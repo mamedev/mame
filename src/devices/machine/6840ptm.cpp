@@ -39,6 +39,7 @@
 #include "6840ptm.h"
 
 //#define VERBOSE 1
+//#define LOG_OUTPUT_STREAM std::cout
 #include "logmacro.h"
 
 

@@ -7,6 +7,7 @@
 *************************************************************************/
 
 #include "machine/eepromser.h"
+#include "machine/timer.h"
 #include "sound/ay8910.h"
 #include "screen.h"
 

@@ -3,6 +3,7 @@
 #include "video/kaneko_spr.h"
 #include "sound/okim6295.h"
 #include "machine/eepromser.h"
+#include "machine/timer.h"
 
 class galpani2_state : public driver_device
 {

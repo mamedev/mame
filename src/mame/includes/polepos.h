@@ -12,6 +12,7 @@
 
 #include "machine/74259.h"
 #include "machine/gen_latch.h"
+#include "machine/timer.h"
 #include "sound/namco.h"
 #include "sound/discrete.h"
 #include "screen.h"

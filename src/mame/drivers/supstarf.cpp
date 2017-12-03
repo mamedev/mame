@@ -11,7 +11,7 @@
 #include "emu.h"
 #include "cpu/i8085/i8085.h"
 #include "cpu/mcs48/mcs48.h"
-#include "machine/gen_latch.h"
+#include "machine/i8212.h"
 #include "sound/ay8910.h"
 #include "speaker.h"
 
@@ -45,7 +45,7 @@ private:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_soundcpu;
 	required_device_array<ay8910_device, 2> m_psg;
-	required_device_array<generic_latch_8_device, 2> m_soundlatch;
+	required_device_array<i8212_device, 2> m_soundlatch;
 
 	u8 m_port1_data;
 	bool m_pcs[2];
@@ -54,7 +54,7 @@ private:
 
 static ADDRESS_MAP_START(main_map, AS_PROGRAM, 8, supstarf_state)
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x8000, 0x8000) AM_DEVREAD("soundlatch1", generic_latch_8_device, read) AM_DEVWRITE("soundlatch2", generic_latch_8_device, write)
+	AM_RANGE(0x8000, 0x8000) AM_DEVREAD("soundlatch1", i8212_device, read) AM_DEVWRITE("soundlatch2", i8212_device, strobe)
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM // 5517 (2Kx8) at IC11
 ADDRESS_MAP_END
 
@@ -102,7 +102,7 @@ WRITE8_MEMBER(supstarf_state::psg_latch_w)
 	}
 
 	if (m_latch_select)
-		m_soundlatch[0]->write(space, 0, data);
+		m_soundlatch[0]->strobe(space, 0, data);
 }
 
 WRITE8_MEMBER(supstarf_state::port1_w)
@@ -177,11 +177,13 @@ static MACHINE_CONFIG_START(supstarf)
 	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(supstarf_state, port2_w))
 	MCFG_MCS48_PORT_T1_IN_CB(READLINE(supstarf_state, phase_detect_r))
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch1")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("maincpu", I8085_RST55_LINE))
+	MCFG_DEVICE_ADD("soundlatch1", I8212, 0)
+	MCFG_I8212_MD_CALLBACK(GND)
+	MCFG_I8212_INT_CALLBACK(INPUTLINE("maincpu", I8085_RST55_LINE))
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("soundcpu", MCS48_INPUT_IRQ))
+	MCFG_DEVICE_ADD("soundlatch2", I8212, 0)
+	MCFG_I8212_MD_CALLBACK(GND)
+	MCFG_I8212_INT_CALLBACK(INPUTLINE("soundcpu", MCS48_INPUT_IRQ))
 	//MCFG_DEVCB_CHAIN_OUTPUT(INPUTLINE("maincpu", I8085_READY_LINE))
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")

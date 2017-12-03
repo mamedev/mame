@@ -84,8 +84,11 @@ machine_static_info::machine_static_info(machine_config const &config, ioport_li
 		m_imperfect_features |= device.type().imperfect_features();
 
 		// look for BIOS options
-		for (rom_entry const &rom : device.rom_region_vector())
-			if (ROMENTRY_ISSYSTEM_BIOS(&rom)) { m_has_bioses = true; break; }
+		for (tiny_rom_entry const *rom = device.rom_region(); !m_has_bioses && rom && !ROMENTRY_ISEND(rom); ++rom)
+		{
+			if (ROMENTRY_ISSYSTEM_BIOS(rom))
+				m_has_bioses = true;
+		}
 
 		// if we don't have ports passed in, build here
 		if (!ports)
@@ -180,7 +183,7 @@ std::string machine_info::warnings_string() const
 		buf << m_machine.rom_load().software_load_warnings_message();
 
 	// if we have at least one warning flag, print the general header
-	if ((m_machine.rom_load().knownbad() > 0) || (machine_flags() & (MACHINE_WARNINGS | MACHINE_BTANB)) || unemulated_features() || imperfect_features())
+	if ((m_machine.rom_load().knownbad() > 0) || (machine_flags() & (MACHINE_ERRORS | MACHINE_WARNINGS | MACHINE_BTANB)) || unemulated_features() || imperfect_features())
 	{
 		if (!buf.str().empty())
 			buf << '\n';

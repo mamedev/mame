@@ -11,6 +11,7 @@
 #include "cpu/m6800/m6800.h"
 #include "sound/hc55516.h"
 #include "machine/ticket.h"
+#include "machine/timer.h"
 #include "machine/watchdog.h"
 #include "machine/6821pia.h"
 #include "machine/bankdev.h"

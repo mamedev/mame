@@ -44,6 +44,9 @@
 #define MCFG_AMD_29F800T_ADD(_tag) \
 	MCFG_DEVICE_ADD(_tag, AMD_29F800T, 0)
 
+#define MCFG_AMD_29F800B_16BIT_ADD(_tag) \
+	MCFG_DEVICE_ADD(_tag, AMD_29F800B_16BIT, 0)
+
 #define MCFG_AMD_29LV200T_ADD(_tag) \
 	MCFG_DEVICE_ADD(_tag, AMD_29LV200T, 0)
 
@@ -130,6 +133,7 @@ public:
 		FLASH_AMD_29F080,
 		FLASH_AMD_29F400T,
 		FLASH_AMD_29F800T,
+		FLASH_AMD_29F800B_16BIT,
 		FLASH_AMD_29LV200T,
 		FLASH_SHARP_LH28F016S,
 		FLASH_SHARP_LH28F016S_16BIT,
@@ -302,6 +306,12 @@ public:
 	amd_29f800t_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
+class amd_29f800b_16bit_device : public intelfsh16_device
+{
+public:
+	amd_29f800b_16bit_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+};
+
 class amd_29lv200t_device : public intelfsh8_device
 {
 public:
@@ -434,6 +444,7 @@ DECLARE_DEVICE_TYPE(AMD_29F040,            amd_29f040_device)
 DECLARE_DEVICE_TYPE(AMD_29F080,            amd_29f080_device)
 DECLARE_DEVICE_TYPE(AMD_29F400T,           amd_29f400t_device)
 DECLARE_DEVICE_TYPE(AMD_29F800T,           amd_29f800t_device)
+DECLARE_DEVICE_TYPE(AMD_29F800B_16BIT,     amd_29f800b_16bit_device)
 DECLARE_DEVICE_TYPE(AMD_29LV200T,          amd_29lv200t_device)
 DECLARE_DEVICE_TYPE(FUJITSU_29F160T,       fujitsu_29f160t_device)
 DECLARE_DEVICE_TYPE(FUJITSU_29F016A,       fujitsu_29f016a_device)

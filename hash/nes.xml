@@ -28297,12 +28297,16 @@
 		<description>Pinball (Euro, Rev. A)</description>
 		<year>1986</year>
 		<publisher>Nintendo</publisher>
-		<info name="serial" value="NES-PN (EEC/NOE/ESP)"/>
+		<info name="serial" value="NES-PN-(EEC/NOE/ESP)"/>
 		<info name="release" value="19860109"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="nrom" />
 			<feature name="pcb" value="NES-NROM-128" />
 			<feature name="mirroring" value="horizontal" />
+			<feature name="pcb_model" value="NES-NROM-128-06" />
+			<feature name="u1" value="U1 PRG" />
+			<feature name="u2" value="U2 CHR" />
+			<feature name="u3" value="U3 CIC" />
 			<dataarea name="prg" size="32768">
 				<rom name="pal-pn-0 prg" size="16384" crc="b8571339" sha1="9fb84f4b9e3eaa1df88be37c679ce20204acef77" offset="00000" />
 				<rom size="16384" offset="0x4000" loadflag="reload" />
@@ -35978,6 +35982,10 @@
 			<feature name="slot" value="nrom" />
 			<feature name="pcb" value="NES-NROM-256" />
 			<feature name="mirroring" value="vertical" />
+			<feature name="pcb_model" value="NES-NROM-256-06" />
+			<feature name="u1" value="U1 PRG" />
+			<feature name="u2" value="U2 CHR" />
+			<feature name="u3" value="U3 CIC" />
 			<dataarea name="prg" size="32768">
 				<rom name="pal-sm-0 prg" size="32768" crc="967a605f" sha1="31b332f6bc338e058a7b958dca285066c405b697" offset="00000" />
 			</dataarea>
@@ -36162,11 +36170,17 @@
 		<description>Super Mario Bros. 2 (Euro)</description>
 		<year>1989</year>
 		<publisher>Nintendo</publisher>
-		<info name="serial" value="NES-MW (EEC/NOE/SCN)"/>
+		<info name="serial" value="NES-MW-(EEC/NOE/SCN/ESP)"/>
 		<info name="release" value="19890428"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="txrom" />
 			<feature name="pcb" value="NES-TSROM" />
+			<feature name="pcb_model" value="NES-TSROM-08" />
+			<feature name="u1" value="U1 PRG" />
+			<feature name="u2" value="U2 CHR" />
+			<feature name="u3" value="U3 CIC" />
+			<feature name="u4" value="U4" /> <!-- Not printed: MMC3B -->
+			<feature name="u5" value="U5 W-RAM" />
 			<feature name="mmc3_type" value="MMC3B" />
 			<dataarea name="prg" size="131072">
 				<rom name="pal-mw-0 prg" size="131072" crc="08af16a0" sha1="f38f8823112e1a33794fe638cdded7efbb98c67a" offset="00000" />
@@ -39865,11 +39879,17 @@
 		<description>Trog! (Euro)</description>
 		<year>1991</year>
 		<publisher>Acclaim Entertainment</publisher>
-		<info name="serial" value="NES-4A (NOE/ESP)"/>
+		<info name="serial" value="NES-4A-(NOE/ESP)"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="uxrom" />
 			<feature name="pcb" value="NES-UNROM" />
 			<feature name="mirroring" value="vertical" />
+			<feature name="pcb_model" value="NES-UNROM-09" />
+			<feature name="u1" value="U1 PRG" />
+			<feature name="u2" value="U2 CHR RAM" />
+			<feature name="u3" value="U3 CIC" />
+			<feature name="u4" value="U4 HC161" />
+			<feature name="u5" value="U5 HC32" />
 			<dataarea name="prg" size="131072">
 				<rom name="pal-4a-0 prg" size="131072" crc="b6b5c372" sha1="60065354f49a9880407e871ad8d9eb6784004cfe" offset="00000" />
 			</dataarea>

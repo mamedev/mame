@@ -250,6 +250,7 @@ void sega8_4pak_device::device_start()
 void sega8_4pak_device::device_reset()
 {
 	memset(m_reg, 0, sizeof(m_reg));
+	memset(m_rom_bank_base, 0, sizeof(m_rom_bank_base));
 }
 
 

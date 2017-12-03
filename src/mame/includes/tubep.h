@@ -62,13 +62,11 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(coin1_counter_w);
 	DECLARE_WRITE_LINE_MEMBER(coin2_counter_w);
 	DECLARE_WRITE8_MEMBER(main_cpu_irq_line_clear_w);
-	DECLARE_WRITE8_MEMBER(tubep_soundlatch_w);
 	DECLARE_WRITE8_MEMBER(second_cpu_irq_line_clear_w);
+	DECLARE_WRITE8_MEMBER(tubep_soundlatch_w);
 	DECLARE_READ8_MEMBER(tubep_soundlatch_r);
 	DECLARE_READ8_MEMBER(tubep_sound_irq_ack);
 	DECLARE_WRITE8_MEMBER(tubep_sound_unknown);
-	DECLARE_WRITE8_MEMBER(rjammer_soundlatch_w);
-	DECLARE_READ8_MEMBER(rjammer_soundlatch_r);
 	DECLARE_WRITE8_MEMBER(rjammer_voice_input_w);
 	DECLARE_WRITE8_MEMBER(rjammer_voice_intensity_control_w);
 	DECLARE_WRITE8_MEMBER(tubep_textram_w);

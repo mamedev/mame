@@ -12,6 +12,7 @@
 #include "cpu/v60/v60.h"
 #include "machine/i8251.h"
 #include "machine/m1comm.h"
+#include "machine/timer.h"
 #include "video/segaic24.h"
 
 #include "screen.h"

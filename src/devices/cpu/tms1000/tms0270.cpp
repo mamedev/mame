@@ -23,7 +23,7 @@ DEFINE_DEVICE_TYPE(TMS0270, tms0270_cpu_device, "tms0270", "TMS0270") // 40-pin 
 
 // internal memory maps
 static ADDRESS_MAP_START(program_11bit_9, AS_PROGRAM, 16, tms1k_base_device)
-	AM_RANGE(0x000, 0xfff) AM_ROM
+	AM_RANGE(0x000, 0x7ff) AM_ROM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(data_144x4, AS_DATA, 8, tms1k_base_device)
@@ -34,7 +34,7 @@ ADDRESS_MAP_END
 
 // device definitions
 tms0270_cpu_device::tms0270_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: tms0980_cpu_device(mconfig, TMS0270, tag, owner, clock, 16 /* o pins */, 16 /* r pins */, 7 /* pc bits */, 9 /* byte width */, 4 /* x width */, 12 /* prg width */, ADDRESS_MAP_NAME(program_11bit_9), 8 /* data width */, ADDRESS_MAP_NAME(data_144x4))
+	: tms0980_cpu_device(mconfig, TMS0270, tag, owner, clock, 16 /* o pins */, 16 /* r pins */, 7 /* pc bits */, 9 /* byte width */, 4 /* x width */, 11 /* prg width */, ADDRESS_MAP_NAME(program_11bit_9), 8 /* data width */, ADDRESS_MAP_NAME(data_144x4))
 	, m_read_ctl(*this)
 	, m_write_ctl(*this)
 	, m_write_pdc(*this)

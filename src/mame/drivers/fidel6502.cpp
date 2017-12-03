@@ -420,6 +420,7 @@ I/O is via TTL, very similar to Designer Display
 #include "machine/6821pia.h"
 #include "machine/i8255.h"
 #include "machine/nvram.h"
+#include "machine/timer.h"
 #include "sound/volt_reg.h"
 #include "speaker.h"
 
@@ -1707,8 +1708,8 @@ static MACHINE_CONFIG_START( sc12 )
 	MCFG_DEVICE_ADD("sc12_map", ADDRESS_MAP_BANK, 0)
 	MCFG_DEVICE_PROGRAM_MAP(sc12_map)
 	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_ADDRESS_MAP_BANK_DATABUS_WIDTH(8)
-	MCFG_ADDRESS_MAP_BANK_ADDRBUS_WIDTH(16)
+	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
+	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(16)
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", fidelbase_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_fidel_sc12)
@@ -2391,4 +2392,4 @@ CONS( 1988, fphantom,   0,        0, fphantom,  fphantom,  fidel6502_state, fpha
 
 CONS( 1990, chesster,   0,        0, chesster,  chesster,  fidel6502_state, chesster, "Fidelity Electronics", "Chesster Challenger (V1.3)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
 CONS( 1990, chesstera,  chesster, 0, chesster,  chesster,  fidel6502_state, chesster, "Fidelity Electronics", "Chesster Challenger", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
-CONS( 1991, kishon,     chesster, 0, kishon,    chesster,  fidel6502_state, chesster, "Fidelity Electronics", "Kishon Chesster", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1991, kishon,     chesster, 0, kishon,    chesster,  fidel6502_state, chesster, "Fidelity Electronics", "Kishon Chesster", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )

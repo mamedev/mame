@@ -340,7 +340,7 @@ void pic8259_device::device_start()
 {
 	// resolve callbacks
 	m_out_int_func.resolve_safe();
-	m_sp_en_func.resolve_safe(1);
+	m_in_sp_func.resolve_safe(1);
 	m_read_slave_ack_func.resolve_safe(0);
 
 	// Register save state items
@@ -395,7 +395,7 @@ void pic8259_device::device_reset()
 	m_vector_addr_low = 0;
 	m_vector_addr_high = 0;
 
-	m_master = m_sp_en_func();
+	m_master = m_in_sp_func();
 }
 
 DEFINE_DEVICE_TYPE(PIC8259, pic8259_device, "pic8259", "Intel 8259 PIC")
@@ -403,7 +403,7 @@ DEFINE_DEVICE_TYPE(PIC8259, pic8259_device, "pic8259", "Intel 8259 PIC")
 pic8259_device::pic8259_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, PIC8259, tag, owner, clock)
 	, m_out_int_func(*this)
-	, m_sp_en_func(*this)
+	, m_in_sp_func(*this)
 	, m_read_slave_ack_func(*this)
 	, m_irr(0)
 	, m_irq_lines(0)

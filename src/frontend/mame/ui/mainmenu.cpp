@@ -99,7 +99,7 @@ void menu_main::populate(float &customtop, float &custombottom)
 		item_append(_("Pseudo terminals"), "", 0, (void *)PTY_INFO);
 
 	if (ui().machine_info().has_bioses())
-		item_append(_("Bios Selection"), "", 0, (void *)BIOS_SELECTION);
+		item_append(_("BIOS Selection"), "", 0, (void *)BIOS_SELECTION);
 
 	/* add slot info menu */
 	if (slot_interface_iterator(machine().root_device()).first() != nullptr)

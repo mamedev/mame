@@ -10,12 +10,12 @@
 
 <softwarelist name="bbc_flop_80186" description="80186 Co-Processor Discs">
 
-	<software name="m512sys" supported="no">
+	<software name="m512sys">
 		<description>BBC Master 512 System Discs</description>
 		<year>1986</year>
 		<publisher>Acorn Computers</publisher>
 		<info name="format" value="ADFS-DOS" />
-		<info name="compatibility" value="80186 co-processor" />
+		<info name="usage" value="Requires 80186 co-processor" />
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="DOS Plus Boot v2.1"/>
 			<dataarea name="flop" size="655360">
@@ -54,12 +54,26 @@
 		</part>
 	</software>
 
-	<software name="dabs1" supported="no">
+	<software name="m512tg">
+		<description>Master 512 Technical Guide Programs</description>
+		<year>1989</year>
+		<publisher>Dabs Press</publisher>
+		<info name="format" value="DOS+" />
+		<info name="usage" value="Requires 80186 co-processor" />
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Programs Disc"/>
+			<dataarea name="flop" size="819200">
+				<rom name="M512 Technical Guide.img" size="819200" crc="e5b6f16f" sha1="58fd80094fcaa8738f40c8d63f8d93165dad4c5a" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dabs1">
 		<description>Dabs Shareware Vol.1</description>
 		<year>1988</year>
 		<publisher>Dabs Press</publisher>
 		<info name="format" value="DOS+" />
-		<info name="compatibility" value="80186 co-processor" />
+		<info name="usage" value="Requires 80186 co-processor" />
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disc 1 - Word Processing"/>
 			<dataarea name="flop" size="819200">
@@ -92,12 +106,12 @@
 		</part>
 	</software>
 
-	<software name="dabs2" supported="no">
+	<software name="dabs2">
 		<description>Dabs Shareware Vol.2</description>
 		<year>1988</year>
 		<publisher>Dabs Press</publisher>
 		<info name="format" value="DOS+" />
-		<info name="compatibility" value="80186 co-processor" />
+		<info name="usage" value="Requires 80186 co-processor" />
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disc 1"/>
 			<dataarea name="flop" size="819200">

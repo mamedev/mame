@@ -495,6 +495,7 @@ expect that the software reads these once on startup only.
 #include "cpu/mcs48/mcs48.h"
 #include "machine/i8255.h"
 #include "machine/i8243.h"
+#include "machine/timer.h"
 #include "machine/z80pio.h"
 #include "sound/beep.h"
 #include "sound/volt_reg.h"

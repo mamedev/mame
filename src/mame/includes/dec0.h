@@ -28,6 +28,7 @@ public:
 		m_tilegen3(*this, "tilegen3"),
 		m_spritegen(*this, "spritegen"),
 		m_pfprotect(*this, "pfprotect"),
+		m_sndprotect(*this, "sndprotect"),
 		m_soundlatch(*this, "soundlatch"),
 		m_ram(*this, "ram"),
 		m_spriteram(*this, "spriteram"),
@@ -45,6 +46,7 @@ public:
 	optional_device<deco_bac06_device> m_tilegen3;
 	optional_device<deco_mxc06_device> m_spritegen;
 	optional_device<address_map_bank_device> m_pfprotect;
+	optional_device<address_map_bank_device> m_sndprotect;
 	required_device<generic_latch_8_device> m_soundlatch;
 
 	required_shared_ptr<uint16_t> m_ram;
@@ -57,6 +59,7 @@ public:
 	uint16_t m_i8751_return;
 	uint16_t m_i8751_command;
 	int m_slyspy_state;
+	int m_slyspy_sound_state;
 	int m_hippodrm_msb;
 	int m_hippodrm_lsb;
 	uint8_t m_i8751_ports[4];
@@ -64,14 +67,12 @@ public:
 	uint16_t m_pri;
 
 	DECLARE_WRITE16_MEMBER(dec0_control_w);
-	DECLARE_WRITE16_MEMBER(slyspy_control_w);
 	DECLARE_WRITE16_MEMBER(midres_sound_w);
 	DECLARE_READ16_MEMBER(slyspy_controls_r);
 	DECLARE_READ16_MEMBER(slyspy_protection_r);
 	DECLARE_WRITE16_MEMBER(slyspy_state_w);
 	DECLARE_READ16_MEMBER(slyspy_state_r);
 	DECLARE_READ16_MEMBER(dec0_controls_r);
-	DECLARE_READ16_MEMBER(dec0_rotary_r);
 	DECLARE_READ16_MEMBER(midres_controls_r);
 	DECLARE_READ8_MEMBER(hippodrm_prot_r);
 	DECLARE_WRITE8_MEMBER(hippodrm_prot_w);
@@ -85,6 +86,9 @@ public:
 	DECLARE_WRITE16_MEMBER(dec0_update_sprites_w);
 	DECLARE_WRITE16_MEMBER(dec0_priority_w);
 	DECLARE_READ16_MEMBER(ffantasybl_242024_r);
+
+	DECLARE_READ8_MEMBER(slyspy_sound_state_r);
+	DECLARE_READ8_MEMBER(slyspy_sound_state_reset_r);
 
 	DECLARE_DRIVER_INIT(robocop);
 	DECLARE_DRIVER_INIT(hippodrm);

@@ -20,19 +20,24 @@
 
     ToDo:
     - Newer ROM set from Team Europe and try to work out the graphics expansion
-    - uPD765 oddness that prevents Disk BASIC from loading
 
 ***************************************************************************/
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "imagedev/cassette.h"
+#include "formats/pc_dsk.h"
+#include "formats/dsk_dsk.h"
+#include "formats/td0_dsk.h"
 #include "machine/clock.h"
 #include "machine/i8251.h"
 #include "machine/ram.h"
 #include "machine/bankdev.h"
 #include "machine/upd765.h"
 #include "machine/i8257.h"
+#include "machine/timer.h"
+#include "bus/generic/carts.h"
+#include "bus/generic/slot.h"
 #include "sound/beep.h"
 #include "sound/wave.h"
 #include "video/mc6845.h"
@@ -69,6 +74,7 @@ public:
 		, m_fdc(*this, "fdc")
 		, m_dmac(*this, "dmac")
 		, m_config(*this, "CONFIG")
+		, m_cart(*this, "cartslot")
 	{ }
 
 	DECLARE_READ8_MEMBER (ram0000_r);
@@ -88,13 +94,16 @@ public:
 	DECLARE_WRITE8_MEMBER(portf0_w);
 	DECLARE_INPUT_CHANGED_MEMBER(alphatro_break);
 	DECLARE_WRITE_LINE_MEMBER(txdata_callback);
-	DECLARE_WRITE_LINE_MEMBER(write_usart_clock);
 	DECLARE_WRITE_LINE_MEMBER(hrq_w);
 	DECLARE_WRITE_LINE_MEMBER(fdc_irq_w);
 	DECLARE_PALETTE_INIT(alphatro);
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_c);
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_p);
 	MC6845_UPDATE_ROW(crtc_update_row);
+
+	image_init_result load_cart(device_image_interface &image, generic_slot_device *slot);
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load) { return load_cart(image, m_cart); }
+	DECLARE_FLOPPY_FORMATS( floppy_formats );
 
 private:
 	uint8_t *m_ram_ptr;
@@ -121,6 +130,7 @@ private:
 	required_device<upd765a_device> m_fdc;
 	required_device<i8257_device> m_dmac;
 	required_ioport m_config;
+	required_device<generic_slot_device> m_cart;
 };
 
 void alphatro_state::update_banking()
@@ -172,6 +182,7 @@ READ8_MEMBER (alphatro_state::ram0000_r)
 
 WRITE8_MEMBER(alphatro_state::ram0000_w)
 {
+
 	if (offset < 0xf000)
 	{
 		m_ram_ptr[offset] = data;
@@ -314,12 +325,6 @@ WRITE_LINE_MEMBER( alphatro_state::txdata_callback )
 	m_cass_state = state;
 }
 
-WRITE_LINE_MEMBER( alphatro_state::write_usart_clock )
-{
-	m_usart->write_txc(state);
-	m_usart->write_rxc(state);
-}
-
 MC6845_UPDATE_ROW( alphatro_state::crtc_update_row )
 {
 	const rgb_t *pens = m_palette->palette()->entry_list_raw();
@@ -392,7 +397,7 @@ static ADDRESS_MAP_START( rombank_map, AS_PROGRAM, 8, alphatro_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( cartbank_map, AS_PROGRAM, 8, alphatro_state )
-	AM_RANGE(0x0000, 0x3fff) AM_ROM AM_REGION("cart", 0x0000)
+	AM_RANGE(0x0000, 0x3fff) AM_DEVREAD("cartslot", generic_slot_device, read_rom) AM_WRITE(rama000_w)
 	AM_RANGE(0x4000, 0x7fff) AM_READWRITE(rama000_r, rama000_w)
 ADDRESS_MAP_END
 
@@ -591,6 +596,30 @@ void alphatro_state::machine_reset()
 	m_beep->set_state(0);
 }
 
+image_init_result alphatro_state::load_cart(device_image_interface &image, generic_slot_device *slot)
+{
+	uint32_t size = slot->common_get_size("rom");
+
+	if ((size != 0x4000) && (size != 0x2000))
+	{
+		image.seterror(IMAGE_ERROR_UNSUPPORTED, "Invalid size, must be 8 or 16 K" );
+		return image_init_result::FAIL;
+	}
+
+	slot->rom_alloc(0x4000, GENERIC_ROM8_WIDTH, ENDIANNESS_BIG);
+
+	if (size == 0x4000) // 16K ROMs come in at 0xA000
+	{
+		slot->common_load_rom(slot->get_rom_base(), size, "rom");
+	}
+	else    // load 8K ROMs at an offset of 8K so they end up at 0xC000
+	{
+		slot->common_load_rom(slot->get_rom_base()+0x2000, size, "rom");
+	}
+
+	return image_init_result::PASS;
+}
+
 PALETTE_INIT_MEMBER(alphatro_state, alphatro)
 {
 	// RGB colours
@@ -648,6 +677,11 @@ WRITE_LINE_MEMBER(alphatro_state::hrq_w)
 	m_dmac->hlda_w(state);
 }
 
+FLOPPY_FORMATS_MEMBER( alphatro_state::floppy_formats )
+	FLOPPY_DSK_FORMAT,
+	FLOPPY_PC_FORMAT
+FLOPPY_FORMATS_END
+
 static SLOT_INTERFACE_START( alphatro_floppies )
 	SLOT_INTERFACE( "525dd", FLOPPY_525_DD )
 SLOT_INTERFACE_END
@@ -680,8 +714,9 @@ static MACHINE_CONFIG_START( alphatro )
 	MCFG_UPD765A_ADD("fdc", true, true)
 	MCFG_UPD765_INTRQ_CALLBACK(WRITELINE(alphatro_state, fdc_irq_w))
 	MCFG_UPD765_DRQ_CALLBACK(DEVWRITELINE("dmac", i8257_device, dreq2_w))
-	MCFG_FLOPPY_DRIVE_ADD("fdc:0", alphatro_floppies, "525dd", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:1", alphatro_floppies, "525dd", floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:0", alphatro_floppies, "525dd", alphatro_state::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:1", alphatro_floppies, "525dd", alphatro_state::floppy_formats)
+	MCFG_SOFTWARE_LIST_ADD("flop_list", "alphatro_flop")
 
 	MCFG_DEVICE_ADD("dmac" , I8257, MAIN_CLOCK)
 	MCFG_I8257_OUT_HRQ_CB(WRITELINE(alphatro_state, hrq_w))
@@ -700,11 +735,13 @@ static MACHINE_CONFIG_START( alphatro )
 	MCFG_I8251_TXD_HANDLER(WRITELINE(alphatro_state, txdata_callback))
 
 	MCFG_DEVICE_ADD("usart_clock", CLOCK, 19218) // 19218 to load a real tape, 19222 to load a tape made by this driver
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(alphatro_state, write_usart_clock))
+	MCFG_CLOCK_SIGNAL_HANDLER(DEVWRITELINE("usart", i8251_device, write_txc))
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("usart", i8251_device, write_rxc))
 
 	MCFG_CASSETTE_ADD("cassette")
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_PLAY | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED)
 	MCFG_CASSETTE_INTERFACE("alphatro_cass")
+	MCFG_SOFTWARE_LIST_ADD("cass_list","alphatro_cass")
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer_c", alphatro_state, timer_c, attotime::from_hz(4800))
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer_p", alphatro_state, timer_p, attotime::from_hz(40000))
@@ -712,29 +749,32 @@ static MACHINE_CONFIG_START( alphatro )
 	MCFG_RAM_ADD("ram")
 	MCFG_RAM_DEFAULT_SIZE("64K")
 
+	/* cartridge */
+	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "alphatro_cart")
+	MCFG_GENERIC_EXTENSIONS("bin")
+	MCFG_GENERIC_LOAD(alphatro_state, cart_load)
+	MCFG_SOFTWARE_LIST_ADD("cart_list","alphatro_cart")
+
 	/* 0000 banking */
 	MCFG_DEVICE_ADD("lowbank", ADDRESS_MAP_BANK, 0)
 	MCFG_DEVICE_PROGRAM_MAP(rombank_map)
 	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_BIG)
-	MCFG_ADDRESS_MAP_BANK_DATABUS_WIDTH(8)
+	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
 	MCFG_ADDRESS_MAP_BANK_STRIDE(0x6000)
 
 	/* A000 banking */
 	MCFG_DEVICE_ADD("cartbank", ADDRESS_MAP_BANK, 0)
 	MCFG_DEVICE_PROGRAM_MAP(cartbank_map)
 	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_BIG)
-	MCFG_ADDRESS_MAP_BANK_DATABUS_WIDTH(8)
+	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
 	MCFG_ADDRESS_MAP_BANK_STRIDE(0x4000)
 
 	/* F000 banking */
 	MCFG_DEVICE_ADD("monbank", ADDRESS_MAP_BANK, 0)
 	MCFG_DEVICE_PROGRAM_MAP(monbank_map)
 	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_BIG)
-	MCFG_ADDRESS_MAP_BANK_DATABUS_WIDTH(8)
+	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
 	MCFG_ADDRESS_MAP_BANK_STRIDE(0x1000)
-
-	// software list
-	MCFG_SOFTWARE_LIST_ADD("flop_list", "alphatro_flop")
 MACHINE_CONFIG_END
 
 
@@ -746,13 +786,19 @@ MACHINE_CONFIG_END
 
 ROM_START( alphatro )
 	ROM_REGION( 0xa000, "roms", ROMREGION_ERASE00)
-	ROM_LOAD( "613256.ic-1058", 0x0000, 0x6000, CRC(ceea4cb3) SHA1(b332dea0a2d3bb2978b8422eb0723960388bb467) )
-	ROM_LOAD( "2764.ic-1038",   0x8000, 0x2000, CRC(e337db3b) SHA1(6010bade6a21975636383179903b58a4ca415e49) )
+	ROM_SYSTEM_BIOS( 0, "default", "Alphatronic with Bicom graphics" )
+	ROMX_LOAD( "0_b4-6_ic1038.bin", 0x008000, 0x002000, CRC(e337db3b) SHA1(6010bade6a21975636383179903b58a4ca415e49), ROM_BIOS(1) )
+	ROMX_LOAD( "1_b4-3_ic1058.bin", 0x000000, 0x002000, CRC(1509b15a) SHA1(225c36411de680eb8f4d6b58869460a58e60c0cf), ROM_BIOS(1) )
+	ROMX_LOAD( "2_b4-3_ic1046.bin", 0x002000, 0x002000, CRC(998a865d) SHA1(294fe64e839ae6c4032d5db1f431c35e0d80d367), ROM_BIOS(1) )
+	ROMX_LOAD( "3_b4-3_ic1037.bin", 0x004000, 0x002000, CRC(55cbafef) SHA1(e3376b92f80d5a698cdcb2afaa0f3ef4341dd624), ROM_BIOS(1) )
 
-	ROM_REGION( 0x4000, "cart", ROMREGION_ERASE00)
+	ROM_SYSTEM_BIOS( 1, "orig", "Plain Alphatronic")
+	ROMX_LOAD( "613256.ic-1058", 0x0000, 0x6000, CRC(ceea4cb3) SHA1(b332dea0a2d3bb2978b8422eb0723960388bb467), ROM_BIOS(2) )
+	ROMX_LOAD( "2764.ic-1038",   0x8000, 0x2000, CRC(e337db3b) SHA1(6010bade6a21975636383179903b58a4ca415e49), ROM_BIOS(2) )
 
 	ROM_REGION( 0x1000, "chargen", 0 )
-	ROM_LOAD( "2732.ic-1067",   0x0000, 0x1000, CRC(61f38814) SHA1(35ba31c58a10d5bd1bdb202717792ca021dbe1a8) )
+	ROMX_LOAD( "4_b4-0_ic1067.bin", 0x000000, 0x001000, CRC(00796934) SHA1(8e70f77cfe3eb2ec2051f660518da5c9d409119a), ROM_BIOS(1) )
+	ROMX_LOAD( "2732.ic-1067",   0x0000, 0x1000, CRC(61f38814) SHA1(35ba31c58a10d5bd1bdb202717792ca021dbe1a8), ROM_BIOS(2) )
 ROM_END
 
-COMP( 1983, alphatro,   0,       0,    alphatro,   alphatro, alphatro_state,  0,  "Triumph-Adler", "Alphatronic PC", MACHINE_SUPPORTS_SAVE )
+COMP( 1983, alphatro,   0,        0,    alphatro,   alphatro, alphatro_state,  0,  "Triumph-Adler", "Alphatronic PC", MACHINE_SUPPORTS_SAVE )

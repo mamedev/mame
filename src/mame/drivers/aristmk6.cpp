@@ -26,7 +26,7 @@ notes:
 */
 
 #include "emu.h"
-#include "cpu/sh4/sh4.h"
+#include "cpu/sh/sh4.h"
 #include "machine/ins8250.h"
 #include "machine/eepromser.h"
 #include "screen.h"
@@ -334,6 +334,7 @@ static MACHINE_CONFIG_START( aristmk6 )
 	MCFG_CPU_PROGRAM_MAP(aristmk6_map)
 	MCFG_CPU_IO_MAP(aristmk6_port)
 	MCFG_MMU_HACK_TYPE(2)
+	MCFG_CPU_FORCE_NO_DRC()
 //  MCFG_DEVICE_DISABLE()
 
 	MCFG_DEVICE_ADD( "uart0", NS16550, XTAL_8MHz )

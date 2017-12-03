@@ -11,6 +11,7 @@
 
 #include "emu.h"
 #include "tp0320.h"
+#include "tms1k_dasm.h"
 #include "debugger.h"
 
 // TP0320 is TI's first CMOS MCU with integrated LCD controller, the die is still very similar to TMS0980
@@ -27,7 +28,7 @@ DEFINE_DEVICE_TYPE(TP0320, tp0320_cpu_device, "tp0320", "TP0320") // 28-pin SDIP
 
 // internal memory maps
 static ADDRESS_MAP_START(program_11bit_9, AS_PROGRAM, 16, tms1k_base_device)
-	AM_RANGE(0x000, 0xfff) AM_ROM
+	AM_RANGE(0x000, 0x7ff) AM_ROM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(data_192x4, AS_DATA, 8, tms1k_base_device)
@@ -38,7 +39,7 @@ ADDRESS_MAP_END
 
 // device definitions
 tp0320_cpu_device::tp0320_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: tms0980_cpu_device(mconfig, TP0320, tag, owner, clock, 7 /* o pins */, 10 /* r pins */, 7 /* pc bits */, 9 /* byte width */, 4 /* x width */, 12 /* prg width */, ADDRESS_MAP_NAME(program_11bit_9), 8 /* data width */, ADDRESS_MAP_NAME(data_192x4))
+	: tms0980_cpu_device(mconfig, TP0320, tag, owner, clock, 7 /* o pins */, 10 /* r pins */, 7 /* pc bits */, 9 /* byte width */, 4 /* x width */, 11 /* prg width */, ADDRESS_MAP_NAME(program_11bit_9), 8 /* data width */, ADDRESS_MAP_NAME(data_192x4))
 {
 }
 
@@ -55,10 +56,9 @@ MACHINE_CONFIG_END
 
 
 // disasm
-offs_t tp0320_cpu_device::disasm_disassemble(std::ostream &stream, offs_t pc, const u8 *oprom, const u8 *opram, u32 options)
+util::disasm_interface *tp0320_cpu_device::create_disassembler()
 {
-	extern CPU_DISASSEMBLE(tp0320);
-	return CPU_DISASSEMBLE_NAME(tp0320)(this, stream, pc, oprom, opram, options);
+	return new tp0320_disassembler;
 }
 
 

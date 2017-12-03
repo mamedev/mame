@@ -106,6 +106,13 @@ READ8_MEMBER(atm_state::beta_disable_r)
 	return m_program->read_byte(offset + 0x4000);
 }
 
+static ADDRESS_MAP_START(atm_mem, AS_PROGRAM, 8, atm_state)
+	AM_RANGE(0x0000, 0x3fff) AM_ROMBANK("bank1")
+	AM_RANGE(0x4000, 0x7fff) AM_RAMBANK("bank2")
+	AM_RANGE(0x8000, 0xbfff) AM_RAMBANK("bank3")
+	AM_RANGE(0xc000, 0xffff) AM_RAMBANK("bank4")
+ADDRESS_MAP_END
+
 static ADDRESS_MAP_START (atm_io, AS_IO, 8, atm_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x001f, 0x001f) AM_DEVREADWRITE(BETA_DISK_TAG, beta_disk_device, status_r, command_w) AM_MIRROR(0xff00)
@@ -173,6 +180,7 @@ GFXDECODE_END
 
 static MACHINE_CONFIG_DERIVED( atm, spectrum_128 )
 	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(atm_mem)
 	MCFG_CPU_IO_MAP(atm_io)
 	MCFG_CPU_DECRYPTED_OPCODES_MAP(atm_switch)
 	MCFG_MACHINE_RESET_OVERRIDE(atm_state, atm )
@@ -180,6 +188,8 @@ static MACHINE_CONFIG_DERIVED( atm, spectrum_128 )
 	MCFG_BETA_DISK_ADD(BETA_DISK_TAG)
 
 	MCFG_GFXDECODE_MODIFY("gfxdecode", atm)
+
+	MCFG_DEVICE_REMOVE("exp")
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( atmtb2, atm )

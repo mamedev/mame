@@ -398,6 +398,11 @@ bool dsk_format::load(io_generic *io, uint32_t form_factor, floppy_image *image)
 				continue;
 			track_header tr;
 			io_generic_read(io, &tr,track_offsets[(track<<1)+side],sizeof(tr));
+
+			// skip if there are no sectors in this track
+			if (tr.number_of_sector == 0)
+				continue;
+
 			desc_pc_sector sects[256];
 			uint8_t sect_data[65536];
 			int sdatapos = 0;

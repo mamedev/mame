@@ -1081,10 +1081,8 @@ static ADDRESS_MAP_START( muskeys_map, AS_PROGRAM, 8, cmi_state)
 	AM_RANGE(0x0000, 0x007f) AM_RAM
 	AM_RANGE(0x0080, 0x0083) AM_DEVREADWRITE("cmi10_pia_u21", pia6821_device, read, write)
 	AM_RANGE(0x0090, 0x0093) AM_DEVREADWRITE("cmi10_pia_u20", pia6821_device, read, write)
-	AM_RANGE(0x00a0, 0x00a0) AM_DEVREADWRITE("acia_mkbd_kbd", acia6850_device, status_r, control_w)
-	AM_RANGE(0x00a1, 0x00a1) AM_DEVREADWRITE("acia_mkbd_kbd", acia6850_device, data_r, data_w)
-	AM_RANGE(0x00b0, 0x00b0) AM_DEVREADWRITE("acia_mkbd_cmi", acia6850_device, status_r, control_w)
-	AM_RANGE(0x00b1, 0x00b1) AM_DEVREADWRITE("acia_mkbd_cmi", acia6850_device, data_r, data_w)
+	AM_RANGE(0x00a0, 0x00a1) AM_DEVREADWRITE("acia_mkbd_kbd", acia6850_device, read, write)
+	AM_RANGE(0x00b0, 0x00b1) AM_DEVREADWRITE("acia_mkbd_cmi", acia6850_device, read, write)
 	AM_RANGE(0x4000, 0x47ff) AM_RAM
 	AM_RANGE(0xb000, 0xb400) AM_ROM
 	AM_RANGE(0xf000, 0xffff) AM_ROM
@@ -2781,11 +2779,11 @@ static MACHINE_CONFIG_START( cmi2x )
 	MCFG_MSM5832_ADD("msm5832", XTAL_32_768kHz)
 
 	MCFG_DEVICE_ADD("i8214_1", I8214, 1000000) // cmi_8214_intf_1
-	MCFG_I8214_IRQ_CALLBACK(WRITELINE(cmi_state, i8214_1_int_w))
+	MCFG_I8214_INT_CALLBACK(WRITELINE(cmi_state, i8214_1_int_w))
 	MCFG_DEVICE_ADD("i8214_2", I8214, 1000000) // cmi_8214_intf_2
-	MCFG_I8214_IRQ_CALLBACK(WRITELINE(cmi_state, i8214_2_int_w))
+	MCFG_I8214_INT_CALLBACK(WRITELINE(cmi_state, i8214_2_int_w))
 	MCFG_DEVICE_ADD("i8214_3", I8214, 1000000) // cmi_8214_intf_3
-	MCFG_I8214_IRQ_CALLBACK(WRITELINE(cmi_state, i8214_3_int_w))
+	MCFG_I8214_INT_CALLBACK(WRITELINE(cmi_state, i8214_3_int_w))
 	MCFG_I8214_ENLG_CALLBACK(WRITELINE(cmi_state, i8214_3_enlg))
 
 	MCFG_DEVICE_ADD("q133_pia_1", PIA6821, 0) // pia_q133_1_config
@@ -2854,7 +2852,7 @@ static MACHINE_CONFIG_START( cmi2x )
 	MCFG_ACIA6850_RTS_HANDLER(DEVWRITELINE("ank_pia", pia6821_device, ca2_w))
 	MCFG_ACIA6850_IRQ_HANDLER(WRITELINE(cmi_state, mkbd_kbd_acia_int))
 
-	MCFG_INPUT_MERGER_ACTIVE_HIGH("irqs")
+	MCFG_INPUT_MERGER_ANY_HIGH("irqs")
 	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("alphakeys", M6802_IRQ_LINE))
 
 	MCFG_DEVICE_MODIFY("ank_pia")

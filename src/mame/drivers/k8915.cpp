@@ -2,17 +2,20 @@
 // copyright-holders:Miodrag Milanovic, Robbbert
 /***************************************************************************
 
-        Robotron K8915
+Robotron K8915
 
-        30/08/2010 Skeleton driver
+2010-08-30
 
-        When it says DIAGNOSTIC RAZ P, press enter.
+When it says DIAGNOSTIC RAZ P, press enter.
 
 ****************************************************************************/
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "machine/keyboard.h"
+#include "machine/z80ctc.h"
+#include "machine/z80sio.h"
+#include "machine/clock.h"
+#include "bus/rs232/rs232.h"
 #include "screen.h"
 
 class k8915_state : public driver_device
@@ -23,38 +26,20 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_p_videoram(*this, "videoram")
 		, m_p_chargen(*this, "chargen")
-	{
-	}
+	{ }
 
-	DECLARE_READ8_MEMBER(k8915_52_r);
-	DECLARE_READ8_MEMBER(k8915_53_r);
 	DECLARE_WRITE8_MEMBER(k8915_a8_w);
-	void kbd_put(u8 data);
 	DECLARE_DRIVER_INIT(k8915);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 private:
 	uint8_t m_framecnt;
-	uint8_t m_term_data;
 	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
 	required_shared_ptr<uint8_t> m_p_videoram;
 	required_region_ptr<u8> m_p_chargen;
 };
 
-READ8_MEMBER( k8915_state::k8915_52_r )
-{
-// get data from ascii keyboard
-	uint8_t ret = m_term_data;
-	m_term_data = 0;
-	return ret;
-}
-
-READ8_MEMBER( k8915_state::k8915_53_r )
-{
-// keyboard status
-	return m_term_data ? 1 : 0;
-}
 
 WRITE8_MEMBER( k8915_state::k8915_a8_w )
 {
@@ -65,17 +50,17 @@ WRITE8_MEMBER( k8915_state::k8915_a8_w )
 		membank("boot")->set_entry(1); // rom at 0000
 }
 
-static ADDRESS_MAP_START(k8915_mem, AS_PROGRAM, 8, k8915_state)
+static ADDRESS_MAP_START(mem_map, AS_PROGRAM, 8, k8915_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x0fff) AM_RAMBANK("boot")
 	AM_RANGE(0x1000, 0x17ff) AM_RAM AM_SHARE("videoram")
 	AM_RANGE(0x1800, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(k8915_io, AS_IO, 8, k8915_state)
+static ADDRESS_MAP_START(io_map, AS_IO, 8, k8915_state)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x52, 0x52) AM_READ(k8915_52_r)
-	AM_RANGE(0x53, 0x53) AM_READ(k8915_53_r)
+	AM_RANGE(0x50, 0x53) AM_DEVREADWRITE("sio", z80sio_device, ba_cd_r, ba_cd_w)
+	AM_RANGE(0x58, 0x5b) AM_DEVREADWRITE("ctc", z80ctc_device, read, write)
 	AM_RANGE(0xa8, 0xa8) AM_WRITE(k8915_a8_w)
 ADDRESS_MAP_END
 
@@ -140,16 +125,12 @@ uint32_t k8915_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 	return 0;
 }
 
-void k8915_state::kbd_put(u8 data)
-{
-	m_term_data = data;
-}
 
 static MACHINE_CONFIG_START( k8915 )
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_16MHz / 4)
-	MCFG_CPU_PROGRAM_MAP(k8915_mem)
-	MCFG_CPU_IO_MAP(k8915_io)
+	MCFG_CPU_ADD("maincpu", Z80, XTAL_4_9152MHz / 2)
+	MCFG_CPU_PROGRAM_MAP(mem_map)
+	MCFG_CPU_IO_MAP(io_map)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green())
@@ -162,8 +143,21 @@ static MACHINE_CONFIG_START( k8915 )
 
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
-	MCFG_DEVICE_ADD("keyboard", GENERIC_KEYBOARD, 0)
-	MCFG_GENERIC_KEYBOARD_CB(PUT(k8915_state, kbd_put))
+	MCFG_DEVICE_ADD("ctc_clock", CLOCK, XTAL_4_9152MHz / 2)
+	MCFG_CLOCK_SIGNAL_HANDLER(DEVWRITELINE("ctc", z80ctc_device, trg2))
+
+	MCFG_DEVICE_ADD("ctc", Z80CTC, XTAL_4_9152MHz / 2)
+	MCFG_Z80CTC_ZC2_CB(DEVWRITELINE("sio", z80sio_device, rxtxcb_w))
+
+	MCFG_DEVICE_ADD("sio", Z80SIO, XTAL_4_9152MHz / 2)
+	MCFG_Z80SIO_OUT_TXDB_CB(DEVWRITELINE("rs232", rs232_port_device, write_txd))
+	MCFG_Z80SIO_OUT_DTRB_CB(DEVWRITELINE("rs232", rs232_port_device, write_dtr))
+	MCFG_Z80SIO_OUT_RTSB_CB(DEVWRITELINE("rs232", rs232_port_device, write_rts))
+
+	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, "keyboard")
+	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("sio", z80sio_device, rxb_w))
+	MCFG_RS232_DCD_HANDLER(DEVWRITELINE("sio", z80sio_device, dcdb_w))
+	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("sio", z80sio_device, ctsb_w))
 MACHINE_CONFIG_END
 
 

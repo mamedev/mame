@@ -93,6 +93,7 @@
 #include "cpu/hmcs40/hmcs40.h"
 #include "cpu/cop400/cop400.h"
 #include "machine/gen_latch.h"
+#include "machine/timer.h"
 #include "sound/spkrdev.h"
 #include "rendlay.h"
 #include "screen.h"

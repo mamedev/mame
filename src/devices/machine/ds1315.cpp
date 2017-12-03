@@ -1,11 +1,15 @@
 // license:BSD-3-Clause
-// copyright-holders:Tim Lindner
+// copyright-holders:Tim Lindner, R. Belmont
 /*****************************************************************************************
 
-    ds1315.c
+    ds1315.cpp
 
     Dallas Semiconductor's Phantom Time Chip DS1315.
     NOTE: writes are decoded, but the host's time will always be returned when asked.
+
+    November 2017: R. Belmont added capability to emulate DS1216 and other DS121x
+    parts where the clock sits in the same place as a ROM.  The backing callback
+    returns the ROM contents when the RTC is locked.
 
     April 2015: chip enable / chip reset / phantom writes by Karl-Ludwig Deisenhofer
 
@@ -29,7 +33,10 @@
 DEFINE_DEVICE_TYPE(DS1315, ds1315_device, "ds1315", "Dallas DS1315 Phantom Time Chip")
 
 ds1315_device::ds1315_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, DS1315, tag, owner, clock), m_mode(), m_count(0)
+	: device_t(mconfig, DS1315, tag, owner, clock),
+	m_backing_read(*this),
+	m_mode(),
+	m_count(0)
 {
 }
 
@@ -39,6 +46,8 @@ ds1315_device::ds1315_device(const machine_config &mconfig, const char *tag, dev
 
 void ds1315_device::device_start()
 {
+	m_backing_read.resolve_safe(0xff);
+
 	save_item(NAME(m_count));
 	save_item(NAME(m_mode));
 	save_item(NAME(m_raw_data));
@@ -77,6 +86,37 @@ static const uint8_t ds1315_pattern[] =
     IMPLEMENTATION
 ***************************************************************************/
 
+// automated read, does all the work the real Dallas chip does
+READ8_MEMBER( ds1315_device::read )
+{
+	if (m_mode == DS_SEEK_MATCHING)
+	{
+		if (offset & 1)
+		{
+			read_1(space, 0);
+		}
+		else
+		{
+			read_0(space, 0);
+		}
+
+		if (offset & 4)
+		{
+			m_count = 0;
+			m_mode = DS_SEEK_MATCHING;
+		}
+
+		return m_backing_read(offset);
+	}
+	else if (m_mode == DS_CALENDAR_IO)
+	{
+		return read_data(space, offset);
+	}
+
+	return 0xff;    // shouldn't happen, but compilers don't know that
+}
+
+
 /*-------------------------------------------------
  read_0 (actual data)
  -------------------------------------------------*/
@@ -92,7 +132,6 @@ READ8_MEMBER( ds1315_device::read_0 )
 			m_mode = DS_CALENDAR_IO;
 			fill_raw_data();
 		}
-
 		return 0;
 	}
 
@@ -246,7 +285,7 @@ void ds1315_device::input_raw_data()
 	raw[6] = bcd_2_dec(raw[6]); // month
 	raw[7] = bcd_2_dec(raw[7]); // year (two digits)
 
-	printf("\nDS1315 RTC INPUT (WILL BE IGNORED) mm/dd/yy  hh:mm:ss - %02d/%02d/%02d %02d/%02d/%02d",
+	logerror("\nDS1315 RTC INPUT (WILL BE IGNORED) mm/dd/yy  hh:mm:ss - %02d/%02d/%02d %02d/%02d/%02d",
 				raw[6], raw[5], raw[7], raw[3], raw[2], raw[1]
 			);
 }

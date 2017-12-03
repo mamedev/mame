@@ -8,6 +8,7 @@
 
 ***************************************************************************/
 
+#include "machine/timer.h"
 #include "sound/cem3394.h"
 #include "screen.h"
 
@@ -144,7 +145,14 @@ public:
 	DECLARE_READ8_MEMBER(balsente_random_num_r);
 	DECLARE_WRITE8_MEMBER(balsente_rombank_select_w);
 	DECLARE_WRITE8_MEMBER(balsente_rombank2_select_w);
-	DECLARE_WRITE8_MEMBER(balsente_misc_output_w);
+	DECLARE_WRITE_LINE_MEMBER(out0_w);
+	DECLARE_WRITE_LINE_MEMBER(out1_w);
+	DECLARE_WRITE_LINE_MEMBER(out2_w);
+	DECLARE_WRITE_LINE_MEMBER(out3_w);
+	DECLARE_WRITE_LINE_MEMBER(out4_w);
+	DECLARE_WRITE_LINE_MEMBER(out5_w);
+	DECLARE_WRITE_LINE_MEMBER(out6_w);
+	DECLARE_WRITE_LINE_MEMBER(nvrecall_w);
 	DECLARE_READ8_MEMBER(balsente_m6850_r);
 	DECLARE_WRITE8_MEMBER(balsente_m6850_w);
 	DECLARE_READ8_MEMBER(balsente_m6850_sound_r);

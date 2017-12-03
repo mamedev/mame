@@ -2413,6 +2413,32 @@ ROM_START( cobram3 )
 	DISK_IMAGE_READONLY( "cobra", 0, SHA1(8390498294aca97a5d1769032e7b115d1a42f5d3) )
 ROM_END
 
+ROM_START( cobram3a ) // ROMS came from a blister, shows same version and date as the parent, but bh00 to bh02 differ quite a bit
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "bh03",   0x8000, 0x2000, CRC(755cbbf5) SHA1(e3ea146f8c344af1e9bf51548ae4902cb09e589a) )
+	ROM_LOAD( "bh02",   0xa000, 0x2000, CRC(e6c4fdba) SHA1(f2ed8ebb4f4e89e14f413cd199903fa2f5407638) ) //sldh
+	ROM_LOAD( "bh01",   0xc000, 0x2000, CRC(0f658ccb) SHA1(f4405b7a66c1bfbc7ab2cf44a148d04807ece88f) ) //sldh
+	ROM_LOAD( "bh00",   0xe000, 0x2000, CRC(84548e60) SHA1(cf3226d81ce11d6c4a6ba803abdcc22be8c086a2) ) //sldh
+
+	ROM_REGION( 0x10000, "r2sound:audiocpu", 0 )
+	ROM_LOAD( "m3drom1.bin",  0xd000, 0x1000, CRC(a6e29212) SHA1(a73aafc2efa99e9ae0aecbb6075a10f7178ac938) ) // not dumped for this set
+
+	ROM_REGION( 0x10000, "r2sound:speechcpu", 0 )
+	ROM_LOAD( "bh04",   0xe000, 0x2000, CRC(c3f61bc9) SHA1(d02374e6e29238def0cfb01c96c78b206f24d77e) )
+
+	ROM_REGION( 0x2000, "bgtiles", 0 )
+	ROM_LOAD( "bh09",   0x0000, 0x1000, CRC(8c5dfac0) SHA1(5be28f807c4eb9df76a8f7519086ae57953d8c6f) )
+	ROM_LOAD( "bh0a",   0x1000, 0x1000, CRC(8b8da8dc) SHA1(9f03ac0e6b6396cd44843ea394d55d79848d6a27) )
+
+	ROM_REGION( 0x10000, "sprites", 0 )
+	ROM_LOAD( "bh05",   0x0000, 0x2000, CRC(d8f49994) SHA1(0631457264ff7f8d5fb1edc2c0211992a67c73e6) )
+	ROM_LOAD( "bh08",   0x4000, 0x2000, CRC(d6439e2f) SHA1(84a6e574f76313ce065d8765f21bdda8fe5a9a7b) )
+	ROM_LOAD( "bh07",   0x8000, 0x2000, CRC(f94668d2) SHA1(b5c3a54cf80097ac447a8140bd5877a66712e240) )
+	ROM_LOAD( "bh06",   0xc000, 0x2000, CRC(ab6c7cf1) SHA1(3625f2e00a333552036bff99af25edeac5915d78) )
+
+	DISK_REGION( "laserdisc" )
+	DISK_IMAGE_READONLY( "cobra", 0, SHA1(8390498294aca97a5d1769032e7b115d1a42f5d3) ) // not dumped for this set
+ROM_END
 
 ROM_START( usvsthem )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -2636,7 +2662,8 @@ GAME( 1983, screwloo,  0,        screwloo,  screwloo, gottlieb_state, screwloo, 
 GAME( 1983, mach3,     0,        g2laser,   mach3,    gottlieb_state, romtiles, ROT0,   "Mylstar",                   "M.A.C.H. 3 (set 1)", 0 )
 GAME( 1983, mach3a,    mach3,    g2laser,   mach3,    gottlieb_state, romtiles, ROT0,   "Mylstar",                   "M.A.C.H. 3 (set 2)", 0 )
 GAME( 1983, mach3b,    mach3,    g2laser,   mach3,    gottlieb_state, romtiles, ROT0,   "Mylstar",                   "M.A.C.H. 3 (set 3)", 0 )
-GAME( 1984, cobram3,   cobra,    cobram3,   cobram3,  gottlieb_state, romtiles, ROT0,   "Data East",                 "Cobra Command (M.A.C.H. 3 hardware)", 0 )
+GAME( 1984, cobram3,   cobra,    cobram3,   cobram3,  gottlieb_state, romtiles, ROT0,   "Data East",                 "Cobra Command (M.A.C.H. 3 hardware, set 1)", 0 )
+GAME( 1984, cobram3a,  cobra,    cobram3,   cobram3,  gottlieb_state, romtiles, ROT0,   "Data East",                 "Cobra Command (M.A.C.H. 3 hardware, set 2)", 0 )
 GAME( 1984, usvsthem,  0,        g2laser,   usvsthem, gottlieb_state, romtiles, ROT0,   "Mylstar",                   "Us vs. Them", 0 )
 GAME( 1984, 3stooges,  0,        gottlieb2, 3stooges, gottlieb_state, stooges,  ROT0,   "Mylstar",                   "The Three Stooges In Brides Is Brides (set 1)", 0 )
 GAME( 1984, 3stoogesa, 3stooges, gottlieb2, 3stooges, gottlieb_state, stooges,  ROT0,   "Mylstar",                   "The Three Stooges In Brides Is Brides (set 2)", 0 )

@@ -23,8 +23,8 @@
 #include "includes/xybots.h"
 
 #include "cpu/m68000/m68000.h"
+#include "machine/eeprompar.h"
 #include "machine/watchdog.h"
-#include "machine/atarigen.h"
 #include "speaker.h"
 
 
@@ -81,11 +81,11 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, xybots_state )
 	AM_RANGE(0x802e00, 0x802fff) AM_MIRROR(0x7f8000) AM_RAM AM_SHARE("mob")
 	AM_RANGE(0x803000, 0x803fff) AM_MIRROR(0x7f8000) AM_RAM_DEVWRITE("playfield", tilemap_device, write) AM_SHARE("playfield")
 	AM_RANGE(0x804000, 0x8047ff) AM_MIRROR(0x7f8800) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
-	AM_RANGE(0x805000, 0x805fff) AM_MIRROR(0x7f8000) AM_DEVREADWRITE8("eeprom", atari_eeprom_device, read, write, 0x00ff)
+	AM_RANGE(0x805000, 0x805fff) AM_MIRROR(0x7f8000) AM_DEVREADWRITE8("eeprom", eeprom_parallel_28xx_device, read, write, 0x00ff)
 	AM_RANGE(0x806000, 0x8060ff) AM_MIRROR(0x7f8000) AM_DEVREAD8("jsa", atari_jsa_i_device, main_response_r, 0x00ff)
 	AM_RANGE(0x806100, 0x8061ff) AM_MIRROR(0x7f8000) AM_READ_PORT("FFE100")
 	AM_RANGE(0x806200, 0x8062ff) AM_MIRROR(0x7f8000) AM_READ(special_port1_r)
-	AM_RANGE(0x806800, 0x8068ff) AM_MIRROR(0x7f8000) AM_DEVWRITE("eeprom", atari_eeprom_device, unlock_write)
+	AM_RANGE(0x806800, 0x8068ff) AM_MIRROR(0x7f8000) AM_DEVWRITE("eeprom", eeprom_parallel_28xx_device, unlock_write)
 	AM_RANGE(0x806900, 0x8069ff) AM_MIRROR(0x7f8000) AM_DEVWRITE8("jsa", atari_jsa_i_device, main_command_w, 0x00ff)
 	AM_RANGE(0x806a00, 0x806aff) AM_MIRROR(0x7f8000) AM_DEVWRITE("watchdog", watchdog_timer_device, reset16_w)
 	AM_RANGE(0x806b00, 0x806bff) AM_MIRROR(0x7f8000) AM_WRITE(video_int_ack_w)
@@ -191,7 +191,8 @@ static MACHINE_CONFIG_START( xybots )
 
 	MCFG_MACHINE_RESET_OVERRIDE(xybots_state,xybots)
 
-	MCFG_ATARI_EEPROM_2804_ADD("eeprom")
+	MCFG_EEPROM_2804_ADD("eeprom")
+	MCFG_EEPROM_28XX_LOCK_AFTER_WRITE(true)
 
 	MCFG_WATCHDOG_ADD("watchdog")
 

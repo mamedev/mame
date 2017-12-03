@@ -89,6 +89,30 @@ Supported games:
                Asian region, independent of the "Difficulty" dipswitches. See the code beginning at
                1FE94 (RAM address 1002D6 contains 0 if region is an Asian region, 1 if Europe or USA)
 
+    fixeight - The same program is used for all regions, and the region can be changed just by swapping
+               EEPROMs. However, the V25 code also recognizes a secret input that rewrites the EEPROM to
+               use any one of the 14 recognized regional licenses, using the state of the player 1 and
+               player 2 button inputs held in conjunction with it as a 4-bit binary code:
+
+               Region                      Button input
+               ------------------------    ------------------------------------
+               Korea, Taito license        No buttons
+               Korea                       P1 button 1
+               Hong Kong, Taito license    P1 button 2
+               Hong Kong                   P1 buttons 1 & 2
+               Taiwan, Taito license       P2 button 1
+               Taiwan                      P1 button 1 + P2 button 1
+               SE Asia, Taito license      P1 button 2 + P2 button 1
+               Southeast Asia              P1 buttons 1 & 2 + P2 button 1
+               Europe, Taito license       P2 button 2
+               Europe                      P1 button 1 + P2 button 2
+               USA, Taito license          P1 button 2 + P2 button 2
+               USA                         P1 buttons 1 & 2 + P2 button 2
+               (Invalid)                   P2 buttons 1 & 2
+               (Invalid)                   P1 button 1 + P2 buttons 1 & 2
+               Japan                       P1 button 2 + P2 buttons 1 & 2
+               Japan, Taito license        P1 buttons 1 & 2 + P2 buttons 1 & 2
+
     grindstm - Code at 20A26 in vfive forces region to Japan. All sets have some NOPs at reset vector,
                and the NEC V25 CPU test that the other games do is skipped. Furthermore, all sets have
                a broken ROM checksum routine that reads address ranges that don't match the actual
@@ -386,7 +410,6 @@ To reset the NVRAM in Othello Derby, hold P1 Button 1 down while booting.
 
 void toaplan2_state::machine_start()
 {
-	save_item(NAME(m_mcu_data));
 	save_item(NAME(m_old_p1_paddle_h));
 	save_item(NAME(m_old_p2_paddle_h));
 	save_item(NAME(m_z80_busreq));
@@ -402,8 +425,6 @@ WRITE_LINE_MEMBER(toaplan2_state::toaplan2_reset)
 
 MACHINE_RESET_MEMBER(toaplan2_state,toaplan2)
 {
-	m_mcu_data = 0x00;
-
 	// All games execute a RESET instruction on init, presumably to reset the sound CPU.
 	// This is important for games with common RAM; the RAM test will fail
 	// when leaving service mode if the sound CPU is not reset.
@@ -644,27 +665,13 @@ WRITE16_MEMBER(toaplan2_state::shared_ram_w)
 }
 
 
-WRITE16_MEMBER(toaplan2_state::toaplan2_hd647180_cpu_w)
-{
-	// Command sent to secondary CPU. Support for HD647180 will be
-	// required when a ROM dump becomes available for this hardware
-
-	if (ACCESSING_BITS_0_7)
-	{
-		m_mcu_data = data & 0xff;
-		logerror("PC:%08x Writing command (%04x) to secondary CPU shared port\n", space.device().safe_pcbase(), m_mcu_data);
-	}
-}
-
-
 CUSTOM_INPUT_MEMBER(toaplan2_state::c2map_r)
 {
 	// For Teki Paki hardware
 	// bit 4 high signifies secondary CPU is ready
 	// bit 5 is tested low before V-Blank bit ???
-	//m_mcu_data = 0xff;
 
-	return (m_cmdavailable) ? 0x00 : 0x01;
+	return m_soundlatch->pending_r() ? 0x00 : 0x01;
 }
 
 
@@ -720,33 +727,6 @@ WRITE16_MEMBER(toaplan2_state::fixeightbl_oki_bankswitch_w)
 		data &= 7;
 		if (data <= 4) membank("bank1")->set_entry(data);
 	}
-}
-
-READ8_MEMBER(toaplan2_state::fixeight_region_r)
-{
-	// this must match the eeprom region!
-	// however on the real PCB any of the EEPROMs we have work without any special treatment
-	// so is there a decryption error causing this to happen, or should this be read back
-	// from somewhere else?
-
-	if (!strcmp(machine().system().name,"fixeightkt"))  return 0x00;
-	if (!strcmp(machine().system().name,"fixeightk"))   return 0x01;
-	if (!strcmp(machine().system().name,"fixeightht"))  return 0x02;
-	if (!strcmp(machine().system().name,"fixeighth"))   return 0x03;
-	if (!strcmp(machine().system().name,"fixeighttwt")) return 0x04;
-	if (!strcmp(machine().system().name,"fixeighttw"))  return 0x05;
-	if (!strcmp(machine().system().name,"fixeightat"))  return 0x06;
-	if (!strcmp(machine().system().name,"fixeighta"))   return 0x07;
-	if (!strcmp(machine().system().name,"fixeightt"))   return 0x08;
-	if (!strcmp(machine().system().name,"fixeight9"))   return 0x09;
-	if (!strcmp(machine().system().name,"fixeighta"))   return 0x0a;
-	if (!strcmp(machine().system().name,"fixeightu"))   return 0x0b;
-//  if (!strcmp(machine().system().name,"fixeightc")) return 0x0c; // invalid
-//  if (!strcmp(machine().system().name,"fixeightd")) return 0x0d; // invalid
-	if (!strcmp(machine().system().name,"fixeightj"))   return 0x0e;
-	if (!strcmp(machine().system().name,"fixeightjt"))  return 0x0f;
-
-	return 0x00;
 }
 
 
@@ -905,7 +885,7 @@ static ADDRESS_MAP_START( tekipaki_68k_mem, AS_PROGRAM, 16, toaplan2_state )
 	AM_RANGE(0x180040, 0x180041) AM_WRITE(toaplan2_coin_word_w)
 	AM_RANGE(0x180050, 0x180051) AM_READ_PORT("IN1")
 	AM_RANGE(0x180060, 0x180061) AM_READ_PORT("IN2")
-	AM_RANGE(0x180070, 0x180071) AM_WRITE(tekipaki_mcu_w)
+	AM_RANGE(0x180070, 0x180071) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x00ff)
 ADDRESS_MAP_END
 
 
@@ -1405,14 +1385,6 @@ static ADDRESS_MAP_START( bbakraid_sound_z80_port, AS_IO, 8, toaplan2_state )
 ADDRESS_MAP_END
 
 
-#ifdef USE_HD64x180
-static ADDRESS_MAP_START( hd647180_mem, AS_PROGRAM, 8, toaplan2_state )
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0xfe00, 0xffff) AM_RAM     // Internal 512 bytes of RAM
-ADDRESS_MAP_END
-#endif
-
-
 static ADDRESS_MAP_START( v25_mem, AS_PROGRAM, 8, toaplan2_state )
 	AM_RANGE(0x00000, 0x00001) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
 	AM_RANGE(0x00004, 0x00004) AM_DEVREADWRITE("oki", okim6295_device, read, write)
@@ -1429,7 +1401,9 @@ ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( fixeight_v25_mem, AS_PROGRAM, 8, toaplan2_state )
-	AM_RANGE(0x00004, 0x00004) AM_READ(fixeight_region_r)
+	AM_RANGE(0x00000, 0x00000) AM_READ_PORT("IN1")
+	AM_RANGE(0x00002, 0x00002) AM_READ_PORT("IN2")
+	AM_RANGE(0x00004, 0x00004) AM_READ_PORT("IN3")
 	AM_RANGE(0x0000a, 0x0000b) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
 	AM_RANGE(0x0000c, 0x0000c) AM_DEVREADWRITE("oki", okim6295_device, read, write)
 	AM_RANGE(0x80000, 0x87fff) AM_MIRROR(0x78000) AM_RAM AM_SHARE("shared_ram")
@@ -1453,24 +1427,9 @@ ADDRESS_MAP_END
 
 
 
-WRITE16_MEMBER(toaplan2_state::tekipaki_mcu_w)
-{
-	if (ACCESSING_BITS_0_7)
-	{
-		m_mcu_data = data & 0xff;
-		m_cmdavailable = 1;
-	}
-};
-
-READ8_MEMBER(toaplan2_state::tekipaki_soundlatch_r)
-{
-	m_cmdavailable = 0;
-	return m_mcu_data;
-};
-
 READ8_MEMBER(toaplan2_state::tekipaki_cmdavailable_r)
 {
-	if (m_cmdavailable) return 0xff;
+	if (m_soundlatch->pending_r()) return 0xff;
 	else return 0x00;
 };
 
@@ -1483,7 +1442,7 @@ static ADDRESS_MAP_START( hd647180_io_map, AS_IO, 8, toaplan2_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 
 	AM_RANGE(0x60, 0x60) AM_READ(tekipaki_cmdavailable_r)
-	AM_RANGE(0x84, 0x84) AM_READ(tekipaki_soundlatch_r)
+	AM_RANGE(0x84, 0x84) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 
 	AM_RANGE(0x82, 0x82) AM_DEVREADWRITE("ymsnd", ym3812_device, status_port_r, control_port_w)
 	AM_RANGE(0x83, 0x83) AM_DEVREADWRITE("ymsnd", ym3812_device, read_port_r, write_port_w)
@@ -1495,7 +1454,7 @@ static ADDRESS_MAP_START( ghox_hd647180_mem_map, AS_PROGRAM, 8, toaplan2_state )
 	AM_RANGE(0x0fe00, 0x0ffff) AM_RAM   // Internal 512 byte RAM
 	AM_RANGE(0x3fe00, 0x3ffff) AM_RAM   // Relocated internal RAM (RMCR = 30)
 
-	AM_RANGE(0x40000, 0x407ff) AM_RAM AM_SHARE("shared_ram") 
+	AM_RANGE(0x40000, 0x407ff) AM_RAM AM_SHARE("shared_ram")
 
 	AM_RANGE(0x80002, 0x80002) AM_READ_PORT("DSWA")
 	AM_RANGE(0x80004, 0x80004) AM_READ_PORT("DSWB")
@@ -2100,7 +2059,7 @@ static INPUT_PORTS_START( fixeight )
 	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(3)
 	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(3)
 	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_START3 )
-	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_MEMORY_RESET ) PORT_NAME("Region Reset")
 	PORT_BIT( 0xff00, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // Unknown/Unused
 
 	PORT_START("SYS")
@@ -3258,6 +3217,8 @@ static MACHINE_CONFIG_START( tekipaki )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+
 	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL_27MHz/8)
 	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
@@ -3290,7 +3251,7 @@ static MACHINE_CONFIG_START( ghox )
 	MCFG_PALETTE_ADD("palette", T2PALETTE_LENGTH)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
-	MCFG_DEVICE_ADD("gp9001", GP9001_VDP, 0)
+	MCFG_DEVICE_ADD("gp9001", GP9001_VDP, XTAL_27MHz)
 	MCFG_GFX_PALETTE("palette")
 	MCFG_GP9001_VINT_CALLBACK(INPUTLINE("maincpu", M68K_IRQ_4))
 
@@ -3613,16 +3574,17 @@ static MACHINE_CONFIG_START( pipibibsbl )
 MACHINE_CONFIG_END
 
 /* x = modified to match batsugun 'unencrypted' code - '?' likewise, but not so sure about them */
+/* e = opcodes used in the EEPROM service routine */
 /* this one seems more different to the other tables */
 static const uint8_t ts001turbo_decryption_table[256] = {
 	0x90,0x05,0x57,0x5f,0xfe,0x4f,0xbd,0x36, 0x80,0x8b,0x8a,0x0a,0x89,0x90,0x47,0x80, /* 00 */
 			/*r*//*r*//*r*//*r*//*r*//*r*//*r*/ /*r*//*r*//*r*//*r*//*r*/     /*r*//*r*/
 	0x22,0x90,0x90,0x5d,0x81,0x3c,0xb5,0x83, 0x68,0xff,0x75,0x75,0x8d,0x5b,0x8a,0x38, /* 10 */
 	/*r*/          /*r*//*r*//*r*//*r*//*r*/ /*r*//*r*//*r*//*r*//*r*//*r*//*r*//*r*/
-	0x8b,0xeb,0xd2,0x0a,0xb4,0xc7,0x46,0xd1, 0x0a,0x53,0xbd,0x90,0x22,0xff,0x1f,0x03, /* 20 */
-	/*a*//*r*//*r*//*r*//*r*//*r*//*r*//*r*/ /*r*//*r*//*r*/     /*r*//*r*//*?*//*r*/
-	0xfb,0x45,0xc3,0x02,0x90,0x0f,0x90,0x02, 0x0f,0xb7,0x90,0x24,0xc6,0xeb,0x1b,0x32, /* 30 */
-	/*r*//*r*//*r*//*r*/     /*r*/     /*r*/ /*r*//*r*/     /*r*//*r*//*r*//*r*//*r*/
+	0x8b,0xeb,0xd2,0x0a,0xb4,0xc7,0x46,0xd1, 0x0a,0x53,0xbd,0x77,0x22,0xff,0x1f,0x03, /* 20 */
+	/*a*//*r*//*r*//*r*//*r*//*r*//*r*//*r*/ /*r*//*r*//*r*//*e*//*r*//*r*//*?*//*r*/
+	0xfb,0x45,0xc3,0x02,0x90,0x0f,0xa3,0x02, 0x0f,0xb7,0x90,0x24,0xc6,0xeb,0x1b,0x32, /* 30 */
+	/*r*//*r*//*r*//*r*/     /*r*//*e*//*r*/ /*r*//*r*/     /*r*//*r*//*r*//*r*//*r*/
 	0x8d,0xb9,0xfe,0x08,0x88,0x90,0x8a,0x8a, 0x75,0x8a,0xbd,0x58,0xfe,0x51,0x1e,0x8b, /* 40 */
 	/*r*//*r*//*r*//*r*//*r*/     /*r*//*r*/ /*r*//*r*//*r*//*r*//*r*//*r*//*r*//*r*/
 	0x0f,0x22,0xf6,0x90,0xc3,0x36,0x03,0x8d, 0xbb,0x16,0xbc,0x90,0x0f,0x5e,0xf9,0x2e, /* 50 */
@@ -3637,8 +3599,8 @@ static const uint8_t ts001turbo_decryption_table[256] = {
 	/*x*//*r*//*r*//*r*//*r*//*r*/           /*r*//*r*//*r*//*r*//*r*//*r*//*r*/
 	0x80,0xd3,0x89,0xe8,0x90,0x90,0x2a,0x74, 0x90,0x5f,0xf6,0x88,0x4f,0x56,0x8c,0x03, /* a0 */
 	/*r*//*a*//*r*//*r*/          /*r*//*r*/      /*r*//*r*//*r*//*r*//*r*//*r*//*r*/
-	0x47,0x90,0x88,0x90,0x03,0xfe,0x90,0xfc, 0x2a,0x90,0x33,0x07,0xb1,0x50,0x0f,0x3e, /* b0 */
-	/*r*/     /*r*/     /*r*//*r*/     /*r*/ /*r*/     /*r*//*r*//*r*//*r*//*r*//*r*/
+	0x47,0xa1,0x88,0x90,0x03,0xfe,0x90,0xfc, 0x2a,0x90,0x33,0x07,0xb1,0x50,0x0f,0x3e, /* b0 */
+	/*r*//*e*//*r*/     /*r*//*r*/     /*r*/ /*r*/     /*r*//*r*//*r*//*r*//*r*//*r*/
 	0xbd,0x4d,0xf3,0xbf,0x59,0xd2,0xea,0xc6, 0x2a,0x74,0x72,0xe2,0x3e,0x2e,0x90,0x2e, /* c0 */
 	/*r*//*r*//*r*//*r*//*r*//*a*//*x*//*r*/ /*r*//*r*//*r*//*r*//*r*//*r*/     /*r*/
 	0x2e,0x73,0x88,0x72,0x45,0x5d,0xc1,0xb9, 0x32,0x38,0x88,0xc1,0xa0,0x06,0x45,0x90, /* d0 */

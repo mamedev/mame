@@ -384,19 +384,6 @@ enum_value(T value) noexcept
 //  INLINE FUNCTIONS
 //**************************************************************************
 
-// population count
-#if !defined(__NetBSD__)
-inline int popcount(u32 val)
-{
-	int count;
-
-	for (count = 0; val != 0; count++)
-		val &= val - 1;
-	return count;
-}
-#endif
-
-
 // convert a series of 32 bits into a float
 inline float u2f(u32 v)
 {
@@ -442,6 +429,14 @@ inline u64 d2u(double d)
 	} u;
 	u.dd = d;
 	return u.vv;
+}
+
+
+// constexpr absolute value of an integer
+template <typename T>
+constexpr std::enable_if_t<std::is_signed<T>::value, T> iabs(T v)
+{
+	return (v < T(0)) ? -v : v;
 }
 
 #endif  /* MAME_EMU_EMUCORE_H */

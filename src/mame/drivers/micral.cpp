@@ -2,31 +2,61 @@
 // copyright-holders:Robbbert
 /********************************************************************************
 
-    Bull (Originally R2E) Micral 80-22G
+Bull (Originally R2E) Micral 80-22G
 
-    2015-10-01 Skeleton [Robbbert]
+2015-10-01 Skeleton [Robbbert]
 
-    http://www.ti99.com/exelvision/website/index.php?page=r2e-micral-8022-g
+http://www.ti99.com/exelvision/website/index.php?page=r2e-micral-8022-g
 
-    This expensive, futuristic-looking design featured a motherboard and slots,
-    much like an ancient pc. The known chip complement is:
-    Z80A, 4MHz; 64KB RAM, 2KB BIOS ROM, 256x4 prom (7611);
-    CRT8002, TMS9937 (=CRT5037), 4KB video RAM, 256x4 prom (7611);
-    2x 5.25 inch floppy drives, one ST506 5MB hard drive;
-    CDP6402 UART. Sound is a beeper.
-    The keyboard has a uPD780C (=Z80) and 1KB of ROM.
+This expensive, futuristic-looking design featured a motherboard and slots,
+much like an ancient pc. The known chip complement is:
+Z80A, 4MHz; 64KB RAM, 2KB BIOS ROM, 256x4 prom (7611);
+CRT8002, TMS9937 (=CRT5037), 4KB video RAM, 256x4 prom (7611);
+2x 5.25 inch floppy drives, one ST506 5MB hard drive;
+CDP6402 UART. Sound is a beeper.
+The keyboard has a uPD780C (=Z80) and 1KB of ROM.
 
-    The FDC and HDC are unknown.
-    No manuals, schematic or circuit description have been found.
+The FDC and HDC are unknown.
+No manuals, schematic or circuit description have been found.
+
+Commands must be in uppercase. Reboot to exit each command.
+Bx[,x]: ??
+Gxxxx : go (writes a jump @FFED then jumps to FFEB)
+T     : test
+*     : echo keystrokes
+enter : ??
+
+Using generic keyboard via the uart for now. It's unknown how the real keyboard
+communicates with the main cpu.
+
+FFF8/9 are used for sending instructions to the screen. FFF9 is command/status,
+and FFF8 is data. The codes 0-D seem to be for the CRT5037, but the results don't
+make much sense. Code A0 is to write a byte to the current cursor position, and
+B0 is to get the status.
+
+Screen needs:
+- Scrolling
+- Proper character generator
+- To be properly understood
+- According to the web, graphics are possible. A screenshot shows reverse video
+  exists.
+
+Other things...
+- Beeper
+- 2 floppy drives
+- keyboard
+- unknown ports
 
 *********************************************************************************/
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "video/tms9927.h"
-#include "sound/beep.h"
+//#include "sound/beep.h"
 #include "screen.h"
 #include "speaker.h"
+#include "machine/ay31015.h"
+#include "bus/rs232/rs232.h"
 
 
 class micral_state : public driver_device
@@ -35,27 +65,98 @@ public:
 	micral_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
-		, m_beep(*this, "beeper")
+		//, m_beep(*this, "beeper")
+		, m_p_videoram(*this, "vram")
+		, m_p_chargen(*this, "chargen")
+		, m_uart(*this, "uart")
+		, m_crtc(*this, "crtc")
 	{ }
 
 	DECLARE_DRIVER_INIT(micral);
 	DECLARE_MACHINE_RESET(micral);
-	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	DECLARE_READ8_MEMBER(keyin_r);
+	DECLARE_READ8_MEMBER(status_r);
+	DECLARE_READ8_MEMBER(unk_r);
+	DECLARE_READ8_MEMBER(video_r);
+	DECLARE_WRITE8_MEMBER(video_w);
+	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 private:
+	u16 s_curpos;
+	u8 s_command;
+	u8 s_data;
 	required_device<cpu_device> m_maincpu;
-	required_device<beep_device> m_beep;
+	//required_device<beep_device> m_beep;
+	required_region_ptr<u8> m_p_videoram;
+	required_region_ptr<u8> m_p_chargen;
+	required_device<ay31015_device> m_uart;
+	required_device<crt5037_device> m_crtc;
 };
 
+READ8_MEMBER( micral_state::status_r )
+{
+	return m_uart->get_output_pin(AY31015_DAV) | 4;
+}
 
-static ADDRESS_MAP_START( micral_mem, AS_PROGRAM, 8, micral_state )
+READ8_MEMBER( micral_state::unk_r )
+{
+	return 0x96;
+}
+
+READ8_MEMBER( micral_state::keyin_r )
+{
+	m_uart->set_input_pin(AY31015_RDAV, 0);
+	u8 result = m_uart->get_received_data();
+	m_uart->set_input_pin(AY31015_RDAV, 1);
+	return result;
+}
+
+READ8_MEMBER( micral_state::video_r )
+{
+	if (offset)
+		return 0x07;
+	else
+		return m_p_videoram[s_curpos];
+}
+
+WRITE8_MEMBER( micral_state::video_w )
+{
+	if (offset)
+	{
+		s_command = data;
+		if (s_command == 0x0c)
+			s_curpos = (s_curpos & 0xff00) | s_data;
+		else
+		if (s_command == 0x0d)
+			s_curpos = (s_curpos & 0xff) | ((s_data & 0x1f) << 8);
+		else
+		if (s_command == 0xa0)
+			m_p_videoram[s_curpos] = s_data;
+
+		//if (s_command < 0x10)
+			//m_crtc->write(space, s_command, s_data);
+	}
+	else
+	{
+		s_data = data;
+	}
+}
+
+
+static ADDRESS_MAP_START( mem_map, AS_PROGRAM, 8, micral_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0xf7ff) AM_RAM
 	AM_RANGE(0xf800, 0xfeff) AM_ROM
-	AM_RANGE(0xff00, 0xffff) AM_RAM // FFF0-F seems to be devices
+	AM_RANGE(0xff00, 0xffef) AM_RAM
+	AM_RANGE(0xfff6, 0xfff7) // AM_WRITENOP // unknown ports
+	AM_RANGE(0xfff8, 0xfff9) AM_READWRITE(video_r, video_w)
+	AM_RANGE(0xfffa, 0xfffa) AM_READ(keyin_r)
+	AM_RANGE(0xfffb, 0xfffb) AM_READ(unk_r)
+	AM_RANGE(0xfffc, 0xfffc) AM_READ(status_r)
+	AM_RANGE(0xfffd, 0xffff) // more unknown ports
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( micral_kbd_mem, AS_PROGRAM, 8, micral_state )
+static ADDRESS_MAP_START( mem_kbd, AS_PROGRAM, 8, micral_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x03ff) AM_ROM
 	AM_RANGE(0x8000, 0x8000) AM_RAM // byte returned to main cpu after receiving irq
@@ -75,7 +176,7 @@ static ADDRESS_MAP_START( micral_kbd_mem, AS_PROGRAM, 8, micral_state )
 	AM_RANGE(0xa000, 0xa000) AM_READ_PORT("X13")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( micral_kbd_io, AS_IO, 8, micral_state )
+static ADDRESS_MAP_START( io_kbd, AS_IO, 8, micral_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ_PORT("X14")
 ADDRESS_MAP_END
@@ -200,34 +301,40 @@ static INPUT_PORTS_START( micral )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_LCONTROL) // ??
 INPUT_PORTS_END
 
-uint32_t micral_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t micral_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-//  for (int y = 0; y < 32*8; y++)
-//  {
-//      offs_t offset = (y / 8) * 128;
+	uint8_t y,ra,chr,gfx;
+	uint16_t sy=0,ma=0,x;
 
-//      for (int sx = 0; sx < 64; sx++)
-//      {
-//          uint8_t code = m_video_ram[offset++];
-//          uint8_t attr = m_video_ram[offset++];
+	for (y = 0; y < 24; y++)
+	{
+		for (ra = 0; ra < 10; ra++)
+		{
+			uint16_t *p = &bitmap.pix16(sy++);
 
-//          offs_t char_offs = ((code & 0x7f) << 3) | (y & 0x07);
-//          if (BIT(code, 7)) char_offs = ((code & 0x7f) << 3) | ((y >> 1) & 0x07);
-
-//          uint8_t data = m_char_rom->base()[char_offs];
-
-//          rgb_t fg = m_palette->pen_color(attr & 0x07);
-//          rgb_t bg = m_palette->pen_color((attr >> 3) & 0x07);
-
-//          for (int x = 0; x < 6; x++)
-//          {
-//              bitmap.pix32(y, (sx * 6) + x) = BIT(data, 7) ? fg : bg;
-
-//              data <<= 1;
-//          }
-//      }
-//  }
-
+			for (x = 0; x < 80; x++)
+			{
+				gfx = 0;
+				if (ra < 9)
+				{
+					chr = m_p_videoram[x+ma];
+					gfx = m_p_chargen[(chr<<4) | ra ];
+					if (((s_curpos & 0xff)==x) && ((s_curpos >> 8)==y))
+						gfx ^= 0xff;
+				}
+				/* Display a scanline of a character */
+				*p++ = BIT(gfx, 7);
+				*p++ = BIT(gfx, 6);
+				*p++ = BIT(gfx, 5);
+				*p++ = BIT(gfx, 4);
+				*p++ = BIT(gfx, 3);
+				*p++ = BIT(gfx, 2);
+				*p++ = BIT(gfx, 1);
+				*p++ = BIT(gfx, 0);
+			}
+		}
+		ma+=256;
+	}
 	return 0;
 }
 
@@ -245,16 +352,28 @@ MACHINE_RESET_MEMBER( micral_state, micral )
 	//membank("bankr0")->set_entry(0); // point at rom
 	//membank("bankw0")->set_entry(0); // always write to ram
 	m_maincpu->set_state_int(Z80_PC, 0xf800);
+
+	// no idea if these are hard-coded, or programmable
+	m_uart->set_input_pin(AY31015_XR, 0);
+	m_uart->set_input_pin(AY31015_XR, 1);
+	m_uart->set_input_pin(AY31015_SWE, 0);
+	m_uart->set_input_pin(AY31015_NP, 1);
+	m_uart->set_input_pin(AY31015_TSB, 0);
+	m_uart->set_input_pin(AY31015_NB1, 1);
+	m_uart->set_input_pin(AY31015_NB2, 1);
+	m_uart->set_input_pin(AY31015_EPS, 1);
+	m_uart->set_input_pin(AY31015_CS, 1);
+	m_uart->set_input_pin(AY31015_CS, 0);
 }
 
 static MACHINE_CONFIG_START( micral )
 	// basic machine hardware
 	MCFG_CPU_ADD( "maincpu", Z80, XTAL_4MHz )
-	MCFG_CPU_PROGRAM_MAP(micral_mem)
+	MCFG_CPU_PROGRAM_MAP(mem_map)
 	// no i/o ports on main cpu
 	MCFG_CPU_ADD( "keyboard", Z80, XTAL_1MHz ) // freq unknown
-	MCFG_CPU_PROGRAM_MAP(micral_kbd_mem)
-	MCFG_CPU_IO_MAP(micral_kbd_io)
+	MCFG_CPU_PROGRAM_MAP(mem_kbd)
+	MCFG_CPU_IO_MAP(io_kbd)
 
 	MCFG_MACHINE_RESET_OVERRIDE(micral_state, micral)
 
@@ -263,20 +382,28 @@ static MACHINE_CONFIG_START( micral )
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(250))
 	MCFG_SCREEN_UPDATE_DRIVER(micral_state, screen_update)
-	MCFG_SCREEN_SIZE(64*6, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0, 64*6-1, 0, 32*8-1)
+	MCFG_SCREEN_SIZE(640, 240)
+	MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 239)
+	MCFG_SCREEN_PALETTE("palette")
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 	//MCFG_GFXDECODE_ADD("gfxdecode", "palette", micral)
 
-	MCFG_DEVICE_ADD("crtc", CRT5037, XTAL_17_9712MHz/2)  // xtal freq unknown
-	MCFG_TMS9927_CHAR_WIDTH(6)  // unknown
+	MCFG_DEVICE_ADD("crtc", CRT5037, 4000000)  // xtal freq unknown
+	MCFG_TMS9927_CHAR_WIDTH(8)  // unknown
 	//MCFG_TMS9927_VSYN_CALLBACK(DEVWRITELINE(TMS5501_TAG, tms5501_device, sens_w))
 	MCFG_VIDEO_SET_SCREEN("screen")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("beeper", BEEP, 2000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	//MCFG_SPEAKER_STANDARD_MONO("mono")
+	//MCFG_SOUND_ADD("beeper", BEEP, 2000)
+	//MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+
+	MCFG_DEVICE_ADD("uart", AY51013, 0) // CDP6402
+	MCFG_AY51013_TX_CLOCK(153600)
+	MCFG_AY51013_RX_CLOCK(153600)
+	MCFG_AY51013_READ_SI_CB(DEVREADLINE("rs232", rs232_port_device, rxd_r))
+	MCFG_AY51013_WRITE_SO_CB(DEVWRITELINE("rs232", rs232_port_device, write_txd))
+	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, "keyboard")
 MACHINE_CONFIG_END
 
 ROM_START( micral )
@@ -285,6 +412,12 @@ ROM_START( micral )
 
 	ROM_REGION( 0x400, "keyboard", 0 )
 	ROM_LOAD( "2010221.rom", 0x000, 0x400, CRC(65123378) SHA1(401f0a648b78bf1662a1cd2546e83ba8e3cb7a42) )
+
+	ROM_REGION( 0x2000, "vram", ROMREGION_ERASEFF )
+
+	// Using the chargen from 'c10' for now.
+	ROM_REGION( 0x2000, "chargen", 0 )
+	ROM_LOAD( "c10_char.bin", 0x0000, 0x2000, BAD_DUMP CRC(cb530b6f) SHA1(95590bbb433db9c4317f535723b29516b9b9fcbf))
 ROM_END
 
 /* Driver */

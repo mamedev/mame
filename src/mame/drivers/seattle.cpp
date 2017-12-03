@@ -1317,6 +1317,9 @@ static INPUT_PORTS_START( calspeed )
 	PORT_INCLUDE(seattle_common)
 
 	PORT_MODIFY("DIPS")
+	PORT_DIPNAME( 0x0010, 0x0010, "Obsidian Manufacturing Test" ) // Needs boot rom test on to run.
+	PORT_DIPSETTING(      0x0010, DEF_STR( Off ))
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ))
 	PORT_DIPNAME( 0x0040, 0x0040, "Boot ROM Test" )
 	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )

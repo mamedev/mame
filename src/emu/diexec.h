@@ -162,6 +162,8 @@ public:
 	void set_input_line_vector(int linenum, int vector) { m_input[linenum].set_vector(vector); }
 	void set_input_line_and_vector(int linenum, int state, int vector) { m_input[linenum].set_state_synced(state, vector); }
 	int input_state(int linenum) const { return m_input[linenum].m_curstate; }
+	void pulse_input_line(int irqline, const attotime &duration);
+	void pulse_input_line_and_vector(int irqline, int vector, const attotime &duration);
 
 	// suspend/resume
 	void suspend(u32 reason, bool eatcycles);
@@ -292,9 +294,13 @@ private:
 	void on_vblank(screen_device &screen, bool vblank_state);
 
 	TIMER_CALLBACK_MEMBER(trigger_periodic_interrupt);
+	TIMER_CALLBACK_MEMBER(irq_pulse_clear);
 	void suspend_resume_changed();
 
 	attoseconds_t minimum_quantum() const;
+
+public:
+	attotime minimum_quantum_time() const { return attotime(0, minimum_quantum()); }
 };
 
 // iterator

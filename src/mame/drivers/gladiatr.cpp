@@ -224,7 +224,7 @@ WRITE8_MEMBER(gladiatr_state::gladiator_int_control_w)
 }
 
 /* YM2203 IRQ */
-WRITE_LINE_MEMBER(gladiatr_state::gladiator_ym_irq)
+WRITE_LINE_MEMBER(gladiatr_state_base::ym_irq)
 {
 	/* NMI IRQ is not used by gladiator sound program */
 	m_subcpu->set_input_line(INPUT_LINE_NMI, state ? ASSERT_LINE : CLEAR_LINE);
@@ -241,23 +241,37 @@ WRITE8_MEMBER(gladiatr_state::gladiator_adpcm_w)
 	m_msm->vclk_w (BIT(data, 4));   // bit 4
 }
 
-WRITE8_MEMBER(gladiatr_state::gladiator_cpu_sound_command_w)
+WRITE8_MEMBER(ppking_state::ppking_adpcm_w)
+{
+	// bit 6 = bank offset
+	//membank("bank2")->set_entry((data & 0x40) ? 1 : 0);
+
+	m_msm->data_w(data);            // bit 0..3
+	m_msm->reset_w(BIT(data, 5));   // bit 5
+	m_msm->vclk_w (BIT(data, 4));   // bit 4
+}
+
+WRITE8_MEMBER(ppking_state::cpu2_irq_ack_w)
+{
+	m_subcpu->set_input_line(0, CLEAR_LINE);
+}
+
+WRITE8_MEMBER(gladiatr_state_base::adpcm_command_w)
 {
 	m_soundlatch->write(space,0,data);
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 }
 
-READ8_MEMBER(gladiatr_state::gladiator_cpu_sound_command_r)
+READ8_MEMBER(gladiatr_state_base::adpcm_command_r)
 {
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 	return m_soundlatch->read(space,0);
 }
 
-WRITE_LINE_MEMBER(gladiatr_state::flipscreen_w)
+WRITE_LINE_MEMBER(gladiatr_state_base::flipscreen_w)
 {
 	flip_screen_set(state);
 }
-
 
 #if 1
 /* !!!!! patch to IRQ timing for 2nd CPU !!!!! */
@@ -376,73 +390,233 @@ INPUT_CHANGED_MEMBER(gladiatr_state::p2_s2)
 
 READ8_MEMBER(ppking_state::ppking_f1_r)
 {
-	return machine().rand();
+	return 0xff;
 }
 
-READ8_MEMBER(ppking_state::ppking_f6a3_r)
-{
-	if (space.device().safe_pcbase() == 0x8e)
-		m_nvram[0x6a3] = 1;
+/**********************************
+ *
+ * Ping Pong King MCU simulation
+ *
+ * 0x8ad =
+ * 0x8f6 = IO check (must return 0x40)
+ *
+ **********************************/
 
-	return m_nvram[0x6a3];
+//#include "debugger.h"
+
+inline bool ppking_state::mcu_parity_check()
+{
+	int i;
+	uint8_t res = 0;
+
+	for(i=0;i<8;i++)
+	{
+		if(m_mcu[0].rxd & (1 << i))
+			res++;
+	}
+
+	if(res % 2)
+		return false;
+
+	return true;
+}
+
+inline void ppking_state::mcu_input_check()
+{
+	if(m_mcu[0].txd == 0x41)
+	{
+		m_mcu[0].state = 1;
+		//m_mcu[0].packet_type = 0;
+	}
+	else if(m_mcu[0].txd == 0x42)
+	{
+		m_mcu[0].state = 2;
+		//m_mcu[0].packet_type = 0;
+		//machine().debug_break();
+	}
+	else if(m_mcu[0].txd == 0x44)
+	{
+		m_mcu[0].state = 3;
+	}
+}
+
+READ8_MEMBER(ppking_state::ppking_qx0_r)
+{
+	// status
+	if(offset == 1)
+		return 1;
+
+	if(m_mcu[0].rst)
+	{
+		switch(m_mcu[0].state)
+		{
+			case 1:
+			{
+				m_mcu[0].packet_type^=1;
+
+				if(m_mcu[0].packet_type & 1)
+				{
+					m_mcu[0].rxd = ((ioport("DSW3")->read()) & 0x9f) | 0x20;
+				}
+				else
+				{
+					m_mcu[0].rxd = ((ioport("SYSTEM")->read()) & 0x9f);
+				}
+
+				break;
+			}
+
+			case 2:
+			{
+				m_mcu[0].packet_type^=1;
+				if(m_mcu[0].packet_type & 1)
+				{
+					// Host wants this from time to time, otherwise huge input lag happens periodically (protection?)
+					m_mcu[0].rxd = 0x17;
+				}
+				else
+				{
+					m_mcu[0].rxd = ((ioport("P1")->read()) & 0x3f);
+					m_mcu[0].rxd |= ((ioport("SYSTEM")->read()) & 0x80);
+				}
+
+				break;
+			}
+
+			case 3:
+			{
+				m_mcu[0].packet_type^=1;
+				if(m_mcu[0].packet_type & 1)
+				{
+					// same as above for player 2
+					m_mcu[0].rxd = 0x17;
+				}
+				else
+				{
+					m_mcu[0].rxd = ((ioport("P2")->read()) & 0x3f);
+					m_mcu[0].rxd |= ((ioport("SYSTEM")->read()) & 0x80);
+				}
+
+				break;
+			}
+		}
+
+		if(mcu_parity_check() == false)
+			m_mcu[0].rxd |= 0x40;
+	}
+
+	//printf("%04x rst %d\n",m_maincpu->pc(),m_mcu[0].rst);
+
+	return m_mcu[0].rxd;
 }
 
 WRITE8_MEMBER(ppking_state::ppking_qx0_w)
 {
-	if(!offset)
+	if(offset == 1)
 	{
-		m_data2 = data;
-		m_flag2 = 1;
+		switch(data)
+		{
+			case 0:
+				m_mcu[0].rxd = 0x40;
+				m_mcu[0].rst = 0;
+				m_mcu[0].state = 0;
+				break;
+			case 1:
+				/*
+				status codes:
+				0x06 sub NG IOX2
+				0x05 sub NG IOX1
+				0x04 sub NG CIOS
+				0x03 sub NG OPN
+				0x02 sub NG ROM
+				0x01 sub NG RAM
+				0x00 ok
+				*/
+				m_mcu[0].rxd = 0x40;
+				m_mcu[0].rst = 0;
+				break;
+			case 2:
+				m_mcu[0].rxd = ((ioport("DSW2")->read() & 0x1f) << 2);
+				m_mcu[0].rst = 0;
+				break;
+			case 3:
+				mcu_input_check();
+				m_mcu[0].rst = 1;
+				break;
+
+			default:
+				printf("%02x %02x\n",offset,data);
+				break;
+		}
+	}
+	else
+	{
+		m_mcu[0].txd = data;
+
+		m_mcu[1].rst = 0;
+		m_soundlatch2->write(space, 0, data & 0xff);
+
+		mcu_input_check();
+
 	}
 }
 
 WRITE8_MEMBER(ppking_state::ppking_qx1_w)
 {
-	if(!offset)
+	if(offset == 1)
 	{
-		m_data1 = data;
-		m_flag1 = 1;
+		if(data == 0xf0)
+			m_mcu[1].rst = 1;
 	}
-}
-
-WRITE8_MEMBER(ppking_state::ppking_qx2_w)
-{
 }
 
 WRITE8_MEMBER(ppking_state::ppking_qx3_w)
 {
 }
 
-READ8_MEMBER(ppking_state::ppking_qx0_r)
-{
-	if (!offset)
-		return m_data1;
-	else
-		return m_flag2;
-}
 
 READ8_MEMBER(ppking_state::ppking_qx1_r)
 {
-	if (!offset)
-		return m_data2;
-	else
-		return m_flag1;
-}
+	// status
+	if(offset == 1)
+		return 1;
 
-READ8_MEMBER(ppking_state::ppking_qx2_r)
-{
-	return machine().rand();
+	if(m_mcu[1].rst == 1)
+		return 0x40;
+
+	return m_soundlatch2->read(space,0);
 }
 
 READ8_MEMBER(ppking_state::ppking_qx3_r)
 {
-	return machine().rand()&0xf;
+	if(offset == 1)
+		return 1;
+
+	return 0;
+}
+
+// serial communication with another board (COMU in service mode)
+// NMI is used to acquire data from the other board,
+// either sent via 1->0 poll of the 0xc003 port or by reading 0xc0c0 (former more likely)
+READ8_MEMBER(ppking_state::ppking_qxcomu_r)
+{
+	if(offset == 1)
+		return 1;
+
+	return 0;
+}
+
+WRITE8_MEMBER(ppking_state::ppking_qxcomu_w)
+{
+	// ...
 }
 
 MACHINE_RESET_MEMBER(ppking_state, ppking)
 {
-	m_data1 = m_data2 = 0;
-	m_flag1 = m_flag2 = 1;
+	// yes, it expects to read DSW1 without sending commands first ...
+	m_mcu[0].rxd = (ioport("DSW1")->read() & 0x1f) << 2;;
+	m_mcu[0].rst = 0;
+	m_mcu[0].state = 0;
 }
 
 static ADDRESS_MAP_START( ppking_cpu1_map, AS_PROGRAM, 8, ppking_state )
@@ -458,25 +632,27 @@ ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( ppking_cpu3_map, AS_PROGRAM, 8, ppking_state )
-	AM_RANGE(0x2000, 0x2fff) AM_ROM
-	AM_RANGE(0xc000, 0xffff) AM_ROM
+	AM_RANGE(0x1000, 0x1fff) AM_WRITE(ppking_adpcm_w)
+	AM_RANGE(0x2000, 0x2fff) AM_READ(adpcm_command_r)
+	AM_RANGE(0x8000, 0xffff) AM_ROM AM_WRITENOP
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( ppking_cpu1_io, AS_IO, 8, ppking_state )
 //  ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0xc000, 0xc000) AM_WRITE(spritebuffer_w)
-	AM_RANGE(0xc004, 0xc004) AM_NOP // WRITE(ppking_irq_patch_w)
+	AM_RANGE(0xc000, 0xc007) AM_DEVWRITE("mainlatch", ls259_device, write_d0)
+//  AM_RANGE(0xc004, 0xc004) AM_NOP // WRITE(ppking_irq_patch_w)
 	AM_RANGE(0xc09e, 0xc09f) AM_READ(ppking_qx0_r) AM_WRITE(ppking_qx0_w)
-	AM_RANGE(0xc0bf, 0xc0bf) AM_NOP
+	AM_RANGE(0xc0bf, 0xc0bf) AM_NOP // watchdog
+	AM_RANGE(0xc0c0, 0xc0c1) AM_READ(ppking_qxcomu_r) AM_WRITE(ppking_qxcomu_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( ppking_cpu2_io, AS_IO, 8, ppking_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE("ymsnd", ym2203_device, read, write)
 	AM_RANGE(0x20, 0x21) AM_READ(ppking_qx1_r) AM_WRITE(ppking_qx1_w)
-	AM_RANGE(0x40, 0x40) AM_READNOP
-	AM_RANGE(0x60, 0x61) AM_READWRITE(ppking_qx2_r,ppking_qx2_w)
+	AM_RANGE(0x40, 0x40) AM_WRITE(cpu2_irq_ack_w)
 	AM_RANGE(0x80, 0x81) AM_READWRITE(ppking_qx3_r,ppking_qx3_w)
+	AM_RANGE(0xe0, 0xe0) AM_WRITE(adpcm_command_w)
 ADDRESS_MAP_END
 
 
@@ -501,8 +677,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( gladiatr_cpu3_map, AS_PROGRAM, 8, gladiatr_state )
 	AM_RANGE(0x1000, 0x1fff) AM_WRITE(gladiator_adpcm_w)
-	AM_RANGE(0x2000, 0x2fff) AM_READ(gladiator_cpu_sound_command_r)
-	AM_RANGE(0x4000, 0xffff) AM_ROMBANK("bank2")
+	AM_RANGE(0x2000, 0x2fff) AM_READ(adpcm_command_r)
+	AM_RANGE(0x4000, 0xffff) AM_ROMBANK("bank2") AM_WRITENOP
 ADDRESS_MAP_END
 
 
@@ -521,9 +697,95 @@ static ADDRESS_MAP_START( gladiatr_cpu2_io, AS_IO, 8, gladiatr_state )
 	AM_RANGE(0x60, 0x61) AM_DEVREADWRITE("cctl", upi41_cpu_device, upi41_master_r, upi41_master_w)
 	AM_RANGE(0x80, 0x81) AM_DEVREADWRITE("ccpu", upi41_cpu_device, upi41_master_r, upi41_master_w)
 	AM_RANGE(0xa0, 0xa7) AM_DEVWRITE("filtlatch", ls259_device, write_d0)
-	AM_RANGE(0xe0, 0xe0) AM_WRITE(gladiator_cpu_sound_command_w)
+	AM_RANGE(0xe0, 0xe0) AM_WRITE(adpcm_command_w)
 ADDRESS_MAP_END
 
+
+static INPUT_PORTS_START( ppking )
+	PORT_START("P1")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_8WAY
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )  PORT_8WAY
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )    PORT_8WAY
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )  PORT_8WAY
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 )
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON2 )
+	PORT_BIT( 0xc0, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("P2")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )  PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )    PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )  PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(2)
+	PORT_BIT( 0xc0, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("SYSTEM")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START1 )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 )
+	PORT_DIPNAME( 0x04, 0x00, "SYSTEM" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
+	PORT_BIT( 0x60, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_IMPULSE(2)
+
+	PORT_START("DSW1")
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW1:7,6")
+	PORT_DIPSETTING(    0x03, DEF_STR( Easy ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Normal ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( Hard ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
+	PORT_DIPUNUSED_DIPLOC( 0x04, 0x04, "SW1:5" )
+	PORT_DIPNAME( 0x08, 0x08, "VS Mode (link)" ) PORT_DIPLOCATION("SW1:4") // unemulated
+	PORT_DIPSETTING(    0x08, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
+	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW1:3")
+	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( No ) )
+	PORT_BIT( 0xe0, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("DSW2")
+	// TODO: coinage not working (controlled by MCU)
+	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Coin_A ) ) PORT_DIPLOCATION("SW2:8,7")
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( 1C_4C ) )
+	PORT_DIPSETTING(    0x03, DEF_STR( 1C_5C ) )
+	PORT_DIPNAME( 0x0c, 0x00, DEF_STR( Coin_B ) ) PORT_DIPLOCATION("SW2:6,5")
+	PORT_DIPSETTING(    0x00, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( 4C_1C ) )
+	PORT_DIPSETTING(    0x0c, DEF_STR( 5C_1C ) )
+	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Cabinet ) ) PORT_DIPLOCATION("SW2:4")
+	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Cocktail ) )
+	PORT_BIT( 0xe0, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("DSW3")
+	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Free_Play ) ) PORT_DIPLOCATION("SW3:1")
+	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( Yes ) )
+	// Round -> Normal/Round Free in manual, allows player to continue playing even if he loses
+	PORT_DIPNAME( 0x02, 0x00, "Win Round even when losing (Cheat)" ) PORT_DIPLOCATION("SW3:2")
+	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Yes ) )
+	// Happens at reset
+	PORT_DIPNAME( 0x04, 0x00, "Backup RAM Clear" ) PORT_DIPLOCATION("SW3:3")
+	PORT_DIPSETTING(    0x04, DEF_STR( Yes ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
+	PORT_DIPUNUSED_DIPLOC( 0x08, 0x00, "SW3:4" )
+	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Flip_Screen ) ) PORT_DIPLOCATION("SW3:5")
+	PORT_DIPSETTING(    0x10, DEF_STR( Yes ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
+	PORT_BIT( 0x60, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_SERVICE_DIPLOC(   0x80, IP_ACTIVE_HIGH, "SW3:8" )
+INPUT_PORTS_END
 
 static INPUT_PORTS_START( gladiatr )
 	PORT_START("DSW1")      /* (8741-0 parallel port)*/
@@ -682,7 +944,7 @@ static MACHINE_CONFIG_START( ppking )
 	MCFG_CPU_ADD("sub", Z80, XTAL_12MHz/4) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(cpu2_map)
 	MCFG_CPU_IO_MAP(ppking_cpu2_io)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", ppking_state,  irq0_line_hold)
+	MCFG_CPU_PERIODIC_INT_DRIVER(ppking_state,  irq0_line_assert, 60)
 
 	MCFG_CPU_ADD("audiocpu", M6809, XTAL_12MHz/16) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(ppking_cpu3_map)
@@ -692,12 +954,22 @@ static MACHINE_CONFIG_START( ppking )
 	MCFG_MACHINE_RESET_OVERRIDE(ppking_state, ppking)
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
+	MCFG_DEVICE_ADD("mainlatch", LS259, 0) // 5L on main board
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(ppking_state, spritebuffer_w))
+//  MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(gladiatr_state, spritebank_w))
+//  MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(MEMBANK("bank1"))
+//  MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(ppking_state, nmi_mask_w))
+//  MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(INPUTLINE("sub", INPUT_LINE_RESET)) // shadowed by aforementioned hack
+//  Q6 used
+	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(ppking_state, flipscreen_w))
+
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
+//  MCFG_SCREEN_REFRESH_RATE(60)
+//  MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+//  MCFG_SCREEN_SIZE(32*8, 32*8)
+//  MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
+	MCFG_SCREEN_RAW_PARAMS(XTAL_12MHz/2,384,0,256,264,16,240) // assume same as Arkanoid
 	MCFG_SCREEN_UPDATE_DRIVER(ppking_state, screen_update_ppking)
 	MCFG_SCREEN_PALETTE("palette")
 
@@ -710,10 +982,12 @@ static MACHINE_CONFIG_START( ppking )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
 
 	MCFG_SOUND_ADD("ymsnd", YM2203, XTAL_12MHz/8) /* verified on pcb */
+	MCFG_YM2203_IRQ_HANDLER(WRITELINE(gladiatr_state_base, ym_irq))
 	MCFG_AY8910_PORT_A_READ_CB(READ8(ppking_state, ppking_f1_r))
-	MCFG_AY8910_PORT_B_READ_CB(READ8(ppking_state, ppking_f1_r))
+	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW3")) /* port B read */
 	MCFG_SOUND_ROUTE(0, "mono", 0.60)
 	MCFG_SOUND_ROUTE(1, "mono", 0.60)
 	MCFG_SOUND_ROUTE(2, "mono", 0.60)
@@ -802,7 +1076,7 @@ static MACHINE_CONFIG_START( gladiatr )
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_SOUND_ADD("ymsnd", YM2203, XTAL_12MHz/8) /* verified on pcb */
-	MCFG_YM2203_IRQ_HANDLER(WRITELINE(gladiatr_state, gladiator_ym_irq))
+	MCFG_YM2203_IRQ_HANDLER(WRITELINE(gladiatr_state_base, ym_irq))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW3")) /* port B read */
 	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(gladiatr_state, gladiator_int_control_w)) /* port A write */
 	MCFG_SOUND_ROUTE(0, "mono", 0.60)
@@ -837,8 +1111,10 @@ ROM_START( ppking )
 	ROM_LOAD( "q0_16.6e",       0x4000, 0x2000, CRC(b1e32588) SHA1(13c74479238a34a08e249f9120b42a52d80f8274) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
-	ROM_LOAD( "q0_19.5n",       0x0c000, 0x2000, CRC(4bcf896d) SHA1(f587a66fcc63e989742ce2d5f4cf2bb464987038) )
+	ROM_LOAD( "q0_19.5n",       0x0a000, 0x2000, CRC(4bcf896d) SHA1(f587a66fcc63e989742ce2d5f4cf2bb464987038) )
+	ROM_RELOAD(                 0x08000, 0x2000 )
 	ROM_LOAD( "q0_18.5m",       0x0e000, 0x2000, CRC(89ba64f8) SHA1(fa01316ea744b4277ee64d5f14cb6d7e3a949f2b) )
+	ROM_RELOAD(                 0x0c000, 0x2000 )
 
 	ROM_REGION( 0x02000, "gfx1", 0 )
 	ROM_LOAD( "q0_15.1r",       0x00000, 0x2000, CRC(fbd33219) SHA1(78b9bb327ededaa818d26c41c5e8fd1c041ef142) )
@@ -1174,15 +1450,24 @@ DRIVER_INIT_MEMBER(ppking_state, ppking)
 			rom[i+2*j*0x2000] = rom[i+j*0x2000];
 		}
 	}
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0xf6a3,0xf6a3,read8_delegate(FUNC(ppking_state::ppking_f6a3_r),this));
 
-	save_item(NAME(m_data1));
-	save_item(NAME(m_data2));
+	rom = memregion("sub")->base();
+
+	// patch audio CPU crash + ROM checksums
+	rom[0x1b9] = 0x00;
+	rom[0x1ba] = 0x00;
+	rom[0x1bb] = 0x00;
+	rom[0x839] = 0x00;
+	rom[0x83a] = 0x00;
+	rom[0x83b] = 0x00;
+	rom[0x845] = 0x00;
+	rom[0x846] = 0x00;
+	rom[0x847] = 0x00;
 }
 
 
 
-GAME( 1985, ppking,   0,        ppking,   0,        ppking_state,   ppking,   ROT90, "Taito America Corporation", "Ping-Pong King", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1985, ppking,   0,        ppking,   ppking,   ppking_state,   ppking,   ROT90, "Taito America Corporation", "Ping-Pong King", MACHINE_IMPERFECT_SOUND | MACHINE_NO_COCKTAIL | MACHINE_NODEVICE_LAN )
 GAME( 1986, gladiatr, 0,        gladiatr, gladiatr, gladiatr_state, gladiatr, ROT0,  "Allumer / Taito America Corporation", "Gladiator (US)", MACHINE_SUPPORTS_SAVE )
 GAME( 1986, ogonsiro, gladiatr, gladiatr, gladiatr, gladiatr_state, gladiatr, ROT0,  "Allumer / Taito Corporation", "Ougon no Shiro (Japan)", MACHINE_SUPPORTS_SAVE )
 GAME( 1986, greatgur, gladiatr, gladiatr, gladiatr, gladiatr_state, gladiatr, ROT0,  "Allumer / Taito Corporation", "Great Gurianos (Japan?)", MACHINE_SUPPORTS_SAVE )

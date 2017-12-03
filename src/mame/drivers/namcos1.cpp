@@ -1301,8 +1301,8 @@ ROM_START( dspirit2 )
 	ROM_LOAD_512( "ds1_p3.bin",     0x180000, CRC(c6e5954b) SHA1(586fc108f264e91a4bbbb05153dd1aa19be81b5b) )
 	ROM_LOAD_512( "ds1_p4.bin",     0x200000, CRC(f3307870) SHA1(a85d28c5dc55cbfa6c384d71e724db44c547d976) )
 	ROM_LOAD_512( "ds1_p5.bin",     0x280000, CRC(9a3a1028) SHA1(505808834677c433e0a4cfbf387b2874e2d0fc47) )
-	ROM_LOAD_512( "ds2-pr6d.s11",   0x300000, CRC(5382447d) SHA1(3034d3a57b493c86673ee0aa7172bae778edd76a) ) // aka 8722-1107.bin for Atari's part number
-	ROM_LOAD_512( "ds2-pr7d.t11",   0x380000, CRC(80ff492a) SHA1(716ff7444edc0dfcce0fda2d213feb183435471f) ) // aka 8722-1108.bin for Atari's part number
+	ROM_LOAD_512( "ds2-pr6d.s11",   0x300000, CRC(5382447d) SHA1(3034d3a57b493c86673ee0aa7172bae778edd76a) ) // aka 8722-136055-1107.bin for Atari's part number
+	ROM_LOAD_512( "ds2-pr7d.t11",   0x380000, CRC(80ff492a) SHA1(716ff7444edc0dfcce0fda2d213feb183435471f) ) // aka 8722-136055-1108.bin for Atari's part number
 
 	ROM_REGION( 0x1000, "mcu", 0 )  /* MCU internal ROM */
 	ROM_LOAD( "cus64-64a1.mcu",     0x0000, 0x1000, CRC(ffb5c0bd) SHA1(7a38c0cc2553c627f4ec507fb6e807cf7d537c02) ) /* internal 63701 MCU code */

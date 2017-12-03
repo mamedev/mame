@@ -26,14 +26,14 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE(SAA5050, saa5050_device, "saa5050", "Mullard SA5050")
-DEFINE_DEVICE_TYPE(SAA5051, saa5051_device, "saa5051", "Mullard SA5051")
-DEFINE_DEVICE_TYPE(SAA5052, saa5052_device, "saa5052", "Mullard SA5052")
-DEFINE_DEVICE_TYPE(SAA5053, saa5053_device, "saa5053", "Mullard SA5053")
-DEFINE_DEVICE_TYPE(SAA5054, saa5054_device, "saa5054", "Mullard SA5054")
-DEFINE_DEVICE_TYPE(SAA5055, saa5055_device, "saa5055", "Mullard SA5055")
-DEFINE_DEVICE_TYPE(SAA5056, saa5056_device, "saa5056", "Mullard SA5056")
-DEFINE_DEVICE_TYPE(SAA5057, saa5057_device, "saa5057", "Mullard SA5057")
+DEFINE_DEVICE_TYPE(SAA5050, saa5050_device, "saa5050", "SAA5050 Teletext Character Generator")
+DEFINE_DEVICE_TYPE(SAA5051, saa5051_device, "saa5051", "SAA5051 Teletext Character Generator")
+DEFINE_DEVICE_TYPE(SAA5052, saa5052_device, "saa5052", "SAA5052 Teletext Character Generator")
+DEFINE_DEVICE_TYPE(SAA5053, saa5053_device, "saa5053", "SAA5053 Teletext Character Generator")
+DEFINE_DEVICE_TYPE(SAA5054, saa5054_device, "saa5054", "SAA5054 Teletext Character Generator")
+DEFINE_DEVICE_TYPE(SAA5055, saa5055_device, "saa5055", "SAA5055 Teletext Character Generator")
+DEFINE_DEVICE_TYPE(SAA5056, saa5056_device, "saa5056", "SAA5056 Teletext Character Generator")
+DEFINE_DEVICE_TYPE(SAA5057, saa5057_device, "saa5057", "SAA5057 Teletext Character Generator")
 
 
 //-------------------------------------------------

@@ -7,6 +7,7 @@
 *************************************************************************/
 
 #include "machine/atarigen.h"
+#include "machine/timer.h"
 #include "machine/x2212.h"
 
 class foodf_state : public atarigen_state

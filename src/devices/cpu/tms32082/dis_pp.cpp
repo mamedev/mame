@@ -3,9 +3,9 @@
 // TMS32082 PP Disassembler
 
 #include "emu.h"
+#include "dis_pp.h"
 
-
-static const char *REG_NAMES[128] =
+const char *tms32082_pp_disassembler::REG_NAMES[128] =
 {
 	// 0 - 15
 	"a0",       "a1",       "a2",       "a3",       "a4",       "???",      "a6",       "a7",
@@ -33,7 +33,7 @@ static const char *REG_NAMES[128] =
 	"???",      "???",      "???",      "???",      "tag0",     "tag1",     "tag2",     "tag3"
 };
 
-static const char *CONDITION_CODES[16] =
+const char *tms32082_pp_disassembler::CONDITION_CODES[16] =
 {
 	"",         "[p] ",     "[ls] ",    "[hi] ",
 	"[lt] ",    "[le] ",    "[ge] ",    "[gt] ",
@@ -41,49 +41,39 @@ static const char *CONDITION_CODES[16] =
 	"[v] ",     "[nv] ",    "[n] ",     "[nn] "
 };
 
-static const char *TRANSFER_SIZE[4] =
+const char *tms32082_pp_disassembler::TRANSFER_SIZE[4] =
 {
 	"b:", "h:", "w:", ""
 };
 
-
-static std::ostream *output;
-
-static char *format_address_mode(int mode, int areg, int s, int limx)
+std::string tms32082_pp_disassembler::format_address_mode(int mode, int areg, int s, int limx)
 {
-	static char buffer[64];
-
-	memset(buffer, 0, sizeof(char)*64);
-
 	switch (mode)
 	{
-		case 0x4: sprintf(buffer, "*(a%d++=x%d)", areg, limx); break;
-		case 0x5: sprintf(buffer, "*(a%d--=x%d)", areg, limx); break;
-		case 0x6: sprintf(buffer, "*(a%d++0x%04X)", areg, limx); break;
-		case 0x7: sprintf(buffer, "*(a%d--0x%04X)", areg, limx); break;
-		case 0x8: sprintf(buffer, "*(a%d+x%d)", areg, limx); break;
-		case 0x9: sprintf(buffer, "*(a%d-x%d)", areg, limx); break;
-		case 0xa: sprintf(buffer, "*(a%d+0x%04X)", areg, limx); break;
-		case 0xb: sprintf(buffer, "*(a%d-0x%04X)", areg, limx); break;
-		case 0xc: sprintf(buffer, "*(a%d+=x%d)", areg, limx); break;
-		case 0xd: sprintf(buffer, "*(a%d-=x%d)", areg, limx); break;
-		case 0xe: sprintf(buffer, "*(a%d+=0x%04X)", areg, limx); break;
-		case 0xf: sprintf(buffer, "*(a%d-=0x%04X)", areg, limx); break;
+		case 0x4: return util::string_format("*(a%d++=x%d)", areg, limx);
+		case 0x5: return util::string_format("*(a%d--=x%d)", areg, limx);
+		case 0x6: return util::string_format("*(a%d++0x%04X)", areg, limx);
+		case 0x7: return util::string_format("*(a%d--0x%04X)", areg, limx);
+		case 0x8: return util::string_format("*(a%d+x%d)", areg, limx);
+		case 0x9: return util::string_format("*(a%d-x%d)", areg, limx);
+		case 0xa: return util::string_format("*(a%d+0x%04X)", areg, limx);
+		case 0xb: return util::string_format("*(a%d-0x%04X)", areg, limx);
+		case 0xc: return util::string_format("*(a%d+=x%d)", areg, limx);
+		case 0xd: return util::string_format("*(a%d-=x%d)", areg, limx);
+		case 0xe: return util::string_format("*(a%d+=0x%04X)", areg, limx);
+		case 0xf: return util::string_format("*(a%d-=0x%04X)", areg, limx);
 	}
 
-	return buffer;
+	return "";
 }
 
-static void format_transfer(uint64_t op)
+void tms32082_pp_disassembler::format_transfer(uint64_t op)
 {
-	char buffer[128];
-	char *b = buffer;
+	std::string buffer;
 	int lmode = (op >> 35) & 0xf;
 	int gmode = (op >> 13) & 0xf;
 
 	bool is_nop = false;
-
-	memset(buffer, 0, sizeof(char)*128);
 
 	switch (lmode)
 	{
@@ -106,8 +96,8 @@ static void format_transfer(uint64_t op)
 					int dreg = (dstbank << 3) | dst;
 					int sreg = (srcbank << 3) | src;
 
-					b += sprintf(b, "%s", CONDITION_CODES[cond]);
-					b += sprintf(b, "%s = %s", REG_NAMES[dreg], REG_NAMES[sreg]);
+					buffer += util::string_format("%s", CONDITION_CODES[cond]);
+					buffer += util::string_format("%s = %s", REG_NAMES[dreg], REG_NAMES[sreg]);
 					break;
 				}
 				case 0x01:                                      // Format 8: Conditional DU ||Conditional Field Move
@@ -122,8 +112,8 @@ static void format_transfer(uint64_t op)
 					int dreg = (dstbank << 3) | dst;
 					int sreg = (4 << 3) | src;
 
-					b += sprintf(b, "%s", CONDITION_CODES[cond]);
-					b += sprintf(b, "%s = [%s%d]%s", REG_NAMES[dreg], TRANSFER_SIZE[size], itm, REG_NAMES[sreg]);
+					buffer += util::string_format("%s", CONDITION_CODES[cond]);
+					buffer += util::string_format("%s = [%s%d]%s", REG_NAMES[dreg], TRANSFER_SIZE[size], itm, REG_NAMES[sreg]);
 					break;
 				}
 				case 0x02: case 0x03:                           // Format 10: Conditional Non-D Data Unit
@@ -142,8 +132,8 @@ static void format_transfer(uint64_t op)
 					}
 					else
 					{
-						b += sprintf(b, "%s", CONDITION_CODES[cond]);
-						b += sprintf(b, "%s = %s", REG_NAMES[dreg], REG_NAMES[sreg]);
+						buffer += util::string_format("%s", CONDITION_CODES[cond]);
+						buffer += util::string_format("%s = %s", REG_NAMES[dreg], REG_NAMES[sreg]);
 					}
 					break;
 				}
@@ -161,14 +151,14 @@ static void format_transfer(uint64_t op)
 
 						int greg = (bank << 3) | reg;
 
-						b += sprintf(b, "%s", CONDITION_CODES[cond]);
+						buffer += util::string_format("%s", CONDITION_CODES[cond]);
 
 						switch (le)
 						{
-							case 0: b += sprintf(b, "&%s%s = %s", TRANSFER_SIZE[size], format_address_mode(gmode, ga, s, gimx), REG_NAMES[greg]); break;
-							case 1: b += sprintf(b, "%s = %s", REG_NAMES[greg], format_address_mode(gmode, ga, s, gimx)); break;
-							case 2: b += sprintf(b, "%s = &%s%s", REG_NAMES[greg], TRANSFER_SIZE[size], format_address_mode(gmode, ga, s, gimx)); break;
-							case 3: b += sprintf(b, "%s = &%s%s", REG_NAMES[greg], TRANSFER_SIZE[size], format_address_mode(gmode, ga, s, gimx)); break;
+							case 0: buffer += util::string_format("&%s%s = %s", TRANSFER_SIZE[size], format_address_mode(gmode, ga, s, gimx), REG_NAMES[greg]); break;
+							case 1: buffer += util::string_format("%s = %s", REG_NAMES[greg], format_address_mode(gmode, ga, s, gimx)); break;
+							case 2: buffer += util::string_format("%s = &%s%s", REG_NAMES[greg], TRANSFER_SIZE[size], format_address_mode(gmode, ga, s, gimx)); break;
+							case 3: buffer += util::string_format("%s = &%s%s", REG_NAMES[greg], TRANSFER_SIZE[size], format_address_mode(gmode, ga, s, gimx)); break;
 						}
 					}
 					else                                        // Format 5: Global (Long Offset)
@@ -190,10 +180,10 @@ static void format_transfer(uint64_t op)
 
 						switch (le)
 						{
-							case 0: b += sprintf(b, "&%s%s = %s", TRANSFER_SIZE[size], format_address_mode(gmode, ga, s, offset), REG_NAMES[greg]); break;
-							case 1: b += sprintf(b, "%s = %s", REG_NAMES[greg], format_address_mode(gmode, ga, s, offset)); break;
-							case 2: b += sprintf(b, "%s = &%s%s", REG_NAMES[greg], TRANSFER_SIZE[size], format_address_mode(gmode, ga, s, offset)); break;
-							case 3: b += sprintf(b, "%s = &%s%s", REG_NAMES[greg], TRANSFER_SIZE[size], format_address_mode(gmode, ga, s, offset)); break;
+							case 0: buffer += util::string_format("&%s%s = %s", TRANSFER_SIZE[size], format_address_mode(gmode, ga, s, offset), REG_NAMES[greg]); break;
+							case 1: buffer += util::string_format("%s = %s", REG_NAMES[greg], format_address_mode(gmode, ga, s, offset)); break;
+							case 2: buffer += util::string_format("%s = &%s%s", REG_NAMES[greg], TRANSFER_SIZE[size], format_address_mode(gmode, ga, s, offset)); break;
+							case 3: buffer += util::string_format("%s = &%s%s", REG_NAMES[greg], TRANSFER_SIZE[size], format_address_mode(gmode, ga, s, offset)); break;
 						}
 					}
 					break;
@@ -210,12 +200,12 @@ static void format_transfer(uint64_t op)
 			{
 				case 0x00:                                      // Format 2: Move || Local
 				{
-					b += sprintf(b, "move||local <TODO>");
+					buffer += util::string_format("move||local <TODO>");
 					break;
 				}
 				case 0x01:                                      // Format 3: Field Move || Local
 				{
-					b += sprintf(b, "field move||local <TODO>");
+					buffer += util::string_format("field move||local <TODO>");
 					break;
 				}
 				case 0x02: case 0x03:                           // Format 6: Non-D DU || Local
@@ -231,10 +221,10 @@ static void format_transfer(uint64_t op)
 
 					switch (le)
 					{
-						case 0: b += sprintf(b, "&%s%s = %s", TRANSFER_SIZE[size], format_address_mode(lmode, la, s, limx), REG_NAMES[reg]); break;
-						case 1: b += sprintf(b, "%s = %s", REG_NAMES[reg], format_address_mode(lmode, la, s, limx)); break;
-						case 2: b += sprintf(b, "%s = &%s%s", REG_NAMES[reg], TRANSFER_SIZE[size], format_address_mode(lmode, la, s, limx)); break;
-						case 3: b += sprintf(b, "%s = &%s%s", REG_NAMES[reg], TRANSFER_SIZE[size], format_address_mode(lmode, la, s, limx)); break;
+						case 0: buffer += util::string_format("&%s%s = %s", TRANSFER_SIZE[size], format_address_mode(lmode, la, s, limx), REG_NAMES[reg]); break;
+						case 1: buffer += util::string_format("%s = %s", REG_NAMES[reg], format_address_mode(lmode, la, s, limx)); break;
+						case 2: buffer += util::string_format("%s = &%s%s", REG_NAMES[reg], TRANSFER_SIZE[size], format_address_mode(lmode, la, s, limx)); break;
+						case 3: buffer += util::string_format("%s = &%s%s", REG_NAMES[reg], TRANSFER_SIZE[size], format_address_mode(lmode, la, s, limx)); break;
 					}
 					break;
 				}
@@ -263,10 +253,10 @@ static void format_transfer(uint64_t op)
 
 					switch (le)
 					{
-						case 0: b += sprintf(b, "&%s%s = %s", TRANSFER_SIZE[size], format_address_mode(lmode, la, s, offset), REG_NAMES[reg]); break;
-						case 1: b += sprintf(b, "%s = %s", REG_NAMES[reg], format_address_mode(lmode, la, s, offset)); break;
-						case 2: b += sprintf(b, "%s = &%s%s", REG_NAMES[reg], TRANSFER_SIZE[size], format_address_mode(lmode, la, s, offset)); break;
-						case 3: b += sprintf(b, "%s = &%s%s", REG_NAMES[reg], TRANSFER_SIZE[size], format_address_mode(lmode, la, s, offset)); break;
+						case 0: buffer += util::string_format("&%s%s = %s", TRANSFER_SIZE[size], format_address_mode(lmode, la, s, offset), REG_NAMES[reg]); break;
+						case 1: buffer += util::string_format("%s = %s", REG_NAMES[reg], format_address_mode(lmode, la, s, offset)); break;
+						case 2: buffer += util::string_format("%s = &%s%s", REG_NAMES[reg], TRANSFER_SIZE[size], format_address_mode(lmode, la, s, offset)); break;
+						case 3: buffer += util::string_format("%s = &%s%s", REG_NAMES[reg], TRANSFER_SIZE[size], format_address_mode(lmode, la, s, offset)); break;
 					}
 					break;
 				}
@@ -294,10 +284,10 @@ static void format_transfer(uint64_t op)
 					// local transfer
 					switch (local_le)
 					{
-						case 0: b += sprintf(b, "&%s%s = %s", TRANSFER_SIZE[local_size], format_address_mode(lmode, la, local_s, local_imx), REG_NAMES[lreg]); break;
-						case 1: b += sprintf(b, "%s = %s", REG_NAMES[lreg], format_address_mode(lmode, la, local_s, local_imx)); break;
-						case 2: b += sprintf(b, "%s = &%s%s", REG_NAMES[lreg], TRANSFER_SIZE[local_size], format_address_mode(lmode, la, local_s, local_imx)); break;
-						case 3: b += sprintf(b, "%s = &%s%s", REG_NAMES[lreg], TRANSFER_SIZE[local_size], format_address_mode(lmode, la, local_s, local_imx)); break;
+						case 0: buffer += util::string_format("&%s%s = %s", TRANSFER_SIZE[local_size], format_address_mode(lmode, la, local_s, local_imx), REG_NAMES[lreg]); break;
+						case 1: buffer += util::string_format("%s = %s", REG_NAMES[lreg], format_address_mode(lmode, la, local_s, local_imx)); break;
+						case 2: buffer += util::string_format("%s = &%s%s", REG_NAMES[lreg], TRANSFER_SIZE[local_size], format_address_mode(lmode, la, local_s, local_imx)); break;
+						case 3: buffer += util::string_format("%s = &%s%s", REG_NAMES[lreg], TRANSFER_SIZE[local_size], format_address_mode(lmode, la, local_s, local_imx)); break;
 					}
 
 					util::stream_format(*output, ", ");
@@ -305,10 +295,10 @@ static void format_transfer(uint64_t op)
 					// global transfer
 					switch (global_le)
 					{
-						case 0: b += sprintf(b, "&%s%s = %s", TRANSFER_SIZE[global_size], format_address_mode(gmode, ga, global_s, global_imx), REG_NAMES[greg]); break;
-						case 1: b += sprintf(b, "%s = %s", REG_NAMES[greg], format_address_mode(gmode, ga, global_s, global_imx)); break;
-						case 2: b += sprintf(b, "%s = &%s%s", REG_NAMES[greg], TRANSFER_SIZE[global_size], format_address_mode(gmode, ga, global_s, global_imx)); break;
-						case 3: b += sprintf(b, "%s = &%s%s", REG_NAMES[greg], TRANSFER_SIZE[global_size], format_address_mode(gmode, ga, global_s, global_imx)); break;
+						case 0: buffer += util::string_format("&%s%s = %s", TRANSFER_SIZE[global_size], format_address_mode(gmode, ga, global_s, global_imx), REG_NAMES[greg]); break;
+						case 1: buffer += util::string_format("%s = %s", REG_NAMES[greg], format_address_mode(gmode, ga, global_s, global_imx)); break;
+						case 2: buffer += util::string_format("%s = &%s%s", REG_NAMES[greg], TRANSFER_SIZE[global_size], format_address_mode(gmode, ga, global_s, global_imx)); break;
+						case 3: buffer += util::string_format("%s = &%s%s", REG_NAMES[greg], TRANSFER_SIZE[global_size], format_address_mode(gmode, ga, global_s, global_imx)); break;
 					}
 					break;
 				}
@@ -320,7 +310,7 @@ static void format_transfer(uint64_t op)
 		util::stream_format(*output, " || %s", buffer);
 }
 
-static void format_alu_op(int aluop, int a, const char *dst_text, const char *a_text, const char *b_text, const char *c_text)
+void tms32082_pp_disassembler::format_alu_op(int aluop, int a, const char *dst_text, const char *a_text, const char *b_text, const char *c_text)
 {
 	if (a)      // arithmetic
 	{
@@ -409,13 +399,17 @@ static void format_alu_op(int aluop, int a, const char *dst_text, const char *a_
 	}
 }
 
-static offs_t tms32082_disasm_pp(std::ostream &stream, offs_t pc, const uint8_t *oprom)
+u32 tms32082_pp_disassembler::opcode_alignment() const
+{
+	return 8;
+}
+
+offs_t tms32082_pp_disassembler::disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params)
 {
 	output = &stream;
 	uint32_t flags = 0;
 
-	uint64_t op = ((uint64_t)(oprom[0]) << 56) | ((uint64_t)(oprom[1]) << 48) | ((uint64_t)(oprom[2]) << 40) | ((uint64_t)(oprom[3]) << 32) |
-				((uint64_t)(oprom[4]) << 24) | ((uint64_t)(oprom[5]) << 16) | ((uint64_t)(oprom[6]) << 8) | ((uint64_t)(oprom[7]));
+	uint64_t op = opcodes.r64(pc);
 
 	switch (op >> 60)
 	{
@@ -695,10 +689,5 @@ static offs_t tms32082_disasm_pp(std::ostream &stream, offs_t pc, const uint8_t 
 			break;
 	}
 
-	return 8 | flags | DASMFLAG_SUPPORTED;
-}
-
-CPU_DISASSEMBLE(tms32082_pp)
-{
-	return tms32082_disasm_pp(stream, pc, oprom);
+	return 8 | flags | SUPPORTED;
 }

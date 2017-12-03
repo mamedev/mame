@@ -39,8 +39,8 @@
 #include "emu.h"
 #include "includes/thunderj.h"
 #include "cpu/m68000/m68000.h"
+#include "machine/eeprompar.h"
 #include "machine/watchdog.h"
-#include "machine/atarigen.h"
 #include "speaker.h"
 
 
@@ -118,9 +118,9 @@ WRITE16_MEMBER(thunderj_state::latch_w)
 
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, thunderj_state )
 	AM_RANGE(0x000000, 0x09ffff) AM_ROM
-	AM_RANGE(0x0e0000, 0x0e0fff) AM_DEVREADWRITE8("eeprom", atari_eeprom_device, read, write, 0x00ff)
+	AM_RANGE(0x0e0000, 0x0e0fff) AM_DEVREADWRITE8("eeprom", eeprom_parallel_28xx_device, read, write, 0x00ff)
 	AM_RANGE(0x160000, 0x16ffff) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0x1f0000, 0x1fffff) AM_DEVWRITE("eeprom", atari_eeprom_device, unlock_write)
+	AM_RANGE(0x1f0000, 0x1fffff) AM_DEVWRITE("eeprom", eeprom_parallel_28xx_device, unlock_write)
 	AM_RANGE(0x260000, 0x26000f) AM_READ_PORT("260000")
 	AM_RANGE(0x260010, 0x260011) AM_READ_PORT("260010")
 	AM_RANGE(0x260012, 0x260013) AM_READ(special_port2_r)
@@ -259,7 +259,8 @@ static MACHINE_CONFIG_START( thunderj )
 	MCFG_MACHINE_START_OVERRIDE(thunderj_state,thunderj)
 	MCFG_MACHINE_RESET_OVERRIDE(thunderj_state,thunderj)
 
-	MCFG_ATARI_EEPROM_2816_ADD("eeprom")
+	MCFG_EEPROM_2816_ADD("eeprom")
+	MCFG_EEPROM_28XX_LOCK_AFTER_WRITE(true)
 
 	MCFG_WATCHDOG_ADD("watchdog")
 

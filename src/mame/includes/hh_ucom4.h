@@ -2,7 +2,7 @@
 // copyright-holders:hap
 /*
 
-  NEC uCOM4 MCU tabletops/handhelds or other simple devices,
+  NEC uCOM4 MCU tabletops/handhelds or other simple devices.
 
 */
 
@@ -10,9 +10,8 @@
 #define MAME_INCLUDES_HH_UCOM4_H
 
 #include "cpu/ucom4/ucom4.h"
+#include "machine/timer.h"
 #include "sound/spkrdev.h"
-
-#include "rendlay.h"
 
 
 class hh_ucom4_state : public driver_device

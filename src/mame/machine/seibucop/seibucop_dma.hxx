@@ -95,10 +95,11 @@ void raiden2cop_device::dma_palette_brightness()
 			rt = (targetpaldata & 0x001f) >> 0;
 			r = (paldata & 0x001f) >> 0;
 
+			// TODO: presumably any brightness value that isn't 0x0000-0x000f has no effect here
 			if (pal_brightness_val == 0x10)
 				pal_val = bt << 10 | gt << 5 | rt << 0;
-			else if (pal_brightness_val == 0xff) // TODO: might be the back plane or it still doesn't do any mod, needs PCB tests
-				pal_val = 0;
+			else if (pal_brightness_val == 0xffff) // level transitions
+				pal_val = bt << 10 | gt << 5 | rt << 0;
 			else
 			{
 				bt = fade_table(bt << 5 | ((pal_brightness_val * 2) ^ 0));

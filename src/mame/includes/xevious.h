@@ -1,6 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:Nicola Salmoria
 
+#include "machine/timer.h"
+
 class xevious_state : public galaga_state
 {
 public:

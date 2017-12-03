@@ -63,6 +63,7 @@ instead of magnet sensors.
 #include "cpu/m6502/r65c02.h"
 #include "machine/mos6551.h"
 #include "machine/nvram.h"
+#include "machine/timer.h"
 #include "video/hlcd0538.h"
 #include "screen.h"
 #include "speaker.h"

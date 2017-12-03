@@ -113,6 +113,7 @@
 #include "emu.h"
 
 #include "cpu/i8085/i8085.h"
+//#include "bus/s100/s100.h"
 #include "imagedev/cassette.h"
 #include "machine/ay31015.h"
 #include "machine/keyboard.h"
@@ -733,7 +734,7 @@ void sol20_state::kbd_put(u8 data)
 
 static MACHINE_CONFIG_START( sol20 )
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",I8080, XTAL_14_31818MHz/7)
+	MCFG_CPU_ADD("maincpu",I8080, XTAL_14_31818MHz / 7) // divider selectable as 5, 6 or 7 through jumpers
 	MCFG_CPU_PROGRAM_MAP(sol20_mem)
 	MCFG_CPU_IO_MAP(sol20_io)
 	MCFG_I8085A_INTE(DEVWRITELINE("speaker", speaker_sound_device, level_w))

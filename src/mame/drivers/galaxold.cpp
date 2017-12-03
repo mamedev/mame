@@ -537,6 +537,32 @@ static ADDRESS_MAP_START( dkongjrm_map, AS_PROGRAM, 8, galaxold_state )
 ADDRESS_MAP_END
 
 
+static ADDRESS_MAP_START( dkongjrmc_map, AS_PROGRAM, 8, galaxold_state )
+	AM_RANGE(0x0000, 0x5fff) AM_ROM
+	AM_RANGE(0x6000, 0x6fff) AM_RAM
+	AM_RANGE(0x7000, 0x70ff) AM_RAM_WRITE(galaxold_attributesram_w) AM_SHARE("attributesram")
+	AM_RANGE(0x7100, 0x71ff) AM_RAM AM_SHARE("spriteram")
+	AM_RANGE(0x7000, 0x73ff) AM_RAM_WRITE(galaxold_videoram_w)
+	AM_RANGE(0x7400, 0x77ff) AM_RAM_WRITE(galaxold_videoram_w) AM_SHARE("videoram")
+	AM_RANGE(0x7800, 0x7800) AM_READ_PORT("DSW")
+	AM_RANGE(0x7801, 0x7801) AM_WRITE(galaxold_nmi_enable_w)
+	AM_RANGE(0x7802, 0x7802) AM_WRITE(galaxold_leds_w)
+	AM_RANGE(0x7804, 0x7804) AM_WRITE(galaxold_gfxbank_w)
+	AM_RANGE(0x7806, 0x7806) AM_WRITE(galaxold_flip_screen_x_w)
+	AM_RANGE(0x7807, 0x7807) AM_WRITE(galaxold_flip_screen_y_w)
+	AM_RANGE(0x7d00, 0x7d02) AM_MIRROR(0x0080) AM_DEVWRITE("cust", galaxian_sound_device, background_enable_w)
+	AM_RANGE(0x7d03, 0x7d03) AM_MIRROR(0x0080) AM_DEVWRITE("cust", galaxian_sound_device, noise_enable_w)
+	AM_RANGE(0x7d05, 0x7d05) AM_MIRROR(0x0080) AM_DEVWRITE("cust", galaxian_sound_device, fire_enable_w)
+	AM_RANGE(0x7d06, 0x7d07) AM_MIRROR(0x0080) AM_DEVWRITE("cust", galaxian_sound_device, vol_w)
+	AM_RANGE(0x8000, 0x8000) AM_READ_PORT("IN0")
+	AM_RANGE(0x8100, 0x8100) AM_READ_PORT("IN1")
+	AM_RANGE(0x8103, 0x8103) AM_WRITE(galaxold_coin_counter_w)
+	AM_RANGE(0x8104, 0x8107) AM_DEVWRITE("cust", galaxian_sound_device, lfo_freq_w)
+	AM_RANGE(0x8200, 0x8200) AM_DEVWRITE("cust", galaxian_sound_device, pitch_w)
+	AM_RANGE(0x9000, 0x9fff) AM_ROM
+ADDRESS_MAP_END
+
+
 static ADDRESS_MAP_START( tazzmang, AS_PROGRAM, 8, galaxold_state )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0x7000, 0x7000) AM_READ_PORT("DSW0") /* mirror */
@@ -1596,6 +1622,44 @@ static INPUT_PORTS_START( dkongjrm )
 INPUT_PORTS_END
 
 
+static INPUT_PORTS_START( dkongjrmc )
+	PORT_START("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )  PORT_4WAY
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_4WAY
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 )
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )  PORT_4WAY
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )  PORT_4WAY PORT_COCKTAIL
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )    PORT_4WAY
+
+	PORT_START("IN1")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START1 )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )  PORT_4WAY PORT_COCKTAIL
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_4WAY PORT_COCKTAIL
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_COCKTAIL
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )    PORT_4WAY PORT_COCKTAIL
+	PORT_DIPNAME( 0xc0, 0x00, DEF_STR( Lives ) )
+	PORT_DIPSETTING(    0x00, "3" )
+	PORT_DIPSETTING(    0x40, "4" )
+	PORT_DIPSETTING(    0x80, "5" )
+	PORT_DIPSETTING(    0xc0, "6" )
+
+	PORT_START("DSW")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Bonus_Life ) )
+	PORT_DIPSETTING(    0x00, "10000" )
+	PORT_DIPSETTING(    0x02, "20000" )
+	PORT_DIPNAME( 0x0c, 0x00, DEF_STR( Coinage ) )
+	PORT_DIPSETTING(    0x0c, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( 1C_3C ) )
+	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_UNUSED )
+INPUT_PORTS_END
+
+
 /* verified from Z80 code */
 static INPUT_PORTS_START( porter )
 	PORT_START("IN0")
@@ -2334,6 +2398,14 @@ static MACHINE_CONFIG_DERIVED( dkongjrm, mooncrst )
 MACHINE_CONFIG_END
 
 
+static MACHINE_CONFIG_DERIVED( dkongjrmc, mooncrst )
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(dkongjrmc_map)
+
+	MCFG_VIDEO_START_OVERRIDE(galaxold_state,dkongjrmc)
+MACHINE_CONFIG_END
+
+
 static MACHINE_CONFIG_DERIVED( rockclim, mooncrst )
 
 	/* basic machine hardware */
@@ -3031,6 +3103,30 @@ ROM_START( dkongjrm )
 	ROM_LOAD( "hustler.clr",  0x0000, 0x0020, CRC(aa1f7f5e) SHA1(311dd17aa11490a1173c76223e4ccccf8ea29850) )
 ROM_END
 
+ROM_START( dkongjrmc ) // "CENTROMATIC - G/G" main board
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "2732-1.bin",   0x0000, 0x1000, CRC(1bcb41be) SHA1(74b1700babd26cb0c781bc702130a63da0386463) )
+	ROM_LOAD( "2732-2.bin",   0x1000, 0x1000, CRC(f027a6b9) SHA1(557ab9737c31b4c57b1d37d62bb5ce51c574c4b9) )
+	ROM_LOAD( "2732-3.bin",   0x2000, 0x1000, CRC(e2484ff4) SHA1(fdd77db1ba0dc7876e0503aace7273d7a8dedd53) )
+	ROM_LOAD( "2732-4.bin",   0x3000, 0x1000, CRC(37e5dd92) SHA1(69bbc765a54e98b69cf6831342469a9c94659f8f) )
+	ROM_LOAD( "2732-5.bin",   0x4000, 0x1000, CRC(b2d89348) SHA1(209f3ca7c97afa3e746f778df0c34664f8791855) )
+	ROM_LOAD( "2732-6.bin",   0x5000, 0x1000, CRC(24b0c560) SHA1(0b7e099ad2aace542fedb8b7c8c28204d3ea7a46) )
+	ROM_LOAD( "2732-7.bin",   0x9000, 0x1000, CRC(7428eefa) SHA1(82e5c8461fe48e5d6222bb5d0a259e6fd0c5cac7) )
+
+	ROM_REGION( 0x4000, "gfx1", 0 ) // GFX ROM sub board marked "CALFESA" on solder side
+	ROM_LOAD( "2732-A.bin",   0x0000, 0x1000, CRC(526ed721) SHA1(5fd317908b9d9aa70768f8f7cfbfdfa6d1e654b6) )
+	ROM_LOAD( "2732-B.bin",   0x1000, 0x1000, CRC(d2cb5130) SHA1(b87d2c74cc74782fec7268f0a637613450a2fb4b) )
+	ROM_LOAD( "2732-C.bin",   0x2000, 0x1000, CRC(7ceae713) SHA1(1f85d3b34cf10bd6277b408aed051a18cf9b1090) )
+	ROM_LOAD( "2732-D.bin",   0x3000, 0x1000, CRC(2aa1acf1) SHA1(fdf58e737253ca5f0cf3667d3a74efeafdb66e21) )
+
+	ROM_REGION( 0x0020, "proms", 0 )
+	ROM_LOAD( "82s123.bin",   0x0000, 0x0020, CRC(6a0c7d87) SHA1(140335d85c67c75b65689d4e76d29863c209cf32) )
+
+	ROM_REGION( 0x0200, "mainproms", 0 )
+	ROM_LOAD( "TBP28L22N-8240A.bin", 0x0000, 0x0100, CRC(df72ed74) SHA1(fce9a846b7238c2cc8898e6338485f3df0a56755) )
+	ROM_LOAD( "TBP28L22N-A8240A.bin", 0x0100, 0x0100, CRC(9575df2b) SHA1(9360730fc230d17f6be5fc7f8d46d79566839cfa) )
+ROM_END
+
 ROM_START( porter )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "port1.bin",          0x0000, 0x0800, CRC(babaf7fe) SHA1(2138abf57990df9b6f9953efd3be9b2bede49520) )
@@ -3440,7 +3536,8 @@ GAME( 1981, scrambler, scramble, scrambler, scrambler, galaxold_state, 0,       
 GAME( 1981, 4in1,      0,        4in1,      4in1,      galaxold_state, 4in1,     ROT90,  "Armenia / Food and Fun", "4 Fun in 1", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1982, bagmanmc,  bagman,   bagmanmc,  bagmanmc,  galaxold_state, 0,        ROT90,  "bootleg", "Bagman (bootleg on Moon Cresta hardware, set 1)", MACHINE_IMPERFECT_COLORS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 GAME( 1984, bagmanm2,  bagman,   bagmanmc,  bagmanmc,  galaxold_state, 0,        ROT90,  "bootleg (GIB)", "Bagman (bootleg on Moon Cresta hardware, set 2)", MACHINE_IMPERFECT_COLORS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1982, dkongjrm,  dkongjr,  dkongjrm,  dkongjrm,  galaxold_state, 0,        ROT90,  "bootleg", "Donkey Kong Jr. (bootleg on Moon Cresta hardware)", MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_SOUND | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1982, dkongjrm,  dkongjr,  dkongjrm,  dkongjrm,  galaxold_state, 0,        ROT90,  "bootleg", "Donkey Kong Jr. (bootleg on Moon Cresta hardware, set 1)", MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_SOUND | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1982, dkongjrmc, dkongjr,  dkongjrmc, dkongjrmc, galaxold_state, 0,        ROT90,  "bootleg (Centromatic)", "Donkey Kong Jr. (bootleg on Moon Cresta hardware, set 2)", MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // sprites leave artifacts
 GAME( 1982, porter,    dockman,  porter,    porter,    galaxold_state, 0,        ROT90,  "bootleg", "Port Man (bootleg on Moon Cresta hardware)", MACHINE_IMPERFECT_COLORS | MACHINE_NO_COCKTAIL )
 GAME( 1982, tazzmang,  tazmania, tazzmang,  tazzmang,  galaxold_state, 0,        ROT90,  "bootleg", "Tazz-Mania (bootleg on Galaxian hardware)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 GAME( 1982, tazzmang2, tazmania, tazzmang,  tazzmang,  galaxold_state, 0,        ROT90,  "bootleg", "Tazz-Mania (bootleg on Galaxian hardware with Starfield)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )

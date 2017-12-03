@@ -51,7 +51,6 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual void send_key(uint8_t code) { if (!m_keyboard_cb.isnull()) m_keyboard_cb(code); }
 
-	optional_device<palette_device> m_palette;
 	required_ioport m_io_term_conf;
 
 	static constexpr unsigned TERMINAL_WIDTH = 80;

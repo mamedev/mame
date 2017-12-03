@@ -71,12 +71,6 @@ READ8_MEMBER(amspdwy_state::amspdwy_sound_r)
 	return (m_ym2151->status_r(space, 0) & ~0x30) | ioport("IN0")->read();
 }
 
-WRITE8_MEMBER(amspdwy_state::amspdwy_sound_w)
-{
-	m_soundlatch->write(space, 0, data);
-	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
-}
-
 static ADDRESS_MAP_START( amspdwy_map, AS_PROGRAM, 8, amspdwy_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x801f) AM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
@@ -89,7 +83,7 @@ static ADDRESS_MAP_START( amspdwy_map, AS_PROGRAM, 8, amspdwy_state )
 	AM_RANGE(0xa800, 0xa800) AM_READ(amspdwy_wheel_0_r)
 	AM_RANGE(0xac00, 0xac00) AM_READ(amspdwy_wheel_1_r)
 	AM_RANGE(0xb000, 0xb000) AM_WRITENOP // irq ack?
-	AM_RANGE(0xb400, 0xb400) AM_READWRITE(amspdwy_sound_r, amspdwy_sound_w)
+	AM_RANGE(0xb400, 0xb400) AM_READ(amspdwy_sound_r) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
 	AM_RANGE(0xc000, 0xc0ff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM
 ADDRESS_MAP_END
@@ -280,6 +274,7 @@ static MACHINE_CONFIG_START( amspdwy )
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 
 	MCFG_YM2151_ADD("ymsnd", 3000000)
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 0))

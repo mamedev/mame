@@ -592,7 +592,8 @@ static MACHINE_CONFIG_START( pipedrm )
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
-	MCFG_DEVICE_ADD("gga", VSYSTEM_GGA, 0)
+	MCFG_DEVICE_ADD("gga", VSYSTEM_GGA, XTAL_14_31818MHz / 2) // divider not verified
+
 	MCFG_VSYSTEM_GGA_REGISTER_WRITE_CB(WRITE8(fromance_state, fromance_gga_data_w))
 
 	MCFG_DEVICE_ADD("vsystem_spr_old", VSYSTEM_SPR2, 0)
@@ -646,7 +647,8 @@ static MACHINE_CONFIG_START( hatris )
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
-	MCFG_DEVICE_ADD("gga", VSYSTEM_GGA, 0)
+	MCFG_DEVICE_ADD("gga", VSYSTEM_GGA, XTAL_14_31818MHz / 2) // divider not verified
+
 	MCFG_VSYSTEM_GGA_REGISTER_WRITE_CB(WRITE8(fromance_state, fromance_gga_data_w))
 
 	MCFG_VIDEO_START_OVERRIDE(pipedrm_state,hatris)

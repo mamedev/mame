@@ -386,7 +386,7 @@ static DISCRETE_SOUND_START(mooncrst)
 	DISCRETE_MIXER7(NODE_280, 1, NODE_133_00, NODE_133_02, NODE_133_02,NODE_133_03, NODE_120, NODE_157, NODE_182, &mooncrst_mixer_desc)
 DISCRETE_SOUND_END
 
-DEFINE_DEVICE_TYPE(GALAXIAN, galaxian_sound_device, "galaxian_sound", "Galaxian Audio Custom")
+DEFINE_DEVICE_TYPE(GALAXIAN, galaxian_sound_device, "galaxian_sound", "Galaxian Custom Sound")
 
 galaxian_sound_device::galaxian_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, GALAXIAN, tag, owner, clock)

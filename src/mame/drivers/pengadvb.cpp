@@ -25,7 +25,7 @@ NOTE! switches 1, 3 & 5 must be ON or the game will not boot.
 TODO:
 - A timer apparently expires when beating stage 4 (signalled by a long beeping sound).
   Player needs to insert another credit and press start button (?) in order to continue.
-  Is this timer supposed to be shown on screen or there are additional 7-LEDs not handled? 
+  Is this timer supposed to be shown on screen or there are additional 7-LEDs not handled?
 
 ***************************************************************************/
 
@@ -178,7 +178,7 @@ WRITE8_MEMBER(pengadvb_state::pengadvb_ppi_port_a_w)
 }
 
 READ8_MEMBER(pengadvb_state::pengadvb_ppi_port_b_r)
-{	
+{
 	// TODO: dipswitch
 	switch (m_kb_matrix_row)
 	{
@@ -214,29 +214,29 @@ static MACHINE_CONFIG_START( pengadvb )
 	MCFG_DEVICE_ADD("page0", ADDRESS_MAP_BANK, 0)
 	MCFG_DEVICE_PROGRAM_MAP(bank_mem)
 	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_ADDRESS_MAP_BANK_DATABUS_WIDTH(8)
-	MCFG_ADDRESS_MAP_BANK_ADDRBUS_WIDTH(18)
+	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
+	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(18)
 	MCFG_ADDRESS_MAP_BANK_STRIDE(0x10000)
 
 	MCFG_DEVICE_ADD("page1", ADDRESS_MAP_BANK, 0)
 	MCFG_DEVICE_PROGRAM_MAP(bank_mem)
 	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_ADDRESS_MAP_BANK_DATABUS_WIDTH(8)
-	MCFG_ADDRESS_MAP_BANK_ADDRBUS_WIDTH(18)
+	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
+	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(18)
 	MCFG_ADDRESS_MAP_BANK_STRIDE(0x10000)
 
 	MCFG_DEVICE_ADD("page2", ADDRESS_MAP_BANK, 0)
 	MCFG_DEVICE_PROGRAM_MAP(bank_mem)
 	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_ADDRESS_MAP_BANK_DATABUS_WIDTH(8)
-	MCFG_ADDRESS_MAP_BANK_ADDRBUS_WIDTH(18)
+	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
+	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(18)
 	MCFG_ADDRESS_MAP_BANK_STRIDE(0x10000)
 
 	MCFG_DEVICE_ADD("page3", ADDRESS_MAP_BANK, 0)
 	MCFG_DEVICE_PROGRAM_MAP(bank_mem)
 	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_ADDRESS_MAP_BANK_DATABUS_WIDTH(8)
-	MCFG_ADDRESS_MAP_BANK_ADDRBUS_WIDTH(18)
+	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
+	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(18)
 	MCFG_ADDRESS_MAP_BANK_STRIDE(0x10000)
 
 	MCFG_DEVICE_ADD("ppi8255", I8255, 0)

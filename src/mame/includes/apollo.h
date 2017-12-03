@@ -327,7 +327,7 @@ void apollo_csr_set_status_register(uint16_t mask, uint16_t data);
 #define MCFG_APOLLO_SIO_OUTPORT_CALLBACK(_cb) \
 	devcb = &apollo_sio::set_outport_cb(*device, DEVCB_##_cb);
 
-class apollo_sio: public mc68681_base_device
+class apollo_sio: public duart_base_device
 {
 public:
 	apollo_sio(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
@@ -340,7 +340,6 @@ protected:
 
 private:
 	uint8_t m_csrb;
-	uint8_t m_ip6;
 };
 
 DECLARE_DEVICE_TYPE(APOLLO_SIO, apollo_sio)

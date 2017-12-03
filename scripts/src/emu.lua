@@ -178,8 +178,6 @@ files {
 	MAME_DIR .. "src/emu/speaker.h",
 	MAME_DIR .. "src/emu/tilemap.cpp",
 	MAME_DIR .. "src/emu/tilemap.h",
-	MAME_DIR .. "src/emu/timer.cpp",
-	MAME_DIR .. "src/emu/timer.h",
 	MAME_DIR .. "src/emu/uiinput.cpp",
 	MAME_DIR .. "src/emu/uiinput.h",
 	MAME_DIR .. "src/emu/validity.cpp",
@@ -189,6 +187,8 @@ files {
 	MAME_DIR .. "src/emu/rendersw.hxx",
 	MAME_DIR .. "src/emu/ui/uimain.h",
 	MAME_DIR .. "src/emu/ui/cmddata.h",   -- TODO: remove
+	MAME_DIR .. "src/emu/debug/debugbuf.cpp",
+	MAME_DIR .. "src/emu/debug/debugbuf.h",
 	MAME_DIR .. "src/emu/debug/debugcmd.cpp",
 	MAME_DIR .. "src/emu/debug/debugcmd.h",
 	MAME_DIR .. "src/emu/debug/debugcon.cpp",

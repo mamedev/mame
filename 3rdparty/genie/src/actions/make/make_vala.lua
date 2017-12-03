@@ -78,6 +78,10 @@
 		_p('.PHONY: clean prebuild prelink')
 		_p('')
 
+		_p('all: prebuild prelink $(TARGET) | $(TARGETDIR)')
+		_p('\t@:')
+		_p('')
+
 		-- target build rule
 		_p('$(TARGET): $(SOURCES) | $(TARGETDIR)')
 		_p('\t$(SILENT) $(VALAC) -o $(TARGET) --cc=$(CC) $(FLAGS) $(SOURCES)')

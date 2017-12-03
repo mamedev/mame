@@ -2,24 +2,24 @@
 // copyright-holders:Patrick Mackinlay
 
 /*
-* An implementation of the MCGA device found on Intergraph InterPro family workstations. There is no
-* public documentation on this device, so the implementation is being built to follow the logic of the
-* system boot ROM and its diagnostic tests.
-*
-* Please be aware that code in here is not only broken, it's likely wrong in many cases.
-*
-* TODO
-*   - too long to list
-*/
+ * An implementation of the MCGA (Memory Controller Gate Array) and FMCC (Fast
+ * Memory Control Chip) devices found in Intergraph InterPro family systems.
+ * There is no public documentation on this device, so the implementation is
+ * being built to follow the logic of the system boot ROM and its diagnostic
+ * tests.
+ *
+ * Please be aware that code in here is not only broken, it's likely wrong in
+ * many cases.
+ *
+ * TODO
+ *   - too long to list
+ */
+
 #include "emu.h"
 #include "interpro_mcga.h"
 
 #define VERBOSE 0
-#if VERBOSE
-#define LOG_MCGA(...) logerror(__VA_ARGS__)
-#else
-#define LOG_MCGA(...) {}
-#endif
+#include "logmacro.h"
 
 DEVICE_ADDRESS_MAP_START(map, 32, interpro_mcga_device)
 	AM_RANGE(0x00, 0x03) AM_READWRITE16(reg00_r, reg00_w, 0xffff)
@@ -45,8 +45,8 @@ DEVICE_ADDRESS_MAP_START(map, 32, interpro_fmcc_device)
 	AM_RANGE(0x48, 0x4b) AM_READWRITE16(error_control_r, error_control_w, 0xffff)
 ADDRESS_MAP_END
 
-DEFINE_DEVICE_TYPE(INTERPRO_MCGA, interpro_mcga_device, "mcga", "InterPro MCGA")
-DEFINE_DEVICE_TYPE(INTERPRO_FMCC, interpro_fmcc_device, "fmcc", "InterPro FMCC")
+DEFINE_DEVICE_TYPE(INTERPRO_MCGA, interpro_mcga_device, "mcga", "Memory Controller Gate Array")
+DEFINE_DEVICE_TYPE(INTERPRO_FMCC, interpro_fmcc_device, "fmcc", "Fast Memory Control Chip")
 
 interpro_mcga_device::interpro_mcga_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, type, tag, owner, clock)

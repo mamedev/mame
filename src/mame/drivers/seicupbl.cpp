@@ -64,7 +64,6 @@ public:
 	// screen updates
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE8_MEMBER(okim_rombank_w);
-	DECLARE_WRITE8_MEMBER(sound_cmd_w);
 	DECLARE_WRITE16_MEMBER(vram_sc0_w);
 	DECLARE_WRITE16_MEMBER(vram_sc1_w);
 	DECLARE_WRITE16_MEMBER(vram_sc2_w);
@@ -295,12 +294,6 @@ uint32_t seicupbl_state::screen_update( screen_device &screen, bitmap_ind16 &bit
 	return 0;
 }
 
-WRITE8_MEMBER(seicupbl_state::sound_cmd_w)
-{
-	m_soundlatch->write(space, 0, data & 0xff);
-	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE );
-}
-
 WRITE16_MEMBER(seicupbl_state::vram_sc0_w)
 {
 	COMBINE_DATA(&m_back_data[offset]);
@@ -335,7 +328,7 @@ static ADDRESS_MAP_START( cupsocbl_mem, AS_PROGRAM, 16, seicupbl_state )
 	AM_RANGE(0x100708, 0x100709) AM_READ_PORT("PLAYERS34")
 	AM_RANGE(0x10070c, 0x10070d) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x10071c, 0x10071d) AM_READ_PORT("DSW2")
-	AM_RANGE(0x100740, 0x100741) AM_WRITE8(sound_cmd_w,0x00ff)
+	AM_RANGE(0x100740, 0x100741) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x00ff)
 	AM_RANGE(0x100800, 0x100fff) AM_RAM_WRITE(vram_sc0_w) AM_SHARE("back_data")
 	AM_RANGE(0x101000, 0x1017ff) AM_RAM_WRITE(vram_sc2_w) AM_SHARE("fore_data")
 	AM_RANGE(0x101800, 0x101fff) AM_RAM_WRITE(vram_sc1_w) AM_SHARE("mid_data")
@@ -578,6 +571,7 @@ static MACHINE_CONFIG_START( cupsocbl )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 
 	MCFG_OKIM6295_ADD("oki", 1000000, PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)

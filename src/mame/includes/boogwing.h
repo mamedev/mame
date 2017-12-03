@@ -21,7 +21,7 @@ public:
 		: driver_device(mconfig, type, tag),
 			m_maincpu(*this, "maincpu"),
 			m_audiocpu(*this, "audiocpu"),
-			m_deco104(*this, "ioprot104"),
+			m_deco104(*this, "ioprot"),
 			m_decocomn(*this, "deco_common"),
 			m_deco_tilegen1(*this, "tilegen1"),
 			m_deco_tilegen2(*this, "tilegen2"),

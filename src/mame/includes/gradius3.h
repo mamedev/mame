@@ -5,6 +5,8 @@
     Gradius 3
 
 *************************************************************************/
+
+#include "machine/timer.h"
 #include "sound/k007232.h"
 #include "video/k052109.h"
 #include "video/k051960.h"

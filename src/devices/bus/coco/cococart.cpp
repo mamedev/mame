@@ -380,6 +380,18 @@ uint8_t* cococart_slot_device::get_cart_base()
 
 
 //-------------------------------------------------
+//  get_cart_size
+//-------------------------------------------------
+
+uint32_t cococart_slot_device::get_cart_size()
+{
+	if (m_cart != nullptr)
+		return m_cart->get_cart_size();
+	return 0;
+}
+
+
+//-------------------------------------------------
 //  set_cart_base_update
 //-------------------------------------------------
 
@@ -401,16 +413,16 @@ image_init_result cococart_slot_device::call_load()
 		offs_t read_length;
 		if (!loaded_through_softlist())
 		{
-			read_length = fread(m_cart->get_cart_base(), 0x8000);
+			read_length = fread(m_cart->get_cart_base(), m_cart->get_cart_size());
 		}
 		else
 		{
 			read_length = get_software_region_length("rom");
 			memcpy(m_cart->get_cart_base(), get_software_region("rom"), read_length);
 		}
-		while(read_length < 0x8000)
+		while(read_length < m_cart->get_cart_size())
 		{
-			offs_t len = std::min(read_length, 0x8000 - read_length);
+			offs_t len = std::min(read_length, m_cart->get_cart_size() - read_length);
 			memcpy(m_cart->get_cart_base() + read_length, m_cart->get_cart_base(), len);
 			read_length += len;
 		}
@@ -519,6 +531,16 @@ void device_cococart_interface::set_sound_enable(bool sound_enable)
 uint8_t* device_cococart_interface::get_cart_base()
 {
 	return nullptr;
+}
+
+
+//-------------------------------------------------
+//  get_cart_size
+//-------------------------------------------------
+
+uint32_t device_cococart_interface::get_cart_size()
+{
+	return 0x8000;
 }
 
 

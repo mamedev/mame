@@ -10,7 +10,11 @@
 #endif
 
 #ifndef LOG_OUTPUT_FUNC
+#ifdef LOG_OUTPUT_STREAM
+#define LOG_OUTPUT_FUNC [] (auto &&... args) { util::stream_format((LOG_OUTPUT_STREAM), std::forward<decltype(args)>(args)...); }
+#else
 #define LOG_OUTPUT_FUNC logerror
+#endif
 #endif
 
 #ifndef LOG_GENERAL

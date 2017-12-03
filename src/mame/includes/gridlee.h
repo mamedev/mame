@@ -8,7 +8,6 @@
 
 ***************************************************************************/
 
-#include "machine/74259.h"
 #include "sound/samples.h"
 #include "screen.h"
 
@@ -33,15 +32,13 @@ public:
 		m_videoram(*this, "videoram"),
 		m_maincpu(*this, "maincpu"),
 		m_screen(*this, "screen"),
-		m_palette(*this, "palette"),
-		m_latch(*this, "latch") { }
+		m_palette(*this, "palette") { }
 
 	required_shared_ptr<uint8_t> m_spriteram;
 	required_shared_ptr<uint8_t> m_videoram;
 	required_device<cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
-	required_device<ls259_device> m_latch;
 
 	uint8_t m_last_analog_input[2];
 	uint8_t m_last_analog_output[2];

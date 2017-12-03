@@ -220,8 +220,9 @@ WRITE8_MEMBER(nemesis_state::gx400_speech_start_w)
 
 WRITE8_MEMBER(nemesis_state::salamand_speech_start_w)
 {
-	m_vlm->st(1);
-	m_vlm->st(0);
+	m_vlm->rst(BIT(data, 0));
+	m_vlm->st(BIT(data, 1));
+	// bit 2 is OE for VLM data
 }
 
 READ8_MEMBER(nemesis_state::nemesis_portA_r)

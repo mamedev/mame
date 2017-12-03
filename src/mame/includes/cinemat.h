@@ -157,7 +157,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(wotw_sound3_w);
 	DECLARE_WRITE_LINE_MEMBER(wotw_sound4_w);
 	DECLARE_WRITE_LINE_MEMBER(demon_sound4_w);
-	DECLARE_WRITE_LINE_MEMBER(qb3_sound4_w);
+	DECLARE_WRITE8_MEMBER(qb3_sound_fifo_w);
 };
 
 /*----------- defined in audio/cinemat.c -----------*/

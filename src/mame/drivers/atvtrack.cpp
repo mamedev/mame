@@ -56,6 +56,15 @@ Notes:
       DB9       - Probably used for cabinet linking
       SW3       - Push button switch
 
+
+Gaelco Football
+(c) 2002 Gaelco
+
+PCB:
+GAELCO
+REF. 020201
+Same PCB as above ATV Track, exept for HD6417750 SH4 CPUs was used intead of HD6417750S.
+
 */
 
 /*
@@ -92,7 +101,7 @@ TODO:
 */
 
 #include "emu.h"
-#include "cpu/sh4/sh4.h"
+#include "cpu/sh/sh4.h"
 #include "debugger.h"
 #include "screen.h"
 
@@ -556,6 +565,7 @@ static MACHINE_CONFIG_START( atvtrack )
 	MCFG_SH4_CLOCK(ATV_CPU_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(atvtrack_main_map)
 	MCFG_CPU_IO_MAP(atvtrack_main_port)
+	MCFG_CPU_FORCE_NO_DRC()
 
 	MCFG_CPU_ADD("subcpu", SH4LE, ATV_CPU_CLOCK)
 	MCFG_SH4_MD0(1)
@@ -570,6 +580,7 @@ static MACHINE_CONFIG_START( atvtrack )
 	MCFG_SH4_CLOCK(ATV_CPU_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(atvtrack_sub_map)
 	MCFG_CPU_IO_MAP(atvtrack_sub_port)
+	MCFG_CPU_FORCE_NO_DRC()
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -607,6 +618,17 @@ ROM_START( atvtracka )
 	ROM_LOAD32_BYTE("k9f2808u0b.ic20", 0x0000001, 0x1080000, CRC(b0c34433) SHA1(852c79bb3d7082cd2c056140071ae7d71679ec1d) )
 	ROM_LOAD32_BYTE("k9f2808u0b.ic14", 0x0000002, 0x1080000, CRC(02a12085) SHA1(acb112c9c7b29d92610465fb92268ce787ca06f4) )
 	ROM_LOAD32_BYTE("k9f2808u0b.ic19", 0x0000003, 0x1080000, CRC(856c1e6a) SHA1(a6b2839120d61811c36cc6b4095de9cefceb394b) )
+
+	ROM_REGION( 0x20000, "fpga", ROMREGION_ERASEFF)
+	ROM_LOAD("epc1pc8.ic23", 0x0000000, 0x1ff01, CRC(752444c7) SHA1(c77e8fcfcbe15b53eda25553763bdac45f0ef7df) ) // contains configuration data for the fpga
+ROM_END
+
+ROM_START( gfootbal )
+	ROM_REGION( 0x4200000, "nand", ROMREGION_ERASEFF) // NAND roms, contain additional data hence the sizes
+	ROM_LOAD32_BYTE("k9f2808u0b.ic15",  0x00000000, 0x01080000, CRC(876ca493) SHA1(d888be59d924fe23e725c6a8aa9609e9abcab608) )
+	ROM_LOAD32_BYTE("k9f2808u0b.ic20",  0x00000001, 0x01080000, CRC(df9cf6e2) SHA1(07be171c3768de8f548bceeaf3da8d3bf7cb85d3) )
+	ROM_LOAD32_BYTE("k9f2808u0b.ic14",  0x00000002, 0x01080000, CRC(48d901a3) SHA1(00f151b67e5603354a97708247bed46a2f1bbe1d) )
+	ROM_LOAD32_BYTE("k9f2808u0b.ic19",  0x00000003, 0x01080000, CRC(2db6c016) SHA1(490d23e338014b4e5f2f12dd04dfae2a93a15e11) )
 
 	ROM_REGION( 0x20000, "fpga", ROMREGION_ERASEFF)
 	ROM_LOAD("epc1pc8.ic23", 0x0000000, 0x1ff01, CRC(752444c7) SHA1(c77e8fcfcbe15b53eda25553763bdac45f0ef7df) ) // contains configuration data for the fpga
@@ -662,8 +684,9 @@ ROM_START( smashdrv )
 	// ic21 unpopulated
 ROM_END
 
-GAME( 2002, atvtrack,  0,          atvtrack,    atvtrack, atvtrack_state,   0, ROT0, "Gaelco", "ATV Track (set 1)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 2002, atvtracka, atvtrack,   atvtrack,    atvtrack, atvtrack_state,   0, ROT0, "Gaelco", "ATV Track (set 2)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 2002, atvtrack,  0,          atvtrack,    atvtrack, atvtrack_state,   0, ROT0, "Gaelco",           "ATV Track (set 1)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 2002, atvtracka, atvtrack,   atvtrack,    atvtrack, atvtrack_state,   0, ROT0, "Gaelco",           "ATV Track (set 2)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 2002, gfootbal,  0,          atvtrack,    atvtrack, atvtrack_state,   0, ROT0, "Gaelco / Zigurat", "Gaelco Football", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 
 // almost identical PCB, FlashROM mapping and master registers addresses different
-GAME( 2000, smashdrv, 0,           smashdrv,    atvtrack, smashdrv_state,   0, ROT0, "Gaelco", "Smashing Drive (UK)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 2000, smashdrv, 0,           smashdrv,    atvtrack, smashdrv_state,   0, ROT0, "Gaelco",           "Smashing Drive (UK)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

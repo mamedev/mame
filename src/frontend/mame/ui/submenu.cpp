@@ -28,7 +28,7 @@ std::vector<submenu::option> const submenu::misc_options = {
 	{ submenu::option_type::EMU,  __("Skip information screen at startup"),      OPTION_SKIP_GAMEINFO },
 	{ submenu::option_type::UI,   __("Force 4:3 aspect for snapshot display"),   OPTION_FORCED4X3 },
 	{ submenu::option_type::UI,   __("Use image as background"),                 OPTION_USE_BACKGROUND },
-	{ submenu::option_type::UI,   __("Skip bios selection menu"),                OPTION_SKIP_BIOS_MENU },
+	{ submenu::option_type::UI,   __("Skip BIOS selection menu"),                OPTION_SKIP_BIOS_MENU },
 	{ submenu::option_type::UI,   __("Skip software parts selection menu"),      OPTION_SKIP_PARTS_MENU },
 	{ submenu::option_type::UI,   __("Info auto audit"),                         OPTION_INFO_AUTO_AUDIT },
 	{ submenu::option_type::UI,   __("Hide romless machine from available list"),OPTION_HIDE_ROMLESS },
@@ -423,59 +423,24 @@ void submenu::populate(float &customtop, float &custombottom)
 
 void submenu::custom_render(void *selectedref, float top, float bottom, float origx1, float origy1, float origx2, float origy2)
 {
-	float width;
+	char const *const toptext[] = { _(m_options[0].description) };
+	draw_text_box(
+			std::begin(toptext), std::end(toptext),
+			origx1, origx2, origy1 - top, origy1 - UI_BOX_TB_BORDER,
+			ui::text_layout::CENTER, ui::text_layout::TRUNCATE, false,
+			UI_TEXT_COLOR, UI_GREEN_COLOR, 1.0f);
 
-	ui().draw_text_full(container(), _(m_options[0].description), 0.0f, 0.0f, 1.0f, ui::text_layout::CENTER, ui::text_layout::TRUNCATE,
-			mame_ui_manager::NONE, rgb_t::white(), rgb_t::black(), &width, nullptr);
-	width += 2 * UI_BOX_LR_BORDER;
-	float maxwidth = std::max(origx2 - origx1, width);
-
-	// compute our bounds
-	float x1 = 0.5f - 0.5f * maxwidth;
-	float x2 = x1 + maxwidth;
-	float y1 = origy1 - top;
-	float y2 = origy1 - UI_BOX_TB_BORDER;
-
-	// draw a box
-	ui().draw_outlined_box(container(), x1, y1, x2, y2, UI_GREEN_COLOR);
-
-	// take off the borders
-	x1 += UI_BOX_LR_BORDER;
-	x2 -= UI_BOX_LR_BORDER;
-	y1 += UI_BOX_TB_BORDER;
-
-	// draw the text within it
-	ui().draw_text_full(container(), _(m_options[0].description), x1, y1, x2 - x1, ui::text_layout::CENTER, ui::text_layout::TRUNCATE,
-		mame_ui_manager::NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, nullptr, nullptr);
-
-	if (selectedref != nullptr)
+	if (selectedref)
 	{
-		option &selected_sm_option = *reinterpret_cast<option *>(selectedref);
-		if (selected_sm_option.entry != nullptr)
+		option &selected_sm_option(*reinterpret_cast<option *>(selectedref));
+		if (selected_sm_option.entry)
 		{
-			ui().draw_text_full(container(), selected_sm_option.entry->description(), 0.0f, 0.0f, 1.0f, ui::text_layout::CENTER, ui::text_layout::TRUNCATE,
-					mame_ui_manager::NONE, rgb_t::white(), rgb_t::black(), &width, nullptr);
-
-			width += 2 * UI_BOX_LR_BORDER;
-			maxwidth = std::max(origx2 - origx1, width);
-
-			// compute our bounds
-			x1 = 0.5f - 0.5f * maxwidth;
-			x2 = x1 + maxwidth;
-			y1 = origy2 + UI_BOX_TB_BORDER;
-			y2 = origy2 + bottom;
-
-			// draw a box
-			ui().draw_outlined_box(container(), x1, y1, x2, y2, UI_RED_COLOR);
-
-			// take off the borders
-			x1 += UI_BOX_LR_BORDER;
-			x2 -= UI_BOX_LR_BORDER;
-			y1 += UI_BOX_TB_BORDER;
-
-			// draw the text within it
-			ui().draw_text_full(container(), selected_sm_option.entry->description(), x1, y1, x2 - x1, ui::text_layout::CENTER, ui::text_layout::NEVER,
-					mame_ui_manager::NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, nullptr, nullptr);
+			char const *const bottomtext[] = { selected_sm_option.entry->description() };
+			draw_text_box(
+					std::begin(bottomtext), std::end(bottomtext),
+					origx1, origx2, origy2 + UI_BOX_TB_BORDER, origy2 + bottom,
+					ui::text_layout::CENTER, ui::text_layout::TRUNCATE, false,
+					UI_TEXT_COLOR, UI_RED_COLOR, 1.0f);
 		}
 	}
 }

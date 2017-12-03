@@ -79,17 +79,16 @@ void menu_bios_selection::populate(float &customtop, float &custombottom)
 	/* cycle through all devices for this system */
 	for (device_t &device : device_iterator(machine().root_device()))
 	{
-		if (device.rom_region() != nullptr && !ROMENTRY_ISEND(device.rom_region()))
+		tiny_rom_entry const *rom(device.rom_region());
+		if (rom && !ROMENTRY_ISEND(rom))
 		{
 			const char *val = "default";
-			for (const rom_entry *rom = device.rom_region(); !ROMENTRY_ISEND(rom); rom++)
+			for ( ; !ROMENTRY_ISEND(rom); rom++)
 			{
 				if (ROMENTRY_ISSYSTEM_BIOS(rom) && ROM_GETBIOSFLAGS(rom) == device.system_bios())
-				{
-					val = ROM_GETHASHDATA(rom);
-				}
+					val = rom->hashdata;
 			}
-			item_append(device.owner() == nullptr ? "driver" : device.tag()+1, val, FLAG_LEFT_ARROW | FLAG_RIGHT_ARROW, (void *)&device);
+			item_append(!device.owner() ? "driver" : (device.tag() + 1), val, FLAG_LEFT_ARROW | FLAG_RIGHT_ARROW, (void *)&device);
 		}
 	}
 
@@ -117,14 +116,12 @@ void menu_bios_selection::handle()
 		else if (menu_event->iptkey == IPT_UI_LEFT || menu_event->iptkey == IPT_UI_RIGHT)
 		{
 			device_t *dev = (device_t *)menu_event->itemref;
-			int cnt = 0;
-			for (const rom_entry &rom : dev->rom_region_vector())
-			{
-				if (ROMENTRY_ISSYSTEM_BIOS(&rom)) cnt ++;
-			}
+			int const cnt = ([bioses = romload::entries(dev->rom_region()).get_system_bioses()] () { return std::distance(bioses.begin(), bioses.end()); })();
 			int val = dev->system_bios() + ((menu_event->iptkey == IPT_UI_LEFT) ? -1 : +1);
-			if (val<1) val=cnt;
-			if (val>cnt) val=1;
+			if (val < 1)
+				val = cnt;
+			if (val > cnt)
+				val = 1;
 			dev->set_system_bios(val);
 			if (strcmp(dev->tag(),":")==0) {
 				machine().options().set_value("bios", val-1, OPTION_PRIORITY_CMDLINE);
@@ -167,7 +164,7 @@ void menu_network_devices::populate(float &customtop, float &custombottom)
 			}
 		}
 
-		item_append(network.device().tag(),  (title) ? title : "------", FLAG_LEFT_ARROW | FLAG_RIGHT_ARROW, (void *)network);
+		item_append(network.device().tag(),  (title) ? title : "------", FLAG_LEFT_ARROW | FLAG_RIGHT_ARROW, (void *)&network);
 	}
 }
 
@@ -635,8 +632,7 @@ void menu_export::handle()
 
 					// iterate through drivers and output the info
 					while (drvlist.next())
-						if (!(drvlist.driver().flags & machine_flags::NO_STANDALONE))
-							util::stream_format(buffer, "%-18s\"%s\"\n", drvlist.driver().name, drvlist.driver().type.fullname());
+						util::stream_format(buffer, "%-18s\"%s\"\n", drvlist.driver().name, drvlist.driver().type.fullname());
 					file.puts(buffer.str().c_str());
 					file.close();
 					machine().popmessage(_("%s.txt saved under ui folder."), filename.c_str());
@@ -676,6 +672,7 @@ menu_machine_configure::menu_machine_configure(mame_ui_manager &mui, render_cont
 {
 	// parse the INI file
 	std::ostringstream error;
+	osd_setup_osd_specific_emu_options(m_opts);
 	mame_options::parse_standard_inis(m_opts, error, m_drv);
 	setup_bios();
 }
@@ -720,7 +717,7 @@ void menu_machine_configure::handle()
 					break;
 				case DELFAV:
 					mame_machine_manager::instance()->favorite().remove_favorite_game();
-					if (main_filters::actual == FILTER_FAVORITE)
+					if (main_filters::actual == machine_filter::FAVORITE)
 					{
 						m_fav_reset = true;
 						menu::stack_pop();
@@ -760,14 +757,14 @@ void menu_machine_configure::handle()
 void menu_machine_configure::populate(float &customtop, float &custombottom)
 {
 	// add options items
-	item_append(_("Bios"), "", FLAG_DISABLE | FLAG_UI_HEADING, nullptr);
+	item_append(_("BIOS"), "", FLAG_DISABLE | FLAG_UI_HEADING, nullptr);
 	if (!m_bios.empty())
 	{
 		uint32_t arrows = get_arrow_flags(std::size_t(0), m_bios.size() - 1, m_curbios);
 		item_append(_("Driver"), m_bios[m_curbios].first, arrows, (void *)(uintptr_t)BIOS);
 	}
 	else
-		item_append(_("This machine has no bios."), "", FLAG_DISABLE, nullptr);
+		item_append(_("This machine has no BIOS."), "", FLAG_DISABLE, nullptr);
 
 	item_append(menu_item_type::SEPARATOR);
 	item_append(_(submenu::advanced_options[0].description), "", 0, (void *)(uintptr_t)ADVANCED);
@@ -792,42 +789,12 @@ void menu_machine_configure::populate(float &customtop, float &custombottom)
 
 void menu_machine_configure::custom_render(void *selectedref, float top, float bottom, float origx1, float origy1, float origx2, float origy2)
 {
-	float width;
-	std::string text[2];
-	float maxwidth = origx2 - origx1;
-
-	text[0] = _("Configure machine:");
-	text[1] = m_drv->type.fullname();
-
-	for (auto & elem : text)
-	{
-		ui().draw_text_full(container(), elem.c_str(), 0.0f, 0.0f, 1.0f, ui::text_layout::CENTER, ui::text_layout::TRUNCATE,
-			mame_ui_manager::NONE, rgb_t::white(), rgb_t::black(), &width, nullptr);
-		width += 2 * UI_BOX_LR_BORDER;
-		maxwidth = std::max(maxwidth, width);
-	}
-
-	// compute our bounds
-	float x1 = 0.5f - 0.5f * maxwidth;
-	float x2 = x1 + maxwidth;
-	float y1 = origy1 - top;
-	float y2 = origy1 - UI_BOX_TB_BORDER;
-
-	// draw a box
-	ui().draw_outlined_box(container(), x1, y1, x2, y2, UI_GREEN_COLOR);
-
-	// take off the borders
-	x1 += UI_BOX_LR_BORDER;
-	x2 -= UI_BOX_LR_BORDER;
-	y1 += UI_BOX_TB_BORDER;
-
-	// draw the text within it
-	for (auto & elem : text)
-	{
-		ui().draw_text_full(container(), elem.c_str(), x1, y1, x2 - x1, ui::text_layout::CENTER, ui::text_layout::TRUNCATE,
-			mame_ui_manager::NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, nullptr, nullptr);
-		y1 += ui().get_line_height();
-	}
+	char const *const text[] = { _("Configure machine:"), m_drv->type.fullname() };
+	draw_text_box(
+			std::begin(text), std::end(text),
+			origx1, origx2, origy1 - top, origy1 - UI_BOX_TB_BORDER,
+			ui::text_layout::CENTER, ui::text_layout::TRUNCATE, false,
+			UI_TEXT_COLOR, UI_GREEN_COLOR, 1.0f);
 }
 
 void menu_machine_configure::setup_bios()
@@ -835,40 +802,35 @@ void menu_machine_configure::setup_bios()
 	if (m_drv->rom == nullptr)
 		return;
 
-	auto entries = rom_build_entries(m_drv->rom);
-
 	std::string specbios(m_opts.bios());
-	std::string default_name;
-	for (const rom_entry &rom : entries)
-		if (ROMENTRY_ISDEFAULT_BIOS(&rom))
-			default_name = ROM_GETNAME(&rom);
-
-	std::size_t bios_count = 0;
-	for (const rom_entry &rom : entries)
+	char const *default_name(nullptr);
+	for (tiny_rom_entry const *rom = m_drv->rom; !ROMENTRY_ISEND(rom); ++rom)
 	{
-		if (ROMENTRY_ISSYSTEM_BIOS(&rom))
-		{
-			std::string name(ROM_GETHASHDATA(&rom));
-			std::string biosname(ROM_GETNAME(&rom));
-			int bios_flags = ROM_GETBIOSFLAGS(&rom);
-			std::string bios_number = std::to_string(bios_flags - 1);
-
-			// check biosnumber and name
-			if (bios_number == specbios || biosname == specbios)
-				m_curbios = bios_count;
-
-			if (biosname == default_name)
-			{
-				name.append(_(" (default)"));
-				if (specbios == "default")
-					m_curbios = bios_count;
-			}
-
-			m_bios.emplace_back(name, bios_flags - 1);
-			bios_count++;
-		}
+		if (ROMENTRY_ISDEFAULT_BIOS(rom))
+			default_name = rom->name;
 	}
 
+	std::size_t bios_count = 0;
+	for (romload::system_bios const &bios : romload::entries(m_drv->rom).get_system_bioses())
+	{
+		std::string name(bios.get_description());
+		u32 const bios_flags(bios.get_value());
+		std::string const bios_number(std::to_string(bios_flags - 1));
+
+		// check biosnumber and name
+		if ((bios_number == specbios) || (specbios == bios.get_name()))
+			m_curbios = bios_count;
+
+		if (default_name && !std::strcmp(bios.get_name(), default_name))
+		{
+			name.append(_(" (default)"));
+			if (specbios == "default")
+				m_curbios = bios_count;
+		}
+
+		m_bios.emplace_back(std::move(name), bios_flags - 1);
+		bios_count++;
+	}
 }
 
 //-------------------------------------------------
@@ -944,30 +906,12 @@ void menu_plugins_configure::populate(float &customtop, float &custombottom)
 
 void menu_plugins_configure::custom_render(void *selectedref, float top, float bottom, float origx1, float origy1, float origx2, float origy2)
 {
-	float width;
-
-	ui().draw_text_full(container(), _("Plugins"), 0.0f, 0.0f, 1.0f, ui::text_layout::CENTER, ui::text_layout::TRUNCATE,
-		mame_ui_manager::NONE, rgb_t::white(), rgb_t::black(), &width, nullptr);
-	width += 2 * UI_BOX_LR_BORDER;
-	float maxwidth = std::max(origx2 - origx1, width);
-
-	// compute our bounds
-	float x1 = 0.5f - 0.5f * maxwidth;
-	float x2 = x1 + maxwidth;
-	float y1 = origy1 - top;
-	float y2 = origy1 - UI_BOX_TB_BORDER;
-
-	// draw a box
-	ui().draw_outlined_box(container(), x1, y1, x2, y2, UI_GREEN_COLOR);
-
-	// take off the borders
-	x1 += UI_BOX_LR_BORDER;
-	x2 -= UI_BOX_LR_BORDER;
-	y1 += UI_BOX_TB_BORDER;
-
-	// draw the text within it
-	ui().draw_text_full(container(), _("Plugins"), x1, y1, x2 - x1, ui::text_layout::CENTER, ui::text_layout::TRUNCATE,
-		mame_ui_manager::NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, nullptr, nullptr);
+	char const *const toptext[] = { _("Plugins") };
+	draw_text_box(
+			std::begin(toptext), std::end(toptext),
+			origx1, origx2, origy1 - top, origy1 - UI_BOX_TB_BORDER,
+			ui::text_layout::CENTER, ui::text_layout::TRUNCATE, false,
+			UI_TEXT_COLOR, UI_GREEN_COLOR, 1.0f);
 }
 
 } // namespace ui

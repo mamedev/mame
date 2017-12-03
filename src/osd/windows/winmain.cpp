@@ -273,11 +273,13 @@ const options_entry windows_options::s_option_entries[] =
 #if WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
 
 //============================================================
-//  utf8_main
+//  main
 //============================================================
 
-int main(std::vector<std::string> &args)
+int main(int argc, char *argv[])
 {
+	std::vector<std::string> args = osd_get_command_line(argc, argv);
+
 	// use small output buffers on non-TTYs (i.e. pipes)
 	if (!isatty(fileno(stdout)))
 		setvbuf(stdout, (char *) nullptr, _IOFBF, 64);
@@ -614,6 +616,17 @@ void windows_osd_interface::osd_exit()
 
 	// one last pass at events
 	winwindow_process_events(machine(), false, false);
+}
+
+
+//============================================================
+//  osd_setup_osd_specific_emu_options
+//============================================================
+
+void osd_setup_osd_specific_emu_options(emu_options &opts)
+{
+	opts.add_entries(osd_options::s_option_entries);
+	opts.add_entries(windows_options::s_option_entries);
 }
 
 

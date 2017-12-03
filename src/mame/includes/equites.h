@@ -6,9 +6,9 @@
 
 *************************************************************************/
 
-#include "machine/74259.h"
 #include "machine/alpha8201.h"
 #include "machine/gen_latch.h"
+#include "machine/timer.h"
 #include "sound/samples.h"
 #include "sound/msm5232.h"
 #include "sound/dac.h"
@@ -35,8 +35,7 @@ public:
 		m_msm(*this, "msm"),
 		m_dac_1(*this, "dac1"),
 		m_dac_2(*this, "dac2"),
-		m_soundlatch(*this, "soundlatch"),
-		m_mainlatch(*this, "mainlatch")
+		m_soundlatch(*this, "soundlatch")
 	{ }
 
 	/* memory pointers */
@@ -82,7 +81,6 @@ public:
 	required_device<dac_byte_interface> m_dac_1;
 	required_device<dac_byte_interface> m_dac_2;
 	required_device<generic_latch_8_device> m_soundlatch;
-	required_device<ls259_device> m_mainlatch;
 
 	DECLARE_WRITE8_MEMBER(equites_c0f8_w);
 	DECLARE_WRITE8_MEMBER(equites_cymbal_ctrl_w);

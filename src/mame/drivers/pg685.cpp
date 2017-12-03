@@ -383,7 +383,8 @@ MC6845_UPDATE_ROW( pg685_state::crtc_update_row_oua12 )
 static MACHINE_CONFIG_START(pg685_backplane)
 	MCFG_DEVICE_ADD("bppit", PIT8253, 0)
 
-	MCFG_PIC8259_ADD("bppic", NOOP, VCC, NOOP) // ???
+	MCFG_DEVICE_ADD("bppic", PIC8259, 0)
+	MCFG_PIC8259_OUT_INT_CB(NOOP) // ???
 
 	MCFG_DEVICE_ADD("bpuart", MC2661, XTAL_4_9152MHz) // internal clock
 MACHINE_CONFIG_END
@@ -407,7 +408,9 @@ static MACHINE_CONFIG_START( pg675 )
 	MCFG_CPU_PROGRAM_MAP(pg675_mem)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("mainpic", pic8259_device, inta_cb)
 
-	MCFG_PIC8259_ADD("mainpic", INPUTLINE("maincpu", 0), VCC, NOOP)
+	MCFG_DEVICE_ADD("mainpic", PIC8259, 0)
+	MCFG_PIC8259_OUT_INT_CB(INPUTLINE("maincpu", 0))
+	MCFG_PIC8259_IN_SP_CB(VCC)
 
 	// i/o cpu
 
@@ -454,7 +457,9 @@ static MACHINE_CONFIG_START( pg685 )
 	MCFG_CPU_PROGRAM_MAP(pg685_mem)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("mainpic", pic8259_device, inta_cb)
 
-	MCFG_PIC8259_ADD("mainpic", INPUTLINE("maincpu", 0), VCC, NOOP)
+	MCFG_DEVICE_ADD("mainpic", PIC8259, 0)
+	MCFG_PIC8259_OUT_INT_CB(INPUTLINE("maincpu", 0))
+	MCFG_PIC8259_IN_SP_CB(VCC)
 
 	// i/o cpu
 
@@ -503,7 +508,9 @@ static MACHINE_CONFIG_START( pg685oua12 )
 	MCFG_CPU_PROGRAM_MAP(pg685oua12_mem)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("mainpic", pic8259_device, inta_cb)
 
-	MCFG_PIC8259_ADD("mainpic", INPUTLINE("maincpu", 0), VCC, NOOP)
+	MCFG_DEVICE_ADD("mainpic", PIC8259, 0)
+	MCFG_PIC8259_OUT_INT_CB(INPUTLINE("maincpu", 0))
+	MCFG_PIC8259_IN_SP_CB(VCC)
 
 	// i/o cpu
 

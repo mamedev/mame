@@ -12,8 +12,9 @@
 
 #pragma once
 
-#include "ui/custmenu.h"
 #include "ui/selmenu.h"
+#include "ui/utils.h"
+
 
 namespace ui {
 
@@ -24,17 +25,16 @@ public:
 	menu_select_software(mame_ui_manager &mui, render_container &container, const game_driver *driver);
 	virtual ~menu_select_software() override;
 
-protected:
-	virtual bool menu_has_search_active() override { return !m_search.empty(); }
-
 private:
 	enum { VISIBLE_GAMES_IN_SEARCH = 200 };
 
-	std::string         m_search;
-	const game_driver   *m_driver;
-	bool                m_has_empty_start;
-	s_filter            m_filter;
-	int                 highlight;
+	typedef std::map<software_filter::type, software_filter::ptr> filter_map;
+
+	const game_driver       *m_driver;
+	bool                    m_has_empty_start;
+	software_filter_data    m_filter_data;
+	filter_map              m_filters;
+	software_filter::type   m_filter_type;
 
 	virtual void populate(float &customtop, float &custombottom) override;
 	virtual void handle() override;
@@ -50,19 +50,22 @@ private:
 	virtual std::string make_driver_description(game_driver const &driver) const override;
 	virtual std::string make_software_description(ui_software_info const &software) const override;
 
+	// filter navigation
+	virtual void filter_selected() override;
+
+	// toolbar
+	virtual void inkey_export() override { throw false; }
+
 	ui_software_info                  *m_searchlist[VISIBLE_GAMES_IN_SEARCH + 1];
 	std::vector<ui_software_info *>   m_displaylist, m_tmp, m_sortedlist;
 	std::vector<ui_software_info>     m_swinfo;
 
 	void build_software_list();
-	void build_list(std::vector<ui_software_info *> &vec, const char *filter_text = nullptr, int filter = -1);
-	void build_custom();
 	void find_matches(const char *str, int count);
 	void load_sw_custom_filters();
 
 	// handlers
 	void inkey_select(const event *menu_event);
-	void inkey_special(const event *menu_event);
 
 	virtual void general_info(const game_driver *driver, std::string &buffer) override {}
 };

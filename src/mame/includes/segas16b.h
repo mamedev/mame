@@ -111,6 +111,7 @@ public:
 	DECLARE_DRIVER_INIT(hwchamp_5521);
 	DECLARE_DRIVER_INIT(altbeas5_5521);
 	DECLARE_DRIVER_INIT(sdi_5358_small);
+	DECLARE_DRIVER_INIT(fpointbla);
 	DECLARE_DRIVER_INIT(altbeasj_5521);
 	DECLARE_DRIVER_INIT(ddux_5704);
 	DECLARE_DRIVER_INIT(snapper);
@@ -238,6 +239,25 @@ protected:
 	optional_shared_ptr<uint16_t> m_bootleg_page;
 
 
+};
+
+class afighter_16b_analog_state : public segas16b_state
+{
+public:
+	// construction/destruction
+	afighter_16b_analog_state(const machine_config &mconfig, device_type type, const char *tag)
+		: segas16b_state(mconfig, type, tag),
+			m_accel(*this, "ACCEL"),
+			m_steer(*this, "STEER")
+	{ }
+
+	DECLARE_CUSTOM_INPUT_MEMBER(afighter_accel_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(afighter_handl_left_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(afighter_handl_right_r);
+
+	protected:
+	required_ioport     m_accel;
+	required_ioport     m_steer;
 };
 
 

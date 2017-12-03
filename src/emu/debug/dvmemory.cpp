@@ -531,7 +531,7 @@ void debug_view_memory::recompute()
 	int addrchars;
 	if (source.m_space != nullptr)
 	{
-		m_maxaddr = m_no_translation ? source.m_space->bytemask() : source.m_space->logbytemask();
+		m_maxaddr = m_no_translation ? source.m_space->addrmask() : source.m_space->logaddrmask();
 		addrchars = m_no_translation ? source.m_space->addrchars() : source.m_space->logaddrchars();
 	}
 	else
@@ -547,6 +547,8 @@ void debug_view_memory::recompute()
 		m_addrformat = string_format("%%0%dX%*s", addrchars, 8 - addrchars, "");
 
 	// if we are viewing a space with a minimum chunk size, clamp the bytes per chunk
+	// BAD
+#if 0
 	if (source.m_space != nullptr && source.m_space->byte_to_address(1) > 1)
 	{
 		u32 min_bytes_per_chunk = source.m_space->byte_to_address(1);
@@ -557,6 +559,7 @@ void debug_view_memory::recompute()
 		}
 		m_chunks_per_row = std::max(1U, m_chunks_per_row);
 	}
+#endif
 
 	// recompute the byte offset based on the most recent expression result
 	m_bytes_per_row = m_bytes_per_chunk * m_chunks_per_row;
@@ -617,7 +620,7 @@ bool debug_view_memory::needs_recompute()
 		const debug_view_memory_source &source = downcast<const debug_view_memory_source &>(*m_source);
 		offs_t resultbyte;
 		if (source.m_space != nullptr)
-			resultbyte  = source.m_space->address_to_byte(m_expression.value()) & source.m_space->logbytemask();
+			resultbyte  = m_expression.value() & source.m_space->logaddrmask();
 		else
 			resultbyte = m_expression.value();
 

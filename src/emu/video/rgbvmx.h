@@ -75,6 +75,13 @@ public:
 #endif
 	}
 
+	// This function sets all elements to the same val
+	void set_all(const s32& val) { set(val, val, val, val); }
+	// This function zeros all elements
+	void zero() { set_all(0); }
+	// This function zeros only the alpha element
+	void zero_alpha() { set_a(0); }
+
 	inline rgb_t to_rgba() const
 	{
 		VECU32 temp = VECU32(vec_packs(m_value, m_value));
@@ -91,6 +98,12 @@ public:
 		u32 result;
 		vec_ste(temp, 0, &result);
 		return result;
+	}
+
+	void set_a16(const s32 value)
+	{
+		const VECS32 temp = { value, value, value, value };
+		m_value = vec_perm(m_value, temp, alpha_perm);
 	}
 
 	void set_a(const s32 value)
@@ -204,6 +217,12 @@ public:
 #endif
 		return result;
 	}
+
+	// These selects return an rgbaint_t with all fields set to the element choosen (a, r, g, or b)
+	rgbaint_t select_alpha32() const { return rgbaint_t(get_a32(), get_a32(), get_a32(), get_a32()); }
+	rgbaint_t select_red32() const { return rgbaint_t(get_r32(), get_r32(), get_r32(), get_r32()); }
+	rgbaint_t select_green32() const { return rgbaint_t(get_g32(), get_g32(), get_g32(), get_g32()); }
+	rgbaint_t select_blue32() const { return rgbaint_t(get_b32(), get_b32(), get_b32(), get_b32()); }
 
 	inline void add(const rgbaint_t& color2)
 	{
@@ -460,14 +479,6 @@ public:
 	void scale_and_clamp(const rgbaint_t& scale);
 	void scale_imm_and_clamp(const s32 scale);
 
-	void scale_imm_add_and_clamp(const s32 scale, const rgbaint_t& other)
-	{
-		mul_imm(scale);
-		sra_imm(8);
-		add(other);
-		clamp_to_uint8();
-	}
-
 	void scale_add_and_clamp(const rgbaint_t& scale, const rgbaint_t& other)
 	{
 		mul(scale);
@@ -599,6 +610,11 @@ public:
 		const VECU32 temp = { u32(shift), u32(shift), u32(shift), u32(shift) };
 		m_value = vec_sra(m_value, temp);
 		return *this;
+	}
+
+	inline void merge_alpha16(const rgbaint_t& alpha)
+	{
+		m_value = vec_perm(m_value, alpha.m_value, alpha_perm);
 	}
 
 	inline void merge_alpha(const rgbaint_t& alpha)

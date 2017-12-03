@@ -99,7 +99,8 @@ const tiny_rom_entry *i80130_device::device_rom_region() const
 //-------------------------------------------------
 
 MACHINE_CONFIG_MEMBER( i80130_device::device_add_mconfig )
-	MCFG_PIC8259_ADD("pic", DEVWRITELINE(DEVICE_SELF, i80130_device, irq_w), VCC, NOOP)
+	MCFG_DEVICE_ADD("pic", PIC8259, 0)
+	MCFG_PIC8259_OUT_INT_CB(WRITELINE(i80130_device, irq_w))
 
 	MCFG_DEVICE_ADD("pit", PIT8254, 0)
 	MCFG_PIT8253_CLK0(0)

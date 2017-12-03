@@ -258,21 +258,12 @@ READ16_MEMBER(shadfrce_state::input_ports_r)
 }
 
 
-WRITE16_MEMBER(shadfrce_state::sound_brt_w)
+WRITE8_MEMBER(shadfrce_state::screen_brt_w)
 {
-	if (ACCESSING_BITS_8_15)
-	{
-		m_soundlatch->write(space, 1, data >> 8);
-		m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE );
-	}
-	else
-	{
-		int i;
-		double brt = (data & 0xff) / 255.0;
+	double brt = (data & 0xff) / 255.0;
 
-		for (i = 0; i < 0x4000; i++)
-			m_palette->set_pen_contrast(i, brt);
-	}
+	for (int i = 0; i < 0x4000; i++)
+		m_palette->set_pen_contrast(i, brt);
 }
 
 WRITE16_MEMBER(shadfrce_state::irq_ack_w)
@@ -377,7 +368,8 @@ static ADDRESS_MAP_START( shadfrce_map, AS_PROGRAM, 16, shadfrce_state )
 	AM_RANGE(0x1d0000, 0x1d0005) AM_WRITE(irq_ack_w)
 	AM_RANGE(0x1d0006, 0x1d0007) AM_WRITE(irq_w)
 	AM_RANGE(0x1d0008, 0x1d0009) AM_WRITE(scanline_w)
-	AM_RANGE(0x1d000c, 0x1d000d) AM_READNOP AM_WRITE(sound_brt_w)  /* sound command + screen brightness */
+	AM_RANGE(0x1d000c, 0x1d000d) AM_READNOP AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0xff00)
+	AM_RANGE(0x1d000c, 0x1d000d) AM_WRITE8(screen_brt_w, 0x00ff)
 	AM_RANGE(0x1d0010, 0x1d0011) AM_WRITENOP /* ?? */
 	AM_RANGE(0x1d0012, 0x1d0013) AM_WRITENOP /* ?? */
 	AM_RANGE(0x1d0014, 0x1d0015) AM_WRITENOP /* ?? */
@@ -565,6 +557,7 @@ static MACHINE_CONFIG_START( shadfrce )
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 
 	MCFG_YM2151_ADD("ymsnd", XTAL_3_579545MHz)      /* verified on pcb */
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 0))

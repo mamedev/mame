@@ -301,21 +301,44 @@ WRITE8_MEMBER(balsente_state::balsente_rombank2_select_w)
  *
  *************************************/
 
-WRITE8_MEMBER(balsente_state::balsente_misc_output_w)
+WRITE_LINE_MEMBER(balsente_state::out0_w)
 {
-	offset = (offset / 4) % 8;
-	data >>= 7;
+//      output().set_led_value(0, state);
+}
 
-	/* these are generally used to control the various lamps */
-	/* special case is offset 7, which recalls the NVRAM data */
-	if (offset == 7)
-	{
-		logerror("nvrecall_w=%d\n", data);
-	}
-	else
-	{
-//      output().set_led_value(offset, data);
-	}
+WRITE_LINE_MEMBER(balsente_state::out1_w)
+{
+//      output().set_led_value(1, state);
+}
+
+WRITE_LINE_MEMBER(balsente_state::out2_w)
+{
+//      output().set_led_value(2, state);
+}
+
+WRITE_LINE_MEMBER(balsente_state::out3_w)
+{
+//      output().set_led_value(3, state);
+}
+
+WRITE_LINE_MEMBER(balsente_state::out4_w)
+{
+//      output().set_led_value(4, state);
+}
+
+WRITE_LINE_MEMBER(balsente_state::out5_w)
+{
+//      output().set_led_value(5, state);
+}
+
+WRITE_LINE_MEMBER(balsente_state::out6_w)
+{
+//      output().set_led_value(6, state);
+}
+
+WRITE_LINE_MEMBER(balsente_state::nvrecall_w)
+{
+	logerror("nvrecall_w=%d\n", state);
 }
 
 

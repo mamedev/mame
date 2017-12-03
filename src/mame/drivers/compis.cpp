@@ -62,6 +62,7 @@
 #include "machine/pic8259.h"
 #include "machine/pit8253.h"
 #include "machine/ram.h"
+#include "machine/timer.h"
 #include "machine/z80dart.h"
 
 #define I80186_TAG      "ic1"
@@ -778,7 +779,7 @@ static MACHINE_CONFIG_START( compis )
 	MCFG_DEVICE_ADD(COMPIS_KEYBOARD_TAG, COMPIS_KEYBOARD, 0)
 	MCFG_COMPIS_KEYBOARD_OUT_TX_HANDLER(DEVWRITELINE(I8251A_TAG, i8251_device, write_rxd))
 
-	MCFG_I8274_ADD(I8274_TAG, XTAL_15_36MHz/4, 0, 0, 0, 0)
+	MCFG_DEVICE_ADD(I8274_TAG, I8274, XTAL_15_36MHz/4)
 	MCFG_Z80DART_OUT_TXDA_CB(DEVWRITELINE(RS232_A_TAG, rs232_port_device, write_txd))
 	MCFG_Z80DART_OUT_DTRA_CB(DEVWRITELINE(RS232_A_TAG, rs232_port_device, write_dtr))
 	MCFG_Z80DART_OUT_RTSA_CB(DEVWRITELINE(RS232_A_TAG, rs232_port_device, write_rts))

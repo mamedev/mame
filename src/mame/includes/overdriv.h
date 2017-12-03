@@ -5,7 +5,9 @@
     Over Drive
 
 *************************************************************************/
+
 #include "machine/k053252.h"
+#include "machine/timer.h"
 #include "video/k051316.h"
 #include "video/k053246_k053247_k055673.h"
 #include "video/k053251.h"

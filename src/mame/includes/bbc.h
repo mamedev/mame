@@ -82,6 +82,10 @@ public:
 		m_upd7002(*this, "upd7002"),
 		m_analog(*this, "analogue"),
 		m_joyport(*this, "joyport"),
+		m_tube(*this, "tube"),
+		m_intube(*this, "intube"),
+		m_extube(*this, "extube"),
+		m_1mhzbus(*this, "1mhzbus"),
 		m_rtc(*this, "rtc"),
 		m_fdc(*this, "fdc"),
 		m_i8271(*this, "i8271"),
@@ -157,6 +161,7 @@ public:
 	DECLARE_MACHINE_RESET(bbcmc);
 	DECLARE_MACHINE_RESET(ltmpbp);
 	DECLARE_MACHINE_RESET(ltmpm);
+	DECLARE_MACHINE_START(cfa3000);
 
 	DECLARE_PALETTE_INIT(bbc);
 	INTERRUPT_GEN_MEMBER(bbcb_vsync);
@@ -228,6 +233,10 @@ public: // HACK FOR MC6845
 	optional_device<upd7002_device> m_upd7002;
 	optional_device<bbc_analogue_slot_device> m_analog;
 	optional_device<bbc_joyport_slot_device> m_joyport;
+	optional_device<bbc_tube_slot_device> m_tube;
+	optional_device<bbc_tube_slot_device> m_intube;
+	optional_device<bbc_tube_slot_device> m_extube;
+	optional_device<bbc_1mhzbus_slot_device> m_1mhzbus;
 	optional_device<mc146818_device> m_rtc;
 	optional_device<bbc_fdc_slot_device> m_fdc;
 	optional_device<i8271_device> m_i8271;
@@ -250,7 +259,7 @@ public: // HACK FOR MC6845
 	required_memory_bank m_bank7; // bbca bbcb bbcbp bbcbp128 bbcm
 	optional_memory_bank m_bank8; //                          bbcm
 
-	required_device<input_merger_active_high_device> m_irqs;
+	required_device<input_merger_device> m_irqs;
 
 	machine_type_t m_machinetype;
 
@@ -269,6 +278,9 @@ public: // HACK FOR MC6845
 
 	int m_pagedRAM;         // BBC B+ memory handling
 	int m_vdusel;           // BBC B+ memory handling
+
+	bool m_lk18_ic41_paged_rom;  // BBC Master Paged ROM/RAM select IC41
+	bool m_lk19_ic37_paged_rom;  // BBC Master Paged ROM/RAM select IC37
 
 							/*
 							ACCCON
@@ -391,42 +403,27 @@ public: // HACK FOR MC6845
 
 // this is the real location of the start of the BBC's ram in the emulation
 // it can be changed if shadow ram is being used to point at the upper 32K of RAM
-
-// this is the screen memory location of the next pixels to be drawn
-
-// this is a more global variable to store the bitmap variable passed in in the bbc_vh_screenrefresh function
-
-// this is the X and Y screen location in emulation pixels of the next pixels to be drawn
-
-
-	unsigned char *m_BBC_Video_RAM;
-	uint16_t *m_BBC_display;
-	uint16_t *m_BBC_display_left;
-	uint16_t *m_BBC_display_right;
-	bitmap_ind16 *m_BBC_bitmap;
-	int m_y_screen_pos;
-	unsigned char m_pixel_bits[256];
+	uint8_t *m_video_ram;
+	uint8_t m_pixel_bits[256];
 	int m_hsync;
 	int m_vsync;
-	int m_display_enable;
 
-	int m_Teletext_Latch;
-	int m_VideoULA_CR;
-	int m_VideoULA_CR_counter;
-	int m_videoULA_Reg;
-	int m_videoULA_master_cursor_size;
-	int m_videoULA_width_of_cursor;
-	int m_videoULA_6845_clock_rate;
-	int m_videoULA_characters_per_line;
-	int m_videoULA_teletext_normal_select;
-	int m_videoULA_flash_colour_select;
+	uint8_t m_teletext_latch;
+
+	struct {
+		// control register
+		int master_cursor_size;
+		int width_of_cursor;
+		int clock_rate_6845;
+		int characters_per_line;
+		int teletext_normal_select;
+		int flash_colour_select;
+		// inputs
+		int de;
+	} m_video_ula;
 
 	int m_pixels_per_byte;
-	int m_emulation_pixels_per_real_pixel;
-	int m_emulation_pixels_per_byte;
-
-	int m_emulation_cursor_size;
-	int m_cursor_state;
+	int m_cursor_size;
 
 	int m_videoULA_palette0[16];
 	int m_videoULA_palette1[16];
@@ -444,7 +441,7 @@ public: // HACK FOR MC6845
 	void MC6850_Receive_Clock(int new_clock);
 	void BBC_Cassette_motor(unsigned char status);
 	void bbc_update_nmi();
-	unsigned int calculate_video_address(int ma,int ra);
+	uint16_t calculate_video_address(uint16_t ma, uint8_t ra);
 	required_device<palette_device> m_palette;
 	optional_ioport m_bbcconfig;
 };

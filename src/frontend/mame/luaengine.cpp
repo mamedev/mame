@@ -746,6 +746,8 @@ void lua_engine::initialize()
  * emu.print_info(str) -- output to stderr at info level
  * emu.print_debug(str) -- output to stderr at debug level
  * emu.driver_find(driver) -- find and return game_driver for driver
+ * emu.wait(len) -- wait for len within coroutine
+ * emu.lang_translate(str) -- get translation for str if available
  */
 	sol::table emu = sol().create_named_table("emu");
 	emu["app_name"] = &emulator_info::get_appname_lower;
@@ -806,6 +808,7 @@ void lua_engine::initialize()
 			engine->machine().scheduler().timer_set(attotime::from_double(lua_tonumber(L, 1)), timer_expired_delegate(FUNC(lua_engine::resume), engine), 0, L);
 			return lua_yield(L, 0);
 		});
+	emu["lang_translate"] = &lang_translate;
 
 /*
  * emu.file([opt] searchpath, flags) - flags can be as in osdcore "OPEN_FLAG_*" or lua style with 'rwc' with addtional c for create *and truncate* (be careful)
@@ -825,7 +828,7 @@ void lua_engine::initialize()
 				[](emu_file &file, const char *path, u32 flags) { new (&file) emu_file(path, flags); },
 				[](emu_file &file, const char *mode) {
 					int flags = 0;
-					for(int i = 0; i < 2; i++) // limit to three chars
+					for(int i = 0; i < 3 && mode[i]; i++) // limit to three chars
 					{
 						switch(mode[i])
 						{
@@ -844,7 +847,7 @@ void lua_engine::initialize()
 				},
 				[](emu_file &file, const char *path, const char* mode) {
 					int flags = 0;
-					for(int i = 0; i < 2; i++) // limit to three chars
+					for(int i = 0; i < 3 && mode[i]; i++) // limit to three chars
 					{
 						switch(mode[i])
 						{
@@ -920,7 +923,7 @@ void lua_engine::initialize()
 */
 
 	emu.new_usertype<context>("thread", sol::call_constructor, sol::constructors<sol::types<>>(),
-			"start", [this](context &ctx, const char *scr) {
+			"start", [](context &ctx, const char *scr) {
 					std::string script(scr);
 					if(ctx.busy)
 						return false;
@@ -959,13 +962,13 @@ void lua_engine::initialize()
 					th.detach();
 					return true;
 				},
-			"continue", [this](context &ctx, const char *val) {
+			"continue", [](context &ctx, const char *val) {
 					if(!ctx.yield)
 						return;
 					ctx.result = val;
 					ctx.sync.notify_all();
 				},
-			"result", sol::property([this](context &ctx) -> std::string {
+			"result", sol::property([](context &ctx) -> std::string {
 					if(ctx.busy && !ctx.yield)
 						return "";
 					return ctx.result;
@@ -1005,7 +1008,7 @@ void lua_engine::initialize()
 					}
 					return sol::make_object(sol(), ret);
 				},
-			"read_block", [this](save_item &item, int offset, sol::buffer *buff) {
+			"read_block", [](save_item &item, int offset, sol::buffer *buff) {
 					if(!item.base || ((offset + buff->get_len()) > (item.size * item.count)))
 						buff->set_len(0);
 					else
@@ -1264,7 +1267,7 @@ void lua_engine::initialize()
  * debug:wplist(space)[] - table of watchpoints
  */
 	sol().registry().new_usertype<device_debug>("device_debug", "new", sol::no_constructor,
-			"step", [this](device_debug &dev, sol::object num) {
+			"step", [](device_debug &dev, sol::object num) {
 					int steps = 1;
 					if(num.is<int>())
 						steps = num.as<int>();
@@ -1451,8 +1454,8 @@ void lua_engine::initialize()
 					for (address_map_entry &entry : space.map()->m_entrylist)
 					{
 						sol::table mapentry = sol().create_table();
-						mapentry["offset"] = space.address_to_byte(entry.m_addrstart) & space.bytemask();
-						mapentry["endoff"] = space.address_to_byte(entry.m_addrend) & space.bytemask();
+						mapentry["offset"] = space.address_to_byte(entry.m_addrstart) & space.addrmask();
+						mapentry["endoff"] = space.address_to_byte(entry.m_addrend) & space.addrmask();
 						mapentry["readtype"] = entry.m_read.m_type;
 						mapentry["writetype"] = entry.m_write.m_type;
 						map.add(mapentry);
@@ -1584,8 +1587,8 @@ void lua_engine::initialize()
  * input:code_name(code) - get code friendly name
  * input:seq_from_tokens(tokens) - get input_seq for multiple space separated KEYCODE_* string tokens
  * input:seq_pressed(seq) - get pressed state for input_seq
- * input:seq_to_token(seq) - get KEYCODE_* string tokens for seq
- * input:seq_to_name(seq) - get seq friendly name
+ * input:seq_to_tokens(seq) - get KEYCODE_* string tokens for seq
+ * input:seq_name(seq) - get seq friendly name
  */
 
 	sol().registry().new_usertype<input_manager>("input", "new", sol::no_constructor,

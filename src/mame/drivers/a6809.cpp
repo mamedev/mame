@@ -53,6 +53,7 @@ enter  show next address
 #include "cpu/m6809/m6809.h"
 #include "machine/6522via.h"
 #include "machine/keyboard.h"
+#include "machine/timer.h"
 #include "video/saa5050.h"
 #include "video/mc6845.h"
 #include "imagedev/cassette.h"

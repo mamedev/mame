@@ -48,20 +48,8 @@ public:
 		m_generic_paletteram_16(*this, "paletteram")
 	{ }
 
-	required_shared_ptr<uint16_t> m_npvidram;
-	required_shared_ptr<uint16_t> m_npvidregs;
-	required_device<cpu_device> m_maincpu;
-	required_device<cpu_device> m_audiocpu;
-	required_device<upd4990a_device> m_upd4990a;
-	required_device<gfxdecode_device> m_gfxdecode;
-	required_device<screen_device> m_screen;
-	required_device<palette_device> m_palette;
-	required_device<generic_latch_8_device> m_soundlatch;
-	optional_shared_ptr<uint16_t> m_generic_paletteram_16;
+	static constexpr feature_type unemulated_features() { return feature::CAMERA | feature::PRINTER; }
 
-	uint8_t m_audio_result;
-	uint8_t m_bank_val;
-	uint8_t m_vblank;
 	DECLARE_READ8_MEMBER(neoprint_calendar_r);
 	DECLARE_WRITE8_MEMBER(neoprint_calendar_w);
 	DECLARE_READ8_MEMBER(neoprint_unk_r);
@@ -77,11 +65,29 @@ public:
 	DECLARE_DRIVER_INIT(npcartv1);
 	DECLARE_DRIVER_INIT(nprsp);
 	DECLARE_DRIVER_INIT(unkneo);
-	virtual void machine_start() override;
-	virtual void video_start() override;
 	DECLARE_MACHINE_RESET(nprsp);
 	uint32_t screen_update_neoprint(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_nprsp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+protected:
+	virtual void machine_start() override;
+	virtual void video_start() override;
+
+private:
+	required_shared_ptr<uint16_t> m_npvidram;
+	required_shared_ptr<uint16_t> m_npvidregs;
+	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_audiocpu;
+	required_device<upd4990a_device> m_upd4990a;
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<screen_device> m_screen;
+	required_device<palette_device> m_palette;
+	required_device<generic_latch_8_device> m_soundlatch;
+	optional_shared_ptr<uint16_t> m_generic_paletteram_16;
+
+	uint8_t m_audio_result;
+	uint8_t m_bank_val;
+	uint8_t m_vblank;
 	void draw_layer(bitmap_ind16 &bitmap,const rectangle &cliprect,int layer,int data_shift);
 	void audio_cpu_assert_nmi();
 };

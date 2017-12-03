@@ -107,6 +107,7 @@ TP-S.1 TP-S.2 TP-S.3 TP-B.1  8212 TP-B.2 TP-B.3          TP-B.4
 #include "cpu/z80/z80.h"
 #include "cpu/m6805/m6805.h"
 #include "machine/74259.h"
+#include "machine/gen_latch.h"
 #include "sound/ay8910.h"
 #include "sound/msm5205.h"
 #include "speaker.h"
@@ -377,13 +378,6 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-WRITE8_MEMBER(tubep_state::rjammer_soundlatch_w)
-{
-	m_sound_latch = data;
-	m_soundcpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
-}
-
-
 static ADDRESS_MAP_START( rjammer_main_map, AS_PROGRAM, 8, tubep_state )
 	AM_RANGE(0x0000, 0x9fff) AM_ROM
 	AM_RANGE(0xa000, 0xa7ff) AM_RAM                                 /* MB8416 SRAM on daughterboard on main PCB (there are two SRAMs, this is the one on the left) */
@@ -403,7 +397,7 @@ static ADDRESS_MAP_START( rjammer_main_portmap, AS_IO, 8, tubep_state )
 
 	AM_RANGE(0xd0, 0xd7) AM_DEVWRITE("mainlatch", ls259_device, write_d0)
 	AM_RANGE(0xe0, 0xe0) AM_WRITE(main_cpu_irq_line_clear_w)    /* clear IRQ interrupt */
-	AM_RANGE(0xf0, 0xf0) AM_WRITE(rjammer_soundlatch_w)
+	AM_RANGE(0xf0, 0xf0) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
 ADDRESS_MAP_END
 
 
@@ -505,13 +499,6 @@ MACHINE_RESET_MEMBER(tubep_state,rjammer)
  *
  *************************************/
 
-READ8_MEMBER(tubep_state::rjammer_soundlatch_r)
-{
-	int res = m_sound_latch;
-	return res;
-}
-
-
 WRITE8_MEMBER(tubep_state::rjammer_voice_startstop_w)
 {
 	/* bit 0 of data selects voice start/stop (reset pin on MSM5205)*/
@@ -583,7 +570,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( rjammer_sound_portmap, AS_IO, 8, tubep_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ(rjammer_soundlatch_r)
+	AM_RANGE(0x00, 0x00) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 	AM_RANGE(0x10, 0x10) AM_WRITE(rjammer_voice_startstop_w)
 	AM_RANGE(0x18, 0x18) AM_WRITE(rjammer_voice_frequency_select_w)
 	AM_RANGE(0x80, 0x80) AM_WRITE(rjammer_voice_input_w)
@@ -905,6 +892,9 @@ static MACHINE_CONFIG_START( rjammer )
 	MCFG_CPU_ADD("soundcpu",Z80,19968000 / 8)   /* X2 19968000 Hz divided by LS669 (on Qc output) (signal RH0) */
 	MCFG_CPU_PROGRAM_MAP(rjammer_sound_map)
 	MCFG_CPU_IO_MAP(rjammer_sound_portmap)
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("soundcpu", INPUT_LINE_NMI))
 
 	MCFG_CPU_ADD("mcu",NSC8105,6000000) /* 6 MHz Xtal - divided internally ??? */
 	MCFG_CPU_PROGRAM_MAP(nsc_map)

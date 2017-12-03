@@ -292,32 +292,7 @@ WRITE8_MEMBER(airbustr_state::sound_bankswitch_w)
 READ8_MEMBER(airbustr_state::soundcommand_status_r)
 {
 	// bits: 2 <-> ?    1 <-> soundlatch full   0 <-> soundlatch2 empty
-	return 4 + m_soundlatch_status * 2 + (1 - m_soundlatch2_status);
-}
-
-READ8_MEMBER(airbustr_state::soundcommand_r)
-{
-	m_soundlatch_status = 0;    // soundlatch has been read
-	return m_soundlatch->read(space, 0);
-}
-
-READ8_MEMBER(airbustr_state::soundcommand2_r)
-{
-	m_soundlatch2_status = 0;   // soundlatch2 has been read
-	return m_soundlatch2->read(space, 0);
-}
-
-WRITE8_MEMBER(airbustr_state::soundcommand_w)
-{
-	m_soundlatch->write(space, 0, data);
-	m_soundlatch_status = 1;    // soundlatch has been written
-	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE); // cause a nmi to sub cpu
-}
-
-WRITE8_MEMBER(airbustr_state::soundcommand2_w)
-{
-	m_soundlatch2->write(space, 0, data);
-	m_soundlatch2_status = 1;   // soundlatch2 has been written
+	return 4 | (m_soundlatch->pending_r() << 1) | !m_soundlatch2->pending_r();
 }
 
 
@@ -362,7 +337,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( slave_io_map, AS_IO, 8, airbustr_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(slave_bankswitch_w)
-	AM_RANGE(0x02, 0x02) AM_READWRITE(soundcommand2_r, soundcommand_w)
+	AM_RANGE(0x02, 0x02) AM_DEVREAD("soundlatch2", generic_latch_8_device, read) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
 	AM_RANGE(0x04, 0x0c) AM_WRITE(scrollregs_w)
 	AM_RANGE(0x0e, 0x0e) AM_READ(soundcommand_status_r)
 	AM_RANGE(0x20, 0x20) AM_READ_PORT("P1")
@@ -383,7 +358,7 @@ static ADDRESS_MAP_START( sound_io_map, AS_IO, 8, airbustr_state )
 	AM_RANGE(0x00, 0x00) AM_WRITE(sound_bankswitch_w)
 	AM_RANGE(0x02, 0x03) AM_DEVREADWRITE("ymsnd", ym2203_device, read, write)
 	AM_RANGE(0x04, 0x04) AM_DEVREADWRITE("oki", okim6295_device, read, write)
-	AM_RANGE(0x06, 0x06) AM_READWRITE(soundcommand_r, soundcommand2_w)
+	AM_RANGE(0x06, 0x06) AM_DEVREAD("soundlatch", generic_latch_8_device, read) AM_DEVWRITE("soundlatch2", generic_latch_8_device, write)
 ADDRESS_MAP_END
 
 /* Input Ports */
@@ -550,8 +525,6 @@ void airbustr_state::machine_start()
 	membank("slavebank")->configure_entries(0, 8, memregion("slave")->base(), 0x4000);
 	membank("audiobank")->configure_entries(0, 8, memregion("audiocpu")->base(), 0x4000);
 
-	save_item(NAME(m_soundlatch_status));
-	save_item(NAME(m_soundlatch2_status));
 	save_item(NAME(m_bg_scrollx));
 	save_item(NAME(m_bg_scrolly));
 	save_item(NAME(m_fg_scrollx));
@@ -561,7 +534,6 @@ void airbustr_state::machine_start()
 
 void airbustr_state::machine_reset()
 {
-	m_soundlatch_status = m_soundlatch2_status = 0;
 	m_bg_scrollx = 0;
 	m_bg_scrolly = 0;
 	m_fg_scrollx = 0;
@@ -617,6 +589,8 @@ static MACHINE_CONFIG_START( airbustr )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
+
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
 
 	MCFG_SOUND_ADD("ymsnd", YM2203, XTAL_12MHz/4)   /* verified on pcb */

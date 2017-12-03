@@ -89,7 +89,6 @@ public:
 	DECLARE_WRITE8_MEMBER(foreground_w);
 	DECLARE_WRITE8_MEMBER(bg_bank_w);
 	DECLARE_WRITE8_MEMBER(coins_w);
-	DECLARE_WRITE8_MEMBER(snd_w);
 	DECLARE_WRITE8_MEMBER(main_irq_ack_w);
 	DECLARE_WRITE8_MEMBER(adpcm_w);
 	DECLARE_WRITE8_MEMBER(snd_ack_w);
@@ -219,12 +218,6 @@ WRITE8_MEMBER(dacholer_state::coins_w)
 	output().set_led_value(1, data & 8);
 }
 
-WRITE8_MEMBER(dacholer_state::snd_w)
-{
-	m_soundlatch->write(space, offset, data);
-	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
-}
-
 WRITE8_MEMBER(dacholer_state::main_irq_ack_w)
 {
 	m_maincpu->set_input_line(0, CLEAR_LINE);
@@ -258,7 +251,7 @@ static ADDRESS_MAP_START( main_io_map, AS_IO, 8, dacholer_state )
 	AM_RANGE(0x22, 0x22) AM_WRITE(bg_scroll_x_w)
 	AM_RANGE(0x23, 0x23) AM_WRITE(bg_scroll_y_w)
 	AM_RANGE(0x24, 0x24) AM_WRITE(main_irq_ack_w)
-	AM_RANGE(0x27, 0x27) AM_WRITE(snd_w)
+	AM_RANGE(0x27, 0x27) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
 ADDRESS_MAP_END
 
 
@@ -302,7 +295,7 @@ WRITE8_MEMBER(dacholer_state::music_irq_w)
 
 static ADDRESS_MAP_START( snd_io_map, AS_IO, 8, dacholer_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_DEVREADWRITE("soundlatch", generic_latch_8_device, read, clear_w)
+	AM_RANGE(0x00, 0x00) AM_DEVREADWRITE("soundlatch", generic_latch_8_device, read, acknowledge_w)
 	AM_RANGE(0x04, 0x04) AM_WRITE(music_irq_w)
 	AM_RANGE(0x08, 0x08) AM_WRITE(snd_irq_w)
 	AM_RANGE(0x0c, 0x0c) AM_WRITE(snd_ack_w)
@@ -314,7 +307,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( itaten_snd_io_map, AS_IO, 8, dacholer_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_DEVREADWRITE("soundlatch", generic_latch_8_device, read, clear_w)
+	AM_RANGE(0x00, 0x00) AM_DEVREADWRITE("soundlatch", generic_latch_8_device, read, acknowledge_w)
 	AM_RANGE(0x86, 0x87) AM_DEVWRITE("ay1", ay8910_device, data_address_w)
 	AM_RANGE(0x8a, 0x8b) AM_DEVWRITE("ay2", ay8910_device, data_address_w)
 	AM_RANGE(0x8e, 0x8f) AM_DEVWRITE("ay3", ay8910_device, data_address_w)
@@ -680,6 +673,7 @@ static MACHINE_CONFIG_START( dacholer )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 
 	MCFG_SOUND_ADD("ay1", AY8910, XTAL_19_968MHz/16)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)

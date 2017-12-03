@@ -12,6 +12,7 @@
 
 #include "cpu/adsp2100/adsp2100.h"
 #include "machine/gen_latch.h"
+#include "machine/timer.h"
 #include "sound/dmadac.h"
 
 

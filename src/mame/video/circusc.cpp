@@ -122,6 +122,8 @@ void circusc_state::video_start()
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(circusc_state::get_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 
 	m_bg_tilemap->set_scroll_cols(32);
+
+	save_item(NAME(m_spritebank));
 }
 
 
@@ -144,9 +146,14 @@ WRITE8_MEMBER(circusc_state::circusc_colorram_w)
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(circusc_state::circusc_flipscreen_w)
+WRITE_LINE_MEMBER(circusc_state::flipscreen_w)
 {
-	flip_screen_set(data & 1);
+	flip_screen_set(state);
+}
+
+WRITE_LINE_MEMBER(circusc_state::spritebank_w)
+{
+	m_spritebank = state;
 }
 
 
@@ -160,12 +167,7 @@ WRITE8_MEMBER(circusc_state::circusc_flipscreen_w)
 void circusc_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	int offs;
-	uint8_t *sr;
-
-	if ((*m_spritebank & 0x01) != 0)
-		sr = m_spriteram;
-	else
-		sr = m_spriteram_2;
+	uint8_t *sr = m_spritebank ? m_spriteram : m_spriteram_2;
 
 	for (offs = 0; offs < m_spriteram.bytes(); offs += 4)
 	{

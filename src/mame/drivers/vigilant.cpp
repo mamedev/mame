@@ -83,7 +83,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( vigilant_io_map, AS_IO, 8, vigilant_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ_PORT("IN0") AM_DEVWRITE("m72", m72_audio_device, sound_command_byte_w)    /* SD */
+	AM_RANGE(0x00, 0x00) AM_READ_PORT("IN0") AM_DEVWRITE("m72", m72_audio_device, sound_command_w)    /* SD */
 	AM_RANGE(0x01, 0x01) AM_READ_PORT("IN1") AM_WRITE(vigilant_out2_w)          /* OUT2 */
 	AM_RANGE(0x02, 0x02) AM_READ_PORT("IN2")
 	AM_RANGE(0x03, 0x03) AM_READ_PORT("DSW1")
@@ -109,7 +109,7 @@ static ADDRESS_MAP_START( kikcubic_io_map, AS_IO, 8, vigilant_state )
 	AM_RANGE(0x02, 0x02) AM_READ_PORT("IN0")
 	AM_RANGE(0x03, 0x03) AM_READ_PORT("IN1")
 	AM_RANGE(0x04, 0x04) AM_READ_PORT("IN2") AM_WRITE(bank_select_w)
-	AM_RANGE(0x06, 0x06) AM_DEVWRITE("m72", m72_audio_device, sound_command_byte_w)
+	AM_RANGE(0x06, 0x06) AM_DEVWRITE("m72", m72_audio_device, sound_command_w)
 //  AM_RANGE(0x07, 0x07) AM_WRITENOP /* ?? */
 ADDRESS_MAP_END
 

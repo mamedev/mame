@@ -12,7 +12,7 @@ function dat.check(set, softlist)
 	if not status or not info then
 		return nil
 	end
-	return "History"
+	return _("History")
 end
 
 function dat.get()

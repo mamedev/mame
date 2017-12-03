@@ -1260,10 +1260,8 @@ static ADDRESS_MAP_START( st_map, AS_PROGRAM, 16, st_state )
 	AM_RANGE(0xff8a3c, 0xff8a3d) AM_READWRITE(blitter_ctrl_r, blitter_ctrl_w)
 #endif
 	AM_RANGE(0xfffa00, 0xfffa3f) AM_DEVREADWRITE8(MC68901_TAG, mc68901_device, read, write, 0x00ff)
-	AM_RANGE(0xfffc00, 0xfffc01) AM_DEVREADWRITE8(MC6850_0_TAG, acia6850_device, status_r, control_w, 0xff00)
-	AM_RANGE(0xfffc02, 0xfffc03) AM_DEVREADWRITE8(MC6850_0_TAG, acia6850_device, data_r, data_w, 0xff00)
-	AM_RANGE(0xfffc04, 0xfffc05) AM_DEVREADWRITE8(MC6850_1_TAG, acia6850_device, status_r, control_w, 0xff00)
-	AM_RANGE(0xfffc06, 0xfffc07) AM_DEVREADWRITE8(MC6850_1_TAG, acia6850_device, data_r, data_w, 0xff00)
+	AM_RANGE(0xfffc00, 0xfffc03) AM_DEVREADWRITE8(MC6850_0_TAG, acia6850_device, read, write, 0xff00)
+	AM_RANGE(0xfffc04, 0xfffc07) AM_DEVREADWRITE8(MC6850_1_TAG, acia6850_device, read, write, 0xff00)
 ADDRESS_MAP_END
 
 
@@ -1304,10 +1302,8 @@ static ADDRESS_MAP_START( megast_map, AS_PROGRAM, 16, megast_state )
 	AM_RANGE(0xff8a3c, 0xff8a3d) AM_READWRITE(blitter_ctrl_r, blitter_ctrl_w)
 	AM_RANGE(0xfffa00, 0xfffa3f) AM_DEVREADWRITE8(MC68901_TAG, mc68901_device, read, write, 0x00ff)
 	AM_RANGE(0xfffa40, 0xfffa57) AM_READWRITE(fpu_r, fpu_w)
-	AM_RANGE(0xfffc00, 0xfffc01) AM_DEVREADWRITE8(MC6850_0_TAG, acia6850_device, status_r, control_w, 0xff00)
-	AM_RANGE(0xfffc02, 0xfffc03) AM_DEVREADWRITE8(MC6850_0_TAG, acia6850_device, data_r, data_w, 0xff00)
-	AM_RANGE(0xfffc04, 0xfffc05) AM_DEVREADWRITE8(MC6850_1_TAG, acia6850_device, status_r, control_w, 0xff00)
-	AM_RANGE(0xfffc06, 0xfffc07) AM_DEVREADWRITE8(MC6850_1_TAG, acia6850_device, data_r, data_w, 0xff00)
+	AM_RANGE(0xfffc00, 0xfffc03) AM_DEVREADWRITE8(MC6850_0_TAG, acia6850_device, read, write, 0xff00)
+	AM_RANGE(0xfffc04, 0xfffc07) AM_DEVREADWRITE8(MC6850_1_TAG, acia6850_device, read, write, 0xff00)
 	AM_RANGE(0xfffc20, 0xfffc3f) AM_DEVREADWRITE8(RP5C15_TAG, rp5c15_device, read, write, 0x00ff)
 ADDRESS_MAP_END
 
@@ -2581,7 +2577,7 @@ ROM_END
 
 ROM_START( st_es )
 	ROM_REGION16_BE( 0x30000, M68000_TAG, 0 )
-	ROM_DEFAULT_BIOS("tos100")
+	ROM_DEFAULT_BIOS("tos104")
 	ROM_SYSTEM_BIOS( 0, "tos104", "TOS 1.04 (Rainbow TOS)" )
 	ROMX_LOAD( "tos104es.bin", 0x00000, 0x30000, BAD_DUMP CRC(f4e8ecd2) SHA1(df63f8ac09125d0877b55d5ba1282779b7f99c16), ROM_BIOS(1) )
 
@@ -2596,7 +2592,7 @@ ROM_END
 
 ROM_START( st_nl )
 	ROM_REGION16_BE( 0x30000, M68000_TAG, 0 )
-	ROM_DEFAULT_BIOS("tos100")
+	ROM_DEFAULT_BIOS("tos104")
 	ROM_SYSTEM_BIOS( 0, "tos104", "TOS 1.04 (Rainbow TOS)" )
 	ROMX_LOAD( "tos104nl.bin", 0x00000, 0x30000, BAD_DUMP CRC(bb4370d4) SHA1(6de7c96b2d2e5c68778f4bce3eaf85a4e121f166), ROM_BIOS(1) )
 

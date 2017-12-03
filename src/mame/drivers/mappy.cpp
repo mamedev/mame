@@ -515,7 +515,7 @@ Notes:
   99,99999,9999,9999,999999
   it seems to be a counter decremented while the game is running.
 
-- Mappy: similarly, if you enter service mode and press press
+- Mappy: similarly, if you enter service mode and press
   P1 button + service coin the following is shown:
   99.99.999.9999.9999.9999
   99.99.999.9999.9999.0000

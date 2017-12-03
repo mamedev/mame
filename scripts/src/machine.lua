@@ -29,8 +29,12 @@ files {
 	MAME_DIR .. "src/devices/machine/ram.h",
 	MAME_DIR .. "src/devices/machine/legscsi.cpp",
 	MAME_DIR .. "src/devices/machine/legscsi.h",
+	MAME_DIR .. "src/devices/machine/sdlc.cpp",
+	MAME_DIR .. "src/devices/machine/sdlc.h",
 	MAME_DIR .. "src/devices/machine/terminal.cpp",
 	MAME_DIR .. "src/devices/machine/terminal.h",
+	MAME_DIR .. "src/devices/machine/timer.cpp",
+	MAME_DIR .. "src/devices/machine/timer.h",
 }
 files {
 	MAME_DIR .. "src/devices/imagedev/bitbngr.cpp",
@@ -585,6 +589,18 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/machine/am9513.h,MACHINES["AM9513"] = true
+---------------------------------------------------
+
+if (MACHINES["AM9513"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/am9513.cpp",
+		MAME_DIR .. "src/devices/machine/am9513.h",
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/machine/am9517a.h,MACHINES["AM9517A"] = true
 ---------------------------------------------------
 
@@ -654,6 +670,18 @@ if (MACHINES["ATAFLASH"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/machine/ataflash.cpp",
 		MAME_DIR .. "src/devices/machine/ataflash.h",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/devices/machine/atmel_arm_aic.h,MACHINES["ARM_AIC"] = true
+---------------------------------------------------
+
+if (MACHINES["ARM_AIC"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/atmel_arm_aic.cpp",
+		MAME_DIR .. "src/devices/machine/atmel_arm_aic.h",
 	}
 end
 
@@ -1007,6 +1035,30 @@ if (MACHINES["HP_TACO"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/machine/hp_taco.cpp",
 		MAME_DIR .. "src/devices/machine/hp_taco.h",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/devices/machine/1ma6.h,MACHINES["1MA6"] = true
+---------------------------------------------------
+
+if (MACHINES["1MA6"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/1ma6.cpp",
+		MAME_DIR .. "src/devices/machine/1ma6.h",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/devices/machine/1mb5.h,MACHINES["1MB5"] = true
+---------------------------------------------------
+
+if (MACHINES["1MB5"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/1mb5.cpp",
+		MAME_DIR .. "src/devices/machine/1mb5.h",
 	}
 end
 
@@ -2347,6 +2399,18 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/machine/sega_scu.h,MACHINES["SEGA_SCU"] = true
+---------------------------------------------------
+
+if (MACHINES["SEGA_SCU"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/sega_scu.cpp",
+		MAME_DIR .. "src/devices/machine/sega_scu.h",
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/machine/stvcd.h,MACHINES["STVCD"] = true
 ---------------------------------------------------
 
@@ -2494,6 +2558,18 @@ if (MACHINES["TMS9902"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/machine/tms9902.cpp",
 		MAME_DIR .. "src/devices/machine/tms9902.h",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/devices/machine/tube.h,MACHINES["TUBE"] = true
+---------------------------------------------------
+
+if (MACHINES["TUBE"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/tube.cpp",
+		MAME_DIR .. "src/devices/machine/tube.h",
 	}
 end
 
@@ -3223,5 +3299,29 @@ if (MACHINES["I82586"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/machine/i82586.cpp",
 		MAME_DIR .. "src/devices/machine/i82586.h",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/devices/machine/adc0844.h,MACHINES["ADC0844"] = true
+---------------------------------------------------
+
+if (MACHINES["ADC0844"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/adc0844.cpp",
+		MAME_DIR .. "src/devices/machine/adc0844.h",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/devices/machine/28fxxx.h,MACHINES["28FXXX"] = true
+---------------------------------------------------
+
+if (MACHINES["28FXXX"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/28fxxx.cpp",
+		MAME_DIR .. "src/devices/machine/28fxxx.h",
 	}
 end

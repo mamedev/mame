@@ -504,7 +504,7 @@ WRITE8_MEMBER( namcos2_shared_state::namcos2_mcu_analog_ctrl_w )
 		/* If the interrupt enable bit is set trigger an A/D IRQ */
 		if(data & 0x20)
 		{
-			generic_pulse_irq_line(*m_mcu, HD63705_INT_ADCONV, 1);
+			m_mcu->pulse_input_line(HD63705_INT_ADCONV, m_mcu->minimum_quantum_time());
 		}
 	}
 }

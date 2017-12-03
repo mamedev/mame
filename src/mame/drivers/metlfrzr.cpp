@@ -24,6 +24,7 @@
 #include "audio/t5182.h"
 
 #include "cpu/z80/z80.h"
+#include "machine/timer.h"
 #include "screen.h"
 #include "speaker.h"
 

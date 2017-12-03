@@ -313,9 +313,9 @@ void video_manager::save_snapshot(screen_device *screen, emu_file &file)
 	// add two text entries describing the image
 	std::string text1 = std::string(emulator_info::get_appname()).append(" ").append(emulator_info::get_build_version());
 	std::string text2 = std::string(machine().system().manufacturer).append(" ").append(machine().system().type.fullname());
-	png_info pnginfo = { nullptr };
-	png_add_text(&pnginfo, "Software", text1.c_str());
-	png_add_text(&pnginfo, "System", text2.c_str());
+	png_info pnginfo;
+	pnginfo.add_text("Software", text1.c_str());
+	pnginfo.add_text("System", text2.c_str());
 
 	// now do the actual work
 	const rgb_t *palette = (screen != nullptr && screen->has_palette()) ? screen->palette().palette()->entry_list_adjusted() : nullptr;
@@ -323,9 +323,6 @@ void video_manager::save_snapshot(screen_device *screen, emu_file &file)
 	png_error error = png_write_bitmap(file, &pnginfo, m_snap_bitmap, entries, palette);
 	if (error != PNGERR_NONE)
 		osd_printf_error("Error generating PNG for snapshot: png_error = %d\n", error);
-
-	// free any data allocated
-	png_free(&pnginfo);
 }
 
 
@@ -1297,21 +1294,20 @@ void video_manager::record_frame()
 		while (m_mng_next_frame_time <= curtime)
 		{
 			// set up the text fields in the movie info
-			png_info pnginfo = { nullptr };
+			png_info pnginfo;
 			if (m_mng_frame == 0)
 			{
 				std::string text1 = std::string(emulator_info::get_appname()).append(" ").append(emulator_info::get_build_version());
 				std::string text2 = std::string(machine().system().manufacturer).append(" ").append(machine().system().type.fullname());
-				png_add_text(&pnginfo, "Software", text1.c_str());
-				png_add_text(&pnginfo, "System", text2.c_str());
+				pnginfo.add_text("Software", text1.c_str());
+				pnginfo.add_text("System", text2.c_str());
 			}
 
 			// write the next frame
 			screen_device *screen = machine().first_screen();
 			const rgb_t *palette = (screen != nullptr && screen->has_palette()) ? screen->palette().palette()->entry_list_adjusted() : nullptr;
 			int entries = (screen != nullptr && screen->has_palette()) ? screen->palette().entries() : 0;
-			png_error error = mng_capture_frame(*m_mng_file, &pnginfo, m_snap_bitmap, entries, palette);
-			png_free(&pnginfo);
+			png_error error = mng_capture_frame(*m_mng_file, pnginfo, m_snap_bitmap, entries, palette);
 			if (error != PNGERR_NONE)
 			{
 				g_profiler.stop();

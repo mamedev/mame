@@ -6,10 +6,7 @@
 
 ***************************************************************************/
 
-#include "machine/74259.h"
 #include "machine/bankdev.h"
-#include "machine/msm6242.h"
-#include "sound/ym2413.h"
 #include "sound/msm5205.h"
 #include "sound/okim6295.h"
 #include "screen.h"
@@ -21,13 +18,10 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_soundcpu(*this, "soundcpu")
-		, m_ym2413(*this, "ym2413")
 		, m_oki(*this, "oki")
 		, m_msm(*this, "msm")
 		, m_screen(*this, "screen")
 		, m_palette(*this, "palette")
-		, m_rtc(*this, "rtc")
-		, m_mainlatch(*this, "mainlatch")
 		, m_bankdev(*this, "bankdev")
 		, m_gfx_region1(*this, "gfx1")
 		, m_gfx_region2(*this, "gfx2")
@@ -44,13 +38,10 @@ public:
 	/* devices */
 	required_device<cpu_device> m_maincpu;
 	optional_device<cpu_device> m_soundcpu;
-	optional_device<ym2413_device> m_ym2413;
 	optional_device<okim6295_device> m_oki;
 	optional_device<msm5205_device> m_msm;
 	optional_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
-	optional_device<msm6242_device> m_rtc;
-	optional_device<ls259_device> m_mainlatch;
 	optional_device<address_map_bank_device> m_bankdev;
 	optional_region_ptr<uint8_t> m_gfx_region1;
 	optional_region_ptr<uint8_t> m_gfx_region2;
@@ -124,7 +115,6 @@ public:
 	uint8_t m_hopper;
 
 	/* misc */
-	int m_hnoridur_bank;
 	uint8_t m_palette_ram[16*256*2];
 	int m_palbank;
 	int m_msm5205next;
@@ -140,7 +130,6 @@ public:
 	int m_tenkai_6c;
 	int m_tenkai_70;
 	uint8_t m_gekisha_val[2];
-	uint8_t *m_hnoridur_ptr;
 
 	DECLARE_WRITE8_MEMBER(dynax_vblank_ack_w);
 	DECLARE_WRITE_LINE_MEMBER(blitter_ack_w);
@@ -159,11 +148,13 @@ public:
 	DECLARE_WRITE8_MEMBER(cdracula_sound_rombank_w);
 	DECLARE_WRITE8_MEMBER(hnoridur_rombank_w);
 	DECLARE_WRITE8_MEMBER(hnoridur_palbank_w);
-	DECLARE_WRITE8_MEMBER(hnoridur_palette_w);
-	DECLARE_WRITE8_MEMBER(yarunara_palette_w);
-	DECLARE_WRITE8_MEMBER(nanajign_palette_w);
+	DECLARE_WRITE8_MEMBER(hnoridur_palette_lo_w);
+	DECLARE_WRITE8_MEMBER(hnoridur_palette_hi_w);
+	void hnoridur_palette_update(offs_t offset);
+	DECLARE_WRITE8_MEMBER(nanajign_palette_lo_w);
+	DECLARE_WRITE8_MEMBER(nanajign_palette_hi_w);
+	void nanajign_palette_update(offs_t offset);
 	DECLARE_WRITE8_MEMBER(adpcm_data_w);
-	DECLARE_WRITE8_MEMBER(yarunara_mainlatch_w);
 	DECLARE_WRITE8_MEMBER(hjingi_bank_w);
 	DECLARE_WRITE_LINE_MEMBER(hjingi_lockout_w);
 	DECLARE_WRITE_LINE_MEMBER(hjingi_hopper_w);
@@ -183,7 +174,6 @@ public:
 	DECLARE_READ8_MEMBER(jantouki_soundlatch_status_r);
 	DECLARE_READ8_MEMBER(mjelctrn_keyboard_1_r);
 	DECLARE_READ8_MEMBER(mjelctrn_dsw_r);
-	DECLARE_WRITE8_MEMBER(mjelctrn_blitter_ack_w);
 	DECLARE_WRITE8_MEMBER(tenkai_ipsel_w);
 	DECLARE_WRITE8_MEMBER(tenkai_ip_w);
 	DECLARE_READ8_MEMBER(tenkai_ip_r);
@@ -266,11 +256,6 @@ public:
 	INTERRUPT_GEN_MEMBER(jantouki_vblank_interrupt);
 	INTERRUPT_GEN_MEMBER(jantouki_sound_vblank_interrupt);
 	INTERRUPT_GEN_MEMBER(yarunara_clock_interrupt);
-	INTERRUPT_GEN_MEMBER(mjelctrn_vblank_interrupt);
-
-	TIMER_DEVICE_CALLBACK_MEMBER(neruton_irq_scanline);
-	TIMER_DEVICE_CALLBACK_MEMBER(majxtal7_vblank_interrupt);
-	TIMER_DEVICE_CALLBACK_MEMBER(tenkai_interrupt);
 
 	void tenkai_update_rombank();
 
@@ -284,12 +269,11 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(adpcm_reset_kludge_w);
 	DECLARE_WRITE8_MEMBER(tenkai_dswsel_w);
 	DECLARE_READ8_MEMBER(tenkai_dsw_r);
-	DECLARE_WRITE_LINE_MEMBER(tenkai_rtc_irq);
+	DECLARE_WRITE_LINE_MEMBER(tenkai_blitter_ack_w);
 	DECLARE_MACHINE_RESET(dynax);
 	DECLARE_MACHINE_START(dynax);
 	DECLARE_MACHINE_START(hanamai);
 	DECLARE_VIDEO_START(hanamai);
-	DECLARE_MACHINE_START(hnoridur);
 	DECLARE_VIDEO_START(hnoridur);
 	DECLARE_PALETTE_INIT(sprtmtch);
 	DECLARE_VIDEO_START(sprtmtch);
@@ -301,6 +285,7 @@ public:
 	DECLARE_VIDEO_START(mcnpshnt);
 	DECLARE_PALETTE_INIT(janyuki);
 	DECLARE_VIDEO_START(neruton);
+	DECLARE_VIDEO_START(tenkai);
 
 	inline void blitter_plot_pixel( int layer, int mask, int x, int y, int pen, int wrap, int flags );
 	int blitter_drawgfx( int layer, int mask, memory_region *gfx, int src, int pen, int x, int y, int wrap, int flags );
@@ -316,7 +301,7 @@ public:
 	void sprtmtch_update_irq();
 	void jantouki_update_irq();
 	void mjelctrn_update_irq();
-	void neruton_update_irq();
+	void tenkai_update_irq();
 	void jantouki_sound_update_irq();
 	void tenkai_show_6c();
 };

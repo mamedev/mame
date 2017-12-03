@@ -101,34 +101,14 @@ TODO:
 #define MCU_CLOCK           (XTAL_12MHz/4)
 
 
-TIMER_CALLBACK_MEMBER(lkage_state::nmi_callback)
-{
-	if (m_sound_nmi_enable)
-		m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
-	else
-		m_pending_nmi = 1;
-}
-
-WRITE8_MEMBER(lkage_state::lkage_sound_command_w)
-{
-	m_soundlatch->write(space, offset, data);
-	machine().scheduler().synchronize(timer_expired_delegate(FUNC(lkage_state::nmi_callback),this), data);
-}
-
 WRITE8_MEMBER(lkage_state::lkage_sh_nmi_disable_w)
 {
-	m_sound_nmi_enable = 0;
+	m_soundnmi->in_w<1>(0);
 }
 
 WRITE8_MEMBER(lkage_state::lkage_sh_nmi_enable_w)
 {
-	m_sound_nmi_enable = 1;
-	if (m_pending_nmi)
-	{
-		/* probably wrong but commands may go lost otherwise */
-		m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
-		m_pending_nmi = 0;
-	}
+	m_soundnmi->in_w<1>(1);
 }
 
 READ8_MEMBER(lkage_state::sound_status_r)
@@ -141,7 +121,7 @@ static ADDRESS_MAP_START( lkage_map, AS_PROGRAM, 8, lkage_state )
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM /* work ram */
 	AM_RANGE(0xe800, 0xefff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0xf000, 0xf003) AM_RAM AM_SHARE("vreg") /* video registers */
-	AM_RANGE(0xf060, 0xf060) AM_WRITE(lkage_sound_command_w)
+	AM_RANGE(0xf060, 0xf060) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
 	AM_RANGE(0xf061, 0xf061) AM_WRITENOP AM_READ(sound_status_r)
 	AM_RANGE(0xf063, 0xf063) AM_WRITENOP /* pulsed; nmi on sound cpu? */
 	AM_RANGE(0xf080, 0xf080) AM_READ_PORT("DSW1")
@@ -490,8 +470,6 @@ void lkage_state::machine_start()
 
 	save_item(NAME(m_mcu_ready));
 	save_item(NAME(m_mcu_val));
-	save_item(NAME(m_sound_nmi_enable));
-	save_item(NAME(m_pending_nmi));
 }
 
 void lkage_state::machine_reset()
@@ -500,9 +478,8 @@ void lkage_state::machine_reset()
 
 	m_mcu_ready = 3;
 	m_mcu_val = 0;
-	m_sound_nmi_enable = 0;
-	m_pending_nmi = 0;
 
+	m_soundnmi->in_w<1>(0);
 }
 
 static MACHINE_CONFIG_START( lkage )
@@ -538,6 +515,10 @@ static MACHINE_CONFIG_START( lkage )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(DEVWRITELINE("soundnmi", input_merger_device, in_w<0>))
+
+	MCFG_INPUT_MERGER_ALL_HIGH("soundnmi")
+	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 
 	MCFG_SOUND_ADD("ym1", YM2203, AUDIO_CLOCK )
 	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
@@ -585,6 +566,10 @@ static MACHINE_CONFIG_START( lkageb )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(DEVWRITELINE("soundnmi", input_merger_device, in_w<0>))
+
+	MCFG_INPUT_MERGER_ALL_HIGH("soundnmi")
+	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 
 	MCFG_SOUND_ADD("ym1", YM2203, AUDIO_CLOCK)
 	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("audiocpu", 0))

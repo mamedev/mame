@@ -403,7 +403,7 @@ uint32_t combatsc_state::screen_update_combatsc(screen_device &screen, bitmap_in
 	m_bg_tilemap[1]->set_scrolly(0, m_k007121_2->ctrlram_r(space, 2));
 
 	screen.priority().fill(0, cliprect);
-	
+
 	if (m_priority == 0)
 	{
 		m_bg_tilemap[1]->draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE | 0, 4);
@@ -419,7 +419,7 @@ uint32_t combatsc_state::screen_update_combatsc(screen_device &screen, bitmap_in
 	{
 		m_bg_tilemap[0]->draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE | 0, 1);
 		m_bg_tilemap[0]->draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE | 1, 2);
-		
+
 		/* we use the priority buffer so sprites are drawn front to back */
 		// drill sergeant ribbons goes here, MT #06259
 		draw_sprites(bitmap, cliprect, m_spriteram[1].get(), 1, screen.priority(), 0x0f00);

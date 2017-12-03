@@ -377,14 +377,3 @@ WRITE16_MEMBER( seibu_crtc_device::write_alt )
 {
 	write_word(BITSWAP16(offset,15,14,13,12,11,10,9,8,7,6,5,3,4,2,1,0),data);
 }
-
-/* Good E Jang / Seibu Cup Soccer Selection XOR bit 6 of the address bus */
-READ16_MEMBER( seibu_crtc_device::read_xor )
-{
-	return read_word(offset ^ 0x20);
-}
-
-WRITE16_MEMBER( seibu_crtc_device::write_xor )
-{
-	write_word(offset ^ 0x20,data);
-}

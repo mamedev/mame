@@ -729,7 +729,7 @@ static MACHINE_CONFIG_START( ojankohs )
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ojankohs)
 	MCFG_PALETTE_ADD("palette", 1024)
 
-	MCFG_DEVICE_ADD("gga", VSYSTEM_GGA, 0)
+	MCFG_DEVICE_ADD("gga", VSYSTEM_GGA, XTAL_13_333MHz/2) // divider not verified
 
 	MCFG_VIDEO_START_OVERRIDE(ojankohs_state,ojankohs)
 
@@ -810,7 +810,7 @@ static MACHINE_CONFIG_START( ccasino )
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ojankohs)
 	MCFG_PALETTE_ADD("palette", 1024)
 
-	MCFG_DEVICE_ADD("gga", VSYSTEM_GGA, 0)
+	MCFG_DEVICE_ADD("gga", VSYSTEM_GGA, XTAL_13_333MHz/2) // divider not verified
 
 	MCFG_VIDEO_START_OVERRIDE(ojankohs_state,ojankoy)
 

@@ -130,6 +130,7 @@ irq vector 0x26:                                                                
 #include "imagedev/cassette.h"
 #include "machine/i8251.h"
 #include "machine/i8255.h"
+#include "machine/timer.h"
 #include "sound/ay8910.h"
 #include "sound/upd7752.h"
 #include "sound/wave.h"

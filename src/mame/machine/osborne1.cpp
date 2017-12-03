@@ -53,8 +53,7 @@ READ8_MEMBER( osborne1_state::bank_2xxx_3xxx_r )
 	}
 	if ((offset & 0xA00) == 0xA00) // Serial
 	{
-		if (offset & 0x01) data &= m_acia->data_r(space, 0);
-		else data &= m_acia->status_r(space, 0);
+		data &= m_acia->read(space, offset & 0x01);
 	}
 	if ((offset & 0xC00) == 0x400) // SCREEN-PAC
 	{
@@ -80,8 +79,7 @@ WRITE8_MEMBER( osborne1_state::bank_2xxx_3xxx_w )
 			m_pia0->write(space, offset & 0x03, data);
 		if ((offset & 0xA00) == 0xA00) // Serial
 		{
-			if (offset & 0x01) m_acia->data_w(space, 0, data);
-			else m_acia->control_w(space, 0, data);
+			m_acia->write(space, offset & 0x01, data);
 		}
 		if ((offset & 0xC00) == 0x400) // SCREEN-PAC
 		{

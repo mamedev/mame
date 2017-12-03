@@ -920,7 +920,8 @@ static MACHINE_CONFIG_START( ngen )
 	MCFG_80186_TMROUT0_HANDLER(WRITELINE(ngen_state, cpu_timer_w))
 	MCFG_80186_IRQ_SLAVE_ACK(READ8(ngen_state, irq_cb))
 
-	MCFG_PIC8259_ADD( "pic", DEVWRITELINE("maincpu",i80186_cpu_device,int0_w), VCC, NOOP)
+	MCFG_DEVICE_ADD("pic", PIC8259, 0)
+	MCFG_PIC8259_OUT_INT_CB(DEVWRITELINE("maincpu", i80186_cpu_device, int0_w))
 
 	MCFG_DEVICE_ADD("pit", PIT8254, 0)
 	MCFG_PIT8253_CLK0(78120/4)  // 19.53kHz, /4 of the CPU timer output?
@@ -949,7 +950,7 @@ static MACHINE_CONFIG_START( ngen )
 	MCFG_I8237_OUT_IOW_3_CB(WRITE8(ngen_state, dma_3_dack_w))
 
 	// I/O board
-	MCFG_UPD7201_ADD("iouart",0,0,0,0,0) // clocked by PIT channel 2?
+	MCFG_DEVICE_ADD("iouart", UPD7201, 0) // clocked by PIT channel 2?
 	MCFG_Z80DART_OUT_TXDA_CB(DEVWRITELINE("rs232_a", rs232_port_device, write_txd))
 	MCFG_Z80DART_OUT_TXDB_CB(DEVWRITELINE("rs232_b", rs232_port_device, write_txd))
 	MCFG_Z80DART_OUT_DTRA_CB(DEVWRITELINE("rs232_a", rs232_port_device, write_dtr))
@@ -1030,7 +1031,8 @@ static MACHINE_CONFIG_START( ngen386 )
 	MCFG_CPU_IO_MAP(ngen386_io)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("pic", pic8259_device, inta_cb)
 
-	MCFG_PIC8259_ADD( "pic", INPUTLINE("i386cpu",0), VCC, NOOP)
+	MCFG_DEVICE_ADD("pic", PIC8259, 0)
+	MCFG_PIC8259_OUT_INT_CB(INPUTLINE("i386cpu", 0))
 
 	MCFG_DEVICE_ADD("pit", PIT8254, 0)
 	MCFG_PIT8253_CLK0(78120/4)  // 19.53kHz, /4 of the CPU timer output?
@@ -1059,7 +1061,7 @@ static MACHINE_CONFIG_START( ngen386 )
 	MCFG_I8237_OUT_IOW_3_CB(WRITE8(ngen_state, dma_3_dack_w))
 
 	// I/O board
-	MCFG_UPD7201_ADD("iouart",0,0,0,0,0) // clocked by PIT channel 2?
+	MCFG_DEVICE_ADD("iouart", UPD7201, 0) // clocked by PIT channel 2?
 	MCFG_Z80DART_OUT_TXDA_CB(DEVWRITELINE("rs232_a", rs232_port_device, write_txd))
 	MCFG_Z80DART_OUT_TXDB_CB(DEVWRITELINE("rs232_b", rs232_port_device, write_txd))
 	MCFG_Z80DART_OUT_DTRA_CB(DEVWRITELINE("rs232_a", rs232_port_device, write_dtr))

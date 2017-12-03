@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include "cpu/sh4/sh4.h"
+#include "cpu/sh/sh4.h"
 
 #define MCFG_NAOMI_G1_ADD(_tag, type, _irq_cb)                          \
 	MCFG_DEVICE_ADD(_tag, type, 0)                                      \

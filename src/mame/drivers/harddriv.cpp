@@ -328,6 +328,7 @@ Notes:
 #include "includes/harddriv.h"
 
 #include "includes/slapstic.h"
+#include "machine/timer.h"
 #include "machine/watchdog.h"
 #include "sound/volt_reg.h"
 #include "speaker.h"
@@ -1445,7 +1446,7 @@ static MACHINE_CONFIG_START( driver_nomsp )
 	MCFG_M48T02_ADD("200e") // MK48T02
 	MCFG_EEPROM_2816_ADD("210e") // MK48Z02
 
-	MCFG_MC68681_ADD("duartn68681", XTAL_3_6864MHz)
+	MCFG_DEVICE_ADD("duartn68681", MC68681, XTAL_3_6864MHz)
 	MCFG_MC68681_IRQ_CALLBACK(WRITELINE(harddriv_state, harddriv_duart_irq_handler))
 	MCFG_MC68681_A_TX_CALLBACK(DEVWRITELINE ("rs232", rs232_port_device, write_txd))
 

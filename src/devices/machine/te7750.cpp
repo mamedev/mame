@@ -195,7 +195,7 @@ void te7750_device::device_start()
 	for (auto &cb : m_output_cb)
 		cb.resolve_safe();
 
-	// resolve IOS (assume soft mode unless specified)
+	// resolve IOS (assume soft mode unless specified)
 	m_ios_cb.resolve_safe(0);
 
 	// save state

@@ -2,6 +2,7 @@
 // copyright-holders:David Haywood
 
 #include "machine/gen_latch.h"
+#include "machine/timer.h"
 #include "screen.h"
 
 class wwfsstar_state : public driver_device
@@ -37,7 +38,6 @@ public:
 	tilemap_t *m_bg0_tilemap;
 
 	DECLARE_WRITE16_MEMBER(scroll_w);
-	DECLARE_WRITE16_MEMBER(sound_w);
 	DECLARE_WRITE16_MEMBER(flipscreen_w);
 	DECLARE_WRITE16_MEMBER(irqack_w);
 	DECLARE_WRITE16_MEMBER(fg0_videoram_w);

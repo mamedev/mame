@@ -72,7 +72,6 @@ public:
 	DECLARE_WRITE8_MEMBER( ppi_pc_w );
 	DECLARE_READ8_MEMBER( ppi_pc_r );
 
-	DECLARE_WRITE_LINE_MEMBER( pit_out0_w );
 	DECLARE_WRITE_LINE_MEMBER( mtron_w );
 
 	DECLARE_WRITE_LINE_MEMBER( fdc_drq_w );

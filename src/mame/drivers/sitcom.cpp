@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Robbbert,Vas Crabb
+// copyright-holders:Vas Crabb
 /***************************************************************************
 
     SITCOM (known as Sitcom, Sitcom85, Sitcom8085)
@@ -340,8 +340,8 @@ MACHINE_CONFIG_START( sitcom )
 	MCFG_DEVICE_ADD("bank", ADDRESS_MAP_BANK, 0)
 	MCFG_DEVICE_PROGRAM_MAP(sitcom_bank)
 	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_ADDRESS_MAP_BANK_DATABUS_WIDTH(8)
-	MCFG_ADDRESS_MAP_BANK_ADDRBUS_WIDTH(16)
+	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
+	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(16)
 	MCFG_ADDRESS_MAP_BANK_STRIDE(0x8000)
 
 	MCFG_CLOCK_ADD("100hz", 100)

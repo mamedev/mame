@@ -67,6 +67,7 @@ Dumped by Uki
 #include "cpu/m68000/m68000.h"
 #include "machine/eepromser.h"
 #include "machine/kaneko_toybox.h"
+#include "machine/timer.h"
 #include "machine/watchdog.h"
 #include "sound/ymz280b.h"
 #include "video/kaneko_grap2.h"

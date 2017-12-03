@@ -145,7 +145,7 @@ public:
 
 	void soft_reset();
 
-	void dden_w(bool dden);
+	DECLARE_WRITE_LINE_MEMBER(dden_w);
 	void set_floppy(floppy_image_device *floppy);
 	void set_force_ready(bool force_ready);
 	void set_disable_motor_control(bool _disable_motor_control);
@@ -175,13 +175,13 @@ public:
 	DECLARE_READ8_MEMBER( read ) { return gen_r(offset); }
 	DECLARE_WRITE8_MEMBER( write ) { gen_w(offset,data); }
 
-	bool intrq_r();
-	bool drq_r();
+	DECLARE_READ_LINE_MEMBER(intrq_r);
+	DECLARE_READ_LINE_MEMBER(drq_r);
 
-	bool hld_r();
-	void hlt_w(bool state);
+	DECLARE_READ_LINE_MEMBER(hld_r);
+	DECLARE_WRITE_LINE_MEMBER(hlt_w);
 
-	bool enp_r();
+	DECLARE_READ_LINE_MEMBER(enp_r);
 
 	void index_callback(floppy_image_device *floppy, int state);
 

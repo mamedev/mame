@@ -8,6 +8,7 @@
 
 #include "cpu/m6805/m68705.h"
 #include "machine/gen_latch.h"
+#include "machine/timer.h"
 #include "sound/msm5205.h"
 #include "screen.h"
 

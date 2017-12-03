@@ -6038,8 +6038,58 @@ ROM_START( cawingr1 )
 	ROM_LOAD( "iob1.11e",     0x0000, 0x0117, CRC(3abc0700) SHA1(973043aa46ec6d5d1db20dc9d5937005a0f9f6ae) )
 ROM_END
 
-/* B-Board 89624B-3 */
+/* B-Board 89625B-1 */
 ROM_START( cawingu )
+	ROM_REGION( CODE_SIZE, "maincpu", 0 )      /* 68000 code */
+	ROM_LOAD16_BYTE( "cau_36.12f",  0x00000, 0x20000, CRC(c2574c0c) SHA1(dc74a02cc81f7ef283e4c750b1f3c08a85c7f9a4) )   // these 4 had a red stripe across label
+	ROM_LOAD16_BYTE( "cau_42.12h",  0x00001, 0x20000, CRC(d89e00be) SHA1(4c64648f0f80c7e85170a50f5e558a100b937c8f) )   // these 4 had a red stripe across label
+	ROM_LOAD16_BYTE( "cau_37.13f",  0x40000, 0x20000, CRC(8e6d4f8a) SHA1(dd9c429e753b8e4c10a16f5121ebd727c7c653a4) )   // these 4 had a red stripe across label
+	ROM_LOAD16_BYTE( "cau_43.13h",  0x40001, 0x20000, CRC(ece07955) SHA1(46e3f0123c9f651b3d7c3798938ca14dd0227f76) )   // these 4 had a red stripe across label
+	ROM_LOAD16_BYTE( "cau_34.10f",  0x80000, 0x20000, CRC(5fda906e) SHA1(7b3ef17d494a2f92e58ab7e34a3beaad8c149fca) )
+	ROM_LOAD16_BYTE( "cau_40.10h",  0x80001, 0x20000, CRC(736c1835) SHA1(a91f479fab30603a111304adc0478d430faa80fc) )
+	ROM_LOAD16_BYTE( "cau_35.11f",  0xc0000, 0x20000, CRC(74c2ddf0) SHA1(df1b50649fdad9cc57dfddbf12345056a2f1d121) )
+	ROM_LOAD16_BYTE( "cau_41.11h",  0xc0001, 0x20000, CRC(2a44bfe5) SHA1(f29cf5548e753c79b081e742cf30af9c177c2cc7) )
+
+	ROM_REGION( 0x200000, "gfx", 0 )
+	ROMX_LOAD( "cau_09.4b",  0x000000, 0x20000, CRC(d4b17c3a) SHA1(e5be3afbe0071e3a7c424bae0e9d9445aedd4f4b) , ROM_SKIP(7) )
+	ROMX_LOAD( "cau_01.4a",  0x000001, 0x20000, CRC(34c3094e) SHA1(281b52b1d0b6ff5af47d28f405d09803d8db54f8) , ROM_SKIP(7) )
+	ROMX_LOAD( "cau_13.9b",  0x000002, 0x20000, CRC(9d5c7911) SHA1(de67245cb097c60c3a5ea0fc6d0a427fc0167338) , ROM_SKIP(7) )
+	ROMX_LOAD( "cau_05.9a",  0x000003, 0x20000, CRC(f042cc7b) SHA1(904b9df5170e86ebc64d61812ff9affdb4722993) , ROM_SKIP(7) )
+	ROMX_LOAD( "cau_24.5e",  0x000004, 0x20000, CRC(0eac450f) SHA1(0ff0bd0835c91003d0a3ebd6b2b36928a835462e) , ROM_SKIP(7) )
+	ROMX_LOAD( "cau_17.5c",  0x000005, 0x20000, CRC(4fab0d0c) SHA1(f05cde37e9860008a777b0def7477203444a84dd) , ROM_SKIP(7) )
+	ROMX_LOAD( "cau_38.8h",  0x000006, 0x20000, CRC(cb96ed24) SHA1(9888181030b0cdd3be34fbae1a178f362187988a) , ROM_SKIP(7) )
+	ROMX_LOAD( "cau_32.8f",  0x000007, 0x20000, CRC(433a0859) SHA1(76534bf08d0779bd018c2400ac3f1b4b2de27e1c) , ROM_SKIP(7) )
+	ROMX_LOAD( "cau_10.5b",  0x100000, 0x20000, CRC(4af10ef2) SHA1(a118f0ab73b1580ac1e860b615417d2ad423571c) , ROM_SKIP(7) )
+	ROMX_LOAD( "cau_02.5a",  0x100001, 0x20000, CRC(3e1f5b34) SHA1(baf2a29fd56c24314dca2d1ea0b6eb9e7db1445e) , ROM_SKIP(7) )
+	ROMX_LOAD( "cau_14.10b", 0x100002, 0x20000, CRC(2bef78c4) SHA1(a72e6ac95b533b19df22272e98af5fa859f6b810) , ROM_SKIP(7) )
+	ROMX_LOAD( "cau_06.10a", 0x100003, 0x20000, CRC(3777ede1) SHA1(46344a5696492351f0ee81b94e9e324f882222ca) , ROM_SKIP(7) )
+	ROMX_LOAD( "cau_25.7e",  0x100004, 0x20000, CRC(859ee531) SHA1(59174d333f8a97119e0e733743c06b1fad4d9214) , ROM_SKIP(7) )
+	ROMX_LOAD( "cau_18.7c",  0x100005, 0x20000, CRC(4c52edf1) SHA1(acc8e79881d97e0404316c58609577fab4dcb0bb) , ROM_SKIP(7) )
+	ROMX_LOAD( "cau_39.9h",  0x100006, 0x20000, CRC(147be975) SHA1(69dbe31ea3bb0ef310a4e02e43aa863e072cd762) , ROM_SKIP(7) )
+	ROMX_LOAD( "cau_33.9f",  0x100007, 0x20000, CRC(8560c130) SHA1(dc4d3f7699f208fbf2284efa37fe8634d6881a97) , ROM_SKIP(7) )
+
+	ROM_REGION( 0x18000, "audiocpu", 0 ) /* 64k for the audio CPU (+banks) */
+	ROM_LOAD( "cau_23.13b",  0x00000, 0x08000, CRC(96fe7485) SHA1(10466889dfc6bc8afd3075385e241a16372efbeb) )   // == ca_9.12b
+	ROM_CONTINUE(            0x10000, 0x08000 )
+
+	ROM_REGION( 0x40000, "oki", 0 ) /* Samples */
+	ROM_LOAD( "cau_30.12c",  0x00000, 0x20000, CRC(4a613a2c) SHA1(06e10644fc60925b85d2ca0888c9fa057bfe996a) )   // == ca_18.11c
+	ROM_LOAD( "cau_31.13c",  0x20000, 0x20000, CRC(74584493) SHA1(5cfb15f1b9729323707972646313aee8ab3ac4eb) )   // == ca_19.12c
+
+	ROM_REGION( 0x0200, "aboardplds", 0 )
+	ROM_LOAD( "buf1",         0x0000, 0x0117, CRC(eb122de7) SHA1(b26b5bfe258e3e184f069719f9fd008d6b8f6b9b) )
+	ROM_LOAD( "ioa1",         0x0000, 0x0117, CRC(59c7ee3b) SHA1(fbb887c5b4f5cb8df77cec710eaac2985bc482a6) )
+	ROM_LOAD( "prg1",         0x0000, 0x0117, CRC(f1129744) SHA1(a5300f301c1a08a7da768f0773fa0fe3f683b237) )
+	ROM_LOAD( "rom1",         0x0000, 0x0117, CRC(41dc73b9) SHA1(7d4c9f1693c821fbf84e32dd6ef62ddf14967845) )
+	ROM_LOAD( "sou1",         0x0000, 0x0117, CRC(84f4b2fe) SHA1(dcc9e86cc36316fe42eace02d6df75d08bc8bb6d) )
+
+	ROM_REGION( 0x0200, "bboardplds", 0 )
+	ROM_LOAD( "ca22b.1a",     0x0000, 0x0117, CRC(5152e678) SHA1(ac61df30cd073b26f2145e3ea0c513ec804d047a) )   // photo shows this to be labeled CA222B
+	ROM_LOAD( "iob1.12e",     0x0000, 0x0117, CRC(3abc0700) SHA1(973043aa46ec6d5d1db20dc9d5937005a0f9f6ae) )    /* seen the same pcb with LWIO.12E */
+ROM_END
+
+/* B-Board 89624B-3 */
+ROM_START( cawingur1 )
 	ROM_REGION( CODE_SIZE, "maincpu", 0 )      /* 68000 code */
 	ROM_LOAD16_BYTE( "cau_30a.11f",    0x00000, 0x20000, CRC(91fceacd) SHA1(4845999a96fee829264346ca399fdd64a8408001) ) // == cae_30a.11f
 	ROM_LOAD16_BYTE( "cau_35a.11h",    0x00001, 0x20000, CRC(f090d9b2) SHA1(261dc4ac79507299a7f9a1ad5edb8425345db06c) )
@@ -8652,6 +8702,39 @@ ROM_START( knightsja )
 	ROM_REGION( 0x0200, "cboardplds", 0 )
 	ROM_LOAD( "ioc1.ic7",     0x0000, 0x0117, CRC(0d182081) SHA1(475b3d417785da4bc512cce2b274bb00d4cc6792) )
 	ROM_LOAD( "c632.ic1",     0x0000, 0x0117, CRC(0fbd9270) SHA1(d7e737b20c44d41e29ca94be56114b31934dde81) )
+ROM_END
+
+// dumper's note: This board has bad priority layers - The 'flag' is behind the characters on one demo mode level for example
+
+ROM_START( knightsb2 )
+	ROM_REGION( CODE_SIZE, "maincpu", 0 )      /* 68000 code */
+	ROM_LOAD16_BYTE( "left.code.040",   0x00000, 0x80000, CRC(95d00a7e) SHA1(2da1c47aa15d44aa842a8d79e030e7e7b69bec19) )
+	ROM_LOAD16_BYTE( "right.code.040",  0x00001, 0x80000, CRC(5a9d0b64) SHA1(6ff312879c3d675ceee6fd3e262f797fabb9871e) )
+
+	ROM_REGION( 0x400000, "gfx", 0 ) // same ROM arrangement as sfm8. Same bootlegger?
+	ROMX_LOAD( "spe-a.japan9207d.mask1.801",    0x000000, 0x40000, CRC(14a15fcd) SHA1(8bb9d79145dd652e9a7c6e433a3f423d5518cd41), ROM_SKIP(7) )
+	ROM_CONTINUE(          0x000004, 0x40000)
+	ROM_CONTINUE(          0x200000, 0x40000)
+	ROM_CONTINUE(          0x200004, 0x40000)
+	ROMX_LOAD( "spe-b.japan9207d.mask2.801",    0x000001, 0x40000, CRC(250d2957) SHA1(067bc46e3fc8b9166da1fb25f7fe9dbd80d9fda4), ROM_SKIP(7) )
+	ROM_CONTINUE(          0x000005, 0x40000)
+	ROM_CONTINUE(          0x200001, 0x40000)
+	ROM_CONTINUE(          0x200005, 0x40000)
+	ROMX_LOAD( "spe-c.japan9207d.mask4.801",    0x000002, 0x40000, CRC(0721c26d) SHA1(6211a723520fd1c2594e95b353ea6deb70d7ce90), ROM_SKIP(7) )
+	ROM_CONTINUE(          0x000006, 0x40000)
+	ROM_CONTINUE(          0x200002, 0x40000)
+	ROM_CONTINUE(          0x200006, 0x40000)
+	ROMX_LOAD( "spe-d.japan9207d.mask3.801",    0x000003, 0x40000, CRC(db97f56a) SHA1(bf61dd97b0e3790b27b0f67bb98ecae69ffa048f), ROM_SKIP(7) )
+	ROM_CONTINUE(          0x000007, 0x40000)
+	ROM_CONTINUE(          0x200003, 0x40000)
+	ROM_CONTINUE(          0x200007, 0x40000)
+
+	ROM_REGION( 0x18000, "audiocpu", 0 ) /* 64k for the audio CPU (+banks) */
+	ROM_LOAD( "sound.code.512",  0x00000, 0x08000, CRC(5e44d9ee) SHA1(47a7503321be8d52b5c44af838e3bb82ee15a415) )
+	ROM_CONTINUE(           0x10000, 0x08000 )
+
+	ROM_REGION( 0x40000, "oki", 0 ) /* Samples */
+	ROM_LOAD( "spe-e.japan9208d.snd.mask.020",  0x00000, 0x40000, CRC(85f837a0) SHA1(21a3fe8fdad10bfc994777e0b85c2c4b23943534) )
 ROM_END
 
 /* B-Board 91635B-2 */
@@ -12532,7 +12615,8 @@ GAME( 1990, mswordu,     msword,   cps1_10MHz, msword,   cps_state,   cps1,     
 GAME( 1990, mswordj,     msword,   cps1_10MHz, msword,   cps_state,   cps1,     ROT0,   "Capcom", "Magic Sword: Heroic Fantasy (Japan 900623)", MACHINE_SUPPORTS_SAVE )    // 23.06.1990  "JAPAN"
 GAME( 1990, cawing,      0,        cps1_10MHz, cawing,   cps_state,   cps1,     ROT0,   "Capcom", "Carrier Air Wing (World 901012)", MACHINE_SUPPORTS_SAVE )   // "ETC"
 GAME( 1990, cawingr1,    cawing,   cps1_10MHz, cawing,   cps_state,   cps1,     ROT0,   "Capcom", "Carrier Air Wing (World 901009)", MACHINE_SUPPORTS_SAVE )   // "ETC"
-GAME( 1990, cawingu,     cawing,   cps1_10MHz, cawing,   cps_state,   cps1,     ROT0,   "Capcom", "Carrier Air Wing (USA 901012)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, cawingu,     cawing,   cps1_10MHz, cawing,   cps_state,   cps1,     ROT0,   "Capcom", "Carrier Air Wing (USA 901130)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, cawingur1,   cawing,   cps1_10MHz, cawing,   cps_state,   cps1,     ROT0,   "Capcom", "Carrier Air Wing (USA 901012)", MACHINE_SUPPORTS_SAVE )
 GAME( 1990, cawingj,     cawing,   cps1_10MHz, cawing,   cps_state,   cps1,     ROT0,   "Capcom", "U.S. Navy (Japan 901012)", MACHINE_SUPPORTS_SAVE )
 GAME( 1990, nemo,        0,        cps1_10MHz, nemo,     cps_state,   cps1,     ROT0,   "Capcom", "Nemo (World 901130)", MACHINE_SUPPORTS_SAVE )   // "ETC"
 GAME( 1990, nemor1,      nemo,     cps1_10MHz, nemo,     cps_state,   cps1,     ROT0,   "Capcom", "Nemo (World 901109)", MACHINE_SUPPORTS_SAVE )   // "ETC"
@@ -12587,6 +12671,7 @@ GAME( 1991, knights,     0,        cps1_10MHz, knights,  cps_state,   cps1,     
 GAME( 1991, knightsu,    knights,  cps1_10MHz, knights,  cps_state,   cps1,     ROT0,   "Capcom", "Knights of the Round (USA 911127)", MACHINE_SUPPORTS_SAVE )
 GAME( 1991, knightsj,    knights,  cps1_10MHz, knights,  cps_state,   cps1,     ROT0,   "Capcom", "Knights of the Round (Japan 911127, B-Board 91634B-2)", MACHINE_SUPPORTS_SAVE )
 GAME( 1991, knightsja,   knights,  cps1_10MHz, knights,  cps_state,   cps1,     ROT0,   "Capcom", "Knights of the Round (Japan 911127, B-Board 89625B-1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, knightsb2,   knights,  cps1_10MHz, knights,  cps_state,   cps1,     ROT0,   "Capcom", "Knights of the Round (bootleg, World 911127)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // i.e. player selection screen problems
 GAME( 1992, sf2ce,       0,        cps1_12MHz, sf2,      cps_state,   cps1,     ROT0,   "Capcom", "Street Fighter II': Champion Edition (World 920513)", MACHINE_SUPPORTS_SAVE )   // "ETC"
 GAME( 1992, sf2ceea,     sf2ce,    cps1_12MHz, sf2,      cps_state,   cps1,     ROT0,   "Capcom", "Street Fighter II': Champion Edition (World 920313)", MACHINE_SUPPORTS_SAVE )   // "ETC"
 GAME( 1992, sf2ceua,     sf2ce,    cps1_12MHz, sf2,      cps_state,   cps1,     ROT0,   "Capcom", "Street Fighter II': Champion Edition (USA 920313)", MACHINE_SUPPORTS_SAVE )

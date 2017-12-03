@@ -73,6 +73,7 @@
 
 #include "emu.h"
 #include "pic16c5x.h"
+#include "16c5xdsm.h"
 #include "debugger.h"
 
 
@@ -183,10 +184,9 @@ device_memory_interface::space_config_vector pic16c5x_device::memory_space_confi
 	};
 }
 
-offs_t pic16c5x_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+util::disasm_interface *pic16c5x_device::create_disassembler()
 {
-	extern CPU_DISASSEMBLE( pic16c5x );
-	return CPU_DISASSEMBLE_NAME(pic16c5x)(this, stream, pc, oprom, opram, options);
+	return new pic16c5x_disassembler;
 }
 
 
@@ -197,7 +197,7 @@ void pic16c5x_device::update_internalram_ptr()
 
 
 
-#define PIC16C5x_RDOP(A)         (m_direct->read_word((A)<<1))
+#define PIC16C5x_RDOP(A)         (m_direct->read_word(A))
 #define PIC16C5x_RAM_RDMEM(A)    ((uint8_t)m_data->read_byte(A))
 #define PIC16C5x_RAM_WRMEM(A,V)  (m_data->write_byte(A,V))
 
@@ -883,7 +883,7 @@ enum
 void pic16c5x_device::device_start()
 {
 	m_program = &space(AS_PROGRAM);
-	m_direct = &m_program->direct();
+	m_direct = m_program->direct<-1>();
 	m_data = &space(AS_DATA);
 
 	m_read_a.resolve_safe(0);

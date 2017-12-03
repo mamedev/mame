@@ -157,6 +157,7 @@ JC-301-00  W11 9510K7059    23C16000        U85
 #include "cpu/m68000/m68000.h"
 #include "machine/eepromser.h"
 #include "machine/nvram.h"
+#include "machine/timer.h"
 #include "machine/watchdog.h"
 #include "sound/ymz280b.h"
 #include "video/sknsspr.h"

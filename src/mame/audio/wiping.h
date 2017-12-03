@@ -58,6 +58,6 @@ private:
 	void make_mixer_table(int voices, int gain);
 };
 
-DECLARE_DEVICE_TYPE(WIPING, wiping_sound_device)
+DECLARE_DEVICE_TYPE(WIPING_CUSTOM, wiping_sound_device)
 
 #endif // MAME_AUDIO_WIPING_H

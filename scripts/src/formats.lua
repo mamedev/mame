@@ -907,6 +907,18 @@ end
 
 --------------------------------------------------
 --
+--@src/lib/formats/hti_tape.h,FORMATS["HTI_TAP"] = true
+--------------------------------------------------
+
+if (FORMATS["HTI_TAP"]~=null or _OPTIONS["with-tools"]) then
+	files {
+		MAME_DIR.. "src/lib/formats/hti_tape.cpp",
+		MAME_DIR.. "src/lib/formats/hti_tape.h",
+	}
+end
+
+--------------------------------------------------
+--
 --@src/lib/formats/hpi_dsk.h,FORMATS["HPI_DSK"] = true
 --------------------------------------------------
 

@@ -85,7 +85,7 @@ void device_rom_interface::set_rom(const void *base, u32 size)
 
 void device_rom_interface::interface_pre_start()
 {
-	m_rom_direct = &space().direct();
+	m_rom_direct = space().direct<0>();
 	m_bank = nullptr;
 	m_cur_bank = -1;
 	device().save_item(NAME(m_cur_bank));

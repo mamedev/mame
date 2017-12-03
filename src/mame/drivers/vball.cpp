@@ -170,13 +170,6 @@ WRITE8_MEMBER(vball_state::bankswitch_w)
 	m_scrolly_hi = (data & 0x40) << 2;
 }
 
-/* The sound system comes all but verbatim from Double Dragon */
-WRITE8_MEMBER(vball_state::cpu_sound_command_w)
-{
-	m_soundlatch->write(space, offset, data);
-	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
-}
-
 
 /* bit 0 = flip screen
    bit 1 = scrollx hi
@@ -218,7 +211,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, vball_state )
 	AM_RANGE(0x1009, 0x1009) AM_WRITE(bankswitch_w)
 	AM_RANGE(0x100a, 0x100b) AM_WRITE(irq_ack_w)  /* is there a scanline counter here? */
 	AM_RANGE(0x100c, 0x100c) AM_WRITE(scrollx_lo_w)
-	AM_RANGE(0x100d, 0x100d) AM_WRITE(cpu_sound_command_w)
+	AM_RANGE(0x100d, 0x100d) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
 	AM_RANGE(0x100e, 0x100e) AM_WRITEONLY AM_SHARE("scrolly_lo")
 	AM_RANGE(0x2000, 0x2fff) AM_WRITE(videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0x3000, 0x3fff) AM_WRITE(attrib_w) AM_SHARE("attribram")
@@ -425,7 +418,9 @@ static MACHINE_CONFIG_START( vball )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
+	// The sound system comes all but verbatim from Double Dragon
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 
 	MCFG_YM2151_ADD("ymsnd", 3579545)
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 0))

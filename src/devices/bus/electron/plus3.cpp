@@ -17,7 +17,6 @@
 
 #include "emu.h"
 #include "plus3.h"
-#include "softlist.h"
 
 
 //**************************************************************************
@@ -39,8 +38,6 @@ FLOPPY_FORMATS_END0
 
 SLOT_INTERFACE_START(electron_floppies)
 	SLOT_INTERFACE("35dd",    FLOPPY_35_DD)
-	SLOT_INTERFACE("525sd",   FLOPPY_525_SD)
-	SLOT_INTERFACE("525dd",   FLOPPY_525_DD)
 	SLOT_INTERFACE("525qd",   FLOPPY_525_QD)
 SLOT_INTERFACE_END
 
@@ -48,7 +45,7 @@ SLOT_INTERFACE_END
 ROM_START( plus3 )
 	// Bank 4 Disc
 	ROM_REGION(0x4000, "exp_rom", 0)
-	ROM_DEFAULT_BIOS("adfs")
+	ROM_DEFAULT_BIOS("adfs100")
 	// ADFS
 	ROM_SYSTEM_BIOS(0, "adfs100", "Acorn ADFS 1.00")
 	ROMX_LOAD("adfs.rom", 0x0000, 0x4000, CRC(3289bdc6) SHA1(e7c7a1094d50a3579751df2007269067c8ff6812), ROM_BIOS(1))
@@ -68,14 +65,11 @@ ROM_END
 MACHINE_CONFIG_MEMBER( electron_plus3_device::device_add_mconfig )
 	/* fdc */
 	MCFG_WD1770_ADD("fdc", XTAL_16MHz / 2)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:0", electron_floppies, "35dd", floppy_formats)
-	MCFG_SLOT_FIXED(true)
+	MCFG_FLOPPY_DRIVE_ADD_FIXED("fdc:0", electron_floppies, "35dd", floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", electron_floppies, nullptr, floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 
-	/* software lists */
-	MCFG_SOFTWARE_LIST_ADD("flop_ls", "electron_flop")
 
 	/* pass-through */
 	MCFG_ELECTRON_PASSTHRU_EXPANSION_SLOT_ADD(nullptr)

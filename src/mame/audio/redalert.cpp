@@ -71,7 +71,7 @@ WRITE8_MEMBER(redalert_state::redalert_audio_command_w)
 	m_soundlatch->write(space, 0, data);
 
 	/* D7 is also connected to the NMI input of the CPU -
-	   the NMI is actually toggled by a 74121 */
+	   the NMI is actually toggled by a 74121 (R1=27K, C10=330p) */
 	if ((data & 0x80) == 0x00)
 		m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }

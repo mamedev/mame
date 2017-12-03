@@ -6,15 +6,18 @@ Ithaca Intersystems DPS-1
 
 The last commercial release of a computer fitted with a front panel.
 
+It needs to boot from floppy before anything appears on screen.
+
 ToDo:
 - Need artwork of the front panel switches and LEDs, and port FF.
-- Replace terminal with s2651 UART and RS232.
 
 ***************************************************************************************************************/
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "machine/upd765.h"
-#include "machine/terminal.h"
+#include "machine/mc2661.h"
+#include "bus/rs232/rs232.h"
+//#include "bus/s100/s100.h"
 #include "softlist.h"
 
 class dps1_state : public driver_device
@@ -26,11 +29,8 @@ public:
 		, m_fdc(*this, "fdc")
 		, m_floppy0(*this, "fdc:0")
 		//, m_floppy1(*this, "fdc:1")
-		, m_terminal(*this, "terminal")
 	{ }
 
-	DECLARE_READ8_MEMBER(port00_r);
-	DECLARE_WRITE8_MEMBER(port00_w);
 	DECLARE_WRITE8_MEMBER(portb2_w);
 	DECLARE_WRITE8_MEMBER(portb4_w);
 	DECLARE_WRITE8_MEMBER(portb6_w);
@@ -43,28 +43,25 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(fdc_drq_w);
 	DECLARE_DRIVER_INIT(dps1);
 	DECLARE_MACHINE_RESET(dps1);
-	void kbd_put(u8 data);
 
 private:
 	bool m_dma_dir;
 	uint16_t m_dma_adr;
-	uint8_t m_term_data;
 	required_device<cpu_device> m_maincpu;
 	required_device<upd765_family_device> m_fdc;
 	required_device<floppy_connector> m_floppy0;
 	//required_device<floppy_connector> m_floppy1;
-	required_device<generic_terminal_device> m_terminal;
 };
 
-static ADDRESS_MAP_START( dps1_mem, AS_PROGRAM, 8, dps1_state )
+static ADDRESS_MAP_START( mem_map, AS_PROGRAM, 8, dps1_state )
 	AM_RANGE(0x0000, 0x03ff) AM_READ_BANK("bankr0") AM_WRITE_BANK("bankw0")
 	AM_RANGE(0x0400, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( dps1_io, AS_IO, 8, dps1_state )
+static ADDRESS_MAP_START( io_map, AS_IO, 8, dps1_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x00, 0x03) AM_READWRITE(port00_r,port00_w) // 2651 uart
+	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("uart", mc2661_device, read, write) // S2651
 	AM_RANGE(0xb0, 0xb1) AM_DEVICE("fdc", upd765_family_device, map)
 	AM_RANGE(0xb2, 0xb3) AM_WRITE(portb2_w) // set dma fdc->memory
 	AM_RANGE(0xb4, 0xb5) AM_WRITE(portb4_w) // set dma memory->fdc
@@ -74,35 +71,14 @@ static ADDRESS_MAP_START( dps1_io, AS_IO, 8, dps1_state )
 	AM_RANGE(0xbc, 0xbd) AM_WRITE(portbc_w) // set A0-7
 	AM_RANGE(0xbe, 0xbf) AM_WRITE(portbe_w) // disable eprom
 	AM_RANGE(0xff, 0xff) AM_READWRITE(portff_r, portff_w)
+	// other allocated ports, optional
+	// AM_RANGE(0x04, 0x07) AM_DEVREADWRITE("uart2", mc2661_device, read, write) // S2651
+	// AM_RANGE(0x08, 0x0b) parallel ports
+	AM_RANGE(0x10, 0x17) AM_NOP // pair of AM9519 interrupt controllers
+	// AM_RANGE(0x18, 0x1f) control lines 0 to 7
+	AM_RANGE(0xe0, 0xe3) AM_NOP //unknown device
 ADDRESS_MAP_END
 
-// uart in
-READ8_MEMBER( dps1_state::port00_r )
-{
-	uint8_t data = 0x4e;
-	switch(offset)
-	{
-		case 0:
-			data = m_term_data;
-			m_term_data = 0;
-			break;
-		case 1:
-			data = (m_term_data) ? 3 : 1;
-			break;
-		case 3:
-			data = 0x27;
-		default:
-			break;
-	}
-	return data;
-}
-
-// uart out
-WRITE8_MEMBER( dps1_state::port00_w )
-{
-	if (offset == 0)
-		m_terminal->write(space, 0, data);
-}
 
 // read from disk, to memory
 WRITE8_MEMBER( dps1_state::portb2_w )
@@ -201,11 +177,6 @@ DRIVER_INIT_MEMBER( dps1_state, dps1 )
 static INPUT_PORTS_START( dps1 )
 INPUT_PORTS_END
 
-void dps1_state::kbd_put(u8 data)
-{
-	m_term_data = data;
-}
-
 static SLOT_INTERFACE_START( floppies )
 	SLOT_INTERFACE( "floppy0", FLOPPY_8_DSDD )
 SLOT_INTERFACE_END
@@ -213,13 +184,20 @@ SLOT_INTERFACE_END
 static MACHINE_CONFIG_START( dps1 )
 	// basic machine hardware
 	MCFG_CPU_ADD("maincpu", Z80, 4000000)
-	MCFG_CPU_PROGRAM_MAP(dps1_mem)
-	MCFG_CPU_IO_MAP(dps1_io)
+	MCFG_CPU_PROGRAM_MAP(mem_map)
+	MCFG_CPU_IO_MAP(io_map)
 	MCFG_MACHINE_RESET_OVERRIDE(dps1_state, dps1)
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("terminal", GENERIC_TERMINAL, 0)
-	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(PUT(dps1_state, kbd_put))
+	MCFG_DEVICE_ADD("uart", MC2661, XTAL_5_0688MHz)
+	MCFG_MC2661_TXD_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_txd))
+	MCFG_MC2661_RTS_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_rts))
+	MCFG_MC2661_DTR_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_dtr))
+
+	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, "terminal")
+	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("uart",mc2661_device,rx_w))
+	MCFG_RS232_DSR_HANDLER(DEVWRITELINE("uart",mc2661_device,dsr_w))
+	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("uart",mc2661_device,cts_w))
 
 	// floppy
 	MCFG_UPD765A_ADD("fdc", false, true)

@@ -860,6 +860,7 @@ static MACHINE_CONFIG_START( lasr2001 )
 
 	// software list
 	MCFG_SOFTWARE_LIST_ADD("cart_list","crvision")
+	MCFG_SOFTWARE_LIST_ADD("cart_list2","laser2001_cart")
 MACHINE_CONFIG_END
 
 /***************************************************************************
@@ -882,13 +883,15 @@ ROM_END
 #define rom_rameses rom_fnvision
 #define rom_vz2000 rom_fnvision
 
+ROM_START( lasr2001 )
+	ROM_REGION( 0x10000, M6502_TAG, 0 )
+	ROM_LOAD( "laser2001.rom", 0x0000, 0x4000, CRC(4dc35c39) SHA1(c12e098c14ac0724869053df2b63277a3e413802) )
+ROM_END
+
 ROM_START( manager )
 	ROM_REGION( 0x10000, M6502_TAG, 0 )
 	ROM_LOAD( "01", 0x0000, 0x2000, CRC(702f4cf5) SHA1(cd14ee74e787d24b76c166de484dae24206e219b) )
 	ROM_LOAD( "23", 0x2000, 0x2000, CRC(46489d88) SHA1(467f5bcd62d0b4117c443e13373df8f3c45df7b2) )
-
-	ROM_REGION( 0x1000, "disk", 0 )
-	ROM_LOAD( "floppy interface cartridge", 0x0000, 0x1000, NO_DUMP )
 ROM_END
 
 /***************************************************************************
@@ -903,6 +906,6 @@ CONS( 1982, wizzard,    crvision,   0,      pal,      crvision, crvision_pal_sta
 CONS( 1982, rameses,    crvision,   0,      pal,      crvision, crvision_pal_state, 0,    "Hanimex",                "Rameses (Oceania)",           0 )
 CONS( 1983, vz2000,     crvision,   0,      pal,      crvision, crvision_pal_state, 0,    "Dick Smith Electronics", "VZ 2000 (Oceania)",           0 )
 CONS( 1983, crvisio2,   crvision,   0,      pal,      crvision, crvision_pal_state, 0,    "Video Technology",       "CreatiVision MK-II (Europe)", 0 )
-//COMP( 1983, lasr2001,   0,          0,      lasr2001, lasr2001, laser2001_state,    0,    "Video Technology",       "Laser 2001",                  MACHINE_NOT_WORKING )
-//COMP( 1983, vz2001,     lasr2001,   0,      lasr2001, lasr2001, laser2001_state,    0,    "Dick Smith Electronics", "VZ 2001 (Oceania)",           MACHINE_NOT_WORKING )
+COMP( 1983, lasr2001,   0,          0,      lasr2001, manager,  laser2001_state,    0,    "Video Technology",       "Laser 2001",                  0 )
+//COMP( 1983, vz2001,     lasr2001,   0,      lasr2001, lasr2001, laser2001_state,    0,    "Dick Smith Electronics", "VZ 2001 (Oceania)",           0 )
 COMP( 1983, manager,    0,          0,      lasr2001, manager, laser2001_state,     0,     "Salora",                "Manager (Finland)",           0 )

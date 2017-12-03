@@ -470,7 +470,7 @@ std::string normalize_unicode(const char *s, size_t length, unicode_normalizatio
 
 //-------------------------------------------------
 //  uchar_toupper - uses utf8proc to convert to
-//	upper case
+//  upper case
 //-------------------------------------------------
 
 char32_t uchar_toupper(char32_t ch)
@@ -481,7 +481,7 @@ char32_t uchar_toupper(char32_t ch)
 
 //-------------------------------------------------
 //  uchar_tolower - uses utf8proc to convert to
-//	lower case
+//  lower case
 //-------------------------------------------------
 
 char32_t uchar_tolower(char32_t ch)

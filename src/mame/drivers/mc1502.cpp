@@ -6,6 +6,11 @@
 
     Driver file for Elektronika MS 1502
 
+    To do:
+    - fix video errors caused by 465caf8038a120b4c1ffad9df67a1dc7474e5bb1
+      "cga: treat as fixed sync monitor (nw)"
+    - debug video init in BIOS 7.2
+
 ***************************************************************************/
 
 #include "emu.h"
@@ -258,7 +263,8 @@ static MACHINE_CONFIG_START( mc1502 )
 	MCFG_PIT8253_CLK2(XTAL_16MHz/12) /* pio port c pin 4, and speaker polling enough */
 	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(mc1502_state, mc1502_pit8253_out2_changed))
 
-	MCFG_PIC8259_ADD("pic8259", INPUTLINE("maincpu", 0), VCC, NOOP)
+	MCFG_DEVICE_ADD("pic8259", PIC8259, 0)
+	MCFG_PIC8259_OUT_INT_CB(INPUTLINE("maincpu", 0))
 
 	MCFG_DEVICE_ADD("ppi8255n1", I8255, 0)
 	MCFG_I8255_OUT_PORTA_CB(DEVWRITE8("cent_data_out", output_latch_device, write))
@@ -365,13 +371,17 @@ ROM_START( mc1502 )
 	ROMX_LOAD( "ms1502b0.pgm", 0xc000, 0x2000, CRC(92fcc29a) SHA1(930a4cffcd6ec6110dd9a18bd389b78f0ccb110a),ROM_BIOS(8))
 	ROMX_LOAD( "ms1502b1.pgm", 0xe000, 0x2000, CRC(fe355a58) SHA1(b4ef7775045c6f2095e2b487fe19824986a4892c),ROM_BIOS(8))
 	// 5.31
-	ROM_SYSTEM_BIOS(8, "v531_92", "v5.31 12/10/92")
+	ROM_SYSTEM_BIOS(8, "v531_93", "v5.31 21/01/93")
 	ROMX_LOAD( "ms531b0.pgm", 0xc000, 0x2000, CRC(d97157d1) SHA1(cb1a1e0e2d9a0fcc78f9b09bfb4814d408ee4fae),ROM_BIOS(9))
 	ROMX_LOAD( "ms531b1.pgm", 0xe000, 0x2000, CRC(b1368e1a) SHA1(286496d25dc0ac2d8fe1802caffc6c37b236d105),ROM_BIOS(9))
 	// 5.2
 	ROM_SYSTEM_BIOS(9, "v52_91", "v5.2 10/11/91")
 	ROMX_LOAD( "msv5~2b0.pgm", 0xc000, 0x2000, CRC(f7f370e9) SHA1(e069a35005581a02856853b57dd511ab8e10054b),ROM_BIOS(10))
 	ROMX_LOAD( "msv5~2b1.pgm", 0xe000, 0x2000, CRC(d50e1c43) SHA1(22724dec0052ee9e52f44f5914f2f5f3fae14612),ROM_BIOS(10))
+
+	// 7.2
+	ROM_SYSTEM_BIOS(10, "v72", "v7.2 01/21/96")
+	ROMX_LOAD( "7.2_1.bin", 0xe000, 0x2000, CRC(80912ad4) SHA1(cc54b77b2db4cc5d614efafd04367d2f06400fc8),ROM_BIOS(11))
 
 	ROM_REGION(0x2000,"gfx1", ROMREGION_ERASE00)
 	ROM_LOAD( "symgen.rom", 0x0000, 0x2000, CRC(b2747a52) SHA1(6766d275467672436e91ac2997ac6b77700eba1e))

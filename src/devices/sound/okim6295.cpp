@@ -35,6 +35,11 @@
         ???? abcd = one bit per voice, set to 0 if nothing is playing, or
                     1 if it is active
 
+    OKI Semiconductor produced this chip in two package variants. The
+    44-pin QFP version, MSM6295GS, is the original one and by far the more
+    common of the two. The 42-pin DIP version, MSM6295VRS, omits A17 and
+    RD, which limits its ROM addressing to one megabit instead of two.
+
 ***************************************************************************/
 
 #include "emu.h"

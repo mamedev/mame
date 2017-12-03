@@ -67,29 +67,29 @@ game region code..
 ASIC 3:
     state based device?
     see
-    machine/pgmprot.c
+    machine/pgmprot_orlegend.cpp
 
 ASIC 25 + ASIC 12
     state based device + rom overlays
     see
-    machine/pgmprot5.c
+    machine/pgmprot_igs025_igs012.cpp
 
 ASIC 25 + ASIC 22
     state based device + encrypted DMA device
     see
-    machine/pgmprot4.c
+    machine/pgmprot_igs025_igs022.cpp
 
 ASIC 25 + ASIC 28
     state based device + encrypted DMA device?
     see
-    machine/pgmprot6.c
+    machine/pgmprot_igs025_igs028.cpp
 
 ASIC 027A(55857F/55857G):
     ARM based CPUs with internal ROM
     see
-    machine/pgmprot1.c
-    machine/pgmprot2.c
-    machine/pgmprot3.c
+    machine/pgmprot_igs027a_type1.cpp
+    machine/pgmprot_igs027a_type2.cpp
+    machine/pgmprot_igs027a_type3.cpp
 
 
 there are probably more...
@@ -3224,6 +3224,43 @@ ROM_START( martmastc102 )
 	ROM_LOAD( "m1001.u7",    0xc00000, 0x400000, CRC(662d2d48) SHA1(2fcc3099d9c04456cae3b13035fb28eaf709e7d8) )
 ROM_END
 
+/*
+Only the ROMs at U9 and U10 were dumped.
+
+U9 and U10 are not standard EPROMs, instead they are 27C322 adapter boards with an SMD OKI 27C3202 TSOP.
+*/
+
+ROM_START( martmasttw )
+	ROM_REGION( 0x600000, "maincpu", 0 ) /* 68000 Code */
+	PGM_68K_BIOS
+	ROM_LOAD16_WORD_SWAP( "mm_v102_u9.bin",    0x100000, 0x400000, CRC(7eb41ed4) SHA1(7df7789db8f9110fe747f41e193b4a28096018e7) )
+
+	ROM_REGION( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
+	ROM_LOAD( "martial_masters_v101_tw.asic", 0x000000, 0x04000, NO_DUMP )
+
+	ROM_REGION32_LE( 0x400000, "user1", 0 ) /* Protection Data (encrypted external ARM data) */
+	ROM_LOAD( "mm_v101_u10.bin", 0x000000, 0x400000,   CRC(917beb91) SHA1(0d867d8382518197ac98522bfc69063042db9890) ) // double size wrt to other sets
+
+	ROM_REGION( 0xc00000, "tiles", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
+	PGM_VIDEO_BIOS
+	ROM_LOAD( "t1000.u3",    0x180000, 0x800000, CRC(bbf879b5) SHA1(bd9a6aea34ad4001e89e62ff4b7a2292eb833c00) )
+
+	ROM_REGION( 0x2800000, "sprcol", 0 ) /* Sprite Colour Data */
+	ROM_LOAD( "a1000.u3",    0x0000000, 0x0800000, CRC(43577ac8) SHA1(6eea8b455985d5bac74dcc9943cdc3c0902de6cc) )
+	ROM_LOAD( "a1001.u4",    0x0800000, 0x0800000, CRC(fe7a476f) SHA1(a8c7f1f0dd3e53141aed6d927eb88a3ceebb81e4) )
+	ROM_LOAD( "a1002.u6",    0x1000000, 0x0800000, CRC(62e33d38) SHA1(96163d583e25073594f8413ce263e56b66bd69a1) )
+	ROM_LOAD( "a1003.u8",    0x1800000, 0x0800000, CRC(b2c4945a) SHA1(7b18287a2db56db3651cfd4deb607af53522fefd) )
+	ROM_LOAD( "a1004.u10",   0x2000000, 0x0400000, CRC(9fd3f5fd) SHA1(057531f91062be51589c6cf8f4170089b9be6380) )
+
+	ROM_REGION( 0x1000000, "sprmask", 0 ) /* Sprite Masks + Colour Indexes */
+	ROM_LOAD( "b1000.u9",    0x0000000, 0x0800000,  CRC(c5961f6f) SHA1(a68060b10edbd084cbde79d2ed1c9084777beb10) )
+	ROM_LOAD( "b1001.u11",   0x0800000, 0x0800000,  CRC(0b7e1c06) SHA1(545e15e0087f8621d593fecd8b4013f7ca311686) )
+
+	ROM_REGION( 0x1000000, "ics", 0 ) /* Samples - (8 bit mono 11025Hz) - */
+	PGM_AUDIO_BIOS
+	ROM_LOAD( "m1000.u5",    0x400000, 0x800000, CRC(ed407ae8) SHA1(a6e9c09b39c13e8fb7fbc89fa9f823cbeb66e901) )
+	ROM_LOAD( "m1001.u7",    0xc00000, 0x400000, CRC(662d2d48) SHA1(2fcc3099d9c04456cae3b13035fb28eaf709e7d8) )
+ROM_END
 
 /*
 
@@ -4370,6 +4407,34 @@ ROM_START( espgalbl ) // this assumes a Dodonpachi 2 Bee Storm cart was used
 	ROM_LOAD( "w04801b032.u17",    0x400000, 0x400000, CRC(60298536) SHA1(6b7333f16cce778c5725dbdf75a5446f0906397a) ) //music-1
 ROM_END
 
+
+ROM_START( ddp3 )
+	ROM_REGION( 0x600000, "maincpu", 0 ) /* 68000 Code */
+	ROM_LOAD16_WORD_SWAP( "ddp3_bios.u37",    0x00000, 0x080000, CRC(b3cc5c8f) SHA1(02d9511cf71e4a0d6ca8fd9a1ef2c79b0d001824) ) // uses a standard PGM bios with the startup logos hacked out
+	ROM_LOAD16_WORD_SWAP( "ddp3_v101_16m.u36",  0x100000, 0x200000,CRC(fba2180e) SHA1(59c1a76243e587c07215c8a76649401ef0bff7c7) ) // marked (chinese text) 3 V101 16M
+
+	ROM_REGION( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
+	ROM_LOAD( "ddp3_igs027a.bin", 0x000000, 0x04000, NO_DUMP )
+
+	ROM_REGION( 0xc00000, "tiles", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
+	ROM_LOAD( "pgm_t01s.rom", 0x000000, 0x200000, CRC(1a7123a0) SHA1(cc567f577bfbf45427b54d6695b11b74f2578af3) ) // same as standard PGM bios
+	ROM_LOAD( "t04401w064.u19",0x180000, 0x800000, CRC(3a95f19c) SHA1(fd3c47cf0b8b1e20c6bec4be68a089fc8bbf4dbe) ) //text-1
+
+	ROM_REGION( 0x1c00000, "sprcol", 0 ) /* Sprite Colour Data */
+	ROM_LOAD( "a04401w064.u7",  0x0000000, 0x0800000, CRC(ed229794) SHA1(1cf1863495a18c7c7d277a9be43ec116b00960b0) ) //image-1
+	ROM_LOAD( "a04402w064.u8",  0x0800000, 0x0800000, CRC(752167b0) SHA1(c33c3398dd8e479c9d5bd348924958a6aecbf0fc) ) //image-2
+
+	ROM_REGION( 0x1000000, "sprmask", 0 ) /* Sprite Masks + Colour Indexes */
+	ROM_LOAD( "b04401w064.u1",  0x0000000, 0x0800000, CRC(8cbff066) SHA1(eef1cd566bc70ebf45f047e56026803d5c1dac43) ) //bitmap-1
+
+	ROM_REGION( 0x1000000, "ics", 0 ) /* Samples - (8 bit mono 11025Hz) - */
+	ROM_LOAD( "pgm_m01s.rom", 0x000000, 0x200000, CRC(45ae7159) SHA1(d3ed3ff3464557fd0df6b069b2e431528b0ebfa8) ) // same as standard PGM bios
+	ROM_LOAD( "m04401b032.u17",  0x400000, 0x400000, CRC(5a0dbd76) SHA1(06ab202f6bd5ebfb35b9d8cc7a8fb83ec8840659) ) //music-1
+
+	ROM_REGION( 0x20000, "sram", 0 ) /* default settings */
+	ROM_LOAD( "ddp3_defaults.nv",  0x0000000, 0x020000, CRC(571e96c0) SHA1(348940c77ca348213331b85b9b1d3aabb96a528a) )
+ROM_END
+
 ROM_START( ddpdoj )
 	ROM_REGION( 0x600000, "maincpu", 0 ) /* 68000 Code */
 	ROM_LOAD16_WORD_SWAP( "ddp3_bios.u37",    0x00000, 0x080000, CRC(b3cc5c8f) SHA1(02d9511cf71e4a0d6ca8fd9a1ef2c79b0d001824) ) // uses a standard PGM bios with the startup logos hacked out
@@ -4632,11 +4697,6 @@ GAME( 1999, kovsh100,     kovsh,     pgm_arm_type1,     kovsh, pgm_arm_type1_sta
 // nasty modern asian bootleg of Knights of Valour Super Heroes with characters ripped from SNK's The King of Fighters series!
 GAME( 1999, kovqhsgs,     kovsh,     pgm_arm_type1,     kovsh, pgm_arm_type1_state, kovqhsgs,   ROT0,   "bootleg", "Knights of Valour: Quan Huang San Guo Special / Sangoku Senki: Quan Huang San Guo Special (ver. 303CN)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 
-
-
-
-
-
 // region provided by internal ARM rom
 GAME( 2000, kov2,         pgm,       pgm_arm_type2,    kov2, pgm_arm_type2_state,    kov2,       ROT0,   "IGS", "Knights of Valour 2 / Sangoku Senki 2 (ver. 107, 102, 100HK)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // 05/10/01 14:24:08 V107 (Ext. Arm V102, Int. Arm V100HK)
 GAME( 2000, kov2106,      kov2,      pgm_arm_type2,    kov2, pgm_arm_type2_state,    kov2,       ROT0,   "IGS", "Knights of Valour 2 / Sangoku Senki 2 (ver. 106, 102, 100HK)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // 02/27/01 13:26:46 V106 (Ext. Arm V102, Int. Arm V100HK)
@@ -4655,6 +4715,7 @@ GAME( 2001, martmast,     pgm,       pgm_arm_type2,    martmast, pgm_arm_type2_s
 GAME( 2001, martmastc,    martmast,  pgm_arm_type2,    martmast, pgm_arm_type2_state,  martmast,   ROT0,   "IGS", "Martial Masters (ver. 104, 102, 101CN)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // 68k V104, Ext Arm 102, Int Arm 101CN
 GAME( 2001, martmastc103, martmast,  pgm_arm_type2,    martmast, pgm_arm_type2_state,  martmast,   ROT0,   "IGS", "Martial Masters (ver. 103, 102, 101CN)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // 68k V103, Ext Arm 102, Int Arm 101CN (actually 102 CN on the PCB, needs to be dumped)
 GAME( 2001, martmastc102, martmast,  pgm_arm_type2,    martmast, pgm_arm_type2_state,  martmast,   ROT0,   "IGS", "Martial Masters (ver. 102, 101, 101CN)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // 68k V102, Ext Arm 101, Int Arm 101CN
+GAME( 2001, martmasttw,   martmast,  pgm_arm_type2,    martmast, pgm_arm_type2_state,  martmast,   ROT0,   "IGS", "Martial Masters (ver. 102, 101, 101TW)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING ) // 68k V102, Ext Arm 101, Int Arm 101TW
 
 // region provided by internal ARM rom
 GAME( 2001, ddp2,         pgm,       pgm_arm_type2,    pgm, pgm_arm_type2_state,     ddp2,       ROT270, "IGS", "DoDonPachi II - Bee Storm (World, ver. 102)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
@@ -4692,12 +4753,13 @@ GAME( 2002, dmnfrntpcb,   dmnfrnt,   pgm_arm_type3,     pgm, pgm_arm_type3_state
 
 
 /* these don't use an External ARM rom, and don't have any weak internal functions which would allow the internal ROM to be read out */
-GAME( 2002, ddpdoj,       0,         pgm_arm_type1_cave,    pgm, pgm_arm_type1_state,     ddp3,      ROT270, "Cave (AMI license)", "DoDonPachi Dai-Ou-Jou V101 (2002.04.05.Master Ver)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // is there a v101 without the . after 05?
-GAME( 2002, ddpdoja,    ddpdoj,      pgm_arm_type1_cave,    pgm, pgm_arm_type1_state,     ddp3,      ROT270, "Cave (AMI license)", "DoDonPachi Dai-Ou-Jou V100 (2002.04.05.Master Ver)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 2002, ddpdojb,    ddpdoj,      pgm_arm_type1_cave,    pgm, pgm_arm_type1_state,     ddp3,      ROT270, "Cave (AMI license)", "DoDonPachi Dai-Ou-Jou (2002.04.05 Master Ver)",      MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 2002, ddpdojblk,  ddpdoj,      pgm_arm_type1_cave,    pgm, pgm_arm_type1_state,     ddp3,      ROT270, "Cave (AMI license)", "DoDonPachi Dai-Ou-Jou (2002.10.07.Black Ver)",                MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // Displays "2002.04.05.Master Ver" (old) or "2002.10.07.Black Ver" (new)
-GAME( 2002, ddpdojblka, ddpdoj,      pgm_arm_type1_cave,    pgm, pgm_arm_type1_state,     ddp3,      ROT270, "Cave (AMI license)", "DoDonPachi Dai-Ou-Jou (2002.10.07 Black Ver)",                MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // Displays "2002.04.05.Master Ver" (old) or "2002.10.07 Black Ver" (new)
-GAME( 2012, ddpdojblkbl, ddpdoj,     pgm_arm_type1,         pgm, pgm_arm_type1_state,    kovsh,      ROT270, "bootleg",            "DoDonPachi Dai-Ou-Jou (2002.10.07 Black Ver., bootleg Knights of Valour Super Heroes conversion)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // 68k: SANGO EX V100 12/06/99 13:36:04, ARM: China internal ROM
+GAME( 2002, ddp3,       0,           pgm_arm_type1_cave,    pgm, pgm_arm_type1_state,     ddp3,      ROT270, "Cave (AMI license)", "DoDonPachi III (World, 2002.05.15 Master Ver)",                MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 2002, ddpdoj,     ddp3,        pgm_arm_type1_cave,    pgm, pgm_arm_type1_state,     ddp3,      ROT270, "Cave (AMI license)", "DoDonPachi Dai-Ou-Jou V101 (Japan, 2002.04.05.Master Ver)",  MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // is there a v101 without the . after 05?
+GAME( 2002, ddpdoja,    ddp3,        pgm_arm_type1_cave,    pgm, pgm_arm_type1_state,     ddp3,      ROT270, "Cave (AMI license)", "DoDonPachi Dai-Ou-Jou V100 (Japan, 2002.04.05.Master Ver)",  MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 2002, ddpdojb,    ddp3,        pgm_arm_type1_cave,    pgm, pgm_arm_type1_state,     ddp3,      ROT270, "Cave (AMI license)", "DoDonPachi Dai-Ou-Jou (Japan, 2002.04.05 Master Ver)",       MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 2002, ddpdojblk,  ddp3,        pgm_arm_type1_cave,    pgm, pgm_arm_type1_state,     ddp3,      ROT270, "Cave (AMI license)", "DoDonPachi Dai-Ou-Jou (Japan, 2002.10.07.Black Ver)",        MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // Displays "2002.04.05.Master Ver" (old) or "2002.10.07.Black Ver" (new)
+GAME( 2002, ddpdojblka, ddp3,        pgm_arm_type1_cave,    pgm, pgm_arm_type1_state,     ddp3,      ROT270, "Cave (AMI license)", "DoDonPachi Dai-Ou-Jou (Japan, 2002.10.07 Black Ver)",        MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // Displays "2002.04.05.Master Ver" (old) or "2002.10.07 Black Ver" (new)
+GAME( 2012, ddpdojblkbl,ddp3,        pgm_arm_type1,         pgm, pgm_arm_type1_state,     kovsh,     ROT270, "bootleg",            "DoDonPachi Dai-Ou-Jou (Japan, 2002.10.07 Black Ver., bootleg Knights of Valour Super Heroes conversion)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // the extra . in the revision has been added by bootlegger
 
 
 // the exact text of the 'version' shows which revision of the game it is; the newest has 2 '.' symbols in the string, the oldest, none.
@@ -4790,8 +4852,8 @@ GAME( 2004, pgm3in1,      pgm,       pgm_arm_type1_sim,    py2k2, pgm_arm_type1_
 /* Games below this point are known to have an 'execute only' internal ROM area covering an area at the start of the internal ROM.  This can't be read when running code from either internal or external ROM space. */
 
 
-// simulation doesn't seem 100%
-GAME( 2004, oldsplus,     pgm,       pgm_arm_type1_sim, oldsplus, pgm_arm_type1_state,     oldsplus,   ROT0,   "IGS", "Oriental Legend Special Plus / Xi You Shi E Zhuan Super Plus", MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) /* need internal rom of IGS027A */
+// Simulation doesn't seem 100% so marked as NOT WORKING.  Probably wasn't released in all specified regions (protection device intenral ROM supplies the region)  "Oriental Ex" is the identifier string used in test mode.
+GAME( 2004, oldsplus,     pgm,       pgm_arm_type1_sim, oldsplus, pgm_arm_type1_state,     oldsplus,   ROT0,   "IGS", "Oriental Legend 2 (Korea) / Xi You Shi E Zhuan Super Plus (World, China, Japan, Hong Kong, Taiwan) (ver. 205) [Oriental Ex]", MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) /* need internal rom of IGS027A */
 
 // we use the kovsh ARM rom for this, itercepting commands and changing them to match it, doesn't seem 100% correct tho so I'm leaving it as NOT WORKING; for example the ARM rom supplies addresses of Z80 music data sections, which have moved causing incorrect music, some damage rates could be different too.
 // the game logo remains stuck on the screen during gameplay, but videos of the original board suggest this happens on real hardware as well

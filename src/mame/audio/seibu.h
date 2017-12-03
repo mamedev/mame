@@ -46,8 +46,8 @@ public:
 	template<class _Object> static devcb_base &set_ym_read_callback(device_t &device, _Object object)  { return downcast<seibu_sound_device &>(device).m_ym_read_cb.set_callback(object); }
 	template<class _Object> static devcb_base &set_ym_write_callback(device_t &device, _Object object) { return downcast<seibu_sound_device &>(device).m_ym_write_cb.set_callback(object); }
 
-	DECLARE_READ16_MEMBER( main_word_r );
-	DECLARE_WRITE16_MEMBER( main_word_w );
+	DECLARE_READ8_MEMBER( main_r );
+	DECLARE_WRITE8_MEMBER( main_w );
 	DECLARE_WRITE16_MEMBER( main_mustb_w );
 	DECLARE_WRITE8_MEMBER( irq_clear_w );
 	DECLARE_WRITE8_MEMBER( rst10_ack_w );

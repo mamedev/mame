@@ -37,6 +37,8 @@ typedef u16 indirect_pen_t;
 
 class device_palette_interface : public device_interface
 {
+	friend class screen_device;
+
 	static constexpr int MAX_SHADOW_PRESETS = 4;
 
 public:

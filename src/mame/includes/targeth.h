@@ -6,6 +6,7 @@
 #pragma once
 
 #include "machine/74259.h"
+#include "screen.h"
 
 class targeth_state : public driver_device
 {
@@ -14,6 +15,7 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this,"maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
+		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
 		m_outlatch(*this, "outlatch"),
 		m_videoram(*this, "videoram"),
@@ -34,7 +36,8 @@ public:
 	TILE_GET_INFO_MEMBER(get_tile_info_screen0);
 	TILE_GET_INFO_MEMBER(get_tile_info_screen1);
 
-	TIMER_DEVICE_CALLBACK_MEMBER(interrupt);
+	TIMER_CALLBACK_MEMBER(gun1_irq);
+	TIMER_CALLBACK_MEMBER(gun2_irq);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -47,6 +50,7 @@ protected:
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 	required_device<ls259_device> m_outlatch;
 
@@ -54,6 +58,8 @@ private:
 	required_shared_ptr<uint16_t> m_vregs;
 	required_shared_ptr<uint16_t> m_spriteram;
 	optional_shared_ptr<uint16_t> m_shareram;
+
+	emu_timer       *m_gun_irq_timer[2];
 
 	tilemap_t *m_pant[2];
 };

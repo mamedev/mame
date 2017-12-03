@@ -713,9 +713,8 @@ TIMER_CALLBACK_MEMBER( apollo_state::apollo_rtc_timer )
 #define VERBOSE 0
 
 apollo_sio::apollo_sio(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	mc68681_base_device(mconfig, APOLLO_SIO, tag, owner, clock),
-	m_csrb(0),
-	m_ip6(0)
+	duart_base_device(mconfig, APOLLO_SIO, tag, owner, clock),
+	m_csrb(0)
 {
 }
 
@@ -728,10 +727,7 @@ void apollo_sio::device_reset()
 	ip3_w((input_data & 0x08) ? ASSERT_LINE : CLEAR_LINE);
 	ip4_w((input_data & 0x10) ? ASSERT_LINE : CLEAR_LINE);
 	ip5_w((input_data & 0x20) ? ASSERT_LINE : CLEAR_LINE);
-//  ip6_w((input_data & 0x40) ? ASSERT_LINE : CLEAR_LINE);
-
-	// MC2681 has IP[6] (instead of /IACK on MC68681)
-	m_ip6 = (input_data & 0x40) ? ASSERT_LINE : CLEAR_LINE;
+	ip6_w((input_data & 0x40) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 READ8_MEMBER( apollo_sio::read )
@@ -744,7 +740,7 @@ READ8_MEMBER( apollo_sio::read )
 			"1X/16X Test", "RHRB", "IVR", "Input Ports", "Start Counter",
 			"Stop Counter" };
 
-	int data = mc68681_base_device::read(space, offset/2, mem_mask);
+	int data = duart_base_device::read(space, offset/2, mem_mask);
 
 	switch (offset / 2)
 	{
@@ -760,10 +756,6 @@ READ8_MEMBER( apollo_sio::read )
 			// (to prevent that the MD selftest or SK command will hang in Service mode)
 			data = 0xff;
 		}
-		break;
-	case 0x0d: /* IP */
-		// MC2681 has IP[6] (instead of /IACK on MC68681)
-		data = (data & ~0x40) | (m_ip6 ? 0x40 : 0);
 		break;
 	}
 
@@ -804,11 +796,11 @@ WRITE8_MEMBER( apollo_sio::write )
 		break;
 #endif
 	}
-	mc68681_base_device::write(space, offset/2, data, mem_mask);
+	duart_base_device::write(space, offset/2, data, mem_mask);
 }
 
 // device type definition
-DEFINE_DEVICE_TYPE(APOLLO_SIO, apollo_sio, "apollo_sio", "DN3000/DS3500 SIO")
+DEFINE_DEVICE_TYPE(APOLLO_SIO, apollo_sio, "apollo_sio", "DN3000/DS3500 SIO (MC2681)")
 
 WRITE_LINE_MEMBER(apollo_state::sio_irq_handler)
 {
@@ -1097,8 +1089,15 @@ MACHINE_CONFIG_START( common )
 	MCFG_I8237_OUT_DACK_1_CB(WRITELINE(apollo_state, pc_dack5_w))
 	MCFG_I8237_OUT_DACK_2_CB(WRITELINE(apollo_state, pc_dack6_w))
 	MCFG_I8237_OUT_DACK_3_CB(WRITELINE(apollo_state, pc_dack7_w))
-	MCFG_PIC8259_ADD( APOLLO_PIC1_TAG, WRITELINE(apollo_state,apollo_pic8259_master_set_int_line), VCC, READ8(apollo_state, apollo_pic8259_get_slave_ack))
-	MCFG_PIC8259_ADD( APOLLO_PIC2_TAG, WRITELINE(apollo_state,apollo_pic8259_slave_set_int_line), GND, NOOP)
+
+	MCFG_DEVICE_ADD(APOLLO_PIC1_TAG, PIC8259, 0)
+	MCFG_PIC8259_OUT_INT_CB(WRITELINE(apollo_state, apollo_pic8259_master_set_int_line))
+	MCFG_PIC8259_IN_SP_CB(VCC)
+	MCFG_PIC8259_CASCADE_ACK_CB(READ8(apollo_state, apollo_pic8259_get_slave_ack))
+
+	MCFG_DEVICE_ADD(APOLLO_PIC2_TAG, PIC8259, 0)
+	MCFG_PIC8259_OUT_INT_CB(WRITELINE(apollo_state, apollo_pic8259_slave_set_int_line))
+	MCFG_PIC8259_IN_SP_CB(GND)
 
 	MCFG_DEVICE_ADD(APOLLO_PTM_TAG, PTM6840, 0)
 	MCFG_PTM6840_EXTERNAL_CLOCKS(250000, 125000, 62500)

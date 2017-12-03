@@ -164,15 +164,11 @@ enum {
 #define STATUS_REG_MASK 0x003f  // Status register mask
 #define TACH_TICKS_PER_INCH     968     // Tachometer pulses per inch of tape movement
 #define TAPE_POS_FRACT  1024    // 10 bits of fractional part in tape_pos_t
-#define ONE_INCH_POS    (TACH_TICKS_PER_INCH * TAPE_POS_FRACT)  // Value in tape_pos_t representing 1 inch of tape
 #define TACH_FREQ_SLOW  21276   // Tachometer pulse frequency for slow speed (21.98 ips)
 #define TACH_FREQ_FAST  87196   // Tachometer pulse frequency for fast speed (90.08 ips)
 #define TACH_FREQ_BRAKE_SLOW    11606   // Tachometer pulse frequency when stopping from slow speed (11.99 ips)
 #define TACH_FREQ_BRAKE_FAST    44566   // Tachometer pulse frequency when stopping from fast speed (46.04 ips)
-#define TAPE_LENGTH     ((140 * 12 + 72 * 2) * ONE_INCH_POS)    // Tape length: 140 ft of usable tape + 72" of punched tape at either end
-#define TAPE_INIT_POS   (80 * ONE_INCH_POS)     // Initial tape position: 80" from beginning (just past the punched part)
-#define ZERO_BIT_LEN    619     // Length of 0 bits at slow tape speed: 1/(35200 Hz)
-#define ONE_BIT_LEN     1083    // Length of 1 bits at slow tape speed: 1.75 times ZERO_BIT_LEN
+#define TAPE_INIT_POS   (80 * hti_format_t::ONE_INCH_POS)     // Initial tape position: 80" from beginning (just past the punched part)
 #define QUICK_CMD_USEC  25      // usec for "quick" command execution (totally made up)
 #define FAST_BRAKE_DIST 3350450 // Braking distance at fast speed (~3.38 in)
 // There are 2 braking distances here: The first one (commented out) is the theoretical value, the second one
@@ -182,15 +178,13 @@ enum {
 //#define SLOW_BRAKE_DIST 197883  // Braking distance at slow speed (~0.2 in)
 #define SLOW_BRAKE_DIST 71000  // Braking distance at slow speed (~0.07 in)
 #define PREAMBLE_WORD   0       // Value of preamble word
-#define END_GAP_LENGTH  (6 * ONE_INCH_POS)      // Length of final gap: 6"
+#define END_GAP_LENGTH  (6 * hti_format_t::ONE_INCH_POS)      // Length of final gap: 6"
 // Minimum gap lengths are probably counted from tacho pulses in real TACO: short gaps could be equal to 64 pulses and long ones
 // to 1472 (23 * 64)
-#define SHORT_GAP_LENGTH        ((tape_pos_t)(0.066 * ONE_INCH_POS))    // Minimum length of short gaps: 0.066" ([1], pg 8-10)
-#define LONG_GAP_LENGTH ((tape_pos_t)(1.5 * ONE_INCH_POS))      // Minimum length of long gaps: 1.5" ([1], pg 8-10)
-#define NULL_TAPE_POS   ((tape_pos_t)-1)        // Special value for invalid/unknown tape position
-#define PREAMBLE_TIMEOUT    ((tape_pos_t)(2.6 * ONE_INCH_POS))  // Min. length of gap making preamble search time out (totally made up)
-#define DATA_TIMEOUT    ((tape_pos_t)(0.066 * ONE_INCH_POS))    // Min. length of gap that will cause data reading to time out (totally made up)
-#define FILE_MAGIC      0x4f434154      // Magic value at start of image file: "TACO"
+#define SHORT_GAP_LENGTH        ((hti_format_t::tape_pos_t)(0.066 * hti_format_t::ONE_INCH_POS))    // Minimum length of short gaps: 0.066" ([1], pg 8-10)
+#define LONG_GAP_LENGTH ((hti_format_t::tape_pos_t)(1.5 * hti_format_t::ONE_INCH_POS))      // Minimum length of long gaps: 1.5" ([1], pg 8-10)
+#define PREAMBLE_TIMEOUT    ((hti_format_t::tape_pos_t)(2.6 * hti_format_t::ONE_INCH_POS))  // Min. length of gap making preamble search time out (totally made up)
+#define DATA_TIMEOUT    ((hti_format_t::tape_pos_t)(0.066 * hti_format_t::ONE_INCH_POS))    // Min. length of gap that will cause data reading to time out (totally made up)
 
 // Parts of command register
 #define CMD_CODE(reg) \
@@ -255,32 +249,6 @@ enum {
 #define STATUS_WPR_MASK         BIT_MASK(STATUS_WPR_BIT)        // Write protection
 #define STATUS_ERR_MASK         (STATUS_CART_OUT_MASK)  // Mask of errors in status reg.
 
-// *** Position of tape holes ***
-// At beginning of tape:
-// *START*
-// |<-----24"----->|<---12"--->|<---12"--->|<-----24"----->|
-//               O   O       O   O       O   O             O
-//               |<->|       |<->|       |<->|
-//               0.218"      0.218"      0.218"
-// At end of tape:
-//                                                     *END*
-// |<-----24"----->|<---12"--->|<---12"--->|<-----24"----->|
-// O               O           O           O
-//
-const hp_taco_device::tape_pos_t hp_taco_device::tape_holes[] = {
-		(hp_taco_device::tape_pos_t)(23.891 * ONE_INCH_POS),    // 24 - 0.218 / 2
-		(hp_taco_device::tape_pos_t)(24.109 * ONE_INCH_POS),    // 24 + 0.218 / 2
-		(hp_taco_device::tape_pos_t)(35.891 * ONE_INCH_POS),    // 36 - 0.218 / 2
-		(hp_taco_device::tape_pos_t)(36.109 * ONE_INCH_POS),    // 36 + 0.218 / 2
-		(hp_taco_device::tape_pos_t)(47.891 * ONE_INCH_POS),    // 48 - 0.218 / 2
-		(hp_taco_device::tape_pos_t)(48.109 * ONE_INCH_POS),    // 48 + 0.218 / 2
-		72 * ONE_INCH_POS,      // 72
-		1752 * ONE_INCH_POS,    // 1752
-		1776 * ONE_INCH_POS,    // 1776
-		1788 * ONE_INCH_POS,    // 1788
-		1800 * ONE_INCH_POS     // 1800
-};
-
 // Device type definition
 DEFINE_DEVICE_TYPE(HP_TACO, hp_taco_device, "hp_taco", "HP TACO")
 
@@ -291,6 +259,7 @@ hp_taco_device::hp_taco_device(const machine_config &mconfig, device_type type, 
 			m_irq_handler(*this),
 			m_flg_handler(*this),
 			m_sts_handler(*this),
+	m_image(),
 			m_image_dirty(false)
 {
 		clear_state();
@@ -460,7 +429,7 @@ void hp_taco_device::device_timer(emu_timer &timer, device_timer_id id, int para
 						switch (CMD_CODE(m_cmd_reg)) {
 						case CMD_FINAL_GAP:
 						case CMD_WRITE_IRG:
-								write_gap(m_rw_pos , m_tape_pos);
+							m_image.write_gap(current_track() , m_rw_pos , m_tape_pos);
 								m_rw_pos = m_tape_pos;
 								break;
 
@@ -547,7 +516,7 @@ void hp_taco_device::clear_state(void)
 		m_rw_pos = 0;
 		m_next_word = 0;
 		m_rd_it_valid = false;
-		m_gap_detect_start = NULL_TAPE_POS;
+		m_gap_detect_start = hti_format_t::NULL_TAPE_POS;
 
 		set_tape_present(false);
 		set_tape_present(is_loaded());
@@ -581,31 +550,7 @@ unsigned hp_taco_device::speed_to_tick_freq(void) const
 				(m_tape_fast ? TACH_FREQ_FAST * TAPE_POS_FRACT : TACH_FREQ_SLOW * TAPE_POS_FRACT);
 }
 
-bool hp_taco_device::pos_offset(tape_pos_t& pos , tape_pos_t offset) const
-{
-		if (offset == 0) {
-				return true;
-		}
-
-		if (!m_tape_fwd) {
-				offset = -offset;
-		}
-
-		pos += offset;
-
-		// In real life tape would unspool..
-		if (pos > TAPE_LENGTH) {
-				pos = TAPE_LENGTH;
-				return false;
-		} else if (pos < 0) {
-				pos = 0;
-				return false;
-		} else {
-				return true;
-		}
-}
-
-hp_taco_device::tape_pos_t hp_taco_device::current_tape_pos(void) const
+hti_format_t::tape_pos_t hp_taco_device::current_tape_pos(void) const
 {
 		if (m_start_time.is_never()) {
 				// Tape not moving
@@ -615,11 +560,11 @@ hp_taco_device::tape_pos_t hp_taco_device::current_tape_pos(void) const
 		attotime delta_time(machine().time() - m_start_time);
 		LOG_0(("delta_time = %g\n" , delta_time.as_double()));
 		// How many tachometer ticks has the tape moved?
-		tape_pos_t delta_tach = (tape_pos_t)(delta_time.as_ticks(speed_to_tick_freq()));
+		hti_format_t::tape_pos_t delta_tach = (hti_format_t::tape_pos_t)(delta_time.as_ticks(speed_to_tick_freq()));
 		LOG_0(("delta_tach = %u\n" , delta_tach));
 
-		tape_pos_t tape_pos = m_tape_pos;
-		if (!pos_offset(tape_pos , delta_tach)) {
+		auto tape_pos = m_tape_pos;
+		if (!hti_format_t::pos_offset(tape_pos , m_tape_fwd , delta_tach)) {
 				LOG(("Tape unspooled!\n"));
 		}
 
@@ -639,10 +584,10 @@ void hp_taco_device::update_tape_pos(void)
 
 		// Gap detection
 		bool gap_detected = false;
-		if (m_gap_detect_start != NULL_TAPE_POS && abs(m_gap_detect_start - m_tape_pos) >= min_gap_size()) {
-				tape_pos_t tmp = m_tape_pos;
-				pos_offset(tmp , -min_gap_size());
-				gap_detected = just_gap(tmp , m_tape_pos);
+		if (m_gap_detect_start != hti_format_t::NULL_TAPE_POS && abs(m_gap_detect_start - m_tape_pos) >= min_gap_size()) {
+				auto tmp = m_tape_pos;
+				hti_format_t::pos_offset(tmp , m_tape_fwd , -min_gap_size());
+				gap_detected = m_image.just_gap(current_track() , tmp , m_tape_pos);
 		}
 		if (gap_detected) {
 				BIT_SET(m_status_reg, STATUS_GAP_BIT);
@@ -660,9 +605,9 @@ void hp_taco_device::update_tach_reg(void)
 				return;
 		}
 
-		tape_pos_t pos = current_tape_pos();
-		tape_pos_t pos_int = pos / TAPE_POS_FRACT;
-		tape_pos_t ref_int = m_tach_reg_ref / TAPE_POS_FRACT;
+		auto pos = current_tape_pos();
+		hti_format_t::tape_pos_t pos_int = pos / TAPE_POS_FRACT;
+		hti_format_t::tape_pos_t ref_int = m_tach_reg_ref / TAPE_POS_FRACT;
 		uint16_t reg_value = (uint16_t)(abs(pos_int - ref_int) + m_tach_reg);
 
 		LOG_0(("Tach = %04x @ pos = %d, ref_pos = %d\n" , reg_value , pos , m_tach_reg_ref));
@@ -682,48 +627,13 @@ void hp_taco_device::freeze_tach_reg(bool freeze)
 
 }
 
-void hp_taco_device::ensure_a_lt_b(tape_pos_t& a , tape_pos_t& b)
-{
-		if (a > b) {
-				// Ensure A always comes before B
-				tape_pos_t tmp;
-				tmp = a;
-				a = b;
-				b = tmp;
-		}
-}
-
-// Position of next hole tape will reach in a given direction
-hp_taco_device::tape_pos_t hp_taco_device::next_hole(void) const
-{
-		if (m_tape_fwd) {
-				for (tape_pos_t hole : tape_holes) {
-						if (hole > m_tape_pos) {
-								LOG_0(("next hole fwd @%u = %u\n" , m_tape_pos , hole));
-								return hole;
-						}
-				}
-				// No more holes: will hit end of tape
-				return NULL_TAPE_POS;
-		} else {
-				for (int i = (sizeof(tape_holes) / sizeof(tape_holes[ 0 ])) - 1; i >= 0; i--) {
-						if (tape_holes[ i ] < m_tape_pos) {
-								LOG_0(("next hole rev @%u = %u\n" , m_tape_pos , tape_holes[ i ]));
-								return tape_holes[ i ];
-						}
-				}
-				// No more holes: will hit start of tape
-				return NULL_TAPE_POS;
-		}
-}
-
-attotime hp_taco_device::time_to_distance(tape_pos_t distance) const
+attotime hp_taco_device::time_to_distance(hti_format_t::tape_pos_t distance) const
 {
 		// +1 for rounding
 		return attotime::from_ticks(distance + 1 , speed_to_tick_freq());
 }
 
-attotime hp_taco_device::time_to_target(tape_pos_t target) const
+attotime hp_taco_device::time_to_target(hti_format_t::tape_pos_t target) const
 {
 		return time_to_distance(abs(target - m_tape_pos));
 }
@@ -758,7 +668,7 @@ bool hp_taco_device::start_tape_cmd(uint16_t cmd_reg , uint16_t must_be_1 , uint
 
 				if (m_tape_wr) {
 						// Write command: disable gap detector
-						m_gap_detect_start = NULL_TAPE_POS;
+						m_gap_detect_start = hti_format_t::NULL_TAPE_POS;
 						BIT_CLR(m_status_reg, STATUS_GAP_BIT);
 						m_image_dirty = true;
 				} else if (not_moving || prev_tape_braking || prev_tape_wr != m_tape_wr || prev_tape_fwd != m_tape_fwd || prev_tape_fast != m_tape_fast) {
@@ -791,140 +701,12 @@ bool hp_taco_device::start_tape_cmd(uint16_t cmd_reg , uint16_t must_be_1 , uint
 void hp_taco_device::stop_tape(void)
 {
 		m_start_time = attotime::never;
-		m_gap_detect_start = NULL_TAPE_POS;
+		m_gap_detect_start = hti_format_t::NULL_TAPE_POS;
 }
 
-hp_taco_device::tape_track_t& hp_taco_device::current_track(void)
+unsigned hp_taco_device::current_track(void)
 {
-		return m_tracks[ BIT(m_status_reg , STATUS_TRACKB_BIT) ];
-}
-
-// Return physical length of a 16-bit word on tape
-hp_taco_device::tape_pos_t hp_taco_device::word_length(tape_word_t w)
-{
-		unsigned zeros , ones;
-
-		// pop count of w
-		ones = (w & 0x5555) + ((w >> 1) & 0x5555);
-		ones = (ones & 0x3333) + ((ones >> 2) & 0x3333);
-		ones = (ones & 0x0f0f) + ((ones >> 4) & 0x0f0f);
-		ones = (ones & 0x00ff) + ((ones >> 8) & 0x00ff);
-
-		zeros = 16 - ones;
-
-		return zeros * ZERO_BIT_LEN + (ones + 1) * ONE_BIT_LEN;
-}
-
-hp_taco_device::tape_pos_t hp_taco_device::word_end_pos(const tape_track_t::iterator& it)
-{
-	return it->first + word_length(it->second);
-}
-
-void hp_taco_device::adjust_it(tape_track_t& track , tape_track_t::iterator& it , tape_pos_t pos)
-{
-		if (it != track.begin()) {
-			--it;
-			if (word_end_pos(it) <= pos) {
-				++it;
-			}
-		}
-}
-
-// Write a word on current tape track
-void hp_taco_device::write_word(tape_pos_t start , tape_word_t word , tape_pos_t& length)
-{
-		tape_track_t& track = current_track();
-		tape_track_t::iterator it_low = track.lower_bound(start);
-		adjust_it(track , it_low , start);
-		length = word_length(word);
-		tape_pos_t end_pos = start + length;
-		tape_track_t::iterator it_high = track.lower_bound(end_pos);
-
-		track.erase(it_low , it_high);
-
-		track.insert(it_high , std::make_pair(start, word));
-		LOG_0(("WR %04x @ T%u:%u\n" , word , BIT(m_status_reg , STATUS_TRACKB_BIT) , start));
-}
-
-// Write a gap on current track
-void hp_taco_device::write_gap(tape_pos_t a , tape_pos_t b)
-{
-		ensure_a_lt_b(a , b);
-		tape_track_t& track = current_track();
-		tape_track_t::iterator it_low = track.lower_bound(a);
-		adjust_it(track , it_low , a);
-		tape_track_t::iterator it_high = track.lower_bound(b);
-
-		track.erase(it_low, it_high);
-
-		LOG_0(("GAP on T%u:[%u,%u)\n" , BIT(m_status_reg , STATUS_TRACKB_BIT) , a , b));
-}
-
-bool hp_taco_device::just_gap(tape_pos_t a , tape_pos_t b)
-{
-		ensure_a_lt_b(a , b);
-		tape_track_t& track = current_track();
-		tape_track_t::iterator it_low = track.lower_bound(a);
-		tape_track_t::iterator it_high = track.lower_bound(b);
-
-		adjust_it(track, it_low, a);
-
-		return it_low == it_high;
-}
-
-hp_taco_device::tape_pos_t hp_taco_device::farthest_end(const tape_track_t::iterator& it) const
-{
-		if (m_tape_fwd) {
-				return word_end_pos(it);
-		} else {
-				return it->first;
-		}
-}
-
-bool hp_taco_device::next_data(tape_track_t::iterator& it , tape_pos_t pos , bool inclusive)
-{
-		tape_track_t& track = current_track();
-		it = track.lower_bound(pos);
-		if (m_tape_fwd) {
-				if (inclusive) {
-						adjust_it(track, it, pos);
-				}
-				return it != track.end();
-		} else {
-				// Never more than 2 iterations
-				do {
-					if (it == track.begin()) {
-						it = track.end();
-						return false;
-					}
-					--it;
-				} while (!inclusive && word_end_pos(it) > pos);
-				return true;
-		}
-}
-
-hp_taco_device::adv_res_t hp_taco_device::adv_it(tape_track_t::iterator& it)
-{
-		tape_track_t& track = current_track();
-		if (m_tape_fwd) {
-			tape_pos_t prev_pos = word_end_pos(it);
-			++it;
-				if (it == track.end()) {
-					return ADV_NO_MORE_DATA;
-				} else {
-					adv_res_t res = prev_pos == it->first ? ADV_CONT_DATA : ADV_DISCONT_DATA;
-					return res;
-				}
-		} else {
-			if (it == track.begin()) {
-				it = track.end();
-				return ADV_NO_MORE_DATA;
-			} else {
-				tape_pos_t prev_pos = it->first;
-				--it;
-				return prev_pos == word_end_pos(it) ? ADV_CONT_DATA : ADV_DISCONT_DATA;
-			}
-		}
+		return BIT(m_status_reg , STATUS_TRACKB_BIT);
 }
 
 attotime hp_taco_device::fetch_next_wr_word(void)
@@ -945,207 +727,22 @@ attotime hp_taco_device::fetch_next_wr_word(void)
 		// Update checksum with new word
 		m_checksum_reg += m_next_word;
 
-		return time_to_distance(word_length(m_next_word));
+		return time_to_distance(hti_format_t::word_length(m_next_word));
 }
 
-attotime hp_taco_device::time_to_rd_next_word(tape_pos_t& word_rd_pos)
+attotime hp_taco_device::time_to_rd_next_word(hti_format_t::tape_pos_t& word_rd_pos)
 {
 		if (m_rd_it_valid) {
-				word_rd_pos = farthest_end(m_rd_it);
+			word_rd_pos = hti_format_t::farthest_end(m_rd_it , m_tape_fwd);
 				return time_to_target(word_rd_pos);
 		} else {
 				return attotime::never;
 		}
 }
 
-hp_taco_device::tape_pos_t hp_taco_device::min_gap_size(void) const
+hti_format_t::tape_pos_t hp_taco_device::min_gap_size(void) const
 {
 		return LONG_GAP(m_cmd_reg) ? LONG_GAP_LENGTH : SHORT_GAP_LENGTH;
-}
-
-/**
- * Scan for next "n_gaps" gaps
- *
- * @param[in,out] pos Start position on input, start of gap on output
- * @param it Pointer to data word where scan is to start
- * @param n_gaps Number of gaps to scan
- * @param min_gap Minimum gap size
- *
- * @return true if n_gaps gaps are found
- */
-bool hp_taco_device::next_n_gap(tape_pos_t& pos , tape_track_t::iterator it , unsigned n_gaps , tape_pos_t min_gap)
-{
-		tape_track_t& track = current_track();
-		bool done = false;
-		tape_track_t::iterator prev_it;
-
-		if (m_tape_fwd) {
-				tape_pos_t next_pos;
-
-				while (1) {
-						if (it == track.end()) {
-								next_pos = TAPE_LENGTH;
-								done = true;
-						} else {
-								next_pos = it->first;
-						}
-						if (((next_pos - pos) >= min_gap && --n_gaps == 0) || done) {
-								break;
-						}
-						adv_res_t adv_res;
-						do {
-								prev_it = it;
-								adv_res = adv_it(it);
-						} while (adv_res == ADV_CONT_DATA);
-						pos = word_end_pos(prev_it);
-				}
-		} else {
-				tape_pos_t next_pos;
-
-				while (1) {
-						if (it == track.end()) {
-								next_pos = 0;
-								done = true;
-						} else {
-								next_pos = word_end_pos(it);
-						}
-						if (((pos - next_pos) >= min_gap && --n_gaps == 0) || done) {
-								break;
-						}
-						adv_res_t adv_res;
-						do {
-								prev_it = it;
-								adv_res = adv_it(it);
-						} while (adv_res == ADV_CONT_DATA);
-						pos = prev_it->first;
-				}
-		}
-
-		// Set "pos" where minimum gap size is met
-		pos_offset(pos , min_gap);
-
-		return n_gaps == 0;
-}
-
-bool hp_taco_device::next_n_gap(tape_pos_t& pos , unsigned n_gaps , tape_pos_t min_gap)
-{
-		tape_track_t::iterator it;
-		// First align with next data
-		next_data(it, pos, true);
-		// Then scan for n_gaps
-		return next_n_gap(pos, it, n_gaps, min_gap);
-}
-
-void hp_taco_device::clear_tape(void)
-{
-	for (tape_track_t& track : m_tracks) {
-		track.clear();
-	}
-}
-
-void hp_taco_device::dump_sequence(tape_track_t::const_iterator it_start , unsigned n_words)
-{
-	if (n_words) {
-		uint32_t tmp32;
-		uint16_t tmp16;
-
-		tmp32 = n_words;
-		fwrite(&tmp32 , sizeof(tmp32));
-		tmp32 = it_start->first;
-		fwrite(&tmp32 , sizeof(tmp32));
-
-		for (unsigned i = 0; i < n_words; i++) {
-			tmp16 = it_start->second;
-			fwrite(&tmp16 , sizeof(tmp16));
-			++it_start;
-		}
-	}
-}
-
-void hp_taco_device::save_tape(void)
-{
-	uint32_t tmp32;
-
-	fseek(0, SEEK_SET);
-
-	tmp32 = FILE_MAGIC;
-	fwrite(&tmp32 , sizeof(tmp32));
-
-	for (const tape_track_t& track : m_tracks) {
-		tape_pos_t next_pos = (tape_pos_t)-1;
-		unsigned n_words = 0;
-		tape_track_t::const_iterator it_start;
-		for (tape_track_t::const_iterator it = track.cbegin(); it != track.cend(); ++it) {
-				if (it->first != next_pos) {
-						dump_sequence(it_start , n_words);
-						it_start = it;
-						n_words = 0;
-				}
-				next_pos = it->first + word_length(it->second);
-				n_words++;
-		}
-		dump_sequence(it_start , n_words);
-		// End of track
-		tmp32 = (uint32_t)-1;
-		fwrite(&tmp32 , sizeof(tmp32));
-	}
-}
-
-bool hp_taco_device::load_track(tape_track_t& track)
-{
-		uint32_t tmp32;
-
-		track.clear();
-
-		while (1) {
-				if (fread(&tmp32 , sizeof(tmp32)) != sizeof(tmp32)) {
-						return false;
-				}
-
-				if (tmp32 == (uint32_t)-1) {
-						return true;
-				}
-
-				unsigned n_words = tmp32;
-
-				if (fread(&tmp32 , sizeof(tmp32)) != sizeof(tmp32)) {
-						return false;
-				}
-
-				tape_pos_t pos = (tape_pos_t)tmp32;
-
-				for (unsigned i = 0; i < n_words; i++) {
-						uint16_t tmp16;
-
-						if (fread(&tmp16 , sizeof(tmp16)) != sizeof(tmp16)) {
-								return false;
-						}
-
-						track.insert(std::make_pair(pos , tmp16));
-						pos += word_length(tmp16);
-				}
-		}
-}
-
-bool hp_taco_device::load_tape(void)
-{
-		uint32_t magic;
-
-		if (fread(&magic , sizeof(magic)) != sizeof(magic) ||
-			magic != FILE_MAGIC) {
-				return false;
-		}
-
-		for (tape_track_t& track : m_tracks) {
-				if (!load_track(track)) {
-						LOG(("load_tape failed"));
-						clear_tape();
-						return false;
-				}
-		}
-
-		LOG(("load_tape done\n"));
-		return true;
 }
 
 void hp_taco_device::set_tape_present(bool present)
@@ -1165,9 +762,9 @@ void hp_taco_device::set_tape_present(bool present)
 
 attotime hp_taco_device::time_to_next_hole(void) const
 {
-	tape_pos_t pos = next_hole();
+	auto pos = hti_format_t::next_hole(m_tape_pos , m_tape_fwd);
 
-	if (pos == NULL_TAPE_POS) {
+	if (pos == hti_format_t::NULL_TAPE_POS) {
 		return attotime::never;
 	} else {
 		return time_to_target(pos);
@@ -1176,7 +773,7 @@ attotime hp_taco_device::time_to_next_hole(void) const
 
 attotime hp_taco_device::time_to_tach_pulses(void) const
 {
-		return time_to_distance((tape_pos_t)(0x10000U - m_tach_reg) * TAPE_POS_FRACT);
+		return time_to_distance((hti_format_t::tape_pos_t)(0x10000U - m_tach_reg) * TAPE_POS_FRACT);
 }
 
 void hp_taco_device::terminate_cmd_now(void)
@@ -1236,7 +833,7 @@ void hp_taco_device::cmd_fsm(void)
 								m_cmd_state = CMD_PH1;
 						} else {
 								// PH1
-								write_gap(m_rw_pos , m_tape_pos);
+							m_image.write_gap(current_track() , m_rw_pos , m_tape_pos);
 								cmd_duration = attotime::zero;
 								m_cmd_state = CMD_END;
 						}
@@ -1246,7 +843,7 @@ void hp_taco_device::cmd_fsm(void)
 						if (m_cmd_state == CMD_PH0) {
 								// PH0
 								// Search for preamble first
-								m_rd_it_valid = next_data(m_rd_it , m_tape_pos , false);
+							m_rd_it_valid = m_image.next_data(current_track() , m_tape_pos , m_tape_fwd , false , m_rd_it);
 								cmd_duration = time_to_rd_next_word(m_rw_pos);
 								// Set T/O for preamble search
 								set_data_timeout(true);
@@ -1262,8 +859,8 @@ void hp_taco_device::cmd_fsm(void)
 										m_timeout_timer->reset();
 										irq_w(true);
 								} else {
-										adv_res_t res = adv_it(m_rd_it);
-										if (res != ADV_NO_MORE_DATA) {
+									auto res = m_image.adv_it(current_track() , m_tape_fwd , m_rd_it);
+										if (res != hti_format_t::ADV_NO_MORE_DATA) {
 												cmd_duration = time_to_rd_next_word(m_rw_pos);
 										}
 										// Set T/O for arrival of data words
@@ -1278,13 +875,13 @@ void hp_taco_device::cmd_fsm(void)
 								// PH0
 								m_next_word = PREAMBLE_WORD;
 								m_rw_pos = m_tape_pos;
-								cmd_duration = time_to_distance(word_length(m_next_word));
+								cmd_duration = time_to_distance(hti_format_t::word_length(m_next_word));
 								m_cmd_state = CMD_PH1;
 						} else {
 								// PH1 & PH2 of CMD_RECORD_WRITE
-								tape_pos_t length;
-								write_word(m_rw_pos , m_next_word , length);
-								pos_offset(m_rw_pos , length);
+								hti_format_t::tape_pos_t length;
+								m_image.write_word(current_track() , m_rw_pos , m_next_word , length);
+								hti_format_t::pos_offset(m_rw_pos , m_tape_fwd , length);
 								// Just to be sure..
 								m_tape_pos = m_rw_pos;
 								cmd_duration = fetch_next_wr_word();
@@ -1317,8 +914,8 @@ void hp_taco_device::cmd_fsm(void)
 				case CMD_INGAP_MOVE:
 						if (m_cmd_state == CMD_PH0) {
 								// PH0
-								tape_pos_t target = m_tape_pos;
-								if (next_n_gap(target, 1, min_gap_size())) {
+							auto target = m_tape_pos;
+								if (m_image.next_gap(current_track() , target, m_tape_fwd, min_gap_size())) {
 										LOG_0(("IRG @%d\n" , target));
 										cmd_duration = time_to_target(target);
 								}
@@ -1335,16 +932,16 @@ void hp_taco_device::cmd_fsm(void)
 				case CMD_NOT_INDTA:
 						if (m_cmd_state == CMD_PH0) {
 								// PH0
-								if (next_data(m_rd_it , m_tape_pos , true)) {
-										cmd_duration = time_to_target(farthest_end(m_rd_it));
+							if (m_image.next_data(current_track() , m_tape_pos , m_tape_fwd , true , m_rd_it)) {
+									cmd_duration = time_to_target(hti_format_t::farthest_end(m_rd_it , m_tape_fwd));
 								}
 								// Set T/O for data
 								set_data_timeout(true);
 								m_cmd_state = CMD_PH1;
 						} else {
 								// PH1
-								tape_pos_t target = m_tape_pos;
-								if (next_n_gap(target, 1, min_gap_size())) {
+								auto target = m_tape_pos;
+								if (m_image.next_gap(current_track() , target, m_tape_fwd, min_gap_size())) {
 										LOG_0(("End of data @%d\n" , target));
 										cmd_duration = time_to_target(target);
 								}
@@ -1363,7 +960,7 @@ void hp_taco_device::cmd_fsm(void)
 								m_cmd_state = CMD_PH1;
 						} else {
 								// PH1
-								write_gap(m_rw_pos , m_tape_pos);
+							m_image.write_gap(current_track() , m_rw_pos , m_tape_pos);
 								cmd_duration = attotime::zero;
 								m_cmd_state = CMD_END;
 						}
@@ -1381,16 +978,16 @@ void hp_taco_device::cmd_fsm(void)
 									break;
 								}
 							}
-							if (next_data(m_rd_it , m_tape_pos , true)) {
-								cmd_duration = time_to_target(farthest_end(m_rd_it));
+							if (m_image.next_data(current_track() , m_tape_pos , m_tape_fwd , true , m_rd_it)) {
+								cmd_duration = time_to_target(hti_format_t::farthest_end(m_rd_it , m_tape_fwd));
 							}
 							// Set T/O for data
 							set_data_timeout(true);
 							m_cmd_state = CMD_PH1;
 						} else if (m_cmd_state == CMD_PH1) {
 							// PH1
-							tape_pos_t target = m_tape_pos;
-							if (next_n_gap(target, 1, min_gap_size())) {
+							auto target = m_tape_pos;
+							if (m_image.next_gap(current_track() , target, m_tape_fwd, min_gap_size())) {
 								LOG_0(("Gap @%d (%u to go)\n" , target , 0x10000U - m_tach_reg));
 								cmd_duration = time_to_target(target);
 							}
@@ -1407,8 +1004,8 @@ void hp_taco_device::cmd_fsm(void)
 								m_cmd_state = CMD_PH1;
 						} else {
 								// PH1
-								if (next_data(m_rd_it , m_tape_pos , true)) {
-										cmd_duration = time_to_target(farthest_end(m_rd_it));
+							if (m_image.next_data(current_track() , m_tape_pos , m_tape_fwd , true , m_rd_it)) {
+									cmd_duration = time_to_target(hti_format_t::farthest_end(m_rd_it , m_tape_fwd));
 								}
 								// Apparently this cmd doesn't set no-data T/O
 								m_cmd_state = CMD_END;
@@ -1430,8 +1027,8 @@ void hp_taco_device::cmd_fsm(void)
 								m_cmd_state = CMD_PH1;
 						} else {
 								// PH1
-								tape_pos_t target = m_tape_pos;
-								if (next_n_gap(target, 1, min_gap_size())) {
+								auto target = m_tape_pos;
+								if (m_image.next_gap(current_track() , target, m_tape_fwd, min_gap_size())) {
 										LOG_0(("GAP @%d\n" , target));
 										cmd_duration = time_to_target(target);
 								}
@@ -1445,7 +1042,7 @@ void hp_taco_device::cmd_fsm(void)
 								// Should also check if tape position has gone too far to read word @ m_rd_it
 								if (!m_rd_it_valid) {
 										// Search for preamble first
-										m_rd_it_valid = next_data(m_rd_it , m_tape_pos , false);
+									m_rd_it_valid = m_image.next_data(current_track() , m_tape_pos , m_tape_fwd , false , m_rd_it);
 										// Set T/O for preamble search
 										set_data_timeout(true);
 
@@ -1483,9 +1080,9 @@ void hp_taco_device::cmd_fsm(void)
 								}
 								// Set T/O for arrival of data words
 								set_data_timeout(false);
-								adv_res_t res = adv_it(m_rd_it);
+								auto res = m_image.adv_it(current_track() , m_tape_fwd , m_rd_it);
 								LOG_0(("adv_it %d\n" , res));
-								if (res == ADV_NO_MORE_DATA) {
+								if (res == hti_format_t::ADV_NO_MORE_DATA) {
 										m_rd_it_valid = false;
 								}
 						}
@@ -1511,8 +1108,8 @@ void hp_taco_device::cmd_fsm(void)
 								// Note: checksum is not updated
 								m_data_reg = m_rd_it->second;
 								LOG_0(("Final RD %04x\n" , m_data_reg));
-								adv_res_t res = adv_it(m_rd_it);
-								if (res == ADV_NO_MORE_DATA) {
+								auto res = m_image.adv_it(current_track() , m_tape_fwd , m_rd_it);
+								if (res == hti_format_t::ADV_NO_MORE_DATA) {
 										m_rd_it_valid = false;
 								}
 								cmd_duration = attotime::zero;
@@ -1672,20 +1269,24 @@ void hp_taco_device::start_cmd_exec(uint16_t new_cmd_reg)
 
 image_init_result hp_taco_device::internal_load(bool is_create)
 {
-		device_reset();
+	device_reset();
 
-		if (is_create) {
-				clear_tape();
-				save_tape();
-		} else if (!load_tape()) {
-				seterror(IMAGE_ERROR_INVALIDIMAGE , "Wrong format");
-				set_tape_present(false);
-				return image_init_result::FAIL;
-		}
+	io_generic io;
+	io.file = (device_image_interface *)this;
+	io.procs = &image_ioprocs;
+	io.filler = 0;
+	if (is_create) {
+		m_image.clear_tape();
+		m_image.save_tape(&io);
+	} else if (!m_image.load_tape(&io)) {
+		seterror(IMAGE_ERROR_INVALIDIMAGE , "Wrong format");
+		set_tape_present(false);
+		return image_init_result::FAIL;
+	}
 
-		m_image_dirty = false;
+	m_image_dirty = false;
 
-		set_tape_present(true);
+	set_tape_present(true);
 	return image_init_result::PASS;
 }
 
@@ -1703,17 +1304,21 @@ image_init_result hp_taco_device::call_create(int format_type, util::option_reso
 
 void hp_taco_device::call_unload()
 {
-		LOG(("call_unload dirty=%d\n" , m_image_dirty));
+	LOG(("call_unload dirty=%d\n" , m_image_dirty));
 
-		device_reset();
+	device_reset();
 
-		if (m_image_dirty) {
-				save_tape();
-				m_image_dirty = false;
-		}
+	if (m_image_dirty) {
+		io_generic io;
+		io.file = (device_image_interface *)this;
+		io.procs = &image_ioprocs;
+		io.filler = 0;
+		m_image.save_tape(&io);
+		m_image_dirty = false;
+	}
 
-		clear_tape();
-		set_tape_present(false);
+	m_image.clear_tape();
+	set_tape_present(false);
 }
 
 std::string hp_taco_device::call_display()
@@ -1739,7 +1344,7 @@ std::string hp_taco_device::call_display()
 		m2 = m_tape_fast ? '<' : ' ';
 	}
 
-	int pos_in = current_tape_pos() / ONE_INCH_POS;
+	int pos_in = current_tape_pos() / hti_format_t::ONE_INCH_POS;
 
 	buffer = string_format("%c %c %c%c [%04d/1824]" , track , r_w , m1 , m2 , pos_in);
 

@@ -37,7 +37,7 @@
 #define LOG_SETUP   (1U <<  1)
 
 //#define VERBOSE  (LOG_GENERAL|LOG_SETUP)
-//#define LOG_OUTPUT_FUNC printf
+//#define LOG_OUTPUT_STREAM std::cout
 
 #include "logmacro.h"
 
@@ -46,10 +46,8 @@
 
 #ifdef _MSC_VER
 #define FUNCNAME __func__
-#define LLFORMAT "%I64d"
 #else
 #define FUNCNAME __PRETTY_FUNCTION__
-#define LLFORMAT "%lld"
 #endif
 
 
@@ -58,7 +56,7 @@
 ***************************************************************************/
 
 const int mc14411_device::s_counter_divider[16] = {
-			 ////////// X64 /////// X16 /////// X8 //////// X1 ////////
+		 ////////// X64 /////// X16 /////// X8 //////// X1 ////////
 	  3, // F1:     614.4 kHz   153.6 kHz   76800 Hz    9600 Hz
 	  4, // F2:     460.8 kHz   115.2 kHz   57600 Hz    7200 Hz
 	  6, // F3:     307.2 kHz   76800 Hz    36400 Hz    4800 Hz

@@ -66,7 +66,7 @@ Soul Calibur II................................. 123456X  SC21 DVD0            D
 Soul Calibur III Arcade Edition................. 123456X  SC31001-NA-DVD0-A    DVD          NM00031   SC31001-NA-A           Namco 2005                    \
    "                           ................. 123456X  SC31001-NA-DVD0-B    DVD          NM00031   SC31001-NA-A           Namco 2005                    / # % @
 Sukusuku Inufuku 2 / The Dog Luck 2............. 123456X  HM-IN2               CD           NM00037   IN2 Ver.A              Hampster/Video System 2007
-Super Dragonball Z / Chou Dragonball Z.......... XXXX56X  DB1                  DVD          NM00027   DB1 Ver.B              Banpresto 2005
+Super Dragon Ball Z / Chou Dragon Ball Z........ XXXX56X  DB1                  DVD          NM00027   DB1 Ver.B              Banpresto 2005
 Taiko no Tatsujin 7............................. ------X  TK71 DVD0            DVD          NM00023   TK71 Ver.A             Namco 2005
 Taiko no Tatsujin 8............................. ------X  TK8100-1-NA-DVD0-A   DVD          NM00033   TK81001-NA-A           Namco 2006
 Taiko No Tatsujin 9............................. XXXX56X  TK9100-1-NA-DVD0-A   DVD          NM00038   TK91001-NA-A           Namco 2006
@@ -1312,6 +1312,9 @@ ROM_START( timecrs3 )
 
 	DISK_REGION("dvd")
 	DISK_IMAGE_READONLY( "tst1dvd0", 0, SHA1(f8a447d9a4224282516bea590f5217c751bdc4ae) )
+
+	ROM_REGION(0x40000, "iocpu", 0)   // NAMCO V291 I/O PCB, HD643334 H8/3334 MCU code
+	ROM_LOAD("tss-iopc.ic3", 0x000000, 0x040000, CRC(bb112fe0) SHA1(6fa5dc81d258137c1b1ad427d49d136d0bbf53fa) )
 ROM_END
 
 ROM_START( timecrs3e )
@@ -1324,6 +1327,9 @@ ROM_START( timecrs3e )
 
 	DISK_REGION("dvd")
 	DISK_IMAGE_READONLY( "tst1dvd0", 0, SHA1(f8a447d9a4224282516bea590f5217c751bdc4ae) )
+
+	ROM_REGION(0x40000, "iocpu", 0)   // NAMCO V291 I/O PCB, HD643334 H8/3334 MCU code
+	ROM_LOAD("tss-iopc.ic3", 0x000000, 0x040000, CRC(bb112fe0) SHA1(6fa5dc81d258137c1b1ad427d49d136d0bbf53fa) )
 ROM_END
 
 ROM_START( zgundmdx )

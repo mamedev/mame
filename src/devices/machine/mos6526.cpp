@@ -790,14 +790,14 @@ void mos6526_device::execute_run()
 
 READ8_MEMBER( mos6526_device::read )
 {
-	if (machine().side_effect_disabled())
-		return 0xff;
-
 	uint8_t data = 0;
 
 	switch (offset & 0x0f)
 	{
 	case PRA:
+		if (machine().side_effect_disabled())
+			return 0xff;
+
 		if (m_ddra != 0xff)
 			data = (m_read_pa(0) & ~m_ddra) | (m_pra & m_ddra);
 		else
@@ -806,6 +806,9 @@ READ8_MEMBER( mos6526_device::read )
 		break;
 
 	case PRB:
+		if (machine().side_effect_disabled())
+			return 0xff;
+
 		if (m_ddrb != 0xff)
 			data = (m_read_pb(0) & ~m_ddrb) | (m_prb & m_ddrb);
 		else
@@ -857,20 +860,32 @@ READ8_MEMBER( mos6526_device::read )
 		break;
 
 	case TOD_10THS:
+		if (machine().side_effect_disabled())
+			return 0xff;
+
 		data = read_tod(0);
 
 		m_tod_latched = false;
 		break;
 
 	case TOD_SEC:
+		if (machine().side_effect_disabled())
+			return 0xff;
+
 		data = read_tod(1);
 		break;
 
 	case TOD_MIN:
+		if (machine().side_effect_disabled())
+			return 0xff;
+
 		data = read_tod(2);
 		break;
 
 	case TOD_HR:
+		if (machine().side_effect_disabled())
+			return 0xff;
+
 		if (!m_tod_latched)
 		{
 			m_tod_latched = true;
@@ -886,6 +901,9 @@ READ8_MEMBER( mos6526_device::read )
 
 	case ICR:
 		data = (m_ir1 << 7) | m_icr;
+
+		if (machine().side_effect_disabled())
+			return data;
 
 		m_icr_read = true;
 

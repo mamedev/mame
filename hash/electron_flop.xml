@@ -657,6 +657,30 @@
 		</part>
 	</software>
 
+	<software name="starspell">
+		<description>Starspell Dictionary Disk (3.5")</description>
+		<year>1989</year>
+		<publisher>Slogger</publisher>
+		<info name="format" value="ADFS" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="327680">
+				<rom name="Starspell-Dictionary-adfs_e.adf" size="327680" crc="93d418c6" sha1="112dacc72d7d49a8a255ca2f7185e1cf7caa0a72" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="starspelld" cloneof="starspell">
+		<description>Starspell Dictionary Disk (5.25")</description>
+		<year>1989</year>
+		<publisher>Slogger</publisher>
+		<info name="format" value="DFS" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="204800">
+				<rom name="Starspell-Dictionary-dfs_e.adf" size="204800" crc="88c692d1" sha1="2cf05091b210d31f968a2ed90a4d1db253586415" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="stranded">
 		<description>Stranded!</description>
 		<year>1988</year>
@@ -864,7 +888,7 @@
 	</software>
 
 	<software name="eug00">
-		<description>Electron User Group #00</description>
+		<description>Electron User Group #00 (3.5")</description>
 		<year>1991</year>
 		<publisher>E.U.G.</publisher>
 		<info name="format" value="ADFS" />
@@ -875,9 +899,21 @@
 		</part>
 	</software>
 
+	<software name="eug00d" cloneof="eug00">
+		<description>Electron User Group #00 (5.25")</description>
+		<year>1991</year>
+		<publisher>E.U.G.</publisher>
+		<info name="format" value="DFS" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="409600">
+				<rom name="eug00-dfs_e.dsd" size="409600" crc="634eaa95" sha1="46fa0edc770e654bc00ab9dc37f9d1ef696da926" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="eug01">
-		<description>Electron User Group #01</description>
-		<year>19??</year>
+		<description>Electron User Group #01 (3.5")</description>
+		<year>1991</year>
 		<publisher>E.U.G.</publisher>
 		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
@@ -887,9 +923,21 @@
 		</part>
 	</software>
 
+	<software name="eug01d" cloneof="eug01">
+		<description>Electron User Group #01 (5.25")</description>
+		<year>1991</year>
+		<publisher>E.U.G.</publisher>
+		<info name="format" value="DFS" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="409600">
+				<rom name="eug01-dfs_e.dsd" size="409600" crc="5dc20000" sha1="76a50e7a88a958049b0d17039fd450435a96f124" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="eug02">
-		<description>Electron User Group #02</description>
-		<year>19??</year>
+		<description>Electron User Group #02 (3.5")</description>
+		<year>1991</year>
 		<publisher>E.U.G.</publisher>
 		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
@@ -899,9 +947,21 @@
 		</part>
 	</software>
 
+	<software name="eug02d" cloneof="eug02">
+		<description>Electron User Group #02 (5.25")</description>
+		<year>1991</year>
+		<publisher>E.U.G.</publisher>
+		<info name="format" value="DFS" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="409600">
+				<rom name="eug02-dfs_e.dsd" size="409600" crc="a544cafe" sha1="8eb3003d10bc2da016c285b87ac18ebd544c9d3b" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="eug03">
-		<description>Electron User Group #03</description>
-		<year>19??</year>
+		<description>Electron User Group #03 (3.5")</description>
+		<year>1992</year>
 		<publisher>E.U.G.</publisher>
 		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
@@ -911,9 +971,21 @@
 		</part>
 	</software>
 
+	<software name="eug03d" cloneof="eug03">
+		<description>Electron User Group #03 (5.25")</description>
+		<year>1992</year>
+		<publisher>E.U.G.</publisher>
+		<info name="format" value="DFS" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="409600">
+				<rom name="eug03-dfs_e.dsd" size="409600" crc="f5a038b3" sha1="b7b86081955e0f6afad00231d7c06b016b0f14b7" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="eug04">
-		<description>Electron User Group #04</description>
-		<year>19??</year>
+		<description>Electron User Group #04 (3.5")</description>
+		<year>1992</year>
 		<publisher>E.U.G.</publisher>
 		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
@@ -923,9 +995,21 @@
 		</part>
 	</software>
 
+	<software name="eug04d" cloneof="eug04">
+		<description>Electron User Group #04 (5.25")</description>
+		<year>1992</year>
+		<publisher>E.U.G.</publisher>
+		<info name="format" value="DFS" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="409600">
+				<rom name="eug04-dfs_e.dsd" size="409600" crc="44443e50" sha1="5595d20e332f6e2346520685e6598342c688af19" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="eug05">
-		<description>Electron User Group #05</description>
-		<year>19??</year>
+		<description>Electron User Group #05 (3.5")</description>
+		<year>1992</year>
 		<publisher>E.U.G.</publisher>
 		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
@@ -935,9 +1019,21 @@
 		</part>
 	</software>
 
+	<software name="eug05d" cloneof="eug05">
+		<description>Electron User Group #05 (5.25")</description>
+		<year>1992</year>
+		<publisher>E.U.G.</publisher>
+		<info name="format" value="DFS" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="409600">
+				<rom name="eug05-dfs_e.dsd" size="409600" crc="9ef25d40" sha1="aaf2b7d3049d92d4b5b8c201c7a7aee8d2a9125b" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="eug06">
-		<description>Electron User Group #06</description>
-		<year>19??</year>
+		<description>Electron User Group #06 (3.5")</description>
+		<year>1992</year>
 		<publisher>E.U.G.</publisher>
 		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
@@ -947,9 +1043,21 @@
 		</part>
 	</software>
 
+	<software name="eug06d" cloneof="eug06">
+		<description>Electron User Group #06 (5.25")</description>
+		<year>1992</year>
+		<publisher>E.U.G.</publisher>
+		<info name="format" value="DFS" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="409600">
+				<rom name="eug06-dfs_e.dsd" size="409600" crc="b9e11b3a" sha1="8d4c3c1b17921ad6e274e5c0f6f1b7b33f783bb4" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="eug07">
-		<description>Electron User Group #07</description>
-		<year>19??</year>
+		<description>Electron User Group #07 (3.5")</description>
+		<year>1992</year>
 		<publisher>E.U.G.</publisher>
 		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
@@ -959,9 +1067,21 @@
 		</part>
 	</software>
 
+	<software name="eug07d" cloneof="eug07">
+		<description>Electron User Group #07 (5.25")</description>
+		<year>1992</year>
+		<publisher>E.U.G.</publisher>
+		<info name="format" value="DFS" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="409600">
+				<rom name="eug07-dfs_e.dsd" size="409600" crc="2870b1e8" sha1="97ba97e1d328c0196e06c73cb4707bf7e1a91df0" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="eug08">
-		<description>Electron User Group #08</description>
-		<year>19??</year>
+		<description>Electron User Group #08 (3.5")</description>
+		<year>1993</year>
 		<publisher>E.U.G.</publisher>
 		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
@@ -971,9 +1091,21 @@
 		</part>
 	</software>
 
+	<software name="eug08d" cloneof="eug08">
+		<description>Electron User Group #08 (5.25")</description>
+		<year>1993</year>
+		<publisher>E.U.G.</publisher>
+		<info name="format" value="DFS" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="409600">
+				<rom name="eug08-dfs_e.dsd" size="409600" crc="0492b7dc" sha1="42308c74985ed546fe1219361a5b7bbbd1ecf085" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="eug09">
-		<description>Electron User Group #09</description>
-		<year>19??</year>
+		<description>Electron User Group #09 (3.5")</description>
+		<year>1993</year>
 		<publisher>E.U.G.</publisher>
 		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
@@ -983,9 +1115,21 @@
 		</part>
 	</software>
 
+	<software name="eug09d" cloneof="eug09">
+		<description>Electron User Group #09 (5.25")</description>
+		<year>1993</year>
+		<publisher>E.U.G.</publisher>
+		<info name="format" value="DFS" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="409600">
+				<rom name="eug09-dfs_e.dsd" size="409600" crc="cd02060f" sha1="06bb44a7f302ae8f348730f11f0ea771d7f2a67c" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="eug10">
-		<description>Electron User Group #10</description>
-		<year>19??</year>
+		<description>Electron User Group #10 (3.5")</description>
+		<year>1993</year>
 		<publisher>E.U.G.</publisher>
 		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
@@ -995,9 +1139,21 @@
 		</part>
 	</software>
 
+	<software name="eug10d" cloneof="eug10">
+		<description>Electron User Group #10 (5.25")</description>
+		<year>1993</year>
+		<publisher>E.U.G.</publisher>
+		<info name="format" value="DFS" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="409600">
+				<rom name="eug10-dfs_e.dsd" size="409600" crc="fa750dc8" sha1="492ef78747d6b2914f2f9300c9c91ca65959f253" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="eug11">
-		<description>Electron User Group #11</description>
-		<year>19??</year>
+		<description>Electron User Group #11 (3.5")</description>
+		<year>1993</year>
 		<publisher>E.U.G.</publisher>
 		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
@@ -1007,9 +1163,21 @@
 		</part>
 	</software>
 
+	<software name="eug11d" cloneof="eug11">
+		<description>Electron User Group #11 (5.25")</description>
+		<year>1993</year>
+		<publisher>E.U.G.</publisher>
+		<info name="format" value="DFS" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="409600">
+				<rom name="eug11-dfs_e.dsd" size="409600" crc="f1218c77" sha1="cc537658a8cd4ebe121bd1f00dba91ee9d44ebd3" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="eug12">
-		<description>Electron User Group #12</description>
-		<year>19??</year>
+		<description>Electron User Group #12 (3.5")</description>
+		<year>1994</year>
 		<publisher>E.U.G.</publisher>
 		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
@@ -1019,9 +1187,21 @@
 		</part>
 	</software>
 
+	<software name="eug12d" cloneof="eug12">
+		<description>Electron User Group #12 (5.25")</description>
+		<year>1994</year>
+		<publisher>E.U.G.</publisher>
+		<info name="format" value="DFS" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="409600">
+				<rom name="eug12-dfs_e.dsd" size="409600" crc="768ae3db" sha1="21d476b7eb3eceb1302a2becbf79c61db4dd9c33" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="eug13">
-		<description>Electron User Group #13</description>
-		<year>19??</year>
+		<description>Electron User Group #13 (3.5")</description>
+		<year>1994</year>
 		<publisher>E.U.G.</publisher>
 		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
@@ -1031,9 +1211,21 @@
 		</part>
 	</software>
 
+	<software name="eug13d" cloneof="eug13">
+		<description>Electron User Group #13 (5.25")</description>
+		<year>1994</year>
+		<publisher>E.U.G.</publisher>
+		<info name="format" value="DFS" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="409600">
+				<rom name="eug13-dfs_e.dsd" size="409600" crc="c2635188" sha1="9424dec994ba64aab6de708186b75561d0aa0df3" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="eug14">
-		<description>Electron User Group #14</description>
-		<year>19??</year>
+		<description>Electron User Group #14 (3.5")</description>
+		<year>1994</year>
 		<publisher>E.U.G.</publisher>
 		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
@@ -1043,9 +1235,21 @@
 		</part>
 	</software>
 
+	<software name="eug14d" cloneof="eug14">
+		<description>Electron User Group #14 (5.25")</description>
+		<year>1994</year>
+		<publisher>E.U.G.</publisher>
+		<info name="format" value="DFS" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="409600">
+				<rom name="eug14-dfs_e.dsd" size="409600" crc="ac86655d" sha1="04c5ccae88708f46e36e8cb24faa8a02c5e27b8d" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="eug15">
-		<description>Electron User Group #15</description>
-		<year>19??</year>
+		<description>Electron User Group #15 (3.5")</description>
+		<year>1994</year>
 		<publisher>E.U.G.</publisher>
 		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
@@ -1055,9 +1259,21 @@
 		</part>
 	</software>
 
+	<software name="eug15d" cloneof="eug15">
+		<description>Electron User Group #15 (5.25")</description>
+		<year>1994</year>
+		<publisher>E.U.G.</publisher>
+		<info name="format" value="DFS" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="409600">
+				<rom name="eug15-dfs_e.dsd" size="409600" crc="ef2cada6" sha1="43e5c0e6b75db29827b2b3d1b7c1bf53d01ab31a" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="eug16">
-		<description>Electron User Group #16</description>
-		<year>19??</year>
+		<description>Electron User Group #16 (3.5")</description>
+		<year>1994</year>
 		<publisher>E.U.G.</publisher>
 		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
@@ -1067,9 +1283,21 @@
 		</part>
 	</software>
 
+	<software name="eug16d" cloneof="eug16">
+		<description>Electron User Group #16 (5.25")</description>
+		<year>1994</year>
+		<publisher>E.U.G.</publisher>
+		<info name="format" value="DFS" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="409600">
+				<rom name="eug16-dfs_e.dsd" size="409600" crc="7af78d3d" sha1="2cf4a1944a3bc1262400cc3bc934b66d535a0604" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="eug17">
-		<description>Electron User Group #17</description>
-		<year>19??</year>
+		<description>Electron User Group #17 (3.5")</description>
+		<year>1994</year>
 		<publisher>E.U.G.</publisher>
 		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
@@ -1079,9 +1307,21 @@
 		</part>
 	</software>
 
+	<software name="eug17d" cloneof="eug17">
+		<description>Electron User Group #17 (5.25")</description>
+		<year>1994</year>
+		<publisher>E.U.G.</publisher>
+		<info name="format" value="DFS" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="409600">
+				<rom name="eug17-dfs_e.dsd" size="409600" crc="b844b58d" sha1="75fc9d54000f558c8ef73ff8d02eafa1d1c35b72" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="eug18">
-		<description>Electron User Group #18</description>
-		<year>19??</year>
+		<description>Electron User Group #18 (3.5")</description>
+		<year>1995</year>
 		<publisher>E.U.G.</publisher>
 		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
@@ -1091,9 +1331,21 @@
 		</part>
 	</software>
 
+	<software name="eug18d" cloneof="eug18">
+		<description>Electron User Group #18 (5.25")</description>
+		<year>1995</year>
+		<publisher>E.U.G.</publisher>
+		<info name="format" value="DFS" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="409600">
+				<rom name="eug18-dfs_e.dsd" size="409600" crc="4183b2fe" sha1="2102c4964f33a0c74d79a7a0824b951c59785ed4" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="eug19">
-		<description>Electron User Group #19</description>
-		<year>19??</year>
+		<description>Electron User Group #19 (3.5")</description>
+		<year>1995</year>
 		<publisher>E.U.G.</publisher>
 		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
@@ -1103,9 +1355,21 @@
 		</part>
 	</software>
 
+	<software name="eug19d" cloneof="eug19">
+		<description>Electron User Group #19 (5.25")</description>
+		<year>1995</year>
+		<publisher>E.U.G.</publisher>
+		<info name="format" value="DFS" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="409600">
+				<rom name="eug19-dfs_e.dsd" size="409600" crc="3d21f62f" sha1="c0a6e6ad37ed9c729c6b9a62868fca2ba98aea45" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="eug20">
-		<description>Electron User Group #20</description>
-		<year>19??</year>
+		<description>Electron User Group #20 (3.5")</description>
+		<year>1995</year>
 		<publisher>E.U.G.</publisher>
 		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
@@ -1115,9 +1379,21 @@
 		</part>
 	</software>
 
+	<software name="eug20d" cloneof="eug20">
+		<description>Electron User Group #20 (5.25")</description>
+		<year>1995</year>
+		<publisher>E.U.G.</publisher>
+		<info name="format" value="DFS" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="409600">
+				<rom name="eug20-dfs_e.dsd" size="409600" crc="422a22db" sha1="3731c347b5718ce23d75ec5c68e4029d882b1392" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="eug21">
-		<description>Electron User Group #21</description>
-		<year>19??</year>
+		<description>Electron User Group #21 (3.5")</description>
+		<year>1995</year>
 		<publisher>E.U.G.</publisher>
 		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
@@ -1140,9 +1416,31 @@
 		</part>
 	</software>
 
+	<software name="eug21d" cloneof="eug21">
+		<description>Electron User Group #21 (5.25")</description>
+		<year>1995</year>
+		<publisher>E.U.G.</publisher>
+		<info name="format" value="DFS" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="409600">
+				<rom name="eug21a-dfs_e.dsd" size="409600" crc="2a2c9bfd" sha1="215263e9581793ac872a8ba7b6b356597ad8b960" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="409600">
+				<rom name="eug21b-dfs_e.dsd" size="409600" crc="057cc376" sha1="92dd2614eec5e104c0021eb74df3cd1c86a8f225" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size="409600">
+				<rom name="eug21c-dfs_e.dsd" size="409600" crc="526837c1" sha1="9bab106933fa859633dc08227eb38fe80bc02e2a" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="eug22">
-		<description>Electron User Group #22</description>
-		<year>19??</year>
+		<description>Electron User Group #22 (3.5")</description>
+		<year>1995</year>
 		<publisher>E.U.G.</publisher>
 		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
@@ -1152,9 +1450,21 @@
 		</part>
 	</software>
 
-	<software name="eug23">
-		<description>Electron User Group #23</description>
-		<year>19??</year>
+	<software name="eug22d" cloneof="eug22">
+		<description>Electron User Group #22 (5.25")</description>
+		<year>1995</year>
+		<publisher>E.U.G.</publisher>
+		<info name="format" value="DFS" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="409600">
+				<rom name="eug22-dfs_e.dsd" size="409600" crc="f65b405d" sha1="a72317277626ef01f423ee28f3c1258e95179b24" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+		<software name="eug23">
+		<description>Electron User Group #23 (3.5")</description>
+		<year>1995</year>
 		<publisher>E.U.G.</publisher>
 		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
@@ -1164,9 +1474,21 @@
 		</part>
 	</software>
 
+	<software name="eug23d" cloneof="eug23">
+		<description>Electron User Group #23 (5.25")</description>
+		<year>1995</year>
+		<publisher>E.U.G.</publisher>
+		<info name="format" value="DFS" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="409600">
+				<rom name="eug23-dfs_e.dsd" size="409600" crc="a4435fb1" sha1="00bedd0f2d00be81e2ebd28a5c118f66eaf35aa2" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="eug24">
-		<description>Electron User Group #24</description>
-		<year>19??</year>
+		<description>Electron User Group #24 (3.5")</description>
+		<year>1996</year>
 		<publisher>E.U.G.</publisher>
 		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
@@ -1176,9 +1498,21 @@
 		</part>
 	</software>
 
+	<software name="eug24d" cloneof="eug24">
+		<description>Electron User Group #24 (5.25")</description>
+		<year>1996</year>
+		<publisher>E.U.G.</publisher>
+		<info name="format" value="DFS" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="409600">
+				<rom name="eug24-dfs_e.dsd" size="409600" crc="ea15813b" sha1="9fad5440c43e6d65638ca54018ea96af920f7b45" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="eug25">
-		<description>Electron User Group #25</description>
-		<year>19??</year>
+		<description>Electron User Group #25 (3.5")</description>
+		<year>1996</year>
 		<publisher>E.U.G.</publisher>
 		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
@@ -1188,9 +1522,21 @@
 		</part>
 	</software>
 
+	<software name="eug25d" cloneof="eug25">
+		<description>Electron User Group #25 (5.25")</description>
+		<year>1996</year>
+		<publisher>E.U.G.</publisher>
+		<info name="format" value="DFS" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="409600">
+				<rom name="eug25-dfs_e.dsd" size="409600" crc="977a74e9" sha1="578119425a62d33f448b2b2c0bf8b835d1aed5c2" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="eug26">
-		<description>Electron User Group #26</description>
-		<year>19??</year>
+		<description>Electron User Group #26 (3.5")</description>
+		<year>1996</year>
 		<publisher>E.U.G.</publisher>
 		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
@@ -1200,9 +1546,21 @@
 		</part>
 	</software>
 
+	<software name="eug26d" cloneof="eug26">
+		<description>Electron User Group #26 (5.25")</description>
+		<year>1996</year>
+		<publisher>E.U.G.</publisher>
+		<info name="format" value="DFS" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="409600">
+				<rom name="eug26-dfs_e.dsd" size="409600" crc="db5df507" sha1="107096d1dfbe9a657804b598fbb78fb485a7891d" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="eug27">
-		<description>Electron User Group #27</description>
-		<year>19??</year>
+		<description>Electron User Group #27 (3.5")</description>
+		<year>1996</year>
 		<publisher>E.U.G.</publisher>
 		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
@@ -1212,9 +1570,21 @@
 		</part>
 	</software>
 
+	<software name="eug27d" cloneof="eug27">
+		<description>Electron User Group #27 (5.25")</description>
+		<year>1996</year>
+		<publisher>E.U.G.</publisher>
+		<info name="format" value="DFS" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="409600">
+				<rom name="eug27-dfs_e.dsd" size="409600" crc="5fefa4e6" sha1="86115433b86808860695c053c3e1e3552f8fcf4e" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="eug28">
-		<description>Electron User Group #28</description>
-		<year>19??</year>
+		<description>Electron User Group #28 (3.5")</description>
+		<year>1996</year>
 		<publisher>E.U.G.</publisher>
 		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
@@ -1224,9 +1594,21 @@
 		</part>
 	</software>
 
+	<software name="eug28d" cloneof="eug28">
+		<description>Electron User Group #28 (5.25")</description>
+		<year>1996</year>
+		<publisher>E.U.G.</publisher>
+		<info name="format" value="DFS" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="409600">
+				<rom name="eug28-dfs_e.dsd" size="409600" crc="18d5427c" sha1="beae565d47a8aca6a0f66e5ce2025cee65c92a24" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="eug29">
-		<description>Electron User Group #29</description>
-		<year>19??</year>
+		<description>Electron User Group #29 (3.5")</description>
+		<year>1996</year>
 		<publisher>E.U.G.</publisher>
 		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
@@ -1236,9 +1618,21 @@
 		</part>
 	</software>
 
+	<software name="eug29d" cloneof="eug29">
+		<description>Electron User Group #29 (5.25")</description>
+		<year>1996</year>
+		<publisher>E.U.G.</publisher>
+		<info name="format" value="DFS" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="409600">
+				<rom name="eug29-dfs_e.dsd" size="409600" crc="5722978c" sha1="9cb7e1b42bd6ecc756e0ccc9b3efea119ea0bfa6" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="eug30">
-		<description>Electron User Group #30</description>
-		<year>19??</year>
+		<description>Electron User Group #30 (3.5")</description>
+		<year>1997</year>
 		<publisher>E.U.G.</publisher>
 		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
@@ -1248,9 +1642,21 @@
 		</part>
 	</software>
 
+	<software name="eug30d" cloneof="eug30">
+		<description>Electron User Group #30 (5.25")</description>
+		<year>1997</year>
+		<publisher>E.U.G.</publisher>
+		<info name="format" value="DFS" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="409600">
+				<rom name="eug30-dfs_e.dsd" size="409600" crc="a5c93259" sha1="4c54f2b80dae8e86c04a4fa7ab460793f7110afd" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="eug31">
-		<description>Electron User Group #31</description>
-		<year>19??</year>
+		<description>Electron User Group #31 (3.5")</description>
+		<year>1997</year>
 		<publisher>E.U.G.</publisher>
 		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
@@ -1260,9 +1666,21 @@
 		</part>
 	</software>
 
+	<software name="eug31d" cloneof="eug31">
+		<description>Electron User Group #31 (5.25")</description>
+		<year>1997</year>
+		<publisher>E.U.G.</publisher>
+		<info name="format" value="DFS" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="409600">
+				<rom name="eug31-dfs_e.dsd" size="409600" crc="ccd96dfd" sha1="6ef23d4727cd80d951591a2f42d41213215706ee" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="eug32">
-		<description>Electron User Group #32</description>
-		<year>19??</year>
+		<description>Electron User Group #32 (3.5")</description>
+		<year>1997</year>
 		<publisher>E.U.G.</publisher>
 		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
@@ -1272,9 +1690,21 @@
 		</part>
 	</software>
 
+	<software name="eug32d" cloneof="eug32">
+		<description>Electron User Group #32 (5.25")</description>
+		<year>1997</year>
+		<publisher>E.U.G.</publisher>
+		<info name="format" value="DFS" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="409600">
+				<rom name="eug32-dfs_e.dsd" size="409600" crc="961286e3" sha1="bb482985d4fa0e7bbf3cc7326eb7c425666bf0c7" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="eug33">
-		<description>Electron User Group #33</description>
-		<year>19??</year>
+		<description>Electron User Group #33 (3.5")</description>
+		<year>1997</year>
 		<publisher>E.U.G.</publisher>
 		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
@@ -1284,9 +1714,21 @@
 		</part>
 	</software>
 
+	<software name="eug33d" cloneof="eug33">
+		<description>Electron User Group #33 (5.25")</description>
+		<year>1997</year>
+		<publisher>E.U.G.</publisher>
+		<info name="format" value="DFS" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="409600">
+				<rom name="eug33-dfs_e.dsd" size="409600" crc="00047bd9" sha1="fdfa42b978bf4748a8bb041da0586577df908fe8" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="eug34">
-		<description>Electron User Group #34</description>
-		<year>19??</year>
+		<description>Electron User Group #34 (3.5")</description>
+		<year>1997</year>
 		<publisher>E.U.G.</publisher>
 		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
@@ -1296,9 +1738,21 @@
 		</part>
 	</software>
 
+	<software name="eug34d" cloneof="eug34">
+		<description>Electron User Group #34 (5.25")</description>
+		<year>1997</year>
+		<publisher>E.U.G.</publisher>
+		<info name="format" value="DFS" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="409600">
+				<rom name="eug34-dfs_e.dsd" size="409600" crc="1b679dbe" sha1="f0a7c0cedb4d0d32734a6ab15ff0599b3be2f602" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="eug35">
-		<description>Electron User Group #35</description>
-		<year>19??</year>
+		<description>Electron User Group #35 (3.5")</description>
+		<year>1997</year>
 		<publisher>E.U.G.</publisher>
 		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
@@ -1308,9 +1762,21 @@
 		</part>
 	</software>
 
+	<software name="eug35d" cloneof="eug35">
+		<description>Electron User Group #35 (5.25")</description>
+		<year>1997</year>
+		<publisher>E.U.G.</publisher>
+		<info name="format" value="DFS" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="409600">
+				<rom name="eug35-dfs_e.dsd" size="409600" crc="42100a1a" sha1="0e4aad4719f85aa5151a6696287ee74b6c4bb50c" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="eug36">
-		<description>Electron User Group #36</description>
-		<year>19??</year>
+		<description>Electron User Group #36 (3.5")</description>
+		<year>1998</year>
 		<publisher>E.U.G.</publisher>
 		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
@@ -1320,9 +1786,21 @@
 		</part>
 	</software>
 
+	<software name="eug36d" cloneof="eug36">
+		<description>Electron User Group #36 (5.25")</description>
+		<year>1998</year>
+		<publisher>E.U.G.</publisher>
+		<info name="format" value="DFS" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="409600">
+				<rom name="eug36-dfs_e.dsd" size="409600" crc="459b5996" sha1="54dfc1e2de4660669412275bd88a59b7857f4d6b" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="eug37">
-		<description>Electron User Group #37</description>
-		<year>19??</year>
+		<description>Electron User Group #37 (3.5")</description>
+		<year>1998</year>
 		<publisher>E.U.G.</publisher>
 		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
@@ -1332,9 +1810,21 @@
 		</part>
 	</software>
 
+	<software name="eug37d" cloneof="eug37">
+		<description>Electron User Group #37 (5.25")</description>
+		<year>1998</year>
+		<publisher>E.U.G.</publisher>
+		<info name="format" value="DFS" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="409600">
+				<rom name="eug37-dfs_e.dsd" size="409600" crc="3a93906b" sha1="08179e41a784141a46fef7f1cbe9f3cbb0d8b1b9" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="eug38">
-		<description>Electron User Group #38</description>
-		<year>19??</year>
+		<description>Electron User Group #38 (3.5")</description>
+		<year>1998</year>
 		<publisher>E.U.G.</publisher>
 		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
@@ -1344,9 +1834,21 @@
 		</part>
 	</software>
 
+	<software name="eug38d" cloneof="eug38">
+		<description>Electron User Group #38 (5.25")</description>
+		<year>1998</year>
+		<publisher>E.U.G.</publisher>
+		<info name="format" value="DFS" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="409600">
+				<rom name="eug38-dfs_e.dsd" size="409600" crc="a90ce642" sha1="394e78d74e505db29249c7d3ea4f49707cba35e8" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="eug39">
-		<description>Electron User Group #39</description>
-		<year>19??</year>
+		<description>Electron User Group #39 (3.5")</description>
+		<year>1998</year>
 		<publisher>E.U.G.</publisher>
 		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
@@ -1356,9 +1858,21 @@
 		</part>
 	</software>
 
+	<software name="eug39d" cloneof="eug39">
+		<description>Electron User Group #39 (5.25")</description>
+		<year>1998</year>
+		<publisher>E.U.G.</publisher>
+		<info name="format" value="DFS" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="409600">
+				<rom name="eug39-dfs_e.dsd" size="409600" crc="44047d34" sha1="5c79856aa3f2c7e277befffc268b3ec5ddab4976" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="eug40">
-		<description>Electron User Group #40</description>
-		<year>19??</year>
+		<description>Electron User Group #40 (3.5")</description>
+		<year>1998</year>
 		<publisher>E.U.G.</publisher>
 		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
@@ -1368,9 +1882,21 @@
 		</part>
 	</software>
 
+	<software name="eug40d" cloneof="eug40">
+		<description>Electron User Group #40 (5.25")</description>
+		<year>1998</year>
+		<publisher>E.U.G.</publisher>
+		<info name="format" value="DFS" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="409600">
+				<rom name="eug40-dfs_e.dsd" size="409600" crc="0846ddf4" sha1="10cc8323a1c81b2830a7dc36b9c3ef82bc0ab925" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="eug41">
-		<description>Electron User Group #41</description>
-		<year>19??</year>
+		<description>Electron User Group #41 (3.5")</description>
+		<year>1998</year>
 		<publisher>E.U.G.</publisher>
 		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
@@ -1380,9 +1906,21 @@
 		</part>
 	</software>
 
+	<software name="eug41d" cloneof="eug41">
+		<description>Electron User Group #41 (5.25")</description>
+		<year>1998</year>
+		<publisher>E.U.G.</publisher>
+		<info name="format" value="DFS" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="409600">
+				<rom name="eug41-dfs_e.dsd" size="409600" crc="d591c38c" sha1="8e8e334f05f3f65a35933d70544a1ede6b18ab48" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="eug42">
-		<description>Electron User Group #42</description>
-		<year>19??</year>
+		<description>Electron User Group #42 (3.5")</description>
+		<year>1999</year>
 		<publisher>E.U.G.</publisher>
 		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
@@ -1392,9 +1930,21 @@
 		</part>
 	</software>
 
+	<software name="eug42d" cloneof="eug42">
+		<description>Electron User Group #42 (5.25")</description>
+		<year>1999</year>
+		<publisher>E.U.G.</publisher>
+		<info name="format" value="DFS" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="204800">
+				<rom name="eug42.ssd" size="204800" crc="2f0c398f" sha1="9b8e4375a39587024443b69aded2b468fe2044b3" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="eug43_44">
-		<description>Electron User Group #43/#44</description>
-		<year>19??</year>
+		<description>Electron User Group #43/#44 (3.5")</description>
+		<year>1999</year>
 		<publisher>E.U.G.</publisher>
 		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
@@ -1404,9 +1954,21 @@
 		</part>
 	</software>
 
+	<software name="eug43_44d" cloneof="eug43_44">
+		<description>Electron User Group #43/#44 (5.25")</description>
+		<year>1999</year>
+		<publisher>E.U.G.</publisher>
+		<info name="format" value="DFS" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="409600">
+				<rom name="eug43a44-dfs_e.dsd" size="409600" crc="2828094f" sha1="9162107e2f5eabb0394d6f2675e3a6646e9c79ba" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="eug45">
-		<description>Electron User Group #45</description>
-		<year>19??</year>
+		<description>Electron User Group #45 (3.5")</description>
+		<year>1999</year>
 		<publisher>E.U.G.</publisher>
 		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
@@ -1416,9 +1978,21 @@
 		</part>
 	</software>
 
+	<software name="eug45d" cloneof="eug45">
+		<description>Electron User Group #45 (5.25")</description>
+		<year>1999</year>
+		<publisher>E.U.G.</publisher>
+		<info name="format" value="DFS" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="409600">
+				<rom name="eug45-dfs_e.dsd" size="409600" crc="ef191a48" sha1="8849be0154f05565a7aa98b65da79350ed4d3c68" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="eug46">
-		<description>Electron User Group #46</description>
-		<year>19??</year>
+		<description>Electron User Group #46 (3.5")</description>
+		<year>1999</year>
 		<publisher>E.U.G.</publisher>
 		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
@@ -1428,9 +2002,21 @@
 		</part>
 	</software>
 
+	<software name="eug46d" cloneof="eug46">
+		<description>Electron User Group #46 (5.25")</description>
+		<year>1999</year>
+		<publisher>E.U.G.</publisher>
+		<info name="format" value="DFS" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="409600">
+				<rom name="eug46-dfs_e.dsd" size="409600" crc="2b190bfd" sha1="e8953f005b63060e3956059ff541266b1e0a6de0" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="eug47">
-		<description>Electron User Group #47</description>
-		<year>19??</year>
+		<description>Electron User Group #47 (3.5")</description>
+		<year>2000</year>
 		<publisher>E.U.G.</publisher>
 		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
@@ -1440,9 +2026,21 @@
 		</part>
 	</software>
 
+	<software name="eug47d" cloneof="eug47">
+		<description>Electron User Group #47 (5.25")</description>
+		<year>2000</year>
+		<publisher>E.U.G.</publisher>
+		<info name="format" value="DFS" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="409600">
+				<rom name="eug47-dfs_e.dsd" size="409600" crc="8c82041e" sha1="f827e59d013b910469f0d6ab94fab62f99e38340" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="eug48">
-		<description>Electron User Group #48</description>
-		<year>19??</year>
+		<description>Electron User Group #48 (3.5")</description>
+		<year>2000</year>
 		<publisher>E.U.G.</publisher>
 		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
@@ -1452,9 +2050,21 @@
 		</part>
 	</software>
 
+	<software name="eug48d" cloneof="eug48">
+		<description>Electron User Group #48 (5.25")</description>
+		<year>2000</year>
+		<publisher>E.U.G.</publisher>
+		<info name="format" value="DFS" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="409600">
+				<rom name="eug48-dfs_e.dsd" size="409600" crc="30732de9" sha1="a34170f06da0f1ef3dc37bb939cb9c64857a0121" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="eug49">
-		<description>Electron User Group #49</description>
-		<year>19??</year>
+		<description>Electron User Group #49 (3.5")</description>
+		<year>2000</year>
 		<publisher>E.U.G.</publisher>
 		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
@@ -1464,9 +2074,21 @@
 		</part>
 	</software>
 
+	<software name="eug49d" cloneof="eug49">
+		<description>Electron User Group #49 (5.25")</description>
+		<year>2000</year>
+		<publisher>E.U.G.</publisher>
+		<info name="format" value="DFS" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="409600">
+				<rom name="eug49-dfs_e.dsd" size="409600" crc="fc48af08" sha1="9cc7f7168d25b8efda7205de336fd969643a0c30" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="eug50">
-		<description>Electron User Group #50</description>
-		<year>19??</year>
+		<description>Electron User Group #50 (3.5")</description>
+		<year>2000</year>
 		<publisher>E.U.G.</publisher>
 		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
@@ -1476,9 +2098,21 @@
 		</part>
 	</software>
 
+	<software name="eug50d" cloneof="eug50">
+		<description>Electron User Group #50 (5.25")</description>
+		<year>2000</year>
+		<publisher>E.U.G.</publisher>
+		<info name="format" value="DFS" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="409600">
+				<rom name="eug50-dfs_e.dsd" size="409600" crc="43a2281d" sha1="f8dafb77fdb70e94d8799618d50a0a72d5421a38" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="eug51">
-		<description>Electron User Group #51</description>
-		<year>19??</year>
+		<description>Electron User Group #51 (3.5")</description>
+		<year>2000</year>
 		<publisher>E.U.G.</publisher>
 		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
@@ -1488,9 +2122,21 @@
 		</part>
 	</software>
 
+	<software name="eug51d" cloneof="eug51">
+		<description>Electron User Group #51 (5.25")</description>
+		<year>2000</year>
+		<publisher>E.U.G.</publisher>
+		<info name="format" value="DFS" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="409600">
+				<rom name="eug51-dfs_e.dsd" size="409600" crc="f3f33ab2" sha1="054f3c08fd01a6c29782fbff4a567becb3f06735" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="eug52">
-		<description>Electron User Group #52</description>
-		<year>19??</year>
+		<description>Electron User Group #52 (3.5")</description>
+		<year>2000</year>
 		<publisher>E.U.G.</publisher>
 		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
@@ -1500,9 +2146,21 @@
 		</part>
 	</software>
 
+	<software name="eug52d" cloneof="eug52">
+		<description>Electron User Group #52 (5.25")</description>
+		<year>2000</year>
+		<publisher>E.U.G.</publisher>
+		<info name="format" value="DFS" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="409600">
+				<rom name="eug52-dfs_e.dsd" size="409600" crc="99b705e5" sha1="c024c30e605091f1401b5badf73da256fac7e001" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="eug53">
-		<description>Electron User Group #53</description>
-		<year>19??</year>
+		<description>Electron User Group #53 (3.5")</description>
+		<year>2000</year>
 		<publisher>E.U.G.</publisher>
 		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
@@ -1512,9 +2170,21 @@
 		</part>
 	</software>
 
+	<software name="eug53d" cloneof="eug53">
+		<description>Electron User Group #53 (5.25")</description>
+		<year>2000</year>
+		<publisher>E.U.G.</publisher>
+		<info name="format" value="DFS" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="409600">
+				<rom name="eug53-dfs_e.dsd" size="409600" crc="95edd7d6" sha1="c9dfd72506280741df7b64db51a657f66567ec8f" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="eug54">
-		<description>Electron User Group #54</description>
-		<year>19??</year>
+		<description>Electron User Group #54 (3.5")</description>
+		<year>2000</year>
 		<publisher>E.U.G.</publisher>
 		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
@@ -1524,9 +2194,21 @@
 		</part>
 	</software>
 
+	<software name="eug54d" cloneof="eug54">
+		<description>Electron User Group #54 (5.25")</description>
+		<year>2000</year>
+		<publisher>E.U.G.</publisher>
+		<info name="format" value="DFS" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="409600">
+				<rom name="eug54-dfs_e.dsd" size="409600" crc="a917561b" sha1="92d4c6cc85463ea524f35067c7d8b70dd0b1379d" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="eug55">
-		<description>Electron User Group #55</description>
-		<year>19??</year>
+		<description>Electron User Group #55 (3.5")</description>
+		<year>2000</year>
 		<publisher>E.U.G.</publisher>
 		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
@@ -1536,9 +2218,21 @@
 		</part>
 	</software>
 
+	<software name="eug55d" cloneof="eug55">
+		<description>Electron User Group #55 (5.25")</description>
+		<year>2000</year>
+		<publisher>E.U.G.</publisher>
+		<info name="format" value="DFS" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="409600">
+				<rom name="eug55-dfs_e.dsd" size="409600" crc="7ba2e7b2" sha1="38c78ddbf19b8cee1f5b563ffdd7b1abe6dcc0ef" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="eug56">
-		<description>Electron User Group #56</description>
-		<year>19??</year>
+		<description>Electron User Group #56 (3.5")</description>
+		<year>2001</year>
 		<publisher>E.U.G.</publisher>
 		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
@@ -1548,9 +2242,21 @@
 		</part>
 	</software>
 
+	<software name="eug56d" cloneof="eug56">
+		<description>Electron User Group #56 (5.25")</description>
+		<year>2001</year>
+		<publisher>E.U.G.</publisher>
+		<info name="format" value="DFS" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="409600">
+				<rom name="eug56-dfs_e.dsd" size="409600" crc="fd4375e1" sha1="82734e3db0acac2b74e53339a65cc582533d811b" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="eug57">
-		<description>Electron User Group #57</description>
-		<year>19??</year>
+		<description>Electron User Group #57 (3.5")</description>
+		<year>2001</year>
 		<publisher>E.U.G.</publisher>
 		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
@@ -1560,9 +2266,21 @@
 		</part>
 	</software>
 
+	<software name="eug57d" cloneof="eug57">
+		<description>Electron User Group #57 (5.25")</description>
+		<year>2001</year>
+		<publisher>E.U.G.</publisher>
+		<info name="format" value="DFS" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="409600">
+				<rom name="eug57-dfs_e.dsd" size="409600" crc="22bf0a8e" sha1="d8ac6baab4aefa640579af2b1906183fab208713" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="eug58">
-		<description>Electron User Group #58</description>
-		<year>19??</year>
+		<description>Electron User Group #58 (3.5")</description>
+		<year>2001</year>
 		<publisher>E.U.G.</publisher>
 		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
@@ -1572,9 +2290,21 @@
 		</part>
 	</software>
 
+	<software name="eug58d" cloneof="eug58">
+		<description>Electron User Group #58 (5.25")</description>
+		<year>2001</year>
+		<publisher>E.U.G.</publisher>
+		<info name="format" value="DFS" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="409600">
+				<rom name="eug58-dfs_e.dsd" size="409600" crc="328e56cc" sha1="2a6463d4508510fce7db7309fbf1dc67e516cef3" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="eug59">
-		<description>Electron User Group #59</description>
-		<year>19??</year>
+		<description>Electron User Group #59 (3.5")</description>
+		<year>2001</year>
 		<publisher>E.U.G.</publisher>
 		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
@@ -1584,9 +2314,21 @@
 		</part>
 	</software>
 
+	<software name="eug59d" cloneof="eug59">
+		<description>Electron User Group #59 (5.25")</description>
+		<year>2001</year>
+		<publisher>E.U.G.</publisher>
+		<info name="format" value="DFS" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="409600">
+				<rom name="eug59-dfs_e.dsd" size="409600" crc="451f108a" sha1="9d5cb9aaa9479341730325bdcf72df3e4d4ed70c" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="eug60">
-		<description>Electron User Group #60</description>
-		<year>20??</year>
+		<description>Electron User Group #60 (3.5")</description>
+		<year>2001</year>
 		<publisher>E.U.G.</publisher>
 		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
@@ -1596,9 +2338,21 @@
 		</part>
 	</software>
 
+	<software name="eug60d" cloneof="eug60">
+		<description>Electron User Group #60 (5.25")</description>
+		<year>2001</year>
+		<publisher>E.U.G.</publisher>
+		<info name="format" value="DFS" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="409600">
+				<rom name="eug60-dfs_e.dsd" size="409600" crc="6a8192f9" sha1="a33c1e641f76ec5e0ccc1387ef6fc78d8edfe318" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="eug61">
-		<description>Electron User Group #61</description>
-		<year>20??</year>
+		<description>Electron User Group #61 (3.5")</description>
+		<year>2001</year>
 		<publisher>E.U.G.</publisher>
 		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
@@ -1608,8 +2362,20 @@
 		</part>
 	</software>
 
+	<software name="eug61d" cloneof="eug61">
+		<description>Electron User Group #61 (5.25")</description>
+		<year>2001</year>
+		<publisher>E.U.G.</publisher>
+		<info name="format" value="DFS" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="409600">
+				<rom name="eug61-dfs_e.dsd" size="409600" crc="18055da5" sha1="1653fe39c39f31917e4f050d0f9f1b5e387cc230" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="eug62">
-		<description>Electron User Group #62</description>
+		<description>Electron User Group #62 (3.5")</description>
 		<year>2002</year>
 		<publisher>E.U.G.</publisher>
 		<info name="format" value="ADFS" />
@@ -1620,9 +2386,21 @@
 		</part>
 	</software>
 
+	<software name="eug62d" cloneof="eug62">
+		<description>Electron User Group #62 (5.25")</description>
+		<year>2002</year>
+		<publisher>E.U.G.</publisher>
+		<info name="format" value="DFS" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="409600">
+				<rom name="eug62-dfs_e.dsd" size="409600" crc="4b68c7c8" sha1="4ff011ecee9a039596e20e081d5d73c7e8893a48" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="eug63">
-		<description>Electron User Group #63</description>
-		<year>20??</year>
+		<description>Electron User Group #63 (3.5")</description>
+		<year>2003</year>
 		<publisher>E.U.G.</publisher>
 		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
@@ -1632,9 +2410,21 @@
 		</part>
 	</software>
 
+	<software name="eug63d" cloneof="eug63">
+		<description>Electron User Group #63 (5.25")</description>
+		<year>2003</year>
+		<publisher>E.U.G.</publisher>
+		<info name="format" value="DFS" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="409600">
+				<rom name="eug63-dfs_e.dsd" size="409600" crc="80ce6698" sha1="75b9fb586e800a8523288f81ee644f89d9279a8b" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="eug64">
-		<description>Electron User Group #64</description>
-		<year>20??</year>
+		<description>Electron User Group #64 (3.5")</description>
+		<year>2003</year>
 		<publisher>E.U.G.</publisher>
 		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
@@ -1644,9 +2434,21 @@
 		</part>
 	</software>
 
+	<software name="eug64d" cloneof="eug64">
+		<description>Electron User Group #64 (5.25")</description>
+		<year>2003</year>
+		<publisher>E.U.G.</publisher>
+		<info name="format" value="DFS" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="409600">
+				<rom name="eug64-dfs_e.dsd" size="409600" crc="2e7bb30d" sha1="a023e6d36f3382850481a5444db91e8e3869e4f6" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="eug65">
-		<description>Electron User Group #65</description>
-		<year>20??</year>
+		<description>Electron User Group #65 (3.5")</description>
+		<year>2004</year>
 		<publisher>E.U.G.</publisher>
 		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
@@ -1656,14 +2458,134 @@
 		</part>
 	</software>
 
+	<software name="eug65d" cloneof="eug65">
+		<description>Electron User Group #65 (5.25")</description>
+		<year>2004</year>
+		<publisher>E.U.G.</publisher>
+		<info name="format" value="DFS" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="409600">
+				<rom name="eug65-dfs_e.dsd" size="409600" crc="0566d2eb" sha1="2f201c7250bc38d4a2332ec54d5da4d9c0224d2b" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="eug66">
-		<description>Electron User Group #66</description>
-		<year>20??</year>
+		<description>Electron User Group #66 (3.5")</description>
+		<year>2006</year>
 		<publisher>E.U.G.</publisher>
 		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "327680">
 				<rom name="eug66-adfs_e.adf" size="327680" crc="c7ce4f99" sha1="35bedcbb14806525a4a37bb35c24ade254183f05" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="eug66d" cloneof="eug66">
+		<description>Electron User Group #66 (5.25")</description>
+		<year>2006</year>
+		<publisher>E.U.G.</publisher>
+		<info name="format" value="DFS" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="204800">
+				<rom name="eug66.ssd" size="204800" crc="1b1ac0fb" sha1="601eb49d40bc9a121395d97ec7754e6366a33aeb" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="eug67d">
+		<description>Electron User Group #67 (5.25")</description>
+		<year>2007</year>
+		<publisher>E.U.G.</publisher>
+		<info name="format" value="DFS" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="196096">
+				<rom name="eug67.ssd" size="196096" crc="f64462dd" sha1="fec1db419d9cb285db1a4dddf1c74e2e09f8feee" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="eug68d">
+		<description>Electron User Group #68 (5.25")</description>
+		<year>2008</year>
+		<publisher>E.U.G.</publisher>
+		<info name="format" value="DFS" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="391168">
+				<rom name="eug68-dfs_e.dsd" size="391168" crc="e94924cc" sha1="abdb0adfe21fad6624b5262f08626efd5d11784d" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="eug69d">
+		<description>Electron User Group #69 (5.25")</description>
+		<year>2009</year>
+		<publisher>E.U.G.</publisher>
+		<info name="format" value="DFS" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="150784">
+				<rom name="eug69.ssd" size="150784" crc="a668d88c" sha1="ca65e4904723cbb1c51f983c1ca34e6605eea71d" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="eug70d">
+		<description>Electron User Group #70 (5.25")</description>
+		<year>2010</year>
+		<publisher>E.U.G.</publisher>
+		<info name="format" value="DFS" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="381440">
+				<rom name="eug70-dfs_e.dsd" size="381440" crc="71d66fb6" sha1="2fc1b2dc931965faa3bbf56d780413416fa49d65" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="eug71d">
+		<description>Electron User Group #71 (5.25")</description>
+		<year>2010</year>
+		<publisher>E.U.G.</publisher>
+		<info name="format" value="DFS" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="340480">
+				<rom name="eug71-dfs_e.dsd" size="340480" crc="bf695652" sha1="4cb391b48ec7e5e175884dcfc5d46c5bec02818e" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="eug72d">
+		<description>Electron User Group #72 (5.25")</description>
+		<year>2010</year>
+		<publisher>E.U.G.</publisher>
+		<info name="format" value="DFS" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="359168">
+				<rom name="eug72-dfs_e.dsd" size="359168" crc="b2c18e91" sha1="7868e7519ea40679d5f7627dd90e16a1a6dd993a" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="eug73d">
+		<description>Electron User Group #73 (5.25")</description>
+		<year>2010</year>
+		<publisher>E.U.G.</publisher>
+		<info name="format" value="DFS" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="228608">
+				<rom name="eug73-dfs_e.dsd" size="228608" crc="29fe1b9a" sha1="809375a086f7ca687a67c90c387480e459194c14" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="eug74d">
+		<description>Electron User Group #74 (5.25")</description>
+		<year>2012</year>
+		<publisher>E.U.G.</publisher>
+		<info name="format" value="DFS" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="406528">
+				<rom name="eug74-dfs_e.dsd" size="406528" crc="b2d40da7" sha1="8d84aacc8e512a4d75163d62218cb2ad80880286" offset="0"/>
 			</dataarea>
 		</part>
 	</software>

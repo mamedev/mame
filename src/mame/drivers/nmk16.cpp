@@ -1053,6 +1053,12 @@ static ADDRESS_MAP_START( macross2_map, AS_PROGRAM, 16, nmk16_state )
 	AM_RANGE(0x1f0000, 0x1fffff) AM_RAM AM_SHARE("mainram")
 ADDRESS_MAP_END
 
+static ADDRESS_MAP_START( tdragon3h_map, AS_PROGRAM, 16, nmk16_state ) // bootleg has these 2 swapped
+	AM_RANGE(0x10000e, 0x10000f) AM_READ_PORT("DSW2")
+	AM_RANGE(0x10000a, 0x10000b) AM_DEVREAD8("soundlatch2", generic_latch_8_device, read, 0x00ff)    /* from Z80 */
+	AM_IMPORT_FROM(macross2_map)
+ADDRESS_MAP_END
+
 static ADDRESS_MAP_START( raphero_map, AS_PROGRAM, 16, nmk16_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x100000, 0x100001) AM_READ_PORT("IN0")
@@ -4552,6 +4558,12 @@ static MACHINE_CONFIG_START( tdragon2 )
 	MCFG_NMK112_ROM1("oki2")
 MACHINE_CONFIG_END
 
+static MACHINE_CONFIG_DERIVED( tdragon3h, tdragon2 )
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(tdragon3h_map)
+MACHINE_CONFIG_END
+
+
 static MACHINE_CONFIG_START( raphero )
 
 	/* basic machine hardware */
@@ -6438,6 +6450,37 @@ ROM_START( tdragon2 )
 	ROM_LOAD( "10.bpr", 0x0100, 0x0100, CRC(e6ead349) SHA1(6d81b1c0233580aa48f9718bade42d640e5ef3dd) )  /* unknown */
 ROM_END
 
+ROM_START( tdragon3h )
+	ROM_REGION( 0x80000, "maincpu", 0 )     /* 68000 code */
+	ROM_LOAD16_BYTE( "H.27C2001",      0x00000, 0x40000, CRC(0091f4a3) SHA1(025e5f7ff12eaa90c5cfe757c71d58ba7040cba7) )
+	ROM_LOAD16_BYTE( "L.27C020",       0x00001, 0x40000, CRC(4699c313) SHA1(1851a4b5ad9c2bac230126d195e239a5ebe827f9) )
+
+	ROM_REGION( 0x20000, "audiocpu", 0 )        /* Z80 code */
+	ROM_LOAD( "1.27C1000",    0x00000, 0x20000, CRC(b870be61) SHA1(ea5d45c3a3ab805e55806967f00167cf6366212e) ) /* banked */
+
+	ROM_REGION( 0x020000, "fgtile", 0 )
+	ROM_LOAD( "12.27C1000",    0x000000, 0x020000, CRC(f809d616) SHA1(c6a4d776fee770ec197204b855b85bcc719469a5) )    /* 8x8 tiles */
+
+	// all other roms are MASK parts marked 'CONNY' but weren't dumped from this PCB so content is only assumed to be the same
+
+	ROM_REGION( 0x200000, "bgtile", 0 )
+	ROM_LOAD( "ww930914.2", 0x000000, 0x200000, CRC(f968c65d) SHA1(fd6d21bba53f945b1597d7d0735bc62dd44d5498) )  /* 16x16 tiles */
+
+	ROM_REGION( 0x400000, "sprites", 0 )
+	ROM_LOAD16_WORD_SWAP( "ww930917.7", 0x000000, 0x200000, CRC(b98873cb) SHA1(cc19200865176e940ff68e12de81f029b51c2084) )  /* Sprites */
+	ROM_LOAD16_WORD_SWAP( "ww930918.8", 0x200000, 0x200000, CRC(baee84b2) SHA1(b325b00e6147266dbdc840e03556004531dc2038) )
+
+	ROM_REGION( 0x240000, "oki1", 0 )   /* OKIM6295 samples */
+	ROM_LOAD( "ww930916.4", 0x040000, 0x200000, CRC(07c35fe6) SHA1(33547bd88764704310f2ef8cf3bfe21ceb56d5b7) )  /* all banked */
+
+	ROM_REGION( 0x240000, "oki2", 0 )   /* OKIM6295 samples */
+	ROM_LOAD( "ww930915.3", 0x040000, 0x200000, CRC(82025bab) SHA1(ac6053700326ea730d00ec08193e2c8a2a019f0b) )  /* all banked */
+
+	ROM_REGION( 0x0200, "proms", 0 )
+	ROM_LOAD( "9.bpr",  0x0000, 0x0100, CRC(435653a2) SHA1(575b4a46ea65179de3042614da438d2f6d8b572e) )  /* unknown */
+	ROM_LOAD( "10.bpr", 0x0100, 0x0100, CRC(e6ead349) SHA1(6d81b1c0233580aa48f9718bade42d640e5ef3dd) )  /* unknown */
+ROM_END
+
 ROM_START( tdragon2a )
 	ROM_REGION( 0x80000, "maincpu", 0 )     /* 68000 code */
 	ROM_LOAD16_WORD_SWAP( "6.bin",      0x00000, 0x80000, CRC(310d6bca) SHA1(f46ad1d13cf5014aef1f0e8862b369ab31c22866) )
@@ -8006,6 +8049,7 @@ GAME( 1993, macross2k,  macross2, macross2,     macross2,     nmk16_state,  bank
 GAME( 1993, tdragon2,   0,        tdragon2,     tdragon2,     nmk16_state,  banked_audiocpu, ROT270, "NMK",                          "Thunder Dragon 2 (9th Nov. 1993)", MACHINE_NO_COCKTAIL )
 GAME( 1993, tdragon2a,  tdragon2, tdragon2,     tdragon2,     nmk16_state,  banked_audiocpu, ROT270, "NMK",                          "Thunder Dragon 2 (1st Oct. 1993)", MACHINE_NO_COCKTAIL )
 GAME( 1993, bigbang,    tdragon2, tdragon2,     tdragon2,     nmk16_state,  banked_audiocpu, ROT270, "NMK",                          "Big Bang (9th Nov. 1993)", MACHINE_NO_COCKTAIL )
+GAME( 1996, tdragon3h,  tdragon2, tdragon3h,    tdragon2,     nmk16_state,  banked_audiocpu, ROT270, "bootleg (Conny Co Ltd.)",      "Thunder Dragon 3 (bootleg of Thunder Dragon 2)", MACHINE_NO_COCKTAIL ) // based on 1st Oct. 1993 set
 
 /* arcadia was a name conflict to the Emerson Arcadia 2001 in mess */
 GAME( 1994, arcadian,   0,        raphero,      raphero,      nmk16_state,  banked_audiocpu, ROT270, "NMK",                          "Arcadia (NMK)", 0 ) // 23rd July 1993 in test mode, (c)1994 on title screen

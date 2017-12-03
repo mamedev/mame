@@ -21,9 +21,10 @@
 
 #include "emu.h"
 #include "includes/toobin.h"
+
 #include "cpu/m68000/m68000.h"
+#include "machine/eeprompar.h"
 #include "machine/watchdog.h"
-#include "machine/atarigen.h"
 #include "speaker.h"
 
 #define MASTER_CLOCK        XTAL_32MHz
@@ -95,13 +96,13 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, toobin_state )
 	AM_RANGE(0x828380, 0x828381) AM_MIRROR(0x45003e) AM_RAM_WRITE(slip_w) AM_SHARE("mob:slip")
 	AM_RANGE(0x8283c0, 0x8283c1) AM_MIRROR(0x45003e) AM_WRITE(scanline_int_ack_w)
 	AM_RANGE(0x828400, 0x828401) AM_MIRROR(0x4500fe) AM_DEVWRITE("jsa", atari_jsa_i_device, sound_reset_w)
-	AM_RANGE(0x828500, 0x828501) AM_MIRROR(0x4500fe) AM_DEVWRITE("eeprom", atari_eeprom_device, unlock_write)
+	AM_RANGE(0x828500, 0x828501) AM_MIRROR(0x4500fe) AM_DEVWRITE("eeprom", eeprom_parallel_28xx_device, unlock_write)
 	AM_RANGE(0x828600, 0x828601) AM_MIRROR(0x4500fe) AM_WRITE(xscroll_w) AM_SHARE("xscroll")
 	AM_RANGE(0x828700, 0x828701) AM_MIRROR(0x4500fe) AM_WRITE(yscroll_w) AM_SHARE("yscroll")
 	AM_RANGE(0x828800, 0x828801) AM_MIRROR(0x4507fe) AM_READ_PORT("FF8800")
 	AM_RANGE(0x829000, 0x829001) AM_MIRROR(0x4507fe) AM_READ_PORT("FF9000")
 	AM_RANGE(0x829800, 0x829801) AM_MIRROR(0x4507fe) AM_DEVREAD8("jsa", atari_jsa_i_device, main_response_r, 0x00ff)
-	AM_RANGE(0x82a000, 0x82afff) AM_MIRROR(0x451000) AM_DEVREADWRITE8("eeprom", atari_eeprom_device, read, write, 0x00ff)
+	AM_RANGE(0x82a000, 0x82afff) AM_MIRROR(0x451000) AM_DEVREADWRITE8("eeprom", eeprom_parallel_28xx_device, read, write, 0x00ff)
 	AM_RANGE(0x82c000, 0x82ffff) AM_MIRROR(0x450000) AM_RAM
 ADDRESS_MAP_END
 
@@ -203,7 +204,8 @@ static MACHINE_CONFIG_START( toobin )
 
 	MCFG_MACHINE_RESET_OVERRIDE(toobin_state,toobin)
 
-	MCFG_ATARI_EEPROM_2804_ADD("eeprom")
+	MCFG_EEPROM_2804_ADD("eeprom")
+	MCFG_EEPROM_28XX_LOCK_AFTER_WRITE(true)
 
 	MCFG_WATCHDOG_ADD("watchdog")
 	MCFG_WATCHDOG_VBLANK_INIT("screen", 8)

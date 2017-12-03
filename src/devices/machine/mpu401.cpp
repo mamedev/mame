@@ -72,7 +72,7 @@ ADDRESS_MAP_END
 
 ROM_START( mpu401 )
 	ROM_REGION(0x1000, ROM_TAG, 0)
-	ROM_LOAD( "roland_6801v0b55p.bin", 0x000000, 0x001000, CRC(65d3a151) SHA1(00efbfb96aeb997b69bb16981c6751d3c784bb87) )
+	ROM_LOAD( "roland__6801v0b55p__15179222.bin", 0x000000, 0x001000, CRC(65d3a151) SHA1(00efbfb96aeb997b69bb16981c6751d3c784bb87) ) /* Mask MCU; Label: "Roland // 6801V0B55P // 5A1 JAPAN // 15179222"; This is the final version (1.5A) of the mpu401 firmware; version is located at offsets 0x649 (0x15) and 0x64f (0x01) */
 ROM_END
 
 //**************************************************************************

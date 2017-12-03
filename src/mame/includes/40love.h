@@ -4,6 +4,8 @@
 #include "machine/taito68705interface.h"
 #include "machine/gen_latch.h"
 #include "sound/msm5232.h"
+#include "sound/ay8910.h"
+#include "sound/ta7630.h"
 
 class fortyl_state : public driver_device
 {
@@ -20,6 +22,8 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_bmcu(*this, "bmcu"),
 		m_msm(*this, "msm"),
+		m_ay(*this,"aysnd"),
+		m_ta7630(*this,"ta7630"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
 		m_soundlatch(*this, "soundlatch") { }
@@ -68,6 +72,8 @@ public:
 	required_device<cpu_device> m_maincpu;
 	optional_device<taito68705_mcu_device> m_bmcu;
 	required_device<msm5232_device> m_msm;
+	required_device<ay8910_device> m_ay;
+	required_device<ta7630_device> m_ta7630;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	required_device<generic_latch_8_device> m_soundlatch;
@@ -102,7 +108,6 @@ public:
 	DECLARE_MACHINE_START(40love);
 	DECLARE_MACHINE_RESET(40love);
 	DECLARE_MACHINE_RESET(common);
-	DECLARE_MACHINE_RESET(ta7630);
 	uint32_t screen_update_fortyl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void redraw_pixels();
 	void fortyl_set_scroll_x( int offset );

@@ -1407,6 +1407,7 @@ Note:
 #include "cpu/arm7/arm7.h"
 #include "cpu/arm7/arm7core.h"
 #include "machine/pxa255.h"
+#include "machine/timer.h"
 #include "screen.h"
 #include "speaker.h"
 

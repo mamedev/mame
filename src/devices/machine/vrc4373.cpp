@@ -92,7 +92,7 @@ ADDRESS_MAP_END
 
 vrc4373_device::vrc4373_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: pci_host_device(mconfig, VRC4373, tag, owner, clock),
-		m_cpu_space(nullptr), m_cpu(nullptr), cpu_tag(nullptr), m_irq_num(-1), m_ram_size(0x0), m_simm0_size(0x0),
+		m_cpu_space(nullptr), m_irq_cb(*this), m_cpu(nullptr), cpu_tag(nullptr), m_ram_size(0x0), m_simm0_size(0x0),
 		m_mem_config("memory_space", ENDIANNESS_LITTLE, 32, 32),
 		m_io_config("io_space", ENDIANNESS_LITTLE, 32, 32), m_pci1_laddr(0), m_pci2_laddr(0), m_pci_io_laddr(0), m_target1_laddr(0), m_target2_laddr(0),
 		m_romRegion(*this, "rom")
@@ -114,6 +114,7 @@ void vrc4373_device::device_start()
 	m_cpu_space = &m_cpu->space(AS_PCI_CONFIG);
 	memory_space = &space(AS_PCI_MEM);
 	io_space = &space(AS_PCI_IO);
+	is_multifunction_device = false;
 
 	memset(m_cpu_regs, 0, sizeof(m_cpu_regs));
 
@@ -124,6 +125,9 @@ void vrc4373_device::device_start()
 	io_window_end   = 0xffffffff;
 	io_offset       = 0x00000000;
 	status = 0x0280;
+
+	m_irq_cb.resolve();
+
 	// Reserve 8M for ram
 	m_ram.reserve(0x00800000 / 4);
 	m_ram.resize(m_ram_size);
@@ -414,8 +418,8 @@ TIMER_CALLBACK_MEMBER (vrc4373_device::dma_transfer)
 		m_cpu_regs[NREG_DMACR1 + which * 0xc] &= ~DMA_GO;
 		// Set the interrupt
 		if (m_cpu_regs[NREG_DMACR1 + which * 0xc] & DMA_INT_EN) {
-			if (m_irq_num != -1) {
-				m_cpu->set_input_line(m_irq_num, ASSERT_LINE);
+			if (!m_irq_cb.isnull()) {
+				m_irq_cb(ASSERT_LINE);
 			} else {
 				logerror("vrc4373_device::dma_transfer Error: DMA configured to trigger interrupt but no interrupt line configured\n");
 			}
@@ -435,6 +439,10 @@ READ32_MEMBER (vrc4373_device::cpu_if_r)
 			break;
 		case NREG_PCICDR:
 			result = config_data_r(space, offset);
+			break;
+		case NREG_ICSR:
+			// Top 16 bits always read as zero
+			result &= 0xffff;
 			break;
 		default:
 			break;
@@ -512,6 +520,13 @@ WRITE32_MEMBER(vrc4373_device::cpu_if_w)
 				m_dma_timer->set_param(which);
 				m_dma_timer->adjust(attotime::zero, 0, DMA_TIMER_PERIOD);
 				LOGNILE("%08X:nile Start DMA Lane %i PCI: %08X MEM: %08X Words: %X\n", m_cpu->space(AS_PCI_CONFIG).device().safe_pc(), which, m_cpu_regs[NREG_DMA_CPAR], m_cpu_regs[NREG_DMA_CMAR], m_cpu_regs[NREG_DMA_REM]);
+			}
+			break;
+		case NREG_ICSR:
+			// TODO: Check and clear individual interrupts
+			if (data & 0xff000000) {
+				if (!m_irq_cb.isnull())
+					m_irq_cb(CLEAR_LINE);
 			}
 			break;
 		case NREG_BMCR:

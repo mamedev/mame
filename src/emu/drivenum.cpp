@@ -308,7 +308,7 @@ void driver_enumerator::find_approximate_matches(const char *string, std::size_t
 		for (int index = 0; index < s_driver_count; index++)
 		{
 			// skip things that can't run
-			if (m_included[index] &&  !(s_drivers_sorted[index]->flags & MACHINE_NO_STANDALONE))
+			if (m_included[index])
 			{
 				// pick the best match between driver name and description
 				int curpenalty = penalty_compare(string, s_drivers_sorted[index]->type.fullname());

@@ -75,7 +75,7 @@ protected:
 
 	// device_execute_interface overrides
 	virtual uint32_t execute_min_cycles() const override { return 6; }
-	virtual uint32_t execute_max_cycles() const override { return 20; }
+	virtual uint32_t execute_max_cycles() const override { return 27; }
 	virtual uint32_t execute_input_lines() const override { return 4; }
 	virtual uint64_t execute_clocks_to_cycles(uint64_t clocks) const override { return (clocks + 2 - 1) / 2; }
 	virtual uint64_t execute_cycles_to_clocks(uint64_t cycles) const override { return (cycles * 2); }
@@ -91,9 +91,7 @@ protected:
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
 	// device_disasm_interface overrides
-	virtual uint32_t disasm_min_opcode_bytes() const override { return 1; }
-	virtual uint32_t disasm_max_opcode_bytes() const override { return 3; }
-	virtual offs_t disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
+	virtual util::disasm_interface *create_disassembler() override;
 
 	DECLARE_ADDRESS_MAP(program_2kb, 8);
 	DECLARE_ADDRESS_MAP(program_4kb, 8);
@@ -103,7 +101,7 @@ private:
 	address_space_config m_data_config;
 
 	address_space *m_program;
-	direct_read_data *m_direct;
+	direct_read_data<0> *m_direct;
 	address_space *m_data;
 
 	// callbacks
@@ -114,6 +112,7 @@ private:
 
 	/* registers */
 	uint16_t m_pc;              /* program counter */
+	uint16_t m_ppc;             /* program counter at last opcode fetch */
 	uint8_t m_r[256];           /* register file */
 	uint8_t m_input[4];         /* port input latches */
 	uint8_t m_output[4];        /* port output latches */
@@ -125,7 +124,8 @@ private:
 	uint8_t m_fake_r[16];       /* fake working registers */
 
 	/* interrupts */
-	int m_irq[6];             /* interrupts */
+	int m_irq_line[4];          /* IRQ line state */
+	bool m_irq_taken;
 
 	/* execution logic */
 	int m_icount;             /* instruction counter */
@@ -137,7 +137,13 @@ private:
 	TIMER_CALLBACK_MEMBER( t0_tick );
 	TIMER_CALLBACK_MEMBER( t1_tick );
 
+	void take_interrupt(int irq);
+	void process_interrupts();
+
+	inline uint16_t mask_external_address(uint16_t addr);
 	inline uint8_t fetch();
+	inline uint8_t fetch_opcode();
+	inline uint16_t fetch_word();
 	inline uint8_t register_read(uint8_t offset);
 	inline uint16_t register_pair_read(uint8_t offset);
 	inline void register_write(uint8_t offset, uint8_t data);
@@ -152,10 +158,10 @@ private:
 	inline void set_flag(uint8_t flag, int state);
 	inline void clear(uint8_t dst);
 	inline void load(uint8_t dst, uint8_t src);
-	inline void load_from_memory(address_space *space);
-	inline void load_to_memory(address_space *space);
-	inline void load_from_memory_autoinc(address_space *space);
-	inline void load_to_memory_autoinc(address_space *space);
+	inline void load_from_memory(address_space &space);
+	inline void load_to_memory(address_space &space);
+	inline void load_from_memory_autoinc(address_space &space);
+	inline void load_to_memory_autoinc(address_space &space);
 	inline void pop(uint8_t dst);
 	inline void push(uint8_t src);
 	inline void add_carry(uint8_t dst, int8_t src);

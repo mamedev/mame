@@ -121,11 +121,9 @@ static ADDRESS_MAP_START( ob68k1a_mem, AS_PROGRAM, 16, ob68k1a_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000000, 0x01ffff) AM_RAM
 	AM_RANGE(0xfe0000, 0xfeffff) AM_ROM AM_REGION(MC68000L10_TAG, 0)
-	AM_RANGE(0xffff00, 0xffff01) AM_DEVREADWRITE8(MC6850_0_TAG, acia6850_device, status_r, control_w, 0x00ff)
-	AM_RANGE(0xffff02, 0xffff03) AM_DEVREADWRITE8(MC6850_0_TAG, acia6850_device, data_r, data_w, 0x00ff)
+	AM_RANGE(0xffff00, 0xffff03) AM_DEVREADWRITE8(MC6850_0_TAG, acia6850_device, read, write, 0x00ff)
 	AM_RANGE(0xffff10, 0xffff11) AM_WRITE8(com8116_w, 0xff00)
-	AM_RANGE(0xffff20, 0xffff21) AM_DEVREADWRITE8(MC6850_1_TAG, acia6850_device, status_r, control_w, 0x00ff)
-	AM_RANGE(0xffff22, 0xffff23) AM_DEVREADWRITE8(MC6850_1_TAG, acia6850_device, data_r, data_w, 0x00ff)
+	AM_RANGE(0xffff20, 0xffff23) AM_DEVREADWRITE8(MC6850_1_TAG, acia6850_device, read, write, 0x00ff)
 //  AM_RANGE(0xffff40, 0xffff47) AM_DEVREADWRITE8(MC6821_0_TAG, pia6821_device, read, write, 0x00ff)
 //  AM_RANGE(0xffff40, 0xffff47) AM_DEVREADWRITE8(MC6821_1_TAG, pia6821_device, read, write, 0xff00)
 	AM_RANGE(0xffff40, 0xffff47) AM_READWRITE8(pia_r, pia_w, 0xffff)
@@ -144,29 +142,6 @@ ADDRESS_MAP_END
 
 INPUT_PORTS_START( ob68k1a )
 INPUT_PORTS_END
-
-
-
-//**************************************************************************
-//  DEVICE CONFIGURATION
-//**************************************************************************
-
-
-//-------------------------------------------------
-//  COM8116_INTERFACE( dbrg_intf )
-//-------------------------------------------------
-
-WRITE_LINE_MEMBER( ob68k1a_state::rx_tx_0_w )
-{
-	m_acia0->write_txc(state);
-	m_acia0->write_rxc(state);
-}
-
-WRITE_LINE_MEMBER( ob68k1a_state::rx_tx_1_w )
-{
-	m_acia1->write_txc(state);
-	m_acia1->write_rxc(state);
-}
 
 
 
@@ -247,8 +222,10 @@ static MACHINE_CONFIG_START( ob68k1a )
 	MCFG_RS232_CTS_HANDLER(DEVWRITELINE(MC6850_1_TAG, acia6850_device, write_cts))
 
 	MCFG_DEVICE_ADD(COM8116_TAG, COM8116, XTAL_5_0688MHz)
-	MCFG_COM8116_FR_HANDLER(WRITELINE(ob68k1a_state, rx_tx_0_w))
-	MCFG_COM8116_FT_HANDLER(WRITELINE(ob68k1a_state, rx_tx_1_w))
+	MCFG_COM8116_FR_HANDLER(DEVWRITELINE(MC6850_0_TAG, acia6850_device, write_txc))
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE(MC6850_0_TAG, acia6850_device, write_rxc))
+	MCFG_COM8116_FT_HANDLER(DEVWRITELINE(MC6850_1_TAG, acia6850_device, write_txc))
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE(MC6850_1_TAG, acia6850_device, write_rxc))
 
 	// internal ram
 	MCFG_RAM_ADD(RAM_TAG)

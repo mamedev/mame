@@ -24,6 +24,17 @@
         Note that a dipswitch setting allows score to be displayed
         onscreen, but there's no equivalent for tachometer.
 
+    -   TODO: the two sound callbacks could, under unusual circumstances,
+        conflict with one another, causing the newly written value to have
+        its bit 7 cleared before the sound cpu reads it.
+        The proper way to handle this is to use a single callback which
+        processes a timestamped event queue.
+
+    -   TODO: merge the sound system with taitosj.cpp, as the sound system
+        is almost completely identical. Also import the taitosj.cpp dac/volume
+        system, as the system used in audio/grchamp.cpp for dac output is
+        incorrect.
+
     Notes:
 
     -   The object of the game is to avoid the opposing cars.
@@ -40,6 +51,8 @@
         Player's numerical rank all through the race.
 
     -   The Speech Feature enhances the game play.
+
+    -   Schematics: https://ia800501.us.archive.org/16/items/ArcadeGameManualGrandchampion/grandchampion.pdf
 
 ***************************************************************************/
 
@@ -82,6 +95,8 @@
 
 void grchamp_state::machine_start()
 {
+	m_soundlatch_data = 0x00;
+	m_soundlatch_flag = false;
 	save_item(NAME(m_cpu0_out));
 	save_item(NAME(m_cpu1_out));
 	save_item(NAME(m_comm_latch));
@@ -95,6 +110,7 @@ void grchamp_state::machine_start()
 
 	void grchamp_state::machine_reset()
 {
+	m_soundnmi->in_w<0>(0); // disable sound nmi
 	/* if the coin system is 1 way, lock Coin B (Page 40) */
 	machine().bookkeeping().coin_lockout_w(1, (ioport("DSWB")->read() & 0x10) ? 1 : 0);
 }
@@ -202,8 +218,7 @@ WRITE8_MEMBER(grchamp_state::cpu0_outputs_w)
 
 		case 0x0e:  /* OUT14 */
 			/* O-21 connector */
-			m_soundlatch->write(space, 0, data);
-			m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+			machine().scheduler().synchronize(timer_expired_delegate(FUNC(grchamp_state::soundlatch_w_cb), this), data); // soundlatch write, needs to synchronize
 			break;
 	}
 }
@@ -423,6 +438,44 @@ READ8_MEMBER(grchamp_state::main_to_sub_comm_r)
  *  Sound port handlers
  *
  *************************************/
+TIMER_CALLBACK_MEMBER(grchamp_state::soundlatch_w_cb)
+{
+	if (m_soundlatch_flag && (m_soundlatch_data != param))
+		logerror("Warning: soundlatch written before being read. Previous: %02x, new: %02x\n", m_soundlatch_data, param);
+	m_soundlatch_data = param;
+	m_soundlatch_flag = true;
+	m_soundnmi->in_w<1>(1);
+}
+
+TIMER_CALLBACK_MEMBER(grchamp_state::soundlatch_clear7_w_cb)
+{
+	if (m_soundlatch_flag)
+		logerror("Warning: soundlatch bit 7 cleared before being read. Previous: %02x, new: %02x\n", m_soundlatch_data, m_soundlatch_data&0x7f);
+	m_soundlatch_data &= 0x7F;
+}
+
+// RD5000
+READ8_MEMBER(grchamp_state::soundlatch_r)
+{
+	if (!machine().side_effect_disabled())
+	{
+		m_soundlatch_flag = false;
+		m_soundnmi->in_w<1>(0);
+	}
+	return m_soundlatch_data;
+}
+
+// WR5000
+WRITE8_MEMBER(grchamp_state::soundlatch_clear7_w)
+{
+	machine().scheduler().synchronize(timer_expired_delegate(FUNC(grchamp_state::soundlatch_clear7_w_cb), this), data);
+}
+
+// RD5001
+READ8_MEMBER(grchamp_state::soundlatch_flags_r)
+{
+	return (m_soundlatch_flag?8:0) /*| (m_sound_semaphore2?4:0)*/ | 3;
+}
 
 WRITE8_MEMBER(grchamp_state::portA_0_w)
 {
@@ -436,12 +489,13 @@ WRITE8_MEMBER(grchamp_state::portB_0_w)
 
 WRITE8_MEMBER(grchamp_state::portA_2_w)
 {
-	/* A0/A1 modify the output of AY8910 #2 */
-	/* A7 contributes to the discrete logic hanging off of AY8910 #0 */
+	/* A0/A1 modify the output of AY8910 #2 with filter capacitors */
+	/* A7 contributes to the volume control for the discrete logic dac hanging off of AY8910 #0's i/o ports */
 }
 WRITE8_MEMBER(grchamp_state::portB_2_w)
 {
-	/* B0 connects elsewhere */
+	/* B0 is the sound nmi enable, active low */
+	m_soundnmi->in_w<0>((~data)&1);
 }
 
 
@@ -535,9 +589,39 @@ static ADDRESS_MAP_START( sub_portmap, AS_IO, 8, grchamp_state )
 ADDRESS_MAP_END
 
 
-/* complete memory map derived from schematics */
+/* complete memory map derived from schematics;
+   the grchamp sound system is almost identical to taitosj.cpp sound system
+*/
+/* Sound cpu address map ( * = used within this section; x = don't care )
+           |           |           |
+15 14 13 12 11 10  9  8  7  6  5  4  3  2  1  0
+ 0  *  *  *                                       R  74LS138 @ 10B
+ 0  0  0  0  *  *  *  *  *  *  *  *  *  *  *  *   R  ROM (7B)
+ 0  0  0  1  *  *  *  *  *  *  *  *  *  *  *  *   R  ROM (6B)
+(0  0  1  0  *  *  *  *  *  *  *  *  *  *  *  *   R  ROM (5B), not populated, OPEN BUS)
+(0  0  1  1  *  *  *  *  *  *  *  *  *  *  *  *   R  ROM (4B), not populated, OPEN BUS)
+(0  1  *  *  x  x  x  x  x  x  x  x  x  x  x  x   R is also decoded by the 74LS138 @ 10B, but those four outputs are not connected anywhere and that region is occupied below)
+ 0  1  *  *  *                                    RW 74LS138 @ 9C
+ 0  1  0  0  0  0  *  *  *  *  *  *  *  *  *  *   RW SRAMs (2x 2114 @ 5C, 4C)
+ 0  1  0  0  0  1  x  x  x  x  x  x  x  x  x  x   OPEN BUS
+ 0  1  0  0  1                                    RW /CS5 (AY chips, this area has a 2 clock waitstate penalty on any access)
+ 0  1  0  0  1  x  x  x  x  x  x  x  x  0  0  0   W  Address AY @ 3B (with dac/volume connected to ioa/iob)
+ 0  1  0  0  1  x  x  x  x  x  x  x  x  0  0  1   RW  Data AY @ 3B (with dac/volume connected to ioa/iob)
+ 0  1  0  0  1  x  x  x  x  x  x  x  x  0  1  0   W  Address AY @ 2B
+ 0  1  0  0  1  x  x  x  x  x  x  x  x  0  1  1   RW  Data AY @ 2B
+ 0  1  0  0  1  x  x  x  x  x  x  x  x  1  x  0   W  Address AY @ 1B (with filter caps on ioa1,ioa0, nmi enable on iob0, dac attenuate on ioa7)
+ 0  1  0  0  1  x  x  x  x  x  x  x  x  1  x  1   RW  Data AY @ 1B (with filter caps on ioa1,ioa0, nmi enable on iob0, dac attenuate on ioa7)
+ 0  1  0  1  0                                    RW /CS6 (soundlatch/semaphores/nmi state)
+ 0  1  0  1  0  x  x  x  x  x  x  x  x  x  *  *   RW  74155 @ 6D
+ 0  1  0  1  0  x  x  x  x  x  x  x  x  x  0  0   R   Read soundlatch, and clear main->sound semaphore
+ 0  1  0  1  0  x  x  x  x  x  x  x  x  x  0  0   W   Clear bit 7 in soundlatch
+ 0  1  0  1  0  x  x  x  x  x  x  x  x  x  0  1   R   Read main->sound semaphore state in bit 3, bit 2 is 0, bits 1 and 0 are both 1, remaining bits are open bus
+ 0  1  0  1  0  x  x  x  x  x  x  x  x  x  0  1   W   OPEN BUS
+ 0  1  0  1  0  x  x  x  x  x  x  x  x  x  1  x   RW  OPEN BUS
+*/
 static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, grchamp_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
+	// 2000-3fff are empty rom sockets
 	AM_RANGE(0x4000, 0x43ff) AM_RAM
 	AM_RANGE(0x4800, 0x4801) AM_MIRROR(0x07f8) AM_DEVWRITE("ay1", ay8910_device, address_data_w)
 	AM_RANGE(0x4801, 0x4801) AM_MIRROR(0x07f8) AM_DEVREAD("ay1", ay8910_device, data_r)
@@ -545,7 +629,8 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, grchamp_state )
 	AM_RANGE(0x4803, 0x4803) AM_MIRROR(0x07f8) AM_DEVREAD("ay2", ay8910_device, data_r)
 	AM_RANGE(0x4804, 0x4805) AM_MIRROR(0x07fa) AM_DEVWRITE("ay3", ay8910_device, address_data_w)
 	AM_RANGE(0x4805, 0x4805) AM_MIRROR(0x07fa) AM_DEVREAD("ay3", ay8910_device, data_r)
-	AM_RANGE(0x5000, 0x5000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
+	AM_RANGE(0x5000, 0x5000) AM_MIRROR(0x07fc) AM_READ(soundlatch_r) AM_WRITE(soundlatch_clear7_w)
+	AM_RANGE(0x5001, 0x5001) AM_MIRROR(0x07fc) AM_READ(soundlatch_flags_r) AM_WRITENOP // writes here on taitosj reset the secondary semaphore, which doesn't exist on grchamp, but the code tries to reset it anyway!
 ADDRESS_MAP_END
 
 
@@ -682,7 +767,8 @@ static MACHINE_CONFIG_START( grchamp )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_INPUT_MERGER_ALL_HIGH("soundnmi")
+	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 
 	MCFG_SOUND_ADD("ay1", AY8910, SOUND_CLOCK/4)    /* 3B */
 	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(grchamp_state, portA_0_w))

@@ -737,9 +737,9 @@ ROM_START( kinst )
 	ROM_LOAD( "ki-l14.u98", 0x00000, 0x80000, CRC(afedb75f) SHA1(07254f20707377f7195e64675eb6458e663c1a9a) )
 	ROM_SYSTEM_BIOS(2, "v1.3", "Killer Instinct (v1.3)")
 	ROM_LOAD( "ki-l13.u98", 0x00000, 0x80000, CRC(65f7ea31) SHA1(7f21620a512549db6821a0b4fa53681a767b7974) )
-	ROM_SYSTEM_BIOS(3, "proto v4.7", "Killer Instinct (proto v4.7)")
+	ROM_SYSTEM_BIOS(3, "proto-v4.7", "Killer Instinct (proto v4.7)")
 	ROM_LOAD( "ki-p47.u98", 0x00000, 0x80000, CRC(05e67bcb) SHA1(501e69b3026394f69229a6e9866c1037502b86bb) )
-	ROM_SYSTEM_BIOS(4, "v1.5d AnyIDE", "Killer Instinct (v1.5d AnyIDE)") // unofficial version, allows use of alternate hard drives or CF cards
+	ROM_SYSTEM_BIOS(4, "v1.5d-anyide", "Killer Instinct (v1.5d AnyIDE)") // unofficial version, allows use of alternate hard drives or CF cards
 	ROM_LOAD( "ki_l15di.u98", 0x00000, 0x80000, CRC(230f55fb) SHA1(f5f12311aae922d12f98d72ac8fdd77b7b084af2) )
 
 	ROM_REGION16_LE( 0x1000000, "dcs", ROMREGION_ERASEFF )  /* sound data */
@@ -768,7 +768,7 @@ ROM_START( kinst2 )
 	ROM_LOAD( "ki2-l11.u98", 0x00000, 0x80000, CRC(0cb8de1e) SHA1(fe447f4b1d29b524f57c5ba1890652ef6afff88a) )
 	ROM_SYSTEM_BIOS(3, "v1.0", "Killer Instinct 2 (v1.0)")
 	ROM_LOAD( "ki2-l10.u98", 0x00000, 0x80000, CRC(b17b4b3d) SHA1(756629cd1b51ae50f2b9818765dd3d277c3019b3) )
-	ROM_SYSTEM_BIOS(4, "v1.4 AnyIDE", "Killer Instinct 2 (v1.4 AnyIDE)")
+	ROM_SYSTEM_BIOS(4, "v1.4-anyide", "Killer Instinct 2 (v1.4 AnyIDE)")
 	ROM_LOAD( "ki2_l14p.u98", 0x00000, 0x80000, CRC(d80c937a) SHA1(85a009638f2eada4c63240fc30a9e7be59afab7f) )
 
 	ROM_REGION16_LE( 0x1000000, "dcs", ROMREGION_ERASEFF )  /* sound data */
@@ -793,7 +793,7 @@ ROM_START( kinst2uk )
 	ROM_LOAD( "ki2-l14k.u98", 0x00000, 0x80000, CRC(9cbd00a8) SHA1(926dce4bb9016331ea40d3c337a9ace896f07493) )
 	ROM_SYSTEM_BIOS(1, "v1.3k", "Killer Instinct 2 (v1.3k, upgrade kit)")
 	ROM_LOAD( "ki2-l13k.u98", 0x00000, 0x80000, CRC(3b4f16fc) SHA1(c28416f94453fd1f73ba01025276a04610569d12) )
-	ROM_SYSTEM_BIOS(2, "v1.4 AnyIDE", "Killer Instinct 2 (v1.4k, upgrade kit AnyIDE)")
+	ROM_SYSTEM_BIOS(2, "v1.4-anyide", "Killer Instinct 2 (v1.4k, upgrade kit AnyIDE)")
 	ROM_LOAD( "ki2_d14p.u98", 0x00000, 0x80000, CRC(d716d428) SHA1(1a3b000fdc35b3824a0c8142ba9b496490894543) )
 
 	ROM_REGION16_LE( 0x1000000, "dcs", ROMREGION_ERASEFF )  /* sound data */

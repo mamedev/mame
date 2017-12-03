@@ -239,7 +239,6 @@ public:
 	// additional helpers
 	void register_vblank_callback(vblank_state_delegate vblank_callback);
 	void register_screen_bitmap(bitmap_t &bitmap);
-	void resolve_palette();
 
 	// internal to the video system
 	bool update_quads();
@@ -263,6 +262,7 @@ private:
 
 	// device-level overrides
 	virtual void device_validity_check(validity_checker &valid) const override;
+	virtual void device_resolve_objects() override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual void device_stop() override;

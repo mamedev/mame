@@ -21,6 +21,7 @@
 #include "includes/atari400.h"
 
 #include "cpu/m6502/m6502.h"
+#include "machine/timer.h"
 #include "sound/spkrdev.h"
 #include "sound/pokey.h"
 #include "video/gtia.h"

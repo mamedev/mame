@@ -4387,7 +4387,7 @@
 	NEO-MVS PROGBK1 / NEO-MVS CHA256B
 	-->
 
-	<software name="tws96">
+	<software name="twsoc96">
 		<description>Tecmo World Soccer '96</description>
 		<year>1996</year>
 		<publisher>Tecmo</publisher>
@@ -6676,7 +6676,7 @@
 		<sharedfeat name="compatibility" value="MVS,AES" />
 		<part name="cart" interface="neo_cart">
 			<dataarea name="maincpu" width="16" endianness="big" size="0x500000">
-				<rom loadflag="load16_word_swap" name="238-p1.p1" offset="0x000000" size="0x100000" crc="5677456f" sha1="f76169fa5c90871d65e2a16fd1bb036c90533ac8" />
+				<rom loadflag="load16_word_swap" name="238-pg1.p1" offset="0x000000" size="0x100000" crc="efedf8dc" sha1="f638df9bf7aa7d514ee2bccfc7f2adbf39ca83fc" />  <!-- mask rom TC538200 -->
 				<rom loadflag="load16_word_swap" name="238-p2.sp2" offset="0x100000" size="0x400000" crc="5b4a09c5" sha1="de04036cba2da4bb2da73d902d1822b82b4f67a9" />  <!-- TC5332205 -->
 			</dataarea>
 			<dataarea name="fixed" size="0x040000">
@@ -6713,7 +6713,7 @@
 		<sharedfeat name="compatibility" value="MVS,AES" />
 		<part name="cart" interface="neo_cart">
 			<dataarea name="maincpu" width="16" endianness="big" size="0x500000">
-				<rom loadflag="load16_word_swap" name="238-pg1.p1" offset="0x000000" size="0x100000" crc="efedf8dc" sha1="f638df9bf7aa7d514ee2bccfc7f2adbf39ca83fc" />  <!-- mask rom TC538200 -->
+				<rom loadflag="load16_word_swap" name="238-p1.p1" offset="0x000000" size="0x100000" crc="5677456f" sha1="f76169fa5c90871d65e2a16fd1bb036c90533ac8" />
 				<rom loadflag="load16_word_swap" name="238-p2.sp2" offset="0x100000" size="0x400000" crc="5b4a09c5" sha1="de04036cba2da4bb2da73d902d1822b82b4f67a9" />  <!-- TC5332205 -->
 			</dataarea>
 			<dataarea name="fixed" size="0x040000">
@@ -6738,7 +6738,6 @@
 			</dataarea>
 		</part>
 	</software>
-
 
 	<!--
 	ID-0239

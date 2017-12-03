@@ -555,6 +555,7 @@ READ8_MEMBER(pacman_state::alibaba_mystery_1_r)
 	/* The return value determines what the mystery item is.  Each bit corresponds
 	   to a question mark */
 	return machine().rand() & 0x0f;
+//  return m_maincpu->state_int(Z80_R) & 0x0f;
 }
 
 
@@ -4926,7 +4927,7 @@ ROM_START( mspacmnf )
 
 	ROM_REGION( 0x2000, "gfx1", 0 )
 	ROM_LOAD( "5e",           0x0000, 0x1000, CRC(5c281d01) SHA1(5e8b472b615f12efca3fe792410c23619f067845) )
-	ROM_LOAD( "5f",           0x1000, 0x1000, CRC(615af909) SHA1(fd6a1dde780b39aea76bf1c4befa5882573c2ef4) )
+	ROM_LOAD( "5f",           0x1000, 0x1000, CRC(615af909) SHA1(fd6a1dde780b39aea76bf1c4befa5882573c2ef4) ) // sldh w/msheartb
 
 	ROM_REGION( 0x0120, "proms", 0 )
 	ROM_LOAD( "82s123.7f",    0x0000, 0x0020, CRC(2fc650bd) SHA1(8d0268dee78e47c712202b0ec4f1f51109b1f2a5) )
@@ -5064,7 +5065,7 @@ ROM_START( mspacmat )
 	ROM_LOAD( "u7",           0xb000, 0x1000, CRC(c82cd714) SHA1(1d8ac7ad03db2dc4c8c18ade466e12032673f874) )
 
 	ROM_REGION( 0x2000, "gfx1", 0 )
-	ROM_LOAD( "5e",           0x0000, 0x1000, CRC(5c281d01) SHA1(5e8b472b615f12efca3fe792410c23619f067845) )
+	ROM_LOAD( "5e",           0x0000, 0x1000, CRC(5c281d01) SHA1(5e8b472b615f12efca3fe792410c23619f067845) ) // sldh w/msheartb
 	ROM_LOAD( "5f",           0x1000, 0x1000, CRC(615af909) SHA1(fd6a1dde780b39aea76bf1c4befa5882573c2ef4) )
 
 	ROM_REGION( 0x0120, "proms", 0 )
@@ -5428,7 +5429,7 @@ ROM_START( crush3 )
 	ROM_LOAD( "6.5f",  0x1000, 0x1000, CRC(b5c14376) SHA1(2c8c57f96c51f12f73daf65dc2a73e8185aaacea) )
 
 	ROM_REGION( 0x0120, "proms", 0 )
-	ROM_LOAD( "82s123.7f",    0x0000, 0x0020, CRC(ff344446) SHA1(45eb37533da8912645a089b014f3b3384702114a) )
+	ROM_LOAD( "82s123.7f",    0x0000, 0x0020, CRC(ff344446) SHA1(45eb37533da8912645a089b014f3b3384702114a) ) // sldh w/crush4
 	ROM_LOAD( "82s129.4a",    0x0020, 0x0100, CRC(63efb927) SHA1(5c144a613fc4960a1dfd7ead89e7fee258a63171) )
 
 	ROM_REGION( 0x0200, "namco", 0 )    /* sound PROMs */
@@ -5454,7 +5455,7 @@ ROM_START( crush4 )
 	ROM_LOAD( "unkmol.5j",    0x1800, 0x0800, CRC(6e00d2ac) SHA1(aa3f1f3a3b6899bea717d97e4817b13159e552e5) )
 
 	ROM_REGION( 0x0120, "proms", 0 )
-	ROM_LOAD( "82s123.7f",    0x0000, 0x0020, CRC(2fc650bd) SHA1(8d0268dee78e47c712202b0ec4f1f51109b1f2a5) )
+	ROM_LOAD( "82s123.7f",    0x0000, 0x0020, CRC(2fc650bd) SHA1(8d0268dee78e47c712202b0ec4f1f51109b1f2a5) ) // sldh w/crush3
 	ROM_LOAD( "2s140.4a",     0x0020, 0x0100, CRC(63efb927) SHA1(5c144a613fc4960a1dfd7ead89e7fee258a63171) )
 
 	ROM_REGION( 0x0200, "namco", 0 )    /* sound PROMs */
@@ -5972,18 +5973,19 @@ ROM_START( lizwiz )
 ROM_END
 
 
-ROM_START( theglobp )
-	ROM_REGION( 0x20000, "maincpu", 0 )
-	ROM_LOAD( "glob.u2",      0x0000, 0x2000, CRC(829d0bea) SHA1(89f52b459a03fb40b9bbd97ac8a292f7ead6faba) )
-	ROM_LOAD( "glob.u3",      0x2000, 0x2000, CRC(31de6628) SHA1(35a47dcf34efd74b5b2fda137e06a3dcabd74854) )
+// Distributed by:  Eagle Conversions, 25 Eagle St., Bldg #5, Providence, RI 02908
+ROM_START( theglobp ) // Pac-Man PCB conversion kit. Includes a small daughtercard (2 roms + 4 PLDs, plugs in through the Z80 socket), 2 roms + 2 BPROMs
+	ROM_REGION( 0x20000, "maincpu", 0 ) // these 2 ROMs are encrypted & located on daughtercard
+	ROM_LOAD( "u_2_the_glob_pg02284_eagle.u2", 0x0000, 0x2000, CRC(829d0bea) SHA1(89f52b459a03fb40b9bbd97ac8a292f7ead6faba) ) /* actual label: U 2 THE GLOB PG02284 EAGLE */
+	ROM_LOAD( "u_3_the_glob_pg02284_eagle.u3", 0x2000, 0x2000, CRC(31de6628) SHA1(35a47dcf34efd74b5b2fda137e06a3dcabd74854) ) /* actual label: U 3 THE GLOB PG02284 EAGLE */
 
 	ROM_REGION( 0x2000, "gfx1", 0 )
-	ROM_LOAD( "glob.5e",      0x0000, 0x1000, CRC(53688260) SHA1(9ce0d1d67d12743b69e8190bf7506b00b2f02955) )
-	ROM_LOAD( "glob.5f",      0x1000, 0x1000, CRC(051f59c7) SHA1(e1e1322686997e5bcdac164704b328cce352ae42) )
+	ROM_LOAD( "5_e_the_glob_pg02284_eagle.5e", 0x0000, 0x1000, CRC(53688260) SHA1(9ce0d1d67d12743b69e8190bf7506b00b2f02955) ) /* actual label: 5 E THE GLOB PG02284 EAGLE */
+	ROM_LOAD( "5_f_the_glob_pg02284_eagle.5f", 0x1000, 0x1000, CRC(051f59c7) SHA1(e1e1322686997e5bcdac164704b328cce352ae42) ) /* actual label: 5 F THE GLOB PG02284 EAGLE */
 
 	ROM_REGION( 0x0120, "proms", 0 )
-	ROM_LOAD( "glob.7f",      0x0000, 0x0020, CRC(1f617527) SHA1(448845cab63800a05fcb106897503d994377f78f) )
-	ROM_LOAD( "glob.4a",      0x0020, 0x0100, CRC(28faa769) SHA1(7588889f3102d4e0ca7918f536556209b2490ea1) )
+	ROM_LOAD( "7_f_the_glob.7f", 0x0000, 0x0020, CRC(1f617527) SHA1(448845cab63800a05fcb106897503d994377f78f) ) /* actual label: 7 F THE GLOB  (black dot preceeds "THE") */
+	ROM_LOAD( "4_a_the_glob.4a", 0x0020, 0x0100, CRC(28faa769) SHA1(7588889f3102d4e0ca7918f536556209b2490ea1) ) /* actual label: 7 F THE GLOB  (black dot preceeds "THE") */
 
 	ROM_REGION( 0x0200, "namco", 0 )    /* sound PROMs */
 	ROM_LOAD( "82s126.1m",    0x0000, 0x0100, CRC(a9cc86bf) SHA1(bbcec0570aeceb582ff8238a4bc8546a23430081) )
@@ -5994,16 +5996,16 @@ ROM_END
 //Program roms same as the globp
 ROM_START( sprglobp )
 	ROM_REGION( 0x20000, "maincpu", 0 )
-	ROM_LOAD( "glob.u2",      0x0000, 0x2000, CRC(829d0bea) SHA1(89f52b459a03fb40b9bbd97ac8a292f7ead6faba) )
-	ROM_LOAD( "glob.u3",      0x2000, 0x2000, CRC(31de6628) SHA1(35a47dcf34efd74b5b2fda137e06a3dcabd74854) )
+	ROM_LOAD( "u_2_the_glob_pg02284_eagle.u2", 0x0000, 0x2000, CRC(829d0bea) SHA1(89f52b459a03fb40b9bbd97ac8a292f7ead6faba) )
+	ROM_LOAD( "u_3_the_glob_pg02284_eagle.u3", 0x2000, 0x2000, CRC(31de6628) SHA1(35a47dcf34efd74b5b2fda137e06a3dcabd74854) )
 
 	ROM_REGION( 0x2000, "gfx1", 0 )
 	ROM_LOAD( "5e_2532.dat",  0x0000, 0x1000, CRC(1aa16109) SHA1(ddc8606512d7ab7555b84146b9d793f65ad0a75f) )
 	ROM_LOAD( "5f_2532.dat",  0x1000, 0x1000, CRC(afe72a89) SHA1(fb17632e2665c3cebc1865ef25fa310cc52725c4) )
 
 	ROM_REGION( 0x0120, "proms", 0 )
-	ROM_LOAD( "glob.7f",      0x0000, 0x0020, CRC(1f617527) SHA1(448845cab63800a05fcb106897503d994377f78f) )
-	ROM_LOAD( "glob.4a",      0x0020, 0x0100, CRC(28faa769) SHA1(7588889f3102d4e0ca7918f536556209b2490ea1) )
+	ROM_LOAD( "7_f_the_glob.7f", 0x0000, 0x0020, CRC(1f617527) SHA1(448845cab63800a05fcb106897503d994377f78f) )
+	ROM_LOAD( "4_a_the_glob.4a", 0x0020, 0x0100, CRC(28faa769) SHA1(7588889f3102d4e0ca7918f536556209b2490ea1) )
 
 	ROM_REGION( 0x0200, "namco", 0 )    /* sound PROMs */
 	ROM_LOAD( "82s126.1m",    0x0000, 0x0100, CRC(a9cc86bf) SHA1(bbcec0570aeceb582ff8238a4bc8546a23430081) )
@@ -6045,8 +6047,8 @@ ROM_START( beastfp )
 	ROM_LOAD( "beastf.ic4",   0x0000, 0x002c, CRC(a6ab926d) SHA1(a8c2ddce2d595cecf057b37916f2f897de8a0e4e) ) // pal10h8
 
 	ROM_REGION( 0x0120, "proms", 0 )
-	ROM_LOAD( "glob.7f",      0x0000, 0x0020, CRC(1f617527) SHA1(448845cab63800a05fcb106897503d994377f78f) )
-	ROM_LOAD( "glob.4a",      0x0020, 0x0100, CRC(28faa769) SHA1(7588889f3102d4e0ca7918f536556209b2490ea1) )
+	ROM_LOAD( "7_f_the_glob.7f", 0x0000, 0x0020, CRC(1f617527) SHA1(448845cab63800a05fcb106897503d994377f78f) )
+	ROM_LOAD( "4_a_the_glob.4a", 0x0020, 0x0100, CRC(28faa769) SHA1(7588889f3102d4e0ca7918f536556209b2490ea1) )
 
 	ROM_REGION( 0x0200, "namco", 0 )    /* sound PROMs */
 	ROM_LOAD( "82s126.1m",    0x0000, 0x0100, CRC(a9cc86bf) SHA1(bbcec0570aeceb582ff8238a4bc8546a23430081) )
@@ -6056,8 +6058,8 @@ ROM_END
 
 ROM_START( eeekk ) // Pac-Man PCB conversion kit. Includes a small daughtercard (2 roms + 4 PLDs, plugs in through the Z80 socket), 2 roms + 2 BPROMs
 	ROM_REGION( 0x20000, "maincpu", 0 )
-	ROM_LOAD( "u_2_eeekk_pg03094.u2",   0x0000, 0x2000, CRC(701e37f2) SHA1(15bbd983e9112ce15dd229f126f2bccfa8b9807c) ) // encrypted
-	ROM_LOAD( "u_3_eeekk_pg03094.u3",   0x2000, 0x2000, CRC(bcf524ae) SHA1(be2a1a2984ea1439c63d8c353e4ae85bf42c8a55) ) // encrypted
+	ROM_LOAD( "u_2_eeekk_pg03094.u2",   0x0000, 0x2000, CRC(701e37f2) SHA1(15bbd983e9112ce15dd229f126f2bccfa8b9807c) ) // encrypted  - located on daughtercard
+	ROM_LOAD( "u_3_eeekk_pg03094.u3",   0x2000, 0x2000, CRC(bcf524ae) SHA1(be2a1a2984ea1439c63d8c353e4ae85bf42c8a55) ) // encrypted  - located on daughtercard
 
 	ROM_REGION( 0x2000, "gfx1", 0 )
 	ROM_LOAD( "5_e_eeekk_pg03094.5e",   0x0000, 0x1000, CRC(780183a8) SHA1(8466d75d79b3c87db143f5c2e8b58dad1d2e501c) )
@@ -6288,18 +6290,18 @@ ROM_START( acitya )
 	ROM_LOAD( "82s126.3m"  ,  0x0100, 0x0100, CRC(77245b66) SHA1(0c4d0bee858b97632411c440bea6948a74759746) ) /* timing - not used */
 ROM_END
 
-ROM_START( bwcasino )
+ROM_START( bwcasino ) // Pac-Man PCB conversion kit. Includes a small daughtercard (2 roms + 4 PLDs, plugs in through the Z80 socket), 1 rom + 2 BPROMs
 	ROM_REGION( 0x20000, "maincpu", 0 )
-	ROM_LOAD( "bwc_u2.bin",   0x0000, 0x2000, CRC(e2eea868) SHA1(9e9dae02ab746ef48981f42a75c192c5aae0ffee) )
-	ROM_LOAD( "bwc_u3.bin",   0x2000, 0x2000, CRC(a935571e) SHA1(ab4f53be2544593fc8eb4c4bcccdec4191c0c626) )
+	ROM_LOAD( "u_2_boardwalk_casino_pp09144.u2",   0x0000, 0x2000, CRC(e2eea868) SHA1(9e9dae02ab746ef48981f42a75c192c5aae0ffee) ) // labeled U 2 BOARDWALK CASINO PP09144  - located on daughtercard
+	ROM_LOAD( "u_3_boardwalk_casino_pp09144.u3",   0x2000, 0x2000, CRC(a935571e) SHA1(ab4f53be2544593fc8eb4c4bcccdec4191c0c626) ) // labeled U 3 BOARDWALK CASINO PP09144  - located on daughtercard
 
 	ROM_REGION( 0x2000, "gfx1", 0 )
-	ROM_LOAD( "bwc_5e.bin",   0x0000, 0x1000, CRC(e334c01e) SHA1(cc6e50e3cf51eb8b7b27aa7351733954da8128ff) )
+	ROM_LOAD( "5_e_boardwalk_casino_pp09144.5e",   0x0000, 0x1000, CRC(e334c01e) SHA1(cc6e50e3cf51eb8b7b27aa7351733954da8128ff) ) // labeled 5 E BOARDWALK CASINO PP09144
 	ROM_RELOAD( 0x1000, 0x1000 ) /* Not Used?? */
 
 	ROM_REGION( 0x0120, "proms", 0 )
-	ROM_LOAD( "aca_7f.bin",   0x0000, 0x0020, CRC(133bb744) SHA1(da4074f3ea30202973f0b6c9ad05a992bb44eafd) )
-	ROM_LOAD( "aca_4a.bin",   0x0020, 0x0100, CRC(8e29208f) SHA1(a30a405fbd43d27a8d403f6c3545178564dede5d) )
+	ROM_LOAD( "7_f_b.w.c.7f",   0x0000, 0x0020, CRC(133bb744) SHA1(da4074f3ea30202973f0b6c9ad05a992bb44eafd) ) // labeled 7 F B.W.C. with sinlge red dot
+	ROM_LOAD( "4_a_b.w.c.4a",   0x0020, 0x0100, CRC(8e29208f) SHA1(a30a405fbd43d27a8d403f6c3545178564dede5d) ) // labeled 4 A B.W.C. with sinlge red dot
 
 	ROM_REGION( 0x0200, "namco", 0 ) /* sound PROMs */
 	ROM_LOAD( "82s126.1m",    0x0000, 0x0100, CRC(a9cc86bf) SHA1(bbcec0570aeceb582ff8238a4bc8546a23430081) )

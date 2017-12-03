@@ -54,15 +54,6 @@ Notes:
 #include "speaker.h"
 
 
-WRITE16_MEMBER(deniam_state::sound_command_w)
-{
-	if (ACCESSING_BITS_8_15)
-	{
-		m_soundlatch->write(space,offset, (data >> 8) & 0xff);
-		m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
-	}
-}
-
 WRITE8_MEMBER(deniam_state::deniam16b_oki_rom_bank_w)
 {
 	m_oki->set_rom_bank((data >> 6) & 1);
@@ -88,7 +79,7 @@ static ADDRESS_MAP_START( deniam16b_map, AS_PROGRAM, 16, deniam_state )
 	AM_RANGE(0x410000, 0x410fff) AM_RAM_WRITE(deniam_textram_w) AM_SHARE("textram")
 	AM_RANGE(0x440000, 0x4407ff) AM_WRITEONLY AM_SHARE("spriteram")
 	AM_RANGE(0x840000, 0x840fff) AM_WRITE(deniam_palette_w) AM_SHARE("paletteram")
-	AM_RANGE(0xc40000, 0xc40001) AM_WRITE(sound_command_w)
+	AM_RANGE(0xc40000, 0xc40001) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0xff00)
 	AM_RANGE(0xc40002, 0xc40003) AM_READWRITE(deniam_coinctrl_r, deniam_coinctrl_w)
 	AM_RANGE(0xc40004, 0xc40005) AM_WRITE(deniam_irq_ack_w)
 	AM_RANGE(0xc44000, 0xc44001) AM_READ_PORT("SYSTEM")
@@ -285,6 +276,7 @@ static MACHINE_CONFIG_START( deniam16b )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 
 	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL_25MHz/6) /* "SM64" ym3812 clone; 4.166470 measured, = 4.166666Mhz verified */
 	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", 0))

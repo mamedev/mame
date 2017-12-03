@@ -66,14 +66,9 @@ void irem_audio_device::device_start()
 //-------------------------------------------------
 //  device_reset - device-specific reset
 //-------------------------------------------------
+
 void irem_audio_device::device_reset()
 {
-	m_adpcm1->reset();
-	if (m_adpcm2) m_adpcm2->reset();
-	m_ay_45L->reset();
-	m_ay_45M->reset();
-	m_cpu->reset();
-
 	m_port1 = 0; // ?
 	m_port2 = 0; // ?
 	m_soundlatch = 0;
@@ -247,26 +242,6 @@ WRITE8_MEMBER( irem_audio_device::m62_adpcm_w )
 	msm5205_device *adpcm = (offset & 1) ? m_adpcm2.target() : m_adpcm1.target();
 	if (adpcm != nullptr)
 		adpcm->data_w(data);
-}
-
-
-
-/*************************************
- *
- *  MSM5205 data ready signals
- *
- *************************************/
-
-void irem_audio_device::adpcm_int(int st)
-{
-	m_cpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
-
-	/* the first MSM5205 clocks the second */
-	if (m_adpcm2 != nullptr)
-	{
-		m_adpcm2->vclk_w(1);
-		m_adpcm2->vclk_w(0);
-	}
 }
 
 
@@ -453,7 +428,8 @@ MACHINE_CONFIG_MEMBER( m62_audio_device::device_add_mconfig )
 	MCFG_SOUND_ROUTE_EX(2, "snd_nl", 1.0, 5)
 
 	MCFG_SOUND_ADD("msm1", MSM5205, XTAL_384kHz) /* verified on pcb */
-	MCFG_MSM5205_VCLK_CB(WRITELINE(irem_audio_device, adpcm_int))          /* interrupt function */
+	MCFG_MSM5205_VCK_CALLBACK(INPUTLINE("iremsound", INPUT_LINE_NMI)) // driven through NPN inverter
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("msm2", msm5205_device, vclk_w)) // the first MSM5205 clocks the second
 	MCFG_MSM5205_PRESCALER_SELECTOR(S96_4B)      /* default to 4KHz, but can be changed at run time */
 	MCFG_SOUND_ROUTE_EX(0, "snd_nl", 1.0, 6)
 
@@ -518,7 +494,7 @@ MACHINE_CONFIG_MEMBER( m52_soundc_audio_device::device_add_mconfig )
 	MCFG_SOUND_ROUTE_EX(0, "filtermix", 1.0, 1)
 
 	MCFG_SOUND_ADD("msm1", MSM5205, XTAL_384kHz) /* verified on pcb */
-	MCFG_MSM5205_VCLK_CB(WRITELINE(irem_audio_device, adpcm_int))          /* interrupt function */
+	MCFG_MSM5205_VCK_CALLBACK(INPUTLINE("iremsound", INPUT_LINE_NMI)) // driven through NPN inverter
 	MCFG_MSM5205_PRESCALER_SELECTOR(S96_4B)      /* default to 4KHz, but can be changed at run time */
 	MCFG_SOUND_ROUTE_EX(0, "filtermix", 1.0, 2)
 
@@ -552,7 +528,8 @@ MACHINE_CONFIG_MEMBER( m52_large_audio_device::device_add_mconfig )  /* 10 yard 
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
 	MCFG_SOUND_ADD("msm1", MSM5205, XTAL_384kHz) /* verified on pcb */
-	MCFG_MSM5205_VCLK_CB(WRITELINE(irem_audio_device, adpcm_int))          /* interrupt function */
+	MCFG_MSM5205_VCK_CALLBACK(INPUTLINE("iremsound", INPUT_LINE_NMI)) // driven through NPN inverter
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("msm2", msm5205_device, vclk_w)) // the first MSM5205 clocks the second
 	MCFG_MSM5205_PRESCALER_SELECTOR(S96_4B)      /* default to 4KHz, but can be changed at run time */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 

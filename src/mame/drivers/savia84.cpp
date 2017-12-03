@@ -38,32 +38,34 @@ class savia84_state : public driver_device
 {
 public:
 	savia84_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-	m_maincpu(*this, "maincpu"),
-	m_ppi8255(*this, "ppi8255")
-	{ }
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_ppi8255(*this, "ppi8255")
+		{ }
 
-	required_device<cpu_device> m_maincpu;
-	required_device<i8255_device> m_ppi8255;
 	DECLARE_READ8_MEMBER(savia84_8255_portc_r);
 	DECLARE_WRITE8_MEMBER(savia84_8255_porta_w);
 	DECLARE_WRITE8_MEMBER(savia84_8255_portb_w);
 	DECLARE_WRITE8_MEMBER(savia84_8255_portc_w);
+
+private:
 	uint8_t m_kbd;
 	uint8_t m_segment;
 	uint8_t m_digit;
 	uint8_t m_digit_last;
 	virtual void machine_reset() override;
+	required_device<cpu_device> m_maincpu;
+	required_device<i8255_device> m_ppi8255;
 };
 
-static ADDRESS_MAP_START( savia84_mem, AS_PROGRAM, 8, savia84_state )
+static ADDRESS_MAP_START( mem_map, AS_PROGRAM, 8, savia84_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff) // A15 not connected at the CPU
 	AM_RANGE(0x0000, 0x07ff) AM_ROM
 	AM_RANGE(0x1800, 0x1fff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( savia84_io, AS_IO, 8, savia84_state )
+static ADDRESS_MAP_START( io_map, AS_IO, 8, savia84_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0x07)
 	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("ppi8255", i8255_device, read, write) // ports F8-FB
@@ -171,8 +173,8 @@ READ8_MEMBER( savia84_state::savia84_8255_portc_r ) // IN FA - read keyboard
 static MACHINE_CONFIG_START( savia84 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80, XTAL_4MHz / 2)
-	MCFG_CPU_PROGRAM_MAP(savia84_mem)
-	MCFG_CPU_IO_MAP(savia84_io)
+	MCFG_CPU_PROGRAM_MAP(mem_map)
+	MCFG_CPU_IO_MAP(io_map)
 
 	/* video hardware */
 	MCFG_DEFAULT_LAYOUT(layout_savia84)
@@ -183,7 +185,6 @@ static MACHINE_CONFIG_START( savia84 )
 	MCFG_I8255_OUT_PORTB_CB(WRITE8(savia84_state, savia84_8255_portb_w))
 	MCFG_I8255_IN_PORTC_CB(READ8(savia84_state, savia84_8255_portc_r))
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(savia84_state, savia84_8255_portc_w))
-
 MACHINE_CONFIG_END
 
 /* ROM definition */

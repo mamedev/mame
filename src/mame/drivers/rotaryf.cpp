@@ -18,6 +18,7 @@ driver by Barry Rodewald
 
 #include "cpu/i8085/i8085.h"
 #include "machine/i8255.h"
+#include "machine/timer.h"
 #include "sound/samples.h"
 #include "sound/sn76477.h"
 

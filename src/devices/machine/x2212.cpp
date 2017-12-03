@@ -31,8 +31,8 @@ ADDRESS_MAP_END
 //**************************************************************************
 
 // device type definition
-DEFINE_DEVICE_TYPE(X2212, x2212_device, "x2212", "Xicor X2212 256x4 NVRAM")
-DEFINE_DEVICE_TYPE(X2210, x2210_device, "x2210", "Xicor X2210 64x4 NVRAM")
+DEFINE_DEVICE_TYPE(X2212, x2212_device, "x2212", "Xicor X2212 256x4 NOVRAM")
+DEFINE_DEVICE_TYPE(X2210, x2210_device, "x2210", "Xicor X2210 64x4 NOVRAM")
 
 //-------------------------------------------------
 //  x2212_device - constructor
@@ -209,7 +209,7 @@ READ8_MEMBER( x2212_device::read )
 
 //-------------------------------------------------
 //  store - set the state of the store line
-//  (active high)
+//  (FIXME: actually active low, not active high)
 //-------------------------------------------------
 
 WRITE_LINE_MEMBER( x2212_device::store )
@@ -222,7 +222,7 @@ WRITE_LINE_MEMBER( x2212_device::store )
 
 //-------------------------------------------------
 //  recall - set the state of the recall line
-//  (active high)
+//  (FIXME: actually active low, not active high)
 //-------------------------------------------------
 
 WRITE_LINE_MEMBER( x2212_device::recall )

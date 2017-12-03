@@ -66,6 +66,8 @@
 *********************************************************************/
 
 #include "emu.h"
+#include "dragon_fdc.h"
+
 #include "cococart.h"
 #include "coco_fdc.h"
 #include "imagedev/flopdrv.h"

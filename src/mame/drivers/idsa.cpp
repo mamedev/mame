@@ -9,10 +9,10 @@ Hardware:
 ---------
 CPU:     Z80 @ 4 MHz
     INT: IRQ @ 977 Hz (4MHz/2048/2) or 488 Hz (4MHz/2048/4)
-IO:      DMA, AY8910 ports
+DRIVERS: 2 x 8255 driving lamps and coils, used as demultiplexers only (no read access)
 DISPLAY: bsktball: 7-digit 7-segment panels with PROM-based 5-bit BCD data (allowing a simple alphabet)
          v1: 6-digit 7-segment panels with BCD decoding
-SOUND:   2 x AY8910 @ 2 MHz plus SP0256 @ 3.12 MHz on board
+SOUND:   2 x AY8910 @ 2 MHz (also used as output interface) plus SP0256 @ 3.12 MHz on board
 
 Schematic is terrible, lots of important info left out. Need the V1 manual & schematic.
 
@@ -32,6 +32,7 @@ ToDO:
 #include "sound/ay8910.h"
 #include "sound/sp0256.h"
 #include "machine/clock.h"
+#include "machine/i8255.h"
 #include "speaker.h"
 
 
@@ -42,6 +43,7 @@ public:
 		: genpin_class(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_speech(*this, "speech")
+		, m_ppi(*this, "ppi%u", 1)
 		{ }
 
 	DECLARE_WRITE_LINE_MEMBER(clock_w);
@@ -54,10 +56,13 @@ public:
 	DECLARE_WRITE8_MEMBER(ay2_b_w);
 
 private:
-	uint16_t m_irqcnt;
 	virtual void machine_reset() override;
+
+	uint16_t m_irqcnt;
+	uint8_t m_ppi_data;
 	required_device<cpu_device> m_maincpu;
 	required_device<sp0256_device> m_speech;
+	required_device_array<i8255_device, 2> m_ppi;
 };
 
 static ADDRESS_MAP_START( maincpu_map, AS_PROGRAM, 8, idsa_state )
@@ -228,18 +233,26 @@ WRITE8_MEMBER( idsa_state::port90_w )
 // AY ports are for lamps and solenoids
 WRITE8_MEMBER( idsa_state::ay1_a_w )
 {
+	//logerror("%s: AY1 port A = %02X\n", machine().describe_context(), data);
+	if (!BIT(data, 2))
+		m_ppi[0]->write(space, data & 0x03, m_ppi_data);
+	if (!BIT(data, 3))
+		m_ppi[1]->write(space, data & 0x03, m_ppi_data);
 }
 
 WRITE8_MEMBER( idsa_state::ay1_b_w )
 {
+	m_ppi_data = data;
 }
 
 WRITE8_MEMBER( idsa_state::ay2_a_w )
 {
+	//logerror("%s: AY2 port A = %02X\n", machine().describe_context(), data);
 }
 
 WRITE8_MEMBER( idsa_state::ay2_b_w )
 {
+	//logerror("%s: AY2 port B = %02X\n", machine().describe_context(), data);
 }
 
 WRITE_LINE_MEMBER( idsa_state::clock_w )
@@ -280,14 +293,19 @@ static MACHINE_CONFIG_START( idsa )
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 	MCFG_SOUND_ADD("speech", SP0256, 3120000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.5)
+
 	MCFG_SOUND_ADD("aysnd1", AY8910, 2000000) // 2Mhz according to pinmame, schematic omits the clock line
 	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(idsa_state, ay1_a_w))
 	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(idsa_state, ay1_b_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.75)
+
 	MCFG_SOUND_ADD("aysnd2", AY8910, 2000000)
 	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(idsa_state, ay2_a_w))
 	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(idsa_state, ay2_b_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.75)
+
+	MCFG_DEVICE_ADD("ppi1", I8255, 0)
+	MCFG_DEVICE_ADD("ppi2", I8255, 0)
 MACHINE_CONFIG_END
 
 

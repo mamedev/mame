@@ -22,6 +22,7 @@
 #include "sound/ym2413.h"
 #include "sound/okim6376.h"
 #include "machine/nvram.h"
+#include "machine/timer.h"
 #include "sound/upd7759.h"
 #include "cpu/mcs51/mcs51.h"
 #include "sound/okim6295.h"

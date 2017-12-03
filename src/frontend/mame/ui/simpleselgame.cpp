@@ -232,8 +232,7 @@ void simple_menu_select_game::populate(float &customtop, float &custombottom)
 	int curitem;
 
 	for (curitem = matchcount = 0; m_driverlist[curitem] != nullptr && matchcount < VISIBLE_GAMES_IN_LIST; curitem++)
-		if (!(m_driverlist[curitem]->flags & machine_flags::NO_STANDALONE))
-			matchcount++;
+		matchcount++;
 
 	// if nothing there, add a single multiline item and return
 	if (matchcount == 0)
@@ -286,10 +285,7 @@ void simple_menu_select_game::populate(float &customtop, float &custombottom)
 void simple_menu_select_game::custom_render(void *selectedref, float top, float bottom, float origx1, float origy1, float origx2, float origy2)
 {
 	const game_driver *driver;
-	float width, maxwidth;
-	float x1, y1, x2, y2;
 	std::string tempbuf[5];
-	int line;
 
 	// display the current typeahead
 	if (!m_search.empty())
@@ -297,37 +293,12 @@ void simple_menu_select_game::custom_render(void *selectedref, float top, float 
 	else
 		tempbuf[0] = _("Type name or select: (random)");
 
-	// get the size of the text
-	ui().draw_text_full(
-			container(), tempbuf[0].c_str(),
-			0.0f, 0.0f, 1.0f,
-			ui::text_layout::CENTER, ui::text_layout::TRUNCATE,
-			mame_ui_manager::NONE, rgb_t::white(), rgb_t::black(),
-			&width, nullptr);
-	width += 2 * UI_BOX_LR_BORDER;
-	maxwidth = std::max(width, origx2 - origx1);
-
-	// compute our bounds
-	x1 = 0.5f - 0.5f * maxwidth;
-	x2 = x1 + maxwidth;
-	y1 = origy1 - top;
-	y2 = origy1 - UI_BOX_TB_BORDER;
-
-	// draw a box
-	ui().draw_outlined_box(container(), x1, y1, x2, y2, UI_BACKGROUND_COLOR);
-
-	// take off the borders
-	x1 += UI_BOX_LR_BORDER;
-	x2 -= UI_BOX_LR_BORDER;
-	y1 += UI_BOX_TB_BORDER;
-
-	// draw the text within it
-	ui().draw_text_full(
-			container(), tempbuf[0].c_str(),
-			x1, y1, x2 - x1,
-			ui::text_layout::CENTER, ui::text_layout::TRUNCATE,
-			mame_ui_manager::NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR,
-			nullptr, nullptr);
+	// draw the top box
+	draw_text_box(
+			tempbuf, tempbuf + 1,
+			origx1, origx2, origy1 - top, origy1 - UI_BOX_TB_BORDER,
+			ui::text_layout::CENTER, ui::text_layout::TRUNCATE, false,
+			UI_TEXT_COLOR, UI_BACKGROUND_COLOR, 1.0f);
 
 	// determine the text to render below
 	driver = ((uintptr_t)selectedref > skip_main_items) ? (const game_driver *)selectedref : nullptr;
@@ -363,30 +334,26 @@ void simple_menu_select_game::custom_render(void *selectedref, float top, float 
 			tempbuf[3] = _("Overall: Working");
 
 		// next line is graphics, sound status
-		const char *gfxstat;
 		if (m_cached_unemulated & device_t::feature::GRAPHICS)
-			gfxstat = _("Unimplemented");
+			tempbuf[4] = _("Graphics: Unimplemented, ");
 		else if ((m_cached_unemulated | m_cached_imperfect) & (device_t::feature::GRAPHICS | device_t::feature::PALETTE))
-			gfxstat = _("Imperfect");
+			tempbuf[4] = _("Graphics: Imperfect, ");
 		else
-			gfxstat = _("OK");
+			tempbuf[4] = _("Graphics: OK, ");
 
-		const char *soundstat;
 		if (m_cached_flags & machine_flags::NO_SOUND_HW)
-			soundstat = _("None");
+			tempbuf[4].append(_("Sound: None"));
 		else if (m_cached_unemulated & device_t::feature::SOUND)
-			soundstat = _("Unimplemented");
+			tempbuf[4].append(_("Sound: Unimplemented"));
 		else if (m_cached_imperfect & device_t::feature::SOUND)
-			soundstat = _("Imperfect");
+			tempbuf[4].append(_("Sound: Imperfect"));
 		else
-			soundstat = _("OK");
-
-		tempbuf[4] = string_format(_("Gfx: %s, Sound: %s"), gfxstat, soundstat);
+			tempbuf[4].append(_("Sound: OK"));
 	}
 	else
 	{
 		const char *s = emulator_info::get_copyright();
-		line = 0;
+		unsigned line = 0;
 
 		// first line is version string
 		tempbuf[line++] = string_format("%s %s", emulator_info::get_appname(), build_version);
@@ -408,38 +375,12 @@ void simple_menu_select_game::custom_render(void *selectedref, float top, float 
 		}
 	}
 
-	// get the size of the text
-	maxwidth = origx2 - origx1;
-	for (line = 0; line < 4; line++)
-	{
-		ui().draw_text_full(container(), tempbuf[line].c_str(), 0.0f, 0.0f, 1.0f, ui::text_layout::CENTER, ui::text_layout::TRUNCATE,
-							mame_ui_manager::NONE, rgb_t::white(), rgb_t::black(), &width, nullptr);
-		width += 2 * UI_BOX_LR_BORDER;
-		maxwidth = std::max(maxwidth, width);
-	}
-
-	// compute our bounds
-	x1 = 0.5f - 0.5f * maxwidth;
-	x2 = x1 + maxwidth;
-	y1 = origy2 + UI_BOX_TB_BORDER;
-	y2 = origy2 + bottom;
-
-	// draw a box
-	rgb_t const color = driver ? m_cached_color : UI_BACKGROUND_COLOR;
-	ui().draw_outlined_box(container(), x1, y1, x2, y2, color);
-
-	// take off the borders
-	x1 += UI_BOX_LR_BORDER;
-	x2 -= UI_BOX_LR_BORDER;
-	y1 += UI_BOX_TB_BORDER;
-
-	// draw all lines
-	for (line = 0; line < 4; line++)
-	{
-		ui().draw_text_full(container(), tempbuf[line].c_str(), x1, y1, x2 - x1, ui::text_layout::CENTER, ui::text_layout::TRUNCATE,
-							mame_ui_manager::NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, nullptr, nullptr);
-		y1 += ui().get_line_height();
-	}
+	// draw the bottom box
+	draw_text_box(
+			tempbuf, tempbuf + 4,
+			origx1, origx2, origy2 + UI_BOX_TB_BORDER, origy2 + bottom,
+			ui::text_layout::CENTER, ui::text_layout::TRUNCATE, true,
+			UI_TEXT_COLOR, driver ? m_cached_color : UI_BACKGROUND_COLOR, 1.0f);
 }
 
 

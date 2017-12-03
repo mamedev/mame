@@ -1,8 +1,8 @@
 // license:BSD-3-Clause
-// copyright-holders:Curt Coder
+// copyright-holders:Curt Coder,AJR
 /**********************************************************************
 
-    Intel 8212 8-Bit Input/Output Port emulation
+    Intel 8212/3212 8-Bit Input/Output Port (Multi-Mode Latch Buffer)
 
 **********************************************************************
                             _____   _____
@@ -12,7 +12,7 @@
                    DO1   4 |             | 21  DO8
                    DI2   5 |             | 20  DI7
                    DO2   6 |    8212     | 19  DO7
-                   DI3   7 |             | 18  DI6
+                   DI3   7 |    3212     | 18  DI6
                    DO3   8 |             | 17  DO6
                    DI4   9 |             | 16  DI5
                    DO4  10 |             | 15  DO5
@@ -33,14 +33,17 @@
 //  INTERFACE CONFIGURATION MACROS
 ///*************************************************************************
 
-#define MCFG_I8212_IRQ_CALLBACK(_write) \
-	devcb = &i8212_device::set_irq_wr_callback(*device, DEVCB_##_write);
+#define MCFG_I8212_INT_CALLBACK(_write) \
+	devcb = &i8212_device::set_int_wr_callback(*device, DEVCB_##_write);
 
 #define MCFG_I8212_DI_CALLBACK(_read) \
 	devcb = &i8212_device::set_di_rd_callback(*device, DEVCB_##_read);
 
 #define MCFG_I8212_DO_CALLBACK(_write) \
 	devcb = &i8212_device::set_do_wr_callback(*device, DEVCB_##_write);
+
+#define MCFG_I8212_MD_CALLBACK(_read) \
+	devcb = &i8212_device::set_md_rd_callback(*device, DEVCB_##_read);
 
 
 
@@ -52,19 +55,32 @@
 
 class i8212_device : public device_t
 {
+	enum class mode : u8
+	{
+		INPUT,
+		OUTPUT
+	};
+
 public:
 	// construction/destruction
 	i8212_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template <class Object> static devcb_base &set_irq_wr_callback(device_t &device, Object &&cb) { return downcast<i8212_device &>(device).m_write_irq.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_int_wr_callback(device_t &device, Object &&cb) { return downcast<i8212_device &>(device).m_write_int.set_callback(std::forward<Object>(cb)); }
 	template <class Object> static devcb_base &set_di_rd_callback(device_t &device, Object &&cb) { return downcast<i8212_device &>(device).m_read_di.set_callback(std::forward<Object>(cb)); }
 	template <class Object> static devcb_base &set_do_wr_callback(device_t &device, Object &&cb) { return downcast<i8212_device &>(device).m_write_do.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_md_rd_callback(device_t &device, Object &&cb) { return downcast<i8212_device &>(device).m_read_md.set_callback(std::forward<Object>(cb)); }
 
-	DECLARE_READ8_MEMBER( read );
-	DECLARE_WRITE8_MEMBER( write );
+	// data read handlers
+	DECLARE_READ8_MEMBER(read);
+	IRQ_CALLBACK_MEMBER(inta_cb);
 
-	DECLARE_WRITE_LINE_MEMBER( md_w );
-	DECLARE_WRITE_LINE_MEMBER( stb_w );
+	// data write handlers
+	DECLARE_WRITE8_MEMBER(write);
+	DECLARE_WRITE8_MEMBER(strobe);
+
+	// line write handlers
+	DECLARE_WRITE_LINE_MEMBER(md_w);
+	DECLARE_WRITE_LINE_MEMBER(stb_w);
 
 protected:
 	// device-level overrides
@@ -72,19 +88,16 @@ protected:
 	virtual void device_reset() override;
 
 private:
-	enum
-	{
-		MODE_INPUT = 0,
-		MODE_OUTPUT
-	};
+	// helpers
+	mode get_mode();
 
-	devcb_write_line   m_write_irq;
+	devcb_write_line   m_write_int;
 	devcb_read8        m_read_di;
 	devcb_write8       m_write_do;
+	devcb_read_line    m_read_md;
 
-	int m_md;                   // mode
 	int m_stb;                  // strobe
-	uint8_t m_data;               // data latch
+	uint8_t m_data;             // data latch
 };
 
 

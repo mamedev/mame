@@ -169,7 +169,9 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_seta001(*this, "spritegen"),
 		m_palette(*this, "palette"),
-		m_x1(*this, "x1snd") { }
+		m_x1(*this, "x1snd"),
+		m_fakex(*this, "FAKEX"),
+		m_fakey(*this, "FAKEY") { }
 
 	int      m_screenflip;
 
@@ -177,8 +179,13 @@ public:
 	required_device<seta001_device> m_seta001;
 	required_device<palette_device> m_palette;
 	required_device<x1_010_device> m_x1;
+
+	optional_ioport m_fakex;
+	optional_ioport m_fakey;
 	uint8_t    m_last_trackball_val[2];
+
 	DECLARE_READ8_MEMBER(trackball_r);
+	DECLARE_READ8_MEMBER(trackball_reset_r);
 	DECLARE_WRITE8_MEMBER(champbwl_misc_w);
 	DECLARE_WRITE8_MEMBER(doraemon_outputs_w);
 	DECLARE_MACHINE_START(champbwl);
@@ -207,15 +214,22 @@ PALETTE_INIT_MEMBER(champbwl_state,champbwl)
 READ8_MEMBER(champbwl_state::trackball_r)
 {
 	uint8_t ret;
-	uint8_t port4 = ioport("FAKEX")->read();
-	uint8_t port5 = ioport("FAKEY")->read();
+	uint8_t port4 = m_fakex->read();
+	uint8_t port5 = m_fakey->read();
 
 	ret = (((port4 - m_last_trackball_val[0]) & 0x0f)<<4) | ((port5 - m_last_trackball_val[1]) & 0x0f);
 
-	m_last_trackball_val[0] = port4;
-	m_last_trackball_val[1] = port5;
-
 	return ret;
+}
+
+READ8_MEMBER(champbwl_state::trackball_reset_r)
+{
+	if (!machine().side_effect_disabled())
+	{
+		m_last_trackball_val[0] = m_fakex->read();
+		m_last_trackball_val[1] = m_fakey->read();
+	}
+	return 0xff;
 }
 
 WRITE8_MEMBER(champbwl_state::champbwl_misc_w)
@@ -242,7 +256,7 @@ static ADDRESS_MAP_START( champbwl_map, AS_PROGRAM, 8, champbwl_state )
 
 	AM_RANGE(0xf000, 0xf000) AM_READ(trackball_r)
 	AM_RANGE(0xf002, 0xf002) AM_READ_PORT("IN0")
-	AM_RANGE(0xf004, 0xf004) AM_READ_PORT("IN1")
+	AM_RANGE(0xf004, 0xf004) AM_READ(trackball_reset_r)
 	AM_RANGE(0xf006, 0xf006) AM_READ_PORT("IN2")
 	AM_RANGE(0xf007, 0xf007) AM_READ_PORT("IN3")
 
@@ -297,32 +311,6 @@ static INPUT_PORTS_START( champbwl )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SPECIAL ) // INT( 4M)
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) // INT(16M)
-
-	PORT_START("IN1")
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("IN2")
 	PORT_SERVICE_DIPLOC( 0x01, IP_ACTIVE_LOW, "SW1:1" )

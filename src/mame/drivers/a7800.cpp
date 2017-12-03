@@ -98,6 +98,7 @@
 
 #include "emu.h"
 #include "cpu/m6502/m6502.h"
+#include "machine/timer.h"
 #include "sound/tiaintf.h"
 #include "sound/tiasound.h"
 #include "machine/mos6530n.h"

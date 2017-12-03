@@ -25,4 +25,48 @@
 		</part>
 	</software>
 
+	<software name="rsz">
+		<description>PX-4 Rom Writer</description>
+		<year>198?</year>
+		<publisher>EPSON</publisher>
+		<part name="cart" interface="px4_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="px4rsz.bin" size="32768" crc="12aa3f9c" sha1="c51af300c3d5bc7e8fa45ca9193f093e769cc611" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rmwr">
+		<description>PX-4 Prom Writer Cartridge V2.0</description>
+		<year>198?</year>
+		<publisher>EPSON</publisher>
+		<part name="cart" interface="px4_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="px4rmwr.bin" size="32768" crc="9a91bde0" sha1="aa650613672e702572b98eebf048555c988c7f5b" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pw2">
+		<description>PX-4 Rom Write</description>
+		<year>198?</year>
+		<publisher>EPSON</publisher>
+		<part name="cart" interface="px4_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="px4promwriter2.bin" size="32768" crc="5c54faf3" sha1="4879a126b1975f09fadba8831e14c7e8f41c40f3" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dialtext">
+		<description>Dialtext 4</description>
+		<year>198?</year>
+		<publisher>EPSON</publisher>
+		<part name="cart" interface="px4_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="dialtext.bin" size="32768" crc="7eaa31ba" sha1="0bec906e3c5e92d9b1aba1a10d91db08d05e83f4" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>

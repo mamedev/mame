@@ -25,6 +25,7 @@ ToDo:
 #include "cpu/z80/z80.h"
 #include "cpu/z80/z80daisy.h"
 #include "machine/i8255.h"
+#include "machine/timer.h"
 #include "machine/z80ctc.h"
 #include "sound/sn76477.h"
 #include "speaker.h"

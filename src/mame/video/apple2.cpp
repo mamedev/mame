@@ -1368,6 +1368,12 @@ void a2_video_device::hgr_update(screen_device &screen, bitmap_ind16 &bitmap, co
 				artifact_map_ptr = &m_hires_artifact_map[((vram_row[col + 1] & 0x80) >> 7) * 16];
 			}
 
+			// CEC mono HGR mode
+			if ((m_monohgr) && (mon_type == 0))
+			{
+				mon_type = 1;
+			}
+
 			switch (mon_type)
 			{
 				case 0:

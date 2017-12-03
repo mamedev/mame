@@ -38,6 +38,9 @@
 #define MCFG_EEPROM_28040_ADD(_tag) \
 	MCFG_DEVICE_ADD(_tag, EEPROM_PARALLEL_28040, 0)
 
+// true when external circuit is used to lock EEPROM after every write
+#define MCFG_EEPROM_28XX_LOCK_AFTER_WRITE(_lock) \
+	eeprom_parallel_28xx_device::static_set_lock_after_write(*device, _lock);
 
 
 //**************************************************************************
@@ -65,14 +68,33 @@ protected:
 class eeprom_parallel_28xx_device : public eeprom_parallel_base_device
 {
 public:
-	// read/write data lines - for now we cheat and ignore the control lines, assuming
-	// they are handled reasonably
+	// static configuration helpers
+	static void static_set_lock_after_write(device_t &device, bool lock);
+
+	// read/write data lines
 	DECLARE_WRITE8_MEMBER(write);
 	DECLARE_READ8_MEMBER(read);
+
+	// control lines
+	DECLARE_WRITE_LINE_MEMBER(oe_w);
+	DECLARE_WRITE8_MEMBER(unlock_write);
+	DECLARE_WRITE16_MEMBER(unlock_write);
+	DECLARE_WRITE32_MEMBER(unlock_write);
 
 protected:
 	// construction/destruction
 	eeprom_parallel_28xx_device(const machine_config &mconfig, device_type devtype, const char *tag, device_t *owner);
+
+	// device-level overrides
+	virtual void device_start() override;
+	virtual void device_reset() override;
+
+private:
+	// configuration state
+	bool            m_lock_after_write;         // lock EEPROM after writes
+
+	// runtime state
+	int             m_oe;                       // state of OE line (-1 = synchronized with read)
 };
 
 

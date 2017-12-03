@@ -188,10 +188,10 @@ ROM_START(fccpu20sbc)   ROM_END
 
 /* Driver */
 /*    YEAR  NAME          PARENT    COMPAT MACHINE         INPUT     CLASS          INIT         COMPANY                   FULLNAME                FLAGS */
-COMP (1986, fccpu20sbc,    0,          0,  cpu20,          cpu20,    cpu20_state,   0,           "Force Computers GmbH",   "SYS68K/CPU-20",        MACHINE_NO_SOUND_HW | MACHINE_TYPE_COMPUTER )
-COMP (1986, fccpu21ssbc,   fccpu20sbc, 0,  cpu21s,         cpu20,    cpu20_state,   cpu21s,      "Force Computers GmbH",   "SYS68K/CPU-21S",       MACHINE_NO_SOUND_HW | MACHINE_TYPE_COMPUTER )
-COMP (1986, fccpu21sbc,    fccpu20sbc, 0,  cpu21,          cpu20,    cpu20_state,   cpu21,       "Force Computers GmbH",   "SYS68K/CPU-21",        MACHINE_NO_SOUND_HW | MACHINE_TYPE_COMPUTER )
-COMP (1986, fccpu21asbc,   fccpu20sbc, 0,  cpu21a,         cpu20,    cpu20_state,   cpu21a,      "Force Computers GmbH",   "SYS68K/CPU-21A",       MACHINE_NO_SOUND_HW | MACHINE_TYPE_COMPUTER )
-COMP (1986, fccpu21yasbc,  fccpu20sbc, 0,  cpu21ya,        cpu20,    cpu20_state,   cpu21ya,     "Force Computers GmbH",   "SYS68K/CPU-21YA",      MACHINE_NO_SOUND_HW | MACHINE_TYPE_COMPUTER )
-COMP (1986, fccpu21bsbc,   fccpu20sbc, 0,  cpu21b,         cpu20,    cpu20_state,   cpu21b,      "Force Computers GmbH",   "SYS68K/CPU-21B",       MACHINE_NO_SOUND_HW | MACHINE_TYPE_COMPUTER )
-COMP (1986, fccpu21ybsbc,  fccpu20sbc, 0,  cpu21yb,        cpu20,    cpu20_state,   cpu21yb,     "Force Computers GmbH",   "SYS68K/CPU-21YB",      MACHINE_NO_SOUND_HW | MACHINE_TYPE_COMPUTER )
+COMP (1986, fccpu20sbc,    0,          0,  cpu20,          cpu20,    cpu20_state,   0,           "Force Computers GmbH",   "SYS68K/CPU-20",        MACHINE_NO_SOUND_HW )
+COMP (1986, fccpu21ssbc,   fccpu20sbc, 0,  cpu21s,         cpu20,    cpu20_state,   cpu21s,      "Force Computers GmbH",   "SYS68K/CPU-21S",       MACHINE_NO_SOUND_HW )
+COMP (1986, fccpu21sbc,    fccpu20sbc, 0,  cpu21,          cpu20,    cpu20_state,   cpu21,       "Force Computers GmbH",   "SYS68K/CPU-21",        MACHINE_NO_SOUND_HW )
+COMP (1986, fccpu21asbc,   fccpu20sbc, 0,  cpu21a,         cpu20,    cpu20_state,   cpu21a,      "Force Computers GmbH",   "SYS68K/CPU-21A",       MACHINE_NO_SOUND_HW )
+COMP (1986, fccpu21yasbc,  fccpu20sbc, 0,  cpu21ya,        cpu20,    cpu20_state,   cpu21ya,     "Force Computers GmbH",   "SYS68K/CPU-21YA",      MACHINE_NO_SOUND_HW )
+COMP (1986, fccpu21bsbc,   fccpu20sbc, 0,  cpu21b,         cpu20,    cpu20_state,   cpu21b,      "Force Computers GmbH",   "SYS68K/CPU-21B",       MACHINE_NO_SOUND_HW )
+COMP (1986, fccpu21ybsbc,  fccpu20sbc, 0,  cpu21yb,        cpu20,    cpu20_state,   cpu21yb,     "Force Computers GmbH",   "SYS68K/CPU-21YB",      MACHINE_NO_SOUND_HW )

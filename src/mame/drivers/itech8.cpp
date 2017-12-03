@@ -25,7 +25,7 @@
         * Ninja Clowns
 
     Known issues:
-        * Ninja Clowns main ROM dump claims it's bad
+        * None
 
 ****************************************************************************
 
@@ -831,11 +831,21 @@ WRITE16_MEMBER(itech8_state::display_page16_w)
 		page_w(space, 0, ~data >> 8);
 }
 
-
-WRITE16_MEMBER(itech8_state::palette16_w)
+READ16_MEMBER(itech8_state::rom_constant_r)
 {
-	if (ACCESSING_BITS_8_15)
-		palette_w(space, offset / 8, data >> 8);
+//  Ninja Clowns reads this area for program ROM checksum
+	logerror("Read ROM constant area %04x\n",offset*2+0x40000);
+	return 0xd840;
+}
+
+READ8_MEMBER(itech8_state::ninclown_palette_r)
+{
+	return m_tlc34076->read(space, offset / 16);
+}
+
+WRITE8_MEMBER(itech8_state::ninclown_palette_w)
+{
+	m_tlc34076->write(space, offset / 16, data);
 }
 
 
@@ -893,19 +903,19 @@ static ADDRESS_MAP_START( gtg2_map, AS_PROGRAM, 8, itech8_state )
 	AM_RANGE(0x4000, 0xffff) AM_ROMBANK("bank1")
 ADDRESS_MAP_END
 
-
 /*------ Ninja Clowns layout ------*/
 static ADDRESS_MAP_START( ninclown_map, AS_PROGRAM, 16, itech8_state )
 	AM_RANGE(0x000000, 0x00007f) AM_RAM AM_REGION("maincpu", 0)
 	AM_RANGE(0x000080, 0x003fff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x004000, 0x07ffff) AM_ROM
+	AM_RANGE(0x004000, 0x03ffff) AM_ROM
+	AM_RANGE(0x040000, 0x07ffff) AM_READ(rom_constant_r)
 	AM_RANGE(0x100080, 0x100081) AM_WRITE8(sound_data_w, 0xff00)
 	AM_RANGE(0x100100, 0x100101) AM_READ_PORT("40") AM_WRITE(grom_bank16_w)
 	AM_RANGE(0x100180, 0x100181) AM_READ_PORT("60") AM_WRITE(display_page16_w)
 	AM_RANGE(0x100240, 0x100241) AM_DEVWRITE8("tms34061", tms34061_device, latch_w, 0xff00)
 	AM_RANGE(0x100280, 0x100281) AM_READ_PORT("80") AM_WRITENOP
 	AM_RANGE(0x100300, 0x10031f) AM_READWRITE8(blitter_r, blitter_w, 0xffff)
-	AM_RANGE(0x100380, 0x1003ff) AM_WRITE(palette16_w)
+	AM_RANGE(0x100380, 0x1003ff) AM_READWRITE8(ninclown_palette_r, ninclown_palette_w, 0xff00)
 	AM_RANGE(0x110000, 0x110fff) AM_READWRITE8(tms34061_r, tms34061_w, 0xffff)
 ADDRESS_MAP_END
 
@@ -1926,7 +1936,8 @@ static MACHINE_CONFIG_DERIVED( ninclown, itech8_core_hi )
 
 	MCFG_CPU_REPLACE("maincpu", M68000, CLOCK_12MHz)
 	MCFG_CPU_PROGRAM_MAP(ninclown_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", itech8_state,  generate_nmi)
+	// definitely doesn't like the generate_nmi code, so we just generate VBlank irq here instead
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", itech8_state,  irq3_line_hold)
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
@@ -2272,31 +2283,31 @@ ROM_END
 
 ROM_START( sstrike )
 	ROM_REGION( 0x1c000, "maincpu", 0 )
-	ROM_LOAD( "sstrku5.bin", 0x08000, 0x8000, CRC(af00cddf) SHA1(b866e8dfce1449f7462a79efa385ea6b55cdc6e7) )
-	ROM_COPY( "maincpu", 0x8000, 0x14000, 0x8000 )
+	ROM_LOAD( "sstrik_prg-v1_u5.u5", 0x08000, 0x8000, CRC(af00cddf) SHA1(b866e8dfce1449f7462a79efa385ea6b55cdc6e7) ) /* labeled SSTRIKE PRG-V1(U5) */
+	ROM_COPY( "maincpu",     0x8000, 0x14000, 0x8000 )
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )
-	ROM_LOAD( "sstrku27.bin", 0x08000, 0x8000, CRC(efab7252) SHA1(eb3b2002531e551e3d67958ea3cc56a69fa660e2) )
+	ROM_LOAD( "sstrik_snd1.4_u27.u27", 0x08000, 0x8000, CRC(efab7252) SHA1(eb3b2002531e551e3d67958ea3cc56a69fa660e2) ) /* labeled SSTRIKE SND1.4(U27) */
 
 	ROM_REGION( 0x10000, "sub", 0 )
-	ROM_LOAD( "spstku53.bin", 0x00000, 0x0800, CRC(04b85918) SHA1(409aef2e71937c7654334999df9313909d757966) )
+	ROM_LOAD( "spstku53.u53", 0x00000, 0x0800, CRC(04b85918) SHA1(409aef2e71937c7654334999df9313909d757966) )
 	ROM_CONTINUE(        0x00000, 0x0800 )
 	ROM_CONTINUE(        0x00000, 0x0800 )
 	ROM_CONTINUE(        0x00000, 0x0800 )
 
 	ROM_REGION( 0xc0000, "grom", 0 )
-	ROM_LOAD( "sstgrom0.bin", 0x00000, 0x20000, CRC(9cfb9849) SHA1(5aa860c0c6e3916ebdb8898ee44f633bf3347ca8) )
-	ROM_LOAD( "sstgrom1.bin", 0x20000, 0x20000, CRC(d9ea14e1) SHA1(4cddf3237c203b0a3f7ae770f85f1be35e9e1b78) )
-	ROM_LOAD( "sstgrom2.bin", 0x40000, 0x20000, CRC(dcd97bf7) SHA1(95361222ac58bf74539f2a7e80574bcd848c615e) )
+	ROM_LOAD( "super_strike_grom0.grom0", 0x00000, 0x20000, CRC(9cfb9849) SHA1(5aa860c0c6e3916ebdb8898ee44f633bf3347ca8) )
+	ROM_LOAD( "super_strike_grom1.grom1", 0x20000, 0x20000, CRC(d9ea14e1) SHA1(4cddf3237c203b0a3f7ae770f85f1be35e9e1b78) )
+	ROM_LOAD( "super_strike_grom2.grom2", 0x40000, 0x20000, CRC(dcd97bf7) SHA1(95361222ac58bf74539f2a7e80574bcd848c615e) )
 
 	ROM_REGION( 0x40000, "oki", 0 )
-	ROM_LOAD( "sstsrom0.bin", 0x00000, 0x20000, CRC(6ff390b9) SHA1(f31dae9e31f3fc83b9253e49fd4204820db3587e) )
+	ROM_LOAD( "super_strike_srom0.srom0", 0x00000, 0x20000, CRC(6ff390b9) SHA1(f31dae9e31f3fc83b9253e49fd4204820db3587e) )
 ROM_END
 
 
 ROM_START( stratabs )
 	ROM_REGION( 0x1c000, "maincpu", 0 )
-	ROM_LOAD( "sb_prog-v4t.u5", 0x08000, 0x8000, CRC(38ddae75) SHA1(71a9cbd36cf7b180a88bab3ab92a4dff93ce365f) )
+	ROM_LOAD( "sb_prog-v4t.u5",  0x08000, 0x8000, CRC(38ddae75) SHA1(71a9cbd36cf7b180a88bab3ab92a4dff93ce365f) )
 	ROM_COPY( "maincpu", 0x8000, 0x14000, 0x8000 )
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )
@@ -2311,7 +2322,7 @@ ROM_START( stratabs )
 	ROM_REGION( 0xc0000, "grom", 0 )
 	ROM_LOAD( "sb_grom00", 0x00000, 0x20000, CRC(22f6ce56) SHA1(8e423122384257d9c5d8f48192ff6fa1f544fd97) )
 	ROM_LOAD( "sb_grom01", 0x20000, 0x20000, CRC(6cc7ad6f) SHA1(d601b9bb81f26ad86e5cc053cab055831331ccde) )
-	ROM_LOAD( "sb_grom02",  0x40000, 0x20000, CRC(475134ef) SHA1(5920e7a211f1b2234e8a3f51e570303c3787d8fd) )
+	ROM_LOAD( "sb_grom02", 0x40000, 0x20000, CRC(475134ef) SHA1(5920e7a211f1b2234e8a3f51e570303c3787d8fd) )
 
 	ROM_REGION( 0x40000, "oki", 0 )
 	ROM_LOAD( "sb_srom0", 0x00000, 0x20000, CRC(6ff390b9) SHA1(f31dae9e31f3fc83b9253e49fd4204820db3587e) )
@@ -2384,23 +2395,23 @@ ROM_START( hstennis10 )
 ROM_END
 
 
-ROM_START( arlingtn )
-	/* banks are loaded in the opposite order from the others, */
-	ROM_REGION( 0x1c000, "maincpu", 0 )
-	ROM_LOAD( "ahrd121.bin", 0x10000, 0x4000, CRC(00aae02e) SHA1(3bcfbd256c34ae222dde24ba9544f19da70b698e) )
-	ROM_CONTINUE(            0x04000, 0xc000 )
+ROM_START( arlingtn ) /* PCB  p/n 1030 rev. 1A */
+	ROM_REGION( 0x1c000, "maincpu", 0 ) /* banks are loaded in the opposite order from the others, */
+	ROM_LOAD( "ahr-d_v_1.21.u5", 0x10000, 0x4000, CRC(00aae02e) SHA1(3bcfbd256c34ae222dde24ba9544f19da70b698e) ) /* Service menu reports version as 1.21-D */
+	ROM_CONTINUE(                0x04000, 0xc000 )
 	ROM_COPY( "maincpu", 0x8000, 0x14000, 0x8000 )
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )
-	ROM_LOAD( "ahrsnd11.bin", 0x08000, 0x8000, CRC(dec57dca) SHA1(21a8ead10b0434629f41f6b067c49b6622569a6c) )
+	ROM_LOAD( "ahr_snd_v1.1.u27", 0x08000, 0x8000, CRC(dec57dca) SHA1(21a8ead10b0434629f41f6b067c49b6622569a6c) )
 
 	ROM_REGION( 0xc0000, "grom", 0 )
-	ROM_LOAD( "grom0.bin", 0x00000, 0x20000, CRC(5ef57fe5) SHA1(e877979e034a61968b432037501e25a302a17a9a) )
-	ROM_LOAD( "grom1.bin", 0x20000, 0x20000, CRC(6aca95c0) SHA1(da7a899bf0812a7af178e48b5a626ce56a836579) )
-	ROM_LOAD( "grom2.bin", 0x40000, 0x10000, CRC(6d6fde1b) SHA1(aaabc45d4b566be42e8d28d767e4771a96d9caae) )
+	ROM_LOAD( "grom0.grom0", 0x00000, 0x20000, CRC(5ef57fe5) SHA1(e877979e034a61968b432037501e25a302a17a9a) )
+	ROM_LOAD( "grom1.grom1", 0x20000, 0x20000, CRC(6aca95c0) SHA1(da7a899bf0812a7af178e48b5a626ce56a836579) )
+	ROM_LOAD( "grom2.grom2", 0x40000, 0x10000, CRC(6d6fde1b) SHA1(aaabc45d4b566be42e8d28d767e4771a96d9caae) )
+	/* GROM3, GROM4 & GROM5 are unpopulated */
 
 	ROM_REGION( 0x40000, "oki", 0 )
-	ROM_LOAD( "srom0.bin", 0x00000, 0x40000, CRC(56087f81) SHA1(1d4a1f396ee9d8ed51d0417ea94b0b379312d72f) )
+	ROM_LOAD( "srom0.srom0", 0x00000, 0x40000, CRC(56087f81) SHA1(1d4a1f396ee9d8ed51d0417ea94b0b379312d72f) )
 ROM_END
 
 
@@ -2569,10 +2580,9 @@ ROM_END
 
 
 ROM_START( ninclown )
-	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_REGION( 0x40000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "prog1", 0x00000, 0x20000, CRC(fabfdcd2) SHA1(7a9852838cf7772d8f8f956b03823c4222520a5a) )
 	ROM_LOAD16_BYTE( "prog0", 0x00001, 0x20000, CRC(eca63db5) SHA1(b86d75ee81e155a21de18c2e0fa898f15d61560d) )
-	ROM_COPY(    "maincpu", 0x0000, 0x40000, 0x40000 )
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD( "nc-snd", 0x08000, 0x8000, CRC(f9d5b4e1) SHA1(e5c3774db349b60baf11baecf55ac432871e612c) )
@@ -2757,9 +2767,9 @@ GAME( 1990, slikshot,  0,        slikshot_hi,       slikshot, itech8_state, slik
 GAME( 1990, slikshot17,slikshot, slikshot_hi,       slikshot, itech8_state, slikshot, ROT90,  "Grand Products/Incredible Technologies", "Slick Shot (V1.7)", MACHINE_MECHANICAL )
 GAME( 1990, slikshot16,slikshot, slikshot_hi,       slikshot, itech8_state, slikshot, ROT90,  "Grand Products/Incredible Technologies", "Slick Shot (V1.6)", MACHINE_MECHANICAL )
 GAME( 1990, dynobop,   0,        slikshot_hi,       dynobop,  itech8_state, slikshot, ROT90,  "Grand Products/Incredible Technologies", "Dyno Bop (V1.1)", MACHINE_MECHANICAL )
-GAME( 1990, sstrike,   0,        sstrike,           sstrike,  itech8_state, sstrike,  ROT270, "Strata/Incredible Technologies", "Super Strike Bowling", MACHINE_MECHANICAL )
-GAME( 1991, pokrdice,  0,        slikshot_lo_noz80, pokrdice, itech8_state, 0,        ROT90,  "Strata/Incredible Technologies", "Poker Dice", 0 )
+GAME( 1990, sstrike,   0,        sstrike,           sstrike,  itech8_state, sstrike,  ROT270, "Strata/Incredible Technologies", "Super Strike Bowling (V1)", MACHINE_MECHANICAL )
 GAME( 1990, stratabs,  stratab,  sstrike,           stratabs, itech8_state, sstrike,  ROT270, "Strata/Incredible Technologies", "Strata Bowling (V1 4T, Super Strike Bowling type PCB)", MACHINE_NOT_WORKING ) // need to figure out the control hookup for this set, service mode indicates it's still a trackball like stratab
+GAME( 1991, pokrdice,  0,        slikshot_lo_noz80, pokrdice, itech8_state, 0,        ROT90,  "Strata/Incredible Technologies", "Poker Dice", 0 )
 
 /* Hot Shots Tennis-style PCB */
 GAME( 1990, hstennis,  0,        hstennis_hi,       hstennis, itech8_state, hstennis, ROT90,  "Strata/Incredible Technologies", "Hot Shots Tennis (V1.1)", 0 )
@@ -2776,7 +2786,7 @@ GAME( 1991, rimrockn16, rimrockn, rimrockn,         rimrockn, itech8_state, rimr
 GAME( 1991, rimrockn12, rimrockn, rimrockn,         rimrockn, itech8_state, rimrockn, ROT0,   "Strata/Incredible Technologies", "Rim Rockin' Basketball (V1.2)", 0 )
 
 /* Ninja Clowns-style PCB */
-GAME( 1991, ninclown, 0,        ninclown,           ninclown, itech8_state, 0,        ROT0,   "Strata/Incredible Technologies", "Ninja Clowns (08/27/91)", 0 )
+GAME( 1991, ninclown, 0,        ninclown,           ninclown, itech8_state, 0,        ROT0,   "Strata/Incredible Technologies", "Ninja Clowns (27 oct 91)", 0 )
 
 /* Golden Tee Golf II-style PCB */
 GAME( 1992, gpgolf,   0,        gtg2,               gpgolf,   itech8_state, 0,        ROT0,   "Strata/Incredible Technologies", "Golden Par Golf (Joystick, V1.1)", 0 )

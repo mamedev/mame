@@ -68,11 +68,6 @@ end
 			}
 	end
 
-	configuration { "vs*" }
-	flags {
-		"Unicode",
-	}
-
 	configuration { "winstore*" }
 		-- Windows Required Files
 		files {
@@ -301,6 +296,7 @@ end
 	end
 	links {
 		"bgfx",
+		"bimg",
 		"bx",
 		"ocore_" .. _OPTIONS["osd"],
 	}

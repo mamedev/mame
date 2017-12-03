@@ -108,6 +108,7 @@ TODO:
 #include "bus/generic/carts.h"
 #include "machine/bankdev.h"
 #include "machine/genpc.h"
+#include "machine/timer.h"
 #include "screen.h"
 #include "softlist.h"
 
@@ -543,7 +544,7 @@ static MACHINE_CONFIG_START( pasogo )
 	MCFG_DEVICE_ADD("ems", ADDRESS_MAP_BANK, 0)
 	MCFG_DEVICE_PROGRAM_MAP(emsbank_map)
 	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_ADDRESS_MAP_BANK_DATABUS_WIDTH(16)
+	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(16)
 	MCFG_ADDRESS_MAP_BANK_STRIDE(0x4000)
 
 	MCFG_IBM5160_MOTHERBOARD_ADD("mb", "maincpu")

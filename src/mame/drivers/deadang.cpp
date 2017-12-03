@@ -69,7 +69,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, deadang_state )
 	AM_RANGE(0x03800, 0x03fff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x04000, 0x04fff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0x05000, 0x05fff) AM_WRITEONLY
-	AM_RANGE(0x06000, 0x0600f) AM_DEVREADWRITE("seibu_sound", seibu_sound_device, main_word_r, main_word_w)
+	AM_RANGE(0x06000, 0x0600f) AM_DEVREADWRITE8("seibu_sound", seibu_sound_device, main_r, main_w, 0x00ff)
 	AM_RANGE(0x06010, 0x07fff) AM_WRITEONLY
 	AM_RANGE(0x08000, 0x087ff) AM_WRITE(text_w) AM_SHARE("videoram")
 	AM_RANGE(0x08800, 0x0bfff) AM_WRITEONLY

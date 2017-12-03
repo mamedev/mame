@@ -47,13 +47,12 @@ struct machine_flags
 		SUPPORTS_SAVE       = 0x00000080,   // system supports save states
 		NO_COCKTAIL         = 0x00000100,   // screen flip support is missing
 		IS_BIOS_ROOT        = 0x00000200,   // this driver entry is a BIOS root
-		NO_STANDALONE       = 0x00000400,   // this driver cannot stand alone
-		REQUIRES_ARTWORK    = 0x00000800,   // requires external artwork for key game elements
-		CLICKABLE_ARTWORK   = 0x00001000,   // artwork is clickable and requires mouse cursor
-		UNOFFICIAL          = 0x00002000,   // unofficial hardware modification
-		NO_SOUND_HW         = 0x00004000,   // system has no sound output
-		MECHANICAL          = 0x00008000,   // contains mechanical parts (pinball, redemption games, ...)
-		IS_INCOMPLETE       = 0x00010000    // official system with blatantly incomplete hardware/software
+		REQUIRES_ARTWORK    = 0x00000400,   // requires external artwork for key game elements
+		CLICKABLE_ARTWORK   = 0x00000800,   // artwork is clickable and requires mouse cursor
+		UNOFFICIAL          = 0x00001000,   // unofficial hardware modification
+		NO_SOUND_HW         = 0x00002000,   // system has no sound output
+		MECHANICAL          = 0x00004000,   // contains mechanical parts (pinball, redemption games, ...)
+		IS_INCOMPLETE       = 0x00008000    // official system with blatantly incomplete hardware/software
 	};
 };
 
@@ -69,7 +68,6 @@ constexpr u64 MACHINE_NOT_WORKING               = machine_flags::NOT_WORKING;
 constexpr u64 MACHINE_SUPPORTS_SAVE             = machine_flags::SUPPORTS_SAVE;
 constexpr u64 MACHINE_NO_COCKTAIL               = machine_flags::NO_COCKTAIL;
 constexpr u64 MACHINE_IS_BIOS_ROOT              = machine_flags::IS_BIOS_ROOT;
-constexpr u64 MACHINE_NO_STANDALONE             = machine_flags::NO_STANDALONE;
 constexpr u64 MACHINE_REQUIRES_ARTWORK          = machine_flags::REQUIRES_ARTWORK;
 constexpr u64 MACHINE_CLICKABLE_ARTWORK         = machine_flags::CLICKABLE_ARTWORK;
 constexpr u64 MACHINE_UNOFFICIAL                = machine_flags::UNOFFICIAL;

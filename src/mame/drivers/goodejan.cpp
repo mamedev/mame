@@ -450,7 +450,7 @@ static ADDRESS_MAP_START( common_io_map, AS_IO, 16, goodejan_state )
 	AM_RANGE(0xc000, 0xc001) AM_READ_PORT("DSW1")
 	AM_RANGE(0xc002, 0xc003) AM_READ(mahjong_panel_r)
 	AM_RANGE(0xc004, 0xc005) AM_READ_PORT("DSW2") // switches
-	AM_RANGE(0xd000, 0xd00f) AM_DEVREADWRITE("seibu_sound", seibu_sound_device, main_word_r, main_word_w)
+	AM_RANGE(0xd000, 0xd00f) AM_DEVREADWRITE8("seibu_sound", seibu_sound_device, main_r, main_w, 0x00ff)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( totmejan_io_map, AS_IO, 16, goodejan_state )
@@ -459,7 +459,7 @@ static ADDRESS_MAP_START( totmejan_io_map, AS_IO, 16, goodejan_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( goodejan_io_map, AS_IO, 16, goodejan_state )
-	AM_RANGE(0x8000, 0x807f) AM_DEVREADWRITE("crtc", seibu_crtc_device, read_xor, write_xor)
+	AM_RANGE(0x8000, 0x807f) AM_DEVREADWRITE_MOD("crtc", seibu_crtc_device, read, write, xor<0x20>)
 	AM_IMPORT_FROM(common_io_map)
 ADDRESS_MAP_END
 

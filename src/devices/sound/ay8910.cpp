@@ -494,10 +494,12 @@ Yamaha YM2203: 2 I/O ports
   The first 16 registers are the same(?) as the YM2149.
   YM2203: Unused bits in registers have unknown behavior.
   I/O current source/sink behavior is unknown.
-  YM2203 die is unknown; two die revisions, 'F' and 'H', have been observed
-    from Yamaha chip/datecode silkscreen surface markings. It is unknown
-    what behavioral differences exist between these two revisions.
-    The 'F' revision only appears during the first year of production.
+  YM2203 die is unknown; three die revisions, 'D', 'F' and 'H', have been
+    observed from Yamaha chip/datecode silkscreen surface markings. It is
+    unknown what behavioral differences exist between these revisions.
+    The 'D' revision only appears during the first year of production, 1984, on chips marked 'YM2203B'
+    The 'F' revision exists from 1984?-1991, chips are marked 'YM2203C'
+    The 'H' revision exists from 1991 onward, chips are marked 'YM2203C'
 Yamaha YM3439: limited info: CMOS version of YM2149?
 Yamaha YMZ284: limited info: 0 I/O port, different clock divider
   The chip selection logic is again simplified here: pin 1 is /WR, pin 2 is

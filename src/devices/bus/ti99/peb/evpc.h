@@ -18,6 +18,7 @@
 #pragma once
 
 #include "peribox.h"
+#include "machine/timer.h"
 #include "video/v9938.h"
 #include "sound/sn76496.h"
 #include "bus/ti99/ti99defs.h"

@@ -1,6 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:Tomasz Slanina
+
 #include "audio/seibu.h"    // for seibu_sound_decrypt on the MAIN cpu (not sound)
+#include "machine/timer.h"
 #include "screen.h"
 
 class mustache_state : public driver_device

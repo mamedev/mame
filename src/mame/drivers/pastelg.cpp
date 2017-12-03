@@ -517,14 +517,14 @@ ROM_END
 
 ROM_START( threeds )
 	ROM_REGION( 0x10000, "maincpu", 0 ) /* program */
-	ROM_LOAD( "up9.9a",    0x00000, 0x04000, CRC(bc0e7cfd) SHA1(4e84f573fb2c1228757d34b8bc69649b145d9707) )
-	ROM_LOAD( "up10.10a",  0x04000, 0x04000, CRC(e185d9f5) SHA1(98d4a824ed6a89e42543fb87daed33ef606bcced) )
-	ROM_LOAD( "up11.11a",  0x08000, 0x04000, CRC(d1fb728b) SHA1(46e8e6ccdc1b78da29c969cd9290158c96bac4c4) )
+	ROM_LOAD( "ft9.9a",    0x00000, 0x04000, CRC(bc0e7cfd) SHA1(4e84f573fb2c1228757d34b8bc69649b145d9707) ) // labeled FT9  (red label)
+	ROM_LOAD( "ft10.10a",  0x04000, 0x04000, CRC(e185d9f5) SHA1(98d4a824ed6a89e42543fb87daed33ef606bcced) ) // labeled FT10 (red label)
+	ROM_LOAD( "ft11.11a",  0x08000, 0x04000, CRC(d1fb728b) SHA1(46e8e6ccdc1b78da29c969cd9290158c96bac4c4) ) // labeled FT11 (red label)
 
 	ROM_REGION( 0x08000, "voice", ROMREGION_ERASE00 ) /* voice */
 
 	ROM_REGION( 0x38000, "gfx1", 0 ) /* gfx */
-	ROM_LOAD( "1.1a",  0x00000, 0x08000, CRC(5734ca7d) SHA1(d22b9e604cc4e2c0bb4eb32ded06bb5fa519965f) )
+	ROM_LOAD( "1.1a",  0x00000, 0x08000, CRC(5734ca7d) SHA1(d22b9e604cc4e2c0bb4eb32ded06bb5fa519965f) ) // roms 1 through 7 where labeled simply "1" through "7" in black labels
 	ROM_LOAD( "2.2a",  0x08000, 0x08000, CRC(c7f21718) SHA1(4b2956d499e4db63e7f2329420e3d0313e6360ed) )
 	ROM_LOAD( "3.3a",  0x10000, 0x08000, CRC(87bd0a9e) SHA1(a0443017ef4c19f0135c4f764a96457f02cda743) )
 	ROM_LOAD( "4.4a",  0x18000, 0x08000, CRC(b75ecf2b) SHA1(50b8f27988dd24ff475a500d361db3c7a7051f40) )

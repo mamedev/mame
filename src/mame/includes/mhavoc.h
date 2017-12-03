@@ -6,6 +6,8 @@
 
 *************************************************************************/
 
+#include "machine/timer.h"
+
 #define MHAVOC_CLOCK        10000000
 #define MHAVOC_CLOCK_5M     (MHAVOC_CLOCK/2)
 #define MHAVOC_CLOCK_2_5M   (MHAVOC_CLOCK/4)

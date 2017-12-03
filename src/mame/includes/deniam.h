@@ -52,7 +52,6 @@ public:
 	uint16_t         m_coinctrl;
 
 	/* devices */
-	DECLARE_WRITE16_MEMBER(sound_command_w);
 	DECLARE_WRITE16_MEMBER(deniam_irq_ack_w);
 	DECLARE_WRITE16_MEMBER(deniam_videoram_w);
 	DECLARE_WRITE16_MEMBER(deniam_textram_w);

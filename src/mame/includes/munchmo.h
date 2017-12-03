@@ -48,15 +48,15 @@ public:
 	required_device<palette_device> m_palette;
 	required_device<generic_latch_8_device> m_soundlatch;
 
-	DECLARE_WRITE8_MEMBER(nmi_enable_w);
+	DECLARE_WRITE_LINE_MEMBER(nmi_enable_w);
 	DECLARE_WRITE8_MEMBER(nmi_ack_w);
 	DECLARE_WRITE8_MEMBER(sound_nmi_ack_w);
-	DECLARE_WRITE8_MEMBER(palette_bank_w);
-	DECLARE_WRITE8_MEMBER(flipscreen_w);
+	DECLARE_WRITE_LINE_MEMBER(palette_bank_0_w);
+	DECLARE_WRITE_LINE_MEMBER(palette_bank_1_w);
+	DECLARE_WRITE_LINE_MEMBER(flipscreen_w);
 	DECLARE_READ8_MEMBER(ay1reset_r);
 	DECLARE_READ8_MEMBER(ay2reset_r);
 	virtual void machine_start() override;
-	virtual void machine_reset() override;
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(munchmo);
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

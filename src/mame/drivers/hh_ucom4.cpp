@@ -72,6 +72,7 @@ TODO:
 #include "emu.h"
 #include "includes/hh_ucom4.h"
 #include "video/hlcd0515.h"
+#include "rendlay.h"
 #include "screen.h"
 #include "speaker.h"
 

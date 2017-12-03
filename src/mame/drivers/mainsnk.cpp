@@ -118,27 +118,10 @@ cc_p14.j2 8192 0xedc6a1eb M5L2764k
 #include "speaker.h"
 
 
-void mainsnk_state::machine_start()
-{
-	save_item(NAME(m_sound_cpu_busy));
-}
-
-WRITE8_MEMBER(mainsnk_state::sound_command_w)
-{
-	m_sound_cpu_busy = 1;
-	m_soundlatch->write(space, 0, data);
-	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
-}
-
 READ8_MEMBER(mainsnk_state::sound_ack_r)
 {
-	m_sound_cpu_busy = 0;
+	m_audiocpu->set_input_line(0, CLEAR_LINE);
 	return 0xff;
-}
-
-CUSTOM_INPUT_MEMBER(mainsnk_state::sound_r)
-{
-	return (m_sound_cpu_busy) ? 0x01 : 0x00;
 }
 
 
@@ -152,7 +135,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, mainsnk_state )
 	AM_RANGE(0xc400, 0xc400) AM_READ_PORT("DSW1")
 	AM_RANGE(0xc500, 0xc500) AM_READ_PORT("DSW2")
 	AM_RANGE(0xc600, 0xc600) AM_WRITE(c600_w)
-	AM_RANGE(0xc700, 0xc700) AM_WRITE(sound_command_w)
+	AM_RANGE(0xc700, 0xc700) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
 	AM_RANGE(0xd800, 0xdbff) AM_RAM_WRITE(bgram_w) AM_SHARE("bgram")
 	AM_RANGE(0xdc00, 0xe7ff) AM_RAM
 	AM_RANGE(0xe800, 0xefff) AM_RAM AM_SHARE("spriteram")
@@ -163,7 +146,7 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, mainsnk_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0xa000, 0xa000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-	AM_RANGE(0xc000, 0xc000) AM_READ(sound_ack_r)
+	AM_RANGE(0xc000, 0xc000) AM_DEVREAD("soundlatch", generic_latch_8_device, acknowledge_r)
 	AM_RANGE(0xe000, 0xe001) AM_DEVWRITE("ay1", ay8910_device, address_data_w)
 	AM_RANGE(0xe002, 0xe003) AM_WRITENOP    // ? always FFFF, snkwave leftover?
 	AM_RANGE(0xe008, 0xe009) AM_DEVWRITE("ay2", ay8910_device, address_data_w)
@@ -171,7 +154,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_portmap, AS_IO, 8, mainsnk_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READNOP
+	AM_RANGE(0x00, 0x00) AM_READ(sound_ack_r)
 ADDRESS_MAP_END
 
 
@@ -183,7 +166,7 @@ static INPUT_PORTS_START( mainsnk )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SERVICE1 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_START1 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_START2 )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, mainsnk_state, sound_r, nullptr)  /* sound CPU status */
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("soundlatch", generic_latch_8_device, pending_r)  /* sound CPU status */
 	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_SERVICE )
 
@@ -277,7 +260,7 @@ static INPUT_PORTS_START( canvas )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SERVICE1 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_START1 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_START2 )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, mainsnk_state, sound_r, nullptr)  /* sound CPU status */
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("soundlatch", generic_latch_8_device, pending_r)  /* sound CPU status */
 	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_SERVICE )
 
@@ -398,7 +381,7 @@ static MACHINE_CONFIG_START( mainsnk )
 	MCFG_CPU_ADD("audiocpu", Z80,4000000)
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 	MCFG_CPU_IO_MAP(sound_portmap)
-	MCFG_CPU_PERIODIC_INT_DRIVER(mainsnk_state, irq0_line_hold,  244)
+	MCFG_CPU_PERIODIC_INT_DRIVER(mainsnk_state, irq0_line_assert,  244)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -416,6 +399,8 @@ static MACHINE_CONFIG_START( mainsnk )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
+	MCFG_GENERIC_LATCH_SEPARATE_ACKNOWLEDGE(true)
 
 	MCFG_SOUND_ADD("ay1", AY8910, 2000000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.35)

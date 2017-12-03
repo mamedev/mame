@@ -28,6 +28,8 @@ public:
 	bool m_80col;
 	bool m_altcharset;
 	bool m_an2;
+	bool m_monohgr;
+
 	std::unique_ptr<uint16_t[]> m_hires_artifact_map;
 	std::unique_ptr<uint16_t[]> m_dhires_artifact_map;
 

@@ -72,6 +72,7 @@ K1000233A
 #include "cpu/m6805/m68705.h"
 #include "cpu/z80/z80.h"
 
+#include "machine/74259.h"
 #include "machine/gen_latch.h"
 #include "machine/watchdog.h"
 
@@ -83,22 +84,25 @@ K1000233A
 
 INTERRUPT_GEN_MEMBER(pitnrun_state::nmi_source)
 {
-	if (m_nmi) device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	if (m_nmi)
+		device.execute().set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 }
 
-WRITE8_MEMBER(pitnrun_state::nmi_enable_w)
+WRITE_LINE_MEMBER(pitnrun_state::nmi_enable_w)
 {
-	m_nmi = data & 1;
+	m_nmi = state;
+	if (!m_nmi)
+		m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 }
 
-WRITE8_MEMBER(pitnrun_state::hflip_w)
+WRITE_LINE_MEMBER(pitnrun_state::hflip_w)
 {
-	flip_screen_x_set(data);
+	flip_screen_x_set(state);
 }
 
-WRITE8_MEMBER(pitnrun_state::vflip_w)
+WRITE_LINE_MEMBER(pitnrun_state::vflip_w)
 {
-	flip_screen_y_set(data);
+	flip_screen_y_set(state);
 }
 
 static ADDRESS_MAP_START( pitnrun_map, AS_PROGRAM, 8, pitnrun_state )
@@ -108,13 +112,9 @@ static ADDRESS_MAP_START( pitnrun_map, AS_PROGRAM, 8, pitnrun_state )
 	AM_RANGE(0x9000, 0x9fff) AM_RAM_WRITE(videoram2_w) AM_SHARE("videoram2")
 	AM_RANGE(0xa000, 0xa0ff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0xa800, 0xa800) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0xa800, 0xa807) AM_WRITENOP /* Analog Sound */
-	AM_RANGE(0xb000, 0xb000) AM_READ_PORT("DSW") AM_WRITE(nmi_enable_w)
-	AM_RANGE(0xb001, 0xb001) AM_WRITE(color_select_w)
-	AM_RANGE(0xb004, 0xb004) AM_WRITENOP/* COLOR SEL 2 - not used ?*/
-	AM_RANGE(0xb005, 0xb005) AM_WRITE(char_bank_select)
-	AM_RANGE(0xb006, 0xb006) AM_WRITE(hflip_w)
-	AM_RANGE(0xb007, 0xb007) AM_WRITE(vflip_w)
+	AM_RANGE(0xa800, 0xa807) AM_DEVWRITE("noiselatch", ls259_device, write_d0) /* Analog Sound */
+	AM_RANGE(0xb000, 0xb000) AM_READ_PORT("DSW")
+	AM_RANGE(0xb000, 0xb007) AM_DEVWRITE("mainlatch", ls259_device, write_d0)
 	AM_RANGE(0xb800, 0xb800) AM_READ_PORT("INPUTS") AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
 	AM_RANGE(0xc800, 0xc801) AM_WRITE(scroll_w)
 	AM_RANGE(0xc802, 0xc802) AM_WRITE(scroll_y_w)
@@ -279,6 +279,14 @@ static MACHINE_CONFIG_START( pitnrun )
 	MCFG_CPU_PROGRAM_MAP(pitnrun_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", pitnrun_state,  nmi_source)
 
+	MCFG_DEVICE_ADD("mainlatch", LS259, 0) // 7B (mislabeled LS156 on schematic)
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(pitnrun_state, nmi_enable_w)) // NMION
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(pitnrun_state, color_select_w))
+	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(NOOP) // COLOR SEL 2 - not used ?
+	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(pitnrun_state, char_bank_select_w))
+	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(pitnrun_state, hflip_w)) // HFLIP
+	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(pitnrun_state, vflip_w)) // VFLIP
+
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL_5MHz/2)          /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(pitnrun_sound_map)
 	MCFG_CPU_IO_MAP(pitnrun_sound_io_map)
@@ -315,6 +323,8 @@ static MACHINE_CONFIG_START( pitnrun )
 	MCFG_AY8910_PORT_A_READ_CB(DEVREAD8("soundlatch", generic_latch_8_device, read))
 	MCFG_AY8910_PORT_B_READ_CB(DEVREAD8("soundlatch", generic_latch_8_device, read))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+
+	MCFG_DEVICE_ADD("noiselatch", LS259, 0) // 1J
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( pitnrun_mcu, pitnrun )

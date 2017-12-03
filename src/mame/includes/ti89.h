@@ -10,6 +10,7 @@
 #define TI89_H_
 
 #include "machine/intelfsh.h"
+#include "machine/timer.h"
 
 class ti68k_state : public driver_device
 {

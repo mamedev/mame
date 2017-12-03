@@ -6,6 +6,8 @@
 
 **************************************************************************/
 
+#include "machine/gen_latch.h"
+
 class suprridr_state : public driver_device
 {
 public:
@@ -13,6 +15,7 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
+		m_soundlatch(*this, "soundlatch"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
 		m_fgram(*this, "fgram"),
@@ -21,6 +24,7 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
+	required_device<generic_latch_8_device> m_soundlatch;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 
@@ -29,7 +33,6 @@ public:
 	required_shared_ptr<uint8_t> m_spriteram;
 
 	uint8_t m_nmi_enable;
-	uint8_t m_sound_data;
 	tilemap_t *m_fg_tilemap;
 	tilemap_t *m_bg_tilemap;
 	tilemap_t *m_bg_tilemap_noscroll;
@@ -37,8 +40,6 @@ public:
 	uint8_t m_flipy;
 
 	DECLARE_WRITE8_MEMBER(nmi_enable_w);
-	DECLARE_WRITE8_MEMBER(sound_data_w);
-	DECLARE_WRITE8_MEMBER(sound_irq_ack_w);
 	DECLARE_WRITE8_MEMBER(coin_lock_w);
 	DECLARE_WRITE8_MEMBER(flipx_w);
 	DECLARE_WRITE8_MEMBER(flipy_w);
@@ -47,7 +48,6 @@ public:
 	DECLARE_WRITE8_MEMBER(bgscrolly_w);
 	DECLARE_WRITE8_MEMBER(bgram_w);
 	DECLARE_WRITE8_MEMBER(fgram_w);
-	DECLARE_READ8_MEMBER(sound_data_r);
 
 	DECLARE_CUSTOM_INPUT_MEMBER(control_r);
 
@@ -55,9 +55,9 @@ public:
 	TILE_GET_INFO_MEMBER(get_tile_info2);
 
 	INTERRUPT_GEN_MEMBER(main_nmi_gen);
-	TIMER_CALLBACK_MEMBER(delayed_sound_w);
 
 	virtual void machine_start() override;
+	virtual void machine_reset() override;
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(suprridr);
 

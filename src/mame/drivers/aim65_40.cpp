@@ -50,6 +50,7 @@ The source code there implies that *maybe* ff7e and ff7f are also open bus.
 #include "cpu/m6502/m6502.h"
 #include "machine/6522via.h"
 #include "machine/mos6551.h"
+#include "bus/rs232/rs232.h"
 #include "aim65_40.lh"
 
 
@@ -72,13 +73,15 @@ class aim65_40_state : public driver_device
 {
 public:
 	aim65_40_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag)
+		{ }
 
 	// devices
-	device_t *m_via0;
-	device_t *m_via1;
-	device_t *m_via2;
-	device_t *m_speaker;
+	//device_t *m_via0;
+	//device_t *m_via1;
+	//device_t *m_via2;
+	//device_t *m_speaker;
+private:
 };
 
 
@@ -88,12 +91,13 @@ public:
 
 static ADDRESS_MAP_START( aim65_40_mem, AS_PROGRAM, 8, aim65_40_state )
 	AM_RANGE(0x0000, 0x3fff) AM_RAM
-	AM_RANGE(0xa000, 0xff7f) AM_ROM
+	AM_RANGE(0xa000, 0xcfff) AM_ROM AM_REGION("roms", 0)
+	AM_RANGE(0xf000, 0xff7f) AM_ROM AM_REGION("roms", 0x3000)
 	AM_RANGE(0xffa0, 0xffaf) AM_DEVREADWRITE(M6522_0_TAG, via6522_device, read, write)
 	AM_RANGE(0xffb0, 0xffbf) AM_DEVREADWRITE(M6522_1_TAG, via6522_device, read, write)
 	AM_RANGE(0xffc0, 0xffcf) AM_DEVREADWRITE(M6522_2_TAG, via6522_device, read, write)
 	AM_RANGE(0xffd0, 0xffd3) AM_DEVREADWRITE(M6551_TAG, mos6551_device, read, write)
-	AM_RANGE(0xffe0, 0xffff) AM_ROM
+	AM_RANGE(0xffe0, 0xffff) AM_ROM AM_REGION("roms", 0x3fe0)
 ADDRESS_MAP_END
 
 /***************************************************************************
@@ -123,6 +127,15 @@ static MACHINE_CONFIG_START( aim65_40 )
 	MCFG_DEVICE_ADD(M6522_2_TAG, VIA6522, 0)
 	MCFG_DEVICE_ADD(M6551_TAG, MOS6551, 0)
 	MCFG_MOS6551_XTAL(XTAL_1_8432MHz)
+	MCFG_MOS6551_TXD_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_txd))
+	MCFG_MOS6551_RTS_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_rts))
+	MCFG_MOS6551_DTR_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_dtr))
+
+	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, "terminal")
+	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(M6551_TAG, mos6551_device, write_rxd))
+	MCFG_RS232_DCD_HANDLER(DEVWRITELINE(M6551_TAG, mos6551_device, write_dcd))
+	MCFG_RS232_DSR_HANDLER(DEVWRITELINE(M6551_TAG, mos6551_device, write_dsr))
+	MCFG_RS232_CTS_HANDLER(DEVWRITELINE(M6551_TAG, mos6551_device, write_cts))
 MACHINE_CONFIG_END
 
 /***************************************************************************
@@ -130,11 +143,11 @@ MACHINE_CONFIG_END
 ***************************************************************************/
 
 ROM_START( aim65_40 )
-	ROM_REGION( 0x10000, M6502_TAG, 0 )
-	ROM_LOAD( "mon a v1.0 r32u5-11.z65", 0xa000, 0x1000, CRC(8c970c67) SHA1(5c8aecb2155a10777a57d4f0f2d16b7ba7b1fb45) )
-	ROM_LOAD( "mon b v1.0 r32u6-11.z66", 0xb000, 0x1000, CRC(38a1e0cd) SHA1(37c34e32ad25d27e9590ee3f325801ca311be7b1) )
-	ROM_LOAD( "r2332lp r3224-11.z70",    0xc000, 0x1000, CRC(0878b399) SHA1(483e92b57d64be51643a9f6490521a8572aa2f68) ) // Assembler
-	ROM_LOAD( "i-of v1.0 r32t3-12.z73",  0xf000, 0x1000, CRC(a62bec4a) SHA1(a2fc69a33dc3b7684bf3399beff7b22eaf05c843) )
+	ROM_REGION( 0x4000, "roms", 0 )
+	ROM_LOAD( "mon a v1.0 r32u5-11.z65", 0x0000, 0x1000, CRC(8c970c67) SHA1(5c8aecb2155a10777a57d4f0f2d16b7ba7b1fb45) )
+	ROM_LOAD( "mon b v1.0 r32u6-11.z66", 0x1000, 0x1000, CRC(38a1e0cd) SHA1(37c34e32ad25d27e9590ee3f325801ca311be7b1) )
+	ROM_LOAD( "r2332lp r3224-11.z70",    0x2000, 0x1000, CRC(0878b399) SHA1(483e92b57d64be51643a9f6490521a8572aa2f68) ) // Assembler
+	ROM_LOAD( "i-of v1.0 r32t3-12.z73",  0x3000, 0x1000, CRC(a62bec4a) SHA1(a2fc69a33dc3b7684bf3399beff7b22eaf05c843) )
 ROM_END
 
 /***************************************************************************

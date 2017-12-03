@@ -58,7 +58,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( shisen_io_map, AS_IO, 8, shisen_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READWRITE(dsw1_r, coin_w)
-	AM_RANGE(0x01, 0x01) AM_READ_PORT("DSW2") AM_DEVWRITE("m72", m72_audio_device, sound_command_byte_w)
+	AM_RANGE(0x01, 0x01) AM_READ_PORT("DSW2") AM_DEVWRITE("m72", m72_audio_device, sound_command_w)
 	AM_RANGE(0x02, 0x02) AM_READ_PORT("P1") AM_WRITE(bankswitch_w)
 	AM_RANGE(0x03, 0x03) AM_READ_PORT("P2")
 	AM_RANGE(0x04, 0x04) AM_READ_PORT("COIN")

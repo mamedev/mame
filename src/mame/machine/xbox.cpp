@@ -30,11 +30,11 @@ bool xbox_base_state::find_bios_hash(running_machine &mach, int bios, uint32_t &
 	uint32_t crc = 0;
 	const std::vector<rom_entry> &rev = mach.root_device().rom_region_vector();
 
-	for (rom_entry re : rev)
+	for (rom_entry const &re : rev)
 	{
-		if ((re.flags() & ROMENTRY_TYPEMASK) == ROMENTRYTYPE_ROM)
+		if (ROMENTRY_ISFILE(re))
 		{
-			if ((re.flags() & ROM_BIOSFLAGSMASK) == ROM_BIOS(bios + 1))
+			if (ROM_GETBIOSFLAGS(re) == (bios + 1))
 			{
 				const std::string &h = re.hashdata();
 				util::hash_collection hc(h.c_str());
@@ -254,7 +254,7 @@ void xbox_base_state::dump_timer_command(int ref, const std::vector<std::string>
 	con.printf("Header.Inserted %d byte\n", cpu.read_byte(space, address + 3, true));
 	con.printf("Header.SignalState %08X dword\n", cpu.read_dword(space, address + 4, true));
 	con.printf("Header.WaitListEntry {%08X,%08X} _LIST_ENTRY\n", cpu.read_dword(space, address + 8, true), cpu.read_dword(space, address + 12, true));
-	con.printf("%s", string_format("DueTime %I64x qword\n", (int64_t)cpu.read_qword(space, address + 16, true)).c_str());
+	con.printf("%s", string_format("DueTime %x qword\n", (int64_t)cpu.read_qword(space, address + 16, true)).c_str());
 	con.printf("TimerListEntry {%08X,%08X} _LIST_ENTRY\n", cpu.read_dword(space, address + 24, true), cpu.read_dword(space, address + 28, true));
 	con.printf("Dpc %08X dword\n", cpu.read_dword(space, address + 32, true));
 	con.printf("Period %d dword\n", cpu.read_dword(space, address + 36, true));
@@ -887,8 +887,15 @@ MACHINE_CONFIG_START(xbox_base)
 	MCFG_PCI_DEVICE_ADD(":pci:1e.0:00.0", NV2A_GPU, 0x10de02a0, 0, 0, 0)
 	MCFG_MCPX_NV2A_GPU_CPU("maincpu")
 	MCFG_MCPX_NV2A_GPU_INTERRUPT_HANDLER(DEVWRITELINE(":", xbox_base_state, xbox_nv2a_interrupt_changed))
-	MCFG_PIC8259_ADD("pic8259_1", WRITELINE(xbox_base_state, xbox_pic8259_1_set_int_line), VCC, READ8(xbox_base_state, get_slave_ack))
-	MCFG_PIC8259_ADD("pic8259_2", DEVWRITELINE("pic8259_1", pic8259_device, ir2_w), GND, NOOP)
+
+	MCFG_DEVICE_ADD("pic8259_1", PIC8259, 0)
+	MCFG_PIC8259_OUT_INT_CB(WRITELINE(xbox_base_state, xbox_pic8259_1_set_int_line))
+	MCFG_PIC8259_IN_SP_CB(VCC)
+	MCFG_PIC8259_CASCADE_ACK_CB(READ8(xbox_base_state, get_slave_ack))
+
+	MCFG_DEVICE_ADD("pic8259_2", PIC8259, 0)
+	MCFG_PIC8259_OUT_INT_CB(DEVWRITELINE("pic8259_1", pic8259_device, ir2_w))
+	MCFG_PIC8259_IN_SP_CB(GND)
 
 	MCFG_DEVICE_ADD("pit8254", PIT8254, 0)
 	MCFG_PIT8253_CLK0(1125000) /* heartbeat IRQ */

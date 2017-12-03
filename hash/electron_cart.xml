@@ -141,6 +141,70 @@
 
 	<!-- Business -->
 
+	<software name="click" supported="no">
+		<description>Click</description>
+		<year>1990</year>
+		<publisher>Slogger</publisher>
+		<part name="cart" interface="electron_cart">
+			<dataarea name="lorom" size="32768">
+				<rom name="click-1.03.rom" size="32768" crc="955b9d29" sha1="5fbe78d09b1b989c1ff3939a9d29f7597d0e66d9" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="starspell">
+		<description>Starspell</description>
+		<year>1989</year>
+		<publisher>Slogger</publisher>
+		<part name="cart" interface="electron_cart">
+			<dataarea name="uprom" size="16384">
+				<rom name="starspell-1.00.rom" size="16384" crc="765a71f3" sha1="a02a8ac35aaafef27a1911161c3c06b509ad56a4" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spellword">
+		<description>Starspell &amp; Starword</description>
+		<year>1989</year>
+		<publisher>Slogger</publisher>
+		<part name="cart" interface="electron_cart">
+			<dataarea name="uprom" size="16384">
+				<rom name="starspell-1.00.rom" size="16384" crc="765a71f3" sha1="a02a8ac35aaafef27a1911161c3c06b509ad56a4" offset="0" />
+			</dataarea>
+			<dataarea name="lorom" size="16384">
+				<rom name="starword-1.01.rom" size="16384" crc="eee36568" sha1="ba9d6c11d3875a94ec76a529693ced34b283bd50" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spellview">
+		<description>Starspell &amp; View</description>
+		<year>1989</year>
+		<publisher>Slogger</publisher>
+		<part name="cart" interface="electron_cart">
+			<dataarea name="uprom" size="16384">
+				<rom name="starspell-1.00.rom" size="16384" crc="765a71f3" sha1="a02a8ac35aaafef27a1911161c3c06b509ad56a4" offset="0" />
+			</dataarea>
+			<dataarea name="lorom" size="16384">
+				<rom name="view-v1.0e.rom" size="16384" crc="5bdea2dd" sha1="64a12be5a1bbcf5bd003f38feb98e0eeafd601ee" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="stopress">
+		<description>Stop Press</description>
+		<year>1987</year>
+		<publisher>Slogger</publisher>
+		<part name="cart" interface="electron_cart">
+			<dataarea name="uprom" size="16384">
+				<rom name="stoppress-1.9-1.rom" size="16384" crc="900716e1" sha1="1d6d219c51e8a2be305e69b8fecaa76d992d5ba2" offset="0" />
+			</dataarea>
+			<dataarea name="lorom" size="16384">
+				<rom name="stoppress-1.9-2.rom" size="16384" crc="559294a4" sha1="36645885d2fe2d5ec34453d944ccc4e72ee80a62" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="view">
 		<description>View</description>
 		<year>1984</year>
@@ -161,6 +225,74 @@
 		<part name="cart" interface="electron_cart">
 			<dataarea name="uprom" size="16384">
 				<rom name="viewsheet-v1.0e.rom" size="16384" crc="356fe589" sha1="146b3fb6cc9843a64c4e29a69f80db8980fab043" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Expansion Cartridges -->
+
+	<software name="ap3" supported="no">
+		<description>Advanced Plus 3</description>
+		<year>1988</year>
+		<publisher>P.R.E.S.</publisher>
+		<part name="cart" interface="electron_cart">
+			<dataarea name="uprom" size="16384">
+				<rom name="pres-adfs-v1.15.rom" size="16384" crc="8f81edc3" sha1="32007425058a7b0f8bd5c17b3c22552aa3a03eca" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ap4" supported="no">
+		<description>Advanced Plus 4</description>
+		<year>1988</year>
+		<publisher>P.R.E.S.</publisher>
+		<part name="cart" interface="electron_cart">
+			<dataarea name="uprom" size="16384">
+				<rom name="acp1770-dfs-2.20.rom" size="16384" crc="f3dc9bc5" sha1="99449db032a16795efa28c211d8a257ec36c1eae" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cumana" supported="no">
+		<description>Cumana Floppy Disc System</description>
+		<year>1984</year>
+		<publisher>Cumana</publisher>
+		<part name="cart" interface="electron_cart">
+			<dataarea name="uprom" size="16384">
+				<rom name="cumana-dfs-1.00.rom" size="16384" crc="3d351cee" sha1="d6f7af671bf78b3ea7b9a235d47ef8b22b9bee31" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="peg400" supported="no">
+		<description>Pegasus 400</description>
+		<year>1987</year>
+		<publisher>Slogger</publisher>
+		<part name="cart" interface="electron_cart">
+			<dataarea name="uprom" size="16384">
+				<rom name="pegasus400_dfs_slogger-v1.02.rom" size="16384" crc="52d4c45d" sha1="fb6c3adc719b1a2034ec15fc41ecc10345885449" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sndexp" supported="no">
+		<description>Sound Expansion v1</description>
+		<year>1988</year>
+		<publisher>Project Expansions</publisher>
+		<part name="cart" interface="electron_cart">
+			<dataarea name="uprom" size="8192">
+				<rom name="sound_expansion-v1.00.rom" size="8192" crc="01a43480" sha1="9f570abbff97e6615a29c9d2de5ec9f37d22c564" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sndexpc" supported="no">
+		<description>Sound Expansion v3</description>
+		<year>1989</year>
+		<publisher>Complex Software Systems</publisher>
+		<part name="cart" interface="electron_cart">
+			<dataarea name="uprom" size="16384">
+				<rom name="sound_expansion-v3.00.rom" size="16384" crc="65ebfb98" sha1="2e409b92c97cda34ff25c2951e5f799125fe7e32" offset="0" />
 			</dataarea>
 		</part>
 	</software>

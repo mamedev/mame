@@ -38,6 +38,7 @@ memory map:
 001     W  Devastators sets bit 1, function unknown.
            Ultraman sets the register to 0x0f.
            None of the other games I tested seem to set this register to other than 0.
+           Update: Chequered Flag sets bit 0 when background should be dimmed (palette control?)
 002-003 W  selects the portion of the gfx ROMs to be read.
 004     W  Aliens uses this to select the ROM bank to be read, but Punk Shot
            and TMNT don't, they use another bit of the registers above. Many
@@ -136,6 +137,7 @@ k051960_device::k051960_device(const machine_config &mconfig, const char *tag, d
 	, m_irq_handler(*this)
 	, m_firq_handler(*this)
 	, m_nmi_handler(*this)
+	, m_vreg_contrast_handler(*this)
 	, m_romoffset(0)
 	, m_spriteflip(0)
 	, m_readroms(0)
@@ -207,6 +209,7 @@ void k051960_device::device_start()
 	m_irq_handler.resolve_safe();
 	m_firq_handler.resolve_safe();
 	m_nmi_handler.resolve_safe();
+	m_vreg_contrast_handler.resolve_safe();
 
 	// register for save states
 	save_item(NAME(m_romoffset));
@@ -330,6 +333,10 @@ WRITE8_MEMBER( k051960_device::k051937_w )
 	}
 	else if (offset == 1)
 	{
+		//popmessage("%04x: write %02x to 051937 address %x", space.device().safe_pc(), data, offset);
+		// Chequered Flag uses this bit to enable background palette dimming
+		// TODO: use a callback here for now, pending further investigation over this bit
+		m_vreg_contrast_handler(BIT(data,0));
 		// unknown, Devastators writes 02 here in game
 		if (0)
 			logerror("%s: %02x to 051937 address %x\n", machine().describe_context(), data, offset);

@@ -360,8 +360,7 @@ void cli_frontend::listfull(const std::vector<std::string> &args)
 
 	// iterate through drivers and output the info
 	while (drivlist.next())
-		if ((drivlist.driver().flags & machine_flags::NO_STANDALONE) == 0)
-			osd_printf_info("%-18s\"%s\"\n", drivlist.driver().name, drivlist.driver().type.fullname());
+		osd_printf_info("%-18s\"%s\"\n", drivlist.driver().name, drivlist.driver().type.fullname());
 }
 
 
@@ -499,15 +498,19 @@ void cli_frontend::listcrc(const std::vector<std::string> &args)
 	// iterate through matches, and then through ROMs
 	while (drivlist.next())
 	{
-		for (device_t &device : device_iterator(drivlist.config()->root_device()))
-			for (const rom_entry *region = rom_first_region(device); region; region = rom_next_region(region))
-				for (const rom_entry *rom = rom_first_file(region); rom; rom = rom_next_file(rom))
+		for (device_t const &device : device_iterator(drivlist.config()->root_device()))
+		{
+			for (tiny_rom_entry const *rom = device.rom_region(); rom && !ROMENTRY_ISEND(rom); ++rom)
+			{
+				if (ROMENTRY_ISFILE(rom))
 				{
 					// if we have a CRC, display it
 					uint32_t crc;
-					if (util::hash_collection(ROM_GETHASHDATA(rom)).crc(crc))
-						osd_printf_info("%08x %-32s\t%-16s\t%s\n", crc, ROM_GETNAME(rom), device.shortname(), device.name());
+					if (util::hash_collection(rom->hashdata).crc(crc))
+						osd_printf_info("%08x %-32s\t%-16s\t%s\n", crc, rom->name, device.shortname(), device.name());
 				}
+			}
+		}
 	}
 }
 
@@ -550,7 +553,7 @@ void cli_frontend::listroms(const std::vector<std::string> &args)
 
 		// iterate through roms
 		bool hasroms = false;
-		for (device_t &device : device_iterator(root))
+		for (device_t const &device : device_iterator(root))
 		{
 			for (const rom_entry *region = rom_first_region(device); region; region = rom_next_region(region))
 			{
@@ -716,7 +719,15 @@ void cli_frontend::listdevices(const std::vector<std::string> &args)
 
 		// sort them by tag
 		std::sort(device_list.begin(), device_list.end(), [](device_t *dev1, device_t *dev2) {
-			return strcmp(dev1->tag(), dev2->tag()) < 0;
+			// end of string < ':' < '0'
+			const char *tag1 = dev1->tag();
+			const char *tag2 = dev2->tag();
+			while (*tag1 == *tag2 && *tag1 != '\0' && *tag2 != '\0')
+			{
+				tag1++;
+				tag2++;
+			}
+			return (*tag1 == ':' ? ' ' : *tag1) < (*tag2 == ':' ? ' ' : *tag2);
 		});
 
 		// dump the results

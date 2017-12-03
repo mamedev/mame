@@ -104,6 +104,7 @@ TODO: - Distinguish door switches using manual
 #include "machine/6821pia.h"
 #include "machine/6840ptm.h"
 #include "machine/nvram.h"
+#include "machine/timer.h"
 
 #include "cpu/m6800/m6800.h"
 #include "machine/steppers.h"

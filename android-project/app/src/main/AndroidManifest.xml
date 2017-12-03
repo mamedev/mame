@@ -4,8 +4,8 @@
 -->
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
       package="org.mamedev.mame"
-      android:versionCode="188"
-      android:versionName="0.188"
+      android:versionCode="192"
+      android:versionName="0.192"
       android:installLocation="auto">
 
     <!-- Android 5.0 -->
@@ -33,7 +33,7 @@
                  android:hardwareAccelerated="true" >
         <activity android:name="MAME"
                   android:label="@string/app_name"
-                  android:configChanges="keyboardHidden|orientation"
+                  android:configChanges="keyboardHidden|orientation|screenSize"
                   >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

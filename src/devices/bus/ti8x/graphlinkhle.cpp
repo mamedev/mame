@@ -5,7 +5,7 @@
 #include "graphlinkhle.h"
 
 
-DEFINE_DEVICE_TYPE_NS(TI8X_GRAPH_LINK_HLE, bus::ti8x, graph_link_hle_device, "tii8x_glinkhle", "TI-Graph Link (grey, HLE)")
+DEFINE_DEVICE_TYPE_NS(TI8X_GRAPH_LINK_HLE, bus::ti8x, graph_link_hle_device, "ti8x_glinkhle", "TI-Graph Link (grey, HLE)")
 
 
 namespace bus { namespace ti8x {

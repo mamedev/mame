@@ -158,7 +158,7 @@ WRITE8_MEMBER(kingofb_state::kingofb_colorram2_w)
 
 WRITE8_MEMBER(kingofb_state::kingofb_f800_w)
 {
-	m_nmi_enable = data & 0x20;
+	m_nmigate->in_w<1>(BIT(data, 5));
 
 	if (m_palette_bank != ((data & 0x18) >> 3))
 	{

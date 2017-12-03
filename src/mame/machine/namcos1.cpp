@@ -1041,12 +1041,11 @@ READ8_MEMBER( namcos1_state::berabohm_buttons_r )
 			m_strobe_count = 0;
 			m_strobe ^= 0x40;
 			if (m_strobe == 0)
-			{
 				m_input_count = (m_input_count + 1) % 5;
-				if (m_input_count == 3) res |= 0x10;
-			}
 		}
 
+		// status bit, used to signal end of pressure sensitive button reads
+		if (m_input_count == 3) res |= 0x10;
 		res |= m_strobe;
 
 		return res;

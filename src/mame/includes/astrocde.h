@@ -152,7 +152,6 @@ public:
 	DECLARE_WRITE8_MEMBER(demndrgn_banksw_w);
 	DECLARE_READ8_MEMBER(demndrgn_io_r);
 	DECLARE_WRITE8_MEMBER(demndrgn_sound_w);
-	DECLARE_WRITE8_MEMBER(tenpindx_sound_w);
 	DECLARE_WRITE8_MEMBER(tenpindx_lamp_w);
 	DECLARE_WRITE8_MEMBER(tenpindx_counter_w);
 	DECLARE_WRITE8_MEMBER(tenpindx_lights_w);

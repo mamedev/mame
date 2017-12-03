@@ -274,6 +274,7 @@ disabled). Perhaps power on/off related??
 #include "emu.h"
 #include "cpu/nec/nec.h"
 #include "machine/rp5c01.h"
+#include "machine/timer.h"
 #include "sound/spkrdev.h"
 #include "rendlay.h"
 #include "screen.h"

@@ -40,41 +40,6 @@ public:
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette") { }
 
-	/* memory pointers */
-	required_shared_ptr<uint16_t> m_spriteram;
-	optional_shared_ptr<uint16_t> m_pixelram;
-
-	/* video-related */
-	/* framebuffer is a raw bitmap, remapped as a last step */
-	std::unique_ptr<bitmap_ind16> m_framebuffer[2];
-	std::unique_ptr<bitmap_ind16> m_pixel_bitmap;
-	std::unique_ptr<bitmap_ind16> m_realpunc_bitmap;
-
-	uint16_t        m_pixel_scroll[2];
-
-	int           m_b_fg_color_base;
-	int           m_b_sp_color_base;
-
-	/* misc */
-	uint16_t        m_eep_latch;
-	uint16_t        m_coin_word;
-
-	uint16_t        m_realpunc_video_ctrl;
-
-	/* devices */
-	required_device<cpu_device> m_maincpu;
-	required_device<cpu_device> m_audiocpu;
-	device_t *m_ym;
-	optional_device<hd63484_device> m_hd63484;
-	required_device<tc0180vcu_device> m_tc0180vcu;
-	optional_device<tc0640fio_device> m_tc0640fio;
-	optional_device<tc0220ioc_device> m_tc0220ioc;
-	optional_device<tc0510nio_device> m_tc0510nio;
-	optional_device<mb87078_device> m_mb87078;
-	required_device<gfxdecode_device> m_gfxdecode;
-	required_device<screen_device> m_screen;
-	required_device<palette_device> m_palette;
-
 	DECLARE_WRITE8_MEMBER(bankswitch_w);
 	DECLARE_READ16_MEMBER(tracky1_hi_r);
 	DECLARE_READ16_MEMBER(tracky1_lo_r);
@@ -100,8 +65,6 @@ public:
 	DECLARE_WRITE8_MEMBER(mb87078_gain_changed);
 	DECLARE_INPUT_CHANGED_MEMBER(realpunc_sensor);
 	DECLARE_DRIVER_INIT(taito_b);
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
 	DECLARE_VIDEO_START(taitob_color_order0);
 	DECLARE_VIDEO_START(taitob_color_order1);
 	DECLARE_VIDEO_START(taitob_color_order2);
@@ -123,10 +86,56 @@ public:
 	INTERRUPT_GEN_MEMBER(selfeena_interrupt);
 	INTERRUPT_GEN_MEMBER(sbm_interrupt);
 	INTERRUPT_GEN_MEMBER(realpunc_interrupt);
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+
+private:
+	/* memory pointers */
+	required_shared_ptr<uint16_t> m_spriteram;
+	optional_shared_ptr<uint16_t> m_pixelram;
+
+	/* video-related */
+	/* framebuffer is a raw bitmap, remapped as a last step */
+	std::unique_ptr<bitmap_ind16> m_framebuffer[2];
+	std::unique_ptr<bitmap_ind16> m_pixel_bitmap;
+	std::unique_ptr<bitmap_ind16> m_realpunc_bitmap;
+
+	uint16_t        m_pixel_scroll[3];
+
+	int           m_b_fg_color_base;
+	int           m_b_sp_color_base;
+
+	/* misc */
+	uint16_t        m_eep_latch;
+	uint16_t        m_coin_word;
+
+	uint16_t        m_realpunc_video_ctrl;
+
+	/* devices */
+	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_audiocpu;
+	device_t *m_ym;
+	optional_device<hd63484_device> m_hd63484;
+	required_device<tc0180vcu_device> m_tc0180vcu;
+	optional_device<tc0640fio_device> m_tc0640fio;
+	optional_device<tc0220ioc_device> m_tc0220ioc;
+	optional_device<tc0510nio_device> m_tc0510nio;
+	optional_device<mb87078_device> m_mb87078;
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<screen_device> m_screen;
+	required_device<palette_device> m_palette;
+
 	void hitice_clear_pixel_bitmap(  );
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void draw_framebuffer( bitmap_ind16 &bitmap, const rectangle &cliprect, int priority );
+};
 
-protected:
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+class taitob_c_state : public taitob_state
+{
+public:
+	using taitob_state::taitob_state;
+	static constexpr feature_type unemulated_features() { return feature::CAMERA; }
 };

@@ -43,6 +43,14 @@
             http://www.bitsavers.org/pdf/sun/sun1/800-0345_Sun-1_System_Ref_Man_Jul82.pdf
             (page 39,40 of pdf contain memory map)
 
+        This "Draft Version 1.0" reference claims a 10MHz clock for the
+        MC68000 and a 5MHz clock for the Am9513; though the original design
+        may have specified a 10MHz CPU, and though this speed may have been
+        realized in later models, schematics suggest the system's core
+        devices actually run at 8/4MHz (divided from a 16MHz XTAL), which
+        lets the 1.0 monitor ROM's Am9513 configuration generate a more
+        plausible baud rate.
+
         04/12/2009 Skeleton driver.
 
         04/04/2011 Modernised, added terminal keyboard.
@@ -52,9 +60,9 @@
 #include "emu.h"
 #include "bus/rs232/rs232.h"
 #include "cpu/m68000/m68000.h"
+#include "machine/am9513.h"
 #include "machine/z80sio.h"
 
-#define TERMINAL_TAG "terminal"
 
 class sun1_state : public driver_device
 {
@@ -80,8 +88,8 @@ static ADDRESS_MAP_START(sun1_mem, AS_PROGRAM, 16, sun1_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00000000, 0x001fffff) AM_RAM AM_SHARE("p_ram") // 512 KB RAM / ROM at boot
 	AM_RANGE(0x00200000, 0x00203fff) AM_ROM AM_REGION("user1",0)
-	AM_RANGE(0x00600000, 0x006000ff) AM_DEVREADWRITE8("iouart", upd7201_new_device, ba_cd_r, ba_cd_w, 0xff00)
-	AM_RANGE(0x00800000, 0x008000ff) AM_UNMAP // AM9513 timer at 5MHz
+	AM_RANGE(0x00600000, 0x00600007) AM_MIRROR(0x1ffff8) AM_DEVREADWRITE8("iouart", upd7201_new_device, ba_cd_r, ba_cd_w, 0xff00)
+	AM_RANGE(0x00800000, 0x00800003) AM_MIRROR(0x1ffffc) AM_DEVREADWRITE("timer", am9513_device, read16, write16)
 	AM_RANGE(0x00a00000, 0x00bfffff) AM_UNMAP // page map
 	AM_RANGE(0x00c00000, 0x00dfffff) AM_UNMAP // segment map
 	AM_RANGE(0x00e00000, 0x00ffffff) AM_UNMAP // context register
@@ -104,17 +112,27 @@ void sun1_state::machine_reset()
 
 static MACHINE_CONFIG_START( sun1 )
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_10MHz)
+	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz / 2)
 	MCFG_CPU_PROGRAM_MAP(sun1_mem)
 
-	// UART is actually clocked by AM9513 (channel 4 = port A, channel 5 = port B)
-	MCFG_UPD7201_ADD("iouart", 0, 9600*16, 9600*16, 9600*16, 9600*16)
+	MCFG_DEVICE_ADD("timer", AM9513, XTAL_16MHz / 4)
+	MCFG_AM9513_FOUT_CALLBACK(DEVWRITELINE("timer", am9513_device, gate1_w))
+	MCFG_AM9513_OUT1_CALLBACK(NOOP) // Watchdog; generates BERR/Reset
+	MCFG_AM9513_OUT2_CALLBACK(INPUTLINE("maincpu", M68K_IRQ_6)) // User timer
+	MCFG_AM9513_OUT3_CALLBACK(INPUTLINE("maincpu", M68K_IRQ_7)) // Refresh timer (2 ms)
+	MCFG_AM9513_OUT4_CALLBACK(DEVWRITELINE("iouart", upd7201_new_device, rxca_w))
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("iouart", upd7201_new_device, txca_w))
+	MCFG_AM9513_OUT5_CALLBACK(DEVWRITELINE("iouart", upd7201_new_device, rxcb_w))
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("iouart", upd7201_new_device, txcb_w))
+
+	MCFG_DEVICE_ADD("iouart", UPD7201_NEW, XTAL_16MHz / 4)
 	MCFG_Z80SIO_OUT_TXDA_CB(DEVWRITELINE("rs232a", rs232_port_device, write_txd))
 	MCFG_Z80SIO_OUT_DTRA_CB(DEVWRITELINE("rs232a", rs232_port_device, write_dtr))
 	MCFG_Z80SIO_OUT_RTSA_CB(DEVWRITELINE("rs232a", rs232_port_device, write_rts))
 	MCFG_Z80SIO_OUT_TXDB_CB(DEVWRITELINE("rs232b", rs232_port_device, write_txd))
 	MCFG_Z80SIO_OUT_DTRB_CB(DEVWRITELINE("rs232b", rs232_port_device, write_dtr))
 	MCFG_Z80SIO_OUT_RTSB_CB(DEVWRITELINE("rs232b", rs232_port_device, write_rts))
+	MCFG_Z80SIO_OUT_INT_CB(INPUTLINE("maincpu", M68K_IRQ_5))
 
 	MCFG_RS232_PORT_ADD("rs232a", default_rs232_devices, "terminal")
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("iouart", upd7201_new_device, rxa_w))

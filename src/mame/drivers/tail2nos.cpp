@@ -52,8 +52,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, tail2nos_state )
 	AM_RANGE(0xfff004, 0xfff005) AM_READ_PORT("DSW")
 	AM_RANGE(0xfff008, 0xfff009) AM_READ8(sound_semaphore_r, 0x00ff) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x00ff)
 	AM_RANGE(0xfff020, 0xfff023) AM_DEVWRITE8("gga", vsystem_gga_device, write, 0x00ff)
-	AM_RANGE(0xfff030, 0xfff031) AM_DEVREADWRITE8("acia", acia6850_device, status_r, control_w, 0x00ff)
-	AM_RANGE(0xfff032, 0xfff033) AM_DEVREADWRITE8("acia", acia6850_device, data_r, data_w, 0x00ff)
+	AM_RANGE(0xfff030, 0xfff033) AM_DEVREADWRITE8("acia", acia6850_device, read, write, 0x00ff)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, tail2nos_state )
@@ -266,7 +265,7 @@ static MACHINE_CONFIG_START( tail2nos )
 	MCFG_K051316_WRAP(1)
 	MCFG_K051316_CB(tail2nos_state, zoom_callback)
 
-	MCFG_DEVICE_ADD("gga", VSYSTEM_GGA, 0)
+	MCFG_DEVICE_ADD("gga", VSYSTEM_GGA, XTAL_14_31818MHz / 2) // divider not verified
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

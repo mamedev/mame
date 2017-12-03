@@ -7,6 +7,7 @@
 
 
 #include "cpu/z80/z80.h"
+#include "machine/timer.h"
 #include "sound/sn76496.h"
 #include "video/tms9928a.h"
 #include "machine/coleco.h"

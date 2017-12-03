@@ -32,6 +32,7 @@
 #include "machine/intelfsh.h"
 #include "machine/ram.h"
 #include "machine/rp5c01.h"
+#include "machine/timer.h"
 #include "rendlay.h"
 #include "screen.h"
 
@@ -469,13 +470,13 @@ static MACHINE_CONFIG_START( mstation )
 	MCFG_DEVICE_ADD("bank0", ADDRESS_MAP_BANK, 0)
 	MCFG_DEVICE_PROGRAM_MAP(mstation_banked_map)
 	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_ADDRESS_MAP_BANK_DATABUS_WIDTH(8)
+	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
 	MCFG_ADDRESS_MAP_BANK_STRIDE(0x4000)
 
 	MCFG_DEVICE_ADD("bank1", ADDRESS_MAP_BANK, 0)
 	MCFG_DEVICE_PROGRAM_MAP(mstation_banked_map)
 	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_ADDRESS_MAP_BANK_DATABUS_WIDTH(8)
+	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
 	MCFG_ADDRESS_MAP_BANK_STRIDE(0x4000)
 
 	/* internal ram */

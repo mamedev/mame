@@ -96,7 +96,11 @@
 void suprridr_state::machine_start()
 {
 	save_item(NAME(m_nmi_enable));
-	save_item(NAME(m_sound_data));
+}
+
+void suprridr_state::machine_reset()
+{
+	m_soundlatch->acknowledge_w(machine().dummy_space(), 0, 0);
 }
 
 /*************************************
@@ -115,38 +119,6 @@ INTERRUPT_GEN_MEMBER(suprridr_state::main_nmi_gen)
 {
 	if (m_nmi_enable)
 		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
-}
-
-
-
-/*************************************
- *
- *  Sound CPU communication
- *
- *************************************/
-
-TIMER_CALLBACK_MEMBER(suprridr_state::delayed_sound_w)
-{
-	m_sound_data = param;
-	m_audiocpu->set_input_line(0, ASSERT_LINE);
-}
-
-
-WRITE8_MEMBER(suprridr_state::sound_data_w)
-{
-	machine().scheduler().synchronize(timer_expired_delegate(FUNC(suprridr_state::delayed_sound_w),this), data);
-}
-
-
-READ8_MEMBER(suprridr_state::sound_data_r)
-{
-	return m_sound_data;
-}
-
-
-WRITE8_MEMBER(suprridr_state::sound_irq_ack_w)
-{
-	m_audiocpu->set_input_line(0, CLEAR_LINE);
 }
 
 
@@ -185,7 +157,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, suprridr_state )
 	AM_RANGE(0xb002, 0xb003) AM_WRITE(coin_lock_w)
 	AM_RANGE(0xb006, 0xb006) AM_WRITE(flipx_w)
 	AM_RANGE(0xb007, 0xb007) AM_WRITE(flipy_w)
-	AM_RANGE(0xb800, 0xb800) AM_WRITE(sound_data_w)
+	AM_RANGE(0xb800, 0xb800) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
 	AM_RANGE(0xc801, 0xc801) AM_WRITE(fgdisable_w)
 	AM_RANGE(0xc802, 0xc802) AM_WRITE(fgscrolly_w)
 	AM_RANGE(0xc804, 0xc804) AM_WRITE(bgscrolly_w)
@@ -214,7 +186,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_portmap, AS_IO, 8, suprridr_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_WRITE(sound_irq_ack_w)
+	AM_RANGE(0x00, 0x00) AM_DEVWRITE("soundlatch", generic_latch_8_device, acknowledge_w)
 	AM_RANGE(0x8c, 0x8d) AM_DEVWRITE("ay1", ay8910_device, address_data_w)
 	AM_RANGE(0x8d, 0x8d) AM_DEVREAD("ay1", ay8910_device, data_r)
 	AM_RANGE(0x8e, 0x8f) AM_DEVWRITE("ay2", ay8910_device, address_data_w)
@@ -379,8 +351,12 @@ static MACHINE_CONFIG_START( suprridr )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	MCFG_SOUND_ADD("ay2", AY8910, XTAL_49_152MHz/32)
-	MCFG_AY8910_PORT_A_READ_CB(READ8(suprridr_state, sound_data_r))
+	MCFG_AY8910_PORT_A_READ_CB(DEVREAD8("soundlatch", generic_latch_8_device, read))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", 0))
+	MCFG_GENERIC_LATCH_SEPARATE_ACKNOWLEDGE(true)
 MACHINE_CONFIG_END
 
 

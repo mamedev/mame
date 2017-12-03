@@ -12,6 +12,7 @@
 #include "cpu/z80/z80.h"
 #include "machine/74259.h"
 #include "machine/ram.h"
+#include "machine/timer.h"
 
 #define MCFG_DECODMD_TYPE1_ADD(_tag, _region) \
 	MCFG_DEVICE_ADD(_tag, DECODMD1, 0) \

@@ -6,6 +6,7 @@
 
 ***************************************************************************/
 
+#include "machine/timer.h"
 #include "sound/sn76496.h"
 
 class gberet_state : public driver_device

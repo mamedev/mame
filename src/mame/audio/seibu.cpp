@@ -243,9 +243,9 @@ WRITE8_MEMBER( seibu_sound_device::pending_w )
 	m_sub2main_pending = 1;
 }
 
-READ16_MEMBER( seibu_sound_device::main_word_r )
+READ8_MEMBER( seibu_sound_device::main_r )
 {
-	//logerror("%06x: seibu_main_word_r(%x)\n",space.device().safe_pc(),offset);
+	//logerror("%06x: seibu_main_r(%x)\n",space.device().safe_pc(),offset);
 	switch (offset)
 	{
 		case 2:
@@ -254,38 +254,36 @@ READ16_MEMBER( seibu_sound_device::main_word_r )
 		case 5:
 			return m_main2sub_pending ? 1 : 0;
 		default:
-			//logerror("%06x: seibu_main_word_r(%x)\n",space.device().safe_pc(),offset);
-			return 0xffff;
+			//logerror("%06x: seibu_main_r(%x)\n",space.device().safe_pc(),offset);
+			return 0xff;
 	}
 }
 
-WRITE16_MEMBER( seibu_sound_device::main_word_w )
+WRITE8_MEMBER( seibu_sound_device::main_w )
 {
-	//printf("%06x: seibu_main_word_w(%x,%02x)\n",space.device().safe_pc(),offset,data);
-	if (ACCESSING_BITS_0_7)
+	//printf("%06x: seibu_main_w(%x,%02x)\n",space.device().safe_pc(),offset,data);
+	switch (offset)
 	{
-		switch (offset)
-		{
-			case 0:
-			case 1:
-				m_main2sub[offset] = data;
-				break;
-			case 4:
-				update_irq_lines(RST18_ASSERT);
-				break;
-			case 2: //Sengoku Mahjong writes here
-			case 6:
-				/* just a guess */
-				m_sub2main_pending = 0;
-				m_main2sub_pending = 1;
-				break;
-			default:
-				//logerror("%06x: seibu_main_word_w(%x,%02x)\n",space.device().safe_pc(),offset,data);
-				break;
-		}
+		case 0:
+		case 1:
+			m_main2sub[offset] = data;
+			break;
+		case 4:
+			update_irq_lines(RST18_ASSERT);
+			break;
+		case 2: //Sengoku Mahjong writes here
+		case 6:
+			/* just a guess */
+			m_sub2main_pending = 0;
+			m_main2sub_pending = 1;
+			break;
+		default:
+			//logerror("%06x: seibu_main_w(%x,%02x)\n",space.device().safe_pc(),offset,data);
+			break;
 	}
 }
 
+// used only by NMK16 bootlegs
 WRITE16_MEMBER( seibu_sound_device::main_mustb_w )
 {
 	if (ACCESSING_BITS_0_7)

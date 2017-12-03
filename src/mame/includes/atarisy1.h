@@ -8,6 +8,7 @@
 
 #include "machine/74259.h"
 #include "machine/atarigen.h"
+#include "machine/timer.h"
 #include "sound/tms5220.h"
 #include "sound/ym2151.h"
 #include "video/atarimo.h"

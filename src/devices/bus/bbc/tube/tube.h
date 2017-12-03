@@ -53,14 +53,14 @@
 	MCFG_DEVICE_ADD(_tag, BBC_TUBE_SLOT, 0) \
 	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false)
 
-#define MCFG_BBC_PASSTHRU_TUBE_SLOT_ADD() \
-	MCFG_BBC_TUBE_SLOT_ADD(BBC_TUBE_SLOT_TAG, 0, bbc_tube_devices, nullptr)
-
+#define MCFG_BBC_TUBE_SLOT_IRQ_HANDLER(_devcb) \
+	devcb = &bbc_tube_slot_device::set_irq_handler(*device, DEVCB_##_devcb);
 
 
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
+
 
 // ======================> bbc_tube_slot_device
 
@@ -71,6 +71,16 @@ class bbc_tube_slot_device : public device_t, public device_slot_interface
 public:
 	// construction/destruction
 	bbc_tube_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	virtual ~bbc_tube_slot_device();
+
+	// callbacks
+	template <class Object> static devcb_base &set_irq_handler(device_t &device, Object &&cb)
+	{ return downcast<bbc_tube_slot_device &>(device).m_irq_handler.set_callback(std::forward<Object>(cb)); }
+
+	DECLARE_READ8_MEMBER( host_r );
+	DECLARE_WRITE8_MEMBER( host_w );
+
+	DECLARE_WRITE_LINE_MEMBER( irq_w ) { m_irq_handler(state); }
 
 protected:
 	// device-level overrides
@@ -78,6 +88,9 @@ protected:
 	virtual void device_reset() override;
 
 	device_bbc_tube_interface *m_card;
+
+private:
+	devcb_write_line m_irq_handler;
 };
 
 
@@ -89,6 +102,10 @@ public:
 	// construction/destruction
 	virtual ~device_bbc_tube_interface();
 
+	// reading and writing
+	virtual DECLARE_READ8_MEMBER(host_r) { return 0xfe; }
+	virtual DECLARE_WRITE8_MEMBER(host_w) { }
+
 protected:
 	device_bbc_tube_interface(const machine_config &mconfig, device_t &device);
 
@@ -99,8 +116,9 @@ protected:
 // device type definition
 DECLARE_DEVICE_TYPE(BBC_TUBE_SLOT, bbc_tube_slot_device)
 
-SLOT_INTERFACE_EXTERN( bbc_tube_ext_devices );
-SLOT_INTERFACE_EXTERN( bbc_tube_int_devices );
+SLOT_INTERFACE_EXTERN( bbc_extube_devices );
+SLOT_INTERFACE_EXTERN( bbc_intube_devices );
+//SLOT_INTERFACE_EXTERN( bbc_x25tube_devices );
 
 
 #endif // MAME_BUS_BBC_TUBE_TUBE_H

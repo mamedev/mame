@@ -168,14 +168,14 @@ WRITE8_MEMBER(zaccaria_state::attributes_w)
 	m_attributesram[offset] = data;
 }
 
-WRITE8_MEMBER(zaccaria_state::flip_screen_x_w)
+WRITE_LINE_MEMBER(zaccaria_state::flip_screen_x_w)
 {
-	flip_screen_x_set(data & 1);
+	flip_screen_x_set(state);
 }
 
-WRITE8_MEMBER(zaccaria_state::flip_screen_y_w)
+WRITE_LINE_MEMBER(zaccaria_state::flip_screen_y_w)
 {
-	flip_screen_y_set(data & 1);
+	flip_screen_y_set(state);
 }
 
 

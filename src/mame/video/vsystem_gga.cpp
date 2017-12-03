@@ -2,7 +2,7 @@
 // copyright-holders:AJR
 /******************************************************************************
 
-    Video System C7-01 GGA
+    Video System C7-01 GGA (Graphics Gate Array?)
 
     Skeleton device.
 

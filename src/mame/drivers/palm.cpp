@@ -58,7 +58,7 @@ public:
 	required_ioport m_io_penb;
 	required_ioport m_io_portd;
 
-	offs_t palm_dasm_override(device_t &device, std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, int options);
+	offs_t palm_dasm_override(std::ostream &stream, offs_t pc, const util::disasm_interface::data_buffer &opcodes, const util::disasm_interface::data_buffer &params);
 };
 
 
@@ -374,7 +374,7 @@ ROM_START( palmm515 )
 	ROM_SYSTEM_BIOS( 0, "4.1e", "Palm OS 4.1 (English)" )
 	ROMX_LOAD( "palmos41-en-m515.rom", 0x008000, 0x400000, CRC(6e143436) SHA1(a0767ea26cc493a3f687525d173903fef89f1acb), ROM_GROUPWORD | ROM_BIOS(1) )
 	ROM_RELOAD(0x000000, 0x004000)
-	ROM_DEFAULT_BIOS( "4.0e" )
+	ROM_DEFAULT_BIOS( "4.1e" )
 ROM_END
 
 ROM_START( visor )

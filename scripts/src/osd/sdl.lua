@@ -94,14 +94,6 @@ function maintargetosdoptions(_target,_subtarget)
 		links {
 			"psapi",
 		}
-		configuration { "mingw*" }
-			linkoptions{
-				"-municode",
-			}
-		configuration { "vs*" }
-			flags {
-				"Unicode",
-			}
 		configuration {}
 	elseif _OPTIONS["targetos"]=="haiku" then
 		links {

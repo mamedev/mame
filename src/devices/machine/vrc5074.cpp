@@ -7,7 +7,7 @@
 #define LOG_NILE_IRQS       (0)
 #define LOG_PCI             (0)
 #define LOG_TIMERS          (0)
-#define LOG_DYNAMIC         (0)
+#define LOG_MAP             (0)
 #define LOG_NILE_MASTER     (0)
 #define LOG_NILE_TARGET     (0)
 #define PRINTF_SERIAL       (0)
@@ -136,16 +136,30 @@ ADDRESS_MAP_END
 
 // Target Window 1 map
 DEVICE_ADDRESS_MAP_START(target1_map, 32, vrc5074_device)
-	AM_RANGE(0x00000000, 0xFFFFFFFF) AM_READWRITE(    target1_r,          target1_w)
+	AM_RANGE(0x00000000, 0xFFFFFFFF) AM_READWRITE(target1_r, target1_w)
 ADDRESS_MAP_END
+
+MACHINE_CONFIG_MEMBER(vrc5074_device::device_add_mconfig)
+	MCFG_DEVICE_ADD("uart", NS16550, SYSTEM_CLOCK / 12)
+	MCFG_INS8250_OUT_INT_CB(WRITELINE(vrc5074_device, uart_irq_callback))
+	MCFG_INS8250_OUT_TX_CB(DEVWRITELINE("ttys00", rs232_port_device, write_txd))
+	MCFG_INS8250_OUT_DTR_CB(DEVWRITELINE("ttys00", rs232_port_device, write_dtr))
+	MCFG_INS8250_OUT_RTS_CB(DEVWRITELINE("ttys00", rs232_port_device, write_rts))
+
+	MCFG_RS232_PORT_ADD("ttys00", default_rs232_devices, nullptr)
+	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("uart", ns16550_device, rx_w))
+	MCFG_RS232_DCD_HANDLER(DEVWRITELINE("uart", ns16550_device, dcd_w))
+	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("uart", ns16550_device, cts_w))
+MACHINE_CONFIG_END
 
 vrc5074_device::vrc5074_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: pci_host_device(mconfig, VRC5074, tag, owner, clock),
-		m_cpu_space(nullptr), m_cpu(nullptr), cpu_tag(nullptr),
-		m_mem_config("memory_space", ENDIANNESS_LITTLE, 32, 32),
-		m_io_config("io_space", ENDIANNESS_LITTLE, 32, 32),
-		m_romRegion(*this, "rom"),
-		m_updateRegion(*this, "update")
+	m_uart(*this, "uart"),
+	m_cpu_space(nullptr), m_cpu(nullptr), cpu_tag(nullptr),
+	m_mem_config("memory_space", ENDIANNESS_LITTLE, 32, 32),
+	m_io_config("io_space", ENDIANNESS_LITTLE, 32, 32),
+	m_romRegion(*this, "rom"),
+	m_updateRegion(*this, "update")
 {
 	for (int i = 0; i < 2; i++)
 		m_sdram_size[i] = 0x0;
@@ -224,9 +238,10 @@ void vrc5074_device::device_start()
 	save_item(NAME(m_sdram[0]));
 	save_item(NAME(m_sdram[1]));
 	save_item(NAME(m_cpu_regs));
-	save_item(NAME(m_serial_regs));
 	save_item(NAME(m_nile_irq_state));
 	save_item(NAME(m_sdram_addr));
+	save_item(NAME(m_uart_irq));
+	save_item(NAME(m_timer_period));
 	machine().save().register_postload(save_prepost_delegate(FUNC(vrc5074_device::postload), this));
 }
 
@@ -241,13 +256,12 @@ void vrc5074_device::device_reset()
 {
 	pci_device::device_reset();
 	memset(m_cpu_regs, 0, sizeof(m_cpu_regs));
-	memset(m_serial_regs, 0, sizeof(m_serial_regs));
 	m_nile_irq_state = 0;
 	regenerate_config_mapping();
 	m_dma_timer->adjust(attotime::never);
 	m_sdram_addr[0] = 0;
 	m_sdram_addr[1] = 0;
-
+	m_uart_irq = 0;
 }
 
 void vrc5074_device::map_cpu_space()
@@ -279,7 +293,7 @@ void vrc5074_device::map_cpu_space()
 				m_cpu_space->install_ram(winStart, winStart + winSize - 1, m_sdram[index].data());
 				m_cpu->add_fastram(winStart, winStart + winSize - 1, false, m_sdram[index].data());
 			}
-			if (LOG_NILE)
+			if (LOG_NILE | LOG_MAP)
 				logerror("map_cpu_space ram_size=%08X ram_base=%08X\n", winSize, winStart);
 		}
 	}
@@ -296,7 +310,7 @@ void vrc5074_device::map_cpu_space()
 			if (winSize > 0 && m_cs_devices[index - 2] != nullptr) {
 				m_cpu_space->install_device_delegate(winStart, winStart + winSize - 1, *m_cs_devices[index - 2], m_cs_maps[index - 2]);
 			}
-			if (LOG_NILE)
+			if (LOG_NILE | LOG_MAP)
 				logerror("map_cpu_space cs%d_size=%08X cs%d_base=%08X\n", index, winSize, index, winStart);
 		}
 	}
@@ -320,7 +334,7 @@ void vrc5074_device::map_cpu_space()
 					m_cpu_space->install_write_handler(winStart, winStart + winSize - 1, write32_delegate(FUNC(vrc5074_device::pci1_w), this));
 				}
 			}
-			if (LOG_NILE)
+			if (LOG_NILE | LOG_MAP)
 				logerror("map_cpu_space pci%d_size=%08X pci%d_base=%08X\n", index, winSize, index, winStart);
 		}
 	}
@@ -343,7 +357,7 @@ void vrc5074_device::map_extra(uint64_t memory_window_start, uint64_t memory_win
 		winEnd = winStart + winSize -1;
 		memory_space->install_read_handler(winStart, winEnd, read32_delegate(FUNC(vrc5074_device::target1_r), this));
 		memory_space->install_write_handler(winStart, winEnd, write32_delegate(FUNC(vrc5074_device::target1_w), this));
-		if (LOG_NILE)
+		if (LOG_NILE | LOG_MAP)
 			logerror("%s: map_extra Target Window 1 start=%08X end=%08X size=%08X\n", tag(), winStart, winEnd, winSize);
 	}
 	//// PCI Target Window 2
@@ -668,7 +682,7 @@ void vrc5074_device::update_nile_irqs()
 	int i;
 
 	/* check for UART transmit IRQ enable and synthsize one */
-	if (m_serial_regs[NREG_UARTIER] & 2)
+	if (m_uart_irq)
 		m_nile_irq_state |= 0x0010;
 	else
 		m_nile_irq_state &= ~0x0010;
@@ -727,21 +741,12 @@ void vrc5074_device::update_nile_irqs()
 TIMER_CALLBACK_MEMBER(vrc5074_device::nile_timer_callback)
 {
 	int which = param;
-	uint32_t *regs = &m_cpu_regs[NREG_T0CTRL + which * 4];
+
 	if (LOG_TIMERS) logerror("timer %d fired\n", which);
 
 	/* adjust the timer to fire again */
 	{
-		uint32_t scale = regs[0];
-		if (regs[1] & 2) {
-			uint32_t scaleSrc = (regs[1] >> 2) & 0x3;
-			uint32_t *scaleReg = &m_cpu_regs[NREG_T0CTRL + scaleSrc * 4];
-			scale *= scaleReg[0];
-			//logerror("Unexpected value: timer %d is prescaled\n", which);
-			logerror("Timer Scaling value: timer %d is prescaled from %08X to %08X\n", which, regs[0], scale);
-		}
-		if (scale != 0)
-			m_timer[which]->adjust(TIMER_PERIOD * scale, which);
+		m_timer[which]->adjust(attotime::from_double(m_timer_period[which]), which);
 	}
 
 	/* trigger the interrupt */
@@ -824,15 +829,8 @@ READ32_MEMBER(vrc5074_device::cpu_reg_r)
 		which = (offset - NREG_T0CNTR) / 4;
 		if (m_cpu_regs[offset - 1] & 1)
 		{
-			//if (m_cpu_regs[offset - 1] & 2)
-			//  logerror("Unexpected value: timer %d is prescaled\n", which);
-			uint32_t scale = 1;
-			if (m_cpu_regs[offset - 1] & 2) {
-				uint32_t scaleSrc = (m_cpu_regs[offset - 1] >> 2) & 0x3;
-				scale = m_cpu_regs[NREG_T0CTRL + scaleSrc * 4];
-				logerror("Timer value: timer %d is prescaled by \n", which, scale);
-			}
-			result = m_cpu_regs[offset + 1] = m_timer[which]->remaining().as_double() * (double)SYSTEM_CLOCK / scale;
+			// Should check for cascaded timer
+			result = m_cpu_regs[offset] = m_timer[which]->remaining().as_double() * SYSTEM_CLOCK;
 		}
 
 		if (LOG_TIMERS) logerror("%08X:NILE READ: timer %d counter(%03X) = %08X\n", m_cpu_space->device().safe_pc(), which, offset * 4, result);
@@ -879,6 +877,8 @@ WRITE32_MEMBER(vrc5074_device::cpu_reg_w)
 		map_cpu_space();
 		break;
 	case NREG_CPUSTAT + 0:    /* CPU status */
+		if (data & 0x1) logerror("cpu_reg_w: System Cold Reset\n");
+		if (data & 0x2) logerror("cpu_reg_w: CPU Warm Reset\n");
 	case NREG_CPUSTAT + 1:    /* CPU status */
 		if (LOG_NILE) logerror("%08X:NILE WRITE: CPU status(%03X) = %08X & %08X\n", m_cpu_space->device().safe_pc(), offset * 4, data, mem_mask);
 		logit = 0;
@@ -948,37 +948,26 @@ WRITE32_MEMBER(vrc5074_device::cpu_reg_w)
 	case NREG_T2CTRL + 1:     /* general purpose timer control (control bits) */
 	case NREG_T3CTRL + 1:     /* watchdog timer control (control bits) */
 		which = (offset - NREG_T0CTRL) / 4;
-		if (LOG_NILE) logerror("%08X:NILE WRITE: timer %d control(%03X) = %08X & %08X\n", m_cpu_space->device().safe_pc(), which, offset * 4, data, mem_mask);
+		if (LOG_NILE | LOG_TIMERS) logerror("%08X:NILE WRITE: timer %d control(%03X) = %08X & %08X\n", m_cpu_space->device().safe_pc(), which, offset * 4, data, mem_mask);
 		logit = 0;
-
+		m_timer_period[which] = (uint64_t(m_cpu_regs[NREG_T0CTRL + which * 4]) + 1) * attotime::from_hz(SYSTEM_CLOCK).as_double();
+		if (m_cpu_regs[offset] & 2) {
+			// Cascade timer
+			uint32_t scaleSrc = (m_cpu_regs[offset] >> 2) & 0x3;
+			m_timer_period[which] += (uint64_t(m_cpu_regs[NREG_T0CTRL + scaleSrc * 4]) + 1) * attotime::from_hz(SYSTEM_CLOCK).as_double();
+			logerror("Timer scale: timer %d is scaled by %08X\n", which, m_cpu_regs[NREG_T0CTRL + which * 4]);
+		}
 		/* timer just enabled? */
 		if (!(olddata & 1) && (m_cpu_regs[offset] & 1))
 		{
-			uint32_t scale = m_cpu_regs[offset - 1];
-			//if (m_cpu_regs[offset] & 2)
-			//  logerror("Unexpected value: timer %d is prescaled\n", which);
-			if (m_cpu_regs[offset] & 2) {
-				uint32_t scaleSrc = (m_cpu_regs[offset] >> 2) & 0x3;
-				scale *= m_cpu_regs[NREG_T0CTRL + scaleSrc * 4];
-				logerror("Timer scale: timer %d is scaled by %08X\n", which, m_cpu_regs[NREG_T0CTRL + which * 4]);
-			}
-			if (scale != 0)
-				m_timer[which]->adjust(TIMER_PERIOD * scale, which);
-			if (LOG_TIMERS) logerror("Starting timer %d at a rate of %f Hz scale = %08X\n", which, ATTOSECONDS_TO_HZ((TIMER_PERIOD * (m_cpu_regs[offset + 1] + 1)).attoseconds()), scale);
+			m_timer[which]->adjust(attotime::from_double(m_timer_period[which]), which);
+			if (LOG_TIMERS) logerror("Starting timer %d at a rate of %f Hz\n", which, ATTOSECONDS_TO_HZ(attotime::from_double(m_timer_period[which]).as_attoseconds()));
 		}
 
 		/* timer disabled? */
 		else if ((olddata & 1) && !(m_cpu_regs[offset] & 1))
 		{
-			//if (m_cpu_regs[offset] & 2)
-			//  logerror("Unexpected value: timer %d is prescaled\n", which);
-			uint32_t scale = 1;
-			if (m_cpu_regs[offset] & 2) {
-				uint32_t scaleSrc = (m_cpu_regs[offset] >> 2) & 0x3;
-				scale = m_cpu_regs[NREG_T0CTRL + scaleSrc * 4];
-				logerror("Timer scale: timer %d is scaled by %08X\n", which, scale);
-			}
-			m_cpu_regs[offset + 1] = m_timer[which]->remaining().as_double() * SYSTEM_CLOCK / scale;
+			m_cpu_regs[offset + 1] = m_timer[which]->remaining().as_double() * SYSTEM_CLOCK;
 			m_timer[which]->adjust(attotime::never, which);
 		}
 		break;
@@ -993,15 +982,7 @@ WRITE32_MEMBER(vrc5074_device::cpu_reg_w)
 
 		if (m_cpu_regs[offset - 1] & 1)
 		{
-			//if (m_cpu_regs[offset - 1] & 2)
-			//  logerror("Unexpected value: timer %d is prescaled\n", which);
-			uint32_t scale = 1;
-			if (m_cpu_regs[offset - 1] & 2) {
-				uint32_t scaleSrc = (m_cpu_regs[offset - 1] >> 2) & 0x3;
-				scale = m_cpu_regs[NREG_T0CTRL + scaleSrc * 4];
-				logerror("Timer scale: timer %d is scaled by %08X\n", which, scale);
-			}
-			m_timer[which]->adjust(TIMER_PERIOD * m_cpu_regs[offset] * scale, which);
+			m_timer[which]->adjust(attotime::from_hz(SYSTEM_CLOCK) * m_cpu_regs[offset], which);
 		}
 		break;
 	}
@@ -1010,54 +991,39 @@ WRITE32_MEMBER(vrc5074_device::cpu_reg_w)
 		logerror("%06X:cpu_reg_w offset %03X = %08X & %08X\n", m_cpu_space->device().safe_pc(), offset * 4, data, mem_mask);
 }
 
+WRITE_LINE_MEMBER(vrc5074_device::uart_irq_callback)
+{
+	if (state ^ m_uart_irq) {
+		m_uart_irq = state;
+		update_nile_irqs();
+		if (LOG_NILE)
+			logerror("uart_irq_callback: state = %d\n", state);
+	}
+}
+
 READ32_MEMBER(vrc5074_device::serial_r)
 {
-	uint32_t result = m_serial_regs[offset];
-	bool logit = true;
+	uint32_t result = m_uart->ins8250_r(space, offset>>1);
 
-	switch (offset)
-	{
-
-	case NREG_UARTIIR:          /* serial port interrupt ID */
-		if (m_cpu_regs[NREG_UARTIER] & 2)
-			result = 0x02;          /* transmitter buffer IRQ pending */
-		else
-			result = 0x01;          /* no IRQ pending */
-		break;
-
-	case NREG_UARTLSR:          /* serial port line status */
-		result = 0x60;
-		logit = 0;
-		break;
-
-	}
-
-	if (LOG_NILE && logit)
-		logerror("%06X:serial_r offset %03X = %08X\n", m_cpu_space->device().safe_pc(), offset * 4, result);
+	if (0 && LOG_NILE)
+		logerror("%06X:serial_r offset %03X = %08X (%08x)\n", m_cpu_space->device().safe_pc(), offset>>1, result, offset*4);
 	return result;
 }
 
-
 WRITE32_MEMBER(vrc5074_device::serial_w)
 {
-	bool logit = true;
-	COMBINE_DATA(&m_serial_regs[offset]);
-
-	switch (offset)
-	{
-
-	case NREG_UARTTHR:      /* serial port output */
-		if (PRINTF_SERIAL) {
-			logerror("%c", data & 0xff);
-			printf("%c", data & 0xff);
+	m_uart->ins8250_w(space, offset>>1, data);
+	if (PRINTF_SERIAL && offset == NREG_UARTTHR) {
+		static std::string debugStr;
+		printf("%c", data);
+		if (data == 0xd || debugStr.length()>=80) {
+			logerror("%s", debugStr.c_str());
+			debugStr.clear();
 		}
-		logit = 0;
-		break;
-	case NREG_UARTIER:      /* serial interrupt enable */
-		update_nile_irqs();
-		break;
+		else {
+			debugStr += char(data);
+		}
 	}
-
-	if (LOG_NILE && logit)
-		logerror("%06X:serial_w offset %03X = %08X & %08X\n", m_cpu_space->device().safe_pc(), offset * 4, data, mem_mask);
+	if (0 && LOG_NILE)
+		logerror("%06X:serial_w offset %03X = %08X & %08X (%08x)\n", m_cpu_space->device().safe_pc(), offset>>1, data, mem_mask, offset*4);
 }

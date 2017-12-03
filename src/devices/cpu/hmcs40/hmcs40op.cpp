@@ -663,7 +663,7 @@ void hmcs40_cpu_device::op_p()
 	// P p: Pattern Generation
 	m_icount--;
 	u16 address = m_a | m_b << 4 | m_c << 8 | (m_op & 7) << 9 | (m_pc & ~0x3f);
-	u16 o = m_program->read_word((address & m_prgmask) << 1);
+	u16 o = m_program->read_word(address & m_prgmask);
 
 	// destination is determined by the 2 highest bits
 	if (o & 0x100)

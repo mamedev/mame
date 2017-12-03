@@ -21,6 +21,7 @@
 #include "cpu/z80/z80.h"
 #include "machine/i8255.h"
 #include "machine/tc009xlvc.h"
+#include "machine/timer.h"
 #include "sound/2203intf.h"
 #include "screen.h"
 #include "speaker.h"

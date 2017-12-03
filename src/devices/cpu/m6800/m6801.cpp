@@ -248,7 +248,7 @@ DEFINE_DEVICE_TYPE(M6801, m6801_cpu_device, "m6801", "M6801")
 DEFINE_DEVICE_TYPE(M6803, m6803_cpu_device, "m6803", "M6803")
 DEFINE_DEVICE_TYPE(HD6301, hd6301_cpu_device, "hd6301", "HD6301")
 DEFINE_DEVICE_TYPE(HD63701, hd63701_cpu_device, "hd63701", "HD63701")
-DEFINE_DEVICE_TYPE(HD6303R, hd6303r_cpu_device, "hd6304r", "HD6304R")
+DEFINE_DEVICE_TYPE(HD6303R, hd6303r_cpu_device, "hd6303r", "HD6303R")
 DEFINE_DEVICE_TYPE(HD6303Y, hd6303y_cpu_device, "hd6303y", "HD6303Y")
 
 m6801_cpu_device::m6801_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
@@ -1259,32 +1259,24 @@ void m6801_cpu_device::m6801_clock_serial()
 	}
 }
 
-
-offs_t m6801_cpu_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+util::disasm_interface *m6801_cpu_device::create_disassembler()
 {
-	extern CPU_DISASSEMBLE( m6801 );
-	return CPU_DISASSEMBLE_NAME(m6801)(this, stream, pc, oprom, opram, options);
+	return new m680x_disassembler(6801);
 }
 
-
-offs_t m6803_cpu_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+util::disasm_interface *m6803_cpu_device::create_disassembler()
 {
-	extern CPU_DISASSEMBLE( m6803 );
-	return CPU_DISASSEMBLE_NAME(m6803)(this, stream, pc, oprom, opram, options);
+	return new m680x_disassembler(6803);
 }
 
-
-offs_t hd6301_cpu_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+util::disasm_interface *hd6301_cpu_device::create_disassembler()
 {
-	extern CPU_DISASSEMBLE( hd6301 );
-	return CPU_DISASSEMBLE_NAME(hd6301)(this, stream, pc, oprom, opram, options);
+	return new m680x_disassembler(6301);
 }
 
-
-offs_t hd63701_cpu_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+util::disasm_interface *hd63701_cpu_device::create_disassembler()
 {
-	extern CPU_DISASSEMBLE( hd63701 );
-	return CPU_DISASSEMBLE_NAME(hd63701)(this, stream, pc, oprom, opram, options);
+	return new m680x_disassembler(63701);
 }
 
 void hd63701_cpu_device::TAKE_TRAP()

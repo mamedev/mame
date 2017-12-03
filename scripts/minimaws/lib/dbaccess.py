@@ -4,9 +4,131 @@
 ## copyright-holders:Vas Crabb
 
 import sqlite3
+import sys
+
+if sys.version_info >= (3, 4):
+    import urllib.request
 
 
 class SchemaQueries(object):
+    CREATE_FEATURETYPE = \
+            'CREATE TABLE featuretype (\n' \
+            '    id              INTEGER PRIMARY KEY,\n' \
+            '    name            TEXT    NOT NULL,\n' \
+            '    UNIQUE (name ASC))'
+    CREATE_SOURCEFILE = \
+            'CREATE TABLE sourcefile (\n' \
+            '    id              INTEGER PRIMARY KEY,\n' \
+            '    filename        TEXT    NOT NULL,\n' \
+            '    UNIQUE (filename ASC))'
+    CREATE_MACHINE = \
+            'CREATE TABLE machine (\n' \
+            '    id              INTEGER PRIMARY KEY,\n' \
+            '    shortname       TEXT    NOT NULL,\n' \
+            '    description     TEXT    NOT NULL,\n' \
+            '    sourcefile      INTEGER NOT NULL,\n' \
+            '    isdevice        INTEGER NOT NULL,\n' \
+            '    runnable        INTEGER NOT NULL,\n' \
+            '    UNIQUE (shortname ASC),\n' \
+            '    UNIQUE (description ASC),\n' \
+            '    FOREIGN KEY (sourcefile) REFERENCES sourcefile (id))'
+    CREATE_SYSTEM = \
+            'CREATE TABLE system (\n' \
+            '    id              INTEGER PRIMARY KEY,\n' \
+            '    year            TEXT    NOT NULL,\n' \
+            '    manufacturer    TEXT    NOT NULL,\n' \
+            '    FOREIGN KEY (id) REFERENCES machine (id))'
+    CREATE_CLONEOF = \
+            'CREATE TABLE cloneof (\n' \
+            '    id              INTEGER PRIMARY KEY,\n' \
+            '    parent          TEXT    NOT NULL,\n' \
+            '    FOREIGN KEY (id) REFERENCES machine (id))'
+    CREATE_ROMOF = \
+            'CREATE TABLE romof (\n' \
+            '    id              INTEGER PRIMARY KEY,\n' \
+            '    parent          TEXT    NOT NULL,\n' \
+            '    FOREIGN KEY (id) REFERENCES machine (id))'
+    CREATE_BIOSSET = \
+            'CREATE TABLE biosset (\n' \
+            '    id              INTEGER PRIMARY KEY,\n' \
+            '    machine         INTEGER NOT NULL,\n' \
+            '    name            TEXT    NOT NULL,\n' \
+            '    description     TEXT    NOT NULL,\n' \
+            '    UNIQUE (machine ASC, name ASC),\n' \
+            '    FOREIGN KEY (machine) REFERENCES machine (id))'
+    CREATE_BIOSSETDEFAULT = \
+            'CREATE TABLE biossetdefault (\n' \
+            '    id              INTEGER PRIMARY KEY,\n' \
+            '    FOREIGN KEY (id) REFERENCES biosset (id))'
+    CREATE_DEVICEREFERENCE = \
+            'CREATE TABLE devicereference (\n' \
+            '    id              INTEGER PRIMARY KEY,\n' \
+            '    machine         INTEGER NOT NULL,\n' \
+            '    device          INTEGER NOT NULL,\n' \
+            '    UNIQUE (machine ASC, device ASC),\n' \
+            '    FOREIGN KEY (machine) REFERENCES machine (id),\n' \
+            '    FOREIGN KEY (device) REFERENCES machine (id))'
+    CREATE_DIPSWITCH = \
+            'CREATE TABLE dipswitch (\n' \
+            '    id              INTEGER PRIMARY KEY,\n' \
+            '    machine         INTEGER NOT NULL,\n' \
+            '    isconfig        INTEGER NOT NULL,\n' \
+            '    name            TEXT    NOT NULL,\n' \
+            '    tag             TEXT    NOT NULL,\n' \
+            '    mask            INTEGER NOT NULL,\n' \
+            '    --UNIQUE (machine ASC, tag ASC, mask ASC), not necessarily true, need to expose port conditions\n' \
+            '    FOREIGN KEY (machine) REFERENCES machine (id))'
+    CREATE_DIPLOCATION = \
+            'CREATE TABLE diplocation (\n' \
+            '    id              INTEGER PRIMARY KEY,\n' \
+            '    dipswitch       INTEGER NOT NULL,\n' \
+            '    bit             INTEGER NOT NULL,\n' \
+            '    name            TEXT    NOT NULL,\n' \
+            '    num             INTEGER NOT NULL,\n' \
+            '    inverted        INTEGER NOT NULL,\n' \
+            '    UNIQUE (dipswitch ASC, bit ASC),\n' \
+            '    FOREIGN KEY (dipswitch) REFERENCES dipswitch (id))'
+    CREATE_DIPVALUE = \
+            'CREATE TABLE dipvalue (\n' \
+            '    id              INTEGER PRIMARY KEY,\n' \
+            '    dipswitch       INTEGER NOT NULL,\n' \
+            '    name            TEXT    NOT NULL,\n' \
+            '    value           INTEGER NOT NULL,\n' \
+            '    isdefault       INTEGER NOT NULL,\n' \
+            '    FOREIGN KEY (dipswitch) REFERENCES dipswitch (id))'
+    CREATE_FEATURE = \
+            'CREATE TABLE feature (\n' \
+            '    id              INTEGER PRIMARY KEY,\n' \
+            '    machine         INTEGER NOT NULL,\n' \
+            '    featuretype     INTEGER NOT NULL,\n' \
+            '    status          INTEGER NOT NULL,\n' \
+            '    overall         INTEGER NOT NULL,\n' \
+            '    UNIQUE (machine ASC, featuretype ASC),\n' \
+            '    FOREIGN KEY (machine) REFERENCES machine (id),\n' \
+            '    FOREIGN KEY (featuretype) REFERENCES featuretype (id))'
+    CREATE_SLOT = \
+            'CREATE TABLE slot (\n' \
+            '    id              INTEGER PRIMARY KEY,\n' \
+            '    machine         INTEGER NOT NULL,\n' \
+            '    name            TEXT    NOT NULL,\n' \
+            '    UNIQUE (machine ASC, name ASC),\n' \
+            '    FOREIGN KEY (machine) REFERENCES machine (id))'
+    CREATE_SLOTOPTION = \
+            'CREATE TABLE slotoption (\n' \
+            '    id              INTEGER PRIMARY KEY,\n' \
+            '    slot            INTEGER NOT NULL,\n' \
+            '    device          INTEGER NOT NULL,\n' \
+            '    name            TEXT    NOT NULL,\n' \
+            '    UNIQUE (slot ASC, name ASC),\n' \
+            '    FOREIGN KEY (slot) REFERENCES slot (id),\n' \
+            '    FOREIGN KEY (device) REFERENCES machine (id))'
+    CREATE_SLOTDEFAULT = \
+            'CREATE TABLE slotdefault (\n' \
+            '    id              INTEGER PRIMARY KEY,\n' \
+            '    slotoption      INTEGER NOT NULL,\n' \
+            '    FOREIGN KEY (id) REFERENCES slot (id),\n' \
+            '    FOREIGN KEY (slotoption) REFERENCES slotoption (id))'
+
     CREATE_TEMPORARY_DEVICEREFERENCE = 'CREATE TEMPORARY TABLE temp_devicereference (id INTEGER PRIMARY KEY, machine INTEGER NOT NULL, device TEXT NOT NULL, UNIQUE (machine, device))'
     CREATE_TEMPORARY_SLOTOPTION = 'CREATE TEMPORARY TABLE temp_slotoption (id INTEGER PRIMARY KEY, slot INTEGER NOT NULL, device TEXT NOT NULL, name TEXT NOT NULL)'
     CREATE_TEMPORARY_SLOTDEFAULT = 'CREATE TEMPORARY TABLE temp_slotdefault (id INTEGER PRIMARY KEY, slotoption INTEGER NOT NULL)'
@@ -43,6 +165,51 @@ class SchemaQueries(object):
 
     DROP_DIPSWITCH_MACHINE_ISCONFIG = 'DROP INDEX IF EXISTS dipswitch_machine_isconfig'
 
+    CREATE_TABLES = (
+            CREATE_FEATURETYPE,
+            CREATE_SOURCEFILE,
+            CREATE_MACHINE,
+            CREATE_SYSTEM,
+            CREATE_CLONEOF,
+            CREATE_ROMOF,
+            CREATE_BIOSSET,
+            CREATE_BIOSSETDEFAULT,
+            CREATE_DEVICEREFERENCE,
+            CREATE_DIPSWITCH,
+            CREATE_DIPLOCATION,
+            CREATE_DIPVALUE,
+            CREATE_FEATURE,
+            CREATE_SLOT,
+            CREATE_SLOTOPTION,
+            CREATE_SLOTDEFAULT)
+
+    CREATE_TEMPORARY_TABLES = (
+            CREATE_TEMPORARY_DEVICEREFERENCE,
+            CREATE_TEMPORARY_SLOTOPTION,
+            CREATE_TEMPORARY_SLOTDEFAULT)
+
+    CREATE_INDEXES = (
+            INDEX_MACHINE_ISDEVICE_SHORTNAME,
+            INDEX_MACHINE_ISDEVICE_DESCRIPTION,
+            INDEX_MACHINE_RUNNABLE_SHORTNAME,
+            INDEX_MACHINE_RUNNABLE_DESCRIPTION,
+            INDEX_SYSTEM_YEAR,
+            INDEX_SYSTEM_MANUFACTURER,
+            INDEX_ROMOF_PARENT,
+            INDEX_CLONEOF_PARENT,
+            INDEX_DIPSWITCH_MACHINE_ISCONFIG)
+
+    DROP_INDEXES = (
+            DROP_MACHINE_ISDEVICE_SHORTNAME,
+            DROP_MACHINE_ISDEVICE_DESCRIPTION,
+            DROP_MACHINE_RUNNABLE_SHORTNAME,
+            DROP_MACHINE_RUNNABLE_DESCRIPTION,
+            DROP_SYSTEM_YEAR,
+            DROP_SYSTEM_MANUFACTURER,
+            DROP_ROMOF_PARENT,
+            DROP_CLONEOF_PARENT,
+            DROP_DIPSWITCH_MACHINE_ISCONFIG)
+
 
 class UpdateQueries(object):
     ADD_FEATURETYPE = 'INSERT OR IGNORE INTO featuretype (name) VALUES (?)'
@@ -51,6 +218,8 @@ class UpdateQueries(object):
     ADD_SYSTEM = 'INSERT INTO system (id, year, manufacturer) VALUES (?, ?, ?)'
     ADD_CLONEOF = 'INSERT INTO cloneof (id, parent) VALUES (?, ?)'
     ADD_ROMOF = 'INSERT INTO romof (id, parent) VALUES (?, ?)'
+    ADD_BIOSSET = 'INSERT INTO biosset (machine, name, description) VALUES (?, ?, ?)'
+    ADD_BIOSSETDEFAULT = 'INSERT INTO biossetdefault (id) VALUES (?)'
     ADD_DIPSWITCH = 'INSERT INTO dipswitch (machine, isconfig, name, tag, mask) VALUES (?, ?, ?, ?, ?)'
     ADD_DIPLOCATION = 'INSERT INTO diplocation (dipswitch, bit, name, num, inverted) VALUES (?, ?, ?, ?, ?)'
     ADD_DIPVALUE = 'INSERT INTO dipvalue (dipswitch, name, value, isdefault) VALUES (?, ?, ?, ?)'
@@ -170,11 +339,22 @@ class QueryCursor(object):
                     'ORDER BY shortname ASC',
                     patterns)
 
+    def get_machine_id(self, machine):
+        return (self.dbcurs.execute('SELECT id FROM machine WHERE shortname = ?', (machine, )).fetchone() or (None, ))[0]
+
     def get_machine_info(self, machine):
         return self.dbcurs.execute(
                 'SELECT machine.id AS id, machine.description AS description, machine.isdevice AS isdevice, machine.runnable AS runnable, sourcefile.filename AS sourcefile, system.year AS year, system.manufacturer AS manufacturer, cloneof.parent AS cloneof, romof.parent AS romof ' \
                 'FROM machine JOIN sourcefile ON machine.sourcefile = sourcefile.id LEFT JOIN system ON machine.id = system.id LEFT JOIN cloneof ON system.id = cloneof.id LEFT JOIN romof ON system.id = romof.id ' \
                 'WHERE machine.shortname = ?',
+                (machine, ))
+
+    def get_biossets(self, machine):
+        return self.dbcurs.execute(
+                'SELECT biosset.name AS name, biosset.description AS description, COUNT(biossetdefault.id) AS isdefault ' \
+                'FROM biosset LEFT JOIN biossetdefault USING (id) ' \
+                'WHERE biosset.machine = ? ' \
+                'GROUP BY biosset.id',
                 (machine, ))
 
     def get_devices_referenced(self, machine):
@@ -189,6 +369,13 @@ class QueryCursor(object):
                 'SELECT machine.shortname AS shortname, machine.description AS description, sourcefile.filename AS sourcefile ' \
                 'FROM machine JOIN sourcefile ON machine.sourcefile = sourcefile.id ' \
                 'WHERE machine.id IN (SELECT machine FROM devicereference WHERE device = ?)',
+                (device, ))
+
+    def get_compatible_slots(self, device):
+        return self.dbcurs.execute(
+                'SELECT machine.shortname AS shortname, machine.description AS description, slot.name AS slot, slotoption.name AS slotoption, sourcefile.filename AS sourcefile ' \
+                'FROM slotoption JOIN slot ON slotoption.slot = slot.id JOIN machine on slot.machine = machine.id JOIN sourcefile ON machine.sourcefile = sourcefile.id '
+                'WHERE slotoption.device = ?',
                 (device, ))
 
     def get_sourcefile_id(self, filename):
@@ -221,6 +408,31 @@ class QueryCursor(object):
         else:
             return self.dbcurs.execute('SELECT COUNT(*) FROM sourcefile').fetchone()[0]
 
+    def count_slots(self, machine):
+        return self.dbcurs.execute(
+                'SELECT COUNT(*) FROM slot WHERE machine = ?', (machine, )).fetchone()[0]
+
+    def get_feature_flags(self, machine):
+        return self.dbcurs.execute(
+                'SELECT featuretype.name AS featuretype, feature.status AS status, feature.overall AS overall ' \
+                'FROM feature JOIN featuretype ON feature.featuretype = featuretype.id ' \
+                'WHERE feature.machine = ?',
+                (machine, ))
+
+    def get_slot_defaults(self, machine):
+        return self.dbcurs.execute(
+                'SELECT slot.name AS name, slotoption.name AS option ' \
+                'FROM slot JOIN slotdefault ON slot.id = slotdefault.id JOIN slotoption ON slotdefault.slotoption = slotoption.id ' \
+                'WHERE slot.machine = ?',
+                (machine, ))
+
+    def get_slot_options(self, machine):
+        return self.dbcurs.execute(
+                'SELECT slot.name AS slot, slotoption.name AS option, machine.shortname AS shortname, machine.description AS description ' \
+                'FROM slot JOIN slotoption ON slot.id = slotoption.slot JOIN machine ON slotoption.device = machine.id ' \
+                'WHERE slot.machine = ?',
+                (machine, ))
+
 
 class UpdateCursor(object):
     def __init__(self, dbconn, **kwargs):
@@ -250,6 +462,14 @@ class UpdateCursor(object):
 
     def add_romof(self, machine, parent):
         self.dbcurs.execute(UpdateQueries.ADD_ROMOF, (machine, parent))
+        return self.dbcurs.lastrowid
+
+    def add_biosset(self, machine, name, description):
+        self.dbcurs.execute(UpdateQueries.ADD_BIOSSET, (machine, name, description))
+        return self.dbcurs.lastrowid
+
+    def add_biossetdefault(self, biosset):
+        self.dbcurs.execute(UpdateQueries.ADD_BIOSSETDEFAULT, (biosset, ))
         return self.dbcurs.lastrowid
 
     def add_devicereference(self, machine, device):
@@ -286,9 +506,11 @@ class UpdateCursor(object):
 
 class QueryConnection(object):
     def __init__(self, database, **kwargs):
-        # TODO: detect python versions that allow URL-based read-only connection
         super(QueryConnection, self).__init__(**kwargs)
-        self.dbconn = sqlite3.connect(database)
+        if sys.version_info >= (3, 4):
+            self.dbconn = sqlite3.connect('file:' + urllib.request.pathname2url(database) + '?mode=ro', uri=True)
+        else:
+            self.dbconn = sqlite3.connect(database)
         self.dbconn.row_factory = sqlite3.Row
         self.dbconn.execute('PRAGMA foreign_keys = ON')
 
@@ -303,6 +525,7 @@ class UpdateConnection(object):
     def __init__(self, database, **kwargs):
         super(UpdateConnection, self).__init__(**kwargs)
         self.dbconn = sqlite3.connect(database)
+        self.dbconn.execute('PRAGMA page_size = 4096')
         self.dbconn.execute('PRAGMA foreign_keys = ON')
 
     def commit(self):
@@ -318,10 +541,21 @@ class UpdateConnection(object):
         return UpdateCursor(self.dbconn)
 
     def prepare_for_load(self):
-        self.drop_indexes()
-        self.dbconn.execute(SchemaQueries.CREATE_TEMPORARY_DEVICEREFERENCE)
-        self.dbconn.execute(SchemaQueries.CREATE_TEMPORARY_SLOTOPTION)
-        self.dbconn.execute(SchemaQueries.CREATE_TEMPORARY_SLOTDEFAULT)
+        # here be dragons - this is a poor man's DROP ALL TABLES etc.
+        self.dbconn.execute('PRAGMA foreign_keys = OFF')
+        for query in self.dbconn.execute('SELECT \'DROP INDEX \' || name FROM sqlite_master WHERE type = \'index\' AND NOT name GLOB \'sqlite_autoindex_*\'').fetchall():
+            self.dbconn.execute(query[0])
+        for query in self.dbconn.execute('SELECT \'DROP TABLE \' || name FROM sqlite_master WHERE type = \'table\'').fetchall():
+            self.dbconn.execute(query[0])
+        self.dbconn.execute('PRAGMA foreign_keys = ON')
+
+        # this is where the sanity starts
+        for query in SchemaQueries.DROP_INDEXES:
+            self.dbconn.execute(query)
+        for query in SchemaQueries.CREATE_TABLES:
+            self.dbconn.execute(query)
+        for query in SchemaQueries.CREATE_TEMPORARY_TABLES:
+            self.dbconn.execute(query)
         self.dbconn.commit()
 
     def finalise_load(self):
@@ -334,27 +568,6 @@ class UpdateConnection(object):
         self.dbconn.execute(UpdateQueries.FINALISE_SLOTDEFAULTS)
         self.dbconn.commit()
         self.dbconn.execute(SchemaQueries.DROP_TEMPORARY_SLOTDEFAULT)
-        self.create_indexes()
+        for query in SchemaQueries.CREATE_INDEXES:
+            self.dbconn.execute(query)
         self.dbconn.commit()
-
-    def drop_indexes(self):
-        self.dbconn.execute(SchemaQueries.DROP_MACHINE_ISDEVICE_SHORTNAME)
-        self.dbconn.execute(SchemaQueries.DROP_MACHINE_ISDEVICE_DESCRIPTION)
-        self.dbconn.execute(SchemaQueries.DROP_MACHINE_RUNNABLE_SHORTNAME)
-        self.dbconn.execute(SchemaQueries.DROP_MACHINE_RUNNABLE_DESCRIPTION)
-        self.dbconn.execute(SchemaQueries.DROP_SYSTEM_YEAR)
-        self.dbconn.execute(SchemaQueries.DROP_SYSTEM_MANUFACTURER)
-        self.dbconn.execute(SchemaQueries.DROP_ROMOF_PARENT)
-        self.dbconn.execute(SchemaQueries.DROP_CLONEOF_PARENT)
-        self.dbconn.execute(SchemaQueries.DROP_DIPSWITCH_MACHINE_ISCONFIG)
-
-    def create_indexes(self):
-        self.dbconn.execute(SchemaQueries.INDEX_MACHINE_ISDEVICE_SHORTNAME)
-        self.dbconn.execute(SchemaQueries.INDEX_MACHINE_ISDEVICE_DESCRIPTION)
-        self.dbconn.execute(SchemaQueries.INDEX_MACHINE_RUNNABLE_SHORTNAME)
-        self.dbconn.execute(SchemaQueries.INDEX_MACHINE_RUNNABLE_DESCRIPTION)
-        self.dbconn.execute(SchemaQueries.INDEX_SYSTEM_YEAR)
-        self.dbconn.execute(SchemaQueries.INDEX_SYSTEM_MANUFACTURER)
-        self.dbconn.execute(SchemaQueries.INDEX_ROMOF_PARENT)
-        self.dbconn.execute(SchemaQueries.INDEX_CLONEOF_PARENT)
-        self.dbconn.execute(SchemaQueries.INDEX_DIPSWITCH_MACHINE_ISCONFIG)

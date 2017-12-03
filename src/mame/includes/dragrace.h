@@ -6,6 +6,7 @@
 
 *************************************************************************/
 
+#include "machine/timer.h"
 #include "machine/watchdog.h"
 #include "sound/discrete.h"
 #include "screen.h"

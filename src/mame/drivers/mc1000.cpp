@@ -29,6 +29,7 @@
 #include "imagedev/cassette.h"
 #include "machine/ram.h"
 #include "machine/rescap.h"
+#include "machine/timer.h"
 #include "sound/ay8910.h"
 #include "video/mc6845.h"
 #include "video/mc6847.h"

@@ -2,7 +2,7 @@
 // copyright-holders:Dirk Best
 /****************************************************************************
 
-    amiga.c
+    amiga.cpp
 
     Amiga floppies
 
@@ -290,15 +290,11 @@ static int is_leap(int year)
 
 
 /* Convert amiga time to standard time */
-static time_t amiga_crack_time(amiga_date *date)
+static imgtool::datetime amiga_crack_time(amiga_date *date)
 {
 	int month_days[12] = { 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
 	int year = 1978, month = 1, year_days = 365; /* base date */
 	int day = date->days;
-	struct tm t;
-
-	/* initialize struct */
-	memset(&t, 0, sizeof(t));
 
 	/* first calculate the year */
 	while (day >= year_days)
@@ -316,15 +312,16 @@ static time_t amiga_crack_time(amiga_date *date)
 		month++;
 	}
 
-	/* fill the struct with our calculated values */
-	t.tm_year = year - 1900;
-	t.tm_mon  = month - 1;
-	t.tm_mday = day + 1;
-	t.tm_hour = date->mins / 60;
-	t.tm_min  = date->mins % 60;
-	t.tm_sec  = date->ticks / 50;
+	// fill the struct with our calculated values
+	util::arbitrary_datetime dt;
+	dt.year = year;
+	dt.month  = month;
+	dt.day_of_month = day;
+	dt.hour = date->mins / 60;
+	dt.minute  = date->mins % 60;
+	dt.second  = date->ticks / 50;
 
-	return mktime(&t);
+	return imgtool::datetime(imgtool::datetime::datetime_type::LOCAL, dt);
 }
 
 
@@ -1785,9 +1782,9 @@ static void amiga_image_info(imgtool::image &img, std::ostream &stream)
 	ret = read_root_block(img, &root);
 	if (ret) return;
 
-	t_c = amiga_crack_time(&root.c);
-	t_v = amiga_crack_time(&root.v);
-	t_r = amiga_crack_time(&root.r);
+	t_c = amiga_crack_time(&root.c).to_time_t();
+	t_v = amiga_crack_time(&root.v).to_time_t();
+	t_r = amiga_crack_time(&root.r).to_time_t();
 
 	strftime(c, sizeof(c), "%d-%b-%y %H:%M:%S", localtime(&t_c));
 	strftime(v, sizeof(v), "%d-%b-%y %H:%M:%S", localtime(&t_v));

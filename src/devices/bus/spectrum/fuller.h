@@ -1,0 +1,59 @@
+// license:BSD-3-Clause
+// copyright-holders:Nigel Barnes
+/**********************************************************************
+
+    Fuller Box Games Unit
+
+**********************************************************************/
+
+#ifndef MAME_BUS_SPECTRUM_FULLER_H
+#define MAME_BUS_SPECTRUM_FULLER_H
+
+#pragma once
+
+
+#include "exp.h"
+#include "sound/ay8910.h"
+
+//**************************************************************************
+//  TYPE DEFINITIONS
+//**************************************************************************
+
+// ======================> spectrum_fuller_device
+
+class spectrum_fuller_device :
+	public device_t,
+	public device_spectrum_expansion_interface
+{
+public:
+	// construction/destruction
+	spectrum_fuller_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
+	// device-level overrides
+	virtual void device_start() override;
+	virtual void device_reset() override;
+
+	// optional information overrides
+	virtual void device_add_mconfig(machine_config &config) override;
+	virtual ioport_constructor device_input_ports() const override;
+
+	virtual DECLARE_READ8_MEMBER(mreq_r) override;
+	virtual DECLARE_WRITE8_MEMBER(mreq_w) override;
+	virtual DECLARE_READ8_MEMBER(port_fe_r) override;
+	virtual DECLARE_READ_LINE_MEMBER(romcs) override;
+
+private:
+	DECLARE_READ8_MEMBER(joystick_r);
+
+	required_device<spectrum_expansion_slot_device> m_exp;
+	required_device<ay8910_device> m_psg;
+	required_ioport m_joy;
+};
+
+
+// device type definition
+DECLARE_DEVICE_TYPE(SPECTRUM_FULLER, spectrum_fuller_device)
+
+
+#endif // MAME_BUS_SPECTRUM_FULLER_H

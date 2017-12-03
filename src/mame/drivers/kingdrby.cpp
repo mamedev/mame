@@ -304,7 +304,7 @@ WRITE8_MEMBER(kingdrby_state::hopper_io_w)
 
 WRITE8_MEMBER(kingdrby_state::sound_cmd_w)
 {
-	m_soundcpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	m_soundcpu->set_input_line(INPUT_LINE_NMI, BIT(data, 7) ? ASSERT_LINE : CLEAR_LINE);
 	m_sound_cmd = data;
 	/* soundlatch is unneeded since we are already using perfect interleave. */
 	// m_soundlatch->write(space,0, data);
@@ -955,6 +955,7 @@ static MACHINE_CONFIG_START( kingdrby )
 	// 6000-6003 PPI group modes 0/0 - B & C (lower) as input, A & C (upper) as output.
 	MCFG_DEVICE_ADD("ppi8255_1", I8255A, 0)
 	MCFG_I8255_OUT_PORTA_CB(WRITE8(kingdrby_state, sound_cmd_w))
+	MCFG_I8255_TRISTATE_PORTA_CB(CONSTANT(0x7f))
 	MCFG_I8255_IN_PORTB_CB(READ8(kingdrby_state, key_matrix_r))
 	MCFG_I8255_IN_PORTC_CB(READ8(kingdrby_state, input_mux_r))
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(kingdrby_state, outport2_w))
@@ -995,6 +996,7 @@ static MACHINE_CONFIG_DERIVED( kingdrbb, kingdrby )
 	MCFG_DEVICE_ADD("ppi8255_0", I8255A, 0)
 	/* C as input, (all) as output */
 	MCFG_I8255_OUT_PORTA_CB(WRITE8(kingdrby_state, sound_cmd_w))
+	MCFG_I8255_TRISTATE_PORTA_CB(CONSTANT(0x7f))
 	MCFG_I8255_IN_PORTB_CB(IOPORT("IN0"))
 	MCFG_I8255_OUT_PORTB_CB(WRITE8(kingdrby_state, outportb_w))
 	MCFG_I8255_IN_PORTC_CB(IOPORT("IN1"))

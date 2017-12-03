@@ -13,6 +13,7 @@
 #include "video/powervr2.h"
 #include "machine/naomig1.h"
 #include "machine/maple-dc.h"
+#include "machine/timer.h"
 #include "sound/aica.h"
 
 class dc_state : public driver_device

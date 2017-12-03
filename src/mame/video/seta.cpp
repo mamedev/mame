@@ -176,9 +176,9 @@ static const game_offset game_offsets[] =
 	{ "metafox",  {  0,  0 }, { 16,-19 } }, // sprites unknown, tilemap correct (test grid)
 	{ "setaroul", {  7,  0 }, {  5,  0 } }, // unknown (flipped offsets are unused: game handles flipping manually without setting the flip bit)
 	{ "drgnunit", {  2,  2 }, { -2, -2 } }, // correct (test grid and I/O test)
-	{ "jockeyc",  {  0,  0 }, { -2,  0 } }, // sprites unknown, tilemap correct (test grid)
+	{ "jockeyc",  {  0,  0 }, { -2,126 } }, // sprites correct? (bets), tilemap correct (test grid)
+	{ "inttoote2",{  0,  0 }, { -2,126 } }, // "
 	{ "inttoote", {  0,  0 }, { -2,  0 } }, // "
-	{ "inttootea",{  0,  0 }, { -2,  0 } }, // "
 	{ "stg",      {  0,  0 }, { -2, -2 } }, // sprites correct? (panel), tilemap correct (test grid)
 	{ "qzkklogy", {  1,  1 }, { -1, -1 } }, // correct (timer, test grid)
 	{ "qzkklgy2", {  0,  0 }, { -1, -3 } }, // sprites unknown, tilemaps correct (test grid)
@@ -522,6 +522,14 @@ VIDEO_START_MEMBER(setaroul_state,setaroul_1_layer)
 	m_seta001->set_bg_xoffsets( 0, 0x2 );
 }
 
+VIDEO_START_MEMBER(jockeyc_state,jockeyc_1_layer)
+{
+	VIDEO_START_CALL_MEMBER(seta_1_layer);
+
+	// position kludges
+	m_seta001->set_fg_yoffsets( -0x12+8, 0x0e );
+}
+
 VIDEO_START_MEMBER(seta_state,twineagl_1_layer)
 {
 	VIDEO_START_CALL_MEMBER( seta_no_layers );
@@ -674,7 +682,7 @@ PALETTE_INIT_MEMBER(seta_state,zingzip)
 }
 
 // color prom
-PALETTE_INIT_MEMBER(seta_state,inttoote)
+PALETTE_INIT_MEMBER(seta_state,palette_init_RRRRRGGGGGBBBBB_proms)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	int x;
@@ -690,7 +698,7 @@ PALETTE_INIT_MEMBER(setaroul_state,setaroul)
 	m_gfxdecode->gfx(0)->set_granularity(16);
 	m_gfxdecode->gfx(1)->set_granularity(16);
 
-	PALETTE_INIT_NAME(inttoote)(palette);
+	PALETTE_INIT_NAME(palette_init_RRRRRGGGGGBBBBB_proms)(palette);
 }
 
 PALETTE_INIT_MEMBER(seta_state,usclssic)
@@ -1085,12 +1093,5 @@ uint32_t seta_state::screen_update_seta(screen_device &screen, bitmap_ind16 &bit
 uint32_t seta_state::screen_update_usclssic(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	usclssic_set_pens();
-	return screen_update_seta_layers(screen, bitmap, cliprect);
-}
-
-
-uint32_t seta_state::screen_update_inttoote(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
-{
-	/* no palette to set */
 	return screen_update_seta_layers(screen, bitmap, cliprect);
 }

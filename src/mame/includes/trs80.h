@@ -106,6 +106,7 @@ public:
 	DECLARE_READ8_MEMBER( trs80_gfxram_r );
 	DECLARE_WRITE8_MEMBER( trs80_gfxram_w );
 	DECLARE_READ8_MEMBER (trs80_wd179x_r);
+	DECLARE_READ8_MEMBER (cp500_a11_flipflop_toggle);
 	DECLARE_DRIVER_INIT(trs80m4);
 	DECLARE_DRIVER_INIT(trs80l2);
 	DECLARE_DRIVER_INIT(trs80m4p);
@@ -118,6 +119,7 @@ public:
 	DECLARE_QUICKLOAD_LOAD_MEMBER( trs80_cmd );
 	DECLARE_MACHINE_RESET(trs80m4);
 	DECLARE_MACHINE_RESET(lnw80);
+	DECLARE_MACHINE_RESET(cp500);
 	DECLARE_PALETTE_INIT(lnw80);
 	uint32_t screen_update_trs80(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_trs80m4(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -150,6 +152,7 @@ private:
 	uint16_t m_start_address;
 	uint8_t m_crtc_reg;
 	uint8_t m_size_store;
+	bool m_a11_flipflop;
 	void trs80_fdc_interrupt_internal();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;

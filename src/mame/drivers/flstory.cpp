@@ -16,110 +16,70 @@
 
 #include "cpu/m6805/m6805.h"
 #include "cpu/z80/z80.h"
-#include "sound/ay8910.h"
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
 #include "screen.h"
 #include "speaker.h"
 
 
-READ8_MEMBER(flstory_state::from_snd_r)
-{
-	m_snd_flag = 0;
-	return m_snd_data;
-}
-
 READ8_MEMBER(flstory_state::snd_flag_r)
 {
-	return m_snd_flag | 0xfd;
+	return (m_soundlatch->pending_r() ? 0 : 1) | (m_soundlatch2->pending_r() ? 2 : 0);
 }
 
-WRITE8_MEMBER(flstory_state::to_main_w)
+WRITE8_MEMBER(flstory_state::snd_reset_w)
 {
-	m_snd_data = data;
-	m_snd_flag = 2;
+	m_audiocpu->set_input_line(INPUT_LINE_RESET, (data & 1 ) ? ASSERT_LINE : CLEAR_LINE);
 }
 
-TIMER_CALLBACK_MEMBER(flstory_state::nmi_callback)
-{
-	if (m_sound_nmi_enable)
-		m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
-	else
-		m_pending_nmi = 1;
-}
-
-WRITE8_MEMBER(flstory_state::sound_command_w)
-{
-	m_soundlatch->write(space, 0, data);
-	machine().scheduler().synchronize(timer_expired_delegate(FUNC(flstory_state::nmi_callback),this), data);
-}
-
-
-WRITE8_MEMBER(flstory_state::nmi_disable_w)
-{
-	m_sound_nmi_enable = 0;
-}
-
-WRITE8_MEMBER(flstory_state::nmi_enable_w)
-{
-	m_sound_nmi_enable = 1;
-	if (m_pending_nmi)
-	{
-		m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
-		m_pending_nmi = 0;
-	}
-}
-
-static ADDRESS_MAP_START( flstory_map, AS_PROGRAM, 8, flstory_state )
+static ADDRESS_MAP_START( base_map, AS_PROGRAM, 8, flstory_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
-	AM_RANGE(0xc000, 0xc7ff) AM_RAM_WRITE(flstory_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0xc800, 0xcfff) AM_RAM /* unknown */
-	AM_RANGE(0xd000, 0xd000) AM_DEVREADWRITE("bmcu", taito68705_mcu_device, data_r, data_w)
-	AM_RANGE(0xd001, 0xd001) AM_WRITENOP    /* watchdog? */
-	AM_RANGE(0xd002, 0xd002) AM_WRITENOP    /* coin lock out? */
-	AM_RANGE(0xd400, 0xd400) AM_READWRITE(from_snd_r, sound_command_w)
+
+	// rumba lumber reads area 0xc800-0xcfff
+	// onna34ro checks the whole range during POST but having a mirror or not doesn't make any difference for the check to pass
+	AM_RANGE(0xc000, 0xc7ff) AM_MIRROR(0x800) AM_RAM_WRITE(flstory_videoram_w) AM_SHARE("videoram")
+
+	AM_RANGE(0xd001, 0xd001) AM_WRITENOP    /* watchdog */
+	AM_RANGE(0xd002, 0xd002) AM_NOP         /* unknown read & coin lock out? */
+
+	AM_RANGE(0xd400, 0xd400) AM_DEVREAD("soundlatch2", generic_latch_8_device, read)
+	AM_RANGE(0xd400, 0xd400) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
+	AM_RANGE(0xd403, 0xd403) AM_READNOP AM_WRITE(snd_reset_w) // unknown read (set/clr side effect?)
+
 	AM_RANGE(0xd401, 0xd401) AM_READ(snd_flag_r)
-	AM_RANGE(0xd403, 0xd403) AM_NOP /* unknown */
 	AM_RANGE(0xd800, 0xd800) AM_READ_PORT("DSW0")
 	AM_RANGE(0xd801, 0xd801) AM_READ_PORT("DSW1")
 	AM_RANGE(0xd802, 0xd802) AM_READ_PORT("DSW2")
 	AM_RANGE(0xd803, 0xd803) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0xd804, 0xd804) AM_READ_PORT("P1")
-	AM_RANGE(0xd805, 0xd805) AM_READ(flstory_mcu_status_r)
 	AM_RANGE(0xd806, 0xd806) AM_READ_PORT("P2")
-//  AM_RANGE(0xda00, 0xda00) AM_WRITEONLY
+
 	AM_RANGE(0xdc00, 0xdc9f) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0xdca0, 0xdcbf) AM_RAM_WRITE(flstory_scrlram_w) AM_SHARE("scrlram")
-	AM_RANGE(0xdcc0, 0xdcff) AM_RAM /* unknown */
+
 	AM_RANGE(0xdd00, 0xdeff) AM_READWRITE(flstory_palette_r, flstory_palette_w)
+
+	// victorious nine read 0xf80a during attract, unknown purpose
+	AM_RANGE(0xe000, 0xe7ff) AM_MIRROR(0x1800) AM_RAM AM_SHARE("workram") /* work RAM */
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( flstory_map, AS_PROGRAM, 8, flstory_state )
+	AM_IMPORT_FROM(base_map)
+	AM_RANGE(0xd000, 0xd000) AM_DEVREADWRITE("bmcu", taito68705_mcu_device, data_r, data_w)
+
+	AM_RANGE(0xd805, 0xd805) AM_READ(flstory_mcu_status_r)
+//  AM_RANGE(0xda00, 0xda00) AM_WRITEONLY
+	AM_RANGE(0xdcc0, 0xdcff) AM_RAM /* unknown */
 	AM_RANGE(0xdf03, 0xdf03) AM_WRITE(flstory_gfxctrl_w)
-	AM_RANGE(0xe000, 0xe7ff) AM_RAM /* work RAM */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( onna34ro_map, AS_PROGRAM, 8, flstory_state )
-	AM_RANGE(0x0000, 0xbfff) AM_ROM
-	AM_RANGE(0xc000, 0xc7ff) AM_RAM_WRITE(flstory_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0xc800, 0xcfff) AM_RAM /* unknown */
+	AM_IMPORT_FROM(base_map)
 //  AM_RANGE(0xd000, 0xd000) AM_DEVREADWRITE("bmcu", taito68705_mcu_device, data_r, data_w)
-	AM_RANGE(0xd001, 0xd001) AM_WRITENOP    /* watchdog? */
-	AM_RANGE(0xd002, 0xd002) AM_WRITENOP    /* coin lock out? */
-	AM_RANGE(0xd400, 0xd400) AM_READWRITE(from_snd_r, sound_command_w)
-	AM_RANGE(0xd401, 0xd401) AM_READ(snd_flag_r)
-	AM_RANGE(0xd403, 0xd403) AM_NOP /* unknown */
-	AM_RANGE(0xd800, 0xd800) AM_READ_PORT("DSW0")
-	AM_RANGE(0xd801, 0xd801) AM_READ_PORT("DSW1")
-	AM_RANGE(0xd802, 0xd802) AM_READ_PORT("DSW2")
-	AM_RANGE(0xd803, 0xd803) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0xd804, 0xd804) AM_READ_PORT("P1")
 //  AM_RANGE(0xd805, 0xd805) AM_READ(flstory_mcu_status_r)
-	AM_RANGE(0xd806, 0xd806) AM_READ_PORT("P2")
 //  AM_RANGE(0xda00, 0xda00) AM_WRITEONLY
-	AM_RANGE(0xdc00, 0xdc9f) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0xdca0, 0xdcbf) AM_RAM_WRITE(flstory_scrlram_w) AM_SHARE("scrlram")
 	AM_RANGE(0xdcc0, 0xdcff) AM_RAM /* unknown */
-	AM_RANGE(0xdd00, 0xdeff) AM_READWRITE(flstory_palette_r, flstory_palette_w)
 	AM_RANGE(0xdf03, 0xdf03) AM_WRITE(flstory_gfxctrl_w)
-	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_SHARE("workram") /* work RAM */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( onna34ro_mcu_map, AS_PROGRAM, 8, flstory_state )
@@ -136,83 +96,28 @@ CUSTOM_INPUT_MEMBER(flstory_state::victnine_mcu_status_bit01_r)
 }
 
 static ADDRESS_MAP_START( victnine_map, AS_PROGRAM, 8, flstory_state )
-	AM_RANGE(0x0000, 0xbfff) AM_ROM
-	AM_RANGE(0xc000, 0xc7ff) AM_RAM_WRITE(flstory_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0xc800, 0xcfff) AM_RAM /* unknown */
+	AM_IMPORT_FROM(base_map)
 	AM_RANGE(0xd000, 0xd000) AM_READWRITE(victnine_mcu_r, victnine_mcu_w)
-	AM_RANGE(0xd001, 0xd001) AM_WRITENOP    /* watchdog? */
-	AM_RANGE(0xd002, 0xd002) AM_NOP /* unknown read & coin lock out? */
-	AM_RANGE(0xd400, 0xd400) AM_READWRITE(from_snd_r, sound_command_w)
-	AM_RANGE(0xd401, 0xd401) AM_READ(snd_flag_r)
-	AM_RANGE(0xd403, 0xd403) AM_READNOP /* unknown */
-	AM_RANGE(0xd800, 0xd800) AM_READ_PORT("DSW0")
-	AM_RANGE(0xd801, 0xd801) AM_READ_PORT("DSW1")
-	AM_RANGE(0xd802, 0xd802) AM_READ_PORT("DSW2")
-	AM_RANGE(0xd803, 0xd803) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0xd804, 0xd804) AM_READ_PORT("P1")
+
 	AM_RANGE(0xd805, 0xd805) AM_READ_PORT("EXTRA_P1")   /* also mcu */
-	AM_RANGE(0xd806, 0xd806) AM_READ_PORT("P2")
 	AM_RANGE(0xd807, 0xd807) AM_READ_PORT("EXTRA_P2")
 //  AM_RANGE(0xda00, 0xda00) AM_WRITEONLY
-	AM_RANGE(0xdc00, 0xdc9f) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0xdca0, 0xdcbf) AM_RAM_WRITE(flstory_scrlram_w) AM_SHARE("scrlram")
 	AM_RANGE(0xdce0, 0xdce0) AM_READWRITE(victnine_gfxctrl_r, victnine_gfxctrl_w)
 	AM_RANGE(0xdce1, 0xdce1) AM_WRITENOP    /* unknown */
-	AM_RANGE(0xdd00, 0xdeff) AM_READWRITE(flstory_palette_r, flstory_palette_w)
-	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_SHARE("workram") /* work RAM */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( rumba_map, AS_PROGRAM, 8, flstory_state )
-	AM_RANGE(0x0000, 0xbfff) AM_ROM
-	AM_RANGE(0xc000, 0xc7ff) AM_RAM_WRITE(flstory_videoram_w) AM_SHARE("videoram")
-//  AM_RANGE(0xc800, 0xcfff) AM_RAM /* unknown */
+	AM_IMPORT_FROM(base_map)
 	AM_RANGE(0xd000, 0xd000) AM_DEVREADWRITE("bmcu", taito68705_mcu_device, data_r, data_w)
-	AM_RANGE(0xd001, 0xd001) AM_WRITENOP    /* watchdog? */
-//  AM_RANGE(0xd002, 0xd002) AM_NOP /* unknown read & coin lock out? */
-	AM_RANGE(0xd400, 0xd400) AM_READWRITE(from_snd_r, sound_command_w)
-	AM_RANGE(0xd401, 0xd401) AM_READ(snd_flag_r)
-//  AM_RANGE(0xd403, 0xd403) AM_READNOP /* unknown */
-	AM_RANGE(0xd800, 0xd800) AM_READ_PORT("DSW0")
-	AM_RANGE(0xd801, 0xd801) AM_READ_PORT("DSW1")
-	AM_RANGE(0xd802, 0xd802) AM_READ_PORT("DSW2")
-	AM_RANGE(0xd803, 0xd803) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0xd804, 0xd804) AM_READ_PORT("P1")
+
 	AM_RANGE(0xd805, 0xd805) AM_READ(flstory_mcu_status_r)
-	AM_RANGE(0xd806, 0xd806) AM_READ_PORT("P2")
 	AM_RANGE(0xd807, 0xd807) AM_READ_PORT("EXTRA_P2")
 //  AM_RANGE(0xda00, 0xda00) AM_WRITEONLY
-	AM_RANGE(0xdc00, 0xdc9f) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0xdca0, 0xdcbf) AM_RAM_WRITE(flstory_scrlram_w) AM_SHARE("scrlram")
 	AM_RANGE(0xdce0, 0xdce0) AM_READWRITE(victnine_gfxctrl_r, victnine_gfxctrl_w)
 //  AM_RANGE(0xdce1, 0xdce1) AM_WRITENOP    /* unknown */
-	AM_RANGE(0xdd00, 0xdeff) AM_READWRITE(flstory_palette_r, flstory_palette_w)
-	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_SHARE("workram") /* work RAM */
 ADDRESS_MAP_END
 
 
-MACHINE_RESET_MEMBER(flstory_state,ta7630)
-{
-	int i;
-
-	double db           = 0.0;
-	double db_step      = 1.50; /* 1.50 dB step (at least, maybe more) */
-	double db_step_inc  = 0.125;
-	for (i = 0; i < 16; i++)
-	{
-		double max = 100.0 / pow(10.0, db/20.0 );
-		m_vol_ctrl[15 - i] = max;
-		/*logerror("vol_ctrl[%x] = %i (%f dB)\n", 15 - i, m_vol_ctrl[15 - i], db);*/
-		db += db_step;
-		db_step += db_step_inc;
-	}
-
-	/* for (i = 0; i < 8; i++)
-	    logerror("SOUND Chan#%i name=%s\n", i, mixer_get_name(i)); */
-/*
-  channels 0-2 AY#0
-  channels 3,4 MSM5232 group1,group2
-*/
-}
 
 WRITE8_MEMBER(flstory_state::sound_control_0_w)
 {
@@ -220,37 +125,37 @@ WRITE8_MEMBER(flstory_state::sound_control_0_w)
 	//  popmessage("SND0 0=%02x 1=%02x 2=%02x 3=%02x", m_snd_ctrl0, m_snd_ctrl1, m_snd_ctrl2, m_snd_ctrl3);
 
 	/* this definitely controls main melody voice on 2'-1 and 4'-1 outputs */
-	m_msm->set_output_gain(0, m_vol_ctrl[(m_snd_ctrl0 >> 4) & 15] / 100.0); /* group1 from msm5232 */
-	m_msm->set_output_gain(1, m_vol_ctrl[(m_snd_ctrl0 >> 4) & 15] / 100.0); /* group1 from msm5232 */
-	m_msm->set_output_gain(2, m_vol_ctrl[(m_snd_ctrl0 >> 4) & 15] / 100.0); /* group1 from msm5232 */
-	m_msm->set_output_gain(3, m_vol_ctrl[(m_snd_ctrl0 >> 4) & 15] / 100.0); /* group1 from msm5232 */
+	for(int i=0;i<4;i++)
+		m_ta7630->set_channel_volume(m_msm,i,m_snd_ctrl0 >> 4);
+	//m_msm->set_output_gain(0, m_vol_ctrl[(m_snd_ctrl0 >> 4) & 15] / 100.0); /* group1 from msm5232 */
+	//m_msm->set_output_gain(1, m_vol_ctrl[(m_snd_ctrl0 >> 4) & 15] / 100.0); /* group1 from msm5232 */
+	//m_msm->set_output_gain(2, m_vol_ctrl[(m_snd_ctrl0 >> 4) & 15] / 100.0); /* group1 from msm5232 */
+	//m_msm->set_output_gain(3, m_vol_ctrl[(m_snd_ctrl0 >> 4) & 15] / 100.0); /* group1 from msm5232 */
 
 }
 WRITE8_MEMBER(flstory_state::sound_control_1_w)
 {
 	m_snd_ctrl1 = data & 0xff;
 	//  popmessage("SND1 0=%02x 1=%02x 2=%02x 3=%02x", m_snd_ctrl0, m_snd_ctrl1, m_snd_ctrl2, m_snd_ctrl3);
-	m_msm->set_output_gain(4, m_vol_ctrl[(m_snd_ctrl1 >> 4) & 15] / 100.0); /* group2 from msm5232 */
-	m_msm->set_output_gain(5, m_vol_ctrl[(m_snd_ctrl1 >> 4) & 15] / 100.0); /* group2 from msm5232 */
-	m_msm->set_output_gain(6, m_vol_ctrl[(m_snd_ctrl1 >> 4) & 15] / 100.0); /* group2 from msm5232 */
-	m_msm->set_output_gain(7, m_vol_ctrl[(m_snd_ctrl1 >> 4) & 15] / 100.0); /* group2 from msm5232 */
+	for(int i=0;i<4;i++)
+		m_ta7630->set_channel_volume(m_msm,i+4,m_snd_ctrl1 >> 4);
+
+//  m_msm->set_output_gain(4, m_vol_ctrl[(m_snd_ctrl1 >> 4) & 15] / 100.0); /* group2 from msm5232 */
+//  m_msm->set_output_gain(5, m_vol_ctrl[(m_snd_ctrl1 >> 4) & 15] / 100.0); /* group2 from msm5232 */
+//  m_msm->set_output_gain(6, m_vol_ctrl[(m_snd_ctrl1 >> 4) & 15] / 100.0); /* group2 from msm5232 */
+//  m_msm->set_output_gain(7, m_vol_ctrl[(m_snd_ctrl1 >> 4) & 15] / 100.0); /* group2 from msm5232 */
 }
 
 WRITE8_MEMBER(flstory_state::sound_control_2_w)
 {
-	device_t *device = machine().device("aysnd");
-	int i;
-
 	m_snd_ctrl2 = data & 0xff;
 	//  popmessage("SND2 0=%02x 1=%02x 2=%02x 3=%02x", m_snd_ctrl0, m_snd_ctrl1, m_snd_ctrl2, m_snd_ctrl3);
 
-	device_sound_interface *sound;
-	device->interface(sound);
-	for (i = 0; i < 3; i++)
-		sound->set_output_gain(i, m_vol_ctrl[(m_snd_ctrl2 >> 4) & 15] / 100.0); /* ym2149f all */
+	m_ta7630->set_device_volume(m_ay,m_snd_ctrl2 >> 4);
 }
 
-WRITE8_MEMBER(flstory_state::sound_control_3_w)/* unknown */
+// ta7630 bass / treble for AY?
+WRITE8_MEMBER(flstory_state::sound_control_3_w)
 {
 	m_snd_ctrl3 = data & 0xff;
 	//  popmessage("SND3 0=%02x 1=%02x 2=%02x 3=%02x", m_snd_ctrl0, m_snd_ctrl1, m_snd_ctrl2, m_snd_ctrl3);
@@ -264,9 +169,10 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, flstory_state )
 	AM_RANGE(0xca00, 0xca0d) AM_DEVWRITE("msm", msm5232_device, write)
 	AM_RANGE(0xcc00, 0xcc00) AM_WRITE(sound_control_0_w)
 	AM_RANGE(0xce00, 0xce00) AM_WRITE(sound_control_1_w)
-	AM_RANGE(0xd800, 0xd800) AM_DEVREAD("soundlatch", generic_latch_8_device, read) AM_WRITE(to_main_w)
-	AM_RANGE(0xda00, 0xda00) AM_READNOP AM_WRITE(nmi_enable_w)          /* unknown read*/
-	AM_RANGE(0xdc00, 0xdc00) AM_WRITE(nmi_disable_w)
+	AM_RANGE(0xd800, 0xd800) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
+	AM_RANGE(0xd800, 0xd800) AM_DEVWRITE("soundlatch2", generic_latch_8_device, write)
+	AM_RANGE(0xda00, 0xda00) AM_READ(snd_flag_r) AM_DEVWRITE("soundnmi", input_merger_device, in_set<1>)
+	AM_RANGE(0xdc00, 0xdc00) AM_DEVWRITE("soundnmi", input_merger_device, in_clear<1>)
 	AM_RANGE(0xde00, 0xde00) AM_READNOP AM_DEVWRITE("dac", dac_byte_interface, write) /* signed 8-bit DAC &  unknown read */
 	AM_RANGE(0xe000, 0xefff) AM_ROM                                         /* space for diagnostics ROM */
 ADDRESS_MAP_END
@@ -789,11 +695,6 @@ void flstory_state::machine_start()
 	save_item(NAME(m_char_bank));
 	save_item(NAME(m_palette_bank));
 	/* sound */
-	save_item(NAME(m_snd_data));
-	save_item(NAME(m_snd_flag));
-	save_item(NAME(m_sound_nmi_enable));
-	save_item(NAME(m_pending_nmi));
-	save_item(NAME(m_vol_ctrl));
 	save_item(NAME(m_snd_ctrl0));
 	save_item(NAME(m_snd_ctrl1));
 	save_item(NAME(m_snd_ctrl2));
@@ -807,17 +708,15 @@ void flstory_state::machine_start()
 
 MACHINE_RESET_MEMBER(flstory_state,flstory)
 {
-	MACHINE_RESET_CALL_MEMBER(ta7630);
+//  MACHINE_RESET_CALL_MEMBER(ta7630);
 
 	/* video */
 	m_gfxctrl = 0;
-	m_char_bank = 0;
+//  onna34ro doesn't set this up when checking RAM/VRAM (available by keeping pressed service button at startup)
+//  so we invert the logic here
+	m_char_bank = 1;
 	m_palette_bank = 0;
 	/* sound */
-	m_snd_data = 0;
-	m_snd_flag = 0;
-	m_sound_nmi_enable = 0;
-	m_pending_nmi = 0;
 	m_snd_ctrl0 = 0;
 	m_snd_ctrl1 = 0;
 	m_snd_ctrl2 = 0;
@@ -847,10 +746,12 @@ static MACHINE_CONFIG_START( flstory )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
+//  MCFG_SCREEN_REFRESH_RATE(60)
+//  MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+//  MCFG_SCREEN_SIZE(32*8, 32*8)
+//  MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
+	// derived from ladyfrog.cpp, guess
+	MCFG_SCREEN_RAW_PARAMS( XTAL_8MHz, 510, 0, 256, 262, 2*8, 30*8 ) // pixel clock appears to run at 8 MHz
 	MCFG_SCREEN_UPDATE_DRIVER(flstory_state, screen_update_flstory)
 	MCFG_SCREEN_PALETTE("palette")
 
@@ -864,6 +765,13 @@ static MACHINE_CONFIG_START( flstory )
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(DEVWRITELINE("soundnmi", input_merger_device, in_w<0>))
+
+	MCFG_INPUT_MERGER_ALL_HIGH("soundnmi")
+	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("audiocpu", INPUT_LINE_NMI))
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
+	MCFG_TA7630_ADD("ta7630")
 
 	MCFG_SOUND_ADD("aysnd", YM2149, XTAL_8MHz/4) /* verified on pcb */
 	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(flstory_state, sound_control_2_w))
@@ -892,11 +800,11 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( onna34ro )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 10733000/2)     /* ??? */
+	MCFG_CPU_ADD("maincpu", Z80, XTAL_10_733MHz/2)     /* ??? */
 	MCFG_CPU_PROGRAM_MAP(onna34ro_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", flstory_state,  irq0_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80, 8000000/2)     /* 4 MHz */
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL_8MHz/2)     /* 4 MHz */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(flstory_state, irq0_line_hold, 2*60)   /* IRQ generated by ??? */
 						/* NMI generated by the main CPU */
@@ -907,10 +815,12 @@ static MACHINE_CONFIG_START( onna34ro )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
+//  MCFG_SCREEN_REFRESH_RATE(60)
+//  MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+//  MCFG_SCREEN_SIZE(32*8, 32*8)
+//  MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
+	// derived from ladyfrog.cpp, guess
+	MCFG_SCREEN_RAW_PARAMS( XTAL_8MHz, 510, 0, 256, 262, 2*8, 30*8 ) // pixel clock appears to run at 8 MHz
 	MCFG_SCREEN_UPDATE_DRIVER(flstory_state, screen_update_flstory)
 	MCFG_SCREEN_PALETTE("palette")
 
@@ -924,13 +834,20 @@ static MACHINE_CONFIG_START( onna34ro )
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(DEVWRITELINE("soundnmi", input_merger_device, in_w<0>))
 
-	MCFG_SOUND_ADD("aysnd", YM2149, 8000000/4)
+	MCFG_INPUT_MERGER_ALL_HIGH("soundnmi")
+	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("audiocpu", INPUT_LINE_NMI))
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
+	MCFG_TA7630_ADD("ta7630")
+
+	MCFG_SOUND_ADD("aysnd", YM2149, XTAL_8MHz/4)
 	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(flstory_state, sound_control_2_w))
 	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(flstory_state, sound_control_3_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.1)
 
-	MCFG_SOUND_ADD("msm", MSM5232, 8000000/4)
+	MCFG_SOUND_ADD("msm", MSM5232, XTAL_8MHz/4)
 	MCFG_MSM5232_SET_CAPACITORS(1.0e-6, 1.0e-6, 1.0e-6, 1.0e-6, 1.0e-6, 1.0e-6, 1.0e-6, 1.0e-6) /* 1.0 uF capacitors (verified on real PCB) */
 	MCFG_SOUND_ROUTE(0, "speaker", 1.0)    // pin 28  2'-1
 	MCFG_SOUND_ROUTE(1, "speaker", 1.0)    // pin 29  4'-1
@@ -959,11 +876,11 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( victnine )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 8000000/2)      /* 4 MHz */
+	MCFG_CPU_ADD("maincpu", Z80, XTAL_8MHz/2)      /* 4 MHz */
 	MCFG_CPU_PROGRAM_MAP(victnine_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", flstory_state,  irq0_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80, 8000000/2)     /* 4 MHz */
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL_8MHz/2)     /* 4 MHz */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(flstory_state, irq0_line_hold, 2*60)   /* IRQ generated by ??? */
 						/* NMI generated by the main CPU */
@@ -977,10 +894,12 @@ static MACHINE_CONFIG_START( victnine )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
+//  MCFG_SCREEN_REFRESH_RATE(60)
+//  MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+//  MCFG_SCREEN_SIZE(32*8, 32*8)
+//  MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
+	// derived from ladyfrog.cpp, guess
+	MCFG_SCREEN_RAW_PARAMS( XTAL_8MHz, 510, 0, 256, 262, 2*8, 30*8 ) // pixel clock appears to run at 8 MHzs
 	MCFG_SCREEN_UPDATE_DRIVER(flstory_state, screen_update_victnine)
 	MCFG_SCREEN_PALETTE("palette")
 
@@ -994,13 +913,20 @@ static MACHINE_CONFIG_START( victnine )
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(DEVWRITELINE("soundnmi", input_merger_device, in_w<0>))
 
-	MCFG_SOUND_ADD("aysnd", YM2149, 8000000/4)
+	MCFG_INPUT_MERGER_ALL_HIGH("soundnmi")
+	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("audiocpu", INPUT_LINE_NMI))
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
+	MCFG_TA7630_ADD("ta7630")
+
+	MCFG_SOUND_ADD("aysnd", YM2149, XTAL_8MHz/4)
 	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(flstory_state, sound_control_2_w))
 	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(flstory_state, sound_control_3_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
 
-	MCFG_SOUND_ADD("msm", MSM5232, 8000000/4)
+	MCFG_SOUND_ADD("msm", MSM5232, XTAL_8MHz/4)
 	MCFG_MSM5232_SET_CAPACITORS(1.0e-6, 1.0e-6, 1.0e-6, 1.0e-6, 1.0e-6, 1.0e-6, 1.0e-6, 1.0e-6) /* 1.0 uF capacitors (verified on real PCB) */
 	MCFG_SOUND_ROUTE(0, "speaker", 1.0)    // pin 28  2'-1
 	MCFG_SOUND_ROUTE(1, "speaker", 1.0)    // pin 29  4'-1
@@ -1041,10 +967,12 @@ static MACHINE_CONFIG_START( rumba )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
+//  MCFG_SCREEN_REFRESH_RATE(60)
+//  MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+//  MCFG_SCREEN_SIZE(32*8, 32*8)
+//  MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
+	// derived from ladyfrog.cpp, guess
+	MCFG_SCREEN_RAW_PARAMS( XTAL_8MHz, 510, 0, 256, 262, 2*8, 30*8 ) // pixel clock appears to run at 8 MHz
 	MCFG_SCREEN_UPDATE_DRIVER(flstory_state, screen_update_rumba)
 	MCFG_SCREEN_PALETTE("palette")
 
@@ -1058,6 +986,13 @@ static MACHINE_CONFIG_START( rumba )
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(DEVWRITELINE("soundnmi", input_merger_device, in_w<0>))
+
+	MCFG_INPUT_MERGER_ALL_HIGH("soundnmi")
+	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("audiocpu", INPUT_LINE_NMI))
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
+	MCFG_TA7630_ADD("ta7630")
 
 	MCFG_SOUND_ADD("aysnd", YM2149, XTAL_8MHz/4) /* verified on pcb */
 	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(flstory_state, sound_control_2_w))

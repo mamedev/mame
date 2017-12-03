@@ -1,7 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:Manuel Abadia, David Haywood
 
-#include "machine/74259.h"
 #include "machine/eepromser.h"
 #include "machine/gen_latch.h"
 #include "sound/msm5205.h"
@@ -17,7 +16,6 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
 		m_soundlatch(*this, "soundlatch"),
-		m_outlatch(*this, "outlatch"),
 		m_pixelram(*this, "pixelram"),
 		m_videoram(*this, "videoram"),
 		m_vregs(*this, "vregs"),
@@ -32,7 +30,6 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	required_device<generic_latch_8_device> m_soundlatch;
-	optional_device<ls259_device> m_outlatch;
 
 	required_shared_ptr<uint16_t> m_pixelram;
 	required_shared_ptr<uint16_t> m_videoram;
@@ -57,7 +54,6 @@ public:
 
 	// common
 	DECLARE_WRITE16_MEMBER(vram_w);
-	DECLARE_WRITE8_MEMBER(coin_w);
 	DECLARE_WRITE_LINE_MEMBER(coin1_lockout_w);
 	DECLARE_WRITE_LINE_MEMBER(coin2_lockout_w);
 	DECLARE_WRITE_LINE_MEMBER(coin1_counter_w);
@@ -65,11 +61,10 @@ public:
 
 	// splash specific
 	DECLARE_WRITE_LINE_MEMBER(splash_msm5205_int);
-	DECLARE_WRITE16_MEMBER(splash_sh_irqtrigger_w);
 	DECLARE_WRITE8_MEMBER(splash_adpcm_data_w);
+	DECLARE_WRITE8_MEMBER(splash_adpcm_control_w);
 
 	// roldfrog specific
-	DECLARE_WRITE16_MEMBER(roldf_sh_irqtrigger_w);
 	DECLARE_READ16_MEMBER(roldfrog_bombs_r);
 	DECLARE_WRITE8_MEMBER(roldfrog_vblank_ack_w);
 	DECLARE_READ8_MEMBER(roldfrog_unk_r);
@@ -122,7 +117,6 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(adpcm_int2);
 	DECLARE_WRITE16_MEMBER(protection_w);
 	DECLARE_READ16_MEMBER(protection_r);
-	DECLARE_WRITE16_MEMBER(sh_irqtrigger_w);
 	DECLARE_WRITE8_MEMBER(eeprom_w);
 
 	DECLARE_DRIVER_INIT(funystrp);

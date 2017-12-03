@@ -71,6 +71,7 @@ public:
 	DECLARE_WRITE8_MEMBER(starwars_math_w);
 	DECLARE_CUSTOM_INPUT_MEMBER(matrix_flag_r);
 	DECLARE_READ8_MEMBER(starwars_main_ready_flag_r);
+	DECLARE_WRITE_LINE_MEMBER(boost_interleave_hack);
 	DECLARE_WRITE8_MEMBER(starwars_soundrst_w);
 	DECLARE_WRITE8_MEMBER(quad_pokeyn_w);
 	DECLARE_DRIVER_INIT(esb);

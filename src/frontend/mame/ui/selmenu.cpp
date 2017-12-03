@@ -9,9 +9,9 @@
 ***************************************************************************/
 
 #include "emu.h"
-
 #include "ui/selmenu.h"
 
+#include "ui/datmenu.h"
 #include "ui/icorender.h"
 #include "ui/info.h"
 #include "ui/inifile.h"
@@ -27,6 +27,7 @@
 
 #include "drivenum.h"
 #include "emuopts.h"
+#include "rendfont.h"
 #include "rendutil.h"
 #include "softlist.h"
 #include "softlist_dev.h"
@@ -119,9 +120,11 @@ bool menu_select_launch::reselect_last::s_reselect = false;
 std::mutex menu_select_launch::s_cache_guard;
 menu_select_launch::cache_ptr_map menu_select_launch::s_caches;
 
-
+// instantiate possible variants of these so derived classes don't get link errors
 template bool menu_select_launch::select_bios(game_driver const &, bool);
 template bool menu_select_launch::select_bios(ui_software_info const &, bool);
+template float menu_select_launch::draw_left_panel<machine_filter>(machine_filter::type current, std::map<machine_filter::type, machine_filter::ptr> const &filters, float x1, float y1, float x2, float y2);
+template float menu_select_launch::draw_left_panel<software_filter>(software_filter::type current, std::map<software_filter::type, software_filter::ptr> const &filters, float x1, float y1, float x2, float y2);
 
 
 menu_select_launch::system_flags::system_flags(machine_static_info const &info)
@@ -231,29 +234,12 @@ void menu_select_launch::software_parts::handle()
 
 void menu_select_launch::software_parts::custom_render(void *selectedref, float top, float bottom, float origx1, float origy1, float origx2, float origy2)
 {
-	float width;
-	ui().draw_text_full(container(), _("Software part selection:"), 0.0f, 0.0f, 1.0f, ui::text_layout::CENTER, ui::text_layout::TRUNCATE,
-									mame_ui_manager::NONE, rgb_t::white(), rgb_t::black(), &width, nullptr);
-	width += 2 * UI_BOX_LR_BORDER;
-	float maxwidth = std::max(origx2 - origx1, width);
-
-	// compute our bounds
-	float x1 = 0.5f - 0.5f * maxwidth;
-	float x2 = x1 + maxwidth;
-	float y1 = origy1 - top;
-	float y2 = origy1 - UI_BOX_TB_BORDER;
-
-	// draw a box
-	ui().draw_outlined_box(container(), x1, y1, x2, y2, UI_GREEN_COLOR);
-
-	// take off the borders
-	x1 += UI_BOX_LR_BORDER;
-	x2 -= UI_BOX_LR_BORDER;
-	y1 += UI_BOX_TB_BORDER;
-
-	// draw the text within it
-	ui().draw_text_full(container(), _("Software part selection:"), x1, y1, x2 - x1, ui::text_layout::CENTER, ui::text_layout::TRUNCATE,
-									mame_ui_manager::NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, nullptr, nullptr);
+	char const *const text[] = { _("Software part selection:") };
+	draw_text_box(
+			std::begin(text), std::end(text),
+			origx1, origx2, origy1 - top, origy1 - UI_BOX_TB_BORDER,
+			ui::text_layout::CENTER, ui::text_layout::TRUNCATE, false,
+			UI_TEXT_COLOR, UI_GREEN_COLOR, 1.0f);
 }
 
 
@@ -354,29 +340,12 @@ void menu_select_launch::bios_selection::handle()
 
 void menu_select_launch::bios_selection::custom_render(void *selectedref, float top, float bottom, float origx1, float origy1, float origx2, float origy2)
 {
-	float width;
-	ui().draw_text_full(container(), _("Bios selection:"), 0.0f, 0.0f, 1.0f, ui::text_layout::CENTER, ui::text_layout::TRUNCATE,
-									mame_ui_manager::NONE, rgb_t::white(), rgb_t::black(), &width, nullptr);
-	width += 2 * UI_BOX_LR_BORDER;
-	float maxwidth = std::max(origx2 - origx1, width);
-
-	// compute our bounds
-	float x1 = 0.5f - 0.5f * maxwidth;
-	float x2 = x1 + maxwidth;
-	float y1 = origy1 - top;
-	float y2 = origy1 - UI_BOX_TB_BORDER;
-
-	// draw a box
-	ui().draw_outlined_box(container(), x1, y1, x2, y2, UI_GREEN_COLOR);
-
-	// take off the borders
-	x1 += UI_BOX_LR_BORDER;
-	x2 -= UI_BOX_LR_BORDER;
-	y1 += UI_BOX_TB_BORDER;
-
-	// draw the text within it
-	ui().draw_text_full(container(), _("Bios selection:"), x1, y1, x2 - x1, ui::text_layout::CENTER, ui::text_layout::TRUNCATE,
-									mame_ui_manager::NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, nullptr, nullptr);
+	char const *const text[] = { _("BIOS selection:") };
+	draw_text_box(
+			std::begin(text), std::end(text),
+			origx1, origx2, origy1 - top, origy1 - UI_BOX_TB_BORDER,
+			ui::text_layout::CENTER, ui::text_layout::TRUNCATE, false,
+			UI_TEXT_COLOR, UI_GREEN_COLOR, 1.0f);
 }
 
 
@@ -454,6 +423,7 @@ menu_select_launch::menu_select_launch(mame_ui_manager &mui, render_container &c
 	, m_prev_selected(nullptr)
 	, m_total_lines(0)
 	, m_topline_datsview(0)
+	, m_filter_highlight(0)
 	, m_ui_error(false)
 	, m_info_driver(nullptr)
 	, m_info_software(nullptr)
@@ -572,47 +542,15 @@ void menu_select_launch::custom_render(void *selectedref, float top, float botto
 
 	// determine the text for the header
 	make_topbox_text(tempbuf[0], tempbuf[1], tempbuf[2]);
+	float const y1 = origy1 - 3.0f * UI_BOX_TB_BORDER - ui().get_line_height();
+	draw_text_box(
+			tempbuf, tempbuf + 3,
+			origx1, origx2, origy1 - top, y1,
+			ui::text_layout::CENTER, ui::text_layout::NEVER, true,
+			UI_TEXT_COLOR, UI_BACKGROUND_COLOR, 1.0f);
 
-	// get the size of the text
-	float maxwidth = origx2 - origx1;
-	for (int line = 0; line < 3; ++line)
-	{
-		float width;
-		ui().draw_text_full(container(), tempbuf[line].c_str(), 0.0f, 0.0f, 1.0f, ui::text_layout::CENTER, ui::text_layout::NEVER,
-				mame_ui_manager::NONE, rgb_t::white(), rgb_t::black(), &width, nullptr);
-		width += 2 * UI_BOX_LR_BORDER;
-		maxwidth = (std::max)(width, maxwidth);
-	}
-
-	float text_size = 1.0f;
-	if (maxwidth > origx2 - origx1)
-	{
-		text_size = (origx2 - origx1) / maxwidth;
-		maxwidth = origx2 - origx1;
-	}
-
-	// compute our bounds
-	float tbarspace = ui().get_line_height();
-	float x1 = 0.5f - 0.5f * maxwidth;
-	float x2 = x1 + maxwidth;
-	float y1 = origy1 - top;
-	float y2 = origy1 - 3.0f * UI_BOX_TB_BORDER - tbarspace;
-
-	// draw a box
-	ui().draw_outlined_box(container(), x1, y1, x2, y2, UI_BACKGROUND_COLOR);
-
-	// take off the borders
-	x1 += UI_BOX_LR_BORDER;
-	x2 -= UI_BOX_LR_BORDER;
-	y1 += UI_BOX_TB_BORDER;
-
-	// draw the text within it
-	for (int line = 0; line < 3; ++line)
-	{
-		ui().draw_text_full(container(), tempbuf[line].c_str(), x1, y1, x2 - x1, ui::text_layout::CENTER, ui::text_layout::NEVER,
-				mame_ui_manager::NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, nullptr, nullptr, text_size);
-		y1 += ui().get_line_height();
-	}
+	// draw toolbar
+	draw_toolbar(origx1, y1, origx2, origy1 - UI_BOX_TB_BORDER);
 
 	// determine the text to render below
 	ui_software_info const *swinfo;
@@ -715,58 +653,16 @@ void menu_select_launch::custom_render(void *selectedref, float top, float botto
 		tempbuf[4].clear();
 	}
 
-	// compute our bounds
-	x1 = 0.5f - 0.5f * maxwidth;
-	x2 = x1 + maxwidth;
-	y1 = y2;
-	y2 = origy1 - UI_BOX_TB_BORDER;
-
-	// draw toolbar
-	draw_toolbar(x1, y1, x2, y2);
-
-	// get the size of the text
-	maxwidth = origx2 - origx1;
-
-	for (auto &elem : tempbuf)
-	{
-		float width;
-		ui().draw_text_full(container(), elem.c_str(), 0.0f, 0.0f, 1.0f, ui::text_layout::CENTER, ui::text_layout::NEVER,
-				mame_ui_manager::NONE, rgb_t::white(), rgb_t::black(), &width, nullptr);
-		width += 2 * UI_BOX_LR_BORDER;
-		maxwidth = (std::max)(maxwidth, width);
-	}
-
-	if (maxwidth > origx2 - origx1)
-	{
-		text_size = (origx2 - origx1) / maxwidth;
-		maxwidth = origx2 - origx1;
-	}
-
-	// compute our bounds
-	x1 = 0.5f - 0.5f * maxwidth;
-	x2 = x1 + maxwidth;
-	y1 = origy2 + UI_BOX_TB_BORDER;
-	y2 = origy2 + bottom;
-
-	// draw a box
-	ui().draw_outlined_box(container(), x1, y1, x2, y2, color);
-
-	// take off the borders
-	x1 += UI_BOX_LR_BORDER;
-	x2 -= UI_BOX_LR_BORDER;
-	y1 += UI_BOX_TB_BORDER;
+	// draw the footer
+	draw_text_box(
+			std::begin(tempbuf), std::end(tempbuf),
+			origx1, origx2, origy2 + UI_BOX_TB_BORDER, origy2 + bottom,
+			ui::text_layout::CENTER, ui::text_layout::NEVER, true,
+			UI_TEXT_COLOR, color, 1.0f);
 
 	// is favorite? draw the star
 	if (isstar)
-		draw_star(x1, y1);
-
-	// draw all lines
-	for (auto &elem : tempbuf)
-	{
-		ui().draw_text_full(container(), elem.c_str(), x1, y1, x2 - x1, ui::text_layout::CENTER, ui::text_layout::NEVER,
-				mame_ui_manager::NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, nullptr, nullptr, text_size);
-		y1 += ui().get_line_height();
-	}
+		draw_star(origx1 + UI_BOX_LR_BORDER, origy2 + (2.0f * UI_BOX_TB_BORDER));
 }
 
 
@@ -818,6 +714,26 @@ void menu_select_launch::inkey_navigation()
 		set_focus(focused_menu::MAIN);
 		select_prev();
 		break;
+	}
+}
+
+
+void menu_select_launch::inkey_dats()
+{
+	ui_software_info const *software;
+	game_driver const *driver;
+	get_selection(software, driver);
+	if (software)
+	{
+		if (software->startempty && mame_machine_manager::instance()->lua()->call_plugin_check<const char *>("data_list", software->driver->name, true))
+			menu::stack_push<menu_dats_view>(ui(), container(), software->driver);
+		else if (mame_machine_manager::instance()->lua()->call_plugin_check<const char *>("data_list", std::string(software->shortname).append(1, ',').append(software->listname).c_str()) || !software->usage.empty())
+			menu::stack_push<menu_dats_view>(ui(), container(), software);
+	}
+	else if (driver)
+	{
+		if (mame_machine_manager::instance()->lua()->call_plugin_check<const char *>("data_list", driver->name, true))
+			menu::stack_push<menu_dats_view>(ui(), container(), driver);
 	}
 }
 
@@ -904,6 +820,126 @@ bool menu_select_launch::draw_error_text()
 		ui().draw_text_box(container(), m_error_text.c_str(), ui::text_layout::CENTER, 0.5f, 0.5f, UI_RED_COLOR);
 
 	return m_ui_error;
+}
+
+
+template <typename Filter>
+float menu_select_launch::draw_left_panel(
+		typename Filter::type current,
+		std::map<typename Filter::type, typename Filter::ptr> const &filters,
+		float x1, float y1, float x2, float y2)
+{
+	if ((ui_globals::panels_status != SHOW_PANELS) && (ui_globals::panels_status != HIDE_RIGHT_PANEL))
+		return draw_collapsed_left_panel(x1, y1, x2, y2);
+
+	// calculate line height
+	float const line_height(ui().get_line_height());
+	float const text_size(ui().options().infos_size());
+	float const sc(y2 - y1 - (2.0f * UI_BOX_TB_BORDER));
+	float line_height_max(line_height * text_size);
+	if ((Filter::COUNT * line_height_max) > sc)
+	{
+		float const lm(sc / Filter::COUNT);
+		line_height_max = line_height * (lm / line_height);
+	}
+
+	// calculate horizontal offset for unadorned names
+	std::string tmp("_# ");
+	convert_command_glyph(tmp);
+	float const text_sign = ui().get_string_width(tmp.c_str(), text_size);
+
+	// get the maximum width of a filter name
+	float left_width(0.0f);
+	for (typename Filter::type x = Filter::FIRST; Filter::COUNT > x; ++x)
+		left_width = std::max(ui().get_string_width(Filter::display_name(x), text_size) + text_sign, left_width);
+
+	// outline the box and inset by the border width
+	float const origy1(y1);
+	float const origy2(y2);
+	x2 = x1 + left_width + 2.0f * UI_BOX_LR_BORDER;
+	ui().draw_outlined_box(container(), x1, y1, x2, y2, UI_BACKGROUND_COLOR);
+	x1 += UI_BOX_LR_BORDER;
+	x2 -= UI_BOX_LR_BORDER;
+	y1 += UI_BOX_TB_BORDER;
+	y2 -= UI_BOX_TB_BORDER;
+
+	// now draw the rows
+	auto const active_filter(filters.find(current));
+	for (typename Filter::type filter = Filter::FIRST; Filter::COUNT > filter; ++filter)
+	{
+		std::string str;
+		if (filters.end() != active_filter)
+		{
+			str = active_filter->second->adorned_display_name(filter);
+		}
+		else
+		{
+			if (current == filter)
+			{
+				str = std::string("_> ");
+				convert_command_glyph(str);
+			}
+			str.append(Filter::display_name(filter));
+		}
+
+		// handle mouse hover in passing
+		rgb_t bgcolor = UI_TEXT_BG_COLOR;
+		rgb_t fgcolor = UI_TEXT_COLOR;
+		if (mouse_in_rect(x1, y1, x2, y1 + line_height_max))
+		{
+			bgcolor = UI_MOUSEOVER_BG_COLOR;
+			fgcolor = UI_MOUSEOVER_COLOR;
+			hover = HOVER_FILTER_FIRST + filter;
+			highlight(x1, y1, x2, y1 + line_height_max, bgcolor);
+		}
+
+		// draw primary highlight if keyboard focus is here
+		if ((m_filter_highlight == filter) && (get_focus() == focused_menu::LEFT))
+		{
+			fgcolor = rgb_t(0xff, 0xff, 0xff, 0x00);
+			bgcolor = rgb_t(0xff, 0xff, 0xff, 0xff);
+			ui().draw_textured_box(
+					container(),
+					x1, y1, x2, y1 + line_height_max,
+					bgcolor, rgb_t(255, 43, 43, 43),
+					hilight_main_texture(), PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_TEXWRAP(1));
+		}
+
+		// finally draw the text itself and move to the next line
+		float const x1t = x1 + ((str == Filter::display_name(filter)) ? text_sign : 0.0f);
+		ui().draw_text_full(
+				container(), str.c_str(),
+				x1t, y1, x2 - x1,
+				ui::text_layout::LEFT, ui::text_layout::NEVER,
+				mame_ui_manager::NORMAL, fgcolor, bgcolor,
+				nullptr, nullptr, text_size);
+		y1 += line_height_max;
+	}
+
+	x1 = x2 + UI_BOX_LR_BORDER;
+	x2 = x1 + 2.0f * UI_BOX_LR_BORDER;
+	y1 = origy1;
+	y2 = origy2;
+	float const space = x2 - x1;
+	float const lr_arrow_width = 0.4f * space * machine().render().ui_aspect();
+
+	// set left-right arrows dimension
+	float const ar_x0 = 0.5f * (x2 + x1) - 0.5f * lr_arrow_width;
+	float const ar_y0 = 0.5f * (y2 + y1) + 0.1f * space;
+	float const ar_x1 = ar_x0 + lr_arrow_width;
+	float const ar_y1 = 0.5f * (y2 + y1) + 0.9f * space;
+
+	ui().draw_outlined_box(container(), x1, y1, x2, y2, rgb_t(0xef, 0x12, 0x47, 0x7b));
+
+	rgb_t fgcolor = UI_TEXT_COLOR;
+	if (mouse_in_rect(x1, y1, x2, y2))
+	{
+		fgcolor = UI_MOUSEOVER_COLOR;
+		hover = HOVER_LPANEL_ARROW;
+	}
+
+	draw_arrow(ar_x0, ar_y0, ar_x1, ar_y1, fgcolor, ROT90 ^ ORIENTATION_FLIP_X);
+	return x2 + UI_BOX_LR_BORDER;
 }
 
 
@@ -1062,19 +1098,19 @@ float menu_select_launch::draw_icon(int linenum, void *selectedref, float x0, fl
 		while (path.next(curpath))
 			searchstr.append(";").append(curpath.c_str()).append(PATH_SEPARATOR).append("icons");
 
-		bitmap_argb32 *tmp = auto_alloc(machine(), bitmap_argb32);
+		bitmap_argb32 tmp;
 		emu_file snapfile(searchstr.c_str(), OPEN_FLAG_READ);
 		std::string fullname = std::string(driver->name).append(".ico");
-		render_load_ico(*tmp, snapfile, nullptr, fullname.c_str());
+		render_load_ico(tmp, snapfile, nullptr, fullname.c_str());
 
-		if (!tmp->valid() && cloneof)
+		if (!tmp.valid() && cloneof)
 		{
 			fullname.assign(driver->parent).append(".ico");
-			render_load_ico(*tmp, snapfile, nullptr, fullname.c_str());
+			render_load_ico(tmp, snapfile, nullptr, fullname.c_str());
 		}
 
 		bitmap_argb32 &bitmap(icon->second.second);
-		if (tmp->valid())
+		if (tmp.valid())
 		{
 			float panel_width = x1 - x0;
 			float panel_height = y1 - y0;
@@ -1088,38 +1124,35 @@ float menu_select_launch::draw_icon(int linenum, void *selectedref, float x0, fl
 			int panel_height_pixel = panel_height * screen_height;
 
 			// Calculate resize ratios for resizing
-			auto ratioW = (float)panel_width_pixel / tmp->width();
-			auto ratioH = (float)panel_height_pixel / tmp->height();
-			auto dest_xPixel = tmp->width();
-			auto dest_yPixel = tmp->height();
+			auto ratioW = (float)panel_width_pixel / tmp.width();
+			auto ratioH = (float)panel_height_pixel / tmp.height();
+			auto dest_xPixel = tmp.width();
+			auto dest_yPixel = tmp.height();
 
 			if (ratioW < 1 || ratioH < 1)
 			{
 				// smaller ratio will ensure that the image fits in the view
 				float ratio = std::min(ratioW, ratioH);
-				dest_xPixel = tmp->width() * ratio;
-				dest_yPixel = tmp->height() * ratio;
+				dest_xPixel = tmp.width() * ratio;
+				dest_yPixel = tmp.height() * ratio;
 			}
 
-			bitmap_argb32 *dest_bitmap;
-			dest_bitmap = auto_alloc(machine(), bitmap_argb32);
+			bitmap_argb32 dest_bitmap;
 
 			// resample if necessary
-			if (dest_xPixel != tmp->width() || dest_yPixel != tmp->height())
+			if (dest_xPixel != tmp.width() || dest_yPixel != tmp.height())
 			{
-				dest_bitmap->allocate(dest_xPixel, dest_yPixel);
+				dest_bitmap.allocate(dest_xPixel, dest_yPixel);
 				render_color color = { 1.0f, 1.0f, 1.0f, 1.0f };
-				render_resample_argb_bitmap_hq(*dest_bitmap, *tmp, color, true);
+				render_resample_argb_bitmap_hq(dest_bitmap, tmp, color, true);
 			}
 			else
-				dest_bitmap = tmp;
+				dest_bitmap = std::move(tmp);
 
 			bitmap.allocate(panel_width_pixel, panel_height_pixel);
 			for (int x = 0; x < dest_xPixel; x++)
 				for (int y = 0; y < dest_yPixel; y++)
-					bitmap.pix32(y, x) = dest_bitmap->pix32(y, x);
-
-			auto_free(machine(), dest_bitmap);
+					bitmap.pix32(y, x) = dest_bitmap.pix32(y, x);
 
 			icon->second.first->set_bitmap(bitmap, bitmap.cliprect(), TEXFORMAT_ARGB32);
 		}
@@ -1127,8 +1160,6 @@ float menu_select_launch::draw_icon(int linenum, void *selectedref, float x0, fl
 		{
 			bitmap.reset();
 		}
-
-		auto_free(machine(), tmp);
 	}
 
 	if (icon->second.second.valid())
@@ -1192,7 +1223,16 @@ void menu_select_launch::handle_keys(uint32_t flags, int &iptkey)
 	// if we hit select, return true or pop the stack, depending on the item
 	if (exclusive_input_pressed(iptkey, IPT_UI_SELECT, 0))
 	{
-		if (is_last_selected() && m_focus == focused_menu::MAIN)
+		if (m_ui_error)
+		{
+			// dismiss error
+		}
+		else if (m_focus == focused_menu::LEFT)
+		{
+			m_prev_selected = nullptr;
+			filter_selected();
+		}
+		if (is_last_selected() && (m_focus == focused_menu::MAIN))
 		{
 			iptkey = IPT_UI_CANCEL;
 			stack_pop();
@@ -1200,11 +1240,23 @@ void menu_select_launch::handle_keys(uint32_t flags, int &iptkey)
 		return;
 	}
 
-	// hitting cancel also pops the stack
 	if (exclusive_input_pressed(iptkey, IPT_UI_CANCEL, 0))
 	{
-		if (!m_ui_error && !menu_has_search_active())
+		if (m_ui_error)
+		{
+			// dismiss error
+		}
+		else if (menu_has_search_active())
+		{
+			// escape pressed with non-empty search text clears it
+			m_search.clear();
+			reset(reset_options::SELECT_FIRST);
+		}
+		else
+		{
+			// otherwise pop the stack
 			stack_pop();
+		}
 		return;
 	}
 
@@ -1212,17 +1264,17 @@ void menu_select_launch::handle_keys(uint32_t flags, int &iptkey)
 	validate_selection(1);
 
 	// swallow left/right keys if they are not appropriate
-	bool ignoreleft = ((selected_item().flags & FLAG_LEFT_ARROW) == 0);
-	bool ignoreright = ((selected_item().flags & FLAG_RIGHT_ARROW) == 0);
-	bool leftclose = (ui_globals::panels_status == HIDE_BOTH || ui_globals::panels_status == HIDE_LEFT_PANEL);
-	bool rightclose = (ui_globals::panels_status == HIDE_BOTH || ui_globals::panels_status == HIDE_RIGHT_PANEL);
+	bool const ignoreleft = ((selected_item().flags & FLAG_LEFT_ARROW) == 0);
+	bool const ignoreright = ((selected_item().flags & FLAG_RIGHT_ARROW) == 0);
+	bool const leftclose = (ui_globals::panels_status == HIDE_BOTH || ui_globals::panels_status == HIDE_LEFT_PANEL);
+	bool const rightclose = (ui_globals::panels_status == HIDE_BOTH || ui_globals::panels_status == HIDE_RIGHT_PANEL);
 
 	// accept left/right keys as-is with repeat
 	if (!ignoreleft && exclusive_input_pressed(iptkey, IPT_UI_LEFT, (flags & PROCESS_LR_REPEAT) ? 6 : 0))
 	{
 		// Swap the right panel
 		if (m_focus == focused_menu::RIGHTTOP)
-			iptkey = IPT_UI_LEFT_PANEL;
+			ui_globals::rpanel = RP_IMAGES;
 		return;
 	}
 
@@ -1230,30 +1282,26 @@ void menu_select_launch::handle_keys(uint32_t flags, int &iptkey)
 	{
 		// Swap the right panel
 		if (m_focus == focused_menu::RIGHTTOP)
-			iptkey = IPT_UI_RIGHT_PANEL;
+			ui_globals::rpanel = RP_INFOS;
 		return;
 	}
 
 	// up backs up by one item
 	if (exclusive_input_pressed(iptkey, IPT_UI_UP, 6))
 	{
-		// Filter
 		if (!leftclose && m_focus == focused_menu::LEFT)
 		{
-			iptkey = IPT_UI_UP_FILTER;
 			return;
 		}
-
-		// Infos
-		if (!rightclose && m_focus == focused_menu::RIGHTBOTTOM)
+		else if (!rightclose && m_focus == focused_menu::RIGHTBOTTOM)
 		{
-			iptkey = IPT_UI_UP_PANEL;
 			m_topline_datsview--;
 			return;
 		}
-
-		if (selected == visible_items + 1 || is_first_selected() || m_ui_error)
+		else if (selected == visible_items + 1 || is_first_selected() || m_ui_error)
+		{
 			return;
+		}
 
 		selected--;
 
@@ -1264,26 +1312,21 @@ void menu_select_launch::handle_keys(uint32_t flags, int &iptkey)
 	// down advances by one item
 	if (exclusive_input_pressed(iptkey, IPT_UI_DOWN, 6))
 	{
-		// Filter
 		if (!leftclose && m_focus == focused_menu::LEFT)
 		{
-			iptkey = IPT_UI_DOWN_FILTER;
 			return;
 		}
-
-		// Infos
-		if (!rightclose && m_focus == focused_menu::RIGHTBOTTOM)
+		else if (!rightclose && m_focus == focused_menu::RIGHTBOTTOM)
 		{
-			iptkey = IPT_UI_DOWN_PANEL;
 			m_topline_datsview++;
 			return;
 		}
-
-		if (is_last_selected() || selected == visible_items - 1 || m_ui_error)
+		else if (is_last_selected() || selected == visible_items - 1 || m_ui_error)
+		{
 			return;
+		}
 
 		selected++;
-
 		if (selected == top_line + m_visible_items + (top_line != 0))
 			top_line++;
 	}
@@ -1294,7 +1337,6 @@ void menu_select_launch::handle_keys(uint32_t flags, int &iptkey)
 		// Infos
 		if (!rightclose && m_focus == focused_menu::RIGHTBOTTOM)
 		{
-			iptkey = IPT_UI_DOWN_PANEL;
 			m_topline_datsview -= m_right_visible_lines - 1;
 			return;
 		}
@@ -1316,7 +1358,6 @@ void menu_select_launch::handle_keys(uint32_t flags, int &iptkey)
 		// Infos
 		if (!rightclose && m_focus == focused_menu::RIGHTBOTTOM)
 		{
-			iptkey = IPT_UI_DOWN_PANEL;
 			m_topline_datsview += m_right_visible_lines - 1;
 			return;
 		}
@@ -1335,10 +1376,12 @@ void menu_select_launch::handle_keys(uint32_t flags, int &iptkey)
 	// home goes to the start
 	if (exclusive_input_pressed(iptkey, IPT_UI_HOME, 0))
 	{
-		// Infos
-		if (!rightclose && m_focus == focused_menu::RIGHTBOTTOM)
+		if (!leftclose && m_focus == focused_menu::LEFT)
 		{
-			iptkey = IPT_UI_DOWN_PANEL;
+			return;
+		}
+		else if (!rightclose && m_focus == focused_menu::RIGHTBOTTOM)
+		{
 			m_topline_datsview = 0;
 			return;
 		}
@@ -1353,10 +1396,12 @@ void menu_select_launch::handle_keys(uint32_t flags, int &iptkey)
 	// end goes to the last
 	if (exclusive_input_pressed(iptkey, IPT_UI_END, 0))
 	{
-		// Infos
-		if (!rightclose && m_focus == focused_menu::RIGHTBOTTOM)
+		if (!leftclose && m_focus == focused_menu::LEFT)
 		{
-			iptkey = IPT_UI_DOWN_PANEL;
+			return;
+		}
+		else if (!rightclose && m_focus == focused_menu::RIGHTBOTTOM)
+		{
 			m_topline_datsview = m_total_lines;
 			return;
 		}
@@ -1399,9 +1444,6 @@ void menu_select_launch::handle_keys(uint32_t flags, int &iptkey)
 
 void menu_select_launch::handle_events(uint32_t flags, event &ev)
 {
-	bool stop = false;
-	ui_event local_menu_event;
-
 	if (m_pressed)
 	{
 		bool const pressed = mouse_pressed();
@@ -1414,187 +1456,218 @@ void menu_select_launch::handle_events(uint32_t flags, event &ev)
 				machine().ui_input().push_mouse_down_event(mouse_target, target_x, target_y);
 		}
 		else
+		{
 			reset_pressed();
+		}
 	}
 
 	// loop while we have interesting events
+	bool stop(false), search_changed(false);
+	ui_event local_menu_event;
 	while (!stop && machine().ui_input().pop_event(&local_menu_event))
 	{
 		switch (local_menu_event.event_type)
 		{
-			// if we are hovering over a valid item, select it with a single click
-			case UI_EVENT_MOUSE_DOWN:
+		// if we are hovering over a valid item, select it with a single click
+		case ui_event::MOUSE_DOWN:
+			if (m_ui_error)
 			{
-				if (m_ui_error)
-				{
-					ev.iptkey = IPT_OTHER;
-					stop = true;
-				}
-				else
-				{
-					if (hover >= 0 && hover < item.size())
-					{
-						if (hover >= visible_items - 1 && selected < visible_items)
-							m_prev_selected = get_selection_ref();
-						selected = hover;
-						m_focus = focused_menu::MAIN;
-					}
-					else if (hover == HOVER_ARROW_UP)
-					{
-						selected -= m_visible_items;
-						if (selected < 0)
-							selected = 0;
-						top_line -= m_visible_items - (top_line + m_visible_lines == visible_items);
-						set_pressed();
-					}
-					else if (hover == HOVER_ARROW_DOWN)
-					{
-						selected += m_visible_lines - 2 + (selected == 0);
-						if (selected >= visible_items)
-							selected = visible_items - 1;
-						top_line += m_visible_lines - 2;
-						set_pressed();
-					}
-					else if (hover == HOVER_UI_RIGHT)
-						ev.iptkey = IPT_UI_RIGHT;
-					else if (hover == HOVER_UI_LEFT)
-						ev.iptkey = IPT_UI_LEFT;
-					else if (hover == HOVER_DAT_DOWN)
-						m_topline_datsview += m_right_visible_lines - 1;
-					else if (hover == HOVER_DAT_UP)
-						m_topline_datsview -= m_right_visible_lines - 1;
-					else if (hover == HOVER_LPANEL_ARROW)
-					{
-						if (ui_globals::panels_status == HIDE_LEFT_PANEL)
-							ui_globals::panels_status = SHOW_PANELS;
-						else if (ui_globals::panels_status == HIDE_BOTH)
-							ui_globals::panels_status = HIDE_RIGHT_PANEL;
-						else if (ui_globals::panels_status == SHOW_PANELS)
-							ui_globals::panels_status = HIDE_LEFT_PANEL;
-						else if (ui_globals::panels_status == HIDE_RIGHT_PANEL)
-							ui_globals::panels_status = HIDE_BOTH;
-					}
-					else if (hover == HOVER_RPANEL_ARROW)
-					{
-						if (ui_globals::panels_status == HIDE_RIGHT_PANEL)
-							ui_globals::panels_status = SHOW_PANELS;
-						else if (ui_globals::panels_status == HIDE_BOTH)
-							ui_globals::panels_status = HIDE_LEFT_PANEL;
-						else if (ui_globals::panels_status == SHOW_PANELS)
-							ui_globals::panels_status = HIDE_RIGHT_PANEL;
-						else if (ui_globals::panels_status == HIDE_LEFT_PANEL)
-							ui_globals::panels_status = HIDE_BOTH;
-					}
-					else if (hover == HOVER_B_FAV)
-					{
-						ev.iptkey = IPT_UI_FAVORITES;
-						stop = true;
-					}
-					else if (hover == HOVER_B_EXPORT)
-					{
-						ev.iptkey = IPT_UI_EXPORT;
-						stop = true;
-					}
-					else if (hover == HOVER_B_DATS)
-					{
-						ev.iptkey = IPT_UI_DATS;
-						stop = true;
-					}
-					else if (hover >= HOVER_RP_FIRST && hover <= HOVER_RP_LAST)
-					{
-						ui_globals::rpanel = (HOVER_RP_FIRST - hover) * (-1);
-						stop = true;
-					}
-					else if (hover >= HOVER_SW_FILTER_FIRST && hover <= HOVER_SW_FILTER_LAST)
-					{
-						l_sw_hover = (HOVER_SW_FILTER_FIRST - hover) * (-1);
-						ev.iptkey = IPT_OTHER;
-						stop = true;
-					}
-					else if (hover >= HOVER_FILTER_FIRST && hover <= HOVER_FILTER_LAST)
-					{
-						l_hover = (HOVER_FILTER_FIRST - hover) * (-1);
-						ev.iptkey = IPT_OTHER;
-						stop = true;
-					}
-				}
-				break;
+				ev.iptkey = IPT_OTHER;
+				stop = true;
 			}
-
-			// if we are hovering over a valid item, fake a UI_SELECT with a double-click
-			case UI_EVENT_MOUSE_DOUBLE_CLICK:
+			else
+			{
 				if (hover >= 0 && hover < item.size())
 				{
+					if (hover >= visible_items - 1 && selected < visible_items)
+						m_prev_selected = get_selection_ref();
 					selected = hover;
-					ev.iptkey = IPT_UI_SELECT;
+					m_focus = focused_menu::MAIN;
 				}
-
-				if (is_last_selected())
+				else if (hover == HOVER_ARROW_UP)
 				{
-					ev.iptkey = IPT_UI_CANCEL;
-					stack_pop();
+					selected -= m_visible_items;
+					if (selected < 0)
+						selected = 0;
+					top_line -= m_visible_items - (top_line + m_visible_lines == visible_items);
+					set_pressed();
 				}
-				stop = true;
-				break;
-
-			// caught scroll event
-			case UI_EVENT_MOUSE_WHEEL:
-				if (hover >= 0 && hover < item.size() - skip_main_items - 1)
+				else if (hover == HOVER_ARROW_DOWN)
 				{
-					if (local_menu_event.zdelta > 0)
-					{
-						if (selected >= visible_items || is_first_selected() || m_ui_error)
-							break;
-						selected -= local_menu_event.num_lines;
-						if (selected < top_line + (top_line != 0))
-							top_line -= local_menu_event.num_lines;
-					}
-					else
-					{
-						if (selected >= visible_items - 1 || m_ui_error)
-							break;
-						selected += local_menu_event.num_lines;
-						if (selected > visible_items - 1)
-							selected = visible_items - 1;
-						if (selected >= top_line + m_visible_items + (top_line != 0))
-							top_line += local_menu_event.num_lines;
-					}
+					selected += m_visible_lines - 2 + (selected == 0);
+					if (selected >= visible_items)
+						selected = visible_items - 1;
+					top_line += m_visible_lines - 2;
+					set_pressed();
 				}
-				break;
-
-			// translate CHAR events into specials
-			case UI_EVENT_CHAR:
-				if (exclusive_input_pressed(ev.iptkey, IPT_UI_CONFIGURE, 0))
+				else if (hover == HOVER_UI_RIGHT)
+					ev.iptkey = IPT_UI_RIGHT;
+				else if (hover == HOVER_UI_LEFT)
+					ev.iptkey = IPT_UI_LEFT;
+				else if (hover == HOVER_DAT_DOWN)
+					m_topline_datsview += m_right_visible_lines - 1;
+				else if (hover == HOVER_DAT_UP)
+					m_topline_datsview -= m_right_visible_lines - 1;
+				else if (hover == HOVER_LPANEL_ARROW)
 				{
-					ev.iptkey = IPT_UI_CONFIGURE;
+					if (ui_globals::panels_status == HIDE_LEFT_PANEL)
+						ui_globals::panels_status = SHOW_PANELS;
+					else if (ui_globals::panels_status == HIDE_BOTH)
+						ui_globals::panels_status = HIDE_RIGHT_PANEL;
+					else if (ui_globals::panels_status == SHOW_PANELS)
+						ui_globals::panels_status = HIDE_LEFT_PANEL;
+					else if (ui_globals::panels_status == HIDE_RIGHT_PANEL)
+						ui_globals::panels_status = HIDE_BOTH;
+				}
+				else if (hover == HOVER_RPANEL_ARROW)
+				{
+					if (ui_globals::panels_status == HIDE_RIGHT_PANEL)
+						ui_globals::panels_status = SHOW_PANELS;
+					else if (ui_globals::panels_status == HIDE_BOTH)
+						ui_globals::panels_status = HIDE_LEFT_PANEL;
+					else if (ui_globals::panels_status == SHOW_PANELS)
+						ui_globals::panels_status = HIDE_RIGHT_PANEL;
+					else if (ui_globals::panels_status == HIDE_LEFT_PANEL)
+						ui_globals::panels_status = HIDE_BOTH;
+				}
+				else if (hover == HOVER_B_FAV)
+				{
+					ev.iptkey = IPT_UI_FAVORITES;
 					stop = true;
+				}
+				else if (hover == HOVER_B_EXPORT)
+				{
+					inkey_export();
+					stop = true;
+				}
+				else if (hover == HOVER_B_DATS)
+				{
+					inkey_dats();
+					stop = true;
+				}
+				else if (hover >= HOVER_RP_FIRST && hover <= HOVER_RP_LAST)
+				{
+					ui_globals::rpanel = (HOVER_RP_FIRST - hover) * (-1);
+					stop = true;
+				}
+				else if (hover >= HOVER_FILTER_FIRST && hover <= HOVER_FILTER_LAST)
+				{
+					m_prev_selected = nullptr;
+					m_filter_highlight = hover - HOVER_FILTER_FIRST;
+					filter_selected();
+					stop = true;
+				}
+			}
+			break;
+
+		// if we are hovering over a valid item, fake a UI_SELECT with a double-click
+		case ui_event::MOUSE_DOUBLE_CLICK:
+			if (hover >= 0 && hover < item.size())
+			{
+				selected = hover;
+				ev.iptkey = IPT_UI_SELECT;
+			}
+
+			if (is_last_selected())
+			{
+				ev.iptkey = IPT_UI_CANCEL;
+				stack_pop();
+			}
+			stop = true;
+			break;
+
+		// caught scroll event
+		case ui_event::MOUSE_WHEEL:
+			if (hover >= 0 && hover < item.size() - skip_main_items - 1)
+			{
+				if (local_menu_event.zdelta > 0)
+				{
+					if (selected >= visible_items || is_first_selected() || m_ui_error)
+						break;
+					selected -= local_menu_event.num_lines;
+					if (selected < top_line + (top_line != 0))
+						top_line -= local_menu_event.num_lines;
 				}
 				else
 				{
-					ev.iptkey = IPT_SPECIAL;
-					ev.unichar = local_menu_event.ch;
-					stop = true;
+					if (selected >= visible_items - 1 || m_ui_error)
+						break;
+					selected += local_menu_event.num_lines;
+					if (selected > visible_items - 1)
+						selected = visible_items - 1;
+					if (selected >= top_line + m_visible_items + (top_line != 0))
+						top_line += local_menu_event.num_lines;
 				}
-				break;
+			}
+			else if (hover == HOVER_INFO_TEXT)
+			{
+				if (local_menu_event.zdelta > 0)
+					m_topline_datsview -= local_menu_event.num_lines;
+				else
+					m_topline_datsview += local_menu_event.num_lines;
+			}
+			break;
 
-			case UI_EVENT_MOUSE_RDOWN:
-				if (hover >= 0 && hover < item.size() - skip_main_items - 1)
-				{
-					selected = hover;
-					m_prev_selected = get_selection_ref();
-					m_focus = focused_menu::MAIN;
-					ev.iptkey = IPT_CUSTOM;
-					ev.mouse.x0 = local_menu_event.mouse_x;
-					ev.mouse.y0 = local_menu_event.mouse_y;
-					stop = true;
-				}
-				break;
+		// translate CHAR events into specials
+		case ui_event::IME_CHAR:
+			if (exclusive_input_pressed(ev.iptkey, IPT_UI_CONFIGURE, 0))
+			{
+				ev.iptkey = IPT_UI_CONFIGURE;
+				stop = true;
+			}
+			else if (m_ui_error)
+			{
+				ev.iptkey = IPT_SPECIAL;
+				stop = true;
+			}
+			else if (accept_search())
+			{
+				if (input_character(m_search, local_menu_event.ch, uchar_is_printable))
+					search_changed = true;
+			}
+			break;
 
-			// ignore everything else
-			default:
+		case ui_event::MOUSE_RDOWN:
+			if (hover >= 0 && hover < item.size() - skip_main_items - 1)
+			{
+				selected = hover;
+				m_prev_selected = get_selection_ref();
+				m_focus = focused_menu::MAIN;
+				ev.iptkey = IPT_CUSTOM;
+				ev.mouse.x0 = local_menu_event.mouse_x;
+				ev.mouse.y0 = local_menu_event.mouse_y;
+				stop = true;
+			}
+			break;
+
+		// ignore everything else
+		default:
+			break;
+		}
+
+		// need to update search before processing certain kinds of events, but others don't matter
+		if (search_changed)
+		{
+			switch (machine().ui_input().peek_event_type())
+			{
+			case ui_event::MOUSE_DOWN:
+			case ui_event::MOUSE_RDOWN:
+			case ui_event::MOUSE_DOUBLE_CLICK:
+			case ui_event::MOUSE_WHEEL:
+				stop = true;
 				break;
+			case ui_event::NONE:
+			case ui_event::MOUSE_MOVE:
+			case ui_event::MOUSE_LEAVE:
+			case ui_event::MOUSE_UP:
+			case ui_event::MOUSE_RUP:
+			case ui_event::IME_CHAR:
+				break;
+			}
 		}
 	}
+	if (search_changed)
+		reset(reset_options::SELECT_FIRST);
 }
 
 
@@ -1966,7 +2039,7 @@ void menu_select_launch::arts_render(float origx1, float origy1, float origx2, f
 	game_driver const *driver;
 	get_selection(software, driver);
 
-	if (software && ((software->startempty != 1) || !driver))
+	if (software && (!software->startempty || !driver))
 	{
 		m_cache->set_snapx_driver(nullptr);
 
@@ -1980,19 +2053,18 @@ void menu_select_launch::arts_render(float origx1, float origy1, float origx2, f
 		if (!m_cache->snapx_software_is(software) || !snapx_valid() || ui_globals::switch_image)
 		{
 			emu_file snapfile(searchstr.c_str(), OPEN_FLAG_READ);
-			bitmap_argb32 *tmp_bitmap;
-			tmp_bitmap = auto_alloc(machine(), bitmap_argb32);
+			bitmap_argb32 tmp_bitmap;
 
 			if (software->startempty == 1)
 			{
 				// Load driver snapshot
 				std::string fullname = std::string(software->driver->name) + ".png";
-				render_load_png(*tmp_bitmap, snapfile, nullptr, fullname.c_str());
+				render_load_png(tmp_bitmap, snapfile, nullptr, fullname.c_str());
 
-				if (!tmp_bitmap->valid())
+				if (!tmp_bitmap.valid())
 				{
 					fullname.assign(software->driver->name).append(".jpg");
-					render_load_jpeg(*tmp_bitmap, snapfile, nullptr, fullname.c_str());
+					render_load_jpeg(tmp_bitmap, snapfile, nullptr, fullname.c_str());
 				}
 			}
 			else if (ui_globals::curimage_view == TITLES_VIEW)
@@ -2000,12 +2072,12 @@ void menu_select_launch::arts_render(float origx1, float origy1, float origx2, f
 				// First attempt from name list
 				std::string const pathname = software->listname + "_titles";
 				std::string fullname = software->shortname + ".png";
-				render_load_png(*tmp_bitmap, snapfile, pathname.c_str(), fullname.c_str());
+				render_load_png(tmp_bitmap, snapfile, pathname.c_str(), fullname.c_str());
 
-				if (!tmp_bitmap->valid())
+				if (!tmp_bitmap.valid())
 				{
 					fullname.assign(software->shortname).append(".jpg");
-					render_load_jpeg(*tmp_bitmap, snapfile, pathname.c_str(), fullname.c_str());
+					render_load_jpeg(tmp_bitmap, snapfile, pathname.c_str(), fullname.c_str());
 				}
 			}
 			else
@@ -2013,33 +2085,32 @@ void menu_select_launch::arts_render(float origx1, float origy1, float origx2, f
 				// First attempt from name list
 				std::string pathname = software->listname;
 				std::string fullname = software->shortname + ".png";
-				render_load_png(*tmp_bitmap, snapfile, pathname.c_str(), fullname.c_str());
+				render_load_png(tmp_bitmap, snapfile, pathname.c_str(), fullname.c_str());
 
-				if (!tmp_bitmap->valid())
+				if (!tmp_bitmap.valid())
 				{
 					fullname.assign(software->shortname).append(".jpg");
-					render_load_jpeg(*tmp_bitmap, snapfile, pathname.c_str(), fullname.c_str());
+					render_load_jpeg(tmp_bitmap, snapfile, pathname.c_str(), fullname.c_str());
 				}
 
-				if (!tmp_bitmap->valid())
+				if (!tmp_bitmap.valid())
 				{
 					// Second attempt from driver name + part name
 					pathname.assign(software->driver->name).append(software->part);
 					fullname.assign(software->shortname).append(".png");
-					render_load_png(*tmp_bitmap, snapfile, pathname.c_str(), fullname.c_str());
+					render_load_png(tmp_bitmap, snapfile, pathname.c_str(), fullname.c_str());
 
-					if (!tmp_bitmap->valid())
+					if (!tmp_bitmap.valid())
 					{
 						fullname.assign(software->shortname).append(".jpg");
-						render_load_jpeg(*tmp_bitmap, snapfile, pathname.c_str(), fullname.c_str());
+						render_load_jpeg(tmp_bitmap, snapfile, pathname.c_str(), fullname.c_str());
 					}
 				}
 			}
 
 			m_cache->set_snapx_software(software);
 			ui_globals::switch_image = false;
-			arts_render_images(tmp_bitmap, origx1, origy1, origx2, origy2);
-			auto_free(machine(), tmp_bitmap);
+			arts_render_images(std::move(tmp_bitmap), origx1, origy1, origx2, origy2);
 		}
 
 		// if the image is available, loaded and valid, display it
@@ -2059,31 +2130,30 @@ void menu_select_launch::arts_render(float origx1, float origy1, float origx2, f
 		{
 			emu_file snapfile(searchstr.c_str(), OPEN_FLAG_READ);
 			snapfile.set_restrict_to_mediapath(true);
-			bitmap_argb32 *tmp_bitmap;
-			tmp_bitmap = auto_alloc(machine(), bitmap_argb32);
+			bitmap_argb32 tmp_bitmap;
 
 			// try to load snapshot first from saved "0000.png" file
 			std::string fullname(driver->name);
-			render_load_png(*tmp_bitmap, snapfile, fullname.c_str(), "0000.png");
+			render_load_png(tmp_bitmap, snapfile, fullname.c_str(), "0000.png");
 
-			if (!tmp_bitmap->valid())
-				render_load_jpeg(*tmp_bitmap, snapfile, fullname.c_str(), "0000.jpg");
+			if (!tmp_bitmap.valid())
+				render_load_jpeg(tmp_bitmap, snapfile, fullname.c_str(), "0000.jpg");
 
 			// if fail, attemp to load from standard file
-			if (!tmp_bitmap->valid())
+			if (!tmp_bitmap.valid())
 			{
 				fullname.assign(driver->name).append(".png");
-				render_load_png(*tmp_bitmap, snapfile, nullptr, fullname.c_str());
+				render_load_png(tmp_bitmap, snapfile, nullptr, fullname.c_str());
 
-				if (!tmp_bitmap->valid())
+				if (!tmp_bitmap.valid())
 				{
 					fullname.assign(driver->name).append(".jpg");
-					render_load_jpeg(*tmp_bitmap, snapfile, nullptr, fullname.c_str());
+					render_load_jpeg(tmp_bitmap, snapfile, nullptr, fullname.c_str());
 				}
 			}
 
 			// if fail again, attemp to load from parent file
-			if (!tmp_bitmap->valid())
+			if (!tmp_bitmap.valid())
 			{
 				// set clone status
 				bool cloneof = strcmp(driver->parent, "0");
@@ -2097,20 +2167,19 @@ void menu_select_launch::arts_render(float origx1, float origy1, float origx2, f
 				if (cloneof)
 				{
 					fullname.assign(driver->parent).append(".png");
-					render_load_png(*tmp_bitmap, snapfile, nullptr, fullname.c_str());
+					render_load_png(tmp_bitmap, snapfile, nullptr, fullname.c_str());
 
-					if (!tmp_bitmap->valid())
+					if (!tmp_bitmap.valid())
 					{
 						fullname.assign(driver->parent).append(".jpg");
-						render_load_jpeg(*tmp_bitmap, snapfile, nullptr, fullname.c_str());
+						render_load_jpeg(tmp_bitmap, snapfile, nullptr, fullname.c_str());
 					}
 				}
 			}
 
 			m_cache->set_snapx_driver(driver);
 			ui_globals::switch_image = false;
-			arts_render_images(tmp_bitmap, origx1, origy1, origx2, origy2);
-			auto_free(machine(), tmp_bitmap);
+			arts_render_images(std::move(tmp_bitmap), origx1, origy1, origx2, origy2);
 		}
 
 		// if the image is available, loaded and valid, display it
@@ -2154,16 +2223,20 @@ std::string menu_select_launch::arts_render_common(float origx1, float origy1, f
 
 	if (bgcolor != UI_TEXT_BG_COLOR)
 	{
-		ui().draw_textured_box(container(), origx1 + ((middle - title_size) * 0.5f), origy1, origx1 + ((middle + title_size) * 0.5f),
-				origy1 + line_height, bgcolor, rgb_t(43, 43, 43), hilight_main_texture(), PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_TEXWRAP(1));
+		ui().draw_textured_box(
+				container(),
+				origx1 + ((middle - title_size) * 0.5f), origy1 + UI_BOX_TB_BORDER,
+				origx1 + ((middle + title_size) * 0.5f), origy1 + UI_BOX_TB_BORDER + line_height,
+				bgcolor, rgb_t(43, 43, 43),
+				hilight_main_texture(), PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_TEXWRAP(1));
 	}
 
 	ui().draw_text_full(container(),
-			snaptext.c_str(), origx1, origy1, origx2 - origx1,
+			snaptext.c_str(), origx1, origy1 + UI_BOX_TB_BORDER, origx2 - origx1,
 			ui::text_layout::CENTER, ui::text_layout::TRUNCATE, mame_ui_manager::NORMAL, fgcolor, bgcolor,
 			nullptr, nullptr, tmp_size);
 
-	draw_common_arrow(origx1, origy1, origx2, origy2, ui_globals::curimage_view, FIRST_VIEW, LAST_VIEW, title_size);
+	draw_common_arrow(origx1, origy1 + UI_BOX_TB_BORDER, origx2, origy2, ui_globals::curimage_view, FIRST_VIEW, LAST_VIEW, title_size);
 
 	return searchstr;
 }
@@ -2173,29 +2246,29 @@ std::string menu_select_launch::arts_render_common(float origx1, float origy1, f
 //  perform rendering of image
 //-------------------------------------------------
 
-void menu_select_launch::arts_render_images(bitmap_argb32 *tmp_bitmap, float origx1, float origy1, float origx2, float origy2)
+void menu_select_launch::arts_render_images(bitmap_argb32 &&tmp_bitmap, float origx1, float origy1, float origx2, float origy2)
 {
 	bool no_available = false;
 	float line_height = ui().get_line_height();
 
 	// if it fails, use the default image
-	if (!tmp_bitmap->valid())
+	if (!tmp_bitmap.valid())
 	{
-		tmp_bitmap->allocate(256, 256);
+		tmp_bitmap.allocate(256, 256);
 		const bitmap_argb32 &src(m_cache->no_avail_bitmap());
 		for (int x = 0; x < 256; x++)
 		{
 			for (int y = 0; y < 256; y++)
-				tmp_bitmap->pix32(y, x) = src.pix32(y, x);
+				tmp_bitmap.pix32(y, x) = src.pix32(y, x);
 		}
 		no_available = true;
 	}
 
 	bitmap_argb32 &snapx_bitmap(m_cache->snapx_bitmap());
-	if (tmp_bitmap->valid())
+	if (tmp_bitmap.valid())
 	{
 		float panel_width = origx2 - origx1 - 0.02f;
-		float panel_height = origy2 - origy1 - 0.02f - (2.0f * UI_BOX_TB_BORDER) - (2.0f * line_height);
+		float panel_height = origy2 - origy1 - 0.02f - (3.0f * UI_BOX_TB_BORDER) - (2.0f * line_height);
 		int screen_width = machine().render().ui_target().width();
 		int screen_height = machine().render().ui_target().height();
 
@@ -2206,20 +2279,20 @@ void menu_select_launch::arts_render_images(bitmap_argb32 *tmp_bitmap, float ori
 		int panel_height_pixel = panel_height * screen_height;
 
 		// Calculate resize ratios for resizing
-		auto ratioW = (float)panel_width_pixel / tmp_bitmap->width();
-		auto ratioH = (float)panel_height_pixel / tmp_bitmap->height();
-		auto ratioI = (float)tmp_bitmap->height() / tmp_bitmap->width();
-		auto dest_xPixel = tmp_bitmap->width();
-		auto dest_yPixel = tmp_bitmap->height();
+		auto ratioW = (float)panel_width_pixel / tmp_bitmap.width();
+		auto ratioH = (float)panel_height_pixel / tmp_bitmap.height();
+		auto ratioI = (float)tmp_bitmap.height() / tmp_bitmap.width();
+		auto dest_xPixel = tmp_bitmap.width();
+		auto dest_yPixel = tmp_bitmap.height();
 
 		// force 4:3 ratio min
 		if (ui().options().forced_4x3_snapshot() && ratioI < 0.75f && ui_globals::curimage_view == SNAPSHOT_VIEW)
 		{
 			// smaller ratio will ensure that the image fits in the view
-			dest_yPixel = tmp_bitmap->width() * 0.75f;
+			dest_yPixel = tmp_bitmap.width() * 0.75f;
 			ratioH = (float)panel_height_pixel / dest_yPixel;
 			float ratio = std::min(ratioW, ratioH);
-			dest_xPixel = tmp_bitmap->width() * ratio;
+			dest_xPixel = tmp_bitmap.width() * ratio;
 			dest_yPixel *= ratio;
 		}
 		// resize the bitmap if necessary
@@ -2227,22 +2300,21 @@ void menu_select_launch::arts_render_images(bitmap_argb32 *tmp_bitmap, float ori
 		{
 			// smaller ratio will ensure that the image fits in the view
 			float ratio = std::min(ratioW, ratioH);
-			dest_xPixel = tmp_bitmap->width() * ratio;
-			dest_yPixel = tmp_bitmap->height() * ratio;
+			dest_xPixel = tmp_bitmap.width() * ratio;
+			dest_yPixel = tmp_bitmap.height() * ratio;
 		}
 
-		bitmap_argb32 *dest_bitmap;
+		bitmap_argb32 dest_bitmap;
 
 		// resample if necessary
-		if (dest_xPixel != tmp_bitmap->width() || dest_yPixel != tmp_bitmap->height())
+		if (dest_xPixel != tmp_bitmap.width() || dest_yPixel != tmp_bitmap.height())
 		{
-			dest_bitmap = auto_alloc(machine(), bitmap_argb32);
-			dest_bitmap->allocate(dest_xPixel, dest_yPixel);
+			dest_bitmap.allocate(dest_xPixel, dest_yPixel);
 			render_color color = { 1.0f, 1.0f, 1.0f, 1.0f };
-			render_resample_argb_bitmap_hq(*dest_bitmap, *tmp_bitmap, color, true);
+			render_resample_argb_bitmap_hq(dest_bitmap, tmp_bitmap, color, true);
 		}
 		else
-			dest_bitmap = tmp_bitmap;
+			dest_bitmap = std::move(tmp_bitmap);
 
 		snapx_bitmap.allocate(panel_width_pixel, panel_height_pixel);
 		int x1 = (0.5f * panel_width_pixel) - (0.5f * dest_xPixel);
@@ -2250,9 +2322,7 @@ void menu_select_launch::arts_render_images(bitmap_argb32 *tmp_bitmap, float ori
 
 		for (int x = 0; x < dest_xPixel; x++)
 			for (int y = 0; y < dest_yPixel; y++)
-				snapx_bitmap.pix32(y + y1, x + x1) = dest_bitmap->pix32(y, x);
-
-		auto_free(machine(), dest_bitmap);
+				snapx_bitmap.pix32(y + y1, x + x1) = dest_bitmap.pix32(y, x);
 
 		// apply bitmap
 		m_cache->snapx_texture()->set_bitmap(snapx_bitmap, snapx_bitmap.cliprect(), TEXFORMAT_ARGB32);
@@ -2276,7 +2346,7 @@ void menu_select_launch::draw_snapx(float origx1, float origy1, float origx2, fl
 		float const line_height = ui().get_line_height();
 		float const x1 = origx1 + 0.01f;
 		float const x2 = origx2 - 0.01f;
-		float const y1 = origy1 + UI_BOX_TB_BORDER + line_height;
+		float const y1 = origy1 + (2.0f * UI_BOX_TB_BORDER) + line_height;
 		float const y2 = origy2 - UI_BOX_TB_BORDER - line_height;
 
 		// apply texture
@@ -2299,28 +2369,26 @@ bool menu_select_launch::has_multiple_bios(game_driver const &driver, s_bios &bi
 	if (!driver.rom)
 		return false;
 
-	auto const entries = rom_build_entries(driver.rom);
-
-	std::string default_name;
-	for (const rom_entry &rom : entries)
-		if (ROMENTRY_ISDEFAULT_BIOS(&rom))
-			default_name = ROM_GETNAME(&rom);
-
-	for (const rom_entry &rom : entries)
+	char const *default_name(nullptr);
+	for (tiny_rom_entry const *rom = driver.rom; !ROMENTRY_ISEND(rom); ++rom)
 	{
-		if (ROMENTRY_ISSYSTEM_BIOS(&rom))
-		{
-			std::string name(ROM_GETHASHDATA(&rom));
-			std::string bname(ROM_GETNAME(&rom));
-			int bios_flags = ROM_GETBIOSFLAGS(&rom);
+		if (ROMENTRY_ISDEFAULT_BIOS(rom))
+			default_name = rom->name;
+	}
 
-			if (bname == default_name)
-			{
-				name.append(_(" (default)"));
-				biosname.emplace(biosname.begin(), name, bios_flags - 1);
-			}
-			else
-				biosname.emplace_back(name, bios_flags - 1);
+	for (romload::system_bios const &bios : romload::entries(driver.rom).get_system_bioses())
+	{
+		std::string name(bios.get_description());
+		u32 const bios_flags(bios.get_value());
+
+		if (default_name && !std::strcmp(bios.get_name(), default_name))
+		{
+			name.append(_(" (default)"));
+			biosname.emplace(biosname.begin(), std::move(name), bios_flags - 1);
+		}
+		else
+		{
+			biosname.emplace_back(std::move(name), bios_flags - 1);
 		}
 	}
 	return biosname.size() > 1U;
@@ -2331,6 +2399,36 @@ void menu_select_launch::exit(running_machine &machine)
 {
 	std::lock_guard<std::mutex> guard(s_cache_guard);
 	s_caches.erase(&machine);
+}
+
+
+//-------------------------------------------------
+//  draw collapsed left panel
+//-------------------------------------------------
+
+float menu_select_launch::draw_collapsed_left_panel(float x1, float y1, float x2, float y2)
+{
+	float const space = x2 - x1;
+	float const lr_arrow_width = 0.4f * space * machine().render().ui_aspect();
+
+	// set left-right arrows dimension
+	float const ar_x0 = 0.5f * (x2 + x1) - (0.5f * lr_arrow_width);
+	float const ar_y0 = 0.5f * (y2 + y1) + (0.1f * space);
+	float const ar_x1 = ar_x0 + lr_arrow_width;
+	float const ar_y1 = 0.5f * (y2 + y1) + (0.9f * space);
+
+	ui().draw_outlined_box(container(), x1, y1, x2, y2, rgb_t(0xef, 0x12, 0x47, 0x7b)); // FIXME: magic numbers in colour?
+
+	rgb_t fgcolor = UI_TEXT_COLOR;
+	if (mouse_in_rect(x1, y1, x2, y2))
+	{
+		fgcolor = UI_MOUSEOVER_COLOR;
+		hover = HOVER_LPANEL_ARROW;
+	}
+
+	draw_arrow(ar_x0, ar_y0, ar_x1, ar_y1, fgcolor, ROT90);
+
+	return x2 + UI_BOX_LR_BORDER;
 }
 
 
@@ -2350,12 +2448,12 @@ void menu_select_launch::infos_render(float origx1, float origy1, float origx2, 
 	int total;
 	get_selection(software, driver);
 
-	if (software && ((software->startempty != 1) || !driver))
+	if (software && (!software->startempty || !driver))
 	{
 		m_info_driver = nullptr;
-		first = "Usage";
+		first = __("Usage");
 
-		if (m_info_software != software || m_info_view != ui_globals::cur_sw_dats_view)
+		if ((m_info_software != software) || (m_info_view != ui_globals::cur_sw_dats_view))
 		{
 			m_info_buffer.clear();
 			if (software == m_info_software)
@@ -2374,10 +2472,12 @@ void menu_select_launch::infos_render(float origx1, float origy1, float origx2, 
 			}
 
 			if (m_info_view == 0)
+			{
 				m_info_buffer = software->usage;
+			}
 			else
 			{
-				m_info_buffer = "";
+				m_info_buffer.clear();
 				mame_machine_manager::instance()->lua()->call_plugin("data", m_info_view - 1, m_info_buffer);
 			}
 		}
@@ -2386,7 +2486,7 @@ void menu_select_launch::infos_render(float origx1, float origy1, float origx2, 
 	else if (driver)
 	{
 		m_info_software = nullptr;
-		first = "General Info";
+		first = __("General Info");
 
 		if (driver != m_info_driver || ui_globals::curdats_view != m_info_view)
 		{
@@ -2417,31 +2517,29 @@ void menu_select_launch::infos_render(float origx1, float origy1, float origx2, 
 		total = ui_globals::curdats_total;
 	}
 	else
+	{
 		return;
+	}
 
+	origy1 += UI_BOX_TB_BORDER;
 	float gutter_width = 0.4f * line_height * machine().render().ui_aspect() * 1.3f;
 	float ud_arrow_width = line_height * machine().render().ui_aspect();
 	float oy1 = origy1 + line_height;
 
-	std::string snaptext;
-	if (m_info_view)
-		snaptext = _(m_items_list[m_info_view - 1].c_str());
-	else
-		snaptext = _(first);
+	char const *const snaptext(m_info_view ? m_items_list[m_info_view - 1].c_str() : _(first));
 
-	// apply title to right panel
-	float title_size = 0.0f;
-	float txt_length = 0.0f;
-
-	for (int x = 0; x < ui_globals::curdats_total; ++x)
+	// get width of widest title
+	float title_size(0.0f);
+	for (std::size_t x = 0; total > x; ++x)
 	{
-		const char *name;
-		if(!x)
-			name = first;
-		else
-			name = m_items_list[x - 1].c_str();
-		ui().draw_text_full(container(), _(name), origx1, origy1, origx2 - origx1, ui::text_layout::CENTER,
-				ui::text_layout::NEVER, mame_ui_manager::NONE, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, &txt_length, nullptr);
+		char const *const name(x ? m_items_list[x - 1].c_str() : _(first));
+		float txt_length(0.0f);
+		ui().draw_text_full(
+				container(), name,
+				origx1, origy1, origx2 - origx1,
+				ui::text_layout::CENTER, ui::text_layout::NEVER,
+				mame_ui_manager::NONE, UI_TEXT_COLOR, UI_TEXT_BG_COLOR,
+				&txt_length, nullptr);
 		txt_length += 0.01f;
 		title_size = (std::max)(txt_length, title_size);
 	}
@@ -2467,7 +2565,7 @@ void menu_select_launch::infos_render(float origx1, float origy1, float origx2, 
 				origy1 + line_height, bgcolor, rgb_t(255, 43, 43, 43), hilight_main_texture(), PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_TEXWRAP(1));
 	}
 
-	ui().draw_text_full(container(), snaptext.c_str(), origx1, origy1, origx2 - origx1, ui::text_layout::CENTER,
+	ui().draw_text_full(container(), snaptext, origx1, origy1, origx2 - origx1, ui::text_layout::CENTER,
 			ui::text_layout::NEVER, mame_ui_manager::NORMAL, fgcolor, bgcolor, nullptr, nullptr, tmp_size);
 
 	char justify = 'l'; // left justify
@@ -2503,7 +2601,10 @@ void menu_select_launch::infos_render(float origx1, float origy1, float origx2, 
 	if (m_topline_datsview + r_visible_lines >= m_total_lines)
 		m_topline_datsview = m_total_lines - r_visible_lines;
 
-	sc = origx2 - origx1 - (2.0f * UI_BOX_LR_BORDER);
+	if (mouse_in_rect(origx1 + gutter_width, oy1, origx2 - gutter_width, origy2))
+		hover = HOVER_INFO_TEXT;
+
+	sc = origx2 - origx1 - (2.0f * gutter_width);
 	for (int r = 0; r < r_visible_lines; ++r)
 	{
 		int itemline = r + m_topline_datsview;

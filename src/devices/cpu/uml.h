@@ -73,20 +73,20 @@ namespace uml
 		COND_NV,                    // requires V
 		COND_U,                     // requires U
 		COND_NU,                    // requires U
-		COND_A,                     // requires CZ
-		COND_BE,                    // requires CZ
-		COND_G,                     // requires SVZ
-		COND_LE,                    // requires SVZ
-		COND_L,                     // requires SV
-		COND_GE,                    // requires SV
+		COND_A,                     // requires CZ, unsigned
+		COND_BE,                    // requires CZ, unsigned
+		COND_G,                     // requires SVZ, signed
+		COND_LE,                    // requires SVZ, signed
+		COND_L,                     // requires SV, signed
+		COND_GE,                    // requires SV, signed
 
 		COND_MAX,
 
 		// basic condition code aliases
 		COND_E = COND_Z,
 		COND_NE = COND_NZ,
-		COND_B = COND_C,
-		COND_AE = COND_NC
+		COND_B = COND_C, // unsigned
+		COND_AE = COND_NC // unsigned
 	};
 
 	// floating point rounding modes

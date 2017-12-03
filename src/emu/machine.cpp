@@ -826,6 +826,8 @@ void running_machine::set_rtc_datetime(const system_time &systime)
 //  rand - standardized random numbers
 //-------------------------------------------------
 
+// TODO: using this function in the core is strongly discouraged (can affect inp playback),
+//       maybe we should consider moving this function to somewhere else instead.
 u32 running_machine::rand()
 {
 	m_rand_seed = 1664525 * m_rand_seed + 1013904223;
@@ -972,6 +974,10 @@ void running_machine::logfile_callback(const char *buffer)
 
 void running_machine::start_all_devices()
 {
+	// resolve objects first to avoid messy start order dependencies
+	for (device_t &device : device_iterator(root_device()))
+		device.resolve_objects();
+
 	m_dummy_space.start();
 
 	// iterate through the devices

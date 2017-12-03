@@ -64,8 +64,6 @@ public:
 	virtual bool is_reset_on_load() const override { return 0; }
 	virtual bool support_command_line_image_creation() const override { return 1; }
 	virtual const char *file_extensions() const override { return "awd"; }
-	virtual const char *custom_instance_name() const override { return "disk"; }
-	virtual const char *custom_brief_instance_name() const override { return "disk"; }
 
 	virtual image_init_result call_create(int format_type, util::option_resolution *format_options) override;
 protected:

@@ -6,14 +6,15 @@
 #ifndef BX_PIXEL_FORMAT_H_HEADER_GUARD
 #define BX_PIXEL_FORMAT_H_HEADER_GUARD
 
-#include "fpumath.h"
+#include "math.h"
 #include "uint32_t.h"
 
 namespace bx
 {
+	///
 	struct EncodingType
 	{
-		enum Enum
+		enum Enum ///
 		{
 			Unorm,
 			Int,
@@ -228,9 +229,9 @@ namespace bx
 	void packRgb10A2(void* _dst, const float* _src);
 	void unpackRgb10A2(float* _dst, const void* _src);
 
-	// R11G11B10F
-	void packR11G11B10F(void* _dst, const float* _src);
-	void unpackR11G11B10F(float* _dst, const void* _src);
+	// RG11B10F
+	void packRG11B10F(void* _dst, const float* _src);
+	void unpackRG11B10F(float* _dst, const void* _src);
 
 	// RG32F
 	void packRg32F(void* _dst, const float* _src);

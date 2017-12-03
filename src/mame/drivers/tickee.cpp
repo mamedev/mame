@@ -303,14 +303,14 @@ READ16_MEMBER(tickee_state::rapidfir_transparent_r)
 TMS340X0_TO_SHIFTREG_CB_MEMBER(tickee_state::rapidfir_to_shiftreg)
 {
 	if (address < 0x800000)
-		memcpy(shiftreg, &m_vram[TOWORD(address)], TOBYTE(0x2000));
+		memcpy(shiftreg, &m_vram[address >> 4], 0x400);
 }
 
 
 TMS340X0_FROM_SHIFTREG_CB_MEMBER(tickee_state::rapidfir_from_shiftreg)
 {
 	if (address < 0x800000)
-		memcpy(&m_vram[TOWORD(address)], shiftreg, TOBYTE(0x2000));
+		memcpy(&m_vram[address >> 4], shiftreg, 0x400);
 }
 
 

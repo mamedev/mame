@@ -112,6 +112,7 @@
 
 #include "imgtool.h"
 #include "formats/imageutl.h"
+#include "formats/hti_tape.h"
 
 // Constants
 #define SECTOR_LEN          256 // Bytes in a sector
@@ -131,14 +132,10 @@
 #define CHARS_PER_FNAME_EXT (CHARS_PER_FNAME + 1 + CHARS_PER_EXT)   // Characters in filename + extension
 #define PAD_WORD            0xffff  // Word value for padding
 #define FIRST_FILE_SECTOR   (FIRST_DIR_SECTOR + SECTORS_PER_DIR * DIR_COPIES)   // First file sector
-#define MAGIC               0x5441434f  // Magic value at start of image file: "TACO"
-#define ONE_INCH_POS        (968 * 1024)    // 1 inch of tape in tape_pos_t units
-#define START_POS           ((tape_pos_t)(72.25 * ONE_INCH_POS))    // Start position on each track
+#define START_POS           ((tape_pos_t)(72.25 * hti_format_t::ONE_INCH_POS))    // Start position on each track
 #define DZ_WORDS            350 // Words in deadzone
-#define IRG_SIZE            ONE_INCH_POS    // Size of inter-record-gap: 1"
-#define IFG_SIZE            ((tape_pos_t)(2.5 * ONE_INCH_POS))  // Size of inter-file-gap: 2.5"
-#define ZERO_BIT_LEN        619     // Length of "0" bits when encoded on tape
-#define ONE_BIT_LEN         1083    // Length of "1" bits when encoded on tape
+#define IRG_SIZE            hti_format_t::ONE_INCH_POS    // Size of inter-record-gap: 1"
+#define IFG_SIZE            ((tape_pos_t)(2.5 * hti_format_t::ONE_INCH_POS))  // Size of inter-file-gap: 2.5"
 #define HDR_W0_ZERO_MASK    0x4000  // Mask of zero bits in word 0 of header
 #define RES_FREE_FIELD      0x2000  // Mask of "reserved free field" bit
 #define FILE_ID_BIT         0x8000  // Mask of "file identifier" bit
@@ -151,11 +148,10 @@
 #define BYTES_AVAILABLE_MASK    0xff00  // Mask of "bytes available" field
 #define BYTES_USED          0x00ff  // "bytes used" field = 256
 #define BYTES_USED_MASK     0x00ff  // Mask of "bytes used" field
-#define FORMAT_SECT_SIZE    ((tape_pos_t)(2.85 * ONE_INCH_POS)) // Size of sectors including padding: 2.85"
-#define PAD_WORD_LENGTH     (17 * ONE_BIT_LEN)  // Size of PAD_WORD on tape
+#define FORMAT_SECT_SIZE    ((tape_pos_t)(2.85 * hti_format_t::ONE_INCH_POS)) // Size of sectors including padding: 2.85"
 #define PREAMBLE_WORD       0   // Value of preamble word
-#define WORDS_PER_SECTOR_W_MARGIN   256 // Maximum number of words in a sector with a lot of margin (there are actually never more than about 160 words)
-#define MIN_IRG_SIZE        ((tape_pos_t)(0.066 * ONE_INCH_POS))    // Minimum size of IRG gaps: 0.066"
+#define WORDS_PER_HEADER_N_SECTOR   (WORDS_PER_SECTOR + 5)
+#define MIN_IRG_SIZE        ((tape_pos_t)(0.066 * hti_format_t::ONE_INCH_POS))    // Minimum size of IRG gaps: 0.066"
 
 // File types
 #define BKUP_FILETYPE       0
@@ -187,10 +183,10 @@
 #define EOLN (CRLF == 1 ? "\r" : (CRLF == 2 ? "\n" : (CRLF == 3 ? "\r\n" : NULL)))
 
 // Words stored on tape
-typedef uint16_t tape_word_t;
+using tape_word_t = hti_format_t::tape_word_t;
 
 // Tape position, 1 unit = 1 inch / (968 * 1024)
-typedef int32_t tape_pos_t;
+using tape_pos_t = hti_format_t::tape_pos_t;
 
 /********************************************************************************
  * Directory entries
@@ -257,10 +253,7 @@ private:
 	static bool filename_char_check(uint8_t c);
 	static bool filename_check(const uint8_t *filename);
 	bool decode_dir(void);
-	static tape_pos_t word_length(tape_word_t w);
-	static tape_pos_t block_end_pos(tape_pos_t pos , const tape_word_t *block , unsigned block_len);
-	static bool save_word(imgtool::stream *stream , tape_pos_t& pos , tape_word_t w);
-	static bool save_words(imgtool::stream *stream , tape_pos_t& pos , const tape_word_t *block , unsigned block_len);
+	void save_words(hti_format_t& img , unsigned track , tape_pos_t& pos , const tape_word_t *block , unsigned block_len);
 	static tape_word_t checksum(const tape_word_t *block , unsigned block_len);
 };
 
@@ -298,106 +291,128 @@ void tape_image_t::format_img(void)
 	dirty = true;
 }
 
+static int my_seekproc(void *file, int64_t offset, int whence)
+{
+	reinterpret_cast<imgtool::stream *>(file)->seek(offset, whence);
+	return 0;
+}
+
+static size_t my_readproc(void *file, void *buffer, size_t length)
+{
+	return reinterpret_cast<imgtool::stream *>(file)->read(buffer, length);
+}
+
+static size_t my_writeproc(void *file, const void *buffer, size_t length)
+{
+	reinterpret_cast<imgtool::stream *>(file)->write(buffer, length);
+	return length;
+}
+
+static uint64_t my_filesizeproc(void *file)
+{
+	return reinterpret_cast<imgtool::stream *>(file)->size();
+}
+
+static const struct io_procs my_stream_procs = {
+	nullptr,
+	my_seekproc,
+	my_readproc,
+	my_writeproc,
+	my_filesizeproc
+};
+
 imgtoolerr_t tape_image_t::load_from_file(imgtool::stream *stream)
 {
-	stream->seek(0 , SEEK_SET);
+	hti_format_t inp_image;
 
-	uint8_t tmp[ 4 ];
+	io_generic io;
+	io.file = (void *)stream;
+	io.procs = &my_stream_procs;
+	io.filler = 0;
 
-	if (stream->read(tmp , 4) != 4) {
+	if (!inp_image.load_tape(&io)) {
 		return IMGTOOLERR_READERROR;
 	}
 
-	if (pick_integer_be(tmp , 0 , 4) != MAGIC) {
-		return IMGTOOLERR_CORRUPTIMAGE;
-	}
-
 	unsigned exp_sector = 0;
-	// Loader state:
-	// 0    Wait for DZ
-	// 1    Wait for sector data
-	// 2    Wait for gap
-	unsigned state;
-	tape_pos_t end_pos = 0;
-	for (unsigned track = 0; track < TRACKS_NO; track++) {
-		state = 0;
+	unsigned last_sector_on_track = SECTORS_PER_TRACK;
+	for (unsigned track = 0; track < TRACKS_NO; track++ , last_sector_on_track += SECTORS_PER_TRACK) {
+		tape_pos_t pos = 0;
+		// Loader state:
+		// 0    Wait for DZ
+		// 1    Wait for sector data
+		// 2    Wait for gap
+		unsigned state = 0;
 
-		while (1) {
-			if (stream->read(tmp , 4) != 4) {
-				return IMGTOOLERR_READERROR;
-			}
-			uint32_t words_no = pick_integer_le(tmp , 0 , 4);
-			if (words_no == (uint32_t)-1) {
-				// Track ended
-				break;
-			}
-			if (stream->read(tmp , 4) != 4) {
-				return IMGTOOLERR_READERROR;
-			}
-			tape_pos_t pos = pick_integer_le(tmp , 0 , 4);
-			tape_word_t buffer[ WORDS_PER_SECTOR_W_MARGIN ];
-			for (unsigned i = 0; i < words_no; i++) {
-				if (stream->read(tmp , 2) != 2) {
-					return IMGTOOLERR_READERROR;
-				}
-				if (i < WORDS_PER_SECTOR_W_MARGIN) {
-					buffer[ i ] = pick_integer_le(tmp , 0 , 2);
-				}
-			}
+		while (exp_sector != last_sector_on_track) {
 			switch (state) {
 			case 0:
-				// Skip DZ
-				state = 1;
+			case 1:
+				{
+					hti_format_t::track_iterator_t it;
+
+					if (!inp_image.next_data(track , pos , true , false , it)) {
+						// No more data on tape
+						return IMGTOOLERR_CORRUPTIMAGE;
+					}
+					if (state == 1) {
+						// Extract record data
+						if (it->second != PREAMBLE_WORD) {
+							return IMGTOOLERR_CORRUPTIMAGE;
+						}
+						tape_word_t buffer[ WORDS_PER_HEADER_N_SECTOR ];
+						for (unsigned i = 0; i < WORDS_PER_HEADER_N_SECTOR; i++) {
+							auto res = inp_image.adv_it(track , true , it);
+							if (res != hti_format_t::ADV_CONT_DATA) {
+								return IMGTOOLERR_CORRUPTIMAGE;
+							}
+							buffer[ i ] = it->second;
+						}
+						if (buffer[ 3 ] != checksum(&buffer[ 0 ], 3) ||
+							buffer[ 4 + WORDS_PER_SECTOR ] != checksum(&buffer[ 4 ], WORDS_PER_SECTOR)) {
+							return IMGTOOLERR_CORRUPTIMAGE;
+						}
+						// Check record content
+						if (exp_sector != (buffer[ 1 ] & 0xfff)) {
+							return IMGTOOLERR_CORRUPTIMAGE;
+						}
+						if (((buffer[ 0 ] & FILE_ID_BIT) != 0) != (exp_sector == 0)) {
+							return IMGTOOLERR_CORRUPTIMAGE;
+						}
+						if ((buffer[ 0 ] & (HDR_W0_ZERO_MASK | RES_FREE_FIELD | SIF_FILE_NO_MASK)) != (RES_FREE_FIELD | SIF_FILE_NO)) {
+							return IMGTOOLERR_CORRUPTIMAGE;
+						}
+						if ((buffer[ 1 ] & SIF_FREE_FIELD_MASK) != SIF_FREE_FIELD) {
+							return IMGTOOLERR_CORRUPTIMAGE;
+						}
+						bool in_use = (buffer[ 0 ] & SECTOR_IN_USE) != 0;
+						if ((buffer[ 2 ] & BYTES_AVAILABLE_MASK) != BYTES_AVAILABLE ||
+							(in_use && (buffer[ 2 ] & BYTES_USED_MASK) != BYTES_USED) ||
+							(!in_use && (buffer[ 2 ] & BYTES_USED_MASK) != 0)) {
+							return IMGTOOLERR_CORRUPTIMAGE;
+						}
+						if (in_use) {
+							set_sector(exp_sector, &buffer[ 4 ]);
+						} else {
+							unset_sector(exp_sector);
+						}
+						exp_sector++;
+					}
+					pos = it->first;
+					state = 2;
+				}
 				break;
 
 			case 2:
-				if ((pos - end_pos) < MIN_IRG_SIZE) {
-					// Gap too short, discard data block
-					break;
-				}
-				// Intentional fall-through
-
-			case 1:
-				if (words_no < 6 + WORDS_PER_SECTOR || buffer[ 0 ] != PREAMBLE_WORD ||
-					buffer[ 4 ] != checksum(&buffer[ 1 ], 3) ||
-					buffer[ 5 + WORDS_PER_SECTOR ] != checksum(&buffer[ 5 ], WORDS_PER_SECTOR)) {
+				// Find next gap
+				if (!inp_image.next_gap(track , pos , true , MIN_IRG_SIZE)) {
 					return IMGTOOLERR_CORRUPTIMAGE;
 				}
-				// Check sector content
-				if (exp_sector != (buffer[ 2 ] & 0xfff)) {
-					return IMGTOOLERR_CORRUPTIMAGE;
-				}
-				if (((buffer[ 1 ] & FILE_ID_BIT) != 0 && exp_sector != 0) ||
-					((buffer[ 1 ] & FILE_ID_BIT) == 0 && exp_sector == 0)) {
-					return IMGTOOLERR_CORRUPTIMAGE;
-				}
-				if ((buffer[ 1 ] & (HDR_W0_ZERO_MASK | RES_FREE_FIELD | SIF_FILE_NO_MASK)) != (RES_FREE_FIELD | SIF_FILE_NO)) {
-					return IMGTOOLERR_CORRUPTIMAGE;
-				}
-				if ((buffer[ 2 ] & SIF_FREE_FIELD_MASK) != SIF_FREE_FIELD) {
-					return IMGTOOLERR_CORRUPTIMAGE;
-				}
-				bool in_use = (buffer[ 1 ] & SECTOR_IN_USE) != 0;
-				if ((buffer[ 3 ] & BYTES_AVAILABLE_MASK) != BYTES_AVAILABLE ||
-					(in_use && (buffer[ 3 ] & BYTES_USED_MASK) != BYTES_USED) ||
-					(!in_use && (buffer[ 3 ] & BYTES_USED_MASK) != 0)) {
-					return IMGTOOLERR_CORRUPTIMAGE;
-				}
-				if (in_use) {
-					set_sector(exp_sector, &buffer[ 5 ]);
-				} else {
-					unset_sector(exp_sector);
-				}
-				exp_sector++;
-				state = 2;
+				state = 1;
 				break;
-			}
-			end_pos = block_end_pos(pos, &buffer[ 0 ], words_no);
-		}
-	}
 
-	if (exp_sector != TOT_SECTORS) {
-		return IMGTOOLERR_CORRUPTIMAGE;
+			}
+		}
 	}
 
 	if (!decode_dir()) {
@@ -409,69 +424,17 @@ imgtoolerr_t tape_image_t::load_from_file(imgtool::stream *stream)
 	return IMGTOOLERR_SUCCESS;
 }
 
-tape_pos_t tape_image_t::word_length(tape_word_t w)
+void tape_image_t::save_words(hti_format_t& img , unsigned track , tape_pos_t& pos , const tape_word_t *block , unsigned block_len)
 {
-	unsigned zeros , ones;
-
-	// pop count of w
-	ones = (w & 0x5555) + ((w >> 1) & 0x5555);
-	ones = (ones & 0x3333) + ((ones >> 2) & 0x3333);
-	ones = (ones & 0x0f0f) + ((ones >> 4) & 0x0f0f);
-	ones = (ones & 0x00ff) + ((ones >> 8) & 0x00ff);
-
-	zeros = 16 - ones;
-
-	return zeros * ZERO_BIT_LEN + (ones + 1) * ONE_BIT_LEN;
-}
-
-tape_pos_t tape_image_t::block_end_pos(tape_pos_t pos , const tape_word_t *block , unsigned block_len)
-{
-	while (block_len--) {
-		pos += word_length(*block++);
-	}
-	return pos;
-}
-
-bool tape_image_t::save_word(imgtool::stream *stream , tape_pos_t& pos , tape_word_t w)
-{
-	uint8_t tmp[ 2 ];
-
-	place_integer_le(tmp , 0 , 2 , w);
-	if (stream->write(tmp , 2) != 2) {
-		return false;
-	}
-
-	pos += word_length(w);
-
-	return true;
-}
-
-bool tape_image_t::save_words(imgtool::stream *stream , tape_pos_t& pos , const tape_word_t *block , unsigned block_len)
-{
-	uint8_t tmp[ 4 ];
-
-	// Number of words (including preamble)
-	place_integer_le(tmp , 0 , 4 , block_len + 1);
-	if (stream->write(tmp , 4) != 4) {
-		return false;
-	}
-	// Start position
-	place_integer_le(tmp , 0 , 4 , pos);
-	if (stream->write(tmp , 4) != 4) {
-		return false;
-	}
 	// Preamble
-	if (!save_word(stream , pos , PREAMBLE_WORD)) {
-		return false;
-	}
+	tape_pos_t length;
+	img.write_word(track , pos , PREAMBLE_WORD , length);
+	pos += length;
 	// Words
 	for (unsigned i = 0; i < block_len; i++) {
-		if (!save_word(stream, pos, block[ i ])) {
-			return false;
-		}
+		img.write_word(track , pos , *block++ , length);
+		pos += length;
 	}
-
-	return true;
 }
 
 tape_word_t tape_image_t::checksum(const tape_word_t *block , unsigned block_len)
@@ -488,95 +451,80 @@ imgtoolerr_t tape_image_t::save_to_file(imgtool::stream *stream)
 	// Encode copies of directory into sectors
 	encode_dir();
 
-	// Store sectors
-	stream->seek(0 , SEEK_SET);
+	// Store sectors into image
+	hti_format_t out_image;
 
-	uint8_t tmp[ 4 ];
+	unsigned rec_no = 0;
+	for (unsigned track = 0; track < TRACKS_NO; track++) {
+		tape_pos_t pos = START_POS;
 
-	place_integer_be(tmp , 0 , 4 , MAGIC);
-	if (stream->write(tmp , 4) != 4) {
-		return IMGTOOLERR_WRITEERROR;
-	}
+		// Start of either track
+		// Deadzone + 1" of gap
+		tape_word_t deadzone[ DZ_WORDS ];
+		for (auto& dz : deadzone) {
+			dz = PAD_WORD;
+		}
+		save_words(out_image, track, pos, deadzone, DZ_WORDS);
+		pos += IRG_SIZE;
 
-	tape_pos_t pos = START_POS;
+		for (unsigned i = 0; i < SECTORS_PER_TRACK; i++ , rec_no++) {
+			bool in_use = alloc_map[ rec_no ];
+			// Sector header
+			tape_word_t sector[ WORDS_PER_HEADER_N_SECTOR ];
 
-	for (unsigned i = 0; i < TOT_SECTORS; i++) {
-		if (i == TOT_SECTORS / 2) {
-			// Track 0 -> 1
-			place_integer_le(tmp , 0 , 4 , (uint32_t)-1);
-			if (stream->write(tmp , 4) != 4) {
-				return IMGTOOLERR_WRITEERROR;
+			// Header word 0: file identifier bit, reserved free-field bit, empty record indicator & file #
+			sector[ 0 ] = RES_FREE_FIELD | SIF_FILE_NO;
+			if (rec_no == 0) {
+				sector[ 0 ] |= FILE_ID_BIT;
 			}
-		}
-		if (i == 0 || i == TOT_SECTORS / 2) {
-			// Start of either track
-			pos = START_POS;
-			// Deadzone + 1" of gap
-			tape_word_t deadzone[ DZ_WORDS ];
-			for (unsigned j = 0; j < DZ_WORDS; j++) {
-				deadzone[ j ] = PAD_WORD;
+			if (in_use) {
+				sector[ 0 ] |= SECTOR_IN_USE;
 			}
-			if (!save_words(stream, pos, deadzone, DZ_WORDS)) {
-				return IMGTOOLERR_WRITEERROR;
+			// Header word 1: free-field & sector #
+			sector[ 1 ] = SIF_FREE_FIELD | rec_no;
+			// Header word 2: bytes available & bytes used
+			sector[ 2 ] = BYTES_AVAILABLE;
+			if (in_use) {
+				sector[ 2 ] |= BYTES_USED;
+			}
+			// Checksum of header
+			sector[ 3 ] = checksum(&sector[ 0 ] , 3);
+			// Sector payload
+			if (in_use) {
+				memcpy(&sector[ 4 ] , &img[ rec_no ][ 0 ] , SECTOR_LEN);
+			} else {
+				for (unsigned j = 4; j < (4 + WORDS_PER_SECTOR); j++) {
+					sector[ j ] = PAD_WORD;
+				}
+			}
+			// Checksum of payload
+			sector[ 4 + WORDS_PER_SECTOR ] = checksum(&sector[ 4 ] , WORDS_PER_SECTOR);
+
+			tape_pos_t start_pos = pos;
+			save_words(out_image, track, pos, sector, WORDS_PER_HEADER_N_SECTOR);
+
+			// Pad sector up to FORMAT_SECT_SIZE
+			while ((pos - start_pos) < FORMAT_SECT_SIZE) {
+				tape_pos_t length;
+				out_image.write_word(track , pos , PAD_WORD , length);
+				pos += length;
 			}
 
-			pos += IRG_SIZE;
-		}
-		bool in_use = alloc_map[ i ];
-		// Sector header
-		tape_word_t sector[ WORDS_PER_SECTOR_W_MARGIN ];
-
-		// Header word 0: file identifier bit, reserved free-field bit, empty record indicator & file #
-		sector[ 0 ] = RES_FREE_FIELD | SIF_FILE_NO;
-		if (i == 0) {
-			sector[ 0 ] |= FILE_ID_BIT;
-		}
-		if (in_use) {
-			sector[ 0 ] |= SECTOR_IN_USE;
-		}
-		// Header word 1: free-field & sector #
-		sector[ 1 ] = SIF_FREE_FIELD | i;
-		// Header word 2: bytes available & bytes used
-		sector[ 2 ] = BYTES_AVAILABLE;
-		if (in_use) {
-			sector[ 2 ] |= BYTES_USED;
-		}
-		// Checksum of header
-		sector[ 3 ] = checksum(&sector[ 0 ] , 3);
-		// Sector payload
-		if (in_use) {
-			memcpy(&sector[ 4 ] , &img[ i ][ 0 ] , SECTOR_LEN);
-		} else {
-			for (unsigned j = 4; j < (4 + WORDS_PER_SECTOR); j++) {
-				sector[ j ] = PAD_WORD;
+			// Gap between sectors
+			if (rec_no == 0) {
+				pos += IFG_SIZE;
+			} else {
+				pos += IRG_SIZE;
 			}
-		}
-		// Checksum of payload
-		sector[ 4 + WORDS_PER_SECTOR ] = checksum(&sector[ 4 ] , WORDS_PER_SECTOR);
-		// Pad sector up to FORMAT_SECT_SIZE
-		tape_pos_t sect_size = 0;
-		for (unsigned j = 0; j < 5 + WORDS_PER_SECTOR; j++) {
-			sect_size += word_length(sector[ j ]);
-		}
-		unsigned padding_words = (FORMAT_SECT_SIZE - sect_size) / PAD_WORD_LENGTH;
-		for (unsigned j = 5 + WORDS_PER_SECTOR; j < 5 + WORDS_PER_SECTOR + padding_words; j++) {
-			sector[ j ] = PAD_WORD;
-		}
-		if (!save_words(stream, pos, sector, 5 + WORDS_PER_SECTOR + padding_words)) {
-			return IMGTOOLERR_WRITEERROR;
-		}
-		// Gap between sectors
-		if (i == 0) {
-			pos += IFG_SIZE;
-		} else {
-			pos += IRG_SIZE;
 		}
 	}
 
-	place_integer_le(tmp , 0 , 4 , (uint32_t)-1);
-	if (stream->write(tmp , 4) != 4) {
-		return IMGTOOLERR_WRITEERROR;
-	}
+	io_generic io;
+	io.file = (void *)stream;
+	io.procs = &my_stream_procs;
+	io.filler = 0;
+
+	out_image.save_tape(&io);
 
 	return IMGTOOLERR_SUCCESS;
 }
@@ -1046,7 +994,7 @@ static imgtoolerr_t hp9845_tape_open(imgtool::image &image, imgtool::stream::ptr
 {
 	tape_state_t& state = get_tape_state(image);
 
-	state.stream = stream.get();
+	state.stream = stream.release();
 
 	tape_image_t& tape_image = get_tape_image(state);
 
@@ -1054,7 +1002,6 @@ static imgtoolerr_t hp9845_tape_open(imgtool::image &image, imgtool::stream::ptr
 	if (err)
 		return err;
 
-	state.stream = stream.release();
 	return IMGTOOLERR_SUCCESS;
 }
 

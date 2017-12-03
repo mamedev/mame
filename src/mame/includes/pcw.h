@@ -11,6 +11,7 @@
 
 #include "machine/upd765.h"
 #include "machine/ram.h"
+#include "machine/timer.h"
 #include "sound/beep.h"
 #include "screen.h"
 

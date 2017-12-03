@@ -211,6 +211,7 @@ Dip locations verified with US conversion kit manual.
 
 #include "cpu/m68000/m68000.h"
 #include "cpu/h6280/h6280.h"
+#include "machine/mb8421.h"
 #include "sound/2203intf.h"
 #include "sound/ym2151.h"
 #include "screen.h"
@@ -218,6 +219,16 @@ Dip locations verified with US conversion kit manual.
 
 
 /**********************************************************************************/
+
+WRITE16_MEMBER(dassault_state::main_irq_ack_w)
+{
+	m_maincpu->set_input_line(M68K_IRQ_4, CLEAR_LINE);
+}
+
+WRITE16_MEMBER(dassault_state::sub_irq_ack_w)
+{
+	m_subcpu->set_input_line(M68K_IRQ_5, CLEAR_LINE);
+}
 
 READ16_MEMBER(dassault_state::dassault_control_r)
 {
@@ -254,44 +265,6 @@ READ16_MEMBER(dassault_state::dassault_sub_control_r)
 	return ioport("VBLANK1")->read();
 }
 
-WRITE16_MEMBER(dassault_state::dassault_sound_w)
-{
-	m_soundlatch->write(space, 0, data & 0xff);
-	m_audiocpu->set_input_line(0, HOLD_LINE); /* IRQ1 */
-}
-
-/* The CPU-CPU irq controller is overlaid onto the end of the shared memory */
-READ16_MEMBER(dassault_state::dassault_irq_r)
-{
-	switch (offset)
-	{
-	case 0: m_maincpu->set_input_line(5, CLEAR_LINE); break;
-	case 1: m_subcpu->set_input_line(6, CLEAR_LINE); break;
-	}
-	return m_shared_ram[(0xffc / 2) + offset]; /* The values probably don't matter */
-}
-
-WRITE16_MEMBER(dassault_state::dassault_irq_w)
-{
-	switch (offset)
-	{
-	case 0: m_maincpu->set_input_line(5, ASSERT_LINE); break;
-	case 1: m_subcpu->set_input_line(6, ASSERT_LINE); break;
-	}
-
-	COMBINE_DATA(&m_shared_ram[(0xffc / 2) + offset]); /* The values probably don't matter */
-}
-
-WRITE16_MEMBER(dassault_state::shared_ram_w)
-{
-	COMBINE_DATA(&m_shared_ram[offset]);
-}
-
-READ16_MEMBER(dassault_state::shared_ram_r)
-{
-	return m_shared_ram[offset];
-}
-
 /**********************************************************************************/
 
 static ADDRESS_MAP_START( dassault_map, AS_PROGRAM, 16, dassault_state )
@@ -299,8 +272,10 @@ static ADDRESS_MAP_START( dassault_map, AS_PROGRAM, 16, dassault_state )
 
 	AM_RANGE(0x100000, 0x103fff) AM_RAM_DEVWRITE("deco_common", decocomn_device, nonbuffered_palette_w) AM_SHARE("paletteram")
 
-	AM_RANGE(0x140004, 0x140007) AM_WRITENOP /* ? */
-	AM_RANGE(0x180000, 0x180001) AM_WRITE(dassault_sound_w)
+	AM_RANGE(0x140004, 0x140005) AM_WRITE(main_irq_ack_w)
+	AM_RANGE(0x140006, 0x140007) AM_WRITENOP /* ? */
+
+	AM_RANGE(0x180000, 0x180001) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x00ff)
 
 	AM_RANGE(0x1c0000, 0x1c000f) AM_READ(dassault_control_r)
 	AM_RANGE(0x1c000a, 0x1c000b) AM_DEVWRITE("deco_common", decocomn_device, priority_w)
@@ -319,21 +294,20 @@ static ADDRESS_MAP_START( dassault_map, AS_PROGRAM, 16, dassault_state )
 
 	AM_RANGE(0x3f8000, 0x3fbfff) AM_RAM AM_SHARE("ram") /* Main ram */
 	AM_RANGE(0x3fc000, 0x3fcfff) AM_RAM AM_SHARE("spriteram2") /* Spriteram (2nd) */
-	AM_RANGE(0x3feffc, 0x3fefff) AM_READWRITE(dassault_irq_r, dassault_irq_w)
-	AM_RANGE(0x3fe000, 0x3fefff) AM_READWRITE(shared_ram_r, shared_ram_w) AM_SHARE("shared_ram") /* Shared ram */
+	AM_RANGE(0x3fe000, 0x3fefff) AM_DEVREADWRITE("sharedram", mb8421_mb8431_16_device, left_r, left_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( dassault_sub_map, AS_PROGRAM, 16, dassault_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 
 	AM_RANGE(0x100000, 0x100001) AM_DEVWRITE("spriteram", buffered_spriteram16_device, write)
-	AM_RANGE(0x100002, 0x100007) AM_WRITENOP /* ? */
+	AM_RANGE(0x100002, 0x100003) AM_WRITE(sub_irq_ack_w)
+	AM_RANGE(0x100004, 0x100007) AM_WRITENOP /* ? */
 	AM_RANGE(0x100004, 0x100005) AM_READ(dassault_sub_control_r)
 
 	AM_RANGE(0x3f8000, 0x3fbfff) AM_RAM AM_SHARE("ram2") /* Sub cpu ram */
 	AM_RANGE(0x3fc000, 0x3fcfff) AM_RAM AM_SHARE("spriteram") /* Sprite ram */
-	AM_RANGE(0x3feffc, 0x3fefff) AM_READWRITE(dassault_irq_r, dassault_irq_w)
-	AM_RANGE(0x3fe000, 0x3fefff) AM_READWRITE(shared_ram_r, shared_ram_w)
+	AM_RANGE(0x3fe000, 0x3fefff) AM_DEVREADWRITE("sharedram", mb8421_mb8431_16_device, right_r, right_w)
 ADDRESS_MAP_END
 
 /******************************************************************************/
@@ -542,17 +516,21 @@ static MACHINE_CONFIG_START( dassault )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_28MHz/2)   /* 14MHz - Accurate */
 	MCFG_CPU_PROGRAM_MAP(dassault_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", dassault_state,  irq4_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", dassault_state,  irq4_line_assert)
 
 	MCFG_CPU_ADD("sub", M68000, XTAL_28MHz/2)   /* 14MHz - Accurate */
 	MCFG_CPU_PROGRAM_MAP(dassault_sub_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", dassault_state,  irq5_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", dassault_state,  irq5_line_assert)
 
 	MCFG_CPU_ADD("audiocpu", H6280, XTAL_32_22MHz/8)    /* Accurate */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 
 //  MCFG_QUANTUM_TIME(attotime::from_hz(8400)) /* 140 CPU slices per frame */
 	MCFG_QUANTUM_PERFECT_CPU("maincpu") // I was seeing random lockups.. let's see if this helps
+
+	MCFG_DEVICE_ADD("sharedram", MB8421_MB8431_16BIT, 0)
+	MCFG_MB8421_INTL_HANDLER(INPUTLINE("maincpu", M68K_IRQ_5))
+	MCFG_MB8421_INTR_HANDLER(INPUTLINE("sub", M68K_IRQ_6))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -617,6 +595,7 @@ static MACHINE_CONFIG_START( dassault )
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", 0)) // IRQ1
 
 	MCFG_SOUND_ADD("ym1", YM2203, XTAL_32_22MHz/8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.40)

@@ -31,26 +31,18 @@ DIP Locations verified for:
 
 READ8_MEMBER(bking_state::bking_sndnmi_disable_r)
 {
-	m_sound_nmi_enable = 0;
+	m_soundnmi->in_w<1>(0);
 	return 0;
 }
 
 WRITE8_MEMBER(bking_state::bking_sndnmi_enable_w)
 {
-	m_sound_nmi_enable = 1;
+	m_soundnmi->in_w<1>(1);
 }
 
 WRITE8_MEMBER(bking_state::bking_soundlatch_w)
 {
-	int i, code = 0;
-
-	for (i = 0;i < 8;i++)
-		if (data & (1 << i))
-			code |= 0x80 >> i;
-
-	m_soundlatch->write(space, offset, code);
-	if (m_sound_nmi_enable)
-		m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	m_soundlatch->write(space, offset, BITSWAP8(data, 0, 1, 2, 3, 4, 5, 6, 7));
 }
 
 WRITE8_MEMBER(bking_state::bking3_addr_l_w)
@@ -347,9 +339,6 @@ void bking_state::machine_start()
 	save_item(NAME(m_palette_bank));
 	save_item(NAME(m_controller));
 	save_item(NAME(m_hit));
-
-	/* sound */
-	save_item(NAME(m_sound_nmi_enable));
 }
 
 MACHINE_START_MEMBER(bking_state,bking3)
@@ -384,7 +373,7 @@ void bking_state::machine_reset()
 	m_hit = 0;
 
 	/* sound */
-	m_sound_nmi_enable = 1;
+	m_soundnmi->in_w<1>(0);
 }
 
 MACHINE_RESET_MEMBER(bking_state,bking3)
@@ -432,6 +421,10 @@ static MACHINE_CONFIG_START( bking )
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(DEVWRITELINE("soundnmi", input_merger_device, in_w<0>))
+
+	MCFG_INPUT_MERGER_ALL_HIGH("soundnmi")
+	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 
 	MCFG_SOUND_ADD("ay1", AY8910, XTAL_6MHz/4)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)

@@ -42,7 +42,7 @@
 
 
 // device type definition
-DEFINE_DEVICE_TYPE(ARCADIA_SOUND, arcadia_sound_device, "arcadia_sound", "Arcadia Audio Custom")
+DEFINE_DEVICE_TYPE(ARCADIA_SOUND, arcadia_sound_device, "arcadia_sound", "Arcadia Custom Sound")
 
 //-------------------------------------------------
 //  arcadia_sound_device - constructor

@@ -110,15 +110,6 @@ WRITE16_MEMBER(shangha3_state::blocken_coinctrl_w)
 }
 
 
-WRITE16_MEMBER(shangha3_state::heberpop_sound_command_w)
-{
-	if (ACCESSING_BITS_0_7)
-	{
-		m_soundlatch->write(space, 0, data & 0xff);
-		m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff);  /* RST 38h */
-	}
-}
-
 WRITE16_MEMBER(shangha3_state::irq_ack_w)
 {
 	m_maincpu->set_input_line(4, CLEAR_LINE);
@@ -151,7 +142,7 @@ static ADDRESS_MAP_START( heberpop_map, AS_PROGRAM, 16, shangha3_state )
 	AM_RANGE(0x200008, 0x200009) AM_WRITE(blitter_go_w)
 	AM_RANGE(0x20000a, 0x20000b) AM_WRITE(irq_ack_w)
 	AM_RANGE(0x20000c, 0x20000d) AM_WRITE(heberpop_coinctrl_w)
-	AM_RANGE(0x20000e, 0x20000f) AM_WRITE(heberpop_sound_command_w)
+	AM_RANGE(0x20000e, 0x20000f) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x00ff)
 	AM_RANGE(0x300000, 0x30ffff) AM_RAM AM_SHARE("ram") /* gfx & work ram */
 	AM_RANGE(0x340000, 0x340001) AM_WRITE(flipscreen_w)
 	AM_RANGE(0x360000, 0x360001) AM_WRITE(gfxlist_addr_w)
@@ -166,7 +157,7 @@ static ADDRESS_MAP_START( blocken_map, AS_PROGRAM, 16, shangha3_state )
 	AM_RANGE(0x100008, 0x100009) AM_WRITE(blitter_go_w)
 	AM_RANGE(0x10000a, 0x10000b) AM_READNOP AM_WRITE(irq_ack_w) // r -> unknown purpose (value doesn't matter, left-over?)
 	AM_RANGE(0x10000c, 0x10000d) AM_WRITE(blocken_coinctrl_w)
-	AM_RANGE(0x10000e, 0x10000f) AM_WRITE(heberpop_sound_command_w)
+	AM_RANGE(0x10000e, 0x10000f) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x00ff)
 	AM_RANGE(0x200000, 0x200fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0x300000, 0x30ffff) AM_RAM AM_SHARE("ram") /* gfx & work ram */
 	AM_RANGE(0x340000, 0x340001) AM_WRITE(flipscreen_w)
@@ -521,6 +512,7 @@ static MACHINE_CONFIG_START( heberpop )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", 0))
 
 	MCFG_SOUND_ADD("ymsnd", YM3438, XTAL_48MHz/6) /* 8 MHz? */
 	MCFG_YM2612_IRQ_HANDLER(INPUTLINE("audiocpu", INPUT_LINE_NMI))
@@ -564,6 +556,7 @@ static MACHINE_CONFIG_START( blocken )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", 0))
 
 	MCFG_SOUND_ADD("ymsnd", YM3438, XTAL_48MHz/6) /* 8 MHz? */
 	MCFG_YM2612_IRQ_HANDLER(INPUTLINE("audiocpu", INPUT_LINE_NMI))
@@ -744,6 +737,9 @@ DRIVER_INIT_MEMBER(shangha3_state,shangha3)
 DRIVER_INIT_MEMBER(shangha3_state,heberpop)
 {
 	m_do_shadows = 0;
+
+	// sound CPU runs in IM 0
+	m_audiocpu->set_input_line_vector(0, 0xff);  /* RST 38h */
 }
 
 GAME( 1993, shangha3,   0,        shangha3, shangha3, shangha3_state, shangha3, ROT0, "Sunsoft", "Shanghai III (World)", MACHINE_SUPPORTS_SAVE )

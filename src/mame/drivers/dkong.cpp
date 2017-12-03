@@ -3383,7 +3383,7 @@ GAME( 2013, dkongpe,   dkong,    dkong2b,   dkong,    dkong_state, 0,        ROT
 
 GAME( 1982, dkongjr,   0,        dkongjr,   dkongjr,  dkong_state, 0,        ROT90,  "Nintendo of America", "Donkey Kong Junior (US set F-2)",              MACHINE_SUPPORTS_SAVE )
 GAME( 1982, dkongjrj,  dkongjr,  dkongjr,   dkongjr,  dkong_state, 0,        ROT90,  "Nintendo",            "Donkey Kong Jr. (Japan)",                      MACHINE_SUPPORTS_SAVE )
-GAME( 1982, dkongjnrj, dkongjr,  dkongjr,   dkongjr,  dkong_state, 0,        ROT90,  "Nintendo",            "Donkey Kong Junior (Japan?)",                  MACHINE_SUPPORTS_SAVE )
+GAME( 1982, dkongjnrj, dkongjr,  dkongjr,   dkongjr,  dkong_state, 0,        ROT90,  "Nintendo",            "Donkey Kong Junior (Japan set F-1)",           MACHINE_SUPPORTS_SAVE )
 GAME( 1982, dkongjrb,  dkongjr,  dkongjr,   dkongjr,  dkong_state, 0,        ROT90,  "bootleg",             "Donkey Kong Jr. (bootleg)",                    MACHINE_SUPPORTS_SAVE )
 GAME( 1982, dkongjre,  dkongjr,  dkongjr,   dkongjr,  dkong_state, 0,        ROT90,  "Nintendo of America", "Donkey Kong Junior (E kit)",                   MACHINE_SUPPORTS_SAVE )
 GAME( 1982, dkongjrpb, dkongjr,  dkongjr,   dkongjr,  dkong_state, 0,        ROT90,  "bootleg",             "Donkey Kong Junior (P kit, bootleg)",          MACHINE_SUPPORTS_SAVE ) // definitely not issued by Nintendo

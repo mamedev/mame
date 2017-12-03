@@ -16,7 +16,7 @@ function dat.check(set, softlist)
 		return nil
 	end
 	info = "#jf\n" .. info
-	return "Command"
+	return _("Command")
 end
 
 function dat.get()

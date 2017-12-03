@@ -27,6 +27,7 @@
 #include "imagedev/chd_cd.h"
 #include "includes/saturn.h"
 #include "cdrom.h"
+#include "machine/timer.h"
 #include "sound/cdda.h"
 #include "debugger.h"
 #include "coreutil.h"
@@ -125,6 +126,14 @@ void saturn_state::cr_standard_return(uint16_t cur_status)
 		cr3 = (get_track_index(cd_curfad)<<8) | (cd_curfad>>16); //index & 0xff00
 		cr4 = cd_curfad;
 	}
+}
+
+void saturn_state::mpeg_standard_return(uint16_t cur_status)
+{
+	cr1 = cur_status | 0x01;
+	cr2 = 0; // V-Counter
+	cr3 = (0 << 8) | 0x10; // Picture Info | audio status
+	cr4 = 0x1000; // video status
 }
 
 void saturn_state::cd_exec_command( void )
@@ -1353,8 +1362,15 @@ void saturn_state::cd_exec_command( void )
 //          cr1 = cd_stat;  // necessary to pass
 //          cr2 = 0x4;
 //          hirqreg |= (CMOK|EFLS|CSCT);
-			sectorstore = 1;
-			hirqreg = 0xfc5;
+			if(cr2 == 0x0001) // MPEG card
+			{
+				hirqreg |= (CMOK|MPED);
+			}
+			else
+			{
+				sectorstore = 1;
+				hirqreg = 0x7c5;
+			}
 			cr_standard_return(cd_stat);
 			status_type = 0;
 			break;
@@ -1364,7 +1380,10 @@ void saturn_state::cd_exec_command( void )
 			if(cd_stat != CD_STAT_NODISC && cd_stat != CD_STAT_OPEN)
 				cd_stat = CD_STAT_PAUSE;
 			cr1 = cd_stat;  // necessary to pass
-			cr2 = 0x4;      // (must return this value to pass bios checks)
+			if(cr2 == 0x0001) // MPEG card
+				cr2 = 0x2;
+			else
+				cr2 = 0x4;    // 0 = No CD, 1 = Audio CD, 2 Regular Data disk (not Saturn), 3 pirate disc, 4 Saturn disc
 			cr3 = 0;
 			cr4 = 0;
 			hirqreg |= (CMOK);
@@ -1372,9 +1391,42 @@ void saturn_state::cd_exec_command( void )
 			status_type = 0;
 			break;
 
+		// following are MPEG commands, enough to get Sport Fishing to do something
+		// MPEG Get Status
+		case 0x90:
+		// MPEG Set IRQ Mask
+		case 0x92:
+		// MPEG Set Mode
+		case 0x94:
+			mpeg_standard_return(cd_stat);
+			hirqreg |= (CMOK);
+			break;
+
+		// MPEG get IRQ
+		case 0x91:
+			cr1 = cd_stat | 0;
+			cr2 = 5;
+			cr3 = 0;
+			cr4 = 0;
+			hirqreg |= (CMOK);
+			break;
+
+		// MPEG init
+		case 0x93:
+			hirqreg |= (CMOK|MPED);
+			if(cr2 == 0x0001)
+				hirqreg |= (MPCM);
+
+			cr1 = cd_stat;
+			cr2 = 0;
+			cr3 = 0;
+			cr4 = 0;
+			break;
+
 		default:
 			CDROM_LOG(("CD: Unknown command %04x\n", cr1>>8))
 			popmessage("CD Block unknown command %02x, contact MAMEdev",cr1>>8);
+
 			hirqreg |= (CMOK);
 			break;
 	}
@@ -1468,9 +1520,9 @@ void saturn_state::stvcd_reset( void )
 	}
 
 	// open device
-	if (cdrom)
+	//if (cdrom)
 	{
-		cdrom_close(cdrom);
+		//cdrom_close(cdrom);
 		cdrom = (cdrom_file *)nullptr;
 	}
 
@@ -1483,7 +1535,7 @@ void saturn_state::stvcd_reset( void )
 	else
 	{
 		// MAME case
-		cdrom = cdrom_open(machine().rom_load().get_disk_handle("cdrom"));
+		cdrom = cdrom_open(machine().rom_load().get_disk_handle(":cdrom"));
 	}
 
 	machine().device<cdda_device>("cdda")->set_cdrom(cdrom);
@@ -2668,6 +2720,7 @@ void saturn_state::stvcd_set_tray_close( void )
 		return;
 
 	hirqreg |= DCHG;
+	cdrom = (cdrom_file *)nullptr;
 
 	cdrom_image_device *cddevice = machine().device<cdrom_image_device>("cdrom");
 	if (cddevice!=nullptr)
@@ -2678,7 +2731,7 @@ void saturn_state::stvcd_set_tray_close( void )
 	else
 	{
 		// MAME case
-		cdrom = cdrom_open(machine().rom_load().get_disk_handle("cdrom"));
+		cdrom = cdrom_open(machine().rom_load().get_disk_handle(":cdrom"));
 	}
 
 	machine().device<cdda_device>("cdda")->set_cdrom(cdrom);

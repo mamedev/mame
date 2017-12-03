@@ -2,7 +2,6 @@
 // copyright-holders:Quench, Yochizo, David Haywood
 
 /**************** Machine stuff ******************/
-//#define USE_HD64x180          /* Define if CPU support is available */
 //#define TRUXTON2_STEREO       /* Uncomment to hear truxton2 music in stereo */
 
 #include "cpu/m68000/m68000.h"
@@ -66,11 +65,10 @@ public:
 	optional_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
-	optional_device<generic_latch_8_device> m_soundlatch; // batrider and bgaregga and batsugun
+	optional_device<generic_latch_8_device> m_soundlatch; // tekipaki, batrider, bgaregga, batsugun
 	optional_device<generic_latch_8_device> m_soundlatch2;
 	optional_device<ticket_dispenser_device> m_hopper;
 
-	uint16_t m_mcu_data;
 	int8_t m_old_p1_paddle_h; /* For Ghox */
 	int8_t m_old_p2_paddle_h;
 	uint8_t m_v25_reset_line; /* 0x20 for dogyuun/batsugun, 0x10 for vfive, 0x08 for fixeight */
@@ -88,12 +86,10 @@ public:
 	DECLARE_WRITE16_MEMBER(shippumd_coin_word_w);
 	DECLARE_READ16_MEMBER(shared_ram_r);
 	DECLARE_WRITE16_MEMBER(shared_ram_w);
-	DECLARE_WRITE16_MEMBER(toaplan2_hd647180_cpu_w);
 	DECLARE_READ16_MEMBER(ghox_p1_h_analog_r);
 	DECLARE_READ16_MEMBER(ghox_p2_h_analog_r);
 	DECLARE_WRITE16_MEMBER(fixeight_subcpu_ctrl_w);
 	DECLARE_WRITE16_MEMBER(fixeightbl_oki_bankswitch_w);
-	DECLARE_READ8_MEMBER(fixeight_region_r);
 	DECLARE_WRITE8_MEMBER(raizing_z80_bankswitch_w);
 	DECLARE_WRITE8_MEMBER(raizing_oki_bankswitch_w);
 	DECLARE_READ8_MEMBER(bgaregga_E01D_r);
@@ -139,10 +135,6 @@ public:
 	DECLARE_VIDEO_START(batrider);
 
 	// Teki Paki sound
-	uint8_t m_cmdavailable;
-
-	DECLARE_WRITE16_MEMBER(tekipaki_mcu_w);
-	DECLARE_READ8_MEMBER(tekipaki_soundlatch_r);
 	DECLARE_READ8_MEMBER(tekipaki_cmdavailable_r);
 
 	uint32_t screen_update_toaplan2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

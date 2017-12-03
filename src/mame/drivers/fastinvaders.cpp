@@ -15,6 +15,7 @@ http://www.citylan.it/wiki/index.php/Fast_Invaders_%288275_version%29
 #include "cpu/i8085/i8085.h"
 #include "machine/i8257.h"
 #include "machine/pic8259.h"
+#include "machine/timer.h"
 #include "video/i8275.h"
 #include "video/mc6845.h"
 #include "screen.h"
@@ -641,7 +642,8 @@ static MACHINE_CONFIG_START( fastinvaders )
 MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("pic8259", pic8259_device, inta_cb)
 MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", fastinvaders_state, scanline_timer, "screen", 0, 1)
 
-	MCFG_PIC8259_ADD( "pic8259", INPUTLINE("maincpu", 0), VCC, NOOP)
+	MCFG_DEVICE_ADD("pic8259", PIC8259, 0)
+	MCFG_PIC8259_OUT_INT_CB(INPUTLINE("maincpu", 0))
 
 	MCFG_DEVICE_ADD("dma8257", I8257, 6144100)
 	MCFG_I8257_IN_MEMR_CB(READ8(fastinvaders_state, memory_read_byte))

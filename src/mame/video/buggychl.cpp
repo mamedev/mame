@@ -58,7 +58,7 @@ WRITE8_MEMBER(buggychl_state::buggychl_ctrl_w)
 	flip_screen_y_set(data & 0x01);
 	flip_screen_x_set(data & 0x02);
 
-	m_bg_on = data & 0x04;
+	m_bg_clip_on = data & 0x04;
 	m_sky_on = data & 0x08;
 
 	m_sprite_color_base = (data & 0x10) ? 1 * 16 : 3 * 16;
@@ -88,8 +88,12 @@ void buggychl_state::draw_bg( bitmap_ind16 &bitmap, const rectangle &cliprect )
 
 	/* prevent wraparound */
 	rectangle clip = cliprect;
-	if (flip_screen_x()) clip.min_x += 8*8;
-	else clip.max_x -= 8*8;
+	// enable clipping if on (title screen disable this to cover all of the area)
+	if(m_bg_clip_on)
+	{
+		if (flip_screen_x()) clip.min_x += 8*8;
+		else clip.max_x -= 8*8;
+	}
 
 	for (offs = 0; offs < 0x400; offs++)
 	{
@@ -228,10 +232,9 @@ uint32_t buggychl_state::screen_update_buggychl(screen_device &screen, bitmap_in
 	if (m_sky_on)
 		draw_sky(bitmap, cliprect);
 	else
-		bitmap.fill(0, cliprect);
+		bitmap.fill(0x20, cliprect); // stage 3 disables sky, wants background pen to be blue
 
-	if (m_bg_on)
-		draw_bg(bitmap, cliprect);
+	draw_bg(bitmap, cliprect);
 
 	draw_sprites(bitmap, cliprect);
 

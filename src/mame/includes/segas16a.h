@@ -166,3 +166,22 @@ protected:
 	uint8_t                   m_mj_input_num;
 	optional_ioport_array<6> m_mj_inputs;
 };
+
+class afighter_16a_analog_state : public segas16a_state
+{
+public:
+	// construction/destruction
+	afighter_16a_analog_state(const machine_config &mconfig, device_type type, const char *tag)
+		: segas16a_state(mconfig, type, tag),
+			m_accel(*this, "ACCEL"),
+			m_steer(*this, "STEER")
+	{ }
+
+	DECLARE_CUSTOM_INPUT_MEMBER(afighter_accel_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(afighter_handl_left_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(afighter_handl_right_r);
+
+	protected:
+	required_ioport     m_accel;
+	required_ioport     m_steer;
+};

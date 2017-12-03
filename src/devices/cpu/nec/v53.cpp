@@ -515,7 +515,10 @@ MACHINE_CONFIG_MEMBER( v53_base_device::device_add_mconfig )
 	MCFG_AM9517A_OUT_DACK_3_CB(WRITELINE(v53_base_device, dma_dack3_trampoline_w))
 
 
-	MCFG_PIC8259_ADD( "upd71059pic", WRITELINE(v53_base_device, internal_irq_w), VCC, READ8(v53_base_device, get_pic_ack))
+	MCFG_DEVICE_ADD("upd71059pic", PIC8259, 0)
+	MCFG_PIC8259_OUT_INT_CB(WRITELINE(v53_base_device, internal_irq_w))
+	MCFG_PIC8259_IN_SP_CB(VCC)
+	MCFG_PIC8259_CASCADE_ACK_CB(READ8(v53_base_device, get_pic_ack))
 
 
 

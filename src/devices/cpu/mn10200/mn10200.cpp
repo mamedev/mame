@@ -11,6 +11,7 @@
 #include "emu.h"
 #include "debugger.h"
 #include "mn10200.h"
+#include "mn102dis.h"
 
 #define log_write(...)
 #define log_event(...)
@@ -88,10 +89,9 @@ void mn10200_device::state_string_export(const device_state_entry &entry, std::s
 	}
 }
 
-offs_t mn10200_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+util::disasm_interface *mn10200_device::create_disassembler()
 {
-	extern CPU_DISASSEMBLE( mn10200 );
-	return CPU_DISASSEMBLE_NAME(mn10200)(this, stream, pc, oprom, opram, options);
+	return new mn10200_disassembler;
 }
 
 
@@ -208,10 +208,12 @@ void mn10200_device::device_start()
 		m_serial[i].ctrll = 0;
 		m_serial[i].ctrlh = 0;
 		m_serial[i].buf = 0;
+		m_serial[i].recv = 0;
 
 		save_item(NAME(m_serial[i].ctrll), i);
 		save_item(NAME(m_serial[i].ctrlh), i);
 		save_item(NAME(m_serial[i].buf), i);
+		save_item(NAME(m_serial[i].recv), i);
 	}
 
 	// ports
@@ -2153,13 +2155,13 @@ READ8_MEMBER(mn10200_device::io_control_r)
 		case 0x181: case 0x191:
 			return m_serial[(offset-0x180) >> 4].ctrlh;
 
-		case 0x182:
+		case 0x182: //case 0x192:
 		{
-			static int zz;
-			return zz++;
+			int ser = (offset-0x180) >> 4;
+			return m_serial[ser].recv++;
 		}
 
-		case 0x183:
+		case 0x183: //case 0x193:
 			return 0x10;
 
 		// 8-bit timers

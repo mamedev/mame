@@ -28,6 +28,7 @@
 #include "emu.h"
 #include "includes/eprom.h"
 #include "cpu/m68000/m68000.h"
+#include "machine/eeprompar.h"
 #include "machine/watchdog.h"
 #include "screen.h"
 #include "speaker.h"
@@ -147,10 +148,10 @@ WRITE16_MEMBER(eprom_state::sync_w)
 
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, eprom_state )
 	AM_RANGE(0x000000, 0x09ffff) AM_ROM
-	AM_RANGE(0x0e0000, 0x0e0fff) AM_DEVREADWRITE8("eeprom", atari_eeprom_device, read, write, 0x00ff)
+	AM_RANGE(0x0e0000, 0x0e0fff) AM_DEVREADWRITE8("eeprom", eeprom_parallel_28xx_device, read, write, 0x00ff)
 	AM_RANGE(0x16cc00, 0x16cc01) AM_READWRITE(sync_r, sync_w)
 	AM_RANGE(0x160000, 0x16ffff) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0x1f0000, 0x1fffff) AM_DEVWRITE("eeprom", atari_eeprom_device, unlock_write)
+	AM_RANGE(0x1f0000, 0x1fffff) AM_DEVWRITE("eeprom", eeprom_parallel_28xx_device, unlock_write)
 	AM_RANGE(0x260000, 0x26000f) AM_READ_PORT("260000")
 	AM_RANGE(0x260010, 0x26001f) AM_READ(special_port1_r)
 	AM_RANGE(0x260020, 0x26002f) AM_READ(adc_r)
@@ -172,10 +173,10 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( guts_map, AS_PROGRAM, 16, eprom_state )
 	AM_RANGE(0x000000, 0x09ffff) AM_ROM
-	AM_RANGE(0x0e0000, 0x0e0fff) AM_DEVREADWRITE8("eeprom", atari_eeprom_device, read, write, 0x00ff)
+	AM_RANGE(0x0e0000, 0x0e0fff) AM_DEVREADWRITE8("eeprom", eeprom_parallel_28xx_device, read, write, 0x00ff)
 	AM_RANGE(0x16cc00, 0x16cc01) AM_READWRITE(sync_r, sync_w)
 	AM_RANGE(0x160000, 0x16ffff) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0x1f0000, 0x1fffff) AM_DEVWRITE("eeprom", atari_eeprom_device, unlock_write)
+	AM_RANGE(0x1f0000, 0x1fffff) AM_DEVWRITE("eeprom", eeprom_parallel_28xx_device, unlock_write)
 	AM_RANGE(0x260000, 0x26000f) AM_READ_PORT("260000")
 	AM_RANGE(0x260010, 0x26001f) AM_READ(special_port1_r)
 	AM_RANGE(0x260020, 0x26002f) AM_READ(adc_r)
@@ -401,7 +402,8 @@ static MACHINE_CONFIG_START( eprom )
 	MCFG_MACHINE_START_OVERRIDE(eprom_state,eprom)
 	MCFG_MACHINE_RESET_OVERRIDE(eprom_state,eprom)
 
-	MCFG_ATARI_EEPROM_2804_ADD("eeprom")
+	MCFG_EEPROM_2804_ADD("eeprom")
+	MCFG_EEPROM_28XX_LOCK_AFTER_WRITE(true)
 
 	MCFG_WATCHDOG_ADD("watchdog")
 
@@ -446,7 +448,8 @@ static MACHINE_CONFIG_START( klaxp )
 	MCFG_MACHINE_START_OVERRIDE(eprom_state,eprom)
 	MCFG_MACHINE_RESET_OVERRIDE(eprom_state,eprom)
 
-	MCFG_ATARI_EEPROM_2804_ADD("eeprom")
+	MCFG_EEPROM_2804_ADD("eeprom")
+	MCFG_EEPROM_28XX_LOCK_AFTER_WRITE(true)
 
 	MCFG_WATCHDOG_ADD("watchdog")
 
@@ -490,7 +493,8 @@ static MACHINE_CONFIG_START( guts )
 	MCFG_MACHINE_START_OVERRIDE(eprom_state,eprom)
 	MCFG_MACHINE_RESET_OVERRIDE(eprom_state,eprom)
 
-	MCFG_ATARI_EEPROM_2804_ADD("eeprom")
+	MCFG_EEPROM_2804_ADD("eeprom")
+	MCFG_EEPROM_28XX_LOCK_AFTER_WRITE(true)
 
 	MCFG_WATCHDOG_ADD("watchdog")
 

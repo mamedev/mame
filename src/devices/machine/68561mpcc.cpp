@@ -76,10 +76,8 @@ FEATURES
 
 #ifdef _MSC_VER
 #define FUNCNAME __func__
-#define LLFORMAT "%I64d"
 #else
 #define FUNCNAME __PRETTY_FUNCTION__
-#define LLFORMAT "%lld"
 #endif
 
 //**************************************************************************
@@ -589,7 +587,7 @@ void mpcc_device::tra_complete()
 }
 
 //-------------------------------------------------
-//  rcv_callback - called when it is time to sample incomming data bit
+//  rcv_callback - called when it is time to sample incoming data bit
 //-------------------------------------------------
 void mpcc_device::rcv_callback()
 {

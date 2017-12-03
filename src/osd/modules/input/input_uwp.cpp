@@ -492,7 +492,7 @@ internal:
 		{
 			ui_event uiev;
 			memset(&uiev, 0, sizeof(uiev));
-			uiev.event_type = UI_EVENT_CHAR;
+			uiev.event_type = ui_event::IME_CHAR;
 			this->Machine.ui_input().push_event(uiev);
 		}
 	}

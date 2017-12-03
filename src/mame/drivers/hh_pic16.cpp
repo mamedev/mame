@@ -47,6 +47,7 @@
 #include "emu.h"
 #include "cpu/pic16c5x/pic16c5x.h"
 #include "machine/clock.h"
+#include "machine/timer.h"
 #include "sound/spkrdev.h"
 #include "speaker.h"
 

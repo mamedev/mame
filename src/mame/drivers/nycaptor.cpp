@@ -211,16 +211,6 @@ WRITE8_MEMBER(nycaptor_state::sub_cpu_halt_w)
 	m_subcpu->set_input_line(INPUT_LINE_HALT, (data) ? ASSERT_LINE : CLEAR_LINE);
 }
 
-READ8_MEMBER(nycaptor_state::from_snd_r)
-{
-	return m_snd_data;
-}
-
-WRITE8_MEMBER(nycaptor_state::to_main_w)
-{
-	m_snd_data = data;
-}
-
 READ8_MEMBER(nycaptor_state::nycaptor_b_r)
 {
 	return 1;
@@ -259,52 +249,21 @@ READ8_MEMBER(nycaptor_state::nycaptor_mcu_status_r2)
 	return (CLEAR_LINE != m_bmcu->host_semaphore_r()) ? 0 : 1;
 }
 
-
-MACHINE_RESET_MEMBER(nycaptor_state,ta7630)
+READ8_MEMBER(nycaptor_state::sound_status_r)
 {
-	int i;
-	double db           = 0.0;
-	double db_step      = 0.50; /* 0.50 dB step (at least, maybe more) */
-	double db_step_inc  = 0.275;
-
-	for (i = 0; i < 16; i++)
-	{
-		double max = 100.0 / pow(10.0, db/20.0 );
-		m_vol_ctrl[15 - i] = max;
-		/*logerror("vol_ctrl[%x] = %i (%f dB)\n", 15 - i, m_vol_ctrl[15 - i], db);*/
-		db += db_step;
-		db_step += db_step_inc;
-	}
+	return (m_soundlatch->pending_r() ? 1 : 0) | (m_soundlatch2->pending_r() ? 2 : 0);
 }
 
-TIMER_CALLBACK_MEMBER(nycaptor_state::nmi_callback)
-{
-	if (m_sound_nmi_enable)
-		m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
-	else
-		m_pending_nmi = 1;
-}
 
-WRITE8_MEMBER(nycaptor_state::sound_command_w)
-{
-	m_soundlatch->write(space, 0, data);
-	machine().scheduler().synchronize(timer_expired_delegate(FUNC(nycaptor_state::nmi_callback),this), data);
-}
 
 WRITE8_MEMBER(nycaptor_state::nmi_disable_w)
 {
-	m_sound_nmi_enable = 0;
+	m_soundnmi->in_w<1>(0);
 }
 
 WRITE8_MEMBER(nycaptor_state::nmi_enable_w)
 {
-	m_sound_nmi_enable = 1;
-
-	if (m_pending_nmi)
-	{
-		m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
-		m_pending_nmi = 0;
-	}
+	m_soundnmi->in_w<1>(1);
 }
 
 WRITE8_MEMBER(nycaptor_state::unk_w)
@@ -329,7 +288,7 @@ static ADDRESS_MAP_START( nycaptor_master_map, AS_PROGRAM, 8, nycaptor_state )
 	AM_RANGE(0xd000, 0xd000) AM_DEVREADWRITE("bmcu", taito68705_mcu_device, data_r, data_w)
 	AM_RANGE(0xd001, 0xd001) AM_WRITE(sub_cpu_halt_w)
 	AM_RANGE(0xd002, 0xd002) AM_READWRITE(nycaptor_generic_control_r, nycaptor_generic_control_w)   /* bit 3 - memory bank at 0x8000-0xbfff */
-	AM_RANGE(0xd400, 0xd400) AM_READWRITE(from_snd_r, sound_command_w)
+	AM_RANGE(0xd400, 0xd400) AM_DEVREAD("soundlatch2", generic_latch_8_device, read) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
 	AM_RANGE(0xd401, 0xd401) AM_READNOP
 	AM_RANGE(0xd403, 0xd403) AM_WRITE(sound_cpu_reset_w)
 	AM_RANGE(0xd800, 0xd800) AM_READ_PORT("DSWA")
@@ -338,7 +297,7 @@ static ADDRESS_MAP_START( nycaptor_master_map, AS_PROGRAM, 8, nycaptor_state )
 	AM_RANGE(0xd803, 0xd803) AM_READ_PORT("IN0")
 	AM_RANGE(0xd804, 0xd804) AM_READ_PORT("IN1")
 	AM_RANGE(0xd805, 0xd805) AM_READ(nycaptor_mcu_status_r1)
-	AM_RANGE(0xd806, 0xd806) AM_READNOP /* unknown ?sound? */
+	AM_RANGE(0xd806, 0xd806) AM_READ(sound_status_r)
 	AM_RANGE(0xd807, 0xd807) AM_READ(nycaptor_mcu_status_r2)
 	AM_RANGE(0xdc00, 0xdc9f) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0xdca0, 0xdcbf) AM_RAM_WRITE(nycaptor_scrlram_w) AM_SHARE("scrlram")
@@ -367,7 +326,7 @@ static ADDRESS_MAP_START( nycaptor_slave_map, AS_PROGRAM, 8, nycaptor_state )
 	AM_RANGE(0xe000, 0xffff) AM_RAM AM_SHARE("sharedram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( nycaptor_sound_map, AS_PROGRAM, 8, nycaptor_state )
+static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, nycaptor_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
 	AM_RANGE(0xc800, 0xc801) AM_DEVWRITE("ay1", ay8910_device, address_data_w)
@@ -376,10 +335,10 @@ static ADDRESS_MAP_START( nycaptor_sound_map, AS_PROGRAM, 8, nycaptor_state )
 	AM_RANGE(0xca00, 0xca00) AM_WRITENOP
 	AM_RANGE(0xcb00, 0xcb00) AM_WRITENOP
 	AM_RANGE(0xcc00, 0xcc00) AM_WRITENOP
-	AM_RANGE(0xd000, 0xd000) AM_DEVREAD("soundlatch", generic_latch_8_device, read) AM_WRITE(to_main_w)
+	AM_RANGE(0xd000, 0xd000) AM_DEVREAD("soundlatch", generic_latch_8_device, read) AM_DEVWRITE("soundlatch2", generic_latch_8_device, write)
 	AM_RANGE(0xd200, 0xd200) AM_READNOP AM_WRITE(nmi_enable_w)
 	AM_RANGE(0xd400, 0xd400) AM_WRITE(nmi_disable_w)
-	AM_RANGE(0xd600, 0xd600) AM_WRITENOP
+	AM_RANGE(0xd600, 0xd600) AM_DEVWRITE("dac", dac_byte_interface, write) //otherwise no girl's scream in cycle shooting, see MT03975
 	AM_RANGE(0xe000, 0xefff) AM_NOP
 ADDRESS_MAP_END
 
@@ -424,7 +383,7 @@ static ADDRESS_MAP_START( cyclshtg_master_map, AS_PROGRAM, 8, nycaptor_state )
 	AM_RANGE(0xd000, 0xd000) AM_READWRITE(cyclshtg_mcu_r, cyclshtg_mcu_w)
 	AM_RANGE(0xd001, 0xd001) AM_WRITE(sub_cpu_halt_w)
 	AM_RANGE(0xd002, 0xd002) AM_READWRITE(nycaptor_generic_control_r, cyclshtg_generic_control_w)
-	AM_RANGE(0xd400, 0xd400) AM_READWRITE(from_snd_r, sound_command_w)
+	AM_RANGE(0xd400, 0xd400) AM_DEVREAD("soundlatch2", generic_latch_8_device, read) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
 	AM_RANGE(0xd403, 0xd403) AM_WRITE(sound_cpu_reset_w)
 	AM_RANGE(0xd800, 0xd800) AM_READ_PORT("DSWA")
 	AM_RANGE(0xd801, 0xd801) AM_READ_PORT("DSWB")
@@ -432,7 +391,7 @@ static ADDRESS_MAP_START( cyclshtg_master_map, AS_PROGRAM, 8, nycaptor_state )
 	AM_RANGE(0xd803, 0xd803) AM_READ_PORT("IN0")
 	AM_RANGE(0xd804, 0xd804) AM_READ_PORT("IN1")
 	AM_RANGE(0xd805, 0xd805) AM_READ(cyclshtg_mcu_status_r)
-	AM_RANGE(0xd806, 0xd806) AM_READNOP
+	AM_RANGE(0xd806, 0xd806) AM_READ(sound_status_r)
 	AM_RANGE(0xd807, 0xd807) AM_READ(cyclshtg_mcu_status_r)
 	AM_RANGE(0xdc00, 0xdc9f) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0xdca0, 0xdcbf) AM_RAM_WRITE(nycaptor_scrlram_w) AM_SHARE("scrlram")
@@ -461,11 +420,6 @@ static ADDRESS_MAP_START( cyclshtg_slave_map, AS_PROGRAM, 8, nycaptor_state )
 	AM_RANGE(0xe000, 0xffff) AM_RAM AM_SHARE("sharedram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( cyclshtg_sound_map, AS_PROGRAM, 8, nycaptor_state )
-	AM_RANGE(0xd600, 0xd600) AM_DEVWRITE("dac", dac_byte_interface, write) //otherwise no girl's scream, see MT03975
-	AM_IMPORT_FROM( nycaptor_sound_map )
-ADDRESS_MAP_END
-
 READ8_MEMBER(nycaptor_state::unk_r)
 {
 	return machine().rand();
@@ -478,7 +432,7 @@ static ADDRESS_MAP_START( bronx_master_map, AS_PROGRAM, 8, nycaptor_state )
 	AM_RANGE(0xd000, 0xd000) AM_READ(cyclshtg_mcu_r) AM_WRITENOP
 	AM_RANGE(0xd001, 0xd001) AM_WRITE(sub_cpu_halt_w)
 	AM_RANGE(0xd002, 0xd002) AM_READWRITE(nycaptor_generic_control_r, cyclshtg_generic_control_w)
-	AM_RANGE(0xd400, 0xd400) AM_READWRITE(from_snd_r, sound_command_w)
+	AM_RANGE(0xd400, 0xd400) AM_DEVREAD("soundlatch2", generic_latch_8_device, read) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
 	AM_RANGE(0xd401, 0xd401) AM_READ(unk_r)
 	AM_RANGE(0xd403, 0xd403) AM_WRITE(sound_cpu_reset_w)
 	AM_RANGE(0xd800, 0xd800) AM_READ_PORT("DSWA")
@@ -487,7 +441,7 @@ static ADDRESS_MAP_START( bronx_master_map, AS_PROGRAM, 8, nycaptor_state )
 	AM_RANGE(0xd803, 0xd803) AM_READ_PORT("IN0")
 	AM_RANGE(0xd804, 0xd804) AM_READ_PORT("IN1")
 	AM_RANGE(0xd805, 0xd805) AM_READ(cyclshtg_mcu_status_r)
-	AM_RANGE(0xd806, 0xd806) AM_READNOP
+	AM_RANGE(0xd806, 0xd806) AM_READ(sound_status_r)
 	AM_RANGE(0xd807, 0xd807) AM_READ(cyclshtg_mcu_status_r)
 	AM_RANGE(0xdc00, 0xdc9f) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0xdca0, 0xdcbf) AM_RAM_WRITE(nycaptor_scrlram_w) AM_SHARE("scrlram")
@@ -753,33 +707,21 @@ void nycaptor_state::machine_start()
 		membank("bank1")->configure_entries(0, 4, memregion("maincpu")->base() + 0x10000, 0x4000);
 
 	save_item(NAME(m_generic_control_reg));
-	save_item(NAME(m_sound_nmi_enable));
-	save_item(NAME(m_pending_nmi));
-	save_item(NAME(m_snd_data));
-	save_item(NAME(m_vol_ctrl));
 
 	save_item(NAME(m_char_bank));
 	save_item(NAME(m_palette_bank));
 	save_item(NAME(m_gfxctrl));
-
-
 }
 
 void nycaptor_state::machine_reset()
 {
-	MACHINE_RESET_CALL_MEMBER(ta7630);
+//  MACHINE_RESET_CALL_MEMBER(ta7630);
 
 	m_generic_control_reg = 0;
-	m_sound_nmi_enable = 0;
-	m_pending_nmi = 0;
-	m_snd_data = 0;
 
 	m_char_bank = 0;
 	m_palette_bank = 0;
 	m_gfxctrl = 0;
-
-
-	memset(m_vol_ctrl, 0, sizeof(m_vol_ctrl));
 }
 
 static MACHINE_CONFIG_START( nycaptor )
@@ -794,7 +736,7 @@ static MACHINE_CONFIG_START( nycaptor )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", nycaptor_state,  irq0_line_hold)   /* IRQ generated by ??? */
 
 	MCFG_CPU_ADD("audiocpu", Z80,8000000/2)
-	MCFG_CPU_PROGRAM_MAP(nycaptor_sound_map)
+	MCFG_CPU_PROGRAM_MAP(sound_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(nycaptor_state, irq0_line_hold, 2*60)  /* IRQ generated by ??? */
 
 	MCFG_DEVICE_ADD("bmcu", TAITO68705_MCU,2000000)
@@ -820,6 +762,12 @@ static MACHINE_CONFIG_START( nycaptor )
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(DEVWRITELINE("soundnmi", input_merger_device, in_w<0>))
+
+	MCFG_INPUT_MERGER_ALL_HIGH("soundnmi")
+	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("audiocpu", INPUT_LINE_NMI))
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
 
 	MCFG_SOUND_ADD("ay1", AY8910, 8000000/4)
 	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(nycaptor_state, unk_w))
@@ -846,6 +794,10 @@ static MACHINE_CONFIG_START( nycaptor )
 	// pin 22 Noise Output  not mapped
 
 	// Does the DAC also exist on this board? nycaptor writes 0x80 to 0xd600
+	// Update: of course it exists, sound board seems common Taito design.
+	MCFG_SOUND_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25) // unknown DAC
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( cyclshtg )
@@ -859,7 +811,7 @@ static MACHINE_CONFIG_START( cyclshtg )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", nycaptor_state,  irq0_line_hold)
 
 	MCFG_CPU_ADD("audiocpu", Z80,8000000/2)
-	MCFG_CPU_PROGRAM_MAP(cyclshtg_sound_map)
+	MCFG_CPU_PROGRAM_MAP(sound_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(nycaptor_state, irq0_line_hold, 2*60)
 
 #ifdef USE_MCU
@@ -884,6 +836,12 @@ static MACHINE_CONFIG_START( cyclshtg )
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(DEVWRITELINE("soundnmi", input_merger_device, in_w<0>))
+
+	MCFG_INPUT_MERGER_ALL_HIGH("soundnmi")
+	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("audiocpu", INPUT_LINE_NMI))
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
 
 	MCFG_SOUND_ADD("ay1", AY8910, 8000000/4)
 	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(nycaptor_state, unk_w))
@@ -927,7 +885,7 @@ static MACHINE_CONFIG_START( bronx )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", nycaptor_state,  irq0_line_hold)
 
 	MCFG_CPU_ADD("audiocpu", Z80,8000000/2)
-	MCFG_CPU_PROGRAM_MAP(cyclshtg_sound_map)
+	MCFG_CPU_PROGRAM_MAP(sound_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(nycaptor_state, irq0_line_hold, 2*60)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(120))
@@ -947,6 +905,12 @@ static MACHINE_CONFIG_START( bronx )
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(DEVWRITELINE("soundnmi", input_merger_device, in_w<0>))
+
+	MCFG_INPUT_MERGER_ALL_HIGH("soundnmi")
+	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("audiocpu", INPUT_LINE_NMI))
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
 
 	MCFG_SOUND_ADD("ay1", AY8910, 8000000/4)
 	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(nycaptor_state, unk_w))

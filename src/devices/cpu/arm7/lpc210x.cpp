@@ -41,7 +41,7 @@ ADDRESS_MAP_END
 
 
 lpc210x_device::lpc210x_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: arm7_cpu_device(mconfig, LPC2103, tag, owner, clock, 4, eARM_ARCHFLAGS_T, ENDIANNESS_LITTLE)
+	: arm7_cpu_device(mconfig, LPC2103, tag, owner, clock, 4, ARCHFLAG_T, ENDIANNESS_LITTLE)
 	, m_program_config("program", ENDIANNESS_LITTLE, 32, 32, 0, ADDRESS_MAP_NAME(lpc2103_map))
 {
 }

@@ -13,6 +13,7 @@
 #pragma once
 
 #include <iosfwd>
+#include <unordered_map>
 
 
 //**************************************************************************
@@ -68,9 +69,10 @@ private:
 	// internal keyboard code information
 	struct keycode_map_entry
 	{
-		char32_t        ch;
 		ioport_field *  field[SHIFT_COUNT + 1];
+		unsigned        shift;
 	};
+	typedef std::unordered_map<char32_t, keycode_map_entry> keycode_map;
 
 	// internal helpers
 	void build_codes(ioport_manager &manager);
@@ -96,7 +98,7 @@ private:
 	ioport_queue_chars_delegate     m_queue_chars;      // queue characters callback
 	ioport_accept_char_delegate     m_accept_char;      // accept character callback
 	ioport_charqueue_empty_delegate m_charqueue_empty;  // character queue empty callback
-	std::vector<keycode_map_entry>  m_keycode_map;      // keycode map
+	keycode_map                     m_keycode_map;      // keycode map
 };
 
 

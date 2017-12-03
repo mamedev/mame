@@ -22,6 +22,7 @@
 
 #include "emu.h"
 #include "includes/atarig1.h"
+#include "machine/eeprompar.h"
 #include "machine/watchdog.h"
 #include "speaker.h"
 
@@ -195,7 +196,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, atarig1_state )
 	AM_RANGE(0x040000, 0x077fff) AM_ROM
 	AM_RANGE(0x078000, 0x07ffff) AM_ROM /* hydra slapstic goes here */
 	AM_RANGE(0xf80000, 0xf80001) AM_DEVWRITE("watchdog", watchdog_timer_device, reset16_w)
-	AM_RANGE(0xf88000, 0xf8ffff) AM_DEVWRITE("eeprom", atari_eeprom_device, unlock_write)
+	AM_RANGE(0xf88000, 0xf8ffff) AM_DEVWRITE("eeprom", eeprom_parallel_28xx_device, unlock_write)
 	AM_RANGE(0xf90000, 0xf90001) AM_DEVWRITE8("jsa", atari_jsa_ii_device, main_command_w, 0xff00)
 	AM_RANGE(0xf98000, 0xf98001) AM_DEVWRITE("jsa", atari_jsa_ii_device, sound_reset_w)
 	AM_RANGE(0xfa0000, 0xfa0001) AM_DEVWRITE8("rle", atari_rle_objects_device, control_write, 0x00ff)
@@ -203,7 +204,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, atarig1_state )
 	AM_RANGE(0xfc0000, 0xfc0001) AM_READ(special_port0_r)
 	AM_RANGE(0xfc8000, 0xfc8007) AM_READWRITE(a2d_data_r, a2d_select_w)
 	AM_RANGE(0xfd0000, 0xfd0001) AM_DEVREAD8("jsa", atari_jsa_ii_device, main_response_r, 0xff00)
-	AM_RANGE(0xfd8000, 0xfdffff) AM_DEVREADWRITE8("eeprom", atari_eeprom_device, read, write, 0x00ff)
+	AM_RANGE(0xfd8000, 0xfdffff) AM_DEVREADWRITE8("eeprom", eeprom_parallel_28xx_device, read, write, 0x00ff)
 /*  AM_RANGE(0xfe0000, 0xfe7fff) AM_READ(from_r)*/
 	AM_RANGE(0xfe8000, 0xfe89ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0xff0000, 0xff0fff) AM_RAM AM_SHARE("rle")
@@ -433,7 +434,8 @@ static MACHINE_CONFIG_START( atarig1 )
 	MCFG_MACHINE_START_OVERRIDE(atarig1_state,atarig1)
 	MCFG_MACHINE_RESET_OVERRIDE(atarig1_state,atarig1)
 
-	MCFG_ATARI_EEPROM_2816_ADD("eeprom")
+	MCFG_EEPROM_2816_ADD("eeprom")
+	MCFG_EEPROM_28XX_LOCK_AFTER_WRITE(true)
 
 	MCFG_WATCHDOG_ADD("watchdog")
 

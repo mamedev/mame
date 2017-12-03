@@ -10,9 +10,23 @@
     supporting stereo sound.  The left channel was at $FF7A, and the right
     channel was at $FF7B
 
+
+    Hidden Code exists in the ORCH-90 to produce a higher quality output.
+    Once you start the PAK, hit "SHIFT+ENTER" at the title screen.  Once you
+    are at command, type the following (playing the William Tell default):
+    "S" + "ENTER"
+    "P" + "SHIFT+ENTER"
+
+    The output will be cleaner due to code causing a change in CPU speed by
+    addressing CPU registers to run the 6809 at 2x speed.
+
+    "P" + "ENTER" will play at regular CPU speed.  The difference should be
+    very noticable.
+
 ***************************************************************************/
 
 #include "emu.h"
+#include "coco_orch90.h"
 #include "cococart.h"
 
 #include "sound/dac.h"

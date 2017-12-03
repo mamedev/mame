@@ -62,7 +62,9 @@
 
 // ======================> esqpanel_device
 
-class esqpanel_external_panel_server;
+namespace esqpanel {
+	class external_panel_server;
+}
 
 class esqpanel_device : public device_t, public device_serial_interface
 {
@@ -107,7 +109,7 @@ protected:
 
 	bool m_eps_mode;
 
-	esqpanel_external_panel_server *m_external_panel_server;
+	esqpanel::external_panel_server *m_external_panel_server;
 
 private:
 	static const int XMIT_RING_SIZE = 16;

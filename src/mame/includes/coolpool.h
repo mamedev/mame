@@ -3,6 +3,7 @@
 #define NVRAM_UNLOCK_SEQ_LEN 10
 
 #include "cpu/tms34010/tms34010.h"
+#include "machine/timer.h"
 #include "video/tlc34076.h"
 
 class coolpool_state : public driver_device

@@ -12,6 +12,7 @@
 #include "bus/hp9845_io/hp9845_io.h"
 #include "screen.h"
 #include "machine/ram.h"
+#include "machine/timer.h"
 
 class hp9845_base_state : public driver_device
 {

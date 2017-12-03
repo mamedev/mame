@@ -175,7 +175,7 @@ void menu_load_save_state_base::populate(float &customtop, float &custombottom)
 	std::sort(
 		m_entries_vec.begin(),
 		m_entries_vec.end(),
-		[this](const file_entry *a, const file_entry *b)
+		[](const file_entry *a, const file_entry *b)
 		{
 			return a->last_modified() > b->last_modified();
 		});
@@ -328,9 +328,7 @@ void menu_load_save_state_base::slot_selected(std::string &&name)
 
 void menu_load_save_state_base::custom_render(void *selectedref, float top, float bottom, float origx1, float origy1, float origx2, float origy2)
 {
-	extra_text_render(top, bottom, origx1, origy1, origx2, origy2,
-		m_header,
-		m_footer);
+	extra_text_render(top, bottom, origx1, origy1, origx2, origy2, m_header, m_footer);
 }
 
 
@@ -355,15 +353,16 @@ const menu_load_save_state_base::file_entry &menu_load_save_state_base::file_ent
 
 
 //-------------------------------------------------
-//  is_present
+//  state_name
 //-------------------------------------------------
 
 std::string menu_load_save_state_base::state_directory() const
 {
+	const char *stateopt = machine().options().state_name();
 	return util::string_format("%s%s%s",
 		machine().options().state_directory(),
 		PATH_SEPARATOR,
-		machine().system().name);
+		machine().get_statename(stateopt));
 }
 
 

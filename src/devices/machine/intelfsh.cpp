@@ -87,6 +87,7 @@ DEFINE_DEVICE_TYPE(AMD_29F040,            amd_29f040_device,            "amd_29f
 DEFINE_DEVICE_TYPE(AMD_29F080,            amd_29f080_device,            "amd_29f080",            "AMD 29F080 Flash")
 DEFINE_DEVICE_TYPE(AMD_29F400T,           amd_29f400t_device,           "amd_29f400t",           "AMD 29F400T Flash")
 DEFINE_DEVICE_TYPE(AMD_29F800T,           amd_29f800t_device,           "amd_29f800t",           "AMD 29F800T Flash")
+DEFINE_DEVICE_TYPE(AMD_29F800B_16BIT,     amd_29f800b_16bit_device,     "amd_29f800b_16bit",     "AMD 29F800B Flash used in 16 bit mode")
 DEFINE_DEVICE_TYPE(AMD_29LV200T,          amd_29lv200t_device,          "amd_29lv200t",          "AMD 29LV200T Flash")
 DEFINE_DEVICE_TYPE(FUJITSU_29F160T,       fujitsu_29f160t_device,       "fujitsu_29f160t",       "Fujitsu 29F160T Flash")
 DEFINE_DEVICE_TYPE(FUJITSU_29F016A,       fujitsu_29f016a_device,       "fujitsu_29f016a",       "Fujitsu 29F016A Flash")
@@ -203,6 +204,13 @@ intelfsh_device::intelfsh_device(const machine_config &mconfig, device_type type
 		m_maker_id = MFG_AMD;
 		m_device_id = 0xda;
 		m_top_boot_sector = true;
+		break;
+	case FLASH_AMD_29F800B_16BIT:
+		m_bits = 16;
+		m_size = 0x100000;
+		m_maker_id = MFG_AMD;
+		m_device_id = 0x2258;
+		m_top_boot_sector = false;
 		break;
 	case FLASH_AMD_29LV200T:
 		m_bits = 8;
@@ -386,6 +394,9 @@ amd_29f400t_device::amd_29f400t_device(const machine_config &mconfig, const char
 
 amd_29f800t_device::amd_29f800t_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: intelfsh8_device(mconfig, AMD_29F800T, tag, owner, clock, FLASH_AMD_29F800T) { }
+
+amd_29f800b_16bit_device::amd_29f800b_16bit_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: intelfsh16_device(mconfig, AMD_29F800B_16BIT, tag, owner, clock, FLASH_AMD_29F800B_16BIT) { }
 
 amd_29lv200t_device::amd_29lv200t_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: intelfsh8_device(mconfig, AMD_29LV200T, tag, owner, clock, FLASH_AMD_29LV200T) { }
@@ -638,7 +649,7 @@ uint32_t intelfsh_device::read_full(uint32_t address)
 		break;
 	}
 
-	//logerror( "intelflash_read( %08x ) %08x\n", address, data );
+	//if (m_flash_mode != FM_NORMAL) logerror( "intelflash_read( %08x ) %08x\n", address, data );
 
 	return data;
 }

@@ -194,8 +194,8 @@ RoadBlasters (aka Future Vette):005*
 #include "includes/atarisy1.h"
 #include "cpu/m68000/m68000.h"
 #include "cpu/m6502/m6502.h"
-#include "machine/atarigen.h"
 #include "machine/6522via.h"
+#include "machine/eeprompar.h"
 #include "machine/watchdog.h"
 #include "sound/pokey.h"
 #include "sound/ym2151.h"
@@ -456,13 +456,13 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, atarisy1_state )
 	AM_RANGE(0x860000, 0x860001) AM_WRITE(atarisy1_bankselect_w) AM_SHARE("bankselect")
 	AM_RANGE(0x880000, 0x880001) AM_DEVWRITE("watchdog", watchdog_timer_device, reset16_w)
 	AM_RANGE(0x8a0000, 0x8a0001) AM_WRITE(video_int_ack_w)
-	AM_RANGE(0x8c0000, 0x8c0001) AM_DEVWRITE("eeprom", atari_eeprom_device, unlock_write)
+	AM_RANGE(0x8c0000, 0x8c0001) AM_DEVWRITE("eeprom", eeprom_parallel_28xx_device, unlock_write)
 	AM_RANGE(0x900000, 0x9fffff) AM_RAM
 	AM_RANGE(0xa00000, 0xa01fff) AM_RAM_DEVWRITE("playfield", tilemap_device, write) AM_SHARE("playfield")
 	AM_RANGE(0xa02000, 0xa02fff) AM_RAM_WRITE(atarisy1_spriteram_w) AM_SHARE("mob")
 	AM_RANGE(0xa03000, 0xa03fff) AM_RAM_DEVWRITE("alpha", tilemap_device, write) AM_SHARE("alpha")
 	AM_RANGE(0xb00000, 0xb007ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
-	AM_RANGE(0xf00000, 0xf00fff) AM_DEVREADWRITE8("eeprom", atari_eeprom_device, read, write, 0x00ff)
+	AM_RANGE(0xf00000, 0xf00fff) AM_DEVREADWRITE8("eeprom", eeprom_parallel_28xx_device, read, write, 0x00ff)
 	AM_RANGE(0xf20000, 0xf20007) AM_READ(trakball_r)
 	AM_RANGE(0xf40000, 0xf4001f) AM_READWRITE(joystick_r, joystick_w)
 	AM_RANGE(0xf60000, 0xf60003) AM_READ_PORT("F60000")
@@ -738,7 +738,8 @@ static MACHINE_CONFIG_START( atarisy1 )
 	MCFG_MACHINE_START_OVERRIDE(atarisy1_state,atarisy1)
 	MCFG_MACHINE_RESET_OVERRIDE(atarisy1_state,atarisy1)
 
-	MCFG_ATARI_EEPROM_2804_ADD("eeprom")
+	MCFG_EEPROM_2804_ADD("eeprom")
+	MCFG_EEPROM_28XX_LOCK_AFTER_WRITE(true)
 
 	MCFG_DEVICE_ADD("outlatch", LS259, 0) // 15H (TTL) or 14F (LSI)
 	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(DEVWRITELINE("ymsnd", ym2151_device, reset_w))

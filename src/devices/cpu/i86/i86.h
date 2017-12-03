@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include <cpu/i386/i386dasm.h>
 
 /////////////////////////////////////////////////////////////////
 
@@ -18,6 +19,17 @@ DECLARE_DEVICE_TYPE(I8088, i8088_cpu_device)
 #define MCFG_I8086_LOCK_HANDLER(_write) \
 	devcb = &i8086_common_cpu_device::set_lock_handler(*device, DEVCB_##_write);
 
+#define MCFG_I8086_IF_HANDLER(_write) \
+	devcb = &i8086_cpu_device::set_if_handler(*device, DEVCB_##_write);
+
+#define MCFG_I8086_STACK_MAP(map) \
+	MCFG_DEVICE_ADDRESS_MAP(i8086_cpu_device::AS_STACK, map)
+
+#define MCFG_I8086_CODE_MAP(map) \
+	MCFG_DEVICE_ADDRESS_MAP(i8086_cpu_device::AS_CODE, map)
+
+#define MCFG_I8086_EXTRA_MAP(map) \
+	MCFG_DEVICE_ADDRESS_MAP(i8086_cpu_device::AS_EXTRA, map)
 
 enum
 {
@@ -28,7 +40,7 @@ enum
 };
 
 
-class i8086_common_cpu_device : public cpu_device
+class i8086_common_cpu_device : public cpu_device, public i386_disassembler::config
 {
 public:
 	template <class Object> static devcb_base &set_lock_handler(device_t &device, Object &&cb)
@@ -123,9 +135,8 @@ protected:
 	virtual void execute_set_input(int inputnum, int state) override;
 
 	// device_disasm_interface overrides
-	virtual uint32_t disasm_min_opcode_bytes() const override { return 1; }
-	virtual uint32_t disasm_max_opcode_bytes() const override { return 8; }
-	virtual offs_t disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
+	virtual util::disasm_interface *create_disassembler() override;
+	virtual int get_mode() const override;
 
 	// device_state_interface overrides
 	virtual void state_import(const device_state_entry &entry) override;
@@ -139,6 +150,11 @@ protected:
 	inline uint16_t read_word(uint32_t addr);
 	inline void write_byte(uint32_t addr, uint8_t data);
 	inline void write_word(uint32_t addr, uint16_t data);
+	inline address_space *sreg_to_space(int sreg);
+	inline uint8_t read_byte(uint32_t addr, int sreg);
+	inline uint16_t read_word(uint32_t addr, int sreg);
+	inline void write_byte(uint32_t addr, uint8_t data, int sreg);
+	inline void write_word(uint32_t addr, uint16_t data, int sreg);
 	virtual uint8_t read_port_byte(uint16_t port);
 	virtual uint16_t read_port_word(uint16_t port);
 	virtual void write_port_byte(uint16_t port, uint8_t data);
@@ -297,8 +313,8 @@ protected:
 	uint8_t   m_fire_trap;
 	uint8_t   m_test_state;
 
-	address_space *m_program, *m_opcodes;
-	direct_read_data *m_direct, *m_direct_opcodes;
+	address_space *m_program, *m_opcodes, *m_stack, *m_code, *m_extra;
+	direct_read_data<0> *m_direct, *m_direct_opcodes;
 	address_space *m_io;
 	offs_t m_fetch_xor;
 	int m_icount;
@@ -310,6 +326,7 @@ protected:
 	uint32_t m_ea;
 	uint16_t m_eo;
 	uint16_t m_e16;
+	int m_easeg;
 
 	// Used during execution of instructions
 	uint8_t   m_modrm;
@@ -340,11 +357,18 @@ protected:
 class i8086_cpu_device : public i8086_common_cpu_device
 {
 public:
+	enum {
+		AS_STACK = AS_OPCODES + 1,
+		AS_CODE, // data reads from CS are still different from opcode fetches
+		AS_EXTRA
+	};
 	// construction/destruction
 	i8086_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// device_memory_interface overrides
 	virtual space_config_vector memory_space_config() const override;
+	template <class Object> static devcb_base &set_if_handler(device_t &device, Object &&cb)
+	{ return downcast<i8086_cpu_device &>(device).m_out_if_func.set_callback(std::forward<Object>(cb)); }
 
 protected:
 	i8086_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int data_bus_size);
@@ -358,8 +382,12 @@ protected:
 
 	address_space_config m_program_config;
 	address_space_config m_opcodes_config;
+	address_space_config m_stack_config;
+	address_space_config m_code_config;
+	address_space_config m_extra_config;
 	address_space_config m_io_config;
 	static const uint8_t m_i8086_timing[200];
+	devcb_write_line m_out_if_func;
 };
 
 class i8088_cpu_device : public i8086_cpu_device

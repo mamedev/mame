@@ -139,31 +139,38 @@ INSTRUCTION( ld_IR2_R1 )        { mode_IR2_R1(load) }
 INSTRUCTION( ld_R1_IM )         { mode_R1_IM(load) }
 INSTRUCTION( ld_IR1_IM )        { mode_IR1_IM(load) }
 
-void z8_device::load_from_memory(address_space *space)
+void z8_device::load_from_memory(address_space &space)
 {
 	uint8_t operands = fetch();
 	uint8_t dst = get_working_register(operands >> 4);
 	uint8_t src = get_working_register(operands & 0x0f);
 
 	uint16_t address = register_pair_read(src);
-	uint8_t data = m_direct->read_byte(address);
+
+	uint8_t data;
+	if (&space == m_program && address < m_rom_size)
+		data = m_direct->read_byte(address);
+	else
+		data = space.read_byte(mask_external_address(address));
 
 	register_write(dst, data);
 }
 
-void z8_device::load_to_memory(address_space *space)
+void z8_device::load_to_memory(address_space &space)
 {
 	uint8_t operands = fetch();
 	uint8_t src = get_working_register(operands >> 4);
 	uint8_t dst = get_working_register(operands & 0x0f);
 
 	uint16_t address = register_pair_read(dst);
-	uint8_t data = register_read(src);
+	if (&space != m_program || address >= m_rom_size)
+		address = mask_external_address(address);
 
-	m_program->write_byte(address, data);
+	uint8_t data = register_read(src);
+	space.write_byte(address, data);
 }
 
-void z8_device::load_from_memory_autoinc(address_space *space)
+void z8_device::load_from_memory_autoinc(address_space &space)
 {
 	uint8_t operands = fetch();
 	uint8_t dst = get_working_register(operands >> 4);
@@ -171,15 +178,19 @@ void z8_device::load_from_memory_autoinc(address_space *space)
 	uint8_t src = get_working_register(operands & 0x0f);
 
 	uint16_t address = register_pair_read(src);
-	uint8_t data = m_direct->read_byte(address);
 
+	uint8_t data;
+	if (&space == m_program && address < m_rom_size)
+		data = m_direct->read_byte(address);
+	else
+		data = space.read_byte(mask_external_address(address));
 	register_write(real_dst, data);
 
 	register_write(dst, real_dst + 1);
 	register_pair_write(src, address + 1);
 }
 
-void z8_device::load_to_memory_autoinc(address_space *space)
+void z8_device::load_to_memory_autoinc(address_space &space)
 {
 	uint8_t operands = fetch();
 	uint8_t src = get_working_register(operands >> 4);
@@ -189,20 +200,22 @@ void z8_device::load_to_memory_autoinc(address_space *space)
 	uint16_t address = register_pair_read(dst);
 	uint8_t data = register_read(real_src);
 
-	m_program->write_byte(address, data);
+	if (&space != m_program || address >= m_rom_size)
+		address = mask_external_address(address);
+	space.write_byte(address, data);
 
 	register_pair_write(dst, address + 1);
 	register_write(src, real_src + 1);
 }
 
-INSTRUCTION( ldc_r1_Irr2 )      { load_from_memory(m_program); }
-INSTRUCTION( ldc_r2_Irr1 )      { load_to_memory(m_program); }
-INSTRUCTION( ldci_Ir1_Irr2 )    { load_from_memory_autoinc(m_program); }
-INSTRUCTION( ldci_Ir2_Irr1 )    { load_to_memory_autoinc(m_program); }
-INSTRUCTION( lde_r1_Irr2 )      { load_from_memory(m_data); }
-INSTRUCTION( lde_r2_Irr1 )      { load_to_memory(m_data); }
-INSTRUCTION( ldei_Ir1_Irr2 )    { load_from_memory_autoinc(m_data); }
-INSTRUCTION( ldei_Ir2_Irr1 )    { load_to_memory_autoinc(m_data); }
+INSTRUCTION( ldc_r1_Irr2 )      { load_from_memory(*m_program); }
+INSTRUCTION( ldc_r2_Irr1 )      { load_to_memory(*m_program); }
+INSTRUCTION( ldci_Ir1_Irr2 )    { load_from_memory_autoinc(*m_program); }
+INSTRUCTION( ldci_Ir2_Irr1 )    { load_to_memory_autoinc(*m_program); }
+INSTRUCTION( lde_r1_Irr2 )      { load_from_memory(*m_data); }
+INSTRUCTION( lde_r2_Irr1 )      { load_to_memory(*m_data); }
+INSTRUCTION( ldei_Ir1_Irr2 )    { load_from_memory_autoinc(*m_data); }
+INSTRUCTION( ldei_Ir2_Irr1 )    { load_to_memory_autoinc(*m_data); }
 
 void z8_device::pop(uint8_t dst)
 {
@@ -280,7 +293,7 @@ void z8_device::compare(uint8_t dst, uint8_t src)
 	uint8_t data = register_read(dst);
 	uint16_t new_data = data - src;
 
-	set_flag_c(!(new_data & 0x100));
+	set_flag_c(new_data & 0x100);
 	set_flag_z(new_data == 0);
 	set_flag_s(new_data & 0x80);
 	set_flag_v(((data & 0x80) != (src & 0x80)) && ((new_data & 0x80) == (src & 0x80)));
@@ -365,9 +378,9 @@ void z8_device::subtract_carry(uint8_t dst, uint8_t src)
 {
 	/* dst <- dst - src - C */
 	uint8_t data = register_read(dst);
-	uint16_t new_data = data - src;
+	uint16_t new_data = data - src - flag(C);
 
-	set_flag_c(!(new_data & 0x100));
+	set_flag_c(new_data & 0x100);
 	set_flag_z(new_data == 0);
 	set_flag_s(new_data & 0x80);
 	set_flag_v(((data & 0x80) != (src & 0x80)) && ((new_data & 0x80) == (src & 0x80)));
@@ -390,7 +403,7 @@ void z8_device::subtract(uint8_t dst, uint8_t src)
 	uint8_t data = register_read(dst);
 	uint16_t new_data = data - src;
 
-	set_flag_c(!(new_data & 0x100));
+	set_flag_c(new_data & 0x100);
 	set_flag_z(new_data == 0);
 	set_flag_s(new_data & 0x80);
 	set_flag_v(((data & 0x80) != (src & 0x80)) && ((new_data & 0x80) == (src & 0x80)));
@@ -490,7 +503,7 @@ void z8_device::call(uint16_t dst)
 }
 
 INSTRUCTION( call_IRR1 )        { uint16_t dst = register_pair_read(get_intermediate_register(get_register(fetch()))); call(dst); }
-INSTRUCTION( call_DA )          { uint16_t dst = (fetch() << 8) | fetch(); call(dst); }
+INSTRUCTION( call_DA )          { uint16_t dst = fetch_word(); call(dst); }
 
 INSTRUCTION( djnz_r1_RA )
 {
@@ -567,7 +580,7 @@ int z8_device::check_condition_code(int cc)
 
 INSTRUCTION( jp_cc_DA )
 {
-	uint16_t dst = (fetch() << 8) | fetch();
+	uint16_t dst = fetch_word();
 
 	/* if cc is true, then PC <- dst */
 	if (check_condition_code(opcode >> 4))

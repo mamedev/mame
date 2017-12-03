@@ -88,9 +88,7 @@ protected:
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
 	// device_disasm_interface overrides
-	virtual uint32_t disasm_min_opcode_bytes() const override { return 4; }
-	virtual uint32_t disasm_max_opcode_bytes() const override { return 4; }
-	virtual offs_t disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
+	virtual util::disasm_interface *create_disassembler() override;
 
 	devcb_write_line     m_out_irq_cb;
 	devcb_read16         m_in_dma_cb;
@@ -156,8 +154,5 @@ private:
 
 
 DECLARE_DEVICE_TYPE(SCUDSP, scudsp_cpu_device)
-
-
-CPU_DISASSEMBLE( scudsp );
 
 #endif // MAME_CPU_SCUDSP_SCUDSP_H

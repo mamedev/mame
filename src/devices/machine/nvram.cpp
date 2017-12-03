@@ -166,5 +166,5 @@ void nvram_device::determine_final_base()
 
 	// if we are region-backed for the default, find it now and make sure it's the right size
 	if (m_region.found() && m_region->bytes() != m_length)
-		throw emu_fatalerror("%s",string_format("NVRAM device '%s' has a default region, but it should be 0x%I64uX bytes", tag(), m_length).c_str());
+		throw emu_fatalerror("%s",string_format("NVRAM device '%s' has a default region, but it should be 0x%X bytes", tag(), m_length).c_str());
 }

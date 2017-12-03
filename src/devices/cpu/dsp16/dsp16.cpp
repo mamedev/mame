@@ -11,6 +11,7 @@
 #include "emu.h"
 #include "debugger.h"
 #include "dsp16.h"
+#include "dsp16dis.h"
 
 //
 // TODO:
@@ -161,7 +162,7 @@ void dsp16_device::device_start()
 	// get our address spaces
 	m_program = &space(AS_PROGRAM);
 	m_data = &space(AS_DATA);
-	m_direct = &m_program->direct();
+	m_direct = m_program->direct<-1>();
 
 	// set our instruction counter
 	m_icountptr = &m_icount;
@@ -321,40 +322,15 @@ void dsp16_device::state_string_export(const device_state_entry &entry, std::str
 	}
 }
 
-
 //-------------------------------------------------
-//  disasm_min_opcode_bytes - return the length
-//  of the shortest instruction, in bytes
-//-------------------------------------------------
-
-uint32_t dsp16_device::disasm_min_opcode_bytes() const
-{
-	return 2;
-}
-
-
-//-------------------------------------------------
-//  disasm_max_opcode_bytes - return the length
-//  of the longest instruction, in bytes
-//-------------------------------------------------
-
-uint32_t dsp16_device::disasm_max_opcode_bytes() const
-{
-	return 4;
-}
-
-
-//-------------------------------------------------
-//  disasm_disassemble - call the disassembly
+//  disassemble - call the disassembly
 //  helper function
 //-------------------------------------------------
 
-offs_t dsp16_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+util::disasm_interface *dsp16_device::create_disassembler()
 {
-	extern CPU_DISASSEMBLE( dsp16a );
-	return CPU_DISASSEMBLE_NAME(dsp16a)(this, stream, pc, oprom, opram, options);
+	return new dsp16a_disassembler;
 }
-
 
 
 /***************************************************************************
@@ -363,18 +339,18 @@ offs_t dsp16_device::disasm_disassemble(std::ostream &stream, offs_t pc, const u
 
 inline uint32_t dsp16_device::data_read(const uint16_t& addr)
 {
-	return m_data->read_word(addr << 1);
+	return m_data->read_word(addr);
 }
 
 inline void dsp16_device::data_write(const uint16_t& addr, const uint16_t& data)
 {
-	m_data->write_word(addr << 1, data & 0xffff);
+	m_data->write_word(addr, data & 0xffff);
 }
 
 inline uint32_t dsp16_device::opcode_read(const uint8_t pcOffset)
 {
 	const uint16_t readPC = m_pc + pcOffset;
-	return m_direct->read_dword(readPC << 1);
+	return m_direct->read_dword(readPC);
 }
 
 

@@ -855,20 +855,21 @@ static MACHINE_CONFIG_START( m660 )
 	MCFG_SOUND_ROUTE_EX(0, "dac2", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac2", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
+
 /*******************************************************************************/
 
-ROM_START( tsamurai )
+ROM_START( tsamurai ) // there's a protection device labeled B5 at location l3 on the main board
 	ROM_REGION( 0x10000, "maincpu", 0 ) /* Z80 code  - main CPU */
-	ROM_LOAD( "01.3r",      0x0000, 0x4000, CRC(d09c8609) SHA1(66b51897704250f520b4c58cb6f6f3aef8913459) )
-	ROM_LOAD( "02.3t",      0x4000, 0x4000, CRC(d0f2221c) SHA1(6cfa9a52b35d17776cfa3e14e679b1a6218d54fa) )
-	ROM_LOAD( "03.3v",      0x8000, 0x4000, CRC(eee8b0c9) SHA1(91dd47cdcd36d804e178b70d4338292ac36517f0) )
+	ROM_LOAD( "a35-01-1.3r", 0x0000, 0x4000, CRC(d09c8609) SHA1(66b51897704250f520b4c58cb6f6f3aef8913459) )
+	ROM_LOAD( "a35-02-1.3t", 0x4000, 0x4000, CRC(d0f2221c) SHA1(6cfa9a52b35d17776cfa3e14e679b1a6218d54fa) )
+	ROM_LOAD( "a35.03-1.3v", 0x8000, 0x4000, CRC(eee8b0c9) SHA1(91dd47cdcd36d804e178b70d4338292ac36517f0) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 ) /* Z80 code - sample player#1 */
-	ROM_LOAD( "14.4e",      0x0000, 0x2000, CRC(220e9c04) SHA1(660351c866995147d2ba69940707879d6cf11718) )
+	ROM_LOAD( "a35-14.4e",  0x0000, 0x2000, CRC(220e9c04) SHA1(660351c866995147d2ba69940707879d6cf11718) )
 	ROM_LOAD( "a35-15.4c",  0x2000, 0x2000, CRC(1e0d1e33) SHA1(02612f10c264f06f59f61f0de4df0ef84249e963) )
 
 	ROM_REGION( 0x10000, "audio2", 0 ) /* Z80 code - sample player#2 */
-	ROM_LOAD( "13.4j",      0x0000, 0x2000, CRC(73feb0e2) SHA1(7c650d0cdc517a60e14614083ab42aa934338556) )
+	ROM_LOAD( "a35-13.4j",      0x0000, 0x2000, CRC(73feb0e2) SHA1(7c650d0cdc517a60e14614083ab42aa934338556) )
 
 	ROM_REGION( 0x6000, "gfx1", 0 )
 	ROM_LOAD( "a35-04.10a", 0x0000, 0x2000, CRC(b97ce9b1) SHA1(3993001bd98758fd5673d91786846ae019c64027) ) // tiles
@@ -1027,9 +1028,9 @@ ROM_START( yamagchi )
 	ROM_LOAD( "mb7114e.2m", 0x200, 0x100, CRC(938d0fce) SHA1(9aa14fdee23b1ed50300fe8f82525bb363914d93) )
 ROM_END
 
-ROM_START( ladymstr )
+ROM_START( ladymstr ) // there's a protection device labeled 6 at location l3 on the main board
 	ROM_REGION( 0x10000, "maincpu", 0 ) /* Z80 code  - main CPU */
-	ROM_LOAD( "a49-01-1.3r",0x0000, 0x4000, CRC(acbd0b64) SHA1(00a95ad28b6923dab808dd94af10cb1d70123d3e) )
+	ROM_LOAD( "a49-01-1.3r",0x0000, 0x4000, CRC(acbd0b64) SHA1(00a95ad28b6923dab808dd94af10cb1d70123d3e) ) // believed to be newer because of the -01 suffix
 	ROM_LOAD( "a49-02.3t",  0x4000, 0x4000, CRC(b0a9020b) SHA1(78c777ffa6e9063fe4e816d9a58e394f45bd875b) )
 	ROM_LOAD( "a49-03.3v",  0x8000, 0x4000, CRC(641c94ed) SHA1(494502d2478f9d8ad29be6c1815a5e4639d6ba3a) )
 
@@ -1061,6 +1062,39 @@ ROM_START( ladymstr )
 	ROM_LOAD( "a49-18.2m",  0x200, 0x0100, CRC(f5ce3c45) SHA1(f2dcdaf95b55b8fd713bdbb965731c064b4a0757) )
 ROM_END
 
+ROM_START( ladymstr2 ) // there's a protection device labeled 6 at location l3 on the main board
+	ROM_REGION( 0x10000, "maincpu", 0 ) /* Z80 code  - main CPU */
+	ROM_LOAD( "a49-01.3r",  0x0000, 0x4000, CRC(8729e50e) SHA1(0b75dd6da26e71b32cfd1dfc1160e35f928286c4) )
+	ROM_LOAD( "a49-02.3t",  0x4000, 0x4000, CRC(b0a9020b) SHA1(78c777ffa6e9063fe4e816d9a58e394f45bd875b) )
+	ROM_LOAD( "a49-03.3v",  0x8000, 0x4000, CRC(641c94ed) SHA1(494502d2478f9d8ad29be6c1815a5e4639d6ba3a) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 ) /* Z80 code - sample player#1 */
+	ROM_LOAD( "a49-14.4e",  0x0000, 0x2000, CRC(d83a3c02) SHA1(43f49d8f57726a629533d37a11338fd071e2e2d7) )
+	ROM_LOAD( "a49-15.4c",  0x2000, 0x2000, CRC(d24ee5fd) SHA1(f35a602cd24427687580f80d4c045c42557cdf06) )
+
+	ROM_REGION( 0x10000, "audio2", 0 ) /* Z80 code - sample player#2 */
+	ROM_LOAD( "a49-13.4j",  0x0000, 0x2000, CRC(7942bd7c) SHA1(71a10db610a4eaf2e30a7ace4473d9eeb3239dc9) )
+
+	ROM_REGION( 0x6000, "gfx1", 0 )
+	ROM_LOAD( "a49-04.10a", 0x0000, 0x2000, CRC(1fed96e6) SHA1(47c44def272a94e11d06948841c414568acc832a) ) // tiles
+	ROM_LOAD( "a49-05.10c", 0x2000, 0x2000, CRC(e0fce676) SHA1(f374ab8de8157327fdd48438d74c1bf7a5bf156d) )
+	ROM_LOAD( "a49-06.10d", 0x4000, 0x2000, CRC(f895672e) SHA1(f6ee81663850db025484b39c683ff992a0c84877) )
+
+	ROM_REGION( 0x6000, "gfx2", 0 )
+	ROM_LOAD( "a49-10.11n", 0x0000, 0x1000, CRC(a7a361ba) SHA1(f142f78ac2434b22240202a9763c921db2d42fdb) ) // characters
+	ROM_LOAD( "a49-11.11q", 0x2000, 0x1000, CRC(801902e3) SHA1(abbcc2c6d805ab158f94ef60125eeea4d5041f71) )
+	ROM_LOAD( "a49-12.11r", 0x4000, 0x1000, CRC(cef75565) SHA1(9325effa7bd920af4997858bf26ebb01eeb858cd) )
+
+	ROM_REGION( 0xc000, "gfx3", 0 )
+	ROM_LOAD( "a49-07.12h", 0x0000, 0x4000, CRC(8c749828) SHA1(118057c1364d996f1445214c6aff749d6aa30a22) ) // sprites
+	ROM_LOAD( "a49-08.12j", 0x4000, 0x4000, CRC(03c10aed) SHA1(65b28bd724d9812d58ee5e0a4d0b5b0f9c2723b4) )
+	ROM_LOAD( "a49-09.12k", 0x8000, 0x4000, CRC(f61316d2) SHA1(b07eec0f4a2fe971ea3f4d56739981aef5ff4d0a) )
+
+	ROM_REGION( 0x300, "proms", 0 )
+	ROM_LOAD( "a49-16.2j",  0x000, 0x0100, CRC(a7b077d4) SHA1(48c3e68d67de067c0ead0dbd34769b755fb5952f) )
+	ROM_LOAD( "a49-17.2l",  0x100, 0x0100, CRC(1c04c087) SHA1(7179edf96f59a469353d9652900b99fef25f4054) )
+	ROM_LOAD( "a49-18.2m",  0x200, 0x0100, CRC(f5ce3c45) SHA1(f2dcdaf95b55b8fd713bdbb965731c064b4a0757) )
+ROM_END
 
 ROM_START( m660 )
 	ROM_REGION( 0x10000, "maincpu", 0 ) /* Z80 code  - main CPU */
@@ -1207,6 +1241,50 @@ ROM_START( alphaxz )
 	ROM_LOAD( "5r.bpr",      0x200, 0x100, CRC(b7d6fdb5) SHA1(67d3bb16470f5d4ec35164a391ad6b65850f824a) )
 ROM_END
 
+
+/*
+This version of the game is the original which was tested in small quantities in Taito owned arcades.
+Taito lost the license to sell the title which Kaneko sold to Wood Place.
+Same hardware as Samurai Nihon-ichi.
+*/
+
+ROM_START( the26thz ) // there's a protection device labeled 6 or 9 on the main board (seems to be the same as the tsamurai one)
+	ROM_REGION( 0x10000, "maincpu", 0 ) /* Z80 code  - main CPU */
+	ROM_LOAD( "A72_01.3R",   0x0000, 0x4000, CRC(2be77520) SHA1(26c65a9c59a0cf3609d084ec4e0af4e670a3069c) ) // 27128
+	ROM_LOAD( "A72_02.3T",   0x4000, 0x4000, CRC(ef2646f2) SHA1(0b178793420bd5e5fb77cf55e049a73f0fbc2d0f) ) // 27128
+	ROM_LOAD( "A72_03.3V",   0x8000, 0x4000, CRC(d83b7758) SHA1(ff025c67e7ace9b178fd46642f98d79e18076d28) ) // 27128
+
+	ROM_REGION( 0x10000, "audiocpu", 0 ) /* Z80 code - sample player */
+	ROM_LOAD( "A72_16.4N",       0x0000, 0x4000, CRC(5734db5a) SHA1(ff99bf618018be20a4b38fcfbe75d9c5bb6fd176) ) // 27128
+
+	ROM_REGION( 0x10000, "audio2", 0 ) /* Z80 code - sample player */
+	ROM_LOAD( "A72_15.4J",       0x0000, 0x4000, CRC(fba51cf7) SHA1(b18571112dcbe3214a803d0898b0a21957dc5e5f) ) // 27128
+
+	ROM_REGION( 0x10000, "audio3", 0 ) /* Z80 code AY driver, identical to the parent set but split in 2 ROMs */
+	ROM_LOAD( "A72_14.4E",   0x0000, 0x4000, CRC(d078373e) SHA1(939c8c1eb651d34b3c873db3aeef4c59b4f70a9f) ) // 27128
+	ROM_LOAD( "A72_13.4D",   0x4000, 0x4000, CRC(11980449) SHA1(e17611980043c152c518b334ffda8e93d368e4a9) ) // 27128
+
+	ROM_REGION( 0xc000, "gfx1", 0 ) // tiles
+	ROM_LOAD( "A72_04.10A",   0x00000, 0x4000, CRC(23da4e3d) SHA1(fd48c86769360a778057a673d5c1dfdfe00f6c18) ) // 27128
+	ROM_LOAD( "A72_05.10B",   0x04000, 0x4000, CRC(8746ff69) SHA1(6b95f209d931601155ad492652e3016df3e5dfb0) ) // 27128
+	ROM_LOAD( "A72_06.10D",   0x08000, 0x4000, CRC(6e494964) SHA1(9f42935281502a1e73f602cb93ca241aeaa03201) ) // 27128
+
+	ROM_REGION( 0x6000, "gfx2", 0 ) // characters
+	ROM_LOAD( "A72_10.11N",   0x00000, 0x1000, CRC(a23e4829) SHA1(329ff6bd21c804c103938e333b355c7387b5d0be) ) // 2732
+	ROM_LOAD( "A72_11.11Q",   0x02000, 0x1000, CRC(9717229f) SHA1(ecc1bbde29fbd28eebc2016ca5e04bc841ca061e) ) // 2732
+	ROM_LOAD( "A72_12.11R",   0x04000, 0x1000, CRC(7a602979) SHA1(32c40ad1cb1b6bb49c6f37da443a4368fd24faf7) ) // 2732
+
+	ROM_REGION( 0xc000, "gfx3", 0 ) // sprites
+	ROM_LOAD( "A72_07.12H",   0x00000, 0x4000, CRC(5f9cc65e) SHA1(235b4a8762ba429855cc9db07477efde2a62e03d) ) // 27128
+	ROM_LOAD( "A72_08.12J",   0x04000, 0x4000, CRC(23e3a6ba) SHA1(d6d035b7b7530a909669ac045aea51e297ba784e) ) // 27128
+	ROM_LOAD( "A72_09.12K",   0x08000, 0x4000, CRC(7096fa71) SHA1(f9697b30d7eec5ee9122d783f9ee7b9cdbab9262) ) // 27128
+
+	ROM_REGION( 0x300, "proms", 0 )
+	ROM_LOAD( "A72_17.2K",      0x000, 0x100, CRC(cd16d0f1) SHA1(4b0a68f28329fb86d252f4170edd2ab0488805e5) ) // 82S129
+	ROM_LOAD( "A72_18.2L",      0x100, 0x100, CRC(22e8b22c) SHA1(2934ca96495fca72a33fa2881dc65ab21342c410) ) // 82S129
+	ROM_LOAD( "A72_19.2M",      0x200, 0x100, CRC(b7d6fdb5) SHA1(67d3bb16470f5d4ec35164a391ad6b65850f824a) ) // 82S129
+ROM_END
+
 ROM_START( vsgongf )
 	ROM_REGION( 0x10000, "maincpu", 0 ) /* Z80 code  - main CPU */
 	ROM_LOAD( "1.5a",   0x0000, 0x2000, CRC(2c056dee) SHA1(f063fdd571949a1b7ac36f88e17feec7354ea894) ) /* good? */
@@ -1291,20 +1369,28 @@ ROM_START( ringfgt2 )
 	ROM_LOAD( "clr.6p",  0x200, 0x0100, CRC(0e4fd17a) SHA1(d4e32bd9dd903177af61f77976a25c5db1467bba) )
 ROM_END
 
-GAME( 1984, vsgongf,   0,        vsgongf,  vsgongf,  tsamurai_state, 0, ROT90, "Kaneko", "VS Gong Fight", MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION )
-GAME( 1984, ringfgt,   vsgongf,  vsgongf,  vsgongf,  tsamurai_state, 0, ROT90, "Kaneko (Taito license)", "Ring Fighter (set 1)", MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
-GAME( 1984, ringfgt2,  vsgongf,  vsgongf,  vsgongf,  tsamurai_state, 0, ROT90, "Kaneko (Taito license)", "Ring Fighter (set 2)", MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
+DRIVER_INIT_MEMBER(tsamurai_state, the26thz)
+{
+	m_maincpu->space(AS_PROGRAM).unmap_read(0xd803, 0xd803);
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0xd803, 0xd803, read8_delegate(FUNC(tsamurai_state::tsamurai_unknown_d803_r), this));
+}
 
-GAME( 1985, tsamurai,  0,        tsamurai, tsamurai, tsamurai_state, 0, ROT90, "Kaneko / Taito", "Samurai Nihon-Ichi (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, tsamurai2, tsamurai, tsamurai, tsamurai, tsamurai_state, 0, ROT90, "Kaneko / Taito", "Samurai Nihon-Ichi (set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, tsamuraih, tsamurai, tsamurai, tsamurai, tsamurai_state, 0, ROT90, "bootleg", "Samurai Nihon-Ichi (bootleg, harder)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, vsgongf,   0,        vsgongf,  vsgongf,  tsamurai_state, 0,        ROT90, "Kaneko", "VS Gong Fight", MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION )
+GAME( 1984, ringfgt,   vsgongf,  vsgongf,  vsgongf,  tsamurai_state, 0,        ROT90, "Kaneko (Taito license)", "Ring Fighter (set 1)", MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, ringfgt2,  vsgongf,  vsgongf,  vsgongf,  tsamurai_state, 0,        ROT90, "Kaneko (Taito license)", "Ring Fighter (set 2)", MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
 
-GAME( 1985, ladymstr,  0,        tsamurai, ladymstr, tsamurai_state, 0, ROT90, "Kaneko / Taito", "Lady Master of Kung Fu", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, nunchaku,  ladymstr, tsamurai, nunchaku, tsamurai_state, 0, ROT90, "Kaneko / Taito", "Nunchackun", MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
+GAME( 1985, tsamurai,  0,        tsamurai, tsamurai, tsamurai_state, 0,        ROT90, "Kaneko / Taito", "Samurai Nihon-Ichi (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, tsamurai2, tsamurai, tsamurai, tsamurai, tsamurai_state, 0,        ROT90, "Kaneko / Taito", "Samurai Nihon-Ichi (set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, tsamuraih, tsamurai, tsamurai, tsamurai, tsamurai_state, 0,        ROT90, "bootleg", "Samurai Nihon-Ichi (bootleg, harder)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1985, yamagchi,  0,        tsamurai, yamagchi, tsamurai_state, 0, ROT90, "Kaneko / Taito", "Go Go Mr. Yamaguchi / Yuke Yuke Yamaguchi-kun", MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
+GAME( 1985, ladymstr,  0,        tsamurai, ladymstr, tsamurai_state, 0,        ROT90, "Kaneko / Taito", "Lady Master of Kung Fu (set 1, newer)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, ladymstr2, ladymstr, tsamurai, ladymstr, tsamurai_state, 0,        ROT90, "Kaneko / Taito", "Lady Master of Kung Fu (set 2, older)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, nunchaku,  ladymstr, tsamurai, nunchaku, tsamurai_state, 0,        ROT90, "Kaneko / Taito", "Nunchackun", MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
 
-GAME( 1986, m660,      0,        m660,     m660,     tsamurai_state, 0, ROT90, "Wood Place Inc. (Taito America Corporation license)", "Mission 660 (US)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, m660j,     m660,     m660,     m660,     tsamurai_state, 0, ROT90, "Wood Place Inc. (Taito Corporation license)", "Mission 660 (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, m660b,     m660,     m660,     m660,     tsamurai_state, 0, ROT90, "bootleg", "Mission 660 (bootleg)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, alphaxz,   m660,     m660,     m660,     tsamurai_state, 0, ROT90, "Ed Co. Ltd. (Wood Place Inc. license)", "The Alphax Z (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, yamagchi,  0,        tsamurai, yamagchi, tsamurai_state, 0,        ROT90, "Kaneko / Taito", "Go Go Mr. Yamaguchi / Yuke Yuke Yamaguchi-kun", MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
+
+GAME( 1986, m660,      0,        m660,     m660,     tsamurai_state, 0,        ROT90, "Wood Place Inc. (Taito America Corporation license)", "Mission 660 (US)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, m660j,     m660,     m660,     m660,     tsamurai_state, 0,        ROT90, "Wood Place Inc. (Taito Corporation license)", "Mission 660 (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, m660b,     m660,     m660,     m660,     tsamurai_state, 0,        ROT90, "bootleg", "Mission 660 (bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, alphaxz,   m660,     m660,     m660,     tsamurai_state, 0,        ROT90, "Ed Co. Ltd. (Wood Place Inc. license)", "The Alphax Z (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, the26thz,  m660,     m660,     m660,     tsamurai_state, the26thz, ROT90, "Ed Co. Ltd. (Taito license)", "The 26th Z (Japan, location test)", MACHINE_SUPPORTS_SAVE )

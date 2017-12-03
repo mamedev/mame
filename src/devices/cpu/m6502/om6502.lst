@@ -1395,9 +1395,10 @@ lax_aba
 lax_aby
 	TMP = read_pc();
 	TMP = set_h(TMP, read_pc());
-	read(set_l(TMP, TMP+Y));
-	TMP += Y;
-	A = X = read(TMP);
+	if(page_changing(TMP, Y)) {
+		read(set_l(TMP, TMP+Y));
+	}
+	A = X = read(TMP+Y);
 	set_nz(A);
 	prefetch();
 

@@ -21,7 +21,7 @@ HP14782-1
 |    K2                                                             ROM4    |---------|     |
 |                       |-------------|       4050   5114   5114                            |
 |           4013        |   CDP1802   |       4050   5114   5114    ROM3    4030  ROM6  4060|
-|           4013        |-------------|       4050   5114   5114                            |
+|           4013 3.57MHz|-------------|       4050   5114   5114                            |
 |           4081  40106                       4051   5114   5114    ROM2    4076  5114  4011|
 |                                             4556   5114   5114          CDP1856 5114      |
 |                   |-------|                        5114   5114    ROM1  CDP1856 5114  4076|
@@ -40,70 +40,98 @@ Notes:
     ROM6    - Hitachi HN462732G 4Kx8 EPROM
     5114    - RCA MWS5114E1 1024-Word x 4-Bit LSI Static RAM
     MC1374  - Motorola MC1374P TV Modulator
-    CDP1802 - RCA CDP1802BE CMOS 8-Bit Microprocessor running at ? MHz
+    CDP1802 - RCA CDP1802BE CMOS 8-Bit Microprocessor running at 3.57MHz
     CDP1852 - RCA CDP1852CE Byte-Wide Input/Output Port
     CDP1853 - RCA CDP1853CE N-Bit 1 of 8 Decoder
     CDP1856 - RCA CDP1856CE 4-Bit Memory Buffer
     CDP1869 - RCA CDP1869CE Video Interface System (VIS) Address and Sound Generator
     CDP1870 - RCA CDP1870CE Video Interface System (VIS) Color Video (DOT XTAL at 5.6260MHz, CHROM XTAL at 8.867238MHz)
     CN1     - RF connector [TMC-700]
-    CN2     - printer connector [TMC-700]
-    CN3     - EURO connector
-    CN4     - tape connector
-    CN5     - video connector
-    CN6     - power connector
-    CN7     - audio connector [TMCP-300]
-    CN8     - keyboard connector
-    SW1     - RUN/STOP switch
+    CN2     - 10x2 pin printer connector [TMC-700]
+    CN3     - 32x3 pin EURO connector
+    CN4     - DIN5D tape connector
+                1   input (500 mV / 47 Kohm)
+                2   GND
+                3   output (580 mV / 47 Kohm)
+                4   input (500 mV / 47 Kohm)
+                5   output (580 mV / 47 Kohm)
+    CN5     - DIN5X video connector
+                1   GND
+                2   GND
+                3   composite video output (75 ohm)
+                4   GND
+                5   composite video output (75 ohm)
+    CN6     - DIN2 power connector
+                1   input 8..12V DC..400Hz 300mA
+                2   GND
+    CN7     - DIN5D audio connector [TMCP-300]
+                1   N/C
+                2   GND
+                3   mono audio output
+                4   N/C
+                5   mono audio output
+    CN8     - 10x2 pin keyboard connector
+    SW1     - RUN/STOP switch (left=run, right=stop)
     SW2     - internal speaker/external audio switch [TMCP-300]
-    P1      - color phase lock adjustment
-    C1      - dot oscillator adjustment
-    C2      - chrom oscillator adjustment
-    T1      - RF signal strength adjustment [TMC-700]
-    T2      - tape recording level adjustment (0.57 Vpp)
-    T3      - video output level adjustment (1 Vpp)
-    T4      - video synchronization pulse adjustment
-    K1      - RF signal quality adjustment [TMC-700]
-    K2      - RF channel adjustment (VHF I) [TMC-700]
+    P1      - color phase lock adjustment potentiometer
+    C1      - dot oscillator adjustment variable capacitor
+    C2      - chroma oscillator adjustment variable capacitor
+    T1      - RF signal strength adjustment potentiometer [TMC-700]
+    T2      - tape recording level adjustment potentiometer (0.57 V p-p)
+    T3      - video output level adjustment potentiometer (1 V p-p)
+    T4      - video synchronization pulse adjustment potentiometer
+    K1      - RF signal quality adjustment variable inductor [TMC-700]
+    K2      - RF channel adjustment variable inductor (VHF I) [TMC-700]
     LS1     - loudspeaker
 
 */
 
 /*
 
-    TODO:
+    TODO
 
-    - proper emulation of the VISMAC interface (cursor blinking, color RAM), schematics are needed
-    - disk interface
-    - CPU frequency needs to be derived from the schematics
-    - serial interface expansion card
-    - centronics printer handshaking
+    - connect expansion bus
 
 */
 
 #include "emu.h"
 #include "includes/tmc600.h"
 
-/* Read/Write Handlers */
-
-WRITE8_MEMBER( tmc600_state::keyboard_latch_w )
+READ8_MEMBER( tmc600_state::rtc_r )
 {
-	m_keylatch = data;
+	m_rtc_int = m_vismac_reg_latch >> 3;
+
+	return 0;
+}
+
+WRITE8_MEMBER( tmc600_state::printer_w )
+{
+	m_centronics->write_data0(BIT(data, 0));
+	m_centronics->write_data1(BIT(data, 1));
+	m_centronics->write_data2(BIT(data, 2));
+	m_centronics->write_data3(BIT(data, 3));
+	m_centronics->write_data4(BIT(data, 4));
+	m_centronics->write_data5(BIT(data, 5));
+	m_centronics->write_data6(BIT(data, 6));
+	m_centronics->write_data7(BIT(data, 7));
+
+	m_centronics->write_strobe(0);
+	m_centronics->write_strobe(1);
 }
 
 /* Memory Maps */
 
 static ADDRESS_MAP_START( tmc600_map, AS_PROGRAM, 8, tmc600_state )
-	AM_RANGE(0x0000, 0x4fff) AM_ROM
-	AM_RANGE(0x6000, 0xbfff) AM_RAM
+	AM_RANGE(0x0000, 0x5fff) AM_ROM
+	AM_RANGE(0x6000, 0x7fff) AM_RAM
 	AM_RANGE(0xf400, 0xf7ff) AM_DEVICE(CDP1869_TAG, cdp1869_device, char_map)
 	AM_RANGE(0xf800, 0xffff) AM_DEVICE(CDP1869_TAG, cdp1869_device, page_map)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( tmc600_io_map, AS_IO, 8, tmc600_state )
-	AM_RANGE(0x03, 0x03) AM_WRITE(keyboard_latch_w)
-	AM_RANGE(0x04, 0x04) AM_DEVWRITE("cent_data_out", output_latch_device, write)
-	AM_RANGE(0x05, 0x05) AM_WRITE(vismac_data_w)
+	AM_RANGE(0x03, 0x03) AM_DEVWRITE(CDP1852_KB_TAG, cdp1852_device, write)
+	AM_RANGE(0x04, 0x04) AM_DEVWRITE(CDP1852_TMC700_TAG, cdp1852_device, write)
+	AM_RANGE(0x05, 0x05) AM_READWRITE(rtc_r, vismac_data_w)
 //  AM_RANGE(0x06, 0x06) AM_WRITE(floppy_w)
 	AM_RANGE(0x07, 0x07) AM_WRITE(vismac_register_w)
 ADDRESS_MAP_END
@@ -192,15 +220,10 @@ static INPUT_PORTS_START( tmc600 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME(UTF8_LEFT) PORT_CODE(KEYCODE_LEFT) PORT_CHAR(UCHAR_MAMEKEY(LEFT))
 
 	PORT_START("RUN")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Run/Stop") PORT_CODE(KEYCODE_F3) PORT_CHAR(UCHAR_MAMEKEY(F3)) PORT_TOGGLE
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Run/Stop") PORT_CODE(KEYCODE_F3) PORT_CHAR(UCHAR_MAMEKEY(F3)) PORT_TOGGLE PORT_WRITE_LINE_DEVICE_MEMBER(CDP1802_TAG, cosmac_device, clear_w)
 INPUT_PORTS_END
 
 /* CDP1802 Interface */
-
-READ_LINE_MEMBER( tmc600_state::clear_r )
-{
-	return BIT(m_run->read(), 0);
-}
 
 READ_LINE_MEMBER( tmc600_state::ef2_r )
 {
@@ -209,9 +232,9 @@ READ_LINE_MEMBER( tmc600_state::ef2_r )
 
 READ_LINE_MEMBER( tmc600_state::ef3_r )
 {
-	uint8_t data = ~m_key_row[m_keylatch / 8]->read();
+	uint8_t keylatch = m_bwio->do_r();
 
-	return BIT(data, m_keylatch % 8);
+	return !BIT(m_key_row[(keylatch >> 3) & 0x07]->read(), keylatch & 0x07);
 }
 
 WRITE_LINE_MEMBER( tmc600_state::q_w )
@@ -219,81 +242,89 @@ WRITE_LINE_MEMBER( tmc600_state::q_w )
 	m_cassette->output(state ? +1.0 : -1.0);
 }
 
-/* Machine Initialization */
-
-void tmc600_state::machine_start()
+WRITE8_MEMBER( tmc600_state::sc_w )
 {
-	address_space &program = m_maincpu->space(AS_PROGRAM);
-
-	/* configure RAM */
-	switch (m_ram->size())
-	{
-	case 8*1024:
-		program.unmap_readwrite(0x8000, 0xbfff);
-		break;
-
-	case 16*1024:
-		program.unmap_readwrite(0xa000, 0xbfff);
-		break;
+	if (data == COSMAC_STATE_CODE_S3_INTERRUPT) {
+		m_maincpu->int_w(CLEAR_LINE);
 	}
-
-	/* register for state saving */
-	save_item(NAME(m_keylatch));
 }
 
 /* Machine Drivers */
 
 static MACHINE_CONFIG_START( tmc600 )
-	// basic system hardware
-	MCFG_CPU_ADD(CDP1802_TAG, CDP1802, 3579545)  // ???
+	// CPU
+	MCFG_CPU_ADD(CDP1802_TAG, CDP1802, XTAL_3_57MHz)
 	MCFG_CPU_PROGRAM_MAP(tmc600_map)
 	MCFG_CPU_IO_MAP(tmc600_io_map)
 	MCFG_COSMAC_WAIT_CALLBACK(VCC)
-	MCFG_COSMAC_CLEAR_CALLBACK(READLINE(tmc600_state, clear_r))
 	MCFG_COSMAC_EF2_CALLBACK(READLINE(tmc600_state, ef2_r))
 	MCFG_COSMAC_EF3_CALLBACK(READLINE(tmc600_state, ef3_r))
 	MCFG_COSMAC_Q_CALLBACK(WRITELINE(tmc600_state, q_w))
+	MCFG_COSMAC_SC_CALLBACK(WRITE8(tmc600_state, sc_w))
 
 	// sound and video hardware
 	MCFG_FRAGMENT_ADD(tmc600_video)
 
-	/* devices */
-	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, centronics_devices, "printer")
+	// keyboard output latch
+	MCFG_DEVICE_ADD(CDP1852_KB_TAG, CDP1852, XTAL_3_57MHz/8) // clock is CDP1802 TPB
+	MCFG_CDP1852_MODE_CALLBACK(VCC)
 
-	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", CENTRONICS_TAG)
+	// address bus demux for expansion bus
+	MCFG_DEVICE_ADD(CDP1852_BUS_TAG, CDP1852, 0) // clock is expansion bus TPA
+	MCFG_CDP1852_MODE_CALLBACK(GND)
 
+	// printer output latch
+	MCFG_DEVICE_ADD(CDP1852_TMC700_TAG, CDP1852, XTAL_3_57MHz/8) // clock is CDP1802 TPB
+	MCFG_CDP1852_MODE_CALLBACK(VCC)
+	MCFG_CDP1852_DO_CALLBACK(WRITE8(tmc600_state, printer_w))
+
+	// printer connector
+	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, centronics_devices, nullptr)
+	MCFG_CENTRONICS_BUSY_HANDLER(DEVWRITELINE(CDP1802_TAG, cosmac_device, ef4_w)) MCFG_DEVCB_XOR(1)
+
+	// cassette
 	MCFG_CASSETTE_ADD("cassette")
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED)
 
-	/* internal ram */
+	// expansion bus connector
+	MCFG_TMC600_EURO_BUS_SLOT_ADD(TMC600_EURO_BUS_TAG, tmc600_euro_bus_cards, nullptr)
+
+	// internal RAM
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("8K")
-	MCFG_RAM_EXTRA_OPTIONS("16K,24K")
 MACHINE_CONFIG_END
 
 /* ROMs */
 
 #if 0
 ROM_START( tmc600s1 )
-	ROM_REGION( 0x5000, CDP1802_TAG, 0 )
+	ROM_REGION( 0x6000, CDP1802_TAG, 0 )
 	ROM_LOAD( "sb20",       0x0000, 0x1000, NO_DUMP )
 	ROM_LOAD( "sb21",       0x1000, 0x1000, NO_DUMP )
 	ROM_LOAD( "sb22",       0x2000, 0x1000, NO_DUMP )
 	ROM_LOAD( "sb23",       0x3000, 0x1000, NO_DUMP )
-	ROM_LOAD( "190482_2",   0x4000, 0x1000, NO_DUMP )
+	ROM_SYSTEM_BIOS( 0, "sb040282", "SB040282" )
+	ROMX_LOAD( "190482",    0x4000, 0x1000, NO_DUMP, ROM_BIOS(1) )
+	ROM_SYSTEM_BIOS( 1, "sbdos", "SBDOS" )
+	ROMX_LOAD( "190482_",   0x4000, 0x1000, NO_DUMP, ROM_BIOS(2) )
+	ROMX_LOAD( "190482_v",  0x5000, 0x1000, NO_DUMP, ROM_BIOS(2) )
 
 	ROM_REGION( 0x1000, "chargen", 0 )
-	ROM_LOAD( "chargen",    0x0000, 0x1000, NO_DUMP )
+	ROM_LOAD( "chargen",    0x0000, 0x1000, CRC(93f92cbf) SHA1(371156fb38fa5319c6fde537ccf14eed94e7adfb) )
 ROM_END
 #endif
 
 ROM_START( tmc600s2 )
-	ROM_REGION( 0x5000, CDP1802_TAG, 0 )
+	ROM_REGION( 0x6000, CDP1802_TAG, 0 )
 	ROM_LOAD( "sb30",       0x0000, 0x1000, CRC(95d1292a) SHA1(1fa52d59d3005f8ac74a32c2164fdb22947c2748) )
 	ROM_LOAD( "sb31",       0x1000, 0x1000, CRC(2c8f3d17) SHA1(f14e8adbcddeaeaa29b1e7f3dfa741f4e230f599) )
 	ROM_LOAD( "sb32",       0x2000, 0x1000, CRC(dd58a128) SHA1(be9bdb0fc5e0cc3dcc7f2fb7ccab69bf5b043803) )
 	ROM_LOAD( "sb33",       0x3000, 0x1000, CRC(b7d241fa) SHA1(6f3eadf86c4e3aaf93d123e302a18dc4d9db964b) )
-	ROM_LOAD( "151182",     0x4000, 0x1000, CRC(c1a8d9d8) SHA1(4552e1f06d0e338ba7b0f1c3a20b8a51c27dafde) )
+	ROM_SYSTEM_BIOS( 0, "sb040282", "SB040282" )
+	ROMX_LOAD( "151182",    0x4000, 0x1000, CRC(c1a8d9d8) SHA1(4552e1f06d0e338ba7b0f1c3a20b8a51c27dafde), ROM_BIOS(1) )
+	ROM_SYSTEM_BIOS( 1, "sbdos", "SBDOS" )
+	ROMX_LOAD( "151182_",   0x4000, 0x1000, NO_DUMP, ROM_BIOS(2) )
+	ROMX_LOAD( "151182_v",  0x5000, 0x1000, NO_DUMP, ROM_BIOS(2) )
 
 	ROM_REGION( 0x1000, "chargen", 0 )
 	ROM_LOAD( "chargen",    0x0000, 0x1000, CRC(93f92cbf) SHA1(371156fb38fa5319c6fde537ccf14eed94e7adfb) )

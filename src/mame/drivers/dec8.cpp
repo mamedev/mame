@@ -145,6 +145,11 @@ void dec8_state::device_timer(emu_timer &timer, device_timer_id id, int param, v
 		// clear the IRQ request.  The MCU does not clear it itself.
 		m_mcu->set_input_line(MCS51_INT1_LINE, CLEAR_LINE);
 		break;
+	case TIMER_DEC8_M6502:
+		// Gondomania schematics show a LS194 for the sound IRQ, sharing the 6502 clock
+		// S1=H, S0=L, LSI=H, and QA is the only output connected (to NMI)
+		m_audiocpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
+		break;
 	default:
 		assert_always(false, "Unknown id in dec8_state::device_timer");
 	}
@@ -157,7 +162,7 @@ WRITE8_MEMBER(dec8_state::dec8_i8751_w)
 	case 0: /* High byte - SECIRQ is trigged on activating this latch */
 		m_i8751_value = (m_i8751_value & 0xff) | (data << 8);
 		m_mcu->set_input_line(MCS51_INT1_LINE, ASSERT_LINE);
-		timer_set(m_mcu->clocks_to_attotime(64), TIMER_DEC8_I8751); // 64 clocks not confirmed
+		m_i8751_timer->adjust(m_mcu->clocks_to_attotime(64)); // 64 clocks not confirmed
 		break;
 	case 1: /* Low byte */
 		m_i8751_value = (m_i8751_value & 0xff00) | data;
@@ -378,7 +383,8 @@ WRITE8_MEMBER(dec8_state::csilver_control_w)
 WRITE8_MEMBER(dec8_state::dec8_sound_w)
 {
 	m_soundlatch->write(space, 0, data);
-	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	m_audiocpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
+	m_m6502_timer->adjust(m_audiocpu->cycles_to_attotime(3));
 }
 
 WRITE_LINE_MEMBER(dec8_state::csilver_adpcm_int)
@@ -1896,6 +1902,9 @@ INTERRUPT_GEN_MEMBER(dec8_state::oscar_interrupt)
 
 void dec8_state::machine_start()
 {
+	m_i8751_timer = timer_alloc(TIMER_DEC8_I8751);
+	m_m6502_timer = timer_alloc(TIMER_DEC8_M6502);
+
 	save_item(NAME(m_latch));
 	save_item(NAME(m_nmi_enable));
 	save_item(NAME(m_i8751_port0));
@@ -1940,14 +1949,10 @@ void dec8_state::machine_reset()
 }
 
 
-/* TODO: These are raw guesses, only to get ~57,41 Hz, assume to be the same as dec0 */
-#define DEC8_PIXEL_CLOCK XTAL_20MHz/4
-#define DEC8_HTOTAL 320
-#define DEC8_HBEND 0
-#define DEC8_HBSTART 256
-#define DEC8_VTOTAL 272
-#define DEC8_VBEND 8
-#define DEC8_VBSTART 256-8
+// DECO video CRTC, unverified
+#define MCFG_SCREEN_RAW_PARAMS_DATA_EAST \
+		MCFG_SCREEN_RAW_PARAMS(XTAL_12MHz/2,384,0,256,272,8,248)
+
 
 static MACHINE_CONFIG_START( lastmisn )
 
@@ -1976,7 +1981,7 @@ static MACHINE_CONFIG_START( lastmisn )
 //  MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* 58Hz, 529ms Vblank duration */)
 //  MCFG_SCREEN_SIZE(32*8, 32*8)
 //  MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
-	MCFG_SCREEN_RAW_PARAMS(DEC8_PIXEL_CLOCK, DEC8_HTOTAL, DEC8_HBEND, DEC8_HBSTART, DEC8_VTOTAL, DEC8_VBEND, DEC8_VBSTART)
+	MCFG_SCREEN_RAW_PARAMS_DATA_EAST
 	MCFG_SCREEN_UPDATE_DRIVER(dec8_state, screen_update_lastmisn)
 	MCFG_SCREEN_PALETTE("palette")
 
@@ -2030,7 +2035,7 @@ static MACHINE_CONFIG_START( shackled )
 //  MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* 58Hz, 529ms Vblank duration */)
 //  MCFG_SCREEN_SIZE(32*8, 32*8)
 //  MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
-	MCFG_SCREEN_RAW_PARAMS(DEC8_PIXEL_CLOCK, DEC8_HTOTAL, DEC8_HBEND, DEC8_HBSTART, DEC8_VTOTAL, DEC8_VBEND, DEC8_VBSTART)
+	MCFG_SCREEN_RAW_PARAMS_DATA_EAST
 	MCFG_SCREEN_UPDATE_DRIVER(dec8_state, screen_update_shackled)
 	MCFG_SCREEN_PALETTE("palette")
 
@@ -2083,7 +2088,7 @@ static MACHINE_CONFIG_START( gondo )
 //  MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(529) /* 58Hz, 529ms Vblank duration */)
 //  MCFG_SCREEN_SIZE(32*8, 32*8)
 //  MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
-	MCFG_SCREEN_RAW_PARAMS(DEC8_PIXEL_CLOCK, DEC8_HTOTAL, DEC8_HBEND, DEC8_HBSTART, DEC8_VTOTAL, DEC8_VBEND, DEC8_VBSTART)
+	MCFG_SCREEN_RAW_PARAMS_DATA_EAST
 	MCFG_SCREEN_UPDATE_DRIVER(dec8_state, screen_update_gondo)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(dec8_state, screen_vblank_dec8))
 	MCFG_SCREEN_PALETTE("palette")
@@ -2137,7 +2142,7 @@ static MACHINE_CONFIG_START( garyoret )
 //  MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(529) /* 58Hz, 529ms Vblank duration */)
 //  MCFG_SCREEN_SIZE(32*8, 32*8)
 //  MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
-	MCFG_SCREEN_RAW_PARAMS(DEC8_PIXEL_CLOCK, DEC8_HTOTAL, DEC8_HBEND, DEC8_HBSTART, DEC8_VTOTAL, DEC8_VBEND, DEC8_VBSTART)
+	MCFG_SCREEN_RAW_PARAMS_DATA_EAST
 	MCFG_SCREEN_UPDATE_DRIVER(dec8_state, screen_update_garyoret)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(dec8_state, screen_vblank_dec8))
 	MCFG_SCREEN_PALETTE("palette")
@@ -2195,7 +2200,7 @@ static MACHINE_CONFIG_START( ghostb )
 //  MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* 58Hz, 529ms Vblank duration */)
 //  MCFG_SCREEN_SIZE(32*8, 32*8)
 //  MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
-	MCFG_SCREEN_RAW_PARAMS(DEC8_PIXEL_CLOCK, DEC8_HTOTAL, DEC8_HBEND, DEC8_HBSTART, DEC8_VTOTAL, DEC8_VBEND, DEC8_VBSTART)
+	MCFG_SCREEN_RAW_PARAMS_DATA_EAST
 	MCFG_SCREEN_UPDATE_DRIVER(dec8_state, screen_update_ghostb)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(dec8_state, screen_vblank_dec8))
 	MCFG_SCREEN_PALETTE("palette")
@@ -2253,7 +2258,7 @@ static MACHINE_CONFIG_START( csilver )
 //  MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(529) /* 58Hz, 529ms Vblank duration */)
 //  MCFG_SCREEN_SIZE(32*8, 32*8)
 //  MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
-	MCFG_SCREEN_RAW_PARAMS(DEC8_PIXEL_CLOCK, DEC8_HTOTAL, DEC8_HBEND, DEC8_HBSTART, DEC8_VTOTAL, DEC8_VBEND, DEC8_VBSTART)
+	MCFG_SCREEN_RAW_PARAMS_DATA_EAST
 	MCFG_SCREEN_UPDATE_DRIVER(dec8_state, screen_update_lastmisn)
 	MCFG_SCREEN_PALETTE("palette")
 
@@ -2316,7 +2321,7 @@ static MACHINE_CONFIG_START( oscar )
 //  MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* 58Hz, 529ms Vblank duration */)
 //  MCFG_SCREEN_SIZE(32*8, 32*8)
 //  MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
-	MCFG_SCREEN_RAW_PARAMS(DEC8_PIXEL_CLOCK, DEC8_HTOTAL, DEC8_HBEND, DEC8_HBSTART, DEC8_VTOTAL, DEC8_VBEND, DEC8_VBSTART)
+	MCFG_SCREEN_RAW_PARAMS_DATA_EAST
 	MCFG_SCREEN_UPDATE_DRIVER(dec8_state, screen_update_oscar)
 	MCFG_SCREEN_PALETTE("palette")
 
@@ -2366,7 +2371,7 @@ static MACHINE_CONFIG_START( srdarwin )
 //  MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(529) /* 58Hz, 529ms Vblank duration */)
 //  MCFG_SCREEN_SIZE(32*8, 32*8)
 //  MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
-	MCFG_SCREEN_RAW_PARAMS(DEC8_PIXEL_CLOCK, DEC8_HTOTAL, DEC8_HBEND, DEC8_HBSTART, DEC8_VTOTAL, DEC8_VBEND, DEC8_VBSTART)
+	MCFG_SCREEN_RAW_PARAMS_DATA_EAST
 	MCFG_SCREEN_UPDATE_DRIVER(dec8_state, screen_update_srdarwin)
 	MCFG_SCREEN_PALETTE("palette")
 
@@ -2424,7 +2429,7 @@ static MACHINE_CONFIG_START( cobracom )
 //  MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(529) /* 58Hz, 529ms Vblank duration */)
 //  MCFG_SCREEN_SIZE(32*8, 32*8)
 //  MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
-	MCFG_SCREEN_RAW_PARAMS(DEC8_PIXEL_CLOCK, DEC8_HTOTAL, DEC8_HBEND, DEC8_HBSTART, DEC8_VTOTAL, DEC8_VBEND, DEC8_VBSTART)
+	MCFG_SCREEN_RAW_PARAMS_DATA_EAST
 	MCFG_SCREEN_UPDATE_DRIVER(dec8_state, screen_update_cobracom)
 	MCFG_SCREEN_PALETTE("palette")
 

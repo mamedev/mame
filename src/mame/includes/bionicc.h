@@ -8,6 +8,7 @@
 ***************************************************************************/
 
 #include "machine/gen_latch.h"
+#include "machine/timer.h"
 #include "video/bufsprite.h"
 #include "video/tigeroad_spr.h"
 

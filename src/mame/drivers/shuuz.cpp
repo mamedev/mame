@@ -23,6 +23,7 @@
 #include "includes/shuuz.h"
 
 #include "cpu/m68000/m68000.h"
+#include "machine/eeprompar.h"
 #include "machine/watchdog.h"
 #include "sound/okim6295.h"
 #include "speaker.h"
@@ -111,8 +112,8 @@ READ16_MEMBER(shuuz_state::special_port0_r)
 
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, shuuz_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
-	AM_RANGE(0x100000, 0x100fff) AM_DEVREADWRITE8("eeprom", atari_eeprom_device, read, write, 0x00ff)
-	AM_RANGE(0x101000, 0x101fff) AM_DEVWRITE("eeprom", atari_eeprom_device, unlock_write)
+	AM_RANGE(0x100000, 0x100fff) AM_DEVREADWRITE8("eeprom", eeprom_parallel_28xx_device, read, write, 0x00ff)
+	AM_RANGE(0x101000, 0x101fff) AM_DEVWRITE("eeprom", eeprom_parallel_28xx_device, unlock_write)
 	AM_RANGE(0x102000, 0x102001) AM_DEVWRITE("watchdog", watchdog_timer_device, reset16_w)
 	AM_RANGE(0x103000, 0x103003) AM_READ(leta_r)
 	AM_RANGE(0x105000, 0x105001) AM_READWRITE(special_port0_r, latch_w)
@@ -236,7 +237,8 @@ static MACHINE_CONFIG_START( shuuz )
 	MCFG_CPU_ADD("maincpu", M68000, ATARI_CLOCK_14MHz/2)
 	MCFG_CPU_PROGRAM_MAP(main_map)
 
-	MCFG_ATARI_EEPROM_2816_ADD("eeprom")
+	MCFG_EEPROM_2816_ADD("eeprom")
+	MCFG_EEPROM_28XX_LOCK_AFTER_WRITE(true)
 
 	MCFG_WATCHDOG_ADD("watchdog")
 

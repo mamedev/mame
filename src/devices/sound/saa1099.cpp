@@ -350,7 +350,7 @@ WRITE8_MEMBER( saa1099_device::control_w )
 	if ((data & 0xff) > 0x1c)
 	{
 		/* Error! */
-		logerror("%s: (SAA1099 '%s') Unknown register selected\n", machine().describe_context(), tag());
+		logerror("%s: Unknown register selected\n", machine().describe_context());
 	}
 
 	m_selected_reg = data & 0x1f;
@@ -435,7 +435,7 @@ WRITE8_MEMBER( saa1099_device::data_w )
 			int i;
 
 			/* Synch & Reset generators */
-			logerror("%s: (SAA1099 '%s') -reg 0x1c- Chip reset\n", machine().describe_context(), tag());
+			logerror("%s: -reg 0x1c- Chip reset\n", machine().describe_context());
 			for (i = 0; i < 6; i++)
 			{
 				m_channels[i].level = 0;
@@ -445,7 +445,7 @@ WRITE8_MEMBER( saa1099_device::data_w )
 		break;
 	default:    /* Error! */
 		if (data != 0)
-			logerror("%s: (SAA1099 '%s') Unknown operation (reg:%02x, data:%02x)\n", machine().describe_context(), tag(), reg, data);
+			logerror("%s: Unknown operation (reg:%02x, data:%02x)\n", machine().describe_context(), reg, data);
 	}
 }
 

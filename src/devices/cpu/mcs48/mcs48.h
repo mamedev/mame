@@ -180,9 +180,7 @@ protected:
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
 	// device_disasm_interface overrides
-	virtual uint32_t disasm_min_opcode_bytes() const override { return 1; }
-	virtual uint32_t disasm_max_opcode_bytes() const override { return 2; }
-	virtual offs_t disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
+	virtual util::disasm_interface *create_disassembler() override;
 
 protected:
 	address_space_config m_program_config;
@@ -230,7 +228,7 @@ protected:
 
 	/* Memory spaces */
 	address_space *m_program;
-	direct_read_data *m_direct;
+	direct_read_data<0> *m_direct;
 	address_space *m_data;
 	address_space *m_io;
 
@@ -241,6 +239,23 @@ protected:
 
 	typedef int (mcs48_cpu_device::*mcs48_ophandler)();
 	static const mcs48_ophandler s_opcode_table[256];
+
+	/* ROM is mapped to AS_PROGRAM */
+	uint8_t program_r(offs_t a)         { return m_program->read_byte(a); }
+
+	/* RAM is mapped to AS_DATA */
+	uint8_t ram_r(offs_t a)             { return m_data->read_byte(a); }
+	void    ram_w(offs_t a, uint8_t v)  { m_data->write_byte(a, v); }
+
+	/* ports are mapped to AS_IO and callbacks */
+	uint8_t ext_r(offs_t a)             { return m_io->read_byte(a); }
+	void    ext_w(offs_t a, uint8_t v)  { m_io->write_byte(a, v); }
+	uint8_t port_r(offs_t a)            { return m_port_in_cb[a - 1](); }
+	void    port_w(offs_t a, uint8_t v) { m_port_out_cb[a - 1](v); }
+	int     test_r(offs_t a)            { return m_test_in_cb[a](); }
+	uint8_t bus_r()                     { return m_bus_in_cb(); }
+	void    bus_w(uint8_t v)            { m_bus_out_cb(v); }
+	void    prog_w(int v)               { m_prog_out_cb(v); }
 
 	uint8_t opcode_fetch();
 	uint8_t argument_fetch();
@@ -633,7 +648,7 @@ protected:
 	// construction/destruction
 	upi41_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int rom_size, int ram_size);
 
-	virtual offs_t disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
+	virtual util::disasm_interface *create_disassembler() override;
 
 	TIMER_CALLBACK_MEMBER( master_callback );
 };

@@ -5,6 +5,7 @@
  *
  */
 
+#include "machine/timer.h"
 #include "video/segaic24.h"
 #include "sound/dac.h"
 #include "screen.h"
@@ -102,7 +103,6 @@ public:
 	DECLARE_WRITE8_MEMBER( frc_w );
 	DECLARE_READ16_MEMBER(  mlatch_r );
 	DECLARE_WRITE16_MEMBER( mlatch_w );
-	DECLARE_READ8_MEMBER(   dials_r );
 	DECLARE_READ16_MEMBER(  iod_r );
 	DECLARE_WRITE16_MEMBER( iod_w );
 

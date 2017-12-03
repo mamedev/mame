@@ -12,6 +12,7 @@
 #pragma once
 
 #include "cpu/mcs40/mcs40.h"
+#include "machine/timer.h"
 
 class busicom_state : public driver_device
 {

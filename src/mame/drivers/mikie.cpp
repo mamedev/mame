@@ -44,6 +44,7 @@ Stephh's notes (based on the games M6809 code and some tests) :
 
 #include "cpu/z80/z80.h"
 #include "cpu/m6809/m6809.h"
+#include "machine/74259.h"
 #include "machine/gen_latch.h"
 #include "machine/watchdog.h"
 #include "sound/sn76496.h"
@@ -72,25 +73,30 @@ READ8_MEMBER(mikie_state::mikie_sh_timer_r)
 	return clock;
 }
 
-WRITE8_MEMBER(mikie_state::mikie_sh_irqtrigger_w)
+WRITE_LINE_MEMBER(mikie_state::sh_irqtrigger_w)
 {
-	if (m_last_irq == 0 && data == 1)
+	if (state)
 	{
 		// setting bit 0 low then high triggers IRQ on the sound CPU
 		m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff);
 	}
-
-	m_last_irq = data;
 }
 
-WRITE8_MEMBER(mikie_state::mikie_coin_counter_w)
+WRITE_LINE_MEMBER(mikie_state::coin_counter_1_w)
 {
-	machine().bookkeeping().coin_counter_w(offset, data);
+	machine().bookkeeping().coin_counter_w(0, state);
 }
 
-WRITE8_MEMBER(mikie_state::irq_mask_w)
+WRITE_LINE_MEMBER(mikie_state::coin_counter_2_w)
 {
-	m_irq_mask = data & 1;
+	machine().bookkeeping().coin_counter_w(1, state);
+}
+
+WRITE_LINE_MEMBER(mikie_state::irq_mask_w)
+{
+	m_irq_mask = state;
+	if (!m_irq_mask)
+		m_maincpu->set_input_line(M6809_IRQ_LINE, CLEAR_LINE);
 }
 
 /*************************************
@@ -101,10 +107,7 @@ WRITE8_MEMBER(mikie_state::irq_mask_w)
 
 static ADDRESS_MAP_START( mikie_map, AS_PROGRAM, 8, mikie_state )
 	AM_RANGE(0x0000, 0x00ff) AM_RAM
-	AM_RANGE(0x2000, 0x2001) AM_WRITE(mikie_coin_counter_w)
-	AM_RANGE(0x2002, 0x2002) AM_WRITE(mikie_sh_irqtrigger_w)
-	AM_RANGE(0x2006, 0x2006) AM_WRITE(mikie_flipscreen_w)
-	AM_RANGE(0x2007, 0x2007) AM_WRITE(irq_mask_w)
+	AM_RANGE(0x2000, 0x2007) AM_DEVWRITE("mainlatch", ls259_device, write_d0)
 	AM_RANGE(0x2100, 0x2100) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
 	AM_RANGE(0x2200, 0x2200) AM_WRITE(mikie_palettebank_w)
 	AM_RANGE(0x2300, 0x2300) AM_WRITENOP    // ???
@@ -239,30 +242,37 @@ GFXDECODE_END
 void mikie_state::machine_start()
 {
 	save_item(NAME(m_palettebank));
-	save_item(NAME(m_last_irq));
+	save_item(NAME(m_irq_mask));
 }
 
 void mikie_state::machine_reset()
 {
 	m_palettebank = 0;
-	m_last_irq = 0;
 }
 
 INTERRUPT_GEN_MEMBER(mikie_state::vblank_irq)
 {
-	if(m_irq_mask)
-		device.execute().set_input_line(0, HOLD_LINE);
+	if (m_irq_mask)
+		device.execute().set_input_line(M6809_IRQ_LINE, ASSERT_LINE);
 }
 
 static MACHINE_CONFIG_START( mikie )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6809, OSC/12)
+	MCFG_CPU_ADD("maincpu", M6809, OSC/12) // 9A (surface scratched)
 	MCFG_CPU_PROGRAM_MAP(mikie_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", mikie_state,  vblank_irq)
 
-	MCFG_CPU_ADD("audiocpu", Z80, CLK)
+	MCFG_CPU_ADD("audiocpu", Z80, CLK) // 4E (surface scratched)
 	MCFG_CPU_PROGRAM_MAP(sound_map)
+
+	MCFG_DEVICE_ADD("mainlatch", LS259, 0) // 6I
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(mikie_state, coin_counter_1_w)) // COIN1
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(mikie_state, coin_counter_2_w)) // COIN2
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(mikie_state, sh_irqtrigger_w)) // SOUNDON
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(NOOP) // END (not used?)
+	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(mikie_state, flipscreen_w)) // FLIP
+	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(mikie_state, irq_mask_w)) // INT
 
 	MCFG_WATCHDOG_ADD("watchdog")
 

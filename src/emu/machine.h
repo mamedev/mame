@@ -250,6 +250,7 @@ public:
 	u32 rand();
 	std::string describe_context() const;
 	std::string compose_saveload_filename(std::string &&base_filename, const char **searchpath = nullptr);
+	std::string get_statename(const char *statename_opt) const;
 
 	// CPU information
 	cpu_device *            firstcpu;           // first CPU
@@ -293,7 +294,6 @@ private:
 	template <typename T> struct is_null<T *> { template <typename U> static bool value(U &&x) { return !x; } };
 	void start();
 	void set_saveload_filename(std::string &&filename);
-	std::string get_statename(const char *statename_opt) const;
 	void handle_saveload();
 	void soft_reset(void *ptr = nullptr, s32 param = 0);
 	std::string nvram_filename(device_t &device) const;

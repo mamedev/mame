@@ -7,8 +7,8 @@
 **********************************************************************/
 
 
-#ifndef MAME_BUS__BBC_FDC_ACORN_H
-#define MAME_BUS__BBC_FDC_ACORN_H
+#ifndef MAME_BUS_BBC_FDC_ACORN_H
+#define MAME_BUS_BBC_FDC_ACORN_H
 
 #pragma once
 
@@ -31,6 +31,8 @@ public:
 	// construction/destruction
 	bbc_acorn8271_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+	DECLARE_FLOPPY_FORMATS(floppy_formats);
+
 protected:
 	// device-level overrides
 	virtual void device_start() override;
@@ -41,8 +43,6 @@ protected:
 	virtual const tiny_rom_entry *device_rom_region() const override;
 
 private:
-	DECLARE_FLOPPY_FORMATS(floppy_formats);
-
 	DECLARE_WRITE_LINE_MEMBER(fdc_intrq_w);
 	DECLARE_WRITE_LINE_MEMBER(motor_w);
 	DECLARE_WRITE_LINE_MEMBER(side_w);
@@ -62,9 +62,6 @@ public:
 	// construction/destruction
 	bbc_acorn1770_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_READ8_MEMBER(wd1770l_read);
-	DECLARE_WRITE8_MEMBER(wd1770l_write);
-
 protected:
 	// device-level overrides
 	virtual void device_start() override;
@@ -75,8 +72,8 @@ protected:
 	virtual const tiny_rom_entry *device_rom_region() const override;
 
 private:
-	DECLARE_FLOPPY_FORMATS(floppy_formats);
-
+	DECLARE_READ8_MEMBER(wd1770l_read);
+	DECLARE_WRITE8_MEMBER(wd1770l_write);
 	DECLARE_WRITE_LINE_MEMBER(fdc_intrq_w);
 	DECLARE_WRITE_LINE_MEMBER(fdc_drq_w);
 
@@ -94,4 +91,4 @@ DECLARE_DEVICE_TYPE(BBC_ACORN8271, bbc_acorn8271_device)
 DECLARE_DEVICE_TYPE(BBC_ACORN1770, bbc_acorn1770_device)
 
 
-#endif // MAME_BUS__BBC_FDC_ACORN_H
+#endif // MAME_BUS_BBC_FDC_ACORN_H

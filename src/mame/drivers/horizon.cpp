@@ -2,15 +2,19 @@
 // copyright-holders:Miodrag Milanovic
 /***************************************************************************
 
-        NorthStar Horizon
+NorthStar Horizon
 
-        07/12/2009 Skeleton driver.
+2009-12-07 Skeleton driver.
 
-        It appears these machines say nothing until a floppy disk is
-        succesfully loaded. The memory range EA00-EB40 appears to be
-        used by devices, particularly the FDC.
+http://www.hartetechnologies.com/manuals/Northstar/
 
-    http://www.hartetechnologies.com/manuals/Northstar/
+The tiny bios (only about 200 bytes) initialises nothing, but only loads the
+initial sector from the disk and transfers control to it. All the used memory
+locations in the EA00-EB40 range are listed in the memory map. It does not
+use the IO map, and has no text.
+
+The 2MHz downgrade is suggested in the manual for the CPU board (ZPB-A). It
+involves replacing the XTAL and reconnecting one jumper.
 
 ****************************************************************************/
 
@@ -49,12 +53,16 @@ class horizon_state : public driver_device
 {
 public:
 	horizon_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, Z80_TAG),
-			m_usart_l(*this, I8251_L_TAG),
-			m_usart_r(*this, I8251_L_TAG)
-	{ }
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, Z80_TAG)
+		, m_usart_l(*this, I8251_L_TAG)
+		, m_usart_r(*this, I8251_L_TAG)
+		{ }
 
+	DECLARE_READ8_MEMBER(ff_r);
+
+private:
+	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
 	required_device<i8251_device> m_usart_l;
 	required_device<i8251_device> m_usart_r;
@@ -71,6 +79,16 @@ public:
 //-------------------------------------------------
 
 static ADDRESS_MAP_START( horizon_mem, AS_PROGRAM, 8, horizon_state )
+	AM_RANGE(0x0000, 0xe7ff) AM_RAM
+	AM_RANGE(0xe800, 0xe9ff) AM_ROM AM_REGION("roms", 0)
+	AM_RANGE(0xea01, 0xea01)
+	AM_RANGE(0xea11, 0xea11)
+	AM_RANGE(0xea21, 0xea21)
+	AM_RANGE(0xea31, 0xea31)
+	AM_RANGE(0xeb10, 0xeb17) AM_READ(ff_r)
+	AM_RANGE(0xeb20, 0xeb20)
+	AM_RANGE(0xeb35, 0xeb35)
+	AM_RANGE(0xeb40, 0xeb40)
 ADDRESS_MAP_END
 
 
@@ -88,13 +106,21 @@ ADDRESS_MAP_END
 //**************************************************************************
 
 //-------------------------------------------------
-//  INPUT_PORTS( sage2 )
+//  INPUT_PORTS
 //-------------------------------------------------
 
 static INPUT_PORTS_START( horizon )
 INPUT_PORTS_END
 
+void horizon_state::machine_reset()
+{
+	m_maincpu->set_pc(0xe800);
+}
 
+READ8_MEMBER( horizon_state::ff_r )
+{
+	return 0xff;
+}
 
 //**************************************************************************
 //  DEVICE CONFIGURATION
@@ -143,7 +169,7 @@ SLOT_INTERFACE_END
 
 static MACHINE_CONFIG_START( horizon )
 	// basic machine hardware
-	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL_4MHz)
+	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL_8MHz / 2)
 	MCFG_CPU_PROGRAM_MAP(horizon_mem)
 	MCFG_CPU_IO_MAP(horizon_io)
 
@@ -168,23 +194,31 @@ static MACHINE_CONFIG_START( horizon )
 	MCFG_RS232_DSR_HANDLER(DEVWRITELINE(I8251_R_TAG, i8251_device, write_dsr))
 
 	// S-100
-	MCFG_S100_BUS_ADD()
+	MCFG_DEVICE_ADD("s100", S100_BUS, XTAL_8MHz / 4)
 	MCFG_S100_RDY_CALLBACK(INPUTLINE(Z80_TAG, Z80_INPUT_LINE_BOGUSWAIT))
-	//MCFG_S100_SLOT_ADD("s100_1", horizon_s100_cards, nullptr, nullptr) // CPU
-	MCFG_S100_SLOT_ADD("s100_2", horizon_s100_cards, nullptr) // RAM
-	MCFG_S100_SLOT_ADD("s100_3", horizon_s100_cards, "mdsad") // MDS
-	MCFG_S100_SLOT_ADD("s100_4", horizon_s100_cards, nullptr) // FPB
-	MCFG_S100_SLOT_ADD("s100_5", horizon_s100_cards, nullptr)
-	MCFG_S100_SLOT_ADD("s100_6", horizon_s100_cards, nullptr)
-	MCFG_S100_SLOT_ADD("s100_7", horizon_s100_cards, nullptr)
-	MCFG_S100_SLOT_ADD("s100_8", horizon_s100_cards, nullptr)
-	MCFG_S100_SLOT_ADD("s100_9", horizon_s100_cards, nullptr)
-	MCFG_S100_SLOT_ADD("s100_10", horizon_s100_cards, nullptr)
-	MCFG_S100_SLOT_ADD("s100_11", horizon_s100_cards, nullptr)
-	MCFG_S100_SLOT_ADD("s100_12", horizon_s100_cards, nullptr)
+	//MCFG_S100_SLOT_ADD("s100:1", horizon_s100_cards, nullptr, nullptr) // CPU
+	MCFG_S100_SLOT_ADD("s100:2", horizon_s100_cards, nullptr) // RAM
+	MCFG_S100_SLOT_ADD("s100:3", horizon_s100_cards, "mdsad") // MDS
+	MCFG_S100_SLOT_ADD("s100:4", horizon_s100_cards, nullptr) // FPB
+	MCFG_S100_SLOT_ADD("s100:5", horizon_s100_cards, nullptr)
+	MCFG_S100_SLOT_ADD("s100:6", horizon_s100_cards, nullptr)
+	MCFG_S100_SLOT_ADD("s100:7", horizon_s100_cards, nullptr)
+	MCFG_S100_SLOT_ADD("s100:8", horizon_s100_cards, nullptr)
+	MCFG_S100_SLOT_ADD("s100:9", horizon_s100_cards, nullptr)
+	MCFG_S100_SLOT_ADD("s100:10", horizon_s100_cards, nullptr)
+	MCFG_S100_SLOT_ADD("s100:11", horizon_s100_cards, nullptr)
+	MCFG_S100_SLOT_ADD("s100:12", horizon_s100_cards, nullptr)
 
 	// software list
 	MCFG_SOFTWARE_LIST_ADD("flop_list", "horizon")
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( horizon2mhz, horizon )
+	MCFG_CPU_MODIFY("z80")
+	MCFG_CPU_CLOCK(XTAL_4MHz / 2)
+
+	MCFG_DEVICE_MODIFY("s100")
+	MCFG_DEVICE_CLOCK(XTAL_4MHz / 2)
 MACHINE_CONFIG_END
 
 
@@ -198,9 +232,11 @@ MACHINE_CONFIG_END
 //-------------------------------------------------
 
 ROM_START( nshrz )
-	ROM_REGION( 0x400, Z80_TAG, 0 )
+	ROM_REGION( 0x400, "roms", 0 )
 	ROM_LOAD( "option.prom", 0x000, 0x400, NO_DUMP )
 ROM_END
+
+#define rom_nshrz2mhz rom_nshrz
 
 
 //-------------------------------------------------
@@ -208,8 +244,8 @@ ROM_END
 //-------------------------------------------------
 
 ROM_START( vector1 ) // This one have different I/O
-	ROM_REGION( 0x10000, Z80_TAG, ROMREGION_ERASEFF )
-	ROM_LOAD( "horizon.bin", 0xe800, 0x0100, CRC(7aafa134) SHA1(bf1552c4818f30473798af4f54e65e1957e0db48))
+	ROM_REGION( 0x400, "roms", ROMREGION_ERASEFF )
+	ROM_LOAD( "horizon.bin", 0x0000, 0x0100, CRC(7aafa134) SHA1(bf1552c4818f30473798af4f54e65e1957e0db48))
 ROM_END
 
 
@@ -219,5 +255,8 @@ ROM_END
 //**************************************************************************
 
 //    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    STATE          INIT  COMPANY                 FULLNAME                          FLAGS
-COMP( 1976, nshrz,   0,      0,      horizon, horizon, horizon_state, 0,    "North Star Computers", "Horizon (North Star Computers)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
-COMP( 1979, vector1, nshrz,  0,      horizon, horizon, horizon_state, 0,    "Vector Graphic",       "Vector 1+ (DD drive)",           MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+COMP( 1976, nshrz,     0,     0, horizon,     horizon, horizon_state, 0, "North Star Computers", "Horizon (North Star Computers, 4MHz)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+COMP( 1976, nshrz2mhz, nshrz, 0, horizon2mhz, horizon, horizon_state, 0, "North Star Computers", "Horizon (North Star Computers, 2MHz)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+
+// This really should be in its own driver
+COMP( 1979, vector1,  0,      0, horizon,     horizon, horizon_state, 0, "Vector Graphic",       "Vector 1+ (DD drive)",                  MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )

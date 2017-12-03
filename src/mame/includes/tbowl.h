@@ -52,7 +52,6 @@ public:
 	DECLARE_WRITE8_MEMBER(coincounter_w);
 	DECLARE_WRITE8_MEMBER(boardb_bankswitch_w);
 	DECLARE_WRITE8_MEMBER(boardc_bankswitch_w);
-	DECLARE_WRITE8_MEMBER(sound_command_w);
 	DECLARE_WRITE8_MEMBER(trigger_nmi);
 	DECLARE_WRITE8_MEMBER(adpcm_start_w);
 	DECLARE_WRITE8_MEMBER(adpcm_end_w);

@@ -11,6 +11,7 @@
 #include "machine/eepromser.h"
 #include "machine/z80scc.h"
 #include "bus/rs232/rs232.h"
+#include "screen.h"
 
 //MCFG_PCI_DEVICE_ADD(_tag, _type, _main_id, _revision, _pclass, _subsystem_id)
 
@@ -58,12 +59,15 @@ public:
 	iteagle_fpga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	required_device<nvram_device> m_rtc;
+	optional_device<nvram_device> m_e1_nvram;
 	required_device<scc85c30_device> m_scc1;
+	screen_device *m_screen;
 
 	void set_init_info(int version, int seq_init) {m_version=version; m_seq_init=seq_init;}
 	void set_irq_info(const char *tag, const int irq_num, const int serial_num) {
 		m_cpu_tag = tag; m_irq_num = irq_num; m_serial_irq_num = serial_num;}
 
+	DECLARE_WRITE_LINE_MEMBER(vblank_update);
 	DECLARE_WRITE8_MEMBER(serial_rx_w);
 
 protected:
@@ -81,13 +85,17 @@ private:
 
 	uint32_t m_fpga_regs[0x20 / 4];
 	uint32_t m_rtc_regs[0x800 / 4];
-	uint32_t m_ram[0x20000 / 4];
+	uint32_t m_e1_nv_data[0x40 / 4];
+	uint32_t m_e1_ram[0x10000 / 4];
 	uint32_t m_prev_reg;
 
 	uint32_t m_version;
 	uint32_t m_seq_init;
 	uint32_t m_seq;
 	uint32_t m_seq_rem1, m_seq_rem2;
+
+	int m_vblank_state;
+	int m_gun_x, m_gun_y;
 
 	iteagle_am85c30 m_serial0_1;
 	iteagle_am85c30 m_serial2_3;
@@ -104,8 +112,10 @@ private:
 	DECLARE_READ32_MEMBER( rtc_r );
 	DECLARE_WRITE32_MEMBER( rtc_w );
 
-	DECLARE_READ32_MEMBER( ram_r );
-	DECLARE_WRITE32_MEMBER( ram_w );
+	DECLARE_READ32_MEMBER(e1_nvram_r);
+	DECLARE_WRITE32_MEMBER(e1_nvram_w);
+	DECLARE_READ32_MEMBER( e1_ram_r );
+	DECLARE_WRITE32_MEMBER( e1_ram_w );
 
 	DECLARE_WRITE_LINE_MEMBER(serial_interrupt);
 };

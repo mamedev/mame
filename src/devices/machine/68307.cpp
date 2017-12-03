@@ -44,7 +44,7 @@ ADDRESS_MAP_END
 
 
 MACHINE_CONFIG_MEMBER( m68307_cpu_device::device_add_mconfig )
-	MCFG_MC68681_ADD("internal68681", 16000000/4) // ?? Mhz - should be specified in inline config
+	MCFG_DEVICE_ADD("internal68681", MC68681, 16000000/4) // ?? Mhz - should be specified in inline config
 	MCFG_MC68681_IRQ_CALLBACK(WRITELINE(m68307_cpu_device, m68307_duart_irq_handler))
 	MCFG_MC68681_A_TX_CALLBACK(WRITELINE(m68307_cpu_device, m68307_duart_txa))
 	MCFG_MC68681_B_TX_CALLBACK(WRITELINE(m68307_cpu_device, m68307_duart_txb))
@@ -158,7 +158,7 @@ void m68307_cpu_device::write_dword_m68307(offs_t address, uint32_t data)
 void m68307_cpu_device::init16_m68307(address_space &space)
 {
 	m_space = &space;
-	m_direct = &space.direct();
+	m_direct = space.direct<0>();
 	opcode_xor = 0;
 
 	readimm16 = m68k_readimm16_delegate(&m68307_cpu_device::simple_read_immediate_16_m68307, this);

@@ -3,6 +3,7 @@
 
 #include "machine/taito68705interface.h"
 #include "machine/gen_latch.h"
+#include "machine/input_merger.h"
 #include "screen.h"
 
 class bking_state : public driver_device
@@ -16,7 +17,8 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
-		m_soundlatch(*this, "soundlatch")
+		m_soundlatch(*this, "soundlatch"),
+		m_soundnmi(*this, "soundnmi")
 	{
 	}
 
@@ -43,10 +45,6 @@ public:
 	int         m_controller;
 	int         m_hit;
 
-	/* sound-related */
-	int         m_sound_nmi_enable;
-	int         m_pending_nmi;
-
 	/* misc */
 	int         m_addr_h;
 	int         m_addr_l;
@@ -58,6 +56,7 @@ public:
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 	required_device<generic_latch_8_device> m_soundlatch;
+	required_device<input_merger_device> m_soundnmi;
 
 	DECLARE_READ8_MEMBER(bking_sndnmi_disable_r);
 	DECLARE_WRITE8_MEMBER(bking_sndnmi_enable_w);

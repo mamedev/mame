@@ -77,9 +77,6 @@ protected:
 	virtual void device_reset() override;
 	virtual void device_add_mconfig(machine_config &config) override;
 
-	virtual uint32_t disasm_min_opcode_bytes() const override { return 2; }
-	virtual uint32_t disasm_max_opcode_bytes() const override { return 10; }
-
 	virtual uint32_t execute_min_cycles() const override { return 4; }
 	virtual uint32_t execute_max_cycles() const override { return 158; }
 

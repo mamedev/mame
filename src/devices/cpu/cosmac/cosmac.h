@@ -126,7 +126,9 @@
 // input lines
 enum
 {
-	COSMAC_INPUT_LINE_INT = 0,
+	COSMAC_INPUT_LINE_WAIT = 0,
+	COSMAC_INPUT_LINE_CLEAR,
+	COSMAC_INPUT_LINE_INT,
 	COSMAC_INPUT_LINE_DMAIN,
 	COSMAC_INPUT_LINE_DMAOUT,
 	COSMAC_INPUT_LINE_EF1,
@@ -205,6 +207,8 @@ public:
 	// public interfaces
 	offs_t get_memory_address();
 
+	DECLARE_WRITE_LINE_MEMBER( wait_w ) { set_input_line(COSMAC_INPUT_LINE_WAIT, state); }
+	DECLARE_WRITE_LINE_MEMBER( clear_w ) { set_input_line(COSMAC_INPUT_LINE_CLEAR, state); }
 	DECLARE_WRITE_LINE_MEMBER( int_w ) { set_input_line(COSMAC_INPUT_LINE_INT, state); }
 	DECLARE_WRITE_LINE_MEMBER( dma_in_w ) { set_input_line(COSMAC_INPUT_LINE_DMAIN, state); }
 	DECLARE_WRITE_LINE_MEMBER( dma_out_w ) { set_input_line(COSMAC_INPUT_LINE_DMAOUT, state); }
@@ -235,10 +239,6 @@ protected:
 	virtual void state_import(const device_state_entry &entry) override;
 	virtual void state_export(const device_state_entry &entry) override;
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
-
-	// device_disasm_interface overrides
-	virtual uint32_t disasm_min_opcode_bytes() const override;
-	virtual uint32_t disasm_max_opcode_bytes() const override;
 
 	// helpers
 	inline uint8_t read_opcode(offs_t pc);
@@ -411,6 +411,8 @@ protected:
 	cosmac_state        m_state;            // state
 	cosmac_mode         m_mode;             // control mode
 	cosmac_mode         m_pmode;            // previous control mode
+	bool m_wait;
+	bool m_clear;
 	int                 m_irq;              // interrupt request
 	int                 m_dmain;            // DMA input request
 	int                 m_dmaout;           // DMA output request
@@ -435,7 +437,7 @@ protected:
 	int                 m_icount;
 	address_space *     m_program;
 	address_space *     m_io;
-	direct_read_data *  m_direct;
+	direct_read_data<0> *m_direct;
 
 	// opcode/condition tables
 	typedef void (cosmac_device::*ophandler)();
@@ -453,7 +455,7 @@ public:
 
 protected:
 	// device_disasm_interface overrides
-	virtual offs_t disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
+	virtual util::disasm_interface *create_disassembler() override;
 
 	virtual cosmac_device::ophandler get_ophandler(uint8_t opcode) override;
 
@@ -471,7 +473,7 @@ public:
 
 protected:
 	// device_disasm_interface overrides
-	virtual offs_t disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
+	virtual util::disasm_interface *create_disassembler() override;
 
 	virtual cosmac_device::ophandler get_ophandler(uint8_t opcode) override;
 

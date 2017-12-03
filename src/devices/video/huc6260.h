@@ -83,7 +83,7 @@ private:
 	uint8_t   m_pixels_per_clock; /* Number of pixels to output per colour clock */
 	uint16_t  m_pixel_data;
 	uint8_t   m_pixel_clock;
-	
+
 	emu_timer   *m_timer;
 	std::unique_ptr<bitmap_ind16>   m_bmp;
 

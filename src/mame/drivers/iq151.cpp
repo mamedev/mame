@@ -49,6 +49,7 @@ ToDo:
 #include "imagedev/cassette.h"
 #include "machine/i8255.h"
 #include "machine/pic8259.h"
+#include "machine/timer.h"
 #include "sound/spkrdev.h"
 
 // cartridge slot
@@ -404,7 +405,8 @@ static MACHINE_CONFIG_START( iq151 )
 	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MCFG_PIC8259_ADD("pic8259", INPUTLINE("maincpu", 0), VCC, NOOP)
+	MCFG_DEVICE_ADD("pic8259", PIC8259, 0)
+	MCFG_PIC8259_OUT_INT_CB(INPUTLINE("maincpu", 0))
 
 	MCFG_DEVICE_ADD("ppi8255", I8255, 0)
 	MCFG_I8255_IN_PORTA_CB(READ8(iq151_state, keyboard_row_r))

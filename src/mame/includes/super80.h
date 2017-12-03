@@ -11,6 +11,7 @@
 #include "imagedev/cassette.h"
 #include "imagedev/snapquik.h"
 #include "machine/buffer.h"
+#include "machine/timer.h"
 #include "machine/wd_fdc.h"
 #include "machine/z80dma.h"
 #include "machine/z80pio.h"

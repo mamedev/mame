@@ -121,7 +121,7 @@ int ttl74123_device::timer_running()
 
 TIMER_CALLBACK_MEMBER( ttl74123_device::output_callback )
 {
-	m_output_changed_cb((offs_t)0, param);
+	m_output_changed_cb(param);
 }
 
 
@@ -147,7 +147,7 @@ TIMER_CALLBACK_MEMBER( ttl74123_device::clear_callback )
 {
 	int output = timer_running();
 
-	m_output_changed_cb((offs_t)0, output);
+	m_output_changed_cb(output);
 }
 
 //-------------------------------------------------
@@ -190,15 +190,15 @@ void ttl74123_device::start_pulse()
 //  a_w - write register a data
 //-------------------------------------------------
 
-WRITE8_MEMBER( ttl74123_device::a_w )
+WRITE_LINE_MEMBER( ttl74123_device::a_w )
 {
 	/* start/regtrigger pulse if B=HI and falling edge on A (while clear is HI) */
-	if (!data && m_a && m_b && m_clear)
+	if (!state && m_a && m_b && m_clear)
 	{
 		start_pulse();
 	}
 
-	m_a = data;
+	m_a = state;
 }
 
 
@@ -206,15 +206,15 @@ WRITE8_MEMBER( ttl74123_device::a_w )
 //  b_w - write register b data
 //-------------------------------------------------
 
-WRITE8_MEMBER( ttl74123_device::b_w)
+WRITE_LINE_MEMBER( ttl74123_device::b_w)
 {
 	/* start/regtrigger pulse if A=LO and rising edge on B (while clear is HI) */
-	if (data && !m_b && !m_a && m_clear)
+	if (state && !m_b && !m_a && m_clear)
 	{
 		start_pulse();
 	}
 
-	m_b = data;
+	m_b = state;
 }
 
 
@@ -222,20 +222,20 @@ WRITE8_MEMBER( ttl74123_device::b_w)
 //  clear_w - write register clear data
 //-------------------------------------------------
 
-WRITE8_MEMBER( ttl74123_device::clear_w)
+WRITE_LINE_MEMBER( ttl74123_device::clear_w)
 {
 	/* start/regtrigger pulse if B=HI and A=LO and rising edge on clear */
-	if (data && !m_a && m_b && !m_clear)
+	if (state && !m_a && m_b && !m_clear)
 	{
 		start_pulse();
 	}
-	else if (!data)  /* clear the output  */
+	else if (!state)  /* clear the output  */
 	{
 		m_timer->adjust(attotime::zero);
 
 		LOG("74123:  Cleared\n");
 	}
-	m_clear = data;
+	m_clear = state;
 }
 
 
@@ -243,7 +243,7 @@ WRITE8_MEMBER( ttl74123_device::clear_w)
 //  reset_w - reset device
 //-------------------------------------------------
 
-WRITE8_MEMBER( ttl74123_device::reset_w)
+WRITE_LINE_MEMBER( ttl74123_device::reset_w)
 {
 	set_output();
 }

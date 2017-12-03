@@ -6,7 +6,7 @@
 
 *************************************************************************/
 
-#include "machine/gen_latch.h"
+#include "machine/input_merger.h"
 #include "machine/watchdog.h"
 #include "sound/discrete.h"
 #include "screen.h"
@@ -24,7 +24,7 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
 		m_screen(*this, "screen"),
-		m_soundlatch(*this, "soundlatch"),
+		m_soundnmi(*this, "soundnmi"),
 		m_radarram(*this, "radarram"),
 		m_videoram(*this, "videoram"),
 		m_spriteram(*this, "spriteram"),
@@ -40,7 +40,7 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	required_device<screen_device> m_screen;
-	required_device<generic_latch_8_device> m_soundlatch;
+	required_device<input_merger_device> m_soundnmi;
 
 	required_shared_ptr<uint8_t> m_radarram;
 	required_shared_ptr<uint8_t> m_videoram;
@@ -58,6 +58,9 @@ public:
 	uint16_t      m_ledlatch;
 	uint8_t       m_ledaddr;
 	uint16_t      m_ledram[8];
+
+	uint8_t       m_soundlatch_data;
+	bool          m_soundlatch_flag;
 
 	uint16_t      m_collide;
 	uint8_t       m_collmode;
@@ -82,6 +85,11 @@ public:
 	DECLARE_WRITE8_MEMBER(left_w);
 	DECLARE_WRITE8_MEMBER(center_w);
 	DECLARE_WRITE8_MEMBER(right_w);
+	TIMER_CALLBACK_MEMBER(soundlatch_w_cb);
+	TIMER_CALLBACK_MEMBER(soundlatch_clear7_w_cb);
+	DECLARE_READ8_MEMBER(soundlatch_r);
+	DECLARE_WRITE8_MEMBER(soundlatch_clear7_w);
+	DECLARE_READ8_MEMBER(soundlatch_flags_r);
 	DECLARE_WRITE8_MEMBER(portA_0_w);
 	DECLARE_WRITE8_MEMBER(portB_0_w);
 	DECLARE_WRITE8_MEMBER(portA_2_w);

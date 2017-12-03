@@ -378,15 +378,11 @@ VIDEO_START_MEMBER(hyprduel_state,common_14220)
 
 VIDEO_START_MEMBER(hyprduel_state,hyprduel_14220)
 {
-	m_sprite_yoffs_sub = 2;
-
 	VIDEO_START_CALL_MEMBER(common_14220);
 }
 
 VIDEO_START_MEMBER(hyprduel_state,magerror_14220)
 {
-	m_sprite_yoffs_sub = 0;
-
 	VIDEO_START_CALL_MEMBER(common_14220);
 }
 
@@ -453,8 +449,8 @@ void hyprduel_state::draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, 
 	uint8_t *base_gfx8 = memregion("gfx1")->base();
 	uint32_t gfx_size = memregion("gfx1")->bytes();
 
-	int max_x = m_screen->width();
-	int max_y = m_screen->height();
+	int max_x = (m_spriteregs[1]+1) * 2;
+	int max_y = (m_spriteregs[0]+1) * 2;
 
 	int max_sprites = m_spriteram.bytes() / 8;
 	int sprites = m_videoregs[0x00 / 2] % max_sprites;
@@ -682,8 +678,8 @@ uint32_t hyprduel_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 		}
 	}
 
-	m_sprite_xoffs = m_videoregs[0x06 / 2] - screen.width()  / 2;
-	m_sprite_yoffs = m_videoregs[0x04 / 2] - screen.height() / 2 - m_sprite_yoffs_sub;
+	m_sprite_xoffs = m_videoregs[0x06 / 2] - (m_spriteregs[1]+1);
+	m_sprite_yoffs = m_videoregs[0x04 / 2] - (m_spriteregs[0]+1);
 
 	/* The background color is selected by a register */
 	screen.priority().fill(0, cliprect);

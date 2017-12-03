@@ -964,20 +964,16 @@ static INPUT_PORTS_START( term2 )
 	PORT_BIT( 0xffff, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("STICK0_X")
-	PORT_BIT( 0x00ff, 0x0080, IPT_AD_STICK_X ) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_SENSITIVITY(20) PORT_KEYDELTA(10) PORT_CENTERDELTA(0) PORT_REVERSE PORT_PLAYER(1)
-	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_X ) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_SENSITIVITY(20) PORT_KEYDELTA(10) PORT_CENTERDELTA(0) PORT_REVERSE PORT_PLAYER(1)
 
 	PORT_START("STICK0_Y")
 	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_Y ) PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_SENSITIVITY(20) PORT_KEYDELTA(10) PORT_CENTERDELTA(0) PORT_PLAYER(1)
-	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("STICK1_X")
 	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_X ) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_SENSITIVITY(20) PORT_KEYDELTA(10) PORT_CENTERDELTA(0) PORT_REVERSE PORT_PLAYER(2)
-	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("STICK1_Y")
 	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_Y ) PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_SENSITIVITY(20) PORT_KEYDELTA(10) PORT_CENTERDELTA(0) PORT_PLAYER(2)
-	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
 
@@ -1245,6 +1241,15 @@ static MACHINE_CONFIG_DERIVED( yunit_adpcm_6bit_faster, yunit_core )
 	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_ENTRIES(4096)
 	MCFG_VIDEO_START_OVERRIDE(midyunit_state,midyunit_6bit)
+MACHINE_CONFIG_END
+
+
+static MACHINE_CONFIG_DERIVED( term2, yunit_adpcm_6bit_faster )
+	MCFG_ADC0844_ADD("adc") // U2 on Coil Lamp Driver Board (A-14915)
+	MCFG_ADC0844_CH1_CB(IOPORT("STICK0_X"))
+	MCFG_ADC0844_CH2_CB(IOPORT("STICK0_Y"))
+	MCFG_ADC0844_CH3_CB(IOPORT("STICK1_X"))
+	MCFG_ADC0844_CH4_CB(IOPORT("STICK1_Y"))
 MACHINE_CONFIG_END
 
 
@@ -3077,12 +3082,12 @@ GAME( 1991, shimpactp4, shimpact, yunit_cvsd_6bit_slow,  shimpact, midyunit_stat
 
 GAME( 1991, strkforc, 0,        yunit_cvsd_4bit_fast,  strkforc, midyunit_state, strkforc, ROT0, "Midway",   "Strike Force (rev 1 02/25/91)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1991, term2,    0,        yunit_adpcm_6bit_faster, term2, midyunit_state,    term2,    ORIENTATION_FLIP_X, "Midway",   "Terminator 2 - Judgment Day (rev LA4 08/03/92)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, term2la3, term2,    yunit_adpcm_6bit_faster, term2, midyunit_state,    term2la3, ORIENTATION_FLIP_X, "Midway",   "Terminator 2 - Judgment Day (rev LA3 03/27/92)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, term2la2, term2,    yunit_adpcm_6bit_faster, term2, midyunit_state,    term2la2, ORIENTATION_FLIP_X, "Midway",   "Terminator 2 - Judgment Day (rev LA2 12/09/91)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, term2la1, term2,    yunit_adpcm_6bit_faster, term2, midyunit_state,    term2la1, ORIENTATION_FLIP_X, "Midway",   "Terminator 2 - Judgment Day (rev LA1 11/01/91)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, term2pa2, term2,    yunit_adpcm_6bit_faster, term2, midyunit_state,    term2la1, ORIENTATION_FLIP_X, "Midway",   "Terminator 2 - Judgment Day (prototype, rev PA2 10/18/91)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, term2lg1, term2,    yunit_adpcm_6bit_faster, term2, midyunit_state,    term2la1, ORIENTATION_FLIP_X, "Midway",   "Terminator 2 - Judgment Day (rev LG1 11/04/91)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, term2,    0,        term2,                   term2, midyunit_state,    term2,    ORIENTATION_FLIP_X, "Midway",   "Terminator 2 - Judgment Day (rev LA4 08/03/92)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, term2la3, term2,    term2,                   term2, midyunit_state,    term2la3, ORIENTATION_FLIP_X, "Midway",   "Terminator 2 - Judgment Day (rev LA3 03/27/92)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, term2la2, term2,    term2,                   term2, midyunit_state,    term2la2, ORIENTATION_FLIP_X, "Midway",   "Terminator 2 - Judgment Day (rev LA2 12/09/91)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, term2la1, term2,    term2,                   term2, midyunit_state,    term2la1, ORIENTATION_FLIP_X, "Midway",   "Terminator 2 - Judgment Day (rev LA1 11/01/91)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, term2pa2, term2,    term2,                   term2, midyunit_state,    term2la1, ORIENTATION_FLIP_X, "Midway",   "Terminator 2 - Judgment Day (prototype, rev PA2 10/18/91)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, term2lg1, term2,    term2,                   term2, midyunit_state,    term2la1, ORIENTATION_FLIP_X, "Midway",   "Terminator 2 - Judgment Day (rev LG1 11/04/91)", MACHINE_SUPPORTS_SAVE )
 
 GAME( 1992, mkla4,    mk,       yunit_adpcm_6bit_fast,   mkla4, midyunit_state,    mkyunit,  ROT0, "Midway",   "Mortal Kombat (rev 4.0 09/28/92)", MACHINE_SUPPORTS_SAVE )
 GAME( 1992, mkla3,    mk,       yunit_adpcm_6bit_fast,   mkla4, midyunit_state,    mkyunit,  ROT0, "Midway",   "Mortal Kombat (rev 3.0 08/31/92)", MACHINE_SUPPORTS_SAVE )

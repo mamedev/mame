@@ -355,8 +355,8 @@ static ADDRESS_MAP_START( rbisland_map, AS_PROGRAM, 16, rbisland_state )
 	AM_RANGE(0x3a0000, 0x3a0001) AM_WRITE(rbisland_spritectrl_w)
 	AM_RANGE(0x3b0000, 0x3b0003) AM_READ_PORT("DSWB")
 	AM_RANGE(0x3c0000, 0x3c0003) AM_WRITENOP        /* written very often, watchdog? */
-	AM_RANGE(0x3e0000, 0x3e0001) AM_READNOP AM_DEVWRITE8("tc0140syt", tc0140syt_device, master_port_w, 0x00ff)
-	AM_RANGE(0x3e0002, 0x3e0003) AM_DEVREADWRITE8("tc0140syt", tc0140syt_device, master_comm_r, master_comm_w, 0x00ff)
+	AM_RANGE(0x3e0000, 0x3e0001) AM_READNOP AM_DEVWRITE8("ciu", pc060ha_device, master_port_w, 0x00ff)
+	AM_RANGE(0x3e0002, 0x3e0003) AM_DEVREADWRITE8("ciu", pc060ha_device, master_comm_r, master_comm_w, 0x00ff)
 	AM_RANGE(0x800000, 0x8007ff) AM_READWRITE(rbisland_cchip_ram_r,rbisland_cchip_ram_w)
 	AM_RANGE(0x800802, 0x800803) AM_READWRITE(rbisland_cchip_ctrl_r,rbisland_cchip_ctrl_w)
 	AM_RANGE(0x800c00, 0x800c01) AM_WRITE(rbisland_cchip_bank_w)
@@ -414,8 +414,8 @@ static ADDRESS_MAP_START( rbisland_sound_map, AS_PROGRAM, 8, rbisland_state )
 	AM_RANGE(0x8000, 0x8fff) AM_RAM
 	AM_RANGE(0x9000, 0x9001) AM_DEVREADWRITE("ymsnd", ym2151_device,read,write)
 	AM_RANGE(0x9002, 0x9100) AM_READNOP
-	AM_RANGE(0xa000, 0xa000) AM_DEVWRITE("tc0140syt", tc0140syt_device, slave_port_w)
-	AM_RANGE(0xa001, 0xa001) AM_DEVREADWRITE("tc0140syt", tc0140syt_device, slave_comm_r, slave_comm_w)
+	AM_RANGE(0xa000, 0xa000) AM_DEVWRITE("ciu", pc060ha_device, slave_port_w)
+	AM_RANGE(0xa001, 0xa001) AM_DEVREADWRITE("ciu", pc060ha_device, slave_comm_r, slave_comm_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( jumping_sound_map, AS_PROGRAM, 8, rbisland_state )
@@ -672,9 +672,9 @@ static MACHINE_CONFIG_START( rbisland )
 	MCFG_SOUND_ROUTE(0, "mono", 0.50)
 	MCFG_SOUND_ROUTE(1, "mono", 0.50)
 
-	MCFG_DEVICE_ADD("tc0140syt", TC0140SYT, 0)
-	MCFG_TC0140SYT_MASTER_CPU("maincpu")
-	MCFG_TC0140SYT_SLAVE_CPU("audiocpu")
+	MCFG_DEVICE_ADD("ciu", PC060HA, 0)
+	MCFG_PC060HA_MASTER_CPU("maincpu")
+	MCFG_PC060HA_SLAVE_CPU("audiocpu")
 MACHINE_CONFIG_END
 
 

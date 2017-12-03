@@ -6,6 +6,7 @@
 
 *************************************************************************/
 
+#include "machine/timer.h"
 #include "video/bufsprite.h"
 
 class exedexes_state : public driver_device

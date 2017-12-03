@@ -2,12 +2,13 @@
 // copyright-holders:David Haywood, R. Belmont, Pierpaolo Prazzoli
 /*************************************************************************
 
-    Dragonball Z
+    Dragon Ball Z
 
 *************************************************************************/
 
 #include "machine/gen_latch.h"
 #include "machine/k053252.h"
+#include "machine/timer.h"
 #include "video/k054156_k054157_k056832.h"
 #include "video/k053246_k053247_k055673.h"
 #include "video/k053936.h"

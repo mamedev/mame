@@ -399,7 +399,7 @@ static MACHINE_CONFIG_DERIVED( pac90, wc90 )
 MACHINE_CONFIG_END
 
 
-ROM_START( wc90 )
+ROM_START( twcup90 )
 	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD( "ic87_01.bin",  0x00000, 0x08000, CRC(4a1affbc) SHA1(bc531e97ca31c66fdac194e2d79d5c6ba1300556) )  /* c000-ffff is not used */
 	ROM_LOAD( "ic95_02.bin",  0x10000, 0x10000, CRC(847d439c) SHA1(eade31050da9e84feb4406e327d050a7496871b7) )  /* banked at f000-f7ff */
@@ -433,7 +433,7 @@ ROM_START( wc90 )
 ROM_END
 
 
-ROM_START( wc90a )
+ROM_START( twcup90a )
 	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD( "wc90-1.bin",   0x00000, 0x08000, CRC(d1804e1a) SHA1(eec7374f4d23c89843f38fffff436635adb43b63) )  /* c000-ffff is not used */
 	ROM_LOAD( "ic95_02.bin",  0x10000, 0x10000, CRC(847d439c) SHA1(eade31050da9e84feb4406e327d050a7496871b7) )  /* banked at f000-f7ff */
@@ -466,7 +466,7 @@ ROM_START( wc90a )
 	ROM_LOAD( "ic82_06.bin",  0x00000, 0x20000, CRC(2fd692ed) SHA1(0273dc39181504320bec0187d074b2f86c821508) )
 ROM_END
 
-ROM_START( wc90b )
+ROM_START( twcup90b )
 	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD( "ic87-1b.bin",  0x00000, 0x08000, CRC(d024a971) SHA1(856c6ab7abc1cd6db42703f70930b84e3da69db0) )  /* c000-ffff is not used */
 	ROM_LOAD( "ic95_02.bin",  0x10000, 0x10000, CRC(847d439c) SHA1(eade31050da9e84feb4406e327d050a7496871b7) )  /* banked at f000-f7ff */
@@ -499,7 +499,7 @@ ROM_START( wc90b )
 	ROM_LOAD( "ic82_06.bin",  0x00000, 0x20000, CRC(2fd692ed) SHA1(0273dc39181504320bec0187d074b2f86c821508) )
 ROM_END
 
-ROM_START( wc90t )
+ROM_START( twcup90t )
 	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD( "wc90a-1.bin",  0x00000, 0x08000, CRC(b6f51a68) SHA1(e0263dee35bf99cb4288a1df825bbbca17c85d36) )  /* c000-ffff is not used */
 	ROM_LOAD( "wc90a-2.bin",  0x10000, 0x10000, CRC(c50f2a98) SHA1(0fbeabadebfa75515d5e35bfcc565ecfa4d6e693) )  /* banked at f000-f7ff */
@@ -563,9 +563,9 @@ ROM_START( pac90 )
 ROM_END
 
 
-GAME( 1989, wc90,  0,       wc90,  wc90,  wc90_state, 0, ROT0,  "Tecmo", "Tecmo World Cup '90 (World)",           MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1989, wc90a, wc90,    wc90,  wc90,  wc90_state, 0, ROT0,  "Tecmo", "Tecmo World Cup '90 (Euro set 1)",      MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1989, wc90b, wc90,    wc90,  wc90,  wc90_state, 0, ROT0,  "Tecmo", "Tecmo World Cup '90 (Euro set 2)",      MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1989, wc90t, wc90,    wc90t, wc90,  wc90_state, 0, ROT0,  "Tecmo", "Tecmo World Cup '90 (trackball set 1)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1989, twcup90,  0,       wc90,  wc90,  wc90_state, 0, ROT0,  "Tecmo", "Tecmo World Cup '90 (World)",           MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1989, twcup90a, twcup90, wc90,  wc90,  wc90_state, 0, ROT0,  "Tecmo", "Tecmo World Cup '90 (Euro set 1)",      MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1989, twcup90b, twcup90, wc90,  wc90,  wc90_state, 0, ROT0,  "Tecmo", "Tecmo World Cup '90 (Euro set 2)",      MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1989, twcup90t, twcup90, wc90t, wc90,  wc90_state, 0, ROT0,  "Tecmo", "Tecmo World Cup '90 (trackball set 1)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 
 GAME( 199?, pac90, puckman, pac90, pac90, wc90_state, 0, ROT90, "bootleg (Macro)", "Pac-Man (bootleg on World Cup '90 hardware)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // made by Mike Coates etc.

@@ -186,7 +186,8 @@ static ADDRESS_MAP_START( lsasquad_map, AS_PROGRAM, 8, lsasquad_state )
 	AM_RANGE(0xe806, 0xe806) AM_READ_PORT("START")
 	AM_RANGE(0xe807, 0xe807) AM_READ_PORT("SERVICE")
 	AM_RANGE(0xea00, 0xea00) AM_WRITE(lsasquad_bankswitch_w)
-	AM_RANGE(0xec00, 0xec00) AM_READWRITE(lsasquad_sound_result_r,lsasquad_sound_command_w)
+	AM_RANGE(0xec00, 0xec00) AM_DEVREAD("soundlatch2", generic_latch_8_device, read)
+	AM_RANGE(0xec00, 0xec00) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
 	AM_RANGE(0xec01, 0xec01) AM_READ(lsasquad_sound_status_r)
 	AM_RANGE(0xee00, 0xee00) AM_DEVREADWRITE("bmcu", taito68705_mcu_device, data_r, data_w)
 ADDRESS_MAP_END
@@ -196,7 +197,8 @@ static ADDRESS_MAP_START( lsasquad_sound_map, AS_PROGRAM, 8, lsasquad_state )
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0xa000, 0xa001) AM_DEVREADWRITE("ymsnd", ym2203_device, read, write)
 	AM_RANGE(0xc000, 0xc001) AM_DEVWRITE("aysnd", ay8910_device, address_data_w)
-	AM_RANGE(0xd000, 0xd000) AM_READWRITE(lsasquad_sh_sound_command_r, lsasquad_sh_result_w)
+	AM_RANGE(0xd000, 0xd000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
+	AM_RANGE(0xd000, 0xd000) AM_DEVWRITE("soundlatch2", generic_latch_8_device, write)
 	AM_RANGE(0xd400, 0xd400) AM_WRITE(lsasquad_sh_nmi_disable_w)
 	AM_RANGE(0xd800, 0xd800) AM_WRITE(lsasquad_sh_nmi_enable_w)
 	AM_RANGE(0xd800, 0xd800) AM_READ(lsasquad_sound_status_r)
@@ -221,7 +223,8 @@ static ADDRESS_MAP_START( storming_map, AS_PROGRAM, 8, lsasquad_state )
 	AM_RANGE(0xe806, 0xe806) AM_READ_PORT("START")
 	AM_RANGE(0xe807, 0xe807) AM_READ_PORT("SERVICE")
 	AM_RANGE(0xea00, 0xea00) AM_WRITE(lsasquad_bankswitch_w)
-	AM_RANGE(0xec00, 0xec00) AM_READWRITE(lsasquad_sound_result_r,lsasquad_sound_command_w)
+	AM_RANGE(0xec00, 0xec00) AM_DEVREAD("soundlatch2", generic_latch_8_device, read)
+	AM_RANGE(0xec00, 0xec00) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
 	AM_RANGE(0xec01, 0xec01) AM_READ(lsasquad_sound_status_r)
 ADDRESS_MAP_END
 
@@ -383,8 +386,7 @@ static ADDRESS_MAP_START( daikaiju_map, AS_PROGRAM, 8, lsasquad_state )
 	AM_RANGE(0xe806, 0xe806) AM_READ_PORT("START")
 	AM_RANGE(0xe807, 0xe807) AM_READ_PORT("SERVICE")
 	AM_RANGE(0xea00, 0xea00) AM_WRITE(lsasquad_bankswitch_w)
-	AM_RANGE(0xec00, 0xec00) AM_WRITE(lsasquad_sound_command_w)
-	AM_RANGE(0xec01, 0xec01) AM_READ(lsasquad_sound_status_r)
+	AM_RANGE(0xec00, 0xec00) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
 	AM_RANGE(0xee00, 0xee00) AM_DEVREADWRITE("bmcu", taito68705_mcu_device, data_r, data_w)
 ADDRESS_MAP_END
 
@@ -393,9 +395,9 @@ static ADDRESS_MAP_START( daikaiju_sound_map, AS_PROGRAM, 8, lsasquad_state )
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0xa000, 0xa001) AM_DEVREADWRITE("ymsnd", ym2203_device, read, write)
 	AM_RANGE(0xc000, 0xc001) AM_DEVWRITE("aysnd", ay8910_device, address_data_w)
-	AM_RANGE(0xd000, 0xd000) AM_READ(daikaiju_sh_sound_command_r)
-	AM_RANGE(0xd400, 0xd400) AM_WRITENOP
-	AM_RANGE(0xd800, 0xd800) AM_READ(daikaiju_sound_status_r) AM_WRITENOP
+	AM_RANGE(0xd000, 0xd000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
+	AM_RANGE(0xd400, 0xd400) AM_WRITE(lsasquad_sh_nmi_disable_w)
+	AM_RANGE(0xd800, 0xd800) AM_READWRITE(daikaiju_sound_status_r, lsasquad_sh_nmi_enable_w)
 	AM_RANGE(0xdc00, 0xdc00) AM_WRITENOP
 	AM_RANGE(0xe000, 0xefff) AM_ROM /* space for diagnostic ROM? */
 ADDRESS_MAP_END
@@ -541,22 +543,10 @@ MACHINE_START_MEMBER(lsasquad_state,lsasquad)
 	uint8_t *ROM = memregion("maincpu")->base();
 
 	membank("bank1")->configure_entries(0, 8, &ROM[0x10000], 0x2000);
-
-
-	save_item(NAME(m_sound_pending));
-	save_item(NAME(m_sound_nmi_enable));
-	save_item(NAME(m_pending_nmi));
-	save_item(NAME(m_sound_cmd));
-	save_item(NAME(m_sound_result));
 }
 
 MACHINE_RESET_MEMBER(lsasquad_state,lsasquad)
 {
-	m_sound_pending = 0;
-	m_sound_nmi_enable = 0;
-	m_pending_nmi = 0;
-	m_sound_cmd = 0;
-	m_sound_result = 0;
 }
 
 /* Note: lsasquad clock values are not verified */
@@ -579,6 +569,14 @@ static MACHINE_CONFIG_START( lsasquad )
 
 	MCFG_MACHINE_START_OVERRIDE(lsasquad_state,lsasquad)
 	MCFG_MACHINE_RESET_OVERRIDE(lsasquad_state,lsasquad)
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(DEVWRITELINE("soundnmi", input_merger_device, in_w<0>))
+
+	MCFG_INPUT_MERGER_ALL_HIGH("soundnmi")
+	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("audiocpu", INPUT_LINE_NMI))
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -638,6 +636,12 @@ static MACHINE_CONFIG_START( daikaiju )
 
 	MCFG_MACHINE_START_OVERRIDE(lsasquad_state,lsasquad)
 	MCFG_MACHINE_RESET_OVERRIDE(lsasquad_state,lsasquad)
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(DEVWRITELINE("soundnmi", input_merger_device, in_w<0>))
+
+	MCFG_INPUT_MERGER_ALL_HIGH("soundnmi")
+	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

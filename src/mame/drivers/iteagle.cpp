@@ -41,8 +41,7 @@
         * 3DFX Voodoo 1 video
 
     TODO:
-        * Add support for Eagle 1 (Virtual Pool) PCBs
-        * Add support for later RED boards
+        * Big buck hunter sportmans paradise and shooters challenge only work with secondary targeting (reduced threshold)
 
   Notes:
     Sound volume may be muted, it can be adjusted through the service menu or with volume up/down buttons (+/-)
@@ -132,12 +131,8 @@ public:
 
 void iteagle_state::machine_start()
 {
-	/* set the fastest DRC options */
-	m_maincpu->mips3drc_set_options(MIPS3DRC_FASTEST_OPTIONS);
-
-	/* configure fast RAM regions for DRC */
-	//m_maincpu->mips3drc_add_fastram(0x00000000, 16*1024*1024-1, false, m_rambase);
-	//m_maincpu->mips3drc_add_fastram(0x1fc00000, 0x1fc7ffff, true, m_rombase);
+	// Setting MIPS3DRC_STRICT_VERIFY seems to eliminate the hangs in the bbh series
+	m_maincpu->mips3drc_set_options(MIPS3DRC_STRICT_VERIFY);
 }
 
 void iteagle_state::machine_reset()
@@ -156,9 +151,10 @@ void iteagle_state::machine_reset()
 static MACHINE_CONFIG_START( iteagle )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", VR4310LE, 166666666)
+	MCFG_CPU_ADD("maincpu", VR4310LE, 133333333)
 	MCFG_MIPS3_ICACHE_SIZE(16384)
 	MCFG_MIPS3_DCACHE_SIZE(8192)
+	MCFG_MIPS3_SYSTEM_CLOCK(66666667)
 
 	MCFG_PCI_ROOT_ADD(                ":pci")
 	MCFG_VRC4373_ADD(                 PCI_ID_NILE, ":maincpu")
@@ -173,8 +169,12 @@ static MACHINE_CONFIG_START( iteagle )
 	MCFG_SOUND_ROUTE(0, PCI_ID_SOUND":lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, PCI_ID_SOUND":rspeaker", 1.0)
 	MCFG_ES1373_IRQ_ADD(              ":maincpu", MIPS3_IRQ3)
+
 	MCFG_VOODOO_PCI_ADD(              PCI_ID_VIDEO, TYPE_VOODOO_3, ":maincpu")
 	MCFG_VOODOO_PCI_FBMEM(16)
+	MCFG_DEVICE_MODIFY(PCI_ID_VIDEO":voodoo")
+	MCFG_VOODOO_VBLANK_CB(DEVWRITELINE(PCI_ID_FPGA, iteagle_fpga_device, vblank_update))
+
 	MCFG_ITEAGLE_EEPROM_ADD(          PCI_ID_EEPROM)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -243,23 +243,30 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( bbh2sp, iteagle )
 	MCFG_DEVICE_MODIFY(PCI_ID_FPGA)
-	MCFG_ITEAGLE_FPGA_INIT(0x02000602, 0x0d0a0a)
+	MCFG_ITEAGLE_FPGA_INIT(0x02010602, 0x0d0a0a)
 	MCFG_DEVICE_MODIFY(PCI_ID_EEPROM)
 	MCFG_ITEAGLE_EEPROM_INIT(0x0000, 0x7)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( bbhcotw, iteagle )
 	MCFG_DEVICE_MODIFY(PCI_ID_FPGA)
-	MCFG_ITEAGLE_FPGA_INIT(0x02000603, 0x080704)
+	MCFG_ITEAGLE_FPGA_INIT(0x02010603, 0x080704)
 	MCFG_DEVICE_MODIFY(PCI_ID_EEPROM)
 	MCFG_ITEAGLE_EEPROM_INIT(0x0603, 0x9)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( virtpool, iteagle )
+	// Not sure what the actual value should be
+	// Setting a lower frequency helps delay the tutorial screen premature cut-out
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_CLOCK(99999999)
+	MCFG_MIPS3_SYSTEM_CLOCK(33333333)
+
 	MCFG_DEVICE_REMOVE(PCI_ID_VIDEO)
 	MCFG_VOODOO_PCI_ADD(PCI_ID_VIDEO, TYPE_VOODOO_1, ":maincpu")
 	MCFG_VOODOO_PCI_FBMEM(4)
 	MCFG_VOODOO_PCI_TMUMEM(4, 4)
+
 	MCFG_DEVICE_MODIFY(PCI_ID_FPGA)
 	MCFG_ITEAGLE_FPGA_INIT(0x01000202, 0x080808)
 	MCFG_DEVICE_MODIFY(PCI_ID_EEPROM)
@@ -275,10 +282,16 @@ MACHINE_CONFIG_END
 static INPUT_PORTS_START( iteagle )
 
 	PORT_START("SW5")
-	PORT_DIPNAME( 0xf, 0x1, "Resolution" )
+	PORT_DIPNAME( 0x3, 0x1, "Resolution" )
 	PORT_DIPSETTING(0x1, "Medium" )
 	PORT_DIPSETTING(0x0, "Low" )
 	PORT_DIPSETTING(0x2, "Low_Alt" )
+	PORT_DIPNAME(0x4, 0x0, "SW5-3")
+	PORT_DIPSETTING(0x0, DEF_STR(On))
+	PORT_DIPSETTING(0x4, DEF_STR(Off))
+	PORT_DIPNAME(0x8, 0x0, "SW5-4")
+	PORT_DIPSETTING(0x0, DEF_STR(On))
+	PORT_DIPSETTING(0x8, DEF_STR(Off))
 
 	PORT_START("IN1")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 )
@@ -296,14 +309,18 @@ static INPUT_PORTS_START( iteagle )
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME( "Service" )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x000c, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_DIPNAME( 0x0010, 0x00, "SW51-1" )
-	PORT_DIPSETTING(0x00, "Normal" )
-	PORT_DIPSETTING(0x10, "Operator Mode" )
+	PORT_DIPNAME( 0x0010, 0x00, "Operator Mode" )
+	PORT_DIPSETTING(0x00, DEF_STR(No))
+	PORT_DIPSETTING(0x10, DEF_STR(Yes))
 	PORT_DIPNAME( 0x0020, 0x00, "SW51-2" )
-	PORT_DIPSETTING(0x00, "On" )
-	PORT_DIPSETTING(0x20, "Off" )
-	PORT_DIPNAME( 0xc0, 0x00, "SW51-34" )
-	PORT_DIPSETTING(0x00, "On" )
+	PORT_DIPSETTING(0x00, DEF_STR(On))
+	PORT_DIPSETTING(0x20, DEF_STR(Off))
+	PORT_DIPNAME( 0x40, 0x00, "SW51-3" )
+	PORT_DIPSETTING(0x00, DEF_STR(On))
+	PORT_DIPSETTING(0x40, DEF_STR(Off))
+	PORT_DIPNAME(0x80, 0x00, "SW51-4")
+	PORT_DIPSETTING(0x00, DEF_STR(On))
+	PORT_DIPSETTING(0x80, DEF_STR(Off))
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_VOLUME_UP )
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_VOLUME_DOWN )
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_BILL1 )
@@ -328,12 +345,18 @@ static INPUT_PORTS_START( iteagle )
 
 	PORT_START("GUNY1")
 	PORT_BIT( 0x1ff, 0x100, IPT_LIGHTGUN_Y )
-	PORT_SENSITIVITY(50) PORT_KEYDELTA(10) PORT_MINMAX(0, 383)
+	PORT_SENSITIVITY(50) PORT_KEYDELTA(10)
 
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( virtpool )
 	PORT_INCLUDE( iteagle )
+
+	PORT_MODIFY("SW5")
+	PORT_DIPNAME( 0x3, 0x1, "Resolution" )  // Setting to low resolution will hang the game
+	PORT_DIPSETTING(0x1, "Medium" )
+	PORT_DIPSETTING(0x0, "Low (Hangs)" )
+	PORT_DIPSETTING(0x3, "VGA (Buggy)" )
 
 	PORT_MODIFY("IN1")
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME( "English" )
@@ -343,11 +366,24 @@ static INPUT_PORTS_START( virtpool )
 
 	PORT_MODIFY("SYSTEM")
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME( "Slop" )
+	PORT_DIPNAME(0x0010, 0x00, "SW51-1")  // Turning this on freezes virtpool at boot
+	PORT_DIPSETTING(0x00, DEF_STR(On))
+	PORT_DIPSETTING(0x10, DEF_STR(Off))
+	PORT_DIPNAME(0x80, 0x00, "Operator Mode")
+	PORT_DIPSETTING(0x00, DEF_STR(No))
+	PORT_DIPSETTING(0x80, DEF_STR(Yes))
 
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( bbh )
 	PORT_INCLUDE( iteagle )
+
+	// bbhsc is low resolution only, bbhsc version 1.60.01 will set low resolution automatically
+	PORT_MODIFY("SW5")
+	PORT_DIPNAME(0x3, 0x0, "Resolution")
+	PORT_DIPSETTING(0x1, "Medium" )
+	PORT_DIPSETTING(0x0, "Low" )
+	PORT_DIPSETTING(0x2, "Low_Alt" )
 
 	PORT_MODIFY("IN1")
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME( "Trigger" )
@@ -355,16 +391,38 @@ static INPUT_PORTS_START( bbh )
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNUSED )
 
+	PORT_MODIFY("SYSTEM")
+	// bbhsc and bbh2sp only work with seconday targeting
+	PORT_DIPNAME(0x0020, 0x20, "Targeting")
+	PORT_DIPSETTING(0x00, "Regular")
+	PORT_DIPSETTING(0x20, "Secondary")
+
 	PORT_MODIFY("GUNX1")
-	PORT_BIT( 0x1ff, 0x100, IPT_LIGHTGUN_X )
-	PORT_SENSITIVITY(50) PORT_KEYDELTA(10)
+	PORT_BIT( 0x3ff, 0x200, IPT_LIGHTGUN_X )
+	PORT_SENSITIVITY(50) PORT_KEYDELTA(24)
 	PORT_CROSSHAIR(X, 1.0, 0.0, 0)
 
 	PORT_MODIFY("GUNY1")
 	PORT_BIT( 0x1ff, 0x100, IPT_LIGHTGUN_Y )
-	PORT_SENSITIVITY(50) PORT_KEYDELTA(10) PORT_MINMAX(0, 383)
+	PORT_SENSITIVITY(50) PORT_KEYDELTA(12)
 	PORT_CROSSHAIR(Y, 1.0, 0.0, 0)
 
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( bbh2 )
+	PORT_INCLUDE( bbh )
+
+	// Default bbh2sp and bbhcotw to medium resolution
+	PORT_MODIFY("SW5")
+	PORT_DIPNAME(0x3, 0x1, "Resolution")
+	PORT_DIPSETTING(0x1, "Medium" )
+	PORT_DIPSETTING(0x0, "Low" )
+	PORT_DIPSETTING(0x2, "Low_Alt" )
+
+	PORT_MODIFY("GUNX1")
+	PORT_BIT( 0x1ff, 0x100, IPT_LIGHTGUN_X )
+	PORT_SENSITIVITY(50) PORT_KEYDELTA(12)
+	PORT_CROSSHAIR(X, 1.0, 0.0, 0)
 INPUT_PORTS_END
 
 /*************************************
@@ -551,10 +609,18 @@ ROM_START( bbhsc )
 	ROM_LOAD( "bb15-us.u53", 0x0000, 0x0880, NO_DUMP )
 
 	DISK_REGION( PCI_ID_IDE":ide:0:hdd:image" )
+	DISK_IMAGE("bbhsc_v1.60.01", 0, SHA1(8554fdd7193ee27c0fe8ca921aa8db9c0378b313)) /* Build 09:50:13, May 29 2002 */
+ROM_END
+
+ROM_START( bbhsca )
+	EAGLE_BIOS
+
+	ROM_REGION( 0x0880, "atmel", 0 ) /* Atmel 90S2313 AVR internal CPU code */
+	ROM_LOAD( "bb15-us.u53", 0x0000, 0x0880, NO_DUMP )
+
+	DISK_REGION( PCI_ID_IDE":ide:0:hdd:image" )
 	DISK_IMAGE( "bbhsc_v1.50.07_cf", 0, SHA1(21dcf1f7e5ab901ac64e6afb099c35e273b3bf1f) ) /* Build 16:35:34, Feb 26 2002 - 4gb Compact Flash conversion */
 ROM_END
-	//DISK_IMAGE( "bbhsc_v1.50.07_cf", 0, SHA1(21dcf1f7e5ab901ac64e6afb099c35e273b3bf1f) ) /* Build 16:35:34, Feb 26 2002 - 4gb Compact Flash conversion */
-	//DISK_IMAGE( "bbhsc_v1.60.01", 0, SHA1(8554fdd7193ee27c0fe8ca921aa8db9c0378b313) )
 
 ROM_START( bbh2sp )
 	EAGLE_BIOS
@@ -586,8 +652,8 @@ ROM_END
  *************************************/
 
 GAME( 2000, iteagle,    0,        iteagle,  iteagle,  iteagle_state, 0, ROT0, "Incredible Technologies", "Eagle BIOS", MACHINE_IS_BIOS_ROOT )
-GAME( 1998, virtpool,   iteagle,  virtpool, virtpool, iteagle_state, 0, ROT0, "Incredible Technologies", "Virtual Pool", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // random lockups on loading screens
-GAME( 2002, carnking,   iteagle,  carnking, bbh,      iteagle_state, 0, ROT0, "Incredible Technologies", "Carnival King (v1.00.11)", MACHINE_SUPPORTS_SAVE )
+GAME( 1998, virtpool,   iteagle,  virtpool, virtpool, iteagle_state, 0, ROT0, "Incredible Technologies", "Virtual Pool", MACHINE_SUPPORTS_SAVE )
+GAME( 2002, carnking,   iteagle,  carnking, bbh2,     iteagle_state, 0, ROT0, "Incredible Technologies", "Carnival King (v1.00.11)", MACHINE_SUPPORTS_SAVE )
 GAME( 2000, gtfore01,   iteagle,  gtfore01, iteagle,  iteagle_state, 0, ROT0, "Incredible Technologies", "Golden Tee Fore! (v1.00.25)", MACHINE_SUPPORTS_SAVE )
 GAME( 2001, gtfore02,   iteagle,  gtfore02, iteagle,  iteagle_state, 0, ROT0, "Incredible Technologies", "Golden Tee Fore! 2002 (v2.01.06)", MACHINE_SUPPORTS_SAVE )
 GAME( 2002, gtfore03,   iteagle,  gtfore03, iteagle,  iteagle_state, 0, ROT0, "Incredible Technologies", "Golden Tee Fore! 2003 (v3.00.10)", MACHINE_SUPPORTS_SAVE )
@@ -599,6 +665,7 @@ GAME( 2004, gtfore05a,  gtfore05, gtfore05, iteagle,  iteagle_state, 0, ROT0, "I
 GAME( 2004, gtfore05b,  gtfore05, gtfore05, iteagle,  iteagle_state, 0, ROT0, "Incredible Technologies", "Golden Tee Fore! 2005 Extra (v5.01.00)", MACHINE_SUPPORTS_SAVE )
 GAME( 2004, gtfore05c,  gtfore05, gtfore05, iteagle,  iteagle_state, 0, ROT0, "Incredible Technologies", "Golden Tee Fore! 2005 Extra (v5.00.00)", MACHINE_SUPPORTS_SAVE )
 GAME( 2005, gtfore06,   iteagle,  gtfore06, iteagle,  iteagle_state, 0, ROT0, "Incredible Technologies", "Golden Tee Fore! 2006 Complete (v6.00.01)", MACHINE_SUPPORTS_SAVE )
-GAME( 2002, bbhsc,      iteagle,  bbhsc,    bbh,      iteagle_state, 0, ROT0, "Incredible Technologies", "Big Buck Hunter - Shooter's Challenge (v1.50.07)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // doesn't boot
-GAME( 2002, bbh2sp,     iteagle,  bbh2sp,   bbh,      iteagle_state, 0, ROT0, "Incredible Technologies", "Big Buck Hunter II - Sportsman's Paradise (v2.02.11)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // SW51-2 needs to be off
-GAME( 2006, bbhcotw,    iteagle,  bbhcotw,  bbh,      iteagle_state, 0, ROT0, "Incredible Technologies", "Big Buck Hunter Call of the Wild (v3.02.5)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // random lockups
+GAME( 2002, bbhsc,      iteagle,  bbhsc,    bbh,      iteagle_state, 0, ROT0, "Incredible Technologies", "Big Buck Hunter - Shooter's Challenge (v1.60.01)", MACHINE_SUPPORTS_SAVE )
+GAME( 2002, bbhsca,     bbhsc,    bbhsc,    bbh,      iteagle_state, 0, ROT0, "Incredible Technologies", "Big Buck Hunter - Shooter's Challenge (v1.50.07)", MACHINE_SUPPORTS_SAVE )
+GAME( 2003, bbh2sp,     iteagle,  bbh2sp,   bbh2,     iteagle_state, 0, ROT0, "Incredible Technologies", "Big Buck Hunter II - Sportsman's Paradise (v2.02.11)", MACHINE_SUPPORTS_SAVE )
+GAME( 2006, bbhcotw,    iteagle,  bbhcotw,  bbh2,     iteagle_state, 0, ROT0, "Incredible Technologies", "Big Buck Hunter Call of the Wild (v3.02.5)", MACHINE_SUPPORTS_SAVE )

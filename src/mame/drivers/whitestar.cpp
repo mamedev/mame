@@ -417,6 +417,21 @@ ROM_START(gldneye)
 	ROM_LOAD("bondu21.bin", 0x080000, 0x80000, CRC(5be0f205) SHA1(aaef8f6ee6c8d5ebf08f90368061288adf850a18))
 ROM_END
 
+ROM_START(gldneye_402)
+	ROM_REGION(0x80000, "user1", 0)
+	ROM_LOAD("bondcpu.402", 0x00000, 0x20000, CRC(6faad064) SHA1(c598e9073670f0aa27e61b728c85a8ff54691b20))
+	ROM_RELOAD(0x20000, 0x20000)
+	ROM_RELOAD(0x40000, 0x20000)
+	ROM_RELOAD(0x60000, 0x20000)
+	ROM_REGION(0x80000, "dmdcpu", 0)
+	ROM_LOAD("bondispa.400", 0x00000, 0x80000, CRC(9cc0c710) SHA1(3c6df97d881aed9d1d08cc2a5d0c4ec020295902))
+	ROM_REGION(0x010000, "soundcpu", 0)
+	ROM_LOAD("bondu7.bin", 0x0000, 0x10000, CRC(7581a349) SHA1(493236bdc52b601a08009f9b03d64b6047d52661))
+	ROM_REGION(0x1000000, "bsmt", 0 )
+	ROM_LOAD("bondu17.bin", 0x000000, 0x80000, CRC(d9c56b9d) SHA1(df8cde0b63d6a8437a1cb239094547262c3f8774))
+	ROM_LOAD("bondu21.bin", 0x080000, 0x80000, CRC(5be0f205) SHA1(aaef8f6ee6c8d5ebf08f90368061288adf850a18))
+ROM_END
+
 /*-------------------------------------------------------------------
 / Golden Cue
 /-------------------------------------------------------------------*/
@@ -3400,7 +3415,8 @@ GAME(2001,  austini,      austin,     whitestar,  whitestar, whitestar_state, 0,
 GAME(1998,  godzillp,     0,          whitestar,  whitestar, whitestar_state, 0,  ROT0,   "Sega",     "Godzilla (Pinball, 2.05)",                                 MACHINE_IS_PINBALL)
 GAME(1998,  godzillp_100, godzillp,   whitestar,  whitestar, whitestar_state, 0,  ROT0,   "Sega",     "Godzilla (Pinball, 1.00)",                                 MACHINE_IS_PINBALL)
 GAME(1998,  godzillp_090, godzillp,   whitestar,  whitestar, whitestar_state, 0,  ROT0,   "Sega",     "Godzilla (Pinball, 0.90)",                                 MACHINE_IS_PINBALL)
-GAME(1996,  gldneye,      0,          whitestar,  whitestar, whitestar_state, 0,  ROT0,   "Sega",     "Goldeneye",                                                MACHINE_IS_PINBALL)
+GAME(1996,  gldneye,      0,          whitestar,  whitestar, whitestar_state, 0,  ROT0,   "Sega",     "Goldeneye (4.04)",                                         MACHINE_IS_PINBALL)
+GAME(1996,  gldneye_402,  gldneye,    whitestar,  whitestar, whitestar_state, 0,  ROT0,   "Sega",     "Goldeneye (4.02)",                                         MACHINE_IS_PINBALL)
 GAME(1998,  goldcue,      0,          whitestar,  whitestar, whitestar_state, 0,  ROT0,   "Sega",     "Golden Cue",                                               MACHINE_IS_PINBALL)
 GAME(1999,  harl_a13,     0,          whitestar,  whitestar, whitestar_state, 0,  ROT0,   "Sega",     "Harley Davidson (1.03)",                                   MACHINE_IS_PINBALL)
 GAME(1999,  harl_u13,     harl_a13,   whitestar,  whitestar, whitestar_state, 0,  ROT0,   "Sega",     "Harley Davidson (1.03 UK)",                                MACHINE_IS_PINBALL)

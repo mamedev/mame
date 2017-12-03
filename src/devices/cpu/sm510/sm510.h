@@ -17,7 +17,7 @@
 #define MCFG_SM510_READ_K_CB(_devcb) \
 	devcb = &sm510_base_device::set_read_k_callback(*device, DEVCB_##_devcb);
 // when in halt state, any K input going High can wake up the CPU,
-// driver is required to use execute_set_input(SM510_INPUT_LINE_K, state)
+// driver is required to use set_input_line(SM510_INPUT_LINE_K, state)
 #define SM510_INPUT_LINE_K 0
 
 // 1-bit BA(aka alpha) input pin (pull-up)
@@ -35,6 +35,10 @@
 // 2/4-bit R (melody) output port
 #define MCFG_SM510_WRITE_R_CB(_devcb) \
 	devcb = &sm510_base_device::set_write_r_callback(*device, DEVCB_##_devcb);
+
+// R port can be set to direct control with a mask option (default false)
+#define MCFG_SM510_R_DIRECT_CONTROL(_direct) \
+	sm510_base_device::set_r_direct_control(*device, _direct);
 
 // LCD segment outputs: H1-4 as offset(low), a/b/c 1-16 as data d0-d15
 #define MCFG_SM510_WRITE_SEGA_CB(_devcb) \
@@ -81,8 +85,8 @@ a1 48 |                                              | 28 b10
 H4 49 |                                              | 27 a11
 H3 50 |                                              | 26 b11
 H2 51 |                                              | 25 a12
-H1 52 |                    SM510                     | 24 b12
-S1 53 |                    SM511                     | 23 a13
+H1 52 |                                              | 24 b12
+S1 53 |                    SM510                     | 23 a13
 S2 54 |                                              | 22 b13
 S3 55 |                                              | 21 a14
 S4 56 |                                              | 20 b14
@@ -108,6 +112,7 @@ public:
 		, m_prgwidth(prgwidth)
 		, m_datawidth(datawidth)
 		, m_stack_levels(stack_levels)
+		, m_r_direct(false)
 		, m_lcd_ram_a(*this, "lcd_ram_a"), m_lcd_ram_b(*this, "lcd_ram_b"), m_lcd_ram_c(*this, "lcd_ram_c")
 		, m_write_sega(*this), m_write_segb(*this), m_write_segc(*this), m_write_segbs(*this)
 		, m_melody_rom(*this, "melody")
@@ -123,6 +128,7 @@ public:
 	template <class Object> static devcb_base &set_read_b_callback(device_t &device, Object &&cb) { return downcast<sm510_base_device &>(device).m_read_b.set_callback(std::forward<Object>(cb)); }
 	template <class Object> static devcb_base &set_write_s_callback(device_t &device, Object &&cb) { return downcast<sm510_base_device &>(device).m_write_s.set_callback(std::forward<Object>(cb)); }
 	template <class Object> static devcb_base &set_write_r_callback(device_t &device, Object &&cb) { return downcast<sm510_base_device &>(device).m_write_r.set_callback(std::forward<Object>(cb)); }
+	static void set_r_direct_control(device_t &device, bool direct) { downcast<sm510_base_device &>(device).m_r_direct = direct; }
 
 	template <class Object> static devcb_base &set_write_sega_callback(device_t &device, Object &&cb) { return downcast<sm510_base_device &>(device).m_write_sega.set_callback(std::forward<Object>(cb)); }
 	template <class Object> static devcb_base &set_write_segb_callback(device_t &device, Object &&cb) { return downcast<sm510_base_device &>(device).m_write_segb.set_callback(std::forward<Object>(cb)); }
@@ -146,10 +152,6 @@ protected:
 
 	// device_memory_interface overrides
 	virtual space_config_vector memory_space_config() const override;
-
-	// device_disasm_interface overrides
-	virtual u32 disasm_min_opcode_bytes() const override { return 1; }
-	virtual u32 disasm_max_opcode_bytes() const override { return 2; }
 
 	address_space_config m_program_config;
 	address_space_config m_data_config;
@@ -179,6 +181,7 @@ protected:
 	bool m_skip;
 	u8 m_w;
 	u8 m_r, m_r_out;
+	bool m_r_direct;
 	bool m_k_active;
 	bool m_halt;
 	int m_clk_div;
@@ -314,7 +317,7 @@ public:
 	sm510_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 protected:
-	virtual offs_t disasm_disassemble(std::ostream &stream, offs_t pc, const u8 *oprom, const u8 *opram, u32 options) override;
+	virtual util::disasm_interface *create_disassembler() override;
 	virtual void execute_one() override;
 	virtual void get_opcode_param() override;
 
@@ -335,7 +338,7 @@ protected:
 	virtual void device_post_load() override { notify_clock_changed(); }
 	virtual void device_reset() override;
 
-	virtual offs_t disasm_disassemble(std::ostream &stream, offs_t pc, const u8 *oprom, const u8 *opram, u32 options) override;
+	virtual util::disasm_interface *create_disassembler() override;
 	virtual void execute_one() override;
 	virtual void get_opcode_param() override;
 

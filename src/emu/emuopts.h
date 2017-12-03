@@ -523,4 +523,7 @@ private:
 	std::string                                         m_software_name;
 };
 
+// takes an existing emu_options and adds system specific options
+void osd_setup_osd_specific_emu_options(emu_options &opts);
+
 #endif  // MAME_EMU_EMUOPTS_H
