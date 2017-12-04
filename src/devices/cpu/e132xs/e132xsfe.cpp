@@ -1290,7 +1290,7 @@ bool e132xs_frontend::describe(opcode_desc &desc, const opcode_desc *prev)
 			desc.flags |= OPFLAG_IS_CONDITIONAL_BRANCH;
 			break;
 		case 0xfc: // br
-			desc.targetpc = desc.pc + decode_pcrel(desc, op);
+			desc.targetpc = (desc.pc + 2) + decode_pcrel(desc, op);
 			desc.flags |= OPFLAG_IS_UNCONDITIONAL_BRANCH | OPFLAG_END_SEQUENCE;
 			break;
 		case 0xfd: case 0xfe: case 0xff: // trap
