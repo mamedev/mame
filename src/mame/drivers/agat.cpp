@@ -78,8 +78,8 @@ public:
 	required_device<address_map_bank_device> m_upperbank;
 
 	TIMER_DEVICE_CALLBACK_MEMBER(ay3600_repeat);
-	TIMER_DEVICE_CALLBACK_MEMBER(agat_timer);
-	TIMER_DEVICE_CALLBACK_MEMBER(agat_vblank);
+	TIMER_DEVICE_CALLBACK_MEMBER(timer_irq);
+	INTERRUPT_GEN_MEMBER(agat_vblank);
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -799,19 +799,28 @@ TIMER_DEVICE_CALLBACK_MEMBER(agat7_state::ay3600_repeat)
 	}
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(agat7_state::agat_timer)
+INTERRUPT_GEN_MEMBER(agat7_state::agat_vblank)
 {
 	if (m_agat7_interrupts)
 	{
-		m_maincpu->set_input_line(M6502_IRQ_LINE, ASSERT_LINE);
+		m_maincpu->set_input_line(M6502_NMI_LINE, PULSE_LINE);
 	}
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(agat7_state::agat_vblank)
+TIMER_DEVICE_CALLBACK_MEMBER(agat7_state::timer_irq)
 {
 	if (m_agat7_interrupts)
 	{
-		m_maincpu->set_input_line(M6502_NMI_LINE, ASSERT_LINE);
+		switch (param & 0x3f)
+		{
+		case 0:
+			m_maincpu->set_input_line(M6502_IRQ_LINE, CLEAR_LINE);
+			break;
+
+		case 0x20:
+			m_maincpu->set_input_line(M6502_IRQ_LINE, ASSERT_LINE);
+			break;
+		}
 	}
 }
 
@@ -1029,8 +1038,9 @@ SLOT_INTERFACE_END
 static MACHINE_CONFIG_START( agat7 )
 	MCFG_CPU_ADD("maincpu", M6502, XTAL_14_3MHz / 14)
 	MCFG_CPU_PROGRAM_MAP(agat7_map)
+	MCFG_CPU_VBLANK_INT_DRIVER(A7_VIDEO_TAG ":a7screen", agat7_state, agat_vblank)
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("agat7irq", agat7_state, agat_timer, attotime::from_hz(500))
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", agat7_state, timer_irq, A7_VIDEO_TAG ":a7screen", 0, 1)
 
 	MCFG_DEVICE_ADD(A7_VIDEO_TAG, AGAT7VIDEO, 0)
 
