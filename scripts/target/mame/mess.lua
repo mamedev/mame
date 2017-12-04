@@ -418,7 +418,6 @@ MACHINES["F3853"] = true
 MACHINES["HD63450"] = true
 MACHINES["HD64610"] = true
 MACHINES["HP_TACO"] = true
-MACHINES["HP9845_PRINTER"] = true
 MACHINES["1MA6"] = true
 MACHINES["1MB5"] = true
 MACHINES["I2CMEM"] = true
@@ -2133,6 +2132,8 @@ files {
 	MAME_DIR .. "src/mame/drivers/hp48.cpp",
 	MAME_DIR .. "src/mame/includes/hp48.h",
 	MAME_DIR .. "src/mame/machine/hp48.cpp",
+        MAME_DIR .. "src/mame/machine/hp9845_printer.cpp",
+        MAME_DIR .. "src/mame/machine/hp9845_printer.h",
 	MAME_DIR .. "src/mame/video/hp48.cpp",
 	MAME_DIR .. "src/mame/drivers/hp49gp.cpp",
 	MAME_DIR .. "src/mame/drivers/hp9845.cpp",

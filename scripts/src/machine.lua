@@ -1040,18 +1040,6 @@ end
 
 ---------------------------------------------------
 --
---@src/devices/machine/hp9845_printer.h,MACHINES["HP9845_PRINTER"] = true
----------------------------------------------------
-
-if (MACHINES["HP9845_PRINTER"]~=null) then
-	files {
-		MAME_DIR .. "src/devices/machine/hp9845_printer.cpp",
-		MAME_DIR .. "src/devices/machine/hp9845_printer.h",
-	}
-end
-
----------------------------------------------------
---
 --@src/devices/machine/1ma6.h,MACHINES["1MA6"] = true
 ---------------------------------------------------
 
