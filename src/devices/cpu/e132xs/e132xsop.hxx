@@ -2442,10 +2442,8 @@ void hyperstone_device::hyperstone_lddp()
 	else
 	{
 		const uint32_t srcf_code = (src_code + 1) & 0x3f;
-		uint32_t one = READ_W(dreg);
-		uint32_t two = READ_W(dreg + 4);
-		m_local_regs[src_code] = one;
-		m_local_regs[srcf_code] = two;
+		m_local_regs[src_code] = READ_W(dreg);
+		m_local_regs[srcf_code] = READ_W(dreg + 4);
 
 		// post increment the destination register if it's different from the source one
 		// and from the "next source" one
