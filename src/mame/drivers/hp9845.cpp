@@ -25,6 +25,7 @@
 // - Correct character generator ROMs (a huge "thank you" to Ansgar Kueckes for the dumps!)
 // - 98775 light pen controller
 // - Display softkeys on 45C & 45T
+// - HLE of integral printer
 // What's not yet in:
 // - Better naming of tape drive image (it's now "magt1" and "magt2", should be "t15" and "t14")
 // - Better documentation of this file
@@ -32,7 +33,6 @@
 // - Speed, as usual
 // - Light pen tracing sometimes behaves erratically in 45C and 45T
 // What will probably never be in:
-// - Integral printer (firmware and character generator ROMs are very difficult to dump)
 // - Fast LPU processor (dump of microcode PROMs is not available)
 
 #include "emu.h"

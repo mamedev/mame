@@ -31,7 +31,7 @@ public:
 	hp9845_printer_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// static configuration helpers
-	template <class Object> static devcb_base &set_irl_handler(device_t &device, Object &&cb) { return downcast<hp9845_printer_device &>(device).m_flg_handler.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_irl_handler(device_t &device, Object &&cb) { return downcast<hp9845_printer_device &>(device).m_irl_handler.set_callback(std::forward<Object>(cb)); }
 	template <class Object> static devcb_base &set_flg_handler(device_t &device, Object &&cb) { return downcast<hp9845_printer_device &>(device).m_flg_handler.set_callback(std::forward<Object>(cb)); }
 	template <class Object> static devcb_base &set_sts_handler(device_t &device, Object &&cb) { return downcast<hp9845_printer_device &>(device).m_sts_handler.set_callback(std::forward<Object>(cb)); }
 
