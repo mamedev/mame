@@ -3359,8 +3359,6 @@ files {
 	MAME_DIR .. "src/mame/video/sega16sp.h",
 	MAME_DIR .. "src/mame/video/segaic24.cpp",
 	MAME_DIR .. "src/mame/video/segaic24.h",
-	MAME_DIR .. "src/mame/machine/gdrom.cpp",
-	MAME_DIR .. "src/mame/machine/gdrom.h",
 	MAME_DIR .. "src/mame/machine/xbox.cpp",
 	MAME_DIR .. "src/mame/machine/xbox_usb.cpp",
 	MAME_DIR .. "src/mame/machine/xbox_pci.cpp",
