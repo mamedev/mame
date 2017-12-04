@@ -89,8 +89,8 @@ private:
 
 	required_device<cpu_device> m_subcpu2;
 
-	optional_shared_ptr<uint16_t> m_apache3_g_ram;
-	optional_shared_ptr<uint8_t> m_apache3_z80_ram;
+	required_shared_ptr<uint16_t> m_apache3_g_ram;
+	required_shared_ptr<uint8_t> m_apache3_z80_ram;
 
 	uint16_t m_apache3_rotate_ctrl[12];
 	uint8_t m_apache3_adc;
