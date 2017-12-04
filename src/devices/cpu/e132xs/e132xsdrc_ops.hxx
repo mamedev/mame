@@ -83,8 +83,16 @@ void hyperstone_device::generate_decode_immediate_s(drcuml_block *block, compile
 	}
 }
 
-void hyperstone_device::generate_ignore_immediate_s(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc)
+void hyperstone_device::generate_ignore_immediate_s(drcuml_block *block, const opcode_desc *desc)
 {
+	uint16_t op = desc->opptr.w[0];
+
+	static const uint32_t lengths[16] = { 1<<19, 3<<19, 2<<19, 2<<19, 1<<19, 1<<19, 1<<19, 1<<19, 1<<19, 1<<19, 1<<19, 1<<19, 1<<19, 1<<19, 1<<19, 1<<19 };
+	static const uint32_t offsets[16] = { 0, 4, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+	const uint8_t nybble = op & 0x0f;
+
+	UML_MOV(block, mem(&m_instruction_length), lengths[nybble]);
+	UML_ADD(block, DRC_PC, DRC_PC, offsets[nybble]);
 }
 
 void hyperstone_device::generate_decode_pcrel(drcuml_block *block, const opcode_desc *desc)
@@ -748,7 +756,7 @@ void hyperstone_device::generate_mov(drcuml_block *block, compiler_state *compil
 	UML_TEST(block, I3, ~0);
 	UML_SETc(block, uml::COND_Z, I2);
 	UML_ROLINS(block, DRC_SR, I2, 1, Z_MASK);
-	UML_ROLINS(block, DRC_SR, I5, 28, N_MASK);
+	UML_ROLINS(block, DRC_SR, I5, 3, N_MASK);
 
 	if (DST_GLOBAL)
 	{
@@ -1042,7 +1050,7 @@ void hyperstone_device::generate_cmpi(drcuml_block *block, compiler_state *compi
 	UML_CMP(block, I2, I1);
 	UML_MOVc(block, uml::COND_E, I3, Z_MASK);
 	UML_MOVc(block, uml::COND_B, I3, C_MASK);
-	UML_JMPc(block, uml::COND_L, no_n = compiler->m_labelnum++);
+	UML_JMPc(block, uml::COND_GE, no_n = compiler->m_labelnum++);
 	UML_OR(block, I3, I3, N_MASK);
 	UML_LABEL(block, no_n);
 	UML_OR(block, DRC_SR, DRC_SR, I3);
@@ -1204,7 +1212,79 @@ void hyperstone_device::generate_addsi(drcuml_block *block, compiler_state *comp
 template <hyperstone_device::reg_bank DST_GLOBAL, hyperstone_device::imm_size IMM_LONG>
 void hyperstone_device::generate_cmpbi(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc)
 {
-	printf("Unimplemented: generate_cmpbi (%08x)\n", desc->pc);
+	uint16_t op = desc->opptr.w[0];
+	const uint32_t dst_code = (op & 0xf0) >> 4;
+
+	if (!IMM_LONG)
+		generate_check_delay_pc(block);
+
+	if (DST_GLOBAL)
+	{
+		UML_LOAD(block, I2, (void *)m_global_regs, dst_code, SIZE_DWORD, SCALE_x4);
+	}
+	else
+	{
+		UML_ROLAND(block, I3, DRC_SR, 7, 0x7f);
+		UML_ADD(block, I4, I3, dst_code);
+		UML_AND(block, I5, I4, 0x3f);
+		UML_LOAD(block, I2, (void *)m_local_regs, I5, SIZE_DWORD, SCALE_x4);
+	}
+
+	const uint32_t n = ((op & 0x100) >> 4) | (op & 0x0f);
+	if (n)
+	{
+		if (n == 31)
+		{
+			if (IMM_LONG)
+			{
+				generate_ignore_immediate_s(block, desc);
+				generate_check_delay_pc(block);
+			}
+			UML_MOV(block, I1, 0x7fffffff);
+		}
+		else
+		{
+			if (IMM_LONG)
+			{
+				generate_decode_immediate_s(block, compiler, desc);
+				generate_check_delay_pc(block);
+			}
+			else
+			{
+				UML_MOV(block, I1, op & 0xf);
+			}
+		}
+
+		UML_AND(block, DRC_SR, DRC_SR, ~Z_MASK);
+		UML_TEST(block, I2, I1);
+		UML_SETc(block, uml::COND_Z, I3);
+		UML_ROLINS(block, DRC_SR, I3, Z_SHIFT, Z_MASK);
+	}
+	else
+	{
+		if (IMM_LONG)
+		{
+			generate_ignore_immediate_s(block, desc);
+			generate_check_delay_pc(block);
+		}
+
+		int or_mask, done;
+		UML_TEST(block, I2, 0xff000000);
+		UML_JMPc(block, uml::COND_Z, or_mask = compiler->m_labelnum++);
+		UML_TEST(block, I2, 0x00ff0000);
+		UML_JMPc(block, uml::COND_Z, or_mask);
+		UML_TEST(block, I2, 0x0000ff00);
+		UML_JMPc(block, uml::COND_Z, or_mask);
+		UML_TEST(block, I2, 0x000000ff);
+		UML_JMPc(block, uml::COND_Z, or_mask);
+		UML_AND(block, DRC_SR, DRC_SR, ~Z_MASK);
+		UML_JMP(block, done = compiler->m_labelnum++);
+
+		UML_LABEL(block, or_mask);
+		UML_OR(block, DRC_SR, DRC_SR, Z_MASK);
+
+		UML_LABEL(block, done);
+	}
 }
 
 
