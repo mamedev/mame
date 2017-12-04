@@ -1057,15 +1057,12 @@ void hyperstone_device::generate_movi(drcuml_block *block, compiler_state *compi
 {
 	uint16_t op = desc->opptr.w[0];
 	const uint32_t dst_code = (op & 0xf0) >> 4;
+	const uint32_t src_code = op & 0xf;
 
 	if (IMM_LONG)
-	{
-		generate_decode_immediate_s(block, compiler, desc); // I1 <-- imm32
-	}
+		generate_decode_immediate_s(block, compiler, desc);
 	else
-	{
-		UML_AND(block, I1, I0, 0xf);
-	}
+		UML_MOV(block, I1, src_code);
 
 	generate_check_delay_pc(block);
 
@@ -1127,7 +1124,73 @@ void hyperstone_device::generate_movi(drcuml_block *block, compiler_state *compi
 template <hyperstone_device::reg_bank DST_GLOBAL, hyperstone_device::imm_size IMM_LONG>
 void hyperstone_device::generate_addi(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc)
 {
-	printf("Unimplemented: generate_addi (%08x)\n", desc->pc);
+	uint16_t op = desc->opptr.w[0];
+	const uint32_t dst_code = (op & 0xf0) >> 4;
+	const uint32_t src_code = op & 0xf;
+
+	if (IMM_LONG)
+		generate_decode_immediate_s(block, compiler, desc); // I1 <-- imm32
+	else
+		UML_MOV(block, I1, src_code);
+
+	generate_check_delay_pc(block);
+
+	if (DST_GLOBAL)
+	{
+		UML_LOAD(block, I2, (void *)m_global_regs, dst_code, SIZE_DWORD, SCALE_x4);
+	}
+	else
+	{
+		UML_ROLAND(block, I3, DRC_SR, 7, 0x7f);
+		UML_ADD(block, I4, I3, dst_code);
+		UML_AND(block, I5, I4, 0x3f);
+		UML_LOAD(block, I2, (void *)m_local_regs, I5, SIZE_DWORD, SCALE_x4);
+	}
+
+	if (!(op & 0x10f))
+	{
+		UML_TEST(block, DRC_SR, Z_MASK);
+		UML_SETc(block, uml::COND_Z, I4);
+		UML_AND(block, I5, I2, 1);
+		UML_OR(block, I6, I4, I5);
+		UML_AND(block, I1, DRC_SR, I6);
+	}
+
+	UML_AND(block, DRC_SR, DRC_SR, ~(C_MASK | V_MASK | Z_MASK | N_MASK));
+
+	UML_DADD(block, I0, I1, I2);
+
+	UML_DTEST(block, I2, 0x100000000U);
+	UML_SETc(block, uml::COND_NZ, I4);
+	UML_ROLINS(block, DRC_SR, I4, 0, C_MASK);
+
+	UML_XOR(block, I4, I2, I0);
+	UML_XOR(block, I5, I1, I0);
+	UML_AND(block, I6, I4, I5);
+	UML_ROLINS(block, DRC_SR, I6, 4, V_MASK);
+
+	UML_ADD(block, I0, I1, I2);
+
+	UML_TEST(block, I0, ~0);
+	UML_SETc(block, uml::COND_Z, I4);
+	UML_ROLINS(block, DRC_SR, I4, 0, Z_MASK);
+	UML_ROLINS(block, DRC_SR, I0, 3, N_MASK);
+
+	if (DST_GLOBAL)
+	{
+		UML_MOV(block, I4, dst_code);
+		UML_MOV(block, I5, I0);
+		generate_set_global_register(block, compiler, desc);
+
+		if (dst_code == 0)
+			UML_AND(block, DRC_SR, DRC_SR, ~M_MASK);
+	}
+	else
+	{
+		UML_ADD(block, I4, I3, dst_code);
+		UML_AND(block, I5, I4, 0x3f);
+		UML_STORE(block, (void *)m_local_regs, I5, I0, SIZE_DWORD, SCALE_x4);
+	}
 }
 
 
