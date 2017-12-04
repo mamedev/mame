@@ -162,6 +162,8 @@ MACHINE_CONFIG_MEMBER( i82371sb_isa_device::device_add_mconfig )
 	MCFG_ISA16_SLOT_ADD("isabus","board1", pc_isa16_cards, "fdcsmc", true)
 	MCFG_ISA16_SLOT_ADD("isabus","board2", pc_isa16_cards, "comat", true)
 	MCFG_ISA16_SLOT_ADD("isabus","board3", pc_isa16_cards, "lpt", true)
+	MCFG_ISA16_SLOT_ADD("isabus","board4", pc_isa16_cards, nullptr, false)
+	MCFG_ISA16_SLOT_ADD("isabus","board5", pc_isa16_cards, nullptr, false)
 	// VGA-HACK
 	MCFG_FRAGMENT_ADD( pcvideo_vga );
 	// end-VGA-HACK
