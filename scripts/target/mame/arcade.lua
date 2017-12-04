@@ -887,6 +887,8 @@ files {
 	MAME_DIR .. "src/mame/audio/decobsmt.h",
 	MAME_DIR .. "src/mame/audio/efo_zsu.cpp",
 	MAME_DIR .. "src/mame/audio/efo_zsu.h",
+	MAME_DIR .. "src/mame/audio/rax.cpp",
+	MAME_DIR .. "src/mame/audio/rax.h",
 	MAME_DIR .. "src/mame/audio/segam1audio.cpp",
 	MAME_DIR .. "src/mame/audio/segam1audio.h",
 }
@@ -4683,8 +4685,6 @@ files {
 	MAME_DIR .. "src/mame/drivers/pse.cpp",
 	MAME_DIR .. "src/mame/drivers/quizo.cpp",
 	MAME_DIR .. "src/mame/drivers/quizpun2.cpp",
-	MAME_DIR .. "src/mame/audio/rax.cpp",
-	MAME_DIR .. "src/mame/audio/rax.h",
 	MAME_DIR .. "src/mame/drivers/rbmk.cpp",
 	MAME_DIR .. "src/mame/drivers/rcorsair.cpp",
 	MAME_DIR .. "src/mame/drivers/re900.cpp",
