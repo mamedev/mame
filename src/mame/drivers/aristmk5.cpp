@@ -498,7 +498,7 @@ WRITE8_MEMBER(aristmk5_state::spi_mux_w)
 		break;
 
 	case 2: // Mechanical meters
-		for(int i=0; i<4; i++)
+		for(int i = 0; i < 4; i++)
 			output().set_lamp_value(32 + i, BIT(m_spi_data[m_spi_mux], 1 + i));     // Tower Lamps
 		break;
 
@@ -507,7 +507,7 @@ WRITE8_MEMBER(aristmk5_state::spi_mux_w)
 		break;
 
 	case 5: // Door outputs
-		for(int i=0; i<32; i++)
+		for(int i = 0; i < 32; i++)
 			output().set_lamp_value(i, BIT(m_spi_data[m_spi_mux], i));
 		break;
 
@@ -818,19 +818,19 @@ WRITE8_MEMBER(aristmk5_state::sram_banksel_w)
 
 WRITE8_MEMBER(aristmk5_state::buttons_lamps_w)
 {
-	for(int i=0; i<8; i++)
+	for(int i = 0; i < 8; i++)
 		output().set_lamp_value((offset >> 2) * 8 + i, BIT(data, i));
 }
 
 WRITE8_MEMBER(aristmk5_state::other_lamps_w)
 {
-	for(int i=0; i<8; i++)
+	for(int i = 0; i < 8; i++)
 		output().set_lamp_value(16 + i, BIT(data, i));
 }
 
 WRITE8_MEMBER(aristmk5_state::bill_acceptor_lamps_w)
 {
-	for(int i=0; i<8; i++)
+	for(int i = 0; i < 8; i++)
 		output().set_lamp_value(24 + i, BIT(data, i));
 }
 
@@ -1743,7 +1743,7 @@ DRIVER_INIT_MEMBER(aristmk5_state,aristmk5)
 		int size = memregion("game_prg")->bytes();
 		int found = 0;
 
-		for (int i = 0;i < (size / 4) - 4;i++)
+		for (int i = 0; i < (size / 4) - 4; i++)
 		{
 			if (((ROM[i + 0] & 0xfffff000) == 0xe59f1000) &&
 				(ROM[i + 1] == 0xe3a03000) &&
@@ -1784,7 +1784,7 @@ DRIVER_INIT_MEMBER(aristmk5_state,aristmk5)
 
 					// the checksum is a simple 32-bit sum with the dword containing the checksum skipped (and the dword after it for no obvious reason!)
 					uint32_t calculatedchecksum = 0;
-					for (int i = actual / 4; i < actual2 / 4;i++)
+					for (int i = actual / 4; i < actual2 / 4; i++)
 					{
 						if ((i < (actual3 / 4)) ||
 							(i > (actual4 / 4)))
@@ -1813,7 +1813,7 @@ DRIVER_INIT_MEMBER(aristmk5_state,aristmk5)
 
 					// almost always just the end of the roms
 					int realend = 0;
-					for (int i = size - 1; i >= actual2 / 4;i--)
+					for (int i = size - 1; i >= actual2 / 4; i--)
 					{
 						if ((ROM[i] != 0xffffffff) && (ROM[i] != 0x00000000))
 						{
@@ -1825,7 +1825,7 @@ DRIVER_INIT_MEMBER(aristmk5_state,aristmk5)
 
 
 					int realend2 = 0;
-					for (int i = realend - 4; i >= actual2 / 4;i--)
+					for (int i = realend - 4; i >= actual2 / 4; i--)
 					{
 						if ((ROM[i] != 0xffffffff) && (ROM[i] != 0x00000000))
 						{
@@ -1889,9 +1889,9 @@ void aristmk5_state::machine_reset()
 
 		PRG = memregion(rom_region[op_mode & 7])->base();
 
-		if(PRG!=nullptr)
+		if(PRG != nullptr)
 
-		for(i=0;i<0x400000;i++)
+		for(i = 0; i < 0x400000; i++)
 			ROM[i] = PRG[i];
 	}
 
