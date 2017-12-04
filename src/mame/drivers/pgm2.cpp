@@ -55,7 +55,7 @@
 
 	Debug features (require DIP SW1:8 On):
 	- QC TEST mode: hold P1 A+B during boot
-	- Debug/Test mode: hold P1 B+C during boot, when ingame pressing P1 Start skips to next location, where might be other unknown debug featuers.
+	- Debug/Cheat mode: hold P1 B+C during boot, when ingame pressing P1 Start skips to next location, where might be more unknown debug features.
 	works for both currently dumped games (orleg2, kov2nl)
 
 */
