@@ -1025,9 +1025,9 @@ void hp_hybrid_cpu_device::do_pw(uint16_t opcode)
 				}
 				WM(tmp_addr >> 1 , tmp);
 			} else {
-				// Extend address
-				uint16_t val  = (tmp_addr & 1) ? uint8_t(tmp) << 8 : uint8_t(tmp);
-				uint16_t mask = (tmp_addr & 1) ? 0xff00 : 0x00ff;
+				// Extend address, form byte address
+				uint16_t val  = (tmp_addr & 1) ? uint8_t(tmp) : (tmp << 8);
+				uint16_t mask = (tmp_addr & 1) ? 0x00ff : 0xff00;
 				tmp_addr = add_mae(AEC_CASE_C , tmp_addr >> 1);
 				m_program->write_word(tmp_addr , val, mask);
 			}
@@ -1130,7 +1130,7 @@ uint16_t hp_hybrid_cpu_device::RIO(uint8_t pa , uint8_t ic)
 
 void hp_hybrid_cpu_device::WIO(uint8_t pa , uint8_t ic , uint16_t v)
 {
-	m_io->write_word(HP_MAKE_IOADDR(pa, ic), v);
+	m_io->write_word(HP_MAKE_IOADDR(pa, ic) , v);
 }
 
 hp_5061_3001_cpu_device::hp_5061_3001_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
