@@ -2468,6 +2468,33 @@ ROM_START( bumblbugu )
 ROM_END
 
 
+// 593 / 10 Credit Multiplier / 9 Line Multiline
+// Bumble Bugs / Export / D - 05/07/97
+// All devices are 27c4002 instead of 27c4096
+// Marked as CHG047999 and 87,006%
+// Variation (% and NO):87,006% 99
+// No required set chip version
+// No required touch screen
+ROM_START( bumblbugua )
+	ARISTOCRAT_MK5_BIOS
+	/*
+	    Checksum code found at 0x000d08
+	    Checksum is stored at 0x000020-0x000027
+	        Expected Checksum   0xa23f49f6
+	        Calculated Checksum 0xa23f49f6  (OK)
+	*/
+	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
+	ROM_LOAD32_WORD( "chg047999.u7",  0x000000, 0x80000, CRC(7e9be2d0) SHA1(84293a391e9797afc904bb3be05367361ae8d4c7) )  // 87,006% 99
+	ROM_LOAD32_WORD( "chg047999.u11", 0x000002, 0x80000, CRC(efd350ac) SHA1(19975b4d2b55b65542a7ff38fa035fd516bd6e2e) )  // 87,006% 99
+	ROM_LOAD32_WORD( "chg047999.u8",  0x100000, 0x80000, CRC(e0c01d01) SHA1(9153129fd348a97da7cccf002e5d03e4b4db9264) )  // base
+	ROM_LOAD32_WORD( "chg047999.u12", 0x100002, 0x80000, CRC(7dbb634b) SHA1(f7a752240989032af142f4cd6e4260a12a5b4c0a) )  // base
+
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
+	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
+ROM_END
+
+
 // 0200143V / 571/4 / 10 Credit Multiplier/9 Line Multiline
 // Butterfly Delight / Local / A - 19/12/95
 ROM_START( buttdeli )
@@ -7022,6 +7049,7 @@ GAMEL( 1999, bootsctnub,  bootsctn, aristmk5_usa,       aristmk5_usa, aristmk5_s
 GAMEL( 1996, bumblbug,    aristmk5, aristmk5,           swhr2,        aristmk5_state, aristmk5, ROT0, "Aristocrat", "Bumble Bugs (0200510V, NSW/ACT)",                      MACHINE_FLAGS, layout_swhr2 )           // 593, D - 5/07/96, Rev 3
 GAMEL( 1996, bumblbugql,  bumblbug, aristmk5,           swhr2,        aristmk5_state, aristmk5, ROT0, "Aristocrat", "Bumble Bugs (0200456V, Queensland)",                   MACHINE_FLAGS, layout_swhr2 )           // 593, D - 5/07/96, Rev 1.0
 GAMEL( 1997, bumblbugu,   bumblbug, aristmk5_usa,       aristmk5_usa, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Bumble Bugs (CHG0479-03, US)",                         MACHINE_FLAGS, layout_aristmk5_us )     // 593, D - 05/07/97
+GAMEL( 1997, bumblbugua,  bumblbug, aristmk5_usa,       aristmk5_usa, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Bumble Bugs (CHG0479-99, US)",                         MACHINE_FLAGS, layout_aristmk5_us )     // 593, D - 05/07/97
 GAMEL( 1995, buttdeli,    aristmk5, aristmk5,           swhr2,        aristmk5_state, aristmk5, ROT0, "Aristocrat", "Butterfly Delight (0200143V, NSW/ACT)",                MACHINE_FLAGS, layout_swhr2 )           // 571/4, A - 19/12/95, Rev 1.8.1.0
 GAMEL( 1998, cashcat,     aristmk5, aristmk5,           aristmk5,     aristmk5_state, aristmk5, ROT0, "Aristocrat", "Cash Cat (0100676V, NSW/ACT)",                         MACHINE_FLAGS, layout_aristmk5 )        // 614/3, A - 03/04/98, Rev 7
 GAMEL( 1997, cashcata,    cashcat,  aristmk5,           aristmk5_9,   aristmk5_state, aristmk5, ROT0, "Aristocrat", "Cash Cat (0100557V, NSW/ACT)",                         MACHINE_FLAGS, layout_dolphntrb )       // 614/1, B - 01/12/97, Rev 7
