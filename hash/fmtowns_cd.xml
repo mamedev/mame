@@ -8614,7 +8614,6 @@ User/save disks that can be created from the game itself are not included.
 
 	<!--
 	Originally labeled as "mp3 source". It probably needs a redump.
-	Also, the floppy disk seems to be an overdump.
 	-->
 	<software name="sspirits">
 		<!--
@@ -8628,8 +8627,8 @@ User/save disks that can be created from the game itself are not included.
 		<info name="release" value="199509xx" />
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Boot Disk" />
-			<dataarea name="flop" size="1281280">
-				<rom name="samurai spirits (boot disk).bin" size="1281280" crc="2f1793ac" sha1="bd0f7f5f3fc4b0bd58d04812449cae853b58b5a8" offset="000000" />
+			<dataarea name="flop" size="1261568">
+				<rom name="samurai spirits (boot disk).bin" size="1261568" crc="7d10e903" sha1="5893035421003ce336e7516863c3c17a3ed86c0b" offset="000000" />
 			</dataarea>
 		</part>
 		<part name="cdrom" interface="fmt_cdrom">
