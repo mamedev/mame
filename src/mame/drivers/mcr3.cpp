@@ -439,14 +439,11 @@ WRITE8_MEMBER(mcr3_state::spyhunt_op4_w)
 }
 
 
-WRITE_LINE_MEMBER(mcr3_state::spyhunt_lamp0_w) { output().set_value("lamp0", state); }
-WRITE_LINE_MEMBER(mcr3_state::spyhunt_lamp1_w) { output().set_value("lamp1", state); }
-WRITE_LINE_MEMBER(mcr3_state::spyhunt_lamp2_w) { output().set_value("lamp2", state); }
-WRITE_LINE_MEMBER(mcr3_state::spyhunt_lamp3_w) { output().set_value("lamp3", state); }
-WRITE_LINE_MEMBER(mcr3_state::spyhunt_lamp4_w) { output().set_value("lamp4", state); }
-WRITE_LINE_MEMBER(mcr3_state::spyhunt_lamp5_w) { output().set_value("lamp5", state); }
-WRITE_LINE_MEMBER(mcr3_state::spyhunt_lamp6_w) { output().set_value("lamp6", state); }
-WRITE_LINE_MEMBER(mcr3_state::spyhunt_lamp7_w) { output().set_value("lamp7", state); }
+template<int n>
+WRITE_LINE_MEMBER(mcr3_state::spyhunt_lamp_w)
+{
+	m_spyhunt_lamp[n] = state;
+}
 
 
 
@@ -1197,14 +1194,14 @@ static MACHINE_CONFIG_DERIVED( mcrsc_csd, mcrscroll )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 
 	MCFG_DEVICE_ADD("lamplatch", CD4099, 0) // U1 on Lamp Driver Board
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(mcr3_state, spyhunt_lamp0_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(mcr3_state, spyhunt_lamp1_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(mcr3_state, spyhunt_lamp2_w))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(mcr3_state, spyhunt_lamp3_w))
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(mcr3_state, spyhunt_lamp4_w))
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(mcr3_state, spyhunt_lamp5_w))
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(mcr3_state, spyhunt_lamp6_w))
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(mcr3_state, spyhunt_lamp7_w))
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(mcr3_state, spyhunt_lamp_w<0>))
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(mcr3_state, spyhunt_lamp_w<1>))
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(mcr3_state, spyhunt_lamp_w<2>))
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(mcr3_state, spyhunt_lamp_w<3>))
+	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(mcr3_state, spyhunt_lamp_w<4>))
+	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(mcr3_state, spyhunt_lamp_w<5>))
+	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(mcr3_state, spyhunt_lamp_w<6>))
+	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(mcr3_state, spyhunt_lamp_w<7>))
 MACHINE_CONFIG_END
 
 
@@ -1642,6 +1639,8 @@ DRIVER_INIT_MEMBER(mcr3_state,spyhunt)
 	machine().device<midway_ssio_device>("ssio")->set_custom_input(2, 0xff, read8_delegate(FUNC(mcr3_state::spyhunt_ip2_r),this));
 	machine().device<midway_ssio_device>("ssio")->set_custom_output(4, 0xff, write8_delegate(FUNC(mcr3_state::spyhunt_op4_w),this));
 
+	m_spyhunt_lamp.resolve();
+
 	m_spyhunt_sprite_color_mask = 0x00;
 	m_spyhunt_scroll_offset = 16;
 }
@@ -1663,6 +1662,8 @@ DRIVER_INIT_MEMBER(mcr3_state,turbotag)
 	machine().device<midway_ssio_device>("ssio")->set_custom_input(1, 0x60, read8_delegate(FUNC(mcr3_state::spyhunt_ip1_r),this));
 	machine().device<midway_ssio_device>("ssio")->set_custom_input(2, 0xff, read8_delegate(FUNC(mcr3_state::turbotag_ip2_r),this));
 	machine().device<midway_ssio_device>("ssio")->set_custom_output(4, 0xff, write8_delegate(FUNC(mcr3_state::spyhunt_op4_w),this));
+
+	m_spyhunt_lamp.resolve();
 
 	m_spyhunt_sprite_color_mask = 0x00;
 	m_spyhunt_scroll_offset = 88;
