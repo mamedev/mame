@@ -35204,6 +35204,7 @@ stfightgb                       // (c) 1986 Seibu Kaihatsu (Germany-Benelux)
 stlforce                        // (c) 1994 Electronic Devices (Italy) / Ecogames S.L. (Spain)
 twinbrat                        // (c) 1995
 twinbrata                       // (c) 1995
+twinbratb                       // (c) 1995
 
 @source:stratos.cpp
 stratos                         // Kasparov Stratos Chess Computer
