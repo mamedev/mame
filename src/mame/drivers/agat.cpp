@@ -27,6 +27,7 @@
 #include "bus/a2bus/a2diskii.h"
 #include "bus/a2bus/agat7langcard.h"
 #include "bus/a2bus/agat7ram.h"
+#include "bus/a2bus/agat840k_hle.h"
 
 #include "screen.h"
 #include "softlist.h"
@@ -1022,7 +1023,7 @@ static SLOT_INTERFACE_START(agat7_cards)
 	SLOT_INTERFACE("a7lang", A2BUS_AGAT7LANGCARD) // Agat-7 RAM Language Card -- decimal 3.089.119
 	SLOT_INTERFACE("a7ram", A2BUS_AGAT7RAM) // Agat-7 32K RAM Card -- decimal 3.089.119-01, KR565RU6D chips
 	SLOT_INTERFACE("a7fdc", A2BUS_AGAT7_FDC) // Disk II clone -- decimal 3.089.105
-	// 840K floppy controller -- decimal 7.104.351
+	SLOT_INTERFACE("a7fdc840", A2BUS_AGAT840K_HLE) // 840K floppy controller -- decimal 7.104.351 or 3.089.023?
 	// Serial-parallel card -- decimal 3.089.106
 	// Printer card (agat9) -- decimal 3.089.174
 
