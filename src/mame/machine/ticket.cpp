@@ -99,19 +99,7 @@ void ticket_dispenser_device::static_set_senses(device_t &device, uint8_t motor_
 //**************************************************************************
 
 //-------------------------------------------------
-//  read - read the status line via the active bit
-//  (legacy method)
-//-------------------------------------------------
-
-READ8_MEMBER( ticket_dispenser_device::read )
-{
-	LOG(("%s: Ticket Status Read = %02X\n", machine().describe_context(), m_status));
-	return m_status;
-}
-
-
-//-------------------------------------------------
-//  line_r - read the status line as a proper line
+//  line_r - read the status line
 //-------------------------------------------------
 
 READ_LINE_MEMBER( ticket_dispenser_device::line_r )

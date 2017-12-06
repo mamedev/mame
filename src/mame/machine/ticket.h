@@ -67,7 +67,6 @@ public:
 	static void static_set_senses(device_t &device, uint8_t motor_sense, uint8_t status_sense, bool hopper_type);
 
 	// read/write handlers
-	DECLARE_READ8_MEMBER( read );
 	DECLARE_READ_LINE_MEMBER( line_r );
 	DECLARE_WRITE8_MEMBER( write );
 	DECLARE_WRITE_LINE_MEMBER( motor_w );

@@ -873,7 +873,7 @@ READ16_MEMBER(subsino2_state::bishjan_input_r)
 
 	return  (res << 8) |                    // high byte
 			ioport("SYSTEM")->read() |      // low byte
-			(machine().device<ticket_dispenser_device>("hopper")->read(space, 0) ? 0x00 : 0x04) // bit 2: hopper sensor
+			(machine().device<ticket_dispenser_device>("hopper")->line_r() ? 0x00 : 0x04) // bit 2: hopper sensor
 	;
 }
 
