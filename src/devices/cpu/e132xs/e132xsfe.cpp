@@ -1249,12 +1249,12 @@ bool e132xs_frontend::describe(opcode_desc &desc, const opcode_desc *prev)
 		case 0xe4: case 0xe5: case 0xe6: case 0xe7: // dbc, dbnc, dbse, dbht - could be 4 bytes (pcrel)
 		case 0xe8: case 0xe9: case 0xea: case 0xeb: // dbn, dbnn, dblt, dbgt - could be 4 bytes (pcrel)
 			desc.regin[0] |= SR_CODE;
-			desc.targetpc = desc.pc + decode_pcrel(desc, op);
+			desc.targetpc = BRANCH_TARGET_DYNAMIC;
 			desc.flags |= OPFLAG_IS_CONDITIONAL_BRANCH;
 			desc.delayslots = 1;
 			break;
 		case 0xec: // dbr - could be 4 bytes (pcrel)
-			desc.targetpc = desc.pc + decode_pcrel(desc, op);
+			desc.targetpc = BRANCH_TARGET_DYNAMIC;
 			desc.flags |= OPFLAG_IS_UNCONDITIONAL_BRANCH | OPFLAG_END_SEQUENCE;
 			desc.delayslots = 1;
 			break;
@@ -1270,7 +1270,7 @@ bool e132xs_frontend::describe(opcode_desc &desc, const opcode_desc *prev)
 			desc.regin[0] |= 1 << gsrc_code;
 			desc.regout[ldst_group] |= 1 << ldst_code;
 			desc.regout[ldstf_group] |= 1 << ldstf_code;
-			desc.targetpc = desc.pc + decode_call(desc);
+			desc.targetpc = BRANCH_TARGET_DYNAMIC;
 			desc.flags |= OPFLAG_IS_UNCONDITIONAL_BRANCH | OPFLAG_END_SEQUENCE;
 			break;
 		case 0xef: // call local
@@ -1278,18 +1278,19 @@ bool e132xs_frontend::describe(opcode_desc &desc, const opcode_desc *prev)
 			desc.regin[lsrc_group] |= 1 << lsrc_code;
 			desc.regout[ldst_group] |= 1 << ldst_code;
 			desc.regout[ldstf_group] |= 1 << ldstf_code;
-			desc.targetpc = desc.pc + decode_call(desc);
+			desc.targetpc = BRANCH_TARGET_DYNAMIC;
 			desc.flags |= OPFLAG_IS_UNCONDITIONAL_BRANCH | OPFLAG_END_SEQUENCE;
 			break;
 		case 0xf0: case 0xf1: case 0xf2: case 0xf3: // bv, bnv, be, bne
 		case 0xf4: case 0xf5: case 0xf6: case 0xf7: // bc, bnc, bse, bht
 		case 0xf8: case 0xf9: case 0xfa: case 0xfb: // bn, bnn, blt, bgt
+			decode_pcrel(desc, op);
 			desc.regin[0] |= SR_CODE;
-			desc.targetpc = desc.pc + decode_pcrel(desc, op);
+			desc.targetpc = BRANCH_TARGET_DYNAMIC;
 			desc.flags |= OPFLAG_IS_CONDITIONAL_BRANCH;
 			break;
 		case 0xfc: // br
-			desc.targetpc = desc.pc + decode_pcrel(desc, op);
+			desc.targetpc = (desc.pc + 2) + decode_pcrel(desc, op);
 			desc.flags |= OPFLAG_IS_UNCONDITIONAL_BRANCH | OPFLAG_END_SEQUENCE;
 			break;
 		case 0xfd: case 0xfe: case 0xff: // trap

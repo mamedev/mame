@@ -1620,34 +1620,6 @@ WRITE32_MEMBER(gba_lcd_device::video_w)
 	}
 }
 
-static inline uint32_t combine_data_32_16(uint32_t prev, uint32_t data, uint32_t mem_mask)
-{
-	COMBINE_DATA(&prev);
-
-	switch (mem_mask)
-	{
-	case 0x000000ff:
-		prev &= 0xffff00ff;
-		prev |= data << 8;
-		break;
-	case 0x0000ff00:
-		prev &= 0xffffff00;
-		prev |= data >> 8;
-		break;
-	case 0x00ff0000:
-		prev &= 0x00ffffff;
-		prev |= data << 8;
-		break;
-	case 0xff000000:
-		prev &= 0xff00ffff;
-		prev |= data >> 8;
-		break;
-	default:
-		break;
-	}
-	return prev;
-}
-
 READ32_MEMBER(gba_lcd_device::gba_pram_r)
 {
 	return m_pram[offset];
@@ -1655,7 +1627,7 @@ READ32_MEMBER(gba_lcd_device::gba_pram_r)
 
 WRITE32_MEMBER(gba_lcd_device::gba_pram_w)
 {
-	m_pram[offset] = combine_data_32_16(m_pram[offset], data, mem_mask);
+	COMBINE_DATA(&m_pram[offset]);
 }
 
 READ32_MEMBER(gba_lcd_device::gba_vram_r)
@@ -1665,7 +1637,7 @@ READ32_MEMBER(gba_lcd_device::gba_vram_r)
 
 WRITE32_MEMBER(gba_lcd_device::gba_vram_w)
 {
-	m_vram[offset] = combine_data_32_16(m_vram[offset], data, mem_mask);
+	COMBINE_DATA(&m_vram[offset]);
 }
 
 READ32_MEMBER(gba_lcd_device::gba_oam_r)
@@ -1675,7 +1647,7 @@ READ32_MEMBER(gba_lcd_device::gba_oam_r)
 
 WRITE32_MEMBER(gba_lcd_device::gba_oam_w)
 {
-	m_oam[offset] = combine_data_32_16(m_oam[offset], data, mem_mask);
+	COMBINE_DATA(&m_oam[offset]);
 }
 
 TIMER_CALLBACK_MEMBER(gba_lcd_device::perform_hbl)

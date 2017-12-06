@@ -1,6 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Ryan Holtz
 
+#include "emu.h"
 #include "e132xs.h"
 #include "e132xsfe.h"
 #include "32xsdefs.h"
@@ -85,12 +86,12 @@ static void cfunc_update_timer_prescale(void *param)
 	((hyperstone_device *)param)->update_timer_prescale();
 }
 
-/*
+#if 0
 static void cfunc_print(void *param)
 {
 	((hyperstone_device *)param)->ccfunc_print();
 }
-*/
+#endif
 
 /*-------------------------------------------------
     ccfunc_total_cycles - compute the total number
@@ -617,7 +618,15 @@ void hyperstone_device::generate_delay_slot_and_branch(drcuml_block *block, comp
 	/* fetch the target register if dynamic, in case it is modified by the delay slot */
 	if (desc->targetpc == BRANCH_TARGET_DYNAMIC)
 	{
-		UML_MOV(block, mem(&m_branch_dest), I0);
+		UML_MOV(block, mem(&m_branch_dest), DRC_PC);
+	}
+
+	if (desc->delayslots)
+	{
+		/* compile the delay slot using temporary compiler state */
+		assert(desc->delay.first() != nullptr);
+		generate_sequence_instruction(block, &compiler_temp, desc->delay.first());       // <next instruction>
+		UML_MOV(block, mem(&m_branch_dest), DRC_PC);
 	}
 
 	/* update the cycles and jump through the hash table to the target */
@@ -969,5 +978,6 @@ bool hyperstone_device::generate_opcode(drcuml_block *block, compiler_state *com
 
 	UML_LABEL(block, done);
 	UML_XOR(block, DRC_SR, DRC_SR, I7);
+
 	return true;
 }

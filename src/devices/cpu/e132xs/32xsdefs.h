@@ -156,6 +156,10 @@
 #define S_MASK                  0x00040000
 #define ILC_MASK                0x00180000
 
+#define C_SHIFT                 0
+#define Z_SHIFT                 1
+#define N_SHIFT                 2
+#define V_SHIFT                 3
 #define S_SHIFT                 18
 
 /* SR flags */

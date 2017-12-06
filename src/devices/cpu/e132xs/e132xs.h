@@ -254,6 +254,7 @@ protected:
 
 	uint64_t m_numcycles;
 
+	uint32_t m_prev_pc;
 	uint32_t m_delay_pc;
 	uint32_t m_delay_slot;
 
@@ -434,9 +435,9 @@ private:
 	void generate_check_delay_pc(drcuml_block *block);
 	void generate_decode_const(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
 	void generate_decode_immediate_s(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-	void generate_ignore_immediate_s(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-	void generate_decode_pcrel(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-	void generate_ignore_pcrel(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
+	void generate_ignore_immediate_s(drcuml_block *block, const opcode_desc *desc);
+	void generate_decode_pcrel(drcuml_block *block, const opcode_desc *desc);
+	void generate_ignore_pcrel(drcuml_block *block, const opcode_desc *desc);
 
 	void generate_set_global_register(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
 

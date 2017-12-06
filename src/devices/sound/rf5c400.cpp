@@ -181,7 +181,7 @@ void rf5c400_device::device_start()
 
 	m_stream = stream_alloc(0, 2, clock() / 384);
 
-	m_rommask = (m_rom.length()/2) - 1;
+	m_rommask = m_rom.length() - 1;
 }
 
 //-------------------------------------------------

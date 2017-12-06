@@ -45,13 +45,18 @@
     Support remaining games (need IGS036 dumps)
     Identify which regions each game was released in and either dump alt. internal ROMs for each region, or
       create them until that can be done.
-    RTC (integrated into the CPU with the SRAM?)
+    properly implement RTC (integrated into the CPU)
     Memory Card system (there's an MCU on the motherboard that will need simulating or dumping somehow)
     Verify Sprite Zoom (check exactly which pixels are doubled / missed on hardware for flipped , non-flipped cases etc.)
     Simplify IGS036 encryption based on tables in internal roms
     Fix ARM? bug that means Oriental Legend 2 needs a patch (might also be that it needs the card reader, and is running a
      codepath that would not exist in a real environment at the moment)
     Fix Save States (is this a driver problem or an ARM core problem, they don't work unless you get through the startup tests)
+
+	Debug features (require DIP SW1:8 On):
+	- QC TEST mode: hold P1 A+B during boot
+	- Debug/Cheat mode: hold P1 B+C during boot, when ingame pressing P1 Start skips to next location, where might be more unknown debug features.
+	works for both currently dumped games (orleg2, kov2nl)
 
 */
 
@@ -232,7 +237,7 @@ static INPUT_PORTS_START( pgm2 )
 	PORT_DIPNAME( 0x40000000, 0x40000000, DEF_STR( Unused ) )  PORT_DIPLOCATION("SW1:7")
 	PORT_DIPSETTING(          0x40000000, DEF_STR( Off ) )
 	PORT_DIPSETTING(          0x00000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80000000, 0x80000000, DEF_STR( Unused ) )  PORT_DIPLOCATION("SW1:8")
+	PORT_DIPNAME( 0x80000000, 0x80000000, "Debug" )  PORT_DIPLOCATION("SW1:8")
 	PORT_DIPSETTING(          0x80000000, DEF_STR( Off ) )
 	PORT_DIPSETTING(          0x00000000, DEF_STR( On ) )
 INPUT_PORTS_END

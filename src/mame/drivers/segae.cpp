@@ -200,7 +200,7 @@ ROMs:
 Game                     IC2         IC3         IC4         IC5         IC7
 ---------------------------------------------------------------------------------
 Megumi Rescue*           IC-2        IC-3        IC-4        IC-5        IC-7
-Hang-On Jr.              EPR-?       EPR-?       EPR-?       EPR-?       EPR-?     Hello, Sega Part Numbers....!?
+Hang-On Jr.              EPR-7261    EPR-7260    EPR-7259    EPR-7258    EPR-7257B
 Transformer              EPR-7350    EPR-7606    EPR-7348    EPR-7347    EPR-7605
            /Astro Flash  EPR-7350    EPR-7349    EPR-7348    EPR-7347    EPR-7723
 Slap Shooter             EPR-7355    EPR-7354    EPR-7353    EPR-7352    EPR-7751
@@ -971,16 +971,20 @@ ROM_END
 
 //*************************************************************************************************************************
 //  Hang-On Jr., Sega System E
+//   Game ID# 833-5911 HANG ON JR. REV.
+//   ROM BD # 834-5910 REV.B
+//
+// Analog control board:  834-5805 (required for game to boot)
 //
 ROM_START( hangonjr )
 	ROM_REGION( 0x30000, "maincpu", 0 )
-	ROM_LOAD( "rom5.ic7",   0x00000, 0x08000, CRC(d63925a7) SHA1(699f222d9712fa42651c753fe75d7b60e016d3ad) ) /* Fixed Code */
+	ROM_LOAD( "epr-7257b.ic7",   0x00000, 0x08000, CRC(d63925a7) SHA1(699f222d9712fa42651c753fe75d7b60e016d3ad) ) /* Fixed Code */
 
 	/* The following are 8 0x4000 banks that get mapped to reads from 0x8000 - 0xbfff */
-	ROM_LOAD( "rom4.ic5",   0x10000, 0x08000, CRC(ee3caab3) SHA1(f583cf92c579d1ca235e8b300e256ba58a04dc90) )
-	ROM_LOAD( "rom3.ic4",   0x18000, 0x08000, CRC(d2ba9bc9) SHA1(85cf2a801883bf69f78134fc4d5075134f47dc03) )
-	ROM_LOAD( "rom2.ic3",   0x20000, 0x08000, CRC(e14da070) SHA1(f8781f65be5246a23c1f492905409775bbf82ea8) )
-	ROM_LOAD( "rom1.ic2",   0x28000, 0x08000, CRC(3810cbf5) SHA1(c8d5032522c0c903ab3d138f62406a66e14a5c69) )
+	ROM_LOAD( "epr-7258.ic5",   0x10000, 0x08000, CRC(ee3caab3) SHA1(f583cf92c579d1ca235e8b300e256ba58a04dc90) )
+	ROM_LOAD( "epr-7259.ic4",   0x18000, 0x08000, CRC(d2ba9bc9) SHA1(85cf2a801883bf69f78134fc4d5075134f47dc03) )
+	ROM_LOAD( "epr-7260.ic3",   0x20000, 0x08000, CRC(e14da070) SHA1(f8781f65be5246a23c1f492905409775bbf82ea8) )
+	ROM_LOAD( "epr-7261.ic2",   0x28000, 0x08000, CRC(3810cbf5) SHA1(c8d5032522c0c903ab3d138f62406a66e14a5c69) )
 ROM_END
 
 //*************************************************************************************************************************
@@ -1078,7 +1082,7 @@ ROM_END
 
 
 //    YEAR, NAME,     PARENT,   MACHINE,           INPUT,    STATE          INIT,     MONITOR,COMPANY,FULLNAME,FLAGS
-GAME( 1985, hangonjr, 0,        hangonjr,          hangonjr, systeme_state, 0,        ROT0,   "Sega", "Hang-On Jr.", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, hangonjr, 0,        hangonjr,          hangonjr, systeme_state, 0,        ROT0,   "Sega", "Hang-On Jr. Rev.B", MACHINE_SUPPORTS_SAVE )
 GAME( 1986, slapshtr, 0,        systeme,           slapshtr, systeme_state, 0,        ROT0,   "Sega", "Slap Shooter", MACHINE_SUPPORTS_SAVE) // 1986 date from flyer
 GAME( 1986, transfrm, 0,        systeme,           transfrm, systeme_state, 0,        ROT0,   "Sega", "Transformer", MACHINE_SUPPORTS_SAVE )
 GAME( 1986, astrofl,  transfrm, systemex_315_5177, transfrm, systeme_state, 0,        ROT0,   "Sega", "Astro Flash (Japan)", MACHINE_SUPPORTS_SAVE )

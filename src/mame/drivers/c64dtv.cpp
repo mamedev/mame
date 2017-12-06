@@ -1,5 +1,16 @@
 // license:BSD-3-Clause
 // copyright-holders:Curt Coder
+/*************************************************************************************************************
+
+Commodore 64 Direct-to-TV
+It looks like a fat joystick.
+
+Chips: All unmarked. According to Wikipedia an ASIC contains an entire
+       Commodore 64 (6510 CPU, VIC-II, SID, CIA, PLA) running at 32MHz. The
+       6510 CPU portion runs at 1MHz.
+Crystals: 32.720 (X1), unmarked (X2).
+
+*************************************************************************************************************/
 #include "emu.h"
 #include "screen.h"
 
@@ -66,4 +77,4 @@ ROM_END
 //  GAME DRIVERS
 //**************************************************************************
 
-CONS( 2005, c64dtv,  0,  0,    c64dtv,     c64dtv, c64dtv_state,     0,     "The Toy:Lobster Company", "Commodore 64 Direct-to-TV (Version 2 050711) (PAL)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+CONS( 2005, c64dtv,  0,  0,    c64dtv,     c64dtv, c64dtv_state,     0,     "The Toy:Lobster Company", "Commodore 64 Direct-to-TV (Version 2 050711) (PAL)", MACHINE_IS_SKELETON )

@@ -389,34 +389,20 @@ u8 debugger_cpu::read_byte(address_space &space, offs_t address, bool apply_tran
 
 u16 debugger_cpu::read_word(address_space &space, offs_t address, bool apply_translation)
 {
+	device_memory_interface &memory = space.device().memory();
+
 	/* mask against the logical byte mask */
 	address &= space.logaddrmask();
 
 	u16 result;
-	if (!WORD_ALIGNED(address))
-	{   /* if this is misaligned read, or if there are no word readers, just read two bytes */
-		u8 byte0 = read_byte(space, address + 0, apply_translation);
-		u8 byte1 = read_byte(space, address + 1, apply_translation);
-
-		/* based on the endianness, the result is assembled differently */
-		if (space.endianness() == ENDIANNESS_LITTLE)
-			result = byte0 | (byte1 << 8);
-		else
-			result = byte1 | (byte0 << 8);
+	/* translate if necessary; if not mapped, return 0xffff */
+	if (apply_translation && !memory.translate(space.spacenum(), TRANSLATE_READ_DEBUG, address))
+	{
+		result = 0xffff;
 	}
 	else
-	{   /* otherwise, this proceeds like the byte case */
-		device_memory_interface &memory = space.device().memory();
-
-		/* translate if necessary; if not mapped, return 0xffff */
-		if (apply_translation && !memory.translate(space.spacenum(), TRANSLATE_READ_DEBUG, address))
-		{
-			result = 0xffff;
-		}
-		else
-		{   /* otherwise, call the byte reading function for the translated address */
-			result = space.read_word(address);
-		}
+	{   /* otherwise, call the byte reading function for the translated address */
+		result = space.read_word_unaligned(address);
 	}
 
 	return result;
@@ -430,33 +416,20 @@ u16 debugger_cpu::read_word(address_space &space, offs_t address, bool apply_tra
 
 u32 debugger_cpu::read_dword(address_space &space, offs_t address, bool apply_translation)
 {
+	device_memory_interface &memory = space.device().memory();
+
 	/* mask against the logical byte mask */
 	address &= space.logaddrmask();
 
 	u32 result;
-	if (!DWORD_ALIGNED(address))
-	{   /* if this is a misaligned read, or if there are no dword readers, just read two words */
-		u16 word0 = read_word(space, address + 0, apply_translation);
-		u16 word1 = read_word(space, address + 2, apply_translation);
 
-		/* based on the endianness, the result is assembled differently */
-		if (space.endianness() == ENDIANNESS_LITTLE)
-			result = word0 | (word1 << 16);
-		else
-			result = word1 | (word0 << 16);
+	if (apply_translation && !memory.translate(space.spacenum(), TRANSLATE_READ_DEBUG, address))
+	{   /* translate if necessary; if not mapped, return 0xffffffff */
+		result = 0xffffffff;
 	}
 	else
-	{   /* otherwise, this proceeds like the byte case */
-		device_memory_interface &memory = space.device().memory();
-
-		if (apply_translation && !memory.translate(space.spacenum(), TRANSLATE_READ_DEBUG, address))
-		{   /* translate if necessary; if not mapped, return 0xffffffff */
-			result = 0xffffffff;
-		}
-		else
-		{   /* otherwise, call the byte reading function for the translated address */
-			result = space.read_dword(address);
-		}
+	{   /* otherwise, call the byte reading function for the translated address */
+		result = space.read_dword_unaligned(address);
 	}
 
 	return result;
@@ -470,34 +443,21 @@ u32 debugger_cpu::read_dword(address_space &space, offs_t address, bool apply_tr
 
 u64 debugger_cpu::read_qword(address_space &space, offs_t address, bool apply_translation)
 {
+	device_memory_interface &memory = space.device().memory();
+
 	/* mask against the logical byte mask */
 	address &= space.logaddrmask();
 
 	u64 result;
-	if (!QWORD_ALIGNED(address))
-	{   /* if this is a misaligned read, or if there are no qword readers, just read two dwords */
-		u32 dword0 = read_dword(space, address + 0, apply_translation);
-		u32 dword1 = read_dword(space, address + 4, apply_translation);
 
-		/* based on the endianness, the result is assembled differently */
-		if (space.endianness() == ENDIANNESS_LITTLE)
-			result = dword0 | (u64(dword1) << 32);
-		else
-			result = dword1 | (u64(dword0) << 32);
+	/* translate if necessary; if not mapped, return 0xffffffffffffffff */
+	if (apply_translation && !memory.translate(space.spacenum(), TRANSLATE_READ_DEBUG, address))
+	{
+		result = ~u64(0);
 	}
 	else
-	{   /* otherwise, this proceeds like the byte case */
-		device_memory_interface &memory = space.device().memory();
-
-		/* translate if necessary; if not mapped, return 0xffffffffffffffff */
-		if (apply_translation && !memory.translate(space.spacenum(), TRANSLATE_READ_DEBUG, address))
-		{
-			result = ~u64(0);
-		}
-		else
-		{   /* otherwise, call the byte reading function for the translated address */
-			result = space.read_qword(address);
-		}
+	{   /* otherwise, call the byte reading function for the translated address */
+		result = space.read_qword_unaligned(address);
 	}
 
 	return result;

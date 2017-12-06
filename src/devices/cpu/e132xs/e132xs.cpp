@@ -1429,72 +1429,28 @@ bool hyperstone_device::get_h() const
 
 void hyperstone_device::hyperstone_trap()
 {
+	static const uint32_t conditions[16] = {
+		0, 0, 0, 0, N_MASK | Z_MASK, N_MASK | Z_MASK, N_MASK, N_MASK, C_MASK | Z_MASK, C_MASK | Z_MASK, C_MASK, C_MASK, Z_MASK, Z_MASK, V_MASK, 0
+	};
+	static const bool trap_if_set[16] = {
+		false, false, false, false, true, false, true, false, true, false, true, false, true, false, true, false
+	};
+
 	check_delay_PC();
 
 	const uint8_t trapno = (m_op & 0xfc) >> 2;
 	const uint32_t addr = get_trap_addr(trapno);
 	const uint8_t code = ((m_op & 0x300) >> 6) | (m_op & 0x03);
 
-	switch (code)
+	if (trap_if_set[code])
 	{
-		case TRAPLE:
-			if (SR & (N_MASK | Z_MASK))
-				execute_trap(addr);
-			break;
-
-		case TRAPGT:
-			if(!(SR & (N_MASK | Z_MASK)))
-				execute_trap(addr);
-			break;
-
-		case TRAPLT:
-			if (SR & N_MASK)
-				execute_trap(addr);
-			break;
-
-		case TRAPGE:
-			if (!(SR & N_MASK))
-				execute_trap(addr);
-			break;
-
-		case TRAPSE:
-			if (SR & (C_MASK | Z_MASK))
-				execute_trap(addr);
-			break;
-
-		case TRAPHT:
-			if (!(SR & (C_MASK | Z_MASK)))
-				execute_trap(addr);
-			break;
-
-		case TRAPST:
-			if (SR & C_MASK)
-				execute_trap(addr);
-			break;
-
-		case TRAPHE:
-			if (!(SR & C_MASK))
-				execute_trap(addr);
-			break;
-
-		case TRAPE:
-			if (SR & Z_MASK)
-				execute_trap(addr);
-			break;
-
-		case TRAPNE:
-			if (!(SR & Z_MASK))
-				execute_trap(addr);
-			break;
-
-		case TRAPV:
-			if (SR & V_MASK)
-				execute_trap(addr);
-			break;
-
-		case TRAP:
+		if (SR & conditions[code])
 			execute_trap(addr);
-			break;
+	}
+	else
+	{
+		if (!(SR & conditions[code]))
+			execute_trap(addr);
 	}
 
 	m_icount -= m_clock_cycles_1;
