@@ -1143,6 +1143,9 @@ configuration { "mingw*" }
 		linkoptions {
 			"-Wl,--start-group",
 		}
+		includedirs {
+			MAME_DIR .. "3rdparty/dx11/Include"
+		}
 		links {
 			"user32",
 			"winmm",
@@ -1154,6 +1157,8 @@ configuration { "mingw*" }
 			"iphlpapi",
 			"shell32",
 			"userenv",
+			"d3d11",
+			"d3dcompiler_47",
 		}
 
 configuration { "mingw-clang" }

@@ -478,8 +478,8 @@ bool voodoo_gpu::InitBuffers(int sizeX, int sizeY)
 	if (FAILED(m_gpu->CreateSamplerState(&rendDesc, &m_renderState)))
 		return false;
 
-		// Create the depth stencil state
-		D3D11_DEPTH_STENCIL_DESC depthStencilDesc;
+	// Create the depth stencil state
+	D3D11_DEPTH_STENCIL_DESC depthStencilDesc;
 	ZeroMemory(&depthStencilDesc, sizeof(D3D11_DEPTH_STENCIL_DESC));
 	// Depth test parameters
 	depthStencilDesc.DepthEnable = FALSE;
@@ -829,8 +829,6 @@ void voodoo_gpu::SetColorCtrl(uint32_t fbzColorPath, uint32_t color0, uint32_t c
 
 void voodoo_gpu::UpdateDepth()
 {
-	HRESULT result;
-
 	// Create the depth stencil state
 	D3D11_DEPTH_STENCIL_DESC depthStencilDesc;
 	ZeroMemory(&depthStencilDesc, sizeof(D3D11_DEPTH_STENCIL_DESC));
@@ -867,7 +865,7 @@ void voodoo_gpu::UpdateDepth()
 	// Release old state
 	SAFE_RELEASE(m_depthState);
 	// Create New
-	result = m_gpu->CreateDepthStencilState(&depthStencilDesc, &m_depthState);
+	m_gpu->CreateDepthStencilState(&depthStencilDesc, &m_depthState);
 
 	/*
 	// Release old state
@@ -1361,7 +1359,7 @@ HRESULT voodoo_gpu::RenderToTex()
 	testComb = ConvertTexmode(texMode);  // Mode 0
 
 	// Clear the back buffer 
-	XMFLOAT4 Zero = { 0.000000000f, 0.000000000f, 0.000000000f, 0.000000000f };
+	//XMFLOAT4 Zero = { 0.000000000f, 0.000000000f, 0.000000000f, 0.000000000f };
 	FastFill(0, 511, 0, 384, 0);
 
 	// Setup constants
@@ -1385,7 +1383,7 @@ HRESULT voodoo_gpu::RenderToTex()
 		uint8_t sg[2] = { 0xff, 0x0f };
 		uint8_t sb[2] = { 0xff, 0x0f };
 		int sa[2] = { 0xff, 0x0f };
-		int sw[2] = { 0xff, 0x0f };
+		//int sw[2] = { 0xff, 0x0f };
 		int sz[2] = { 0xf, 0x8f };
 		
 		uint32_t wSel = 0;
@@ -1445,7 +1443,7 @@ void voodoo_gpu::CopyBuffer(uint16_t *dst)
 	desc.CPUAccessFlags = D3D11_CPU_ACCESS_READ | D3D11_CPU_ACCESS_WRITE;
 	desc.Usage = D3D11_USAGE_STAGING;
 
-	HRESULT hr = m_gpu->CreateTexture2D(&desc, NULL, &pNewTexture);
+	m_gpu->CreateTexture2D(&desc, NULL, &pNewTexture);
 
 	m_context->CopyResource(pNewTexture, m_compTexture);
 
@@ -1463,7 +1461,7 @@ void voodoo_gpu::CopyBuffer(uint16_t *dst)
 	{
 		//size_t msize = std::min<size_t>(desc.Width * 4, resource.RowPitch);
 		//size_t msize = resource.RowPitch;
-		size_t msize = desc.Width * 4;
+		//size_t msize = desc.Width * 4;
 		//memcpy_s(dptr, desc.Width * 4, sptr, msize);
 		memcpy(dptr, sptr, desc.Width*4);
 		sptr += desc.Width;
@@ -1503,7 +1501,7 @@ void voodoo_gpu::CopyBufferRGB(uint8_t *dst)
 	desc.CPUAccessFlags = D3D11_CPU_ACCESS_READ | D3D11_CPU_ACCESS_WRITE;
 	desc.Usage = D3D11_USAGE_STAGING;
 
-	HRESULT hr = m_gpu->CreateTexture2D(&desc, NULL, &pNewTexture);
+	m_gpu->CreateTexture2D(&desc, NULL, &pNewTexture);
 
 	m_context->CopyResource(pNewTexture, m_renderTexture);
 
@@ -1519,7 +1517,7 @@ void voodoo_gpu::CopyBufferRGB(uint8_t *dst)
 	{
 		//size_t msize = std::min<size_t>(desc.Width * 4, resource.RowPitch);
 		//size_t msize = resource.RowPitch;
-		size_t msize = desc.Width;
+		//size_t msize = desc.Width;
 		//memcpy_s(dptr, desc.Width, sptr, msize);
 		//sptr += resource.RowPitch;
 		memcpy(dptr, sptr, desc.Width * 4);
@@ -1545,7 +1543,7 @@ void voodoo_gpu::CopyBufferComp(uint16_t *dst)
 	desc.CPUAccessFlags = D3D11_CPU_ACCESS_READ | D3D11_CPU_ACCESS_WRITE;
 	desc.Usage = D3D11_USAGE_STAGING;
 
-	HRESULT hr = m_gpu->CreateTexture2D(&desc, NULL, &pNewTexture);
+	m_gpu->CreateTexture2D(&desc, NULL, &pNewTexture);
 
 	m_context->CopyResource(pNewTexture, m_compTexture);
 
@@ -1647,7 +1645,6 @@ void voodoo_gpu::CreateTexture(texDescription &desc, int index, uint32_t &texMod
 		}
 		// Create the new entries
 		// Create gpu texture
-		HRESULT hr;
 		D3D11_TEXTURE2D_DESC texDesc;
 		texDesc.Width = desc.sSize;
 		texDesc.Height = desc.tSize;
@@ -1660,7 +1657,7 @@ void voodoo_gpu::CreateTexture(texDescription &desc, int index, uint32_t &texMod
 		texDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
 		texDesc.CPUAccessFlags = 0;
 		texDesc.MiscFlags = 0;
-		hr = m_gpu->CreateTexture2D(&texDesc, NULL, &new_map.texTexture);
+		m_gpu->CreateTexture2D(&texDesc, NULL, &new_map.texTexture);
 
 		// Create the Resource View
 		D3D11_SHADER_RESOURCE_VIEW_DESC texResourceViewDesc;
@@ -1668,7 +1665,7 @@ void voodoo_gpu::CreateTexture(texDescription &desc, int index, uint32_t &texMod
 		texResourceViewDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
 		texResourceViewDesc.Texture2D.MostDetailedMip = 0;
 		texResourceViewDesc.Texture2D.MipLevels = 9;
-		hr = m_gpu->CreateShaderResourceView(new_map.texTexture, &texResourceViewDesc, &new_map.texRV);
+		m_gpu->CreateShaderResourceView(new_map.texTexture, &texResourceViewDesc, &new_map.texRV);
 
 		// Create the Sampler State
 		D3D11_SAMPLER_DESC sampDesc;
@@ -1700,7 +1697,7 @@ void voodoo_gpu::CreateTexture(texDescription &desc, int index, uint32_t &texMod
 		sampDesc.MinLOD = float((texLod >> 0) & 0x3f) / 4.0f; // Should actually be signed (4.2s)
 		sampDesc.MaxLOD = float((texLod >> 6) & 0x3f) / 4.0f; // Should actually be signed (4.2s)
 		sampDesc.MipLODBias = float(int32_t(((texLod >> 12) & 0x3f) << 26)) / 268435456.0f; // val / 2^28 (4.2s)
-		hr = m_gpu->CreateSamplerState(&sampDesc, &new_map.texSampler);
+		m_gpu->CreateSamplerState(&sampDesc, &new_map.texSampler);
 
 		// Copy texture data to buffer
 		uint32_t *srcBuff;

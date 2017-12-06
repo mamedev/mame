@@ -47,7 +47,7 @@ using DirectX::XMFLOAT4;
 #define DEPTH_PIXEL_BUFFER 512
 
 // Depth of the pixel buffer for lfb direct writes
-#define DEPTH_LFB_WRITE_BUFFER 256
+#define DEPTH_LFB_WRITE_BUFFER 512
 
 class voodoo_gpu
 {
