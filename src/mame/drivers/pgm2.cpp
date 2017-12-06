@@ -836,8 +836,8 @@ DRIVER_INIT_MEMBER(pgm2_state,kof98umh)
 {
 	uint16_t *src = (uint16_t *)memregion("sprites_mask")->base();
 
-	iga_u12_decode(src, 0x08000000, 0x1e96); // wrong
-	iga_u16_decode(src, 0x08000000, 0x869c); // wrong
+	iga_u12_decode(src, 0x08000000, 0x21df);
+	iga_u16_decode(src, 0x08000000, 0x8692);
 
 	src = (uint16_t *)memregion("sprites_colour")->base();
 	sprite_colour_decode(src, 0x20000000);
