@@ -11,6 +11,7 @@
 
 #include "emu.h"
 #include "esrip.h"
+#include "esripdsm.h"
 
 #include "debugger.h"
 #include "screen.h"
@@ -192,7 +193,7 @@ void esrip_device::device_start()
 	m_ipt_ram.resize(IPT_RAM_SIZE/2);
 
 	m_program = &space(AS_PROGRAM);
-	m_direct = &m_program->direct();
+	m_direct = m_program->direct<-3>();
 
 	// register our state for the debugger
 	state_add(STATE_GENPC,     "GENPC",     m_rip_pc).noshow();
@@ -372,38 +373,14 @@ void esrip_device::state_string_export(const device_state_entry &entry, std::str
 
 
 //-------------------------------------------------
-//  disasm_min_opcode_bytes - return the length
-//  of the shortest instruction, in bytes
-//-------------------------------------------------
-
-uint32_t esrip_device::disasm_min_opcode_bytes() const
-{
-	return 8;
-}
-
-
-//-------------------------------------------------
-//  disasm_max_opcode_bytes - return the length
-//  of the longest instruction, in bytes
-//-------------------------------------------------
-
-uint32_t esrip_device::disasm_max_opcode_bytes() const
-{
-	return 8;
-}
-
-
-//-------------------------------------------------
-//  disasm_disassemble - call the disassembly
+//  disassemble - call the disassembly
 //  helper function
 //-------------------------------------------------
 
-offs_t esrip_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+util::disasm_interface *esrip_device::create_disassembler()
 {
-	extern CPU_DISASSEMBLE( esrip );
-	return CPU_DISASSEMBLE_NAME(esrip)(this, stream, pc, oprom, opram, options);
+	return new esrip_disassembler;
 }
-
 
 /***************************************************************************
     PRIVATE FUNCTIONS
@@ -1901,7 +1878,7 @@ void esrip_device::execute_run()
 		m_pl7 = m_l7;
 
 		/* Latch instruction */
-		inst = m_direct->read_qword(RIP_PC << 3);
+		inst = m_direct->read_qword(RIP_PC);
 
 		in_h = inst >> 32;
 		in_l = inst & 0xffffffff;

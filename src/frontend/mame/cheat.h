@@ -327,8 +327,8 @@ public:
 
 	// global helpers
 	static std::string quote_expression(parsed_expression const &expression);
-	static uint64_t execute_frombcd(symbol_table &table, void *ref, int params, uint64_t const *param);
-	static uint64_t execute_tobcd(symbol_table &table, void *ref, int params, uint64_t const *param);
+	static uint64_t execute_frombcd(symbol_table &table, int params, uint64_t const *param);
+	static uint64_t execute_tobcd(symbol_table &table, int params, uint64_t const *param);
 
 private:
 	// internal helpers

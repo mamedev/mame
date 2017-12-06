@@ -396,7 +396,7 @@ public:
 	{ }
 
 	required_device<cpu_device> m_maincpu;
-	required_device<mc68681_device> m_duart;
+	required_device<scn2681_device> m_duart;
 	required_device<esq1_filters> m_filters;
 	optional_device<wd1772_device> m_fdc;
 	optional_device<esqpanel2x40_device> m_panel;
@@ -409,7 +409,6 @@ public:
 	DECLARE_WRITE8_MEMBER(mapper_w);
 	DECLARE_WRITE8_MEMBER(analog_w);
 
-	DECLARE_WRITE_LINE_MEMBER(duart_irq_handler);
 	DECLARE_WRITE_LINE_MEMBER(duart_tx_a);
 	DECLARE_WRITE_LINE_MEMBER(duart_tx_b);
 	DECLARE_WRITE8_MEMBER(duart_output);
@@ -503,7 +502,7 @@ static ADDRESS_MAP_START( esq1_map, AS_PROGRAM, 8, esq1_state )
 	AM_RANGE(0x0000, 0x1fff) AM_RAM                 // OSRAM
 	AM_RANGE(0x4000, 0x5fff) AM_RAM                 // SEQRAM
 	AM_RANGE(0x6000, 0x63ff) AM_DEVREADWRITE("es5503", es5503_device, read, write)
-	AM_RANGE(0x6400, 0x640f) AM_DEVREADWRITE("duart", mc68681_device, read, write)
+	AM_RANGE(0x6400, 0x640f) AM_DEVREADWRITE("duart", scn2681_device, read, write)
 	AM_RANGE(0x6800, 0x68ff) AM_WRITE(analog_w)
 	AM_RANGE(0x7000, 0x7fff) AM_ROMBANK("osbank")
 	AM_RANGE(0x8000, 0xffff) AM_ROM AM_REGION("osrom", 0x8000)  // OS "high" ROM is always mapped here
@@ -514,7 +513,7 @@ static ADDRESS_MAP_START( sq80_map, AS_PROGRAM, 8, esq1_state )
 	AM_RANGE(0x4000, 0x5fff) AM_RAM                 // SEQRAM
 //  AM_RANGE(0x4000, 0x5fff) AM_READWRITE(seqdosram_r, seqdosram_w)
 	AM_RANGE(0x6000, 0x63ff) AM_DEVREADWRITE("es5503", es5503_device, read, write)
-	AM_RANGE(0x6400, 0x640f) AM_DEVREADWRITE("duart", mc68681_device, read, write)
+	AM_RANGE(0x6400, 0x640f) AM_DEVREADWRITE("duart", scn2681_device, read, write)
 	AM_RANGE(0x6800, 0x68ff) AM_WRITE(analog_w)
 	AM_RANGE(0x6c00, 0x6dff) AM_WRITE(mapper_w)
 	AM_RANGE(0x6e00, 0x6fff) AM_READWRITE(wd1772_r, wd1772_w)
@@ -536,11 +535,6 @@ ADDRESS_MAP_END
 // OP4 = metronome low
 // OP5 = metronome hi
 // OP6/7 = tape out
-
-WRITE_LINE_MEMBER(esq1_state::duart_irq_handler)
-{
-	m_maincpu->set_input_line(M6809_IRQ_LINE, state);
-}
 
 WRITE8_MEMBER(esq1_state::duart_output)
 {
@@ -588,18 +582,18 @@ static MACHINE_CONFIG_START( esq1 )
 	MCFG_CPU_ADD("maincpu", M6809E, 4000000)    // how fast is it?
 	MCFG_CPU_PROGRAM_MAP(esq1_map)
 
-	MCFG_MC68681_ADD("duart", 4000000)
-	MCFG_MC68681_SET_EXTERNAL_CLOCKS(500000, 500000, 1000000, 1000000)
-	MCFG_MC68681_IRQ_CALLBACK(WRITELINE(esq1_state, duart_irq_handler))
+	MCFG_DEVICE_ADD("duart", SCN2681, XTAL_8MHz / 2)
+	MCFG_MC68681_SET_EXTERNAL_CLOCKS(XTAL_8MHz / 16, XTAL_8MHz / 16, XTAL_8MHz / 8, XTAL_8MHz / 8)
+	MCFG_MC68681_IRQ_CALLBACK(INPUTLINE("maincpu", M6809_IRQ_LINE))
 	MCFG_MC68681_A_TX_CALLBACK(WRITELINE(esq1_state, duart_tx_a))
 	MCFG_MC68681_B_TX_CALLBACK(WRITELINE(esq1_state, duart_tx_b))
 	MCFG_MC68681_OUTPORT_CALLBACK(WRITE8(esq1_state, duart_output))
 
 	MCFG_ESQPANEL2X40_ADD("panel")
-	MCFG_ESQPANEL_TX_CALLBACK(DEVWRITELINE("duart", mc68681_device, rx_b_w))
+	MCFG_ESQPANEL_TX_CALLBACK(DEVWRITELINE("duart", scn2681_device, rx_b_w))
 
 	MCFG_MIDI_PORT_ADD("mdin", midiin_slot, "midiin")
-	MCFG_MIDI_RX_HANDLER(DEVWRITELINE("duart", mc68681_device, rx_a_w)) // route MIDI Tx send directly to 68681 channel A Rx
+	MCFG_MIDI_RX_HANDLER(DEVWRITELINE("duart", scn2681_device, rx_a_w)) // route MIDI Tx send directly to 68681 channel A Rx
 
 	MCFG_MIDI_PORT_ADD("mdout", midiout_slot, "midiout")
 
@@ -609,7 +603,7 @@ static MACHINE_CONFIG_START( esq1 )
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
-	MCFG_ES5503_ADD("es5503", 7000000)
+	MCFG_ES5503_ADD("es5503", XTAL_8MHz)
 	MCFG_ES5503_OUTPUT_CHANNELS(8)
 	MCFG_ES5503_IRQ_FUNC(WRITELINE(esq1_state, esq1_doc_irq))
 	MCFG_ES5503_ADC_FUNC(READ8(esq1_state, esq1_adc_read))
@@ -696,6 +690,6 @@ ROM_START( esqm )
 ROM_END
 
 
-CONS( 1986, esq1, 0   , 0, esq1, esq1, esq1_state, 0, "Ensoniq", "ESQ-1", MACHINE_NOT_WORKING )
-CONS( 1986, esqm, esq1, 0, esq1, esq1, esq1_state, 0, "Ensoniq", "ESQ-M", MACHINE_NOT_WORKING )
-CONS( 1988, sq80, 0,    0, sq80, esq1, esq1_state, 0, "Ensoniq", "SQ-80", MACHINE_NOT_WORKING )
+CONS( 1986, esq1, 0   , 0, esq1, esq1, esq1_state, 0, "Ensoniq", "ESQ-1 Digital Wave Synthesizer", MACHINE_NOT_WORKING )
+CONS( 1986, esqm, esq1, 0, esq1, esq1, esq1_state, 0, "Ensoniq", "ESQ-M Digital Wave Synthesizer Module", MACHINE_NOT_WORKING )
+CONS( 1988, sq80, 0,    0, sq80, esq1, esq1_state, 0, "Ensoniq", "SQ-80 Cross Wave Synthesizer", MACHINE_NOT_WORKING )

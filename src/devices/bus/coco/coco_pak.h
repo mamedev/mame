@@ -64,4 +64,10 @@ private:
 	uint8_t m_pos;
 };
 
+
+// device type definitions
+extern const device_type COCO_PAK;
+extern const device_type COCO_PAK_BANKED;
+extern const device_type COCO_PAK_GMC;
+
 #endif // MAME_BUS_COCO_COCO_PAK_H

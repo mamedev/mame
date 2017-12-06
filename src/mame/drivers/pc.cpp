@@ -346,6 +346,7 @@ Misc: A Kaypro 16/2 is a configuration without harddisk but with two floppy disk
 
 #include "emu.h"
 #include "machine/genpc.h"
+#include "machine/i8251.h"
 #include "cpu/i86/i86.h"
 #include "cpu/nec/nec.h"
 #include "bus/isa/isa.h"
@@ -408,6 +409,13 @@ static ADDRESS_MAP_START(ibm5550_io, AS_IO, 16, pc_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00a0, 0x00a1) AM_READ8(unk_r, 0x00ff )
 	AM_RANGE(0x0000, 0x00ff) AM_DEVICE8("mb", ibm5160_mb_device, map, 0xffff)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START(epc_io, AS_IO, 8, pc_state)
+	ADDRESS_MAP_UNMAP_HIGH
+	AM_RANGE(0x0070, 0x0070) AM_DEVREADWRITE("i8251", i8251_device, data_r, data_w)
+	AM_RANGE(0x0071, 0x0071) AM_DEVREADWRITE("i8251", i8251_device, status_r, control_w)
+	AM_RANGE(0x0000, 0x00ff) AM_DEVICE("mb", ibm5160_mb_device, map)
 ADDRESS_MAP_END
 
 INPUT_CHANGED_MEMBER(pc_state::pc_turbo_callback)
@@ -525,6 +533,11 @@ MACHINE_CONFIG_END
 
 // Ericsson Information System
 static MACHINE_CONFIG_DERIVED( epc, pccga )
+	MCFG_DEVICE_REMOVE("maincpu")
+	MCFG_CPU_PC(pc8, epc, I8088, 4772720)
+	MCFG_DEVICE_MODIFY("isa1")
+	MCFG_SLOT_DEFAULT_OPTION("ega")
+	MCFG_DEVICE_ADD("i8251", I8251, 0) // clock?
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( eppc, pccga )
@@ -823,9 +836,13 @@ ROM_END
 
 ROM_START( epc )
 	ROM_REGION(0x10000,"bios", 0)
-	ROM_LOAD( "epcbios1.bin",  0xe000, 0x02000, CRC(79a83706) SHA1(33528c46a24d7f65ef5a860fbed05afcf797fc55))
-	ROM_LOAD( "epcbios2.bin",  0xc000, 0x02000, CRC(3ca764ca) SHA1(02232fedef22d31a641f4b65933b9e269afce19e))
-	ROM_LOAD( "epcbios3.bin",  0xa000, 0x02000, CRC(70483280) SHA1(b44b09da94d77b0269fc48f07d130b2d74c4bb8f))
+	ROM_DEFAULT_BIOS("p860110")
+	ROM_SYSTEM_BIOS(0, "p840705", "P840705")
+	ROMX_LOAD("ericsson_8088.bin", 0xe000, 0x2000, CRC(3953c38d) SHA1(2bfc1f1d11d0da5664c3114994fc7aa3d6dd010d), ROM_BIOS(1))
+	ROM_SYSTEM_BIOS(1, "p860110", "P860110")
+	ROMX_LOAD( "epcbios1.bin",  0xe000, 0x02000, CRC(79a83706) SHA1(33528c46a24d7f65ef5a860fbed05afcf797fc55), ROM_BIOS(2))
+	ROMX_LOAD( "epcbios2.bin",  0xa000, 0x02000, CRC(3ca764ca) SHA1(02232fedef22d31a641f4b65933b9e269afce19e), ROM_BIOS(2))
+	ROMX_LOAD( "epcbios3.bin",  0xc000, 0x02000, CRC(70483280) SHA1(b44b09da94d77b0269fc48f07d130b2d74c4bb8f), ROM_BIOS(2))
 ROM_END
 
 ROM_START( eppc )
@@ -996,6 +1013,7 @@ ROM_START( kaypro16 )
 	ROM_REGION(0x10000, "bios", 0)
 	ROM_LOAD("pc102782.bin", 0xe000, 0x2000, CRC(ade4ed14) SHA1(de6d87ae83a71728d60df6a5964e680487ea8400))
 ROM_END
+
 
 /***************************************************************************
 

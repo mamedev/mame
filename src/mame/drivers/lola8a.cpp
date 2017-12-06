@@ -17,6 +17,10 @@
     DLOAD DSAVE DVERIFY MERGE CAT RUN NEW ON LIST DEF MON GWIND TWIND UNDER
     SPC OFF TAB THEN TO STEP AND OR XOR NOT ABS LEN SQR INT ASC CHR VAL STR MID
     ARG CALL RND LEFT RIGHT DOT SGN SIN FREE PI FN TAN COS POP PEEK INP LN EXP ATN
+
+    COLOUR x (x = 0 to 3) there's no known colour ram, unable to determine
+    how colours can be displayed. Therefore we only show black and white.
+
 ****************************************************************************/
 
 #include "emu.h"
@@ -39,28 +43,26 @@ public:
 	lola8a_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
-		, m_cass(*this, "cassette"),
-		m_palette(*this, "palette")
+		, m_cass(*this, "cassette")
+		, m_palette(*this, "palette")
+		, m_p_videoram(*this, "videoram")
 	{ }
-
-	required_device<cpu_device> m_maincpu;
-
-	virtual void machine_reset() override { m_maincpu->set_pc(0x8000); }
 
 	DECLARE_READ8_MEMBER(lola8a_port_a_r);
 	DECLARE_WRITE8_MEMBER(lola8a_port_b_w);
 	DECLARE_WRITE_LINE_MEMBER(crtc_vsync);
 	DECLARE_READ_LINE_MEMBER(cass_r);
 	DECLARE_WRITE_LINE_MEMBER(cass_w);
-
 	DECLARE_READ8_MEMBER(keyboard_r);
 	MC6845_UPDATE_ROW(crtc_update_row);
 
 private:
 	uint8_t m_portb;
+	virtual void machine_reset() override { m_maincpu->set_pc(0x8000); }
+	required_device<cpu_device> m_maincpu;
 	required_device<cassette_image_device> m_cass;
-public:
 	required_device<palette_device> m_palette;
+	required_shared_ptr<uint8_t> m_p_videoram;
 };
 
 static ADDRESS_MAP_START(lola8a_mem, AS_PROGRAM, 8, lola8a_state)
@@ -72,7 +74,7 @@ static ADDRESS_MAP_START(lola8a_mem, AS_PROGRAM, 8, lola8a_state)
 	AM_RANGE( 0x8000, 0x9fff ) AM_ROM // 2764A at B45
 	AM_RANGE( 0xa000, 0xbfff ) AM_ROM // 2764A at C45
 	AM_RANGE( 0xc000, 0xdfff ) AM_ROM // 2764A at H67
-	AM_RANGE( 0xe000, 0xffff ) AM_RAM // 6264 at G67
+	AM_RANGE( 0xe000, 0xffff ) AM_RAM AM_SHARE("videoram") // 6264 at G67
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(lola8a_io, AS_IO, 8, lola8a_state)
@@ -191,21 +193,28 @@ INPUT_PORTS_END
 
 MC6845_UPDATE_ROW( lola8a_state::crtc_update_row )
 {
-	address_space &program = m_maincpu->space(AS_PROGRAM);
+	const rgb_t *palette = m_palette->palette()->entry_list_raw();
+	u8 x,gfx;
+	u16 mem;
+	u32 *p = &bitmap.pix32(y);
+	ma &= 0x7ff;
 
-	for (int sx = 0; sx < x_count; sx++)
+	for (x = 0; x < x_count; x++)
 	{
-		uint16_t addr = 0xa000 + sx*8 + ra + ma * 8;
-		uint8_t code = program.read_byte(addr);
+		mem = (x+ma)*8 + ra;
+		gfx = m_p_videoram[mem] ^ ((cursor_x == x) ? 0xff : 0);
 
-		for (int x = 0; x <= 8; x++)
-		{
-			int color = BIT(code, 7-x) ? 7 : 0;
-			if (cursor_x==sx) color = 7;
-			bitmap.pix32(y, x + sx*8) = m_palette->pen_color(color);
-		}
+		*p++ = palette[BIT(gfx, 7) ? 7 : 0];
+		*p++ = palette[BIT(gfx, 6) ? 7 : 0];
+		*p++ = palette[BIT(gfx, 5) ? 7 : 0];
+		*p++ = palette[BIT(gfx, 4) ? 7 : 0];
+		*p++ = palette[BIT(gfx, 3) ? 7 : 0];
+		*p++ = palette[BIT(gfx, 2) ? 7 : 0];
+		*p++ = palette[BIT(gfx, 1) ? 7 : 0];
+		*p++ = palette[BIT(gfx, 0) ? 7 : 0];
 	}
 }
+
 
 READ8_MEMBER(lola8a_state::lola8a_port_a_r)
 {

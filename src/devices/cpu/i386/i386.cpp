@@ -3171,36 +3171,13 @@ uint64_t i386_device::debug_virttophys(symbol_table &table, int params, const ui
 	return result;
 }
 
-uint64_t i386_debug_segbase(symbol_table &table, void *ref, int params, const uint64_t *param)
-{
-	i386_device *i386 = (i386_device *)(ref);
-	return i386->debug_segbase(table, params, param);
-}
-
-uint64_t i386_debug_seglimit(symbol_table &table, void *ref, int params, const uint64_t *param)
-{
-	i386_device *i386 = (i386_device *)(ref);
-	return i386->debug_seglimit(table, params, param);
-}
-
-uint64_t i386_debug_segofftovirt(symbol_table &table, void *ref, int params, const uint64_t *param)
-{
-	i386_device *i386 = (i386_device *)(ref);
-	return i386->debug_segofftovirt(table, params, param);
-}
-
-static uint64_t i386_debug_virttophys(symbol_table &table, void *ref, int params, const uint64_t *param)
-{
-	i386_device *i386 = (i386_device *)(ref);
-	return i386->debug_virttophys(table, params, param);
-}
-
 void i386_device::device_debug_setup()
 {
-	debug()->symtable().add("segbase", (void *)this, 1, 1, i386_debug_segbase);
-	debug()->symtable().add("seglimit", (void *)this, 1, 1, i386_debug_seglimit);
-	debug()->symtable().add("segofftovirt", (void *)this, 2, 2, i386_debug_segofftovirt);
-	debug()->symtable().add("virttophys", (void *)this, 1, 1, i386_debug_virttophys);
+	using namespace std::placeholders;
+	debug()->symtable().add("segbase", 1, 1, std::bind(&i386_device::debug_segbase, this, _1, _2, _3));
+	debug()->symtable().add("seglimit", 1, 1, std::bind(&i386_device::debug_seglimit, this, _1, _2, _3));
+	debug()->symtable().add("segofftovirt", 2, 2, std::bind(&i386_device::debug_segofftovirt, this, _1, _2, _3));
+	debug()->symtable().add("virttophys", 1, 1, std::bind(&i386_device::debug_virttophys, this, _1, _2, _3));
 }
 
 /*************************************************************************/
@@ -3244,7 +3221,7 @@ void i386_device::i386_common_init()
 	}
 
 	m_program = &space(AS_PROGRAM);
-	m_direct = &m_program->direct();
+	m_direct = m_program->direct<0>();
 	m_io = &space(AS_IO);
 	m_smi = false;
 	m_debugger_temp = 0;
@@ -4021,11 +3998,15 @@ bool i386_device::memory_translate(int spacenum, int intention, offs_t &address)
 	return ret;
 }
 
-offs_t i386_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+int i386_device::get_mode() const
 {
-	return i386_dasm_one(stream, pc, oprom, m_sreg[CS].d ? 32 : 16);
+	return m_sreg[CS].d ? 32 : 16;
 }
 
+util::disasm_interface *i386_device::create_disassembler()
+{
+	return new i386_disassembler(this);
+}
 
 /*****************************************************************************/
 /* Intel 486 */

@@ -11,36 +11,9 @@
  *
  *****************************************************************************/
 #include "emu.h"
+#include "pps4dasm.h"
 
-#define OP(A)   oprom[(A) - PC]
-#define ARG(A)  opram[(A) - PC]
-
-typedef enum pps4_token_e {
-	t_AD,       t_ADC,      t_ADSK,     t_ADCSK,    t_ADI,
-	t_DC,       t_AND,      t_OR,       t_EOR,      t_COMP,
-	t_SC,       t_RC,       t_SF1,      t_RF1,      t_SF2,
-	t_RF2,      t_LD,       t_EX,       t_EXD,      t_LDI,
-	t_LAX,      t_LXA,      t_LABL,     t_LBMX,     t_LBUA,
-	t_XABL,     t_XBMX,     t_XAX,      t_XS,       t_CYS,
-	t_LB,       t_LBL,      t_INCB,     t_DECB,     t_T,
-	t_TM,       t_TL,       t_TML,      t_SKC,      t_SKZ,
-	t_SKBI,     t_SKF1,     t_SKF2,     t_RTN,      t_RTNSK,
-	t_IOL,      t_DIA,      t_DIB,      t_DOA,      t_SAG,
-	t_COUNT,
-	t_MASK = (1 << 6) - 1,
-	t_I3c  = 1 <<  6,   /* immediate 3 bit constant, complemented */
-	t_I4   = 1 <<  7,   /* immediate 4 bit constant */
-	t_I4c  = 1 <<  8,   /* immediate 4 bit constant, complemented */
-	t_I4p  = 1 <<  9,   /* immediate 4 bit offset into page 3 */
-	t_I6p  = 1 << 10,   /* immediate 6 bit constant; address in current page */
-	t_I6i  = 1 << 11,   /* immediate 6 bit indirect page 3 offset (16 ... 63) + followed by page 1 address */
-	t_I8   = 1 << 12,   /* immediate 8 bit constant (I/O port number) */
-	t_I8c  = 1 << 13,   /* immediate 8 bit constant inverted */
-	t_OVER = 1 << 14,   /* Debugger step over (CALL) */
-	t_OUT  = 1 << 15    /* Debugger step out (RETURN) */
-}   pps4_token_e;
-
-static const char *token_str[t_COUNT] = {
+const char *pps4_disassembler::token_str[t_COUNT] = {
 	"ad",           /* add */
 	"adc",          /* add with carry-in */
 	"adsk",         /* add and skip on carry-out */
@@ -93,7 +66,7 @@ static const char *token_str[t_COUNT] = {
 	"sag"           /* special address generation */
 };
 
-static const uint16_t table[] = {
+const uint16_t pps4_disassembler::table[] = {
 /* 00 */ t_LBL | t_I8c,
 /* 01 */ t_TML | t_I4 | t_I8,
 /* 02 */ t_TML | t_I4 | t_I8,
@@ -367,11 +340,16 @@ static const uint16_t table[] = {
 /* ff */ t_TM | t_I6i | t_OVER
 };
 
-CPU_DISASSEMBLE(pps4)
+u32 pps4_disassembler::opcode_alignment() const
+{
+	return 1;
+}
+
+offs_t pps4_disassembler::disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params)
 {
 	uint32_t flags = 0;
 	unsigned PC = pc;
-	uint8_t op = OP(pc++);
+	uint8_t op = opcodes.r8(pc++);
 	uint32_t tok = table[op];
 
 	if (0 == (tok & t_MASK)) {
@@ -422,21 +400,21 @@ CPU_DISASSEMBLE(pps4)
 
 	if (tok & t_I8) {
 		// 8 bit immediate I/O port address
-		uint8_t arg = ARG(pc++);
+		uint8_t arg = params.r8(pc++);
 		util::stream_format(stream, "%02x", arg);
 	}
 
 	if (tok & t_I8c) {
 		// 8 bit immediate offset into page
-		uint16_t arg = ~ARG(pc++) & 255;
+		uint16_t arg = ~params.r8(pc++) & 255;
 		util::stream_format(stream, "%02x", arg);
 	}
 
 	if (tok & t_OVER)  // TL or TML
-			flags |= DASMFLAG_STEP_OVER;
+			flags |= STEP_OVER;
 
 	if (tok & t_OUT)   // RTN or RTNSK
-			flags |= DASMFLAG_STEP_OUT;
+			flags |= STEP_OUT;
 
-	return (pc - PC) | flags | DASMFLAG_SUPPORTED;
+	return (pc - PC) | flags | SUPPORTED;
 }

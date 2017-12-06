@@ -1,10 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Angelo Salese, ElSemi, Ville Linde
 #include "emu.h"
-#include "debugger.h"
-#include "mb86235.h"
+#include "mb86235d.h"
 
-static const char *regname[128] =
+const char *mb86235_disassembler::regname[128] =
 {
 	"MA0",  "MA1",  "MA2",  "MA3",  "MA4",  "MA5",  "MA6",  "MA7",
 	"AA0",  "AA1",  "AA2",  "AA3",  "AA4",  "AA5",  "AA6",  "AA7",
@@ -16,7 +15,7 @@ static const char *regname[128] =
 	"???",  "???",  "???",  "???",  "???",  "???",  "???",  "???"
 };
 
-static const char *db_mnemonic[64] =
+const char *mb86235_disassembler::db_mnemonic[64] =
 {
 	"DBMN",   "DBMZ",   "DBMV",    "DBMU",    "DBZD",    "DBNR",    "DBIL",    "DBZC",
 	"DBAN",   "DBAZ",   "DBAV",    "DBAU",    "DBMD",    "DBAD",    "???",     "???",
@@ -28,7 +27,7 @@ static const char *db_mnemonic[64] =
 	"???",    "???",    "???",     "???",     "???",     "???",     "???",     "???"
 };
 
-static const char *dbn_mnemonic[64] =
+const char *mb86235_disassembler::dbn_mnemonic[64] =
 {
 	"DBNMN",  "DBNMZ",  "DBNMV",   "DBNMU",   "DBNZD",   "DBNNR",   "DBNIL",   "DBNZC",
 	"DBNAN",  "DBNAZ",  "DBNAV",   "DBNAU",   "DBNMD",   "DBNAD",   "???",     "???",
@@ -40,7 +39,7 @@ static const char *dbn_mnemonic[64] =
 	"???",    "???",    "???",     "???",     "???",     "???",     "???",     "???"
 };
 
-static const char *dc_mnemonic[64] =
+const char *mb86235_disassembler::dc_mnemonic[64] =
 {
 	"DCMN",   "DCMZ",   "DCMV",    "DCMU",    "DCZD",    "DCNR",    "DCIL",    "DCZC",
 	"DCAN",   "DCAZ",   "DCAV",    "DCAU",    "DCMD",    "DCAD",    "???",     "???",
@@ -52,7 +51,7 @@ static const char *dc_mnemonic[64] =
 	"???",    "???",    "???",     "???",     "???",     "???",     "???",     "???"
 };
 
-static const char *dcn_mnemonic[64] =
+const char *mb86235_disassembler::dcn_mnemonic[64] =
 {
 	"DCNMN",  "DCNMZ",  "DCNMV",   "DCNMU",   "DCNZD",   "DCNNR",   "DCNIL",   "DCNZC",
 	"DCNAN",  "DCNAZ",  "DCNAV",   "DCNAU",   "DCNMD",   "DCNAD",   "???",     "???",
@@ -64,29 +63,29 @@ static const char *dcn_mnemonic[64] =
 	"???",    "???",    "???",     "???",     "???",     "???",     "???",     "???"
 };
 
-static const char *mi1_field[16] =
+const char *mb86235_disassembler::mi1_field[16] =
 { "MA0", "MA1", "MA2", "MA3", "MA4", "MA5", "MA6", "MA7", "MB0", "MB1", "MB2", "MB3", "MB4", "MB5", "MB6", "MB7" };
 
-static const char *mi2_field[32] =
+const char *mb86235_disassembler::mi2_field[32] =
 { "MA0", "MA1", "MA2", "MA3", "MA4", "MA5", "MA6", "MA7", "MB0", "MB1", "MB2", "MB3", "MB4", "MB5", "MB6", "MB7",
 	"PR", "PR++", "PR--", "PR#0", "???", "???", "???", "???", "-1.0E+0", "0.0E+0", "0.5E+0", "1.0E+0", "1.5E+0", "2.0E+0", "3.0E+0", "5.0E+0" };
 
-static const char *mo_field[32] =
+const char *mb86235_disassembler::mo_field[32] =
 { "MA0", "MA1", "MA2", "MA3", "MA4", "MA5", "MA6", "MA7", "MB0", "MB1", "MB2", "MB3", "MB4", "MB5", "MB6", "MB7",
 	"AA0", "AA1", "AA2", "AA3", "AA4", "AA5", "AA6", "AA7", "AB0", "AB1", "AB2", "AB3", "AB4", "AB5", "AB6", "AB7" };
 
-static const char *ai1_field[16] =
+const char *mb86235_disassembler::ai1_field[16] =
 { "AA0", "AA1", "AA2", "AA3", "AA4", "AA5", "AA6", "AA7", "AB0", "AB1", "AB2", "AB3", "AB4", "AB5", "AB6", "AB7" };
 
-static const char *ai2_field[32] =
+const char *mb86235_disassembler::ai2_field[32] =
 { "AA0", "AA1", "AA2", "AA3", "AA4", "AA5", "AA6", "AA7", "AB0", "AB1", "AB2", "AB3", "AB4", "AB5", "AB6", "AB7",
 	"PR", "PR++", "PR--", "PR#0", "???", "???", "???", "???", "0", "1", "-1", "???", "???", "???", "???", "???" };
 
-static const char *ai2f_field[32] =
+const char *mb86235_disassembler::ai2f_field[32] =
 { "AA0", "AA1", "AA2", "AA3", "AA4", "AA5", "AA6", "AA7", "AB0", "AB1", "AB2", "AB3", "AB4", "AB5", "AB6", "AB7",
 	"PR", "PR++", "PR--", "PR#0", "???", "???", "???", "???", "-1.0E+0", "0.0E+0", "0.5E+0", "1.0E+0", "1.5E+0", "2.0E+0", "3.0E+0", "5.0E+0" };
 
-static void dasm_ea(std::ostream &stream, int md, int arx, int ary, int disp)
+void mb86235_disassembler::dasm_ea(std::ostream &stream, int md, int arx, int ary, int disp)
 {
 	if (arx & 0x20)
 		stream << "B(";
@@ -117,7 +116,7 @@ static void dasm_ea(std::ostream &stream, int md, int arx, int ary, int disp)
 	stream << ')';
 }
 
-static void dasm_alu_mul(std::ostream &stream, uint64_t opcode, bool twoop)
+void mb86235_disassembler::dasm_alu_mul(std::ostream &stream, uint64_t opcode, bool twoop)
 {
 	int ma = (opcode & ((uint64_t)(1) << 41)) ? 1 : 0;
 	int o = (opcode >> 42) & 0x1f;
@@ -220,7 +219,7 @@ static void dasm_alu_mul(std::ostream &stream, uint64_t opcode, bool twoop)
 	}
 }
 
-static void dasm_control(std::ostream &stream, uint32_t pc, uint64_t opcode)
+void mb86235_disassembler::dasm_control(std::ostream &stream, uint32_t pc, uint64_t opcode)
 {
 	int ef1 = (opcode >> 16) & 0x3f;
 	int ef2 = opcode & 0xffff;
@@ -335,7 +334,7 @@ static void dasm_control(std::ostream &stream, uint32_t pc, uint64_t opcode)
 	}
 }
 
-static void dasm_double_xfer1(std::ostream &stream, uint64_t opcode)
+void mb86235_disassembler::dasm_double_xfer1(std::ostream &stream, uint64_t opcode)
 {
 	int sd = (opcode >> 25) & 3;
 
@@ -413,7 +412,7 @@ static void dasm_double_xfer1(std::ostream &stream, uint64_t opcode)
 	}
 }
 
-static void dasm_xfer1(std::ostream &stream, uint64_t opcode)
+void mb86235_disassembler::dasm_xfer1(std::ostream &stream, uint64_t opcode)
 {
 	int dr = (opcode >> 12) & 0x7f;
 	int sr = (opcode >> 19) & 0x7f;
@@ -469,7 +468,7 @@ static void dasm_xfer1(std::ostream &stream, uint64_t opcode)
 	}
 }
 
-static void dasm_double_xfer2_field(std::ostream &stream, int sd, uint32_t field)
+void mb86235_disassembler::dasm_double_xfer2_field(std::ostream &stream, int sd, uint32_t field)
 {
 	switch (sd)
 	{
@@ -537,7 +536,7 @@ static void dasm_double_xfer2_field(std::ostream &stream, int sd, uint32_t field
 	}
 }
 
-static void dasm_double_xfer2(std::ostream &stream, uint64_t opcode)
+void mb86235_disassembler::dasm_double_xfer2(std::ostream &stream, uint64_t opcode)
 {
 	int asd = (opcode >> 38) & 3;
 	int bsd = (opcode >> 18) & 3;
@@ -583,7 +582,7 @@ static void dasm_double_xfer2(std::ostream &stream, uint64_t opcode)
 	}
 }
 
-static void dasm_xfer2(std::ostream &stream, uint64_t opcode)
+void mb86235_disassembler::dasm_xfer2(std::ostream &stream, uint64_t opcode)
 {
 	int op = (opcode >> 39) & 3;
 	int trm = (opcode >> 38) & 1;
@@ -652,7 +651,7 @@ static void dasm_xfer2(std::ostream &stream, uint64_t opcode)
 	}
 }
 
-static void dasm_xfer3(std::ostream &stream, uint64_t opcode)
+void mb86235_disassembler::dasm_xfer3(std::ostream &stream, uint64_t opcode)
 {
 	uint32_t imm = (uint32_t)(opcode >> 27);
 	int dr = (opcode >> 19) & 0x7f;
@@ -668,8 +667,9 @@ static void dasm_xfer3(std::ostream &stream, uint64_t opcode)
 		dasm_ea(stream, md, dr, ary, disp);
 }
 
-static unsigned dasm_mb86235(std::ostream &stream, uint32_t pc, uint64_t opcode)
+offs_t mb86235_disassembler::disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params)
 {
+	u64 opcode = opcodes.r64(pc);
 	switch ((opcode >> 61) & 7)
 	{
 		case 0:     // ALU / MUL / double transfer (type 1)
@@ -711,14 +711,11 @@ static unsigned dasm_mb86235(std::ostream &stream, uint32_t pc, uint64_t opcode)
 			break;
 	}
 
-	return (1 | DASMFLAG_SUPPORTED);
+	return 1 | SUPPORTED;
 }
 
-
-CPU_DISASSEMBLE(mb86235)
+u32 mb86235_disassembler::opcode_alignment() const
 {
-	uint64_t op = *(uint64_t*)oprom;
-	op = little_endianize_int64(op);
-
-	return dasm_mb86235(stream, pc, op);
+	return 1;
 }
+

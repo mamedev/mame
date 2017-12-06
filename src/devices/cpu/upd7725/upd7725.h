@@ -107,9 +107,7 @@ protected:
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
 	// device_disasm_interface overrides
-	virtual uint32_t disasm_min_opcode_bytes() const override;
-	virtual uint32_t disasm_max_opcode_bytes() const override;
-	virtual offs_t disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
+	virtual util::disasm_interface *create_disassembler() override;
 
 	// inline data
 	const address_space_config m_program_config, m_data_config;
@@ -191,7 +189,7 @@ private:
 	// 2 = next opcode is the second half of int firing 'CALL 0100'
 	int m_irq_firing;
 	address_space *m_program, *m_data;
-	direct_read_data *m_direct;
+	direct_read_data<-2> *m_direct;
 
 protected:
 // device callbacks

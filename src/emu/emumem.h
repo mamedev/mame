@@ -17,6 +17,14 @@
 #ifndef MAME_EMU_EMUMEM_H
 #define MAME_EMU_EMUMEM_H
 
+using s8 = std::int8_t;
+using u8 = std::uint8_t;
+using s16 = std::int16_t;
+using u16 = std::uint16_t;
+using s32 = std::int32_t;
+using u32 = std::uint32_t;
+using s64 = std::int64_t;
+using u64 = std::uint64_t;
 
 
 //**************************************************************************
@@ -63,21 +71,21 @@ typedef named_delegate<void (address_map &)> address_map_delegate;
 // struct with function pointers for accessors; use is generally discouraged unless necessary
 struct data_accessors
 {
-	u8      (*read_byte)(address_space &space, offs_t byteaddress);
-	u16     (*read_word)(address_space &space, offs_t byteaddress);
-	u16     (*read_word_masked)(address_space &space, offs_t byteaddress, u16 mask);
-	u32     (*read_dword)(address_space &space, offs_t byteaddress);
-	u32     (*read_dword_masked)(address_space &space, offs_t byteaddress, u32 mask);
-	u64     (*read_qword)(address_space &space, offs_t byteaddress);
-	u64     (*read_qword_masked)(address_space &space, offs_t byteaddress, u64 mask);
+	u8      (*read_byte)(address_space &space, offs_t address);
+	u16     (*read_word)(address_space &space, offs_t address);
+	u16     (*read_word_masked)(address_space &space, offs_t address, u16 mask);
+	u32     (*read_dword)(address_space &space, offs_t address);
+	u32     (*read_dword_masked)(address_space &space, offs_t address, u32 mask);
+	u64     (*read_qword)(address_space &space, offs_t address);
+	u64     (*read_qword_masked)(address_space &space, offs_t address, u64 mask);
 
-	void    (*write_byte)(address_space &space, offs_t byteaddress, u8 data);
-	void    (*write_word)(address_space &space, offs_t byteaddress, u16 data);
-	void    (*write_word_masked)(address_space &space, offs_t byteaddress, u16 data, u16 mask);
-	void    (*write_dword)(address_space &space, offs_t byteaddress, u32 data);
-	void    (*write_dword_masked)(address_space &space, offs_t byteaddress, u32 data, u32 mask);
-	void    (*write_qword)(address_space &space, offs_t byteaddress, u64 data);
-	void    (*write_qword_masked)(address_space &space, offs_t byteaddress, u64 data, u64 mask);
+	void    (*write_byte)(address_space &space, offs_t address, u8 data);
+	void    (*write_word)(address_space &space, offs_t address, u16 data);
+	void    (*write_word_masked)(address_space &space, offs_t address, u16 data, u16 mask);
+	void    (*write_dword)(address_space &space, offs_t address, u32 data);
+	void    (*write_dword_masked)(address_space &space, offs_t address, u32 data, u32 mask);
+	void    (*write_qword)(address_space &space, offs_t address, u64 data);
+	void    (*write_qword_masked)(address_space &space, offs_t address, u64 data, u64 mask);
 };
 
 
@@ -106,26 +114,28 @@ typedef device_delegate<void (address_space &, offs_t)> setoffset_delegate;
 // ======================> direct_read_data
 
 // direct_read_data contains state data for direct read access
-class direct_read_data
+template<int AddrShift> class direct_read_data
 {
 	friend class address_table;
 
 public:
+	using direct_update_delegate = delegate<offs_t (direct_read_data<AddrShift> &, offs_t)>;
+
 	// direct_range is an internal class that is part of a list of start/end ranges
 	class direct_range
 	{
 	public:
 		// construction
-		direct_range(): m_bytestart(0),m_byteend(~0) { }
+		direct_range(): m_addrstart(0),m_addrend(~0) { }
 
 		inline bool operator==(direct_range val) noexcept
 		{   // return true if _Left and _Right identify the same thread
-			return (m_bytestart == val.m_bytestart) && (m_byteend == val.m_byteend);
+			return (m_addrstart == val.m_addrstart) && (m_addrend == val.m_addrend);
 		}
 
 		// internal state
-		offs_t                  m_bytestart;            // starting byte offset of the range
-		offs_t                  m_byteend;              // ending byte offset of the range
+		offs_t                  m_addrstart;            // starting offset of the range
+		offs_t                  m_addrend;              // ending offset of the range
 	};
 
 	// construction/destruction
@@ -137,31 +147,34 @@ public:
 	u8 *ptr() const { return m_ptr; }
 
 	// see if an address is within bounds, or attempt to update it if not
-	bool address_is_valid(offs_t byteaddress) { return EXPECTED(byteaddress >= m_bytestart && byteaddress <= m_byteend) || set_direct_region(byteaddress); }
+	bool address_is_valid(offs_t address) { return EXPECTED(address >= m_addrstart && address <= m_addrend) || set_direct_region(address); }
 
 	// force a recomputation on the next read
-	void force_update() { m_byteend = 0; m_bytestart = 1; }
+	void force_update() { m_addrend = 0; m_addrstart = 1; }
 	void force_update(u16 if_match) { if (m_entry == if_match) force_update(); }
 
 	// accessor methods
-	void *read_ptr(offs_t byteaddress, offs_t directxor = 0);
-	u8 read_byte(offs_t byteaddress, offs_t directxor = 0);
-	u16 read_word(offs_t byteaddress, offs_t directxor = 0);
-	u32 read_dword(offs_t byteaddress, offs_t directxor = 0);
-	u64 read_qword(offs_t byteaddress, offs_t directxor = 0);
+	void *read_ptr(offs_t address, offs_t directxor = 0);
+	u8 read_byte(offs_t address, offs_t directxor = 0);
+	u16 read_word(offs_t address, offs_t directxor = 0);
+	u32 read_dword(offs_t address, offs_t directxor = 0);
+	u64 read_qword(offs_t address, offs_t directxor = 0);
+
+	void remove_intersecting_ranges(offs_t start, offs_t end);
+
+	static constexpr offs_t offset_to_byte(offs_t offset) { return AddrShift < 0 ? offset << iabs(AddrShift) : offset >> iabs(AddrShift); }
 
 private:
 	// internal helpers
-	bool set_direct_region(offs_t byteaddress);
-	direct_range *find_range(offs_t byteaddress, u16 &entry);
-	void remove_intersecting_ranges(offs_t bytestart, offs_t byteend);
+	bool set_direct_region(offs_t address);
+	direct_range *find_range(offs_t address, u16 &entry);
 
 	// internal state
 	address_space &             m_space;
 	u8 *                        m_ptr;                  // direct access data pointer
-	offs_t                      m_bytemask;             // byte address mask
-	offs_t                      m_bytestart;            // minimum valid byte address
-	offs_t                      m_byteend;              // maximum valid byte address
+	offs_t                      m_addrmask;             // address mask
+	offs_t                      m_addrstart;            // minimum valid address
+	offs_t                      m_addrend;              // maximum valid address
 	u16                         m_entry;                // live entry
 	std::list<direct_range>     m_rangelist[TOTAL_MEMORY_BANKS];  // list of ranges for each entry
 };
@@ -183,21 +196,27 @@ public:
 	// getters
 	const char *name() const { return m_name; }
 	endianness_t endianness() const { return m_endianness; }
-	int data_width() const { return m_databus_width; }
-	int addr_width() const { return m_addrbus_width; }
+	int data_width() const { return m_data_width; }
+	int addr_width() const { return m_addr_width; }
+	int addr_shift() const { return m_addr_shift; }
+
+	// Actual alignment of the bus addresses
+	int alignment() const { int bytes = m_data_width / 8; return m_addr_shift < 0 ? bytes >> -m_addr_shift : bytes << m_addr_shift; }
+
+	// Address delta to byte delta helpers
+	inline offs_t addr2byte(offs_t address) const { return (m_addr_shift < 0) ? (address << -m_addr_shift) : (address >> m_addr_shift); }
+	inline offs_t byte2addr(offs_t address) const { return (m_addr_shift > 0) ? (address << m_addr_shift) : (address >> -m_addr_shift); }
 
 	// address-to-byte conversion helpers
-	inline offs_t addr2byte(offs_t address) const { return (m_addrbus_shift < 0) ? (address << -m_addrbus_shift) : (address >> m_addrbus_shift); }
-	inline offs_t addr2byte_end(offs_t address) const { return (m_addrbus_shift < 0) ? ((address << -m_addrbus_shift) | ((1 << -m_addrbus_shift) - 1)) : (address >> m_addrbus_shift); }
-	inline offs_t byte2addr(offs_t address) const { return (m_addrbus_shift > 0) ? (address << m_addrbus_shift) : (address >> -m_addrbus_shift); }
-	inline offs_t byte2addr_end(offs_t address) const { return (m_addrbus_shift > 0) ? ((address << m_addrbus_shift) | ((1 << m_addrbus_shift) - 1)) : (address >> -m_addrbus_shift); }
+	inline offs_t addr2byte_end(offs_t address) const { return (m_addr_shift < 0) ? ((address << -m_addr_shift) | ((1 << -m_addr_shift) - 1)) : (address >> m_addr_shift); }
+	inline offs_t byte2addr_end(offs_t address) const { return (m_addr_shift > 0) ? ((address << m_addr_shift) | ((1 << m_addr_shift) - 1)) : (address >> -m_addr_shift); }
 
 	// state
 	const char *        m_name;
 	endianness_t        m_endianness;
-	u8                  m_databus_width;
-	u8                  m_addrbus_width;
-	s8                  m_addrbus_shift;
+	u8                  m_data_width;
+	u8                  m_addr_width;
+	s8                  m_addr_shift;
 	u8                  m_logaddr_width;
 	u8                  m_page_shift;
 	bool                m_is_octal;                 // to determine if messages/debugger will show octal or hex
@@ -218,7 +237,11 @@ class address_space
 	friend class address_table_read;
 	friend class address_table_write;
 	friend class address_table_setoffset;
-	friend class direct_read_data;
+	friend class direct_read_data<3>;
+	friend class direct_read_data<0>;
+	friend class direct_read_data<-1>;
+	friend class direct_read_data<-2>;
+	friend class direct_read_data<-3>;
 
 protected:
 	// construction/destruction
@@ -235,19 +258,24 @@ public:
 	int spacenum() const { return m_spacenum; }
 	address_map *map() const { return m_map.get(); }
 
-	direct_read_data &direct() const { return *m_direct; }
+	template<int AddrShift> direct_read_data<AddrShift> *direct() const {
+		static_assert(AddrShift == 3 || AddrShift == 0 || AddrShift == -1 || AddrShift == -2 || AddrShift == -3, "Unsupported AddrShift in direct()");
+		if(AddrShift != m_config.addr_shift())
+			fatalerror("Requesing direct() with address shift %d while the config says %d\n", AddrShift, m_config.addr_shift());
+		return static_cast<direct_read_data<AddrShift> *>(m_direct);
+	}
 
 	int data_width() const { return m_config.data_width(); }
 	int addr_width() const { return m_config.addr_width(); }
+	int alignment() const { return m_config.alignment(); }
 	endianness_t endianness() const { return m_config.endianness(); }
+	int addr_shift() const { return m_config.addr_shift(); }
 	u64 unmap() const { return m_unmap; }
 	bool is_octal() const { return m_config.m_is_octal; }
 
 	offs_t addrmask() const { return m_addrmask; }
-	offs_t bytemask() const { return m_bytemask; }
 	u8 addrchars() const { return m_addrchars; }
 	offs_t logaddrmask() const { return m_logaddrmask; }
-	offs_t logbytemask() const { return m_logbytemask; }
 	u8 logaddrchars() const { return m_logaddrchars; }
 
 	// debug helpers
@@ -262,41 +290,41 @@ public:
 
 	// general accessors
 	virtual void accessors(data_accessors &accessors) const = 0;
-	virtual void *get_read_ptr(offs_t byteaddress) = 0;
-	virtual void *get_write_ptr(offs_t byteaddress) = 0;
+	virtual void *get_read_ptr(offs_t address) = 0;
+	virtual void *get_write_ptr(offs_t address) = 0;
 
 	// read accessors
-	virtual u8 read_byte(offs_t byteaddress) = 0;
-	virtual u16 read_word(offs_t byteaddress) = 0;
-	virtual u16 read_word(offs_t byteaddress, u16 mask) = 0;
-	virtual u16 read_word_unaligned(offs_t byteaddress) = 0;
-	virtual u16 read_word_unaligned(offs_t byteaddress, u16 mask) = 0;
-	virtual u32 read_dword(offs_t byteaddress) = 0;
-	virtual u32 read_dword(offs_t byteaddress, u32 mask) = 0;
-	virtual u32 read_dword_unaligned(offs_t byteaddress) = 0;
-	virtual u32 read_dword_unaligned(offs_t byteaddress, u32 mask) = 0;
-	virtual u64 read_qword(offs_t byteaddress) = 0;
-	virtual u64 read_qword(offs_t byteaddress, u64 mask) = 0;
-	virtual u64 read_qword_unaligned(offs_t byteaddress) = 0;
-	virtual u64 read_qword_unaligned(offs_t byteaddress, u64 mask) = 0;
+	virtual u8 read_byte(offs_t address) = 0;
+	virtual u16 read_word(offs_t address) = 0;
+	virtual u16 read_word(offs_t address, u16 mask) = 0;
+	virtual u16 read_word_unaligned(offs_t address) = 0;
+	virtual u16 read_word_unaligned(offs_t address, u16 mask) = 0;
+	virtual u32 read_dword(offs_t address) = 0;
+	virtual u32 read_dword(offs_t address, u32 mask) = 0;
+	virtual u32 read_dword_unaligned(offs_t address) = 0;
+	virtual u32 read_dword_unaligned(offs_t address, u32 mask) = 0;
+	virtual u64 read_qword(offs_t address) = 0;
+	virtual u64 read_qword(offs_t address, u64 mask) = 0;
+	virtual u64 read_qword_unaligned(offs_t address) = 0;
+	virtual u64 read_qword_unaligned(offs_t address, u64 mask) = 0;
 
 	// write accessors
-	virtual void write_byte(offs_t byteaddress, u8 data) = 0;
-	virtual void write_word(offs_t byteaddress, u16 data) = 0;
-	virtual void write_word(offs_t byteaddress, u16 data, u16 mask) = 0;
-	virtual void write_word_unaligned(offs_t byteaddress, u16 data) = 0;
-	virtual void write_word_unaligned(offs_t byteaddress, u16 data, u16 mask) = 0;
-	virtual void write_dword(offs_t byteaddress, u32 data) = 0;
-	virtual void write_dword(offs_t byteaddress, u32 data, u32 mask) = 0;
-	virtual void write_dword_unaligned(offs_t byteaddress, u32 data) = 0;
-	virtual void write_dword_unaligned(offs_t byteaddress, u32 data, u32 mask) = 0;
-	virtual void write_qword(offs_t byteaddress, u64 data) = 0;
-	virtual void write_qword(offs_t byteaddress, u64 data, u64 mask) = 0;
-	virtual void write_qword_unaligned(offs_t byteaddress, u64 data) = 0;
-	virtual void write_qword_unaligned(offs_t byteaddress, u64 data, u64 mask) = 0;
+	virtual void write_byte(offs_t address, u8 data) = 0;
+	virtual void write_word(offs_t address, u16 data) = 0;
+	virtual void write_word(offs_t address, u16 data, u16 mask) = 0;
+	virtual void write_word_unaligned(offs_t address, u16 data) = 0;
+	virtual void write_word_unaligned(offs_t address, u16 data, u16 mask) = 0;
+	virtual void write_dword(offs_t address, u32 data) = 0;
+	virtual void write_dword(offs_t address, u32 data, u32 mask) = 0;
+	virtual void write_dword_unaligned(offs_t address, u32 data) = 0;
+	virtual void write_dword_unaligned(offs_t address, u32 data, u32 mask) = 0;
+	virtual void write_qword(offs_t address, u64 data) = 0;
+	virtual void write_qword(offs_t address, u64 data, u64 mask) = 0;
+	virtual void write_qword_unaligned(offs_t address, u64 data) = 0;
+	virtual void write_qword_unaligned(offs_t address, u64 data, u64 mask) = 0;
 
 	// Set address. This will invoke setoffset handlers for the respective entries.
-	virtual void set_address(offs_t byteaddress) = 0;
+	virtual void set_address(offs_t address) = 0;
 
 	// address-to-byte conversion helpers
 	offs_t address_to_byte(offs_t address) const { return m_config.addr2byte(address); }
@@ -386,6 +414,10 @@ public:
 	void allocate_memory();
 	void locate_memory();
 
+	void invalidate_read_caches();
+	void invalidate_read_caches(u16 entry);
+	void invalidate_read_caches(offs_t start, offs_t end);
+
 private:
 	// internal helpers
 	virtual address_table_read &read() = 0;
@@ -412,15 +444,13 @@ protected:
 	// private state
 	const address_space_config &m_config;       // configuration of this space
 	device_t &              m_device;           // reference to the owning device
-	std::unique_ptr<address_map> m_map;              // original memory map
+	std::unique_ptr<address_map> m_map;         // original memory map
 	offs_t                  m_addrmask;         // physical address mask
-	offs_t                  m_bytemask;         // byte-converted physical address mask
 	offs_t                  m_logaddrmask;      // logical address mask
-	offs_t                  m_logbytemask;      // byte-converted logical address mask
 	u64                     m_unmap;            // unmapped value
 	int        m_spacenum;         // address space index
 	bool                    m_log_unmap;        // log unmapped accesses in this space?
-	std::unique_ptr<direct_read_data> m_direct;    // fast direct-access read info
+	void *                  m_direct;           // fast direct-access read info
 	const char *            m_name;             // friendly name of the address space
 	u8                      m_addrchars;        // number of characters to use for physical addresses
 	u8                      m_logaddrchars;     // number of characters to use for logical addresses
@@ -440,26 +470,26 @@ class memory_block
 
 public:
 	// construction/destruction
-	memory_block(address_space &space, offs_t bytestart, offs_t byteend, void *memory = nullptr);
+	memory_block(address_space &space, offs_t start, offs_t end, void *memory = nullptr);
 	~memory_block();
 
 	// getters
 	running_machine &machine() const { return m_machine; }
-	offs_t bytestart() const { return m_bytestart; }
-	offs_t byteend() const { return m_byteend; }
+	offs_t addrstart() const { return m_addrstart; }
+	offs_t addrend() const { return m_addrend; }
 	u8 *data() const { return m_data; }
 
 	// is the given range contained by this memory block?
-	bool contains(address_space &space, offs_t bytestart, offs_t byteend) const
+	bool contains(address_space &space, offs_t addrstart, offs_t addrend) const
 	{
-		return (&space == &m_space && m_bytestart <= bytestart && m_byteend >= byteend);
+		return (&space == &m_space && m_addrstart <= addrstart && m_addrend >= addrend);
 	}
 
 private:
 	// internal state
 	running_machine &       m_machine;              // need the machine to free our memory
 	address_space &         m_space;                // which address space are we associated with?
-	offs_t                  m_bytestart, m_byteend; // byte-normalized start/end for verifying a match
+	offs_t                  m_addrstart, m_addrend; // start/end for verifying a match
 	u8 *                    m_data;                 // pointer to the data for this block
 	std::vector<u8>         m_allocated;            // pointer to the actually allocated block
 };
@@ -502,7 +532,7 @@ class memory_bank
 
 public:
 	// construction/destruction
-	memory_bank(address_space &space, int index, offs_t bytestart, offs_t byteend, const char *tag = nullptr);
+	memory_bank(address_space &space, int index, offs_t start, offs_t end, const char *tag = nullptr);
 	~memory_bank();
 
 	// getters
@@ -510,16 +540,16 @@ public:
 	int index() const { return m_index; }
 	int entry() const { return m_curentry; }
 	bool anonymous() const { return m_anonymous; }
-	offs_t bytestart() const { return m_bytestart; }
+	offs_t addrstart() const { return m_addrstart; }
 	void *base() const { return *m_baseptr; }
 	const char *tag() const { return m_tag.c_str(); }
 	const char *name() const { return m_name.c_str(); }
 
 	// compare a range against our range
-	bool matches_exactly(offs_t bytestart, offs_t byteend) const { return (m_bytestart == bytestart && m_byteend == byteend); }
-	bool fully_covers(offs_t bytestart, offs_t byteend) const { return (m_bytestart <= bytestart && m_byteend >= byteend); }
-	bool is_covered_by(offs_t bytestart, offs_t byteend) const { return (m_bytestart >= bytestart && m_byteend <= byteend); }
-	bool straddles(offs_t bytestart, offs_t byteend) const { return (m_bytestart < byteend && m_byteend > bytestart); }
+	bool matches_exactly(offs_t addrstart, offs_t addrend) const { return (m_addrstart == addrstart && m_addrend == addrend); }
+	bool fully_covers(offs_t addrstart, offs_t addrend) const { return (m_addrstart <= addrstart && m_addrend >= addrend); }
+	bool is_covered_by(offs_t addrstart, offs_t addrend) const { return (m_addrstart >= addrstart && m_addrend <= addrend); }
+	bool straddles(offs_t addrstart, offs_t addrend) const { return (m_addrstart < addrend && m_addrend > addrstart); }
 
 	// track and verify address space references to this bank
 	bool references_space(const address_space &space, read_or_write readorwrite) const;
@@ -543,8 +573,8 @@ private:
 	u8 **                   m_baseptr;              // pointer to our base pointer in the global array
 	u16                     m_index;                // array index for this handler
 	bool                    m_anonymous;            // are we anonymous or explicit?
-	offs_t                  m_bytestart;            // byte-adjusted start offset
-	offs_t                  m_byteend;              // byte-adjusted end offset
+	offs_t                  m_addrstart;            // start offset
+	offs_t                  m_addrend;              // end offset
 	int                     m_curentry;             // current entry
 	std::vector<bank_entry> m_entry;                // array of entries (dynamically allocated)
 	std::string             m_name;                 // friendly name for this bank
@@ -791,10 +821,10 @@ private:
 //  backing that address
 //-------------------------------------------------
 
-inline void *direct_read_data::read_ptr(offs_t byteaddress, offs_t directxor)
+template<int AddrShift> inline void *direct_read_data<AddrShift>::read_ptr(offs_t address, offs_t directxor)
 {
-	if (address_is_valid(byteaddress))
-		return &m_ptr[(byteaddress ^ directxor) & m_bytemask];
+	if (address_is_valid(address))
+		return &m_ptr[offset_to_byte(((address ^ directxor) & m_addrmask))];
 	return nullptr;
 }
 
@@ -804,11 +834,13 @@ inline void *direct_read_data::read_ptr(offs_t byteaddress, offs_t directxor)
 //  direct_read_data class
 //-------------------------------------------------
 
-inline u8 direct_read_data::read_byte(offs_t byteaddress, offs_t directxor)
+template<int AddrShift> inline u8 direct_read_data<AddrShift>::read_byte(offs_t address, offs_t directxor)
 {
-	if (address_is_valid(byteaddress))
-		return m_ptr[(byteaddress ^ directxor) & m_bytemask];
-	return m_space.read_byte(byteaddress);
+	if(AddrShift <= -1)
+		fatalerror("Can't direct_read_data::read_byte on a memory space with address shift %d", AddrShift);
+	if (address_is_valid(address))
+		return m_ptr[offset_to_byte((address ^ directxor) & m_addrmask)];
+	return m_space.read_byte(address);
 }
 
 
@@ -817,11 +849,13 @@ inline u8 direct_read_data::read_byte(offs_t byteaddress, offs_t directxor)
 //  direct_read_data class
 //-------------------------------------------------
 
-inline u16 direct_read_data::read_word(offs_t byteaddress, offs_t directxor)
+template<int AddrShift> inline u16 direct_read_data<AddrShift>::read_word(offs_t address, offs_t directxor)
 {
-	if (address_is_valid(byteaddress))
-		return *reinterpret_cast<u16 *>(&m_ptr[(byteaddress ^ directxor) & m_bytemask]);
-	return m_space.read_word(byteaddress);
+	if(AddrShift <= -2)
+		fatalerror("Can't direct_read_data::read_word on a memory space with address shift %d", AddrShift);
+	if (address_is_valid(address))
+		return *reinterpret_cast<u16 *>(&m_ptr[offset_to_byte((address ^ directxor) & m_addrmask)]);
+	return m_space.read_word(address);
 }
 
 
@@ -830,11 +864,13 @@ inline u16 direct_read_data::read_word(offs_t byteaddress, offs_t directxor)
 //  direct_read_data class
 //-------------------------------------------------
 
-inline u32 direct_read_data::read_dword(offs_t byteaddress, offs_t directxor)
+template<int AddrShift> inline u32 direct_read_data<AddrShift>::read_dword(offs_t address, offs_t directxor)
 {
-	if (address_is_valid(byteaddress))
-		return *reinterpret_cast<u32 *>(&m_ptr[(byteaddress ^ directxor) & m_bytemask]);
-	return m_space.read_dword(byteaddress);
+	if(AddrShift <= -3)
+		fatalerror("Can't direct_read_data::read_dword on a memory space with address shift %d", AddrShift);
+	if (address_is_valid(address))
+		return *reinterpret_cast<u32 *>(&m_ptr[offset_to_byte((address ^ directxor) & m_addrmask)]);
+	return m_space.read_dword(address);
 }
 
 
@@ -843,11 +879,11 @@ inline u32 direct_read_data::read_dword(offs_t byteaddress, offs_t directxor)
 //  direct_read_data class
 //-------------------------------------------------
 
-inline u64 direct_read_data::read_qword(offs_t byteaddress, offs_t directxor)
+template<int AddrShift> inline u64 direct_read_data<AddrShift>::read_qword(offs_t address, offs_t directxor)
 {
-	if (address_is_valid(byteaddress))
-		return *reinterpret_cast<u64 *>(&m_ptr[(byteaddress ^ directxor) & m_bytemask]);
-	return m_space.read_qword(byteaddress);
+	if (address_is_valid(address))
+		return *reinterpret_cast<u64 *>(&m_ptr[offset_to_byte((address ^ directxor) & m_addrmask)]);
+	return m_space.read_qword(address);
 }
 
 #endif  /* MAME_EMU_EMUMEM_H */

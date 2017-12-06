@@ -417,8 +417,8 @@ void i8086_common_cpu_device::device_start()
 	m_stack = m_program;
 	m_code = m_program;
 	m_extra = m_program;
-	m_direct = &m_program->direct();
-	m_direct_opcodes = &m_opcodes->direct();
+	m_direct = m_program->direct<0>();
+	m_direct_opcodes = m_opcodes->direct<0>();
 	m_io = &space(AS_IO);
 
 	save_item(NAME(m_regs.w));
@@ -570,9 +570,14 @@ void i8086_common_cpu_device::execute_set_input( int inptnum, int state )
 	}
 }
 
-offs_t i8086_common_cpu_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+util::disasm_interface *i8086_common_cpu_device::create_disassembler()
 {
-	return i386_dasm_one(stream, pc, oprom, 1);
+	return new i386_disassembler(this);
+}
+
+int i8086_common_cpu_device::get_mode() const
+{
+	return 1;
 }
 
 uint8_t i8086_common_cpu_device::read_port_byte(uint16_t port)

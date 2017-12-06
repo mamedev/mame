@@ -173,15 +173,13 @@ private:
 
 static ADDRESS_MAP_START( gimix_banked_mem, AS_PROGRAM, 8, gimix_state)
 	AM_RANGE(0x00000, 0x0dfff) AM_RAMBANK("lower_ram")
-	AM_RANGE(0x0e000, 0x0e000) AM_DEVREADWRITE("acia1",acia6850_device,status_r,control_w)
-	AM_RANGE(0x0e001, 0x0e001) AM_DEVREADWRITE("acia1",acia6850_device,data_r,data_w)
-	AM_RANGE(0x0e004, 0x0e004) AM_DEVREADWRITE("acia2",acia6850_device,status_r,control_w)
-	AM_RANGE(0x0e005, 0x0e005) AM_DEVREADWRITE("acia2",acia6850_device,data_r,data_w)
+	AM_RANGE(0x0e000, 0x0e001) AM_DEVREADWRITE("acia1", acia6850_device, read, write)
+	AM_RANGE(0x0e004, 0x0e005) AM_DEVREADWRITE("acia2", acia6850_device, read, write)
 	//AM_RANGE(0x0e018, 0x0e01b) AM_READWRITE(fdc_r, fdc_w)  // FD1797 FDC (PIO)
 	AM_RANGE(0x0e100, 0x0e1ff) AM_RAM
 	//AM_RANGE(0x0e200, 0x0e20f) // 9511A / 9512 Arithmetic Processor
-	AM_RANGE(0x0e210, 0x0e21f) AM_DEVREADWRITE("timer",ptm6840_device,read,write)
-	AM_RANGE(0x0e220, 0x0e23f) AM_DEVREADWRITE("rtc",mm58167_device,read,write)
+	AM_RANGE(0x0e210, 0x0e21f) AM_DEVREADWRITE("timer", ptm6840_device, read, write)
+	AM_RANGE(0x0e220, 0x0e23f) AM_DEVREADWRITE("rtc", mm58167_device, read, write)
 	AM_RANGE(0x0e240, 0x0e3af) AM_RAM
 	AM_RANGE(0x0e3b0, 0x0e3b3) AM_READWRITE(dma_r, dma_w)  // DMA controller (custom?)
 	AM_RANGE(0x0e3b4, 0x0e3b7) AM_READWRITE(fdc_r, fdc_w)  // FD1797 FDC
@@ -542,7 +540,7 @@ SLOT_INTERFACE_END
 MCFG_DEVICE_ADD(tag, ADDRESS_MAP_BANK, 0) \
 MCFG_DEVICE_PROGRAM_MAP(gimix_banked_mem) \
 MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE) \
-MCFG_ADDRESS_MAP_BANK_DATABUS_WIDTH(8) \
+MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8) \
 MCFG_ADDRESS_MAP_BANK_STRIDE(0x1000)
 
 static MACHINE_CONFIG_START( gimix )

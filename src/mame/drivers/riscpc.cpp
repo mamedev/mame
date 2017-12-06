@@ -589,7 +589,7 @@ TIMER_CALLBACK_MEMBER(riscpc_state::IOMD_timer0_callback)
 	m_IRQ_status_A|=0x20;
 	if(m_IRQ_mask_A&0x20)
 	{
-		generic_pulse_irq_line(*m_maincpu, ARM7_IRQ_LINE,1);
+		m_maincpu->pulse_input_line(ARM7_IRQ_LINE, m_maincpu->minimum_quantum_time());
 	}
 }
 
@@ -598,7 +598,7 @@ TIMER_CALLBACK_MEMBER(riscpc_state::IOMD_timer1_callback)
 	m_IRQ_status_A|=0x40;
 	if(m_IRQ_mask_A&0x40)
 	{
-		generic_pulse_irq_line(*m_maincpu, ARM7_IRQ_LINE,1);
+		m_maincpu->pulse_input_line(ARM7_IRQ_LINE, m_maincpu->minimum_quantum_time());
 	}
 }
 
@@ -607,7 +607,7 @@ TIMER_CALLBACK_MEMBER(riscpc_state::flyback_timer_callback)
 	m_IRQ_status_A|=0x08;
 	if(m_IRQ_mask_A&0x08)
 	{
-		generic_pulse_irq_line(*m_maincpu, ARM7_IRQ_LINE,1);
+		m_maincpu->pulse_input_line(ARM7_IRQ_LINE, m_maincpu->minimum_quantum_time());
 	}
 
 	m_flyback_timer->adjust(machine().first_screen()->time_until_pos(m_vidc20_vert_reg[VDER]));
@@ -883,8 +883,8 @@ ROM_START(rpc600)
 	ROM_REGION( 0x800000, "user1", ROMREGION_ERASEFF )
 	// Version 3.50
 	ROM_SYSTEM_BIOS( 0, "350", "RiscOS 3.50" )
-	ROMX_LOAD( "0277,521-01.bin", 0x000000, 0x100000, CRC(8ba4444e) SHA1(1b31d7a6e924bef0e0056c3a00a3fed95e55b175), ROM_GROUPWORD | ROM_SKIP(2) | ROM_BIOS(1))
-	ROMX_LOAD( "0277,522-01.bin", 0x000002, 0x100000, CRC(2bc95c9f) SHA1(f8c6e2a1deb4fda48aac2e9fa21b9e01955331cf), ROM_GROUPWORD | ROM_SKIP(2) | ROM_BIOS(1))
+	ROMX_LOAD( "0277,521-01.bin", 0x000000, 0x100000, CRC(8ba4444e) SHA1(1b31d7a6e924bef0e0056c3a00a3fed95e55b175), ROM_BIOS(1))
+	ROMX_LOAD( "0277,522-01.bin", 0x100000, 0x100000, CRC(2bc95c9f) SHA1(f8c6e2a1deb4fda48aac2e9fa21b9e01955331cf), ROM_BIOS(1))
 	ROM_REGION( 0x800000, "vram", ROMREGION_ERASE00 )
 ROM_END
 

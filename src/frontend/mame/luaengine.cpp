@@ -828,7 +828,7 @@ void lua_engine::initialize()
 				[](emu_file &file, const char *path, u32 flags) { new (&file) emu_file(path, flags); },
 				[](emu_file &file, const char *mode) {
 					int flags = 0;
-					for(int i = 0; i < 2; i++) // limit to three chars
+					for(int i = 0; i < 3 && mode[i]; i++) // limit to three chars
 					{
 						switch(mode[i])
 						{
@@ -847,7 +847,7 @@ void lua_engine::initialize()
 				},
 				[](emu_file &file, const char *path, const char* mode) {
 					int flags = 0;
-					for(int i = 0; i < 2; i++) // limit to three chars
+					for(int i = 0; i < 3 && mode[i]; i++) // limit to three chars
 					{
 						switch(mode[i])
 						{
@@ -1454,8 +1454,8 @@ void lua_engine::initialize()
 					for (address_map_entry &entry : space.map()->m_entrylist)
 					{
 						sol::table mapentry = sol().create_table();
-						mapentry["offset"] = space.address_to_byte(entry.m_addrstart) & space.bytemask();
-						mapentry["endoff"] = space.address_to_byte(entry.m_addrend) & space.bytemask();
+						mapentry["offset"] = space.address_to_byte(entry.m_addrstart) & space.addrmask();
+						mapentry["endoff"] = space.address_to_byte(entry.m_addrend) & space.addrmask();
 						mapentry["readtype"] = entry.m_read.m_type;
 						mapentry["writetype"] = entry.m_write.m_type;
 						map.add(mapentry);
@@ -1587,8 +1587,8 @@ void lua_engine::initialize()
  * input:code_name(code) - get code friendly name
  * input:seq_from_tokens(tokens) - get input_seq for multiple space separated KEYCODE_* string tokens
  * input:seq_pressed(seq) - get pressed state for input_seq
- * input:seq_to_token(seq) - get KEYCODE_* string tokens for seq
- * input:seq_to_name(seq) - get seq friendly name
+ * input:seq_to_tokens(seq) - get KEYCODE_* string tokens for seq
+ * input:seq_name(seq) - get seq friendly name
  */
 
 	sol().registry().new_usertype<input_manager>("input", "new", sol::no_constructor,

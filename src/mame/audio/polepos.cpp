@@ -216,7 +216,7 @@ static void filter_opamp_m_bandpass_setup(device_t *device, double r1, double r2
 
 
 // device type definition
-DEFINE_DEVICE_TYPE(POLEPOS, polepos_sound_device, "polepos_sound", "Pole Position Audio Custom")
+DEFINE_DEVICE_TYPE(POLEPOS, polepos_sound_device, "polepos_sound", "Pole Position Custom Sound")
 
 
 //**************************************************************************

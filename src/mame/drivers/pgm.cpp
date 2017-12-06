@@ -67,29 +67,29 @@ game region code..
 ASIC 3:
     state based device?
     see
-    machine/pgmprot.c
+    machine/pgmprot_orlegend.cpp
 
 ASIC 25 + ASIC 12
     state based device + rom overlays
     see
-    machine/pgmprot5.c
+    machine/pgmprot_igs025_igs012.cpp
 
 ASIC 25 + ASIC 22
     state based device + encrypted DMA device
     see
-    machine/pgmprot4.c
+    machine/pgmprot_igs025_igs022.cpp
 
 ASIC 25 + ASIC 28
     state based device + encrypted DMA device?
     see
-    machine/pgmprot6.c
+    machine/pgmprot_igs025_igs028.cpp
 
 ASIC 027A(55857F/55857G):
     ARM based CPUs with internal ROM
     see
-    machine/pgmprot1.c
-    machine/pgmprot2.c
-    machine/pgmprot3.c
+    machine/pgmprot_igs027a_type1.cpp
+    machine/pgmprot_igs027a_type2.cpp
+    machine/pgmprot_igs027a_type3.cpp
 
 
 there are probably more...
@@ -3230,7 +3230,7 @@ Only the ROMs at U9 and U10 were dumped.
 U9 and U10 are not standard EPROMs, instead they are 27C322 adapter boards with an SMD OKI 27C3202 TSOP.
 */
 
-ROM_START( martmasttw ) 
+ROM_START( martmasttw )
 	ROM_REGION( 0x600000, "maincpu", 0 ) /* 68000 Code */
 	PGM_68K_BIOS
 	ROM_LOAD16_WORD_SWAP( "mm_v102_u9.bin",    0x100000, 0x400000, CRC(7eb41ed4) SHA1(7df7789db8f9110fe747f41e193b4a28096018e7) )
@@ -4696,11 +4696,6 @@ GAME( 1999, kovsh101,     kovsh,     pgm_arm_type1,     kovsh, pgm_arm_type1_sta
 GAME( 1999, kovsh100,     kovsh,     pgm_arm_type1,     kovsh, pgm_arm_type1_state,    kovsh,      ROT0,   "IGS", "Knights of Valour Super Heroes / Sangoku Senki Super Heroes (ver. 100, CN)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // 68k: SANGO EX V100 12/06/99 13:36:04, ARM: China internal ROM
 // nasty modern asian bootleg of Knights of Valour Super Heroes with characters ripped from SNK's The King of Fighters series!
 GAME( 1999, kovqhsgs,     kovsh,     pgm_arm_type1,     kovsh, pgm_arm_type1_state, kovqhsgs,   ROT0,   "bootleg", "Knights of Valour: Quan Huang San Guo Special / Sangoku Senki: Quan Huang San Guo Special (ver. 303CN)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-
-
-
-
-
 
 // region provided by internal ARM rom
 GAME( 2000, kov2,         pgm,       pgm_arm_type2,    kov2, pgm_arm_type2_state,    kov2,       ROT0,   "IGS", "Knights of Valour 2 / Sangoku Senki 2 (ver. 107, 102, 100HK)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // 05/10/01 14:24:08 V107 (Ext. Arm V102, Int. Arm V100HK)

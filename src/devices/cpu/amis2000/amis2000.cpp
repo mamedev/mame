@@ -20,6 +20,7 @@
 
 #include "emu.h"
 #include "amis2000.h"
+#include "amis2000d.h"
 #include "debugger.h"
 
 
@@ -98,10 +99,9 @@ void amis2000_base_device::state_string_export(const device_state_entry &entry, 
 	}
 }
 
-offs_t amis2000_base_device::disasm_disassemble(std::ostream &stream, offs_t pc, const u8 *oprom, const u8 *opram, u32 options)
+util::disasm_interface *amis2000_base_device::create_disassembler()
 {
-	extern CPU_DISASSEMBLE(amis2000);
-	return CPU_DISASSEMBLE_NAME(amis2000)(this, stream, pc, oprom, opram, options);
+	return new amis2000_disassembler;
 }
 
 

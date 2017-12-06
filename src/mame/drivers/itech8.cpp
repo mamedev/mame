@@ -2396,7 +2396,7 @@ ROM_END
 
 
 ROM_START( arlingtn ) /* PCB  p/n 1030 rev. 1A */
-	ROM_REGION( 0x1c000, "maincpu", 0 )	/* banks are loaded in the opposite order from the others, */
+	ROM_REGION( 0x1c000, "maincpu", 0 ) /* banks are loaded in the opposite order from the others, */
 	ROM_LOAD( "ahr-d_v_1.21.u5", 0x10000, 0x4000, CRC(00aae02e) SHA1(3bcfbd256c34ae222dde24ba9544f19da70b698e) ) /* Service menu reports version as 1.21-D */
 	ROM_CONTINUE(                0x04000, 0xc000 )
 	ROM_COPY( "maincpu", 0x8000, 0x14000, 0x8000 )

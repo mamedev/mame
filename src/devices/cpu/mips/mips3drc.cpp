@@ -27,6 +27,7 @@
 #include "debugger.h"
 #include "mips3com.h"
 #include "mips3fe.h"
+#include "mips3dsm.h"
 #include "cpu/drcfe.h"
 #include "cpu/drcuml.h"
 #include "cpu/drcumlsh.h"
@@ -834,69 +835,6 @@ void mips3_device::static_generate_memory_accessor(int mode, int size, int iswri
 		UML_CMP(block, I3, 6);                                          // cmp     i3,6
 		UML_EXHc(block, COND_NE, exception_addrerr, I0);                            // exh     addrerr,i0,ne
 		UML_LABEL(block, addrok);                                               // addrok:
-	}
-
-	/* TX4925 on-board peripherals pass-through */
-	if (m_flavor == MIPS3_TYPE_TX4925)
-	{
-		int addrok;
-		UML_AND(block, I3, I0, 0xffff0000);             // and i3, i0, 0xffff0000
-		UML_CMP(block, I3, 0xff1f0000);                 // cmp i3, 0xff1f0000
-		UML_JMPc(block, COND_NZ, addrok = label++);
-
-		switch (size)
-		{
-			case 1:
-				if (iswrite)
-					UML_WRITE(block, I0, I1, SIZE_BYTE, SPACE_PROGRAM);                 // write   i0,i1,program_byte
-				else
-					UML_READ(block, I0, I0, SIZE_BYTE, SPACE_PROGRAM);                  // read    i0,i0,program_byte
-				break;
-
-			case 2:
-				if (iswrite)
-					UML_WRITE(block, I0, I1, SIZE_WORD, SPACE_PROGRAM);                 // write   i0,i1,program_word
-				else
-					UML_READ(block, I0, I0, SIZE_WORD, SPACE_PROGRAM);                  // read    i0,i0,program_word
-				break;
-
-			case 4:
-				if (iswrite)
-				{
-					if (!ismasked)
-						UML_WRITE(block, I0, I1, SIZE_DWORD, SPACE_PROGRAM);                // write   i0,i1,program_dword
-					else
-						UML_WRITEM(block, I0, I1, I2, SIZE_DWORD, SPACE_PROGRAM);   // writem  i0,i1,i2,program_dword
-				}
-				else
-				{
-					if (!ismasked)
-						UML_READ(block, I0, I0, SIZE_DWORD, SPACE_PROGRAM);             // read    i0,i0,program_dword
-					else
-						UML_READM(block, I0, I0, I2, SIZE_DWORD, SPACE_PROGRAM);        // readm   i0,i0,i2,program_dword
-				}
-				break;
-
-			case 8:
-				if (iswrite)
-				{
-					if (!ismasked)
-						UML_DWRITE(block, I0, I1, SIZE_QWORD, SPACE_PROGRAM);               // dwrite  i0,i1,program_qword
-					else
-						UML_DWRITEM(block, I0, I1, I2, SIZE_QWORD, SPACE_PROGRAM);  // dwritem i0,i1,i2,program_qword
-				}
-				else
-				{
-					if (!ismasked)
-						UML_DREAD(block, I0, I0, SIZE_QWORD, SPACE_PROGRAM);                // dread   i0,i0,program_qword
-					else
-						UML_DREADM(block, I0, I0, I2, SIZE_QWORD, SPACE_PROGRAM);   // dreadm  i0,i0,i2,program_qword
-				}
-				break;
-		}
-		UML_RET(block);
-
-		UML_LABEL(block, addrok);
 	}
 
 	/* general case: assume paging and perform a translation */
@@ -3349,8 +3287,9 @@ void mips3_device::log_add_disasm_comment(drcuml_block *block, uint32_t pc, uint
 {
 	if (m_drcuml->logging())
 	{
+		mips3_disassembler mips3d;
 		std::ostringstream stream;
-		dasmmips3(stream, pc, op);
+		mips3d.dasm_one(stream, pc, op);
 		const std::string stream_string = stream.str();
 		block->append_comment("%08X: %s", pc, stream_string.c_str());                                  // comment
 	}
@@ -3488,7 +3427,10 @@ void mips3_device::log_opcode_desc(drcuml_state *drcuml, const opcode_desc *desc
 			if (desclist->flags & OPFLAG_VIRTUAL_NOOP)
 				buffer << "<virtual nop>";
 			else
-				dasmmips3(buffer, desclist->pc, desclist->opptr.l[0]);
+			{
+				mips3_disassembler mips3d;
+				mips3d.dasm_one(buffer, desclist->pc, desclist->opptr.l[0]);
+			}
 		}
 		else
 			buffer << "???";

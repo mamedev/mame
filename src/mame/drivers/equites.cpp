@@ -416,7 +416,7 @@ WRITE8_MEMBER(equites_state::equites_c0f8_w)
 
 		case 1: // c0f9: RST75 trigger (written by NMI handler)
 			// Note: solder pad CP3 on the pcb would allow to disable this
-			generic_pulse_irq_line(*m_audiocpu, I8085_RST75_LINE, 1);
+			m_audiocpu->pulse_input_line(I8085_RST75_LINE, m_audiocpu->minimum_quantum_time());
 			break;
 
 		case 2: // c0fa: INTR trigger (written by NMI handler)

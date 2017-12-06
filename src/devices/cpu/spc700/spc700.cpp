@@ -1353,9 +1353,9 @@ void spc700_device::execute_set_input( int inptnum, int state )
 
 #include "spc700ds.h"
 
-offs_t spc700_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+util::disasm_interface *spc700_device::create_disassembler()
 {
-	return CPU_DISASSEMBLE_NAME(spc700)(this, stream, pc, oprom, opram, options);
+	return new spc700_disassembler;
 }
 
 //int dump_flag = 0;

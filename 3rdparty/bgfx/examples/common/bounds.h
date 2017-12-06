@@ -19,6 +19,20 @@ struct Cylinder
 	float m_radius;
 };
 
+struct Capsule
+{
+	float m_pos[3];
+	float m_end[3];
+	float m_radius;
+};
+
+struct Cone
+{
+	float m_pos[3];
+	float m_end[3];
+	float m_radius;
+};
+
 struct Disk
 {
 	float m_center[3];
@@ -56,7 +70,7 @@ struct Tris
 	float m_v2[3];
 };
 
-struct Intersection
+struct Hit
 {
 	float m_pos[3];
 	float m_normal[3];
@@ -65,6 +79,9 @@ struct Intersection
 
 /// Convert axis aligned bounding box to oriented bounding box.
 void aabbToObb(Obb& _obb, const Aabb& _aabb);
+
+/// Convert oriented bounding box to axis aligned bounding box.
+void toAabb(Aabb& _aabb, const Obb& _obb);
 
 /// Convert sphere to axis aligned bounding box.
 void toAabb(Aabb& _aabb, const Sphere& _sphere);
@@ -112,22 +129,31 @@ void intersectPlanes(float _result[3], const Plane& _pa, const Plane& _pb, const
 /// Make screen space ray from x, y coordinate and inverse view-projection matrix.
 Ray makeRay(float _x, float _y, const float* _invVp);
 
-/// Intersect ray / aabb.
-bool intersect(const Ray& _ray, const Aabb& _aabb, Intersection* _intersection = NULL);
+/// Intersect ray / AABB.
+bool intersect(const Ray& _ray, const Aabb& _aabb, Hit* _hit = NULL);
+
+/// Intersect ray / OBB.
+bool intersect(const Ray& _ray, const Obb& _obb, Hit* _hit = NULL);
 
 /// Intersect ray / cylinder.
-bool intersect(const Ray& _ray, const Cylinder& _cylinder, bool _capsule, Intersection* _intersection = NULL);
+bool intersect(const Ray& _ray, const Cylinder& _cylinder, Hit* _hit = NULL);
+
+/// Intersect ray / capsule.
+bool intersect(const Ray& _ray, const Capsule& _capsule, Hit* _hit = NULL);
+
+/// Intersect ray / cone.
+bool intersect(const Ray& _ray, const Cone& _cone, Hit* _hit = NULL);
 
 /// Intersect ray / disk.
-bool intersect(const Ray& _ray, const Disk& _disk, Intersection* _intersection = NULL);
+bool intersect(const Ray& _ray, const Disk& _disk, Hit* _hit = NULL);
 
 /// Intersect ray / plane.
-bool intersect(const Ray& _ray, const Plane& _plane, Intersection* _intersection = NULL);
+bool intersect(const Ray& _ray, const Plane& _plane, Hit* _hit = NULL);
 
 /// Intersect ray / sphere.
-bool intersect(const Ray& _ray, const Sphere& _sphere, Intersection* _intersection = NULL);
+bool intersect(const Ray& _ray, const Sphere& _sphere, Hit* _hit = NULL);
 
 /// Intersect ray / triangle.
-bool intersect(const Ray& _ray, const Tris& _triangle, Intersection* _intersection = NULL);
+bool intersect(const Ray& _ray, const Tris& _triangle, Hit* _hit = NULL);
 
 #endif // BOUNDS_H_HEADER_GUARD

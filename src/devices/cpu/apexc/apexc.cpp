@@ -327,6 +327,7 @@ field:      X address   D           Function    Y address   D (part 2)
 
 #include "emu.h"
 #include "apexc.h"
+#include "apexcdsm.h"
 #include "debugger.h"
 
 
@@ -854,9 +855,7 @@ void apexc_cpu_device::execute_run()
 	} while (m_icount > 0);
 }
 
-
-offs_t apexc_cpu_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+util::disasm_interface *apexc_cpu_device::create_disassembler()
 {
-	extern CPU_DISASSEMBLE( apexc );
-	return CPU_DISASSEMBLE_NAME(apexc)(this, stream, pc, oprom, opram, options);
+	return new apexc_disassembler;
 }

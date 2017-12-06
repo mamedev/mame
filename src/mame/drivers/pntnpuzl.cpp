@@ -125,6 +125,7 @@ CN1 standard DB15 VGA connector (15KHz)
 
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
+#include "cpu/mcs96/i8x9x.h"
 #include "machine/6522via.h"
 #include "machine/eepromser.h"
 #include "video/pc_vga.h"
@@ -137,7 +138,7 @@ public:
 	pntnpuzl_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this,"maincpu"),
-		m_eeprom(*this, "eeprom")
+		m_via(*this, "via")
 	{ }
 
 	uint16_t m_pntpzl_200000;
@@ -156,7 +157,7 @@ public:
 	DECLARE_READ16_MEMBER(irq4_ack_r);
 	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
 	DECLARE_DRIVER_INIT(pip);
-	required_device<eeprom_serial_93cxx_device> m_eeprom;
+	required_device<via6522_device> m_via;
 };
 
 
@@ -203,12 +204,16 @@ WRITE16_MEMBER(pntnpuzl_state::pntnpuzl_280018_w)
 	m_serial >>= 1;
 	if (data & 0x2000)
 		m_serial |= 0x400;
+
+	m_via->write(space, 0x18/2, data >> 8);
 }
 
 READ16_MEMBER(pntnpuzl_state::pntnpuzl_280014_r)
 {
 	static const int startup[3] = { 0x80, 0x0c, 0x00 };
 	int res;
+
+	(void)m_via->read(space, 0x14/2);
 
 	if (m_serial_out == 0x11)
 	{
@@ -279,12 +284,16 @@ static ADDRESS_MAP_START( pntnpuzl_map, AS_PROGRAM, 16, pntnpuzl_state )
 	AM_RANGE(0x400000, 0x407fff) AM_RAM
 ADDRESS_MAP_END
 
+static ADDRESS_MAP_START( mcu_map, AS_PROGRAM, 8, pntnpuzl_state )
+	AM_RANGE(0x2000, 0x3fff) AM_ROM AM_REGION("mcu", 0)
+ADDRESS_MAP_END
+
 
 INPUT_CHANGED_MEMBER(pntnpuzl_state::coin_inserted)
 {
 	/* TODO: change this! */
 	if(newval)
-		generic_pulse_irq_line(*m_maincpu, (uint8_t)(uintptr_t)param, 1);
+		m_maincpu->pulse_input_line((uint8_t)(uintptr_t)param, m_maincpu->minimum_quantum_time());
 }
 
 static INPUT_PORTS_START( pntnpuzl )
@@ -334,6 +343,9 @@ static MACHINE_CONFIG_START( pntnpuzl )
 	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("eeprom", eeprom_serial_93cxx_device, cs_write)) MCFG_DEVCB_BIT(6)
 	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("eeprom", eeprom_serial_93cxx_device, clk_write)) MCFG_DEVCB_BIT(5)
 
+	MCFG_CPU_ADD("mcu", P8098, 12000000) // ??
+	MCFG_CPU_PROGRAM_MAP(mcu_map) // FIXME: this is all internal
+
 	/* video hardware */
 	MCFG_FRAGMENT_ADD( pcvideo_vga )
 MACHINE_CONFIG_END
@@ -342,6 +354,9 @@ ROM_START( pntnpuzl )
 	ROM_REGION( 0x80000, "maincpu", 0 ) /* 68000 Code */
 	ROM_LOAD16_BYTE( "pntnpuzl.u2", 0x00001, 0x40000, CRC(dfda3f73) SHA1(cca8ccdd501a26cba07365b1238d7b434559bbc6) )
 	ROM_LOAD16_BYTE( "pntnpuzl.u3", 0x00000, 0x40000, CRC(4173f250) SHA1(516fe6f91b925f71c36b97532608b82e63bda436) )
+
+	ROM_REGION( 0x2000, "mcu", 0 )
+	ROM_LOAD( "pntnpzl8798.bin", 0x0000, 0x2000, CRC(3ff98e89) SHA1(c48665992cb5377b69902f2a352c9214602a0b84) )
 
 	/* for reference, probably not used in any way by the game */
 	ROM_REGION( 0x10000, "video_bios", 0 )

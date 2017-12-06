@@ -6,6 +6,7 @@
 
 #include "emu.h"
 #include "patinhofeio_cpu.h"
+#include "patinho_feio_dasm.h"
 #include "debugger.h"
 #include "includes/patinhofeio.h" // FIXME: this is a dependency from devices on MAME
 
@@ -782,8 +783,7 @@ void patinho_feio_cpu_device::execute_instruction()
 	printf("unimplemented opcode: 0x%02X\n", m_opcode);
 }
 
-offs_t patinho_feio_cpu_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+util::disasm_interface *patinho_feio_cpu_device::create_disassembler()
 {
-	extern CPU_DISASSEMBLE( patinho_feio );
-	return CPU_DISASSEMBLE_NAME(patinho_feio)(this, stream, pc, oprom, opram, options);
+	return new patinho_feio_disassembler;
 }

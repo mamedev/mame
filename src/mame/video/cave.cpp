@@ -506,7 +506,7 @@ void cave_state::get_sprite_info_cave(int chip)
 
 	uint16_t *source;
 	uint16_t *finish;
-	struct sprite_cave *sprite = m_sprite[chip];
+	sprite_cave *sprite = m_sprite[chip].get();
 
 	int glob_flipx = m_videoregs[chip][0] & 0x8000;
 	int glob_flipy = m_videoregs[chip][1] & 0x8000;
@@ -623,7 +623,7 @@ void cave_state::get_sprite_info_cave(int chip)
 
 		sprite++;
 	}
-	m_num_sprites[chip] = sprite - m_sprite[chip];
+	m_num_sprites[chip] = sprite - m_sprite[chip].get();
 }
 
 void cave_state::get_sprite_info_donpachi(int chip)
@@ -636,7 +636,7 @@ void cave_state::get_sprite_info_donpachi(int chip)
 	uint16_t *source;
 	uint16_t *finish;
 
-	struct sprite_cave *sprite = m_sprite[chip];
+	sprite_cave *sprite = m_sprite[chip].get();
 
 	int glob_flipx = m_videoregs[chip][0] & 0x8000;
 	int glob_flipy = m_videoregs[chip][1] & 0x8000;
@@ -709,7 +709,7 @@ void cave_state::get_sprite_info_donpachi(int chip)
 
 		sprite++;
 	}
-	m_num_sprites[chip] = sprite - m_sprite[chip];
+	m_num_sprites[chip] = sprite - m_sprite[chip].get();
 }
 
 
@@ -732,8 +732,10 @@ void cave_state::sprite_init_cave()
 	for (int chip = 0; chip < 4; chip++)
 	{
 		m_num_sprites[chip] = m_spriteram[chip].bytes() / 0x10 / 2;
-		m_sprite[chip] = auto_alloc_array_clear(machine(), struct sprite_cave, m_num_sprites[chip]);
-		memset(m_sprite_table, 0, sizeof(m_sprite_table));
+		m_sprite[chip] = std::make_unique<sprite_cave []>(m_num_sprites[chip]);
+		for (auto &prio : m_sprite_table[chip])
+			for (sprite_cave *&spr : prio)
+				spr = nullptr;
 		m_spriteram_bank[chip] = m_spriteram_bank_delay[chip] = 0;
 	}
 
@@ -768,8 +770,8 @@ void cave_state::cave_sprite_check(int chip, screen_device &screen, const rectan
 	}
 
 	{   /* check priority & sprite type */
-		struct sprite_cave *sprite = m_sprite[chip];
-		const struct sprite_cave *finish = &sprite[m_num_sprites[chip]];
+		sprite_cave *sprite = m_sprite[chip].get();
+		const sprite_cave *const finish = &sprite[m_num_sprites[chip]];
 		int i[4] = {0,0,0,0};
 		int priority_check = 0;
 		int spritetype = m_spritetype[1];
@@ -829,7 +831,7 @@ void cave_state::cave_sprite_check(int chip, screen_device &screen, const rectan
 	}
 }
 
-void cave_state::do_blit_zoom32_cave( int chip, const struct sprite_cave *sprite )
+void cave_state::do_blit_zoom32_cave( int chip, const sprite_cave *sprite )
 {
 	/*  assumes SPRITE_LIST_RAW_DATA flag is set */
 	int x1, x2, y1, y2, dx, dy;
@@ -961,7 +963,7 @@ void cave_state::do_blit_zoom32_cave( int chip, const struct sprite_cave *sprite
 }
 
 
-void cave_state::do_blit_zoom32_cave_zb( int chip, const struct sprite_cave *sprite )
+void cave_state::do_blit_zoom32_cave_zb( int chip, const sprite_cave *sprite )
 {
 	/*  assumes SPRITE_LIST_RAW_DATA flag is set */
 	int x1, x2, y1, y2, dx, dy;
@@ -1059,7 +1061,7 @@ void cave_state::do_blit_zoom32_cave_zb( int chip, const struct sprite_cave *spr
 		uint32_t *dest = (uint32_t *)(m_blit.baseaddr + m_blit.line_offset * y1);
 		int pitchz = m_blit.line_offset_zbuf * dy / 2;
 		uint16_t *zbf = (uint16_t *)(m_blit.baseaddr_zbuf + m_blit.line_offset_zbuf * y1);
-		uint16_t pri_sp = (uint16_t)(sprite - m_sprite[chip]) + m_sprite_zbuf_baseval;
+		uint16_t pri_sp = (uint16_t)(sprite - m_sprite[chip].get()) + m_sprite_zbuf_baseval;
 		int ycount = ycount0;
 
 		for (y = y1; y != y2; y += dy)
@@ -1096,7 +1098,7 @@ void cave_state::do_blit_zoom32_cave_zb( int chip, const struct sprite_cave *spr
 	}
 }
 
-void cave_state::do_blit_32_cave( int chip, const struct sprite_cave *sprite )
+void cave_state::do_blit_32_cave( int chip, const sprite_cave *sprite )
 {
 	/*  assumes SPRITE_LIST_RAW_DATA flag is set */
 	int x1, x2, y1, y2, dx, dy;
@@ -1191,7 +1193,7 @@ void cave_state::do_blit_32_cave( int chip, const struct sprite_cave *sprite )
 }
 
 
-void cave_state::do_blit_32_cave_zb( int chip, const struct sprite_cave *sprite )
+void cave_state::do_blit_32_cave_zb( int chip, const sprite_cave *sprite )
 {
 	/*  assumes SPRITE_LIST_RAW_DATA flag is set */
 	int x1, x2, y1, y2, dx, dy;
@@ -1269,7 +1271,7 @@ void cave_state::do_blit_32_cave_zb( int chip, const struct sprite_cave *sprite 
 		uint32_t *dest = (uint32_t *)(m_blit.baseaddr + m_blit.line_offset * y1);
 		int pitchz = m_blit.line_offset_zbuf * dy / 2;
 		uint16_t *zbf = (uint16_t *)(m_blit.baseaddr_zbuf + m_blit.line_offset_zbuf * y1);
-		uint16_t pri_sp = (uint16_t)(sprite - m_sprite[chip]) + m_sprite_zbuf_baseval;
+		uint16_t pri_sp = (uint16_t)(sprite - m_sprite[chip].get()) + m_sprite_zbuf_baseval;
 
 		pen_data += sprite->line_offset * ycount0 + xcount0;
 		for (y = y1; y != y2; y += dy)
@@ -1299,7 +1301,7 @@ void cave_state::sprite_draw_cave( int chip, int priority )
 	int i = 0;
 	while (m_sprite_table[chip][priority][i])
 	{
-		const struct sprite_cave *sprite = m_sprite_table[chip][priority][i++];
+		const sprite_cave *sprite = m_sprite_table[chip][priority][i++];
 		if ((sprite->tile_width == sprite->total_width) && (sprite->tile_height == sprite->total_height))
 			do_blit_32_cave(chip, sprite);
 		else
@@ -1312,7 +1314,7 @@ void cave_state::sprite_draw_cave_zbuf( int chip, int priority )
 	int i = 0;
 	while (m_sprite_table[chip][priority][i])
 	{
-		const struct sprite_cave *sprite = m_sprite_table[chip][priority][i++];
+		const sprite_cave *sprite = m_sprite_table[chip][priority][i++];
 		if ((sprite->tile_width == sprite->total_width) && (sprite->tile_height == sprite->total_height))
 			do_blit_32_cave_zb(chip, sprite);
 		else

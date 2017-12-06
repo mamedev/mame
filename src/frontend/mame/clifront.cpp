@@ -719,7 +719,15 @@ void cli_frontend::listdevices(const std::vector<std::string> &args)
 
 		// sort them by tag
 		std::sort(device_list.begin(), device_list.end(), [](device_t *dev1, device_t *dev2) {
-			return strcmp(dev1->tag(), dev2->tag()) < 0;
+			// end of string < ':' < '0'
+			const char *tag1 = dev1->tag();
+			const char *tag2 = dev2->tag();
+			while (*tag1 == *tag2 && *tag1 != '\0' && *tag2 != '\0')
+			{
+				tag1++;
+				tag2++;
+			}
+			return (*tag1 == ':' ? ' ' : *tag1) < (*tag2 == ':' ? ' ' : *tag2);
 		});
 
 		// dump the results

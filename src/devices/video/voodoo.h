@@ -2003,8 +2003,8 @@ public:
 		tmp = _mm_mul_pd(tmp, _mm_set1_pd(256.0));
 		__m128i tmp2 = _mm_cvttpd_epi32(tmp);
 #ifdef __SSE4_1__
-		sow = _mm_extract_epi32(tmp2, 0);
-		tow = _mm_extract_epi32(tmp2, 1);
+		sow = _mm_extract_epi32(tmp2, 1);
+		tow = _mm_extract_epi32(tmp2, 0);
 #else
 		sow = _mm_cvtsi128_si32(_mm_shuffle_epi32(tmp2, _MM_SHUFFLE(0, 0, 0, 1)));
 		tow = _mm_cvtsi128_si32(tmp2);

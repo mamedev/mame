@@ -154,10 +154,6 @@ public:
 
 	// information used during processing
 	void *                  m_memory;               // pointer to memory backing this entry
-	offs_t                  m_bytestart;            // byte-adjusted start address
-	offs_t                  m_byteend;              // byte-adjusted end address
-	offs_t                  m_bytemirror;           // byte-adjusted mirror bits
-	offs_t                  m_bytemask;             // byte-adjusted mask bits
 
 	// handler setters for 8-bit functions
 	address_map_entry &set_handler(read8_delegate func, u64 mask = 0);

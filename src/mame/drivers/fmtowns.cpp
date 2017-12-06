@@ -2670,6 +2670,9 @@ void towns_state::driver_start()
 	m_towns_cd.buffer_ptr = -1;
 	m_towns_cd.read_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(towns_state::towns_cdrom_read_byte),this), (void*)machine().device("dma_1"));
 
+	save_pointer(m_video.towns_crtc_reg,"CRTC registers",32);
+	save_pointer(m_video.towns_video_reg,"Video registers",2);
+
 	m_maincpu->space(AS_PROGRAM).install_ram(0x100000,m_ram->size()-1,nullptr);
 }
 
@@ -2777,8 +2780,10 @@ static MACHINE_CONFIG_START( towns_base )
 	MCFG_SCREEN_VISIBLE_AREA(0, 768-1, 0, 512-1)
 	MCFG_SCREEN_UPDATE_DRIVER(towns_state, screen_update)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", towns)
-	MCFG_PALETTE_ADD("palette", 256)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette16_0", towns)
+	MCFG_PALETTE_ADD("palette256", 256)
+	MCFG_PALETTE_ADD("palette16_0", 16)
+	MCFG_PALETTE_ADD("palette16_1", 16)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

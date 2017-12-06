@@ -64,13 +64,13 @@ READ8_MEMBER(seattle_comp_state::pic_slave_ack)
 }
 
 
-static ADDRESS_MAP_START(seattle_mem, AS_PROGRAM, 16, seattle_comp_state)
+static ADDRESS_MAP_START(mem_map, AS_PROGRAM, 16, seattle_comp_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00000,0xff7ff) AM_RAM
 	AM_RANGE(0xff800,0xfffff) AM_ROM AM_REGION("user1", 0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(seattle_io, AS_IO, 16, seattle_comp_state)
+static ADDRESS_MAP_START(io_map, AS_IO, 16, seattle_comp_state)
 	//ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0xf0, 0xf1) AM_DEVREADWRITE8("pic1", pic8259_device, read, write, 0xffff)
@@ -100,8 +100,8 @@ DEVICE_INPUT_DEFAULTS_END
 static MACHINE_CONFIG_START( seattle )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8086, XTAL_24MHz / 3) // 8 MHz or 4 MHz selectable
-	MCFG_CPU_PROGRAM_MAP(seattle_mem)
-	MCFG_CPU_IO_MAP(seattle_io)
+	MCFG_CPU_PROGRAM_MAP(mem_map)
+	MCFG_CPU_IO_MAP(io_map)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("pic1", pic8259_device, inta_cb)
 
 	MCFG_DEVICE_ADD("pic1", PIC8259, 0)
@@ -135,7 +135,7 @@ static MACHINE_CONFIG_START( seattle )
 MACHINE_CONFIG_END
 
 /* ROM definition */
-ROM_START( seattle )
+ROM_START( scp300f )
 	ROM_REGION( 0x800, "user1", 0 )
 	ROM_LOAD( "mon86 v1.5tdd", 0x0000, 0x0800, CRC(7db23169) SHA1(c791b02ca33a4e1f8e95eb541624a59738f378c4))
 ROM_END
@@ -143,4 +143,4 @@ ROM_END
 /* Driver */
 
 //    YEAR  NAME     PARENT  COMPAT   MACHINE   INPUT    CLASS               INIT    COMPANY            FULLNAME    FLAGS
-COMP( 1986, seattle, 0,      0,       seattle,  seattle, seattle_comp_state, 0,    "Seattle Computer", "SCP-300F", MACHINE_NO_SOUND_HW )
+COMP( 1986, scp300f, 0,      0,       seattle,  seattle, seattle_comp_state, 0,    "Seattle Computer", "SCP-300F", MACHINE_NO_SOUND_HW )

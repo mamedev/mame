@@ -4,13 +4,13 @@
 
     transwarp.cpp
 
-	Implementation of the Applied Engineering TransWarp accelerator
-	
-	TODO: 
-	- needs built-in language card, it's advertised to work w/o one.
-	- C074 speed control
-	- Doesn't work with Swyft but advertised to; how does h/w get
-	  around the Fxxx ROM not checksumming right?
+    Implementation of the Applied Engineering TransWarp accelerator
+
+    TODO:
+    - needs built-in language card, it's advertised to work w/o one.
+    - C074 speed control
+    - Doesn't work with Swyft but advertised to; how does h/w get
+      around the Fxxx ROM not checksumming right?
 
 *********************************************************************/
 
@@ -37,7 +37,7 @@ ADDRESS_MAP_END
 
 ROM_START( warprom )
 	ROM_REGION(0x1000, "twrom", 0)
-	ROM_LOAD( "ae transwarp rom v1.4.bin", 0x000000, 0x001000, CRC(afe37f55) SHA1(7b75534e7895e04859a0b1337801c6eeb0cef52a) ) 
+	ROM_LOAD( "ae transwarp rom v1.4.bin", 0x000000, 0x001000, CRC(afe37f55) SHA1(7b75534e7895e04859a0b1337801c6eeb0cef52a) )
 ROM_END
 
 static INPUT_PORTS_START( warp )
@@ -121,7 +121,7 @@ ioport_constructor a2bus_transwarp_device::device_input_ports() const
 //-------------------------------------------------
 
 MACHINE_CONFIG_MEMBER( a2bus_transwarp_device::device_add_mconfig )
-	MCFG_CPU_ADD(CPU_TAG, M65C02, XTAL_14_31818MHz/4)
+	MCFG_CPU_ADD(CPU_TAG, M65C02, A2BUS_7M_CLOCK / 2)
 	MCFG_CPU_PROGRAM_MAP(m65c02_mem)
 MACHINE_CONFIG_END
 
@@ -133,7 +133,7 @@ a2bus_transwarp_device::a2bus_transwarp_device(const machine_config &mconfig, de
 	device_t(mconfig, type, tag, owner, clock),
 	device_a2bus_card_interface(mconfig, *this),
 	m_bEnabled(false),
-	m_ourcpu(*this, CPU_TAG), 
+	m_ourcpu(*this, CPU_TAG),
 	m_rom(*this, "twrom"),
 	m_dsw1(*this, "DSW1"),
 	m_dsw2(*this, "DSW2")
@@ -168,17 +168,13 @@ void a2bus_transwarp_device::device_reset()
 	if (!(m_dsw2->read() & 0x80))
 	{
 		if (m_dsw1->read() & 0x80)
-		{
-			m_ourcpu->set_unscaled_clock(XTAL_14_31818MHz/8);			
-		}
+			m_ourcpu->set_unscaled_clock(A2BUS_7M_CLOCK / 4);
 		else
-		{
-			m_ourcpu->set_unscaled_clock(XTAL_14_31818MHz/4);			
-		}
+			m_ourcpu->set_unscaled_clock(A2BUS_7M_CLOCK / 2);
 	}
 	else
 	{
-		m_ourcpu->set_unscaled_clock(1021800);		
+		m_ourcpu->set_unscaled_clock(1021800);
 	}
 }
 
@@ -187,15 +183,11 @@ void a2bus_transwarp_device::device_timer(emu_timer &timer, device_timer_id id, 
 	if (!(m_dsw2->read() & 0x80))
 	{
 		if (m_dsw1->read() & 0x80)
-		{
-			m_ourcpu->set_unscaled_clock(XTAL_14_31818MHz/8);			
-		}
+			m_ourcpu->set_unscaled_clock(A2BUS_7M_CLOCK / 4);
 		else
-		{
-			m_ourcpu->set_unscaled_clock(XTAL_14_31818MHz/4);			
-		}
+			m_ourcpu->set_unscaled_clock(A2BUS_7M_CLOCK / 2);
 	}
-	m_timer->adjust(attotime::never);	
+	m_timer->adjust(attotime::never);
 }
 
 READ8_MEMBER( a2bus_transwarp_device::dma_r )
@@ -220,7 +212,7 @@ READ8_MEMBER( a2bus_transwarp_device::dma_r )
 
 WRITE8_MEMBER( a2bus_transwarp_device::dma_w )
 {
-	//if ((offset >= 0xc070) && (offset <= 0xc07f))	printf("%02x to %04x\n", data, offset);
+	//if ((offset >= 0xc070) && (offset <= 0xc07f)) printf("%02x to %04x\n", data, offset);
 
 	if (offset == 0xc072)
 	{
@@ -244,7 +236,7 @@ void a2bus_transwarp_device::hit_slot(int slot)
 {
 	// only do slot slowdown if acceleration is enabled
 	if (!(m_dsw2->read() & 0x80))
-	{	
+	{
 		// accleration's on, check the specific slot
 		if (m_dsw2->read() & (1<<(slot-1)))
 		{

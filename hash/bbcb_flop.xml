@@ -40,6 +40,17 @@
 		</part>
 	</software>
 
+	<software name="acorndem">
+		<description>Acornsoft Demo Disk v1.0</description>
+		<year>1984</year>
+		<publisher>Acornsoft</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="204800">
+				<rom name="Acornsoft Demo Disk.ssd" size="204800" crc="57015366" sha1="bb72e7cc96ca87c2ebb560f7cb9cba7feb658105" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="acornhit1">
 		<description>The Acornsoft Hits Vol.1</description>
 		<year>1987</year>
@@ -691,6 +702,17 @@
 		</part>
 	</software>
 
+	<software name="revsdemo">
+		<description>Revs Demo</description>
+		<year>1985</year>
+		<publisher>Acornsoft</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="30720">
+				<rom name="Revs Demo.ssd" size="30720" crc="41097c26" sha1="a5151f5286bdfd60d37eb0e1877525dee34d696a" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="scavhunt">
 		<description>Scavenger Hunt</description>
 		<year>1984</year>
@@ -767,6 +789,17 @@
 			<feature name="part_id" value="Disk 2"/>
 			<dataarea name="flop" size="90880">
 				<rom name="SuperiorCollectionVol2-Disk2.ssd" size="90880" crc="5c784da3" sha1="1d7fa62287eb403c2a48ce2c2d2f7f4bbdaf860f" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ssdemo">
+		<description>Superior Software - Demonstration Disc</description>
+		<year>1983</year>
+		<publisher>Superior Software (Demo)</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="156672">
+				<rom name="superiorsoftware-demo.ssd" size="156672" crc="f1142517" sha1="32faa9add514534bd94e0e6a8c01ae2a165e9922" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1213,7 +1246,7 @@
 		<description>ABC</description>
 		<year>1984</year>
 		<publisher>Acornsoft</publisher>
-		<info name="release" value="SBE24" />
+		<info name="release" value="SNE24" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="102400">
 				<rom name="ABC.ssd" size="102400" crc="bdd721b1" sha1="9129f48b9fc439de9cc92924d7e905d0f4156228" offset="0" />
@@ -1561,6 +1594,18 @@
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="102400">
 				<rom name="TimeShare (Fisher-Marriott).ssd" size="102400" crc="60aa3359" sha1="d5d9dd3d8fb03882380e4c2b78dcd35304bc3150" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="treeknow">
+		<description>Tree of Knowledge</description>
+		<year>1983</year>
+		<publisher>Acornsoft</publisher>
+		<info name="release" value="SNE04" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="102400">
+				<rom name="Tree of Knowledge(1983)(Acornsoft).ssd" size="102400" crc="71762857" sha1="90cf78f488804dc0bfc2a8005f20232378de3601" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -2933,6 +2978,18 @@
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="58880">
 				<rom name="beebsid17.ssd" size="58880" crc="b3a15530" sha1="24f43d128d28d4e4072826fc5437ea4ba3e37978" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="beebsid18">
+		<description>BeebSID 18 - Club Hits</description>
+		<year>2017</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="author" value="PitfallJones" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="107520">
+				<rom name="beebsid18.ssd" size="107520" crc="f332ef9f" sha1="6a9946ad960b07758490d7b23b7a6453b27d8baa" offset="0"/>
 			</dataarea>
 		</part>
 	</software>

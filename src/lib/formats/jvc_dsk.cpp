@@ -84,16 +84,20 @@ bool jvc_format::parse_header(io_generic *io, int &header_size, int &tracks, int
 		int os9_total_sectors = pick_integer_be(os9_header, 0x00, 3);
 		int os9_heads = BIT(os9_header[0x10], 0) ? 2 : 1;
 		int os9_sectors = pick_integer_be(os9_header, 0x11, 2);
-		int os9_tracks = os9_total_sectors / os9_sectors / os9_heads;
 
-		// now let's see if we have valid info
-		if ((os9_tracks * os9_heads * os9_sectors * 256) == size)
+		if (os9_total_sectors > 0 && os9_heads > 0 && os9_sectors > 0)
 		{
-			tracks = os9_tracks;
-			heads = os9_heads;
-			sectors = os9_sectors;
+			int os9_tracks = os9_total_sectors / os9_sectors / os9_heads;
 
-			osd_printf_verbose("OS-9 format disk image detected.\n");
+			// now let's see if we have valid info
+			if ((os9_tracks * os9_heads * os9_sectors * 256) == size)
+			{
+				tracks = os9_tracks;
+				heads = os9_heads;
+				sectors = os9_sectors;
+
+				osd_printf_verbose("OS-9 format disk image detected.\n");
+			}
 		}
 	}
 

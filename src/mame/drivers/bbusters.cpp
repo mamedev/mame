@@ -881,8 +881,8 @@ ROM_END
 
 ROM_START( bbustersj )
 	ROM_REGION( 0x80000, "maincpu", 0 )
-	ROM_LOAD16_BYTE( "bb3_ver2_j2.k10", 0x000000, 0x20000, CRC(605eb62f) SHA1(b13afd561731ad9115c5b997b8a7a79a57557612) ) /* red "J2" stamped on program labels - 2 Player version */
-	ROM_LOAD16_BYTE( "bb5_ver2_j2.k12", 0x000001, 0x20000, CRC(9deea26f) SHA1(c5436db0c55da9b0c5e0e053f59a1e17ee4690a6) )
+	ROM_LOAD16_BYTE( "bb3_ver2_j3.k10", 0x000000, 0x20000, CRC(6a1cd941) SHA1(d29775703f30b0a440e5e960006c0d33bb09992c) ) /* red "J3" stamped on program labels - 3 Player version */
+	ROM_LOAD16_BYTE( "bb5_ver2_j3.k12", 0x000001, 0x20000, CRC(7b180752) SHA1(7ae98e3eb81b19a9208e8dae1cdd64796021d034) )
 	ROM_LOAD16_BYTE( "bb-2.k8",    0x040000, 0x20000, CRC(20141805) SHA1(0958579681bda81bcf48d020a14bc147c1e575f1) )
 	ROM_LOAD16_BYTE( "bb-4.k11",   0x040001, 0x20000, CRC(d482e0e9) SHA1(e56ca92965e8954b613ba4b0e3975e3a12840c30) )
 
@@ -929,8 +929,8 @@ ROM_END
 
 ROM_START( bbustersja )
 	ROM_REGION( 0x80000, "maincpu", 0 )
-	ROM_LOAD16_BYTE( "bb3_ver2_j3.k10", 0x000000, 0x20000, CRC(6a1cd941) SHA1(d29775703f30b0a440e5e960006c0d33bb09992c) ) /* red "J3" stamped on program labels - 3 Player version */
-	ROM_LOAD16_BYTE( "bb5_ver2_j3.k12", 0x000001, 0x20000, CRC(7b180752) SHA1(7ae98e3eb81b19a9208e8dae1cdd64796021d034) )
+	ROM_LOAD16_BYTE( "bb3_ver2_j2.k10", 0x000000, 0x20000, CRC(605eb62f) SHA1(b13afd561731ad9115c5b997b8a7a79a57557612) ) /* red "J2" stamped on program labels - 2 Player version */
+	ROM_LOAD16_BYTE( "bb5_ver2_j2.k12", 0x000001, 0x20000, CRC(9deea26f) SHA1(c5436db0c55da9b0c5e0e053f59a1e17ee4690a6) )
 	ROM_LOAD16_BYTE( "bb-2.k8",    0x040000, 0x20000, CRC(20141805) SHA1(0958579681bda81bcf48d020a14bc147c1e575f1) )
 	ROM_LOAD16_BYTE( "bb-4.k11",   0x040001, 0x20000, CRC(d482e0e9) SHA1(e56ca92965e8954b613ba4b0e3975e3a12840c30) )
 
@@ -1164,8 +1164,8 @@ ROM_END
 GAME( 1989, bbusters,   0,        bbusters, bbusters, bbusters_state, 0, ROT0,  "SNK", "Beast Busters (World)",                      MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1989, bbustersu,  bbusters, bbusters, bbusters, bbusters_state, 0, ROT0,  "SNK", "Beast Busters (US, Version 3)",              MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1989, bbustersua, bbusters, bbusters, bbusters, bbusters_state, 0, ROT0,  "SNK", "Beast Busters (US, Version 2)",              MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1989, bbustersj,  bbusters, bbusters, bbusters, bbusters_state, 0, ROT0,  "SNK", "Beast Busters (Japan, Version 2, 2 Player)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1989, bbustersja, bbusters, bbusters, bbusters, bbusters_state, 0, ROT0,  "SNK", "Beast Busters (Japan, Version 2, 3 Player)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1989, bbustersj,  bbusters, bbusters, bbusters, bbusters_state, 0, ROT0,  "SNK", "Beast Busters (Japan, Version 2, 3 Player)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1989, bbustersja, bbusters, bbusters, bbusters, bbusters_state, 0, ROT0,  "SNK", "Beast Busters (Japan, Version 2, 2 Player)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 
 GAME( 1989, mechatt,    0,        mechatt,  mechatt,  bbusters_state, 0, ROT0,  "SNK", "Mechanized Attack (World)",                        MACHINE_SUPPORTS_SAVE )
 GAME( 1989, mechattj,   mechatt,  mechatt,  mechattj, bbusters_state, 0, ROT0,  "SNK", "Mechanized Attack (Japan)",                        MACHINE_SUPPORTS_SAVE )

@@ -63,7 +63,7 @@ std::string to_string(const T& val) {
 }
 #endif
 
-#if defined(_MSC_VER) && _MSC_VER < 1700
+#if defined(_MSC_VER) && _MSC_VER < 1800
 inline long long int strtoll (const char* str, char** endptr, int base)
 {
   return _strtoi64(str, endptr, base);
@@ -76,6 +76,10 @@ inline long long int atoll (const char* str)
 {
   return strtoll(str, NULL, 10);
 }
+#endif
+
+#if defined(_MSC_VER)
+#define strdup _strdup
 #endif
 
 /* windows only pragma */
@@ -222,6 +226,7 @@ inline const TString String(const int i, const int /*base*/ = 10)
 
 struct TSourceLoc {
     void init() { name = nullptr; string = 0; line = 0; column = 0; }
+    void init(int stringNum) { init(); string = stringNum; }
     // Returns the name if it exists. Otherwise, returns the string number.
     std::string getStringNameOrNum(bool quoteStringName = true) const
     {
@@ -235,7 +240,10 @@ struct TSourceLoc {
     int column;
 };
 
-typedef TMap<TString, TString> TPragmaTable;
+class TPragmaTable : public TMap<TString, TString> {
+public:
+    POOL_ALLOCATOR_NEW_DELETE(GetThreadPoolAllocator())
+};
 
 const int MaxTokenLength = 1024;
 

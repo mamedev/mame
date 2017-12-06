@@ -15,23 +15,21 @@
 #include "cpu/tms9900/tms9995.h"
 #include "machine/terminal.h"
 
-#define TERMINAL_TAG "terminal"
 
 class evmbug_state : public driver_device
 {
 public:
 	evmbug_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu"),
-		m_terminal(*this, TERMINAL_TAG)
-	{
-	}
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_terminal(*this, "terminal")
+	{ }
 
 	DECLARE_READ8_MEMBER(rs232_r);
 	DECLARE_WRITE8_MEMBER(rs232_w);
 	void kbd_put(u8 data);
 
-protected:
+private:
 	virtual void machine_reset() override;
 	uint8_t m_term_data;
 	uint8_t m_term_out;
@@ -39,12 +37,12 @@ protected:
 	required_device<generic_terminal_device> m_terminal;
 };
 
-static ADDRESS_MAP_START( evmbug_mem, AS_PROGRAM, 8, evmbug_state )
+static ADDRESS_MAP_START( mem_map, AS_PROGRAM, 8, evmbug_state )
 	AM_RANGE(0x0000, 0x17ff) AM_ROM
 	AM_RANGE(0xec00, 0xefff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( evmbug_io, AS_IO, 8, evmbug_state )
+static ADDRESS_MAP_START( io_map, AS_IO, 8, evmbug_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x0007) AM_WRITE(rs232_w)
 	AM_RANGE(0x0000, 0x0002) AM_READ(rs232_r)
@@ -98,10 +96,10 @@ static MACHINE_CONFIG_START( evmbug )
 	// basic machine hardware
 	// TMS9995 CPU @ 12.0 MHz
 	// We have no lines connected yet
-	MCFG_TMS99xx_ADD("maincpu", TMS9995, 12000000, evmbug_mem, evmbug_io )
+	MCFG_TMS99xx_ADD("maincpu", TMS9995, 12000000, mem_map, io_map )
 
 	/* video hardware */
-	MCFG_DEVICE_ADD(TERMINAL_TAG, GENERIC_TERMINAL, 0)
+	MCFG_DEVICE_ADD("terminal", GENERIC_TERMINAL, 0)
 	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(PUT(evmbug_state, kbd_put))
 MACHINE_CONFIG_END
 

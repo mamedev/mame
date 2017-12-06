@@ -34,13 +34,12 @@ private:
 };
 
 
-static ADDRESS_MAP_START( rd100_mem, AS_PROGRAM, 8, rd100_state )
+static ADDRESS_MAP_START( mem_map, AS_PROGRAM, 8, rd100_state )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x87ff) AM_RAM
+	AM_RANGE(0x0000, 0x7fff) AM_RAM
+	//AM_RANGE(0x8640, 0x8643)  // device
+	//AM_RANGE(0x8700, 0x8700)  // device
 	AM_RANGE(0x8800, 0xffff) AM_ROM AM_REGION("roms", 0x800)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( rd100_io, AS_IO, 8, rd100_state )
 ADDRESS_MAP_END
 
 /* Input ports */
@@ -89,8 +88,7 @@ MACHINE_RESET_MEMBER( rd100_state, rd100 )
 static MACHINE_CONFIG_START( rd100 )
 	// basic machine hardware
 	MCFG_CPU_ADD("maincpu",M6809E, XTAL_4MHz)  // freq unknown
-	MCFG_CPU_PROGRAM_MAP(rd100_mem)
-	MCFG_CPU_IO_MAP(rd100_io)
+	MCFG_CPU_PROGRAM_MAP(mem_map)
 
 	MCFG_MACHINE_RESET_OVERRIDE(rd100_state, rd100)
 

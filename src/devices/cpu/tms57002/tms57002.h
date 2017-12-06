@@ -35,9 +35,7 @@ protected:
 	virtual uint32_t execute_max_cycles() const override;
 	virtual uint32_t execute_input_lines() const override;
 	virtual void execute_run() override;
-	virtual uint32_t disasm_min_opcode_bytes() const override;
-	virtual uint32_t disasm_max_opcode_bytes() const override;
-	virtual offs_t disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
+	virtual util::disasm_interface *create_disassembler() override;
 
 private:
 	enum {

@@ -29,6 +29,8 @@ files {
 	MAME_DIR .. "src/devices/machine/ram.h",
 	MAME_DIR .. "src/devices/machine/legscsi.cpp",
 	MAME_DIR .. "src/devices/machine/legscsi.h",
+	MAME_DIR .. "src/devices/machine/sdlc.cpp",
+	MAME_DIR .. "src/devices/machine/sdlc.h",
 	MAME_DIR .. "src/devices/machine/terminal.cpp",
 	MAME_DIR .. "src/devices/machine/terminal.h",
 	MAME_DIR .. "src/devices/machine/timer.cpp",
@@ -668,6 +670,18 @@ if (MACHINES["ATAFLASH"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/machine/ataflash.cpp",
 		MAME_DIR .. "src/devices/machine/ataflash.h",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/devices/machine/atmel_arm_aic.h,MACHINES["ARM_AIC"] = true
+---------------------------------------------------
+
+if (MACHINES["ARM_AIC"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/atmel_arm_aic.cpp",
+		MAME_DIR .. "src/devices/machine/atmel_arm_aic.h",
 	}
 end
 
@@ -3285,5 +3299,29 @@ if (MACHINES["I82586"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/machine/i82586.cpp",
 		MAME_DIR .. "src/devices/machine/i82586.h",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/devices/machine/adc0844.h,MACHINES["ADC0844"] = true
+---------------------------------------------------
+
+if (MACHINES["ADC0844"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/adc0844.cpp",
+		MAME_DIR .. "src/devices/machine/adc0844.h",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/devices/machine/28fxxx.h,MACHINES["28FXXX"] = true
+---------------------------------------------------
+
+if (MACHINES["28FXXX"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/28fxxx.cpp",
+		MAME_DIR .. "src/devices/machine/28fxxx.h",
 	}
 end

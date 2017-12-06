@@ -91,6 +91,8 @@
 #define MCFG_EEPROM_SERIAL_DATA MCFG_EEPROM_DATA
 #define MCFG_EEPROM_SERIAL_DEFAULT_VALUE MCFG_EEPROM_DEFAULT_VALUE
 
+#define MCFG_EEPROM_SERIAL_DO_CALLBACK(_devcb) \
+	devcb = &eeprom_serial_base_device::static_set_do_callback(*device, DEVCB_##_devcb);
 
 
 //**************************************************************************
@@ -107,6 +109,10 @@ public:
 	static void static_set_address_bits(device_t &device, int addrbits);
 	static void static_enable_streaming(device_t &device);
 	static void static_enable_output_on_falling_clock(device_t &device);
+	template<class Object> static devcb_base &static_set_do_callback(device_t &device, Object &&object)
+	{
+		return downcast<eeprom_serial_base_device &>(device).m_do_cb.set_callback(std::forward<Object>(object));
+	}
 
 protected:
 	// construction/destruction
@@ -174,6 +180,7 @@ protected:
 	uint8_t         m_command_address_bits;     // number of address bits in a command
 	bool            m_streaming_enabled;        // true if streaming is enabled
 	bool            m_output_on_falling_clock_enabled;  // true if the output pin is updated on the falling edge of the clock
+	devcb_write_line m_do_cb;                   // callback to push state of DO line
 
 	// runtime state
 	eeprom_state    m_state;                    // current internal state

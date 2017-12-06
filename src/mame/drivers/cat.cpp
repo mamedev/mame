@@ -1070,7 +1070,7 @@ static MACHINE_CONFIG_START( cat )
 
 	MCFG_VIDEO_START_OVERRIDE(cat_state,cat)
 
-	MCFG_MC68681_ADD( "duartn68681", (XTAL_19_968MHz*2)/11 ) // duart is normally clocked by 3.6864mhz xtal, but cat seemingly uses a divider from the main xtal instead which probably yields 3.63054545Mhz. There is a trace to cut and a mounting area to allow using an actual 3.6864mhz xtal if you so desire
+	MCFG_DEVICE_ADD( "duartn68681", MC68681, (XTAL_19_968MHz*2)/11 ) // duart is normally clocked by 3.6864mhz xtal, but cat seemingly uses a divider from the main xtal instead which probably yields 3.63054545Mhz. There is a trace to cut and a mounting area to allow using an actual 3.6864mhz xtal if you so desire
 	MCFG_MC68681_IRQ_CALLBACK(WRITELINE(cat_state, cat_duart_irq_handler))
 	MCFG_MC68681_A_TX_CALLBACK(WRITELINE(cat_state, cat_duart_txa))
 	MCFG_MC68681_B_TX_CALLBACK(WRITELINE(cat_state, cat_duart_txb))

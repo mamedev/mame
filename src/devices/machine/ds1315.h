@@ -37,7 +37,7 @@ public:
 
 	// this handler automates the bits 0/2 stuff
 	DECLARE_READ8_MEMBER(read);
-	
+
 	DECLARE_READ8_MEMBER(read_0);
 	DECLARE_READ8_MEMBER(read_1);
 	DECLARE_READ8_MEMBER(read_data);
@@ -56,7 +56,7 @@ protected:
 
 private:
 	devcb_read8 m_backing_read;
-	
+
 	enum mode_t : u8
 	{
 		DS_SEEK_MATCHING,

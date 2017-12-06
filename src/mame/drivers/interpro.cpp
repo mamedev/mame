@@ -104,8 +104,10 @@
  *   U35   128 kB EPROM (MPRGW510B)  Boot ROM
  *   U43?  (MPRGM610P)               Bitstream for XC3020?
  *   U44   Intel 82596SX             Ethernet controller (20MHz)
+ *   U67   Intel N28F010-200         128Kx8 flash memory (200ns)
  *   U68   CYID21603 TC150G89AF
  *   U71   LSI L1A6104 CICD 95801    Intergraph I/O gate array
+ *   U76   Intel N28F010-200         128Kx8 flash memory (200ns)
  *   U81   NCR 53C94                 SCSI controller
  *   U86   24.0 MHz crystal          Clock source for 53C94?
  *   U87   4.9152 MHz crystal        Clock source for 8530s?
@@ -129,7 +131,9 @@
  *   U43?  (MPRGM610P)               Bitstream for XC3020?
  *   U44   Intel 82596SX?            Ethernet controller
  *   U68   CYID21603 TC150G89AF
+ *   U67   Intel N28F010             128Kx8 flash memory
  *   U71   LSI L1A7374 CIDC094A3     Intergraph I/O gate array
+ *   U76   Intel N28F010             128Kx8 flash memory
  *   U81   NCR 53C94                 SCSI controller
  *   U86   24.0 MHz crystal          Clock source for 53C94?
  *   U87   4.9152 MHz crystal        Clock source for 8530s?
@@ -155,14 +159,6 @@
 #define VERBOSE 0
 #include "logmacro.h"
 
-// FIXME: eeprom/flash device embedded here until real device is known
-DEFINE_DEVICE_TYPE(INTERPRO_EEPROM, interpro_eeprom_device, "interpro_eeprom", "InterPro Flash EEPROM");
-
-interpro_eeprom_device::interpro_eeprom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: eeprom_base_device(mconfig, INTERPRO_EEPROM, tag, owner)
-{
-}
-
 void interpro_state::machine_start()
 {
 	// FIXME: disabled for now to avoid cold start diagnostic errors
@@ -186,8 +182,14 @@ void interpro_state::machine_reset()
 	m_sreg_ctrl1 = CTRL1_FLOPLOW;
 }
 
-DRIVER_INIT_MEMBER(interpro_state, interpro)
+DRIVER_INIT_MEMBER(interpro_state, common)
 {
+}
+
+DRIVER_INIT_MEMBER(turquoise_state, turquoise)
+{
+	interpro_state::init_common();
+
 	// FIXME: not all memory sizes are reported properly using fdm "5 inqhw" and
 	// "optimum_memory" commands
 
@@ -197,11 +199,26 @@ DRIVER_INIT_MEMBER(interpro_state, interpro)
 	// 128 = reports 128M, 16x8
 	// 256 = reports 256M, 32x8
 
-	// grab the main memory space from the mmu
-	address_space &space = m_mmu->space(0);
+	// map the configured ram
+	m_d_cammu->space(0).install_ram(0, m_ram->mask(), m_ram->pointer());
+	m_i_cammu->space(0).install_ram(0, m_ram->mask(), m_ram->pointer());
+}
+
+DRIVER_INIT_MEMBER(sapphire_state, sapphire)
+{
+	interpro_state::init_common();
+
+	// FIXME: not all memory sizes are reported properly using fdm "5 inqhw" and
+	// "optimum_memory" commands
+
+	// 16 = reports 16M, banks empty?
+	// 32 = reports 16M, banks empty?
+	// 64 = reports 128M, 16x8
+	// 128 = reports 128M, 16x8
+	// 256 = reports 256M, 32x8
 
 	// map the configured ram
-	space.install_ram(0, m_ram->mask(), m_ram->pointer());
+	m_mmu->space(0).install_ram(0, m_ram->mask(), m_ram->pointer());
 }
 
 WRITE16_MEMBER(interpro_state::sreg_led_w)
@@ -242,7 +259,9 @@ WRITE16_MEMBER(sapphire_state::sreg_ctrl2_w)
 {
 	interpro_state::sreg_ctrl2_w(space, offset, data, mem_mask);
 
-	m_eeprom->write_enable(data & CTRL2_FLASHEN ? ASSERT_LINE : CLEAR_LINE);
+	// enable/disable programming power on both flash devices
+	m_flash_lo->vpp(data & CTRL2_FLASHEN ? ASSERT_LINE : CLEAR_LINE);
+	m_flash_hi->vpp(data & CTRL2_FLASHEN ? ASSERT_LINE : CLEAR_LINE);
 }
 
 READ16_MEMBER(interpro_state::sreg_error_r)
@@ -301,12 +320,20 @@ READ8_MEMBER(interpro_state::nodeid_r)
 }
 
 // these maps connect the cpu virtual addresses to the mmu
-static ADDRESS_MAP_START(clipper_insn_map, AS_PROGRAM, 32, interpro_state)
-	AM_RANGE(0x00000000, 0xffffffff) AM_DEVREAD32(INTERPRO_MMU_TAG, cammu_device, insn_r, 0xffffffff)
+static ADDRESS_MAP_START(c300_insn_map, AS_PROGRAM, 32, interpro_state)
+	AM_RANGE(0x00000000, 0xffffffff) AM_DEVREAD(INTERPRO_MMU_TAG "_i", cammu_device, read)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(clipper_data_map, AS_DATA, 32, interpro_state)
-	AM_RANGE(0x00000000, 0xffffffff) AM_DEVREADWRITE32(INTERPRO_MMU_TAG, cammu_device, data_r, data_w, 0xffffffff)
+static ADDRESS_MAP_START(c300_data_map, AS_DATA, 32, interpro_state)
+	AM_RANGE(0x00000000, 0xffffffff) AM_DEVREADWRITE(INTERPRO_MMU_TAG "_d", cammu_device, read, write)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START(c400_insn_map, AS_PROGRAM, 32, interpro_state)
+	AM_RANGE(0x00000000, 0xffffffff) AM_DEVREAD(INTERPRO_MMU_TAG, cammu_device, read)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START(c400_data_map, AS_DATA, 32, interpro_state)
+	AM_RANGE(0x00000000, 0xffffffff) AM_DEVREADWRITE(INTERPRO_MMU_TAG, cammu_device, read, write)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(interpro_common_map, 0, 32, interpro_state)
@@ -376,19 +403,22 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START(sapphire_main_map, 0, 32, sapphire_state)
 	AM_RANGE(0x00000000, 0x00ffffff) AM_RAM AM_SHARE(RAM_TAG)
 	AM_RANGE(0x7f100000, 0x7f11ffff) AM_ROM AM_REGION(INTERPRO_EPROM_TAG, 0)
-	AM_RANGE(0x7f180000, 0x7f1bffff) AM_DEVREADWRITE16(INTERPRO_EEPROM_TAG, interpro_eeprom_device, eeprom_r, eeprom_w, 0xffffffff)
+	AM_RANGE(0x7f180000, 0x7f1fffff) AM_DEVREADWRITE8(INTERPRO_FLASH_TAG "_lo", intel_28f010_device, read, write, 0x00ff00ff) AM_MASK(0x3ffff)
+	AM_RANGE(0x7f180000, 0x7f1fffff) AM_DEVREADWRITE8(INTERPRO_FLASH_TAG "_hi", intel_28f010_device, read, write, 0xff00ff00) AM_MASK(0x3ffff)
 
 	AM_IMPORT_FROM(sapphire_base_map)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(turquoise_io_map, 1, 32, interpro_state)
-	AM_RANGE(0x00000000, 0x00001fff) AM_DEVICE(INTERPRO_MMU_TAG, cammu_device, map)
+	AM_RANGE(0x00000800, 0x000009ff) AM_DEVICE(INTERPRO_MMU_TAG "_d", cammu_c3_device, map)
+	AM_RANGE(0x00000a00, 0x00000bff) AM_DEVICE(INTERPRO_MMU_TAG "_i", cammu_c3_device, map)
+	AM_RANGE(0x00000c00, 0x00000dff) AM_DEVICE(INTERPRO_MMU_TAG "_d", cammu_c3_device, map_global)
 
 	AM_IMPORT_FROM(turquoise_base_map)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(sapphire_io_map, 1, 32, interpro_state)
-	AM_RANGE(0x00000000, 0x00001fff) AM_DEVICE(INTERPRO_MMU_TAG, cammu_device, map)
+	AM_RANGE(0x00000000, 0x00001fff) AM_DEVICE(INTERPRO_MMU_TAG, cammu_c4_device, map)
 
 	AM_IMPORT_FROM(sapphire_base_map)
 ADDRESS_MAP_END
@@ -487,8 +517,6 @@ static MACHINE_CONFIG_START(ioga)
 	// ioga floppy terminal count, ethernet channel attention
 	MCFG_INTERPRO_IOGA_FDCTC_CB(DEVWRITELINE(INTERPRO_FDC_TAG, upd765_family_device, tc_line_w))
 	MCFG_INTERPRO_IOGA_ETH_CA_CB(DEVWRITELINE(INTERPRO_ETH_TAG, i82586_base_device, ca))
-
-	MCFG_INTERPRO_IOGA_DMA_BUS(INTERPRO_CAMMU_TAG, 0)
 MACHINE_CONFIG_END
 
 static INPUT_PORTS_START(interpro)
@@ -542,15 +570,24 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED(turquoise, interpro)
 	MCFG_CPU_ADD(INTERPRO_CPU_TAG, CLIPPER_C300, XTAL_12_5MHz)
-	MCFG_CPU_PROGRAM_MAP(clipper_insn_map)
-	MCFG_CPU_DATA_MAP(clipper_data_map)
+	MCFG_CPU_PROGRAM_MAP(c300_insn_map)
+	MCFG_CPU_DATA_MAP(c300_data_map)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE(INTERPRO_IOGA_TAG, interpro_ioga_device, acknowledge_interrupt)
 
-	MCFG_DEVICE_ADD(INTERPRO_MMU_TAG, CAMMU_C3, 0)
+	MCFG_DEVICE_ADD(INTERPRO_MMU_TAG "_i", CAMMU_C3, 0)
 	MCFG_DEVICE_ADDRESS_MAP(0, turquoise_main_map)
 	MCFG_DEVICE_ADDRESS_MAP(1, turquoise_io_map)
 	MCFG_DEVICE_ADDRESS_MAP(2, interpro_boot_map)
 	MCFG_CAMMU_SSW_CB(DEVREAD32(INTERPRO_CPU_TAG, clipper_device, get_ssw))
+	MCFG_CAMMU_EXCEPTION_CB(DEVWRITE16(INTERPRO_CPU_TAG, clipper_device, set_exception))
+
+	MCFG_DEVICE_ADD(INTERPRO_MMU_TAG "_d", CAMMU_C3, 0)
+	MCFG_DEVICE_ADDRESS_MAP(0, turquoise_main_map)
+	MCFG_DEVICE_ADDRESS_MAP(1, turquoise_io_map)
+	MCFG_DEVICE_ADDRESS_MAP(2, interpro_boot_map)
+	MCFG_CAMMU_SSW_CB(DEVREAD32(INTERPRO_CPU_TAG, clipper_device, get_ssw))
+	MCFG_CAMMU_EXCEPTION_CB(DEVWRITE16(INTERPRO_CPU_TAG, clipper_device, set_exception))
+	MCFG_CAMMU_LINK(INTERPRO_MMU_TAG "_i")
 
 	// boot fails memory test without this
 	MCFG_DEVICE_MODIFY(RAM_TAG)
@@ -588,13 +625,17 @@ static MACHINE_CONFIG_DERIVED(turquoise, interpro)
 
 	// i/o gate array
 	MCFG_DEVICE_ADD(INTERPRO_IOGA_TAG, TURQUOISE_IOGA, 0)
+	MCFG_INTERPRO_IOGA_MEMORY(INTERPRO_MMU_TAG "_d", 0)
 	MCFG_FRAGMENT_ADD(ioga)
+
+	MCFG_DEVICE_MODIFY(INTERPRO_SRBUS_TAG)
+	MCFG_SR_MEMORY(INTERPRO_MMU_TAG "_d", 0, 1)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED(sapphire, interpro)
 	MCFG_CPU_ADD(INTERPRO_CPU_TAG, CLIPPER_C400, XTAL_12_5MHz)
-	MCFG_CPU_PROGRAM_MAP(clipper_insn_map)
-	MCFG_CPU_DATA_MAP(clipper_data_map)
+	MCFG_CPU_PROGRAM_MAP(c400_insn_map)
+	MCFG_CPU_DATA_MAP(c400_data_map)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE(INTERPRO_IOGA_TAG, interpro_ioga_device, acknowledge_interrupt)
 
 	MCFG_DEVICE_ADD(INTERPRO_MMU_TAG, CAMMU_C4T, 0)
@@ -602,6 +643,7 @@ static MACHINE_CONFIG_DERIVED(sapphire, interpro)
 	MCFG_DEVICE_ADDRESS_MAP(1, sapphire_io_map)
 	MCFG_DEVICE_ADDRESS_MAP(2, interpro_boot_map)
 	MCFG_CAMMU_SSW_CB(DEVREAD32(INTERPRO_CPU_TAG, clipper_device, get_ssw))
+	MCFG_CAMMU_EXCEPTION_CB(DEVWRITE16(INTERPRO_CPU_TAG, clipper_device, set_exception))
 
 	// memory control gate array
 	MCFG_DEVICE_ADD(INTERPRO_MCGA_TAG, INTERPRO_FMCC, 0)
@@ -633,12 +675,16 @@ static MACHINE_CONFIG_DERIVED(sapphire, interpro)
 
 	// i/o gate array
 	MCFG_DEVICE_ADD(INTERPRO_IOGA_TAG, SAPPHIRE_IOGA, 0)
+	MCFG_INTERPRO_IOGA_MEMORY(INTERPRO_MMU_TAG, 0)
 	MCFG_FRAGMENT_ADD(ioga)
 
-	// eeprom
-	MCFG_DEVICE_ADD(INTERPRO_EEPROM_TAG, INTERPRO_EEPROM, 0)
-	MCFG_EEPROM_SIZE(0x20000, 16)
-	MCFG_EEPROM_WRITE_TIME(attotime::from_usec(1000))
+	// flash memory
+	MCFG_DEVICE_ADD(INTERPRO_FLASH_TAG "_lo", INTEL_28F010, 0)
+	MCFG_DEVICE_ADD(INTERPRO_FLASH_TAG "_hi", INTEL_28F010, 0)
+
+	// sr bus address spaces
+	MCFG_DEVICE_MODIFY(INTERPRO_SRBUS_TAG)
+	MCFG_SR_MEMORY(INTERPRO_MMU_TAG, 0, 1)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_DERIVED(ip2000, turquoise)
@@ -684,8 +730,11 @@ ROM_START(ip2400)
 	ROM_SYSTEM_BIOS(0, "ip2400", "InterPro 2400 EPROM")
 	ROMX_LOAD("mprgw510b__05_16_92.u35", 0x00000, 0x20000, CRC(3b2c4545) SHA1(4e4c98d1cd1035a04be8527223f44d0b687ec3ef), ROM_BIOS(1))
 
-	ROM_REGION16_LE(0x0040000, INTERPRO_EEPROM_TAG, 0)
-	ROM_LOAD_OPTIONAL("c4saph.bin", 0x00000, 0x40000, CRC(a0c0899f) SHA1(dda6fbca81f9885a1a76ca3c25e80463a83a0ef7))
+	ROM_REGION(0x20000, INTERPRO_FLASH_TAG "_lo", 0)
+	ROM_LOAD_OPTIONAL("y225.u76", 0x00000, 0x20000, CRC(46c0b105) SHA1(7c4a104e4fb3d0e5e8db7c911cdfb3f5c4fb0218))
+
+	ROM_REGION(0x20000, INTERPRO_FLASH_TAG "_hi", 0)
+	ROM_LOAD_OPTIONAL("y226.u67", 0x00000, 0x20000, CRC(54d95730) SHA1(a4e114dee1567d8aa31eed770f7cc366588f395c))
 ROM_END
 
 ROM_START(ip2500)
@@ -696,8 +745,11 @@ ROM_START(ip2500)
 	ROM_SYSTEM_BIOS(0, "ip2500", "InterPro 2500 EPROM")
 	ROMX_LOAD("ip2500_eprom.bin", 0x00000, 0x20000, NO_DUMP, ROM_BIOS(1))
 
-	ROM_REGION16_LE(0x0040000, INTERPRO_EEPROM_TAG, 0)
-	ROM_LOAD_OPTIONAL("c4saph.bin", 0x00000, 0x40000, CRC(a0c0899f) SHA1(dda6fbca81f9885a1a76ca3c25e80463a83a0ef7))
+	ROM_REGION(0x20000, INTERPRO_FLASH_TAG "_lo", 0)
+	ROM_LOAD_OPTIONAL("y225.u76", 0x00000, 0x20000, CRC(46c0b105) SHA1(7c4a104e4fb3d0e5e8db7c911cdfb3f5c4fb0218))
+
+	ROM_REGION(0x20000, INTERPRO_FLASH_TAG "_hi", 0)
+	ROM_LOAD_OPTIONAL("y226.u67", 0x00000, 0x20000, CRC(54d95730) SHA1(a4e114dee1567d8aa31eed770f7cc366588f395c))
 ROM_END
 
 ROM_START(ip2700)
@@ -708,8 +760,11 @@ ROM_START(ip2700)
 	ROM_SYSTEM_BIOS(0, "ip2700", "InterPro 2700 EPROM")
 	ROMX_LOAD("mprgz530a__9405181.u35", 0x00000, 0x20000, CRC(467ce7bd) SHA1(53faee40d5df311f53b24c930e434cbf94a5c4aa), ROM_BIOS(1))
 
-	ROM_REGION16_LE(0x0040000, INTERPRO_EEPROM_TAG, 0)
-	ROM_LOAD_OPTIONAL("c4saph.bin", 0x00000, 0x40000, CRC(a0c0899f) SHA1(dda6fbca81f9885a1a76ca3c25e80463a83a0ef7))
+	ROM_REGION(0x20000, INTERPRO_FLASH_TAG "_lo", 0)
+	ROM_LOAD_OPTIONAL("y225.u76", 0x00000, 0x20000, CRC(46c0b105) SHA1(7c4a104e4fb3d0e5e8db7c911cdfb3f5c4fb0218))
+
+	ROM_REGION(0x20000, INTERPRO_FLASH_TAG "_hi", 0)
+	ROM_LOAD_OPTIONAL("y226.u67", 0x00000, 0x20000, CRC(54d95730) SHA1(a4e114dee1567d8aa31eed770f7cc366588f395c))
 ROM_END
 
 ROM_START(ip2800)
@@ -720,13 +775,16 @@ ROM_START(ip2800)
 	ROM_SYSTEM_BIOS(0, "ip2800", "InterPro 2800 EPROM")
 	ROMX_LOAD("ip2800_eprom.bin", 0x00000, 0x20000, CRC(467ce7bd) SHA1(53faee40d5df311f53b24c930e434cbf94a5c4aa), ROM_BIOS(1))
 
-	ROM_REGION16_LE(0x0040000, INTERPRO_EEPROM_TAG, 0)
-	ROM_LOAD_OPTIONAL("c4saph.bin", 0x00000, 0x40000, CRC(a0c0899f) SHA1(dda6fbca81f9885a1a76ca3c25e80463a83a0ef7))
+	ROM_REGION(0x20000, INTERPRO_FLASH_TAG "_lo", 0)
+	ROM_LOAD_OPTIONAL("y225.u76", 0x00000, 0x20000, CRC(46c0b105) SHA1(7c4a104e4fb3d0e5e8db7c911cdfb3f5c4fb0218))
+
+	ROM_REGION(0x20000, INTERPRO_FLASH_TAG "_hi", 0)
+	ROM_LOAD_OPTIONAL("y226.u67", 0x00000, 0x20000, CRC(54d95730) SHA1(a4e114dee1567d8aa31eed770f7cc366588f395c))
 ROM_END
 
-/*    YEAR   NAME        PARENT  COMPAT  MACHINE     INPUT     CLASS            INIT      COMPANY         FULLNAME         FLAGS */
-COMP( 1989,  ip2000,     0,      0,      ip2000,     interpro, turquoise_state, interpro, "Intergraph",   "InterPro 2000", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
-COMP( 1991?, ip2400,     0,      0,      ip2400,     interpro, sapphire_state,  interpro, "Intergraph",   "InterPro 2400", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
-COMP( 1993?, ip2500,     0,      0,      ip2500,     interpro, sapphire_state,  interpro, "Intergraph",   "InterPro 2500", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
-COMP( 1992,  ip2700,     0,      0,      ip2700,     interpro, sapphire_state,  interpro, "Intergraph",   "InterPro 2700", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
-COMP( 1994,  ip2800,     0,      0,      ip2800,     interpro, sapphire_state,  interpro, "Intergraph",   "InterPro 2800", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+/*    YEAR   NAME        PARENT  COMPAT  MACHINE     INPUT     CLASS            INIT       COMPANY         FULLNAME         FLAGS */
+COMP( 1989,  ip2000,     0,      0,      ip2000,     interpro, turquoise_state, turquoise, "Intergraph",   "InterPro 2000", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+COMP( 1991?, ip2400,     0,      0,      ip2400,     interpro, sapphire_state,  sapphire,  "Intergraph",   "InterPro 2400", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+COMP( 1993?, ip2500,     0,      0,      ip2500,     interpro, sapphire_state,  sapphire,  "Intergraph",   "InterPro 2500", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+COMP( 1992,  ip2700,     0,      0,      ip2700,     interpro, sapphire_state,  sapphire,  "Intergraph",   "InterPro 2700", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+COMP( 1994,  ip2800,     0,      0,      ip2800,     interpro, sapphire_state,  sapphire,  "Intergraph",   "InterPro 2800", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

@@ -1,7 +1,8 @@
 // license:GPL-2.0+
 // copyright-holders: Olivier Galibert, Juergen Buchmueller, Krzysztof Strzecha, Robbbert
 /***************************************************************************
-    zx.c
+
+    ZX-80/ZX-81 and derivatives
 
     Original driver by:
     Juergen Buchmueller, Dec 1999
@@ -80,6 +81,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( pow3000_io_map, AS_IO, 8, zx_state )
 	AM_RANGE(0x0000, 0xffff) AM_READWRITE(pow3000_io_r, zx81_io_w)
 ADDRESS_MAP_END
+
 
 /* Input Ports */
 
@@ -307,18 +309,14 @@ INPUT_PORTS_END
 
 /* Palette Initialization */
 
-
 PALETTE_INIT_MEMBER(zx_state, zx)
 {
 	palette.set_pen_color(0, rgb_t::white());
 	palette.set_pen_color(1, rgb_t::black());
 }
 
-PALETTE_INIT_MEMBER(zx_state,ts1000)
-{
-	palette.set_pen_color(0, rgb_t(64, 244, 244)); /* cyan */
-	palette.set_pen_color(1, rgb_t::black());
-}
+
+/* Machine Configs */
 
 static MACHINE_CONFIG_START( zx80 )
 	/* basic machine hardware */
@@ -383,12 +381,10 @@ static MACHINE_CONFIG_DERIVED( zx81_spk, zx81 )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( ts1000, zx81 )
-	MCFG_PALETTE_MODIFY("palette")
-	MCFG_PALETTE_INIT_OWNER(zx_state, ts1000)
-
 	/* internal ram */
 	MCFG_RAM_MODIFY(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("2K")
+	MCFG_RAM_EXTRA_OPTIONS("1K,16K,32K,48K")
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( ts1500, ts1000 )
@@ -491,6 +487,7 @@ ROM_START( zx97 )
 	ROM_REGION( 0x8000, "maincpu", 0 )
 	ROM_LOAD( "zx97.rom", 0x0000, 0x8000, CRC(5cf49744) SHA1(b2a486efdc7b2bc3dc8e5a441ea5532bfa3207bd) )
 ROM_END
+
 
 /* Game Drivers */
 

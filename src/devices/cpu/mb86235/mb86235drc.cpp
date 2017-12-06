@@ -498,7 +498,6 @@ void mb86235_device::static_generate_memory_accessors()
 	UML_CMP(block, I0, 0x400);
 	UML_JMPc(block, COND_GE, label);
 	// internal A-RAM
-	UML_SHL(block, I0, I0, 2);
 	UML_READ(block, I1, I0, SIZE_DWORD, SPACE_DATA);
 	UML_RET(block);
 	// external
@@ -506,7 +505,6 @@ void mb86235_device::static_generate_memory_accessors()
 	UML_AND(block, I0, I0, 0x3fff);
 	UML_AND(block, I2, mem(&m_core->eb), ~0x3fff);
 	UML_OR(block, I0, I0, I2);
-	UML_SHL(block, I0, I0, 2);
 	UML_READ(block, I1, I0, SIZE_DWORD, SPACE_DATA);
 	UML_RET(block);
 
@@ -523,7 +521,6 @@ void mb86235_device::static_generate_memory_accessors()
 	UML_CMP(block, I0, 0x400);
 	UML_JMPc(block, COND_GE, label);
 	// internal A-RAM
-	UML_SHL(block, I0, I0, 2);
 	UML_WRITE(block, I0, I1, SIZE_DWORD, SPACE_DATA);
 	UML_RET(block);
 	// external
@@ -531,7 +528,6 @@ void mb86235_device::static_generate_memory_accessors()
 	UML_AND(block, I0, I0, 0x3fff);
 	UML_AND(block, I2, mem(&m_core->eb), ~0x3fff);
 	UML_OR(block, I0, I0, I2);
-	UML_SHL(block, I0, I0, 2);
 	UML_WRITE(block, I0, I1, SIZE_DWORD, SPACE_DATA);
 	UML_RET(block);
 
@@ -1666,7 +1662,6 @@ void mb86235_device::generate_xfer1(drcuml_block *block, compiler_state *compile
 				generate_ea(block, compiler, desc, md, sr & 7, ary, disp5);
 				if (sr & 0x20)  // RAM-B
 				{
-					UML_SHL(block, I0, I0, 2);
 					UML_READ(block, I1, I0, SIZE_DWORD, SPACE_IO);
 				}
 				else // RAM-A
@@ -1684,7 +1679,6 @@ void mb86235_device::generate_xfer1(drcuml_block *block, compiler_state *compile
 				generate_ea(block, compiler, desc, md, dr & 7, ary, disp5);
 				if (dr & 0x20)  // RAM-B
 				{
-					UML_SHL(block, I0, I0, 2);
 					UML_WRITE(block, I0, I1, SIZE_DWORD, SPACE_IO);
 				}
 				else // RAM-A
@@ -1743,7 +1737,6 @@ void mb86235_device::generate_xfer2(drcuml_block *block, compiler_state *compile
 					generate_ea(block, compiler, desc, md, sr & 7, ary, disp14);
 					if (sr & 0x20)  // RAM-B
 					{
-						UML_SHL(block, I0, I0, 2);
 						UML_READ(block, I1, I0, SIZE_DWORD, SPACE_IO);
 					}
 					else // RAM-A
@@ -1761,7 +1754,6 @@ void mb86235_device::generate_xfer2(drcuml_block *block, compiler_state *compile
 					generate_ea(block, compiler, desc, md, dr & 7, ary, disp14);
 					if (dr & 0x20)  // RAM-B
 					{
-						UML_SHL(block, I0, I0, 2);
 						UML_WRITE(block, I0, I1, SIZE_DWORD, SPACE_IO);
 					}
 					else // RAM-A
@@ -1779,14 +1771,12 @@ void mb86235_device::generate_xfer2(drcuml_block *block, compiler_state *compile
 				generate_reg_read(block, compiler, desc, dr & 0x3f, I0);
 				UML_ADD(block, I1, mem(&m_core->eb), mem(&m_core->eo));
 				UML_ADD(block, I1, I1, disp14);
-				UML_SHL(block, I1, I1, 2);
 				UML_WRITE(block, I1, I0, SIZE_DWORD, SPACE_DATA);
 			}
 			else
 			{
 				UML_ADD(block, I1, mem(&m_core->eb), mem(&m_core->eo));
 				UML_ADD(block, I1, I1, disp14);
-				UML_SHL(block, I1, I1, 2);
 				UML_READ(block, I0, I1, SIZE_DWORD, SPACE_DATA);
 				generate_reg_write(block, compiler, desc, dr & 0x3f, I0);
 			}
@@ -1835,7 +1825,6 @@ void mb86235_device::generate_xfer3(drcuml_block *block, compiler_state *compile
 
 		case 3:     // RAM-B
 			generate_ea(block, compiler, desc, md, dr & 7, ary, disp);
-			UML_SHL(block, I0, I0, 2);
 			UML_WRITE(block, I0, imm, SIZE_DWORD, SPACE_IO);
 			break;
 	}

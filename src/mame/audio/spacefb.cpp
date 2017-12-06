@@ -24,7 +24,7 @@ READ8_MEMBER(spacefb_state::audio_p2_r)
 
 READ_LINE_MEMBER(spacefb_state::audio_t0_r)
 {
-	return BIT(m_sound_latch, 6);
+	return BIT(m_sound_latch, 5);
 }
 
 

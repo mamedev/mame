@@ -10,6 +10,8 @@
 #include "pipe.h"
 
 // supported devices
+#include "silicon_disc.h"
+#include "speculator.h"
 #include "tk02.h"
 
 
@@ -54,6 +56,9 @@ tatung_pipe_device::~tatung_pipe_device()
 
 void tatung_pipe_device::device_start()
 {
+	// get inserted module
+	m_card = dynamic_cast<device_tatung_pipe_interface *>(get_card_device());
+
 	// resolve callbacks
 	m_int_handler.resolve_safe();
 	m_nmi_handler.resolve_safe();
@@ -66,6 +71,16 @@ void tatung_pipe_device::device_start()
 
 void tatung_pipe_device::device_reset()
 {
+}
+
+//-------------------------------------------------
+//  host to module interface
+//-------------------------------------------------
+
+WRITE_LINE_MEMBER( tatung_pipe_device::host_int_w )
+{
+	if (m_card)
+		m_card->int_w(state);
 }
 
 //-------------------------------------------------
@@ -115,5 +130,7 @@ device_tatung_pipe_interface::~device_tatung_pipe_interface()
 //**************************************************************************
 
 SLOT_INTERFACE_START( tatung_pipe_cards )
+	SLOT_INTERFACE("silicon_disc", EINSTEIN_SILICON_DISC)
+	SLOT_INTERFACE("speculator", EINSTEIN_SPECULATOR)
 	SLOT_INTERFACE("tk02", TK02_80COL)
 SLOT_INTERFACE_END

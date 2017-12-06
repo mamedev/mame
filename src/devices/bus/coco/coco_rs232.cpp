@@ -9,6 +9,8 @@
 ***************************************************************************/
 
 #include "emu.h"
+#include "coco_rs232.h"
+
 #include "cococart.h"
 #include "machine/mos6551.h"
 

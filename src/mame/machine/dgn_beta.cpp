@@ -946,9 +946,9 @@ void dgn_beta_state::machine_start()
   OS9 Syscalls for disassembly
 ****************************************************************************/
 
-offs_t dgn_beta_state::dgnbeta_dasm_override(device_t &device, std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, int options)
+offs_t dgn_beta_state::dgnbeta_dasm_override(std::ostream &stream, offs_t pc, const util::disasm_interface::data_buffer &opcodes, const util::disasm_interface::data_buffer &params)
 {
-	return coco_state::os9_dasm_override(device, stream, pc, oprom, opram, options);
+	return coco_state::os9_dasm_override(stream, pc, opcodes, params);
 }
 
 void dgn_beta_state::execute_beta_dat_log(int ref, const std::vector<std::string> &params)

@@ -2,7 +2,7 @@
 // copyright-holders:Angelo Salese
 /***************************************************************************
 
-	Flower custom sound chip
+    Flower custom sound chip
 
 ***************************************************************************/
 
@@ -11,23 +11,15 @@
 
 #pragma once
 
-
-
-//**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-
-
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 
 // ======================> flower_sound_device
 
-class flower_sound_device : public device_t, 
-				            public device_sound_interface,
-						    public device_memory_interface
+class flower_sound_device : public device_t,
+							public device_sound_interface,
+							public device_memory_interface
 {
 public:
 	// construction/destruction
@@ -36,8 +28,8 @@ public:
 	// I/O operations
 	DECLARE_WRITE8_MEMBER( lower_write );
 	DECLARE_WRITE8_MEMBER( upper_write );
-//	virtual DECLARE_ADDRESS_MAP(lower_map, 8);
-//	virtual DECLARE_ADDRESS_MAP(upper_map, 8);
+//  virtual DECLARE_ADDRESS_MAP(lower_map, 8);
+//  virtual DECLARE_ADDRESS_MAP(upper_map, 8);
 	DECLARE_WRITE8_MEMBER( frequency_w );
 	DECLARE_WRITE8_MEMBER( repeat_w );
 	DECLARE_WRITE8_MEMBER( unk_w );
@@ -59,15 +51,14 @@ private:
 
 	const address_space_config m_io_space_config;
 	sound_stream *m_stream;
-	
+
 	static constexpr unsigned MAX_VOICES = 8;
-	static constexpr int samplerate = 48000;
 	static constexpr int defgain = 48;
-	
+
 	std::unique_ptr<int16_t[]> m_mixer_table;
 	int16_t *m_mixer_lookup;
 	std::unique_ptr<short[]> m_mixer_buffer;
-	
+
 	struct fl_sound_channel
 	{
 		uint8_t start_nibbles[6];
@@ -82,13 +73,13 @@ private:
 		bool repeat;
 		int channel_number;
 	};
-	
+
 	/* data about the sound system */
 	fl_sound_channel m_channel_list[MAX_VOICES];
 	fl_sound_channel *m_last_channel;
-	
+
 	void make_mixer_table(int voices, int gain);
-	
+
 	const uint8_t *m_sample_rom;
 	const uint8_t *m_volume_rom;
 };
@@ -98,10 +89,4 @@ private:
 DECLARE_DEVICE_TYPE(FLOWER_CUSTOM, flower_sound_device)
 
 
-
-//**************************************************************************
-//  GLOBAL VARIABLES
-//**************************************************************************
-
-
-#endif // MAME_MACHINE_FLOWER_H
+#endif // MAME_AUDIO_FLOWER_H

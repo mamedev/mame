@@ -84,8 +84,7 @@ static ADDRESS_MAP_START(datum_mem, AS_PROGRAM, 8, datum_state)
 	ADDRESS_MAP_GLOBAL_MASK (0x7fff) // A15 not used
 	AM_RANGE(0x0000, 0x007f) AM_RAM // inside CPU
 	AM_RANGE(0x1000, 0x13ff) AM_MIRROR(0x0c00) AM_RAM // main ram 2x 2114
-	AM_RANGE(0x4000, 0x4000) AM_MIRROR(0x0ffe) AM_DEVREADWRITE("acia", acia6850_device, status_r, control_w)
-	AM_RANGE(0x4001, 0x4001) AM_MIRROR(0x0ffe) AM_DEVREADWRITE("acia", acia6850_device, data_r, data_w)
+	AM_RANGE(0x4000, 0x4001) AM_MIRROR(0x0ffe) AM_DEVREADWRITE("acia", acia6850_device, read, write)
 	AM_RANGE(0x5000, 0x5003) AM_MIRROR(0x0ffc) AM_DEVREADWRITE("pia2", pia6821_device, read, write)
 	AM_RANGE(0x6000, 0x6003) AM_MIRROR(0x0ffc) AM_DEVREADWRITE("pia1", pia6821_device, read, write)
 	AM_RANGE(0x7000, 0x77ff) AM_MIRROR(0x0800) AM_ROM AM_REGION("roms", 0)

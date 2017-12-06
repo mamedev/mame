@@ -431,4 +431,12 @@ inline u64 d2u(double d)
 	return u.vv;
 }
 
+
+// constexpr absolute value of an integer
+template <typename T>
+constexpr std::enable_if_t<std::is_signed<T>::value, T> iabs(T v)
+{
+	return (v < T(0)) ? -v : v;
+}
+
 #endif  /* MAME_EMU_EMUCORE_H */

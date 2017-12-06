@@ -58,11 +58,8 @@ protected:
 	required_device<am9517a_device> m_dma8237_1;
 	required_device<am9517a_device> m_dma8237_2;
 	required_device<pit8254_device> m_pit8254;
-	required_device<at_keyboard_controller_device> m_keybc;
 	required_device<isa16_device> m_isabus;
 	required_device<speaker_sound_device> m_speaker;
-	required_device<ds12885_device> m_ds12885;
-	required_device<pc_kbdc_device> m_pc_kbdc;
 	required_device<bus_master_ide_controller_device> m_ide;
 	required_device<bus_master_ide_controller_device> m_ide2;
 
@@ -121,11 +118,36 @@ private:
 	DECLARE_WRITE8_MEMBER(ide2_write_cs1_w);
 	DECLARE_READ8_MEMBER(at_dma8237_2_r);
 	DECLARE_WRITE8_MEMBER(at_dma8237_2_w);
-	DECLARE_WRITE8_MEMBER(write_rtc);
 	DECLARE_READ8_MEMBER(pc_dma_read_byte);
 	DECLARE_WRITE8_MEMBER(pc_dma_write_byte);
 	DECLARE_READ8_MEMBER(pc_dma_read_word);
 	DECLARE_WRITE8_MEMBER(pc_dma_write_word);
+};
+
+// ======================> southbridge_extended_device
+
+class southbridge_extended_device :
+	public southbridge_device
+{
+public:
+
+
+protected:
+	// construction/destruction
+	southbridge_extended_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
+	// optional information overrides
+	virtual void device_add_mconfig(machine_config &config) override;
+
+	// device-level overrides
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	required_device<at_keyboard_controller_device> m_keybc;
+	required_device<ds12885_device> m_ds12885;
+	required_device<pc_kbdc_device> m_pc_kbdc;
+
+private:
+	DECLARE_WRITE8_MEMBER(write_rtc);
 };
 
 #endif  // MAME_BUS_LPCI_SOUTHBRIDGE_H

@@ -49,17 +49,18 @@
  *  ( - GPIB Listener/Talker Test
  *  ) - GPIB Controller Test
  *
- *  The Attache 8:16 is an upgraded Attache adding an 8086 (+ optional 8087) board with its own 256kB of RAM, 
+ *  The Attache 8:16 is an upgraded Attache adding an 8086 (+ optional 8087) board with its own 256kB of RAM,
  *  and optionally a GPIB controller (TMS9914A) and serial synchronous port (Z8530 SCC).  It also has modifications
  *  to the main Z80 board, specifically the display circuitry, adding a high-resolution display, and replacing
  *  the character ROM with a larger ROM containing an IBM character set.
  *  It effectively allows the Attache to run MS-DOS and use a 10MB hard disk.
- * 
+ *
  *  TODO:
  *    - Keyboard repeat
  *    - Get at least some of the system tests to pass
  *    - and probably lots more I've forgotten, too.
- *    - implement Z80-8086 comms on the 8:16
+ *    - improve Z80-8086 comms on the 8:16, saving a file to the RAM disk under CP/M often ends in deadlock.
+ *    - add Z8530 SCC and TMS9914A GPIB to the 8:16.  These are optional devices, so aren't strictly required at this stage.
  *
  */
 
@@ -75,10 +76,10 @@
 #include "machine/z80ctc.h"
 #include "machine/z80sio.h"
 #include "machine/z80pio.h"
+#include "machine/i8255.h"
 #include "cpu/i86/i86.h"
 #include "sound/ay8910.h"
 #include "video/tms9927.h"
-
 #include "screen.h"
 #include "softlist.h"
 #include "speaker.h"
@@ -233,10 +234,35 @@ class attache816_state : public attache_state
 public:
 	attache816_state(const machine_config &mconfig, device_type type, const char *tag)
 		: attache_state(mconfig, type, tag),
-		  m_extcpu(*this,"extcpu")
+		  m_extcpu(*this,"extcpu"),
+		  m_ppi(*this,"ppi"),
+		  m_comms_val(0),
+		  m_x86_irq_enable(0),
+		  m_z80_rx_ready(false),
+		  m_z80_tx_ready(false)
 	{ }
+
+	DECLARE_WRITE8_MEMBER(x86_comms_w);
+	DECLARE_READ8_MEMBER(x86_comms_r);
+	DECLARE_WRITE8_MEMBER(x86_irq_enable);
+	DECLARE_WRITE8_MEMBER(x86_iobf_enable_w);
+	DECLARE_READ8_MEMBER(z80_comms_r);
+	DECLARE_WRITE8_MEMBER(z80_comms_w);
+	DECLARE_READ8_MEMBER(z80_comms_status_r);
+	DECLARE_WRITE8_MEMBER(z80_comms_ctrl_w);
+	DECLARE_WRITE_LINE_MEMBER(ppi_irq);
+	DECLARE_WRITE_LINE_MEMBER(x86_dsr);
+
+	virtual void machine_reset() override;
+
 private:
 	required_device<cpu_device> m_extcpu;
+	required_device<i8255_device> m_ppi;
+
+	uint8_t m_comms_val;
+	uint8_t m_x86_irq_enable;
+	bool m_z80_rx_ready;
+	bool m_z80_tx_ready;
 };
 
 // Attributes (based on schematics):
@@ -767,6 +793,111 @@ WRITE_LINE_MEMBER( attache_state::fdc_dack_w )
 {
 }
 
+/*
+ * Z80 <-> 8086 communication
+ */
+
+WRITE8_MEMBER(attache816_state::x86_comms_w)
+{
+	m_comms_val = data;
+	m_z80_rx_ready = false;
+	machine().scheduler().synchronize();
+	logerror("x86 writes %02x to comms\n",data);
+}
+
+READ8_MEMBER(attache816_state::x86_comms_r)
+{
+	m_z80_tx_ready = false;
+	logerror("x86 reads %02x from comms\n",m_comms_val);
+	machine().scheduler().synchronize();
+	return m_comms_val;
+}
+
+// PPI Port B - IRQ enable
+// bit 0: i8255A PPI
+// bit 1: TMS9914A GPIB
+// bit 2: Z8530 SCC
+// bit 3: 8087 FPU
+// bit 4: enable WAIT logic
+// bit 5: enable high-resolution graphics
+WRITE8_MEMBER(attache816_state::x86_irq_enable)
+{
+	m_x86_irq_enable = data;
+}
+
+WRITE8_MEMBER(attache816_state::x86_iobf_enable_w)
+{
+	switch(offset)
+	{
+		case 0x00:
+			m_ppi->pc6_w(0);
+			break;
+		case 0x01:
+			m_ppi->pc6_w(1);
+			break;
+		case 0x04:
+			m_ppi->pc4_w(0);
+			break;
+		case 0x05:
+			m_ppi->pc4_w(1);
+			break;
+		default:
+			logerror("Invalid x86 IRQ enable write offset %02x data %02x\n",offset,data);
+	}
+}
+
+READ8_MEMBER(attache816_state::z80_comms_r)
+{
+	m_z80_rx_ready = true;
+	m_ppi->pc6_w(0);
+	logerror("z80 reads %02x from comms\n",m_comms_val);
+	machine().scheduler().synchronize();
+	return m_comms_val;
+}
+
+WRITE8_MEMBER(attache816_state::z80_comms_w)
+{
+	m_comms_val = data;
+	logerror("z80 writes %02x to comms\n",data);
+	m_z80_tx_ready = true;
+	m_ppi->pc4_w(0);
+	machine().scheduler().synchronize();
+//  m_ppi->write(space,0,data);
+}
+
+// Z80 comms status
+// bit 0: set if no data is ready
+// bit 1: set if ready to accept data
+READ8_MEMBER(attache816_state::z80_comms_status_r)
+{
+	uint8_t ret = 0xf0;  // low nibble always high?
+
+	if(m_z80_rx_ready)
+		ret |= 0x01;
+	if(m_z80_tx_ready)
+		ret |= 0x02;
+
+	return ret;
+}
+
+// Z80 comms controller
+// bit 0: Reset 8086
+WRITE8_MEMBER(attache816_state::z80_comms_ctrl_w)
+{
+	m_extcpu->set_input_line(INPUT_LINE_RESET,(data & 0x01) ? ASSERT_LINE : CLEAR_LINE);
+}
+
+WRITE_LINE_MEMBER(attache816_state::ppi_irq)
+{
+	if(m_x86_irq_enable & 0x01)
+		m_extcpu->set_input_line_and_vector(0,state,0x03);
+}
+
+WRITE_LINE_MEMBER(attache816_state::x86_dsr)
+{
+	// TODO: /DSR to Z8530 SCC
+}
+
 static ADDRESS_MAP_START( attache_map, AS_PROGRAM, 8, attache_state)
 	AM_RANGE(0x0000,0x1fff) AM_RAMBANK("bank1")
 	AM_RANGE(0x2000,0x3fff) AM_RAMBANK("bank2")
@@ -790,9 +921,9 @@ static ADDRESS_MAP_START( attache_io, AS_IO, 8, attache_state)
 	AM_RANGE(0xff, 0xff) AM_READWRITE(memmap_r, memmap_w) AM_MIRROR(0xff00)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( attache816_io, AS_IO, 8, attache_state)
-// 0xb8 - 8086 comms port (connects to PPI port A)
-// 0xb9 - Status/Control
+static ADDRESS_MAP_START( attache816_io, AS_IO, 8, attache816_state)
+	AM_RANGE(0xb8, 0xb8) AM_READWRITE(z80_comms_status_r, z80_comms_ctrl_w) AM_MIRROR(0xff00)
+	AM_RANGE(0xb9, 0xb9) AM_READWRITE(z80_comms_r, z80_comms_w) AM_MIRROR(0xff00)
 	AM_RANGE(0xe0, 0xed) AM_DEVREADWRITE("dma",am9517a_device,read,write) AM_MIRROR(0xff00)
 	AM_RANGE(0xee, 0xee) AM_WRITE(display_command_w) AM_MIRROR(0xff00)
 	AM_RANGE(0xef, 0xef) AM_READWRITE(dma_mask_r, dma_mask_w) AM_MIRROR(0xff00)
@@ -804,17 +935,17 @@ static ADDRESS_MAP_START( attache816_io, AS_IO, 8, attache_state)
 	AM_RANGE(0xff, 0xff) AM_READWRITE(memmap_r, memmap_w) AM_MIRROR(0xff00)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( attache_x86_map, AS_PROGRAM, 16, attache_state)
+static ADDRESS_MAP_START( attache_x86_map, AS_PROGRAM, 16, attache816_state)
 	AM_RANGE(0x00000, 0x3ffff) AM_RAM
 	AM_RANGE(0xb0000, 0xbffff) AM_NOP  // triggers IRQ?
 	AM_RANGE(0xfe000, 0xfffff) AM_ROM AM_REGION("x86bios",0x0000)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( attache_x86_io, AS_IO, 16, attache_state)
-// 0x100-0x104 - i8255 PPI
-// 0x108/9 - Set/Clear IBF IRQ enable
-// 0x10c/d - Set/Clear OBF IRQ enable
-	AM_RANGE(0x104, 0x105) AM_NOP
+static ADDRESS_MAP_START( attache_x86_io, AS_IO, 16, attache816_state)
+	AM_RANGE(0x100, 0x107) AM_DEVREADWRITE8("ppi",i8255_device,read,write,0x00ff)
+	AM_RANGE(0x108, 0x10d) AM_WRITE8(x86_iobf_enable_w,0xffff);
+// 0x140/2/4/6 - Z8530 SCC serial
+// 0x180/2/4/6/8/a/c/e - GPIB (TMS9914A)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START(attache)
@@ -963,6 +1094,11 @@ void attache_state::machine_reset()
 	m_kb_bitpos = 0;
 }
 
+void attache816_state::machine_reset()
+{
+	attache_state::machine_reset();
+}
+
 static MACHINE_CONFIG_START( attache )
 	MCFG_CPU_ADD("maincpu",Z80,XTAL_8MHz / 2)
 	MCFG_CPU_PROGRAM_MAP(attache_map)
@@ -970,7 +1106,7 @@ static MACHINE_CONFIG_START( attache )
 	MCFG_Z80_DAISY_CHAIN(attache_daisy_chain)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
-	
+
 	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green())
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(64)) /* not accurate */
@@ -1031,7 +1167,7 @@ static MACHINE_CONFIG_START( attache816 )
 	MCFG_Z80_DAISY_CHAIN(attache_daisy_chain)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
-	
+
 	MCFG_CPU_ADD("extcpu",I8086,XTAL_24MHz / 3)
 	MCFG_CPU_PROGRAM_MAP(attache_x86_map)
 	MCFG_CPU_IO_MAP(attache_x86_io)
@@ -1062,6 +1198,13 @@ static MACHINE_CONFIG_START( attache816 )
 
 	MCFG_DEVICE_ADD("ctc", Z80CTC, XTAL_8MHz / 4)
 	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
+
+	MCFG_DEVICE_ADD("ppi", I8255A, 0)
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(attache816_state, x86_comms_w))
+	MCFG_I8255_IN_PORTA_CB(READ8(attache816_state, x86_comms_r))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(attache816_state, x86_irq_enable))
+	MCFG_I8255_OUT_PORTC_CB(WRITELINE(attache816_state, x86_dsr)) MCFG_DEVCB_BIT(0)
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE(attache816_state, ppi_irq)) MCFG_DEVCB_BIT(7) MCFG_DEVCB_INVERT
 
 	MCFG_DEVICE_ADD("dma", AM9517A, XTAL_8MHz / 4)
 	MCFG_AM9517A_OUT_HREQ_CB(WRITELINE(attache_state, hreq_w))
@@ -1143,7 +1286,7 @@ ROM_START( attache816 )
 	ROM_REGION(0x2000, "x86bios", 0)
 	ROM_LOAD16_BYTE("u4.bin",  0x0000, 0x1000, CRC(658c8f93) SHA1(ce4b388af5b73884194f548afa706964305462f7) )
 	ROM_LOAD16_BYTE("u9.bin",  0x0001, 0x1000, CRC(cc4cd938) SHA1(6a1d316628641f9b4de5c8c46f9430ef5bd6120f) )
-	
+
 ROM_END
 
 //    YEAR  NAME    PARENT  COMPAT      MACHINE     INPUT    DEVICE            INIT    COMPANY     FULLNAME             FLAGS

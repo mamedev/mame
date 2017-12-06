@@ -7,7 +7,7 @@
 	premake.make.cpp = { }
 	premake.make.override = { }
 	premake.make.makefile_ignore = false
-	
+
 	local cpp = premake.make.cpp
 	local make = premake.make
 
@@ -67,9 +67,9 @@
 		_p('')
 
 		if os.is("MacOSX") and prj.kind == "WindowedApp" then
-			_p('all: $(OBJDIRS) prebuild prelink $(TARGET) $(dir $(TARGETDIR))PkgInfo $(dir $(TARGETDIR))Info.plist | $(TARGETDIR)')
+			_p('all: $(OBJDIRS) $(TARGETDIR) prebuild prelink $(TARGET) $(dir $(TARGETDIR))PkgInfo $(dir $(TARGETDIR))Info.plist')
 		else
-			_p('all: $(OBJDIRS) prebuild prelink $(TARGET) | $(TARGETDIR)')
+			_p('all: $(OBJDIRS) $(TARGETDIR) prebuild prelink $(TARGET)')
 		end
 		_p('\t@:')
 		_p('')
@@ -101,11 +101,11 @@
 				prj.archivesplit_size=200
 			end
 			if (not prj.options.ArchiveSplit) then
-                _p('ifeq (posix,$(SHELLTYPE))')
-                _p('\t$(SILENT) rm -f  $(TARGET)')
-                _p('else')
-                _p('\t$(SILENT) if exist $(subst /,\\\\,$(TARGET)) del $(subst /,\\\\,$(TARGET))')
-                _p('endif')
+				_p('ifeq (posix,$(SHELLTYPE))')
+				_p('\t$(SILENT) rm -f  $(TARGET)')
+				_p('else')
+				_p('\t$(SILENT) if exist $(subst /,\\\\,$(TARGET)) del $(subst /,\\\\,$(TARGET))')
+				_p('endif')
 				_p('\t$(SILENT) $(LINKCMD) $(OBJECTS)' .. (os.is("MacOSX") and " 2>&1 > /dev/null | sed -e '/.o) has no symbols$$/d'" or ""))
 			else
 				_p('\t$(call RM,$(TARGET))')
@@ -398,8 +398,8 @@
 		_p('  ALL_ASMFLAGS       += $(ASMFLAGS) $(CFLAGS) $(ALL_CPPFLAGS) $(ARCH)%s', make.list(table.join(cc.getcflags(cfg), cfg.buildoptions, cfg.buildoptions_asm)))
 		_p('  ALL_CFLAGS         += $(CFLAGS) $(ALL_CPPFLAGS) $(ARCH)%s', make.list(table.join(cc.getcflags(cfg), cfg.buildoptions, cfg.buildoptions_c)))
 		_p('  ALL_CXXFLAGS       += $(CXXFLAGS) $(CFLAGS) $(ALL_CPPFLAGS) $(ARCH)%s', make.list(table.join(cc.getcflags(cfg), cc.getcxxflags(cfg), cfg.buildoptions, cfg.buildoptions_cpp)))
-		_p('  ALL_OBJCFLAGS      += $(CFLAGS) $(ALL_CPPFLAGS) $(ARCH)%s', make.list(table.join(cc.getcflags(cfg), cfg.buildoptions, cfg.buildoptions_objc)))
-		_p('  ALL_OBJCPPFLAGS    += $(CXXFLAGS) $(CFLAGS) $(ALL_CPPFLAGS) $(ARCH)%s', make.list(table.join(cc.getcflags(cfg), cc.getcxxflags(cfg), cfg.buildoptions, cfg.buildoptions_objcpp)))
+		_p('  ALL_OBJCFLAGS      += $(CFLAGS) $(ALL_CPPFLAGS) $(ARCH)%s', make.list(table.join(cc.getcflags(cfg), cc.getobjcflags(cfg), cfg.buildoptions, cfg.buildoptions_objc)))
+		_p('  ALL_OBJCPPFLAGS    += $(CXXFLAGS) $(CFLAGS) $(ALL_CPPFLAGS) $(ARCH)%s', make.list(table.join(cc.getcflags(cfg), cc.getcxxflags(cfg), cc.getobjcflags(cfg), cfg.buildoptions, cfg.buildoptions_objcpp)))
 
 		_p('  ALL_RESFLAGS       += $(RESFLAGS) $(DEFINES) $(INCLUDES)%s',
 		        make.list(table.join(cc.getdefines(cfg.resdefines),

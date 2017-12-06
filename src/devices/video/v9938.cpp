@@ -241,22 +241,6 @@ void v99x8_device::configure_pal_ntsc()
 
 
 /*
-    Not really right... won't work with sprites in graphics 7
-    and with palette updated mid-screen
-*/
-int v99x8_device::get_transpen()
-{
-	if (m_mode == V9938_MODE_GRAPHIC7)
-	{
-		return m_pal_ind256[0];
-	}
-	else
-	{
-		return m_pal_ind16[0];
-	}
-}
-
-/*
     Driver-specific function: update the vdp mouse state
 */
 void v99x8_device::update_mouse_state(int mx_delta, int my_delta, int button_state)
@@ -309,11 +293,6 @@ b0 is set if b2 and b1 are set (remember, color bus is 3 bits)
 
 void v9938_device::palette_init()
 {
-	int i;
-
-	// create the full 512 colour palette
-	for (i=0;i<512;i++)
-		set_pen_color(i, pal3bit(i >> 6), pal3bit(i >> 3), pal3bit(i >> 0));
 }
 
 /*
@@ -327,23 +306,15 @@ to emulate this. Also it keeps the palette a reasonable size. :)
 
 */
 
-uint16_t v99x8_device::s_pal_indYJK[0x20000];
+uint32_t v99x8_device::s_pal_indYJK[0x20000];
 
 void v9958_device::palette_init()
 {
-	int r,g,b,y,j,k,i,k0,j0,n;
-	uint8_t pal[19268*3];
-
-	// init v9938 512-color palette
-	for (i=0;i<512;i++)
-		set_pen_color(i, pal3bit(i >> 6), pal3bit(i >> 3), pal3bit(i >> 0));
-
-	if (entries() != 19780)
-		fatalerror("V9958: not enough palette, must be 19780");
+	int r,g,b,y,j,k,k0,j0;
 
 	// set up YJK table
 	LOG("Building YJK table for V9958 screens, may take a while ... \n");
-	i = 0;
+
 	for (y=0;y<32;y++) for (k=0;k<64;k++) for (j=0;j<64;j++)
 	{
 		// calculate the color
@@ -356,38 +327,11 @@ void v9958_device::palette_init()
 		if (g < 0) g = 0; else if (g > 31) g = 31;
 		if (b < 0) b = 0; else if (b > 31) b = 31;
 
-		//r = (r << 3) | (r >> 2);
-		//b = (b << 3) | (b >> 2);
-		//g = (g << 3) | (g >> 2);
-		// have we seen this one before?
-		n = 0;
-		while (n < i)
-		{
-			if (pal[n*3+0] == r && pal[n*3+1] == g && pal[n*3+2] == b)
-			{
-				v99x8_device::s_pal_indYJK[y | j << 5 | k << (5 + 6)] = n + 512;
-				break;
-			}
-			n++;
-		}
-
-		if (i == n)
-		{
-			// so we haven't; add it
-			pal[i*3+0] = r;
-			pal[i*3+1] = g;
-			pal[i*3+2] = b;
-			set_pen_color(i+512, rgb_t(pal5bit(r), pal5bit(g), pal5bit(b)));
-			v99x8_device::s_pal_indYJK[y | j << 5 | k << (5 + 6)] = i + 512;
-			i++;
-		}
+		v99x8_device::s_pal_indYJK[y | j << 5 | k << (5 + 6)] = uint32_t(rgb_t(pal5bit(r), pal5bit(g), pal5bit(b)));
 	}
-
-	if (i != 19268)
-		LOG("Table creation failed - %d colours out of 19286 created\n", i);
 }
 
-uint32_t v99x8_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t v99x8_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	copybitmap(bitmap, m_bitmap, 0, 0, 0, 0, cliprect);
 	return 0;
@@ -530,10 +474,9 @@ void v99x8_device::palette_w(uint8_t data)
 		indexp = m_cont_reg[0x10] & 15;
 		m_pal_reg[indexp*2] = m_pal_write & 0x77;
 		m_pal_reg[indexp*2+1] = data & 0x07;
+
 		// update palette
-		m_pal_ind16[indexp] = (((int)m_pal_write << 2) & 0x01c0)  |
-		(((int)data << 3) & 0x0038)  |
-		((int)m_pal_write & 0x0007);
+		set_pen16(indexp, uint32_t(rgb_t(pal3bit((m_pal_write & 0x70) >> 4), pal3bit(data & 0x07), pal3bit(m_pal_write & 0x07))));
 
 		m_cont_reg[0x10] = (m_cont_reg[0x10] + 1) & 15;
 		m_pal_write_first = 0;
@@ -668,8 +611,6 @@ void v99x8_device::device_start()
 	save_item(NAME(m_mx_delta));
 	save_item(NAME(m_my_delta));
 	save_item(NAME(m_button_state));
-	save_item(NAME(m_pal_ind16));
-	save_item(NAME(m_pal_ind256));
 	save_item(NAME(m_mmc.SX));
 	save_item(NAME(m_mmc.SY));
 	save_item(NAME(m_mmc.DX));
@@ -755,7 +696,7 @@ void v99x8_device::reset_palette()
 		5, 5, 5, // 14: gray
 		7, 7, 7  // 15: white
 	};
-	int i, red, ind;
+	int i, red;
 
 	for (i=0;i<16;i++)
 	{
@@ -763,18 +704,15 @@ void v99x8_device::reset_palette()
 		m_pal_reg[i*2+0] = pal16[i*3+1] << 4 | pal16[i*3+2];
 		m_pal_reg[i*2+1] = pal16[i*3];
 		// set the reference table
-		m_pal_ind16[i] = pal16[i*3+1] << 6 | pal16[i*3] << 3 | pal16[i*3+2];
+		set_pen16(i, uint32_t(rgb_t(pal3bit(pal16[i*3+1]), pal3bit(pal16[i*3]), pal3bit(pal16[i*3+2]))));
 	}
 
 	// set internal palette GRAPHIC 7
 	for (i=0;i<256;i++)
 	{
-		ind = (i << 4) & 0x01c0;
-		ind |= (i >> 2) & 0x0038;
 		red = (i << 1) & 6; if (red == 6) red++;
-		ind |= red;
 
-		m_pal_ind256[i] = ind;
+		set_pen256(i, uint32_t(rgb_t(pal3bit((i & 0x1c) >> 2), pal3bit((i & 0xe0) >> 5), pal3bit(red))));
 	}
 }
 
@@ -938,39 +876,39 @@ inline bool v99x8_device::v9938_second_field()
 }
 
 
-void v99x8_device::default_border(uint16_t *ln)
+void v99x8_device::default_border(uint32_t *ln)
 {
 	pen_t pen;
 	int i;
 
-	pen = this->pen(m_pal_ind16[m_cont_reg[7] & 0x0f]);
+	pen = pen16(m_cont_reg[7] & 0x0f);
 	i = LONG_WIDTH;
 	while (i--) *ln++ = pen;
 }
 
-void v99x8_device::graphic7_border(uint16_t *ln)
+void v99x8_device::graphic7_border(uint32_t *ln)
 {
 	pen_t pen;
 	int i;
 
-	pen = this->pen(m_pal_ind256[m_cont_reg[7]]);
+	pen = pen256(m_cont_reg[7]);
 	i = LONG_WIDTH;
 	while (i--) *ln++ = pen;
 }
 
-void v99x8_device::graphic5_border(uint16_t *ln)
+void v99x8_device::graphic5_border(uint32_t *ln)
 {
 	int i;
 	pen_t pen0;
 	pen_t pen1;
 
-	pen1 = pen(m_pal_ind16[m_cont_reg[7] & 0x03]);
-	pen0 = pen(m_pal_ind16[(m_cont_reg[7] >> 2) & 0x03]);
+	pen1 = pen16(m_cont_reg[7] & 0x03);
+	pen0 = pen16((m_cont_reg[7] >> 2) & 0x03);
 	i = LONG_WIDTH / 2;
 	while (i--) { *ln++ = pen0; *ln++ = pen1; }
 }
 
-void v99x8_device::mode_text1(uint16_t *ln, int line)
+void v99x8_device::mode_text1(uint32_t *ln, int line)
 {
 	int pattern, x, xx, name, xxx;
 	pen_t fg, bg, pen;
@@ -979,12 +917,12 @@ void v99x8_device::mode_text1(uint16_t *ln, int line)
 	patterntbl_addr = m_cont_reg[4] << 11;
 	nametbl_addr = m_cont_reg[2] << 10;
 
-	fg = this->pen(m_pal_ind16[m_cont_reg[7] >> 4]);
-	bg = this->pen(m_pal_ind16[m_cont_reg[7] & 15]);
+	fg = pen16(m_cont_reg[7] >> 4);
+	bg = pen16(m_cont_reg[7] & 15);
 
 	name = (line/8)*40;
 
-	pen = this->pen(m_pal_ind16[m_cont_reg[7] & 0x0f]);
+	pen = pen16(m_cont_reg[7] & 0x0f);
 
 	xxx = (m_offset_x + 8) * 2;
 	while (xxx--) *ln++ = pen;
@@ -1007,7 +945,7 @@ void v99x8_device::mode_text1(uint16_t *ln, int line)
 	while (xxx--) *ln++ = pen;
 }
 
-void v99x8_device::mode_text2(uint16_t *ln, int line)
+void v99x8_device::mode_text2(uint32_t *ln, int line)
 {
 	int pattern, x, charcode, name, xxx, patternmask, colourmask;
 	pen_t fg, bg, fg0, bg0, pen;
@@ -1023,15 +961,15 @@ void v99x8_device::mode_text2(uint16_t *ln, int line)
 	nametbl_addr = ((m_cont_reg[2] & 0xfc) << 10);
 	patternmask = ((m_cont_reg[2] & 3) << 10) | 0x3ff; /* seems correct */
 
-	fg = this->pen(m_pal_ind16[m_cont_reg[7] >> 4]);
-	bg = this->pen(m_pal_ind16[m_cont_reg[7] & 15]);
-	fg0 = this->pen(m_pal_ind16[m_cont_reg[12] >> 4]);
-	bg0 = this->pen(m_pal_ind16[m_cont_reg[12] & 15]);
+	fg = pen16(m_cont_reg[7] >> 4);
+	bg = pen16(m_cont_reg[7] & 15);
+	fg0 = pen16(m_cont_reg[12] >> 4);
+	bg0 = pen16(m_cont_reg[12] & 15);
 
 	name = (line/8)*80;
 
 	xxx = (m_offset_x + 8) * 2;
-	pen = this->pen(m_pal_ind16[m_cont_reg[7] & 0x0f]);
+	pen = pen16(m_cont_reg[7] & 0x0f);
 	while (xxx--) *ln++ = pen;
 
 	for (x=0;x<80;x++)
@@ -1074,7 +1012,7 @@ void v99x8_device::mode_text2(uint16_t *ln, int line)
 	while (xxx--) *ln++ = pen;
 }
 
-void v99x8_device::mode_multi(uint16_t *ln, int line)
+void v99x8_device::mode_multi(uint32_t *ln, int line)
 {
 	int nametbl_addr, patterntbl_addr, colour;
 	int name, line2, x, xx;
@@ -1086,14 +1024,14 @@ void v99x8_device::mode_multi(uint16_t *ln, int line)
 	line2 = (line - m_cont_reg[23]) & 255;
 	name = (line2/8)*32;
 
-	pen_bg = this->pen(m_pal_ind16[m_cont_reg[7] & 0x0f]);
+	pen_bg = pen16(m_cont_reg[7] & 0x0f);
 	xx = m_offset_x * 2;
 	while (xx--) *ln++ = pen_bg;
 
 	for (x=0;x<32;x++)
 	{
 		colour = m_vram_space->read_byte(patterntbl_addr + (m_vram_space->read_byte(nametbl_addr + name) * 8) + ((line2/4)&7));
-		pen = this->pen(m_pal_ind16[colour >> 4]);
+		pen = pen16(colour >> 4);
 		/* eight pixels */
 		*ln++ = pen;
 		*ln++ = pen;
@@ -1103,7 +1041,7 @@ void v99x8_device::mode_multi(uint16_t *ln, int line)
 		*ln++ = pen;
 		*ln++ = pen;
 		*ln++ = pen;
-		pen = this->pen(m_pal_ind16[colour & 15]);
+		pen = pen16(colour & 15);
 		/* eight pixels */
 		*ln++ = pen;
 		*ln++ = pen;
@@ -1120,7 +1058,7 @@ void v99x8_device::mode_multi(uint16_t *ln, int line)
 	while (xx--) *ln++ = pen_bg;
 }
 
-void v99x8_device::mode_graphic1(uint16_t *ln, int line)
+void v99x8_device::mode_graphic1(uint32_t *ln, int line)
 {
 	pen_t fg, bg, pen;
 	int nametbl_addr, patterntbl_addr, colourtbl_addr;
@@ -1134,7 +1072,7 @@ void v99x8_device::mode_graphic1(uint16_t *ln, int line)
 
 	name = (line2/8)*32;
 
-	pen = this->pen(m_pal_ind16[m_cont_reg[7] & 0x0f]);
+	pen = pen16(m_cont_reg[7] & 0x0f);
 	xxx = m_offset_x * 2;
 	while (xxx--) *ln++ = pen;
 
@@ -1142,8 +1080,8 @@ void v99x8_device::mode_graphic1(uint16_t *ln, int line)
 	{
 		charcode = m_vram_space->read_byte(nametbl_addr + name);
 		colour = m_vram_space->read_byte(colourtbl_addr + charcode/8);
-		fg = this->pen(m_pal_ind16[colour >> 4]);
-		bg = this->pen(m_pal_ind16[colour & 15]);
+		fg = pen16(colour >> 4);
+		bg = pen16(colour & 15);
 		pattern = m_vram_space->read_byte(patterntbl_addr + (charcode * 8 + (line2 & 7)));
 
 		for (xx=0;xx<8;xx++)
@@ -1159,7 +1097,7 @@ void v99x8_device::mode_graphic1(uint16_t *ln, int line)
 	while (xx--) *ln++ = pen;
 }
 
-void v99x8_device::mode_graphic23(uint16_t *ln, int line)
+void v99x8_device::mode_graphic23(uint32_t *ln, int line)
 {
 	pen_t fg, bg, pen;
 	int nametbl_addr, patterntbl_addr, colourtbl_addr;
@@ -1176,7 +1114,7 @@ void v99x8_device::mode_graphic23(uint16_t *ln, int line)
 	line2 = (line + m_cont_reg[23]) & 255;
 	name = (line2/8)*32;
 
-	pen = this->pen(m_pal_ind16[m_cont_reg[7] & 0x0f]);
+	pen = pen16(m_cont_reg[7] & 0x0f);
 	xxx = m_offset_x * 2;
 	while (xxx--) *ln++ = pen;
 
@@ -1185,8 +1123,8 @@ void v99x8_device::mode_graphic23(uint16_t *ln, int line)
 		charcode = m_vram_space->read_byte(nametbl_addr + name) + (line2&0xc0)*4;
 		colour = m_vram_space->read_byte(colourtbl_addr + ((charcode&colourmask)*8+(line2&7)));
 		pattern = m_vram_space->read_byte(patterntbl_addr + ((charcode&patternmask)*8+(line2&7)));
-		fg = this->pen(m_pal_ind16[colour >> 4]);
-		bg = this->pen(m_pal_ind16[colour & 15]);
+		fg = pen16(colour >> 4);
+		bg = pen16(colour & 15);
 		for (xx=0;xx<8;xx++)
 		{
 			*ln++ = (pattern & 0x80) ? fg : bg;
@@ -1200,7 +1138,7 @@ void v99x8_device::mode_graphic23(uint16_t *ln, int line)
 	while (xx--) *ln++ = pen;
 }
 
-void v99x8_device::mode_graphic4(uint16_t *ln, int line)
+void v99x8_device::mode_graphic4(uint32_t *ln, int line)
 {
 	int nametbl_addr, colour;
 	int line2, linemask, x, xx;
@@ -1214,17 +1152,17 @@ void v99x8_device::mode_graphic4(uint16_t *ln, int line)
 	if ( (m_cont_reg[2] & 0x20) && v9938_second_field() )
 		nametbl_addr += 0x8000;
 
-	pen_bg = this->pen(m_pal_ind16[m_cont_reg[7] & 0x0f]);
+	pen_bg = pen16(m_cont_reg[7] & 0x0f);
 	xx = m_offset_x * 2;
 	while (xx--) *ln++ = pen_bg;
 
 	for (x=0;x<128;x++)
 	{
 		colour = m_vram_space->read_byte(nametbl_addr++);
-		pen = this->pen(m_pal_ind16[colour >> 4]);
+		pen = pen16(colour >> 4);
 		*ln++ = pen;
 		*ln++ = pen;
-		pen = this->pen(m_pal_ind16[colour & 15]);
+		pen = pen16(colour & 15);
 		*ln++ = pen;
 		*ln++ = pen;
 	}
@@ -1233,7 +1171,7 @@ void v99x8_device::mode_graphic4(uint16_t *ln, int line)
 	while (xx--) *ln++ = pen_bg;
 }
 
-void v99x8_device::mode_graphic5(uint16_t *ln, int line)
+void v99x8_device::mode_graphic5(uint32_t *ln, int line)
 {
 	int nametbl_addr, colour;
 	int line2, linemask, x, xx;
@@ -1248,8 +1186,8 @@ void v99x8_device::mode_graphic5(uint16_t *ln, int line)
 	if ( (m_cont_reg[2] & 0x20) && v9938_second_field() )
 		nametbl_addr += 0x8000;
 
-	pen_bg1[0] = this->pen(m_pal_ind16[m_cont_reg[7] & 0x03]);
-	pen_bg0[0] = this->pen(m_pal_ind16[(m_cont_reg[7] >> 2) & 0x03]);
+	pen_bg1[0] = pen16(m_cont_reg[7] & 0x03);
+	pen_bg0[0] = pen16((m_cont_reg[7] >> 2) & 0x03);
 
 	xx = m_offset_x;
 	while (xx--) { *ln++ = pen_bg0[0]; *ln++ = pen_bg1[0]; }
@@ -1258,8 +1196,8 @@ void v99x8_device::mode_graphic5(uint16_t *ln, int line)
 
 	for (;x<4;x++)
 	{
-		pen_bg0[x] = this->pen(m_pal_ind16[x]);
-		pen_bg1[x] = this->pen(m_pal_ind16[x]);
+		pen_bg0[x] = pen16(x);
+		pen_bg1[x] = pen16(x);
 	}
 
 	for (x=0;x<128;x++)
@@ -1272,13 +1210,13 @@ void v99x8_device::mode_graphic5(uint16_t *ln, int line)
 		*ln++ = pen_bg1[(colour&3)];
 	}
 
-	pen_bg1[0] = this->pen(m_pal_ind16[m_cont_reg[7] & 0x03]);
-	pen_bg0[0] = this->pen(m_pal_ind16[(m_cont_reg[7] >> 2) & 0x03]);
+	pen_bg1[0] = pen16(m_cont_reg[7] & 0x03);
+	pen_bg0[0] = pen16((m_cont_reg[7] >> 2) & 0x03);
 	xx = 16 - m_offset_x;
 	while (xx--) { *ln++ = pen_bg0[0]; *ln++ = pen_bg1[0]; }
 }
 
-void v99x8_device::mode_graphic6(uint16_t *ln, int line)
+void v99x8_device::mode_graphic6(uint32_t *ln, int line)
 {
 	uint8_t colour;
 	int line2, linemask, x, xx, nametbl_addr;
@@ -1293,7 +1231,7 @@ void v99x8_device::mode_graphic6(uint16_t *ln, int line)
 	if ( (m_cont_reg[2] & 0x20) && v9938_second_field() )
 		nametbl_addr += 0x10000;
 
-	pen_bg = pen(m_pal_ind16[m_cont_reg[7] & 0x0f]);
+	pen_bg = pen16(m_cont_reg[7] & 0x0f);
 	xx = m_offset_x * 2;
 	while (xx--) *ln++ = pen_bg;
 
@@ -1303,8 +1241,8 @@ void v99x8_device::mode_graphic6(uint16_t *ln, int line)
 		{
 			nametbl_addr++;
 			colour = m_vram_space->read_byte(((nametbl_addr&1) << 16) | (nametbl_addr>>1));
-			fg0 = pen(m_pal_ind16[colour >> 4]);
-			fg1 = pen(m_pal_ind16[colour & 15]);
+			fg0 = pen16(colour >> 4);
+			fg1 = pen16(colour & 15);
 			*ln++ = fg0; *ln++ = fg1; *ln++ = fg0; *ln++ = fg1;
 			*ln++ = fg0; *ln++ = fg1; *ln++ = fg0; *ln++ = fg1;
 			*ln++ = fg0; *ln++ = fg1; *ln++ = fg0; *ln++ = fg1;
@@ -1317,8 +1255,8 @@ void v99x8_device::mode_graphic6(uint16_t *ln, int line)
 		for (x=0;x<256;x++)
 		{
 			colour = m_vram_space->read_byte(((nametbl_addr&1) << 16) | (nametbl_addr>>1));
-			*ln++ = pen(m_pal_ind16[colour >> 4]);
-			*ln++ = pen(m_pal_ind16[colour & 15]);
+			*ln++ = pen16(colour >> 4);
+			*ln++ = pen16(colour & 15);
 			nametbl_addr++;
 		}
 	}
@@ -1327,7 +1265,7 @@ void v99x8_device::mode_graphic6(uint16_t *ln, int line)
 	while (xx--) *ln++ = pen_bg;
 }
 
-void v99x8_device::mode_graphic7(uint16_t *ln, int line)
+void v99x8_device::mode_graphic7(uint32_t *ln, int line)
 {
 	uint8_t colour;
 	int line2, linemask, x, xx, nametbl_addr;
@@ -1341,7 +1279,7 @@ void v99x8_device::mode_graphic7(uint16_t *ln, int line)
 	if ( (m_cont_reg[2] & 0x20) && v9938_second_field() )
 		nametbl_addr += 0x10000;
 
-	pen_bg = this->pen(m_pal_ind256[m_cont_reg[7]]);
+	pen_bg = pen256(m_cont_reg[7]);
 	xx = m_offset_x * 2;
 	while (xx--) *ln++ = pen_bg;
 
@@ -1396,17 +1334,17 @@ void v99x8_device::mode_graphic7(uint16_t *ln, int line)
 			ind = (colour[0] & 7) << 11 | (colour[1] & 7) << 14 |
 			(colour[2] & 7) << 5 | (colour[3] & 7) << 8;
 
-			*ln++ = colour[0] & 8 ? m_pal_ind16[colour[0] >> 4] : s_pal_indYJK[ind | ((colour[0] >> 3) & 30)];
-			*ln++ = colour[0] & 8 ? m_pal_ind16[colour[0] >> 4] : s_pal_indYJK[ind | ((colour[0] >> 3) & 30)];
+			*ln++ = colour[0] & 8 ? pen16(colour[0] >> 4) : s_pal_indYJK[ind | ((colour[0] >> 3) & 30)];
+			*ln++ = colour[0] & 8 ? pen16(colour[0] >> 4) : s_pal_indYJK[ind | ((colour[0] >> 3) & 30)];
 
-			*ln++ = colour[1] & 8 ? m_pal_ind16[colour[1] >> 4] : s_pal_indYJK[ind | ((colour[1] >> 3) & 30)];
-			*ln++ = colour[1] & 8 ? m_pal_ind16[colour[1] >> 4] : s_pal_indYJK[ind | ((colour[1] >> 3) & 30)];
+			*ln++ = colour[1] & 8 ? pen16(colour[1] >> 4) : s_pal_indYJK[ind | ((colour[1] >> 3) & 30)];
+			*ln++ = colour[1] & 8 ? pen16(colour[1] >> 4) : s_pal_indYJK[ind | ((colour[1] >> 3) & 30)];
 
-			*ln++ = colour[2] & 8 ? m_pal_ind16[colour[2] >> 4] : s_pal_indYJK[ind | ((colour[2] >> 3) & 30)];
-			*ln++ = colour[2] & 8 ? m_pal_ind16[colour[2] >> 4] : s_pal_indYJK[ind | ((colour[2] >> 3) & 30)];
+			*ln++ = colour[2] & 8 ? pen16(colour[2] >> 4) : s_pal_indYJK[ind | ((colour[2] >> 3) & 30)];
+			*ln++ = colour[2] & 8 ? pen16(colour[2] >> 4) : s_pal_indYJK[ind | ((colour[2] >> 3) & 30)];
 
-			*ln++ = colour[3] & 8 ? m_pal_ind16[colour[3] >> 4] : s_pal_indYJK[ind | ((colour[3] >> 3) & 30)];
-			*ln++ = colour[3] & 8 ? m_pal_ind16[colour[3] >> 4] : s_pal_indYJK[ind | ((colour[3] >> 3) & 30)];
+			*ln++ = colour[3] & 8 ? pen16(colour[3] >> 4) : s_pal_indYJK[ind | ((colour[3] >> 3) & 30)];
+			*ln++ = colour[3] & 8 ? pen16(colour[3] >> 4) : s_pal_indYJK[ind | ((colour[3] >> 3) & 30)];
 
 			nametbl_addr++;
 		}
@@ -1417,7 +1355,7 @@ void v99x8_device::mode_graphic7(uint16_t *ln, int line)
 		{
 			nametbl_addr++;
 			colour = m_vram_space->read_byte(((nametbl_addr&1) << 16) | (nametbl_addr>>1));
-			pen = this->pen(m_pal_ind256[colour]);
+			pen = pen256(colour);
 			*ln++ = pen; *ln++ = pen;
 			*ln++ = pen; *ln++ = pen;
 			*ln++ = pen; *ln++ = pen;
@@ -1434,7 +1372,7 @@ void v99x8_device::mode_graphic7(uint16_t *ln, int line)
 		for (x=0;x<256;x++)
 		{
 			colour = m_vram_space->read_byte(((nametbl_addr&1) << 16) | (nametbl_addr>>1));
-			pen = this->pen(m_pal_ind256[colour]);
+			pen = pen256(colour);
 			*ln++ = pen;
 			*ln++ = pen;
 			nametbl_addr++;
@@ -1445,13 +1383,13 @@ void v99x8_device::mode_graphic7(uint16_t *ln, int line)
 	while (xx--) *ln++ = pen_bg;
 }
 
-void v99x8_device::mode_unknown(uint16_t *ln, int line)
+void v99x8_device::mode_unknown(uint32_t *ln, int line)
 {
 	pen_t fg, bg;
 	int x;
 
-	fg = pen(m_pal_ind16[m_cont_reg[7] >> 4]);
-	bg = pen(m_pal_ind16[m_cont_reg[7] & 15]);
+	fg = pen16(m_cont_reg[7] >> 4);
+	bg = pen16(m_cont_reg[7] & 15);
 
 	x = m_offset_x * 2;
 	while (x--) *ln++ = bg;
@@ -1463,7 +1401,7 @@ void v99x8_device::mode_unknown(uint16_t *ln, int line)
 	while (x--) *ln++ = bg;
 }
 
-void v99x8_device::default_draw_sprite(uint16_t *ln, uint8_t *col)
+void v99x8_device::default_draw_sprite(uint32_t *ln, uint8_t *col)
 {
 	int i;
 	ln += m_offset_x * 2;
@@ -1472,8 +1410,8 @@ void v99x8_device::default_draw_sprite(uint16_t *ln, uint8_t *col)
 	{
 		if (col[i] & 0x80)
 		{
-			*ln++ = pen(m_pal_ind16[col[i] & 0x0f]);
-			*ln++ = pen(m_pal_ind16[col[i] & 0x0f]);
+			*ln++ = pen16(col[i] & 0x0f);
+			*ln++ = pen16(col[i] & 0x0f);
 		}
 		else
 		{
@@ -1482,7 +1420,7 @@ void v99x8_device::default_draw_sprite(uint16_t *ln, uint8_t *col)
 	}
 }
 
-void v99x8_device::graphic5_draw_sprite(uint16_t *ln, uint8_t *col)
+void v99x8_device::graphic5_draw_sprite(uint32_t *ln, uint8_t *col)
 {
 	int i;
 	ln += m_offset_x * 2;
@@ -1491,8 +1429,8 @@ void v99x8_device::graphic5_draw_sprite(uint16_t *ln, uint8_t *col)
 	{
 		if (col[i] & 0x80)
 		{
-			*ln++ = pen(m_pal_ind16[(col[i] >> 2) & 0x03]);
-			*ln++ = pen(m_pal_ind16[col[i] & 0x03]);
+			*ln++ = pen16((col[i] >> 2) & 0x03);
+			*ln++ = pen16(col[i] & 0x03);
 		}
 		else
 		{
@@ -1502,7 +1440,7 @@ void v99x8_device::graphic5_draw_sprite(uint16_t *ln, uint8_t *col)
 }
 
 
-void v99x8_device::graphic7_draw_sprite(uint16_t *ln, uint8_t *col)
+void v99x8_device::graphic7_draw_sprite(uint32_t *ln, uint8_t *col)
 {
 	static const uint16_t g7_ind16[16] = {
 		0, 2, 192, 194, 48, 50, 240, 242,
@@ -1515,8 +1453,9 @@ void v99x8_device::graphic7_draw_sprite(uint16_t *ln, uint8_t *col)
 	{
 		if (col[i] & 0x80)
 		{
-			*ln++ = pen(g7_ind16[col[i] & 0x0f]);
-			*ln++ = pen(g7_ind16[col[i] & 0x0f]);
+			rgb_t color = rgb_t(pal3bit(g7_ind16[col[i] & 0x0f] >> 6), pal3bit(g7_ind16[col[i] & 0x0f] >> 3), pal3bit(g7_ind16[col[i] & 0x0f]));
+			*ln++ = uint32_t(color);
+			*ln++ = uint32_t(color);
 		}
 		else
 		{
@@ -1858,60 +1797,60 @@ void v99x8_device::set_mode()
 	m_mode = i;
 }
 
-void v99x8_device::refresh_16(int line)
+void v99x8_device::refresh_32(int line)
 {
 	bool double_lines = false;
 	uint8_t col[256];
-	uint16_t *ln, *ln2 = nullptr;
+	uint32_t *ln, *ln2 = nullptr;
 
 	if (m_cont_reg[9] & 0x08)
 	{
-		ln = &m_bitmap.pix16(m_scanline*2+((m_stat_reg[2]>>1)&1));
+		ln = &m_bitmap.pix32(m_scanline*2+((m_stat_reg[2]>>1)&1));
 	}
 	else
 	{
-		ln = &m_bitmap.pix16(m_scanline*2);
-		ln2 = &m_bitmap.pix16(m_scanline*2+1);
+		ln = &m_bitmap.pix32(m_scanline*2);
+		ln2 = &m_bitmap.pix32(m_scanline*2+1);
 		double_lines = true;
 	}
 
 	if ( !(m_cont_reg[1] & 0x40) || (m_stat_reg[2] & 0x40) )
 	{
-		(this->*s_modes[m_mode].border_16)(ln);
+		(this->*s_modes[m_mode].border_32)(ln);
 	}
 	else
 	{
-		(this->*s_modes[m_mode].visible_16)(ln, line);
+		(this->*s_modes[m_mode].visible_32)(ln, line);
 		if (s_modes[m_mode].sprites)
 		{
 			(this->*s_modes[m_mode].sprites)(line, col);
-			(this->*s_modes[m_mode].draw_sprite_16)(ln, col);
+			(this->*s_modes[m_mode].draw_sprite_32)(ln, col);
 		}
 	}
 
 	if (double_lines)
-		memcpy(ln2, ln, (512 + 32) * 2);
+		memcpy(ln2, ln, (512 + 32) * sizeof(*ln));
 }
 
 void v99x8_device::refresh_line(int line)
 {
-	int ind16, ind256;
+	pen_t ind16, ind256;
 
-	ind16 = m_pal_ind16[0];
-	ind256 = m_pal_ind256[0];
+	ind16 = pen16(0);
+	ind256 = pen256(0);
 
 	if ( !(m_cont_reg[8] & 0x20) && (m_mode != V9938_MODE_GRAPHIC5) )
 	{
-		m_pal_ind16[0] = m_pal_ind16[(m_cont_reg[7] & 0x0f)];
-		m_pal_ind256[0] = m_pal_ind256[m_cont_reg[7]];
+		set_pen16(0, pen16(m_cont_reg[7] & 0x0f));
+		set_pen256(0, pen256(m_cont_reg[7]));
 	}
 
-	refresh_16 (line);
+	refresh_32(line);
 
 	if ( !(m_cont_reg[8] & 0x20) && (m_mode != V9938_MODE_GRAPHIC5) )
 	{
-		m_pal_ind16[0] = ind16;
-		m_pal_ind256[0] = ind256;
+		set_pen16(0, ind16);
+		set_pen256(0, ind256);
 	}
 }
 

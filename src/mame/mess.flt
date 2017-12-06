@@ -72,6 +72,7 @@ atm.cpp
 atom.cpp
 atpci.cpp
 att4425.cpp
+att630.cpp
 attache.cpp
 aussiebyte.cpp
 avigo.cpp
@@ -125,6 +126,7 @@ channelf.cpp
 chaos.cpp
 chessmst.cpp
 chesstrv.cpp
+cit220.cpp
 clcd.cpp
 cm1800.cpp
 cmi.cpp
@@ -150,6 +152,7 @@ cxgz80.cpp
 cxhumax.cpp
 cybiko.cpp
 czk80.cpp
+d400.cpp
 d6800.cpp
 d6809.cpp
 dai.cpp
@@ -188,6 +191,7 @@ elf.cpp
 elwro800.cpp
 enmirage.cpp
 ep64.cpp
+esprit.cpp
 esq1.cpp
 esq5505.cpp
 esqasr.cpp
@@ -247,7 +251,6 @@ h8.cpp
 h89.cpp
 harriet.cpp
 hazeltin.cpp
-hazeltine.cpp
 hec2hrp.cpp
 hh_amis2k.cpp
 hh_cop400.cpp
@@ -345,6 +348,7 @@ lwriter.cpp
 lynx.cpp
 m20.cpp
 m24.cpp
+m3.cpp
 m5.cpp
 m6805evs.cpp
 m68705prg.cpp
@@ -359,7 +363,8 @@ mbee.cpp
 mc10.cpp
 mc1000.cpp
 mc1502.cpp
-mc80.cpp
+mc8020.cpp
+mc8030.cpp
 mcb216.cpp
 mccpm.cpp
 megadriv.cpp
@@ -375,11 +380,13 @@ microdec.cpp
 microkit.cpp
 micronic.cpp
 microtan.cpp
+microterm.cpp
 microvsn.cpp
 mikro80.cpp
 mikromik.cpp
 mikrosha.cpp
 mightyframe.cpp
+milwaukee.cpp
 mini2440.cpp
 minicom.cpp
 miniforce.cpp
@@ -501,6 +508,7 @@ phc25.cpp
 phunsy.cpp
 pimps.cpp
 pipbug.cpp
+picno.cpp
 pitagjr.cpp
 pk8000.cpp
 pk8020.cpp
@@ -650,6 +658,7 @@ tek440x.cpp
 tekxp33x.cpp
 terak.cpp
 terco.cpp
+terminals.cpp
 test_t400.cpp
 testconsole.cpp
 tg100.cpp
@@ -728,6 +737,8 @@ vixen.cpp
 vk100.cpp
 votrpss.cpp
 votrtnt.cpp
+vp122.cpp
+vp60.cpp
 vsmilepro.cpp
 vt100.cpp
 vt220.cpp

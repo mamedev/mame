@@ -12,6 +12,7 @@
 #include "cpu/m68000/m68000.h"
 #include "cpu/i8085/i8085.h"
 //#include "bus/s100/s100.h"
+#include "machine/i8251.h"
 #include "machine/terminal.h"
 
 
@@ -26,7 +27,7 @@ public:
 	{ }
 
 	void kbd_put(u8 data);
-	DECLARE_WRITE16_MEMBER(dual68_terminal_w);
+	DECLARE_WRITE16_MEMBER(terminal_w);
 
 private:
 	virtual void machine_reset() override;
@@ -38,7 +39,7 @@ private:
 
 
 
-WRITE16_MEMBER( dual68_state::dual68_terminal_w )
+WRITE16_MEMBER( dual68_state::terminal_w )
 {
 	m_terminal->write(space, 0, data >> 8);
 }
@@ -47,7 +48,7 @@ static ADDRESS_MAP_START(dual68_mem, AS_PROGRAM, 16, dual68_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00000000, 0x0000ffff) AM_RAM AM_SHARE("ram")
 	AM_RANGE(0x00080000, 0x00081fff) AM_ROM AM_REGION("user1",0)
-	AM_RANGE(0x007f0000, 0x007f0001) AM_WRITE(dual68_terminal_w)
+	AM_RANGE(0x007f0000, 0x007f0001) AM_WRITE(terminal_w)
 	AM_RANGE(0x00800000, 0x00801fff) AM_ROM AM_REGION("user1",0)
 ADDRESS_MAP_END
 
@@ -59,6 +60,14 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(sio4_io, AS_IO, 8, dual68_state)
 	ADDRESS_MAP_UNMAP_HIGH
+	AM_RANGE(0x22, 0x22) AM_DEVREADWRITE("uart1", i8251_device, status_r, control_w)
+	AM_RANGE(0x23, 0x23) AM_DEVREADWRITE("uart1", i8251_device, data_r, data_w)
+	AM_RANGE(0x2a, 0x2a) AM_DEVREADWRITE("uart2", i8251_device, status_r, control_w)
+	AM_RANGE(0x2b, 0x2b) AM_DEVREADWRITE("uart2", i8251_device, data_r, data_w)
+	AM_RANGE(0x32, 0x32) AM_DEVREADWRITE("uart3", i8251_device, status_r, control_w)
+	AM_RANGE(0x33, 0x33) AM_DEVREADWRITE("uart3", i8251_device, data_r, data_w)
+	AM_RANGE(0x3a, 0x3a) AM_DEVREADWRITE("uart4", i8251_device, status_r, control_w)
+	AM_RANGE(0x3b, 0x3b) AM_DEVREADWRITE("uart4", i8251_device, data_r, data_w)
 ADDRESS_MAP_END
 
 /* Input ports */
@@ -92,6 +101,11 @@ static MACHINE_CONFIG_START( dual68 )
 	/* video hardware */
 	MCFG_DEVICE_ADD("terminal", GENERIC_TERMINAL, 0)
 	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(PUT(dual68_state, kbd_put))
+
+	MCFG_DEVICE_ADD("uart1", I8251, 0)
+	MCFG_DEVICE_ADD("uart2", I8251, 0)
+	MCFG_DEVICE_ADD("uart3", I8251, 0)
+	MCFG_DEVICE_ADD("uart4", I8251, 0)
 MACHINE_CONFIG_END
 
 /* ROM definition */

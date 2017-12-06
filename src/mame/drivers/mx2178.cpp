@@ -23,9 +23,10 @@ TODO:
 ***************************************************************************************************/
 
 #include "emu.h"
-#include "bus/rs232/rs232.h"
 #include "cpu/z80/z80.h"
+//#include "cpu/8x300/8x300.h" // device = N8X300
 #include "machine/6850acia.h"
+#include "bus/rs232/rs232.h"
 #include "machine/clock.h"
 #include "video/mc6845.h"
 #include "screen.h"
@@ -64,10 +65,8 @@ static ADDRESS_MAP_START(mx2178_io, AS_IO, 8, mx2178_state)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_DEVREADWRITE("crtc", mc6845_device, status_r, address_w)
 	AM_RANGE(0x01, 0x01) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
-	AM_RANGE(0x80, 0x80) AM_DEVREADWRITE("acia1", acia6850_device, status_r, control_w)
-	AM_RANGE(0x81, 0x81) AM_DEVREADWRITE("acia1", acia6850_device, data_r, data_w)
-	AM_RANGE(0xa0, 0xa0) AM_DEVREADWRITE("acia2", acia6850_device, status_r, control_w)
-	AM_RANGE(0xa1, 0xa1) AM_DEVREADWRITE("acia2", acia6850_device, data_r, data_w)
+	AM_RANGE(0x80, 0x81) AM_DEVREADWRITE("acia1", acia6850_device, read, write)
+	AM_RANGE(0xa0, 0xa1) AM_DEVREADWRITE("acia2", acia6850_device, read, write)
 ADDRESS_MAP_END
 
 

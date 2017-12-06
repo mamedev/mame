@@ -81,6 +81,7 @@ TODO:
 #include "emu.h"
 #include "includes/champbas.h"
 #include "cpu/z80/z80.h"
+#include "cpu/m6805/m68705.h"
 #include "machine/74259.h"
 #include "machine/gen_latch.h"
 #include "machine/watchdog.h"
@@ -221,6 +222,11 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( champbb2_map, AS_PROGRAM, 8, champbas_state )
 	AM_RANGE(0x7800, 0x7fff) AM_ROM
 	AM_IMPORT_FROM( champbasj_map )
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( tbasebal_map, AS_PROGRAM, 8, champbas_state )
+	AM_RANGE(0x7800, 0x7fff) AM_ROM
+	AM_IMPORT_FROM( champbas_map )
 ADDRESS_MAP_END
 
 // more sprites in exctsccr
@@ -614,6 +620,7 @@ static MACHINE_CONFIG_DERIVED( champbasj, champbas )
 	MCFG_QUANTUM_PERFECT_CPU("alpha_8201:mcu")
 MACHINE_CONFIG_END
 
+
 static MACHINE_CONFIG_DERIVED( champbasja, champbas )
 
 	/* basic machine hardware */
@@ -634,6 +641,17 @@ static MACHINE_CONFIG_DERIVED( champbb2, champbasj )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(champbb2_map)
 MACHINE_CONFIG_END
+
+
+static MACHINE_CONFIG_DERIVED( tbasebal, champbas )
+
+	/* basic machine hardware */
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(tbasebal_map)
+
+	MCFG_CPU_ADD("mcu", M68705P3, XTAL_18_432MHz/6) // ?Mhz
+MACHINE_CONFIG_END
+
 
 
 static MACHINE_CONFIG_START( exctsccr )
@@ -909,32 +927,30 @@ ROM_START( champbb2 )
 	ROM_LOAD( "pr5956", 0x0020, 0x100, CRC(872dd450) SHA1(6c1e2c4a2fc072f4bf4996c731adb0b01b347506) ) /* look-up table */
 ROM_END
 
-ROM_START( champbb2a )
+ROM_START( tbasebal )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "1.bin", 0x0000, 0x2000, CRC(9b75b44d) SHA1(35b67638a5e48cbe999907e3c9c3a33da9d76bba) )
-	ROM_LOAD( "2.bin", 0x2000, 0x2000, CRC(736a1b62) SHA1(24c2d57506754ca789b378a595c03b7591eb5b5c) )
-	ROM_LOAD( "3.bin", 0x4000, 0x2000, CRC(cf5f28cb) SHA1(d553f2085c9c8c77b241b4239cc1ad1764b490d0) )
-	ROM_LOAD( "4.bin", 0x7800, 0x0800, NO_DUMP )
+	ROM_LOAD( "1.2E.2764",     0x0000, 0x2000, CRC(9b75b44d) SHA1(35b67638a5e48cbe999907e3c9c3a33da9d76bba) )
+	ROM_LOAD( "2_P9.2G.2764",  0x2000, 0x2000, CRC(736a1b62) SHA1(24c2d57506754ca789b378a595c03b7591eb5b5c) )
+	ROM_LOAD( "3.2H.2764",     0x4000, 0x2000, CRC(cf5f28cb) SHA1(d553f2085c9c8c77b241b4239cc1ad1764b490d0) )
+	ROM_LOAD( "IC2.2764",      0x6000, 0x2000, CRC(aacb9647) SHA1(4f3830ffc18f8578064babbc638efb5a59ef1a3d) ) // on sub-board with MCU
 
-	/* not in this set, but probably the same */
 	ROM_REGION( 0x10000, "audiocpu", 0 )
-	ROM_LOAD( "epr5933", 0x0000, 0x2000, CRC(26ab3e16) SHA1(019b9d34233a6b7a53e204154b782ceb42915d2b) )
-	ROM_LOAD( "epr5934", 0x2000, 0x2000, CRC(7c01715f) SHA1(b15b2001b8c110f2599eee3aeed79f67686ebd7e) )
-	ROM_LOAD( "epr5935", 0x4000, 0x2000, CRC(3c911786) SHA1(eea0c467e213d237b5bb9d04b19a418d6090c2dc) )
+	ROM_LOAD( "6.2K.2764", 0x0000, 0x2000, CRC(24c482ee) SHA1(c25bdf77014e095fc11a9a6b17f16858f19db451) )
+	ROM_LOAD( "7.2L.2764", 0x2000, 0x2000, CRC(f10b148b) SHA1(d66516d509f6f16e51ee59d27c4867e276064c3f) )
+	ROM_LOAD( "8.2N.2764", 0x4000, 0x2000, CRC(2dc484dd) SHA1(28bd68c787d7e6989849ca52009948dbd5cdcc79) )
 
-	// the pcb has a 8302 on it, though only the 8201 instructions are used
-	ROM_REGION( 0x2000, "alpha_8201:mcu", 0 )
-	ROM_LOAD( "alpha-8302_44801b35.bin", 0x0000, 0x2000, CRC(edabac6c) SHA1(eaf1c51b63023256df526b0d3fd53cffc919c901) )
+	ROM_REGION( 0x0800, "mcu", 0 ) /* MC68705P5 */
+	ROM_LOAD( "IC3_mc68705p3_rom.bin",    0x0000, 0x0800, CRC(6b477f5f) SHA1(c773a4bed22106346fb2347b6d5a32958be8213c) )
 
 	ROM_REGION( 0x2000, "gfx1", 0 ) // chars + sprites: rearranged by DRIVER_INIT to leave only chars
-	ROM_LOAD( "epr5936", 0x0000, 0x2000, CRC(c4a4df75) SHA1(7b85dbf405697b0b8881f910c08f6db6c828b19a) )
+	ROM_LOAD( "4.5E.2764", 0x0000, 0x2000, CRC(c4a4df75) SHA1(7b85dbf405697b0b8881f910c08f6db6c828b19a) )
 
 	ROM_REGION( 0x2000, "gfx2", 0 ) // chars + sprites: rearranged by DRIVER_INIT to leave only sprites
-	ROM_LOAD( "epr5937", 0x0000, 0x2000, CRC(5c80ec42) SHA1(9b79737577e48a6b2ec20ce145252545955e82c3) )
+	ROM_LOAD( "5.5G.2764", 0x0000, 0x2000, CRC(5c80ec42) SHA1(9b79737577e48a6b2ec20ce145252545955e82c3) )
 
 	ROM_REGION( 0x0120, "proms", 0 )
-	ROM_LOAD( "pr5957", 0x0000, 0x020, CRC(f5ce825e) SHA1(956f580840f1a7d24bfbd72b2929d14e9ee1b660) ) /* palette */
-	ROM_LOAD( "pr5956", 0x0020, 0x100, CRC(872dd450) SHA1(6c1e2c4a2fc072f4bf4996c731adb0b01b347506) ) /* look-up table */
+	ROM_LOAD( "1e.bpr",    0x0000, 0x0020, CRC(f5ce825e) SHA1(956f580840f1a7d24bfbd72b2929d14e9ee1b660) ) /* palette - wasn't dumped from this set, could be wrong */
+	ROM_LOAD( "5K.82S129", 0x0020, 0x0100, CRC(2e481ffa) SHA1(bc8979efd43bee8be0ce96ebdacc873a5821e06e) ) /* look-up table */
 ROM_END
 
 ROM_START( champbb2j )
@@ -1278,8 +1294,8 @@ GAME( 1983, champbasj,  champbas, champbasj,  champbas, champbas_state, champbas
 GAME( 1983, champbasja, champbas, champbasja, champbas, champbas_state, champbas, ROT0,   "Alpha Denshi Co.", "Champion Base Ball (Japan set 2)", MACHINE_SUPPORTS_SAVE ) // simplified protection, no mcu
 GAME( 1983, champbasjb, champbas, champbasjb, champbas, champbas_state, champbas, ROT0,   "Alpha Denshi Co.", "Champion Base Ball (Japan set 3)", MACHINE_SUPPORTS_SAVE ) // no protection
 GAME( 1983, champbb2,   0,        champbb2,   champbas, champbas_state, champbas, ROT0,   "Alpha Denshi Co. (Sega license)", "Champion Base Ball Part-2 (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, champbb2a,  champbb2, champbb2,   champbas, champbas_state, champbas, ROT0,   "Alpha Denshi Co.", "Champion Base Ball Part-2 (set 2)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // incomplete dump
 GAME( 1983, champbb2j,  champbb2, champbb2,   champbas, champbas_state, champbas, ROT0,   "Alpha Denshi Co.", "Champion Base Ball Part-2 (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, tbasebal,   champbb2, tbasebal,   champbas, champbas_state, champbas, ROT0,   "Alpha Denshi Co.", "Taikyoku Base Ball", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // 68705 protection instead
 
 GAME( 1983, exctsccr,   0,        exctsccr,   exctsccr, champbas_state, exctsccr, ROT270, "Alpha Denshi Co.", "Exciting Soccer", MACHINE_SUPPORTS_SAVE )
 GAME( 1983, exctsccru,  exctsccr, exctsccr,   exctsccr, champbas_state, exctsccr, ROT270, "Alpha Denshi Co.", "Exciting Soccer (US)", MACHINE_SUPPORTS_SAVE )

@@ -15,7 +15,7 @@
 #include "machine/interpro_arbga.h"
 
 #include "machine/ram.h"
-#include "machine/eeprom.h"
+#include "machine/28fxxx.h"
 #include "machine/mc146818.h"
 #include "machine/z80scc.h"
 #include "machine/upd765.h"
@@ -55,29 +55,9 @@
 
 #define INTERPRO_IDPROM_TAG        "idprom"
 #define INTERPRO_EPROM_TAG         "eprom"
-#define INTERPRO_EEPROM_TAG        "eeprom"
+#define INTERPRO_FLASH_TAG         "flash"
 
 #define INTERPRO_SRBUS_TAG         "sr"
-
-class interpro_eeprom_device : public eeprom_base_device
-{
-public:
-	interpro_eeprom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-
-	DECLARE_READ16_MEMBER(eeprom_r) { return read(offset); }
-	DECLARE_WRITE16_MEMBER(eeprom_w) { if (m_write_enable) write(offset, data); }
-
-	DECLARE_WRITE_LINE_MEMBER(write_enable) { m_write_enable = state; }
-
-protected:
-	virtual void device_start() override { eeprom_base_device::device_start(); }
-	virtual void device_reset() override { eeprom_base_device::device_reset(); }
-
-private:
-	int m_write_enable;
-};
-
-DECLARE_DEVICE_TYPE(INTERPRO_EEPROM, interpro_eeprom_device)
 
 class interpro_state : public driver_device
 {
@@ -85,7 +65,6 @@ public:
 	interpro_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, INTERPRO_CPU_TAG)
-		, m_mmu(*this, INTERPRO_MMU_TAG)
 		, m_ram(*this, RAM_TAG)
 		, m_mcga(*this, INTERPRO_MCGA_TAG)
 		, m_sga(*this, INTERPRO_SGA_TAG)
@@ -98,10 +77,10 @@ public:
 		, m_scsi(*this, INTERPRO_SCSI_DEVICE_TAG)
 		, m_eth(*this, INTERPRO_ETH_TAG)
 		, m_ioga(*this, INTERPRO_IOGA_TAG)
-		{ }
+	{
+	}
 
 	required_device<clipper_device> m_maincpu;
-	required_device<cammu_device> m_mmu;
 	required_device<ram_device> m_ram;
 
 	required_device<interpro_mcga_device> m_mcga;
@@ -116,7 +95,7 @@ public:
 	required_device<i82586_base_device> m_eth;
 	required_device<interpro_ioga_device> m_ioga;
 
-	DECLARE_DRIVER_INIT(interpro);
+	DECLARE_DRIVER_INIT(common);
 
 	enum sreg_error_mask
 	{
@@ -200,9 +179,17 @@ class turquoise_state : public interpro_state
 public:
 	turquoise_state(const machine_config &mconfig, device_type type, const char *tag)
 		: interpro_state(mconfig, type, tag)
-	{}
+		, m_d_cammu(*this, INTERPRO_MMU_TAG "_d")
+		, m_i_cammu(*this, INTERPRO_MMU_TAG "_i")
+	{
+	}
+
+	DECLARE_DRIVER_INIT(turquoise);
 
 	DECLARE_WRITE8_MEMBER(sreg_error_w) { m_sreg_error = data; }
+
+	required_device<cammu_c3_device> m_d_cammu;
+	required_device<cammu_c3_device> m_i_cammu;
 };
 
 class sapphire_state : public interpro_state
@@ -210,12 +197,20 @@ class sapphire_state : public interpro_state
 public:
 	sapphire_state(const machine_config &mconfig, device_type type, const char *tag)
 		: interpro_state(mconfig, type, tag)
-		, m_eeprom(*this, INTERPRO_EEPROM_TAG)
-	{}
+		, m_mmu(*this, INTERPRO_MMU_TAG)
+		, m_flash_lo(*this, INTERPRO_FLASH_TAG "_lo")
+		, m_flash_hi(*this, INTERPRO_FLASH_TAG "_hi")
+	{
+	}
 
-	required_device<interpro_eeprom_device> m_eeprom;
+	DECLARE_DRIVER_INIT(sapphire);
 
 	virtual DECLARE_WRITE16_MEMBER(sreg_ctrl2_w) override;
+
+	required_device<cammu_c4_device> m_mmu;
+
+	required_device<intel_28f010_device> m_flash_lo;
+	required_device<intel_28f010_device> m_flash_hi;
 };
 
 #endif // MAME_INCLUDES_INTERPRO_H

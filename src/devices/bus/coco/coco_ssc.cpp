@@ -31,6 +31,8 @@
 ***************************************************************************/
 
 #include "emu.h"
+#include "coco_ssc.h"
+
 #include "sound/ay8910.h"
 #include "sound/sp0256.h"
 #include "machine/netlist.h"

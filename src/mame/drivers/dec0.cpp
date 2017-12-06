@@ -500,9 +500,10 @@ READ16_MEMBER(dec0_state::slyspy_controls_r)
 	return ~0;
 }
 
+// TODO: this can be a timer access, maybe video counter returns (and used as RNG in both games)
 READ16_MEMBER(dec0_state::slyspy_protection_r)
 {
-	switch (offset<<1) 
+	switch (offset<<1)
 	{
 		/* These values are for Boulderdash, I have no idea what they do in Slyspy */
 		case 0:     return 0;
@@ -512,7 +513,7 @@ READ16_MEMBER(dec0_state::slyspy_protection_r)
 		// sly spy uses this port as RNG, for now let's do same thing as bootleg (i.e. reads 0x306028)
 		// chances are that it actually ties to the main CPU xtal instead.
 		// (reads at 6958 6696)
-		case 0xc:	return m_ram[0x2028/2] >> 8;
+		case 0xc:   return m_ram[0x2028/2] >> 8;
 	}
 
 	logerror("%04x, Unknown protection read at 30c000 %d\n", space.device().safe_pc(), offset);
@@ -687,7 +688,7 @@ READ8_MEMBER(dec0_state::slyspy_sound_state_r)
 	m_slyspy_sound_state ++;
 	m_slyspy_sound_state &= 3;
 	m_sndprotect->set_bank(m_slyspy_sound_state);
-	
+
 	// returned value doesn't matter
 	return 0xff;
 }
@@ -696,7 +697,7 @@ READ8_MEMBER(dec0_state::slyspy_sound_state_reset_r)
 {
 	m_slyspy_sound_state = 0;
 	m_sndprotect->set_bank(m_slyspy_sound_state);
-	
+
 	// returned value doesn't matter
 	return 0xff;
 }
@@ -1592,15 +1593,10 @@ GFXDECODE_END
 
 
 
-/* This is guesswork, in order to get ~57,41 Hz.
- * If real Pixel Clock isn't 5 MHz then htotal/vtotal is different too ... */
-#define DEC0_PIXEL_CLOCK XTAL_20MHz/4
-#define DEC0_HTOTAL 320
-#define DEC0_HBEND 0
-#define DEC0_HBSTART 256
-#define DEC0_VTOTAL 272
-#define DEC0_VBEND 8
-#define DEC0_VBSTART 256-8
+// DECO video CRTC, pixel clock is unverified (actually 24MHz/4?)
+#define MCFG_SCREEN_RAW_PARAMS_DATA_EAST \
+		MCFG_SCREEN_RAW_PARAMS(XTAL_12MHz/2,384,0,256,272,8,248)
+
 
 
 static MACHINE_CONFIG_START( dec0_base )
@@ -1609,7 +1605,7 @@ static MACHINE_CONFIG_START( dec0_base )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	//MCFG_SCREEN_REFRESH_RATE(57.41)
 	//MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(529) /* 57.41 Hz, 529us Vblank */)
-	MCFG_SCREEN_RAW_PARAMS(DEC0_PIXEL_CLOCK,DEC0_HTOTAL,DEC0_HBEND,DEC0_HBSTART,DEC0_VTOTAL,DEC0_VBEND,DEC0_VBSTART)
+	MCFG_SCREEN_RAW_PARAMS_DATA_EAST
 	//MCFG_SCREEN_SIZE(32*8, 32*8)
 	//MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
 	//MCFG_SCREEN_UPDATE_DRIVER differs per game
@@ -1742,7 +1738,7 @@ static MACHINE_CONFIG_START( automat )
 	MCFG_SCREEN_ADD("screen", RASTER)
 //  MCFG_SCREEN_REFRESH_RATE(57.41)
 //  MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(529) /* 57.41 Hz, 529us Vblank */)
-	MCFG_SCREEN_RAW_PARAMS(DEC0_PIXEL_CLOCK,DEC0_HTOTAL,DEC0_HBEND,DEC0_HBSTART,DEC0_VTOTAL,DEC0_VBEND,DEC0_VBSTART)
+	MCFG_SCREEN_RAW_PARAMS_DATA_EAST
 	MCFG_SCREEN_UPDATE_DRIVER(dec0_automat_state, screen_update_automat)
 	MCFG_SCREEN_PALETTE("palette")
 
@@ -1817,7 +1813,7 @@ static MACHINE_CONFIG_START( secretab )
 	MCFG_SCREEN_ADD("screen", RASTER)
 //  MCFG_SCREEN_REFRESH_RATE(57.41)
 //  MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(529) /* 57.41 Hz, 529us Vblank */)
-	MCFG_SCREEN_RAW_PARAMS(DEC0_PIXEL_CLOCK,DEC0_HTOTAL,DEC0_HBEND,DEC0_HBSTART,DEC0_VTOTAL,DEC0_VBEND,DEC0_VBSTART)
+	MCFG_SCREEN_RAW_PARAMS_DATA_EAST
 	MCFG_SCREEN_UPDATE_DRIVER(dec0_automat_state, screen_update_secretab)
 	MCFG_SCREEN_PALETTE("palette")
 
@@ -1973,18 +1969,18 @@ static MACHINE_CONFIG_DERIVED( slyspy, dec1 )
 	MCFG_DEVICE_ADD("pfprotect", ADDRESS_MAP_BANK, 0)
 	MCFG_DEVICE_PROGRAM_MAP(slyspy_protection_map)
 	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_BIG)
-	MCFG_ADDRESS_MAP_BANK_DATABUS_WIDTH(16)
-	MCFG_ADDRESS_MAP_BANK_ADDRBUS_WIDTH(18)
+	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(16)
+	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(18)
 	MCFG_ADDRESS_MAP_BANK_STRIDE(0x10000)
 
 	MCFG_DEVICE_ADD("sndprotect", ADDRESS_MAP_BANK, 0)
 	MCFG_DEVICE_PROGRAM_MAP(slyspy_sound_protection_map)
 	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_ADDRESS_MAP_BANK_DATABUS_WIDTH(8)
-	MCFG_ADDRESS_MAP_BANK_ADDRBUS_WIDTH(21)
+	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
+	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(21)
 	MCFG_ADDRESS_MAP_BANK_STRIDE(0x80000)
 
-	
+
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(dec0_state, screen_update_slyspy)

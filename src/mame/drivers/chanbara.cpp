@@ -347,9 +347,9 @@ static const gfx_layout spritelayout =
 static GFXDECODE_START( chanbara )
 	GFXDECODE_ENTRY( "gfx1", 0x00000, tilelayout,   0x40, 32 )
 	GFXDECODE_ENTRY( "sprites", 0x00000, spritelayout, 0x80, 16 )
-
 	GFXDECODE_ENTRY( "gfx3", 0x00000, tile16layout, 0, 32 )
 GFXDECODE_END
+
 /***************************************************************************/
 
 
@@ -387,16 +387,18 @@ void chanbara_state::machine_reset()
 
 static MACHINE_CONFIG_START( chanbara )
 
-	MCFG_CPU_ADD("maincpu", M6809, 12000000/8)
+	MCFG_CPU_ADD("maincpu", M6809, XTAL_12MHz/8)
 	MCFG_CPU_PROGRAM_MAP(chanbara_map)
 
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(57.4122)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0, 32*8-1, 2*8, 30*8-1)
+//  MCFG_SCREEN_REFRESH_RATE(57.4122)
+//  MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
+//  MCFG_SCREEN_SIZE(32*8, 32*8)
+//  MCFG_SCREEN_VISIBLE_AREA(0, 32*8-1, 2*8, 30*8-1)
+	// DECO video CRTC
+	MCFG_SCREEN_RAW_PARAMS(XTAL_12MHz/2,384,0,256,272,16,240)
 	MCFG_SCREEN_UPDATE_DRIVER(chanbara_state, screen_update_chanbara)
 	MCFG_SCREEN_PALETTE("palette")
 
@@ -409,8 +411,6 @@ static MACHINE_CONFIG_START( chanbara )
 
 	MCFG_SOUND_ADD("ymsnd", YM2203, 12000000/8)
 	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("maincpu", 0))
-
-
 	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(chanbara_state, chanbara_ay_out_0_w))
 	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(chanbara_state, chanbara_ay_out_1_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)

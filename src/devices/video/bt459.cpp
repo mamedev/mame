@@ -10,12 +10,8 @@
  * Reference: http://www.bitsavers.org/components/brooktree/_dataBooks/1991_Brooktree_Product_Databook.pdf
  *
  * TODO
- *   - blink masking and blinking
  *   - pixel pan and zoom
- *   - dual cursor logic
- *   - X Windows modes
  *   - overlay/underlay
- *   - optimisation
  */
 
 #include "emu.h"
@@ -72,10 +68,13 @@ void bt459_device::device_start()
 
 	save_item(NAME(m_cursor_ram));
 	save_item(NAME(m_palette_ram));
+
+	save_item(NAME(m_blink_start));
 }
 
 void bt459_device::device_reset()
 {
+	m_blink_start = -1;
 }
 
 /*
@@ -274,6 +273,9 @@ WRITE8_MEMBER(bt459_device::register_w)
 			(data & CR0302) == CR0302_3232 ? "32 on 32 off" :
 			(data & CR0302) == CR0302_1616 ? "16 on 16 off" : "16 on 48 off",
 			8 >> (data & CR0100));
+
+		// reset the blink timer
+		m_blink_start = -1;
 		break;
 
 	case REG_COMMAND_1:
@@ -489,60 +491,80 @@ WRITE8_MEMBER(bt459_device::palette_w)
 
 void bt459_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, u8 *pixel_data)
 {
-	// draw pixel data
+	// initialise the blink timer
+	if (m_blink_start > screen.frame_number())
+		m_blink_start = screen.frame_number();
+
+	// compute the blink state according to the programmed duty cycle
+	const bool blink_state = ((screen.frame_number() - m_blink_start) & (
+		(m_command_0 & CR0302) == CR0302_1616 ? 0x10 :
+		(m_command_0 & CR0302) == CR0302_3232 ? 0x20 :
+		(m_command_0 & CR0302) == CR0302_6464 ? 0x40 : 0x30)) == 0;
+
+	// compute the pixel mask from the pixel read mask and blink mask/state
+	const u8 pixel_mask = m_pixel_read_mask & (blink_state ? 0xffU : ~m_pixel_blink_mask);
+
+	// draw visible pixel data
 	switch (m_command_0 & CR0100)
 	{
 	case CR0100_1BPP:
-		for (int y = 0; y < screen.height(); y++)
-			for (int x = 0; x < screen.width(); x += 8)
+		for (int y = screen.visible_area().min_y; y <= screen.visible_area().max_y; y++)
+			for (int x = screen.visible_area().min_x; x <= screen.visible_area().max_x; x += 8)
 			{
 				u8 data = *pixel_data++;
 
-				bitmap.pix(y, x + 7) = get_rgb(data & 0x1); data >>= 1;
-				bitmap.pix(y, x + 6) = get_rgb(data & 0x1); data >>= 1;
-				bitmap.pix(y, x + 5) = get_rgb(data & 0x1); data >>= 1;
-				bitmap.pix(y, x + 4) = get_rgb(data & 0x1); data >>= 1;
-				bitmap.pix(y, x + 3) = get_rgb(data & 0x1); data >>= 1;
-				bitmap.pix(y, x + 2) = get_rgb(data & 0x1); data >>= 1;
-				bitmap.pix(y, x + 1) = get_rgb(data & 0x1); data >>= 1;
-				bitmap.pix(y, x + 0) = get_rgb(data & 0x1);
+				bitmap.pix(y, x + 7) = get_rgb(data & 0x1, pixel_mask); data >>= 1;
+				bitmap.pix(y, x + 6) = get_rgb(data & 0x1, pixel_mask); data >>= 1;
+				bitmap.pix(y, x + 5) = get_rgb(data & 0x1, pixel_mask); data >>= 1;
+				bitmap.pix(y, x + 4) = get_rgb(data & 0x1, pixel_mask); data >>= 1;
+				bitmap.pix(y, x + 3) = get_rgb(data & 0x1, pixel_mask); data >>= 1;
+				bitmap.pix(y, x + 2) = get_rgb(data & 0x1, pixel_mask); data >>= 1;
+				bitmap.pix(y, x + 1) = get_rgb(data & 0x1, pixel_mask); data >>= 1;
+				bitmap.pix(y, x + 0) = get_rgb(data & 0x1, pixel_mask);
 			}
 		break;
 
 	case CR0100_2BPP:
-		for (int y = 0; y < screen.height(); y++)
-			for (int x = 0; x < screen.width(); x += 4)
+		for (int y = screen.visible_area().min_y; y <= screen.visible_area().max_y; y++)
+			for (int x = screen.visible_area().min_x; x <= screen.visible_area().max_x; x += 4)
 			{
 				u8 data = *pixel_data++;
 
-				bitmap.pix(y, x + 3) = get_rgb(data & 0x3); data >>= 2;
-				bitmap.pix(y, x + 2) = get_rgb(data & 0x3); data >>= 2;
-				bitmap.pix(y, x + 1) = get_rgb(data & 0x3); data >>= 2;
-				bitmap.pix(y, x + 0) = get_rgb(data & 0x3);
+				bitmap.pix(y, x + 3) = get_rgb(data & 0x3, pixel_mask); data >>= 2;
+				bitmap.pix(y, x + 2) = get_rgb(data & 0x3, pixel_mask); data >>= 2;
+				bitmap.pix(y, x + 1) = get_rgb(data & 0x3, pixel_mask); data >>= 2;
+				bitmap.pix(y, x + 0) = get_rgb(data & 0x3, pixel_mask);
 			}
 		break;
 
 	case CR0100_4BPP:
-		for (int y = 0; y < screen.height(); y++)
-			for (int x = 0; x < screen.width(); x += 2)
+		for (int y = screen.visible_area().min_y; y <= screen.visible_area().max_y; y++)
+			for (int x = screen.visible_area().min_x; x <= screen.visible_area().max_x; x += 2)
 			{
 				u8 data = *pixel_data++;
 
-				bitmap.pix(y, x + 1) = get_rgb(data & 0x7); data >>= 4;
-				bitmap.pix(y, x + 0) = get_rgb(data & 0x7);
+				bitmap.pix(y, x + 1) = get_rgb(data & 0x7, pixel_mask); data >>= 4;
+				bitmap.pix(y, x + 0) = get_rgb(data & 0x7, pixel_mask);
 			}
 		break;
 
 	case CR0100_8BPP:
-		for (int y = 0; y < screen.height(); y++)
-			for (int x = 0; x < screen.width(); x++)
-				bitmap.pix(y, x) = get_rgb(*pixel_data++);
+		for (int y = screen.visible_area().min_y; y <= screen.visible_area().max_y; y++)
+			for (int x = screen.visible_area().min_x; x <= screen.visible_area().max_x; x++)
+				bitmap.pix(y, x) = get_rgb(*pixel_data++, pixel_mask);
 		break;
 	}
 
-	// draw cursors
-	if (m_cursor_command & (CR47 | CR46 | CR45 | CR44))
+	// draw cursors when visible and not blinked off
+	if ((m_cursor_command & (CR47 | CR46 | CR45 | CR44)) && ((m_cursor_command & CR40) == 0 || blink_state))
 	{
+		// get 64x64 bitmap and cross hair cursor plane enable
+		const u8 bm_cursor_enable = (m_cursor_command & (CR47 | CR46)) >> 6;
+		const u8 ch_cursor_enable = (m_cursor_command & (CR45 | CR44)) >> 4;
+
+		// get cross hair cursor half thickness
+		const int ch_thickness = (m_cursor_command & CR4241) >> 1;
+
 		/*
 		 * The cursor (x) value to be written is calculated as follows:
 		 *
@@ -550,9 +572,10 @@ void bt459_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, co
 		 *
 		 * where
 		 *
-		 *   P = 37 if 1:1 input multiplexing, 52 if 4:1 input multiplexing, 57 if 5:1 input multiplexing
-		 *   H = number of pixels between the first rising edge of LD* following the falling edge of HSYNC*
-		 *       to active video
+		 *   P = 37 if 1:1 input multiplexing, 52 if 4:1 input multiplexing,
+		 *       57 if 5:1 input multiplexing
+		 *   H = number of pixels between the first rising edge of LD*
+		 *       following the falling edge of HSYNC* to active video
 		 *
 		 * The cursor (y) value to be written is calculated as follows:
 		 *
@@ -560,63 +583,67 @@ void bt459_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, co
 		 *
 		 * where
 		 *
-		 *   V = number of scan lines from the second sync pulse during vertical blanking to active video
+		 *   V = number of scan lines from the second sync pulse during
+		 *       vertical blanking to active video
 		 *
-		 * Values from $0FC0 (-64) to $0FBF (+4031) may be loaded into the cursor(y) register. The negative values ($0FC0
-		 * to $0FFF) are used in situations where V < 32, and the cursor must be moved off the top of the screen.
+		 * Values from $0FC0 (-64) to $0FBF (+4031) may be loaded into the
+		 * cursor (y) register. The negative values ($0FC0 to $0FFF) are used
+		 * in situations where V < 32, and the cursor must be moved off the
+		 * top of the screen.
 		 */
-		const int cursor_x = m_cursor_x - screen.visible_area().min_x + (
+		const int cursor_x = m_cursor_x + (
 			(m_command_0 & CR0706) == CR0706_11MPX ? 37 :
 			(m_command_0 & CR0706) == CR0706_41MPX ? 52 :
 			(m_command_0 & CR0706) == CR0706_51MPX ? 57 : 0);
-		const int cursor_y = (m_cursor_y < 0xfc0 ? m_cursor_y : m_cursor_y - 0x1000) - screen.visible_area().min_y + 32;
+		const int cursor_y = (m_cursor_y < 0xfc0 ? m_cursor_y : m_cursor_y - 0x1000) + 32;
 
-		// 64x64 cursor
-		if (m_cursor_command & (CR47 | CR46))
+		// 64x64 bitmap cursor
+		if (bm_cursor_enable)
 		{
 			// compute target 64x64 rectangle
 			rectangle cursor(cursor_x - 31, cursor_x + 32, cursor_y - 31, cursor_y + 32);
 
-			// intersect with bitmap
+			// intersect with screen bitmap
 			cursor &= bitmap.cliprect();
 
 			// draw if any portion is visible
 			if (!cursor.empty())
 			{
-				const u8 cursor_mask = ((m_cursor_command & CR47) ? 0x2 : 0) | ((m_cursor_command & CR46) ? 0x1 : 0);
-				int cursor_offset = 0;
+				for (int y = 0; y < 64; y++)
+				{
+					// get screen y pixel coordinate
+					const int ypos = cursor_y - 31 + y;
 
-				for (int y = cursor_y - 31; y <= cursor_y + 32; y++)
-					for (int x = cursor_x - 31; x <= cursor_x + 32; x += 4)
+					for (int x = 0; x < 64; x++)
 					{
-						// fetch 4x2 bits of cursor data
-						u8 data = m_cursor_ram[cursor_offset++];
-						int cursor_color;
+						// get screen x pixel coordinate
+						const int xpos = cursor_x - 31 + x;
 
-						// write cursor pixels which are visible
-						if ((cursor_color = ((data >>= 0) & cursor_mask)) && cursor.contains(x + 3, y))
-							bitmap.pix(y, x + 3) = m_cursor_color[cursor_color - 1];
+						// check if pixel is visible
+						if (cursor.contains(xpos, ypos))
+						{
+							// retrieve 2 bits of 64x64 bitmap cursor data
+							u8 data = (m_cursor_ram[y * 16 + (x >> 2)] >> ((3 - (x & 3)) << 1)) & bm_cursor_enable;
 
-						if ((cursor_color = ((data >>= 2) & cursor_mask)) && cursor.contains(x + 2, y))
-							bitmap.pix(y, x + 2) = m_cursor_color[cursor_color - 1];
+							// check for dual-cursor mode and combine with cross-hair data
+							if (ch_cursor_enable)
+								if (((x >= 31 - ch_thickness) && (x <= 31 + ch_thickness)) || ((y >= 31 - ch_thickness) && (y <= 31 + ch_thickness)))
+									data = (m_cursor_command & CR43) ? data | ch_cursor_enable : data ^ ch_cursor_enable;
 
-						if ((cursor_color = ((data >>= 2) & cursor_mask)) && cursor.contains(x + 1, y))
-							bitmap.pix(y, x + 1) = m_cursor_color[cursor_color - 1];
-
-						if ((cursor_color = ((data >>= 2) & cursor_mask)) && cursor.contains(x + 0, y))
-							bitmap.pix(y, x + 0) = m_cursor_color[cursor_color - 1];
+							// write cursor data to screen (normal or X Window mode)
+							if (data && !((m_command_2 & CR21) && data == 1))
+								bitmap.pix(ypos, xpos) = m_cursor_color[data - 1];
+						}
 					}
+				}
 			}
 		}
 
 		// cross hair cursor
-		if (m_cursor_command & (CR45 | CR44))
+		if (ch_cursor_enable)
 		{
 			// get the cross hair cursor color
-			const rgb_t cursor_color = m_cursor_color[(((m_cursor_command & CR45) ? 0x2 : 0) | ((m_cursor_command & CR44) ? 0x1 : 0)) - 1];
-
-			// get half the cross hair line thickness
-			const int thickness = (m_cursor_command & CR4241) >> 1;
+			const rgb_t ch_color = m_cursor_color[ch_cursor_enable - 1];
 
 			/*
 			 * The window (x) value to be written is calculated as follows:
@@ -625,9 +652,10 @@ void bt459_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, co
 			 *
 			 * where
 			 *
-			 *   P = 5 if 1:1 input multiplexing, 20 if 4:1 input multiplexing, 25 if 5:1 input multiplexing
-			 *   H = number of pixels between the first rising edge of LD* following the falling edge of HSYNC*
-			 *       to active video
+			 *   P = 5 if 1:1 input multiplexing, 20 if 4:1 input multiplexing,
+			 *       25 if 5:1 input multiplexing
+			 *   H = number of pixels between the first rising edge of LD*
+			 *       following the falling edge of HSYNC* to active video
 			 *
 			 * The window (y) value to be written is calculated as follows:
 			 *
@@ -635,47 +663,80 @@ void bt459_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, co
 			 *
 			 * where
 			 *
-			 *   V = number of scan lines from the second sync pulse during vertical blanking to active video
+			 *   V = number of scan lines from the second sync pulse during
+			 *       vertical blanking to active video
 			 *
-			 * Values from $0000 to $0FFF may be written to the window (x) and (y) registers. A full-screen cross hair
-			 * is implemented by loading the window (x,y) registers with $0000, and the window width and height registers with
-			 * $0FFF.
+			 * Values from $0000 to $0FFF may be written to the window (x) and
+			 * (y) registers. A full-screen cross hair is implemented by
+			 * loading the window (x,y) registers with $0000, and the window
+			 * width and height registers with $0FFF.
 			 */
-			const int window_x = m_window_x - screen.visible_area().min_x + (
+			const bool full_screen = (m_window_x == 0 && m_window_y == 0 && m_window_w == 0x0fff && m_window_h == 0x0fff);
+			const int window_x = full_screen ? screen.visible_area().min_x : m_window_x + (
 				(m_command_0 & CR0706) == CR0706_11MPX ? 5 :
 				(m_command_0 & CR0706) == CR0706_41MPX ? 20 :
 				(m_command_0 & CR0706) == CR0706_51MPX ? 25 : 0);
-			const int window_y = m_window_y - screen.visible_area().min_y;
+			const int window_y = full_screen ? screen.visible_area().min_y : m_window_y;
 
 			/*
-			 * The actual window width is 2, 8 or 10 pixels more than the value specified by the window width register, depending
-			 * on whether 1:1, 4:1 or 5:1 input multiplexing is specified. The actual window height is 2 pixels more than the
-			 * value specified by the window height register. Therefore, the minimum window width is 2, 8 or 10 pixels for 1:1,
-			 * 4:1 and 5:1 multiplexing, respectively. The minimum window height is 2 pixels.
+			 * The actual window width is 2, 8 or 10 pixels more than the
+			 * value specified by the window width register, depending on
+			 * whether 1:1, 4:1 or 5:1 input multiplexing is specified. The
+			 * actual window height is 2 pixels more than the value specified
+			 * by the window height register. Therefore, the minimum window
+			 * width is 2, 8 or 10 pixels for 1:1, 4:1 and 5:1 multiplexing,
+			 * respectively. The minimum window height is 2 pixels.
 			 *
-			 * Values from $0000 to $0FFF may be written to the window width and height registers.
+			 * Values from $0000 to $0FFF may be written to the window width
+			 * and height registers.
+			 *
+			 * Note: testing indicates the cross-hair cursor should be drawn
+			 * strictly inside the window, although this is not 100% clear from
+			 * the documentation.
 			 */
-			const int window_w = m_window_w + (
+			const int window_w = full_screen ? screen.visible_area().width() : m_window_w + (
 				(m_command_0 & CR0706) == CR0706_11MPX ? 2 :
 				(m_command_0 & CR0706) == CR0706_41MPX ? 8 :
 				(m_command_0 & CR0706) == CR0706_51MPX ? 10 : 0);
-			const int window_h = m_window_h + 2;
+			const int window_h = full_screen ? screen.visible_area().height() : m_window_h + 2;
 
-			// draw the vertical line
-			rectangle vertical(cursor_x - thickness, cursor_x + thickness, window_y, window_y + window_h);
+			// check for dual-cursor mode
+			if (bm_cursor_enable)
+			{
+				// draw the cross hair cursor as vertical and horizontal filled rectangles broken by the 64x64 cursor area
+				rectangle v1(cursor_x - ch_thickness, cursor_x + ch_thickness, window_y + 1, cursor_y - 32);
+				rectangle v2(cursor_x - ch_thickness, cursor_x + ch_thickness, cursor_y + 33, window_y + window_h);
+				rectangle h1(window_x + 1, cursor_x - 32, cursor_y - ch_thickness, cursor_y + ch_thickness);
+				rectangle h2(cursor_x + 33, window_x + window_w, cursor_y - ch_thickness, cursor_y + ch_thickness);
 
-			vertical &= bitmap.cliprect();
+				v1 &= bitmap.cliprect();
+				v2 &= bitmap.cliprect();
+				h1 &= bitmap.cliprect();
+				h2 &= bitmap.cliprect();
 
-			if (!vertical.empty())
-				bitmap.fill(cursor_color, vertical);
+				if (!v1.empty())
+					bitmap.fill(ch_color, v1);
+				if (!v2.empty())
+					bitmap.fill(ch_color, v2);
+				if (!h1.empty())
+					bitmap.fill(ch_color, h1);
+				if (!h2.empty())
+					bitmap.fill(ch_color, h2);
+			}
+			else
+			{
+				// draw the cross hair cursor as unbroken vertical and horizontal filled rectangles
+				rectangle v(cursor_x - ch_thickness, cursor_x + ch_thickness, window_y + 1, window_y + window_h);
+				rectangle h(window_x + 1, window_x + window_w, cursor_y - ch_thickness, cursor_y + ch_thickness);
 
-			// draw the horizontal line
-			rectangle horizontal(window_x, window_x + window_w, cursor_y - thickness, cursor_y + thickness);
+				v &= bitmap.cliprect();
+				h &= bitmap.cliprect();
 
-			horizontal &= bitmap.cliprect();
-
-			if (!horizontal.empty())
-				bitmap.fill(cursor_color, horizontal);
+				if (!v.empty())
+					bitmap.fill(ch_color, v);
+				if (!h.empty())
+					bitmap.fill(ch_color, h);
+			}
 		}
 	}
 }

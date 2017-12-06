@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Barry Rodewald, Robbbert
+// copyright-holders:Barry Rodewald
 /***************************************************************************
 
 Hilger Analytical AB6089 Mk. 1 (LSI Octopus)
@@ -991,7 +991,8 @@ static MACHINE_CONFIG_START( octopus )
 //  MCFG_SCREEN_PALETTE("palette")
 //  MCFG_PALETTE_ADD_MONOCHROME("palette")
 
-	MCFG_SCN2674_VIDEO_ADD("crtc", 0, DEVWRITELINE("pic_slave",pic8259_device,ir0_w))  // character clock can be selectable, either 16MHz or 17.6MHz
+	MCFG_DEVICE_ADD("crtc", SCN2674, 0)  // character clock can be selectable, either 16MHz or 17.6MHz
+	MCFG_SCN2674_INTR_CALLBACK(DEVWRITELINE("pic_slave", pic8259_device, ir0_w))
 	MCFG_SCN2674_TEXT_CHARACTER_WIDTH(8)
 	MCFG_SCN2674_GFX_CHARACTER_WIDTH(8)
 	MCFG_SCN2674_DRAW_CHARACTER_CALLBACK_OWNER(octopus_state, display_pixels)
@@ -1001,7 +1002,7 @@ static MACHINE_CONFIG_START( octopus )
 	MCFG_DEVICE_ADD("z80_bank", ADDRESS_MAP_BANK, 0)
 	MCFG_DEVICE_PROGRAM_MAP(octopus_mem)
 	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_ADDRESS_MAP_BANK_DATABUS_WIDTH(8)
+	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
 	MCFG_ADDRESS_MAP_BANK_STRIDE(0x10000)
 
 	MCFG_RAM_ADD("ram")

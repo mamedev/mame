@@ -2,9 +2,12 @@
 // copyright-holders:Miodrag Milanovic
 /***************************************************************************
 
-        Terak 8510A
+Terak 8510A
 
-        23/02/2009 Skeleton driver.
+2009-02-23 Skeleton driver.
+
+Known chips: i8257 DMA, i8272a FDC
+Floppies were 8 inch IBM format.
 
 ****************************************************************************/
 
@@ -17,26 +20,29 @@ class terak_state : public driver_device
 {
 public:
 	terak_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) ,
-		m_maincpu(*this, "maincpu") { }
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		{ }
 
 	DECLARE_READ16_MEMBER(terak_fdc_status_r);
 	DECLARE_WRITE16_MEMBER(terak_fdc_command_w);
 	DECLARE_READ16_MEMBER(terak_fdc_data_r);
 	DECLARE_WRITE16_MEMBER(terak_fdc_data_w);
+	uint32_t screen_update_terak(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+private:
 	uint8_t m_unit;
 	uint8_t m_cmd;
-	uint16_t m_data;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	uint32_t screen_update_terak(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 };
 
 READ16_MEMBER( terak_state::terak_fdc_status_r )
 {
 	logerror("terak_fdc_status_r\n");
-	if (m_cmd==3) {
+	if (m_cmd==3)
+	{
 		logerror("cmd is 3\n");
 		return 0xffff;
 	}
@@ -61,7 +67,7 @@ WRITE16_MEMBER( terak_state::terak_fdc_data_w )
 	logerror("terak_fdc_data_w %04x\n",data);
 }
 
-static ADDRESS_MAP_START(terak_mem, AS_PROGRAM, 16, terak_state)
+static ADDRESS_MAP_START(mem_map, AS_PROGRAM, 16, terak_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE( 0x0000,  0xf5ff ) AM_RAM // RAM
 
@@ -94,8 +100,7 @@ static MACHINE_CONFIG_START( terak )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",T11, XTAL_4MHz)
 	MCFG_T11_INITIAL_MODE(6 << 13)
-	MCFG_CPU_PROGRAM_MAP(terak_mem)
-
+	MCFG_CPU_PROGRAM_MAP(mem_map)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -117,11 +122,11 @@ ROM_START( terak )
 
 	ROM_REGION( 0x2000, "kbd", 0)
 	// keytronic keyboard, roms are unlabelled, type 6301-1J. CPU is 30293E-003. No crystal.
-	ROM_LOAD( "82s129.z2", 0x000000, 0x000100, CRC(a5dce419) SHA1(819197a03eb9b6ea3318f5afc37c0b436dd747a7) )
-	ROM_LOAD( "82s129.z1", 0x000000, 0x000100, CRC(f34e061f) SHA1(3cb354b2680056d4b3234c680958d4591279ac8a) )
+	ROM_LOAD( "82s129.z2", 0x0000, 0x0100, CRC(a5dce419) SHA1(819197a03eb9b6ea3318f5afc37c0b436dd747a7) )
+	ROM_LOAD( "82s129.z1", 0x0100, 0x0100, CRC(f34e061f) SHA1(3cb354b2680056d4b3234c680958d4591279ac8a) )
 ROM_END
 
 /* Driver */
 
 //    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT  STATE        INIT  COMPANY  FULLNAME       FLAGS
-COMP( ????, terak,  0,      0,       terak,     terak, terak_state, 0,    "Terak", "Terak 8510A", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1977, terak,  0,      0,       terak,     terak, terak_state, 0,    "Terak", "Terak 8510A", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

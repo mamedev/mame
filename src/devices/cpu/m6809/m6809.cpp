@@ -83,6 +83,7 @@ March 2013 NPW:
 #include "debugger.h"
 #include "m6809.h"
 #include "m6809inl.h"
+#include "6x09dasm.h"
 
 
 //**************************************************************************
@@ -133,8 +134,8 @@ void m6809_base_device::device_start()
 	m_mintf->m_program  = &space(AS_PROGRAM);
 	m_mintf->m_sprogram = has_space(AS_OPCODES) ? &space(AS_OPCODES) : m_mintf->m_program;
 
-	m_mintf->m_direct  = &m_mintf->m_program->direct();
-	m_mintf->m_sdirect = &m_mintf->m_sprogram->direct();
+	m_mintf->m_direct  = m_mintf->m_program->direct<0>();
+	m_mintf->m_sdirect = m_mintf->m_sprogram->direct<0>();
 
 	m_lic_func.resolve_safe();
 
@@ -350,36 +351,13 @@ void m6809_base_device::state_string_export(const device_state_entry &entry, std
 
 
 //-------------------------------------------------
-//  disasm_min_opcode_bytes - return the length
-//  of the shortest instruction, in bytes
-//-------------------------------------------------
-
-uint32_t m6809_base_device::disasm_min_opcode_bytes() const
-{
-	return 1;
-}
-
-
-//-------------------------------------------------
-//  disasm_max_opcode_bytes - return the length
-//  of the longest instruction, in bytes
-//-------------------------------------------------
-
-uint32_t m6809_base_device::disasm_max_opcode_bytes() const
-{
-	return 5;
-}
-
-
-//-------------------------------------------------
-//  disasm_disassemble - call the disassembly
+//  disassemble - call the disassembly
 //  helper function
 //-------------------------------------------------
 
-offs_t m6809_base_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+util::disasm_interface *m6809_base_device::create_disassembler()
 {
-	extern CPU_DISASSEMBLE( m6809 );
-	return CPU_DISASSEMBLE_NAME(m6809)(this, stream, pc, oprom, opram, options);
+	return new m6809_disassembler;
 }
 
 

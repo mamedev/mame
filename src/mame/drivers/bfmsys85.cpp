@@ -373,11 +373,8 @@ static ADDRESS_MAP_START( memmap, AS_PROGRAM, 8, bfmsys85_state )
 	AM_RANGE(0x3001, 0x3001) AM_READNOP //sound latch
 	AM_RANGE(0x3200, 0x3200) AM_DEVWRITE("aysnd", ay8910_device, address_w)
 
-	AM_RANGE(0x3402, 0x3402) AM_DEVWRITE("acia6850_0", acia6850_device, control_w)
-	AM_RANGE(0x3403, 0x3403) AM_DEVWRITE("acia6850_0", acia6850_device, data_w)
-
-	AM_RANGE(0x3406, 0x3406) AM_DEVREAD("acia6850_0", acia6850_device, status_r)
-	AM_RANGE(0x3407, 0x3407) AM_DEVREAD("acia6850_0", acia6850_device, data_r)
+	AM_RANGE(0x3402, 0x3403) AM_DEVWRITE("acia6850_0", acia6850_device, write)
+	AM_RANGE(0x3406, 0x3407) AM_DEVREAD("acia6850_0", acia6850_device, read)
 
 	AM_RANGE(0x3600, 0x3600) AM_WRITE(mux_enable_w)     // mux enable
 

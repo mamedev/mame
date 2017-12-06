@@ -1919,6 +1919,18 @@ void copybitmap_trans(bitmap_rgb32 &dest, const bitmap_rgb32 &src, int flipx, in
 }
 
 
+/*-------------------------------------------------
+    copybitmap_transalphpa - copy from one bitmap
+    to another, copying all unclipped pixels except
+    those with an alpha value of zero
+-------------------------------------------------*/
+
+void copybitmap_transalpha(bitmap_rgb32 &dest, const bitmap_rgb32 &src, int flipx, int flipy, s32 destx, s32 desty, const rectangle &cliprect)
+{
+	DECLARE_NO_PRIORITY;
+	COPYBITMAP_CORE(u32, PIXEL_OP_COPY_TRANSALPHA, NO_PRIORITY);
+}
+
 
 /***************************************************************************
     COPYSCROLLBITMAP IMPLEMENTATIONS

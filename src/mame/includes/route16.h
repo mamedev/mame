@@ -31,7 +31,8 @@ public:
 	DECLARE_WRITE8_MEMBER(route16_sharedram_w);
 	DECLARE_READ8_MEMBER(routex_prot_read);
 	DECLARE_WRITE8_MEMBER(ttmahjng_input_port_matrix_w);
-	DECLARE_READ8_MEMBER(ttmahjng_input_port_matrix_r);
+	DECLARE_READ8_MEMBER(ttmahjng_p1_matrix_r);
+	DECLARE_READ8_MEMBER(ttmahjng_p2_matrix_r);
 	DECLARE_READ8_MEMBER(speakres_in3_r);
 	DECLARE_WRITE8_MEMBER(speakres_out2_w);
 	DECLARE_WRITE8_MEMBER(stratvox_sn76477_w);

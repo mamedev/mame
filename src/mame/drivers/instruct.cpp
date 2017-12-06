@@ -214,7 +214,7 @@ INTERRUPT_GEN_MEMBER( instruct_state::t2l_int )
 	}
 }
 
-static ADDRESS_MAP_START( instruct_mem, AS_PROGRAM, 8, instruct_state )
+static ADDRESS_MAP_START( mem_map, AS_PROGRAM, 8, instruct_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x0ffe) AM_RAM AM_SHARE("mainram")
 	AM_RANGE(0x0fff, 0x0fff) AM_READWRITE(port_r,port_w)
@@ -223,7 +223,7 @@ static ADDRESS_MAP_START( instruct_mem, AS_PROGRAM, 8, instruct_state )
 	AM_RANGE(0x2000, 0x7fff) AM_RAM AM_SHARE("extram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( instruct_io, AS_IO, 8, instruct_state )
+static ADDRESS_MAP_START( io_map, AS_IO, 8, instruct_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x07, 0x07) AM_READWRITE(port_r,port_w)
 	AM_RANGE(0xf8, 0xf8) AM_WRITE(portf8_w)
@@ -234,7 +234,7 @@ static ADDRESS_MAP_START( instruct_io, AS_IO, 8, instruct_state )
 	AM_RANGE(0xfe, 0xfe) AM_READ(portfe_r)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( instruct_data, AS_DATA, 8, instruct_state )
+static ADDRESS_MAP_START( data_map, AS_DATA, 8, instruct_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(S2650_DATA_PORT, S2650_DATA_PORT) AM_READWRITE(port_r,port_w)
 ADDRESS_MAP_END
@@ -411,9 +411,9 @@ QUICKLOAD_LOAD_MEMBER( instruct_state, instruct )
 static MACHINE_CONFIG_START( instruct )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",S2650, XTAL_3_579545MHz / 4)
-	MCFG_CPU_PROGRAM_MAP(instruct_mem)
-	MCFG_CPU_IO_MAP(instruct_io)
-	MCFG_CPU_DATA_MAP(instruct_data)
+	MCFG_CPU_PROGRAM_MAP(mem_map)
+	MCFG_CPU_IO_MAP(io_map)
+	MCFG_CPU_DATA_MAP(data_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(instruct_state, t2l_int, 120)
 	MCFG_S2650_SENSE_INPUT(READLINE(instruct_state, sense_r))
 	MCFG_S2650_FLAG_OUTPUT(WRITELINE(instruct_state, flag_w))

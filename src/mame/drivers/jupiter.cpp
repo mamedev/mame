@@ -110,10 +110,8 @@ static ADDRESS_MAP_START( jupiter2_mem, AS_PROGRAM, 8, jupiter2_state )
 //  AM_RANGE(0xff90, 0xff93) Hytype Parallel Printer PIA
 //  AM_RANGE(0xffa0, 0xffa7) Persci Floppy Disk Controller
 //  AM_RANGE(0xffb0, 0xffb3) Video PIA
-	AM_RANGE(0xffc0, 0xffc0) AM_DEVREADWRITE("acia0", acia6850_device, status_r, control_w) // Serial Port 0 ACIA
-	AM_RANGE(0xffc1, 0xffc1) AM_DEVREADWRITE("acia0", acia6850_device, data_r, data_w)
-	AM_RANGE(0xffc4, 0xffc4) AM_DEVREADWRITE("acia1", acia6850_device, status_r, control_w) // Serial Port 1 ACIA
-	AM_RANGE(0xffc5, 0xffc5) AM_DEVREADWRITE("acia1", acia6850_device, data_r, data_w)
+	AM_RANGE(0xffc0, 0xffc1) AM_DEVREADWRITE("acia0", acia6850_device, read, write) // Serial Port 0 ACIA
+	AM_RANGE(0xffc4, 0xffc5) AM_DEVREADWRITE("acia1", acia6850_device, read, write) // Serial Port 1 ACIA
 //  AM_RANGE(0xffc8, 0xffc9) Serial Port 2 ACIA
 //  AM_RANGE(0xffcc, 0xffcd) Serial Port 3 ACIA
 //  AM_RANGE(0xffd0, 0xffd1) Serial Port 4 ACIA / Cassette

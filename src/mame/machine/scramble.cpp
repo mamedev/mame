@@ -2,7 +2,7 @@
 // copyright-holders:Nicola Salmoria
 /***************************************************************************
 
-  machine.c
+  machine/scramble.cpp
 
   Functions to emulate general aspects of the machine (RAM, ROM, interrupts,
   I/O ports)
@@ -569,10 +569,6 @@ DRIVER_INIT_MEMBER(scramble_state,billiard)
 DRIVER_INIT_MEMBER(scramble_state,mrkougar)
 {
 	DRIVER_INIT_CALL(devilfsh);
-}
-
-DRIVER_INIT_MEMBER(scramble_state,mrkougb)
-{
 }
 
 DRIVER_INIT_MEMBER(scramble_state,ad2083)

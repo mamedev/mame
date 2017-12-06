@@ -494,22 +494,27 @@ namespace
 DEFINE_DEVICE_TYPE(COCO3_HDB1, coco3_hdb1_device, "coco3_hdb1", "CoCo3 HDB-DOS")
 
 //**************************************************************************
-//              CP400 FDC
+//              Prológica CP-450 BASIC Disco V. 1.0 (1984)
+//
+//  There is a photo of the CP-450 disk controller unit at:
+//  https://datassette.org/softwares/tandy-trs-color/cp-450-basic-disco-v-10
+//  http://files.datassette.org/softwares/img/wp_20141212_22_08_26_pro.jpg
+//
 //**************************************************************************
 
-ROM_START(cp400_fdc)
+ROM_START(cp450_fdc)
 	ROM_REGION(0x4000, "eprom", ROMREGION_ERASE00)
-	ROM_LOAD("cp400dsk.rom", 0x0000, 0x2000, CRC(e9ad60a0) SHA1(827697fa5b755f5dc1efb054cdbbeb04e405405b))
+	ROM_LOAD("cp450_basic_disco_v1.0.rom", 0x0000, 0x2000, CRC(e9ad60a0) SHA1(827697fa5b755f5dc1efb054cdbbeb04e405405b))
 ROM_END
 
 namespace
 {
-	class cp400_fdc_device : public coco_fdc_device_base
+	class cp450_fdc_device : public coco_fdc_device_base
 	{
 	public:
 		// construction/destruction
-		cp400_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-			: coco_fdc_device_base(mconfig, CP400_FDC, tag, owner, clock)
+		cp450_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+			: coco_fdc_device_base(mconfig, CP450_FDC, tag, owner, clock)
 		{
 		}
 
@@ -517,9 +522,43 @@ namespace
 		// optional information overrides
 		virtual const tiny_rom_entry *device_rom_region() const override
 		{
-			return ROM_NAME(cp400_fdc);
+			return ROM_NAME(cp450_fdc);
 		}
 	};
 }
 
-DEFINE_DEVICE_TYPE(CP400_FDC, cp400_fdc_device, "cp400_fdc", "CP400 FDC")
+DEFINE_DEVICE_TYPE(CP450_FDC, cp450_fdc_device, "cp450_fdc", "Prológica CP-450 BASIC Disco V. 1.0 (1984)")
+
+//**************************************************************************
+//              Codimex CD-6809 FDC (1986)
+//
+// Seems to be a clone of the JFD-COCO originally manufactured by J&M
+// More ifo at: http://amxproject.com/?p=2747
+//**************************************************************************
+
+ROM_START(cd6809_fdc)
+	ROM_REGION(0x4000, "eprom", ROMREGION_ERASE00)
+	ROM_LOAD("cd6809dsk.u16", 0x0000, 0x2000, CRC(3c35bda8) SHA1(9b2eec25188bed4326b84739a666435884e4ddf4))
+ROM_END
+
+namespace
+{
+	class cd6809_fdc_device : public coco_fdc_device_base
+	{
+	public:
+		// construction/destruction
+		cd6809_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+			: coco_fdc_device_base(mconfig, CD6809_FDC, tag, owner, clock)
+		{
+		}
+
+	protected:
+		// optional information overrides
+		virtual const tiny_rom_entry *device_rom_region() const override
+		{
+			return ROM_NAME(cd6809_fdc);
+		}
+	};
+}
+
+DEFINE_DEVICE_TYPE(CD6809_FDC, cd6809_fdc_device, "cd6809_fdc", "Codimex CD-6809 Disk BASIC (1986)")

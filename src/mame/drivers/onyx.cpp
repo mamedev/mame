@@ -106,7 +106,6 @@ static ADDRESS_MAP_START(subio, AS_IO, 8, onyx_state)
 	AM_RANGE(0x0c, 0x0f) AM_DEVREADWRITE("sio1s", z80sio_device, cd_ba_r, cd_ba_w )
 ADDRESS_MAP_END
 
-
 /***************************************************************************
 
     Machine Drivers
@@ -197,5 +196,73 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME   PARENT  COMPAT   MACHINE    INPUT  CLASS       INIT  COMPANY  FULLNAME  FLAGS
-COMP( 1982, c8002, 0,      0,       c8002,     c8002, onyx_state, 0,    "Onyx",  "C8002",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+//    YEAR  NAME   PARENT  COMPAT   MACHINE    INPUT  CLASS       INIT  COMPANY          FULLNAME  FLAGS
+COMP( 1982, c8002, 0,      0,       c8002,     c8002, onyx_state, 0,    "Onyx Systems",  "C8002",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+
+
+
+/********************************************************************************************************************************
+
+Onyx Systems C5000.
+(says C8000 on the backplate)
+
+Chips: 256k dynamic RAM, Z80A, Z80DMA, 5x Z80PIO, 2x Z80SIO/0, 2x Z80CTC, 5? undumped proms, 3 red leds, 1x 4-sw DIP
+Crystals: 16.000000, 19.660800
+Labels of proms: 339, 153, XMN4, 2_1, 1_2
+
+*********************************************************************************************************************************/
+
+static ADDRESS_MAP_START(c5000_mem, AS_PROGRAM, 8, onyx_state)
+	AM_RANGE(0x0000, 0x1fff) AM_ROM
+	AM_RANGE(0x2000, 0xffff) AM_RAM
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START(c5000_io, AS_IO, 8, onyx_state)
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	AM_RANGE(0x10, 0x13) AM_DEVREADWRITE("sio1", z80sio_device, cd_ba_r, cd_ba_w )
+ADDRESS_MAP_END
+
+static MACHINE_CONFIG_START( c5000 )
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu", Z80, XTAL_16MHz / 4 )
+	//MCFG_Z80_DAISY_CHAIN(sub_daisy_chain)
+	MCFG_CPU_PROGRAM_MAP(c5000_mem)
+	MCFG_CPU_IO_MAP(c5000_io)
+	//MCFG_MACHINE_RESET_OVERRIDE(onyx_state, c8002)
+
+	MCFG_DEVICE_ADD("sio1_clock", CLOCK, 614400)
+	MCFG_CLOCK_SIGNAL_HANDLER(DEVWRITELINE("sio1", z80sio_device, rxtxcb_w))
+	//MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("sio1" ,z80sio_device, txca_w))
+
+	/* peripheral hardware */
+	//MCFG_DEVICE_ADD("pio1", Z80PIO, XTAL_16MHz/4)
+	//MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
+	//MCFG_DEVICE_ADD("pio2", Z80PIO, XTAL_16MHz/4)
+	//MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
+	//MCFG_DEVICE_ADD("ctc1", Z80CTC, XTAL_16MHz /4)
+	//MCFG_DEVICE_ADD("ctc2", Z80CTC, XTAL_16MHz /4)
+	//MCFG_DEVICE_ADD("ctc3", Z80CTC, XTAL_16MHz /4)
+	MCFG_DEVICE_ADD("sio1", Z80SIO, XTAL_16MHz /4)
+	MCFG_Z80SIO_OUT_TXDB_CB(DEVWRITELINE("rs232", rs232_port_device, write_txd))
+	MCFG_Z80SIO_OUT_DTRB_CB(DEVWRITELINE("rs232", rs232_port_device, write_dtr))
+	MCFG_Z80SIO_OUT_RTSB_CB(DEVWRITELINE("rs232", rs232_port_device, write_rts))
+
+	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, "terminal")
+	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("sio1", z80sio_device, rxb_w))
+	MCFG_RS232_DCD_HANDLER(DEVWRITELINE("sio1", z80sio_device, dcdb_w))
+	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("sio1", z80sio_device, ctsb_w))
+
+	//MCFG_DEVICE_ADD("sio2", Z80SIO, XTAL_16MHz /4)
+MACHINE_CONFIG_END
+
+
+ROM_START( c5000 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "860-3.prom1", 0x0000, 0x1000, CRC(31b52df3) SHA1(e221c7829b4805805cde1bde763bd5a936e7db1a) )
+	ROM_LOAD( "861-3.prom2", 0x1000, 0x1000, CRC(d1eba182) SHA1(850035497975b821fc1e51fbb73642cba3ff9784) )
+ROM_END
+
+/* Driver */
+
+//    YEAR  NAME   PARENT  COMPAT   MACHINE    INPUT  CLASS       INIT  COMPANY          FULLNAME  FLAGS
+COMP( 1981, c5000, 0,      0,       c5000,     c8002, onyx_state, 0,    "Onyx Systems",  "C5000",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )

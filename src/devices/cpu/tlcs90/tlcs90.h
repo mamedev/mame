@@ -63,18 +63,6 @@
 	devcb = &tlcs90_device::set_port_write_cb(*device, 8, DEVCB_##_devcb);
 
 
-#define T90_IOBASE  0xffc0
-
-enum e_ir
-{
-	T90_P0=T90_IOBASE,  T90_P1,     T90_P01CR_IRFL, T90_IRFH,   T90_P2,     T90_P2CR,   T90_P3,     T90_P3CR,
-	T90_P4,             T90_P4CR,   T90_P5,         T90_SMMOD,  T90_P6,     T90_P7,     T90_P67CR,  T90_SMCR,
-	T90_P8,             T90_P8CR,   T90_WDMOD,      T90_WDCR,   T90_TREG0,  T90_TREG1,  T90_TREG2,  T90_TREG3,
-	T90_TCLK,           T90_TFFCR,  T90_TMOD,       T90_TRUN,   T90_CAP1L,  T90_CAP1H,  T90_CAP2L,  T90_CAL2H,
-	T90_TREG4L,         T90_TREG4H, T90_TREG5L,     T90_TREG5H, T90_T4MOD,  T90_T4FFCR, T90_INTEL,  T90_INTEH,
-	T90_DMAEH,          T90_SCMOD,  T90_SCCR,       T90_SCBUF,  T90_BX,     T90_BY,     T90_ADREG,  T90_ADMOD
-};
-
 enum tlcs90_e_irq {    INTSWI = 0, INTNMI, INTWD,  INT0,   INTT0,  INTT1,  INTT2,  INTT3,  INTT4,  INT1,   INTT5,  INT2,   INTRX,  INTTX,  INTMAX  };
 DECLARE_ENUM_INCDEC_OPERATORS(tlcs90_e_irq)
 
@@ -131,9 +119,7 @@ protected:
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
 	// device_disasm_interface overrides
-	virtual uint32_t disasm_min_opcode_bytes() const override { return 1; }
-	virtual uint32_t disasm_max_opcode_bytes() const override { return 6; }
-	virtual offs_t disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
+	virtual util::disasm_interface *create_disassembler() override;
 
 private:
 	enum class e_mode : u8 {
@@ -156,7 +142,14 @@ private:
 	address_space *m_program;
 	int     m_icount;
 	int         m_extra_cycles;       // extra cycles for interrupts
-	uint8_t       m_internal_registers[48];
+
+	uint8_t m_port_latch[MAX_PORTS];
+
+	uint8_t m_p4cr;
+	uint8_t m_p67cr;
+	uint8_t m_p8cr;
+	uint8_t m_smmod;
+
 	uint32_t      m_ixbase,m_iybase;
 
 	// Timers: 4 x 8-bit + 1 x 16-bit
@@ -164,6 +157,12 @@ private:
 	uint8_t       m_timer_value[4];
 	uint16_t      m_timer4_value;
 	attotime    m_timer_period;
+	uint8_t m_tmod;
+	uint8_t m_tclk;
+	uint8_t m_trun;
+	uint8_t m_treg_8bit[4];
+	uint8_t m_t4mod;
+	uint16_t m_treg_16bit[2];
 
 	// Work registers
 	uint8_t        m_op;
@@ -189,8 +188,6 @@ private:
 	inline uint8_t  READ8();
 	inline uint16_t READ16();
 	void decode();
-	const char *internal_registers_names(uint16_t x);
-	bool stream_arg(std::ostream &stream, uint32_t pc, const char *pre, const e_mode mode, const uint16_t r, const uint16_t rb);
 	inline uint16_t r8( const uint16_t r );
 	inline void w8( const uint16_t r, uint16_t value );
 	inline uint16_t r16( const uint16_t r );

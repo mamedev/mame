@@ -43,6 +43,8 @@
  ***************************************************************************/
 
 #include "emu.h"
+#include "coco_t4426.h"
+
 #include "cococart.h"
 #include "machine/6850acia.h"
 #include "bus/rs232/rs232.h"

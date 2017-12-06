@@ -34,7 +34,7 @@ protected:
 	class memory_interface {
 	public:
 		address_space *m_program, *m_sprogram;
-		direct_read_data *m_direct, *m_sdirect;
+		direct_read_data<0> *m_direct, *m_sdirect;
 
 		virtual ~memory_interface() {}
 		virtual uint8_t read(uint16_t adr) = 0;
@@ -71,9 +71,7 @@ protected:
 	virtual space_config_vector memory_space_config() const override;
 
 	// device_disasm_interface overrides
-	virtual uint32_t disasm_min_opcode_bytes() const override;
-	virtual uint32_t disasm_max_opcode_bytes() const override;
-	virtual offs_t disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
+	virtual util::disasm_interface *create_disassembler() override;
 
 	// device_state_interface overrides
 	virtual void state_import(const device_state_entry &entry) override;

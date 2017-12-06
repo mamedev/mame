@@ -153,7 +153,7 @@ inline s64 recip_scale(s64 scale)
 
 inline s32 apply_scale(s32 value, s64 scale)
 {
-	return (s64(value) * scale) >> 24;
+	return (s64(value) * scale) / (1 << 24);
 }
 
 
@@ -3346,10 +3346,6 @@ analog_field::analog_field(ioport_field &field)
 			// single axis that increases from default
 			m_scalepos = compute_scale(m_adjmax - m_adjmin, INPUT_ABSOLUTE_MAX - INPUT_ABSOLUTE_MIN);
 
-			// move from default
-			if (m_adjdefvalue == m_adjmax)
-				m_scalepos = -m_scalepos;
-
 			// make the scaling the same for easier coding when we need to scale
 			m_scaleneg = m_scalepos;
 
@@ -3416,25 +3412,11 @@ inline s32 analog_field::apply_min_max(s32 value) const
 	s32 adjmin = apply_inverse_sensitivity(m_minimum);
 	s32 adjmax = apply_inverse_sensitivity(m_maximum);
 
-	// for absolute devices, clamp to the bounds absolutely
-	if (!m_wraps)
-	{
-		if (value > adjmax)
-			value = adjmax;
-		else if (value < adjmin)
-			value = adjmin;
-	}
-
-	// for relative devices, wrap around when we go past the edge
-	else
-	{
-		s32 range = adjmax - adjmin;
-		// rolls to other end when 1 position past end.
-		value = (value - adjmin) % range;
-		if (value < 0)
-			value += range;
-		value += adjmin;
-	}
+	// clamp to the bounds absolutely
+	if (value > adjmax)
+		value = adjmax;
+	else if (value < adjmin)
+		value = adjmin;
 
 	return value;
 }
@@ -3447,7 +3429,7 @@ inline s32 analog_field::apply_min_max(s32 value) const
 
 inline s32 analog_field::apply_sensitivity(s32 value) const
 {
-	return s32((s64(value) * m_sensitivity) / 100.0 + 0.5);
+	return lround((s64(value) * m_sensitivity) / 100.0);
 }
 
 
@@ -3470,7 +3452,8 @@ inline s32 analog_field::apply_inverse_sensitivity(s32 value) const
 s32 analog_field::apply_settings(s32 value) const
 {
 	// apply the min/max and then the sensitivity
-	value = apply_min_max(value);
+	if (!m_wraps)
+		value = apply_min_max(value);
 	value = apply_sensitivity(value);
 
 	// apply reversal if needed
@@ -3488,6 +3471,18 @@ s32 analog_field::apply_settings(s32 value) const
 		value = apply_scale(value, m_scaleneg);
 	value += m_adjdefvalue;
 
+	// for relative devices, wrap around when we go past the edge
+	// (this is done last to prevent rounding errors)
+	if (m_wraps)
+	{
+		s32 range = m_adjmax - m_adjmin;
+		// rolls to other end when 1 position past end.
+		value = (value - m_adjmin) % range;
+		if (value < 0)
+			value += range;
+		value += m_adjmin;
+	}
+
 	return value;
 }
 
@@ -3499,8 +3494,12 @@ s32 analog_field::apply_settings(s32 value) const
 
 void analog_field::frame_update(running_machine &machine)
 {
-	// clamp the previous value to the min/max range and remember it
-	m_previous = m_accum = apply_min_max(m_accum);
+	// clamp the previous value to the min/max range
+	if (!m_wraps)
+		m_accum = apply_min_max(m_accum);
+
+	// remember the previous value in case we need to interpolate
+	m_previous = m_accum;
 
 	// get the new raw analog value and its type
 	input_item_class itemclass;

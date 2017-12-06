@@ -47,6 +47,9 @@ public:
 
 	DECLARE_WRITE8_MEMBER(pa_w);
 
+	DECLARE_WRITE_LINE_MEMBER(prt_irl_w);
+	DECLARE_WRITE_LINE_MEMBER(prt_flg_w);
+	DECLARE_WRITE_LINE_MEMBER(prt_sts_w);
 	DECLARE_WRITE_LINE_MEMBER(t14_irq_w);
 	DECLARE_WRITE_LINE_MEMBER(t14_flg_w);
 	DECLARE_WRITE_LINE_MEMBER(t14_sts_w);
@@ -55,7 +58,6 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(t15_sts_w);
 
 	DECLARE_INPUT_CHANGED_MEMBER(togglekey_changed);
-
 protected:
 	required_device<hp_5061_3001_cpu_device> m_lpu;
 	required_device<hp_5061_3001_cpu_device> m_ppu;
@@ -81,6 +83,7 @@ protected:
 
 	virtual void advance_gv_fsm(bool ds , bool trigger) = 0;
 	void kb_scan_ioport(ioport_value pressed , ioport_port *port , unsigned idx_base , int& max_seq_len , unsigned& max_seq_idx);
+	void update_kb_prt_irq();
 
 	// Character generator
 	required_region_ptr<uint8_t> m_chargen;
@@ -141,6 +144,9 @@ protected:
 	ioport_value m_kb_state[ 4 ];
 	uint8_t m_kb_scancode;
 	uint16_t m_kb_status;
+
+	// Printer
+	bool m_prt_irl;
 };
 
 #endif /* _HP9845_H_ */

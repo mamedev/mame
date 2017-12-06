@@ -10,6 +10,7 @@
 
 #include "emu.h"
 #include "debugcpu.h"
+#include "debugbuf.h"
 
 #include "express.h"
 #include "debugcon.h"
@@ -48,6 +49,7 @@ debugger_cpu::debugger_cpu(running_machine &machine)
 	, m_breakcpu(nullptr)
 	, m_symtable(nullptr)
 	, m_execution_state(EXECUTION_STATE_STOPPED)
+	, m_stop_when_not_device(nullptr)
 	, m_bpindex(1)
 	, m_wpindex(1)
 	, m_rpindex(1)
@@ -71,10 +73,10 @@ debugger_cpu::debugger_cpu(running_machine &machine)
 	m_symtable->add("wpdata", symbol_table::READ_ONLY, &m_wpdata);
 
 	using namespace std::placeholders;
-	m_symtable->add("cpunum", nullptr, std::bind(&debugger_cpu::get_cpunum, this, _1, _2));
-	m_symtable->add("beamx", (void *)first_screen, std::bind(&debugger_cpu::get_beamx, this, _1, _2));
-	m_symtable->add("beamy", (void *)first_screen, std::bind(&debugger_cpu::get_beamy, this, _1, _2));
-	m_symtable->add("frame", (void *)first_screen, std::bind(&debugger_cpu::get_frame, this, _1, _2));
+	m_symtable->add("cpunum", std::bind(&debugger_cpu::get_cpunum, this, _1));
+	m_symtable->add("beamx", std::bind(&debugger_cpu::get_beamx, this, _1, first_screen));
+	m_symtable->add("beamy", std::bind(&debugger_cpu::get_beamy, this, _1, first_screen));
+	m_symtable->add("frame", std::bind(&debugger_cpu::get_frame, this, _1, first_screen));
 
 	/* add the temporary variables to the global symbol table */
 	for (int regnum = 0; regnum < NUM_TEMP_VARIABLES; regnum++)
@@ -363,7 +365,7 @@ u8 debugger_cpu::read_byte(address_space &space, offs_t address, bool apply_tran
 	device_memory_interface &memory = space.device().memory();
 
 	/* mask against the logical byte mask */
-	address &= space.logbytemask();
+	address &= space.logaddrmask();
 
 	/* translate if necessary; if not mapped, return 0xff */
 	u8 result;
@@ -387,34 +389,20 @@ u8 debugger_cpu::read_byte(address_space &space, offs_t address, bool apply_tran
 
 u16 debugger_cpu::read_word(address_space &space, offs_t address, bool apply_translation)
 {
+	device_memory_interface &memory = space.device().memory();
+
 	/* mask against the logical byte mask */
-	address &= space.logbytemask();
+	address &= space.logaddrmask();
 
 	u16 result;
-	if (!WORD_ALIGNED(address))
-	{   /* if this is misaligned read, or if there are no word readers, just read two bytes */
-		u8 byte0 = read_byte(space, address + 0, apply_translation);
-		u8 byte1 = read_byte(space, address + 1, apply_translation);
-
-		/* based on the endianness, the result is assembled differently */
-		if (space.endianness() == ENDIANNESS_LITTLE)
-			result = byte0 | (byte1 << 8);
-		else
-			result = byte1 | (byte0 << 8);
+	/* translate if necessary; if not mapped, return 0xffff */
+	if (apply_translation && !memory.translate(space.spacenum(), TRANSLATE_READ_DEBUG, address))
+	{
+		result = 0xffff;
 	}
 	else
-	{   /* otherwise, this proceeds like the byte case */
-		device_memory_interface &memory = space.device().memory();
-
-		/* translate if necessary; if not mapped, return 0xffff */
-		if (apply_translation && !memory.translate(space.spacenum(), TRANSLATE_READ_DEBUG, address))
-		{
-			result = 0xffff;
-		}
-		else
-		{   /* otherwise, call the byte reading function for the translated address */
-			result = space.read_word(address);
-		}
+	{   /* otherwise, call the byte reading function for the translated address */
+		result = space.read_word_unaligned(address);
 	}
 
 	return result;
@@ -428,33 +416,20 @@ u16 debugger_cpu::read_word(address_space &space, offs_t address, bool apply_tra
 
 u32 debugger_cpu::read_dword(address_space &space, offs_t address, bool apply_translation)
 {
+	device_memory_interface &memory = space.device().memory();
+
 	/* mask against the logical byte mask */
-	address &= space.logbytemask();
+	address &= space.logaddrmask();
 
 	u32 result;
-	if (!DWORD_ALIGNED(address))
-	{   /* if this is a misaligned read, or if there are no dword readers, just read two words */
-		u16 word0 = read_word(space, address + 0, apply_translation);
-		u16 word1 = read_word(space, address + 2, apply_translation);
 
-		/* based on the endianness, the result is assembled differently */
-		if (space.endianness() == ENDIANNESS_LITTLE)
-			result = word0 | (word1 << 16);
-		else
-			result = word1 | (word0 << 16);
+	if (apply_translation && !memory.translate(space.spacenum(), TRANSLATE_READ_DEBUG, address))
+	{   /* translate if necessary; if not mapped, return 0xffffffff */
+		result = 0xffffffff;
 	}
 	else
-	{   /* otherwise, this proceeds like the byte case */
-		device_memory_interface &memory = space.device().memory();
-
-		if (apply_translation && !memory.translate(space.spacenum(), TRANSLATE_READ_DEBUG, address))
-		{   /* translate if necessary; if not mapped, return 0xffffffff */
-			result = 0xffffffff;
-		}
-		else
-		{   /* otherwise, call the byte reading function for the translated address */
-			result = space.read_dword(address);
-		}
+	{   /* otherwise, call the byte reading function for the translated address */
+		result = space.read_dword_unaligned(address);
 	}
 
 	return result;
@@ -468,34 +443,21 @@ u32 debugger_cpu::read_dword(address_space &space, offs_t address, bool apply_tr
 
 u64 debugger_cpu::read_qword(address_space &space, offs_t address, bool apply_translation)
 {
+	device_memory_interface &memory = space.device().memory();
+
 	/* mask against the logical byte mask */
-	address &= space.logbytemask();
+	address &= space.logaddrmask();
 
 	u64 result;
-	if (!QWORD_ALIGNED(address))
-	{   /* if this is a misaligned read, or if there are no qword readers, just read two dwords */
-		u32 dword0 = read_dword(space, address + 0, apply_translation);
-		u32 dword1 = read_dword(space, address + 4, apply_translation);
 
-		/* based on the endianness, the result is assembled differently */
-		if (space.endianness() == ENDIANNESS_LITTLE)
-			result = dword0 | (u64(dword1) << 32);
-		else
-			result = dword1 | (u64(dword0) << 32);
+	/* translate if necessary; if not mapped, return 0xffffffffffffffff */
+	if (apply_translation && !memory.translate(space.spacenum(), TRANSLATE_READ_DEBUG, address))
+	{
+		result = ~u64(0);
 	}
 	else
-	{   /* otherwise, this proceeds like the byte case */
-		device_memory_interface &memory = space.device().memory();
-
-		/* translate if necessary; if not mapped, return 0xffffffffffffffff */
-		if (apply_translation && !memory.translate(space.spacenum(), TRANSLATE_READ_DEBUG, address))
-		{
-			result = ~u64(0);
-		}
-		else
-		{   /* otherwise, call the byte reading function for the translated address */
-			result = space.read_qword(address);
-		}
+	{   /* otherwise, call the byte reading function for the translated address */
+		result = space.read_qword_unaligned(address);
 	}
 
 	return result;
@@ -531,7 +493,7 @@ void debugger_cpu::write_byte(address_space &space, offs_t address, u8 data, boo
 	device_memory_interface &memory = space.device().memory();
 
 	/* mask against the logical byte mask */
-	address &= space.logbytemask();
+	address &= space.logaddrmask();
 
 	/* translate if necessary; if not mapped, we're done */
 	if (apply_translation && !memory.translate(space.spacenum(), TRANSLATE_WRITE_DEBUG, address))
@@ -553,7 +515,7 @@ void debugger_cpu::write_byte(address_space &space, offs_t address, u8 data, boo
 void debugger_cpu::write_word(address_space &space, offs_t address, u16 data, bool apply_translation)
 {
 	/* mask against the logical byte mask */
-	address &= space.logbytemask();
+	address &= space.logaddrmask();
 
 	/* if this is a misaligned write, or if there are no word writers, just read two bytes */
 	if (!WORD_ALIGNED(address))
@@ -596,7 +558,7 @@ void debugger_cpu::write_word(address_space &space, offs_t address, u16 data, bo
 void debugger_cpu::write_dword(address_space &space, offs_t address, u32 data, bool apply_translation)
 {
 	/* mask against the logical byte mask */
-	address &= space.logbytemask();
+	address &= space.logaddrmask();
 
 	/* if this is a misaligned write, or if there are no dword writers, just read two words */
 	if (!DWORD_ALIGNED(address))
@@ -639,7 +601,7 @@ void debugger_cpu::write_dword(address_space &space, offs_t address, u32 data, b
 void debugger_cpu::write_qword(address_space &space, offs_t address, u64 data, bool apply_translation)
 {
 	/* mask against the logical byte mask */
-	address &= space.logbytemask();
+	address &= space.logaddrmask();
 
 	/* if this is a misaligned write, or if there are no qword writers, just read two dwords */
 	if (!QWORD_ALIGNED(address))
@@ -703,7 +665,7 @@ u64 debugger_cpu::read_opcode(address_space &space, offs_t address, int size)
 	u64 result = ~u64(0) & (~u64(0) >> (64 - 8*size));
 
 	/* keep in logical range */
-	address &= space.logbytemask();
+	address &= space.logaddrmask();
 
 	/* if we're bigger than the address bus, break into smaller pieces */
 	if (size > space.data_width() / 8)
@@ -723,7 +685,7 @@ u64 debugger_cpu::read_opcode(address_space &space, offs_t address, int size)
 		return result;
 
 	/* keep in physical range */
-	address &= space.bytemask();
+	address &= space.addrmask();
 
 	/* switch off the size and handle unaligned accesses */
 	switch (size)
@@ -1340,9 +1302,8 @@ expression_error::error_code debugger_cpu::expression_validate(void *param, cons
     get_beamx - get beam horizontal position
 -------------------------------------------------*/
 
-u64 debugger_cpu::get_beamx(symbol_table &table, void *ref)
+u64 debugger_cpu::get_beamx(symbol_table &table, screen_device *screen)
 {
-	screen_device *screen = reinterpret_cast<screen_device *>(ref);
 	return (screen != nullptr) ? screen->hpos() : 0;
 }
 
@@ -1351,9 +1312,8 @@ u64 debugger_cpu::get_beamx(symbol_table &table, void *ref)
     get_beamy - get beam vertical position
 -------------------------------------------------*/
 
-u64 debugger_cpu::get_beamy(symbol_table &table, void *ref)
+u64 debugger_cpu::get_beamy(symbol_table &table, screen_device *screen)
 {
-	screen_device *screen = reinterpret_cast<screen_device *>(ref);
 	return (screen != nullptr) ? screen->vpos() : 0;
 }
 
@@ -1362,9 +1322,8 @@ u64 debugger_cpu::get_beamy(symbol_table &table, void *ref)
     get_frame - get current frame number
 -------------------------------------------------*/
 
-u64 debugger_cpu::get_frame(symbol_table &table, void *ref)
+u64 debugger_cpu::get_frame(symbol_table &table, screen_device *screen)
 {
-	screen_device *screen = reinterpret_cast<screen_device *>(ref);
 	return (screen != nullptr) ? screen->frame_number() : 0;
 }
 
@@ -1374,7 +1333,7 @@ u64 debugger_cpu::get_frame(symbol_table &table, void *ref)
     'cpunum' symbol
 -------------------------------------------------*/
 
-u64 debugger_cpu::get_cpunum(symbol_table &table, void *ref)
+u64 debugger_cpu::get_cpunum(symbol_table &table)
 {
 	execute_interface_iterator iter(m_machine.root_device());
 	return iter.indexof(m_visiblecpu->execute());
@@ -1537,22 +1496,34 @@ device_debug::device_debug(device_t &device)
 		// add global symbol for cycles and totalcycles
 		if (m_exec != nullptr)
 		{
-			m_symtable.add("cycles", nullptr, get_cycles);
-			m_symtable.add("totalcycles", nullptr, get_totalcycles);
-			m_symtable.add("lastinstructioncycles", nullptr, get_lastinstructioncycles);
+			m_symtable.add("cycles", get_cycles);
+			m_symtable.add("totalcycles", get_totalcycles);
+			m_symtable.add("lastinstructioncycles", get_lastinstructioncycles);
 		}
 
 		// add entries to enable/disable unmap reporting for each space
 		if (m_memory != nullptr)
 		{
 			if (m_memory->has_space(AS_PROGRAM))
-				m_symtable.add("logunmap", (void *)&m_memory->space(AS_PROGRAM), get_logunmap, set_logunmap);
+				m_symtable.add(
+						"logunmap",
+						[&space = m_memory->space(AS_PROGRAM)] (symbol_table &table) { return space.log_unmap(); },
+						[&space = m_memory->space(AS_PROGRAM)] (symbol_table &table, u64 value) { return space.set_log_unmap(bool(value)); });
 			if (m_memory->has_space(AS_DATA))
-				m_symtable.add("logunmapd", (void *)&m_memory->space(AS_DATA), get_logunmap, set_logunmap);
+				m_symtable.add(
+						"logunmap",
+						[&space = m_memory->space(AS_DATA)] (symbol_table &table) { return space.log_unmap(); },
+						[&space = m_memory->space(AS_DATA)] (symbol_table &table, u64 value) { return space.set_log_unmap(bool(value)); });
 			if (m_memory->has_space(AS_IO))
-				m_symtable.add("logunmapi", (void *)&m_memory->space(AS_IO), get_logunmap, set_logunmap);
+				m_symtable.add(
+						"logunmap",
+						[&space = m_memory->space(AS_IO)] (symbol_table &table) { return space.log_unmap(); },
+						[&space = m_memory->space(AS_IO)] (symbol_table &table, u64 value) { return space.set_log_unmap(bool(value)); });
 			if (m_memory->has_space(AS_OPCODES))
-				m_symtable.add("logunmapo", (void *)&m_memory->space(AS_OPCODES), get_logunmap, set_logunmap);
+				m_symtable.add(
+						"logunmap",
+						[&space = m_memory->space(AS_OPCODES)] (symbol_table &table) { return space.log_unmap(); },
+						[&space = m_memory->space(AS_OPCODES)] (symbol_table &table, u64 value) { return space.set_log_unmap(bool(value)); });
 		}
 
 		// add all registers into it
@@ -1562,8 +1533,13 @@ device_debug::device_debug(device_t &device)
 			// TODO: floating point registers
 			if (!entry->is_float())
 			{
+				using namespace std::placeholders;
 				strmakelower(tempstr.assign(entry->symbol()));
-				m_symtable.add(tempstr.c_str(), (void *)(uintptr_t)entry->index(), get_state, entry->writeable() ? set_state : nullptr, entry->format_string());
+				m_symtable.add(
+						tempstr.c_str(),
+						std::bind(&device_debug::get_state, _1, entry->index()),
+						entry->writeable() ? std::bind(&device_debug::set_state, _1, entry->index(), _2) : symbol_table::setter_func(nullptr),
+						entry->format_string());
 			}
 		}
 	}
@@ -1574,8 +1550,8 @@ device_debug::device_debug(device_t &device)
 		m_flags = DEBUG_FLAG_OBSERVING | DEBUG_FLAG_HISTORY;
 
 		// if no curpc, add one
-		if (m_state != nullptr && m_symtable.find("curpc") == nullptr)
-			m_symtable.add("curpc", nullptr, get_current_pc);
+		if (m_state && !m_symtable.find("curpc"))
+			m_symtable.add("curpc", get_current_pc);
 	}
 
 	// set up trace
@@ -2487,33 +2463,15 @@ bool device_debug::comment_import(util::xml::data_node const &cpunode, bool is_i
 
 u32 device_debug::compute_opcode_crc32(offs_t pc) const
 {
-	// Basically the same thing as dasm_wrapped, but with some tiny savings
-	assert(m_memory != nullptr);
+	std::vector<u8> opbuf;
+	debug_disasm_buffer buffer(device());
 
-	// determine the adjusted PC
-	address_space &decrypted_space = m_memory->has_space(AS_OPCODES) ? m_memory->space(AS_OPCODES) : m_memory->space(AS_PROGRAM);
-	address_space &space = m_memory->space(AS_PROGRAM);
-	offs_t pcbyte = space.address_to_byte(pc) & space.bytemask();
-
-	// fetch the bytes up to the maximum
-	u8 opbuf[64], argbuf[64];
-	int maxbytes = (m_disasm != nullptr) ? m_disasm->max_opcode_bytes() : 1;
-	for (int numbytes = 0; numbytes < maxbytes; numbytes++)
-	{
-		opbuf[numbytes] = m_device.machine().debugger().cpu().read_opcode(decrypted_space, pcbyte + numbytes, 1);
-		argbuf[numbytes] = m_device.machine().debugger().cpu().read_opcode(space, pcbyte + numbytes, 1);
-	}
-
-	u32 numbytes = maxbytes;
-	if (m_disasm != nullptr)
-	{
-		// disassemble to our buffer
-		std::ostringstream diasmbuf;
-		numbytes = m_disasm->disassemble(diasmbuf, pc, opbuf, argbuf) & DASMFLAG_LENGTHMASK;
-	}
+	// disassemble the current instruction and get the flags
+	u32 dasmresult = buffer.disassemble_info(pc);
+	buffer.data_get(pc, dasmresult & util::disasm_interface::LENGTHMASK, true, opbuf);
 
 	// return a CRC of the exact count of opcode bytes
-	return core_crc32(0, opbuf, numbytes);
+	return core_crc32(0, &opbuf[0], opbuf.size());
 }
 
 
@@ -2593,26 +2551,29 @@ void device_debug::compute_debug_flags()
 
 void device_debug::prepare_for_step_overout(offs_t pc)
 {
+	debug_disasm_buffer buffer(device());
+
 	// disassemble the current instruction and get the flags
-	std::string dasmbuffer;
-	offs_t dasmresult = dasm_wrapped(dasmbuffer, pc);
+	u32 dasmresult = buffer.disassemble_info(pc);
 
 	// if flags are supported and it's a call-style opcode, set a temp breakpoint after that instruction
-	if ((dasmresult & DASMFLAG_SUPPORTED) != 0 && (dasmresult & DASMFLAG_STEP_OVER) != 0)
+	if ((dasmresult & util::disasm_interface::SUPPORTED) != 0 && (dasmresult & util::disasm_interface::STEP_OVER) != 0)
 	{
-		int extraskip = (dasmresult & DASMFLAG_OVERINSTMASK) >> DASMFLAG_OVERINSTSHIFT;
-		pc += dasmresult & DASMFLAG_LENGTHMASK;
+		int extraskip = (dasmresult & util::disasm_interface::OVERINSTMASK) >> util::disasm_interface::OVERINSTSHIFT;
+		pc = buffer.next_pc_wrap(pc, dasmresult & util::disasm_interface::LENGTHMASK);
 
 		// if we need to skip additional instructions, advance as requested
-		while (extraskip-- > 0)
-			pc += dasm_wrapped(dasmbuffer, pc) & DASMFLAG_LENGTHMASK;
+		while (extraskip-- > 0) {
+			u32 result = buffer.disassemble_info(pc);
+			pc += buffer.next_pc_wrap(pc, result & util::disasm_interface::LENGTHMASK);
+		}
 		m_stepaddr = pc;
 	}
 
 	// if we're stepping out and this isn't a step out instruction, reset the steps until stop to a high number
 	if ((m_flags & DEBUG_FLAG_STEPPING_OUT) != 0)
 	{
-		if ((dasmresult & DASMFLAG_SUPPORTED) != 0 && (dasmresult & DASMFLAG_STEP_OUT) == 0)
+		if ((dasmresult & util::disasm_interface::SUPPORTED) != 0 && (dasmresult & util::disasm_interface::STEP_OUT) == 0)
 			m_stepsleft = 100;
 		else
 			m_stepsleft = 1;
@@ -2885,43 +2846,11 @@ void device_debug::hotspot_check(address_space &space, offs_t address)
 
 
 //-------------------------------------------------
-//  dasm_wrapped - wraps calls to the disassembler
-//  by fetching the opcode bytes to a temporary
-//  buffer and then disassembling them
-//-------------------------------------------------
-
-u32 device_debug::dasm_wrapped(std::string &buffer, offs_t pc)
-{
-	assert(m_memory != nullptr && m_disasm != nullptr);
-
-	// determine the adjusted PC
-	address_space &decrypted_space = m_memory->has_space(AS_OPCODES) ? m_memory->space(AS_OPCODES) : m_memory->space(AS_PROGRAM);
-	address_space &space = m_memory->space(AS_PROGRAM);
-	offs_t pcbyte = space.address_to_byte(pc) & space.bytemask();
-
-	// fetch the bytes up to the maximum
-	u8 opbuf[64], argbuf[64];
-	int maxbytes = m_disasm->max_opcode_bytes();
-	for (int numbytes = 0; numbytes < maxbytes; numbytes++)
-	{
-		opbuf[numbytes] = m_device.machine().debugger().cpu().read_opcode(decrypted_space, pcbyte + numbytes, 1);
-		argbuf[numbytes] = m_device.machine().debugger().cpu().read_opcode(space, pcbyte + numbytes, 1);
-	}
-
-	// disassemble to our buffer
-	std::ostringstream stream;
-	uint32_t result = m_disasm->disassemble(stream, pc, opbuf, argbuf);
-	buffer = stream.str();
-	return result;
-}
-
-
-//-------------------------------------------------
 //  get_current_pc - getter callback for a device's
 //  current instruction pointer
 //-------------------------------------------------
 
-u64 device_debug::get_current_pc(symbol_table &table, void *ref)
+u64 device_debug::get_current_pc(symbol_table &table)
 {
 	device_t *device = reinterpret_cast<device_t *>(table.globalref());
 	return device->safe_pcbase();
@@ -2933,7 +2862,7 @@ u64 device_debug::get_current_pc(symbol_table &table, void *ref)
 //  'cycles' symbol
 //-------------------------------------------------
 
-u64 device_debug::get_cycles(symbol_table &table, void *ref)
+u64 device_debug::get_cycles(symbol_table &table)
 {
 	device_t *device = reinterpret_cast<device_t *>(table.globalref());
 	return device->debug()->m_exec->cycles_remaining();
@@ -2945,7 +2874,7 @@ u64 device_debug::get_cycles(symbol_table &table, void *ref)
 //  'totalcycles' symbol
 //-------------------------------------------------
 
-u64 device_debug::get_totalcycles(symbol_table &table, void *ref)
+u64 device_debug::get_totalcycles(symbol_table &table)
 {
 	device_t *device = reinterpret_cast<device_t *>(table.globalref());
 	return device->debug()->m_total_cycles;
@@ -2957,7 +2886,7 @@ u64 device_debug::get_totalcycles(symbol_table &table, void *ref)
 //  'lastinstructioncycles' symbol
 //-------------------------------------------------
 
-u64 device_debug::get_lastinstructioncycles(symbol_table &table, void *ref)
+u64 device_debug::get_lastinstructioncycles(symbol_table &table)
 {
 	device_t *device = reinterpret_cast<device_t *>(table.globalref());
 	device_debug *debug = device->debug();
@@ -2966,38 +2895,14 @@ u64 device_debug::get_lastinstructioncycles(symbol_table &table, void *ref)
 
 
 //-------------------------------------------------
-//  get_logunmap - getter callback for the logumap
-//  symbols
-//-------------------------------------------------
-
-u64 device_debug::get_logunmap(symbol_table &table, void *ref)
-{
-	address_space &space = *reinterpret_cast<address_space *>(table.globalref());
-	return space.log_unmap();
-}
-
-
-//-------------------------------------------------
-//  set_logunmap - setter callback for the logumap
-//  symbols
-//-------------------------------------------------
-
-void device_debug::set_logunmap(symbol_table &table, void *ref, u64 value)
-{
-	address_space &space = *reinterpret_cast<address_space *>(table.globalref());
-	space.set_log_unmap(value ? true : false);
-}
-
-
-//-------------------------------------------------
 //  get_state - getter callback for a device's
 //  state symbols
 //-------------------------------------------------
 
-u64 device_debug::get_state(symbol_table &table, void *ref)
+u64 device_debug::get_state(symbol_table &table, int index)
 {
 	device_t *device = reinterpret_cast<device_t *>(table.globalref());
-	return device->debug()->m_state->state_int(reinterpret_cast<uintptr_t>(ref));
+	return device->debug()->m_state->state_int(index);
 }
 
 
@@ -3006,10 +2911,10 @@ u64 device_debug::get_state(symbol_table &table, void *ref)
 //  state symbols
 //-------------------------------------------------
 
-void device_debug::set_state(symbol_table &table, void *ref, u64 value)
+void device_debug::set_state(symbol_table &table, int index, u64 value)
 {
 	device_t *device = reinterpret_cast<device_t *>(table.globalref());
-	device->debug()->m_state->set_state_int(reinterpret_cast<uintptr_t>(ref), value);
+	device->debug()->m_state->set_state_int(index, value);
 }
 
 
@@ -3094,8 +2999,8 @@ device_debug::watchpoint::watchpoint(device_debug* debugInterface,
 		m_index(index),
 		m_enabled(true),
 		m_type(type),
-		m_address(space.address_to_byte(address) & space.bytemask()),
-		m_length(space.address_to_byte(length)),
+		m_address(address & space.addrmask()),
+		m_length(length),
 		m_condition(&symbols, (condition != nullptr) ? condition : "1"),
 		m_action((action != nullptr) ? action : "")
 {
@@ -3257,35 +3162,24 @@ void device_debug::tracer::update(offs_t pc)
 	if (!m_action.empty())
 		m_debug.m_device.machine().debugger().console().execute_command(m_action, false);
 
-	// print the address
-	std::string buffer;
-	int logaddrchars = m_debug.logaddrchars();
-	if (m_debug.is_octal())
-	{
-		buffer = string_format("%0*o: ", logaddrchars*3/2, pc);
-	}
-	else
-	{
-		buffer = string_format("%0*X: ", logaddrchars, pc);
-	}
-
-	// print the disassembly
-	std::string dasm;
-	offs_t dasmresult = m_debug.dasm_wrapped(dasm, pc);
-	buffer.append(dasm);
+	debug_disasm_buffer buffer(m_debug.device());
+	std::string instruction;
+	offs_t next_pc, size;
+	u32 dasmresult;
+	buffer.disassemble(pc, instruction, next_pc, size, dasmresult);
 
 	// output the result
-	fprintf(&m_file, "%s\n", buffer.c_str());
+	fprintf(&m_file, "%s: %s\n", buffer.pc_to_string(pc).c_str(), instruction.c_str());
 
 	// do we need to step the trace over this instruction?
-	if (m_trace_over && (dasmresult & DASMFLAG_SUPPORTED) != 0 && (dasmresult & DASMFLAG_STEP_OVER) != 0)
+	if (m_trace_over && (dasmresult & util::disasm_interface::SUPPORTED) != 0 && (dasmresult & util::disasm_interface::STEP_OVER) != 0)
 	{
-		int extraskip = (dasmresult & DASMFLAG_OVERINSTMASK) >> DASMFLAG_OVERINSTSHIFT;
-		offs_t trace_over_target = pc + (dasmresult & DASMFLAG_LENGTHMASK);
+		int extraskip = (dasmresult & util::disasm_interface::OVERINSTMASK) >> util::disasm_interface::OVERINSTSHIFT;
+		offs_t trace_over_target = buffer.next_pc_wrap(pc, dasmresult & util::disasm_interface::LENGTHMASK);
 
 		// if we need to skip additional instructions, advance as requested
 		while (extraskip-- > 0)
-			trace_over_target += m_debug.dasm_wrapped(dasm, trace_over_target) & DASMFLAG_LENGTHMASK;
+			trace_over_target = buffer.next_pc_wrap(trace_over_target, buffer.disassemble_info(trace_over_target) & util::disasm_interface::LENGTHMASK);
 
 		m_trace_over_target = trace_over_target;
 	}

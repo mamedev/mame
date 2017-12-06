@@ -8,6 +8,7 @@
 
 #include "emu.h"
 #include "tms0980.h"
+#include "tms1k_dasm.h"
 #include "debugger.h"
 
 // TMS0980
@@ -31,7 +32,7 @@ DEFINE_DEVICE_TYPE(TMS1980, tms1980_cpu_device, "tms1980", "TMS1980") // 28-pin 
 
 // internal memory maps
 static ADDRESS_MAP_START(program_11bit_9, AS_PROGRAM, 16, tms1k_base_device)
-	AM_RANGE(0x000, 0xfff) AM_ROM
+	AM_RANGE(0x000, 0x7ff) AM_ROM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(data_144x4, AS_DATA, 8, tms1k_base_device)
@@ -42,7 +43,7 @@ ADDRESS_MAP_END
 
 // device definitions
 tms0980_cpu_device::tms0980_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: tms0980_cpu_device(mconfig, TMS0980, tag, owner, clock, 8 /* o pins */, 9 /* r pins */, 7 /* pc bits */, 9 /* byte width */, 4 /* x width */, 12 /* prg width */, ADDRESS_MAP_NAME(program_11bit_9), 8 /* data width */, ADDRESS_MAP_NAME(data_144x4))
+	: tms0980_cpu_device(mconfig, TMS0980, tag, owner, clock, 8 /* o pins */, 9 /* r pins */, 7 /* pc bits */, 9 /* byte width */, 4 /* x width */, 11 /* prg width */, ADDRESS_MAP_NAME(program_11bit_9), 8 /* data width */, ADDRESS_MAP_NAME(data_144x4))
 {
 }
 
@@ -52,7 +53,7 @@ tms0980_cpu_device::tms0980_cpu_device(const machine_config &mconfig, device_typ
 }
 
 tms1980_cpu_device::tms1980_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: tms0980_cpu_device(mconfig, TMS1980, tag, owner, clock, 7, 10, 7, 9, 4, 12, ADDRESS_MAP_NAME(program_11bit_9), 8, ADDRESS_MAP_NAME(data_144x4))
+	: tms0980_cpu_device(mconfig, TMS1980, tag, owner, clock, 7, 10, 7, 9, 4, 11, ADDRESS_MAP_NAME(program_11bit_9), 8, ADDRESS_MAP_NAME(data_144x4))
 {
 }
 
@@ -84,10 +85,9 @@ MACHINE_CONFIG_END
 
 
 // disasm
-offs_t tms0980_cpu_device::disasm_disassemble(std::ostream &stream, offs_t pc, const u8 *oprom, const u8 *opram, u32 options)
+util::disasm_interface *tms0980_cpu_device::create_disassembler()
 {
-	extern CPU_DISASSEMBLE(tms0980);
-	return CPU_DISASSEMBLE_NAME(tms0980)(this, stream, pc, oprom, opram, options);
+	return new tms0980_disassembler;
 }
 
 
@@ -173,8 +173,8 @@ u32 tms0980_cpu_device::read_micro()
 
 void tms0980_cpu_device::read_opcode()
 {
-	debugger_instruction_hook(this, m_rom_address << 1);
-	m_opcode = m_program->read_word(m_rom_address << 1) & 0x1ff;
+	debugger_instruction_hook(this, m_rom_address);
+	m_opcode = m_program->read_word(m_rom_address) & 0x1ff;
 	m_c4 = BITSWAP8(m_opcode,7,6,5,4,0,1,2,3) & 0xf; // opcode operand is bitswapped for most opcodes
 
 	m_fixed = m_fixed_decode[m_opcode];

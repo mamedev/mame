@@ -5,48 +5,22 @@
 
 WRITE8_MEMBER( tmc600_state::vismac_register_w )
 {
-	m_vismac_reg_latch = data;
+	m_vismac_reg_latch = data >> 4;
 }
 
 WRITE8_MEMBER( tmc600_state::vismac_data_w )
 {
 	uint16_t ma = m_maincpu->get_memory_address();
 
-	switch (m_vismac_reg_latch)
+	switch (m_vismac_reg_latch & 0x07)
 	{
-	case 0x20:
-		// character color latch
-		m_vismac_color_latch = data;
-		break;
-
-	case 0x30:
-		// background color latch
-		m_vismac_bkg_latch = data & 0x07;
-
-		m_vis->out3_w(space, ma, data);
-		break;
-
-	case 0x40:
-		m_vis->out4_w(space, ma, data);
-		break;
-
-	case 0x50:
-		m_vis->out5_w(space, ma, data);
-		break;
-
-	case 0x60:
-		m_vis->out6_w(space, ma, data);
-		break;
-
-	case 0x70:
-		m_vis->out7_w(space, ma, data);
-		break;
+	case 2: m_vismac_color_latch = data & 0x0f; break;
+	case 3: m_vis->out3_w(space, ma, data); break;
+	case 4: m_vis->out4_w(space, ma, data); break;
+	case 5: m_vis->out5_w(space, ma, data); break;
+	case 6: m_vis->out6_w(space, ma, data); break;
+	case 7: m_vis->out7_w(space, ma, data); break;
 	}
-}
-
-TIMER_DEVICE_CALLBACK_MEMBER(tmc600_state::blink_tick)
-{
-	m_blink = !m_blink;
 }
 
 uint8_t tmc600_state::get_color(uint16_t pma)
@@ -56,7 +30,7 @@ uint8_t tmc600_state::get_color(uint16_t pma)
 
 	if (BIT(color, 3) && m_blink)
 	{
-		color = m_vismac_bkg_latch;
+		color ^= 0x07;
 	}
 
 	return color;
@@ -93,15 +67,34 @@ CDP1869_PCB_READ_MEMBER( tmc600_state::tmc600_pcb_r )
 	return BIT(color, 0);
 }
 
+WRITE_LINE_MEMBER( tmc600_state::prd_w )
+{
+	if (!state) {
+		m_frame++;
+
+		switch (m_frame) {
+		case 8:
+			m_maincpu->int_w(CLEAR_LINE);
+			break;
+
+		case 16:
+			m_maincpu->int_w(m_rtc_int);
+			m_blink = !m_blink;
+			m_frame = 0;
+			break;
+		}
+	}
+}
+
 void tmc600_state::video_start()
 {
 	// allocate memory
 	m_color_ram.allocate(TMC600_PAGE_RAM_SIZE);
 
-	// register for state saving
+	// state saving
 	save_item(NAME(m_vismac_reg_latch));
 	save_item(NAME(m_vismac_color_latch));
-	save_item(NAME(m_vismac_bkg_latch));
+	save_item(NAME(m_frame));
 	save_item(NAME(m_blink));
 }
 
@@ -125,7 +118,6 @@ GFXDECODE_END
 MACHINE_CONFIG_START( tmc600_video )
 	// video hardware
 	MCFG_CDP1869_SCREEN_PAL_ADD(CDP1869_TAG, SCREEN_TAG, cdp1869_device::DOT_CLK_PAL)
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("blink", tmc600_state, blink_tick, attotime::from_hz(2))
 
 	MCFG_GFXDECODE_ADD("gfxdecode", CDP1869_TAG":palette", tmc600)
 
@@ -136,6 +128,7 @@ MACHINE_CONFIG_START( tmc600_video )
 	MCFG_CDP1869_CHAR_PCB_READ_OWNER(tmc600_state, tmc600_pcb_r)
 	MCFG_CDP1869_CHAR_RAM_READ_OWNER(tmc600_state, tmc600_char_ram_r)
 	MCFG_CDP1869_PAL_NTSC_CALLBACK(VCC)
+	MCFG_CDP1869_PRD_CALLBACK(WRITELINE(tmc600_state, prd_w))
 	MCFG_VIDEO_SET_SCREEN(SCREEN_TAG)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END

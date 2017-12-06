@@ -11,7 +11,7 @@
 
 
 // device type definition
-DEFINE_DEVICE_TYPE(CPS3, cps3_sound_device, "cps3_custom", "CPS3 Audio Custom")
+DEFINE_DEVICE_TYPE(CPS3, cps3_sound_device, "cps3_custom", "CPS3 Custom Sound")
 
 
 //**************************************************************************

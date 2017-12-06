@@ -232,6 +232,8 @@ if (BUSES["BBC_FDC"]~=null) then
 		MAME_DIR .. "src/devices/bus/bbc/fdc/acorn.h",
 		MAME_DIR .. "src/devices/bus/bbc/fdc/cumana.cpp",
 		MAME_DIR .. "src/devices/bus/bbc/fdc/cumana.h",
+		MAME_DIR .. "src/devices/bus/bbc/fdc/cv1797.cpp",
+		MAME_DIR .. "src/devices/bus/bbc/fdc/cv1797.h",
 		MAME_DIR .. "src/devices/bus/bbc/fdc/opus.cpp",
 		MAME_DIR .. "src/devices/bus/bbc/fdc/opus.h",
 		MAME_DIR .. "src/devices/bus/bbc/fdc/watford.cpp",
@@ -251,6 +253,8 @@ if (BUSES["BBC_ANALOGUE"]~=null) then
 		MAME_DIR .. "src/devices/bus/bbc/analogue/analogue.h",
 		MAME_DIR .. "src/devices/bus/bbc/analogue/joystick.cpp",
 		MAME_DIR .. "src/devices/bus/bbc/analogue/joystick.h",
+		MAME_DIR .. "src/devices/bus/bbc/analogue/cfa3000a.cpp",
+		MAME_DIR .. "src/devices/bus/bbc/analogue/cfa3000a.h",
 	}
 end
 
@@ -283,6 +287,8 @@ if (BUSES["BBC_1MHZBUS"]~=null) then
 		MAME_DIR .. "src/devices/bus/bbc/1mhzbus/beebsid.h",
 		MAME_DIR .. "src/devices/bus/bbc/1mhzbus/opus3.cpp",
 		MAME_DIR .. "src/devices/bus/bbc/1mhzbus/opus3.h",
+		MAME_DIR .. "src/devices/bus/bbc/1mhzbus/cfa3000opt.cpp",
+		MAME_DIR .. "src/devices/bus/bbc/1mhzbus/cfa3000opt.h",
 	}
 end
 
@@ -304,6 +310,8 @@ if (BUSES["BBC_TUBE"]~=null) then
 		MAME_DIR .. "src/devices/bus/bbc/tube/tube_80186.h",
 		MAME_DIR .. "src/devices/bus/bbc/tube/tube_80286.cpp",
 		MAME_DIR .. "src/devices/bus/bbc/tube/tube_80286.h",
+		MAME_DIR .. "src/devices/bus/bbc/tube/tube_arm.cpp",
+		MAME_DIR .. "src/devices/bus/bbc/tube/tube_arm.h",
 		MAME_DIR .. "src/devices/bus/bbc/tube/tube_casper.cpp",
 		MAME_DIR .. "src/devices/bus/bbc/tube/tube_casper.h",
 		MAME_DIR .. "src/devices/bus/bbc/tube/tube_z80.cpp",
@@ -323,6 +331,8 @@ if (BUSES["BBC_USERPORT"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/bus/bbc/userport/userport.cpp",
 		MAME_DIR .. "src/devices/bus/bbc/userport/userport.h",
+		MAME_DIR .. "src/devices/bus/bbc/userport/cfa3000kbd.cpp",
+		MAME_DIR .. "src/devices/bus/bbc/userport/cfa3000kbd.h",
 	}
 end
 
@@ -712,6 +722,8 @@ if (BUSES["ELECTRON"]~=null) then
 		MAME_DIR .. "src/devices/bus/electron/exp.h",
 		MAME_DIR .. "src/devices/bus/electron/fbjoy.cpp",
 		MAME_DIR .. "src/devices/bus/electron/fbjoy.h",
+		MAME_DIR .. "src/devices/bus/electron/plus1.cpp",
+		MAME_DIR .. "src/devices/bus/electron/plus1.h",
 		MAME_DIR .. "src/devices/bus/electron/plus3.cpp",
 		MAME_DIR .. "src/devices/bus/electron/plus3.h",
 		MAME_DIR .. "src/devices/bus/electron/pwrjoy.cpp",
@@ -1375,6 +1387,23 @@ if (BUSES["SPC1000"]~=null) then
 		MAME_DIR .. "src/devices/bus/spc1000/fdd.h",
 		MAME_DIR .. "src/devices/bus/spc1000/vdp.cpp",
 		MAME_DIR .. "src/devices/bus/spc1000/vdp.h",
+	}
+end
+
+
+---------------------------------------------------
+--
+--@src/devices/bus/ss50/interface.h,BUSES["SS50"] = true
+---------------------------------------------------
+
+if (BUSES["SS50"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/bus/ss50/interface.cpp",
+		MAME_DIR .. "src/devices/bus/ss50/interface.h",
+		MAME_DIR .. "src/devices/bus/ss50/mpc.cpp",
+		MAME_DIR .. "src/devices/bus/ss50/mpc.h",
+		MAME_DIR .. "src/devices/bus/ss50/mps.cpp",
+		MAME_DIR .. "src/devices/bus/ss50/mps.h",
 	}
 end
 
@@ -2592,20 +2621,29 @@ if (BUSES["COCO"]~=null) then
 		MAME_DIR .. "src/devices/bus/coco/cococart.cpp",
 		MAME_DIR .. "src/devices/bus/coco/cococart.h",
 		MAME_DIR .. "src/devices/bus/coco/coco_rs232.cpp",
+		MAME_DIR .. "src/devices/bus/coco/coco_rs232.h",
 		MAME_DIR .. "src/devices/bus/coco/coco_dcmodem.cpp",
+		MAME_DIR .. "src/devices/bus/coco/coco_dcmodem.h",
 		MAME_DIR .. "src/devices/bus/coco/coco_orch90.cpp",
+		MAME_DIR .. "src/devices/bus/coco/coco_orch90.h",
 		MAME_DIR .. "src/devices/bus/coco/coco_ssc.cpp",
+		MAME_DIR .. "src/devices/bus/coco/coco_ssc.h",
 		MAME_DIR .. "src/devices/bus/coco/coco_pak.cpp",
 		MAME_DIR .. "src/devices/bus/coco/coco_pak.h",
 		MAME_DIR .. "src/devices/bus/coco/coco_fdc.cpp",
 		MAME_DIR .. "src/devices/bus/coco/coco_fdc.h",
 		MAME_DIR .. "src/devices/bus/coco/coco_gmc.cpp",
+		MAME_DIR .. "src/devices/bus/coco/coco_gmc.h",
 		MAME_DIR .. "src/devices/bus/coco/coco_multi.cpp",
+		MAME_DIR .. "src/devices/bus/coco/coco_multi.h",
 		MAME_DIR .. "src/devices/bus/coco/coco_dwsock.cpp",
 		MAME_DIR .. "src/devices/bus/coco/coco_dwsock.h",
 		MAME_DIR .. "src/devices/bus/coco/coco_t4426.cpp",
+		MAME_DIR .. "src/devices/bus/coco/coco_t4426.h",
 		MAME_DIR .. "src/devices/bus/coco/dragon_fdc.cpp",
+		MAME_DIR .. "src/devices/bus/coco/dragon_fdc.h",
 		MAME_DIR .. "src/devices/bus/coco/dragon_jcbsnd.cpp",
+		MAME_DIR .. "src/devices/bus/coco/dragon_jcbsnd.h",
 	}
 end
 
@@ -3152,7 +3190,8 @@ end
 if (BUSES["HP_OPTROM"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/bus/hp_optroms/hp_optrom.cpp",
-		}
+		MAME_DIR .. "src/devices/bus/hp_optroms/hp_optrom.h",
+	}
 end
 
 ---------------------------------------------------
@@ -3163,7 +3202,8 @@ end
 if (BUSES["HP80_OPTROM"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/bus/hp80_optroms/hp80_optrom.cpp",
-		}
+		MAME_DIR .. "src/devices/bus/hp80_optroms/hp80_optrom.h",
+	}
 end
 
 ---------------------------------------------------
@@ -3174,7 +3214,9 @@ end
 if (BUSES["HP80_IO"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/bus/hp80_io/hp80_io.cpp",
+		MAME_DIR .. "src/devices/bus/hp80_io/hp80_io.h",
 		MAME_DIR .. "src/devices/bus/hp80_io/82937.cpp",
+		MAME_DIR .. "src/devices/bus/hp80_io/82937.h",
 	}
 end
 
@@ -3186,8 +3228,11 @@ end
 if (BUSES["HP9845_IO"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/bus/hp9845_io/hp9845_io.cpp",
+		MAME_DIR .. "src/devices/bus/hp9845_io/hp9845_io.h",
 		MAME_DIR .. "src/devices/bus/hp9845_io/98034.cpp",
+		MAME_DIR .. "src/devices/bus/hp9845_io/98034.h",
 		MAME_DIR .. "src/devices/bus/hp9845_io/98035.cpp",
+		MAME_DIR .. "src/devices/bus/hp9845_io/98035.h",
 	}
 end
 
@@ -3294,6 +3339,10 @@ if (BUSES["TATUNG_PIPE"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/bus/einstein/pipe/pipe.cpp",
 		MAME_DIR .. "src/devices/bus/einstein/pipe/pipe.h",
+		MAME_DIR .. "src/devices/bus/einstein/pipe/silicon_disc.cpp",
+		MAME_DIR .. "src/devices/bus/einstein/pipe/silicon_disc.h",
+		MAME_DIR .. "src/devices/bus/einstein/pipe/speculator.cpp",
+		MAME_DIR .. "src/devices/bus/einstein/pipe/speculator.h",
 		MAME_DIR .. "src/devices/bus/einstein/pipe/tk02.cpp",
 		MAME_DIR .. "src/devices/bus/einstein/pipe/tk02.h",
 	}
@@ -3312,5 +3361,17 @@ if (BUSES["EINSTEIN_USERPORT"]~=null) then
 		MAME_DIR .. "src/devices/bus/einstein/userport/mouse.h",
 		MAME_DIR .. "src/devices/bus/einstein/userport/speech.cpp",
 		MAME_DIR .. "src/devices/bus/einstein/userport/speech.h",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/devices/bus/tmc600/euro.h,BUSES["TMC600"] = true
+---------------------------------------------------
+
+if (BUSES["TMC600"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/bus/tmc600/euro.cpp",
+		MAME_DIR .. "src/devices/bus/tmc600/euro.h",
 	}
 end

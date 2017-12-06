@@ -260,55 +260,6 @@ void driver_device::device_reset_after_children()
 
 
 //**************************************************************************
-//  INTERRUPT ENABLE AND VECTOR HELPERS
-//**************************************************************************
-
-//-------------------------------------------------
-//  irq_pulse_clear - clear a "pulsed" IRQ line
-//-------------------------------------------------
-
-void driver_device::irq_pulse_clear(void *ptr, s32 param)
-{
-	device_execute_interface *exec = reinterpret_cast<device_execute_interface *>(ptr);
-	int irqline = param;
-	exec->set_input_line(irqline, CLEAR_LINE);
-}
-
-
-//-------------------------------------------------
-//  generic_pulse_irq_line - "pulse" an IRQ line by
-//  asserting it and then clearing it x cycle(s)
-//  later
-//-------------------------------------------------
-
-void driver_device::generic_pulse_irq_line(device_execute_interface &exec, int irqline, int cycles)
-{
-	assert(irqline != INPUT_LINE_NMI && irqline != INPUT_LINE_RESET && cycles > 0);
-	exec.set_input_line(irqline, ASSERT_LINE);
-
-	attotime target_time = exec.local_time() + exec.cycles_to_attotime(cycles * exec.min_cycles());
-	machine().scheduler().timer_set(target_time - machine().time(), timer_expired_delegate(FUNC(driver_device::irq_pulse_clear), this), irqline, (void *)&exec);
-}
-
-
-//-------------------------------------------------
-//  generic_pulse_irq_line_and_vector - "pulse" an
-//  IRQ line by asserting it and then clearing it
-//  x cycle(s) later, specifying a vector
-//-------------------------------------------------
-
-void driver_device::generic_pulse_irq_line_and_vector(device_execute_interface &exec, int irqline, int vector, int cycles)
-{
-	assert(irqline != INPUT_LINE_NMI && irqline != INPUT_LINE_RESET && cycles > 0);
-	exec.set_input_line_and_vector(irqline, ASSERT_LINE, vector);
-
-	attotime target_time = exec.local_time() + exec.cycles_to_attotime(cycles * exec.min_cycles());
-	machine().scheduler().timer_set(target_time - machine().time(), timer_expired_delegate(FUNC(driver_device::irq_pulse_clear), this), irqline, (void *)&exec);
-}
-
-
-
-//**************************************************************************
 //  INTERRUPT GENERATION CALLBACK HELPERS
 //**************************************************************************
 

@@ -16,85 +16,8 @@
 
 #include "emu.h"
 #include "tlcs870.h"
+#include "tlcs870d.h"
 #include "debugger.h"
-
-
-// di, ei, j, and test are just 'alias' opcodes
-static const char *const op_names[] = {
-	"??",
-	"call", "callp", "callv", "clr", "cpl",
-	"daa", "das", "dec", /*"di",*/ "div",
-	/*"ei",*/
-	"inc",
-	/*"j",*/ "jp", "jr", "jrs",
-	"ld", "ldw",
-	"mcmp", "mul",
-	"nop",
-	"pop", "push",
-	"ret", "reti", "retn", "rolc", "rold", "rorc", "rord",
-	"set", "shlc", "shrc", "swap", "swi",
-	/*"test",*/ "xch",
-	// ALU operations
-	"addc",
-	"add",
-	"subb",
-	"sub",
-	"and",
-	"xor",
-	"or",
-	"cmp",
-};
-
-
-
-
-static const char *const reg8[] = {
-	"A",
-	"W",
-	"C",
-	"B",
-	"E",
-	"D",
-	"L",
-	"H"
-};
-
-static const char *const type_x[] = {
-	"(x)",
-	"(PC+A)",
-	"(DE)",
-	"(HL)",
-	"(HL+d)",
-	"(HL+C)",
-	"(HL+)",
-	"(-HL)",
-};
-
-static const char *const conditions[] = {
-	"EQ/Z",
-	"NE/NZ",
-	"LT/CS",
-	"GE/CC",
-	"LE",
-	"GT",
-	"T",
-	"F",
-};
-
-static const char *const reg16[] = {
-	"WA",
-	"BC",
-	"DE",
-	"HL"
-};
-
-#ifdef UNUSED_DEFINTION
-static const char *const reg16p[] = {
-	"DE",
-	"HL"
-};
-#endif
-
 
 #define IS16BIT 0x80
 #define BITPOS 0x40
@@ -2336,71 +2259,6 @@ bool tlcs870_device::stream_arg(std::ostream &stream, uint32_t pc, const char *p
 	return false;
 }
 
-void tlcs870_device::disasm_disassemble_param(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options, int type, uint16_t val)
-{
-	int basetype = type & MODE_MASK;
-
-	if (basetype==ADDR_IN_IMM_X) util::stream_format(stream, " ($%02x)", val); // direct
-	if (basetype==ADDR_IN_PC_PLUS_REG_A) util::stream_format(stream, " %s", type_x[1]);
-	if (basetype==ADDR_IN_DE) util::stream_format(stream, " %s", type_x[2]);
-	if (basetype==ADDR_IN_HL) util::stream_format(stream, " %s", type_x[3]);
-	if (basetype==ADDR_IN_HL_PLUS_IMM_D) util::stream_format(stream, " (HL+$%04x)", val); // todo, sign extend
-	if (basetype==ADDR_IN_HL_PLUS_REG_C) util::stream_format(stream, " %s", type_x[5]);
-	if (basetype==ADDR_IN_HLINC) util::stream_format(stream, " %s", type_x[6]);
-	if (basetype==ADDR_IN_DECHL) util::stream_format(stream, " %s", type_x[7]);
-
-	if (basetype==REG_8BIT)
-	{
-		if (type&IS16BIT) util::stream_format(stream, " %s", reg16[val&3]);
-		else util::stream_format(stream, " %s", reg8[val & 7]);
-	}
-
-	if (basetype==CONDITIONAL) util::stream_format(stream, " %s", conditions[val]);
-	if (basetype==(STACKPOINTER & MODE_MASK)) util::stream_format(stream, " SP");
-	if (basetype==REGISTERBANK) util::stream_format(stream, " RBS");
-	if (basetype==PROGRAMSTATUSWORD) util::stream_format(stream, " PSW");
-	if (basetype==MEMVECTOR_16BIT) util::stream_format(stream, " ($%04x)", val);
-	if (basetype==ABSOLUTE_VAL_8)
-	{
-		if (type&IS16BIT) util::stream_format(stream, "$%04x", val);
-		else util::stream_format(stream, "$%02x", val);
-	}
-
-	if (basetype == (CARRYFLAG & MODE_MASK))
-	{
-		util::stream_format(stream, " CF");
-	}
-	else if (type&BITPOS)
-	{
-		if (type & BITPOS_INDIRECT) util::stream_format(stream, ".BIT_%s", reg8[m_bitpos&7]);
-		else util::stream_format(stream, ".BIT_%d", m_bitpos);
-	}
-}
-
-offs_t tlcs870_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
-{
-	m_addr = pc;
-
-	decode();
-
-	util::stream_format         (stream, "%-5s",                op_names[ m_op ] );
-
-	if (m_param1_type)
-	{
-		disasm_disassemble_param(stream, pc, oprom, opram, options, m_param1_type, m_param1);
-	}
-
-	if (m_param2_type)
-	{
-		if (m_param1_type) util::stream_format(stream, ",");
-
-		disasm_disassemble_param(stream, pc, oprom, opram, options, m_param2_type, m_param2);
-
-	}
-
-	return (m_addr - pc) | DASMFLAG_SUPPORTED;
-}
-
 void tlcs870_device::execute_set_input(int inputnum, int state)
 {
 #if 0
@@ -3304,4 +3162,9 @@ void tlcs870_device::state_string_export(const device_state_entry &entry, std::s
 			break;
 	}
 
+}
+
+util::disasm_interface *tlcs870_device::create_disassembler()
+{
+	return new tlcs870_disassembler;
 }

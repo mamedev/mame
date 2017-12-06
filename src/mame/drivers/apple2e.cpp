@@ -80,11 +80,11 @@
         Like IIc with memory expansion, but with licensed built-in Zip Chip which
         runs the 65C02 at 4 MHz turbo speed with a small cache RAM.
 
-		The machine has an internal "Apple 3.5" drive plus a custom chip
-		named "MIG" (Multidrive Interface Glue) which helps with the control 
-		of the drive.  This gets around the fact that 1 MHz isn't 
-		sufficient to handle direct Woz-style control of a double-density 
-		3.5" drive.
+        The machine has an internal "Apple 3.5" drive plus a custom chip
+        named "MIG" (Multidrive Interface Glue) which helps with the control
+        of the drive.  This gets around the fact that 1 MHz isn't
+        sufficient to handle direct Woz-style control of a double-density
+        3.5" drive.
 
         External drive port allows IIgs-style daisy-chaining.
 
@@ -400,7 +400,7 @@ private:
 	bool m_intc8rom;
 
 	bool m_isiic, m_isiicplus, m_iscec;
-	uint8_t m_migram[0x200];
+	uint8_t m_migram[0x800];
 	uint16_t m_migpage;
 
 	uint8_t *m_ram_ptr, *m_rom_ptr, *m_cec_ptr;
@@ -464,7 +464,7 @@ uint8_t apple2e_state::mig_r(uint16_t offset)
 	if (offset == 0x20)
 	{
 		m_migpage += 0x20;
-		m_migpage &= 0x1ff;	// make sure we wrap
+		m_migpage &= 0x7ff; // make sure we wrap
 	}
 
 	// reset MIG RAM window
@@ -489,7 +489,7 @@ void apple2e_state::mig_w(uint16_t offset, uint8_t data)
 	if (offset == 0x20)
 	{
 		m_migpage += 0x20;
-		m_migpage &= 0x1ff;	// make sure we wrap
+		m_migpage &= 0x7ff; // make sure we wrap
 	}
 
 	// reset MIG RAM window
@@ -571,7 +571,7 @@ READ8_MEMBER(apple2e_state::memexp_r)
 
 	if (!m_exp_ram)
 	{
-		return 0xff;
+		return read_floatingbus();
 	}
 
 	if (offset == 3)
@@ -3823,8 +3823,8 @@ static SLOT_INTERFACE_START(apple2_cards)
 //  SLOT_INTERFACE("magicmusician", A2BUS_MAGICMUSICIAN)    /* Magic Musician Card */
 	SLOT_INTERFACE("pcxport", A2BUS_PCXPORTER) /* Applied Engineering PC Transporter */
 	SLOT_INTERFACE("ssprite", A2BUS_SSPRITE)    /* Synetix SuperSprite Board */
-	SLOT_INTERFACE("ssbapple", A2BUS_SSBAPPLE)	/* SSB Apple speech board */
-	SLOT_INTERFACE("twarp", A2BUS_TRANSWARP)	/* AE TransWarp accelerator */
+	SLOT_INTERFACE("ssbapple", A2BUS_SSBAPPLE)  /* SSB Apple speech board */
+	SLOT_INTERFACE("twarp", A2BUS_TRANSWARP)    /* AE TransWarp accelerator */
 SLOT_INTERFACE_END
 
 static SLOT_INTERFACE_START(apple2eaux_cards)
@@ -3868,84 +3868,84 @@ static MACHINE_CONFIG_START( apple2e )
 	MCFG_DEVICE_ADD(A2_0000_TAG, ADDRESS_MAP_BANK, 0)
 	MCFG_DEVICE_PROGRAM_MAP(r0000bank_map)
 	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_ADDRESS_MAP_BANK_DATABUS_WIDTH(8)
+	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
 	MCFG_ADDRESS_MAP_BANK_STRIDE(0x200)
 
 	/* 0200 banking */
 	MCFG_DEVICE_ADD(A2_0200_TAG, ADDRESS_MAP_BANK, 0)
 	MCFG_DEVICE_PROGRAM_MAP(r0200bank_map)
 	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_ADDRESS_MAP_BANK_DATABUS_WIDTH(8)
+	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
 	MCFG_ADDRESS_MAP_BANK_STRIDE(0x200)
 
 	/* 0400 banking */
 	MCFG_DEVICE_ADD(A2_0400_TAG, ADDRESS_MAP_BANK, 0)
 	MCFG_DEVICE_PROGRAM_MAP(r0400bank_map)
 	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_ADDRESS_MAP_BANK_DATABUS_WIDTH(8)
+	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
 	MCFG_ADDRESS_MAP_BANK_STRIDE(0x400)
 
 	/* 0800 banking */
 	MCFG_DEVICE_ADD(A2_0800_TAG, ADDRESS_MAP_BANK, 0)
 	MCFG_DEVICE_PROGRAM_MAP(r0800bank_map)
 	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_ADDRESS_MAP_BANK_DATABUS_WIDTH(8)
+	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
 	MCFG_ADDRESS_MAP_BANK_STRIDE(0x2000)
 
 	/* 2000 banking */
 	MCFG_DEVICE_ADD(A2_2000_TAG, ADDRESS_MAP_BANK, 0)
 	MCFG_DEVICE_PROGRAM_MAP(r2000bank_map)
 	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_ADDRESS_MAP_BANK_DATABUS_WIDTH(8)
+	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
 	MCFG_ADDRESS_MAP_BANK_STRIDE(0x2000)
 
 	/* 4000 banking */
 	MCFG_DEVICE_ADD(A2_4000_TAG, ADDRESS_MAP_BANK, 0)
 	MCFG_DEVICE_PROGRAM_MAP(r4000bank_map)
 	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_ADDRESS_MAP_BANK_DATABUS_WIDTH(8)
+	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
 	MCFG_ADDRESS_MAP_BANK_STRIDE(0x8000)
 
 	/* C100 banking */
 	MCFG_DEVICE_ADD(A2_C100_TAG, ADDRESS_MAP_BANK, 0)
 	MCFG_DEVICE_PROGRAM_MAP(c100bank_map)
 	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_ADDRESS_MAP_BANK_DATABUS_WIDTH(8)
+	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
 	MCFG_ADDRESS_MAP_BANK_STRIDE(0x200)
 
 	/* C300 banking */
 	MCFG_DEVICE_ADD(A2_C300_TAG, ADDRESS_MAP_BANK, 0)
 	MCFG_DEVICE_PROGRAM_MAP(c300bank_map)
 	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_ADDRESS_MAP_BANK_DATABUS_WIDTH(8)
+	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
 	MCFG_ADDRESS_MAP_BANK_STRIDE(0x100)
 
 	/* C400 banking */
 	MCFG_DEVICE_ADD(A2_C400_TAG, ADDRESS_MAP_BANK, 0)
 	MCFG_DEVICE_PROGRAM_MAP(c400bank_map)
 	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_ADDRESS_MAP_BANK_DATABUS_WIDTH(8)
+	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
 	MCFG_ADDRESS_MAP_BANK_STRIDE(0x400)
 
 	/* C800 banking */
 	MCFG_DEVICE_ADD(A2_C800_TAG, ADDRESS_MAP_BANK, 0)
 	MCFG_DEVICE_PROGRAM_MAP(c800bank_map)
 	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_ADDRESS_MAP_BANK_DATABUS_WIDTH(8)
+	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
 	MCFG_ADDRESS_MAP_BANK_STRIDE(0x800)
 
 	/* built-in language card emulation */
 	MCFG_DEVICE_ADD(A2_LCBANK_TAG, ADDRESS_MAP_BANK, 0)
 	MCFG_DEVICE_PROGRAM_MAP(lcbank_map)
 	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_ADDRESS_MAP_BANK_DATABUS_WIDTH(8)
+	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
 	MCFG_ADDRESS_MAP_BANK_STRIDE(0x3000)
 
 	/* /INH banking */
 	MCFG_DEVICE_ADD(A2_UPPERBANK_TAG, ADDRESS_MAP_BANK, 0)
 	MCFG_DEVICE_PROGRAM_MAP(inhbank_map)
 	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_ADDRESS_MAP_BANK_DATABUS_WIDTH(8)
+	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
 	MCFG_ADDRESS_MAP_BANK_STRIDE(0x3000)
 
 	/* keyboard controller */

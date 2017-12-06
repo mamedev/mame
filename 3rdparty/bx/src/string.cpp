@@ -3,6 +3,7 @@
  * License: https://github.com/bkaradzic/bx#license-bsd-2-clause
  */
 
+#include "bx_p.h"
 #include <bx/allocator.h>
 #include <bx/hash.h>
 #include <bx/readerwriter.h>
@@ -10,10 +11,16 @@
 
 #if !BX_CRT_NONE
 #	include <stdio.h> // vsnprintf, vsnwprintf
+#	include <wchar.h> // vswprintf
 #endif // !BX_CRT_NONE
 
 namespace bx
 {
+	inline bool isInRange(char _ch, char _from, char _to)
+	{
+		return unsigned(_ch - _from) <= unsigned(_to-_from);
+	}
+
 	bool isSpace(char _ch)
 	{
 		return ' '  == _ch
@@ -27,12 +34,12 @@ namespace bx
 
 	bool isUpper(char _ch)
 	{
-		return _ch >= 'A' && _ch <= 'Z';
+		return isInRange(_ch, 'A', 'Z');
 	}
 
 	bool isLower(char _ch)
 	{
-		return _ch >= 'a' && _ch <= 'z';
+		return isInRange(_ch, 'a', 'z');
 	}
 
 	bool isAlpha(char _ch)
@@ -42,7 +49,7 @@ namespace bx
 
 	bool isNumeric(char _ch)
 	{
-		return _ch >= '0' && _ch <= '9';
+		return isInRange(_ch, '0', '9');
 	}
 
 	bool isAlphaNum(char _ch)
@@ -52,7 +59,60 @@ namespace bx
 
 	bool isPrint(char _ch)
 	{
-		return isAlphaNum(_ch) || isSpace(_ch);
+		return isInRange(_ch, ' ', '~');
+	}
+
+	typedef bool (*CharTestFn)(char _ch);
+
+	template<CharTestFn fn>
+	inline bool isCharTest(const StringView& _str)
+	{
+		bool result = true;
+
+		for (const char* ptr = _str.getPtr(), *term = _str.getTerm()
+			; ptr != term && result
+			; ++ptr
+			)
+		{
+			result &= fn(*ptr);
+		}
+
+		return result;
+	}
+
+	bool isSpace(const StringView& _str)
+	{
+		return isCharTest<isSpace>(_str);
+	}
+
+	bool isUpper(const StringView& _str)
+	{
+		return isCharTest<isUpper>(_str);
+	}
+
+	bool isLower(const StringView& _str)
+	{
+		return isCharTest<isLower>(_str);
+	}
+
+	bool isAlpha(const StringView& _str)
+	{
+		return isCharTest<isAlpha>(_str);
+	}
+
+	bool isNumeric(const StringView& _str)
+	{
+		return isCharTest<isNumeric>(_str);
+	}
+
+	bool isAlphaNum(const StringView& _str)
+	{
+		return isCharTest<isAlphaNum>(_str);
+	}
+
+	bool isPrint(const StringView& _str)
+	{
+		return isCharTest<isPrint>(_str);
 	}
 
 	char toLower(char _ch)
@@ -70,7 +130,7 @@ namespace bx
 
 	void toLower(char* _inOutStr, int32_t _max)
 	{
-		const int32_t len = strnlen(_inOutStr, _max);
+		const int32_t len = strLen(_inOutStr, _max);
 		toLowerUnsafe(_inOutStr, len);
 	}
 
@@ -89,14 +149,8 @@ namespace bx
 
 	void toUpper(char* _inOutStr, int32_t _max)
 	{
-		const int32_t len = strnlen(_inOutStr, _max);
+		const int32_t len = strLen(_inOutStr, _max);
 		toUpperUnsafe(_inOutStr, len);
-	}
-
-	bool toBool(const char* _str)
-	{
-		char ch = toLower(_str[0]);
-		return ch == 't' ||  ch == '1';
 	}
 
 	typedef char (*CharFn)(char _ch);
@@ -107,11 +161,13 @@ namespace bx
 	}
 
 	template<CharFn fn>
-	int32_t strCmp(const char* _lhs, const char* _rhs, int32_t _max)
+	inline int32_t strCmp(const char* _lhs, int32_t _lhsMax, const char* _rhs, int32_t _rhsMax)
 	{
+		int32_t max = min(_lhsMax, _rhsMax);
+
 		for (
-			; 0 < _max && fn(*_lhs) == fn(*_rhs)
-			; ++_lhs, ++_rhs, --_max
+			; 0 < max && fn(*_lhs) == fn(*_rhs)
+			; ++_lhs, ++_rhs, --max
 			)
 		{
 			if (*_lhs == '\0'
@@ -121,20 +177,105 @@ namespace bx
 			}
 		}
 
-		return 0 == _max ? 0 : fn(*_lhs) - fn(*_rhs);
+		return 0 == max && _lhsMax == _rhsMax ? 0 : fn(*_lhs) - fn(*_rhs);
 	}
 
-	int32_t strncmp(const char* _lhs, const char* _rhs, int32_t _max)
+	int32_t strCmp(const StringView& _lhs, const StringView& _rhs, int32_t _max)
 	{
-		return strCmp<toNoop>(_lhs, _rhs, _max);
+		return strCmp<toNoop>(
+			  _lhs.getPtr()
+			, min(_lhs.getLength(), _max)
+			, _rhs.getPtr()
+			, min(_rhs.getLength(), _max)
+			);
 	}
 
-	int32_t strincmp(const char* _lhs, const char* _rhs, int32_t _max)
+	int32_t strCmpI(const StringView& _lhs, const StringView& _rhs, int32_t _max)
 	{
-		return strCmp<toLower>(_lhs, _rhs, _max);
+		return strCmp<toLower>(
+			  _lhs.getPtr()
+			, min(_lhs.getLength(), _max)
+			, _rhs.getPtr()
+			, min(_rhs.getLength(), _max)
+			);
 	}
 
-	int32_t strnlen(const char* _str, int32_t _max)
+	inline int32_t strCmpV(const char* _lhs, int32_t _lhsMax, const char* _rhs, int32_t _rhsMax)
+	{
+		int32_t max  = min(_lhsMax, _rhsMax);
+		int32_t ii   = 0;
+		int32_t idx  = 0;
+		bool    zero = true;
+
+		for (
+			; 0 < max && _lhs[ii] == _rhs[ii]
+			; ++ii, --max
+			)
+		{
+			const uint8_t ch = _lhs[ii];
+			if ('\0' == ch
+			||  '\0' == _rhs[ii])
+			{
+				break;
+			}
+
+			if (!isNumeric(ch) )
+			{
+				idx  = ii+1;
+				zero = true;
+			}
+			else if ('0' != ch)
+			{
+				zero = false;
+			}
+		}
+
+		if (0 == max)
+		{
+			return _lhsMax == _rhsMax ? 0 : _lhs[ii] - _rhs[ii];
+		}
+
+		if ('0' != _lhs[idx]
+		&&  '0' != _rhs[idx])
+		{
+			int32_t jj = 0;
+			for (jj = ii
+				; 0 < max && isNumeric(_lhs[jj])
+				; ++jj, --max
+				)
+			{
+				if (!isNumeric(_rhs[jj]) )
+				{
+					return 1;
+				}
+			}
+
+			if (isNumeric(_rhs[jj]))
+			{
+				return -1;
+			}
+		}
+		else if (zero
+			 &&  idx < ii
+			 && (isNumeric(_lhs[ii]) || isNumeric(_rhs[ii]) ) )
+		{
+			return (_lhs[ii] - '0') - (_rhs[ii] - '0');
+		}
+
+		return 0 == max && _lhsMax == _rhsMax ? 0 : _lhs[ii] - _rhs[ii];
+	}
+
+	int32_t strCmpV(const StringView& _lhs, const StringView& _rhs, int32_t _max)
+	{
+		return strCmpV(
+			  _lhs.getPtr()
+			, min(_lhs.getLength(), _max)
+			, _rhs.getPtr()
+			, min(_rhs.getLength(), _max)
+			);
+	}
+
+	int32_t strLen(const char* _str, int32_t _max)
 	{
 		if (NULL == _str)
 		{
@@ -146,13 +287,18 @@ namespace bx
 		return int32_t(ptr - _str);
 	}
 
-	int32_t strlncpy(char* _dst, int32_t _dstSize, const char* _src, int32_t _num)
+	int32_t strLen(const StringView& _str, int32_t _max)
+	{
+		return strLen(_str.getPtr(), min(_str.getLength(), _max) );
+	}
+
+	inline int32_t strCopy(char* _dst, int32_t _dstSize, const char* _src, int32_t _num)
 	{
 		BX_CHECK(NULL != _dst, "_dst can't be NULL!");
 		BX_CHECK(NULL != _src, "_src can't be NULL!");
 		BX_CHECK(0 < _dstSize, "_dstSize can't be 0!");
 
-		const int32_t len = strnlen(_src, _num);
+		const int32_t len = strLen(_src, _num);
 		const int32_t max = _dstSize-1;
 		const int32_t num = (len < max ? len : max);
 		memCopy(_dst, _src, num);
@@ -161,20 +307,30 @@ namespace bx
 		return num;
 	}
 
-	int32_t strlncat(char* _dst, int32_t _dstSize, const char* _src, int32_t _num)
+	int32_t strCopy(char* _dst, int32_t _dstSize, const StringView& _str, int32_t _num)
+	{
+		return strCopy(_dst, _dstSize, _str.getPtr(), min(_str.getLength(), _num) );
+	}
+
+	inline int32_t strCat(char* _dst, int32_t _dstSize, const char* _src, int32_t _num)
 	{
 		BX_CHECK(NULL != _dst, "_dst can't be NULL!");
 		BX_CHECK(NULL != _src, "_src can't be NULL!");
 		BX_CHECK(0 < _dstSize, "_dstSize can't be 0!");
 
 		const int32_t max = _dstSize;
-		const int32_t len = strnlen(_dst, max);
-		return strlncpy(&_dst[len], max-len, _src, _num);
+		const int32_t len = strLen(_dst, max);
+		return strCopy(&_dst[len], max-len, _src, _num);
 	}
 
-	const char* strnchr(const char* _str, char _ch, int32_t _max)
+	int32_t strCat(char* _dst, int32_t _dstSize, const StringView& _str, int32_t _num)
 	{
-		for (int32_t ii = 0, len = strnlen(_str, _max); ii < len; ++ii)
+		return strCat(_dst, _dstSize, _str.getPtr(), min(_str.getLength(), _num) );
+	}
+
+	inline const char* strFindUnsafe(const char* _str, int32_t _len, char _ch)
+	{
+		for (int32_t ii = 0; ii < _len; ++ii)
 		{
 			if (_str[ii] == _ch)
 			{
@@ -185,9 +341,19 @@ namespace bx
 		return NULL;
 	}
 
-	const char* strnrchr(const char* _str, char _ch, int32_t _max)
+	inline const char* strFind(const char* _str, int32_t _max, char _ch)
 	{
-		for (int32_t ii = strnlen(_str, _max); 0 < ii; --ii)
+		return strFindUnsafe(_str, strLen(_str, _max), _ch);
+	}
+
+	const char* strFind(const StringView& _str, char _ch)
+	{
+		return strFind(_str.getPtr(), _str.getLength(), _ch);
+	}
+
+	inline const char* strRFindUnsafe(const char* _str, int32_t _len, char _ch)
+	{
+		for (int32_t ii = _len; 0 <= ii; --ii)
 		{
 			if (_str[ii] == _ch)
 			{
@@ -196,15 +362,25 @@ namespace bx
 		}
 
 		return NULL;
+	}
+
+	inline const char* strRFind(const char* _str, int32_t _max, char _ch)
+	{
+		return strRFindUnsafe(_str, strLen(_str, _max), _ch);
+	}
+
+	const char* strRFind(const StringView& _str, char _ch)
+	{
+		return strRFind(_str.getPtr(), _str.getLength(), _ch);
 	}
 
 	template<CharFn fn>
-	static const char* strStr(const char* _str, int32_t _strMax, const char* _find, int32_t _findMax)
+	inline const char* strFind(const char* _str, int32_t _strMax, const char* _find, int32_t _findMax)
 	{
 		const char* ptr = _str;
 
-		int32_t       stringLen = strnlen(_str,  _strMax);
-		const int32_t findLen   = strnlen(_find, _findMax);
+		int32_t       stringLen = strLen(_str,  _strMax);
+		const int32_t findLen   = strLen(_find, _findMax);
 
 		for (; stringLen >= findLen; ++ptr, --stringLen)
 		{
@@ -239,27 +415,81 @@ namespace bx
 		return NULL;
 	}
 
-	const char* strnstr(const char* _str, const char* _find, int32_t _max)
+	const char* strFind(const StringView& _str, const StringView& _find, int32_t _num)
 	{
-		return strStr<toNoop>(_str, _max, _find, INT32_MAX);
+		return strFind<toNoop>(
+			  _str.getPtr()
+			, _str.getLength()
+			, _find.getPtr()
+			, min(_find.getLength(), _num)
+			);
 	}
 
-	const char* stristr(const char* _str, const char* _find, int32_t _max)
+	const char* strFindI(const StringView& _str, const StringView& _find, int32_t _num)
 	{
-		return strStr<toLower>(_str, _max, _find, INT32_MAX);
+		return strFind<toLower>(
+			  _str.getPtr()
+			, _str.getLength()
+			, _find.getPtr()
+			, min(_find.getLength(), _num)
+			);
+	}
+
+	StringView strLTrim(const StringView& _str, const StringView& _chars)
+	{
+		const char* ptr   = _str.getPtr();
+		const char* chars = _chars.getPtr();
+		const uint32_t charsLen = _chars.getLength();
+
+		for (uint32_t ii = 0, len = _str.getLength(); ii < len; ++ii)
+		{
+			if (NULL == strFindUnsafe(chars, charsLen, ptr[ii]) )
+			{
+				return StringView(ptr + ii, len-ii);
+			}
+		}
+
+		return StringView();
+	}
+
+	StringView strRTrim(const StringView& _str, const StringView& _chars)
+	{
+		if (_str.isEmpty() )
+		{
+			return StringView();
+		}
+
+		const char* ptr   = _str.getPtr();
+		const char* chars = _chars.getPtr();
+		const uint32_t charsLen = _chars.getLength();
+
+		for (int32_t len = _str.getLength(), ii = len-1; 0 <= ii; --ii)
+		{
+			if (NULL == strFindUnsafe(chars, charsLen, ptr[ii]) )
+			{
+				return StringView(ptr, ii+1);
+			}
+		}
+
+		return StringView();
+	}
+
+	StringView strTrim(const StringView& _str, const StringView& _chars)
+	{
+		return strLTrim(strRTrim(_str, _chars), _chars);
 	}
 
 	const char* strnl(const char* _str)
 	{
-		for (; '\0' != *_str; _str += strnlen(_str, 1024) )
+		for (; '\0' != *_str; _str += strLen(_str, 1024) )
 		{
-			const char* eol = strnstr(_str, "\r\n", 1024);
+			const char* eol = strFind(StringView(_str, 1024), "\r\n");
 			if (NULL != eol)
 			{
 				return eol + 2;
 			}
 
-			eol = strnstr(_str, "\n", 1024);
+			eol = strFind(StringView(_str, 1024), "\n");
 			if (NULL != eol)
 			{
 				return eol + 1;
@@ -271,15 +501,15 @@ namespace bx
 
 	const char* streol(const char* _str)
 	{
-		for (; '\0' != *_str; _str += strnlen(_str, 1024) )
+		for (; '\0' != *_str; _str += strLen(_str, 1024) )
 		{
-			const char* eol = strnstr(_str, "\r\n", 1024);
+			const char* eol = strFind(StringView(_str, 1024), "\r\n");
 			if (NULL != eol)
 			{
 				return eol;
 			}
 
-			eol = strnstr(_str, "\n", 1024);
+			eol = strFind(StringView(_str, 1024), "\n");
 			if (NULL != eol)
 			{
 				return eol;
@@ -348,9 +578,9 @@ namespace bx
 
 	const char* findIdentifierMatch(const char* _str, const char* _word)
 	{
-		int32_t len = strnlen(_word);
-		const char* ptr = strnstr(_str, _word);
-		for (; NULL != ptr; ptr = strnstr(ptr + len, _word) )
+		int32_t len = strLen(_word);
+		const char* ptr = strFind(_str, _word);
+		for (; NULL != ptr; ptr = strFind(ptr + len, _word) )
 		{
 			if (ptr != _str)
 			{
@@ -418,7 +648,7 @@ namespace bx
 		static int32_t write(WriterI* _writer, const char* _str, int32_t _len, const Param& _param, Error* _err)
 		{
 			int32_t size = 0;
-			int32_t len = (int32_t)strnlen(_str, _len);
+			int32_t len = (int32_t)strLen(_str, _len);
 			int32_t padding = _param.width > len ? _param.width - len : 0;
 			bool sign = _param.sign && len > 1 && _str[0] != '-';
 			padding = padding > 0 ? padding - sign : 0;
@@ -534,7 +764,7 @@ namespace bx
 				toUpperUnsafe(str, len);
 			}
 
-			const char* dot = strnchr(str, '.');
+			const char* dot = strFind(str, INT32_MAX, '.');
 			if (NULL != dot)
 			{
 				const int32_t precLen = int32_t(
@@ -574,7 +804,7 @@ namespace bx
 
 	int32_t write(WriterI* _writer, const char* _format, va_list _argList, Error* _err)
 	{
-		MemoryReader reader(_format, uint32_t(strnlen(_format) ) );
+		MemoryReader reader(_format, uint32_t(strLen(_format) ) );
 
 		int32_t size = 0;
 
@@ -793,9 +1023,9 @@ namespace bx
 	{
 		va_list argList;
 		va_start(argList, _format);
-		int32_t size = write(_writer, _format, argList, _err);
+		int32_t total = write(_writer, _format, argList, _err);
 		va_end(argList);
-		return size;
+		return total;
 	}
 
 	int32_t vsnprintfRef(char* _out, int32_t _max, const char* _format, va_list _argList)
@@ -829,8 +1059,11 @@ namespace bx
 
 	int32_t vsnprintf(char* _out, int32_t _max, const char* _format, va_list _argList)
 	{
+		va_list argList;
+		va_copy(argList, _argList);
+		int32_t total = 0;
 #if BX_CRT_NONE
-		return vsnprintfRef(_out, _max, _format, _argList);
+		total = vsnprintfRef(_out, _max, _format, argList);
 #elif BX_CRT_MSVC
 		int32_t len = -1;
 		if (NULL != _out)
@@ -840,26 +1073,30 @@ namespace bx
 			len = ::vsnprintf_s(_out, _max, size_t(-1), _format, argListCopy);
 			va_end(argListCopy);
 		}
-		return -1 == len ? ::_vscprintf(_format, _argList) : len;
+		total = -1 == len ? ::_vscprintf(_format, argList) : len;
 #else
-		return ::vsnprintf(_out, _max, _format, _argList);
+		total = ::vsnprintf(_out, _max, _format, argList);
 #endif // BX_COMPILER_MSVC
+		va_end(argList);
+		return total;
 	}
 
 	int32_t snprintf(char* _out, int32_t _max, const char* _format, ...)
 	{
 		va_list argList;
 		va_start(argList, _format);
-		int32_t len = vsnprintf(_out, _max, _format, argList);
+		int32_t total = vsnprintf(_out, _max, _format, argList);
 		va_end(argList);
-		return len;
+		return total;
 	}
 
 	int32_t vsnwprintf(wchar_t* _out, int32_t _max, const wchar_t* _format, va_list _argList)
 	{
+		va_list argList;
+		va_copy(argList, _argList);
+		int32_t total = 0;
 #if BX_CRT_NONE
-		BX_UNUSED(_out, _max, _format, _argList);
-		return 0;
+		BX_UNUSED(_out, _max, _format, argList);
 #elif BX_CRT_MSVC
 		int32_t len = -1;
 		if (NULL != _out)
@@ -869,12 +1106,14 @@ namespace bx
 			len = ::_vsnwprintf_s(_out, _max, size_t(-1), _format, argListCopy);
 			va_end(argListCopy);
 		}
-		return -1 == len ? ::_vscwprintf(_format, _argList) : len;
+		total = -1 == len ? ::_vscwprintf(_format, _argList) : len;
 #elif BX_CRT_MINGW
-		return ::vsnwprintf(_out, _max, _format, _argList);
+		total = ::vsnwprintf(_out, _max, _format, argList);
 #else
-		return ::vswprintf(_out, _max, _format, _argList);
+		total = ::vswprintf(_out, _max, _format, argList);
 #endif // BX_COMPILER_MSVC
+		va_end(argList);
+		return total;
 	}
 
 	int32_t swnprintf(wchar_t* _out, int32_t _max, const wchar_t* _format, ...)
@@ -886,44 +1125,36 @@ namespace bx
 		return len;
 	}
 
-	const char* baseName(const char* _filePath)
-	{
-		const char* bs       = strnrchr(_filePath, '\\');
-		const char* fs       = strnrchr(_filePath, '/');
-		const char* slash    = (bs > fs ? bs : fs);
-		const char* colon    = strnrchr(_filePath, ':');
-		const char* basename = slash > colon ? slash : colon;
-		if (NULL != basename)
-		{
-			return basename+1;
-		}
+	static const char s_units[] = { 'B', 'K', 'M', 'G', 'T', 'P', 'E', 'Z', 'Y' };
 
-		return _filePath;
-	}
-
-	void prettify(char* _out, int32_t _count, uint64_t _size)
+	template<uint32_t Kilo, char KiloCh0, char KiloCh1>
+	inline int32_t prettify(char* _out, int32_t _count, uint64_t _value)
 	{
 		uint8_t idx = 0;
-		double size = double(_size);
-		while (_size != (_size&0x7ff)
-		&&     idx < 9)
+		double value = double(_value);
+		while (_value != (_value&0x7ff)
+		&&     idx < BX_COUNTOF(s_units) )
 		{
-			_size >>= 10;
-			size *= 1.0/1024.0;
+			_value /= Kilo;
+			value  *= 1.0/double(Kilo);
 			++idx;
 		}
 
-		snprintf(_out, _count, "%0.2f %c%c", size, "BkMGTPEZY"[idx], idx > 0 ? 'B' : '\0');
+		return snprintf(_out, _count, "%0.2f %c%c%c", value
+			, s_units[idx]
+			, idx > 0 ? KiloCh0 : '\0'
+			, KiloCh1
+			);
 	}
 
-	int32_t strlcpy(char* _dst, const char* _src, int32_t _max)
+	int32_t prettify(char* _out, int32_t _count, uint64_t _value, Units::Enum _units)
 	{
-		return strlncpy(_dst, _max, _src);
-	}
+		if (Units::Kilo == _units)
+		{
+			return prettify<1000, 'B', '\0'>(_out, _count, _value);
+		}
 
-	int32_t strlcat(char* _dst, const char* _src, int32_t _max)
-	{
-		return strlncat(_dst, _max, _src);
+		return prettify<1024, 'i', 'B'>(_out, _count, _value);
 	}
 
 } // namespace bx

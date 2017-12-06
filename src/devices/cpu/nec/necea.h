@@ -7,26 +7,26 @@ uint32_t nec_common_device::EA_002() { m_EO=Wreg(BP)+Wreg(IX); m_EA=DefaultBase(
 uint32_t nec_common_device::EA_003() { m_EO=Wreg(BP)+Wreg(IY); m_EA=DefaultBase(SS)+m_EO; return m_EA; }
 uint32_t nec_common_device::EA_004() { m_EO=Wreg(IX); m_EA=DefaultBase(DS0)+m_EO; return m_EA; }
 uint32_t nec_common_device::EA_005() { m_EO=Wreg(IY); m_EA=DefaultBase(DS0)+m_EO; return m_EA; }
-uint32_t nec_common_device::EA_006() { m_EO=FETCH(); m_EO+=FETCH()<<8; m_EA=DefaultBase(DS0)+m_EO; return m_EA; }
+uint32_t nec_common_device::EA_006() { m_EO=fetch(); m_EO+=fetch()<<8; m_EA=DefaultBase(DS0)+m_EO; return m_EA; }
 uint32_t nec_common_device::EA_007() { m_EO=Wreg(BW); m_EA=DefaultBase(DS0)+m_EO; return m_EA; }
 
-uint32_t nec_common_device::EA_100() { m_EO=(Wreg(BW)+Wreg(IX)+(int8_t)FETCH()); m_EA=DefaultBase(DS0)+m_EO; return m_EA; }
-uint32_t nec_common_device::EA_101() { m_EO=(Wreg(BW)+Wreg(IY)+(int8_t)FETCH()); m_EA=DefaultBase(DS0)+m_EO; return m_EA; }
-uint32_t nec_common_device::EA_102() { m_EO=(Wreg(BP)+Wreg(IX)+(int8_t)FETCH()); m_EA=DefaultBase(SS)+m_EO; return m_EA; }
-uint32_t nec_common_device::EA_103() { m_EO=(Wreg(BP)+Wreg(IY)+(int8_t)FETCH()); m_EA=DefaultBase(SS)+m_EO; return m_EA; }
-uint32_t nec_common_device::EA_104() { m_EO=(Wreg(IX)+(int8_t)FETCH()); m_EA=DefaultBase(DS0)+m_EO; return m_EA; }
-uint32_t nec_common_device::EA_105() { m_EO=(Wreg(IY)+(int8_t)FETCH()); m_EA=DefaultBase(DS0)+m_EO; return m_EA; }
-uint32_t nec_common_device::EA_106() { m_EO=(Wreg(BP)+(int8_t)FETCH()); m_EA=DefaultBase(SS)+m_EO; return m_EA; }
-uint32_t nec_common_device::EA_107() { m_EO=(Wreg(BW)+(int8_t)FETCH()); m_EA=DefaultBase(DS0)+m_EO; return m_EA; }
+uint32_t nec_common_device::EA_100() { m_EO=(Wreg(BW)+Wreg(IX)+(int8_t)fetch()); m_EA=DefaultBase(DS0)+m_EO; return m_EA; }
+uint32_t nec_common_device::EA_101() { m_EO=(Wreg(BW)+Wreg(IY)+(int8_t)fetch()); m_EA=DefaultBase(DS0)+m_EO; return m_EA; }
+uint32_t nec_common_device::EA_102() { m_EO=(Wreg(BP)+Wreg(IX)+(int8_t)fetch()); m_EA=DefaultBase(SS)+m_EO; return m_EA; }
+uint32_t nec_common_device::EA_103() { m_EO=(Wreg(BP)+Wreg(IY)+(int8_t)fetch()); m_EA=DefaultBase(SS)+m_EO; return m_EA; }
+uint32_t nec_common_device::EA_104() { m_EO=(Wreg(IX)+(int8_t)fetch()); m_EA=DefaultBase(DS0)+m_EO; return m_EA; }
+uint32_t nec_common_device::EA_105() { m_EO=(Wreg(IY)+(int8_t)fetch()); m_EA=DefaultBase(DS0)+m_EO; return m_EA; }
+uint32_t nec_common_device::EA_106() { m_EO=(Wreg(BP)+(int8_t)fetch()); m_EA=DefaultBase(SS)+m_EO; return m_EA; }
+uint32_t nec_common_device::EA_107() { m_EO=(Wreg(BW)+(int8_t)fetch()); m_EA=DefaultBase(DS0)+m_EO; return m_EA; }
 
-uint32_t nec_common_device::EA_200() { m_E16=FETCH(); m_E16+=FETCH()<<8; m_EO=Wreg(BW)+Wreg(IX)+(int16_t)m_E16; m_EA=DefaultBase(DS0)+m_EO; return m_EA; }
-uint32_t nec_common_device::EA_201() { m_E16=FETCH(); m_E16+=FETCH()<<8; m_EO=Wreg(BW)+Wreg(IY)+(int16_t)m_E16; m_EA=DefaultBase(DS0)+m_EO; return m_EA; }
-uint32_t nec_common_device::EA_202() { m_E16=FETCH(); m_E16+=FETCH()<<8; m_EO=Wreg(BP)+Wreg(IX)+(int16_t)m_E16; m_EA=DefaultBase(SS)+m_EO; return m_EA; }
-uint32_t nec_common_device::EA_203() { m_E16=FETCH(); m_E16+=FETCH()<<8; m_EO=Wreg(BP)+Wreg(IY)+(int16_t)m_E16; m_EA=DefaultBase(SS)+m_EO; return m_EA; }
-uint32_t nec_common_device::EA_204() { m_E16=FETCH(); m_E16+=FETCH()<<8; m_EO=Wreg(IX)+(int16_t)m_E16; m_EA=DefaultBase(DS0)+m_EO; return m_EA; }
-uint32_t nec_common_device::EA_205() { m_E16=FETCH(); m_E16+=FETCH()<<8; m_EO=Wreg(IY)+(int16_t)m_E16; m_EA=DefaultBase(DS0)+m_EO; return m_EA; }
-uint32_t nec_common_device::EA_206() { m_E16=FETCH(); m_E16+=FETCH()<<8; m_EO=Wreg(BP)+(int16_t)m_E16; m_EA=DefaultBase(SS)+m_EO; return m_EA; }
-uint32_t nec_common_device::EA_207() { m_E16=FETCH(); m_E16+=FETCH()<<8; m_EO=Wreg(BW)+(int16_t)m_E16; m_EA=DefaultBase(DS0)+m_EO; return m_EA; }
+uint32_t nec_common_device::EA_200() { m_E16=fetch(); m_E16+=fetch()<<8; m_EO=Wreg(BW)+Wreg(IX)+(int16_t)m_E16; m_EA=DefaultBase(DS0)+m_EO; return m_EA; }
+uint32_t nec_common_device::EA_201() { m_E16=fetch(); m_E16+=fetch()<<8; m_EO=Wreg(BW)+Wreg(IY)+(int16_t)m_E16; m_EA=DefaultBase(DS0)+m_EO; return m_EA; }
+uint32_t nec_common_device::EA_202() { m_E16=fetch(); m_E16+=fetch()<<8; m_EO=Wreg(BP)+Wreg(IX)+(int16_t)m_E16; m_EA=DefaultBase(SS)+m_EO; return m_EA; }
+uint32_t nec_common_device::EA_203() { m_E16=fetch(); m_E16+=fetch()<<8; m_EO=Wreg(BP)+Wreg(IY)+(int16_t)m_E16; m_EA=DefaultBase(SS)+m_EO; return m_EA; }
+uint32_t nec_common_device::EA_204() { m_E16=fetch(); m_E16+=fetch()<<8; m_EO=Wreg(IX)+(int16_t)m_E16; m_EA=DefaultBase(DS0)+m_EO; return m_EA; }
+uint32_t nec_common_device::EA_205() { m_E16=fetch(); m_E16+=fetch()<<8; m_EO=Wreg(IY)+(int16_t)m_E16; m_EA=DefaultBase(DS0)+m_EO; return m_EA; }
+uint32_t nec_common_device::EA_206() { m_E16=fetch(); m_E16+=fetch()<<8; m_EO=Wreg(BP)+(int16_t)m_E16; m_EA=DefaultBase(SS)+m_EO; return m_EA; }
+uint32_t nec_common_device::EA_207() { m_E16=fetch(); m_E16+=fetch()<<8; m_EO=Wreg(BW)+(int16_t)m_E16; m_EA=DefaultBase(DS0)+m_EO; return m_EA; }
 
 const nec_common_device::nec_eahandler nec_common_device::s_GetEA[192]=
 {

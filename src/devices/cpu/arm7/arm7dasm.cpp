@@ -23,16 +23,17 @@
  ******************************************************************************/
 
 #include "emu.h"
+#include "arm7dasm.h"
 #include "arm7core.h"
 
-static void WritePadding(std::ostream &stream, std::streampos start_position)
+void arm7_disassembler::WritePadding(std::ostream &stream, std::streampos start_position)
 {
 	std::streamoff difference = stream.tellp() - start_position;
 	for (std::streamoff i = difference; i < 8; i++)
 		stream << ' ';
 }
 
-static void DasmCoProc_RT(std::ostream &stream, uint32_t opcode, const char *pConditionCode, std::streampos start_position)
+void arm7_disassembler::DasmCoProc_RT(std::ostream &stream, uint32_t opcode, const char *pConditionCode, std::streampos start_position)
 {
 	/* co processor register transfer */
 	/* xxxx 1110 oooL nnnn dddd cccc ppp1 mmmm */
@@ -51,7 +52,7 @@ static void DasmCoProc_RT(std::ostream &stream, uint32_t opcode, const char *pCo
 	if((opcode>>5)&7) util::stream_format( stream, ", %d",(opcode>>5)&7);
 }
 
-static void DasmCoProc_DT(std::ostream &stream, uint32_t opcode, const char *pConditionCode, std::streampos start_position)
+void arm7_disassembler::DasmCoProc_DT(std::ostream &stream, uint32_t opcode, const char *pConditionCode, std::streampos start_position)
 {
 	/* co processor data transfer */
 	/* xxxx 111P UNWL nnnn dddd pppp oooooooo */
@@ -75,7 +76,7 @@ static void DasmCoProc_DT(std::ostream &stream, uint32_t opcode, const char *pCo
 	util::stream_format(stream, "%s%s",(opcode&0x1000000)?"]":"",(opcode&0x200000)?"{!}":"");
 }
 
-static void DasmCoProc_DO(std::ostream &stream, uint32_t opcode, const char *pConditionCode, std::streampos start_position)
+void arm7_disassembler::DasmCoProc_DO(std::ostream &stream, uint32_t opcode, const char *pConditionCode, std::streampos start_position)
 {
 	/* co processor data operation */
 	/* xxxx 1110 oooo nnnn dddd cccc ppp0 mmmm */
@@ -88,7 +89,7 @@ static void DasmCoProc_DO(std::ostream &stream, uint32_t opcode, const char *pCo
 	if((opcode>>5)&7) util::stream_format(stream, ", %d",(opcode>>5)&7);
 }
 
-static void WriteImmediateOperand( std::ostream &stream, uint32_t opcode )
+void arm7_disassembler::WriteImmediateOperand( std::ostream &stream, uint32_t opcode )
 {
 	/* rrrrbbbbbbbb */
 	uint32_t imm;
@@ -100,7 +101,7 @@ static void WriteImmediateOperand( std::ostream &stream, uint32_t opcode )
 	util::stream_format( stream, ", #$%x", imm );
 }
 
-static void WriteDataProcessingOperand( std::ostream &stream, uint32_t opcode, int printOp0, int printOp1, int printOp2 )
+void arm7_disassembler::WriteDataProcessingOperand( std::ostream &stream, uint32_t opcode, int printOp0, int printOp1, int printOp2 )
 {
 	/* ccccctttmmmm */
 	static const char *const pRegOp[4] = { "LSL","LSR","ASR","ROR" };
@@ -142,7 +143,7 @@ static void WriteDataProcessingOperand( std::ostream &stream, uint32_t opcode, i
 	}
 }
 
-static void WriteRegisterOperand1( std::ostream &stream, uint32_t opcode )
+void arm7_disassembler::WriteRegisterOperand1( std::ostream &stream, uint32_t opcode )
 {
 	/* ccccctttmmmm */
 	static const char *const pRegOp[4] = { "LSL","LSR","ASR","ROR" };
@@ -172,7 +173,7 @@ static void WriteRegisterOperand1( std::ostream &stream, uint32_t opcode )
 } /* WriteRegisterOperand */
 
 
-static void WriteBranchAddress( std::ostream &stream, uint32_t pc, uint32_t opcode, bool h_bit )
+void arm7_disassembler::WriteBranchAddress( std::ostream &stream, uint32_t pc, uint32_t opcode, bool h_bit )
 {
 	opcode <<= 2;
 	if (h_bit && (opcode & 0x04000000))
@@ -188,7 +189,7 @@ static void WriteBranchAddress( std::ostream &stream, uint32_t pc, uint32_t opco
 	util::stream_format( stream, "$%x", pc );
 } /* WriteBranchAddress */
 
-static uint32_t arm7_disasm( std::ostream &stream, uint32_t pc, uint32_t opcode )
+u32 arm7_disassembler::arm7_disasm( std::ostream &stream, uint32_t pc, uint32_t opcode )
 {
 	static const char *const pConditionCodeTable[16] =
 	{
@@ -212,13 +213,21 @@ static uint32_t arm7_disasm( std::ostream &stream, uint32_t pc, uint32_t opcode 
 
 	if( (opcode&0xfe000000)==0xfa000000 ) //bits 31-25 == 1111 101 (BLX - v5)
 	{
-		/* BLX */
+		/* BLX(1) */
 		util::stream_format( stream, "BLX" );
-		dasmflags = DASMFLAG_STEP_OVER;
+		dasmflags = STEP_OVER;
 
 		WritePadding(stream, start_position);
 
 		WriteBranchAddress( stream, pc, opcode, true );
+	}
+	else if( (opcode&0x0ff000f0)==0x01200030 )  // (BLX - v5)
+	{
+		/* BLX(2) */
+		util::stream_format( stream, "BLX" );
+		dasmflags = STEP_OVER;
+		WritePadding(stream, start_position);
+		util::stream_format( stream, "R%d",(opcode&0xf));
 	}
 	else if( (opcode&0x0ffffff0)==0x012fff10 ) //bits 27-4 == 000100101111111111110001
 	{
@@ -228,7 +237,7 @@ static uint32_t arm7_disasm( std::ostream &stream, uint32_t pc, uint32_t opcode 
 		WritePadding(stream, start_position);
 		util::stream_format( stream, "R%d",(opcode&0xf));
 		if ((opcode & 0x0f) == 14)
-			dasmflags = DASMFLAG_STEP_OUT;
+			dasmflags = STEP_OUT;
 	}
 	else if ((opcode & 0x0ff000f0) == 0x01600010)   // CLZ - v5
 	{
@@ -492,7 +501,7 @@ static uint32_t arm7_disasm( std::ostream &stream, uint32_t pc, uint32_t opcode 
 			case 0x0d:
 				/* look for mov pc,lr */
 				if (((opcode >> 12) & 0x0f) == 15 && ((opcode >> 0) & 0x0f) == 14 && (opcode & 0x02000000) == 0)
-					dasmflags = DASMFLAG_STEP_OUT;
+					dasmflags = STEP_OUT;
 			case 0x0f:
 				WriteDataProcessingOperand(stream, opcode, 1, 0, 1);
 				break;
@@ -641,7 +650,7 @@ static uint32_t arm7_disasm( std::ostream &stream, uint32_t pc, uint32_t opcode 
 		if( opcode&0x01000000 )
 		{
 			util::stream_format( stream, "BL" );
-			dasmflags = DASMFLAG_STEP_OVER;
+			dasmflags = STEP_OVER;
 		}
 		else
 		{
@@ -680,16 +689,16 @@ static uint32_t arm7_disasm( std::ostream &stream, uint32_t pc, uint32_t opcode 
 		util::stream_format( stream, "SWI%s $%x",
 			pConditionCode,
 			opcode&0x00ffffff );
-		dasmflags = DASMFLAG_STEP_OVER;
+		dasmflags = STEP_OVER;
 	}
 	else
 	{
 		util::stream_format( stream, "Undefined" );
 	}
-	return dasmflags | DASMFLAG_SUPPORTED;
+	return 4 | dasmflags | SUPPORTED;
 }
 
-static uint32_t thumb_disasm(std::ostream &stream, uint32_t pc, uint16_t opcode)
+u32 arm7_disassembler::thumb_disasm(std::ostream &stream, uint32_t pc, uint16_t opcode)
 {
 	std::streampos start_position = stream.tellp();
 	uint32_t dasmflags = 0;
@@ -970,7 +979,7 @@ static uint32_t thumb_disasm(std::ostream &stream, uint32_t pc, uint16_t opcode)
 										rd = ( ( opcode & THUMB_HIREG_RS ) >> THUMB_HIREG_RS_SHIFT ) + 8;
 										util::stream_format( stream, "BX R%d", rd );
 										if (rd == 14)
-											dasmflags = DASMFLAG_STEP_OUT;
+											dasmflags = STEP_OUT;
 										break;
 									case 0x2:
 										rd = ( opcode & THUMB_HIREG_RS ) >> THUMB_HIREG_RS_SHIFT;
@@ -1279,7 +1288,7 @@ static uint32_t thumb_disasm(std::ostream &stream, uint32_t pc, uint16_t opcode)
 				{
 					addr = ( ( opcode & THUMB_BLOP_OFFS ) << 1 ) & 0xfffc;
 					util::stream_format( stream, "BLX (LO) %08x", addr );
-					dasmflags = DASMFLAG_STEP_OVER;
+					dasmflags = STEP_OVER;
 				}
 				else
 				{
@@ -1295,7 +1304,7 @@ static uint32_t thumb_disasm(std::ostream &stream, uint32_t pc, uint16_t opcode)
 				if( opcode & THUMB_BLOP_LO )
 				{
 					util::stream_format( stream, "BL (LO) %08x", ( opcode & THUMB_BLOP_OFFS ) << 1 );
-					dasmflags = DASMFLAG_STEP_OVER;
+					dasmflags = STEP_OVER;
 				}
 				else
 				{
@@ -1305,7 +1314,7 @@ static uint32_t thumb_disasm(std::ostream &stream, uint32_t pc, uint16_t opcode)
 						addr |= 0xff800000;
 					}
 					util::stream_format( stream, "BL (HI) %08x", addr );
-					dasmflags = DASMFLAG_STEP_OVER;
+					dasmflags = STEP_OVER;
 				}
 				break;
 			default:
@@ -1313,25 +1322,22 @@ static uint32_t thumb_disasm(std::ostream &stream, uint32_t pc, uint16_t opcode)
 				break;
 		}
 
-	return dasmflags | DASMFLAG_SUPPORTED;
+	return 2 | dasmflags | SUPPORTED;
 }
 
-CPU_DISASSEMBLE( arm7arm )
+arm7_disassembler::arm7_disassembler(config *conf) : m_config(conf)
 {
-	return arm7_disasm(stream, pc, oprom[0] | (oprom[1] << 8) | (oprom[2] << 16) | (oprom[3] << 24)) | 4;
 }
 
-CPU_DISASSEMBLE( arm7arm_be )
+u32 arm7_disassembler::opcode_alignment() const
 {
-	return arm7_disasm(stream, pc, oprom[3] | (oprom[2] << 8) | (oprom[1] << 16) | (oprom[0] << 24)) | 4;
+	return m_config->get_t_flag() ? 2 : 4;
 }
 
-CPU_DISASSEMBLE( arm7thumb )
+offs_t arm7_disassembler::disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params)
 {
-	return thumb_disasm(stream, pc, oprom[0] | (oprom[1] << 8)) | 2;
-}
-
-CPU_DISASSEMBLE( arm7thumb_be )
-{
-	return thumb_disasm(stream, pc, oprom[1] | (oprom[0] << 8)) | 2;
+	if(m_config->get_t_flag())
+		return thumb_disasm(stream, pc, opcodes.r16(pc));
+	else
+		return arm7_disasm(stream, pc, opcodes.r32(pc));
 }

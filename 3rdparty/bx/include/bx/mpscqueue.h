@@ -6,6 +6,7 @@
 #ifndef BX_MPSCQUEUE_H_HEADER_GUARD
 #define BX_MPSCQUEUE_H_HEADER_GUARD
 
+#include "allocator.h"
 #include "mutex.h"
 #include "spscqueue.h"
 
@@ -22,7 +23,7 @@ namespace bx
 
 	public:
 		///
-		MpScUnboundedQueueT();
+		MpScUnboundedQueueT(AllocatorI* _allocator);
 
 		///
 		~MpScUnboundedQueueT();
@@ -52,7 +53,7 @@ namespace bx
 
 	public:
 		///
-		MpScUnboundedBlockingQueue();
+		MpScUnboundedBlockingQueue(AllocatorI* _allocator);
 
 		///
 		~MpScUnboundedBlockingQueue();

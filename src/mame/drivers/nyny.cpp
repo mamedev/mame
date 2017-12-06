@@ -148,12 +148,11 @@ public:
 	DECLARE_WRITE8_MEMBER(pia_2_port_a_w);
 	DECLARE_WRITE8_MEMBER(pia_2_port_b_w);
 	DECLARE_WRITE_LINE_MEMBER(flipscreen_w);
-	DECLARE_WRITE_LINE_MEMBER(display_enable_changed);
 	DECLARE_WRITE8_MEMBER(nyny_ay8910_37_port_a_w);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	INTERRUPT_GEN_MEMBER(update_pia_1);
-	DECLARE_WRITE8_MEMBER(ic48_1_74123_output_changed);
+	DECLARE_WRITE_LINE_MEMBER(ic48_1_74123_output_changed);
 	inline void shift_star_generator(  );
 
 	MC6845_UPDATE_ROW(crtc_update_row);
@@ -242,9 +241,9 @@ WRITE8_MEMBER(nyny_state::pia_2_port_b_w)
  *
  *************************************/
 
-WRITE8_MEMBER(nyny_state::ic48_1_74123_output_changed)
+WRITE_LINE_MEMBER(nyny_state::ic48_1_74123_output_changed)
 {
-	m_pia2->ca1_w(data);
+	m_pia2->ca1_w(state);
 }
 
 /*************************************
@@ -354,11 +353,6 @@ MC6845_END_UPDATE( nyny_state::crtc_end_update )
 	}
 }
 
-
-WRITE_LINE_MEMBER(nyny_state::display_enable_changed)
-{
-	m_ic48_1->a_w(generic_space(), 0, state);
-}
 
 
 /*************************************
@@ -618,7 +612,7 @@ static MACHINE_CONFIG_START( nyny )
 	MCFG_MC6845_CHAR_WIDTH(8)
 	MCFG_MC6845_UPDATE_ROW_CB(nyny_state, crtc_update_row)
 	MCFG_MC6845_END_UPDATE_CB(nyny_state, crtc_end_update)
-	MCFG_MC6845_OUT_DE_CB(WRITELINE(nyny_state, display_enable_changed))
+	MCFG_MC6845_OUT_DE_CB(DEVWRITELINE("ic48_1", ttl74123_device, a_w))
 
 	/* 74LS123 */
 	MCFG_DEVICE_ADD("ic48_1", TTL74123, 0)
@@ -628,7 +622,7 @@ static MACHINE_CONFIG_START( nyny )
 	MCFG_TTL74123_A_PIN_VALUE(1)                  /* A pin - driven by the CRTC */
 	MCFG_TTL74123_B_PIN_VALUE(1)                  /* B pin - pulled high */
 	MCFG_TTL74123_CLEAR_PIN_VALUE(1)                  /* Clear pin - pulled high */
-	MCFG_TTL74123_OUTPUT_CHANGED_CB(WRITE8(nyny_state, ic48_1_74123_output_changed))
+	MCFG_TTL74123_OUTPUT_CHANGED_CB(WRITELINE(nyny_state, ic48_1_74123_output_changed))
 
 	MCFG_DEVICE_ADD("pia1", PIA6821, 0)
 	MCFG_PIA_READPA_HANDLER(IOPORT("IN0"))

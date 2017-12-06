@@ -366,7 +366,7 @@ WRITE_LINE_MEMBER(gaelco3d_state::fp_analog_clock_w)
 		if (m_fp_clock == 28)
 		{
 			m_fp_clock = 0;
-			for (auto i = 0; i < 2; i++)
+			for (int i = 0; i < 2; i++)
 			{
 				u32 ay = m_analog[i * 2].read_safe(0);
 				u32 ax = m_analog[i * 2 + 1].read_safe(0);
@@ -561,7 +561,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(gaelco3d_state::adsp_autobuffer_irq)
 		reg = m_adsp_ireg_base;
 
 		/* generate the (internal, thats why the pulse) irq */
-		generic_pulse_irq_line(*m_adsp, ADSP2105_IRQ1, 1);
+		m_adsp->pulse_input_line(ADSP2105_IRQ1, m_adsp->minimum_quantum_time());
 	}
 
 	/* store it */

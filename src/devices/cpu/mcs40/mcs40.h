@@ -178,7 +178,7 @@ protected:
 			device_type type,
 			char const *tag,
 			device_t *owner,
-			uint32_t clock,
+			u32 clock,
 			bool extended_cm,
 			unsigned rom_width,
 			unsigned stack_ptr_mask,
@@ -199,10 +199,6 @@ protected:
 	virtual void state_import(device_state_entry const &entry) override;
 	virtual void state_export(device_state_entry const &entry) override;
 	virtual void state_string_export(device_state_entry const &entry, std::string &str) const override;
-
-	// device_disasm_interface implementation
-	virtual u32 disasm_min_opcode_bytes() const override;
-	virtual u32 disasm_max_opcode_bytes() const override;
 
 	// instruction execution
 	virtual bool is_io_op(u8 opr) = 0;
@@ -295,7 +291,7 @@ private:
 	// address spaces
 	address_space_config const  m_space_config[7];
 	address_space               *m_spaces[7];
-	direct_read_data            *m_direct;
+	direct_read_data<0>         *m_direct;
 
 	// bus snooping callback
 	bus_cycle_delegate      m_bus_cycle_cb;
@@ -368,7 +364,7 @@ public:
 	template <unsigned N, typename Obj> static devcb_base &set_cm_ram_cb(device_t &device, Obj &&cb)
 	{ return downcast<i4004_cpu_device &>(device).set_cm_ram_cb<N>(std::forward<Obj>(cb)); }
 
-	i4004_cpu_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock);
+	i4004_cpu_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
 
 protected:
 	using mcs40_cpu_device_base::mcs40_cpu_device_base;
@@ -378,12 +374,7 @@ protected:
 	virtual void execute_set_input(int inputnum, int state) override;
 
 	// device_disasm_interface implementation
-	virtual offs_t disasm_disassemble(
-			std::ostream &stream,
-			offs_t pc,
-			uint8_t const *oprom,
-			uint8_t const *opram,
-			uint32_t options) override;
+	virtual util::disasm_interface *create_disassembler() override;
 
 	// mcs40_cpu_device_base implementation
 	virtual bool is_io_op(u8 opr) override;
@@ -413,16 +404,11 @@ public:
 	template <typename Obj> static devcb_base &set_stp_ack_cb(device_t &device, Obj &&cb)
 	{ return downcast<i4040_cpu_device &>(device).set_stp_ack_cb(std::forward<Obj>(cb)); }
 
-	i4040_cpu_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock);
+	i4040_cpu_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
 
 protected:
 	// device_disasm_interface implementation
-	virtual offs_t disasm_disassemble(
-			std::ostream &stream,
-			offs_t pc,
-			uint8_t const *oprom,
-			uint8_t const *opram,
-			uint32_t options) override;
+	virtual util::disasm_interface *create_disassembler() override;
 
 	// device_execute_interface implementation
 	virtual u32 execute_input_lines() const override;

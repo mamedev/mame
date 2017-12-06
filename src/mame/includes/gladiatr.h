@@ -14,6 +14,10 @@ public:
 	DECLARE_WRITE8_MEMBER(paletteram_w);
 	DECLARE_WRITE_LINE_MEMBER(spritebuffer_w);
 	DECLARE_WRITE8_MEMBER(spritebuffer_w);
+	DECLARE_WRITE8_MEMBER(adpcm_command_w);
+	DECLARE_READ8_MEMBER(adpcm_command_r);
+	DECLARE_WRITE_LINE_MEMBER(flipscreen_w);
+	DECLARE_WRITE_LINE_MEMBER(ym_irq);
 
 protected:
 	gladiatr_state_base(const machine_config &mconfig, device_type type, const char *tag)
@@ -104,13 +108,9 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(spritebank_w);
 	DECLARE_WRITE8_MEMBER(gladiatr_video_registers_w);
 
-	DECLARE_WRITE8_MEMBER(gladiator_cpu_sound_command_w);
-	DECLARE_READ8_MEMBER(gladiator_cpu_sound_command_r);
-	DECLARE_WRITE_LINE_MEMBER(flipscreen_w);
 	DECLARE_WRITE8_MEMBER(gladiatr_irq_patch_w);
 	DECLARE_WRITE8_MEMBER(gladiator_int_control_w);
 	DECLARE_WRITE8_MEMBER(gladiator_adpcm_w);
-	DECLARE_WRITE_LINE_MEMBER(gladiator_ym_irq);
 
 	DECLARE_WRITE_LINE_MEMBER(tclk_w);
 	DECLARE_READ8_MEMBER(cctl_p1_r);
@@ -159,24 +159,22 @@ public:
 	ppking_state(const machine_config &mconfig, device_type type, const char *tag)
 		: gladiatr_state_base(mconfig, type, tag)
 		, m_nvram(*this, "nvram")
-		, m_data1(0)
-		, m_data2(0)
-		, m_flag1(0)
-		, m_flag2(0)
+		, m_soundlatch2(*this, "soundlatch2")
 	{
 	}
 
 	DECLARE_READ8_MEMBER(ppking_f1_r);
-	DECLARE_READ8_MEMBER(ppking_f6a3_r);
 	DECLARE_WRITE8_MEMBER(ppking_qx0_w);
 	DECLARE_WRITE8_MEMBER(ppking_qx1_w);
-	DECLARE_WRITE8_MEMBER(ppking_qx2_w);
 	DECLARE_WRITE8_MEMBER(ppking_qx3_w);
-	DECLARE_READ8_MEMBER(ppking_qx2_r);
 	DECLARE_READ8_MEMBER(ppking_qx3_r);
 	DECLARE_READ8_MEMBER(ppking_qx0_r);
 	DECLARE_READ8_MEMBER(ppking_qx1_r);
+	DECLARE_READ8_MEMBER(ppking_qxcomu_r);
+	DECLARE_WRITE8_MEMBER(ppking_qxcomu_w);
 	DECLARE_WRITE8_MEMBER(ppking_video_registers_w);
+	DECLARE_WRITE8_MEMBER(ppking_adpcm_w);
+	DECLARE_WRITE8_MEMBER(cpu2_irq_ack_w);
 
 	DECLARE_DRIVER_INIT(ppking);
 
@@ -187,9 +185,17 @@ public:
 
 private:
 	required_shared_ptr<uint8_t>    m_nvram;
+	required_device<generic_latch_8_device> m_soundlatch2;
 
-	u8  m_data1;
-	u8  m_data2;
-	u8  m_flag1;
-	u8  m_flag2;
+	struct
+	{
+		uint8_t rxd;
+		uint8_t txd;
+		uint8_t rst;
+		uint8_t state;
+		uint8_t packet_type;
+	} m_mcu[2];
+
+	bool mcu_parity_check();
+	void mcu_input_check();
 };

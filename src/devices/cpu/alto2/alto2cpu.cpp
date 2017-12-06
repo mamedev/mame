@@ -7,6 +7,7 @@
  *****************************************************************************/
 #include "emu.h"
 #include "alto2cpu.h"
+#include "alto2dsm.h"
 #include "a2roms.h"
 
 #define DEBUG_UCODE_CONST_DATA  0   //!< define to 1 to dump decoded micro code and constants
@@ -2979,4 +2980,9 @@ void alto2_cpu_device::soft_reset()
 	m_display_time = 0;                 // reset the display state machine timing accu
 	m_unload_time = 0;              // reset the word unload timing accu
 	m_bitclk_time = 0;              // reset the bitclk timing accu
+}
+
+util::disasm_interface *alto2_cpu_device::create_disassembler()
+{
+	return new alto2_disassembler;
 }

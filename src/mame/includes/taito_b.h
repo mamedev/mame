@@ -40,6 +40,59 @@ public:
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette") { }
 
+	DECLARE_WRITE8_MEMBER(bankswitch_w);
+	DECLARE_READ16_MEMBER(tracky1_hi_r);
+	DECLARE_READ16_MEMBER(tracky1_lo_r);
+	DECLARE_READ16_MEMBER(trackx1_hi_r);
+	DECLARE_READ16_MEMBER(trackx1_lo_r);
+	DECLARE_READ16_MEMBER(tracky2_hi_r);
+	DECLARE_READ16_MEMBER(tracky2_lo_r);
+	DECLARE_READ16_MEMBER(trackx2_hi_r);
+	DECLARE_READ16_MEMBER(trackx2_lo_r);
+	DECLARE_WRITE16_MEMBER(gain_control_w);
+	DECLARE_READ16_MEMBER(eep_latch_r);
+	DECLARE_WRITE16_MEMBER(eeprom_w);
+	DECLARE_WRITE8_MEMBER(player_12_coin_ctrl_w);
+	DECLARE_READ16_MEMBER(player_34_coin_ctrl_r);
+	DECLARE_WRITE16_MEMBER(player_34_coin_ctrl_w);
+	DECLARE_WRITE16_MEMBER(spacedxo_tc0220ioc_w);
+	DECLARE_WRITE16_MEMBER(realpunc_output_w);
+	DECLARE_WRITE16_MEMBER(hitice_pixelram_w);
+	DECLARE_WRITE16_MEMBER(hitice_pixel_scroll_w);
+	DECLARE_WRITE16_MEMBER(realpunc_video_ctrl_w);
+	DECLARE_READ16_MEMBER(tc0180vcu_framebuffer_word_r);
+	DECLARE_WRITE16_MEMBER(tc0180vcu_framebuffer_word_w);
+	DECLARE_WRITE8_MEMBER(mb87078_gain_changed);
+	DECLARE_INPUT_CHANGED_MEMBER(realpunc_sensor);
+	DECLARE_DRIVER_INIT(taito_b);
+	DECLARE_VIDEO_START(taitob_color_order0);
+	DECLARE_VIDEO_START(taitob_color_order1);
+	DECLARE_VIDEO_START(taitob_color_order2);
+	DECLARE_VIDEO_START(hitice);
+	DECLARE_VIDEO_RESET(hitice);
+	DECLARE_VIDEO_START(realpunc);
+	DECLARE_VIDEO_START(taitob_core);
+	uint32_t screen_update_taitob(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_realpunc(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	DECLARE_WRITE_LINE_MEMBER(screen_vblank_taitob);
+	INTERRUPT_GEN_MEMBER(rastansaga2_interrupt);
+	INTERRUPT_GEN_MEMBER(crimec_interrupt);
+	INTERRUPT_GEN_MEMBER(hitice_interrupt);
+	INTERRUPT_GEN_MEMBER(rambo3_interrupt);
+	INTERRUPT_GEN_MEMBER(pbobble_interrupt);
+	INTERRUPT_GEN_MEMBER(viofight_interrupt);
+	INTERRUPT_GEN_MEMBER(masterw_interrupt);
+	INTERRUPT_GEN_MEMBER(silentd_interrupt);
+	INTERRUPT_GEN_MEMBER(selfeena_interrupt);
+	INTERRUPT_GEN_MEMBER(sbm_interrupt);
+	INTERRUPT_GEN_MEMBER(realpunc_interrupt);
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+
+private:
 	/* memory pointers */
 	required_shared_ptr<uint16_t> m_spriteram;
 	optional_shared_ptr<uint16_t> m_pixelram;
@@ -75,58 +128,14 @@ public:
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 
-	DECLARE_WRITE8_MEMBER(bankswitch_w);
-	DECLARE_READ16_MEMBER(tracky1_hi_r);
-	DECLARE_READ16_MEMBER(tracky1_lo_r);
-	DECLARE_READ16_MEMBER(trackx1_hi_r);
-	DECLARE_READ16_MEMBER(trackx1_lo_r);
-	DECLARE_READ16_MEMBER(tracky2_hi_r);
-	DECLARE_READ16_MEMBER(tracky2_lo_r);
-	DECLARE_READ16_MEMBER(trackx2_hi_r);
-	DECLARE_READ16_MEMBER(trackx2_lo_r);
-	DECLARE_WRITE16_MEMBER(gain_control_w);
-	DECLARE_READ16_MEMBER(eep_latch_r);
-	DECLARE_WRITE16_MEMBER(eeprom_w);
-	DECLARE_WRITE8_MEMBER(player_12_coin_ctrl_w);
-	DECLARE_READ16_MEMBER(player_34_coin_ctrl_r);
-	DECLARE_WRITE16_MEMBER(player_34_coin_ctrl_w);
-	DECLARE_WRITE16_MEMBER(spacedxo_tc0220ioc_w);
-	DECLARE_WRITE16_MEMBER(realpunc_output_w);
-	DECLARE_WRITE16_MEMBER(hitice_pixelram_w);
-	DECLARE_WRITE16_MEMBER(hitice_pixel_scroll_w);
-	DECLARE_WRITE16_MEMBER(realpunc_video_ctrl_w);
-	DECLARE_READ16_MEMBER(tc0180vcu_framebuffer_word_r);
-	DECLARE_WRITE16_MEMBER(tc0180vcu_framebuffer_word_w);
-	DECLARE_WRITE8_MEMBER(mb87078_gain_changed);
-	DECLARE_INPUT_CHANGED_MEMBER(realpunc_sensor);
-	DECLARE_DRIVER_INIT(taito_b);
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	DECLARE_VIDEO_START(taitob_color_order0);
-	DECLARE_VIDEO_START(taitob_color_order1);
-	DECLARE_VIDEO_START(taitob_color_order2);
-	DECLARE_VIDEO_START(hitice);
-	DECLARE_VIDEO_RESET(hitice);
-	DECLARE_VIDEO_START(realpunc);
-	DECLARE_VIDEO_START(taitob_core);
-	uint32_t screen_update_taitob(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	uint32_t screen_update_realpunc(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE_LINE_MEMBER(screen_vblank_taitob);
-	INTERRUPT_GEN_MEMBER(rastansaga2_interrupt);
-	INTERRUPT_GEN_MEMBER(crimec_interrupt);
-	INTERRUPT_GEN_MEMBER(hitice_interrupt);
-	INTERRUPT_GEN_MEMBER(rambo3_interrupt);
-	INTERRUPT_GEN_MEMBER(pbobble_interrupt);
-	INTERRUPT_GEN_MEMBER(viofight_interrupt);
-	INTERRUPT_GEN_MEMBER(masterw_interrupt);
-	INTERRUPT_GEN_MEMBER(silentd_interrupt);
-	INTERRUPT_GEN_MEMBER(selfeena_interrupt);
-	INTERRUPT_GEN_MEMBER(sbm_interrupt);
-	INTERRUPT_GEN_MEMBER(realpunc_interrupt);
 	void hitice_clear_pixel_bitmap(  );
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void draw_framebuffer( bitmap_ind16 &bitmap, const rectangle &cliprect, int priority );
+};
 
-protected:
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+class taitob_c_state : public taitob_state
+{
+public:
+	using taitob_state::taitob_state;
+	static constexpr feature_type unemulated_features() { return feature::CAMERA; }
 };

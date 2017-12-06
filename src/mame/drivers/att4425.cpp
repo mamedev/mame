@@ -50,6 +50,11 @@ public:
 		, m_screen(*this, SCREEN_TAG)
 		{ }
 
+	DECLARE_WRITE8_MEMBER(port10_w);
+	DECLARE_WRITE8_MEMBER(port14_w);
+	DECLARE_READ8_MEMBER(port14_r);
+	DECLARE_READ8_MEMBER(port15_r);
+
 	DECLARE_WRITE_LINE_MEMBER(write_line_clock);
 	DECLARE_WRITE_LINE_MEMBER(write_keyboard_clock);
 
@@ -69,19 +74,42 @@ private:
 
 /* Memory Maps */
 
+WRITE8_MEMBER(att4425_state::port10_w)
+{
+	logerror("Writing %02X to port 10\n", data);
+}
+
+WRITE8_MEMBER(att4425_state::port14_w)
+{
+	logerror("Writing %02X to port 14\n", data);
+}
+
+READ8_MEMBER(att4425_state::port14_r)
+{
+	// only complement of bit 0 used?
+	return 0;
+}
+
+READ8_MEMBER(att4425_state::port15_r)
+{
+	// status of something (at least bits 2 and 3 used)
+	return 0;
+}
+
 static ADDRESS_MAP_START( att4425_mem, AS_PROGRAM, 8, att4425_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM AM_REGION(Z80_TAG, 0)
 	AM_RANGE(0x8000, 0xffff) AM_RAM AM_SHARE("videoram") // c000..f7af?
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( att4425_io, AS_IO, 8, att4425_state )
-	AM_RANGE(0x0000, 0x0000) AM_MIRROR(0xff00) AM_DEVREADWRITE(I8251_TAG, i8251_device, data_r, data_w)
-	AM_RANGE(0x0001, 0x0001) AM_MIRROR(0xff00) AM_DEVREADWRITE(I8251_TAG, i8251_device, status_r, control_w)
-	AM_RANGE(0x0008, 0x0008) AM_MIRROR(0xff00) AM_UNMAP // write 08
-	AM_RANGE(0x0010, 0x0010) AM_MIRROR(0xff00) AM_UNMAP // write 10
-	AM_RANGE(0x0014, 0x0015) AM_MIRROR(0xff00) AM_UNMAP // NVRAM? read 14, 15; write 14
-	AM_RANGE(0x0018, 0x001b) AM_MIRROR(0xff00) AM_DEVREADWRITE(Z80CTC_TAG, z80ctc_device, read, write)
-	AM_RANGE(0x001c, 0x001f) AM_MIRROR(0xff00) AM_DEVREADWRITE(Z80SIO_TAG, z80sio_device, ba_cd_r, ba_cd_w)
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	AM_RANGE(0x00, 0x00) AM_DEVREADWRITE(I8251_TAG, i8251_device, data_r, data_w)
+	AM_RANGE(0x01, 0x01) AM_DEVREADWRITE(I8251_TAG, i8251_device, status_r, control_w)
+	AM_RANGE(0x10, 0x10) AM_WRITE(port10_w)
+	AM_RANGE(0x14, 0x14) AM_READWRITE(port14_r, port14_w)
+	AM_RANGE(0x15, 0x15) AM_READ(port15_r)
+	AM_RANGE(0x18, 0x1b) AM_DEVREADWRITE(Z80CTC_TAG, z80ctc_device, read, write)
+	AM_RANGE(0x1c, 0x1f) AM_DEVREADWRITE(Z80SIO_TAG, z80sio_device, ba_cd_r, ba_cd_w)
 ADDRESS_MAP_END
 
 /* Input Ports */

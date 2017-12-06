@@ -31,7 +31,7 @@
 inline uint8_t _count_leading_zeros(uint32_t value)
 {
 	unsigned long index;
-	return _BitScanReverse(&index, value) ? (index ^ 31) : 32;
+	return _BitScanReverse(&index, value) ? (31U - index) : 32U;
 }
 #endif
 
@@ -46,7 +46,7 @@ inline uint8_t _count_leading_zeros(uint32_t value)
 inline uint8_t _count_leading_ones(uint32_t value)
 {
 	unsigned long index;
-	return _BitScanReverse(&index, ~value) ? (index ^ 31) : 32;
+	return _BitScanReverse(&index, ~value) ? (31U - index) : 32U;
 }
 #endif
 
