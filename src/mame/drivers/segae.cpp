@@ -267,9 +267,9 @@ GND  8A 8B GND
 
  Game Notes:
  Riddle of Pythagoras is interesting, it looks like Sega might have planned it
- as a two player game, there is prelimiary code for 2 player support which
- never gets executed, see code around 0x0E95.  Theres also quite a bit of
- pointless code here and there.  Some Interesting Memory Locations
+ as a two player game, there is preliminary code for 2 player support which
+ never gets executed, see code around 0x0E95. There's also quite a bit of
+ pointless code here and there. Some Interesting Memory Locations
 
  C000 : level - value (00-0x32)
  C001 : level - display (00-0x50, BCD coded)
@@ -339,6 +339,9 @@ public:
 	DECLARE_DRIVER_INIT( opaopa );
 	DECLARE_DRIVER_INIT( fantzn2 );
 
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+
+private:
 	// Devices
 	required_device<cpu_device>          m_maincpu;
 	required_device<sega315_5124_device> m_vdp1;
@@ -355,8 +358,6 @@ public:
 
 	// Video RAM
 	uint8_t m_vram[2][0x4000 * 2];
-
-	uint32_t screen_update_systeme(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -836,7 +837,7 @@ static INPUT_PORTS_START( ridleofp ) /* Used By Riddle Of Pythagoras */
 INPUT_PORTS_END
 
 
-uint32_t systeme_state::screen_update_systeme(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t systeme_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	bitmap_rgb32 &vdp1_bitmap = m_vdp1->get_bitmap();
 	bitmap_rgb32 &vdp2_bitmap = m_vdp2->get_bitmap();
@@ -872,7 +873,7 @@ static MACHINE_CONFIG_START( systeme )
 	MCFG_SCREEN_RAW_PARAMS(XTAL_10_738635MHz/2, \
 			sega315_5124_device::WIDTH , sega315_5124_device::LBORDER_START + sega315_5124_device::LBORDER_WIDTH, sega315_5124_device::LBORDER_START + sega315_5124_device::LBORDER_WIDTH + 256, \
 			sega315_5124_device::HEIGHT_NTSC, sega315_5124_device::TBORDER_START + sega315_5124_device::NTSC_192_TBORDER_HEIGHT, sega315_5124_device::TBORDER_START + sega315_5124_device::NTSC_192_TBORDER_HEIGHT + 192)
-	MCFG_SCREEN_UPDATE_DRIVER(systeme_state, screen_update_systeme)
+	MCFG_SCREEN_UPDATE_DRIVER(systeme_state, screen_update)
 
 	MCFG_DEVICE_ADD("vdp1", SEGA315_5124, 0)
 	MCFG_SEGA315_5124_IS_PAL(false)
