@@ -64,7 +64,7 @@ void dp8510_device::device_start()
 	save_item(NAME(m_fifo_output_latch));
 
 	// fifo
-	save_item(NAME(m_fifo[FIFO_SIZE]));
+	save_item(NAME(m_fifo));
 	save_item(NAME(m_fifo_head));
 	save_item(NAME(m_fifo_tail));
 
