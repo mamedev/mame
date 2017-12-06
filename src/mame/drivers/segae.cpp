@@ -896,8 +896,8 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( hangonjr, systeme )
 	MCFG_DEVICE_MODIFY("ppi")
 	MCFG_I8255_IN_PORTA_CB(READ8(systeme_state, hangonjr_port_f8_read))
-	MCFG_I8255_IN_PORTC_CB(CONSTANT(0)) // bit 4 ought to be ADC /INTR signal
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(systeme_state, hangonjr_port_fa_write))
+	MCFG_I8255_IN_PORTC_CB(CONSTANT(0)) // bit 4 must be the ADC0804 /INTR signal
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(systeme_state, hangonjr_port_fa_write)) // CD4051 selector input
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( ridleofp, systeme )
@@ -975,6 +975,7 @@ ROM_END
 //   ROM BD # 834-5910 REV.B
 //
 // Analog control board:  834-5805 (required for game to boot)
+// ICs on this board are LS244 (IC1), ADC0804 (IC2), LS367 (IC3) and CD4051 (IC4).
 //
 ROM_START( hangonjr )
 	ROM_REGION( 0x30000, "maincpu", 0 )
@@ -1082,7 +1083,7 @@ ROM_END
 
 
 //    YEAR, NAME,     PARENT,   MACHINE,           INPUT,    STATE          INIT,     MONITOR,COMPANY,FULLNAME,FLAGS
-GAME( 1985, hangonjr, 0,        hangonjr,          hangonjr, systeme_state, 0,        ROT0,   "Sega", "Hang-On Jr. Rev.B", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, hangonjr, 0,        hangonjr,          hangonjr, systeme_state, 0,        ROT0,   "Sega", "Hang-On Jr. (Rev. B)", MACHINE_SUPPORTS_SAVE )
 GAME( 1986, slapshtr, 0,        systeme,           slapshtr, systeme_state, 0,        ROT0,   "Sega", "Slap Shooter", MACHINE_SUPPORTS_SAVE) // 1986 date from flyer
 GAME( 1986, transfrm, 0,        systeme,           transfrm, systeme_state, 0,        ROT0,   "Sega", "Transformer", MACHINE_SUPPORTS_SAVE )
 GAME( 1986, astrofl,  transfrm, systemex_315_5177, transfrm, systeme_state, 0,        ROT0,   "Sega", "Astro Flash (Japan)", MACHINE_SUPPORTS_SAVE )
