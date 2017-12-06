@@ -3628,6 +3628,36 @@ ROM_START( genmagi )
 ROM_END
 
 
+// MV4112/2    5,10,25,50 Credit Multiplier / 20 Line Multiline
+// Green Lizard [Reel Game] / Export  A - 05/01/01
+// Game Eprom: AHG1623
+// Requires set chip version: 4.04.xx
+// Variation (% and NO):
+// Doesn't requires touch screen 
+ROM_START( glizardu )
+	ARISTOCRAT_MK5_BIOS
+	/*
+	    Checksum code found at 0x000d18
+	    Checksum is stored at 0x000020-0x000027
+	        Expected Checksum   0x36907c47
+	        Calculated Checksum 0x36907c47  (OK)
+	*/
+	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
+	ROM_LOAD32_WORD( "ahg1623.u7",  0x000000, 0x80000, CRC(bee526f8) SHA1(32227a6655393a966af3ab698388146f0b752c67) )  // game
+	ROM_LOAD32_WORD( "ahg1623.u11", 0x000002, 0x80000, CRC(177ffc12) SHA1(4cedadcf8ddfb95aff7aa0ece96411646677ff96) )  // game
+	ROM_LOAD32_WORD( "ahg1623.u8",  0x100000, 0x80000, CRC(22657930) SHA1(8a6db02ce1c45a19d6e6f222788f607224b8af43) )  // base
+	ROM_LOAD32_WORD( "ahg1623.u12", 0x100002, 0x80000, CRC(47153192) SHA1(3a384a98c3251a522928a82b391ae88986b6a078) )  // base
+	ROM_LOAD32_WORD( "ahg1623.u9",  0x200000, 0x80000, CRC(b4e33204) SHA1(92c7871872ecfbddde9bf04b7e60802d8598cf36) )  // base
+	ROM_LOAD32_WORD( "ahg1623.u13", 0x200002, 0x80000, CRC(5c658f42) SHA1(0f1b2d79c0c15562f14e59bb424a9c62df6bd959) )  // base
+	ROM_LOAD32_WORD( "ahg1623.u10", 0x300000, 0x80000, CRC(613cb7d8) SHA1(bfd6606f809f5eb2c81802539b5ab7e2a63046a1) )  // base
+	ROM_LOAD32_WORD( "ahg1623.u14", 0x300002, 0x80000, CRC(5ceb871c) SHA1(42b8a087fa39261818dd333ea3d8c1ef269671bf) )  // base
+
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
+	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
+ROM_END
+
+
 // 0100767V / 625 / 10 Credit Multiplier/20 Line Multiline
 // Gnome Around The World 200cm / NSW/ACT / C - 18/12/98
 ROM_START( gnomeatw )
@@ -7091,6 +7121,7 @@ GAMEL( 2000, fortellr,   aristmk5,  aristmk5,           goldenra,     aristmk5_s
 GAMEL( 1998, gambler,    aristmk5,  aristmk5_usa,       aristmk5_usa, aristmk5_state, aristmk5, ROT0, "Aristocrat", "The Gambler (EHG0916-02, US)",                         MACHINE_FLAGS, layout_aristmk5_us )     // MV4084/1, A - 30/10/98
 GAMEL( 2001, geisha,     aristmk5,  aristmk5,           geisha,       aristmk5_state, aristmk5, ROT0, "Aristocrat", "Geisha (0101408V, New Zealand)",                       MACHINE_FLAGS, layout_geisha )          // MV4127, A - 05/03/01, Rev 25
 GAMEL( 1999, genmagi,    aristmk5,  aristmk5_touch,     genmagi,      aristmk5_state, aristmk5, ROT0, "Aristocrat", "Genie Magic (0200894V, NSW/ACT)",                      MACHINE_FLAGS, layout_genmagi )         // 632/1, C - 15/02/99, Rev 20
+GAMEL( 2001, glizardu,   aristmk5,  aristmk5_usa,       aristmk5_usa, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Green Lizard (AHG1623, US)",                           MACHINE_FLAGS, layout_aristmk5_us_200 ) // MV4112/2 - A - 05/01/01
 GAMEL( 1998, gnomeatw,   aristmk5,  aristmk5,           kgalah,       aristmk5_state, aristmk5, ROT0, "Aristocrat", "Gnome Around The World (0100767V, NSW/ACT)",           MACHINE_FLAGS, layout_kgalah )          // 625, C - 18/12/98, Rev 16
 GAMEL( 1997, goldpyr,    aristmk5,  aristmk5_usa,       dolphntru,    aristmk5_state, aristmk5, ROT0, "Aristocrat", "Golden Pyramids (AHG1205-03, US)",                     MACHINE_FLAGS, layout_aristmk5_us )     // MV4091, B - 13/05/97
 GAMEL( 1997, goldpyra,   goldpyr,   aristmk5_usa,       aristmk5_usa, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Golden Pyramids (AHG1206-99, US)",                     MACHINE_FLAGS, layout_aristmk5_us )     // 602/2, B - 13/05/97
