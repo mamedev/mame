@@ -1862,6 +1862,7 @@ void device_debug::single_step(int numsteps)
 {
 	assert(m_exec != nullptr);
 
+	m_device.machine().rewind_capture();
 	m_stepsleft = numsteps;
 	m_stepaddr = ~0;
 	m_flags |= DEBUG_FLAG_STEPPING;
@@ -1878,6 +1879,7 @@ void device_debug::single_step_over(int numsteps)
 {
 	assert(m_exec != nullptr);
 
+	m_device.machine().rewind_capture();
 	m_stepsleft = numsteps;
 	m_stepaddr = ~0;
 	m_flags |= DEBUG_FLAG_STEPPING_OVER;
@@ -1894,6 +1896,7 @@ void device_debug::single_step_out()
 {
 	assert(m_exec != nullptr);
 
+	m_device.machine().rewind_capture();
 	m_stepsleft = 100;
 	m_stepaddr = ~0;
 	m_flags |= DEBUG_FLAG_STEPPING_OUT;
@@ -1910,6 +1913,7 @@ void device_debug::go(offs_t targetpc)
 {
 	assert(m_exec != nullptr);
 
+	m_device.machine().rewind_invalidate();
 	m_stopaddr = targetpc;
 	m_flags |= DEBUG_FLAG_STOP_PC;
 	m_device.machine().debugger().cpu().set_execution_state(EXECUTION_STATE_RUNNING);
@@ -1924,6 +1928,7 @@ void device_debug::go_vblank()
 {
 	assert(m_exec != nullptr);
 
+	m_device.machine().rewind_invalidate();
 	m_flags |= DEBUG_FLAG_STOP_VBLANK;
 	m_device.machine().debugger().cpu().go_vblank();
 }
@@ -1938,6 +1943,7 @@ void device_debug::go_interrupt(int irqline)
 {
 	assert(m_exec != nullptr);
 
+	m_device.machine().rewind_invalidate();
 	m_stopirq = irqline;
 	m_flags |= DEBUG_FLAG_STOP_INTERRUPT;
 	m_device.machine().debugger().cpu().set_execution_state(EXECUTION_STATE_RUNNING);
@@ -1957,6 +1963,7 @@ void device_debug::go_exception(int exception)
 {
 	assert(m_exec != nullptr);
 
+	m_device.machine().rewind_invalidate();
 	m_stopexception = exception;
 	m_flags |= DEBUG_FLAG_STOP_EXCEPTION;
 	m_device.machine().debugger().cpu().set_execution_state(EXECUTION_STATE_RUNNING);
@@ -1972,6 +1979,7 @@ void device_debug::go_milliseconds(u64 milliseconds)
 {
 	assert(m_exec != nullptr);
 
+	m_device.machine().rewind_invalidate();
 	m_stoptime = m_device.machine().time() + attotime::from_msec(milliseconds);
 	m_flags |= DEBUG_FLAG_STOP_TIME;
 	m_device.machine().debugger().cpu().set_execution_state(EXECUTION_STATE_RUNNING);
