@@ -58,6 +58,20 @@
 	- Debug/Cheat mode: hold P1 B+C during boot, when ingame pressing P1 Start skips to next location, where might be more unknown debug features.
 	works for both currently dumped games (orleg2, kov2nl)
 
+
+	Holographic Stickers
+
+	The IGS036 CPUs have holographic stickers on them, there is a number printed on each sticker but it doesn't seem connected to the
+	game code / revision contained within, it might just be to mark the date the board was produced as it seems to coincide with the
+	design of the hologram.  For reference the ones being used for dumping are
+
+	Dodonpachi Daioujou Tamashi (China) - W10
+	King of Fighter 98 UMH (China) - C11
+	Knights of Valour 2 (China) - V21
+	Knights of Valour 3 (China) - V21
+	Oriental Legend 2 (Oversea) - V21
+	Oriental Legend 2 (China) - A8
+
 */
 
 #include "includes/pgm2.h"
@@ -361,38 +375,77 @@ MACHINE_CONFIG_END
 	ROM_REGION( 0x10000, "sram", 0 ) \
 	ROM_LOAD( "xyj2_nvram",            0x00000000, 0x10000, CRC(ccccc71c) SHA1(585b5ccbf89dd28d8532da785d7c8af12f31c6d6) )
 
-#define ORLEG2_PROGRAM_104 \
-	ROM_REGION( 0x1000000, "user1", 0 ) \
-	ROM_LOAD( "xyj2_v104cn.u7",          0x00000000, 0x0800000, CRC(7c24a4f5) SHA1(3cd9f9264ef2aad0869afdf096e88eb8d74b2570) )
+/* 
+   External program revisions are CONFIRMED to be the same between regions, even if the label changes (localized game title + country specific extension code)
+    
+   Confirmed country codes used on labels
+   FA = Oversea
+   CN = China
+   JP = Japan
+   TW = Taiwan
+  
+*/
 
-#define ORLEG2_PROGRAM_103 \
+#define ORLEG2_PROGRAM_104(prefix, extension) \
 	ROM_REGION( 0x1000000, "user1", 0 ) \
-	ROM_LOAD( "xyj2_v103cn.u7",  0x000000, 0x800000, CRC(21c1fae8) SHA1(36eeb7a5e8dc8ee7c834f3ff1173c28cf6c2f1a3) )
+	ROM_LOAD( #prefix "_v104" #extension ".u7",  0x000000, 0x800000, CRC(7c24a4f5) SHA1(3cd9f9264ef2aad0869afdf096e88eb8d74b2570) )
 
-#define ORLEG2_PROGRAM_101 \
+#define ORLEG2_PROGRAM_103(prefix, extension) \
 	ROM_REGION( 0x1000000, "user1", 0 ) \
-	ROM_LOAD( "xyj2_v101cn.u7",  0x000000, 0x800000, CRC(45805b53) SHA1(f2a8399c821b75fadc53e914f6f318707e70787c) )
+	ROM_LOAD( #prefix "_v103" #extension ".u7",  0x000000, 0x800000, CRC(21c1fae8) SHA1(36eeb7a5e8dc8ee7c834f3ff1173c28cf6c2f1a3) )
+
+#define ORLEG2_PROGRAM_101(prefix, extension) \
+	ROM_REGION( 0x1000000, "user1", 0 ) \
+	ROM_LOAD( #prefix "_v101" #extension ".u7",  0x000000, 0x800000, CRC(45805b53) SHA1(f2a8399c821b75fadc53e914f6f318707e70787c) )
+
+/* 
+   Internal ROMs for CHINA and OVERSEA are confirmed to differ by just the region byte, other regions not yet verified.
+   label is a localized version of the game title and the country code (see above)
+   For OVERSEA this is "O/L2", but we omit the / due to naming rules
+   For the CHINA version this uses the Chinese characters
+*/
 
 #define ORLEG2_INTERNAL_CHINA \
 	ROM_REGION( 0x04000, "maincpu", 0 ) \
-	/* Offset 3cb8 of the internal rom controls the region, however only China is dumped at the moment.  Overseas (English) external ROM is confirmed to match (with FA rom label extensions) but th Internal rom might differ by more than the region byte so needs dumping */ \
-	ROM_LOAD( "xyj2_igs036_china.rom", 0x00000000, 0x0004000, CRC(bcce7641) SHA1(c3b5cf6e9f6eae09b6785314777a52b34c3c7657) )
+	ROM_LOAD( "xyj2_cn.igs036", 0x00000000, 0x0004000, CRC(bcce7641) SHA1(c3b5cf6e9f6eae09b6785314777a52b34c3c7657) )
+
+#define ORLEG2_INTERNAL_OVERSEAS \
+	ROM_REGION( 0x04000, "maincpu", 0 ) \
+	ROM_LOAD( "ol2_fa.igs036", 0x00000000, 0x0004000, CRC(cc4d398a) SHA1(c50bcc81f02cd5aa8ad157d73209dc53bdedc023) )
 
 ROM_START( orleg2 )
-	ORLEG2_INTERNAL_CHINA
-	ORLEG2_PROGRAM_104
+	ORLEG2_INTERNAL_OVERSEAS
+	ORLEG2_PROGRAM_104(ol2,fa)
 	ORLEG2_VIDEO_SOUND_ROMS
 ROM_END
 
 ROM_START( orleg2_103 )
-	ORLEG2_INTERNAL_CHINA
-	ORLEG2_PROGRAM_103
+	ORLEG2_INTERNAL_OVERSEAS
+	ORLEG2_PROGRAM_103(ol2,fa)
 	ORLEG2_VIDEO_SOUND_ROMS
 ROM_END
 
 ROM_START( orleg2_101 )
+	ORLEG2_INTERNAL_OVERSEAS
+	ORLEG2_PROGRAM_101(ol2,fa)
+	ORLEG2_VIDEO_SOUND_ROMS
+ROM_END
+
+ROM_START( orleg2_104cn )
 	ORLEG2_INTERNAL_CHINA
-	ORLEG2_PROGRAM_101
+	ORLEG2_PROGRAM_104(xyj2,cn)
+	ORLEG2_VIDEO_SOUND_ROMS
+ROM_END
+
+ROM_START( orleg2_103cn )
+	ORLEG2_INTERNAL_CHINA
+	ORLEG2_PROGRAM_103(xyj2,cn)
+	ORLEG2_VIDEO_SOUND_ROMS
+ROM_END
+
+ROM_START( orleg2_101cn )
+	ORLEG2_INTERNAL_CHINA
+	ORLEG2_PROGRAM_101(xyj2,cn)
 	ORLEG2_VIDEO_SOUND_ROMS
 ROM_END
 
@@ -796,9 +849,13 @@ DRIVER_INIT_MEMBER(pgm2_state,kof98umh)
 /* PGM2 */
 
 // Oriental Legend 2 - should be a V102 and V100 too
-GAME( 2007, orleg2,       0,         pgm2,    pgm2, pgm2_state,     orleg2,       ROT0, "IGS", "Oriental Legend 2 (V104, China)", MACHINE_NOT_WORKING )
-GAME( 2007, orleg2_103,   orleg2,    pgm2,    pgm2, pgm2_state,     orleg2,       ROT0, "IGS", "Oriental Legend 2 (V103, China)", MACHINE_NOT_WORKING )
-GAME( 2007, orleg2_101,   orleg2,    pgm2,    pgm2, pgm2_state,     orleg2,       ROT0, "IGS", "Oriental Legend 2 (V101, China)", MACHINE_NOT_WORKING )
+GAME( 2007, orleg2,       0,         pgm2,    pgm2, pgm2_state,     orleg2,       ROT0, "IGS", "Oriental Legend 2 (V104, Oversea)", 0 ) /* Overseas sets of OL2 do not use the card reader */
+GAME( 2007, orleg2_103,   orleg2,    pgm2,    pgm2, pgm2_state,     orleg2,       ROT0, "IGS", "Oriental Legend 2 (V103, Oversea)", 0 )
+GAME( 2007, orleg2_101,   orleg2,    pgm2,    pgm2, pgm2_state,     orleg2,       ROT0, "IGS", "Oriental Legend 2 (V101, Oversea)", 0 )
+
+GAME( 2007, orleg2_104cn, orleg2,    pgm2,    pgm2, pgm2_state,     orleg2,       ROT0, "IGS", "Oriental Legend 2 (V104, China)", MACHINE_NOT_WORKING )
+GAME( 2007, orleg2_103cn, orleg2,    pgm2,    pgm2, pgm2_state,     orleg2,       ROT0, "IGS", "Oriental Legend 2 (V103, China)", MACHINE_NOT_WORKING )
+GAME( 2007, orleg2_101cn, orleg2,    pgm2,    pgm2, pgm2_state,     orleg2,       ROT0, "IGS", "Oriental Legend 2 (V101, China)", MACHINE_NOT_WORKING )
 
 // Knights of Valour 2 New Legend
 GAME( 2008, kov2nl,       0,         pgm2,    pgm2, pgm2_state,     kov2nl,       ROT0, "IGS", "Knights of Valour 2 New Legend (V302, China)", MACHINE_NOT_WORKING )
