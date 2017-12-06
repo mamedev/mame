@@ -1368,9 +1368,6 @@ Notes:
 		<description>Tora e no Michi (Tourvision PCE bootleg)</description>
 		<year>1990</year>
 		<publisher>bootleg (Tourvision) / Victor Entertainment</publisher>
-		<info name="serial" value="JC63004"/>
-		<info name="release" value="19900223"/>
-		<info name="alt_title" value="虎への道"/>
 		<part name="cart" interface="tourvision_cart">
 			<dataarea name="rom" size="1048576">
 				<rom name="tiger_road.bin" size="1048576" crc="5e55f35c" sha1="942c8e9e8923acf7ef2ba8878879251621e48408" offset="000000" />
