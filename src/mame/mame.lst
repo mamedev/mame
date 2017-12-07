@@ -29935,6 +29935,9 @@ diablo68                        //
 nocto                           //
 npresto                         //
 
+@source:nsg6809.cpp
+pitchhit                        //
+
 @source:nsm.cpp
 firebird                        //
 
