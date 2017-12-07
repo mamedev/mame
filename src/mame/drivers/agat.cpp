@@ -2,18 +2,51 @@
 // copyright-holders:R. Belmont, Sergey Svishchev
 /***************************************************************************
 
-    agat.c
-    Skeleton driver for Agat series of Soviet Apple II non-clones
+    agat.cpp
 
-    These are similar to Apple II (same bus architecture, keyboard and
-    floppy interface), but video controller is completely different.
+    Driver for Agat series of Soviet Apple II non-clones
 
-    To do:
-    - native keyboards (at least two variants)
-    - 840K floppy controller (MFM encoding, but track layout is unique)
-    - agat7: 64K and 128K onboard memory configurations
-    - agat9
-    - 3rd party slot devices
+    These are similar to Apple II (same bus architecture, keyboard
+    and floppy interface), but native video controllers are different.
+
+    agat7 supports Apple (40col, HGR and DHR) video modes with add-on
+    card; agat9 has built-in support for 40col and HGR.  Palette in
+    Apple modes is different and pixel stretching is not done.
+
+    To do (common):
+    - native keyboard (at least two variants)
+    - video: text modes use 7x8 character cell and 224x256 raster
+    - video: vertical raster splits (used at least by Rapira)
+    - what is the state of devices at init and reset?
+    - what do floating bus reads do?
+    - ignore debugger reads -- use side_effect_disabled()
+    - softlists
+
+    To do (agat7):
+    - hw variant: 16 colors
+    - hw variant: 256-char chargen
+    - hw variant: 64K and 128K onboard memory
+    - "500hz" interrupt breakage
+    - what does write to C009 do? (basedos7.nib)
+
+    To do (agat9):
+    - memory banking: what does write to C18x..C1Fx do?
+    - memory expansion boards
+    - apple2 video compat mode incl. language card emulation
+    - 840K floppy controller: low level emulation, AIM format support
+    - mouse via parallel port
+    - hw revisions and agat9a model (via http://agatcomp.ru/Images/case.shtml)
+
+    Slot devices -- 1st party:
+    - agat7: apple2 video card (decimal 3.089.121) -- http://agatcomp.ru/Images/new_j121.shtml
+    - agat7: serial-parallel card (decimal 3.089.10)6
+    - agat9: printer card (decimal 3.089.17)4
+
+    Slot devices -- 3rd party:
+    - Nippel Clock (uses mc146818)
+    - Nippel mouse -- http://agatcomp.ru/Images/new_mouse.shtml
+    - Sprite Card-93 (uses fd1793)
+    - others
 
 ************************************************************************/
 
@@ -1144,5 +1177,5 @@ ROM_START( agat9 )
 ROM_END
 
 //    YEAR  NAME      PARENT    COMPAT    MACHINE      INPUT    STATE         INIT      COMPANY            FULLNAME  FLAGS
-COMP( 1983, agat7,    apple2,   0,        agat7,       agat7,   agat7_state,  0,        "Agat",            "Agat-7", MACHINE_NOT_WORKING)
+COMP( 1983, agat7,    apple2,   0,        agat7,       agat7,   agat7_state,  0,        "Agat",            "Agat-7", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_CONTROLS)
 COMP( 1984, agat9,    apple2,   0,        agat7,       agat7,   agat7_state,  0,        "Agat",            "Agat-9", MACHINE_NOT_WORKING)
