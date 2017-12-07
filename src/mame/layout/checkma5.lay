@@ -179,6 +179,19 @@
 		</rect>
 	</element>
 
+	<element name="BET3">
+		<rect state="0">
+			<color red="1.0" green="1.0" blue="1.0" />
+		</rect>
+		<rect state="1">
+			<color red="0.5" green="0.5" blue="0.5" />
+		</rect>
+		<text string="BET 3">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.1" width="1" height="0.8" />
+		</text>
+	</element>
+
 	<element name="BET3C">
 		<rect state="0">
 			<color red="1.0" green="1.0" blue="1.0" />
@@ -326,11 +339,9 @@
 		<bezel name="lamp5" element="BET2" inputtag="P1" inputmask="0x20">
 			<bounds x="1.09" y="3.28" width="0.31" height="0.24" />
 		</bezel>
-		<!-- FIXME - missing element definition
 		<bezel name="lamp4" element="BET3" inputtag="P1" inputmask="0x10">
 		    <bounds x="1.51" y="3.28" width="0.31" height="0.24" />
 		</bezel>
-		-->
 		<bezel name="lamp3" element="BET4" inputtag="P1" inputmask="0x08">
 			<bounds x="1.91" y="3.28" width="0.31" height="0.24" />
 		</bezel>
@@ -393,11 +404,9 @@
 		<bezel name="lamp5" element="BET2" inputtag="P1" inputmask="0x20">
 			<bounds x="1.09" y="3.28" width="0.31" height="0.24" />
 		</bezel>
-		<!-- FIXME - missing element definition
 		<bezel name="lamp4" element="BET3" inputtag="P1" inputmask="0x10">
 		    <bounds x="1.51" y="3.28" width="0.31" height="0.24" />
 		</bezel>
-		-->
 		<bezel name="lamp3" element="BET5" inputtag="P1" inputmask="0x08">
 			<bounds x="1.91" y="3.28" width="0.31" height="0.24" />
 		</bezel>
