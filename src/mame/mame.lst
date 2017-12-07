@@ -14756,6 +14756,7 @@ f2pbball                        // Fonas
 f3in1                           // Fonas
 fxmcr165                        // Gakken
 ginv1000                        // Gakken
+ginv2000                        // Gakken
 gjackpot                        // Gakken
 gpoker                          // Gakken
 h2hbaseb                        // Coleco
@@ -31297,6 +31298,9 @@ kov3_100                        //
 orleg2                          // (c) 2007
 orleg2_103                      //
 orleg2_101                      //
+orleg2_104cn                    //
+orleg2_103cn                    //
+orleg2_101cn                    //
 kof98umh						// (c) 2009
 
 @source:pgm3.cpp

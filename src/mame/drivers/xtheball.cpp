@@ -28,6 +28,7 @@ public:
 			m_maincpu(*this, "maincpu"),
 			m_watchdog(*this, "watchdog"),
 			m_tlc34076(*this, "tlc34076"),
+			m_ticket(*this, "ticket"),
 			m_vram_bg(*this, "vrabg"),
 			m_vram_fg(*this, "vrafg"),
 			m_analog_x(*this, "ANALOGX"),
@@ -36,6 +37,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<watchdog_timer_device> m_watchdog;
 	required_device<tlc34076_device> m_tlc34076;
+	required_device<ticket_dispenser_device> m_ticket;
 
 	required_shared_ptr<uint16_t> m_vram_bg;
 	required_shared_ptr<uint16_t> m_vram_fg;
@@ -158,7 +160,7 @@ WRITE16_MEMBER(xtheball_state::bit_controls_w)
 			switch (offset)
 			{
 				case 7:
-					machine().device<ticket_dispenser_device>("ticket")->write(space, 0, data << 7);
+					m_ticket->motor_w(data & 1);
 					break;
 
 				case 8:

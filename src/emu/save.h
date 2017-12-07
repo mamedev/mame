@@ -26,6 +26,7 @@
 enum save_error
 {
 	STATERR_NONE,
+	STATERR_NOT_FOUND,
 	STATERR_ILLEGAL_REGISTRATIONS,
 	STATERR_INVALID_HEADER,
 	STATERR_READ_ERROR,
@@ -79,11 +80,17 @@ public:
 	u32             m_offset;               // offset within the final structure
 };
 
+class ram_state;
+class rewinder;
+
 class save_manager
 {
 	// type_checker is a set of templates to identify valid save types
 	template<typename _ItemType> struct type_checker { static const bool is_atom = false; static const bool is_pointer = false; };
 	template<typename _ItemType> struct type_checker<_ItemType*> { static const bool is_atom = false; static const bool is_pointer = true; };
+
+	friend class ram_state;
+	friend class rewinder;
 
 public:
 	// construction/destruction
@@ -91,6 +98,7 @@ public:
 
 	// getters
 	running_machine &machine() const { return m_machine; }
+	rewinder *rewind() { return m_rewind.get(); }
 	int registration_count() const { return m_entry_list.size(); }
 	bool registration_allowed() const { return m_reg_allowed; }
 
@@ -166,17 +174,67 @@ private:
 		// construction/destruction
 		state_callback(save_prepost_delegate callback);
 
-		save_prepost_delegate m_func;               // delegate
+		save_prepost_delegate m_func;                 // delegate
 	};
 
 	// internal state
-	running_machine &       m_machine;              // reference to our machine
-	bool                    m_reg_allowed;          // are registrations allowed?
-	int                     m_illegal_regs;         // number of illegal registrations
+	running_machine &         m_machine;              // reference to our machine
+	std::unique_ptr<rewinder> m_rewind;               // rewinder
+	bool                      m_reg_allowed;          // are registrations allowed?
+	int                       m_illegal_regs;         // number of illegal registrations
 
-	std::vector<std::unique_ptr<state_entry>> m_entry_list;          // list of registered entries
+	std::vector<std::unique_ptr<state_entry>>    m_entry_list;       // list of registered entries
+	std::vector<std::unique_ptr<ram_state>>      m_ramstate_list;    // list of ram states
 	std::vector<std::unique_ptr<state_callback>> m_presave_list;     // list of pre-save functions
 	std::vector<std::unique_ptr<state_callback>> m_postload_list;    // list of post-load functions
+};
+
+class ram_state
+{
+	save_manager &     m_save;  // reference to save_manager
+	util::vectorstream m_data;  // save data buffer
+
+public:
+	bool               m_valid; // can we load this state?
+	attotime           m_time;  // machine timestamp
+
+	ram_state(save_manager &save);
+	static size_t get_size(save_manager &save);
+	save_error save();
+	save_error load();
+};
+
+class rewinder
+{
+	save_manager &                          m_save;       // reference to save_manager
+	bool                                    m_enabled;    // enable rewind savestates
+	uint32_t                                m_capacity;   // imposed limit of total states (1-500)
+	std::vector<std::unique_ptr<ram_state>> m_state_list; // rewinder's own ram states
+
+	// load/save management
+	enum class rewind_operation
+	{
+		SAVE,
+		LOAD
+	};
+
+	enum
+	{
+		REWIND_INDEX_NONE = -1,
+		REWIND_INDEX_FIRST = 0
+	};
+	
+	int get_current_index();
+	int get_first_invalid_index();
+	void check_size();
+	void report_error(save_error type, rewind_operation operation, int index = REWIND_INDEX_FIRST);
+
+public:
+	rewinder(save_manager &save);
+	bool enabled() { return m_enabled; }
+	int invalidate();
+	void capture();
+	void step();
 };
 
 

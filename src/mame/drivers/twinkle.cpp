@@ -9,7 +9,7 @@ driver by smf and R. Belmont
 TODO:
 
 dvd check for bmiidx, bmiidxa, bmiidxc & bmiidxca
-remove dummy 8mb bank
+The first 128k of RF5C400 bank 0 is uploaded by the 68000, the rest is unused. It may be using 16J & 18J
 emulate dvd player and video mixing
 16seg led font
 
@@ -28,14 +28,14 @@ beatmania IIDX + DDR Club Kit(newer)  1999     896 JA BBM       *?             *
 beatmania IIDX Substream              1999     *?               GC983 A04      *?           ?
 beatmania IIDX Club Version 2         1999     GE984 A01(BM)    *?             *984 A02     ?
                                              + GE984 A01(DDR)
-beatmania IIDX 2nd Style              1999     GC985 A01        GC985 A04      *           *985 HDD A01
-beatmania IIDX 3rd Style              2000     GC992-JA A01     GC992-JA A04   *           *992 HDD A01
-beatmania IIDX 3rd Style(newer)       2000     GC992-JA C01     GC992-JA A04   *           *992 HDD A01
-beatmania IIDX 4th Style              2000     A03 JA A01       A03 JA A02     *A03        A03 JA A03
-beatmania IIDX 5th Style              2001     A17 JA A01       A17 JA A02     *           *A17 JA A03
-beatmania IIDX 6th Style              2001     B4U JA A01       B4U JA A02     *           B4U JA A03
-beatmania IIDX 6th Style(newer)       2001     B4U JA B01       B4U JA A02     *           B4U JA A03
-beatmania IIDX 7th Style              2002     B44 JA A01       B44 JA A02     *           B44 JA A03
+beatmania IIDX 2nd Style              1999     GC985 A01        GC985 A04      *?          *985 HDD A01
+beatmania IIDX 3rd Style              2000     GC992-JA A01     GC992-JA A04   *?          *992 HDD A01
+beatmania IIDX 3rd Style(newer)       2000     GC992-JA C01     GC992-JA A04   *?          *992 HDD A01
+beatmania IIDX 4th Style              2000     A03 JA A01       A03 JA A02     A03         A03 JA A03
+beatmania IIDX 5th Style              2001     A17 JA A01       A17 JA A02     A17         *A17 JA A03
+beatmania IIDX 6th Style              2001     B4U JA A01       B4U JA A02     *?          B4U JA A03
+beatmania IIDX 6th Style(newer)       2001     B4U JA B01       B4U JA A02     *?          B4U JA A03
+beatmania IIDX 7th Style              2002     B44 JA A01       B44 JA A02     *?          B44 JA A03
 beatmania IIDX 8th Style              2002     C44 JA A01       C44 JA A02     *C44        C44 JA A03
 
 * = Not dumped.
@@ -267,7 +267,7 @@ public:
 
 	required_device<am53cf96_device> m_am53cf96;
 	required_device<ata_interface_device> m_ata;
-	required_region_ptr<uint16_t> m_waveram;
+	required_shared_ptr<uint16_t> m_waveram;
 
 	uint16_t m_spu_ctrl;      // SPU board control register
 	uint8_t m_spu_shared[0x400];  // SPU/PSX shared dual-ported RAM
@@ -923,6 +923,10 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 16, twinkle_state )
 	AM_RANGE(0x800000, 0xffffff) AM_READWRITE(twinkle_waveram_r, twinkle_waveram_w)
 ADDRESS_MAP_END
 
+static ADDRESS_MAP_START(rf5c400_map, 0, 16, twinkle_state)
+	AM_RANGE(0x0000000, 0x1ffffff) AM_RAM AM_SHARE("rfsnd")
+ADDRESS_MAP_END
+
 /* SCSI */
 
 static void scsi_dma_read( twinkle_state *state, uint32_t *p_n_psxram, uint32_t n_address, int32_t n_size )
@@ -1069,6 +1073,7 @@ static MACHINE_CONFIG_START( twinkle )
 	MCFG_SOUND_ROUTE( 1, "speakerright", 0.75 )
 
 	MCFG_RF5C400_ADD("rfsnd", XTAL_33_8688MHz/2);
+	MCFG_DEVICE_ADDRESS_MAP(0, rf5c400_map)
 	MCFG_SOUND_ROUTE(0, "speakerleft", 1.0)
 	MCFG_SOUND_ROUTE(1, "speakerright", 1.0)
 MACHINE_CONFIG_END
@@ -1170,9 +1175,7 @@ INPUT_PORTS_END
 	ROM_LOAD( "863a03.7b",    0x000000, 0x080000, CRC(81498f73) SHA1(3599b40a5872eab3a00d345287635355fcb25a71) )\
 \
 	ROM_REGION32_LE( 0x080000, "audiocpu", 0 )\
-	ROM_LOAD16_WORD_SWAP( "863a05.2x",    0x000000, 0x080000, CRC(6f42a09e) SHA1(cab5209f90f47b9ee6e721479913ad74e3ba84b1) )\
-\
-	ROM_REGION16_LE(0x2000000, "rfsnd", ROMREGION_ERASE00) // the first 8mb isn't populated
+	ROM_LOAD16_WORD_SWAP( "863a05.2x",    0x000000, 0x080000, CRC(6f42a09e) SHA1(cab5209f90f47b9ee6e721479913ad74e3ba84b1) )
 
 ROM_START( gq863 )
 	TWINKLE_BIOS
