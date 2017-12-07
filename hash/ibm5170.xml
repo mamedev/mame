@@ -9439,9 +9439,9 @@
 		<!-- Dumped via Kryoflux from original disks, all tracks show as modified -->
 		<description>WarCraft - Orcs &amp; Humans</description>
 		<year>1994</year>
+		<publisher>Interplay</publisher>
 		<info name="version" value="1.05" />
 		<info name="developer" value="Blizzard Entertainment" />
-		<publisher>Interplay</publisher>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
 				<rom name="[PC] Warcraft Orcs and Humans [3.5HD] [Disk 1 of 4].img" size="1474560" crc="528d9208" sha1="4a3fb4cf21acce1a51754e4cdd29d906d6cff6c4" offset="0"/>

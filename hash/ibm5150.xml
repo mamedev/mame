@@ -8260,9 +8260,9 @@ has been replaced with an all-zero block. -->
 	<software name="nightmar">
 		<description>A Nightmare on Elm Street</description>
 		<year>1989</year>
+		<publisher>Monarch Software</publisher>
 		<info name="version" value="2.00" />
 		<info name="developer" value="Westwood Associates" />
-		<publisher>Monarch Software</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size = "368640">
 				<rom name="A Nightmare on Elm Street (USA) (v2.00) (Disk 1).img" size="368640" crc="fed37ad6" sha1="f0adcd8164d3bdc7bb2ca742067ce1cc3ea1a4c2" offset="0"/>
