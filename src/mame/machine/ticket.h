@@ -68,7 +68,6 @@ public:
 
 	// read/write handlers
 	DECLARE_READ_LINE_MEMBER( line_r );
-	DECLARE_WRITE8_MEMBER( write );
 	DECLARE_WRITE_LINE_MEMBER( motor_w );
 
 protected:
@@ -84,13 +83,12 @@ protected:
 	bool m_hopper_type;
 
 	// active state
-	uint8_t m_active_bit;
-	uint8_t m_motoron;
-	uint8_t m_ticketdispensed;
-	uint8_t m_ticketnotdispensed;
+	bool m_motoron;
+	bool m_ticketdispensed;
+	bool m_ticketnotdispensed;
 
-	uint8_t m_status;
-	uint8_t m_power;
+	bool m_status;
+	bool m_power;
 	emu_timer *m_timer;
 };
 

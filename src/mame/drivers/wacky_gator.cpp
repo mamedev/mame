@@ -109,7 +109,7 @@ WRITE8_MEMBER(wackygtr_state::status_lamps_w)
 	set_lamps(0, data & 0x3f);
 
 	machine().bookkeeping().coin_counter_w(0, BIT(data, 6));
-	m_ticket->write(space, 0, data & 0x80);
+	m_ticket->motor_w(BIT(data, 7));
 }
 
 WRITE8_MEMBER(wackygtr_state::sample_ctrl_w)

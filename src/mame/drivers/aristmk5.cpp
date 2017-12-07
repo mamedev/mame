@@ -706,7 +706,7 @@ READ8_MEMBER(aristmk5_state::eeprom_r)
 
 WRITE8_MEMBER(aristmk5_state::hopper_w)
 {
-	m_hopper->write(space, 0, (data & 0x02) ? 0x80 : 0);
+	m_hopper->motor_w(BIT(data, 1));
 	m_hopper_test = BIT(data, 2);
 }
 
@@ -741,7 +741,7 @@ WRITE8_MEMBER(aristmk5_state::eeprom_w)
 WRITE8_MEMBER(aristmk5_state::eeprom_usa_w)
 {
 	eeprom_w(space, offset, data, mem_mask);
-	m_hopper->write(space, 0, (data & 0x04) ? 0x80 : 0);
+	m_hopper->motor_w(BIT(data, 2));
 }
 
 READ8_MEMBER(aristmk5_state::ldor_r)

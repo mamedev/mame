@@ -491,10 +491,10 @@ WRITE8_MEMBER(kurukuru_state::kurukuru_out_latch_w)
     07 | Not connected      | unused
 
 */
-	machine().bookkeeping().coin_counter_w(0, data & 0x01);      /* Coin Counter 1 */
-	machine().bookkeeping().coin_counter_w(1, data & 0x20);      /* Coin Counter 2 */
-	machine().bookkeeping().coin_lockout_global_w(data & 0x40);  /* Coin Lock */
-	m_hopper->write(space, 0, (data & 0x40) ? 0x80 : 0);         /* Hopper Motor */
+	machine().bookkeeping().coin_counter_w(0, BIT(data, 0));
+	machine().bookkeeping().coin_counter_w(1, BIT(data, 5));
+	//machine().bookkeeping().coin_lockout_global_w(BIT(data, 6));
+	m_hopper->motor_w(BIT(data, 6));
 
 	if (data & 0x9e)
 		logerror("kurukuru_out_latch_w %02X @ %04X\n", data, space.device().safe_pc());

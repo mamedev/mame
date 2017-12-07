@@ -359,7 +359,6 @@ Notes:
 #include "cpu/tms32031/tms32031.h"
 #include "machine/6522via.h"
 #include "machine/nvram.h"
-#include "machine/ticket.h"
 #include "machine/timekpr.h"
 #include "machine/watchdog.h"
 #include "sound/es5506.h"
@@ -739,11 +738,11 @@ WRITE8_MEMBER(itech32_state::drivedge_portb_out)
 	/* bit 4 controls the ticket dispenser */
 	/* bit 5 controls the coin counter */
 	/* bit 6 controls the diagnostic sound LED */
-	output().set_led_value(1, data & 0x01);
-	output().set_led_value(2, data & 0x02);
-	output().set_led_value(3, data & 0x04);
-	machine().device<ticket_dispenser_device>("ticket")->write(machine().dummy_space(), 0, (data & 0x10) << 3);
-	machine().bookkeeping().coin_counter_w(0, (data & 0x20) >> 5);
+	output().set_led_value(1, BIT(data, 0));
+	output().set_led_value(2, BIT(data, 1));
+	output().set_led_value(3, BIT(data, 2));
+	m_ticket->motor_w(BIT(data, 4));
+	machine().bookkeeping().coin_counter_w(0, BIT(data, 5));
 }
 
 
@@ -760,8 +759,8 @@ WRITE8_MEMBER(itech32_state::pia_portb_out)
 	/* bit 4 controls the ticket dispenser */
 	/* bit 5 controls the coin counter */
 	/* bit 6 controls the diagnostic sound LED */
-	machine().device<ticket_dispenser_device>("ticket")->write(machine().dummy_space(), 0, (data & 0x10) << 3);
-	machine().bookkeeping().coin_counter_w(0, (data & 0x20) >> 5);
+	m_ticket->motor_w(BIT(data, 4));
+	machine().bookkeeping().coin_counter_w(0, BIT(data, 5));
 }
 
 

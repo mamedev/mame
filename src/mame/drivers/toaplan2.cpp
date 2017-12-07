@@ -596,7 +596,7 @@ WRITE8_MEMBER(toaplan2_state::pwrkick_coin_w)
 	machine().bookkeeping().coin_counter_w(0, (data & 2) >> 1 ); // medal
 	machine().bookkeeping().coin_counter_w(1, (data & 8) >> 3 ); // 10 yen
 	machine().bookkeeping().coin_counter_w(2, (data & 1) ); // 100 yen
-	m_hopper->write(space, 0, data & 0x80);
+	m_hopper->motor_w(BIT(data, 7));
 }
 
 WRITE8_MEMBER(toaplan2_state::pwrkick_coin_lockout_w)
