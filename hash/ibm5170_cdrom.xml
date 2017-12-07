@@ -22,6 +22,17 @@
 			</diskarea>
 		</part>
 	</software>
+	
+	<software name="ironbld">
+		<description>Iron Blood</description>
+		<year>1996</year>
+		<publisher>Microforum</publisher>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="ironbld" sha1="01d07168e1bc60ca08fbce8c79dcb30c92e36abb" />
+			</diskarea>			
+		</part>
+	</software>
 
 	<software name="ultrasnd" supported="partial">
 		<!-- includes Gravis UltraSound (GUS) Installation - V4.11 -->
