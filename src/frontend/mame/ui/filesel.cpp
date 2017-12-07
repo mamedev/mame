@@ -55,6 +55,7 @@ menu_file_selector::menu_file_selector(mame_ui_manager &mui, render_container &c
 	, m_has_create(has_create)
 	, m_result(result)
 {
+	(void)m_image;
 }
 
 
