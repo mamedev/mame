@@ -155,6 +155,10 @@ void rf5c400_device::device_start()
 		chan.env_scale = 1.0;
 	}
 
+	save_item(NAME(m_rf5c400_status));
+	save_item(NAME(m_ext_mem_address));
+	save_item(NAME(m_ext_mem_data));
+
 	for (int i = 0; i < ARRAY_LENGTH(m_channels); i++)
 	{
 		save_item(NAME(m_channels[i].startH), i);
@@ -314,28 +318,50 @@ void rf5c400_device::rom_bank_updated()
 
 /*****************************************************************************/
 
-static uint16_t rf5c400_status = 0; // a static one of these for all instances of the chip?  how does that work?
 READ16_MEMBER( rf5c400_device::rf5c400_r )
 {
-	switch(offset)
+	if (offset < 0x400)
 	{
-		case 0x00:
-		{
-			return rf5c400_status;
-		}
+		//osd_printf_debug("%s:rf5c400_r: %08X, %08X\n", machine().describe_context().c_str(), offset, mem_mask);
 
-		case 0x04:
+		switch(offset)
 		{
-			return 0;
-		}
+			case 0x00:
+			{
+				return m_rf5c400_status;
+			}
 
-		case 0x13:      // memory read
-		{
-			return read_word(m_ext_mem_address<<1);
+			case 0x04:      // unknown read
+			{
+				return 0;
+			}
+
+			case 0x13:      // memory read
+			{
+				return read_word(m_ext_mem_address<<1);
+			}
+
+			default:
+			{
+				//osd_printf_debug("%s:rf5c400_r: %08X, %08X\n", machine().describe_context().c_str(), offset, mem_mask);
+				return 0;
+			}
 		}
 	}
+	else
+	{
+		//int ch = (offset >> 5) & 0x1f;
+		int reg = (offset & 0x1f);
 
-	return 0;
+		switch (reg)
+		{
+		case 0x0F:      // unknown read
+			return 0;
+
+		default:
+			return 0;
+		}
+	}
 }
 
 WRITE16_MEMBER( rf5c400_device::rf5c400_w )
@@ -346,7 +372,7 @@ WRITE16_MEMBER( rf5c400_device::rf5c400_w )
 		{
 			case 0x00:
 			{
-				rf5c400_status = data;
+				m_rf5c400_status = data;
 				break;
 			}
 
@@ -432,11 +458,11 @@ WRITE16_MEMBER( rf5c400_device::rf5c400_w )
 
 			default:
 			{
-				//osd_printf_debug("%s:rf5c400_w: %08X, %08X, %08X\n", machine().describe_context(), data, offset, mem_mask);
+				//osd_printf_debug("%s:rf5c400_w: %08X, %08X, %08X\n", machine().describe_context().c_str(), data, offset, mem_mask);
 				break;
 			}
 		}
-		//osd_printf_debug("%s:rf5c400_w: %08X, %08X, %08X at %08X\n", machine().describe_context(), data, offset, mem_mask);
+		//osd_printf_debug("%s:rf5c400_w: %08X, %08X, %08X\n", machine().describe_context().c_str(), data, offset, mem_mask);
 	}
 	else
 	{
@@ -505,12 +531,12 @@ WRITE16_MEMBER( rf5c400_device::rf5c400_w )
 			}
 			case 0x0A:      // relative to env attack ?
 			{
-				// always 0x0100
+				// always 0x0100/0x140
 				break;
 			}
 			case 0x0B:      // relative to env decay ?
 			{
-				// always 0x0100
+				// always 0x0100/0x140/0x180
 				break;
 			}
 			case 0x0C:      // env decay
@@ -522,13 +548,18 @@ WRITE16_MEMBER( rf5c400_device::rf5c400_w )
 			}
 			case 0x0D:      // relative to env release ?
 			{
-				// always 0x0100
+				// always 0x0100/0x140
 				break;
 			}
 			case 0x0E:      // env release
 			{
 				// 0xXX70: XX = release-0x1f (encoded) (0x01 if release <= 0x20)
 				channel->release = data;
+				break;
+			}
+			case 0x0F:      // unknown write
+			{
+				// always 0x0000
 				break;
 			}
 			case 0x10:      // resonance, cutoff freq.
