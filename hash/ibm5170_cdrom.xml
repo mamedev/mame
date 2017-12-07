@@ -23,7 +23,7 @@
 		</part>
 	</software>
 	
-	<software name="prototyp" supported="partial">
+	<software name="prototyp">
 		<description>Prototype</description>
 		<year>1995</year>
 		<publisher>Neo</publisher>
