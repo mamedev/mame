@@ -7,7 +7,7 @@
     * Pitch Hitter
     * Super Shot (undumped)
 
-    Partial memory map for "Universal Game PCB" in Super Shot schematics:
+    Memory map for "Universal Game PCB" in Super Shot schematics:
 
                 2K SRAM             8K SRAM
            JP5-A JP6-B JP7-B   JP5-B JP6-A JP7-A
@@ -26,6 +26,8 @@
     *IN-B     $1A00-$1BFF         $3A00-$3BFF
     *OUT-A    $1800-$19FF         $3800-$39FF
     *IN-A     $1800-$19FF         $3800-$39FF
+
+    "ASIC" is a rather odd thing to call a 6551...
 
 ***************************************************************************/
 
