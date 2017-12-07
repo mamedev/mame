@@ -22,6 +22,19 @@
 			</diskarea>
 		</part>
 	</software>
+	
+	<software name="prototyp" supported="partial">
+		<description>Prototype</description>
+		<year>1995</year>
+		<publisher>Neo</publisher>
+		<info name="version" value="1.0" />
+		<part name="cdrom" interface="cdrom">
+			<feature name="disk_label" value="Prototype" />
+			<diskarea name="cdrom">
+				<disk name="prototyp" sha1="f6695bf4e59f7821e2918e9df7390aee6c5c70dc" />
+			</diskarea>
+		</part>
+	</software>
 
 	<software name="ultrasnd" supported="partial">
 		<!-- includes Gravis UltraSound (GUS) Installation - V4.11 -->
