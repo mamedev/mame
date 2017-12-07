@@ -34,6 +34,7 @@
 #include "emu.h"
 #include "cpu/m6809/m6809.h"
 #include "machine/6522via.h"
+#include "machine/input_merger.h"
 #include "machine/mos6551.h"
 #include "machine/watchdog.h"
 
@@ -65,11 +66,16 @@ static MACHINE_CONFIG_START( pitchhit )
 	MCFG_CPU_PROGRAM_MAP(main_map)
 
 	MCFG_DEVICE_ADD("via", VIA6522, XTAL_4MHz / 4)
+	MCFG_VIA6522_IRQ_HANDLER(DEVWRITELINE("mainirq", input_merger_device, in_w<0>))
 
 	MCFG_DEVICE_ADD("acia", MOS6551, 0)
 	MCFG_MOS6551_XTAL(XTAL_1_8432MHz)
+	MCFG_MOS6551_IRQ_HANDLER(DEVWRITELINE("mainirq", input_merger_device, in_w<1>))
 
 	MCFG_WATCHDOG_ADD("deadman")
+
+	MCFG_INPUT_MERGER_ANY_HIGH("mainirq")
+	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("maincpu", M6809_IRQ_LINE))
 MACHINE_CONFIG_END
 
 
