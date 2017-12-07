@@ -23,7 +23,7 @@
 		</part>
 	</software>
 	
-	<software name="sideline" supported="partial">
+	<software name="sideline">
 		<description>Sideline</description>
 		<year>1996</year>
 		<publisher>EMAG Soft</publisher>
