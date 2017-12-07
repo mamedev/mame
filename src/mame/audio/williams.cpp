@@ -759,7 +759,7 @@ MACHINE_CONFIG_MEMBER( williams_adpcm_sound_device::device_add_mconfig )
 
 	MCFG_OKIM6295_ADD("oki", ADPCM_MASTER_CLOCK/8, PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_DEVICE_ADDRESS_MAP(0, williams_adpcm_oki_map)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, DEVICE_SELF_OWNER, 0.5)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, DEVICE_SELF_OWNER, 0.15)
 MACHINE_CONFIG_END
 
 
