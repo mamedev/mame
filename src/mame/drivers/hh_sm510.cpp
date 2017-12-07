@@ -11,7 +11,7 @@
   MAME external artwork is recommended for the backgrounds inlays.
 
   TODO:
-  - improve LCD segments in SVGs for: gnw_mc25, gnw_eg26, exospace
+  - improve/redo SVGs of: gnw_mc25, gnw_eg26, exospace
   - confirm gnw_mc25/gnw_eg26 rom (dumped from Soviet clone, but pretty confident that it's same)
 
 ***************************************************************************/
@@ -2677,7 +2677,7 @@ ROM_START( gnw_mc25 )
 	ROM_LOAD( "mc-25", 0x0000, 0x0740, BAD_DUMP CRC(cb820c32) SHA1(7e94fc255f32db725d5aa9e196088e490c1a1443) ) // dumped from Soviet clone
 
 	ROM_REGION( 102453, "svg", 0)
-	ROM_LOAD( "gnw_mc25.svg", 0, 102453, CRC(88cc7c49) SHA1(c000d51d1b99750116b97f9bafc0314ea506366d) )
+	ROM_LOAD( "gnw_mc25.svg", 0, 102453, BAD_DUMP CRC(88cc7c49) SHA1(c000d51d1b99750116b97f9bafc0314ea506366d) )
 ROM_END
 
 ROM_START( gnw_eg26 )
@@ -2685,7 +2685,7 @@ ROM_START( gnw_eg26 )
 	ROM_LOAD( "eg-26", 0x0000, 0x0740, BAD_DUMP CRC(cb820c32) SHA1(7e94fc255f32db725d5aa9e196088e490c1a1443) ) // dumped from Soviet clone
 
 	ROM_REGION( 102848, "svg", 0)
-	ROM_LOAD( "gnw_eg26.svg", 0, 102848, CRC(742c2605) SHA1(984d430ad2ff47ad7a3f9b25b7d3f3d51b10cca5) )
+	ROM_LOAD( "gnw_eg26.svg", 0, 102848, BAD_DUMP CRC(742c2605) SHA1(984d430ad2ff47ad7a3f9b25b7d3f3d51b10cca5) )
 ROM_END
 
 ROM_START( nupogodi )
@@ -2701,7 +2701,7 @@ ROM_START( exospace )
 	ROM_LOAD( "exospace.bin", 0x0000, 0x0740, CRC(553e2b09) SHA1(2b74f8437b881fbb62b61f25435a5bfc66872a9a) )
 
 	ROM_REGION( 66790, "svg", 0)
-	ROM_LOAD( "exospace.svg", 0, 66790, CRC(df31043a) SHA1(2d8caf42894df699e469652e5f448beaebbcc1ae) )
+	ROM_LOAD( "exospace.svg", 0, 66790, BAD_DUMP CRC(df31043a) SHA1(2d8caf42894df699e469652e5f448beaebbcc1ae) )
 ROM_END
 
 
@@ -2811,8 +2811,8 @@ ROM_START( taltbeast )
 	ROM_REGION( 0x1000, "maincpu", 0 )
 	ROM_LOAD( "m88", 0x0000, 0x1000, CRC(1b3d15e7) SHA1(78371230dff872d6c07eefdbc4856c2a3336eb61) )
 
-	ROM_REGION( 668221, "svg", 0)
-	ROM_LOAD( "taltbeast.svg", 0, 668221, CRC(9b41b5b9) SHA1(4c520f917572894a2f0ab92efbd344c6bc6deccc) )
+	ROM_REGION( 667887, "svg", 0)
+	ROM_LOAD( "taltbeast.svg", 0, 667887, CRC(1ca9bbf1) SHA1(be844dddee4a95f70ea2adf875d3ee6cda2a6633) )
 ROM_END
 
 
