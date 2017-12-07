@@ -26,8 +26,8 @@
 	<software name="sideline" supported="partial">
 		<description>Sideline</description>
 		<year>1996</year>
-		<publisher>EMAG</publisher>
-		<info name="version" value="1.0"/ >
+		<publisher>EMAG Soft</publisher>
+		<info name="version" value="1.20"/ >
 		<part name="cdrom" interface="cdrom">
 			<feature name="disk_label" value="Sideline" />
 			<diskarea name="cdrom">
