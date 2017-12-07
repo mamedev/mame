@@ -1646,6 +1646,12 @@ void debugger_commands::execute_stateload(int ref, const std::vector<std::string
 
 void debugger_commands::execute_rewind(int ref, const std::vector<std::string> &params)
 {
+	if (!m_machine.save().rewind()->enabled())
+	{
+		m_console.printf("Rewind not enabled\n");
+		return;
+	}
+
 	m_machine.rewind_step();
 
 	// clear all PC & memory tracks
