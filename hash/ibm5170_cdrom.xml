@@ -22,6 +22,19 @@
 			</diskarea>
 		</part>
 	</software>
+	
+	<software name="sideline">
+		<description>Sideline</description>
+		<year>1996</year>
+		<publisher>EMAG Soft</publisher>
+		<info name="version" value="1.20"/ >
+		<part name="cdrom" interface="cdrom">
+			<feature name="disk_label" value="Sideline" />
+			<diskarea name="cdrom">
+				<disk name="sideline" sha1="2926390df55f17d1c472deb1ddeed428829af4e4" />
+			</diskarea>			
+		</part>
+	</software>
 
 	<software name="ultrasnd" supported="partial">
 		<!-- includes Gravis UltraSound (GUS) Installation - V4.11 -->
