@@ -579,7 +579,7 @@ INPUT_CHANGED_MEMBER(esq1_state::key_stroke)
 }
 
 static MACHINE_CONFIG_START( esq1 )
-	MCFG_CPU_ADD("maincpu", M6809E, 4000000)    // how fast is it?
+	MCFG_CPU_ADD("maincpu", MC6809, XTAL_8MHz) // XTAL not directly attached to CPU
 	MCFG_CPU_PROGRAM_MAP(esq1_map)
 
 	MCFG_DEVICE_ADD("duart", SCN2681, XTAL_8MHz / 2)

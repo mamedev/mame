@@ -62,7 +62,7 @@ static INPUT_PORTS_START( pitchhit )
 INPUT_PORTS_END
 
 static MACHINE_CONFIG_START( pitchhit )
-	MCFG_CPU_ADD("maincpu", M6809, XTAL_4MHz / 4)
+	MCFG_CPU_ADD("maincpu", MC6809, XTAL_4MHz) // clock buffered through 74HC4060
 	MCFG_CPU_PROGRAM_MAP(main_map)
 
 	MCFG_DEVICE_ADD("via", VIA6522, XTAL_4MHz / 4)

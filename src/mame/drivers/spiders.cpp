@@ -539,7 +539,7 @@ INPUT_PORTS_END
 static MACHINE_CONFIG_START( spiders )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6809, 2800000)
+	MCFG_CPU_ADD("maincpu", MC6809, 2800000)
 	MCFG_CPU_PROGRAM_MAP(spiders_main_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(spiders_state, update_pia_1,  25)
 

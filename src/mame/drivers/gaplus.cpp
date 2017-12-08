@@ -515,15 +515,15 @@ void gaplus_state::machine_start()
 static MACHINE_CONFIG_START( gaplus )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6809,  24576000/16)    /* 1.536 MHz */
+	MCFG_CPU_ADD("maincpu", MC6809E, XTAL_24_576MHz/16)    /* 1.536 MHz */
 	MCFG_CPU_PROGRAM_MAP(cpu1_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", gaplus_state,  vblank_main_irq)
 
-	MCFG_CPU_ADD("sub", M6809,  24576000/16)    /* 1.536 MHz */
+	MCFG_CPU_ADD("sub", MC6809E, XTAL_24_576MHz/16)    /* 1.536 MHz */
 	MCFG_CPU_PROGRAM_MAP(cpu2_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", gaplus_state,  vblank_sub_irq)
 
-	MCFG_CPU_ADD("sub2", M6809, 24576000/16)    /* 1.536 MHz */
+	MCFG_CPU_ADD("sub2", MC6809E, XTAL_24_576MHz/16)    /* 1.536 MHz */
 	MCFG_CPU_PROGRAM_MAP(cpu3_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", gaplus_state,  vblank_sub2_irq)
 
@@ -571,7 +571,7 @@ static MACHINE_CONFIG_START( gaplus )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("namco", NAMCO_15XX, 24576000/1024)
+	MCFG_SOUND_ADD("namco", NAMCO_15XX, XTAL_24_576MHz/1024)
 	MCFG_NAMCO_AUDIO_VOICES(8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 

@@ -363,11 +363,11 @@ void ironhors_state::machine_reset()
 static MACHINE_CONFIG_START( ironhors )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6809,18432000/6)        /* 3.072 MHz??? mod by Shingo Suzuki 1999/10/15 */
+	MCFG_CPU_ADD("maincpu", MC6809E, 18432000/6)        /* 3.072 MHz??? mod by Shingo Suzuki 1999/10/15 */
 	MCFG_CPU_PROGRAM_MAP(master_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", ironhors_state, irq, "screen", 0, 1)
 
-	MCFG_CPU_ADD("soundcpu",Z80,18432000/6)      /* 3.072 MHz */
+	MCFG_CPU_ADD("soundcpu", Z80, 18432000/6)      /* 3.072 MHz */
 	MCFG_CPU_PROGRAM_MAP(slave_map)
 	MCFG_CPU_IO_MAP(slave_io_map)
 

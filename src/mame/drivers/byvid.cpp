@@ -120,7 +120,7 @@ private:
 	bool m_u11_timer;
 	virtual void machine_reset() override;
 	required_device<m6800_cpu_device> m_maincpu;
-	required_device<m6809e_device> m_videocpu;
+	required_device<mc6809_device> m_videocpu;
 	required_device<m6803_cpu_device> m_audiocpu;
 	required_device<pia6821_device> m_pia_u7;
 	required_device<pia6821_device> m_pia_u10;
@@ -746,7 +746,7 @@ static MACHINE_CONFIG_START( babypac )
 	MCFG_CPU_ADD("maincpu", M6800, XTAL_3_579545MHz/4) // no xtal, just 2 chips
 	MCFG_CPU_PROGRAM_MAP(main_map)
 
-	MCFG_CPU_ADD("videocpu", M6809E, XTAL_3_579545MHz)
+	MCFG_CPU_ADD("videocpu", MC6809, XTAL_3_579545MHz)
 	MCFG_CPU_PROGRAM_MAP(video_map)
 
 	MCFG_CPU_ADD("audiocpu", M6803, XTAL_3_579545MHz)
@@ -807,7 +807,7 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( granny, babypac )
 	MCFG_DEVICE_REMOVE("videocpu")
-	MCFG_CPU_ADD("videocpu", M6809E, XTAL_8MHz) //??
+	MCFG_CPU_ADD("videocpu", MC6809, XTAL_8MHz) // MC68B09P (XTAL value hard to read)
 	MCFG_CPU_PROGRAM_MAP(granny_map)
 
 	MCFG_DEVICE_REMOVE("screen")

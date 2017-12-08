@@ -4,7 +4,7 @@
  *   Data East Pinball Dot Matrix Display
  *
  *    Type 2: 128x32
- *    68B09E @ 8MHz
+ *    68B09E @ 2MHz
  *    68B45 CRTC
  */
 
@@ -130,7 +130,7 @@ ADDRESS_MAP_END
 
 MACHINE_CONFIG_MEMBER( decodmd_type2_device::device_add_mconfig )
 	/* basic machine hardware */
-	MCFG_CPU_ADD("dmdcpu", M6809E, XTAL_8MHz)
+	MCFG_CPU_ADD("dmdcpu", MC6809E, XTAL_8MHz / 4)
 	MCFG_CPU_PROGRAM_MAP(decodmd2_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))

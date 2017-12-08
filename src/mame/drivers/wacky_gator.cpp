@@ -273,7 +273,7 @@ ADDRESS_MAP_END
 
 static MACHINE_CONFIG_START( wackygtr )
 
-	MCFG_CPU_ADD("maincpu", M6809E, XTAL_3_579545MHz)   // HD68B09P
+	MCFG_CPU_ADD("maincpu", MC6809, XTAL_3_579545MHz)   // HD68B09P
 	MCFG_CPU_PROGRAM_MAP(program_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(wackygtr_state, irq0_line_assert, 50)  // FIXME
 

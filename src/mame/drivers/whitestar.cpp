@@ -115,7 +115,7 @@ INTERRUPT_GEN_MEMBER(whitestar_state::whitestar_firq_interrupt)
 
 static MACHINE_CONFIG_START( whitestar )
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6809, 2000000)
+	MCFG_CPU_ADD("maincpu", MC6809E, 2000000)
 	MCFG_CPU_PROGRAM_MAP(whitestar_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(whitestar_state, whitestar_firq_interrupt,  976) // value taken from PinMAME
 

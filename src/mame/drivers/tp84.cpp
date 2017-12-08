@@ -331,11 +331,11 @@ INTERRUPT_GEN_MEMBER(tp84_state::sub_vblank_irq)
 static MACHINE_CONFIG_START( tp84 )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("cpu1",M6809, XTAL_18_432MHz/12) /* verified on pcb */
+	MCFG_CPU_ADD("cpu1", MC6809E, XTAL_18_432MHz/12) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(tp84_cpu1_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", tp84_state,  main_vblank_irq)
 
-	MCFG_CPU_ADD("sub", M6809, XTAL_18_432MHz/12)   /* verified on pcb */
+	MCFG_CPU_ADD("sub", MC6809E, XTAL_18_432MHz/12)   /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(cpu2_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", tp84_state,  sub_vblank_irq)
 

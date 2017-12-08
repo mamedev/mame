@@ -1921,7 +1921,7 @@ void halleys_state::machine_reset()
 
 
 static MACHINE_CONFIG_START( halleys )
-	MCFG_CPU_ADD("maincpu", M6809, XTAL_19_968MHz/12) /* verified on pcb */
+	MCFG_CPU_ADD("maincpu", MC6809E, XTAL_19_968MHz/12) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(halleys_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", halleys_state, halleys_scanline, "screen", 0, 1)
 

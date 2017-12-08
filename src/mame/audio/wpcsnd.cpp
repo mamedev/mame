@@ -67,7 +67,7 @@ uint8_t wpcsnd_device::data_r()
 }
 
 MACHINE_CONFIG_MEMBER( wpcsnd_device::device_add_mconfig )
-	MCFG_CPU_ADD("bgcpu", M6809E, XTAL_8MHz) // MC68B09E
+	MCFG_CPU_ADD("bgcpu", MC6809E, XTAL_8MHz / 4) // MC68B09E
 	MCFG_CPU_PROGRAM_MAP(wpcsnd_map)
 	MCFG_QUANTUM_TIME(attotime::from_hz(50))
 

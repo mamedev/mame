@@ -1280,7 +1280,7 @@ INPUT_PORTS_END
 static MACHINE_CONFIG_START( balsente )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6809, XTAL_20MHz/16) /* xtal verified but not speed */
+	MCFG_CPU_ADD("maincpu", MC6809E, XTAL_20MHz/16) /* xtal verified but not speed */
 	MCFG_CPU_PROGRAM_MAP(cpu1_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", balsente_state,  balsente_update_analog_inputs)
 

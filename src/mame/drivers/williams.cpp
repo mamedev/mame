@@ -1436,7 +1436,7 @@ GFXDECODE_END
 static MACHINE_CONFIG_START( williams )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6809, MASTER_CLOCK/3/4)
+	MCFG_CPU_ADD("maincpu", MC6809E, MASTER_CLOCK/3/4)
 	MCFG_CPU_PROGRAM_MAP(williams_map)
 
 	MCFG_CPU_ADD("soundcpu", M6808, SOUND_CLOCK) // internal clock divider of 4, effective frequency is 894.886kHz
@@ -1650,7 +1650,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( williams2 )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6809, MASTER_CLOCK/3/4)
+	MCFG_CPU_ADD("maincpu", MC6809E, MASTER_CLOCK/3/4)
 	MCFG_CPU_PROGRAM_MAP(williams2_d000_ram_map)
 
 	MCFG_CPU_ADD("soundcpu", M6808, MASTER_CLOCK/3) /* yes, this is different from the older games */

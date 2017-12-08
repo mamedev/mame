@@ -946,7 +946,7 @@ static MACHINE_CONFIG_START( ddragon )
 	MCFG_CPU_ADD("sub", HD63701, MAIN_CLOCK / 2)    /* 6 MHz / 4 internally */
 	MCFG_CPU_PROGRAM_MAP(sub_map)
 
-	MCFG_CPU_ADD("soundcpu", M6809, MAIN_CLOCK / 8) /* 1.5 MHz */
+	MCFG_CPU_ADD("soundcpu", MC6809, MAIN_CLOCK / 2) /* 6 MHz / 4 internally */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(60000)) /* heavy interleaving to sync up sprite<->main CPUs */
@@ -1009,14 +1009,14 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( ddragon6809 )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6809, MAIN_CLOCK / 8)  /* 1.5 MHz */
+	MCFG_CPU_ADD("maincpu", MC6809E, MAIN_CLOCK / 8)  /* 1.5 MHz */
 	MCFG_CPU_PROGRAM_MAP(ddragon_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", ddragon_state, ddragon_scanline, "screen", 0, 1)
 
-	MCFG_CPU_ADD("sub", M6809, MAIN_CLOCK / 8)  /* 1.5 Mhz */
+	MCFG_CPU_ADD("sub", MC6809E, MAIN_CLOCK / 8)  /* 1.5 Mhz */
 	MCFG_CPU_PROGRAM_MAP(sub_map)
 
-	MCFG_CPU_ADD("soundcpu", M6809, MAIN_CLOCK / 8) /* 1.5 MHz */
+	MCFG_CPU_ADD("soundcpu", MC6809E, MAIN_CLOCK / 8) /* 1.5 MHz */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(60000)) /* heavy interleaving to sync up sprite<->main CPUs */

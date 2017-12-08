@@ -316,14 +316,14 @@ void capbowl_state::machine_reset()
 static MACHINE_CONFIG_START( capbowl )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6809E, MASTER_CLOCK)
+	MCFG_CPU_ADD("maincpu", MC6809E, MASTER_CLOCK / 4) // MC68B09EP
 	MCFG_CPU_PROGRAM_MAP(capbowl_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", capbowl_state,  interrupt)
 
 	MCFG_WATCHDOG_ADD("watchdog")
 	MCFG_WATCHDOG_TIME_INIT(PERIOD_OF_555_ASTABLE(100000.0, 100000.0, 0.1e-6) * 15.5) // ~0.3s
 
-	MCFG_CPU_ADD("audiocpu", M6809E, MASTER_CLOCK)
+	MCFG_CPU_ADD("audiocpu", MC6809E, MASTER_CLOCK / 4) // MC68B09EP
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 //  MCFG_WATCHDOG_TIME_INIT(PERIOD_OF_555_ASTABLE(100000.0, 100000.0, 0.1e-6) * 15.5) // TODO
 
@@ -348,7 +348,7 @@ static MACHINE_CONFIG_START( capbowl )
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("ymsnd", YM2203, MASTER_CLOCK/2)
+	MCFG_SOUND_ADD("ymsnd", YM2203, MASTER_CLOCK / 2)
 	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("audiocpu", M6809_FIRQ_LINE))
 	MCFG_AY8910_PORT_A_READ_CB(DEVREADLINE("ticket", ticket_dispenser_device, line_r)) MCFG_DEVCB_BIT(7)
 	MCFG_AY8910_PORT_B_WRITE_CB(DEVWRITELINE("ticket", ticket_dispenser_device, motor_w)) MCFG_DEVCB_BIT(7)  /* Also a status LED. See memory map above */

@@ -77,6 +77,21 @@ March 2013 NPW:
     Removed unused jmp/jsr _slap functions from 6809ops.c,
     m6809_slapstick check moved into the opcode functions.
 
+******************************************************************************
+
+    M6809 cycle timings are relative to a four-phase clock cycle defined by
+    the Q and E signals on pins 35 and 34. The Q clock must lead the E clock
+    by approximately half a cycle. On the MC6809E, Q and E are inputs, and
+    one 74LS74 wired as a two-stage Johnson counter is almost sufficient to
+    generate both (though E requires voltage levels above TTL). On the
+    MC6809, however, Q and E are output from an internal clock generator
+    which can be driven by a crystal oscillator connected to pins 38 and 39.
+    (The MC6809E reuses the same numbered pins for the unrelated TSC and LIC
+    functions.) The frequencies of Q and E on the MC6809 are that of the XTAL
+    divided by 4. MAME's emulation formerly assigned this internal clock
+    divider to the MC6809E and not to the MC6809; the confusion resulting
+    from this error is in the process of being straightened out.
+
 *****************************************************************************/
 
 #include "emu.h"
@@ -104,8 +119,10 @@ March 2013 NPW:
 //  DEVICE INTERFACE
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE(M6809, m6809_device, "m6809", "M6809")
-DEFINE_DEVICE_TYPE(M6809E, m6809e_device, "m6809e", "M6809E")
+DEFINE_DEVICE_TYPE(MC6809, mc6809_device, "mc6809", "MC6809")
+DEFINE_DEVICE_TYPE(MC6809E, mc6809e_device, "mc6809e", "MC6809E")
+DEFINE_DEVICE_TYPE(M6809, m6809_device, "m6809", "MC6809 (legacy)")
+DEFINE_DEVICE_TYPE(M6809E, m6809e_device, "m6809e", "MC6809E (legacy)")
 
 
 //-------------------------------------------------
@@ -573,6 +590,28 @@ uint8_t m6809_base_device::mi_default::read_opcode_arg(uint16_t adr)
 void m6809_base_device::mi_default::write(uint16_t adr, uint8_t val)
 {
 	m_program->write_byte(adr, val);
+}
+
+
+
+//-------------------------------------------------
+//  mc6809_device
+//-------------------------------------------------
+
+mc6809_device::mc6809_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: m6809_base_device(mconfig, tag, owner, clock, MC6809, 4)
+{
+}
+
+
+
+//-------------------------------------------------
+//  mc6809e_device
+//-------------------------------------------------
+
+mc6809e_device::mc6809e_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+		: m6809_base_device(mconfig, tag, owner, clock, MC6809E, 1)
+{
 }
 
 

@@ -17,7 +17,7 @@
 #include "includes/konamipt.h"
 
 #include "cpu/z80/z80.h"
-#include "cpu/m6809/m6809.h"
+#include "cpu/m6809/hd6309.h"
 #include "cpu/m6809/konami.h"
 #include "sound/ym2151.h"
 #include "speaker.h"
@@ -173,7 +173,7 @@ static MACHINE_CONFIG_START( ajax )
 	MCFG_CPU_ADD("maincpu", KONAMI, XTAL_24MHz/2/4)    /* 052001 12/4 MHz*/
 	MCFG_CPU_PROGRAM_MAP(ajax_main_map)
 
-	MCFG_CPU_ADD("sub", M6809, 3000000) /* ? */
+	MCFG_CPU_ADD("sub", HD6309, 3000000) /* ? */
 	MCFG_CPU_PROGRAM_MAP(ajax_sub_map)
 
 	MCFG_CPU_ADD("audiocpu", Z80, 3579545)  /* 3.58 MHz */
