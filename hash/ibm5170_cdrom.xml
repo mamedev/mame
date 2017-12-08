@@ -31,7 +31,7 @@
 		<part name="cdrom" interface="cdrom">
 			<feature name="disk_label" value="Prototype" />
 			<diskarea name="cdrom">
-				<disk name="prototyp" sha1="f6695bf4e59f7821e2918e9df7390aee6c5c70dc" />
+				<disk name="prototyp" sha1="0cdfabab37e5e9b219b3c8a381c937ae52749bb1" />
 			</diskarea>
 		</part>
 	</software>
