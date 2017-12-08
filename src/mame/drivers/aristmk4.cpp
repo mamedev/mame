@@ -1747,7 +1747,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(aristmk4_state::aristmk4_pf)
 
 static MACHINE_CONFIG_START( aristmk4 )
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6809, MAIN_CLOCK/8) // 1.5mhz
+	MCFG_CPU_ADD("maincpu", M6809, MAIN_CLOCK/8) // M68B09E @ 1.5 MHz
 	MCFG_CPU_PROGRAM_MAP(aristmk4_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", aristmk4_state,  irq0_line_hold)
 
@@ -1772,7 +1772,7 @@ static MACHINE_CONFIG_START( aristmk4 )
 	MCFG_I8255_IN_PORTB_CB(READ8(aristmk4_state, pb1_r))
 	MCFG_I8255_IN_PORTC_CB(READ8(aristmk4_state, pc1_r))
 
-	MCFG_DEVICE_ADD("via6522_0", VIA6522, 0) /* 1 MHz.(only 1 or 2 MHz.are valid) */
+	MCFG_DEVICE_ADD("via6522_0", VIA6522, MAIN_CLOCK/8) // R65C22P2
 	MCFG_VIA6522_READPA_HANDLER(READ8(aristmk4_state, via_a_r))
 	MCFG_VIA6522_READPB_HANDLER(READ8(aristmk4_state, via_b_r))
 	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(aristmk4_state, via_a_w))

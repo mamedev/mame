@@ -98,6 +98,7 @@ private:
 
 	rf5c400_channel m_channels[32];
 
+	uint16_t m_rf5c400_status;
 	uint32_t m_ext_mem_address;
 	uint16_t m_ext_mem_data;
 };

@@ -985,6 +985,7 @@ READ8_MEMBER(towns_state::towns_padport_r)
 					break;
 				case MOUSE_START:
 				case MOUSE_SYNC:
+					break;
 				default:
 					if(m_towns_mouse_output < MOUSE_Y_LOW)
 						ret |= 0x0f;
@@ -1072,6 +1073,7 @@ READ8_MEMBER(towns_state::towns_padport_r)
 					break;
 				case MOUSE_START:
 				case MOUSE_SYNC:
+					break;
 				default:
 					if(m_towns_mouse_output < MOUSE_Y_LOW)
 						ret |= 0x0f;

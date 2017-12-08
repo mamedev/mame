@@ -90,6 +90,27 @@ READ32_MEMBER(pgm2_state::rtc_r)
 	return machine().time().seconds();
 }
 
+READ8_MEMBER(pgm2_state::encryption_r)
+{
+	return m_encryption_table[offset];
+}
+
+WRITE8_MEMBER(pgm2_state::encryption_w)
+{
+	m_encryption_table[offset] = data;
+}
+
+WRITE32_MEMBER(pgm2_state::encryption_do_w)
+{
+	if (m_has_decrypted == 0)
+	{
+		igs036_decryptor decrypter(m_encryption_table);
+		decrypter.decrypter_rom(memregion("user1"));
+		m_has_decrypted = 1;
+	}
+}
+
+
 INTERRUPT_GEN_MEMBER(pgm2_state::igs_interrupt)
 {
 	m_arm_aic->set_irq(0x47);
@@ -150,7 +171,7 @@ static ADDRESS_MAP_START( pgm2_map, AS_PROGRAM, 32, pgm2_state )
 
 	// internal to IGS036? - various other writes down here on startup too - could be other standard ATMEL peripherals like the ARM_AIC mixed with custom bits
 	AM_RANGE(0xffffec00, 0xffffec5f) AM_RAM
-	AM_RANGE(0xfffffc00, 0xfffffcff) AM_RAM // confirmed as encryption table for main program rom (see code at 3950)
+	AM_RANGE(0xfffffc00, 0xfffffcff) AM_READWRITE8(encryption_r,encryption_w, 0xffffffff) // confirmed as encryption table for main program rom (see code at 3950)
 
 	AM_RANGE(0xfffff000, 0xfffff14b) AM_DEVICE("arm_aic", arm_aic_device, regs_map)
 
@@ -159,7 +180,7 @@ static ADDRESS_MAP_START( pgm2_map, AS_PROGRAM, 32, pgm2_state )
 
 	AM_RANGE(0xfffffd28, 0xfffffd2b) AM_READ(rtc_r)
 
-//  AM_RANGE(0xfffffa08, 0xfffffa0b) AM_WRITE(table_done_w) // after uploading encryption? table might actually send it or enable external ROM?
+	AM_RANGE(0xfffffa08, 0xfffffa0b) AM_WRITE(encryption_do_w) // after uploading encryption? table might actually send it or enable external ROM?
 	AM_RANGE(0xfffffa0c, 0xfffffa0f) AM_READ(unk_startup_r)
 ADDRESS_MAP_END
 
@@ -266,6 +287,8 @@ WRITE_LINE_MEMBER(pgm2_state::irq)
 
 void pgm2_state::machine_start()
 {
+	save_item(NAME(m_encryption_table));
+	save_item(NAME(m_has_decrypted));
 }
 
 void pgm2_state::machine_reset()
@@ -751,8 +774,7 @@ DRIVER_INIT_MEMBER(pgm2_state,orleg2)
 	src = (uint16_t *)memregion("sprites_colour")->base();
 	sprite_colour_decode(src, 0x4000000);
 
-	igs036_decryptor decrypter(orleg2_key);
-	decrypter.decrypter_rom(memregion("user1"));
+	m_has_decrypted = 0;
 
 	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0x20020114, 0x20020117, read32_delegate(FUNC(pgm2_state::orleg2_speedup_r),this));
 }
@@ -767,8 +789,7 @@ DRIVER_INIT_MEMBER(pgm2_state,kov2nl)
 	src = (uint16_t *)memregion("sprites_colour")->base();
 	sprite_colour_decode(src, 0x4000000);
 
-	igs036_decryptor decrypter(kov2_key);
-	decrypter.decrypter_rom(memregion("user1"));
+	m_has_decrypted = 0;
 
 	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0x20020470, 0x20020473, read32_delegate(FUNC(pgm2_state::kov2nl_speedup_r), this));
 }
@@ -785,6 +806,7 @@ DRIVER_INIT_MEMBER(pgm2_state,ddpdojh)
 
 	igs036_decryptor decrypter(ddpdoj_key);
 	decrypter.decrypter_rom(memregion("user1"));
+	m_has_decrypted = 1;
 }
 
 DRIVER_INIT_MEMBER(pgm2_state,kov3)
@@ -799,6 +821,7 @@ DRIVER_INIT_MEMBER(pgm2_state,kov3)
 
 	igs036_decryptor decrypter(kov3_key);
 	decrypter.decrypter_rom(memregion("user1"));
+	m_has_decrypted = 1;
 }
 
 void pgm2_state::decrypt_kov3_module(uint32_t addrxor, uint16_t dataxor)
@@ -844,6 +867,7 @@ DRIVER_INIT_MEMBER(pgm2_state,kof98umh)
 
 	igs036_decryptor decrypter(kof98umh_key);
 	decrypter.decrypter_rom(memregion("user1"));
+	m_has_decrypted = 1;
 }
 
 /* PGM2 */

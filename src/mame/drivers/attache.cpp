@@ -800,16 +800,14 @@ WRITE_LINE_MEMBER( attache_state::fdc_dack_w )
 WRITE8_MEMBER(attache816_state::x86_comms_w)
 {
 	m_comms_val = data;
+	m_ppi->pc6_w(1);
 	m_z80_rx_ready = false;
-	machine().scheduler().synchronize();
-	logerror("x86 writes %02x to comms\n",data);
 }
 
 READ8_MEMBER(attache816_state::x86_comms_r)
 {
 	m_z80_tx_ready = false;
-	logerror("x86 reads %02x from comms\n",m_comms_val);
-	machine().scheduler().synchronize();
+	m_ppi->pc4_w(1);
 	return m_comms_val;
 }
 
@@ -850,19 +848,14 @@ READ8_MEMBER(attache816_state::z80_comms_r)
 {
 	m_z80_rx_ready = true;
 	m_ppi->pc6_w(0);
-	logerror("z80 reads %02x from comms\n",m_comms_val);
-	machine().scheduler().synchronize();
 	return m_comms_val;
 }
 
 WRITE8_MEMBER(attache816_state::z80_comms_w)
 {
 	m_comms_val = data;
-	logerror("z80 writes %02x to comms\n",data);
 	m_z80_tx_ready = true;
 	m_ppi->pc4_w(0);
-	machine().scheduler().synchronize();
-//  m_ppi->write(space,0,data);
 }
 
 // Z80 comms status
@@ -1171,6 +1164,7 @@ static MACHINE_CONFIG_START( attache816 )
 	MCFG_CPU_ADD("extcpu",I8086,XTAL_24MHz / 3)
 	MCFG_CPU_PROGRAM_MAP(attache_x86_map)
 	MCFG_CPU_IO_MAP(attache_x86_io)
+	MCFG_QUANTUM_PERFECT_CPU("extcpu")
 
 	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green())
 	MCFG_SCREEN_REFRESH_RATE(60)

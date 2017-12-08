@@ -830,6 +830,7 @@ nmk16.cpp
 norautp.cpp
 notechan.cpp
 nova2001.cpp
+nsg6809.cpp
 nsm.cpp
 nsmpoker.cpp
 nss.cpp

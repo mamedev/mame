@@ -49,6 +49,10 @@ public:
 	DECLARE_READ32_MEMBER(orleg2_speedup_r);
 	DECLARE_READ32_MEMBER(kov2nl_speedup_r);
 
+	DECLARE_READ8_MEMBER(encryption_r);
+	DECLARE_WRITE8_MEMBER(encryption_w);
+	DECLARE_WRITE32_MEMBER(encryption_do_w);
+
 	DECLARE_DRIVER_INIT(kov2nl);
 	DECLARE_DRIVER_INIT(orleg2);
 	DECLARE_DRIVER_INIT(ddpdojh);
@@ -91,6 +95,9 @@ private:
 
 	uint32_t m_sprites_mask_mask;
 	uint32_t m_sprites_colour_mask;
+	
+	uint8_t m_encryption_table[0x100];
+	int m_has_decrypted;	// so we only do it once.
 
 	// devices
 	required_device<cpu_device> m_maincpu;

@@ -94,6 +94,7 @@ static const help_item static_help_list[] =
 		"  pcatmemd <address>[,<cpu>] -- query which PC wrote to a given data memory address for the current CPU\n"
 		"  pcatmemi <address>[,<cpu>] -- query which PC wrote to a given I/O memory address for the current CPU\n"
 		"                                (Note: you can also query this info by right clicking in a memory window\n"
+		"  rewind[rw] -- go back in time by loading the most recent rewind state"
 		"  statesave[ss] <filename> -- save a state file for the current driver\n"
 		"  stateload[sl] <filename> -- load a state file for the current driver\n"
 		"  snap [<filename>] -- save a screen snapshot.\n"
@@ -455,6 +456,19 @@ static const help_item static_help_list[] =
 		"  Print which PC wrote this CPU's memory location 0x400000.\n"
 	},
 	{
+		"rewind[rw]",
+		"\n"
+		"  rewind[rw]"
+		"\n"
+		"The rewind command loads the most recent RAM-based state.  Rewind states, when enabled, are "
+		"saved when \"step\", \"over\", or \"out\" command gets executed, storing the machine state as "
+		"of the moment before actually stepping.  Consecutively loading rewind states can work like "
+		"reverse execution.  Depending on which steps forward were taken previously, the bahavior can "
+		"be similar to GDB's \"reverse-stepi\" or \"reverse-next\".  All output for this command is "
+		"currently echoed into the running machine window.  Previous memory and PC tracking statistics "
+		"are cleared, actual reverse execution does not occur.\n"
+	},
+	{
 		"statesave[ss]",
 		"\n"
 		"  statesave[ss] <filename>\n"
@@ -472,7 +486,7 @@ static const help_item static_help_list[] =
 	{
 		"stateload[sl]",
 		"\n"
-		"  stateload[ss] <filename>\n"
+		"  stateload[sl] <filename>\n"
 		"\n"
 		"The stateload command retrieves a save state from disk. "
 		"The given state file gets read from the standard state directory (sta), and gets .sta to it - "

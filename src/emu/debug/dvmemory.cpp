@@ -936,13 +936,14 @@ void debug_view_memory::set_data_format(int format)
 		return;
 
 	pos = begin_update_and_get_cursor_pos();
+	const debug_view_memory_source &source = downcast<const debug_view_memory_source &>(*m_source);
 	if ((format <= 8) && (m_data_format <= 8)) {
-		const debug_view_memory_source &source = downcast<const debug_view_memory_source &>(*m_source);
 
 		pos.m_address += (pos.m_shift / 8) ^ ((source.m_endianness == ENDIANNESS_LITTLE) ? 0 : (m_bytes_per_chunk - 1));
 		pos.m_shift %= 8;
 
 		m_bytes_per_chunk = format;
+		m_steps_per_chunk = source.m_space ? source.m_space->byte_to_address(m_bytes_per_chunk) : m_bytes_per_chunk;
 		m_chunks_per_row = m_bytes_per_row / format;
 		if (m_chunks_per_row < 1)
 			m_chunks_per_row = 1;
@@ -975,6 +976,7 @@ void debug_view_memory::set_data_format(int format)
 			}
 		}
 		m_chunks_per_row = m_bytes_per_row / m_bytes_per_chunk;
+		m_steps_per_chunk = source.m_space ? source.m_space->byte_to_address(m_bytes_per_chunk) : m_bytes_per_chunk;
 		pos.m_shift = 0;
 		pos.m_address -= pos.m_address % m_bytes_per_chunk;
 	}
