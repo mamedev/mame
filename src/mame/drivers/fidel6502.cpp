@@ -351,6 +351,27 @@ CPU D6 to W: (model 6092, tied to VCC otherwise)
 - D2-D6: VCC
 - D7: TSI BUSY
 
+------------------
+One interesting clone of The Excellence is the Computerchess Playmate-2. It was
+produced in 1989 by SPS(Bulgaria) and RRR(Riga Radio Factory). The chess program
+ROM is identical to Excellence EP12. All internal circuitry is the same, the only
+difference is the capacitor driving the 555 for IRQ is 10nf instead of 22nf.
+
+What makes it unique is the addition of a chess clock.
+
+connector pinout from main pcb:
+1) 5V
+2) GND
+3) 74HC259.pin9 (Q4) = Row LED driving
+4) 74HC259.pin10 (Q5) = Column LED driving
+5) 74HC259.pin12 (Q7) = Bat. Low signal
+6) 74HC42.pin4 (Q3) = Col-D/Row-4 -> 'White Move' if D-LED blinks
+
+The extra board has a 7474, a К1016ХЛ1 (RTC, or MCU clock driver), a 4-digit
+VFD display, and some buttons for controlling the clock. IRQ frequency is doubled
+presumedly for using the blinking led as seconds counter. It only tracks player time,
+not of the opponent. And it obviously doesn't show chessmove coordinates either.
+
 
 ******************************************************************************
 
