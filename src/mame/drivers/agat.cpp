@@ -2,18 +2,51 @@
 // copyright-holders:R. Belmont, Sergey Svishchev
 /***************************************************************************
 
-    agat.c
-    Skeleton driver for Agat series of Soviet Apple II non-clones
+    agat.cpp
 
-    These are similar to Apple II (same bus architecture, keyboard and
-    floppy interface), but video controller is completely different.
+    Driver for Agat series of Soviet Apple II non-clones
 
-    To do:
-    - native keyboards (at least two variants)
-    - 840K floppy controller (MFM encoding, but track layout is unique)
-    - agat7: 64K and 128K onboard memory configurations
-    - agat9
-    - 3rd party slot devices
+    These are similar to Apple II (same bus architecture, keyboard
+    and floppy interface), but native video controllers are different.
+
+    agat7 supports Apple (40col, HGR and DHR) video modes with add-on
+    card; agat9 has built-in support for 40col and HGR.  Palette in
+    Apple modes is different and pixel stretching is not done.
+
+    To do (common):
+    - native keyboard (at least two variants)
+    - video: text modes use 7x8 character cell and 224x256 raster
+    - video: vertical raster splits (used at least by Rapira)
+    - what is the state of devices at init and reset?
+    - what do floating bus reads do?
+    - ignore debugger reads -- use side_effect_disabled()
+    - softlists
+
+    To do (agat7):
+    - hw variant: 16 colors
+    - hw variant: 256-char chargen
+    - hw variant: 64K and 128K onboard memory
+    - "500hz" interrupt breakage
+    - what does write to C009 do? (basedos7.nib)
+
+    To do (agat9):
+    - memory banking: what does write to C18x..C1Fx do?
+    - memory expansion boards
+    - apple2 video compat mode incl. language card emulation
+    - 840K floppy controller: low level emulation, AIM format support
+    - mouse via parallel port
+    - hw revisions and agat9a model (via http://agatcomp.ru/Images/case.shtml)
+
+    Slot devices -- 1st party:
+    - agat7: apple2 video card (decimal 3.089.121) -- http://agatcomp.ru/Images/new_j121.shtml
+    - agat7: serial-parallel card (decimal 3.089.10)6
+    - agat9: printer card (decimal 3.089.17)4
+
+    Slot devices -- 3rd party:
+    - Nippel Clock (uses mc146818)
+    - Nippel mouse -- http://agatcomp.ru/Images/new_mouse.shtml
+    - Sprite Card-93 (uses fd1793)
+    - others
 
 ************************************************************************/
 
@@ -27,6 +60,7 @@
 #include "bus/a2bus/a2diskii.h"
 #include "bus/a2bus/agat7langcard.h"
 #include "bus/a2bus/agat7ram.h"
+#include "bus/a2bus/agat840k_hle.h"
 
 #include "screen.h"
 #include "softlist.h"
@@ -78,14 +112,12 @@ public:
 	required_device<address_map_bank_device> m_upperbank;
 
 	TIMER_DEVICE_CALLBACK_MEMBER(ay3600_repeat);
-	TIMER_DEVICE_CALLBACK_MEMBER(agat_timer);
-	TIMER_DEVICE_CALLBACK_MEMBER(agat_vblank);
+	TIMER_DEVICE_CALLBACK_MEMBER(timer_irq);
+	INTERRUPT_GEN_MEMBER(agat_vblank);
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	DECLARE_READ8_MEMBER(c000_r);
-	DECLARE_WRITE8_MEMBER(c000_w);
 	DECLARE_READ8_MEMBER(c080_r);
 	DECLARE_WRITE8_MEMBER(c080_w);
 	DECLARE_READ8_MEMBER(c100_r);
@@ -106,6 +138,20 @@ public:
 	DECLARE_WRITE8_MEMBER(agat7_membank_w);
 	DECLARE_READ8_MEMBER(agat7_ram_r);
 	DECLARE_WRITE8_MEMBER(agat7_ram_w);
+	DECLARE_READ8_MEMBER(keyb_data_r);
+	DECLARE_READ8_MEMBER(keyb_strobe_r);
+	DECLARE_WRITE8_MEMBER(keyb_strobe_w);
+	DECLARE_READ8_MEMBER(cassette_toggle_r);
+	DECLARE_WRITE8_MEMBER(cassette_toggle_w);
+	DECLARE_READ8_MEMBER(speaker_toggle_r);
+	DECLARE_WRITE8_MEMBER(speaker_toggle_w);
+	DECLARE_READ8_MEMBER(interrupts_on_r);
+	DECLARE_WRITE8_MEMBER(interrupts_on_w);
+	DECLARE_READ8_MEMBER(interrupts_off_r);
+	DECLARE_WRITE8_MEMBER(interrupts_off_w);
+	DECLARE_READ8_MEMBER(flags_r);
+	DECLARE_READ8_MEMBER(controller_strobe_r);
+	DECLARE_WRITE8_MEMBER(controller_strobe_w);
 
 private:
 	int m_speaker_state;
@@ -291,120 +337,123 @@ void agat7_state::machine_reset()
 /***************************************************************************
     I/O
 ***************************************************************************/
-// most softswitches don't care about read vs write, so handle them here
-void agat7_state::do_io(address_space &space, int offset)
+
+READ8_MEMBER(agat7_state::keyb_data_r)
 {
-	if (machine().side_effect_disabled())
-	{
-		return;
-	}
-
-	switch (offset & 0xf0)
-	{
-		case 0x20:
-			m_cassette_state ^= 1;
-			m_cassette->output(m_cassette_state ? 1.0f : -1.0f);
-			break;
-
-		case 0x30:
-			m_speaker_state ^= 1;
-			m_speaker->level_w(m_speaker_state);
-			break;
-
-		// XXX agat7: 0x4N -- enable timer interrupts, 0x5N -- disable (or vice versa depending on hw rev)
-		case 0x40:
-			m_agat7_interrupts = true;
-			break;
-
-		case 0x50:
-			m_agat7_interrupts = false;
-
-		case 0x70:
-			m_joystick_x1_time = machine().time().as_double() + m_x_calibration * m_joy1x->read();
-			m_joystick_y1_time = machine().time().as_double() + m_y_calibration * m_joy1y->read();
-			m_joystick_x2_time = machine().time().as_double() + m_x_calibration * m_joy2x->read();
-			m_joystick_y2_time = machine().time().as_double() + m_y_calibration * m_joy2y->read();
-			break;
-	}
+	return m_strobe ? (m_transchar | m_strobe) : 0;
 }
 
-READ8_MEMBER(agat7_state::c000_r)
+READ8_MEMBER(agat7_state::keyb_strobe_r)
 {
-	if (offset)
-	logerror("%s: c000_r %04X == %02X\n", machine().describe_context(), offset+0xc000, 0);
-	else if (m_strobe)
-	logerror("%s: c000_r %04X == %02X\n", machine().describe_context(), offset+0xc000, m_transchar | m_strobe);
+	// reads any key down, clears strobe
+	uint8_t rv = m_transchar | (m_anykeydown ? 0x80 : 0x00);
+	if (!machine().side_effect_disabled())
+		m_strobe = 0;
+	return rv;
+}
 
-	switch (offset)
-	{
-		// keyboard latch.  NB: agat7 returns 0 if latch is clear, agat9 returns char code.
-		case 0x00: case 0x01: case 0x02: case 0x03: case 0x04: case 0x05: case 0x06: case 0x07:
-		case 0x08: case 0x09: case 0x0a: case 0x0b: case 0x0c: case 0x0d: case 0x0e: case 0x0f:
-			return m_strobe ? (m_transchar | m_strobe) : 0;
+WRITE8_MEMBER(agat7_state::keyb_strobe_w)
+{
+	// clear keyboard latch
+	m_strobe = 0;
+}
 
-		case 0x10:  // reads any key down, clears strobe
-			{
-				uint8_t rv = m_transchar | (m_anykeydown ? 0x80 : 0x00);
-				m_strobe = 0;
-				return rv;
-			}
-
-		case 0x60: // cassette in
-		case 0x68:
-			return m_cassette->input() > 0.0 ? 0x80 : 0;
-
-		case 0x61:  // button 0
-		case 0x69:
-			return (m_joybuttons->read() & 0x10) ? 0x80 : 0;
-
-		case 0x62:  // button 1
-		case 0x6a:
-			return (m_joybuttons->read() & 0x20) ? 0x80 : 0;
-
-		case 0x63:  // button 2
-		case 0x6b:
-			return ((m_joybuttons->read() & 0x40) || (m_kbspecial->read() & 0x06)) ? 0 : 0x80;
-
-		case 0x64:  // joy 1 X axis
-		case 0x6c:
-			return (space.machine().time().as_double() < m_joystick_x1_time) ? 0x80 : 0;
-
-		case 0x65:  // joy 1 Y axis
-		case 0x6d:
-			return (space.machine().time().as_double() < m_joystick_y1_time) ? 0x80 : 0;
-
-		case 0x66: // joy 2 X axis
-		case 0x6e:
-			return (space.machine().time().as_double() < m_joystick_x2_time) ? 0x80 : 0;
-
-		case 0x67: // joy 2 Y axis
-		case 0x6f:
-			return (space.machine().time().as_double() < m_joystick_y2_time) ? 0x80 : 0;
-
-		default:
-			do_io(space, offset);
-			break;
-	}
-
+READ8_MEMBER(agat7_state::cassette_toggle_r)
+{
+	if (!machine().side_effect_disabled())
+		cassette_toggle_w(space, offset, 0);
 	return read_floatingbus();
 }
 
-WRITE8_MEMBER(agat7_state::c000_w)
+WRITE8_MEMBER(agat7_state::cassette_toggle_w)
 {
-	logerror("%s: c000_w %04X <- %02X\n", machine().describe_context(), offset + 0xc000, data);
+	m_cassette_state ^= 1;
+	m_cassette->output(m_cassette_state ? 1.0f : -1.0f);
+}
 
+READ8_MEMBER(agat7_state::speaker_toggle_r)
+{
+	if (!machine().side_effect_disabled())
+		speaker_toggle_w(space, offset, 0);
+	return read_floatingbus();
+}
+
+WRITE8_MEMBER(agat7_state::speaker_toggle_w)
+{
+	m_speaker_state ^= 1;
+	m_speaker->level_w(m_speaker_state);
+}
+
+READ8_MEMBER(agat7_state::interrupts_on_r)
+{
+	if (!machine().side_effect_disabled())
+		interrupts_on_w(space, offset, 0);
+	return read_floatingbus();
+}
+
+WRITE8_MEMBER(agat7_state::interrupts_on_w)
+{
+	m_agat7_interrupts = true;
+}
+
+READ8_MEMBER(agat7_state::interrupts_off_r)
+{
+	if (!machine().side_effect_disabled())
+		interrupts_off_w(space, offset, 0);
+	return read_floatingbus();
+}
+
+WRITE8_MEMBER(agat7_state::interrupts_off_w)
+{
+	m_agat7_interrupts = false;
+}
+
+READ8_MEMBER(agat7_state::flags_r)
+{
 	switch (offset)
 	{
-		// clear keyboard latch
-		case 0x10: case 0x11: case 0x12: case 0x13: case 0x14: case 0x15: case 0x16: case 0x17:
-		case 0x18: case 0x19: case 0x1a: case 0x1b: case 0x1c: case 0x1d: case 0x1e: case 0x1f:
-			m_strobe = 0;
-			break;
+	case 0: // cassette in
+		return m_cassette->input() > 0.0 ? 0x80 : 0;
 
-		default:
-			do_io(space, offset);
-			break;
+	case 1: // button 0
+		return (m_joybuttons->read() & 0x10) ? 0x80 : 0;
+
+	case 2: // button 1
+		return (m_joybuttons->read() & 0x20) ? 0x80 : 0;
+
+	case 3: // button 2
+		return ((m_joybuttons->read() & 0x40) || !(m_kbspecial->read() & 0x06)) ? 0x80 : 0;
+
+	case 4: // joy 1 X axis
+		return (space.machine().time().as_double() < m_joystick_x1_time) ? 0x80 : 0;
+
+	case 5: // joy 1 Y axis
+		return (space.machine().time().as_double() < m_joystick_y1_time) ? 0x80 : 0;
+
+	case 6: // joy 2 X axis
+		return (space.machine().time().as_double() < m_joystick_x2_time) ? 0x80 : 0;
+
+	case 7: // joy 2 Y axis
+		return (space.machine().time().as_double() < m_joystick_y2_time) ? 0x80 : 0;
 	}
+
+	// this is never reached
+	return 0;
+}
+
+READ8_MEMBER(agat7_state::controller_strobe_r)
+{
+	if (!machine().side_effect_disabled())
+		controller_strobe_w(space, offset, 0);
+	return read_floatingbus();
+}
+
+WRITE8_MEMBER(agat7_state::controller_strobe_w)
+{
+	m_joystick_x1_time = machine().time().as_double() + m_x_calibration * m_joy1x->read();
+	m_joystick_y1_time = machine().time().as_double() + m_y_calibration * m_joy1y->read();
+	m_joystick_x2_time = machine().time().as_double() + m_x_calibration * m_joy2x->read();
+	m_joystick_y2_time = machine().time().as_double() + m_y_calibration * m_joy2y->read();
 }
 
 READ8_MEMBER(agat7_state::c080_r)
@@ -479,7 +528,7 @@ WRITE8_MEMBER(agat7_state::c100_w)
 			m_cnxx_slot = slotnum;
 		}
 
-		m_slotdevice[slotnum]->write_cnxx(space, offset&0xff, data);
+		m_slotdevice[slotnum]->write_cnxx(space, offset & 0xff, data);
 	}
 }
 
@@ -633,7 +682,14 @@ WRITE8_MEMBER(agat7_state::agat7_ram_w)
 static ADDRESS_MAP_START( agat7_map, AS_PROGRAM, 8, agat7_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0xbfff) AM_READWRITE(agat7_ram_r, agat7_ram_w)
-	AM_RANGE(0xc000, 0xc07f) AM_READWRITE(c000_r, c000_w)
+	AM_RANGE(0xc000, 0xc000) AM_MIRROR(0xf) AM_READ(keyb_data_r) AM_WRITENOP
+	AM_RANGE(0xc010, 0xc010) AM_MIRROR(0xf) AM_READWRITE(keyb_strobe_r, keyb_strobe_w)
+	AM_RANGE(0xc020, 0xc020) AM_MIRROR(0xf) AM_READWRITE(cassette_toggle_r, cassette_toggle_w)
+	AM_RANGE(0xc030, 0xc030) AM_MIRROR(0xf) AM_READWRITE(speaker_toggle_r, speaker_toggle_w)
+	AM_RANGE(0xc040, 0xc040) AM_MIRROR(0xf) AM_READWRITE(interrupts_on_r, interrupts_on_w)
+	AM_RANGE(0xc050, 0xc050) AM_MIRROR(0xf) AM_READWRITE(interrupts_off_r, interrupts_off_w)
+	AM_RANGE(0xc060, 0xc067) AM_MIRROR(0x8) AM_READ(flags_r) AM_WRITENOP
+	AM_RANGE(0xc070, 0xc070) AM_MIRROR(0xf) AM_READWRITE(controller_strobe_r, controller_strobe_w)
 	AM_RANGE(0xc080, 0xc0ef) AM_READWRITE(c080_r, c080_w)
 	AM_RANGE(0xc0f0, 0xc0ff) AM_READWRITE(agat7_membank_r, agat7_membank_w)
 	AM_RANGE(0xc100, 0xc6ff) AM_READWRITE(c100_r, c100_w)
@@ -725,20 +781,20 @@ static const uint8_t a2_key_remap[0x40][4] =
 	{ 0x1a,0x1a,0x1a,0x1a },    /* Down */
 	{ 0x10,0x10,0x10,0x10 },    /* KP1 */
 	{ 0x0d,0x0d,0x0d,0x0d },    /* Enter   31     */
-	{ 0x11,0x11,0x11,0x11 },
-	{ 0x12,0x12,0x12,0x12 },
-	{ 0x13,0x13,0x13,0x13 },
-	{ 0x14,0x14,0x14,0x14 },
-	{ 0x1c,0x1c,0x1c,0x1c },
-	{ 0x1d,0x1d,0x1d,0x1d },
-	{ 0x1e,0x1e,0x1e,0x1e },
-	{ 0x1f,0x1f,0x1f,0x1f },
-	{ 0x01,0x01,0x01,0x01 },
-	{ 0x02,0x02,0x02,0x02 },
-	{ 0x03,0x03,0x03,0x03 },
-	{ 0x04,0x04,0x04,0x04 },
-	{ 0x05,0x05,0x05,0x05 },
-	{ 0x06,0x06,0x06,0x06 },
+	{ 0x11,0x11,0x11,0x11 },    /* KP2 */
+	{ 0x12,0x12,0x12,0x12 },    /* KP3 */
+	{ 0x13,0x13,0x13,0x13 },    /* KP4 */
+	{ 0x14,0x14,0x14,0x14 },    /* KP5 */
+	{ 0x1c,0x1c,0x1c,0x1c },    /* KP6 */
+	{ 0x1d,0x1d,0x1d,0x1d },    /* KP7 */
+	{ 0x1e,0x1e,0x1e,0x1e },    /* KP8 */
+	{ 0x1f,0x1f,0x1f,0x1f },    /* KP9 */
+	{ 0x01,0x01,0x01,0x01 },    /* KP0 */
+	{ 0x02,0x02,0x02,0x02 },    /* KP. */
+	{ 0x03,0x03,0x03,0x03 },    /* KP= */
+	{ 0x04,0x04,0x04,0x04 },    /* PF1 */
+	{ 0x05,0x05,0x05,0x05 },    /* PF2 */
+	{ 0x06,0x06,0x06,0x06 },    /* PF3 */
 };
 
 WRITE_LINE_MEMBER(agat7_state::ay3600_data_ready_w)
@@ -777,19 +833,28 @@ TIMER_DEVICE_CALLBACK_MEMBER(agat7_state::ay3600_repeat)
 	}
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(agat7_state::agat_timer)
+INTERRUPT_GEN_MEMBER(agat7_state::agat_vblank)
 {
 	if (m_agat7_interrupts)
 	{
-		m_maincpu->set_input_line(M6502_IRQ_LINE, ASSERT_LINE);
+		m_maincpu->set_input_line(M6502_NMI_LINE, PULSE_LINE);
 	}
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(agat7_state::agat_vblank)
+TIMER_DEVICE_CALLBACK_MEMBER(agat7_state::timer_irq)
 {
 	if (m_agat7_interrupts)
 	{
-		m_maincpu->set_input_line(M6502_NMI_LINE, ASSERT_LINE);
+		switch (param & 0x3f)
+		{
+		case 0:
+			m_maincpu->set_input_line(M6502_IRQ_LINE, CLEAR_LINE);
+			break;
+
+		case 0x20:
+			m_maincpu->set_input_line(M6502_IRQ_LINE, ASSERT_LINE);
+			break;
+		}
 	}
 }
 
@@ -833,8 +898,8 @@ static INPUT_PORTS_START( agat7_joystick )
 	PORT_CODE_DEC(JOYCODE_Y_UP_SWITCH)      PORT_CODE_INC(JOYCODE_Y_DOWN_SWITCH)
 
 	PORT_START("joystick_buttons")
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1)  PORT_PLAYER(1)            PORT_CODE(KEYCODE_0_PAD)    PORT_CODE(JOYCODE_BUTTON1)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON2)  PORT_PLAYER(1)            PORT_CODE(KEYCODE_ENTER_PAD)PORT_CODE(JOYCODE_BUTTON2)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1)  PORT_PLAYER(1)            PORT_CODE(KEYCODE_0_PAD)    PORT_CODE(JOYCODE_BUTTON1) PORT_CHAR(UCHAR_MAMEKEY(0_PAD))
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON2)  PORT_PLAYER(1)            PORT_CODE(KEYCODE_ENTER_PAD)PORT_CODE(JOYCODE_BUTTON2) PORT_CHAR(UCHAR_MAMEKEY(ENTER_PAD))
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON1)  PORT_PLAYER(2)            PORT_CODE(JOYCODE_BUTTON1)
 INPUT_PORTS_END
 
@@ -879,7 +944,7 @@ static INPUT_PORTS_START( agat7_common )
 	PORT_BIT(0x040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_U)  PORT_CHAR('U') PORT_CHAR('u')
 	PORT_BIT(0x080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_I)  PORT_CHAR('I') PORT_CHAR('i')
 	PORT_BIT(0x100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_O)  PORT_CHAR('O') PORT_CHAR('o')
-	PORT_BIT(0x200, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_P)  PORT_CHAR('P') PORT_CHAR('@')
+	PORT_BIT(0x200, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_P)  PORT_CHAR('P') PORT_CHAR('p')
 
 	PORT_START("X2")
 	PORT_BIT(0x001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_D)  PORT_CHAR('D') PORT_CHAR('d')
@@ -890,8 +955,8 @@ static INPUT_PORTS_START( agat7_common )
 	PORT_BIT(0x020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_K)  PORT_CHAR('K') PORT_CHAR('k')
 	PORT_BIT(0x040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_L)  PORT_CHAR('L') PORT_CHAR('l')
 	PORT_BIT(0x080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_COLON) PORT_CHAR(';') PORT_CHAR('+')
-	PORT_BIT(0x100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(UTF8_LEFT)      PORT_CODE(KEYCODE_LEFT)
-	PORT_BIT(0x200, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(UTF8_RIGHT)     PORT_CODE(KEYCODE_RIGHT)
+	PORT_BIT(0x100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(UTF8_LEFT)      PORT_CODE(KEYCODE_LEFT) PORT_CHAR(UCHAR_MAMEKEY(LEFT))
+	PORT_BIT(0x200, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(UTF8_RIGHT)     PORT_CODE(KEYCODE_RIGHT) PORT_CHAR(UCHAR_MAMEKEY(RIGHT))
 
 	PORT_START("X3")
 	PORT_BIT(0x001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_Z)  PORT_CHAR('Z') PORT_CHAR('z')
@@ -912,8 +977,8 @@ static INPUT_PORTS_START( agat7_common )
 	PORT_BIT(0x008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Esc")      PORT_CODE(KEYCODE_ESC)      PORT_CHAR(27)
 	PORT_BIT(0x010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_A)          PORT_CHAR('A') PORT_CHAR('a')
 	PORT_BIT(0x020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_SPACE)  PORT_CHAR(' ')
-	PORT_BIT(0x040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(UTF8_UP)    PORT_CODE(KEYCODE_UP)
-	PORT_BIT(0x080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(UTF8_DOWN)  PORT_CODE(KEYCODE_DOWN)
+	PORT_BIT(0x040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(UTF8_UP)    PORT_CODE(KEYCODE_UP) PORT_CHAR(UCHAR_MAMEKEY(UP))
+	PORT_BIT(0x080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(UTF8_DOWN)  PORT_CODE(KEYCODE_DOWN) PORT_CHAR(UCHAR_MAMEKEY(DOWN))
 	PORT_BIT(0x100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Num 1") PORT_CODE(KEYCODE_7_PAD) PORT_CHAR(UCHAR_MAMEKEY(7_PAD))
 	PORT_BIT(0x200, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Return")   PORT_CODE(KEYCODE_ENTER)    PORT_CHAR(13)
 
@@ -932,8 +997,8 @@ static INPUT_PORTS_START( agat7_common )
 	PORT_START("X6")
 	PORT_BIT(0x001, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Num =") PORT_CODE(KEYCODE_ENTER_PAD) PORT_CHAR(UCHAR_MAMEKEY(ENTER_PAD))
 	PORT_BIT(0x002, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("PF1") PORT_CODE(KEYCODE_SLASH_PAD) PORT_CHAR(UCHAR_MAMEKEY(SLASH_PAD))
-	PORT_BIT(0x004, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("PF2") PORT_CODE(KEYCODE_ASTERISK)
-	PORT_BIT(0x008, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("PF3") PORT_CODE(KEYCODE_MINUS_PAD)
+	PORT_BIT(0x004, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("PF2") PORT_CODE(KEYCODE_ASTERISK) PORT_CHAR(UCHAR_MAMEKEY(ASTERISK))
+	PORT_BIT(0x008, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("PF3") PORT_CODE(KEYCODE_MINUS_PAD) PORT_CHAR(UCHAR_MAMEKEY(MINUS_PAD))
 	PORT_BIT(0x010, IP_ACTIVE_HIGH, IPT_UNUSED)
 	PORT_BIT(0x020, IP_ACTIVE_HIGH, IPT_UNUSED)
 	PORT_BIT(0x040, IP_ACTIVE_HIGH, IPT_UNUSED)
@@ -972,7 +1037,7 @@ static INPUT_PORTS_START( agat7_common )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Control")      PORT_CODE(KEYCODE_LCONTROL) PORT_CHAR(UCHAR_SHIFT_2)
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNUSED)
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("RESET")        PORT_CODE(KEYCODE_F12)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("RESET")        PORT_CODE(KEYCODE_F12) PORT_CHAR(UCHAR_MAMEKEY(F12))
 INPUT_PORTS_END
 
 static INPUT_PORTS_START(agat7)
@@ -991,7 +1056,7 @@ static SLOT_INTERFACE_START(agat7_cards)
 	SLOT_INTERFACE("a7lang", A2BUS_AGAT7LANGCARD) // Agat-7 RAM Language Card -- decimal 3.089.119
 	SLOT_INTERFACE("a7ram", A2BUS_AGAT7RAM) // Agat-7 32K RAM Card -- decimal 3.089.119-01, KR565RU6D chips
 	SLOT_INTERFACE("a7fdc", A2BUS_AGAT7_FDC) // Disk II clone -- decimal 3.089.105
-	// 840K floppy controller -- decimal 7.104.351
+	SLOT_INTERFACE("a7fdc840", A2BUS_AGAT840K_HLE) // 840K floppy controller -- decimal 7.104.351 or 3.089.023?
 	// Serial-parallel card -- decimal 3.089.106
 	// Printer card (agat9) -- decimal 3.089.174
 
@@ -1007,8 +1072,9 @@ SLOT_INTERFACE_END
 static MACHINE_CONFIG_START( agat7 )
 	MCFG_CPU_ADD("maincpu", M6502, XTAL_14_3MHz / 14)
 	MCFG_CPU_PROGRAM_MAP(agat7_map)
+	MCFG_CPU_VBLANK_INT_DRIVER(A7_VIDEO_TAG ":a7screen", agat7_state, agat_vblank)
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("agat7irq", agat7_state, agat_timer, attotime::from_hz(500))
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", agat7_state, timer_irq, A7_VIDEO_TAG ":a7screen", 0, 1)
 
 	MCFG_DEVICE_ADD(A7_VIDEO_TAG, AGAT7VIDEO, 0)
 
@@ -1111,5 +1177,5 @@ ROM_START( agat9 )
 ROM_END
 
 //    YEAR  NAME      PARENT    COMPAT    MACHINE      INPUT    STATE         INIT      COMPANY            FULLNAME  FLAGS
-COMP( 1983, agat7,    apple2,   0,        agat7,       agat7,   agat7_state,  0,        "Agat",            "Agat-7", MACHINE_NOT_WORKING)
+COMP( 1983, agat7,    apple2,   0,        agat7,       agat7,   agat7_state,  0,        "Agat",            "Agat-7", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_CONTROLS)
 COMP( 1984, agat9,    apple2,   0,        agat7,       agat7,   agat7_state,  0,        "Agat",            "Agat-9", MACHINE_NOT_WORKING)
