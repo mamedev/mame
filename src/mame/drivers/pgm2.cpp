@@ -100,6 +100,14 @@ WRITE8_MEMBER(pgm2_state::encryption_w)
 	m_encryption_table[offset] = data;
 }
 
+WRITE32_MEMBER(pgm2_state::sprite_encryption_w)
+{
+	COMBINE_DATA(&m_spritekey);
+
+	if (!m_sprite_predecrypted)
+		m_realspritekey = BITSWAP32(m_spritekey ^ 0x90055555, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 19, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31);
+}
+
 WRITE32_MEMBER(pgm2_state::encryption_do_w)
 {
 	if (m_has_decrypted == 0)
@@ -165,6 +173,7 @@ static ADDRESS_MAP_START( pgm2_map, AS_PROGRAM, 32, pgm2_state )
 	AM_RANGE(0x30100000, 0x301000ff) AM_RAM // unknown mask 00ff00ff, seems to be banked with 0x30120030 too?
 
 	AM_RANGE(0x30120000, 0x30120003) AM_RAM AM_SHARE("bgscroll") // scroll
+	AM_RANGE(0x30120038, 0x3012003b) AM_WRITE(sprite_encryption_w)
 	// there are other 0x301200xx regs
 
 	AM_RANGE(0x40000000, 0x40000003) AM_DEVREADWRITE8("ymz774", ymz774_device, read, write, 0xffffffff)
@@ -289,10 +298,14 @@ void pgm2_state::machine_start()
 {
 	save_item(NAME(m_encryption_table));
 	save_item(NAME(m_has_decrypted));
+	save_item(NAME(m_spritekey));
+	save_item(NAME(m_realspritekey));
 }
 
 void pgm2_state::machine_reset()
 {
+	m_spritekey = 0;
+	m_realspritekey = 0;
 }
 
 static const gfx_layout tiles8x8_layout =
@@ -763,34 +776,30 @@ READ32_MEMBER(pgm2_state::kov2nl_speedup_r)
 }
 
 
-
-DRIVER_INIT_MEMBER(pgm2_state,orleg2)
+// for games with the internal ROMs fully dumped that provide the sprite key and program rom key at runtime
+void pgm2_state::common_encryption_init()
 {
 	uint16_t *src = (uint16_t *)memregion("sprites_mask")->base();
 
-	iga_u12_decode(src, 0x2000000, 0x4761);
-	iga_u16_decode(src, 0x2000000, 0xc79f);
+	iga_u12_decode(src, memregion("sprites_mask")->bytes(), 0x0000);
+	iga_u16_decode(src, memregion("sprites_mask")->bytes(), 0x0000);
+	m_sprite_predecrypted = 0;
 
 	src = (uint16_t *)memregion("sprites_colour")->base();
-	sprite_colour_decode(src, 0x4000000);
+	sprite_colour_decode(src, memregion("sprites_colour")->bytes());
 
 	m_has_decrypted = 0;
+}
 
+DRIVER_INIT_MEMBER(pgm2_state,orleg2)
+{
+	common_encryption_init();
 	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0x20020114, 0x20020117, read32_delegate(FUNC(pgm2_state::orleg2_speedup_r),this));
 }
 
 DRIVER_INIT_MEMBER(pgm2_state,kov2nl)
 {
-	uint16_t *src = (uint16_t *)memregion("sprites_mask")->base();
-
-	iga_u12_decode(src, 0x2000000, 0xa193);
-	iga_u16_decode(src, 0x2000000, 0xb780);
-
-	src = (uint16_t *)memregion("sprites_colour")->base();
-	sprite_colour_decode(src, 0x4000000);
-
-	m_has_decrypted = 0;
-
+	common_encryption_init();
 	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0x20020470, 0x20020473, read32_delegate(FUNC(pgm2_state::kov2nl_speedup_r), this));
 }
 
@@ -800,6 +809,7 @@ DRIVER_INIT_MEMBER(pgm2_state,ddpdojh)
 
 	iga_u12_decode(src, 0x1000000, 0x1e96);
 	iga_u16_decode(src, 0x1000000, 0x869c);
+	m_sprite_predecrypted = 1;
 
 	src = (uint16_t *)memregion("sprites_colour")->base();
 	sprite_colour_decode(src, 0x2000000);
@@ -815,6 +825,7 @@ DRIVER_INIT_MEMBER(pgm2_state,kov3)
 
 	iga_u12_decode(src, 0x4000000, 0x956d);
 	iga_u16_decode(src, 0x4000000, 0x3d17);
+	m_sprite_predecrypted = 1;
 
 	src = (uint16_t *)memregion("sprites_colour")->base();
 	sprite_colour_decode(src, 0x8000000);
@@ -861,6 +872,7 @@ DRIVER_INIT_MEMBER(pgm2_state,kof98umh)
 
 	iga_u12_decode(src, 0x08000000, 0x21df);
 	iga_u16_decode(src, 0x08000000, 0x8692);
+	m_sprite_predecrypted = 1;
 
 	src = (uint16_t *)memregion("sprites_colour")->base();
 	sprite_colour_decode(src, 0x20000000);
