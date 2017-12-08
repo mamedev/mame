@@ -1651,12 +1651,6 @@ void render_target::load_layout_files(const internal_layout *layoutfile, bool si
 			have_default |= true;
 	}
 
-	// if a default view has been specified, use that as a fallback
-	if (system.default_layout != nullptr)
-		have_default |= load_layout_file(nullptr, system.default_layout);
-	if (m_manager.machine().config().m_default_layout != nullptr)
-		have_default |= load_layout_file(nullptr, m_manager.machine().config().m_default_layout);
-
 	if (!have_default)
 	{
 		if (screens == 0)
