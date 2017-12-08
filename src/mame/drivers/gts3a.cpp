@@ -334,7 +334,7 @@ static MACHINE_CONFIG_START( gts3a )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M65C02, XTAL_4MHz / 2)
 	MCFG_CPU_PROGRAM_MAP(gts3a_map)
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	MCFG_NVRAM_ADD_0FILL("nvram") // 6116LP + DS1210
 
 	MCFG_CPU_ADD("dmdcpu", M65C02, XTAL_3_579545MHz / 2)
 	MCFG_CPU_PROGRAM_MAP(gts3a_dmd_map)
