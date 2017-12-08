@@ -105,7 +105,7 @@ WRITE32_MEMBER(pgm2_state::sprite_encryption_w)
 	COMBINE_DATA(&m_spritekey);
 
 	if (!m_sprite_predecrypted)
-		m_realspritekey = BITSWAP32(m_spritekey ^ 0x90055555, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 19, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31);
+		m_realspritekey = BITSWAP32(m_spritekey ^ 0x90055555, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31);
 }
 
 WRITE32_MEMBER(pgm2_state::encryption_do_w)
