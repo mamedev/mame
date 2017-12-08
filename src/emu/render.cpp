@@ -1585,6 +1585,15 @@ void render_target::load_layout_files(const internal_layout *layoutfile, bool si
 	if (singlefile)
 		return;
 
+	// if override_artwork defined, load that and return
+	if (m_manager.machine().options().override_artwork())
+	{
+		if (load_layout_file(m_manager.machine().options().override_artwork(), m_manager.machine().options().override_artwork()))
+			return;
+		if (load_layout_file(m_manager.machine().options().override_artwork(), "default"))
+			return;
+	}
+
 	// try to load a file based on the driver name
 	const game_driver &system = m_manager.machine().system();
 	if (!load_layout_file(basename, system.name))
@@ -1619,6 +1628,34 @@ void render_target::load_layout_files(const internal_layout *layoutfile, bool si
 		if (m_filelist.empty())
 			throw emu_fatalerror("Couldn't parse default layout??");
 	}
+
+	// Check the parent of the parent to cover bios based artwork
+	if (cloneof != -1) {
+		const game_driver &clone(driver_list::driver(cloneof));
+		int cloneofclone = driver_list::clone(clone);
+		if (cloneofclone != -1 && cloneofclone != cloneof)
+		{
+			if (!load_layout_file(driver_list::driver(cloneofclone).name, driver_list::driver(cloneofclone).name))
+				have_default |= load_layout_file(driver_list::driver(cloneofclone).name, "default");
+			else
+				have_default |= true;
+		}
+	}
+
+	// Use fallback artwork if defined and no artwork has been found yet
+	if (m_manager.machine().options().fallback_artwork())
+	{
+		if (!load_layout_file(m_manager.machine().options().fallback_artwork(), m_manager.machine().options().fallback_artwork()))
+			have_default |= load_layout_file(m_manager.machine().options().fallback_artwork(), "default");
+		else
+			have_default |= true;
+	}
+
+	// if a default view has been specified, use that as a fallback
+	if (system.default_layout != nullptr)
+		have_default |= load_layout_file(nullptr, system.default_layout);
+	if (m_manager.machine().config().m_default_layout != nullptr)
+		have_default |= load_layout_file(nullptr, m_manager.machine().config().m_default_layout);
 
 	if (!have_default)
 	{
