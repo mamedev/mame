@@ -63,6 +63,8 @@ public:
 		m_vt83c461(*this, "ide"),
 		m_soundlatch(*this, "soundlatch"),
 		m_soundlatch16(*this, "soundlatch16"),
+		m_bankedroms(*this, "bankedroms"),
+		m_soundbank(*this, "soundbank"),
 		m_cat702_1_dataout(1),
 		m_cat702_2_dataout(1),
 		m_znmcu_dataout(1),
@@ -173,6 +175,8 @@ private:
 	optional_device<vt83c461_device> m_vt83c461;
 	optional_device<generic_latch_8_device> m_soundlatch;
 	optional_device<generic_latch_16_device> m_soundlatch16;
+	optional_memory_bank m_bankedroms;
+	optional_memory_bank m_soundbank;
 
 	int m_cat702_1_dataout;
 	int m_cat702_2_dataout;
@@ -525,12 +529,12 @@ READ16_MEMBER(zn_state::capcom_kickharness_r)
 
 WRITE8_MEMBER(zn_state::bank_coh1000c_w)
 {
-	membank( "bankedroms" )->set_entry( data );
+	m_bankedroms->set_entry( data );
 }
 
 WRITE8_MEMBER(zn_state::qsound_bankswitch_w)
 {
-	membank( "soundbank" )->set_entry( data & 0x0f );
+	m_soundbank->set_entry( data & 0x0f );
 }
 
 INTERRUPT_GEN_MEMBER(zn_state::qsound_interrupt)
@@ -558,10 +562,10 @@ ADDRESS_MAP_END
 
 MACHINE_RESET_MEMBER(zn_state,coh1000c)
 {
-	membank("bankedroms")->configure_entries(0, 16, memregion( "maskroms" )->base() + 0x400000, 0x400000 ); /* banked game rom */
-	membank("bankedroms")->set_entry(0 );
-	membank("soundbank")->configure_entries(0, 16, memregion("audiocpu")->base() + 0x8000, 0x4000 ); /* banked audio rom */
-	membank("soundbank")->set_entry(0 );
+	m_bankedroms->configure_entries(0, 16, memregion( "maskroms" )->base() + 0x400000, 0x400000 ); /* banked game rom */
+	m_bankedroms->set_entry(0 );
+	m_soundbank->configure_entries(0, 16, memregion("audiocpu")->base() + 0x8000, 0x4000 ); /* banked audio rom */
+	m_soundbank->set_entry(0 );
 }
 
 MACHINE_RESET_MEMBER(zn_state,glpracr)
@@ -1003,12 +1007,12 @@ WRITE8_MEMBER(zn_state::bank_coh1000t_w)
 
 	m_mb3773->write_line_ck((data & 0x20) >> 5);
 
-	membank( "bankedroms" )->set_entry( data & 3 );
+	m_bankedroms->set_entry( data & 3 );
 }
 
 WRITE8_MEMBER(zn_state::fx1a_sound_bankswitch_w)
 {
-	membank( "soundbank" )->set_entry( ( data - 1 ) & 0x07 );
+	m_soundbank->set_entry( ( data - 1 ) & 0x07 );
 }
 
 static ADDRESS_MAP_START(coh1000ta_map, AS_PROGRAM, 32, zn_state)
@@ -1022,11 +1026,11 @@ ADDRESS_MAP_END
 
 MACHINE_RESET_MEMBER(zn_state,coh1000ta)
 {
-	membank( "bankedroms" )->configure_entries( 0, 4, memregion( "bankedroms" )->base(), 0x800000 ); /* banked game rom */
-	membank( "bankedroms" )->set_entry( 0 );
+	m_bankedroms->configure_entries( 0, 4, memregion( "bankedroms" )->base(), 0x800000 ); /* banked game rom */
+	m_bankedroms->set_entry( 0 );
 
-	membank( "soundbank" )->configure_entries( 0, 8, memregion( "audiocpu" )->base() + 0x4000, 0x4000 );
-	membank( "soundbank" )->set_entry( 0 );
+	m_soundbank->configure_entries( 0, 8, memregion( "audiocpu" )->base() + 0x4000, 0x4000 );
+	m_soundbank->set_entry( 0 );
 }
 
 static ADDRESS_MAP_START( fx1a_sound_map, AS_PROGRAM, 8, zn_state )
@@ -1097,8 +1101,8 @@ DRIVER_INIT_MEMBER(zn_state,coh1000tb)
 
 MACHINE_RESET_MEMBER(zn_state,coh1000tb)
 {
-	membank( "bankedroms" )->configure_entries( 0, 4, memregion( "bankedroms" )->base(), 0x800000 ); /* banked game rom */
-	membank( "bankedroms" )->set_entry( 0 );
+	m_bankedroms->configure_entries( 0, 4, memregion( "bankedroms" )->base(), 0x800000 ); /* banked game rom */
+	m_bankedroms->set_entry( 0 );
 }
 
 static MACHINE_CONFIG_DERIVED(coh1000tb, zn1_1mb_vram)
@@ -1533,7 +1537,7 @@ WRITE8_MEMBER(zn_state::coh1002e_bank_w)
 {
 	znsecsel_w( space, offset, data, mem_mask );
 
-	membank( "bankedroms" )->set_entry( data & 3 );
+	m_bankedroms->set_entry( data & 3 );
 }
 
 WRITE8_MEMBER(zn_state::coh1002e_sound_irq_w)
@@ -1552,8 +1556,8 @@ ADDRESS_MAP_END
 
 MACHINE_RESET_MEMBER(zn_state,coh1002e)
 {
-	membank( "bankedroms" )->configure_entries( 0, 4, memregion( "bankedroms" )->base(), 0x800000 ); /* banked game rom */
-	membank( "bankedroms" )->set_entry( 0 );
+	m_bankedroms->configure_entries( 0, 4, memregion( "bankedroms" )->base(), 0x800000 ); /* banked game rom */
+	m_bankedroms->set_entry( 0 );
 }
 
 static ADDRESS_MAP_START( psarc_snd_map, AS_PROGRAM, 16, zn_state )
@@ -1638,7 +1642,7 @@ WRITE16_MEMBER(zn_state::bam2_mcu_w)
 	switch( offset )
 	{
 	case 0:
-		membank( "bankedroms" )->set_entry( data & 0xf );
+		m_bankedroms->set_entry( data & 0xf );
 		break;
 
 	case 1:
@@ -1693,8 +1697,8 @@ DRIVER_INIT_MEMBER(zn_state,bam2)
 
 MACHINE_RESET_MEMBER(zn_state,bam2)
 {
-	membank( "bankedroms" )->configure_entries( 0, 16, memregion( "bankedroms" )->base(), 0x400000 ); /* banked game rom */
-	membank( "bankedroms" )->set_entry( 1 );
+	m_bankedroms->configure_entries( 0, 16, memregion( "bankedroms" )->base(), 0x400000 ); /* banked game rom */
+	m_bankedroms->set_entry( 1 );
 }
 
 static MACHINE_CONFIG_DERIVED( bam2, zn1_2mb_vram )
@@ -1939,7 +1943,7 @@ WRITE16_MEMBER(zn_state::nbajamex_bank_w)
 			m_maincpu->space(AS_PROGRAM).install_read_bank(0x1f200000, 0x1f7fffff, "bankedroms2");
 			membank( "bankedroms2" )->set_base( memregion( "bankedroms" )->base() + bankbase1);
 		}
-		membank( "bankedroms" )->set_base( memregion( "bankedroms" )->base() + bankbase0);
+		m_bankedroms->set_base( memregion( "bankedroms" )->base() + bankbase0);
 	}
 	else if (offset == 1)
 	{
@@ -2012,7 +2016,7 @@ DRIVER_INIT_MEMBER(zn_state,nbajamex)
 
 MACHINE_RESET_MEMBER(zn_state,nbajamex)
 {
-	membank( "bankedroms" )->set_base( memregion( "bankedroms" )->base() );
+	m_bankedroms->set_base( memregion( "bankedroms" )->base() );
 }
 
 DRIVER_INIT_MEMBER(zn_state,jdredd)
@@ -2183,7 +2187,7 @@ WRITE16_MEMBER(zn_state::coh1001l_latch_w)
 
 WRITE8_MEMBER(zn_state::coh1001l_bank_w)
 {
-	membank( "bankedroms" )->set_entry( data & 3 );
+	m_bankedroms->set_entry( data & 3 );
 }
 
 static ADDRESS_MAP_START(coh1001l_map, AS_PROGRAM, 32, zn_state)
@@ -2196,8 +2200,8 @@ ADDRESS_MAP_END
 
 MACHINE_RESET_MEMBER(zn_state,coh1001l)
 {
-	membank( "bankedroms" )->configure_entries( 0, 4, memregion( "bankedroms" )->base(), 0x800000 ); /* banked game rom */
-	membank( "bankedroms" )->set_entry( 0 );
+	m_bankedroms->configure_entries( 0, 4, memregion( "bankedroms" )->base(), 0x800000 ); /* banked game rom */
+	m_bankedroms->set_entry( 0 );
 }
 
 static ADDRESS_MAP_START( atlus_snd_map, AS_PROGRAM, 16, zn_state )
@@ -2240,7 +2244,7 @@ Key:    Mother    KN01
 
 WRITE8_MEMBER(zn_state::coh1002v_bank_w)
 {
-	membank( "bankedroms" )->set_entry( data );
+	m_bankedroms->set_entry( data );
 }
 
 static ADDRESS_MAP_START(coh1002v_map, AS_PROGRAM, 32, zn_state)
@@ -2253,8 +2257,8 @@ ADDRESS_MAP_END
 
 MACHINE_RESET_MEMBER(zn_state,coh1002v)
 {
-	membank( "bankedroms" )->configure_entries( 0, 24, memregion( "bankedroms" )->base(), 0x100000 ); /* banked game rom */
-	membank( "bankedroms" )->set_entry( 0 );
+	m_bankedroms->configure_entries( 0, 24, memregion( "bankedroms" )->base(), 0x100000 ); /* banked game rom */
+	m_bankedroms->set_entry( 0 );
 }
 
 static MACHINE_CONFIG_DERIVED( coh1002v, zn1_2mb_vram )
@@ -2425,7 +2429,7 @@ Notes:
 WRITE8_MEMBER(zn_state::coh1002m_bank_w)
 {
 	verboselog(1, "coh1002m_bank_w( %08x, %08x, %08x )\n", offset, data, mem_mask );
-	membank( "bankedroms" )->set_entry( data );
+	m_bankedroms->set_entry( data );
 }
 
 static ADDRESS_MAP_START(coh1002m_map, AS_PROGRAM, 32, zn_state)
@@ -2437,8 +2441,8 @@ ADDRESS_MAP_END
 
 MACHINE_RESET_MEMBER(zn_state,coh1002m)
 {
-	membank( "bankedroms" )->configure_entries( 0, 6, memregion( "bankedroms" )->base(), 0x800000 ); /* banked game rom */
-	membank( "bankedroms" )->set_entry( 0 );
+	m_bankedroms->configure_entries( 0, 6, memregion( "bankedroms" )->base(), 0x800000 ); /* banked game rom */
+	m_bankedroms->set_entry( 0 );
 }
 
 static MACHINE_CONFIG_DERIVED( coh1002m, zn1_2mb_vram )
