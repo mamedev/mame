@@ -98,6 +98,8 @@ inline void pgm2_state::draw_sprite_line(const rectangle &cliprect, int &mask_of
 		maskdata |= m_sprites_mask[mask_offset + 2] << 8;
 		maskdata |= m_sprites_mask[mask_offset + 3] << 0;
 
+		maskdata ^= m_realspritekey;
+
 		if (reverse)
 		{
 			mask_offset -= 4;
