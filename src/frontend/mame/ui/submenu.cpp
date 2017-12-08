@@ -63,6 +63,8 @@ std::vector<submenu::option> const submenu::advanced_options = {
 
 	{ submenu::option_type::HEAD, __("State/Playback Options") },
 	{ submenu::option_type::EMU,  __("Automatic save/restore"),                  OPTION_AUTOSAVE },
+	{ submenu::option_type::EMU,  __("Rewind"),                                  OPTION_REWIND },
+	{ submenu::option_type::EMU,  __("Rewind capacity"),                         OPTION_REWIND_CAPACITY },
 	{ submenu::option_type::EMU,  __("Bilinear snapshot"),                       OPTION_SNAPBILINEAR },
 	{ submenu::option_type::EMU,  __("Burn-in"),                                 OPTION_BURNIN },
 

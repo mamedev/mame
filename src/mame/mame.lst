@@ -1449,6 +1449,7 @@ bpartya                         // (c) 2000
 bumblbug                        // (c) 1996
 bumblbugql                      // (c) 1996
 bumblbugu                       // (c) 1997
+bumblbugua                      // (c) 1997
 buttdeli                        // (c) 1995
 canrose                         // (c) 1996
 cashcat                         // (c) 1998
@@ -1496,6 +1497,7 @@ fortfvr                         // (c) 2001
 gambler                         // (c) 1998
 geisha                          // (c) 2001
 genmagi                         // (c) 1999
+glizardu                        // (c) 2001
 gnomeatw                        // (c) 1998
 goldpyr                         // (c) 1997
 goldpyra                        // (c) 1997
@@ -10615,6 +10617,7 @@ pokoachu                        // (c) 1999
 renaimj                         // (c) 1999
 sengomjk                        // (c) 1998
 thenanpa                        // (c) 1999
+torarech						// (c) 2000
 tsuwaku                         // (c) 2000
 
 @source:cswat.cpp
@@ -12858,6 +12861,7 @@ jolycdib                        // 1990 bootleg
 jolycdic                        // 1993 bootleg
 jolycdid                        // 1990 bootleg
 jolycdie                        // 1990 bootleg
+jolycdif                        // 1990 bootleg
 jolycdit                        // 199? bootleg
 jolycdsp                        // (c) 1992 TAB-Austria
 jolycmzs                        // (c) 1993 MZS Tech
@@ -14752,6 +14756,7 @@ f2pbball                        // Fonas
 f3in1                           // Fonas
 fxmcr165                        // Gakken
 ginv1000                        // Gakken
+ginv2000                        // Gakken
 gjackpot                        // Gakken
 gpoker                          // Gakken
 h2hbaseb                        // Coleco
@@ -29930,6 +29935,9 @@ diablo68                        //
 nocto                           //
 npresto                         //
 
+@source:nsg6809.cpp
+pitchhit                        //
+
 @source:nsm.cpp
 firebird                        //
 
@@ -31293,6 +31301,9 @@ kov3_100                        //
 orleg2                          // (c) 2007
 orleg2_103                      //
 orleg2_101                      //
+orleg2_104cn                    //
+orleg2_103cn                    //
+orleg2_101cn                    //
 kof98umh						// (c) 2009
 
 @source:pgm3.cpp
@@ -35203,6 +35214,7 @@ stfightgb                       // (c) 1986 Seibu Kaihatsu (Germany-Benelux)
 stlforce                        // (c) 1994 Electronic Devices (Italy) / Ecogames S.L. (Spain)
 twinbrat                        // (c) 1995
 twinbrata                       // (c) 1995
+twinbratb                       // (c) 1995
 
 @source:stratos.cpp
 stratos                         // Kasparov Stratos Chess Computer
@@ -36898,6 +36910,7 @@ snowbro2b                       //
 sstriker                        // (c) 1993 Raizing
 sstrikera                       // (c) 1993 Raizing
 tekipaki                        // TP-020 (c) 1991 Toaplan
+tekipakit                       // TP-020 (c) 1991 Toaplan (location test)
 truxton2                        // TP-024 (c) 1992 Toaplan
 vfive                           // TP-027 (c) 1993 Toaplan (Japan)
 whoopee                         // TP-025

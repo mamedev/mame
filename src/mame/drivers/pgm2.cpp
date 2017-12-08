@@ -58,6 +58,20 @@
 	- Debug/Cheat mode: hold P1 B+C during boot, when ingame pressing P1 Start skips to next location, where might be more unknown debug features.
 	works for both currently dumped games (orleg2, kov2nl)
 
+
+	Holographic Stickers
+
+	The IGS036 CPUs have holographic stickers on them, there is a number printed on each sticker but it doesn't seem connected to the
+	game code / revision contained within, it might just be to mark the date the board was produced as it seems to coincide with the
+	design of the hologram.  For reference the ones being used for dumping are
+
+	Dodonpachi Daioujou Tamashi (China) - W10
+	King of Fighter 98 UMH (China) - C11
+	Knights of Valour 2 (China) - V21
+	Knights of Valour 3 (China) - V21
+	Oriental Legend 2 (Oversea) - V21
+	Oriental Legend 2 (China) - A8
+
 */
 
 #include "includes/pgm2.h"
@@ -75,6 +89,35 @@ READ32_MEMBER(pgm2_state::rtc_r)
 	// TODO: somehow hook here current time/date, which is a bit complicated because value is relative, later to it added "base time" stored in SRAM
 	return machine().time().seconds();
 }
+
+READ8_MEMBER(pgm2_state::encryption_r)
+{
+	return m_encryption_table[offset];
+}
+
+WRITE8_MEMBER(pgm2_state::encryption_w)
+{
+	m_encryption_table[offset] = data;
+}
+
+WRITE32_MEMBER(pgm2_state::sprite_encryption_w)
+{
+	COMBINE_DATA(&m_spritekey);
+
+	if (!m_sprite_predecrypted)
+		m_realspritekey = BITSWAP32(m_spritekey ^ 0x90055555, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31);
+}
+
+WRITE32_MEMBER(pgm2_state::encryption_do_w)
+{
+	if (m_has_decrypted == 0)
+	{
+		igs036_decryptor decrypter(m_encryption_table);
+		decrypter.decrypter_rom(memregion("user1"));
+		m_has_decrypted = 1;
+	}
+}
+
 
 INTERRUPT_GEN_MEMBER(pgm2_state::igs_interrupt)
 {
@@ -130,13 +173,14 @@ static ADDRESS_MAP_START( pgm2_map, AS_PROGRAM, 32, pgm2_state )
 	AM_RANGE(0x30100000, 0x301000ff) AM_RAM // unknown mask 00ff00ff, seems to be banked with 0x30120030 too?
 
 	AM_RANGE(0x30120000, 0x30120003) AM_RAM AM_SHARE("bgscroll") // scroll
+	AM_RANGE(0x30120038, 0x3012003b) AM_WRITE(sprite_encryption_w)
 	// there are other 0x301200xx regs
 
 	AM_RANGE(0x40000000, 0x40000003) AM_DEVREADWRITE8("ymz774", ymz774_device, read, write, 0xffffffff)
 
 	// internal to IGS036? - various other writes down here on startup too - could be other standard ATMEL peripherals like the ARM_AIC mixed with custom bits
 	AM_RANGE(0xffffec00, 0xffffec5f) AM_RAM
-	AM_RANGE(0xfffffc00, 0xfffffcff) AM_RAM // confirmed as encryption table for main program rom (see code at 3950)
+	AM_RANGE(0xfffffc00, 0xfffffcff) AM_READWRITE8(encryption_r,encryption_w, 0xffffffff) // confirmed as encryption table for main program rom (see code at 3950)
 
 	AM_RANGE(0xfffff000, 0xfffff14b) AM_DEVICE("arm_aic", arm_aic_device, regs_map)
 
@@ -145,7 +189,7 @@ static ADDRESS_MAP_START( pgm2_map, AS_PROGRAM, 32, pgm2_state )
 
 	AM_RANGE(0xfffffd28, 0xfffffd2b) AM_READ(rtc_r)
 
-//  AM_RANGE(0xfffffa08, 0xfffffa0b) AM_WRITE(table_done_w) // after uploading encryption? table might actually send it or enable external ROM?
+	AM_RANGE(0xfffffa08, 0xfffffa0b) AM_WRITE(encryption_do_w) // after uploading encryption? table might actually send it or enable external ROM?
 	AM_RANGE(0xfffffa0c, 0xfffffa0f) AM_READ(unk_startup_r)
 ADDRESS_MAP_END
 
@@ -252,10 +296,16 @@ WRITE_LINE_MEMBER(pgm2_state::irq)
 
 void pgm2_state::machine_start()
 {
+	save_item(NAME(m_encryption_table));
+	save_item(NAME(m_has_decrypted));
+	save_item(NAME(m_spritekey));
+	save_item(NAME(m_realspritekey));
 }
 
 void pgm2_state::machine_reset()
 {
+	m_spritekey = 0;
+	m_realspritekey = 0;
 }
 
 static const gfx_layout tiles8x8_layout =
@@ -361,38 +411,77 @@ MACHINE_CONFIG_END
 	ROM_REGION( 0x10000, "sram", 0 ) \
 	ROM_LOAD( "xyj2_nvram",            0x00000000, 0x10000, CRC(ccccc71c) SHA1(585b5ccbf89dd28d8532da785d7c8af12f31c6d6) )
 
-#define ORLEG2_PROGRAM_104 \
-	ROM_REGION( 0x1000000, "user1", 0 ) \
-	ROM_LOAD( "xyj2_v104cn.u7",          0x00000000, 0x0800000, CRC(7c24a4f5) SHA1(3cd9f9264ef2aad0869afdf096e88eb8d74b2570) )
+/* 
+   External program revisions are CONFIRMED to be the same between regions, even if the label changes (localized game title + country specific extension code)
+    
+   Confirmed country codes used on labels
+   FA = Oversea
+   CN = China
+   JP = Japan
+   TW = Taiwan
+  
+*/
 
-#define ORLEG2_PROGRAM_103 \
+#define ORLEG2_PROGRAM_104(prefix, extension) \
 	ROM_REGION( 0x1000000, "user1", 0 ) \
-	ROM_LOAD( "xyj2_v103cn.u7",  0x000000, 0x800000, CRC(21c1fae8) SHA1(36eeb7a5e8dc8ee7c834f3ff1173c28cf6c2f1a3) )
+	ROM_LOAD( #prefix "_v104" #extension ".u7",  0x000000, 0x800000, CRC(7c24a4f5) SHA1(3cd9f9264ef2aad0869afdf096e88eb8d74b2570) )
 
-#define ORLEG2_PROGRAM_101 \
+#define ORLEG2_PROGRAM_103(prefix, extension) \
 	ROM_REGION( 0x1000000, "user1", 0 ) \
-	ROM_LOAD( "xyj2_v101cn.u7",  0x000000, 0x800000, CRC(45805b53) SHA1(f2a8399c821b75fadc53e914f6f318707e70787c) )
+	ROM_LOAD( #prefix "_v103" #extension ".u7",  0x000000, 0x800000, CRC(21c1fae8) SHA1(36eeb7a5e8dc8ee7c834f3ff1173c28cf6c2f1a3) )
+
+#define ORLEG2_PROGRAM_101(prefix, extension) \
+	ROM_REGION( 0x1000000, "user1", 0 ) \
+	ROM_LOAD( #prefix "_v101" #extension ".u7",  0x000000, 0x800000, CRC(45805b53) SHA1(f2a8399c821b75fadc53e914f6f318707e70787c) )
+
+/* 
+   Internal ROMs for CHINA and OVERSEA are confirmed to differ by just the region byte, other regions not yet verified.
+   label is a localized version of the game title and the country code (see above)
+   For OVERSEA this is "O/L2", but we omit the / due to naming rules
+   For the CHINA version this uses the Chinese characters
+*/
 
 #define ORLEG2_INTERNAL_CHINA \
 	ROM_REGION( 0x04000, "maincpu", 0 ) \
-	/* Offset 3cb8 of the internal rom controls the region, however only China is dumped at the moment.  Overseas (English) external ROM is confirmed to match (with FA rom label extensions) but th Internal rom might differ by more than the region byte so needs dumping */ \
-	ROM_LOAD( "xyj2_igs036_china.rom", 0x00000000, 0x0004000, CRC(bcce7641) SHA1(c3b5cf6e9f6eae09b6785314777a52b34c3c7657) )
+	ROM_LOAD( "xyj2_cn.igs036", 0x00000000, 0x0004000, CRC(bcce7641) SHA1(c3b5cf6e9f6eae09b6785314777a52b34c3c7657) )
+
+#define ORLEG2_INTERNAL_OVERSEAS \
+	ROM_REGION( 0x04000, "maincpu", 0 ) \
+	ROM_LOAD( "ol2_fa.igs036", 0x00000000, 0x0004000, CRC(cc4d398a) SHA1(c50bcc81f02cd5aa8ad157d73209dc53bdedc023) )
 
 ROM_START( orleg2 )
-	ORLEG2_INTERNAL_CHINA
-	ORLEG2_PROGRAM_104
+	ORLEG2_INTERNAL_OVERSEAS
+	ORLEG2_PROGRAM_104(ol2,fa)
 	ORLEG2_VIDEO_SOUND_ROMS
 ROM_END
 
 ROM_START( orleg2_103 )
-	ORLEG2_INTERNAL_CHINA
-	ORLEG2_PROGRAM_103
+	ORLEG2_INTERNAL_OVERSEAS
+	ORLEG2_PROGRAM_103(ol2,fa)
 	ORLEG2_VIDEO_SOUND_ROMS
 ROM_END
 
 ROM_START( orleg2_101 )
+	ORLEG2_INTERNAL_OVERSEAS
+	ORLEG2_PROGRAM_101(ol2,fa)
+	ORLEG2_VIDEO_SOUND_ROMS
+ROM_END
+
+ROM_START( orleg2_104cn )
 	ORLEG2_INTERNAL_CHINA
-	ORLEG2_PROGRAM_101
+	ORLEG2_PROGRAM_104(xyj2,cn)
+	ORLEG2_VIDEO_SOUND_ROMS
+ROM_END
+
+ROM_START( orleg2_103cn )
+	ORLEG2_INTERNAL_CHINA
+	ORLEG2_PROGRAM_103(xyj2,cn)
+	ORLEG2_VIDEO_SOUND_ROMS
+ROM_END
+
+ROM_START( orleg2_101cn )
+	ORLEG2_INTERNAL_CHINA
+	ORLEG2_PROGRAM_101(xyj2,cn)
 	ORLEG2_VIDEO_SOUND_ROMS
 ROM_END
 
@@ -687,36 +776,30 @@ READ32_MEMBER(pgm2_state::kov2nl_speedup_r)
 }
 
 
-
-DRIVER_INIT_MEMBER(pgm2_state,orleg2)
+// for games with the internal ROMs fully dumped that provide the sprite key and program rom key at runtime
+void pgm2_state::common_encryption_init()
 {
 	uint16_t *src = (uint16_t *)memregion("sprites_mask")->base();
 
-	iga_u12_decode(src, 0x2000000, 0x4761);
-	iga_u16_decode(src, 0x2000000, 0xc79f);
+	iga_u12_decode(src, memregion("sprites_mask")->bytes(), 0x0000);
+	iga_u16_decode(src, memregion("sprites_mask")->bytes(), 0x0000);
+	m_sprite_predecrypted = 0;
 
 	src = (uint16_t *)memregion("sprites_colour")->base();
-	sprite_colour_decode(src, 0x4000000);
+	sprite_colour_decode(src, memregion("sprites_colour")->bytes());
 
-	igs036_decryptor decrypter(orleg2_key);
-	decrypter.decrypter_rom(memregion("user1"));
+	m_has_decrypted = 0;
+}
 
+DRIVER_INIT_MEMBER(pgm2_state,orleg2)
+{
+	common_encryption_init();
 	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0x20020114, 0x20020117, read32_delegate(FUNC(pgm2_state::orleg2_speedup_r),this));
 }
 
 DRIVER_INIT_MEMBER(pgm2_state,kov2nl)
 {
-	uint16_t *src = (uint16_t *)memregion("sprites_mask")->base();
-
-	iga_u12_decode(src, 0x2000000, 0xa193);
-	iga_u16_decode(src, 0x2000000, 0xb780);
-
-	src = (uint16_t *)memregion("sprites_colour")->base();
-	sprite_colour_decode(src, 0x4000000);
-
-	igs036_decryptor decrypter(kov2_key);
-	decrypter.decrypter_rom(memregion("user1"));
-
+	common_encryption_init();
 	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0x20020470, 0x20020473, read32_delegate(FUNC(pgm2_state::kov2nl_speedup_r), this));
 }
 
@@ -726,12 +809,14 @@ DRIVER_INIT_MEMBER(pgm2_state,ddpdojh)
 
 	iga_u12_decode(src, 0x1000000, 0x1e96);
 	iga_u16_decode(src, 0x1000000, 0x869c);
+	m_sprite_predecrypted = 1;
 
 	src = (uint16_t *)memregion("sprites_colour")->base();
 	sprite_colour_decode(src, 0x2000000);
 
 	igs036_decryptor decrypter(ddpdoj_key);
 	decrypter.decrypter_rom(memregion("user1"));
+	m_has_decrypted = 1;
 }
 
 DRIVER_INIT_MEMBER(pgm2_state,kov3)
@@ -740,12 +825,14 @@ DRIVER_INIT_MEMBER(pgm2_state,kov3)
 
 	iga_u12_decode(src, 0x4000000, 0x956d);
 	iga_u16_decode(src, 0x4000000, 0x3d17);
+	m_sprite_predecrypted = 1;
 
 	src = (uint16_t *)memregion("sprites_colour")->base();
 	sprite_colour_decode(src, 0x8000000);
 
 	igs036_decryptor decrypter(kov3_key);
 	decrypter.decrypter_rom(memregion("user1"));
+	m_has_decrypted = 1;
 }
 
 void pgm2_state::decrypt_kov3_module(uint32_t addrxor, uint16_t dataxor)
@@ -783,22 +870,28 @@ DRIVER_INIT_MEMBER(pgm2_state,kof98umh)
 {
 	uint16_t *src = (uint16_t *)memregion("sprites_mask")->base();
 
-	iga_u12_decode(src, 0x08000000, 0x1e96); // wrong
-	iga_u16_decode(src, 0x08000000, 0x869c); // wrong
+	iga_u12_decode(src, 0x08000000, 0x21df);
+	iga_u16_decode(src, 0x08000000, 0x8692);
+	m_sprite_predecrypted = 1;
 
 	src = (uint16_t *)memregion("sprites_colour")->base();
 	sprite_colour_decode(src, 0x20000000);
 
 	igs036_decryptor decrypter(kof98umh_key);
 	decrypter.decrypter_rom(memregion("user1"));
+	m_has_decrypted = 1;
 }
 
 /* PGM2 */
 
 // Oriental Legend 2 - should be a V102 and V100 too
-GAME( 2007, orleg2,       0,         pgm2,    pgm2, pgm2_state,     orleg2,       ROT0, "IGS", "Oriental Legend 2 (V104, China)", MACHINE_NOT_WORKING )
-GAME( 2007, orleg2_103,   orleg2,    pgm2,    pgm2, pgm2_state,     orleg2,       ROT0, "IGS", "Oriental Legend 2 (V103, China)", MACHINE_NOT_WORKING )
-GAME( 2007, orleg2_101,   orleg2,    pgm2,    pgm2, pgm2_state,     orleg2,       ROT0, "IGS", "Oriental Legend 2 (V101, China)", MACHINE_NOT_WORKING )
+GAME( 2007, orleg2,       0,         pgm2,    pgm2, pgm2_state,     orleg2,       ROT0, "IGS", "Oriental Legend 2 (V104, Oversea)", 0 ) /* Overseas sets of OL2 do not use the card reader */
+GAME( 2007, orleg2_103,   orleg2,    pgm2,    pgm2, pgm2_state,     orleg2,       ROT0, "IGS", "Oriental Legend 2 (V103, Oversea)", 0 )
+GAME( 2007, orleg2_101,   orleg2,    pgm2,    pgm2, pgm2_state,     orleg2,       ROT0, "IGS", "Oriental Legend 2 (V101, Oversea)", 0 )
+
+GAME( 2007, orleg2_104cn, orleg2,    pgm2,    pgm2, pgm2_state,     orleg2,       ROT0, "IGS", "Oriental Legend 2 (V104, China)", MACHINE_NOT_WORKING )
+GAME( 2007, orleg2_103cn, orleg2,    pgm2,    pgm2, pgm2_state,     orleg2,       ROT0, "IGS", "Oriental Legend 2 (V103, China)", MACHINE_NOT_WORKING )
+GAME( 2007, orleg2_101cn, orleg2,    pgm2,    pgm2, pgm2_state,     orleg2,       ROT0, "IGS", "Oriental Legend 2 (V101, China)", MACHINE_NOT_WORKING )
 
 // Knights of Valour 2 New Legend
 GAME( 2008, kov2nl,       0,         pgm2,    pgm2, pgm2_state,     kov2nl,       ROT0, "IGS", "Knights of Valour 2 New Legend (V302, China)", MACHINE_NOT_WORKING )

@@ -329,9 +329,9 @@ WRITE16_MEMBER(bmcpokr_state::mux_w)
 	COMBINE_DATA(&m_mux);
 	if (ACCESSING_BITS_0_7)
 	{
-		m_hopper->write(space, 0,   (data & 0x0001) ? 0x80 : 0x00); // hopper motor
-		machine().bookkeeping().coin_counter_w(1, data & 0x0002);                // coin-in / key-in
-		machine().bookkeeping().coin_counter_w(2, data & 0x0004);                // pay-out
+		m_hopper->motor_w(BIT(data, 0)); // hopper motor
+		machine().bookkeeping().coin_counter_w(1, BIT(data, 1));                // coin-in / key-in
+		machine().bookkeeping().coin_counter_w(2, BIT(data, 2));                // pay-out
 		//                           data & 0x0060                  // DSW mux
 		//                           data & 0x0080                  // ? always on
 	}

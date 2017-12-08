@@ -53,10 +53,10 @@
  @MP1312   TMS1100   1983, Gakken FX-Micom R-165/Tandy Radio Shack Science Fair Microcomputer Trainer
  *MP1359   TMS1100?  1985, Capsela CRC2000
  @MP1525   TMS1170   1980, Coleco Head to Head Baseball
- *MP1604   TMS1370   1982, Gakken Invader 2000/Tandy Cosmic Fire Away 3000
+ @MP1604   TMS1370   1982, Gakken Invader 2000/Tandy Cosmic Fire Away 3000
  @MP1801   TMS1700   1981, Tiger Ditto/Tandy Pocket Repeat (model 60-2152)
  @MP2105   TMS1370   1979, Gakken/Entex Poker (6005)
- @MP2139   TMS1370   1982, Gakken Galaxy Invader 1000/Tandy Cosmic 1000 Fire Away
+ @MP2139   TMS1370   1981, Gakken Galaxy Invader 1000/Tandy Cosmic 1000 Fire Away
  @MP2726   TMS1040   1979, Tomy Break Up
  *MP2788   TMS1040?  1980, Bandai Flight Time (? note: VFD-capable)
  @MP3005   TMS1730   1989, Tiger Copy Cat (model 7-522)
@@ -4398,8 +4398,8 @@ WRITE16_MEMBER(ginv1000_state::write_r)
 	// R8,R15: input mux
 	m_inp_mux = (data >> 8 & 1) | (data >> 14 & 2);
 
-	// R1-R10: VFD matrix grid
-	// R11-R14: VFD matrix plate
+	// R1-R10: VFD grid
+	// R11-R14: VFD plate
 	m_grid = data >> 1 & 0x3ff;
 	m_plate = (m_plate & 0xff) | (data >> 3 & 0xf00);
 	prepare_display();
@@ -4407,14 +4407,14 @@ WRITE16_MEMBER(ginv1000_state::write_r)
 
 WRITE16_MEMBER(ginv1000_state::write_o)
 {
-	// O0-O7: VFD matrix plate
+	// O0-O7: VFD plate
 	m_plate = (m_plate & ~0xff) | data;
 	prepare_display();
 }
 
 READ8_MEMBER(ginv1000_state::read_k)
 {
-	// K: multiplexed inputs (K8 is fire button)
+	// K1,K2: multiplexed inputs (K8 is fire button)
 	return m_inp_matrix[2]->read() | read_inputs(2);
 }
 
@@ -4451,6 +4451,142 @@ static MACHINE_CONFIG_START( ginv1000 )
 	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_SIZE(226, 1080)
 	MCFG_SCREEN_VISIBLE_AREA(0, 226-1, 0, 1080-1)
+	MCFG_DEFAULT_LAYOUT(layout_svg)
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
+
+	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+MACHINE_CONFIG_END
+
+
+
+
+
+/***************************************************************************
+
+  Gakken Invader 2000
+  * TMS1370(28 pins) MP1604 (die label 1370A MP1604)
+  * TMS1024 I/O expander
+  * cyan/red/green VFD display, 1-bit sound
+
+  known releases:
+  - World: Invader 2000
+  - USA(1): Galaxy Invader 10000, published by CGL
+  - USA(2): Cosmic 3000 Fire Away, published by Tandy
+
+***************************************************************************/
+
+class ginv2000_state : public hh_tms1k_state
+{
+public:
+	ginv2000_state(const machine_config &mconfig, device_type type, const char *tag)
+		: hh_tms1k_state(mconfig, type, tag),
+		m_expander(*this, "expander")
+	{ }
+
+	required_device<tms1024_device> m_expander;
+	DECLARE_WRITE8_MEMBER(expander_w);
+
+	void prepare_display();
+	virtual DECLARE_WRITE16_MEMBER(write_r);
+	virtual DECLARE_WRITE16_MEMBER(write_o);
+	virtual DECLARE_READ8_MEMBER(read_k);
+
+protected:
+	virtual void machine_reset() override;
+};
+
+// handlers
+
+void ginv2000_state::prepare_display()
+{
+	display_matrix(16, 10, m_plate, m_grid);
+}
+
+WRITE8_MEMBER(ginv2000_state::expander_w)
+{
+	// TMS1024 port 4-7: VFD plate
+	int shift = (offset - tms1024_device::PORT4) * 4;
+	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
+	prepare_display();
+}
+
+WRITE16_MEMBER(ginv2000_state::write_r)
+{
+	// R0: speaker out
+	m_speaker->level_w(data & 1);
+
+	// R11,R12: input mux
+	m_inp_mux = data >> 11 & 3;
+
+	// R11,R12: TMS1024 S1,S0 (S2 forced high)
+	// R13: TMS1024 STD
+	m_expander->write_s(space, 0, (data >> 12 & 1) | (data >> 10 & 2) | 4);
+	m_expander->write_std(data >> 13 & 1);
+
+	// R1-R10: VFD grid
+	m_grid = data >> 1 & 0x3ff;
+	prepare_display();
+}
+
+WRITE16_MEMBER(ginv2000_state::write_o)
+{
+	// O4-O7: TMS1024 H1-H4
+	m_expander->write_h(space, 0, data >> 4 & 0xf);
+}
+
+READ8_MEMBER(ginv2000_state::read_k)
+{
+	// K1,K2: multiplexed inputs (K8 is fire button)
+	return m_inp_matrix[2]->read() | read_inputs(2);
+}
+
+
+// config
+
+static INPUT_PORTS_START( ginv2000 )
+	PORT_START("IN.0") // R11
+	PORT_CONFNAME( 0x03, 0x01, DEF_STR( Difficulty ) )
+	PORT_CONFSETTING(    0x01, "1" )
+	PORT_CONFSETTING(    0x02, "2" )
+	PORT_BIT( 0x0c, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.1") // R12
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT )
+	PORT_BIT( 0x0c, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.2") // K8
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON1 )
+INPUT_PORTS_END
+
+void ginv2000_state::machine_reset()
+{
+	hh_tms1k_state::machine_reset();
+	m_expander->write_ms(1); // Vss
+}
+
+static MACHINE_CONFIG_START( ginv2000 )
+
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu", TMS1370, 425000) // approximation - RC osc. R=36K, C=47pF
+	MCFG_TMS1XXX_READ_K_CB(READ8(ginv2000_state, read_k))
+	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(ginv2000_state, write_r))
+	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(ginv2000_state, write_o))
+
+	MCFG_DEVICE_ADD("expander", TMS1024, 0)
+	MCFG_TMS1025_WRITE_PORT_CB(PORT4, WRITE8(ginv2000_state, expander_w))
+	MCFG_TMS1025_WRITE_PORT_CB(PORT5, WRITE8(ginv2000_state, expander_w))
+	MCFG_TMS1025_WRITE_PORT_CB(PORT6, WRITE8(ginv2000_state, expander_w))
+	MCFG_TMS1025_WRITE_PORT_CB(PORT7, WRITE8(ginv2000_state, expander_w))
+
+	/* video hardware */
+	MCFG_SCREEN_SVG_ADD("screen", "svg")
+	MCFG_SCREEN_REFRESH_RATE(50)
+	MCFG_SCREEN_SIZE(364, 1080)
+	MCFG_SCREEN_VISIBLE_AREA(0, 364-1, 0, 1080-1)
 	MCFG_DEFAULT_LAYOUT(layout_svg)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
 
@@ -9335,6 +9471,20 @@ ROM_START( ginv1000 )
 ROM_END
 
 
+ROM_START( ginv2000 )
+	ROM_REGION( 0x0800, "maincpu", 0 )
+	ROM_LOAD( "mp1604", 0x0000, 0x0800, CRC(f1646d0b) SHA1(65601931d81e3eef7bf22a08de5a146910ce8137) )
+
+	ROM_REGION( 867, "maincpu:mpla", 0 )
+	ROM_LOAD( "tms1100_common2_micro.pla", 0, 867, CRC(7cc90264) SHA1(c6e1cf1ffb178061da9e31858514f7cd94e86990) )
+	ROM_REGION( 365, "maincpu:opla", 0 )
+	ROM_LOAD( "tms1100_ginv2000_output.pla", 0, 365, CRC(520bb003) SHA1(1640ae54f8dcc257e0ad0cbe0281b38fcbd8da35) )
+
+	ROM_REGION( 374443, "svg", 0)
+	ROM_LOAD( "ginv2000.svg", 0, 374443, CRC(a4ce1e6d) SHA1(57d9ff05d634a8d495b9d544a2a959790cd10b6b) )
+ROM_END
+
+
 ROM_START( fxmcr165 )
 	ROM_REGION( 0x0800, "maincpu", 0 )
 	ROM_LOAD( "mp1312", 0x0000, 0x0800, CRC(6efc8bcc) SHA1(ced8a02b472a3178073691d3dccc0f19f57428fd) )
@@ -9809,7 +9959,8 @@ CONS( 1979, f3in1,      0,         0, f3in1,     f3in1,     f3in1_state,     0, 
 
 CONS( 1979, gpoker,     0,         0, gpoker,    gpoker,    gpoker_state,    0, "Gakken", "Poker (Gakken, 1979 version)", MACHINE_SUPPORTS_SAVE )
 CONS( 1980, gjackpot,   0,         0, gjackpot,  gjackpot,  gjackpot_state,  0, "Gakken", "Jackpot: Gin Rummy & Black Jack", MACHINE_SUPPORTS_SAVE )
-CONS( 1982, ginv1000,   0,         0, ginv1000,  ginv1000,  ginv1000_state,  0, "Gakken", "Galaxy Invader 1000", MACHINE_SUPPORTS_SAVE )
+CONS( 1981, ginv1000,   0,         0, ginv1000,  ginv1000,  ginv1000_state,  0, "Gakken", "Galaxy Invader 1000", MACHINE_SUPPORTS_SAVE )
+CONS( 1982, ginv2000,   0,         0, ginv2000,  ginv2000,  ginv2000_state,  0, "Gakken", "Invader 2000", MACHINE_SUPPORTS_SAVE )
 COMP( 1983, fxmcr165,   0,         0, fxmcr165,  fxmcr165,  fxmcr165_state,  0, "Gakken", "FX-Micom R-165", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
 CONS( 1979, elecdet,    0,         0, elecdet,   elecdet,   elecdet_state,   0, "Ideal", "Electronic Detective", MACHINE_SUPPORTS_SAVE ) // ***

@@ -1,0 +1,265 @@
+<?xml version="1.0"?>
+<mamelayout version="2">
+	<element name="COLLECT">
+		<rect state="0">
+			<color red="1.0" green="1.0" blue="0.0" />
+		</rect>
+		<rect state="1">
+			<color red="0.5" green="0.5" blue="0.0" />
+		</rect>
+		<text string="COLLECT">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.1" width="1" height="0.8" />
+		</text>
+	</element>
+
+	<element name="1LINE">
+		<rect state="0">
+			<color red="1.0" green="1.0" blue="1.0" />
+		</rect>
+		<rect state="1">
+			<color red="0.5" green="0.5" blue="0.5" />
+		</rect>
+		<text string="1 LINE/RED">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.1" width="1" height="0.8" />
+		</text>
+	</element>
+
+	<element name="3LINES">
+		<rect state="0">
+			<color red="1.0" green="1.0" blue="1.0" />
+		</rect>
+		<rect state="1">
+			<color red="0.5" green="0.5" blue="0.5" />
+		</rect>
+		<text string="3 LINES">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.1" width="1" height="0.8" />
+		</text>
+	</element>
+
+	<element name="5LINES">
+		<rect state="0">
+			<color red="1.0" green="1.0" blue="1.0" />
+		</rect>
+		<rect state="1">
+			<color red="0.5" green="0.5" blue="0.5" />
+		</rect>
+		<text string="5 LINES">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.1" width="1" height="0.8" />
+		</text>
+	</element>
+
+	<element name="7LINES">
+		<rect state="0">
+			<color red="1.0" green="1.0" blue="1.0" />
+		</rect>
+		<rect state="1">
+			<color red="0.5" green="0.5" blue="0.5" />
+		</rect>
+		<text string="7 LINES">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.1" width="1" height="0.8" />
+		</text>
+	</element>
+
+	<element name="9LINES">
+		<rect state="0">
+			<color red="1.0" green="1.0" blue="1.0" />
+		</rect>
+		<rect state="1">
+			<color red="0.5" green="0.5" blue="0.5" />
+		</rect>
+		<text string="9 LINES/BLACK">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.1" width="1" height="0.8" />
+		</text>
+	</element>
+
+	<element name="GAMBLE">
+		<rect state="0">
+			<color red="0.5" green="0.0" blue="0.7" />
+		</rect>
+		<rect state="1">
+		<color red="0.25" green="0.0" blue="0.35" />
+
+		</rect>
+		<text string="GAMBLE">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.1" width="1" height="0.8" />
+		</text>
+	</element>
+
+	<element name="RESERVE">
+		<rect state="0">
+			<color red="0.0" green="1.0" blue="0.0" />
+		</rect>
+		<rect state="1">
+			<color red="0.0" green="0.5" blue="0.0" />
+		</rect>
+		<text string="RESERVE">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.1" width="1" height="0.8" />
+		</text>
+	</element>
+
+	<element name="BET1">
+		<rect state="0">
+			<color red="1.0" green="1.0" blue="1.0" />
+		</rect>
+		<rect state="1">
+			<color red="0.5" green="0.5" blue="0.5" />
+		</rect>
+		<text string="BET 1">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.1" width="1" height="0.8" />
+		</text>
+	</element>
+
+	<element name="BET2">
+		<rect state="0">
+			<color red="1.0" green="1.0" blue="1.0" />
+		</rect>
+		<rect state="1">
+			<color red="0.5" green="0.5" blue="0.5" />
+		</rect>
+		<text string="BET 2">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.1" width="1" height="0.8" />
+		</text>
+	</element>
+
+	<element name="BET3">
+		<rect state="0">
+			<color red="1.0" green="1.0" blue="1.0" />
+		</rect>
+		<rect state="1">
+			<color red="0.5" green="0.5" blue="0.5" />
+		</rect>
+		<text string="BET 3">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.1" width="1" height="0.8" />
+		</text>
+	</element>
+
+	<element name="BET5">
+		<rect state="0">
+			<color red="1.0" green="1.0" blue="1.0" />
+		</rect>
+		<rect state="1">
+			<color red="0.5" green="0.5" blue="0.5" />
+		</rect>
+		<text string="BET 5">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.1" width="1" height="0.8" />
+		</text>
+	</element>
+
+	<element name="BET10">
+		<rect state="0">
+			<color red="1.0" green="1.0" blue="1.0" />
+		</rect>
+		<rect state="1">
+			<color red="0.5" green="0.5" blue="0.5" />
+		</rect>
+		<text string="BET 10">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.1" width="1" height="0.8" />
+		</text>
+	</element>
+
+	<element name="TAKE_WIN">
+		<rect state="0">
+			<color red="1.0" green="0.7" blue="0.0" />
+		</rect>
+		<rect state="1">
+			<color red="0.5" green="0.35" blue="0.0" />
+		</rect>
+		<text string="TAKE WIN/START FEATURE">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.1" width="1" height="0.8" />
+		</text>
+	</element>
+
+	<element name="REDLAMP">
+		<disk state="1">
+			<color red="0.2" green="0.0" blue="0.0" />
+		</disk>
+		<disk state="0">
+			<color red="1.0" green="0.0" blue="0.0" />
+		</disk>
+	</element>
+
+	<view name="Button Lamps">
+		<screen index="0">
+			<bounds left="0" top="0" right="4" bottom="3" />
+		</screen>
+
+		<!-- Buttons lamps -->
+		<bezel name="lamp8" element="COLLECT" inputtag="P1" inputmask="0x100">
+			<bounds x="0.27" y="3.02" width="0.31" height="0.24" />
+		</bezel>
+		<bezel name="lamp9" element="BET1" inputtag="P1" inputmask="0x200">
+			<bounds x="0.68" y="3.02" width="0.31" height="0.24" />
+		</bezel>
+		<bezel name="lamp10" element="BET2" inputtag="P1" inputmask="0x400">
+			<bounds x="1.09" y="3.02" width="0.31" height="0.24" />
+		</bezel>
+		<bezel name="lamp11" element="BET3" inputtag="P1" inputmask="0x800">
+			<bounds x="1.51" y="3.02" width="0.31" height="0.24" />
+		</bezel>
+		<bezel name="lamp12" element="BET5" inputtag="P1" inputmask="0x1000">
+			<bounds x="1.91" y="3.02" width="0.31" height="0.24" />
+		</bezel>
+		<bezel name="lamp13" element="BET10" inputtag="P1" inputmask="0x2000">
+			<bounds x="2.32" y="3.02" width="0.31" height="0.24" />
+		</bezel>
+
+		<bezel name="lamp7" element="RESERVE" inputtag="P1" inputmask="0x80">
+			<bounds x="0.27" y="3.28" width="0.31" height="0.24" />
+		</bezel>
+		<bezel name="lamp6" element="1LINE" inputtag="P1" inputmask="0x40">
+			<bounds x="0.68" y="3.28" width="0.31" height="0.24" />
+		</bezel>
+		<bezel name="lamp5" element="3LINES" inputtag="P1" inputmask="0x20">
+			<bounds x="1.09" y="3.28" width="0.31" height="0.24" />
+		</bezel>
+		<bezel name="lamp4" element="5LINES" inputtag="P1" inputmask="0x10">
+			<bounds x="1.51" y="3.28" width="0.31" height="0.24" />
+		</bezel>
+		<bezel name="lamp3" element="7LINES" inputtag="P1" inputmask="0x08">
+			<bounds x="1.91" y="3.28" width="0.31" height="0.24" />
+		</bezel>
+		<bezel name="lamp2" element="9LINES" inputtag="P1" inputmask="0x04">
+			<bounds x="2.32" y="3.28" width="0.31" height="0.24" />
+		</bezel>
+		<bezel name="lamp0" element="GAMBLE" inputtag="P1" inputmask="0x01">
+			<bounds x="2.73" y="3.28" width="0.31" height="0.24" />
+		</bezel>
+		<bezel name="lamp1" element="TAKE_WIN" inputtag="P1" inputmask="0x02">
+			<bounds x="3.14" y="3.28" width="0.31" height="0.24" />
+		</bezel>
+
+		<!-- Tower lamps -->
+		<bezel name="lamp32" element="REDLAMP">
+			<bounds x="3.58" y="3.24" width="0.10" height="0.10" />
+		</bezel>
+		<bezel name="lamp33" element="REDLAMP">
+			<bounds x="3.58" y="3.36" width="0.10" height="0.10" />
+		</bezel>
+		<bezel name="lamp34" element="REDLAMP">
+			<bounds x="3.68" y="3.24" width="0.10" height="0.10" />
+		</bezel>
+		<bezel name="lamp35" element="REDLAMP">
+			<bounds x="3.68" y="3.36" width="0.10" height="0.10" />
+		</bezel>
+	</view>
+
+	<view name="Screen">
+		<screen index="0">
+			<bounds left="0" top="0" right="4" bottom="3" />
+		</screen>
+	</view>
+</mamelayout>

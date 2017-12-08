@@ -144,7 +144,6 @@
 
 #include "emu.h"
 #include "e132xs.h"
-#include "e132xsfe.h"
 
 #include "debugger.h"
 
@@ -152,9 +151,6 @@
 
 //#define VERBOSE 1
 #include "logmacro.h"
-
-/* size of the execution code cache */
-#define CACHE_SIZE                      (32 * 1024 * 1024)
 
 //**************************************************************************
 //  INTERNAL ADDRESS MAP
@@ -203,27 +199,6 @@ hyperstone_device::hyperstone_device(const machine_config &mconfig, const char *
 	, m_program_config("program", ENDIANNESS_BIG, prg_data_width, 32, 0, internal_map)
 	, m_io_config("io", ENDIANNESS_BIG, io_data_width, 15)
 	, m_icount(0)
-	, m_cache(CACHE_SIZE + sizeof(hyperstone_device))
-	, m_drcuml(nullptr)
-	, m_drcfe(nullptr)
-	, m_drcoptions(0)
-	, m_cache_dirty(0)
-	, m_entry(nullptr)
-	, m_nocode(nullptr)
-	, m_out_of_cycles(nullptr)
-	, m_drc_arg0(0)
-	, m_drc_arg1(0)
-	, m_drc_arg2(0)
-	, m_drc_arg3(0)
-	, m_mem_read8(nullptr)
-	, m_mem_write8(nullptr)
-	, m_mem_read16(nullptr)
-	, m_mem_write16(nullptr)
-	, m_mem_read32(nullptr)
-	, m_mem_write32(nullptr)
-	, m_io_read32(nullptr)
-	, m_io_write32(nullptr)
-	, m_enable_drc(false)
 {
 }
 
@@ -1017,12 +992,6 @@ void hyperstone_device::device_start()
 
 void hyperstone_device::init(int scale_mask)
 {
-#if ENABLE_E132XS_DRC
-	m_enable_drc = allow_drc();
-#else
-	m_enable_drc = false;
-#endif
-
 	memset(m_global_regs, 0, sizeof(uint32_t) * 32);
 	memset(m_local_regs, 0, sizeof(uint32_t) * 64);
 	m_op = 0;
@@ -1056,38 +1025,6 @@ void hyperstone_device::init(int scale_mask)
 	{
 		m_fl_lut[i] = (i ? i : 16);
 	}
-
-	uint32_t umlflags = 0;
-	m_drcuml = std::make_unique<drcuml_state>(*this, m_cache, umlflags, 1, 32, 1);
-
-	// add UML symbols-
-	m_drcuml->symbol_add(&m_global_regs[0], sizeof(uint32_t), "pc");
-	m_drcuml->symbol_add(&m_global_regs[1], sizeof(uint32_t), "sr");
-	m_drcuml->symbol_add(&m_icount, sizeof(m_icount), "icount");
-
-	char buf[4];
-	for (int i=0; i < 32; i++)
-	{
-		sprintf(buf, "g%d", i);
-		m_drcuml->symbol_add(&m_global_regs[i], sizeof(uint32_t), buf);
-	}
-
-	for (int i=0; i < 64; i++)
-	{
-		sprintf(buf, "l%d", i);
-		m_drcuml->symbol_add(&m_local_regs[i], sizeof(uint32_t), buf);
-	}
-
-	m_drcuml->symbol_add(&m_drc_arg0, sizeof(uint32_t), "arg0");
-	m_drcuml->symbol_add(&m_drc_arg1, sizeof(uint32_t), "arg1");
-	m_drcuml->symbol_add(&m_drc_arg2, sizeof(uint32_t), "arg2");
-	m_drcuml->symbol_add(&m_drc_arg3, sizeof(uint32_t), "arg3");
-
-	/* initialize the front-end helper */
-	m_drcfe = std::make_unique<e132xs_frontend>(this, COMPILE_BACKWARDS_BYTES, COMPILE_FORWARDS_BYTES, SINGLE_INSTRUCTION_MODE ? 1 : COMPILE_MAX_SEQUENCE);
-
-	/* mark the cache dirty so it is updated on next execute */
-	m_cache_dirty = true;
 
 	// register our state for the debugger
 	state_add(STATE_GENPC,    "GENPC",     m_global_regs[0]).noshow();
@@ -1347,14 +1284,6 @@ void hyperstone_device::device_reset()
 
 void hyperstone_device::device_stop()
 {
-	if (m_drcfe != nullptr)
-	{
-		m_drcfe = nullptr;
-	}
-	if (m_drcuml != nullptr)
-	{
-		m_drcuml = nullptr;
-	}
 }
 
 
@@ -1429,72 +1358,28 @@ bool hyperstone_device::get_h() const
 
 void hyperstone_device::hyperstone_trap()
 {
+	static const uint32_t conditions[16] = {
+		0, 0, 0, 0, N_MASK | Z_MASK, N_MASK | Z_MASK, N_MASK, N_MASK, C_MASK | Z_MASK, C_MASK | Z_MASK, C_MASK, C_MASK, Z_MASK, Z_MASK, V_MASK, 0
+	};
+	static const bool trap_if_set[16] = {
+		false, false, false, false, true, false, true, false, true, false, true, false, true, false, true, false
+	};
+
 	check_delay_PC();
 
 	const uint8_t trapno = (m_op & 0xfc) >> 2;
 	const uint32_t addr = get_trap_addr(trapno);
 	const uint8_t code = ((m_op & 0x300) >> 6) | (m_op & 0x03);
 
-	switch (code)
+	if (trap_if_set[code])
 	{
-		case TRAPLE:
-			if (SR & (N_MASK | Z_MASK))
-				execute_trap(addr);
-			break;
-
-		case TRAPGT:
-			if(!(SR & (N_MASK | Z_MASK)))
-				execute_trap(addr);
-			break;
-
-		case TRAPLT:
-			if (SR & N_MASK)
-				execute_trap(addr);
-			break;
-
-		case TRAPGE:
-			if (!(SR & N_MASK))
-				execute_trap(addr);
-			break;
-
-		case TRAPSE:
-			if (SR & (C_MASK | Z_MASK))
-				execute_trap(addr);
-			break;
-
-		case TRAPHT:
-			if (!(SR & (C_MASK | Z_MASK)))
-				execute_trap(addr);
-			break;
-
-		case TRAPST:
-			if (SR & C_MASK)
-				execute_trap(addr);
-			break;
-
-		case TRAPHE:
-			if (!(SR & C_MASK))
-				execute_trap(addr);
-			break;
-
-		case TRAPE:
-			if (SR & Z_MASK)
-				execute_trap(addr);
-			break;
-
-		case TRAPNE:
-			if (!(SR & Z_MASK))
-				execute_trap(addr);
-			break;
-
-		case TRAPV:
-			if (SR & V_MASK)
-				execute_trap(addr);
-			break;
-
-		case TRAP:
+		if (SR & conditions[code])
 			execute_trap(addr);
-			break;
+	}
+	else
+	{
+		if (!(SR & conditions[code]))
+			execute_trap(addr);
 	}
 
 	m_icount -= m_clock_cycles_1;
@@ -1565,12 +1450,6 @@ void hyperstone_device::hyperstone_do()
 
 void hyperstone_device::execute_run()
 {
-	if (m_enable_drc)
-	{
-		execute_run_drc();
-		return;
-	}
-
 	if (m_intblock < 0)
 		m_intblock = 0;
 

@@ -9439,9 +9439,9 @@
 		<!-- Dumped via Kryoflux from original disks, all tracks show as modified -->
 		<description>WarCraft - Orcs &amp; Humans</description>
 		<year>1994</year>
+		<publisher>Interplay</publisher>
 		<info name="version" value="1.05" />
 		<info name="developer" value="Blizzard Entertainment" />
-		<publisher>Interplay</publisher>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
 				<rom name="[PC] Warcraft Orcs and Humans [3.5HD] [Disk 1 of 4].img" size="1474560" crc="528d9208" sha1="4a3fb4cf21acce1a51754e4cdd29d906d6cff6c4" offset="0"/>
@@ -10207,6 +10207,50 @@
 		<part name="flop4" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
 				<rom name="diskd.img" size="1474560" crc="5d84110d" sha1="0140425ccb5aea27ccbff00a320941cccd86ac7a" offset="0" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="l123r3">
+		<!-- missing all other disks -->
+		<description>Lotus 1-2-3 Release 3</description>
+		<year>1989</year>
+		<publisher>Lotus Development</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<!--
+			Lotus 1-2-3 Release 3
+			Drivers Disk 2
+
+			(C) Copyright 1989 Lotus Development Corporation.
+			All rights reserved. Part No. 100007L
+			-->
+			<feature name="part_id" value="Drivers Disk 2"/>
+			<dataarea name="flop" size="737280">
+				<rom name="100007l.img" size="737280" crc="bd2be994" sha1="3c3a3bcbf5b4b4a037ab896c5a607a930f7536fe" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ontrakdm">
+		<description>Ontrack Disk Manager</description>
+		<year>1997</year>
+		<publisher>Quantum Data Systems</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<!--
+			Ontrack Disk Manager
+			For Quantum ATA (IDE) Disk Drives
+			Quantum(TM)
+			Capacity for the Extraordinary(TM)
+
+			Supports ATA disk drives greater than 528 MB under DOS, Windows 3.1X, Windows 95, Windows NT and OS/2
+
+			For detailed installation instructions and to view the on-line manual: insert Disk Manager diskette and type "A: HELP". This diskette is bootable with Ontrack's OS Boot Kernel.
+
+			Rev. G
+			Quantum P/N: 77-109028-01
+			-->
+			<dataarea name="flop" size="1474560">
+				<rom name="77-109028-01.img" size="1474560" crc="565510f6" sha1="d862aec61ee23e9499db92b1d955c01939eabdeb" offset="0"/>
 			</dataarea>
 		</part>
 	</software>

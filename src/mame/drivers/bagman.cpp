@@ -108,7 +108,11 @@ WRITE_LINE_MEMBER(bagman_state::tmsprom_csq0_w)
 
 WRITE_LINE_MEMBER(bagman_state::tmsprom_csq1_w)
 {
-	m_tmsprom->rom_csq_w(machine().dummy_space(), 1, state);
+	// HACK: Schematics suggest that this LS259 does in fact respond to the master
+	// reset signal, which would pull /OE active low on both 2732s at once. How
+	// does that situation manage not to overload the circuitry?
+	if (state || m_tmslatch->q4_r())
+		m_tmsprom->rom_csq_w(machine().dummy_space(), 1, state);
 }
 
 WRITE_LINE_MEMBER(bagman_state::coin_counter_w)

@@ -683,6 +683,42 @@ void running_machine::immediate_load(const char *filename)
 
 
 //-------------------------------------------------
+//  rewind_capture - capture and append a new 
+//  state to the rewind list
+//-------------------------------------------------
+
+void running_machine::rewind_capture()
+{
+	if (m_save.rewind()->enabled())
+		m_save.rewind()->capture();
+}
+
+
+//-------------------------------------------------
+//  rewind_step - a single step back through
+//  rewind states
+//-------------------------------------------------
+
+void running_machine::rewind_step()
+{
+	if (m_save.rewind()->enabled())
+		m_save.rewind()->step();
+}
+
+
+//-------------------------------------------------
+//  rewind_invalidate - mark all the future rewind
+//  states as invalid
+//-------------------------------------------------
+
+void running_machine::rewind_invalidate()
+{
+	if (m_save.rewind()->enabled())
+		m_save.rewind()->invalidate();
+}
+
+
+//-------------------------------------------------
 //  pause - pause the system
 //-------------------------------------------------
 
@@ -721,7 +757,10 @@ void running_machine::resume()
 void running_machine::toggle_pause()
 {
 	if (paused())
+	{
+		rewind_invalidate();
 		resume();
+	}
 	else
 		pause();
 }

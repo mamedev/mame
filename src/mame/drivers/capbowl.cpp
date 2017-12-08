@@ -350,8 +350,8 @@ static MACHINE_CONFIG_START( capbowl )
 
 	MCFG_SOUND_ADD("ymsnd", YM2203, MASTER_CLOCK/2)
 	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("audiocpu", M6809_FIRQ_LINE))
-	MCFG_AY8910_PORT_A_READ_CB(DEVREAD8("ticket", ticket_dispenser_device, read))
-	MCFG_AY8910_PORT_B_WRITE_CB(DEVWRITE8("ticket", ticket_dispenser_device, write))  /* Also a status LED. See memory map above */
+	MCFG_AY8910_PORT_A_READ_CB(DEVREADLINE("ticket", ticket_dispenser_device, line_r)) MCFG_DEVCB_BIT(7)
+	MCFG_AY8910_PORT_B_WRITE_CB(DEVWRITELINE("ticket", ticket_dispenser_device, motor_w)) MCFG_DEVCB_BIT(7)  /* Also a status LED. See memory map above */
 	MCFG_SOUND_ROUTE(0, "speaker", 0.07)
 	MCFG_SOUND_ROUTE(1, "speaker", 0.07)
 	MCFG_SOUND_ROUTE(2, "speaker", 0.07)

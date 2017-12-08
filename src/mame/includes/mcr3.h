@@ -18,12 +18,14 @@ public:
 		m_spyhunt_alpharam(*this, "spyhunt_alpha"),
 		m_maxrpm_adc(*this, "adc"),
 		m_lamplatch(*this, "lamplatch"),
+		m_spyhunt_lamp(*this, "lamp%u", 0U),
 		m_screen(*this, "screen")
 	{ }
 
 	optional_shared_ptr<uint8_t> m_spyhunt_alpharam;
 	optional_device<adc0844_device> m_maxrpm_adc;
 	optional_device<cd4099_device> m_lamplatch;
+	output_finder<8> m_spyhunt_lamp;
 	required_device<screen_device> m_screen;
 
 	uint8_t m_input_mux;
@@ -63,14 +65,7 @@ public:
 	DECLARE_READ8_MEMBER(spyhunt_ip1_r);
 	DECLARE_READ8_MEMBER(spyhunt_ip2_r);
 	DECLARE_WRITE8_MEMBER(spyhunt_op4_w);
-	DECLARE_WRITE_LINE_MEMBER(spyhunt_lamp0_w);
-	DECLARE_WRITE_LINE_MEMBER(spyhunt_lamp1_w);
-	DECLARE_WRITE_LINE_MEMBER(spyhunt_lamp2_w);
-	DECLARE_WRITE_LINE_MEMBER(spyhunt_lamp3_w);
-	DECLARE_WRITE_LINE_MEMBER(spyhunt_lamp4_w);
-	DECLARE_WRITE_LINE_MEMBER(spyhunt_lamp5_w);
-	DECLARE_WRITE_LINE_MEMBER(spyhunt_lamp6_w);
-	DECLARE_WRITE_LINE_MEMBER(spyhunt_lamp7_w);
+	template<int n> DECLARE_WRITE_LINE_MEMBER(spyhunt_lamp_w);
 	DECLARE_READ8_MEMBER(turbotag_ip2_r);
 	DECLARE_READ8_MEMBER(turbotag_kludge_r);
 	DECLARE_DRIVER_INIT(crater);

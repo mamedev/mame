@@ -1337,7 +1337,7 @@ WRITE16_MEMBER(igs017_state::mgcs_magic_w)
 				// ---- ---0 Hopper Motor
 				m_input_select = data & 0xff;
 
-				m_hopperdev->write(space, 0, (data & 0x0001) ? 0x80 : 0x00);
+				m_hopperdev->motor_w(BIT(data, 0));
 
 				if (igs029_irq)
 				{
