@@ -193,6 +193,12 @@ inline void st_state::shifter_load()
 //  glue_tick -
 //-------------------------------------------------
 
+void st_state::draw_pixel(int x, int y, u32 pen)
+{
+	if(x < m_bitmap.width() && y < m_bitmap.height())
+		m_bitmap.pix32(y, x) = pen;
+}
+
 void st_state::glue_tick()
 {
 	int y = machine().first_screen()->vpos();
@@ -241,36 +247,36 @@ void st_state::glue_tick()
 	{
 	case 0:
 		pen = shift_mode_0();
-		m_bitmap.pix32(y, x) = pen;
-		m_bitmap.pix32(y, x+1) = pen;
+		draw_pixel(x, y, pen);
+		draw_pixel(x+1, y, pen);
 		pen = shift_mode_0();
-		m_bitmap.pix32(y, x+2) = pen;
-		m_bitmap.pix32(y, x+3) = pen;
+		draw_pixel(x+2, y, pen);
+		draw_pixel(x+3, y, pen);
 		pen = shift_mode_0();
-		m_bitmap.pix32(y, x+4) = pen;
-		m_bitmap.pix32(y, x+5) = pen;
+		draw_pixel(x+4, y, pen);
+		draw_pixel(x+5, y, pen);
 		pen = shift_mode_0();
-		m_bitmap.pix32(y, x+6) = pen;
-		m_bitmap.pix32(y, x+7) = pen;
+		draw_pixel(x+6, y, pen);
+		draw_pixel(x+7, y, pen);
 		break;
 
 	case 1:
 		pen = shift_mode_1();
-		m_bitmap.pix32(y, x) = pen;
+		draw_pixel(x, y, pen);
 		pen = shift_mode_1();
-		m_bitmap.pix32(y, x+1) = pen;
+		draw_pixel(x+1, y, pen);
 		pen = shift_mode_1();
-		m_bitmap.pix32(y, x+2) = pen;
+		draw_pixel(x+2, y, pen);
 		pen = shift_mode_1();
-		m_bitmap.pix32(y, x+3) = pen;
+		draw_pixel(x+3, y, pen);
 		pen = shift_mode_1();
-		m_bitmap.pix32(y, x+4) = pen;
+		draw_pixel(x+4, y, pen);
 		pen = shift_mode_1();
-		m_bitmap.pix32(y, x+5) = pen;
+		draw_pixel(x+5, y, pen);
 		pen = shift_mode_1();
-		m_bitmap.pix32(y, x+6) = pen;
+		draw_pixel(x+6, y, pen);
 		pen = shift_mode_1();
-		m_bitmap.pix32(y, x+7) = pen;
+		draw_pixel(x+7, y, pen);
 		break;
 
 	case 2:
