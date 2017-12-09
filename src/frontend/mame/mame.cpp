@@ -155,7 +155,14 @@ void mame_machine_manager::start_luaengine()
 	}
 	if (options().console())
 	{
-		m_plugins->set_value("console", "1", OPTION_PRIORITY_CMDLINE);
+		if (m_plugins->exists(OPTION_CONSOLE))
+		{
+			m_plugins->set_value(OPTION_CONSOLE, "1", OPTION_PRIORITY_CMDLINE);
+		}
+		else
+		{
+			osd_printf_error("**Console plugin not found. LUA Console will not start**\n");
+		}
 	}
 
 	m_lua->initialize();
