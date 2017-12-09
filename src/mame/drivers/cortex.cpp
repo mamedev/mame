@@ -21,8 +21,11 @@ TMS9909   - Floppy Disk Controller (not emulated)
 TMS9902   - UART (x2) (not usable with rs232.h)
 AY-5-2376 - Keyboard controller
 
+All input to be in uppercase. Note that "lowercase" is just smaller uppercase,
+and is not acceptable as input.
+
+
 ToDo:
-- All input causes an error message
 - Screen corrupts when scrolling
 - Unemulated devices
 - Keyboard to use AY device
