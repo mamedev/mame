@@ -11,7 +11,6 @@
     such as Arena(in editmode).
 
     TODO:
-    - fex68km3 addressmap RAM mirror? PCB has 2*32K RAM, emulated has 16K+64K
     - USART is not emulated
     - V9(68030 @ 32MHz) is faster than V10(68040 @ 25MHz) but it should be the other
       way around, culprit is unemulated cache?
@@ -29,7 +28,7 @@ PCB label 510-1129A01
 PCB has edge connector for module, but no external slot
 
 There's room for 2 SIMMs at U22 and U23. Unpopulated in Excel 68000, used for
-128KB hashtable RAM in Mach II. Mach III has wire mods to U8/U9(2*32KB).
+128KB hashtable RAM in Mach II. Mach III has wire mods to U8/U9(2*8KB + 2*32KB piggybacked).
 
 I/O is via TTL, overall very similar to EAG.
 
