@@ -38,13 +38,16 @@ public:
 		m_sprites_colour(*this, "sprites_colour"),
 		m_sp_palette(*this, "sp_palette"),
 		m_bg_palette(*this, "bg_palette"),
-		m_tx_palette(*this, "tx_palette")
+		m_tx_palette(*this, "tx_palette"),
+		m_mcu_timer(*this, "mcu_timer")
 	{ }
 
 	DECLARE_READ32_MEMBER(unk_startup_r);
 	DECLARE_READ32_MEMBER(rtc_r);
+	DECLARE_READ32_MEMBER(mcu_r);
 	DECLARE_WRITE32_MEMBER(fg_videoram_w);
 	DECLARE_WRITE32_MEMBER(bg_videoram_w);
+	DECLARE_WRITE32_MEMBER(mcu_w);
 
 	DECLARE_READ32_MEMBER(orleg2_speedup_r);
 	DECLARE_READ32_MEMBER(kov2nl_speedup_r);
@@ -104,6 +107,12 @@ private:
 	uint32_t m_realspritekey;
 	int m_sprite_predecrypted;
 
+	uint32_t m_mcu_regs[8];
+	uint32_t m_mcu_result0;
+	uint32_t m_mcu_result1;
+	uint8_t m_mcu_last_cmd;
+	void mcu_command(bool is_command);
+
 	// devices
 	required_device<cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;
@@ -122,6 +131,7 @@ private:
 	required_device<palette_device> m_sp_palette;
 	required_device<palette_device> m_bg_palette;
 	required_device<palette_device> m_tx_palette;
+	required_device<timer_device> m_mcu_timer;
 };
 
 #endif

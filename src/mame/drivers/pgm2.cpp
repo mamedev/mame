@@ -53,7 +53,7 @@
      codepath that would not exist in a real environment at the moment)
     Fix Save States (is this a driver problem or an ARM core problem, they don't work unless you get through the startup tests)
 
-	Debug features (require DIP SW1:8 On):
+	Debug features (require DIP SW1:8 On and SW1:1 Off):
 	- QC TEST mode: hold P1 A+B during boot
 	- Debug/Cheat mode: hold P1 B+C during boot, when ingame pressing P1 Start skips to next location, where might be more unknown debug features.
 	works for both currently dumped games (orleg2, kov2nl)
@@ -126,10 +126,87 @@ INTERRUPT_GEN_MEMBER(pgm2_state::igs_interrupt)
 
 TIMER_DEVICE_CALLBACK_MEMBER(pgm2_state::igs_interrupt2)
 {
-	int scanline = param;
+	m_arm_aic->set_irq(0x46);
+}
 
-	if(scanline == 0)
-		 m_arm_aic->set_irq(0x46);
+// "MPU" MCU HLE starts here
+void pgm2_state::mcu_command(bool is_command)
+{
+	uint8_t cmd = m_mcu_regs[0] & 0xff;
+	if (is_command && cmd != 0xf6)
+		logerror("MCU command %08x %08x\n", m_mcu_regs[0], m_mcu_regs[1]);
+
+	if (is_command)
+	{
+		m_mcu_last_cmd = cmd;
+		switch (cmd)
+		{
+		case 0xf6:	// get result
+			m_mcu_regs[3] = m_mcu_result0;
+			m_mcu_regs[4] = m_mcu_result1;
+			m_mcu_timer->adjust(attotime::from_msec(1));
+			break;
+		case 0xe0: // command port test
+			m_mcu_result0 = m_mcu_regs[0];
+			m_mcu_result1 = m_mcu_regs[1];
+			m_mcu_timer->adjust(attotime::from_msec(30)); // such quite long delay is needed for debug codes check routine
+			break;
+		case 0xe1: // shared ram access (unimplemented)
+		{
+			// MCU access to RAM shared at 0x30100000, 2x banks, in the same time CPU and MCU access different banks
+			// where is offset ?
+//			uint8_t mode = m_mcu_regs[0] >> 16; // 0 - ???, 1 - read, 2 - write
+//			uint8_t data = m_mcu_regs[0] >> 24;
+			m_mcu_result0 = cmd;
+			m_mcu_result1 = 0;
+			m_mcu_timer->adjust(attotime::from_msec(1));
+		}
+			break;
+		case 0xc0: // unknown / unimplemented, most of them probably IC Card RW related
+		case 0xc1:
+		case 0xc2:
+		case 0xc3:
+		case 0xc4:
+		case 0xc5:
+		case 0xc6:
+		case 0xc7:
+		case 0xc8:
+		case 0xc9:
+			m_mcu_result0 = cmd;
+			m_mcu_result1 = 0;
+			m_mcu_timer->adjust(attotime::from_msec(1));
+			break;
+		default:
+			logerror("MCU unknown command %08x %08x\n", m_mcu_regs[0], m_mcu_regs[1]);
+			m_mcu_timer->adjust(attotime::from_msec(1));
+			break;
+		}
+		m_mcu_regs[3] = (m_mcu_regs[3] & 0xff00ffff) | 0x00F70000;	// set "command accepted" status
+	}
+	else // next step
+	{
+		if (m_mcu_last_cmd && m_mcu_last_cmd != 0xf6)
+		{
+			m_mcu_regs[3] = (m_mcu_regs[3] & 0xff00ffff) | 0x00F20000; 	// set "command done and return data" status
+			m_mcu_timer->adjust(attotime::from_msec(1));
+		}
+	}
+}
+
+READ32_MEMBER(pgm2_state::mcu_r)
+{
+	return m_mcu_regs[(offset >> 15) & 7];
+}
+
+WRITE32_MEMBER(pgm2_state::mcu_w)
+{
+	int reg = (offset >> 15) & 7;
+	COMBINE_DATA(&m_mcu_regs[reg]);
+
+	if (reg == 2 && m_mcu_regs[2]) // irq to mcu
+		mcu_command(true);
+	if (reg == 5 && m_mcu_regs[5]) // ack to mcu (written at the end of irq handler routine)
+		mcu_command(false);
 }
 
 static ADDRESS_MAP_START( pgm2_map, AS_PROGRAM, 32, pgm2_state )
@@ -137,13 +214,7 @@ static ADDRESS_MAP_START( pgm2_map, AS_PROGRAM, 32, pgm2_state )
 
 	AM_RANGE(0x02000000, 0x0200ffff) AM_RAM AM_SHARE("sram") // 'battery ram' (in CPU?)
 
-	// could be the card reader, looks a bit like a standard IGS MCU comms protocol going on here
-	AM_RANGE(0x03600000, 0x03600003) AM_WRITENOP
-	AM_RANGE(0x03620000, 0x03620003) AM_WRITENOP
-	AM_RANGE(0x03640000, 0x03640003) AM_WRITENOP
-	AM_RANGE(0x03660000, 0x03660003) AM_READ_PORT("UNK1")
-	AM_RANGE(0x03680000, 0x03680003) AM_READ_PORT("UNK2")
-	AM_RANGE(0x036a0000, 0x036a0003) AM_WRITENOP
+	AM_RANGE(0x03600000, 0x036bffff) AM_READWRITE(mcu_r, mcu_w)
 
 	AM_RANGE(0x03900000, 0x03900003) AM_READ_PORT("INPUTS0")
 	AM_RANGE(0x03a00000, 0x03a00003) AM_READ_PORT("INPUTS1")
@@ -170,7 +241,7 @@ static ADDRESS_MAP_START( pgm2_map, AS_PROGRAM, 32, pgm2_state )
 	what is the real size? */
 	AM_RANGE(0x300e0000, 0x300e03ff) AM_RAM AM_SHARE("lineram") AM_MIRROR(0x000fc00)
 
-	AM_RANGE(0x30100000, 0x301000ff) AM_RAM // unknown mask 00ff00ff, seems to be banked with 0x30120030 too?
+	AM_RANGE(0x30100000, 0x301000ff) AM_RAM // MCU shared RAM, access at even bytes only (8bit device at 16bit bus?), 2x banks switched via 0x30120032 register (16bit)
 
 	AM_RANGE(0x30120000, 0x30120003) AM_RAM AM_SHARE("bgscroll") // scroll
 	AM_RANGE(0x30120038, 0x3012003b) AM_WRITE(sprite_encryption_w)
@@ -189,19 +260,11 @@ static ADDRESS_MAP_START( pgm2_map, AS_PROGRAM, 32, pgm2_state )
 
 	AM_RANGE(0xfffffd28, 0xfffffd2b) AM_READ(rtc_r)
 
-	AM_RANGE(0xfffffa08, 0xfffffa0b) AM_WRITE(encryption_do_w) // after uploading encryption? table might actually send it or enable external ROM?
+	AM_RANGE(0xfffffa08, 0xfffffa0b) AM_WRITE(encryption_do_w) // after uploading encryption? table might actually send it or enable external ROM? when read bits0-1 is ROM board status (0 if OK)
 	AM_RANGE(0xfffffa0c, 0xfffffa0f) AM_READ(unk_startup_r)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( pgm2 )
-// probably not inputs
-	PORT_START("UNK1")
-	PORT_BIT( 0xffffffff, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-
-// probably not inputs
-	PORT_START("UNK2")
-	PORT_BIT( 0xffffffff, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-
 	PORT_START("INPUTS0")
 	PORT_BIT( 0x00000001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(1)
 	PORT_BIT( 0x00000002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(1)
@@ -300,12 +363,17 @@ void pgm2_state::machine_start()
 	save_item(NAME(m_has_decrypted));
 	save_item(NAME(m_spritekey));
 	save_item(NAME(m_realspritekey));
+	save_item(NAME(m_mcu_regs));
+	save_item(NAME(m_mcu_result0));
+	save_item(NAME(m_mcu_result1));
+	save_item(NAME(m_mcu_last_cmd));
 }
 
 void pgm2_state::machine_reset()
 {
 	m_spritekey = 0;
 	m_realspritekey = 0;
+	m_mcu_last_cmd = 0;
 }
 
 static const gfx_layout tiles8x8_layout =
@@ -348,7 +416,7 @@ static MACHINE_CONFIG_START( pgm2 )
 	MCFG_CPU_PROGRAM_MAP(pgm2_map)
 
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", pgm2_state,  igs_interrupt)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", pgm2_state, igs_interrupt2, "screen", 0, 1)
+	MCFG_TIMER_DRIVER_ADD("mcu_timer", pgm2_state, igs_interrupt2)
 
 	MCFG_ARM_AIC_ADD("arm_aic")
 	MCFG_IRQ_LINE_CB(WRITELINE(pgm2_state, irq))
