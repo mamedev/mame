@@ -5,7 +5,6 @@
 
 #pragma once
 
-#include "video/dp8510.h"
 
 class dp8510_device : public device_t
 {

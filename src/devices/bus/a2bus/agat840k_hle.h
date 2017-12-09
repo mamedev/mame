@@ -14,11 +14,9 @@
 #pragma once
 
 #include "a2bus.h"
+#include "imagedev/flopdrv.h"
 #include "machine/i8255.h"
 
-
-#define MXCSR_SYNC		0x40
-#define MXCSR_TR		0x80
 
 
 //**************************************************************************
@@ -26,10 +24,16 @@
 //**************************************************************************
 
 class a2bus_agat840k_hle_device:
-	public device_t,
-	public device_a2bus_card_interface
+		public device_t,
+		public device_a2bus_card_interface
 {
 public:
+	enum : u8
+	{
+		MXCSR_SYNC  = 0x40,
+		MXCSR_TR    = 0x80
+	};
+
 	// construction/destruction
 	a2bus_agat840k_hle_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 

@@ -13,9 +13,9 @@
 *********************************************************************/
 
 #include "emu.h"
-#include "imagedev/flopdrv.h"
-#include "formats/agat840k_hle_dsk.h"
 #include "agat840k_hle.h"
+
+#include "formats/agat840k_hle_dsk.h"
 
 //#define VERBOSE 1
 #include "logmacro.h"
@@ -175,14 +175,18 @@ void a2bus_agat840k_hle_device::device_reset()
 		}
 		for (int j = 0; j < 21; j++)
 		{
-			int k, cksum = 0, s = (j * 1) % 21;
+			const int s = (j * 1) % 21;
+			int cksum = 0;
 
 			m_floppy->floppy_drive_read_sector_data(t & 1, s, buf, 256);
 
-#define BAUX 22
-#define BLOB (256 + 19 + BAUX)
+			enum
+			{
+				BAUX = 22,
+				BLOB = 256 + 19 + BAUX
+			};
 
-			for (k = 0; k < 256; k++)
+			for (int k = 0; k < 256; k++)
 			{
 				if (cksum > 255) { cksum++; cksum &= 255; }
 				cksum += buf[k];
@@ -211,13 +215,11 @@ void a2bus_agat840k_hle_device::device_reset()
 			elem[13 + (BLOB * j) + 17 + 257] = 0x5a;
 
 			// gap3
-			for (k = 0; k < BAUX; k++)
+			for (int k = 0; k < BAUX; k++)
 			{
 				elem[13 + (BLOB * j) + 17 + 258 + k] = 0xaa;
 			}
 		}
-#undef BAUX
-#undef BLOB
 
 		t++;
 		if ((t & 1) == 0)
@@ -407,9 +409,7 @@ WRITE8_MEMBER(a2bus_agat840k_hle_device::d14_o_c)
 // data are latched in by write to PC4
 READ8_MEMBER(a2bus_agat840k_hle_device::d15_i_a)
 {
-	u16 data = 0;
-
-	data = m_tracks[(2 * m_floppy->floppy_drive_get_current_track()) + m_side][m_count_read];
+	const u16 data = m_tracks[(2 * m_floppy->floppy_drive_get_current_track()) + m_side][m_count_read];
 	LOG("sector data: %02x @ %4d (head %d track %2d)%s\n", data & 0xff, m_count_read,
 		m_side, m_floppy->floppy_drive_get_current_track(), 
 		BIT(data, 14) ? " volume" : (BIT(data, 13) ? " cksum" : ""));
