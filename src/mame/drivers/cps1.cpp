@@ -5525,8 +5525,8 @@ ROM_START( 1941j )
 	ROM_LOAD( "sou1",         0x0000, 0x0117, CRC(84f4b2fe) SHA1(dcc9e86cc36316fe42eace02d6df75d08bc8bb6d) )
 
 	ROM_REGION( 0x0200, "bboardplds", 0 )
-	ROM_LOAD( "yi22b.1a",     0x0000, 0x0117, NO_DUMP )
-	ROM_LOAD( "lwio.12e",     0x0000, 0x0117, CRC(ad52b90c) SHA1(f0fd6aeea515ee449320fe15684e6b3ab7f97bf4) )    // pal verification required
+	ROM_LOAD( "yi22b.1a",     0x0000, 0x0117, CRC(b5cad2a0) SHA1(3b1232cf821617bc9819fa7b9b3f4e7fc66976f3) )
+	ROM_LOAD( "lwio.12e",     0x0000, 0x0117, CRC(ad52b90c) SHA1(f0fd6aeea515ee449320fe15684e6b3ab7f97bf4) )
 ROM_END
 
 /* B-Board 89624B-3 */
