@@ -2,17 +2,23 @@
 // copyright-holders:Robbbert
 /***************************************************************************
 
-        Stuart's Breadboard Project. TMS9995 evaluation kit TMAM6095.
+Stuart's Breadboard Project. TMS9995 evaluation kit TMAM6095.
 
-        2013-06-02 Skeleton driver.
+2013-06-02 Skeleton driver.
 
-        http://www.avjd51.dsl.pipex.com/tms9995_eval_module/tms9995_eval_module.htm
+http://www.stuartconner.me.uk/tms9995_eval_module/tms9995_eval_module.htm
 
+It uses TMS9902 UART for comms, but our implementation of that chip is
+not ready for rs232.h as yet.
+
+Press any key to get it started. All input to be in uppercase. Haven't found
+any commands that work as yet.
 
 ****************************************************************************/
 
 #include "emu.h"
 #include "cpu/tms9900/tms9995.h"
+//#include "machine/tms9902.h"
 #include "machine/terminal.h"
 
 
@@ -33,7 +39,9 @@ private:
 	virtual void machine_reset() override;
 	uint8_t m_term_data;
 	uint8_t m_term_out;
-	required_device<cpu_device> m_maincpu;
+	bool m_rin;
+	bool m_rbrl;
+	required_device<tms9995_device> m_maincpu;
 	required_device<generic_terminal_device> m_terminal;
 };
 
@@ -44,8 +52,10 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( io_map, AS_IO, 8, evmbug_state )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x0007) AM_WRITE(rs232_w)
-	AM_RANGE(0x0000, 0x0002) AM_READ(rs232_r)
+	//AM_RANGE(0x0000, 0x0003) AM_DEVREAD("uart1", tms9902_device, cruread)
+	//AM_RANGE(0x0000, 0x001f) AM_DEVWRITE("uart1", tms9902_device, cruwrite)
+	AM_RANGE(0x0000, 0x0003) AM_READ(rs232_r)
+	AM_RANGE(0x0000, 0x001f) AM_WRITE(rs232_w)
 ADDRESS_MAP_END
 
 /* Input ports */
@@ -54,60 +64,64 @@ INPUT_PORTS_END
 
 READ8_MEMBER( evmbug_state::rs232_r )
 {
-	static uint8_t temp = 0;
-	temp^=0xff;
-	if (offset == 1)
-		return temp;
-
+	if (offset == 0)
+		return m_term_data;
+	else
 	if (offset == 2)
+		return (m_rbrl ? 0x20 : 0) | 0xc0;
+	else
 	{
-		return 0xff;//(m_term_data) ? 0 : 0xff;
+		m_rin ^= 1;
+		return m_rin << 7;
 	}
-
-	uint8_t ret = m_term_data;
-	m_term_data = 0;
-	return ret;
 }
 
 WRITE8_MEMBER( evmbug_state::rs232_w )
 {
-	if (offset == 0)
-		m_term_out = 0;
+	if (offset < 8)
+	{
+		if (offset == 0)
+			m_term_out = 0;
 
-	m_term_out |= (data << offset);
+		m_term_out |= (data << offset);
 
-	if (offset == 7)
-		m_terminal->write(space, 0, m_term_out & 0x7f);
+		if (offset == 7)
+			m_terminal->write(space, 0, m_term_out & 0x7f);
+	}
+	else
+	if (offset == 18)
+		m_rbrl = 0;
 }
 
 void evmbug_state::kbd_put(u8 data)
 {
 	m_term_data = data;
+	m_rbrl = data ? 1 : 0;
 }
 
 void evmbug_state::machine_reset()
 {
-	m_term_data = 0;
+	m_rbrl = 0;
 	// Disable auto wait state generation by raising the READY line on reset
-	static_cast<tms9995_device*>(machine().device("maincpu"))->ready_line(ASSERT_LINE);
+	m_maincpu->ready_line(ASSERT_LINE);
 }
 
 static MACHINE_CONFIG_START( evmbug )
 	// basic machine hardware
 	// TMS9995 CPU @ 12.0 MHz
 	// We have no lines connected yet
-	MCFG_TMS99xx_ADD("maincpu", TMS9995, 12000000, mem_map, io_map )
+	MCFG_TMS99xx_ADD("maincpu", TMS9995, XTAL_12MHz, mem_map, io_map )
 
 	/* video hardware */
 	MCFG_DEVICE_ADD("terminal", GENERIC_TERMINAL, 0)
 	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(PUT(evmbug_state, kbd_put))
+
+	//MCFG_DEVICE_ADD("uart1", TMS9902, XTAL_12MHz / 4)
 MACHINE_CONFIG_END
 
 /* ROM definition */
 ROM_START( evmbug )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
-//  ROM_LOAD( "u8.bin", 0x0000, 0x1000, CRC(bdb8c7bd) SHA1(340829dcb7a65f2e830fd5aff82a312e3ed7918f) )
-//  ROM_LOAD( "u9.bin", 0x1000, 0x0800, CRC(4de459ea) SHA1(00a42fe556d4ffe1f85b2ce369f544b07fbd06d9) )
 	ROM_LOAD( "evmbug.bin", 0x0000, 0x8000, CRC(a239ec56) SHA1(65b500d7d0f897ce0c320cf3ec32ff4042774599) )
 ROM_END
 
