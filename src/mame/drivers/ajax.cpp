@@ -173,7 +173,7 @@ static MACHINE_CONFIG_START( ajax )
 	MCFG_CPU_ADD("maincpu", KONAMI, XTAL_24MHz/2/4)    /* 052001 12/4 MHz*/
 	MCFG_CPU_PROGRAM_MAP(ajax_main_map)
 
-	MCFG_CPU_ADD("sub", HD6309, 3000000) /* ? */
+	MCFG_CPU_ADD("sub", HD6309E, 3000000) /* ? */
 	MCFG_CPU_PROGRAM_MAP(ajax_sub_map)
 
 	MCFG_CPU_ADD("audiocpu", Z80, 3579545)  /* 3.58 MHz */
