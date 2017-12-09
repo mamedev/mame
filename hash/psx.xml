@@ -10176,7 +10176,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<rom name="Gunners Heaven (Japan).cue" size="88" crc="6c5136cc" sha1="44136d13f418a67d8342f07d0d3fac2f165ee039"/>
 		<rom name="Gunners Heaven (Japan).bin" size="398306496" crc="4ff1d1aa" sha1="82bc08baacad979beea29cea702c2c9d85a7c206"/>
 		-->
-		<description>Gunner's Heaven (Japan)</description>
+		<description>Gunners Heaven (Japan)</description>
 		<year>1995</year>
 		<publisher>Media Vision</publisher>
 		<part name="cdrom" interface="psx_cdrom">
@@ -13688,7 +13688,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<rom name="Macross Digital Mission VF-X (Japan) (v1.1) (Track 1).bin" size="650036352" crc="a8eead5b" sha1="732bb1fb49b6822d960d8b1cfd3e8e44e15d5195"/>
 		<rom name="Macross Digital Mission VF-X (Japan) (v1.1) (Track 2).bin" size="1712256" crc="c9cc476e" sha1="4f9f15c5f519429eccb33d5ceebf18cdf681849c"/>
 		-->
-		<description>Macross VF-X (Japan)</description>
+		<description>Macross Digital Mission VF-X (Japan)</description>
 		<year>1997</year>
 		<publisher>Bandai</publisher>
 		<part name="cdrom" interface="psx_cdrom">
