@@ -30,8 +30,8 @@
 		<year>1995</year>
 		<publisher>Finson / Antinomia</publisher>
 		<part name="cdrom" interface="cdrom">
+			<feature name="disk_label" value="CD0141" />
 			<diskarea name="cdrom">
-				<feature name="disk_label" value="CD0141" />
 				<disk name="pompei" sha1="964c914b8580a21b2f1a54e9329336ead243598b" />
 			</diskarea>			
 		</part>
