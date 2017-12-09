@@ -2,23 +2,39 @@
 // copyright-holders:Robbbert
 /***************************************************************************
 
-        Powertran Cortex
+Powertran Cortex
 
-        2012-04-20 Skeleton driver.
+2012-04-20 Skeleton driver.
 
-        ftp://ftp.whtech.com/Powertran Cortex/
-        http://www.powertrancortex.com/index.html
+ftp://ftp.whtech.com/Powertran Cortex/
+http://www.powertrancortex.com/index.html
 
-        Uses Texas Instruments parts and similar to other TI computers.
-        It was designed by TI engineers, so it may perhaps be a clone
-        of another TI or the Geneve.
+Uses Texas Instruments parts and similar to other TI computers.
+It was designed by TI engineers, so it may perhaps be a clone
+of another TI or the Geneve.
 
-        Chips:
-        TMS9995   - CPU
-        TMS9929   - Video
-        TMS9911   - DMA to floppy
-        TMS9909   - Floppy Disk Controller
-        AY-5-2376 - Keyboard controller
+Chips:
+TMS9995   - CPU
+TMS9929   - Video
+TMS9911   - DMA to floppy (not emulated)
+TMS9909   - Floppy Disk Controller (not emulated)
+TMS9902   - UART (x2) (not usable with rs232.h)
+AY-5-2376 - Keyboard controller
+
+ToDo:
+- All input causes an error message
+- Screen corrupts when scrolling
+- Unemulated devices
+- Keyboard to use AY device
+- Banking
+- Memory manager device
+- Various CRU I/O
+
+Note that the MAME implementation of CRU addresses is not the same as real
+hardware. For writing, MAME uses the correct address (R12/2 + offset), with
+the bit (0 or 1), being in 'data'. However, for reading, 8 CRU bits are
+packed into a single address-byte (CRU 0 = bit 0, etc). So the address is
+(R12/2 + offset) >> 3.
 
 ****************************************************************************/
 
@@ -27,6 +43,8 @@
 #include "cpu/tms9900/tms9995.h"
 #include "machine/74259.h"
 #include "video/tms9928a.h"
+//#include "machine/tms9902.h"
+#include "machine/keyboard.h"
 
 class cortex_state : public driver_device
 {
@@ -37,7 +55,14 @@ public:
 		, m_p_ram(*this, "ram")
 		{ }
 
+	void kbd_put(u8 data);
+	DECLARE_WRITE_LINE_MEMBER(keyboard_ack_w);
+	DECLARE_READ8_MEMBER(pio_r);
+	DECLARE_READ8_MEMBER(keyboard_r);
+
 private:
+	bool m_cru0005;
+	uint8_t m_term_data;
 	virtual void machine_reset() override;
 	required_device<tms9995_device> m_maincpu;
 	required_shared_ptr<uint8_t> m_p_ram;
@@ -53,11 +78,13 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( io_map, AS_IO, 8, cortex_state )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x000f) AM_MIRROR(0x0030) AM_DEVWRITE("control", ls259_device, write_a0)
-	//AM_RANGE(0x0000, 0x000f) AM_MIRROR(0x0020) AM_READ(pio_r)
-	//AM_RANGE(0x0010, 0x001f) AM_MIRROR(0x0020) AM_READ(keyboard_r)
-	//AM_RANGE(0x0080, 0x00bf) AM_READWRITE(rs232_r,rs232_w)
-	//AM_RANGE(0x0180, 0x01bf) AM_READWRITE(cass_r,cass_w)
+	AM_RANGE(0x0000, 0x0007) AM_MIRROR(0x18) AM_DEVWRITE("control", ls259_device, write_d0)
+	AM_RANGE(0x0000, 0x0000) AM_READ(pio_r)
+	AM_RANGE(0x0001, 0x0001) AM_READ(keyboard_r)
+	// read ranges are incorrect - should be 1/8th of current values.
+	//AM_RANGE(0x0080, 0x00bf) AM_DEVREADWRITE("uart1", tms9902_device, cruread, cruwrite) // RS232
+	//AM_RANGE(0x0180, 0x01bf) AM_DEVREADWRITE("uart2", tms9902_device, cruread, cruwrite) // Cassette
+	//AM_RANGE(0x01c0, 0x01ff) // DMA controller - TMS9911
 	//AM_RANGE(0x0800, 0x080f) AM_WRITE(cent_data_w)
 	//AM_RANGE(0x0810, 0x0811) AM_WRITE(cent_strobe_w)
 	//AM_RANGE(0x0812, 0x0813) AM_READ(cent_stat_r)
@@ -69,9 +96,35 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START( cortex )
 INPUT_PORTS_END
 
+READ8_MEMBER( cortex_state::pio_r )
+{
+	return (m_cru0005 ? 0x20 : 0) | 0xdf;
+}
+
+READ8_MEMBER( cortex_state::keyboard_r )
+{
+	return m_term_data;
+}
+
+WRITE_LINE_MEMBER( cortex_state::keyboard_ack_w )
+{
+	if (!state)
+	{
+		m_maincpu->set_input_line(INT_9995_INT4, CLEAR_LINE);
+		m_cru0005 = 1;
+	}
+}
+
+void cortex_state::kbd_put(u8 data)
+{
+	m_term_data = data;
+	m_cru0005 = 0;
+	m_maincpu->set_input_line(INT_9995_INT4, ASSERT_LINE);
+}
 
 void cortex_state::machine_reset()
 {
+	m_cru0005 = 1;
 	uint8_t* ROM = memregion("maincpu")->base();
 	memcpy(m_p_ram, ROM, 0x6000);
 	m_maincpu->ready_line(ASSERT_LINE);
@@ -82,11 +135,11 @@ static MACHINE_CONFIG_START( cortex )
 	/* TMS9995 CPU @ 12.0 MHz */
 	// Standard variant, no overflow int
 	// No lines connected yet
-	MCFG_TMS99xx_ADD("maincpu", TMS9995, 12000000, mem_map, io_map)
+	MCFG_TMS99xx_ADD("maincpu", TMS9995, XTAL_12MHz, mem_map, io_map)
 
 	MCFG_DEVICE_ADD("control", LS259, 0) // IC64
 	//MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(cortex_state, basic_led_w))
-	//MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(cortex_state, keyboard_ack_w))
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(cortex_state, keyboard_ack_w))
 	//MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(cortex_state, ebus_int_ack_w))
 	//MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(cortex_state, ebus_to_en_w))
 	//MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(cortex_state, disk_size_w))
@@ -98,6 +151,12 @@ static MACHINE_CONFIG_START( cortex )
 	MCFG_TMS9928A_VRAM_SIZE(0x4000)
 	MCFG_TMS9928A_SCREEN_ADD_PAL( "screen" )
 	MCFG_SCREEN_UPDATE_DEVICE( "tms9928a", tms9928a_device, screen_update )
+
+	MCFG_DEVICE_ADD("keyboard", GENERIC_KEYBOARD, 0)
+	MCFG_GENERIC_KEYBOARD_CB(PUT(cortex_state, kbd_put))
+
+	//MCFG_DEVICE_ADD("uart1", TMS9902, XTAL_12MHz / 4)
+	//MCFG_DEVICE_ADD("uart2", TMS9902, XTAL_12MHz / 4)
 MACHINE_CONFIG_END
 
 /* ROM definition */
