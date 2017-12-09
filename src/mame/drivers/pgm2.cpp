@@ -139,17 +139,18 @@ void pgm2_state::mcu_command(bool is_command)
 	if (is_command)
 	{
 		m_mcu_last_cmd = cmd;
+		uint8_t status = 0xf7; // "command accepted" status
+		int delay = 1;
 		switch (cmd)
 		{
 		case 0xf6:	// get result
 			m_mcu_regs[3] = m_mcu_result0;
 			m_mcu_regs[4] = m_mcu_result1;
-			m_mcu_timer->adjust(attotime::from_msec(1));
 			break;
 		case 0xe0: // command port test
 			m_mcu_result0 = m_mcu_regs[0];
 			m_mcu_result1 = m_mcu_regs[1];
-			m_mcu_timer->adjust(attotime::from_msec(30)); // such quite long delay is needed for debug codes check routine
+			delay = 30;  // such quite long delay is needed for debug codes check routine
 			break;
 		case 0xe1: // shared ram access (unimplemented)
 		{
@@ -159,10 +160,12 @@ void pgm2_state::mcu_command(bool is_command)
 //			uint8_t data = m_mcu_regs[0] >> 24;
 			m_mcu_result0 = cmd;
 			m_mcu_result1 = 0;
-			m_mcu_timer->adjust(attotime::from_msec(1));
 		}
 			break;
-		case 0xc0: // unknown / unimplemented, most of them probably IC Card RW related
+			// unknown / unimplemented, all C0-C9 commands is IC Card RW related
+			// (m_mcu_regs[0] >> 8) & 0xff - target RW unit (player) #
+		case 0xc0: // insert card or/and check card presence. result: F7 - ok, F4 - no card
+			status = 0xf4;
 		case 0xc1:
 		case 0xc2:
 		case 0xc3:
@@ -174,14 +177,14 @@ void pgm2_state::mcu_command(bool is_command)
 		case 0xc9:
 			m_mcu_result0 = cmd;
 			m_mcu_result1 = 0;
-			m_mcu_timer->adjust(attotime::from_msec(1));
 			break;
 		default:
 			logerror("MCU unknown command %08x %08x\n", m_mcu_regs[0], m_mcu_regs[1]);
-			m_mcu_timer->adjust(attotime::from_msec(1));
+			status = 0xf4; // error
 			break;
 		}
-		m_mcu_regs[3] = (m_mcu_regs[3] & 0xff00ffff) | 0x00F70000;	// set "command accepted" status
+		m_mcu_regs[3] = (m_mcu_regs[3] & 0xff00ffff) | (status << 16);
+		m_mcu_timer->adjust(attotime::from_msec(delay));
 	}
 	else // next step
 	{
