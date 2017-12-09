@@ -22,7 +22,20 @@
 			</diskarea>
 		</part>
 	</software>
-	
+
+	<!-- Can't install to hard disk, can't save game, default text speed is very slow on 486 -->
+	<!-- (set option 5 from 100 to 0 to make text and voices to sync) -->
+	<software name="pompei" supported="partial">
+		<description>Pompei A.D. LXXIX</description>
+		<year>1995</year>
+		<publisher>Finson / Antinomia</publisher>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="pompei" sha1="964c914b8580a21b2f1a54e9329336ead243598b" />
+			</diskarea>			
+		</part>
+	</software>
+
 	<software name="sideline">
 		<description>Sideline</description>
 		<year>1996</year>
