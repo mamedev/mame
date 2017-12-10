@@ -124,28 +124,62 @@ INTERRUPT_GEN_MEMBER(pgm2_state::igs_interrupt)
 	m_arm_aic->set_irq(0x47);
 }
 
+WRITE16_MEMBER(pgm2_state::share_bank_w)
+{
+	COMBINE_DATA(&m_share_bank);
+}
+
+READ8_MEMBER(pgm2_state::shareram_r)
+{
+	return m_shareram[offset + (m_share_bank & 1) * 128];
+}
+WRITE8_MEMBER(pgm2_state::shareram_w)
+{
+	m_shareram[offset + (m_share_bank & 1) * 128] = data;
+}
+
+
 TIMER_DEVICE_CALLBACK_MEMBER(pgm2_state::igs_interrupt2)
 {
 	m_arm_aic->set_irq(0x46);
 }
 
+static const uint8_t orleg2_china_card[32] = {
+	0xA2, 0x13, 0x10, 0x91, 0x05, 0x0C, 0x81, 0x15, 0x10, 0x00, 0x00, 0x03, 0x00, 0x49, 0x47, 0x53,
+	0x00, 0x00, 0x00, 0x00, 0x00, 0xD2, 0x76, 0x00, 0x00, 0x04, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
+};
+#ifdef UNUSED_DEFINITION
+static const uint8_t kov2nl_china_card[32] = {
+	0xA2, 0x13, 0x10, 0x91, 0x05, 0x0C, 0x81, 0x15, 0x06, 0x00, 0x00, 0x04, 0x00, 0x49, 0x47, 0x53,
+	0x00, 0x00, 0x00, 0x00, 0x00, 0xD2, 0x76, 0x00, 0x00, 0x04, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
+};
+#endif
+
 // "MPU" MCU HLE starts here
+// TODO: make data cards using image_interface
+// command delays is far not correct, might not work in other games
+// command results probably either incorrect (except for explicit checked bytes)
 void pgm2_state::mcu_command(bool is_command)
 {
 	uint8_t cmd = m_mcu_regs[0] & 0xff;
-	if (is_command && cmd != 0xf6)
-		logerror("MCU command %08x %08x\n", m_mcu_regs[0], m_mcu_regs[1]);
+//	if (is_command && cmd != 0xf6)
+//		logerror("MCU command %08x %08x\n", m_mcu_regs[0], m_mcu_regs[1]);
 
 	if (is_command)
 	{
 		m_mcu_last_cmd = cmd;
 		uint8_t status = 0xf7; // "command accepted" status
 		int delay = 1;
+
+		uint8_t arg1 = m_mcu_regs[0] >> 8;
+		uint8_t arg2 = m_mcu_regs[0] >> 16;
+		uint8_t arg3 = m_mcu_regs[0] >> 24;
 		switch (cmd)
 		{
 		case 0xf6:	// get result
 			m_mcu_regs[3] = m_mcu_result0;
 			m_mcu_regs[4] = m_mcu_result1;
+			m_mcu_last_cmd = 0;
 			break;
 		case 0xe0: // command port test
 			m_mcu_result0 = m_mcu_regs[0];
@@ -155,28 +189,48 @@ void pgm2_state::mcu_command(bool is_command)
 		case 0xe1: // shared ram access (unimplemented)
 		{
 			// MCU access to RAM shared at 0x30100000, 2x banks, in the same time CPU and MCU access different banks
-			// where is offset ?
-//			uint8_t mode = m_mcu_regs[0] >> 16; // 0 - ???, 1 - read, 2 - write
-//			uint8_t data = m_mcu_regs[0] >> 24;
+			uint8_t mode = m_mcu_regs[0] >> 16; // 0 - ???, 1 - read, 2 - write
+			uint8_t data = m_mcu_regs[0] >> 24;
+			if (mode == 2)
+			{
+				// where is offset ? so far assume this command fill whole page
+				memset(&m_shareram[(~m_share_bank & 1) * 128], data, 128);
+			}
 			m_mcu_result0 = cmd;
 			m_mcu_result1 = 0;
 		}
 			break;
 			// unknown / unimplemented, all C0-C9 commands is IC Card RW related
-			// (m_mcu_regs[0] >> 8) & 0xff - target RW unit (player) #
+			// (m_mcu_regs[0] >> 8) & 0xff - target RW unit (player)
 		case 0xc0: // insert card or/and check card presence. result: F7 - ok, F4 - no card
-			status = 0xf4;
-		case 0xc1:
-		case 0xc2:
-		case 0xc3:
-		case 0xc4:
-		case 0xc5:
-		case 0xc6:
-		case 0xc7:
-		case 0xc8:
-		case 0xc9:
+			if (!m_have_card[arg1])
+				status = 0xf4;
 			m_mcu_result0 = cmd;
-			m_mcu_result1 = 0;
+			break;
+		case 0xc1: // check ready/busy ?
+			m_mcu_result0 = cmd;
+			break;
+		case 0xc2: // read data to shared ram, args - offset, len
+			memcpy(&m_shareram[(~m_share_bank & 1) * 128], &m_card_data[arg1][arg2], arg3);
+			m_mcu_result0 = cmd;
+			break;
+		case 0xc3: // save data from shared ram, args - offset, len
+			memcpy(&m_card_data[arg1][arg2], &m_shareram[(~m_share_bank & 1) * 128], arg3);
+			m_mcu_result0 = cmd;
+			break;
+		case 0xc7: // get card ID?, no args, result1 expected to be fixed value for new card
+			m_mcu_result1 = 0xf81f0000;
+			m_mcu_result0 = cmd;
+			break;
+		case 0xc8: // write byte, args - offset, data byte
+			m_card_data[arg1][arg2] = arg3;
+			m_mcu_result0 = cmd;
+			break;
+		case 0xc4: // not used
+		case 0xc5: // set new password?, args - offset, data byte (offs 0 - always 7, 1-3 password)
+		case 0xc6: // not used
+		case 0xc9: // card authentication, args - 3 byte password, ('I','G','S' for new cards)
+			m_mcu_result0 = cmd;
 			break;
 		default:
 			logerror("MCU unknown command %08x %08x\n", m_mcu_regs[0], m_mcu_regs[1]);
@@ -188,10 +242,11 @@ void pgm2_state::mcu_command(bool is_command)
 	}
 	else // next step
 	{
-		if (m_mcu_last_cmd && m_mcu_last_cmd != 0xf6)
+		if (m_mcu_last_cmd)
 		{
 			m_mcu_regs[3] = (m_mcu_regs[3] & 0xff00ffff) | 0x00F20000; 	// set "command done and return data" status
-			m_mcu_timer->adjust(attotime::from_msec(1));
+			m_mcu_timer->adjust(attotime::from_usec(100));
+			m_mcu_last_cmd = 0;
 		}
 	}
 }
@@ -244,9 +299,10 @@ static ADDRESS_MAP_START( pgm2_map, AS_PROGRAM, 32, pgm2_state )
 	what is the real size? */
 	AM_RANGE(0x300e0000, 0x300e03ff) AM_RAM AM_SHARE("lineram") AM_MIRROR(0x000fc00)
 
-	AM_RANGE(0x30100000, 0x301000ff) AM_RAM // MCU shared RAM, access at even bytes only (8bit device at 16bit bus?), 2x banks switched via 0x30120032 register (16bit)
+	AM_RANGE(0x30100000, 0x301000ff) AM_READWRITE8(shareram_r, shareram_w, 0x00ff00ff)
 
 	AM_RANGE(0x30120000, 0x30120003) AM_RAM AM_SHARE("bgscroll") // scroll
+	AM_RANGE(0x30120030, 0x30120033) AM_WRITE16(share_bank_w, 0xffff0000)
 	AM_RANGE(0x30120038, 0x3012003b) AM_WRITE(sprite_encryption_w)
 	// there are other 0x301200xx regs
 
@@ -370,6 +426,8 @@ void pgm2_state::machine_start()
 	save_item(NAME(m_mcu_result0));
 	save_item(NAME(m_mcu_result1));
 	save_item(NAME(m_mcu_last_cmd));
+	save_item(NAME(m_shareram));
+	save_item(NAME(m_share_bank));
 }
 
 void pgm2_state::machine_reset()
@@ -377,6 +435,12 @@ void pgm2_state::machine_reset()
 	m_spritekey = 0;
 	m_realspritekey = 0;
 	m_mcu_last_cmd = 0;
+	m_share_bank = 0;
+
+	m_have_card[0] = true;
+	m_have_card[1] = m_have_card[2] = m_have_card[3] = false;
+	memcpy(m_card_data[0], orleg2_china_card, sizeof(orleg2_china_card));
+//	memcpy(m_card_data[0], kov2nl_china_card, sizeof(kov2nl_china_card));
 }
 
 static const gfx_layout tiles8x8_layout =

@@ -279,7 +279,8 @@ public:
 		m_cage(*this, "cage"),
 		m_dcs(*this, "dcs"),
 		m_ethernet(*this, "ethernet"),
-		m_ioasic(*this, "ioasic")
+		m_ioasic(*this, "ioasic"),
+		m_io_analog(*this, "AN%u", 0)
 		{}
 
 	required_device<nvram_device> m_nvram;
@@ -288,6 +289,7 @@ public:
 	optional_device<dcs_audio_device> m_dcs;
 	optional_device<smc91c94_device> m_ethernet;
 	required_device<midway_ioasic_device> m_ioasic;
+	optional_ioport_array<8> m_io_analog;
 
 	widget_data m_widget;
 	uint32_t m_interrupt_enable;
@@ -306,6 +308,9 @@ public:
 	uint32_t m_output;
 	uint8_t m_output_mode;
 	uint32_t m_gear;
+	int8_t m_wheel_force;
+	int m_wheel_offset;
+	bool m_wheel_calibrated;
 	DECLARE_READ32_MEMBER(interrupt_state_r);
 	DECLARE_READ32_MEMBER(interrupt_state2_r);
 	DECLARE_READ32_MEMBER(interrupt_config_r);
@@ -399,6 +404,7 @@ void seattle_state::machine_start()
 	save_item(NAME(m_output));
 	save_item(NAME(m_output_mode));
 	save_item(NAME(m_gear));
+	save_item(NAME(m_wheel_calibrated));
 }
 
 
@@ -409,6 +415,9 @@ void seattle_state::machine_reset()
 	m_interrupt_config = 0;
 	m_interrupt_enable = 0;
 	m_gear = 1;
+	m_wheel_force = 0;
+	m_wheel_offset = 0;
+	m_wheel_calibrated = false;
 	/* reset either the DCS2 board or the CAGE board */
 	if (machine().device("dcs") != nullptr)
 	{
@@ -602,11 +611,31 @@ READ32_MEMBER(seattle_state::analog_port_r)
 
 WRITE32_MEMBER(seattle_state::analog_port_w)
 {
-	static const char *const portnames[] = { "AN0", "AN1", "AN2", "AN3", "AN4", "AN5", "AN6", "AN7" };
-
 	if (data < 8 || data > 15)
 		logerror("%08X:Unexpected analog port select = %08X\n", space.device().safe_pc(), data);
-	m_pending_analog_read = ioport(portnames[data & 7])->read();
+	int index = data & 7;
+	uint8_t currValue = m_io_analog[index].read_safe(0);
+	if (!m_wheel_calibrated && ((m_wheel_force > 20) || (m_wheel_force < -20))) {
+		if (m_wheel_force > 0 && m_wheel_offset < 128)
+			m_wheel_offset++;
+		else if (m_wheel_offset > -128)
+			m_wheel_offset--;
+		int tmpVal = int(currValue) + m_wheel_offset;
+		if (tmpVal < m_io_analog[index]->field(0xff)->minval())
+			m_pending_analog_read = m_io_analog[index]->field(0xff)->minval();
+		else if (tmpVal > m_io_analog[index]->field(0xff)->maxval())
+			m_pending_analog_read = m_io_analog[index]->field(0xff)->maxval();
+		else
+			m_pending_analog_read = tmpVal;
+	}
+	else {
+		m_pending_analog_read = currValue;
+	}
+	// Declare calibration finished as soon as non-middle value is detected, ie the user has turned the wheel
+	if (!m_wheel_calibrated && currValue != 0 && (currValue > (0x80 + 0x10) || currValue < (0x80 - 0x10))) {
+		m_wheel_calibrated = true;
+		//osd_printf_info("wheel calibration comlete wheel: %02x\n", currValue);
+	}
 }
 
 /*************************************
@@ -628,6 +657,8 @@ WRITE32_MEMBER(seattle_state::wheel_board_w)
 		{
 		case 0x0:
 			machine().output().set_value("wheel", arg); // target wheel angle. signed byte.
+			m_wheel_force = int8_t(arg);
+			//logerror("wheel_board_w: data = %08x op: %02x arg: %02x\n", data, op, arg);
 			break;
 
 		case 0x4:
@@ -725,15 +756,19 @@ WRITE32_MEMBER(seattle_state::carnevil_gun_w)
 
 READ32_MEMBER(seattle_state::ethernet_r)
 {
+	uint32_t data = 0;
 	if (!(offset & 8))
-		return m_ethernet->read(space, offset & 7, mem_mask & 0xffff);
+		data = m_ethernet->read(space, offset & 7, mem_mask & 0xffff);
 	else
-		return m_ethernet->read(space, offset & 7, mem_mask & 0x00ff);
+		data = m_ethernet->read(space, offset & 7, mem_mask & 0x00ff);
+	//logerror("ethernet_r: @%08x=%08x mask: %08x\n", offset, data, mem_mask);
+	return data;
 }
 
 
 WRITE32_MEMBER(seattle_state::ethernet_w)
 {
+	//logerror("ethernet_w: @%08x=%08x mask: %08x\n", offset, data, mem_mask);
 	if (!(offset & 8))
 		m_ethernet->write(space, offset & 7, data & 0xffff, mem_mask | 0xffff);
 	else
@@ -798,6 +833,8 @@ WRITE32_MEMBER(seattle_state::output_w)
 
 				case 0x04:
 					output().set_value("wheel", arg); // wheel motor delta. signed byte.
+					m_wheel_force = int8_t(~arg);
+					//logerror("wheel_board_w: data = %08x op: %02x arg: %02x\n", data, op, arg);
 					break;
 
 				case 0x05:

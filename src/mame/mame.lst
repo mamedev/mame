@@ -20445,6 +20445,7 @@ edfp                            // (c) 1991 (Japan, Prototype)
 hachoo                          // (c) 1989
 hayaosi1                        // (c) 1993
 iganinju                        // (c) 1988 (Japan)
+inyourfa                        // (c) 1988 (Japan)
 jitsupro                        // (c) 1989 (Japan)
 kazan                           // (c) 1988 (World)
 kickoff                         // (c) 1988 (Japan)
@@ -34690,6 +34691,7 @@ worldwar                        // A6004 'WW' (c) 1987
 
 @source:snk6502.cpp
 fantasyg                        // (c) 1981 SNK
+fantasyg2                       // (c) 1981 SNK
 fantasyj                        // (c) 1981 SNK
 fantasyu                        // (c) 1981 Rock-Ola
 nibbler                         // (c) 1982 Rock-ola (version 9)
@@ -36119,6 +36121,7 @@ zooo                            // 2004.05 Zooo
 
 @source:taitojc.cpp
 dangcurv                        // 1995.?? E09 (c) 1995 Taito Corporation
+dangcurvj                       // 1995.?? E09 (c) 1995 Taito Corporation
 dendego                         // 1997.03 E35 (c) 1996 Taito Corporation (Japan) - Ver 2.2 J
 dendego2                        // 1998.03 E52 (c) 1998 Taito Corporation (Japan) - Ver 2.5 J
 dendego23k                      // 1998.08 E52 (c) 1998 Taito Corporation (Japan) - Ver 2.20 J

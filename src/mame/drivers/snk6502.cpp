@@ -1392,6 +1392,40 @@ ROM_START( fantasyg )
 	ROM_LOAD( "fs_f_11.bin",  0x5000, 0x0800, CRC(3a352e1f) SHA1(af880ce3daed0877d454421bd08c86ff71f6bf72) )
 ROM_END
 
+// SK-7A and SK-6 PCBs
+ROM_START( fantasyg2 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "ts5.bin",     0x3000, 0x1000, CRC(6edca14e) SHA1(d9152e212f2b3cdb6e7968e4e7638454ea02c4a5) )
+	ROM_LOAD( "fs1.bin",     0x4000, 0x1000, CRC(d99656e8) SHA1(6f5febaeca2ec167523f48361ae2395772bcef53) )
+	ROM_LOAD( "ts2.bin",     0x5000, 0x1000, CRC(2db6ce28) SHA1(18cced543f27664b3eaddf103a41580a905ffae1) )
+	ROM_LOAD( "ts3.bin",     0x6000, 0x1000, CRC(1a0aa7c5) SHA1(c8f34618ffc98c73db7067851de24f245b8988ad) )
+	ROM_LOAD( "fs4.bin",     0x7000, 0x1000, CRC(c02ad442) SHA1(a90b2d04fc2e8b2dda634c18eafb88007eaedc67) )
+	ROM_LOAD( "fs6.bin",     0x8000, 0x1000, CRC(e5b91bc2) SHA1(85515eb57c8040fc95a9c62706e1a504e6749f66) )
+	ROM_RELOAD(              0xf000, 0x1000 )  /* for the reset and interrupt vectors */
+	ROM_LOAD( "fs7.bin",     0x9000, 0x1000, CRC(cc18428e) SHA1(c7c0a031434cf9ce3c450b0c5dc2b154b08d19cf) )
+	ROM_LOAD( "fs8.bin",     0xa000, 0x1000, CRC(371129fe) SHA1(c21759222aebcc9ea1292e367a41ac43a4dd3554) )
+	ROM_LOAD( "fs9.bin",     0xb000, 0x1000, CRC(49574d4a) SHA1(37cae0df7e8705c300f684b3351b5bdba5e44ea2) )
+
+	ROM_REGION( 0x2000, "gfx1", 0 )
+	ROM_LOAD( "fs10.bin", 0x0000, 0x1000, CRC(86a801c3) SHA1(c040b5807c25823072f7e8ceab57b95d4bed89fe) )
+	ROM_LOAD( "fs11.bin", 0x1000, 0x1000, CRC(9dfff71c) SHA1(7a7c017170f2ea903a730a4e5ab69db379a4fc61) )
+
+	ROM_REGION( 0x0040, "proms", 0 )
+	ROM_LOAD( "fantasy.ic7",  0x0000, 0x0020, CRC(361a5e99) SHA1(b9777ce658549c03971bd476482d5cc0be27d3a9) ) /* foreground colors */
+	ROM_LOAD( "fantasy.ic6",  0x0020, 0x0020, CRC(33d974f7) SHA1(a6f6a531dec3f454b477bfdda8e213e9cad42748) ) /* background colors */
+
+	ROM_REGION( 0x1800, "snk6502", 0 )  /* sound ROMs */
+	ROM_LOAD( "fs_b_51.bin",  0x0000, 0x0800, CRC(48094ec5) SHA1(7d6118133bc1eb8ebc5d8a95d10ef842daffef89) )
+	ROM_LOAD( "fs_a_52.bin",  0x0800, 0x0800, CRC(1d0316e8) SHA1(6a3ab289b5fefef8663514bd1d5817c70fe58882) )
+	ROM_LOAD( "fs_c_53.bin",  0x1000, 0x0800, CRC(49fd4ae8) SHA1(96ff1267c0ffab1e8a0769fa869516e2546ab640) )
+
+	ROM_REGION( 0x5800, "speech", 0 )   /* space for the speech ROMs (not supported) */
+	//ROM_LOAD( "hd38882.bin",  0x0000, 0x4000, NO_DUMP )   /* HD38882 internal ROM */
+	ROM_LOAD( "fs_d_7.bin",   0x4000, 0x0800, CRC(a7ef4cc6) SHA1(8df71cb18fcfe9a2f592f83bc01cf2314ae30e32) )
+	ROM_LOAD( "fs_e_8.bin",   0x4800, 0x0800, CRC(19b8fb3e) SHA1(271c76f68866c28bc6755238a71970d5f7c81ecb) )
+	ROM_LOAD( "fs_f_11.bin",  0x5000, 0x0800, CRC(3a352e1f) SHA1(af880ce3daed0877d454421bd08c86ff71f6bf72) )
+ROM_END
+
 ROM_START( fantasyj )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "fs5jic12.bin", 0x3000, 0x1000, CRC(dd1eac89) SHA1(d63078d4666e3c6db0c9b3f8b45ef81606ed5a4f) )
@@ -1673,8 +1707,9 @@ GAME( 1981, satansatind, satansat, satansat, satansat, snk6502_state, 0, ROT90, 
 GAME( 1981, vanguard,    0,        vanguard, vanguard, snk6502_state, 0, ROT90, "SNK", "Vanguard (SNK)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1981, vanguardc,   vanguard, vanguard, vanguard, snk6502_state, 0, ROT90, "SNK (Centuri license)", "Vanguard (Centuri)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1981, vanguardj,   vanguard, vanguard, vanguard, snk6502_state, 0, ROT90, "SNK", "Vanguard (Japan)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1981, fantasyg,    fantasyu, fantasy,  fantasy,  snk6502_state, 0, ROT90, "SNK", "Fantasy (Germany)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // bootleg?
 GAME( 1981, fantasyu,    0,        fantasy,  fantasyu, snk6502_state, 0, ROT90, "SNK (Rock-Ola license)", "Fantasy (US)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1981, fantasyg,    fantasyu, fantasy,  fantasy,  snk6502_state, 0, ROT90, "SNK", "Fantasy (Germany, set 1)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // bootleg?
+GAME( 1981, fantasyg2,   fantasyu, fantasy,  fantasy,  snk6502_state, 0, ROT90, "SNK", "Fantasy (Germany, set 2)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // bootleg?
 GAME( 1981, fantasyj,    fantasyu, fantasy,  fantasyu, snk6502_state, 0, ROT90, "SNK", "Fantasy (Japan)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1982, pballoon,    0,        pballoon, pballoon, snk6502_state, 0, ROT90, "SNK", "Pioneer Balloon", MACHINE_SUPPORTS_SAVE )
 GAME( 1982, pballoonr,   pballoon, pballoon, pballoon, snk6502_state, 0, ROT90, "SNK (Rock-Ola license)", "Pioneer Balloon (Rock-Ola license)", MACHINE_SUPPORTS_SAVE )

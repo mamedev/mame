@@ -92,6 +92,15 @@ March 2013 NPW:
     divider to the MC6809E and not to the MC6809; the confusion resulting
     from this error is in the process of being straightened out.
 
+    Maximum clock ratings:
+
+                        Q & E           EXTAL
+        MC6809(E)       1.0 MHz         4.0 MHz
+        MC68A09(E)      1.5 MHz         6.0 MHz
+        MC68B09(E)      2.0 MHz         8.0 MHz
+        HD63B09(E)      2.0 MHz         8.0 MHz
+        HD63C09(E)      3.0 MHz         12.0 MHz
+
 *****************************************************************************/
 
 #include "emu.h"
