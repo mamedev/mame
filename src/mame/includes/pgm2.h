@@ -48,6 +48,9 @@ public:
 	DECLARE_WRITE32_MEMBER(fg_videoram_w);
 	DECLARE_WRITE32_MEMBER(bg_videoram_w);
 	DECLARE_WRITE32_MEMBER(mcu_w);
+	DECLARE_WRITE16_MEMBER(share_bank_w);
+	DECLARE_READ8_MEMBER(shareram_r);
+	DECLARE_WRITE8_MEMBER(shareram_w);
 
 	DECLARE_READ32_MEMBER(orleg2_speedup_r);
 	DECLARE_READ32_MEMBER(kov2nl_speedup_r);
@@ -107,6 +110,8 @@ private:
 	uint32_t m_realspritekey;
 	int m_sprite_predecrypted;
 
+	uint8_t m_shareram[0x100];
+	uint16_t m_share_bank;
 	uint32_t m_mcu_regs[8];
 	uint32_t m_mcu_result0;
 	uint32_t m_mcu_result1;
