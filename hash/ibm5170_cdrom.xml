@@ -63,6 +63,19 @@
 		</part>
 	</software>
 
+	<software name="arampage">
+		<description>Alien Rampage (v1.13)</description>
+		<year>1996</year>
+		<publisher>Softdisk</publisher>
+		<info name="version" value="1.13" />
+		<part name="cdrom" interface="cdrom">
+			<feature name="disk_label" value="Alien Rampage" />
+			<diskarea name="cdrom">
+				<disk name="arampage" sha1="88ae86b0837bc5fba7a3585a506d5ad24161b001" />
+			</diskarea>
+		</part>
+	</software>
+	
 	<software name="ultrasnd" supported="partial">
 		<!-- includes Gravis UltraSound (GUS) Installation - V4.11 -->
 		<description>The UltraSound CD</description>
