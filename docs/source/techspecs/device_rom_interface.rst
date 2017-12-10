@@ -41,7 +41,16 @@ rom description for the system, it will be automatically picked up as
 the connected rom.  An address map has priority over the region if
 present in the machine config.
 
-| void **set_rom**\ (const void \*base, UINT32 size);
+| void **set_rom_endianness**\ (endianness_t endian)
+| void **set_rom_data_width**\ (u8 width)
+| void **set_rom_addr_width**\ (u8 width)
+
+These methods, intended for generic devices with indefinite hardware
+specifications, override the endianness, data bus width and address 
+bus width assigned through the constructor. They must be called from
+within the device before **config_complete** time.
+
+| void **set_rom**\ (const void \*base, u32 size);
 
 At any time post- **interface_pre_start**, a memory block can be
 setup as the connected rom with that method.  It overrides any
@@ -76,3 +85,8 @@ Using that interface makes the device derive from
 **device_memory_interface**. If the device wants to actually use the
 memory interface for itself, remember that AS_0/AS_PROGRAM is used by
 the rom interface, and don't forget to upcall **memory_space_config**.
+
+For devices which have outputs that can be used to address ROMs but
+only to forward the data to another device for processing, it may be
+helpful to disable the interface when it is not required. This can be
+done by overriding **memory_space_config** to return an empty vector.
