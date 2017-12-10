@@ -302,5 +302,16 @@
 			</diskarea>
 		</part>
 	</software>
+	
+	<software name="zyclunt">
+		<description>Zyclunt</description>
+		<year>1995</year>
+		<publisher>Phantagram</publisher>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="zyclunt" sha1="cc6e69cdd5bdda70361778c3515571114a97b662" />
+			</diskarea>
+		</part>	
+	</software>
 
 </softwarelist>
