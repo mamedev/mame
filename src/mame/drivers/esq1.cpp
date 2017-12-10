@@ -57,6 +57,7 @@ TODO:
     - Keyboard
     - Analog filters and VCA on the back end of the 5503
     - SQ-80 support (additional banking, FDC)
+      SQ-80 is totally broken now, jumping into unmapped memory
 
 NOTES:
     Commands from KPC are all 2 bytes
