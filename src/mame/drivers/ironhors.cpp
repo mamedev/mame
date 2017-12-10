@@ -368,7 +368,9 @@ M6809E runs at 1.532mhz ( NOT 3.072mhz)
 
 Vsync is 61hz
 
-These clocks make the emulation run too fast. Real hardware video: http://d.hatena.ne.jp/video/niconico/sm3842410
+Hsync is 15,56khz
+
+These clocks make the emulation run too fast.
 */
 
 static MACHINE_CONFIG_START( ironhors )
