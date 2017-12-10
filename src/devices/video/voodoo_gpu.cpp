@@ -6,6 +6,8 @@
 //
 
 #include "voodoo_gpu.h"
+#include <sys/types.h>
+#include <sys/stat.h>
 
 voodoo_gpu::voodoo_gpu()
 {
@@ -21,8 +23,11 @@ voodoo_gpu::voodoo_gpu()
 	m_pixelPoints.reserve(DEPTH_PIXEL_BUFFER);
 	m_pixels_ready = false;
 
-	m_lfbWritePoints.reserve(DEPTH_LFB_WRITE_BUFFER);
+	m_lfbWritePoints.reserve(DEPTH_PIXEL_BUFFER);
 	m_lfb_write_ready = false;
+
+	m_trianglePoints.reserve(DEPTH_TRIANGLE_BUFFER*3);
+	m_triangles_ready = false;
 
 	m_pVS = nullptr;
 	m_pixelVS = nullptr;
@@ -50,7 +55,8 @@ voodoo_gpu::voodoo_gpu()
 
 	m_depthBuffer = NULL;
 	m_depthState = NULL;
-	m_depthFastFillState = NULL;
+	m_depthAlwaysState = NULL;
+	m_depthNeverState = NULL;
 	m_depthView = NULL;
 	m_rasterState = NULL;
 	m_blendState = NULL;
@@ -68,13 +74,14 @@ voodoo_gpu::voodoo_gpu()
 	m_frameBufferCtrl.enablePerspective1 = 0;
 
 	m_updateFrameBufferCtrl = true;
-	m_updateTexCtrl = false;
+	m_updateTexCtrl = true;
 
-	m_destBuffer = nullptr;
+	m_drawIndex = -1;
+	m_drawBuffer = nullptr;
 	m_fastFbzMode = 0;
 	m_regFbzMode = 0;
 
-	m_updateColorCtrl = false;
+	m_updateColorCtrl = true;
 	m_regFbzColorPath = 0;
 	m_regColor0 = 0;
 	m_regColor1 = 0;
@@ -82,15 +89,15 @@ voodoo_gpu::voodoo_gpu()
 		m_regTexMode[i] = 0;
 	}
 
-	m_updateBlendState = false;
-	m_updateAlphaTest = false;
+	m_updateBlendState = true;
+	m_updateAlphaTest = true;
 	m_regAlphaMode = 0;
 	ZeroMemory(&m_blendDesc, sizeof(D3D11_BLEND_DESC));
-	m_updateDepth = false;
+	m_updateDepth = true;
 	m_regZAColor = 0;
 
-	m_updateFogTable = false;
-	m_updateFogCtrl = false;
+	m_updateFogTable = true;
+	m_updateFogCtrl = true;
 	m_regFogMode = 0;
 	m_regFogColor = 0;
 
@@ -126,7 +133,8 @@ voodoo_gpu::~voodoo_gpu()
 	SAFE_RELEASE(m_compTexture);
 	SAFE_RELEASE(m_depthBuffer);
 	SAFE_RELEASE(m_depthState);
-	SAFE_RELEASE(m_depthFastFillState);
+	SAFE_RELEASE(m_depthAlwaysState);
+	SAFE_RELEASE(m_depthNeverState);
 	SAFE_RELEASE(m_depthView);
 	SAFE_RELEASE(m_rasterState);
 	SAFE_RELEASE(m_blendState);
@@ -217,47 +225,76 @@ bool voodoo_gpu::InitDevice()
 		}
 	}
 
+	// Check for shader source directory
+	struct stat info;
+
+	std::string dirStr = "src/devices/video/";
+	std::wstring dirWStr = L"src/devices/video/";
+	if (stat(dirStr.c_str(), &info) != 0) {
+		printf("cannot access %s setting to current directory\n", dirStr.c_str());
+		dirStr = "./";
+		dirWStr = L"./";
+		if (stat(dirStr.c_str(), &info) != 0) {
+			printf("cannot access %s\n", dirStr.c_str());
+			return false;
+		}
+	}
+	if (!(info.st_mode & S_IFDIR))
+	{
+		printf("cannot find shader directory %s\n", dirStr.c_str());
+		return false;
+	}
+	// Compile the shaders
+	if (!CompileShaders(dirWStr))
+		return false;
+
 	return true;
 }
 
-bool voodoo_gpu::CompileShaders()
+bool voodoo_gpu::CompileShaders(std::wstring pSrcDir)
 {
-
+	std::wstring fileName;
 	// Compile vertex and pixel shader routines
 	SAFE_RELEASE(m_pVS);
-	if (FAILED(CreateVertexShader(L"src/devices/video/voodoo_gpu_vs.hlsl", "VS", &m_pVS, 1))) {
-		printf("voodoo_gpu:: Error could not compile VS\n");
+	fileName = pSrcDir + L"voodoo_gpu_vs.hlsl";
+	if (FAILED(CreateVertexShaderFile(fileName.c_str(), "VS", &m_pVS, 1))) {
+		printf("voodoo_gpu:: Error could not compile VS %ws\n", fileName.c_str());
 		return false;
 	}
 
 	SAFE_RELEASE(m_pixelVS);
-	if (FAILED(CreateVertexShader(L"src/devices/video/voodoo_gpu_vs.hlsl", "PIXEL_VS", &m_pixelVS, 2))) {
-		printf("voodoo_gpu:: Error could not compile PIXEL_VS\n");
+	fileName = pSrcDir + L"voodoo_gpu_vs.hlsl";
+	if (FAILED(CreateVertexShaderFile(fileName.c_str(), "PIXEL_VS", &m_pixelVS, 2))) {
+		printf("voodoo_gpu:: Error could not compile PIXEL_VS %ws\n", fileName.c_str());
 		return false;
 	}
 
 	SAFE_RELEASE(m_pPS);
-	if (FAILED(CreatePixelShader(L"src/devices/video/voodoo_gpu_ps.hlsl", "PS", &m_pPS))) {
-		printf("voodoo_gpu:: Error could not compile PS\n");
+	fileName = pSrcDir + L"voodoo_gpu_ps.hlsl";
+	if (FAILED(CreatePixelShaderFile(fileName.c_str(), "PS", &m_pPS))) {
+		printf("voodoo_gpu:: Error could not compile PS %ws\n", fileName.c_str());
 		return false;
 	}
 
 	SAFE_RELEASE(m_fastFillPS);
-	if (FAILED(CreatePixelShader(L"src/devices/video/voodoo_gpu_ps.hlsl", "FASTFILL_PS", &m_fastFillPS))) {
-		printf("voodoo_gpu:: Error could not compile FASTFILL_PS\n");
+	fileName = pSrcDir + L"voodoo_gpu_ps.hlsl";
+	if (FAILED(CreatePixelShaderFile(fileName.c_str(), "FASTFILL_PS", &m_fastFillPS))) {
+		printf("voodoo_gpu:: Error could not compile FASTFILL_PS %ws\n", fileName.c_str());
 		return false;
 	}
 
 	// Compile vertex and pixel shader routines for compressed buffer
 	SAFE_RELEASE(m_compVS);
-	if (FAILED(CreateVertexShader(L"src/devices/video/voodoo_gpu_vs.hlsl", "COMP_VS", &m_compVS))) {
-		printf("voodoo_gpu:: Error could not compile COMP_VS\n");
+	fileName = pSrcDir + L"voodoo_gpu_vs.hlsl";
+	if (FAILED(CreateVertexShaderFile(fileName.c_str(), "COMP_VS", &m_compVS))) {
+		printf("voodoo_gpu:: Error could not compile COMP_VS %ws\n", fileName.c_str());
 		return false;
 	}
 
 	SAFE_RELEASE(m_compPS);
-	if (FAILED(CreatePixelShader(L"src/devices/video/voodoo_gpu_ps.hlsl", "COMP_PS", &m_compPS))) {
-		printf("voodoo_gpu:: Error could not compile COMP_PS\n");
+	fileName = pSrcDir + L"voodoo_gpu_ps.hlsl";
+	if (FAILED(CreatePixelShaderFile(fileName.c_str(), "COMP_PS", &m_compPS))) {
+		printf("voodoo_gpu:: Error could not compile COMP_PS %ws\n", fileName.c_str());
 		return false;
 	}
 
@@ -412,10 +449,6 @@ bool voodoo_gpu::InitRenderBuffers(int sizeX, int sizeY, int fbiWidth)
 
 bool voodoo_gpu::InitBuffers(int sizeX, int sizeY)
 {
-	// Compile the shaders
-	if(!CompileShaders())
-		return false;
-
 	// Initialize the rendering buffers
 	if (!InitRenderBuffers(sizeX, sizeY, sizeX))
 		return false;
@@ -450,7 +483,7 @@ bool voodoo_gpu::InitBuffers(int sizeX, int sizeY)
 	// Vertex buffer
 	ZeroMemory(&bd, sizeof(bd));
 	bd.Usage = D3D11_USAGE_DEFAULT;
-	bd.ByteWidth = sizeof(ShaderVertex) * 3;
+	bd.ByteWidth = sizeof(ShaderVertex) * 3 * DEPTH_TRIANGLE_BUFFER;
 	bd.BindFlags = D3D11_BIND_VERTEX_BUFFER;
 	bd.CPUAccessFlags = 0;
 	if (FAILED(m_gpu->CreateBuffer(&bd, NULL, &m_pVertexBuffer)))
@@ -488,11 +521,18 @@ bool voodoo_gpu::InitBuffers(int sizeX, int sizeY)
 	if (FAILED(m_gpu->CreateDepthStencilState(&depthStencilDesc, &m_depthState)))
 		return false;
 
-	// Create the depth stencil state for fast fill
+	// Create the depth stencil state for always
+	depthStencilDesc.DepthEnable = TRUE;
+	depthStencilDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
+	depthStencilDesc.DepthFunc = D3D11_COMPARISON_ALWAYS;
+	if (FAILED(m_gpu->CreateDepthStencilState(&depthStencilDesc, &m_depthAlwaysState)))
+		return false;
+
+	// Create the depth stencil state for never
 	depthStencilDesc.DepthEnable = FALSE;
 	depthStencilDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ZERO;
-	depthStencilDesc.DepthFunc = D3D11_COMPARISON_ALWAYS;
-	if (FAILED(m_gpu->CreateDepthStencilState(&depthStencilDesc, &m_depthFastFillState)))
+	depthStencilDesc.DepthFunc = D3D11_COMPARISON_NEVER;
+	if (FAILED(m_gpu->CreateDepthStencilState(&depthStencilDesc, &m_depthNeverState)))
 		return false;
 
 	// Dithering Textures
@@ -623,7 +663,7 @@ ID3D11DeviceContext* voodoo_gpu::GetContext()
 	return m_context;
 }
 
-HRESULT voodoo_gpu::CreateVertexShader(LPCWSTR pSrcFile, LPCSTR pFunctionName, ID3D11VertexShader** ppShaderOut, int mode)
+HRESULT voodoo_gpu::CreateVertexShaderFile(LPCWSTR pSrcFile, LPCSTR pFunctionName, ID3D11VertexShader** ppShaderOut, int mode)
 {
 	HRESULT result;
 
@@ -697,7 +737,7 @@ HRESULT voodoo_gpu::CreateVertexShader(LPCWSTR pSrcFile, LPCSTR pFunctionName, I
 	}
 	return result;
 }
-HRESULT voodoo_gpu::CreatePixelShader(LPCWSTR pSrcFile, LPCSTR pFunctionName, ID3D11PixelShader** ppShaderOut)
+HRESULT voodoo_gpu::CreatePixelShaderFile(LPCWSTR pSrcFile, LPCSTR pFunctionName, ID3D11PixelShader** ppShaderOut)
 {
 	HRESULT result;
 
@@ -1067,11 +1107,20 @@ void voodoo_gpu::UpdateConstants()
 
 void voodoo_gpu::FlushBuffer(void)
 {
-	// Check for pixels that haven't been drawn
+	// Check for pending LFB 3d writes
 	if (m_pixels_ready)
 		DrawPixels();
-	if (m_need_copy)
-		CopyBuffer(m_destBuffer);
+
+	// Check for pending LFB direct writes
+	if (m_lfb_write_ready)
+		DrawLfbWrites();
+
+	// Check for pending triangles
+	if (m_triangles_ready)
+		DrawTriangle();
+
+	// Copy gpu frame buffer to local frame buffer
+	CopyBuffer(m_drawBuffer);
 }
 
 void voodoo_gpu::DrawFastFill(ShaderPoint *triangleVertices)
@@ -1097,17 +1146,6 @@ void voodoo_gpu::DrawFastFill(ShaderPoint *triangleVertices)
 		// Check for depth changes
 		if ((m_fastFbzMode ^ m_regFbzMode) & 0x400) {
 			m_fastFbzMode = m_regFbzMode;
-			// Create the depth stencil state
-			D3D11_DEPTH_STENCIL_DESC depthStencilDesc;
-			ZeroMemory(&depthStencilDesc, sizeof(D3D11_DEPTH_STENCIL_DESC));
-			// Depth test parameters
-			depthStencilDesc.DepthEnable = ((m_regFbzMode >> 10) & 1);
-			depthStencilDesc.DepthWriteMask = ((m_regFbzMode >> 10) & 1) ? D3D11_DEPTH_WRITE_MASK_ALL : D3D11_DEPTH_WRITE_MASK_ZERO;
-			depthStencilDesc.DepthFunc = D3D11_COMPARISON_ALWAYS;
-			// Release old state
-			SAFE_RELEASE(m_depthFastFillState);
-			// Create New
-			m_gpu->CreateDepthStencilState(&depthStencilDesc, &m_depthFastFillState);
 		}
 	}
 
@@ -1127,7 +1165,10 @@ void voodoo_gpu::DrawFastFill(ShaderPoint *triangleVertices)
 	// Blending is disabled on the second pass
 	m_context->OMSetBlendState(NULL, 0, 0xffffffff);
 	// Write to depth buffer first pass
-	m_context->OMSetDepthStencilState(m_depthFastFillState, 0);
+	if (m_regFbzMode & (1 << 10))
+		m_context->OMSetDepthStencilState(m_depthAlwaysState, 0);
+	else
+		m_context->OMSetDepthStencilState(m_depthNeverState, 0);
 	m_context->VSSetShader(m_pixelVS, nullptr, 0);
 	m_context->PSSetShader(m_fastFillPS, nullptr, 0);
 
@@ -1148,18 +1189,22 @@ void voodoo_gpu::DrawFastFill(ShaderPoint *triangleVertices)
 	m_need_copy = true;
 }
 
-void voodoo_gpu::DrawTriangle(ShaderVertex *triangleVertices, uint16_t *dst)
+void voodoo_gpu::DrawTriangle()
 {
+	if (!m_triangles_ready)
+		return;
+
+	//static long maxSize = 0;
+	//if (m_trianglePoints.size() >= maxSize) {
+	//	maxSize = m_trianglePoints.size();
+	//	printf("DrawTriangle: num=%lli\n", m_trianglePoints.size()/3);
+	//}
 	// Check for pixels that haven't been drawn
 	if (m_pixels_ready)
 		DrawPixels();
-
-	// Check if destination frame buffer has changed
-	if (1 && m_need_copy && m_destBuffer != dst)
-	{
-		CopyBuffer(m_destBuffer);
-	}
-	m_destBuffer = dst;
+	// Check for pending LFB direct writes
+	if (m_lfb_write_ready)
+		DrawLfbWrites();
 
 	/*
 	D3D11_MAPPED_SUBRESOURCE mappedResource;
@@ -1193,7 +1238,14 @@ void voodoo_gpu::DrawTriangle(ShaderVertex *triangleVertices, uint16_t *dst)
 	UpdateConstants();
 
 	// Copy vertex buffer over
-	m_context->UpdateSubresource(m_pVertexBuffer, 0, nullptr, triangleVertices, 0, 0);
+	D3D11_BOX pointBox;
+	pointBox.left = 0;
+	pointBox.right = m_trianglePoints.size() * sizeof(ShaderVertex);
+	pointBox.top = 0;
+	pointBox.bottom = 1;
+	pointBox.front = 0;
+	pointBox.back = 1;
+	m_context->UpdateSubresource(m_pVertexBuffer, 0, &pointBox, m_trianglePoints.data(), 0, 0);
 
 	//////// Pass 0 /////////
 	// Setup to draw to render buffer
@@ -1209,7 +1261,7 @@ void voodoo_gpu::DrawTriangle(ShaderVertex *triangleVertices, uint16_t *dst)
 	m_context->VSSetShader(m_pVS, nullptr, 0);
 	m_context->PSSetShader(m_pPS, nullptr, 0);
 
-	m_context->Draw(3, 0);
+	m_context->Draw(m_trianglePoints.size(), 0);
 
 	//////// Pass 1 /////////
 	// Setup to draw from render buffer to compressed (COMP) buffer, depth testing is disabled
@@ -1221,7 +1273,11 @@ void voodoo_gpu::DrawTriangle(ShaderVertex *triangleVertices, uint16_t *dst)
 	m_context->PSSetShaderResources(COMP_TEX_OFFSET, 1, &m_renderResourceView);
 	m_context->PSSetSamplers(COMP_TEX_OFFSET, 1, &m_renderState);
 
-	m_context->Draw(3, 0);
+	m_context->Draw(m_trianglePoints.size(), 0);
+
+	// Clear cached pixels
+	m_trianglePoints.clear();
+	m_triangles_ready = false;
 
 	m_need_copy = true;
 }
@@ -1230,6 +1286,16 @@ void voodoo_gpu::DrawPixels()
 {
 	if (!m_pixels_ready)
 		return;
+
+	//static long maxSize = 0;
+	//if (m_pixelPoints.size() >= maxSize) {
+	//	maxSize = m_pixelPoints.size();
+	//	printf("DrawPixels: num=%lli\n", m_pixelPoints.size());
+	//}
+
+	// Check for pending LFB direct writes
+	if (0 && m_lfb_write_ready)
+		DrawLfbWrites();
 
 	// Check to see if we are in the right mode
 	if (m_renderMode != PIXEL)
@@ -1297,21 +1363,103 @@ void voodoo_gpu::DrawPixels()
 	m_pixels_ready = false;
 
 	m_need_copy = true;
+}
+
+void voodoo_gpu::DrawLfbWrites()
+{
+	if (!m_lfb_write_ready)
+		return;
+
+	//printf("DrawLfbWrites size=%lli index: %i dest: %p\n", m_lfbWritePoints.size(), m_drawIndex,  m_drawBuffer);
+	// Check for pending LFB 3d writes
+	if (0 && m_pixels_ready)
+		DrawPixels();
+
+	// Check to see if we are in the right mode
+	if (m_renderMode != DIRECTWRITE)
+	{
+		// Turn off tmus
+		m_texCtrl.texCtrl[0].enable = 0;
+		m_texCtrl.texCtrl[1].enable = 0;
+		m_updateTexCtrl = true;
+
+		// Set input layout
+		m_context->IASetInputLayout(m_pixelVertexLayout);
+		m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_POINTLIST);
+		UINT stride = sizeof(ShaderPoint);
+		UINT offset = 0;
+		m_context->IASetVertexBuffers(0, 1, &m_pixelBuffer, &stride, &offset);
+		m_renderMode = DIRECTWRITE;
+		// Set lfb write mode in gpu constant buffer
+		m_colorCtrl.pixel_mode = 2;
+		m_updateColorCtrl = true;
+
+	}
+
+	UpdateConstants();
+
+	// Copy pixel point buffer over
+	D3D11_BOX pointBox;
+	pointBox.left = 0;
+	pointBox.right = m_lfbWritePoints.size() * sizeof(ShaderPoint);
+	pointBox.top = 0;
+	pointBox.bottom = 1;
+	pointBox.front = 0;
+	pointBox.back = 1;
+	m_context->UpdateSubresource(m_pixelBuffer, 0, &pointBox, m_lfbWritePoints.data(), 0, 0);
+
+	//////// Pass 0 /////////
+	// Setup to draw to render buffer
+	// Set the render resouce to be NULL to avoid output binding warnings
+	ID3D11ShaderResourceView *const pSRV[1] = { NULL };
+	m_context->PSSetShaderResources(COMP_TEX_OFFSET, 1, pSRV);
+
+	m_context->OMSetRenderTargets(1, &m_renderTargetView, m_depthView);
+	// Blending is disabled
+	m_context->OMSetBlendState(NULL, 0, 0xffffffff);
+	// Write to depth buffer first pass
+	// TODO: Check if there is depth data to write
+	//m_context->OMSetDepthStencilState(m_depthAlwaysState, 0);
+	m_context->OMSetDepthStencilState(m_depthNeverState, 0);
+	m_context->VSSetShader(m_pixelVS, nullptr, 0);
+	m_context->PSSetShader(m_pPS, nullptr, 0);
+
+	m_context->Draw(m_lfbWritePoints.size(), 0);
+
+	//////// Pass 1 /////////
+	// Setup to draw from render buffer to compressed (COMP) buffer, depth testing is disabled
+	m_context->OMSetRenderTargets(1, &m_compTargetView, nullptr);
+	// Blending is disabled on the second pass
+	m_context->OMSetBlendState(NULL, 0, 0xffffffff);
+	m_context->VSSetShader(m_compVS, nullptr, 0);
+	m_context->PSSetShader(m_compPS, nullptr, 0);
+	m_context->PSSetShaderResources(COMP_TEX_OFFSET, 1, &m_renderResourceView);
+	m_context->PSSetSamplers(COMP_TEX_OFFSET, 1, &m_renderState);
+
+	m_context->Draw(m_lfbWritePoints.size(), 0);
+
+	// Clear cached pixels
+	m_lfbWritePoints.clear();
+	m_lfb_write_ready = false;
+
+	m_need_copy = true;
 
 }
 
-void voodoo_gpu::FastFill(int sx, int ex, int sy, int ey, uint16_t *dst)
+void voodoo_gpu::FastFill(int sx, int ex, int sy, int ey, uint16_t *dst, int drawIndex)
 {
+	//printf("FastFill: dst: %p old: %p newIndex: %i\n", dst, m_drawBuffer, drawIndex);
 	// Check for pixels that haven't been drawn
 	if (m_pixels_ready)
 		DrawPixels();
 
 	// Check if destination frame buffer has changed
-	if (1 && m_need_copy && m_destBuffer != dst)
+	if (1 && m_need_copy && m_drawIndex != drawIndex)
 	{
-		CopyBuffer(m_destBuffer);
+		CopyBuffer(m_drawBuffer);
+		m_drawIndex = drawIndex;
 	}
-	m_destBuffer = dst;
+	m_drawBuffer = dst;
 
 	
 	UpdateColorCtrl();
@@ -1360,7 +1508,7 @@ HRESULT voodoo_gpu::RenderToTex()
 
 	// Clear the back buffer 
 	//XMFLOAT4 Zero = { 0.000000000f, 0.000000000f, 0.000000000f, 0.000000000f };
-	FastFill(0, 511, 0, 384, 0);
+	FastFill(0, 511, 0, 384, 0, 0);
 
 	// Setup constants
 	//m_frameBufferCtrl.xSize = 512.0f;
@@ -1388,12 +1536,12 @@ HRESULT voodoo_gpu::RenderToTex()
 		
 		uint32_t wSel = 0;
 		uint32_t wVal = 0x0;
-		PushPixel(x, y, mask, sr, sg, sb, sa, sz, wSel, wVal, 0);
+		PushPixel(x, y, mask, sr, sg, sb, sa, sz, wSel, wVal, 0, 0);
 		x = 0x2;
-		PushPixel(x, y, mask, sr, sg, sb, sa, sz, wSel, wVal, 0);
+		PushPixel(x, y, mask, sr, sg, sb, sa, sz, wSel, wVal, 0, 0);
 		x = 0x0;
 		y = 0x1;
-		PushPixel(x, y, mask, sr, sg, sb, sa, sz, wSel, wVal, 0);
+		PushPixel(x, y, mask, sr, sg, sb, sa, sz, wSel, wVal, 0, 0);
 		DrawPixels();
 		return S_OK;
 	}
@@ -1406,7 +1554,7 @@ HRESULT voodoo_gpu::RenderToTex()
 	//inVec.push_back({ XMFLOAT4(10.0f, 0.0f, 0.0f, 1.0f), XMFLOAT4(128.0f, 254.0f, 253.0f, 1.0f), XMFLOAT3(0.0f, 0.0f, 1.0f) });
 	//inVec.push_back({ XMFLOAT4(0.0f, 10.0f, 0.0f, 1.0f), XMFLOAT4(128.0f, 254.0f, 253.0f, 1.0f), XMFLOAT3(0.0f, 0.0f, 1.0f) });
 
-	DrawTriangle(inVec.data(), 0);
+	//DrawTriangle(inVec.data(), 0, 0);
 	//DrawTriangle(inVec.data());
 
 	return S_OK;
@@ -1433,6 +1581,7 @@ void voodoo_gpu::CopyBuffer(uint16_t *dst)
 {
 	if (!m_need_copy) return;
 	m_need_copy = false;
+	//printf("CopyBuffer dst: %p\n", dst);
 
 	ID3D11Texture2D* pNewTexture = NULL;
 	D3D11_TEXTURE2D_DESC desc;
@@ -1457,6 +1606,7 @@ void voodoo_gpu::CopyBuffer(uint16_t *dst)
 	uint32_t* dptr = tmpBuf;
 	uint32_t* sptr = reinterpret_cast<uint32_t*>(resource.pData);
 
+	//printf("CopyBuffer: Height: %d Width: %d fbiWidth: %d\n", desc.Height, desc.Width, m_fbiWidth);
 	for (size_t h = 0; h < desc.Height; ++h)
 	{
 		//size_t msize = std::min<size_t>(desc.Width * 4, resource.RowPitch);
@@ -1477,6 +1627,8 @@ void voodoo_gpu::CopyBuffer(uint16_t *dst)
 			uint16_t rgb16 = ((dptr[elem] << (0 + 11 - 3)) & 0xf800) | ((dptr[elem] >> (8 - 5 + 2)) & 0x07e0) | ((dptr[elem] >> (16 - 0 + 3)) & 0x001f);
 			//dst[h * m_hVis + elem] = rgb16;
 			dst[elem] = rgb16;
+			//if ((elem < 2) && (h < 2))
+			//	printf("x: %d y: %d pix: %4x\n", elem, int(h), rgb16);
 		}
 		dst += desc.Width;
 		//dst += rowPixels;
@@ -1779,15 +1931,39 @@ void voodoo_gpu::CreateTexture(texDescription &desc, int index, uint32_t &texMod
 	m_context->PSSetSamplers(index + TMU_TEX_OFFSET, 1, &m_texMap[mapIndex].texSampler);
 }
 
-void voodoo_gpu::PushPixel(int &x, int &y, int &mask, uint8_t *sr, uint8_t *sg, uint8_t *sb, int *sa, int *sz, uint32_t wSel, uint32_t &wVal, uint16_t *dst)
+void voodoo_gpu::PushTriangle(ShaderVertex *triangleVertices, uint16_t *dst, int drawIndex)
+{
+	// Check if destination frame buffer has changed
+	if (0 && m_need_copy && m_drawIndex != drawIndex)
+	{
+		CopyBuffer(m_drawBuffer);
+		m_drawIndex = drawIndex;
+	}
+	m_drawBuffer = dst;
+
+	for (int index = 0; index < 3; index++) {
+		m_trianglePoints.push_back(triangleVertices[index]);
+	}
+	m_triangles_ready = true;
+
+	// Send out the triangles
+	if (m_trianglePoints.size() == DEPTH_TRIANGLE_BUFFER * 3) {
+		DrawTriangle();
+	}
+
+}
+
+void voodoo_gpu::PushPixel(int &x, int &y, int &mask, uint8_t *sr, uint8_t *sg, uint8_t *sb, int *sa, int *sz, uint32_t wSel, uint32_t &wVal, uint16_t *dst, int drawIndex)
 {
 	// Check if destination frame buffer has changed
 	// Skip this for now to save cycles
-	if (0 && m_need_copy && m_destBuffer != dst)
+	if (0 && m_drawIndex != drawIndex)
 	{
-		CopyBuffer(m_destBuffer);
+		DrawPixels();
+		CopyBuffer(m_drawBuffer);
+		m_drawIndex = drawIndex;
 	}
-	m_destBuffer = dst;
+	m_drawBuffer = dst;
 
 	ShaderPoint pixel;
 	for (size_t pix = 0; pix < 2; ++pix)
@@ -1813,6 +1989,42 @@ void voodoo_gpu::PushPixel(int &x, int &y, int &mask, uint8_t *sr, uint8_t *sg, 
 	if (m_pixelPoints.size() >= DEPTH_PIXEL_BUFFER-1) {
 		DrawPixels();
 	}
+}
+
+void voodoo_gpu::PushLfbWrite(int &x, int &y, int &mask, uint8_t *sr, uint8_t *sg, uint8_t *sb, int *depth, uint16_t *dst, int drawIndex)
+{
+	// Check if destination frame buffer has changed
+	// Need this for blitz2k validation checks
+	if (1 && m_drawIndex != drawIndex)
+	{
+		DrawLfbWrites();
+		CopyBuffer(m_drawBuffer);
+		m_drawIndex = drawIndex;
+	}
+	m_drawBuffer = dst;
+
+	ShaderPoint pixel;
+	for (size_t pix = 0; pix < 2; ++pix)
+	{
+		if (mask & (0xf << (pix * 4))) {
+			pixel.intX = x + pix;
+			pixel.intY = y;
+			pixel.intZ = depth[pix];
+			pixel.intW = depth[pix];
+			pixel.intR = sr[pix];
+			pixel.intG = sg[pix];
+			pixel.intB = sb[pix];
+			pixel.intA = 0xff;
+			m_lfbWritePoints.push_back(pixel);
+
+			m_lfb_write_ready = true;
+		}
+	}
+	// Need to start drawing one early in case of single pixel write followed by a 2 pixel write
+	if (m_lfbWritePoints.size() >= DEPTH_PIXEL_BUFFER - 1) {
+		DrawLfbWrites();
+	}
+
 }
 
 void voodoo_gpu::ReadTex()

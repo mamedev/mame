@@ -32,7 +32,7 @@ using DirectX::XMFLOAT4;
 #define NUM_TEX 2
 
 // Number of textures for use by TMUs
-#define MAX_TEX 128
+#define MAX_TEX 256
 
 // Dither Texture t and s register offset
 #define DITH_TEX_OFFSET 0
@@ -43,11 +43,11 @@ using DirectX::XMFLOAT4;
 // Starting texture and sampling register offset in gpu
 #define TMU_TEX_OFFSET 3
 
-// Depth of the pixel buffer for lfb writes through pixel pipeline
-#define DEPTH_PIXEL_BUFFER 512
+// Depth of the pixel buffer for lfb writes through pixel pipeline and direct
+#define DEPTH_PIXEL_BUFFER 1024
 
-// Depth of the pixel buffer for lfb direct writes
-#define DEPTH_LFB_WRITE_BUFFER 512
+// Depth of triangle vertex buffer for triangle drawing
+#define DEPTH_TRIANGLE_BUFFER 1024
 
 class voodoo_gpu
 {
@@ -70,13 +70,6 @@ public:
 		XMFLOAT4 Col;
 		XMFLOAT3 Tex0;
 		XMFLOAT3 Tex1;
-	};
-
-	struct LFBWriteStruct
-	{
-		uint32_t x;
-		uint32_t y;
-
 	};
 
 	struct frameBufferCtrl // register(b0)
@@ -196,20 +189,25 @@ public:
 public:
 	voodoo_gpu();
 	~voodoo_gpu();
-	enum RenderMode { TRIANGLE, PIXEL, FASTFILL };
+	enum RenderMode { TRIANGLE, PIXEL, DIRECTWRITE, FASTFILL };
 	bool InitDevice();
-	bool CompileShaders();
+	bool CompileShaders(std::wstring pSrcDir);
 	bool InitBuffers(int sizeX, int sizeY);
 	bool InitRenderBuffers(int sizeX, int sizeY, int fbiWidth);
-	HRESULT CreateVertexShader(LPCWSTR pSrcFile, LPCSTR pFunctionName, ID3D11VertexShader** ppShaderOut, int mode = 0);
-	HRESULT CreatePixelShader(LPCWSTR pSrcFile, LPCSTR pFunctionName, ID3D11PixelShader** ppShaderOut);
+	HRESULT CreateVertexShaderFile(LPCWSTR pSrcFile, LPCSTR pFunctionName, ID3D11VertexShader** ppShaderOut, int mode = 0);
+	HRESULT CreatePixelShaderFile(LPCWSTR pSrcFile, LPCSTR pFunctionName, ID3D11PixelShader** ppShaderOut);
 	HRESULT RenderToTex();
 	void ReadTex();
+	// Flushes pending pixels and copies frame buffer to local memory
 	void FlushBuffer(void);
 	void DrawFastFill(ShaderPoint *triangleVertices);
-	void DrawTriangle(ShaderVertex *triangleVertices, uint16_t *dst);
+	void DrawTriangle();
+	// Sends any pixels in the pixel proccessing pipeline queue to the gpu to be processed
 	void DrawPixels();
-	void FastFill(int sx, int ex, int sy, int ey, uint16_t *dst);
+	// Sends any lfb writes in the lfb write queue to the gpu to be processed
+	void DrawLfbWrites();
+	void FastFill(int sx, int ex, int sy, int ey, uint16_t *dst, int drawIndex);
+	// Copies gpu frame buffer to local frame buffer if there has been changes
 	void CopyBuffer(uint16_t *dst);
 	void CopyBufferComp(uint16_t *dst);
 	void CopyBufferRGB(uint8_t *dst);
@@ -230,13 +228,19 @@ public:
 	void UpdateFogCtrl();
 
 	void UpdateTexCtrl(int enalbeTex0, int enableTex1);
+	// Transfer any control structure updates from local to gpu registers
 	void UpdateConstants();
 	void FlagTexture(uint32_t &offset);
 	void FlagTexture(int index, uint32_t *texBase, uint32_t &texLod);
 	Combine_Struct ConvertTexmode(uint32_t &texMode);
 	void CreateTexture(texDescription &desc, int index, uint32_t &texMode, uint32_t &texLod, uint32_t &texDetail);
-	void PushPixel(int &x, int &y, int &mask, uint8_t *sr, uint8_t *sg, uint8_t *sb, int *sa, int *sz, uint32_t wSel, uint32_t &wVal, uint16_t *dst);
-
+	// Pushes a triangle onto the triangle processing queue
+	void PushTriangle(ShaderVertex *triangleVertices, uint16_t *dst, int drawIndex);
+	// Pushes a pixel onto LFB 3d processing queue
+	void PushPixel(int &x, int &y, int &mask, uint8_t *sr, uint8_t *sg, uint8_t *sb, int *sa, int *sz, uint32_t wSel, uint32_t &wVal, uint16_t *dst, int drawIndex);
+	// Pushes a RGB write onto the lfb write queue
+	void PushLfbWrite(int &x, int &y, int &mask, uint8_t *sr, uint8_t *sg, uint8_t *sb, int *depth, uint16_t *dst, int drawIndex);
+	void SetDrawIndex(int index) { m_drawIndex = index; };
 private:
 	ID3D11Device* GetGPU();
 	ID3D11DeviceContext* GetContext();
@@ -285,7 +289,10 @@ private:
 
 	ID3D11Texture2D* m_depthBuffer;
 	ID3D11DepthStencilState* m_depthState;
-	ID3D11DepthStencilState* m_depthFastFillState;
+	// Always write depth
+	ID3D11DepthStencilState* m_depthAlwaysState;
+	// Never write depth
+	ID3D11DepthStencilState* m_depthNeverState;
 	ID3D11DepthStencilView* m_depthView;
 	ID3D11RasterizerState* m_rasterState;
 	ID3D11BlendState* m_blendState;
@@ -300,8 +307,12 @@ private:
 	frameBufferCtrl m_frameBufferCtrl;
 	Color_Ctrl_Struct m_colorCtrl;
 	Tex_Interface_Struct m_texCtrl;
+	// Queue for triangle drawing
+	std::vector<ShaderVertex> m_trianglePoints;
+	// Queue for LFB 3D pixel pipeline writes
 	std::vector<ShaderPoint> m_pixelPoints;
-	std::vector<LFBWriteStruct> m_lfbWritePoints;
+	// Queue for LFB direct writes
+	std::vector<ShaderPoint> m_lfbWritePoints;
 
 	bool m_updateBlendState;		// Blending
 	bool m_updateAlphaTest;			// Alpha Testing
@@ -314,11 +325,13 @@ private:
 	Fog_Table_Struct m_fogTable;
 
 	bool m_need_copy;
+	bool m_triangles_ready;
 	bool m_pixels_ready;
 	bool m_lfb_write_ready;
 
 	int m_fbiWidth;
-	uint16_t *m_destBuffer;
+	int m_drawIndex;
+	uint16_t *m_drawBuffer;
 
 	uint32_t m_fastFbzMode;
 	uint32_t m_regFbzMode, m_regFbzColorPath, m_regColor0, m_regColor1, m_regAlphaMode, m_regTexMode[NUM_TEX];

@@ -206,9 +206,15 @@ PS_OUTPUT PS(PS_INPUT input)
 		// Color combining
 		srcColor = ColorCombine(c_other, c_local, colCtrl, texColor.a, texColor.rgb);
 	}
-	else {
-		// Pixel pipeline LFB write
+	else if (pixel_mode == 1) {
+		// Pixel pipeline 3d LFB write
 		srcColor = input.Col;
+	}
+	else {
+		// LFB direct write
+		output.Col = input.Col;
+		output.Depth = input.Oow;
+		return output;
 	}
 
 	// Alpha Testing
