@@ -180,21 +180,22 @@ ADDRESS_MAP_END
 WRITE_LINE_MEMBER(mermaid_state::rougien_sample_rom_lo_w)
 {
 	m_adpcm_rom_sel = state | (m_adpcm_rom_sel & 2);
+	m_adpcm_counter->set_rom_bank(m_adpcm_rom_sel);
 }
 
 WRITE_LINE_MEMBER(mermaid_state::rougien_sample_rom_hi_w)
 {
 	m_adpcm_rom_sel = (state <<1) | (m_adpcm_rom_sel & 1);
+	m_adpcm_counter->set_rom_bank(m_adpcm_rom_sel);
 }
 
 WRITE_LINE_MEMBER(mermaid_state::rougien_sample_playback_w)
 {
 	if (state)
 	{
-		m_adpcm_pos = m_adpcm_rom_sel*0x1000;
-		m_adpcm_end = m_adpcm_pos+0x1000;
 		m_adpcm_idle = 0;
 		m_adpcm->reset_w(0);
+		m_adpcm_counter->reset_w(0);
 	}
 }
 
@@ -366,13 +367,10 @@ void mermaid_state::machine_start()
 	save_item(NAME(m_rougien_gfxbank2));
 	save_item(NAME(m_ay8910_enable));
 
-	save_item(NAME(m_adpcm_pos));
-	save_item(NAME(m_adpcm_end));
 	save_item(NAME(m_adpcm_idle));
 	save_item(NAME(m_adpcm_data));
 	save_item(NAME(m_adpcm_trigger));
 	save_item(NAME(m_adpcm_rom_sel));
-	save_item(NAME(m_adpcm_play_reg));
 }
 
 void mermaid_state::machine_reset()
@@ -387,33 +385,32 @@ void mermaid_state::machine_reset()
 
 	m_adpcm_idle = 1;
 	m_adpcm_rom_sel = 0;
-	m_adpcm_play_reg = 0;
+	m_adpcm->reset_w(1);
+	m_adpcm_counter->reset_w(1);
+	m_adpcm_trigger = 0;
+	m_adpcm_data = 0;
 }
 
 /* Similar to Jantotsu, apparently the HW has three ports that controls what kind of sample should be played. Every sample size is 0x1000. */
+WRITE8_MEMBER(mermaid_state::adpcm_data_w)
+{
+	m_adpcm_data = data;
+	m_adpcm->data_w(m_adpcm_trigger ? (data & 0x0f) : (data & 0xf0) >> 4);
+}
+
 WRITE_LINE_MEMBER(mermaid_state::rougien_adpcm_int)
 {
-//  popmessage("%08x",m_adpcm_pos);
+	if (!state)
+		return;
 
-	if (m_adpcm_pos >= m_adpcm_end || m_adpcm_idle)
+	m_adpcm_trigger ^= 1;
+	m_adpcm->data_w(m_adpcm_trigger ? (m_adpcm_data & 0x0f) : (m_adpcm_data & 0xf0) >> 4);
+	m_adpcm_counter->clock_w(m_adpcm_trigger);
+	if (m_adpcm_trigger == 0 && m_adpcm_counter->count() == 0)
 	{
-		//m_adpcm_idle = 1;
+		m_adpcm_idle = 1;
 		m_adpcm->reset_w(1);
-		m_adpcm_trigger = 0;
-	}
-	else
-	{
-		uint8_t *ROM = memregion("adpcm")->base();
-
-		m_adpcm_data = ((m_adpcm_trigger ? (ROM[m_adpcm_pos] & 0x0f) : (ROM[m_adpcm_pos] & 0xf0) >> 4));
-		m_adpcm->data_w(m_adpcm_data & 0xf);
-		m_adpcm_trigger ^= 1;
-		if (m_adpcm_trigger == 0)
-		{
-			m_adpcm_pos++;
-			//if ((ROM[m_adpcm_pos] & 0xff) == 0x70)
-			//  m_adpcm_idle = 1;
-		}
+		m_adpcm_counter->reset_w(1);
 	}
 }
 
@@ -483,9 +480,14 @@ static MACHINE_CONFIG_DERIVED( rougien, mermaid )
 	MCFG_PALETTE_INIT_OWNER(mermaid_state,rougien)
 
 	MCFG_SOUND_ADD("adpcm", MSM5205, 384000)
-	MCFG_MSM5205_VCLK_CB(WRITELINE(mermaid_state, rougien_adpcm_int))  /* interrupt function */
+	MCFG_MSM5205_VCK_CALLBACK(WRITELINE(mermaid_state, rougien_adpcm_int))
 	MCFG_MSM5205_PRESCALER_SELECTOR(S96_4B)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+
+	MCFG_DEVICE_ADD("adpcm_counter", RIPPLE_COUNTER, 0)
+	MCFG_DEVICE_ROM("adpcm")
+	MCFG_RIPPLE_COUNTER_STAGES(12)
+	MCFG_RIPPLE_COUNTER_ROM_OUT_CB(WRITE8(mermaid_state, adpcm_data_w))
 MACHINE_CONFIG_END
 
 /* ROMs */
