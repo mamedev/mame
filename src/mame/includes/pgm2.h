@@ -117,6 +117,8 @@ private:
 	uint32_t m_mcu_result1;
 	uint8_t m_mcu_last_cmd;
 	void mcu_command(bool is_command);
+	uint8_t m_card_data[4][0x100];
+	bool m_have_card[4];
 
 	// devices
 	required_device<cpu_device> m_maincpu;

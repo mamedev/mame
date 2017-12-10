@@ -144,18 +144,34 @@ TIMER_DEVICE_CALLBACK_MEMBER(pgm2_state::igs_interrupt2)
 	m_arm_aic->set_irq(0x46);
 }
 
+static const uint8_t orleg2_china_card[32] = {
+	0xA2, 0x13, 0x10, 0x91, 0x05, 0x0C, 0x81, 0x15, 0x10, 0x00, 0x00, 0x03, 0x00, 0x49, 0x47, 0x53,
+	0x00, 0x00, 0x00, 0x00, 0x00, 0xD2, 0x76, 0x00, 0x00, 0x04, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
+};
+static const uint8_t kov2nl_china_card[32] = {
+	0xA2, 0x13, 0x10, 0x91, 0x05, 0x0C, 0x81, 0x15, 0x06, 0x00, 0x00, 0x04, 0x00, 0x49, 0x47, 0x53,
+	0x00, 0x00, 0x00, 0x00, 0x00, 0xD2, 0x76, 0x00, 0x00, 0x04, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
+};
+
 // "MPU" MCU HLE starts here
+// TODO: make data cards using image_interface
+// command delays is far not correct, might not work in other games
+// command results probably either incorrect (except for explicit checked bytes)
 void pgm2_state::mcu_command(bool is_command)
 {
 	uint8_t cmd = m_mcu_regs[0] & 0xff;
-	if (is_command && cmd != 0xf6)
-		logerror("MCU command %08x %08x\n", m_mcu_regs[0], m_mcu_regs[1]);
+//	if (is_command && cmd != 0xf6)
+//		logerror("MCU command %08x %08x\n", m_mcu_regs[0], m_mcu_regs[1]);
 
 	if (is_command)
 	{
 		m_mcu_last_cmd = cmd;
 		uint8_t status = 0xf7; // "command accepted" status
 		int delay = 1;
+
+		uint8_t arg1 = m_mcu_regs[0] >> 8;
+		uint8_t arg2 = m_mcu_regs[0] >> 16;
+		uint8_t arg3 = m_mcu_regs[0] >> 24;
 		switch (cmd)
 		{
 		case 0xf6:	// get result
@@ -183,20 +199,36 @@ void pgm2_state::mcu_command(bool is_command)
 		}
 			break;
 			// unknown / unimplemented, all C0-C9 commands is IC Card RW related
-			// (m_mcu_regs[0] >> 8) & 0xff - target RW unit (player) #
+			// (m_mcu_regs[0] >> 8) & 0xff - target RW unit (player)
 		case 0xc0: // insert card or/and check card presence. result: F7 - ok, F4 - no card
-			status = 0xf4;
-		case 0xc1:
-		case 0xc2:
-		case 0xc3:
-		case 0xc4:
-		case 0xc5:
-		case 0xc6:
-		case 0xc7:
-		case 0xc8:
-		case 0xc9:
+			if (!m_have_card[arg1])
+				status = 0xf4;
 			m_mcu_result0 = cmd;
-			m_mcu_result1 = 0;
+			break;
+		case 0xc1: // check ready/busy ?
+			m_mcu_result0 = cmd;
+			break;
+		case 0xc2: // read data to shared ram, args - offset, len
+			memcpy(&m_shareram[(~m_share_bank & 1) * 128], &m_card_data[arg1][arg2], arg3);
+			m_mcu_result0 = cmd;
+			break;
+		case 0xc3: // save data from shared ram, args - offset, len
+			memcpy(&m_card_data[arg1][arg2], &m_shareram[(~m_share_bank & 1) * 128], arg3);
+			m_mcu_result0 = cmd;
+			break;
+		case 0xc7: // get card ID?, no args, result1 expected to be fixed value for new card
+			m_mcu_result1 = 0xf81f0000;
+			m_mcu_result0 = cmd;
+			break;
+		case 0xc8: // write byte, args - offset, data byte
+			m_card_data[arg1][arg2] = arg3;
+			m_mcu_result0 = cmd;
+			break;
+		case 0xc4: // not used
+		case 0xc5: // set new password?, args - offset, data byte (offs 0 - always 7, 1-3 password)
+		case 0xc6: // not used
+		case 0xc9: // card authentication, args - 3 byte password, ('I','G','S' for new cards)
+			m_mcu_result0 = cmd;
 			break;
 		default:
 			logerror("MCU unknown command %08x %08x\n", m_mcu_regs[0], m_mcu_regs[1]);
@@ -402,6 +434,11 @@ void pgm2_state::machine_reset()
 	m_realspritekey = 0;
 	m_mcu_last_cmd = 0;
 	m_share_bank = 0;
+
+	m_have_card[0] = true;
+	m_have_card[1] = m_have_card[2] = m_have_card[3] = false;
+	memcpy(m_card_data[0], orleg2_china_card, sizeof(orleg2_china_card));
+//	memcpy(m_card_data[0], kov2nl_china_card, sizeof(kov2nl_china_card));
 }
 
 static const gfx_layout tiles8x8_layout =
