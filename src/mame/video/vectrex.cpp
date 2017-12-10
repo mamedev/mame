@@ -207,7 +207,7 @@ TIMER_CALLBACK_MEMBER(vectrex_state::update_signal)
 	if (!m_ramp)
 	{
 		length = m_maincpu->clocks_to_cycles(m_maincpu->clock()) * INT_PER_CLOCK
-			* (machine().time() - m_vector_start_time).as_double());
+			* (machine().time() - m_vector_start_time).as_double();
 
 		m_x_int += length * (m_analog[A_X] + m_analog[A_ZR]);
 		m_y_int += length * (m_analog[A_Y] + m_analog[A_ZR]);
