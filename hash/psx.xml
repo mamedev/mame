@@ -45016,7 +45016,7 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		</part>
 	</software>
 
-	<software name="hokutosk" supported="partially">
+	<software name="hokutosk" supported="partial">
 		<!-- Original images (Redump)
 		<rom name="Hokuto no Ken - Seikimatsu Kyuuseishu Densetsu (Japan).cue" size="278" crc="736b61a5" sha1="7c318db42827e230c7766972759654c266c0ba65"/>
 		<rom name="Hokuto no Ken - Seikimatsu Kyuuseishu Densetsu (Japan) (Track 1).bin" size="659056272" crc="79e9fc16" sha1="1f9b064ceafef91641bb3bbcc075a604f478489e"/>
