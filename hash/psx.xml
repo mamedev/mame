@@ -45636,6 +45636,21 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		</part>
 	</software>
 
+	<software name="kaetkita">
+		<!-- Original images (Redump)
+		<rom name="Kaette Kita Cyborg Kuro-chan (Japan).cue" size="102" crc="9708bd74" sha1="8312951576c460a9260afe0c6c90a4f394cf08b7"/>
+		<rom name="Kaette Kita Cyborg Kuro-chan (Japan).bin" size="86581824" crc="12d2c699" sha1="adbb7f5efaf20068ef5f2723fa31e6f5e33acb5a"/>
+		-->
+		<description>Kaette Kita Cyborg Kuro-chan (Japan)</description>
+		<year>2002</year>
+		<publisher>Konami</publisher>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="kaette kita cyborg kuro-chan (japan)" sha1="4eb205399a5b201519b637d038cb85c15cb8d9be"/>
+			</diskarea>
+		</part>
+	</software>
+
 	<software name="k1gp98" supported="no">
 		<!-- Unknown source
 		<rom name="Fighting Illusion - K-1 Grand Prix '98 (Japan) [SLPS-01696].bin" size="723828000" crc="28058ede" sha1="83e5eabbccbfcbc7d5821b559cd813db22227926"/>
