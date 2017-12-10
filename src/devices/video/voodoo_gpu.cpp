@@ -258,28 +258,28 @@ bool voodoo_gpu::CompileShaders(std::wstring pSrcDir)
 	SAFE_RELEASE(m_pVS);
 	fileName = pSrcDir + L"voodoo_gpu_vs.hlsl";
 	if (FAILED(CreateVertexShaderFile(fileName.c_str(), "VS", &m_pVS, 1))) {
-		printf("voodoo_gpu:: Error could not compile VS %ws\n", fileName.c_str());
+		printf("voodoo_gpu:: Error could not compile VS %S\n", fileName.c_str());
 		return false;
 	}
 
 	SAFE_RELEASE(m_pixelVS);
 	fileName = pSrcDir + L"voodoo_gpu_vs.hlsl";
 	if (FAILED(CreateVertexShaderFile(fileName.c_str(), "PIXEL_VS", &m_pixelVS, 2))) {
-		printf("voodoo_gpu:: Error could not compile PIXEL_VS %ws\n", fileName.c_str());
+		printf("voodoo_gpu:: Error could not compile PIXEL_VS %S\n", fileName.c_str());
 		return false;
 	}
 
 	SAFE_RELEASE(m_pPS);
 	fileName = pSrcDir + L"voodoo_gpu_ps.hlsl";
 	if (FAILED(CreatePixelShaderFile(fileName.c_str(), "PS", &m_pPS))) {
-		printf("voodoo_gpu:: Error could not compile PS %ws\n", fileName.c_str());
+		printf("voodoo_gpu:: Error could not compile PS %S\n", fileName.c_str());
 		return false;
 	}
 
 	SAFE_RELEASE(m_fastFillPS);
 	fileName = pSrcDir + L"voodoo_gpu_ps.hlsl";
 	if (FAILED(CreatePixelShaderFile(fileName.c_str(), "FASTFILL_PS", &m_fastFillPS))) {
-		printf("voodoo_gpu:: Error could not compile FASTFILL_PS %ws\n", fileName.c_str());
+		printf("voodoo_gpu:: Error could not compile FASTFILL_PS %S\n", fileName.c_str());
 		return false;
 	}
 
@@ -287,14 +287,14 @@ bool voodoo_gpu::CompileShaders(std::wstring pSrcDir)
 	SAFE_RELEASE(m_compVS);
 	fileName = pSrcDir + L"voodoo_gpu_vs.hlsl";
 	if (FAILED(CreateVertexShaderFile(fileName.c_str(), "COMP_VS", &m_compVS))) {
-		printf("voodoo_gpu:: Error could not compile COMP_VS %ws\n", fileName.c_str());
+		printf("voodoo_gpu:: Error could not compile COMP_VS %S\n", fileName.c_str());
 		return false;
 	}
 
 	SAFE_RELEASE(m_compPS);
 	fileName = pSrcDir + L"voodoo_gpu_ps.hlsl";
 	if (FAILED(CreatePixelShaderFile(fileName.c_str(), "COMP_PS", &m_compPS))) {
-		printf("voodoo_gpu:: Error could not compile COMP_PS %ws\n", fileName.c_str());
+		printf("voodoo_gpu:: Error could not compile COMP_PS %S\n", fileName.c_str());
 		return false;
 	}
 
