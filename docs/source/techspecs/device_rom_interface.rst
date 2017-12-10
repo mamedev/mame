@@ -15,7 +15,7 @@ as rom.  In the region/block cases, banking is automatically handled.
 2. Setup
 --------
 
-| **device_rom_interface**\ (const machine_config &mconfig, device_t &device, UINT8 addrwidth, endianness_t endian = ENDIANNESS_LITTLE, UINT8 datawidth = 8)
+| **device_rom_interface**\ (const machine_config &mconfig, device_t &device, u8 addrwidth, endianness_t endian = ENDIANNESS_LITTLE, u8 datawidth = 8)
 
 The constructor of the interface wants, in addition to the standard
 parameters, the address bus width of the dedicated bus.  In addition
@@ -60,10 +60,10 @@ times.
 3. Rom access
 -------------
 
-| UINT8 **read_byte**\ (offs_t byteaddress)
-| UINT16 **read_word**\ (offs_t byteaddress)
-| UINT32 **read_dword**\ (offs_t byteaddress)
-| UINT64 **read_qword**\ (offs_t byteaddress)
+| u8 **read_byte**\ (offs_t byteaddress)
+| u16 **read_word**\ (offs_t byteaddress)
+| u32 **read_dword**\ (offs_t byteaddress)
+| u64 **read_qword**\ (offs_t byteaddress)
 
 These methods provide read access to the connected rom.  Out-of-bounds
 access results in standard unmapped read logerror messages.
