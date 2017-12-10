@@ -34687,6 +34687,7 @@ worldwar                        // A6004 'WW' (c) 1987
 
 @source:snk6502.cpp
 fantasyg                        // (c) 1981 SNK
+fantasyg2                       // (c) 1981 SNK
 fantasyj                        // (c) 1981 SNK
 fantasyu                        // (c) 1981 Rock-Ola
 nibbler                         // (c) 1982 Rock-ola (version 9)
