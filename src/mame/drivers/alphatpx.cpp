@@ -585,15 +585,19 @@ ROM_END
 // Alphatronic P3
 ROM_START( alphatp3 )
 	ROM_REGION(0x1800, "boot", 0) // P3 ROM space 0x1000
-	ROM_LOAD("caap36_02_19.bin", 0x0000, 0x1000, CRC(23df6666) SHA1(5ea04cd299dec9951425eb91ecceb4818c4c6378)) // identical between rfka01 #1 and #2
-
+	ROM_SYSTEM_BIOS(0, "gx347", "gx347") // identical between earlier and later P3
+	ROM_SYSTEM_BIOS(1, "lb352", "lb352") // BIOS names taken from CPU card labels
+	
+	ROMX_LOAD("caap36_02_19.bin", 0x0000, 0x1000, CRC(23df6666) SHA1(5ea04cd299dec9951425eb91ecceb4818c4c6378), ROM_BIOS(1) )
+	ROMX_LOAD("caap36_02_19.bin", 0x0000, 0x1000, CRC(23df6666) SHA1(5ea04cd299dec9951425eb91ecceb4818c4c6378), ROM_BIOS(2) )
+	
 	ROM_REGION(0x400, "kbdmcu", 0)
-//	ROM_LOAD("p3_keyboard_mab8041a.bin", 0x000, 0x400, CRC(4fd60dc1) SHA1(165f0c5afdef37385d06cf5caeae8422536de7fc)) // rfka01 machine #1
-	ROM_LOAD("p3_keyboard_8278.bin",  0x000, 0x400, CRC(5DB00D85) SHA1(0DC8E274A5AECE261EF60494901601C0D8B1EB51))  // rfka01 machine #2
+	ROMX_LOAD("p3_keyboard_8278.bin",  0x000, 0x400, CRC(5db00d85) SHA1(0dc8e274a5aece261ef60494901601c0d8b1eb51), ROM_BIOS(1) )
+	ROMX_LOAD("p3_keyboard_mab8041a.bin", 0x000, 0x400, CRC(5db00d85) SHA1(0dc8e274a5aece261ef60494901601c0d8b1eb51), ROM_BIOS(2) )
 
 	ROM_REGION(0x800, "gfx", 0)
-	// ROM_LOAD("cajp08_00_15.bin", 0x000, 0x800, CRC(d6248209) SHA1(21689703de7183ecffb410eb8a6d516efe27da9d)) // rfka01 machine #2
-	ROM_LOAD("cajp08_01_15.bin", 0x000, 0x800, CRC(4ed11dac) SHA1(9db9b8e0edf471faaddbb5521d6223121146bab8)) // rfka01 machine #1
+	ROMX_LOAD("cajp08_00_15.bin", 0x000, 0x800, CRC(d6248209) SHA1(21689703de7183ecffb410eb8a6d516efe27da9d), ROM_BIOS(1) )
+	ROMX_LOAD("cajp08_01_15.bin", 0x000, 0x800, CRC(4ed11dac) SHA1(9db9b8e0edf471faaddbb5521d6223121146bab8), ROM_BIOS(2) )
 ROM_END
 
 // Alphatronic P30
