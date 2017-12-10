@@ -22,6 +22,30 @@
 			</diskarea>
 		</part>
 	</software>
+
+	<software name="arampage">
+		<description>Alien Rampage (v1.13)</description>
+		<year>1996</year>
+		<publisher>Softdisk</publisher>
+		<info name="version" value="1.13" />
+		<part name="cdrom" interface="cdrom">
+			<feature name="disk_label" value="Alien Rampage" />
+			<diskarea name="cdrom">
+				<disk name="arampage" sha1="88ae86b0837bc5fba7a3585a506d5ad24161b001" />
+		</diskarea>
+		</part>
+	</software>
+
+	<software name="ironbld">
+ 		<description>Iron Blood</description>
+ 		<year>1996</year>
+ 		<publisher>Microforum</publisher>
+ 		<part name="cdrom" interface="cdrom">
+ 			<diskarea name="cdrom">
++				<disk name="ironbld" sha1="45f44fa1a8feb98daba2b7befb6a8360ad39b352" />
+ 			</diskarea>			
+ 		</part>
+ 	</software>
 	
 	<software name="prototyp">
 		<description>Prototype</description>
@@ -301,6 +325,17 @@
 				<disk name="en_win2000_pro_sp4" sha1="9344cce041f092f0194944bdc690af7df7185cf6" />
 			</diskarea>
 		</part>
+	</software>
+
+	<software name="zyclunt">
+		<description>Zyclunt</description>
+		<year>1995</year>
+		<publisher>Phantagram</publisher>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="zyclunt" sha1="cc6e69cdd5bdda70361778c3515571114a97b662" />
+			</diskarea>
+		</part>	
 	</software>
 
 </softwarelist>
