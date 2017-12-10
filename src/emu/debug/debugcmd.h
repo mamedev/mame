@@ -93,6 +93,7 @@ private:
 	void execute_trace_internal(int ref, const std::vector<std::string> &params, bool trace_over);
 
 	void execute_help(int ref, const std::vector<std::string> &params);
+	void execute_helphtml(int ref, const std::vector<std::string> &params);
 	void execute_print(int ref, const std::vector<std::string> &params);
 	void execute_printf(int ref, const std::vector<std::string> &params);
 	void execute_logerror(int ref, const std::vector<std::string> &params);
