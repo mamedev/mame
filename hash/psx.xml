@@ -42805,6 +42805,21 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		</part>
 	</software>
 
+	<software name="fireprog">
+		<!-- Original images (Redump)
+		<rom name="Fire Pro Wrestling G (Japan) (v1.1).cue" size="101" crc="235169a5" sha1="8d8e7d6247ba63290b18224639ef7f97e89121d1"/>
+		<rom name="Fire Pro Wrestling G (Japan) (v1.1).bin" size="303358608" crc="8ddb5a09" sha1="26c1da5e5b64d162e9f85c285ffaf2cf2d82214a"/>
+		-->
+		<description>Fire Pro Wrestling G (Japan) (v1.1)</description>
+		<year>2000</year>
+		<publisher>Spike</publisher>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="fire pro wrestling g (japan (v1.1)" sha1="5b0792750443a320ce4e62e2f01da8d721a2686e"/>
+			</diskarea>
+		</part>
+	</software>
+
 	<software name="firewomn" supported="no">
 		<!-- Unknown source
 		<rom name="Fire Woman Matoigumi (Japan) [SLPS-01315].bin" size="710339280" crc="b3526c6a" sha1="2dd364f28f82774e3a4ce73e06c8197c29514df0"/>
@@ -44046,6 +44061,21 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		</part>
 	</software>
 
+	<software name="gradiusg">
+		<!-- Original images (Redump)
+		<rom name="Gradius Gaiden (Japan) (v1.1).cue" size="95" crc="2a2a5d50" sha1="2e638e4f7e1e11e14cf121a14dc5a6835b808579"/>
+		<rom name="Gradius Gaiden (Japan) (v1.1).bin" size="589716960" crc="8ddb5a09" sha1="5c4794957782bed1ec79851c3ac40d673495b2be"/>
+		-->
+		<description>Gradius Gaiden (Japan) (v1.1)</description>
+		<year>1997</year>
+		<publisher>Konami</publisher>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="gradius gaiden (japan) (v1.1)" sha1="587c2314833c127d1fd4b94ea6d3535537b62146"/>
+			</diskarea>
+		</part>
+	</software>
+
 	<software name="grandoll" supported="no">
 		<!-- Unknown source
 		<rom name="Chou-Kousoku Gran Doll (Japan) [SLPS-00935].bin" size="558237792" crc="d66949aa" sha1="4e81d144625673671ee8c345eca0dbad0c3f6e59"/>
@@ -44184,6 +44214,21 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
 				<disk name="gung-ho brigade (japan) [slps-01902]" sha1="f067ac6b2b3e7d2a20345b06c51c563e32f42135"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="gunnersh">
+		<!-- Original images (Redump)
+		<rom name="Gunners Heaven (Japan).cue" size="88" crc="6c5136cc" sha1="44136d13f418a67d8342f07d0d3fac2f165ee039"/>
+		<rom name="Gunners Heaven (Japan).bin" size="398306496" crc="4ff1d1aa" sha1="82bc08baacad979beea29cea702c2c9d85a7c206"/>
+		-->
+		<description>Gunners Heaven (Japan)</description>
+		<year>1995</year>
+		<publisher>Media Vision</publisher>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="gunners heaven (japan)" sha1="06106575688eaeebf0cf5aac6ddc51403dcdcc28"/>
 			</diskarea>
 		</part>
 	</software>
@@ -44971,6 +45016,22 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		</part>
 	</software>
 
+	<software name="hokutosk" supported="partially">
+		<!-- Original images (Redump)
+		<rom name="Hokuto no Ken - Seikimatsu Kyuuseishu Densetsu (Japan).cue" size="278" crc="736b61a5" sha1="7c318db42827e230c7766972759654c266c0ba65"/>
+		<rom name="Hokuto no Ken - Seikimatsu Kyuuseishu Densetsu (Japan) (Track 1).bin" size="659056272" crc="79e9fc16" sha1="1f9b064ceafef91641bb3bbcc075a604f478489e"/>
+		<rom name="Hokuto no Ken - Seikimatsu Kyuuseishu Densetsu (Japan) (Track 2).bin" size="37396800" crc="7976083e" sha1="d9f92af296360772e62caa4cb276de3fa74f5538"/>
+		-->
+		<description>Hokuto no Ken - Seikimatsu Kyuuseishu Densetsu (Japan)</description>
+		<year>2000</year>
+		<publisher>Bandai</publisher>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="hokuto no ken - seikimatsu kyuuseishu densetsu (japan)" sha1="bd52aeec9c61c52b4e7a5391e1a4bd56fe453cdd"/>
+			</diskarea>
+		</part>
+	</software>
+
 	<software name="hooockey" supported="no">
 		<!-- Unknown source
 		<rom name="Hooockey!! (Japan) [SLPM-86488].bin" size="156692592" crc="032f439f" sha1="ac67eb197a3b761e46679135a0f6e30957617a58"/>
@@ -45518,6 +45579,21 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
 				<disk name="jigsaw world (japan) [slps-02251]" sha1="729f2da447fa231d5d6767c27e62f208fb494b5f"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="jikkparo" supported="no">
+		<!-- Original images (Redump)
+		<rom name="Jikkyou Oshaberi Parodius - Forever with Me (Japan).cue" size="117" crc="5a953380" sha1="c00f3a13075a1fa66c451a7427a12354ee9855b6"/>
+		<rom name="Jikkyou Oshaberi Parodius - Forever with Me (Japan).bin" size="236070240" crc="6818a16d" sha1="b133e7d7ab6679e742b9c29053fba239d948287e"/>
+		-->
+		<description>Jikkyou Oshaberi Parodius - Forever with Me (Japan)</description>
+		<year>1996</year>
+		<publisher>Konami</publisher>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="jikkyou oshaberi parodius - forever with me (japan)" sha1="2ccce47c444030d1ec6751ec54e943f80fbf9164"/>
 			</diskarea>
 		</part>
 	</software>
@@ -47286,6 +47362,39 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
 				<disk name="lup salad - lupupu cube (japan) [slps-00416]" sha1="2077cf3f27c7133fb17c559de364cdd6f4ace26c"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="macrovfx">
+		<!-- Original images (Redump)
+		<rom name="Macross Digital Mission VF-X (Japan) (v1.1).cue" size="256" crc="4ff1d1aa" sha1="fd92d61ea6dd653e34d73cf87aa984226437cd92"/>
+		<rom name="Macross Digital Mission VF-X (Japan) (v1.1) (Track 1).bin" size="650036352" crc="a8eead5b" sha1="732bb1fb49b6822d960d8b1cfd3e8e44e15d5195"/>
+		<rom name="Macross Digital Mission VF-X (Japan) (v1.1) (Track 2).bin" size="1712256" crc="c9cc476e" sha1="4f9f15c5f519429eccb33d5ceebf18cdf681849c"/>
+		-->
+		<description>Macross Digital Mission VF-X (Japan)</description>
+		<year>1997</year>
+		<publisher>Bandai</publisher>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="macross digital mission vf-x (japan) (v1.1)" sha1="d6cc4f5cacf2877560a692b45788f61f71a18873"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="macrvfx2">
+		<!-- Original images (Redump)
+		<rom name="Macross VF-X2 (Japan).cue" size="327" crc="0f83c2d4" sha1="735b4ddcefe82825f69d265b8975d6d4bb929d80"/>
+		<rom name="Macross VF-X2 (Japan) (Track 1).bin" size="430867584" crc="9696eadb" sha1="f7e0d5b2175850b77d5bd8e2efd2123d74240af9"/>
+		<rom name="Macross VF-X2 (Japan) (Track 2).bin" size="47451600" crc="2e07f6eb" sha1="68f587366f2ad490fe47d9c14056cb087ab47c46"/>
+		<rom name="Macross VF-X2 (Japan) (Track 3).bin" size="37573200" crc="b65806d8" sha1="4bda128d58304d25207af2ffa564fd2493771db8"/>
+		-->
+		<description>Macross VF-X2 (Japan)</description>
+		<year>1999</year>
+		<publisher>Bandai</publisher>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="macross vf-x2 (japan)" sha1="2cb788b175f9dccdd1c491e7f054048534593040"/>
 			</diskarea>
 		</part>
 	</software>
@@ -53515,6 +53624,106 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		</part>
 	</software>
 
+	<software name="srobota">
+		<!-- Original images (Redump)
+		<rom name="Super Robot Taisen Alpha (Japan) (v1.1).cue" size="105" crc="a64072b6" sha1="e48e50c8dd42eb4ec94eac0b124606d9f19484b5"/>
+		<rom name="Super Robot Taisen Alpha (Japan) (v1.1).bin" size="646374288" crc="b6550e08" sha1="914a07e58ed4b68ea7a2b732372a565f532fab0d"/>
+		-->
+		<description>Super Robot Taisen Alpha (Japan) (v1.1)</description>
+		<year>2000</year>
+		<publisher>Banpresto</publisher>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="super robot taisen alpha (japan) (v1.1)" sha1="55891934c6f643bad499999e441d019c9a14f478" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="srobotagp">
+		<!-- Original images (Redump)
+		<rom name="Super Robot Taisen Alpha Gaiden (Japan) (Premium Edition).cue" size="123" crc="ee787a65" sha1="5877e52eafb38b0cec2fb888ecba26aaa1e02d28"/>
+		<rom name="Super Robot Taisen Alpha Gaiden (Japan) (Premium Edition).bin" size="718310208" crc="366c1cf1" sha1="b0d87ae8cf6434e2cb5c47d03812e0c0874a874c"/>
+		-->
+		<description>Super Robot Taisen Alpha Gaiden - Premium Edition (Japan)</description>
+		<year>2001</year>
+		<publisher>Banpresto</publisher>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="super robot taisen alpha gaiden - premium edition (japan)" sha1="6d1c0aadeb797702d8de68b1d96b0c62ae84cf77" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="srobotags">
+		<!-- Original images (Redump)
+		<rom name="Super Robot Taisen Alpha Gaiden (Japan) (Shokai Genteiban).cue" size="124" crc="8715a811" sha1="e8e634d9b85372ec0169cbffe47cac88b060eb90"/>
+		<rom name="Super Robot Taisen Alpha Gaiden (Japan) (Shokai Genteiban).bin" size="718310208" crc="b9bef60c" sha1="546675f35773bdf68a5b24a0fe429443a175cc44"/>
+		-->
+		<description>Super Robot Taisen Alpha Gaiden - Shokai Genteiban (Japan)</description>
+		<year>2001</year>
+		<publisher>Banpresto</publisher>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="super robot taisen alpha gaiden - shokai genteiban (japan)" sha1="104390ee61a56baf4902f45a945cb588d3b7c795" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="srobotcb">
+		<!-- Original images (Redump)
+		<rom name="Super Robot Taisen - Complete Box (Japan) (Disc 1) (Super Robot Wars Complete Box).cue" size="334" crc="c68361e4" sha1="3b5e4cc51caa48bc6982d56d1f478accfb009791"/>
+		<rom name="Super Robot Taisen - Complete Box (Japan) (Disc 1) (Super Robot Wars Complete Box) (Track 1).bin" size="565543104" crc="597ac371" sha1="14017a7ccc3b92e9483085fc744da414a721b68e"/>
+		<rom name="Super Robot Taisen - Complete Box (Japan) (Disc 1) (Super Robot Wars Complete Box) (Track 2).bin" size="32104800" crc="9b94ea54" sha1="bd1fde88c2b79e3cf8821c969373460d51f3155a"/>
+		<rom name="Super Robot Taisen - Complete Box (Japan) (Disc 2) (History of Super Robot Wars).cue" size="146" crc="50c54b6d" sha1="990fb4f7d6563eacc9b7ee425a4c34105d2404c6"/>
+		<rom name="Super Robot Taisen - Complete Box (Japan) (Disc 2) (History of Super Robot Wars).bin" size="642105408" crc="bef35311" sha1="65ffad2101381dbc4821ef1d152029e99d9f0996"/>
+		-->
+		<description>Super Robot Taisen Complete Box (Japan)</description>
+		<year>1999</year>
+		<publisher>Banpresto</publisher>
+		<part name="cdrom1" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="super robot taisen - complete box (japan) (disc 1)" sha1="624cc4b224cb211199095a6c2daad947c9d4c6de" />
+			</diskarea>
+		</part>
+		<part name="cdrom2" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="super robot taisen - complete box (japan) (disc 2) (history of super robot wars)" sha1="9ec3ef55ff9ac2c5f94990c74271f6bbb365d3da"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="srobotf">
+		<!-- Original images (Redump)
+		<rom name="Super Robot Taisen F (Japan).cue" size="" crc="1b9c1216" sha1="d397125bf25c42d3edbb2dd12b8e936a5a77c464"/>
+		<rom name="Super Robot Taisen F (Japan) (Track 1).bin" size="" crc="c9d941ba" sha1="582019486fa0288100086d3a1866b9b91031c8f7"/>
+		<rom name="Super Robot Taisen F (Japan) (Track 2).bin" size="" crc="9b94ea54" sha1="bd1fde88c2b79e3cf8821c969373460d51f3155a"/>
+		-->
+		<description>Super Robot Taisen F (Japan)</description>
+		<year>1998</year>
+		<publisher>Banpresto</publisher>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="super robot taisen f (japan)" sha1="3b86350787d8d9512e276f646a6ef7d8fe2191d4" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="srobotfk">
+		<!-- Original images (Redump)
+		<rom name="Super Robot Taisen F Kanketsuhen (Japan).cue" size="" crc="f40ace20" sha1="af84071adadb4c8eb8020b95e1064729cfeb1426"/>
+		<rom name="Super Robot Taisen F Kanketsuhen (Japan) (Track 1).bin" size="" crc="a04ec282" sha1="28b3988d5e405f5bd602ed42113c709b4bc4e0d4"/>
+		<rom name="Super Robot Taisen F Kanketsuhen (Japan) (Track 2).bin" size="" crc="9b94ea54" sha1="bd1fde88c2b79e3cf8821c969373460d51f3155a"/>
+		-->
+		<description>Super Robot Taisen F Kanketsuhen (Japan)</description>
+		<year>1999</year>
+		<publisher>Banpresto</publisher>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="super robot taisen f kanketsuhen (japan)" sha1="f2587e200ebb55eee1dcd7092b2e745102d5db3a" />
+			</diskarea>
+		</part>
+	</software>
+
 	<software name="ss037pzl" supported="no">
 		<!-- Unknown source
 		<rom name="Simple 1500 Series Vol.037 - The Illustration Puzzle &amp; Slide Puzzle (Japan) [SLPS-02958].bin" size="78610896" crc="8d1cf9e1" sha1="051d05d76e349f5a01f1db9c541ac799272d250c"/>
@@ -58278,6 +58487,21 @@ use an alternate design found on the demo disk... It might be possible to enable
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
 				<disk name="tr1" sha1="a42bca9a943f660a6c080a38a2c8082109c78e79" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="zanacx">
+		<!-- Original images (Redump)
+		<rom name="Zanac x Zanac (Japan).cue" size="87" crc="bf9b92c3" sha1="6a6d9eccb0e4c5d7443e616b0591de3df8643709"/>
+		<rom name="Zanac x Zanac (Japan).bin" size="379659840" crc="cf5625d4" sha1="8d8e7d6247ba63290b18224639ef7f97e89121d1"/>
+		-->
+		<description>Zanac X Zanac (Japan)</description>
+		<year>2001</year>
+		<publisher>Compile</publisher>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="zanac x zanac (japan)" sha1="93d215a0de3ac5a16b4bc58a058f01f084ada63a" />
 			</diskarea>
 		</part>
 	</software>
