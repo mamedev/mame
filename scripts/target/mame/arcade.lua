@@ -3170,6 +3170,7 @@ files {
 	MAME_DIR .. "src/mame/includes/megadrvb.h",
 	MAME_DIR .. "src/mame/drivers/megaplay.cpp",
 	MAME_DIR .. "src/mame/drivers/megatech.cpp",
+	MAME_DIR .. "src/mame/drivers/calcune.cpp",
 	MAME_DIR .. "src/mame/drivers/model1.cpp",
 	MAME_DIR .. "src/mame/includes/model1.h",
 	MAME_DIR .. "src/mame/machine/model1.cpp",
