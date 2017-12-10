@@ -710,12 +710,13 @@ WRITE8_MEMBER( towns_state::towns_spriteram_w )
  *      +4: Sprite Attribute
  *          bit 15: enforce offsets (regs 2-5)
  *          bit 12,13: flip sprite
+ *          bits 10,11: half-size
  *          bits 10-0: Sprite RAM offset containing sprite pattern
  *          TODO: other attributes (zoom?)
  *      +6: Sprite Colour
  *          bit 15: use colour data in located in sprite RAM offset in bits 11-0 (x32)
  */
-void towns_state::render_sprite_4(uint32_t poffset, uint32_t coffset, uint16_t x, uint16_t y, uint16_t xflip, uint16_t yflip, const rectangle* rect)
+void towns_state::render_sprite_4(uint32_t poffset, uint32_t coffset, uint16_t x, uint16_t y, uint16_t xflip, uint16_t yflip, uint16_t xhalfsize, uint16_t yhalfsize, const rectangle* rect)
 {
 	uint16_t xpos,ypos;
 	uint16_t col,pixel;
@@ -728,25 +729,47 @@ void towns_state::render_sprite_4(uint32_t poffset, uint32_t coffset, uint16_t x
 	if(xflip)
 	{
 		xstart = x+14;
-		xend = x-2;
-		xdir = -2;
+		if (xhalfsize) 
+		{
+			xend = x+6;
+			xdir = -1;
+		}
+		else
+		{
+			xend = x-2;
+			xdir = -2;
+		}
 	}
 	else
 	{
 		xstart = x+1;
-		xend = x+17;
-		xdir = 2;
+		if (xhalfsize) 
+		{
+			xend = x+9;
+			xdir = 1;
+		}
+		else
+		{
+			xend = x+17;
+			xdir = 2;
+		}
 	}
 	if(yflip)
 	{
 		ystart = y+15;
-		yend = y-1;
+		if (yhalfsize)
+			yend = y+7;
+		else
+			yend = y-1;
 		ydir = -1;
 	}
 	else
 	{
 		ystart = y;
-		yend = y+16;
+		if (yhalfsize) 
+			yend = y+8;
+		else
+			yend = y+16;
 		ydir = 1;
 	}
 	xstart &= 0x1ff;
@@ -754,7 +777,7 @@ void towns_state::render_sprite_4(uint32_t poffset, uint32_t coffset, uint16_t x
 	ystart &= 0x1ff;
 	yend &= 0x1ff;
 	poffset &= 0x1ffff;
-
+	
 	for(ypos=ystart;ypos!=yend;ypos+=ydir,ypos&=0x1ff)
 	{
 		for(xpos=xstart;xpos!=xend;xpos+=xdir,xpos&=0x1ff)
@@ -776,24 +799,30 @@ void towns_state::render_sprite_4(uint32_t poffset, uint32_t coffset, uint16_t x
 					m_towns_gfxvram[0x40000+voffset] = col & 0x00ff;
 				}
 			}
-			if(xflip)
-				voffset+=2;
-			else
-				voffset-=2;
-			pixel = m_towns_txtvram[poffset] & 0x0f;
-			col = m_towns_txtvram[coffset+(pixel*2)] | (m_towns_txtvram[coffset+(pixel*2)+1] << 8);
-			if((m_video.towns_sprite_page != 0 && voffset > 0x1ffff && voffset < 0x40000)
-					|| (m_video.towns_sprite_page == 0 && voffset < 0x20000))
+
+			if (!xhalfsize)
 			{
-				if(xpos < width && ypos < height && pixel != 0)
+				if(xflip)
+					voffset+=2;
+				else
+					voffset-=2;
+				pixel = m_towns_txtvram[poffset] & 0x0f;
+				col = m_towns_txtvram[coffset+(pixel*2)] | (m_towns_txtvram[coffset+(pixel*2)+1] << 8);
+				if((m_video.towns_sprite_page != 0 && voffset > 0x1ffff && voffset < 0x40000)
+						|| (m_video.towns_sprite_page == 0 && voffset < 0x20000))
 				{
-					m_towns_gfxvram[0x40000+voffset+1] = (col & 0xff00) >> 8;
-					m_towns_gfxvram[0x40000+voffset] = col & 0x00ff;
+					if(xpos < width && ypos < height && pixel != 0)
+					{
+						m_towns_gfxvram[0x40000+voffset+1] = (col & 0xff00) >> 8;
+						m_towns_gfxvram[0x40000+voffset] = col & 0x00ff;
+					}
 				}
 			}
 			poffset++;
 			poffset &= 0x1ffff;
 		}
+		if (yhalfsize)
+			poffset+=8;
 	}
 }
 
@@ -904,7 +933,7 @@ void towns_state::draw_sprites(const rectangle* rect)
 				n,x,y,attr,colour,poffset,coffset);
 #endif
 			if(!(colour & 0x2000))
-				render_sprite_4((poffset)&0x1ffff,coffset,x,y,attr&0x2000,attr&0x1000,rect);
+				render_sprite_4((poffset)&0x1ffff,coffset,x,y,attr&0x2000,attr&0x1000,attr&0x400,attr&0x800,rect);
 		}
 		else
 		{
