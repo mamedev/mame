@@ -94,7 +94,7 @@ image_init_result pgm2_memcard_device::call_create(int format_type, util::option
 
 void pgm2_memcard_device::auth(uint8_t p1, uint8_t p2, uint8_t p3)
 {
-	if (m_security_data[0] & 3)
+	if (m_security_data[0] & 7)
 	{
 		if (m_security_data[1] == p1 && m_security_data[2] == p2 && m_security_data[3] == p3)
 			authenticated = true;
