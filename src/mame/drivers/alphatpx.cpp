@@ -25,15 +25,18 @@ P1
 Upper 32K
 0x4000 - 0x400a reserved
 0x4010 - 0xc000 32K RAM
+1x 160K, single sided, 40 tracks, 16 sectors/track, 256 bytes/sector floppy disk drive
 
 P2, P2S
 Upper 48K
 0x4000 - 0x400a reserved
 0x4010 - 0xfff 48K RAM
+P2: 2x 160K, single sided, 40 tracks, 16 sectors/track, 256 bytes/sector floppy disk drives
 
 P2 U, paging via 
 An adapter with RAM at 0x0000 and 0x3fff and the banking logic (see above) is added to the the standard 48K memory card.
 16K memory card
+P2S, P2U: 2x 320K, double sided, 40 tracks, 16 sectors/track, 256 bytes/sector floppy disk drives
 
 P3, P4
 0x0000 - 0x0fff ROM monitor (MOS)
@@ -42,13 +45,16 @@ P3, P4
 0x1c00 - 0x2fff free
 0x3000 - 0x3fff video memory
 0x4000 - 0xffff RAM
-
+P3: 2x785K, double sided, 80 tracks, 5 sectors/track, 1024 bytes/sector floppy disk drives
+P4: 1x785K, double sided, 80 tracks, 5 sectors/track, 1024 bytes/sector floppy disk drive, 1x harddisk 360 tracks, 4 heads, 17 sectors/track, 512 bytes/sector
 
 P2 U and P3 support regular CP/M use with a full 64K RAM complement.
 Still, the video RAM is at 0x3000 and 0x3ffff even for these machines, and from what I've read they also use the routine present in the ROM monitor, the MOS.
 That means, that in order to update the video RAM and probably other I/O the lower 16K (page 0) are constantly paged in and paged out.
-
 This is accomplished by writing 2FH to port 0x78 in order to switch in the ROM (and assorted, see below) area and by writing 63H to port 0x78 in order to swap the full 64K RAM back in.
+
+P30 and P40 were P3 and P4's with an additional 8088 card (some with an extra graphics extension) to support MS-DOS.
+
 ***************************************************************************/
 
 #include "emu.h"
