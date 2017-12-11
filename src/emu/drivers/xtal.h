@@ -100,6 +100,7 @@ enum
 	XTAL_6MHz           = 6000000,      /* American Poker II, Taito SJ System */
 	XTAL_6_144MHz       = 6144000,      /* Used on Alpha Denshi early 80's games sound board, Casio FP-200 and Namco Universal System 16 */
 	XTAL_6_5MHz         = 6500000,      /* Jupiter Ace */
+	XTAL_6_88MHz        = 6880000,      /* Barcrest MPU4 */
 	XTAL_6_9MHz         = 6900000,      /* BBN BitGraph CPU */
 	XTAL_7MHz           = 7000000,      /* Jaleco Mega System PCBs */
 	XTAL_7_15909MHz     = 7159090,      /* Blood Bros (2x NTSC subcarrier) */
