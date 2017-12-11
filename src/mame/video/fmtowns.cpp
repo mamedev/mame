@@ -709,10 +709,9 @@ WRITE8_MEMBER( towns_state::towns_spriteram_w )
  *      +2: Y position (10-bit)
  *      +4: Sprite Attribute
  *          bit 15: enforce offsets (regs 2-5)
- *          bit 12,13: flip sprite
+ *          bit 12,13,14: flip / rotate sprite
  *          bits 10,11: half-size
- *          bits 10-0: Sprite RAM offset containing sprite pattern
- *          TODO: other attributes (zoom?)
+ *          bits 9-0: Sprite RAM offset containing sprite pattern
  *      +6: Sprite Colour
  *          bit 15: use colour data in located in sprite RAM offset in bits 11-0 (x32)
  */
@@ -818,15 +817,18 @@ void towns_state::render_sprite_4(uint32_t poffset, uint32_t coffset, uint16_t x
 					}
 				}
 			}
+
 			poffset++;
 			poffset &= 0x1ffff;
 		}
 		if (yhalfsize)
+		{
 			poffset+=8;
+		}
 	}
 }
 
-void towns_state::render_sprite_16(uint32_t poffset, uint16_t x, uint16_t y, uint16_t xflip, uint16_t yflip, const rectangle* rect)
+void towns_state::render_sprite_16(uint32_t poffset, uint16_t x, uint16_t y, uint16_t xflip, uint16_t yflip, uint16_t xhalfsize, uint16_t yhalfsize, const rectangle* rect)
 {
 	uint16_t xpos,ypos;
 	uint16_t col;
@@ -839,25 +841,37 @@ void towns_state::render_sprite_16(uint32_t poffset, uint16_t x, uint16_t y, uin
 	if(xflip)
 	{
 		xstart = x+16;
-		xend = x;
+		if (xhalfsize)
+			xend = x+8;
+		else
+			xend = x;
 		xdir = -1;
 	}
 	else
 	{
 		xstart = x+1;
-		xend = x+17;
+		if (xhalfsize)
+			xend = x+9;
+		else
+			xend = x+17;
 		xdir = 1;
 	}
 	if(yflip)
 	{
 		ystart = y+15;
-		yend = y-1;
+		if (yhalfsize)
+			yend = y+7;
+		else
+			yend = y-1;
 		ydir = -1;
 	}
 	else
 	{
 		ystart = y;
-		yend = y+16;
+		if (yhalfsize)
+			yend = y+16;
+		else
+			yend = y+8;
 		ydir = 1;
 	}
 	xstart &= 0x1ff;
@@ -886,9 +900,15 @@ void towns_state::render_sprite_16(uint32_t poffset, uint16_t x, uint16_t y, uin
 					m_towns_gfxvram[0x40000+voffset] = col & 0x00ff;
 				}
 			}
-			poffset+=2;
+			if (xhalfsize)
+				poffset+=4;
+			else
+				poffset+=2;
 			poffset &= 0x1ffff;
 		}
+		
+		if (yhalfsize)
+			poffset+=16;
 	}
 }
 
@@ -943,7 +963,7 @@ void towns_state::draw_sprites(const rectangle* rect)
 				n,x,y,attr,colour,poffset);
 #endif
 			if(!(colour & 0x2000))
-				render_sprite_16((poffset)&0x1ffff,x,y,attr&0x2000,attr&0x1000,rect);
+				render_sprite_16((poffset)&0x1ffff,x,y,attr&0x2000,attr&0x1000,attr&0x400,attr&0x800,rect);
 		}
 	}
 
