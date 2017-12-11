@@ -614,6 +614,7 @@ class arm946es_cpu_device : public arm9_cpu_device
 public:
 	// construction/destruction
 	arm946es_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	arm946es_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	// 946E-S has Protection Unit instead of ARM MMU so CP15 is quite different
 	virtual DECLARE_READ32_MEMBER( arm7_rt_r_callback ) override;
@@ -635,6 +636,12 @@ private:
 	void RefreshDTCM();
 };
 
+class igs036_cpu_device : public arm946es_cpu_device
+{
+public:
+	// construction/destruction
+	igs036_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+};
 
 class pxa255_cpu_device : public arm7_cpu_device
 {
@@ -650,15 +657,6 @@ public:
 	// construction/destruction
 	sa1110_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
-
-class igs036_cpu_device : public arm9_cpu_device
-{
-public:
-	// construction/destruction
-	igs036_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	virtual DECLARE_WRITE32_MEMBER( arm7_rt_w_callback ) override;
-};
-
 
 DECLARE_DEVICE_TYPE(ARM7,     arm7_cpu_device)
 DECLARE_DEVICE_TYPE(ARM7_BE,  arm7_be_cpu_device)
