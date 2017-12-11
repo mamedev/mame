@@ -5,7 +5,7 @@
     pgm2_memcard.cpp
 
     PGM2 Memory card functions.
-	(based on ng_memcard.cpp)
+	Presumable Siemens SLE 4442 or compatible.
 
 *********************************************************************/
 
@@ -45,12 +45,19 @@ void pgm2_memcard_device::device_start()
 
 image_init_result pgm2_memcard_device::call_load()
 {
-	if(length() != 0x100)
+	authenticated = false;
+	if(length() != 0x108)
 		return image_init_result::FAIL;
 
 	fseek(0, SEEK_SET);
 	size_t ret = fread(m_memcard_data, 0x100);
 	if(ret != 0x100)
+		return image_init_result::FAIL;
+	ret = fread(m_protection_data, 4);
+	if (ret != 4)
+		return image_init_result::FAIL;
+	ret = fread(m_security_data, 4);
+	if (ret != 4)
 		return image_init_result::FAIL;
 
 	return image_init_result::PASS;
@@ -58,12 +65,16 @@ image_init_result pgm2_memcard_device::call_load()
 
 void pgm2_memcard_device::call_unload()
 {
+	authenticated = false;
 	fseek(0, SEEK_SET);
 	fwrite(m_memcard_data, 0x100);
+	fwrite(m_protection_data, 4);
+	fwrite(m_security_data, 4);
 }
 
 image_init_result pgm2_memcard_device::call_create(int format_type, util::option_resolution *format_options)
 {
+	authenticated = false;
 	// cards must contain valid defaults for each game / region or they don't work?
 	memory_region *rgn = memregion("^default_card");
 
@@ -71,14 +82,28 @@ image_init_result pgm2_memcard_device::call_create(int format_type, util::option
 		return image_init_result::FAIL;
 
 	memcpy(m_memcard_data, rgn->base(), 0x100);
+	memcpy(m_protection_data, rgn->base() + 0x100, 4);
+	memcpy(m_security_data, rgn->base() + 0x104, 4);
 
-	size_t ret = fwrite(m_memcard_data, 0x100);
-	if(ret != 0x100)
+	size_t ret = fwrite(rgn->base(), 0x108);
+	if(ret != 0x108)
 		return image_init_result::FAIL;
 
 	return image_init_result::PASS;
 }
 
+void pgm2_memcard_device::auth(uint8_t p1, uint8_t p2, uint8_t p3)
+{
+	if (m_security_data[0] & 3)
+	{
+		if (m_security_data[1] == p1 && m_security_data[2] == p2 && m_security_data[3] == p3)
+			authenticated = true;
+		else {
+			m_security_data[0] >>= 1; // hacky
+			logerror("Wrong IC Card password !!!");
+		}
+	}
+}
 
 READ8_MEMBER(pgm2_memcard_device::read)
 {
@@ -87,5 +112,32 @@ READ8_MEMBER(pgm2_memcard_device::read)
 
 WRITE8_MEMBER(pgm2_memcard_device::write)
 {
-	m_memcard_data[offset] = data;
+	if (authenticated && (offset >= 0x20 || (m_protection_data[offset>>3] & (1 <<(offset & 7)))))
+	{
+		m_memcard_data[offset] = data;
+	}
+}
+
+READ8_MEMBER(pgm2_memcard_device::read_prot)
+{
+	return m_protection_data[offset];
+}
+
+WRITE8_MEMBER(pgm2_memcard_device::write_prot)
+{
+	if (authenticated)
+		m_protection_data[offset] &= data;
+}
+
+READ8_MEMBER(pgm2_memcard_device::read_sec)
+{
+	if (!authenticated)
+		return 0xff; // guess
+	return m_security_data[offset];
+}
+
+WRITE8_MEMBER(pgm2_memcard_device::write_sec)
+{
+	if (authenticated)
+		m_security_data[offset] = data;
 }

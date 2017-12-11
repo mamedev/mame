@@ -46,11 +46,7 @@
     Identify which regions each game was released in and either dump alt. internal ROMs for each region, or
       create them until that can be done.
     properly implement RTC (integrated into the CPU)
-    Memory Card system (there's an MCU on the motherboard that will need simulating or dumping somehow)
     Verify Sprite Zoom (check exactly which pixels are doubled / missed on hardware for flipped , non-flipped cases etc.)
-    Simplify IGS036 encryption based on tables in internal roms
-    Fix ARM? bug that means Oriental Legend 2 needs a patch (might also be that it needs the card reader, and is running a
-     codepath that would not exist in a real environment at the moment)
     Fix Save States (is this a driver problem or an ARM core problem, they don't work unless you get through the startup tests)
 
 	Debug features (require DIP SW1:8 On and SW1:1 Off):
@@ -188,47 +184,86 @@ void pgm2_state::mcu_command(address_space &space, bool is_command)
 			m_mcu_result1 = 0;
 		}
 		break;
-		// unknown / unimplemented, all C0-C9 commands is IC Card RW related
-		// (m_mcu_regs[0] >> 8) & 0xff - target RW unit (player)
+		// C0-C9 commands is IC Card RW comms
 		case 0xc0: // insert card or/and check card presence. result: F7 - ok, F4 - no card
 			if (m_memcard_device[arg1 & 3]->present() == -1)
 				status = 0xf4;
 			m_mcu_result0 = cmd;
 			break;
 		case 0xc1: // check ready/busy ?
+			if (m_memcard_device[arg1 & 3]->present() == -1)
+				status = 0xf4;
 			m_mcu_result0 = cmd;
 			break;
-		case 0xc2: // read data to shared ram, args - offset, len
+		case 0xc2: // read data to shared ram
 			for (int i = 0; i < arg3; i++)
 			{
 				if (m_memcard_device[arg1 & 3]->present() != -1)
 					m_shareram[i + (~m_share_bank & 1) * 128] = m_memcard_device[arg1 & 3]->read(space, arg2 + i);
+				else
+					status = 0xf4;
 			}
-
 			m_mcu_result0 = cmd;
 			break;
-		case 0xc3: // save data from shared ram, args - offset, len
+		case 0xc3: // save data from shared ram
 			for (int i = 0; i < arg3; i++)
 			{
 				if (m_memcard_device[arg1 & 3]->present() != -1)
 					m_memcard_device[arg1 & 3]->write(space, arg2 + i, m_shareram[i + (~m_share_bank & 1) * 128]);
+				else
+					status = 0xf4;
 			}
 			m_mcu_result0 = cmd;
 			break;
-		case 0xc7: // get card ID?, no args, result1 expected to be fixed value for new card
-			m_mcu_result1 = 0xf81f0000;
+		case 0xc4: // presumable read security mem (password only?)
+			if (m_memcard_device[arg1 & 3]->present() != -1)
+			{
+				m_mcu_result1 = m_memcard_device[arg1 & 3]->read_sec(space, 1) |
+					(m_memcard_device[arg1 & 3]->read_sec(space, 2) << 8) |
+					(m_memcard_device[arg1 & 3]->read_sec(space, 3) << 16);
+			}
+			else
+				status = 0xf4;
 			m_mcu_result0 = cmd;
 			break;
-		case 0xc8: // write byte, args - offset, data byte
+		case 0xc5: // write security mem
+			if (m_memcard_device[arg1 & 3]->present() != -1)
+				m_memcard_device[arg1 & 3]->write_sec(space, arg2 & 3, arg3);
+			else
+				status = 0xf4;
+			m_mcu_result0 = cmd;
+			break;
+		case 0xc6: // presumable write protection mem
+			if (m_memcard_device[arg1 & 3]->present() != -1)
+				m_memcard_device[arg1 & 3]->write_prot(space, arg2 & 3, arg3);
+			else
+				status = 0xf4;
+			m_mcu_result0 = cmd;
+			break;
+		case 0xc7: // read protection mem
+			if (m_memcard_device[arg1 & 3]->present() != -1)
+			{
+				m_mcu_result1 = m_memcard_device[arg1 & 3]->read_prot(space, 0) |
+					(m_memcard_device[arg1 & 3]->read_prot(space, 1) << 8) |
+					(m_memcard_device[arg1 & 3]->read_prot(space, 2) << 16) |
+					(m_memcard_device[arg1 & 3]->read_prot(space, 3) << 24);
+			}
+			else
+				status = 0xf4;
+			m_mcu_result0 = cmd;
+			break;
+		case 0xc8: // write data mem
 			if (m_memcard_device[arg1 & 3]->present() != -1)
 				m_memcard_device[arg1 & 3]->write(space, arg2, arg3);
-
+			else
+				status = 0xf4;
 			m_mcu_result0 = cmd;
 			break;
-		case 0xc4: // not used
-		case 0xc5: // set new password?, args - offset, data byte (offs 0 - always 7, 1-3 password)
-		case 0xc6: // not used
-		case 0xc9: // card authentication, args - 3 byte password, ('I','G','S' for new cards)
+		case 0xc9: // card authentication
+			if (m_memcard_device[arg1 & 3]->present() != -1)
+				m_memcard_device[arg1 & 3]->auth(arg2, arg3, m_mcu_regs[1] & 0xff);
+			else
+				status = 0xf4;
 			m_mcu_result0 = cmd;
 			break;
 		default:
@@ -585,8 +620,8 @@ MACHINE_CONFIG_END
 #define ORLEG2_INTERNAL_CHINA \
 	ROM_REGION( 0x04000, "maincpu", 0 ) \
 	ROM_LOAD( "xyj2_cn.igs036", 0x00000000, 0x0004000, CRC(bcce7641) SHA1(c3b5cf6e9f6eae09b6785314777a52b34c3c7657) ) \
-	ROM_REGION( 0x100, "default_card", 0 ) \
-	ROM_LOAD( "blank_orleg2_china_card.pg2", 0x000, 0x100, CRC(099156f0) SHA1(a621c9772a98719c657bba3a1bf235487eb78615) )
+	ROM_REGION( 0x108, "default_card", 0 ) \
+	ROM_LOAD( "blank_orleg2_china_card.pg2", 0x000, 0x108, CRC(dc29556f) SHA1(2335cc7af25d4dd9763c6944d3f0eb50276de80a) )
 
 #define ORLEG2_INTERNAL_OVERSEAS \
 	ROM_REGION( 0x04000, "maincpu", 0 ) \
@@ -667,8 +702,8 @@ ROM_END
 #define KOV2NL_INTERNAL_CHINA \
 	ROM_REGION( 0x04000, "maincpu", 0 ) \
 	ROM_LOAD( "gsyx_igs036_china.rom", 0x00000000, 0x0004000, CRC(e09fe4ce) SHA1(c0cac64ef8727cbe79d503ec4df66ddb6f2c925e) ) \
-	ROM_REGION( 0x100, "default_card", 0 ) \
-	ROM_LOAD( "blank_kov2nl_china_card.pg2", 0x000, 0x100, CRC(91786244) SHA1(ac0ce11b46c19ffe21f6b94bc83ef061f547b591) )
+	ROM_REGION( 0x108, "default_card", 0 ) \
+	ROM_LOAD( "blank_kov2nl_china_card.pg2", 0x000, 0x108, CRC(02842ae8) SHA1(a6cda633b09a706039a79b73db2c258094826f85) )
 
 
 ROM_START( kov2nl )
