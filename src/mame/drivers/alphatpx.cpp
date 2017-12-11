@@ -323,10 +323,13 @@ INPUT_PORTS_END
 //  FLOPPY
 //**************************************************************************
 
-static SLOT_INTERFACE_START( alphatp3_floppies )
+static SLOT_INTERFACE_START( alphatp3_floppies ) // two BASF 2471 drives
 	SLOT_INTERFACE("525qd", FLOPPY_525_QD)
 SLOT_INTERFACE_END
 
+static SLOT_INTERFACE_START( alphatp2_floppies ) // two BASF 6106 drives
+	SLOT_INTERFACE("525ssdd", FLOPPY_525_SSDD)
+SLOT_INTERFACE_END
 
 //**************************************************************************
 //  VIDEO
@@ -558,6 +561,12 @@ static MACHINE_CONFIG_START( alphatp3 )
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", alphatp3_floppies, "525qd", floppy_image_device::default_floppy_formats)
 MACHINE_CONFIG_END
 
+static MACHINE_CONFIG_DERIVED (alphatp2, alphatp3)
+	MCFG_DEVICE_REMOVE("fdc:0")
+	MCFG_DEVICE_REMOVE("fdc:1")
+	MCFG_FLOPPY_DRIVE_ADD("fdc:0", alphatp2_floppies, "525ssdd", floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:1", alphatp2_floppies, "525ssdd", floppy_image_device::default_floppy_formats)
+MACHINE_CONFIG_END
 
 //**************************************************************************
 //  ROM DEFINITIONS
@@ -635,6 +644,6 @@ ROM_END
 //**************************************************************************
 
 //    YEAR  NAME       PARENT   COMPAT   MACHINE   INPUT       CLASS           INIT  COMPANY          FULLNAME  FLAGS
-COMP( 198?, alphatp2,  alphatp3, 0,     alphatp3, alphatp3, alphatpx_state, 0,    "Triumph-Adler", "alphatronic P2", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 198?, alphatp2,  alphatp3, 0,     alphatp2, alphatp3, alphatpx_state, 0,    "Triumph-Adler", "alphatronic P2", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 COMP( 1982, alphatp3,  0,        0,     alphatp3, alphatp3, alphatpx_state, 0,    "Triumph-Adler", "alphatronic P3", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 COMP( 198?, alphatp30, alphatp3, 0,		alphatp3, alphatp3, alphatpx_state, 0,	"Triumph-Adler", "alphatronic P30",MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
