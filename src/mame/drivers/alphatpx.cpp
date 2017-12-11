@@ -566,34 +566,49 @@ MACHINE_CONFIG_END
 // Alphatronic P2
 ROM_START( alphatp2 ) // P2 ROM space 0x1800
 	ROM_REGION(0x1800, "boot", 0)
-	ROM_SYSTEM_BIOS(0, "p2_es", "p2_es")
-	ROMX_LOAD("caap_p2_es.bin", 0x0000, 0x1800, CRC(FBA85CD3) SHA1(E82482AF6D39F892B88868677572898945E02581), ROM_BIOS(1) )	// P2 SPANIEN
-	ROM_SYSTEM_BIOS(1, "p2_sks", "p2_sks")
-	ROMX_LOAD("mos3-p2_sks.bin", 0x0000, 0x1800, CRC(C045AADB) SHA1(1478530894E1DA53CC96DDB765DD1E03FF3ADEF1), ROM_BIOS(2) )		// P2 sks
-	ROM_SYSTEM_BIOS(2, "p2_ta", "p2_ta")
-	ROMX_LOAD("prom2p00.bin", 0x0000, 0x0800, CRC(c98d2982) SHA1(11e98ae441b7a9c8dfd22795f8208667959f1d1c), ROM_BIOS(3) )		// P2 TA
-	ROMX_LOAD("prom2p01.bin", 0x0800, 0x0800, CRC(14f19693) SHA1(7ecb66818a3e352fede1857a18cd12bf742603a9), ROM_BIOS(3) )
-	ROMX_LOAD("prom2p02.bin", 0x1000, 0x0800, CRC(f304c3aa) SHA1(92213e77e4e6de12a4eaee25a9c1ec0ab54e93d4), ROM_BIOS(3) )
+	ROM_SYSTEM_BIOS(0, "caap94-96", "caap94-96")
+	ROM_SYSTEM_BIOS(1, "caap04-06", "caap04-06")	
+	ROM_SYSTEM_BIOS(2, "p2_es", "p2_es")
+	ROM_SYSTEM_BIOS(3, "p2_sks", "p2_sks")
+	ROM_SYSTEM_BIOS(4, "p2_ta", "p2_ta")
+	
+	ROMX_LOAD("caap_96_00_5a.bin", 0x0000, 0x0800, CRC(cb137796) SHA1(876bd0762faffc7b74093922d8fbf1c72ec70060), ROM_BIOS(1) ) // earlier P2, three 16K RAM boards
+	ROMX_LOAD("caap_05_02_12.bin", 0x0800, 0x0800, CRC(14f19693) SHA1(7ecb66818a3e352fede1857a18cd12bf742603a9), ROM_BIOS(1) )
+	ROMX_LOAD("caap_94_01_50.bin", 0x1000, 0x0800, CRC(fda8d4a4) SHA1(fa91e6e8504e7f84cf69d86f72826ad5405fd82d), ROM_BIOS(1) )
+
+	ROMX_LOAD("prom2p00.bin", 0x0000, 0x0800, CRC(c98d2982) SHA1(11e98ae441b7a9c8dfd22795f8208667959f1d1c), ROM_BIOS(2) ) // later P2, one 48K RAM board
+	ROMX_LOAD("prom2p01.bin", 0x0800, 0x0800, CRC(14f19693) SHA1(7ecb66818a3e352fede1857a18cd12bf742603a9), ROM_BIOS(2) )
+	ROMX_LOAD("prom2p02.bin", 0x1000, 0x0800, CRC(f304c3aa) SHA1(92213e77e4e6de12a4eaee25a9c1ec0ab54e93d4), ROM_BIOS(2) )
+
+	ROMX_LOAD("caap_p2_es.bin", 0x0000, 0x1800, CRC(FBA85CD3) SHA1(E82482AF6D39F892B88868677572898945E02581), ROM_BIOS(3) )	// P2 Spain
+
+	ROMX_LOAD("mos3-p2_sks.bin", 0x0000, 0x1800, CRC(C045AADB) SHA1(1478530894E1DA53CC96DDB765DD1E03FF3ADEF1), ROM_BIOS(4) ) // P2 sks
+
+	ROMX_LOAD("prom2p00.bin", 0x0000, 0x0800, CRC(c98d2982) SHA1(11e98ae441b7a9c8dfd22795f8208667959f1d1c), ROM_BIOS(5) ) // P2 TA
+	ROMX_LOAD("prom2p01.bin", 0x0800, 0x0800, CRC(14f19693) SHA1(7ecb66818a3e352fede1857a18cd12bf742603a9), ROM_BIOS(5) )
+	ROMX_LOAD("prom2p02.bin", 0x1000, 0x0800, CRC(f304c3aa) SHA1(92213e77e4e6de12a4eaee25a9c1ec0ab54e93d4), ROM_BIOS(5) )
 
 	ROM_REGION(0x400, "kbdmcu", 0)	
-	ROM_LOAD("p3_keyboard_8278.bin",  0x000, 0x400, CRC(5DB00D85) SHA1(0DC8E274A5AECE261EF60494901601C0D8B1EB51))	// borrowed from rfka01 machine #2 until we have a proper dump from a P2
+	ROM_LOAD("p2_keyboard_ip8041a_8278.bin",  0x000, 0x400, CRC(5db00d85) SHA1(0dc8e274a5aece261ef60494901601c0d8b1eb51))	// same across all dumped P2 and P3 machines
 
 	ROM_REGION(0x800, "gfx", 0)
-	ROM_LOAD("cajp08_01_15.bin", 0x000, 0x800, CRC(4ed11dac) SHA1(9db9b8e0edf471faaddbb5521d6223121146bab8)) // borrowed from rfka01 machine #1 until we have a proper dump from a P2
+	ROMX_LOAD("cajp_97_00_5a.bin", 0x000, 0x800, CRC(aa5eab85) SHA1(2718924f5520e7e9aad635786847e78e3096b285), ROM_BIOS(1)) 
+	ROMX_LOAD("cajp_01_01_28.bin", 0x000, 0x800, CRC(d6248209) SHA1(21689703de7183ecffb410eb8a6d516efe27da9d), ROM_BIOS(2))
+	ROMX_LOAD("cajp_01_01_28.bin", 0x000, 0x800, CRC(d6248209) SHA1(21689703de7183ecffb410eb8a6d516efe27da9d), ROM_BIOS(3))
+	ROMX_LOAD("cajp_01_01_28.bin", 0x000, 0x800, CRC(d6248209) SHA1(21689703de7183ecffb410eb8a6d516efe27da9d), ROM_BIOS(4))
+	ROMX_LOAD("cajp_01_01_28.bin", 0x000, 0x800, CRC(d6248209) SHA1(21689703de7183ecffb410eb8a6d516efe27da9d), ROM_BIOS(5))	
 ROM_END
 
 // Alphatronic P3
 ROM_START( alphatp3 )
 	ROM_REGION(0x1800, "boot", 0) // P3 ROM space 0x1000
-	ROM_SYSTEM_BIOS(0, "gx347", "gx347") // identical between earlier and later P3
-	ROM_SYSTEM_BIOS(1, "lb352", "lb352") // BIOS names taken from CPU card labels
+	ROM_SYSTEM_BIOS(0, "gx347", "gx347") // earlier P3, seperate 48K and 16K RAM boards
+	ROM_SYSTEM_BIOS(1, "lb352", "lb352") // later P3, one 64K RAM board
 	
-	ROMX_LOAD("caap36_02_19.bin", 0x0000, 0x1000, CRC(23df6666) SHA1(5ea04cd299dec9951425eb91ecceb4818c4c6378), ROM_BIOS(1) )
-	ROMX_LOAD("caap36_02_19.bin", 0x0000, 0x1000, CRC(23df6666) SHA1(5ea04cd299dec9951425eb91ecceb4818c4c6378), ROM_BIOS(2) )
-	
+	ROM_LOAD("caap36_02_19.bin", 0x0000, 0x1000, CRC(23df6666) SHA1(5ea04cd299dec9951425eb91ecceb4818c4c6378) ) // identical between earlier and later P3
+																												// BIOS names taken from CPU card labels
 	ROM_REGION(0x400, "kbdmcu", 0)
-	ROMX_LOAD("p3_keyboard_8278.bin",  0x000, 0x400, CRC(5db00d85) SHA1(0dc8e274a5aece261ef60494901601c0d8b1eb51), ROM_BIOS(1) )
-	ROMX_LOAD("p3_keyboard_mab8041a.bin", 0x000, 0x400, CRC(5db00d85) SHA1(0dc8e274a5aece261ef60494901601c0d8b1eb51), ROM_BIOS(2) )
+	ROM_LOAD("p3_keyboard_8278.bin",  0x000, 0x400, CRC(5db00d85) SHA1(0dc8e274a5aece261ef60494901601c0d8b1eb51) )
 
 	ROM_REGION(0x800, "gfx", 0)
 	ROMX_LOAD("cajp08_00_15.bin", 0x000, 0x800, CRC(d6248209) SHA1(21689703de7183ecffb410eb8a6d516efe27da9d), ROM_BIOS(1) )
@@ -603,7 +618,7 @@ ROM_END
 // Alphatronic P30
 ROM_START( alphatp30 ) // P30 add-on card with 8088 needs to be emulated to boot DOS
 	ROM_REGION(0x1800, "boot", 0)
-	ROM_LOAD("hasl17.07.84.bin", 0x0000, 0x1000, CRC(6A91701B) SHA1(8A4F925D0FABAB37852A54D04E06DEB2AEAA349C))	// netmercer EPRom P30 ...wait for INT6.5 or INT5.5 with RIM to write char in hsync or hsync GAP-time !!
+	ROM_LOAD("hasl17.07.84.bin", 0x0000, 0x1000, CRC(6A91701B) SHA1(8A4F925D0FABAB37852A54D04E06DEB2AEAA349C))	// netmercer Eprom P30 ...wait for INT6.5 or INT5.5 with RIM to write char in hsync or hsync GAP-time !!
 
 	ROM_REGION(0x400, "kbdmcu", 0)
 	ROM_LOAD("p3_keyboard_8278.bin",  0x000, 0x400, CRC(5DB00D85) SHA1(0DC8E274A5AECE261EF60494901601C0D8B1EB51))  // borrowed from rfka01 machine #2
