@@ -9194,6 +9194,9 @@ calchase                        // (c) 1999 The Game Room
 eggsplc                         // (c) 2002 The Game Room
 hostinv                         // (c) 1998 The Game Room
 
+@source:calcune.cpp
+calcune
+
 @source:calomega.cpp
 comg074                         // (c) 1981 Cal Omega Inc.
 comg076                         // (c) 1981 Cal Omega Inc.
