@@ -48,96 +48,6 @@
 #define ADB_IS_PM_VIA2_CLASS    (m_model >= MODEL_MAC_PB140 && m_model <= MODEL_MAC_PBDUO_270c)
 #define ADB_IS_PM_CLASS ((m_model >= MODEL_MAC_PORTABLE && m_model <= MODEL_MAC_PB100) || (m_model >= MODEL_MAC_PB140 && m_model <= MODEL_MAC_PBDUO_270c))
 
-/* for Egret and CUDA streaming MCU commands, command types */
-enum mac_streaming_t
-{
-	MCU_STREAMING_NONE = 0,
-	MCU_STREAMING_PRAMRD,
-	MCU_STREAMING_PRAMWR,
-	MCU_STREAMING_WRAMRD,
-	MCU_STREAMING_WRAMWR
-};
-
-enum
-{
-	RBV_TYPE_RBV = 0,
-	RBV_TYPE_V8,
-	RBV_TYPE_SONORA,
-	RBV_TYPE_DAFB
-};
-
-/* tells which model is being emulated (set by macxxx_init) */
-enum model_t
-{
-	MODEL_MAC_128K512K, // 68000 machines
-	MODEL_MAC_512KE,
-	MODEL_MAC_PLUS,
-	MODEL_MAC_SE,
-	MODEL_MAC_CLASSIC,
-
-	MODEL_MAC_PORTABLE, // Portable/PB100 are sort of hybrid classic and Mac IIs
-	MODEL_MAC_PB100,
-
-	MODEL_MAC_II,       // Mac II class 68020/030 machines
-	MODEL_MAC_II_FDHD,
-	MODEL_MAC_IIX,
-	MODEL_MAC_IICX,
-	MODEL_MAC_IICI,
-	MODEL_MAC_IISI,
-	MODEL_MAC_IIVX,
-	MODEL_MAC_IIVI,
-	MODEL_MAC_IIFX,
-	MODEL_MAC_SE30,
-
-	MODEL_MAC_LC,       // LC class 68030 machines, generally using a V8 or compatible gate array
-	MODEL_MAC_LC_II,
-	MODEL_MAC_LC_III,
-	MODEL_MAC_LC_III_PLUS,
-	MODEL_MAC_CLASSIC_II,
-	MODEL_MAC_COLOR_CLASSIC,
-
-	MODEL_MAC_LC_475,   // LC III clones with Cuda instead of Egret and 68LC040 on most models
-	MODEL_MAC_LC_520,
-	MODEL_MAC_LC_550,
-	MODEL_MAC_TV,
-	MODEL_MAC_LC_575,
-	MODEL_MAC_LC_580,
-
-	MODEL_MAC_PB140,    // 68030 PowerBooks.  140/145/145B/170 all have the same machine ID
-	MODEL_MAC_PB160,    // 160/180/165 all have the same machine ID too
-	MODEL_MAC_PB165c,
-	MODEL_MAC_PB180c,
-	MODEL_MAC_PB150,    // 150 is fairly radically different from the other 1x0s
-
-	MODEL_MAC_PBDUO_210,    // 68030 PowerBook Duos
-	MODEL_MAC_PBDUO_230,
-	MODEL_MAC_PBDUO_250,
-	MODEL_MAC_PBDUO_270c,
-
-	MODEL_MAC_QUADRA_700,   // 68(LC)040 desktops
-	MODEL_MAC_QUADRA_610,
-	MODEL_MAC_QUADRA_650,
-	MODEL_MAC_QUADRA_800,
-	MODEL_MAC_QUADRA_900,
-	MODEL_MAC_QUADRA_950,
-	MODEL_MAC_QUADRA_660AV,
-	MODEL_MAC_QUADRA_840AV,
-	MODEL_MAC_QUADRA_605,
-	MODEL_MAC_QUADRA_630,
-
-	MODEL_MAC_PB550c,   // 68(LC)040 PowerBooks
-	MODEL_MAC_PB520,
-	MODEL_MAC_PB520c,
-	MODEL_MAC_PB540,
-	MODEL_MAC_PB540c,
-	MODEL_MAC_PB190,
-	MODEL_MAC_PB190cs,
-
-	MODEL_MAC_POWERMAC_6100,    // NuBus PowerMacs
-	MODEL_MAC_POWERMAC_7100,
-	MODEL_MAC_POWERMAC_8100
-};
-
 // video parameters for classic Macs
 #define MAC_H_VIS   (512)
 #define MAC_V_VIS   (342)
@@ -205,6 +115,96 @@ public:
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
+
+	/* for Egret and CUDA streaming MCU commands, command types */
+	enum mac_streaming_t
+	{
+		MCU_STREAMING_NONE = 0,
+		MCU_STREAMING_PRAMRD,
+		MCU_STREAMING_PRAMWR,
+		MCU_STREAMING_WRAMRD,
+		MCU_STREAMING_WRAMWR
+	};
+
+	enum
+	{
+		RBV_TYPE_RBV = 0,
+		RBV_TYPE_V8,
+		RBV_TYPE_SONORA,
+		RBV_TYPE_DAFB
+	};
+
+	/* tells which model is being emulated (set by macxxx_init) */
+	enum model_t
+	{
+		MODEL_MAC_128K512K, // 68000 machines
+		MODEL_MAC_512KE,
+		MODEL_MAC_PLUS,
+		MODEL_MAC_SE,
+		MODEL_MAC_CLASSIC,
+
+		MODEL_MAC_PORTABLE, // Portable/PB100 are sort of hybrid classic and Mac IIs
+		MODEL_MAC_PB100,
+
+		MODEL_MAC_II,       // Mac II class 68020/030 machines
+		MODEL_MAC_II_FDHD,
+		MODEL_MAC_IIX,
+		MODEL_MAC_IICX,
+		MODEL_MAC_IICI,
+		MODEL_MAC_IISI,
+		MODEL_MAC_IIVX,
+		MODEL_MAC_IIVI,
+		MODEL_MAC_IIFX,
+		MODEL_MAC_SE30,
+
+		MODEL_MAC_LC,       // LC class 68030 machines, generally using a V8 or compatible gate array
+		MODEL_MAC_LC_II,
+		MODEL_MAC_LC_III,
+		MODEL_MAC_LC_III_PLUS,
+		MODEL_MAC_CLASSIC_II,
+		MODEL_MAC_COLOR_CLASSIC,
+
+		MODEL_MAC_LC_475,   // LC III clones with Cuda instead of Egret and 68LC040 on most models
+		MODEL_MAC_LC_520,
+		MODEL_MAC_LC_550,
+		MODEL_MAC_TV,
+		MODEL_MAC_LC_575,
+		MODEL_MAC_LC_580,
+
+		MODEL_MAC_PB140,    // 68030 PowerBooks.  140/145/145B/170 all have the same machine ID
+		MODEL_MAC_PB160,    // 160/180/165 all have the same machine ID too
+		MODEL_MAC_PB165c,
+		MODEL_MAC_PB180c,
+		MODEL_MAC_PB150,    // 150 is fairly radically different from the other 1x0s
+
+		MODEL_MAC_PBDUO_210,    // 68030 PowerBook Duos
+		MODEL_MAC_PBDUO_230,
+		MODEL_MAC_PBDUO_250,
+		MODEL_MAC_PBDUO_270c,
+
+		MODEL_MAC_QUADRA_700,   // 68(LC)040 desktops
+		MODEL_MAC_QUADRA_610,
+		MODEL_MAC_QUADRA_650,
+		MODEL_MAC_QUADRA_800,
+		MODEL_MAC_QUADRA_900,
+		MODEL_MAC_QUADRA_950,
+		MODEL_MAC_QUADRA_660AV,
+		MODEL_MAC_QUADRA_840AV,
+		MODEL_MAC_QUADRA_605,
+		MODEL_MAC_QUADRA_630,
+
+		MODEL_MAC_PB550c,   // 68(LC)040 PowerBooks
+		MODEL_MAC_PB520,
+		MODEL_MAC_PB520c,
+		MODEL_MAC_PB540,
+		MODEL_MAC_PB540c,
+		MODEL_MAC_PB190,
+		MODEL_MAC_PB190cs,
+
+		MODEL_MAC_POWERMAC_6100,    // NuBus PowerMacs
+		MODEL_MAC_POWERMAC_7100,
+		MODEL_MAC_POWERMAC_8100
+	};
 
 	model_t m_model;
 
