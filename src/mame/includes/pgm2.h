@@ -16,6 +16,7 @@
 #include "machine/nvram.h"
 #include "machine/timer.h"
 #include "machine/atmel_arm_aic.h"
+#include "machine/pgm2_memcard.h"
 
 class pgm2_state : public driver_device
 {
@@ -39,7 +40,11 @@ public:
 		m_sp_palette(*this, "sp_palette"),
 		m_bg_palette(*this, "bg_palette"),
 		m_tx_palette(*this, "tx_palette"),
-		m_mcu_timer(*this, "mcu_timer")
+		m_mcu_timer(*this, "mcu_timer"),
+		m_memcard0(*this, "memcard_p1"),
+		m_memcard1(*this, "memcard_p2"),
+		m_memcard2(*this, "memcard_p3"),
+		m_memcard3(*this, "memcard_p4")
 	{ }
 
 	DECLARE_READ32_MEMBER(unk_startup_r);
@@ -116,9 +121,7 @@ private:
 	uint32_t m_mcu_result0;
 	uint32_t m_mcu_result1;
 	uint8_t m_mcu_last_cmd;
-	void mcu_command(bool is_command);
-	uint8_t m_card_data[4][0x100];
-	bool m_have_card[4];
+	void mcu_command(address_space &space, bool is_command);
 
 	// devices
 	required_device<cpu_device> m_maincpu;
@@ -139,6 +142,13 @@ private:
 	required_device<palette_device> m_bg_palette;
 	required_device<palette_device> m_tx_palette;
 	required_device<timer_device> m_mcu_timer;
+
+	optional_device<pgm2_memcard_device> m_memcard0;
+	optional_device<pgm2_memcard_device> m_memcard1;
+	optional_device<pgm2_memcard_device> m_memcard2;
+	optional_device<pgm2_memcard_device> m_memcard3;
+	pgm2_memcard_device *m_memcard_device[4];
+
 };
 
 #endif
