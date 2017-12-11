@@ -32,21 +32,34 @@
 			<feature name="disk_label" value="Alien Rampage" />
 			<diskarea name="cdrom">
 				<disk name="arampage" sha1="88ae86b0837bc5fba7a3585a506d5ad24161b001" />
-		</diskarea>
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Requires VESA driver to install and play -->
+	<software name="crusader">
+		<description>Crusader - No Remorse (v1.23)</description>
+		<year>1996</year>
+		<publisher>Origin</publisher>
+		<info name="version" value="1.23" />
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="crusader" sha1="fcf090cd321fd299339b8848ca4b723ef5a28475" />
+			</diskarea>
 		</part>
 	</software>
 
 	<software name="ironbld">
- 		<description>Iron Blood</description>
- 		<year>1996</year>
- 		<publisher>Microforum</publisher>
- 		<part name="cdrom" interface="cdrom">
- 			<diskarea name="cdrom">
-+				<disk name="ironbld" sha1="45f44fa1a8feb98daba2b7befb6a8360ad39b352" />
- 			</diskarea>			
- 		</part>
- 	</software>
-	
+		<description>Iron Blood</description>
+		<year>1996</year>
+		<publisher>Microforum</publisher>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="ironbld" sha1="45f44fa1a8feb98daba2b7befb6a8360ad39b352" />
+			</diskarea>
+		</part>
+	</software>
+
 	<software name="prototyp">
 		<description>Prototype</description>
 		<year>1995</year>
@@ -70,7 +83,23 @@
 			<feature name="disk_label" value="CD0141" />
 			<diskarea name="cdrom">
 				<disk name="pompei" sha1="964c914b8580a21b2f1a54e9329336ead243598b" />
-			</diskarea>			
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="rise2dc" supported="partial">
+		<description>Rise 2 Resurrection - Director's Cut</description>
+		<year>1995</year>
+		<publisher>Acclaim</publisher>
+		<part name="cdrom1" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="rise 2 resurrection - director's cut (disc 1).chd" sha1="cd62b2bde9355b2625d8bdeaece3ec2ccfff5310" />
+			</diskarea>
+		</part>
+		<part name="cdrom2" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="rise 2 resurrection - director's cut (disc 2).chd" sha1="e6c6c4876d18fbb5916ed13885f1ea614aad05eb" />
+			</diskarea>
 		</part>
 	</software>
 
@@ -83,6 +112,17 @@
 			<feature name="disk_label" value="Sideline" />
 			<diskarea name="cdrom">
 				<disk name="sideline" sha1="5e6b52aa5cb9df8a65362901ac60a98f8f6ab464" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="turricn2">
+		<description>Turrican II - The Final Fight</description>
+		<year>1996</year>
+		<publisher>Factor 5</publisher>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="turricn2" sha1="7efd6bd06b9c05ea1be1d2f2f7538954e044b5c9" />
 			</diskarea>
 		</part>
 	</software>
@@ -335,7 +375,7 @@
 			<diskarea name="cdrom">
 				<disk name="zyclunt" sha1="cc6e69cdd5bdda70361778c3515571114a97b662" />
 			</diskarea>
-		</part>	
+		</part>
 	</software>
 
 </softwarelist>
