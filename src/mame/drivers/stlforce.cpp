@@ -224,12 +224,13 @@ static MACHINE_CONFIG_DERIVED( twinbrat, stlforce )
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_CLOCK(14745600)
+	MCFG_CPU_CLOCK(XTAL_14_7456MHz)
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VISIBLE_AREA(3*8, 45*8-1, 0*8, 30*8-1)
 
 	MCFG_DEVICE_MODIFY("oki")
+	MCFG_DEVICE_CLOCK(XTAL_30MHz / 32) // verified on 2 PCBs
 	MCFG_DEVICE_ADDRESS_MAP(0, twinbrat_oki_map)
 MACHINE_CONFIG_END
 
