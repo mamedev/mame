@@ -303,4 +303,31 @@
 		</part>
 	</software>
 
+	<software name="alieninc">
+		<!--
+		Alien Incident
+		English - French - German
+
+		Gametek(R)		compro games
+
+		(C) 1996 Gametek UK
+		All rights reserved
+		Published by Gametek (UK), Ltd.
+		Hogarth House 29 - 31 Sheet St.
+		Windsor, SL4 1BY U.K.
+
+		Mastered by AMI American Multimedia, Inc.
+		GCR-102-0062 G2 960914
+		-->
+		<description>Alien Incident (Eng, Fre, Ger, Fin) (v1.30)</description>
+		<year>1996</year>
+		<publisher>Gametek</publisher>
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="gcr-102-0062" sha1="183949d162064c38a21d6a143a815af6760233fb" />
+			</diskarea>
+		</part>
+	</software>
+
 </softwarelist>
