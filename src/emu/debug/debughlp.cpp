@@ -1658,7 +1658,7 @@ bool debug_generate_html()
 	HTML_TRY(fprintf(file, "<a name=\"Top\"></a>%s%s<br>", debug_buffer.c_str(), html_preopen.c_str()));
 	
 	/* close the tag opened in the header */
-	HTML_TRY(fprintf(file, html_preclose.c_str()));
+	HTML_TRY(fprintf(file, "%s", html_preclose.c_str()));
 
 	/* sort the tags */
 	for (int i = 1; i < ARRAY_LENGTH(static_help_list); i++)
@@ -1685,7 +1685,7 @@ bool debug_generate_html()
 	}
 
 	/* close the html tag and the file */
-	HTML_TRY(fprintf(file, html_preclose.c_str()));
+	HTML_TRY(fprintf(file, "%s", html_preclose.c_str()));
 	if (fclose(file))
 		return false;
 	return true;
