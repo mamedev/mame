@@ -148,14 +148,16 @@ arm920t_cpu_device::arm920t_cpu_device(const machine_config &mconfig, const char
 }
 
 
-arm946es_cpu_device::arm946es_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: arm9_cpu_device(mconfig, ARM946ES, tag, owner, clock, 5, ARCHFLAG_T | ARCHFLAG_E, ENDIANNESS_LITTLE),
+
+
+arm946es_cpu_device::arm946es_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: arm9_cpu_device(mconfig, type, tag, owner, clock, 5, ARCHFLAG_T | ARCHFLAG_E, ENDIANNESS_LITTLE),
 	cp15_control(0x78)
 {
 	m_copro_id = ARM9_COPRO_ID_MFR_ARM
-			   | ARM9_COPRO_ID_ARCH_V5TE
-			   | ARM9_COPRO_ID_PART_ARM946
-			   | ARM9_COPRO_ID_STEP_ARM946_A0;
+		| ARM9_COPRO_ID_ARCH_V5TE
+		| ARM9_COPRO_ID_PART_ARM946
+		| ARM9_COPRO_ID_STEP_ARM946_A0;
 
 	memset(ITCM, 0, 0x8000);
 	memset(DTCM, 0, 0x4000);
@@ -167,6 +169,17 @@ arm946es_cpu_device::arm946es_cpu_device(const machine_config &mconfig, const ch
 	cp15_dtcm_size = 0;
 	cp15_dtcm_end = 0;
 	cp15_itcm_reg = cp15_dtcm_reg = 0;
+}
+
+arm946es_cpu_device::arm946es_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: arm946es_cpu_device(mconfig, ARM946ES, tag, owner, clock)
+{
+}
+
+// unknown configuration, but uses MPU not MMU, so closer to ARM946ES
+igs036_cpu_device::igs036_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: arm946es_cpu_device(mconfig, IGS036, tag, owner, clock)
+{
 }
 
 pxa255_cpu_device::pxa255_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
@@ -188,13 +201,6 @@ sa1110_cpu_device::sa1110_cpu_device(const machine_config &mconfig, const char *
 			   | ARM9_COPRO_ID_PART_SA1110
 			   | ARM9_COPRO_ID_STEP_SA1110_A0;
 }
-
-// unknown configuration
-igs036_cpu_device::igs036_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: arm9_cpu_device(mconfig, IGS036, tag, owner, clock, 5, ARCHFLAG_T | ARCHFLAG_E, ENDIANNESS_LITTLE)
-{
-}
-
 
 device_memory_interface::space_config_vector arm7_cpu_device::memory_space_config() const
 {
@@ -1457,14 +1463,6 @@ uint8_t arm946es_cpu_device::arm7_cpu_read8(uint32_t addr)
 
 	// Handle through normal 8 bit handler (for 32 bit cpu)
 	return m_program->read_byte(addr);
-}
-
-WRITE32_MEMBER(igs036_cpu_device::arm7_rt_w_callback)
-{
-	arm7_cpu_device::arm7_rt_w_callback(space, offset, data, mem_mask);
-	/* disable the MMU for now, it doesn't seem to set up valid mappings
-	   so could be entirely different here */
-	COPRO_CTRL &= ~COPRO_CTRL_MMU_EN;
 }
 
 void arm7_cpu_device::arm7_dt_r_callback(uint32_t insn, uint32_t *prn)
