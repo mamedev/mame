@@ -144,26 +144,14 @@ TIMER_DEVICE_CALLBACK_MEMBER(pgm2_state::igs_interrupt2)
 	m_arm_aic->set_irq(0x46);
 }
 
-static const uint8_t orleg2_china_card[32] = {
-	0xA2, 0x13, 0x10, 0x91, 0x05, 0x0C, 0x81, 0x15, 0x10, 0x00, 0x00, 0x03, 0x00, 0x49, 0x47, 0x53,
-	0x00, 0x00, 0x00, 0x00, 0x00, 0xD2, 0x76, 0x00, 0x00, 0x04, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
-};
-#ifdef UNUSED_DEFINITION
-static const uint8_t kov2nl_china_card[32] = {
-	0xA2, 0x13, 0x10, 0x91, 0x05, 0x0C, 0x81, 0x15, 0x06, 0x00, 0x00, 0x04, 0x00, 0x49, 0x47, 0x53,
-	0x00, 0x00, 0x00, 0x00, 0x00, 0xD2, 0x76, 0x00, 0x00, 0x04, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
-};
-#endif
-
 // "MPU" MCU HLE starts here
-// TODO: make data cards using image_interface
-// command delays is far not correct, might not work in other games
-// command results probably either incorrect (except for explicit checked bytes)
-void pgm2_state::mcu_command(bool is_command)
+// command delays are far from correct, might not work in other games
+// command results probably incorrect (except for explicit checked bytes)
+void pgm2_state::mcu_command(address_space &space, bool is_command)
 {
 	uint8_t cmd = m_mcu_regs[0] & 0xff;
-//	if (is_command && cmd != 0xf6)
-//		logerror("MCU command %08x %08x\n", m_mcu_regs[0], m_mcu_regs[1]);
+	//	if (is_command && cmd != 0xf6)
+	//		logerror("MCU command %08x %08x\n", m_mcu_regs[0], m_mcu_regs[1]);
 
 	if (is_command)
 	{
@@ -199,11 +187,11 @@ void pgm2_state::mcu_command(bool is_command)
 			m_mcu_result0 = cmd;
 			m_mcu_result1 = 0;
 		}
-			break;
-			// unknown / unimplemented, all C0-C9 commands is IC Card RW related
-			// (m_mcu_regs[0] >> 8) & 0xff - target RW unit (player)
+		break;
+		// unknown / unimplemented, all C0-C9 commands is IC Card RW related
+		// (m_mcu_regs[0] >> 8) & 0xff - target RW unit (player)
 		case 0xc0: // insert card or/and check card presence. result: F7 - ok, F4 - no card
-			if (!m_have_card[arg1])
+			if (m_memcard_device[arg1 & 3]->present() == -1)
 				status = 0xf4;
 			m_mcu_result0 = cmd;
 			break;
@@ -211,11 +199,20 @@ void pgm2_state::mcu_command(bool is_command)
 			m_mcu_result0 = cmd;
 			break;
 		case 0xc2: // read data to shared ram, args - offset, len
-			memcpy(&m_shareram[(~m_share_bank & 1) * 128], &m_card_data[arg1][arg2], arg3);
+			for (int i = 0; i < arg3; i++)
+			{
+				if (m_memcard_device[arg1 & 3]->present() != -1)
+					m_shareram[i + (~m_share_bank & 1) * 128] = m_memcard_device[arg1 & 3]->read(space, arg2 + i);
+			}
+
 			m_mcu_result0 = cmd;
 			break;
 		case 0xc3: // save data from shared ram, args - offset, len
-			memcpy(&m_card_data[arg1][arg2], &m_shareram[(~m_share_bank & 1) * 128], arg3);
+			for (int i = 0; i < arg3; i++)
+			{
+				if (m_memcard_device[arg1 & 3]->present() != -1)
+					m_memcard_device[arg1 & 3]->write(space, arg2 + i, m_shareram[i + (~m_share_bank & 1) * 128]);
+			}
 			m_mcu_result0 = cmd;
 			break;
 		case 0xc7: // get card ID?, no args, result1 expected to be fixed value for new card
@@ -223,7 +220,9 @@ void pgm2_state::mcu_command(bool is_command)
 			m_mcu_result0 = cmd;
 			break;
 		case 0xc8: // write byte, args - offset, data byte
-			m_card_data[arg1][arg2] = arg3;
+			if (m_memcard_device[arg1 & 3]->present() != -1)
+				m_memcard_device[arg1 & 3]->write(space, arg2, arg3);
+
 			m_mcu_result0 = cmd;
 			break;
 		case 0xc4: // not used
@@ -262,9 +261,9 @@ WRITE32_MEMBER(pgm2_state::mcu_w)
 	COMBINE_DATA(&m_mcu_regs[reg]);
 
 	if (reg == 2 && m_mcu_regs[2]) // irq to mcu
-		mcu_command(true);
+		mcu_command(space, true);
 	if (reg == 5 && m_mcu_regs[5]) // ack to mcu (written at the end of irq handler routine)
-		mcu_command(false);
+		mcu_command(space, false);
 }
 
 static ADDRESS_MAP_START( pgm2_map, AS_PROGRAM, 32, pgm2_state )
@@ -428,6 +427,11 @@ void pgm2_state::machine_start()
 	save_item(NAME(m_mcu_last_cmd));
 	save_item(NAME(m_shareram));
 	save_item(NAME(m_share_bank));
+
+	m_memcard_device[0] = m_memcard0;
+	m_memcard_device[1] = m_memcard1;
+	m_memcard_device[2] = m_memcard2;
+	m_memcard_device[3] = m_memcard3;
 }
 
 void pgm2_state::machine_reset()
@@ -436,11 +440,6 @@ void pgm2_state::machine_reset()
 	m_realspritekey = 0;
 	m_mcu_last_cmd = 0;
 	m_share_bank = 0;
-
-	m_have_card[0] = true;
-	m_have_card[1] = m_have_card[2] = m_have_card[3] = false;
-	memcpy(m_card_data[0], orleg2_china_card, sizeof(orleg2_china_card));
-//	memcpy(m_card_data[0], kov2nl_china_card, sizeof(kov2nl_china_card));
 }
 
 static const gfx_layout tiles8x8_layout =
@@ -516,6 +515,13 @@ static MACHINE_CONFIG_START( pgm2 )
 	MCFG_YMZ774_ADD("ymz774", 16384000) // is clock correct ?
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
+
+	MCFG_PGM2_MEMCARD_ADD("memcard_p1")
+	MCFG_PGM2_MEMCARD_ADD("memcard_p2")
+	MCFG_PGM2_MEMCARD_ADD("memcard_p3")
+	MCFG_PGM2_MEMCARD_ADD("memcard_p4")
+
+
 MACHINE_CONFIG_END
 
 /* using macros for the video / sound roms because the locations never change between sets, and
@@ -578,7 +584,9 @@ MACHINE_CONFIG_END
 
 #define ORLEG2_INTERNAL_CHINA \
 	ROM_REGION( 0x04000, "maincpu", 0 ) \
-	ROM_LOAD( "xyj2_cn.igs036", 0x00000000, 0x0004000, CRC(bcce7641) SHA1(c3b5cf6e9f6eae09b6785314777a52b34c3c7657) )
+	ROM_LOAD( "xyj2_cn.igs036", 0x00000000, 0x0004000, CRC(bcce7641) SHA1(c3b5cf6e9f6eae09b6785314777a52b34c3c7657) ) \
+	ROM_REGION( 0x100, "default_card", 0 ) \
+	ROM_LOAD( "blank_orleg2_china_card.pg2", 0x000, 0x100, CRC(099156f0) SHA1(a621c9772a98719c657bba3a1bf235487eb78615) )
 
 #define ORLEG2_INTERNAL_OVERSEAS \
 	ROM_REGION( 0x04000, "maincpu", 0 ) \
@@ -658,7 +666,10 @@ ROM_END
 
 #define KOV2NL_INTERNAL_CHINA \
 	ROM_REGION( 0x04000, "maincpu", 0 ) \
-	ROM_LOAD( "gsyx_igs036_china.rom", 0x00000000, 0x0004000, CRC(e09fe4ce) SHA1(c0cac64ef8727cbe79d503ec4df66ddb6f2c925e) )
+	ROM_LOAD( "gsyx_igs036_china.rom", 0x00000000, 0x0004000, CRC(e09fe4ce) SHA1(c0cac64ef8727cbe79d503ec4df66ddb6f2c925e) ) \
+	ROM_REGION( 0x100, "default_card", 0 ) \
+	ROM_LOAD( "blank_kov2nl_china_card.pg2", 0x000, 0x100, CRC(91786244) SHA1(ac0ce11b46c19ffe21f6b94bc83ef061f547b591) )
+
 
 ROM_START( kov2nl )
 	KOV2NL_INTERNAL_CHINA
@@ -1024,14 +1035,14 @@ GAME( 2007, orleg2,       0,         pgm2,    pgm2, pgm2_state,     orleg2,     
 GAME( 2007, orleg2_103,   orleg2,    pgm2,    pgm2, pgm2_state,     orleg2,       ROT0, "IGS", "Oriental Legend 2 (V103, Oversea)", 0 )
 GAME( 2007, orleg2_101,   orleg2,    pgm2,    pgm2, pgm2_state,     orleg2,       ROT0, "IGS", "Oriental Legend 2 (V101, Oversea)", 0 )
 
-GAME( 2007, orleg2_104cn, orleg2,    pgm2,    pgm2, pgm2_state,     orleg2,       ROT0, "IGS", "Oriental Legend 2 (V104, China)", MACHINE_NOT_WORKING )
-GAME( 2007, orleg2_103cn, orleg2,    pgm2,    pgm2, pgm2_state,     orleg2,       ROT0, "IGS", "Oriental Legend 2 (V103, China)", MACHINE_NOT_WORKING )
-GAME( 2007, orleg2_101cn, orleg2,    pgm2,    pgm2, pgm2_state,     orleg2,       ROT0, "IGS", "Oriental Legend 2 (V101, China)", MACHINE_NOT_WORKING )
+GAME( 2007, orleg2_104cn, orleg2,    pgm2,    pgm2, pgm2_state,     orleg2,       ROT0, "IGS", "Oriental Legend 2 (V104, China)", 0 )
+GAME( 2007, orleg2_103cn, orleg2,    pgm2,    pgm2, pgm2_state,     orleg2,       ROT0, "IGS", "Oriental Legend 2 (V103, China)", 0 )
+GAME( 2007, orleg2_101cn, orleg2,    pgm2,    pgm2, pgm2_state,     orleg2,       ROT0, "IGS", "Oriental Legend 2 (V101, China)", 0 )
 
 // Knights of Valour 2 New Legend
-GAME( 2008, kov2nl,       0,         pgm2,    pgm2, pgm2_state,     kov2nl,       ROT0, "IGS", "Knights of Valour 2 New Legend (V302, China)", MACHINE_NOT_WORKING )
-GAME( 2008, kov2nl_301,   kov2nl,    pgm2,    pgm2, pgm2_state,     kov2nl,       ROT0, "IGS", "Knights of Valour 2 New Legend (V301, China)", MACHINE_NOT_WORKING )
-GAME( 2008, kov2nl_300,   kov2nl,    pgm2,    pgm2, pgm2_state,     kov2nl,       ROT0, "IGS", "Knights of Valour 2 New Legend (V300, China)", MACHINE_NOT_WORKING ) // was dumped from a Taiwan board tho
+GAME( 2008, kov2nl,       0,         pgm2,    pgm2, pgm2_state,     kov2nl,       ROT0, "IGS", "Knights of Valour 2 New Legend (V302, China)", 0 )
+GAME( 2008, kov2nl_301,   kov2nl,    pgm2,    pgm2, pgm2_state,     kov2nl,       ROT0, "IGS", "Knights of Valour 2 New Legend (V301, China)", 0 )
+GAME( 2008, kov2nl_300,   kov2nl,    pgm2,    pgm2, pgm2_state,     kov2nl,       ROT0, "IGS", "Knights of Valour 2 New Legend (V300, China)", 0 ) // was dumped from a Taiwan board tho
 
 // Dodonpachi Daioujou Tamashii - should be a V200 too
 GAME( 2010, ddpdojh,      0,    pgm2,    pgm2, pgm2_state,     ddpdojh,    ROT270, "IGS", "Dodonpachi Daioujou Tamashii (V201, China)", MACHINE_NOT_WORKING )

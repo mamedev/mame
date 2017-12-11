@@ -1950,6 +1950,8 @@ files {
 	MAME_DIR .. "src/mame/drivers/pgm2.cpp",
 	MAME_DIR .. "src/mame/video/pgm2.cpp",
 	MAME_DIR .. "src/mame/includes/pgm2.h",
+	MAME_DIR .. "src/mame/machine/pgm2_memcard.cpp",
+	MAME_DIR .. "src/mame/machine/pgm2_memcard.h",
 	MAME_DIR .. "src/mame/drivers/pgm3.cpp",
 	MAME_DIR .. "src/mame/drivers/spoker.cpp",
 	MAME_DIR .. "src/mame/machine/igs036crypt.cpp",
