@@ -68,6 +68,25 @@
 	Oriental Legend 2 (Oversea) - V21
 	Oriental Legend 2 (China) - A8
 
+	GPU registers, located at 301200xx, 16bit access.
+	00 - bg scroll x
+	02 - bg scroll y
+	04 - zoom something, 0F-7F, default 1F
+	06 - zoom something, 0F-7F, default 1F
+	08 - fg? scroll x
+	0a - fg? scroll y
+	0e - sprite related, set to 1 at sprite hw init
+	10 - sprite related, orleg2 - 0x13, kov2nl - 0x14
+	14 - sprite enable ? set to 0 before spriteram update, to 1 after
+	16 - enable access to vrams/palettes/etc ? (bitmask)
+	18 - vblank ack
+	1a - ? 0 at init
+	1c - sprite related, orleg2 - 5, kov2nl - 7
+	1e - sprite related, set to 2 at sprite hw init
+	32 - shared RAM bank
+	34, 36 - sprite related, set to 0 at sprite hw init, some unused xor feature ?
+	38, 3a - sprite mask xor key
+
 */
 
 #include "includes/pgm2.h"

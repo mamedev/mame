@@ -96,11 +96,17 @@ void pgm2_memcard_device::auth(uint8_t p1, uint8_t p2, uint8_t p3)
 {
 	if (m_security_data[0] & 7)
 	{
-		if (m_security_data[1] == p1 && m_security_data[2] == p2 && m_security_data[3] == p3)
+		if (m_security_data[1] == p1 && m_security_data[2] == p2 && m_security_data[3] == p3) {
 			authenticated = true;
+			m_security_data[0] = 7;
+		}
 		else {
+			authenticated = false;
 			m_security_data[0] >>= 1; // hacky
-			logerror("Wrong IC Card password !!!");
+			if (m_security_data[0] & 7)
+				popmessage("Wrong IC Card password !!!\n");
+			else
+				popmessage("Wrong IC Card password, card was locked!!!\n");
 		}
 	}
 }
