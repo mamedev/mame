@@ -45,8 +45,12 @@ PCB label 510.1134A02
 ROM address/data lines are scrambled, presumed for easy placement on PCB and not
 for obfuscation. I/O is nearly the same as Designer Display on 6502 hardware.
 
-Designer Mach IV Master 2325 uses a M68EC020 at 20MHz and has more RAM:
-32KB(4*P5164-70) + 512KB(TC518512PL-80). The ROM is not scrambled.
+Designer Mach IV Master 2325 (model 6129)
+-----------------------------------------
+32KB(4*P5164-70) + 512KB(TC518512PL-80) RAM, 64KB ROM(TMS 27C512-120JL)
+MC68EC020RP25 CPU, 20MHz XTAL
+PCB label 510.1149A01
+It has a green "Shift" led instead of red, and ROM is not scrambled.
 
 
 ******************************************************************************
@@ -406,11 +410,11 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( fdes2325_map, AS_PROGRAM, 32, fidel68k_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000000, 0x00ffff) AM_ROM
-	AM_RANGE(0x300000, 0x37ffff) AM_RAM
-	AM_RANGE(0x500000, 0x507fff) AM_RAM
 	AM_RANGE(0x100000, 0x10000f) AM_WRITE8(fdes68k_lcd_w, 0x00ff00ff)
 	AM_RANGE(0x140000, 0x14000f) AM_WRITE8(fdes68k_control_w, 0x00ff00ff)
 	AM_RANGE(0x180000, 0x18000f) AM_READ8(fdes68k_input_r, 0xff00ff00)
+	AM_RANGE(0x300000, 0x37ffff) AM_RAM
+	AM_RANGE(0x500000, 0x507fff) AM_RAM
 ADDRESS_MAP_END
 
 
@@ -686,7 +690,7 @@ ROM_END
 
 ROM_START( fdes2325 ) // model 6129, PCB label 510.1149A01
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD("61_24_white.ic10", 0x00000, 0x10000, CRC(f74157e1) SHA1(87f3f2d584e292f81593e053240d022cc477834d) ) // 27c512
+	ROM_LOAD("61_29_white.ic10", 0x00000, 0x10000, CRC(f74157e1) SHA1(87f3f2d584e292f81593e053240d022cc477834d) ) // 27c512
 
 	ROM_REGION( 0x100, "pals", 0 )
 	ROM_LOAD("101-1097a01.ic19", 0x000, 0x100, NO_DUMP ) // PALCE16V8Q-25PC
@@ -748,7 +752,7 @@ ROM_END
 //    YEAR  NAME      PARENT   CMP MACHINE   INPUT    STATE           INIT      COMPANY, FULLNAME, FLAGS
 CONS( 1987, fex68k,   0,        0, fex68k,   fex68k,  fidel68k_state, 0,        "Fidelity Electronics", "Excel 68000", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
 CONS( 1988, fex68km2, fex68k,   0, fex68km2, fex68k,  fidel68k_state, 0,        "Fidelity Electronics", "Excel 68000 Mach II (rev. C+)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
-CONS( 1988, fex68km3, fex68k,   0, fex68km3, fex68k,  fidel68k_state, 0,        "Fidelity Electronics", "Excel 68000 Mach III", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
+CONS( 1988, fex68km3, fex68k,   0, fex68km3, fex68k,  fidel68k_state, 0,        "Fidelity Electronics", "Excel 68000 Mach III Master", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
 
 CONS( 1989, fdes2265, 0,        0, fdes2265, fdes68k, fidel68k_state, fdes2265, "Fidelity Electronics", "Designer Mach III Master 2265", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
 CONS( 1991, fdes2325, fdes2265, 0, fdes2325, fdes68k, fidel68k_state, 0,        "Fidelity Electronics", "Designer Mach IV Master 2325", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
