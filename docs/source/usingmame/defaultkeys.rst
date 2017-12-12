@@ -27,7 +27,8 @@ All the keys below are fully configurable in the user interface. This list shows
                   | 
                   | If you are running with -debug, this key sends a 'break' in emulation.
 **P**             | Pauses the game.
-**Shift+P**       | While paused, advances to next frame.
+**Shift+P**       | While paused, advances to next frame. If rewind is enabled, a new rewind save state is also captured.
+**Shift+~**       | While paused, loads the most recent rewind save state.
 **F2**            | Service Mode for games that support it.
 **F3**            | Resets the game.
 **Shift+F3**      | Performs a "hard reset", which tears everything down and re-creates it 
