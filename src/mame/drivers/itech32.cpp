@@ -1678,7 +1678,7 @@ static MACHINE_CONFIG_START( timekill )
 	MCFG_CPU_PROGRAM_MAP(timekill_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", itech32_state,  generate_int1)
 
-	MCFG_CPU_ADD("soundcpu", M6809, SOUND_CLOCK/8)
+	MCFG_CPU_ADD("soundcpu", MC6809, SOUND_CLOCK/2)
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 
 	MCFG_NVRAM_ADD_CUSTOM_DRIVER("nvram", itech32_state, nvram_init)
