@@ -347,7 +347,7 @@ ROM_START( vt420 )
 	ROM_LOAD( "23-068e9-00.e2", 0x00000, 0x20000, CRC(22c3f93b) SHA1(b212911c41e4dba2e09d91fdd1f72d6c7536b0af) )
 ROM_END
 
-COMP( 1990, vt420, 0, 0, terminals, terminals, terminals_state, 0, "DEC", "VT-240", MACHINE_IS_SKELETON )
+COMP( 1990, vt420, 0, 0, terminals, terminals, terminals_state, 0, "DEC", "VT-420", MACHINE_IS_SKELETON )
 
 
 

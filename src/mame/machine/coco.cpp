@@ -1399,16 +1399,16 @@ static const char *const os9syscalls[] =
 //  os9_dasm_override
 //-------------------------------------------------
 
-offs_t coco_state::os9_dasm_override(device_t &device, std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, int options)
+offs_t coco_state::os9_dasm_override(std::ostream &stream, offs_t pc, const util::disasm_interface::data_buffer &opcodes, const util::disasm_interface::data_buffer &params)
 {
 	unsigned call;
 	offs_t result = 0;
 
 	// Microware OS-9 (on the CoCo) and a number of other 6x09 based systems used the SWI2
 	// instruction for syscalls.  This checks for a SWI2 and looks up the syscall as appropriate
-	if ((oprom[0] == 0x10) && (oprom[1] == 0x3F))
+	if ((opcodes.r8(pc) == 0x10) && (opcodes.r8(pc+1) == 0x3F))
 	{
-		call = oprom[2];
+		call = opcodes.r8(pc+2);
 		if ((call < ARRAY_LENGTH(os9syscalls)) && (os9syscalls[call] != nullptr))
 		{
 			util::stream_format(stream, "OS9   %s", os9syscalls[call]);
@@ -1419,7 +1419,7 @@ offs_t coco_state::os9_dasm_override(device_t &device, std::ostream &stream, off
 }
 
 
-offs_t coco_state::dasm_override(device_t &device, std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, int options)
+offs_t coco_state::dasm_override(std::ostream &stream, offs_t pc, const util::disasm_interface::data_buffer &opcodes, const util::disasm_interface::data_buffer &params)
 {
-	return os9_dasm_override(device, stream, pc, oprom, opram, options);
+	return os9_dasm_override(stream, pc, opcodes, params);
 }

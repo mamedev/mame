@@ -12,8 +12,9 @@
 #define MAME_CPU_M6502_M740_H
 
 #include "m6502.h"
+#include "m740d.h"
 
-class m740_device : public m6502_device {
+class m740_device : public m6502_device, public m740_disassembler::config {
 public:
 	enum
 	{
@@ -41,11 +42,9 @@ public:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
-	static const disasm_entry disasm_entries[0x200];
-
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
-	virtual offs_t disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
+	virtual util::disasm_interface *create_disassembler() override;
 	virtual void do_exec_full() override;
 	virtual void do_exec_partial() override;
 	virtual void execute_set_input(int inputnum, int state) override;
@@ -54,6 +53,9 @@ protected:
 	m740_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 #define O(o) void o ## _full(); void o ## _partial()
+
+	u32 inst_state_base;        /* Current instruction bank */
+	virtual u32 get_state_base() const override;
 
 	uint8_t do_clb(uint8_t in, uint8_t bit);
 	uint8_t do_seb(uint8_t in, uint8_t bit);

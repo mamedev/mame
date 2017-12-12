@@ -15,11 +15,11 @@ class lilith_state : public driver_device
 public:
 	lilith_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
-//		, m_maincpu(*this, "maincpu")
+//      , m_maincpu(*this, "maincpu")
 	{ }
 
 private:
-//	required_device<cpu_device> m_maincpu;
+//  required_device<cpu_device> m_maincpu;
 };
 
 //static ADDRESS_MAP_START( mem_map, AS_PROGRAM, 8, lilith_state )

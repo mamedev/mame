@@ -112,7 +112,7 @@ public:
 protected:
 	virtual void machine_start() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
-	
+
 private:
 	/* devices */
 	required_device<cpu_device> m_maincpu;
@@ -158,7 +158,7 @@ private:
 	/* misc */
 	int         m_gakusai_oki_bank_lo;
 	int         m_gakusai_oki_bank_hi;
-	
+
 	void update_irq_state();
 	void metro_common();
 	void gakusai_oki_bank_set();

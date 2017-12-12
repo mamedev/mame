@@ -507,7 +507,7 @@ static MACHINE_CONFIG_START( bigkarnk )
 	MCFG_CPU_PROGRAM_MAP(bigkarnk_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", gaelco_state,  irq6_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", M6809, 8867000/4)  /* 68B09, 2.21675 MHz? */
+	MCFG_CPU_ADD("audiocpu", MC6809E, 8867000/4)  /* 68B09EP, 2.21675 MHz? */
 	MCFG_CPU_PROGRAM_MAP(bigkarnk_snd_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))

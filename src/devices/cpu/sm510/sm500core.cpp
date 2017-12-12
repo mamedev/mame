@@ -13,6 +13,7 @@
 
 #include "emu.h"
 #include "sm500.h"
+#include "sm510d.h"
 #include "debugger.h"
 
 
@@ -48,10 +49,9 @@ sm500_device::sm500_device(const machine_config &mconfig, device_type type, cons
 
 
 // disasm
-offs_t sm500_device::disasm_disassemble(std::ostream &stream, offs_t pc, const u8 *oprom, const u8 *opram, u32 options)
+util::disasm_interface *sm500_device::create_disassembler()
 {
-	extern CPU_DISASSEMBLE(sm500);
-	return CPU_DISASSEMBLE_NAME(sm500)(this, stream, pc, oprom, opram, options);
+	return new sm500_disassembler;
 }
 
 

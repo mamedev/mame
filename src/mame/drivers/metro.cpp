@@ -67,23 +67,14 @@ no PCB number but all look identical to each other.
 
 To Do:
 
--   Tilemaps/sprites offsets may be emulated understanding what appear to be CRT registers
-    at c78880 (sequence of 4 values), c78890 (sequence of 5 values) and c788a0 (start sequence).
--   Wrong color bars in service mode (e.g. balcube, toride2g).
-    They use solid color tiles (80xx), but the right palette is not at 00-ff.
-    Related to the unknown table in the RAM mapped just before the palette?
+-   For video related issues @see devices/video/imagetek_i4100.cpp
 -   Most games, in service mode, seem to require that you press start1&2 *exactly at once*
     in order to advance to the next screen (e.g. holding 1 then pressing 2 doesn't work).
 -   Coin lockout
--   Some gfx problems in ladykill, 3kokushi, puzzli, gakusai,
-    seem related to how we handle windows and wrapping
 -   Interrupt timing needs figuring out properly, having it incorrect
     causes scrolling glitches in some games.  Test cases Mouse Go Go
     title screen, GunMaster title screen.  Changing it can cause
     excessive slowdown in said games however.
--   Bang Bang Ball / Bubble Buster slow to a crawl when you press a
-    button between levels, on a real PCB it speeds up instead (related
-    to above?)
 -   vmetal: ES8712 actually controls a M6585 and an unknown logic selector chip.
 
 Notes:
@@ -124,7 +115,11 @@ READ16_MEMBER(metro_state::metro_irq_cause_r)
 	/* interrupt cause, used by
 
 	int[0] vblank
-	int[1] ?            DAITORIDE, BALCUBE, KARATOUR, MOUJA
+	int[1] hblank (bangball for faster intermission skip, 
+	               puzzli for gameplay water effect, 
+				   blzntrnd title screen scroll (enabled all the time then?),
+				   unused/empty in balcube, daitoride, karatour,
+				   unchecked mouja & other i4300 games )
 	int[2] blitter
 	int[3] ?            KARATOUR
 	int[4] ?
@@ -228,7 +223,7 @@ INTERRUPT_GEN_MEMBER(metro_state::metro_periodic_interrupt)
 TIMER_DEVICE_CALLBACK_MEMBER(metro_state::bangball_scanline)
 {
 	int scanline = param;
-	
+
 	// vblank irq
 	if(scanline == 224)
 	{
@@ -458,22 +453,23 @@ WRITE8_MEMBER(metro_state::daitorid_portb_w)
 
 ***************************************************************************/
 
-/* IT DOESN'T WORK PROPERLY */
-
 WRITE16_MEMBER(metro_state::metro_coin_lockout_1word_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-//      machine().bookkeeping().coin_lockout_w(0, data & 1);
-//      machine().bookkeeping().coin_lockout_w(1, data & 2);
+		machine().bookkeeping().coin_counter_w(0, data & 1);
+		machine().bookkeeping().coin_counter_w(1, data & 2);
 	}
 	if (data & ~3)  logerror("CPU #0 PC %06X : unknown bits of coin lockout written: %04X\n", space.device().safe_pc(), data);
 }
 
-
+// value written doesn't matter, also each counted coin gets reported after one full second.
+// TODO: maybe the counter also controls lockout?
 WRITE16_MEMBER(metro_state::metro_coin_lockout_4words_w)
 {
+	machine().bookkeeping().coin_counter_w((offset >> 1) & 1, offset & 1);
 //  machine().bookkeeping().coin_lockout_w((offset >> 1) & 1, offset & 1);
+
 	if (data & ~1)  logerror("CPU #0 PC %06X : unknown bits of coin lockout written: %04X\n", space.device().safe_pc(), data);
 }
 
@@ -720,7 +716,7 @@ static ADDRESS_MAP_START( kokushi_map, AS_PROGRAM, 16, metro_state )
 	AM_RANGE(0xc00000, 0xc00001) AM_READ_PORT("IN0") AM_WRITE(metro_soundstatus_w)  // To Sound CPU
 	AM_RANGE(0xc00002, 0xc00003) AM_READ_PORT("IN1")                                // Inputs
 	AM_RANGE(0xc00004, 0xc00005) AM_READ_PORT("DSW0")                               //
-	AM_RANGE(0xc00002, 0xc00009) AM_WRITE(metro_coin_lockout_4words_w   )           // Coin Lockout
+	AM_RANGE(0xc00002, 0xc00009) AM_WRITE(metro_coin_lockout_4words_w)              // Coin Lockout
 ADDRESS_MAP_END
 
 
@@ -2151,9 +2147,9 @@ static INPUT_PORTS_START( lastfort )
 	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Demo_Sounds ) )      PORT_DIPLOCATION("SW2:7")
 	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0040, DEF_STR( On ) )
-//	PORT_DIPNAME( 0x0080, 0x0080, "Tiles" )             PORT_DIPLOCATION("SW2:8")
-//	PORT_DIPSETTING(      0x0080, "Mahjong" )
-//	PORT_DIPSETTING(      0x0000, "Cards" )             // Not working - See notes
+//  PORT_DIPNAME( 0x0080, 0x0080, "Tiles" )             PORT_DIPLOCATION("SW2:8")
+//  PORT_DIPSETTING(      0x0080, "Mahjong" )
+//  PORT_DIPSETTING(      0x0000, "Cards" )             // Not working - See notes
 	PORT_DIPUNUSED_DIPLOC( 0x0080, 0x0080, "SW2:8" )
 
 	PORT_START("IN3")   // $c0000e
@@ -3092,7 +3088,7 @@ MACHINE_CONFIG_END
 // TODO: these comes from the CRTC inside the i4100
 static MACHINE_CONFIG_START( i4100_config_360x224 )
 	MCFG_FRAGMENT_ADD( i4100_config )
-	
+
 	MCFG_DEVICE_MODIFY("screen")
 	MCFG_SCREEN_SIZE(360, 224)
 	MCFG_SCREEN_VISIBLE_AREA(0, 360-1, 0, 224-1)
@@ -3100,7 +3096,7 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( i4220_config_320x240 )
 	MCFG_FRAGMENT_ADD( i4220_config )
-	
+
 	MCFG_DEVICE_MODIFY("screen")
 	MCFG_SCREEN_SIZE(320, 240)
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 240-1)
@@ -3185,7 +3181,7 @@ static MACHINE_CONFIG_DERIVED( batlbubl, msgogo )
 	MCFG_CPU_VBLANK_INT_REMOVE()
 	MCFG_CPU_PERIODIC_INT_REMOVE()
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", metro_state, bangball_scanline, "screen", 0, 1)
-	
+
 	// doesn't like 58.2 Hz
 	MCFG_DEVICE_MODIFY("screen")
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -3254,7 +3250,7 @@ static MACHINE_CONFIG_START( dharma )
 
 	/* video hardware */
 	MCFG_FRAGMENT_ADD(i4220_config)
-	
+
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
@@ -3276,7 +3272,7 @@ static MACHINE_CONFIG_START( karatour )
 	MCFG_CPU_PERIODIC_INT_DRIVER(metro_state, metro_periodic_interrupt,  8*60) // ?
 
 	MCFG_FRAGMENT_ADD(metro_upd7810_sound)
-	
+
 	/* video hardware */
 	MCFG_FRAGMENT_ADD(i4100_config)
 
@@ -3305,7 +3301,7 @@ static MACHINE_CONFIG_START( 3kokushi )
 
 	/* video hardware */
 	MCFG_FRAGMENT_ADD( i4220_config_320x240 )
-	
+
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
@@ -3403,7 +3399,7 @@ static MACHINE_CONFIG_START( dokyusp )
 
 	/* video hardware */
 	MCFG_FRAGMENT_ADD( i4300_config_384x224 )
-	
+
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
@@ -3429,7 +3425,7 @@ static MACHINE_CONFIG_START( gakusai )
 
 	/* video hardware */
 	MCFG_FRAGMENT_ADD( i4300_config_320x240 )
-	
+
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
@@ -3531,7 +3527,7 @@ static MACHINE_CONFIG_START( pururun )
 
 	/* video hardware */
 	MCFG_FRAGMENT_ADD( i4220_config )
-	
+
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
@@ -3555,7 +3551,7 @@ static MACHINE_CONFIG_START( skyalert )
 	MCFG_CPU_PERIODIC_INT_DRIVER(metro_state, metro_periodic_interrupt,  8*60) // ?
 
 	MCFG_FRAGMENT_ADD(metro_upd7810_sound)
-	
+
 	MCFG_FRAGMENT_ADD(i4100_config_360x224)
 
 
@@ -3701,7 +3697,7 @@ static MACHINE_CONFIG_DERIVED( gstrik2, blzntrnd )
 
 	MCFG_DEVICE_MODIFY("k053936")
 	MCFG_K053936_OFFSETS(-77, -19)
-	
+
 	MCFG_DEVICE_MODIFY("vdp2")
 	MCFG_I4100_TILEMAP_XOFFSETS(0,-8,0)
 MACHINE_CONFIG_END

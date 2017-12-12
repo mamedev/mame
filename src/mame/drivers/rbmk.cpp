@@ -39,7 +39,7 @@ Notes:
                 * - Unpopulated position for PIC16F84
         3.6V_BATT - Purpose of battery unknown, does not appear to be used for backup of suicide RAM,
                     and there's no RTC on the board.
-            93C46 - 128 x8 EEPROM. This chip was covered by a plactic cover. There's nothing else under
+            93C46 - 128 x8 EEPROM. This chip was covered by a plastic cover. There's nothing else under
                     the cover, but there was an unpopulated position for a PIC16F84
             89C51 - Atmel 89C51 Microcontroller (protected)
 
@@ -49,6 +49,8 @@ Notes:
             A1 - Atmel AT27C080     (GFX)
             B1 - Macronix MX261000  (GFX?? or PRG/data for 89C51?)
             S1 - Macronix MX27C2000 (OKI samples)
+
+Keep pressed 9 and press reset to enter service mode.
 */
 
 #include "emu.h"
@@ -68,53 +70,78 @@ class rbmk_state : public driver_device
 public:
 	rbmk_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_gms_vidram2(*this, "gms_vidram2"),
-		m_gms_vidram(*this, "gms_vidram"),
+		m_vidram2(*this, "vidram2"),
+		m_vidram(*this, "vidram"),
 		m_maincpu(*this, "maincpu"),
 		m_mcu(*this, "mcu"),
 		m_eeprom(*this, "eeprom"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette")  { }
 
-	required_shared_ptr<uint16_t> m_gms_vidram2;
-	required_shared_ptr<uint16_t> m_gms_vidram;
-	uint16_t m_tilebank;
-	uint8_t m_mux_data;
-	DECLARE_READ16_MEMBER(gms_read);
-	DECLARE_WRITE16_MEMBER(gms_write1);
-	DECLARE_WRITE16_MEMBER(gms_write2);
-	DECLARE_WRITE16_MEMBER(gms_write3);
-	DECLARE_READ8_MEMBER(rbmk_mcu_io_r);
-	DECLARE_WRITE8_MEMBER(rbmk_mcu_io_w);
+	DECLARE_READ16_MEMBER(unk_r);
+	DECLARE_READ16_MEMBER(dip_mux_r);
+	DECLARE_WRITE16_MEMBER(dip_mux_w);
+	DECLARE_WRITE16_MEMBER(unk_w);
+	DECLARE_WRITE16_MEMBER(tilebank_w);
+	DECLARE_READ8_MEMBER(mcu_io_r);
+	DECLARE_WRITE8_MEMBER(mcu_io_w);
 	DECLARE_WRITE8_MEMBER(mcu_io_mux_w);
 	DECLARE_WRITE16_MEMBER(eeprom_w);
-	virtual void video_start() override;
-	uint32_t screen_update_rbmk(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(mcu_irq);
+
+protected:
+	virtual void video_start() override;
+
+private:
+	required_shared_ptr<uint16_t> m_vidram2;
+	required_shared_ptr<uint16_t> m_vidram;
+
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_mcu;
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+
+	uint16_t m_tilebank;
+	uint8_t m_mux_data;
+	uint16_t m_dip_mux;
 };
 
 
-READ16_MEMBER(rbmk_state::gms_read)
+READ16_MEMBER(rbmk_state::unk_r)
 {
 	return machine().rand();
 }
 
-
-WRITE16_MEMBER(rbmk_state::gms_write1)
+READ16_MEMBER(rbmk_state::dip_mux_r)
 {
+/*
+definitely muxed dips. See switch test in test mode. This implementation doesn't work properly, though. For now use the old one.
+
+uint16_t res = 0xffff;
+switch(m_dip_mux)
+{
+case 0x1000: res = ioport("DSW1")->read(); break;
+case 0x2000: res = ioport("DSW2")->read(); break;
+case 0x4000: res = ioport("DSW3")->read(); break;
+}
+return res;*/
+	return ioport("DSW1")->read();
 }
 
-WRITE16_MEMBER(rbmk_state::gms_write2)
+WRITE16_MEMBER(rbmk_state::tilebank_w)
 {
-	m_tilebank=data;
+	m_tilebank = data;
 }
 
-WRITE16_MEMBER(rbmk_state::gms_write3)
+WRITE16_MEMBER(rbmk_state::dip_mux_w)
+{
+	m_dip_mux = data;
+}
+
+WRITE16_MEMBER(rbmk_state::unk_w)
 {
 }
 
@@ -132,28 +159,43 @@ WRITE16_MEMBER(rbmk_state::eeprom_w)
 
 
 static ADDRESS_MAP_START( rbmk_mem, AS_PROGRAM, 16, rbmk_state )
-	AM_RANGE(0x000000, 0x07ffff) AM_ROM
+	AM_RANGE(0x000000, 0x07ffff) AM_ROM AM_WRITENOP
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM
 	AM_RANGE(0x500000, 0x50ffff) AM_RAM
-	AM_RANGE(0x940000, 0x940fff) AM_RAM AM_SHARE("gms_vidram2")
+	AM_RANGE(0x940000, 0x940fff) AM_RAM AM_SHARE("vidram2")
 	AM_RANGE(0x980300, 0x983fff) AM_RAM // 0x2048  words ???, byte access
 	AM_RANGE(0x900000, 0x900fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
-	AM_RANGE(0x9c0000, 0x9c0fff) AM_RAM AM_SHARE("gms_vidram")
+	AM_RANGE(0x9c0000, 0x9c0fff) AM_RAM AM_SHARE("vidram")
 	AM_RANGE(0xb00000, 0xb00001) AM_WRITE(eeprom_w)
-	AM_RANGE(0xC00000, 0xC00001) AM_READ_PORT("IN0") AM_WRITE(gms_write1)
-	AM_RANGE(0xC08000, 0xC08001) AM_READ_PORT("IN1") AM_WRITE(gms_write2)
-	AM_RANGE(0xC10000, 0xC10001) AM_READ_PORT("IN3")
-	AM_RANGE(0xC18080, 0xC18081) AM_READ(gms_read)
-	AM_RANGE(0xC20000, 0xC20001) AM_READ_PORT("IN2")
-	AM_RANGE(0xC28000, 0xC28001) AM_WRITE(gms_write3)
+	AM_RANGE(0xc00000, 0xc00001) AM_READWRITE(dip_mux_r, dip_mux_w)
+	AM_RANGE(0xc08000, 0xc08001) AM_READ_PORT("IN1") AM_WRITE(tilebank_w)
+	AM_RANGE(0xc10000, 0xc10001) AM_READ_PORT("IN2")
+	AM_RANGE(0xc18080, 0xc18081) AM_READ(unk_r)
+	AM_RANGE(0xc20000, 0xc20001) AM_READ_PORT("IN3")
+	AM_RANGE(0xc28000, 0xc28001) AM_WRITE(unk_w)
 ADDRESS_MAP_END
 
+static ADDRESS_MAP_START( rbspm_mem, AS_PROGRAM, 16, rbmk_state )
+	AM_RANGE(0x000000, 0x07ffff) AM_ROM
+	AM_RANGE(0x200000, 0x200001) AM_WRITE(eeprom_w) // wrong
+	AM_RANGE(0x300000, 0x300001) AM_READWRITE(dip_mux_r, dip_mux_w)
+	AM_RANGE(0x308000, 0x308001) AM_READ_PORT("IN1") AM_WRITE(tilebank_w) // ok
+	AM_RANGE(0x310000, 0x310001) AM_READ_PORT("IN2")
+	AM_RANGE(0x318080, 0x318081) AM_READ(unk_r)
+	AM_RANGE(0x320000, 0x320001) AM_READ_PORT("IN3")
+	AM_RANGE(0x328000, 0x328001) AM_WRITE(unk_w)
+	AM_RANGE(0x500000, 0x50ffff) AM_RAM
+	AM_RANGE(0x900000, 0x900fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette") // if removed fails gfx test?
+	AM_RANGE(0x940000, 0x940fff) AM_RAM AM_SHARE("vidram2") // if removed fails palette test?
+	AM_RANGE(0x980300, 0x983fff) AM_RAM // 0x2048  words ???, byte access, u25 and u26 according to test mode
+	AM_RANGE(0x9c0000, 0x9c0fff) AM_RAM AM_SHARE("vidram")
+ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( rbmk_mcu_mem, AS_PROGRAM, 8, rbmk_state )
+static ADDRESS_MAP_START( mcu_mem, AS_PROGRAM, 8, rbmk_state )
 //  AM_RANGE(0x0000, 0x0fff) AM_ROM
 ADDRESS_MAP_END
 
-READ8_MEMBER(rbmk_state::rbmk_mcu_io_r)
+READ8_MEMBER(rbmk_state::mcu_io_r)
 {
 	if(m_mux_data & 8)
 	{
@@ -171,7 +213,7 @@ READ8_MEMBER(rbmk_state::rbmk_mcu_io_r)
 	return 0xff;
 }
 
-WRITE8_MEMBER(rbmk_state::rbmk_mcu_io_w)
+WRITE8_MEMBER(rbmk_state::mcu_io_w)
 {
 	if(m_mux_data & 8) { machine().device<ym2151_device>("ymsnd")->write(space, offset & 1, data); }
 	else if(m_mux_data & 4)
@@ -188,15 +230,52 @@ WRITE8_MEMBER(rbmk_state::mcu_io_mux_w)
 	m_mux_data = ~data;
 }
 
-static ADDRESS_MAP_START( rbmk_mcu_io, AS_IO, 8, rbmk_state )
-	AM_RANGE(0x0ff00, 0x0ffff) AM_READWRITE(rbmk_mcu_io_r, rbmk_mcu_io_w )
+static ADDRESS_MAP_START( mcu_io, AS_IO, 8, rbmk_state )
+	AM_RANGE(0x0ff00, 0x0ffff) AM_READWRITE(mcu_io_r, mcu_io_w )
 
 	AM_RANGE(MCS51_PORT_P3, MCS51_PORT_P3) AM_WRITE(mcu_io_mux_w )
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( rbmk )
-	PORT_START("IN0")
-	PORT_DIPNAME( 0x0001, 0x0001, DEF_STR( Unknown ) )
+	PORT_START("IN1")   /* 16bit */
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_SERVICE1 )
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_MAHJONG_DOUBLE_UP )
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT  )
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT  )
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_BUTTON1 )
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_MAHJONG_BET )
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_BUTTON2 )
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("IN2")   /* 16bit */
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK ) PORT_TOGGLE
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_MEMORY_RESET ) PORT_TOGGLE
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
+
+
+	PORT_START("DSW1")   /* 16bit, in test mode first 8 are recognised as dsw1, second 8 as dsw4*/
+	PORT_DIPNAME( 0x0001, 0x0001, "DSW1" )
 	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Unknown ) )
@@ -246,41 +325,8 @@ static INPUT_PORTS_START( rbmk )
 	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 
-	PORT_START("IN1")   /* 16bit */
-	PORT_DIPNAME( 0x0001, 0x0001, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_SERVICE1 )
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_MAHJONG_DOUBLE_UP )
-
-	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT  )
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT  )
-	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_BUTTON1 )
-	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_MAHJONG_BET )
-	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_BUTTON2 )
-
-	PORT_DIPNAME( 0x1000, 0x1000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x1000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x2000, 0x2000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x2000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x4000, 0x4000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x4000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x8000, 0x8000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-
-	PORT_START("IN2")   /* 16bit */
-	PORT_DIPNAME( 0x0001, 0x0001, DEF_STR( Unknown ) )
+	PORT_START("DSW2")   /* 16bit, in test mode first 8 are recognised as dsw2, second 8 as dsw5*/
+	PORT_DIPNAME( 0x0001, 0x0001, "DSW2" ) // 1,2,3 should be coinage
 	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Unknown ) )
@@ -329,57 +375,8 @@ static INPUT_PORTS_START( rbmk )
 	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 
-
-	PORT_START("IN3")   /* 16bit */
-	PORT_DIPNAME( 0x0001, 0x0001, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0008, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0100, 0x0100, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0100, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0200, 0x0200, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0200, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0400, 0x0400, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0400, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0800, 0x0800, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0800, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x1000, 0x1000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x1000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x2000, 0x2000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x2000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x4000, 0x4000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x4000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
-
-	PORT_START("IN4")   /* 16bit */
-	PORT_DIPNAME( 0x0001, 0x0001, DEF_STR( Unknown ) )
+	PORT_START("DSW3")      /* 16bit, in test mode first 8 are recognised as dsw3, second 8 as dsw6*/
+	PORT_DIPNAME( 0x0001, 0x0001, "DSW3" )
 	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Unknown ) )
@@ -428,8 +425,8 @@ static INPUT_PORTS_START( rbmk )
 	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 
-	PORT_START("IN5")   /* 16bit */
-	PORT_DIPNAME( 0x0001, 0x0001, DEF_STR( Unknown ) )
+	PORT_START("IN3")   /* 16bit, not verified in test mode? */
+	PORT_DIPNAME( 0x0001, 0x0001, "IN3" )
 	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Unknown ) )
@@ -480,6 +477,15 @@ static INPUT_PORTS_START( rbmk )
 INPUT_PORTS_END
 
 
+static INPUT_PORTS_START( rbspm )
+	PORT_INCLUDE( rbmk )
+
+	PORT_MODIFY("DSW1")
+	PORT_DIPNAME( 0x4000, 0x4000, DEF_STR( Version ) )
+	PORT_DIPSETTING(      0x4000, "4.1" )
+	PORT_DIPSETTING(      0x0000, "4.2" )
+INPUT_PORTS_END
+
 static const gfx_layout rbmk32_layout =
 {
 	8,32,
@@ -511,9 +517,12 @@ GFXDECODE_END
 
 void rbmk_state::video_start()
 {
+	save_item(NAME(m_tilebank));
+	save_item(NAME(m_mux_data));
+	save_item(NAME(m_dip_mux));
 }
 
-uint32_t rbmk_state::screen_update_rbmk(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t rbmk_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int x,y;
 	int count = 0;
@@ -522,7 +531,7 @@ uint32_t rbmk_state::screen_update_rbmk(screen_device &screen, bitmap_ind16 &bit
 	{
 		for (x=0;x<64;x++)
 		{
-			int tile = m_gms_vidram2[count+0x600];
+			int tile = m_vidram2[count+0x600];
 			m_gfxdecode->gfx(0)->opaque(bitmap,cliprect,(tile&0xfff)+((m_tilebank&0x10)>>4)*0x1000,tile>>12,0,0,x*8,y*32);
 			count++;
 		}
@@ -534,7 +543,7 @@ uint32_t rbmk_state::screen_update_rbmk(screen_device &screen, bitmap_ind16 &bit
 	{
 		for (x=0;x<64;x++)
 		{
-			int tile = m_gms_vidram[count];
+			int tile = m_vidram[count];
 			m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,(tile&0xfff)+((m_tilebank>>1)&3)*0x1000,tile>>12,0,0,x*8,y*8,0);
 			count++;
 		}
@@ -553,19 +562,18 @@ static MACHINE_CONFIG_START( rbmk )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", rbmk_state,  irq1_line_hold)
 
 	MCFG_CPU_ADD("mcu", AT89C4051, 22000000 / 4) // frequency isn't right
-	MCFG_CPU_PROGRAM_MAP(rbmk_mcu_mem)
-	MCFG_CPU_IO_MAP(rbmk_mcu_io)
+	MCFG_CPU_PROGRAM_MAP(mcu_mem)
+	MCFG_CPU_IO_MAP(mcu_io)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", rbmk_state,  mcu_irq)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", rbmk)
-
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(58)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 0*8, 32*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(rbmk_state, screen_update_rbmk)
+	MCFG_SCREEN_UPDATE_DRIVER(rbmk_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 0x800)
@@ -583,6 +591,16 @@ static MACHINE_CONFIG_START( rbmk )
 	MCFG_YM2151_ADD("ymsnd", 22000000 / 8)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.60)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.60)
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( rbspm, rbmk )
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(rbspm_mem)
+
+	MCFG_CPU_MODIFY("mcu")
+	MCFG_DEVICE_DISABLE() // until decapped
+
+	// PIC16F84 if decapped
 MACHINE_CONFIG_END
 
 ROM_START( rbmk )
@@ -608,5 +626,37 @@ ROM_START( rbmk )
 	ROM_LOAD16_WORD_SWAP( "93c46.u51", 0x00, 0x080, CRC(4ca6ff01) SHA1(66c456eac5b0d1176ef9130baf2e746efdf30152) )
 ROM_END
 
+/*
+Gameplay videos:
+http://youtu.be/pPk-6N1wXoE
+http://youtu.be/VGbrR7GfDck
+*/
 
-GAME( 1998, rbmk, 0, rbmk, rbmk, rbmk_state, 0, ROT0,  "GMS", "Real Battle Mahjong King", MACHINE_NOT_WORKING )
+ROM_START( rbspm )
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* 68000 Code */
+	ROM_LOAD( "MJ-DFMJ-P1.bin", 0x00000, 0x80000, CRC(8f81f154) SHA1(50a9a373dec96b0265907f053d068d636bdabd61) )
+
+	ROM_REGION( 0x1000, "mcu", 0 ) /* protected MCU */
+	ROM_LOAD( "89c51.bin", 0x0, 0x1000, NO_DUMP ) // reads as all 0xff
+
+	ROM_REGION( 0x1000, "pic", 0 ) /* pic was populated on this board */
+	ROM_LOAD( "pic16f84.bin", 0x0, 0x1000, NO_DUMP )
+
+	ROM_REGION( 0x20000, "user1", 0 ) /* ??? mcu data / code */
+	ROM_LOAD( "MJ-DFMJ-2.2-XX.bin", 0x00000, 0x20000,  CRC(58a9eea2) SHA1(1a251e9b049bc8dafbc0728b3d876fdd5a1c8dd9) )
+
+	ROM_REGION( 0x080000, "oki", 0 ) /* Samples */
+	ROM_LOAD( "MJ-DFMJ-2.2-S1.bin", 0x00000, 0x80000, CRC(2410bb61) SHA1(54e258e4af089841a63e45f25aad70310a28d76b) )  // 1st and 2nd half identical
+
+	ROM_REGION( 0x80000, "gfx1", 0 ) /* 8x32 tiles, lots of girls etc. */
+	ROM_LOAD( "MJ-DFMJ-4.2-A1.bin", 0x00000, 0x80000,  CRC(b0a3a866) SHA1(cc950532160a066fc6ce427f6df9d58ee4589821) )
+
+	ROM_REGION( 0x80000, "gfx2", 0 ) /* 8x8 tiles? cards etc */
+	ROM_LOAD( "MJ-DFMJ-4.8-T1.bin", 0x00000, 0x80000, CRC(2b8b689d) SHA1(65ab643fac1e734af8b3a86caa06b532baafa0fe) )
+
+	ROM_REGION16_BE( 0x80, "eeprom", 0 ) /* eeprom */
+	ROM_LOAD16_WORD_SWAP( "93c46.u51", 0x00, 0x080, NO_DUMP )
+ROM_END
+
+GAME( 1998, rbmk, 0, rbmk, rbmk, rbmk_state, 0, ROT0,  "GMS", "Real Battle Mahjong King (Version 8.8)", MACHINE_NOT_WORKING )
+GAME( 1998, rbspm, 0, rbspm, rbspm, rbmk_state, 0, ROT0,  "GMS", "Real Battle Super Phoenix Mahjong (Version 4.1)", MACHINE_NOT_WORKING )

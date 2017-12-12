@@ -1,8 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Ernesto Corvi
 #include "emu.h"
-#include "debugger.h"
-#include "mb86233.h"
+#include "mb86233d.h"
 
 /*
 
@@ -74,14 +73,14 @@
 
 
 
-static const char *const regnames[0x40] = {
+const char *const mb86233_disassembler::regnames[0x40] = {
 	"b0", "b1", "x0", "x1", "x2", "i0", "i1", "i2", "sp", "pag", "vsm", "dmc", "c0", "c1", "pc", "-",
 	"a", "ah", "al", "b", "bh", "bl", "c", "ch", "cl", "d", "dh", "dl", "p", "ph", "pl", "sft",
 	"rf0", "rf1", "rf2", "rf3", "rf4", "rf5", "rf6", "rf7", "rf8", "rf9", "rfa", "rfb", "rfc", "rfd", "rfe", "rff",
 	"sio0", "si1", "pio", "pioa", "rpc", "r?35", "r?36", "r?37", "pad", "mod", "ear", "st", "mask", "tim", "cx", "dx"
 };
 
-static std::string condition(unsigned int cond, bool invert)
+std::string mb86233_disassembler::condition(unsigned int cond, bool invert)
 {
 	std::ostringstream stream;
 
@@ -101,12 +100,12 @@ static std::string condition(unsigned int cond, bool invert)
 	return stream.str();
 }
 
-static std::string regs(uint32_t reg)
+std::string mb86233_disassembler::regs(u32 reg)
 {
 	return regnames[reg & 0x3f];
 }
 
-static std::string memory(uint32_t reg, bool x1)
+std::string mb86233_disassembler::memory(u32 reg, bool x1)
 {
 	std::ostringstream stream;
 
@@ -182,7 +181,7 @@ static std::string memory(uint32_t reg, bool x1)
 	return stream.str();
 }
 
-static std::string alu0_func( uint32_t alu)
+std::string mb86233_disassembler::alu0_func(u32 alu)
 {
 	std::ostringstream stream;
 
@@ -224,14 +223,16 @@ static std::string alu0_func( uint32_t alu)
 	return stream.str();
 }
 
-static unsigned dasm_mb86233(std::ostream &stream, uint32_t opcode )
+offs_t mb86233_disassembler::disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params)
 {
+	u32 opcode = opcodes.r32(pc);
+
 	switch((opcode >> 26) & 0x3f) {
 	case 0x00: { // Dual move AB
-		uint32_t r1 = opcode & 0x1ff;
-		uint32_t r2 = (opcode >> 9) & 0x1ff;
-		uint32_t alu = (opcode >> 21) & 0x1f;
-		uint32_t op = (opcode >> 18) & 0x7;
+		u32 r1 = opcode & 0x1ff;
+		u32 r2 = (opcode >> 9) & 0x1ff;
+		u32 alu = (opcode >> 21) & 0x1f;
+		u32 op = (opcode >> 18) & 0x7;
 
 		if(alu)
 			util::stream_format(stream, "%s : ", alu0_func(alu) );
@@ -253,10 +254,10 @@ static unsigned dasm_mb86233(std::ostream &stream, uint32_t opcode )
 	}
 
 	case 0x07: { // LD/MOV
-		uint32_t r1 = opcode & 0x1ff;
-		uint32_t r2 = (opcode >> 9) & 0x1ff;
-		uint32_t alu = (opcode >> 21) & 0x1f;
-		uint32_t op = (opcode >> 18) & 0x7;
+		u32 r1 = opcode & 0x1ff;
+		u32 r2 = (opcode >> 9) & 0x1ff;
+		u32 alu = (opcode >> 21) & 0x1f;
+		u32 op = (opcode >> 18) & 0x7;
 
 		if(alu) {
 			util::stream_format(stream, "%s", alu0_func(alu));
@@ -345,8 +346,8 @@ static unsigned dasm_mb86233(std::ostream &stream, uint32_t opcode )
 	}
 
 	case 0x0f: { // rep/clr0/clr1/set
-		uint32_t alu = (opcode >> 21) & 0x1f;
-		uint32_t sub2 = (opcode >> 17) & 7;
+		u32 alu = (opcode >> 21) & 0x1f;
+		u32 sub2 = (opcode >> 17) & 7;
 
 		if(alu)
 			util::stream_format(stream, "%s : ", alu0_func(alu));
@@ -400,9 +401,9 @@ static unsigned dasm_mb86233(std::ostream &stream, uint32_t opcode )
 		break;
 
 	case 0x2f: case 0x3f: {
-		uint32_t cond = ( opcode >> 20 ) & 0x1f;
-		uint32_t subtype = ( opcode >> 17 ) & 7;
-		uint32_t data = opcode & 0xffff;
+		u32 cond = ( opcode >> 20 ) & 0x1f;
+		u32 subtype = ( opcode >> 17 ) & 7;
+		u32 data = opcode & 0xffff;
 		bool invert = opcode & 0x40000000;
 
 		switch(subtype) {
@@ -454,12 +455,10 @@ static unsigned dasm_mb86233(std::ostream &stream, uint32_t opcode )
 		break;
 	}
 
-	return (1 | DASMFLAG_SUPPORTED);
+	return 1 | SUPPORTED;
 }
 
-CPU_DISASSEMBLE(mb86233)
+u32 mb86233_disassembler::opcode_alignment() const
 {
-	uint32_t op = *(uint32_t *)oprom;
-	op = little_endianize_int32(op);
-	return dasm_mb86233(stream, op);
+	return 1;
 }

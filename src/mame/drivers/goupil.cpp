@@ -552,15 +552,15 @@ static MACHINE_CONFIG_START( goupil_g1 )
 	MCFG_EF9364_PAGES_CNT(1);
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("goupil_sl", goupil_g1_state, goupil_scanline, "screen", 0, 10)
 
-	MCFG_DEVICE_ADD("m_via_video", VIA6522, 0)
+	MCFG_DEVICE_ADD("m_via_video", VIA6522, CPU_CLOCK / 4)
 	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(goupil_g1_state, via_video_pba_w))
 	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(goupil_g1_state, via_video_pbb_w))
 	MCFG_VIA6522_CA2_HANDLER(WRITELINE(goupil_g1_state, via_video_ca2_w))
 
-	MCFG_DEVICE_ADD("m_via_keyb", VIA6522, 0)
+	MCFG_DEVICE_ADD("m_via_keyb", VIA6522, CPU_CLOCK / 4)
 	MCFG_VIA6522_IRQ_HANDLER(INPUTLINE("maincpu", M6808_IRQ_LINE))
 
-	MCFG_DEVICE_ADD("m_via_modem", VIA6522, 0)
+	MCFG_DEVICE_ADD("m_via_modem", VIA6522, CPU_CLOCK / 4)
 	MCFG_VIA6522_IRQ_HANDLER(INPUTLINE("maincpu", M6808_IRQ_LINE))
 
 	/* Floppy */
@@ -615,15 +615,15 @@ static MACHINE_CONFIG_START( goupil_g2 )
 	MCFG_MC6845_UPDATE_ROW_CB(goupil_g2_state, crtc_update_row)
 	MCFG_MC6845_ADDR_CHANGED_CB(goupil_g2_state, crtc_update_addr_changed)
 
-	MCFG_DEVICE_ADD("m_via_video", VIA6522, 0)
+	MCFG_DEVICE_ADD("m_via_video", VIA6522, CPU_CLOCK / 4)
 	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(goupil_g2_state, via_video_pba_w))
 	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(goupil_g2_state, via_video_pbb_w))
 	MCFG_VIA6522_CA2_HANDLER(WRITELINE(goupil_g2_state, via_video_ca2_w))
 
-	MCFG_DEVICE_ADD("m_via_keyb", VIA6522, 0)
+	MCFG_DEVICE_ADD("m_via_keyb", VIA6522, CPU_CLOCK / 4)
 	MCFG_VIA6522_IRQ_HANDLER(INPUTLINE("maincpu", M6808_IRQ_LINE))
 
-	MCFG_DEVICE_ADD("m_via_modem", VIA6522, 0)
+	MCFG_DEVICE_ADD("m_via_modem", VIA6522, CPU_CLOCK / 4)
 	MCFG_VIA6522_IRQ_HANDLER(INPUTLINE("maincpu", M6808_IRQ_LINE))
 
 	/* Floppy */

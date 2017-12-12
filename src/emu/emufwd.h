@@ -130,7 +130,7 @@ class driver_device;
 
 // declared in emumem.h
 class address_space;
-class direct_read_data;
+template<int addr_shift> class direct_read_data;
 class memory_bank;
 class memory_block;
 class memory_manager;

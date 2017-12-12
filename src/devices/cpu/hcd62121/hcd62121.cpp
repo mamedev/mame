@@ -21,6 +21,7 @@ TODO:
 
 #include "emu.h"
 #include "hcd62121.h"
+#include "hcd62121d.h"
 
 #include "debugger.h"
 
@@ -1751,9 +1752,7 @@ void hcd62121_cpu_device::execute_run()
 	} while (m_icount > 0);
 }
 
-
-offs_t hcd62121_cpu_device::disasm_disassemble(std::ostream &stream, offs_t pc, const u8 *oprom, const u8 *opram, uint32_t options)
+util::disasm_interface *hcd62121_cpu_device::create_disassembler()
 {
-	extern CPU_DISASSEMBLE(hcd62121);
-	return CPU_DISASSEMBLE_NAME(hcd62121)(this, stream, pc, oprom, opram, options);
+	return new hcd62121_disassembler;
 }

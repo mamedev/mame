@@ -7,11 +7,10 @@
 
 /*
    Hardware:
-CPU:     2 x M6809, optional M6802 (what for?)
+CPU:     2 x 6809E, optional MC6802 which may replace second 6809E
     INT: IRQ on CPU 0, FIRQ on CPU 1
-IO:      DMA (Direct Memory Access/Address)
-         2x PIA 6821
-         1x VIS 6522
+IO:      2x PIA 6821
+         1x VIA 6522
 DISPLAY: 5x6 digit 7 or 16 segment display
 SOUND:   basically the same as Bally's Squalk & Talk -61 board but missing AY8912 synth chip
 */
@@ -58,13 +57,13 @@ INPUT_PORTS_END
 
 static MACHINE_CONFIG_START( barni )
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6809, 2000000)
+	MCFG_CPU_ADD("maincpu", MC6809E, XTAL_4MHz / 4)
 	MCFG_CPU_PROGRAM_MAP(maincpu_map)
 
-	MCFG_CPU_ADD("subcpu", M6809, 2000000)
+	MCFG_CPU_ADD("subcpu", MC6809E, XTAL_4MHz / 4)
 	MCFG_CPU_PROGRAM_MAP(subcpu_map)
 
-	MCFG_CPU_ADD("audiocpu", M6802, 2000000)
+	MCFG_CPU_ADD("audiocpu", M6802, 4000000) // uses own XTAL, but what is the value?
 	MCFG_CPU_PROGRAM_MAP(audiocpu_map)
 
 	/* video hardware */

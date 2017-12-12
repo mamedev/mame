@@ -100,6 +100,7 @@
 #include "emu.h"
 #include "debugger.h"
 #include "adsp2100.h"
+#include "2100dasm.h"
 
 
 // device type definitions
@@ -417,7 +418,7 @@ void adsp21xx_device::device_start()
 
 	// get our address spaces
 	m_program = &space(AS_PROGRAM);
-	m_direct = &m_program->direct();
+	m_direct = m_program->direct<-2>();
 	m_data = &space(AS_DATA);
 	m_io = has_space(AS_IO) ? &space(AS_IO) : nullptr;
 
@@ -758,38 +759,14 @@ void adsp21xx_device::state_string_export(const device_state_entry &entry, std::
 
 
 //-------------------------------------------------
-//  disasm_min_opcode_bytes - return the length
-//  of the shortest instruction, in bytes
-//-------------------------------------------------
-
-uint32_t adsp21xx_device::disasm_min_opcode_bytes() const
-{
-	return 4;
-}
-
-
-//-------------------------------------------------
-//  disasm_max_opcode_bytes - return the length
-//  of the longest instruction, in bytes
-//-------------------------------------------------
-
-uint32_t adsp21xx_device::disasm_max_opcode_bytes() const
-{
-	return 4;
-}
-
-
-//-------------------------------------------------
-//  disasm_disassemble - call the disassembly
+//  disassemble - call the disassembly
 //  helper function
 //-------------------------------------------------
 
-offs_t adsp21xx_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+util::disasm_interface *adsp21xx_device::create_disassembler()
 {
-	extern CPU_DISASSEMBLE( adsp21xx );
-	return CPU_DISASSEMBLE_NAME(adsp21xx)(this, stream, pc, oprom, opram, options);
+	return new adsp21xx_disassembler;
 }
-
 
 
 
@@ -799,37 +776,37 @@ offs_t adsp21xx_device::disasm_disassemble(std::ostream &stream, offs_t pc, cons
 
 inline uint16_t adsp21xx_device::data_read(uint32_t addr)
 {
-	return m_data->read_word(addr << 1);
+	return m_data->read_word(addr);
 }
 
 inline void adsp21xx_device::data_write(uint32_t addr, uint16_t data)
 {
-	m_data->write_word(addr << 1, data);
+	m_data->write_word(addr, data);
 }
 
 inline uint16_t adsp21xx_device::io_read(uint32_t addr)
 {
-	return m_io->read_word(addr << 1);
+	return m_io->read_word(addr);
 }
 
 inline void adsp21xx_device::io_write(uint32_t addr, uint16_t data)
 {
-	m_io->write_word(addr << 1, data);
+	m_io->write_word(addr, data);
 }
 
 inline uint32_t adsp21xx_device::program_read(uint32_t addr)
 {
-	return m_program->read_dword(addr << 2);
+	return m_program->read_dword(addr);
 }
 
 inline void adsp21xx_device::program_write(uint32_t addr, uint32_t data)
 {
-	m_program->write_dword(addr << 2, data & 0xffffff);
+	m_program->write_dword(addr, data & 0xffffff);
 }
 
 inline uint32_t adsp21xx_device::opcode_read()
 {
-	return m_direct->read_dword(m_pc << 2);
+	return m_direct->read_dword(m_pc);
 }
 
 

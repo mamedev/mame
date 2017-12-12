@@ -3,12 +3,12 @@
 // TMS32082 MP Disassembler
 
 #include "emu.h"
-
+#include "dis_mp.h"
 
 #define SIMM15(v) (int32_t)((v & 0x4000) ? (v | 0xffffe000) : (v))
 #define UIMM15(v) (v)
 
-static const char *BCND_CONDITION[32] =
+const char *tms32082_mp_disassembler::BCND_CONDITION[32] =
 {
 	"nev.b",    "gt0.b",    "eq0.b",    "ge0.b",    "lt0.b",    "ne0.b",    "le0.b",    "alw.b",
 	"nev.h",    "gt0.h",    "eq0.h",    "ge0.h",    "lt0.h",    "ne0.h",    "le0.h",    "alw.h",
@@ -16,7 +16,7 @@ static const char *BCND_CONDITION[32] =
 	"nev.d",    "gt0.d",    "eq0.d",    "ge0.d",    "lt0.d",    "ne0.d",    "le0.d",    "alw.d",
 };
 
-static const char *BITNUM_CONDITION[32] =
+const char *tms32082_mp_disassembler::BITNUM_CONDITION[32] =
 {
 	"eq.b",     "ne.b",     "gt.b",     "le.b",     "lt.b",     "ge.b",     "hi.b",     "ls.b",
 	"lo.b",     "hs.b",     "eq.h",     "ne.h",     "gt.h",     "le.h",     "lt.h",     "ge.h",
@@ -24,87 +24,75 @@ static const char *BITNUM_CONDITION[32] =
 	"lt.w",     "ge.w",     "hi.w",     "ls.w",     "lo.w",     "hs.w",     "?",        "?",
 };
 
-static const char *MEMOP_S[2] =
+const char *tms32082_mp_disassembler::MEMOP_S[2] =
 {
 	":s", ""
 };
 
-static const char *MEMOP_M[2] =
+const char *tms32082_mp_disassembler::MEMOP_M[2] =
 {
 	":m", ""
 };
 
-static const char *FLOATOP_PRECISION[4] =
+const char *tms32082_mp_disassembler::FLOATOP_PRECISION[4] =
 {
 	"s", "d", "i", "u"
 };
 
-static const char *ACC_SEL[4] =
+const char *tms32082_mp_disassembler::ACC_SEL[4] =
 {
 	"A0", "A1", "A2", "A3"
 };
 
-static const char *FLOATOP_ROUND[4] =
+const char *tms32082_mp_disassembler::FLOATOP_ROUND[4] =
 {
 	"n", "z", "p", "m"
 };
 
-static std::ostream *output;
-static const uint8_t *opdata;
-static int opbytes;
-
-static uint32_t fetch(void)
+uint32_t tms32082_mp_disassembler::fetch(offs_t &pos, const data_buffer &opcodes)
 {
-	uint32_t d = ((uint32_t)(opdata[0]) << 24) | ((uint32_t)(opdata[1]) << 16) | ((uint32_t)(opdata[2]) << 8) | opdata[3];
-	opdata += 4;
-	opbytes += 4;
+	uint32_t d = opcodes.r32(pos);
+	pos += 4;
 	return d;
 }
 
-static char* get_creg_name(uint32_t reg)
+std::string tms32082_mp_disassembler::get_creg_name(uint32_t reg)
 {
-	static char buffer[64];
-
 	switch (reg)
 	{
-		case 0x0000:    sprintf(buffer, "EPC"); break;
-		case 0x0001:    sprintf(buffer, "EIP"); break;
-		case 0x0002:    sprintf(buffer, "CONFIG"); break;
-		case 0x0004:    sprintf(buffer, "INTPEN"); break;
-		case 0x0006:    sprintf(buffer, "IE"); break;
-		case 0x0008:    sprintf(buffer, "FPST"); break;
-		case 0x000a:    sprintf(buffer, "PPERROR"); break;
-		case 0x000d:    sprintf(buffer, "PKTREQ"); break;
-		case 0x000e:    sprintf(buffer, "TCOUNT"); break;
-		case 0x000f:    sprintf(buffer, "TSCALE"); break;
-		case 0x0010:    sprintf(buffer, "FLTOP"); break;
-		case 0x0011:    sprintf(buffer, "FLTADR"); break;
-		case 0x0012:    sprintf(buffer, "FLTTAG"); break;
-		case 0x0013:    sprintf(buffer, "FLTDTL"); break;
-		case 0x0014:    sprintf(buffer, "FLTDTH"); break;
-		case 0x0020:    sprintf(buffer, "SYSSTK"); break;
-		case 0x0021:    sprintf(buffer, "SYSTMP"); break;
-		case 0x0030:    sprintf(buffer, "MPC"); break;
-		case 0x0031:    sprintf(buffer, "MIP"); break;
-		case 0x0033:    sprintf(buffer, "ECOMCNTL"); break;
-		case 0x0034:    sprintf(buffer, "ANASTAT"); break;
-		case 0x0039:    sprintf(buffer, "BRK1"); break;
-		case 0x003a:    sprintf(buffer, "BRK2"); break;
-		case 0x4000:    sprintf(buffer, "IN0P"); break;
-		case 0x4001:    sprintf(buffer, "IN1P"); break;
-		case 0x4002:    sprintf(buffer, "OUTP"); break;
-		default:        sprintf(buffer, "CR %04X", reg);
+		case 0x0000:    return "EPC";
+		case 0x0001:    return "EIP";
+		case 0x0002:    return "CONFIG";
+		case 0x0004:    return "INTPEN";
+		case 0x0006:    return "IE";
+		case 0x0008:    return "FPST";
+		case 0x000a:    return "PPERROR";
+		case 0x000d:    return "PKTREQ";
+		case 0x000e:    return "TCOUNT";
+		case 0x000f:    return "TSCALE";
+		case 0x0010:    return "FLTOP";
+		case 0x0011:    return "FLTADR";
+		case 0x0012:    return "FLTTAG";
+		case 0x0013:    return "FLTDTL";
+		case 0x0014:    return "FLTDTH";
+		case 0x0020:    return "SYSSTK";
+		case 0x0021:    return "SYSTMP";
+		case 0x0030:    return "MPC";
+		case 0x0031:    return "MIP";
+		case 0x0033:    return "ECOMCNTL";
+		case 0x0034:    return "ANASTAT";
+		case 0x0039:    return "BRK1";
+		case 0x003a:    return "BRK2";
+		case 0x4000:    return "IN0P";
+		case 0x4001:    return "IN1P";
+		case 0x4002:    return "OUTP";
+		default:        return util::string_format("CR %04X", reg);
 	}
-
-	return buffer;
 }
 
-static char* format_vector_op(uint32_t op, uint32_t imm32)
+std::string tms32082_mp_disassembler::format_vector_op(uint32_t op, uint32_t imm32)
 {
-	static char buffer[256];
-	static char dest[64];
-	char *b = buffer;
-
+	std::string result;
 	int rd = (op >> 27) & 0x1f;
 	int rs = (op >> 22) & 0x1f;
 	int src1 = (op & 0x1f);
@@ -121,85 +109,87 @@ static char* format_vector_op(uint32_t op, uint32_t imm32)
 	bool regdest = (op & (1 << 10)) == 0 && (op & (1 << 6)) == 0;
 
 	// accumulator or register destination
-	if (regdest)
-		sprintf(dest, "R%d", rd);
-	else
-		sprintf(dest, "A%d", acc);
+	std::string dest = regdest ? util::string_format("R%d", rd) : util::string_format("A%d", acc);
 
 	// base op
 	switch (subop)
 	{
-		case 0xc0:  b += sprintf(b, "vadd.%s%s     R%d, R%d, R%d", FLOATOP_PRECISION[p1], FLOATOP_PRECISION[pd2], src1, rs, rs); break;
-		case 0xc1:  b += sprintf(b, "vadd.%s%s     0x%08X, R%d, R%d", FLOATOP_PRECISION[p1], FLOATOP_PRECISION[pd2], imm32, rs, rs); break;
-		case 0xc2:  b += sprintf(b, "vsub.%s%s     R%d, R%d, R%d", FLOATOP_PRECISION[p1], FLOATOP_PRECISION[pd2], rs, src1, rs); break;
-		case 0xc3:  b += sprintf(b, "vsub.%s%s     R%d, 0x%08X, R%d", FLOATOP_PRECISION[p1], FLOATOP_PRECISION[pd2], rs, imm32, rs); break;
-		case 0xc4:  b += sprintf(b, "vmpy.%s%s     R%d, R%d, R%d", FLOATOP_PRECISION[p1], FLOATOP_PRECISION[pd2], src1, rs, rs); break;
-		case 0xc5:  b += sprintf(b, "vmpy.%s%s     0x%08X, R%d, R%d", FLOATOP_PRECISION[p1], FLOATOP_PRECISION[pd2], imm32, rs, rs); break;
+		case 0xc0:  result += util::string_format("vadd.%s%s     R%d, R%d, R%d", FLOATOP_PRECISION[p1], FLOATOP_PRECISION[pd2], src1, rs, rs); break;
+		case 0xc1:  result += util::string_format("vadd.%s%s     0x%08X, R%d, R%d", FLOATOP_PRECISION[p1], FLOATOP_PRECISION[pd2], imm32, rs, rs); break;
+		case 0xc2:  result += util::string_format("vsub.%s%s     R%d, R%d, R%d", FLOATOP_PRECISION[p1], FLOATOP_PRECISION[pd2], rs, src1, rs); break;
+		case 0xc3:  result += util::string_format("vsub.%s%s     R%d, 0x%08X, R%d", FLOATOP_PRECISION[p1], FLOATOP_PRECISION[pd2], rs, imm32, rs); break;
+		case 0xc4:  result += util::string_format("vmpy.%s%s     R%d, R%d, R%d", FLOATOP_PRECISION[p1], FLOATOP_PRECISION[pd2], src1, rs, rs); break;
+		case 0xc5:  result += util::string_format("vmpy.%s%s     0x%08X, R%d, R%d", FLOATOP_PRECISION[p1], FLOATOP_PRECISION[pd2], imm32, rs, rs); break;
 
 		case 0xd6: case 0xc6:
-					b += sprintf(b, "vmsub.s%s    R%d, %s, R%d", FLOATOP_PRECISION[pd2], src1, z ? "0" : ACC_SEL[acc], rs);
+					result += util::string_format("vmsub.s%s    R%d, %s, R%d", FLOATOP_PRECISION[pd2], src1, z ? "0" : ACC_SEL[acc], rs);
 					break;
 		case 0xd7: case 0xc7:
-					b += sprintf(b, "vmsub.s%s    0x%08X, %s, R%d", FLOATOP_PRECISION[pd2], imm32, z ? "0" : ACC_SEL[acc], rs);
+					result += util::string_format("vmsub.s%s    0x%08X, %s, R%d", FLOATOP_PRECISION[pd2], imm32, z ? "0" : ACC_SEL[acc], rs);
 					break;
 		case 0xd8: case 0xc8:
-					b += sprintf(b, "vrnd.%s%s     R%d, R%d", FLOATOP_PRECISION[p1], FLOATOP_PRECISION[pd4], src1, rs);
+					result += util::string_format("vrnd.%s%s     R%d, R%d", FLOATOP_PRECISION[p1], FLOATOP_PRECISION[pd4], src1, rs);
 					break;
 		case 0xd9: case 0xc9:
-					b += sprintf(b, "vrnd.%s%s     0x%08X, R%d", FLOATOP_PRECISION[p1], FLOATOP_PRECISION[pd4], imm32, rs);
+					result += util::string_format("vrnd.%s%s     0x%08X, R%d", FLOATOP_PRECISION[p1], FLOATOP_PRECISION[pd4], imm32, rs);
 					break;
 
-		case 0xca:  b += sprintf(b, "vrnd.%s%s     R%d, R%d", FLOATOP_PRECISION[2 + p1], FLOATOP_PRECISION[pd2],src1, rs); break;
-		case 0xcb:  b += sprintf(b, "vrnd.%s%s     0x%08X, R%d", FLOATOP_PRECISION[2 + p1], FLOATOP_PRECISION[pd2], imm32, rs); break;
+		case 0xca:  result += util::string_format("vrnd.%s%s     R%d, R%d", FLOATOP_PRECISION[2 + p1], FLOATOP_PRECISION[pd2],src1, rs); break;
+		case 0xcb:  result += util::string_format("vrnd.%s%s     0x%08X, R%d", FLOATOP_PRECISION[2 + p1], FLOATOP_PRECISION[pd2], imm32, rs); break;
 
 		case 0xcc: case 0xdc:
-					b += sprintf(b, "vmac.ss%s    R%d, R%d, %s, %s", FLOATOP_PRECISION[(op >> 9) & 1], src1, rs, z ? "0" : ACC_SEL[acc], (regdest && rd == 0) ? ACC_SEL[acc] : dest);
+					result += util::string_format("vmac.ss%s    R%d, R%d, %s, %s", FLOATOP_PRECISION[(op >> 9) & 1], src1, rs, z ? "0" : ACC_SEL[acc], (regdest && rd == 0) ? ACC_SEL[acc] : dest);
 					break;
 		case 0xcd: case 0xdd:
-					b += sprintf(b, "vmac.ss%s    0x%08X, R%d, %s, %s", FLOATOP_PRECISION[(op >> 9) & 1], imm32, rs, z ? "0" : ACC_SEL[acc], (regdest && rd == 0) ? ACC_SEL[acc] : dest);
+					result += util::string_format("vmac.ss%s    0x%08X, R%d, %s, %s", FLOATOP_PRECISION[(op >> 9) & 1], imm32, rs, z ? "0" : ACC_SEL[acc], (regdest && rd == 0) ? ACC_SEL[acc] : dest);
 					break;
 		case 0xce: case 0xde:
-					b += sprintf(b, "vmsc.ss%s    R%d, R%d, %s, %s", FLOATOP_PRECISION[(op >> 9) & 1], src1, rs, z ? "0" : ACC_SEL[acc], (regdest && rd == 0) ? ACC_SEL[acc] : dest);
+					result += util::string_format("vmsc.ss%s    R%d, R%d, %s, %s", FLOATOP_PRECISION[(op >> 9) & 1], src1, rs, z ? "0" : ACC_SEL[acc], (regdest && rd == 0) ? ACC_SEL[acc] : dest);
 					break;
 		case 0xcf: case 0xdf:
-					b += sprintf(b, "vmsc.ss%s    0x%08X, R%d, %s, %s", FLOATOP_PRECISION[(op >> 9) & 1], imm32, rs, z ? "0" : ACC_SEL[acc], (regdest && rd == 0) ? ACC_SEL[acc] : dest);
+					result += util::string_format("vmsc.ss%s    0x%08X, R%d, %s, %s", FLOATOP_PRECISION[(op >> 9) & 1], imm32, rs, z ? "0" : ACC_SEL[acc], (regdest && rd == 0) ? ACC_SEL[acc] : dest);
 					break;
 
-		default:    b += sprintf(b, "?"); break;
+		default:    result += '?'; break;
 	}
 
 	// align the line end
-	int len = strlen(buffer);
+	int len = result.size();
 	if (len < 30)
 	{
 		for (int i=0; i < (30-len); i++)
 		{
-			b += sprintf(b, " ");
+			result += ' ';
 		}
 	}
 
 	// optional load/store op
 	switch (vector_ls_bits)
 	{
-		case 0x01:      b += sprintf(b, "|| vst.s   R%d", rd); break;
-		case 0x03:      b += sprintf(b, "|| vst.d   R%d", rd); break;
-		case 0x04:      b += sprintf(b, "|| vld0.s  R%d", rd); break;
-		case 0x05:      b += sprintf(b, "|| vld1.s  R%d", rd); break;
-		case 0x06:      b += sprintf(b, "|| vld0.d  R%d", rd); break;
-		case 0x07:      b += sprintf(b, "|| vld1.d  R%d", rd); break;
+		case 0x01:      result += util::string_format("|| vst.s   R%d", rd); break;
+		case 0x03:      result += util::string_format("|| vst.d   R%d", rd); break;
+		case 0x04:      result += util::string_format("|| vld0.s  R%d", rd); break;
+		case 0x05:      result += util::string_format("|| vld1.s  R%d", rd); break;
+		case 0x06:      result += util::string_format("|| vld0.d  R%d", rd); break;
+		case 0x07:      result += util::string_format("|| vld1.d  R%d", rd); break;
 	}
 
-	return buffer;
+	return result;
 }
 
-static offs_t tms32082_disasm_mp(std::ostream &stream, offs_t pc, const uint8_t *oprom)
+
+u32 tms32082_mp_disassembler::opcode_alignment() const
+{
+	return 4;
+}
+
+offs_t tms32082_mp_disassembler::disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params)
 {
 	output = &stream;
-	opdata = oprom;
-	opbytes = 0;
+	offs_t pos = pc;
 	uint32_t flags = 0;
 
-	uint32_t op = fetch();
+	uint32_t op = fetch(pos, opcodes);
 
 	int rd = (op >> 27) & 0x1f;
 	int link = rd;
@@ -310,7 +300,7 @@ static offs_t tms32082_disasm_mp(std::ostream &stream, offs_t pc, const uint8_t 
 
 			uint32_t imm32 = 0;
 			if (op & (1 << 12))     // fetch 32-bit immediate if needed
-				imm32 = fetch();
+				imm32 = fetch(pos, opcodes);
 
 			int m = op & (1 << 15) ? 0 : 1;
 			int s = op & (1 << 11) ? 0 : 1;
@@ -502,10 +492,5 @@ static offs_t tms32082_disasm_mp(std::ostream &stream, offs_t pc, const uint8_t 
 		}
 	}
 
-	return opbytes | flags | DASMFLAG_SUPPORTED;
-}
-
-CPU_DISASSEMBLE(tms32082_mp)
-{
-	return tms32082_disasm_mp(stream, pc, oprom);
+	return (pos - pc) | flags | SUPPORTED;
 }

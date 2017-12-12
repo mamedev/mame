@@ -259,7 +259,7 @@ INTERRUPT_GEN_MEMBER(mikie_state::vblank_irq)
 static MACHINE_CONFIG_START( mikie )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6809, OSC/12) // 9A (surface scratched)
+	MCFG_CPU_ADD("maincpu", MC6809E, OSC/12) // 9A (surface scratched)
 	MCFG_CPU_PROGRAM_MAP(mikie_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", mikie_state,  vblank_irq)
 

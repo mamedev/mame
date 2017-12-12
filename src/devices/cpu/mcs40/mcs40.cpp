@@ -9,6 +9,7 @@
  *****************************************************************************/
 #include "emu.h"
 #include "mcs40.h"
+#include "mcs40dasm.h"
 #include "debugger.h"
 
 
@@ -85,7 +86,7 @@ mcs40_cpu_device_base::mcs40_cpu_device_base(
 		device_type type,
 		const char *tag,
 		device_t *owner,
-		uint32_t clock,
+		u32 clock,
 		bool extended_cm,
 		unsigned rom_width,
 		unsigned stack_ptr_mask,
@@ -141,7 +142,7 @@ void mcs40_cpu_device_base::device_start()
 	m_spaces[AS_RAM_STATUS]     = &space(AS_RAM_STATUS);
 	m_spaces[AS_RAM_PORTS]      = &space(AS_RAM_PORTS);
 	m_spaces[AS_PROGRAM_MEMORY] = &space(AS_PROGRAM_MEMORY);
-	m_direct = &m_spaces[AS_ROM]->direct();
+	m_direct = m_spaces[AS_ROM]->direct<0>();
 
 	m_bus_cycle_cb.bind_relative_to(*owner());
 	m_sync_cb.resolve_safe();
@@ -412,21 +413,6 @@ void mcs40_cpu_device_base::state_string_export(device_state_entry const &entry,
 				(CLEAR_LINE != m_test) ? 'T' : '.');
 		break;
 	}
-}
-
-
-/***********************************************************************
-    device_disasm_interface implementation
-***********************************************************************/
-
-u32 mcs40_cpu_device_base::disasm_min_opcode_bytes() const
-{
-	return 1U;
-}
-
-u32 mcs40_cpu_device_base::disasm_max_opcode_bytes() const
-{
-	return 2U;
 }
 
 
@@ -842,7 +828,7 @@ inline void mcs40_cpu_device_base::update_4289_f_l(u8 val)
 
 
 
-i4004_cpu_device::i4004_cpu_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock)
+i4004_cpu_device::i4004_cpu_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)
 	: mcs40_cpu_device_base(mconfig, I4004, tag, owner, clock, false, 12U, 0x3U, 16U, 0x7U)
 {
 }
@@ -874,15 +860,9 @@ void i4004_cpu_device::execute_set_input(int inputnum, int state)
     device_disasm_interface implementation
 ***********************************************************************/
 
-offs_t i4004_cpu_device::disasm_disassemble(
-		std::ostream &stream,
-		offs_t pc,
-		uint8_t const *oprom,
-		uint8_t const *opram,
-		uint32_t options)
+util::disasm_interface *i4004_cpu_device::create_disassembler()
 {
-	extern CPU_DISASSEMBLE(i4004);
-	return CPU_DISASSEMBLE_NAME(i4004)(this, stream, pc, oprom, opram, options);
+	return new i4004_disassembler;
 }
 
 
@@ -897,7 +877,7 @@ bool i4004_cpu_device::is_io_op(u8 opr)
 
 i4004_cpu_device::cycle i4004_cpu_device::do_cycle1(u8 opr, u8 opa, pmem &program_op)
 {
-	static constexpr uint8_t kbp_table[] = { 0x0, 0x1, 0x2, 0xf, 0x3, 0xf, 0xf, 0xf, 0x4, 0xf, 0xf, 0xf, 0xf, 0xf, 0xf, 0xf };
+	static constexpr u8 kbp_table[] = { 0x0, 0x1, 0x2, 0xf, 0x3, 0xf, 0xf, 0xf, 0x4, 0xf, 0xf, 0xf, 0xf, 0xf, 0xf, 0xf };
 
 	switch (opr)
 	{
@@ -1158,7 +1138,7 @@ u8 i4004_cpu_device::do_io(u8 opr, u8 opa)
 
 
 
-i4040_cpu_device::i4040_cpu_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock)
+i4040_cpu_device::i4040_cpu_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)
 	: i4004_cpu_device(mconfig, I4040, tag, owner, clock, true, 13U, 0x7U, 24U, 0xfU)
 {
 }
@@ -1190,15 +1170,9 @@ void i4040_cpu_device::execute_set_input(int inputnum, int state)
     device_disasm_interface implementation
 ***********************************************************************/
 
-offs_t i4040_cpu_device::disasm_disassemble(
-		std::ostream &stream,
-		offs_t pc,
-		uint8_t const *oprom,
-		uint8_t const *opram,
-		uint32_t options)
+util::disasm_interface *i4040_cpu_device::create_disassembler()
 {
-	extern CPU_DISASSEMBLE(i4040);
-	return CPU_DISASSEMBLE_NAME(i4040)(this, stream, pc, oprom, opram, options);
+	return new i4040_disassembler;
 }
 
 

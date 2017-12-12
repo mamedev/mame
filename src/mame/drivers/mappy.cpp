@@ -195,7 +195,7 @@ PCB Number: 22109611 (22109631)
   |  0773         1502              |
   |  PAL          GR1-3.3M          |
   |               8148       VOL    |
-  |  6809         8148              |
+  |  68A09EP      8148              |
   |                                 |
   |  GR1-4.1K                       |
   |                               --|
@@ -217,7 +217,7 @@ PCB Number: 22109611 (22109631)
   |                      5604       |
   |  GR2-1.1B                       |
   |            PAL       1603  DSWA |
-  |  6809                           |
+  |  68A09EP                        |
   |                       18.432MHz |
   |---------------------------------|
 
@@ -1315,11 +1315,11 @@ void mappy_state::machine_start()
 static MACHINE_CONFIG_START( superpac_common )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6809, PIXEL_CLOCK/4)   /* 1.536 MHz */
+	MCFG_CPU_ADD("maincpu", MC6809E, PIXEL_CLOCK/4)   /* 1.536 MHz */
 	MCFG_CPU_PROGRAM_MAP(superpac_cpu1_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", mappy_state,  main_vblank_irq)    // also update the custom I/O chips
 
-	MCFG_CPU_ADD("sub", M6809, PIXEL_CLOCK/4)   /* 1.536 MHz */
+	MCFG_CPU_ADD("sub", MC6809E, PIXEL_CLOCK/4)   /* 1.536 MHz */
 	MCFG_CPU_PROGRAM_MAP(superpac_cpu2_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", mappy_state,  sub_vblank_irq)
 
@@ -1427,15 +1427,15 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( phozon )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6809,  PIXEL_CLOCK/4)  /* MAIN CPU */
+	MCFG_CPU_ADD("maincpu", MC6809E, PIXEL_CLOCK/4)  /* MAIN CPU */
 	MCFG_CPU_PROGRAM_MAP(phozon_cpu1_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", mappy_state,  main_vblank_irq)  // also update the custom I/O chips
 
-	MCFG_CPU_ADD("sub", M6809,  PIXEL_CLOCK/4)  /* SOUND CPU */
+	MCFG_CPU_ADD("sub", MC6809E, PIXEL_CLOCK/4)  /* SOUND CPU */
 	MCFG_CPU_PROGRAM_MAP(phozon_cpu2_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", mappy_state,  sub_vblank_irq)
 
-	MCFG_CPU_ADD("sub2", M6809, PIXEL_CLOCK/4)  /* SUB CPU */
+	MCFG_CPU_ADD("sub2", MC6809E, PIXEL_CLOCK/4)  /* SUB CPU */
 	MCFG_CPU_PROGRAM_MAP(phozon_cpu3_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", mappy_state,  sub2_vblank_irq)
 
@@ -1495,11 +1495,11 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( mappy_common )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6809, PIXEL_CLOCK/4)   /* 1.536 MHz */
+	MCFG_CPU_ADD("maincpu", MC6809E, PIXEL_CLOCK/4)   /* 1.536 MHz */
 	MCFG_CPU_PROGRAM_MAP(mappy_cpu1_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", mappy_state,  main_vblank_irq)   // also update the custom I/O chips
 
-	MCFG_CPU_ADD("sub", M6809, PIXEL_CLOCK/4)   /* 1.536 MHz */
+	MCFG_CPU_ADD("sub", MC6809E, PIXEL_CLOCK/4)   /* 1.536 MHz */
 	MCFG_CPU_PROGRAM_MAP(mappy_cpu2_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", mappy_state,  sub_vblank_irq)
 

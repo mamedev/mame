@@ -1069,8 +1069,8 @@ cheat_manager::cheat_manager(running_machine &machine)
 
 	// create a global symbol table
 	m_symtable.add("frame", symbol_table::READ_ONLY, &m_framecount);
-	m_symtable.add("frombcd", nullptr, 1, 1, execute_frombcd);
-	m_symtable.add("tobcd", nullptr, 1, 1, execute_tobcd);
+	m_symtable.add("frombcd", 1, 1, execute_frombcd);
+	m_symtable.add("tobcd", 1, 1, execute_tobcd);
 
 	// we rely on the debugger expression callbacks; if the debugger isn't
 	// enabled, we must jumpstart them manually
@@ -1320,7 +1320,7 @@ std::string cheat_manager::quote_expression(const parsed_expression &expression)
 //  execute_frombcd - convert a value from BCD
 //-------------------------------------------------
 
-uint64_t cheat_manager::execute_frombcd(symbol_table &table, void *ref, int params, const uint64_t *param)
+uint64_t cheat_manager::execute_frombcd(symbol_table &table, int params, const uint64_t *param)
 {
 	uint64_t value(param[0]);
 	uint64_t multiplier(1);
@@ -1340,7 +1340,7 @@ uint64_t cheat_manager::execute_frombcd(symbol_table &table, void *ref, int para
 //  execute_tobcd - convert a value to BCD
 //-------------------------------------------------
 
-uint64_t cheat_manager::execute_tobcd(symbol_table &table, void *ref, int params, const uint64_t *param)
+uint64_t cheat_manager::execute_tobcd(symbol_table &table, int params, const uint64_t *param)
 {
 	uint64_t value(param[0]);
 	uint64_t result(0);

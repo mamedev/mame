@@ -21,7 +21,7 @@ See https://en.wikipedia.org/wiki/HP_2100 for more info.
                 077F     5081-2361
 
 **HP 1000 firmware:
- 13207-60001 
+ 13207-60001
 
 
             1816-
@@ -96,7 +96,7 @@ E-Series Control Memory Map
 Control Memory Module Allocation      Module No    Octal        Software Entry Point
 
 HP Base Set                          -+ 0            00000-00377  yes      1k
-                                      | 1            00400-00777  yes 
+                                      | 1            00400-00777  yes
                                       | 2            01000-01377  yes
                                       + 3            01400-01777  yes
 Available For User Microprogramming  -+ 4            02000-02377  no       2k
@@ -113,7 +113,7 @@ Available For User Microprogramming  -+ 4            02000-02377  no       2k
                                       | 15           07400-07777  no
                                       | 16           10000-10377  no       5k
                                       | 17           10400-10777  no
-                                      | 18           11000-11377  no 
+                                      | 18           11000-11377  no
                                       | 19           11400-11777  no
                                       | 20           12000-12377  no       6k
                                       | 21           12400-12777  no
@@ -165,7 +165,7 @@ F-Series Control Memory Map
 Control Memory Module Allocation      Module No    Octal        Software Entry Point
 
 HP Base Set                          -+ 0            00000-00377  yes      1k
-                                      | 1            00400-00777  yes 
+                                      | 1            00400-00777  yes
                                       | 2            01000-01377  yes
                                       + 3            01400-01777  yes
 HP Reserved                          -+ 4            02000-02377  yes      2k
@@ -238,11 +238,11 @@ class hp2100_state : public driver_device
 public:
 	hp2100_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
-//		, m_maincpu(*this, "maincpu")
+//      , m_maincpu(*this, "maincpu")
 	{ }
 
 private:
-//	required_device<cpu_device> m_maincpu;
+//  required_device<cpu_device> m_maincpu;
 };
 
 //static ADDRESS_MAP_START( mem_map, AS_PROGRAM, 16, hp2100_state )

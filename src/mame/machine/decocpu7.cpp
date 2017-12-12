@@ -40,3 +40,22 @@ void deco_cpu7_device::mi_decrypt::write(uint16_t adr, uint8_t val)
 	program->write_byte(adr, val);
 	had_written = true;
 }
+
+util::disasm_interface *deco_cpu7_device::create_disassembler()
+{
+	return new disassembler(static_cast<mi_decrypt *>(mintf));
+}
+
+deco_cpu7_device::disassembler::disassembler(mi_decrypt *mi) : mintf(mi)
+{
+}
+
+u32 deco_cpu7_device::disassembler::interface_flags() const
+{
+	return SPLIT_DECRYPTION;
+}
+
+u8 deco_cpu7_device::disassembler::decrypt8(u8 value, offs_t pc, bool opcode) const
+{
+	return opcode && mintf->had_written && ((pc & 0x104) == 0x104) ? BITSWAP8(value,6,5,3,4,2,7,1,0) : value;
+}

@@ -1144,7 +1144,7 @@ WRITE8_MEMBER(unkch_state::coincount_w)
 
 */
 
-	m_ticket_dispenser->write(space, offset, data & 0x80);
+	m_ticket_dispenser->motor_w(BIT(data, 7));
 
 	machine().bookkeeping().coin_counter_w(0, data & 0x04);  /* Credit counter */
 	machine().bookkeeping().coin_counter_w(1, data & 0x08);  /* Key In counter */

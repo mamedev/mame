@@ -17,6 +17,7 @@
 #include "emu.h"
 #include "debugger.h"
 #include "am29000.h"
+#include "am29dasm.h"
 
 
 DEFINE_DEVICE_TYPE(AM29000, am29000_cpu_device, "am29000", "AMC Am29000")
@@ -130,9 +131,9 @@ device_memory_interface::space_config_vector am29000_cpu_device::memory_space_co
 void am29000_cpu_device::device_start()
 {
 	m_program = &space(AS_PROGRAM);
-	m_direct = &m_program->direct();
+	m_direct = m_program->direct<0>();
 	m_data = &space(AS_DATA);
-	m_datadirect = &m_data->direct();
+	m_datadirect = m_data->direct<0>();
 	m_io = &space(AS_IO);
 	m_cfg = (PRL_AM29000 | PRL_REV_D) << CFG_PRL_SHIFT;
 
@@ -702,9 +703,7 @@ void am29000_cpu_device::execute_set_input(int inputnum, int state)
 	// TODO : CHECK IRQs
 }
 
-
-offs_t am29000_cpu_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+util::disasm_interface *am29000_cpu_device::create_disassembler()
 {
-	extern CPU_DISASSEMBLE( am29000 );
-	return CPU_DISASSEMBLE_NAME(am29000)(this, stream, pc, oprom, opram, options);
+	return new am29000_disassembler;
 }

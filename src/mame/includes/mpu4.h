@@ -16,7 +16,7 @@
 #include "machine/meters.h"
 
 
-#define MPU4_MASTER_CLOCK (6880000)
+#define MPU4_MASTER_CLOCK           XTAL_6_88MHz
 #define VIDEO_MASTER_CLOCK          XTAL_10MHz
 
 

@@ -54,7 +54,7 @@ namespace bx
 			return handle;
 		}
 
-		return invalid;
+		return kInvalidHandle;
 	}
 
 	inline bool HandleAlloc::isValid(uint16_t _handle) const
@@ -104,7 +104,7 @@ namespace bx
 	inline HandleAlloc* createHandleAlloc(AllocatorI* _allocator, uint16_t _maxHandles)
 	{
 		uint8_t* ptr = (uint8_t*)BX_ALLOC(_allocator, sizeof(HandleAlloc) + 2*_maxHandles*sizeof(uint16_t) );
-		return ::new (ptr) HandleAlloc(_maxHandles);
+		return BX_PLACEMENT_NEW(ptr, HandleAlloc)(_maxHandles);
 	}
 
 	inline void destroyHandleAlloc(AllocatorI* _allocator, HandleAlloc* _handleAlloc)
@@ -139,12 +139,12 @@ namespace bx
 	template <uint16_t MaxHandlesT>
 	inline uint16_t HandleListT<MaxHandlesT>::popBack()
 	{
-		uint16_t last = invalid != m_back
+		uint16_t last = kInvalidHandle != m_back
 			? m_back
 			: m_front
 			;
 
-		if (invalid != last)
+		if (kInvalidHandle != last)
 		{
 			remove(last);
 		}
@@ -163,7 +163,7 @@ namespace bx
 	{
 		uint16_t front = m_front;
 
-		if (invalid != front)
+		if (kInvalidHandle != front)
 		{
 			remove(front);
 		}
@@ -205,7 +205,7 @@ namespace bx
 		BX_CHECK(isValid(_handle), "Invalid handle %d!", _handle);
 		Link& curr = m_links[_handle];
 
-		if (invalid != curr.m_prev)
+		if (kInvalidHandle != curr.m_prev)
 		{
 			Link& prev  = m_links[curr.m_prev];
 			prev.m_next = curr.m_next;
@@ -215,7 +215,7 @@ namespace bx
 			m_front = curr.m_next;
 		}
 
-		if (invalid != curr.m_next)
+		if (kInvalidHandle != curr.m_next)
 		{
 			Link& next  = m_links[curr.m_next];
 			next.m_prev = curr.m_prev;
@@ -225,16 +225,16 @@ namespace bx
 			m_back = curr.m_prev;
 		}
 
-		curr.m_prev = invalid;
-		curr.m_next = invalid;
+		curr.m_prev = kInvalidHandle;
+		curr.m_next = kInvalidHandle;
 	}
 
 	template <uint16_t MaxHandlesT>
 	inline void HandleListT<MaxHandlesT>::reset()
 	{
 		memSet(m_links, 0xff, sizeof(m_links) );
-		m_front = invalid;
-		m_back  = invalid;
+		m_front = kInvalidHandle;
+		m_back  = kInvalidHandle;
 	}
 
 	template <uint16_t MaxHandlesT>
@@ -243,10 +243,10 @@ namespace bx
 		Link& curr = m_links[_handle];
 		curr.m_next = _before;
 
-		if (invalid != _before)
+		if (kInvalidHandle != _before)
 		{
 			Link& link = m_links[_before];
-			if (invalid != link.m_prev)
+			if (kInvalidHandle != link.m_prev)
 			{
 				Link& prev = m_links[link.m_prev];
 				prev.m_next = _handle;
@@ -265,10 +265,10 @@ namespace bx
 		Link& curr = m_links[_handle];
 		curr.m_prev = _after;
 
-		if (invalid != _after)
+		if (kInvalidHandle != _after)
 		{
 			Link& link = m_links[_after];
-			if (invalid != link.m_next)
+			if (kInvalidHandle != link.m_next)
 			{
 				Link& next = m_links[link.m_next];
 				next.m_prev = _handle;
@@ -292,12 +292,12 @@ namespace bx
 	{
 		Link& curr = m_links[_handle];
 
-		if (invalid == curr.m_prev)
+		if (kInvalidHandle == curr.m_prev)
 		{
 			m_front = _handle;
 		}
 
-		if (invalid == curr.m_next)
+		if (kInvalidHandle == curr.m_next)
 		{
 			m_back = _handle;
 		}
@@ -342,7 +342,7 @@ namespace bx
 	inline uint16_t HandleAllocLruT<MaxHandlesT>::alloc()
 	{
 		uint16_t handle = m_alloc.alloc();
-		if (invalid != handle)
+		if (kInvalidHandle != handle)
 		{
 			m_list.pushFront(handle);
 		}
@@ -417,7 +417,7 @@ namespace bx
 	template <uint32_t MaxCapacityT, typename KeyT>
 	inline bool HandleHashMapT<MaxCapacityT, KeyT>::insert(KeyT _key, uint16_t _handle)
 	{
-		if (invalid == _handle)
+		if (kInvalidHandle == _handle)
 		{
 			return false;
 		}
@@ -427,7 +427,7 @@ namespace bx
 		uint32_t idx = firstIdx;
 		do
 		{
-			if (m_handle[idx] == invalid)
+			if (m_handle[idx] == kInvalidHandle)
 			{
 				m_key[idx]    = _key;
 				m_handle[idx] = _handle;
@@ -463,7 +463,7 @@ namespace bx
 	template <uint32_t MaxCapacityT, typename KeyT>
 	inline bool HandleHashMapT<MaxCapacityT, KeyT>::removeByHandle(uint16_t _handle)
 	{
-		if (invalid != _handle)
+		if (kInvalidHandle != _handle)
 		{
 			for (uint32_t idx = 0; idx < MaxCapacityT; ++idx)
 			{
@@ -486,7 +486,7 @@ namespace bx
 			return m_handle[idx];
 		}
 
-		return invalid;
+		return kInvalidHandle;
 	}
 
 	template <uint32_t MaxCapacityT, typename KeyT>
@@ -512,7 +512,7 @@ namespace bx
 	inline typename HandleHashMapT<MaxCapacityT, KeyT>::Iterator HandleHashMapT<MaxCapacityT, KeyT>::first() const
 	{
 		Iterator it;
-		it.handle = invalid;
+		it.handle = kInvalidHandle;
 		it.pos    = 0;
 		it.num    = m_numElements;
 
@@ -535,7 +535,7 @@ namespace bx
 		}
 
 		for (
-			;_it.pos < MaxCapacityT && invalid == m_handle[_it.pos]
+			;_it.pos < MaxCapacityT && kInvalidHandle == m_handle[_it.pos]
 			; ++_it.pos
 			);
 		_it.handle = m_handle[_it.pos];
@@ -553,7 +553,7 @@ namespace bx
 		uint32_t idx = firstIdx;
 		do
 		{
-			if (m_handle[idx] == invalid)
+			if (m_handle[idx] == kInvalidHandle)
 			{
 				return UINT32_MAX;
 			}
@@ -573,20 +573,20 @@ namespace bx
 	template <uint32_t MaxCapacityT, typename KeyT>
 	inline void HandleHashMapT<MaxCapacityT, KeyT>::removeIndex(uint32_t _idx)
 	{
-		m_handle[_idx] = invalid;
+		m_handle[_idx] = kInvalidHandle;
 		--m_numElements;
 
 		for (uint32_t idx = (_idx + 1) % MaxCapacityT
-				; m_handle[idx] != invalid
+				; m_handle[idx] != kInvalidHandle
 				; idx = (idx + 1) % MaxCapacityT)
 		{
-			if (m_handle[idx] != invalid)
+			if (m_handle[idx] != kInvalidHandle)
 			{
 				const KeyT key = m_key[idx];
 				if (idx != findIndex(key) )
 				{
 					const uint16_t handle = m_handle[idx];
-					m_handle[idx] = invalid;
+					m_handle[idx] = kInvalidHandle;
 					--m_numElements;
 					insert(key, handle);
 				}
@@ -627,16 +627,16 @@ namespace bx
 	inline uint16_t HandleHashMapAllocT<MaxHandlesT, KeyT>::alloc(KeyT _key)
 	{
 		uint16_t handle = m_alloc.alloc();
-		if (invalid == handle)
+		if (kInvalidHandle == handle)
 		{
-			return invalid;
+			return kInvalidHandle;
 		}
 
 		bool ok = m_table.insert(_key, handle);
 		if (!ok)
 		{
 			m_alloc.free(handle);
-			return invalid;
+			return kInvalidHandle;
 		}
 
 		return handle;
@@ -646,7 +646,7 @@ namespace bx
 	inline void HandleHashMapAllocT<MaxHandlesT, KeyT>::free(KeyT _key)
 	{
 		uint16_t handle = m_table.find(_key);
-		if (invalid == handle)
+		if (kInvalidHandle == handle)
 		{
 			return;
 		}

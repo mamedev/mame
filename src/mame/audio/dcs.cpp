@@ -1736,19 +1736,19 @@ void dcs_audio_device::reset_timer()
 	{
 		/* Road Burners: @ 28: JMP $0032  18032F, same code at $32 */
 
-		if (m_program->read_dword(0x18*4) == 0x0c0030 &&      /* ENA SEC_REG */
-			m_program->read_dword(0x19*4) == 0x804828 &&      /* SI = DM($0482) */
-			m_program->read_dword(0x1a*4) == 0x904828 &&      /* DM($0482) = SI */
-			m_program->read_dword(0x1b*4) == 0x0C0020 &&      /* DIS SEC_REG */
-			m_program->read_dword(0x1c*4) == 0x0A001F)            /* RTI */
+		if (m_program->read_dword(0x18) == 0x0c0030 &&      /* ENA SEC_REG */
+			m_program->read_dword(0x19) == 0x804828 &&      /* SI = DM($0482) */
+			m_program->read_dword(0x1a) == 0x904828 &&      /* DM($0482) = SI */
+			m_program->read_dword(0x1b) == 0x0C0020 &&      /* DIS SEC_REG */
+			m_program->read_dword(0x1c) == 0x0A001F)            /* RTI */
 		{
 			m_timer_ignore = true;
 		} else if (
 			// ADSP 2181 (DSIO and DENVER)
-			m_program->read_dword(0x28*4) == 0x18032F &&      /* JUMP $0032 */
-			m_program->read_dword(0x32*4) == 0x0c0030 &&      /* ENA SEC_REG */
-			m_program->read_dword(0x33*4) == 0x014828 &&      /* SI = IO($482) */
-			m_program->read_dword(0x34*4) == 0x01C828)        /* IO($482) = SI */
+			m_program->read_dword(0x28) == 0x18032F &&      /* JUMP $0032 */
+			m_program->read_dword(0x32) == 0x0c0030 &&      /* ENA SEC_REG */
+			m_program->read_dword(0x33) == 0x014828 &&      /* SI = IO($482) */
+			m_program->read_dword(0x34) == 0x01C828)        /* IO($482) = SI */
 		{
 			m_timer_ignore = true;
 		}
@@ -1944,7 +1944,7 @@ TIMER_DEVICE_CALLBACK_MEMBER( dcs_audio_device::dcs_irq )
 
 		for (i = 0; i < count; i++)
 		{
-			buffer[i] = m_data->read_word(reg * 2);
+			buffer[i] = m_data->read_word(reg);
 			reg += m_incs;
 		}
 
@@ -2280,10 +2280,10 @@ int dcs_audio_device::preprocess_stage_1(uint16_t data)
 					if (transfer.writes_left & 1)
 						transfer.temp = data;
 					else
-						m_program->write_dword(transfer.start++ * 4, (transfer.temp << 8) | (data & 0xff));
+						m_program->write_dword(transfer.start++, (transfer.temp << 8) | (data & 0xff));
 				}
 				else
-					m_data->write_word(transfer.start++ * 2, data);
+					m_data->write_word(transfer.start++, data);
 
 				/* if we're done, start a timer to send the response words */
 				if (transfer.state == 0)
@@ -2628,8 +2628,8 @@ MACHINE_CONFIG_MEMBER( dcs2_audio_dsio_device::device_add_mconfig )
 	MCFG_DEVICE_ADD("data_map_bank", ADDRESS_MAP_BANK, 0)
 	MCFG_DEVICE_PROGRAM_MAP(dsio_rambank_map)
 	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_ADDRESS_MAP_BANK_DATABUS_WIDTH(16)
-	MCFG_ADDRESS_MAP_BANK_ADDRBUS_WIDTH(14)
+	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(16)
+	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(14)
 	MCFG_ADDRESS_MAP_BANK_STRIDE(0x2000)
 
 	MCFG_TIMER_DEVICE_ADD("dcs_reg_timer", DEVICE_SELF, dcs_audio_device, dcs_irq)
@@ -2669,8 +2669,8 @@ MACHINE_CONFIG_MEMBER( dcs2_audio_denver_device::device_add_mconfig )
 	MCFG_DEVICE_ADD("data_map_bank", ADDRESS_MAP_BANK, 0)
 	MCFG_DEVICE_PROGRAM_MAP(denver_rambank_map)
 	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_ADDRESS_MAP_BANK_DATABUS_WIDTH(16)
-	MCFG_ADDRESS_MAP_BANK_ADDRBUS_WIDTH(14)
+	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(16)
+	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(14)
 	MCFG_ADDRESS_MAP_BANK_STRIDE(0x2000)
 
 	MCFG_TIMER_DEVICE_ADD("dcs_reg_timer", DEVICE_SELF, dcs_audio_device, dcs_irq)

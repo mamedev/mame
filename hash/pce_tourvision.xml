@@ -535,6 +535,17 @@ Notes:
 		</part>
 	</software>
 
+	<!--Final Soldier -->
+	<software name="finalsol">
+		<description>Final Soldier (Tourvision PCE bootleg)</description>
+		<year>1991</year>
+		<publisher>bootleg (Tourvision) / Hudson</publisher>
+		<part name="cart" interface="tourvision_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="final_soldier.bin" size="1048576" crc="bf28530b" sha1="fe9b487ab0fb5adc83d23d66c0ccb6dde6b77fbd" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
 
 	<!--Formation Soccer - Human Cup ' 90 - Human -->
 	<software name="fsoccr90">
@@ -873,6 +884,17 @@ Notes:
 		</part>
 	</software>
 
+	<!--PC Genjin - Pithecanthropus Computerurus -->
+	<software name="pcgenj">
+		<description>PC Genjin - Pithecanthropus Computerurus (Tourvision PCE bootleg)</description>
+		<year>1989</year>
+		<publisher>bootleg (Tourvision) / Hudson</publisher>
+		<part name="cart" interface="tourvision_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="pc_genjin.bin" size="1048576" crc="eecd176f" sha1="b24e7501e0aa9e8ba8759f9bb32452f42d7688cd" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
 
 	<!--PC Genjin 2 - Hudson -->
 	<software name="pcgenj2">
@@ -1214,6 +1236,17 @@ Notes:
 		</part>
 	</software>
 
+	<!--Splatterhouse -->
+	<software name="splatth">
+		<description>Splatterhouse (Tourvision PCE bootleg)</description>
+		<year>1990</year>
+		<publisher>bootleg (Tourvision) / Namcot</publisher>
+		<part name="cart" interface="tourvision_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="splatterhouse.bin" size="1048576" crc="be8e8c4c" sha1="f8a65d95a68735e7549838c845befcf07483876c" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
 
 	<!--Super Star Soldier - Hudson / Kaneko -->
 	<software name="sssoldr">
@@ -1257,6 +1290,16 @@ Notes:
 		</part>
 	</software>
 
+	<software name="sdragon">
+		<description>Tenseiryuu - Saint Dragon (Tourvision PCE bootleg)</description>
+		<year>1990</year>
+		<publisher>bootleg (Tourvision) / Irem</publisher>
+		<part name="cart" interface="tourvision_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="saint_dragon.bin" size="1048576" crc="492231a9" sha1="b8bfd18bde2398b07a693c86d21a14cd9627f0c8" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
 
 	<!--Terra Cresta II -->
 	<software name="terracr2">
@@ -1320,6 +1363,17 @@ Notes:
 		</part>
 	</software>
 
+	<!--Tora e no Michi -->
+	<software name="toramich">
+		<description>Tora e no Michi (Tourvision PCE bootleg)</description>
+		<year>1990</year>
+		<publisher>bootleg (Tourvision) / Victor Entertainment</publisher>
+		<part name="cart" interface="tourvision_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="tiger_road.bin" size="1048576" crc="5e55f35c" sha1="942c8e9e8923acf7ef2ba8878879251621e48408" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
 
 	<!--Toy Shop Boys -->
 	<software name="toyshopb">
@@ -1397,6 +1451,17 @@ Notes:
 		</part>
 	</software>
 
+	<!--Violent Soldier -->
+	<software name="violents">
+		<description>Violent Soldier (Tourvision PCE bootleg)</description>
+		<year>1990</year>
+		<publisher>bootleg (Tourvision) / IGS</publisher>
+		<part name="cart" interface="tourvision_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="violent_soldier.bin" size="1048576" crc="66bbea83" sha1="b60d507eb5d5069f0e8a52308a35459b44ee5b9e" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
 
 	<!--Volfied - Taito -->
 	<software name="volfied">

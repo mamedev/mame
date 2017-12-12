@@ -8,6 +8,7 @@
 
 #include "machine/gen_latch.h"
 #include "machine/timer.h"
+#include "sound/discrete.h"
 
 class ironhors_state : public driver_device
 {
@@ -19,6 +20,7 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
 		m_soundlatch(*this, "soundlatch"),
+		m_disc_ih(*this, "disc_ih"),
 		m_interrupt_enable(*this, "int_enable"),
 		m_scroll(*this, "scroll"),
 		m_colorram(*this, "colorram"),
@@ -26,12 +28,37 @@ public:
 		m_spriteram2(*this, "spriteram2"),
 		m_spriteram(*this, "spriteram") { }
 
+	DECLARE_WRITE8_MEMBER(sh_irqtrigger_w);
+	DECLARE_WRITE8_MEMBER(videoram_w);
+	DECLARE_WRITE8_MEMBER(colorram_w);
+	DECLARE_WRITE8_MEMBER(charbank_w);
+	DECLARE_WRITE8_MEMBER(palettebank_w);
+	DECLARE_WRITE8_MEMBER(flipscreen_w);
+	DECLARE_WRITE8_MEMBER(filter_w);
+	DECLARE_READ8_MEMBER(farwest_soundlatch_r);
+
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_farwest(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+	TIMER_DEVICE_CALLBACK_MEMBER(irq);
+	TIMER_DEVICE_CALLBACK_MEMBER(farwest_irq);
+
+	DECLARE_PALETTE_INIT(ironhors);
+	DECLARE_VIDEO_START(farwest);
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
+
+private:
 	/* devices */
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_soundcpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	required_device<generic_latch_8_device> m_soundlatch;
+	required_device<discrete_device> m_disc_ih;
 
 	/* memory pointers */
 	required_shared_ptr<uint8_t> m_interrupt_enable;
@@ -47,29 +74,9 @@ public:
 	int        m_charbank;
 	int        m_spriterambank;
 
-	DECLARE_WRITE8_MEMBER(sh_irqtrigger_w);
-	DECLARE_WRITE8_MEMBER(videoram_w);
-	DECLARE_WRITE8_MEMBER(colorram_w);
-	DECLARE_WRITE8_MEMBER(charbank_w);
-	DECLARE_WRITE8_MEMBER(palettebank_w);
-	DECLARE_WRITE8_MEMBER(flipscreen_w);
-	DECLARE_WRITE8_MEMBER(filter_w);
-	DECLARE_READ8_MEMBER(farwest_soundlatch_r);
-
-	TILE_GET_INFO_MEMBER(get_bg_tile_info);
-	TILE_GET_INFO_MEMBER(farwest_get_bg_tile_info);
-
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(ironhors);
-	DECLARE_VIDEO_START(farwest);
-
-	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	uint32_t screen_update_farwest(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void farwest_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 
-	TIMER_DEVICE_CALLBACK_MEMBER(irq);
-	TIMER_DEVICE_CALLBACK_MEMBER(farwest_irq);
+	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+	TILE_GET_INFO_MEMBER(farwest_get_bg_tile_info);
 };

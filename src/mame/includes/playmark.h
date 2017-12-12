@@ -2,6 +2,7 @@
 // copyright-holders:Nicola Salmoria, Pierpaolo Prazzoli, Quench
 #include "sound/okim6295.h"
 #include "machine/eepromser.h"
+#include "machine/ticket.h"
 #include "cpu/pic16c5x/pic16c5x.h"
 
 class playmark_state : public driver_device
@@ -21,7 +22,9 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette") { }
+		m_palette(*this, "palette"),
+		m_ticket(*this, "ticket"),
+		m_token(*this, "token") { }
 
 	/* memory pointers */
 	optional_shared_ptr<uint16_t> m_bgvideoram;
@@ -116,4 +119,6 @@ public:
 	optional_device<pic16c57_device> m_audiocpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	optional_device<ticket_dispenser_device> m_ticket;
+	optional_device<ticket_dispenser_device> m_token;
 };

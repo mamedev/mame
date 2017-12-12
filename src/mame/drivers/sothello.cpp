@@ -30,7 +30,7 @@
 |                                                                                 |
 +---------------------------------------------------------------------------------+
 
-CPU  : Z80A(x2) 68B09
+CPU  : Z80A(x2) HD68B09P
 Sound: YM2203?(surface scratched) + M5205
 OSC  : 8.0000MHz(X1)   21.477 MHz(X2)   384kHz(X3)
 
@@ -97,12 +97,7 @@ private:
 
 #define VDP_MEM             0x40000
 
-#define MAIN_CLOCK          (XTAL_21_4772MHz)
-#define MAINCPU_CLOCK       (XTAL_21_4772MHz/6)
-#define SOUNDCPU_CLOCK      (XTAL_21_4772MHz/6)
-#define YM_CLOCK            (XTAL_21_4772MHz/12)
-#define MSM_CLOCK           (XTAL_384kHz)
-#define SUBCPU_CLOCK        (XTAL_8MHz/4)
+
 
 
 /* main Z80 */
@@ -352,30 +347,30 @@ void sothello_state::machine_reset()
 static MACHINE_CONFIG_START( sothello )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, MAINCPU_CLOCK)
+	MCFG_CPU_ADD("maincpu", Z80, XTAL_21_4772MHz / 6)
 	MCFG_CPU_PROGRAM_MAP(maincpu_mem_map)
 	MCFG_CPU_IO_MAP(maincpu_io_map)
 
-	MCFG_CPU_ADD("soundcpu", Z80, SOUNDCPU_CLOCK)
+	MCFG_CPU_ADD("soundcpu", Z80, XTAL_21_4772MHz / 6)
 	MCFG_CPU_PROGRAM_MAP(soundcpu_mem_map)
 	MCFG_CPU_IO_MAP(soundcpu_io_map)
 
-	MCFG_CPU_ADD("subcpu", M6809, SUBCPU_CLOCK)
+	MCFG_CPU_ADD("subcpu", MC6809, XTAL_8MHz) // divided by 4 internally
 	MCFG_CPU_PROGRAM_MAP(subcpu_mem_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
 	/* video hardware */
-	MCFG_V9938_ADD("v9938", "screen", VDP_MEM, MAIN_CLOCK)
+	MCFG_V9938_ADD("v9938", "screen", VDP_MEM, XTAL_21_4772MHz)
 	MCFG_V99X8_INTERRUPT_CALLBACK(INPUTLINE("maincpu", 0))
-	MCFG_V99X8_SCREEN_ADD_NTSC("screen", "v9938", MAIN_CLOCK)
+	MCFG_V99X8_SCREEN_ADD_NTSC("screen", "v9938", XTAL_21_4772MHz)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("ymsnd", YM2203, YM_CLOCK)
+	MCFG_SOUND_ADD("ymsnd", YM2203, XTAL_21_4772MHz / 12)
 	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("subcpu", 0))
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSWA"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSWB"))
@@ -386,7 +381,7 @@ static MACHINE_CONFIG_START( sothello )
 
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
-	MCFG_SOUND_ADD("msm", MSM5205, MSM_CLOCK)
+	MCFG_SOUND_ADD("msm", MSM5205, XTAL_384kHz)
 	MCFG_MSM5205_VCLK_CB(WRITELINE(sothello_state, adpcm_int))      /* interrupt function */
 	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)  /* changed on the fly */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)

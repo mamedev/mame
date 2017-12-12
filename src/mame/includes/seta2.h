@@ -9,6 +9,7 @@
 #include "machine/tmp68301.h"
 #include "machine/eepromser.h"
 #include "machine/intelfsh.h"
+#include "machine/ticket.h"
 #include "machine/timer.h"
 #include "machine/upd4992.h"
 #include "sound/okim9810.h"
@@ -21,14 +22,17 @@ public:
 	seta2_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this,"maincpu"),
+		m_gfxdecode(*this, "gfxdecode"),
+		m_screen(*this, "screen"),
+		m_palette(*this, "palette"),
+
 		m_tmp68301(*this, "tmp68301"),
 		m_oki(*this, "oki"),
 		m_eeprom(*this, "eeprom"),
 		m_flash(*this, "flash"),
 		m_rtc(*this, "rtc"),
-		m_gfxdecode(*this, "gfxdecode"),
-		m_screen(*this, "screen"),
-		m_palette(*this, "palette"),
+		m_dispenser(*this, "dispenser"),
+
 		m_nvram(*this, "nvram"),
 		m_spriteram(*this, "spriteram", 0),
 		m_tileram(*this, "tileram", 0),
@@ -38,14 +42,16 @@ public:
 	{ }
 
 	required_device<cpu_device> m_maincpu;
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<screen_device> m_screen;
+	required_device<palette_device> m_palette;
+
 	optional_device<tmp68301_device> m_tmp68301;
 	optional_device<okim9810_device> m_oki;
 	optional_device<eeprom_serial_93cxx_device> m_eeprom;
 	optional_device<intelfsh16_device> m_flash;
 	optional_device<upd4992_device> m_rtc;
-	required_device<gfxdecode_device> m_gfxdecode;
-	required_device<screen_device> m_screen;
-	required_device<palette_device> m_palette;
+	optional_device<ticket_dispenser_device> m_dispenser;
 
 	optional_shared_ptr<uint16_t> m_nvram;
 	optional_shared_ptr<uint16_t> m_spriteram;
@@ -84,6 +90,10 @@ public:
 
 	DECLARE_WRITE16_MEMBER(samshoot_coin_w);
 
+	DECLARE_WRITE16_MEMBER(telpacfl_lamp1_w);
+	DECLARE_WRITE16_MEMBER(telpacfl_lamp2_w);
+	DECLARE_WRITE16_MEMBER(telpacfl_lockout_w);
+
 	DECLARE_READ16_MEMBER(gundamex_eeprom_r);
 	DECLARE_WRITE16_MEMBER(gundamex_eeprom_w);
 
@@ -107,6 +117,7 @@ public:
 	virtual void video_start() override;
 	DECLARE_VIDEO_START(yoffset);
 	DECLARE_VIDEO_START(xoffset);
+	DECLARE_VIDEO_START(xoffset1);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank);

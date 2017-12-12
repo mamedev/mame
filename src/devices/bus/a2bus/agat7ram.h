@@ -47,9 +47,9 @@ private:
 	void do_io(int offset);
 
 	int m_inh_state;
-	int m_last_offset;
 	int m_main_bank;
-	uint8_t m_ram[32*1024];
+	uint8_t m_ram[32 * 1024];
+	uint8_t m_csr;
 };
 
 // device type definition

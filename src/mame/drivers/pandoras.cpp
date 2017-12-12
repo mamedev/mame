@@ -308,11 +308,11 @@ READ8_MEMBER(pandoras_state::pandoras_portB_r)
 static MACHINE_CONFIG_START( pandoras )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6809, MASTER_CLOCK/6)  /* CPU A */
+	MCFG_CPU_ADD("maincpu", MC6809E, MASTER_CLOCK/6)  /* CPU A */
 	MCFG_CPU_PROGRAM_MAP(pandoras_master_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", pandoras_state,  pandoras_master_interrupt)
 
-	MCFG_CPU_ADD("sub", M6809, MASTER_CLOCK/6)      /* CPU B */
+	MCFG_CPU_ADD("sub", MC6809E, MASTER_CLOCK/6)      /* CPU B */
 	MCFG_CPU_PROGRAM_MAP(pandoras_slave_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", pandoras_state,  pandoras_slave_interrupt)
 

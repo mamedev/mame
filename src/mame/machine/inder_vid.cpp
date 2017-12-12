@@ -57,18 +57,18 @@ TMS340X0_TO_SHIFTREG_CB_MEMBER(inder_vid_device::to_shiftreg)
 {
 	if (m_shiftfull == 0)
 	{
-		//printf("read to shift regs address %08x (%08x)\n", address, TOWORD(address) * 2);
+		//printf("read to shift regs address %08x\n", address);
 
-		memcpy(shiftreg, &m_vram[TOWORD(address) & ~TOWORD(0x1fff)], TOBYTE(0x2000)); // & ~TOWORD(0x1fff) is needed for round 6
+		memcpy(shiftreg, &m_vram[(address & ~0x1fff) >> 4], 0x400); // & ~0x1fff is needed for round 6
 		m_shiftfull = 1;
 	}
 }
 
 TMS340X0_FROM_SHIFTREG_CB_MEMBER(inder_vid_device::from_shiftreg)
 {
-//  printf("write from shift regs address %08x (%08x)\n", address, TOWORD(address) * 2);
+//  printf("write from shift regs address %08x\n", address);
 
-	memcpy(&m_vram[TOWORD(address) & ~TOWORD(0x1fff)], shiftreg, TOBYTE(0x2000));
+	memcpy(&m_vram[(address & ~0x1fff) >> 4], shiftreg, 0x400);
 
 	m_shiftfull = 0;
 }

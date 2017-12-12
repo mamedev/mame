@@ -1195,7 +1195,7 @@ void hp85_state::prt_do_printing()
 	m_prt_busy_timer->adjust(attotime::from_msec(PRT_BUSY_MSEC));
 }
 
-#define IOP_MASK(x)	BIT_MASK<ioport_value>((x))
+#define IOP_MASK(x) BIT_MASK<ioport_value>((x))
 
 static INPUT_PORTS_START(hp85)
 	// Keyboard is arranged in a matrix of 10 rows and 8 columns. In addition there are 3 keys with
@@ -1331,8 +1331,8 @@ static MACHINE_CONFIG_START(hp85)
 	MCFG_DEVICE_ADD("rombank", ADDRESS_MAP_BANK, 0)
 	MCFG_DEVICE_PROGRAM_MAP(rombank_mem_map)
 	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_ADDRESS_MAP_BANK_DATABUS_WIDTH(8)
-	MCFG_ADDRESS_MAP_BANK_ADDRBUS_WIDTH(21)
+	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
+	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(21)
 	MCFG_ADDRESS_MAP_BANK_STRIDE(HP80_OPTROM_SIZE)
 
 	MCFG_SCREEN_ADD("screen" , RASTER)

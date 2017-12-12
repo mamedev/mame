@@ -57,7 +57,7 @@ inline void pgm2_state::draw_sprite_chunk(const rectangle &cliprect, int &palett
 			if (pix)
 			{
 				if (xzoombit) draw_sprite_pixel(cliprect, palette_offset, x + realxdraw, realy, pal);
-			
+
 				palette_offset += palette_inc;
 				palette_offset &= m_sprites_colour_mask;
 			}
@@ -97,6 +97,8 @@ inline void pgm2_state::draw_sprite_line(const rectangle &cliprect, int &mask_of
 		maskdata |= m_sprites_mask[mask_offset + 1] << 16;
 		maskdata |= m_sprites_mask[mask_offset + 2] << 8;
 		maskdata |= m_sprites_mask[mask_offset + 3] << 0;
+
+		maskdata ^= m_realspritekey;
 
 		if (reverse)
 		{
@@ -150,7 +152,7 @@ void pgm2_state::draw_sprites(screen_device &screen, const rectangle &cliprect, 
 		for (int i = 0; i < endoflist-2; i += 4)
 		{
 			//printf("sprite with %08x %08x %08x %08x\n", spriteram[i + 0], spriteram[i + 1], spriteram[i + 2], spriteram[i + 3]);
-		
+
 			int x =     (spriteram[i + 0] & 0x000007ff) >> 0;
 			int y =     (spriteram[i + 0] & 0x003ff800) >> 11;
 			int pal =   (spriteram[i + 0] & 0x0fc00000) >> 22;
@@ -173,7 +175,7 @@ void pgm2_state::draw_sprites(screen_device &screen, const rectangle &cliprect, 
 				// unk0 & 0x40000000 set during gameplay on kov2nl, why? more pri bits?
 				//popmessage("sprite rendering unused bits set unk0 %08x unk1 %08x\n", unk0, unk1);
 			}
-			
+
 			int mask_offset = (spriteram[i + 2]<<1);
 			int palette_offset = (spriteram[i + 3]);
 

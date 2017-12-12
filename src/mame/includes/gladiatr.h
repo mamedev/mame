@@ -175,7 +175,7 @@ public:
 	DECLARE_WRITE8_MEMBER(ppking_video_registers_w);
 	DECLARE_WRITE8_MEMBER(ppking_adpcm_w);
 	DECLARE_WRITE8_MEMBER(cpu2_irq_ack_w);
-	
+
 	DECLARE_DRIVER_INIT(ppking);
 
 	DECLARE_MACHINE_RESET(ppking);
@@ -186,7 +186,7 @@ public:
 private:
 	required_shared_ptr<uint8_t>    m_nvram;
 	required_device<generic_latch_8_device> m_soundlatch2;
-	
+
 	struct
 	{
 		uint8_t rxd;
@@ -195,7 +195,7 @@ private:
 		uint8_t state;
 		uint8_t packet_type;
 	} m_mcu[2];
-	
+
 	bool mcu_parity_check();
 	void mcu_input_check();
 };

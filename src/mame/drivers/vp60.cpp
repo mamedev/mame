@@ -33,6 +33,7 @@ static ADDRESS_MAP_START( mem_map, AS_PROGRAM, 8, vp60_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( io_map, AS_PROGRAM, 8, vp60_state )
+	AM_RANGE(0x8000, 0x87ff) AM_RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( kbd_map, AS_PROGRAM, 8, vp60_state )

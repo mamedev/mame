@@ -30,15 +30,6 @@ m58846_device::m58846_device(const machine_config &mconfig, const char *tag, dev
 { }
 
 
-// disasm
-offs_t m58846_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
-{
-	extern CPU_DISASSEMBLE(m58846);
-	return CPU_DISASSEMBLE_NAME(m58846)(this, stream, pc, oprom, opram, options);
-}
-
-
-
 //-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------

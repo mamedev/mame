@@ -985,6 +985,7 @@ READ8_MEMBER(towns_state::towns_padport_r)
 					break;
 				case MOUSE_START:
 				case MOUSE_SYNC:
+					break;
 				default:
 					if(m_towns_mouse_output < MOUSE_Y_LOW)
 						ret |= 0x0f;
@@ -1072,6 +1073,7 @@ READ8_MEMBER(towns_state::towns_padport_r)
 					break;
 				case MOUSE_START:
 				case MOUSE_SYNC:
+					break;
 				default:
 					if(m_towns_mouse_output < MOUSE_Y_LOW)
 						ret |= 0x0f;
@@ -2672,7 +2674,7 @@ void towns_state::driver_start()
 
 	save_pointer(m_video.towns_crtc_reg,"CRTC registers",32);
 	save_pointer(m_video.towns_video_reg,"Video registers",2);
-	
+
 	m_maincpu->space(AS_PROGRAM).install_ram(0x100000,m_ram->size()-1,nullptr);
 }
 

@@ -1,13 +1,14 @@
 // license:BSD-3-Clause
 // copyright-holders:Juergen Buchmueller, R. Belmont
 #include "emu.h"
-#include "debugger.h"
-#include "sh2.h"
+#include "sh_dasm.h"
 
 #define SIGNX8(x)   (((int32_t)(x) << 24) >> 24)
 #define SIGNX12(x)  (((int32_t)(x) << 20) >> 20)
+#define Rn  ((opcode>>8)&15)
+#define Rm  ((opcode>>4)&15)
 
-static const char *const regname[16] = {
+const char *const sh_disassembler::regname[16] = {
 	"R0", "R1", "R2", "R3", "R4", "R5", "R6", "R7",
 	"R8", "R9", "R10","R11","R12","R13","R14",
 	// The old SH2 dasm used 'SP' here, the old SH4 used 'R15'
@@ -15,7 +16,7 @@ static const char *const regname[16] = {
 	"R15"
 };
 
-static uint32_t op0000(std::ostream &stream, uint32_t pc, uint16_t opcode)
+uint32_t sh_disassembler::op0000(std::ostream &stream, uint32_t pc, uint16_t opcode)
 {
 	uint32_t  flags = 0;
 	switch(opcode & 0x3f)
@@ -37,7 +38,7 @@ static uint32_t op0000(std::ostream &stream, uint32_t pc, uint16_t opcode)
 		break;
 	case 0x0B:
 		stream << "RTS";
-		flags = DASMFLAG_STEP_OUT;
+		flags = STEP_OUT;
 		break;
 	case 0x12:
 		util::stream_format(stream, "STS     GBR,%s", regname[Rn]);
@@ -71,7 +72,7 @@ static uint32_t op0000(std::ostream &stream, uint32_t pc, uint16_t opcode)
 		break;
 	case 0x2B:
 		stream << "RTE";
-		flags = DASMFLAG_STEP_OUT;
+		flags = STEP_OUT;
 		break;
 	default:
 		switch(opcode & 15)
@@ -129,13 +130,13 @@ static uint32_t op0000(std::ostream &stream, uint32_t pc, uint16_t opcode)
 	return flags;
 }
 
-static uint32_t op0001(std::ostream &stream, uint32_t pc, uint16_t opcode)
+uint32_t sh_disassembler::op0001(std::ostream &stream, uint32_t pc, uint16_t opcode)
 {
 	util::stream_format(stream, "MOV.L   %s,@($%02X,%s)", regname[Rm], (opcode & 15) * 4, regname[Rn]);
 	return 0;
 }
 
-static uint32_t op0010(std::ostream &stream, uint32_t pc, uint16_t opcode)
+uint32_t sh_disassembler::op0010(std::ostream &stream, uint32_t pc, uint16_t opcode)
 {
 	switch (opcode & 15)
 	{
@@ -191,7 +192,7 @@ static uint32_t op0010(std::ostream &stream, uint32_t pc, uint16_t opcode)
 	return 0;
 }
 
-static uint32_t op0011(std::ostream &stream, uint32_t pc, uint16_t opcode)
+uint32_t sh_disassembler::op0011(std::ostream &stream, uint32_t pc, uint16_t opcode)
 {
 	switch (opcode & 15)
 	{
@@ -247,7 +248,7 @@ static uint32_t op0011(std::ostream &stream, uint32_t pc, uint16_t opcode)
 	return 0;
 }
 
-static uint32_t op0100(std::ostream &stream, uint32_t pc, uint16_t opcode)
+uint32_t sh_disassembler::op0100(std::ostream &stream, uint32_t pc, uint16_t opcode)
 {
 	uint32_t flags = 0;
 	switch(opcode & 0x3F)
@@ -287,7 +288,7 @@ static uint32_t op0100(std::ostream &stream, uint32_t pc, uint16_t opcode)
 		break;
 	case 0x0b:
 		util::stream_format(stream, "JSR     %s", regname[Rn]);
-		flags = DASMFLAG_STEP_OVER | DASMFLAG_STEP_OVER_EXTRA(1);
+		flags = STEP_OVER | step_over_extra(1);
 		break;
 	case 0x0e:
 		util::stream_format(stream, "LDC     %s,SR", regname[Rn]);
@@ -376,13 +377,13 @@ static uint32_t op0100(std::ostream &stream, uint32_t pc, uint16_t opcode)
 	return flags;
 }
 
-static uint32_t op0101(std::ostream &stream, uint32_t pc, uint16_t opcode)
+uint32_t sh_disassembler::op0101(std::ostream &stream, uint32_t pc, uint16_t opcode)
 {
 	util::stream_format(stream, "MOV.L   @($%02X,%s),%s", (opcode & 15) * 4, regname[Rm], regname[Rn]);
 	return 0;
 }
 
-static uint32_t op0110(std::ostream &stream, uint32_t pc, uint16_t opcode)
+uint32_t sh_disassembler::op0110(std::ostream &stream, uint32_t pc, uint16_t opcode)
 
 {
 	switch(opcode & 0xF)
@@ -439,13 +440,13 @@ static uint32_t op0110(std::ostream &stream, uint32_t pc, uint16_t opcode)
 	return 0;
 }
 
-static uint32_t op0111(std::ostream &stream, uint32_t pc, uint16_t opcode)
+uint32_t sh_disassembler::op0111(std::ostream &stream, uint32_t pc, uint16_t opcode)
 {
 	util::stream_format(stream, "ADD     #$%02X,%s", opcode & 0xff, regname[Rn]);
 	return 0;
 }
 
-static uint32_t op1000(std::ostream &stream, uint32_t pc, uint16_t opcode)
+uint32_t sh_disassembler::op1000(std::ostream &stream, uint32_t pc, uint16_t opcode)
 {
 	switch((opcode >> 8) & 15)
 	{
@@ -482,25 +483,25 @@ static uint32_t op1000(std::ostream &stream, uint32_t pc, uint16_t opcode)
 	return 0;
 }
 
-static uint32_t op1001(std::ostream &stream, uint32_t pc, uint16_t opcode)
+uint32_t sh_disassembler::op1001(std::ostream &stream, uint32_t pc, uint16_t opcode)
 {
 	util::stream_format(stream, "MOV.W   @($%04X,PC),%s [%08X]", (opcode & 0xff) * 2, regname[Rn], pc+((opcode & 0xff) * 2)+2);
 	return 0;
 }
 
-static uint32_t op1010(std::ostream &stream, uint32_t pc, uint16_t opcode)
+uint32_t sh_disassembler::op1010(std::ostream &stream, uint32_t pc, uint16_t opcode)
 {
 	util::stream_format(stream, "BRA     $%08X", SIGNX12(opcode & 0xfff) * 2 + pc + 2);
 	return 0;
 }
 
-static uint32_t op1011(std::ostream &stream, uint32_t pc, uint16_t opcode)
+uint32_t sh_disassembler::op1011(std::ostream &stream, uint32_t pc, uint16_t opcode)
 {
 	util::stream_format(stream, "BSR     $%08X", SIGNX12(opcode & 0xfff) * 2 + pc + 2);
-	return DASMFLAG_STEP_OVER | DASMFLAG_STEP_OVER_EXTRA(1);
+	return STEP_OVER | step_over_extra(1);
 }
 
-static uint32_t op1100(std::ostream &stream, uint32_t pc, uint16_t opcode)
+uint32_t sh_disassembler::op1100(std::ostream &stream, uint32_t pc, uint16_t opcode)
 {
 	uint32_t flags = 0;
 	switch((opcode >> 8) & 15)
@@ -516,7 +517,7 @@ static uint32_t op1100(std::ostream &stream, uint32_t pc, uint16_t opcode)
 		break;
 	case  3:
 		util::stream_format(stream, "TRAPA   #$%02X", opcode & 0xff);
-		flags = DASMFLAG_STEP_OVER;
+		flags = STEP_OVER;
 		break;
 	case  4:
 		util::stream_format(stream, "MOV.B   @($%02X,GBR),R0", opcode & 0xff);
@@ -558,61 +559,29 @@ static uint32_t op1100(std::ostream &stream, uint32_t pc, uint16_t opcode)
 	return flags;
 }
 
-static uint32_t op1101(std::ostream &stream, uint32_t pc, uint16_t opcode)
+uint32_t sh_disassembler::op1101(std::ostream &stream, uint32_t pc, uint16_t opcode)
 {
 	util::stream_format(stream, "MOV.L   @($%04X,PC),%s [%08X]", (opcode & 0xff) * 4, regname[Rn], ((pc + 2) & ~3) + (opcode & 0xff) * 4);
 	return 0;
 }
 
-static uint32_t op1110(std::ostream &stream, uint32_t pc, uint16_t opcode)
+uint32_t sh_disassembler::op1110(std::ostream &stream, uint32_t pc, uint16_t opcode)
 {
 	util::stream_format(stream, "MOV     #$%02X,%s", (opcode & 0xff), regname[Rn]);
 	return 0;
 }
 
-static uint32_t op1111(std::ostream &stream, uint32_t pc, uint16_t opcode)
+uint32_t sh_disassembler::op1111(std::ostream &stream, uint32_t pc, uint16_t opcode)
 {
 	util::stream_format(stream, "unknown $%04X", opcode);
 	return 0;
 }
 
-unsigned DasmSH2(std::ostream &stream, unsigned pc, uint16_t opcode)
-{
-	uint32_t flags;
-
-	pc += 2;
-
-	switch ((opcode >> 12) & 15)
-	{
-	case  0: flags = op0000(stream, pc, opcode); break;
-	case  1: flags = op0001(stream, pc, opcode); break;
-	case  2: flags = op0010(stream, pc, opcode); break;
-	case  3: flags = op0011(stream, pc, opcode); break;
-	case  4: flags = op0100(stream, pc, opcode); break;
-	case  5: flags = op0101(stream, pc, opcode); break;
-	case  6: flags = op0110(stream, pc, opcode); break;
-	case  7: flags = op0111(stream, pc, opcode); break;
-	case  8: flags = op1000(stream, pc, opcode); break;
-	case  9: flags = op1001(stream, pc, opcode); break;
-	case 10: flags = op1010(stream, pc, opcode); break;
-	case 11: flags = op1011(stream, pc, opcode); break;
-	case 12: flags = op1100(stream, pc, opcode); break;
-	case 13: flags = op1101(stream, pc, opcode); break;
-	case 14: flags = op1110(stream, pc, opcode); break;
-	default: flags = op1111(stream, pc, opcode); break;
-	}
-	return 2 | flags | DASMFLAG_SUPPORTED;
-}
-
-CPU_DISASSEMBLE(sh2)
-{
-	return DasmSH2(stream, pc, (oprom[0] << 8) | oprom[1]);
-}
 
 /* SH4 specifics */
 
 
-static uint32_t op0000_sh34(std::ostream &stream, uint32_t pc, uint16_t opcode)
+uint32_t sh_disassembler::op0000_sh34(std::ostream &stream, uint32_t pc, uint16_t opcode)
 {
 	uint32_t  flags = 0;
 	switch (opcode & 0xF)
@@ -739,14 +708,14 @@ static uint32_t op0000_sh34(std::ostream &stream, uint32_t pc, uint16_t opcode)
 		{
 		case 0x00:
 			stream << "RTS";
-			flags = DASMFLAG_STEP_OUT;
+			flags = STEP_OUT;
 			break;
 		case 0x10:
 			stream << "SLEEP";
 			break;
 		case 0x20:
 			stream << "RTE";
-			flags = DASMFLAG_STEP_OUT;
+			flags = STEP_OUT;
 			break;
 		}
 		break;
@@ -767,7 +736,7 @@ static uint32_t op0000_sh34(std::ostream &stream, uint32_t pc, uint16_t opcode)
 }
 
 
-static uint32_t op0100_sh34(std::ostream &stream, uint32_t pc, uint16_t opcode)
+uint32_t sh_disassembler::op0100_sh34(std::ostream &stream, uint32_t pc, uint16_t opcode)
 {
 	uint32_t flags = 0;
 	switch (opcode & 0xF)
@@ -978,7 +947,7 @@ static uint32_t op0100_sh34(std::ostream &stream, uint32_t pc, uint16_t opcode)
 		{
 		case 0x00:
 			util::stream_format(stream, "JSR     %s", regname[Rn]);
-			flags = DASMFLAG_STEP_OVER | DASMFLAG_STEP_OVER_EXTRA(1);
+			flags = STEP_OVER | step_over_extra(1);
 			break;
 		case 0x10:
 			util::stream_format(stream, "TAS     %s", regname[Rn]);
@@ -1026,7 +995,7 @@ static uint32_t op0100_sh34(std::ostream &stream, uint32_t pc, uint16_t opcode)
 }
 
 
-static uint32_t op1111_sh34(std::ostream &stream, uint32_t pc, uint16_t opcode)
+uint32_t sh_disassembler::op1111_sh34(std::ostream &stream, uint32_t pc, uint16_t opcode)
 {
 	switch (opcode & 0xf)
 	{
@@ -1149,40 +1118,73 @@ static uint32_t op1111_sh34(std::ostream &stream, uint32_t pc, uint16_t opcode)
 	return 0;
 }
 
-unsigned DasmSH4(std::ostream &stream, unsigned pc, uint16_t opcode)
+offs_t sh_disassembler::disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params)
+{
+	u16 opcode = opcodes.r16(pc);
+	return dasm_one(stream, pc, opcode);
+}
+
+offs_t sh_disassembler::dasm_one(std::ostream &stream, offs_t pc, u16 opcode)
 {
 	uint32_t flags;
 
 	pc += 2;
 
-	switch ((opcode >> 12) & 15)
+	if (m_is_sh34)
 	{
-	case  0: flags = op0000_sh34(stream, pc, opcode); break;
-	case  1: flags = op0001(stream, pc, opcode); break;
-	case  2: flags = op0010(stream, pc, opcode); break;
-	case  3: flags = op0011(stream, pc, opcode); break;
-	case  4: flags = op0100_sh34(stream, pc, opcode); break;
-	case  5: flags = op0101(stream, pc, opcode); break;
-	case  6: flags = op0110(stream, pc, opcode); break;
-	case  7: flags = op0111(stream, pc, opcode); break;
-	case  8: flags = op1000(stream, pc, opcode); break;
-	case  9: flags = op1001(stream, pc, opcode); break;
-	case 10: flags = op1010(stream, pc, opcode); break;
-	case 11: flags = op1011(stream, pc, opcode); break;
-	case 12: flags = op1100(stream, pc, opcode); break;
-	case 13: flags = op1101(stream, pc, opcode); break;
-	case 14: flags = op1110(stream, pc, opcode); break;
-	default: flags = op1111_sh34(stream, pc, opcode); break;
+		switch ((opcode >> 12) & 15)
+		{
+		case  0: flags = op0000_sh34(stream, pc, opcode); break;
+		case  1: flags = op0001(stream, pc, opcode); break;
+		case  2: flags = op0010(stream, pc, opcode); break;
+		case  3: flags = op0011(stream, pc, opcode); break;
+		case  4: flags = op0100_sh34(stream, pc, opcode); break;
+		case  5: flags = op0101(stream, pc, opcode); break;
+		case  6: flags = op0110(stream, pc, opcode); break;
+		case  7: flags = op0111(stream, pc, opcode); break;
+		case  8: flags = op1000(stream, pc, opcode); break;
+		case  9: flags = op1001(stream, pc, opcode); break;
+		case 10: flags = op1010(stream, pc, opcode); break;
+		case 11: flags = op1011(stream, pc, opcode); break;
+		case 12: flags = op1100(stream, pc, opcode); break;
+		case 13: flags = op1101(stream, pc, opcode); break;
+		case 14: flags = op1110(stream, pc, opcode); break;
+		default: flags = op1111_sh34(stream, pc, opcode); break;
+		}
 	}
-	return 2 | flags | DASMFLAG_SUPPORTED;
+	else
+	{
+		switch ((opcode >> 12) & 15)
+		{
+		case  0: flags = op0000(stream, pc, opcode); break;
+		case  1: flags = op0001(stream, pc, opcode); break;
+		case  2: flags = op0010(stream, pc, opcode); break;
+		case  3: flags = op0011(stream, pc, opcode); break;
+		case  4: flags = op0100(stream, pc, opcode); break;
+		case  5: flags = op0101(stream, pc, opcode); break;
+		case  6: flags = op0110(stream, pc, opcode); break;
+		case  7: flags = op0111(stream, pc, opcode); break;
+		case  8: flags = op1000(stream, pc, opcode); break;
+		case  9: flags = op1001(stream, pc, opcode); break;
+		case 10: flags = op1010(stream, pc, opcode); break;
+		case 11: flags = op1011(stream, pc, opcode); break;
+		case 12: flags = op1100(stream, pc, opcode); break;
+		case 13: flags = op1101(stream, pc, opcode); break;
+		case 14: flags = op1110(stream, pc, opcode); break;
+		default: flags = op1111(stream, pc, opcode); break;
+		}
+	}
+
+	return 2 | flags | SUPPORTED;
 }
 
-CPU_DISASSEMBLE(sh4)
+
+u32 sh_disassembler::opcode_alignment() const
 {
-	return DasmSH4(stream, pc, (oprom[1] << 8) | oprom[0]);
+	return 2;
 }
 
-CPU_DISASSEMBLE(sh4be)
+sh_disassembler::sh_disassembler(bool is_sh34) : m_is_sh34(is_sh34)
 {
-	return DasmSH4(stream, pc, (oprom[0] << 8) | oprom[1]);
 }
+

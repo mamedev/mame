@@ -34,7 +34,7 @@
     MAME doesn't yet support fractions in crystal frequencies. For example,
     XTAL_3_579545MHz should actually be 3579545.454545...Hz (39375000/11).
     This is no problem though: see above note about tolerance.
-    
+
     In the "Examples" column, please don't add 1000 examples, this is just
     for interest, so two or three examples is enough.
     The actual reference where the xtals are used can be found in the
@@ -58,6 +58,7 @@ enum
 	XTAL_1MHz           = 1000000,      /* Used to drive OKI M6295 chips */
 	XTAL_1_2944MHz      = 1294400,      /* BBN BitGraph PSG */
 	XTAL_1_75MHz        = 1750000,      /* RCA CDP1861 */
+	XTAL_1_7971MHz      = 1797100,      /* SWTPC 6800 (with MIKBUG) */
 	XTAL_1_8432MHz      = 1843200,      /* Bondwell 12/14 */
 	XTAL_1_9968MHz      = 1996800,      /* NEC PC-98xx */
 	XTAL_2MHz           = 2000000,
@@ -99,6 +100,7 @@ enum
 	XTAL_6MHz           = 6000000,      /* American Poker II, Taito SJ System */
 	XTAL_6_144MHz       = 6144000,      /* Used on Alpha Denshi early 80's games sound board, Casio FP-200 and Namco Universal System 16 */
 	XTAL_6_5MHz         = 6500000,      /* Jupiter Ace */
+	XTAL_6_88MHz        = 6880000,      /* Barcrest MPU4 */
 	XTAL_6_9MHz         = 6900000,      /* BBN BitGraph CPU */
 	XTAL_7MHz           = 7000000,      /* Jaleco Mega System PCBs */
 	XTAL_7_15909MHz     = 7159090,      /* Blood Bros (2x NTSC subcarrier) */
@@ -174,6 +176,7 @@ enum
 	XTAL_15_92MHz       = 15920000,     /* HP Integral PC */
 	XTAL_15_9744MHz     = 15974400,     /* Osborne 1 (9600 * 52 * 32) */
 	XTAL_16MHz          = 16000000,     /* Extremely common, used on 100's of PCBs */
+	XTAL_16_128MHz      = 16128000,     /* Fujitsu FM-7 */
 	XTAL_16_384MHz      = 16384000,
 	XTAL_16_4MHz        = 16400000,     /* MS 6102 */
 	XTAL_16_5888MHz     = 16588800,     /* SM 7238 */
@@ -201,6 +204,7 @@ enum
 	XTAL_20_079MHz      = 20790000,     /* Blockade-hardware Gremlin games */
 	XTAL_20_625MHz      = 20625000,     /* SM 7238 */
 	XTAL_21MHz          = 21000000,     /* Lock-On pixel clock */
+	XTAL_21_0526MHz     = 21052600,     /* NEC PC-98xx pixel clock */
 	XTAL_21_3MHz        = 21300000,
 	XTAL_21_4772MHz     = 21477272,     /* BMC bowling, some Data East 90's games, Vtech Socrates; (6x NTSC subcarrier) */
 	XTAL_22MHz          = 22000000,
@@ -244,6 +248,7 @@ enum
 	XTAL_30_4761MHz     = 30476100,     /* Taito JC */
 	XTAL_30_8MHz        = 30800000,     /* 15IE-00-013 */
 	XTAL_31_684MHz      = 31684000,     /* TeleVideo TVI-955 132-column display clock */
+	XTAL_31_9488MHz     = 31948800,     /* NEC PC-88xx, PC-98xx */
 	XTAL_32MHz          = 32000000,
 	XTAL_32_22MHz       = 32220000,     /* Typically used on 90's Data East PCBs (close to 9x NTSC subcarrier which is 32.215905Mhz*/
 	XTAL_32_5304MHz     = 32530400,     /* Seta 2 */
@@ -258,6 +263,7 @@ enum
 	XTAL_39_3216MHz     = 39321600,     /* Sun 2/120 */
 	XTAL_40MHz          = 40000000,
 	XTAL_42MHz          = 42000000,     /* BMC A-00211 - Popo Bear */
+	XTAL_42_1052MHz     = 42105200,     /* NEC PC-88xx */
 	XTAL_42_9545MHz     = 42954545,     /* CPS3 (12x NTSC subcarrier)*/
 	XTAL_43_320MHz      = 43320000,     /* DEC VT420 */
 	XTAL_44_1MHz        = 44100000,     /* Subsino's Bishou Jan */

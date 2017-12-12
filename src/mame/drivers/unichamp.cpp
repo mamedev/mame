@@ -77,6 +77,8 @@ public:
 	DECLARE_READ16_MEMBER(unichamp_trapl_r);
 	DECLARE_WRITE16_MEMBER(unichamp_trapl_w);
 
+	DECLARE_READ16_MEMBER(read_ff);
+
 	uint32_t screen_update_unichamp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 protected:
@@ -106,7 +108,7 @@ static ADDRESS_MAP_START( unichamp_mem, AS_PROGRAM, 16, unichamp_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x1FFF) //B13/B14/B15 are grounded!
 	AM_RANGE(0x0000, 0x00FF) AM_READWRITE8(unichamp_gicram_r, unichamp_gicram_w, 0x00ff)
 	AM_RANGE(0x0100, 0x07FF) AM_READWRITE(unichamp_trapl_r, unichamp_trapl_w)
-	AM_RANGE(0x0800, 0x17FF) AM_ROM AM_REGION("maincpu", 0x0800 << 1)   // Carts and EXE ROM, 10-bits wide
+	AM_RANGE(0x0800, 0x0FFF) AM_ROM AM_REGION("maincpu", 0)   // Carts and EXE ROM, 10-bits wide
 ADDRESS_MAP_END
 
 
@@ -134,7 +136,7 @@ READ8_MEMBER(unichamp_state::bext_r)
 	//The BEXT instruction pushes a user-defined nibble out on the four EBCA pins (EBCA0 to EBCA3)
 	//and reads the ECBI input pin for HIGH or LOW signal to know whether or not to branch
 
-	//The unisonic control system couldnt be simpler in desing.
+	//The unisonic control system couldnt be simpler in design.
 	//Each of the two player controllers has three buttons:
 	//one tying !RESET(GIC pin 21) to ground when closed - resetting the WHOLE system.
 	//a YES button (connecting EBCA0 to EBCI for Player1 and EBC2 to EBCI for Player2)
@@ -154,6 +156,11 @@ DRIVER_INIT_MEMBER(unichamp_state,unichamp)
 {
 }
 
+READ16_MEMBER(unichamp_state::read_ff)
+{
+	return 0xffff;
+}
+
 void unichamp_state::machine_start()
 {
 	if (m_cart->exists()){
@@ -166,10 +173,11 @@ void unichamp_state::machine_start()
 			ptr[i] = ptr[i+1];
 			ptr[i+1] = TEMP;
 		}
-
-		m_maincpu->space(AS_PROGRAM).install_read_handler(0x1000, 0x1800,
+		m_maincpu->space(AS_PROGRAM).install_read_handler(0x1000, 0x17ff,
 					read16_delegate(FUNC(generic_slot_device::read16_rom),(generic_slot_device*)m_cart));
-	}
+	} else
+		m_maincpu->space(AS_PROGRAM).install_read_handler(0x1000, 0x17ff,
+					read16_delegate(FUNC(unichamp_state::read_ff), this));
 }
 
 /* Set Reset and INTR/INTRM Vector */
@@ -193,8 +201,9 @@ void unichamp_state::machine_reset()
 
 	/* Set initial PC */
 	m_maincpu->set_state_int(cp1610_cpu_device::CP1610_R7, 0x0800);
-}
 
+	memset(m_ram, 0, sizeof(m_ram));
+}
 
 uint32_t unichamp_state::screen_update_unichamp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
@@ -265,9 +274,9 @@ MACHINE_CONFIG_END
 
 
 ROM_START(unichamp)
-	ROM_REGION(0x10000<<1,"maincpu", ROMREGION_ERASEFF)
+	ROM_REGION(0x1000,"maincpu", ROMREGION_ERASEFF)
 
-	ROM_LOAD16_WORD( "9501-01009.u2", 0x0800<<1, 0x1000, CRC(49a0bd8f) SHA1(f4d126d3462ad351da4b75d76c75942d5a6f27ef))
+	ROM_LOAD16_WORD( "9501-01009.u2", 0, 0x1000, CRC(49a0bd8f) SHA1(f4d126d3462ad351da4b75d76c75942d5a6f27ef))
 
 	//these below are for local tests. you can use them in softlist or -cart
 	//ROM_LOAD16_WORD( "pac-02.bin",   0x1000<<1, 0x1000, CRC(fe3213be) SHA1(5b9c407fe86865f3454d4be824a7f2bf53478f73))

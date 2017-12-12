@@ -36,8 +36,8 @@ protected:
 	DECLARE_READ8_MEMBER(p2_r);
 	DECLARE_WRITE8_MEMBER(p2_w);
 	DECLARE_READ_LINE_MEMBER(t1_r);
-    DECLARE_READ8_MEMBER(bus_r);
-    DECLARE_WRITE8_MEMBER(bus_w);
+	DECLARE_READ8_MEMBER(bus_r);
+	DECLARE_WRITE8_MEMBER(bus_w);
 
 private:
 	required_device<cpu_device>             m_mcu;

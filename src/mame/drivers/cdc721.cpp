@@ -28,7 +28,7 @@ public:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_DRIVER_INIT(init);
 	DECLARE_PALETTE_INIT(cdc721);
-//	DECLARE_WRITE8_MEMBER(port70_w) { membank("bankr0")->set_entry(BIT(data, 3)); }
+//  DECLARE_WRITE8_MEMBER(port70_w) { membank("bankr0")->set_entry(BIT(data, 3)); }
 
 private:
 	u8 m_flashcnt;
@@ -40,7 +40,7 @@ private:
 
 static ADDRESS_MAP_START( mem_map, AS_PROGRAM, 8, cdc721_state )
 	AM_RANGE(0x0000, 0x4fff) AM_ROM AM_REGION("maincpu", 0x10000)
-//	AM_RANGE(0x0000, 0x4fff) AM_READ_BANK("bankr0") AM_WRITE_BANK("bankw0")
+//  AM_RANGE(0x0000, 0x4fff) AM_READ_BANK("bankr0") AM_WRITE_BANK("bankw0")
 	AM_RANGE(0x8000, 0xe10f) AM_RAM
 	AM_RANGE(0xe110, 0xffff) AM_RAM AM_SHARE("videoram")
 ADDRESS_MAP_END
@@ -48,7 +48,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( io_map, AS_IO, 8, cdc721_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x10, 0x1f) AM_DEVREADWRITE("crtc", tms9927_device, read, write)
-//	AM_RANGE(0x70, 0x70) AM_WRITE(port70_w)
+//  AM_RANGE(0x70, 0x70) AM_WRITE(port70_w)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( cdc721 )
@@ -56,17 +56,17 @@ INPUT_PORTS_END
 
 void cdc721_state::machine_reset()
 {
-//	membank("bankr0")->set_entry(0);
-//	membank("bankw0")->set_entry(0);
+//  membank("bankr0")->set_entry(0);
+//  membank("bankw0")->set_entry(0);
 }
 
 DRIVER_INIT_MEMBER( cdc721_state, init )
 {
-//	uint8_t *main = memregion("maincpu")->base();
+//  uint8_t *main = memregion("maincpu")->base();
 
-//	membank("bankr0")->configure_entry(1, &main[0x14000]);
-//	membank("bankr0")->configure_entry(0, &main[0x4000]);
-//	membank("bankw0")->configure_entry(0, &main[0x4000]);
+//  membank("bankr0")->configure_entry(1, &main[0x14000]);
+//  membank("bankr0")->configure_entry(0, &main[0x4000]);
+//  membank("bankw0")->configure_entry(0, &main[0x4000]);
 }
 
 /* F4 Character Displayer */

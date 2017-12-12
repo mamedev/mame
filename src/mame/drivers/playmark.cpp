@@ -65,11 +65,8 @@ TODO:
 
 #include "cpu/m68000/m68000.h"
 #include "cpu/pic16c5x/pic16c5x.h"
-#include "machine/eepromser.h"
 #include "machine/nvram.h"
-#include "machine/ticket.h"
 #include "screen.h"
-#include "sound/okim6295.h"
 #include "speaker.h"
 
 
@@ -118,14 +115,14 @@ WRITE16_MEMBER(playmark_state::hotmind_coin_eeprom_w)
 			if ((m_dispenser_latch & 0x80) == 0) m_dispenser_latch = 0;
 			if (data & 0x10) {
 				m_dispenser_latch |= ((data & 0x10) | 0x80);
-				machine().device<ticket_dispenser_device>("token")->write(space, 0, 0x80);
+				m_token->motor_w(1);
 			}
 		}
 		else {
 			m_dispenser_latch &= 0x7f;
-			machine().device<ticket_dispenser_device>("token")->write(space, 0, (m_dispenser_latch & 0x10) ? 0x80 : 0);
+			m_token->motor_w(BIT(m_dispenser_latch, 4));
 		}
-		machine().device<ticket_dispenser_device>("ticket")->write(space, 0, (data & 0x08) ? 0x80 : 0);
+		m_ticket->motor_w(BIT(data, 3));
 
 		machine().bookkeeping().coin_counter_w(0, data & 0x20);      /* Coin In counter - transistor driven */
 		machine().bookkeeping().coin_counter_w(1, data & 0x40);      /* Token/Ticket Out counter - transistor driven */
@@ -146,14 +143,14 @@ WRITE16_MEMBER(playmark_state::luckboomh_dispenser_w)
 			if ((m_dispenser_latch & 0x80) == 0) m_dispenser_latch = 0;
 			if (data & 0x10) {
 				m_dispenser_latch |= ((data & 0x10) | 0x80);
-				machine().device<ticket_dispenser_device>("token")->write(space, 0, 0x80);
+				m_token->motor_w(1);
 			}
 		}
 		else {
 			m_dispenser_latch &= 0x7f;
-			machine().device<ticket_dispenser_device>("token")->write(space, 0, (m_dispenser_latch & 0x10) ? 0x80 : 0);
+			m_token->motor_w(BIT(m_dispenser_latch, 4));
 		}
-		machine().device<ticket_dispenser_device>("ticket")->write(space, 0, (data & 0x08) ? 0x80 : 0);
+		m_ticket->motor_w(BIT(data, 3));
 
 		machine().bookkeeping().coin_counter_w(0, data & 0x20);      /* Coin In counter - transistor driven */
 		machine().bookkeeping().coin_counter_w(1, data & 0x40);      /* Token/Ticket Out counter - transistor driven */

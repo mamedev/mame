@@ -8313,7 +8313,7 @@ ROM_START( peps0239 ) /* Normal board : Jackpot Jewels Slots (PS0239) - Payout 9
 
 	ROM_REGION( 0x020000, "gfx1", 0 )
 	ROM_LOAD( "mro-cg1151.u72",   0x00000, 0x8000, BAD_DUMP CRC(596f1207) SHA1(d66acfa509e33e9fe2dce89ef4c19909a578b3bf) ) /*  08/24/92   @ IGT  MN */
-	ROM_LOAD( "mgo-cg1151.u73",   0x08000, 0x8000, BAD_DUMP CRC(aa4984ca) SHA1(2bbf2eba739b6cac7459a8021535967520c198ba) ) 
+	ROM_LOAD( "mgo-cg1151.u73",   0x08000, 0x8000, BAD_DUMP CRC(aa4984ca) SHA1(2bbf2eba739b6cac7459a8021535967520c198ba) )
 	ROM_LOAD( "mbo-cg1151.u74",   0x10000, 0x8000, BAD_DUMP CRC(cf13bf00) SHA1(beaaa9acf660bb2c59d68f9f971b1e8f11bd81e9) ) /* one of these four roms are bad as there are 7 rogue */
 	ROM_LOAD( "mxo-cg1151.u75",   0x18000, 0x8000, BAD_DUMP CRC(659d72db) SHA1(973ccd71a7993d1885f1dbd0f877f18133650616) ) /* "green" dots in the single BAR with Diamond graphic */
 

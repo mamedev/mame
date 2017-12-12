@@ -47,14 +47,15 @@ namespace ui {
 
 menu_file_selector::menu_file_selector(mame_ui_manager &mui, render_container &container, device_image_interface *image, std::string &current_directory, std::string &current_file, bool has_empty, bool has_softlist, bool has_create, menu_file_selector::result &result)
 	: menu(mui, container)
+	, m_image(image)
 	, m_current_directory(current_directory)
 	, m_current_file(current_file)
+	, m_has_empty(has_empty)
+	, m_has_softlist(has_softlist)
+	, m_has_create(has_create)
 	, m_result(result)
 {
-	m_image = image;
-	m_has_empty = has_empty;
-	m_has_softlist = has_softlist;
-	m_has_create = has_create;
+	(void)m_image;
 }
 
 
@@ -176,7 +177,9 @@ int menu_file_selector::compare_entries(const file_selector_entry *e1, const fil
 //-------------------------------------------------
 
 menu_file_selector::file_selector_entry &menu_file_selector::append_entry(
-	file_selector_entry_type entry_type, const std::string &entry_basename, const std::string &entry_fullpath)
+		file_selector_entry_type entry_type,
+		const std::string &entry_basename,
+		const std::string &entry_fullpath)
 {
 	return append_entry(entry_type, std::string(entry_basename), std::string(entry_fullpath));
 }
@@ -188,7 +191,9 @@ menu_file_selector::file_selector_entry &menu_file_selector::append_entry(
 //-------------------------------------------------
 
 menu_file_selector::file_selector_entry &menu_file_selector::append_entry(
-	file_selector_entry_type entry_type, std::string &&entry_basename, std::string &&entry_fullpath)
+		file_selector_entry_type entry_type,
+		std::string &&entry_basename,
+		std::string &&entry_fullpath)
 {
 	// allocate a new entry
 	file_selector_entry entry;
@@ -197,47 +202,41 @@ menu_file_selector::file_selector_entry &menu_file_selector::append_entry(
 	entry.fullpath = std::move(entry_fullpath);
 
 	// find the end of the list
-	m_entrylist.emplace_back(std::move(entry));
-	return m_entrylist[m_entrylist.size() - 1];
+	return *m_entrylist.emplace(m_entrylist.end(), std::move(entry));
 }
 
 
 //-------------------------------------------------
-//  append_entry_menu_item - appends
+//  append_dirent_entry - appends
 //  a menu item for a file selector entry
 //-------------------------------------------------
 
 menu_file_selector::file_selector_entry *menu_file_selector::append_dirent_entry(const osd::directory::entry *dirent)
 {
-	std::string buffer;
 	file_selector_entry_type entry_type;
-	file_selector_entry *entry;
-
-	switch(dirent->type)
+	switch (dirent->type)
 	{
-		case osd::directory::entry::entry_type::FILE:
-			entry_type = SELECTOR_ENTRY_TYPE_FILE;
-			break;
+	case osd::directory::entry::entry_type::FILE:
+		entry_type = SELECTOR_ENTRY_TYPE_FILE;
+		break;
 
-		case osd::directory::entry::entry_type::DIR:
-			entry_type = SELECTOR_ENTRY_TYPE_DIRECTORY;
-			break;
+	case osd::directory::entry::entry_type::DIR:
+		entry_type = SELECTOR_ENTRY_TYPE_DIRECTORY;
+		break;
 
-		default:
-			// exceptional case; do not add a menu item
-			return nullptr;
+	default:
+		// exceptional case; do not add a menu item
+		return nullptr;
 	}
 
 	// determine the full path
-	buffer = util::zippath_combine(m_current_directory, dirent->name);
+	std::string buffer = util::zippath_combine(m_current_directory, dirent->name);
 
 	// create the file selector entry
-	entry = &append_entry(
-		entry_type,
-		dirent->name,
-		std::move(buffer));
-
-	return entry;
+	return &append_entry(
+			entry_type,
+			dirent->name,
+			std::move(buffer));
 }
 
 
@@ -290,64 +289,51 @@ void menu_file_selector::append_entry_menu_item(const file_selector_entry *entry
 
 void menu_file_selector::populate(float &customtop, float &custombottom)
 {
-	util::zippath_directory *directory = nullptr;
-	osd_file::error err;
-	const osd::directory::entry *dirent;
-	const file_selector_entry *entry;
 	const file_selector_entry *selected_entry = nullptr;
-	int i;
-	const char *volume_name;
-	uint8_t first;
 
-	// open the directory
-	err = util::zippath_opendir(m_current_directory, &directory);
 
 	// clear out the menu entries
 	m_entrylist.clear();
 
+	// open the directory
+	util::zippath_directory *directory = nullptr;
+	osd_file::error const err = util::zippath_opendir(m_current_directory, &directory);
+
+	// add the "[empty slot]" entry if available
 	if (m_has_empty)
-	{
-		// add the "[empty slot]" entry
 		append_entry(SELECTOR_ENTRY_TYPE_EMPTY, "", "");
-	}
 
+	// add the "[create]" entry
 	if (m_has_create && !util::zippath_is_zip(directory))
-	{
-		// add the "[create]" entry
 		append_entry(SELECTOR_ENTRY_TYPE_CREATE, "", "");
-	}
 
+	// add and select the "[software list]" entry if available
 	if (m_has_softlist)
-	{
-		// add the "[software list]" entry
-		entry = &append_entry(SELECTOR_ENTRY_TYPE_SOFTWARE_LIST, "", "");
-		selected_entry = entry;
-	}
+		selected_entry = &append_entry(SELECTOR_ENTRY_TYPE_SOFTWARE_LIST, "", "");
 
 	// add the drives
-	i = 0;
-	while((volume_name = osd_get_volume_name(i))!=nullptr)
-	{
-		append_entry(SELECTOR_ENTRY_TYPE_DRIVE,
-			volume_name, volume_name);
-		i++;
-	}
+	int i = 0;
+	for (char const *volume_name = osd_get_volume_name(i); volume_name; volume_name = osd_get_volume_name(++i))
+		append_entry(SELECTOR_ENTRY_TYPE_DRIVE, volume_name, volume_name);
 
 	// mark first filename entry
-	first = m_entrylist.size() + 1;
+	std::size_t const first = m_entrylist.size() + 1;
 
 	// build the menu for each item
-	if (err == osd_file::error::NONE)
+	if (osd_file::error::NONE != err)
 	{
-		while((dirent = util::zippath_readdir(directory)) != nullptr)
+		osd_printf_verbose("menu_file_selector::populate: error opening directory '%s' (%d)\n", m_current_directory.c_str(), int(err));
+	}
+	else
+	{
+		for (osd::directory::entry const *dirent = util::zippath_readdir(directory); dirent; dirent = util::zippath_readdir(directory))
 		{
 			// append a dirent entry
-			entry = append_dirent_entry(dirent);
-
-			if (entry != nullptr)
+			file_selector_entry const *entry = append_dirent_entry(dirent);
+			if (entry)
 			{
 				// set the selected item to be the first non-parent directory or file
-				if ((selected_entry == nullptr) && strcmp(dirent->name, ".."))
+				if (!selected_entry && strcmp(dirent->name, ".."))
 					selected_entry = entry;
 
 				// do we have to select this file?
@@ -356,29 +342,31 @@ void menu_file_selector::populate(float &customtop, float &custombottom)
 			}
 		}
 	}
+	if (directory)
+		util::zippath_closedir(directory);
 
 	// sort the menu entries
-	const std::collate<wchar_t>& coll = std::use_facet<std::collate<wchar_t>>(std::locale());
-	std::sort(m_entrylist.begin()+first, m_entrylist.end(), [&coll](file_selector_entry const &x, file_selector_entry const &y)
-		{
-			std::wstring xstr = wstring_from_utf8(x.basename);
-			std::wstring ystr = wstring_from_utf8(y.basename);
-			return coll.compare(xstr.data(), xstr.data()+xstr.size(), ystr.data(), ystr.data()+ystr.size()) < 0;
-		} );
+	const std::collate<wchar_t> &coll = std::use_facet<std::collate<wchar_t>>(std::locale());
+	std::sort(
+			m_entrylist.begin() + first,
+			m_entrylist.end(),
+			[&coll] (file_selector_entry const &x, file_selector_entry const &y)
+			{
+				std::wstring const xstr = wstring_from_utf8(x.basename);
+				std::wstring const ystr = wstring_from_utf8(y.basename);
+				return coll.compare(xstr.data(), xstr.data()+xstr.size(), ystr.data(), ystr.data()+ystr.size()) < 0;
+			});
 
 	// append all of the menu entries
-	for (auto &entry : m_entrylist)
+	for (file_selector_entry const &entry : m_entrylist)
 		append_entry_menu_item(&entry);
 
 	// set the selection (if we have one)
-	if (selected_entry != nullptr)
-		set_selection((void *) selected_entry);
+	if (selected_entry)
+		set_selection((void *)selected_entry);
 
 	// set up custom render proc
 	customtop = ui().get_line_height() + 3.0f * UI_BOX_TB_BORDER;
-
-	if (directory != nullptr)
-		util::zippath_closedir(directory);
 }
 
 
@@ -426,7 +414,7 @@ void menu_file_selector::handle()
 				if (err != osd_file::error::NONE)
 				{
 					// this path is problematic; present the user with an error and bail
-					ui().popup_time(1, "Error accessing %s", entry->fullpath);
+					ui().popup_time(1, _("Error accessing %s"), entry->fullpath);
 					break;
 				}
 				m_current_directory.assign(entry->fullpath);

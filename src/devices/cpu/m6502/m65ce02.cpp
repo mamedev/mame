@@ -10,6 +10,7 @@
 
 #include "emu.h"
 #include "m65ce02.h"
+#include "m65ce02d.h"
 
 DEFINE_DEVICE_TYPE(M65CE02, m65ce02_device, "m65ce02", "M65CE02")
 
@@ -23,9 +24,9 @@ m65ce02_device::m65ce02_device(const machine_config &mconfig, device_type type, 
 {
 }
 
-offs_t m65ce02_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+util::disasm_interface *m65ce02_device::create_disassembler()
 {
-	return disassemble_generic(stream, pc, oprom, opram, options, disasm_entries);
+	return new m65ce02_disassembler;
 }
 
 void m65ce02_device::init()

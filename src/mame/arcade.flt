@@ -172,6 +172,7 @@ bzone.cpp
 cabal.cpp
 cabaret.cpp
 calchase.cpp
+calcune.cpp
 calomega.cpp
 calorie.cpp
 canyon.cpp
@@ -830,6 +831,7 @@ nmk16.cpp
 norautp.cpp
 notechan.cpp
 nova2001.cpp
+nsg6809.cpp
 nsm.cpp
 nsmpoker.cpp
 nss.cpp

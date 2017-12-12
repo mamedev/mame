@@ -22,6 +22,75 @@
 			</diskarea>
 		</part>
 	</software>
+	
+	<software name="prototyp">
+		<description>Prototype</description>
+		<year>1995</year>
+		<publisher>Neo</publisher>
+		<info name="version" value="1.0" />
+		<part name="cdrom" interface="cdrom">
+			<feature name="disk_label" value="Prototype" />
+			<diskarea name="cdrom">
+				<disk name="prototyp" sha1="0cdfabab37e5e9b219b3c8a381c937ae52749bb1" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Can't install to hard disk, can't save game, default text speed is very slow on 486 -->
+	<!-- (set option 5 from 100 to 0 to make text and voices to sync) -->
+	<software name="pompei" supported="partial">
+		<description>Pompei A.D. LXXIX</description>
+		<year>1995</year>
+		<publisher>Finson / Antinomia</publisher>
+		<part name="cdrom" interface="cdrom">
+			<feature name="disk_label" value="CD0141" />
+			<diskarea name="cdrom">
+				<disk name="pompei" sha1="964c914b8580a21b2f1a54e9329336ead243598b" />
+			</diskarea>			
+		</part>
+	</software>
+
+	<software name="sideline">
+		<description>Sideline</description>
+		<year>1996</year>
+		<publisher>EMAG Soft</publisher>
+		<info name="version" value="1.20" />
+		<part name="cdrom" interface="cdrom">
+			<feature name="disk_label" value="Sideline" />
+			<diskarea name="cdrom">
+				<disk name="sideline" sha1="5e6b52aa5cb9df8a65362901ac60a98f8f6ab464" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="ultrasnd" supported="partial">
+		<!-- includes Gravis UltraSound (GUS) Installation - V4.11 -->
+		<description>The UltraSound CD</description>
+		<year>1995</year>
+		<publisher>Advanced Gravis</publisher>
+		<info name="version" value="1.1" />
+
+		<part name="cdrom" interface="cdrom">
+			<feature name="disk_serial" value="490-0028-XX" />
+			<diskarea name="cdrom">
+				<disk name="ultrasnd_cd" sha1="3fe3d683131e5f94bebf25a69c0cd4e496d4891e" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="ultraexp" supported="partial">
+		<!-- includes Gravis UltraSound (GUS) Installation - V3.59 -->
+		<description>The UltraSound Experience</description>
+		<year>1994</year>
+		<publisher>Advanced Gravis</publisher>
+		<info name="version" value="1.0e" />
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="ultraexp" sha1="145027e33e8ed4f342209ec41f9f13e7b8d5ba26" />
+			</diskarea>
+		</part>
+	</software>
 
 	<software name="pcdos2k">
 		<description>PC DOS 2000</description>
@@ -230,6 +299,33 @@
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="en_win2000_pro_sp4" sha1="9344cce041f092f0194944bdc690af7df7185cf6" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="alieninc">
+		<!--
+		Alien Incident
+		English - French - German
+
+		Gametek(R)		compro games
+
+		(C) 1996 Gametek UK
+		All rights reserved
+		Published by Gametek (UK), Ltd.
+		Hogarth House 29 - 31 Sheet St.
+		Windsor, SL4 1BY U.K.
+
+		Mastered by AMI American Multimedia, Inc.
+		GCR-102-0062 G2 960914
+		-->
+		<description>Alien Incident (Eng, Fre, Ger, Fin) (v1.30)</description>
+		<year>1996</year>
+		<publisher>Gametek</publisher>
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="gcr-102-0062" sha1="183949d162064c38a21d6a143a815af6760233fb" />
 			</diskarea>
 		</part>
 	</software>

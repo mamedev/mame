@@ -1,5 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Luca Elia
+#ifndef MAME_INCLUDES_CAVE_H
+#define MAME_INCLUDES_CAVE_H
+
+#pragma once
 
 /***************************************************************************
 
@@ -14,26 +18,31 @@
 #include "sound/okim6295.h"
 #include "screen.h"
 
-struct sprite_cave
-{
-	int priority, flags;
-
-	const uint8_t *pen_data;  /* points to top left corner of tile data */
-	int line_offset;
-
-	pen_t base_pen;
-	int tile_width, tile_height;
-	int total_width, total_height;  /* in screen coordinates */
-	int x, y, xcount0, ycount0;
-	int zoomx_re, zoomy_re;
-};
-
-#define MAX_PRIORITY        4
-#define MAX_SPRITE_NUM      0x400
-
 class cave_state : public driver_device
 {
 public:
+	enum
+	{
+		MAX_PRIORITY        = 4,
+		MAX_SPRITE_NUM      = 0x400
+	};
+
+	struct sprite_cave
+	{
+		sprite_cave() { }
+
+		int priority = 0, flags = 0;
+
+		const uint8_t *pen_data = nullptr;  /* points to top left corner of tile data */
+		int line_offset = 0;
+
+		pen_t base_pen = 0;
+		int tile_width = 0, tile_height = 0;
+		int total_width = 0, total_height = 0;  /* in screen coordinates */
+		int x = 0, y = 0, xcount0 = 0, ycount0 = 0;
+		int zoomx_re = 0, zoomy_re = 0;
+	};
+
 	cave_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_videoregs(*this, "videoregs.%u", 0)
@@ -63,8 +72,8 @@ public:
 	optional_shared_ptr_array<uint16_t, 4> m_paletteram;
 
 	/* video-related */
-	struct sprite_cave *m_sprite[4];
-	struct sprite_cave *m_sprite_table[4][MAX_PRIORITY][MAX_SPRITE_NUM + 1];
+	std::unique_ptr<sprite_cave []> m_sprite[4];
+	sprite_cave *m_sprite_table[4][MAX_PRIORITY][MAX_SPRITE_NUM + 1];
 
 	struct
 	{
@@ -268,10 +277,10 @@ private:
 	void get_sprite_info_donpachi(int chip);
 	void sprite_init_cave();
 	void cave_sprite_check(int chip, screen_device &screen, const rectangle &clip);
-	void do_blit_zoom32_cave( int chip, const struct sprite_cave *sprite );
-	void do_blit_zoom32_cave_zb( int chip, const struct sprite_cave *sprite );
-	void do_blit_32_cave( int chip, const struct sprite_cave *sprite );
-	void do_blit_32_cave_zb( int chip, const struct sprite_cave *sprite );
+	void do_blit_zoom32_cave( int chip, const sprite_cave *sprite );
+	void do_blit_zoom32_cave_zb( int chip, const sprite_cave *sprite );
+	void do_blit_32_cave( int chip, const sprite_cave *sprite );
+	void do_blit_32_cave_zb( int chip, const sprite_cave *sprite );
 	void sprite_draw_cave( int chip, int priority );
 	void sprite_draw_cave_zbuf( int chip, int priority );
 	void sprite_draw_donpachi( int chip, int priority );
@@ -279,3 +288,5 @@ private:
 	void init_cave();
 	void show_leds();
 };
+
+#endif // MAME_INCLUDES_CAVE_H

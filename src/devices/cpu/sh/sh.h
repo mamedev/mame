@@ -99,8 +99,6 @@
 
 #define R32(reg)        m_regmap[reg]
 
-extern unsigned DasmSH2(std::ostream &stream, unsigned pc, uint16_t opcode);
-
 enum
 {
 	SH4_PC = 1, SH_SR, SH4_PR, SH4_GBR, SH4_VBR, SH4_DBR, SH4_MACH, SH4_MACL,
@@ -349,7 +347,7 @@ public:
 
 	void sh2drc_add_fastram(offs_t start, offs_t end, uint8_t readonly, void *base);
 
-	direct_read_data *m_direct;
+	direct_read_data<0> *m_direct;
 	address_space *m_program;
 
 	std::unique_ptr<drcuml_state>      m_drcuml;                 /* DRC UML generator state */

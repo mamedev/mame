@@ -246,7 +246,7 @@ WRITE8_MEMBER(cfrogger_state::plate_w)
 	if (offset == MELPS4_PORTF)
 		m_inp_mux = data & 3;
 
-	// Sx,Fx,Gx: vfd matrix plate
+	// Sx,Fx,Gx: vfd plate
 	int mask = (offset == MELPS4_PORTS) ? 0xff : 0xf; // port S is 8-bit
 	int shift = (offset == MELPS4_PORTS) ? 0 : (offset + 1) * 4;
 	m_plate = (m_plate & ~(mask << shift)) | (data << shift);
@@ -255,7 +255,7 @@ WRITE8_MEMBER(cfrogger_state::plate_w)
 
 WRITE16_MEMBER(cfrogger_state::grid_w)
 {
-	// D0-D11: vfd matrix grid
+	// D0-D11: vfd grid
 	m_grid = data;
 	prepare_display();
 }
@@ -362,7 +362,7 @@ WRITE8_MEMBER(gjungler_state::plate_w)
 	if (offset == MELPS4_PORTG)
 		m_inp_mux = data & 3;
 
-	// Sx,Fx,Gx,U: vfd matrix plate
+	// Sx,Fx,Gx,U: vfd plate
 	int mask = (offset == MELPS4_PORTS) ? 0xff : 0xf; // port S is 8-bit
 	int shift = (offset == MELPS4_PORTS) ? 0 : (offset + 1) * 4;
 	m_plate = (m_plate & ~(mask << shift)) | (data << shift);
@@ -371,7 +371,7 @@ WRITE8_MEMBER(gjungler_state::plate_w)
 
 WRITE16_MEMBER(gjungler_state::grid_w)
 {
-	// D0-D11: vfd matrix grid
+	// D0-D11: vfd grid
 	m_grid = data;
 	prepare_display();
 }

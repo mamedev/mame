@@ -7,23 +7,9 @@
 */
 
 #include "emu.h"
-#include "debugger.h"
-#include "tms1k_base.h"
+#include "tms1k_dasm.h"
 
-
-enum e_mnemonics
-{
-	zILL = 0,
-	zA10AAC, zA6AAC, zA8AAC, zAC1AC, zACACC, zACNAA, zALEC, zALEM, zAMAAC, zBRANCH, zCALL, zCCLA,
-	zCLA, zCLO, zCOMC, zCOMX, zCOMX8, zCPAIZ, zCTMDYN, zDAN, zDMAN, zDMEA, zDNAA,
-	zDYN, zIA, zIMAC, zIYC, zKNEZ, zLDP, zLDX2, zLDX3, zLDX4, zMNEA, zMNEZ,
-	zNDMEA, zOFF, zRBIT, zREAC, zRETN, zRSTR, zSAL, zSAMAN, zSBIT,
-	zSBL, zSEAC, zSETR, zTAM, zTAMACS, zTAMDYN, zTAMIY, zTAMIYC, zTAMZA,
-	zTAY, zTBIT, zTCMIY, zTCY, zTDO, zTKA, zTKM, zTMA,
-	zTMY, zTYA, zXDA, zXMA, zYMCY, zYNEA, zYNEC
-};
-
-static const char *const s_mnemonic[] =
+const char *const tms1000_base_disassembler::s_mnemonic[] =
 {
 	"?",
 	"A10AAC", "A6AAC", "A8AAC", "AC1AC", "ACACC", "ACNAA", "ALEC", "ALEM", "AMAAC", "BRANCH", "CALL", "CCLA",
@@ -35,29 +21,19 @@ static const char *const s_mnemonic[] =
 	"TMY", "TYA", "XDA", "XMA", "YMCY", "YNEA", "YNEC"
 };
 
-
-#define _OVER DASMFLAG_STEP_OVER
-#define _OUT  DASMFLAG_STEP_OUT
-
-static const u32 s_flags[] =
+const u32 tms1000_base_disassembler::s_flags[] =
 {
 	0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, _OVER, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, STEP_OVER, 0,
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, _OUT, 0, 0, 0, 0,
+	0, 0, 0, 0, STEP_OUT, 0, 0, 0, 0,
 	0, 0, 0, 0, 0, 0, 0, 0, 0,
 	0, 0, 0, 0, 0, 0, 0, 0,
 	0, 0, 0, 0, 0, 0, 0
 };
 
-
-enum e_addressing
-{
-	zB0 = 0, zI2, zI3, zI4, zB7
-};
-
-static const u8 s_addressing[] =
+const u8 tms1000_base_disassembler::s_addressing[] =
 {
 	zB0,
 	zB0, zB0, zB0, zI4, zI4, zI4, zI4, zB0, zB0, zB7, zB7, zB0,
@@ -73,7 +49,7 @@ static const u8 s_addressing[] =
 
 // opcode luts
 
-static const u8 tms1000_mnemonic[256] =
+const u8 tms1000_disassembler::tms1000_mnemonic[256] =
 {
 /* 0x00 */
 	zCOMX,   zA8AAC,  zYNEA,   zTAM,    zTAMZA,  zA10AAC, zA6AAC,  zDAN,    zTKA,    zKNEZ,   zTDO,    zCLO,    zRSTR,   zSETR,   zIA,     zRETN,   // 0
@@ -97,7 +73,7 @@ static const u8 tms1000_mnemonic[256] =
 };
 
 
-static const u8 tms1100_mnemonic[256] =
+const u8 tms1100_disassembler::tms1100_mnemonic[256] =
 {
 /* 0x00 */
 	zMNEA,   zALEM,   zYNEA,   zXMA,    zDYN,    zIYC,    zAMAAC,  zDMAN,   zTKA,    zCOMX,   zTDO,    zCOMC,   zRSTR,   zSETR,   zKNEZ,   zRETN,   // 0
@@ -121,7 +97,7 @@ static const u8 tms1100_mnemonic[256] =
 };
 
 
-static const u8 tms0980_mnemonic[512] =
+const u8 tms0980_disassembler::tms0980_mnemonic[512] =
 {
 /* 0x000 */
 	zCOMX,   zALEM,   zYNEA,   zXMA,    zDYN,    zIYC,    zCLA,    zDMAN,   zTKA,    zMNEA,   zTKM,    0,       0,       zSETR,   zKNEZ,   0,       // 0
@@ -163,7 +139,7 @@ static const u8 tms0980_mnemonic[512] =
 };
 
 
-static const u8 tp0320_mnemonic[512] =
+const u8 tp0320_disassembler::tp0320_mnemonic[512] =
 {
 /* 0x000 */
 	0,       zALEM,   zYNEA,   zXMA,    zDYN,    zIYC,    zCLA,    zDMAN,   zTKA,    zMNEA,   zTKM,    0,       0,       zSETR,   zKNEZ,   0,       // 0
@@ -208,31 +184,27 @@ static const u8 tp0320_mnemonic[512] =
 
 // disasm
 
-static const u8 i2_value[4] =
+const u8 tms1000_base_disassembler::i2_value[4] =
 {
 	0, 2, 1, 3
 };
 
-static const u8 i3_value[8] =
+const u8 tms1000_base_disassembler::i3_value[8] =
 {
 	0, 4, 2, 6, 1, 5, 3, 7
 };
 
-static const u8 i4_value[16] =
+const u8 tms1000_base_disassembler::i4_value[16] =
 {
 	0x0, 0x8, 0x4, 0xc, 0x2, 0xa, 0x6, 0xe, 0x1, 0x9, 0x5, 0xd, 0x3, 0xb, 0x7, 0xf
 };
 
-static offs_t tms1k_dasm(std::ostream &stream, const u8 *oprom, const u8 *lut_mnemonic, u16 opcode_mask)
+offs_t tms1000_base_disassembler::disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params)
 {
-	// get current opcode
-	int pos = 0;
-	u16 op = oprom[pos++];
-	if (opcode_mask & 0x100)
-		op = (op << 8 | oprom[pos++]) & 0x1ff;
+	u16 op = m_opcode_9bits ? opcodes.r16(pc) & 0x1ff : opcodes.r8(pc);
 
 	// convert to mnemonic/param
-	u16 instr = lut_mnemonic[op];
+	u16 instr = m_lut_mnemonic[op];
 	util::stream_format(stream, "%-8s ", s_mnemonic[instr]);
 
 	switch( s_addressing[instr] )
@@ -247,35 +219,90 @@ static offs_t tms1k_dasm(std::ostream &stream, const u8 *oprom, const u8 *lut_mn
 			util::stream_format(stream, "%d", i4_value[op & 0x0f]);
 			break;
 		case zB7:
-			if (opcode_mask & 0x100)
-				util::stream_format(stream, "$%02X", op << 1 & 0xfe);
-			else
-				util::stream_format(stream, "$%02X", op & 0x3f);
+			util::stream_format(stream, "$%02X", op & (m_opcode_9bits ? 0x7f : 0x3f));
 			break;
 		default:
 			break;
 	}
 
-	return pos | s_flags[instr] | DASMFLAG_SUPPORTED;
+	return 1 | s_flags[instr] | SUPPORTED;
 }
 
-
-CPU_DISASSEMBLE(tms1000)
+tms1000_disassembler::tms1000_disassembler() : tms1000_base_disassembler(tms1000_mnemonic, false, 6)
 {
-	return tms1k_dasm(stream, oprom, tms1000_mnemonic, 0xff);
 }
 
-CPU_DISASSEMBLE(tms1100)
+tms1100_disassembler::tms1100_disassembler() : tms1000_base_disassembler(tms1100_mnemonic, false, 6)
 {
-	return tms1k_dasm(stream, oprom, tms1100_mnemonic, 0xff);
 }
 
-CPU_DISASSEMBLE(tms0980)
+tms0980_disassembler::tms0980_disassembler() : tms1000_base_disassembler(tms0980_mnemonic, true, 7)
 {
-	return tms1k_dasm(stream, oprom, tms0980_mnemonic, 0x1ff);
 }
 
-CPU_DISASSEMBLE(tp0320)
+tp0320_disassembler::tp0320_disassembler() : tms1000_base_disassembler(tp0320_mnemonic, true, 7)
 {
-	return tms1k_dasm(stream, oprom, tp0320_mnemonic, 0x1ff);
 }
+
+tms1000_base_disassembler::tms1000_base_disassembler(const u8 *lut_mnemonic, bool opcode_9bits, int pc_bits) : m_lut_mnemonic(lut_mnemonic), m_opcode_9bits(opcode_9bits), m_pc_bits(pc_bits)
+{
+}
+
+offs_t tms1000_base_disassembler::pc_linear_to_real(offs_t pc) const
+{
+	switch(m_pc_bits) {
+	case 6: {
+		static const u8 l2r6[64] = {
+			0x00, 0x01, 0x03, 0x07, 0x0f, 0x1f, 0x3f, 0x3e, 0x3d, 0x3b, 0x37, 0x2f, 0x1e, 0x3c, 0x39, 0x33,
+			0x27, 0x0e, 0x1d, 0x3a, 0x35, 0x2b, 0x16, 0x2c, 0x18, 0x30, 0x21, 0x02, 0x05, 0x0b, 0x17, 0x2e,
+			0x1c, 0x38, 0x31, 0x23, 0x06, 0x0d, 0x1b, 0x36, 0x2d, 0x1a, 0x34, 0x29, 0x12, 0x24, 0x08, 0x11,
+			0x22, 0x04, 0x09, 0x13, 0x26, 0x0c, 0x19, 0x32, 0x25, 0x0a, 0x15, 0x2a, 0x14, 0x28, 0x10, 0x20,
+		};
+		return (pc & ~0x3f) | l2r6[pc & 0x3f];
+	}
+	case 7: {
+		static const u8 l2r7[128] = {
+			0x00, 0x01, 0x03, 0x07, 0x0f, 0x1f, 0x3f, 0x7f, 0x7e, 0x7d, 0x7b, 0x77, 0x6f, 0x5f, 0x3e, 0x7c,
+			0x79, 0x73, 0x67, 0x4f, 0x1e, 0x3d, 0x7a, 0x75, 0x6b, 0x57, 0x2e, 0x5c, 0x38, 0x70, 0x61, 0x43,
+			0x06, 0x0d, 0x1b, 0x37, 0x6e, 0x5d, 0x3a, 0x74, 0x69, 0x53, 0x26, 0x4c, 0x18, 0x31, 0x62, 0x45,
+			0x0a, 0x15, 0x2b, 0x56, 0x2c, 0x58, 0x30, 0x60, 0x41, 0x02, 0x05, 0x0b, 0x17, 0x2f, 0x5e, 0x3c,
+			0x78, 0x71, 0x63, 0x47, 0x0e, 0x1d, 0x3b, 0x76, 0x6d, 0x5b, 0x36, 0x6c, 0x59, 0x32, 0x64, 0x49,
+			0x12, 0x25, 0x4a, 0x14, 0x29, 0x52, 0x24, 0x48, 0x10, 0x21, 0x42, 0x04, 0x09, 0x13, 0x27, 0x4e,
+			0x1c, 0x39, 0x72, 0x65, 0x4b, 0x16, 0x2d, 0x5a, 0x34, 0x68, 0x51, 0x22, 0x44, 0x08, 0x11, 0x23,
+			0x46, 0x0c, 0x19, 0x33, 0x66, 0x4d, 0x1a, 0x35, 0x6a, 0x55, 0x2a, 0x54, 0x28, 0x50, 0x20, 0x40,
+		};
+		return (pc & ~0x7f) | l2r7[pc & 0x7f];
+	}
+	}
+	return 0;
+}
+
+offs_t tms1000_base_disassembler::pc_real_to_linear(offs_t pc) const
+{
+	switch(m_pc_bits) {
+	case 6: {
+		static const u8 r2l6[64] = {
+			0x00, 0x01, 0x1b, 0x02, 0x31, 0x1c, 0x24, 0x03, 0x2e, 0x32, 0x39, 0x1d, 0x35, 0x25, 0x11, 0x04,
+			0x3e, 0x2f, 0x2c, 0x33, 0x3c, 0x3a, 0x16, 0x1e, 0x18, 0x36, 0x29, 0x26, 0x20, 0x12, 0x0c, 0x05,
+			0x3f, 0x1a, 0x30, 0x23, 0x2d, 0x38, 0x34, 0x10, 0x3d, 0x2b, 0x3b, 0x15, 0x17, 0x28, 0x1f, 0x0b,
+			0x19, 0x22, 0x37, 0x0f, 0x2a, 0x14, 0x27, 0x0a, 0x21, 0x0e, 0x13, 0x09, 0x0d, 0x08, 0x07, 0x06,
+		};
+		return (pc & ~0x3f) | r2l6[pc & 0x3f];
+	}
+	case 7: {
+		static const u8 r2l7[128] = {
+			0x00, 0x01, 0x39, 0x02, 0x5b, 0x3a, 0x20, 0x03, 0x6d, 0x5c, 0x30, 0x3b, 0x71, 0x21, 0x44, 0x04,
+			0x58, 0x6e, 0x50, 0x5d, 0x53, 0x31, 0x65, 0x3c, 0x2c, 0x72, 0x76, 0x22, 0x60, 0x45, 0x14, 0x05,
+			0x7e, 0x59, 0x6b, 0x6f, 0x56, 0x51, 0x2a, 0x5e, 0x7c, 0x54, 0x7a, 0x32, 0x34, 0x66, 0x1a, 0x3d,
+			0x36, 0x2d, 0x4d, 0x73, 0x68, 0x77, 0x4a, 0x23, 0x1c, 0x61, 0x26, 0x46, 0x3f, 0x15, 0x0e, 0x06,
+			0x7f, 0x38, 0x5a, 0x1f, 0x6c, 0x2f, 0x70, 0x43, 0x57, 0x4f, 0x52, 0x64, 0x2b, 0x75, 0x5f, 0x13,
+			0x7d, 0x6a, 0x55, 0x29, 0x7b, 0x79, 0x33, 0x19, 0x35, 0x4c, 0x67, 0x49, 0x1b, 0x25, 0x3e, 0x0d,
+			0x37, 0x1e, 0x2e, 0x42, 0x4e, 0x63, 0x74, 0x12, 0x69, 0x28, 0x78, 0x18, 0x4b, 0x48, 0x24, 0x0c,
+			0x1d, 0x41, 0x62, 0x11, 0x27, 0x17, 0x47, 0x0b, 0x40, 0x10, 0x16, 0x0a, 0x0f, 0x09, 0x08, 0x07,
+		};
+		return (pc & ~0x7f) | r2l7[pc & 0x7f];
+	}
+	}
+	return 0;
+}
+

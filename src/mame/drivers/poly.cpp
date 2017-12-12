@@ -86,8 +86,7 @@ static ADDRESS_MAP_START(poly_mem, AS_PROGRAM, 8, poly_state)
 	AM_RANGE(0xa000,0xcfff) AM_ROM
 	AM_RANGE(0xd000,0xdfff) AM_RAM
 	AM_RANGE(0xe000,0xe003) AM_DEVREADWRITE("pia0", pia6821_device, read, write) //video control PIA 6821
-	AM_RANGE(0xe004,0xe004) AM_DEVREADWRITE("acia", acia6850_device, status_r, control_w)
-	AM_RANGE(0xe005,0xe005) AM_DEVREADWRITE("acia", acia6850_device, data_r, data_w)
+	AM_RANGE(0xe004,0xe005) AM_DEVREADWRITE("acia", acia6850_device, read, write)
 	AM_RANGE(0xe006,0xe006) AM_WRITE(baud_rate_w)
 	AM_RANGE(0xe00c,0xe00f) AM_DEVREADWRITE("pia1", pia6821_device, read, write) //keyboard PIA 6821
 	AM_RANGE(0xe020,0xe027) AM_DEVREADWRITE("ptm", ptm6840_device, read, write) //timer 6840
@@ -153,7 +152,7 @@ WRITE8_MEMBER(poly_state::baud_rate_w)
 
 static MACHINE_CONFIG_START( poly )
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6809E, XTAL_12_0576MHz / 3)
+	MCFG_CPU_ADD("maincpu", MC6809, XTAL_12_0576MHz / 3) // nominally 4 MHz
 	MCFG_CPU_PROGRAM_MAP(poly_mem)
 
 	/* video hardware */

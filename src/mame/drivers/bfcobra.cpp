@@ -92,7 +92,7 @@
     Defines
 */
 #define Z80_XTAL    5910000     /* Unconfirmed */
-#define M6809_XTAL  1000000
+#define M6809_XTAL  4000000     /* Unconfirmed */
 
 
 
@@ -1262,10 +1262,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( z80_io_map, AS_IO, 8, bfcobra_state )
 ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x23) AM_READWRITE(chipset_r, chipset_w)
-	AM_RANGE(0x24, 0x24) AM_DEVWRITE("acia6850_0", acia6850_device, control_w)
-	AM_RANGE(0x25, 0x25) AM_DEVWRITE("acia6850_0", acia6850_device, data_w)
-	AM_RANGE(0x26, 0x26) AM_DEVREAD("acia6850_0", acia6850_device, status_r)
-	AM_RANGE(0x27, 0x27) AM_DEVREAD("acia6850_0", acia6850_device, data_r)
+	AM_RANGE(0x24, 0x25) AM_DEVWRITE("acia6850_0", acia6850_device, write)
+	AM_RANGE(0x26, 0x27) AM_DEVREAD("acia6850_0", acia6850_device, read)
 	AM_RANGE(0x30, 0x30) AM_READ(fdctrl_r)
 	AM_RANGE(0x31, 0x31) AM_READWRITE(fddata_r, fdctrl_w)
 	AM_RANGE(0x40, 0x40) AM_WRITE(rombank_w)
@@ -1400,10 +1398,8 @@ static ADDRESS_MAP_START( m6809_prog_map, AS_PROGRAM, 8, bfcobra_state )
 	AM_RANGE(0x2E00, 0x2E00) AM_READ(int_latch_r)
 	AM_RANGE(0x3001, 0x3001) AM_DEVWRITE("aysnd", ay8910_device, data_w)
 	AM_RANGE(0x3201, 0x3201) AM_DEVWRITE("aysnd", ay8910_device, address_w)
-	AM_RANGE(0x3404, 0x3404) AM_DEVREADWRITE("acia6850_1", acia6850_device, status_r, control_w)
-	AM_RANGE(0x3405, 0x3405) AM_DEVREADWRITE("acia6850_1", acia6850_device, data_r, data_w)
-	AM_RANGE(0x3406, 0x3406) AM_DEVREADWRITE("acia6850_2", acia6850_device, status_r, control_w)
-	AM_RANGE(0x3407, 0x3407) AM_DEVREADWRITE("acia6850_2", acia6850_device, data_r, data_w)
+	AM_RANGE(0x3404, 0x3405) AM_DEVREADWRITE("acia6850_1", acia6850_device, read, write)
+	AM_RANGE(0x3406, 0x3407) AM_DEVREADWRITE("acia6850_2", acia6850_device, read, write)
 //  AM_RANGE(0x3408, 0x3408) AM_NOP
 //  AM_RANGE(0x340A, 0x340A) AM_NOP
 //  AM_RANGE(0x3600, 0x3600) AM_NOP
@@ -1637,7 +1633,7 @@ static MACHINE_CONFIG_START( bfcobra )
 	MCFG_CPU_IO_MAP(z80_io_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", bfcobra_state,  vblank_gen)
 
-	MCFG_CPU_ADD("audiocpu", M6809, M6809_XTAL)
+	MCFG_CPU_ADD("audiocpu", MC6809, M6809_XTAL) // MC6809P
 	MCFG_CPU_PROGRAM_MAP(m6809_prog_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(bfcobra_state, timer_irq, 1000)
 
@@ -1659,7 +1655,7 @@ static MACHINE_CONFIG_START( bfcobra )
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("aysnd", AY8910, M6809_XTAL)
+	MCFG_SOUND_ADD("aysnd", AY8910, M6809_XTAL / 4)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 
 	MCFG_SOUND_ADD("upd", UPD7759, UPD7759_STANDARD_CLOCK)

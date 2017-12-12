@@ -35,25 +35,25 @@ PALETTE_INIT_MEMBER(exterm_state, exterm)
 
 TMS340X0_TO_SHIFTREG_CB_MEMBER(exterm_state::to_shiftreg_master)
 {
-	memcpy(shiftreg, &m_master_videoram[TOWORD(address)], 256 * sizeof(uint16_t));
+	memcpy(shiftreg, &m_master_videoram[address >> 4], 256 * sizeof(uint16_t));
 }
 
 
 TMS340X0_FROM_SHIFTREG_CB_MEMBER(exterm_state::from_shiftreg_master)
 {
-	memcpy(&m_master_videoram[TOWORD(address)], shiftreg, 256 * sizeof(uint16_t));
+	memcpy(&m_master_videoram[address >> 4], shiftreg, 256 * sizeof(uint16_t));
 }
 
 
 TMS340X0_TO_SHIFTREG_CB_MEMBER(exterm_state::to_shiftreg_slave)
 {
-	memcpy(shiftreg, &m_slave_videoram[TOWORD(address)], 256 * 2 * sizeof(uint8_t));
+	memcpy(shiftreg, &m_slave_videoram[address >> 4], 256 * 2 * sizeof(uint8_t));
 }
 
 
 TMS340X0_FROM_SHIFTREG_CB_MEMBER(exterm_state::from_shiftreg_slave)
 {
-	memcpy(&m_slave_videoram[TOWORD(address)], shiftreg, 256 * 2 * sizeof(uint8_t));
+	memcpy(&m_slave_videoram[address >> 4], shiftreg, 256 * 2 * sizeof(uint8_t));
 }
 
 
