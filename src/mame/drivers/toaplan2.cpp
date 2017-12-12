@@ -4069,10 +4069,10 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( batrider )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_32MHz/2)       /* 16MHz , 32MHz Oscillator */
+	MCFG_CPU_ADD("maincpu", M68000, XTAL_32MHz/2) /* 16MHz , 32MHz Oscillator (verified) */
 	MCFG_CPU_PROGRAM_MAP(batrider_68k_mem)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_32MHz/8)     /* 4MHz , 32MHz Oscillator */
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL_32MHz/6) /* 5.333MHz , 32MHz Oscillator (verified) */
 	MCFG_CPU_PROGRAM_MAP(batrider_sound_z80_mem)
 	MCFG_CPU_IO_MAP(batrider_sound_z80_port)
 
@@ -4109,7 +4109,7 @@ static MACHINE_CONFIG_START( batrider )
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch3")
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch4")
 
-	MCFG_YM2151_ADD("ymsnd", XTAL_32MHz/8)
+	MCFG_YM2151_ADD("ymsnd", XTAL_32MHz/8) /* 4MHz , 32MHz Oscillator (verified) */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MCFG_OKIM6295_ADD("oki1", XTAL_32MHz/10, PIN7_HIGH)
