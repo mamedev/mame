@@ -126,6 +126,10 @@ void smc91c9x_device::device_start()
 
 	m_irq_handler.resolve_safe();
 
+	// Set completion queues to max size to save properly
+	m_comp_rx.resize(ETHER_BUFFERS);
+	m_comp_tx.resize(ETHER_BUFFERS);
+
 	/* register ide states */
 	save_item(NAME(m_reg));
 	save_item(NAME(m_regmask));
@@ -135,9 +139,8 @@ void smc91c9x_device::device_start()
 	save_item(NAME(m_recd));
 	save_item(NAME(m_alloc_rx));
 	save_item(NAME(m_alloc_tx));
-	// TODO: Need to save these
-	//save_item(NAME(m_comp_rx));
-	//save_item(NAME(m_comp_tx));
+	save_item(NAME(m_comp_rx));
+	save_item(NAME(m_comp_tx));
 }
 
 //-------------------------------------------------
@@ -222,11 +225,10 @@ void smc91c9x_device::mmu_reset()
 	// Reset MMU allocations
 	m_alloc_rx = 0;
 	m_alloc_tx = 0;
+
 	// Reset completion FIFOs
-	while (!m_comp_tx.empty())
-		m_comp_tx.pop();
-	while (!m_comp_rx.empty())
-		m_comp_rx.pop();
+	m_comp_tx.clear();
+	m_comp_rx.clear();
 
 	// Flush fifos.
 	clear_tx_fifo();
@@ -426,7 +428,7 @@ void smc91c9x_device::recv_cb(uint8_t *data, int length)
 		packet[3] = (dst) >> 8;
 
 		// Push packet number to rx completion fifo
-		m_comp_rx.push(packet_num);
+		m_comp_rx.push_back(packet_num);
 	}
 	else
 	{
@@ -627,7 +629,7 @@ void smc91c9x_device::process_command(uint16_t data)
 
 		case ECMD_REMOVE_TOPFRAME_TX:
 			LOG("   REMOVE FRAME FROM TX FIFO\n");
-			m_comp_tx.pop();
+			m_comp_tx.erase(m_comp_tx.begin());
 			// TODO: Should we clear TX_INT?
 			break;
 
@@ -639,7 +641,7 @@ void smc91c9x_device::process_command(uint16_t data)
 		case ECMD_REMOVE_TOPFRAME_RX:
 			LOG("   REMOVE FRAME FROM RX FIFO\n");
 			// remove entry from rx queue
-			m_comp_rx.pop();
+			m_comp_rx.erase(m_comp_rx.begin());
 
 			update_ethernet_irq();
 			m_recd++;
@@ -661,7 +663,7 @@ void smc91c9x_device::process_command(uint16_t data)
 			{
 				const int packet_number = m_reg[EREG_PNR_ARR] & 0xff;
 				// Push packet number tx completion fifo
-				m_comp_tx.push(packet_number);
+				m_comp_tx.push_back(packet_number);
 				m_tx_timer->adjust(attotime::from_usec(10));
 			}
 			break;
@@ -873,7 +875,7 @@ WRITE16_MEMBER( smc91c9x_device::write )
 		case EREG_INTERRUPT:
 			// Pop tx fifo packet from completion fifo if clear tx int is set
 			if (m_reg[EREG_INTERRUPT] & data & EINT_TX) {
-				m_comp_tx.pop();
+				m_comp_tx.erase(m_comp_tx.begin());
 				m_reg[EREG_INTERRUPT] &= ~EINT_TX;
 			}
 			m_reg[EREG_INTERRUPT] &= ~(data & 0x56);

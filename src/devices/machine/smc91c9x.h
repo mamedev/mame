@@ -11,8 +11,6 @@
 #ifndef MAME_MACHINE_SMC91C9X_H
 #define MAME_MACHINE_SMC91C9X_H
 
-#include <queue>
-
 /***************************************************************************
     TYPE DEFINITIONS
 ***************************************************************************/
@@ -45,7 +43,7 @@ private:
 	// mmu
 	// The bits in these vectors indicate a packet has been allocated
 	u32 m_alloc_rx, m_alloc_tx;
-	std::queue<int> m_comp_tx, m_comp_rx;
+	std::vector<int> m_comp_tx, m_comp_rx;
 	// Requests a packet allocation and returns true
 	// and sets the packet number if successful
 	bool alloc_req(const int tx, int &packet_num);
