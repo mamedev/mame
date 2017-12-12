@@ -75,16 +75,16 @@
 	06 - zoom something, 0F-7F, default 1F
 	08 - fg? scroll x
 	0a - fg? scroll y
-	0e - sprite related, set to 1 at sprite hw init
-	10 - sprite related, orleg2 - 0x13, kov2nl - 0x14
+	0e - ? 1 at init (sprite related?)
+	10 - ? orleg2 - 0x13, kov2nl - 0x14 at init (sprite related?)
 	14 - sprite enable ? set to 0 before spriteram update, to 1 after
 	16 - enable access to vrams/palettes/etc ? (bitmask)
 	18 - vblank ack
 	1a - ? 0 at init
-	1c - sprite related, orleg2 - 5, kov2nl - 7
-	1e - sprite related, set to 2 at sprite hw init
+	1c - ? orleg2 - 5, kov2nl - 7 at init (sprite related?)
+	1e - ? 2 at init (sprite related?)
 	32 - shared RAM bank
-	34, 36 - sprite related, set to 0 at sprite hw init, some unused xor feature ?
+	34, 36 - ? 0 at init, some unused xor feature ?
 	38, 3a - sprite mask xor key
 
 */
@@ -805,6 +805,9 @@ ROM_END
 ROM_START( kov3 )
 	ROM_REGION( 0x04000, "maincpu", 0 )
 	ROM_LOAD( "kov3_igs036.rom",         0x00000000, 0x0004000, NO_DUMP ) // CRC(c7d33764) SHA1(5cd48f876e637d60391d39ac6e40bf243300cc75)
+
+	ROM_REGION( 0x108, "default_card", 0 )
+	ROM_LOAD( "blank_kov3_china_card.pg2", 0x000, 0x108, CRC(bd5a968f) SHA1(b9045eb70e02afda7810431c592208053d863980) )
 
 	ROM_REGION( 0x1000000, "user1", 0 )
 	ROM_LOAD( "kov3_v104cn_raw.bin",         0x00000000, 0x0800000, CRC(1b5cbd24) SHA1(6471d4842a08f404420dea2bd1c8b88798c80fd5) )
