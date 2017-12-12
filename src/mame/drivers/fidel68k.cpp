@@ -183,7 +183,8 @@ B0000x-xxxxxx: see V7, -800000
 #include "speaker.h"
 
 // internal artwork
-#include "fidel_desdis_68k.lh" // clickable
+#include "fidel_desdis_68kg.lh" // clickable
+#include "fidel_desdis_68kr.lh" // clickable
 #include "fidel_ex_68k.lh" // clickable
 #include "fidel_eag_68k.lh" // clickable
 
@@ -569,7 +570,7 @@ static MACHINE_CONFIG_START( fdes2265 )
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_off", fidel68k_state, irq_off, attotime::from_hz(597))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", fidelbase_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_fidel_desdis_68k)
+	MCFG_DEFAULT_LAYOUT(layout_fidel_desdis_68kr)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
@@ -583,6 +584,8 @@ static MACHINE_CONFIG_DERIVED( fdes2325, fdes2265 )
 	/* basic machine hardware */
 	MCFG_CPU_REPLACE("maincpu", M68EC020, XTAL_20MHz) // MC68EC020RP25
 	MCFG_CPU_PROGRAM_MAP(fdes2325_map)
+
+	MCFG_DEFAULT_LAYOUT(layout_fidel_desdis_68kg)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( eag )
