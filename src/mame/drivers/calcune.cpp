@@ -1,5 +1,17 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
+/***************************************************************************
+
+    Calcune (Japan, prototype)
+
+    CPUs are HD68HC000CP8 and TMP84C00AU-6 QFP types. Other ICs include two
+    Sega 315-5560-02 VDPs and a YMZ280B-F for sound.
+
+    Oscillators: 53.693MHz (OSC1), 16.9444 (XL1), 14.318 (XL3).
+
+    Printed on board: "VDP LICENSE FROM SEGA, MANUFACTURED BY ADO."
+
+***************************************************************************/
 
 #include "emu.h"
 
