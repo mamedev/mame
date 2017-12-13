@@ -63,6 +63,43 @@
 		</part>
 	</software>
 
+	<!-- Windows 3.1/95 -->
+	<!-- there's at least a German version of this too -->
+	<software name="noiangi">
+		<description>Noi Siamo Angeli (Italian)</description>
+		<year>1997</year>
+		<publisher>Smile Interactive</publisher>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="bud" sha1="053ed238459721e9b62b9c045af6d8931a223095" />
+			</diskarea>
+		</part>
+	</software>
+	
+	<!-- Windows 95/98/ME/XP and Mac OS supported -->
+	<!-- Requires 256 colors minimum otherwise they crashes at boot -->
+	<software name="v16imagine">
+		<description>Viper -V16- Imagine (International)</description>
+		<year>2001</year>
+		<publisher>Sogna / Hobibox Europe</publisher>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="GX" sha1="5de4abf4a883a56ec389bb255d176b5a39a63420" />
+			</diskarea>
+		</part>
+	</software>
+	
+	<software name="v16rise">
+		<description>Viper -V16- RISE (International)</description>
+		<year>2001</year>
+		<publisher>Sogna / Hobibox Europe</publisher>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="GX4" sha1="a600a961b5127d3a5ee368c20d9f54e6ede23b81" />
+			</diskarea>
+		</part>
+	</software>
+
 	<software name="ultrasnd" supported="partial">
 		<!-- includes Gravis UltraSound (GUS) Installation - V4.11 -->
 		<description>The UltraSound CD</description>
