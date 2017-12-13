@@ -1,27 +1,38 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <softwarelist name="ibm5170_cdrom" description="IBM PC/AT CD-ROM images">
+	
+	<!--                                         -->
+	<!--                  Games                  -->
+	<!--                                         -->
 
-	<software name="acercpr" supported="no">
-		<!-- Floppy dumped via Kryoflux, three tracks show as modified -->
-		<description>Acer CPR</description>
-		<year>1995</year>
-		<publisher>Acer America Corporation</publisher>
-		<info name="version" value="1.2a" />    <!-- floppy version 1.2a, CD version 1.2 -->
+	<software name="alieninc">
+		<!--
+		Alien Incident
+		English - French - German
 
-		<part name="flop1" interface="floppy_3_5">
-			<feature name="disk_label" value="Hard Drive Recovery Start-Up Diskette" />
-			<dataarea name="flop" size="1474560">
-				<rom name="acer cpr.img" size="1474560" crc="6f88a82a" sha1="a0afd6dcddbf6ae67d5c28c068af2fa9843dcb5f" offset="0" status="baddump" />
-			</dataarea>
-		</part>
+		Gametek(R)		compro games
+
+		(C) 1996 Gametek UK
+		All rights reserved
+		Published by Gametek (UK), Ltd.
+		Hogarth House 29 - 31 Sheet St.
+		Windsor, SL4 1BY U.K.
+
+		Mastered by AMI American Multimedia, Inc.
+		GCR-102-0062 G2 960914
+		-->
+		<description>Alien Incident (Eng, Fre, Ger, Fin) (v1.30)</description>
+		<year>1996</year>
+		<publisher>Gametek</publisher>
+
 		<part name="cdrom" interface="cdrom">
-			<feature name="disk_label" value="Hard Drive Recovery" />
 			<diskarea name="cdrom">
-				<disk name="acercpr" sha1="a0f073387e661318eae2d1fdd30dfb116d1295ae" />
+				<disk name="gcr-102-0062" sha1="183949d162064c38a21d6a143a815af6760233fb" />
 			</diskarea>
 		</part>
 	</software>
+
 	
 	<!-- Windows 95, Direct X 3.0 (in cdrom under Instdx.exe) -->
 	<software name="arabkid">
@@ -36,18 +47,103 @@
 		</part>
 	</software>
 	
-	<software name="prototyp">
-		<description>Prototype</description>
-		<year>1995</year>
-		<publisher>Neo</publisher>
-		<info name="version" value="1.0" />
+	<!-- Pentium class 200 MHz / Direct X 7.0 / Windows 95 -->
+	<!-- TODO: invalid opcode exception after install -->
+	<software name="boorball" supported="no">
+		<description>Boorp's Balls</description>
+		<year>2001</year>
+		<publisher>Xpiral / TSY</publisher>
+		<info name="alt_title" value="ブーアプス　ボール" />
 		<part name="cdrom" interface="cdrom">
-			<feature name="disk_label" value="Prototype" />
 			<diskarea name="cdrom">
-				<disk name="prototyp" sha1="0cdfabab37e5e9b219b3c8a381c937ae52749bb1" />
+				<disk name="booaps" sha1="58d2602ca37c40041a6b504857d4c3057e52e94d" />
 			</diskarea>
 		</part>
 	</software>
+
+	<!-- Pentium class 166 MHz / Direct X 7.0 -->
+	<!-- Windows 95/98/ME -->
+	<!-- TODO: some transparency issues -->
+	<software name="dobupanic" supported="partial">
+		<description>Doka Chan No Building Panic (Japan)</description>
+		<year>2001</year>
+		<publisher>MSD-JAPAN / Salva Corporation / D-YAMA</publisher>
+		<info name="alt_title" value="どかちゃんのビルパニック" />
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="bpanic" sha1="141b67f93b4d96be7c064d3603a5b961ed56f23b" />
+			</diskarea>
+		</part>
+	</software>
+
+	
+	<!-- Windows 95 -->
+	<!-- 256 colors minimum -->
+	<software name="doom2j">
+		<description>Doom II for Windows 95 (Japan)</description>
+		<year>1996</year>
+		<publisher>Id Software / Imagineer</publisher>
+		<info name="alt_title" value="ドゥームＩＩ" />
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="doom2j" sha1="61dd4c9a81d4d354a14533dcbd257a5bcffd22c6" />
+			</diskarea>
+		</part>
+	</software>
+	
+	<!-- Untouched image from original CD created with an ASUS DRW-1814BLT (EAC drive sample read offset reported as +6)
+	   If you subtract 0x18 (4 * 6) bytes from a .wav extracted from this CHD the audio matches a rip done with EAC (verified) -->
+	<software name="krondor">
+		<description>Betrayal at Krondor (1994 release, CDDA)</description>
+		<year>1994</year>
+		<publisher>Dynamix</publisher>
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="betrayal_at_krondor" sha1="f0d0907edccfc4f6ab4f181b0d2e9a3b18f81e73" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="krondora" cloneof="krondor">
+		<description>Betrayal at Krondor (1998 release, no CDDA)</description>
+		<year>1998</year>
+		<publisher>Dynamix</publisher>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="betrayal_at_krondor_1998" sha1="d58acdb5bc10c2ad9a4b6dd51438102785c44216" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Windows 3.1 / Windows 95 -->
+	<!-- 256 colors minimum -->
+	<!-- TODO: gfx issues -->
+	<software name="gollygoal" supported="partial">
+		<description>Golly! Ghosts! Goal! (Japan)</description>
+		<year>1996</year>
+		<publisher>Namco</publisher>
+		<info name="alt_title" value="ゴーリーゴーストゴール!" />
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="ggg" sha1="ab7babc13b5ffb4536fc7a553753a9d12ec41103" />
+			</diskarea>
+		</part>
+	</software>
+	
+	<!-- Untouched image from original CD created with an ASUS DRW-1814BLT (EAC drive sample read offset reported as +6)
+	   If you subtract 0x18 (4 * 6) bytes from a .wav extracted from this CHD the audio matches a rip done with EAC (verified) -->
+	<software name="kingsq6e">
+		<description>King's Quest VI (Windows 3.1 enhanced)</description>
+		<year>1993</year>
+		<publisher>Sierra</publisher>
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="kings_quest_6_enhanced" sha1="0d237ee8c2d15be3b47f3676eddce41a00bca094" />
+			</diskarea>
+		</part>
+	</software>	
 
 	<!-- Windows 3.1/95 -->
 	<software name="noiangi">
@@ -73,6 +169,24 @@
 		</part>
 	</software>
 	
+	<!-- Windows 3.1 / Mac LCIII -->
+	<software name="orgaslave">
+		<description>Orgaslave</description>
+		<year>1996</year>
+		<publisher>Kuki</publisher>
+		<info name="alt_title" value="オルガスレイブ" />
+		<part name="cdrom1" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="cd1" sha1="60c4be022959c6b108c096780451ba102b488b00" />
+			</diskarea>
+		</part>
+		<part name="cdrom2" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="cd2" sha1="11e9986c9b33aeee9cc42fc623f2909f9883ae49" />
+			</diskarea>
+		</part>
+	</software>	
+
 	<!-- Can't install to hard disk, can't save game, default text speed is very slow on 486 -->
 	<!-- (set option 5 from 100 to 0 to make text and voices to sync) -->
 	<software name="pompei" supported="partial">
@@ -87,6 +201,19 @@
 		</part>
 	</software>
 
+	<software name="prototyp">
+		<description>Prototype</description>
+		<year>1995</year>
+		<publisher>Neo</publisher>
+		<info name="version" value="1.0" />
+		<part name="cdrom" interface="cdrom">
+			<feature name="disk_label" value="Prototype" />
+			<diskarea name="cdrom">
+				<disk name="prototyp" sha1="0cdfabab37e5e9b219b3c8a381c937ae52749bb1" />
+			</diskarea>
+		</part>
+	</software>
+	
 	<software name="sideline">
 		<description>Sideline</description>
 		<year>1996</year>
@@ -100,6 +227,20 @@
 		</part>
 	</software>
 	
+	<!-- Windows 3.1 -->
+	<!-- TODO: gfx shift issue on 256 color mode -->
+	<software name="spaceinv" supported="partial">
+		<description>Space Invaders for Windows</description>
+		<year>1997</year>
+		<publisher>Wiz / Taito</publisher>
+		<part name="cdrom" interface="cdrom">
+			<feature name="disk_label" value="Sideline" />
+			<diskarea name="cdrom">
+				<disk name="si_4" sha1="0827a8a8f6602fd0947396b9ef96e449eb7a4d5c" />
+			</diskarea>
+		</part>
+	</software>
+
 	<!-- Windows 95/98/ME/XP and Mac OS supported -->
 	<!-- Requires 256 colors minimum otherwise they crashes at boot -->
 	<software name="v16imagine">
@@ -120,6 +261,31 @@
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="GX4" sha1="a600a961b5127d3a5ee368c20d9f54e6ede23b81" />
+			</diskarea>
+		</part>
+	</software>
+	
+	<!--                                         -->
+	<!-- Drivers / Utilities / Operating Systems -->
+	<!--                                         -->
+	
+	<software name="acercpr" supported="no">
+		<!-- Floppy dumped via Kryoflux, three tracks show as modified -->
+		<description>Acer CPR</description>
+		<year>1995</year>
+		<publisher>Acer America Corporation</publisher>
+		<info name="version" value="1.2a" />    <!-- floppy version 1.2a, CD version 1.2 -->
+
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="disk_label" value="Hard Drive Recovery Start-Up Diskette" />
+			<dataarea name="flop" size="1474560">
+				<rom name="acer cpr.img" size="1474560" crc="6f88a82a" sha1="a0afd6dcddbf6ae67d5c28c068af2fa9843dcb5f" offset="0" status="baddump" />
+			</dataarea>
+		</part>
+		<part name="cdrom" interface="cdrom">
+			<feature name="disk_label" value="Hard Drive Recovery" />
+			<diskarea name="cdrom">
+				<disk name="acercpr" sha1="a0f073387e661318eae2d1fdd30dfb116d1295ae" />
 			</diskarea>
 		</part>
 	</software>
@@ -225,46 +391,6 @@
 		</part>
 	</software>
 
-	<!-- Untouched image from original CD created with an ASUS DRW-1814BLT (EAC drive sample read offset reported as +6)
-	   If you subtract 0x18 (4 * 6) bytes from a .wav extracted from this CHD the audio matches a rip done with EAC (verified) -->
-	<software name="kingsq6e">
-		<description>King's Quest VI (Windows 3.1 enhanced)</description>
-		<year>1993</year>
-		<publisher>Sierra</publisher>
-
-		<part name="cdrom" interface="cdrom">
-			<diskarea name="cdrom">
-				<disk name="kings_quest_6_enhanced" sha1="0d237ee8c2d15be3b47f3676eddce41a00bca094" />
-			</diskarea>
-		</part>
-	</software>
-
-	<!-- Untouched image from original CD created with an ASUS DRW-1814BLT (EAC drive sample read offset reported as +6)
-	   If you subtract 0x18 (4 * 6) bytes from a .wav extracted from this CHD the audio matches a rip done with EAC (verified) -->
-	<software name="krondor">
-		<description>Betrayal at Krondor (1994 release, CDDA)</description>
-		<year>1994</year>
-		<publisher>Dynamix</publisher>
-
-		<part name="cdrom" interface="cdrom">
-			<diskarea name="cdrom">
-				<disk name="betrayal_at_krondor" sha1="f0d0907edccfc4f6ab4f181b0d2e9a3b18f81e73" />
-			</diskarea>
-		</part>
-	</software>
-
-	<software name="krondora" cloneof="krondor">
-		<description>Betrayal at Krondor (1998 release, no CDDA)</description>
-		<year>1998</year>
-		<publisher>Dynamix</publisher>
-
-		<part name="cdrom" interface="cdrom">
-			<diskarea name="cdrom">
-				<disk name="betrayal_at_krondor_1998" sha1="d58acdb5bc10c2ad9a4b6dd51438102785c44216" />
-			</diskarea>
-		</part>
-	</software>
-
 	<!-- various Windows CDROMs
 	   so far the listed discs should all be full english language retail discs, this can be expanded later -->
 
@@ -363,32 +489,4 @@
 			</diskarea>
 		</part>
 	</software>
-
-	<software name="alieninc">
-		<!--
-		Alien Incident
-		English - French - German
-
-		Gametek(R)		compro games
-
-		(C) 1996 Gametek UK
-		All rights reserved
-		Published by Gametek (UK), Ltd.
-		Hogarth House 29 - 31 Sheet St.
-		Windsor, SL4 1BY U.K.
-
-		Mastered by AMI American Multimedia, Inc.
-		GCR-102-0062 G2 960914
-		-->
-		<description>Alien Incident (Eng, Fre, Ger, Fin) (v1.30)</description>
-		<year>1996</year>
-		<publisher>Gametek</publisher>
-
-		<part name="cdrom" interface="cdrom">
-			<diskarea name="cdrom">
-				<disk name="gcr-102-0062" sha1="183949d162064c38a21d6a143a815af6760233fb" />
-			</diskarea>
-		</part>
-	</software>
-
 </softwarelist>
