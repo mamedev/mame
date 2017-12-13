@@ -3910,6 +3910,34 @@ ROM_START( honeypot )
 ROM_END
 
 
+// BHG1455 / MV4122/3 / 5, 10, 20 Credit Multiplier / 9 Line Multiline
+// HONKY TONK - CASH EXPRESS / Export / A - 07/08/01
+// Requires set chip version: 4.04.xx
+// Variation (% and NO)
+// No requires touch screen
+// The game shares reel graphics with Boot Scootin', but background is different and doesn't seems that is a clone.
+ROM_START( hnktonku )
+	ARISTOCRAT_MK5_BIOS
+	/*
+	    Checksum code found at 0x000d18
+	    Checksum is stored at 0x000020-0x000027
+	        Expected Checksum   0x576a26b7
+	        Calculated Checksum 0x576a26b7  (OK)
+	*/
+	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
+	ROM_LOAD32_WORD( "bhg1455.u7",  0x000000, 0x80000, CRC(ef25e5a1) SHA1(00d7dcb852cc2ccb61c5af15108f8c374419527f) )
+	ROM_LOAD32_WORD( "bhg1455.u11", 0x000002, 0x80000, CRC(737bd8c8) SHA1(0863ed66ca28ab47945d1c6012740bc559c79b0d) )
+	ROM_LOAD32_WORD( "bhg1455.u8",  0x100000, 0x80000, CRC(822f408e) SHA1(c31d046a48f28de9d8b90676851c4ea5f30cc732) )
+	ROM_LOAD32_WORD( "bhg1455.u12", 0x100002, 0x80000, CRC(520f051e) SHA1(c3d5058f753e72852e37dcd94c34a4caabdff161) )
+	ROM_LOAD32_WORD( "bhg1455.u9",  0x200000, 0x80000, CRC(9c928891) SHA1(7fc4f38b9c06d4d5b27d246fffee3a1fd527d6ad) )
+	ROM_LOAD32_WORD( "bhg1455.u13", 0x200002, 0x80000, CRC(18dd37fe) SHA1(432a4959886fad4f4a55de31b7cc42c51d7f2792) )
+
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
+	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
+ROM_END
+
+
 // 0100872V / 631/3 B / 25 Credit Multiplier / 20 Line Multiline
 // INCA SUN / NSW/ACT / B- 03/05/99
 ROM_START( incasun )
@@ -7261,6 +7289,7 @@ GAMEL( 1997, goldpyra,   goldpyr,   aristmk5_usa,       bootsctnua,   aristmk5_s
 GAMEL( 1998, goldpyrb,   goldpyr,   aristmk5,           goldpyrb,     aristmk5_state, aristmk5, ROT0, "Aristocrat", "Golden Pyramids (0100878V, Victoria)",                 MACHINE_FLAGS, layout_goldpyrb )        // 602/5, C - 19/06/98
 GAMEL( 2000, goldenra,   aristmk5,  aristmk5,           goldenra,     aristmk5_state, aristmk5, ROT0, "Aristocrat", "Golden Ra (0101164V, NSW/ACT)",                        MACHINE_FLAGS, layout_goldenra )        // 661, A - 10/04/00, Rev 15
 GAMEL( 2000, honeypot,   aristmk5,  aristmk5,           goldenra,     aristmk5_state, aristmk5, ROT0, "Aristocrat", "Honey Pot (03J00241, NSW/ACT)",                        MACHINE_FLAGS, layout_yukongl5 )        // JB008, A - 21/11/2000, Rev 17
+GAMEL( 2001, hnktonku,   aristmk5,  aristmk5_usa,       aristmk5_usa, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Honkey Tonk - Cash Express (BHG1455, US)",             MACHINE_FLAGS, layout_aristmk5_us )     // MV4122/3, A - 07/08/01
 GAMEL( 1999, incasun,    aristmk5,  aristmk5,           incasun,      aristmk5_state, aristmk5, ROT0, "Aristocrat", "Inca Sun (0100872V, NSW/ACT)",                         MACHINE_FLAGS, layout_incasun )         // 631/3 B, B - 03/05/99, Rev 15
 GAMEL( 1999, incasunsp,  incasun,   aristmk5,           incasun,      aristmk5_state, aristmk5, ROT0, "Aristocrat", "Inca Sun (0100872V, NSW/ACT, Show Program)",           MACHINE_FLAGS, layout_incasun )         // 631/3 B, B - 03/05/99, Rev 15
 GAMEL( 2000, incasunnz,  incasun,   aristmk5,           incasunnz,    aristmk5_state, aristmk5, ROT0, "Aristocrat", "Inca Sun (0101108V, New Zealand)",                     MACHINE_FLAGS, layout_incasunnz )       // MV4113, A - 6/3/00, Rev 25
