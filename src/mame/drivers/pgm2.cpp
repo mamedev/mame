@@ -845,7 +845,7 @@ all others:         SPANSION S99-50070
 	ROM_REGION( 0x200000, "tiles", ROMREGION_ERASEFF ) \
 	ROM_LOAD( "ig-d3_text.u1",          0x00000000, 0x0200000, CRC(9a0ea82e) SHA1(7844fd7e46c3fbb2164060f160da528254fd177e) ) \
 	\
-	ROM_REGION( 0x2000000, "bgtile", ROMREGION_ERASEFF ) \
+	ROM_REGION( 0x2000000, "bgtile", ROMREGION_ERASE00 ) \
 	/* bgl/bgh unpopulated (no background tilemap) */ \
 	\
 	ROM_REGION( 0x08000000, "sprites_mask", 0 ) /* 1bpp sprite mask data */ \
@@ -866,7 +866,7 @@ all others:         SPANSION S99-50070
 
 ROM_START( kof98umh )
 	ROM_REGION( 0x04000, "maincpu", 0 )
-	ROM_LOAD( "kof98uhm_igs036.rom",       0x00000000, 0x0004000, NO_DUMP ) // CRC(3ed2e50f) SHA1(35310045d375d9dda36c325e35257123a7b5b8c7)
+	ROM_LOAD( "kof98umh_internal_rom.bin",       0x00000000, 0x0004000, CRC(3ed2e50f) SHA1(35310045d375d9dda36c325e35257123a7b5b8c7) )
 
 	ROM_REGION( 0x1000000, "user1", 0 )
 	ROM_LOAD( "kof98umh_v100cn.u4",        0x00000000, 0x1000000, CRC(2ea91e3b) SHA1(5a586bb99cc4f1b02e0db462d5aff721512e0640) )
@@ -974,6 +974,25 @@ READ32_MEMBER(pgm2_state::kov2nl_speedup_r)
 	return m_mainram[0x20470 / 4];
 }
 
+READ32_MEMBER(pgm2_state::kof98umh_speedup_r)
+{
+	int pc = space.device().safe_pc();
+
+	if (pc == 0x100028f6)
+	{
+		if ((m_mainram[0x00060 / 4] == 0x00) && (m_mainram[0x00064 / 4] == 0x00))
+			space.device().execute().spin_until_interrupt();
+	}
+	/*
+	else
+	{
+	    printf("pc is %08x\n", pc);
+	}
+	*/
+
+	return m_mainram[0x00060 / 4];
+}
+
 
 // for games with the internal ROMs fully dumped that provide the sprite key and program rom key at runtime
 void pgm2_state::common_encryption_init()
@@ -1067,19 +1086,13 @@ DRIVER_INIT_MEMBER(pgm2_state, kov3_100)
 
 DRIVER_INIT_MEMBER(pgm2_state,kof98umh)
 {
-	uint16_t *src = (uint16_t *)memregion("sprites_mask")->base();
-
-	iga_u12_decode(src, 0x08000000, 0x21df);
-	iga_u16_decode(src, 0x08000000, 0x8692);
-	m_sprite_predecrypted = 1;
-
-	src = (uint16_t *)memregion("sprites_colour")->base();
-	sprite_colour_decode(src, 0x20000000);
-
-	igs036_decryptor decrypter(kof98umh_key);
-	decrypter.decrypter_rom(memregion("user1"));
-	m_has_decrypted = 1;
+	common_encryption_init();
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0x20000060, 0x20000063, read32_delegate(FUNC(pgm2_state::kof98umh_speedup_r),this));
 }
+
+
+
+
 
 /* PGM2 */
 
