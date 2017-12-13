@@ -138,9 +138,9 @@ void pgm2_state::draw_sprites(screen_device &screen, const rectangle &cliprect, 
 
 	//printf("frame\n");
 
-	for (int i = 0;i < 0x2000 / 4;i++)
+	for (int i = 0;i < 0x2000 / 4;i+=4)
 	{
-		if (spriteram[i] == 0x80000000)
+		if (spriteram[i+2] & 0x80000000)
 		{
 			endoflist = i;
 			break;
