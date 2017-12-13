@@ -4,7 +4,7 @@
 
  Super Cobra hardware
 
-NOTE:  Eventually to be merged into GALAXIAN.C
+NOTE:  Eventually to be merged into galaxian.cpp
 
 TODO:
 ----
@@ -30,7 +30,7 @@ Notes/Tidbits:
   differences are the title, copyright removed, different encryptions or
   no encryption, plus hustlerb has a different memory map.
 
-- In Tazmania, when set to Upright mode, player 2 left skips the current
+- In Tazmania and clones, when set to Upright mode, player 2 left skips the current
   level
 
 ***************************************************************************/
@@ -52,7 +52,6 @@ public:
 		: scramble_state(mconfig, type, tag),
 			m_soundram(*this, "soundram") { }
 
-	optional_shared_ptr<uint8_t> m_soundram;
 	DECLARE_READ8_MEMBER(scobra_soundram_r);
 	DECLARE_WRITE8_MEMBER(scobra_soundram_w);
 	DECLARE_READ8_MEMBER(scobra_type2_ppi8255_0_r);
@@ -64,6 +63,9 @@ public:
 	DECLARE_WRITE8_MEMBER(hustler_ppi8255_0_w);
 	DECLARE_WRITE8_MEMBER(hustler_ppi8255_1_w);
 	DECLARE_CUSTOM_INPUT_MEMBER(stratgyx_coinage_r);
+
+private:
+	optional_shared_ptr<uint8_t> m_soundram;
 };
 
 
@@ -142,6 +144,26 @@ static ADDRESS_MAP_START( type2_map, AS_PROGRAM, 8, scobra_state )
 	AM_RANGE(0xa800, 0xa80f) AM_READWRITE(scobra_type2_ppi8255_1_r, scobra_type2_ppi8255_1_w)
 	AM_RANGE(0xb000, 0xb000) AM_WRITE(galaxold_stars_enable_w)
 	AM_RANGE(0xb004, 0xb004) AM_WRITE(galaxold_nmi_enable_w)
+	AM_RANGE(0xb006, 0xb006) AM_WRITE(galaxold_coin_counter_0_w)
+	AM_RANGE(0xb008, 0xb008) AM_WRITE(galaxold_coin_counter_1_w)
+	AM_RANGE(0xb00c, 0xb00c) AM_WRITE(galaxold_flip_screen_y_w)
+	AM_RANGE(0xb00e, 0xb00e) AM_WRITE(galaxold_flip_screen_x_w)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( tazmani3_map, AS_PROGRAM, 8, scobra_state )
+	AM_RANGE(0x0000, 0x7fff) AM_ROM
+	AM_RANGE(0x8000, 0x87ff) AM_RAM
+	AM_RANGE(0x8800, 0x883f) AM_RAM_WRITE(galaxold_attributesram_w) AM_SHARE("attributesram")
+	AM_RANGE(0x8840, 0x885f) AM_RAM AM_SHARE("spriteram")
+	AM_RANGE(0x8860, 0x887f) AM_RAM AM_SHARE("bulletsram")
+	AM_RANGE(0x8880, 0x88ff) AM_RAM
+	AM_RANGE(0x9000, 0x93ff) AM_RAM_WRITE(galaxold_videoram_w) AM_SHARE("videoram")
+	AM_RANGE(0x9400, 0x97ff) AM_READWRITE(galaxold_videoram_r, galaxold_videoram_w) /* mirror */
+	AM_RANGE(0x9800, 0x9800) AM_DEVREAD("watchdog", watchdog_timer_device, reset_r)
+	AM_RANGE(0xa000, 0xa003) AM_DEVREADWRITE("ppi8255_0", i8255_device, read, write)
+	AM_RANGE(0xa800, 0xa803) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write)
+	AM_RANGE(0xb000, 0xb000) AM_WRITE(galaxold_stars_enable_w)
+	AM_RANGE(0xb001, 0xb001) AM_WRITE(galaxold_nmi_enable_w)
 	AM_RANGE(0xb006, 0xb006) AM_WRITE(galaxold_coin_counter_0_w)
 	AM_RANGE(0xb008, 0xb008) AM_WRITE(galaxold_coin_counter_1_w)
 	AM_RANGE(0xb00c, 0xb00c) AM_WRITE(galaxold_flip_screen_y_w)
@@ -449,7 +471,7 @@ static INPUT_PORTS_START( darkplnt )
 	PORT_BIT( 0xfc, 0x00, IPT_DIAL ) PORT_SENSITIVITY(25) PORT_KEYDELTA(10) /* scrambled dial */
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( tazmania )
+static INPUT_PORTS_START( tazmani2 )
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON2 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 )
@@ -496,6 +518,49 @@ static INPUT_PORTS_START( tazmania )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
+
+static INPUT_PORTS_START( tazmani3 )
+	PORT_START("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_COCKTAIL 
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON1 )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 )
+
+	PORT_START("IN1")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Lives ) )
+	PORT_DIPSETTING(    0x01, "3" )
+	PORT_DIPSETTING(    0x00, "5" )
+	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Demo_Sounds ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_COCKTAIL
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_COCKTAIL
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_COCKTAIL
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START2 )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START1 )
+
+	PORT_START("IN2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_COCKTAIL 
+	PORT_DIPNAME( 0x06, 0x02, DEF_STR( Coinage ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x00, "Coin A 1/2 Coin B 2/1" )
+	PORT_DIPSETTING(    0x04, "Coin A 1/3 Coin B 3/1" )
+	PORT_DIPSETTING(    0x06, "Coin A 1/4 Coin B 4/1" )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Cabinet ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Upright ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Cocktail ) )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+INPUT_PORTS_END
 
 /* cocktail mode is N/A */
 static INPUT_PORTS_START( rescue )
@@ -891,6 +956,13 @@ static MACHINE_CONFIG_DERIVED( type2, type1 )
 	MCFG_CPU_PROGRAM_MAP(type2_map)
 MACHINE_CONFIG_END
 
+static MACHINE_CONFIG_DERIVED( tazmani3, type2 )
+
+	/* basic machine hardware */
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(tazmani3_map)
+MACHINE_CONFIG_END
+
 
 static MACHINE_CONFIG_DERIVED( stratgyx, type2 )
 
@@ -1123,6 +1195,7 @@ ROM_START( tazmani2 )
 	ROM_LOAD( "colr6f.cpu",   0x0000, 0x0020, CRC(fce333c7) SHA1(f63a214dc47c5e7c80db000b0b6a261ca8da6629) )
 ROM_END
 
+// PCBs: RODMAR 6920-00-01 P1 and 6920-01-01 P1 but Arfyc copyright
 ROM_START( tazmani3 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "2ck.cpu",      0x0000, 0x1000, CRC(e8b6f9c3) SHA1(121f83274b3fdb4b2cb4bd0160d61886825c8793) ) // sldh
@@ -1624,8 +1697,8 @@ GAME( 1982, strongx,   stratgyx, stratgyx,  stratgyx,  scobra_state,  stratgyx, 
 
 GAME( 1982, darkplnt,  0,        darkplnt,  darkplnt,  scobra_state,  darkplnt,     ROT180, "Stern Electronics",                  "Dark Planet", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1982, tazmani2,  tazmania, type2,     tazmania,  scobra_state,  tazmani2,     ROT90,  "Stern Electronics",                  "Tazz-Mania (set 2, alt hardware)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, tazmani3,  tazmania, type2,     tazmania,  scobra_state,  tazmani2,     ROT90,  "bootleg (Rodmar)",                   "Tazz-Mania (Rodmar bootleg)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // different i8255 hook up
+GAME( 1982, tazmani2,  tazmania, type2,     tazmani2,  scobra_state,  tazmani2,     ROT90,  "Stern Electronics",                  "Tazz-Mania (set 2, alt hardware)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, tazmani3,  tazmania, tazmani3,  tazmani3,  scobra_state,  0,            ROT90,  "bootleg (Arfyc / Rodmar)",           "Tazz-Mania (Arfyc / Rodmar bootleg)", MACHINE_SUPPORTS_SAVE )
 
 GAME( 1982, rescue,    0,        rescue,    rescue,    scobra_state,  rescue,       ROT90,  "Stern Electronics",                  "Rescue", MACHINE_SUPPORTS_SAVE )
 GAME( 1982, rescueb,   rescue,   rescueb,   rescue,    scobra_state,  rescue,       ROT90,  "bootleg (Videl Games)",              "Tuono Blu (bootleg of Rescue)", MACHINE_SUPPORTS_SAVE )
