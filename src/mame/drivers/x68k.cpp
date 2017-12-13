@@ -968,7 +968,6 @@ void x68k_state::set_bus_error(uint32_t address, bool write, uint16_t mem_mask)
 		address++;
 	m_bus_error = true;
 	m_maincpu->set_buserror_details(address, write, m_maincpu->get_fc());
-	m_maincpu->mmu_tmp_buserror_address = address; // Hack for x68030
 	m_maincpu->set_input_line(M68K_LINE_BUSERROR, ASSERT_LINE);
 	m_maincpu->set_input_line(M68K_LINE_BUSERROR, CLEAR_LINE);
 	m_bus_error_timer->adjust(m_maincpu->cycles_to_attotime(16)); // let rmw cycles complete
