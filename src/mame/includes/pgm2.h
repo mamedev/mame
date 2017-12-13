@@ -32,6 +32,7 @@ public:
 		m_bg_videoram(*this, "bg_videoram"),
 		m_sp_videoram(*this, "sp_videoram"),
 		m_bgscroll(*this, "bgscroll"),
+		m_fgscroll(*this, "fgscroll"),
 		m_gfxdecode2(*this, "gfxdecode2"),
 		m_gfxdecode3(*this, "gfxdecode3"),
 		m_arm_aic(*this, "arm_aic"),
@@ -130,6 +131,7 @@ private:
 	required_shared_ptr<uint32_t> m_bg_videoram;
 	required_shared_ptr<uint32_t> m_sp_videoram;
 	required_shared_ptr<uint32_t> m_bgscroll;
+	required_shared_ptr<uint32_t> m_fgscroll;
 	required_device<gfxdecode_device> m_gfxdecode2;
 	required_device<gfxdecode_device> m_gfxdecode3;
 	required_device<arm_aic_device> m_arm_aic;

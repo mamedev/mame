@@ -258,6 +258,8 @@ void pgm2_state::copy_sprites_from_bitmap(screen_device &screen, bitmap_rgb32 &b
 
 uint32_t pgm2_state::screen_update_pgm2(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
+	m_fg_tilemap->set_scrollx(0, m_fgscroll[0] & 0xffff);
+	m_fg_tilemap->set_scrolly(0, m_fgscroll[0] >> 16);
 	m_bg_tilemap->set_scrolly(0, (m_bgscroll[0x0/4] & 0xffff0000)>>16 );
 
 	for (int y = 0; y < 224; y++)

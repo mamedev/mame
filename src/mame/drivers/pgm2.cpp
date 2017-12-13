@@ -73,8 +73,8 @@
 	02 - bg scroll y
 	04 - zoom something, 0F-7F, default 1F
 	06 - zoom something, 0F-7F, default 1F
-	08 - fg? scroll x
-	0a - fg? scroll y
+	08 - fg scroll x
+	0a - fg scroll y
 	0e - ? 1 at init (sprite related?)
 	10 - ? orleg2 - 0x13, kov2nl - 0x14 at init (sprite related?)
 	14 - sprite enable ? set to 0 before spriteram update, to 1 after
@@ -355,6 +355,7 @@ static ADDRESS_MAP_START( pgm2_map, AS_PROGRAM, 32, pgm2_state )
 	AM_RANGE(0x30100000, 0x301000ff) AM_READWRITE8(shareram_r, shareram_w, 0x00ff00ff)
 
 	AM_RANGE(0x30120000, 0x30120003) AM_RAM AM_SHARE("bgscroll") // scroll
+	AM_RANGE(0x30120008, 0x3012000b) AM_RAM AM_SHARE("fgscroll")
 	AM_RANGE(0x30120030, 0x30120033) AM_WRITE16(share_bank_w, 0xffff0000)
 	AM_RANGE(0x30120038, 0x3012003b) AM_WRITE(sprite_encryption_w)
 	// there are other 0x301200xx regs
