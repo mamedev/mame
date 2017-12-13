@@ -29,9 +29,9 @@
 /* ======================================================================== */
 
 /* Check for > 32bit sizes */
-constexpr int8_t MAKE_INT_8(uint32_t A) const { return (int8_t)(A); }
-constexpr int16_t MAKE_INT_16(uint32_t A) const { return (int16_t)(A); }
-constexpr int32_t MAKE_INT_32(uint32_t A) const { return (int32_t)(A); }
+static constexpr int8_t MAKE_INT_8(uint32_t A) { return (int8_t)(A); }
+static constexpr int16_t MAKE_INT_16(uint32_t A) { return (int16_t)(A); }
+static constexpr int32_t MAKE_INT_32(uint32_t A) { return (int32_t)(A); }
 
 
 /* ======================================================================== */
@@ -107,89 +107,89 @@ static constexpr int M68K_CACR_EI  = 0x01; // Enable Instruction Cache
 /* ---------------------------- General Macros ---------------------------- */
 
 /* Bit Isolation Macros */
-constexpr uint32_t BIT_0(uint32_t A) const  { return ((A) & 0x00000001); }
-constexpr uint32_t BIT_1(uint32_t A) const  { return ((A) & 0x00000002); }
-constexpr uint32_t BIT_2(uint32_t A) const  { return ((A) & 0x00000004); }
-constexpr uint32_t BIT_3(uint32_t A) const  { return ((A) & 0x00000008); }
-constexpr uint32_t BIT_4(uint32_t A) const  { return ((A) & 0x00000010); }
-constexpr uint32_t BIT_5(uint32_t A) const  { return ((A) & 0x00000020); }
-constexpr uint32_t BIT_6(uint32_t A) const  { return ((A) & 0x00000040); }
-constexpr uint32_t BIT_7(uint32_t A) const  { return ((A) & 0x00000080); }
-constexpr uint32_t BIT_8(uint32_t A) const  { return ((A) & 0x00000100); }
-constexpr uint32_t BIT_9(uint32_t A) const  { return ((A) & 0x00000200); }
-constexpr uint32_t BIT_A(uint32_t A) const  { return ((A) & 0x00000400); }
-constexpr uint32_t BIT_B(uint32_t A) const  { return ((A) & 0x00000800); }
-constexpr uint32_t BIT_C(uint32_t A) const  { return ((A) & 0x00001000); }
-constexpr uint32_t BIT_D(uint32_t A) const  { return ((A) & 0x00002000); }
-constexpr uint32_t BIT_E(uint32_t A) const  { return ((A) & 0x00004000); }
-constexpr uint32_t BIT_F(uint32_t A) const  { return ((A) & 0x00008000); }
-constexpr uint32_t BIT_10(uint32_t A) const { return ((A) & 0x00010000); }
-constexpr uint32_t BIT_11(uint32_t A) const { return ((A) & 0x00020000); }
-constexpr uint32_t BIT_12(uint32_t A) const { return ((A) & 0x00040000); }
-constexpr uint32_t BIT_13(uint32_t A) const { return ((A) & 0x00080000); }
-constexpr uint32_t BIT_14(uint32_t A) const { return ((A) & 0x00100000); }
-constexpr uint32_t BIT_15(uint32_t A) const { return ((A) & 0x00200000); }
-constexpr uint32_t BIT_16(uint32_t A) const { return ((A) & 0x00400000); }
-constexpr uint32_t BIT_17(uint32_t A) const { return ((A) & 0x00800000); }
-constexpr uint32_t BIT_18(uint32_t A) const { return ((A) & 0x01000000); }
-constexpr uint32_t BIT_19(uint32_t A) const { return ((A) & 0x02000000); }
-constexpr uint32_t BIT_1A(uint32_t A) const { return ((A) & 0x04000000); }
-constexpr uint32_t BIT_1B(uint32_t A) const { return ((A) & 0x08000000); }
-constexpr uint32_t BIT_1C(uint32_t A) const { return ((A) & 0x10000000); }
-constexpr uint32_t BIT_1D(uint32_t A) const { return ((A) & 0x20000000); }
-constexpr uint32_t BIT_1E(uint32_t A) const { return ((A) & 0x40000000); }
-constexpr uint32_t BIT_1F(uint32_t A) const { return ((A) & 0x80000000); }
+static constexpr uint32_t BIT_0(uint32_t A)  { return ((A) & 0x00000001); }
+static constexpr uint32_t BIT_1(uint32_t A)  { return ((A) & 0x00000002); }
+static constexpr uint32_t BIT_2(uint32_t A)  { return ((A) & 0x00000004); }
+static constexpr uint32_t BIT_3(uint32_t A)  { return ((A) & 0x00000008); }
+static constexpr uint32_t BIT_4(uint32_t A)  { return ((A) & 0x00000010); }
+static constexpr uint32_t BIT_5(uint32_t A)  { return ((A) & 0x00000020); }
+static constexpr uint32_t BIT_6(uint32_t A)  { return ((A) & 0x00000040); }
+static constexpr uint32_t BIT_7(uint32_t A)  { return ((A) & 0x00000080); }
+static constexpr uint32_t BIT_8(uint32_t A)  { return ((A) & 0x00000100); }
+static constexpr uint32_t BIT_9(uint32_t A)  { return ((A) & 0x00000200); }
+static constexpr uint32_t BIT_A(uint32_t A)  { return ((A) & 0x00000400); }
+static constexpr uint32_t BIT_B(uint32_t A)  { return ((A) & 0x00000800); }
+static constexpr uint32_t BIT_C(uint32_t A)  { return ((A) & 0x00001000); }
+static constexpr uint32_t BIT_D(uint32_t A)  { return ((A) & 0x00002000); }
+static constexpr uint32_t BIT_E(uint32_t A)  { return ((A) & 0x00004000); }
+static constexpr uint32_t BIT_F(uint32_t A)  { return ((A) & 0x00008000); }
+static constexpr uint32_t BIT_10(uint32_t A) { return ((A) & 0x00010000); }
+static constexpr uint32_t BIT_11(uint32_t A) { return ((A) & 0x00020000); }
+static constexpr uint32_t BIT_12(uint32_t A) { return ((A) & 0x00040000); }
+static constexpr uint32_t BIT_13(uint32_t A) { return ((A) & 0x00080000); }
+static constexpr uint32_t BIT_14(uint32_t A) { return ((A) & 0x00100000); }
+static constexpr uint32_t BIT_15(uint32_t A) { return ((A) & 0x00200000); }
+static constexpr uint32_t BIT_16(uint32_t A) { return ((A) & 0x00400000); }
+static constexpr uint32_t BIT_17(uint32_t A) { return ((A) & 0x00800000); }
+static constexpr uint32_t BIT_18(uint32_t A) { return ((A) & 0x01000000); }
+static constexpr uint32_t BIT_19(uint32_t A) { return ((A) & 0x02000000); }
+static constexpr uint32_t BIT_1A(uint32_t A) { return ((A) & 0x04000000); }
+static constexpr uint32_t BIT_1B(uint32_t A) { return ((A) & 0x08000000); }
+static constexpr uint32_t BIT_1C(uint32_t A) { return ((A) & 0x10000000); }
+static constexpr uint32_t BIT_1D(uint32_t A) { return ((A) & 0x20000000); }
+static constexpr uint32_t BIT_1E(uint32_t A) { return ((A) & 0x40000000); }
+static constexpr uint32_t BIT_1F(uint32_t A) { return ((A) & 0x80000000); }
 
 /* Get the most significant bit for specific sizes */
-constexpr uint32_t GET_MSB_8(uint32_t A) const  { return ((A) & 0x80); }
-constexpr uint32_t GET_MSB_9(uint32_t A) const  { return ((A) & 0x100); }
-constexpr uint32_t GET_MSB_16(uint32_t A) const { return ((A) & 0x8000); }
-constexpr uint32_t GET_MSB_17(uint32_t A) const { return ((A) & 0x10000); }
-constexpr uint32_t GET_MSB_32(uint32_t A) const { return ((A) & 0x80000000); }
-constexpr uint64_t GET_MSB_33(uint64_t A) const { return ((A) & 0x100000000U); }
+static constexpr uint32_t GET_MSB_8(uint32_t A)  { return ((A) & 0x80); }
+static constexpr uint32_t GET_MSB_9(uint32_t A)  { return ((A) & 0x100); }
+static constexpr uint32_t GET_MSB_16(uint32_t A) { return ((A) & 0x8000); }
+static constexpr uint32_t GET_MSB_17(uint32_t A) { return ((A) & 0x10000); }
+static constexpr uint32_t GET_MSB_32(uint32_t A) { return ((A) & 0x80000000); }
+static constexpr uint64_t GET_MSB_33(uint64_t A) { return ((A) & 0x100000000U); }
 
 /* Isolate nibbles */
-constexpr uint32_t LOW_NIBBLE(uint32_t A) const  { return ((A) & 0x0f); }
-constexpr uint32_t HIGH_NIBBLE(uint32_t A) const { return ((A) & 0xf0); }
+static constexpr uint32_t LOW_NIBBLE(uint32_t A)  { return ((A) & 0x0f); }
+static constexpr uint32_t HIGH_NIBBLE(uint32_t A) { return ((A) & 0xf0); }
 
 /* These are used to isolate 8, 16, and 32 bit sizes */
-constexpr uint32_t MASK_OUT_ABOVE_2(uint32_t A) const  { return ((A) & 3); }
-constexpr uint32_t MASK_OUT_ABOVE_8(uint32_t A) const  { return ((A) & 0xff); }
-constexpr uint32_t MASK_OUT_ABOVE_16(uint32_t A) const { return ((A) & 0xffff); }
-constexpr uint32_t MASK_OUT_BELOW_2(uint32_t A) const  { return ((A) & ~3); }
-constexpr uint32_t MASK_OUT_BELOW_8(uint32_t A) const  { return ((A) & ~0xff); }
-constexpr uint32_t MASK_OUT_BELOW_16(uint32_t A) const { return ((A) & ~0xffff); }
+static constexpr uint32_t MASK_OUT_ABOVE_2(uint32_t A)  { return ((A) & 3); }
+static constexpr uint32_t MASK_OUT_ABOVE_8(uint32_t A)  { return ((A) & 0xff); }
+static constexpr uint32_t MASK_OUT_ABOVE_16(uint32_t A) { return ((A) & 0xffff); }
+static constexpr uint32_t MASK_OUT_BELOW_2(uint32_t A)  { return ((A) & ~3); }
+static constexpr uint32_t MASK_OUT_BELOW_8(uint32_t A)  { return ((A) & ~0xff); }
+static constexpr uint32_t MASK_OUT_BELOW_16(uint32_t A) { return ((A) & ~0xffff); }
 
 /* No need to mask if we are 32 bit */
-constexpr uint32_t MASK_OUT_ABOVE_32(uint32_t A) const { return ((A) & u64(0xffffffffU)); }
-constexpr uint64_t MASK_OUT_BELOW_32(uint64_t A) const { return ((A) & ~u64(0xffffffffU)); }
+static constexpr uint32_t MASK_OUT_ABOVE_32(uint32_t A) { return ((A) & u64(0xffffffffU)); }
+static constexpr uint64_t MASK_OUT_BELOW_32(uint64_t A) { return ((A) & ~u64(0xffffffffU)); }
 
 /* Shift & Rotate Macros. */
-constexpr uint32_t LSL(uint32 A, uint32_t C) const { return ((A) << (C)); }
-constexpr uint32_t LSR(uint32 A, uint32_t C) const { return ((A) >> (C)); }
+static constexpr uint32_t LSL(uint32 A, uint32_t C) { return ((A) << (C)); }
+static constexpr uint32_t LSR(uint32 A, uint32_t C) { return ((A) >> (C)); }
 
 /* We have to do this because the morons at ANSI decided that shifts
 * by >= data size are undefined.
 */
-constexpr uint32_t LSR_32(uint32 A, uint32_t C) const { return ((C) < 32 ? (A) >> (C) : 0); }
-constexpr uint32_t LSL_32(uint32 A, uint32_t C) const { return ((C) < 32 ? (A) << (C) : 0); }
+static constexpr uint32_t LSR_32(uint32 A, uint32_t C) { return ((C) < 32 ? (A) >> (C) : 0); }
+static constexpr uint32_t LSL_32(uint32 A, uint32_t C) { return ((C) < 32 ? (A) << (C) : 0); }
 
-constexpr uint64_t LSL_32_64(uint64_t A, uint32_t C) const { return ((A) << (C)); }
-constexpr uint64_t LSR_32_64(uint64_t A, uint32_t C) const { return ((A) >> (C)); }
-constexpr uint64_t ROL_33_64(uint64_t A, uint32_t C) const { return (LSL_32_64(A, C) | LSR_32_64(A, 33 - (C))); }
-constexpr uint64_t ROR_33_64(uint64_t A, uint32_t C) const { return (LSR_32_64(A, C) | LSL_32_64(A, 33 - (C))); }
+static constexpr uint64_t LSL_32_64(uint64_t A, uint32_t C) { return ((A) << (C)); }
+static constexpr uint64_t LSR_32_64(uint64_t A, uint32_t C) { return ((A) >> (C)); }
+static constexpr uint64_t ROL_33_64(uint64_t A, uint32_t C) { return (LSL_32_64(A, C) | LSR_32_64(A, 33 - (C))); }
+static constexpr uint64_t ROR_33_64(uint64_t A, uint32_t C) { return (LSR_32_64(A, C) | LSL_32_64(A, 33 - (C))); }
 
-constexpr uint32_t ROL_8(uint32_t A, uint32_t C) const     { return MASK_OUT_ABOVE_8(LSL(A, C) | LSR(A, 8-(C))); }
-constexpr uint32_t ROL_9(uint32_t A, uint32_t C) const     { return                 (LSL(A, C) | LSR(A, 9-(C))); }
-constexpr uint32_t ROL_16(uint32_t A, uint32_t C) const    { return MASK_OUT_ABOVE_16(LSL(A, C) | LSR(A, 16-(C))); }
-constexpr uint32_t ROL_17(uint32_t A, uint32_t C) const    { return                 (LSL(A, C) | LSR(A, 17-(C))); }
-constexpr uint32_t ROL_32(uint32_t A, uint32_t C) const    { return MASK_OUT_ABOVE_32(LSL_32(A, C) | LSR_32(A, 32-(C))); }
+static constexpr uint32_t ROL_8(uint32_t A, uint32_t C)     { return MASK_OUT_ABOVE_8(LSL(A, C) | LSR(A, 8-(C))); }
+static constexpr uint32_t ROL_9(uint32_t A, uint32_t C)     { return                 (LSL(A, C) | LSR(A, 9-(C))); }
+static constexpr uint32_t ROL_16(uint32_t A, uint32_t C)    { return MASK_OUT_ABOVE_16(LSL(A, C) | LSR(A, 16-(C))); }
+static constexpr uint32_t ROL_17(uint32_t A, uint32_t C)    { return                 (LSL(A, C) | LSR(A, 17-(C))); }
+static constexpr uint32_t ROL_32(uint32_t A, uint32_t C)    { return MASK_OUT_ABOVE_32(LSL_32(A, C) | LSR_32(A, 32-(C))); }
 
-constexpr uint32_t ROR_8(uint32_t A, uint32_t C) const     { return MASK_OUT_ABOVE_8(LSR(A, C) | LSL(A, 8-(C))); }
-constexpr uint32_t ROR_9(uint32_t A, uint32_t C) const     { return                  (LSR(A, C) | LSL(A, 9-(C))); }
-constexpr uint32_t ROR_16(uint32_t A, uint32_t C) const    { return MASK_OUT_ABOVE_16(LSR(A, C) | LSL(A, 16-(C))); }
-constexpr uint32_t ROR_17(uint32_t A, uint32_t C) const    { return                  (LSR(A, C) | LSL(A, 17-(C))); }
-constexpr uint32_t ROR_32(uint32_t A, uint32_t C) const    { return MASK_OUT_ABOVE_32(LSR_32(A, C) | LSL_32(A, 32-(C))); }
+static constexpr uint32_t ROR_8(uint32_t A, uint32_t C)     { return MASK_OUT_ABOVE_8(LSR(A, C) | LSL(A, 8-(C))); }
+static constexpr uint32_t ROR_9(uint32_t A, uint32_t C)     { return                  (LSR(A, C) | LSL(A, 9-(C))); }
+static constexpr uint32_t ROR_16(uint32_t A, uint32_t C)    { return MASK_OUT_ABOVE_16(LSR(A, C) | LSL(A, 16-(C))); }
+static constexpr uint32_t ROR_17(uint32_t A, uint32_t C)    { return                  (LSR(A, C) | LSL(A, 17-(C))); }
+static constexpr uint32_t ROR_32(uint32_t A, uint32_t C)    { return MASK_OUT_ABOVE_32(LSR_32(A, C) | LSL_32(A, 32-(C))); }
 
 
 
@@ -211,24 +211,24 @@ inline uint32_t &REG_SP()          { return m_dar[15]; }
 /* These defines are dependant on the configuration defines in m68kconf.h */
 
 /* Disable certain comparisons if we're not using all CPU types */
-constexpr uint32_t CPU_TYPE_IS_COLDFIRE() const    { return ((m_cpu_type) & (CPU_TYPE_COLDFIRE)); }
+inline uint32_t CPU_TYPE_IS_COLDFIRE() const    { return ((m_cpu_type) & (CPU_TYPE_COLDFIRE)); }
 
-constexpr uint32_t CPU_TYPE_IS_040_PLUS() const    { return ((m_cpu_type) & (CPU_TYPE_040 | CPU_TYPE_EC040)); }
+inline uint32_t CPU_TYPE_IS_040_PLUS() const    { return ((m_cpu_type) & (CPU_TYPE_040 | CPU_TYPE_EC040)); }
 
-constexpr uint32_t CPU_TYPE_IS_030_PLUS() const    { return ((m_cpu_type) & (CPU_TYPE_030 | CPU_TYPE_EC030 | CPU_TYPE_040 | CPU_TYPE_EC040)); }
+inline uint32_t CPU_TYPE_IS_030_PLUS() const    { return ((m_cpu_type) & (CPU_TYPE_030 | CPU_TYPE_EC030 | CPU_TYPE_040 | CPU_TYPE_EC040)); }
 
-constexpr uint32_t CPU_TYPE_IS_020_PLUS() const    { return ((m_cpu_type) & (CPU_TYPE_020 | CPU_TYPE_030 | CPU_TYPE_EC030 | CPU_TYPE_040 | CPU_TYPE_EC040 | CPU_TYPE_FSCPU32 | CPU_TYPE_COLDFIRE)); }
+inline uint32_t CPU_TYPE_IS_020_PLUS() const    { return ((m_cpu_type) & (CPU_TYPE_020 | CPU_TYPE_030 | CPU_TYPE_EC030 | CPU_TYPE_040 | CPU_TYPE_EC040 | CPU_TYPE_FSCPU32 | CPU_TYPE_COLDFIRE)); }
 
-constexpr uint32_t CPU_TYPE_IS_020_VARIANT() const { return ((m_cpu_type) & (CPU_TYPE_EC020 | CPU_TYPE_020 | CPU_TYPE_FSCPU32)); }
+inline uint32_t CPU_TYPE_IS_020_VARIANT() const { return ((m_cpu_type) & (CPU_TYPE_EC020 | CPU_TYPE_020 | CPU_TYPE_FSCPU32)); }
 
-constexpr uint32_t CPU_TYPE_IS_EC020_PLUS() const  { return ((m_cpu_type) & (CPU_TYPE_EC020 | CPU_TYPE_020 | CPU_TYPE_030 | CPU_TYPE_EC030 | CPU_TYPE_040 | CPU_TYPE_EC040 | CPU_TYPE_FSCPU32 | CPU_TYPE_COLDFIRE)); }
-constexpr uint32_t CPU_TYPE_IS_EC020_LESS() const  { return ((m_cpu_type) & (CPU_TYPE_000 | CPU_TYPE_008 | CPU_TYPE_010 | CPU_TYPE_EC020)); }
+inline uint32_t CPU_TYPE_IS_EC020_PLUS() const  { return ((m_cpu_type) & (CPU_TYPE_EC020 | CPU_TYPE_020 | CPU_TYPE_030 | CPU_TYPE_EC030 | CPU_TYPE_040 | CPU_TYPE_EC040 | CPU_TYPE_FSCPU32 | CPU_TYPE_COLDFIRE)); }
+inline uint32_t CPU_TYPE_IS_EC020_LESS() const  { return ((m_cpu_type) & (CPU_TYPE_000 | CPU_TYPE_008 | CPU_TYPE_010 | CPU_TYPE_EC020)); }
 
-constexpr uint32_t CPU_TYPE_IS_010() const         { return ((m_cpu_type) == CPU_TYPE_010); }
-constexpr uint32_t CPU_TYPE_IS_010_PLUS() const    { return ((m_cpu_type) & (CPU_TYPE_010 | CPU_TYPE_EC020 | CPU_TYPE_020 | CPU_TYPE_EC030 | CPU_TYPE_030 | CPU_TYPE_040 | CPU_TYPE_EC040 | CPU_TYPE_FSCPU32 | CPU_TYPE_COLDFIRE)); }
-constexpr uint32_t CPU_TYPE_IS_010_LESS() const    { return ((m_cpu_type) & (CPU_TYPE_000 | CPU_TYPE_008 | CPU_TYPE_010)); }
+inline uint32_t CPU_TYPE_IS_010() const         { return ((m_cpu_type) == CPU_TYPE_010); }
+inline uint32_t CPU_TYPE_IS_010_PLUS() const    { return ((m_cpu_type) & (CPU_TYPE_010 | CPU_TYPE_EC020 | CPU_TYPE_020 | CPU_TYPE_EC030 | CPU_TYPE_030 | CPU_TYPE_040 | CPU_TYPE_EC040 | CPU_TYPE_FSCPU32 | CPU_TYPE_COLDFIRE)); }
+inline uint32_t CPU_TYPE_IS_010_LESS() const    { return ((m_cpu_type) & (CPU_TYPE_000 | CPU_TYPE_008 | CPU_TYPE_010)); }
 
-constexpr uint32_t CPU_TYPE_IS_000() const         { return ((m_cpu_type) == CPU_TYPE_000 || (m_cpu_type) == CPU_TYPE_008); }
+inline uint32_t CPU_TYPE_IS_000() const         { return ((m_cpu_type) == CPU_TYPE_000 || (m_cpu_type) == CPU_TYPE_008); }
 
 
 /* Initiates trace checking before each instruction (t1) */
@@ -314,28 +314,28 @@ inline uint32_t OPER_I_32() { return m68ki_read_imm_32(); }
 /* --------------------------- Status Register ---------------------------- */
 
 /* Flag Calculation Macros */
-constexpr uint32_t CFLAG_8(uint32_t A) const { return (A); }
-constexpr uint32_t CFLAG_16(uint32_t A) const { return ((A)>>8); }
+static constexpr uint32_t CFLAG_8(uint32_t A) { return (A); }
+static constexpr uint32_t CFLAG_16(uint32_t A) { return ((A)>>8); }
 
-constexpr uint32_t CFLAG_ADD_32(uint32_t S, uint32_t D, uint32_t R) const { return (((S & D) | (~R & (S | D)))>>23); }
-constexpr uint32_t CFLAG_SUB_32(uint32_t S, uint32_t D, uint32_t R) const { return (((S & R) | (~D & (S | R)))>>23); }
+static constexpr uint32_t CFLAG_ADD_32(uint32_t S, uint32_t D, uint32_t R) { return (((S & D) | (~R & (S | D)))>>23); }
+static constexpr uint32_t CFLAG_SUB_32(uint32_t S, uint32_t D, uint32_t R) { return (((S & R) | (~D & (S | R)))>>23); }
 
-constexpr uint32_t VFLAG_ADD_8(uint32_t S, uint32_t D, uint32_t R) const { return ((S^R) & (D^R)); }
-constexpr uint32_t VFLAG_ADD_16(uint32_t S, uint32_t D, uint32_t R) const { return (((S^R) & (D^R))>>8); }
-constexpr uint32_t VFLAG_ADD_32(uint32_t S, uint32_t D, uint32_t R) const { return (((S^R) & (D^R))>>24); }
+static constexpr uint32_t VFLAG_ADD_8(uint32_t S, uint32_t D, uint32_t R) { return ((S^R) & (D^R)); }
+static constexpr uint32_t VFLAG_ADD_16(uint32_t S, uint32_t D, uint32_t R) { return (((S^R) & (D^R))>>8); }
+static constexpr uint32_t VFLAG_ADD_32(uint32_t S, uint32_t D, uint32_t R) { return (((S^R) & (D^R))>>24); }
 
-constexpr uint32_t VFLAG_SUB_8(uint32_t S, uint32_t D, uint32_t R) const { return ((S^D) & (R^D)); }
-constexpr uint32_t VFLAG_SUB_16(uint32_t S, uint32_t D, uint32_t R) const { return (((S^D) & (R^D))>>8); }
-constexpr uint32_t VFLAG_SUB_32(uint32_t S, uint32_t D, uint32_t R) const { return (((S^D) & (R^D))>>24); }
+static constexpr uint32_t VFLAG_SUB_8(uint32_t S, uint32_t D, uint32_t R) { return ((S^D) & (R^D)); }
+static constexpr uint32_t VFLAG_SUB_16(uint32_t S, uint32_t D, uint32_t R) { return (((S^D) & (R^D))>>8); }
+static constexpr uint32_t VFLAG_SUB_32(uint32_t S, uint32_t D, uint32_t R) { return (((S^D) & (R^D))>>24); }
 
-constexpr uint32_t NFLAG_8(uint32_t A) const { return (A); }
-constexpr uint32_t NFLAG_16(uint32_t A) const { return ((A)>>8); }
-constexpr uint32_t NFLAG_32(uint32_t A) const { return ((A)>>24); }
-constexpr uint32_t NFLAG_64(uint64_t A) const { return ((A)>>56); }
+static constexpr uint32_t NFLAG_8(uint32_t A) { return (A); }
+static constexpr uint32_t NFLAG_16(uint32_t A) { return ((A)>>8); }
+static constexpr uint32_t NFLAG_32(uint32_t A) { return ((A)>>24); }
+static constexpr uint32_t NFLAG_64(uint64_t A) { return ((A)>>56); }
 
-constexpr uint32_t ZFLAG_8(uint32_t A) const { return MASK_OUT_ABOVE_8(A); }
-constexpr uint32_t ZFLAG_16(uint32_t A) const { return MASK_OUT_ABOVE_16(A); }
-constexpr uint32_t ZFLAG_32(uint32_t A) const { return MASK_OUT_ABOVE_32(A); }
+static constexpr uint32_t ZFLAG_8(uint32_t A) { return MASK_OUT_ABOVE_8(A); }
+static constexpr uint32_t ZFLAG_16(uint32_t A) { return MASK_OUT_ABOVE_16(A); }
+static constexpr uint32_t ZFLAG_32(uint32_t A) { return MASK_OUT_ABOVE_32(A); }
 
 
 /* Flag values */
