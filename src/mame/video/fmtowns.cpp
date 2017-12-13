@@ -715,7 +715,7 @@ WRITE8_MEMBER( towns_state::towns_spriteram_w )
  *      +6: Sprite Colour
  *          bit 15: use colour data in located in sprite RAM offset in bits 11-0 (x32)
  */
-void towns_state::render_sprite_4(uint32_t poffset, uint32_t coffset, uint16_t x, uint16_t y, uint16_t xflip, uint16_t yflip, uint16_t xhalfsize, uint16_t yhalfsize, const rectangle* rect)
+void towns_state::render_sprite_4(uint32_t poffset, uint32_t coffset, uint16_t x, uint16_t y, bool xflip, bool yflip, bool xhalfsize, bool yhalfsize, const rectangle* rect)
 {
 	uint16_t xpos,ypos;
 	uint16_t col,pixel;
@@ -828,7 +828,7 @@ void towns_state::render_sprite_4(uint32_t poffset, uint32_t coffset, uint16_t x
 	}
 }
 
-void towns_state::render_sprite_16(uint32_t poffset, uint16_t x, uint16_t y, uint16_t xflip, uint16_t yflip, uint16_t xhalfsize, uint16_t yhalfsize, const rectangle* rect)
+void towns_state::render_sprite_16(uint32_t poffset, uint16_t x, uint16_t y, bool xflip, bool yflip, bool xhalfsize, bool yhalfsize, const rectangle* rect)
 {
 	uint16_t xpos,ypos;
 	uint16_t col;
@@ -920,6 +920,7 @@ void towns_state::draw_sprites(const rectangle* rect)
 	uint16_t xoff = (m_video.towns_sprite_reg[2] | (m_video.towns_sprite_reg[3] << 8)) & 0x1ff;
 	uint16_t yoff = (m_video.towns_sprite_reg[4] | (m_video.towns_sprite_reg[5] << 8)) & 0x1ff;
 	uint32_t poffset,coffset;
+	bool xflip, yflip, xhalfsize, yhalfsize;
 
 	if(!(m_video.towns_sprite_reg[1] & 0x80))
 		return;
@@ -936,6 +937,11 @@ void towns_state::draw_sprites(const rectangle* rect)
 		y = m_towns_txtvram[8*n+2] | (m_towns_txtvram[8*n+3] << 8);
 		attr = m_towns_txtvram[8*n+4] | (m_towns_txtvram[8*n+5] << 8);
 		colour = m_towns_txtvram[8*n+6] | (m_towns_txtvram[8*n+7] << 8);
+		xflip = (attr & 0x2000) >> 13;
+		yflip = (attr & 0x1000) >> 12;
+		xhalfsize = (attr & 0x400) >> 10;
+		yhalfsize = (attr & 0x800) >> 11;
+		
 		if(attr & 0x8000)
 		{
 			x += xoff;
@@ -953,7 +959,7 @@ void towns_state::draw_sprites(const rectangle* rect)
 				n,x,y,attr,colour,poffset,coffset);
 #endif
 			if(!(colour & 0x2000))
-				render_sprite_4((poffset)&0x1ffff,coffset,x,y,attr&0x2000,attr&0x1000,attr&0x400,attr&0x800,rect);
+				render_sprite_4((poffset)&0x1ffff,coffset,x,y,xflip,yflip,xhalfsize,yhalfsize,rect);
 		}
 		else
 		{
@@ -963,7 +969,7 @@ void towns_state::draw_sprites(const rectangle* rect)
 				n,x,y,attr,colour,poffset);
 #endif
 			if(!(colour & 0x2000))
-				render_sprite_16((poffset)&0x1ffff,x,y,attr&0x2000,attr&0x1000,attr&0x400,attr&0x800,rect);
+				render_sprite_16((poffset)&0x1ffff,x,y,xflip,yflip,xhalfsize,yhalfsize,rect);
 		}
 	}
 
