@@ -161,7 +161,7 @@ void mame_machine_manager::start_luaengine()
 		}
 		else
 		{
-			osd_printf_error("**Console plugin not found. LUA Console will not start**\n");
+			fatalerror("Console plugin not found.\n");
 		}
 	}
 
