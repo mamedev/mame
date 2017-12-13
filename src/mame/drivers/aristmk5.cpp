@@ -4313,6 +4313,35 @@ ROM_START( kookabuk )
 ROM_END
 
 
+// BHG1204 / MV4114/1 / 3,5,10,20,25,50 Credit Multiplier / 20 Line Multiline
+// KEEP YOUR HAT ON / Export / B - 08/05/2000
+// Requires set chip version: 4.01.xx
+// Variation (% and NO)
+// Requires touch screen 
+ROM_START( kyhatonu )
+	ARISTOCRAT_MK5_BIOS
+	/*
+	    Checksum code found at 0x000d18
+	    Checksum is stored at 0x000020-0x000027
+	        Expected Checksum   0x57cc5e5a
+	        Calculated Checksum 0x57cc5e5a  (OK)
+	*/
+	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
+	ROM_LOAD32_WORD( "bhg1204.u7",  0x000000, 0x80000, CRC(bc365ca9) SHA1(f5bb4fc0b2eaed1274b21bc4762b6914ce621d8a) )
+	ROM_LOAD32_WORD( "bhg1204.u11", 0x000002, 0x80000, CRC(14376c1e) SHA1(616549215f35c4f5a8c4243f84290dd8b3fae5df) )
+	ROM_LOAD32_WORD( "bhg1204.u8",  0x100000, 0x80000, CRC(29081b50) SHA1(0c3990b11c9e249829babc0631840e982a387709) )
+	ROM_LOAD32_WORD( "bhg1204.u12", 0x100002, 0x80000, CRC(aba9029c) SHA1(2fe65670cf1ec7a5caab770ad9af6ad3af070e53) )
+	ROM_LOAD32_WORD( "bhg1204.u9",  0x200000, 0x80000, CRC(45a025db) SHA1(ea1f64a6c0272bb84ebdb0975f2d8198b8b5550a) )
+	ROM_LOAD32_WORD( "bhg1204.u13", 0x200002, 0x80000, CRC(fd4b24c4) SHA1(97db7899c61050c7580af67177c7fe2c8b6116aa) )
+	ROM_LOAD32_WORD( "bhg1204.u10", 0x300000, 0x80000, CRC(164ac0dd) SHA1(f6168ab76455ad29df6a4a43eea65d8c644d295a) )
+	ROM_LOAD32_WORD( "bhg1204.u14", 0x300002, 0x80000, CRC(490a9eb5) SHA1(30df13960614f82deac5426ff754885ffb429603) )
+
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
+	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
+ROM_END
+
+
 // 0100473V / 599/3 / 25 Credit Multiplier / 20 Line Multiline
 // Loco Loot / Local / C - 17/06/97
 ROM_START( locoloot )
@@ -7325,6 +7354,7 @@ GAMEL( 1995, kgalaha,    kgalah,    aristmk5,           kgalah,       aristmk5_s
 GAMEL( 1994, kgbirda5,   aristmk5,  aristmk5,           kgbirda5,     aristmk5_state, aristmk5, ROT0, "Aristocrat", "K.G. Bird (0200024V, NSW/ACT)",                        MACHINE_FLAGS, layout_kgbirda5 )        // 540/3, D - 10/10/94
 GAMEL( 2001, koalamnt,   aristmk5,  aristmk5_usa,       dolphntrce,   aristmk5_state, aristmk5, ROT0, "Aristocrat", "Koala Mint (CHG1573, US)",                             MACHINE_FLAGS, layout_dolphntrce )      // MV4137, A - 12/09/01
 GAMEL( 1998, kookabuk,   aristmk5,  aristmk5,           aristmk5,     aristmk5_state, aristmk5, ROT0, "Aristocrat", "Kooka Bucks (0100677V, NSW/ACT)",                      MACHINE_FLAGS, layout_aristmk5 )        // 661, A - 03/04/98, Rev 5
+GAMEL( 2000, kyhatonu,   aristmk5,  aristmk5_usa_touch, aristmk5_usa, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Keep Your Hat On (BHG1204, US)",                       MACHINE_FLAGS, layout_aristmk5_us )     // MV4114/1, B - 08/05/2000
 GAMEL( 1997, locoloot,   aristmk5,  aristmk5,           cashcham,     aristmk5_state, aristmk5, ROT0, "Aristocrat", "Loco Loot (0100473V, NSW/ACT)",                        MACHINE_FLAGS, layout_cashcham )        // 599/3, C - 17/06/97, Rev 1.26.13.0
 GAMEL( 1997, locoloota,  locoloot,  aristmk5,           locoloota,    aristmk5_state, aristmk5, ROT0, "Aristocrat", "Loco Loot (0100472V, NSW/ACT)",                        MACHINE_FLAGS, layout_locoloota )       // 599/2, C - 17/06/97, Rev 1.26.13.0
 GAMEL( 1998, locolootnz, locoloot,  aristmk5,           cashchamnz,   aristmk5_state, aristmk5, ROT0, "Aristocrat", "Loco Loot (0600725V, New Zealand)",                    MACHINE_FLAGS, layout_cashchamnz )      // MV4064, A - 8/7/98, Rev 24
