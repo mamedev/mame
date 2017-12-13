@@ -14722,6 +14722,7 @@ tbatfor                         // Tiger
 tbatman                         // Tiger
 tbtoads                         // Tiger
 tddragon                        // Tiger
+tgaiden                         // Tiger
 tgaunt                          // Tiger
 tjdredd                         // Tiger
 tkarnov                         // Tiger
@@ -18309,8 +18310,8 @@ marinedt                        // MG  (c) 1981 Taito Corporation
 @source:mario.cpp
 mario                           // (c) 1983 Nintendo of America
 marioe                          // (c) 1983 Nintendo of America
+mariof                          // (c) 1983 Nintendo of America
 marioj                          // (c) 1983 Nintendo
-marioo                          // (c) 1983 Nintendo of America
 masao                           // bootleg
 
 @source:markham.cpp
@@ -20455,7 +20456,7 @@ edfp                            // (c) 1991 (Japan, Prototype)
 hachoo                          // (c) 1989
 hayaosi1                        // (c) 1993
 iganinju                        // (c) 1988 (Japan)
-inyourfa                        // (c) 1988 (Japan)
+inyourfa                        // (c) 1991 (World)
 jitsupro                        // (c) 1989 (Japan)
 kazan                           // (c) 1988 (World)
 kickoff                         // (c) 1988 (Japan)
@@ -38793,6 +38794,10 @@ cannballv                       // (c) 1995 Yun Sung / T&K
 magix                           // (c) 1995 Yun Sung
 magixb                          // bootleg
 rocktris                        // (c) 1994? Yun Sung
+
+@source:yuvomz80.cpp
+goldhexa                        // Yuvo / Yubis
+hexapres                        //
 
 @source:z100.cpp
 z100                            //

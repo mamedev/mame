@@ -40,6 +40,9 @@ private:
 	static constexpr unsigned ETHER_BUFFERS = 16;
 	static constexpr unsigned ETHERNET_ADDR_SIZE = 6;
 
+	// external network is present
+	bool m_network_available;
+
 	// mmu
 	// The bits in these vectors indicate a packet has been allocated
 	u32 m_alloc_rx, m_alloc_tx;
@@ -74,8 +77,8 @@ private:
 
 	emu_timer* m_tx_timer;
 
-	int ethernet_packet_is_for_me(const uint8_t mac_address[]);
-	int is_broadcast(uint8_t mac_address[]);
+	int ethernet_packet_is_for_me(const uint8_t *mac_address);
+	int is_broadcast(const uint8_t *mac_address);
 
 	void update_ethernet_irq();
 	void update_stats();

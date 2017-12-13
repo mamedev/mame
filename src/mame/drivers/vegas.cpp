@@ -2306,6 +2306,8 @@ DRIVER_INIT_MEMBER(vegas_state,warfa)
 {
 	/* speedups */
 	m_maincpu->mips3drc_add_hotspot(0x8009436C, 0x0C031663, 250);     /* confirmed */
+	// TODO: For some reason game hangs if ethernet is on
+	m_ethernet->set_link_connected(false);
 }
 
 

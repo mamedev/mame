@@ -69,7 +69,7 @@ WRITE32_MEMBER( m68340_cpu_device::m68340_internal_base_w )
 		}
 
 		COMBINE_DATA(&m_m68340_base);
-		logerror("%08x m68340_internal_base_w %08x, %08x (%08x) (m_m68340_base write)\n", pc, offset*4,data,mem_mask);
+		logerror("%08x m68340_internal_base_w %08x, %08x (%08x) (m_m68340_base write)\n", pc(), offset*4,data,mem_mask);
 
 		// map new modules
 		if (m_m68340_base&1)
@@ -103,7 +103,7 @@ WRITE32_MEMBER( m68340_cpu_device::m68340_internal_base_w )
 	}
 	else
 	{
-		logerror("%08x m68340_internal_base_w %08x, %04x (%04x) (should fall through?)\n", pc, offset*4,data,mem_mask);
+		logerror("%08x m68340_internal_base_w %08x, %04x (%04x) (should fall through?)\n", pc(), offset*4,data,mem_mask);
 	}
 
 
