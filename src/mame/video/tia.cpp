@@ -447,7 +447,7 @@ void tia_video_device::draw_sprite_helper(uint8_t* p, uint8_t *col, struct playe
 
 	if (REFP & 8)
 	{
-		GRP = BITSWAP8(GRP, 0, 1, 2, 3, 4, 5, 6, 7);
+		GRP = bitswap<8>(GRP, 0, 1, 2, 3, 4, 5, 6, 7);
 	}
 
 	for (i = 0; i < PLAYER_GFX_SLOTS; i++)
@@ -539,9 +539,9 @@ void tia_video_device::draw_playfield_helper(uint8_t* p, uint8_t* col, int horz,
 	uint8_t COLU, uint8_t REFPF)
 {
 	uint32_t PF =
-		(BITSWAP8(PF0, 0, 1, 2, 3, 4, 5, 6, 7) << 0x10) |
-		(BITSWAP8(PF1, 7, 6, 5, 4, 3, 2, 1, 0) << 0x08) |
-		(BITSWAP8(PF2, 0, 1, 2, 3, 4, 5, 6, 7) << 0x00);
+		(bitswap<8>(PF0, 0, 1, 2, 3, 4, 5, 6, 7) << 0x10) |
+		(bitswap<8>(PF1, 7, 6, 5, 4, 3, 2, 1, 0) << 0x08) |
+		(bitswap<8>(PF2, 0, 1, 2, 3, 4, 5, 6, 7) << 0x00);
 
 	int i;
 	int j;

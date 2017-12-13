@@ -375,7 +375,7 @@ WRITE8_MEMBER(bambball_state::plate_w)
 	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
 
 	// update display
-	u16 plate = BITSWAP16(m_plate,13,8,4,12,9,10,14,1,7,0,15,11,6,3,5,2);
+	u16 plate = bitswap<16>(m_plate,13,8,4,12,9,10,14,1,7,0,15,11,6,3,5,2);
 	display_matrix(16, 9, plate, m_grid);
 }
 
@@ -484,8 +484,8 @@ public:
 
 void bmboxing_state::prepare_display()
 {
-	u16 grid = BITSWAP16(m_grid,15,14,13,12,11,10,9,0,1,2,3,4,5,6,7,8);
-	u32 plate = BITSWAP16(m_plate,15,14,13,12,1,2,0,3,11,4,10,7,5,6,9,8);
+	u16 grid = bitswap<16>(m_grid,15,14,13,12,11,10,9,0,1,2,3,4,5,6,7,8);
+	u32 plate = bitswap<16>(m_plate,15,14,13,12,1,2,0,3,11,4,10,7,5,6,9,8);
 	display_matrix(12, 9, plate, grid);
 }
 
@@ -623,8 +623,8 @@ public:
 
 void bfriskyt_state::prepare_display()
 {
-	u16 grid = BITSWAP16(m_grid,15,14,13,12,11,10,9,8,0,1,2,3,4,5,6,7);
-	u32 plate = BITSWAP24(m_plate,23,22,0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21);
+	u16 grid = bitswap<16>(m_grid,15,14,13,12,11,10,9,8,0,1,2,3,4,5,6,7);
+	u32 plate = bitswap<24>(m_plate,23,22,0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21);
 	display_matrix(22, 8, plate, grid);
 }
 
@@ -755,8 +755,8 @@ WRITE8_MEMBER(packmon_state::plate_w)
 	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
 
 	// update display
-	u16 grid = BITSWAP16(m_grid,15,14,13,12,11,10,0,1,2,3,4,5,6,7,8,9);
-	u32 plate = BITSWAP24(m_plate,23,22,21,20,0,1,2,3,4,5,6,19,18,17,16,15,14,13,12,11,10,9,8,7);
+	u16 grid = bitswap<16>(m_grid,15,14,13,12,11,10,0,1,2,3,4,5,6,7,8,9);
+	u32 plate = bitswap<24>(m_plate,23,22,21,20,0,1,2,3,4,5,6,19,18,17,16,15,14,13,12,11,10,9,8,7);
 	display_matrix(20, 10, plate, grid);
 }
 
@@ -865,8 +865,8 @@ public:
 
 void msthawk_state::prepare_display()
 {
-	u16 grid = BITSWAP16(m_grid,15,14,13,12,11,10,0,1,2,3,4,5,6,7,8,9);
-	u32 plate = BITSWAP24(m_plate,23,22,21,19,20,18,17,16,15,14,13,12,11,10,9,8,7,6,5,4,3,2,1,0);
+	u16 grid = bitswap<16>(m_grid,15,14,13,12,11,10,0,1,2,3,4,5,6,7,8,9);
+	u32 plate = bitswap<24>(m_plate,23,22,21,19,20,18,17,16,15,14,13,12,11,10,9,8,7,6,5,4,3,2,1,0);
 	display_matrix(21, 10, plate, grid);
 }
 
@@ -997,8 +997,8 @@ WRITE8_MEMBER(bzaxxon_state::plate_w)
 	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
 
 	// update display
-	u16 grid = BITSWAP16(m_grid,15,14,13,12,11,6,7,8,9,10,5,4,3,2,1,0);
-	u32 plate = BITSWAP24(m_plate,23,22,21,20,5,7,0,1,2,3,4,6,19,16,17,18,15,14,13,12,10,8,9,11) | 0x800;
+	u16 grid = bitswap<16>(m_grid,15,14,13,12,11,6,7,8,9,10,5,4,3,2,1,0);
+	u32 plate = bitswap<24>(m_plate,23,22,21,20,5,7,0,1,2,3,4,6,19,16,17,18,15,14,13,12,10,8,9,11) | 0x800;
 	display_matrix(20, 11, plate, grid);
 }
 
@@ -1117,8 +1117,8 @@ WRITE8_MEMBER(zackman_state::plate_w)
 	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
 
 	// update display
-	u8 grid = BITSWAP8(m_grid,0,1,2,3,4,5,6,7);
-	u32 plate = BITSWAP32(m_plate,31,30,27,0,1,2,3,4,5,6,7,8,9,10,11,24,25,26,29,28,23,22,21,20,19,18,17,16,15,14,13,12);
+	u8 grid = bitswap<8>(m_grid,0,1,2,3,4,5,6,7);
+	u32 plate = bitswap<32>(m_plate,31,30,27,0,1,2,3,4,5,6,7,8,9,10,11,24,25,26,29,28,23,22,21,20,19,18,17,16,15,14,13,12);
 	display_matrix(29, 8, plate, grid);
 }
 
@@ -1232,8 +1232,8 @@ public:
 
 void bpengo_state::prepare_display()
 {
-	u8 grid = BITSWAP8(m_grid,0,1,2,3,4,5,6,7);
-	u32 plate = BITSWAP32(m_plate,31,30,29,28,23,22,21,16,17,18,19,20,27,26,25,24,15,14,13,12,11,10,9,8,7,6,5,4,3,2,1,0);
+	u8 grid = bitswap<8>(m_grid,0,1,2,3,4,5,6,7);
+	u32 plate = bitswap<32>(m_plate,31,30,29,28,23,22,21,16,17,18,19,20,27,26,25,24,15,14,13,12,11,10,9,8,7,6,5,4,3,2,1,0);
 	display_matrix(25, 8, plate, grid);
 }
 
@@ -1360,8 +1360,8 @@ public:
 
 void bbtime_state::prepare_display()
 {
-	u8 grid = BITSWAP8(m_grid,7,6,0,1,2,3,4,5);
-	u32 plate = BITSWAP32(m_plate,31,30,29,28,25,24,26,27,22,23,15,14,12,11,10,8,7,6,4,1,5,9,13,3,2,16,17,18,19,20,0,21) | 0x1;
+	u8 grid = bitswap<8>(m_grid,7,6,0,1,2,3,4,5);
+	u32 plate = bitswap<32>(m_plate,31,30,29,28,25,24,26,27,22,23,15,14,12,11,10,8,7,6,4,1,5,9,13,3,2,16,17,18,19,20,0,21) | 0x1;
 	display_matrix(28, 6, plate, grid);
 }
 
@@ -1485,8 +1485,8 @@ WRITE8_MEMBER(bdoramon_state::plate_w)
 	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
 
 	// update display
-	u8 grid = BITSWAP8(m_grid,0,1,2,3,4,5,7,6);
-	u32 plate = BITSWAP24(m_plate,23,22,21,20,11,19,18,17,16,15,14,13,12,10,9,8,7,6,5,4,3,2,1,0);
+	u8 grid = bitswap<8>(m_grid,0,1,2,3,4,5,7,6);
+	u32 plate = bitswap<24>(m_plate,23,22,21,20,11,19,18,17,16,15,14,13,12,10,9,8,7,6,5,4,3,2,1,0);
 	display_matrix(19, 8, plate, grid);
 }
 
@@ -1584,8 +1584,8 @@ WRITE8_MEMBER(bultrman_state::plate_w)
 	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
 
 	// update display
-	u8 grid = BITSWAP8(m_grid,0,1,2,3,4,5,6,7);
-	u32 plate = BITSWAP24(m_plate,23,22,21,20,19,0,18,17,16,15,14,13,12,3,11,10,9,8,7,6,5,4,1,2);
+	u8 grid = bitswap<8>(m_grid,0,1,2,3,4,5,6,7);
+	u32 plate = bitswap<24>(m_plate,23,22,21,20,19,0,18,17,16,15,14,13,12,3,11,10,9,8,7,6,5,4,1,2);
 	display_matrix(18, 8, plate, grid);
 }
 
@@ -1672,7 +1672,7 @@ public:
 
 void machiman_state::prepare_display()
 {
-	u32 plate = BITSWAP24(m_plate,23,22,21,20,19,0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18);
+	u32 plate = bitswap<24>(m_plate,23,22,21,20,19,0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18);
 	display_matrix(19, 5, plate, m_grid);
 }
 
@@ -1802,7 +1802,7 @@ READ8_MEMBER(pairmtch_state::input_r)
 WRITE8_MEMBER(pairmtch_state::sound_w)
 {
 	// R5x: soundlatch (to audiocpu R2x)
-	m_soundlatch->write(space, 0, BITSWAP8(data,7,6,5,4,0,1,2,3));
+	m_soundlatch->write(space, 0, bitswap<8>(data,7,6,5,4,0,1,2,3));
 }
 
 
@@ -1811,7 +1811,7 @@ WRITE8_MEMBER(pairmtch_state::sound_w)
 WRITE8_MEMBER(pairmtch_state::sound2_w)
 {
 	// R2x: soundlatch (to maincpu R5x)
-	m_soundlatch2->write(space, 0, BITSWAP8(data,7,6,5,4,0,1,2,3));
+	m_soundlatch2->write(space, 0, bitswap<8>(data,7,6,5,4,0,1,2,3));
 }
 
 WRITE16_MEMBER(pairmtch_state::speaker_w)
@@ -1924,7 +1924,7 @@ WRITE8_MEMBER(alnattck_state::plate_w)
 	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
 
 	// update display
-	u32 plate = BITSWAP24(m_plate,23,22,21,20,19,18,17,16,11,9,8,10,7,2,0,1,3,4,5,6,12,13,14,15);
+	u32 plate = bitswap<24>(m_plate,23,22,21,20,19,18,17,16,11,9,8,10,7,2,0,1,3,4,5,6,12,13,14,15);
 	display_matrix(20, 10, plate, m_grid);
 }
 
@@ -2054,7 +2054,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(cdkong_state::speaker_decay_sim)
 
 void cdkong_state::prepare_display()
 {
-	u32 plate = BITSWAP32(m_plate,31,30,29,24,0,16,8,1,23,17,9,2,18,10,25,27,26,3,15,27,11,11,14,22,6,13,21,5,19,12,20,4) | 0x800800;
+	u32 plate = bitswap<32>(m_plate,31,30,29,24,0,16,8,1,23,17,9,2,18,10,25,27,26,3,15,27,11,11,14,22,6,13,21,5,19,12,20,4) | 0x800800;
 	display_matrix(29, 11, plate, m_grid);
 }
 
@@ -2172,8 +2172,8 @@ public:
 
 void cgalaxn_state::prepare_display()
 {
-	u16 grid = BITSWAP16(m_grid,15,14,13,12,1,2,0,11,10,9,8,7,6,5,4,3);
-	u16 plate = BITSWAP16(m_plate,15,14,6,5,4,3,2,1,7,8,9,10,11,0,12,13);
+	u16 grid = bitswap<16>(m_grid,15,14,13,12,1,2,0,11,10,9,8,7,6,5,4,3);
+	u16 plate = bitswap<16>(m_plate,15,14,6,5,4,3,2,1,7,8,9,10,11,0,12,13);
 	display_matrix(15, 12, plate, grid);
 }
 
@@ -2307,8 +2307,8 @@ WRITE8_MEMBER(cpacman_state::plate_w)
 	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
 
 	// update display
-	u16 grid = BITSWAP16(m_grid,15,14,13,12,11,0,1,2,3,4,5,6,7,8,9,10);
-	u32 plate = BITSWAP32(m_plate,31,30,29,28,27,0,1,2,3,8,9,10,11,16,17,18,19,25,26,23,22,21,20,24,15,14,13,12,4,5,6,7);
+	u16 grid = bitswap<16>(m_grid,15,14,13,12,11,0,1,2,3,4,5,6,7,8,9,10);
+	u32 plate = bitswap<32>(m_plate,31,30,29,28,27,0,1,2,3,8,9,10,11,16,17,18,19,25,26,23,22,21,20,24,15,14,13,12,4,5,6,7);
 	display_matrix(27, 11, plate, grid);
 }
 
@@ -2424,8 +2424,8 @@ WRITE8_MEMBER(cmspacmn_state::plate_w)
 	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
 
 	// update display
-	u16 grid = BITSWAP16(m_grid,15,14,13,11,10,9,8,7,6,5,4,3,2,1,0,1);
-	u64 plate = BIT(m_plate,15)<<32 | BITSWAP32(m_plate,14,13,12,4,5,6,7,24,23,25,22,21,20,13,24,3,19,14,12,11,24,2,10,8,7,25,0,9,1,18,17,16) | 0x1004080;
+	u16 grid = bitswap<16>(m_grid,15,14,13,11,10,9,8,7,6,5,4,3,2,1,0,1);
+	u64 plate = BIT(m_plate,15)<<32 | bitswap<32>(m_plate,14,13,12,4,5,6,7,24,23,25,22,21,20,13,24,3,19,14,12,11,24,2,10,8,7,25,0,9,1,18,17,16) | 0x1004080;
 	display_matrix(33, 12, plate, grid);
 }
 
@@ -2540,7 +2540,7 @@ void sag_state::prepare_display()
 
 	// grid 8-11 are 7segs
 	set_display_segmask(0xf00, 0x7f);
-	u8 seg = BITSWAP8(m_plate,3,4,5,6,7,8,9,10);
+	u8 seg = bitswap<8>(m_plate,3,4,5,6,7,8,9,10);
 	for (int y = 8; y < 12; y++)
 		m_display_state[y] = (m_grid >> y & 1) ? seg : 0;
 
@@ -2670,8 +2670,8 @@ public:
 
 void egalaxn2_state::prepare_display()
 {
-	u16 grid = BITSWAP16(m_grid,15,0,1,2,3,4,5,6,7,8,9,10,11,12,13,14);
-	u32 plate = BITSWAP24(m_plate,23,22,21,20,15,14,13,12,7,6,5,4,3,2,1,0,19,18,17,16,11,10,9,8);
+	u16 grid = bitswap<16>(m_grid,15,0,1,2,3,4,5,6,7,8,9,10,11,12,13,14);
+	u32 plate = bitswap<24>(m_plate,23,22,21,20,15,14,13,12,7,6,5,4,3,2,1,0,19,18,17,16,11,10,9,8);
 	display_matrix(24, 15, plate, grid);
 }
 
@@ -2870,8 +2870,8 @@ protected:
 
 void eturtles_state::prepare_display()
 {
-	u16 grid = BITSWAP16(m_grid,15,1,14,13,12,11,10,9,8,7,6,5,4,3,2,0);
-	u32 plate = BITSWAP32(m_plate,31,30,11,12,18,19,16,17,22,15,20,21,27,26,23,25,24,2,3,1,0,6,4,5,10,9,2,8,7,14,1,13);
+	u16 grid = bitswap<16>(m_grid,15,1,14,13,12,11,10,9,8,7,6,5,4,3,2,0);
+	u32 plate = bitswap<32>(m_plate,31,30,11,12,18,19,16,17,22,15,20,21,27,26,23,25,24,2,3,1,0,6,4,5,10,9,2,8,7,14,1,13);
 	display_matrix(30, 15, plate | (grid >> 5 & 8), grid); // grid 8 also forces plate 3 high
 }
 
@@ -3049,8 +3049,8 @@ public:
 
 void estargte_state::prepare_display()
 {
-	u16 grid = BITSWAP16(m_grid,15,0,14,13,12,11,10,9,8,7,6,5,4,3,2,1);
-	u32 plate = BITSWAP32(m_plate,31,30,29,15,17,19,21,23,25,27,26,24,3,22,20,18,16,14,12,10,8,6,4,2,0,1,3,5,7,9,11,13);
+	u16 grid = bitswap<16>(m_grid,15,0,14,13,12,11,10,9,8,7,6,5,4,3,2,1);
+	u32 plate = bitswap<32>(m_plate,31,30,29,15,17,19,21,23,25,27,26,24,3,22,20,18,16,14,12,10,8,6,4,2,0,1,3,5,7,9,11,13);
 	display_matrix(29, 14, plate, grid);
 }
 
@@ -3166,8 +3166,8 @@ WRITE8_MEMBER(ghalien_state::plate_w)
 	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
 
 	// update display
-	u16 grid = BITSWAP16(m_grid,15,14,13,12,11,10,0,1,2,3,4,5,6,7,8,9);
-	u32 plate = BITSWAP24(m_plate,23,22,21,20,14,12,10,8,9,13,15,2,0,1,3,11,7,5,4,6,19,17,16,18);
+	u16 grid = bitswap<16>(m_grid,15,14,13,12,11,10,0,1,2,3,4,5,6,7,8,9);
+	u32 plate = bitswap<24>(m_plate,23,22,21,20,14,12,10,8,9,13,15,2,0,1,3,11,7,5,4,6,19,17,16,18);
 	display_matrix(20, 10, plate, grid);
 }
 
@@ -3285,8 +3285,8 @@ WRITE8_MEMBER(gckong_state::plate_w)
 	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
 
 	// update display
-	u16 grid = BITSWAP16(m_grid,15,14,13,12,11,0,1,2,3,4,5,6,7,8,9,10);
-	u32 plate = BITSWAP32(m_plate,31,30,29,28,27,26,25,6,7,8,12,13,14,15,16,17,18,17,16,12,11,10,9,8,7,6,5,4,3,2,1,0) | 0x8000;
+	u16 grid = bitswap<16>(m_grid,15,14,13,12,11,0,1,2,3,4,5,6,7,8,9,10);
+	u32 plate = bitswap<32>(m_plate,31,30,29,28,27,26,25,6,7,8,12,13,14,15,16,17,18,17,16,12,11,10,9,8,7,6,5,4,3,2,1,0) | 0x8000;
 	display_matrix(32, 11, plate, grid);
 }
 
@@ -3408,7 +3408,7 @@ WRITE8_MEMBER(gdigdug_state::plate_w)
 	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
 
 	// update display
-	u32 plate = BITSWAP32(m_plate,30,31,0,1,2,3,4,5,6,7,20,21,22,27,26,25,28,29,24,23,15,14,13,12,8,9,10,11,19,18,17,16);
+	u32 plate = bitswap<32>(m_plate,30,31,0,1,2,3,4,5,6,7,20,21,22,27,26,25,28,29,24,23,15,14,13,12,8,9,10,11,19,18,17,16);
 	display_matrix(32, 9, plate, m_grid);
 }
 
@@ -3528,7 +3528,7 @@ public:
 
 void mwcbaseb_state::prepare_display()
 {
-	u8 grid = BITSWAP8(m_grid,0,1,2,3,4,5,6,7);
+	u8 grid = bitswap<8>(m_grid,0,1,2,3,4,5,6,7);
 	display_matrix(16, 8, m_plate, grid);
 }
 
@@ -3688,7 +3688,7 @@ WRITE8_MEMBER(pbqbert_state::plate_w)
 	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
 
 	// update display
-	u32 plate = BITSWAP32(m_plate,31,30,24,25,26,27,28,15,14,29,13,12,11,10,9,8,7,6,5,4,3,2,1,0,16,17,18,19,20,21,22,23) | 0x400000;
+	u32 plate = bitswap<32>(m_plate,31,30,24,25,26,27,28,15,14,29,13,12,11,10,9,8,7,6,5,4,3,2,1,0,16,17,18,19,20,21,22,23) | 0x400000;
 	display_matrix(30, 8, plate, m_grid);
 }
 
@@ -3776,8 +3776,8 @@ public:
 
 void kingman_state::prepare_display()
 {
-	u16 grid = BITSWAP16(m_grid,15,14,13,12,11,10,9,0,1,2,3,4,5,6,7,8);
-	u32 plate = BITSWAP24(m_plate,23,6,7,5,4,3,2,1,0,13,12,20,19,18,17,16,10,11,9,8,14,15,13,12);
+	u16 grid = bitswap<16>(m_grid,15,14,13,12,11,10,9,0,1,2,3,4,5,6,7,8);
+	u32 plate = bitswap<24>(m_plate,23,6,7,5,4,3,2,1,0,13,12,20,19,18,17,16,10,11,9,8,14,15,13,12);
 	display_matrix(23, 9, plate, grid);
 }
 
@@ -3897,8 +3897,8 @@ public:
 
 void tmtron_state::prepare_display()
 {
-	u16 grid = BITSWAP16(m_grid,15,14,13,12,11,10,1,2,3,4,5,6,7,8,9,0);
-	u32 plate = BITSWAP24(m_plate,23,5,2,21,1,6,7,9,10,11,21,0,19,3,4,8,3,18,17,16,12,13,14,15);
+	u16 grid = bitswap<16>(m_grid,15,14,13,12,11,10,1,2,3,4,5,6,7,8,9,0);
+	u32 plate = bitswap<24>(m_plate,23,5,2,21,1,6,7,9,10,11,21,0,19,3,4,8,3,18,17,16,12,13,14,15);
 	display_matrix(23, 10, plate, grid);
 }
 
@@ -4023,7 +4023,7 @@ WRITE8_MEMBER(vinvader_state::plate_w)
 	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
 
 	// update display
-	u16 plate = BITSWAP16(m_plate,15,11,7,3,10,6,14,2,9,5,13,1,8,4,12,0);
+	u16 plate = bitswap<16>(m_plate,15,11,7,3,10,6,14,2,9,5,13,1,8,4,12,0);
 	display_matrix(12, 9, plate, m_grid);
 }
 

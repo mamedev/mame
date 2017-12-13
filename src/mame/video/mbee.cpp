@@ -434,7 +434,7 @@ PALETTE_INIT_MEMBER( mbee_state, standard )
 			for (r1 = 0; r1 < 4; r1++)
 			{
 				r = bglevel[r1];
-				k = BITSWAP8(i, 7, 6, 5, 3, 1, 4, 2, 0);
+				k = bitswap<8>(i, 7, 6, 5, 3, 1, 4, 2, 0);
 				palette.set_pen_color(k, rgb_t(r, g, b));
 				i++;
 			}

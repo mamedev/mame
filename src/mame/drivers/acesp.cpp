@@ -3856,13 +3856,13 @@ static void descramble_crystal( uint8_t* region, int start, int end, uint8_t ext
 		switch (i & 0x58)
 		{
 		case 0x00: // same as 0x08
-		case 0x08: x = BITSWAP8( x^0xca , 3,2,1,0,7,4,6,5 ); break;
-		case 0x10: x = BITSWAP8( x^0x30 , 3,0,4,6,1,5,7,2 ); break;
-		case 0x18: x = BITSWAP8( x^0x89 , 4,1,2,5,7,0,6,3 ); break;
-		case 0x40: x = BITSWAP8( x^0x14 , 6,1,4,3,2,5,0,7 ); break;
-		case 0x48: x = BITSWAP8( x^0x40 , 1,0,3,2,5,4,7,6 ); break;
-		case 0x50: x = BITSWAP8( x^0xcb , 3,2,1,0,7,6,5,4 ); break;
-		case 0x58: x = BITSWAP8( x^0xc0 , 2,3,6,0,5,1,7,4 ); break;
+		case 0x08: x = bitswap<8>( x^0xca , 3,2,1,0,7,4,6,5 ); break;
+		case 0x10: x = bitswap<8>( x^0x30 , 3,0,4,6,1,5,7,2 ); break;
+		case 0x18: x = bitswap<8>( x^0x89 , 4,1,2,5,7,0,6,3 ); break;
+		case 0x40: x = bitswap<8>( x^0x14 , 6,1,4,3,2,5,0,7 ); break;
+		case 0x48: x = bitswap<8>( x^0x40 , 1,0,3,2,5,4,7,6 ); break;
+		case 0x50: x = bitswap<8>( x^0xcb , 3,2,1,0,7,6,5,4 ); break;
+		case 0x58: x = bitswap<8>( x^0xc0 , 2,3,6,0,5,1,7,4 ); break;
 		}
 		region[i] = x ^ extra_xor;
 	}

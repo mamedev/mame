@@ -385,7 +385,7 @@ READ8_MEMBER( wico_state::lampst_r )
 			j = m_shared_ram[0x7f9 + i];
 		else
 			j = 0;
-		output().set_digit_value(i * 10 + (m_shared_ram[0x96] & 7), BITSWAP16(j, 8, 8, 8, 8, 8, 8, 7, 7, 6, 6, 5, 4, 3, 2, 1, 0));
+		output().set_digit_value(i * 10 + (m_shared_ram[0x96] & 7), bitswap<16>(j, 8, 8, 8, 8, 8, 8, 7, 7, 6, 6, 5, 4, 3, 2, 1, 0));
 	}
 	return 0xff;
 }

@@ -1312,10 +1312,10 @@ int qix_state::kram3_permut1(int idx, int value)
 	switch (idx)
 	{
 		default:
-		case 0: return BITSWAP8(value, 7,6,5,4, 3,2,1,0);
-		case 1: return BITSWAP8(value, 7,6,5,4, 0,3,2,1);
-		case 2: return BITSWAP8(value, 7,6,5,4, 1,0,3,2);
-		case 3: return BITSWAP8(value, 7,6,5,4, 2,3,0,1);
+		case 0: return bitswap<8>(value, 7,6,5,4, 3,2,1,0);
+		case 1: return bitswap<8>(value, 7,6,5,4, 0,3,2,1);
+		case 2: return bitswap<8>(value, 7,6,5,4, 1,0,3,2);
+		case 3: return bitswap<8>(value, 7,6,5,4, 2,3,0,1);
 	}
 }
 
@@ -1335,7 +1335,7 @@ int qix_state::kram3_permut2(int tbl_index, int idx, const uint8_t *xor_table)
 	xorval ^= 0x02;
 
 	if (idx == 3)
-		xorval = BITSWAP8(xorval, 7,6,5,4, 0,2,3,1);
+		xorval = bitswap<8>(xorval, 7,6,5,4, 0,2,3,1);
 
 	return xorval;
 }

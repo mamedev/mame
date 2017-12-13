@@ -289,7 +289,7 @@ READ8_MEMBER(fidel68k_state::fdes68k_input_r)
 WRITE8_MEMBER(fidel68k_state::fdes68k_lcd_w)
 {
 	// a1-a3,d0-d3: 4*74259 to lcd digit segments
-	u32 mask = BITSWAP8(1 << offset,3,7,6,0,1,2,4,5);
+	u32 mask = bitswap<8>(1 << offset,3,7,6,0,1,2,4,5);
 	for (int i = 0; i < 4; i++)
 	{
 		m_7seg_data = (m_7seg_data & ~mask) | ((data >> i & 1) ? mask : 0);
@@ -304,13 +304,13 @@ DRIVER_INIT_MEMBER(fidel68k_state, fdes2265)
 
 	// descramble data lines
 	for (int i = 0; i < len; i++)
-		rom[i] = BITSWAP16(rom[i], 15,14,8,13,9,12,10,11, 3,4,5,7,6,0,1,2);
+		rom[i] = bitswap<16>(rom[i], 15,14,8,13,9,12,10,11, 3,4,5,7,6,0,1,2);
 
 	// descramble address lines
 	std::vector<u16> buf(len);
 	memcpy(&buf[0], rom, len*2);
 	for (int i = 0; i < len; i++)
-		rom[i] = buf[BITSWAP24(i, 23,22,21,20,19,18,17,16, 15,14,13,12,11,8,10,9, 7,6,5,4,3,2,1,0)];
+		rom[i] = buf[bitswap<24>(i, 23,22,21,20,19,18,17,16, 15,14,13,12,11,8,10,9, 7,6,5,4,3,2,1,0)];
 }
 
 
@@ -325,7 +325,7 @@ void fidel68k_state::eag_prepare_display()
 {
 	// Excel 68000: 4*7seg leds, 8*8 chessboard leds
 	// EAG: 8*7seg leds(2 panels), (8+1)*8 chessboard leds
-	u8 seg_data = BITSWAP8(m_7seg_data,0,1,3,2,7,5,6,4);
+	u8 seg_data = bitswap<8>(m_7seg_data,0,1,3,2,7,5,6,4);
 	set_display_segmask(0x1ff, 0x7f);
 	display_matrix(16, 9, m_led_data << 8 | seg_data, m_inp_mux);
 }

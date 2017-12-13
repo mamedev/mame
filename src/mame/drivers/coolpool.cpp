@@ -1145,13 +1145,13 @@ DRIVER_INIT_MEMBER(coolpool_state,9ballsht)
 		hi = rom[a] >> 8;
 		lo = rom[a] & 0xff;
 
-		nhi = BITSWAP8(hi,5,2,0,7,6,4,3,1) ^ 0x29;
+		nhi = bitswap<8>(hi,5,2,0,7,6,4,3,1) ^ 0x29;
 		if (hi & 0x01) nhi ^= 0x03;
 		if (hi & 0x10) nhi ^= 0xc1;
 		if (hi & 0x20) nhi ^= 0x40;
 		if (hi & 0x40) nhi ^= 0x12;
 
-		nlo = BITSWAP8(lo,5,3,4,6,7,1,2,0) ^ 0x80;
+		nlo = bitswap<8>(lo,5,3,4,6,7,1,2,0) ^ 0x80;
 		if ((lo & 0x02) && (lo & 0x04)) nlo ^= 0x01;
 		if (lo & 0x04) nlo ^= 0x0c;
 		if (lo & 0x08) nlo ^= 0x10;

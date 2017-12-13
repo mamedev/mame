@@ -349,7 +349,7 @@ WRITE64_MEMBER(novag6502_state::cforte_lcd_output_w)
 		for (int i = 0; i < 4; i++)
 			m_display_state[dig+3] |= ((rowdata[i] >> (2*dig) & 3) << (2*i));
 
-		m_display_state[dig+3] = BITSWAP8(m_display_state[dig+3],7,2,0,4,6,5,3,1);
+		m_display_state[dig+3] = bitswap<8>(m_display_state[dig+3],7,2,0,4,6,5,3,1);
 	}
 
 	cforte_prepare_display();

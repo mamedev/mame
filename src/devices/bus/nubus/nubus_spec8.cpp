@@ -257,7 +257,7 @@ WRITE32_MEMBER( nubus_spec8s3_device::spec8s3_w )
 
 			if (m_count == 3)
 			{
-				int actual_color = BITSWAP8(m_clutoffs, 0, 1, 2, 3, 4, 5, 6, 7);
+				int actual_color = bitswap<8>(m_clutoffs, 0, 1, 2, 3, 4, 5, 6, 7);
 
 //              printf("RAMDAC: color %d = %02x %02x %02x (PC=%x)\n", actual_color, m_colors[0], m_colors[1], m_colors[2], space.device().safe_pc() );
 				m_palette[actual_color] = rgb_t(m_colors[0], m_colors[1], m_colors[2]);

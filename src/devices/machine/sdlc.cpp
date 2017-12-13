@@ -282,7 +282,7 @@ void sdlc_logger_device::log_frame(bool partial) const
 				fcs |= std::uint16_t(m_buffer[frame_bytes - 1]) << (8 - residual_bits);
 				if (residual_bits)
 					fcs |= (std::uint16_t(m_buffer[frame_bytes]) & ((1U << residual_bits) - 1U)) << (16 - residual_bits);
-				fcs = ~BITSWAP16(fcs, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15);
+				fcs = ~bitswap<16>(fcs, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15);
 				util::stream_format(msg, " FCS=%04X", fcs);
 				if (!is_frame_check_good())
 					util::stream_format(msg, " (expected %04X)", m_expected_fcs);

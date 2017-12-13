@@ -77,7 +77,7 @@ uint32_t risc2500_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 		// 12 characters 5 x 7
 		for(int x=0; x<5; x++)
 		{
-			uint8_t gfx = BITSWAP8(m_vram[c*5 + x], 6,5,0,1,2,3,4,7);
+			uint8_t gfx = bitswap<8>(m_vram[c*5 + x], 6,5,0,1,2,3,4,7);
 
 			for(int y=0; y<7; y++)
 				bitmap.pix16(y, 71 - (c*6 + x)) = (gfx >> (y + 1)) & 1;
@@ -86,7 +86,7 @@ uint32_t risc2500_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 		// LCD digits and symbols
 		int data_addr = 0x40 + c * 5;
 		uint16_t data = ((m_vram[data_addr + 1] & 0x3) << 5) | ((m_vram[data_addr + 2] & 0x7) << 2) | (m_vram[data_addr + 4] & 0x3);
-		data = BITSWAP8(data, 7,3,0,1,4,6,5,2) | ((m_vram[data_addr - 1] & 0x04) ? 0x80 : 0);
+		data = bitswap<8>(data, 7,3,0,1,4,6,5,2) | ((m_vram[data_addr - 1] & 0x04) ? 0x80 : 0);
 
 		output().set_digit_value(c, data);
 		output().set_indexed_value("sym", c, BIT(m_vram[data_addr + 1], 2));

@@ -4098,7 +4098,7 @@ static void chunky_to_planar(memory_region *rgn)
 	for (int i = 0; i < len; i++)
 	{
 		uint32_t data = little_endianize_int32(ROM[i]);
-		data = BITSWAP32(data,31,27,23,19,15,11,7,3,30,26,22,18,14,10,6,2,29,25,21,17,13,9,5,1,28,24,20,16,12,8,4,0);
+		data = bitswap<32>(data,31,27,23,19,15,11,7,3,30,26,22,18,14,10,6,2,29,25,21,17,13,9,5,1,28,24,20,16,12,8,4,0);
 		ROM[i] = little_endianize_int32(data);
 	}
 }
@@ -4120,9 +4120,9 @@ DRIVER_INIT_MEMBER(tmnt_state, mia)
 		int B = A & 0x3ff00;
 
 		if ((A & 0x3c000) == 0x3c000)
-			B |= BITSWAP8(A,7,6,4,2,1,0,5,3);
+			B |= bitswap<8>(A,7,6,4,2,1,0,5,3);
 		else
-			B |= BITSWAP8(A,6,4,2,1,0,7,5,3);
+			B |= bitswap<8>(A,6,4,2,1,0,7,5,3);
 
 		gfxdata[A] = temp[B];
 	}

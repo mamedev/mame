@@ -98,7 +98,7 @@ uint16_t igs036_decryptor::deobfuscate(uint16_t cipherword, int word_address)con
 	// key-independent manipulation
 	int shift = rotation(word_address);
 	int aux = rol(cipherword, shift);
-	aux = BITSWAP16(aux, 10,9,8,7,0,15,6,5,   14,13,4,3,12,11,2,1);
+	aux = bitswap<16>(aux, 10,9,8,7,0,15,6,5,   14,13,4,3,12,11,2,1);
 
 	return aux;
 }

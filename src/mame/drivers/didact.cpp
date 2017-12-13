@@ -268,7 +268,7 @@ WRITE8_MEMBER( md6802_state::pia2_kbB_w )
 //  LOG("--->%s(%02x)\n", FUNCNAME, data);
 
 	/* Store the segment pattern but do not lit up the digit here, done by pulling the correct cathode low on Port A */
-	m_segments = BITSWAP8(data, 0, 4, 5, 3, 2, 1, 7, 6);
+	m_segments = bitswap<8>(data, 0, 4, 5, 3, 2, 1, 7, 6);
 }
 
 WRITE_LINE_MEMBER( md6802_state::pia2_ca2_w )

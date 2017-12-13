@@ -92,7 +92,7 @@ template<int digit>
 WRITE8_MEMBER(et3400_state::led_w)
 {
 /* This computer sets each segment, one at a time. */
-	uint8_t segdata = BITSWAP8(~data, 7, 0, 1, 2, 3, 4, 5, 6);
+	uint8_t segdata = bitswap<8>(~data, 7, 0, 1, 2, 3, 4, 5, 6);
 	output().set_digit_value(digit, segdata);
 }
 

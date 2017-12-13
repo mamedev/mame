@@ -120,7 +120,7 @@ WRITE32_MEMBER(pgm2_state::sprite_encryption_w)
 	COMBINE_DATA(&m_spritekey);
 
 	if (!m_sprite_predecrypted)
-		m_realspritekey = BITSWAP32(m_spritekey ^ 0x90055555, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31);
+		m_realspritekey = bitswap<32>(m_spritekey ^ 0x90055555, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31);
 }
 
 WRITE32_MEMBER(pgm2_state::encryption_do_w)
@@ -899,7 +899,7 @@ static void iga_u16_decode(uint16_t *rom, int len, int ixor)
 		if ( (i>>1) & 0x000400) x ^= 0x8000;
 
 		rom[i] ^= x;
-		rom[i] = BITSWAP16(rom[i], 8,9,10,11,12,13,14,15,0,1,2,3,4,5,6,7);
+		rom[i] = bitswap<16>(rom[i], 8,9,10,11,12,13,14,15,0,1,2,3,4,5,6,7);
 	}
 }
 
@@ -924,7 +924,7 @@ static void iga_u12_decode(uint16_t* rom, int len, int ixor)
 		if ( (i>>1) & 0x000400) x ^= 0x0000;
 
 		rom[i] ^= x;
-		rom[i] = BITSWAP16(rom[i], 8,9,10,11,12,13,14,15,0,1,2,3,4,5,6,7);
+		rom[i] = bitswap<16>(rom[i], 8,9,10,11,12,13,14,15,0,1,2,3,4,5,6,7);
 	}
 }
 
@@ -934,7 +934,7 @@ static void sprite_colour_decode(uint16_t* rom, int len)
 
 	for (i = 0; i < len / 2; i++)
 	{
-		rom[i] = BITSWAP16(rom[i], 15, 14, /* unused - 6bpp */
+		rom[i] = bitswap<16>(rom[i], 15, 14, /* unused - 6bpp */
 								   13, 12, 11,
 								   5, 4, 3,
 								   7, 6, /* unused - 6bpp */

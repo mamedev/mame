@@ -3027,7 +3027,7 @@ DRIVER_INIT_MEMBER(aerofgt_state, kickball)
 	uint8_t *src = memregion( "gfx2" )->base();
 	for (int i = 0;i < 0x80000;i++)
 	{
-		src[i] = BITSWAP8(src[i], 7, 5, 6, 4, 3, 2, 1, 0);
+		src[i] = bitswap<8>(src[i], 7, 5, 6, 4, 3, 2, 1, 0);
 	}
 }
 

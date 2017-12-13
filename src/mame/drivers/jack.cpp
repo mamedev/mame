@@ -1590,16 +1590,16 @@ DRIVER_INIT_MEMBER(jack_state,striv)
 		if (A & 0x1000)
 		{
 			if (A & 4)
-				ROM[A] = BITSWAP8(data,7,2,5,1,3,6,4,0) ^ 1;
+				ROM[A] = bitswap<8>(data,7,2,5,1,3,6,4,0) ^ 1;
 			else
-				ROM[A] = BITSWAP8(data,0,2,5,1,3,6,4,7) ^ 0x81;
+				ROM[A] = bitswap<8>(data,0,2,5,1,3,6,4,7) ^ 0x81;
 		}
 		else
 		{
 			if (A & 4)
-				ROM[A] = BITSWAP8(data,7,2,5,1,3,6,4,0) ^ 1;
+				ROM[A] = bitswap<8>(data,7,2,5,1,3,6,4,0) ^ 1;
 			else
-				ROM[A] = BITSWAP8(data,0,2,5,1,3,6,4,7);
+				ROM[A] = bitswap<8>(data,0,2,5,1,3,6,4,7);
 		}
 	}
 

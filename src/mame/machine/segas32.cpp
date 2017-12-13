@@ -46,7 +46,7 @@ void segas32_v25_state::decrypt_protrom()
 
 	// unscramble the address lines
 	for(i = 0; i < 0x10000; i++)
-		rom[i] = temp[BITSWAP16(i, 14, 11, 15, 12, 13, 4, 3, 7, 5, 10, 2, 8, 9, 6, 1, 0)];
+		rom[i] = temp[bitswap<16>(i, 14, 11, 15, 12, 13, 4, 3, 7, 5, 10, 2, 8, 9, 6, 1, 0)];
 }
 
 

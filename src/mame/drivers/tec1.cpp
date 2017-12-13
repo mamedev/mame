@@ -145,7 +145,7 @@ WRITE8_MEMBER( tec1_state::tec1_segment_w )
     d1 segment f
     d0 segment a */
 
-	m_segment = BITSWAP8(data, 4, 2, 1, 6, 7, 5, 3, 0);
+	m_segment = bitswap<8>(data, 4, 2, 1, 6, 7, 5, 3, 0);
 }
 
 WRITE8_MEMBER( tec1_state::tec1_digit_w )

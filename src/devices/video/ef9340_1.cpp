@@ -213,7 +213,7 @@ void ef9340_1_device::ef9341_write( uint8_t command, uint8_t b, uint8_t data )
 
 						if ( b >= 0xa0 )
 						{
-							m_ef934x_ext_char_ram[ ( ( a & 0x80 ) << 3 ) | external_chargen_address( b, slice ) ] = BITSWAP8(m_ef9341.TA,0,1,2,3,4,5,6,7);
+							m_ef934x_ext_char_ram[ ( ( a & 0x80 ) << 3 ) | external_chargen_address( b, slice ) ] = bitswap<8>(m_ef9341.TA,0,1,2,3,4,5,6,7);
 						}
 
 						// Increment slice number

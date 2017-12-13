@@ -392,7 +392,7 @@ WRITE8_MEMBER(berzerk_state::magicram_w)
 	uint8_t shift_flop_output = (((uint16_t)m_last_shift_data << 8) | data) >> (m_magicram_control & 0x07);
 
 	if (m_magicram_control & 0x08)
-		shift_flop_output = BITSWAP8(shift_flop_output, 0, 1, 2, 3, 4, 5, 6, 7);
+		shift_flop_output = bitswap<8>(shift_flop_output, 0, 1, 2, 3, 4, 5, 6, 7);
 
 	/* collision detection - AND gate output goes to the K pin of the flip-flop,
 	   while J is LO, therefore, it only resets, never sets */

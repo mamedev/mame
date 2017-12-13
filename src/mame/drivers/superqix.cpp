@@ -423,7 +423,7 @@ READ8_MEMBER(superqix_state_base::nmi_ack_r)
 
 READ8_MEMBER(superqix_state::bootleg_in0_r)
 {
-	return BITSWAP8(ioport("DSW1")->read(), 0,1,2,3,4,5,6,7);
+	return bitswap<8>(ioport("DSW1")->read(), 0,1,2,3,4,5,6,7);
 }
 
 WRITE8_MEMBER(superqix_state::bootleg_flipscreen_w)
@@ -1727,7 +1727,7 @@ DRIVER_INIT_MEMBER(superqix_state_base, perestro)
 		memcpy(temp,&src[i],16);
 		for (j = 0;j < 16;j++)
 		{
-			src[i+j] = temp[BITSWAP8(j,7,6,5,4,3,2,0,1)];
+			src[i+j] = temp[bitswap<8>(j,7,6,5,4,3,2,0,1)];
 		}
 	}
 
@@ -1738,7 +1738,7 @@ DRIVER_INIT_MEMBER(superqix_state_base, perestro)
 		memcpy(temp,&src[i],16);
 		for (j = 0;j < 16;j++)
 		{
-			src[i+j] = temp[BITSWAP8(j,7,6,5,4,0,1,2,3)];
+			src[i+j] = temp[bitswap<8>(j,7,6,5,4,0,1,2,3)];
 		}
 	}
 
@@ -1749,7 +1749,7 @@ DRIVER_INIT_MEMBER(superqix_state_base, perestro)
 		memcpy(temp,&src[i],16);
 		for (j = 0;j < 16;j++)
 		{
-			src[i+j] = temp[BITSWAP8(j,7,6,5,4,1,0,3,2)];
+			src[i+j] = temp[bitswap<8>(j,7,6,5,4,1,0,3,2)];
 		}
 	}
 }

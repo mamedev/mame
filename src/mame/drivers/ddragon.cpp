@@ -231,7 +231,7 @@ WRITE8_MEMBER(darktowr_state::darktowr_mcu_bank_w)
 
 	if (offset == 0x1400 || offset == 0)
 	{
-		uint8_t const value(BITSWAP8(data, 0, 1, 2, 3, 4, 5, 6, 7));
+		uint8_t const value(bitswap<8>(data, 0, 1, 2, 3, 4, 5, 6, 7));
 		m_mcu->pb_w(space, 0, value);
 		logerror("MCU PORT 1 -> %04x (from %04x)\n", value, data);
 	}
@@ -2116,27 +2116,27 @@ DRIVER_INIT_MEMBER(toffy_state, toffy)
 	rom = memregion("maincpu")->base();
 	length = memregion("maincpu")->bytes();
 	for (i = 0; i < length; i++)
-		rom[i] = BITSWAP8(rom[i], 6,7,5,4,3,2,1,0);
+		rom[i] = bitswap<8>(rom[i], 6,7,5,4,3,2,1,0);
 
 	/* and the fg gfx ... */
 	rom = memregion("gfx1")->base();
 	length = memregion("gfx1")->bytes();
 	for (i = 0; i < length; i++)
-		rom[i] = BITSWAP8(rom[i], 7,6,5,3,4,2,1,0);
+		rom[i] = bitswap<8>(rom[i], 7,6,5,3,4,2,1,0);
 
 	/* and the sprites gfx */
 	rom = memregion("gfx2")->base();
 	length = memregion("gfx2")->bytes();
 	for (i = 0; i < length; i++)
-		rom[i] = BITSWAP8(rom[i], 7,6,5,4,3,2,0,1);
+		rom[i] = bitswap<8>(rom[i], 7,6,5,4,3,2,0,1);
 
 	/* and the bg gfx */
 	rom = memregion("gfx3")->base();
 	length = memregion("gfx3")->bytes();
 	for (i = 0; i < length / 2; i++)
 	{
-		rom[i + 0*length/2] = BITSWAP8(rom[i + 0*length/2], 7,6,1,4,3,2,5,0);
-		rom[i + 1*length/2] = BITSWAP8(rom[i + 1*length/2], 7,6,2,4,3,5,1,0);
+		rom[i + 0*length/2] = bitswap<8>(rom[i + 0*length/2], 7,6,1,4,3,2,5,0);
+		rom[i + 1*length/2] = bitswap<8>(rom[i + 1*length/2], 7,6,2,4,3,5,1,0);
 	}
 
 	/* should the sound rom be bitswapped too? */

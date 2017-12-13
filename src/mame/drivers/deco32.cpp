@@ -670,7 +670,7 @@ ADDRESS_MAP_END
 READ16_MEMBER( deco32_state::ioprot_r )
 {
 	offs_t real_address = 0 + (offset *2);
-	offs_t deco146_addr = BITSWAP32(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14,    10,9,8, 7,6,5,4, 3,2,1,0) & 0x7fff;
+	offs_t deco146_addr = bitswap<32>(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14,    10,9,8, 7,6,5,4, 3,2,1,0) & 0x7fff;
 	uint8_t cs = 0;
 
 	return m_ioprot->read_data( deco146_addr, mem_mask, cs );
@@ -679,7 +679,7 @@ READ16_MEMBER( deco32_state::ioprot_r )
 WRITE16_MEMBER( deco32_state::ioprot_w )
 {
 	offs_t real_address = 0 + (offset *2);
-	offs_t deco146_addr = BITSWAP32(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14,    10,9,8, 7,6,5,4, 3,2,1,0) & 0x7fff;
+	offs_t deco146_addr = bitswap<32>(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14,    10,9,8, 7,6,5,4, 3,2,1,0) & 0x7fff;
 	uint8_t cs = 0;
 
 	m_ioprot->write_data( space, deco146_addr, data, mem_mask, cs );
@@ -760,7 +760,7 @@ WRITE_LINE_MEMBER( nslasher_state::tattass_sound_irq_w )
 	{
 		uint8_t data = m_ioprot->soundlatch_r(machine().dummy_space(), 0);
 		// Swap bits 0 and 3 to correct for design error from BSMT schematic
-		data = BITSWAP8(data, 7, 6, 5, 4, 0, 2, 1, 3);
+		data = bitswap<8>(data, 7, 6, 5, 4, 0, 2, 1, 3);
 		m_decobsmt->bsmt_comms_w(machine().dummy_space(), 0, data);
 	}
 }

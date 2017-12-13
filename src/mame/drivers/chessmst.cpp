@@ -253,7 +253,7 @@ void chessmst_state::update_display()
 	for(int i=0; i<4; i++)
 	{
 		if (BIT(m_digit_matrix, i))
-			output().set_indexed_value("digit", i, BITSWAP16(m_digit, 3,5,12,10,14,1,2,13,8,6,11,15,7,9,4,0) | (m_digit_dot << 16));
+			output().set_indexed_value("digit", i, bitswap<16>(m_digit, 3,5,12,10,14,1,2,13,8,6,11,15,7,9,4,0) | (m_digit_dot << 16));
 	}
 }
 

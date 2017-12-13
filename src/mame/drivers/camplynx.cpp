@@ -319,9 +319,9 @@ d0 = read from bank 4 */
 	m_bankdata = data;
 	data ^= 0x8c; // make all lines active high
 	// do writes
-	m_wbyte = BITSWAP8(data, 0, 0, 0, 0, 4, 5, 6, 7) & 0x0f; // rearrange to 1,2,3,4
+	m_wbyte = bitswap<8>(data, 0, 0, 0, 0, 4, 5, 6, 7) & 0x0f; // rearrange to 1,2,3,4
 	// do reads
-	uint8_t rbyte = BITSWAP8(data, 0, 0, 0, 0, 0, 1, 2, 3) & 0x0f; // rearrange to 0,1,2,4
+	uint8_t rbyte = bitswap<8>(data, 0, 0, 0, 0, 0, 1, 2, 3) & 0x0f; // rearrange to 0,1,2,4
 	if (BIT(rbyte, 1))
 		rbyte &= 0x07; // remove 4 if 1 selected (AND gate in IC82)
 //printf("%s:%X:%X:%X\n", machine().describe_context(), data, rbyte, m_wbyte);

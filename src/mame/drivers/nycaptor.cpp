@@ -1287,7 +1287,7 @@ DRIVER_INIT_MEMBER(nycaptor_state,bronx)
 	uint8_t *rom = memregion("maincpu")->base();
 
 	for (i = 0; i < 0x20000; i++)
-		rom[i] = BITSWAP8(rom[i], 0, 1, 2, 3, 4, 5, 6, 7);
+		rom[i] = bitswap<8>(rom[i], 0, 1, 2, 3, 4, 5, 6, 7);
 
 	m_gametype = 1;
 }
@@ -1298,7 +1298,7 @@ DRIVER_INIT_MEMBER(nycaptor_state,colt)
 	uint8_t *rom = memregion("maincpu")->base();
 
 	for (i = 0; i < 0x20000; i++)
-		rom[i] = BITSWAP8(rom[i], 0, 1, 2, 3, 4, 5, 6, 7);
+		rom[i] = bitswap<8>(rom[i], 0, 1, 2, 3, 4, 5, 6, 7);
 
 	m_gametype = 2;
 }

@@ -220,7 +220,7 @@ DRIVER_INIT_MEMBER(dambustr_state,dambustr)
 
 	// Bit swap addresses
 	for(i=0; i<4096*4; i++) {
-		rom[i] = usr[BITSWAP16(i,15,14,13,12, 4,10,9,8,7,6,5,3,11,2,1,0)];
+		rom[i] = usr[bitswap<16>(i,15,14,13,12, 4,10,9,8,7,6,5,3,11,2,1,0)];
 	};
 
 	// Swap program ROMs
@@ -233,9 +233,9 @@ DRIVER_INIT_MEMBER(dambustr_state,dambustr)
 
 	// Bit swap in $1000-$1fff and $4000-$5fff
 	for(i=0; i<0x1000; i++) {
-		rom[0x1000+i] = BITSWAP8(rom[0x1000+i],7,6,5,1,3,2,4,0);
-		rom[0x4000+i] = BITSWAP8(rom[0x4000+i],7,6,5,1,3,2,4,0);
-		rom[0x5000+i] = BITSWAP8(rom[0x5000+i],7,6,5,1,3,2,4,0);
+		rom[0x1000+i] = bitswap<8>(rom[0x1000+i],7,6,5,1,3,2,4,0);
+		rom[0x4000+i] = bitswap<8>(rom[0x4000+i],7,6,5,1,3,2,4,0);
+		rom[0x5000+i] = bitswap<8>(rom[0x5000+i],7,6,5,1,3,2,4,0);
 	};
 
 	// Swap graphics ROMs

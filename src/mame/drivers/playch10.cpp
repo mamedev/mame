@@ -1677,7 +1677,7 @@ DRIVER_INIT_MEMBER(playch10_state,virus)
 	uint32_t len = memregion("rp5h01")->bytes();
 	for (int i = 0; i < len; i++)
 	{
-		ROM[i] = BITSWAP8(ROM[i],0,1,2,3,4,5,6,7);
+		ROM[i] = bitswap<8>(ROM[i],0,1,2,3,4,5,6,7);
 		ROM[i] ^= 0xff;
 	}
 
@@ -1691,7 +1691,7 @@ DRIVER_INIT_MEMBER(playch10_state,ttoon)
 	uint32_t len = memregion("rp5h01")->bytes();
 	for (int i = 0; i < len; i++)
 	{
-		ROM[i] = BITSWAP8(ROM[i],0,1,2,3,4,5,6,7);
+		ROM[i] = bitswap<8>(ROM[i],0,1,2,3,4,5,6,7);
 		ROM[i] ^= 0xff;
 	}
 

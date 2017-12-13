@@ -296,7 +296,7 @@ WRITE16_MEMBER(atarisy2_state::bankselect_w)
 	};*/
 
 	int banknumber = ((data >> 10) & 0x3f) ^ 0x03;
-	banknumber = BITSWAP16(banknumber, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 1, 0, 3, 2);
+	banknumber = bitswap<16>(banknumber, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 1, 0, 3, 2);
 
 	if (offset)
 		m_rombank2->set_entry(banknumber);

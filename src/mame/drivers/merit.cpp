@@ -204,20 +204,20 @@ READ8_MEMBER(merit_state::questions_r)
 WRITE8_MEMBER(merit_state::low_offset_w)
 {
 	offset = (offset & 0xf0) | ((offset - m_decryption_key) & 0x0f);
-	offset = BITSWAP8(offset,7,6,5,4,0,1,2,3);
+	offset = bitswap<8>(offset,7,6,5,4,0,1,2,3);
 	m_question_address = (m_question_address & 0xffff00) | offset;
 }
 
 WRITE8_MEMBER(merit_state::med_offset_w)
 {
 	offset = (offset & 0xf0) | ((offset - m_decryption_key) & 0x0f);
-	offset = BITSWAP8(offset,7,6,5,4,0,1,2,3);
+	offset = bitswap<8>(offset,7,6,5,4,0,1,2,3);
 	m_question_address = (m_question_address & 0xff00ff) | (offset << 8);
 }
 
 WRITE8_MEMBER(merit_state::high_offset_w)
 {
-	offset = BITSWAP8(offset,7,6,5,4,0,1,2,3);
+	offset = bitswap<8>(offset,7,6,5,4,0,1,2,3);
 	m_question_address = (m_question_address & 0x00ffff) | (offset << 16);
 }
 

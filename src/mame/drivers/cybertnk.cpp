@@ -982,7 +982,7 @@ DRIVER_INIT_MEMBER(cybertnk_state,cybertnk)
 		// reorder the data to simplify sprite drawing
 		// we draw 8 pixels at a time, each each nibble contains a pixel, however the original order of 32-bits (8 pixels)
 		// is along the lines of 04 15 26 37 which is awkward to use
-		spr[x] = BITSWAP32(spr[x],  27,26,25,24,   19,18,17,16,  11,10,9,8,  3,2,1,0, 31,30,29,28,   23,22,21,20,   15,14,13,12,   7,6,5,4 );
+		spr[x] = bitswap<32>(spr[x],  27,26,25,24,   19,18,17,16,  11,10,9,8,  3,2,1,0, 31,30,29,28,   23,22,21,20,   15,14,13,12,   7,6,5,4 );
 	}
 
 }

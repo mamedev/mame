@@ -1017,7 +1017,7 @@ void galaxian_state::monsterz_set_latch()
 {
 	// read from a rom (which one?? "a-3e.k3" from audiocpu ($2700-$2fff) looks very suspicious)
 	uint8_t *rom = memregion("audiocpu")->base();
-	m_protection_result = rom[0x2000 | (m_protection_state & 0x1fff)]; // probably needs a BITSWAP8
+	m_protection_result = rom[0x2000 | (m_protection_state & 0x1fff)]; // probably needs a bitswap<8>
 
 	// and an irq on the main z80 afterwards
 	m_maincpu->set_input_line(0, HOLD_LINE );
@@ -1096,7 +1096,7 @@ READ8_MEMBER(galaxian_state::frogger_sound_timer_r)
 {
 	/* same as regular Konami sound but with bits 3,5 swapped */
 	uint8_t konami_value = konami_sound_timer_r(space, 0);
-	return BITSWAP8(konami_value, 7,6,3,4,5,2,1,0);
+	return bitswap<8>(konami_value, 7,6,3,4,5,2,1,0);
 }
 
 
@@ -2096,13 +2096,13 @@ READ8_MEMBER(galaxian_state::froggeram_ppi8255_r)
 	uint8_t result = 0xff;
 	if (offset & 0x0100) result &= m_ppi8255[0]->read(space, offset & 3);
 	if (offset & 0x0200) result &= m_ppi8255[1]->read(space, offset & 3);
-	return BITSWAP8(result, 0, 1, 2, 3, 4, 5, 6, 7);
+	return bitswap<8>(result, 0, 1, 2, 3, 4, 5, 6, 7);
 }
 
 WRITE8_MEMBER(galaxian_state::froggeram_ppi8255_w)
 {
 	// same as theend, but accesses are scrambled
-	data = BITSWAP8(data, 0, 1, 2, 3, 4, 5, 6, 7);
+	data = bitswap<8>(data, 0, 1, 2, 3, 4, 5, 6, 7);
 	if (offset & 0x0100) m_ppi8255[0]->write(space, offset & 3, data);
 	if (offset & 0x0200) m_ppi8255[1]->write(space, offset & 3, data);
 }
@@ -6352,7 +6352,7 @@ void galaxian_state::decode_mooncrst(int length, uint8_t *dest)
 		uint8_t res = data;
 		if (BIT(data,1)) res ^= 0x40;
 		if (BIT(data,5)) res ^= 0x04;
-		if ((offs & 1) == 0) res = BITSWAP8(res,7,2,5,4,3,6,1,0);
+		if ((offs & 1) == 0) res = bitswap<8>(res,7,2,5,4,3,6,1,0);
 		dest[offs] = res;
 	}
 }
@@ -6437,7 +6437,7 @@ void galaxian_state::decode_dingoe()
 
 		/* Swap bit0 with bit4 */
 		if (offs & 0x02)
-			data = BITSWAP8(data, 7,6,5,0,3,2,1,4);
+			data = bitswap<8>(data, 7,6,5,0,3,2,1,4);
 		rombase[offs] = data;
 	}
 }
@@ -6450,7 +6450,7 @@ void galaxian_state::decode_frogger_sound()
 
 	/* the first ROM of the sound CPU has data lines D0 and D1 swapped */
 	for (offs = 0; offs < 0x800; offs++)
-		rombase[offs] = BITSWAP8(rombase[offs], 7,6,5,4,3,2,0,1);
+		rombase[offs] = bitswap<8>(rombase[offs], 7,6,5,4,3,2,0,1);
 }
 
 // froggermc has a bigger first ROM of the sound CPU, thus a different decode
@@ -6461,7 +6461,7 @@ void galaxian_state::decode_froggermc_sound()
 
 	/* the first ROM of the sound CPU has data lines D0 and D1 swapped */
 	for (offs = 0; offs < 0x1000; offs++)
-		rombase[offs] = BITSWAP8(rombase[offs], 7,6,5,4,3,2,0,1);
+		rombase[offs] = bitswap<8>(rombase[offs], 7,6,5,4,3,2,0,1);
 }
 
 
@@ -6472,7 +6472,7 @@ void galaxian_state::decode_frogger_gfx()
 
 	/* the 2nd gfx ROM has data lines D0 and D1 swapped */
 	for (offs = 0x0800; offs < 0x1000; offs++)
-		rombase[offs] = BITSWAP8(rombase[offs], 7,6,5,4,3,2,0,1);
+		rombase[offs] = bitswap<8>(rombase[offs], 7,6,5,4,3,2,0,1);
 }
 
 
@@ -6557,7 +6557,7 @@ void galaxian_state::decode_victoryc()
 		if (i & 0x04) src[i] ^= 0x40;
 		if (i & 0x01) src[i] ^= 0x08;
 
-		src[i] = BITSWAP8(src[i], 6, 3, 5, 4, 2, 7, 1, 0);
+		src[i] = bitswap<8>(src[i], 6, 3, 5, 4, 2, 7, 1, 0);
 	}
 }
 

@@ -568,7 +568,7 @@ DRIVER_INIT_MEMBER(pingpong_state,merlinmm)
 
 	/* decrypt program code */
 	for( i = 0; i < 0x4000; i++ )
-		ROM[i] = BITSWAP8(ROM[i],0,1,2,3,4,5,6,7);
+		ROM[i] = bitswap<8>(ROM[i],0,1,2,3,4,5,6,7);
 }
 
 DRIVER_INIT_MEMBER(pingpong_state,cashquiz)
@@ -579,12 +579,12 @@ DRIVER_INIT_MEMBER(pingpong_state,cashquiz)
 	/* decrypt program code */
 	ROM = memregion("maincpu")->base();
 	for( i = 0; i < 0x4000; i++ )
-		ROM[i] = BITSWAP8(ROM[i],0,1,2,3,4,5,6,7);
+		ROM[i] = bitswap<8>(ROM[i],0,1,2,3,4,5,6,7);
 
 	/* decrypt questions */
 	ROM = memregion("user1")->base();
 	for( i = 0; i < 0x40000; i++ )
-		ROM[i] = BITSWAP8(ROM[i],0,1,2,3,4,5,6,7);
+		ROM[i] = bitswap<8>(ROM[i],0,1,2,3,4,5,6,7);
 
 	/* questions banking handlers */
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x4000, 0x4000, write8_delegate(FUNC(pingpong_state::cashquiz_question_bank_high_w),this));

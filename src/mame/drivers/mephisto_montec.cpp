@@ -162,8 +162,8 @@ WRITE8_MEMBER(mephisto_montec_state::montec_lcd_clk_w)
 
 	if (m_display.shift == 8)
 	{
-		if (m_lcd_mux & 0x01)   output().set_digit_value(0 + m_display.pos, BITSWAP8(m_display.data, 0,3,2,7,6,5,4,1));
-		if (m_lcd_mux & 0x02)   output().set_digit_value(4 + m_display.pos, BITSWAP8(m_display.data, 0,3,2,7,6,5,4,1));
+		if (m_lcd_mux & 0x01)   output().set_digit_value(0 + m_display.pos, bitswap<8>(m_display.data, 0,3,2,7,6,5,4,1));
+		if (m_lcd_mux & 0x02)   output().set_digit_value(4 + m_display.pos, bitswap<8>(m_display.data, 0,3,2,7,6,5,4,1));
 
 		m_display.shift = 0;
 		m_display.pos = (m_display.pos + 1) & 3;

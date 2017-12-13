@@ -202,7 +202,7 @@ WRITE8_MEMBER(lbeach_state::lbeach_fg_vram_w)
 READ8_MEMBER(lbeach_state::lbeach_in1_r)
 {
 	// d6,7(steering wheel) need to be swapped
-	return BITSWAP8(ioport("IN1")->read(),6,7,5,4,3,2,1,0);
+	return bitswap<8>(ioport("IN1")->read(),6,7,5,4,3,2,1,0);
 }
 
 READ8_MEMBER(lbeach_state::lbeach_in2_r)

@@ -486,7 +486,7 @@ void einvaderc_state::prepare_display()
 	set_display_segmask(7, 0x7f);
 
 	// update display
-	u8 l = BITSWAP8(m_l,7,6,0,1,2,3,4,5);
+	u8 l = bitswap<8>(m_l,7,6,0,1,2,3,4,5);
 	u16 grid = (m_d | m_g << 4 | m_sk << 8 | m_so << 9) ^ 0x0ff;
 	display_matrix(8, 10, l, grid);
 }

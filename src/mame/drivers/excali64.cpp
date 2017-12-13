@@ -524,7 +524,7 @@ MC6845_UPDATE_ROW( excali64_state::update_row )
 			if (h > 5)
 				h = 0; // keep us in bounds
 			// hires definition - pixels are opposite order to characters
-			gfx = BITSWAP8(m_p_hiresram[(h << 12) | (chr<<4) | ra], 0, 1, 2, 3, 4, 5, 6, 7);
+			gfx = bitswap<8>(m_p_hiresram[(h << 12) | (chr<<4) | ra], 0, 1, 2, 3, 4, 5, 6, 7);
 		}
 		else
 			gfx = m_p_chargen[(chr<<4) | ra]; // normal character

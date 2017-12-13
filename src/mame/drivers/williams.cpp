@@ -3047,7 +3047,7 @@ DRIVER_INIT_MEMBER(williams_state,defndjeu)
 
 	/* apply simple decryption by swapping bits 0 and 7 */
 	for (i = 0xd000; i < 0x19000; i++)
-		rom[i] = BITSWAP8(rom[i],0,6,5,4,3,2,1,7);
+		rom[i] = bitswap<8>(rom[i],0,6,5,4,3,2,1,7);
 }
 
 

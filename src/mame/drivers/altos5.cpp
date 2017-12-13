@@ -126,9 +126,9 @@ void altos5_state::setup_banks(uint8_t source)
 	// WPRT | template | dma bank / cpu bank
 
 	if (source == 1) // use DMA banks only if BUSACK is asserted
-		offs = ((BITSWAP8(m_port09, 0, 0, 0, 5, 1, 2, 7, 6) << 4) & 0x1f0) ^ 0x100;
+		offs = ((bitswap<8>(m_port09, 0, 0, 0, 5, 1, 2, 7, 6) << 4) & 0x1f0) ^ 0x100;
 	else
-		offs = ((BITSWAP8(m_port09, 0, 0, 0, 5, 1, 2, 4, 3) << 4) & 0x1f0) ^ 0x100;
+		offs = ((bitswap<8>(m_port09, 0, 0, 0, 5, 1, 2, 4, 3) << 4) & 0x1f0) ^ 0x100;
 
 	temp = offs;
 	if ((source == 2) || (temp != m_curr_bank))
