@@ -4008,6 +4008,27 @@ ROM_START( incasunnz )
 ROM_END
 
 
+// 01J01946 / 631/3 B / 25 Credit Multiplier / 20 Line Multiline
+// INCA SUN / VENEZUELA / B - 03/05/99
+ROM_START( incasunv )
+	ARISTOCRAT_MK5_BIOS
+	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
+	/*
+	    Checksum code at 0x000c10 ??
+	*/
+	ROM_LOAD32_WORD( "01j01946.u7",  0x000000, 0x80000, CRC(c6bdbc96) SHA1(ee83b6b4aaa9538ca04f136a4523fd520a24a878) )
+	ROM_LOAD32_WORD( "01j01946.u11", 0x000002, 0x80000, CRC(15be6a5d) SHA1(000218c13e1e3fccdc0565e496a1fd13cb32f6b1) )
+	ROM_LOAD32_WORD( "01j01946.u8",  0x100000, 0x80000, CRC(e26bd9c7) SHA1(e5facaa85c4c72d070b1d5000b80a333122c4fbc) )
+	ROM_LOAD32_WORD( "01j01946.u12", 0x100002, 0x80000, CRC(a9941a3b) SHA1(14868686aa0aa3d966ffbaef2593a11a57a43b05) )
+	ROM_LOAD32_WORD( "01j01946.u9",  0x200000, 0x80000, CRC(90e5a52b) SHA1(b2c334126128f9569846655d78f1641a36aec739) )
+	ROM_LOAD32_WORD( "01j01946.u13", 0x200002, 0x80000, CRC(0efdd830) SHA1(de0be1cd3f691299f48d7a184df6bb59fef22de2) )
+
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
+	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
+ROM_END
+
+
 // CHG1458 / MV4130/3 / 20 Line Multiline / 5, 10, 25, 50 Credit Multiplier
 // Inca Sun / Export / A - 05/09/00
 // Requires set chips 4.03.xx
@@ -7293,6 +7314,7 @@ GAMEL( 2001, hnktonku,   aristmk5,  aristmk5_usa,       aristmk5_usa, aristmk5_s
 GAMEL( 1999, incasun,    aristmk5,  aristmk5,           incasun,      aristmk5_state, aristmk5, ROT0, "Aristocrat", "Inca Sun (0100872V, NSW/ACT)",                         MACHINE_FLAGS, layout_incasun )         // 631/3 B, B - 03/05/99, Rev 15
 GAMEL( 1999, incasunsp,  incasun,   aristmk5,           incasun,      aristmk5_state, aristmk5, ROT0, "Aristocrat", "Inca Sun (0100872V, NSW/ACT, Show Program)",           MACHINE_FLAGS, layout_incasun )         // 631/3 B, B - 03/05/99, Rev 15
 GAMEL( 2000, incasunnz,  incasun,   aristmk5,           incasunnz,    aristmk5_state, aristmk5, ROT0, "Aristocrat", "Inca Sun (0101108V, New Zealand)",                     MACHINE_FLAGS, layout_incasunnz )       // MV4113, A - 6/3/00, Rev 25
+GAMEL( 1999, incasunv,   incasun,   aristmk5,           incasun,      aristmk5_state, aristmk5, ROT0, "Aristocrat", "Inca Sun (01J01946, Venezuela)",                       MACHINE_FLAGS, layout_incasun )         // 631/3, B - 03/05/99
 GAMEL( 2000, incasunu,   incasun,   aristmk5_usa,       dolphntrce,   aristmk5_state, aristmk5, ROT0, "Aristocrat", "Inca Sun (CHG1458, US)",                               MACHINE_FLAGS, layout_dolphntrce )      // MV4130/3, A - 05/09/00
 GAMEL( 2000, incasunua,  incasun,   aristmk5_usa,       bootsctnua,   aristmk5_state, aristmk5, ROT0, "Aristocrat", "Inca Sun (DHG1577, US)",                               MACHINE_FLAGS, layout_dolphntrce )      // MV4130, A - 05/09/00
 GAMEL( 1998, indrema5,   aristmk5,  aristmk5,           indrema5,     aristmk5_state, aristmk5, ROT0, "Aristocrat", "Indian Dreaming (0100845V, NSW/ACT)",                  MACHINE_FLAGS, layout_indrema5 )        // 628/1, B - 15/12/98, Rev 7
