@@ -258,6 +258,15 @@ void pgm2_state::copy_sprites_from_bitmap(screen_device &screen, bitmap_rgb32 &b
 
 uint32_t pgm2_state::screen_update_pgm2(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
+	
+	int mode = m_vidmode[0] & 0x00010000; // other bits not used?
+
+	if (mode)
+		m_screen->set_visible_area(0, 448 - 1, 0, 224 - 1);
+	else // note, +8 to y position too, could be a sprite reg to move sprites intead
+		m_screen->set_visible_area(0, 320 - 1, 8, 224 + 8 - 1);
+	
+
 	m_fg_tilemap->set_scrollx(0, m_fgscroll[0] & 0xffff);
 	m_fg_tilemap->set_scrolly(0, m_fgscroll[0] >> 16);
 	m_bg_tilemap->set_scrolly(0, (m_bgscroll[0x0/4] & 0xffff0000)>>16 );

@@ -356,6 +356,7 @@ static ADDRESS_MAP_START( pgm2_map, AS_PROGRAM, 32, pgm2_state )
 
 	AM_RANGE(0x30120000, 0x30120003) AM_RAM AM_SHARE("bgscroll") // scroll
 	AM_RANGE(0x30120008, 0x3012000b) AM_RAM AM_SHARE("fgscroll")
+	AM_RANGE(0x3012000c, 0x3012000f) AM_RAM AM_SHARE("vidmode")
 	AM_RANGE(0x30120030, 0x30120033) AM_WRITE16(share_bank_w, 0xffff0000)
 	AM_RANGE(0x30120038, 0x3012003b) AM_WRITE(sprite_encryption_w)
 	// there are other 0x301200xx regs
@@ -570,9 +571,15 @@ static MACHINE_CONFIG_START( pgm2 )
 	MCFG_PGM2_MEMCARD_ADD("memcard_p2")
 	MCFG_PGM2_MEMCARD_ADD("memcard_p3")
 	MCFG_PGM2_MEMCARD_ADD("memcard_p4")
-
-
 MACHINE_CONFIG_END
+
+// not strictly needed as the video code supports changing on the fly, but makes recording easier etc.
+static MACHINE_CONFIG_DERIVED( pgm2_lores, pgm2 )
+	MCFG_SCREEN_MODIFY("screen")
+	// note, +8 to y position too, could be a sprite reg to move sprites intead
+	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0+8, 224+8-1)
+MACHINE_CONFIG_END
+
 
 /* using macros for the video / sound roms because the locations never change between sets, and
    we're going to have a LOT of clones to cover all the internal rom regions and external rom revision
@@ -1119,7 +1126,7 @@ GAME( 2011, kov3_102,     kov3, pgm2,    pgm2, pgm2_state,     kov3_102,   ROT0,
 GAME( 2011, kov3_100,     kov3, pgm2,    pgm2, pgm2_state,     kov3_100,   ROT0, "IGS", "Knights of Valour 3 (V100, China)", MACHINE_NOT_WORKING )
 
 // King of Fighters '98: Ultimate Match Hero
-GAME( 2009, kof98umh,     0,    pgm2,    pgm2, pgm2_state,     kof98umh,   ROT0, "IGS / SNK Playmore / NewChannel", "The King of Fighters '98: Ultimate Match HERO (China, V100, 09-08-23)", MACHINE_NOT_WORKING )
+GAME( 2009, kof98umh,     0,    pgm2_lores, pgm2, pgm2_state,  kof98umh,   ROT0, "IGS / SNK Playmore / NewChannel", "The King of Fighters '98: Ultimate Match HERO (China, V100, 09-08-23)", MACHINE_NOT_WORKING )
 
 // Jigsaw World Arena
 
