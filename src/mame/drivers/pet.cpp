@@ -482,7 +482,10 @@ READ8_MEMBER( pet_state::read )
 		break;
 
 	case SEL8:
-		data = m_video_ram[offset & (m_video_ram_size - 1)];
+		if (!(offset & 0x800))
+		{
+			data = m_video_ram[offset & (m_video_ram_size - 1)];
+		}
 		break;
 
 	case SEL9:
@@ -575,7 +578,10 @@ WRITE8_MEMBER( pet_state::write )
 		break;
 
 	case SEL8:
-		m_video_ram[offset & (m_video_ram_size - 1)] = data;
+		if (!(offset & 0x800))
+		{
+			m_video_ram[offset & (m_video_ram_size - 1)] = data;
+		}
 		break;
 
 	case SELE:
