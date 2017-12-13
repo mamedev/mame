@@ -614,7 +614,6 @@ class arm946es_cpu_device : public arm9_cpu_device
 public:
 	// construction/destruction
 	arm946es_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	arm946es_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	// 946E-S has Protection Unit instead of ARM MMU so CP15 is quite different
 	virtual DECLARE_READ32_MEMBER( arm7_rt_r_callback ) override;
@@ -626,6 +625,9 @@ public:
 	virtual uint32_t arm7_cpu_read32(uint32_t addr) override;
 	virtual uint32_t arm7_cpu_read16(uint32_t addr) override;
 	virtual uint8_t arm7_cpu_read8(uint32_t addr) override;
+
+protected:
+	arm946es_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 private:
 	uint32_t cp15_control, cp15_itcm_base, cp15_dtcm_base, cp15_itcm_size, cp15_dtcm_size;
