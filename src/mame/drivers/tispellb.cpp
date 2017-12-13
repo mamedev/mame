@@ -199,7 +199,7 @@ WRITE16_MEMBER(tispellb_state::sub_write_o)
 READ8_MEMBER(tispellb_state::rev1_ctl_r)
 {
 	// main CTL3210 <- sub O6043
-	return bitswap<8>(m_sub_o,7,5,2,1,6,0,4,3) & 0xf;
+	return bitswap<4>(m_sub_o,6,0,4,3);
 }
 
 WRITE16_MEMBER(tispellb_state::sub_write_r)

@@ -636,8 +636,7 @@ WRITE16_MEMBER(tispeak_state::snspellc_write_r)
 WRITE16_MEMBER(tispeak_state::snspellc_write_o)
 {
 	// O3210: TMS5100 CTL8124
-	m_o = bitswap<8>(data,7,6,5,4,3,0,1,2);
-	m_tms5100->ctl_w(space, 0, m_o & 0xf);
+	m_tms5100->ctl_w(space, 0, bitswap<4>(data,3,0,1,2));
 }
 
 READ8_MEMBER(tispeak_state::snspellc_read_k)
@@ -689,7 +688,7 @@ void tispeak_state::k28_prepare_display(u8 old, u8 data)
 WRITE16_MEMBER(tispeak_state::k28_write_r)
 {
 	// R1234: TMS5100 CTL8421
-	m_tms5100->ctl_w(space, 0, bitswap<8>(data,0,0,0,0,1,2,3,4) & 0xf);
+	m_tms5100->ctl_w(space, 0, bitswap<4>(data,1,2,3,4));
 
 	// R0: TMS5100 PDC pin
 	m_tms5100->pdc_w(data & 1);
