@@ -36,7 +36,7 @@ likewise a 2 screen game
 
 WRITE16_MEMBER(xmen_state::eeprom_w)
 {
-	logerror("%06x: write %04x to 108000\n",space.device().safe_pc(),data);
+	logerror("%06x: write %04x to 108000\n", m_maincpu->pc(),data);
 	if (ACCESSING_BITS_0_7)
 	{
 		/* bit 0 = coin counter */

@@ -829,7 +829,7 @@ WRITE16_MEMBER(x68k_state::x68k_sysport_w)
 		COMBINE_DATA(&m_sysport.sram_writeprotect);
 		break;
 	default:
-//      logerror("SYS: [%08x] Wrote %04x to invalid or unimplemented system port %04x\n",space.device().safe_pc(),data,offset);
+//      logerror("SYS: [%08x] Wrote %04x to invalid or unimplemented system port %04x\n",m_maincpu->pc(),data,offset);
 		break;
 	}
 }
