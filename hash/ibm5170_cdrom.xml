@@ -159,7 +159,7 @@
 	</software>
 
 	<software name="noiangd" cloneof="noiangi">
-		<description>We Are Angels - Ein Engel Schlõgt Zu (German)</description>
+		<description>We Are Angels - Ein Engel schlägt zu! (German)</description>
 		<year>1997</year>
 		<publisher>Smile Interactive</publisher>
 		<part name="cdrom" interface="cdrom">
