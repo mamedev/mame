@@ -41,10 +41,7 @@ public:
 		m_bg_palette(*this, "bg_palette"),
 		m_tx_palette(*this, "tx_palette"),
 		m_mcu_timer(*this, "mcu_timer"),
-		m_memcard0(*this, "memcard_p1"),
-		m_memcard1(*this, "memcard_p2"),
-		m_memcard2(*this, "memcard_p3"),
-		m_memcard3(*this, "memcard_p4")
+		m_memcard(*this, "memcard_p%u", 1U)
 	{ }
 
 	DECLARE_READ32_MEMBER(unk_startup_r);
@@ -143,12 +140,7 @@ private:
 	required_device<palette_device> m_tx_palette;
 	required_device<timer_device> m_mcu_timer;
 
-	optional_device<pgm2_memcard_device> m_memcard0;
-	optional_device<pgm2_memcard_device> m_memcard1;
-	optional_device<pgm2_memcard_device> m_memcard2;
-	optional_device<pgm2_memcard_device> m_memcard3;
-	pgm2_memcard_device *m_memcard_device[4];
-
+	optional_device_array<pgm2_memcard_device, 4> m_memcard;
 };
 
 #endif

@@ -205,20 +205,20 @@ void pgm2_state::mcu_command(address_space &space, bool is_command)
 		break;
 		// C0-C9 commands is IC Card RW comms
 		case 0xc0: // insert card or/and check card presence. result: F7 - ok, F4 - no card
-			if (m_memcard_device[arg1 & 3]->present() == -1)
+			if (m_memcard[arg1 & 3]->present() == -1)
 				status = 0xf4;
 			m_mcu_result0 = cmd;
 			break;
 		case 0xc1: // check ready/busy ?
-			if (m_memcard_device[arg1 & 3]->present() == -1)
+			if (m_memcard[arg1 & 3]->present() == -1)
 				status = 0xf4;
 			m_mcu_result0 = cmd;
 			break;
 		case 0xc2: // read data to shared ram
 			for (int i = 0; i < arg3; i++)
 			{
-				if (m_memcard_device[arg1 & 3]->present() != -1)
-					m_shareram[i + (~m_share_bank & 1) * 128] = m_memcard_device[arg1 & 3]->read(space, arg2 + i);
+				if (m_memcard[arg1 & 3]->present() != -1)
+					m_shareram[i + (~m_share_bank & 1) * 128] = m_memcard[arg1 & 3]->read(space, arg2 + i);
 				else
 					status = 0xf4;
 			}
@@ -227,60 +227,60 @@ void pgm2_state::mcu_command(address_space &space, bool is_command)
 		case 0xc3: // save data from shared ram
 			for (int i = 0; i < arg3; i++)
 			{
-				if (m_memcard_device[arg1 & 3]->present() != -1)
-					m_memcard_device[arg1 & 3]->write(space, arg2 + i, m_shareram[i + (~m_share_bank & 1) * 128]);
+				if (m_memcard[arg1 & 3]->present() != -1)
+					m_memcard[arg1 & 3]->write(space, arg2 + i, m_shareram[i + (~m_share_bank & 1) * 128]);
 				else
 					status = 0xf4;
 			}
 			m_mcu_result0 = cmd;
 			break;
 		case 0xc4: // presumable read security mem (password only?)
-			if (m_memcard_device[arg1 & 3]->present() != -1)
+			if (m_memcard[arg1 & 3]->present() != -1)
 			{
-				m_mcu_result1 = m_memcard_device[arg1 & 3]->read_sec(space, 1) |
-					(m_memcard_device[arg1 & 3]->read_sec(space, 2) << 8) |
-					(m_memcard_device[arg1 & 3]->read_sec(space, 3) << 16);
+				m_mcu_result1 = m_memcard[arg1 & 3]->read_sec(space, 1) |
+					(m_memcard[arg1 & 3]->read_sec(space, 2) << 8) |
+					(m_memcard[arg1 & 3]->read_sec(space, 3) << 16);
 			}
 			else
 				status = 0xf4;
 			m_mcu_result0 = cmd;
 			break;
 		case 0xc5: // write security mem
-			if (m_memcard_device[arg1 & 3]->present() != -1)
-				m_memcard_device[arg1 & 3]->write_sec(space, arg2 & 3, arg3);
+			if (m_memcard[arg1 & 3]->present() != -1)
+				m_memcard[arg1 & 3]->write_sec(space, arg2 & 3, arg3);
 			else
 				status = 0xf4;
 			m_mcu_result0 = cmd;
 			break;
 		case 0xc6: // presumable write protection mem
-			if (m_memcard_device[arg1 & 3]->present() != -1)
-				m_memcard_device[arg1 & 3]->write_prot(space, arg2 & 3, arg3);
+			if (m_memcard[arg1 & 3]->present() != -1)
+				m_memcard[arg1 & 3]->write_prot(space, arg2 & 3, arg3);
 			else
 				status = 0xf4;
 			m_mcu_result0 = cmd;
 			break;
 		case 0xc7: // read protection mem
-			if (m_memcard_device[arg1 & 3]->present() != -1)
+			if (m_memcard[arg1 & 3]->present() != -1)
 			{
-				m_mcu_result1 = m_memcard_device[arg1 & 3]->read_prot(space, 0) |
-					(m_memcard_device[arg1 & 3]->read_prot(space, 1) << 8) |
-					(m_memcard_device[arg1 & 3]->read_prot(space, 2) << 16) |
-					(m_memcard_device[arg1 & 3]->read_prot(space, 3) << 24);
+				m_mcu_result1 = m_memcard[arg1 & 3]->read_prot(space, 0) |
+					(m_memcard[arg1 & 3]->read_prot(space, 1) << 8) |
+					(m_memcard[arg1 & 3]->read_prot(space, 2) << 16) |
+					(m_memcard[arg1 & 3]->read_prot(space, 3) << 24);
 			}
 			else
 				status = 0xf4;
 			m_mcu_result0 = cmd;
 			break;
 		case 0xc8: // write data mem
-			if (m_memcard_device[arg1 & 3]->present() != -1)
-				m_memcard_device[arg1 & 3]->write(space, arg2, arg3);
+			if (m_memcard[arg1 & 3]->present() != -1)
+				m_memcard[arg1 & 3]->write(space, arg2, arg3);
 			else
 				status = 0xf4;
 			m_mcu_result0 = cmd;
 			break;
 		case 0xc9: // card authentication
-			if (m_memcard_device[arg1 & 3]->present() != -1)
-				m_memcard_device[arg1 & 3]->auth(arg2, arg3, m_mcu_regs[1] & 0xff);
+			if (m_memcard[arg1 & 3]->present() != -1)
+				m_memcard[arg1 & 3]->auth(arg2, arg3, m_mcu_regs[1] & 0xff);
 			else
 				status = 0xf4;
 			m_mcu_result0 = cmd;
@@ -481,11 +481,6 @@ void pgm2_state::machine_start()
 	save_item(NAME(m_mcu_last_cmd));
 	save_item(NAME(m_shareram));
 	save_item(NAME(m_share_bank));
-
-	m_memcard_device[0] = m_memcard0;
-	m_memcard_device[1] = m_memcard1;
-	m_memcard_device[2] = m_memcard2;
-	m_memcard_device[3] = m_memcard3;
 }
 
 void pgm2_state::machine_reset()
