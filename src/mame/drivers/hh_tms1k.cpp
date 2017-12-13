@@ -5,9 +5,10 @@
   This driver is a collection of simple dedicated handheld and tabletop
   toys based around the TMS1000 MCU series. Anything more complex or clearly
   part of a series is (or will be) in its own driver, see:
-  - hh_tms1k: here
   - eva: Chrysler EVA-11 (and EVA-24)
   - microvsn: Milton Bradley MicroVision
+
+  (contd.) hh_tms1k child drivers:
   - ticalc1x: TI TMS1K-based calculators
   - tispellb: TI Spelling B series gen. 1
   - tispeak: TI Speak & Spell series gen. 1
