@@ -216,12 +216,15 @@ void pgm2_state::draw_sprites(screen_device &screen, const rectangle &cliprect, 
 					draw_sprite_line(cliprect, mask_offset, palette_offset, x, realy, flipx, reverse, sizex, pal, 1, zoomx_bits, growx);
 					realy++;
 
-					if (zoomy_bit)
+					if (zoomy_bit) // draw it again
 					{
 						palette_offset = pre_palette_offset;
 						mask_offset = pre_mask_offset;
+						draw_sprite_line(cliprect, mask_offset, palette_offset, x, realy, flipx, reverse, sizex, pal, 1, zoomx_bits, growx);
+						realy++;
 					}
-					else ydraw++;
+					
+					ydraw++;
 				}
 			}
 		}
