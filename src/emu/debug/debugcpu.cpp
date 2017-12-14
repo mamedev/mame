@@ -2711,7 +2711,7 @@ void device_debug::watchpoint_update_flags(address_space &space)
 
 void device_debug::watchpoint_check(address_space& space, int type, offs_t address, u64 value_to_write, u64 mem_mask)
 {
-	space.machine().debugger().cpu().watchpoint_check(space, type, address, value_to_write, mem_mask, m_wplist);
+	m_device.machine().debugger().cpu().watchpoint_check(space, type, address, value_to_write, mem_mask, m_wplist);
 }
 
 void debugger_cpu::watchpoint_check(address_space& space, int type, offs_t address, u64 value_to_write, u64 mem_mask, std::vector<device_debug::watchpoint *> &wplist)
@@ -2829,7 +2829,7 @@ void device_debug::hotspot_check(address_space &space, offs_t address)
 		// if the bottom of the list is over the threshold, print it
 		hotspot_entry &spot = m_hotspots[m_hotspots.size() - 1];
 		if (spot.m_count > m_hotspot_threshhold)
-			space.machine().debugger().console().printf("Hotspot @ %s %08X (PC=%08X) hit %d times (fell off bottom)\n", space.name(), spot.m_access, spot.m_pc, spot.m_count);
+			m_device.machine().debugger().console().printf("Hotspot @ %s %08X (PC=%08X) hit %d times (fell off bottom)\n", space.name(), spot.m_access, spot.m_pc, spot.m_count);
 
 		// move everything else down and insert this one at the top
 		memmove(&m_hotspots[1], &m_hotspots[0], sizeof(m_hotspots[0]) * (m_hotspots.size() - 1));

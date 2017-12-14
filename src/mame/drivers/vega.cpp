@@ -315,7 +315,7 @@ READ8_MEMBER(vega_state::extern_r)
 		{
 			/* AY 3-8910 */
 			m_ay8910->data_w(space, 0, offset);
-			return 0xff;//mame_rand(space.machine);
+			return 0xff;//mame_rand(machine);
 		}
 
 		case 2: /* 08-0b */

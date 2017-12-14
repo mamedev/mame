@@ -210,7 +210,7 @@ WRITE8_MEMBER( snes_console_state::snes20_hi_w )
 	{ m_cartslot->chip_write(space, offset, data); return; }
 	else if (m_cartslot->get_type() == SNES_CX4
 				&& (offset < 0x400000 && (offset & 0xffff) >= 0x6000 && (offset & 0xffff) < 0x8000))    // hack until we emulate the real CPU
-	{ CX4_write(space.machine(), (offset & 0xffff) - 0x6000, data); return; }
+	{ CX4_write(machine(), (offset & 0xffff) - 0x6000, data); return; }
 	else if (m_type == SNES_SUFAMITURBO
 				&& address >= 0x8000 && ((offset >= 0x600000 && offset < 0x640000) || (offset >= 0x700000 && offset < 0x740000)))
 	{ m_cartslot->write_h(space, offset, data); return; }

@@ -217,7 +217,7 @@ void exidy440_sound_device::mix_to_16(int length, stream_sample_t *dest_left, st
 READ8_MEMBER( exidy440_sound_device::sound_command_r )
 {
 	/* clear the FIRQ that got us here and acknowledge the read to the main CPU */
-	space.machine().device("audiocpu")->execute().set_input_line(1, CLEAR_LINE);
+	machine().device("audiocpu")->execute().set_input_line(1, CLEAR_LINE);
 	m_sound_command_ack = 1;
 
 	return m_sound_command;
@@ -272,7 +272,7 @@ WRITE8_MEMBER( exidy440_sound_device::sound_volume_w )
 
 WRITE8_MEMBER( exidy440_sound_device::sound_interrupt_clear_w )
 {
-	space.machine().device("audiocpu")->execute().set_input_line(0, CLEAR_LINE);
+	machine().device("audiocpu")->execute().set_input_line(0, CLEAR_LINE);
 }
 
 

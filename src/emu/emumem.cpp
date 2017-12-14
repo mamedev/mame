@@ -4219,7 +4219,7 @@ template class direct_read_data<-3>;
 //-------------------------------------------------
 
 memory_block::memory_block(address_space &space, offs_t addrstart, offs_t addrend, void *memory)
-	: m_machine(space.machine()),
+	: m_machine(machine()),
 		m_space(space),
 		m_addrstart(addrstart),
 		m_addrend(addrend),
@@ -4252,7 +4252,7 @@ memory_block::memory_block(address_space &space, offs_t addrstart, offs_t addren
 	{
 		int bytes_per_element = space.data_width() / 8;
 		std::string name = string_format("%08x-%08x", addrstart, addrend);
-		space.machine().save().save_memory(&space.device(), "memory", space.device().tag(), space.spacenum(), name.c_str(), m_data, bytes_per_element, (u32)length / bytes_per_element);
+		machine().save().save_memory(&space.device(), "memory", space.device().tag(), space.spacenum(), name.c_str(), m_data, bytes_per_element, (u32)length / bytes_per_element);
 	}
 }
 
@@ -4276,7 +4276,7 @@ memory_block::~memory_block()
 //-------------------------------------------------
 
 memory_bank::memory_bank(address_space &space, int index, offs_t addrstart, offs_t addrend, const char *tag)
-	: m_machine(space.machine()),
+	: m_machine(machine()),
 		m_baseptr(space.manager().bank_pointer_addr(index)),
 		m_index(index),
 		m_anonymous(tag == nullptr),
@@ -4296,8 +4296,8 @@ memory_bank::memory_bank(address_space &space, int index, offs_t addrstart, offs
 		m_name = string_format("Bank '%s'", tag);
 	}
 
-	if (!m_anonymous && space.machine().save().registration_allowed())
-		space.machine().save().save_item(&space.device(), "memory", m_tag.c_str(), 0, NAME(m_curentry));
+	if (!m_anonymous && machine().save().registration_allowed())
+		machine().save().save_item(&space.device(), "memory", m_tag.c_str(), 0, NAME(m_curentry));
 }
 
 

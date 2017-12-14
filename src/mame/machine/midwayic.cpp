@@ -216,37 +216,37 @@ void midway_serial_pic_emu_device::device_start()
 
 READ8_MEMBER(midway_serial_pic_emu_device::read_a)
 {
-//  printf("%s: read_a\n", space.machine().describe_context());
+//  printf("%s: read_a\n", machine().describe_context());
 	return 0x00;
 }
 
 READ8_MEMBER(midway_serial_pic_emu_device::read_b)
 {
-//  printf("%s: read_b\n", space.machine().describe_context());
+//  printf("%s: read_b\n", machine().describe_context());
 	return 0x00;
 }
 
 READ8_MEMBER(midway_serial_pic_emu_device::read_c)
 {
 //  used
-//  printf("%s: read_c\n", space.machine().describe_context());
+//  printf("%s: read_c\n", machine().describe_context());
 	return 0x00;
 }
 
 WRITE8_MEMBER(midway_serial_pic_emu_device::write_a)
 {
-//  printf("%s: write_a %02x\n", space.machine().describe_context(), data);
+//  printf("%s: write_a %02x\n", machine().describe_context(), data);
 }
 
 WRITE8_MEMBER(midway_serial_pic_emu_device::write_b)
 {
-//  printf("%s: write_b %02x\n", space.machine().describe_context(), data);
+//  printf("%s: write_b %02x\n", machine().describe_context(), data);
 }
 
 WRITE8_MEMBER(midway_serial_pic_emu_device::write_c)
 {
 //  used
-//  printf("%s: write_c %02x\n", space.machine().describe_context(), data);
+//  printf("%s: write_c %02x\n", machine().describe_context(), data);
 }
 
 MACHINE_CONFIG_MEMBER( midway_serial_pic_emu_device::device_add_mconfig )

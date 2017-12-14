@@ -2138,8 +2138,8 @@ void mpu4_state::mpu4_install_mod4yam_space(address_space &space)
 
 void mpu4_state::mpu4_install_mod4oki_space(address_space &space)
 {
-	pia6821_device *pia_ic4ss = space.machine().device<pia6821_device>("pia_ic4ss");
-	ptm6840_device *ptm_ic3ss = space.machine().device<ptm6840_device>("ptm_ic3ss");
+	pia6821_device *pia_ic4ss = machine().device<pia6821_device>("pia_ic4ss");
+	ptm6840_device *ptm_ic3ss = machine().device<ptm6840_device>("ptm_ic3ss");
 
 	space.install_readwrite_handler(0x0880, 0x0883, read8_delegate(FUNC(pia6821_device::read), pia_ic4ss), write8_delegate(FUNC(pia6821_device::write), pia_ic4ss));
 	space.install_read_handler(0x08c0, 0x08c7, read8_delegate(FUNC(ptm6840_device::read), ptm_ic3ss));

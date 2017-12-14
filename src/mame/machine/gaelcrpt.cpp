@@ -148,7 +148,7 @@ uint16_t gaelco_decrypt(address_space &space, int offset, int data, int param1, 
 
 		lastdecword = data;
 
-//      logerror("%s : data1 = %4x > %4x @ %8x\n",space.machine().describe_context(),savedata,data,lastoffset);
+//      logerror("%s : data1 = %4x > %4x @ %8x\n",machine().describe_context(),savedata,data,lastoffset);
 	}
 	return data;
 }

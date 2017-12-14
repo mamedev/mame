@@ -1850,7 +1850,7 @@ READ8_MEMBER(towns_state::towns_cdrom_r)
 				m_towns_cd.cmd_status_ptr = 0;
 /*              if(m_towns_cd.extra_status != 0)
                 {
-                    towns_cdrom_set_irq(space.machine(),TOWNS_CD_IRQ_MPU,1);
+                    towns_cdrom_set_irq(machine(),TOWNS_CD_IRQ_MPU,1);
                     m_towns_cd.status |= 0x02;
                 }*/
 			}

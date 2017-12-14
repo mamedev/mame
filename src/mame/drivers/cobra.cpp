@@ -1670,7 +1670,7 @@ WRITE64_MEMBER(cobra_state::main_fifo_w)
 		if (m_main_debug_state == 0x6b)
 		{
 			// install HD patches for bujutsu
-			if (strcmp(space.machine().system().name, "bujutsu") == 0)
+			if (strcmp(machine().system().name, "bujutsu") == 0)
 			{
 				uint32_t *main_ram = (uint32_t*)(uint64_t*)m_main_ram;
 				uint32_t *sub_ram = (uint32_t*)m_sub_ram;
@@ -1685,7 +1685,7 @@ WRITE64_MEMBER(cobra_state::main_fifo_w)
 				gfx_ram[(0x38632c^4) / 4] = 0x38600000;     // skip check_one_scene()
 			}
 			// racjamdx
-			else if (strcmp(space.machine().system().name, "racjamdx") == 0)
+			else if (strcmp(machine().system().name, "racjamdx") == 0)
 			{
 			}
 		}

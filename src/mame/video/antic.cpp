@@ -1177,7 +1177,7 @@ READ8_MEMBER ( antic_device::read )
 		data = m_r.antic09;
 		break;
 	case 10: /* WSYNC read */
-		space.machine().device("maincpu")->execute().spin_until_trigger(TRIGGER_HSYNC);
+		machine().device("maincpu")->execute().spin_until_trigger(TRIGGER_HSYNC);
 		m_w.wsync = 1;
 		data = m_r.antic0a;
 		break;
@@ -1287,7 +1287,7 @@ WRITE8_MEMBER ( antic_device::write )
 		break;
 	case 10: /* WSYNC write */
 		LOG(("ANTIC 0A write WSYNC  $%02X\n", data));
-		space.machine().device("maincpu")->execute().spin_until_trigger(TRIGGER_HSYNC);
+		machine().device("maincpu")->execute().spin_until_trigger(TRIGGER_HSYNC);
 		m_w.wsync = 1;
 		break;
 	case 11:

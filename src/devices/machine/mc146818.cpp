@@ -528,7 +528,7 @@ READ8_MEMBER( mc146818_device::read )
 			// Update In Progress (UIP) time for 32768 Hz is 244+1984usec
 			/// TODO: support other dividers
 			/// TODO: don't set this if update is stopped
-			if ((space.machine().time() - m_last_refresh) < attotime::from_usec(244+1984))
+			if ((machine().time() - m_last_refresh) < attotime::from_usec(244+1984))
 				data |= REG_A_UIP;
 			break;
 

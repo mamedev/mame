@@ -231,7 +231,7 @@ READ8_MEMBER( epson_tf20_device::rom_disable_r )
 
 READ8_MEMBER( epson_tf20_device::upd765_tc_r )
 {
-	logerror("%s: upd765_tc_r\n", space.machine().describe_context());
+	logerror("%s: upd765_tc_r\n", machine().describe_context());
 
 	// toggle tc on read
 	m_fdc->tc_w(true);
@@ -242,7 +242,7 @@ READ8_MEMBER( epson_tf20_device::upd765_tc_r )
 
 WRITE8_MEMBER( epson_tf20_device::fdc_control_w )
 {
-	logerror("%s: tf20_fdc_control_w(%02x)\n", space.machine().describe_context(), data);
+	logerror("%s: tf20_fdc_control_w(%02x)\n", machine().describe_context(), data);
 
 	// bit 0, motor on signal
 	m_fd0->mon_w(!BIT(data, 0));

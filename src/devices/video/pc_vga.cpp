@@ -1611,8 +1611,8 @@ READ8_MEMBER(vga_device::vga_crtc_r)
 		vga.attribute.state = 0;
 		data = 0;
 
-		hsync = space.machine().first_screen()->hblank() & 1;
-		vsync = vga_vblank(); //space.machine().first_screen()->vblank() & 1;
+		hsync = machine().first_screen()->hblank() & 1;
+		vsync = vga_vblank(); //machine().first_screen()->vblank() & 1;
 
 		data |= (hsync | vsync) & 1; // DD - display disable register
 		data |= (vsync & 1) << 3; // VRetrace register
@@ -1663,10 +1663,10 @@ WRITE8_MEMBER(vga_device::vga_crtc_w)
 			}
 
 			crtc_reg_write(vga.crtc.index,data);
-			//space.machine().first_screen()->update_partial(space.machine().first_screen()->vpos());
+			//machine().first_screen()->update_partial(machine().first_screen()->vpos());
 			#if 0
 			if((vga.crtc.index & 0xfe) != 0x0e)
-				printf("%02x %02x %d\n",vga.crtc.index,data,space.machine().first_screen()->vpos());
+				printf("%02x %02x %d\n",vga.crtc.index,data,machine().first_screen()->vpos());
 			#endif
 			break;
 
@@ -2591,7 +2591,7 @@ WRITE8_MEMBER(tseng_vga_device::port_03d0_w)
 				vga.crtc.data[vga.crtc.index] = data;
 				tseng_crtc_reg_write(vga.crtc.index,data);
 				//if((vga.crtc.index & 0xfe) != 0x0e)
-				//  printf("%02x %02x %d\n",vga.crtc.index,data,space.machine().first_screen()->vpos());
+				//  printf("%02x %02x %d\n",vga.crtc.index,data,machine().first_screen()->vpos());
 				break;
 			case 8:
 				et4k.reg_3d8 = data;

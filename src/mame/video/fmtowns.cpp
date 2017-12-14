@@ -371,8 +371,8 @@ READ8_MEMBER(towns_state::towns_video_440_r)
 			if(m_video.towns_crtc_sel == 30)
 			{
 				// check video position
-				xpos = space.machine().first_screen()->hpos();
-				ypos = space.machine().first_screen()->vpos();
+				xpos = machine().first_screen()->hpos();
+				ypos = machine().first_screen()->vpos();
 
 				if(xpos < (m_video.towns_crtc_reg[0] & 0xfe))
 					ret |= 0x02;
@@ -546,7 +546,7 @@ READ8_MEMBER(towns_state::towns_video_fd90_r)
 			return m_video.towns_degipal[offset-0x08];
 		case 0x10:  // "sub status register"
 			// check video position
-			xpos = space.machine().first_screen()->hpos();
+			xpos = machine().first_screen()->hpos();
 
 			if(xpos < m_video.towns_crtc_layerscr[0].max_x && xpos > m_video.towns_crtc_layerscr[0].min_x)
 				ret |= 0x02;

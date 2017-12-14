@@ -67,7 +67,7 @@ isa16_svga_cirrus_device::isa16_svga_cirrus_device(const machine_config &mconfig
 //-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
-READ8_MEMBER(isa16_svga_cirrus_device::input_port_0_r ) { return 0xff; } //return space.machine().root_device().ioport("IN0")->read(); }
+READ8_MEMBER(isa16_svga_cirrus_device::input_port_0_r ) { return 0xff; } //return machine().root_device().ioport("IN0")->read(); }
 
 void isa16_svga_cirrus_device::device_start()
 {
@@ -148,7 +148,7 @@ isa16_svga_cirrus_gd542x_device::isa16_svga_cirrus_gd542x_device(const machine_c
 //-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
-READ8_MEMBER(isa16_svga_cirrus_gd542x_device::input_port_0_r ) { return 0xff; } //return space.machine().root_device().ioport("IN0")->read(); }
+READ8_MEMBER(isa16_svga_cirrus_gd542x_device::input_port_0_r ) { return 0xff; } //return machine().root_device().ioport("IN0")->read(); }
 
 void isa16_svga_cirrus_gd542x_device::device_start()
 {

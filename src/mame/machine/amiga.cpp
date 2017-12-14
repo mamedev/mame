@@ -1042,7 +1042,7 @@ READ16_MEMBER( amiga_state::cia_r )
 		data |= m_cia_1->read(space, offset >> 7) << 8;
 
 	if (LOG_CIA)
-		logerror("%s: cia_r(%06x) = %04x & %04x\n", space.machine().describe_context(), offset, data, mem_mask);
+		logerror("%s: cia_r(%06x) = %04x & %04x\n", machine().describe_context(), offset, data, mem_mask);
 
 	return data;
 }
@@ -1050,7 +1050,7 @@ READ16_MEMBER( amiga_state::cia_r )
 WRITE16_MEMBER( amiga_state::cia_w )
 {
 	if (LOG_CIA)
-		logerror("%s: cia_w(%06x) = %04x & %04x\n", space.machine().describe_context(), offset, data, mem_mask);
+		logerror("%s: cia_w(%06x) = %04x & %04x\n", machine().describe_context(), offset, data, mem_mask);
 
 	if ((offset & 0x1000/2) == 0 && ACCESSING_BITS_0_7)
 		m_cia_0->write(space, offset >> 7, data & 0xff);
@@ -1232,11 +1232,11 @@ READ16_MEMBER( amiga_state::custom_chip_r )
 			return CUSTOM_REG(REG_INTREQ);
 
 		case REG_COPJMP1:
-			amiga_copper_setpc(space.machine(), CUSTOM_REG_LONG(REG_COP1LCH));
+			amiga_copper_setpc(machine(), CUSTOM_REG_LONG(REG_COP1LCH));
 			break;
 
 		case REG_COPJMP2:
-			amiga_copper_setpc(space.machine(), CUSTOM_REG_LONG(REG_COP2LCH));
+			amiga_copper_setpc(machine(), CUSTOM_REG_LONG(REG_COP2LCH));
 			break;
 
 		case REG_CLXDAT:
@@ -1393,19 +1393,19 @@ WRITE16_MEMBER( amiga_state::custom_chip_w )
 
 		case REG_SPR0PTL:   case REG_SPR1PTL:   case REG_SPR2PTL:   case REG_SPR3PTL:
 		case REG_SPR4PTL:   case REG_SPR5PTL:   case REG_SPR6PTL:   case REG_SPR7PTL:
-			amiga_sprite_dma_reset(space.machine(), (offset - REG_SPR0PTL) / 2);
+			amiga_sprite_dma_reset(machine(), (offset - REG_SPR0PTL) / 2);
 			break;
 
 		case REG_SPR0CTL:   case REG_SPR1CTL:   case REG_SPR2CTL:   case REG_SPR3CTL:
 		case REG_SPR4CTL:   case REG_SPR5CTL:   case REG_SPR6CTL:   case REG_SPR7CTL:
 			/* disable comparitor on writes here */
-			amiga_sprite_enable_comparitor(space.machine(), (offset - REG_SPR0CTL) / 4, false);
+			amiga_sprite_enable_comparitor(machine(), (offset - REG_SPR0CTL) / 4, false);
 			break;
 
 		case REG_SPR0DATA:  case REG_SPR1DATA:  case REG_SPR2DATA:  case REG_SPR3DATA:
 		case REG_SPR4DATA:  case REG_SPR5DATA:  case REG_SPR6DATA:  case REG_SPR7DATA:
 			/* enable comparitor on writes here */
-			amiga_sprite_enable_comparitor(space.machine(), (offset - REG_SPR0DATA) / 4, true);
+			amiga_sprite_enable_comparitor(machine(), (offset - REG_SPR0DATA) / 4, true);
 			break;
 
 		case REG_COP1LCH:
@@ -1414,11 +1414,11 @@ WRITE16_MEMBER( amiga_state::custom_chip_w )
 			break;
 
 		case REG_COPJMP1:
-			amiga_copper_setpc(space.machine(), CUSTOM_REG_LONG(REG_COP1LCH));
+			amiga_copper_setpc(machine(), CUSTOM_REG_LONG(REG_COP1LCH));
 			break;
 
 		case REG_COPJMP2:
-			amiga_copper_setpc(space.machine(), CUSTOM_REG_LONG(REG_COP2LCH));
+			amiga_copper_setpc(machine(), CUSTOM_REG_LONG(REG_COP2LCH));
 			break;
 
 		case REG_DDFSTRT:
@@ -1516,7 +1516,7 @@ WRITE16_MEMBER( amiga_state::custom_chip_w )
 		case REG_COLOR28:   case REG_COLOR29:   case REG_COLOR30:   case REG_COLOR31:
 			if (IS_AGA(state))
 			{
-				amiga_aga_palette_write(space.machine(), offset - REG_COLOR00, data);
+				amiga_aga_palette_write(machine(), offset - REG_COLOR00, data);
 			}
 			else
 			{

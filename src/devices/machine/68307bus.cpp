@@ -23,15 +23,15 @@ READ8_MEMBER( m68307_cpu_device::m68307_internal_mbus_r )
 	{
 		case m68307BUS_MADR:
 			logerror("%08x m68307_internal_mbus_r %08x (MADR - M-Bus Address Register)\n", m_ppc, offset);
-			return space.machine().rand();
+			return machine().rand();
 
 		case m68307BUS_MFDR:
 			logerror("%08x m68307_internal_mbus_r %08x (MFDR - M-Bus Frequency Divider Register)\n", m_ppc, offset);
-			return space.machine().rand();
+			return machine().rand();
 
 		case m68307BUS_MBCR:
 			logerror("%08x m68307_internal_mbus_r %08x (MFCR - M-Bus Control Register)\n", m_ppc, offset);
-			return mbus.m_MFCR;//space.machine().rand();
+			return mbus.m_MFCR;//machine().rand();
 
 		case m68307BUS_MBSR:
 			logerror("%08x m68307_internal_mbus_r %08x (MBSR - M-Bus Status Register)\n", m_ppc, offset);
@@ -44,7 +44,7 @@ READ8_MEMBER( m68307_cpu_device::m68307_internal_mbus_r )
 		case m68307BUS_MBDR:
 			logerror("%08x m68307_internal_mbus_r %08x (MBDR - M-Bus Data I/O Register)\n", m_ppc, offset);
 			mbus.m_intpend = true;
-			return 0xff;//space.machine().rand();
+			return 0xff;//machine().rand();
 
 		default:
 			logerror("%08x m68307_internal_mbus_r %08x (UNKNOWN / ILLEGAL)\n", m_ppc, offset);

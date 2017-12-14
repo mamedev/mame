@@ -196,7 +196,7 @@ WRITE16_MEMBER(cps_state::dinopic_layer_w)
 		m_cps_a_regs[0x14 / 2] = data;
 		break;
 	default:
-		logerror("%s: Unknown layer cmd %X %X\n",space.machine().describe_context(),offset<<1,data);
+		logerror("%s: Unknown layer cmd %X %X\n",machine().describe_context(),offset<<1,data);
 
 	}
 }
@@ -321,7 +321,7 @@ WRITE16_MEMBER(cps_state::punipic_layer_w)
 		// unknown
 		break;
 	default:
-		logerror("%s: Unknown layer cmd %X %X\n",space.machine().describe_context(),offset<<1,data);
+		logerror("%s: Unknown layer cmd %X %X\n",machine().describe_context(),offset<<1,data);
 
 	}
 }
@@ -379,7 +379,7 @@ WRITE16_MEMBER(cps_state::sf2m1_layer_w)
 		m_cps_a_regs[0x06 / 2] = data;
 		break;
 	default:
-		logerror("%s: Unknown layer cmd %X %X\n",space.machine().describe_context(),offset<<1,data);
+		logerror("%s: Unknown layer cmd %X %X\n",machine().describe_context(),offset<<1,data);
 
 	}
 }

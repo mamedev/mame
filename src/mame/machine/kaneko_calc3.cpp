@@ -1339,7 +1339,7 @@ int kaneko_calc3_device::decompress_table(int tabnum, uint8_t* dstram, int dstof
 					//printf("save to eeprom\n");
 
 					{
-						eeprom_serial_93cxx_device *eeprom = space.machine().device<eeprom_serial_93cxx_device>(":eeprom");
+						eeprom_serial_93cxx_device *eeprom = machine().device<eeprom_serial_93cxx_device>(":eeprom");
 
 						for (i=0;i<0x40;i++)
 						{
@@ -1675,7 +1675,7 @@ void kaneko_calc3_device::mcu_run()
 			}
 #endif
 			{
-				eeprom_serial_93cxx_device *eeprom = space.machine().device<eeprom_serial_93cxx_device>(":eeprom");
+				eeprom_serial_93cxx_device *eeprom = machine().device<eeprom_serial_93cxx_device>(":eeprom");
 
 				for (i=0;i<0x40;i++)
 				{

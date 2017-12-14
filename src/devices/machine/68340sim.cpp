@@ -200,7 +200,7 @@ READ8_MEMBER( m68340_cpu_device::m68340_internal_sim_ports_r )
 	assert(m_m68340SIM);
 	m68340_sim &sim = *m_m68340SIM;
 
-	int val =  space.machine().rand();
+	int val =  machine().rand();
 
 	switch (offset)
 	{

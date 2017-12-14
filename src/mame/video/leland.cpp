@@ -198,14 +198,14 @@ int leland_state::leland_vram_port_r(address_space &space, int offset, int num)
 
 		default:
 			logerror("%s: Warning: Unknown video port %02x read (address=%04x)\n",
-						space.machine().describe_context(), offset, addr);
+						machine().describe_context(), offset, addr);
 			ret = 0;
 			break;
 	}
 	state->m_addr = addr;
 
 	if (LOG_COMM && addr >= 0xf000)
-		logerror("%s:%s comm read %04X = %02X\n", space.machine().describe_context(), num ? "slave" : "master", addr, ret);
+		logerror("%s:%s comm read %04X = %02X\n", machine().describe_context(), num ? "slave" : "master", addr, ret);
 
 	return ret;
 }
@@ -233,7 +233,7 @@ void leland_state::leland_vram_port_w(address_space &space, int offset, int data
 		m_screen->update_partial(scanline - 1);
 
 	if (LOG_COMM && addr >= 0xf000)
-		logerror("%s:%s comm write %04X = %02X\n", space.machine().describe_context(), num ? "slave" : "master", addr, data);
+		logerror("%s:%s comm write %04X = %02X\n", machine().describe_context(), num ? "slave" : "master", addr, data);
 
 	/* based on the low 3 bits of the offset, update the destination */
 	switch (offset & 7)
@@ -285,7 +285,7 @@ void leland_state::leland_vram_port_w(address_space &space, int offset, int data
 
 		default:
 			logerror("%s:Warning: Unknown video port write (address=%04x value=%02x)\n",
-						space.machine().describe_context(), offset, addr);
+						machine().describe_context(), offset, addr);
 			break;
 	}
 

@@ -92,7 +92,7 @@ WRITE8_MEMBER(namcos2_shared_state::sound_reset_w)
 		//printf( "dspkick=0x%x\n", data );
 		if (data & 0x04)
 		{
-			(*namcos2_kickstart)(space.machine(), 1);
+			(*namcos2_kickstart)(machine(), 1);
 		}
 	}
 }
@@ -327,7 +327,7 @@ READ16_MEMBER( namcos2_state::namcos2_68k_key_r )
 	//  case 3: return 0x142;
 		case 4: return 0x142;
 	//  case 3: popmessage("blah %08x",space.device().safe_pc());
-		default: return space.machine().rand();
+		default: return machine().rand();
 		}
 
 	case NAMCOS2_SUPER_WSTADIUM_92:
@@ -383,7 +383,7 @@ READ16_MEMBER( namcos2_state::namcos2_68k_key_r )
 
 
 
-	return space.machine().rand()&0xffff;
+	return machine().rand()&0xffff;
 }
 
 WRITE16_MEMBER( namcos2_state::namcos2_68k_key_w )

@@ -389,7 +389,7 @@ WRITE16_MEMBER( sega_32x_device::_32x_68k_a15106_w )
 		{
 			// install the game rom in the normal 0x000000-0x03fffff space used by the genesis - this allows VDP DMA operations to work as they have to be from this area or RAM
 			// it should also UNMAP the banked rom area...
-			space.install_rom(0x0000100, 0x03fffff, space.machine().root_device().memregion("gamecart")->base() + 0x100);
+			space.install_rom(0x0000100, 0x03fffff, machine().root_device().memregion("gamecart")->base() + 0x100);
 		}
 		else
 		{
@@ -397,7 +397,7 @@ WRITE16_MEMBER( sega_32x_device::_32x_68k_a15106_w )
 
 			// this is actually blank / nop area
 			// we should also map the banked area back (we don't currently unmap it tho)
-			space.install_rom(0x0000100, 0x03fffff, space.machine().root_device().memregion("maincpu")->base()+0x100);
+			space.install_rom(0x0000100, 0x03fffff, machine().root_device().memregion("maincpu")->base()+0x100);
 		}
 
 		if((m_a15106_reg & 4) == 0) // clears the FIFO state
@@ -430,7 +430,7 @@ WRITE16_MEMBER( sega_32x_device::_32x_68k_a15106_w )
 
 READ16_MEMBER( sega_32x_device::_32x_dreq_common_r )
 {
-	address_space& _68kspace = space.machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space& _68kspace = machine().device("maincpu")->memory().space(AS_PROGRAM);
 
 	switch (offset)
 	{
@@ -501,7 +501,7 @@ READ16_MEMBER( sega_32x_device::_32x_dreq_common_r )
 
 WRITE16_MEMBER( sega_32x_device::_32x_dreq_common_w )
 {
-	address_space& _68kspace = space.machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space& _68kspace = machine().device("maincpu")->memory().space(AS_PROGRAM);
 
 	switch (offset)
 	{
@@ -689,12 +689,12 @@ WRITE16_MEMBER( sega_32x_device::_32x_68k_a15100_w )
 		if (data & 0x01)
 		{
 			m_32x_adapter_enabled = 1;
-			space.install_rom(0x0880000, 0x08fffff, space.machine().root_device().memregion("gamecart")->base()); // 'fixed' 512kb rom bank
+			space.install_rom(0x0880000, 0x08fffff, machine().root_device().memregion("gamecart")->base()); // 'fixed' 512kb rom bank
 
 			space.install_read_bank(0x0900000, 0x09fffff, "bank12"); // 'bankable' 1024kb rom bank
-			space.machine().root_device().membank("bank12")->set_base(space.machine().root_device().memregion("gamecart")->base()+((m_32x_68k_a15104_reg&0x3)*0x100000) );
+			machine().root_device().membank("bank12")->set_base(machine().root_device().memregion("gamecart")->base()+((m_32x_68k_a15104_reg&0x3)*0x100000) );
 
-			space.install_rom(0x0000000, 0x03fffff, space.machine().root_device().memregion("32x_68k_bios")->base());
+			space.install_rom(0x0000000, 0x03fffff, machine().root_device().memregion("32x_68k_bios")->base());
 
 			/* VDP area */
 			space.install_readwrite_handler(0x0a15180, 0x0a1518b, read16_delegate(FUNC(sega_32x_device::_32x_common_vdp_regs_r), this),     write16_delegate(FUNC(sega_32x_device::_32x_common_vdp_regs_w),this)); // common / shared VDP regs
@@ -704,14 +704,14 @@ WRITE16_MEMBER( sega_32x_device::_32x_68k_a15100_w )
 
 
 
-			space.machine().device("maincpu")->memory().space(AS_PROGRAM).install_readwrite_handler(0x000070, 0x000073, read16_delegate(FUNC(sega_32x_device::_32x_68k_m_hint_vector_r),this), write16_delegate(FUNC(sega_32x_device::_32x_68k_m_hint_vector_w),this)); // h interrupt vector
+			machine().device("maincpu")->memory().space(AS_PROGRAM).install_readwrite_handler(0x000070, 0x000073, read16_delegate(FUNC(sega_32x_device::_32x_68k_m_hint_vector_r),this), write16_delegate(FUNC(sega_32x_device::_32x_68k_m_hint_vector_w),this)); // h interrupt vector
 		}
 		else
 		{
 			m_32x_adapter_enabled = 0;
 
-			space.install_rom(0x0000000, 0x03fffff, space.machine().root_device().memregion("gamecart")->base());
-			space.machine().device("maincpu")->memory().space(AS_PROGRAM).install_readwrite_handler(0x000070, 0x000073, read16_delegate(FUNC(sega_32x_device::_32x_68k_m_hint_vector_r),this), write16_delegate(FUNC(sega_32x_device::_32x_68k_m_hint_vector_w),this)); // h interrupt vector
+			space.install_rom(0x0000000, 0x03fffff, machine().root_device().memregion("gamecart")->base());
+			machine().device("maincpu")->memory().space(AS_PROGRAM).install_readwrite_handler(0x000070, 0x000073, read16_delegate(FUNC(sega_32x_device::_32x_68k_m_hint_vector_r),this), write16_delegate(FUNC(sega_32x_device::_32x_68k_m_hint_vector_w),this)); // h interrupt vector
 		}
 	}
 
@@ -778,7 +778,7 @@ WRITE16_MEMBER( sega_32x_device::_32x_68k_a15104_w )
 		m_32x_68k_a15104_reg = (m_32x_68k_a15104_reg & 0x00ff) | (data & 0xff00);
 	}
 
-	space.machine().root_device().membank("bank12")->set_base(space.machine().root_device().memregion("gamecart")->base()+((m_32x_68k_a15104_reg&0x3)*0x100000) );
+	machine().root_device().membank("bank12")->set_base(machine().root_device().memregion("gamecart")->base()+((m_32x_68k_a15104_reg&0x3)*0x100000) );
 }
 
 /**********************************************************************************************/
@@ -793,7 +793,7 @@ WRITE16_MEMBER( sega_32x_device::_32x_68k_a15104_w )
 // reads
 READ16_MEMBER( sega_32x_device::_32x_68k_m_commsram_r )
 {
-	if (_32X_COMMS_PORT_SYNC) space.machine().scheduler().synchronize();
+	if (_32X_COMMS_PORT_SYNC) machine().scheduler().synchronize();
 	return m_commsram[offset];
 }
 
@@ -801,7 +801,7 @@ READ16_MEMBER( sega_32x_device::_32x_68k_m_commsram_r )
 WRITE16_MEMBER( sega_32x_device::_32x_68k_m_commsram_w )
 {
 	COMBINE_DATA(&m_commsram[offset]);
-	if (_32X_COMMS_PORT_SYNC) space.machine().scheduler().synchronize();
+	if (_32X_COMMS_PORT_SYNC) machine().scheduler().synchronize();
 }
 
 /**********************************************************************************************/
@@ -1069,7 +1069,7 @@ WRITE16_MEMBER( sega_32x_device::_32x_common_vdp_regs_w )
 {
 	// what happens if the z80 accesses it, what authorization do we use? which address space do we get?? the z80 *can* write here and to the framebuffer via the window
 
-	address_space& _68kspace = space.machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space& _68kspace = machine().device("maincpu")->memory().space(AS_PROGRAM);
 
 	if (&space!= &_68kspace)
 	{

@@ -449,10 +449,10 @@ WRITE8_MEMBER(segac2_state::io_portd_w)
 	 D1 : To CN1 pin J. (Coin meter 2)
 	 D0 : To CN1 pin 8. (Coin meter 1)
 	*/
-	//space.machine().bookkeeping().coin_lockout_w(1, data & 0x08);
-	//space.machine().bookkeeping().coin_lockout_w(0, data & 0x04);
-	space.machine().bookkeeping().coin_counter_w(1, data & 0x02);
-	space.machine().bookkeeping().coin_counter_w(0, data & 0x01);
+	//machine().bookkeeping().coin_lockout_w(1, data & 0x08);
+	//machine().bookkeeping().coin_lockout_w(0, data & 0x04);
+	machine().bookkeeping().coin_counter_w(1, data & 0x02);
+	machine().bookkeeping().coin_counter_w(0, data & 0x01);
 }
 
 WRITE8_MEMBER(segac2_state::io_porth_w)
@@ -497,7 +497,7 @@ WRITE8_MEMBER(segac2_state::control_w)
 	data &= 0x0f;
 
 	/* bit 0 controls display enable */
-	//segac2_enable_display(space.machine(), ~data & 1);
+	//segac2_enable_display(machine(), ~data & 1);
 	m_segac2_enable_display = ~data & 1;
 
 	/* bit 1 resets the protection */
@@ -587,8 +587,8 @@ WRITE8_MEMBER(segac2_state::counter_timer_w)
 			break;
 
 		case 0x10:  /* coin counter */
-//          space.machine().bookkeeping().coin_counter_w(0,1);
-//          space.machine().bookkeeping().coin_counter_w(0,0);
+//          machine().bookkeeping().coin_counter_w(0,1);
+//          machine().bookkeeping().coin_counter_w(0,0);
 			break;
 
 		case 0x12:  /* set coinage info -- followed by two 4-bit values */

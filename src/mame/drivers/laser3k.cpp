@@ -465,10 +465,10 @@ READ8_MEMBER( laser3k_state::io2_r )
 	switch (offset)
 	{
 		case 0xc2:  // h-blank status
-			return space.machine().first_screen()->hblank() ? 0x80 : 0x00;
+			return machine().first_screen()->hblank() ? 0x80 : 0x00;
 
 		case 0xc3:  // v-blank status
-			return space.machine().first_screen()->vblank() ? 0x80 : 0x00;
+			return machine().first_screen()->vblank() ? 0x80 : 0x00;
 
 		case 0xc5:  // CPU 1/2 MHz status?
 			return 0x00;

@@ -261,11 +261,11 @@ uint32_t model2_state::copro_fifoout_pop(address_space &space,uint32_t offset, u
 	{
 		if (m_copro_fifoout_num == COPRO_FIFOOUT_SIZE)
 		{
-			space.machine().device<adsp21062_device>("dsp")->set_flag_input(1, ASSERT_LINE);
+			machine().device<adsp21062_device>("dsp")->set_flag_input(1, ASSERT_LINE);
 		}
 		else
 		{
-			space.machine().device<adsp21062_device>("dsp")->set_flag_input(1, CLEAR_LINE);
+			machine().device<adsp21062_device>("dsp")->set_flag_input(1, CLEAR_LINE);
 		}
 	}
 

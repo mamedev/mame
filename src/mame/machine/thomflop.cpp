@@ -753,7 +753,7 @@ WRITE8_MEMBER( thomson_state::to7_qdd_w )
 			int bits, parity;
 			bits   = bit[ (data >> 3) & 7 ];
 			parity = par[ (data >> 3) & 7 ];
-			to7_qdd_stat_update(space.machine());
+			to7_qdd_stat_update(machine());
 			VLOG(( "%f $%04x to7_qdd_w: CTRL2=$%02X bits=%i par=%s blen=%i under=%s%s\n",
 					machine().time().as_double(), m_maincpu->pc(), data,
 					bits, parname[ parity ], data & QDD_C2_BLEN ? 1 : 2,

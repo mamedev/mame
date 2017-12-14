@@ -33,7 +33,7 @@
 #if (USE_8039)
 #define I8035_P2_W(M,D) do { m_soundlatch4->write(M,0,D); } while (0)
 #else
-#define I8035_P2_W(M,D) do { set_ea(M, ((D) & 0x20) ? 0 : 1);  m_soundlatch4->write(M,0,D); } while (0)
+#define I8035_P2_W(M,D) do { set_ea(((D) & 0x20) ? 0 : 1);  m_soundlatch4->write(M,0,D); } while (0)
 #endif
 
 #define I8035_P1_W_AH(M,B,D) I8035_P1_W(M,ACTIVEHIGH_PORT_BIT(I8035_P1_R(M),B,(D)))
@@ -402,13 +402,12 @@ DISCRETE_SOUND_END
  *
  ****************************************************************/
 
-static void set_ea(address_space &space, int ea)
+void mario_state::set_ea(int ea)
 {
-	mario_state *state = space.machine().driver_data<mario_state>();
 	//printf("ea: %d\n", ea);
-	//machine.device("audiocpu")->execute().set_input_line(MCS48_INPUT_EA, (ea) ? ASSERT_LINE : CLEAR_LINE);
-	if (state->m_eabank != nullptr)
-		state->membank(state->m_eabank)->set_entry(ea);
+	//machine().device("audiocpu")->execute().set_input_line(MCS48_INPUT_EA, (ea) ? ASSERT_LINE : CLEAR_LINE);
+	if (m_eabank != nullptr)
+		membank(m_eabank)->set_entry(ea);
 }
 
 /****************************************************************
@@ -445,7 +444,7 @@ void mario_state::sound_reset()
 	address_space &space = machine().device("audiocpu")->memory().space(AS_PROGRAM);
 
 #if USE_8039
-	set_ea(space, 1);
+	set_ea(1);
 #endif
 
 	/* FIXME: convert to latch8 */
