@@ -100,7 +100,7 @@ DRIVER_INIT_MEMBER( hprot1_state, hprot1 )
 		bitswapped_ROM[i] = ROM[i];
 
 	for(i=0x0000;i<0x10000;i++)
-		ROM[BITSWAP16(i, 15, 14, 13, 12, 11, 10, 9, 8, 3, 2, 1, 0, 4, 5, 6, 7)] = bitswapped_ROM[i];
+		ROM[bitswap<16>(i, 15, 14, 13, 12, 11, 10, 9, 8, 3, 2, 1, 0, 4, 5, 6, 7)] = bitswapped_ROM[i];
 }
 
 //A4 = display RS

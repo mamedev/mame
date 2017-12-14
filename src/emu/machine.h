@@ -229,6 +229,11 @@ public:
 	void immediate_save(const char *filename);
 	void immediate_load(const char *filename);
 
+	// rewind operations
+	void rewind_capture();
+	void rewind_step();
+	void rewind_invalidate();
+
 	// scheduled operations
 	void schedule_exit();
 	void schedule_hard_reset();

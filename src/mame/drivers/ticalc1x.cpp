@@ -98,7 +98,7 @@ WRITE16_MEMBER(cmulti8_state::write_r)
 WRITE16_MEMBER(cmulti8_state::write_o)
 {
 	// O0-O7: digit segments
-	m_o = BITSWAP8(data,0,4,5,6,7,1,2,3);
+	m_o = bitswap<8>(data,0,4,5,6,7,1,2,3);
 	prepare_display();
 }
 
@@ -719,7 +719,7 @@ WRITE16_MEMBER(ti1000_state::write_o)
 	// O0-O3,O5(?): input mux
 	// O0-O7: digit segments
 	m_inp_mux = (data & 0xf) | (data >> 1 & 0x10);
-	m_o = BITSWAP8(data,7,4,3,2,1,0,6,5);
+	m_o = bitswap<8>(data,7,4,3,2,1,0,6,5);
 }
 
 READ8_MEMBER(ti1000_state::read_k)
@@ -984,7 +984,7 @@ public:
 WRITE16_MEMBER(lilprof78_state::write_r)
 {
 	// update leds state
-	u8 seg = BITSWAP8(m_o,7,4,3,2,1,0,6,5) & 0x7f;
+	u8 seg = bitswap<8>(m_o,7,4,3,2,1,0,6,5) & 0x7f;
 	u16 r = (data & 7) | (data << 1 & 0x1f0);
 	set_display_segmask(0x1ff, 0x7f);
 	display_matrix(7, 9, seg, r, false);
@@ -993,7 +993,7 @@ WRITE16_MEMBER(lilprof78_state::write_r)
 	m_display_state[3] = (r != 0 && m_o & 0x80) ? 0x41 : 0;
 
 	// 6th digit is a custom 7seg for math symbols (see wizatron_state write_r)
-	m_display_state[6] = BITSWAP8(m_display_state[6],7,6,1,4,2,3,5,0);
+	m_display_state[6] = bitswap<8>(m_display_state[6],7,6,1,4,2,3,5,0);
 	display_update();
 }
 
@@ -1108,7 +1108,7 @@ WRITE16_MEMBER(dataman_state::write_r)
 WRITE16_MEMBER(dataman_state::write_o)
 {
 	// O0-O6: digit segments A-G
-	m_o = BITSWAP8(data,7,1,6,5,4,3,2,0) & 0x7f;
+	m_o = bitswap<8>(data,7,1,6,5,4,3,2,0) & 0x7f;
 	prepare_display();
 }
 
@@ -1297,7 +1297,7 @@ WRITE16_MEMBER(ti30_state::write_o)
 	// O0-O2,O4-O7: input mux
 	// O0-O7: digit segments
 	m_inp_mux = (data & 7) | (data >> 1 & 0x78);
-	m_o = BITSWAP8(data,7,5,2,1,4,0,6,3);
+	m_o = bitswap<8>(data,7,5,2,1,4,0,6,3);
 }
 
 READ8_MEMBER(ti30_state::read_k)

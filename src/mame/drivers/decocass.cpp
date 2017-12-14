@@ -945,7 +945,7 @@ PALETTE_INIT_MEMBER(decocass_state, decocass)
 	for (i = 0; i < 32; i++)
 	{
 		palette.set_pen_indirect(i, i);
-		palette.set_pen_indirect(32+i, BITSWAP8(i, 7, 6, 5, 4, 3, 1, 2, 0));
+		palette.set_pen_indirect(32+i, bitswap<8>(i, 7, 6, 5, 4, 3, 1, 2, 0));
 	}
 }
 

@@ -123,7 +123,7 @@ WRITE16_MEMBER(eva_state::eva11_write_o)
 READ8_MEMBER(eva_state::eva11_read_k)
 {
 	// K84: TMS5100 CTL81(O30)
-	u8 ctl = BITSWAP8(m_tms5100->ctl_r(space, 0),7,6,5,4,3,0,1,2) & 0xc;
+	u8 ctl = bitswap<8>(m_tms5100->ctl_r(space, 0),7,6,5,4,3,0,1,2) & 0xc;
 
 	// TODO: sensors
 

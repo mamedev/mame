@@ -54,15 +54,15 @@
 /* Trap numbers */
 #define TRAPNO_IO2                  48
 #define TRAPNO_IO1                  49
-#define TRAPNO_INT4             50
-#define TRAPNO_INT3             51
-#define TRAPNO_INT2             52
-#define TRAPNO_INT1             53
+#define TRAPNO_INT4                 50
+#define TRAPNO_INT3                 51
+#define TRAPNO_INT2                 52
+#define TRAPNO_INT1                 53
 #define TRAPNO_IO3                  54
 #define TRAPNO_TIMER                55
 #define TRAPNO_RESERVED1            56
 #define TRAPNO_TRACE_EXCEPTION      57
-#define TRAPNO_PARITY_ERROR     58
+#define TRAPNO_PARITY_ERROR         58
 #define TRAPNO_EXTENDED_OVERFLOW    59
 #define TRAPNO_RANGE_ERROR          60
 #define TRAPNO_PRIVILEGE_ERROR      TRAPNO_RANGE_ERROR
@@ -125,27 +125,6 @@
 
 /* Internal registers */
 
-#define SREG  decode.src_value
-#define SREGF decode.next_src_value
-#define DREG  decode.dst_value
-#define DREGF decode.next_dst_value
-#define EXTRA_U decode.extra.u
-#define EXTRA_S decode.extra.s
-
-#define SET_SREG( _data_ )  (decode.src_is_local ? set_local_register(decode.src, (uint32_t)_data_) : set_global_register(decode.src, (uint32_t)_data_))
-#define SET_SREGF( _data_ ) (decode.src_is_local ? set_local_register(decode.src + 1, (uint32_t)_data_) : set_global_register(decode.src + 1, (uint32_t)_data_))
-#define SET_DREG( _data_ )  (decode.dst_is_local ? set_local_register(decode.dst, (uint32_t)_data_) : set_global_register(decode.dst, (uint32_t)_data_))
-#define SET_DREGF( _data_ ) (decode.dst_is_local ? set_local_register(decode.dst + 1, (uint32_t)_data_) : set_global_register(decode.dst + 1, (uint32_t)_data_))
-
-#define SRC_IS_PC      (!decode.src_is_local && decode.src == PC_REGISTER)
-#define DST_IS_PC      (!decode.dst_is_local && decode.dst == PC_REGISTER)
-#define SRC_IS_SR      (!decode.src_is_local && decode.src == SR_REGISTER)
-#define DST_IS_SR      (!decode.dst_is_local && decode.dst == SR_REGISTER)
-#define SAME_SRC_DST   decode.same_src_dst
-#define SAME_SRC_DSTF  decode.same_src_dstf
-#define SAME_SRCF_DST  decode.same_srcf_dst
-
-
 #define OP              m_op
 #define PC              m_global_regs[0] //Program Counter
 #define SR              m_global_regs[1] //Status Register
@@ -175,6 +154,13 @@
 #define T_MASK                  0x00010000
 #define P_MASK                  0x00020000
 #define S_MASK                  0x00040000
+#define ILC_MASK                0x00180000
+
+#define C_SHIFT                 0
+#define Z_SHIFT                 1
+#define N_SHIFT                 2
+#define V_SHIFT                 3
+#define S_SHIFT                 18
 
 /* SR flags */
 #define GET_C                   ( SR & C_MASK)          // bit 0 //CARRY
@@ -220,17 +206,11 @@
 #define SET_LOW_SR(val)         (SR = (SR & 0xffff0000) | ((val) & 0x0000ffff)) // when SR is addressed, only low 16 bits can be changed
 
 
-#define CHECK_C(x)              (SR = (SR & ~0x00000001) | (uint32_t)((x & 0x100000000L) >> 32))
-#define CHECK_VADD(x,y,z)       (SR = (SR & ~0x00000008) | ((((x) ^ (z)) & ((y) ^ (z)) & 0x80000000) >> 29))
-#define CHECK_VADD3(x,y,w,z)    (SR = (SR & ~0x00000008) | ((((x) ^ (z)) & ((y) ^ (z)) & ((w) ^ (z)) & 0x80000000) >> 29))
-#define CHECK_VSUB(x,y,z)       (SR = (SR & ~0x00000008) | (((z ^ y) & (y ^ x) & 0x80000000) >> 29))
-
-
 /* FER flags */
 #define GET_ACCRUED             (FER & 0x0000001f) //bits  4 - 0 //Floating-Point Accrued Exceptions
 #define GET_ACTUAL              (FER & 0x00001f00) //bits 12 - 8 //Floating-Point Actual  Exceptions
 //other bits are reversed, in particular 7 - 5 for the operating system.
-//the user program can only changes the above 2 flags
+//the user program can only change the above 2 flags
 
 
 #endif // MAME_CPU_E132XS_XS32DEFS_H

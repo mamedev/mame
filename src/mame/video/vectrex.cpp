@@ -91,7 +91,7 @@ WRITE8_MEMBER(vectrex_state::vectrex_via_w)
 	case 9:
 		m_via_timer2 = (m_via_timer2 & 0x00ff) | (data << 8);
 
-		period = (attotime::from_hz(m_maincpu->unscaled_clock()) * m_via_timer2);
+		period = m_maincpu->cycles_to_attotime(m_via_timer2);
 
 		if (m_reset_refresh)
 			m_refresh->adjust(period, 0, period);
@@ -206,7 +206,7 @@ TIMER_CALLBACK_MEMBER(vectrex_state::update_signal)
 
 	if (!m_ramp)
 	{
-		length = m_maincpu->unscaled_clock() * INT_PER_CLOCK
+		length = m_maincpu->clocks_to_cycles(m_maincpu->clock()) * INT_PER_CLOCK
 			* (machine().time() - m_vector_start_time).as_double();
 
 		m_x_int += length * (m_analog[A_X] + m_analog[A_ZR]);
@@ -309,7 +309,7 @@ WRITE8_MEMBER(vectrex_state::v_via_pb_w)
 						+(double)(m_pen_y - m_y_int) * (m_pen_y - m_y_int);
 					d2 = b2 - ab * ab / a2;
 					if (d2 < 2e10 && m_analog[A_Z] * m_blank > 0)
-						m_lp_t->adjust(attotime::from_double(ab / a2 / (m_maincpu->unscaled_clock() * INT_PER_CLOCK)));
+						m_lp_t->adjust(attotime::from_double(ab / a2 / (m_maincpu->clocks_to_cycles(m_maincpu->clock()) * INT_PER_CLOCK)));
 				}
 			}
 		}

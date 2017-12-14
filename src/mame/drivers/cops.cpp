@@ -200,7 +200,7 @@ uint32_t cops_state::screen_update( screen_device &screen, bitmap_ind16 &bitmap,
 WRITE8_MEMBER(cops_state::cdrom_data_w)
 {
 	const char *regs[4] = { "CMD", "PARAM", "WRITE", "CTRL" };
-	m_cdrom_data = BITSWAP8(data,0,1,2,3,4,5,6,7);
+	m_cdrom_data = bitswap<8>(data,0,1,2,3,4,5,6,7);
 	uint8_t reg = ((m_cdrom_ctrl & 4) >> 1) | ((m_cdrom_ctrl & 8) >> 3);
 	if (LOG_CDROM) logerror("%s:cdrom_data_w(reg = %s, data = %02x)\n", machine().describe_context(), regs[reg & 0x03], m_cdrom_data);
 }
@@ -647,7 +647,7 @@ WRITE8_MEMBER(cops_state::io1_w)
 				{
 					sprintf(output_name, "digit%d", i);
 					display_data = m_lcd_data_l | (m_lcd_data_h << 8);
-					display_data = BITSWAP16(display_data, 4, 5, 12, 1, 0, 11, 10, 6, 7, 2, 9, 3, 15, 8, 14, 13);
+					display_data = bitswap<16>(display_data, 4, 5, 12, 1, 0, 11, 10, 6, 7, 2, 9, 3, 15, 8, 14, 13);
 					output().set_value(output_name, display_data);
 				}
 			}
@@ -757,7 +757,7 @@ WRITE_LINE_MEMBER(cops_state::via1_irq)
 
 WRITE8_MEMBER(cops_state::via1_b_w)
 {
-	m_sn_data = BITSWAP8(data,0,1,2,3,4,5,6,7);
+	m_sn_data = bitswap<8>(data,0,1,2,3,4,5,6,7);
 	if (m_sn_cb1)
 	{
 		m_sn->write(space,0,m_sn_data);
@@ -915,7 +915,7 @@ DRIVER_INIT_MEMBER(cops_state,cops)
 static MACHINE_CONFIG_START( cops )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",M6502,MAIN_CLOCK/2)
+	MCFG_CPU_ADD("maincpu", M6502, MAIN_CLOCK/2)
 	MCFG_CPU_PROGRAM_MAP(cops_map)
 
 	/* video hardware */
@@ -923,15 +923,15 @@ static MACHINE_CONFIG_START( cops )
 	MCFG_LASERDISC_SCREEN_ADD_NTSC("screen", "laserdisc")
 
 	/* via */
-	MCFG_DEVICE_ADD("via6522_1", VIA6522, 0)
+	MCFG_DEVICE_ADD("via6522_1", VIA6522, MAIN_CLOCK/2)
 	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(cops_state, via1_irq))
 	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(cops_state, via1_b_w))
 	MCFG_VIA6522_CB1_HANDLER(WRITE8(cops_state, via1_cb1_w))
 
-	MCFG_DEVICE_ADD("via6522_2", VIA6522, 0)
+	MCFG_DEVICE_ADD("via6522_2", VIA6522, MAIN_CLOCK/2)
 	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(cops_state, via2_irq))
 
-	MCFG_DEVICE_ADD("via6522_3", VIA6522, 0)
+	MCFG_DEVICE_ADD("via6522_3", VIA6522, MAIN_CLOCK/2)
 	MCFG_VIA6522_READPA_HANDLER(READ8(cops_state, cdrom_data_r))
 	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(cops_state, cdrom_data_w))
 	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(cops_state, cdrom_ctrl_w))
@@ -951,7 +951,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( revlatns )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",M6502,MAIN_CLOCK/2)
+	MCFG_CPU_ADD("maincpu", M6502, MAIN_CLOCK/2)
 	MCFG_CPU_PROGRAM_MAP(revlatns_map)
 
 	/* video hardware */
@@ -959,7 +959,7 @@ static MACHINE_CONFIG_START( revlatns )
 	MCFG_LASERDISC_SCREEN_ADD_NTSC("screen", "laserdisc")
 
 	/* via */
-	MCFG_DEVICE_ADD("via6522_1", VIA6522, 0)
+	MCFG_DEVICE_ADD("via6522_1", VIA6522, MAIN_CLOCK/2)
 	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(cops_state, via1_irq))
 	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(cops_state, via1_b_w))
 	MCFG_VIA6522_CB1_HANDLER(WRITE8(cops_state, via1_cb1_w))

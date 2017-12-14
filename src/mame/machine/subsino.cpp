@@ -20,50 +20,50 @@ extern const uint8_t victor21_xors[8] = { 0x44, 0xbb, 0x66, 0x44, 0xaa, 0x55, 0x
 
 void crsbingo_bitswaps(uint8_t *decrypt, int i)
 {
-	if ((i&7) == 0) decrypt[i] = BITSWAP8(decrypt[i], 7,2,5,4,3,6,1,0 );
-	if ((i&7) == 1) decrypt[i] = BITSWAP8(decrypt[i], 7,2,1,0,3,6,5,4 );
-	if ((i&7) == 2) decrypt[i] = BITSWAP8(decrypt[i], 3,2,5,0,7,6,1,4 );
-	if ((i&7) == 3) decrypt[i] = BITSWAP8(decrypt[i], 7,2,5,0,3,6,1,4 );
-	if ((i&7) == 4) decrypt[i] = BITSWAP8(decrypt[i], 7,6,5,0,3,2,1,4 );
-	if ((i&7) == 5) decrypt[i] = BITSWAP8(decrypt[i], 7,2,1,4,3,6,5,0 );
-	if ((i&7) == 6) decrypt[i] = BITSWAP8(decrypt[i], 7,2,1,0,3,6,5,4 );
-	if ((i&7) == 7) decrypt[i] = BITSWAP8(decrypt[i], 3,2,1,0,7,6,5,4 );
+	if ((i&7) == 0) decrypt[i] = bitswap<8>(decrypt[i], 7,2,5,4,3,6,1,0 );
+	if ((i&7) == 1) decrypt[i] = bitswap<8>(decrypt[i], 7,2,1,0,3,6,5,4 );
+	if ((i&7) == 2) decrypt[i] = bitswap<8>(decrypt[i], 3,2,5,0,7,6,1,4 );
+	if ((i&7) == 3) decrypt[i] = bitswap<8>(decrypt[i], 7,2,5,0,3,6,1,4 );
+	if ((i&7) == 4) decrypt[i] = bitswap<8>(decrypt[i], 7,6,5,0,3,2,1,4 );
+	if ((i&7) == 5) decrypt[i] = bitswap<8>(decrypt[i], 7,2,1,4,3,6,5,0 );
+	if ((i&7) == 6) decrypt[i] = bitswap<8>(decrypt[i], 7,2,1,0,3,6,5,4 );
+	if ((i&7) == 7) decrypt[i] = bitswap<8>(decrypt[i], 3,2,1,0,7,6,5,4 );
 }
 
 void sharkpy_bitswaps(uint8_t *decrypt, int i)
 {
-	if ((i&7) == 0) decrypt[i] = BITSWAP8(decrypt[i], 3,2,1,0,7,6,5,4 );
-	if ((i&7) == 1) decrypt[i] = BITSWAP8(decrypt[i], 7,2,5,4,3,6,1,0 );
-	if ((i&7) == 2) decrypt[i] = BITSWAP8(decrypt[i], 7,2,1,4,3,6,5,0 );
-	if ((i&7) == 3) decrypt[i] = BITSWAP8(decrypt[i], 3,6,1,0,7,2,5,4 );
-	if ((i&7) == 4) decrypt[i] = BITSWAP8(decrypt[i], 7,2,5,4,3,6,1,0 );
-	if ((i&7) == 5) decrypt[i] = BITSWAP8(decrypt[i], 3,2,5,4,7,6,1,0 );
-	if ((i&7) == 6) decrypt[i] = BITSWAP8(decrypt[i], 7,6,1,4,3,2,5,0 );
-	if ((i&7) == 7) decrypt[i] = BITSWAP8(decrypt[i], 3,6,1,4,7,2,5,0 );
+	if ((i&7) == 0) decrypt[i] = bitswap<8>(decrypt[i], 3,2,1,0,7,6,5,4 );
+	if ((i&7) == 1) decrypt[i] = bitswap<8>(decrypt[i], 7,2,5,4,3,6,1,0 );
+	if ((i&7) == 2) decrypt[i] = bitswap<8>(decrypt[i], 7,2,1,4,3,6,5,0 );
+	if ((i&7) == 3) decrypt[i] = bitswap<8>(decrypt[i], 3,6,1,0,7,2,5,4 );
+	if ((i&7) == 4) decrypt[i] = bitswap<8>(decrypt[i], 7,2,5,4,3,6,1,0 );
+	if ((i&7) == 5) decrypt[i] = bitswap<8>(decrypt[i], 3,2,5,4,7,6,1,0 );
+	if ((i&7) == 6) decrypt[i] = bitswap<8>(decrypt[i], 7,6,1,4,3,2,5,0 );
+	if ((i&7) == 7) decrypt[i] = bitswap<8>(decrypt[i], 3,6,1,4,7,2,5,0 );
 }
 
 void victor5_bitswaps(uint8_t *decrypt, int i)
 {
-	if ((i&7) == 0) decrypt[i] = BITSWAP8(decrypt[i], 7,2,5,4,3,6,1,0 );
-	if ((i&7) == 1) decrypt[i] = BITSWAP8(decrypt[i], 7,6,5,0,3,2,1,4 );
-	if ((i&7) == 2) decrypt[i] = BITSWAP8(decrypt[i], 7,2,1,0,3,6,5,4 );
-	if ((i&7) == 3) decrypt[i] = BITSWAP8(decrypt[i], 7,2,1,0,3,6,5,4 );
-	if ((i&7) == 4) decrypt[i] = BITSWAP8(decrypt[i], 3,2,1,0,7,6,5,4 );
-	if ((i&7) == 5) decrypt[i] = BITSWAP8(decrypt[i], 7,6,5,0,3,2,1,4 );
-	if ((i&7) == 6) decrypt[i] = BITSWAP8(decrypt[i], 3,6,1,0,7,2,5,4 );
-	if ((i&7) == 7) decrypt[i] = BITSWAP8(decrypt[i], 7,2,1,4,3,6,5,0 );
+	if ((i&7) == 0) decrypt[i] = bitswap<8>(decrypt[i], 7,2,5,4,3,6,1,0 );
+	if ((i&7) == 1) decrypt[i] = bitswap<8>(decrypt[i], 7,6,5,0,3,2,1,4 );
+	if ((i&7) == 2) decrypt[i] = bitswap<8>(decrypt[i], 7,2,1,0,3,6,5,4 );
+	if ((i&7) == 3) decrypt[i] = bitswap<8>(decrypt[i], 7,2,1,0,3,6,5,4 );
+	if ((i&7) == 4) decrypt[i] = bitswap<8>(decrypt[i], 3,2,1,0,7,6,5,4 );
+	if ((i&7) == 5) decrypt[i] = bitswap<8>(decrypt[i], 7,6,5,0,3,2,1,4 );
+	if ((i&7) == 6) decrypt[i] = bitswap<8>(decrypt[i], 3,6,1,0,7,2,5,4 );
+	if ((i&7) == 7) decrypt[i] = bitswap<8>(decrypt[i], 7,2,1,4,3,6,5,0 );
 }
 
 void victor21_bitswaps(uint8_t *decrypt, int i)
 {
-	if ((i&7) == 0) decrypt[i] = BITSWAP8(decrypt[i], 7,2,1,0,3,6,5,4 );
-	if ((i&7) == 1) decrypt[i] = BITSWAP8(decrypt[i], 3,6,1,4,7,2,5,0 );
-	if ((i&7) == 2) decrypt[i] = BITSWAP8(decrypt[i], 3,2,1,4,7,6,5,0 );
-	if ((i&7) == 3) decrypt[i] = BITSWAP8(decrypt[i], 7,2,5,4,3,6,1,0 );
-	if ((i&7) == 4) decrypt[i] = BITSWAP8(decrypt[i], 7,2,5,4,3,6,1,0 );
-	if ((i&7) == 5) decrypt[i] = BITSWAP8(decrypt[i], 3,6,5,0,7,2,1,4 );
-	if ((i&7) == 6) decrypt[i] = BITSWAP8(decrypt[i], 7,6,5,4,3,2,1,0 );
-	if ((i&7) == 7) decrypt[i] = BITSWAP8(decrypt[i], 3,2,1,4,7,6,5,0 );
+	if ((i&7) == 0) decrypt[i] = bitswap<8>(decrypt[i], 7,2,1,0,3,6,5,4 );
+	if ((i&7) == 1) decrypt[i] = bitswap<8>(decrypt[i], 3,6,1,4,7,2,5,0 );
+	if ((i&7) == 2) decrypt[i] = bitswap<8>(decrypt[i], 3,2,1,4,7,6,5,0 );
+	if ((i&7) == 3) decrypt[i] = bitswap<8>(decrypt[i], 7,2,5,4,3,6,1,0 );
+	if ((i&7) == 4) decrypt[i] = bitswap<8>(decrypt[i], 7,2,5,4,3,6,1,0 );
+	if ((i&7) == 5) decrypt[i] = bitswap<8>(decrypt[i], 3,6,5,0,7,2,1,4 );
+	if ((i&7) == 6) decrypt[i] = bitswap<8>(decrypt[i], 7,6,5,4,3,2,1,0 );
+	if ((i&7) == 7) decrypt[i] = bitswap<8>(decrypt[i], 3,2,1,4,7,6,5,0 );
 }
 
 // Decrypt:

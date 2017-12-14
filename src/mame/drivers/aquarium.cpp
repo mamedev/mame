@@ -68,7 +68,7 @@ WRITE8_MEMBER(aquarium_state::aquarium_watchdog_w)
 WRITE8_MEMBER(aquarium_state::aquarium_z80_bank_w)
 {
 	// uses bits ---x --xx
-	data = BITSWAP8(data, 7, 6, 5, 2, 3,      1, 4, 0);
+	data = bitswap<8>(data, 7, 6, 5, 2, 3,      1, 4, 0);
 
 	//printf("aquarium bank %04x %04x\n", data, mem_mask);
 	// aquarium bank 0003 00ff - correct (title)   011
@@ -82,7 +82,7 @@ WRITE8_MEMBER(aquarium_state::aquarium_z80_bank_w)
 
 uint8_t aquarium_state::aquarium_snd_bitswap( uint8_t scrambled_data )
 {
-	return BITSWAP8(scrambled_data, 0, 1, 2, 3, 4, 5, 6, 7);
+	return bitswap<8>(scrambled_data, 0, 1, 2, 3, 4, 5, 6, 7);
 }
 
 READ8_MEMBER(aquarium_state::aquarium_oki_r)

@@ -846,6 +846,35 @@ ROM_START( trvhanga )
 	ROM_LOAD( "dmpal14h4nc.145.bin", 0x000000, 0x00003c, CRC(ab2af8de) SHA1(775495d47435c23eecf3defba15f5ca890836354) )
 ROM_END
 
+
+ROM_START( sms4in1 )
+    ROM_REGION( 0x100000, "maincpu", 0 )
+    ROM_LOAD( "set4_u19_2764.bin", 0xf8000, 0x02000, CRC(6f6116b9) SHA1(f91412ca9b911e2a822dab91c96e5f655e7ebb1b) )
+    ROM_LOAD( "set4_u18_2764.bin", 0xfa000, 0x02000, CRC(cc13a404) SHA1(1c00d173706c5e88cee69f9c52efa64dbdf4c15b) )
+    ROM_LOAD( "set4_u17_2764.bin", 0xfc000, 0x02000, CRC(fee0f422) SHA1(56ffafce78cf96c0b91b44a8408909b06499c960) )
+    ROM_LOAD( "set4_u16_2764.bin", 0xfe000, 0x02000, CRC(87ed2873) SHA1(daa13f20cac4a41335d972be6772dff5d7555c10) )
+    ROM_COPY( "maincpu",  0xf8000, 0x08000, 0x8000 )
+
+    ROM_REGION( 0x10000, "soundcpu", 0 )
+    ROM_LOAD( "set4_u26_73184_2732.bin", 0x0000, 0x1000, CRC(e04bb922) SHA1(1df90720f11a5b736273f43272d7727b3020f848) )
+    ROM_RELOAD(           0x1000, 0x1000 )
+ROM_END
+
+
+ROM_START( smsjoker )
+    ROM_REGION( 0x100000, "maincpu", 0 )
+    // U19 was not populated
+    ROM_LOAD( "set3_u18_hl_dlxe_080585.bin", 0xfa000, 0x02000, CRC(70614c00) SHA1(90c53e892ece4ceca0476be3653f160a49fd4bc9) )
+    ROM_LOAD( "set3_u17_hl_dlxe_080585.bin", 0xfc000, 0x02000, CRC(872fb1c4) SHA1(a23d093b26c42aa66279d6dfa6d59789f5862d96) )
+    ROM_LOAD( "set3_u16_hl_dlxe_080585.bin", 0xfe000, 0x02000, CRC(786c0792) SHA1(a7eea01c79b0d8baecdbda06ddbca40b39d8513a) )
+    ROM_COPY( "maincpu",  0xf8000, 0x08000, 0x8000 )
+
+    ROM_REGION( 0x10000, "soundcpu", 0 )
+    ROM_LOAD( "set3_u26_26_73184_2732.bin", 0x0000, 0x1000, CRC(e04bb922) SHA1(1df90720f11a5b736273f43272d7727b3020f848) )
+    ROM_RELOAD(           0x1000, 0x1000 )
+ROM_END
+
+
 ROM_START( sureshot )
 	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD( "u-19 hldly s.shot 020687.u19.a12.bin", 0xf8000, 0x02000, CRC(028bdb61) SHA1(e39c27cc6dec12de5a5e60d544f35448e49baee1) )
@@ -909,7 +938,9 @@ ROM_START( secondch )
 	ROM_RELOAD(           0x1000, 0x1000 )
 ROM_END
 
-GAME( 1984, trvhang,  0, sms,      sms, smsmfg_state, 0, ROT0, "SMS Manufacturing Corp.", "Trivia Hangup (question set 1)", MACHINE_SUPPORTS_SAVE ) /* Version Trivia-1-050185 */
-GAME( 1984, trvhanga, 0, sms,      sms, smsmfg_state, 0, ROT0, "SMS Manufacturing Corp.", "Trivia Hangup (question set 2)", MACHINE_NOT_WORKING ) /* Version Trivia-2-011586 */
-GAME( 1985, sureshot, 0, sureshot, sms, smsmfg_state, 0, ROT0, "SMS Manufacturing Corp.", "Sure Shot",                      MACHINE_SUPPORTS_SAVE )
-GAME( 1985, secondch, 0, sureshot, sms, smsmfg_state, 0, ROT0, "SMS Manufacturing Corp.", "Second Chance",                  MACHINE_SUPPORTS_SAVE )
+GAME( 1984, trvhang,  0, sms,      sms, smsmfg_state, 0, ROT0, "SMS Manufacturing Corp.", "Trivia Hangup (question set 1)",   MACHINE_SUPPORTS_SAVE ) /* Version Trivia-1-050185 */
+GAME( 1984, trvhanga, 0, sms,      sms, smsmfg_state, 0, ROT0, "SMS Manufacturing Corp.", "Trivia Hangup (question set 2)",   MACHINE_NOT_WORKING ) /* Version Trivia-2-011586 */
+GAME( 1984, sms4in1,  0, sureshot, sms, smsmfg_state, 0, ROT0, "SMS Manufacturing Corp.", "4-in-1",                           MACHINE_SUPPORTS_SAVE )
+GAME( 1985, smsjoker, 0, sureshot, sms, smsmfg_state, 0, ROT0, "SMS Manufacturing Corp.", "Joker Poker With Hi-Lo Double-Up", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, sureshot, 0, sureshot, sms, smsmfg_state, 0, ROT0, "SMS Manufacturing Corp.", "Sure Shot",                        MACHINE_SUPPORTS_SAVE )
+GAME( 1985, secondch, 0, sureshot, sms, smsmfg_state, 0, ROT0, "SMS Manufacturing Corp.", "Second Chance",                    MACHINE_SUPPORTS_SAVE )

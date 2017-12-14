@@ -85,7 +85,7 @@
     On MAME they will show with full brightness, see eg. building explosions.
     Currently there's a workaround in place.
   - bzaxxon 3D effect is difficult to simulate
-  - improve SVGs of bzaxxon, bpengo, bbtime
+  - improve/redo SVGs of: bzaxxon, bpengo, bbtime
 
 ***************************************************************************/
 
@@ -370,12 +370,12 @@ public:
 
 WRITE8_MEMBER(bambball_state::plate_w)
 {
-	// R1x-R3x(,D0-D3): vfd matrix plate
+	// R1x-R3x(,D0-D3): vfd plate
 	int shift = (offset - hmcs40_cpu_device::PORT_R1X) * 4;
 	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
 
 	// update display
-	u16 plate = BITSWAP16(m_plate,13,8,4,12,9,10,14,1,7,0,15,11,6,3,5,2);
+	u16 plate = bitswap<16>(m_plate,13,8,4,12,9,10,14,1,7,0,15,11,6,3,5,2);
 	display_matrix(16, 9, plate, m_grid);
 }
 
@@ -387,7 +387,7 @@ WRITE16_MEMBER(bambball_state::grid_w)
 	// D7-D10: input mux
 	m_inp_mux = data >> 7 & 0xf;
 
-	// D7-D15: vfd matrix grid
+	// D7-D15: vfd grid
 	m_grid = data >> 7 & 0x1ff;
 
 	// D0-D3: more plates (update display there)
@@ -484,14 +484,14 @@ public:
 
 void bmboxing_state::prepare_display()
 {
-	u16 grid = BITSWAP16(m_grid,15,14,13,12,11,10,9,0,1,2,3,4,5,6,7,8);
-	u32 plate = BITSWAP16(m_plate,15,14,13,12,1,2,0,3,11,4,10,7,5,6,9,8);
+	u16 grid = bitswap<16>(m_grid,15,14,13,12,11,10,9,0,1,2,3,4,5,6,7,8);
+	u32 plate = bitswap<16>(m_plate,15,14,13,12,1,2,0,3,11,4,10,7,5,6,9,8);
 	display_matrix(12, 9, plate, grid);
 }
 
 WRITE8_MEMBER(bmboxing_state::plate_w)
 {
-	// R1x-R3x: vfd matrix plate
+	// R1x-R3x: vfd plate
 	int shift = (offset - hmcs40_cpu_device::PORT_R1X) * 4;
 	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
 	prepare_display();
@@ -505,7 +505,7 @@ WRITE16_MEMBER(bmboxing_state::grid_w)
 	// D9-D12: input mux
 	m_inp_mux = data >> 9 & 0xf;
 
-	// D4-D12: vfd matrix grid
+	// D4-D12: vfd grid
 	m_grid = data >> 4 & 0x1ff;
 	prepare_display();
 }
@@ -623,14 +623,14 @@ public:
 
 void bfriskyt_state::prepare_display()
 {
-	u16 grid = BITSWAP16(m_grid,15,14,13,12,11,10,9,8,0,1,2,3,4,5,6,7);
-	u32 plate = BITSWAP24(m_plate,23,22,0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21);
+	u16 grid = bitswap<16>(m_grid,15,14,13,12,11,10,9,8,0,1,2,3,4,5,6,7);
+	u32 plate = bitswap<24>(m_plate,23,22,0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21);
 	display_matrix(22, 8, plate, grid);
 }
 
 WRITE8_MEMBER(bfriskyt_state::plate_w)
 {
-	// R0x-R3x: vfd matrix plate
+	// R0x-R3x: vfd plate
 	int shift = offset * 4;
 	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
 	prepare_display();
@@ -649,7 +649,7 @@ WRITE16_MEMBER(bfriskyt_state::grid_w)
 		update_int1();
 	}
 
-	// D8-D15: vfd matrix grid
+	// D8-D15: vfd grid
 	m_grid = data >> 8 & 0xff;
 
 	// D0-D5: more plates
@@ -750,13 +750,13 @@ public:
 
 WRITE8_MEMBER(packmon_state::plate_w)
 {
-	// R0x-R3x(,D0-D3): vfd matrix plate
+	// R0x-R3x(,D0-D3): vfd plate
 	int shift = offset * 4;
 	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
 
 	// update display
-	u16 grid = BITSWAP16(m_grid,15,14,13,12,11,10,0,1,2,3,4,5,6,7,8,9);
-	u32 plate = BITSWAP24(m_plate,23,22,21,20,0,1,2,3,4,5,6,19,18,17,16,15,14,13,12,11,10,9,8,7);
+	u16 grid = bitswap<16>(m_grid,15,14,13,12,11,10,0,1,2,3,4,5,6,7,8,9);
+	u32 plate = bitswap<24>(m_plate,23,22,21,20,0,1,2,3,4,5,6,19,18,17,16,15,14,13,12,11,10,9,8,7);
 	display_matrix(20, 10, plate, grid);
 }
 
@@ -768,7 +768,7 @@ WRITE16_MEMBER(packmon_state::grid_w)
 	// D11-D15: input mux
 	m_inp_mux = data >> 11 & 0x1f;
 
-	// D6-D15: vfd matrix grid
+	// D6-D15: vfd grid
 	m_grid = data >> 6 & 0x3ff;
 
 	// D0-D3: plate 9-12 (update display there)
@@ -865,14 +865,14 @@ public:
 
 void msthawk_state::prepare_display()
 {
-	u16 grid = BITSWAP16(m_grid,15,14,13,12,11,10,0,1,2,3,4,5,6,7,8,9);
-	u32 plate = BITSWAP24(m_plate,23,22,21,19,20,18,17,16,15,14,13,12,11,10,9,8,7,6,5,4,3,2,1,0);
+	u16 grid = bitswap<16>(m_grid,15,14,13,12,11,10,0,1,2,3,4,5,6,7,8,9);
+	u32 plate = bitswap<24>(m_plate,23,22,21,19,20,18,17,16,15,14,13,12,11,10,9,8,7,6,5,4,3,2,1,0);
 	display_matrix(21, 10, plate, grid);
 }
 
 WRITE8_MEMBER(msthawk_state::plate_w)
 {
-	// R0x-R3x: vfd matrix plate
+	// R0x-R3x: vfd plate
 	int shift = offset * 4;
 	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
 	prepare_display();
@@ -891,7 +891,7 @@ WRITE16_MEMBER(msthawk_state::grid_w)
 		update_int0();
 	}
 
-	// D6-D15: vfd matrix grid
+	// D6-D15: vfd grid
 	m_grid = data >> 6 & 0x3ff;
 
 	// D0-D4: more plates
@@ -992,13 +992,13 @@ public:
 
 WRITE8_MEMBER(bzaxxon_state::plate_w)
 {
-	// R0x-R3x(,D0-D2): vfd matrix plate
+	// R0x-R3x(,D0-D2): vfd plate
 	int shift = offset * 4;
 	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
 
 	// update display
-	u16 grid = BITSWAP16(m_grid,15,14,13,12,11,6,7,8,9,10,5,4,3,2,1,0);
-	u32 plate = BITSWAP24(m_plate,23,22,21,20,5,7,0,1,2,3,4,6,19,16,17,18,15,14,13,12,10,8,9,11) | 0x800;
+	u16 grid = bitswap<16>(m_grid,15,14,13,12,11,6,7,8,9,10,5,4,3,2,1,0);
+	u32 plate = bitswap<24>(m_plate,23,22,21,20,5,7,0,1,2,3,4,6,19,16,17,18,15,14,13,12,10,8,9,11) | 0x800;
 	display_matrix(20, 11, plate, grid);
 }
 
@@ -1015,7 +1015,7 @@ WRITE16_MEMBER(bzaxxon_state::grid_w)
 		update_int1();
 	}
 
-	// D5-D15: vfd matrix grid
+	// D5-D15: vfd grid
 	m_grid = data >> 5 & 0x7ff;
 
 	// D0-D2: plate 7-9 (update display there)
@@ -1112,13 +1112,13 @@ public:
 
 WRITE8_MEMBER(zackman_state::plate_w)
 {
-	// R0x-R6x(,D0,D1): vfd matrix plate
+	// R0x-R6x(,D0,D1): vfd plate
 	int shift = offset * 4;
 	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
 
 	// update display
-	u8 grid = BITSWAP8(m_grid,0,1,2,3,4,5,6,7);
-	u32 plate = BITSWAP32(m_plate,31,30,27,0,1,2,3,4,5,6,7,8,9,10,11,24,25,26,29,28,23,22,21,20,19,18,17,16,15,14,13,12);
+	u8 grid = bitswap<8>(m_grid,0,1,2,3,4,5,6,7);
+	u32 plate = bitswap<32>(m_plate,31,30,27,0,1,2,3,4,5,6,7,8,9,10,11,24,25,26,29,28,23,22,21,20,19,18,17,16,15,14,13,12);
 	display_matrix(29, 8, plate, grid);
 }
 
@@ -1135,7 +1135,7 @@ WRITE16_MEMBER(zackman_state::grid_w)
 		update_int0();
 	}
 
-	// D8-D15: vfd matrix grid
+	// D8-D15: vfd grid
 	m_grid = data >> 8 & 0xff;
 
 	// D0,D1: plate 12,13 (update display there)
@@ -1232,14 +1232,14 @@ public:
 
 void bpengo_state::prepare_display()
 {
-	u8 grid = BITSWAP8(m_grid,0,1,2,3,4,5,6,7);
-	u32 plate = BITSWAP32(m_plate,31,30,29,28,23,22,21,16,17,18,19,20,27,26,25,24,15,14,13,12,11,10,9,8,7,6,5,4,3,2,1,0);
+	u8 grid = bitswap<8>(m_grid,0,1,2,3,4,5,6,7);
+	u32 plate = bitswap<32>(m_plate,31,30,29,28,23,22,21,16,17,18,19,20,27,26,25,24,15,14,13,12,11,10,9,8,7,6,5,4,3,2,1,0);
 	display_matrix(25, 8, plate, grid);
 }
 
 WRITE8_MEMBER(bpengo_state::plate_w)
 {
-	// R0x-R6x: vfd matrix plate
+	// R0x-R6x: vfd plate
 	int shift = offset * 4;
 	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
 	prepare_display();
@@ -1258,7 +1258,7 @@ WRITE16_MEMBER(bpengo_state::grid_w)
 		update_int0();
 	}
 
-	// D0-D7: vfd matrix grid
+	// D0-D7: vfd grid
 	m_grid = data & 0xff;
 	prepare_display();
 }
@@ -1360,14 +1360,14 @@ public:
 
 void bbtime_state::prepare_display()
 {
-	u8 grid = BITSWAP8(m_grid,7,6,0,1,2,3,4,5);
-	u32 plate = BITSWAP32(m_plate,31,30,29,28,25,24,26,27,22,23,15,14,12,11,10,8,7,6,4,1,5,9,13,3,2,16,17,18,19,20,0,21) | 0x1;
+	u8 grid = bitswap<8>(m_grid,7,6,0,1,2,3,4,5);
+	u32 plate = bitswap<32>(m_plate,31,30,29,28,25,24,26,27,22,23,15,14,12,11,10,8,7,6,4,1,5,9,13,3,2,16,17,18,19,20,0,21) | 0x1;
 	display_matrix(28, 6, plate, grid);
 }
 
 WRITE8_MEMBER(bbtime_state::plate_w)
 {
-	// R0x-R6x: vfd matrix plate
+	// R0x-R6x: vfd plate
 	int shift = offset * 4;
 	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
 	prepare_display();
@@ -1386,7 +1386,7 @@ WRITE16_MEMBER(bbtime_state::grid_w)
 		update_int0();
 	}
 
-	// D4-D9: vfd matrix grid
+	// D4-D9: vfd grid
 	m_grid = data >> 4 & 0x3f;
 	prepare_display();
 }
@@ -1480,13 +1480,13 @@ public:
 
 WRITE8_MEMBER(bdoramon_state::plate_w)
 {
-	// R0x-R3x(,D0-D3): vfd matrix plate
+	// R0x-R3x(,D0-D3): vfd plate
 	int shift = offset * 4;
 	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
 
 	// update display
-	u8 grid = BITSWAP8(m_grid,0,1,2,3,4,5,7,6);
-	u32 plate = BITSWAP24(m_plate,23,22,21,20,11,19,18,17,16,15,14,13,12,10,9,8,7,6,5,4,3,2,1,0);
+	u8 grid = bitswap<8>(m_grid,0,1,2,3,4,5,7,6);
+	u32 plate = bitswap<24>(m_plate,23,22,21,20,11,19,18,17,16,15,14,13,12,10,9,8,7,6,5,4,3,2,1,0);
 	display_matrix(19, 8, plate, grid);
 }
 
@@ -1495,7 +1495,7 @@ WRITE16_MEMBER(bdoramon_state::grid_w)
 	// D7: speaker out
 	m_speaker->level_w(data >> 7 & 1);
 
-	// D8-D15: vfd matrix grid
+	// D8-D15: vfd grid
 	m_grid = data >> 8 & 0xff;
 
 	// D0-D3: plate 15-18 (update display there)
@@ -1579,13 +1579,13 @@ public:
 
 WRITE8_MEMBER(bultrman_state::plate_w)
 {
-	// R0x-R3x(,D0-D2): vfd matrix plate
+	// R0x-R3x(,D0-D2): vfd plate
 	int shift = offset * 4;
 	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
 
 	// update display
-	u8 grid = BITSWAP8(m_grid,0,1,2,3,4,5,6,7);
-	u32 plate = BITSWAP24(m_plate,23,22,21,20,19,0,18,17,16,15,14,13,12,3,11,10,9,8,7,6,5,4,1,2);
+	u8 grid = bitswap<8>(m_grid,0,1,2,3,4,5,6,7);
+	u32 plate = bitswap<24>(m_plate,23,22,21,20,19,0,18,17,16,15,14,13,12,3,11,10,9,8,7,6,5,4,1,2);
 	display_matrix(18, 8, plate, grid);
 }
 
@@ -1594,7 +1594,7 @@ WRITE16_MEMBER(bultrman_state::grid_w)
 	// D7: speaker out
 	m_speaker->level_w(data >> 7 & 1);
 
-	// D8-D15: vfd matrix grid
+	// D8-D15: vfd grid
 	m_grid = data >> 8 & 0xff;
 
 	// D0-D2: plate 15-17 (update display there)
@@ -1672,13 +1672,13 @@ public:
 
 void machiman_state::prepare_display()
 {
-	u32 plate = BITSWAP24(m_plate,23,22,21,20,19,0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18);
+	u32 plate = bitswap<24>(m_plate,23,22,21,20,19,0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18);
 	display_matrix(19, 5, plate, m_grid);
 }
 
 WRITE8_MEMBER(machiman_state::plate_w)
 {
-	// R0x-R3x,R6012: vfd matrix plate
+	// R0x-R3x,R6012: vfd plate
 	int shift = (offset == hmcs40_cpu_device::PORT_R6X) ? 16 : offset * 4;
 	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
 	prepare_display();
@@ -1689,7 +1689,7 @@ WRITE16_MEMBER(machiman_state::grid_w)
 	// D13: speaker out
 	m_speaker->level_w(data >> 13 & 1);
 
-	// D0-D4: vfd matrix grid
+	// D0-D4: vfd grid
 	m_grid = data & 0x1f;
 	prepare_display();
 }
@@ -1771,7 +1771,7 @@ public:
 
 WRITE8_MEMBER(pairmtch_state::plate_w)
 {
-	// R2x,R3x,R6x: vfd matrix plate
+	// R2x,R3x,R6x: vfd plate
 	int shift = (offset == hmcs40_cpu_device::PORT_R6X) ? 8 : (offset-2) * 4;
 	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
 	display_matrix(12, 6, m_plate, m_grid);
@@ -1788,7 +1788,7 @@ WRITE16_MEMBER(pairmtch_state::grid_w)
 	// D10,D15: input mux
 	m_inp_mux = (data >> 10 & 1) | (data >> 14 & 2);
 
-	// D0-D5: vfd matrix grid
+	// D0-D5: vfd grid
 	m_grid = data & 0x3f;
 	display_matrix(12, 6, m_plate, m_grid);
 }
@@ -1802,7 +1802,7 @@ READ8_MEMBER(pairmtch_state::input_r)
 WRITE8_MEMBER(pairmtch_state::sound_w)
 {
 	// R5x: soundlatch (to audiocpu R2x)
-	m_soundlatch->write(space, 0, BITSWAP8(data,7,6,5,4,0,1,2,3));
+	m_soundlatch->write(space, 0, bitswap<8>(data,7,6,5,4,0,1,2,3));
 }
 
 
@@ -1811,7 +1811,7 @@ WRITE8_MEMBER(pairmtch_state::sound_w)
 WRITE8_MEMBER(pairmtch_state::sound2_w)
 {
 	// R2x: soundlatch (to maincpu R5x)
-	m_soundlatch2->write(space, 0, BITSWAP8(data,7,6,5,4,0,1,2,3));
+	m_soundlatch2->write(space, 0, bitswap<8>(data,7,6,5,4,0,1,2,3));
 }
 
 WRITE16_MEMBER(pairmtch_state::speaker_w)
@@ -1919,12 +1919,12 @@ public:
 
 WRITE8_MEMBER(alnattck_state::plate_w)
 {
-	// R0x-R3x(,D0-D3): vfd matrix plate
+	// R0x-R3x(,D0-D3): vfd plate
 	int shift = offset * 4;
 	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
 
 	// update display
-	u32 plate = BITSWAP24(m_plate,23,22,21,20,19,18,17,16,11,9,8,10,7,2,0,1,3,4,5,6,12,13,14,15);
+	u32 plate = bitswap<24>(m_plate,23,22,21,20,19,18,17,16,11,9,8,10,7,2,0,1,3,4,5,6,12,13,14,15);
 	display_matrix(20, 10, plate, m_grid);
 }
 
@@ -1936,7 +1936,7 @@ WRITE16_MEMBER(alnattck_state::grid_w)
 	// D7-D13: input mux
 	m_inp_mux = data >> 7 & 0x7f;
 
-	// D6-D15: vfd matrix grid
+	// D6-D15: vfd grid
 	m_grid = data >> 6 & 0x3ff;
 
 	// D0-D3: plate 16-19 (update display there)
@@ -2054,7 +2054,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(cdkong_state::speaker_decay_sim)
 
 void cdkong_state::prepare_display()
 {
-	u32 plate = BITSWAP32(m_plate,31,30,29,24,0,16,8,1,23,17,9,2,18,10,25,27,26,3,15,27,11,11,14,22,6,13,21,5,19,12,20,4) | 0x800800;
+	u32 plate = bitswap<32>(m_plate,31,30,29,24,0,16,8,1,23,17,9,2,18,10,25,27,26,3,15,27,11,11,14,22,6,13,21,5,19,12,20,4) | 0x800800;
 	display_matrix(29, 11, plate, m_grid);
 }
 
@@ -2064,7 +2064,7 @@ WRITE8_MEMBER(cdkong_state::plate_w)
 	m_r[offset] = data;
 	speaker_decay_reset();
 
-	// R0x-R6x: vfd matrix plate
+	// R0x-R6x: vfd plate
 	int shift = offset * 4;
 	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
 	prepare_display();
@@ -2075,7 +2075,7 @@ WRITE16_MEMBER(cdkong_state::grid_w)
 	// D3: speaker out
 	m_speaker->level_w(data >> 3 & 1);
 
-	// D4-D14: vfd matrix grid
+	// D4-D14: vfd grid
 	m_grid = data >> 4 & 0x7ff;
 	prepare_display();
 }
@@ -2172,8 +2172,8 @@ public:
 
 void cgalaxn_state::prepare_display()
 {
-	u16 grid = BITSWAP16(m_grid,15,14,13,12,1,2,0,11,10,9,8,7,6,5,4,3);
-	u16 plate = BITSWAP16(m_plate,15,14,6,5,4,3,2,1,7,8,9,10,11,0,12,13);
+	u16 grid = bitswap<16>(m_grid,15,14,13,12,1,2,0,11,10,9,8,7,6,5,4,3);
+	u16 plate = bitswap<16>(m_plate,15,14,6,5,4,3,2,1,7,8,9,10,11,0,12,13);
 	display_matrix(15, 12, plate, grid);
 }
 
@@ -2183,7 +2183,7 @@ WRITE8_MEMBER(cgalaxn_state::grid_w)
 	if (offset == hmcs40_cpu_device::PORT_R1X)
 		m_inp_mux = data & 3;
 
-	// R1x-R3x: vfd matrix grid
+	// R1x-R3x: vfd grid
 	int shift = (offset - hmcs40_cpu_device::PORT_R1X) * 4;
 	m_grid = (m_grid & ~(0xf << shift)) | (data << shift);
 	prepare_display();
@@ -2196,7 +2196,7 @@ WRITE16_MEMBER(cgalaxn_state::plate_w)
 
 	// D1: start alien attack whine sound effect (edge triggered)
 
-	// D2-D15: vfd matrix plate
+	// D2-D15: vfd plate
 	m_plate = (m_plate & 0x4000) | (data >> 2 & 0x3fff);
 	prepare_display();
 }
@@ -2302,13 +2302,13 @@ public:
 
 WRITE8_MEMBER(cpacman_state::plate_w)
 {
-	// R1x-R6x(,D1,D2): vfd matrix plate
+	// R1x-R6x(,D1,D2): vfd plate
 	int shift = (offset - hmcs40_cpu_device::PORT_R1X) * 4;
 	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
 
 	// update display
-	u16 grid = BITSWAP16(m_grid,15,14,13,12,11,0,1,2,3,4,5,6,7,8,9,10);
-	u32 plate = BITSWAP32(m_plate,31,30,29,28,27,0,1,2,3,8,9,10,11,16,17,18,19,25,26,23,22,21,20,24,15,14,13,12,4,5,6,7);
+	u16 grid = bitswap<16>(m_grid,15,14,13,12,11,0,1,2,3,4,5,6,7,8,9,10);
+	u32 plate = bitswap<32>(m_plate,31,30,29,28,27,0,1,2,3,8,9,10,11,16,17,18,19,25,26,23,22,21,20,24,15,14,13,12,4,5,6,7);
 	display_matrix(27, 11, plate, grid);
 }
 
@@ -2320,7 +2320,7 @@ WRITE16_MEMBER(cpacman_state::grid_w)
 	// D13-D15: input mux
 	m_inp_mux = data >> 13 & 7;
 
-	// D5-D15: vfd matrix grid
+	// D5-D15: vfd grid
 	m_grid = data >> 5 & 0x7ff;
 
 	// D1,D2: plate 8,14 (update display there)
@@ -2419,13 +2419,13 @@ public:
 
 WRITE8_MEMBER(cmspacmn_state::plate_w)
 {
-	// R1x-R6x(,D0,D1): vfd matrix plate
+	// R1x-R6x(,D0,D1): vfd plate
 	int shift = (offset - hmcs40_cpu_device::PORT_R1X) * 4;
 	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
 
 	// update display
-	u16 grid = BITSWAP16(m_grid,15,14,13,11,10,9,8,7,6,5,4,3,2,1,0,1);
-	u64 plate = BIT(m_plate,15)<<32 | BITSWAP32(m_plate,14,13,12,4,5,6,7,24,23,25,22,21,20,13,24,3,19,14,12,11,24,2,10,8,7,25,0,9,1,18,17,16) | 0x1004080;
+	u16 grid = bitswap<16>(m_grid,15,14,13,11,10,9,8,7,6,5,4,3,2,1,0,1);
+	u64 plate = BIT(m_plate,15)<<32 | bitswap<32>(m_plate,14,13,12,4,5,6,7,24,23,25,22,21,20,13,24,3,19,14,12,11,24,2,10,8,7,25,0,9,1,18,17,16) | 0x1004080;
 	display_matrix(33, 12, plate, grid);
 }
 
@@ -2437,7 +2437,7 @@ WRITE16_MEMBER(cmspacmn_state::grid_w)
 	// D13-D15: input mux
 	m_inp_mux = data >> 13 & 7;
 
-	// D5-D15: vfd matrix grid
+	// D5-D15: vfd grid
 	m_grid = data >> 5 & 0x7ff;
 
 	// D0,D1: more plates (update display there)
@@ -2540,7 +2540,7 @@ void sag_state::prepare_display()
 
 	// grid 8-11 are 7segs
 	set_display_segmask(0xf00, 0x7f);
-	u8 seg = BITSWAP8(m_plate,3,4,5,6,7,8,9,10);
+	u8 seg = bitswap<8>(m_plate,3,4,5,6,7,8,9,10);
 	for (int y = 8; y < 12; y++)
 		m_display_state[y] = (m_grid >> y & 1) ? seg : 0;
 
@@ -2550,7 +2550,7 @@ void sag_state::prepare_display()
 
 WRITE8_MEMBER(sag_state::plate_w)
 {
-	// R0x-R3x: vfd matrix plate
+	// R0x-R3x: vfd plate
 	int shift = offset * 4;
 	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
 	prepare_display();
@@ -2564,7 +2564,7 @@ WRITE16_MEMBER(sag_state::grid_w)
 	// D2-D7: input mux
 	m_inp_mux = data >> 2 & 0x3f;
 
-	// D1-D12: vfd matrix grid
+	// D1-D12: vfd grid
 	m_grid = data >> 1 & 0xfff;
 	prepare_display();
 }
@@ -2670,8 +2670,8 @@ public:
 
 void egalaxn2_state::prepare_display()
 {
-	u16 grid = BITSWAP16(m_grid,15,0,1,2,3,4,5,6,7,8,9,10,11,12,13,14);
-	u32 plate = BITSWAP24(m_plate,23,22,21,20,15,14,13,12,7,6,5,4,3,2,1,0,19,18,17,16,11,10,9,8);
+	u16 grid = bitswap<16>(m_grid,15,0,1,2,3,4,5,6,7,8,9,10,11,12,13,14);
+	u32 plate = bitswap<24>(m_plate,23,22,21,20,15,14,13,12,7,6,5,4,3,2,1,0,19,18,17,16,11,10,9,8);
 	display_matrix(24, 15, plate, grid);
 }
 
@@ -2683,14 +2683,14 @@ WRITE16_MEMBER(egalaxn2_state::grid_w)
 	// D1-D4: input mux
 	m_inp_mux = data >> 1 & 0xf;
 
-	// D1-D15: vfd matrix grid
+	// D1-D15: vfd grid
 	m_grid = data >> 1 & 0x7fff;
 	prepare_display();
 }
 
 WRITE8_MEMBER(egalaxn2_state::plate_w)
 {
-	// R1x-R6x: vfd matrix plate
+	// R1x-R6x: vfd plate
 	int shift = (offset - hmcs40_cpu_device::PORT_R1X) * 4;
 	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
 	prepare_display();
@@ -2870,8 +2870,8 @@ protected:
 
 void eturtles_state::prepare_display()
 {
-	u16 grid = BITSWAP16(m_grid,15,1,14,13,12,11,10,9,8,7,6,5,4,3,2,0);
-	u32 plate = BITSWAP32(m_plate,31,30,11,12,18,19,16,17,22,15,20,21,27,26,23,25,24,2,3,1,0,6,4,5,10,9,2,8,7,14,1,13);
+	u16 grid = bitswap<16>(m_grid,15,1,14,13,12,11,10,9,8,7,6,5,4,3,2,0);
+	u32 plate = bitswap<32>(m_plate,31,30,11,12,18,19,16,17,22,15,20,21,27,26,23,25,24,2,3,1,0,6,4,5,10,9,2,8,7,14,1,13);
 	display_matrix(30, 15, plate | (grid >> 5 & 8), grid); // grid 8 also forces plate 3 high
 }
 
@@ -2879,7 +2879,7 @@ WRITE8_MEMBER(eturtles_state::plate_w)
 {
 	m_r[offset] = data;
 
-	// R0x-R6x: vfd matrix plate
+	// R0x-R6x: vfd plate
 	int shift = offset * 4;
 	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
 	prepare_display();
@@ -2897,7 +2897,7 @@ WRITE16_MEMBER(eturtles_state::grid_w)
 		update_int();
 	}
 
-	// D1-D15: vfd matrix grid
+	// D1-D15: vfd grid
 	m_grid = data >> 1 & 0x7fff;
 	prepare_display();
 }
@@ -3049,8 +3049,8 @@ public:
 
 void estargte_state::prepare_display()
 {
-	u16 grid = BITSWAP16(m_grid,15,0,14,13,12,11,10,9,8,7,6,5,4,3,2,1);
-	u32 plate = BITSWAP32(m_plate,31,30,29,15,17,19,21,23,25,27,26,24,3,22,20,18,16,14,12,10,8,6,4,2,0,1,3,5,7,9,11,13);
+	u16 grid = bitswap<16>(m_grid,15,0,14,13,12,11,10,9,8,7,6,5,4,3,2,1);
+	u32 plate = bitswap<32>(m_plate,31,30,29,15,17,19,21,23,25,27,26,24,3,22,20,18,16,14,12,10,8,6,4,2,0,1,3,5,7,9,11,13);
 	display_matrix(29, 14, plate, grid);
 }
 
@@ -3161,13 +3161,13 @@ public:
 
 WRITE8_MEMBER(ghalien_state::plate_w)
 {
-	// R0x-R3x(,D10-D13): vfd matrix plate
+	// R0x-R3x(,D10-D13): vfd plate
 	int shift = offset * 4;
 	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
 
 	// update display
-	u16 grid = BITSWAP16(m_grid,15,14,13,12,11,10,0,1,2,3,4,5,6,7,8,9);
-	u32 plate = BITSWAP24(m_plate,23,22,21,20,14,12,10,8,9,13,15,2,0,1,3,11,7,5,4,6,19,17,16,18);
+	u16 grid = bitswap<16>(m_grid,15,14,13,12,11,10,0,1,2,3,4,5,6,7,8,9);
+	u32 plate = bitswap<24>(m_plate,23,22,21,20,14,12,10,8,9,13,15,2,0,1,3,11,7,5,4,6,19,17,16,18);
 	display_matrix(20, 10, plate, grid);
 }
 
@@ -3179,7 +3179,7 @@ WRITE16_MEMBER(ghalien_state::grid_w)
 	// D0-D6: input mux
 	m_inp_mux = data & 0x7f;
 
-	// D0-D9: vfd matrix grid
+	// D0-D9: vfd grid
 	m_grid = data & 0x3ff;
 
 	// D10-D13: more plates (update display there)
@@ -3280,13 +3280,13 @@ public:
 
 WRITE8_MEMBER(gckong_state::plate_w)
 {
-	// R0x-R3x(,D0,D1): vfd matrix plate
+	// R0x-R3x(,D0,D1): vfd plate
 	int shift = offset * 4;
 	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
 
 	// update display
-	u16 grid = BITSWAP16(m_grid,15,14,13,12,11,0,1,2,3,4,5,6,7,8,9,10);
-	u32 plate = BITSWAP32(m_plate,31,30,29,28,27,26,25,6,7,8,12,13,14,15,16,17,18,17,16,12,11,10,9,8,7,6,5,4,3,2,1,0) | 0x8000;
+	u16 grid = bitswap<16>(m_grid,15,14,13,12,11,0,1,2,3,4,5,6,7,8,9,10);
+	u32 plate = bitswap<32>(m_plate,31,30,29,28,27,26,25,6,7,8,12,13,14,15,16,17,18,17,16,12,11,10,9,8,7,6,5,4,3,2,1,0) | 0x8000;
 	display_matrix(32, 11, plate, grid);
 }
 
@@ -3303,7 +3303,7 @@ WRITE16_MEMBER(gckong_state::grid_w)
 		update_int1();
 	}
 
-	// D5-D15: vfd matrix grid
+	// D5-D15: vfd grid
 	m_grid = data >> 5 & 0x7ff;
 
 	// D0,D1: more plates (update display there)
@@ -3403,12 +3403,12 @@ public:
 
 WRITE8_MEMBER(gdigdug_state::plate_w)
 {
-	// R0x-R6x(,D0-D3): vfd matrix plate
+	// R0x-R6x(,D0-D3): vfd plate
 	int shift = offset * 4;
 	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
 
 	// update display
-	u32 plate = BITSWAP32(m_plate,30,31,0,1,2,3,4,5,6,7,20,21,22,27,26,25,28,29,24,23,15,14,13,12,8,9,10,11,19,18,17,16);
+	u32 plate = bitswap<32>(m_plate,30,31,0,1,2,3,4,5,6,7,20,21,22,27,26,25,28,29,24,23,15,14,13,12,8,9,10,11,19,18,17,16);
 	display_matrix(32, 9, plate, m_grid);
 }
 
@@ -3425,7 +3425,7 @@ WRITE16_MEMBER(gdigdug_state::grid_w)
 		update_int1();
 	}
 
-	// D7-D15: vfd matrix grid
+	// D7-D15: vfd grid
 	m_grid = data >> 7 & 0x1ff;
 
 	// D0-D3: more plates (update display there)
@@ -3528,13 +3528,13 @@ public:
 
 void mwcbaseb_state::prepare_display()
 {
-	u8 grid = BITSWAP8(m_grid,0,1,2,3,4,5,6,7);
+	u8 grid = bitswap<8>(m_grid,0,1,2,3,4,5,6,7);
 	display_matrix(16, 8, m_plate, grid);
 }
 
 WRITE8_MEMBER(mwcbaseb_state::plate_w)
 {
-	// R1x-R3x,R6x: vfd matrix plate
+	// R1x-R3x,R6x: vfd plate
 	int shift = (offset == hmcs40_cpu_device::PORT_R6X) ? 12 : (offset - hmcs40_cpu_device::PORT_R1X) * 4;
 	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
 	prepare_display();
@@ -3545,7 +3545,7 @@ WRITE16_MEMBER(mwcbaseb_state::grid_w)
 	// D9-D15: input mux
 	m_inp_mux = data >> 9 & 0x7f;
 
-	// D0-D7: vfd matrix grid
+	// D0-D7: vfd grid
 	m_grid = data & 0xff;
 	prepare_display();
 }
@@ -3683,12 +3683,12 @@ public:
 
 WRITE8_MEMBER(pbqbert_state::plate_w)
 {
-	// R0x-R6x(,D8): vfd matrix plate
+	// R0x-R6x(,D8): vfd plate
 	int shift = offset * 4;
 	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
 
 	// update display
-	u32 plate = BITSWAP32(m_plate,31,30,24,25,26,27,28,15,14,29,13,12,11,10,9,8,7,6,5,4,3,2,1,0,16,17,18,19,20,21,22,23) | 0x400000;
+	u32 plate = bitswap<32>(m_plate,31,30,24,25,26,27,28,15,14,29,13,12,11,10,9,8,7,6,5,4,3,2,1,0,16,17,18,19,20,21,22,23) | 0x400000;
 	display_matrix(30, 8, plate, m_grid);
 }
 
@@ -3697,7 +3697,7 @@ WRITE16_MEMBER(pbqbert_state::grid_w)
 	// D14: speaker out
 	m_speaker->level_w(data >> 14 & 1);
 
-	// D0-D7: vfd matrix grid
+	// D0-D7: vfd grid
 	m_grid = data & 0xff;
 
 	// D8: plate 25 (update display there)
@@ -3776,14 +3776,14 @@ public:
 
 void kingman_state::prepare_display()
 {
-	u16 grid = BITSWAP16(m_grid,15,14,13,12,11,10,9,0,1,2,3,4,5,6,7,8);
-	u32 plate = BITSWAP24(m_plate,23,6,7,5,4,3,2,1,0,13,12,20,19,18,17,16,10,11,9,8,14,15,13,12);
+	u16 grid = bitswap<16>(m_grid,15,14,13,12,11,10,9,0,1,2,3,4,5,6,7,8);
+	u32 plate = bitswap<24>(m_plate,23,6,7,5,4,3,2,1,0,13,12,20,19,18,17,16,10,11,9,8,14,15,13,12);
 	display_matrix(23, 9, plate, grid);
 }
 
 WRITE8_MEMBER(kingman_state::plate_w)
 {
-	// R0x-R3x: vfd matrix plate
+	// R0x-R3x: vfd plate
 	int shift = offset * 4;
 	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
 	prepare_display();
@@ -3802,7 +3802,7 @@ WRITE16_MEMBER(kingman_state::grid_w)
 		update_int0();
 	}
 
-	// D7-D15: vfd matrix grid
+	// D7-D15: vfd grid
 	m_grid = data >> 7 & 0x1ff;
 
 	// D0-D4: more plates
@@ -3897,14 +3897,14 @@ public:
 
 void tmtron_state::prepare_display()
 {
-	u16 grid = BITSWAP16(m_grid,15,14,13,12,11,10,1,2,3,4,5,6,7,8,9,0);
-	u32 plate = BITSWAP24(m_plate,23,5,2,21,1,6,7,9,10,11,21,0,19,3,4,8,3,18,17,16,12,13,14,15);
+	u16 grid = bitswap<16>(m_grid,15,14,13,12,11,10,1,2,3,4,5,6,7,8,9,0);
+	u32 plate = bitswap<24>(m_plate,23,5,2,21,1,6,7,9,10,11,21,0,19,3,4,8,3,18,17,16,12,13,14,15);
 	display_matrix(23, 10, plate, grid);
 }
 
 WRITE8_MEMBER(tmtron_state::plate_w)
 {
-	// R0x-R3x: vfd matrix plate
+	// R0x-R3x: vfd plate
 	int shift = offset * 4;
 	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
 	prepare_display();
@@ -3923,7 +3923,7 @@ WRITE16_MEMBER(tmtron_state::grid_w)
 		update_int1();
 	}
 
-	// D6-D15: vfd matrix grid
+	// D6-D15: vfd grid
 	m_grid = data >> 6 & 0x3ff;
 
 	// D0-D3,D5: more plates
@@ -4018,12 +4018,12 @@ public:
 
 WRITE8_MEMBER(vinvader_state::plate_w)
 {
-	// R1x-R3x(,D4-D6): vfd matrix plate
+	// R1x-R3x(,D4-D6): vfd plate
 	int shift = (offset - hmcs40_cpu_device::PORT_R1X) * 4;
 	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
 
 	// update display
-	u16 plate = BITSWAP16(m_plate,15,11,7,3,10,6,14,2,9,5,13,1,8,4,12,0);
+	u16 plate = bitswap<16>(m_plate,15,11,7,3,10,6,14,2,9,5,13,1,8,4,12,0);
 	display_matrix(12, 9, plate, m_grid);
 }
 
@@ -4032,7 +4032,7 @@ WRITE16_MEMBER(vinvader_state::grid_w)
 	// D0: speaker out
 	m_speaker->level_w(data & 1);
 
-	// D7-D15: vfd matrix grid
+	// D7-D15: vfd grid
 	m_grid = data >> 7 & 0x1ff;
 
 	// D4-D6: more plates (update display there)
@@ -4147,7 +4147,7 @@ ROM_START( bzaxxon )
 	ROM_CONTINUE(           0x1e80, 0x0100 )
 
 	ROM_REGION( 521080, "svg", 0)
-	ROM_LOAD( "bzaxxon.svg", 0, 521080, CRC(f4fbb2de) SHA1(83db400e67d91ae4bfee3e8568ae9df94ebede19) )
+	ROM_LOAD( "bzaxxon.svg", 0, 521080, BAD_DUMP CRC(f4fbb2de) SHA1(83db400e67d91ae4bfee3e8568ae9df94ebede19) )
 ROM_END
 
 
@@ -4167,7 +4167,7 @@ ROM_START( bpengo )
 	ROM_CONTINUE(           0x1e80, 0x0100 )
 
 	ROM_REGION( 744461, "svg", 0)
-	ROM_LOAD( "bpengo.svg", 0, 744461, CRC(2b9abaa5) SHA1(c70a6ac1fa757fdd3ababfe6e00573ef1410c1eb) )
+	ROM_LOAD( "bpengo.svg", 0, 744461, BAD_DUMP CRC(2b9abaa5) SHA1(c70a6ac1fa757fdd3ababfe6e00573ef1410c1eb) )
 ROM_END
 
 
@@ -4177,7 +4177,7 @@ ROM_START( bbtime )
 	ROM_CONTINUE(           0x1e80, 0x0100 )
 
 	ROM_REGION( 461605, "svg", 0)
-	ROM_LOAD( "bbtime.svg", 0, 461605, CRC(5b335271) SHA1(46c45b711358e8397ae707668aecead9e341ab8a) )
+	ROM_LOAD( "bbtime.svg", 0, 461605, BAD_DUMP CRC(5b335271) SHA1(46c45b711358e8397ae707668aecead9e341ab8a) )
 ROM_END
 
 

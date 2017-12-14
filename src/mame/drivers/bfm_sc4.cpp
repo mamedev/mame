@@ -493,7 +493,7 @@ WRITE8_MEMBER(bfm_sc45_state::mux_output2_w)
 	}
 	else
 	{
-		uint8_t bf7segdata = BITSWAP8(data,0,7,6,5,4,3,2,1);
+		uint8_t bf7segdata = bitswap<8>(data,0,7,6,5,4,3,2,1);
 		output().set_digit_value(offset, bf7segdata);
 	}
 }

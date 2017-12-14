@@ -1155,7 +1155,7 @@ DRIVER_INIT_MEMBER(wiz_state,stinger)
 
 			/* decode the opcodes */
 			tbl = swap_xor_table[row];
-			m_decrypted_opcodes[a] = BITSWAP8(src, tbl[0], 6, tbl[1], 4, tbl[2], 2, 1, 0) ^ tbl[3];
+			m_decrypted_opcodes[a] = bitswap<8>(src, tbl[0], 6, tbl[1], 4, tbl[2], 2, 1, 0) ^ tbl[3];
 		}
 	}
 }

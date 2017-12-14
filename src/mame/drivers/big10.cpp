@@ -97,7 +97,7 @@ public:
 WRITE8_MEMBER(big10_state::mux_w)
 {
 	m_mux_data = ~data;
-	m_hopper->write(space, 0, (data & 0x40) << 1);
+	m_hopper->motor_w(BIT(data, 6));
 	machine().output().set_lamp_value(1, BIT(~data, 7)); // maybe a coin counter?
 }
 

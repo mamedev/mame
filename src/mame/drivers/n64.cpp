@@ -341,7 +341,7 @@ DEVICE_IMAGE_LOAD_MEMBER(n64_mess_state,n64_cart)
 		}
 	}
 
-	periphs->m_nvram_image = image;
+	periphs->m_nvram_image = &image.device();
 
 	logerror("cart length = %d\n", length);
 

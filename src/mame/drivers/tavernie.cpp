@@ -288,7 +288,7 @@ void tavernie_state::kbd_put(u8 data)
 
 static MACHINE_CONFIG_START( cpu09 )
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",M6809E, XTAL_4MHz)
+	MCFG_CPU_ADD("maincpu", MC6809, XTAL_4MHz)
 	MCFG_CPU_PROGRAM_MAP(cpu09_mem)
 	MCFG_MACHINE_RESET_OVERRIDE(tavernie_state, cpu09)
 

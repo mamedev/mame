@@ -142,7 +142,7 @@ uint8_t c64_stardos_cartridge_device::c64_cd_r(address_space &space, offs_t offs
 {
 	if (!roml || !romh)
 	{
-		// TODO BITSWAP8(7,6,5,4,3,1,2,0) ?
+		// TODO bitswap<8>(7,6,5,4,3,1,2,0) ?
 		data = m_roml[offset & 0x3fff];
 	}
 	else if (!io1)

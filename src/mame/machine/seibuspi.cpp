@@ -171,7 +171,7 @@ void seibuspi_sprite_decrypt(uint8_t *src, int rom_size)
 
 		/* first of all, permutate 16 of the 48 bits */
 		bs = spi_bitswap[key_table[addr & 0xff]&0xf];
-		y3 = BITSWAP16(y3, bs[0],bs[1],bs[2],bs[3],bs[4],bs[5],bs[6],bs[7],
+		y3 = bitswap<16>(y3, bs[0],bs[1],bs[2],bs[3],bs[4],bs[5],bs[6],bs[7],
 							bs[8],bs[9],bs[10],bs[11],bs[12],bs[13],bs[14],bs[15]);
 
 
@@ -350,7 +350,7 @@ void seibuspi_rise10_sprite_decrypt(uint8_t *rom, int size)
 		uint32_t plane54,plane3210;
 
 		plane54 = rom[0*size+2*i] + (rom[0*size+2*i+1] << 8);
-		plane3210 = BITSWAP32(
+		plane3210 = bitswap<32>(
 				rom[2*size+2*i] + (rom[2*size+2*i+1] << 8) + (rom[1*size+2*i] << 16) + (rom[1*size+2*i+1] << 24),
 				23,13,24,4,16,12,25,30,
 				3,5,29,17,14,22,2,11,

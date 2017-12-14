@@ -375,7 +375,7 @@ WRITE8_MEMBER(ufo_state::ex_stepper_w)
 {
 	// stepper motor sequence is: 6 c 9 3 6 c 9 3..
 	// which means d0 and d3 are swapped when compared with UFO board hardware
-	stepper_w(space, offset, BITSWAP8(data,4,6,5,7,0,2,1,3));
+	stepper_w(space, offset, bitswap<8>(data,4,6,5,7,0,2,1,3));
 }
 
 WRITE8_MEMBER(ufo_state::ex_cp_lamps_w)

@@ -94,8 +94,9 @@ public:
 	DECLARE_DRIVER_INIT(renaimj);
 	DECLARE_DRIVER_INIT(sengomjk);
 	DECLARE_DRIVER_INIT(thenanpa);
+	DECLARE_DRIVER_INIT(torarech);
 	DECLARE_DRIVER_INIT(tsuwaku);
-
+	
 	virtual void machine_reset() override;
 	TIMER_DEVICE_CALLBACK_MEMBER(csplayh5_irq);
 	DECLARE_WRITE_LINE_MEMBER(csplayh5_vdp0_interrupt);
@@ -427,6 +428,7 @@ DRIVER_INIT_MEMBER(csplayh5_state,pokoachu)  { general_init(0x7b1e/2, 0x6018); }
 DRIVER_INIT_MEMBER(csplayh5_state,renaimj)   { general_init(0x568c/2, 0x6018); }
 DRIVER_INIT_MEMBER(csplayh5_state,sengomjk)  { general_init(0x5226/2, 0x6018); }
 DRIVER_INIT_MEMBER(csplayh5_state,thenanpa)  { general_init(0x69ec/2, 0x6018); }
+DRIVER_INIT_MEMBER(csplayh5_state,torarech)  { general_init(0x9384/2, 0x6018); }
 DRIVER_INIT_MEMBER(csplayh5_state,tsuwaku)   { general_init(0x856e/2, 0x6018); }
 
 
@@ -839,6 +841,27 @@ ROM_START( tsuwaku )
 	ROM_LOAD( "gal16v8h.020", 0x000000, 0x040000, CRC(ac5c9495) SHA1(1c54ecf6dedbf8c3a29207c1c91b52e2ff394d9d) )
 ROM_END
 
+ROM_START( torarech )
+	ROM_REGION( 0x40000, "maincpu", 0 ) // tmp68301 prg
+	ROM_LOAD16_BYTE( "2.ic3",            0x000000, 0x020000, CRC(a7fda49b) SHA1(a7891e574b4d2ae3bcdc40f76b6e67e67d6e72bd) )
+	ROM_LOAD16_BYTE( "1.ic2",            0x000001, 0x020000, CRC(887c1a0d) SHA1(a594e3ef6514ed48f097e742633c19e51c10b730) )
+
+	DVD_BIOS
+
+	ROM_REGION( 0x20000, ":nichisnd:audiorom", 0 ) // z80
+	ROM_LOAD( "11.ic51",           0x000000, 0x020000, CRC(bd785d10) SHA1(ceb91c0f13eafabb8d48384857af6fc555d48951) )
+
+	ROM_REGION( 0x400000, "blit_gfx", ROMREGION_ERASEFF ) // blitter based gfxs
+	ROM_LOAD16_BYTE( "3.ic40",            0x000000, 0x080000, CRC(cbbbab5c) SHA1(ab8ae64b1f2acfab55ba7cbb173f3036a46001e6) )
+	ROM_LOAD16_BYTE( "4.ic41",            0x000001, 0x080000, CRC(18412fd8) SHA1(6907ce2739549519e1f3dcee2186f6add219a3c2) )
+
+	DISK_REGION( "ide:0:hdd:image" )
+	DISK_IMAGE_READONLY( "nb8018", 0, SHA1(cf8758bb2caaba6377b354694123ddec71a4f8e1) )
+
+	ROM_REGION( 0x040000, "gal", ROMREGION_ERASE00 )
+	ROM_LOAD( "palce16v8h.020", 0x000000, 0xbb2, BAD_DUMP CRC(c8e8605a) SHA1(02e43d9de73256e5c73d6f99834a23cef321d56b) )
+ROM_END
+
 ROM_START( nichisel )
 	ROM_REGION( 0x40000, "maincpu", 0 ) // tmp68301 prg
 	ROM_LOAD16_BYTE( "2.ic3",            0x000000, 0x020000, CRC(fb84fc3e) SHA1(6b87c3516ceec59ec96012ea6a3d2fa9670a1cb3) )
@@ -916,9 +939,9 @@ GAME( 1998, nichidvd,   0,   csplayh5,  csplayh5, csplayh5_state,  0,           
 /* 15 */ GAME( 2000, fuudol,    nichidvd,   csplayh5,  csplayh5, csplayh5_state,  fuudol,    ROT0, "Nichibutsu/eic", "Fuudol (Japan)", MACHINE_NOT_WORKING )
 /* 16 */ GAME( 2000, nuretemi,  nichidvd,   csplayh5,  csplayh5, csplayh5_state,  nuretemi,  ROT0, "Nichibutsu/Love Factory", "Nurete Mitaino... - Net Idol Hen (Japan)", MACHINE_NOT_WORKING )
 /* 17 */ GAME( 2000, tsuwaku,   nichidvd,   csplayh5,  csplayh5, csplayh5_state,  tsuwaku,   ROT0, "Nichibutsu/Love Factory/Just&Just", "Tsuugakuro no Yuuwaku (Japan)", MACHINE_NOT_WORKING )
-// 18 : Torarechattano - AV Kantoku Hen : Nichibutsu/Love Factory/M Friend
+/* 18 */ GAME( 2000, torarech,  nichidvd,   csplayh5,  csplayh5, csplayh5_state,  torarech, ROT0,  "Nichibutsu/Love Factory/M Friend", "Torarechattano - AV Kantoku Hen (Japan)", MACHINE_NOT_WORKING ) 
 /* sp */ GAME( 2000, nichisel,  nichidvd,   csplayh5,  csplayh5, csplayh5_state,  nichisel,  ROT0, "Nichibutsu", "DVD Select (Japan)", MACHINE_NOT_WORKING )
 
 // 2001
 /* 19 */ GAME( 2001, konhaji,   nichidvd,   csplayh5,  csplayh5, csplayh5_state,  konhaji,   ROT0, "Nichibutsu/Love Factory", "Konnano Hajimete! (Japan)", MACHINE_NOT_WORKING )
-// 20 : Uwasa no Deaikei Site : Nichibutsu/Love Factory/eic
+/* 20 */ // Uwasa no Deaikei Site : Nichibutsu/Love Factory/eic

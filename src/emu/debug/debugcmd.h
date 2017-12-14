@@ -131,6 +131,7 @@ private:
 	void execute_hotspot(int ref, const std::vector<std::string> &params);
 	void execute_statesave(int ref, const std::vector<std::string> &params);
 	void execute_stateload(int ref, const std::vector<std::string> &params);
+	void execute_rewind(int ref, const std::vector<std::string> &params);
 	void execute_save(int ref, const std::vector<std::string> &params);
 	void execute_load(int ref, const std::vector<std::string> &params);
 	void execute_dump(int ref, const std::vector<std::string> &params);

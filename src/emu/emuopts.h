@@ -51,6 +51,8 @@
 // core state/playback options
 #define OPTION_STATE                "state"
 #define OPTION_AUTOSAVE             "autosave"
+#define OPTION_REWIND               "rewind"
+#define OPTION_REWIND_CAPACITY      "rewind_capacity"
 #define OPTION_PLAYBACK             "playback"
 #define OPTION_RECORD               "record"
 #define OPTION_RECORD_TIMECODE      "record_timecode"
@@ -327,6 +329,8 @@ public:
 	// core state/playback options
 	const char *state() const { return value(OPTION_STATE); }
 	bool autosave() const { return bool_value(OPTION_AUTOSAVE); }
+	int rewind() const { return bool_value(OPTION_REWIND); }
+	int rewind_capacity() const { return int_value(OPTION_REWIND_CAPACITY); }
 	const char *playback() const { return value(OPTION_PLAYBACK); }
 	const char *record() const { return value(OPTION_RECORD); }
 	bool record_timecode() const { return bool_value(OPTION_RECORD_TIMECODE); }

@@ -152,17 +152,17 @@ uint32_t r9751_state::swap_uint32( uint32_t val )
 
 uint32_t r9751_state::debug_a6()
 {
-	return m_maincpu->space(AS_PROGRAM).read_dword(ptr_m68000->dar[14] + 4);
+	return m_maincpu->space(AS_PROGRAM).read_dword(ptr_m68000->state_int(M68K_A6) + 4);
 }
 
 uint32_t r9751_state::debug_a5()
 {
-	return m_maincpu->space(AS_PROGRAM).read_dword(ptr_m68000->dar[13]);
+	return m_maincpu->space(AS_PROGRAM).read_dword(ptr_m68000->state_int(M68K_A5));
 }
 
 uint32_t r9751_state::debug_a5_20()
 {
-	return m_maincpu->space(AS_PROGRAM).read_dword(ptr_m68000->dar[13] + 0x20);
+	return m_maincpu->space(AS_PROGRAM).read_dword(ptr_m68000->state_int(M68K_A5) + 0x20);
 }
 
 READ8_MEMBER(r9751_state::pdc_dma_r)
@@ -396,7 +396,7 @@ WRITE32_MEMBER( r9751_state::r9751_mmio_5ff_w )
 			m_pdc->reg_p5 = 0;
 
 			/* Send FDD SCSI command location address to PDC 0x2, 0x3 */
-			if(TRACE_FDC) logerror("--- FDD command address: %08X PC: %08X Register: %08X (A6+4): %08X A4: %08X (A5): %08X (A5+20): %08X\n", (fdd_dma_bank & 0x7FFFF800) + ((data << 1)&0x3FFFF), space.machine().firstcpu->pc(), offset << 2 | 0x5FF00000, debug_a6(), ptr_m68000->dar[12], debug_a5(), debug_a5_20());
+			if(TRACE_FDC) logerror("--- FDD command address: %08X PC: %08X Register: %08X (A6+4): %08X A4: %08X (A5): %08X (A5+20): %08X\n", (fdd_dma_bank & 0x7FFFF800) + ((data << 1)&0x3FFFF), space.machine().firstcpu->pc(), offset << 2 | 0x5FF00000, debug_a6(), ptr_m68000->state_int(M68K_A4), debug_a5(), debug_a5_20());
 			data_b0 = data & 0xFF;
 			data_b1 = (data & 0xFF00) >> 8;
 			m_pdc->reg_p2 = data_b0;

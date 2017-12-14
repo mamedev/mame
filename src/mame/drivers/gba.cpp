@@ -238,8 +238,8 @@ void gba_state::dma_exec(int ch)
 	{
 		if ((ctrl>>10) & 1)
 		{
-			src &= 0xfffffffc;
-			dst &= 0xfffffffc;
+			src &= 0xfffffffe;
+			dst &= 0xfffffffe;
 
 			// 32-bit
 			space.write_dword(dst, space.read_dword(src));
@@ -1238,16 +1238,16 @@ WRITE_LINE_MEMBER(gba_state::dma_vblank_callback)
 
 static ADDRESS_MAP_START( gba_map, AS_PROGRAM, 32, gba_state )
 	ADDRESS_MAP_UNMAP_HIGH // for "Fruit Mura no Doubutsu Tachi" and "Classic NES Series"
-	AM_RANGE(0x00000000, 0x00003fff) AM_ROM AM_READ(gba_bios_r)
+	AM_RANGE(0x00000000, 0x00003fff) AM_ROM AM_MIRROR(0x01ffc000) AM_READ(gba_bios_r)
 	AM_RANGE(0x02000000, 0x0203ffff) AM_RAM AM_MIRROR(0xfc0000)
 	AM_RANGE(0x03000000, 0x03007fff) AM_RAM AM_MIRROR(0xff8000)
 	AM_RANGE(0x04000000, 0x0400005f) AM_DEVREADWRITE("lcd", gba_lcd_device, video_r, video_w)
 	AM_RANGE(0x04000060, 0x040003ff) AM_READWRITE(gba_io_r, gba_io_w)
 	AM_RANGE(0x04000400, 0x04ffffff) AM_NOP                                         // Not used
-	AM_RANGE(0x05000000, 0x050003ff) AM_DEVREADWRITE("lcd", gba_lcd_device, gba_pram_r, gba_pram_w)  // Palette RAM
-	AM_RANGE(0x06000000, 0x06017fff) AM_DEVREADWRITE("lcd", gba_lcd_device, gba_vram_r, gba_vram_w)  // VRAM
-	AM_RANGE(0x07000000, 0x070003ff) AM_DEVREADWRITE("lcd", gba_lcd_device, gba_oam_r, gba_oam_w)    // OAM
-	AM_RANGE(0x07000400, 0x07ffffff) AM_NOP                                         // Not used
+	AM_RANGE(0x05000000, 0x050003ff) AM_MIRROR(0x00fffc00) AM_DEVREADWRITE("lcd", gba_lcd_device, gba_pram_r, gba_pram_w)  // Palette RAM
+	AM_RANGE(0x06000000, 0x06017fff) AM_MIRROR(0x00fe0000) AM_DEVREADWRITE("lcd", gba_lcd_device, gba_vram_r, gba_vram_w)  // VRAM
+	AM_RANGE(0x06018000, 0x0601ffff) AM_MIRROR(0x00fe0000) AM_DEVREADWRITE("lcd", gba_lcd_device, gba_vram_r, gba_vram_w)  // VRAM
+	AM_RANGE(0x07000000, 0x070003ff) AM_MIRROR(0x00fffc00) AM_DEVREADWRITE("lcd", gba_lcd_device, gba_oam_r, gba_oam_w)    // OAM
 	//AM_RANGE(0x08000000, 0x0cffffff)  // cart ROM + mirrors, mapped here at machine_start if a cart is present
 	AM_RANGE(0x10000000, 0xffffffff) AM_READ(gba_10000000_r) // for "Justice League Chronicles" (game bug)
 ADDRESS_MAP_END
@@ -1353,6 +1353,8 @@ void gba_state::machine_start()
 		{
 			m_maincpu->space(AS_PROGRAM).install_read_handler(0xe000000, 0xe00ffff, read32_delegate(FUNC(gba_cart_slot_device::read_ram),(gba_cart_slot_device*)m_cart));
 			m_maincpu->space(AS_PROGRAM).install_write_handler(0xe000000, 0xe00ffff, write32_delegate(FUNC(gba_cart_slot_device::write_ram),(gba_cart_slot_device*)m_cart));
+			m_maincpu->space(AS_PROGRAM).install_read_handler(0xe010000, 0xe01ffff, read32_delegate(FUNC(gba_cart_slot_device::read_ram),(gba_cart_slot_device*)m_cart));
+			m_maincpu->space(AS_PROGRAM).install_write_handler(0xe010000, 0xe01ffff, write32_delegate(FUNC(gba_cart_slot_device::write_ram),(gba_cart_slot_device*)m_cart));
 		}
 		if (m_cart->get_type() == GBA_EEPROM || m_cart->get_type() == GBA_EEPROM4 || m_cart->get_type() == GBA_EEPROM64 || m_cart->get_type() == GBA_BOKTAI)
 		{

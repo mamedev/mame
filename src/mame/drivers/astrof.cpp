@@ -453,7 +453,7 @@ READ8_MEMBER(astrof_state::afire_coin_prot_r)
 READ8_MEMBER(astrof_state::tomahawk_protection_r)
 {
 	/* flip the byte */
-	return BITSWAP8(*m_tomahawk_protection, 0, 1, 2, 3, 4, 5, 6, 7);
+	return bitswap<8>(*m_tomahawk_protection, 0, 1, 2, 3, 4, 5, 6, 7);
 }
 
 

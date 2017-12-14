@@ -1064,7 +1064,7 @@ DRIVER_INIT_MEMBER(nss_state,nss)
 	uint8_t *PROM = memregion("rp5h01")->base();
 
 	for (int i = 0; i < 0x10; i++)
-		PROM[i] = BITSWAP8(PROM[i],0,1,2,3,4,5,6,7) ^ 0xff;
+		PROM[i] = bitswap<8>(PROM[i],0,1,2,3,4,5,6,7) ^ 0xff;
 
 	DRIVER_INIT_CALL(snes);
 }

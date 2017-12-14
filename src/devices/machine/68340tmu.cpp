@@ -310,8 +310,8 @@ void mc68340_timer_module_device::device_start()
 
 void mc68340_timer_module_device::do_timer_irq()
 {
-	assert(m_cpu->m68340SIM);
-	m68340_sim &sim = *m_cpu->m68340SIM;
+	assert(m_cpu->m_m68340SIM);
+	m68340_sim &sim = *m_cpu->m_m68340SIM;
 	int timer_irq_level  = (m_ir & 0x0700) >> 8;
 	int timer_irq_vector = (m_ir & 0x00ff) >> 0;
 

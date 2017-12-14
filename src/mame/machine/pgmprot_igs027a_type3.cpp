@@ -727,7 +727,7 @@ DRIVER_INIT_MEMBER(pgm_arm_type3_state,dmnfrnt)
 }
 
 //
-// int j = BITSWAP24(i, 23, 20, 17, 16, 19, 18, 15, 14, 13, 12, 11, 10, 9, 22, 21, 6, 7, 6, 5, 4, 3, 2, 1, 0);
+// int j = bitswap<24>(i, 23, 20, 17, 16, 19, 18, 15, 14, 13, 12, 11, 10, 9, 22, 21, 6, 7, 6, 5, 4, 3, 2, 1, 0);
 // buffer[i] = src[j]
 
 // todo, collapse these to an address swap

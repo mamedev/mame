@@ -111,7 +111,7 @@ static void _atari_load_proc(device_image_interface &image, bool is_created)
 
 void atari_fdc_device::atari_load_proc(device_image_interface &image, bool is_created)
 {
-	int id = floppy_get_drive(image);
+	int id = floppy_get_drive(&image.device());
 	int size, i;
 
 	m_drv[id].image = std::make_unique<uint8_t[]>(MAXSIZE);

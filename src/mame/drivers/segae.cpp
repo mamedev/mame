@@ -200,7 +200,7 @@ ROMs:
 Game                     IC2         IC3         IC4         IC5         IC7
 ---------------------------------------------------------------------------------
 Megumi Rescue*           IC-2        IC-3        IC-4        IC-5        IC-7
-Hang-On Jr.              EPR-?       EPR-?       EPR-?       EPR-?       EPR-?     Hello, Sega Part Numbers....!?
+Hang-On Jr.              EPR-7261    EPR-7260    EPR-7259    EPR-7258    EPR-7257B
 Transformer              EPR-7350    EPR-7606    EPR-7348    EPR-7347    EPR-7605
            /Astro Flash  EPR-7350    EPR-7349    EPR-7348    EPR-7347    EPR-7723
 Slap Shooter             EPR-7355    EPR-7354    EPR-7353    EPR-7352    EPR-7751
@@ -267,9 +267,9 @@ GND  8A 8B GND
 
  Game Notes:
  Riddle of Pythagoras is interesting, it looks like Sega might have planned it
- as a two player game, there is prelimiary code for 2 player support which
- never gets executed, see code around 0x0E95.  Theres also quite a bit of
- pointless code here and there.  Some Interesting Memory Locations
+ as a two player game, there is preliminary code for 2 player support which
+ never gets executed, see code around 0x0E95. There's also quite a bit of
+ pointless code here and there. Some Interesting Memory Locations
 
  C000 : level - value (00-0x32)
  C001 : level - display (00-0x50, BCD coded)
@@ -339,6 +339,9 @@ public:
 	DECLARE_DRIVER_INIT( opaopa );
 	DECLARE_DRIVER_INIT( fantzn2 );
 
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+
+private:
 	// Devices
 	required_device<cpu_device>          m_maincpu;
 	required_device<sega315_5124_device> m_vdp1;
@@ -355,8 +358,6 @@ public:
 
 	// Video RAM
 	uint8_t m_vram[2][0x4000 * 2];
-
-	uint32_t screen_update_systeme(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -836,7 +837,7 @@ static INPUT_PORTS_START( ridleofp ) /* Used By Riddle Of Pythagoras */
 INPUT_PORTS_END
 
 
-uint32_t systeme_state::screen_update_systeme(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t systeme_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	bitmap_rgb32 &vdp1_bitmap = m_vdp1->get_bitmap();
 	bitmap_rgb32 &vdp2_bitmap = m_vdp2->get_bitmap();
@@ -872,7 +873,7 @@ static MACHINE_CONFIG_START( systeme )
 	MCFG_SCREEN_RAW_PARAMS(XTAL_10_738635MHz/2, \
 			sega315_5124_device::WIDTH , sega315_5124_device::LBORDER_START + sega315_5124_device::LBORDER_WIDTH, sega315_5124_device::LBORDER_START + sega315_5124_device::LBORDER_WIDTH + 256, \
 			sega315_5124_device::HEIGHT_NTSC, sega315_5124_device::TBORDER_START + sega315_5124_device::NTSC_192_TBORDER_HEIGHT, sega315_5124_device::TBORDER_START + sega315_5124_device::NTSC_192_TBORDER_HEIGHT + 192)
-	MCFG_SCREEN_UPDATE_DRIVER(systeme_state, screen_update_systeme)
+	MCFG_SCREEN_UPDATE_DRIVER(systeme_state, screen_update)
 
 	MCFG_DEVICE_ADD("vdp1", SEGA315_5124, 0)
 	MCFG_SEGA315_5124_IS_PAL(false)
@@ -896,8 +897,8 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( hangonjr, systeme )
 	MCFG_DEVICE_MODIFY("ppi")
 	MCFG_I8255_IN_PORTA_CB(READ8(systeme_state, hangonjr_port_f8_read))
-	MCFG_I8255_IN_PORTC_CB(CONSTANT(0)) // bit 4 ought to be ADC /INTR signal
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(systeme_state, hangonjr_port_fa_write))
+	MCFG_I8255_IN_PORTC_CB(CONSTANT(0)) // bit 4 must be the ADC0804 /INTR signal
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(systeme_state, hangonjr_port_fa_write)) // CD4051 selector input
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( ridleofp, systeme )
@@ -971,16 +972,21 @@ ROM_END
 
 //*************************************************************************************************************************
 //  Hang-On Jr., Sega System E
+//   Game ID# 833-5911 HANG ON JR. REV.
+//   ROM BD # 834-5910 REV.B
+//
+// Analog control board:  834-5805 (required for game to boot)
+// ICs on this board are LS244 (IC1), ADC0804 (IC2), LS367 (IC3) and CD4051 (IC4).
 //
 ROM_START( hangonjr )
 	ROM_REGION( 0x30000, "maincpu", 0 )
-	ROM_LOAD( "rom5.ic7",   0x00000, 0x08000, CRC(d63925a7) SHA1(699f222d9712fa42651c753fe75d7b60e016d3ad) ) /* Fixed Code */
+	ROM_LOAD( "epr-7257b.ic7",   0x00000, 0x08000, CRC(d63925a7) SHA1(699f222d9712fa42651c753fe75d7b60e016d3ad) ) /* Fixed Code */
 
 	/* The following are 8 0x4000 banks that get mapped to reads from 0x8000 - 0xbfff */
-	ROM_LOAD( "rom4.ic5",   0x10000, 0x08000, CRC(ee3caab3) SHA1(f583cf92c579d1ca235e8b300e256ba58a04dc90) )
-	ROM_LOAD( "rom3.ic4",   0x18000, 0x08000, CRC(d2ba9bc9) SHA1(85cf2a801883bf69f78134fc4d5075134f47dc03) )
-	ROM_LOAD( "rom2.ic3",   0x20000, 0x08000, CRC(e14da070) SHA1(f8781f65be5246a23c1f492905409775bbf82ea8) )
-	ROM_LOAD( "rom1.ic2",   0x28000, 0x08000, CRC(3810cbf5) SHA1(c8d5032522c0c903ab3d138f62406a66e14a5c69) )
+	ROM_LOAD( "epr-7258.ic5",   0x10000, 0x08000, CRC(ee3caab3) SHA1(f583cf92c579d1ca235e8b300e256ba58a04dc90) )
+	ROM_LOAD( "epr-7259.ic4",   0x18000, 0x08000, CRC(d2ba9bc9) SHA1(85cf2a801883bf69f78134fc4d5075134f47dc03) )
+	ROM_LOAD( "epr-7260.ic3",   0x20000, 0x08000, CRC(e14da070) SHA1(f8781f65be5246a23c1f492905409775bbf82ea8) )
+	ROM_LOAD( "epr-7261.ic2",   0x28000, 0x08000, CRC(3810cbf5) SHA1(c8d5032522c0c903ab3d138f62406a66e14a5c69) )
 ROM_END
 
 //*************************************************************************************************************************
@@ -1078,7 +1084,7 @@ ROM_END
 
 
 //    YEAR, NAME,     PARENT,   MACHINE,           INPUT,    STATE          INIT,     MONITOR,COMPANY,FULLNAME,FLAGS
-GAME( 1985, hangonjr, 0,        hangonjr,          hangonjr, systeme_state, 0,        ROT0,   "Sega", "Hang-On Jr.", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, hangonjr, 0,        hangonjr,          hangonjr, systeme_state, 0,        ROT0,   "Sega", "Hang-On Jr. (Rev. B)", MACHINE_SUPPORTS_SAVE )
 GAME( 1986, slapshtr, 0,        systeme,           slapshtr, systeme_state, 0,        ROT0,   "Sega", "Slap Shooter", MACHINE_SUPPORTS_SAVE) // 1986 date from flyer
 GAME( 1986, transfrm, 0,        systeme,           transfrm, systeme_state, 0,        ROT0,   "Sega", "Transformer", MACHINE_SUPPORTS_SAVE )
 GAME( 1986, astrofl,  transfrm, systemex_315_5177, transfrm, systeme_state, 0,        ROT0,   "Sega", "Astro Flash (Japan)", MACHINE_SUPPORTS_SAVE )

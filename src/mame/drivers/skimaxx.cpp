@@ -296,7 +296,7 @@ WRITE32_MEMBER(skimaxx_state::skimaxx_sub_ctrl_w)
 */
 READ32_MEMBER(skimaxx_state::skimaxx_analog_r)
 {
-	return BITSWAP8(ioport(offset ? "Y" : "X")->read(), 0,1,2,3,4,5,6,7);
+	return bitswap<8>(ioport(offset ? "Y" : "X")->read(), 0,1,2,3,4,5,6,7);
 }
 
 /*************************************

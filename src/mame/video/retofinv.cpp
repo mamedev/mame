@@ -45,7 +45,7 @@ PALETTE_INIT_MEMBER(retofinv_state, retofinv)
 	for (i = 0; i < 0x800; i++)
 	{
 		// descramble the address
-		int j = BITSWAP16(i,15,14,13,12,11,10,9,8,7,6,5,4,3,0,1,2);
+		int j = bitswap<16>(i,15,14,13,12,11,10,9,8,7,6,5,4,3,0,1,2);
 		palette.set_pen_indirect(i + 0x200, clut_prom[j]);
 	}
 }
@@ -83,7 +83,7 @@ PALETTE_INIT_MEMBER(retofinv_state, retofinv_bl)
 	for (i = 0; i < 0x800; i++)
 	{
 		// descramble the data
-		palette.set_pen_indirect(i + 0x200, BITSWAP8(clut_prom[i], 4,5,6,7,3,2,1,0));
+		palette.set_pen_indirect(i + 0x200, bitswap<8>(clut_prom[i], 4,5,6,7,3,2,1,0));
 	}
 }
 

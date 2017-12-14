@@ -373,7 +373,7 @@ GFXDECODE_END
 static MACHINE_CONFIG_START( baraduke )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6809, XTAL_49_152MHz/32)
+	MCFG_CPU_ADD("maincpu", MC6809E, XTAL_49_152MHz/32) // 68A09E
 	MCFG_CPU_PROGRAM_MAP(baraduke_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", baraduke_state,  irq0_line_assert)
 

@@ -15,7 +15,6 @@
 #include "cpu/m6809/m6809.h"
 #include "cpu/z80/z80.h"
 #include "sound/2203intf.h"
-#include "sound/discrete.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -49,7 +48,6 @@ WRITE8_MEMBER(ironhors_state::sh_irqtrigger_w)
 
 WRITE8_MEMBER(ironhors_state::filter_w)
 {
-	discrete_device *m_disc_ih = machine().device<discrete_device>("disc_ih");
 	m_disc_ih->write(space, NODE_11, (data & 0x04) >> 2);
 	m_disc_ih->write(space, NODE_12, (data & 0x02) >> 1);
 	m_disc_ih->write(space, NODE_13, (data & 0x01) >> 0);
@@ -360,14 +358,29 @@ void ironhors_state::machine_reset()
 	m_spriterambank = 0;
 }
 
+/*
+clock measurements:
+main Xtal is 18.432mhz
+
+Z80 runs at 3.072mhz
+
+M6809E runs at 1.532mhz ( NOT 3.072mhz)
+
+Vsync is 61hz
+
+Hsync is 15,56khz
+
+These clocks make the emulation run too fast.
+*/
+
 static MACHINE_CONFIG_START( ironhors )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6809,18432000/6)        /* 3.072 MHz??? mod by Shingo Suzuki 1999/10/15 */
+	MCFG_CPU_ADD("maincpu", MC6809E, 18432000/6)        /* 3.072 MHz??? mod by Shingo Suzuki 1999/10/15 */
 	MCFG_CPU_PROGRAM_MAP(master_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", ironhors_state, irq, "screen", 0, 1)
 
-	MCFG_CPU_ADD("soundcpu",Z80,18432000/6)      /* 3.072 MHz */
+	MCFG_CPU_ADD("soundcpu", Z80, 18432000/6)      /* 3.072 MHz */
 	MCFG_CPU_PROGRAM_MAP(slave_map)
 	MCFG_CPU_IO_MAP(slave_io_map)
 

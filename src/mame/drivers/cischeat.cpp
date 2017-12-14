@@ -692,7 +692,7 @@ WRITE16_MEMBER(cischeat_state::captflag_leds_w)
 		output().set_led_value(1, data & 0x2000);    // select
 
 		int power = (data & 0x1000);
-		m_captflag_hopper->write(space, 0, power ? 0x80 : 0x00);    // prize motor
+		m_captflag_hopper->motor_w(power ? 1 : 0);    // prize motor
 		if (!power)
 			m_captflag_hopper->reset();
 	}

@@ -64,6 +64,7 @@ void m6502_device::init()
 
 	save_item(NAME(PC));
 	save_item(NAME(NPC));
+	save_item(NAME(PPC));
 	save_item(NAME(A));
 	save_item(NAME(X));
 	save_item(NAME(Y));

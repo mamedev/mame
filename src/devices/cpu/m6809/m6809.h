@@ -19,6 +19,8 @@
 //**************************************************************************
 
 // device type definition
+DECLARE_DEVICE_TYPE(MC6809, mc6809_device)
+DECLARE_DEVICE_TYPE(MC6809E, mc6809e_device)
 DECLARE_DEVICE_TYPE(M6809, m6809_device)
 DECLARE_DEVICE_TYPE(M6809E, m6809e_device)
 
@@ -292,7 +294,33 @@ private:
 	const char *inputnum_string(int inputnum);
 };
 
-// ======================> m6809_device
+// ======================> mc6809_device
+
+class mc6809_device : public m6809_base_device
+{
+public:
+	// construction/destruction
+	mc6809_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+};
+
+// ======================> mc6809e_device
+
+// MC6809E has LIC line to indicate opcode/data fetch
+#define MCFG_MC6809E_LIC_CB(_devcb) \
+	devcb = &mc6809e_device::set_lic_cb(*device, DEVCB_##_devcb);
+
+
+class mc6809e_device : public m6809_base_device
+{
+public:
+	// construction/destruction
+	mc6809e_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	// static configuration helpers
+	template<class _Object> static devcb_base &set_lic_cb(device_t &device, _Object object) { return downcast<mc6809e_device &>(device).m_lic_func.set_callback(object); }
+};
+
+// ======================> m6809_device (LEGACY)
 
 class m6809_device : public m6809_base_device
 {
@@ -301,20 +329,13 @@ public:
 	m6809_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
-// ======================> m6809e_device
-
-#define MCFG_M6809E_LIC_CB(_devcb) \
-	devcb = &m6809e_device::set_lic_cb(*device, DEVCB_##_devcb);
-
+// ======================> m6809e_device (LEGACY)
 
 class m6809e_device : public m6809_base_device
 {
 public:
 	// construction/destruction
 	m6809e_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-
-	// static configuration helpers
-	template<class _Object> static devcb_base &set_lic_cb(device_t &device, _Object object) { return downcast<m6809e_device &>(device).m_lic_func.set_callback(object); }
 };
 
 enum
@@ -325,7 +346,5 @@ enum
 
 #define M6809_IRQ_LINE  0   /* IRQ line number */
 #define M6809_FIRQ_LINE 1   /* FIRQ line number */
-
-/* M6809e has LIC line to indicate opcode/data fetch */
 
 #endif // MAME_CPU_M6809_M6809_H

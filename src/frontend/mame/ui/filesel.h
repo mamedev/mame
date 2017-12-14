@@ -16,6 +16,7 @@
 #include "ui/menu.h"
 
 namespace ui {
+
 // ======================> menu_file_selector
 
 class menu_file_selector : public menu
@@ -30,7 +31,16 @@ public:
 		FILE
 	};
 
-	menu_file_selector(mame_ui_manager &mui, render_container &container, device_image_interface *image, std::string &current_directory, std::string &current_file, bool has_empty, bool has_softlist, bool has_create, result &result);
+	menu_file_selector(
+			mame_ui_manager &mui,
+			render_container &container,
+			device_image_interface *image,
+			std::string &current_directory,
+			std::string &current_file,
+			bool has_empty,
+			bool has_softlist,
+			bool has_create,
+			result &result);
 	virtual ~menu_file_selector() override;
 
 protected:
@@ -50,7 +60,7 @@ private:
 
 	struct file_selector_entry
 	{
-		file_selector_entry() {}
+		file_selector_entry() { }
 		file_selector_entry(file_selector_entry &&) = default;
 		file_selector_entry &operator=(file_selector_entry &&) = default;
 		file_selector_entry_type type;
@@ -59,16 +69,16 @@ private:
 	};
 
 	// internal state
-	device_image_interface *    m_image;
-	std::string &               m_current_directory;
-	std::string &               m_current_file;
-	bool                        m_has_empty;
-	bool                        m_has_softlist;
-	bool                        m_has_create;
-	result &                    m_result;
+	device_image_interface *const   m_image;
+	std::string &                   m_current_directory;
+	std::string &                   m_current_file;
+	bool const                      m_has_empty;
+	bool const                      m_has_softlist;
+	bool const                      m_has_create;
+	result &                        m_result;
 	std::vector<file_selector_entry>    m_entrylist;
-	std::string                 m_hover_directory;
-	std::string                 m_filename;
+	std::string                     m_hover_directory;
+	std::string                     m_filename;
 
 	virtual void populate(float &customtop, float &custombottom) override;
 	virtual void handle() override;
@@ -95,16 +105,20 @@ public:
 		WRITE_OTHER,
 		WRITE_DIFF
 	};
-	menu_select_rw(mame_ui_manager &mui, render_container &container,
-						bool can_in_place, result &result);
+	menu_select_rw(
+			mame_ui_manager &mui,
+			render_container &container,
+			bool can_in_place,
+			result &result);
 	virtual ~menu_select_rw() override;
-	virtual void populate(float &customtop, float &custombottom) override;
-	virtual void handle() override;
 
 	static void *itemref_from_result(result result);
 	static result result_from_itemref(void *itemref);
 
 private:
+	virtual void populate(float &customtop, float &custombottom) override;
+	virtual void handle() override;
+
 	// internal state
 	bool        m_can_in_place;
 	result &    m_result;

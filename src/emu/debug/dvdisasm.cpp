@@ -321,7 +321,7 @@ void debug_view_disasm::generate_dasm(debug_disasm_buffer &buffer, offs_t pc)
 		if(pos != -1) {
 			if(!pc_changed)
 				return;
-			if(pos >= m_topleft.y && pos < m_topleft.y + m_visible.y)
+			if(pos >= m_topleft.y && pos < m_topleft.y + m_visible.y - 2)
 				return;
 			if(pos < m_total.y - m_visible.y) {
 				m_topleft.x = 0;
@@ -566,6 +566,8 @@ void debug_view_disasm::set_selected_address(offs_t address)
 
 void debug_view_disasm::set_source(const debug_view_source &source)
 {
-	debug_view::set_source(source);
-	m_dasm.clear();
+	if(&source != m_source) {
+		debug_view::set_source(source);
+		m_dasm.clear();
+	}
 }

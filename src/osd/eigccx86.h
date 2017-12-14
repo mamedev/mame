@@ -474,13 +474,12 @@ _count_leading_zeros(uint32_t value)
 	__asm__ (
 		" bsrl    %[value], %[result] ;"
 		" cmovzl  %[bias], %[result]  ;"
-		" xorl    $31, %[result]      ;"
 		: [result] "=&r" (result)       // result can be in any register
 		: [value]  "rm"  (value)        // 'value' can be register or memory
-		, [bias]   "rm"  (uint32_t(63)) // 'bias' can be register or memory
+		, [bias]   "rm"  (~uint32_t(0)) // 'bias' can be register or memory
 		: "cc"                          // clobbers condition codes
 	);
-	return result;
+	return 31U - result;
 }
 
 
@@ -497,13 +496,12 @@ _count_leading_ones(uint32_t value)
 	__asm__ (
 		" bsrl    %[value], %[result] ;"
 		" cmovzl  %[bias], %[result]  ;"
-		" xorl    $31, %[result]      ;"
 		: [result] "=&r" (result)       // result can be in any register
 		: [value]  "rm"  (~value)       // 'value' can be register or memory
-		, [bias]   "rm"  (uint32_t(63)) // 'bias' can be register or memory
+		, [bias]   "rm"  (~uint32_t(0)) // 'bias' can be register or memory
 		: "cc"                          // clobbers condition codes
 	);
-	return result;
+	return 31U - result;
 }
 
 #endif // MAME_OSD_EIGCCX86_H

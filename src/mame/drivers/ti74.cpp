@@ -572,7 +572,7 @@ static MACHINE_CONFIG_START( ti95 )
 	MCFG_GENERIC_EXTENSIONS("bin,rom,256")
 	MCFG_GENERIC_LOAD(ti74_state, ti74_cartridge)
 
-	//MCFG_SOFTWARE_LIST_ADD("cart_list", "ti95_cart")
+	MCFG_SOFTWARE_LIST_ADD("cart_list", "ti95_cart")
 MACHINE_CONFIG_END
 
 

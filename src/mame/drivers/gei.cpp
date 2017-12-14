@@ -212,8 +212,8 @@ WRITE8_MEMBER(gei_state::sound_w)
 	output().set_led_value(9, BIT(data, 3));
 
 	/* bit 5 - ticket out in trivia games */
-	if (m_ticket != nullptr)
-		m_ticket->write(machine().dummy_space(), 0, (data & 0x20) << 2);
+	if (m_ticket.found())
+		m_ticket->motor_w(BIT(data, 5));
 
 	/* bit 6 enables NMI */
 	m_nmi_mask = data & 0x40;

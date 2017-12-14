@@ -5174,7 +5174,10 @@ void voodoo_device::device_start()
 	banshee.io[io_sipMonitor] = 0x40000000;
 	banshee.io[io_lfbMemoryConfig] = 0x000a2200;
 	banshee.io[io_dramInit0] = 0x00579d29;
-	banshee.io[io_dramInit0] |= 0x08000000;      // Konami Viper expects 16MBit SGRAMs
+	if (m_fbmem == 16)
+		banshee.io[io_dramInit0] |= 0x0c000000;      // Midway Vegas (denver) expects 2 banks of 16MBit SGRAMs
+	else
+		banshee.io[io_dramInit0] |= 0x08000000;      // Konami Viper expects 16MBit SGRAMs
 	banshee.io[io_dramInit1] = 0x00f02200;
 	banshee.io[io_tmuGbeInit] = 0x00000bfb;
 

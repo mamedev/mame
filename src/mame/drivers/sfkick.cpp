@@ -237,7 +237,7 @@ READ8_MEMBER(sfkick_state::ppi_port_b_r)
 	{
 		case 0: return m_in0->read();
 		case 1: return m_in1->read();
-		case 2: return BITSWAP8(m_dial->read(),4,5,6,7,3,2,1,0);
+		case 2: return bitswap<8>(m_dial->read(),4,5,6,7,3,2,1,0);
 		case 3: return m_dsw1->read();
 		case 4: return m_dsw2->read();
 	}

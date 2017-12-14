@@ -173,7 +173,7 @@ WRITE8_MEMBER( mkit09_state::pa_w )
 	data ^= 0xff;
 	if (m_keydata > 3)
 	{
-		output().set_digit_value(m_keydata, BITSWAP8(data, 7, 0, 5, 6, 4, 2, 1, 3));
+		output().set_digit_value(m_keydata, bitswap<8>(data, 7, 0, 5, 6, 4, 2, 1, 3));
 		m_keydata = 0;
 	}
 
@@ -191,7 +191,7 @@ WRITE8_MEMBER( mkit09_state::pb_w )
 
 static MACHINE_CONFIG_START( mkit09 )
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",M6809E, XTAL_4MHz)
+	MCFG_CPU_ADD("maincpu", MC6809, XTAL_4MHz)
 	MCFG_CPU_PROGRAM_MAP(mkit09_mem)
 	MCFG_CPU_IO_MAP(mkit09_io)
 
@@ -217,7 +217,7 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( mkit09a )
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",M6809E, XTAL_4MHz)
+	MCFG_CPU_ADD("maincpu", MC6809, XTAL_4MHz)
 	MCFG_CPU_PROGRAM_MAP(mkit09a_mem)
 	MCFG_CPU_IO_MAP(mkit09_io)
 

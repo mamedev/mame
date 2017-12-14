@@ -494,7 +494,7 @@ static MACHINE_CONFIG_START( exprraid )
 	MCFG_CPU_PROGRAM_MAP(master_map)
 	MCFG_CPU_IO_MAP(master_io_map)
 
-	MCFG_CPU_ADD("slave", M6809, XTAL_12MHz / 8)
+	MCFG_CPU_ADD("slave", MC6809, XTAL_12MHz / 2) // MC68B09P
 	MCFG_CPU_PROGRAM_MAP(slave_map)
 	/* IRQs are caused by the YM3526 */
 

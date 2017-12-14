@@ -41,7 +41,7 @@ void alesis_state::update_lcd_symbols(bitmap_ind16 &bitmap, uint8_t pos, uint8_t
 					else
 						m_lcd_digits[0] &= ~(1<<(y-1));
 
-					output().set_value("digit0", BITSWAP8(m_lcd_digits[0],7,3,1,4,6,5,2,0));
+					output().set_value("digit0", bitswap<8>(m_lcd_digits[0],7,3,1,4,6,5,2,0));
 				}
 				break;
 			case 2:
@@ -56,7 +56,7 @@ void alesis_state::update_lcd_symbols(bitmap_ind16 &bitmap, uint8_t pos, uint8_t
 					else
 						m_lcd_digits[1] &= ~(1<<(y-1));
 
-					output().set_value("digit1", BITSWAP8(m_lcd_digits[1],7,3,1,4,6,5,2,0));
+					output().set_value("digit1", bitswap<8>(m_lcd_digits[1],7,3,1,4,6,5,2,0));
 				}
 				break;
 			case 3:
@@ -84,7 +84,7 @@ void alesis_state::update_lcd_symbols(bitmap_ind16 &bitmap, uint8_t pos, uint8_t
 					else
 						m_lcd_digits[4] &= ~(1<<y);
 
-					output().set_value("digit4", BITSWAP8(m_lcd_digits[4],7,3,5,2,0,1,4,6));
+					output().set_value("digit4", bitswap<8>(m_lcd_digits[4],7,3,5,2,0,1,4,6));
 				}
 				break;
 		}
@@ -105,7 +105,7 @@ void alesis_state::update_lcd_symbols(bitmap_ind16 &bitmap, uint8_t pos, uint8_t
 					else
 						m_lcd_digits[3] &= ~(1<<y);
 
-					output().set_value("digit3", BITSWAP8(m_lcd_digits[3],7,3,5,2,0,1,4,6));
+					output().set_value("digit3", bitswap<8>(m_lcd_digits[3],7,3,5,2,0,1,4,6));
 				}
 				break;
 			case 1:
@@ -120,7 +120,7 @@ void alesis_state::update_lcd_symbols(bitmap_ind16 &bitmap, uint8_t pos, uint8_t
 					else
 						m_lcd_digits[2] &= ~(1<<y);
 
-					output().set_value("digit2", BITSWAP8(m_lcd_digits[2],7,3,5,2,0,1,4,6));
+					output().set_value("digit2", bitswap<8>(m_lcd_digits[2],7,3,5,2,0,1,4,6));
 				}
 				break;
 			case 2:

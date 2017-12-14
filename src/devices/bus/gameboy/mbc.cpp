@@ -1057,26 +1057,26 @@ WRITE8_MEMBER(gb_rom_sintax_device::write_bank)
 		switch (m_sintax_mode & 0x0f)
 		{
 			case 0x0d:
-				data = BITSWAP8(data, 1,0,7,6,5,4,3,2);
+				data = bitswap<8>(data, 1,0,7,6,5,4,3,2);
 				break;
 			case 0x09:
-				//data = BITSWAP8(data, 3,2,5,4,0,1,6,7); // Monkey..no
-				data = BITSWAP8(data, 4,5,2,3,0,1,6,7);
+				//data = bitswap<8>(data, 3,2,5,4,0,1,6,7); // Monkey..no
+				data = bitswap<8>(data, 4,5,2,3,0,1,6,7);
 				break;
 			case 0x00: // 0x10=lion 0x00 hmmmmm // 1 and 0 unconfirmed
-				data = BITSWAP8(data, 7,0,5,6,3,4,1,2);
+				data = bitswap<8>(data, 7,0,5,6,3,4,1,2);
 				break;
 			case 0x01:
-				data = BITSWAP8(data, 0,1,6,7,4,5,2,3);
+				data = bitswap<8>(data, 0,1,6,7,4,5,2,3);
 				break;
 			case 0x05:
-				data = BITSWAP8(data, 7,6,1,0,3,2,5,4); // Not 100% on this one
+				data = bitswap<8>(data, 7,6,1,0,3,2,5,4); // Not 100% on this one
 				break;
 			case 0x07:
-				data = BITSWAP8(data, 2,0,3,1,5,4,7,6); // 5 and 7 unconfirmed
+				data = bitswap<8>(data, 2,0,3,1,5,4,7,6); // 5 and 7 unconfirmed
 				break;
 			case 0x0b:
-				data = BITSWAP8(data, 2,3,0,1,6,7,4,5); // 5 and 6 unconfirmed
+				data = bitswap<8>(data, 2,3,0,1,6,7,4,5); // 5 and 6 unconfirmed
 				break;
 		}
 		m_latch_bank2 = (m_latch_bank2 & 0x100) | data;

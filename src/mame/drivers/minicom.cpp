@@ -212,7 +212,7 @@ WRITE8_MEMBER(minicom_state::minicom_io_w)
 
 				if (BIT(changed,4) || BIT(changed,5))
 				{
-					output().set_digit_value(m_digit_index, BITSWAP16(m_display_data,  9,  1,  3, 11, 12,  4,  2, 10, 14, 6,  7, 5,  0, 15,  13, 8) & 0x3FFF);
+					output().set_digit_value(m_digit_index, bitswap<16>(m_display_data,  9,  1,  3, 11, 12,  4,  2, 10, 14, 6,  7, 5,  0, 15,  13, 8) & 0x3FFF);
 				}
 				m_p[offset]=data;
 			}

@@ -1121,7 +1121,7 @@ WRITE8_MEMBER( inder_state::sw_w )
 
 WRITE8_MEMBER( inder_state::sn_w )
 {
-	m_sn->write(space, 0, BITSWAP8(data, 0, 1, 2, 3, 4, 5, 6, 7));
+	m_sn->write(space, 0, bitswap<8>(data, 0, 1, 2, 3, 4, 5, 6, 7));
 }
 
 WRITE8_MEMBER( inder_state::sndcmd_lapbylap_w )

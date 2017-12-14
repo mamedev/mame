@@ -2308,7 +2308,7 @@ ROM_START( afighterc )
 	ROM_LOAD( "epr-10284.12", 0x00000, 0x8000, CRC(8ff09116) SHA1(8b99b6d2499897cfbd037a7e7cf5bc53bce8a63a) )
 
 	ROM_REGION( 0x2000, "maincpu:key", 0 ) // decryption key
-	ROM_LOAD( "317-unknown.key", 0x0000, 0x2000, NO_DUMP )
+	ROM_LOAD( "317-unknown.key", 0x0000, 0x2000, CRC(fee04be8) SHA1(c58d78299ef4cede517be823a8a8a90e46c6ba0d) )
 ROM_END
 
 ROM_START( afighterd )
@@ -2339,7 +2339,7 @@ ROM_START( afighterd )
 	ROM_LOAD( "epr-10284.12", 0x00000, 0x8000, CRC(8ff09116) SHA1(8b99b6d2499897cfbd037a7e7cf5bc53bce8a63a) )
 
 	ROM_REGION( 0x2000, "maincpu:key", 0 ) // decryption key
-	ROM_LOAD( "317-unknown.key", 0x0000, 0x2000, NO_DUMP )
+	ROM_LOAD( "317-unknown.key", 0x0000, 0x2000, CRC(fee04be8) SHA1(c58d78299ef4cede517be823a8a8a90e46c6ba0d) )
 ROM_END
 
 //*************************************************************************************************************************
@@ -3933,8 +3933,8 @@ GAME( 1988, aceattaca,  aceattac, aceattaca_fd1094,         aceattaca,  segas16a
 GAME( 1986, afighter,    0,        system16a_fd1089a_no7751, afighter,          segas16a_state,           generic,     ROT270, "Sega", "Action Fighter (FD1089A 317-0018)", MACHINE_SUPPORTS_SAVE )
 GAME( 1986, afightera,   afighter, system16a_no7751,         afighter,          segas16a_state,           generic,     ROT270, "Sega", "Action Fighter (unprotected)", MACHINE_SUPPORTS_SAVE )
 GAME( 1986, afighterb,   afighter, system16a_no7751,         afighter_analog,   afighter_16a_analog_state,generic,     ROT270, "Sega", "Action Fighter (unprotected, analog controls)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, afighterc,   afighter, system16a_fd1089a_no7751, afighter,          segas16a_state,           generic,     ROT270, "Sega", "Action Fighter (FD1089A 317-unknown)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING ) // encrypted version of afightera
-GAME( 1986, afighterd,   afighter, system16a_fd1089a_no7751, afighter_analog,   afighter_16a_analog_state,generic,     ROT270, "Sega", "Action Fighter (FD1089A 317-unknown, analog controls)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING ) // encrypted version of afighterb
+GAME( 1986, afighterc,   afighter, system16a_fd1089b_no7751, afighter,          segas16a_state,           generic,     ROT270, "Sega", "Action Fighter (FD1089B 317-unknown)", MACHINE_SUPPORTS_SAVE ) // encrypted version of afightera (maybe 317-0017)
+GAME( 1986, afighterd,   afighter, system16a_fd1089b_no7751, afighter_analog,   afighter_16a_analog_state,generic,     ROT270, "Sega", "Action Fighter (FD1089B 317-unknown, analog controls)", MACHINE_SUPPORTS_SAVE ) // encrypted version of afighterb
 
 GAME( 1986, alexkidd,   0,        system16a,                alexkidd,   segas16a_state,generic,     ROT0,   "Sega", "Alex Kidd: The Lost Stars (set 2, unprotected)", MACHINE_SUPPORTS_SAVE )
 GAME( 1986, alexkidd1,  alexkidd, system16a_fd1089a,        alexkidd,   segas16a_state,generic,     ROT0,   "Sega", "Alex Kidd: The Lost Stars (set 1, FD1089A 317-0021)", MACHINE_SUPPORTS_SAVE )

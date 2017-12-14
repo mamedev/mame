@@ -101,7 +101,7 @@ READ16_MEMBER(m24_z8000_device::pmem_r)
 		return 0;
 	offset = (offset & 0x3fff) | (hostseg << 14);
 	if((hostseg >= 40) && (hostseg <= 47))
-		offset = (offset & 0xf0000) | BITSWAP16(offset,15,7,6,14,13,12,11,10,9,8,5,4,3,2,1,0); // move A6/A7 so CGA framebuffer appears linear
+		offset = (offset & 0xf0000) | bitswap<16>(offset,15,7,6,14,13,12,11,10,9,8,5,4,3,2,1,0); // move A6/A7 so CGA framebuffer appears linear
 	ret = m_maincpu->space(AS_PROGRAM).read_word(offset, (mem_mask << 8) | (mem_mask >> 8));
 	return (ret << 8) | (ret >> 8);
 }
@@ -116,7 +116,7 @@ WRITE16_MEMBER(m24_z8000_device::pmem_w)
 		return;
 	offset = (offset & 0x3fff) | (hostseg << 14);
 	if((hostseg >= 40) && (hostseg <= 47))
-		offset = (offset & 0xf0000) | BITSWAP16(offset,15,7,6,14,13,12,11,10,9,8,5,4,3,2,1,0);
+		offset = (offset & 0xf0000) | bitswap<16>(offset,15,7,6,14,13,12,11,10,9,8,5,4,3,2,1,0);
 	m_maincpu->space(AS_PROGRAM).write_word(offset, data, (mem_mask << 8) | (mem_mask >> 8));
 }
 
@@ -136,7 +136,7 @@ READ16_MEMBER(m24_z8000_device::dmem_r)
 		return 0;
 	offset = (offset & 0x3fff) | (hostseg << 14);
 	if((hostseg >= 40) && (hostseg <= 47))
-		offset = (offset & 0xf0000) | BITSWAP16(offset,15,7,6,14,13,12,11,10,9,8,5,4,3,2,1,0);
+		offset = (offset & 0xf0000) | bitswap<16>(offset,15,7,6,14,13,12,11,10,9,8,5,4,3,2,1,0);
 	ret = m_maincpu->space(AS_PROGRAM).read_word(offset, (mem_mask << 8) | (mem_mask >> 8));
 	return (ret << 8) | (ret >> 8);
 }
@@ -151,7 +151,7 @@ WRITE16_MEMBER(m24_z8000_device::dmem_w)
 		return;
 	offset = (offset & 0x3fff) | (hostseg << 14);
 	if((hostseg >= 40) && (hostseg <= 47))
-		offset = (offset & 0xf0000) | BITSWAP16(offset,15,7,6,14,13,12,11,10,9,8,5,4,3,2,1,0);
+		offset = (offset & 0xf0000) | bitswap<16>(offset,15,7,6,14,13,12,11,10,9,8,5,4,3,2,1,0);
 	m_maincpu->space(AS_PROGRAM).write_word(offset, data, (mem_mask << 8) | (mem_mask >> 8));
 }
 

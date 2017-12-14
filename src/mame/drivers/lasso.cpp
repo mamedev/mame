@@ -64,7 +64,7 @@ READ8_MEMBER(lasso_state::sound_status_r)
 
 WRITE8_MEMBER(lasso_state::sound_select_w)
 {
-	uint8_t to_write = BITSWAP8(*m_chip_data, 0, 1, 2, 3, 4, 5, 6, 7);
+	uint8_t to_write = bitswap<8>(*m_chip_data, 0, 1, 2, 3, 4, 5, 6, 7);
 
 	if (~data & 0x01)   /* chip #0 */
 		m_sn_1->write(space, 0, to_write);

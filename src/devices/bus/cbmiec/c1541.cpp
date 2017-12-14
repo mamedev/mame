@@ -1071,7 +1071,7 @@ void fsd2_device::device_start()
 
 	for (offs_t offset = 0; offset < 0x4000; offset++)
 	{
-		uint8_t data = BITSWAP8(rom[offset], 7, 6, 5, 3, 4, 2, 1, 0);
+		uint8_t data = bitswap<8>(rom[offset], 7, 6, 5, 3, 4, 2, 1, 0);
 
 		rom[offset] = data;
 	}

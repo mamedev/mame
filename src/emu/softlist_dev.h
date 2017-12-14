@@ -80,7 +80,7 @@ enum software_compatibility
 class software_list_loader
 {
 public:
-	virtual bool load_software(device_image_interface &device, software_list_device &swlist, const char *swname, const rom_entry *start_entry) const = 0;
+	virtual bool load_software(device_image_interface &image, software_list_device &swlist, const char *swname, const rom_entry *start_entry) const = 0;
 };
 
 
@@ -89,7 +89,7 @@ public:
 class false_software_list_loader : public software_list_loader
 {
 public:
-	virtual bool load_software(device_image_interface &device, software_list_device &swlist, const char *swname, const rom_entry *start_entry) const override;
+	virtual bool load_software(device_image_interface &image, software_list_device &swlist, const char *swname, const rom_entry *start_entry) const override;
 	static const software_list_loader &instance() { return s_instance; }
 
 private:
@@ -102,7 +102,7 @@ private:
 class rom_software_list_loader : public software_list_loader
 {
 public:
-	virtual bool load_software(device_image_interface &device, software_list_device &swlist, const char *swname, const rom_entry *start_entry) const override;
+	virtual bool load_software(device_image_interface &image, software_list_device &swlist, const char *swname, const rom_entry *start_entry) const override;
 	static const software_list_loader &instance() { return s_instance; }
 
 private:
@@ -115,7 +115,7 @@ private:
 class image_software_list_loader : public software_list_loader
 {
 public:
-	virtual bool load_software(device_image_interface &device, software_list_device &swlist, const char *swname, const rom_entry *start_entry) const override;
+	virtual bool load_software(device_image_interface &image, software_list_device &swlist, const char *swname, const rom_entry *start_entry) const override;
 	static const software_list_loader &instance() { return s_instance; }
 
 private:

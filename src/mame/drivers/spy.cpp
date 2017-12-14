@@ -495,11 +495,11 @@ void spy_state::machine_reset()
 static MACHINE_CONFIG_START( spy )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6809, 3000000) /* ? */
+	MCFG_CPU_ADD("maincpu", MC6809E, XTAL_24MHz / 8) // 3 MHz? (divided by 051961)
 	MCFG_CPU_PROGRAM_MAP(spy_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", spy_state,  spy_interrupt)
 
-	MCFG_CPU_ADD("audiocpu", Z80, 3579545)
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL_3_579545MHz)
 	MCFG_CPU_PROGRAM_MAP(spy_sound_map) /* nmi by the sound chip */
 
 	MCFG_WATCHDOG_ADD("watchdog")

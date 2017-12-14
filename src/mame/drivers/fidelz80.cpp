@@ -798,7 +798,7 @@ MACHINE_START_MEMBER(fidelz80_state,vcc)
 WRITE8_MEMBER(fidelz80_state::vcc_ppi_porta_w)
 {
 	// d0-d6: digit segment data, bits are xABCDEFG
-	m_7seg_data = BITSWAP8(data,7,0,1,2,3,4,5,6);
+	m_7seg_data = bitswap<8>(data,7,0,1,2,3,4,5,6);
 	vcc_prepare_display();
 
 	// d0-d5: TSI C0-C5
@@ -860,7 +860,7 @@ WRITE8_MEMBER(fidelz80_state::cc10_ppi_porta_w)
 	}
 
 	// d0-d6: digit segment data (same as VCC)
-	m_7seg_data = BITSWAP8(data,7,0,1,2,3,4,5,6);
+	m_7seg_data = bitswap<8>(data,7,0,1,2,3,4,5,6);
 	vcc_prepare_display();
 }
 
@@ -943,7 +943,7 @@ WRITE8_MEMBER(fidelz80_state::vsc_ppi_porta_w)
 	m_speech->data_w(space, 0, data & 0x3f);
 
 	// d0-d7: data for the 4 7seg leds, bits are HGCBAFED (H is extra led)
-	m_7seg_data = BITSWAP8(data,7,6,2,1,0,5,4,3);
+	m_7seg_data = bitswap<8>(data,7,6,2,1,0,5,4,3);
 	vsc_prepare_display();
 }
 
@@ -1010,7 +1010,7 @@ WRITE8_MEMBER(fidelz80_state::vsc_pio_portb_w)
 void fidelz80_state::vbrc_prepare_display()
 {
 	// 14seg led segments, d15 is extra led, d14 is unused (tone on prototype?)
-	u16 outdata = BITSWAP16(m_7seg_data,12,13,1,6,5,2,0,7,15,11,10,14,4,3,9,8);
+	u16 outdata = bitswap<16>(m_7seg_data,12,13,1,6,5,2,0,7,15,11,10,14,4,3,9,8);
 	set_display_segmask(0xff, 0x3fff);
 	display_matrix(16, 8, outdata, m_led_select);
 }

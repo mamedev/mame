@@ -437,19 +437,19 @@ DRIVER_INIT_MEMBER(wink_state,wink)
 	memcpy(&buffer[0],ROM,0x8000);
 
 	for (i = 0x0000; i <= 0x1fff; i++)
-		ROM[i] = buffer[BITSWAP16(i,15,14,13, 11,12, 7, 9, 8,10, 6, 4, 5, 1, 2, 3, 0)];
+		ROM[i] = buffer[bitswap<16>(i,15,14,13, 11,12, 7, 9, 8,10, 6, 4, 5, 1, 2, 3, 0)];
 
 	for (i = 0x2000; i <= 0x3fff; i++)
-		ROM[i] = buffer[BITSWAP16(i,15,14,13, 10, 7,12, 9, 8,11, 6, 3, 1, 5, 2, 4, 0)];
+		ROM[i] = buffer[bitswap<16>(i,15,14,13, 10, 7,12, 9, 8,11, 6, 3, 1, 5, 2, 4, 0)];
 
 	for (i = 0x4000; i <= 0x5fff; i++)
-		ROM[i] = buffer[BITSWAP16(i,15,14,13,  7,10,11, 9, 8,12, 6, 1, 3, 4, 2, 5, 0)];
+		ROM[i] = buffer[bitswap<16>(i,15,14,13,  7,10,11, 9, 8,12, 6, 1, 3, 4, 2, 5, 0)];
 
 	for (i = 0x6000; i <= 0x7fff; i++)
-		ROM[i] = buffer[BITSWAP16(i,15,14,13, 11,12, 7, 9, 8,10, 6, 4, 5, 1, 2, 3, 0)];
+		ROM[i] = buffer[bitswap<16>(i,15,14,13, 11,12, 7, 9, 8,10, 6, 4, 5, 1, 2, 3, 0)];
 
 	for (i = 0; i < 0x8000; i++)
-		ROM[i] += BITSWAP8(i & 0xff, 7,5,3,1,6,4,2,0);
+		ROM[i] += bitswap<8>(i & 0xff, 7,5,3,1,6,4,2,0);
 }
 
 GAME( 1985, wink,  0,    wink, wink, wink_state, wink, ROT0, "Midcoin", "Wink (set 1)", MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE )

@@ -100,7 +100,7 @@ int saturn_state::get_track_index(uint32_t fad)
 
 int saturn_state::sega_cdrom_get_adr_control(cdrom_file *file, int track)
 {
-	return BITSWAP8(cdrom_get_adr_control(file, cur_track),3,2,1,0,7,6,5,4);
+	return bitswap<8>(cdrom_get_adr_control(file, cur_track),3,2,1,0,7,6,5,4);
 }
 
 void saturn_state::cr_standard_return(uint16_t cur_status)

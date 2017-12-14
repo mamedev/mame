@@ -626,6 +626,9 @@ public:
 	virtual uint32_t arm7_cpu_read16(uint32_t addr) override;
 	virtual uint8_t arm7_cpu_read8(uint32_t addr) override;
 
+protected:
+	arm946es_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
 private:
 	uint32_t cp15_control, cp15_itcm_base, cp15_dtcm_base, cp15_itcm_size, cp15_dtcm_size;
 	uint32_t cp15_itcm_end, cp15_dtcm_end, cp15_itcm_reg, cp15_dtcm_reg;
@@ -635,6 +638,12 @@ private:
 	void RefreshDTCM();
 };
 
+class igs036_cpu_device : public arm946es_cpu_device
+{
+public:
+	// construction/destruction
+	igs036_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+};
 
 class pxa255_cpu_device : public arm7_cpu_device
 {
@@ -650,15 +659,6 @@ public:
 	// construction/destruction
 	sa1110_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
-
-class igs036_cpu_device : public arm9_cpu_device
-{
-public:
-	// construction/destruction
-	igs036_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	virtual DECLARE_WRITE32_MEMBER( arm7_rt_w_callback ) override;
-};
-
 
 DECLARE_DEVICE_TYPE(ARM7,     arm7_cpu_device)
 DECLARE_DEVICE_TYPE(ARM7_BE,  arm7_be_cpu_device)

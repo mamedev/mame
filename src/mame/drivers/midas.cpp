@@ -72,6 +72,8 @@ public:
 		m_palette(*this, "palette"),
 		m_sprgen(*this, "spritegen"),
 		m_screen(*this, "screen"),
+		m_prize(*this, "prize%u", 1),
+		m_ticket(*this, "ticket"),
 		m_zoomram(*this, "zoomtable")
 	{ }
 
@@ -96,6 +98,8 @@ public:
 	required_device<palette_device> m_palette;
 	required_device<neosprite_midas_device> m_sprgen;
 	required_device<screen_device> m_screen;
+	optional_device_array<ticket_dispenser_device, 2> m_prize;
+	optional_device<ticket_dispenser_device> m_ticket;
 	required_shared_ptr<uint16_t> m_zoomram;
 
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank_midas);
@@ -237,8 +241,8 @@ WRITE16_MEMBER(midas_state::hammer_coin_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		machine().bookkeeping().coin_counter_w(0, data & 0x0001);
-		machine().bookkeeping().coin_counter_w(1, data & 0x0002);
+		machine().bookkeeping().coin_counter_w(0, BIT(data, 0));
+		machine().bookkeeping().coin_counter_w(1, BIT(data, 1));
 	}
 #ifdef MAME_DEBUG
 //  popmessage("coin %04X", data);
@@ -249,9 +253,9 @@ WRITE16_MEMBER(midas_state::hammer_motor_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		machine().device<ticket_dispenser_device>("prize1")->write(space, 0, (data & 0x0001) << 7);
-		machine().device<ticket_dispenser_device>("prize2")->write(space, 0, (data & 0x0002) << 6);
-		machine().device<ticket_dispenser_device>("ticket")->write(space, 0, (data & 0x0010) << 3);
+		m_prize[0]->motor_w(BIT(data, 0));
+		m_prize[1]->motor_w(BIT(data, 1));
+		m_ticket->motor_w(BIT(data, 4));
 		// data & 0x0080 ?
 	}
 #ifdef MAME_DEBUG

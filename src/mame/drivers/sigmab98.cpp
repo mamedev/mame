@@ -139,7 +139,10 @@ public:
 		m_eeprom(*this, "eeprom"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
-		m_palette(*this, "palette")
+		m_palette(*this, "palette"),
+		m_hopper(*this, "hopper"),
+		m_hopper_small(*this, "hopper_small"),
+		m_hopper_large(*this, "hopper_large")
 	{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -154,6 +157,9 @@ public:
 	std::vector<uint8_t> m_paletteram;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
+	optional_device<ticket_dispenser_device> m_hopper;
+	optional_device<ticket_dispenser_device> m_hopper_small;
+	optional_device<ticket_dispenser_device> m_hopper_large;
 
 	std::unique_ptr<bitmap_ind16> m_sprite_bitmap;
 
@@ -901,7 +907,7 @@ WRITE8_MEMBER(sigmab98_state::c6_w)
 // 02 hopper motor on (active low)?
 WRITE8_MEMBER(sigmab98_state::c8_w)
 {
-	machine().device<ticket_dispenser_device>("hopper")->write(space, 0, (!(data & 0x02) && (data & 0x01)) ? 0x00 : 0x80);
+	m_hopper->motor_w((!(data & 0x02) && (data & 0x01)) ? 0 : 1);
 
 	m_c8 = data;
 	show_outputs();
@@ -1216,7 +1222,7 @@ WRITE8_MEMBER(sigmab98_state::sammymdl_leds_w)
 // 01 hopper motor on (active low)?
 WRITE8_MEMBER(sigmab98_state::sammymdl_hopper_w)
 {
-	machine().device<ticket_dispenser_device>("hopper")->write(space, 0, (!(data & 0x01) && (data & 0x02)) ? 0x00 : 0x80);
+	m_hopper->motor_w((!(data & 0x01) && (data & 0x02)) ? 0 : 1);
 
 	m_out[2] = data;
 	show_3_outputs();
@@ -1226,7 +1232,7 @@ READ8_MEMBER(sigmab98_state::sammymdl_coin_hopper_r)
 {
 	uint8_t ret = ioport("COIN")->read();
 
-//  if ( !machine().device<ticket_dispenser_device>("hopper")->read(0) )
+//  if ( !m_hopper->read(0) )
 //      ret &= ~0x01;
 
 	return ret;
@@ -1541,8 +1547,8 @@ WRITE8_MEMBER(sigmab98_state::gocowboy_leds_w)
 
 	// 10 hopper enable?
 	// 20 hopper motor on (active low)?
-	machine().device<ticket_dispenser_device>("hopper_small")->write(space, 0, (!(data & 0x20) && (data & 0x10)) ? 0x00 : 0x80);
-	machine().device<ticket_dispenser_device>("hopper_large")->write(space, 0, (!(data & 0x80) && (data & 0x40)) ? 0x00 : 0x80);
+	m_hopper_small->motor_w((!(data & 0x20) && (data & 0x10)) ? 0 : 1);
+	m_hopper_large->motor_w((!(data & 0x80) && (data & 0x40)) ? 0 : 1);
 
 	m_out[1] = data;
 	show_3_outputs();

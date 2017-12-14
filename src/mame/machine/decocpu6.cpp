@@ -31,7 +31,7 @@ void deco_cpu6_device::device_reset()
 uint8_t deco_cpu6_device::mi_decrypt::read_sync(uint16_t adr)
 {
 	if (adr&1)
-		return BITSWAP8(direct->read_byte(adr),6,4,7,5,3,2,1,0);
+		return bitswap<8>(direct->read_byte(adr),6,4,7,5,3,2,1,0);
 	else
 		return direct->read_byte(adr);
 }
@@ -48,5 +48,5 @@ u32 deco_cpu6_device::disassembler::interface_flags() const
 
 u8 deco_cpu6_device::disassembler::decrypt8(u8 value, offs_t pc, bool opcode) const
 {
-	return opcode && (pc & 1) ? BITSWAP8(value,6,4,7,5,3,2,1,0) : value;
+	return opcode && (pc & 1) ? bitswap<8>(value,6,4,7,5,3,2,1,0) : value;
 }

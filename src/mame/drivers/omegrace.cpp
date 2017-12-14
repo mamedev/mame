@@ -620,7 +620,7 @@ DRIVER_INIT_MEMBER(omegrace_state,omegrace)
 	 * in a consistent way to the decoder, we swap the bits
 	 * here. */
 	for (i=0; i<len; i++)
-		prom[i] = BITSWAP8(prom[i],7,6,5,4,1,0,3,2);
+		prom[i] = bitswap<8>(prom[i],7,6,5,4,1,0,3,2);
 }
 
 

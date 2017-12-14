@@ -5,6 +5,8 @@
     Mermaid
 
 *************************************************************************/
+
+#include "machine/ripple_counter.h"
 #include "sound/msm5205.h"
 #include "sound/ay8910.h"
 #include "screen.h"
@@ -22,6 +24,7 @@ public:
 		m_colorram(*this, "colorram"),
 		m_maincpu(*this, "maincpu"),
 		m_adpcm(*this, "adpcm"),
+		m_adpcm_counter(*this, "adpcm_counter"),
 		m_ay8910(*this, "ay%u", 1),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
@@ -51,18 +54,16 @@ public:
 	int m_rougien_gfxbank2;
 
 	/* sound-related */
-	uint32_t   m_adpcm_pos;
-	uint32_t   m_adpcm_end;
 	uint8_t    m_adpcm_idle;
 	int      m_adpcm_data;
 	uint8_t    m_adpcm_trigger;
 	uint8_t    m_adpcm_rom_sel;
-	uint8_t    m_adpcm_play_reg;
 	bool       m_ay8910_enable[2];
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
 	optional_device<msm5205_device> m_adpcm;
+	optional_device<ripple_counter_device> m_adpcm_counter;
 	required_device_array<ay8910_device, 2> m_ay8910;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
@@ -77,6 +78,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(rougien_sample_rom_lo_w);
 	DECLARE_WRITE_LINE_MEMBER(rougien_sample_rom_hi_w);
 	DECLARE_WRITE_LINE_MEMBER(rougien_sample_playback_w);
+	DECLARE_WRITE8_MEMBER(adpcm_data_w);
 	DECLARE_WRITE8_MEMBER(mermaid_videoram2_w);
 	DECLARE_WRITE8_MEMBER(mermaid_videoram_w);
 	DECLARE_WRITE8_MEMBER(mermaid_colorram_w);

@@ -262,7 +262,7 @@ PALETTE_INIT_MEMBER(ettrivia_state, ettrivia)
 		bit1 = (color_prom[i+0x100] >> 1) & 0x01;
 		b = combine_2_weights(weights, bit0, bit1);
 
-		palette.set_pen_color(BITSWAP8(i,5,7,6,2,1,0,4,3), rgb_t(r, g, b));
+		palette.set_pen_color(bitswap<8>(i,5,7,6,2,1,0,4,3), rgb_t(r, g, b));
 	}
 }
 

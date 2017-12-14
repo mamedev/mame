@@ -76,7 +76,7 @@ DRIVER_INIT_MEMBER(suna8_state,hardhead)
 		int table = ((i & 0x0c00) >> 10) | ((i & 0x4000) >> 12);
 
 		if (swaptable[table])
-			rom[i] = BITSWAP8(rom[i], 7,6,5,3,4,2,1,0) ^ 0x58;
+			rom[i] = bitswap<8>(rom[i], 7,6,5,3,4,2,1,0) ^ 0x58;
 	}
 
 	m_bank0d->set_base(memregion("maincpu")->base());
@@ -118,15 +118,15 @@ uint8_t *suna8_state::brickzn_decrypt()
 
 		if (data_swap)
 		{
-			x = BITSWAP8(x, 7,6,5,4,3,2,0,1);
-			RAM[i] = BITSWAP8(x, 7,2,3,4,5,6,1,0) ^ 0x10;
+			x = bitswap<8>(x, 7,6,5,4,3,2,0,1);
+			RAM[i] = bitswap<8>(x, 7,2,3,4,5,6,1,0) ^ 0x10;
 		}
 
 		if (opcode_swap)
 			x ^= 0x80;
 
 		if (opcode_swap || data_swap)
-			x = BITSWAP8(x, 7,2,3,4,5,6,1,0) ^ 0x10;
+			x = bitswap<8>(x, 7,2,3,4,5,6,1,0) ^ 0x10;
 
 		decrypt[i] = x;
 
@@ -255,7 +255,7 @@ rom13:  0?, 1y, 2n, 3n      ?,?,?,? (palettes)
 		int addr = i;
 
 		if (swaptable[(i & 0xff000) >> 12])
-			addr = (addr & 0xf0000) | BITSWAP16(addr, 15,14,13,12,11,10,9,8,6,7,5,4,3,2,1,0);
+			addr = (addr & 0xf0000) | bitswap<16>(addr, 15,14,13,12,11,10,9,8,6,7,5,4,3,2,1,0);
 
 		RAM[i] = decrypt[addr];
 	}
@@ -277,9 +277,9 @@ rom13:  0?, 1y, 2n, 3n      ?,?,?,? (palettes)
 
 		x = RAM[i];
 
-		x = BITSWAP8(x, 7,6,5,3,4,2,1,0) ^ 0x41 ^ xortable[table];
+		x = bitswap<8>(x, 7,6,5,3,4,2,1,0) ^ 0x41 ^ xortable[table];
 		if (swaptable[table])
-			x = BITSWAP8(x, 5,6,7,4,3,2,1,0);
+			x = bitswap<8>(x, 5,6,7,4,3,2,1,0);
 
 		decrypt[i] = x;
 	}
@@ -290,7 +290,7 @@ rom13:  0?, 1y, 2n, 3n      ?,?,?,? (palettes)
 		static const uint8_t swaptable[8] = { 1,1,0,1,0,1,1,0 };
 
 		if (swaptable[(i & 0x7000) >> 12])
-			RAM[i] = BITSWAP8(RAM[i], 5,6,7,4,3,2,1,0) ^ 0x41;
+			RAM[i] = bitswap<8>(RAM[i], 5,6,7,4,3,2,1,0) ^ 0x41;
 	}
 
 	m_bank1->configure_entries(0, 16, memregion("maincpu")->base() + 0x10000, 0x4000);
@@ -335,7 +335,7 @@ DRIVER_INIT_MEMBER(suna8_state,starfigh)
 		int addr = i;
 
 		if (swaptable[(i & 0xff000) >> 12])
-			addr = BITSWAP24(addr, 23,22,21,20,19,18,17,16,15,14,13,12,11,10,9,8,6,7,5,4,3,2,1,0);
+			addr = bitswap<24>(addr, 23,22,21,20,19,18,17,16,15,14,13,12,11,10,9,8,6,7,5,4,3,2,1,0);
 
 		RAM[i] = decrypt[addr];
 	}
@@ -357,9 +357,9 @@ DRIVER_INIT_MEMBER(suna8_state,starfigh)
 
 		x = RAM[i];
 
-		x = BITSWAP8(x, 5,6,7,3,4,2,1,0) ^ 0x45 ^ xortable[table];
+		x = bitswap<8>(x, 5,6,7,3,4,2,1,0) ^ 0x45 ^ xortable[table];
 		if (swaptable[table])
-			x = BITSWAP8(x, 5,6,7,4,3,2,1,0) ^ 0x04;
+			x = bitswap<8>(x, 5,6,7,4,3,2,1,0) ^ 0x04;
 
 		decrypt[i] = x;
 	}
@@ -370,7 +370,7 @@ DRIVER_INIT_MEMBER(suna8_state,starfigh)
 		static const uint8_t swaptable[8] = { 1,1,0,1,0,1,1,0 };
 
 		if (swaptable[(i & 0x7000) >> 12])
-			RAM[i] = BITSWAP8(RAM[i], 5,6,7,4,3,2,1,0) ^ 0x45;
+			RAM[i] = bitswap<8>(RAM[i], 5,6,7,4,3,2,1,0) ^ 0x45;
 	}
 
 
@@ -420,7 +420,7 @@ DRIVER_INIT_MEMBER(suna8_state,sparkman)
 		int addr = i;
 
 		if (swaptable[(i & 0xff000) >> 12])
-			addr = BITSWAP24(addr, 23,22,21,20,19,18,17,16,15,14,13,12,11,10,9,7,8,6,5,4,3,2,1,0);
+			addr = bitswap<24>(addr, 23,22,21,20,19,18,17,16,15,14,13,12,11,10,9,7,8,6,5,4,3,2,1,0);
 
 		RAM[i] = decrypt[addr];
 	}
@@ -442,9 +442,9 @@ DRIVER_INIT_MEMBER(suna8_state,sparkman)
 
 		x = RAM[i];
 
-		x = BITSWAP8(x, 5,6,7,3,4,2,1,0) ^ 0x44 ^ xortable[table];
+		x = bitswap<8>(x, 5,6,7,3,4,2,1,0) ^ 0x44 ^ xortable[table];
 		if (swaptable[table])
-			x = BITSWAP8(x, 5,6,7,4,3,2,1,0) ^ 0x04;
+			x = bitswap<8>(x, 5,6,7,4,3,2,1,0) ^ 0x04;
 
 		decrypt[i] = x;
 	}
@@ -455,7 +455,7 @@ DRIVER_INIT_MEMBER(suna8_state,sparkman)
 		static const uint8_t swaptable[8] = { 1,1,1,0,1,1,0,1 };
 
 		if (swaptable[(i & 0x7000) >> 12])
-			RAM[i] = BITSWAP8(RAM[i], 5,6,7,4,3,2,1,0) ^ 0x44;
+			RAM[i] = bitswap<8>(RAM[i], 5,6,7,4,3,2,1,0) ^ 0x44;
 	}
 
 	// !!!!!! PATCHES !!!!!!
@@ -785,7 +785,7 @@ WRITE8_MEMBER(suna8_state::brickzn_multi_w)
 		    56  coin in         OK?
 		    70  monster hit     NO?     58?
 		*/
-		uint8_t remap = (m_remap_sound ? BITSWAP8(data, 7,6,3,4,5,2,1,0) : data);
+		uint8_t remap = (m_remap_sound ? bitswap<8>(data, 7,6,3,4,5,2,1,0) : data);
 
 		m_soundlatch->write(space, 0, remap);
 

@@ -1921,7 +1921,7 @@ void halleys_state::machine_reset()
 
 
 static MACHINE_CONFIG_START( halleys )
-	MCFG_CPU_ADD("maincpu", M6809, XTAL_19_968MHz/12) /* verified on pcb */
+	MCFG_CPU_ADD("maincpu", MC6809E, XTAL_19_968MHz/12) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(halleys_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", halleys_state, halleys_scanline, "screen", 0, 1)
 
@@ -2154,8 +2154,8 @@ void halleys_state::init_common()
 
 	for (i=0; i<0x10000; i++)
 	{
-		addr = BITSWAP16(i,15,14,13,12,11,10,1,0,4,5,6,3,7,8,9,2);
-		buf[i] = BITSWAP8(rom[addr],0,7,6,5,1,4,2,3);
+		addr = bitswap<16>(i,15,14,13,12,11,10,1,0,4,5,6,3,7,8,9,2);
+		buf[i] = bitswap<8>(rom[addr],0,7,6,5,1,4,2,3);
 	}
 
 	memcpy(rom, buf, 0x10000);

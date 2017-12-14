@@ -1400,6 +1400,8 @@ if (BUSES["SS50"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/bus/ss50/interface.cpp",
 		MAME_DIR .. "src/devices/bus/ss50/interface.h",
+		MAME_DIR .. "src/devices/bus/ss50/mpc.cpp",
+		MAME_DIR .. "src/devices/bus/ss50/mpc.h",
 		MAME_DIR .. "src/devices/bus/ss50/mps.cpp",
 		MAME_DIR .. "src/devices/bus/ss50/mps.h",
 	}
@@ -1785,6 +1787,8 @@ if (BUSES["A2BUS"]~=null) then
 		MAME_DIR .. "src/devices/bus/a2bus/agat7langcard.h",
 		MAME_DIR .. "src/devices/bus/a2bus/agat7ram.cpp",
 		MAME_DIR .. "src/devices/bus/a2bus/agat7ram.h",
+		MAME_DIR .. "src/devices/bus/a2bus/agat840k_hle.cpp",
+		MAME_DIR .. "src/devices/bus/a2bus/agat840k_hle.h",
 		MAME_DIR .. "src/devices/bus/a2bus/ssprite.cpp",
 		MAME_DIR .. "src/devices/bus/a2bus/ssprite.h",
 		MAME_DIR .. "src/devices/bus/a2bus/ssbapple.cpp",

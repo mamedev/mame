@@ -40,7 +40,7 @@ custom CRTC on startup!! (writes to 000414)
 
 static uint32_t decrypt_tile(uint32_t val, int tileno, uint32_t key1, uint32_t key2, uint32_t key3)
 {
-	val = BITSWAP24(val, 18,19,9,5, 10,17,16,20, 21,22,6,11, 15,14,4,23, 0,1,7,8, 13,12,3,2);
+	val = bitswap<24>(val, 18,19,9,5, 10,17,16,20, 21,22,6,11, 15,14,4,23, 0,1,7,8, 13,12,3,2);
 
 	return partial_carry_sum24( val, tileno + key1, key2 ) ^ key3;
 }

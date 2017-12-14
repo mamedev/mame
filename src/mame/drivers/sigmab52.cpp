@@ -23,7 +23,7 @@
 
   CPU:
 
-  - 2x MC68B09CP         ; 6809 CPU @ 2 MHz, from Motorola.
+  - 2x MC68B09P          ; 6809 CPU @ 2 MHz, from Motorola.
   - 1x HD63484P8 @ 8MHz  ; Advanced CRT controller (ACRTC), from Hitachi Semiconductor.
 
   RAM devices:
@@ -110,6 +110,7 @@
 
   TODO:
 
+  - Verify clocks.
   - Improve memory map.
   - Layout.
   - Bill validator.
@@ -131,10 +132,6 @@
 
 #include "sigmab52.lh"
 
-
-#define MAIN_CLOCK  XTAL_18MHz
-#define SEC_CLOCK   XTAL_8MHz
-#define AUX_CLOCK   XTAL_3_579545MHz
 
 class sigmab52_state : public driver_device
 {
@@ -578,16 +575,16 @@ void sigmab52_state::machine_reset()
 static MACHINE_CONFIG_START( jwildb52 )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6809, MAIN_CLOCK/9)    /* 2 MHz */
+	MCFG_CPU_ADD("maincpu", MC6809, XTAL_8MHz)
 	MCFG_CPU_PROGRAM_MAP(jwildb52_map)
 
-	MCFG_CPU_ADD("audiocpu", M6809, MAIN_CLOCK/9)   /* 2 MHz */
+	MCFG_CPU_ADD("audiocpu", MC6809, XTAL_8MHz)
 	MCFG_CPU_PROGRAM_MAP(sound_prog_map)
 
-	MCFG_DEVICE_ADD("6840ptm_1", PTM6840, MAIN_CLOCK/9) // FIXME
+	MCFG_DEVICE_ADD("6840ptm_1", PTM6840, XTAL_8MHz/4) // FIXME
 	MCFG_PTM6840_IRQ_CB(INPUTLINE("maincpu", M6809_IRQ_LINE))
 
-	MCFG_DEVICE_ADD("6840ptm_2", PTM6840, MAIN_CLOCK/18) // FIXME
+	MCFG_DEVICE_ADD("6840ptm_2", PTM6840, XTAL_8MHz/8) // FIXME
 	MCFG_PTM6840_IRQ_CB(WRITELINE(sigmab52_state, ptm2_irq))
 
 	MCFG_NVRAM_ADD_NO_FILL("nvram")
@@ -600,7 +597,7 @@ static MACHINE_CONFIG_START( jwildb52 )
 	MCFG_SCREEN_UPDATE_DEVICE("hd63484", hd63484_device, update_screen)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_HD63484_ADD("hd63484", SEC_CLOCK, jwildb52_hd63484_map)
+	MCFG_HD63484_ADD("hd63484", XTAL_8MHz, jwildb52_hd63484_map)
 
 	MCFG_PALETTE_ADD("palette", 16)
 
@@ -609,7 +606,7 @@ static MACHINE_CONFIG_START( jwildb52 )
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("ymsnd", YM3812, AUX_CLOCK)
+	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL_3_579545MHz)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 MACHINE_CONFIG_END
