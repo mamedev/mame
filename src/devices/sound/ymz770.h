@@ -55,6 +55,7 @@ protected:
 	virtual uint32_t get_phrase_offs(int phrase) { return m_rom[(4 * phrase) + 1] << 16 | m_rom[(4 * phrase) + 2] << 8 | m_rom[(4 * phrase) + 3]; };
 	virtual uint32_t get_seq_offs(int sqn) { return m_rom[(4 * sqn) + 1 + 0x400] << 16 | m_rom[(4 * sqn) + 2 + 0x400] << 8 | m_rom[(4 * sqn) + 3 + 0x400]; };
 	virtual void sequencer();
+	uint8_t get_rom_byte(uint32_t offset) { return m_rom[offset % m_rom.bytes()]; }; // need optimise or its good as is ?
 
 	ymz770_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint32_t sclock);
 
@@ -100,7 +101,7 @@ protected:
 		uint16_t timer;
 		uint16_t stopchan;
 		uint8_t loop;
-		uint8_t *data;
+		uint32_t offset;
 		uint8_t bank;
 		bool is_playing;
 	};
@@ -108,7 +109,7 @@ protected:
 	{
 		uint8_t sqc;
 		uint8_t loop;
-		uint8_t *data;
+		uint32_t offset;
 		bool is_playing;
 		bool is_waiting;
 	};
