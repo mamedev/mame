@@ -38,12 +38,12 @@ public:
 	DECLARE_WRITE32_MEMBER(aic_smr_w) { COMBINE_DATA(&m_aic_smr[offset]); };
 	DECLARE_WRITE32_MEMBER(aic_svr_w) { COMBINE_DATA(&m_aic_svr[offset]); };
 
-	DECLARE_WRITE32_MEMBER(aic_iecr_w) { /*logerror("%s: aic_iecr_w  %08x (Interrupt Enable Command Register)\n", machine().describe_context().c_str(), data);*/ COMBINE_DATA(&m_irqs_enabled); };
-	DECLARE_WRITE32_MEMBER(aic_idcr_w) { /*logerror("%s: aic_idcr_w  %08x (Interrupt Disable Command Register)\n", machine().describe_context().c_str(), data);*/ };
-	DECLARE_WRITE32_MEMBER(aic_iccr_w);
+	DECLARE_WRITE32_MEMBER(aic_iecr_w) { m_irqs_enabled |= data & mem_mask; recalc_irqs(); };
+	DECLARE_WRITE32_MEMBER(aic_idcr_w) { m_irqs_enabled &= ~(data & mem_mask); recalc_irqs(); };
+	DECLARE_WRITE32_MEMBER(aic_iccr_w) { m_irqs_pending &= ~(data & mem_mask); recalc_irqs(); };
 	DECLARE_WRITE32_MEMBER(aic_eoicr_w){ /*logerror("%s: aic_eoicr_w (End of Interrupt Command Register)\n", machine().describe_context().c_str());*/ }; // value doesn't matter
 
-	void set_irq(int identity);
+	void set_irq(int line, int state);
 
 protected:
 	virtual void device_start() override;
@@ -51,6 +51,7 @@ protected:
 
 private:
 	uint32_t m_irqs_enabled;
+	uint32_t m_irqs_pending;
 	uint32_t m_current_irq_vector;
 	uint32_t m_current_firq_vector;
 
@@ -58,6 +59,7 @@ private:
 	uint32_t m_aic_svr[32];
 
 	devcb_write_line    m_irq_out;
+	void recalc_irqs();
 };
 
 #endif

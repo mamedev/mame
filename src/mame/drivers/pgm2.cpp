@@ -136,7 +136,7 @@ WRITE32_MEMBER(pgm2_state::encryption_do_w)
 
 INTERRUPT_GEN_MEMBER(pgm2_state::igs_interrupt)
 {
-	m_arm_aic->set_irq(0x47);
+	m_arm_aic->set_irq(12, ASSERT_LINE);
 }
 
 WRITE16_MEMBER(pgm2_state::share_bank_w)
@@ -156,7 +156,7 @@ WRITE8_MEMBER(pgm2_state::shareram_w)
 
 TIMER_DEVICE_CALLBACK_MEMBER(pgm2_state::igs_interrupt2)
 {
-	m_arm_aic->set_irq(0x46);
+	m_arm_aic->set_irq(3, ASSERT_LINE);
 }
 
 // "MPU" MCU HLE starts here
@@ -187,7 +187,6 @@ void pgm2_state::mcu_command(address_space &space, bool is_command)
 		case 0xe0: // command port test
 			m_mcu_result0 = m_mcu_regs[0];
 			m_mcu_result1 = m_mcu_regs[1];
-			delay = 30;  // such quite long delay is needed for debug codes check routine
 			break;
 		case 0xe1: // shared ram access (unimplemented)
 		{
@@ -317,7 +316,15 @@ WRITE32_MEMBER(pgm2_state::mcu_w)
 	if (reg == 2 && m_mcu_regs[2]) // irq to mcu
 		mcu_command(space, true);
 	if (reg == 5 && m_mcu_regs[5]) // ack to mcu (written at the end of irq handler routine)
+	{
 		mcu_command(space, false);
+		m_arm_aic->set_irq(3, CLEAR_LINE);
+	}
+}
+
+WRITE16_MEMBER(pgm2_state::vbl_ack_w)
+{
+	m_arm_aic->set_irq(12, CLEAR_LINE);
 }
 
 WRITE16_MEMBER(pgm2_state::unk30120014_w)
@@ -333,18 +340,6 @@ WRITE16_MEMBER(pgm2_state::unk30120014_w)
 	}
 }
 
-WRITE16_MEMBER(pgm2_state::unk30120018_w)
-{
-	if (offset == 0)
-	{
-		// writes 1 (maybe sprite enable)
-	}
-	else
-	{
-		// writes 0 (rarely)
-		//printf("unk30120018_w %d %04x\n", offset, data);
-	}
-}
 
 
 static ADDRESS_MAP_START( pgm2_map, AS_PROGRAM, 32, pgm2_state )
@@ -385,7 +380,7 @@ static ADDRESS_MAP_START( pgm2_map, AS_PROGRAM, 32, pgm2_state )
 	AM_RANGE(0x30120008, 0x3012000b) AM_RAM AM_SHARE("fgscroll")
 	AM_RANGE(0x3012000c, 0x3012000f) AM_RAM AM_SHARE("vidmode")
 	AM_RANGE(0x30120014, 0x30120017) AM_WRITE16(unk30120014_w, 0xffffffff)
-	AM_RANGE(0x30120018, 0x3012001b) AM_WRITE16(unk30120018_w, 0xffffffff)
+	AM_RANGE(0x30120018, 0x3012001b) AM_WRITE16(vbl_ack_w, 0x0000ffff)
 	AM_RANGE(0x30120030, 0x30120033) AM_WRITE16(share_bank_w, 0xffff0000)
 	AM_RANGE(0x30120038, 0x3012003b) AM_WRITE(sprite_encryption_w)
 	// there are other 0x301200xx regs
@@ -403,7 +398,7 @@ static ADDRESS_MAP_START( pgm2_map, AS_PROGRAM, 32, pgm2_state )
 
 	AM_RANGE(0xfffffd28, 0xfffffd2b) AM_READ(rtc_r)
 
-	AM_RANGE(0xfffffa08, 0xfffffa0b) AM_WRITE(encryption_do_w) // after uploading encryption? table might actually send it or enable external ROM? when read bits0-1 is ROM board status (0 if OK)
+	AM_RANGE(0xfffffa08, 0xfffffa0b) AM_WRITE(encryption_do_w) // after uploading encryption? table might actually send it or enable external ROM? when read bits0-1 called FUSE 0 and 1, must be 0
 	AM_RANGE(0xfffffa0c, 0xfffffa0f) AM_READ(unk_startup_r)
 ADDRESS_MAP_END
 

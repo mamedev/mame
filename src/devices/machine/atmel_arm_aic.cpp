@@ -53,6 +53,7 @@ void arm_aic_device::device_start()
 	m_irq_out.resolve_safe();
 
 	save_item(NAME(m_irqs_enabled));
+	save_item(NAME(m_irqs_pending));
 	save_item(NAME(m_current_irq_vector));
 	save_item(NAME(m_current_firq_vector));
 
@@ -63,6 +64,7 @@ void arm_aic_device::device_start()
 void arm_aic_device::device_reset()
 {
 	m_irqs_enabled = 0;
+	m_irqs_pending = 0;
 	m_current_irq_vector = 0;
 	m_current_firq_vector = 0;
 
@@ -70,24 +72,38 @@ void arm_aic_device::device_reset()
 	for(auto & elem : m_aic_svr) { elem = 0; }
 }
 
-void arm_aic_device::set_irq(int identity)
+void arm_aic_device::set_irq(int line, int state)
 {
-	for (int i = 0;i < 32;i++)
-	{
-		if (m_aic_smr[i] == identity)
-		{
-			if ((m_irqs_enabled >> i) & 1)
-			{
-				m_current_irq_vector = m_aic_svr[i];
-				m_irq_out(ASSERT_LINE);
-				return;
-			}
-		}
-	}
+	// note: configurable edge / level logic is not simulated, TODO
+	if (state == ASSERT_LINE)
+		m_irqs_pending |= 1 << line;
+	else
+		m_irqs_pending &= ~(1 << line);
+	recalc_irqs();
 }
 
-WRITE32_MEMBER(arm_aic_device::aic_iccr_w)
+void arm_aic_device::recalc_irqs()
 {
-	//logerror("%s: aic_iccr_w  %08x (Interrupt Clear Command Register)\n", machine().describe_context().c_str(), data);
-	m_irq_out(CLEAR_LINE);
-};
+	uint32_t mask = m_irqs_enabled & m_irqs_pending;
+	if (mask)
+	{
+		int pri = -1;
+		uint8_t midx;
+		do
+		{
+			uint8_t idx = 31 - count_leading_zeros(mask);
+			if ((int)(m_aic_smr[idx] & 7) > pri)
+			{
+				midx = idx;
+				pri = m_aic_smr[idx] & 7;
+			}
+			mask &= ~(1 << idx);
+		} while (mask);
+
+		// handle FIQ (idx 0) case ??
+		m_current_irq_vector = m_aic_svr[midx];
+		m_irq_out(ASSERT_LINE);
+	}
+	else
+		m_irq_out(CLEAR_LINE);
+}
