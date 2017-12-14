@@ -635,7 +635,6 @@ public:
 	device_t &device() { return m_device; }
 	const device_t &device() const { return m_device; }
 	operator device_t &() { return m_device; }
-	operator device_t *() { return &m_device; }
 
 	// iteration helpers
 	device_interface *interface_next() const { return m_interface_next; }
