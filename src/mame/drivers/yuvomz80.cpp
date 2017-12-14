@@ -6,6 +6,7 @@
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "machine/i8255.h"
+#include "sound/2610intf.h"
 #include "sound/ymz280b.h"
 #include "speaker.h"
 
@@ -30,7 +31,7 @@ Yuvo PCC116B - maincpu board
 
 Yuvo PCO124B - sound board
 - TMPZ84C00AP-8
-- 8 MHz XTAL
+- 8 MHz, 16.9344 MHz XTALs
 - audiocpu ROM
 - YMZ280B-F
 - sample ROMs
@@ -53,23 +54,36 @@ private:
 
 static ADDRESS_MAP_START( mem_map, AS_PROGRAM, 8, yuvomz80_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM AM_REGION("maincpu", 0)
+	AM_RANGE(0x8000, 0x87ff) AM_RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( io_map, AS_PROGRAM, 8, yuvomz80_state )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("ppi0", i8255_device, read, write)
+	AM_RANGE(0x04, 0x07) AM_DEVREADWRITE("ppi1", i8255_device, read, write)
+	AM_RANGE(0x08, 0x0b) AM_DEVREADWRITE("ppi2", i8255_device, read, write)
+	AM_RANGE(0x0c, 0x0f) AM_DEVREADWRITE("ppi3", i8255_device, read, write)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( audio_mem_map, AS_PROGRAM, 8, yuvomz80_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM AM_REGION("audiocpu", 0)
+	AM_RANGE(0x8000, 0x87ff) AM_RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( audio_io_map, AS_PROGRAM, 8, yuvomz80_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE("ymz", ymz280b_device, read, write)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( hexapres_audio_io_map, AS_PROGRAM, 8, yuvomz80_state )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("ymsnd", ym2610_device, read, write)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( goldhexa )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( yuvomz80 )
+static MACHINE_CONFIG_START( goldhexa )
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_8MHz)
 	MCFG_CPU_PROGRAM_MAP(mem_map)
 	MCFG_CPU_IO_MAP(io_map)
@@ -78,14 +92,31 @@ static MACHINE_CONFIG_START( yuvomz80 )
 	MCFG_CPU_PROGRAM_MAP(audio_mem_map)
 	MCFG_CPU_IO_MAP(audio_io_map)
 
-	MCFG_DEVICE_ADD("ppi8255_0", I8255A, 0)
-
-	MCFG_DEVICE_ADD("ppi8255_1", I8255A, 0)
+	MCFG_DEVICE_ADD("ppi0", I8255A, 0)
+	MCFG_DEVICE_ADD("ppi1", I8255A, 0)
+	MCFG_DEVICE_ADD("ppi2", I8255A, 0)
+	MCFG_DEVICE_ADD("ppi3", I8255A, 0)
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-	MCFG_SOUND_ADD("ymz", YMZ280B, XTAL_8MHz)
+	MCFG_SOUND_ADD("ymz", YMZ280B, XTAL_16_9344MHz)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.00)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.00)
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_START( hexapres )
+	MCFG_CPU_ADD("maincpu", Z80, XTAL_8MHz)
+	MCFG_DEVICE_DISABLE()
+
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL_8MHz)
+	MCFG_CPU_PROGRAM_MAP(audio_mem_map)
+	MCFG_CPU_IO_MAP(hexapres_audio_io_map)
+
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("ymsnd", YM2610, 8000000) // type guessed
+	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
+	MCFG_SOUND_ROUTE(0, "mono", 0.25)
+	MCFG_SOUND_ROUTE(1, "mono", 1.0)
+	MCFG_SOUND_ROUTE(2, "mono", 1.0)
 MACHINE_CONFIG_END
 
 
@@ -108,10 +139,12 @@ ROM_START( hexapres )
 	ROM_REGION(0x10000, "audiocpu", 0)
 	ROM_LOAD( "ghp_snd.bin",  0x0000, 0x10000, CRC(8933b6ea) SHA1(a66157f2b7407ab374db07bcda34f066740f14dc) )
 
-	ROM_REGION(0x100000, "ymz", 0)
+	ROM_REGION(0x80000, "ymsnd", 0)
 	ROM_LOAD( "ghp_voia.bin",  0x00000, 0x80000, CRC(cf3e4c43) SHA1(6d348054704d1d0082d6166701ab84cb162b3a26) )
-	ROM_LOAD( "ghp_voib.bin",  0x80000, 0x80000, CRC(8be745fe) SHA1(840bbb212c8c519f2e4633f8db731fcf3f55635a) )
+
+	ROM_REGION(0x80000, "ymsnd.deltat", 0)
+	ROM_LOAD( "ghp_voib.bin",  0x00000, 0x80000, CRC(8be745fe) SHA1(840bbb212c8c519f2e4633f8db731fcf3f55635a) )
 ROM_END
 
-GAME( 200?, goldhexa, 0, yuvomz80, goldhexa, yuvomz80_state, 0, ROT0, "Yubis", "Golden Hexa", MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 200?, hexapres, 0, yuvomz80, goldhexa, yuvomz80_state, 0, ROT0, "Yubis", "Hexa President", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 200?, goldhexa, 0, goldhexa, goldhexa, yuvomz80_state, 0, ROT0, "Yubis", "Golden Hexa", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 200?, hexapres, 0, hexapres, goldhexa, yuvomz80_state, 0, ROT0, "Yubis", "Hexa President", MACHINE_IS_SKELETON_MECHANICAL )
