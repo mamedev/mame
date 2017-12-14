@@ -8805,6 +8805,7 @@ has been replaced with an all-zero block. -->
 
 	<software name="silpheed35" cloneof="silpheed">
 		<!-- Dumped via Kryoflux, all tracks show as good and unmodified -->
+		<!-- This version was only distributed with the IBM PS/1 Sound/Joystick Card and is newer than the boxed retail version of the game. -->
 		<description>Silpheed (3.5", 3.21, IBM Special Pak)</description>
 		<year>1990</year>
 		<publisher>Sierra</publisher>
