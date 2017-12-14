@@ -2348,7 +2348,7 @@ void address_space::allocate_memory()
 	int tail = blocklist.size();
 	for (address_map_entry &entry : m_map->m_entrylist)
 		if (entry.m_memory != nullptr)
-			blocklist.push_back(std::make_unique<memory_block>(*this, entry.m_addrstart, entry.m_addrend, entry.m_memory));
+			blocklist.push_back(std::make_unique<memory_block>(machine(), *this, entry.m_addrstart, entry.m_addrend, entry.m_memory));
 
 	// loop over all blocks just allocated and assign pointers from them
 	address_map_entry *unassigned = nullptr;
@@ -2395,7 +2395,7 @@ void address_space::allocate_memory()
 		// we now have a block to allocate; do it
 		offs_t curaddrstart = curblockstart * MEMORY_BLOCK_CHUNK;
 		offs_t curaddrend = curblockend * MEMORY_BLOCK_CHUNK + (MEMORY_BLOCK_CHUNK - 1);
-		auto block = std::make_unique<memory_block>(*this, curaddrstart, curaddrend);
+		auto block = std::make_unique<memory_block>(machine(), *this, curaddrstart, curaddrend);
 
 		// assign memory that intersected the new block
 		unassigned = block_assign_intersecting(curaddrstart, curaddrend, block.get()->data());
@@ -2721,7 +2721,7 @@ void address_space::install_ram_generic(offs_t addrstart, offs_t addrend, offs_t
 		{
 			if (machine().phase() >= machine_phase::RESET)
 				fatalerror("Attempted to call install_ram_generic() after initialization time without a baseptr!\n");
-			auto block = std::make_unique<memory_block>(*this, addrstart, addrend);
+			auto block = std::make_unique<memory_block>(machine(), *this, addrstart, addrend);
 			bank.set_base(block.get()->data());
 			manager().m_blocklist.push_back(std::move(block));
 		}
@@ -2751,7 +2751,7 @@ void address_space::install_ram_generic(offs_t addrstart, offs_t addrend, offs_t
 		{
 			if (machine().phase() >= machine_phase::RESET)
 				fatalerror("Attempted to call install_ram_generic() after initialization time without a baseptr!\n");
-			auto block = std::make_unique<memory_block>(*this, address_to_byte(addrstart), address_to_byte_end(addrend));
+			auto block = std::make_unique<memory_block>(machine(), *this, address_to_byte(addrstart), address_to_byte_end(addrend));
 			bank.set_base(block.get()->data());
 			manager().m_blocklist.push_back(std::move(block));
 		}
@@ -4218,8 +4218,8 @@ template class direct_read_data<-3>;
 //  memory_block - constructor
 //-------------------------------------------------
 
-memory_block::memory_block(address_space &space, offs_t addrstart, offs_t addrend, void *memory)
-	: m_machine(machine()),
+memory_block::memory_block(running_machine &_machine, address_space &space, offs_t addrstart, offs_t addrend, void *memory)
+	: m_machine(_machine),
 		m_space(space),
 		m_addrstart(addrstart),
 		m_addrend(addrend),

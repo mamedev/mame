@@ -470,7 +470,7 @@ class memory_block
 
 public:
 	// construction/destruction
-	memory_block(address_space &space, offs_t start, offs_t end, void *memory = nullptr);
+	memory_block(running_machine &_machine, address_space &space, offs_t start, offs_t end, void *memory = nullptr);
 	~memory_block();
 
 	// getters
