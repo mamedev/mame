@@ -6932,6 +6932,29 @@ ROM_START( venicea5 )
 ROM_END
 
 
+// AHG1535 / MV4076 / 9 Line / 5,10,20 Credit Multiplier
+// Wild Africa / Export / C - 17/07/01
+// All devices are 27c4096
+ROM_START( wafricau )
+	ARISTOCRAT_MK5_BIOS
+	/*
+	    Checksum code found at 0x000d18
+	    Checksum is stored at 0x000020-0x000027
+	        Expected Checksum   0x1b3b15a2
+	        Calculated Checksum 0x1b3b15a2  (OK)
+	*/
+	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
+	ROM_LOAD32_WORD( "ahg1535.u7",  0x000000, 0x80000, CRC(57c04faa) SHA1(aa86747b21718f9dfa75b41f7280a00f531e13fe) )  // game
+	ROM_LOAD32_WORD( "ahg1535.u11", 0x000002, 0x80000, CRC(066917c5) SHA1(a821635edc0199427b43eb324922af99679def21) )  // game
+	ROM_LOAD32_WORD( "ahg1535.u8",  0x100000, 0x80000, CRC(64c8c12f) SHA1(3a6e54205c28ae3dfb51ef1895e147e6a9f446a9) )  // base
+	ROM_LOAD32_WORD( "ahg1535.u12", 0x100002, 0x80000, CRC(f569843c) SHA1(ccf1b727ad1dc49bca609ee0887b36a29223cace) )  // base
+
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
+	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
+ROM_END
+
+
 // 0200507V / 506/8 / 3 Credit Multiplier/3 Line Multiline
 // Wild Amazon / Local / A - 10/10/96
 ROM_START( wamazon )
@@ -7474,6 +7497,7 @@ GAMEL( 1998, unicornda,  unicornd,  aristmk5,           aristmk5_9,   aristmk5_s
 GAMEL( 2000, unicorndnz, unicornd,  aristmk5,           unicorndnz,   aristmk5_state, aristmk5, ROT0, "Aristocrat", "Unicorn Dreaming (0101228V, New Zealand)",             MACHINE_FLAGS, layout_aristmk5 )        // MV4113/1, A - 05/04/2000, Rev 27
 GAMEL( 2001, unicorndu,  unicornd,  aristmk5_usa,       bootsctnua,   aristmk5_state, aristmk5, ROT0, "Aristocrat", "Unicorn Dreaming (BHG1584, US)",                       MACHINE_FLAGS, layout_dolphntrce )      // MV4130/1, C - 10/17/01
 GAMEL( 2002, venicea5,   aristmk5,  aristmk5,           goldenra,     aristmk5_state, aristmk5, ROT0, "Aristocrat", "Venice (02J02056, Venezuela)",                         MACHINE_FLAGS, layout_venicea5 )        // JB009/2, B - 11/07/02, Rev 17
+GAMEL( 2001, wafricau,   aristmk5,  aristmk5_usa,       aristmk5_usa, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Wild Africa (AHG1535, US)",                            MACHINE_FLAGS, layout_aristmk5_us )     // MV4076, C - 17/07/01
 GAMEL( 1996, wamazon,    aristmk5,  aristmk5,           wamazon,      aristmk5_state, aristmk5, ROT0, "Aristocrat", "Wild Amazon (0200507V, NSW/ACT)",                      MACHINE_FLAGS, layout_wamazon )         // 506/8, A - 10/10/96, Rev 3
 GAMEL( 1996, wamazona,   wamazon,   aristmk5,           wamazona,     aristmk5_state, aristmk5, ROT0, "Aristocrat", "Wild Amazon (0200285V, NSW/ACT)",                      MACHINE_FLAGS, layout_wamazona )        // 506/6, A - 7/5/96, Rev 1.22.8.0
 GAMEL( 1996, wamazonv,   wamazon,   aristmk5,           wamazon,      aristmk5_state, aristmk5, ROT0, "Aristocrat", "Wild Amazon (01J01996, Venezuela)",                    MACHINE_FLAGS, layout_wamazon )         // 506/8, A - 10/10/96, Rev 3
