@@ -34634,6 +34634,8 @@ smssdisp                        // Sega Master System Store Display Unit
 @source:smsmcorp.cpp
 secondch                        // (c) 1985 SMS MFG CORP
 sureshot                        // (c) 1985 SMS MFG CORP
+smsjoker                        // (c) 1985 SMS MFG CORP
+sms4in1                         // (c) 1984 SMS MFG CORP
 trvhang                         // (c) 1984 SMS MFG CORP
 trvhanga                        // (c) 1984 SMS MFG CORP
 
