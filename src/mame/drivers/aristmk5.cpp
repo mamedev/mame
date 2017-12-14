@@ -2958,6 +2958,28 @@ ROM_START( chickna5qld )
 ROM_END
 
 
+// 596/1   50 Credit Multiplier/9 Line Multiline
+// Chicken / Local / B - 23/12/96
+// 01J01886
+ROM_START( chickna5b )
+	ARISTOCRAT_MK5_BIOS
+	/*
+
+	*/
+	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
+	ROM_LOAD32_WORD( "01j01886.u7",  0x000000, 0x80000, CRC(6852bf73) SHA1(a53c8467f4a128da26707a1fe239f32330dffe0a) )
+	ROM_LOAD32_WORD( "01j01886.u11", 0x000002, 0x80000, CRC(c065aaa2) SHA1(875c2e9e432d4532e116dc197613327a06841fc2) )
+	ROM_LOAD32_WORD( "01j01886.u8",  0x100000, 0x80000, CRC(81ad8cc2) SHA1(006dbc0b352187425bc410903178bad912677a29) )
+	ROM_LOAD32_WORD( "01j01886.u12", 0x100002, 0x80000, CRC(1f03e878) SHA1(b9beee74f5cfd942ba50f8d2955ff588dea32842) )
+	ROM_LOAD32_WORD( "01j01886.u9",  0x200000, 0x80000, CRC(2471f934) SHA1(486757b919f4c4af40b707175d38eca26cda1ea3) )
+	ROM_LOAD32_WORD( "01j01886.u13", 0x200002, 0x80000, CRC(231ca698) SHA1(eb237652974228994e793f0dc87de93095db3c9c) )
+
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
+	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
+ROM_END
+
+
 // 596 - 10 Credit Multiplier / 9 Line Multiline.
 // Chicken - Export C - 23/02/98.
 // Marked as RHG0730, 92.588% and 'touch'
@@ -7304,6 +7326,7 @@ GAMEL( 1998, chariotc,    aristmk5, aristmk5,           chariotc,     aristmk5_s
 GAMEL( 1998, chariotcv,   chariotc, aristmk5,           chariotcv,    aristmk5_state, aristmk5, ROT0, "Aristocrat", "The Chariot Challenge (04J00714, Venezuela)",          MACHINE_FLAGS, layout_snowcat )         // 630, A - 10/08/98, Rev 12
 GAMEL( 2001, checkma5,    aristmk5, aristmk5,           checkma5,     aristmk5_state, aristmk5, ROT0, "Aristocrat", "Checkmate (01J00681, NSW/ACT)",                        MACHINE_FLAGS, layout_checkma5 )        // JB011, B - 06/07/01, Rev 17
 GAMEL( 1996, chickna5,    aristmk5, aristmk5,           chickna5,     aristmk5_state, aristmk5, ROT0, "Aristocrat", "Chicken (0100351V, NSW/ACT)",                          MACHINE_FLAGS, layout_snowcat )         // 596, A - 27/08/96, Rev 1.24
+GAMEL( 1996, chickna5b,   chickna5, aristmk5,           chickna5,     aristmk5_state, aristmk5, ROT0, "Aristocrat", "Chicken (01J01886, NSW/ACT)",                          MACHINE_FLAGS, layout_snowcat )         // 596/1 B - 23/12/96
 GAMEL( 1998, chickna5qld, chickna5, aristmk5,           chickna5,     aristmk5_state, aristmk5, ROT0, "Aristocrat", "Chicken (0200530V, Queensland)",                       MACHINE_FLAGS, layout_snowcat )         // 596, C - 23/02/98, Rev 1.0
 GAMEL( 1998, chickna5u,   chickna5, aristmk5_usa,       chickna5u,    aristmk5_state, aristmk5, ROT0, "Aristocrat", "Chicken (RHG0730-03, US)",                             MACHINE_FLAGS, layout_aristmk5_us )     // 596, C - 23/02/98
 GAMEL( 1998, coralrc2,    aristmk5, aristmk5,           coralrc2,     aristmk5_state, aristmk5, ROT0, "Aristocrat", "Coral Riches II (0100919V, NSW/ACT)",                  MACHINE_FLAGS, layout_coralrc2 )        // 577/7, A - 29/12/98, Rev 12
