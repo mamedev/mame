@@ -98,8 +98,6 @@ inline void pgm2_state::draw_sprite_line(const rectangle &cliprect, int &mask_of
 		maskdata |= m_sprites_mask[mask_offset + 2] << 8;
 		maskdata |= m_sprites_mask[mask_offset + 3] << 0;
 
-		maskdata ^= m_realspritekey;
-
 		if (reverse)
 		{
 			mask_offset -= 4;
@@ -138,9 +136,9 @@ void pgm2_state::draw_sprites(screen_device &screen, const rectangle &cliprect, 
 
 	//printf("frame\n");
 
-	for (int i = 0;i < 0x2000 / 4;i+=4)
+	for (int i = 0;i < 0x2000 / 4;i++)
 	{
-		if (spriteram[i+2] & 0x80000000)
+		if (spriteram[i] == 0x80000000)
 		{
 			endoflist = i;
 			break;
@@ -216,15 +214,12 @@ void pgm2_state::draw_sprites(screen_device &screen, const rectangle &cliprect, 
 					draw_sprite_line(cliprect, mask_offset, palette_offset, x, realy, flipx, reverse, sizex, pal, 1, zoomx_bits, growx);
 					realy++;
 
-					if (zoomy_bit) // draw it again
+					if (zoomy_bit)
 					{
 						palette_offset = pre_palette_offset;
 						mask_offset = pre_mask_offset;
-						draw_sprite_line(cliprect, mask_offset, palette_offset, x, realy, flipx, reverse, sizex, pal, 1, zoomx_bits, growx);
-						realy++;
 					}
-					
-					ydraw++;
+					else ydraw++;
 				}
 			}
 		}
@@ -261,17 +256,6 @@ void pgm2_state::copy_sprites_from_bitmap(screen_device &screen, bitmap_rgb32 &b
 
 uint32_t pgm2_state::screen_update_pgm2(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	
-	int mode = m_vidmode[0] & 0x00010000; // other bits not used?
-
-	if (mode)
-		m_screen->set_visible_area(0, 448 - 1, 0, 224 - 1);
-	else
-		m_screen->set_visible_area(0, 320 - 1, 0, 240 - 1);
-	
-
-	m_fg_tilemap->set_scrollx(0, m_fgscroll[0] & 0xffff);
-	m_fg_tilemap->set_scrolly(0, m_fgscroll[0] >> 16);
 	m_bg_tilemap->set_scrolly(0, (m_bgscroll[0x0/4] & 0xffff0000)>>16 );
 
 	for (int y = 0; y < 224; y++)

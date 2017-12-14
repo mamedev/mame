@@ -38,22 +38,24 @@ public:
 
 protected:
 	virtual void rom_bank_updated() = 0;
-	virtual space_config_vector memory_space_config() const override;
-
-	void set_rom_endianness(endianness_t endian) { assert(!device().configured()); m_rom_config.m_endianness = endian; }
-	void set_rom_data_width(u8 width) { assert(!device().configured()); m_rom_config.m_data_width = width; }
-	void set_rom_addr_width(u8 width) { assert(!device().configured()); m_rom_config.m_addr_width = m_rom_config.m_logaddr_width = width; }
 
 private:
 	const char *m_rom_tag;
-	address_space_config m_rom_config;
+	const address_space_config m_rom_config;
 	direct_read_data<0> *m_rom_direct;
 
 	memory_bank *m_bank;
 	int m_cur_bank, m_bank_count;
 
+	virtual space_config_vector memory_space_config() const override;
 	virtual void interface_pre_start() override;
-	virtual void interface_post_load() override;
+
+	DECLARE_READ8_MEMBER(z8_r);
+	DECLARE_READ16_MEMBER(z16_r);
+	DECLARE_READ32_MEMBER(z32_r);
+	DECLARE_READ64_MEMBER(z64_r);
+
+	void reset_bank();
 };
 
 #endif // MAME_EMU_DIROM_H

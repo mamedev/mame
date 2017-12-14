@@ -280,7 +280,7 @@ WRITE8_MEMBER(fun_tech_corp_state::funtech_coins_w)
 	if (data & 0x01) printf("funtech_coins_w %02x\n", data);
 
 	// 80 = hopper motor?
-	m_hopper->motor_w(BIT(data, 7));
+	m_hopper->write(space, 0, data & 0x80);
 
 	// 40 = ? sometimes
 

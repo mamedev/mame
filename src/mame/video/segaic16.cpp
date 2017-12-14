@@ -457,7 +457,7 @@ void draw_virtual_tilemap(screen_device &screen, segaic16_video_device::tilemap_
 
 	if (info->flip)
 	{
-		pages = bitswap<16>(pages,
+		pages = BITSWAP16(pages,
 			3, 2, 1, 0,
 			7, 6, 5, 4,
 			11, 10, 9, 8,

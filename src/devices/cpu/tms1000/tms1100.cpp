@@ -4,9 +4,6 @@
 
   TMS1000 family - TMS1100, TMS1170, TMS1300, TMS1370
 
-  TODO:
-  - add TMS1100C when needed
-
 */
 
 #include "emu.h"
@@ -18,7 +15,7 @@
 DEFINE_DEVICE_TYPE(TMS1100, tms1100_cpu_device, "tms1100", "TMS1100") // 28-pin DIP, 11 R pins
 DEFINE_DEVICE_TYPE(TMS1170, tms1170_cpu_device, "tms1170", "TMS1170") // high voltage version
 DEFINE_DEVICE_TYPE(TMS1300, tms1300_cpu_device, "tms1300", "TMS1300") // 40-pin DIP, 16 R pins
-DEFINE_DEVICE_TYPE(TMS1370, tms1370_cpu_device, "tms1370", "TMS1370") // high voltage version, also seen in 28-pin package(some O/R pins unavailable)
+DEFINE_DEVICE_TYPE(TMS1370, tms1370_cpu_device, "tms1370", "TMS1370") // high voltage version
 
 
 // internal memory maps

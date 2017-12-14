@@ -79,7 +79,7 @@
 #include "emu.h"
 #include "bus/ss50/interface.h"
 
-#include "bus/ss50/mpc.h"
+//#include "bus/ss50/mpc.h"
 //#include "bus/ss50/mpl.h"
 //#include "bus/ss50/mpr.h"
 #include "bus/ss50/mps.h"
@@ -214,7 +214,7 @@ ss50_card_interface::ss50_card_interface(const machine_config &mconfig, device_t
 }
 
 SLOT_INTERFACE_START(ss50_default_2rs_devices)
-	SLOT_INTERFACE("mpc", SS50_MPC)
+	//SLOT_INTERFACE("mpc", SS50_MPC)
 	//SLOT_INTERFACE("mpl", SS50_MPL)
 	//SLOT_INTERFACE("mpn", SS50_MPN)
 	SLOT_INTERFACE("mps", SS50_MPS)

@@ -17,8 +17,8 @@
 
 READ16_MEMBER( m68307_cpu_device::m68307_internal_timer_r )
 {
-	assert(m_m68307TIMER);
-	m68307_timer &timer = *m_m68307TIMER;
+	assert(m68307TIMER);
+	m68307_timer &timer = *m68307TIMER;
 
 	int pc = space.device().safe_pc();
 	int which = offset & 0x8;
@@ -39,8 +39,8 @@ READ16_MEMBER( m68307_cpu_device::m68307_internal_timer_r )
 
 WRITE16_MEMBER( m68307_cpu_device::m68307_internal_timer_w )
 {
-	assert(m_m68307TIMER);
-	m68307_timer &timer = *m_m68307TIMER;
+	assert(m68307TIMER);
+	m68307_timer &timer = *m68307TIMER;
 
 	int pc = space.device().safe_pc();
 	int which = offset & 0x8;
@@ -102,7 +102,7 @@ WRITE16_MEMBER( m68307_cpu_device::m68307_internal_timer_w )
 TIMER_CALLBACK_MEMBER(m68307_cpu_device::m68307_timer::timer0_callback )
 {
 	m68307_cpu_device* m68k = (m68307_cpu_device *)ptr;
-	single_timer* tptr = &m68k->m_m68307TIMER->singletimer[0];
+	single_timer* tptr = &m68k->m68307TIMER->singletimer[0];
 	tptr->regs[m68307TIMER_TMR] |= 0x2;
 
 	m68k->timer0_interrupt();
@@ -113,7 +113,7 @@ TIMER_CALLBACK_MEMBER(m68307_cpu_device::m68307_timer::timer0_callback )
 TIMER_CALLBACK_MEMBER(m68307_cpu_device::m68307_timer::timer1_callback )
 {
 	m68307_cpu_device* m68k = (m68307_cpu_device *)ptr;
-	single_timer* tptr = &m68k->m_m68307TIMER->singletimer[1];
+	single_timer* tptr = &m68k->m68307TIMER->singletimer[1];
 	tptr->regs[m68307TIMER_TMR] |= 0x2;
 
 	m68k->timer1_interrupt();

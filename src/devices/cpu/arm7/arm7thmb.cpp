@@ -1307,7 +1307,8 @@ void arm7_cpu_device::tg0b_f(uint32_t pc, uint32_t op)
 // "The address should normally be a word aligned quantity and non-word aligned addresses do not affect the instruction."
 // "However, the bottom 2 bits of the address will appear on A[1:0] and might be interpreted by the memory system."
 
-// Endrift says LDMIA/STMIA ignore the low 2 bits and GBA Test Suite assumes it.
+// GBA "BB Ball" performs an unaligned read with A[1:0] = 2 and expects A[1] not to be ignored [BP 800B90A,(R4&3)!=0]
+// GBA "Gadget Racers" performs an unaligned read with A[1:0] = 1 and expects A[0] to be ignored [BP B72,(R0&3)!=0]
 
 void arm7_cpu_device::tg0c_0(uint32_t pc, uint32_t op) /* Store */
 {
@@ -1334,7 +1335,7 @@ void arm7_cpu_device::tg0c_1(uint32_t pc, uint32_t op) /* Load */
 	{
 		if (op & (1 << offs))
 		{
-			SetRegister(offs, READ32(ld_st_address & ~3));
+			SetRegister(offs, READ32(ld_st_address & ~1));
 			ld_st_address += 4;
 		}
 	}

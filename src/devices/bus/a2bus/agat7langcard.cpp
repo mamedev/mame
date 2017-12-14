@@ -10,9 +10,6 @@
 
 #include "agat7langcard.h"
 
-//#define VERBOSE 1
-#include "logmacro.h"
-
 /***************************************************************************
     PARAMETERS
 ***************************************************************************/
@@ -33,7 +30,7 @@ DEFINE_DEVICE_TYPE(A2BUS_AGAT7LANGCARD, a2bus_agat7langcard_device, "a7lang", "A
 
 a2bus_agat7langcard_device::a2bus_agat7langcard_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, type, tag, owner, clock),
-	device_a2bus_card_interface(mconfig, *this), m_inh_state(0), m_dxxx_bank(0), m_main_bank(0), m_csr(0)
+	device_a2bus_card_interface(mconfig, *this), m_inh_state(0), m_last_offset(0), m_dxxx_bank(0), m_main_bank(0)
 {
 }
 
@@ -51,13 +48,13 @@ void a2bus_agat7langcard_device::device_start()
 	// set_a2bus_device makes m_slot valid
 	set_a2bus_device();
 
-	memset(m_ram, 0, 32 * 1024);
+	memset(m_ram, 0, 32*1024);
 
 	save_item(NAME(m_inh_state));
 	save_item(NAME(m_ram));
 	save_item(NAME(m_dxxx_bank));
 	save_item(NAME(m_main_bank));
-	save_item(NAME(m_csr));
+	save_item(NAME(m_last_offset));
 }
 
 void a2bus_agat7langcard_device::device_reset()
@@ -65,7 +62,7 @@ void a2bus_agat7langcard_device::device_reset()
 	m_inh_state = INH_NONE;
 	m_dxxx_bank = 0;
 	m_main_bank = 0;
-	m_csr = 0;
+	m_last_offset = -1;
 	m_mode = 0;
 }
 
@@ -73,7 +70,7 @@ void a2bus_agat7langcard_device::do_io(int offset)
 {
 	int old_inh_state = m_inh_state;
 
-	m_csr = offset & 0x7f;
+	m_last_offset = offset;
 
 	m_inh_state = INH_WRITE;
 	m_dxxx_bank = 0;
@@ -94,11 +91,13 @@ void a2bus_agat7langcard_device::do_io(int offset)
 		recalc_slot_inh();
 	}
 
-	LOG("LC: (ofs %02x) new state %c%c dxxx=%04x main=%05x\n",
+#if 1
+	logerror("LC: (ofs %02x) new state %c%c dxxx=%04x main=%05x\n",
 			offset,
 			(m_inh_state & INH_READ) ? 'R' : 'x',
 			(m_inh_state & INH_WRITE) ? 'W' : 'x',
 			m_dxxx_bank, m_main_bank);
+#endif
 }
 
 
@@ -108,7 +107,7 @@ void a2bus_agat7langcard_device::do_io(int offset)
 
 uint8_t a2bus_agat7langcard_device::read_cnxx(address_space &space, uint8_t offset)
 {
-	return (0x80 | m_csr);
+	return m_last_offset < 0 ? 0x80 : (0x80 | m_last_offset);
 }
 
 

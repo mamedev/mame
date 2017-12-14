@@ -104,18 +104,9 @@ protected:
 		uint8_t bank;
 		bool is_playing;
 	};
-	struct ymz_sqc
-	{
-		uint8_t sqc;
-		uint8_t loop;
-		uint8_t *data;
-		bool is_playing;
-		bool is_waiting;
-	};
 
 	ymz_channel m_channels[16];
 	ymz_sequence m_sequences[8];
-	ymz_sqc m_sqcs[8];
 };
 
 // ======================> ymz774_device
@@ -131,7 +122,6 @@ protected:
 	virtual void internal_reg_write(uint8_t reg, uint8_t data) override;
 	virtual uint32_t get_phrase_offs(int phrase) override { int ph = phrase * 4; return ((m_rom[ph] & 0x0f) << 24 | m_rom[ph + 1] << 16 | m_rom[ph + 2] << 8 | m_rom[ph + 3]) * 2; };
 	virtual uint32_t get_seq_offs(int sqn) override { int sq = sqn * 4 + 0x2000; return ((m_rom[sq] & 0x0f) << 24 | m_rom[sq + 1] << 16 | m_rom[sq + 2] << 8 | m_rom[sq + 3]) * 2; };
-	uint32_t get_sqc_offs(int sqc) { int sq = sqc * 4 + 0x6000; return ((m_rom[sq] & 0x0f) << 24 | m_rom[sq + 1] << 16 | m_rom[sq + 2] << 8 | m_rom[sq + 3]) * 2; };
 	virtual void sequencer() override;
 private:
 	int m_bank;

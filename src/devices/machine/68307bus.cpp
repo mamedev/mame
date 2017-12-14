@@ -15,8 +15,8 @@
 
 READ8_MEMBER( m68307_cpu_device::m68307_internal_mbus_r )
 {
-	assert(m_m68307MBUS);
-	m68307_mbus &mbus = *m_m68307MBUS;
+	assert(m68307MBUS);
+	m68307_mbus &mbus = *m68307MBUS;
 	uint8_t retval;
 
 	int pc = space.device().safe_pc();
@@ -59,8 +59,8 @@ READ8_MEMBER( m68307_cpu_device::m68307_internal_mbus_r )
 
 WRITE8_MEMBER( m68307_cpu_device::m68307_internal_mbus_w )
 {
-	assert(m_m68307MBUS);
-	m68307_mbus &mbus = *m_m68307MBUS;
+	assert(m68307MBUS);
+	m68307_mbus &mbus = *m68307MBUS;
 
 	int pc = space.device().safe_pc();
 

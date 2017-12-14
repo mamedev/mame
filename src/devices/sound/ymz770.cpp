@@ -110,13 +110,6 @@ void ymz770_device::device_start()
 		save_item(NAME(m_sequences[ch].bank), ch);
 		save_item(NAME(m_sequences[ch].is_playing), ch);
 	}
-	for (int ch = 0; ch < 8; ch++)
-	{
-		save_item(NAME(m_sqcs[ch].sqc), ch);
-		save_item(NAME(m_sqcs[ch].loop), ch);
-		save_item(NAME(m_sqcs[ch].is_playing), ch);
-		save_item(NAME(m_sqcs[ch].is_waiting), ch);
-	}
 }
 
 
@@ -150,11 +143,6 @@ void ymz770_device::device_reset()
 		sequence.loop = 0;
 		sequence.bank = 0;
 		sequence.is_playing = false;
-	}
-	for (auto & sqc : m_sqcs)
-	{
-		sqc.is_playing = false;
-		sqc.loop = 0;
 	}
 }
 
@@ -534,7 +522,7 @@ void ymz774_device::internal_reg_write(uint8_t reg, uint8_t data)
 					if (reg & 1)
 						m_sequences[sq].sequence = (m_sequences[sq].sequence & 0xff00) | data;
 					else
-						m_sequences[sq].sequence = (m_sequences[sq].sequence & 0x00ff) | ((data & 0x0f) << 8);
+						m_sequences[sq].sequence = (m_sequences[sq].sequence & 0x00ff) | ((data & 0x0f) << 8); // TODO check if total number really upto 0x1000
 					break;
 				case 0x70: // Start / Stop
 					if (data)
@@ -557,7 +545,7 @@ void ymz774_device::internal_reg_write(uint8_t reg, uint8_t data)
 					break;
 				case 0x88: // timer H and L
 				case 0x90:
-					sq = (reg - 0x88) >> 1;
+					sq = (reg >> 1) & 7;
 					if (reg & 1)
 						m_sequences[sq].timer = (m_sequences[sq].timer & 0xff00) | data;
 					else
@@ -578,26 +566,7 @@ void ymz774_device::internal_reg_write(uint8_t reg, uint8_t data)
 			}
 			else
 			{
-				int sq = reg & 7;
-				switch (reg & 0xf8)
-				{
-				case 0xb0:
-					m_sqcs[sq].sqc = data;
-					break;
-				case 0xb8:
-					if (data)
-					{
-						m_sqcs[sq].data = &m_rom[get_sqc_offs(m_sqcs[sq].sqc)];
-						m_sqcs[sq].is_playing = true;
-						m_sqcs[sq].is_waiting = false;
-					}
-					else
-						m_sqcs[sq].is_playing = false;
-					break;
-				case 0xc0:
-					m_sqcs[sq].loop = data;
-					break;
-				}
+				if (data) logerror("SQC unimplemented %02X %02X\n", reg, data);
 			}
 		}
 		// else bank1 - Equalizer control
@@ -627,32 +596,7 @@ void ymz774_device::sequencer()
 {
 	for (int i = 0; i < 8; i++)
 	{
-		auto & sqc = m_sqcs[i];
 		auto & sequence = m_sequences[i];
-
-		if (sqc.is_playing && !sqc.is_waiting)
-		{
-			sequence.sequence = ((sqc.data[0] << 8) | sqc.data[1]) & 0xfff;
-			sequence.loop = sqc.data[2];
-			sequence.data = &m_rom[get_seq_offs(sequence.sequence)];
-			sequence.delay = 0;
-			sequence.is_playing = true;
-			sqc.is_waiting = true;
-			if (sqc.data[3] == 0xff)
-			{
-				if (sqc.loop)
-				{
-					if (sqc.loop != 255)
-						--sqc.loop;
-					sqc.data = &m_rom[get_sqc_offs(sqc.sqc)];
-				}
-				else
-					sqc.is_playing = false;
-			}
-			else
-				sqc.data += 4;
-		}
-
 		if (sequence.is_playing)
 		{
 			if (sequence.delay > 0)
@@ -679,7 +623,6 @@ void ymz774_device::sequencer()
 					else
 					{
 						sequence.is_playing = false;
-						sqc.is_waiting = false;
 					}
 					break;
 				case 0xfe: // timer delay

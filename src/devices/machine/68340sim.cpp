@@ -45,8 +45,8 @@
 READ16_MEMBER( m68340_cpu_device::m68340_internal_sim_r )
 {
 	LOGR("%s\n", FUNCNAME);
-	assert(m_m68340SIM);
-	m68340_sim &sim = *m_m68340SIM;
+	assert(m68340SIM);
+	m68340_sim &sim = *m68340SIM;
 	int val = 0;
 	int pc = space.device().safe_pc();
 
@@ -106,8 +106,8 @@ WRITE16_MEMBER( m68340_cpu_device::m68340_internal_sim_w )
 		 ((offset * 2) >= 0x10 && (offset * 2) < 0x20) || (offset * 2) >= 0x60 ? "Error - should not happen" :
 		 std::array<char const *, 8> {{"MCR", "reserved", "SYNCR", "AVR/RSR", "SWIV/SYPCR", "PICR", "PITR", "SWSR"}}[(offset * 2) <= m68340_sim::REG_AVR_RSR ? offset : offset - 0x10 + 0x04]);
 
-	assert(m_m68340SIM);
-	m68340_sim &sim = *m_m68340SIM;
+	assert(m68340SIM);
+	m68340_sim &sim = *m68340SIM;
 
 	int pc = space.device().safe_pc();
 
@@ -200,8 +200,8 @@ READ8_MEMBER( m68340_cpu_device::m68340_internal_sim_ports_r )
 {
 	LOGR("%s\n", FUNCNAME);
 	offset += 0x10;
-	assert(m_m68340SIM);
-	m68340_sim &sim = *m_m68340SIM;
+	assert(m68340SIM);
+	m68340_sim &sim = *m68340SIM;
 
 	int pc = space.device().safe_pc();
 	int val =  space.machine().rand();
@@ -287,8 +287,8 @@ WRITE8_MEMBER( m68340_cpu_device::m68340_internal_sim_ports_w )
 {
 	LOG("%s", FUNCNAME);
 	offset += 0x10;
-	assert(m_m68340SIM);
-	m68340_sim &sim = *m_m68340SIM;
+	assert(m68340SIM);
+	m68340_sim &sim = *m68340SIM;
 
 	int pc = space.device().safe_pc();
 
@@ -352,8 +352,8 @@ READ32_MEMBER( m68340_cpu_device::m68340_internal_sim_cs_r )
 	LOGR("%s\n", FUNCNAME);
 	offset += m68340_sim::REG_AM_CS0>>2;
 
-	assert(m_m68340SIM);
-	m68340_sim &sim = *m_m68340SIM;
+	assert(m68340SIM);
+	m68340_sim &sim = *m68340SIM;
 
 	int pc = space.device().safe_pc();
 
@@ -382,17 +382,17 @@ WRITE32_MEMBER( m68340_cpu_device::m68340_internal_sim_cs_w )
 
 	if (offset & 1)
 	{
-	  LOGCS("%08x Base address CS%d %08x, %08x (%08x) ", m_ppc, (offset - 0x10) / 2, offset * 4, data, mem_mask);
+	  LOGCS("%08x Base address CS%d %08x, %08x (%08x) ", pc, (offset - 0x10) / 2, offset * 4, data, mem_mask);
 	  LOGCS("- Base: %08x BFC:%02x WP:%d FTE:%d NCS:%d Valid: %s\n", data & 0xffffff00, (data & 0xf0) >> 4, data & 0x08 ? 1 : 0, data & 0x04 ? 1 : 0, data & 0x02 ? 1 : 0, data & 0x01 ? "Yes" : "No");
 	}
 	else
 	{
-	  LOGCS("%08x Address mask CS%d %08x, %08x (%08x) ", m_ppc, (offset - 0x10) / 2, offset * 4, data, mem_mask);
+	  LOGCS("%08x Address mask CS%d %08x, %08x (%08x) ", pc, (offset - 0x10) / 2, offset * 4, data, mem_mask);
 	  LOGCS("- Mask: %08x FCM:%02x DD:%d PS: %s\n", data & 0xffffff00, (data & 0xf0) >> 4, (data >> 2) & 0x03, std::array<char const *, 4>{{"Reserved", "16-Bit", "8-bit", "External DSACK response"}}[data & 0x03]);
 	}
 
-	assert(m_m68340SIM);
-	m68340_sim &sim = *m_m68340SIM;
+	assert(m68340SIM);
+	m68340_sim &sim = *m68340SIM;
 
 	int pc = space.device().safe_pc();
 
@@ -438,8 +438,8 @@ WRITE32_MEMBER( m68340_cpu_device::m68340_internal_sim_cs_w )
 
 void m68340_cpu_device::do_pit_irq()
 {
-	assert(m_m68340SIM);
-	m68340_sim &sim = *m_m68340SIM;
+	assert(m68340SIM);
+	m68340_sim &sim = *m68340SIM;
 
 	//logerror("do_pit_irq\n");
 	int timer_irq_level  = (sim.m_picr & 0x0700) >> 8;
@@ -485,8 +485,8 @@ void m68340_cpu_device::start_68340_sim()
 	m_pb_in_cb.resolve();
 
 	// Setup correct VCO/clock speed based on reset values and crystal
-	assert(m_m68340SIM);
-	m68340_sim &sim = *m_m68340SIM;
+	assert(m68340SIM);
+	m68340_sim &sim = *m68340SIM;
 	switch (m_clock_mode)
 	{
 	case m68340_sim::CLOCK_MODE_EXT:
@@ -534,8 +534,8 @@ void m68340_sim::reset()
 /* do_tick_pit works on whole clock cycles, no flank support */
 void m68340_cpu_device::do_tick_pit()
 {
-	assert(m_m68340SIM);
-	m68340_sim &sim = *m_m68340SIM;
+	assert(m68340SIM);
+	m68340_sim &sim = *m68340SIM;
 
 	sim.m_pit_counter--;
 	if ( ( (sim.m_mcr & m68340_sim::REG_MCR_FRZ1) == 0) &&

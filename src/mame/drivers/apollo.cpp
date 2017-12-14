@@ -29,7 +29,7 @@
 
 #include "includes/apollo.h"
 
-#include "cpu/m68000/m68000.h"
+#include "cpu/m68000/m68kcpu.h"
 #include "sound/beep.h"
 
 // we use set_verbose
@@ -212,7 +212,6 @@ uint8_t apollo_get_ram_config_byte(void) {
 	return ram_config_byte;
 }
 
-#if 0
 /***************************************************************************
   apollo_instruction_hook
   must be called by the CPU core before executing each instruction
@@ -264,8 +263,6 @@ READ32_MEMBER(apollo_state::apollo_instruction_hook)
 
 	return apollo_debug_instruction_hook(m_maincpu, offset);
 }
-
-#endif
 
 /***************************************************************************
  apollo bus error
@@ -498,7 +495,7 @@ READ32_MEMBER(apollo_state::apollo_unmapped_r)
 	} else if (address == 0x0000ac00 && VERBOSE < 2) {
 		// omit logging for Bus error test address in DN3000 boot prom
 	} else {
-		SLOG1(("unmapped memory dword read from %08x with mask %08x (ir=%04x)", address , mem_mask, m68k->state_int(M68K_IR)));
+		SLOG1(("unmapped memory dword read from %08x with mask %08x (ir=%04x)", address , mem_mask, m68k->ir));
 	}
 
 	/* unmapped; access causes a bus error */
@@ -923,9 +920,7 @@ void apollo_state::machine_reset()
 		m_node_id->set_node_id_from_disk();
 	}
 
-#if 0
 	m_maincpu->set_instruction_hook(read32_delegate(FUNC(apollo_state::apollo_instruction_hook),this));
-#endif
 }
 
 WRITE_LINE_MEMBER(apollo_state::apollo_reset_instr_callback)

@@ -13,9 +13,7 @@
 #include "emu.h"
 #include "debug/debugbuf.h"
 #include "includes/apollo.h"
-#include "cpu/m68000/m68000.h"
-
-#if 0
+#include "cpu/m68000/m68kcpu.h"
 
 //------------------------------------------------------
 //         TRAP 0
@@ -1170,4 +1168,3 @@ int apollo_debug_instruction_hook(m68000_base_device *device, offs_t curpc)
 	}
 	return 0;
 }
-#endif

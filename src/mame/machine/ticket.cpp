@@ -44,6 +44,7 @@ ticket_dispenser_device::ticket_dispenser_device(const machine_config &mconfig, 
 		m_status_sense(TICKET_STATUS_ACTIVE_LOW),
 		m_period(attotime::from_msec(100)),
 		m_hopper_type(false),
+		m_active_bit(0x80),
 		m_motoron(0),
 		m_ticketdispensed(0),
 		m_ticketnotdispensed(0),
@@ -98,7 +99,19 @@ void ticket_dispenser_device::static_set_senses(device_t &device, uint8_t motor_
 //**************************************************************************
 
 //-------------------------------------------------
-//  line_r - read the status line
+//  read - read the status line via the active bit
+//  (legacy method)
+//-------------------------------------------------
+
+READ8_MEMBER( ticket_dispenser_device::read )
+{
+	LOG(("%s: Ticket Status Read = %02X\n", machine().describe_context(), m_status));
+	return m_status;
+}
+
+
+//-------------------------------------------------
+//  line_r - read the status line as a proper line
 //-------------------------------------------------
 
 READ_LINE_MEMBER( ticket_dispenser_device::line_r )
@@ -108,19 +121,20 @@ READ_LINE_MEMBER( ticket_dispenser_device::line_r )
 
 
 //-------------------------------------------------
-//  motor_w - write the control line
+//  write - write the control line via the active
+//  bit (legacy method)
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( ticket_dispenser_device::motor_w )
+WRITE8_MEMBER( ticket_dispenser_device::write )
 {
 	// On an activate signal, start dispensing!
-	if (bool(state) == m_motoron)
+	if ((data & m_active_bit) == m_motoron)
 	{
 		if (!m_power)
 		{
 			LOG(("%s: Ticket Power On\n", machine().describe_context()));
 			m_timer->adjust(m_period);
-			m_power = true;
+			m_power = 1;
 			m_status = m_ticketnotdispensed;
 		}
 	}
@@ -134,9 +148,19 @@ WRITE_LINE_MEMBER( ticket_dispenser_device::motor_w )
 				m_timer->adjust(attotime::never);
 				machine().output().set_led_value(2, 0);
 			}
-			m_power = false;
+			m_power = 0;
 		}
 	}
+}
+
+//-------------------------------------------------
+//  motor_w - write the control line as a proper
+//  line
+//-------------------------------------------------
+
+WRITE_LINE_MEMBER( ticket_dispenser_device::motor_w )
+{
+	write(machine().dummy_space(), 0, state ? m_active_bit : 0);
 }
 
 
@@ -150,9 +174,10 @@ WRITE_LINE_MEMBER( ticket_dispenser_device::motor_w )
 
 void ticket_dispenser_device::device_start()
 {
-	m_motoron = (m_motor_sense == TICKET_MOTOR_ACTIVE_HIGH);
-	m_ticketdispensed = (m_status_sense == TICKET_STATUS_ACTIVE_HIGH);
-	m_ticketnotdispensed = !m_ticketdispensed;
+	m_active_bit = 0x80;
+	m_motoron = (m_motor_sense == TICKET_MOTOR_ACTIVE_HIGH) ? m_active_bit : 0;
+	m_ticketdispensed = (m_status_sense == TICKET_STATUS_ACTIVE_HIGH) ? m_active_bit : 0;
+	m_ticketnotdispensed = m_ticketdispensed ^ m_active_bit;
 
 	m_timer = timer_alloc();
 
@@ -168,7 +193,7 @@ void ticket_dispenser_device::device_start()
 void ticket_dispenser_device::device_reset()
 {
 	m_status = m_ticketnotdispensed;
-	m_power = false;
+	m_power = 0x00;
 }
 
 
@@ -181,13 +206,13 @@ void ticket_dispenser_device::device_timer(emu_timer &timer, device_timer_id id,
 	// if we still have power, keep toggling ticket states
 	if (m_power)
 	{
-		m_status = !m_status;
+		m_status ^= m_active_bit;
 		LOG(("Ticket Status Changed to %02X\n", m_status));
 		m_timer->adjust(m_period);
 	}
 	else if (m_hopper_type)
 	{
-		m_status = !m_status;
+		m_status ^= m_active_bit;
 		LOG(("%s: Ticket Power Off\n", machine().describe_context()));
 		m_timer->adjust(attotime::never);
 		machine().output().set_led_value(2, 0);

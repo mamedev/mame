@@ -78,8 +78,9 @@ WRITE16_MEMBER(splash_state::vram_w)
 
 void splash_state::draw_bitmap(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	int colxor = 0; /* splash and some bitmap modes in roldfrog */
-	int swaps = 0;
+	int sx,sy,color,count,colxor,bitswap;
+	colxor = 0; /* splash and some bitmap modes in roldfrog */
+	bitswap = 0;
 
 	if (m_bitmap_type == 1) /* roldfrog */
 	{
@@ -89,7 +90,7 @@ void splash_state::draw_bitmap(bitmap_ind16 &bitmap, const rectangle &cliprect)
 		}
 		else if (m_bitmap_mode[0] == 0x0100)
 		{
-			swaps = 1;
+			bitswap = 1;
 		}
 		else if (m_bitmap_mode[0] == 0x0200)
 		{
@@ -97,56 +98,56 @@ void splash_state::draw_bitmap(bitmap_ind16 &bitmap, const rectangle &cliprect)
 		}
 		else if (m_bitmap_mode[0] == 0x0300)
 		{
-			swaps = 2;
+			bitswap = 2;
 			colxor = 0x7f;
 		}
 		else if (m_bitmap_mode[0] == 0x0400)
 		{
-			swaps = 3;
+			bitswap = 3;
 		}
 		else if (m_bitmap_mode[0] == 0x0500)
 		{
-			swaps = 4;
+			bitswap = 4;
 		}
 		else if (m_bitmap_mode[0] == 0x0600)
 		{
-			swaps = 5;
+			bitswap = 5;
 			colxor = 0x7f;
 		}
 		else if (m_bitmap_mode[0] == 0x0700)
 		{
-			swaps = 6;
+			bitswap = 6;
 			colxor = 0x55;
 		}
 	}
 
-	int count = 0;
-	for (int sy=0;sy<256;sy++)
+	count = 0;
+	for (sy=0;sy<256;sy++)
 	{
-		for (int sx=0;sx<512;sx++)
+		for (sx=0;sx<512;sx++)
 		{
-			int color = m_pixelram[count]&0xff;
+			color = m_pixelram[count]&0xff;
 			count++;
 
-			switch (swaps)
+			switch( bitswap )
 			{
 			case 1:
-				color = bitswap<8>(color,7,0,1,2,3,4,5,6);
+				color = BITSWAP8(color,7,0,1,2,3,4,5,6);
 				break;
 			case 2:
-				color = bitswap<8>(color,7,4,6,5,1,0,3,2);
+				color = BITSWAP8(color,7,4,6,5,1,0,3,2);
 				break;
 			case 3:
-				color = bitswap<8>(color,7,3,2,1,0,6,5,4);
+				color = BITSWAP8(color,7,3,2,1,0,6,5,4);
 				break;
 			case 4:
-				color = bitswap<8>(color,7,6,4,2,0,5,3,1);
+				color = BITSWAP8(color,7,6,4,2,0,5,3,1);
 				break;
 			case 5:
-				color = bitswap<8>(color,7,0,6,5,4,3,2,1);
+				color = BITSWAP8(color,7,0,6,5,4,3,2,1);
 				break;
 			case 6:
-				color = bitswap<8>(color,7,4,3,2,1,0,6,5);
+				color = BITSWAP8(color,7,4,3,2,1,0,6,5);
 				break;
 			}
 

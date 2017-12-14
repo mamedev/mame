@@ -743,7 +743,7 @@ void apple2e_state::machine_start()
 		// let's do that in the modern MAME way
 		for (int i=0; i<0x040000; i++)
 		{
-			m_cec_remap[i] = bitswap<8>(m_cec_ptr[i], 0, 1, 2, 3, 4, 5, 6, 7);
+			m_cec_remap[i] = BITSWAP8(m_cec_ptr[i], 0, 1, 2, 3, 4, 5, 6, 7);
 		}
 
 		// remap cec gfx1 rom

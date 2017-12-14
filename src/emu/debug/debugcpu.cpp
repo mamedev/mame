@@ -389,20 +389,34 @@ u8 debugger_cpu::read_byte(address_space &space, offs_t address, bool apply_tran
 
 u16 debugger_cpu::read_word(address_space &space, offs_t address, bool apply_translation)
 {
-	device_memory_interface &memory = space.device().memory();
-
 	/* mask against the logical byte mask */
 	address &= space.logaddrmask();
 
 	u16 result;
-	/* translate if necessary; if not mapped, return 0xffff */
-	if (apply_translation && !memory.translate(space.spacenum(), TRANSLATE_READ_DEBUG, address))
-	{
-		result = 0xffff;
+	if (!WORD_ALIGNED(address))
+	{   /* if this is misaligned read, or if there are no word readers, just read two bytes */
+		u8 byte0 = read_byte(space, address + 0, apply_translation);
+		u8 byte1 = read_byte(space, address + 1, apply_translation);
+
+		/* based on the endianness, the result is assembled differently */
+		if (space.endianness() == ENDIANNESS_LITTLE)
+			result = byte0 | (byte1 << 8);
+		else
+			result = byte1 | (byte0 << 8);
 	}
 	else
-	{   /* otherwise, call the byte reading function for the translated address */
-		result = space.read_word_unaligned(address);
+	{   /* otherwise, this proceeds like the byte case */
+		device_memory_interface &memory = space.device().memory();
+
+		/* translate if necessary; if not mapped, return 0xffff */
+		if (apply_translation && !memory.translate(space.spacenum(), TRANSLATE_READ_DEBUG, address))
+		{
+			result = 0xffff;
+		}
+		else
+		{   /* otherwise, call the byte reading function for the translated address */
+			result = space.read_word(address);
+		}
 	}
 
 	return result;
@@ -416,20 +430,33 @@ u16 debugger_cpu::read_word(address_space &space, offs_t address, bool apply_tra
 
 u32 debugger_cpu::read_dword(address_space &space, offs_t address, bool apply_translation)
 {
-	device_memory_interface &memory = space.device().memory();
-
 	/* mask against the logical byte mask */
 	address &= space.logaddrmask();
 
 	u32 result;
+	if (!DWORD_ALIGNED(address))
+	{   /* if this is a misaligned read, or if there are no dword readers, just read two words */
+		u16 word0 = read_word(space, address + 0, apply_translation);
+		u16 word1 = read_word(space, address + 2, apply_translation);
 
-	if (apply_translation && !memory.translate(space.spacenum(), TRANSLATE_READ_DEBUG, address))
-	{   /* translate if necessary; if not mapped, return 0xffffffff */
-		result = 0xffffffff;
+		/* based on the endianness, the result is assembled differently */
+		if (space.endianness() == ENDIANNESS_LITTLE)
+			result = word0 | (word1 << 16);
+		else
+			result = word1 | (word0 << 16);
 	}
 	else
-	{   /* otherwise, call the byte reading function for the translated address */
-		result = space.read_dword_unaligned(address);
+	{   /* otherwise, this proceeds like the byte case */
+		device_memory_interface &memory = space.device().memory();
+
+		if (apply_translation && !memory.translate(space.spacenum(), TRANSLATE_READ_DEBUG, address))
+		{   /* translate if necessary; if not mapped, return 0xffffffff */
+			result = 0xffffffff;
+		}
+		else
+		{   /* otherwise, call the byte reading function for the translated address */
+			result = space.read_dword(address);
+		}
 	}
 
 	return result;
@@ -443,21 +470,34 @@ u32 debugger_cpu::read_dword(address_space &space, offs_t address, bool apply_tr
 
 u64 debugger_cpu::read_qword(address_space &space, offs_t address, bool apply_translation)
 {
-	device_memory_interface &memory = space.device().memory();
-
 	/* mask against the logical byte mask */
 	address &= space.logaddrmask();
 
 	u64 result;
+	if (!QWORD_ALIGNED(address))
+	{   /* if this is a misaligned read, or if there are no qword readers, just read two dwords */
+		u32 dword0 = read_dword(space, address + 0, apply_translation);
+		u32 dword1 = read_dword(space, address + 4, apply_translation);
 
-	/* translate if necessary; if not mapped, return 0xffffffffffffffff */
-	if (apply_translation && !memory.translate(space.spacenum(), TRANSLATE_READ_DEBUG, address))
-	{
-		result = ~u64(0);
+		/* based on the endianness, the result is assembled differently */
+		if (space.endianness() == ENDIANNESS_LITTLE)
+			result = dword0 | (u64(dword1) << 32);
+		else
+			result = dword1 | (u64(dword0) << 32);
 	}
 	else
-	{   /* otherwise, call the byte reading function for the translated address */
-		result = space.read_qword_unaligned(address);
+	{   /* otherwise, this proceeds like the byte case */
+		device_memory_interface &memory = space.device().memory();
+
+		/* translate if necessary; if not mapped, return 0xffffffffffffffff */
+		if (apply_translation && !memory.translate(space.spacenum(), TRANSLATE_READ_DEBUG, address))
+		{
+			result = ~u64(0);
+		}
+		else
+		{   /* otherwise, call the byte reading function for the translated address */
+			result = space.read_qword(address);
+		}
 	}
 
 	return result;
@@ -1862,7 +1902,6 @@ void device_debug::single_step(int numsteps)
 {
 	assert(m_exec != nullptr);
 
-	m_device.machine().rewind_capture();
 	m_stepsleft = numsteps;
 	m_stepaddr = ~0;
 	m_flags |= DEBUG_FLAG_STEPPING;
@@ -1879,7 +1918,6 @@ void device_debug::single_step_over(int numsteps)
 {
 	assert(m_exec != nullptr);
 
-	m_device.machine().rewind_capture();
 	m_stepsleft = numsteps;
 	m_stepaddr = ~0;
 	m_flags |= DEBUG_FLAG_STEPPING_OVER;
@@ -1896,7 +1934,6 @@ void device_debug::single_step_out()
 {
 	assert(m_exec != nullptr);
 
-	m_device.machine().rewind_capture();
 	m_stepsleft = 100;
 	m_stepaddr = ~0;
 	m_flags |= DEBUG_FLAG_STEPPING_OUT;
@@ -1913,7 +1950,6 @@ void device_debug::go(offs_t targetpc)
 {
 	assert(m_exec != nullptr);
 
-	m_device.machine().rewind_invalidate();
 	m_stopaddr = targetpc;
 	m_flags |= DEBUG_FLAG_STOP_PC;
 	m_device.machine().debugger().cpu().set_execution_state(EXECUTION_STATE_RUNNING);
@@ -1928,7 +1964,6 @@ void device_debug::go_vblank()
 {
 	assert(m_exec != nullptr);
 
-	m_device.machine().rewind_invalidate();
 	m_flags |= DEBUG_FLAG_STOP_VBLANK;
 	m_device.machine().debugger().cpu().go_vblank();
 }
@@ -1943,7 +1978,6 @@ void device_debug::go_interrupt(int irqline)
 {
 	assert(m_exec != nullptr);
 
-	m_device.machine().rewind_invalidate();
 	m_stopirq = irqline;
 	m_flags |= DEBUG_FLAG_STOP_INTERRUPT;
 	m_device.machine().debugger().cpu().set_execution_state(EXECUTION_STATE_RUNNING);
@@ -1963,7 +1997,6 @@ void device_debug::go_exception(int exception)
 {
 	assert(m_exec != nullptr);
 
-	m_device.machine().rewind_invalidate();
 	m_stopexception = exception;
 	m_flags |= DEBUG_FLAG_STOP_EXCEPTION;
 	m_device.machine().debugger().cpu().set_execution_state(EXECUTION_STATE_RUNNING);
@@ -1979,7 +2012,6 @@ void device_debug::go_milliseconds(u64 milliseconds)
 {
 	assert(m_exec != nullptr);
 
-	m_device.machine().rewind_invalidate();
 	m_stoptime = m_device.machine().time() + attotime::from_msec(milliseconds);
 	m_flags |= DEBUG_FLAG_STOP_TIME;
 	m_device.machine().debugger().cpu().set_execution_state(EXECUTION_STATE_RUNNING);
@@ -2790,14 +2822,14 @@ void debugger_cpu::watchpoint_check(address_space& space, int type, offs_t addre
 
 					if (type & WATCHPOINT_WRITE)
 					{
-						buffer = string_format("Stopped at watchpoint %X writing %s to %08X (PC=%X)", wp->index(), sizes[size], address, pc);
+						buffer = string_format("Stopped at watchpoint %X writing %s to %08X (PC=%X)", wp->index(), sizes[size], space.byte_to_address(address), pc);
 						if (value_to_write >> 32)
 							buffer.append(string_format(" (data=%X%08X)", u32(value_to_write >> 32), u32(value_to_write)));
 						else
 							buffer.append(string_format(" (data=%X)", u32(value_to_write)));
 					}
 					else
-						buffer = string_format("Stopped at watchpoint %X reading %s from %08X (PC=%X)", wp->index(), sizes[size], address, pc);
+						buffer = string_format("Stopped at watchpoint %X reading %s from %08X (PC=%X)", wp->index(), sizes[size], space.byte_to_address(address), pc);
 					m_machine.debugger().console().printf("%s\n", buffer.c_str());
 					space.device().debug()->compute_debug_flags();
 				}

@@ -344,9 +344,6 @@ public:
 	optional_device<ns16550_device> m_uart2;
 	optional_ioport_array<8> m_io_analog;
 	int m_a2d_shift;
-	int8_t m_wheel_force;
-	int m_wheel_offset;
-	bool m_wheel_calibrated;
 	uint8_t m_vblank_state;
 	uint8_t m_cpuio_data[4];
 	uint8_t m_sio_reset_ctrl;
@@ -405,7 +402,6 @@ public:
 	DECLARE_READ32_MEMBER(unknown_r);
 	DECLARE_READ8_MEMBER(parallel_r);
 	DECLARE_WRITE8_MEMBER(parallel_w);
-	DECLARE_WRITE8_MEMBER(mpsreset_w);
 	DECLARE_WRITE32_MEMBER(i40_w);
 	DECLARE_CUSTOM_INPUT_MEMBER(i40_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(keypad_r);
@@ -457,7 +453,6 @@ void vegas_state::machine_start()
 	save_item(NAME(m_i40_data));
 	save_item(NAME(m_keypad_select));
 	save_item(NAME(m_gear));
-	save_item(NAME(m_wheel_calibrated));
 }
 
 
@@ -477,9 +472,6 @@ void vegas_state::machine_reset()
 	m_i40_data = 0;
 	m_keypad_select = 0;
 	m_gear = 1;
-	m_wheel_force = 0;
-	m_wheel_offset = 0;
-	m_wheel_calibrated = false;
 }
 
 /*************************************
@@ -884,34 +876,13 @@ WRITE32_MEMBER( vegas_state::analog_port_w )
 {
 	uint32_t shift_data = data >> m_a2d_shift;
 	int index = shift_data & 0x7;
-	uint8_t currValue = m_io_analog[index].read_safe(0);
-	if (!m_wheel_calibrated && ((m_wheel_force > 20) || (m_wheel_force < -20))) {
-		if (m_wheel_force > 0 && m_wheel_offset < 128)
-			m_wheel_offset++;
-		else if (m_wheel_offset > -128)
-			m_wheel_offset--;
-		int tmpVal = int(currValue) + m_wheel_offset;
-		if (tmpVal < m_io_analog[index]->field(0xff)->minval())
-			m_pending_analog_read = m_io_analog[index]->field(0xff)->minval();
-		else if (tmpVal > m_io_analog[index]->field(0xff)->maxval())
-			m_pending_analog_read = m_io_analog[index]->field(0xff)->maxval();
-		else
-			m_pending_analog_read = tmpVal;
-	}
-	else {
-		m_pending_analog_read = currValue;
-	}
-	// Declare calibration finished as soon as non-middle value is detected, ie the user has turned the wheel
-	if (!m_wheel_calibrated && currValue != 0 && (currValue > (0x80 + 0x10) || currValue < (0x80 - 0x10))) {
-		m_wheel_calibrated = true;
-		//osd_printf_info("wheel calibration comlete wheel: %02x\n", currValue);
-	}
-	//logerror("analog_port_w: wheel_force: %i read: %i\n", m_wheel_force, m_pending_analog_read);
+	m_pending_analog_read = (m_io_analog[index].read_safe(0));
 	//logerror("%08X: analog_port_w = %08X & %08X index = %d\n", machine().device("maincpu")->safe_pc(), data, mem_mask, index);
 	if (m_sio_irq_enable & 0x02) {
 		m_sio_irq_state |= 0x02;
 		update_sio_irqs();
 	}
+
 }
 
 
@@ -978,14 +949,6 @@ WRITE8_MEMBER(vegas_state::parallel_w)
 }
 
 /*************************************
-* MPS Reset
-*************************************/
-WRITE8_MEMBER(vegas_state::mpsreset_w)
-{
-	logerror("%06X: mpsreset_w %08x = %02x\n", machine().device("maincpu")->safe_pc(), offset, data);
-}
-
-/*************************************
 * Optical 49 Way Joystick I40 Board
 *************************************/
 WRITE32_MEMBER(vegas_state::i40_w)
@@ -1045,13 +1008,12 @@ CUSTOM_INPUT_MEMBER(vegas_state::i40_r)
 *************************************/
 WRITE32_MEMBER(vegas_state::wheel_board_w)
 {
+	//logerror("wheel_board_w: data = %08x\n", data);
 	/* two writes in pairs. bit 11 high, bit 10 flag, flag off first, on second. arg remains the same. */
 	bool valid = (data & (1 << 11));
 	bool flag = (data & (1 << 10));
 	uint8_t op = (data >> 8) & 0x3;
 	uint8_t arg = data & 0xff;
-
-	//logerror("wheel_board_w: data = %08x op: %02x arg: %02x\n", data, op, arg);
 
 	if (valid && flag)
 	{
@@ -1059,7 +1021,6 @@ WRITE32_MEMBER(vegas_state::wheel_board_w)
 		{
 		case 0x0:
 			machine().output().set_value("wheel", arg); // target wheel angle. signed byte.
-			m_wheel_force = int8_t(~arg);
 			break;
 
 		case 0x1:
@@ -1667,7 +1628,7 @@ static ADDRESS_MAP_START(vegas_cs8_map, AS_PROGRAM, 32, vegas_state)
 	AM_RANGE(0x01000000, 0x0100001f) AM_DEVREADWRITE8("uart1", ns16550_device, ins8250_r, ins8250_w, 0xff) // Serial ttyS01 (TL16C552 CS0)
 	AM_RANGE(0x01400000, 0x0140001f) AM_DEVREADWRITE8("uart2", ns16550_device, ins8250_r, ins8250_w, 0xff) // Serial ttyS02 (TL16C552 CS1)
 	AM_RANGE(0x01800000, 0x0180001f) AM_READWRITE8(parallel_r, parallel_w, 0xff) // Parallel UART (TL16C552 CS2)
-	AM_RANGE(0x01c00000, 0x01c00003) AM_WRITE8(mpsreset_w, 0xff) // MPS Reset
+	//AM_RANGE(0x01c00000, 0x0180001f) AM_READWRITE8(parallel_r, parallel_w, 0xff) // MPS Reset
 ADDRESS_MAP_END
 
 /*************************************
@@ -2306,8 +2267,6 @@ DRIVER_INIT_MEMBER(vegas_state,warfa)
 {
 	/* speedups */
 	m_maincpu->mips3drc_add_hotspot(0x8009436C, 0x0C031663, 250);     /* confirmed */
-	// TODO: For some reason game hangs if ethernet is on
-	m_ethernet->set_link_connected(false);
 }
 
 

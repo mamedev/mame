@@ -16,7 +16,8 @@
     Note: All commands must be in uppercase. See the SWTBUG manual.
 
     ToDo:
-        - Add more SS-50 interface slot options
+        - Add more SS-50 interface slot options (in particular, MIKBUG
+          needs MP-C for I/O slot #1)
         - Emulate MP-A2 revision of CPU board, with four 2716 ROM sockets
           and allowance for extra RAM boards at A000-BFFF and C000-DFFF
 
@@ -181,7 +182,7 @@ static MACHINE_CONFIG_DERIVED( swtpcm, swtpc )
 	MCFG_DEVICE_CLOCK(XTAL_1_7971MHz)
 
 	MCFG_DEVICE_MODIFY("io1")
-	MCFG_SLOT_DEFAULT_OPTION("mpc")
+	//MCFG_SLOT_DEFAULT_OPTION("mpc")
 MACHINE_CONFIG_END
 
 /* ROM definition */
@@ -199,4 +200,4 @@ ROM_END
 
 //    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT  STATE        INIT  COMPANY                                     FULLNAME      FLAGS
 COMP( 1977, swtpc,  0,      0,      swtpc,   swtpc, swtpc_state, 0,    "Southwest Technical Products Corporation", "SWTPC 6800 Computer System (with SWTBUG)", MACHINE_NO_SOUND_HW )
-COMP( 1975, swtpcm, swtpc,  0,      swtpcm,  swtpc, swtpc_state, 0,    "Southwest Technical Products Corporation", "SWTPC 6800 Computer System (with MIKBUG)", MACHINE_NO_SOUND_HW )
+COMP( 1975, swtpcm, swtpc,  0,      swtpcm,  swtpc, swtpc_state, 0,    "Southwest Technical Products Corporation", "SWTPC 6800 Computer System (with MIKBUG)", MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING )

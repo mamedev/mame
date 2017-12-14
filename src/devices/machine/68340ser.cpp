@@ -150,7 +150,7 @@ WRITE_LINE_MEMBER( mc68340_serial_module_device::irq_w )
 	LOGINT("IRQ!\n%s\n", FUNCNAME);
 	if (m_ilr > 0)
 	{
-		if (((m_cpu->m_m68340SIM->m_avr_rsr >> (8 + m_ilr)) & 1) != 0) // use autovector ?
+		if (((m_cpu->m68340SIM->m_avr_rsr >> (8 + m_ilr)) & 1) != 0) // use autovector ?
 		{
 			LOGINT("- Autovector level %d\n", m_ilr);
 			m_cpu->set_input_line(m_ilr, HOLD_LINE);

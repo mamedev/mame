@@ -238,17 +238,6 @@ struct z8000_unidasm_t : z8000_disassembler::config
 	virtual bool get_segmented_mode() const override { return segmented_mode; }
 } z8000_unidasm;
 
-// Configuration missing
-struct hyperstone_unidasm_t : hyperstone_disassembler::config
-{
-	bool h;
-	u8 fp;
-	hyperstone_unidasm_t() { h = false; fp = 0; }
-	virtual ~hyperstone_unidasm_t() = default;
-
-	virtual u8 get_fp() const { return fp; }
-	virtual bool get_h() const { return h; }
-} hyperstone_unidasm;
 
 
 
@@ -333,7 +322,7 @@ static const dasm_table_entry dasm_table[] =
 	{ "hmcs40",          le, -1, []() -> util::disasm_interface * { return new hmcs40_disassembler; } },
 	{ "hp_hybrid",       be, -1, []() -> util::disasm_interface * { return new hp_hybrid_disassembler; } },
 	{ "hp_5061_3001",    be, -1, []() -> util::disasm_interface * { return new hp_5061_3001_disassembler; } },
-	{ "hyperstone",      be,  0, []() -> util::disasm_interface * { return new hyperstone_disassembler(&hyperstone_unidasm); } },
+	{ "hyperstone",      be,  0, []() -> util::disasm_interface * { return new hyperstone_disassembler; } },
 	{ "i4004",           le,  0, []() -> util::disasm_interface * { return new i4004_disassembler; } },
 	{ "i4040",           le,  0, []() -> util::disasm_interface * { return new i4040_disassembler; } },
 	{ "i8008",           le,  0, []() -> util::disasm_interface * { return new i8008_disassembler; } },

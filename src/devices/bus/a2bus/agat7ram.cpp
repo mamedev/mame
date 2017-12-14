@@ -10,9 +10,6 @@
 
 #include "agat7ram.h"
 
-//#define VERBOSE 1
-#include "logmacro.h"
-
 /***************************************************************************
     PARAMETERS
 ***************************************************************************/
@@ -33,7 +30,7 @@ DEFINE_DEVICE_TYPE(A2BUS_AGAT7RAM, a2bus_agat7ram_device, "a7ram", "Agat-7 32K R
 
 a2bus_agat7ram_device::a2bus_agat7ram_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, type, tag, owner, clock),
-	device_a2bus_card_interface(mconfig, *this), m_inh_state(0), m_main_bank(0), m_csr(0)
+	device_a2bus_card_interface(mconfig, *this), m_inh_state(0), m_last_offset(0), m_main_bank(0)
 {
 }
 
@@ -51,32 +48,32 @@ void a2bus_agat7ram_device::device_start()
 	// set_a2bus_device makes m_slot valid
 	set_a2bus_device();
 
-	memset(m_ram, 0, 32 * 1024);
+	memset(m_ram, 0, 32*1024);
 
 	save_item(NAME(m_inh_state));
 	save_item(NAME(m_ram));
 	save_item(NAME(m_main_bank));
-	save_item(NAME(m_csr));
+	save_item(NAME(m_last_offset));
 }
 
 void a2bus_agat7ram_device::device_reset()
 {
 	m_inh_state = INH_NONE;
 	m_main_bank = 0;
-	m_csr = 0;
+	m_last_offset = -1;
 }
 
 void a2bus_agat7ram_device::do_io(int offset)
 {
 	int old_inh_state = m_inh_state;
 
-	m_csr = offset & 0x7f;
+	m_last_offset = offset;
 	m_inh_state = INH_NONE;
 	m_main_bank = 0;
 
 	if (offset & 0x8)
 	{
-		m_inh_state = INH_READ | INH_WRITE;
+		m_inh_state = INH_READ|INH_WRITE;
 	}
 
 	if (offset & 0x1)
@@ -89,11 +86,13 @@ void a2bus_agat7ram_device::do_io(int offset)
 		recalc_slot_inh();
 	}
 
-	LOG("RAM: (ofs %02x) new state %c%c main=%05x\n",
+#if 1
+	logerror("RAM: (ofs %02x) new state %c%c main=%05x\n",
 			offset,
 			(m_inh_state & INH_READ) ? 'R' : 'x',
 			(m_inh_state & INH_WRITE) ? 'W' : 'x',
 			m_main_bank);
+#endif
 }
 
 
@@ -103,7 +102,7 @@ void a2bus_agat7ram_device::do_io(int offset)
 
 uint8_t a2bus_agat7ram_device::read_cnxx(address_space &space, uint8_t offset)
 {
-	return m_csr;
+	return m_last_offset < 0 ? 0 : (m_last_offset & 0x7f);
 }
 
 
@@ -126,10 +125,12 @@ uint8_t a2bus_agat7ram_device::read_inh_rom(address_space &space, uint16_t offse
 void a2bus_agat7ram_device::write_inh_rom(address_space &space, uint16_t offset, uint8_t data)
 {
 	// are writes enabled?
-	if ((m_inh_state & INH_WRITE) && !BIT(m_csr, 4))
+	if (!(m_inh_state & INH_WRITE))
 	{
-		m_ram[(offset & 0x3fff) + m_main_bank] = data;
+		return;
 	}
+
+	m_ram[(offset & 0x3fff) + m_main_bank] = data;
 }
 
 int a2bus_agat7ram_device::inh_type()

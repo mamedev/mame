@@ -16,7 +16,6 @@
 #include "machine/nvram.h"
 #include "machine/timer.h"
 #include "machine/atmel_arm_aic.h"
-#include "machine/pgm2_memcard.h"
 
 class pgm2_state : public driver_device
 {
@@ -32,8 +31,6 @@ public:
 		m_bg_videoram(*this, "bg_videoram"),
 		m_sp_videoram(*this, "sp_videoram"),
 		m_bgscroll(*this, "bgscroll"),
-		m_fgscroll(*this, "fgscroll"),
-		m_vidmode(*this, "vidmode"),
 		m_gfxdecode2(*this, "gfxdecode2"),
 		m_gfxdecode3(*this, "gfxdecode3"),
 		m_arm_aic(*this, "arm_aic"),
@@ -41,31 +38,15 @@ public:
 		m_sprites_colour(*this, "sprites_colour"),
 		m_sp_palette(*this, "sp_palette"),
 		m_bg_palette(*this, "bg_palette"),
-		m_tx_palette(*this, "tx_palette"),
-		m_mcu_timer(*this, "mcu_timer"),
-		m_memcard(*this, "memcard_p%u", 1U)
+		m_tx_palette(*this, "tx_palette")
 	{ }
 
 	DECLARE_READ32_MEMBER(unk_startup_r);
-	DECLARE_READ32_MEMBER(rtc_r);
-	DECLARE_READ32_MEMBER(mcu_r);
 	DECLARE_WRITE32_MEMBER(fg_videoram_w);
 	DECLARE_WRITE32_MEMBER(bg_videoram_w);
-	DECLARE_WRITE32_MEMBER(mcu_w);
-	DECLARE_WRITE16_MEMBER(share_bank_w);
-	DECLARE_READ8_MEMBER(shareram_r);
-	DECLARE_WRITE8_MEMBER(shareram_w);
-	DECLARE_WRITE16_MEMBER(unk30120014_w);
-	DECLARE_WRITE16_MEMBER(unk30120018_w);
-	
+
 	DECLARE_READ32_MEMBER(orleg2_speedup_r);
 	DECLARE_READ32_MEMBER(kov2nl_speedup_r);
-	DECLARE_READ32_MEMBER(kof98umh_speedup_r);
-
-	DECLARE_READ8_MEMBER(encryption_r);
-	DECLARE_WRITE8_MEMBER(encryption_w);
-	DECLARE_WRITE32_MEMBER(encryption_do_w);
-	DECLARE_WRITE32_MEMBER(sprite_encryption_w);
 
 	DECLARE_DRIVER_INIT(kov2nl);
 	DECLARE_DRIVER_INIT(orleg2);
@@ -109,21 +90,6 @@ private:
 
 	uint32_t m_sprites_mask_mask;
 	uint32_t m_sprites_colour_mask;
-	
-	void common_encryption_init();
-	uint8_t m_encryption_table[0x100];
-	int m_has_decrypted;	// so we only do it once.
-	uint32_t m_spritekey;
-	uint32_t m_realspritekey;
-	int m_sprite_predecrypted;
-
-	uint8_t m_shareram[0x100];
-	uint16_t m_share_bank;
-	uint32_t m_mcu_regs[8];
-	uint32_t m_mcu_result0;
-	uint32_t m_mcu_result1;
-	uint8_t m_mcu_last_cmd;
-	void mcu_command(address_space &space, bool is_command);
 
 	// devices
 	required_device<cpu_device> m_maincpu;
@@ -135,8 +101,6 @@ private:
 	required_shared_ptr<uint32_t> m_bg_videoram;
 	required_shared_ptr<uint32_t> m_sp_videoram;
 	required_shared_ptr<uint32_t> m_bgscroll;
-	required_shared_ptr<uint32_t> m_fgscroll;
-	required_shared_ptr<uint32_t> m_vidmode;
 	required_device<gfxdecode_device> m_gfxdecode2;
 	required_device<gfxdecode_device> m_gfxdecode3;
 	required_device<arm_aic_device> m_arm_aic;
@@ -145,9 +109,6 @@ private:
 	required_device<palette_device> m_sp_palette;
 	required_device<palette_device> m_bg_palette;
 	required_device<palette_device> m_tx_palette;
-	required_device<timer_device> m_mcu_timer;
-
-	optional_device_array<pgm2_memcard_device, 4> m_memcard;
 };
 
 #endif

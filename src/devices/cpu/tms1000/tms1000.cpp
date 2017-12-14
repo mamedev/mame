@@ -8,7 +8,7 @@
   TODO:
   - add TMS1270 (10 O pins, how does that work?)
   - add TMS1200C (has L input pins like TMS1600)
-  - add TMS1000C-specific mpla
+  - add HALT input pin for TMS1000C
 
 */
 
@@ -34,13 +34,6 @@ DEFINE_DEVICE_TYPE(TMS1700,  tms1700_cpu_device,  "tms1700",  "TMS1700") // 28-p
 DEFINE_DEVICE_TYPE(TMS1730,  tms1730_cpu_device,  "tms1730",  "TMS1730") // 20-pin DIP, same die as TMS1700, package has less pins: 6 R pins, 5 O pins (output PLA is still 8-bit, O1,O3,O5 unused)
 
 // CMOS versions (3-level stack, HALT pin)
-// - RAM at top-left, ROM at top-right(rotate CCW)
-// - ROM ordering is different:
-//   * row select is linear (0-63)
-//   * bit select is 7-0 instead of 0-7
-//   * page select doesn't flip in the middle
-// - 32-term mpla at bottom-right, different order
-// - 32-term opla at bottom-left, ordered O7-O0(0 or 1), and A8,4,2,1,S
 DEFINE_DEVICE_TYPE(TMS1000C, tms1000c_cpu_device, "tms1000c", "TMS1000C") // 28-pin SDIP, 10 R pins
 
 // 2nd source Motorola chips
@@ -128,17 +121,6 @@ MACHINE_CONFIG_MEMBER(tms1000_cpu_device::device_add_mconfig)
 	MCFG_PLA_ADD("opla", 5, 8, 20)
 	MCFG_PLA_FILEFORMAT(BERKELEY)
 MACHINE_CONFIG_END
-
-MACHINE_CONFIG_MEMBER(tms1000c_cpu_device::device_add_mconfig)
-
-	// microinstructions PLA, output PLA
-	//MCFG_PLA_ADD("mpla", 8, 16, 32)
-	MCFG_PLA_ADD("mpla", 8, 16, 30)
-	MCFG_PLA_FILEFORMAT(BERKELEY)
-	MCFG_PLA_ADD("opla", 5, 8, 32)
-	MCFG_PLA_FILEFORMAT(BERKELEY)
-MACHINE_CONFIG_END
-
 
 // disasm
 util::disasm_interface *tms1000_cpu_device::create_disassembler()

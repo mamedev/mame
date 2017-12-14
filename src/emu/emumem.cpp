@@ -738,20 +738,18 @@ private:
 	}
 
 	// internal watchpoint handler
-	template<typename UintType, int AddrShift>
+	template<typename UintType>
 	UintType watchpoint_r(address_space &space, offs_t offset, UintType mask)
 	{
-		int base_shift = sizeof(UintType) == 1 ? 0 : sizeof(UintType) == 2 ? 1 : sizeof(UintType) == 4 ? 2 : 3;
-		offset = offset << (AddrShift + base_shift);
-		m_space.device().debug()->memory_read_hook(m_space, offset, mask);
+		m_space.device().debug()->memory_read_hook(m_space, offset * sizeof(UintType), mask);
 
 		u16 *oldtable = m_live_lookup;
 		m_live_lookup = &m_table[0];
 		UintType result;
 		if (sizeof(UintType) == 1) result = m_space.read_byte(offset);
-		if (sizeof(UintType) == 2) result = m_space.read_word(offset, mask);
-		if (sizeof(UintType) == 4) result = m_space.read_dword(offset, mask);
-		if (sizeof(UintType) == 8) result = m_space.read_qword(offset, mask);
+		if (sizeof(UintType) == 2) result = m_space.read_word(offset << 1, mask);
+		if (sizeof(UintType) == 4) result = m_space.read_dword(offset << 2, mask);
+		if (sizeof(UintType) == 8) result = m_space.read_qword(offset << 3, mask);
 		m_live_lookup = oldtable;
 		return result;
 	}
@@ -808,19 +806,17 @@ private:
 	{
 	}
 
-	template<typename UintType, int AddrShift>
+	template<typename UintType>
 	void watchpoint_w(address_space &space, offs_t offset, UintType data, UintType mask)
 	{
-		int base_shift = sizeof(UintType) == 1 ? 0 : sizeof(UintType) == 2 ? 1 : sizeof(UintType) == 4 ? 2 : 3;
-		offset = offset << (AddrShift + base_shift);
-		m_space.device().debug()->memory_write_hook(m_space, offset, data, mask);
+		m_space.device().debug()->memory_write_hook(m_space, offset * sizeof(UintType), data, mask);
 
 		u16 *oldtable = m_live_lookup;
 		m_live_lookup = &m_table[0];
 		if (sizeof(UintType) == 1) m_space.write_byte(offset, data);
-		if (sizeof(UintType) == 2) m_space.write_word(offset, data, mask);
-		if (sizeof(UintType) == 4) m_space.write_dword(offset, data, mask);
-		if (sizeof(UintType) == 8) m_space.write_qword(offset, data, mask);
+		if (sizeof(UintType) == 2) m_space.write_word(offset << 1, data, mask);
+		if (sizeof(UintType) == 4) m_space.write_dword(offset << 2, data, mask);
+		if (sizeof(UintType) == 8) m_space.write_qword(offset << 3, data, mask);
 		m_live_lookup = oldtable;
 	}
 
@@ -3917,51 +3913,28 @@ address_table_read::address_table_read(address_space &space, bool large)
 		case 8:
 			m_handlers[STATIC_UNMAP]->set_delegate(read8_delegate(FUNC(address_table_read::unmap_r<u8>), this));
 			m_handlers[STATIC_NOP]->set_delegate(read8_delegate(FUNC(address_table_read::nop_r<u8>), this));
-			switch (space.addr_shift())
-			{
-				case  0: m_handlers[STATIC_WATCHPOINT]->set_delegate(read8_delegate (&address_table_read::watchpoint_r<u8,   0>, "watchpoint_r", this)); break;
-				default: abort();
-			}
+			m_handlers[STATIC_WATCHPOINT]->set_delegate(read8_delegate(FUNC(address_table_read::watchpoint_r<u8>), this));
 			break;
 
 		// 16-bit case
 		case 16:
 			m_handlers[STATIC_UNMAP]->set_delegate(read16_delegate(FUNC(address_table_read::unmap_r<u16>), this));
 			m_handlers[STATIC_NOP]->set_delegate(read16_delegate(FUNC(address_table_read::nop_r<u16>), this));
-			switch (space.addr_shift())
-			{
-				case -1: m_handlers[STATIC_WATCHPOINT]->set_delegate(read16_delegate(&address_table_read::watchpoint_r<u16, -1>, "watchpoint_r", this)); break;
-				case  0: m_handlers[STATIC_WATCHPOINT]->set_delegate(read16_delegate(&address_table_read::watchpoint_r<u16,  0>, "watchpoint_r", this)); break;
-				case  3: m_handlers[STATIC_WATCHPOINT]->set_delegate(read16_delegate(&address_table_read::watchpoint_r<u16,  3>, "watchpoint_r", this)); break;
-				default: abort();
-			}
+			m_handlers[STATIC_WATCHPOINT]->set_delegate(read16_delegate(FUNC(address_table_read::watchpoint_r<u16>), this));
 			break;
 
 		// 32-bit case
 		case 32:
 			m_handlers[STATIC_UNMAP]->set_delegate(read32_delegate(FUNC(address_table_read::unmap_r<u32>), this));
 			m_handlers[STATIC_NOP]->set_delegate(read32_delegate(FUNC(address_table_read::nop_r<u32>), this));
-			switch (space.addr_shift())
-			{
-				case -2: m_handlers[STATIC_WATCHPOINT]->set_delegate(read32_delegate(&address_table_read::watchpoint_r<u32, -2>, "watchpoint_r", this)); break;
-				case -1: m_handlers[STATIC_WATCHPOINT]->set_delegate(read32_delegate(&address_table_read::watchpoint_r<u32, -1>, "watchpoint_r", this)); break;
-				case  0: m_handlers[STATIC_WATCHPOINT]->set_delegate(read32_delegate(&address_table_read::watchpoint_r<u32,  0>, "watchpoint_r", this)); break;
-				default: abort();
-			}
+			m_handlers[STATIC_WATCHPOINT]->set_delegate(read32_delegate(FUNC(address_table_read::watchpoint_r<u32>), this));
 			break;
 
 		// 64-bit case
 		case 64:
 			m_handlers[STATIC_UNMAP]->set_delegate(read64_delegate(FUNC(address_table_read::unmap_r<u64>), this));
 			m_handlers[STATIC_NOP]->set_delegate(read64_delegate(FUNC(address_table_read::nop_r<u64>), this));
-			switch (space.addr_shift())
-			{
-				case -3: m_handlers[STATIC_WATCHPOINT]->set_delegate(read64_delegate(&address_table_read::watchpoint_r<u64, -3>, "watchpoint_r", this)); break;
-				case -2: m_handlers[STATIC_WATCHPOINT]->set_delegate(read64_delegate(&address_table_read::watchpoint_r<u64, -2>, "watchpoint_r", this)); break;
-				case -1: m_handlers[STATIC_WATCHPOINT]->set_delegate(read64_delegate(&address_table_read::watchpoint_r<u64, -1>, "watchpoint_r", this)); break;
-				case  0: m_handlers[STATIC_WATCHPOINT]->set_delegate(read64_delegate(&address_table_read::watchpoint_r<u64,  0>, "watchpoint_r", this)); break;
-				default: abort();
-			}
+			m_handlers[STATIC_WATCHPOINT]->set_delegate(read64_delegate(FUNC(address_table_read::watchpoint_r<u64>), this));
 			break;
 	}
 
@@ -4014,51 +3987,28 @@ address_table_write::address_table_write(address_space &space, bool large)
 		case 8:
 			m_handlers[STATIC_UNMAP]->set_delegate(write8_delegate(FUNC(address_table_write::unmap_w<u8>), this));
 			m_handlers[STATIC_NOP]->set_delegate(write8_delegate(FUNC(address_table_write::nop_w<u8>), this));
-			switch (space.addr_shift())
-			{
-				case  0: m_handlers[STATIC_WATCHPOINT]->set_delegate(write8_delegate (&address_table_write::watchpoint_w<u8,   0>, "watchpoint_w", this)); break;
-				default: abort();
-			}
+			m_handlers[STATIC_WATCHPOINT]->set_delegate(write8_delegate(FUNC(address_table_write::watchpoint_w<u8>), this));
 			break;
 
 		// 16-bit case
 		case 16:
 			m_handlers[STATIC_UNMAP]->set_delegate(write16_delegate(FUNC(address_table_write::unmap_w<u16>), this));
 			m_handlers[STATIC_NOP]->set_delegate(write16_delegate(FUNC(address_table_write::nop_w<u16>), this));
-			switch (space.addr_shift())
-			{
-				case -1: m_handlers[STATIC_WATCHPOINT]->set_delegate(write16_delegate(&address_table_write::watchpoint_w<u16, -1>, "watchpoint_w", this)); break;
-				case  0: m_handlers[STATIC_WATCHPOINT]->set_delegate(write16_delegate(&address_table_write::watchpoint_w<u16,  0>, "watchpoint_w", this)); break;
-				case  3: m_handlers[STATIC_WATCHPOINT]->set_delegate(write16_delegate(&address_table_write::watchpoint_w<u16,  3>, "watchpoint_w", this)); break;
-				default: abort();
-			}
+			m_handlers[STATIC_WATCHPOINT]->set_delegate(write16_delegate(FUNC(address_table_write::watchpoint_w<u16>), this));
 			break;
 
 		// 32-bit case
 		case 32:
 			m_handlers[STATIC_UNMAP]->set_delegate(write32_delegate(FUNC(address_table_write::unmap_w<u32>), this));
 			m_handlers[STATIC_NOP]->set_delegate(write32_delegate(FUNC(address_table_write::nop_w<u32>), this));
-			switch (space.addr_shift())
-			{
-				case -2: m_handlers[STATIC_WATCHPOINT]->set_delegate(write32_delegate(&address_table_write::watchpoint_w<u32, -2>, "watchpoint_w", this)); break;
-				case -1: m_handlers[STATIC_WATCHPOINT]->set_delegate(write32_delegate(&address_table_write::watchpoint_w<u32, -1>, "watchpoint_w", this)); break;
-				case  0: m_handlers[STATIC_WATCHPOINT]->set_delegate(write32_delegate(&address_table_write::watchpoint_w<u32,  0>, "watchpoint_w", this)); break;
-				default: abort();
-			}
+			m_handlers[STATIC_WATCHPOINT]->set_delegate(write32_delegate(FUNC(address_table_write::watchpoint_w<u32>), this));
 			break;
 
 		// 64-bit case
 		case 64:
 			m_handlers[STATIC_UNMAP]->set_delegate(write64_delegate(FUNC(address_table_write::unmap_w<u64>), this));
 			m_handlers[STATIC_NOP]->set_delegate(write64_delegate(FUNC(address_table_write::nop_w<u64>), this));
-			switch (space.addr_shift())
-			{
-				case -3: m_handlers[STATIC_WATCHPOINT]->set_delegate(write64_delegate(&address_table_write::watchpoint_w<u64, -3>, "watchpoint_w", this)); break;
-				case -2: m_handlers[STATIC_WATCHPOINT]->set_delegate(write64_delegate(&address_table_write::watchpoint_w<u64, -2>, "watchpoint_w", this)); break;
-				case -1: m_handlers[STATIC_WATCHPOINT]->set_delegate(write64_delegate(&address_table_write::watchpoint_w<u64, -1>, "watchpoint_w", this)); break;
-				case  0: m_handlers[STATIC_WATCHPOINT]->set_delegate(write64_delegate(&address_table_write::watchpoint_w<u64,  0>, "watchpoint_w", this)); break;
-				default: abort();
-			}
+			m_handlers[STATIC_WATCHPOINT]->set_delegate(write64_delegate(FUNC(address_table_write::watchpoint_w<u64>), this));
 			break;
 	}
 
