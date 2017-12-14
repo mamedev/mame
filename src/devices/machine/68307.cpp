@@ -283,8 +283,7 @@ void m68307_cpu_device::device_start()
 
 READ16_MEMBER( m68307_cpu_device::m68307_internal_base_r )
 {
-	int pc = space.device().safe_pc();
-	logerror("%08x m68307_internal_base_r %08x, (%04x)\n", pc, offset*2,mem_mask);
+	logerror("%08x m68307_internal_base_r %08x, (%04x)\n", m_ppc, offset*2,mem_mask);
 
 	switch (offset<<1)
 	{
@@ -300,8 +299,7 @@ READ16_MEMBER( m68307_cpu_device::m68307_internal_base_r )
 
 WRITE16_MEMBER( m68307_cpu_device::m68307_internal_base_w )
 {
-	int pc = space.device().safe_pc();
-	logerror("%08x m68307_internal_base_w %08x, %04x (%04x)\n", pc, offset*2,data,mem_mask);
+	logerror("%08x m68307_internal_base_w %08x, %04x (%04x)\n", m_ppc, offset*2,data,mem_mask);
 	int base;
 	//int mask = 0;
 
