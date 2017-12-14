@@ -75,13 +75,13 @@
 	06 - zoom something, 0F-7F, default 1F
 	08 - fg scroll x
 	0a - fg scroll y
-	0e - ? 1 at init (sprite related?)
-	10 - ? orleg2 - 0x13, kov2nl - 0x14 at init (sprite related?)
+	0e - resolution, 0 - low (kof98), 1 - high (rest of games)
+	10 - ? orleg2 - 0x13, kov2nl, kof - 0x14 at init (sprite related?)
 	14 - sprite enable ? set to 0 before spriteram update, to 1 after
 	16 - enable access to vrams/palettes/etc ? (bitmask)
 	18 - vblank ack
 	1a - ? 0 at init
-	1c - ? orleg2 - 5, kov2nl - 7 at init (sprite related?)
+	1c - ? orleg2 - 5, kov2nl, kof - 7 at init (sprite related?)
 	1e - ? 2 at init (sprite related?)
 	32 - shared RAM bank
 	34, 36 - ? 0 at init, some unused xor feature ?
