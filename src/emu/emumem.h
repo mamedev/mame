@@ -532,7 +532,7 @@ class memory_bank
 
 public:
 	// construction/destruction
-	memory_bank(address_space &space, int index, offs_t start, offs_t end, const char *tag = nullptr);
+	memory_bank(running_machine &_machine, address_space &space, int index, offs_t start, offs_t end, const char *tag = nullptr);
 	~memory_bank();
 
 	// getters

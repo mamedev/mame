@@ -3013,7 +3013,7 @@ memory_bank &address_space::bank_find_or_allocate(const char *tag, offs_t addrst
 		}
 
 		// if no tag, create a unique one
-		auto bank = std::make_unique<memory_bank>(*this, banknum, addrstart, addrend, tag);
+		auto bank = std::make_unique<memory_bank>(machine(), *this, banknum, addrstart, addrend, tag);
 		std::string temptag;
 		if (tag == nullptr) {
 			temptag = string_format("anon_%p", bank.get());
@@ -4275,8 +4275,8 @@ memory_block::~memory_block()
 //  memory_bank - constructor
 //-------------------------------------------------
 
-memory_bank::memory_bank(address_space &space, int index, offs_t addrstart, offs_t addrend, const char *tag)
-	: m_machine(machine()),
+memory_bank::memory_bank(running_machine &_machine, address_space &space, int index, offs_t addrstart, offs_t addrend, const char *tag)
+	: m_machine(_machine),
 		m_baseptr(space.manager().bank_pointer_addr(index)),
 		m_index(index),
 		m_anonymous(tag == nullptr),
