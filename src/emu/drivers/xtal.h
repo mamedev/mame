@@ -220,6 +220,7 @@ enum
 	XTAL_24_8832MHz     = 24883200,     /* DEC VT100 */
 	XTAL_25MHz          = 25000000,     /* Namco System 22, Taito GNET, Dogyuun h/w */
 	XTAL_25_1748MHz     = 25174800,     /* Sega System 16A/16B (1600x NTSC line rate) */
+	XTAL_25_2MHz        = 25200000,     /* Tektronix 4404 video clock */
 	XTAL_25_39836MHz    = 25398360,     /* Tandberg TDV 2324 */
 	XTAL_25_447MHz      = 25447000,     /* Namco EVA3A (Funcube2) */
 	XTAL_25_590906MHz   = 25590906,     /* Atari Jaguar NTSC */

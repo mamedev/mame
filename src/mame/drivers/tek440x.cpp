@@ -53,7 +53,7 @@
 #include "speaker.h"
 
 
-#define VIDEO_CLOCK 25200000
+#define VIDEO_CLOCK XTAL_25_2MHz
 
 class tek440x_state : public driver_device
 {
