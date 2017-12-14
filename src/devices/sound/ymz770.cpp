@@ -637,7 +637,7 @@ void ymz774_device::sequencer()
 			sequence.data = &m_rom[get_seq_offs(sequence.sequence)];
 			sequence.delay = 0;
 			sequence.is_playing = true;
-			//printf("sqc pl %d lp %d last %d\n", sequence.sequence, sequence.loop, sqc.data[3]);
+			sqc.is_waiting = true;
 			if (sqc.data[3] == 0xff)
 			{
 				if (sqc.loop)
@@ -650,10 +650,7 @@ void ymz774_device::sequencer()
 					sqc.is_playing = false;
 			}
 			else
-			{
-				sqc.is_waiting = true;
 				sqc.data += 4;
-			}
 		}
 
 		if (sequence.is_playing)
