@@ -272,7 +272,7 @@ WRITE32_MEMBER( nubus_procolor816_device::procolor816_w )
 			if (mem_mask == 0x00ff0000)
 			{
 		//          printf("%08x to DAC control (PC=%x)\n", data, space.device().safe_pc());
-					m_clutoffs = BITSWAP8((data>>16)&0xff, 0, 1, 2, 3, 4, 5, 6, 7);
+					m_clutoffs = bitswap<8>((data>>16)&0xff, 0, 1, 2, 3, 4, 5, 6, 7);
 			}
 			else if (mem_mask == 0x000000ff)
 			{

@@ -585,7 +585,7 @@ WRITE16_MEMBER(tispeak_state::snspell_write_o)
 	// reorder opla to led14seg, plus DP as d14 and AP as d15:
 	// note: lantutor and snread VFD has an accent triangle instead of DP, and no AP
 	// E,D,C,G,B,A,I,M,L,K,N,J,[AP],H,F,[DP] (sidenote: TI KLMN = MAME MLNK)
-	m_plate = BITSWAP16(data,12,15,10,7,8,9,11,6,13,3,14,0,1,2,4,5);
+	m_plate = bitswap<16>(data,12,15,10,7,8,9,11,6,13,3,14,0,1,2,4,5);
 	prepare_display();
 }
 
@@ -602,7 +602,7 @@ WRITE16_MEMBER(tispeak_state::snmath_write_o)
 {
 	// reorder opla to led14seg, plus DP as d14 and CT as d15:
 	// [DP],D,C,H,F,B,I,M,L,K,N,J,[CT],E,G,A (sidenote: TI KLMN = MAME MLNK)
-	m_plate = BITSWAP16(data,12,0,10,7,8,9,11,6,3,14,4,13,1,2,5,15);
+	m_plate = bitswap<16>(data,12,0,10,7,8,9,11,6,3,14,4,13,1,2,5,15);
 	prepare_display();
 }
 
@@ -636,8 +636,7 @@ WRITE16_MEMBER(tispeak_state::snspellc_write_r)
 WRITE16_MEMBER(tispeak_state::snspellc_write_o)
 {
 	// O3210: TMS5100 CTL8124
-	m_o = BITSWAP8(data,7,6,5,4,3,0,1,2);
-	m_tms5100->ctl_w(space, 0, m_o & 0xf);
+	m_tms5100->ctl_w(space, 0, bitswap<4>(data,3,0,1,2));
 }
 
 READ8_MEMBER(tispeak_state::snspellc_read_k)
@@ -689,7 +688,7 @@ void tispeak_state::k28_prepare_display(u8 old, u8 data)
 WRITE16_MEMBER(tispeak_state::k28_write_r)
 {
 	// R1234: TMS5100 CTL8421
-	m_tms5100->ctl_w(space, 0, BITSWAP8(data,0,0,0,0,1,2,3,4) & 0xf);
+	m_tms5100->ctl_w(space, 0, bitswap<4>(data,1,2,3,4));
 
 	// R0: TMS5100 PDC pin
 	m_tms5100->pdc_w(data & 1);

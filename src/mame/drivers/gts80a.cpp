@@ -286,7 +286,7 @@ WRITE8_MEMBER( gts80a_state::port2a_w )
 	m_port2 = data;
 	static const uint8_t patterns[16] = { 0x3f,0x06,0x5b,0x4f,0x66,0x6d,0x7c,0x07,0x7f,0x67,0x58,0x4c,0x62,0x69,0x78,0 }; // 7448
 	uint16_t seg1 = (uint16_t)patterns[m_segment & 15];
-	uint16_t seg2 = BITSWAP16(seg1, 8, 8, 8, 8, 8, 8, 7, 7, 6, 6, 5, 4, 3, 2, 1, 0);
+	uint16_t seg2 = bitswap<16>(seg1, 8, 8, 8, 8, 8, 8, 7, 7, 6, 6, 5, 4, 3, 2, 1, 0);
 	switch (data & 0x70)
 	{
 		case 0x10: // player 1&2

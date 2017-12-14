@@ -789,7 +789,7 @@ static void decrypt_bios( running_machine &machine, const char *regionName, int 
 
 	for( int i = 0; i < len; i++ )
 	{
-		BIOS[ i ] = BITSWAP16( BIOS[ i ] ^ 0xaaaa,
+		BIOS[ i ] = bitswap<16>( BIOS[ i ] ^ 0xaaaa,
 			b15, b14, b13, b12, b11, b10, b9, b8, b7, b6, b5, b4, b3, b2, b1, b0 );
 	}
 }

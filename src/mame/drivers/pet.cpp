@@ -482,7 +482,10 @@ READ8_MEMBER( pet_state::read )
 		break;
 
 	case SEL8:
-		data = m_video_ram[offset & (m_video_ram_size - 1)];
+		if (!(offset & 0x800))
+		{
+			data = m_video_ram[offset & (m_video_ram_size - 1)];
+		}
 		break;
 
 	case SEL9:
@@ -575,7 +578,10 @@ WRITE8_MEMBER( pet_state::write )
 		break;
 
 	case SEL8:
-		m_video_ram[offset & (m_video_ram_size - 1)] = data;
+		if (!(offset & 0x800))
+		{
+			m_video_ram[offset & (m_video_ram_size - 1)] = data;
+		}
 		break;
 
 	case SELE:
@@ -635,10 +641,10 @@ void cbm8296_state::read_pla1_eprom(offs_t offset, int phi2, int brw, int noscre
 	// PLA-EPROM adapter by Joachim Nemetz (Jogi)
 
 	uint32_t input = (offset & 0xff00) | phi2 << 7 | brw << 6 | noscreen << 5 | noio << 4 | ramsela << 3 | ramsel9 << 2 | ramon << 1 | norom;
-	input = BITSWAP16(input,13,8,9,7,12,14,11,10,6,5,4,3,2,1,0,15);
+	input = bitswap<16>(input,13,8,9,7,12,14,11,10,6,5,4,3,2,1,0,15);
 
 	uint8_t data = m_ue6_rom->base()[input];
-	data = BITSWAP8(data,7,0,1,2,3,4,5,6);
+	data = bitswap<8>(data,7,0,1,2,3,4,5,6);
 
 	cswff = BIT(data, 0);
 	cs9 = BIT(data, 1);
@@ -657,7 +663,7 @@ void cbm8296_state::read_pla1_eprom(offs_t offset, int phi2, int brw, int noscre
 
 void cbm8296_state::read_pla2(offs_t offset, int phi2, int brw, int casena1, int &endra, int &noscreen, int &casena2, int &fa15)
 {
-	uint32_t input = BITSWAP8(m_cr, 0,1,2,3,4,5,6,7) << 8 | ((offset >> 8) & 0xf8) | brw << 2 | phi2 << 1 | casena1;
+	uint32_t input = bitswap<8>(m_cr, 0,1,2,3,4,5,6,7) << 8 | ((offset >> 8) & 0xf8) | brw << 2 | phi2 << 1 | casena1;
 	uint32_t data = m_pla2->read(input);
 
 	endra = BIT(data, 4);
@@ -670,11 +676,11 @@ void cbm8296_state::read_pla2_eprom(offs_t offset, int phi2, int brw, int casena
 {
 	// PLA-EPROM adapter by Joachim Nemetz (Jogi)
 
-	uint32_t input = BITSWAP8(m_cr, 0,1,2,3,4,5,6,7) << 8 | ((offset >> 8) & 0xf8) | brw << 2 | phi2 << 1 | casena1;
-	input = BITSWAP16(input,13,8,9,7,12,14,11,10,6,5,4,3,2,1,0,15);
+	uint32_t input = bitswap<8>(m_cr, 0,1,2,3,4,5,6,7) << 8 | ((offset >> 8) & 0xf8) | brw << 2 | phi2 << 1 | casena1;
+	input = bitswap<16>(input,13,8,9,7,12,14,11,10,6,5,4,3,2,1,0,15);
 
 	uint8_t data = m_ue5_rom->base()[input];
-	data = BITSWAP8(data,7,0,1,2,3,4,5,6);
+	data = bitswap<8>(data,7,0,1,2,3,4,5,6);
 
 	endra = BIT(data, 4);
 	noscreen = BIT(data, 5);

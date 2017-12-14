@@ -166,3 +166,8 @@
 #define WRITE32(addr,data)  arm7_cpu_write32(addr,data)
 #define PTR_READ32          &arm7_cpu_read32
 #define PTR_WRITE32         &arm7_cpu_write32
+
+#define LSL(v, s) ((v) << (s))
+#define LSR(v, s) ((v) >> (s))
+#define ROL(v, s) (LSL((v), (s)) | (LSR((v), 32u - (s))))
+#define ROR(v, s) (LSR((v), (s)) | (LSL((v), 32u - (s))))

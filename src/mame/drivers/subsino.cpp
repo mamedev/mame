@@ -680,7 +680,7 @@ WRITE8_MEMBER(subsino_state::subsino_out_a_w)
 	machine().bookkeeping().coin_counter_w(2, data & 0x10 );    /* keyout */
 	machine().bookkeeping().coin_counter_w(3, data & 0x20 );    /* payout */
 
-	m_hopper->write(space, 0, (data & 0x0020) ? 0x80 : 0);   // hopper motor
+	m_hopper->motor_w(BIT(data, 5));   // hopper motor
 
 //  popmessage("Out A %02x",data);
 }

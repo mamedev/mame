@@ -438,11 +438,11 @@ INTERRUPT_GEN_MEMBER(skykid_state::mcu_vblank_irq)
 static MACHINE_CONFIG_START( skykid )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6809,49152000/32)
+	MCFG_CPU_ADD("maincpu", MC6809E, XTAL_49_152MHz/32)
 	MCFG_CPU_PROGRAM_MAP(skykid_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", skykid_state,  main_vblank_irq)
 
-	MCFG_CPU_ADD("mcu", HD63701,49152000/8) /* or compatible 6808 with extra instructions */
+	MCFG_CPU_ADD("mcu", HD63701, XTAL_49_152MHz/8) /* or compatible 6808 with extra instructions */
 	MCFG_CPU_PROGRAM_MAP(mcu_map)
 	MCFG_CPU_IO_MAP(mcu_port_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", skykid_state,  mcu_vblank_irq)

@@ -49,6 +49,7 @@ public:
 		m_oki(*this, "oki"),
 		m_screen(*this, "screen"),
 		m_tlc34076(*this, "tlc34076"),
+		m_ticket(*this, "ticket%u", 1),
 		m_vram(*this, "vram"),
 		m_control(*this, "control") { }
 
@@ -56,6 +57,7 @@ public:
 	optional_device<okim6295_device> m_oki;
 	required_device<screen_device> m_screen;
 	required_device<tlc34076_device> m_tlc34076;
+	optional_device_array<ticket_dispenser_device, 2> m_ticket;
 
 	required_shared_ptr<uint16_t> m_vram;
 	optional_shared_ptr<uint16_t> m_control;
@@ -336,8 +338,8 @@ WRITE16_MEMBER(tickee_state::tickee_control_w)
 
 	if (offset == 3)
 	{
-		machine().device<ticket_dispenser_device>("ticket1")->write(space, 0, (data & 8) << 4);
-		machine().device<ticket_dispenser_device>("ticket2")->write(space, 0, (data & 4) << 5);
+		m_ticket[0]->motor_w(BIT(data, 3));
+		m_ticket[1]->motor_w(BIT(data, 2));
 	}
 
 	if (olddata != m_control[offset])

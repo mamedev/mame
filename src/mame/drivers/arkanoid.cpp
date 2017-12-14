@@ -2116,12 +2116,12 @@ DRIVER_INIT_MEMBER(arkanoid_state,block2)
 		int srctile;
 
 		// combine these into a single swap..
-		srctile = BITSWAP16(tile,15,14,13,12,
+		srctile = bitswap<16>(tile,15,14,13,12,
 						11,10,9,8,
 						7,5,6,3,
 						1,2,4,0);
 
-		srctile = BITSWAP16(srctile,15,14,13,12,
+		srctile = bitswap<16>(srctile,15,14,13,12,
 						11,9,10,5,
 						7,6,8,4,
 						3,2,1,0);

@@ -236,7 +236,7 @@ void vrc5074_device::device_start()
 	// Save states
 	// m_sdram
 	save_item(NAME(m_sdram[0]));
-	save_item(NAME(m_sdram[1]));
+	if (m_sdram_size[1]) save_item(NAME(m_sdram[1]));
 	save_item(NAME(m_cpu_regs));
 	save_item(NAME(m_nile_irq_state));
 	save_item(NAME(m_sdram_addr));

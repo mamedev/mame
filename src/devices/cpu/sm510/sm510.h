@@ -17,7 +17,7 @@
 #define MCFG_SM510_READ_K_CB(_devcb) \
 	devcb = &sm510_base_device::set_read_k_callback(*device, DEVCB_##_devcb);
 // when in halt state, any K input going High can wake up the CPU,
-// driver is required to use execute_set_input(SM510_INPUT_LINE_K, state)
+// driver is required to use set_input_line(SM510_INPUT_LINE_K, state)
 #define SM510_INPUT_LINE_K 0
 
 // 1-bit BA(aka alpha) input pin (pull-up)

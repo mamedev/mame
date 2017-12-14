@@ -127,10 +127,6 @@ static ADDRESS_MAP_START(v6809_mem, AS_PROGRAM, 8, v6809_state)
 	AM_RANGE(0xf800, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(v6809_io, AS_PROGRAM, 8, v6809_state)
-	AM_RANGE(0x0064, 0x0064) AM_WRITENOP
-ADDRESS_MAP_END
-
 
 /* Input ports */
 static INPUT_PORTS_START( v6809 )
@@ -280,9 +276,8 @@ SLOT_INTERFACE_END
 
 static MACHINE_CONFIG_START( v6809 )
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6809, XTAL_16MHz / 4)
+	MCFG_CPU_ADD("maincpu", MC6809, XTAL_16MHz / 4) // divided by 4 again internally
 	MCFG_CPU_PROGRAM_MAP(v6809_mem)
-	MCFG_CPU_IO_MAP(v6809_io)
 	MCFG_MACHINE_RESET_OVERRIDE(v6809_state, v6809)
 
 	/* video hardware */

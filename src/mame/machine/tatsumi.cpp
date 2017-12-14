@@ -12,22 +12,19 @@ void tatsumi_state::tatsumi_reset()
 {
 	m_last_control = 0;
 	m_control_word = 0;
-	m_apache3_adc = 0;
-	m_apache3_rot_idx = 0;
 
 	save_item(NAME(m_last_control));
 	save_item(NAME(m_control_word));
-	save_item(NAME(m_apache3_adc));
 }
 
 /******************************************************************************/
 
-READ16_MEMBER(tatsumi_state::apache3_bank_r)
+READ16_MEMBER(apache3_state::apache3_bank_r)
 {
 	return m_control_word;
 }
 
-WRITE16_MEMBER(tatsumi_state::apache3_bank_w)
+WRITE16_MEMBER(apache3_state::apache3_bank_w)
 {
 	/*
 	    0x8000  - Set when accessing palette ram (not implemented, perhaps blank screen?)
@@ -60,12 +57,12 @@ WRITE16_MEMBER(tatsumi_state::apache3_bank_w)
 
 // D1 = /ZBREQ  - Z80 bus request
 // D0 = /GRDACC - Allow 68000 access to road pattern RAM
-WRITE16_MEMBER(tatsumi_state::apache3_z80_ctrl_w)
+WRITE16_MEMBER(apache3_state::apache3_z80_ctrl_w)
 {
 	m_subcpu2->set_input_line(INPUT_LINE_HALT, data & 2 ? ASSERT_LINE : CLEAR_LINE);
 }
 
-READ16_MEMBER(tatsumi_state::apache3_v30_v20_r)
+READ16_MEMBER(apache3_state::apache3_v30_v20_r)
 {
 	address_space &targetspace = m_audiocpu->space(AS_PROGRAM);
 
@@ -81,7 +78,7 @@ READ16_MEMBER(tatsumi_state::apache3_v30_v20_r)
 	return 0xff00 | targetspace.read_byte(offset);
 }
 
-WRITE16_MEMBER(tatsumi_state::apache3_v30_v20_w)
+WRITE16_MEMBER(apache3_state::apache3_v30_v20_w)
 {
 	address_space &targetspace = m_audiocpu->space(AS_PROGRAM);
 
@@ -95,17 +92,17 @@ WRITE16_MEMBER(tatsumi_state::apache3_v30_v20_w)
 	}
 }
 
-READ16_MEMBER(tatsumi_state::apache3_z80_r)
+READ16_MEMBER(apache3_state::apache3_z80_r)
 {
 	return m_apache3_z80_ram[offset];
 }
 
-WRITE16_MEMBER(tatsumi_state::apache3_z80_w)
+WRITE16_MEMBER(apache3_state::apache3_z80_w)
 {
 	m_apache3_z80_ram[offset] = data & 0xff;
 }
 
-READ8_MEMBER(tatsumi_state::apache3_adc_r)
+READ8_MEMBER(apache3_state::apache3_adc_r)
 {
 	switch (m_apache3_adc)
 	{
@@ -122,7 +119,7 @@ READ8_MEMBER(tatsumi_state::apache3_adc_r)
 	return 0;
 }
 
-WRITE8_MEMBER(tatsumi_state::apache3_adc_w)
+WRITE8_MEMBER(apache3_state::apache3_adc_w)
 {
 	m_apache3_adc = offset;
 }
@@ -133,7 +130,7 @@ WRITE8_MEMBER(tatsumi_state::apache3_adc_w)
  * presumably loaded into the 8 TZ2213 custom
  * accumulators and counters.
  */
-WRITE16_MEMBER(tatsumi_state::apache3_rotate_w)
+WRITE16_MEMBER(apache3_state::apache3_rotate_w)
 {
 	m_apache3_rotate_ctrl[m_apache3_rot_idx] = data;
 	m_apache3_rot_idx = (m_apache3_rot_idx + 1) % 12;
@@ -141,7 +138,7 @@ WRITE16_MEMBER(tatsumi_state::apache3_rotate_w)
 
 /******************************************************************************/
 
-READ16_MEMBER(tatsumi_state::roundup_v30_z80_r)
+READ16_MEMBER(roundup5_state::roundup_v30_z80_r)
 {
 	address_space &targetspace = m_audiocpu->space(AS_PROGRAM);
 
@@ -152,7 +149,7 @@ READ16_MEMBER(tatsumi_state::roundup_v30_z80_r)
 	return 0xff00 | targetspace.read_byte(offset);
 }
 
-WRITE16_MEMBER(tatsumi_state::roundup_v30_z80_w)
+WRITE16_MEMBER(roundup5_state::roundup_v30_z80_w)
 {
 	address_space &targetspace = m_audiocpu->space(AS_PROGRAM);
 
@@ -167,7 +164,7 @@ WRITE16_MEMBER(tatsumi_state::roundup_v30_z80_w)
 }
 
 
-WRITE16_MEMBER(tatsumi_state::roundup5_control_w)
+WRITE16_MEMBER(roundup5_state::roundup5_control_w)
 {
 	COMBINE_DATA(&m_control_word);
 
@@ -225,13 +222,13 @@ WRITE16_MEMBER(tatsumi_state::roundup5_control_w)
 	m_last_control = m_control_word;
 }
 
-WRITE16_MEMBER(tatsumi_state::roundup5_d0000_w)
+WRITE16_MEMBER(roundup5_state::roundup5_d0000_w)
 {
 	COMBINE_DATA(&m_roundup5_d0000_ram[offset]);
 //  logerror("d_68k_d0000_w %06x %04x\n", space.device().safe_pc(), data);
 }
 
-WRITE16_MEMBER(tatsumi_state::roundup5_e0000_w)
+WRITE16_MEMBER(roundup5_state::roundup5_e0000_w)
 {
 	/*  Bit 0x10 is road bank select,
 	    Bit 0x100 is used, but unknown
@@ -245,7 +242,7 @@ WRITE16_MEMBER(tatsumi_state::roundup5_e0000_w)
 
 /******************************************************************************/
 
-WRITE8_MEMBER(tatsumi_state::cyclwarr_control_w)
+WRITE8_MEMBER(cyclwarr_state::cyclwarr_control_w)
 {
 	m_control_word = data;
 

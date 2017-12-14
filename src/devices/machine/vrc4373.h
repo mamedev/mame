@@ -11,7 +11,7 @@
 #include "cpu/mips/mips3.h"
 
 #define MCFG_VRC4373_ADD(_tag,  _cpu_tag) \
-	MCFG_PCI_HOST_ADD(_tag, VRC4373, 0x005B1033, 0x00, 0x00000000) \
+	MCFG_PCI_HOST_ADD(_tag, VRC4373, 0x1033005B, 0x00, 0x00000000) \
 	downcast<vrc4373_device *>(device)->set_cpu_tag(_cpu_tag);
 
 #define MCFG_VRC4373_SET_RAM(_size) \

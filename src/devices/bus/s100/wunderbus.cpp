@@ -345,7 +345,7 @@ uint8_t s100_wunderbus_device::s100_sinp_r(address_space &space, offs_t offset)
 
 				*/
 
-				data = BITSWAP8(m_10a->read(),0,1,2,3,4,5,6,7) & 0xfc;
+				data = bitswap<8>(m_10a->read(),0,1,2,3,4,5,6,7) & 0xfc;
 				break;
 
 			case 2: // R.T. Clock IN/RESET CLK. Int.

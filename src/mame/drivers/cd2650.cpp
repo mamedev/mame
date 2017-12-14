@@ -167,7 +167,7 @@ uint32_t cd2650_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 
 					chr = m_p_videoram[mem] & 0x3f;
 
-					gfx = m_p_chargen[(BITSWAP8(chr,7,6,2,1,0,3,4,5)<<3) | ra];
+					gfx = m_p_chargen[(bitswap<8>(chr,7,6,2,1,0,3,4,5)<<3) | ra];
 				}
 
 				/* Display a scanline of a character */

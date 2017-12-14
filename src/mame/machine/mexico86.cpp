@@ -106,8 +106,8 @@ void mexico86_state::mcu_simulate(  )
 
 		m_protection_ram[0x04] = 0x3c | (coin_in_read ^ 3);   // coin inputs
 
-		m_protection_ram[0x02] = BITSWAP8(ioport("IN1")->read(), 7,6,5,4,2,3,1,0); // player 1
-		m_protection_ram[0x03] = BITSWAP8(ioport("IN2")->read(), 7,6,5,4,2,3,1,0); // player 2
+		m_protection_ram[0x02] = bitswap<8>(ioport("IN1")->read(), 7,6,5,4,2,3,1,0); // player 1
+		m_protection_ram[0x03] = bitswap<8>(ioport("IN2")->read(), 7,6,5,4,2,3,1,0); // player 2
 
 		if (m_protection_ram[0x19] == 0xaa)  // player 2 active
 			m_protection_ram[0x1b] = m_protection_ram[0x03];

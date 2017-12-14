@@ -1,0 +1,41 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+
+<softwarelist name="ti95_cart" description="TI-95 cartridges">
+
+<!--
+
+    Library functions can be reached from [RUN], [F3]
+
+	Not dumped yet:
+    - Chemical Engineering Library
+
+    Not included in list:
+    - 8KB RAM, battery backed
+
+-->
+
+
+	<software name="maths">
+		<description>Mathematics Library</description>
+		<year>1986</year>
+		<publisher>Texas Instruments</publisher>
+		<part name="cart" interface="ti95_cart">
+			<dataarea name="rom" size="0x8000">
+				<rom name="mathematics.bin" size="0x8000" crc="f2221fd9" sha1="69eba2ecb85f9b2a6b556579e39c20246a50ef34" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="stats">
+		<description>Statistics Library</description>
+		<year>1986</year>
+		<publisher>Texas Instruments</publisher>
+		<part name="cart" interface="ti95_cart">
+			<dataarea name="rom" size="0x8000">
+				<rom name="statistics.bin" size="0x8000" crc="a61753e8" sha1="8ed3048b909e3b05416c1c16b2437902e6ac16f8" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

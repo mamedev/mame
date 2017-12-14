@@ -164,7 +164,7 @@ WRITE8_MEMBER( lc80_state::pio1_pa_w )
 
 	*/
 
-	m_segment = BITSWAP8(~data, 4, 3, 1, 6, 7, 5, 0, 2);
+	m_segment = bitswap<8>(~data, 4, 3, 1, 6, 7, 5, 0, 2);
 
 	update_display();
 }

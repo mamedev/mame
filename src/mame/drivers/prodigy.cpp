@@ -11,7 +11,6 @@
     - Sound
     - Row/column LEDs
     - Chess board sensors
-    - Support for SVG/CSS based browser UI
 
     +-------------------------------------------------------------------------------------+
     |LEDS--------------------------------------------+        +-----------------+         |
@@ -68,11 +67,24 @@
 *******************************************************************************************/
 
 #include "emu.h"
+#include "emuopts.h"
 #include "cpu/m6502/m6502.h"
 #include "machine/74145.h"
 #include "machine/netlist.h"
 #include "machine/nl_prodigy.h"
 #include "machine/6522via.h"
+
+// TODO: Move all HTTPUI stuff global and generic
+#define HTTPUI 1
+
+#if HTTPUI
+#include <zlib.h>
+#include <iostream>
+#include <fstream>
+#include "rapidjson/include/rapidjson/document.h"
+#include "rapidjson/include/rapidjson/stringbuffer.h"
+#include "rapidjson/include/rapidjson/writer.h"
+#endif
 
 // Generated artwork includes
 #include "prodigy.lh"
@@ -84,8 +96,10 @@
 #define LOG_CLK     (1U <<  5)
 #define LOG_KBD     (1U <<  6)
 #define LOG_AW      (1U <<  7)
+#define LOG_HTTP    (1U <<  8)
+#define LOG_XML     (1U <<  9)
 
-//#define VERBOSE (LOG_KBD|LOG_AW) // (LOG_BCD|LOG_NETLIST|LOG_SETUP)
+//#define VERBOSE (LOG_HTTP|LOG_AW) // (LOG_BCD|LOG_NETLIST|LOG_SETUP)
 //#define LOG_OUTPUT_STREAM std::cout
 
 #include "logmacro.h"
@@ -97,6 +111,8 @@
 #define LOGCLK(...)   LOGMASKED(LOG_CLK,     __VA_ARGS__)
 #define LOGKBD(...)   LOGMASKED(LOG_KBD,     __VA_ARGS__)
 #define LOGAW(...)    LOGMASKED(LOG_AW,      __VA_ARGS__)
+#define LOGHTTP(...)  LOGMASKED(LOG_HTTP,    __VA_ARGS__)
+#define LOGXML(...)   LOGMASKED(LOG_XML,     __VA_ARGS__)
 
 #ifdef _MSC_VER
 #define FUNCNAME __func__
@@ -114,12 +130,21 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_74145(*this, "io_74145")
 		, m_segments(0)
+		, m_digit_cache{0xff, 0xff, 0xff, 0xff}
 		, m_via(*this, "via")
 		, m_bcd(*this, NETLIST_TAG)
 		, m_cb1(*this, "bcd:cb1")
 		, m_cb2(*this, "bcd:cb2")
 		, m_digit(0.0)
 		, m_io_line(*this, "LINE%u", 0)
+#if HTTPUI
+		, m_connection(NULL)
+		, m_web_line0(0)
+		, m_web_line1(0)
+		, m_web_line2(0)
+		, m_web_line3(0)
+		, m_web_line4(0)
+#endif
 	{ }
 
 	NETDEV_LOGIC_CALLBACK_MEMBER(bcd_bit0_cb);
@@ -143,6 +168,7 @@ private:
 	required_device<cpu_device> m_maincpu;
 	required_device<ttl74145_device> m_74145;
 	uint8_t m_segments;
+	uint8_t m_digit_cache[4];
 	required_device<via6522_device> m_via;
 	required_device<netlist_mame_device> m_bcd;
 	required_device<netlist_mame_logic_input_device> m_cb1;
@@ -153,6 +179,24 @@ private:
 	virtual void device_start() override;
 	required_ioport_array<5> m_io_line;
 	uint16_t m_line[5];
+
+#if HTTPUI
+	http_manager *m_server;
+	void on_update(http_manager::http_request_ptr request, http_manager::http_response_ptr response);
+	const std::string decompress_layout_data(const internal_layout *layout_data);
+	void on_open(http_manager::websocket_connection_ptr connection);
+	void on_message(http_manager::websocket_connection_ptr connection, const std::string &payload, int opcode);
+	void on_close(http_manager::websocket_connection_ptr connection, int status, const std::string& reason);
+	void on_error(http_manager::websocket_connection_ptr connection, const std::error_code& error_code);
+	void update_web_bcd(uint8_t digit_nbr, uint8_t m_segments);
+
+	http_manager::websocket_connection_ptr m_connection;
+	uint16_t m_web_line0;
+	uint16_t m_web_line1;
+	uint16_t m_web_line2;
+	uint16_t m_web_line3;
+	uint16_t m_web_line4;
+#endif
 };
 
 NETDEV_LOGIC_CALLBACK_MEMBER(prodigy_state::bcd_bit0_cb) { if (data != 0) m_digit |= 0x01; else m_digit &= ~(0x01); LOGBCD("%s: %d m_digit: %02x\n", FUNCNAME, data, m_digit); }
@@ -167,7 +211,218 @@ NETDEV_LOGIC_CALLBACK_MEMBER(prodigy_state::bcd_bit7_cb) { if (data != 0) m_digi
 void prodigy_state::device_start()
 {
 	memset(m_line, 0, sizeof(m_line));
+#if HTTPUI
+	m_server =  machine().manager().http();
+	if (m_server->is_active())
+	{
+		using namespace std::placeholders;
+		m_server->add_http_handler("/layout*", std::bind(&prodigy_state::on_update, this, _1, _2));
+		m_server->add_endpoint("/socket",
+				       std::bind(&prodigy_state::on_open,    this, _1),
+				       std::bind(&prodigy_state::on_message, this, _1, _2, _3),
+				       std::bind(&prodigy_state::on_close,   this, _1, _2, _3),
+				       std::bind(&prodigy_state::on_error,   this, _1, _2)
+				       );
+	}
+#endif
 }
+
+#if HTTPUI
+const std::string prodigy_state::decompress_layout_data(const internal_layout *layout_data)
+{
+	// +1 to ensure data is terminated for XML parser
+	std::unique_ptr<u8> tempout(new u8(layout_data->decompressed_size + 1));
+	std::string fail("");
+	z_stream stream;
+	int zerr;
+
+	/* initialize the stream */
+	memset(&stream, 0, sizeof(stream));
+	stream.next_out = tempout.get();
+	stream.avail_out = layout_data->decompressed_size;
+
+	zerr = inflateInit(&stream);
+	if (zerr != Z_OK)
+	{
+		fatalerror("could not inflateInit");
+		return fail; // return empty buffer
+	}
+
+	/* decompress this chunk */
+	stream.next_in = (unsigned char*)layout_data->data;
+	stream.avail_in = layout_data->compressed_size;
+	zerr = inflate(&stream, Z_NO_FLUSH);
+
+	/* stop at the end of the stream */
+	if (zerr == Z_STREAM_END)
+	{
+		// OK
+	}
+	else if (zerr != Z_OK)
+	{
+		fatalerror("decompression error\n");
+		return fail; // return empty buffer
+	}
+
+	/* clean up */
+	zerr = inflateEnd(&stream);
+	if (zerr != Z_OK)
+	{
+		fatalerror("inflateEnd error\n");
+		return fail; // return empty buffer
+	}
+
+	return std::string((const char *)tempout.get(), layout_data->decompressed_size + 1); 
+}
+
+
+void prodigy_state::on_update(http_manager::http_request_ptr request, http_manager::http_response_ptr response)
+{
+	LOG("%s\n", FUNCNAME);
+
+	LOGHTTP("Full request: %s\n", request->get_resource());
+	LOGHTTP("Path: %s\n", request->get_path());
+	LOGHTTP("Query: %s\n", request->get_query());
+	LOGHTTP("Artpath: %s\n", this->machine().options().art_path());
+	LOGHTTP("System: %s\n", machine().system().name);
+
+	response->set_status(200);
+	response->set_content_type("text/xml");
+
+	if (std::string("/layout/layout.xsl") == request->get_path())
+	{
+		std::string path;
+		osd_get_full_path(path, ".");
+		LOGHTTP("Serving XSL document %s\n", path + "/web/layout.xsl");
+#if 0
+		m_server->serve_document(request, response, "layout.xls"); // Doesn't work, how do I make the webserver serve a file?
+#else
+		std::ifstream xslfile (path + "/web/layout.xsl");
+		if (xslfile.is_open())
+		{
+			std::string buf;
+			std::string outstr;
+			while ( std::getline (xslfile, buf) )
+			{
+				outstr += buf + "\n";
+			}
+			xslfile.close();
+			response->set_body(outstr);
+			LOGXML("%s", outstr);
+		}
+		else
+		{
+			response->set_status(500); // Or 404...?
+			logerror("Unable to open file %s", path + "web/layout.xsl");
+			LOGHTTP("Unable to open file %s", path + "web/layout.xsl");
+		}
+#endif
+	}
+	else
+	{
+		z_stream stream;
+		int zerr;
+		char buf[1024 * 10];
+		std::string outstr;
+		memset(&stream, 0, sizeof(stream));
+		stream.next_in = (Bytef *)(layout_prodigy.data);
+		stream.avail_in = layout_prodigy.compressed_size;
+		if ((zerr = inflateInit(&stream)) == Z_OK)
+		{
+			do
+			{
+				stream.next_out = (Bytef*)(&buf[0]);
+				stream.avail_out = sizeof(buf);
+				zerr = inflate(&stream, 0);
+				if (zerr == Z_OK || zerr == Z_STREAM_END)
+				{
+					outstr.append(&buf[0], stream.total_out - outstr.size());
+					LOGXML("appending %s\n", buf);
+				}
+				else
+				{
+					LOGHTTP("Append Error %d\n", zerr);
+				}
+			}while (zerr == Z_OK);
+			if ((zerr = inflateEnd(&stream)) != Z_OK)
+			{
+				response->set_status(500); // Or 404...?
+				fatalerror("Zlib decompression error\n");
+			}
+			else
+			{
+				outstr.insert(std::string("<?xml version=\"1.0\"?>").size(), "<?xml-stylesheet type=\"text/xml\" href=\"layout.xsl\"?>");
+				response->set_body(outstr);
+			}
+		}
+		else
+		{
+			response->set_status(500); // Or 404...?
+			LOGHTTP("Init Error %d\n", zerr);
+		}
+	}
+}
+
+void prodigy_state::on_open(http_manager::websocket_connection_ptr connection)
+{
+	logerror("websocket connection opened\n");
+	LOGHTTP("%s\n", FUNCNAME);
+	m_connection = connection;
+	for (int i = 0; i < 4; i++)
+	{
+		update_web_bcd(i, m_digit_cache[i]);
+	}
+}
+
+void prodigy_state::on_message(http_manager::websocket_connection_ptr connection, const std::string &payload, int opcode)
+{
+	LOGHTTP("%s: %d - %s\n", FUNCNAME, opcode, payload);
+	using namespace rapidjson;
+	Document document;
+	document.Parse(payload.c_str());
+	LOGHTTP("%s - %04x: %s\n", document["inputtag"].GetString(), document["inputmask"].GetInt(), document["event"].GetInt() == 0 ? "mouse Down" : "mouse Up");
+
+	// TODO: Reduce number of LINE%u and match mouse up to last mouse down so that mouse clicks don't stick "forever" when gliding out of click down boundary
+	if (std::string(document["inputtag"].GetString()).compare("LINE0") == 0)
+	{
+		if (document["event"].GetInt() == 0) m_web_line0 |= document["inputmask"].GetInt(); else m_web_line0 &= ~(document["inputmask"].GetInt());
+		LOGAW("-WEBLINE0: %02x\n", m_web_line0);
+	}
+	else if (std::string(document["inputtag"].GetString()).compare("LINE1") == 0)
+	{
+		if (document["event"].GetInt() == 0) m_web_line1 |= document["inputmask"].GetInt(); else m_web_line1 &= ~(document["inputmask"].GetInt());
+		LOGAW("-WEBLINE1: %02x\n", m_web_line1);
+	}
+	else if (std::string(document["inputtag"].GetString()).compare("LINE2") == 0)
+	{
+		if (document["event"].GetInt() == 0) m_web_line2 |= document["inputmask"].GetInt(); else m_web_line2 &= ~(document["inputmask"].GetInt());
+		LOGAW("-WEBLINE2: %02x\n", m_web_line2);
+	}
+	else if (std::string(document["inputtag"].GetString()).compare("LINE3") == 0)
+	{
+		if (document["event"].GetInt() == 0) m_web_line3 |= document["inputmask"].GetInt(); else m_web_line3 &= ~(document["inputmask"].GetInt());
+		LOGAW("-WEBLINE3: %02x\n", m_web_line3);
+	}
+	else if (std::string(document["inputtag"].GetString()).compare("LINE4") == 0)
+	{
+		if (document["event"].GetInt() == 0) m_web_line4 |= document["inputmask"].GetInt(); else m_web_line4 &= ~(document["inputmask"].GetInt());
+		LOGAW("-WEBLINE4: %02x\n", m_web_line4);
+	}
+}
+
+void prodigy_state::on_close(http_manager::websocket_connection_ptr connection, int status, const std::string& reason)
+{
+	logerror("websocket connection closed: %d - %s\n", status, reason);
+	LOGHTTP("%s: %d - %s\n", FUNCNAME, status, reason);
+}
+
+void prodigy_state::on_error(http_manager::websocket_connection_ptr connection, const std::error_code& error_code)
+{
+	logerror("websocket connection error: %d\n", error_code);
+	LOGHTTP("%s: %d\n", FUNCNAME, error_code);
+}
+
+#endif
 
 WRITE_LINE_MEMBER(prodigy_state::via_cb1_w)
 {
@@ -201,9 +456,13 @@ READ8_MEMBER( prodigy_state::via_pa_r )
 	uint16_t ttl74145_data = m_74145->read();
 
 	LOGKBD(" - 74145: %03x\n", ttl74145_data);
+#if HTTPUI
+	if (ttl74145_data & 0x100) return ((m_line[0] & ~m_web_line0) | (m_line[1] & ~m_web_line1));
+	if (ttl74145_data & 0x200) return ((m_line[4] & ~m_web_line4) | (m_line[3] & ~m_web_line3));
+#else
 	if (ttl74145_data & 0x100) return (m_line[0] | m_line[1]);
 	if (ttl74145_data & 0x200) return (m_line[4] | m_line[3]);
-
+#endif
 	return 0xff;
 }
 
@@ -211,8 +470,14 @@ READ8_MEMBER( prodigy_state::via_pb_r )
 {
 	LOGKBD("%s: Port B <- %02x\n", FUNCNAME, 0);
 	uint16_t ttl74145_data = m_74145->read();
+
+#if HTTPUI
+	if (ttl74145_data & 0x100) return ((((m_line[2] & ~m_web_line2) >>  8) & 3) << 4);
+	if (ttl74145_data & 0x200) return ((((m_line[2] & ~m_web_line2) >> 10) & 3) << 4);
+#else
 	if (ttl74145_data & 0x100) return (((m_line[2] >>  8) & 3) << 4);
 	if (ttl74145_data & 0x200) return (((m_line[2] >> 10) & 3) << 4);
+#endif
 
 	return 0xff;
 }
@@ -241,6 +506,28 @@ WRITE8_MEMBER( prodigy_state::via_pb_w )
 	}
 }
 
+#if HTTPUI
+void prodigy_state::update_web_bcd(uint8_t digit_nbr, uint8_t m_segments)
+{
+	using namespace rapidjson;
+	Document d;
+	d.SetObject();
+	Document::AllocatorType& allocator = d.GetAllocator();
+	// Add data to JSON document
+	d.AddMember("name",     "digit",    allocator);
+	d.AddMember("number",   digit_nbr,  allocator);
+	d.AddMember("segments", m_segments, allocator);
+	// Convert JSON document to string
+	StringBuffer buf;
+	Writer<StringBuffer> writer(buf);
+	d.Accept(writer);
+	if (m_connection != NULL)
+	{
+		m_connection->send_message(buf.GetString(), 1);// 1 == Text 2 == binary
+	}
+}
+#endif
+
 void prodigy_state::update_bcd()
 {
 	LOGBCD("%s\n", FUNCNAME);
@@ -265,7 +552,14 @@ void prodigy_state::update_bcd()
 		LOGBCD(" - segments: %02x -> ", m_digit);
 		m_segments = m_digit;
 		LOGBCD("%02x\n", m_segments);
-		output().set_digit_value( digit_nbr, m_segments);
+		if (m_digit_cache[digit_nbr] != m_segments)
+		{
+			output().set_digit_value( digit_nbr, m_segments);
+			m_digit_cache[digit_nbr] = m_segments;
+#if HTTPUI
+			update_web_bcd(digit_nbr, m_segments);
+#endif
+		}
 	}
 }
 

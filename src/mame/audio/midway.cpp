@@ -729,7 +729,7 @@ ADDRESS_MAP_END
 //-------------------------------------------------
 
 MACHINE_CONFIG_MEMBER(midway_turbo_cheap_squeak_device::device_add_mconfig)
-	MCFG_CPU_ADD("cpu", M6809E, TURBOCS_CLOCK)
+	MCFG_CPU_ADD("cpu", MC6809E, TURBOCS_CLOCK / 4)
 	MCFG_CPU_PROGRAM_MAP(turbocs_map)
 
 	MCFG_DEVICE_ADD("pia", PIA6821, 0)

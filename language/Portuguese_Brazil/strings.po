@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: MAME\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-10-03 10:32+1100\n"
-"PO-Revision-Date: 2017-10-08 16:05-0300\n"
+"POT-Creation-Date: 2017-11-30 08:07+1100\n"
+"PO-Revision-Date: 2017-11-30 08:07-0300\n"
 "Last-Translator: Katananja\n"
 "Language-Team: MAME Language Team\n"
 "Language: pt_BR\n"
@@ -314,7 +314,7 @@ msgstr ""
 
 #: src/frontend/mame/ui/cheatopt.cpp:105
 msgid "All cheats reloaded"
-msgstr "Todos as trapaças recarregadas"
+msgstr "Todas as trapaças foram recarregadas"
 
 #: src/frontend/mame/ui/cheatopt.cpp:136
 msgid "Autofire Settings"
@@ -403,7 +403,7 @@ msgstr "Mostrar painéis laterais"
 
 #: src/frontend/mame/ui/custui.cpp:173
 msgid "Custom UI Settings"
-msgstr "Configurações Personalizadas da IU"
+msgstr "Personalizaçoes da Interface"
 
 #: src/frontend/mame/ui/custui.cpp:223
 msgid "default"
@@ -411,7 +411,7 @@ msgstr "padrão"
 
 #: src/frontend/mame/ui/custui.cpp:331
 msgid "UI Font"
-msgstr "Fonte da IU"
+msgstr "Tipografia da Interface"
 
 #: src/frontend/mame/ui/custui.cpp:336
 msgid "Bold"
@@ -427,11 +427,11 @@ msgstr "Linhas"
 
 #: src/frontend/mame/ui/custui.cpp:348
 msgid "Infos text size"
-msgstr "Tamanho do texto para info"
+msgstr "Tamanho do texto de informação"
 
 #: src/frontend/mame/ui/custui.cpp:362
 msgid "UI Fonts Settings"
-msgstr "Configurações das fontes do UI"
+msgstr "Configurações das Fontes da Interface"
 
 #: src/frontend/mame/ui/custui.cpp:371
 msgid "Sample text - Lorem ipsum dolor sit amet, consectetur adipiscing elit."
@@ -508,7 +508,7 @@ msgstr "Restaurar as cores originais"
 
 #: src/frontend/mame/ui/custui.cpp:481
 msgid "UI Colors Settings"
-msgstr "Configurações de cores da IU"
+msgstr "Configurações de cores da Interface"
 
 #: src/frontend/mame/ui/custui.cpp:490
 #, c-format
@@ -1307,11 +1307,11 @@ msgstr "Há Suporte para Salvamento\tNão\n"
 
 #: src/frontend/mame/ui/selgame.cpp:951
 msgid "Screen Orientation\tVertical\n"
-msgstr "Orientaçlão de tela\tVertical\n"
+msgstr "Orientação de tela\tVertical\n"
 
 #: src/frontend/mame/ui/selgame.cpp:951
 msgid "Screen Orientation\tHorizontal\n"
-msgstr "Orientaçlão de tela\tHorizontal\n"
+msgstr "Orientação de tela\tHorizontal\n"
 
 #: src/frontend/mame/ui/selgame.cpp:961
 msgid "Requires CHD\tYes\n"
@@ -1398,7 +1398,7 @@ msgstr "Mídia de Software"
 
 #: src/frontend/mame/ui/dirmenu.cpp:37
 msgid "UI"
-msgstr "IU"
+msgstr "Interface do Usuário"
 
 #: src/frontend/mame/ui/dirmenu.cpp:39
 msgid "Samples"
@@ -1450,7 +1450,7 @@ msgstr "PCBs"
 
 #: src/frontend/mame/ui/dirmenu.cpp:52
 msgid "Controls Panels"
-msgstr "Painéis de Controles"
+msgstr "Painéis de Controle"
 
 #: src/frontend/mame/ui/dirmenu.cpp:53
 msgid "Crosshairs"
@@ -2099,7 +2099,7 @@ msgstr "Steadykey"
 
 #: src/frontend/mame/ui/submenu.cpp:77
 msgid "UI active"
-msgstr "IU ativo"
+msgstr "IU ativa"
 
 #: src/frontend/mame/ui/submenu.cpp:78
 msgid "Offscreen reload"

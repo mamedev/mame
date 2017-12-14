@@ -2198,6 +2198,18 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/machine/ripple_counter.h,MACHINES["RIPPLE_COUNTER"] = true
+---------------------------------------------------
+
+if (MACHINES["RIPPLE_COUNTER"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/ripple_counter.cpp",
+		MAME_DIR .. "src/devices/machine/ripple_counter.h",
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/machine/roc10937.h,MACHINES["ROC10937"] = true
 ---------------------------------------------------
 

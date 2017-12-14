@@ -305,7 +305,7 @@ static MACHINE_CONFIG_START( ssystem3 )
 	MCFG_PALETTE_INIT_OWNER(ssystem3_state, ssystem3)
 
 	/* via */
-	MCFG_DEVICE_ADD("via6522_0", VIA6522, 0)
+	MCFG_DEVICE_ADD("via6522_0", VIA6522, 1000000)
 	MCFG_VIA6522_READPA_HANDLER(READ8(ssystem3_state,ssystem3_via_read_a))
 	MCFG_VIA6522_READPB_HANDLER(READ8(ssystem3_state,ssystem3_via_read_b))
 	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(ssystem3_state,ssystem3_via_write_a))

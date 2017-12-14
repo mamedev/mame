@@ -170,6 +170,7 @@ public:
 		m_seta001(*this, "spritegen"),
 		m_palette(*this, "palette"),
 		m_x1(*this, "x1snd"),
+		m_hopper(*this, "hopper"),
 		m_fakex(*this, "FAKEX"),
 		m_fakey(*this, "FAKEY") { }
 
@@ -179,6 +180,7 @@ public:
 	required_device<seta001_device> m_seta001;
 	required_device<palette_device> m_palette;
 	required_device<x1_010_device> m_x1;
+	optional_device<ticket_dispenser_device> m_hopper;
 
 	optional_ioport m_fakex;
 	optional_ioport m_fakey;
@@ -271,11 +273,11 @@ ADDRESS_MAP_END
 
 WRITE8_MEMBER(champbwl_state::doraemon_outputs_w)
 {
-	machine().bookkeeping().coin_counter_w(0, data & 1); // coin in counter
-	machine().bookkeeping().coin_counter_w(1, data & 2); // gift out counter
+	machine().bookkeeping().coin_counter_w(0, BIT(data, 0)); // coin in counter
+	machine().bookkeeping().coin_counter_w(1, BIT(data, 1)); // gift out counter
 
-	machine().bookkeeping().coin_lockout_w(0, ~data & 8);    // coin lockout
-	machine().device<ticket_dispenser_device>("hopper")->write(space, 0, (data & 0x04) ? 0x00 : 0x80);  // gift out motor
+	machine().bookkeeping().coin_lockout_w(0, BIT(~data, 3));    // coin lockout
+	m_hopper->motor_w(BIT(~data, 2));  // gift out motor
 
 	membank("bank1")->set_entry((data & 0x30) >> 4);
 

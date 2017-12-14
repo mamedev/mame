@@ -235,7 +235,7 @@ uint32_t monzagp_state::screen_update_monzagp(screen_device &screen, bitmap_ind1
 				bitmap.pix16(y, x) = color;
 
 			// collisions
-			uint8_t coll_prom_addr = BITSWAP8(tile_idx, 7, 6, 5, 4, 2, 0, 1, 3);
+			uint8_t coll_prom_addr = bitswap<8>(tile_idx, 7, 6, 5, 4, 2, 0, 1, 3);
 			uint8_t collisions = collisions_prom[((mycar && othercars) ? 0 : 0x80) | (inv ? 0x40 : 0) | (coll_prom_addr << 2) | (mycar ? 0 : 0x02) | (tile_color & 0x01)];
 			m_collisions_ff |= ((m_collisions_clk ^ collisions) & collisions);
 			m_collisions_clk = collisions;
@@ -299,7 +299,7 @@ READ8_MEMBER(monzagp_state::port_r)
 	}
 	if (!(m_p1 & 0x40))             // digits
 	{
-		data = m_score_ram[BITSWAP8(offset, 3,2,1,0,7,6,5,4)];
+		data = m_score_ram[bitswap<8>(offset, 3,2,1,0,7,6,5,4)];
 		//printf("ext 6 r P1:%02x P2:%02x %02x\n", m_p1, m_p2, offset);
 	}
 	if (!(m_p1 & 0x80))
@@ -350,7 +350,7 @@ WRITE8_MEMBER(monzagp_state::port_w)
 	if (!(m_p1 & 0x40))    // digits
 	{
 		//printf("ext 6 w P1:%02x P2:%02x, %02x = %02x\n", m_p1, m_p2, offset, data);
-		offs_t ram_offset = BITSWAP8(offset, 3,2,1,0,7,6,5,4);
+		offs_t ram_offset = bitswap<8>(offset, 3,2,1,0,7,6,5,4);
 		m_score_ram[ram_offset] = data & 0x0f;
 
 		if ((ram_offset & 0x07) == 0)

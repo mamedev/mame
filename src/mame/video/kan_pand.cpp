@@ -235,7 +235,7 @@ WRITE8_MEMBER ( kaneko_pandora_device::spriteram_w )
 {
 	// it's either hooked up oddly on this, or on the 16-bit games
 	// either way, we swap the address lines so that the spriteram is in the same format
-	offset = BITSWAP16(offset,  15,14,13,12, 11,   7,6,5,4,3,2,1,0,   10,9,8  );
+	offset = bitswap<16>(offset,  15,14,13,12, 11,   7,6,5,4,3,2,1,0,   10,9,8  );
 
 	if (!m_spriteram)
 	{
@@ -256,7 +256,7 @@ READ8_MEMBER( kaneko_pandora_device::spriteram_r )
 {
 	// it's either hooked up oddly on this, or on the 16-bit games
 	// either way, we swap the address lines so that the spriteram is in the same format
-	offset = BITSWAP16(offset,  15,14,13,12, 11,  7,6,5,4,3,2,1,0,  10,9,8  );
+	offset = bitswap<16>(offset,  15,14,13,12, 11,  7,6,5,4,3,2,1,0,  10,9,8  );
 
 	if (!m_spriteram)
 	{

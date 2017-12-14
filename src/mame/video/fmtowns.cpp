@@ -709,13 +709,13 @@ WRITE8_MEMBER( towns_state::towns_spriteram_w )
  *      +2: Y position (10-bit)
  *      +4: Sprite Attribute
  *          bit 15: enforce offsets (regs 2-5)
- *          bit 12,13: flip sprite
- *          bits 10-0: Sprite RAM offset containing sprite pattern
- *          TODO: other attributes (zoom?)
+ *          bit 12,13,14: flip / rotate sprite
+ *          bits 10,11: half-size
+ *          bits 9-0: Sprite RAM offset containing sprite pattern
  *      +6: Sprite Colour
  *          bit 15: use colour data in located in sprite RAM offset in bits 11-0 (x32)
  */
-void towns_state::render_sprite_4(uint32_t poffset, uint32_t coffset, uint16_t x, uint16_t y, uint16_t xflip, uint16_t yflip, const rectangle* rect)
+void towns_state::render_sprite_4(uint32_t poffset, uint32_t coffset, uint16_t x, uint16_t y, bool xflip, bool yflip, bool xhalfsize, bool yhalfsize, const rectangle* rect)
 {
 	uint16_t xpos,ypos;
 	uint16_t col,pixel;
@@ -728,25 +728,47 @@ void towns_state::render_sprite_4(uint32_t poffset, uint32_t coffset, uint16_t x
 	if(xflip)
 	{
 		xstart = x+14;
-		xend = x-2;
-		xdir = -2;
+		if (xhalfsize) 
+		{
+			xend = x+6;
+			xdir = -1;
+		}
+		else
+		{
+			xend = x-2;
+			xdir = -2;
+		}
 	}
 	else
 	{
 		xstart = x+1;
-		xend = x+17;
-		xdir = 2;
+		if (xhalfsize) 
+		{
+			xend = x+9;
+			xdir = 1;
+		}
+		else
+		{
+			xend = x+17;
+			xdir = 2;
+		}
 	}
 	if(yflip)
 	{
 		ystart = y+15;
-		yend = y-1;
+		if (yhalfsize)
+			yend = y+7;
+		else
+			yend = y-1;
 		ydir = -1;
 	}
 	else
 	{
 		ystart = y;
-		yend = y+16;
+		if (yhalfsize) 
+			yend = y+8;
+		else
+			yend = y+16;
 		ydir = 1;
 	}
 	xstart &= 0x1ff;
@@ -754,7 +776,7 @@ void towns_state::render_sprite_4(uint32_t poffset, uint32_t coffset, uint16_t x
 	ystart &= 0x1ff;
 	yend &= 0x1ff;
 	poffset &= 0x1ffff;
-
+	
 	for(ypos=ystart;ypos!=yend;ypos+=ydir,ypos&=0x1ff)
 	{
 		for(xpos=xstart;xpos!=xend;xpos+=xdir,xpos&=0x1ff)
@@ -776,28 +798,37 @@ void towns_state::render_sprite_4(uint32_t poffset, uint32_t coffset, uint16_t x
 					m_towns_gfxvram[0x40000+voffset] = col & 0x00ff;
 				}
 			}
-			if(xflip)
-				voffset+=2;
-			else
-				voffset-=2;
-			pixel = m_towns_txtvram[poffset] & 0x0f;
-			col = m_towns_txtvram[coffset+(pixel*2)] | (m_towns_txtvram[coffset+(pixel*2)+1] << 8);
-			if((m_video.towns_sprite_page != 0 && voffset > 0x1ffff && voffset < 0x40000)
-					|| (m_video.towns_sprite_page == 0 && voffset < 0x20000))
+
+			if (!xhalfsize)
 			{
-				if(xpos < width && ypos < height && pixel != 0)
+				if(xflip)
+					voffset+=2;
+				else
+					voffset-=2;
+				pixel = m_towns_txtvram[poffset] & 0x0f;
+				col = m_towns_txtvram[coffset+(pixel*2)] | (m_towns_txtvram[coffset+(pixel*2)+1] << 8);
+				if((m_video.towns_sprite_page != 0 && voffset > 0x1ffff && voffset < 0x40000)
+						|| (m_video.towns_sprite_page == 0 && voffset < 0x20000))
 				{
-					m_towns_gfxvram[0x40000+voffset+1] = (col & 0xff00) >> 8;
-					m_towns_gfxvram[0x40000+voffset] = col & 0x00ff;
+					if(xpos < width && ypos < height && pixel != 0)
+					{
+						m_towns_gfxvram[0x40000+voffset+1] = (col & 0xff00) >> 8;
+						m_towns_gfxvram[0x40000+voffset] = col & 0x00ff;
+					}
 				}
 			}
+
 			poffset++;
 			poffset &= 0x1ffff;
+		}
+		if (yhalfsize)
+		{
+			poffset+=8;
 		}
 	}
 }
 
-void towns_state::render_sprite_16(uint32_t poffset, uint16_t x, uint16_t y, uint16_t xflip, uint16_t yflip, const rectangle* rect)
+void towns_state::render_sprite_16(uint32_t poffset, uint16_t x, uint16_t y, bool xflip, bool yflip, bool xhalfsize, bool yhalfsize, const rectangle* rect)
 {
 	uint16_t xpos,ypos;
 	uint16_t col;
@@ -810,25 +841,37 @@ void towns_state::render_sprite_16(uint32_t poffset, uint16_t x, uint16_t y, uin
 	if(xflip)
 	{
 		xstart = x+16;
-		xend = x;
+		if (xhalfsize)
+			xend = x+8;
+		else
+			xend = x;
 		xdir = -1;
 	}
 	else
 	{
 		xstart = x+1;
-		xend = x+17;
+		if (xhalfsize)
+			xend = x+9;
+		else
+			xend = x+17;
 		xdir = 1;
 	}
 	if(yflip)
 	{
 		ystart = y+15;
-		yend = y-1;
+		if (yhalfsize)
+			yend = y+7;
+		else
+			yend = y-1;
 		ydir = -1;
 	}
 	else
 	{
 		ystart = y;
-		yend = y+16;
+		if (yhalfsize)
+			yend = y+16;
+		else
+			yend = y+8;
 		ydir = 1;
 	}
 	xstart &= 0x1ff;
@@ -857,9 +900,15 @@ void towns_state::render_sprite_16(uint32_t poffset, uint16_t x, uint16_t y, uin
 					m_towns_gfxvram[0x40000+voffset] = col & 0x00ff;
 				}
 			}
-			poffset+=2;
+			if (xhalfsize)
+				poffset+=4;
+			else
+				poffset+=2;
 			poffset &= 0x1ffff;
 		}
+		
+		if (yhalfsize)
+			poffset+=16;
 	}
 }
 
@@ -871,6 +920,7 @@ void towns_state::draw_sprites(const rectangle* rect)
 	uint16_t xoff = (m_video.towns_sprite_reg[2] | (m_video.towns_sprite_reg[3] << 8)) & 0x1ff;
 	uint16_t yoff = (m_video.towns_sprite_reg[4] | (m_video.towns_sprite_reg[5] << 8)) & 0x1ff;
 	uint32_t poffset,coffset;
+	bool xflip, yflip, xhalfsize, yhalfsize;
 
 	if(!(m_video.towns_sprite_reg[1] & 0x80))
 		return;
@@ -887,6 +937,11 @@ void towns_state::draw_sprites(const rectangle* rect)
 		y = m_towns_txtvram[8*n+2] | (m_towns_txtvram[8*n+3] << 8);
 		attr = m_towns_txtvram[8*n+4] | (m_towns_txtvram[8*n+5] << 8);
 		colour = m_towns_txtvram[8*n+6] | (m_towns_txtvram[8*n+7] << 8);
+		xflip = (attr & 0x2000) >> 13;
+		yflip = (attr & 0x1000) >> 12;
+		xhalfsize = (attr & 0x400) >> 10;
+		yhalfsize = (attr & 0x800) >> 11;
+		
 		if(attr & 0x8000)
 		{
 			x += xoff;
@@ -904,7 +959,7 @@ void towns_state::draw_sprites(const rectangle* rect)
 				n,x,y,attr,colour,poffset,coffset);
 #endif
 			if(!(colour & 0x2000))
-				render_sprite_4((poffset)&0x1ffff,coffset,x,y,attr&0x2000,attr&0x1000,rect);
+				render_sprite_4((poffset)&0x1ffff,coffset,x,y,xflip,yflip,xhalfsize,yhalfsize,rect);
 		}
 		else
 		{
@@ -914,7 +969,7 @@ void towns_state::draw_sprites(const rectangle* rect)
 				n,x,y,attr,colour,poffset);
 #endif
 			if(!(colour & 0x2000))
-				render_sprite_16((poffset)&0x1ffff,x,y,attr&0x2000,attr&0x1000,rect);
+				render_sprite_16((poffset)&0x1ffff,x,y,xflip,yflip,xhalfsize,yhalfsize,rect);
 		}
 	}
 
@@ -958,8 +1013,8 @@ void towns_state::towns_crtc_draw_scan_layer_hicolour(bitmap_rgb32 &bitmap,const
 			scroll = ((m_video.towns_crtc_reg[21] & 0xfc00) << 2) | (((m_video.towns_crtc_reg[21] & 0x3ff) << 2));
 			off += scroll;
 		}
-		off += (m_video.towns_crtc_reg[11] - m_video.towns_crtc_reg[22]);
 		hzoom = ((m_video.towns_crtc_reg[27] & 0x0f00) >> 8) + 1;
+		off += (m_video.towns_crtc_reg[11] - m_video.towns_crtc_reg[22]) * (2 >> (hzoom - 1));
 	}
 	else
 	{
@@ -970,8 +1025,8 @@ void towns_state::towns_crtc_draw_scan_layer_hicolour(bitmap_rgb32 &bitmap,const
 			scroll = ((m_video.towns_crtc_reg[17] & 0xfc00) << 2) | (((m_video.towns_crtc_reg[17] & 0x3ff) << 2));
 			off += scroll;
 		}
-		off += (m_video.towns_crtc_reg[9] - m_video.towns_crtc_reg[18]);
 		hzoom = (m_video.towns_crtc_reg[27] & 0x000f) + 1;
+		off += (m_video.towns_crtc_reg[9] - m_video.towns_crtc_reg[18]) * (2 >> (hzoom - 1));
 	}
 
 	off += line * linesize;
@@ -1150,8 +1205,8 @@ void towns_state::towns_crtc_draw_scan_layer_256(bitmap_rgb32 &bitmap,const rect
 			scroll = ((m_video.towns_crtc_reg[21] & 0xfc00) << 3) | (((m_video.towns_crtc_reg[21] & 0x3ff) << 3));
 			off += scroll;
 		}
-		off += (m_video.towns_crtc_reg[11] - m_video.towns_crtc_reg[22]);
 		hzoom = ((m_video.towns_crtc_reg[27] & 0x0f00) >> 8) + 1;
+		off += (m_video.towns_crtc_reg[11] - m_video.towns_crtc_reg[22]) / hzoom;
 	}
 	else
 	{
@@ -1162,8 +1217,8 @@ void towns_state::towns_crtc_draw_scan_layer_256(bitmap_rgb32 &bitmap,const rect
 			scroll = ((m_video.towns_crtc_reg[17] & 0xfc00) << 3) | (((m_video.towns_crtc_reg[17] & 0x3ff) << 3));
 			off += scroll;
 		}
-		off += (m_video.towns_crtc_reg[9] - m_video.towns_crtc_reg[18]);
 		hzoom = (m_video.towns_crtc_reg[27] & 0x000f) + 1;
+		off += (m_video.towns_crtc_reg[9] - m_video.towns_crtc_reg[18]) / hzoom;
 	}
 
 	off += line * linesize;
@@ -1296,8 +1351,8 @@ void towns_state::towns_crtc_draw_scan_layer_16(bitmap_rgb32 &bitmap,const recta
 			scroll = ((m_video.towns_crtc_reg[21] & 0xfc00)<<2) | (((m_video.towns_crtc_reg[21] & 0x3ff)<<2));
 			off += scroll;
 		}
-		off += (m_video.towns_crtc_reg[11] - m_video.towns_crtc_reg[22]);
 		hzoom = ((m_video.towns_crtc_reg[27] & 0x0f00) >> 8) + 1;
+		off += (m_video.towns_crtc_reg[11] - m_video.towns_crtc_reg[22]) / (hzoom * 2);
 	}
 	else
 	{
@@ -1308,8 +1363,8 @@ void towns_state::towns_crtc_draw_scan_layer_16(bitmap_rgb32 &bitmap,const recta
 			scroll = ((m_video.towns_crtc_reg[17] & 0xfc00)<<2) | (((m_video.towns_crtc_reg[17] & 0x3ff)<<2));
 			off += scroll;
 		}
-		off += (m_video.towns_crtc_reg[9] - m_video.towns_crtc_reg[18]);
 		hzoom = (m_video.towns_crtc_reg[27] & 0x000f) + 1;
+		off += (m_video.towns_crtc_reg[9] - m_video.towns_crtc_reg[18]) / (hzoom * 2);
 	}
 
 	off += line * linesize;

@@ -206,6 +206,9 @@ debugger_commands::debugger_commands(running_machine& machine, debugger_cpu& cpu
 	m_console.register_command("stateload", CMDFLAG_NONE, 0, 1, 1, std::bind(&debugger_commands::execute_stateload, this, _1, _2));
 	m_console.register_command("sl",        CMDFLAG_NONE, 0, 1, 1, std::bind(&debugger_commands::execute_stateload, this, _1, _2));
 
+	m_console.register_command("rewind",    CMDFLAG_NONE, 0, 0, 0, std::bind(&debugger_commands::execute_rewind, this, _1, _2));
+	m_console.register_command("rw",        CMDFLAG_NONE, 0, 0, 0, std::bind(&debugger_commands::execute_rewind, this, _1, _2));
+
 	m_console.register_command("save",      CMDFLAG_NONE, AS_PROGRAM, 3, 4, std::bind(&debugger_commands::execute_save, this, _1, _2));
 	m_console.register_command("saved",     CMDFLAG_NONE, AS_DATA, 3, 4, std::bind(&debugger_commands::execute_save, this, _1, _2));
 	m_console.register_command("savei",     CMDFLAG_NONE, AS_IO, 3, 4, std::bind(&debugger_commands::execute_save, this, _1, _2));
@@ -1627,13 +1630,37 @@ void debugger_commands::execute_stateload(int ref, const std::vector<std::string
 	const std::string &filename(params[0]);
 	m_machine.immediate_load(filename.c_str());
 
-	// Clear all PC & memory tracks
+	// clear all PC & memory tracks
 	for (device_t &device : device_iterator(m_machine.root_device()))
 	{
 		device.debug()->track_pc_data_clear();
 		device.debug()->track_mem_data_clear();
 	}
 	m_console.printf("State load attempted.  Please refer to window message popup for results.\n");
+}
+
+
+/*-------------------------------------------------
+    execute_rewind - execute the rewind command
+-------------------------------------------------*/
+
+void debugger_commands::execute_rewind(int ref, const std::vector<std::string> &params)
+{
+	if (!m_machine.save().rewind()->enabled())
+	{
+		m_console.printf("Rewind not enabled\n");
+		return;
+	}
+
+	m_machine.rewind_step();
+
+	// clear all PC & memory tracks
+	for (device_t &device : device_iterator(m_machine.root_device()))
+	{
+		device.debug()->track_pc_data_clear();
+		device.debug()->track_mem_data_clear();
+	}
+	m_console.printf("Rewind step attempted.  Please refer to window message popup for results.\n");
 }
 
 

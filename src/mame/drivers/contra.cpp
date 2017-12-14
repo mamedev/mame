@@ -202,7 +202,7 @@ static MACHINE_CONFIG_START( contra )
 	MCFG_CPU_PROGRAM_MAP(contra_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", contra_state,  contra_interrupt)
 
-	MCFG_CPU_ADD("audiocpu", M6809, XTAL_24MHz/8) /* 3000000? */
+	MCFG_CPU_ADD("audiocpu", MC6809E, XTAL_24MHz/8) /* 3000000? */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))  /* enough for the sound CPU to read all commands */

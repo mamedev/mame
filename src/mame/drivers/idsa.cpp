@@ -9,8 +9,8 @@ Hardware:
 ---------
 CPU:     Z80 @ 4 MHz
     INT: IRQ @ 977 Hz (4MHz/2048/2) or 488 Hz (4MHz/2048/4)
-DRIVERS: 2 x 8255 driving lamps and coils, used as demultiplexers only (no read access)
-DISPLAY: bsktball: 7-digit 7-segment panels with PROM-based 5-bit BCD data (allowing a simple alphabet)
+DRIVERS: bsktbllp: 2 x 8255 driving lamps and coils, used as demultiplexers only (no read access)
+DISPLAY: bsktbllp: 7-digit 7-segment panels with PROM-based 5-bit BCD data (allowing a simple alphabet)
          v1: 6-digit 7-segment panels with BCD decoding
 SOUND:   2 x AY8910 @ 2 MHz (also used as output interface) plus SP0256 @ 3.12 MHz on board
 
@@ -50,6 +50,14 @@ public:
 	DECLARE_READ8_MEMBER(portb0_r);
 	DECLARE_WRITE8_MEMBER(port80_w);
 	DECLARE_WRITE8_MEMBER(port90_w);
+	DECLARE_WRITE8_MEMBER(ppi_control_w);
+	DECLARE_WRITE8_MEMBER(ppi_data_w);
+	DECLARE_WRITE8_MEMBER(ppi1_a_w);
+	DECLARE_WRITE8_MEMBER(ppi1_b_w);
+	DECLARE_WRITE8_MEMBER(ppi1_c_w);
+	DECLARE_WRITE8_MEMBER(ppi2_a_w);
+	DECLARE_WRITE8_MEMBER(ppi2_b_w);
+	DECLARE_WRITE8_MEMBER(ppi2_c_w);
 	DECLARE_WRITE8_MEMBER(ay1_a_w);
 	DECLARE_WRITE8_MEMBER(ay1_b_w);
 	DECLARE_WRITE8_MEMBER(ay2_a_w);
@@ -62,7 +70,7 @@ private:
 	uint8_t m_ppi_data;
 	required_device<cpu_device> m_maincpu;
 	required_device<sp0256_device> m_speech;
-	required_device_array<i8255_device, 2> m_ppi;
+	optional_device_array<i8255_device, 2> m_ppi;
 };
 
 static ADDRESS_MAP_START( maincpu_map, AS_PROGRAM, 8, idsa_state )
@@ -231,7 +239,7 @@ WRITE8_MEMBER( idsa_state::port90_w )
 }
 
 // AY ports are for lamps and solenoids
-WRITE8_MEMBER( idsa_state::ay1_a_w )
+WRITE8_MEMBER( idsa_state::ppi_control_w )
 {
 	//logerror("%s: AY1 port A = %02X\n", machine().describe_context(), data);
 	if (!BIT(data, 2))
@@ -240,9 +248,49 @@ WRITE8_MEMBER( idsa_state::ay1_a_w )
 		m_ppi[1]->write(space, data & 0x03, m_ppi_data);
 }
 
-WRITE8_MEMBER( idsa_state::ay1_b_w )
+WRITE8_MEMBER( idsa_state::ppi_data_w )
 {
 	m_ppi_data = data;
+}
+
+WRITE8_MEMBER( idsa_state::ppi1_a_w )
+{
+	logerror("%s: PPI1 port A = %02X\n", machine().describe_context(), data);
+}
+
+WRITE8_MEMBER( idsa_state::ppi1_b_w )
+{
+	logerror("%s: PPI1 port B = %02X\n", machine().describe_context(), data);
+}
+
+WRITE8_MEMBER( idsa_state::ppi1_c_w )
+{
+	logerror("%s: PPI1 port C = %02X\n", machine().describe_context(), data);
+}
+
+WRITE8_MEMBER( idsa_state::ppi2_a_w )
+{
+	logerror("%s: PPI2 port A = %02X\n", machine().describe_context(), data);
+}
+
+WRITE8_MEMBER( idsa_state::ppi2_b_w )
+{
+	logerror("%s: PPI2 port B = %02X\n", machine().describe_context(), data);
+}
+
+WRITE8_MEMBER( idsa_state::ppi2_c_w )
+{
+	logerror("%s: PPI2 port C = %02X\n", machine().describe_context(), data);
+}
+
+WRITE8_MEMBER( idsa_state::ay1_a_w )
+{
+	//logerror("%s: AY1 port A = %02X\n", machine().describe_context(), data);
+}
+
+WRITE8_MEMBER( idsa_state::ay1_b_w )
+{
+	//logerror("%s: AY1 port B = %02X\n", machine().describe_context(), data);
 }
 
 WRITE8_MEMBER( idsa_state::ay2_a_w )
@@ -291,21 +339,33 @@ static MACHINE_CONFIG_START( idsa )
 	/* sound hardware */
 	MCFG_FRAGMENT_ADD( genpin_audio )
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-	MCFG_SOUND_ADD("speech", SP0256, 3120000)
+	MCFG_SOUND_ADD("speech", SP0256, 3120000) // unknown variant
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.5)
 
 	MCFG_SOUND_ADD("aysnd1", AY8910, 2000000) // 2Mhz according to pinmame, schematic omits the clock line
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(idsa_state, ay1_a_w))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(idsa_state, ay1_b_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.75)
 
 	MCFG_SOUND_ADD("aysnd2", AY8910, 2000000)
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(idsa_state, ay1_a_w))
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(idsa_state, ay1_b_w))
 	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(idsa_state, ay2_a_w))
 	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(idsa_state, ay2_b_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.75)
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( bsktbllp, idsa )
+	MCFG_DEVICE_MODIFY("aysnd1")
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(idsa_state, ppi_control_w))
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(idsa_state, ppi_data_w))
 
 	MCFG_DEVICE_ADD("ppi1", I8255, 0)
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(idsa_state, ppi1_a_w))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(idsa_state, ppi1_b_w))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(idsa_state, ppi1_c_w))
 	MCFG_DEVICE_ADD("ppi2", I8255, 0)
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(idsa_state, ppi2_a_w))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(idsa_state, ppi2_b_w))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(idsa_state, ppi2_c_w))
 MACHINE_CONFIG_END
 
 
@@ -320,11 +380,12 @@ ROM_END
 ROM_START(bsktbllp)
 	ROM_REGION(0x8000, "maincpu", 0)
 	ROM_LOAD("bsktball.256", 0x0000, 0x8000, CRC(d474e29b) SHA1(750cbacef34dde0b3dcb6c1e4679db78a73643fd))
+	ROM_FILL(0x0cb8, 1, 0x3e) // patch suspicious LD that fetches a bad AY address
 
 	ROM_REGION(0x10000, "speech", 0)
 	ROM_LOAD( "sp0256a-al2.1b",   0x1000, 0x0800, CRC(b504ac15) SHA1(e60fcb5fa16ff3f3b69d36c7a6e955744d3feafc) )
 ROM_END
 
 
-GAME( 1985, v1,       0, idsa, idsa, idsa_state, 0, ROT0, "IDSA", "V.1",         MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 1987, bsktbllp, 0, idsa, idsa, idsa_state, 0, ROT0, "IDSA", "Basket Ball", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1985, v1,       0, idsa,     idsa, idsa_state, 0, ROT0, "IDSA", "V.1",         MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1987, bsktbllp, 0, bsktbllp, idsa, idsa_state, 0, ROT0, "IDSA", "Basket Ball", MACHINE_IS_SKELETON_MECHANICAL )

@@ -22,8 +22,10 @@ public:
 
 	DECLARE_READ16_MEMBER( read );
 	DECLARE_WRITE16_MEMBER( write );
+	TIMER_CALLBACK_MEMBER(send_frame);
 
 	virtual void recv_cb(uint8_t *data, int length) override;
+	void set_link_connected(bool connected) { m_link_unconnected = !connected; };
 
 protected:
 	smc91c9x_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
@@ -34,9 +36,24 @@ protected:
 
 private:
 	static constexpr unsigned ETHER_BUFFER_SIZE   = 2048;
-	static constexpr unsigned ETHER_RX_BUFFERS    = 16;
-	static constexpr unsigned ETHER_TX_BUFFERS    = 16;
+	// TODO: 96 device is larger
+	static constexpr unsigned ETHER_BUFFERS = 16;
 	static constexpr unsigned ETHERNET_ADDR_SIZE = 6;
+
+	// external network is present
+	bool m_network_available;
+
+	// mmu
+	// The bits in these vectors indicate a packet has been allocated
+	u32 m_alloc_rx, m_alloc_tx;
+	std::vector<int> m_comp_tx, m_comp_rx;
+	// Requests a packet allocation and returns true
+	// and sets the packet number if successful
+	bool alloc_req(const int tx, int &packet_num);
+	// Releases an allocation
+	void alloc_release(const int packet_num);
+	// Resets the MMU
+	void mmu_reset();
 
 	// internal state
 	devcb_write_line m_irq_handler;
@@ -51,24 +68,17 @@ private:
 	/* IRQ information */
 	uint8_t           m_irq_state;
 
-	/* allocate information */
-	uint8_t           m_alloc_count;
-
-	/* transmit/receive FIFOs */
-	uint32_t          rx_fifo_out;
-	uint32_t          rx_fifo_in;
-	uint8_t           m_rx[ETHER_BUFFER_SIZE * ETHER_RX_BUFFERS];
-
-	uint32_t          tx_fifo_out;
-	uint32_t          tx_fifo_in;
-	uint8_t           m_tx[ETHER_BUFFER_SIZE * ETHER_TX_BUFFERS];
+	// Main memory
+	uint8_t           m_buffer[ETHER_BUFFER_SIZE * ETHER_BUFFERS];
 
 	/* counters */
 	uint32_t          m_sent;
 	uint32_t          m_recd;
 
-	int ethernet_packet_is_for_me(const uint8_t mac_address[]);
-	int is_broadcast(uint8_t mac_address[]);
+	emu_timer* m_tx_timer;
+
+	int ethernet_packet_is_for_me(const uint8_t *mac_address);
+	int is_broadcast(const uint8_t *mac_address);
 
 	void update_ethernet_irq();
 	void update_stats();
@@ -76,8 +86,6 @@ private:
 	void process_command(uint16_t data);
 	void clear_tx_fifo();
 	void clear_rx_fifo();
-
-	int  send_frame();
 
 };
 

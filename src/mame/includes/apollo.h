@@ -87,8 +87,10 @@ uint8_t apollo_get_ram_config_byte(void);
 //apollo_get_node_id - get the node id
 uint32_t apollo_get_node_id(void);
 
+#if 0
 	// should be called by the CPU core before executing each instruction
 int apollo_instruction_hook(m68000_base_device *device, offs_t curpc);
+#endif
 
 void apollo_set_cache_status_register(device_t *device,uint8_t mask, uint8_t data);
 

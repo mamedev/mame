@@ -1262,7 +1262,38 @@
 		</part>
 	</software>
 
-
+	<software name="bjourneyh" cloneof="bjourney">
+		<description>Blue's Journey / Raguy (ALH-001)</description>
+		<year>1990</year>
+		<publisher>Alpha Denshi Co.</publisher>
+		<info name="serial" value="NGH-022 / ALH-001 (AES)"/>
+		<info name="release" value="19910701 (AES)"/>
+		<info name="alt_title" value="ラギ"/>
+		<sharedfeat name="release" value="AES" />
+		<sharedfeat name="compatibility" value="MVS,AES" />
+		<part name="cart" interface="neo_cart">
+			<dataarea name="maincpu" width="16" endianness="big" size="0x100000">
+				<rom loadflag="load16_word_swap" name="022-hp1.p1" offset="0x000000" size="0x100000" crc="62cbe7b2" sha1="f9a8fd98702c623ae793804ba50d09751e3fee4c" />   <!-- TC538200 -->
+			</dataarea>
+			<dataarea name="fixed" size="0x040000">
+				<rom offset="0x000000" size="0x020000" name="022-s1.s1" crc="843c3624" sha1="dbdf86c193b7c1d795f8c21f2c103c1d3e18abbe" />   <!-- TC531000 -->
+			</dataarea>
+			<dataarea name="audiocpu" size="0x020000">
+				<rom offset="0x000000" size="0x020000" name="022-m1.m1" crc="8e1d4ab6" sha1="deabc11ab81e7e68a3e041c03a127ae28d0d7264" />   <!-- TC531001 -->
+			</dataarea>
+			<dataarea name="ymsnd" size="0x200000">
+				<rom name="022-v11.v11" offset="0x000000" size="0x100000" crc="2cb4ad91" sha1="169ec7303c4275155a66a88cc08270c24132bb36" /> <!-- TC538200 -->
+				<rom name="022-v22.v22" offset="0x100000" size="0x100000" crc="65a54d13" sha1="a591fbcedca8f679dacbebcd554e3aa3fd163e92" /> <!-- TC538200 -->
+			</dataarea>
+			<dataarea name="sprites" size="0x300000">
+				<rom loadflag="load16_byte" name="022-c1.c1" offset="0x000000" size="0x100000" crc="4d47a48c" sha1="6e282285be72583d828e7765b1c1695ecdc44777" />    <!-- TC538200 -->
+				<rom loadflag="load16_byte" name="022-c2.c2" offset="0x000001" size="0x100000" crc="e8c1491a" sha1="c468d2556b3de095aaa05edd1bc16d71303e9478" />    <!-- TC538200 -->
+				<rom loadflag="load16_byte" name="022-c3.c3" offset="0x200000" size="0x080000" crc="66e69753" sha1="974b823fc62236fbc23e727f25b61a805a707a9e" />    <!-- TC534200 -->
+				<rom loadflag="load16_byte" name="022-c4.c4" offset="0x200001" size="0x080000" crc="71bfd48a" sha1="47288be69e6992d09ebef108b4de9ffab6293dc8" />    <!-- TC534200 -->
+			</dataarea>
+		</part>
+	</software>
+	
 	<!--
 	ID-0023
 	. NGM-023

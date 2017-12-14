@@ -127,7 +127,7 @@ void mac_fdc_set_enable_lines(device_t *device, int enable_mask)
 {
 	mac_state *mac = device->machine().driver_data<mac_state>();
 
-	if (mac->m_model != MODEL_MAC_SE)
+	if (mac->m_model != mac_state::MODEL_MAC_SE)
 	{
 		sony_set_enable_lines(device, enable_mask);
 	}

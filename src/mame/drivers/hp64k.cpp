@@ -439,7 +439,9 @@ WRITE_LINE_MEMBER(hp64k_state::hp64k_crtc_drq_w)
 		if (!prev_crtc && crtc_drq) {
 				address_space& prog_space = m_cpu->space(AS_PROGRAM);
 
-				uint8_t data = prog_space.read_byte(m_crtc_ptr);
+				uint16_t data = prog_space.read_word(m_crtc_ptr >> 1);
+				data = m_crtc_ptr & 1 ? data & 0xff : data >> 8;
+
 				m_crtc_ptr++;
 
 				m_crtc->dack_w(prog_space , 0 , hp64k_crtc_filter(data));

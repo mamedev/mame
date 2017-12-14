@@ -740,19 +740,19 @@ DRIVER_INIT_MEMBER(epos_state,dealer)
 
 	/* Key 0 */
 	for (A = 0; A < 0x8000; A++)
-		rom[A] = BITSWAP8(rom[A] ^ 0xbd, 2,6,4,0,5,7,1,3 );
+		rom[A] = bitswap<8>(rom[A] ^ 0xbd, 2,6,4,0,5,7,1,3 );
 
 	/* Key 1 */
 	for (A = 0; A < 0x8000; A++)
-		rom[A + 0x10000] = BITSWAP8(rom[A], 7,5,4,6,3,2,1,0 );
+		rom[A + 0x10000] = bitswap<8>(rom[A], 7,5,4,6,3,2,1,0 );
 
 	/* Key 2 */
 	for (A = 0; A < 0x8000; A++)
-		rom[A + 0x20000] = BITSWAP8(rom[A] ^ 1, 7,6,5,4,3,0,2,1 );
+		rom[A + 0x20000] = bitswap<8>(rom[A] ^ 1, 7,6,5,4,3,0,2,1 );
 
 	/* Key 3 */
 	for (A = 0; A < 0x8000; A++)
-		rom[A + 0x30000] = BITSWAP8(rom[A] ^ 1, 7,5,4,6,3,0,2,1 );
+		rom[A + 0x30000] = bitswap<8>(rom[A] ^ 1, 7,5,4,6,3,0,2,1 );
 
 	/*
 	    there is not enough data to determine key 3.

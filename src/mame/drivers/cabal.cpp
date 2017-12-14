@@ -156,12 +156,12 @@ ADDRESS_MAP_END
 
 READ8_MEMBER(cabal_state::cabalbl_snd2_r)
 {
-	return BITSWAP8(m_sound_command2, 7,2,4,5,3,6,1,0);
+	return bitswap<8>(m_sound_command2, 7,2,4,5,3,6,1,0);
 }
 
 READ8_MEMBER(cabal_state::cabalbl_snd1_r)
 {
-	return BITSWAP8(m_sound_command1, 7,2,4,5,3,6,1,0);
+	return bitswap<8>(m_sound_command1, 7,2,4,5,3,6,1,0);
 }
 
 WRITE8_MEMBER(cabal_state::cabalbl_coin_w)

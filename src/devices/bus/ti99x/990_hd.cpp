@@ -241,7 +241,7 @@ DEVICE_IMAGE_LOAD_MEMBER( ti990_hdc_device, ti990_hd )
 */
 DEVICE_IMAGE_UNLOAD_MEMBER( ti990_hdc_device, ti990_hd )
 {
-	int id = get_id_from_device( image );
+	int id = get_id_from_device(&image.device());
 	hd_unit_t *d;
 
 	d = &m_d[id];

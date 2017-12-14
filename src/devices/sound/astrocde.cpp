@@ -87,7 +87,7 @@ void astrocade_device::device_start()
 
 	/* generate a bitswap table for the noise */
 	for (i = 0; i < 256; i++)
-		m_bitswap[i] = BITSWAP8(i, 0,1,2,3,4,5,6,7);
+		m_bitswap[i] = bitswap<8>(i, 0,1,2,3,4,5,6,7);
 
 	/* allocate a stream for output */
 	m_stream = stream_alloc(0, 1, clock());

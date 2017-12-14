@@ -516,9 +516,9 @@ ADDRESS_MAP_END
 
 READ16_MEMBER(namcos11_state::c76_speedup_r)
 {
-	if ((space.device().safe_pc() == 0xc153) && (!(m_su_83 & 0xff00)))
+	if ((m_mcu->pc() == 0xc153) && (!(m_su_83 & 0xff00)))
 	{
-		space.device().execute().spin_until_interrupt();
+		m_mcu->spin_until_interrupt();
 	}
 
 	return m_su_83;

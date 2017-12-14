@@ -347,5 +347,5 @@ WRITE8_MEMBER( trs80m2_keyboard_device::kb_p2_w )
 
 	*/
 
-	m_keylatch = BITSWAP8(data, 7, 6, 5, 4, 0, 1, 2, 3) & 0x0f;
+	m_keylatch = bitswap<8>(data, 7, 6, 5, 4, 0, 1, 2, 3) & 0x0f;
 }

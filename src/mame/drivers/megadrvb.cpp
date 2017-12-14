@@ -812,12 +812,12 @@ DRIVER_INIT_MEMBER(md_boot_state,mk3mdb)
 		if (x & 0x80000)
 		{
 			rom[x] = rom[x] ^ 0xff;
-			rom[x] = BITSWAP8(rom[x], 0,3,2,5,4,6,7,1);
+			rom[x] = bitswap<8>(rom[x], 0,3,2,5,4,6,7,1);
 		}
 		else
 		{
 			rom[x] = rom[x] ^ 0xff;
-			rom[x] = BITSWAP8(rom[x], 4,0,7,1,3,6,2,5);
+			rom[x] = bitswap<8>(rom[x], 4,0,7,1,3,6,2,5);
 		}
 	}
 
@@ -826,11 +826,11 @@ DRIVER_INIT_MEMBER(md_boot_state,mk3mdb)
 		if (x & 0x80000)
 		{
 			rom[x] = rom[x] ^ 0xff;
-			rom[x] = BITSWAP8(rom[x], 2,7,5,4,1,0,3,6);
+			rom[x] = bitswap<8>(rom[x], 2,7,5,4,1,0,3,6);
 		}
 		else
 		{
-			rom[x] = BITSWAP8(rom[x], 6,1,4,2,7,0,3,5);
+			rom[x] = bitswap<8>(rom[x], 6,1,4,2,7,0,3,5);
 		}
 	}
 
@@ -874,12 +874,12 @@ DRIVER_INIT_MEMBER(md_boot_state,srmdb)
 
 	for (int x = 0x00001; x < 0x40000; x += 2)
 	{
-		rom[x] = BITSWAP8(rom[x] ^ 0xff, 5,1,6,2,4,3,7,0);
+		rom[x] = bitswap<8>(rom[x] ^ 0xff, 5,1,6,2,4,3,7,0);
 	}
 
 	for (int x = 0x40001; x < 0x80000; x += 2)
 	{
-		rom[x] = BITSWAP8(rom[x] ^ 0x00, 2,6,1,5,0,7,3,4);
+		rom[x] = bitswap<8>(rom[x] ^ 0x00, 2,6,1,5,0,7,3,4);
 	}
 
 	// boot vectors don't seem to be valid, so they are patched...

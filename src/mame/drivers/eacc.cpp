@@ -218,7 +218,7 @@ WRITE8_MEMBER( eacc_state::eacc_segment_w )
 		{
 			for (i = 3; i < 7; i++)
 				if (BIT(m_digit, i))
-					output().set_digit_value(i, BITSWAP8(data, 7, 0, 1, 4, 5, 6, 2, 3));
+					output().set_digit_value(i, bitswap<8>(data, 7, 0, 1, 4, 5, 6, 2, 3));
 		}
 	}
 }

@@ -59,7 +59,7 @@ DRIVER_INIT_MEMBER(nbmj8688_state,mjcamera)
 	   the checksum. */
 	for (i = 0;i < 0x10000;i++)
 	{
-		rom[i] = BITSWAP8(prot[i],1,6,0,4,2,3,5,7);
+		rom[i] = bitswap<8>(prot[i],1,6,0,4,2,3,5,7);
 	}
 }
 
@@ -99,7 +99,7 @@ DRIVER_INIT_MEMBER(nbmj8688_state,idhimitu)
 	   the checksum. */
 	for (i = 0;i < 0x10000;i++)
 	{
-		rom[i] = BITSWAP8(prot[i + 0x10000],4,6,2,1,7,0,3,5);
+		rom[i] = bitswap<8>(prot[i + 0x10000],4,6,2,1,7,0,3,5);
 	}
 }
 
@@ -116,7 +116,7 @@ DRIVER_INIT_MEMBER(nbmj8688_state,kaguya2)
 	   the checksum. */
 	for (i = 0;i < 0x10000;i++)
 	{
-		rom[i] = BITSWAP8(prot[i],1,6,0,4,2,3,5,7);
+		rom[i] = bitswap<8>(prot[i],1,6,0,4,2,3,5,7);
 	}
 }
 

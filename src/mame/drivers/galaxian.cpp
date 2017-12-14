@@ -1017,7 +1017,7 @@ void galaxian_state::monsterz_set_latch()
 {
 	// read from a rom (which one?? "a-3e.k3" from audiocpu ($2700-$2fff) looks very suspicious)
 	uint8_t *rom = memregion("audiocpu")->base();
-	m_protection_result = rom[0x2000 | (m_protection_state & 0x1fff)]; // probably needs a BITSWAP8
+	m_protection_result = rom[0x2000 | (m_protection_state & 0x1fff)]; // probably needs a bitswap<8>
 
 	// and an irq on the main z80 afterwards
 	m_maincpu->set_input_line(0, HOLD_LINE );
@@ -1096,7 +1096,7 @@ READ8_MEMBER(galaxian_state::frogger_sound_timer_r)
 {
 	/* same as regular Konami sound but with bits 3,5 swapped */
 	uint8_t konami_value = konami_sound_timer_r(space, 0);
-	return BITSWAP8(konami_value, 7,6,3,4,5,2,1,0);
+	return bitswap<8>(konami_value, 7,6,3,4,5,2,1,0);
 }
 
 
@@ -1901,6 +1901,29 @@ static ADDRESS_MAP_START( turtles_map, AS_PROGRAM, 8, galaxian_state )
 	AM_RANGE(0xb800, 0xb83f) AM_MIRROR(0x47c0) AM_READWRITE(turtles_ppi8255_1_r, turtles_ppi8255_1_w)
 ADDRESS_MAP_END
 
+
+/* map NOT derived from schematics */
+static ADDRESS_MAP_START( amigo2_map, AS_PROGRAM, 8, galaxian_state )
+	AM_RANGE(0x0000, 0x3fff) AM_ROM
+	AM_RANGE(0x4000, 0x4000) AM_READ_PORT("IN0") AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
+	AM_RANGE(0x4001, 0x4001) AM_READ_PORT("IN1")
+	AM_RANGE(0x4002, 0x4002) AM_READ_PORT("IN2")
+	AM_RANGE(0x4003, 0x4003) AM_READ_PORT("IN3")
+	AM_RANGE(0x5000, 0x5000) AM_WRITE(konami_sound_control_w)
+	AM_RANGE(0x8000, 0x87ff) AM_RAM
+	AM_RANGE(0x8800, 0x8bff) AM_RAM_WRITE(galaxian_videoram_w) AM_SHARE("videoram")
+	AM_RANGE(0x9000, 0x90ff) AM_RAM_WRITE(galaxian_objram_w) AM_SHARE("spriteram")
+	AM_RANGE(0xa000, 0xa000) AM_WRITE(scramble_background_red_w)
+	AM_RANGE(0xa008, 0xa008) AM_WRITE(irq_enable_w)
+	AM_RANGE(0xa010, 0xa010) AM_WRITE(galaxian_flip_screen_y_w)
+	AM_RANGE(0xa018, 0xa018) AM_WRITE(galaxian_flip_screen_x_w)
+	AM_RANGE(0xa020, 0xa020) AM_WRITE(scramble_background_green_w)
+	AM_RANGE(0xa028, 0xa028) AM_WRITE(scramble_background_blue_w)
+	AM_RANGE(0xa030, 0xa030) AM_WRITE(coin_count_0_w)
+	AM_RANGE(0xa038, 0xa038) AM_WRITE(coin_count_1_w)
+	AM_RANGE(0xa800, 0xa800) AM_DEVREAD("watchdog", watchdog_timer_device, reset_r)
+ADDRESS_MAP_END
+
 static ADDRESS_MAP_START( turpins_map, AS_PROGRAM, 8, galaxian_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
@@ -2073,13 +2096,13 @@ READ8_MEMBER(galaxian_state::froggeram_ppi8255_r)
 	uint8_t result = 0xff;
 	if (offset & 0x0100) result &= m_ppi8255[0]->read(space, offset & 3);
 	if (offset & 0x0200) result &= m_ppi8255[1]->read(space, offset & 3);
-	return BITSWAP8(result, 0, 1, 2, 3, 4, 5, 6, 7);
+	return bitswap<8>(result, 0, 1, 2, 3, 4, 5, 6, 7);
 }
 
 WRITE8_MEMBER(galaxian_state::froggeram_ppi8255_w)
 {
 	// same as theend, but accesses are scrambled
-	data = BITSWAP8(data, 0, 1, 2, 3, 4, 5, 6, 7);
+	data = bitswap<8>(data, 0, 1, 2, 3, 4, 5, 6, 7);
 	if (offset & 0x0100) m_ppi8255[0]->write(space, offset & 3, data);
 	if (offset & 0x0200) m_ppi8255[1]->write(space, offset & 3, data);
 }
@@ -6040,6 +6063,15 @@ static MACHINE_CONFIG_DERIVED( turtles, konami_base )
 	MCFG_CPU_PROGRAM_MAP(turtles_map)
 MACHINE_CONFIG_END
 
+static MACHINE_CONFIG_DERIVED( amigo2, galaxian_base ) // bootleg has no i8255s
+
+	/* alternate memory map */
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(amigo2_map)
+
+	MCFG_FRAGMENT_ADD(konami_sound_2x_ay8910)
+MACHINE_CONFIG_END
+
 static MACHINE_CONFIG_DERIVED( turpins, turtles )
 
 	// the ROMs came from a blister, so there aren't PCB infos available. Chip types and clocks are guessed.
@@ -6320,7 +6352,7 @@ void galaxian_state::decode_mooncrst(int length, uint8_t *dest)
 		uint8_t res = data;
 		if (BIT(data,1)) res ^= 0x40;
 		if (BIT(data,5)) res ^= 0x04;
-		if ((offs & 1) == 0) res = BITSWAP8(res,7,2,5,4,3,6,1,0);
+		if ((offs & 1) == 0) res = bitswap<8>(res,7,2,5,4,3,6,1,0);
 		dest[offs] = res;
 	}
 }
@@ -6405,7 +6437,7 @@ void galaxian_state::decode_dingoe()
 
 		/* Swap bit0 with bit4 */
 		if (offs & 0x02)
-			data = BITSWAP8(data, 7,6,5,0,3,2,1,4);
+			data = bitswap<8>(data, 7,6,5,0,3,2,1,4);
 		rombase[offs] = data;
 	}
 }
@@ -6418,7 +6450,7 @@ void galaxian_state::decode_frogger_sound()
 
 	/* the first ROM of the sound CPU has data lines D0 and D1 swapped */
 	for (offs = 0; offs < 0x800; offs++)
-		rombase[offs] = BITSWAP8(rombase[offs], 7,6,5,4,3,2,0,1);
+		rombase[offs] = bitswap<8>(rombase[offs], 7,6,5,4,3,2,0,1);
 }
 
 // froggermc has a bigger first ROM of the sound CPU, thus a different decode
@@ -6429,7 +6461,7 @@ void galaxian_state::decode_froggermc_sound()
 
 	/* the first ROM of the sound CPU has data lines D0 and D1 swapped */
 	for (offs = 0; offs < 0x1000; offs++)
-		rombase[offs] = BITSWAP8(rombase[offs], 7,6,5,4,3,2,0,1);
+		rombase[offs] = bitswap<8>(rombase[offs], 7,6,5,4,3,2,0,1);
 }
 
 
@@ -6440,7 +6472,7 @@ void galaxian_state::decode_frogger_gfx()
 
 	/* the 2nd gfx ROM has data lines D0 and D1 swapped */
 	for (offs = 0x0800; offs < 0x1000; offs++)
-		rombase[offs] = BITSWAP8(rombase[offs], 7,6,5,4,3,2,0,1);
+		rombase[offs] = bitswap<8>(rombase[offs], 7,6,5,4,3,2,0,1);
 }
 
 
@@ -6525,7 +6557,7 @@ void galaxian_state::decode_victoryc()
 		if (i & 0x04) src[i] ^= 0x40;
 		if (i & 0x01) src[i] ^= 0x08;
 
-		src[i] = BITSWAP8(src[i], 6, 3, 5, 4, 2, 7, 1, 0);
+		src[i] = bitswap<8>(src[i], 6, 3, 5, 4, 2, 7, 1, 0);
 	}
 }
 
@@ -7168,7 +7200,7 @@ DRIVER_INIT_MEMBER(galaxian_state,mandinga)
 {
 	DRIVER_INIT_CALL(scramble);
 
-	/* watchdog is in a different location) */
+	/* watchdog is in a different location */
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 	watchdog_timer_device *wdog = subdevice<watchdog_timer_device>("watchdog");
 	space.unmap_read(0x7000, 0x7000, 0x7ff);
@@ -7555,6 +7587,20 @@ ROM_START( galaxrfgg )
 	ROM_LOAD( "gxrf.1lk",       0x0800, 0x0800, CRC(0dbcee5b) SHA1(b169c6e539a583a99e1e3ef5982d4c1ab395551f) )
 
 	ROM_REGION( 0x0020, "proms", 0 )
+	ROM_LOAD( "gxrf.6l",       0x0000, 0x0020, CRC(992350e5) SHA1(e901b1abd11cc0f02dd6d87b429d8997f762c15d) )
+ROM_END
+
+ROM_START( galaxrcgg )
+	ROM_REGION( 0x4000, "maincpu", 0 )
+	ROM_LOAD( "7f.bin",       0x0000, 0x1000, CRC(c06eeb10) SHA1(cf1006a7ff02fe8b04a096d802fb8d8937dd913d) )
+	ROM_LOAD( "7j.bin",       0x1000, 0x1000, CRC(182ff334) SHA1(11e84aa887679e3fa977f00dd0b57a7df8ca7d88) )
+	ROM_LOAD( "7l.bin",       0x2000, 0x1000, CRC(420dbbf6) SHA1(678563afd091528ef358a8deaae4ac3cee62e8f4) )
+
+	ROM_REGION( 0x1000, "gfx1", 0 )
+	ROM_LOAD( "1hj.bin",       0x0000, 0x0800, CRC(23e627ff) SHA1(11f8f50fcaa29f757f27d77ea2b977f65dc87e38) )
+	ROM_LOAD( "1kl.bin",       0x0800, 0x0800, CRC(0dbcee5b) SHA1(b169c6e539a583a99e1e3ef5982d4c1ab395551f) )
+
+	ROM_REGION( 0x0020, "proms", 0 ) // not dumped from this board, supposed to be the same
 	ROM_LOAD( "gxrf.6l",       0x0000, 0x0020, CRC(992350e5) SHA1(e901b1abd11cc0f02dd6d87b429d8997f762c15d) )
 ROM_END
 
@@ -10611,6 +10657,35 @@ ROM_START( amigo )
 	ROM_LOAD( "amidar.clr",   0x0000, 0x0020, CRC(f940dcc3) SHA1(1015e56f37c244a850a8f4bf0e36668f047fd46d) )
 ROM_END
 
+/*
+1x  Z8400A-P5-Z80ACPU       10k     8-bit Microprocessor - main
+1x  Z8400A-P5-Z80ACPU       3a      8-bit Microprocessor - sound
+2x  AY-3-8910               6a,7a   Programmable Sound Generator - sound
+1x  LM380N                  1       Audio Amplifier - sound
+1x  oscillator  12.000MHz   12h
+
+PCB is marked: "AMI" on solder side
+*/
+
+ROM_START( amigo2 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "a1.10l",      0x0000, 0x1000, CRC(e4aeac3f) SHA1(661e4badcebb6f6811e9b22d9b1561b64d7e77a9) ) // 2532
+	ROM_LOAD( "a2.9l",       0x1000, 0x1000, CRC(66ae3320) SHA1(3eba2f221ab2662b2b638a8822da48964ee2ceff) ) // 2532
+	ROM_LOAD( "a3.8l",       0x2000, 0x1000, CRC(c369b877) SHA1(4180afee10637781b408ebb50404dd8102351d46) ) // 2532
+	ROM_LOAD( "a4.7l",       0x3000, 0x1000, CRC(2194a1d3) SHA1(3807c2e25288b21e940ff33fb5d1541b559c5c1e) ) // 2532
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "a7.3b",       0x0000, 0x1000, CRC(8ca7b750) SHA1(4f4c2915503b85abe141d717fd254ee10c9da99e) ) // 2532
+	ROM_LOAD( "a8.4b",       0x1000, 0x1000, CRC(9b5bdc0a) SHA1(84d953618c8bf510d23b42232a856ac55f1baff5) ) // 2532
+
+	ROM_REGION( 0x1000, "gfx1", 0 )
+	ROM_LOAD( "a6.3h",      0x0000, 0x0800, CRC(2082ad0a) SHA1(c6014d9575e92adf09b0961c2158a779ebe940c4) ) // 2516
+	ROM_LOAD( "a5.5h",      0x0800, 0x0800, CRC(3029f94f) SHA1(3b432b42e79f8b0a7d65e197f373a04e3c92ff20) ) // 2716
+
+	ROM_REGION( 0x0020, "proms", 0 )
+	ROM_LOAD( "sn74s288n.1k",   0x0000, 0x0020, CRC(01004d3f) SHA1(e53cbc54ea96e846481a67bbcccf6b1726e70f9c) )
+ROM_END
+
 ROM_START( amidars )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "am2d",         0x0000, 0x0800, CRC(24b79547) SHA1(eca735c6a35561a9a6ba8a20dca1e1c78ed073fc) )
@@ -11892,6 +11967,7 @@ GAME( 1979, galaxbsf2,   galaxian, galaxian,   galaxian,   galaxian_state, galax
 GAME( 1979, galaxianbl2, galaxian, galaxian,   galaxianbl, galaxian_state, galaxian,   ROT90,  "bootleg", "Galaxian (bootleg, set 4)", MACHINE_SUPPORTS_SAVE )
 GAME( 1980, galaxrf,     galaxian, galaxian,   galaxrf,    galaxian_state, galaxian,   ROT90,  "bootleg (Recreativos Franco S.A.)", "Galaxian (Recreativos Franco S.A. Spanish bootleg)", MACHINE_SUPPORTS_SAVE )
 GAME( 1980, galaxrfgg,   galaxian, galaxian,   galaxrf,    galaxian_state, galaxian,   ROT90,  "bootleg (Recreativos Franco S.A.)", "Galaxian Growing Galaxip / Galaxian Nave Creciente (Recreativos Franco S.A. Spanish bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1980, galaxrcgg,   galaxian, galaxian,   galaxrf,    galaxian_state, galaxian,   ROT90,  "bootleg (Recreativos Covadonga)", "Galaxian Growing Galaxip / Galaxian Nave Creciente (Recreativos Covadonga Spanish bootleg)", MACHINE_SUPPORTS_SAVE )
 
 // these have the extra 'linescroll effect' title screens, like Moon Alien 2 but made out of a random tile, they lack an energy bar.
 GAME( 1979, moonaln,     galaxian, galaxian,   superg,     galaxian_state, galaxian,   ROT90,  "Namco / Nichibutsu (Karateco license?)", "Moon Alien", MACHINE_SUPPORTS_SAVE ) // or bootleg?
@@ -12099,7 +12175,8 @@ GAME( 1981, amidar1,     amidar,   turtles,    amidar,     galaxian_state, turtl
 GAME( 1982, amidaru,     amidar,   turtles,    amidaru,    galaxian_state, turtles,    ROT90,  "Konami (Stern Electronics license)", "Amidar (Stern Electronics)", MACHINE_SUPPORTS_SAVE )
 GAME( 1982, amidaro,     amidar,   turtles,    amidaro,    galaxian_state, turtles,    ROT90,  "Konami (Olympia license)", "Amidar (Olympia)", MACHINE_SUPPORTS_SAVE )
 GAME( 1982, amidarb,     amidar,   turtles,    amidaru,    galaxian_state, turtles,    ROT90,  "bootleg", "Amidar (bootleg)", MACHINE_SUPPORTS_SAVE ) /* similar to Amigo bootleg */
-GAME( 1982, amigo,       amidar,   turtles,    amidaru,    galaxian_state, turtles,    ROT90,  "bootleg", "Amigo", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, amigo,       amidar,   turtles,    amidaru,    galaxian_state, turtles,    ROT90,  "bootleg", "Amigo (bootleg of Amidar, set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, amigo2,      amidar,   amigo2,     amidaru,    galaxian_state, turtles,    ROT90,  "bootleg", "Amigo (bootleg of Amidar, set 2)", MACHINE_SUPPORTS_SAVE )
 GAME( 1982, amidars,     amidar,   scramble,   amidars,    galaxian_state, scramble,   ROT90,  "Konami", "Amidar (Scramble hardware)", MACHINE_SUPPORTS_SAVE )
 GAME( 1982, mandinga,    amidar,   scramble,   amidars,    galaxian_state, mandinga,   ROT90,  "bootleg (Artemi)", "Mandinga (bootleg of Amidar)", MACHINE_NO_SOUND | MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE ) // sound ROMs have identical halves, reference for color http://www.youtube.com/watch?v=6uGK4AZxV2U
 
