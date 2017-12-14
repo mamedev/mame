@@ -266,8 +266,8 @@ uint32_t pgm2_state::screen_update_pgm2(screen_device &screen, bitmap_rgb32 &bit
 
 	if (mode)
 		m_screen->set_visible_area(0, 448 - 1, 0, 224 - 1);
-	else // note, +8 to y position too, could be a sprite reg to move sprites intead
-		m_screen->set_visible_area(0, 320 - 1, 8, 224 + 8 - 1);
+	else
+		m_screen->set_visible_area(0, 320 - 1, 0, 240 - 1);
 	
 
 	m_fg_tilemap->set_scrollx(0, m_fgscroll[0] & 0xffff);
