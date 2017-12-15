@@ -74,7 +74,6 @@ protected:
 
 private:
 
-	emu_timer       *m_scan_timer;
 	output_delegate m_keyboard_cb;
 	required_ioport m_io_kbd_t[12];
 	u8              m_io_kbd_state[12][8];

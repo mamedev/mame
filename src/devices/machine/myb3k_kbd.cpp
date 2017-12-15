@@ -287,7 +287,6 @@ myb3k_keyboard_device::myb3k_keyboard_device(
 		device_t *owner,
 		u32 clock)
 	: device_t(mconfig, type, tag, owner, clock)
-	, m_scan_timer(nullptr)
 	, m_keyboard_cb()
 	, m_io_kbd_t{ {*this, "MYB3K_T0"}, {*this, "MYB3K_T1"}, {*this, "MYB3K_T2"}, {*this, "MYB3K_T3"},
 		      {*this, "MYB3K_T4"}, {*this, "MYB3K_T5"}, {*this, "MYB3K_T6"}, {*this, "MYB3K_T7"},
