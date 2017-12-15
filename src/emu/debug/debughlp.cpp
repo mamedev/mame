@@ -21,8 +21,6 @@
 #define CONSOLE_HISTORY     (10000)
 #define CONSOLE_LINE_CHARS  (100)
 
-static const std::string html_preopen = "<pre>";
-static const std::string html_preclose = "</pre>";
 
 
 /***************************************************************************
@@ -37,28 +35,15 @@ struct help_item
 
 
 
-
-/***************************************************************************
-    MACROS
-***************************************************************************/
-
-#define HTML_TRY(f) do { if (f < 0) return false; } while (0)
-
-
-
 /***************************************************************************
     LOCAL VARIABLES
 ***************************************************************************/
-
-std::string debug_buffer;
 
 
 
 /***************************************************************************
     FUNCTION PROTOTYPES
 ***************************************************************************/
-
-void debug_format_chapter_html(int index);
 
 
 
@@ -93,7 +78,6 @@ static const help_item static_help_list[] =
 		"Type help <command> for further details on each command\n"
 		"\n"
 		"  help [<topic>] -- get help on a particular topic\n"
-		"  html -- print all debugger help to an html file\n"
 		"  do <expression> -- evaluates the given expression\n"
 		"  symlist [<cpu>] -- lists registered symbols\n"
 		"  softreset -- executes a soft reset\n"
@@ -110,7 +94,7 @@ static const help_item static_help_list[] =
 		"  pcatmemd <address>[,<cpu>] -- query which PC wrote to a given data memory address for the current CPU\n"
 		"  pcatmemi <address>[,<cpu>] -- query which PC wrote to a given I/O memory address for the current CPU\n"
 		"                                (Note: you can also query this info by right clicking in a memory window\n"
-		"  rewind[rw] -- go back in time by loading the most recent rewind state\n"
+		"  rewind[rw] -- go back in time by loading the most recent rewind state"
 		"  statesave[ss] <filename> -- save a state file for the current driver\n"
 		"  stateload[sl] <filename> -- load a state file for the current driver\n"
 		"  snap [<filename>] -- save a screen snapshot.\n"
@@ -281,8 +265,8 @@ static const help_item static_help_list[] =
 		"\n"
 		"Examples:\n"
 		"\n"
-		"  do pc = 0\n"
-		"Sets the register 'pc' to 0.\n"
+		"do pc = 0\n"
+		"  Sets the register 'pc' to 0.\n"
 	},
 	{
 		"symlist",
@@ -295,11 +279,11 @@ static const help_item static_help_list[] =
 		"\n"
 		"Examples:\n"
 		"\n"
-		"  symlist\n"
-		"Displays the global symbol table.\n"
+		"symlist\n"
+		"  Displays the global symbol table.\n"
 		"\n"
-		"  symlist 2\n"
-		"Displays the symbols specific to CPU #2.\n"
+		"symlist 2\n"
+		"  Displays the symbols specific to CPU #2.\n"
 	},
 	{
 		"softreset",
@@ -310,8 +294,8 @@ static const help_item static_help_list[] =
 		"\n"
 		"Examples:\n"
 		"\n"
-		"  softreset\n"
-		"Executes a soft reset.\n"
+		"softreset\n"
+		"  Executes a soft reset.\n"
 	},
 	{
 		"hardreset",
@@ -322,8 +306,8 @@ static const help_item static_help_list[] =
 		"\n"
 		"Examples:\n"
 		"\n"
-		"  hardreset\n"
-		"Executes a hard reset.\n"
+		"hardreset\n"
+		"  Executes a hard reset.\n"
 	},
 	{
 		"print",
@@ -335,11 +319,11 @@ static const help_item static_help_list[] =
 		"\n"
 		"Examples:\n"
 		"\n"
-		"  print pc\n"
-		"Prints the value of 'pc' to the console as a hex number.\n"
+		"print pc\n"
+		"  Prints the value of 'pc' to the console as a hex number.\n"
 		"\n"
-		"  print a,b,a+b\n"
-		"Prints a, b, and the value of a+b to the console as hex numbers.\n"
+		"print a,b,a+b\n"
+		"  Prints a, b, and the value of a+b to the console as hex numbers.\n"
 	},
 	{
 		"printf",
@@ -357,11 +341,11 @@ static const help_item static_help_list[] =
 		"\n"
 		"Examples:\n"
 		"\n"
-		"  printf \"PC=%04X\",pc\n"
-		"Prints PC=<pcval> where <pcval> is displayed in hexadecimal with 4 digits with zero-fill.\n"
+		"printf \"PC=%04X\",pc\n"
+		"  Prints PC=<pcval> where <pcval> is displayed in hexadecimal with 4 digits with zero-fill.\n"
 		"\n"
-		"  printf \"A=%d, B=%d\\nC=%d\",a,b,a+b\n"
-		"Prints A=<aval>, B=<bval> on one line, and C=<a+bval> on a second line.\n"
+		"printf \"A=%d, B=%d\\nC=%d\",a,b,a+b\n"
+		"  Prints A=<aval>, B=<bval> on one line, and C=<a+bval> on a second line.\n"
 	},
 	{
 		"logerror",
@@ -379,11 +363,11 @@ static const help_item static_help_list[] =
 		"\n"
 		"Examples:\n"
 		"\n"
-		"  logerror \"PC=%04X\",pc\n"
-		"Logs PC=<pcval> where <pcval> is displayed in hexadecimal with 4 digits with zero-fill.\n"
+		"logerror \"PC=%04X\",pc\n"
+		"  Logs PC=<pcval> where <pcval> is displayed in hexadecimal with 4 digits with zero-fill.\n"
 		"\n"
-		"  logerror \"A=%d, B=%d\\nC=%d\",a,b,a+b\n"
-		"Logs A=<aval>, B=<bval> on one line, and C=<a+bval> on a second line.\n"
+		"logerror \"A=%d, B=%d\\nC=%d\",a,b,a+b\n"
+		"  Logs A=<aval>, B=<bval> on one line, and C=<a+bval> on a second line.\n"
 	},
 	{
 		"tracelog",
@@ -396,27 +380,27 @@ static const help_item static_help_list[] =
 		"\n"
 		"Examples:\n"
 		"\n"
-		"  tracelog \"PC=%04X\",pc\n"
-		"Outputs PC=<pcval> where <pcval> is displayed in hexadecimal with 4 digits with zero-fill.\n"
+		"tracelog \"PC=%04X\",pc\n"
+		"  Outputs PC=<pcval> where <pcval> is displayed in hexadecimal with 4 digits with zero-fill.\n"
 		"\n"
-		"  printf \"A=%d, B=%d\\nC=%d\",a,b,a+b\n"
-		"Outputs A=<aval>, B=<bval> on one line, and C=<a+bval> on a second line.\n"
+		"printf \"A=%d, B=%d\\nC=%d\",a,b,a+b\n"
+		"  Outputs A=<aval>, B=<bval> on one line, and C=<a+bval> on a second line.\n"
 	},
 	{
 		"tracesym",
 		"\n"
 		"  tracesym <item>[,...]\n"
-		"\n"
-		"The tracesym command prints the specified symbols and routes the output to the currently open trace "
-		"file (see the 'trace' command for details). If no file is currently open, tracesym does nothing. "
-		"\n"
-		"Examples:\n"
-		"\n"
-		"  tracelog pc\n"
-		"Outputs PC=<pcval> where <pcval> is displayed in the default format.\n"
-		"\n"
-		"  printf a,b\n"
-		"Outputs A=<aval>, B=<bval> on one line.\n"
+			"\n"
+			"The tracesym command prints the specified symbols and routes the output to the currently open trace "
+			"file (see the 'trace' command for details). If no file is currently open, tracesym does nothing. "
+			"\n"
+			"Examples:\n"
+			"\n"
+			"tracelog pc\n"
+			"  Outputs PC=<pcval> where <pcval> is displayed in the default format.\n"
+			"\n"
+			"printf a,b\n"
+			"  Outputs A=<aval>, B=<bval> on one line.\n"
 	},
 	{
 		"trackpc",
@@ -430,11 +414,11 @@ static const help_item static_help_list[] =
 		"\n"
 		"Examples:\n"
 		"\n"
-		"  trackpc 1\n"
-		"Begin tracking the current cpu's pc.\n"
+		"trackpc 1\n"
+		"  Begin tracking the current cpu's pc.\n"
 		"\n"
-		"  trackpc 1, 0, 1\n"
-		"Continue tracking pc on cpu 0, but clear existing track info.\n"
+		"trackpc 1, 0, 1\n"
+		"  Continue tracking pc on cpu 0, but clear existing track info.\n"
 	},
 	{
 		"trackmem",
@@ -450,11 +434,11 @@ static const help_item static_help_list[] =
 		"\n"
 		"Examples:\n"
 		"\n"
-		"  trackmem\n"
-		"Begin tracking the current CPU's pc.\n"
+		"trackmem\n"
+		"  Begin tracking the current CPU's pc.\n"
 		"\n"
-		"  trackmem 1, 0, 1\n"
-		"Continue tracking memory writes on cpu 0, but clear existing track info.\n"
+		"trackmem 1, 0, 1\n"
+		"  Continue tracking memory writes on cpu 0, but clear existing track info.\n"
 	},
 	{
 		"pcatmem",
@@ -468,8 +452,8 @@ static const help_item static_help_list[] =
 		"\n"
 		"Examples:\n"
 		"\n"
-		"  pcatmem 400000\n"
-		"Print which PC wrote this CPU's memory location 0x400000.\n"
+		"pcatmem 400000\n"
+		"  Print which PC wrote this CPU's memory location 0x400000.\n"
 	},
 	{
 		"rewind[rw]",
@@ -496,8 +480,8 @@ static const help_item static_help_list[] =
 		"\n"
 		"Examples:\n"
 		"\n"
-		"  statesave foo\n"
-		"Writes file 'foo.sta' in the default state save directory.\n"
+		"statesave foo\n"
+		"  Writes file 'foo.sta' in the default state save directory.\n"
 	},
 	{
 		"stateload[sl]",
@@ -511,8 +495,8 @@ static const help_item static_help_list[] =
 		"\n"
 		"Examples:\n"
 		"\n"
-		"  stateload foo\n"
-		"Reads file 'foo.sta' from the default state save directory.\n"
+		"stateload foo\n"
+		"  Reads file 'foo.sta' from the default state save directory.\n"
 	},
 	{
 		"snap",
@@ -526,13 +510,13 @@ static const help_item static_help_list[] =
 		"\n"
 		"Examples:\n"
 		"\n"
-		"  snap\n"
-		"Takes a snapshot of the current video screen and saves to the next non-conflicting filename "
-		"in the configured snapshot directory.\n"
+		"snap\n"
+		"  Takes a snapshot of the current video screen and saves to the next non-conflicting filename "
+		"  in the configured snapshot directory.\n"
 		"\n"
-		"  snap shinobi\n"
-		"Takes a snapshot of the current video screen and saves it as 'shinobi.png' in the configured "
-		"snapshot directory.\n"
+		"snap shinobi\n"
+		"  Takes a snapshot of the current video screen and saves it as 'shinobi.png' in the configured "
+		"  snapshot directory.\n"
 	},
 	{
 		"source",
@@ -544,8 +528,8 @@ static const help_item static_help_list[] =
 		"\n"
 		"Examples:\n"
 		"\n"
-		"  source break_and_trace.cmd\n"
-		"Reads in debugger commands from break_and_trace.cmd and executes them.\n"
+		"source break_and_trace.cmd\n"
+		"  Reads in debugger commands from break_and_trace.cmd and executes them.\n"
 	},
 	{
 		"quit",
@@ -568,12 +552,12 @@ static const help_item static_help_list[] =
 		"\n"
 		"Examples:\n"
 		"\n"
-		"  dasm venture.asm,0,10000\n"
-		"Disassembles addresses 0-ffff in the current CPU, including raw opcode data, to the "
+		"dasm venture.asm,0,10000\n"
+		"  Disassembles addresses 0-ffff in the current CPU, including raw opcode data, to the "
 		"file 'venture.asm'.\n"
 		"\n"
-		"  dasm harddriv.asm,3000,1000,0,2\n"
-		"Disassembles addresses 3000-3fff from CPU #2, with no raw opcode data, to the file "
+		"dasm harddriv.asm,3000,1000,0,2\n"
+		"  Disassembles addresses 3000-3fff from CPU #2, with no raw opcode data, to the file "
 		"'harddriv.asm'.\n"
 	},
 	{
@@ -596,16 +580,16 @@ static const help_item static_help_list[] =
 		"\n"
 		"Examples:\n"
 		"\n"
-		"  find 0,10000,\"HIGH SCORE\",0\n"
-		"Searches the address range 0-ffff in the current CPU for the string \"HIGH SCORE\" followed "
+		"find 0,10000,\"HIGH SCORE\",0\n"
+		"  Searches the address range 0-ffff in the current CPU for the string \"HIGH SCORE\" followed "
 		"by a 0 byte.\n"
 		"\n"
-		"  findd 3000,1000,w.abcd,4567\n"
-		"Searches the data memory address range 3000-3fff for the word-sized value abcd followed by "
+		"findd 3000,1000,w.abcd,4567\n"
+		"  Searches the data memory address range 3000-3fff for the word-sized value abcd followed by "
 		"the word-sized value 4567.\n"
 		"\n"
-		"  find 0,8000,\"AAR\",d.0,\"BEN\",w.0\n"
-		"Searches the address range 0000-7fff for the string \"AAR\" followed by a dword-sized 0 "
+		"find 0,8000,\"AAR\",d.0,\"BEN\",w.0\n"
+		"  Searches the address range 0000-7fff for the string \"AAR\" followed by a dword-sized 0 "
 		"followed by the string \"BEN\", followed by a word-sized 0.\n"
 	},
 	{
@@ -626,12 +610,12 @@ static const help_item static_help_list[] =
 		"\n"
 		"Examples:\n"
 		"\n"
-		"  dump venture.dmp,0,10000\n"
-		"Dumps addresses 0-ffff in the current CPU in 1-byte chunks, including ASCII data, to "
+		"dump venture.dmp,0,10000\n"
+		"  Dumps addresses 0-ffff in the current CPU in 1-byte chunks, including ASCII data, to "
 		"the file 'venture.dmp'.\n"
 		"\n"
-		"  dumpd harddriv.dmp,3000,1000,4,0,3\n"
-		"Dumps data memory addresses 3000-3fff from CPU #3 in 4-byte chunks, with no ASCII data, "
+		"dumpd harddriv.dmp,3000,1000,4,0,3\n"
+		"  Dumps data memory addresses 3000-3fff from CPU #3 in 4-byte chunks, with no ASCII data, "
 		"to the file 'harddriv.dmp'.\n"
 	},
 	{
@@ -648,11 +632,11 @@ static const help_item static_help_list[] =
 		"\n"
 		"Examples:\n"
 		"\n"
-		"  save venture.bin,0,10000\n"
-		"Saves addresses 0-ffff in the current CPU to the binary file 'venture.bin'.\n"
+		"save venture.bin,0,10000\n"
+		"  Saves addresses 0-ffff in the current CPU to the binary file 'venture.bin'.\n"
 		"\n"
-		"  saved harddriv.bin,3000,1000,3\n"
-		"Saves data memory addresses 3000-3fff from CPU #3 to the binary file 'harddriv.bin'.\n"
+		"saved harddriv.bin,3000,1000,3\n"
+		"  Saves data memory addresses 3000-3fff from CPU #3 to the binary file 'harddriv.bin'.\n"
 	},
 	{
 		"load",
@@ -670,11 +654,11 @@ static const help_item static_help_list[] =
 		"\n"
 		"Examples:\n"
 		"\n"
-		"  load venture.bin,0,10000\n"
-		"Loads addresses 0-ffff in the current CPU from the binary file 'venture.bin'.\n"
+		"load venture.bin,0,10000\n"
+		"  Loads addresses 0-ffff in the current CPU from the binary file 'venture.bin'.\n"
 		"\n"
-		"  loadd harddriv.bin,3000,1000,3\n"
-		"Loads data memory addresses 3000-3fff from CPU #3 from the binary file 'harddriv.bin'.\n"
+		"loadd harddriv.bin,3000,1000,3\n"
+		"  Loads data memory addresses 3000-3fff from CPU #3 from the binary file 'harddriv.bin'.\n"
 	},
 	{
 		"step",
@@ -687,11 +671,11 @@ static const help_item static_help_list[] =
 		"\n"
 		"Examples:\n"
 		"\n"
-		"  s\n"
-		"Steps forward one instruction on the current CPU.\n"
+		"s\n"
+		"  Steps forward one instruction on the current CPU.\n"
 		"\n"
-		"  step 4\n"
-		"Steps forward four instructions on the current CPU.\n"
+		"step 4\n"
+		"  Steps forward four instructions on the current CPU.\n"
 	},
 	{
 		"over",
@@ -710,11 +694,11 @@ static const help_item static_help_list[] =
 		"\n"
 		"Examples:\n"
 		"\n"
-		"  o\n"
-		"Steps forward over one instruction on the current CPU.\n"
+		"o\n"
+		"  Steps forward over one instruction on the current CPU.\n"
 		"\n"
-		"  over 4\n"
-		"Steps forward over four instructions on the current CPU.\n"
+		"over 4\n"
+		"  Steps forward over four instructions on the current CPU.\n"
 	},
 	{
 		"out",
@@ -731,8 +715,8 @@ static const help_item static_help_list[] =
 		"\n"
 		"Examples:\n"
 		"\n"
-		"  out\n"
-		"Steps until the current subroutine or exception handler returns.\n"
+		"out\n"
+		"  Steps until the current subroutine or exception handler returns.\n"
 	},
 	{
 		"go",
@@ -746,11 +730,11 @@ static const help_item static_help_list[] =
 		"\n"
 		"Examples:\n"
 		"\n"
-		"  g\n"
-		"Resume execution until the next break/watchpoint or until a manual break.\n"
+		"g\n"
+		"  Resume execution until the next break/watchpoint or until a manual break.\n"
 		"\n"
-		"  g 1234\n"
-		"Resume execution, stopping at address 1234 unless something else stops us first.\n"
+		"g 1234\n"
+		"  Resume execution, stopping at address 1234 unless something else stops us first.\n"
 	},
 	{
 		"gvblank",
@@ -763,8 +747,8 @@ static const help_item static_help_list[] =
 		"\n"
 		"Examples:\n"
 		"\n"
-		"  gv\n"
-		"Resume execution until the next break/watchpoint or until the next VBLANK.\n"
+		"gv\n"
+		"  Resume execution until the next break/watchpoint or until the next VBLANK.\n"
 	},
 	{
 		"gint",
@@ -779,12 +763,12 @@ static const help_item static_help_list[] =
 		"\n"
 		"Examples:\n"
 		"\n"
-		"  gi\n"
-		"Resume execution until the next break/watchpoint or until any IRQ is asserted and acknowledged "
+		"gi\n"
+		"  Resume execution until the next break/watchpoint or until any IRQ is asserted and acknowledged "
 		"on the current CPU.\n"
 		"\n"
-		"  gint 4\n"
-		"Resume execution until the next break/watchpoint or until IRQ line 4 is asserted and "
+		"gint 4\n"
+		"  Resume execution until the next break/watchpoint or until IRQ line 4 is asserted and "
 		"acknowledged on the current CPU.\n"
 	},
 	{
@@ -797,8 +781,8 @@ static const help_item static_help_list[] =
 		"\n"
 		"Example:\n"
 		"\n"
-		"  gtime #10000\n"
-		"Resume execution for ten seconds\n"
+		"gtime #10000\n"
+		"  Resume execution for ten seconds\n"
 	},
 	{
 		"next",
@@ -819,8 +803,8 @@ static const help_item static_help_list[] =
 		"\n"
 		"Examples:\n"
 		"\n"
-		"  focus 1\n"
-		"Focus exclusively CPU #1 while ignoring all other CPUs when using the debugger.\n"
+		"focus 1\n"
+		"  Focus exclusively CPU #1 while ignoring all other CPUs when using the debugger.\n"
 	},
 	{
 		"ignore",
@@ -834,14 +818,14 @@ static const help_item static_help_list[] =
 		"\n"
 		"Examples:\n"
 		"\n"
-		"  ignore 1\n"
-		"Ignore CPU #1 when using the debugger.\n"
+		"ignore 1\n"
+		"  Ignore CPU #1 when using the debugger.\n"
 		"\n"
-		"  ignore 2,3,4\n"
-		"Ignore CPU #2, #3 and #4 when using the debugger.\n"
+		"ignore 2,3,4\n"
+		"  Ignore CPU #2, #3 and #4 when using the debugger.\n"
 		"\n"
-		"  ignore\n"
-		"List the CPUs that are currently ignored.\n"
+		"ignore\n"
+		"  List the CPUs that are currently ignored.\n"
 	},
 	{
 		"observe",
@@ -853,14 +837,14 @@ static const help_item static_help_list[] =
 		"\n"
 		"Examples:\n"
 		"\n"
-		"  observe 1\n"
-		"Stop ignoring CPU #1 when using the debugger.\n"
+		"observe 1\n"
+		"  Stop ignoring CPU #1 when using the debugger.\n"
 		"\n"
-		"  observe 2,3,4\n"
-		"Stop ignoring CPU #2, #3 and #4 when using the debugger.\n"
+		"observe 2,3,4\n"
+		"  Stop ignoring CPU #2, #3 and #4 when using the debugger.\n"
 		"\n"
-		"  observe\n"
-		"List the CPUs that are currently observed.\n"
+		"observe\n"
+		"  List the CPUs that are currently observed.\n"
 	},
 	{
 		"trace",
@@ -882,29 +866,29 @@ static const help_item static_help_list[] =
 		"\n"
 		"Examples:\n"
 		"\n"
-		"  trace joust.tr\n"
-		"Begin tracing the currently active CPU, logging output to joust.tr.\n"
+		"trace joust.tr\n"
+		"  Begin tracing the currently active CPU, logging output to joust.tr.\n"
 		"\n"
-		"  trace dribling.tr,0\n"
-		"Begin tracing the execution of CPU #0, logging output to dribling.tr.\n"
+		"trace dribling.tr,0\n"
+		"  Begin tracing the execution of CPU #0, logging output to dribling.tr.\n"
 		"\n"
-		"  trace starswep.tr,0,noloop\n"
-		"Begin tracing the execution of CPU #0, logging output to starswep.tr, with loop detection disabled.\n"
+		"trace starswep.tr,0,noloop\n"
+		"  Begin tracing the execution of CPU #0, logging output to starswep.tr, with loop detection disabled.\n"
 		"\n"
-		"  trace starswep.tr,0,logerror\n"
-		"Begin tracing the execution of CPU #0, logging output (along with logerror output) to starswep.tr.\n"
+		"trace starswep.tr,0,logerror\n"
+		"  Begin tracing the execution of CPU #0, logging output (along with logerror output) to starswep.tr.\n"
 		"\n"
-		"  trace starswep.tr,0,logerror|noloop\n"
-		"Begin tracing the execution of CPU #0, logging output (along with logerror output) to starswep.tr, with loop detection disabled.\n"
+		"trace starswep.tr,0,logerror|noloop\n"
+		"  Begin tracing the execution of CPU #0, logging output (along with logerror output) to starswep.tr, with loop detection disabled.\n"
 		"\n"
-		"  trace >>pigskin.tr\n"
-		"Begin tracing the currently active CPU, appending log output to pigskin.tr.\n"
+		"trace >>pigskin.tr\n"
+		"  Begin tracing the currently active CPU, appending log output to pigskin.tr.\n"
 		"\n"
-		"  trace off,0\n"
-		"Turn off tracing on CPU #0.\n"
+		"trace off,0\n"
+		"  Turn off tracing on CPU #0.\n"
 		"\n"
-		"  trace asteroid.tr,0,,{tracelog \"A=%02X \",a}\n"
-		"Begin tracing the execution of CPU #0, logging output to asteroid.tr. Before each line, "
+		"trace asteroid.tr,0,,{tracelog \"A=%02X \",a}\n"
+		"  Begin tracing the execution of CPU #0, logging output to asteroid.tr. Before each line, "
 		"output A=<aval> to the tracelog.\n"
 	},
 	{
@@ -928,20 +912,20 @@ static const help_item static_help_list[] =
 		"\n"
 		"Examples:\n"
 		"\n"
-		"  traceover joust.tr\n"
-		"Begin tracing the currently active CPU, logging output to joust.tr.\n"
+		"traceover joust.tr\n"
+		"  Begin tracing the currently active CPU, logging output to joust.tr.\n"
 		"\n"
-		"  traceover dribling.tr,0\n"
-		"Begin tracing the execution of CPU #0, logging output to dribling.tr.\n"
+		"traceover dribling.tr,0\n"
+		"  Begin tracing the execution of CPU #0, logging output to dribling.tr.\n"
 		"\n"
-		"  traceover starswep.tr,0,false\n"
-		"Begin tracing the execution of CPU #0, logging output to starswep.tr, with loop detection disabled.\n"
+		"traceover starswep.tr,0,false\n"
+		"  Begin tracing the execution of CPU #0, logging output to starswep.tr, with loop detection disabled.\n"
 		"\n"
-		"  traceover off,0\n"
-		"Turn off tracing on CPU #0.\n"
+		"traceover off,0\n"
+		"  Turn off tracing on CPU #0.\n"
 		"\n"
-		"  traceover asteroid.tr,0,true,{tracelog \"A=%02X \",a}\n"
-		"Begin tracing the execution of CPU #0, logging output to asteroid.tr. Before each line, "
+		"traceover asteroid.tr,0,true,{tracelog \"A=%02X \",a}\n"
+		"  Begin tracing the execution of CPU #0, logging output to asteroid.tr. Before each line, "
 		"output A=<aval> to the tracelog.\n"
 	},
 	{
@@ -968,23 +952,23 @@ static const help_item static_help_list[] =
 		"\n"
 		"Examples:\n"
 		"\n"
-		"  bp 1234\n"
-		"Set a breakpoint that will halt execution whenever the PC is equal to 1234.\n"
+		"bp 1234\n"
+		"  Set a breakpoint that will halt execution whenever the PC is equal to 1234.\n"
 		"\n"
-		"  bp 23456,a0 == 0 && a1 == 0\n"
-		"Set a breakpoint that will halt execution whenever the PC is equal to 23456 AND the "
+		"bp 23456,a0 == 0 && a1 == 0\n"
+		"  Set a breakpoint that will halt execution whenever the PC is equal to 23456 AND the "
 		"expression (a0 == 0 && a1 == 0) is true.\n"
 		"\n"
-		"  bp 3456,1,{printf \"A0=%08X\\n\",a0; g}\n"
-		"Set a breakpoint that will halt execution whenever the PC is equal to 3456. When "
+		"bp 3456,1,{printf \"A0=%08X\\n\",a0; g}\n"
+		"  Set a breakpoint that will halt execution whenever the PC is equal to 3456. When "
 		"this happens, print A0=<a0val> and continue executing.\n"
 		"\n"
-		"  bp 45678,a0==100,{a0 = ff; g}\n"
-		"Set a breakpoint that will halt execution whenever the PC is equal to 45678 AND the "
+		"bp 45678,a0==100,{a0 = ff; g}\n"
+		"  Set a breakpoint that will halt execution whenever the PC is equal to 45678 AND the "
 		"expression (a0 == 100) is true. When that happens, set a0 to ff and resume execution.\n"
 		"\n"
-		"  temp0 = 0; bp 567890,++temp0 >= 10\n"
-		"Set a breakpoint that will halt execution whenever the PC is equal to 567890 AND the "
+		"temp0 = 0; bp 567890,++temp0 >= 10\n"
+		"  Set a breakpoint that will halt execution whenever the PC is equal to 567890 AND the "
 		"expression (++temp0 >= 10) is true. This effectively breaks only after the breakpoint "
 		"has been hit 16 times.\n"
 	},
@@ -998,11 +982,11 @@ static const help_item static_help_list[] =
 		"\n"
 		"Examples:\n"
 		"\n"
-		"  bpclear 3\n"
-		"Clear breakpoint index 3.\n"
+		"bpclear 3\n"
+		"  Clear breakpoint index 3.\n"
 		"\n"
-		"  bpclear\n"
-		"Clear all breakpoints.\n"
+		"bpclear\n"
+		"  Clear all breakpoints.\n"
 	},
 	{
 		"bpdisable",
@@ -1015,11 +999,11 @@ static const help_item static_help_list[] =
 		"\n"
 		"Examples:\n"
 		"\n"
-		"  bpdisable 3\n"
-		"Disable breakpoint index 3.\n"
+		"bpdisable 3\n"
+		"  Disable breakpoint index 3.\n"
 		"\n"
-		"  bpdisable\n"
-		"Disable all breakpoints.\n"
+		"bpdisable\n"
+		"  Disable all breakpoints.\n"
 	},
 	{
 		"bpenable",
@@ -1031,11 +1015,11 @@ static const help_item static_help_list[] =
 		"\n"
 		"Examples:\n"
 		"\n"
-		"  bpenable 3\n"
-		"Enable breakpoint index 3.\n"
+		"bpenable 3\n"
+		"  Enable breakpoint index 3.\n"
 		"\n"
-		"  bpenable\n"
-		"Enable all breakpoints.\n"
+		"bpenable\n"
+		"  Enable all breakpoints.\n"
 	},
 	{
 		"bplist",
@@ -1072,20 +1056,20 @@ static const help_item static_help_list[] =
 		"\n"
 		"Examples:\n"
 		"\n"
-		"  wp 1234,6,rw\n"
-		"Set a watchpoint that will halt execution whenever a read or write occurs in the address "
+		"wp 1234,6,rw\n"
+		"  Set a watchpoint that will halt execution whenever a read or write occurs in the address "
 		"range 1234-1239 inclusive.\n"
 		"\n"
-		"  wp 23456,a,w,wpdata == 1\n"
-		"Set a watchpoint that will halt execution whenever a write occurs in the address range "
+		"wp 23456,a,w,wpdata == 1\n"
+		"  Set a watchpoint that will halt execution whenever a write occurs in the address range "
 		"23456-2345f AND the data written is equal to 1.\n"
 		"\n"
-		"  wp 3456,20,r,1,{printf \"Read @ %08X\\n\",wpaddr; g}\n"
-		"Set a watchpoint that will halt execution whenever a read occurs in the address range "
+		"wp 3456,20,r,1,{printf \"Read @ %08X\\n\",wpaddr; g}\n"
+		"  Set a watchpoint that will halt execution whenever a read occurs in the address range "
 		"3456-3475. When this happens, print Read @ <wpaddr> and continue executing.\n"
 		"\n"
-		"  temp0 = 0; wp 45678,1,w,wpdata==f0,{temp0++; g}\n"
-		"Set a watchpoint that will halt execution whenever a write occurs to the address 45678 AND "
+		"temp0 = 0; wp 45678,1,w,wpdata==f0,{temp0++; g}\n"
+		"  Set a watchpoint that will halt execution whenever a write occurs to the address 45678 AND "
 		"the value being written is equal to f0. When that happens, increment the variable temp0 and "
 		"resume execution.\n"
 	},
@@ -1099,11 +1083,11 @@ static const help_item static_help_list[] =
 		"\n"
 		"Examples:\n"
 		"\n"
-		"  wpclear 3\n"
-		"Clear watchpoint index 3.\n"
+		"wpclear 3\n"
+		"  Clear watchpoint index 3.\n"
 		"\n"
-		"  wpclear\n"
-		"Clear all watchpoints.\n"
+		"wpclear\n"
+		"  Clear all watchpoints.\n"
 	},
 	{
 		"wpdisable",
@@ -1116,11 +1100,11 @@ static const help_item static_help_list[] =
 		"\n"
 		"Examples:\n"
 		"\n"
-		"  wpdisable 3\n"
-		"Disable watchpoint index 3.\n"
+		"wpdisable 3\n"
+		"  Disable watchpoint index 3.\n"
 		"\n"
-		"  wpdisable\n"
-		"Disable all watchpoints.\n"
+		"wpdisable\n"
+		"  Disable all watchpoints.\n"
 	},
 	{
 		"wpenable",
@@ -1132,11 +1116,11 @@ static const help_item static_help_list[] =
 		"\n"
 		"Examples:\n"
 		"\n"
-		"  wpenable 3\n"
-		"Enable watchpoint index 3.\n"
+		"wpenable 3\n"
+		"  Enable watchpoint index 3.\n"
 		"\n"
-		"  wpenable\n"
-		"Enable all watchpoints.\n"
+		"wpenable\n"
+		"  Enable all watchpoints.\n"
 	},
 	{
 		"wplist",
@@ -1168,12 +1152,12 @@ static const help_item static_help_list[] =
 		"\n"
 		"Examples:\n"
 		"\n"
-		"  hotspot 0,10\n"
-		"Looks for hotspots on CPU 0 using a search buffer of 16 entries, reporting any entries which "
+		"hotspot 0,10\n"
+		"  Looks for hotspots on CPU 0 using a search buffer of 16 entries, reporting any entries which "
 		"end up with 250 or more hits.\n"
 		"\n"
-		"  hotspot 1,40,#1000\n"
-		"Looks for hotspots on CPU 1 using a search buffer of 64 entries, reporting any entries which "
+		"hotspot 1,40,#1000\n"
+		"  Looks for hotspots on CPU 1 using a search buffer of 64 entries, reporting any entries which "
 		"end up with 1000 or more hits.\n"
 	},
 	{
@@ -1193,15 +1177,15 @@ static const help_item static_help_list[] =
 		"\n"
 		"Examples:\n"
 		"\n"
-		"  rp {PC==0150}\n"
-		"Set a registerpoint that will halt execution whenever the PC register equals 0x150.\n"
+		"rp {PC==0150}\n"
+		"  Set a registerpoint that will halt execution whenever the PC register equals 0x150.\n"
 		"\n"
-		"  temp0=0; rp {PC==0150},{temp0++; g}\n"
-		"Set a registerpoint that will increment the variable temp0 whenever the PC register "
+		"temp0=0; rp {PC==0150},{temp0++; g}\n"
+		"  Set a registerpoint that will increment the variable temp0 whenever the PC register "
 		"equals 0x0150.\n"
 		"\n"
-		"  rp {temp0==5}\n"
-		"Set a registerpoint that will halt execution whenever the temp0 variable equals 5.\n"
+		"rp {temp0==5}\n"
+		"  Set a registerpoint that will halt execution whenever the temp0 variable equals 5.\n"
 	},
 	{
 		"rpclear",
@@ -1213,11 +1197,11 @@ static const help_item static_help_list[] =
 		"\n"
 		"Examples:\n"
 		"\n"
-		"  rpclear 3\n"
-		"Clear registerpoint index 3.\n"
+		"rpclear 3\n"
+		"  Clear registerpoint index 3.\n"
 		"\n"
-		"  rpclear\n"
-		"Clear all registerpoints.\n"
+		"rpclear\n"
+		"  Clear all registerpoints.\n"
 	},
 	{
 		"rpdisable",
@@ -1230,11 +1214,11 @@ static const help_item static_help_list[] =
 		"\n"
 		"Examples:\n"
 		"\n"
-		"  rpdisable 3\n"
-		"Disable registerpoint index 3.\n"
+		"rpdisable 3\n"
+		"  Disable registerpoint index 3.\n"
 		"\n"
-		"  rpdisable\n"
-		"Disable all registerpoints.\n"
+		"rpdisable\n"
+		"  Disable all registerpoints.\n"
 	},
 	{
 		"rpenable",
@@ -1246,11 +1230,11 @@ static const help_item static_help_list[] =
 		"\n"
 		"Examples:\n"
 		"\n"
-		"  rpenable 3\n"
-		"Enable registerpoint index 3.\n"
+		"rpenable 3\n"
+		"  Enable registerpoint index 3.\n"
 		"\n"
-		"  rpenable\n"
-		"Enable all registerpoints.\n"
+		"rpenable\n"
+		"  Enable all registerpoints.\n"
 	},
 	{
 		"rplist",
@@ -1271,8 +1255,8 @@ static const help_item static_help_list[] =
 		"\n"
 		"Example:\n"
 		"\n"
-		"  map 152d0\n"
-		"Gives physical address and bank for logical address 152d0 in program memory\n"
+		"map 152d0\n"
+		"  Gives physical address and bank for logical address 152d0 in program memory\n"
 	},
 	{
 		"memdump",
@@ -1283,11 +1267,11 @@ static const help_item static_help_list[] =
 		"\n"
 		"Examples:\n"
 		"\n"
-		"  memdump mylog.log\n"
-		"Dumps memory to mylog.log.\n"
+		"memdump mylog.log\n"
+		"  Dumps memory to mylog.log.\n"
 		"\n"
-		"  memdump\n"
-		"Dumps memory to memdump.log.\n"
+		"memdump\n"
+		"  Dumps memory to memdump.log.\n"
 	},
 	{
 		"comlist",
@@ -1298,8 +1282,8 @@ static const help_item static_help_list[] =
 		"\n"
 		"Examples:\n"
 		"\n"
-		"  comlist\n"
-		"Shows currently available comments.\n"
+		"comlist\n"
+		"  Shows currently available comments.\n"
 	},
 	{
 		"comadd",
@@ -1311,11 +1295,11 @@ static const help_item static_help_list[] =
 		"\n"
 		"Examples:\n"
 		"\n"
-		"  comadd 0, hello world.\n"
-		"Adds the comment 'hello world.' to the code at address 0x0\n"
+		"comadd 0, hello world.\n"
+		"  Adds the comment 'hello world.' to the code at address 0x0\n"
 		"\n"
-		"  // 10, undocumented opcode!\n"
-		"Adds the comment 'undocumented opcode!' to the code at address 0x10\n"
+		"// 10, undocumented opcode!\n"
+		"  Adds the comment 'undocumented opcode!' to the code at address 0x10\n"
 		"\n"
 	},
 	{
@@ -1328,11 +1312,11 @@ static const help_item static_help_list[] =
 		"\n"
 		"Examples:\n"
 		"\n"
-		"  commit 0, hello world.\n"
-		"Adds the comment 'hello world.' to the code at address 0x0\n"
+		"commit 0, hello world.\n"
+		"  Adds the comment 'hello world.' to the code at address 0x0\n"
 		"\n"
-		"  /* 10, undocumented opcode!\n"
-		"Adds the comment 'undocumented opcode!' to the code at address 0x10\n"
+		"/* 10, undocumented opcode!\n"
+		"  Adds the comment 'undocumented opcode!' to the code at address 0x10\n"
 		"\n"
 	},
 	{
@@ -1344,8 +1328,8 @@ static const help_item static_help_list[] =
 		"\n"
 		"Examples:\n"
 		"\n"
-		"  comsave\n"
-		"Saves the comments to the driver's comment file\n"
+		"comsave\n"
+		"  Saves the comments to the driver's comment file\n"
 		"\n"
 	},
 	{
@@ -1358,8 +1342,8 @@ static const help_item static_help_list[] =
 		"\n"
 		"Examples:\n"
 		"\n"
-		"  comdelete 10\n"
-		"Deletes the comment at code address 0x10 (using the current memory bank settings)\n"
+		"comdelete 10\n"
+		"  Deletes the comment at code address 0x10 (using the current memory bank settings)\n"
 		"\n"
 	},
 	{
@@ -1375,14 +1359,14 @@ static const help_item static_help_list[] =
 		"\n"
 		"Examples:\n"
 		"\n"
-		"  cheatinit ub,0x1000,0x10\n"
-		"Initialize the cheat search from 0x1000 to 0x1010 of the first CPU.\n"
+		"cheatinit ub,0x1000,0x10\n"
+		"  Initialize the cheat search from 0x1000 to 0x1010 of the first CPU.\n"
 		"\n"
-		"  cheatinit sw,0x2000,0x1000,1\n"
-		"Initialize the cheat search with width of 2 byte in signed mode from 0x2000 to 0x3000 of the second CPU.\n"
+		"cheatinit sw,0x2000,0x1000,1\n"
+		"  Initialize the cheat search with width of 2 byte in signed mode from 0x2000 to 0x3000 of the second CPU.\n"
 		"\n"
-		"  cheatinit uds,0x0000,0x1000\n"
-		"Initialize the cheat search with width of 4 byte swapped from 0x0000 to 0x1000.\n"
+		"cheatinit uds,0x0000,0x1000\n"
+		"  Initialize the cheat search with width of 4 byte swapped from 0x0000 to 0x1000.\n"
 	},
 	{
 		"cheatrange",
@@ -1394,8 +1378,8 @@ static const help_item static_help_list[] =
 		"\n"
 		"Examples:\n"
 		"\n"
-		"  cheatrange 0x1000,0x10\n"
-		"Add the bytes from 0x1000 to 0x1010 to the cheat search.\n"
+		"cheatrange 0x1000,0x10\n"
+		"  Add the bytes from 0x1000 to 0x1010 to the cheat search.\n"
 	},
 	{
 		"cheatnext",
@@ -1405,43 +1389,43 @@ static const help_item static_help_list[] =
 		"The cheatnext command will make comparisons with the last search matches.\n"
 		"Possible <condition>:\n"
 		"  all\n"
-		"No <comparisonvalue> needed.\n"
-		"Use to update the last value without changing the current matches.\n"
+		"   no <comparisonvalue> needed.\n"
+		"   use to update the last value without changing the current matches.\n"
 		"  equal [eq]\n"
-		"Without <comparisonvalue> search for all bytes that are equal to the last search.\n"
-		"With <comparisonvalue> search for all bytes that are equal to the <comparisonvalue>.\n"
+		"   without <comparisonvalue> search for all bytes that are equal to the last search.\n"
+		"   with <comparisonvalue> search for all bytes that are equal to the <comparisonvalue>.\n"
 		"  notequal [ne]\n"
-		"Without <comparisonvalue> search for all bytes that are not equal to the last search.\n"
-		"With <comparisonvalue> search for all bytes that are not equal to the <comparisonvalue>.\n"
+		"   without <comparisonvalue> search for all bytes that are not equal to the last search.\n"
+		"   with <comparisonvalue> search for all bytes that are not equal to the <comparisonvalue>.\n"
 		"  decrease [de, +]\n"
-		"Without <comparisonvalue> search for all bytes that have decreased since the last search.\n"
-		"With <comparisonvalue> search for all bytes that have decreased by the <comparisonvalue> since the last search.\n"
+		"   without <comparisonvalue> search for all bytes that have decreased since the last search.\n"
+		"   with <comparisonvalue> search for all bytes that have decreased by the <comparisonvalue> since the last search.\n"
 		"  increase [in, -]\n"
-		"Without <comparisonvalue> search for all bytes that have increased since the last search.\n"
-		"With <comparisonvalue> search for all bytes that have increased by the <comparisonvalue> since the last search.\n"
+		"   without <comparisonvalue> search for all bytes that have increased since the last search.\n"
+		"   with <comparisonvalue> search for all bytes that have increased by the <comparisonvalue> since the last search.\n"
 		"  decreaseorequal [deeq]\n"
-		"No <comparisonvalue> needed.\n"
-		"Search for all bytes that have decreased or have same value since the last search.\n"
+		"   no <comparisonvalue> needed.\n"
+		"   search for all bytes that have decreased or have same value since the last search.\n"
 		"  increaseorequal [ineq]\n"
-		"No <comparisonvalue> needed.\n"
-		"Search for all bytes that have decreased or have same value since the last search.\n"
+		"   no <comparisonvalue> needed.\n"
+		"   search for all bytes that have decreased or have same value since the last search.\n"
 		"  smallerof [lt]\n"
-		"Without <comparisonvalue> this condition is invalid\n"
-		"With <comparisonvalue> search for all bytes that are smaller than the <comparisonvalue>.\n"
+		"   without <comparisonvalue> this condition is invalid\n"
+		"   with <comparisonvalue> search for all bytes that are smaller than the <comparisonvalue>.\n"
 		"  greaterof [gt]\n"
-		"Without <comparisonvalue> this condition is invalid\n"
-		"With <comparisonvalue> search for all bytes that are larger than the <comparisonvalue>.\n"
+		"   without <comparisonvalue> this condition is invalid\n"
+		"   with <comparisonvalue> search for all bytes that are larger than the <comparisonvalue>.\n"
 		"  changedby [ch, ~]\n"
-		"Without <comparisonvalue> this condition is invalid\n"
-		"With <comparisonvalue> search for all bytes that have changed by the <comparisonvalue> since the last search.\n"
+		"   without <comparisonvalue> this condition is invalid\n"
+		"   with <comparisonvalue> search for all bytes that have changed by the <comparisonvalue> since the last search.\n"
 		"\n"
 		"Examples:\n"
 		"\n"
-		"  cheatnext increase\n"
-		"Search for all bytes that have increased since the last search.\n"
+		"cheatnext increase\n"
+		"  search for all bytes that have increased since the last search.\n"
 		"\n"
-		"  cheatnext decrease, 1\n"
-		"Search for all bytes that have decreased by 1 since the last search.\n"
+		"cheatnext decrease, 1\n"
+		"  search for all bytes that have decreased by 1 since the last search.\n"
 	},
 	{
 		"cheatnextf",
@@ -1451,43 +1435,43 @@ static const help_item static_help_list[] =
 		"The cheatnextf command will make comparisons with the initial search.\n"
 		"Possible <condition>:\n"
 		"  all\n"
-		"No <comparisonvalue> needed.\n"
-		"Use to update the last value without changing the current matches.\n"
+		"   no <comparisonvalue> needed.\n"
+		"   use to update the last value without changing the current matches.\n"
 		"  equal [eq]\n"
-		"Without <comparisonvalue> search for all bytes that are equal to the initial search.\n"
-		"With <comparisonvalue> search for all bytes that are equal to the <comparisonvalue>.\n"
+		"   without <comparisonvalue> search for all bytes that are equal to the initial search.\n"
+		"   with <comparisonvalue> search for all bytes that are equal to the <comparisonvalue>.\n"
 		"  notequal [ne]\n"
-		"Without <comparisonvalue> search for all bytes that are not equal to the initial search.\n"
-		"With <comparisonvalue> search for all bytes that are not equal to the <comparisonvalue>.\n"
+		"   without <comparisonvalue> search for all bytes that are not equal to the initial search.\n"
+		"   with <comparisonvalue> search for all bytes that are not equal to the <comparisonvalue>.\n"
 		"  decrease [de, +]\n"
-		"Without <comparisonvalue> search for all bytes that have decreased since the initial search.\n"
-		"With <comparisonvalue> search for all bytes that have decreased by the <comparisonvalue> since the initial search.\n"
+		"   without <comparisonvalue> search for all bytes that have decreased since the initial search.\n"
+		"   with <comparisonvalue> search for all bytes that have decreased by the <comparisonvalue> since the initial search.\n"
 		"  increase [in, -]\n"
-		"Without <comparisonvalue> search for all bytes that have increased since the initial search.\n"
-		"With <comparisonvalue> search for all bytes that have increased by the <comparisonvalue> since the initial search.\n"
+		"   without <comparisonvalue> search for all bytes that have increased since the initial search.\n"
+		"   with <comparisonvalue> search for all bytes that have increased by the <comparisonvalue> since the initial search.\n"
 		"  decreaseorequal [deeq]\n"
-		"No <comparisonvalue> needed.\n"
-		"Search for all bytes that have decreased or have same value since the initial search.\n"
+		"   no <comparisonvalue> needed.\n"
+		"   search for all bytes that have decreased or have same value since the initial search.\n"
 		"  increaseorequal [ineq]\n"
-		"No <comparisonvalue> needed.\n"
-		"Search for all bytes that have decreased or have same value since the initial search.\n"
+		"   no <comparisonvalue> needed.\n"
+		"   search for all bytes that have decreased or have same value since the initial search.\n"
 		"  smallerof [lt]\n"
-		"Without <comparisonvalue> this condition is invalid.\n"
-		"With <comparisonvalue> search for all bytes that are smaller than the <comparisonvalue>.\n"
+		"   without <comparisonvalue> this condition is invalid.\n"
+		"   with <comparisonvalue> search for all bytes that are smaller than the <comparisonvalue>.\n"
 		"  greaterof [gt]\n"
-		"Without <comparisonvalue> this condition is invalid.\n"
-		"With <comparisonvalue> search for all bytes that are larger than the <comparisonvalue>.\n"
+		"   without <comparisonvalue> this condition is invalid.\n"
+		"   with <comparisonvalue> search for all bytes that are larger than the <comparisonvalue>.\n"
 		"  changedby [ch, ~]\n"
-		"Without <comparisonvalue> this condition is invalid\n"
-		"With <comparisonvalue> search for all bytes that have changed by the <comparisonvalue> since the initial search.\n"
+		"   without <comparisonvalue> this condition is invalid\n"
+		"   with <comparisonvalue> search for all bytes that have changed by the <comparisonvalue> since the initial search.\n"
 		"\n"
 		"Examples:\n"
 		"\n"
-		"  cheatnextf increase\n"
-		"Search for all bytes that have increased since the initial search.\n"
+		"cheatnextf increase\n"
+		"  search for all bytes that have increased since the initial search.\n"
 		"\n"
-		"  cheatnextf decrease, 1\n"
-		"Search for all bytes that have decreased by 1 since the initial search.\n"
+		"cheatnextf decrease, 1\n"
+		"  search for all bytes that have decreased by 1 since the initial search.\n"
 	},
 	{
 		"cheatlist",
@@ -1499,10 +1483,10 @@ static const help_item static_help_list[] =
 		"\n"
 		"Examples:\n"
 		"\n"
-		"  cheatlist\n"
-		"Show the current matches in the debug console.\n"
-		"  cheatlist cheat.txt\n"
-		"Save the current matches to cheat.txt.\n"
+		"cheatlist\n"
+		"  Show the current matches in the debug console.\n"
+		"cheatlist cheat.txt\n"
+		"  Save the current matches to cheat.txt.\n"
 	},
 	{
 		"cheatundo",
@@ -1514,8 +1498,8 @@ static const help_item static_help_list[] =
 		"\n"
 		"Examples:\n"
 		"\n"
-		"  cheatundo\n"
-		"Undo the last search (state only).\n"
+		"cheatundo\n"
+		"  Undo the last search (state only).\n"
 	},
 	{
 		"images",
@@ -1526,8 +1510,8 @@ static const help_item static_help_list[] =
 		"\n"
 		"Examples:\n"
 		"\n"
-		"  images\n"
-		"Show list of devices and mounted files for current driver.\n"
+		"images\n"
+		"  Show list of devices and mounted files for current driver.\n"
 	},
 	{
 		"mount",
@@ -1539,8 +1523,8 @@ static const help_item static_help_list[] =
 		"\n"
 		"Examples:\n"
 		"\n"
-		"  mount cart,aladdin\n"
-		"Mounts softlist item alladin on cart device.\n"
+		"mount cart,aladdin\n"
+		"  Mounts softlist item alladin on cart device.\n"
 	},
 	{
 		"unmount",
@@ -1551,8 +1535,8 @@ static const help_item static_help_list[] =
 		"\n"
 		"Examples:\n"
 		"\n"
-		"  unmount cart\n"
-		"Unmounts any file mounted on device named cart.\n"
+		"unmount cart\n"
+		"  Unmounts any file mounted on device named cart.\n"
 	}
 };
 
@@ -1601,92 +1585,4 @@ const char *debug_get_help(const char *tag)
 		if (!strncmp(static_help_list[i].tag, tagcopy, taglen))
 			msglen += sprintf(&ambig_message[msglen], "  help %s?\n", static_help_list[i].tag);
 	return ambig_message;
-}
-
-void debug_format_chapter_html(int index)
-{
-	/* fetch the string */
-	debug_buffer = static_help_list[index].help;
-
-	/* substitute what html can't ignore */
-	strreplace(debug_buffer, "<", "&lt;");
-
-	/* iterate through all lines */
-	for (size_t linebreak = 0; ; )
-	{
-		/* find line break */
-		linebreak = debug_buffer.find_first_of('\n', linebreak);
-
-		/* check validity and advance */
-		if (linebreak >= debug_buffer.length() || linebreak++ == std::string::npos)
-			break;
-
-		/* check if the new line starts with a space */
-		if (debug_buffer[linebreak] != ' ')
-		{
-			/* close the tag and advance */
-			debug_buffer.insert(linebreak, html_preclose);
-			linebreak += html_preclose.length();
-
-			/* find the end of the line */
-			linebreak = debug_buffer.find_first_of('\n', linebreak);
-
-			/* check validity again */
-			if (linebreak >= debug_buffer.length() || linebreak == std::string::npos)
-				break;
-
-			/* open a new tag at the line end and advance */
-			debug_buffer.insert(linebreak, html_preopen);
-			linebreak += html_preopen.length();
-		}
-	}
-}
-
-bool debug_generate_html()
-{
-	std::set<std::string> tags;
-
-	/* open the file */
-	FILE *file = fopen("debughelp.html", "w");
-
-	/* verify it */
-	if (!file)
-		return false;
-
-	/* print the help header */
-	debug_format_chapter_html(0);
-	HTML_TRY(fprintf(file, "<a name=\"Top\"></a>%s%s<br>", debug_buffer.c_str(), html_preopen.c_str()));
-	
-	/* close the tag opened in the header */
-	HTML_TRY(fprintf(file, "%s", html_preclose.c_str()));
-
-	/* sort the tags */
-	for (int i = 1; i < ARRAY_LENGTH(static_help_list); i++)
-	{
-		tags.insert(static_help_list[i].tag);
-	}
-	
-	/* print the links to all chapters */
-	for (auto &tag : tags)
-	{
-		HTML_TRY(fprintf(file, "<a href=\"#%s\">%s</a><br>\n", tag.c_str(), tag.c_str()));
-	}
-	
-	/* empty line */
-	HTML_TRY(fprintf(file, "<br>"));
-
-	/* format chapter contents */
-	for (int i = 1; i < ARRAY_LENGTH(static_help_list); i++)
-	{
-		/* link to the top, anchorize the chapter header, print the contents */
-		debug_format_chapter_html(i);
-		HTML_TRY(fprintf(file, "<a href=\"#Top\">Up</a> <a name=\"%s\"><h3>%s</h3></a>%s%s<br>",
-			static_help_list[i].tag, static_help_list[i].tag, html_preopen.c_str(), debug_buffer.c_str()));
-	}
-
-	/* close the html tag and the file */
-	HTML_TRY(fprintf(file, "%s", html_preclose.c_str()));
-	if (fclose(file))
-		return false;
-	return true;
 }
