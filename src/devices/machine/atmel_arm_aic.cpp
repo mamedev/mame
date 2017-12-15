@@ -88,7 +88,7 @@ void arm_aic_device::recalc_irqs()
 	if (mask)
 	{
 		int pri = -1;
-		uint8_t midx;
+		uint8_t midx = 0;
 		do
 		{
 			uint8_t idx = 31 - count_leading_zeros(mask);
