@@ -146,6 +146,7 @@ DEVICE_INPUT_DEFAULTS_END
 //#include "bus/s100/mm65k16s.h"
 #include "bus/s100/nsmdsa.h"
 #include "bus/s100/nsmdsad.h"
+#include "bus/s100/seals8k.h"
 //#include "bus/s100/wunderbus.h"
 
 static SLOT_INTERFACE_START( horizon_s100_cards )
@@ -155,6 +156,8 @@ static SLOT_INTERFACE_START( horizon_s100_cards )
 	//SLOT_INTERFACE("ram32a", S100_RAM32A)
 	//SLOT_INTERFACE("ram16a", S100_RAM16A)
 	//SLOT_INTERFACE("fpb", S100_FPB)
+	SLOT_INTERFACE("8ksc", S100_8K_SC)
+	SLOT_INTERFACE("8kscbb", S100_8K_SC_BB)
 SLOT_INTERFACE_END
 
 
