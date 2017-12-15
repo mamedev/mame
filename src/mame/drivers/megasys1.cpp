@@ -1108,7 +1108,17 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( inyourfa )
 	PORT_INCLUDE( megasys1_generic )
+	
+	PORT_MODIFY("P1")
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_NAME("P1 Pass / Change Player (defense)")
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1) PORT_NAME("P1 Shoot / Steal")
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1) PORT_NAME("P1 Pass Target change (offense)")
 
+	PORT_MODIFY("P2")
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2) PORT_NAME("P2 Pass / Change Player (defense)")
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2) PORT_NAME("P2 Shoot / Steal")
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2) PORT_NAME("P2 Pass Target change (offense)")
+	
 	PORT_START("DSW")
 	PORT_DIPNAME(           0x0003, 0x0003, "Game Time" ) PORT_DIPLOCATION("SW1:1,2")
 	PORT_DIPSETTING(                0x0002, "00:50" )
@@ -4823,7 +4833,7 @@ GAME( 1990, rittam,   rodland,  system_A,          rodland,  megasys1_state, rit
 GAME( 1990, rodlandjb,rodland,  system_A,          rodland,  megasys1_state, rodlandjb,ROT0,   "bootleg","Rod-Land (Japan bootleg)", MACHINE_SUPPORTS_SAVE )
 GAME( 1990, phantasm, avspirit, system_A,          phantasm, megasys1_state, phantasm, ROT0,   "Jaleco", "Phantasm (Japan)", MACHINE_SUPPORTS_SAVE )
 GAME( 1991, edfp,     edf,      system_A,          edfp,     megasys1_state, edfp,     ROT0,   "Jaleco", "E.D.F. : Earth Defense Force (Japan, prototype)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, inyourfa, 0,        system_A,          inyourfa, megasys1_state, iganinju, ROT0,   "Jaleco", "In Your Face (World, prototype)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, inyourfa, 0,        system_A,          inyourfa, megasys1_state, iganinju, ROT0,   "Jaleco", "In Your Face (US, prototype)", MACHINE_SUPPORTS_SAVE )
 GAME( 1992, soldam,   0,        system_A_soldam,   soldam,   megasys1_state, soldam,   ROT0,   "Jaleco", "Soldam", MACHINE_SUPPORTS_SAVE )
 GAME( 1992, soldamj,  soldam,   system_A_soldam,   soldam,   megasys1_state, soldamj,  ROT0,   "Jaleco", "Soldam (Japan)", MACHINE_SUPPORTS_SAVE )
 
