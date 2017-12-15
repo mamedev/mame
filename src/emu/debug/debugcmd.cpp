@@ -137,7 +137,6 @@ debugger_commands::debugger_commands(running_machine& machine, debugger_cpu& cpu
 
 	/* add all the commands */
 	m_console.register_command("help",      CMDFLAG_NONE, 0, 0, 1, std::bind(&debugger_commands::execute_help, this, _1, _2));
-	m_console.register_command("html",      CMDFLAG_NONE, 0, 0, 0, std::bind(&debugger_commands::execute_html, this, _1, _2));
 	m_console.register_command("print",     CMDFLAG_NONE, 0, 1, MAX_COMMAND_PARAMS, std::bind(&debugger_commands::execute_print, this, _1, _2));
 	m_console.register_command("printf",    CMDFLAG_NONE, 0, 1, MAX_COMMAND_PARAMS, std::bind(&debugger_commands::execute_printf, this, _1, _2));
 	m_console.register_command("logerror",  CMDFLAG_NONE, 0, 1, MAX_COMMAND_PARAMS, std::bind(&debugger_commands::execute_logerror, this, _1, _2));
@@ -551,19 +550,6 @@ void debugger_commands::execute_help(int ref, const std::vector<std::string> &pa
 		m_console.printf_wrap(80, "%s\n", debug_get_help(""));
 	else
 		m_console.printf_wrap(80, "%s\n", debug_get_help(params[0].c_str()));
-}
-
-
-/*-------------------------------------------------
-    execute_html - generate debughelp.html
--------------------------------------------------*/
-
-void debugger_commands::execute_html(int ref, const std::vector<std::string> &params)
-{
-	if (debug_generate_html())
-		m_console.printf("debughelp.html has been successfully created.\n");
-	else
-		m_console.printf("Error creating debughelp.html.");
 }
 
 
