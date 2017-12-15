@@ -11349,14 +11349,14 @@ ROM_END
 
 ROM_START( skelagon )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	/* first half of 36.bin is missing */
+	ROM_LOAD( "36.bin",       0x0000, 0x1000, CRC(d997dc0c) SHA1(938c7b8049bf8c4cd936b585e588dc2c25c74821) )
+	ROM_CONTINUE(             0xe000, 0x1000             )
 	ROM_LOAD( "31.bin",       0x1000, 0x1000, CRC(ae6f8647) SHA1(801e88b91c204f2797e5ce45390ea6eec27a3f54) )
 	ROM_LOAD( "32.bin",       0x2000, 0x1000, CRC(a28c5838) SHA1(0a37de7986c494d1522ce76635dd1fa6d03f05c7) )
 	ROM_LOAD( "33.bin",       0x3000, 0x1000, CRC(32f7e99c) SHA1(2718063a77eeeb8067a9cad7ff3d9e0266b61566) )
 	ROM_LOAD( "37.bin",       0x7000, 0x1000, CRC(47f68a31) SHA1(6e15024f67c88a733ede8702d2a80ddb1892b27e) )
 	ROM_LOAD( "24.bin",       0xc000, 0x1000, CRC(e6d7dc74) SHA1(c1e6d9598fb837775ee6550fea3cd4910572615e) )
 	ROM_LOAD( "35.bin",       0xd000, 0x1000, CRC(5b2a0158) SHA1(66d2fb05a8daaa86bb547b4860d5bf27b4359326) )
-	ROM_LOAD( "36.bin",       0xe000, 0x1000, BAD_DUMP CRC(f53ead29) SHA1(f8957b0c0558acc005f418adbfeb66d1d562c9ac) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "5.5j",         0x0000, 0x1000, CRC(59028fb6) SHA1(94105b5b03c81a948a409f7ea20312bb9c79c150) )
@@ -12217,7 +12217,7 @@ GAME( 19??, aracnis,     scorpion, mooncrst,   aracnis,    galaxian_state, scorp
 
 /* SF-X hardware; based on Scramble with extra Z80 and 8255 driving a DAC-based sample player */
 GAME( 1983, sfx,         0,        sfx,        sfx,        galaxian_state, sfx,        ORIENTATION_FLIP_X, "Nichibutsu", "SF-X", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, skelagon,    sfx,      sfx,        sfx,        galaxian_state, sfx,        ORIENTATION_FLIP_X, "Nichibutsu USA", "Skelagon", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE)
+GAME( 1983, skelagon,    sfx,      sfx,        sfx,        galaxian_state, sfx,        ORIENTATION_FLIP_X, "Nichibutsu USA", "Skelagon", MACHINE_SUPPORTS_SAVE)
 GAME( 1982, monsterz,    0,        monsterz,   sfx,        galaxian_state, sfx,        ORIENTATION_FLIP_X, "Nihon Game", "Monster Zero", MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
 
 
