@@ -584,7 +584,7 @@ uint16_t ata_hle_device::read_dma()
 	return result;
 }
 
-READ16_MEMBER( ata_hle_device::read_cs0 )
+READ16_MEMBER( ata_hle_device::read16_cs0 )
 {
 	/* logit */
 //  if (offset != IDE_CS0_DATA_RW && offset != IDE_CS0_STATUS_R)
@@ -702,7 +702,7 @@ READ16_MEMBER( ata_hle_device::read_cs0 )
 	return result;
 }
 
-READ16_MEMBER( ata_hle_device::read_cs1 )
+READ16_MEMBER( ata_hle_device::read16_cs1 )
 {
 	/* logit */
 //  if (offset != IDE_CS1_ALTERNATE_STATUS_R)
@@ -806,7 +806,7 @@ void ata_hle_device::write_dma( uint16_t data )
 	}
 }
 
-WRITE16_MEMBER( ata_hle_device::write_cs0 )
+WRITE16_MEMBER( ata_hle_device::write16_cs0 )
 {
 	/* logit */
 	if (offset != IDE_CS0_DATA_RW)
@@ -915,7 +915,7 @@ WRITE16_MEMBER( ata_hle_device::write_cs0 )
 	}
 }
 
-WRITE16_MEMBER( ata_hle_device::write_cs1 )
+WRITE16_MEMBER( ata_hle_device::write16_cs1 )
 {
 	/* logit */
 	LOG(("%s:IDE cs1 write to %X = %08X, mem_mask=%d\n", machine().describe_context(), offset, data, mem_mask));

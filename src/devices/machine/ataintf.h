@@ -86,12 +86,12 @@ public:
 	template <class Object> static devcb_base &set_dasp_handler(device_t &device, Object &&cb) { return downcast<ata_interface_device &>(device).m_dasp_handler.set_callback(std::forward<Object>(cb)); }
 
 	uint16_t read_dma();
-	virtual DECLARE_READ16_MEMBER(read_cs0);
-	virtual DECLARE_READ16_MEMBER(read_cs1);
+	virtual DECLARE_READ16_MEMBER(read16_cs0);
+	virtual DECLARE_READ16_MEMBER(read16_cs1);
 
 	void write_dma(uint16_t data);
-	virtual DECLARE_WRITE16_MEMBER(write_cs0);
-	virtual DECLARE_WRITE16_MEMBER(write_cs1);
+	virtual DECLARE_WRITE16_MEMBER(write16_cs0);
+	virtual DECLARE_WRITE16_MEMBER(write16_cs1);
 	DECLARE_WRITE_LINE_MEMBER(write_dmack);
 
 protected:

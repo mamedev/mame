@@ -1947,7 +1947,7 @@ READ16_MEMBER(cobra_state::sub_ata0_r)
 {
 	mem_mask = ( mem_mask << 8 ) | ( mem_mask >> 8 );
 
-	uint32_t data = m_ata->read_cs0(space, offset, mem_mask);
+	uint32_t data = m_ata->read16_cs0(space, offset, mem_mask);
 	data = ( data << 8 ) | ( data >> 8 );
 
 	return data;
@@ -1958,14 +1958,14 @@ WRITE16_MEMBER(cobra_state::sub_ata0_w)
 	mem_mask = ( mem_mask << 8 ) | ( mem_mask >> 8 );
 	data = ( data << 8 ) | ( data >> 8 );
 
-	m_ata->write_cs0(space, offset, data, mem_mask);
+	m_ata->write16_cs0(space, offset, data, mem_mask);
 }
 
 READ16_MEMBER(cobra_state::sub_ata1_r)
 {
 	mem_mask = ( mem_mask << 8 ) | ( mem_mask >> 8 );
 
-	uint32_t data = m_ata->read_cs1(space, offset, mem_mask);
+	uint32_t data = m_ata->read16_cs1(space, offset, mem_mask);
 
 	return ( data << 8 ) | ( data >> 8 );
 }
@@ -1975,7 +1975,7 @@ WRITE16_MEMBER(cobra_state::sub_ata1_w)
 	mem_mask = ( mem_mask << 8 ) | ( mem_mask >> 8 );
 	data = ( data << 8 ) | ( data >> 8 );
 
-	m_ata->write_cs1(space, offset, data, mem_mask);
+	m_ata->write16_cs1(space, offset, data, mem_mask);
 }
 
 READ32_MEMBER(cobra_state::sub_comram_r)

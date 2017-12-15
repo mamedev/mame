@@ -32,10 +32,10 @@ class ide_controller_device : public ata_interface_device
 public:
 	ide_controller_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual DECLARE_READ16_MEMBER(read_cs0) override;
-	virtual DECLARE_READ16_MEMBER(read_cs1) override;
-	virtual DECLARE_WRITE16_MEMBER(write_cs0) override;
-	virtual DECLARE_WRITE16_MEMBER(write_cs1) override;
+	virtual DECLARE_READ16_MEMBER(read16_cs0) override;
+	virtual DECLARE_READ16_MEMBER(read16_cs1) override;
+	virtual DECLARE_WRITE16_MEMBER(write16_cs0) override;
+	virtual DECLARE_WRITE16_MEMBER(write16_cs1) override;
 
 protected:
 	ide_controller_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
@@ -57,19 +57,19 @@ class ide_controller_32_device : public ide_controller_device
 public:
 	ide_controller_32_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual DECLARE_READ32_MEMBER(read_cs0);
-	virtual DECLARE_READ32_MEMBER(read_cs1);
-	virtual DECLARE_WRITE32_MEMBER(write_cs0);
-	virtual DECLARE_WRITE32_MEMBER(write_cs1);
+	virtual DECLARE_READ32_MEMBER(read32_cs0);
+	virtual DECLARE_READ32_MEMBER(read32_cs1);
+	virtual DECLARE_WRITE32_MEMBER(write32_cs0);
+	virtual DECLARE_WRITE32_MEMBER(write32_cs1);
 
 protected:
 	ide_controller_32_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 private:
-	using ide_controller_device::read_cs0;
-	using ide_controller_device::read_cs1;
-	using ide_controller_device::write_cs0;
-	using ide_controller_device::write_cs1;
+	using ide_controller_device::read16_cs0;
+	using ide_controller_device::read16_cs1;
+	using ide_controller_device::write16_cs0;
+	using ide_controller_device::write16_cs1;
 };
 
 DECLARE_DEVICE_TYPE(IDE_CONTROLLER_32, ide_controller_32_device)

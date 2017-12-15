@@ -136,12 +136,12 @@ uint16_t ata_interface_device::read_dma()
 	return result;
 }
 
-READ16_MEMBER( ata_interface_device::read_cs0 )
+READ16_MEMBER( ata_interface_device::read16_cs0 )
 {
 	uint16_t result = mem_mask;
 	for (auto & elem : m_slot)
 		if (elem->dev() != nullptr)
-			result &= elem->dev()->read_cs0(space, offset, mem_mask);
+			result &= elem->dev()->read16_cs0(space, offset, mem_mask);
 
 //  { static int last_status = -1; if (offset == 7 ) { if( result == last_status ) return last_status; last_status = result; } else last_status = -1; }
 
@@ -150,12 +150,12 @@ READ16_MEMBER( ata_interface_device::read_cs0 )
 	return result;
 }
 
-READ16_MEMBER( ata_interface_device::read_cs1 )
+READ16_MEMBER( ata_interface_device::read16_cs1 )
 {
 	uint16_t result = mem_mask;
 	for (auto & elem : m_slot)
 		if (elem->dev() != nullptr)
-			result &= elem->dev()->read_cs1(space, offset, mem_mask);
+			result &= elem->dev()->read16_cs1(space, offset, mem_mask);
 
 //  logerror( "%s: read cs1 %04x %04x %04x\n", machine().describe_context(), offset, result, mem_mask );
 
@@ -178,22 +178,22 @@ void ata_interface_device::write_dma( uint16_t data )
 			elem->dev()->write_dma(data);
 }
 
-WRITE16_MEMBER( ata_interface_device::write_cs0 )
+WRITE16_MEMBER( ata_interface_device::write16_cs0 )
 {
 //  logerror( "%s: write cs0 %04x %04x %04x\n", machine().describe_context(), offset, data, mem_mask );
 
 	for (auto & elem : m_slot)
 		if (elem->dev() != nullptr)
-			elem->dev()->write_cs0(space, offset, data, mem_mask);
+			elem->dev()->write16_cs0(space, offset, data, mem_mask);
 }
 
-WRITE16_MEMBER( ata_interface_device::write_cs1 )
+WRITE16_MEMBER( ata_interface_device::write16_cs1 )
 {
 //  logerror( "%s: write cs1 %04x %04x %04x\n", machine().describe_context(), offset, data, mem_mask );
 
 	for (auto & elem : m_slot)
 		if (elem->dev() != nullptr)
-			elem->dev()->write_cs1(space, offset, data, mem_mask);
+			elem->dev()->write16_cs1(space, offset, data, mem_mask);
 }
 
 WRITE_LINE_MEMBER( ata_interface_device::write_dmack )

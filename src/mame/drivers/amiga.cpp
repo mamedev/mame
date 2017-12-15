@@ -755,9 +755,9 @@ READ16_MEMBER( a4000_state::ide_r )
 
 	// this very likely doesn't respond to all the addresses, figure out which ones
 	if (BIT(offset, 12))
-		data = m_ata->read_cs1(space, (offset >> 1) & 0x07, mem_mask);
+		data = m_ata->read16_cs1(space, (offset >> 1) & 0x07, mem_mask);
 	else
-		data = m_ata->read_cs0(space, (offset >> 1) & 0x07, mem_mask);
+		data = m_ata->read16_cs0(space, (offset >> 1) & 0x07, mem_mask);
 
 	// swap
 	data = (data << 8) | (data >> 8);
@@ -777,9 +777,9 @@ WRITE16_MEMBER( a4000_state::ide_w )
 
 	// this very likely doesn't respond to all the addresses, figure out which ones
 	if (BIT(offset, 12))
-		m_ata->write_cs1(space, (offset >> 1) & 0x07, data, mem_mask);
+		m_ata->write16_cs1(space, (offset >> 1) & 0x07, data, mem_mask);
 	else
-		m_ata->write_cs0(space, (offset >> 1) & 0x07, data, mem_mask);
+		m_ata->write16_cs0(space, (offset >> 1) & 0x07, data, mem_mask);
 }
 
 WRITE_LINE_MEMBER( a4000_state::ide_interrupt_w )
@@ -1658,10 +1658,10 @@ static MACHINE_CONFIG_DERIVED( a600, amiga_base )
 
 	MCFG_GAYLE_ADD("gayle", amiga_state::CLK_28M_PAL / 2, a600_state::GAYLE_ID)
 	MCFG_GAYLE_INT2_HANDLER(WRITELINE(a600_state, gayle_int2_w))
-	MCFG_GAYLE_CS0_READ_HANDLER(DEVREAD16("ata", ata_interface_device, read_cs0))
-	MCFG_GAYLE_CS0_WRITE_HANDLER(DEVWRITE16("ata", ata_interface_device, write_cs0))
-	MCFG_GAYLE_CS1_READ_HANDLER(DEVREAD16("ata", ata_interface_device, read_cs1))
-	MCFG_GAYLE_CS1_WRITE_HANDLER(DEVWRITE16("ata", ata_interface_device, write_cs1))
+	MCFG_GAYLE_CS0_READ_HANDLER(DEVREAD16("ata", ata_interface_device, read16_cs0))
+	MCFG_GAYLE_CS0_WRITE_HANDLER(DEVWRITE16("ata", ata_interface_device, write16_cs0))
+	MCFG_GAYLE_CS1_READ_HANDLER(DEVREAD16("ata", ata_interface_device, read16_cs1))
+	MCFG_GAYLE_CS1_WRITE_HANDLER(DEVWRITE16("ata", ata_interface_device, write16_cs1))
 
 	MCFG_ATA_INTERFACE_ADD("ata", ata_devices, "hdd", nullptr, false)
 	MCFG_ATA_INTERFACE_IRQ_HANDLER(DEVWRITELINE("gayle", gayle_device, ide_interrupt_w))
@@ -1711,10 +1711,10 @@ static MACHINE_CONFIG_DERIVED( a1200, amiga_base )
 
 	MCFG_GAYLE_ADD("gayle", amiga_state::CLK_28M_PAL / 2, a1200_state::GAYLE_ID)
 	MCFG_GAYLE_INT2_HANDLER(WRITELINE(a1200_state, gayle_int2_w))
-	MCFG_GAYLE_CS0_READ_HANDLER(DEVREAD16("ata", ata_interface_device, read_cs0))
-	MCFG_GAYLE_CS0_WRITE_HANDLER(DEVWRITE16("ata", ata_interface_device, write_cs0))
-	MCFG_GAYLE_CS1_READ_HANDLER(DEVREAD16("ata", ata_interface_device, read_cs1))
-	MCFG_GAYLE_CS1_WRITE_HANDLER(DEVWRITE16("ata", ata_interface_device, write_cs1))
+	MCFG_GAYLE_CS0_READ_HANDLER(DEVREAD16("ata", ata_interface_device, read16_cs0))
+	MCFG_GAYLE_CS0_WRITE_HANDLER(DEVWRITE16("ata", ata_interface_device, write16_cs0))
+	MCFG_GAYLE_CS1_READ_HANDLER(DEVREAD16("ata", ata_interface_device, read16_cs1))
+	MCFG_GAYLE_CS1_WRITE_HANDLER(DEVWRITE16("ata", ata_interface_device, write16_cs1))
 
 	MCFG_ATA_INTERFACE_ADD("ata", ata_devices, "hdd", nullptr, false)
 	MCFG_ATA_INTERFACE_IRQ_HANDLER(DEVWRITELINE("gayle", gayle_device, ide_interrupt_w))

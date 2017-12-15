@@ -96,7 +96,7 @@ static ADDRESS_MAP_START( cpu_map, AS_PROGRAM, 32, turrett_state )
 	AM_RANGE(0x04000100, 0x04000103) AM_READWRITE(int_r, int_w)
 	AM_RANGE(0x04000200, 0x040003ff) AM_DEVREADWRITE("ttsound", turrett_device, read, write)
 	AM_RANGE(0x08000000, 0x0800000f) AM_READWRITE(video_r, video_w)
-	AM_RANGE(0x08000200, 0x080003ff) AM_DEVREADWRITE16("ata", ata_interface_device, read_cs0, write_cs0, 0xffffffff)
+	AM_RANGE(0x08000200, 0x080003ff) AM_DEVREADWRITE16("ata", ata_interface_device, read16_cs0, write16_cs0, 0xffffffff)
 	AM_RANGE(0x1fc00000, 0x1fdfffff) AM_ROM AM_REGION("maincpu", 0)
 ADDRESS_MAP_END
 

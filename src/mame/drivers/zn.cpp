@@ -1278,7 +1278,7 @@ void zn_state::atpsx_dma_read( uint32_t *p_n_psxram, uint32_t n_address, int32_t
 	n_size <<= 1;
 	while( n_size > 0 )
 	{
-		psxwriteword( p_n_psxram, n_address, m_vt83c461->read_cs0(space, (uint32_t) 0, (uint32_t) 0xffff) );
+		psxwriteword( p_n_psxram, n_address, m_vt83c461->read32_cs0(space, (uint32_t) 0, (uint32_t) 0xffff) );
 		n_address += 2;
 		n_size--;
 	}
@@ -1299,11 +1299,11 @@ READ16_MEMBER(zn_state::vt83c461_16_r)
 	}
 	else if( offset >= 0x1f0 / 2 && offset < 0x1f8 / 2 )
 	{
-		return m_vt83c461->read_cs0( space, ( offset / 2 ) & 1, (uint32_t) mem_mask << shift ) >> shift;
+		return m_vt83c461->read32_cs0( space, ( offset / 2 ) & 1, (uint32_t) mem_mask << shift ) >> shift;
 	}
 	else if( offset >= 0x3f0 / 2 && offset < 0x3f8 / 2 )
 	{
-		return m_vt83c461->read_cs1( space, ( offset / 2 ) & 1, (uint32_t) mem_mask << shift ) >> shift;
+		return m_vt83c461->read32_cs1( space, ( offset / 2 ) & 1, (uint32_t) mem_mask << shift ) >> shift;
 	}
 	else
 	{
@@ -1322,11 +1322,11 @@ WRITE16_MEMBER(zn_state::vt83c461_16_w)
 	}
 	else if( offset >= 0x1f0 / 2 && offset < 0x1f8 / 2 )
 	{
-		m_vt83c461->write_cs0( space, ( offset / 2 ) & 1, (uint32_t) data << shift, (uint32_t) mem_mask << shift );
+		m_vt83c461->write32_cs0( space, ( offset / 2 ) & 1, (uint32_t) data << shift, (uint32_t) mem_mask << shift );
 	}
 	else if( offset >= 0x3f0 / 2 && offset < 0x3f8 / 2 )
 	{
-		m_vt83c461->write_cs1( space, ( offset / 2 ) & 1, (uint32_t) data << shift, (uint32_t) mem_mask << shift );
+		m_vt83c461->write32_cs1( space, ( offset / 2 ) & 1, (uint32_t) data << shift, (uint32_t) mem_mask << shift );
 	}
 	else
 	{
@@ -1338,7 +1338,7 @@ READ16_MEMBER(zn_state::vt83c461_32_r)
 {
 	if( offset == 0x1f0/2 )
 	{
-		uint32_t data = m_vt83c461->read_cs0(space, 0, 0xffffffff);
+		uint32_t data = m_vt83c461->read32_cs0(space, 0, 0xffffffff);
 		m_vt83c461_latch = data >> 16;
 		return data & 0xffff;
 	}
@@ -2026,8 +2026,8 @@ DRIVER_INIT_MEMBER(zn_state,jdredd)
 
 static ADDRESS_MAP_START(jdredd_map, AS_PROGRAM, 32, zn_state)
 	AM_RANGE(0x1f000000, 0x1f1fffff) AM_ROM AM_REGION("roms", 0)
-	AM_RANGE(0x1fbfff80, 0x1fbfff8f) AM_DEVREADWRITE16("ata", ata_interface_device, read_cs1, write_cs1, 0xffffffff)
-	AM_RANGE(0x1fbfff90, 0x1fbfff9f) AM_DEVREADWRITE16("ata", ata_interface_device, read_cs0, write_cs0, 0xffffffff)
+	AM_RANGE(0x1fbfff80, 0x1fbfff8f) AM_DEVREADWRITE16("ata", ata_interface_device, read16_cs1, write16_cs1, 0xffffffff)
+	AM_RANGE(0x1fbfff90, 0x1fbfff9f) AM_DEVREADWRITE16("ata", ata_interface_device, read16_cs0, write16_cs0, 0xffffffff)
 
 	AM_IMPORT_FROM(coh1000a_map)
 ADDRESS_MAP_END
