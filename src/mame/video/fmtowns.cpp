@@ -710,12 +710,14 @@ WRITE8_MEMBER( towns_state::towns_spriteram_w )
  *      +4: Sprite Attribute
  *          bit 15: enforce offsets (regs 2-5)
  *          bit 12,13,14: flip / rotate sprite
+ *              When the rotate bit (14) is set, the X and Y coordinates are swapped when rendering the sprite to VRAM.
+ *              By combining it with the flip bits, the sprite can be rotated in 90 degree increments, both mirrored and unmirrored.
  *          bits 10,11: half-size
  *          bits 9-0: Sprite RAM offset containing sprite pattern
  *      +6: Sprite Colour
  *          bit 15: use colour data in located in sprite RAM offset in bits 11-0 (x32)
  */
-void towns_state::render_sprite_4(uint32_t poffset, uint32_t coffset, uint16_t x, uint16_t y, bool xflip, bool yflip, bool xhalfsize, bool yhalfsize, const rectangle* rect)
+void towns_state::render_sprite_4(uint32_t poffset, uint32_t coffset, uint16_t x, uint16_t y, bool xflip, bool yflip, bool xhalfsize, bool yhalfsize, bool rotation, const rectangle* rect)
 {
 	uint16_t xpos,ypos;
 	uint16_t col,pixel;
@@ -724,6 +726,13 @@ void towns_state::render_sprite_4(uint32_t poffset, uint32_t coffset, uint16_t x
 	int xdir,ydir;
 	int width = (m_video.towns_crtc_reg[12] - m_video.towns_crtc_reg[11]) / (((m_video.towns_crtc_reg[27] & 0x0f00) >> 8)+1);
 	int height = (m_video.towns_crtc_reg[16] - m_video.towns_crtc_reg[15]) / (((m_video.towns_crtc_reg[27] & 0xf000) >> 12)+2);
+	
+	if (rotation)
+	{
+		std::swap (x,y);
+		std::swap (xflip,yflip);
+		std::swap (width,height);
+	}
 
 	if(xflip)
 	{
@@ -781,14 +790,23 @@ void towns_state::render_sprite_4(uint32_t poffset, uint32_t coffset, uint16_t x
 	{
 		for(xpos=xstart;xpos!=xend;xpos+=xdir,xpos&=0x1ff)
 		{
+			
 			if(m_video.towns_sprite_page != 0)
 				voffset = 0x20000;
 			else
 				voffset = 0x00000;
 			pixel = (m_towns_txtvram[poffset] & 0xf0) >> 4;
 			col = m_towns_txtvram[coffset+(pixel*2)] | (m_towns_txtvram[coffset+(pixel*2)+1] << 8);
-			voffset += (m_video.towns_crtc_reg[24] * 4) * (ypos & 0x1ff);  // scanline size in bytes * y pos
-			voffset += (xpos & 0x1ff) * 2;
+			if (rotation)
+			{
+				voffset += (m_video.towns_crtc_reg[24] * 4) * (xpos & 0x1ff);  // scanline size in bytes * y pos
+				voffset += (ypos & 0x1ff) * 2;
+			}
+			else
+			{
+				voffset += (m_video.towns_crtc_reg[24] * 4) * (ypos & 0x1ff);  // scanline size in bytes * y pos
+				voffset += (xpos & 0x1ff) * 2;
+			}
 			if((m_video.towns_sprite_page != 0 && voffset > 0x1ffff && voffset < 0x40000)
 					|| (m_video.towns_sprite_page == 0 && voffset < 0x20000))
 			{
@@ -802,9 +820,16 @@ void towns_state::render_sprite_4(uint32_t poffset, uint32_t coffset, uint16_t x
 			if (!xhalfsize)
 			{
 				if(xflip)
-					voffset+=2;
+					if (rotation)
+						voffset+=(m_video.towns_crtc_reg[24] * 4);
+					else
+						voffset+=2;
 				else
-					voffset-=2;
+					if (rotation)
+						voffset-=(m_video.towns_crtc_reg[24] * 4);
+					else
+						voffset-=2;
+				
 				pixel = m_towns_txtvram[poffset] & 0x0f;
 				col = m_towns_txtvram[coffset+(pixel*2)] | (m_towns_txtvram[coffset+(pixel*2)+1] << 8);
 				if((m_video.towns_sprite_page != 0 && voffset > 0x1ffff && voffset < 0x40000)
@@ -828,7 +853,7 @@ void towns_state::render_sprite_4(uint32_t poffset, uint32_t coffset, uint16_t x
 	}
 }
 
-void towns_state::render_sprite_16(uint32_t poffset, uint16_t x, uint16_t y, bool xflip, bool yflip, bool xhalfsize, bool yhalfsize, const rectangle* rect)
+void towns_state::render_sprite_16(uint32_t poffset, uint16_t x, uint16_t y, bool xflip, bool yflip, bool xhalfsize, bool yhalfsize, bool rotation, const rectangle* rect)
 {
 	uint16_t xpos,ypos;
 	uint16_t col;
@@ -837,6 +862,13 @@ void towns_state::render_sprite_16(uint32_t poffset, uint16_t x, uint16_t y, boo
 	int xdir,ydir;
 	int width = (m_video.towns_crtc_reg[12] - m_video.towns_crtc_reg[11]) / (((m_video.towns_crtc_reg[27] & 0x0f00) >> 8)+1);
 	int height = (m_video.towns_crtc_reg[16] - m_video.towns_crtc_reg[15]) / (((m_video.towns_crtc_reg[27] & 0xf000) >> 12)+2);
+
+	if (rotation)
+	{
+		std::swap (x,y);
+		std::swap (xflip,yflip);
+		std::swap (width,height);
+	}
 
 	if(xflip)
 	{
@@ -889,8 +921,16 @@ void towns_state::render_sprite_16(uint32_t poffset, uint16_t x, uint16_t y, boo
 			else
 				voffset = 0x00000;
 			col = m_towns_txtvram[poffset] | (m_towns_txtvram[poffset+1] << 8);
-			voffset += (m_video.towns_crtc_reg[24] * 4) * (ypos & 0x1ff);  // scanline size in bytes * y pos
-			voffset += (xpos & 0x1ff) * 2;
+			if (rotation)
+			{
+				voffset += (m_video.towns_crtc_reg[24] * 4) * (xpos & 0x1ff);  // scanline size in bytes * y pos
+				voffset += (ypos & 0x1ff) * 2;
+			}
+			else
+			{
+				voffset += (m_video.towns_crtc_reg[24] * 4) * (ypos & 0x1ff);  // scanline size in bytes * y pos
+				voffset += (xpos & 0x1ff) * 2;
+			}
 			if((m_video.towns_sprite_page != 0 && voffset > 0x1ffff && voffset < 0x40000)
 					|| (m_video.towns_sprite_page == 0 && voffset < 0x20000))
 			{
@@ -920,7 +960,7 @@ void towns_state::draw_sprites(const rectangle* rect)
 	uint16_t xoff = (m_video.towns_sprite_reg[2] | (m_video.towns_sprite_reg[3] << 8)) & 0x1ff;
 	uint16_t yoff = (m_video.towns_sprite_reg[4] | (m_video.towns_sprite_reg[5] << 8)) & 0x1ff;
 	uint32_t poffset,coffset;
-	bool xflip, yflip, xhalfsize, yhalfsize;
+	bool xflip, yflip, xhalfsize, yhalfsize, rotation;
 
 	if(!(m_video.towns_sprite_reg[1] & 0x80))
 		return;
@@ -939,6 +979,7 @@ void towns_state::draw_sprites(const rectangle* rect)
 		colour = m_towns_txtvram[8*n+6] | (m_towns_txtvram[8*n+7] << 8);
 		xflip = (attr & 0x2000) >> 13;
 		yflip = (attr & 0x1000) >> 12;
+		rotation = (attr & 0x4000) >> 14;
 		xhalfsize = (attr & 0x400) >> 10;
 		yhalfsize = (attr & 0x800) >> 11;
 		
@@ -959,7 +1000,7 @@ void towns_state::draw_sprites(const rectangle* rect)
 				n,x,y,attr,colour,poffset,coffset);
 #endif
 			if(!(colour & 0x2000))
-				render_sprite_4((poffset)&0x1ffff,coffset,x,y,xflip,yflip,xhalfsize,yhalfsize,rect);
+				render_sprite_4((poffset)&0x1ffff,coffset,x,y,xflip,yflip,xhalfsize,yhalfsize,rotation,rect);
 		}
 		else
 		{
@@ -969,7 +1010,7 @@ void towns_state::draw_sprites(const rectangle* rect)
 				n,x,y,attr,colour,poffset);
 #endif
 			if(!(colour & 0x2000))
-				render_sprite_16((poffset)&0x1ffff,x,y,xflip,yflip,xhalfsize,yhalfsize,rect);
+				render_sprite_16((poffset)&0x1ffff,x,y,xflip,yflip,xhalfsize,yhalfsize,rotation,rect);
 		}
 	}
 
