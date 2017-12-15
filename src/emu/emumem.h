@@ -242,6 +242,8 @@ class address_space
 	friend class direct_read_data<-1>;
 	friend class direct_read_data<-2>;
 	friend class direct_read_data<-3>;
+	friend class memory_bank;
+	friend class memory_block;
 
 protected:
 	// construction/destruction
@@ -251,7 +253,6 @@ public:
 	virtual ~address_space();
 
 	// getters
-	memory_manager &manager() const { return m_manager; }
 	device_t &device() const { return m_device; }
 	const char *name() const { return m_name; }
 	int spacenum() const { return m_spacenum; }
