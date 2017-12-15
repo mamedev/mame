@@ -247,7 +247,7 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_DERIVED(sbasketbu, sbasketb)
 	MCFG_DEVICE_REMOVE("maincpu")
-	MCFG_CPU_ADD("maincpu", M6809, 1400000)        /* 1.400 MHz ??? */
+	MCFG_CPU_ADD("maincpu", MC6809E, 1400000)        /* 6809E at 1.400 MHz ??? */
 	MCFG_CPU_PROGRAM_MAP(sbasketb_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", sbasketb_state,  vblank_irq)
 MACHINE_CONFIG_END

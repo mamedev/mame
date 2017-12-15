@@ -195,7 +195,7 @@ GFXDECODE_END
 static MACHINE_CONFIG_START( shaolins )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6809, MASTER_CLOCK/12)        /* verified on pcb */
+	MCFG_CPU_ADD("maincpu", MC6809E, MASTER_CLOCK/12)        /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(shaolins_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", shaolins_state, interrupt, "screen", 0, 1)
 	MCFG_WATCHDOG_ADD("watchdog")
