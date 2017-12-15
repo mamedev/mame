@@ -4259,6 +4259,35 @@ ROM_START( kgalaha )
 ROM_END
 
 
+// AHG1625 / MV4112/2 / 5,10,25,50 Credit Multiplier / 20 Line Multiline
+// KING GALAH / Export / B - 07/02/01
+// Requires set chips 4.04.xx
+// Variation (% and NO):
+// Not required touch screen
+ROM_START( kgalahu )
+	ARISTOCRAT_MK5_BIOS
+	/*
+	    Checksum code found at 0x000d18
+	    Checksum is stored at 0x000020-0x000027
+	        Expected Checksum   0x6f1ff98e
+	        Calculated Checksum 0x6f1ff98e  (OK)
+	*/
+	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
+	ROM_LOAD32_WORD( "ahg1625.u7",  0x000000, 0x80000, CRC(2adcfd60) SHA1(bf819be7665df421435b997259dee0668482a837) )  // game
+	ROM_LOAD32_WORD( "ahg1625.u11", 0x000002, 0x80000, CRC(4820a290) SHA1(8d073694365f4b0a85e3abe18cc70fd738db6e2c) )  // game
+	ROM_LOAD32_WORD( "ahg1625.u8",  0x100000, 0x80000, CRC(0e067eab) SHA1(b258b62ca637ee1bc14ccf19b2d337324c0f1b8f) )  // base
+	ROM_LOAD32_WORD( "ahg1625.u12", 0x100002, 0x80000, CRC(08a30954) SHA1(dfd160b0341a8487649e7167f2772dd060f05723) )  // base
+	ROM_LOAD32_WORD( "ahg1625.u9",  0x200000, 0x80000, CRC(b2b29dce) SHA1(ae4bdec2c4c48036fca5672fd3cb1e0dfda76685) )  // base
+	ROM_LOAD32_WORD( "ahg1625.u13", 0x200002, 0x80000, CRC(a35444cc) SHA1(faa0b3edc2acb313d1ce78c7b7dd14b8de465231) )  // base
+	ROM_LOAD32_WORD( "ahg1625.u10", 0x300000, 0x80000, CRC(f9dde22f) SHA1(b321c927a958d0e20e29cf4e12cea1c8bd06a893) )  // base
+	ROM_LOAD32_WORD( "ahg1625.u14", 0x300002, 0x80000, CRC(499419db) SHA1(6df8c7a9a69d60e746eb266127647327d4b88919) )  // base
+
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
+	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
+ROM_END
+
+
 // 0200024V / 540/3 / 10 Credit Multiplier/5 Line Multiline
 // K. G. Bird / Local / D - 10/10/94
 ROM_START( kgbirda5 )
@@ -7426,6 +7455,7 @@ GAMEL( 1996, jumpjoey,   aristmk5,  aristmk5,           cashcham,     aristmk5_s
 GAMEL( 1996, jungjuic,   aristmk5,  aristmk5,           jungjuic,     aristmk5_state, aristmk5, ROT0, "Aristocrat", "Jungle Juice (0200240V, New Zealand)",                 MACHINE_FLAGS, layout_jungjuic )        // 566/3, F - 06/03/96
 GAMEL( 1995, kgalah,     aristmk5,  aristmk5,           kgalah,       aristmk5_state, aristmk5, ROT0, "Aristocrat", "King Galah (0200536V, NSW/ACT)",                       MACHINE_FLAGS, layout_kgalah )          // 613/6, A - 21/07/95
 GAMEL( 1995, kgalaha,    kgalah,    aristmk5,           kgalah,       aristmk5_state, aristmk5, ROT0, "Aristocrat", "King Galah (0100536V, NSW/ACT)",                       MACHINE_FLAGS, layout_kgalah )          // 613, A - 21/07/95
+GAMEL( 1995, kgalahu,    kgalah,    aristmk5_usa,       aristmk5_usa, aristmk5_state, aristmk5, ROT0, "Aristocrat", "King Galah (AHG1625, US)",                             MACHINE_FLAGS, layout_aristmk5_us )     // MV4112/2, B - 07/02/01
 GAMEL( 1994, kgbirda5,   aristmk5,  aristmk5,           kgbirda5,     aristmk5_state, aristmk5, ROT0, "Aristocrat", "K.G. Bird (0200024V, NSW/ACT)",                        MACHINE_FLAGS, layout_kgbirda5 )        // 540/3, D - 10/10/94
 GAMEL( 2001, koalamnt,   aristmk5,  aristmk5_usa,       dolphntrce,   aristmk5_state, aristmk5, ROT0, "Aristocrat", "Koala Mint (CHG1573, US)",                             MACHINE_FLAGS, layout_dolphntrce )      // MV4137, A - 12/09/01
 GAMEL( 1998, kookabuk,   aristmk5,  aristmk5,           aristmk5,     aristmk5_state, aristmk5, ROT0, "Aristocrat", "Kooka Bucks (0100677V, NSW/ACT)",                      MACHINE_FLAGS, layout_aristmk5 )        // 661, A - 03/04/98, Rev 5
