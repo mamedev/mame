@@ -1368,6 +1368,8 @@ if (BUSES["S100"]~=null) then
 		MAME_DIR .. "src/devices/bus/s100/nsmdsa.h",
 		MAME_DIR .. "src/devices/bus/s100/nsmdsad.cpp",
 		MAME_DIR .. "src/devices/bus/s100/nsmdsad.h",
+		MAME_DIR .. "src/devices/bus/s100/seals8k.cpp",
+		MAME_DIR .. "src/devices/bus/s100/seals8k.h",
 		MAME_DIR .. "src/devices/bus/s100/wunderbus.cpp",
 		MAME_DIR .. "src/devices/bus/s100/wunderbus.h",
 	}

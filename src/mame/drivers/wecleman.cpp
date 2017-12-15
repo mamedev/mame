@@ -1150,7 +1150,7 @@ static MACHINE_CONFIG_START( hotchase )
 	MCFG_CPU_ADD("sub", M68000, 10000000)   /* 10 MHz - PCB is drawn in one set's readme */
 	MCFG_CPU_PROGRAM_MAP(hotchase_sub_map)
 
-	MCFG_CPU_ADD("audiocpu", M6809, 3579545 / 2)    /* 3.579/2 MHz - PCB is drawn in one set's readme */
+	MCFG_CPU_ADD("audiocpu", MC6809E, 3579545 / 2)    /* 3.579/2 MHz - PCB is drawn in one set's readme */
 	MCFG_CPU_PROGRAM_MAP(hotchase_sound_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(wecleman_state, hotchase_sound_timer,  496)
 
