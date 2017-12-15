@@ -253,7 +253,6 @@ public:
 	// getters
 	memory_manager &manager() const { return m_manager; }
 	device_t &device() const { return m_device; }
-	running_machine &machine() const { return m_machine; }
 	const char *name() const { return m_name; }
 	int spacenum() const { return m_spacenum; }
 	address_map *map() const { return m_map.get(); }
@@ -457,7 +456,6 @@ protected:
 
 private:
 	memory_manager &        m_manager;          // reference to the owning manager
-	running_machine &       m_machine;          // reference to the owning machine
 };
 
 
@@ -470,7 +468,7 @@ class memory_block
 
 public:
 	// construction/destruction
-	memory_block(running_machine &_machine, address_space &space, offs_t start, offs_t end, void *memory = nullptr);
+	memory_block(address_space &space, offs_t start, offs_t end, void *memory = nullptr);
 	~memory_block();
 
 	// getters
@@ -532,7 +530,7 @@ class memory_bank
 
 public:
 	// construction/destruction
-	memory_bank(running_machine &_machine, address_space &space, int index, offs_t start, offs_t end, const char *tag = nullptr);
+	memory_bank(address_space &space, int index, offs_t start, offs_t end, const char *tag = nullptr);
 	~memory_bank();
 
 	// getters
