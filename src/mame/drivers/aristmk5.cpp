@@ -4989,6 +4989,35 @@ ROM_START( mountmonu )
 ROM_END
 
 
+// BHG1464 / MV4108/5 / 5,10,20 Credit Multiplier / 9 Line Multiline
+// Mountain Money / Export / A - 10/03/01
+// Requires set chip version: 4.04.xx
+// Variation (% and NO):
+// Not required touch screen
+ROM_START( mountmonua )
+	ARISTOCRAT_MK5_BIOS
+	/*
+	    Checksum code found at 0x000d18
+	    Checksum is stored at 0x000020-0x000027
+	        Expected Checksum   0x0916f8a2
+	        Calculated Checksum 0x0916f8a2  (OK)
+	*/
+	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
+	ROM_LOAD32_WORD( "bhg1464.u7",  0x000000, 0x80000, CRC(92e49c10) SHA1(f4723d7ea5f3454e649e0004c6010d0ba836e5ba) )  // game
+	ROM_LOAD32_WORD( "bhg1464.u11", 0x000002, 0x80000, CRC(44b813d9) SHA1(0e62c4eb4bd8e914f419aa2e2875a5419b5bafc5) )  // game
+	ROM_LOAD32_WORD( "bhg1464.u8",  0x100000, 0x80000, CRC(01207fd3) SHA1(9e7fb7a14d41b175d8a201b5c52d08fae024571f) )  // base
+	ROM_LOAD32_WORD( "bhg1464.u12", 0x100002, 0x80000, CRC(69b71a6e) SHA1(01c7a468f7766a85235b6b5ae1e3c9748cbbcb0b) )  // base
+	ROM_LOAD32_WORD( "bhg1464.u9",  0x200000, 0x80000, CRC(1be9a7eb) SHA1(d347b87694fe389a7841ac99f0b35bc159b0a7d4) )  // base
+	ROM_LOAD32_WORD( "bhg1464.u13", 0x200002, 0x80000, CRC(fa139977) SHA1(55bbdcc0c62cc7fe7cc73aa45e45f92f41ae1f24) )  // base
+	ROM_LOAD32_WORD( "bhg1464.u10", 0x300000, 0x80000, CRC(0d225449) SHA1(4b70c2e91877b7d314e4f4616df4ef9fd49303a0) )  // base
+	ROM_LOAD32_WORD( "bhg1464.u14", 0x300002, 0x80000, CRC(5b1e5888) SHA1(4cfb0a7af2553037fed650085bbe11e3d043797b) )  // base
+
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
+	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
+ROM_END
+
+
 // 0200956V / 386/64 / 200 Credits per Draw / 3 Draws(1 cent) / 2 Credits per Draw / 3 Draws ($1.00)
 // MULTIDRAW - FREE GAMES / NSW/ACT / E - 08/05/00
 ROM_START( multidrw )
@@ -7424,6 +7453,7 @@ GAMEL( 1997, monmousea,  monmouse,  aristmk5,           cashcham,     aristmk5_s
 GAMEL( 2001, montree,    aristmk5,  aristmk5,           montree,      aristmk5_state, aristmk5, ROT0, "Aristocrat", "Money Tree (0201397V, New Zealand)",                   MACHINE_FLAGS, layout_montree )         // MV4126, C - 12/04/01, Rev 5
 GAMEL( 1996, mountmon,   aristmk5,  aristmk5,           mountmon,     aristmk5_state, aristmk5, ROT0, "Aristocrat", "Mountain Money (0100294V, NSW/ACT)",                   MACHINE_FLAGS, layout_mountmon )        // 595/3, B - 11/06/96, Rev 1.22.5.0
 GAMEL( 1996, mountmona,  mountmon,  aristmk5,           mystgard,     aristmk5_state, aristmk5, ROT0, "Aristocrat", "Mountain Money (0100289V, NSW/ACT)",                   MACHINE_FLAGS, layout_mystgard )        // 595/2, C - 11/06/96, Rev 1.22.5.0
+GAMEL( 2001, mountmonua, mountmon,  aristmk5_usa,       aristmk5_usa, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Mountain Money (BHG1464, US)",                         MACHINE_FLAGS, layout_aristmk5_us )     // MV4108/5, A - 10/03/01
 GAMEL( 2000, multidrw,   aristmk5,  aristmk5,           multidrw,     aristmk5_state, aristmk5, ROT0, "Aristocrat", "Multidraw - Free Games (0200956V, NSW/ACT)",           MACHINE_FLAGS, layout_multidrw )        // 386/64, E - 08/05/00, Rev 17
 GAMEL( 1996, mystgard,   aristmk5,  aristmk5,           mystgard,     aristmk5_state, aristmk5, ROT0, "Aristocrat", "Mystic Garden (0100275V, NSW/ACT)",                    MACHINE_FLAGS, layout_mystgard )        // 595/1, B - 11/06/96, Rev 1.22
 GAMEL( 2001, one4all,    aristmk5,  aristmk5,           one4all,      aristmk5_state, aristmk5, ROT0, "Aristocrat", "One For All (0101503V, New Zealand)",                  MACHINE_FLAGS, layout_one4all )         // MV4141, A - 28/05/01, Rev 11
