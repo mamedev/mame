@@ -632,8 +632,8 @@ WRITE32_MEMBER(seattle_state::analog_port_w)
 	else {
 		m_pending_analog_read = currValue;
 	}
-	// Declare calibration finished as soon as non-middle value is detected, ie the user has turned the wheel
-	if (!m_wheel_calibrated && currValue != 0 && (currValue > (0x80 + 0x10) || currValue < (0x80 - 0x10))) {
+	// Declare calibration finished as soon as a SYSTEM button is hit
+	if (!m_wheel_calibrated && ((~ioport("SYSTEM")->read()) & 0xffff)) {
 		m_wheel_calibrated = true;
 		//osd_printf_info("wheel calibration comlete wheel: %02x\n", currValue);
 	}
