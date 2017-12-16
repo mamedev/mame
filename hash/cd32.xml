@@ -52,7 +52,7 @@
 	</software>
 
 	<!-- Freezes after the intro, glitchy graphics-->
-	<software name="chaoseng" supported="partial">
+	<software name="chaoseng" supported="no">
 		<description>The Chaos Engine</description>
 		<year>1994</year>
 		<publisher>Renegade</publisher>
