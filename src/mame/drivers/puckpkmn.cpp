@@ -382,7 +382,7 @@ DRIVER_INIT_MEMBER(md_boot_state,puckpkmn)
 	int i;
 
 	for (i = 0; i < len; i++)
-		rom[i] = BITSWAP8(rom[i],1,4,2,0,7,5,3,6);
+		rom[i] = bitswap<8>(rom[i],1,4,2,0,7,5,3,6);
 
 	DRIVER_INIT_CALL(megadriv);
 }

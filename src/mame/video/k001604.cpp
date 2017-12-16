@@ -310,8 +310,8 @@ READ32_MEMBER( k001604_device::reg_r )
 {
 	switch (offset)
 	{
-		case 0x54/4:    return space.machine().rand() << 16;
-		case 0x5c/4:    return space.machine().rand() << 16 | space.machine().rand();
+		case 0x54/4:    return machine().rand() << 16;
+		case 0x5c/4:    return machine().rand() << 16 | machine().rand();
 	}
 
 	return m_reg[offset];

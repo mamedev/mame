@@ -360,7 +360,7 @@ READ8_MEMBER(es5510_device::host_r)
 	//  printf("%06x: DSP read offset %04x (data is %04x)\n",space.device().safe_pc(),offset,dsp_ram[offset]);
 
 	// VFX hack
-	if (core_stricmp(space.machine().system().name, "vfx") == 0)
+	if (core_stricmp(machine().system().name, "vfx") == 0)
 	{
 		if (space.device().safe_pc() == 0xc091f0)
 		{

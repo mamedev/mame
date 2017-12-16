@@ -36,11 +36,11 @@ public:
 	m68307_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	/* trampolines so we can specify the 68681 serial configuration when adding the CPU  */
-	template <class Object> static devcb_base &set_irq_cb(device_t &device, Object &&cb) { return downcast<m68307_cpu_device &>(device).write_irq.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_a_tx_cb(device_t &device, Object &&cb) { return downcast<m68307_cpu_device &>(device).write_a_tx.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_b_tx_cb(device_t &device, Object &&cb) { return downcast<m68307_cpu_device &>(device).write_b_tx.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_inport_cb(device_t &device, Object &&cb) { return downcast<m68307_cpu_device &>(device).read_inport.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_outport_cb(device_t &device, Object &&cb) { return downcast<m68307_cpu_device &>(device).write_outport.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_irq_cb(device_t &device, Object &&cb) { return downcast<m68307_cpu_device &>(device).m_write_irq.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_a_tx_cb(device_t &device, Object &&cb) { return downcast<m68307_cpu_device &>(device).m_write_a_tx.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_b_tx_cb(device_t &device, Object &&cb) { return downcast<m68307_cpu_device &>(device).m_write_b_tx.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_inport_cb(device_t &device, Object &&cb) { return downcast<m68307_cpu_device &>(device).m_read_inport.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_outport_cb(device_t &device, Object &&cb) { return downcast<m68307_cpu_device &>(device).m_write_outport.set_callback(std::forward<Object>(cb)); }
 
 	uint16_t simple_read_immediate_16_m68307(offs_t address);
 
@@ -87,30 +87,30 @@ protected:
 	void mbus_interrupt();
 
 	DECLARE_WRITE_LINE_MEMBER(m68307_duart_irq_handler);
-	DECLARE_WRITE_LINE_MEMBER(m68307_duart_txa) { write_a_tx(state); }
-	DECLARE_WRITE_LINE_MEMBER(m68307_duart_txb) { write_b_tx(state);  }
-	DECLARE_READ8_MEMBER(m68307_duart_input_r) { return read_inport();  }
-	DECLARE_WRITE8_MEMBER(m68307_duart_output_w) { write_outport(data);  }
+	DECLARE_WRITE_LINE_MEMBER(m68307_duart_txa) { m_write_a_tx(state); }
+	DECLARE_WRITE_LINE_MEMBER(m68307_duart_txb) { m_write_b_tx(state);  }
+	DECLARE_READ8_MEMBER(m68307_duart_input_r) { return m_read_inport();  }
+	DECLARE_WRITE8_MEMBER(m68307_duart_output_w) { m_write_outport(data);  }
 
 	void init16_m68307(address_space &space);
 
 	int calc_cs(offs_t address) const;
 
-	devcb_write_line write_irq, write_a_tx, write_b_tx;
-	devcb_read8 read_inport;
-	devcb_write8 write_outport;
+	devcb_write_line m_write_irq, m_write_a_tx, m_write_b_tx;
+	devcb_read8 m_read_inport;
+	devcb_write8 m_write_outport;
 
 	/* 68307 peripheral modules */
-	m68307_sim*    m68307SIM;
-	m68307_mbus*   m68307MBUS;
-//  m68307_serial* m68307SERIAL;
-	m68307_timer*  m68307TIMER;
+	m68307_sim*    m_m68307SIM;
+	m68307_mbus*   m_m68307MBUS;
+//  m68307_serial* m_m68307SERIAL;
+	m68307_timer*  m_m68307TIMER;
 
-	uint16_t m68307_base;
-	uint16_t m68307_scrhigh;
-	uint16_t m68307_scrlow;
+	uint16_t m_m68307_base;
+	uint16_t m_m68307_scrhigh;
+	uint16_t m_m68307_scrlow;
 
-	int m68307_currentcs;
+	int m_m68307_currentcs;
 
 	porta_read_delegate  m_porta_r;
 	porta_write_delegate m_porta_w;

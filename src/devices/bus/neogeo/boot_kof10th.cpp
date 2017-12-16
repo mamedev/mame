@@ -102,7 +102,7 @@ WRITE16_MEMBER(neogeo_kof10th_cart_device::protection_w)
 		if (!m_cart_ram[0xffe])
 			COMBINE_DATA(&m_cart_ram2[(0x00000/2) + (offset & 0xffff)]);    // Write to RAM bank A
 		else
-			m_fixed[offset] = BITSWAP8(data, 7,6,0,4,3,2,1,5);  // Write S data on-the-fly
+			m_fixed[offset] = bitswap<8>(data, 7,6,0,4,3,2,1,5);  // Write S data on-the-fly
 	}
 	else if (offset >= 0xfe000/2)
 	{

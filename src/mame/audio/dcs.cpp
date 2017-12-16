@@ -245,9 +245,9 @@ enum
 #define DSIO_LED        ((m_dsio.reg[1] >> 13) & 1)
 #define DSIO_MUTE       ((m_dsio.reg[1] >> 14) & 1)
 
-#define DSIO_DM_PG      ((m_dsio.reg[2] >> 0) & 0x7ff)
+#define DSIO_DM_PG      ((m_dsio.reg[2] >> 0) & 0x1fff)
 
-#define DSIO_BANK_END   0x7ff
+#define DSIO_BANK_END   0x3ff
 
 /* these macros are used to reference the DENVER ASIC */
 #define DENV_DSP_SPEED  ((m_dsio.reg[1] >> 2) & 3)    /* read only: 1=33.33MHz */
@@ -256,9 +256,9 @@ enum
 #define DENV_LED        ((m_dsio.reg[1] >> 13) & 1)
 #define DENV_MUTE       ((m_dsio.reg[1] >> 14) & 1)
 
-#define DENV_DM_PG      ((m_dsio.reg[2] >> 0) & 0x7ff)
+#define DENV_DM_PG      ((m_dsio.reg[2] >> 0) & 0x1fff)
 
-#define DENV_BANK_END 0xfff
+#define DENV_BANK_END 0x3ff
 
 /*************************************
  *
@@ -394,7 +394,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( dsio_rambank_map, AS_PROGRAM, 16, dcs_audio_device )
 	AM_RANGE(0x0000, 0x1fff) AM_RAM
-	AM_RANGE(0x2000, 0x2000 + DSIO_BANK_END) AM_RAMBANK("databank")
+	AM_RANGE(0x2000, 0x3fff) AM_RAMBANK("databank")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( dsio_io_map, AS_IO, 16, dcs_audio_device )
@@ -430,7 +430,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(denver_rambank_map, AS_PROGRAM, 16, dcs_audio_device)
 	AM_RANGE(0x0000, 0x1fff) AM_RAM
-	AM_RANGE(0x2000, 0x2000 + DENV_BANK_END) AM_RAMBANK("databank")
+	AM_RANGE(0x2000, 0x3fff) AM_RAMBANK("databank")
 ADDRESS_MAP_END
 
 
@@ -456,8 +456,8 @@ void dcs_audio_device::dcs_boot()
 	switch (m_rev)
 	{
 		/* rev 1/1.5: use the last set data bank to boot from */
-		case 1:
-		case 15:
+		case REV_DCS1:
+		case REV_DCS1P5:
 		{
 			/* determine the base */
 			// max_banks = m_bootrom_words / 0x1000;
@@ -475,7 +475,7 @@ void dcs_audio_device::dcs_boot()
 		}
 
 		/* rev 2: use the ROM page in the SDRC to boot from */
-		case 2:
+		case REV_DCS2:
 		{
 			/* determine the base */
 			uint16_t* base;
@@ -502,8 +502,8 @@ void dcs_audio_device::dcs_boot()
 		}
 
 		/* rev 3/4: HALT the ADSP-2181 until program is downloaded via IDMA */
-		case 3:
-		case 4:
+		case REV_DSIO:
+		case REV_DENV:
 			m_cpu->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
 			m_dsio.start_on_next_write = 0;
 			break;
@@ -527,24 +527,24 @@ TIMER_CALLBACK_MEMBER( dcs_audio_device::dcs_reset )
 	switch (m_rev)
 	{
 		/* rev 1/1.5: just reset the bank to 0 */
-		case 1:
-		case 15:
+		case REV_DCS1:
+		case REV_DCS1P5:
 			m_sounddata_bank = 0;
 			m_data_bank->set_entry(0);
 			break;
 
 		/* rev 2: reset the SDRC ASIC */
-		case 2:
+		case REV_DCS2:
 			sdrc_reset();
 			break;
 
 		/* rev 3: reset the DSIO ASIC */
-		case 3:
+		case REV_DSIO:
 			dsio_reset();
 			break;
 
 		/* rev 4: reset the Denver ASIC */
-		case 4:
+		case REV_DENV:
 			denver_reset();
 			break;
 	}
@@ -641,10 +641,10 @@ void dcs_audio_device::dcs_register_state()
 	if (m_sram != nullptr)
 		save_pointer(NAME(m_sram), 0x8000*4 / sizeof(m_sram[0]));
 
-	if (m_rev == 2)
+	if (m_rev == REV_DCS2)
 		machine().save().register_postload(save_prepost_delegate(FUNC(dcs_audio_device::sdrc_remap_memory), this));
 
-	if (m_rev == 4)
+	if (m_rev == REV_DENV)
 		machine().save().register_postload(save_prepost_delegate(FUNC(dcs_audio_device::denver_postload), this));
 }
 
@@ -751,7 +751,7 @@ void dcs_audio_device::device_start()
 	m_bootrom_words = machine().root_device().memregion("dcs")->bytes() / 2;
 	m_sounddata = m_bootrom;
 	m_sounddata_words = m_bootrom_words;
-	if (m_rev == 1)
+	if (m_rev == REV_DCS1)
 	{
 		m_sounddata_banks = m_sounddata_words / 0x1000;
 		m_data_bank->configure_entries(0, m_sounddata_banks, m_sounddata, 0x1000*2);
@@ -797,18 +797,18 @@ void dcs2_audio_device::device_start()
 
 	/* find the DCS CPU and the sound ROMs */
 	m_cpu = subdevice<adsp21xx_device>("dcs2");
-	m_rev = 2;
+	m_rev = REV_DCS2;
 	soundbank_words = 0x1000;
 	if (m_cpu == nullptr)
 	{
 		m_cpu = subdevice<adsp21xx_device>("dsio");
-		m_rev = 3;
+		m_rev = REV_DSIO;
 		soundbank_words = DSIO_BANK_END + 1;
 	}
 	if (m_cpu == nullptr)
 	{
 		m_cpu = subdevice<adsp21xx_device>("denver");
-		m_rev = 4;
+		m_rev = REV_DENV;
 		soundbank_words = DENV_BANK_END + 1;
 	}
 	if (m_cpu != nullptr && !m_cpu->started())
@@ -841,11 +841,12 @@ void dcs2_audio_device::device_start()
 		m_sounddata_words = m_bootrom_words;
 	}
 	m_sounddata_banks = m_sounddata_words / soundbank_words;
-	if (m_rev != 2)
+	if (m_rev != REV_DCS2)
 	{
 		if (m_ram_map)
 			m_ram_map->set_bank(0);
 		m_data_bank->configure_entries(0, m_sounddata_banks, m_sounddata, soundbank_words * 2);
+		logerror("device_start: audio ram banks: %x size: %x\n", m_sounddata_banks, soundbank_words);
 	}
 
 
@@ -879,7 +880,7 @@ void dcs2_audio_device::device_start()
 void dcs_audio_device::install_speedup(void)
 {
 	if (m_polling_offset) {
-		if (m_rev < 3) {
+		if (m_rev < REV_DSIO) {
 			m_cpu->space(AS_DATA).install_readwrite_handler(m_polling_offset, m_polling_offset, read16_delegate(FUNC(dcs_audio_device::dcs_polling_r), this), write16_delegate(FUNC(dcs_audio_device::dcs_polling_w), this));
 		}
 		else {
@@ -920,7 +921,7 @@ WRITE16_MEMBER( dcs_audio_device::dcs_dataram_w )
 
 WRITE16_MEMBER( dcs_audio_device::dcs_data_bank_select_w )
 {
-	if (m_rev != 15)
+	if (m_rev != REV_DCS1P5)
 		m_sounddata_bank = data & 0x7ff;
 	else
 		m_sounddata_bank = (m_sounddata_bank & 0xff00) | (data & 0xff);
@@ -929,7 +930,7 @@ WRITE16_MEMBER( dcs_audio_device::dcs_data_bank_select_w )
 
 	/* bit 11 = sound board led */
 #if 0
-	if (m_rev != 15)
+	if (m_rev != REV_DCS1P5)
 		output().set_led_value(2, data & 0x800);
 #endif
 }
@@ -1268,7 +1269,7 @@ READ16_MEMBER( dcs_audio_device::denver_r )
 		// SDRC Revision
 		result = 0x0003;
 	}
-	if (LOG_DCS_IO) logerror("%04X: denver_r 0x%x = %04x\n", space.device().safe_pc(), offset, result);
+	if (LOG_DCS_IO) logerror("%04X: denver_r %s 0x%x = %04x\n", space.device().safe_pc(), denver_regname[offset], offset, result);
 	return result;
 }
 
@@ -1315,7 +1316,7 @@ WRITE16_MEMBER( dcs_audio_device::denver_w )
 				m_fifo_reset_w(1);
 			break;
 	}
-	if (LOG_DCS_IO) logerror("%04X: denver_w 0x%x = %04x\n", space.device().safe_pc(), offset, data);
+	if (LOG_DCS_IO) logerror("%04X: denver_w %s 0x%x = %04x\n", space.device().safe_pc(), denver_regname[offset], offset, data);
 }
 
 
@@ -1431,7 +1432,7 @@ int dcs_audio_device::control_r()
 	/* only boost for DCS2 boards */
 	if (!m_auto_ack && !m_transfer.hle_enabled)
 		machine().scheduler().boost_interleave(attotime::from_nsec(500), attotime::from_usec(5));
-	if ( /* m_rev == 1 || */ m_rev == 15) // == 1 check breaks mk3
+	if ( /* m_rev == REV_DSC1 || */ m_rev == REV_DCS1P5) // == 1 check breaks mk3
 		return IS_OUTPUT_FULL() ? 0x80 : 0x00;
 	return m_latch_control;
 }
@@ -1654,7 +1655,7 @@ int dcs_audio_device::data2_r()
 {
 	if (LOG_DCS_IO)
 		logerror("%08X dcs:data2_r = %04X\n", machine().device("maincpu")->safe_pc(), m_output_control);
-	if (m_rev >= 3) {
+	if (m_rev >= REV_DSIO) {
 		// Not sure about this but allows sf2049 and roadburn to pass audio initialization tests at boot
 		return m_output_control << 8;
 	}
@@ -1816,7 +1817,7 @@ READ16_MEMBER( dcs_audio_device::adsp_control_r )
 			break;
 
 		case IDMA_CONTROL_REG:
-			if (m_rev == 3 || m_rev == 4)
+			if (m_rev == REV_DSIO || m_rev == REV_DENV)
 				result = downcast<adsp2181_device *>(m_cpu)->idma_addr_r();
 			break;
 
@@ -1843,7 +1844,7 @@ WRITE16_MEMBER(dcs_audio_device:: adsp_control_w )
 	{
 		case SYSCONTROL_REG:
 			/* bit 9 forces a reset (not on 2181) */
-			if ((data & 0x0200) && !(m_rev == 3 || m_rev == 4))
+			if ((data & 0x0200) && !(m_rev == REV_DSIO || m_rev == REV_DENV))
 			{
 				logerror("%04X:Rebooting DCS due to SYSCONTROL write = %04X\n", space.device().safe_pc(), data);
 				m_cpu->set_input_line(INPUT_LINE_RESET, PULSE_LINE);
@@ -1915,7 +1916,7 @@ WRITE16_MEMBER(dcs_audio_device:: adsp_control_w )
 			break;
 
 		case IDMA_CONTROL_REG:
-			if (m_rev == 3 || m_rev == 4)
+			if (m_rev == REV_DSIO || m_rev == REV_DENV)
 				downcast<adsp2181_device *>(m_cpu)->idma_addr_w(data);
 			break;
 	}

@@ -306,7 +306,7 @@ WRITE8_MEMBER( ltd_state::port1_w )
 	if (m_port2 & 0x10)
 	{
 		uint8_t row = m_digit & 15;
-		uint8_t segment = BITSWAP8(data, 7, 0, 1, 2, 3, 4, 5, 6);
+		uint8_t segment = bitswap<8>(data, 7, 0, 1, 2, 3, 4, 5, 6);
 
 		switch (m_counter)
 		{

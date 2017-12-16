@@ -6914,12 +6914,12 @@ void pacman_state::eyes_decode(uint8_t *data)
 
 	for (j = 0; j < 8; j++)
 	{
-		swapbuffer[j] = data[BITSWAP16(j,15,14,13,12,11,10,9,8,7,6,5,4,3,0,1,2)];
+		swapbuffer[j] = data[bitswap<16>(j,15,14,13,12,11,10,9,8,7,6,5,4,3,0,1,2)];
 	}
 
 	for (j = 0; j < 8; j++)
 	{
-		data[j] = BITSWAP8(swapbuffer[j],7,4,5,6,3,2,1,0);
+		data[j] = bitswap<8>(swapbuffer[j],7,4,5,6,3,2,1,0);
 	}
 }
 
@@ -6934,7 +6934,7 @@ DRIVER_INIT_MEMBER(pacman_state,eyes)
 	RAM = memregion("maincpu")->base();
 	for (i = 0; i < 0x4000; i++)
 	{
-		RAM[i] = BITSWAP8(RAM[i],7,6,3,4,5,2,1,0);
+		RAM[i] = bitswap<8>(RAM[i],7,6,3,4,5,2,1,0);
 	}
 
 
@@ -6949,10 +6949,10 @@ DRIVER_INIT_MEMBER(pacman_state,eyes)
 
 
 #define BITSWAP12(val,B11,B10,B9,B8,B7,B6,B5,B4,B3,B2,B1,B0) \
-	BITSWAP16(val,15,14,13,12,B11,B10,B9,B8,B7,B6,B5,B4,B3,B2,B1,B0)
+	bitswap<16>(val,15,14,13,12,B11,B10,B9,B8,B7,B6,B5,B4,B3,B2,B1,B0)
 
 #define BITSWAP11(val,B10,B9,B8,B7,B6,B5,B4,B3,B2,B1,B0) \
-	BITSWAP16(val,15,14,13,12,11,B10,B9,B8,B7,B6,B5,B4,B3,B2,B1,B0)
+	bitswap<16>(val,15,14,13,12,11,B10,B9,B8,B7,B6,B5,B4,B3,B2,B1,B0)
 
 void pacman_state::mspacman_install_patches(uint8_t *ROM)
 {
@@ -7025,13 +7025,13 @@ DRIVER_INIT_MEMBER(pacman_state,mspacman)
 		DROM[0x0000+i] = ROM[0x0000+i]; /* pacman.6e */
 		DROM[0x1000+i] = ROM[0x1000+i]; /* pacman.6f */
 		DROM[0x2000+i] = ROM[0x2000+i]; /* pacman.6h */
-		DROM[0x3000+i] = BITSWAP8(ROM[0xb000+BITSWAP12(i,11,3,7,9,10,8,6,5,4,2,1,0)],0,4,5,7,6,3,2,1);  /* decrypt u7 */
+		DROM[0x3000+i] = bitswap<8>(ROM[0xb000+BITSWAP12(i,11,3,7,9,10,8,6,5,4,2,1,0)],0,4,5,7,6,3,2,1);  /* decrypt u7 */
 	}
 	for (i = 0; i < 0x800; i++)
 	{
-		DROM[0x8000+i] = BITSWAP8(ROM[0x8000+BITSWAP11(i,   8,7,5,9,10,6,3,4,2,1,0)],0,4,5,7,6,3,2,1);  /* decrypt u5 */
-		DROM[0x8800+i] = BITSWAP8(ROM[0x9800+BITSWAP12(i,11,3,7,9,10,8,6,5,4,2,1,0)],0,4,5,7,6,3,2,1);  /* decrypt half of u6 */
-		DROM[0x9000+i] = BITSWAP8(ROM[0x9000+BITSWAP12(i,11,3,7,9,10,8,6,5,4,2,1,0)],0,4,5,7,6,3,2,1);  /* decrypt half of u6 */
+		DROM[0x8000+i] = bitswap<8>(ROM[0x8000+BITSWAP11(i,   8,7,5,9,10,6,3,4,2,1,0)],0,4,5,7,6,3,2,1);  /* decrypt u5 */
+		DROM[0x8800+i] = bitswap<8>(ROM[0x9800+BITSWAP12(i,11,3,7,9,10,8,6,5,4,2,1,0)],0,4,5,7,6,3,2,1);  /* decrypt half of u6 */
+		DROM[0x9000+i] = bitswap<8>(ROM[0x9000+BITSWAP12(i,11,3,7,9,10,8,6,5,4,2,1,0)],0,4,5,7,6,3,2,1);  /* decrypt half of u6 */
 		DROM[0x9800+i] = ROM[0x1800+i];     /* mirror of pacman.6f high */
 	}
 	for (i = 0; i < 0x1000; i++)
@@ -7102,7 +7102,7 @@ DRIVER_INIT_MEMBER(pacman_state,8bpm)
 	/* Data lines D0 and D6 swapped */
 	for( i = 0; i < 0x8000; i++ )
 	{
-		ROM[i] = BITSWAP8(ROM[i],7,0,5,4,3,2,1,6);
+		ROM[i] = bitswap<8>(ROM[i],7,0,5,4,3,2,1,6);
 	}
 
 	membank("bank1")->set_base(&ROM[0 * 0x2000]);
@@ -7119,7 +7119,7 @@ DRIVER_INIT_MEMBER(pacman_state,porky)
 	/* Data lines D0 and D4 swapped */
 	for(i = 0; i < 0x10000; i++)
 	{
-		ROM[i] = BITSWAP8(ROM[i],7,6,5,0,3,2,1,4);
+		ROM[i] = bitswap<8>(ROM[i],7,6,5,0,3,2,1,4);
 	}
 
 	membank("bank1")->configure_entries(0, 2, &ROM[0 * 0x2000], 0x8000);
@@ -7185,7 +7185,7 @@ DRIVER_INIT_MEMBER(pacman_state,superabc)
 
 	// descramble gfx
 	for (int i = 0; i < 0x10000; i++)
-		dest[i] = src[BITSWAP24(i,23,22,21,20,19,18,17, 12,13,14,16,15, 11,10,9,8,7,6,5,4,3,2,1,0)];
+		dest[i] = src[bitswap<24>(i,23,22,21,20,19,18,17, 12,13,14,16,15, 11,10,9,8,7,6,5,4,3,2,1,0)];
 }
 
 READ8_MEMBER(pacman_state::cannonbp_protection_r)
@@ -7324,7 +7324,7 @@ GAME( 1981, crush5,   crush,    crush4,   crush4,   pacman_state,  0,        ROT
 GAME( 1981, maketrax, crush,    maketrax, maketrax, pacman_state,  maketrax, ROT270, "Alpha Denshi Co. / Kural (Williams license)", "Make Trax (US set 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1981, maketrxb, crush,    maketrax, maketrax, pacman_state,  maketrax, ROT270, "Alpha Denshi Co. / Kural (Williams license)", "Make Trax (US set 2)", MACHINE_SUPPORTS_SAVE )
 GAME( 1981, korosuke, crush,    maketrax, korosuke, pacman_state,  korosuke, ROT90,  "Alpha Denshi Co. / Kural Electric, Ltd.", "Korosuke Roller (Japan)", MACHINE_SUPPORTS_SAVE ) // ADK considers it a sequel?
-GAME( 1981, crushrlf, crush,    pacman,   maketrax, pacman_state,  0,        ROT90,  "bootleg", "Crush Roller (Famaresa PCB)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, crushrlf, crush,    pacman,   maketrax, pacman_state,  0,        ROT90,  "bootleg", "Crush Roller (Famare SA PCB)", MACHINE_SUPPORTS_SAVE )
 GAME( 1981, crushbl,  crush,    pacman,   maketrax, pacman_state,  0,        ROT90,  "bootleg", "Crush Roller (bootleg set 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1981, crushbl2, crush,    maketrax, mbrush,   pacman_state,  maketrax, ROT90,  "bootleg", "Crush Roller (bootleg set 2)", MACHINE_SUPPORTS_SAVE )
 GAME( 1981, crushbl3, crush,    maketrax, mbrush,   pacman_state,  maketrax, ROT90,  "bootleg", "Crush Roller (bootleg set 3)", MACHINE_SUPPORTS_SAVE )

@@ -922,16 +922,16 @@ DRIVER_INIT_MEMBER(notetaker_state,notetakr)
 	uint16_t *temppointer;
 	uint16_t wordtemp;
 	uint16_t addrtemp;
-		// leave the src pointer alone, since we've only used a 0x1000 long address space
-		romdst += 0x7f800; // set the dest pointer to 0xff000 (>>1 because 16 bits data)
-		for (int i = 0; i < 0x800; i++)
-		{
-			wordtemp = BITSWAP16(*romsrc, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15); // data bus is completely reversed
-			addrtemp = BITSWAP16(i, 11, 12, 13, 14, 15, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10); // address bus is completely reversed; 11-15 should always be zero
-			temppointer = romdst+(addrtemp&0x7FF);
-			*temppointer = wordtemp;
-			romsrc++;
-		}
+	// leave the src pointer alone, since we've only used a 0x1000 long address space
+	romdst += 0x7f800; // set the dest pointer to 0xff000 (>>1 because 16 bits data)
+	for (int i = 0; i < 0x800; i++)
+	{
+		wordtemp = bitswap<16>(*romsrc, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15); // data bus is completely reversed
+		addrtemp = bitswap<11>(i, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10); // address bus is completely reversed; 11-15 should always be zero
+		temppointer = romdst+(addrtemp&0x7FF);
+		*temppointer = wordtemp;
+		romsrc++;
+	}
 }
 
 /* ROM definition */

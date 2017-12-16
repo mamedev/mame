@@ -1056,9 +1056,9 @@ unsigned short scsp_device::r16(address_space &space, unsigned int addr)
 			*/
 			logerror("SCSP: Reading from EXTS register %08x\n",addr);
 			if(addr == 0xee0)
-				v = space.machine().device<cdda_device>("cdda")->get_channel_volume(0);
+				v = machine().device<cdda_device>("cdda")->get_channel_volume(0);
 			if(addr == 0xee2)
-				v = space.machine().device<cdda_device>("cdda")->get_channel_volume(1);
+				v = machine().device<cdda_device>("cdda")->get_channel_volume(1);
 		}
 	}
 	return v;
@@ -1376,7 +1376,7 @@ void scsp_device::exec_dma(address_space &space)
 	if(m_udata.data[0x1e/2] & 0x10)
 	{
 		popmessage("SCSP DMA IRQ triggered, contact MAMEdev");
-		space.machine().device("audiocpu")->execute().set_input_line(DecodeSCI(SCIDMA),HOLD_LINE);
+		machine().device("audiocpu")->execute().set_input_line(DecodeSCI(SCIDMA),HOLD_LINE);
 	}
 }
 

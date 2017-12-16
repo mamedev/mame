@@ -1392,7 +1392,7 @@ DRIVER_INIT_MEMBER(ampoker2_state, rabbitpk)
 
 	for (i = start; i < size; i++)
 	{
-		rom[i] = BITSWAP8(rom[i], 1, 2, 5, 4, 3, 0, 7, 6) ^ dec_base[(i >> 2) & 0x1f];
+		rom[i] = bitswap<8>(rom[i], 1, 2, 5, 4, 3, 0, 7, 6) ^ dec_base[(i >> 2) & 0x1f];
 	}
 }
 

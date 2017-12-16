@@ -1108,7 +1108,17 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( inyourfa )
 	PORT_INCLUDE( megasys1_generic )
+	
+	PORT_MODIFY("P1")
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_NAME("P1 Pass / Change Player (defense)")
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1) PORT_NAME("P1 Shoot / Steal")
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1) PORT_NAME("P1 Pass Target change (offense)")
 
+	PORT_MODIFY("P2")
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2) PORT_NAME("P2 Pass / Change Player (defense)")
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2) PORT_NAME("P2 Shoot / Steal")
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2) PORT_NAME("P2 Pass Target change (offense)")
+	
 	PORT_START("DSW")
 	PORT_DIPNAME(           0x0003, 0x0003, "Game Time" ) PORT_DIPLOCATION("SW1:1,2")
 	PORT_DIPSETTING(                0x0002, "00:50" )
@@ -3076,7 +3086,7 @@ ROM_START( inyourfa )
 	ROM_LOAD( "08.27C1001",  0x020000, 0x020000, CRC(cadd4731) SHA1(1c4e7ea7064b9c6b2dfdf01fd64f37de6d50bdfa) ) // 11xxxxxxxxxxxxxxx = 0xFF
 
 	ROM_REGION( 0x0200, "proms", 0 )        /* Priority PROM */
-	ROM_LOAD( "kazan.14m",    0x0000, 0x0200, BAD_DUMP CRC(85b30ac4) SHA1(b03f577ceb0f26b67453ffa52ef61fea76a93184) ) // wasn't dumped, this is wrong, might need to be handcrafted
+	ROM_LOAD( "prom.14m",    0x0000,   0x0200, BAD_DUMP CRC(1341ba02) SHA1(edff62979d0376ac01b8da0aca46df087d6e4051) ) // wasn't dumped, this one has been handcrafted
 ROM_END
 
 /***************************************************************************
@@ -4329,7 +4339,7 @@ void megasys1_state::jitsupro_gfx_unmangle(const char *region)
 
 	/* data lines swap: 76543210 -> 43576210 */
 	for (i = 0;i < size;i++)
-		rom[i] =   BITSWAP8(rom[i],0x4,0x3,0x5,0x7,0x6,0x2,0x1,0x0);
+		rom[i] =   bitswap<8>(rom[i],0x4,0x3,0x5,0x7,0x6,0x2,0x1,0x0);
 
 	std::vector<uint8_t> buffer(size);
 
@@ -4339,7 +4349,7 @@ void megasys1_state::jitsupro_gfx_unmangle(const char *region)
 	for (i = 0;i < size;i++)
 	{
 		int a = (i & ~0xffff) |
-	BITSWAP16(i,0xf,0xe,0x8,0xc,0xb,0x3,0x9,0xd,0x7,0x6,0x5,0x4,0xa,0x2,0x1,0x0);
+	bitswap<16>(i,0xf,0xe,0x8,0xc,0xb,0x3,0x9,0xd,0x7,0x6,0x5,0x4,0xa,0x2,0x1,0x0);
 
 		rom[i] = buffer[a];
 	}
@@ -4353,7 +4363,7 @@ void megasys1_state::stdragona_gfx_unmangle(const char *region)
 
 	/* data lines swap: 76543210 -> 37564210 */
 	for (i = 0;i < size;i++)
-		rom[i] =   BITSWAP8(rom[i],3,7,5,6,4,2,1,0);
+		rom[i] =   bitswap<8>(rom[i],3,7,5,6,4,2,1,0);
 
 	std::vector<uint8_t> buffer(size);
 
@@ -4363,7 +4373,7 @@ void megasys1_state::stdragona_gfx_unmangle(const char *region)
 	for (i = 0;i < size;i++)
 	{
 		int a = (i & ~0xffff) |
-	BITSWAP16(i,0xf,0xe,0x3,0xc,0xb,0xd,0x9,0xa,0x7,0x6,0x5,0x4,0x8,0x2,0x1,0x0);
+	bitswap<16>(i,0xf,0xe,0x3,0xc,0xb,0xd,0x9,0xa,0x7,0x6,0x5,0x4,0x8,0x2,0x1,0x0);
 
 		rom[i] = buffer[a];
 	}
@@ -4823,7 +4833,7 @@ GAME( 1990, rittam,   rodland,  system_A,          rodland,  megasys1_state, rit
 GAME( 1990, rodlandjb,rodland,  system_A,          rodland,  megasys1_state, rodlandjb,ROT0,   "bootleg","Rod-Land (Japan bootleg)", MACHINE_SUPPORTS_SAVE )
 GAME( 1990, phantasm, avspirit, system_A,          phantasm, megasys1_state, phantasm, ROT0,   "Jaleco", "Phantasm (Japan)", MACHINE_SUPPORTS_SAVE )
 GAME( 1991, edfp,     edf,      system_A,          edfp,     megasys1_state, edfp,     ROT0,   "Jaleco", "E.D.F. : Earth Defense Force (Japan, prototype)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, inyourfa, 0,        system_A,          inyourfa, megasys1_state, iganinju, ROT0,   "Jaleco", "In Your Face (World, prototype)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // priorities aren't correct
+GAME( 1991, inyourfa, 0,        system_A,          inyourfa, megasys1_state, iganinju, ROT0,   "Jaleco", "In Your Face (US, prototype)", MACHINE_SUPPORTS_SAVE )
 GAME( 1992, soldam,   0,        system_A_soldam,   soldam,   megasys1_state, soldam,   ROT0,   "Jaleco", "Soldam", MACHINE_SUPPORTS_SAVE )
 GAME( 1992, soldamj,  soldam,   system_A_soldam,   soldam,   megasys1_state, soldamj,  ROT0,   "Jaleco", "Soldam (Japan)", MACHINE_SUPPORTS_SAVE )
 

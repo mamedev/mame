@@ -325,7 +325,7 @@ WRITE8_MEMBER(pve500_state::io_sel_w)
 	io_SEL = data;
 	for (int i=0; i<4; i++){
 		if (BIT(io_SEL, i)){
-			LD_data[i] = 0x7F & BITSWAP8(io_LD ^ 0xFF, 7, 0, 1, 2, 3, 4, 5, 6);
+			LD_data[i] = 0x7F & bitswap<8>(io_LD ^ 0xFF, 7, 0, 1, 2, 3, 4, 5, 6);
 		}
 	}
 }

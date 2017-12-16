@@ -170,7 +170,7 @@ WRITE8_MEMBER( h8_state::portf1_w )
 	//d1 segment a
 	//d0 segment g
 
-	m_segment = 0xff ^ BITSWAP8(data, 7, 0, 6, 5, 4, 3, 2, 1);
+	m_segment = 0xff ^ bitswap<8>(data, 7, 0, 6, 5, 4, 3, 2, 1);
 	if (m_digit) output().set_digit_value(m_digit, m_segment);
 }
 

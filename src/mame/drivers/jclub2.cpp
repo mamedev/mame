@@ -1499,7 +1499,7 @@ DRIVER_INIT_MEMBER(darkhors_state,darkhors)
 		std::vector<uint8_t> temp(len);
 
 		for (int i = 0; i < len; i++)
-			temp[i] = eeprom[BITSWAP8(i,7,5,4,3,2,1,0,6)];
+			temp[i] = eeprom[bitswap<8>(i,7,5,4,3,2,1,0,6)];
 
 		memcpy(eeprom, &temp[0], len);
 	}

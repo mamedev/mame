@@ -72,7 +72,7 @@ public:
 
 WRITE8_MEMBER( sc1_state::pio_port_a_w )
 {
-	uint8_t digit = BITSWAP8( data,3,4,6,0,1,2,7,5 );
+	uint8_t digit = bitswap<8>( data,3,4,6,0,1,2,7,5 );
 
 	if (m_matrix & 0x04)
 		output().set_digit_value(3, digit & 0x7f);

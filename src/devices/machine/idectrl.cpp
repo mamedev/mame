@@ -36,7 +36,7 @@ ide_controller_device::ide_controller_device(const machine_config &mconfig, devi
 {
 }
 
-READ16_MEMBER( ide_controller_device::read_cs0 )
+u16 ide_controller_device::read16_cs0(offs_t offset, u16 mem_mask)
 {
 	if (mem_mask == 0xffff && offset == 1)
 	{
@@ -45,48 +45,48 @@ READ16_MEMBER( ide_controller_device::read_cs0 )
 	}
 	if (mem_mask == 0xff00)
 	{
-		return ata_interface_device::read_cs0(space, (offset * 2) + 1, 0xff) << 8;
+		return ata_interface_device::read16_cs0((offset * 2) + 1, 0xff) << 8;
 	}
 	else
 	{
-		return ata_interface_device::read_cs0(space, offset * 2, mem_mask);
+		return ata_interface_device::read16_cs0(offset * 2, mem_mask);
 	}
 }
 
-READ16_MEMBER( ide_controller_device::read_cs1 )
+u16 ide_controller_device::read16_cs1(offs_t offset, u16 mem_mask)
 {
 	if (mem_mask == 0xff00)
 	{
-		return ata_interface_device::read_cs1(space, (offset * 2) + 1, 0xff) << 8;
+		return ata_interface_device::read16_cs1((offset * 2) + 1, 0xff) << 8;
 	}
 	else
 	{
-		return ata_interface_device::read_cs1(space, offset * 2, mem_mask);
+		return ata_interface_device::read16_cs1(offset * 2, mem_mask);
 	}
 }
 
-WRITE16_MEMBER( ide_controller_device::write_cs0 )
+void ide_controller_device::write16_cs0(offs_t offset, u16 data, u16 mem_mask)
 {
 	if (mem_mask == 0xffff && offset == 1 ){ offset = 0; popmessage( "requires ide_controller_32_device" ); }
 	if (mem_mask == 0xff00)
 	{
-		return ata_interface_device::write_cs0(space, (offset * 2) + 1, data >> 8, 0xff);
+		return ata_interface_device::write16_cs0((offset * 2) + 1, data >> 8, 0xff);
 	}
 	else
 	{
-		return ata_interface_device::write_cs0(space, offset * 2, data, mem_mask);
+		return ata_interface_device::write16_cs0(offset * 2, data, mem_mask);
 	}
 }
 
-WRITE16_MEMBER( ide_controller_device::write_cs1 )
+void ide_controller_device::write16_cs1(offs_t offset, u16 data, u16 mem_mask)
 {
 	if (mem_mask == 0xff00)
 	{
-		return ata_interface_device::write_cs1(space, (offset * 2) + 1, data >> 8, 0xff);
+		return ata_interface_device::write16_cs1((offset * 2) + 1, data >> 8, 0xff);
 	}
 	else
 	{
-		return ata_interface_device::write_cs1(space, offset * 2, data, mem_mask);
+		return ata_interface_device::write16_cs1(offset * 2, data, mem_mask);
 	}
 }
 
@@ -103,65 +103,85 @@ ide_controller_32_device::ide_controller_32_device(const machine_config &mconfig
 {
 }
 
-READ32_MEMBER(ide_controller_32_device::read_cs0)
+READ32_MEMBER(ide_controller_32_device::read32_cs0)
+{
+	return read32_cs0(offset, mem_mask);
+}
+
+u32 ide_controller_32_device::read32_cs0(offs_t offset, u32 mem_mask)
 {
 	uint32_t data = 0;
 
 	if (ACCESSING_BITS_0_15)
 	{
-		data = ide_controller_device::read_cs0(space, (offset * 2), mem_mask);
+		data = ide_controller_device::read16_cs0((offset * 2), mem_mask);
 
 		if (offset == 0 && ACCESSING_BITS_16_31)
-			data |= ide_controller_device::read_cs0(space, (offset * 2), mem_mask >> 16) << 16;
+			data |= ide_controller_device::read16_cs0((offset * 2), mem_mask >> 16) << 16;
 	}
 	else if (ACCESSING_BITS_16_31)
 	{
-		data = ide_controller_device::read_cs0(space, (offset * 2) + 1, mem_mask >> 16) << 16;
+		data = ide_controller_device::read16_cs0((offset * 2) + 1, mem_mask >> 16) << 16;
 	}
 
 	return data;
 }
 
-READ32_MEMBER(ide_controller_32_device::read_cs1)
+READ32_MEMBER(ide_controller_32_device::read32_cs1)
+{
+	return read32_cs1(offset, mem_mask);
+}
+
+u32 ide_controller_32_device::read32_cs1(offs_t offset, u32 mem_mask)
 {
 	uint32_t data = 0;
 
 	if (ACCESSING_BITS_0_15)
 	{
-		data = ide_controller_device::read_cs1(space, (offset * 2), mem_mask);
+		data = ide_controller_device::read16_cs1((offset * 2), mem_mask);
 	}
 	else if (ACCESSING_BITS_16_23)
 	{
-		data = ide_controller_device::read_cs1(space, (offset * 2) + 1, mem_mask >> 16) << 16;
+		data = ide_controller_device::read16_cs1((offset * 2) + 1, mem_mask >> 16) << 16;
 	}
 
 	return data;
 }
 
-WRITE32_MEMBER(ide_controller_32_device::write_cs0)
+WRITE32_MEMBER(ide_controller_32_device::write32_cs0)
+{
+	write32_cs0(offset, data, mem_mask);
+}
+
+void ide_controller_32_device::write32_cs0(offs_t offset, u32 data, u32 mem_mask)
 {
 	if (ACCESSING_BITS_0_15)
 	{
-		ide_controller_device::write_cs0(space, (offset * 2), data, mem_mask);
+		ide_controller_device::write16_cs0((offset * 2), data, mem_mask);
 
 		if (offset == 0 && ACCESSING_BITS_16_31)
-			ata_interface_device::write_cs0(space, (offset * 2), data >> 16, mem_mask >> 16);
+			ata_interface_device::write16_cs0((offset * 2), data >> 16, mem_mask >> 16);
 	}
 	else if (ACCESSING_BITS_16_31)
 	{
-		ide_controller_device::write_cs0(space, (offset * 2) + 1, data >> 16, mem_mask >> 16);
+		ide_controller_device::write16_cs0((offset * 2) + 1, data >> 16, mem_mask >> 16);
 	}
 }
 
-WRITE32_MEMBER(ide_controller_32_device::write_cs1)
+WRITE32_MEMBER(ide_controller_32_device::write32_cs1)
+{
+	write32_cs1(offset, data, mem_mask);
+}
+
+void ide_controller_32_device::write32_cs1(offs_t offset, u32 data, u32 mem_mask)
 {
 	if (ACCESSING_BITS_0_15)
 	{
-		ide_controller_device::write_cs1(space, (offset * 2), data, mem_mask);
+		ide_controller_device::write16_cs1((offset * 2), data, mem_mask);
 	}
 	else if (ACCESSING_BITS_16_31)
 	{
-		ide_controller_device::write_cs1(space, (offset * 2) + 1, data >> 16, mem_mask >> 16);
+		ide_controller_device::write16_cs1((offset * 2) + 1, data >> 16, mem_mask >> 16);
 	}
 }
 

@@ -76,7 +76,7 @@ uint32_t multi16_state::screen_update_multi16(screen_device &screen, bitmap_ind1
 		{
 			for(xi=0;xi<16;xi++)
 			{
-				int dot = (BITSWAP16(m_p_vram[count],7,6,5,4,3,2,1,0,15,14,13,12,11,10,9,8) >> (15-xi)) & 0x1;
+				int dot = (bitswap<16>(m_p_vram[count],7,6,5,4,3,2,1,0,15,14,13,12,11,10,9,8) >> (15-xi)) & 0x1;
 
 				if(screen.visible_area().contains(x*16+xi, y))
 					bitmap.pix16(y, x*16+xi) = m_palette->pen(dot);

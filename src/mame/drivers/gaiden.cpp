@@ -1621,7 +1621,7 @@ void gaiden_state::descramble_drgnbowl(int descramble_cpu)
 		memcpy(&buffer[0], ROM, size);
 		for( i = 0; i < size; i++ )
 		{
-			ROM[i] = buffer[BITSWAP24(i,23,22,21,20,
+			ROM[i] = buffer[bitswap<24>(i,23,22,21,20,
 										19,18,17,15,
 								16,14,13,12,
 								11,10, 9, 8,
@@ -1638,7 +1638,7 @@ void gaiden_state::descramble_drgnbowl(int descramble_cpu)
 		memcpy(&buffer[0],ROM,size);
 		for( i = 0; i < size; i++ )
 		{
-			ROM[i] = buffer[BITSWAP24(i,23,22,21,20,
+			ROM[i] = buffer[bitswap<24>(i,23,22,21,20,
 										19,18,16,17,
 										15,14,13, 4,
 											3,12,11,10,
@@ -1672,7 +1672,7 @@ void gaiden_state::descramble_mastninj_gfx(uint8_t* src)
 		int i;
 		for (i = 0;i < len; i++)
 		{
-			buffer[i] = src[BITSWAP24(i,
+			buffer[i] = src[bitswap<24>(i,
 			23,22,21,20,
 			19,18,17,16,
 			15,5,14,13,12,
@@ -1688,7 +1688,7 @@ void gaiden_state::descramble_mastninj_gfx(uint8_t* src)
 		int i;
 		for (i = 0; i < len; i++)
 		{
-			buffer[i] = src[BITSWAP24(i,
+			buffer[i] = src[bitswap<24>(i,
 			23,22,21,20,
 			19,18,17,16,
 			15,6,14,13,12,

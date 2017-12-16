@@ -299,7 +299,7 @@ READ8_MEMBER(gladiatr_state::cctl_p2_r)
 
 READ8_MEMBER(gladiatr_state::ucpu_p2_r)
 {
-	return BITSWAP8(m_dsw1->read(), 0,1,2,3,4,5,6,7);
+	return bitswap<8>(m_dsw1->read(), 0,1,2,3,4,5,6,7);
 }
 
 WRITE8_MEMBER(gladiatr_state::ccpu_p2_w)
@@ -356,7 +356,7 @@ WRITE8_MEMBER(gladiatr_state::csnd_p1_w)
 
 READ8_MEMBER(gladiatr_state::csnd_p2_r)
 {
-	return BITSWAP8(m_dsw2->read(), 2,3,4,5,6,7,1,0);
+	return bitswap<8>(m_dsw2->read(), 2,3,4,5,6,7,1,0);
 }
 
 

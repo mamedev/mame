@@ -490,7 +490,7 @@ WRITE8_MEMBER( snes_state::snes_w_io )
 	{
 //      printf("816: %02x to APU @ %d (PC=%06x)\n", data, offset & 3,space.device().safe_pc());
 		m_spc700->spc_port_in(space, offset & 0x3, data);
-		space.machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(20));
+		machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(20));
 		return;
 	}
 

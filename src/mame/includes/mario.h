@@ -137,6 +137,7 @@ public:
 	DECLARE_READ8_MEMBER(memory_read_byte);
 	DECLARE_WRITE8_MEMBER(memory_write_byte);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void set_ea(int ea);
 };
 
 /*----------- defined in audio/mario.c -----------*/

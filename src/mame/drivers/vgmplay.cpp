@@ -28,6 +28,7 @@
 #include "sound/ym2413.h"
 #include "sound/ymf271.h"
 #include "sound/ymz280b.h"
+#include "sound/2608intf.h"
 
 #include "debugger.h"
 #include "speaker.h"
@@ -75,7 +76,8 @@ public:
 		A_POKEYA     = 0x00013020,
 		A_POKEYB     = 0x00013030,
 		A_YMF271     = 0x00013040,
-		A_YMZ280B    = 0x00013050
+		A_YMZ280B    = 0x00013050,
+		A_YM2608     = 0x00013060
 	};
 
 	enum io16_t
@@ -187,6 +189,7 @@ private:
 	required_device<okim6295_device> m_okim6295;
 	required_device<ymf271_device> m_ymf271;
 	required_device<ymz280b_device> m_ymz280b;
+	required_device<ym2608_device> m_ym2608;
 
 	uint32_t m_multipcma_bank_l;
 	uint32_t m_multipcma_bank_r;
@@ -353,6 +356,13 @@ void vgmplay_device::execute_run()
 				m_pc += 3;
 				break;
 
+			case 0x56:
+			case 0x57:
+				m_io->write_byte(A_YM2608+0+((code & 1) << 1), m_file->read_byte(m_pc+1));
+				m_io->write_byte(A_YM2608+1+((code & 1) << 1), m_file->read_byte(m_pc+2));
+				m_pc += 3;
+				break;
+			
 			case 0xA5:
 				m_io->write_byte(A_YM2203B+0, m_file->read_byte(m_pc+1));
 				m_io->write_byte(A_YM2203B+1, m_file->read_byte(m_pc+2));
@@ -969,6 +979,7 @@ vgmplay_state::vgmplay_state(const machine_config &mconfig, device_type type, co
 	, m_okim6295(*this, "okim6295")
 	, m_ymf271(*this, "ymf271")
 	, m_ymz280b(*this, "ymz280b")
+	, m_ym2608(*this, "ym2608")
 {
 }
 
@@ -1082,7 +1093,7 @@ void vgmplay_state::machine_start()
 				}
 			}
 			if(version >= 0x151 && r32(0x48))
-				logerror("Warning: file requests an unsupported YM2608\n");
+				m_ym2608->set_unscaled_clock(r32(0x48));
 			if(version >= 0x151 && r32(0x4c))
 				logerror("Warning: file requests an unsupported %s\n", r32(0x4c) & 0x80000000 ? "YM2610B" : "YM2610");
 			if(version >= 0x151 && r32(0x50)) {
@@ -1297,6 +1308,7 @@ static ADDRESS_MAP_START( soundchips_map, AS_IO, 8, vgmplay_state )
 	AM_RANGE(vgmplay_device::A_POKEYB,       vgmplay_device::A_POKEYB+0xf)    AM_DEVWRITE    ("pokeyb",        pokey_device, write)
 	AM_RANGE(vgmplay_device::A_YMF271,       vgmplay_device::A_YMF271+0xf)    AM_DEVWRITE    ("ymf271",        ymf271_device, write)
 	AM_RANGE(vgmplay_device::A_YMZ280B,      vgmplay_device::A_YMZ280B+0x1)   AM_DEVWRITE    ("ymz280b",       ymz280b_device, write)
+	AM_RANGE(vgmplay_device::A_YM2608,       vgmplay_device::A_YM2608+0x3)    AM_DEVWRITE    ("ym2608",        ym2608_device, write)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( segapcm_map, 0, 8, vgmplay_state )
@@ -1457,9 +1469,16 @@ static MACHINE_CONFIG_START( vgmplay )
 	MCFG_YMZ280B_EXT_READ_HANDLER(DEVREAD8("vgmplay", vgmplay_device, ymz280b_rom_r))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1)
+	
+	MCFG_SOUND_ADD("ym2608", YM2608, 8000000)
+	MCFG_SOUND_ROUTE(0, "lspeaker",  0.25)
+	MCFG_SOUND_ROUTE(0, "rspeaker", 0.25)
+	MCFG_SOUND_ROUTE(1, "lspeaker",  0.50)
+	MCFG_SOUND_ROUTE(2, "rspeaker", 0.50)
 MACHINE_CONFIG_END
 
 ROM_START( vgmplay )
+	ROM_REGION( 0x80000, "ym2608", ROMREGION_ERASE00 )
 ROM_END
 
 CONS( 2016, vgmplay, 0, 0, vgmplay, vgmplay, vgmplay_state, 0, "MAME", "VGM player", 0 )

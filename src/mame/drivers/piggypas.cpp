@@ -59,7 +59,7 @@ WRITE8_MEMBER(piggypas_state::ctrl_w)
 WRITE8_MEMBER(piggypas_state::mcs51_tx_callback)
 {
 	// Serial output driver is UCN5833A
-	output().set_digit_value(m_digit_idx++, BITSWAP8(data,7,6,4,3,2,1,0,5) & 0x7f);
+	output().set_digit_value(m_digit_idx++, bitswap<8>(data,7,6,4,3,2,1,0,5) & 0x7f);
 }
 
 static ADDRESS_MAP_START( piggypas_map, AS_PROGRAM, 8, piggypas_state )

@@ -1077,7 +1077,7 @@ int atari_slapstic_device::slapstic_tweak(address_space &space, offs_t offset)
 
 	/* log this access */
 	if (LOG_SLAPSTIC)
-		slapstic_log(space.machine(), offset);
+		slapstic_log(machine(), offset);
 
 	/* return the active bank */
 	return current_bank;

@@ -387,10 +387,10 @@ WRITE16_MEMBER( taitox_state::cchip1_ram_w )
 	{
 		m_cc_port = data;
 
-		space.machine().bookkeeping().coin_lockout_w(1, data & 0x08);
-		space.machine().bookkeeping().coin_lockout_w(0, data & 0x04);
-		space.machine().bookkeeping().coin_counter_w(1, data & 0x02);
-		space.machine().bookkeeping().coin_counter_w(0, data & 0x01);
+		machine().bookkeeping().coin_lockout_w(1, data & 0x08);
+		machine().bookkeeping().coin_lockout_w(0, data & 0x04);
+		machine().bookkeeping().coin_counter_w(1, data & 0x02);
+		machine().bookkeeping().coin_counter_w(0, data & 0x01);
 	}
 	else
 	{
@@ -421,9 +421,9 @@ READ16_MEMBER( taitox_state::cchip1_ram_r )
 	{
 		switch (offset)
 		{
-		case 0x00: return space.machine().root_device().ioport("IN0")->read();    /* Player 1 controls + START1 */
-		case 0x01: return space.machine().root_device().ioport("IN1")->read();    /* Player 2 controls + START2 */
-		case 0x02: return space.machine().root_device().ioport("IN2")->read();    /* COINn + SERVICE1 + TILT */
+		case 0x00: return machine().root_device().ioport("IN0")->read();    /* Player 1 controls + START1 */
+		case 0x01: return machine().root_device().ioport("IN1")->read();    /* Player 2 controls + START2 */
+		case 0x02: return machine().root_device().ioport("IN2")->read();    /* COINn + SERVICE1 + TILT */
 		case 0x03: return m_cc_port;
 		}
 	}

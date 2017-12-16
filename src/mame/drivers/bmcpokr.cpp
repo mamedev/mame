@@ -301,7 +301,7 @@ uint32_t bmcpokr_state::screen_update_bmcpokr(screen_device &screen, bitmap_ind1
 
 READ16_MEMBER(bmcpokr_state::unk_r)
 {
-	return space.machine().rand();
+	return machine().rand();
 }
 
 // Hack!

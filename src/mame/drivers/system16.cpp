@@ -3947,7 +3947,7 @@ DRIVER_INIT_MEMBER(segas1x_bootleg_state,beautyb)
 	{
 		rom[x] = rom[x] ^ 0x2400;
 
-		if (x & 8) rom[x] = BITSWAP16(rom[x],15,14,10,12,  11,13,9,8,
+		if (x & 8) rom[x] = bitswap<16>(rom[x],15,14,10,12,  11,13,9,8,
 									7,6,5,4,   3,2,1,0 );
 	}
 

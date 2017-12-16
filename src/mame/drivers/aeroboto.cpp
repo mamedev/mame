@@ -16,6 +16,7 @@ TODO:
     at 2nd title screen and attract mode (purple surface) = light & dark aqua
     This color will not be affected by scroll. Leftmost 8pixels are light, next
     16 pixels are dark, the next 16 pixels are light, and so on.
+- Verify CPU clocks again. Main CPU is a HD68B09P, and next to it is a 8 MHz XTAL.
 
 Revisions:
 - Updated starfield according to Uki's report. (AT)
@@ -239,11 +240,11 @@ void aeroboto_state::machine_reset()
 static MACHINE_CONFIG_START( formatz )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6809, XTAL_10MHz/8) /* verified on pcb */
+	MCFG_CPU_ADD("maincpu", MC6809, XTAL_10MHz/2) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", aeroboto_state,  aeroboto_interrupt)
 
-	MCFG_CPU_ADD("audiocpu", M6809, XTAL_10MHz/16) /* verified on pcb */
+	MCFG_CPU_ADD("audiocpu", MC6809, XTAL_10MHz/4) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", aeroboto_state,  irq0_line_hold)
 

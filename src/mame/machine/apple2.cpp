@@ -1723,7 +1723,7 @@ READ8_MEMBER( apple2_state::apple2_c01x_r )
 			case 0x06:          result |= (m_flags & VAR_ALTZP)     ? 0x80 : 0x00;  break;
 			case 0x07:          result |= (m_flags & VAR_SLOTC3ROM) ? 0x80 : 0x00;  break;
 			case 0x08:          result |= (m_flags & VAR_80STORE)   ? 0x80 : 0x00;  break;
-			case 0x09:          result |= !space.machine().first_screen()->vblank()     ? 0x80 : 0x00;  break;
+			case 0x09:          result |= !machine().first_screen()->vblank()     ? 0x80 : 0x00;  break;
 			case 0x0A:          result |= (m_flags & VAR_TEXT)      ? 0x80 : 0x00;  break;
 			case 0x0B:          result |= (m_flags & VAR_MIXED)     ? 0x80 : 0x00;  break;
 			case 0x0C:          result |= (m_flags & VAR_PAGE2)     ? 0x80 : 0x00;  break;
@@ -1795,7 +1795,7 @@ READ8_MEMBER ( apple2_state::apple2_c03x_r )
 	{
 		if (!offset)
 		{
-			speaker_sound_device *speaker = space.machine().device<speaker_sound_device>("a2speaker");
+			speaker_sound_device *speaker = machine().device<speaker_sound_device>("a2speaker");
 
 			m_a2_speaker_state ^= 1;
 			speaker->level_w(m_a2_speaker_state);
@@ -1902,19 +1902,19 @@ READ8_MEMBER ( apple2_state::apple2_c06x_r )
 				break;
 			case 0x04:
 				/* X Joystick 1 axis */
-				result = space.machine().time().as_double() < m_joystick_x1_time;
+				result = machine().time().as_double() < m_joystick_x1_time;
 				break;
 			case 0x05:
 				/* Y Joystick 1 axis */
-				result = space.machine().time().as_double() < m_joystick_y1_time;
+				result = machine().time().as_double() < m_joystick_y1_time;
 				break;
 			case 0x06:
 				/* X Joystick 2 axis */
-				result = space.machine().time().as_double() < m_joystick_x2_time;
+				result = machine().time().as_double() < m_joystick_x2_time;
 				break;
 			case 0x07:
 				/* Y Joystick 2 axis */
-				result = space.machine().time().as_double() < m_joystick_y2_time;
+				result = machine().time().as_double() < m_joystick_y2_time;
 				break;
 			default:
 				/* c060 Empty Cassette head read

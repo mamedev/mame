@@ -1395,7 +1395,7 @@ WRITE8_MEMBER(uspbball_state::write_a)
 WRITE8_MEMBER(uspbball_state::write_b)
 {
 	// B: digit segment data
-	m_b = BITSWAP8(data,0,1,2,3,4,5,6,7);
+	m_b = bitswap<8>(data,0,1,2,3,4,5,6,7);
 	prepare_display();
 }
 

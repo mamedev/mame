@@ -14,10 +14,12 @@ TODO:
 - verify if pan 100% correct
 - sequencer timers and triggers not implemented (seems used in Deathsmiles ending tune)
  774:
-- find out how volume/pan delayed transition works (used few times in orleg2 attract mode)
 - 4 channel output
 - Equalizer
-- Sequencer (not used)
+- volume/pan delayed transition (used few times during orleg2 attract mode)
+- channel pause/resume (seems not used in games)
+- sequencer pause/resume (seems not used in games)
+- sequencer off trigger (seems not used in games)
 
 ***************************************************************************/
 
@@ -26,8 +28,8 @@ TODO:
 #include "mpeg_audio.h"
 
 // device type definition
-DEFINE_DEVICE_TYPE(YMZ770, ymz770_device, "ymz770", "Yamaha YMZ770C-F AMMS-A")
-DEFINE_DEVICE_TYPE(YMZ774, ymz774_device, "ymz774", "Yamaha YMZ774-S AMMS2")
+DEFINE_DEVICE_TYPE(YMZ770, ymz770_device, "ymz770", "Yamaha YMZ770C AMMS-A")
+DEFINE_DEVICE_TYPE(YMZ774, ymz774_device, "ymz774", "Yamaha YMZ774 AMMS2")
 
 //-------------------------------------------------
 //  ymz770_device - constructor
@@ -71,6 +73,8 @@ void ymz770_device::device_start()
 	}
 	for (auto & sequence : m_sequences)
 		sequence.is_playing = false;
+	for (auto & sqc : m_sqcs)
+		sqc.is_playing = false;
 
 	// register for save states
 	save_item(NAME(m_cur_reg));
@@ -109,6 +113,15 @@ void ymz770_device::device_start()
 		save_item(NAME(m_sequences[ch].loop), ch);
 		save_item(NAME(m_sequences[ch].bank), ch);
 		save_item(NAME(m_sequences[ch].is_playing), ch);
+		save_item(NAME(m_sequences[ch].offset), ch);
+	}
+	for (int ch = 0; ch < 8; ch++)
+	{
+		save_item(NAME(m_sqcs[ch].sqc), ch);
+		save_item(NAME(m_sqcs[ch].loop), ch);
+		save_item(NAME(m_sqcs[ch].is_playing), ch);
+		save_item(NAME(m_sqcs[ch].is_waiting), ch);
+		save_item(NAME(m_sqcs[ch].offset), ch);
 	}
 }
 
@@ -143,6 +156,11 @@ void ymz770_device::device_reset()
 		sequence.loop = 0;
 		sequence.bank = 0;
 		sequence.is_playing = false;
+	}
+	for (auto & sqc : m_sqcs)
+	{
+		sqc.is_playing = false;
+		sqc.loop = 0;
 	}
 }
 
@@ -264,27 +282,18 @@ void ymz770_device::sequencer()
 		if (sequence.is_playing)
 		{
 			if (sequence.delay > 0)
-			{
 				sequence.delay--;
-			}
 			else
 			{
-				int reg = *sequence.data++;
-				uint8_t data = *sequence.data++;
+				int reg = get_rom_byte(sequence.offset++);
+				uint8_t data = get_rom_byte(sequence.offset++);
 				switch (reg)
 				{
 				case 0x0f:
 					if (sequence.loop)
-					{
-						// loop sequence
-						uint8_t sqn = sequence.sequence;
-						uint32_t pptr = get_seq_offs(sqn);
-						sequence.data = &m_rom[pptr];
-					}
+						sequence.offset = get_seq_offs(sequence.sequence); // loop sequence
 					else
-					{
 						sequence.is_playing = false;
-					}
 					break;
 				case 0x0e:
 					sequence.delay = 32 - 1;
@@ -310,9 +319,7 @@ WRITE8_MEMBER( ymz770_device::write )
 		internal_reg_write(m_cur_reg, data);
 	}
 	else
-	{
 		m_cur_reg = data;
-	}
 }
 
 
@@ -339,6 +346,7 @@ void ymz770_device::internal_reg_write(uint8_t reg, uint8_t data)
 
 			// unused
 			default:
+				logerror("unimplemented write %02X %02X\n", reg, data);
 				break;
 		}
 	}
@@ -374,9 +382,7 @@ void ymz770_device::internal_reg_write(uint8_t reg, uint8_t data)
 					m_channels[ch].is_playing = true;
 				}
 				else
-				{
 					m_channels[ch].is_playing = false;
-				}
 
 				m_channels[ch].loop = (data & 1) ? 255 : 0;
 				break;
@@ -396,16 +402,12 @@ void ymz770_device::internal_reg_write(uint8_t reg, uint8_t data)
 			case 1:
 				if (data & 6)
 				{
-					uint8_t sqn = m_sequences[ch].sequence;
-					uint32_t pptr = get_seq_offs(sqn);
-					m_sequences[ch].data = &m_rom[pptr];
+					m_sequences[ch].offset = get_seq_offs(m_sequences[ch].sequence);
 					m_sequences[ch].delay = 0;
 					m_sequences[ch].is_playing = true;
 				}
 				else
-				{
 					m_sequences[ch].is_playing = false;
-				}
 
 				m_sequences[ch].loop = data & 1;
 				break;
@@ -511,62 +513,90 @@ void ymz774_device::internal_reg_write(uint8_t reg, uint8_t data)
 	{
 		if (m_bank == 0)
 		{
-			if (reg < 0xb0)
+			int sq = reg & 7;
+			switch (reg & 0xf8)
 			{
-				int sq = reg & 7;
-				switch (reg & 0xf8)
+			case 0x60: // sequence num H and L
+			case 0x68:
+				sq = (reg >> 1) & 7;
+				if (reg & 1)
+					m_sequences[sq].sequence = (m_sequences[sq].sequence & 0xff00) | data;
+				else
+					m_sequences[sq].sequence = (m_sequences[sq].sequence & 0x00ff) | ((data & 0x0f) << 8);
+				break;
+			case 0x70: // Start / Stop
+				if (data)
 				{
-				case 0x60: // sequence num H and L
-				case 0x68:
-					sq = (reg >> 1) & 7;
-					if (reg & 1)
-						m_sequences[sq].sequence = (m_sequences[sq].sequence & 0xff00) | data;
-					else
-						m_sequences[sq].sequence = (m_sequences[sq].sequence & 0x00ff) | ((data & 0x0f) << 8); // TODO check if total number really upto 0x1000
-					break;
-				case 0x70: // Start / Stop
-					if (data)
-					{
-						uint32_t pptr = get_seq_offs(m_sequences[sq].sequence);
-						m_sequences[sq].data = &m_rom[pptr];
-						m_sequences[sq].delay = 0;
-						m_sequences[sq].is_playing = true;
-					}
-					else
-					{
-						m_sequences[sq].is_playing = false;
-					}
-					break;
-				case 0x78: // Pause / Resume
-					if (data) logerror("SEQ pause/resume unimplemented %02X %02X\n", reg, data);
-					break;
-				case 0x80: // Loop count, 0 = off, 255 - infinite
-					m_sequences[sq].loop = data;
-					break;
-				case 0x88: // timer H and L
-				case 0x90:
-					sq = (reg >> 1) & 7;
-					if (reg & 1)
-						m_sequences[sq].timer = (m_sequences[sq].timer & 0xff00) | data;
-					else
-						m_sequences[sq].timer = (m_sequences[sq].timer & 0x00ff) | (data << 8);
-					break;
-				case 0x98: // Off trigger, bit4 = on/off, bits0-3 channel (end sequence when channel playback ends)
-					if (data) logerror("SEQ Off trigger unimplemented %02X %02X\n", reg, data);
-					break;
-				case 0xa0: // stop channel mask H and L, what it for ? stop chanels immediatelly or when sequence ends (so far assuming later) ?
-				case 0xa8:
-					sq = (reg >> 1) & 7;
-					if (reg & 1)
-						m_sequences[sq].stopchan = (m_sequences[sq].stopchan & 0xff00) | data;
-					else
-						m_sequences[sq].stopchan = (m_sequences[sq].stopchan & 0x00ff) | (data << 8);
-					break;
+					//logerror("SEQ %d start (%s)\n", sq, m_sequences[sq].is_playing ? "playing":"stopped");
+					m_sequences[sq].offset = get_seq_offs(m_sequences[sq].sequence);
+					m_sequences[sq].delay = 0;
+					m_sequences[sq].is_playing = true;
 				}
-			}
-			else
-			{
-				if (data) logerror("SQC unimplemented %02X %02X\n", reg, data);
+				else
+				{
+					//logerror("SEQ %d stop (%s)\n", sq, m_sequences[sq].is_playing ? "playing" : "stopped");
+					if (m_sequences[sq].is_playing)
+						for (int ch = 0; ch < 16; ch++)
+							if (m_sequences[sq].stopchan & (1 << ch))
+								m_channels[ch].is_playing = false;
+					m_sequences[sq].is_playing = false;
+				}
+				break;
+			case 0x78: // Pause / Resume
+				if (data) logerror("SEQ pause/resume unimplemented %02X %02X\n", reg, data);
+				break;
+			case 0x80: // Loop count, 0 = off, 255 - infinite
+				m_sequences[sq].loop = data;
+				break;
+			case 0x88: // timer H and L
+			case 0x90:
+				sq = (reg - 0x88) >> 1;
+				if (reg & 1)
+					m_sequences[sq].timer = (m_sequences[sq].timer & 0xff00) | data;
+				else
+					m_sequences[sq].timer = (m_sequences[sq].timer & 0x00ff) | (data << 8);
+				break;
+			case 0x98: // Off trigger, bit4 = on/off, bits0-3 channel (end sequence when channel playback ends)
+				if (data) logerror("SEQ Off trigger unimplemented %02X %02X\n", reg, data);
+				break;
+			case 0xa0: // stop channel mask H and L, what it for ? stop chanels immediatelly or when sequence ends (so far assuming later) ?
+			case 0xa8:
+				sq = (reg >> 1) & 7;
+				if (reg & 1)
+					m_sequences[sq].stopchan = (m_sequences[sq].stopchan & 0xff00) | data;
+				else
+					m_sequences[sq].stopchan = (m_sequences[sq].stopchan & 0x00ff) | (data << 8);
+				if (data) logerror("Check me: SEQ Stop Channels used %02X %02X\n", reg, data);
+				break;
+			case 0xb0:
+				m_sqcs[sq].sqc = data;
+				break;
+			case 0xb8:
+				if (data)
+				{
+					//logerror("SQC %d start (%s)\n", sq, m_sqcs[sq].is_playing ? "playing" : "stopped");
+					m_sqcs[sq].offset = get_sqc_offs(m_sqcs[sq].sqc);
+					m_sqcs[sq].is_playing = true;
+					m_sqcs[sq].is_waiting = false;
+				}
+				else
+				{
+					//logerror("SQC %d stop (%s)\n", sq, m_sqcs[sq].is_playing ? "playing" : "stopped");
+					m_sqcs[sq].is_playing = false;
+					// stop SEQ too, is this right ? at least kof98umh never manually stop SEQ
+					if (m_sequences[sq].is_playing)
+						for (int ch = 0; ch < 16; ch++)
+							if (m_sequences[sq].stopchan & (1 << ch))
+								m_channels[ch].is_playing = false;
+					m_sequences[sq].is_playing = false;
+				}
+				break;
+			case 0xc0:
+				m_sqcs[sq].loop = data;
+				break;
+			default:
+				logerror("unimplemented write %02X %02X\n", reg, data);
+				break;
 			}
 		}
 		// else bank1 - Equalizer control
@@ -596,7 +626,31 @@ void ymz774_device::sequencer()
 {
 	for (int i = 0; i < 8; i++)
 	{
+		auto & sqc = m_sqcs[i];
 		auto & sequence = m_sequences[i];
+
+		if (sqc.is_playing && !sqc.is_waiting)
+		{
+			sequence.sequence = ((get_rom_byte(sqc.offset) << 8) | get_rom_byte(sqc.offset + 1)) & 0xfff;
+			sqc.offset += 2;
+			sequence.loop = get_rom_byte(sqc.offset++);
+			sequence.offset = get_seq_offs(sequence.sequence);
+			sequence.delay = 0;
+			sequence.is_playing = true;
+			sqc.is_waiting = true;
+			if (get_rom_byte(sqc.offset++) == 0xff)
+			{
+				if (sqc.loop)
+				{
+					if (sqc.loop != 255)
+						--sqc.loop;
+					sqc.offset = get_sqc_offs(sqc.sqc);
+				}
+				else
+					sqc.is_playing = false;
+			}
+		}
+
 		if (sequence.is_playing)
 		{
 			if (sequence.delay > 0)
@@ -605,8 +659,8 @@ void ymz774_device::sequencer()
 			}
 			else
 			{
-				int reg = *sequence.data++;
-				uint8_t data = *sequence.data++;
+				int reg = get_rom_byte(sequence.offset++);
+				uint8_t data = get_rom_byte(sequence.offset++);
 				switch (reg)
 				{
 				case 0xff: // end
@@ -617,12 +671,12 @@ void ymz774_device::sequencer()
 					{
 						if (sequence.loop != 255)
 							--sequence.loop;
-						uint32_t pptr = get_seq_offs(sequence.sequence);
-						sequence.data = &m_rom[pptr];
+						sequence.offset = get_seq_offs(sequence.sequence);
 					}
 					else
 					{
 						sequence.is_playing = false;
+						sqc.is_waiting = false;
 					}
 					break;
 				case 0xfe: // timer delay

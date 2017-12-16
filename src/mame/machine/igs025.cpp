@@ -254,7 +254,7 @@ READ16_MEMBER(igs025_device::killbld_igs025_prot_r)
 		switch (m_kb_cmd)
 		{
 		case 0x00:
-			return BITSWAP8((m_kb_swap + 1) & 0x7f, 0, 1, 2, 3, 4, 5, 6, 7); // drgw3
+			return bitswap<8>((m_kb_swap + 1) & 0x7f, 0, 1, 2, 3, 4, 5, 6, 7); // drgw3
 
 		case 0x01:
 			return m_kb_reg & 0x7f;
@@ -282,7 +282,7 @@ READ16_MEMBER(igs025_device::killbld_igs025_prot_r)
 							return 0x3f00 | ((m_kb_game_id >> 24) & 0xff);
 
 						default: // >= 5
-							return 0x3f00 | BITSWAP8(m_kb_prot_hold, 5, 2, 9, 7, 10, 13, 12, 15);
+							return 0x3f00 | bitswap<8>(m_kb_prot_hold, 5, 2, 9, 7, 10, 13, 12, 15);
 						}
 		}
 

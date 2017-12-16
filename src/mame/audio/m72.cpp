@@ -128,12 +128,12 @@ WRITE_LINE_MEMBER(m72_audio_device::ym2151_irq_handler)
 WRITE8_MEMBER( m72_audio_device::sound_command_w )
 {
 	m_soundlatch->write(*m_space, offset, data);
-	space.machine().scheduler().synchronize(timer_expired_delegate(FUNC(m72_audio_device::setvector_callback), this), Z80_ASSERT);
+	machine().scheduler().synchronize(timer_expired_delegate(FUNC(m72_audio_device::setvector_callback), this), Z80_ASSERT);
 }
 
 WRITE8_MEMBER( m72_audio_device::sound_irq_ack_w )
 {
-	space.machine().scheduler().synchronize(timer_expired_delegate(FUNC(m72_audio_device::setvector_callback), this), Z80_CLEAR);
+	machine().scheduler().synchronize(timer_expired_delegate(FUNC(m72_audio_device::setvector_callback), this), Z80_CLEAR);
 }
 
 

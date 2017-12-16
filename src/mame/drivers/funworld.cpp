@@ -6463,7 +6463,7 @@ DRIVER_INIT_MEMBER(funworld_state, saloon)
 
 	for (i = start; i < size; i++)
 	{
-		rom[i] = BITSWAP8(rom[i], 7, 6, 5, 4, 3, 0, 1, 2);
+		rom[i] = bitswap<8>(rom[i], 7, 6, 5, 4, 3, 0, 1, 2);
 	}
 
 	{
@@ -6475,7 +6475,7 @@ DRIVER_INIT_MEMBER(funworld_state, saloon)
 
 		for (i = start; i < size; i++)
 		{
-			a = ((i & 0xff00) | BITSWAP8(i & 0xff, 2, 0, 1, 3, 4, 5, 6, 7));
+			a = ((i & 0xff00) | bitswap<8>(i & 0xff, 2, 0, 1, 3, 4, 5, 6, 7));
 			rom[a] = buffer[i];
 		}
 	}
@@ -6493,7 +6493,7 @@ DRIVER_INIT_MEMBER(funworld_state, saloon)
 
 		for (i = startg; i < sizeg; i++)
 		{
-			a = BITSWAP16(i, 15, 14, 13, 12, 11, 6, 7, 5, 8, 4, 10, 3, 9, 0, 1, 2);
+			a = bitswap<16>(i, 15, 14, 13, 12, 11, 6, 7, 5, 8, 4, 10, 3, 9, 0, 1, 2);
 			gfxrom[a] = buffer[i];
 		}
 	}
@@ -6507,7 +6507,7 @@ DRIVER_INIT_MEMBER(funworld_state, saloon)
 
 	for (i = startp; i < sizep; i++)
 	{
-		prom[i] = BITSWAP8(prom[i], 2, 3, 5, 4, 6, 7, 1, 0);
+		prom[i] = bitswap<8>(prom[i], 2, 3, 5, 4, 6, 7, 1, 0);
 	}
 
 	{
@@ -6519,7 +6519,7 @@ DRIVER_INIT_MEMBER(funworld_state, saloon)
 
 		for (i = startp; i < sizep; i++)
 		{
-			a = BITSWAP16(i, 15, 14, 13, 12, 11, 10, 9, 4, 8, 7, 6, 5, 2, 0, 1, 3);
+			a = bitswap<16>(i, 15, 14, 13, 12, 11, 10, 9, 4, 8, 7, 6, 5, 2, 0, 1, 3);
 			prom[a] = buffer[i];
 		}
 	}
@@ -6545,7 +6545,7 @@ DRIVER_INIT_MEMBER(funworld_state, multiwin)
 		ROM[x] = ROM[x] ^ 0x91;
 		uint8_t code;
 
-		ROM[x] = BITSWAP8(ROM[x],5,6,7,2,3,0,1,4);
+		ROM[x] = bitswap<8>(ROM[x],5,6,7,2,3,0,1,4);
 
 		code = ROM[x];
 
@@ -6577,7 +6577,7 @@ DRIVER_INIT_MEMBER(funworld_state, royalcdc)
 		uint8_t code;
 
 		// this seems correct for the data, plaintext decrypts fine
-		ROM[x] = BITSWAP8(ROM[x],2,6,7,4,3,1,5,0);
+		ROM[x] = bitswap<8>(ROM[x],2,6,7,4,3,1,5,0);
 
 		// the code uses different encryption, there are conflicts here
 		// so it's probably address based
@@ -6642,7 +6642,7 @@ DRIVER_INIT_MEMBER(funworld_state, dino4)
 
 	for (i = start; i < size; i++)
 	{
-		rom[i] = BITSWAP8(rom[i], 7, 6, 5, 4, 3, 1, 2, 0);
+		rom[i] = bitswap<8>(rom[i], 7, 6, 5, 4, 3, 1, 2, 0);
 	}
 
 	{
@@ -6654,7 +6654,7 @@ DRIVER_INIT_MEMBER(funworld_state, dino4)
 
 		for (i = start; i < size; i++)
 		{
-			a = BITSWAP16(i, 15, 13, 14, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0);
+			a = bitswap<16>(i, 15, 13, 14, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0);
 			rom[a] = buffer[i];
 		}
 	}
@@ -6672,7 +6672,7 @@ DRIVER_INIT_MEMBER(funworld_state, dino4)
 
 		for (i = startg; i < sizeg; i++)
 		{
-			a = BITSWAP16(i, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 4, 5, 3, 2, 1, 0);
+			a = bitswap<16>(i, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 4, 5, 3, 2, 1, 0);
 			gfxrom[a] = buffer[i];
 		}
 	}
@@ -6702,7 +6702,7 @@ DRIVER_INIT_MEMBER(funworld_state, ctunk)
 
 	for (i = start; i < size; i++)
 	{
-		rom[i] = BITSWAP8(rom[i], 5, 6, 7, 3, 4, 0, 1, 2);
+		rom[i] = bitswap<8>(rom[i], 5, 6, 7, 3, 4, 0, 1, 2);
 	}
 
 	//buffer = std::make_unique<uint8_t[]>(size);
@@ -6746,7 +6746,7 @@ static void decrypt_rcdino4(uint8_t *rom, int size, uint8_t *gfxrom, int sizeg, 
 
 	for (i = start; i < size; i++)
 	{
-		rom[i] = BITSWAP8(rom[i], 7, 6, 5, 4, 3, 1, 2, 0);
+		rom[i] = bitswap<8>(rom[i], 7, 6, 5, 4, 3, 1, 2, 0);
 	}
 
 	{
@@ -6758,7 +6758,7 @@ static void decrypt_rcdino4(uint8_t *rom, int size, uint8_t *gfxrom, int sizeg, 
 
 		for (i = start; i < size; i++)
 		{
-			a = BITSWAP16(i, 15, 13, 14, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0);
+			a = bitswap<16>(i, 15, 13, 14, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0);
 			rom[a] = buffer[i];
 		}
 
@@ -6776,7 +6776,7 @@ static void decrypt_rcdino4(uint8_t *rom, int size, uint8_t *gfxrom, int sizeg, 
 
 		for (i = startg; i < sizeg; i++)
 		{
-			a = BITSWAP16(i, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 4, 5, 3, 2, 1, 0);
+			a = bitswap<16>(i, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 4, 5, 3, 2, 1, 0);
 			gfxrom[a] = buffer[i];
 		}
 	}
@@ -6787,7 +6787,7 @@ static void decrypt_rcdino4(uint8_t *rom, int size, uint8_t *gfxrom, int sizeg, 
 
 	for (x = 0x0000; x < 0x10000; x++)
 	{
-		src[x] = BITSWAP8(src[x], 7, 6, 4, 5, 3, 2, 1, 0);
+		src[x] = bitswap<8>(src[x], 7, 6, 4, 5, 3, 2, 1, 0);
 		src[x] = src[x] ^ 0x81;
 	}
 

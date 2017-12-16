@@ -145,8 +145,8 @@ void igs017_igs031_device::video_start()
 
 		for (i = 0; i < size ; i++)
 		{
-			rom[i] = BITSWAP8(rom[i], 0, 1, 2, 3, 4, 5, 6, 7);
-//          rom[i^1] = BITSWAP8(rom[i], 0, 1, 2, 3, 4, 5, 6, 7);
+			rom[i] = bitswap<8>(rom[i], 0, 1, 2, 3, 4, 5, 6, 7);
+//          rom[i^1] = bitswap<8>(rom[i], 0, 1, 2, 3, 4, 5, 6, 7);
 		}
 	}
 }

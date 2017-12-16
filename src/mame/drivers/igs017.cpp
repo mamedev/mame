@@ -225,24 +225,24 @@ uint16_t igs017_state::mgcs_palette_bitswap(uint16_t bgr)
 {
 	bgr = ((bgr & 0xff00) >> 8) | ((bgr & 0x00ff) << 8);
 
-	return BITSWAP16(bgr, 7, 8, 9, 2, 14, 3, 13, 15, 12, 11, 10, 0, 1, 4, 5, 6);
+	return bitswap<16>(bgr, 7, 8, 9, 2, 14, 3, 13, 15, 12, 11, 10, 0, 1, 4, 5, 6);
 }
 
 uint16_t igs017_state::lhzb2a_palette_bitswap(uint16_t bgr)
 {
 //  bgr = ((bgr & 0xff00) >> 8) | ((bgr & 0x00ff) << 8);
-	return BITSWAP16(bgr, 15,9,13,12,11,5,4,8,7,6,0,14,3,2,1,10);
+	return bitswap<16>(bgr, 15,9,13,12,11,5,4,8,7,6,0,14,3,2,1,10);
 }
 
 uint16_t igs017_state::tjsb_palette_bitswap(uint16_t bgr)
 {
 	// bitswap
-	return BITSWAP16(bgr, 15,12,3,6,10,5,4,2,9,13,8,7,11,1,0,14);
+	return bitswap<16>(bgr, 15,12,3,6,10,5,4,2,9,13,8,7,11,1,0,14);
 }
 
 uint16_t igs017_state::slqz2_palette_bitswap(uint16_t bgr)
 {
-	return BITSWAP16(bgr, 15,14,9,4,11,10,12,3,7,6,5,8,13,2,1,0);
+	return bitswap<16>(bgr, 15,14,9,4,11,10,12,3,7,6,5,8,13,2,1,0);
 }
 
 
@@ -297,7 +297,7 @@ void igs017_state::decrypt_program_rom(int mask, int a7, int a6, int a5, int a4,
 	// address lines swap
 	for (i = 0;i < length;i++)
 	{
-		int addr = (i & ~0xff) | BITSWAP8(i,a7,a6,a5,a4,a3,a2,a1,a0);
+		int addr = (i & ~0xff) | bitswap<8>(i,a7,a6,a5,a4,a3,a2,a1,a0);
 		rom[i] = tmp[addr];
 	}
 
@@ -363,7 +363,7 @@ void igs017_state::tjsb_decrypt_sprites()
 	memcpy(tmp.get(), rom, length);
 	for (i = 0; i < length; i++)
 	{
-		addr = (i & ~0xff) | BITSWAP8(i,7,6,5,2,1,4,3,0);
+		addr = (i & ~0xff) | bitswap<8>(i,7,6,5,2,1,4,3,0);
 		rom[i] = tmp[addr];
 	}
 
@@ -371,7 +371,7 @@ void igs017_state::tjsb_decrypt_sprites()
 	for (i = 0; i < length; i += 2)
 	{
 		uint16_t data = (rom[i+1] << 8) | rom[i+0];   // x-22222-11111-00000
-		data = BITSWAP16(data, 15, 14,13,12,11,10, 9,1,7,6,5, 4,3,2,8,0);
+		data = bitswap<16>(data, 15, 14,13,12,11,10, 9,1,7,6,5, 4,3,2,8,0);
 		rom[i+0] = data;
 		rom[i+1] = data >> 8;
 	}
@@ -447,8 +447,8 @@ void igs017_state::mgcs_decrypt_tiles()
 	memcpy(&tmp[0],rom,length);
 	for (i = 0;i < length;i++)
 	{
-		int addr = (i & ~0xffff) | BITSWAP16(i,15,14,13,12,11,10,6,7,8,9,5,4,3,2,1,0);
-		rom[i^1] = BITSWAP8(tmp[addr],0,1,2,3,4,5,6,7);
+		int addr = (i & ~0xffff) | bitswap<16>(i,15,14,13,12,11,10,6,7,8,9,5,4,3,2,1,0);
+		rom[i^1] = bitswap<8>(tmp[addr],0,1,2,3,4,5,6,7);
 	}
 }
 
@@ -463,10 +463,10 @@ void igs017_state::mgcs_flip_sprites()
 		uint16_t pixels = (rom[i+1] << 8) | rom[i+0];
 
 		// flip bits
-		pixels = BITSWAP16(pixels,0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15);
+		pixels = bitswap<16>(pixels,0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15);
 
 		// flip pixels
-		pixels = BITSWAP16(pixels,15, 0,1,2,3,4, 5,6,7,8,9, 10,11,12,13,14);
+		pixels = bitswap<16>(pixels,15, 0,1,2,3,4, 5,6,7,8,9, 10,11,12,13,14);
 
 		rom[i+0] = pixels;
 		rom[i+1] = pixels >> 8;
@@ -507,8 +507,8 @@ void igs017_state::tarzan_decrypt_tiles()
 	memcpy(&tmp[0],rom,length);
 	for (i = 0;i < length;i++)
 	{
-		int addr = (i & ~0xffff) | BITSWAP16(i,15,14,13,12,11,7,8,6,10,9,5,4,3,2,1,0);
-		rom[i] = BITSWAP8(tmp[addr],0,1,2,3,4,5,6,7);
+		int addr = (i & ~0xffff) | bitswap<16>(i,15,14,13,12,11,7,8,6,10,9,5,4,3,2,1,0);
+		rom[i] = bitswap<8>(tmp[addr],0,1,2,3,4,5,6,7);
 	}
 }
 
@@ -765,7 +765,7 @@ void igs017_state::lhzb2_decrypt_tiles()
 	memcpy(&tmp[0], rom, length);
 	for (i = 0; i < length; i++)
 	{
-		addr = (i & ~0xffffff) | BITSWAP24(i,23,22,21,20,19,18,17,1,16,15,14,13,12,11,10,9,8,7,6,5,4,3,2,0);
+		addr = (i & ~0xffffff) | bitswap<24>(i,23,22,21,20,19,18,17,1,16,15,14,13,12,11,10,9,8,7,6,5,4,3,2,0);
 		rom[i] = tmp[addr];
 	}
 }
@@ -781,7 +781,7 @@ void igs017_state::lhzb2_decrypt_sprites()
 	memcpy(tmp.get(), rom, length);
 	for (i = 0; i < length; i++)
 	{
-		addr = (i & ~0xffff) | BITSWAP16(i,15,14,13,6,7,10,9,8,11,12,5,4,3,2,1,0);
+		addr = (i & ~0xffff) | bitswap<16>(i,15,14,13,6,7,10,9,8,11,12,5,4,3,2,1,0);
 		rom[i] = tmp[addr];
 	}
 
@@ -789,7 +789,7 @@ void igs017_state::lhzb2_decrypt_sprites()
 	for (i = 0;i < length;i+=2)
 	{
 		uint16_t data = (rom[i+1] << 8) | rom[i+0];   // x-22222-11111-00000
-		data = BITSWAP16(data, 15, 7,6,5,4,3, 2,1,0,14,13, 12,11,10,9,8);
+		data = bitswap<16>(data, 15, 7,6,5,4,3, 2,1,0,14,13, 12,11,10,9,8);
 		rom[i+0] = data;
 		rom[i+1] = data >> 8;
 	}
@@ -989,7 +989,7 @@ void igs017_state::slqz2_decrypt_tiles()
 	memcpy(&tmp[0],rom,length);
 	for (i = 0;i < length;i++)
 	{
-		int addr = (i & ~0xff) | BITSWAP8(i,7,4,5,6,3,2,1,0);
+		int addr = (i & ~0xff) | bitswap<8>(i,7,4,5,6,3,2,1,0);
 		rom[i] = tmp[addr];
 	}
 }
@@ -1096,9 +1096,9 @@ void igs017_state::spkrform_decrypt_sprites()
 	for (i = 0; i < length; i++)
 	{
 		if (i & 0x80000)
-			addr = (i & ~0xff) | BITSWAP8(i,7,6,3,4,5,2,1,0);
+			addr = (i & ~0xff) | bitswap<8>(i,7,6,3,4,5,2,1,0);
 		else
-			addr = (i & ~0xffff) | BITSWAP16(i,15,14,13,12,11,10, 4, 8,7,6,5, 9,3,2,1,0);
+			addr = (i & ~0xffff) | bitswap<16>(i,15,14,13,12,11,10, 4, 8,7,6,5, 9,3,2,1,0);
 
 		rom[i] = tmp[addr];
 	}
@@ -1412,7 +1412,7 @@ READ16_MEMBER(igs017_state::mgcs_magic_r)
 
 		case 0x01:
 		{
-			uint16_t ret = BITSWAP8( (BITSWAP8(m_scramble_data, 0,1,2,3,4,5,6,7) + 1) & 3, 4,5,6,7, 0,1,2,3);
+			uint16_t ret = bitswap<8>( (bitswap<8>(m_scramble_data, 0,1,2,3,4,5,6,7) + 1) & 3, 4,5,6,7, 0,1,2,3);
 			logerror("%s: reading %02x from igs_magic = %02x\n", machine().describe_context(), ret, m_igs_magic[0]);
 			return ret;
 		}
@@ -1627,7 +1627,7 @@ READ16_MEMBER(igs017_state::mgdha_magic_r)
 			return ioport("BUTTONS")->read();
 
 		case 0x02:
-			return BITSWAP8(ioport("DSW2")->read(), 0,1,2,3,4,5,6,7);
+			return bitswap<8>(ioport("DSW2")->read(), 0,1,2,3,4,5,6,7);
 
 		case 0x03:
 		{

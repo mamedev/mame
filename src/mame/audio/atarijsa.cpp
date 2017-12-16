@@ -408,8 +408,8 @@ WRITE8_MEMBER( atari_jsa_oki_base_device::wrio_w )
 	m_cpu_bank->set_entry((data >> 6) & 3);
 
 	// coin counters
-	space.machine().bookkeeping().coin_counter_w(1, (data >> 5) & 1);
-	space.machine().bookkeeping().coin_counter_w(0, (data >> 4) & 1);
+	machine().bookkeeping().coin_counter_w(1, (data >> 5) & 1);
+	machine().bookkeeping().coin_counter_w(0, (data >> 4) & 1);
 
 	// update the OKI frequency
 	if (m_oki1 != nullptr)

@@ -116,7 +116,7 @@ WRITE8_MEMBER(midcoin24cdjuke_state::digit_w)
 {
 	uint16_t char_data = m_charset[((data & 0x60) << 1) | (data & 0x1f)];
 
-	char_data = BITSWAP16(char_data, 13,11,9,15,14,10,12,8,7,6,5,4,3,2,1,0);
+	char_data = bitswap<16>(char_data, 13,11,9,15,14,10,12,8,7,6,5,4,3,2,1,0);
 
 	output().set_digit_value(offset, char_data ^ 0xffff);
 }

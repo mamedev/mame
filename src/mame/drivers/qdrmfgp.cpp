@@ -224,7 +224,7 @@ READ16_MEMBER(qdrmfgp_state::gp2_ide_std_r)
 				break;
 		}
 	}
-	return m_ata->read_cs0(space, offset, mem_mask);
+	return m_ata->read16_cs0(offset, mem_mask);
 }
 
 
@@ -318,8 +318,8 @@ static ADDRESS_MAP_START( qdrmfgp_map, AS_PROGRAM, 16, qdrmfgp_state )
 	AM_RANGE(0x880000, 0x881fff) AM_DEVREADWRITE("k056832", k056832_device, ram_word_r, ram_word_w)          /* vram */
 	AM_RANGE(0x882000, 0x883fff) AM_DEVREADWRITE("k056832", k056832_device, ram_word_r, ram_word_w)          /* vram (mirror) */
 	AM_RANGE(0x900000, 0x901fff) AM_READ(v_rom_r)                                               /* gfxrom through */
-	AM_RANGE(0xa00000, 0xa0000f) AM_DEVREADWRITE("ata", ata_interface_device, read_cs0, write_cs0) /* IDE control regs */
-	AM_RANGE(0xa40000, 0xa4000f) AM_DEVREADWRITE("ata", ata_interface_device, read_cs1, write_cs1) /* IDE status control reg */
+	AM_RANGE(0xa00000, 0xa0000f) AM_DEVREADWRITE("ata", ata_interface_device, read16_cs0, write16_cs0) /* IDE control regs */
+	AM_RANGE(0xa40000, 0xa4000f) AM_DEVREADWRITE("ata", ata_interface_device, read16_cs1, write16_cs1) /* IDE status control reg */
 	AM_RANGE(0xc00000, 0xcbffff) AM_READWRITE(sndram_r, sndram_w)                               /* sound ram */
 ADDRESS_MAP_END
 
@@ -342,11 +342,11 @@ static ADDRESS_MAP_START( qdrmfgp2_map, AS_PROGRAM, 16, qdrmfgp_state )
 	AM_RANGE(0x89f000, 0x8a0fff) AM_READWRITE(gp2_vram_mirror_r, gp2_vram_mirror_w)             /* vram (mirror) */
 	AM_RANGE(0x900000, 0x901fff) AM_READ(v_rom_r)                                               /* gfxrom through */
 #if IDE_HACK
-	AM_RANGE(0xa00000, 0xa0000f) AM_READ(gp2_ide_std_r) AM_DEVWRITE("ata", ata_interface_device, write_cs0) /* IDE control regs */
+	AM_RANGE(0xa00000, 0xa0000f) AM_READ(gp2_ide_std_r) AM_DEVWRITE("ata", ata_interface_device, write16_cs0) /* IDE control regs */
 #else
-	AM_RANGE(0xa00000, 0xa0000f) AM_DEVREADWRITE("ata", ata_interface_device, read_cs0, write_cs0) /* IDE control regs */
+	AM_RANGE(0xa00000, 0xa0000f) AM_DEVREADWRITE("ata", ata_interface_device, read16_cs0, write16_cs0) /* IDE control regs */
 #endif
-	AM_RANGE(0xa40000, 0xa4000f) AM_DEVREADWRITE("ata", ata_interface_device, read_cs1, write_cs1) /* IDE status control reg */
+	AM_RANGE(0xa40000, 0xa4000f) AM_DEVREADWRITE("ata", ata_interface_device, read16_cs1, write16_cs1) /* IDE status control reg */
 	AM_RANGE(0xc00000, 0xcbffff) AM_READWRITE(sndram_r,sndram_w)                                /* sound ram */
 ADDRESS_MAP_END
 

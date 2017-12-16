@@ -9518,14 +9518,14 @@ DRIVER_INIT_MEMBER(atomiswave_state,atomiswave)
 READ64_MEMBER(atomiswave_state::xtrmhnt2_hack_r)
 {
 	// disable ALL.Net board check
-	if (space.device().safe_pc() == 0xc03cb30)
+	if (m_maincpu->pc() == 0xc03cb30)
 	{
 		dc_ram[0x357fe/8] |= (uint64_t)0x200 << 48;
 		dc_ram[0x358e2/8] |= (uint64_t)0x200 << 16;
 		dc_ram[0x38bb2/8] |= (uint64_t)0x200 << 16;
 		dc_ram[0x38bee/8] |= (uint64_t)0x200 << 48;
 	}
-	if (space.device().safe_pc() == 0xc108240)
+	if (m_maincpu->pc() == 0xc108240)
 		dc_ram[0x9acc8/8] = (dc_ram[0x9acc8/8] & 0xffffffffffff0000U) | (uint64_t)0x0009;
 	return 0;
 }

@@ -161,7 +161,7 @@ void svision_sound_device::sound_stream_update(sound_stream &stream, stream_samp
 
 WRITE8_MEMBER( svision_sound_device::sounddma_w )
 {
-	logerror("%.6f svision snddma write %04x %02x\n", space.machine().time().as_double(),offset+0x18,data);
+	logerror("%.6f svision snddma write %04x %02x\n", machine().time().as_double(),offset+0x18,data);
 	m_dma.reg[offset] = data;
 	switch (offset)
 	{
@@ -173,7 +173,7 @@ WRITE8_MEMBER( svision_sound_device::sounddma_w )
 			m_dma.size = (data ? data : 0x100) * 32;
 			break;
 		case 3:
-			m_dma.step = space.machine().device("maincpu")->unscaled_clock() / (256.0 * space.machine().sample_rate() * (1 + (data & 3)));
+			m_dma.step = machine().device("maincpu")->unscaled_clock() / (256.0 * machine().sample_rate() * (1 + (data & 3)));
 			m_dma.right = data & 4;
 			m_dma.left = data & 8;
 			m_dma.ca14to16 = ((data & 0x70) >> 4) << 14;
@@ -197,7 +197,7 @@ WRITE8_MEMBER( svision_sound_device::noise_w )
 	{
 		case 0:
 			m_noise.volume=data&0xf;
-			m_noise.step= space.machine().device("maincpu")->unscaled_clock() / (256.0*space.machine().sample_rate()*(1+(data>>4)));
+			m_noise.step= machine().device("maincpu")->unscaled_clock() / (256.0*machine().sample_rate()*(1+(data>>4)));
 			break;
 		case 1:
 			m_noise.count = data + 1;

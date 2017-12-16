@@ -193,7 +193,7 @@ WRITE8_MEMBER(sothello_state::msm_cfg_w)
      bit 2 = S2    1
      bit 3 = S1    2
 */
-	m_msm->playmode_w(BITSWAP8((data>>1), 7,6,5,4,3,0,1,2));
+	m_msm->playmode_w(bitswap<8>((data>>1), 7,6,5,4,3,0,1,2));
 	m_msm->reset_w(data & 1);
 }
 

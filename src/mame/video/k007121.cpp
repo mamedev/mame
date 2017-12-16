@@ -174,7 +174,7 @@ WRITE8_MEMBER( k007121_device::ctrl_w )
 	case 6:
 		/* palette bank change */
 		if ((m_ctrlram[offset] & 0x30) != (data & 0x30))
-			space.machine().tilemap().mark_all_dirty();
+			machine().tilemap().mark_all_dirty();
 		break;
 	case 7:
 		m_flipscreen = data & 0x08;

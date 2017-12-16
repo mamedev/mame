@@ -20,9 +20,9 @@
 #define FADE_TO_ZERO    1
 
 
-#define EXIDY440_AUDIO_CLOCK    (XTAL_12_9792MHz / 16)
-#define EXIDY440_MC3418_CLOCK   (EXIDY440_AUDIO_CLOCK / 16)
-#define EXIDY440_MC3417_CLOCK   (EXIDY440_AUDIO_CLOCK / 32)
+#define EXIDY440_AUDIO_CLOCK    (XTAL_12_9792MHz / 4)
+#define EXIDY440_MC3418_CLOCK   (EXIDY440_AUDIO_CLOCK / 4 / 16)
+#define EXIDY440_MC3417_CLOCK   (EXIDY440_AUDIO_CLOCK / 4 / 32)
 
 
 /* internal caching */
@@ -217,7 +217,7 @@ void exidy440_sound_device::mix_to_16(int length, stream_sample_t *dest_left, st
 READ8_MEMBER( exidy440_sound_device::sound_command_r )
 {
 	/* clear the FIRQ that got us here and acknowledge the read to the main CPU */
-	space.machine().device("audiocpu")->execute().set_input_line(1, CLEAR_LINE);
+	machine().device("audiocpu")->execute().set_input_line(1, CLEAR_LINE);
 	m_sound_command_ack = 1;
 
 	return m_sound_command;
@@ -272,7 +272,7 @@ WRITE8_MEMBER( exidy440_sound_device::sound_volume_w )
 
 WRITE8_MEMBER( exidy440_sound_device::sound_interrupt_clear_w )
 {
-	space.machine().device("audiocpu")->execute().set_input_line(0, CLEAR_LINE);
+	machine().device("audiocpu")->execute().set_input_line(0, CLEAR_LINE);
 }
 
 
@@ -875,13 +875,13 @@ ADDRESS_MAP_END
 
 MACHINE_CONFIG_START( exidy440_audio )
 
-	MCFG_CPU_ADD("audiocpu", M6809, EXIDY440_AUDIO_CLOCK)
+	MCFG_CPU_ADD("audiocpu", MC6809, EXIDY440_AUDIO_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(exidy440_audio_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", driver_device, irq0_line_assert)
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_SOUND_ADD("custom", EXIDY440, EXIDY440_AUDIO_CLOCK/16)
+	MCFG_SOUND_ADD("custom", EXIDY440, EXIDY440_MC3418_CLOCK)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 

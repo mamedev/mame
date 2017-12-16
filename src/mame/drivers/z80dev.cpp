@@ -50,7 +50,7 @@ WRITE8_MEMBER( z80dev_state::display_w )
 
 READ8_MEMBER( z80dev_state::test_r )
 {
-	return space.machine().rand();
+	return machine().rand();
 }
 
 static ADDRESS_MAP_START( mem_map, AS_PROGRAM, 8, z80dev_state )

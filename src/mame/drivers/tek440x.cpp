@@ -53,7 +53,7 @@
 #include "speaker.h"
 
 
-#define VIDEO_CLOCK 25200000
+#define VIDEO_CLOCK XTAL_25_2MHz
 
 class tek440x_state : public driver_device
 {
@@ -188,7 +188,7 @@ INPUT_PORTS_END
 static MACHINE_CONFIG_START( tek4404 )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68010, 16666666)
+	MCFG_CPU_ADD("maincpu", M68010, XTAL_40MHz / 4) // MC68010L10
 	MCFG_CPU_PROGRAM_MAP(maincpu_map)
 
 	MCFG_CPU_ADD("fdccpu", M6502, 1000000)
@@ -209,7 +209,7 @@ static MACHINE_CONFIG_START( tek4404 )
 	MCFG_MOS6551_XTAL(XTAL_1_8432MHz)
 	MCFG_MOS6551_TXD_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_txd))
 
-	MCFG_DEVICE_ADD("timer", AM9513, 16666666 / 10) // from CPU E output
+	MCFG_DEVICE_ADD("timer", AM9513, XTAL_40MHz / 4 / 10) // from CPU E output
 
 	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, nullptr)
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("aica", mos6551_device, write_rxd))

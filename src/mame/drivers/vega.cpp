@@ -315,7 +315,7 @@ READ8_MEMBER(vega_state::extern_r)
 		{
 			/* AY 3-8910 */
 			m_ay8910->data_w(space, 0, offset);
-			return 0xff;//mame_rand(space.machine);
+			return 0xff;//mame_rand(machine);
 		}
 
 		case 2: /* 08-0b */
@@ -506,7 +506,7 @@ void vega_state::draw_tilemap(screen_device& screen, bitmap_ind16& bitmap, const
 			int flip=BIT(id,5);
 
 
-			int num=(BITSWAP8( ((id>>2) &7),   7,6,5,4,3,0,1,2 ));
+			int num=(bitswap<8>( ((id>>2) &7),   7,6,5,4,3,0,1,2 ));
 
 			int bank=id&3;
 
@@ -556,7 +556,7 @@ uint32_t vega_state::screen_update_vega(screen_device &screen, bitmap_ind16 &bit
 			for(x=0;x<40;++x)
 			{
 				int character=m_txt_ram[idx];
-				//int color=BITSWAP8(color_lookup[character],7,6,5,4,0,1,2,3)>>1;
+				//int color=bitswap<8>(color_lookup[character],7,6,5,4,0,1,2,3)>>1;
 				int color=color_lookup[character]&0xf;
 				/*
 				 bit 0 - unknown
@@ -565,7 +565,7 @@ uint32_t vega_state::screen_update_vega(screen_device &screen, bitmap_ind16 &bit
 				 bit 3 - red
 				 */
 
-					color=BITSWAP8(color,7,6,5,4,0,1,2,3)&0x7;
+					color=bitswap<8>(color,7,6,5,4,0,1,2,3)&0x7;
 
 				color^=0xf;
 

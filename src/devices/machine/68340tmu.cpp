@@ -43,8 +43,7 @@ READ16_MEMBER( mc68340_timer_module_device::read )
 
 	int val = 0;
 
-	int pc = space.device().safe_pc();
-	LOGR("%08x m68340_internal_timer_r %08x, (%08x)\n", pc, offset * 2, mem_mask);
+	LOGR("%08x m68340_internal_timer_r %08x, (%08x)\n", m_cpu->pcbase(), offset * 2, mem_mask);
 
 	/*Setting the STP bit stops all clocks within the timer module except for the clock
 	  from the IMB. The clock from the IMB remains active to allow the CPU32 access to the MCR.
@@ -59,39 +58,39 @@ READ16_MEMBER( mc68340_timer_module_device::read )
 	{
 	case REG_MCR:
 			val = m_mcr;
-			LOGTIMER("- %08x %s %04x, %04x (%04x) (MCR - Module Configuration Register)\n", pc, FUNCNAME, offset * 2, val, mem_mask);
+			LOGTIMER("- %08x %s %04x, %04x (%04x) (MCR - Module Configuration Register)\n", m_cpu->pcbase(), FUNCNAME, offset * 2, val, mem_mask);
 			break;
 	case REG_IR:
 			val = m_ir;
-			LOGTIMER("- %08x %s %04x, %04x (%04x) (IR - Interrupt Register)\n", pc, FUNCNAME, offset * 2, val, mem_mask);
+			LOGTIMER("- %08x %s %04x, %04x (%04x) (IR - Interrupt Register)\n", m_cpu->pcbase(), FUNCNAME, offset * 2, val, mem_mask);
 			break;
 	case REG_CR:
 			val = m_cr;
-			LOGTIMER("- %08x %s %04x, %04x (%04x) (CR - Control Register)\n", pc, FUNCNAME, offset * 2, val, mem_mask);
+			LOGTIMER("- %08x %s %04x, %04x (%04x) (CR - Control Register)\n", m_cpu->pcbase(), FUNCNAME, offset * 2, val, mem_mask);
 			break;
 	case REG_SR:
 			val = m_sr;
-			LOGTIMER("- %08x %s %04x, %04x (%04x) (SR - Status/Prescaler Register)\n", pc, FUNCNAME, offset * 2, val, mem_mask);
+			LOGTIMER("- %08x %s %04x, %04x (%04x) (SR - Status/Prescaler Register)\n", m_cpu->pcbase(), FUNCNAME, offset * 2, val, mem_mask);
 			break;
 	case REG_CNTR:
 			val = m_cntr_reg;
-			LOGTIMER("- %08x %s %04x, %04x (%04x) (CNTR - Counter Register)\n", pc, FUNCNAME, offset * 2, val, mem_mask);
+			LOGTIMER("- %08x %s %04x, %04x (%04x) (CNTR - Counter Register)\n", m_cpu->pcbase(), FUNCNAME, offset * 2, val, mem_mask);
 			break;
 	case REG_PREL1:
 			val = m_prel1;
-			LOGTIMER("- %08x %s %04x, %04x (%04x) (PREL1 - Preload 1 Register)\n", pc, FUNCNAME, offset * 2, val, mem_mask);
+			LOGTIMER("- %08x %s %04x, %04x (%04x) (PREL1 - Preload 1 Register)\n", m_cpu->pcbase(), FUNCNAME, offset * 2, val, mem_mask);
 			break;
 	case REG_PREL2:
 			val = m_prel2;
-			LOGTIMER("- %08x %s %04x, %04x (%04x) (PREL2 - Preload 2 Register)\n", pc, FUNCNAME, offset * 2, val, mem_mask);
+			LOGTIMER("- %08x %s %04x, %04x (%04x) (PREL2 - Preload 2 Register)\n", m_cpu->pcbase(), FUNCNAME, offset * 2, val, mem_mask);
 			break;
 	case REG_COM:
 			val = m_com;
-			LOGTIMER("- %08x %s %04x, %04x (%04x) (COM - Compare Register)\n", pc, FUNCNAME, offset * 2, val, mem_mask);
+			LOGTIMER("- %08x %s %04x, %04x (%04x) (COM - Compare Register)\n", m_cpu->pcbase(), FUNCNAME, offset * 2, val, mem_mask);
 			break;
 	default:
-			LOGTIMER("- %08x FUNCNAME %08x, %08x (%08x) - not implemented\n", pc, offset * 2, val, mem_mask);
-			logerror("%08x m68340_internal_timer_r %08x, %08x (%08x)\n", pc, offset * 2, val, mem_mask);
+			LOGTIMER("- %08x FUNCNAME %08x, %08x (%08x) - not implemented\n", m_cpu->pcbase(), offset * 2, val, mem_mask);
+			logerror("%08x m68340_internal_timer_r %08x, %08x (%08x)\n", m_cpu->pcbase(), offset * 2, val, mem_mask);
 			break;
 	}
 	LOGR(" * Timer%d Reg %02x [%02x] -> %02x - %s\n",  m_cpu->get_timer_index(this) + 1, offset * 2, offset, val, (offset * 2) > 0x12 ? "reserved" : std::array<char const *, 9> {{"MCR", "reserved", "IR", "CR", "SR", "CNTR", "PREL1", "PREL2", "COM"}}[offset % 0x20]);
@@ -100,8 +99,6 @@ READ16_MEMBER( mc68340_timer_module_device::read )
 
 WRITE16_MEMBER( mc68340_timer_module_device::write )
 {
-	int pc = space.device().safe_pc();
-
 	LOGSETUP("\n%s\n", FUNCNAME);
 	LOGSETUP(" * Timer%d Reg %02x [%02x] <- %02x - %s\n",  m_cpu->get_timer_index(this) + 1, (offset * 2), offset, data,
 			 (offset * 2) > 0x12 ? "reserved" : std::array<char const *, 9>
@@ -120,7 +117,7 @@ WRITE16_MEMBER( mc68340_timer_module_device::write )
 	{
 	case REG_MCR:
 		COMBINE_DATA(&m_mcr);
-		LOGTIMER("PC: %08x %s %04x, %04x (%04x) (MCR - Module Configuration Register)\n", pc, FUNCNAME, offset * 2, data, mem_mask);
+		LOGTIMER("PC: %08x %s %04x, %04x (%04x) (MCR - Module Configuration Register)\n", m_cpu->pcbase(), FUNCNAME, offset * 2, data, mem_mask);
 		LOGTIMER("- Clocks are %s\n", data & REG_MCR_STP ? "stopped" : "running");
 		LOGTIMER("- Freeze signal %s - not implemented\n", data & REG_MCR_FRZ1 ? "stops execution" : "is ignored");
 		LOGTIMER("- Supervisor registers %s - not implemented\n", data & REG_MCR_SUPV ? "requries supervisor privileges" : "can be accessed by user privileged software");
@@ -128,13 +125,13 @@ WRITE16_MEMBER( mc68340_timer_module_device::write )
 		break;
 	case REG_IR:
 		COMBINE_DATA(&m_ir);
-		LOGTIMER("PC: %08x %s %04x, %04x (%04x) (IR - Interrupt Register)\n", pc, FUNCNAME, offset * 2, data, mem_mask);
+		LOGTIMER("PC: %08x %s %04x, %04x (%04x) (IR - Interrupt Register)\n", m_cpu->pcbase(), FUNCNAME, offset * 2, data, mem_mask);
 		LOGTIMER("- Interrupt level : %02x\n", (data & REG_IR_INTLEV) >> 8);
 		LOGTIMER("- Interrupt vector: %02x\n", (data & REG_IR_INTVEC));
 		break;
 	case REG_CR:
 		COMBINE_DATA(&m_cr);
-		LOGTIMER("PC %08x %s %04x, %04x (%04x) (CR - Module Control Register)\n", pc, FUNCNAME, offset * 2, data, mem_mask);
+		LOGTIMER("PC %08x %s %04x, %04x (%04x) (CR - Module Control Register)\n", m_cpu->pcbase(), FUNCNAME, offset * 2, data, mem_mask);
 		LOGTIMER("- Software reset: %s\n", (data & REG_CR_SWR) ? "inactive" : "active" );
 		LOGTIMER("- Enabled interrupts: %02x TO:%d TG:%d TC:%d\n",
 			 data & REG_CR_INTMSK,
@@ -200,7 +197,7 @@ WRITE16_MEMBER( mc68340_timer_module_device::write )
 		}
 		break;
 	case REG_SR:
-		LOGTIMER("PC %08x %s %04x, %04x (%04x) (SR - Status/Prescaler Register)\n", pc, FUNCNAME, offset * 2, data, mem_mask);
+		LOGTIMER("PC %08x %s %04x, %04x (%04x) (SR - Status/Prescaler Register)\n", m_cpu->pcbase(), FUNCNAME, offset * 2, data, mem_mask);
 
 		/* IRQ - Interrupt Request bit
 		   1 = An interrupt condition has occurred. This bit is the logical OR of the enabled TO, TG, and TC interrupt bits.
@@ -212,7 +209,7 @@ WRITE16_MEMBER( mc68340_timer_module_device::write )
 			// TODO: clear IRQ line
 		}
 		COMBINE_DATA(&m_sr);
-		LOGTIMER("PC %08x %s %04x, %04x (%04x) (SR - Status/Prescaler Register)\n", pc, FUNCNAME, offset * 2, data, mem_mask);
+		LOGTIMER("PC %08x %s %04x, %04x (%04x) (SR - Status/Prescaler Register)\n", m_cpu->pcbase(), FUNCNAME, offset * 2, data, mem_mask);
 		LOGTIMER("- IRQ: %s\n", (data & REG_SR_IRQ) ? "Yes" : "None");
 		LOGTIMER("- TO TimeOut int      : %s\n", (data & REG_SR_TO) ? "Asserted" : "Cleared");
 		LOGTIMER("- TG Timer Gate int   : %s\n", (data & REG_SR_TG) ? "Asserted" : "Cleared");
@@ -225,30 +222,30 @@ WRITE16_MEMBER( mc68340_timer_module_device::write )
 		break;
 	case REG_CNTR:
 		COMBINE_DATA(&m_cntr_reg);
-		LOGTIMER("- %08x %s %04x, %04x (%04x) (CNTR - Counter Register)\n", pc, FUNCNAME, offset * 2, data, mem_mask);
+		LOGTIMER("- %08x %s %04x, %04x (%04x) (CNTR - Counter Register)\n", m_cpu->pcbase(), FUNCNAME, offset * 2, data, mem_mask);
 		break;
 	case REG_PREL1:
 		COMBINE_DATA(&m_prel1);
-		LOGTIMER("PC %08x %s %04x, %04x (%04x) (PREL1 - Preload 1 Register)\n", pc, FUNCNAME, offset * 2, data, mem_mask);
+		LOGTIMER("PC %08x %s %04x, %04x (%04x) (PREL1 - Preload 1 Register)\n", m_cpu->pcbase(), FUNCNAME, offset * 2, data, mem_mask);
 		LOGTIMER("- PR1-15 to PR1-0: %04x\n", (data & 0xffff));
 		break;
 	case REG_PREL2:
 		COMBINE_DATA(&m_prel2);
-		LOGTIMER("PC %08x %s %04x, %04x (%04x) (PREL2 - Preload 2 Register)\n", pc, FUNCNAME, offset * 2, data, mem_mask);
+		LOGTIMER("PC %08x %s %04x, %04x (%04x) (PREL2 - Preload 2 Register)\n", m_cpu->pcbase(), FUNCNAME, offset * 2, data, mem_mask);
 		LOGTIMER("- PR2-15 to PR2-0: %04x\n", (data & 0xffff));
 		break;
 	case REG_COM:
 		COMBINE_DATA(&m_com);
-		LOGTIMER("PC %08x %s %04x, %04x (%04x) (COM - Compare Register)\n", pc, FUNCNAME, offset * 2, data, mem_mask);
+		LOGTIMER("PC %08x %s %04x, %04x (%04x) (COM - Compare Register)\n", m_cpu->pcbase(), FUNCNAME, offset * 2, data, mem_mask);
 		LOGTIMER("- COM15-COM0: %04x\n", (data & 0xfff));
 		break;
 	default:
-		LOGTIMER("- %08x FUNCNAME %08x, %08x (%08x) - not implemented\n", pc, offset * 2, data, mem_mask);
-		logerror("%08x m68340_internal_sim_w %08x, %08x (%08x)\n", pc, offset * 2, data, mem_mask);
+		LOGTIMER("- %08x FUNCNAME %08x, %08x (%08x) - not implemented\n", m_cpu->pcbase(), offset * 2, data, mem_mask);
+		logerror("%08x m68340_internal_sim_w %08x, %08x (%08x)\n", m_cpu->pcbase(), offset * 2, data, mem_mask);
 		break;
 	}
 
-	LOG("%08x m68340_internal_timer_w %08x, %08x (%08x)\n", pc, offset * 2, data, mem_mask);
+	LOG("%08x m68340_internal_timer_w %08x, %08x (%08x)\n", m_cpu->pcbase(), offset * 2, data, mem_mask);
 }
 
 WRITE_LINE_MEMBER( mc68340_timer_module_device::tin_w)
@@ -310,8 +307,8 @@ void mc68340_timer_module_device::device_start()
 
 void mc68340_timer_module_device::do_timer_irq()
 {
-	assert(m_cpu->m68340SIM);
-	m68340_sim &sim = *m_cpu->m68340SIM;
+	assert(m_cpu->m_m68340SIM);
+	m68340_sim &sim = *m_cpu->m_m68340SIM;
 	int timer_irq_level  = (m_ir & 0x0700) >> 8;
 	int timer_irq_vector = (m_ir & 0x00ff) >> 0;
 

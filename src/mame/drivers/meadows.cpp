@@ -141,7 +141,7 @@
 READ8_MEMBER(meadows_state::hsync_chain_r)
 {
 	uint8_t val = m_screen->hpos();
-	return BITSWAP8(val,0,1,2,3,4,5,6,7);
+	return bitswap<8>(val,0,1,2,3,4,5,6,7);
 }
 
 

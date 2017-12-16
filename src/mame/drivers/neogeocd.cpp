@@ -282,7 +282,7 @@ WRITE16_MEMBER(ngcd_state::neocd_control_w)
 		case 0x0126:
 //          bprintf(PRINT_NORMAL, _T("  - NGCD Z80 BUSREQ -> 1 (PC: 0x%06X)\n"), SekGetPC(-1));
 			m_has_z80_bus = false;
-			space.machine().scheduler().synchronize();
+			machine().scheduler().synchronize();
 			m_audiocpu->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
 			break;
 		case 0x0128:
@@ -301,7 +301,7 @@ WRITE16_MEMBER(ngcd_state::neocd_control_w)
 		case 0x0146:
 //          bprintf(PRINT_NORMAL, _T("  - NGCD Z80 BUSREQ -> 0 (PC: 0x%06X)\n"), SekGetPC(-1));
 			m_has_z80_bus = true;
-			space.machine().scheduler().synchronize();
+			machine().scheduler().synchronize();
 			m_audiocpu->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
 			break;
 		case 0x0148:

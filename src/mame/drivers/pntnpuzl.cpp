@@ -220,8 +220,8 @@ READ16_MEMBER(pntnpuzl_state::pntnpuzl_280014_r)
 		if (ioport("IN0")->read() & 0x10)
 		{
 			m_touchscr[0] = 0x1b;
-			m_touchscr[2] = BITSWAP8(ioport("TOUCHX")->read(),0,1,2,3,4,5,6,7);
-			m_touchscr[4] = BITSWAP8(ioport("TOUCHY")->read(),0,1,2,3,4,5,6,7);
+			m_touchscr[2] = bitswap<8>(ioport("TOUCHX")->read(),0,1,2,3,4,5,6,7);
+			m_touchscr[4] = bitswap<8>(ioport("TOUCHY")->read(),0,1,2,3,4,5,6,7);
 		}
 		else
 			m_touchscr[0] = 0;

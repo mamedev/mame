@@ -514,7 +514,7 @@ WRITE8_MEMBER( newbrain_state::cop_d_w )
 
 		// COP to VFD serial format, bits 15..0
 		// A B J I x H G2 C x F G1 E K L M D
-		uint16_t value = BITSWAP16(m_402_q, 11, 7, 1, 13, 10, 3, 2, 12, 9, 5, 6, 4, 0, 8, 14, 15) & 0x3fff;
+		uint16_t value = bitswap<16>(m_402_q, 11, 7, 1, 13, 10, 3, 2, 12, 9, 5, 6, 4, 0, 8, 14, 15) & 0x3fff;
 		output().set_digit_value(m_405_q & 0x0f, value);
 
 		if (LOG_VFD) logerror("%s %s vfd segment %u 402.Q %04x data %04x\n", machine().time().as_string(), machine().describe_context(), m_405_q & 0x0f, m_402_q, value);

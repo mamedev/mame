@@ -200,7 +200,7 @@ uint32_t cops_state::screen_update( screen_device &screen, bitmap_ind16 &bitmap,
 WRITE8_MEMBER(cops_state::cdrom_data_w)
 {
 	const char *regs[4] = { "CMD", "PARAM", "WRITE", "CTRL" };
-	m_cdrom_data = BITSWAP8(data,0,1,2,3,4,5,6,7);
+	m_cdrom_data = bitswap<8>(data,0,1,2,3,4,5,6,7);
 	uint8_t reg = ((m_cdrom_ctrl & 4) >> 1) | ((m_cdrom_ctrl & 8) >> 3);
 	if (LOG_CDROM) logerror("%s:cdrom_data_w(reg = %s, data = %02x)\n", machine().describe_context(), regs[reg & 0x03], m_cdrom_data);
 }
@@ -647,7 +647,7 @@ WRITE8_MEMBER(cops_state::io1_w)
 				{
 					sprintf(output_name, "digit%d", i);
 					display_data = m_lcd_data_l | (m_lcd_data_h << 8);
-					display_data = BITSWAP16(display_data, 4, 5, 12, 1, 0, 11, 10, 6, 7, 2, 9, 3, 15, 8, 14, 13);
+					display_data = bitswap<16>(display_data, 4, 5, 12, 1, 0, 11, 10, 6, 7, 2, 9, 3, 15, 8, 14, 13);
 					output().set_value(output_name, display_data);
 				}
 			}
@@ -757,7 +757,7 @@ WRITE_LINE_MEMBER(cops_state::via1_irq)
 
 WRITE8_MEMBER(cops_state::via1_b_w)
 {
-	m_sn_data = BITSWAP8(data,0,1,2,3,4,5,6,7);
+	m_sn_data = bitswap<8>(data,0,1,2,3,4,5,6,7);
 	if (m_sn_cb1)
 	{
 		m_sn->write(space,0,m_sn_data);

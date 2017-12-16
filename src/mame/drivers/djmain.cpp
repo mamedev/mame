@@ -406,23 +406,23 @@ static ADDRESS_MAP_START(maincpu_djmainj, AS_PROGRAM, 32, djmain_state)
 
 	AM_RANGE(0xc00000, 0xc01fff) AM_DEVREADWRITE("k056832", k056832_device, ram_long_r, ram_long_w)  // VIDEO RAM (tilemap) (beatmania)
 	AM_RANGE(0xc02000, 0xc02047) AM_WRITE(unknownc02000_w)                  // ??
-	AM_RANGE(0xf00000, 0xf0000f) AM_DEVREADWRITE16("ata", ata_interface_device, read_cs0, write_cs0, 0xffffffff) // IDE control regs (beatmania)
-	AM_RANGE(0xf40000, 0xf4000f) AM_DEVREADWRITE16("ata", ata_interface_device, read_cs1, write_cs1, 0xffffffff) // IDE status control reg (beatmania)
+	AM_RANGE(0xf00000, 0xf0000f) AM_DEVREADWRITE16("ata", ata_interface_device, read16_cs0, write16_cs0, 0xffffffff) // IDE control regs (beatmania)
+	AM_RANGE(0xf40000, 0xf4000f) AM_DEVREADWRITE16("ata", ata_interface_device, read16_cs1, write16_cs1, 0xffffffff) // IDE status control reg (beatmania)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(maincpu_djmainu, AS_PROGRAM, 32, djmain_state)
 	AM_IMPORT_FROM(maincpu_djmain)
 
-	AM_RANGE(0xd00000, 0xd0000f) AM_DEVREADWRITE16("ata", ata_interface_device, read_cs0, write_cs0, 0xffffffff) // IDE control regs (hiphopmania)
-	AM_RANGE(0xd40000, 0xd4000f) AM_DEVREADWRITE16("ata", ata_interface_device, read_cs1, write_cs1, 0xffffffff) // IDE status control reg (hiphopmania)
+	AM_RANGE(0xd00000, 0xd0000f) AM_DEVREADWRITE16("ata", ata_interface_device, read16_cs0, write16_cs0, 0xffffffff) // IDE control regs (hiphopmania)
+	AM_RANGE(0xd40000, 0xd4000f) AM_DEVREADWRITE16("ata", ata_interface_device, read16_cs1, write16_cs1, 0xffffffff) // IDE status control reg (hiphopmania)
 	AM_RANGE(0xe00000, 0xe01fff) AM_DEVREADWRITE("k056832", k056832_device, ram_long_r, ram_long_w)  // VIDEO RAM (tilemap) (hiphopmania)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(maincpu_djmaina, AS_PROGRAM, 32, djmain_state)
 	AM_IMPORT_FROM(maincpu_djmain)
 
-	AM_RANGE(0xc00000, 0xc0000f) AM_DEVREADWRITE16("ata", ata_interface_device, read_cs0, write_cs0, 0xffffffff) // IDE control regs
-	AM_RANGE(0xc40000, 0xc4000f) AM_DEVREADWRITE16("ata", ata_interface_device, read_cs1, write_cs1, 0xffffffff) // IDE status control reg
+	AM_RANGE(0xc00000, 0xc0000f) AM_DEVREADWRITE16("ata", ata_interface_device, read16_cs0, write16_cs0, 0xffffffff) // IDE control regs
+	AM_RANGE(0xc40000, 0xc4000f) AM_DEVREADWRITE16("ata", ata_interface_device, read16_cs1, write16_cs1, 0xffffffff) // IDE status control reg
 	AM_RANGE(0xf00000, 0xf01fff) AM_DEVREADWRITE("k056832", k056832_device, ram_long_r, ram_long_w)  // VIDEO RAM (tilemap)
 ADDRESS_MAP_END
 

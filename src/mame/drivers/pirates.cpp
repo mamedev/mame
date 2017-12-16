@@ -365,11 +365,11 @@ void pirates_state::decrypt_68k()
 		int adrl, adrr;
 		uint8_t vl, vr;
 
-		adrl = BITSWAP24(i,23,22,21,20,19,18,4,8,3,14,2,15,17,0,9,13,10,5,16,7,12,6,1,11);
-		vl = BITSWAP8(buf[adrl],    4,2,7,1,6,5,0,3);
+		adrl = bitswap<24>(i,23,22,21,20,19,18,4,8,3,14,2,15,17,0,9,13,10,5,16,7,12,6,1,11);
+		vl = bitswap<8>(buf[adrl],    4,2,7,1,6,5,0,3);
 
-		adrr = BITSWAP24(i,23,22,21,20,19,18,4,10,1,11,12,5,9,17,14,0,13,6,15,8,3,16,7,2);
-		vr = BITSWAP8(buf[adrr]>>8, 1,4,7,0,3,5,6,2);
+		adrr = bitswap<24>(i,23,22,21,20,19,18,4,10,1,11,12,5,9,17,14,0,13,6,15,8,3,16,7,2);
+		vr = bitswap<8>(buf[adrr]>>8, 1,4,7,0,3,5,6,2);
 
 		rom[i] = (vr<<8) | vl;
 	}
@@ -390,11 +390,11 @@ void pirates_state::decrypt_p()
 
 	for (i=0; i<rom_size/4; i++)
 	{
-		int adr = BITSWAP24(i,23,22,21,20,19,18,10,2,5,9,7,13,16,14,11,4,1,6,12,17,3,0,15,8);
-		rom[adr+0*(rom_size/4)] = BITSWAP8(buf[i+0*(rom_size/4)], 2,3,4,0,7,5,1,6);
-		rom[adr+1*(rom_size/4)] = BITSWAP8(buf[i+1*(rom_size/4)], 4,2,7,1,6,5,0,3);
-		rom[adr+2*(rom_size/4)] = BITSWAP8(buf[i+2*(rom_size/4)], 1,4,7,0,3,5,6,2);
-		rom[adr+3*(rom_size/4)] = BITSWAP8(buf[i+3*(rom_size/4)], 2,3,4,0,7,5,1,6);
+		int adr = bitswap<24>(i,23,22,21,20,19,18,10,2,5,9,7,13,16,14,11,4,1,6,12,17,3,0,15,8);
+		rom[adr+0*(rom_size/4)] = bitswap<8>(buf[i+0*(rom_size/4)], 2,3,4,0,7,5,1,6);
+		rom[adr+1*(rom_size/4)] = bitswap<8>(buf[i+1*(rom_size/4)], 4,2,7,1,6,5,0,3);
+		rom[adr+2*(rom_size/4)] = bitswap<8>(buf[i+2*(rom_size/4)], 1,4,7,0,3,5,6,2);
+		rom[adr+3*(rom_size/4)] = bitswap<8>(buf[i+3*(rom_size/4)], 2,3,4,0,7,5,1,6);
 	}
 }
 
@@ -413,11 +413,11 @@ void pirates_state::decrypt_s()
 
 	for (i=0; i<rom_size/4; i++)
 	{
-		int adr = BITSWAP24(i,23,22,21,20,19,18,17,5,12,14,8,3,0,7,9,16,4,2,6,11,13,1,10,15);
-		rom[adr+0*(rom_size/4)] = BITSWAP8(buf[i+0*(rom_size/4)], 4,2,7,1,6,5,0,3);
-		rom[adr+1*(rom_size/4)] = BITSWAP8(buf[i+1*(rom_size/4)], 1,4,7,0,3,5,6,2);
-		rom[adr+2*(rom_size/4)] = BITSWAP8(buf[i+2*(rom_size/4)], 2,3,4,0,7,5,1,6);
-		rom[adr+3*(rom_size/4)] = BITSWAP8(buf[i+3*(rom_size/4)], 4,2,7,1,6,5,0,3);
+		int adr = bitswap<24>(i,23,22,21,20,19,18,17,5,12,14,8,3,0,7,9,16,4,2,6,11,13,1,10,15);
+		rom[adr+0*(rom_size/4)] = bitswap<8>(buf[i+0*(rom_size/4)], 4,2,7,1,6,5,0,3);
+		rom[adr+1*(rom_size/4)] = bitswap<8>(buf[i+1*(rom_size/4)], 1,4,7,0,3,5,6,2);
+		rom[adr+2*(rom_size/4)] = bitswap<8>(buf[i+2*(rom_size/4)], 2,3,4,0,7,5,1,6);
+		rom[adr+3*(rom_size/4)] = bitswap<8>(buf[i+3*(rom_size/4)], 4,2,7,1,6,5,0,3);
 	}
 }
 
@@ -437,8 +437,8 @@ void pirates_state::decrypt_oki()
 
 	for (i=0; i<rom_size; i++)
 	{
-		int adr = BITSWAP24(i,23,22,21,20,19,10,16,13,8,4,7,11,14,17,12,6,2,0,5,18,15,3,1,9);
-		rom[adr] = BITSWAP8(buf[i], 2,3,4,0,7,5,1,6);
+		int adr = bitswap<24>(i,23,22,21,20,19,10,16,13,8,4,7,11,14,17,12,6,2,0,5,18,15,3,1,9);
+		rom[adr] = bitswap<8>(buf[i], 2,3,4,0,7,5,1,6);
 	}
 }
 

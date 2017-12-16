@@ -320,7 +320,7 @@ READ16_MEMBER(md_base_state::megadriv_68k_io_read )
 		  D0 : Bit 0 of version number
 		*/
 
-	//return (space.machine().rand()&0x0f0f)|0xf0f0;//0x0000;
+	//return (machine().rand()&0x0f0f)|0xf0f0;//0x0000;
 	switch (offset)
 	{
 		case 0:
@@ -502,7 +502,7 @@ READ16_MEMBER(md_base_state::megadriv_68k_read_z80_ram )
 	else
 	{
 		logerror("%06x: 68000 attempting to access Z80 (read) address space without bus\n", space.device().safe_pc());
-		return space.machine().rand();
+		return machine().rand();
 	}
 }
 
@@ -543,7 +543,7 @@ READ16_MEMBER(md_base_state::megadriv_68k_check_z80_bus )
 	   the value is never zero.  Time Killers is the most fussy, and doesn't like the
 	   read_next_instruction function from system16, so I just return a random value
 	   in the unused bits */
-	uint16_t nextvalue = space.machine().rand();//read_next_instruction(space)&0xff00;
+	uint16_t nextvalue = machine().rand();//read_next_instruction(space)&0xff00;
 
 
 	/* Check if the 68k has the z80 bus */
@@ -730,7 +730,7 @@ WRITE8_MEMBER(md_base_state::megadriv_z80_vdp_write )
 READ8_MEMBER(md_base_state::megadriv_z80_vdp_read )
 {
 	osd_printf_debug("megadriv_z80_vdp_read %02x\n",offset);
-	return space.machine().rand();
+	return machine().rand();
 }
 
 READ8_MEMBER(md_base_state::megadriv_z80_unmapped_read )

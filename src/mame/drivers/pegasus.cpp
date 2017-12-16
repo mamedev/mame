@@ -405,8 +405,8 @@ void pegasus_state::pegasus_decrypt_rom(uint8_t *ROM)
 		for (int i = 0; i < 0x1000; i++)
 		{
 			b = ROM[i];
-			j = BITSWAP16(i, 15, 14, 13, 12, 11, 10, 9, 8, 0, 1, 2, 3, 4, 5, 6, 7);
-			b = BITSWAP8(b, 3, 2, 1, 0, 7, 6, 5, 4);
+			j = bitswap<16>(i, 15, 14, 13, 12, 11, 10, 9, 8, 0, 1, 2, 3, 4, 5, 6, 7);
+			b = bitswap<8>(b, 3, 2, 1, 0, 7, 6, 5, 4);
 			temp_copy[j & 0xfff] = b;
 		}
 		memcpy(ROM, &temp_copy[0], 0x1000);

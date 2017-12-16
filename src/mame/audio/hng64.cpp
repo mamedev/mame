@@ -91,7 +91,7 @@ WRITE32_MEMBER(hng64_state::hng64_soundram_w)
 			logerror("dumping sound program in m_soundram\n");
 			FILE *fp;
 			char filename[256];
-			sprintf(filename,"soundram_%s", space.machine().system().name);
+			sprintf(filename,"soundram_%s", machine().system().name);
 			fp=fopen(filename, "w+b");
 			if (fp)
 			{

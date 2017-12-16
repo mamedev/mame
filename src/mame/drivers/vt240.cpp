@@ -338,7 +338,7 @@ READ8_MEMBER(vt240_state::char_buf_r)
 
 WRITE8_MEMBER(vt240_state::char_buf_w)
 {
-	m_char_buf[m_char_idx++] = BITSWAP8(data, 0, 1, 2, 3, 4, 5, 6, 7);
+	m_char_buf[m_char_idx++] = bitswap<8>(data, 0, 1, 2, 3, 4, 5, 6, 7);
 	m_char_idx &= 0xf;
 }
 
@@ -370,7 +370,7 @@ WRITE8_MEMBER(vt240_state::vom_w)
 	if(!BIT(m_reg0, 2))
 	{
 		m_vom[offset] = data;
-		data = ~BITSWAP8(data, 1, 0, 3, 2, 5, 4, 7, 6);
+		data = ~bitswap<8>(data, 1, 0, 3, 2, 5, 4, 7, 6);
 		m_palette->set_pen_color(offset, pal2bit(data >> 6), pal2bit(data >> 6), pal2bit(data >> 6));
 		m_palette->set_pen_color((offset + 16), pal2bit(data >> 0), pal2bit(data >> 2), pal2bit(data >> 4));
 	}
@@ -410,7 +410,7 @@ WRITE16_MEMBER(vt240_state::vram_w)
 	{
 		if(BIT(m_reg0, 6))
 		{
-			chr = BITSWAP8(m_vpat, m_patidx, m_patidx, m_patidx, m_patidx, m_patidx, m_patidx, m_patidx, m_patidx);
+			chr = bitswap<8>(m_vpat, m_patidx, m_patidx, m_patidx, m_patidx, m_patidx, m_patidx, m_patidx, m_patidx);
 			if(m_patcnt-- == 0)
 			{
 				m_patcnt = m_patmult;
@@ -494,7 +494,7 @@ WRITE16_MEMBER(vt240_state::vram_w)
 
 WRITE8_MEMBER(vt240_state::mask_w)
 {
-	m_mask = BITSWAP8(data, 0, 1, 2, 3, 4, 5, 6, 7);
+	m_mask = bitswap<8>(data, 0, 1, 2, 3, 4, 5, 6, 7);
 }
 
 READ8_MEMBER(vt240_state::nvr_store_r)

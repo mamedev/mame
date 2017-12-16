@@ -199,8 +199,8 @@ void wpc_an_state::device_timer(emu_timer &timer, device_timer_id id, int param,
 		// update LED segments
 		for(x=0;x<16;x++)
 		{
-			output().set_digit_value(x,BITSWAP16(m_wpc->get_alphanumeric(x), 15, 7, 12, 10, 8, 14, 13, 9, 11, 6, 5, 4, 3, 2, 1, 0));
-			output().set_digit_value(x+16,BITSWAP16(m_wpc->get_alphanumeric(20+x), 15, 7, 12, 10, 8, 14, 13, 9, 11, 6, 5, 4, 3, 2, 1, 0));
+			output().set_digit_value(x,bitswap<16>(m_wpc->get_alphanumeric(x), 15, 7, 12, 10, 8, 14, 13, 9, 11, 6, 5, 4, 3, 2, 1, 0));
+			output().set_digit_value(x+16,bitswap<16>(m_wpc->get_alphanumeric(20+x), 15, 7, 12, 10, 8, 14, 13, 9, 11, 6, 5, 4, 3, 2, 1, 0));
 		}
 		m_wpc->reset_alphanumeric();
 		m_vblank_count++;
@@ -317,7 +317,7 @@ DRIVER_INIT_MEMBER(wpc_an_state,wpc_an)
 
 static MACHINE_CONFIG_START( wpc_an_base )
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6809, 2000000)
+	MCFG_CPU_ADD("maincpu", MC6809E, XTAL_8MHz / 4) // 68B09E
 	MCFG_CPU_PROGRAM_MAP(wpc_an_map)
 
 	MCFG_WMS_WPC_ADD("wpc")
