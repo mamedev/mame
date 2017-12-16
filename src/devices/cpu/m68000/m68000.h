@@ -10,43 +10,30 @@
 #define softfloat_h 1
 #include "softfloat/milieu.h"
 #include "softfloat/softfloat.h"
+extern flag floatx80_is_nan(floatx80 a);
 #endif
 
 
 /* MMU constants */
-#define MMU_ATC_ENTRIES (22)    // 68851 has 64, 030 has 22
+constexpr int MMU_ATC_ENTRIES = (22);    // 68851 has 64, 030 has 22
 
 /* instruction cache constants */
-#define M68K_IC_SIZE 128
-
-
-
-
-#define m68ki_check_address_error(m68k, ADDR, WRITE_MODE, FC) \
-	if((ADDR)&1) \
-	{ \
-		m68k->aerr_address = ADDR; \
-		m68k->aerr_write_mode = WRITE_MODE; \
-		m68k->aerr_fc = FC; \
-		throw 10; \
-	}
-
-
+constexpr int M68K_IC_SIZE = 128;
 
 /* There are 7 levels of interrupt to the 68K.
  * A transition from < 7 to 7 will cause a non-maskable interrupt (NMI).
  */
-#define M68K_IRQ_NONE 0
-#define M68K_IRQ_1    1
-#define M68K_IRQ_2    2
-#define M68K_IRQ_3    3
-#define M68K_IRQ_4    4
-#define M68K_IRQ_5    5
-#define M68K_IRQ_6    6
-#define M68K_IRQ_7    7
+constexpr int M68K_IRQ_NONE = 0;
+constexpr int M68K_IRQ_1    = 1;
+constexpr int M68K_IRQ_2    = 2;
+constexpr int M68K_IRQ_3    = 3;
+constexpr int M68K_IRQ_4    = 4;
+constexpr int M68K_IRQ_5    = 5;
+constexpr int M68K_IRQ_6    = 6;
+constexpr int M68K_IRQ_7    = 7;
 
 // special input lines
-#define M68K_LINE_BUSERROR 16
+constexpr int M68K_LINE_BUSERROR = 16;
 
 /* CPU types for use in m68k_set_cpu_type() */
 enum
@@ -78,9 +65,9 @@ enum
 };
 
 /* HMMU enable types for use with m68k_set_hmmu_enable() */
-#define M68K_HMMU_DISABLE   0   /* no translation */
-#define M68K_HMMU_ENABLE_II 1   /* Mac II style fixed translation */
-#define M68K_HMMU_ENABLE_LC 2   /* Mac LC style fixed translation */
+constexpr int M68K_HMMU_DISABLE   = 0;   /* no translation */
+constexpr int M68K_HMMU_ENABLE_II = 1;   /* Mac II style fixed translation */
+constexpr int M68K_HMMU_ENABLE_LC = 2;   /* Mac LC style fixed translation */
 
 /* Special interrupt acknowledge values.
  * Use these as special returns from the interrupt acknowledge callback
@@ -91,29 +78,24 @@ enum
  * This happens in a real 68K if VPA or AVEC is asserted during an interrupt
  * acknowledge cycle instead of DTACK.
  */
-#define M68K_INT_ACK_AUTOVECTOR    0xffffffff
+constexpr uint32_t M68K_INT_ACK_AUTOVECTOR    = 0xffffffff;
 
 /* Causes the spurious interrupt vector (0x18) to be taken
  * This happens in a real 68K if BERR is asserted during the interrupt
  * acknowledge cycle (i.e. no devices responded to the acknowledge).
  */
-#define M68K_INT_ACK_SPURIOUS      0xfffffffe
+constexpr uint32_t M68K_INT_ACK_SPURIOUS      = 0xfffffffe;
 
 enum
 {
 	/* NOTE: M68K_SP fetches the current SP, be it USP, ISP, or MSP */
 	M68K_PC = STATE_GENPC, M68K_SP = 1, M68K_ISP, M68K_USP, M68K_MSP, M68K_SR, M68K_VBR,
-	M68K_SFC, M68K_DFC, M68K_CACR, M68K_CAAR, M68K_PREF_ADDR, M68K_PREF_DATA,
+	M68K_SFC, M68K_DFC, M68K_CACR, M68K_CAAR, M68K_IR, M68K_PREF_ADDR, M68K_PREF_DATA,
 	M68K_D0, M68K_D1, M68K_D2, M68K_D3, M68K_D4, M68K_D5, M68K_D6, M68K_D7,
 	M68K_A0, M68K_A1, M68K_A2, M68K_A3, M68K_A4, M68K_A5, M68K_A6, M68K_A7,
 	M68K_FP0, M68K_FP1, M68K_FP2, M68K_FP3, M68K_FP4, M68K_FP5, M68K_FP6, M68K_FP7,
 	M68K_FPSR, M68K_FPCR
 };
-
-class m68000_base_device;
-
-
-extern const device_type M68K;
 
 class m68000_base_device : public cpu_device
 {
@@ -122,6 +104,7 @@ public:
 	// construction/destruction
 	m68000_base_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+protected:
 	void presave();
 	void postload();
 
@@ -150,6 +133,7 @@ public:
 
 	void define_state(void);
 
+public:
 	void set_reset_callback(write_line_delegate callback);
 	void set_cmpild_callback(write32_delegate callback);
 	void set_rte_callback(write_line_delegate callback);
@@ -157,8 +141,6 @@ public:
 	uint16_t get_fc();
 	void set_hmmu_enable(int enable);
 	void set_fpu_enable(int enable);
-	int get_fpu_enable();
-	void set_instruction_hook(read32_delegate ihook);
 	void set_buserror_details(uint32_t fault_addr, uint8_t rw, uint8_t fc);
 
 protected:
@@ -168,91 +150,89 @@ protected:
 	m68000_base_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock,
 						const device_type type, uint32_t prg_data_width, uint32_t prg_address_bits, address_map_constructor internal_map);
 
-private:
-	int    has_fpu;      /* Indicates if a FPU is available (yes on 030, 040, may be on 020) */
-public:
+	int    m_has_fpu;      /* Indicates if a FPU is available (yes on 030, 040, may be on 020) */
 
 
-	uint32_t cpu_type;     /* CPU Type: 68000, 68008, 68010, 68EC020, 68020, 68EC030, 68030, 68EC040, or 68040 */
-//  uint32_t dasm_type;    /* disassembly type */
-	uint32_t dar[16];      /* Data and Address Registers */
-	uint32_t ppc;        /* Previous program counter */
-	uint32_t pc;           /* Program Counter */
-	uint32_t sp[7];        /* User, Interrupt, and Master Stack Pointers */
-	uint32_t vbr;          /* Vector Base Register (m68010+) */
-	uint32_t sfc;          /* Source Function Code Register (m68010+) */
-	uint32_t dfc;          /* Destination Function Code Register (m68010+) */
-	uint32_t cacr;         /* Cache Control Register (m68020, unemulated) */
-	uint32_t caar;         /* Cache Address Register (m68020, unemulated) */
-	uint32_t ir;           /* Instruction Register */
-	floatx80 fpr[8];     /* FPU Data Register (m68030/040) */
-	uint32_t fpiar;        /* FPU Instruction Address Register (m68040) */
-	uint32_t fpsr;         /* FPU Status Register (m68040) */
-	uint32_t fpcr;         /* FPU Control Register (m68040) */
-	uint32_t t1_flag;      /* Trace 1 */
-	uint32_t t0_flag;      /* Trace 0 */
-	uint32_t s_flag;       /* Supervisor */
-	uint32_t m_flag;       /* Master/Interrupt state */
-	uint32_t x_flag;       /* Extend */
-	uint32_t n_flag;       /* Negative */
-	uint32_t not_z_flag;   /* Zero, inverted for speedups */
-	uint32_t v_flag;       /* Overflow */
-	uint32_t c_flag;       /* Carry */
-	uint32_t int_mask;     /* I0-I2 */
-	uint32_t int_level;    /* State of interrupt pins IPL0-IPL2 -- ASG: changed from ints_pending */
-	uint32_t stopped;      /* Stopped state */
-	uint32_t pref_addr;    /* Last prefetch address */
-	uint32_t pref_data;    /* Data in the prefetch queue */
-	uint32_t sr_mask;      /* Implemented status register bits */
-	uint32_t instr_mode;   /* Stores whether we are in instruction mode or group 0/1 exception mode */
-	uint32_t run_mode;     /* Stores whether we are processing a reset, bus error, address error, or something else */
-	int    has_pmmu;     /* Indicates if a PMMU available (yes on 030, 040, no on EC030) */
-	int    has_hmmu;     /* Indicates if an Apple HMMU is available in place of the 68851 (020 only) */
-	int    pmmu_enabled; /* Indicates if the PMMU is enabled */
-	int    hmmu_enabled; /* Indicates if the HMMU is enabled */
-	int    fpu_just_reset; /* Indicates the FPU was just reset */
+	uint32_t m_cpu_type;     /* CPU Type: 68000, 68008, 68010, 68EC020, 68020, 68EC030, 68030, 68EC040, or 68040 */
+//
+	uint32_t m_dar[16];      /* Data and Address Registers */
+	uint32_t m_ppc;        /* Previous program counter */
+	uint32_t m_pc;           /* Program Counter */
+	uint32_t m_sp[7];        /* User, Interrupt, and Master Stack Pointers */
+	uint32_t m_vbr;          /* Vector Base Register (m68010+) */
+	uint32_t m_sfc;          /* Source Function Code Register (m68010+) */
+	uint32_t m_dfc;          /* Destination Function Code Register (m68010+) */
+	uint32_t m_cacr;         /* Cache Control Register (m68020, unemulated) */
+	uint32_t m_caar;         /* Cache Address Register (m68020, unemulated) */
+	uint32_t m_ir;           /* Instruction Register */
+	floatx80 m_fpr[8];     /* FPU Data Register (m68030/040) */
+	uint32_t m_fpiar;        /* FPU Instruction Address Register (m68040) */
+	uint32_t m_fpsr;         /* FPU Status Register (m68040) */
+	uint32_t m_fpcr;         /* FPU Control Register (m68040) */
+	uint32_t m_t1_flag;      /* Trace 1 */
+	uint32_t m_t0_flag;      /* Trace 0 */
+	uint32_t m_s_flag;       /* Supervisor */
+	uint32_t m_m_flag;       /* Master/Interrupt state */
+	uint32_t m_x_flag;       /* Extend */
+	uint32_t m_n_flag;       /* Negative */
+	uint32_t m_not_z_flag;   /* Zero, inverted for speedups */
+	uint32_t m_v_flag;       /* Overflow */
+	uint32_t m_c_flag;       /* Carry */
+	uint32_t m_int_mask;     /* I0-I2 */
+	uint32_t m_int_level;    /* State of interrupt pins IPL0-IPL2 -- ASG: changed from ints_pending */
+	uint32_t m_stopped;      /* Stopped state */
+	uint32_t m_pref_addr;    /* Last prefetch address */
+	uint32_t m_pref_data;    /* Data in the prefetch queue */
+	uint32_t m_sr_mask;      /* Implemented status register bits */
+	uint32_t m_instr_mode;   /* Stores whether we are in instruction mode or group 0/1 exception mode */
+	uint32_t m_run_mode;     /* Stores whether we are processing a reset, bus error, address error, or something else */
+	int    m_has_pmmu;     /* Indicates if a PMMU available (yes on 030, 040, no on EC030) */
+	int    m_has_hmmu;     /* Indicates if an Apple HMMU is available in place of the 68851 (020 only) */
+	int    m_pmmu_enabled; /* Indicates if the PMMU is enabled */
+	int    m_hmmu_enabled; /* Indicates if the HMMU is enabled */
+	int    m_fpu_just_reset; /* Indicates the FPU was just reset */
 
 	/* Clocks required for instructions / exceptions */
-	uint32_t cyc_bcc_notake_b;
-	uint32_t cyc_bcc_notake_w;
-	uint32_t cyc_dbcc_f_noexp;
-	uint32_t cyc_dbcc_f_exp;
-	uint32_t cyc_scc_r_true;
-	uint32_t cyc_movem_w;
-	uint32_t cyc_movem_l;
-	uint32_t cyc_shift;
-	uint32_t cyc_reset;
+	uint32_t m_cyc_bcc_notake_b;
+	uint32_t m_cyc_bcc_notake_w;
+	uint32_t m_cyc_dbcc_f_noexp;
+	uint32_t m_cyc_dbcc_f_exp;
+	uint32_t m_cyc_scc_r_true;
+	uint32_t m_cyc_movem_w;
+	uint32_t m_cyc_movem_l;
+	uint32_t m_cyc_shift;
+	uint32_t m_cyc_reset;
 
-	int  initial_cycles;
-	int  remaining_cycles;                     /* Number of clocks remaining */
-	int  reset_cycles;
-	uint32_t tracing;
+	int  m_initial_cycles;
+	int  m_remaining_cycles;                     /* Number of clocks remaining */
+	int  m_reset_cycles;
+	uint32_t m_tracing;
 
 	int m_address_error;
 
-	uint32_t    aerr_address;
-	uint32_t    aerr_write_mode;
-	uint32_t    aerr_fc;
+	uint32_t    m_aerr_address;
+	uint32_t    m_aerr_write_mode;
+	uint32_t    m_aerr_fc;
 
 	/* Virtual IRQ lines state */
-	uint32_t virq_state;
-	uint32_t nmi_pending;
+	uint32_t m_virq_state;
+	uint32_t m_nmi_pending;
 
-	void (**jump_table)(m68000_base_device *m68k);
-	const uint8_t* cyc_instruction;
-	const uint8_t* cyc_exception;
+	void (m68000_base_device::**m_jump_table)();
+	const uint8_t* m_cyc_instruction;
+	const uint8_t* m_cyc_exception;
 
 	/* Callbacks to host */
-	device_irq_acknowledge_delegate int_ack_callback;   /* Interrupt Acknowledge */
-	write32_delegate bkpt_ack_callback;                 /* Breakpoint Acknowledge */
-	write_line_delegate reset_instr_callback;           /* Called when a RESET instruction is encountered */
-	write32_delegate cmpild_instr_callback;             /* Called when a CMPI.L #v, Dn instruction is encountered */
-	write_line_delegate rte_instr_callback;             /* Called when a RTE instruction is encountered */
-	write8_delegate tas_write_callback;                 /* Called instead of normal write8 by the TAS instruction,
+	device_irq_acknowledge_delegate m_int_ack_callback;   /* Interrupt Acknowledge */
+	write32_delegate m_bkpt_ack_callback;                 /* Breakpoint Acknowledge */
+	write_line_delegate m_reset_instr_callback;           /* Called when a RESET instruction is encountered */
+	write32_delegate m_cmpild_instr_callback;             /* Called when a CMPI.L #v, Dn instruction is encountered */
+	write_line_delegate m_rte_instr_callback;             /* Called when a RTE instruction is encountered */
+	write8_delegate m_tas_write_callback;                 /* Called instead of normal write8 by the TAS instruction,
 	                                                        allowing writeback to be disabled globally or selectively
 	                                                        or other side effects to be implemented */
 
-	address_space *program, *oprogram;
+	address_space *m_program, *m_oprogram;
 
 	/* Redirect memory calls */
 
@@ -264,25 +244,21 @@ public:
 	typedef delegate<void (offs_t, uint16_t)> m68k_write16_delegate;
 	typedef delegate<void (offs_t, uint32_t)> m68k_write32_delegate;
 
-//  class m68k_memory_interface
-//  {
-	public:
 		void init8(address_space &space, address_space &ospace);
 		void init16(address_space &space, address_space &ospace);
 		void init32(address_space &space, address_space &ospace);
 		void init32mmu(address_space &space, address_space &ospace);
 		void init32hmmu(address_space &space, address_space &ospace);
 
-		offs_t  opcode_xor;                     // Address Calculation
-		m68k_readimm16_delegate readimm16;      // Immediate read 16 bit
-		m68k_read8_delegate read8;
-		m68k_read16_delegate read16;
-		m68k_read32_delegate read32;
-		m68k_write8_delegate write8;
-		m68k_write16_delegate write16;
-		m68k_write32_delegate write32;
+		offs_t  m_opcode_xor;                     // Address Calculation
+		m68k_readimm16_delegate m_readimm16;      // Immediate read 16 bit
+		m68k_read8_delegate m_read8;
+		m68k_read16_delegate m_read16;
+		m68k_read32_delegate m_read32;
+		m68k_write8_delegate m_write8;
+		m68k_write16_delegate m_write16;
+		m68k_write32_delegate m_write32;
 
-	private:
 		uint16_t m68008_read_immediate_16(offs_t address);
 		uint16_t read_immediate_16(offs_t address);
 		uint16_t simple_read_immediate_16(offs_t address);
@@ -305,57 +281,47 @@ public:
 		uint32_t readlong_d32_hmmu(offs_t address);
 		void writelong_d32_hmmu(offs_t address, uint32_t data);
 
-//      m68000_base_device *m_cpustate;
-//  };
-
-	public:
-//  m68k_memory_interface memory;
 
 	address_space *m_space, *m_ospace;
 	direct_read_data<0> *m_direct, *m_odirect;
 
-	uint32_t      iotemp;
+	uint32_t      m_iotemp;
 
 	/* save state data */
-	uint16_t save_sr;
-	uint8_t save_stopped;
-	uint8_t save_halted;
+	uint16_t m_save_sr;
+	uint8_t m_save_stopped;
+	uint8_t m_save_halted;
 
 	/* PMMU registers */
-	uint32_t mmu_crp_aptr, mmu_crp_limit;
-	uint32_t mmu_srp_aptr, mmu_srp_limit;
-	uint32_t mmu_urp_aptr;    /* 040 only */
-	uint32_t mmu_tc;
-	uint16_t mmu_sr;
-	uint32_t mmu_sr_040;
-	uint32_t mmu_atc_tag[MMU_ATC_ENTRIES], mmu_atc_data[MMU_ATC_ENTRIES];
-	uint32_t mmu_atc_rr;
-	uint32_t mmu_tt0, mmu_tt1;
-	uint32_t mmu_itt0, mmu_itt1, mmu_dtt0, mmu_dtt1;
-	uint32_t mmu_acr0, mmu_acr1, mmu_acr2, mmu_acr3;
-	uint32_t mmu_last_page_entry, mmu_last_page_entry_addr;
+	uint32_t m_mmu_crp_aptr, m_mmu_crp_limit;
+	uint32_t m_mmu_srp_aptr, m_mmu_srp_limit;
+	uint32_t m_mmu_urp_aptr;    /* 040 only */
+	uint32_t m_mmu_tc;
+	uint16_t m_mmu_sr;
+	uint32_t m_mmu_sr_040;
+	uint32_t m_mmu_atc_tag[MMU_ATC_ENTRIES], m_mmu_atc_data[MMU_ATC_ENTRIES];
+	uint32_t m_mmu_atc_rr;
+	uint32_t m_mmu_tt0, m_mmu_tt1;
+	uint32_t m_mmu_itt0, m_mmu_itt1, m_mmu_dtt0, m_mmu_dtt1;
+	uint32_t m_mmu_acr0, m_mmu_acr1, m_mmu_acr2, m_mmu_acr3;
+	uint32_t m_mmu_last_page_entry, m_mmu_last_page_entry_addr;
 
-	uint16_t mmu_tmp_sr;      /* temporary hack: status code for ptest and to handle write protection */
-	uint16_t mmu_tmp_fc;      /* temporary hack: function code for the mmu (moves) */
-	uint16_t mmu_tmp_rw;      /* temporary hack: read/write (1/0) for the mmu */
-	uint32_t mmu_tmp_buserror_address;   /* temporary hack: (first) bus error address */
-	uint16_t mmu_tmp_buserror_occurred;  /* temporary hack: flag that bus error has occurred from mmu */
-	uint16_t mmu_tmp_buserror_fc;   /* temporary hack: (first) bus error fc */
-	uint16_t mmu_tmp_buserror_rw;   /* temporary hack: (first) bus error rw */
+	uint16_t m_mmu_tmp_sr;      /* temporary hack: status code for ptest and to handle write protection */
+	uint16_t m_mmu_tmp_fc;      /* temporary hack: function code for the mmu (moves) */
+	uint16_t m_mmu_tmp_rw;      /* temporary hack: read/write (1/0) for the mmu */
+	uint32_t m_mmu_tmp_buserror_address;   /* temporary hack: (first) bus error address */
+	uint16_t m_mmu_tmp_buserror_occurred;  /* temporary hack: flag that bus error has occurred from mmu */
+	uint16_t m_mmu_tmp_buserror_fc;   /* temporary hack: (first) bus error fc */
+	uint16_t m_mmu_tmp_buserror_rw;   /* temporary hack: (first) bus error rw */
 
-	uint32_t ic_address[M68K_IC_SIZE];   /* instruction cache address data */
-	uint32_t ic_data[M68K_IC_SIZE];      /* instruction cache content data */
-	bool   ic_valid[M68K_IC_SIZE];     /* instruction cache valid flags */
+	uint32_t m_ic_address[M68K_IC_SIZE];   /* instruction cache address data */
+	uint32_t m_ic_data[M68K_IC_SIZE];      /* instruction cache content data */
+	bool   m_ic_valid[M68K_IC_SIZE];     /* instruction cache valid flags */
 
 
 
 	/* 68307 / 68340 internal address map */
-	address_space *internal;
-
-
-
-	/* external instruction hook (does not depend on debug mode) */
-	read32_delegate instruction_hook;
+	address_space *m_internal;
 
 
 
@@ -378,10 +344,18 @@ public:
 	void init_cpu_coldfire(void);
 
 
-	void m68ki_exception_interrupt(m68000_base_device *m68k, uint32_t int_level);
+	void m68ki_exception_interrupt(uint32_t int_level);
 
-	void reset_cpu(void);
-	inline void cpu_execute(void);
+	inline void m68ki_check_address_error(uint32_t ADDR, uint32_t WRITE_MODE, uint32_t FC)
+	{
+		if((ADDR)&1)
+		{
+			m_aerr_address = ADDR;
+			m_aerr_write_mode = WRITE_MODE;
+			m_aerr_fc = FC;
+			throw 10;
+		}
+	}
 
 	// device_state_interface overrides
 	virtual void state_import(const device_state_entry &entry) override;
@@ -390,6 +364,11 @@ public:
 
 	// device_memory_interface overrides
 	virtual bool memory_translate(int space, int intention, offs_t &address) override;
+
+#include "m68kcpu.h"
+#include "m68kops.h"
+#include "m68kfpu.hxx"
+#include "m68kmmu.h"
 };
 
 

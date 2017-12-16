@@ -383,12 +383,15 @@ void mermaid_state::machine_reset()
 	m_rougien_gfxbank1 = 0;
 	m_rougien_gfxbank2 = 0;
 
-	m_adpcm_idle = 1;
-	m_adpcm_rom_sel = 0;
-	m_adpcm->reset_w(1);
-	m_adpcm_counter->reset_w(1);
-	m_adpcm_trigger = 0;
-	m_adpcm_data = 0;
+	if (m_adpcm.found())
+	{
+		m_adpcm_idle = 1;
+		m_adpcm_rom_sel = 0;
+		m_adpcm->reset_w(1);
+		m_adpcm_counter->reset_w(1);
+		m_adpcm_trigger = 0;
+		m_adpcm_data = 0;
+	}
 }
 
 /* Similar to Jantotsu, apparently the HW has three ports that controls what kind of sample should be played. Every sample size is 0x1000. */

@@ -3829,7 +3829,7 @@ void segas16b_state::tilemap_16b_fpointbl_fill_latch(int i, uint16_t* latched_pa
 	else if (i == 1)
 	{
 		// 6661 vs 1666
-		latched_pageselect[i] = BITSWAP16(m_bootleg_page[3] ,3, 2, 1, 0 , 7, 6, 5, 4,  11, 10, 9, 8,   15, 14, 13, 12 ) ;
+		latched_pageselect[i] = bitswap<16>(m_bootleg_page[3] ,3, 2, 1, 0 , 7, 6, 5, 4,  11, 10, 9, 8,   15, 14, 13, 12 ) ;
 		latched_yscroll[i] = m_bootleg_scroll[0x10/2]+2;
 		latched_xscroll[i] = -m_bootleg_scroll[0x18/2]-1;
 	}
@@ -9021,7 +9021,7 @@ DRIVER_INIT_MEMBER(segas16b_state, fpointbla)
 
 	for (int i = 0;i < 0x10000;i++)
 	{
-		m_decrypted_opcodes[i] = BITSWAP16(rom[i], 8,9,10,11,12,13,14,15,  0, 1, 2, 3, 4, 5, 6, 7);
+		m_decrypted_opcodes[i] = bitswap<16>(rom[i], 8,9,10,11,12,13,14,15,  0, 1, 2, 3, 4, 5, 6, 7);
 	}
 }
 
@@ -9372,14 +9372,14 @@ WRITE16_MEMBER( isgsm_state::data_w )
 		// 8-bit rotation - used by bloxeed
 		switch (m_data_type & 0xe0)
 		{
-			case 0x00: data = BITSWAP8(data,0,7,6,5,4,3,2,1); break;
-			case 0x20: data = BITSWAP8(data,7,6,5,4,3,2,1,0); break;
-			case 0x40: data = BITSWAP8(data,6,5,4,3,2,1,0,7); break;
-			case 0x60: data = BITSWAP8(data,5,4,3,2,1,0,7,6); break;
-			case 0x80: data = BITSWAP8(data,4,3,2,1,0,7,6,5); break;
-			case 0xa0: data = BITSWAP8(data,3,2,1,0,7,6,5,4); break;
-			case 0xc0: data = BITSWAP8(data,2,1,0,7,6,5,4,3); break;
-			case 0xe0: data = BITSWAP8(data,1,0,7,6,5,4,3,2); break;
+			case 0x00: data = bitswap<8>(data,0,7,6,5,4,3,2,1); break;
+			case 0x20: data = bitswap<8>(data,7,6,5,4,3,2,1,0); break;
+			case 0x40: data = bitswap<8>(data,6,5,4,3,2,1,0,7); break;
+			case 0x60: data = bitswap<8>(data,5,4,3,2,1,0,7,6); break;
+			case 0x80: data = bitswap<8>(data,4,3,2,1,0,7,6,5); break;
+			case 0xa0: data = bitswap<8>(data,3,2,1,0,7,6,5,4); break;
+			case 0xc0: data = bitswap<8>(data,2,1,0,7,6,5,4,3); break;
+			case 0xe0: data = bitswap<8>(data,1,0,7,6,5,4,3,2); break;
 		}
 	}
 
@@ -9455,14 +9455,14 @@ WRITE16_MEMBER( isgsm_state::data_w )
 				// 8-bit rotation - used by tetris
 				switch (m_data_type & 0xe0)
 				{
-					case 0x00: byte = BITSWAP8(byte,0,7,6,5,4,3,2,1); break;
-					case 0x20: byte = BITSWAP8(byte,7,6,5,4,3,2,1,0); break;
-					case 0x40: byte = BITSWAP8(byte,6,5,4,3,2,1,0,7); break;
-					case 0x60: byte = BITSWAP8(byte,5,4,3,2,1,0,7,6); break;
-					case 0x80: byte = BITSWAP8(byte,4,3,2,1,0,7,6,5); break;
-					case 0xa0: byte = BITSWAP8(byte,3,2,1,0,7,6,5,4); break;
-					case 0xc0: byte = BITSWAP8(byte,2,1,0,7,6,5,4,3); break;
-					case 0xe0: byte = BITSWAP8(byte,1,0,7,6,5,4,3,2); break;
+					case 0x00: byte = bitswap<8>(byte,0,7,6,5,4,3,2,1); break;
+					case 0x20: byte = bitswap<8>(byte,7,6,5,4,3,2,1,0); break;
+					case 0x40: byte = bitswap<8>(byte,6,5,4,3,2,1,0,7); break;
+					case 0x60: byte = bitswap<8>(byte,5,4,3,2,1,0,7,6); break;
+					case 0x80: byte = bitswap<8>(byte,4,3,2,1,0,7,6,5); break;
+					case 0xa0: byte = bitswap<8>(byte,3,2,1,0,7,6,5,4); break;
+					case 0xc0: byte = bitswap<8>(byte,2,1,0,7,6,5,4,3); break;
+					case 0xe0: byte = bitswap<8>(byte,1,0,7,6,5,4,3,2); break;
 				}
 			}
 
@@ -9510,7 +9510,7 @@ WRITE16_MEMBER( isgsm_state::cart_security_high_w )
 
 uint32_t isgsm_state::shinfz_security(uint32_t input)
 {
-	return BITSWAP32(input, 19, 20, 25, 26, 15, 0, 16, 2, 8, 9, 13, 14, 31, 21, 7, 18, 11, 30, 22, 17, 3, 4, 12, 28, 29, 5, 27, 10, 23, 24, 1, 6);
+	return bitswap<32>(input, 19, 20, 25, 26, 15, 0, 16, 2, 8, 9, 13, 14, 31, 21, 7, 18, 11, 30, 22, 17, 3, 4, 12, 28, 29, 5, 27, 10, 23, 24, 1, 6);
 }
 
 uint32_t isgsm_state::tetrbx_security(uint32_t input)
@@ -9734,7 +9734,7 @@ DRIVER_INIT_MEMBER(isgsm_state,isgsm)
 	std::vector<uint16_t> temp(0x20000/2);
 	uint16_t *rom = (uint16_t *)memregion("bios")->base();
 	for (int addr = 0; addr < 0x20000/2; addr++)
-		temp[addr ^ 0x4127] = BITSWAP16(rom[addr], 6, 14, 4, 2, 12, 10, 8, 0, 1, 9, 11, 13, 3, 5, 7, 15);
+		temp[addr ^ 0x4127] = bitswap<16>(rom[addr], 6, 14, 4, 2, 12, 10, 8, 0, 1, 9, 11, 13, 3, 5, 7, 15);
 	memcpy(rom, &temp[0], 0x20000);
 }
 
@@ -9745,7 +9745,7 @@ DRIVER_INIT_MEMBER(isgsm_state,shinfz)
 	std::vector<uint16_t> temp(0x200000/2);
 	uint16_t *rom = (uint16_t *)memregion("gamecart_rgn")->base();
 	for (int addr = 0; addr < 0x200000/2; addr++)
-		temp[addr ^ 0x68956] = BITSWAP16(rom[addr], 8, 4, 12, 3, 6, 7, 1, 0, 15, 11, 5, 14, 10, 2, 9, 13);
+		temp[addr ^ 0x68956] = bitswap<16>(rom[addr], 8, 4, 12, 3, 6, 7, 1, 0, 15, 11, 5, 14, 10, 2, 9, 13);
 	memcpy(rom, &temp[0], 0x200000);
 
 	m_read_xor = 0x66;
@@ -9759,7 +9759,7 @@ DRIVER_INIT_MEMBER(isgsm_state,tetrbx)
 	std::vector<uint16_t> temp(0x80000/2);
 	uint16_t *rom = (uint16_t *)memregion("gamecart_rgn")->base();
 	for (int addr = 0; addr < 0x80000/2; addr++)
-		temp[addr ^ 0x2A6E6] = BITSWAP16(rom[addr], 4, 0, 12, 5, 7, 3, 1, 14, 10, 11, 9, 6, 15, 2, 13, 8);
+		temp[addr ^ 0x2A6E6] = bitswap<16>(rom[addr], 4, 0, 12, 5, 7, 3, 1, 14, 10, 11, 9, 6, 15, 2, 13, 8);
 	memcpy(rom, &temp[0], 0x80000);
 
 	m_read_xor = 0x73;

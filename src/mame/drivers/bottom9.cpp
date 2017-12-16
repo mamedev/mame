@@ -19,7 +19,7 @@
 #include "includes/konamipt.h"
 
 #include "cpu/z80/z80.h"
-#include "cpu/m6809/m6809.h"
+#include "cpu/m6809/hd6309.h"
 #include "machine/gen_latch.h"
 #include "machine/watchdog.h"
 #include "speaker.h"
@@ -301,11 +301,11 @@ void bottom9_state::machine_reset()
 static MACHINE_CONFIG_START( bottom9 )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6809, 2000000) /* ? */
+	MCFG_CPU_ADD("maincpu", HD6309E, XTAL_24MHz / 8) // 63C09E
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", bottom9_state,  bottom9_interrupt)
 
-	MCFG_CPU_ADD("audiocpu", Z80, 3579545)
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL_3_579545MHz)
 	MCFG_CPU_PROGRAM_MAP(audio_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(bottom9_state, bottom9_sound_interrupt, 8*60)  /* irq is triggered by the main CPU */
 
@@ -324,7 +324,7 @@ static MACHINE_CONFIG_START( bottom9 )
 	MCFG_PALETTE_ENABLE_SHADOWS()
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
-	MCFG_DEVICE_ADD("k052109", K052109, 0)
+	MCFG_DEVICE_ADD("k052109", K052109, 0) // 051961 on schematics
 	MCFG_GFX_PALETTE("palette")
 	MCFG_K052109_CB(bottom9_state, tile_callback)
 
@@ -342,12 +342,12 @@ static MACHINE_CONFIG_START( bottom9 )
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("k007232_1", K007232, 3579545)
+	MCFG_SOUND_ADD("k007232_1", K007232, XTAL_3_579545MHz)
 	MCFG_K007232_PORT_WRITE_HANDLER(WRITE8(bottom9_state, volume_callback0))
 	MCFG_SOUND_ROUTE(0, "mono", 0.40)
 	MCFG_SOUND_ROUTE(1, "mono", 0.40)
 
-	MCFG_SOUND_ADD("k007232_2", K007232, 3579545)
+	MCFG_SOUND_ADD("k007232_2", K007232, XTAL_3_579545MHz)
 	MCFG_K007232_PORT_WRITE_HANDLER(WRITE8(bottom9_state, volume_callback1))
 	MCFG_SOUND_ROUTE(0, "mono", 0.40)
 	MCFG_SOUND_ROUTE(1, "mono", 0.40)

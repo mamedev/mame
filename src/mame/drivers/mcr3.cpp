@@ -268,7 +268,7 @@ WRITE8_MEMBER(mcr3_state::maxrpm_op6_w)
 
 	/* when both the write and the enable are low, it's a write to the ADC0844 */
 	if (!(data & 0x40) && !(data & 0x20))
-		m_maxrpm_adc->write(space, 0, BITSWAP8(m_maxrpm_adc_control, 7, 6, 5, 4, 2, 3, 1, 0));
+		m_maxrpm_adc->write(space, 0, bitswap<8>(m_maxrpm_adc_control, 7, 6, 5, 4, 2, 3, 1, 0));
 
 	/* low 5 bits control the turbo CS */
 	m_turbo_cheap_squeak->write(space, offset, data);

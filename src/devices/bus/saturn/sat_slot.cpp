@@ -156,7 +156,7 @@ image_init_result sat_cart_slot_device::call_load()
 
 			// fix endianness....
 			for (int i = 0; i < len/4; i ++)
-				ROM[i] = BITSWAP32(ROM[i],7,6,5,4,3,2,1,0,15,14,13,12,11,10,9,8,23,22,21,20,19,18,17,16,31,30,29,28,27,26,25,24);
+				ROM[i] = bitswap<32>(ROM[i],7,6,5,4,3,2,1,0,15,14,13,12,11,10,9,8,23,22,21,20,19,18,17,16,31,30,29,28,27,26,25,24);
 //          {
 //              uint8_t tempa = ROM[i+0];
 //              uint8_t tempb = ROM[i+1];

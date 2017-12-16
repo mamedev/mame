@@ -1696,7 +1696,7 @@ void debugger_commands::execute_save(int ref, const std::vector<std::string> &pa
 	}
 
 	/* now write the data out */
-	auto dis = space->machine().disable_side_effect();
+	auto dis = space->device().machine().disable_side_effect();
 	switch (space->addr_shift())
 	{
 	case -3:
@@ -1922,7 +1922,7 @@ void debugger_commands::execute_dump(int ref, const std::vector<std::string> &pa
 	else if(shift < 0)
 		width >>= -shift;
 
-	auto dis = space->machine().disable_side_effect();
+	auto dis = space->device().machine().disable_side_effect();
 	bool be = space->endianness() == ENDIANNESS_BIG;
 
 	for (offs_t i = offset; i <= endoffset; i += rowsize)

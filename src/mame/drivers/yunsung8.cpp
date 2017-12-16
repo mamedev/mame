@@ -53,7 +53,7 @@ WRITE8_MEMBER(yunsung8_state::bankswitch_w)
 	membank("mainbank")->set_entry(data & 0x07);
 
 	if (data & ~0x37)
-		logerror("CPU #0 - PC %04X: Bank %02X\n", space.device().safe_pc(), data);
+		logerror("CPU #0 - PC %04X: Bank %02X\n", m_maincpu->pc(), data);
 }
 
 READ8_MEMBER(yunsung8_state::sound_command_r)

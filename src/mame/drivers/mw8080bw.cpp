@@ -179,7 +179,7 @@ READ8_MEMBER(mw8080bw_state::mw8080bw_shift_result_rev_r)
 {
 	uint8_t ret = m_mb14241->shift_result_r(space, 0);
 
-	return BITSWAP8(ret,0,1,2,3,4,5,6,7);
+	return bitswap<8>(ret,0,1,2,3,4,5,6,7);
 }
 
 

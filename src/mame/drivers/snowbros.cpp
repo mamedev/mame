@@ -2782,7 +2782,7 @@ DRIVER_INIT_MEMBER(snowbros_state,4in1boot)
 		std::vector<uint8_t> buffer(len);
 		int i;
 		for (i = 0;i < len; i++)
-			if (i&1) buffer[i] = BITSWAP8(src[i],6,7,5,4,3,2,1,0);
+			if (i&1) buffer[i] = bitswap<8>(src[i],6,7,5,4,3,2,1,0);
 			else buffer[i] = src[i];
 
 		memcpy(src,&buffer[0],len);
@@ -2812,7 +2812,7 @@ DRIVER_INIT_MEMBER(snowbros_state,snowbro3)
 		std::vector<uint8_t> buffer(len);
 		int i;
 		for (i = 0;i < len; i++)
-			buffer[i] = src[BITSWAP24(i,23,22,21,20,19,18,17,16,15,14,13,12,11,10,9,8,7,6,5,3,4,1,2,0)];
+			buffer[i] = src[bitswap<24>(i,23,22,21,20,19,18,17,16,15,14,13,12,11,10,9,8,7,6,5,3,4,1,2,0)];
 		memcpy(src,&buffer[0],len);
 	}
 
@@ -2856,7 +2856,7 @@ DRIVER_INIT_MEMBER(snowbros_state,toto)
 
 	for (int i = 0; i < len; i++)
 	{
-		src[i] = BITSWAP8(src[i], 7, 6, 5, 3, 4, 2, 1, 0);
+		src[i] = bitswap<8>(src[i], 7, 6, 5, 3, 4, 2, 1, 0);
 	}
 
 	src = memregion("gfx1")->base();
@@ -2864,7 +2864,7 @@ DRIVER_INIT_MEMBER(snowbros_state,toto)
 
 	for (int i = 0; i < len; i++)
 	{
-		src[i] = BITSWAP8(src[i], 7, 6, 5, 3, 4, 2, 1, 0);
+		src[i] = bitswap<8>(src[i], 7, 6, 5, 3, 4, 2, 1, 0);
 	}
 
 	src = memregion("soundcpu")->base();
@@ -2872,7 +2872,7 @@ DRIVER_INIT_MEMBER(snowbros_state,toto)
 
 	for (int i = 0; i < len; i++)
 	{
-		src[i] = BITSWAP8(src[i], 7, 6, 5, 3, 4, 2, 1, 0);
+		src[i] = bitswap<8>(src[i], 7, 6, 5, 3, 4, 2, 1, 0);
 	}
 
 	// protection? (just return 0x07)

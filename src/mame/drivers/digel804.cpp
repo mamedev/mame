@@ -315,7 +315,7 @@ READ8_MEMBER( digel804_state::ip46 ) // keypad read
 	logerror("Digel804: returning %02X for port 46 keypad read\n", kbd);
 #endif
 
-	return BITSWAP8(kbd,7,6,5,4,1,0,3,2);   // verified from schematics
+	return bitswap<8>(kbd,7,6,5,4,1,0,3,2);   // verified from schematics
 }
 
 WRITE8_MEMBER( digel804_state::op46 )

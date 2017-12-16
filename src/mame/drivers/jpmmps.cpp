@@ -33,6 +33,7 @@
 
 #include "cpu/tms9900/tms9995.h"
 #include "sound/sn76496.h"
+#include "machine/74259.h"
 #include "machine/i8255.h"
 #include "machine/tms9902.h"
 #include "machine/meters.h"
@@ -185,15 +186,7 @@ static ADDRESS_MAP_START( jpmmps_io_map, AS_IO, 8, jpmmps_state )
 //  AM_RANGE(0x0027, 0x0027) // uart2 int
 
 	AM_RANGE(0x0040, 0x005f) AM_DEVREADWRITE("tms9902_ic10", tms9902_device, cruread, cruwrite)
-
-//  AM_RANGE(0x0060, 0x0060) // watchdog
-//  AM_RANGE(0x0061, 0x0061) // ram en
-//  AM_RANGE(0x0062, 0x0062) // alarm
-//  AM_RANGE(0x0063, 0x0063) // nmi en
-//  AM_RANGE(0x0064, 0x0064) // reel en
-//  AM_RANGE(0x0065, 0x0065) // io en
-//  AM_RANGE(0x0066, 0x0066) // bb
-//  AM_RANGE(0x0067, 0x0067) // diagnostic led
+	AM_RANGE(0x0060, 0x0067) AM_DEVWRITE("mainlatch", ls259_device, write_d0)
 ADDRESS_MAP_END
 
 
@@ -232,10 +225,10 @@ WRITE8_MEMBER(jpmmps_state::jpmmps_ic22_portc_w)
 }
 
 
-// these are wrong
-#define MAIN_CLOCK 2000000
-#define SOUND_CLOCK 2000000
-#define DUART_CLOCK 2000000
+// BCLKOUT (used by peripherals) is normally TMS9995 CLKOUT; however, MPS1 allows an external CLK DMA to be selected instead
+#define MAIN_CLOCK XTAL_6MHz
+#define SOUND_CLOCK (MAIN_CLOCK / 4)
+#define DUART_CLOCK (MAIN_CLOCK / 4)
 
 
 void jpmmps_state::machine_reset()
@@ -248,6 +241,18 @@ static MACHINE_CONFIG_START( jpmmps )
 
 	// CPU TMS9995, standard variant; no line connections
 	MCFG_TMS99xx_ADD("maincpu", TMS9995, MAIN_CLOCK, jpmmps_map, jpmmps_io_map)
+
+	MCFG_DEVICE_ADD("mainlatch", LS259, 0) // IC10
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(NOOP) // watchdog
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(NOOP) // ram en
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(NOOP) // alarm
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(NOOP) // nmi en
+	//MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(INPUTLINE("reelmcu", INPUT_LINE_RESET)) MCFG_DEVCB_INVERT // reel en
+	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(NOOP) // io en
+	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(NOOP) // bb
+	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(NOOP) // diagnostic led
+
+	//MCFG_CPU_ADD("reelmcu", TMS7041, XTAL_5MHz)
 
 	MCFG_DEVICE_ADD("ppi8255_ic26", I8255, 0)
 	// Port B 0 is coin lockout

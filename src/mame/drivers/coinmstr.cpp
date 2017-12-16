@@ -1540,8 +1540,8 @@ DRIVER_INIT_MEMBER(coinmstr_state,coinmstr)
 
 	for(i = 0; i < length; i++)
 	{
-		int adr = BITSWAP24(i, 23,22,21,20,19,18,17,16,15, 14,8,7,2,5,12,10,9,11,13,3,6,0,1,4);
-		rom[i] = BITSWAP8(buf[adr],3,2,4,1,5,0,6,7);
+		int adr = bitswap<24>(i, 23,22,21,20,19,18,17,16,15, 14,8,7,2,5,12,10,9,11,13,3,6,0,1,4);
+		rom[i] = bitswap<8>(buf[adr],3,2,4,1,5,0,6,7);
 	}
 }
 

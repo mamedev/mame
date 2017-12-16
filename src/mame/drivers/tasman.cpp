@@ -186,13 +186,13 @@ WRITE8_MEMBER(kongambl_state::eeprom_w)
 
 READ32_MEMBER(kongambl_state::test_r)
 {
-	return -1;//space.machine().rand();
+	return -1;//machine().rand();
 }
 
 /*
  READ32_MEMBER(kongambl_state::rng_r)
 {
-    return space.machine().rand();
+    return machine().rand();
 }
 */
 

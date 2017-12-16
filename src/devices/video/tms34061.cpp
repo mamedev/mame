@@ -191,7 +191,7 @@ void tms34061_device::register_w(address_space &space, offs_t offset, uint8_t da
 	}
 
 	/* log it */
-	LOG("%s:tms34061 %s = %04x\n", space.machine().describe_context(), regnames[regnum], m_regs[regnum]);
+	LOG("%s:tms34061 %s = %04x\n", machine().describe_context(), regnames[regnum], m_regs[regnum]);
 
 	/* update the state of things */
 	switch (regnum)
@@ -269,7 +269,7 @@ uint8_t tms34061_device::register_r(address_space &space, offs_t offset)
 	}
 
 	/* log it */
-	LOG("%s:tms34061 %s read = %04X\n", space.machine().describe_context(), regnames[regnum], result);
+	LOG("%s:tms34061 %s read = %04X\n", machine().describe_context(), regnames[regnum], result);
 	return (offset & 0x02) ? (result >> 8) : result;
 }
 
@@ -376,7 +376,7 @@ void tms34061_device::xypixel_w(address_space &space, int offset, uint8_t data)
 
 	/* mask to the VRAM size */
 	pixeloffs &= m_vrammask;
-	LOG("%s:tms34061 xy (%04x) = %02x/%02x\n", space.machine().describe_context(), pixeloffs, data, m_latchdata);
+	LOG("%s:tms34061 xy (%04x) = %02x/%02x\n", machine().describe_context(), pixeloffs, data, m_latchdata);
 
 	/* set the pixel data */
 	m_vram[pixeloffs] = data;
@@ -432,7 +432,7 @@ void tms34061_device::write(address_space &space, int col, int row, int func, ui
 			offs = ((row << m_rowshift) | col) & m_vrammask;
 			if (m_regs[TMS34061_CONTROL2] & 0x0040)
 				offs |= (m_regs[TMS34061_CONTROL2] & 3) << 16;
-			LOG("%s:tms34061 direct (%04x) = %02x/%02x\n", space.machine().describe_context(), offs, data, m_latchdata);
+			LOG("%s:tms34061 direct (%04x) = %02x/%02x\n", machine().describe_context(), offs, data, m_latchdata);
 			if (m_vram[offs] != data || m_latchram[offs] != m_latchdata)
 			{
 				m_vram[offs] = data;
@@ -446,7 +446,7 @@ void tms34061_device::write(address_space &space, int col, int row, int func, ui
 			if (m_regs[TMS34061_CONTROL2] & 0x0040)
 				offs |= (m_regs[TMS34061_CONTROL2] & 3) << 16;
 			offs &= m_vrammask;
-			LOG("%s:tms34061 shiftreg write (%04x)\n", space.machine().describe_context(), offs);
+			LOG("%s:tms34061 shiftreg write (%04x)\n", machine().describe_context(), offs);
 
 			memcpy(&m_vram[offs], m_shiftreg, (size_t)1 << m_rowshift);
 			memset(&m_latchram[offs], m_latchdata, (size_t)1 << m_rowshift);
@@ -458,14 +458,14 @@ void tms34061_device::write(address_space &space, int col, int row, int func, ui
 			if (m_regs[TMS34061_CONTROL2] & 0x0040)
 				offs |= (m_regs[TMS34061_CONTROL2] & 3) << 16;
 			offs &= m_vrammask;
-			LOG("%s:tms34061 shiftreg read (%04x)\n", space.machine().describe_context(), offs);
+			LOG("%s:tms34061 shiftreg read (%04x)\n", machine().describe_context(), offs);
 
 			m_shiftreg = &m_vram[offs];
 			break;
 
 		/* log anything else */
 		default:
-			logerror("%s:Unsupported TMS34061 function %d\n", space.machine().describe_context(), func);
+			logerror("%s:Unsupported TMS34061 function %d\n", machine().describe_context(), func);
 			break;
 	}
 }
@@ -519,7 +519,7 @@ uint8_t tms34061_device::read(address_space &space, int col, int row, int func)
 
 		/* log anything else */
 		default:
-			logerror("%s:Unsupported TMS34061 function %d\n", space.machine().describe_context(),
+			logerror("%s:Unsupported TMS34061 function %d\n", machine().describe_context(),
 					func);
 			break;
 	}

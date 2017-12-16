@@ -125,10 +125,10 @@ protected:
 	uint32_t m_extal;
 
 	/* 68340 peripheral modules */
-	m68340_sim*    m68340SIM;
-	m68340_dma*    m68340DMA;
+	m68340_sim*    m_m68340SIM;
+	m68340_dma*    m_m68340DMA;
 
-	uint32_t m68340_base;
+	uint32_t m_m68340_base;
 
 	emu_timer *m_irq_timer;
 

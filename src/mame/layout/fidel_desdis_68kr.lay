@@ -53,7 +53,6 @@
 
 	<element name="black"><rect><color red="0.17" green="0.15" blue="0.15" /></rect></element>
 	<element name="white"><rect><color red="0.81" green="0.8" blue="0.79" /></rect></element>
-	<element name="redb"><rect><color red="0.81" green="0.3" blue="0.29" /></rect></element>
 	<element name="disk_black"><disk><color red="0.17" green="0.15" blue="0.15" /></disk></element>
 	<element name="disk_white"><disk><color red="0.81" green="0.8" blue="0.79" /></disk></element>
 
@@ -428,7 +427,7 @@
 		<bezel element="hlb" inputtag="IN.8" inputmask="0x04"><bounds x="67" y="92" width="4" height="4" /><color alpha="0.3" /></bezel>
 		<bezel element="hlb" inputtag="IN.8" inputmask="0x02"><bounds x="76" y="92" width="4" height="4" /><color alpha="0.3" /></bezel>
 
-		<bezel element="redb"><bounds x="-5" y="91" width="8" height="6" /></bezel>
+		<bezel element="black"><bounds x="-5" y="91" width="8" height="6" /></bezel>
 		<bezel element="white"><bounds x="-4.25" y="91.75" width="6.5" height="4.5" /></bezel>
 		<bezel element="text_shift"><bounds x="-4" y="93" width="6" height="2" /></bezel>
 		<bezel name="1.8" element="led"><bounds x="0.65" y="94.65" width="1.5" height="1.5" /></bezel>

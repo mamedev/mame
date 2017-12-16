@@ -2154,8 +2154,8 @@ void halleys_state::init_common()
 
 	for (i=0; i<0x10000; i++)
 	{
-		addr = BITSWAP16(i,15,14,13,12,11,10,1,0,4,5,6,3,7,8,9,2);
-		buf[i] = BITSWAP8(rom[addr],0,7,6,5,1,4,2,3);
+		addr = bitswap<16>(i,15,14,13,12,11,10,1,0,4,5,6,3,7,8,9,2);
+		buf[i] = bitswap<8>(rom[addr],0,7,6,5,1,4,2,3);
 	}
 
 	memcpy(rom, buf, 0x10000);

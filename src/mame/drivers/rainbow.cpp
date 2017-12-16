@@ -2863,7 +2863,7 @@ WRITE16_MEMBER(rainbow_state::vram_w)
 
 	if(m_GDC_MODE_REGISTER & GDC_MODE_VECTOR) // VT240 : if(SELECT_VECTOR_PATTERN_REGISTER)
 	{
-		chr = BITSWAP8(m_vpat, m_patidx, m_patidx, m_patidx, m_patidx, m_patidx, m_patidx, m_patidx, m_patidx);
+		chr = bitswap<8>(m_vpat, m_patidx, m_patidx, m_patidx, m_patidx, m_patidx, m_patidx, m_patidx, m_patidx);
 		chr |= (chr << 8);
 		if(m_patcnt-- == 0)
 		{
@@ -3121,7 +3121,7 @@ WRITE8_MEMBER(rainbow_state::GDC_EXTRA_REGISTER_w)
 			// --------------------  WRITE BUFFER USED IN WORD MODE ONLY !
 			// "OUTPUT WRITE BUFFER IS THE INVERSE OF THE INPUT" (quote from 4-3 of the PDF)
 			//  BITSWAP SEEMS NECESSARY (see digits in DOODLE)... !
-			m_GDC_WRITE_BUFFER[m_GDC_write_buffer_index++] = ~BITSWAP8(data, 0, 1, 2, 3, 4, 5, 6, 7);
+			m_GDC_WRITE_BUFFER[m_GDC_write_buffer_index++] = ~bitswap<8>(data, 0, 1, 2, 3, 4, 5, 6, 7);
 			m_GDC_write_buffer_index &= 0xf; // write up to 16 bytes to port 52h.
 			break;
 
@@ -3149,10 +3149,10 @@ WRITE8_MEMBER(rainbow_state::GDC_EXTRA_REGISTER_w)
 		// There is no specific order for the WRITE_MASK (according to txt/code samples in DEC's PDF).
 		// NOTE: LOW <-> HI JUXTAPOSITION!
 		case 4: // 54h   Write Mask LOW
-			m_GDC_WRITE_MASK = ( BITSWAP8(data, 0, 1, 2, 3, 4, 5, 6, 7) << 8 )  | ( m_GDC_WRITE_MASK & 0x00FF );
+			m_GDC_WRITE_MASK = ( bitswap<8>(data, 0, 1, 2, 3, 4, 5, 6, 7) << 8 )  | ( m_GDC_WRITE_MASK & 0x00FF );
 			break;
 		case 5: // 55h   Write Mask HIGH
-			m_GDC_WRITE_MASK = ( m_GDC_WRITE_MASK & 0xFF00 ) | BITSWAP8(data, 0, 1, 2, 3, 4, 5, 6, 7);
+			m_GDC_WRITE_MASK = ( m_GDC_WRITE_MASK & 0xFF00 ) | bitswap<8>(data, 0, 1, 2, 3, 4, 5, 6, 7);
 			break;
 	} // switch
 

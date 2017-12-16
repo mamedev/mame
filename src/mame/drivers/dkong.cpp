@@ -1655,8 +1655,8 @@ void dkong_state::braze_decrypt_rom(uint8_t *dest)
 	{
 		oldbyte = ROM[mem];
 
-		newmem = ((BITSWAP8((mem >> 8),7,2,3,1,0,6,4,5))<<8) | (mem & 0xff);
-		newbyte = BITSWAP8(oldbyte, 1,4,5,7,6,0,3,2);
+		newmem = ((bitswap<8>((mem >> 8),7,2,3,1,0,6,4,5))<<8) | (mem & 0xff);
+		newbyte = bitswap<8>(oldbyte, 1,4,5,7,6,0,3,2);
 
 		dest[newmem] = newbyte;
 	}
@@ -3248,7 +3248,7 @@ void dkong_state::drakton_decrypt_rom(uint8_t mod, int offs, int *bs)
 		    PAL10H8 driven by the counter. */
 
 		newbyte = (oldbyte & mod) | (~oldbyte & ~mod);
-		newbyte = BITSWAP8(newbyte, bs[0], bs[1], bs[2], bs[3], bs[4], bs[5], bs[6], bs[7]);
+		newbyte = bitswap<8>(newbyte, bs[0], bs[1], bs[2], bs[3], bs[4], bs[5], bs[6], bs[7]);
 
 		ROM[mem + offs] = newbyte;
 	}

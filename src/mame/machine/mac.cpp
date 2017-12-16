@@ -127,7 +127,7 @@ void mac_fdc_set_enable_lines(device_t *device, int enable_mask)
 {
 	mac_state *mac = device->machine().driver_data<mac_state>();
 
-	if (mac->m_model != MODEL_MAC_SE)
+	if (mac->m_model != mac_state::MODEL_MAC_SE)
 	{
 		sony_set_enable_lines(device, enable_mask);
 	}
@@ -1166,7 +1166,7 @@ void mac_state::scc_mouse_irq(int x, int y)
 
 READ16_MEMBER ( mac_state::mac_scc_r )
 {
-	scc8530_t *scc = space.machine().device<scc8530_t>("scc");
+	scc8530_t *scc = machine().device<scc8530_t>("scc");
 	uint16_t result;
 
 	result = scc->reg_r(space, offset);
@@ -1177,13 +1177,13 @@ READ16_MEMBER ( mac_state::mac_scc_r )
 
 WRITE16_MEMBER ( mac_state::mac_scc_w )
 {
-	scc8530_t *scc = space.machine().device<scc8530_t>("scc");
+	scc8530_t *scc = machine().device<scc8530_t>("scc");
 	scc->reg_w(space, offset, data);
 }
 
 WRITE16_MEMBER ( mac_state::mac_scc_2_w )
 {
-	scc8530_t *scc = space.machine().device<scc8530_t>("scc");
+	scc8530_t *scc = machine().device<scc8530_t>("scc");
 	scc->reg_w(space, offset, data >> 8);
 }
 
@@ -1202,7 +1202,7 @@ READ16_MEMBER ( mac_state::mac_iwm_r )
 	 */
 
 	uint16_t result = 0;
-	applefdc_base_device *fdc = space.machine().device<applefdc_base_device>("fdc");
+	applefdc_base_device *fdc = machine().device<applefdc_base_device>("fdc");
 
 	result = fdc->read(offset >> 8);
 
@@ -1214,7 +1214,7 @@ READ16_MEMBER ( mac_state::mac_iwm_r )
 
 WRITE16_MEMBER ( mac_state::mac_iwm_w )
 {
-	applefdc_base_device *fdc = space.machine().device<applefdc_base_device>("fdc");
+	applefdc_base_device *fdc = machine().device<applefdc_base_device>("fdc");
 
 	if (LOG_MAC_IWM)
 		printf("mac_iwm_w: offset=0x%08x data=0x%04x mask %04x (PC=%x)\n", offset, data, mem_mask, space.device().safe_pc());

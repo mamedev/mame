@@ -256,7 +256,7 @@ void jp_state::update_display()
 	if (t == 8)
 	{ // ball number
 		segment = m_disp_data >> 6;
-		output().set_digit_value(94, BITSWAP8(segment, 0, 1, 2, 3, 4, 5, 6, 7) ^ 0xff);
+		output().set_digit_value(94, bitswap<8>(segment, 0, 1, 2, 3, 4, 5, 6, 7) ^ 0xff);
 	}
 	else if (t < 8)
 	{ // main displays

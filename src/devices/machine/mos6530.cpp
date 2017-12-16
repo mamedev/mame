@@ -199,7 +199,7 @@ WRITE8_MEMBER( mos6530_device::write )
 	if (offset & 0x04)
 	{
 		static const uint8_t timershift[4] = { 0, 3, 6, 10 };
-		attotime curtime = space.machine().time();
+		attotime curtime = machine().time();
 		int64_t target;
 
 		/* A0-A1 contain the timer divisor */

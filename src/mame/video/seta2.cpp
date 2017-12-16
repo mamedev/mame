@@ -464,6 +464,13 @@ VIDEO_START_MEMBER(seta2_state,xoffset)
 	m_xoffset = 0x200;
 }
 
+VIDEO_START_MEMBER(seta2_state,xoffset1)
+{
+	video_start();
+
+	m_xoffset = 0x1;
+}
+
 VIDEO_START_MEMBER(seta2_state,yoffset)
 {
 	video_start();

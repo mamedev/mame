@@ -492,7 +492,7 @@ DRIVER_INIT_MEMBER( wmg_state, wmg )
 static MACHINE_CONFIG_START( wmg )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6809, MASTER_CLOCK/3/4)
+	MCFG_CPU_ADD("maincpu", MC6809E, MASTER_CLOCK/3/4)
 	MCFG_CPU_PROGRAM_MAP(wmg_cpu1)
 
 	MCFG_CPU_ADD("soundcpu", M6808, SOUND_CLOCK)

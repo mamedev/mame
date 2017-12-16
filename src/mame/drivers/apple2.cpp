@@ -636,16 +636,16 @@ READ8_MEMBER(napple2_state::flags_r)
 		return (m_joybuttons->read() & 0x40) ? 0x80 : 0;
 
 	case 4:  // joy 1 X axis
-		return (space.machine().time().as_double() < m_joystick_x1_time) ? 0x80 : 0;
+		return (machine().time().as_double() < m_joystick_x1_time) ? 0x80 : 0;
 
 	case 5:  // joy 1 Y axis
-		return (space.machine().time().as_double() < m_joystick_y1_time) ? 0x80 : 0;
+		return (machine().time().as_double() < m_joystick_y1_time) ? 0x80 : 0;
 
 	case 6: // joy 2 X axis
-		return (space.machine().time().as_double() < m_joystick_x2_time) ? 0x80 : 0;
+		return (machine().time().as_double() < m_joystick_x2_time) ? 0x80 : 0;
 
 	case 7: // joy 2 Y axis
-		return (space.machine().time().as_double() < m_joystick_y2_time) ? 0x80 : 0;
+		return (machine().time().as_double() < m_joystick_y2_time) ? 0x80 : 0;
 	}
 
 	// this is never reached

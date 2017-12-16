@@ -975,12 +975,12 @@ READ16_MEMBER( lc89510_temp_device::segacd_cdc_data_r )
 
 READ16_MEMBER( lc89510_temp_device::cdc_data_sub_r )
 {
-	return CDC_Host_r(space.machine(), READ_SUB);
+	return CDC_Host_r(machine(), READ_SUB);
 }
 
 READ16_MEMBER( lc89510_temp_device::cdc_data_main_r )
 {
-	return CDC_Host_r(space.machine(), READ_MAIN);
+	return CDC_Host_r(machine(), READ_MAIN);
 }
 
 
@@ -1006,7 +1006,7 @@ WRITE16_MEMBER( lc89510_temp_device::segacd_irq_mask_w )
 				if (!(segacd_irq_mask & 0x10))
 				{
 					segacd_irq_mask = data & 0x7e;
-					CDD_Process(space.machine(), 0);
+					CDD_Process(machine(), 0);
 					return;
 				}
 			}
@@ -1044,7 +1044,7 @@ WRITE16_MEMBER( lc89510_temp_device::segacd_cdd_ctrl_w )
 			{
 				if (segacd_irq_mask&0x10)
 				{
-					CDD_Process(space.machine(), 1);
+					CDD_Process(machine(), 1);
 				}
 			}
 		}
@@ -1096,7 +1096,7 @@ WRITE8_MEMBER( lc89510_temp_device::segacd_cdd_tx_w )
 
 	if(offset == 9)
 	{
-		CDD_Import(space.machine());
+		CDD_Import(machine());
 	}
 }
 

@@ -99,10 +99,10 @@ WRITE8_MEMBER( mk1_state::mk1_f8_w )
 	/* 0 is high and allows also input */
 	m_f8[offset] = data;
 
-	if ( ! ( m_f8[1] & 1 ) ) m_led[0] = BITSWAP8( m_f8[0],2,1,3,4,5,6,7,0 );
-	if ( ! ( m_f8[1] & 2 ) ) m_led[1] = BITSWAP8( m_f8[0],2,1,3,4,5,6,7,0 );
-	if ( ! ( m_f8[1] & 4 ) ) m_led[2] = BITSWAP8( m_f8[0],2,1,3,4,5,6,7,0 );
-	if ( ! ( m_f8[1] & 8 ) ) m_led[3] = BITSWAP8( m_f8[0],2,1,3,4,5,6,7,0 );
+	if ( ! ( m_f8[1] & 1 ) ) m_led[0] = bitswap<8>( m_f8[0],2,1,3,4,5,6,7,0 );
+	if ( ! ( m_f8[1] & 2 ) ) m_led[1] = bitswap<8>( m_f8[0],2,1,3,4,5,6,7,0 );
+	if ( ! ( m_f8[1] & 4 ) ) m_led[2] = bitswap<8>( m_f8[0],2,1,3,4,5,6,7,0 );
+	if ( ! ( m_f8[1] & 8 ) ) m_led[3] = bitswap<8>( m_f8[0],2,1,3,4,5,6,7,0 );
 }
 
 static ADDRESS_MAP_START( mk1_mem, AS_PROGRAM, 8, mk1_state )

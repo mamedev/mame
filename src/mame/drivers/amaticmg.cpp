@@ -1055,7 +1055,7 @@ void amaticmg_state::encf(uint8_t ciphertext, int address, uint8_t &plaintext, i
 	int aux = address & 0xfff;
 	aux = aux ^ (aux>>6);
 	aux = ((aux<<6) | (aux>>6)) & 0xfff;
-	uint8_t aux2 = BITSWAP8(aux, 9,10,4,1,6,0,7,3);
+	uint8_t aux2 = bitswap<8>(aux, 9,10,4,1,6,0,7,3);
 	aux2 ^= aux2>>4;
 	aux2 = (aux2<<4) | (aux2>>4);
 	ciphertext ^= ciphertext<<4;

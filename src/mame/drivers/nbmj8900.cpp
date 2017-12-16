@@ -49,7 +49,7 @@ DRIVER_INIT_MEMBER(nbmj8900_state,ohpaipee)
 
 	for (i = 0;i < 0x20000;i++)
 	{
-		prot[i] = BITSWAP8(prot[i],2,7,3,5,0,6,4,1);
+		prot[i] = bitswap<8>(prot[i],2,7,3,5,0,6,4,1);
 	}
 #else
 	unsigned char *ROM = memregion("maincpu")->base();
@@ -77,7 +77,7 @@ DRIVER_INIT_MEMBER(nbmj8900_state,togenkyo)
 	   the checksum. */
 	for (i = 0;i < 0x20000;i++)
 	{
-		prot[i] = BITSWAP8(prot[i],2,7,3,5,0,6,4,1);
+		prot[i] = bitswap<8>(prot[i],2,7,3,5,0,6,4,1);
 	}
 #else
 	unsigned char *ROM = memregion("maincpu")->base();

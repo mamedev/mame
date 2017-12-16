@@ -398,7 +398,7 @@ void necdsp_device::exec_op(uint32_t opcode) {
 	case  9: regs.idb = regs.dr; break;
 	case 10: regs.idb = regs.sr; break;
 	case 11: regs.idb = regs.si; break;  //MSB = first bit in from serial, 'natural' SI register order
-	case 12: regs.idb = BITSWAP16(regs.si, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15); break;  //LSB = first bit in from serial, 'reversed' SI register order
+	case 12: regs.idb = bitswap<16>(regs.si, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15); break;  //LSB = first bit in from serial, 'reversed' SI register order
 	case 13: regs.idb = regs.k; break;
 	case 14: regs.idb = regs.l; break;
 	case 15: regs.idb = dataRAM[regs.dp]; break;
@@ -586,7 +586,7 @@ void necdsp_device::exec_ld(uint32_t opcode) {
 				m_out_p0_cb(regs.sr.p0);
 				m_out_p1_cb(regs.sr.p1);
 				break;
-	case  8: regs.so = BITSWAP16(id, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15); break;  //LSB first output, output tapped at bit 15 shifting left
+	case  8: regs.so = bitswap<16>(id, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15); break;  //LSB first output, output tapped at bit 15 shifting left
 	case  9: regs.so = id; break;  //MSB first output, output tapped at bit 15 shifting left
 	case 10: regs.k = id; break;
 	case 11: regs.k = id; regs.l = m_data->read_word(regs.rp); break;

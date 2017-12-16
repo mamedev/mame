@@ -743,7 +743,7 @@ void apple2e_state::machine_start()
 		// let's do that in the modern MAME way
 		for (int i=0; i<0x040000; i++)
 		{
-			m_cec_remap[i] = BITSWAP8(m_cec_ptr[i], 0, 1, 2, 3, 4, 5, 6, 7);
+			m_cec_remap[i] = bitswap<8>(m_cec_ptr[i], 0, 1, 2, 3, 4, 5, 6, 7);
 		}
 
 		// remap cec gfx1 rom
@@ -1528,7 +1528,7 @@ READ8_MEMBER(apple2e_state::c000_r)
 			return m_80store ? 0x80 : 0x00;
 
 		case 0x19:  // read VBLBAR
-			return space.machine().first_screen()->vblank() ? 0x00 : 0x80;
+			return machine().first_screen()->vblank() ? 0x00 : 0x80;
 
 		case 0x1a:  // read TEXT
 			return m_video->m_graphics ? 0x00 : 0x80;
@@ -1570,19 +1570,19 @@ READ8_MEMBER(apple2e_state::c000_r)
 
 		case 0x64:  // joy 1 X axis
 		case 0x6c:
-			return (space.machine().time().as_double() < m_joystick_x1_time) ? 0x80 : 0;
+			return (machine().time().as_double() < m_joystick_x1_time) ? 0x80 : 0;
 
 		case 0x65:  // joy 1 Y axis
 		case 0x6d:
-			return (space.machine().time().as_double() < m_joystick_y1_time) ? 0x80 : 0;
+			return (machine().time().as_double() < m_joystick_y1_time) ? 0x80 : 0;
 
 		case 0x66: // joy 2 X axis
 		case 0x6e:
-			return (space.machine().time().as_double() < m_joystick_x2_time) ? 0x80 : 0;
+			return (machine().time().as_double() < m_joystick_x2_time) ? 0x80 : 0;
 
 		case 0x67: // joy 2 Y axis
 		case 0x6f:
-			return (space.machine().time().as_double() < m_joystick_y2_time) ? 0x80 : 0;
+			return (machine().time().as_double() < m_joystick_y2_time) ? 0x80 : 0;
 
 		case 0x7e:  // read IOUDIS
 			return m_ioudis ? 0x80 : 0x00;
@@ -1838,11 +1838,11 @@ READ8_MEMBER(apple2e_state::c000_iic_r)
 
 		case 0x64:  // joy 1 X axis
 		case 0x6c:
-			return (space.machine().time().as_double() < m_joystick_x1_time) ? 0x80 : 0;
+			return (machine().time().as_double() < m_joystick_x1_time) ? 0x80 : 0;
 
 		case 0x65:  // joy 1 Y axis
 		case 0x6d:
-			return (space.machine().time().as_double() < m_joystick_y1_time) ? 0x80 : 0;
+			return (machine().time().as_double() < m_joystick_y1_time) ? 0x80 : 0;
 
 		case 0x66: // mouse X1 (IIc only)
 		case 0x6e:

@@ -236,7 +236,7 @@ void pioneer_pr8210_device::control_w(uint8_t data)
 		{
 			// data is stored to the PIA in bit-reverse order
 			uint8_t newcommand = (m_accumulator >> 2) & 0x1f;
-			m_pia.porta = BITSWAP8(newcommand, 0,1,2,3,4,5,6,7);
+			m_pia.porta = bitswap<8>(newcommand, 0,1,2,3,4,5,6,7);
 
 			// the MCU logic requires a 0 to execute many commands; however, nobody
 			// consistently sends a 0, whereas they do tend to send duplicate commands...

@@ -204,7 +204,7 @@ void debug_disasm_buffer::debug_data_buffer::setup_methods()
 			switch(shift) {
 			case -1:
 				m_do_fill = [this](offs_t lstart, offs_t lend) {
-					auto dis = m_space->machine().disable_side_effect();
+					auto dis = m_space->device().machine().disable_side_effect();
 					u16 *dest = get_ptr<u16>(lstart);
 					for(offs_t lpc = lstart; lpc != lend; lpc = (lpc + 1) & m_pc_mask) {
 						offs_t tpc = m_intf->pc_linear_to_real(lpc);
@@ -217,7 +217,7 @@ void debug_disasm_buffer::debug_data_buffer::setup_methods()
 				break;
 			case 0:
 				m_do_fill = [this](offs_t lstart, offs_t lend) {
-					auto dis = m_space->machine().disable_side_effect();
+					auto dis = m_space->device().machine().disable_side_effect();
 					u8 *dest = get_ptr<u8>(lstart);
 					u32 steps = 0;
 					for(offs_t lpc = lstart; lpc != lend; lpc = (lpc + 1) & m_pc_mask) {
@@ -236,7 +236,7 @@ void debug_disasm_buffer::debug_data_buffer::setup_methods()
 			switch(shift) {
 			case -3: // bus granularity 64
 				m_do_fill = [this](offs_t lstart, offs_t lend) {
-					auto dis = m_space->machine().disable_side_effect();
+					auto dis = m_space->device().machine().disable_side_effect();
 					u64 *dest = get_ptr<u64>(lstart);
 					for(offs_t lpc = lstart; lpc != lend; lpc = (lpc + 1) & m_pc_mask) {
 						offs_t tpc = lpc;
@@ -250,7 +250,7 @@ void debug_disasm_buffer::debug_data_buffer::setup_methods()
 
 			case -2: // bus granularity 32
 				m_do_fill = [this](offs_t lstart, offs_t lend) {
-					auto dis = m_space->machine().disable_side_effect();
+					auto dis = m_space->device().machine().disable_side_effect();
 					u32 *dest = get_ptr<u32>(lstart);
 					for(offs_t lpc = lstart; lpc != lend; lpc = (lpc + 1) & m_pc_mask) {
 						offs_t tpc = lpc;
@@ -264,7 +264,7 @@ void debug_disasm_buffer::debug_data_buffer::setup_methods()
 
 			case -1: // bus granularity 16
 				m_do_fill = [this](offs_t lstart, offs_t lend) {
-					auto dis = m_space->machine().disable_side_effect();
+					auto dis = m_space->device().machine().disable_side_effect();
 					u16 *dest = get_ptr<u16>(lstart);
 					for(offs_t lpc = lstart; lpc != lend; lpc = (lpc + 1) & m_pc_mask) {
 						offs_t tpc = lpc;
@@ -278,7 +278,7 @@ void debug_disasm_buffer::debug_data_buffer::setup_methods()
 
 			case  0: // bus granularity 8
 				m_do_fill = [this](offs_t lstart, offs_t lend) {
-					auto dis = m_space->machine().disable_side_effect();
+					auto dis = m_space->device().machine().disable_side_effect();
 					u8 *dest = get_ptr<u8>(lstart);
 					for(offs_t lpc = lstart; lpc != lend; lpc = (lpc + 1) & m_pc_mask) {
 						offs_t tpc = lpc;
@@ -292,7 +292,7 @@ void debug_disasm_buffer::debug_data_buffer::setup_methods()
 
 			case  3: // bus granularity 1, stored as u16
 				m_do_fill = [this](offs_t lstart, offs_t lend) {
-					auto dis = m_space->machine().disable_side_effect();
+					auto dis = m_space->device().machine().disable_side_effect();
 					u16 *dest = reinterpret_cast<u16 *>(&m_buffer[0]) + ((lstart - m_lstart) >> 4);
 					for(offs_t lpc = lstart; lpc != lend; lpc = (lpc + 0x10) & m_pc_mask) {
 						offs_t tpc = lpc;

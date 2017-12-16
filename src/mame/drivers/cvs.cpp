@@ -1572,7 +1572,7 @@ DRIVER_INIT_MEMBER(cvs_state,hunchbaka)
 
 	/* data lines D2 and D5 swapped */
 	for (offs = 0; offs < 0x7400; offs++)
-		ROM[offs] = BITSWAP8(ROM[offs],7,6,2,4,3,5,1,0);
+		ROM[offs] = bitswap<8>(ROM[offs],7,6,2,4,3,5,1,0);
 }
 
 
@@ -1638,7 +1638,7 @@ DRIVER_INIT_MEMBER(cvs_state,raiders)
 
 	/* data lines D1 and D6 swapped */
 	for (offs = 0; offs < 0x7400; offs++)
-		ROM[offs] = BITSWAP8(ROM[offs],7,1,5,4,3,2,6,0);
+		ROM[offs] = bitswap<8>(ROM[offs],7,1,5,4,3,2,6,0);
 
 	/* patch out protection */
 	ROM[0x010a] = 0xc0;

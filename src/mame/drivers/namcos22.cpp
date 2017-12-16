@@ -5444,9 +5444,9 @@ ROM_END
 // for MCU BIOS v1.41
 READ16_MEMBER(namcos22_state::mcu141_speedup_r)
 {
-	if ((space.device().safe_pc() == 0xc12d) && (!(m_su_82 & 0xff00)))
+	if ((m_mcu->pc() == 0xc12d) && (!(m_su_82 & 0xff00)))
 	{
-		space.device().execute().spin_until_interrupt();
+		m_mcu->spin_until_interrupt();
 	}
 
 	return m_su_82;
@@ -5460,9 +5460,9 @@ WRITE16_MEMBER(namcos22_state::mcu_speedup_w)
 // for MCU BIOS v1.20/v1.30
 READ16_MEMBER(namcos22_state::mcu130_speedup_r)
 {
-	if ((space.device().safe_pc() == 0xc12a) && (!(m_su_82 & 0xff00)))
+	if ((m_mcu->pc() == 0xc12a) && (!(m_su_82 & 0xff00)))
 	{
-		space.device().execute().spin_until_interrupt();
+		m_mcu->spin_until_interrupt();
 	}
 
 	return m_su_82;
@@ -5471,9 +5471,9 @@ READ16_MEMBER(namcos22_state::mcu130_speedup_r)
 // for NSTX7702 v1.00 (C74)
 READ16_MEMBER(namcos22_state::mcuc74_speedup_r)
 {
-	if (((space.device().safe_pc() == 0xc0df) || (space.device().safe_pc() == 0xc101)) && (!(m_su_82 & 0xff00)))
+	if (((m_mcu->pc() == 0xc0df) || (m_mcu->pc() == 0xc101)) && (!(m_su_82 & 0xff00)))
 	{
-		space.device().execute().spin_until_interrupt();
+		m_mcu->spin_until_interrupt();
 	}
 
 	return m_su_82;

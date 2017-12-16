@@ -919,7 +919,7 @@ READ8_MEMBER( apple2gs_state::apple2gs_c0xx_r )
 		#endif
 
 		case 0x19:  /* C019 - RDVBLBAR */
-			result = (space.machine().first_screen()->vpos() >= (192+BORDER_TOP)) ? 0x80 : 0x00;
+			result = (machine().first_screen()->vpos() >= (192+BORDER_TOP)) ? 0x80 : 0x00;
 			break;
 
 		case 0x22:  /* C022 - TBCOLOR */
@@ -1020,7 +1020,7 @@ READ8_MEMBER( apple2gs_state::apple2gs_c0xx_r )
 			break;
 
 		case 0x2F:  /* C02F - HORIZCNT */
-			result = space.machine().first_screen()->hpos() / 11;
+			result = machine().first_screen()->hpos() / 11;
 			if (result > 0)
 			{
 				result += 0x40;

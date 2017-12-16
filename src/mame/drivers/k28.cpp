@@ -337,7 +337,7 @@ WRITE_LINE_MEMBER(k28_state::mcu_prog_w)
 
 			// output 0-15: digit segment data
 			u16 seg_data = (u16)(m_vfd_shiftreg >> 19);
-			seg_data = BITSWAP16(seg_data,0,1,13,9,10,12,14,8,3,4,5,2,15,11,6,7);
+			seg_data = bitswap<16>(seg_data,0,1,13,9,10,12,14,8,3,4,5,2,15,11,6,7);
 
 			// output 16-24: digit select
 			u16 digit_sel = (u16)(m_vfd_shiftreg >> 10) & 0x1ff;

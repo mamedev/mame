@@ -351,7 +351,7 @@ static const uint16_t ecoin_charset[]=
 
 static uint32_t set_display(uint32_t segin)
 {
-	return BITSWAP32(segin, 31,30,29,28,27,26,25,24,23,22,21,20,19,18,17,16,11,9,15,13,12,8,10,14,7,6,5,4,3,2,1,0);
+	return bitswap<32>(segin, 31,30,29,28,27,26,25,24,23,22,21,20,19,18,17,16,11,9,15,13,12,8,10,14,7,6,5,4,3,2,1,0);
 }
 
 void ecoinf3_state::update_display()

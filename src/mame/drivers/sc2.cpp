@@ -118,7 +118,7 @@ void sc2_state::machine_reset()
 
 void sc2_state::sc2_update_display()
 {
-	uint8_t digit_data = BITSWAP8( m_digit_data,7,0,1,2,3,4,5,6 ) & 0x7f;
+	uint8_t digit_data = bitswap<8>( m_digit_data,7,0,1,2,3,4,5,6 ) & 0x7f;
 
 	if (!BIT(m_led_selected, 0))
 	{

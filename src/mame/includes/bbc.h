@@ -43,23 +43,6 @@
 
 #define RS232_TAG       "rs232"
 
-enum machine_type_t
-{
-	MODELA,
-	MODELB,
-	BPLUS,
-	MASTER,
-	COMPACT
-};
-
-enum monitor_type_t
-{
-	COLOUR = 0,
-	BLACKWHITE = 1,
-	GREEN = 2,
-	AMBER = 3
-};
-
 class bbc_state : public driver_device
 {
 public:
@@ -110,6 +93,23 @@ public:
 		m_palette(*this, "palette"),
 		m_bbcconfig(*this, "BBCCONFIG")
 	{ }
+
+	enum machine_type_t
+	{
+		MODELA,
+		MODELB,
+		BPLUS,
+		MASTER,
+		COMPACT
+	};
+
+	enum monitor_type_t
+	{
+		COLOUR = 0,
+		BLACKWHITE = 1,
+		GREEN = 2,
+		AMBER = 3
+	};
 
 	DECLARE_FLOPPY_FORMATS(floppy_formats_bbc);
 	DECLARE_FLOPPY_FORMATS(floppy_formats_bbcm);

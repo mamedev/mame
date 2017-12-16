@@ -43,11 +43,11 @@ READ8_MEMBER(madalien_state::shift_r)
 READ8_MEMBER(madalien_state::shift_rev_r)
 {
 	uint8_t hi = *m_shift_hi ^ 0x07;
-	uint8_t lo = BITSWAP8(*m_shift_lo,0,1,2,3,4,5,6,7);
+	uint8_t lo = bitswap<8>(*m_shift_lo,0,1,2,3,4,5,6,7);
 
 	uint8_t ret = shift_common(hi, lo);
 
-	return BITSWAP8(ret,7,0,1,2,3,4,5,6) & 0x7f;
+	return bitswap<8>(ret,7,0,1,2,3,4,5,6) & 0x7f;
 }
 
 

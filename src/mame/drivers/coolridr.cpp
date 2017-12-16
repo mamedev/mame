@@ -1355,7 +1355,7 @@ void *coolridr_state::draw_object_threaded(void *param, int threadid)
 
 	if (b2colorNumber != b1colorNumber)
 	{
-	//  b1colorNumber = space.machine().rand()&0xfff;
+	//  b1colorNumber = machine().rand()&0xfff;
 	}
 
 //  if(b1colorNumber > 0x60 || b2colorNumber)

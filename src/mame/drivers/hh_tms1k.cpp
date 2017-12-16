@@ -5,9 +5,10 @@
   This driver is a collection of simple dedicated handheld and tabletop
   toys based around the TMS1000 MCU series. Anything more complex or clearly
   part of a series is (or will be) in its own driver, see:
-  - hh_tms1k: here
   - eva: Chrysler EVA-11 (and EVA-24)
   - microvsn: Milton Bradley MicroVision
+
+  (contd.) hh_tms1k child drivers:
   - ticalc1x: TI TMS1K-based calculators
   - tispellb: TI Spelling B series gen. 1
   - tispeak: TI Speak & Spell series gen. 1
@@ -1775,7 +1776,7 @@ DEVICE_IMAGE_LOAD_MEMBER(quizwizc_state, cartridge)
 	// get cartridge pinout K1 to R connections
 	std::string pinout(image.get_feature("pinout"));
 	m_pinout = std::stoul(pinout, nullptr, 2) & 0xe7;
-	m_pinout = BITSWAP8(m_pinout,4,3,7,5,2,1,6,0) << 4;
+	m_pinout = bitswap<8>(m_pinout,4,3,7,5,2,1,6,0) << 4;
 
 	return image_init_result::PASS;
 }
@@ -1807,7 +1808,7 @@ WRITE16_MEMBER(quizwizc_state::write_r)
 WRITE16_MEMBER(quizwizc_state::write_o)
 {
 	// O0-O7: led/digit segment data
-	m_o = BITSWAP8(data,7,0,1,2,3,4,5,6);
+	m_o = bitswap<8>(data,7,0,1,2,3,4,5,6);
 	prepare_display();
 }
 
@@ -3894,7 +3895,7 @@ WRITE16_MEMBER(f2pbball_state::write_r)
 WRITE16_MEMBER(f2pbball_state::write_o)
 {
 	// O0-O7: led state
-	m_o = BITSWAP8(data,0,7,6,5,4,3,2,1);
+	m_o = bitswap<8>(data,0,7,6,5,4,3,2,1);
 	prepare_display();
 }
 
@@ -4133,7 +4134,7 @@ protected:
 void gpoker_state::prepare_display()
 {
 	set_display_segmask(0x7ff, 0x20ff); // 7seg + bottom-right diagonal
-	u16 segs = BITSWAP16(m_o, 15,14,7,12,11,10,9,8,6,6,5,4,3,2,1,0) & 0x20ff;
+	u16 segs = bitswap<16>(m_o, 15,14,7,12,11,10,9,8,6,6,5,4,3,2,1,0) & 0x20ff;
 	display_matrix(14, 11, segs | (m_r >> 3 & 0xf00), m_r & 0x7ff);
 }
 
@@ -4385,8 +4386,8 @@ public:
 
 void ginv1000_state::prepare_display()
 {
-	u16 grid = BITSWAP16(m_grid,15,14,13,12,11,10,0,1,2,3,4,5,6,9,8,7);
-	u16 plate = BITSWAP16(m_plate,15,14,13,12,3,4,7,8,9,10,11,2,6,5,1,0);
+	u16 grid = bitswap<16>(m_grid,15,14,13,12,11,10,0,1,2,3,4,5,6,9,8,7);
+	u16 plate = bitswap<16>(m_plate,15,14,13,12,3,4,7,8,9,10,11,2,6,5,1,0);
 	display_matrix(12, 10, plate, grid);
 }
 
@@ -4637,7 +4638,7 @@ void fxmcr165_state::prepare_display()
 {
 	// 7seg digit from O0-O6
 	m_display_segmask[0] = 0x7f;
-	m_display_state[0] = BITSWAP8(m_o,7,2,6,5,4,3,1,0) & 0x7f;
+	m_display_state[0] = bitswap<8>(m_o,7,2,6,5,4,3,1,0) & 0x7f;
 
 	// leds from R4-R10
 	m_display_state[1] = m_r >> 4 & 0x7f;
@@ -4774,7 +4775,7 @@ WRITE16_MEMBER(elecdet_state::write_r)
 
 	// R0-R6: select digit
 	set_display_segmask(0x7f, 0x7f);
-	display_matrix(7, 7, BITSWAP8(m_o,7,5,2,1,4,0,6,3), data);
+	display_matrix(7, 7, bitswap<8>(m_o,7,5,2,1,4,0,6,3), data);
 }
 
 WRITE16_MEMBER(elecdet_state::write_o)
@@ -5332,7 +5333,7 @@ WRITE32_MEMBER(horseran_state::lcd_output_w)
 
 	// col5-11 and col13-19 are 7segs
 	for (int i = 0; i < 2; i++)
-		m_display_state[3 + (offset << 1 | i)] = BITSWAP8(data >> (4+8*i),7,3,5,2,0,1,4,6) & 0x7f;
+		m_display_state[3 + (offset << 1 | i)] = bitswap<8>(data >> (4+8*i),7,3,5,2,0,1,4,6) & 0x7f;
 
 	set_display_segmask(0x3f<<3, 0x7f);
 	set_display_size(24, 3+6);
@@ -6519,7 +6520,7 @@ void mbdtower_state::prepare_display()
 	// update current state
 	if (~m_r & 0x10)
 	{
-		u8 o = BITSWAP8(m_o,7,0,4,3,2,1,6,5) & 0x7f;
+		u8 o = bitswap<8>(m_o,7,0,4,3,2,1,6,5) & 0x7f;
 		m_display_state[2] = (m_o & 0x80) ? o : 0;
 		m_display_state[1] = (m_o & 0x80) ? 0 : o;
 		m_display_state[0] = (m_r >> 8 & 1) | (m_r >> 4 & 0xe);
@@ -7090,7 +7091,7 @@ WRITE16_MEMBER(stopthief_state::write_r)
 {
 	// R0-R2: select digit
 	set_display_segmask(7, 0x7f);
-	display_matrix(7, 3, BITSWAP8(m_o,3,5,2,1,4,0,6,7) & 0x7f, data & 7);
+	display_matrix(7, 3, bitswap<8>(m_o,3,5,2,1,4,0,6,7) & 0x7f, data & 7);
 
 	// R3-R8(tied together): speaker out
 	int level = 0;

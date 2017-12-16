@@ -30,7 +30,7 @@ uint8_t deco_cpu7_device::mi_decrypt::read_sync(uint16_t adr)
 	if(had_written) {
 		had_written = false;
 		if((adr & 0x0104) == 0x0104)
-			res = BITSWAP8(res, 6,5,3,4,2,7,1,0);
+			res = bitswap<8>(res, 6,5,3,4,2,7,1,0);
 	}
 	return res;
 }
@@ -57,5 +57,5 @@ u32 deco_cpu7_device::disassembler::interface_flags() const
 
 u8 deco_cpu7_device::disassembler::decrypt8(u8 value, offs_t pc, bool opcode) const
 {
-	return opcode && mintf->had_written && ((pc & 0x104) == 0x104) ? BITSWAP8(value,6,5,3,4,2,7,1,0) : value;
+	return opcode && mintf->had_written && ((pc & 0x104) == 0x104) ? bitswap<8>(value,6,5,3,4,2,7,1,0) : value;
 }

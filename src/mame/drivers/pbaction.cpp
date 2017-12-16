@@ -494,7 +494,7 @@ DRIVER_INIT_MEMBER(pbaction_state,pbactio3)
 	/* first of all, do a simple bitswap */
 	for (i = 0; i < 0xc000; i++)
 	{
-		rom[i] = BITSWAP8(rom[i], 7,6,5,4,1,2,3,0);
+		rom[i] = bitswap<8>(rom[i], 7,6,5,4,1,2,3,0);
 	}
 
 	/* install a protection (?) workaround */

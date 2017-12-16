@@ -448,12 +448,12 @@ READ32_MEMBER(firebeat_state::ata_command_r )
 //  printf("ata_command_r: %08X, %08X\n", offset, mem_mask);
 	if (ACCESSING_BITS_16_31)
 	{
-		r = m_ata->read_cs0(space, offset*2, BYTESWAP16((mem_mask >> 16) & 0xffff));
+		r = m_ata->read16_cs0(offset*2, BYTESWAP16((mem_mask >> 16) & 0xffff));
 		return BYTESWAP16(r) << 16;
 	}
 	else
 	{
-		r = m_ata->read_cs0(space, (offset*2) + 1, BYTESWAP16((mem_mask >> 0) & 0xffff));
+		r = m_ata->read16_cs0((offset*2) + 1, BYTESWAP16((mem_mask >> 0) & 0xffff));
 		return BYTESWAP16(r) << 0;
 	}
 }
@@ -464,11 +464,11 @@ WRITE32_MEMBER(firebeat_state::ata_command_w )
 
 	if (ACCESSING_BITS_16_31)
 	{
-		m_ata->write_cs0(space, offset*2, BYTESWAP16((data >> 16) & 0xffff), BYTESWAP16((mem_mask >> 16) & 0xffff));
+		m_ata->write16_cs0(offset*2, BYTESWAP16((data >> 16) & 0xffff), BYTESWAP16((mem_mask >> 16) & 0xffff));
 	}
 	else
 	{
-		m_ata->write_cs0(space, (offset*2) + 1, BYTESWAP16((data >> 0) & 0xffff), BYTESWAP16((mem_mask >> 0) & 0xffff));
+		m_ata->write16_cs0((offset*2) + 1, BYTESWAP16((data >> 0) & 0xffff), BYTESWAP16((mem_mask >> 0) & 0xffff));
 	}
 }
 
@@ -480,12 +480,12 @@ READ32_MEMBER(firebeat_state::ata_control_r )
 
 	if (ACCESSING_BITS_16_31)
 	{
-		r = m_ata->read_cs1(space, offset*2, BYTESWAP16((mem_mask >> 16) & 0xffff));
+		r = m_ata->read16_cs1(offset*2, BYTESWAP16((mem_mask >> 16) & 0xffff));
 		return BYTESWAP16(r) << 16;
 	}
 	else
 	{
-		r = m_ata->read_cs1(space, (offset*2) + 1, BYTESWAP16((mem_mask >> 0) & 0xffff));
+		r = m_ata->read16_cs1((offset*2) + 1, BYTESWAP16((mem_mask >> 0) & 0xffff));
 		return BYTESWAP16(r) << 0;
 	}
 }
@@ -494,11 +494,11 @@ WRITE32_MEMBER(firebeat_state::ata_control_w )
 {
 	if (ACCESSING_BITS_16_31)
 	{
-		m_ata->write_cs1(space, offset*2, BYTESWAP16(data >> 16) & 0xffff, BYTESWAP16((mem_mask >> 16) & 0xffff));
+		m_ata->write16_cs1(offset*2, BYTESWAP16(data >> 16) & 0xffff, BYTESWAP16((mem_mask >> 16) & 0xffff));
 	}
 	else
 	{
-		m_ata->write_cs1(space, (offset*2) + 1, BYTESWAP16(data >> 0) & 0xffff, BYTESWAP16((mem_mask >> 0) & 0xffff));
+		m_ata->write16_cs1((offset*2) + 1, BYTESWAP16(data >> 0) & 0xffff, BYTESWAP16((mem_mask >> 0) & 0xffff));
 	}
 }
 
@@ -1079,8 +1079,8 @@ static ADDRESS_MAP_START( spu_map, AS_PROGRAM, 16, firebeat_state )
 	AM_RANGE(0x230000, 0x230001) AM_WRITE(spu_irq_ack_w)
 	AM_RANGE(0x260000, 0x260001) AM_WRITE(spu_sdram_bank_w)
 	AM_RANGE(0x280000, 0x2807ff) AM_READWRITE(m68k_spu_share_r, m68k_spu_share_w)
-	AM_RANGE(0x300000, 0x30000f) AM_DEVREADWRITE("spu_ata", ata_interface_device, read_cs0, write_cs0)
-	AM_RANGE(0x340000, 0x34000f) AM_DEVREADWRITE("spu_ata", ata_interface_device, read_cs1, write_cs1)
+	AM_RANGE(0x300000, 0x30000f) AM_DEVREADWRITE("spu_ata", ata_interface_device, read16_cs0, write16_cs0)
+	AM_RANGE(0x340000, 0x34000f) AM_DEVREADWRITE("spu_ata", ata_interface_device, read16_cs1, write16_cs1)
 	AM_RANGE(0x400000, 0x400fff) AM_DEVREADWRITE("rf5c400", rf5c400_device, rf5c400_r, rf5c400_w)
 	AM_RANGE(0x800000, 0x83ffff) AM_RAM         // SDRAM
 	AM_RANGE(0xfc0000, 0xffffff) AM_RAM         // SDRAM

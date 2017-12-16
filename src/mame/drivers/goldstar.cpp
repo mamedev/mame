@@ -11967,7 +11967,7 @@ DRIVER_INIT_MEMBER(wingco_state, magoddsc)
 		if ((A & 4) == 4)
 			ROM[A] ^= 0x01;
 
-		ROM[A] = BITSWAP8(ROM[A], 3,6,5,4,7,2,1,0);
+		ROM[A] = bitswap<8>(ROM[A], 3,6,5,4,7,2,1,0);
 	}
 }
 
@@ -13361,10 +13361,10 @@ DRIVER_INIT_MEMBER(cmaster_state, fb2010)
 
 		switch(i & 0x22)
 		{
-			case 0x00: x = BITSWAP8(x^0x4c^0xff, 0,4,7,6,5,1,3,2); break;
-			case 0x02: x = BITSWAP8(x^0xc0^0xff, 7,6,0,5,3,2,1,4); break; //   67053214
-			case 0x20: x = BITSWAP8(x^0x6b^0xff, 4,3,2,7,5,6,0,1); break;
-			case 0x22: x = BITSWAP8(x^0x23^0xff, 0,6,1,3,4,5,2,7); break;
+			case 0x00: x = bitswap<8>(x^0x4c^0xff, 0,4,7,6,5,1,3,2); break;
+			case 0x02: x = bitswap<8>(x^0xc0^0xff, 7,6,0,5,3,2,1,4); break; //   67053214
+			case 0x20: x = bitswap<8>(x^0x6b^0xff, 4,3,2,7,5,6,0,1); break;
+			case 0x22: x = bitswap<8>(x^0x23^0xff, 0,6,1,3,4,5,2,7); break;
 		}
 
 		ROM[i] = x;
@@ -15373,9 +15373,9 @@ uint8_t cb3_state::cb3_decrypt(uint8_t cipherText, uint16_t address)
 	idx = BIT(cipherText, 1) | (BIT(address,0) << 1) | (BIT(address, 4) << 2);
 
 	if (rotation[idx] == 0)
-		output = BITSWAP8(cipherText, 5, 6, 3, 4, 7, 2, 1, 0);   // rotates bit #3, #5 and #7 in one direction...
+		output = bitswap<8>(cipherText, 5, 6, 3, 4, 7, 2, 1, 0);   // rotates bit #3, #5 and #7 in one direction...
 	else
-		output = BITSWAP8(cipherText, 3, 6, 7, 4, 5, 2, 1, 0);   // ... or in the other
+		output = bitswap<8>(cipherText, 3, 6, 7, 4, 5, 2, 1, 0);   // ... or in the other
 
 	return output ^ sbox[idx];
 }
@@ -15437,7 +15437,7 @@ DRIVER_INIT_MEMBER(cb3_state, chrygld)
 	for (A = 0; A < 0x10000; A++)
 	{
 		uint8_t dat = ROM[A];
-		dat =  BITSWAP8(dat, 5, 6, 3, 4, 7, 2, 1, 0);
+		dat =  bitswap<8>(dat, 5, 6, 3, 4, 7, 2, 1, 0);
 		ROM[A] = dat;
 	}
 
@@ -15494,14 +15494,14 @@ DRIVER_INIT_MEMBER(cmaster_state, nfb96sea)
 		uint8_t x = ROM[i];
 		switch(i & 7)
 		{
-			case 0: x = BITSWAP8(x ^ 0x80, 1, 6, 7, 4, 5, 2, 3, 0); break;
-			case 1: x = BITSWAP8(x ^ 0xa0, 5, 6, 3, 4, 1, 2, 7, 0); break;
-			case 2: x = BITSWAP8(x ^ 0x02, 5, 6, 3, 4, 1, 2, 7, 0); break;
-			case 3: x = BITSWAP8(x ^ 0xa0, 3, 6, 1, 4, 7, 2, 5, 0); break;
-			case 4: x = BITSWAP8(x ^ 0x82, 3, 6, 1, 4, 7, 2, 5, 0); break;
-			case 5: x = BITSWAP8(x ^ 0x02, 1, 6, 7, 4, 5, 2, 3, 0); break;
-			case 6: x = BITSWAP8(x ^ 0x08, 3, 6, 1, 4, 7, 2, 5, 0); break;
-			case 7: x = BITSWAP8(x ^ 0x80, 5, 6, 3, 4, 1, 2, 7, 0); break;
+			case 0: x = bitswap<8>(x ^ 0x80, 1, 6, 7, 4, 5, 2, 3, 0); break;
+			case 1: x = bitswap<8>(x ^ 0xa0, 5, 6, 3, 4, 1, 2, 7, 0); break;
+			case 2: x = bitswap<8>(x ^ 0x02, 5, 6, 3, 4, 1, 2, 7, 0); break;
+			case 3: x = bitswap<8>(x ^ 0xa0, 3, 6, 1, 4, 7, 2, 5, 0); break;
+			case 4: x = bitswap<8>(x ^ 0x82, 3, 6, 1, 4, 7, 2, 5, 0); break;
+			case 5: x = bitswap<8>(x ^ 0x02, 1, 6, 7, 4, 5, 2, 3, 0); break;
+			case 6: x = bitswap<8>(x ^ 0x08, 3, 6, 1, 4, 7, 2, 5, 0); break;
+			case 7: x = bitswap<8>(x ^ 0x80, 5, 6, 3, 4, 1, 2, 7, 0); break;
 		}
 
 		ROM[i] = x;
@@ -15518,10 +15518,10 @@ DRIVER_INIT_MEMBER(cmaster_state, schery97)
 		uint8_t x = ROM[i];
 		switch(i & 0x12)
 		{
-			case 0x00: x = BITSWAP8(x ^ 0x3e, 1, 0, 7, 6, 5, 4, 3, 2); break;
-			case 0x02: x = BITSWAP8(x ^ 0x4d, 0, 7, 6, 5, 4, 3, 2, 1); break;
-			case 0x10: x = BITSWAP8(x ^ 0x24, 2, 1, 0, 7, 6, 5, 4, 3); break;
-			case 0x12: x = BITSWAP8(x ^ 0xbb, 4, 3, 2, 1, 0, 7, 6, 5); break;
+			case 0x00: x = bitswap<8>(x ^ 0x3e, 1, 0, 7, 6, 5, 4, 3, 2); break;
+			case 0x02: x = bitswap<8>(x ^ 0x4d, 0, 7, 6, 5, 4, 3, 2, 1); break;
+			case 0x10: x = bitswap<8>(x ^ 0x24, 2, 1, 0, 7, 6, 5, 4, 3); break;
+			case 0x12: x = bitswap<8>(x ^ 0xbb, 4, 3, 2, 1, 0, 7, 6, 5); break;
 		}
 
 		ROM[i] = x;
@@ -15540,10 +15540,10 @@ DRIVER_INIT_MEMBER(cmaster_state, schery97a)
 		uint8_t x = ROM[i];
 		switch(i & 6)
 		{
-			case 0: x = BITSWAP8(x ^ 0xb9, 4, 0, 6, 7, 3, 1, 5, 2); break;
-			case 2: x = BITSWAP8(x ^ 0x8f, 6, 7, 4, 0, 3, 2, 1, 5); break;
-			case 4: x = BITSWAP8(x ^ 0xd2, 3, 4, 0, 2, 5, 6, 1, 7); break;
-			case 6: x = BITSWAP8(x ^ 0xd1, 6, 0, 2, 1, 4, 5, 3, 7); break;
+			case 0: x = bitswap<8>(x ^ 0xb9, 4, 0, 6, 7, 3, 1, 5, 2); break;
+			case 2: x = bitswap<8>(x ^ 0x8f, 6, 7, 4, 0, 3, 2, 1, 5); break;
+			case 4: x = bitswap<8>(x ^ 0xd2, 3, 4, 0, 2, 5, 6, 1, 7); break;
+			case 6: x = bitswap<8>(x ^ 0xd1, 6, 0, 2, 1, 4, 5, 3, 7); break;
 		}
 
 		ROM[i] = x;
@@ -15563,10 +15563,10 @@ DRIVER_INIT_MEMBER(cmaster_state, skill98)
 		uint8_t x = ROM[i];
 		switch(i & 0x12)
 		{
-			case 0x00: x = BITSWAP8(x ^ 0x21, 2, 1, 0, 7, 6, 5, 4, 3); break;
-			case 0x02: x = BITSWAP8(x ^ 0x45, 2, 1, 0, 7, 6, 5, 4, 3); break;
-			case 0x10: x = BITSWAP8(x ^ 0x23, 4, 3, 2, 1, 0, 7, 6, 5); break;
-			case 0x12: x = BITSWAP8(x ^ 0x5b, 4, 3, 2, 1, 0, 7, 6, 5); break;
+			case 0x00: x = bitswap<8>(x ^ 0x21, 2, 1, 0, 7, 6, 5, 4, 3); break;
+			case 0x02: x = bitswap<8>(x ^ 0x45, 2, 1, 0, 7, 6, 5, 4, 3); break;
+			case 0x10: x = bitswap<8>(x ^ 0x23, 4, 3, 2, 1, 0, 7, 6, 5); break;
+			case 0x12: x = bitswap<8>(x ^ 0x5b, 4, 3, 2, 1, 0, 7, 6, 5); break;
 		}
 
 		ROM[i] = x;
@@ -15585,10 +15585,10 @@ DRIVER_INIT_MEMBER(cmaster_state, nfb96_c1)
 
 		switch(i & 0x12)
 		{
-			case 0x00: x = BITSWAP8(x ^ 0xf5, 6, 4, 3, 7, 0, 1, 5, 2); break;
-			case 0x02: x = BITSWAP8(x ^ 0xe6, 4, 6, 3, 0, 7, 2, 1, 5); break;
-			case 0x10: x = BITSWAP8(x ^ 0x34, 0, 3, 5, 2, 4, 6, 1, 7); break;
-			case 0x12: x = BITSWAP8(x ^ 0xc6, 2, 0, 4, 1, 6, 5, 3, 7); break;
+			case 0x00: x = bitswap<8>(x ^ 0xf5, 6, 4, 3, 7, 0, 1, 5, 2); break;
+			case 0x02: x = bitswap<8>(x ^ 0xe6, 4, 6, 3, 0, 7, 2, 1, 5); break;
+			case 0x10: x = bitswap<8>(x ^ 0x34, 0, 3, 5, 2, 4, 6, 1, 7); break;
+			case 0x12: x = bitswap<8>(x ^ 0xc6, 2, 0, 4, 1, 6, 5, 3, 7); break;
 		}
 		ROM[i] = x;
 	}
@@ -15606,10 +15606,10 @@ DRIVER_INIT_MEMBER(cmaster_state, nfb96_c2)
 
 		switch(i & 0x22)
 		{
-			case 0x00: x = BITSWAP8(x ^ 0x5f, 6, 4, 3, 7, 0, 5, 2, 1); break;
-			case 0x02: x = BITSWAP8(x ^ 0xe7, 4, 6, 3, 0, 7, 5, 1, 2); break;
-			case 0x20: x = BITSWAP8(x ^ 0x18, 0, 3, 5, 2, 4, 7, 1, 6); break;
-			case 0x22: x = BITSWAP8(x ^ 0x74, 2, 0, 4, 1, 6, 7, 3, 5); break;
+			case 0x00: x = bitswap<8>(x ^ 0x5f, 6, 4, 3, 7, 0, 5, 2, 1); break;
+			case 0x02: x = bitswap<8>(x ^ 0xe7, 4, 6, 3, 0, 7, 5, 1, 2); break;
+			case 0x20: x = bitswap<8>(x ^ 0x18, 0, 3, 5, 2, 4, 7, 1, 6); break;
+			case 0x22: x = bitswap<8>(x ^ 0x74, 2, 0, 4, 1, 6, 7, 3, 5); break;
 		}
 
 		ROM[i] = x;
@@ -15627,10 +15627,10 @@ DRIVER_INIT_MEMBER(cmaster_state, nfb96_d)
 
 		switch(i & 5)
 		{
-			case 0: x = BITSWAP8(x ^ 0x6a, 2, 1, 0, 7, 6, 5, 4, 3); break;
-			case 1: x = BITSWAP8(x ^ 0xcc, 0, 7, 6, 5, 4, 3, 2, 1); break;
-			case 4: x = BITSWAP8(x ^ 0x8f, 3, 2, 1, 0, 7, 6, 5, 4); break;
-			case 5: x = BITSWAP8(x ^ 0x93, 4, 3, 2, 1, 0, 7, 6, 5); break;
+			case 0: x = bitswap<8>(x ^ 0x6a, 2, 1, 0, 7, 6, 5, 4, 3); break;
+			case 1: x = bitswap<8>(x ^ 0xcc, 0, 7, 6, 5, 4, 3, 2, 1); break;
+			case 4: x = bitswap<8>(x ^ 0x8f, 3, 2, 1, 0, 7, 6, 5, 4); break;
+			case 5: x = bitswap<8>(x ^ 0x93, 4, 3, 2, 1, 0, 7, 6, 5); break;
 		}
 		ROM[i] = x;
 	}
@@ -15654,10 +15654,10 @@ DRIVER_INIT_MEMBER(cmaster_state, nfb96_dk)
 
 		switch(i & 5)
 		{
-			case 0: x = BITSWAP8(x ^ 0xce, 1, 0, 7, 6, 5, 4, 3, 2); break;
-			case 1: x = BITSWAP8(x ^ 0x9e, 3, 2, 1, 0, 7, 6, 5, 4); break;
-			case 4: x = BITSWAP8(x ^ 0xc3, 0, 7, 6, 5, 4, 3, 2, 1); break;
-			case 5: x = BITSWAP8(x ^ 0xdb, 4, 3, 2, 1, 0, 7, 6, 5); break;
+			case 0: x = bitswap<8>(x ^ 0xce, 1, 0, 7, 6, 5, 4, 3, 2); break;
+			case 1: x = bitswap<8>(x ^ 0x9e, 3, 2, 1, 0, 7, 6, 5, 4); break;
+			case 4: x = bitswap<8>(x ^ 0xc3, 0, 7, 6, 5, 4, 3, 2, 1); break;
+			case 5: x = bitswap<8>(x ^ 0xdb, 4, 3, 2, 1, 0, 7, 6, 5); break;
 		}
 		ROM[i] = x;
 	}
@@ -15675,10 +15675,10 @@ DRIVER_INIT_MEMBER(cmaster_state, rp35)
 
 		switch(i & 3)
 		{
-			case 0: x = BITSWAP8(x ^ 0x2a, 0, 7, 6, 5, 4, 3, 2, 1); break;
-			case 1: x = BITSWAP8(x ^ 0x1c, 4, 3, 2, 1, 0, 7, 6, 5); break;
-			case 2: x = BITSWAP8(x ^ 0x4f, 3, 2, 1, 0, 7, 6, 5, 4); break;
-			case 3: x = BITSWAP8(x ^ 0x23, 1, 0, 7, 6, 5, 4, 3, 2); break;
+			case 0: x = bitswap<8>(x ^ 0x2a, 0, 7, 6, 5, 4, 3, 2, 1); break;
+			case 1: x = bitswap<8>(x ^ 0x1c, 4, 3, 2, 1, 0, 7, 6, 5); break;
+			case 2: x = bitswap<8>(x ^ 0x4f, 3, 2, 1, 0, 7, 6, 5, 4); break;
+			case 3: x = bitswap<8>(x ^ 0x23, 1, 0, 7, 6, 5, 4, 3, 2); break;
 		}
 		ROM[i] = x;
 	}
@@ -15697,10 +15697,10 @@ DRIVER_INIT_MEMBER(cmaster_state, rp36)
 
 		switch(i & 5)
 		{
-			case 0: x = BITSWAP8(x ^ 0xee, 2, 1, 0, 7, 6, 5, 4, 3); break;
-			case 1: x = BITSWAP8(x ^ 0x9f, 3, 2, 1, 0, 7, 6, 5, 4); break;
-			case 4: x = BITSWAP8(x ^ 0xc7, 3, 2, 1, 0, 7, 6, 5, 4); break;
-			case 5: x = BITSWAP8(x ^ 0xc3, 3, 2, 1, 0, 7, 6, 5, 4); break;
+			case 0: x = bitswap<8>(x ^ 0xee, 2, 1, 0, 7, 6, 5, 4, 3); break;
+			case 1: x = bitswap<8>(x ^ 0x9f, 3, 2, 1, 0, 7, 6, 5, 4); break;
+			case 4: x = bitswap<8>(x ^ 0xc7, 3, 2, 1, 0, 7, 6, 5, 4); break;
+			case 5: x = bitswap<8>(x ^ 0xc3, 3, 2, 1, 0, 7, 6, 5, 4); break;
 		}
 
 		ROM[i] = x;
@@ -15719,10 +15719,10 @@ DRIVER_INIT_MEMBER(cmaster_state, rp36c3)
 
 		switch(i & 0xa)
 		{
-			case 0x0: x = BITSWAP8(x ^ 0xfd, 6, 4, 0, 7, 3, 1, 5, 2); break;
-			case 0x2: x = BITSWAP8(x ^ 0xee, 4, 6, 7, 0, 3, 2, 1, 5); break;
-			case 0x8: x = BITSWAP8(x ^ 0x2c, 0, 3, 4, 2, 5, 6, 1, 7); break;
-			case 0xa: x = BITSWAP8(x ^ 0xd6, 2, 0, 6, 1, 4, 5, 3, 7); break;
+			case 0x0: x = bitswap<8>(x ^ 0xfd, 6, 4, 0, 7, 3, 1, 5, 2); break;
+			case 0x2: x = bitswap<8>(x ^ 0xee, 4, 6, 7, 0, 3, 2, 1, 5); break;
+			case 0x8: x = bitswap<8>(x ^ 0x2c, 0, 3, 4, 2, 5, 6, 1, 7); break;
+			case 0xa: x = bitswap<8>(x ^ 0xd6, 2, 0, 6, 1, 4, 5, 3, 7); break;
 		}
 
 		ROM[i] = x;
@@ -15741,10 +15741,10 @@ DRIVER_INIT_MEMBER(cmaster_state, rp96sub)  // 95 33 95 33 70 6C 70 6C... XORs s
 
 		switch(i & 5)
 		{
-			case 0: x = BITSWAP8(x ^ 0x6a, 7, 6, 5, 4, 3, 2, 1, 0); break;
-			case 1: x = BITSWAP8(x ^ 0xcc, 7, 6, 5, 4, 3, 2, 1, 0); break;
-			case 4: x = BITSWAP8(x ^ 0x8f, 7, 6, 5, 4, 3, 2, 1, 0); break;
-			case 5: x = BITSWAP8(x ^ 0x93, 7, 6, 5, 4, 3, 2, 1, 0); break;
+			case 0: x = bitswap<8>(x ^ 0x6a, 7, 6, 5, 4, 3, 2, 1, 0); break;
+			case 1: x = bitswap<8>(x ^ 0xcc, 7, 6, 5, 4, 3, 2, 1, 0); break;
+			case 4: x = bitswap<8>(x ^ 0x8f, 7, 6, 5, 4, 3, 2, 1, 0); break;
+			case 5: x = bitswap<8>(x ^ 0x93, 7, 6, 5, 4, 3, 2, 1, 0); break;
 		}
 
 		ROM[i] = x;
@@ -15764,10 +15764,10 @@ DRIVER_INIT_MEMBER(cmaster_state, po33)
 
 		switch(i & 0x14)
 		{
-			case 0x00: x = BITSWAP8(x ^ 0xde, 2, 1, 0, 7, 6, 5, 4, 3); break;
-			case 0x04: x = BITSWAP8(x ^ 0x3c, 0, 7, 6, 5, 4, 3, 2, 1); break;
-			case 0x10: x = BITSWAP8(x ^ 0x2f, 3, 2, 1, 0, 7, 6, 5, 4); break;
-			case 0x14: x = BITSWAP8(x ^ 0x5b, 4, 3, 2, 1, 0, 7, 6, 5); break;
+			case 0x00: x = bitswap<8>(x ^ 0xde, 2, 1, 0, 7, 6, 5, 4, 3); break;
+			case 0x04: x = bitswap<8>(x ^ 0x3c, 0, 7, 6, 5, 4, 3, 2, 1); break;
+			case 0x10: x = bitswap<8>(x ^ 0x2f, 3, 2, 1, 0, 7, 6, 5, 4); break;
+			case 0x14: x = bitswap<8>(x ^ 0x5b, 4, 3, 2, 1, 0, 7, 6, 5); break;
 		}
 
 		ROM[i] = x;
@@ -15787,10 +15787,10 @@ DRIVER_INIT_MEMBER(cmaster_state, match133)
 
 		switch(i & 0x12)
 		{
-			case 0x00: x = BITSWAP8(x ^ 0xde, 3, 2, 1, 0, 7, 6, 5, 4); break;
-			case 0x02: x = BITSWAP8(x ^ 0x3d, 1, 0, 7, 6, 5, 4, 3, 2); break;
-			case 0x10: x = BITSWAP8(x ^ 0x2f, 4, 3, 2, 1, 0, 7, 6, 5); break;
-			case 0x12: x = BITSWAP8(x ^ 0x5c, 4, 3, 2, 1, 0, 7, 6, 5); break;
+			case 0x00: x = bitswap<8>(x ^ 0xde, 3, 2, 1, 0, 7, 6, 5, 4); break;
+			case 0x02: x = bitswap<8>(x ^ 0x3d, 1, 0, 7, 6, 5, 4, 3, 2); break;
+			case 0x10: x = bitswap<8>(x ^ 0x2f, 4, 3, 2, 1, 0, 7, 6, 5); break;
+			case 0x12: x = bitswap<8>(x ^ 0x5c, 4, 3, 2, 1, 0, 7, 6, 5); break;
 		}
 
 		ROM[i] = x;
@@ -15884,17 +15884,17 @@ DRIVER_INIT_MEMBER(goldstar_state, super9)
 	uint8_t *src = memregion("gfx1")->base();
 	for (i = 0; i < 0x20000; i++)
 	{
-//      src[i] = BITSWAP8(src[i], 7, 4, 2, 1, 6, 5, 3, 0);
-//      src[i] = BITSWAP8(src[i], 7, 3, 2, 6, 1, 5, 4, 0);
-		src[i] = BITSWAP8(src[i], 7, 3, 2, 6, 5, 1, 4, 0);
+//      src[i] = bitswap<8>(src[i], 7, 4, 2, 1, 6, 5, 3, 0);
+//      src[i] = bitswap<8>(src[i], 7, 3, 2, 6, 1, 5, 4, 0);
+		src[i] = bitswap<8>(src[i], 7, 3, 2, 6, 5, 1, 4, 0);
 	}
 
 	uint8_t *src2 = memregion("gfx2")->base();
 	for (i = 0; i < 0x8000; i++)
 	{
-//      src2[i] = BITSWAP8(src2[i], 7, 4, 2, 1, 6, 5, 3, 0);
-//      src2[i] = BITSWAP8(src2[i], 7, 3, 2, 6, 1, 5, 4, 0);
-		src2[i] = BITSWAP8(src2[i], 3, 7, 6, 2, 5, 1, 0, 4);   // endianess
+//      src2[i] = bitswap<8>(src2[i], 7, 4, 2, 1, 6, 5, 3, 0);
+//      src2[i] = bitswap<8>(src2[i], 7, 3, 2, 6, 1, 5, 4, 0);
+		src2[i] = bitswap<8>(src2[i], 3, 7, 6, 2, 5, 1, 0, 4);   // endianess
 	}
 
 }
@@ -15909,7 +15909,7 @@ DRIVER_INIT_MEMBER(cb3_state, cb3e)
 	for (i = 0; i < 0x10000; i++)
 	{
 		uint8_t dat = ROM[i];
-		dat =  BITSWAP8(dat, 5, 6, 3, 4, 7, 2, 1, 0);
+		dat =  bitswap<8>(dat, 5, 6, 3, 4, 7, 2, 1, 0);
 		ROM[i] = dat;
 	}
 
@@ -15918,14 +15918,14 @@ DRIVER_INIT_MEMBER(cb3_state, cb3e)
 	uint8_t *src = memregion("gfx1")->base();
 	for (i = 0; i < 0x20000; i++)
 	{
-		src[i] = BITSWAP8(src[i], 4, 3, 2, 5, 1, 6, 0, 7);      // OK
+		src[i] = bitswap<8>(src[i], 4, 3, 2, 5, 1, 6, 0, 7);      // OK
 	}
 
 /*  bank 2 graphics */
 	uint8_t *src2 = memregion("gfx2")->base();
 	for (i = 0; i < 0x8000; i++)
 	{
-		src2[i] = BITSWAP8(src2[i], 3, 4, 2, 5, 1, 6, 0, 7);    // OK
+		src2[i] = bitswap<8>(src2[i], 3, 4, 2, 5, 1, 6, 0, 7);    // OK
 	}
 }
 
@@ -15936,14 +15936,14 @@ DRIVER_INIT_MEMBER(goldstar_state, wcherry)
 	uint8_t *src = memregion("gfx1")->base();
 	for (i = 0; i < 0x20000; i++)
 	{
-		src[i] = BITSWAP8(src[i], 4, 3, 2, 5, 1, 6, 0, 7);      // OK
+		src[i] = bitswap<8>(src[i], 4, 3, 2, 5, 1, 6, 0, 7);      // OK
 	}
 
 /*  bank 2 graphics */
 	uint8_t *src2 = memregion("gfx2")->base();
 	for (i = 0; i < 0x8000; i++)
 	{
-		src2[i] = BITSWAP8(src2[i], 3, 4, 2, 5, 1, 6, 0, 7);    // OK
+		src2[i] = bitswap<8>(src2[i], 3, 4, 2, 5, 1, 6, 0, 7);    // OK
 	}
 }
 
@@ -15961,14 +15961,14 @@ DRIVER_INIT_MEMBER(wingco_state, flaming7)
 	uint8_t *src = memregion("gfx1")->base();
 	for (i = 0; i < 0x20000; i++)
 	{
-		src[i] = BITSWAP8(src[i], 4, 3, 2, 5, 1, 6, 0, 7);      // OK
+		src[i] = bitswap<8>(src[i], 4, 3, 2, 5, 1, 6, 0, 7);      // OK
 	}
 
 /*  bank 2 graphics */
 	uint8_t *src2 = memregion("gfx2")->base();
 	for (i = 0; i < 0x8000; i++)
 	{
-		src2[i] = BITSWAP8(src2[i], 3, 4, 2, 5, 1, 6, 0, 7);    // OK
+		src2[i] = bitswap<8>(src2[i], 3, 4, 2, 5, 1, 6, 0, 7);    // OK
 	}
 
 /*  Patch to bypass the iButton electronic serial number check.

@@ -172,7 +172,7 @@ READ8_MEMBER(stv_state::critcrsh_ioga_r)
 		case 0x01:
 		case 0x03:
 			res = ioport(lgnames[offset >> 1])->read();
-			res = BITSWAP8(res, 2, 3, 0, 1, 6, 7, 5, 4) & 0xf3;
+			res = bitswap<8>(res, 2, 3, 0, 1, 6, 7, 5, 4) & 0xf3;
 			res |= (ioport("PORTC")->read() & 0x10) ? 0x0 : 0x4; // x/y hit latch actually
 			break;
 		default: res = stv_ioga_r(space,offset); break;
@@ -1897,11 +1897,11 @@ DRIVER_INIT_MEMBER(stv_state,sanjeon)
 	{
 		src[x] = src[x]^0xff;
 
-		src[x] = BITSWAP8(src[x],7,2,5,1,  3,6,4,0);
-		src[x] = BITSWAP8(src[x],4,6,5,7,  3,2,1,0);
-		src[x] = BITSWAP8(src[x],7,6,5,4,  2,3,1,0);
-		src[x] = BITSWAP8(src[x],7,0,5,4,  3,2,1,6);
-		src[x] = BITSWAP8(src[x],3,6,5,4,  7,2,1,0);
+		src[x] = bitswap<8>(src[x],7,2,5,1,  3,6,4,0);
+		src[x] = bitswap<8>(src[x],4,6,5,7,  3,2,1,0);
+		src[x] = bitswap<8>(src[x],7,6,5,4,  2,3,1,0);
+		src[x] = bitswap<8>(src[x],7,0,5,4,  3,2,1,6);
+		src[x] = bitswap<8>(src[x],3,6,5,4,  7,2,1,0);
 
 	}
 

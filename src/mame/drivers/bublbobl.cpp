@@ -2007,10 +2007,10 @@ DRIVER_INIT_MEMBER(bublbobl_state,dland)
 	int i;
 	uint8_t* src = memregion("gfx1")->base();
 	for (i = 0; i < 0x40000; i++)
-		src[i] = BITSWAP8(src[i],7,6,5,4,0,1,2,3);
+		src[i] = bitswap<8>(src[i],7,6,5,4,0,1,2,3);
 
 	for (i = 0x40000; i < 0x80000; i++)
-		src[i] = BITSWAP8(src[i],7,4,5,6,3,0,1,2);
+		src[i] = bitswap<8>(src[i],7,4,5,6,3,0,1,2);
 
 	DRIVER_INIT_CALL(common);
 }

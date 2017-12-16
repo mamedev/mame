@@ -474,8 +474,8 @@ ROM_START(zira)
 	ROM_LOAD("zira_u8.bin",  0x0000, 0x0800, CRC(53f8bf17) SHA1(5eb74f27bc65374a85dd44bbc8f6142488c226a2))
 	ROM_LOAD("zira_u9.bin",  0x0800, 0x0800, CRC(d50a2419) SHA1(81b157f579a433389506817b1b6e02afaa2cf0d5))
 
-	ROM_REGION(0x800, "cop402", 0) // according to the schematic this is a 2716 with a size of 0x800
-	ROM_LOAD("zira.snd",     0x0000, 0x0400, CRC(c8a54854) SHA1(6c0367dcb2a11f0478c44b4e2115c1cb1e8052f3))
+	ROM_REGION(0x800, "cop402", 0) // according to the schematic this is a 2716 with a size of 0x800; according to PinMAME it contains the same code twice
+	ROM_LOAD("zira.snd",     0x0000, 0x0800, CRC(008cb743) SHA1(8e9677f08189638d669b265bb6943275a08ec8b4))
 ROM_END
 
 /*-------------------------------------------------------------------

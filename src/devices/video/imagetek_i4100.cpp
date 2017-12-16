@@ -623,7 +623,7 @@ void imagetek_i4100_device::blt_write( address_space &space, const int tmap, con
 		case 2: vram_1_w(space, offs, data, mask);    break;
 		case 3: vram_2_w(space, offs, data, mask);    break;
 	}
-//  logerror("%s : Blitter %X] %04X <- %04X & %04X\n", space.machine().describe_context(), tmap, offs, data, mask);
+//  logerror("%s : Blitter %X] %04X <- %04X & %04X\n", machine().describe_context(), tmap, offs, data, mask);
 }
 
 /***************************************************************************

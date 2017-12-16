@@ -860,7 +860,7 @@ DRIVER_INIT_MEMBER(bloodbro_state,weststry)
 	{	
 		/* sprite roms ws25 and ws26 have 2 bits swapped
 		   there is also an address swap but that is currently handled in the video implementation */
-		sprites[i] = BITSWAP8(sprites[i],7,6,4,5,3,2,1,0);
+		sprites[i] = bitswap<8>(sprites[i],7,6,4,5,3,2,1,0);
 	}
 
 	m_weststry_opl_irq = false;

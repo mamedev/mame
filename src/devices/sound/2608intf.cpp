@@ -11,6 +11,9 @@
   - Control Write B
   - Data Write B
 
+  TODO:
+  - fix set_unscaled_clock() changes (currently done only by vgmplay driver)
+  
 ***************************************************************************/
 
 #include "emu.h"

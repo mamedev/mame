@@ -150,7 +150,7 @@ void tispellb_state::prepare_display()
 WRITE16_MEMBER(tispellb_state::main_write_o)
 {
 	// reorder opla to led14seg, plus DP as d14 and AP as d15, same as snspell
-	m_plate = BITSWAP16(data,12,15,10,7,8,9,11,6,13,3,14,0,1,2,4,5);
+	m_plate = bitswap<16>(data,12,15,10,7,8,9,11,6,13,3,14,0,1,2,4,5);
 	prepare_display();
 }
 
@@ -199,7 +199,7 @@ WRITE16_MEMBER(tispellb_state::sub_write_o)
 READ8_MEMBER(tispellb_state::rev1_ctl_r)
 {
 	// main CTL3210 <- sub O6043
-	return BITSWAP8(m_sub_o,7,5,2,1,6,0,4,3) & 0xf;
+	return bitswap<4>(m_sub_o,6,0,4,3);
 }
 
 WRITE16_MEMBER(tispellb_state::sub_write_r)

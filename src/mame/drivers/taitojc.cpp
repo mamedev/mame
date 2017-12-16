@@ -1509,10 +1509,10 @@ ROM_END
 
 ROM_START( sidebs2ja ) /* Side by Side 2 Evoluzione Ver 2.4 J */
 	ROM_REGION(0x200000, "maincpu", 0)      /* 68040 code */
-	ROM_LOAD32_BYTE( "e38-23+.ic36", 0x000000, 0x80000, CRC(b3d8e2d9) SHA1(6de6a51c3d9ace532fa03517bab93101b5a3eaae) ) /* Actual label E38-23* */
-	ROM_LOAD32_BYTE( "e38-24+.ic37", 0x000001, 0x80000, CRC(2a47d80d) SHA1(41b889e4a1397c7f0d4f6ef136ed8abfd7e1ed86) ) /* Actual label E38-24* */
-	ROM_LOAD32_BYTE( "e38-25+.ic38", 0x000002, 0x80000, CRC(f1a8a4df) SHA1(e4cf75969fb0503df2290522194b097f5cb983a3) ) /* Actual label E38-25* */
-	ROM_LOAD32_BYTE( "e38-26+.ic39", 0x000003, 0x80000, CRC(b550fbf2) SHA1(a0a461af7e71c6ad6468cfdee2bc7161ae31bbfb) ) /* Actual label E38-26* */
+	ROM_LOAD32_BYTE( "e38-23+.ic36", 0x000000, 0x80000, CRC(b3d8e2d9) SHA1(6de6a51c3d9ace532fa03517bab93101b5a3eaae) ) /* Actually labeled E38-23* */
+	ROM_LOAD32_BYTE( "e38-24+.ic37", 0x000001, 0x80000, CRC(2a47d80d) SHA1(41b889e4a1397c7f0d4f6ef136ed8abfd7e1ed86) ) /* Actually labeled E38-24* */
+	ROM_LOAD32_BYTE( "e38-25+.ic38", 0x000002, 0x80000, CRC(f1a8a4df) SHA1(e4cf75969fb0503df2290522194b097f5cb983a3) ) /* Actually labeled E38-25* */
+	ROM_LOAD32_BYTE( "e38-26+.ic39", 0x000003, 0x80000, CRC(b550fbf2) SHA1(a0a461af7e71c6ad6468cfdee2bc7161ae31bbfb) ) /* Actually labeled E38-26* */
 
 	ROM_REGION( 0x180000, "taito_en:audiocpu", 0 )       /* 68000 Code */
 	ROM_LOAD16_BYTE( "e38-19.ic30", 0x100001, 0x040000, CRC(3f50cb7b) SHA1(76af65c9b74ede843a3182f79cecda8c3e3febe6) )
@@ -1991,12 +1991,12 @@ ROM_START( landgearja ) /* Landing Gear Ver 3.0 J, is there an alternate set wit
 	ROM_LOAD( "e17-32.ic96",   0x0000, 0x0bac, CRC(1d590ca3) SHA1(733e9e34642c1e03fd880fda198b98927c1bb81d) )
 ROM_END
 
-ROM_START( dangcurv )
+ROM_START( dangcurv ) /* Dangerous Curves Ver 2.9 O */
 	ROM_REGION( 0x200000, "maincpu", 0 )        /* 68040 code */
-	ROM_LOAD32_BYTE( "e09_32-1.ic36", 0x000000, 0x80000, CRC(82c0af83) SHA1(307e2dd441116ffaad0d5783cd139bde8fc23460) )
-	ROM_LOAD32_BYTE( "e09_33-1.ic37", 0x000001, 0x80000, CRC(be6eca0b) SHA1(edb4ad0d379132e64c1238191ab17bd4400f3322) )
-	ROM_LOAD32_BYTE( "e09_34-1.ic38", 0x000002, 0x80000, CRC(553de745) SHA1(474e96c810fee8097059e201b95810b3235c6cad) )
-	ROM_LOAD32_BYTE( "e09_35-1.ic39", 0x000003, 0x80000, CRC(a60273fd) SHA1(511191506f04320775787e294a59a94c07364006) )
+	ROM_LOAD32_BYTE( "e09-32-1+.ic36", 0x000000, 0x80000, CRC(82c0af83) SHA1(307e2dd441116ffaad0d5783cd139bde8fc23460) ) /* Actually labeled E09 32-1* */
+	ROM_LOAD32_BYTE( "e09-33-1+.ic37", 0x000001, 0x80000, CRC(be6eca0b) SHA1(edb4ad0d379132e64c1238191ab17bd4400f3322) ) /* Actually labeled E09 33-1* */
+	ROM_LOAD32_BYTE( "e09-34-1+.ic38", 0x000002, 0x80000, CRC(553de745) SHA1(474e96c810fee8097059e201b95810b3235c6cad) ) /* Actually labeled E09 34-1* */
+	ROM_LOAD32_BYTE( "e09-35-1+.ic39", 0x000003, 0x80000, CRC(a60273fd) SHA1(511191506f04320775787e294a59a94c07364006) ) /* Actually labeled E09 35-1* */
 
 	ROM_REGION( 0x180000, "taito_en:audiocpu", 0 )       /* 68000 Code */
 	ROM_LOAD16_BYTE( "e09-27.ic30", 0x100001, 0x40000, CRC(6d54839c) SHA1(a28c9b0727128b82bb0fa71dc951e3f03ee45e1b) )
@@ -2048,7 +2048,7 @@ ROM_START( dangcurv )
 	ROM_LOAD( "e09-22.ic73",   0x0000, 0x0117, CRC(d43972cc) SHA1(ed9454d1a225a5fb6fefc0ae1aebe2b439ed460f) )
 ROM_END
 
-ROM_START( dangcurvj )
+ROM_START( dangcurvj ) /* Dangerous Curves Ver 2.2 J */
 	ROM_REGION( 0x200000, "maincpu", 0 )        /* 68040 code */
 	ROM_LOAD32_BYTE( "e09-23.ic36", 0x000000, 0x80000, CRC(b4cdadd6) SHA1(84bd1d055ff15afb5438cd5151abf78b0000cebc) )
 	ROM_LOAD32_BYTE( "e09-24.ic37", 0x000001, 0x80000, CRC(fb2fc795) SHA1(2f58d043ab9fc0269a5b6827009777cd7ab832fc) )

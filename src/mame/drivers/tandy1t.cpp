@@ -408,7 +408,7 @@ READ8_MEMBER( tandy1000_state::tandy1000_bank_r )
 {
 	uint8_t data = 0xFF;
 
-	logerror( "%s: tandy1000_bank_r: offset = %x\n", space.machine().describe_context(), offset );
+	logerror( "%s: tandy1000_bank_r: offset = %x\n", machine().describe_context(), offset );
 
 	switch( offset )
 	{
@@ -423,7 +423,7 @@ READ8_MEMBER( tandy1000_state::tandy1000_bank_r )
 
 WRITE8_MEMBER( tandy1000_state::tandy1000_bank_w )
 {
-	logerror( "%s: tandy1000_bank_w: offset = %x, data = %02x\n", space.machine().describe_context(), offset, data );
+	logerror( "%s: tandy1000_bank_w: offset = %x, data = %02x\n", machine().describe_context(), offset, data );
 
 	switch( offset )
 	{

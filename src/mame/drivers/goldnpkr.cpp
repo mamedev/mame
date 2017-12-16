@@ -11042,7 +11042,7 @@ DRIVER_INIT_MEMBER(goldnpkr_state, flcnw)
 	for (i = start; i < size; i++)
 	{
 		ROM[i] = ROM[i] ^ 0xa0;
-		ROM[i] = BITSWAP8(ROM[i], 7, 6, 3, 4, 5, 2, 1, 0);
+		ROM[i] = bitswap<8>(ROM[i], 7, 6, 3, 4, 5, 2, 1, 0);
 	}
 }
 

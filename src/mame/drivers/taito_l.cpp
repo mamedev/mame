@@ -2443,7 +2443,7 @@ DRIVER_INIT_MEMBER(taitol_1cpu_state, plottinga)
 {
 	u8 tab[256];
 	for (unsigned i = 0; i < sizeof(tab); i++)
-		tab[i] = BITSWAP8(i, 0, 1, 2, 3, 4, 5, 6, 7);
+		tab[i] = bitswap<8>(i, 0, 1, 2, 3, 4, 5, 6, 7);
 
 	for (unsigned i = 0; i < m_main_prg.length(); i++)
 		m_main_prg[i] = tab[m_main_prg[i]];

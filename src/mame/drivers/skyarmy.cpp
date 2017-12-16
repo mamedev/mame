@@ -93,7 +93,7 @@ WRITE_LINE_MEMBER(skyarmy_state::flip_screen_y_w)
 TILE_GET_INFO_MEMBER(skyarmy_state::get_tile_info)
 {
 	int code = m_videoram[tile_index];
-	int attr = BITSWAP8(m_colorram[tile_index], 7, 6, 5, 4, 3, 0, 1, 2) & 7;
+	int attr = bitswap<8>(m_colorram[tile_index], 7, 6, 5, 4, 3, 0, 1, 2) & 7;
 
 	SET_TILE_INFO_MEMBER(0, code, attr, 0);
 }
@@ -158,7 +158,7 @@ uint32_t skyarmy_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 
 	for (offs = 0 ; offs < 0x40; offs+=4)
 	{
-		pal = BITSWAP8(m_spriteram[offs+2], 7, 6, 5, 4, 3, 0, 1, 2) & 7;
+		pal = bitswap<8>(m_spriteram[offs+2], 7, 6, 5, 4, 3, 0, 1, 2) & 7;
 
 		sx = m_spriteram[offs+3];
 		sy = 240-(m_spriteram[offs]+1);
