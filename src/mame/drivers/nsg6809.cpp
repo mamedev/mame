@@ -2,10 +2,12 @@
 // copyright-holders:AJR
 /***************************************************************************
 
-    Skeleton driver for National Sports Games' 6809-based mechanical games:
+    Skeleton driver for 6809-based mechanical games by National Sports
+    Games, Inc. (a division of Skee-Ball Inc.):
 
-    * Pitch Hitter
+    * Pitch Hitter - Baseball Challenge
     * Super Shot (undumped)
+    * UB-QB - Football Challenge (undumped)
 
     Memory map for "Universal Game PCB" in Super Shot schematics:
 
