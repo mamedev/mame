@@ -7,8 +7,8 @@
 	<!-- No in-game HUD, scrolling problems-->
 	<software name="banshee" supported="partial">
 		<description>Banshee</description>
-		<year></year>
-		<publisher></publisher>
+		<year>1994</year>
+		<publisher>Core</publisher>
 		<part name="cdrom" interface="cd32_cdrom">
 			<diskarea name="cdrom">
 				<disk name="banshee (europe) (en,fr,de,da)" sha1="f10de2115430176776215aef8b239dccb54e34ec"/>
