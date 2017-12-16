@@ -32,10 +32,15 @@ class ide_controller_device : public ata_interface_device
 public:
 	ide_controller_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual DECLARE_READ16_MEMBER(read16_cs0) override;
-	virtual DECLARE_READ16_MEMBER(read16_cs1) override;
-	virtual DECLARE_WRITE16_MEMBER(write16_cs0) override;
-	virtual DECLARE_WRITE16_MEMBER(write16_cs1) override;
+	virtual u16 read16_cs0(offs_t offset, u16 mem_mask = 0xffff) override;
+	virtual u16 read16_cs1(offs_t offset, u16 mem_mask = 0xffff) override;
+	virtual void write16_cs0(offs_t offset, u16 data, u16 mem_mask = 0xffff) override;
+	virtual void write16_cs1(offs_t offset, u16 data, u16 mem_mask = 0xffff) override;
+
+	using ata_interface_device::read16_cs0;
+	using ata_interface_device::read16_cs1;
+	using ata_interface_device::write16_cs0;
+	using ata_interface_device::write16_cs1;
 
 protected:
 	ide_controller_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
@@ -57,10 +62,15 @@ class ide_controller_32_device : public ide_controller_device
 public:
 	ide_controller_32_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual DECLARE_READ32_MEMBER(read32_cs0);
-	virtual DECLARE_READ32_MEMBER(read32_cs1);
-	virtual DECLARE_WRITE32_MEMBER(write32_cs0);
-	virtual DECLARE_WRITE32_MEMBER(write32_cs1);
+	u32 read32_cs0(offs_t offset, u32 mem_mask = 0xffffffff);
+	u32 read32_cs1(offs_t offset, u32 mem_mask = 0xffffffff);
+	void write32_cs0(offs_t offset, u32 data, u32 mem_mask = 0xffffffff);
+	void write32_cs1(offs_t offset, u32 data, u32 mem_mask = 0xffffffff);
+
+	DECLARE_READ32_MEMBER(read32_cs0);
+	DECLARE_READ32_MEMBER(read32_cs1);
+	DECLARE_WRITE32_MEMBER(write32_cs0);
+	DECLARE_WRITE32_MEMBER(write32_cs1);
 
 protected:
 	ide_controller_32_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);

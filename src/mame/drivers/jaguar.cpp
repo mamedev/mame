@@ -382,7 +382,7 @@ public:
 	{
 	}
 
-	virtual DECLARE_WRITE16_MEMBER(write16_cs0) override
+	virtual void write16_cs0(offs_t offset, u16 data, u16 mem_mask) override
 	{
 		// the first write is to the device head register
 		if( offset == 6 && (m_status & IDE_STATUS_DRQ))
@@ -390,7 +390,7 @@ public:
 			m_status &= ~IDE_STATUS_DRQ;
 		}
 
-		ide_hdd_device::write16_cs0(space, offset, data, mem_mask);
+		ide_hdd_device::write16_cs0(offset, data, mem_mask);
 	}
 };
 

@@ -755,9 +755,9 @@ READ16_MEMBER( a4000_state::ide_r )
 
 	// this very likely doesn't respond to all the addresses, figure out which ones
 	if (BIT(offset, 12))
-		data = m_ata->read16_cs1(space, (offset >> 1) & 0x07, mem_mask);
+		data = m_ata->read16_cs1((offset >> 1) & 0x07, mem_mask);
 	else
-		data = m_ata->read16_cs0(space, (offset >> 1) & 0x07, mem_mask);
+		data = m_ata->read16_cs0((offset >> 1) & 0x07, mem_mask);
 
 	// swap
 	data = (data << 8) | (data >> 8);
@@ -777,9 +777,9 @@ WRITE16_MEMBER( a4000_state::ide_w )
 
 	// this very likely doesn't respond to all the addresses, figure out which ones
 	if (BIT(offset, 12))
-		m_ata->write16_cs1(space, (offset >> 1) & 0x07, data, mem_mask);
+		m_ata->write16_cs1((offset >> 1) & 0x07, data, mem_mask);
 	else
-		m_ata->write16_cs0(space, (offset >> 1) & 0x07, data, mem_mask);
+		m_ata->write16_cs0((offset >> 1) & 0x07, data, mem_mask);
 }
 
 WRITE_LINE_MEMBER( a4000_state::ide_interrupt_w )

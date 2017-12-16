@@ -85,13 +85,18 @@ public:
 	template <class Object> static devcb_base &set_dmarq_handler(device_t &device, Object &&cb) { return downcast<ata_interface_device &>(device).m_dmarq_handler.set_callback(std::forward<Object>(cb)); }
 	template <class Object> static devcb_base &set_dasp_handler(device_t &device, Object &&cb) { return downcast<ata_interface_device &>(device).m_dasp_handler.set_callback(std::forward<Object>(cb)); }
 
+	DECLARE_READ16_MEMBER(read16_cs0);
+	DECLARE_READ16_MEMBER(read16_cs1);
+	DECLARE_WRITE16_MEMBER(write16_cs0);
+	DECLARE_WRITE16_MEMBER(write16_cs1);
+
 	uint16_t read_dma();
-	virtual DECLARE_READ16_MEMBER(read16_cs0);
-	virtual DECLARE_READ16_MEMBER(read16_cs1);
+	virtual u16 read16_cs0(offs_t offset, u16 mem_mask = 0xffff);
+	virtual u16 read16_cs1(offs_t offset, u16 mem_mask = 0xffff);
 
 	void write_dma(uint16_t data);
-	virtual DECLARE_WRITE16_MEMBER(write16_cs0);
-	virtual DECLARE_WRITE16_MEMBER(write16_cs1);
+	virtual void write16_cs0(offs_t offset, u16 data, u16 mem_mask = 0xffff);
+	virtual void write16_cs1(offs_t offset, u16 data, u16 mem_mask = 0xffff);
 	DECLARE_WRITE_LINE_MEMBER(write_dmack);
 
 protected:

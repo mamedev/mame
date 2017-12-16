@@ -1272,13 +1272,11 @@ void zn_state::atpsx_dma_read( uint32_t *p_n_psxram, uint32_t n_address, int32_t
 		return;
 	}
 
-	address_space &space = m_maincpu->space(AS_PROGRAM);
-
 	/* dma size is in 32-bit words, convert to words */
 	n_size <<= 1;
 	while( n_size > 0 )
 	{
-		psxwriteword( p_n_psxram, n_address, m_vt83c461->read32_cs0(space, (uint32_t) 0, (uint32_t) 0xffff) );
+		psxwriteword( p_n_psxram, n_address, m_vt83c461->read32_cs0(0, 0xffff) );
 		n_address += 2;
 		n_size--;
 	}
@@ -1295,15 +1293,15 @@ READ16_MEMBER(zn_state::vt83c461_16_r)
 
 	if( offset >= 0x30 / 2 && offset < 0x40 / 2 )
 	{
-		return m_vt83c461->read_config( space, ( offset / 2 ) & 3, mem_mask << shift ) >> shift;
+		return m_vt83c461->read_config( ( offset / 2 ) & 3 ) >> shift;
 	}
 	else if( offset >= 0x1f0 / 2 && offset < 0x1f8 / 2 )
 	{
-		return m_vt83c461->read32_cs0( space, ( offset / 2 ) & 1, (uint32_t) mem_mask << shift ) >> shift;
+		return m_vt83c461->read32_cs0( ( offset / 2 ) & 1, mem_mask << shift ) >> shift;
 	}
 	else if( offset >= 0x3f0 / 2 && offset < 0x3f8 / 2 )
 	{
-		return m_vt83c461->read32_cs1( space, ( offset / 2 ) & 1, (uint32_t) mem_mask << shift ) >> shift;
+		return m_vt83c461->read32_cs1( ( offset / 2 ) & 1, mem_mask << shift ) >> shift;
 	}
 	else
 	{
@@ -1318,15 +1316,15 @@ WRITE16_MEMBER(zn_state::vt83c461_16_w)
 
 	if( offset >= 0x30 / 2 && offset < 0x40 / 2 )
 	{
-		m_vt83c461->write_config( space, ( offset / 2 ) & 3, data << shift, mem_mask << shift );
+		m_vt83c461->write_config( ( offset / 2 ) & 3, data << shift );
 	}
 	else if( offset >= 0x1f0 / 2 && offset < 0x1f8 / 2 )
 	{
-		m_vt83c461->write32_cs0( space, ( offset / 2 ) & 1, (uint32_t) data << shift, (uint32_t) mem_mask << shift );
+		m_vt83c461->write32_cs0( ( offset / 2 ) & 1, data << shift, mem_mask << shift );
 	}
 	else if( offset >= 0x3f0 / 2 && offset < 0x3f8 / 2 )
 	{
-		m_vt83c461->write32_cs1( space, ( offset / 2 ) & 1, (uint32_t) data << shift, (uint32_t) mem_mask << shift );
+		m_vt83c461->write32_cs1( ( offset / 2 ) & 1, data << shift, mem_mask << shift );
 	}
 	else
 	{
@@ -1338,7 +1336,7 @@ READ16_MEMBER(zn_state::vt83c461_32_r)
 {
 	if( offset == 0x1f0/2 )
 	{
-		uint32_t data = m_vt83c461->read32_cs0(space, 0, 0xffffffff);
+		uint32_t data = m_vt83c461->read32_cs0(0);
 		m_vt83c461_latch = data >> 16;
 		return data & 0xffff;
 	}

@@ -136,12 +136,12 @@ uint16_t ata_interface_device::read_dma()
 	return result;
 }
 
-READ16_MEMBER( ata_interface_device::read16_cs0 )
+u16 ata_interface_device::read16_cs0(offs_t offset, u16 mem_mask)
 {
 	uint16_t result = mem_mask;
 	for (auto & elem : m_slot)
 		if (elem->dev() != nullptr)
-			result &= elem->dev()->read16_cs0(space, offset, mem_mask);
+			result &= elem->dev()->read16_cs0(offset, mem_mask);
 
 //  { static int last_status = -1; if (offset == 7 ) { if( result == last_status ) return last_status; last_status = result; } else last_status = -1; }
 
@@ -150,18 +150,27 @@ READ16_MEMBER( ata_interface_device::read16_cs0 )
 	return result;
 }
 
-READ16_MEMBER( ata_interface_device::read16_cs1 )
+u16 ata_interface_device::read16_cs1(offs_t offset, u16 mem_mask)
 {
 	uint16_t result = mem_mask;
 	for (auto & elem : m_slot)
 		if (elem->dev() != nullptr)
-			result &= elem->dev()->read16_cs1(space, offset, mem_mask);
+			result &= elem->dev()->read16_cs1(offset, mem_mask);
 
 //  logerror( "%s: read cs1 %04x %04x %04x\n", machine().describe_context(), offset, result, mem_mask );
 
 	return result;
 }
 
+READ16_MEMBER( ata_interface_device::read16_cs0 )
+{
+	return read16_cs0(offset, mem_mask);
+}
+
+READ16_MEMBER( ata_interface_device::read16_cs1 )
+{
+	return read16_cs1(offset, mem_mask);
+}
 
 /*************************************
  *
@@ -178,22 +187,32 @@ void ata_interface_device::write_dma( uint16_t data )
 			elem->dev()->write_dma(data);
 }
 
-WRITE16_MEMBER( ata_interface_device::write16_cs0 )
+void ata_interface_device::write16_cs0(offs_t offset, u16 data, u16 mem_mask)
 {
 //  logerror( "%s: write cs0 %04x %04x %04x\n", machine().describe_context(), offset, data, mem_mask );
 
 	for (auto & elem : m_slot)
 		if (elem->dev() != nullptr)
-			elem->dev()->write16_cs0(space, offset, data, mem_mask);
+			elem->dev()->write16_cs0(offset, data, mem_mask);
 }
 
-WRITE16_MEMBER( ata_interface_device::write16_cs1 )
+void ata_interface_device::write16_cs1(offs_t offset, u16 data, u16 mem_mask)
 {
 //  logerror( "%s: write cs1 %04x %04x %04x\n", machine().describe_context(), offset, data, mem_mask );
 
 	for (auto & elem : m_slot)
 		if (elem->dev() != nullptr)
-			elem->dev()->write16_cs1(space, offset, data, mem_mask);
+			elem->dev()->write16_cs1(offset, data, mem_mask);
+}
+
+WRITE16_MEMBER( ata_interface_device::write16_cs0 )
+{
+	write16_cs0(offset, data, mem_mask);
+}
+
+WRITE16_MEMBER( ata_interface_device::write16_cs1 )
+{
+	write16_cs1(offset, data, mem_mask);
 }
 
 WRITE_LINE_MEMBER( ata_interface_device::write_dmack )

@@ -168,7 +168,7 @@ uint8_t a2bus_vulcanbase_device::read_c0nx(address_space &space, uint8_t offset)
 	switch (offset)
 	{
 		case 0:
-			m_lastdata = m_ata->read16_cs0(space, offset, 0xffff);
+			m_lastdata = m_ata->read16_cs0(offset);
 //          printf("IDE: read %04x\n", m_lastdata);
 			m_last_read_was_0 = true;
 			return m_lastdata&0xff;
@@ -181,7 +181,7 @@ uint8_t a2bus_vulcanbase_device::read_c0nx(address_space &space, uint8_t offset)
 			}
 			else
 			{
-				return m_ata->read16_cs0(space, offset, 0xff);
+				return m_ata->read16_cs0(offset, 0xff);
 			}
 
 		case 2:
@@ -190,7 +190,7 @@ uint8_t a2bus_vulcanbase_device::read_c0nx(address_space &space, uint8_t offset)
 		case 5:
 		case 6:
 		case 7:
-			return m_ata->read16_cs0(space, offset, 0xff);
+			return m_ata->read16_cs0(offset, 0xff);
 
 		default:
 			logerror("a2vulcan: unknown read @ C0n%x\n", offset);
@@ -222,11 +222,11 @@ void a2bus_vulcanbase_device::write_c0nx(address_space &space, uint8_t offset, u
 				m_lastdata &= 0x00ff;
 				m_lastdata |= (data << 8);
 //              printf("IDE: write %04x\n", m_lastdata);
-				m_ata->write16_cs0(space, 0, m_lastdata, 0xffff);
+				m_ata->write16_cs0(0, m_lastdata);
 			}
 			else
 			{
-				m_ata->write16_cs0(space, offset, data, 0xff);
+				m_ata->write16_cs0(offset, data, 0xff);
 			}
 			break;
 
@@ -237,7 +237,7 @@ void a2bus_vulcanbase_device::write_c0nx(address_space &space, uint8_t offset, u
 		case 6:
 		case 7:
 //          printf("%02x to IDE controller @ %x\n", data, offset);
-			m_ata->write16_cs0(space, offset, data, 0xff);
+			m_ata->write16_cs0(offset, data, 0xff);
 			break;
 
 		case 9: // ROM bank
