@@ -4,6 +4,18 @@
 
 	<!--- Preliminary List -->
 
+	<!-- Wrong colors, freezes at into screen-->
+	<software name="abreed3d" supported="no">
+		<description>Alien Breed 3D</description>
+		<year>1994</year>
+		<publisher>Team 17</publisher>
+		<part name="cdrom" interface="cd32_cdrom">
+			<diskarea name="cdrom">
+				<disk name="alien breed 3d (europe)" sha1="b6a9037ba0cd5fee65f5445b28e968074c335bbe"/>
+			</diskarea>
+		</part>
+	</software>
+
 	<!-- No in-game HUD, scrolling problems-->
 	<software name="banshee" supported="partial">
 		<description>Banshee</description>
