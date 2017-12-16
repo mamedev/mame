@@ -118,6 +118,7 @@ extern flag floatx80_is_nan( floatx80 a );
 
 extern flag floatx80_is_signaling_nan(floatx80 a);
 
+#ifdef UNUSED_DEFINITION
 static inline flag floatx80_is_quiet_nan(floatx80 a)
 {
 	bits64 aLow;
@@ -128,6 +129,7 @@ static inline flag floatx80_is_quiet_nan(floatx80 a)
 		&& (bits64)(aLow << 1)
 		&& (a.low != aLow);
 }
+#endif
 
 static inline int floatx80_is_zero(floatx80 fx)
 {
