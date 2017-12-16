@@ -16,6 +16,18 @@
 		</part>
 	</software>
 
+	<!-- Freezes after the intro, glitchy graphics-->
+	<software name="chaoseng" supported="partial">
+		<description>The Chaos Engine</description>
+		<year>1994</year>
+		<publisher>Renegade</publisher>
+		<part name="cdrom" interface="cd32_cdrom">
+			<diskarea name="cdrom">
+				<disk name="chaos engine, the (europe) (en,fr,de,it)" sha1="0044770e73765705061cb5c63a337eab579574d9"/>
+			</diskarea>
+		</part>
+	</software>
+
 	<!-- playable but there's a scrolling glitch every few frames -->
 	<software name="morph" supported="partial">
 		<description>Morph</description>
