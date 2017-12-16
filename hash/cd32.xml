@@ -4,6 +4,17 @@
 
 	<!--- Preliminary List -->
 
+	<!-- No in-game HUD, scrolling problems-->
+	<software name="banshee" supported="partial">
+		<description>Banshee</description>
+		<year></year>
+		<publisher></publisher>
+		<part name="cdrom" interface="cd32_cdrom">
+			<diskarea name="cdrom">
+				<disk name="banshee (europe) (en,fr,de,da)" sha1="f10de2115430176776215aef8b239dccb54e34ec"/>
+			</diskarea>
+		</part>
+	</software>
 
 	<!-- playable but there's a scrolling glitch every few frames -->
 	<software name="morph" supported="partial">
