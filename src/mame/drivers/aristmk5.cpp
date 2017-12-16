@@ -2984,6 +2984,11 @@ ROM_END
 // Chicken - Export C - 23/02/98.
 // Marked as RHG0730, 92.588% and 'touch'
 // All devices are 27c4002 instead of 27c4096.
+// (the following notes are from another identical set)
+// Game Eprom: RHG073003
+// No requires set chip version:
+// Variation (% and NO): 92,588% 03
+// Requires touch screen
 ROM_START( chickna5u )
 	ARISTOCRAT_MK5_BIOS
 	/*
