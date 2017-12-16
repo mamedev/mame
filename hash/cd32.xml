@@ -79,10 +79,22 @@
 	<software name="fireice" supported="partial">
 		<description>Fire Ice - The Daring Adventures of Cool Coyote</description>
 		<year>1994</year>
-		<publisher>Gremlin Graphics</publisher>
+		<publisher>Graftgold</publisher>
 		<part name="cdrom" interface="cd32_cdrom">
 			<diskarea name="cdrom">
 				<disk name="fire and ice - the daring adventures of cool coyote (europe) (en,fr,de,it)" sha1="064cadd6379a64d764a24db466807c2b1ded659d"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Doesn't boot -->
+	<software name="lotus" supported="no">
+		<description>The Classic Lotus Trilogy</description>
+		<year>1994</year>
+		<publisher>Gremlin</publisher>
+		<part name="cdrom" interface="cd32_cdrom">
+			<diskarea name="cdrom">
+				<disk name="classic lotus trilogy, the (europe)" sha1="da66caa5da1a7b150772e96ca8591222057b3c39"/>
 			</diskarea>
 		</part>
 	</software>
@@ -305,7 +317,5 @@
 			</diskarea>
 		</part>
 	</software>
-
-
 
 </softwarelist>
