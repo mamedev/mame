@@ -41,7 +41,7 @@ U14 28 pin IC
 MicroTouch Systems
 c 1992
 19-507 Rev 2
-ICS1578N 9334
+ICS1578N 9334 (ASIC 1578 on schematic)
 
 U15 48 pin IC
 P8798 (8797 on schematic)
@@ -75,11 +75,11 @@ UM6522A
 Y1
 ECS-120
 32-1
-China -connected to U7
+China -connected to U14
 Other side is unreadable (schematic reads 12.000MHz?)
 
 Y2
-16.000MHz -connected to U5
+16.000MHz -connected to U35
 
 CN1 JAMMA
 CN2 ISA? Video card slot
