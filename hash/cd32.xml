@@ -39,6 +39,28 @@
 		</part>
 	</software>
 
+	<software name="akira" supported="partial">
+		<description>Akira</description>
+		<year>1994</year>
+		<publisher>ICE</publisher>
+		<part name="cdrom" interface="cd32_cdrom">
+			<diskarea name="cdrom">
+				<disk name="akira (europe)" sha1="1abe30f210f4ee779a75796727f5fe3ef1781692"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="alfred" supported="no">
+		<description>Alfred Chicken</description>
+		<year>1993</year>
+		<publisher>Mindscape</publisher>
+		<part name="cdrom" interface="cd32_cdrom">
+			<diskarea name="cdrom">
+				<disk name="alfred chicken (europe)" sha1="6b6f249c830e15f7c5a5dffbe75596982a07c2c1"/>
+			</diskarea>
+		</part>
+	</software>
+
 	<!-- No in-game HUD, scrolling problems-->
 	<software name="banshee" supported="partial">
 		<description>Banshee</description>
