@@ -7,7 +7,7 @@
 	<!-- Wrong colors, freezes at into screen-->
 	<software name="abreed3d" supported="no">
 		<description>Alien Breed 3D</description>
-		<year>1994</year>
+		<year>1995</year>
 		<publisher>Team 17</publisher>
 		<part name="cdrom" interface="cd32_cdrom">
 			<diskarea name="cdrom">
