@@ -38,7 +38,7 @@ DEVICE_ADDRESS_MAP_START( regs_map, 32, arm_aic_device )
 	AM_RANGE(0x138, 0x13b) AM_WRITE(aic_dcr_w)        // AIC_DCR     Debug Control Register (Protect)
 	AM_RANGE(0x140, 0x143) AM_WRITE(aic_ffer_w)       // AIC_FFER    Fast Forcing Enable Register
 	AM_RANGE(0x144, 0x147) AM_WRITE(aic_ffdr_w)       // AIC_FFDR    Fast Forcing Disable Register
-	AM_RANGE(0x144, 0x147) AM_READ(aic_ffsr_r)        // AIC_FFSR    Fast Forcing Status Register
+	AM_RANGE(0x148, 0x14b) AM_READ(aic_ffsr_r)        // AIC_FFSR    Fast Forcing Status Register
 ADDRESS_MAP_END
 
 READ32_MEMBER(arm_aic_device::irq_vector_r)
