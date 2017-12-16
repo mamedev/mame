@@ -4,6 +4,17 @@
 
 	<!--- Preliminary List -->
 
+	<software name="abesqwak" supported="no">
+		<description>Alien Breed - Special Edition + Qwak</description>
+		<year>1994</year>
+		<publisher>Team 17</publisher>
+		<part name="cdrom" interface="cd32_cdrom">
+			<diskarea name="cdrom">
+				<disk name="alien breed special edition and qwak (europe) (en,fr,de,it,da)" sha1="499614c9a89026cbd748af7afd65445c50dd6167"/>
+			</diskarea>
+		</part>
+	</software>
+
 	<!-- Wrong colors, freezes at into screen-->
 	<software name="abreed3d" supported="no">
 		<description>Alien Breed 3D</description>
