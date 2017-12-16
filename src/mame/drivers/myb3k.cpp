@@ -447,7 +447,7 @@ WRITE_LINE_MEMBER(myb3k_state::hrq_w)
 
 READ8_MEMBER(myb3k_state::dma_memory_read_byte)
 {
-	assert(dma_channel != -1);
+	assert(m_dma_channel != -1);
 
 	address_space& prog_space = m_maincpu->space(AS_PROGRAM);
 	uint8_t tmp = prog_space.read_byte(offset | m_dma_page[m_dma_channel & 3] << 16);
@@ -457,7 +457,7 @@ READ8_MEMBER(myb3k_state::dma_memory_read_byte)
 
 WRITE8_MEMBER(myb3k_state::dma_memory_write_byte)
 {
-	assert(dma_channel != -1);
+	assert(m_dma_channel != -1);
 
 	address_space& prog_space = m_maincpu->space(AS_PROGRAM);
 	LOGDMA("%s: %x:%04x <= %02x\n", FUNCNAME, m_dma_channel, offset, data);
