@@ -49,8 +49,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, citycon_state )
 	AM_RANGE(0x0000, 0x0fff) AM_RAM
-	AM_RANGE(0x4000, 0x4001) AM_DEVWRITE("aysnd", ay8910_device, address_data_w)
-//  AM_RANGE(0x4002, 0x4002) AM_DEVREAD("aysnd", ay8910_device, data_r)  /* ?? */
+	AM_RANGE(0x4000, 0x4001) AM_DEVWRITE("aysnd", ym2149_device, address_data_w)
+//  AM_RANGE(0x4002, 0x4002) AM_DEVREAD("aysnd", ym2149_device, data_r)  /* ?? */
 	AM_RANGE(0x6000, 0x6001) AM_DEVREADWRITE("ymsnd", ym2203_device, read, write)
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
@@ -189,11 +189,11 @@ void citycon_state::machine_reset()
 static MACHINE_CONFIG_START( citycon )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6809, 2048000)        /* 2.048 MHz ??? */
+	MCFG_CPU_ADD("maincpu", MC6809, XTAL_8MHz) // HD68B09P
 	MCFG_CPU_PROGRAM_MAP(citycon_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", citycon_state,  irq0_line_assert)
 
-	MCFG_CPU_ADD("audiocpu", M6809, 640000)       /* 0.640 MHz ??? */
+	MCFG_CPU_ADD("audiocpu", MC6809E, 1250000) // HD68A09EP
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", citycon_state,  irq0_line_hold) //actually unused, probably it was during development
 
@@ -217,7 +217,7 @@ static MACHINE_CONFIG_START( citycon )
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
 
-	MCFG_SOUND_ADD("aysnd", AY8910, 1250000)
+	MCFG_SOUND_ADD("aysnd", YM2149, 1250000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 
 	MCFG_SOUND_ADD("ymsnd", YM2203, 1250000)
