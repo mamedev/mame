@@ -6,7 +6,8 @@
   mostly LED electronic games/toys.
 
   TODO:
-  - why does h2hbaskb need a workaround on writing L pins?
+  - why does h2hbaskb(and clones) need a workaround on writing L pins?
+  - is h2hhockey supposed to show timer countdown? or only on TMS1000 version?
   - plus1: which sensor position is which colour?
 
 ***************************************************************************/
@@ -29,6 +30,8 @@
 #include "funjacks.lh" // clickable
 #include "funrlgl.lh"
 #include "h2hbaskb.lh"
+#include "h2hhockey.lh"
+#include "h2hsoccer.lh"
 #include "lchicken.lh" // clickable
 #include "lightfgt.lh" // clickable
 #include "mdallas.lh"
@@ -335,9 +338,10 @@ MACHINE_CONFIG_END
   * 2-digit 7seg display, 41 other leds, 1-bit sound
 
   3 Head to Head games were released using this MCU/ROM. They play very much
-  the same, only differing on game time.
+  the same, only differing on game time. The PCB is pre-configured on G1+IN2
+  and IN3 to select the game.
 
-  An earlier revision of this game runs on TMS1000.
+  An earlier revision of this runs on TMS1000.
 
 ***************************************************************************/
 
@@ -405,7 +409,7 @@ static INPUT_PORTS_START( h2hbaskb )
 	PORT_START("IN.1") // G1 port IN
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("P1 Shoot")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START ) PORT_NAME("Start/Display")
-	PORT_BIT( 0x04, 0x04, IPT_SPECIAL ) PORT_CONDITION("IN.4", 0x04, EQUALS, 0x04)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SPECIAL ) // factory set
 
 	PORT_START("IN.2") // G2 port IN
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_COCKTAIL PORT_16WAY PORT_NAME("P2 Defense Right")
@@ -415,17 +419,32 @@ static INPUT_PORTS_START( h2hbaskb )
 	PORT_CONFSETTING(    0x00, "2" )
 
 	PORT_START("IN.3") // G3 port IN
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_COCKTAIL PORT_NAME("P2 Goalie Right") // only for hockey/soccer
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL PORT_NAME("P2 Goalie Left") // "
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_CONFNAME( 0x04, 0x04, "Factory Test" )
 	PORT_CONFSETTING(    0x04, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START("IN.4") // G1+IN2, IN3 (factory set)
-	PORT_CONFNAME( 0x0c, 0x00, "Game" )
-	PORT_CONFSETTING(    0x00, "Basketball" )
-	PORT_CONFSETTING(    0x08, "Hockey" )
-	PORT_CONFSETTING(    0x0c, "Soccer" )
+	PORT_START("IN.4") // IN3 (factory set)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SPECIAL )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( h2hhockey )
+	PORT_INCLUDE( h2hbaskb )
+
+	PORT_MODIFY("IN.3")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_COCKTAIL PORT_NAME("P2 Goalie Right")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL PORT_NAME("P2 Goalie Left")
+
+	PORT_MODIFY("IN.4")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SPECIAL )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( h2hsoccer )
+	PORT_INCLUDE( h2hhockey )
+
+	PORT_MODIFY("IN.1")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SPECIAL )
 INPUT_PORTS_END
 
 static MACHINE_CONFIG_START( h2hbaskb )
@@ -446,6 +465,18 @@ static MACHINE_CONFIG_START( h2hbaskb )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( h2hhockey, h2hbaskb )
+
+	/* basic machine hardware */
+	MCFG_DEFAULT_LAYOUT(layout_h2hhockey)
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( h2hsoccer, h2hbaskb )
+
+	/* basic machine hardware */
+	MCFG_DEFAULT_LAYOUT(layout_h2hsoccer)
 MACHINE_CONFIG_END
 
 
@@ -543,7 +574,7 @@ INPUT_PORTS_END
 static MACHINE_CONFIG_START( einvaderc )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", COP444L, 900000) // approximation - RC osc. R=47K, C=100pF
+	MCFG_CPU_ADD("maincpu", COP444L, 850000) // approximation - RC osc. R=47K, C=100pF
 	MCFG_COP400_CONFIG(COP400_CKI_DIVISOR_16, COP400_CKO_OSCILLATOR_OUTPUT, false) // guessed
 	MCFG_COP400_READ_IN_CB(IOPORT("IN.0"))
 	MCFG_COP400_WRITE_D_CB(WRITE8(einvaderc_state, write_d))
@@ -729,7 +760,7 @@ MACHINE_CONFIG_END
 
 /***************************************************************************
 
-  Mattel Funtronics Jacks
+  Mattel Funtronics: Jacks
   * COP410L MCU bonded directly to PCB (die label COP410L/B NGS)
   * 8 LEDs, 1-bit sound
 
@@ -837,13 +868,13 @@ MACHINE_CONFIG_END
 
 /***************************************************************************
 
-  Mattel Funtronics Red Light Green Light
+  Mattel Funtronics: Red Light Green Light
   * COP410L MCU bonded directly to PCB (die label COP410L/B NHZ)
   * 14 LEDs, 1-bit sound
 
   known releases:
-  - USA: Funtronics Red Light Green Light
-  - USA(rerelease): Funtronics Hot Wheels Drag Race
+  - USA: Funtronics: Red Light Green Light
+  - USA(rerelease): Funtronics: Hot Wheels Drag Race
 
 ***************************************************************************/
 
@@ -1150,7 +1181,7 @@ MACHINE_CONFIG_END
 
 /***************************************************************************
 
-  Milton Bradley (Electronic) Lightfight
+  Milton Bradley Electronic Lightfight
   * COP421L MCU label /B119 COP421L-HLA/N
   * LED matrix, 1-bit sound
 
@@ -1578,6 +1609,16 @@ ROM_START( h2hbaskb )
 	ROM_LOAD( "cop420l-nmy", 0x0000, 0x0400, CRC(87152509) SHA1(acdb869b65d49b3b9855a557ed671cbbb0f61e2c) )
 ROM_END
 
+ROM_START( h2hhockey )
+	ROM_REGION( 0x0400, "maincpu", 0 )
+	ROM_LOAD( "cop420l-nmy", 0x0000, 0x0400, CRC(87152509) SHA1(acdb869b65d49b3b9855a557ed671cbbb0f61e2c) )
+ROM_END
+
+ROM_START( h2hsoccer )
+	ROM_REGION( 0x0400, "maincpu", 0 )
+	ROM_LOAD( "cop420l-nmy", 0x0000, 0x0400, CRC(87152509) SHA1(acdb869b65d49b3b9855a557ed671cbbb0f61e2c) )
+ROM_END
+
 
 ROM_START( einvaderc )
 	ROM_REGION( 0x0800, "maincpu", 0 )
@@ -1640,18 +1681,20 @@ ROM_END
 //    YEAR  NAME       PARENT   CMP MACHINE    INPUT      STATE          INIT COMPANY, FULLNAME, FLAGS
 CONS( 1979, ctstein,   0,        0, ctstein,   ctstein,   ctstein_state,   0, "Castle Toy", "Einstein (Castle Toy)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
-CONS( 1980, h2hbaskb,  0,        0, h2hbaskb,  h2hbaskb,  h2hbaskb_state,  0, "Coleco", "Head to Head Basketball/Hockey/Soccer (COP420L version)", MACHINE_SUPPORTS_SAVE )
+CONS( 1980, h2hbaskb,  0,        0, h2hbaskb,  h2hbaskb,  h2hbaskb_state,  0, "Coleco", "Head to Head Basketball (COP420L version)", MACHINE_SUPPORTS_SAVE )
+CONS( 1980, h2hhockey, h2hbaskb, 0, h2hhockey, h2hhockey, h2hbaskb_state,  0, "Coleco", "Head to Head Hockey (COP420L version)", MACHINE_SUPPORTS_SAVE )
+CONS( 1980, h2hsoccer, h2hbaskb, 0, h2hsoccer, h2hsoccer, h2hbaskb_state,  0, "Coleco", "Head to Head Soccer (COP420L version)", MACHINE_SUPPORTS_SAVE )
 
 CONS( 1981, einvaderc, einvader, 0, einvaderc, einvaderc, einvaderc_state, 0, "Entex", "Space Invader (Entex, COP444L version)", MACHINE_SUPPORTS_SAVE )
 
 CONS( 1980, lchicken,  0,        0, lchicken,  lchicken,  lchicken_state,  0, "LJN", "I Took a Lickin' From a Chicken", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_MECHANICAL )
 
-CONS( 1979, funjacks,  0,        0, funjacks,  funjacks,  funjacks_state,  0, "Mattel", "Funtronics Jacks", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1979, funrlgl,   0,        0, funrlgl,   funrlgl,   funrlgl_state,   0, "Mattel", "Funtronics Red Light Green Light", MACHINE_SUPPORTS_SAVE )
+CONS( 1979, funjacks,  0,        0, funjacks,  funjacks,  funjacks_state,  0, "Mattel", "Funtronics: Jacks", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1979, funrlgl,   0,        0, funrlgl,   funrlgl,   funrlgl_state,   0, "Mattel", "Funtronics: Red Light Green Light", MACHINE_SUPPORTS_SAVE )
 CONS( 1981, mdallas,   0,        0, mdallas,   mdallas,   mdallas_state,   0, "Mattel", "Dalla$ (J.R. handheld)", MACHINE_SUPPORTS_SAVE ) // ***
 
 CONS( 1980, plus1,     0,        0, plus1,     plus1,     plus1_state,     0, "Milton Bradley", "Plus One", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_CONTROLS ) // ***
-CONS( 1981, lightfgt,  0,        0, lightfgt,  lightfgt,  lightfgt_state,  0, "Milton Bradley", "Lightfight", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1981, lightfgt,  0,        0, lightfgt,  lightfgt,  lightfgt_state,  0, "Milton Bradley", "Electronic Lightfight - The Games of Dueling Lights", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 CONS( 1982, bship82,   bship,    0, bship82,   bship82,   bship82_state,   0, "Milton Bradley", "Electronic Battleship (1982 version)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // ***
 
 CONS( 1978, qkracer,   0,        0, qkracer,   qkracer,   qkracer_state,   0, "National Semiconductor", "QuizKid Racer (COP420 version)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )

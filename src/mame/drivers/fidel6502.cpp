@@ -1080,7 +1080,8 @@ WRITE8_MEMBER(fidel6502_state::kishon_control_w)
 	chesster_control_w(space, offset, data);
 
 	// 2 more bankswitch bits: 74259(2) Q2 to A17, Q0 to A18
-	membank("bank1")->set_entry((m_led_select >> 2 & 3) | (m_speech_bank >> 1 & 4) | (m_speech_bank << 1 & 8) | (m_speech_bank << 4 & 0x10));
+	u8 bank = (m_led_select >> 2 & 3) | bitswap<3>(m_speech_bank, 0,2,3) << 2;
+	membank("bank1")->set_entry(bank);
 }
 
 DRIVER_INIT_MEMBER(fidel6502_state, chesster)
