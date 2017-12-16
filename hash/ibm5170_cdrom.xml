@@ -146,10 +146,11 @@
 	</software>	
 
 	<!-- Windows 3.1/95 -->
+	<!-- Simulmondo is credited when you finish the game -->
 	<software name="noiangi">
 		<description>Noi Siamo Angeli (Italian)</description>
 		<year>1997</year>
-		<publisher>Smile Interactive</publisher>
+		<publisher>Smile Interactive / Simulmondo</publisher>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<!-- no disc label, arbitrary renamed -->
@@ -161,7 +162,7 @@
 	<software name="noiangd" cloneof="noiangi">
 		<description>We Are Angels - Ein Engel schlägt zu! (German)</description>
 		<year>1997</year>
-		<publisher>Smile Interactive</publisher>
+		<publisher>Smile Interactive / Simulmondo</publisher>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="970618_1330" sha1="29ea81c4760934194099fbd0c2a94239b487a400" />
@@ -187,6 +188,18 @@
 		</part>
 	</software>	
 
+	<!-- Windows 3.1 -->
+	<software name="paulymou" supported="partial">
+		<description>Pauly Mouse (Japan)</description>
+		<year>1995</year>
+		<publisher>CDWare / Fuji International Enterprises</publisher>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="pmouse" sha1="c135e153fc7f9accfa4d1c2fa9213e8587af24fc" />
+			</diskarea>			
+		</part>
+	</software>
+	
 	<!-- Can't install to hard disk, can't save game, default text speed is very slow on 486 -->
 	<!-- (set option 5 from 100 to 0 to make text and voices to sync) -->
 	<software name="pompei" supported="partial">
@@ -210,6 +223,20 @@
 			<feature name="disk_label" value="Prototype" />
 			<diskarea name="cdrom">
 				<disk name="prototyp" sha1="0cdfabab37e5e9b219b3c8a381c937ae52749bb1" />
+			</diskarea>
+		</part>
+	</software>
+	
+	<!-- Windows 95 / Mac OS Japan AppleTalk 7.5 -->
+	<!-- Requires 16-bit True Color and 800x600 screen resolution -->
+	<software name="segata" supported="partial">
+		<description>Segata Sanshirou Choujin Densetsu</description>
+		<year>1998</year>
+		<publisher>Sega</publisher>
+		<info name="alt_title" value="せがた三四郎超人伝説" />
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="segata" sha1="0d7a6d9a7143d0309d44c1356f68c15a05949257" />
 			</diskarea>
 		</part>
 	</software>
