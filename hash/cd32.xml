@@ -123,6 +123,30 @@
 		</part>
 	</software>
 
+	<!-- Problems with graphics -->
+	<software name="shadfght" supported="partial">
+		<description>Shadow Fighter</description>
+		<year>1994</year>
+		<publisher>Gremlin Interactive</publisher>
+		<part name="cdrom" interface="cd32_cdrom">
+			<diskarea name="cdrom">
+				<disk name="shadow fighter (europe)" sha1="ea78034b0c53fcbf9188cddc7f095bb5a1b47e25"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Problems with graphics -->
+	<software name="shaolin" supported="partial">
+		<description>Chambers of Shaolin</description>
+		<year>1993</year>
+		<publisher>Unique</publisher>
+		<part name="cdrom" interface="cd32_cdrom">
+			<diskarea name="cdrom">
+				<disk name="chambers of shaolin (europe)" sha1="8a58723a29465fedc8e709aa2d96830055761b05"/>
+			</diskarea>
+		</part>
+	</software>
+
 	<!-- Doesn't work -->
 	<software name="suprputt" supported="no">
 		<description>Super Putty</description>
