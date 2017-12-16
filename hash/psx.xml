@@ -47389,7 +47389,7 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<rom name="Chou Jikuu Yousai Macross - Ai Oboete Imasu ka (Japan) (Disc 2).bin" size="567194208" crc="7471d971" sha1="96e0f7a3387621f044b53722e341b7b566529743"/>
 		-->
 		<description>Chou Jikuu Yousai Macross - Ai Oboete Imasu ka (Japan)</description>
-		<year>1997</year>
+		<year>1999</year>
 		<publisher>Bandai</publisher>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
