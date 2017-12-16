@@ -539,23 +539,17 @@ READ16_MEMBER(toaplan2_state::video_count_r)
 	/* +---------+---------+--------+---------------------------+ */
 	/*************** Control Signals are active low ***************/
 
-	int hpos = m_screen->hpos();
 	int vpos = m_screen->vpos();
 
 	int video_status = 0xff00;    // Set signals inactive
 
 	vpos = (vpos + 15) % 262;
 
-	bool hblank, vblank;
-
-	hblank = (hpos > 325) && (hpos < 380);
-	vblank = (vpos >= 247) && (vpos <= 250);
-
-	if (hblank)
+	if (!m_vdp0->hsync_r())
 		video_status &= ~0x8000;
-	if (vblank)
+	if (!m_vdp0->vsync_r())
 		video_status &= ~0x4000;
-	if (vblank || hblank) // ?? Dogyuun is too slow if this is wrong
+	if (!m_vdp0->fblank_r())
 		video_status &= ~0x0100;
 	if (vpos < 256)
 		video_status |= (vpos & 0xff);
