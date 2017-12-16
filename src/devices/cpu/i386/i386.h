@@ -27,6 +27,9 @@
 
 #define MCFG_I386_SMIACT(_devcb) \
 	devcb = &i386_device::set_smiact(*device, DEVCB_##_devcb);
+  
+#define MCFG_I486_FERR_HANDLER(_devcb) \
+ 	devcb = &i386_device::set_ferr(*device, DEVCB_##_devcb);
 
 #define X86_NUM_CPUS        4
 
@@ -38,6 +41,7 @@ public:
 
 	// static configuration helpers
 	template <class Object> static devcb_base &set_smiact(device_t &device, Object &&cb) { return downcast<i386_device &>(device).m_smiact.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_ferr(device_t &device, Object &&cb) { return downcast<i386_device &>(device).m_ferr_handler.set_callback(std::forward<Object>(cb)); }
 
 	uint64_t debug_segbase(symbol_table &table, int params, const uint64_t *param);
 	uint64_t debug_seglimit(symbol_table &table, int params, const uint64_t *param);
@@ -283,6 +287,7 @@ protected:
 	bool m_nmi_latched;
 	uint32_t m_smbase;
 	devcb_write_line m_smiact;
+	devcb_write_line m_ferr_handler;
 	bool m_lock;
 
 	// bytes in current opcode, debug only
@@ -1386,6 +1391,8 @@ protected:
 	void x87_fincstp(uint8_t modrm);
 	void x87_fclex(uint8_t modrm);
 	void x87_ffree(uint8_t modrm);
+	void x87_fdisi(uint8_t modrm);
+	void x87_feni(uint8_t modrm);
 	void x87_finit(uint8_t modrm);
 	void x87_fldcw(uint8_t modrm);
 	void x87_fstcw(uint8_t modrm);

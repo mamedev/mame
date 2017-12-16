@@ -53,6 +53,7 @@ i386_device::i386_device(const machine_config &mconfig, device_type type, const 
 	, m_program_config("program", ENDIANNESS_LITTLE, program_data_width, program_addr_width, 0)
 	, m_io_config("io", ENDIANNESS_LITTLE, io_data_width, 16, 0)
 	, m_smiact(*this)
+	, m_ferr_handler(*this)
 {
 	m_program_config.m_logaddr_width = 32;
 	m_program_config.m_page_shift = 12;
@@ -3320,6 +3321,8 @@ void i386_device::i386_common_init()
 	machine().save().register_postload(save_prepost_delegate(FUNC(i386_device::i386_postload), this));
 
 	m_smiact.resolve_safe();
+	m_ferr_handler.resolve_safe();
+	m_ferr_handler(0);
 
 	m_icountptr = &m_cycles;
 }
