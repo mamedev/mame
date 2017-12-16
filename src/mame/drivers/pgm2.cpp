@@ -76,13 +76,13 @@
 	08 - fg scroll x
 	0a - fg scroll y
 	0e - resolution, 0 - low (kof98), 1 - high (rest of games)
-	10 - ? orleg2 - 0x13, kov2nl, kof - 0x14 at init (sprite related?)
+	10 - ? orleg2 - 0x13, kov2nl, kof98 - 0x14 at init
 	14 - sprite enable ? set to 0 before spriteram update, to 1 after
 	16 - enable access to vrams/palettes/etc ? (bitmask)
 	18 - vblank ack
 	1a - ? 0 at init
-	1c - ? orleg2 - 5, kov2nl, kof - 7 at init (sprite related?)
-	1e - ? 2 at init (sprite related?)
+	1c - ? orleg2 - 5, kov2nl, kof - 7 at init
+	1e - ? 2 at init
 	32 - shared RAM bank
 	34, 36 - ? 0 at init, some unused xor feature ?
 	38, 3a - sprite mask xor key
@@ -388,11 +388,11 @@ static ADDRESS_MAP_START( pgm2_map, AS_PROGRAM, 32, pgm2_state )
 	AM_RANGE(0x40000000, 0x40000003) AM_DEVREADWRITE8("ymz774", ymz774_device, read, write, 0xffffffff)
 
 	// internal to IGS036? - various other writes down here on startup too - could be other standard ATMEL peripherals like the ARM_AIC mixed with custom bits
-	AM_RANGE(0xffffec00, 0xffffec5f) AM_RAM
+	AM_RANGE(0xffffec00, 0xffffec5f) AM_RAM // SMC controller
 	AM_RANGE(0xfffffc00, 0xfffffcff) AM_READWRITE8(encryption_r,encryption_w, 0xffffffff) // confirmed as encryption table for main program rom (see code at 3950)
 
 	AM_RANGE(0xfffff000, 0xfffff14b) AM_DEVICE("arm_aic", arm_aic_device, regs_map)
-
+	// PIOA (gpio)
 	AM_RANGE(0xfffff430, 0xfffff433) AM_WRITENOP // often
 	AM_RANGE(0xfffff434, 0xfffff437) AM_WRITENOP // often
 
