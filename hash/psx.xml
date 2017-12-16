@@ -47381,6 +47381,28 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		</part>
 	</software>
 
+	<software name="macross">
+		<!-- Original images (Redump)
+		<rom name="Chou Jikuu Yousai Macross - Ai Oboete Imasu ka (Japan) (Disc 1).cue" size="129" crc="2d760659" sha1="12dc2c9b20c7a053faefaf2b3a43bde913c5c7cc"/>
+		<rom name="Chou Jikuu Yousai Macross - Ai Oboete Imasu ka (Japan) (Disc 1).bin" size="506223312" crc="b192eecb" sha1="24fc48207da8928daa5ee47d803ab99bbc1cd539"/>
+		<rom name="Chou Jikuu Yousai Macross - Ai Oboete Imasu ka (Japan) (Disc 2).cue" size="129" crc="2c2b2088" sha1="a9cd8b80b8f7f239dc945bdcd61472dafc6b775f"/>
+		<rom name="Chou Jikuu Yousai Macross - Ai Oboete Imasu ka (Japan) (Disc 2).bin" size="567194208" crc="7471d971" sha1="96e0f7a3387621f044b53722e341b7b566529743"/>
+		-->
+		<description>Chou Jikuu Yousai Macross - Ai Oboete Imasu ka (Japan)</description>
+		<year>1997</year>
+		<publisher>Bandai</publisher>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="chou jikuu yousai macross - ai oboete imasu ka (japan) (disc 1)" sha1="f231291ee425f4e6044f2711bb97d2357972d630"/>
+			</diskarea>
+		</part>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="chou jikuu yousai macross - ai oboete imasu ka (japan) (disc 2)" sha1="34c2a882b7243018578ff43f080ddfd0b6f6d76e"/>
+			</diskarea>
+		</part>
+	</software>
+
 	<software name="macrovfx">
 		<!-- Original images (Redump)
 		<rom name="Macross Digital Mission VF-X (Japan) (v1.1).cue" size="256" crc="4ff1d1aa" sha1="fd92d61ea6dd653e34d73cf87aa984226437cd92"/>
