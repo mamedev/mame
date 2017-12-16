@@ -2,7 +2,7 @@
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <softwarelist name="cd32" description="Amiga CD-32 CD-ROMs">
 
-	<!--- Preliminary List -->
+	<!--- Sourced from Redump -->
 
 	<software name="abesqwak" supported="no">
 		<description>Alien Breed - Special Edition + Qwak</description>
@@ -62,6 +62,92 @@
 			</diskarea>
 		</part>
 	</software>
+
+	<!-- Doesn't progress past loading screen-->
+	<software name="disphero" supported="no">
+		<description>Disposable Hero</description>
+		<year>1994</year>
+		<publisher>Gremlin Graphics</publisher>
+		<part name="cdrom" interface="cd32_cdrom">
+			<diskarea name="cdrom">
+				<disk name="disposable hero (europe)" sha1="46c462df763b680018e018911b8d7ed68d47d24e"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Glitchy graphics -->
+	<software name="fireice" supported="partial">
+		<description>Fire Ice - The Daring Adventures of Cool Coyote</description>
+		<year>1994</year>
+		<publisher>Gremlin Graphics</publisher>
+		<part name="cdrom" interface="cd32_cdrom">
+			<diskarea name="cdrom">
+				<disk name="fire and ice - the daring adventures of cool coyote (europe) (en,fr,de,it)" sha1="064cadd6379a64d764a24db466807c2b1ded659d"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Doesn't boot? -->
+	<software name="projxubb" supported="no">
+		<description>Project-X + Ultimate Body Blows</description>
+		<year>1994</year>
+		<publisher>Team 17</publisher>
+		<part name="cdrom" interface="cd32_cdrom">
+			<diskarea name="cdrom">
+				<disk name="project-x and ultimate body blows (europe)" sha1="cb944c9b2ca7e6c877a9a16029d82b71c57b52b1"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Glitchy graphics, gameplay too fast? -->
+	<software name="riserobo" supported="partial">
+		<description>Rise of The Robots</description>
+		<year>1994</year>
+		<publisher>Mirage</publisher>
+		<part name="cdrom" interface="cd32_cdrom">
+			<diskarea name="cdrom">
+				<disk name="rise of the robots (europe)" sha1="40f0ff022606a6247e6f935c669c522102ada456"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Glitchy graphics, works okay otherwise -->
+	<software name="seekdest" supported="partial">
+		<description>Seek And Destroy</description>
+		<year>1994</year>
+		<publisher>Mindscape</publisher>
+		<part name="cdrom" interface="cd32_cdrom">
+			<diskarea name="cdrom">
+				<disk name="seek and destroy (europe)" sha1="a2259e18e629c3d49b5c290a880d8b4451d2a77a"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Doesn't work -->
+	<software name="suprputt" supported="no">
+		<description>Super Putty</description>
+		<year>1994</year>
+		<publisher>System 3</publisher>
+		<part name="cdrom" interface="cd32_cdrom">
+			<diskarea name="cdrom">
+				<disk name="super putty (europe)" sha1="d54277fda64459223792b49741f3a8450fb98567"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Doesn't work -->
+	<software name="totcarn" supported="no">
+		<description>Total Carnage</description>
+		<year>1994</year>
+		<publisher>I.C.E.</publisher>
+		<part name="cdrom" interface="cd32_cdrom">
+			<diskarea name="cdrom">
+				<disk name="total carnage (europe)" sha1="0480df394dea8e8b892dc7d41c7c933e5dacb497"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Preliminary list -->
 
 	<!-- playable but there's a scrolling glitch every few frames -->
 	<software name="morph" supported="partial">
