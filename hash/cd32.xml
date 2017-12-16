@@ -16,6 +16,18 @@
 		</part>
 	</software>
 
+	<!-- Doesn't run-->
+	<software name="abreedta" supported="no">
+		<description>Alien Breed - Tower Assault</description>
+		<year>1994</year>
+		<publisher>Team 17</publisher>
+		<part name="cdrom" interface="cd32_cdrom">
+			<diskarea name="cdrom">
+				<disk name="alien breed - tower assault (europe)" sha1="0a34fc651775b813a910057f0235a0c26157c39e"/>
+			</diskarea>
+		</part>
+	</software>
+
 	<!-- No in-game HUD, scrolling problems-->
 	<software name="banshee" supported="partial">
 		<description>Banshee</description>
