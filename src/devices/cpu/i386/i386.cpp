@@ -3791,6 +3791,7 @@ void i386_device::pentium_smi()
 	m_smi_latched = false;
 
 	// save state
+	WRITE32(smram_state + SMRAM_SMBASE, m_smbase);
 	WRITE32(smram_state + SMRAM_IP5_CR4, m_cr[4]);
 	WRITE32(smram_state + SMRAM_IP5_ESLIM, m_sreg[ES].limit);
 	WRITE32(smram_state + SMRAM_IP5_ESBASE, m_sreg[ES].base);
