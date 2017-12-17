@@ -189,6 +189,31 @@ device_memory_interface::space_config_vector i8087_device::memory_space_config()
 
 void i8087_device::device_start()
 {
+	save_item(NAME(m_reg[0].high));
+	save_item(NAME(m_reg[0].low));
+	save_item(NAME(m_reg[1].high));
+	save_item(NAME(m_reg[1].low));
+	save_item(NAME(m_reg[2].high));
+	save_item(NAME(m_reg[2].low));
+	save_item(NAME(m_reg[3].high));
+	save_item(NAME(m_reg[3].low));
+	save_item(NAME(m_reg[4].high));
+	save_item(NAME(m_reg[4].low));
+	save_item(NAME(m_reg[5].high));
+	save_item(NAME(m_reg[5].low));
+	save_item(NAME(m_reg[6].high));
+	save_item(NAME(m_reg[6].low));
+	save_item(NAME(m_reg[7].high));
+	save_item(NAME(m_reg[7].low));
+
+	save_item(NAME(m_ea));
+	save_item(NAME(m_pc));
+	save_item(NAME(m_ppc));
+	save_item(NAME(m_opcode));
+	save_item(NAME(m_cw));
+	save_item(NAME(m_sw));
+	save_item(NAME(m_tw));
+
 	m_int_handler.resolve_safe();
 	m_busy_handler.resolve_safe();
 	m_int_handler(0);
