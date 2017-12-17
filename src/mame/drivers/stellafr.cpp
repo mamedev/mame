@@ -5,7 +5,7 @@
 Stella
 German Fruit Machines / Gambling Machines
 
-Possibly related to ADP hardware?
+Possibly related to ADP hardware? The HD63484 video board is definitely absent here.
 
 
 */
