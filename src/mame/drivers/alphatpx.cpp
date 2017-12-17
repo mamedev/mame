@@ -538,6 +538,8 @@ static MACHINE_CONFIG_START( alphatp3 )
 	MCFG_CPU_PROGRAM_MAP(alphatp3_mem)
 	MCFG_CPU_IO_MAP(alphatp3_io)
 
+	MCFG_QUANTUM_PERFECT_CPU("maincpu")
+
 	MCFG_CPU_ADD("kbdmcu", I8041, XTAL_12_8544MHz/2)
 	MCFG_MCS48_PORT_T0_IN_CB(READLINE(alphatpx_state, kbd_matrix_r))
 	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(alphatpx_state, kbd_matrix_w))
