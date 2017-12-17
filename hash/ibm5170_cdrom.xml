@@ -33,6 +33,18 @@
 		</part>
 	</software>
 
+  <software name="arampage">
+		<description>Alien Rampage (v1.13)</description>
+		<year>1996</year>
+		<publisher>Softdisk</publisher>
+		<info name="version" value="1.13" />
+		<part name="cdrom" interface="cdrom">
+			<feature name="disk_label" value="Alien Rampage" />
+			<diskarea name="cdrom">
+				<disk name="arampage" sha1="88ae86b0837bc5fba7a3585a506d5ad24161b001" />
+			</diskarea>
+		</part>
+	</software>
 	
 	<!-- Windows 95, Direct X 3.0 (in cdrom under Instdx.exe) -->
 	<software name="arabkid">
@@ -60,6 +72,19 @@
 			</diskarea>
 		</part>
 	</software>
+  
+  <!-- Requires VESA driver to install and play -->
+	<software name="crusader">
+		<description>Crusader - No Remorse (v1.23)</description>
+		<year>1996</year>
+		<publisher>Origin</publisher>
+		<info name="version" value="1.23" />
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="crusader" sha1="fcf090cd321fd299339b8848ca4b723ef5a28475" />
+			</diskarea>
+		</part>
+	</software>
 
 	<!-- Pentium class 166 MHz / Direct X 7.0 -->
 	<!-- Windows 95/98/ME -->
@@ -74,9 +99,8 @@
 				<disk name="bpanic" sha1="141b67f93b4d96be7c064d3603a5b961ed56f23b" />
 			</diskarea>
 		</part>
-	</software>
+	</software> 
 
-	
 	<!-- Windows 95 -->
 	<!-- 256 colors minimum -->
 	<software name="doom2j">
@@ -84,6 +108,7 @@
 		<year>1996</year>
 		<publisher>Id Software / Imagineer</publisher>
 		<info name="alt_title" value="ドゥームＩＩ" />
+
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="doom2j" sha1="61dd4c9a81d4d354a14533dcbd257a5bcffd22c6" />
@@ -101,6 +126,17 @@
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="betrayal_at_krondor" sha1="f0d0907edccfc4f6ab4f181b0d2e9a3b18f81e73" />
+			</diskarea>
+		</part>
+	</software> 
+  
+	<software name="ironbld">
+		<description>Iron Blood</description>
+		<year>1996</year>
+		<publisher>Microforum</publisher>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="ironbld" sha1="45f44fa1a8feb98daba2b7befb6a8360ad39b352" />
 			</diskarea>
 		</part>
 	</software>
@@ -210,10 +246,10 @@
 			<feature name="disk_label" value="CD0141" />
 			<diskarea name="cdrom">
 				<disk name="pompei" sha1="964c914b8580a21b2f1a54e9329336ead243598b" />
-			</diskarea>			
+			</diskarea>
 		</part>
 	</software>
-
+  
 	<software name="prototyp">
 		<description>Prototype</description>
 		<year>1995</year>
@@ -223,6 +259,22 @@
 			<feature name="disk_label" value="Prototype" />
 			<diskarea name="cdrom">
 				<disk name="prototyp" sha1="0cdfabab37e5e9b219b3c8a381c937ae52749bb1" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="rise2dc" supported="partial">
+		<description>Rise 2 Resurrection - Director's Cut</description>
+		<year>1995</year>
+		<publisher>Acclaim</publisher>
+		<part name="cdrom1" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="rise 2 resurrection - director's cut (disc 1)" sha1="cd62b2bde9355b2625d8bdeaece3ec2ccfff5310" />
+			</diskarea>
+		</part>
+		<part name="cdrom2" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="rise 2 resurrection - director's cut (disc 2)" sha1="e6c6c4876d18fbb5916ed13885f1ea614aad05eb" />
 			</diskarea>
 		</part>
 	</software>
@@ -313,6 +365,17 @@
 			<feature name="disk_label" value="Hard Drive Recovery" />
 			<diskarea name="cdrom">
 				<disk name="acercpr" sha1="a0f073387e661318eae2d1fdd30dfb116d1295ae" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="turricn2">
+		<description>Turrican II - The Final Fight</description>
+		<year>1996</year>
+		<publisher>Factor 5</publisher>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="turricn2" sha1="7efd6bd06b9c05ea1be1d2f2f7538954e044b5c9" />
 			</diskarea>
 		</part>
 	</software>
@@ -516,4 +579,16 @@
 			</diskarea>
 		</part>
 	</software>
+
+	<software name="zyclunt" supported="no">
+		<description>Zyclunt</description>
+		<year>1995</year>
+		<publisher>Phantagram</publisher>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="zyclunt" sha1="cc6e69cdd5bdda70361778c3515571114a97b662" />
+			</diskarea>
+		</part>
+	</software>
+
 </softwarelist>

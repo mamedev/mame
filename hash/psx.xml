@@ -45016,7 +45016,7 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		</part>
 	</software>
 
-	<software name="hokutosk" supported="partially">
+	<software name="hokutosk" supported="partial">
 		<!-- Original images (Redump)
 		<rom name="Hokuto no Ken - Seikimatsu Kyuuseishu Densetsu (Japan).cue" size="278" crc="736b61a5" sha1="7c318db42827e230c7766972759654c266c0ba65"/>
 		<rom name="Hokuto no Ken - Seikimatsu Kyuuseishu Densetsu (Japan) (Track 1).bin" size="659056272" crc="79e9fc16" sha1="1f9b064ceafef91641bb3bbcc075a604f478489e"/>
@@ -45632,6 +45632,21 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
 				<disk name="jungle park (japan) [slps-01086]" sha1="f3d6a87534e2a1dd9ee797777d33ca5197d7c8c5"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="kaetkita">
+		<!-- Original images (Redump)
+		<rom name="Kaette Kita Cyborg Kuro-chan (Japan).cue" size="102" crc="9708bd74" sha1="8312951576c460a9260afe0c6c90a4f394cf08b7"/>
+		<rom name="Kaette Kita Cyborg Kuro-chan (Japan).bin" size="86581824" crc="12d2c699" sha1="adbb7f5efaf20068ef5f2723fa31e6f5e33acb5a"/>
+		-->
+		<description>Kaette Kita Cyborg Kuro-chan (Japan)</description>
+		<year>2002</year>
+		<publisher>Konami</publisher>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="kaette kita cyborg kuro-chan (japan)" sha1="4eb205399a5b201519b637d038cb85c15cb8d9be"/>
 			</diskarea>
 		</part>
 	</software>
@@ -47362,6 +47377,28 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
 				<disk name="lup salad - lupupu cube (japan) [slps-00416]" sha1="2077cf3f27c7133fb17c559de364cdd6f4ace26c"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="macross">
+		<!-- Original images (Redump)
+		<rom name="Chou Jikuu Yousai Macross - Ai Oboete Imasu ka (Japan) (Disc 1).cue" size="129" crc="2d760659" sha1="12dc2c9b20c7a053faefaf2b3a43bde913c5c7cc"/>
+		<rom name="Chou Jikuu Yousai Macross - Ai Oboete Imasu ka (Japan) (Disc 1).bin" size="506223312" crc="b192eecb" sha1="24fc48207da8928daa5ee47d803ab99bbc1cd539"/>
+		<rom name="Chou Jikuu Yousai Macross - Ai Oboete Imasu ka (Japan) (Disc 2).cue" size="129" crc="2c2b2088" sha1="a9cd8b80b8f7f239dc945bdcd61472dafc6b775f"/>
+		<rom name="Chou Jikuu Yousai Macross - Ai Oboete Imasu ka (Japan) (Disc 2).bin" size="567194208" crc="7471d971" sha1="96e0f7a3387621f044b53722e341b7b566529743"/>
+		-->
+		<description>Chou Jikuu Yousai Macross - Ai Oboete Imasu ka (Japan)</description>
+		<year>1999</year>
+		<publisher>Bandai</publisher>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="chou jikuu yousai macross - ai oboete imasu ka (japan) (disc 1)" sha1="f231291ee425f4e6044f2711bb97d2357972d630"/>
+			</diskarea>
+		</part>
+		<part name="cdrom2" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="chou jikuu yousai macross - ai oboete imasu ka (japan) (disc 2)" sha1="34c2a882b7243018578ff43f080ddfd0b6f6d76e"/>
 			</diskarea>
 		</part>
 	</software>
