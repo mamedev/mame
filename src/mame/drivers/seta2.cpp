@@ -3412,7 +3412,7 @@ ROM_END
 
 /***************************************************************************
 
-A-Blast / Penguin Brothers
+Penguin Brothers / A-Blast
 (c)2000 Subsino
 
    CPU: Toshiba TMP68301AF-16 (100 Pin PQFP)
@@ -3472,9 +3472,32 @@ BAT1* Unpopulated CR2032 3Volt battery
 Ram M1 are NEC D43001GU-70LL
 Ram M2 are LGS GM76C8128ALLFW70
 
+Notes about sets:
+penbros: Original version for Japan with non descript ROM labels. There is a Japan region
+         warning & the title screen as well as all game text are in Japanese. However the
+         Subsino logo is the wrong color
+ ablast: Title screen is in traditional Chinese. ROM labels imply Taiwan with "TWN" printed
+         on them. The region warning states Japan only & all game text is in Japanese. Lastly
+         the Subsino logo has correct color. The bootleg is a copy of A-Blast.
 ***************************************************************************/
 
-ROM_START( ablast ) // Genuine P0-142A PCB
+ROM_START( penbros ) // Genuine P0-142A PCB
+	ROM_REGION( 0x100000, "maincpu", 0 )    // TMP68301 Code
+	ROM_LOAD16_BYTE( "u06.bin", 0x000000, 0x080000, CRC(7bbdffac) SHA1(d5766cb171b8d2e4c04a6bae37181fa5ada9d797) )
+	ROM_LOAD16_BYTE( "u07.bin", 0x000001, 0x080000, CRC(d50cda5f) SHA1(fc66f55f2070b447c5db85c948ce40adc37512f7) )
+
+	ROM_REGION( 0x1000000, "sprites", 0 )   // Sprites
+	ROM_LOAD( "u38.bin", 0x000000, 0x400000, CRC(4247b39e) SHA1(f273931293beced312e02c870bf35e9cf0c91a8b) )
+	ROM_LOAD( "u39.bin", 0x400000, 0x400000, CRC(f9f07faf) SHA1(66fc4a9ad422fb384d2c775e43619137226898fc) )
+	ROM_LOAD( "u40.bin", 0x800000, 0x400000, CRC(dc9e0a96) SHA1(c2c8ccf9039ee0e179b08fdd2d37f29899349cda) )
+	ROM_FILL(            0xc00000, 0x400000, 0x00 )    // 6bpp instead of 8bpp
+
+	ROM_REGION( 0x300000, "x1snd", 0 )  // Samples
+	// Leave 1MB empty (addressable by the chip)
+	ROM_LOAD( "u18.bin", 0x100000, 0x200000, CRC(de4e65e2) SHA1(82d4e590c714b3e9bf0ffaf1500deb24fd315595) )
+ROM_END
+
+ROM_START( ablast ) // Genuine P0-142A PCB & original ROM labels
 	ROM_REGION( 0x100000, "maincpu", 0 )    // TMP68301 Code
 	ROM_LOAD16_BYTE( "a-blast_twn_u06.u06", 0x000000, 0x080000, CRC(e62156d7) SHA1(509fd41a0109dc5c00d83250383d578fd75502f3) )
 	ROM_LOAD16_BYTE( "a-blast_twn_u07.u07", 0x000001, 0x080000, CRC(d4ddc16b) SHA1(63312ce9ec6dffb47aa6aed505f077f20713e5ac) )
@@ -3503,22 +3526,6 @@ ROM_START( ablastb ) // bootleg PCB with standard 68000 instead of TMP68301 and 
 	ROM_REGION( 0x300000, "x1snd", 0 )  // Samples
 	// Leave 1MB empty (addressable by the chip)
 	ROM_LOAD( "29F1610.bin", 0x100000, 0x200000, CRC(de4e65e2) SHA1(82d4e590c714b3e9bf0ffaf1500deb24fd315595) )
-ROM_END
-
-ROM_START( penbros ) // Genuine P0-142A PCB - Original or hack?
-	ROM_REGION( 0x100000, "maincpu", 0 )    // TMP68301 Code
-	ROM_LOAD16_BYTE( "u06.bin", 0x000000, 0x080000, CRC(7bbdffac) SHA1(d5766cb171b8d2e4c04a6bae37181fa5ada9d797) )
-	ROM_LOAD16_BYTE( "u07.bin", 0x000001, 0x080000, CRC(d50cda5f) SHA1(fc66f55f2070b447c5db85c948ce40adc37512f7) )
-
-	ROM_REGION( 0x1000000, "sprites", 0 )   // Sprites
-	ROM_LOAD( "u38.bin", 0x000000, 0x400000, CRC(4247b39e) SHA1(f273931293beced312e02c870bf35e9cf0c91a8b) )
-	ROM_LOAD( "u39.bin", 0x400000, 0x400000, CRC(f9f07faf) SHA1(66fc4a9ad422fb384d2c775e43619137226898fc) )
-	ROM_LOAD( "u40.bin", 0x800000, 0x400000, CRC(dc9e0a96) SHA1(c2c8ccf9039ee0e179b08fdd2d37f29899349cda) )
-	ROM_FILL(            0xc00000, 0x400000, 0x00 )    // 6bpp instead of 8bpp
-
-	ROM_REGION( 0x300000, "x1snd", 0 )  // Samples
-	// Leave 1MB empty (addressable by the chip)
-	ROM_LOAD( "u18.bin", 0x100000, 0x200000, CRC(de4e65e2) SHA1(82d4e590c714b3e9bf0ffaf1500deb24fd315595) )
 ROM_END
 
 /***************************************************************************
@@ -4149,9 +4156,9 @@ GAME( 1997, reelquak,  0,        reelquak, reelquak, seta2_state, 0,        ROT0
 GAME( 199?, endrichs,  0,        reelquak, endrichs, seta2_state, 0,        ROT0,   "E.N.Tiger",             "Endless Riches (Ver 1.20)",                    MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1997, staraudi,  0,        staraudi, staraudi, staraudi_state, 0,     ROT0,   "Namco",                 "Star Audition",                                MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 GAME( 1999, pzlbowl,   0,        pzlbowl,  pzlbowl,  seta2_state, 0,        ROT0,   "MOSS / Nihon System",   "Puzzle De Bowling (Japan)",                    MACHINE_NO_COCKTAIL )
-GAME( 2000, ablast,    0,        penbros,  penbros,  seta2_state, 0,        ROT0,   "Subsino",               "A-Blast (Japan)",                              MACHINE_NO_COCKTAIL )
-GAME( 2000, penbros,   ablast,   penbros,  penbros,  seta2_state, 0,        ROT0,   "Subsino",               "Penguin Brothers (Japan)",                     MACHINE_NO_COCKTAIL )
-GAME( 2000, ablastb,   ablast,   penbrosk, penbros,  seta2_state, 0,        ROT0,   "bootleg",               "A-Blast (Japan, bootleg)",                     MACHINE_NO_COCKTAIL | MACHINE_NOT_WORKING )
+GAME( 2000, penbros,   0,        penbros,  penbros,  seta2_state, 0,        ROT0,   "Subsino",               "Penguin Brothers (Japan)",                     MACHINE_NO_COCKTAIL )
+GAME( 2000, ablast,    penbros,  penbros,  penbros,  seta2_state, 0,        ROT0,   "Subsino",               "A-Blast (Japan)",                              MACHINE_NO_COCKTAIL )
+GAME( 2000, ablastb,   penbros,  penbrosk, penbros,  seta2_state, 0,        ROT0,   "bootleg",               "A-Blast (bootleg)",                            MACHINE_NO_COCKTAIL | MACHINE_NOT_WORKING )
 GAME( 2000, namcostr,  0,        namcostr, funcube,  seta2_state, 0,        ROT0,   "Namco",                 "Namco Stars",                                  MACHINE_NO_COCKTAIL | MACHINE_NOT_WORKING )
 GAME( 2000, deerhunt,  0,        samshoot, deerhunt, seta2_state, 0,        ROT0,   "Sammy USA Corporation", "Deer Hunting USA V4.3",                        MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 2000, deerhunta, deerhunt, samshoot, deerhunt, seta2_state, 0,        ROT0,   "Sammy USA Corporation", "Deer Hunting USA V4.2",                        MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS )
