@@ -2465,7 +2465,7 @@ DEFINE_DEVICE_TYPE(DCS_AUDIO_2K, dcs_audio_2k_device, "dcs_audio_2k", "DCS Audio
 //-------------------------------------------------
 
 dcs_audio_2k_device::dcs_audio_2k_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	dcs_audio_device(mconfig, DCS_AUDIO_2K, tag, owner, clock, 1)
+	dcs_audio_device(mconfig, DCS_AUDIO_2K, tag, owner, clock, REV_DCS1)
 {
 }
 
@@ -2481,7 +2481,7 @@ DEFINE_DEVICE_TYPE(DCS_AUDIO_2K_UART, dcs_audio_2k_uart_device, "dcs_audio_2k_ua
 //-------------------------------------------------
 
 dcs_audio_2k_uart_device::dcs_audio_2k_uart_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	dcs_audio_device(mconfig, DCS_AUDIO_2K_UART, tag, owner, clock, 1)
+	dcs_audio_device(mconfig, DCS_AUDIO_2K_UART, tag, owner, clock, REV_DCS1)
 {
 }
 
@@ -2501,7 +2501,7 @@ DEFINE_DEVICE_TYPE(DCS_AUDIO_8K, dcs_audio_8k_device, "dcs_audio_8k", "DCS Audio
 //-------------------------------------------------
 
 dcs_audio_8k_device::dcs_audio_8k_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	dcs_audio_device(mconfig, DCS_AUDIO_8K, tag, owner, clock, 1)
+	dcs_audio_device(mconfig, DCS_AUDIO_8K, tag, owner, clock, REV_DCS1)
 {
 }
 
@@ -2522,7 +2522,7 @@ DEFINE_DEVICE_TYPE(DCS_AUDIO_WPC, dcs_audio_wpc_device, "dcs_audio_wpc", "DCS Au
 //-------------------------------------------------
 
 dcs_audio_wpc_device::dcs_audio_wpc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	dcs_audio_device(mconfig, DCS_AUDIO_WPC, tag, owner, clock, 15)
+	dcs_audio_device(mconfig, DCS_AUDIO_WPC, tag, owner, clock, REV_DCS1P5)
 {
 }
 
@@ -2541,7 +2541,7 @@ MACHINE_CONFIG_END
 //-------------------------------------------------
 
 dcs2_audio_device::dcs2_audio_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
-	dcs_audio_device(mconfig, type, tag, owner, clock, 1)
+	dcs_audio_device(mconfig, type, tag, owner, clock, REV_DCS1)
 {
 }
 
