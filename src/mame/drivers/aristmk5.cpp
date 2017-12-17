@@ -6250,6 +6250,7 @@ ROM_END
 // QUEEN OF THE NILE / NSW/ACT / B - 13/05/97
 // Marked as 94.941%
 // All devices are 27C4002.
+// Note: The game has GHG4090-03 in the stickers, but the strings inside are GHG4091-03 instead. Also the base is GHG4091.
 ROM_START( qnileua )
 	ARISTOCRAT_MK5_BIOS
 	/*
