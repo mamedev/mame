@@ -2961,6 +2961,7 @@ ROM_END
 // 596/1   50 Credit Multiplier/9 Line Multiline
 // Chicken / Local / B - 23/12/96
 // 01J01886
+// Looks like a Venezuela release, even when they didn't change the "local" strings...
 ROM_START( chickna5b )
 	ARISTOCRAT_MK5_BIOS
 	/*
