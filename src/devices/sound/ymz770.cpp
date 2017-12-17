@@ -500,9 +500,7 @@ void ymz774_device::internal_reg_write(uint8_t reg, uint8_t data)
 				m_channels[ch].is_playing = true;
 			}
 			else
-			{
 				m_channels[ch].is_playing = false;
-			}
 			break;
 		case 0x58: // Pause / Resume
 			if (data) logerror("pause/resume unimplemented %02X %02X\n", reg, data);
@@ -559,14 +557,13 @@ void ymz774_device::internal_reg_write(uint8_t reg, uint8_t data)
 			case 0x98: // Off trigger, bit4 = on/off, bits0-3 channel (end sequence when channel playback ends)
 				if (data) logerror("SEQ Off trigger unimplemented %02X %02X\n", reg, data);
 				break;
-			case 0xa0: // stop channel mask H and L, what it for ? stop chanels immediatelly or when sequence ends (so far assuming later) ?
+			case 0xa0: // stop channel mask H and L (when sequence stoped)
 			case 0xa8:
 				sq = (reg >> 1) & 7;
 				if (reg & 1)
 					m_sequences[sq].stopchan = (m_sequences[sq].stopchan & 0xff00) | data;
 				else
 					m_sequences[sq].stopchan = (m_sequences[sq].stopchan & 0x00ff) | (data << 8);
-				if (data) logerror("Check me: SEQ Stop Channels used %02X %02X\n", reg, data);
 				break;
 			case 0xb0:
 				m_sqcs[sq].sqc = data;
@@ -583,7 +580,7 @@ void ymz774_device::internal_reg_write(uint8_t reg, uint8_t data)
 				{
 					//logerror("SQC %d stop (%s)\n", sq, m_sqcs[sq].is_playing ? "playing" : "stopped");
 					m_sqcs[sq].is_playing = false;
-					// stop SEQ too, is this right ? at least kof98umh never manually stop SEQ
+					// stop SEQ too, and stop chanels
 					if (m_sequences[sq].is_playing)
 						for (int ch = 0; ch < 16; ch++)
 							if (m_sequences[sq].stopchan & (1 << ch))
@@ -654,9 +651,7 @@ void ymz774_device::sequencer()
 		if (sequence.is_playing)
 		{
 			if (sequence.delay > 0)
-			{
 				--sequence.delay;
-			}
 			else
 			{
 				int reg = get_rom_byte(sequence.offset++);
@@ -664,7 +659,7 @@ void ymz774_device::sequencer()
 				switch (reg)
 				{
 				case 0xff: // end
-					for (int ch = 0; ch < 16; ch++)	// check this
+					for (int ch = 0; ch < 16; ch++)	// might be wrong, ie not needed in case of loop
 						if (sequence.stopchan & (1 << ch))
 							m_channels[ch].is_playing = false;
 					if (sequence.loop)
