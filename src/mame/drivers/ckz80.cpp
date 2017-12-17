@@ -11,18 +11,24 @@
     such as Arena(in editmode).
 
     TODO:
-    - x
+    - ckmaster 1 WAIT CLK per M1, workaround with z80_set_cycle_tables is possible
+	  (wait state is similar to MSX) but I can't be bothered, better solution
+	  is to add M1 pin to the z80 core. Until then, it'll run ~20% too fast.
 
 ******************************************************************************
 
 Master:
-- x
+- Z80 CPU(NEC D780C-1) @ 4MHz(8MHz XTAL), IRQ from 555 timer
+- 8KB ROM(NEC D2764C-3), 2KB RAM(NEC D4016C)
+- simple I/O via 2*74373 and a 74145
+- 8*8 chessboard buttons, 32+1 border leds, piezo
 
 ******************************************************************************/
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "machine/timer.h"
+#include "machine/bankdev.h"
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
 #include "speaker.h"
@@ -38,6 +44,7 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_dac(*this, "dac"),
+		m_master_map(*this, "master_map"),
 		m_inp_matrix(*this, "IN.%u", 0),
 		m_out_x(*this, "%u.%u", 0U, 0U),
 		m_out_a(*this, "%u.a", 0U),
@@ -49,7 +56,8 @@ public:
 
 	// devices/pointers
 	required_device<cpu_device> m_maincpu;
-	required_device<dac_bit_interface> m_dac;
+	required_device<dac_2bit_binary_weighted_ones_complement_device> m_dac;
+	optional_device<address_map_bank_device> m_master_map;
 	optional_ioport_array<10> m_inp_matrix; // max 10
 	output_finder<0x20, 0x20> m_out_x;
 	output_finder<0x20> m_out_a;
@@ -80,8 +88,11 @@ public:
 	void display_matrix(int maxx, int maxy, u32 setx, u32 sety, bool update = true);
 
 	// Master
-	//DECLARE_READ8_MEMBER(master_input_r);
+	DECLARE_READ8_MEMBER(master_input_r);
+	DECLARE_WRITE8_MEMBER(master_control_w);
 	DECLARE_DRIVER_INIT(master);
+	DECLARE_READ8_MEMBER(master_trampoline_r);
+	DECLARE_WRITE8_MEMBER(master_trampoline_w);
 
 protected:
 	virtual void machine_start() override;
@@ -220,6 +231,26 @@ u16 ckz80_state::read_inputs(int columns)
 
 // TTL/generic
 
+WRITE8_MEMBER(ckz80_state::master_control_w)
+{
+	// d0-d3: 74145 A-D
+	// 74145 0-9: input mux, led select
+	u16 sel = 1 << (data & 0xf) & 0x3ff;
+	m_inp_mux = sel;
+
+	// d4,d5: led data
+	display_matrix(2, 9, data >> 4 & 3, sel & 0x1ff);
+
+	// d6,d7: speaker +/-
+	m_dac->write(data >> 6 & 3);
+}
+
+READ8_MEMBER(ckz80_state::master_input_r)
+{
+	// d0-d7: multiplexed inputs (active low)
+	return ~read_inputs(10);
+}
+
 DRIVER_INIT_MEMBER(ckz80_state, master)
 {
 	u8 *rom = memregion("maincpu")->base();
@@ -237,6 +268,7 @@ DRIVER_INIT_MEMBER(ckz80_state, master)
 }
 
 
+
 /******************************************************************************
     Address Maps
 ******************************************************************************/
@@ -244,8 +276,35 @@ DRIVER_INIT_MEMBER(ckz80_state, master)
 // Master
 
 static ADDRESS_MAP_START( master_map, AS_PROGRAM, 8, ckz80_state )
-	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0xc000, 0xc7ff) AM_RAM
+	AM_RANGE(0x0000, 0x1fff) AM_MIRROR(0x6000) AM_ROM AM_REGION("maincpu", 0) // _A15
+	AM_RANGE(0xa000, 0xa000) AM_MIRROR(0x1fff) AM_READWRITE(master_input_r, master_control_w) // A13
+	AM_RANGE(0xc000, 0xc7ff) AM_MIRROR(0x3800) AM_RAM // A14
+ADDRESS_MAP_END
+
+// PCB design is prone to bus conflicts, but should be fine if software obeys
+WRITE8_MEMBER(ckz80_state::master_trampoline_w)
+{
+	if (offset & 0x2000)
+		m_master_map->write8(space, (offset & 0x3fff) | 0x8000, data);
+	if (offset & 0x4000)
+		m_master_map->write8(space, (offset & 0x7fff) | 0x8000, data);
+}
+
+READ8_MEMBER(ckz80_state::master_trampoline_r)
+{
+	u8 data = 0xff;
+	if (~offset & 0x8000)
+		data &= m_master_map->read8(space, offset);
+	if (offset & 0x2000)
+		data &= m_master_map->read8(space, (offset & 0x3fff) | 0x8000);
+	if (offset & 0x4000)
+		data &= m_master_map->read8(space, (offset & 0x7fff) | 0x8000);
+
+	return data;
+}
+
+static ADDRESS_MAP_START( master_trampoline, AS_PROGRAM, 8, ckz80_state )
+	AM_RANGE(0x0000, 0xffff) AM_READWRITE(master_trampoline_r, master_trampoline_w)
 ADDRESS_MAP_END
 
 
@@ -341,24 +400,24 @@ static INPUT_PORTS_START( master )
 	PORT_INCLUDE( cb_buttons )
 
 	PORT_START("IN.8")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_T) PORT_NAME("Black")
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_2) PORT_NAME("King")
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_3) PORT_NAME("Queen")
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_4) PORT_NAME("Rook")
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_W) PORT_NAME("Bishop")
-	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_E) PORT_NAME("Knight")
-	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_R) PORT_NAME("Pawn")
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_5) PORT_NAME("White")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_1) PORT_NAME("Change Position")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_2) PORT_NAME("Clear Board")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_3) PORT_NAME("New Game")
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_4) PORT_NAME("Take Back")
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_5) PORT_NAME("King")
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_6) PORT_NAME("Queen")
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_7) PORT_NAME("Rook")
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_UNUSED)
 
 	PORT_START("IN.9")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_1) PORT_NAME("Set up")
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_Q) PORT_NAME("New Game")
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_U) PORT_NAME("Take Back")
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_Y) PORT_NAME("Forward")
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_6) PORT_NAME("Hint")
-	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_I) PORT_NAME("Move")
-	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_8) PORT_NAME("Level")
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_7) PORT_NAME("Sound")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_8) PORT_NAME("Bishop")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_9) PORT_NAME("Knight")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_0) PORT_NAME("Pawn")
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_Q) PORT_NAME("White")
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_W) PORT_NAME("Black")
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_E) PORT_NAME("Move")
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_R) PORT_NAME("Level")
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_T) PORT_NAME("Sound")
 INPUT_PORTS_END
 
 
@@ -371,19 +430,25 @@ static MACHINE_CONFIG_START( master )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_8MHz/2)
-	MCFG_CPU_PROGRAM_MAP(master_map)
+	MCFG_CPU_PROGRAM_MAP(master_trampoline)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_on", ckz80_state, irq_on, attotime::from_hz(429)) // theoretical frequency from 555 timer (22nF, 150K, 1K5), measurement was 418Hz
 	MCFG_TIMER_START_DELAY(attotime::from_hz(429) - attotime::from_nsec(22870)) // active for 22.87us
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_off", ckz80_state, irq_off, attotime::from_hz(429))
+
+	MCFG_DEVICE_ADD("master_map", ADDRESS_MAP_BANK, 0)
+	MCFG_DEVICE_PROGRAM_MAP(master_map)
+	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
+	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
+	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(16)
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", ckz80_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_ck_master)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
-	MCFG_SOUND_ADD("dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
+	MCFG_SOUND_ADD("dac", DAC_2BIT_BINARY_WEIGHTED_ONES_COMPLEMENT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 
@@ -394,7 +459,7 @@ MACHINE_CONFIG_END
 
 ROM_START( ckmaster )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD("ckmaster.bin", 0x0000, 0x2000, CRC(59cbec9e) SHA1(2e0629e65778da62bed857406b91a334698d2fe8) ) // D2764C, no label
+	ROM_LOAD("ckmaster.ic2", 0x0000, 0x2000, CRC(59cbec9e) SHA1(2e0629e65778da62bed857406b91a334698d2fe8) ) // D2764C, no label
 ROM_END
 
 
