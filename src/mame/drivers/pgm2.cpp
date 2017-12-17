@@ -393,7 +393,7 @@ static ADDRESS_MAP_START( pgm2_map, AS_PROGRAM, 32, pgm2_state )
 	// AM_RANGE(0xfffff200, 0xfffff247) DBGU (Debug Unit)
 	// AM_RANGE(0xfffff400, 0xfffff4af) PIO (Parallel Input Output Controller)
 	AM_RANGE(0xfffff430, 0xfffff437) AM_WRITENOP // often
-	// AM_RANGE(0xfffffd00, 0xfffffd07) RSTC (Reset Controller)
+	// AM_RANGE(0xfffffd00, 0xfffffd0b) RSTC (Reset Controller)
 	// AM_RANGE(0xfffffd20, 0xfffffd2f) RTTC (Real Time Timer)
 	AM_RANGE(0xfffffd28, 0xfffffd2b) AM_READ(rtc_r)
 	// AM_RANGE(0xfffffd40, 0xfffffd4b) WDTC (Watch Dog Timer)
