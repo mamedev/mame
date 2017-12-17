@@ -318,8 +318,8 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 32, vp10x_state )
 	AM_RANGE(0x1ca00010, 0x1ca00013) AM_READ(test_r)        // bits here cause various test mode stuff
 	AM_RANGE(0x1cf00000, 0x1cf00003) AM_NOP AM_READNOP
 	AM_RANGE(0x1d000030, 0x1d000033) AM_WRITE(dmaaddr_w)    // ATA DMA destination address
-	AM_RANGE(0x1d000040, 0x1d00005f) AM_DEVREADWRITE16("ata", ata_interface_device, read16_cs0, write16_cs0, 0x0000ffff)
-	AM_RANGE(0x1d000060, 0x1d00007f) AM_DEVREADWRITE16("ata", ata_interface_device, read16_cs1, write16_cs1, 0x0000ffff)
+	AM_RANGE(0x1d000040, 0x1d00005f) AM_DEVREADWRITE16("ata", ata_interface_device, read_cs0, write_cs0, 0x0000ffff)
+	AM_RANGE(0x1d000060, 0x1d00007f) AM_DEVREADWRITE16("ata", ata_interface_device, read_cs1, write_cs1, 0x0000ffff)
 	AM_RANGE(0x1f200000, 0x1f200003) AM_READWRITE(pic_r, pic_w)
 	AM_RANGE(0x1f807000, 0x1f807fff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x1fc00000, 0x1fffffff) AM_ROM AM_REGION("maincpu", 0)
@@ -327,8 +327,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( vp50_map, AS_PROGRAM, 32, vp10x_state )
 	AM_RANGE(0x00000000, 0x03ffffff) AM_RAM AM_SHARE("mainram")
-	AM_RANGE(0x1f000010, 0x1f00001f) AM_DEVREADWRITE16("ata", ata_interface_device, read16_cs1, write16_cs1, 0xffffffff)
-	AM_RANGE(0x1f000020, 0x1f00002f) AM_DEVREADWRITE16("ata", ata_interface_device, read16_cs0, write16_cs0, 0xffffffff)
+	AM_RANGE(0x1f000010, 0x1f00001f) AM_DEVREADWRITE16("ata", ata_interface_device, read_cs1, write_cs1, 0xffffffff)
+	AM_RANGE(0x1f000020, 0x1f00002f) AM_DEVREADWRITE16("ata", ata_interface_device, read_cs0, write_cs0, 0xffffffff)
 	AM_RANGE(0x1f400000, 0x1f400003) AM_NOP // FPGA bitstream download?
 	AM_RANGE(0x1f400800, 0x1f400bff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x1fc00000, 0x1fffffff) AM_ROM AM_REGION("maincpu", 0)

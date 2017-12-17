@@ -558,7 +558,7 @@ static ADDRESS_MAP_START( konami573_map, AS_PROGRAM, 32, ksys573_state )
 	AM_RANGE( 0x1f400004, 0x1f400007 ) AM_READ_PORT( "IN1" )
 	AM_RANGE( 0x1f400008, 0x1f40000b ) AM_READ_PORT( "IN2" )
 	AM_RANGE( 0x1f40000c, 0x1f40000f ) AM_READ_PORT( "IN3" )
-	AM_RANGE( 0x1f480000, 0x1f48000f ) AM_DEVREADWRITE16( "ata", ata_interface_device, read16_cs0, write16_cs0, 0xffffffff )
+	AM_RANGE( 0x1f480000, 0x1f48000f ) AM_DEVREADWRITE16( "ata", ata_interface_device, read_cs0, write_cs0, 0xffffffff )
 	AM_RANGE( 0x1f500000, 0x1f500003 ) AM_READWRITE16( control_r, control_w, 0x0000ffff )    // Konami can't make a game without a "control" register.
 	AM_RANGE( 0x1f560000, 0x1f560003 ) AM_WRITE16( atapi_reset_w, 0x0000ffff )
 	AM_RANGE( 0x1f5c0000, 0x1f5c0003 ) AM_WRITENOP                // watchdog?
@@ -627,15 +627,15 @@ TIMER_CALLBACK_MEMBER( ksys573_state::atapi_xfer_end )
 
 	for( int i = 0; i < m_atapi_xfersize; i++ )
 	{
-		uint32_t d = m_ata->read16_cs0(0) << 0;
-		d |= m_ata->read16_cs0(0) << 16;
+		uint32_t d = m_ata->read_cs0(0) << 0;
+		d |= m_ata->read_cs0(0) << 16;
 
 		m_p_n_psxram[ m_atapi_xferbase / 4 ] = d;
 		m_atapi_xferbase += 4;
 	}
 
 	/// HACK: konami80s only works if you dma more data than requested
-	if( ( m_ata->read16_cs1(6) & 8 ) != 0 )
+	if( ( m_ata->read_cs1(6) & 8 ) != 0 )
 	{
 		m_atapi_timer->adjust( m_maincpu->cycles_to_attotime( ( ATAPI_CYCLES_PER_SECTOR * ( m_atapi_xfersize / 64 ) ) ) );
 	}

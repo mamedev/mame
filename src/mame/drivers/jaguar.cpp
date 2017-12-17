@@ -382,7 +382,7 @@ public:
 	{
 	}
 
-	virtual void write16_cs0(offs_t offset, u16 data, u16 mem_mask) override
+	virtual void write_cs0(offs_t offset, uint16_t data, uint16_t mem_mask) override
 	{
 		// the first write is to the device head register
 		if( offset == 6 && (m_status & IDE_STATUS_DRQ))
@@ -390,7 +390,7 @@ public:
 			m_status &= ~IDE_STATUS_DRQ;
 		}
 
-		ide_hdd_device::write16_cs0(offset, data, mem_mask);
+		ide_hdd_device::write_cs0(offset, data, mem_mask);
 	}
 };
 
@@ -1325,8 +1325,8 @@ static ADDRESS_MAP_START( r3000_map, AS_PROGRAM, 32, jaguar_state )
 	AM_RANGE(0x04800000, 0x04bfffff) AM_ROMBANK("maingfxbank")
 	AM_RANGE(0x04c00000, 0x04dfffff) AM_ROMBANK("mainsndbank")
 	AM_RANGE(0x04e00030, 0x04e0003f) AM_DEVREADWRITE("ide", vt83c461_device, read_config, write_config)
-	AM_RANGE(0x04e001f0, 0x04e001f7) AM_DEVREADWRITE("ide", vt83c461_device, read32_cs0, write32_cs0)
-	AM_RANGE(0x04e003f0, 0x04e003f7) AM_DEVREADWRITE("ide", vt83c461_device, read32_cs1, write32_cs1)
+	AM_RANGE(0x04e001f0, 0x04e001f7) AM_DEVREADWRITE("ide", vt83c461_device, read_cs0, write_cs0)
+	AM_RANGE(0x04e003f0, 0x04e003f7) AM_DEVREADWRITE("ide", vt83c461_device, read_cs1, write_cs1)
 	AM_RANGE(0x04f00000, 0x04f003ff) AM_READWRITE16(tom_regs_r, tom_regs_w, 0xffffffff)
 	AM_RANGE(0x04f00400, 0x04f007ff) AM_RAM AM_SHARE("gpuclut")
 	AM_RANGE(0x04f02100, 0x04f021ff) AM_READWRITE(gpuctrl_r, gpuctrl_w)
@@ -1361,8 +1361,8 @@ static ADDRESS_MAP_START( m68020_map, AS_PROGRAM, 32, jaguar_state )
 	AM_RANGE(0xb70000, 0xb70003) AM_READWRITE(misc_control_r, misc_control_w)
 	AM_RANGE(0xc00000, 0xdfffff) AM_ROMBANK("mainsndbank")
 	AM_RANGE(0xe00030, 0xe0003f) AM_DEVREADWRITE("ide", vt83c461_device, read_config, write_config)
-	AM_RANGE(0xe001f0, 0xe001f7) AM_DEVREADWRITE("ide", vt83c461_device, read32_cs0, write32_cs0)
-	AM_RANGE(0xe003f0, 0xe003f7) AM_DEVREADWRITE("ide", vt83c461_device, read32_cs1, write32_cs1)
+	AM_RANGE(0xe001f0, 0xe001f7) AM_DEVREADWRITE("ide", vt83c461_device, read_cs0, write_cs0)
+	AM_RANGE(0xe003f0, 0xe003f7) AM_DEVREADWRITE("ide", vt83c461_device, read_cs1, write_cs1)
 	AM_RANGE(0xf00000, 0xf003ff) AM_READWRITE16(tom_regs_r, tom_regs_w, 0xffffffff)
 	AM_RANGE(0xf00400, 0xf007ff) AM_RAM AM_SHARE("gpuclut")
 	AM_RANGE(0xf02100, 0xf021ff) AM_READWRITE(gpuctrl_r, gpuctrl_w)
@@ -1391,8 +1391,8 @@ static ADDRESS_MAP_START( gpu_map, AS_PROGRAM, 32, jaguar_state )
 	AM_RANGE(0x800000, 0xbfffff) AM_ROMBANK("gpugfxbank")
 	AM_RANGE(0xc00000, 0xdfffff) AM_ROMBANK("dspsndbank")
 	AM_RANGE(0xe00030, 0xe0003f) AM_DEVREADWRITE("ide", vt83c461_device, read_config, write_config)
-	AM_RANGE(0xe001f0, 0xe001f7) AM_DEVREADWRITE("ide", vt83c461_device, read32_cs0, write32_cs0)
-	AM_RANGE(0xe003f0, 0xe003f7) AM_DEVREADWRITE("ide", vt83c461_device, read32_cs1, write32_cs1)
+	AM_RANGE(0xe001f0, 0xe001f7) AM_DEVREADWRITE("ide", vt83c461_device, read_cs0, write_cs0)
+	AM_RANGE(0xe003f0, 0xe003f7) AM_DEVREADWRITE("ide", vt83c461_device, read_cs1, write_cs1)
 	AM_RANGE(0xf00000, 0xf003ff) AM_READWRITE16(tom_regs_r, tom_regs_w, 0xffffffff)
 	AM_RANGE(0xf00400, 0xf007ff) AM_RAM AM_SHARE("gpuclut")
 	AM_RANGE(0xf02100, 0xf021ff) AM_READWRITE(gpuctrl_r, gpuctrl_w)

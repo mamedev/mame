@@ -844,7 +844,7 @@ ADDRESS_MAP_START(xbox_base_map_io, AS_IO, 32, xbox_base_state)
 	AM_RANGE(0x002c, 0x002f) AM_READWRITE8(superio_read, superio_write, 0xffff0000)
 	AM_RANGE(0x0040, 0x0043) AM_DEVREADWRITE8("pit8254", pit8254_device, read, write, 0xffffffff)
 	AM_RANGE(0x00a0, 0x00a3) AM_DEVREADWRITE8("pic8259_2", pic8259_device, read, write, 0xffffffff)
-	AM_RANGE(0x01f0, 0x01f7) AM_DEVREADWRITE(":pci:09.0:ide", bus_master_ide_controller_device, read32_cs0, write32_cs0)
+	AM_RANGE(0x01f0, 0x01f7) AM_DEVREADWRITE(":pci:09.0:ide", bus_master_ide_controller_device, read_cs0, write_cs0)
 	AM_RANGE(0x03f8, 0x03ff) AM_READWRITE8(superiors232_read, superiors232_write, 0xffffffff)
 #if 0
 	AM_RANGE(0x0cf8, 0x0cff) AM_DEVREADWRITE("pcibus", pci_bus_legacy_device, read, write)

@@ -27,7 +27,7 @@ DEVICE_ADDRESS_MAP_START(config_map, 32, ide_pci_device)
 ADDRESS_MAP_END
 
 DEVICE_ADDRESS_MAP_START(chan1_data_command_map, 32, ide_pci_device)
-	AM_RANGE(0x0, 0x7) AM_DEVREADWRITE("ide", bus_master_ide_controller_device, read32_cs0, write32_cs0)
+	AM_RANGE(0x0, 0x7) AM_DEVREADWRITE("ide", bus_master_ide_controller_device, read_cs0, write_cs0)
 ADDRESS_MAP_END
 
 DEVICE_ADDRESS_MAP_START(chan1_control_map, 32, ide_pci_device)
@@ -35,7 +35,7 @@ DEVICE_ADDRESS_MAP_START(chan1_control_map, 32, ide_pci_device)
 ADDRESS_MAP_END
 
 DEVICE_ADDRESS_MAP_START(chan2_data_command_map, 32, ide_pci_device)
-	AM_RANGE(0x0, 0x7) AM_DEVREADWRITE("ide2", bus_master_ide_controller_device, read32_cs0, write32_cs0)
+	AM_RANGE(0x0, 0x7) AM_DEVREADWRITE("ide2", bus_master_ide_controller_device, read_cs0, write_cs0)
 ADDRESS_MAP_END
 
 DEVICE_ADDRESS_MAP_START(chan2_control_map, 32, ide_pci_device)
@@ -117,7 +117,7 @@ READ32_MEMBER(ide_pci_device::ide_read_cs1)
 {
 	// PCI offset starts at 0x3f4, idectrl expects 0x3f0
 	uint32_t data;
-	data = m_ide->read32_cs1(1, mem_mask);
+	data = m_ide->read_cs1(1, mem_mask);
 	if (0)
 		logerror("%s:ide_read_cs1 offset=%08X data=%08X mask=%08X\n", machine().describe_context(), offset, data, mem_mask);
 	return data;
@@ -126,21 +126,21 @@ READ32_MEMBER(ide_pci_device::ide_read_cs1)
 WRITE32_MEMBER(ide_pci_device::ide_write_cs1)
 {
 	// PCI offset starts at 0x3f4, idectrl expects 0x3f0
-	m_ide->write32_cs1(1, data, mem_mask);
+	m_ide->write_cs1(1, data, mem_mask);
 }
 
 READ32_MEMBER(ide_pci_device::ide2_read_cs1)
 {
 	// PCI offset starts at 0x374, idectrl expects 0x370
 	uint32_t data;
-	data = m_ide2->read32_cs1(1, mem_mask);
+	data = m_ide2->read_cs1(1, mem_mask);
 	return data;
 }
 
 WRITE32_MEMBER(ide_pci_device::ide2_write_cs1)
 {
 	// PCI offset starts at 0x374, idectrl expects 0x370
-	m_ide2->write32_cs1(1, data, mem_mask);
+	m_ide2->write_cs1(1, data, mem_mask);
 }
 
 WRITE_LINE_MEMBER(ide_pci_device::ide_interrupt)

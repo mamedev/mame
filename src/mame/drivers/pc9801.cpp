@@ -511,22 +511,22 @@ WRITE8_MEMBER(pc9801_state::ide_ctrl_w)
 
 READ16_MEMBER(pc9801_state::ide_cs0_r)
 {
-	return (m_ide_sel ? m_ide2 : m_ide1)->read16_cs0(offset, mem_mask);
+	return (m_ide_sel ? m_ide2 : m_ide1)->read_cs0(offset, mem_mask);
 }
 
 WRITE16_MEMBER(pc9801_state::ide_cs0_w)
 {
-	(m_ide_sel ? m_ide2 : m_ide1)->write16_cs0(offset, data, mem_mask);
+	(m_ide_sel ? m_ide2 : m_ide1)->write_cs0(offset, data, mem_mask);
 }
 
 READ16_MEMBER(pc9801_state::ide_cs1_r)
 {
-	return (m_ide_sel ? m_ide2 : m_ide1)->read16_cs1(offset, mem_mask);
+	return (m_ide_sel ? m_ide2 : m_ide1)->read_cs1(offset, mem_mask);
 }
 
 WRITE16_MEMBER(pc9801_state::ide_cs1_w)
 {
-	(m_ide_sel ? m_ide2 : m_ide1)->write16_cs1(offset, data, mem_mask);
+	(m_ide_sel ? m_ide2 : m_ide1)->write_cs1(offset, data, mem_mask);
 }
 
 WRITE_LINE_MEMBER(pc9801_state::ide1_irq_w)

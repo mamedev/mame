@@ -136,22 +136,22 @@ southbridge_device::southbridge_device(const machine_config &mconfig, device_typ
 /// HACK: the memory system cannot cope with mixing the  8 bit device map from the fdc with a 32 bit handler
 READ8_MEMBER(southbridge_device::ide_read_cs1_r)
 {
-	return m_ide->read32_cs1(1, 0xff0000) >> 16;
+	return m_ide->read_cs1(1, 0xff0000) >> 16;
 }
 
 WRITE8_MEMBER(southbridge_device::ide_write_cs1_w)
 {
-	m_ide->write32_cs1(1, data << 16, 0xff0000);
+	m_ide->write_cs1(1, data << 16, 0xff0000);
 }
 
 READ8_MEMBER(southbridge_device::ide2_read_cs1_r)
 {
-	return m_ide2->read32_cs1(1, 0xff0000) >> 16;
+	return m_ide2->read_cs1(1, 0xff0000) >> 16;
 }
 
 WRITE8_MEMBER(southbridge_device::ide2_write_cs1_w)
 {
-	m_ide2->write32_cs1(1, data << 16, 0xff0000);
+	m_ide2->write_cs1(1, data << 16, 0xff0000);
 }
 
 //-------------------------------------------------
@@ -169,11 +169,11 @@ void southbridge_device::device_start()
 	spaceio.install_readwrite_handler(0x0080, 0x009f, read8_delegate(FUNC(southbridge_device::at_page8_r),this), write8_delegate(FUNC(southbridge_device::at_page8_w),this), 0xffffffff);
 	spaceio.install_readwrite_handler(0x00a0, 0x00bf, read8_delegate(FUNC(pic8259_device::read),&(*m_pic8259_slave)), write8_delegate(FUNC(pic8259_device::write),&(*m_pic8259_slave)), 0xffffffff);
 	spaceio.install_readwrite_handler(0x00c0, 0x00df, read8_delegate(FUNC(southbridge_device::at_dma8237_2_r),this), write8_delegate(FUNC(southbridge_device::at_dma8237_2_w),this), 0xffffffff);
-	spaceio.install_readwrite_handler(0x0170, 0x0177, read32_delegate(FUNC(bus_master_ide_controller_device::read32_cs0),&(*m_ide2)), write32_delegate(FUNC(bus_master_ide_controller_device::write32_cs0), &(*m_ide2)),0xffffffff);
-	spaceio.install_readwrite_handler(0x01f0, 0x01f7, read32_delegate(FUNC(bus_master_ide_controller_device::read32_cs0),&(*m_ide)), write32_delegate(FUNC(bus_master_ide_controller_device::write32_cs0), &(*m_ide)),0xffffffff);
+	spaceio.install_readwrite_handler(0x0170, 0x0177, read32_delegate(FUNC(bus_master_ide_controller_device::read_cs0),&(*m_ide2)), write32_delegate(FUNC(bus_master_ide_controller_device::write_cs0), &(*m_ide2)),0xffffffff);
+	spaceio.install_readwrite_handler(0x01f0, 0x01f7, read32_delegate(FUNC(bus_master_ide_controller_device::read_cs0),&(*m_ide)), write32_delegate(FUNC(bus_master_ide_controller_device::write_cs0), &(*m_ide)),0xffffffff);
 //  HACK: this works if you take out the (non working) fdc
-//  spaceio.install_readwrite_handler(0x0370, 0x0377, read32_delegate(FUNC(bus_master_ide_controller_device::read32_cs1),&(*m_ide2)), write32_delegate(FUNC(bus_master_ide_controller_device::write32_cs1), &(*m_ide2)),0xffffffff);
-//  spaceio.install_readwrite_handler(0x03f0, 0x03f7, read32_delegate(FUNC(bus_master_ide_controller_device::read32_cs1),&(*m_ide)), write32_delegate(FUNC(bus_master_ide_controller_device::write32_cs1), &(*m_ide)),0xffffffff);
+//  spaceio.install_readwrite_handler(0x0370, 0x0377, read32_delegate(FUNC(bus_master_ide_controller_device::read_cs1),&(*m_ide2)), write32_delegate(FUNC(bus_master_ide_controller_device::write_cs1), &(*m_ide2)),0xffffffff);
+//  spaceio.install_readwrite_handler(0x03f0, 0x03f7, read32_delegate(FUNC(bus_master_ide_controller_device::read_cs1),&(*m_ide)), write32_delegate(FUNC(bus_master_ide_controller_device::write_cs1), &(*m_ide)),0xffffffff);
 	spaceio.install_readwrite_handler(0x0374, 0x0377, read8_delegate(FUNC(southbridge_device::ide2_read_cs1_r),this), write8_delegate(FUNC(southbridge_device::ide2_write_cs1_w), this),0xff0000);
 	spaceio.install_readwrite_handler(0x03f4, 0x03f7, read8_delegate(FUNC(southbridge_device::ide_read_cs1_r),this), write8_delegate(FUNC(southbridge_device::ide_write_cs1_w), this),0xff0000);
 	spaceio.nop_readwrite(0x00e0, 0x00ef);

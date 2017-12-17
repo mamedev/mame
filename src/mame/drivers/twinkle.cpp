@@ -916,7 +916,7 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 16, twinkle_state )
 	AM_RANGE(0x250000, 0x250003) AM_WRITE(spu_ata_dma_high_w) AM_READNOP
 	AM_RANGE(0x260000, 0x260001) AM_WRITE(spu_wavebank_w) AM_READNOP
 	AM_RANGE(0x280000, 0x280fff) AM_READWRITE(shared_68k_r, shared_68k_w)
-	AM_RANGE(0x300000, 0x30000f) AM_DEVREADWRITE("ata", ata_interface_device, read16_cs0, write16_cs0)
+	AM_RANGE(0x300000, 0x30000f) AM_DEVREADWRITE("ata", ata_interface_device, read_cs0, write_cs0)
 	// 34000E = ???
 	AM_RANGE(0x34000e, 0x34000f) AM_WRITENOP
 	AM_RANGE(0x400000, 0x400fff) AM_DEVREADWRITE("rfsnd", rf5c400_device, rf5c400_r, rf5c400_w)

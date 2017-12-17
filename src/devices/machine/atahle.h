@@ -19,21 +19,16 @@ class ata_hle_device : public device_t, public device_ata_interface
 {
 public:
 	virtual uint16_t read_dma() override;
-	virtual u16 read16_cs0(offs_t offset, u16 mem_mask = 0xffff) override;
-	virtual u16 read16_cs1(offs_t offset, u16 mem_mask = 0xffff) override;
+	virtual uint16_t read_cs0(offs_t offset, uint16_t mem_mask = 0xffff) override;
+	virtual uint16_t read_cs1(offs_t offset, uint16_t mem_mask = 0xffff) override;
 
 	virtual void write_dma(uint16_t data) override;
-	virtual void write16_cs0(offs_t offset, u16 data, u16 mem_mask = 0xffff) override;
-	virtual void write16_cs1(offs_t offset, u16 data, u16 mem_mask = 0xffff) override;
+	virtual void write_cs0(offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff) override;
+	virtual void write_cs1(offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff) override;
 	virtual DECLARE_WRITE_LINE_MEMBER(write_csel) override;
 	virtual DECLARE_WRITE_LINE_MEMBER(write_dasp) override;
 	virtual DECLARE_WRITE_LINE_MEMBER(write_dmack) override;
 	virtual DECLARE_WRITE_LINE_MEMBER(write_pdiag) override;
-
-	using device_ata_interface::read16_cs0;
-	using device_ata_interface::read16_cs1;
-	using device_ata_interface::write16_cs0;
-	using device_ata_interface::write16_cs1;
 
 protected:
 	ata_hle_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);

@@ -21,24 +21,3 @@ device_ata_interface::device_ata_interface(const machine_config &mconfig, device
 	m_pdiag_handler(device)
 {
 }
-
-
-READ16_MEMBER( device_ata_interface::read16_cs0 )
-{
-	return read16_cs0(offset, mem_mask);
-}
-
-READ16_MEMBER( device_ata_interface::read16_cs1 )
-{
-	return read16_cs1(offset, mem_mask);
-}
-
-WRITE16_MEMBER( device_ata_interface::write16_cs0 )
-{
-	write16_cs0(offset, data, mem_mask);
-}
-
-WRITE16_MEMBER( device_ata_interface::write16_cs1 )
-{
-	write16_cs1(offset, data, mem_mask);
-}

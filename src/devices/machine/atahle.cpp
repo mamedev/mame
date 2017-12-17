@@ -584,11 +584,11 @@ uint16_t ata_hle_device::read_dma()
 	return result;
 }
 
-u16 ata_hle_device::read16_cs0(offs_t offset, u16)
+uint16_t ata_hle_device::read_cs0(offs_t offset, uint16_t mem_mask)
 {
 	/* logit */
 //  if (offset != IDE_CS0_DATA_RW && offset != IDE_CS0_STATUS_R)
-		LOG(("%s:IDE cs0 read at %X\n", machine().describe_context(), offset));
+		LOG(("%s:IDE cs0 read at %X, mem_mask=%d\n", machine().describe_context(), offset, mem_mask));
 
 	uint16_t result = 0xffff;
 
@@ -596,7 +596,7 @@ u16 ata_hle_device::read16_cs0(offs_t offset, u16)
 	{
 		if (m_dmack)
 		{
-			logerror( "%s: %s dev %d read_cs0 %04x %04x ignored (DMACK)\n", machine().describe_context(), tag(), dev(), offset );
+			logerror( "%s: %s dev %d read_cs0 %04x %04x ignored (DMACK)\n", machine().describe_context(), tag(), dev(), offset, mem_mask );
 		}
 		else if ((m_status & IDE_STATUS_BSY) && offset != IDE_CS0_STATUS_R)
 		{
@@ -607,7 +607,7 @@ u16 ata_hle_device::read16_cs0(offs_t offset, u16)
 				switch (offset)
 				{
 					case IDE_CS0_DATA_RW:
-						logerror( "%s: %s dev %d read_cs0 %04x %04x ignored (BSY)\n", machine().describe_context(), tag(), dev(), offset );
+						logerror( "%s: %s dev %d read_cs0 %04x %04x ignored (BSY)\n", machine().describe_context(), tag(), dev(), offset, mem_mask );
 						break;
 
 					default:
@@ -692,7 +692,7 @@ u16 ata_hle_device::read16_cs0(offs_t offset, u16)
 
 				/* log anything else */
 				default:
-					logerror("%s:unknown IDE cs0 read at %03X\n", machine().describe_context(), offset);
+					logerror("%s:unknown IDE cs0 read at %03X, mem_mask=%d\n", machine().describe_context(), offset, mem_mask);
 					break;
 			}
 		}
@@ -703,11 +703,11 @@ u16 ata_hle_device::read16_cs0(offs_t offset, u16)
 }
 
 
-u16 ata_hle_device::read16_cs1(offs_t offset, u16)
+uint16_t ata_hle_device::read_cs1(offs_t offset, uint16_t mem_mask)
 {
 	/* logit */
 //  if (offset != IDE_CS1_ALTERNATE_STATUS_R)
-		LOG(("%s:IDE cs1 read at %X\n", machine().describe_context(), offset));
+		LOG(("%s:IDE cs1 read at %X, mem_mask=%d\n", machine().describe_context(), offset, mem_mask));
 
 	uint16_t result = 0xffff;
 
@@ -715,7 +715,7 @@ u16 ata_hle_device::read16_cs1(offs_t offset, u16)
 	{
 		if (m_dmack)
 		{
-			logerror( "%s: %s dev %d read_cs1 %04x ignored (DMACK)\n", machine().describe_context(), tag(), dev(), offset );
+			logerror( "%s: %s dev %d read_cs1 %04x %04x ignored (DMACK)\n", machine().describe_context(), tag(), dev(), offset, mem_mask );
 		}
 		else
 		{
@@ -759,7 +759,7 @@ u16 ata_hle_device::read16_cs1(offs_t offset, u16)
 
 				/* log anything else */
 				default:
-					logerror("%s:unknown IDE cs1 read at %03X\n", machine().describe_context(), offset);
+					logerror("%s:unknown IDE cs1 read at %03X, mem_mask=%d\n", machine().describe_context(), offset, mem_mask);
 					break;
 			}
 		}
@@ -807,23 +807,23 @@ void ata_hle_device::write_dma( uint16_t data )
 	}
 }
 
-void ata_hle_device::write16_cs0(offs_t offset, u16 data, u16)
+void ata_hle_device::write_cs0(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	/* logit */
 	if (offset != IDE_CS0_DATA_RW)
-		LOG(("%s:IDE cs0 write to %X = %08X\n", machine().describe_context(), offset, data));
+		LOG(("%s:IDE cs0 write to %X = %08X, mem_mask=%d\n", machine().describe_context(), offset, data, mem_mask));
 
 	if (m_dmack)
 	{
-		logerror( "%s: %s dev %d write_cs0 %04x %04x ignored (DMACK)\n", machine().describe_context(), tag(), dev(), offset, data );
+		logerror( "%s: %s dev %d write_cs0 %04x %04x %04x ignored (DMACK)\n", machine().describe_context(), tag(), dev(), offset, data, mem_mask );
 	}
 	else if ((m_status & IDE_STATUS_BSY) && offset != IDE_CS0_COMMAND_W)
 	{
-		logerror( "%s: %s dev %d write_cs0 %04x %04x ignored (BSY) command %02x\n", machine().describe_context(), tag(), dev(), offset, data, m_command );
+		logerror( "%s: %s dev %d write_cs0 %04x %04x %04x ignored (BSY) command %02x\n", machine().describe_context(), tag(), dev(), offset, data, mem_mask, m_command );
 	}
 	else if ((m_status & IDE_STATUS_DRQ) && offset != IDE_CS0_DATA_RW && offset != IDE_CS0_COMMAND_W)
 	{
-		logerror( "%s: %s dev %d write_cs0 %04x %04x ignored (DRQ) command %02x\n", machine().describe_context(), tag(), dev(), offset, data, m_command );
+		logerror( "%s: %s dev %d write_cs0 %04x %04x %04x ignored (DRQ) command %02x\n", machine().describe_context(), tag(), dev(), offset, data, mem_mask, m_command );
 	}
 	else
 	{
@@ -837,7 +837,7 @@ void ata_hle_device::write16_cs0(offs_t offset, u16 data, u16)
 				{
 					if (!(m_status & IDE_STATUS_DRQ))
 					{
-						logerror( "%s: %s dev %d write_cs0 %04x %04x ignored (!DRQ)\n", machine().describe_context(), tag(), dev(), offset, data );
+						logerror( "%s: %s dev %d write_cs0 %04x %04x %04x ignored (!DRQ)\n", machine().describe_context(), tag(), dev(), offset, data, mem_mask );
 					}
 					else
 					{
@@ -884,11 +884,11 @@ void ata_hle_device::write16_cs0(offs_t offset, u16 data, u16)
 				// Packet devices can accept DEVICE RESET when BSY or DRQ is set.
 				if (m_status & IDE_STATUS_BSY)
 				{
-					logerror( "%s: %s dev %d write_cs0 %04x %04x ignored (BSY) command %02x\n", machine().describe_context(), tag(), dev(), offset, data, m_command );
+					logerror( "%s: %s dev %d write_cs0 %04x %04x %04x ignored (BSY) command %02x\n", machine().describe_context(), tag(), dev(), offset, data, mem_mask, m_command );
 				}
 				else if (m_status & IDE_STATUS_DRQ)
 				{
-					logerror( "%s: %s dev %d write_cs0 %04x %04x ignored (DRQ) command %02x\n", machine().describe_context(), tag(), dev(), offset, data, m_command );
+					logerror( "%s: %s dev %d write_cs0 %04x %04x %04x ignored (DRQ) command %02x\n", machine().describe_context(), tag(), dev(), offset, data, mem_mask, m_command );
 				}
 				else if (device_selected() || m_command == IDE_COMMAND_DIAGNOSTIC)
 				{
@@ -909,20 +909,20 @@ void ata_hle_device::write16_cs0(offs_t offset, u16 data, u16)
 				break;
 
 			default:
-				logerror("%s:unknown IDE cs0 write at %03X = %04x\n", machine().describe_context(), offset, data);
+				logerror("%s:unknown IDE cs0 write at %03X = %04x, mem_mask=%d\n", machine().describe_context(), offset, data, mem_mask);
 				break;
 		}
 	}
 }
 
-void ata_hle_device::write16_cs1(offs_t offset, u16 data, u16)
+void ata_hle_device::write_cs1(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	/* logit */
-	LOG(("%s:IDE cs1 write to %X = %08X\n", machine().describe_context(), offset, data));
+	LOG(("%s:IDE cs1 write to %X = %08X, mem_mask=%d\n", machine().describe_context(), offset, data, mem_mask));
 
 	if (m_dmack)
 	{
-		logerror( "%s: %s dev %d write_cs1 %04x %04x ignored (DMACK)\n", machine().describe_context(), tag(), dev(), offset, data );
+		logerror( "%s: %s dev %d write_cs1 %04x %04x %04x ignored (DMACK)\n", machine().describe_context(), tag(), dev(), offset, data, mem_mask );
 	}
 	else
 	{
@@ -944,7 +944,7 @@ void ata_hle_device::write16_cs1(offs_t offset, u16 data, u16)
 					{
 						if (m_resetting)
 						{
-							logerror( "%s: %s dev %d write_cs1 %04x %04x ignored (RESET)\n", machine().describe_context(), tag(), dev(), offset, data );
+							logerror( "%s: %s dev %d write_cs1 %04x %04x %04x ignored (RESET)\n", machine().describe_context(), tag(), dev(), offset, data, mem_mask );
 						}
 						else
 						{
@@ -964,7 +964,7 @@ void ata_hle_device::write16_cs1(offs_t offset, u16 data, u16)
 				break;
 
 			default:
-				logerror("%s:unknown IDE cs1 write at %03X = %04x\n", machine().describe_context(), offset, data);
+				logerror("%s:unknown IDE cs1 write at %03X = %04x, mem_mask=%d\n", machine().describe_context(), offset, data, mem_mask);
 				break;
 		}
 	}
