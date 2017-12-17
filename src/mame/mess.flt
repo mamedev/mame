@@ -127,6 +127,7 @@ chaos.cpp
 chessmst.cpp
 chesstrv.cpp
 cit220.cpp
+ckz80.cpp
 clcd.cpp
 cm1800.cpp
 cmi.cpp

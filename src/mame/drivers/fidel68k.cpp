@@ -300,7 +300,7 @@ WRITE8_MEMBER(fidel68k_state::fdes68k_lcd_w)
 DRIVER_INIT_MEMBER(fidel68k_state, fdes2265)
 {
 	u16 *rom = (u16*)memregion("maincpu")->base();
-	unsigned const len = memregion("maincpu")->bytes() / 2;
+	const u32 len = memregion("maincpu")->bytes() / 2;
 
 	// descramble data lines
 	for (int i = 0; i < len; i++)

@@ -9747,6 +9747,9 @@ citycon                         // (c) 1985 Jaleco
 citycona                        // (c) 1985 Jaleco
 cruisin                         // (c) 1985 Jaleco/Kitkorp
 
+@source:ckz80.cpp
+ckmaster                        //
+
 @source:clayshoo.cpp
 clayshoo                        // [1979 Allied Leisure]
 
