@@ -265,19 +265,6 @@
 			</diskarea>
 		</part>
 	</software>
-
-	<software name="prototyp">
-		<description>Prototype</description>
-		<year>1995</year>
-		<publisher>Neo</publisher>
-		<info name="version" value="1.0" />
-		<part name="cdrom" interface="cdrom">
-			<feature name="disk_label" value="Prototype" />
-			<diskarea name="cdrom">
-				<disk name="prototyp" sha1="0cdfabab37e5e9b219b3c8a381c937ae52749bb1" />
-			</diskarea>
-		</part>
-	</software>
 	
 	<software name="sideline">
 		<description>Sideline</description>
