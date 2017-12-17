@@ -6271,6 +6271,34 @@ ROM_START( qnileua )
 ROM_END
 
 
+// AHG1608 / MV4091 / 5,10,20 Credit Multiplier / 9 Line Multiline
+// QUEEN OF THE NILE / Export / F - 17/01/01
+// Marked as SPC.
+// All eproms are 27C4096.
+ROM_START( qnileub )
+	ARISTOCRAT_MK5_BIOS
+	/*
+	    Checksum code found at 0x000d18
+	    Checksum is stored at 0x000020-0x000027
+	        Expected Checksum   0xad17f6d5
+	        Calculated Checksum 0xad17f6d5  (OK)
+	*/
+	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
+	ROM_LOAD32_WORD( "ahg1608.u7",  0x000000, 0x80000, CRC(220d4dbc) SHA1(89dc37c6774b7e066868130ce2985a0d86953ec4) )
+	ROM_LOAD32_WORD( "ahg1608.u11", 0x000002, 0x80000, CRC(f11e9f7b) SHA1(3d282dd779f48bca98c4d4ebca4e7206e0f2dff6) )
+	ROM_LOAD32_WORD( "ahg1608.u8",  0x100000, 0x80000, CRC(7101c670) SHA1(51cca228ca219c778761e500ac37953e874e76f5) )
+	ROM_LOAD32_WORD( "ahg1608.u12", 0x100002, 0x80000, CRC(a7875dbf) SHA1(4944773ec12aba122f474975fa52ca28365123df) )
+	ROM_LOAD32_WORD( "ahg1608.u9",  0x200000, 0x80000, CRC(33a4099e) SHA1(a774742332dfb11c9396e08a9a48f9274e76a58a) )
+	ROM_LOAD32_WORD( "ahg1608.u13", 0x200002, 0x80000, CRC(221c24af) SHA1(218bc944a9ba2d89c9b9b8d29e61a37048e70adc) )
+	ROM_LOAD32_WORD( "ahg1608.u10", 0x300000, 0x80000, CRC(49e35226) SHA1(6d3396ff74dd892a009edf32dc3a7677979a9854) )
+	ROM_LOAD32_WORD( "ahg1608.u14", 0x300002, 0x80000, CRC(4d0f1d12) SHA1(980775e628e9508398cb5227af10ed9ff0555b8a) )
+
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
+	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
+ROM_END
+
+
 // 04J00784 / 602/3 / 20 Credit Multiplier / 9 Line Multiline
 // QUEEN OF THE NILE / NSW/ACT / B - 13/05/97
 // ROM contains unaltered NSW/ACT region string and date, but game is for the Venezuelan market
@@ -7697,6 +7725,7 @@ GAMEL( 1999, qniled,     qnile,     aristmk5,           checkma5,     aristmk5_s
 GAMEL( 2000, qnilenl,    qnile,     aristmk5,           qnilenl,      aristmk5_state, aristmk5, ROT0, "Aristocrat", "Queen of the Nile (0301059V, Holland)",                MACHINE_FLAGS, layout_qnilenl )         // 602/5, G - 10/04/00
 GAMEL( 1997, qnileu,     qnile,     aristmk5_usa,       dolphntru,    aristmk5_state, aristmk5, ROT0, "Aristocrat", "Queen of the Nile (GHG4091-02, US)",                   MACHINE_FLAGS, layout_aristmk5_us )     // MV4091, B - 13/05/97
 GAMEL( 1997, qnileua,    qnile,     aristmk5_usa,       dolphntru,    aristmk5_state, aristmk5, ROT0, "Aristocrat", "Queen of the Nile (GHG4091-03, US)",                   MACHINE_FLAGS, layout_aristmk5_us )     // MV4091, B - 13/05/97
+GAMEL( 1997, qnileub,    qnile,     aristmk5_usa,       dolphntru,    aristmk5_state, aristmk5, ROT0, "Aristocrat", "Queen of the Nile (AHG1608, US)",                      MACHINE_FLAGS, layout_aristmk5_us )     // MV4091, F - 17/01/01
 GAMEL( 1997, qnilev,     qnile,     aristmk5,           aristmk5_9,   aristmk5_state, aristmk5, ROT0, "Aristocrat", "Queen of the Nile (04J00784, Venezuela)",              MACHINE_FLAGS, layout_dolphntrb )       // 602/3, B - 13/05/97, Rev 6
 GAMEL( 2001, qnilece,    qnile,     aristmk5_usa,       dolphntrce,   aristmk5_state, aristmk5, ROT0, "Aristocrat", "Queen of the Nile - Cash Express (AHG1609, US)",       MACHINE_FLAGS, layout_dolphntrce )      // MV4091/1, A - 17/01/01
 GAMEL( 2001, qnilecea,   qnile,     aristmk5_usa,       dolphntru,    aristmk5_state, aristmk5, ROT0, "Aristocrat", "Queen of the Nile - Cash Express (AHG1525, US)",       MACHINE_FLAGS, layout_qnilecea )        // MV4091, F - 17/01/01
