@@ -47396,7 +47396,7 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 				<disk name="chou jikuu yousai macross - ai oboete imasu ka (japan) (disc 1)" sha1="f231291ee425f4e6044f2711bb97d2357972d630"/>
 			</diskarea>
 		</part>
-		<part name="cdrom" interface="psx_cdrom">
+		<part name="cdrom2" interface="psx_cdrom">
 			<diskarea name="cdrom">
 				<disk name="chou jikuu yousai macross - ai oboete imasu ka (japan) (disc 2)" sha1="34c2a882b7243018578ff43f080ddfd0b6f6d76e"/>
 			</diskarea>
