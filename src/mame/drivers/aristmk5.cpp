@@ -3638,6 +3638,31 @@ ROM_START( eforsta5u )
 ROM_END
 
 
+// JHG0415-99 / MV4033 / 10 Credit Multiplier / 9 Line Multiline
+// Enchanted Forest / Export / B - 10/02/97
+// Not requires set chip version
+// Variation (% and NO): 88,26% 99
+// All devices are 27c4002 instead of 27c4096.
+ROM_START( eforsta5ua )
+	ARISTOCRAT_MK5_BIOS
+	/*
+	    Checksum code found at 0x000d08
+	    Checksum is stored at 0x000020-0x000027
+	        Expected Checksum   0x5fed2247
+	        Calculated Checksum 0x5fed2247  (OK)
+	*/
+	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
+	ROM_LOAD32_WORD( "jhg041599.u7",  0x000000, 0x80000, CRC(394d93a0) SHA1(5dd91ef55da4b6c8f0866c21d8d4ae9e18ab1bb0) )  // 88,26%
+	ROM_LOAD32_WORD( "jhg041599.u11", 0x000002, 0x80000, CRC(3f542a64) SHA1(36de7fc85f2424a62f322de2ef82e061d2335526) )  // 88,26%
+	ROM_LOAD32_WORD( "jhg041599.u8",  0x100000, 0x80000, CRC(002dec6c) SHA1(fb3f4ce9cd8cd9e0e3133376ed014db83db041c5) )  // base
+	ROM_LOAD32_WORD( "jhg041599.u12", 0x100002, 0x80000, CRC(c968471f) SHA1(9d54a5c396e6f83690db2fcb7ddcc8a47a7dd777) )  // base
+
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
+	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
+ROM_END
+
+
 // 0100651V / 624 / 3 Credit Multiplier / 3 Line Multiline
 // Fast Fortune / Local / D - 07/05/98
 ROM_START( fastfort )
@@ -7468,6 +7493,7 @@ GAMEL( 2000, dynajack,   aristmk5,  aristmk5,           dynajack,     aristmk5_s
 GAMEL( 1998, eldorda5,   aristmk5,  aristmk5,           reelrock,     aristmk5_state, aristmk5, ROT0, "Aristocrat", "El Dorado (0100652V, NSW/ACT)",                        MACHINE_FLAGS, layout_reelrock )        // 623, B - 24/03/98, Rev 3
 GAMEL( 1995, eforsta5,   aristmk5,  aristmk5,           swhr2,        aristmk5_state, aristmk5, ROT0, "Aristocrat", "Enchanted Forest (0400122V, NSW/ACT)",                 MACHINE_FLAGS, layout_swhr2 )           // 570/3, E - 23/06/95, Rev 1.18
 GAMEL( 1997, eforsta5u,  eforsta5,  aristmk5_usa,       aristmk5_usa, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Enchanted Forest (JHG0415-03, US)",                    MACHINE_FLAGS, layout_aristmk5_us )     // MV4033, B - 10/02/97
+GAMEL( 1997, eforsta5ua, eforsta5,  aristmk5_usa,       aristmk5_usa, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Enchanted Forest (JHG0415-99, US)",                    MACHINE_FLAGS, layout_aristmk5_us )     // MV4033, B - 10/02/97
 GAMEL( 1998, fastfort,   aristmk5,  aristmk5,           wildbill,     aristmk5_state, aristmk5, ROT0, "Aristocrat", "Fast Fortune (0100651V, NSW/ACT)",                     MACHINE_FLAGS, layout_wildbill )        // 624, D - 07/05/98, Rev 5
 GAMEL( 2000, fortellr,   aristmk5,  aristmk5,           goldenra,     aristmk5_state, aristmk5, ROT0, "Aristocrat", "Fortune Teller (01J00131, NSW/ACT)",                   MACHINE_FLAGS, layout_fortellr )        // JB006, D - 24/11/2000, Rev 17
 GAMEL( 1998, gambler,    aristmk5,  aristmk5_usa,       aristmk5_usa, aristmk5_state, aristmk5, ROT0, "Aristocrat", "The Gambler (EHG0916-02, US)",                         MACHINE_FLAGS, layout_aristmk5_us )     // MV4084/1, A - 30/10/98
