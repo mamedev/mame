@@ -2965,7 +2965,7 @@ ROM_END
 ROM_START( chickna5b )
 	ARISTOCRAT_MK5_BIOS
 	/*
-
+        (need proper info about the checksum routines).
 	*/
 	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
 	ROM_LOAD32_WORD( "01j01886.u7",  0x000000, 0x80000, CRC(6852bf73) SHA1(a53c8467f4a128da26707a1fe239f32330dffe0a) )
