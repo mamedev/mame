@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:David Haywood
+// copyright-holders:David Haywood, MetalliC
 
 #ifndef MAME_MACHINE_ATMEL_ARM_AIC_H
 #define MAME_MACHINE_ATMEL_ARM_AIC_H

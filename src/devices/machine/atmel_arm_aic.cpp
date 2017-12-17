@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:David Haywood
+// copyright-holders:David Haywood, MetalliC
 
 /*
    ARM AIC (Advanced Interrupt Controller) from Atmel

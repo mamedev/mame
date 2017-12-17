@@ -387,19 +387,20 @@ static ADDRESS_MAP_START( pgm2_map, AS_PROGRAM, 32, pgm2_state )
 
 	AM_RANGE(0x40000000, 0x40000003) AM_DEVREADWRITE8("ymz774", ymz774_device, read, write, 0xffffffff)
 
-	// internal to IGS036? - various other writes down here on startup too - could be other standard ATMEL peripherals like the ARM_AIC mixed with custom bits
-	AM_RANGE(0xffffec00, 0xffffec5f) AM_RAM // SMC controller
-	AM_RANGE(0xfffffc00, 0xfffffcff) AM_READWRITE8(encryption_r,encryption_w, 0xffffffff) // confirmed as encryption table for main program rom (see code at 3950)
-
+	// internal IGS036 - most of them is standard ATMEL peripherals followed by custom bits
+	// AM_RANGE(0xffffec00, 0xffffec7f) SMC (Static Memory Controller)
 	AM_RANGE(0xfffff000, 0xfffff14b) AM_DEVICE("arm_aic", arm_aic_device, regs_map)
-	// PIOA (gpio)
-	AM_RANGE(0xfffff430, 0xfffff433) AM_WRITENOP // often
-	AM_RANGE(0xfffff434, 0xfffff437) AM_WRITENOP // often
-
+	// AM_RANGE(0xfffff200, 0xfffff247) DBGU (Debug Unit)
+	// AM_RANGE(0xfffff400, 0xfffff4af) PIO (Parallel Input Output Controller)
+	AM_RANGE(0xfffff430, 0xfffff437) AM_WRITENOP // often
+	// AM_RANGE(0xfffffd00, 0xfffffd07) RSTC (Reset Controller)
+	// AM_RANGE(0xfffffd20, 0xfffffd2f) RTTC (Real Time Timer)
 	AM_RANGE(0xfffffd28, 0xfffffd2b) AM_READ(rtc_r)
-
+	// AM_RANGE(0xfffffd40, 0xfffffd4b) WDTC (Watch Dog Timer)
+	// custom IGS036 stuff starts here
 	AM_RANGE(0xfffffa08, 0xfffffa0b) AM_WRITE(encryption_do_w) // after uploading encryption? table might actually send it or enable external ROM? when read bits0-1 called FUSE 0 and 1, must be 0
-	AM_RANGE(0xfffffa0c, 0xfffffa0f) AM_READ(unk_startup_r)
+	AM_RANGE(0xfffffa0c, 0xfffffa0f) AM_READ(unk_startup_r) // written 0, then 0x1c, then expected to return (result&0x180)==0x180, then written 0x7c
+	AM_RANGE(0xfffffc00, 0xfffffcff) AM_READWRITE8(encryption_r, encryption_w, 0xffffffff)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( pgm2 )

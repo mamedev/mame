@@ -10,6 +10,7 @@
 -----
 TODO:
 - What does channel ATBL mean?
+- SAC (Simple Access Codes) what it for and how used ?
  770:
 - verify if pan 100% correct
 - sequencer timers and triggers not implemented (seems used in Deathsmiles ending tune)
@@ -557,7 +558,7 @@ void ymz774_device::internal_reg_write(uint8_t reg, uint8_t data)
 			case 0x98: // Off trigger, bit4 = on/off, bits0-3 channel (end sequence when channel playback ends)
 				if (data) logerror("SEQ Off trigger unimplemented %02X %02X\n", reg, data);
 				break;
-			case 0xa0: // stop channel mask H and L (when sequence stoped)
+			case 0xa0: // stop channel mask H and L (when sequence stopped)
 			case 0xa8:
 				sq = (reg >> 1) & 7;
 				if (reg & 1)
@@ -565,10 +566,10 @@ void ymz774_device::internal_reg_write(uint8_t reg, uint8_t data)
 				else
 					m_sequences[sq].stopchan = (m_sequences[sq].stopchan & 0x00ff) | (data << 8);
 				break;
-			case 0xb0:
+			case 0xb0: // SQC number
 				m_sqcs[sq].sqc = data;
 				break;
-			case 0xb8:
+			case 0xb8: // SQC start / stop
 				if (data)
 				{
 					//logerror("SQC %d start (%s)\n", sq, m_sqcs[sq].is_playing ? "playing" : "stopped");
@@ -580,7 +581,7 @@ void ymz774_device::internal_reg_write(uint8_t reg, uint8_t data)
 				{
 					//logerror("SQC %d stop (%s)\n", sq, m_sqcs[sq].is_playing ? "playing" : "stopped");
 					m_sqcs[sq].is_playing = false;
-					// stop SEQ too, and stop chanels
+					// stop SEQ too, and stop channels
 					if (m_sequences[sq].is_playing)
 						for (int ch = 0; ch < 16; ch++)
 							if (m_sequences[sq].stopchan & (1 << ch))
@@ -588,7 +589,7 @@ void ymz774_device::internal_reg_write(uint8_t reg, uint8_t data)
 					m_sequences[sq].is_playing = false;
 				}
 				break;
-			case 0xc0:
+			case 0xc0: // SQC loop (255 = infinite)
 				m_sqcs[sq].loop = data;
 				break;
 			default:
@@ -628,6 +629,7 @@ void ymz774_device::sequencer()
 
 		if (sqc.is_playing && !sqc.is_waiting)
 		{
+			// SQC consists of 4 byte records: SEQ num H, SEQ num L, SEQ Loop count, End flag (0xff)
 			sequence.sequence = ((get_rom_byte(sqc.offset) << 8) | get_rom_byte(sqc.offset + 1)) & 0xfff;
 			sqc.offset += 2;
 			sequence.loop = get_rom_byte(sqc.offset++);
