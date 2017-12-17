@@ -5636,6 +5636,7 @@ ROM_START( pengpayu )
 	ROM_LOAD( "rtc", 0x000000, 0x00001f, CRC(6909acb0) SHA1(6a4589599cd1c477e916474e7b029e9a4e92019b) )
 ROM_END
 
+
 // OHG0417-03 / 586/7(b) / 10 Credit Multiplier / 9 Line Multiline
 // Penguin Pays / Export / B - 14/07/97
 // All devices are 27c4002 instead of 27c4096
@@ -5661,6 +5662,7 @@ ROM_START( pengpayua )
 	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
 ROM_END
 
+
 // OHG0417-02 / 586/7(b) / 10 Credit Multiplier / 9 Line Multiline
 // Penguin Pays / Export / B - 14/07/97
 // All devices are 27c4002 instead of 27c4096
@@ -5685,6 +5687,35 @@ ROM_START( pengpayub )
 	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
 	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
 ROM_END
+
+
+// AHG1544 / MV4122 / 3,5,10,20,25,50 Credit Multiplier / 9 Line Multiline
+// PENGUIN PAYS - CASH EXPRESS / Export / C - 19/01/01
+// Marked SPC.
+// All eproms are 27C4096.
+ROM_START( pengpayuc )
+	ARISTOCRAT_MK5_BIOS
+	/*
+	    Checksum code found at 0x000d18
+	    Checksum is stored at 0x000020-0x000027
+	        Expected Checksum   0x029d0237
+	        Calculated Checksum 0x029d0237  (OK)
+	*/
+	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
+	ROM_LOAD32_WORD( "ahg1544.u7",  0x000000, 0x80000, CRC(c899afcf) SHA1(85b3b9f94965c2bf10b5d5b265aef28bda01a3cb) )  // game
+	ROM_LOAD32_WORD( "ahg1544.u11", 0x000002, 0x80000, CRC(c44eb9bd) SHA1(6eca6459806aa7d0ab0d53e8e3e6f3c0c71f7220) )  // game
+	ROM_LOAD32_WORD( "ahg1544.u8",  0x100000, 0x80000, CRC(c9ebdf24) SHA1(cf29c42d4f15edfe5ba24be6282b3a6d01a29a13) )  // base
+	ROM_LOAD32_WORD( "ahg1544.u12", 0x100002, 0x80000, CRC(10c4cd0f) SHA1(db2df4d143d4ad3312d2c577e6ccbe36247f24c7) )  // base
+	ROM_LOAD32_WORD( "ahg1544.u9",  0x200000, 0x80000, CRC(4eeaf222) SHA1(bb918326bee71d5597b74c6c50cbcfa3ad1ef0c4) )  // base
+	ROM_LOAD32_WORD( "ahg1544.u13", 0x200002, 0x80000, CRC(5ebd90a7) SHA1(766291b62ed4a65ba6fb2d64e52022dd4831957d) )  // base
+	ROM_LOAD32_WORD( "ahg1544.u10", 0x300000, 0x80000, CRC(cbbbb21f) SHA1(c9c213ac720cb7a95179db592dcadbb466ffd572) )  // base
+	ROM_LOAD32_WORD( "ahg1544.u14", 0x300002, 0x80000, CRC(4ef4f063) SHA1(d6e9928f80f19d3fdd0e7acb0bfb6f9b2ae5724b) )  // base
+
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
+	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
+ROM_END
+
 
 // EHG1257 / MV4122/1 / 3,5,10,20,25,50 Credit Multiplier / 20 Line Multiline
 // PENGUIN PAYS / PENGUIN PUCKS / Export / C - 19/01/01
@@ -7623,6 +7654,7 @@ GAMEL( 1995, pengpayc,   pengpay,   aristmk5,           wcougar,      aristmk5_s
 GAMEL( 1997, pengpayu,   pengpay,   aristmk5_usa,       aristmk5_usa, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Penguin Pays (BHI0417-03, US)",                        MACHINE_FLAGS, layout_aristmk5_us )     // 586/7(b), B - 14/07/97
 GAMEL( 1997, pengpayua,  pengpay,   aristmk5_usa,       aristmk5_usa, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Penguin Pays (OHG0417-03, US)",                        MACHINE_FLAGS, layout_aristmk5_us )     // 586/7(b), B - 14/07/97
 GAMEL( 1997, pengpayub,  pengpay,   aristmk5_usa,       aristmk5_usa, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Penguin Pays (OHG0417-02, US)",                        MACHINE_FLAGS, layout_aristmk5_us )     // 586/7(b), B - 14/07/97
+GAMEL( 2001, pengpayuc,  pengpay,   aristmk5_usa,       aristmk5_usa, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Penguin Pays - Cash Express (AHG1544, US)",            MACHINE_FLAGS, layout_aristmk5_us )     // MV4122,  C - 19/01/01
 GAMEL( 2001, pengpuck,   pengpay,   aristmk5_usa,       pengpuck,     aristmk5_state, aristmk5, ROT0, "Aristocrat", "Penguin Pays - Penguin Pucks (EHG1257, US)",           MACHINE_FLAGS, layout_pengpuck )        // MV4122/1, C - 19/01/01
 GAMEL( 1998, petshop,    aristmk5,  aristmk5,           petshop,      aristmk5_state, aristmk5, ROT0, "Aristocrat", "Pet Shop (0100731V, NSW/ACT)",                         MACHINE_FLAGS, layout_petshop )         // 618/1, A - 17/04/98, Rev 13
 GAMEL( 1995, phantpay,   aristmk5,  aristmk5,           swhr2,        aristmk5_state, aristmk5, ROT0, "Aristocrat", "Phantom Pays (0500005V, NSW/ACT)",                     MACHINE_FLAGS, layout_swhr2 )           // 570/1, E - 12/09/95
