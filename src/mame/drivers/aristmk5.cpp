@@ -4953,6 +4953,32 @@ ROM_START( minemineu )
 ROM_END
 
 
+// NHG0416-99 / 559/2 / 10 Credit Multiplier / 9 Line Multiline
+// Mine, Mine, Mine / Export / E - 14/02/96
+// Not Required set chip version:
+// Variation (% and NO): 87,408% 99
+// Not required touch screen
+// All eproms are 27C4002.
+ROM_START( minemineua )
+	ARISTOCRAT_MK5_BIOS
+	/*
+	    Checksum code found at 0x000d10
+	    Checksum is stored at 0x000020-0x000027
+	        Expected Checksum   0xbb6ac5e6
+	        Calculated Checksum 0xbb6ac5e6  (OK)
+	*/
+	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
+	ROM_LOAD32_WORD( "nhg0416.u7",  0x000000, 0x80000, CRC(7258afb3) SHA1(238b883075a5e3cdd2c675190b269c55d08b7b13) )
+	ROM_LOAD32_WORD( "nhg0416.u11", 0x000002, 0x80000, CRC(c65978b0) SHA1(e16b6a57b21b4570687676f4c6b65c463ad6e559) )
+	ROM_LOAD32_WORD( "nhg0416.u8",  0x100000, 0x80000, CRC(50c4d4d8) SHA1(920e62933ffa29622d941b469dcd6c5dfc2ab438) )
+	ROM_LOAD32_WORD( "nhg0416.u12", 0x100002, 0x80000, CRC(fc3f18ff) SHA1(f2afc6bdd7a702e4ac4037749613ac4a40446511) )
+
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
+	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
+ROM_END
+
+
 // 0400469V / 607/1 / 25 Credit Multiplier/20 Line Multiline
 // Money Mouse / Local / B - 08/04/97
 ROM_START( monmouse )
@@ -7570,6 +7596,7 @@ GAMEL( 2000, marmagicua, marmagic,  aristmk5_usa,       bootsctnua,   aristmk5_s
 GAMEL( 1997, mgarden,    aristmk5,  aristmk5_usa,       aristmk5_usa, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Magic Garden (AHG1211-99, US)",                        MACHINE_FLAGS, layout_aristmk5_us )     // MV4033, B - 10/02/97 (alt title for enchanted forest?)
 GAMEL( 1996, minemine,   aristmk5,  aristmk5,           swhr2,        aristmk5_state, aristmk5, ROT0, "Aristocrat", "Mine, Mine, Mine (0400115V, NSW/ACT)",                 MACHINE_FLAGS, layout_swhr2 )           // 559/2, D - 16/01/96, Rev 1.18.3.0
 GAMEL( 1996, minemineu,  minemine,  aristmk5_usa,       aristmk5_usa, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Mine, Mine, Mine (VHG0416-99, US)",                    MACHINE_FLAGS, layout_aristmk5_us )     // 559/2, E - 14/02/96
+GAMEL( 1996, minemineua, minemine,  aristmk5_usa,       aristmk5_usa, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Mine, Mine, Mine (NHG0416-99, US)",                    MACHINE_FLAGS, layout_aristmk5_us )     // 559/2, E - 14/02/96
 GAMEL( 1997, monmouse,   aristmk5,  aristmk5,           cashcham,     aristmk5_state, aristmk5, ROT0, "Aristocrat", "Money Mouse (0400469V, NSW/ACT)",                      MACHINE_FLAGS, layout_cashcham )        // 607/1, B - 08/04/97, Rev 6
 GAMEL( 1997, monmousea,  monmouse,  aristmk5,           cashcham,     aristmk5_state, aristmk5, ROT0, "Aristocrat", "Money Mouse (0300469V, NSW/ACT)",                      MACHINE_FLAGS, layout_cashcham )        // 607/1, B - 08/04/97, Rev 6
 GAMEL( 2001, montree,    aristmk5,  aristmk5,           montree,      aristmk5_state, aristmk5, ROT0, "Aristocrat", "Money Tree (0201397V, New Zealand)",                   MACHINE_FLAGS, layout_montree )         // MV4126, C - 12/04/01, Rev 5
