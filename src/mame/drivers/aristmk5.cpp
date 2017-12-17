@@ -3021,7 +3021,7 @@ ROM_END
 // Not required set chip version:
 // All devices are 27c4002 instead of 27c4096.
 // Requires touch screen
-ROM_START( chickna5ub )
+ROM_START( chickna5ua )
 	ARISTOCRAT_MK5_BIOS
 	/*
 	    Checksum code found at 0x000d08
@@ -7525,7 +7525,7 @@ GAMEL( 1996, chickna5,    aristmk5, aristmk5,           chickna5,     aristmk5_s
 GAMEL( 1996, chickna5b,   chickna5, aristmk5,           chickna5,     aristmk5_state, aristmk5, ROT0, "Aristocrat", "Chicken (01J01886, NSW/ACT)",                          MACHINE_FLAGS, layout_snowcat )         // 596/1 B - 23/12/96
 GAMEL( 1998, chickna5qld, chickna5, aristmk5,           chickna5,     aristmk5_state, aristmk5, ROT0, "Aristocrat", "Chicken (0200530V, Queensland)",                       MACHINE_FLAGS, layout_snowcat )         // 596, C - 23/02/98, Rev 1.0
 GAMEL( 1998, chickna5u,   chickna5, aristmk5_usa,       chickna5u,    aristmk5_state, aristmk5, ROT0, "Aristocrat", "Chicken (RHG0730-03, US)",                             MACHINE_FLAGS, layout_aristmk5_us )     // 596, C - 23/02/98
-GAMEL( 1998, chickna5ub,  chickna5, aristmk5_usa,       chickna5u,    aristmk5_state, aristmk5, ROT0, "Aristocrat", "Chicken (RHG0730-99, US)",                             MACHINE_FLAGS, layout_aristmk5_us )     // 596, C - 23/02/98
+GAMEL( 1998, chickna5ua,  chickna5, aristmk5_usa,       chickna5u,    aristmk5_state, aristmk5, ROT0, "Aristocrat", "Chicken (RHG0730-99, US)",                             MACHINE_FLAGS, layout_aristmk5_us )     // 596, C - 23/02/98
 GAMEL( 1998, coralrc2,    aristmk5, aristmk5,           coralrc2,     aristmk5_state, aristmk5, ROT0, "Aristocrat", "Coral Riches II (0100919V, NSW/ACT)",                  MACHINE_FLAGS, layout_coralrc2 )        // 577/7, A - 29/12/98, Rev 12
 GAMEL( 1998, cuckoo,      aristmk5, aristmk5,           aristmk5,     aristmk5_state, aristmk5, ROT0, "Aristocrat", "Cuckoo (0200753V, NSW/ACT)",                           MACHINE_FLAGS, layout_aristmk5 )        // 615/1, D - 03/07/98, Rev 6
 GAMEL( 2000, cuckoou,     cuckoo,   aristmk5_usa,       aristmk5_usa, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Cuckoo (CHG1195, US)",                                 MACHINE_FLAGS, layout_cuckoou )         // MV4104, C - 02/02/00
