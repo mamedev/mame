@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <softwarelist name="ibm5170_cdrom" description="IBM PC/AT CD-ROM images">
-	
+
 	<!--                                         -->
 	<!--                  Games                  -->
 	<!--                                         -->
@@ -45,7 +45,7 @@
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<!-- Windows 95, Direct X 3.0 (in cdrom under Instdx.exe) -->
 	<software name="arabkid">
 		<description>Arabian Kid</description>
@@ -58,7 +58,32 @@
 			</diskarea>
 		</part>
 	</software>
-	
+
+	<!-- Untouched image from original CD created with an ASUS DRW-1814BLT (EAC drive sample read offset reported as +6)
+	   If you subtract 0x18 (4 * 6) bytes from a .wav extracted from this CHD the audio matches a rip done with EAC (verified) -->
+	<software name="krondor">
+		<description>Betrayal at Krondor (1994 release, CDDA)</description>
+		<year>1994</year>
+		<publisher>Dynamix</publisher>
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="betrayal_at_krondor" sha1="f0d0907edccfc4f6ab4f181b0d2e9a3b18f81e73" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="krondora" cloneof="krondor">
+		<description>Betrayal at Krondor (1998 release, no CDDA)</description>
+		<year>1998</year>
+		<publisher>Dynamix</publisher>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="betrayal_at_krondor_1998" sha1="d58acdb5bc10c2ad9a4b6dd51438102785c44216" />
+			</diskarea>
+		</part>
+	</software>
+
 	<!-- Pentium class 200 MHz / Direct X 7.0 / Windows 95 -->
 	<!-- TODO: invalid opcode exception after install -->
 	<software name="boorball" supported="no">
@@ -99,7 +124,7 @@
 				<disk name="bpanic" sha1="141b67f93b4d96be7c064d3603a5b961ed56f23b" />
 			</diskarea>
 		</part>
-	</software> 
+	</software>
 
 	<!-- Windows 95 -->
 	<!-- 256 colors minimum -->
@@ -115,21 +140,7 @@
 			</diskarea>
 		</part>
 	</software>
-	
-	<!-- Untouched image from original CD created with an ASUS DRW-1814BLT (EAC drive sample read offset reported as +6)
-	   If you subtract 0x18 (4 * 6) bytes from a .wav extracted from this CHD the audio matches a rip done with EAC (verified) -->
-	<software name="krondor">
-		<description>Betrayal at Krondor (1994 release, CDDA)</description>
-		<year>1994</year>
-		<publisher>Dynamix</publisher>
 
-		<part name="cdrom" interface="cdrom">
-			<diskarea name="cdrom">
-				<disk name="betrayal_at_krondor" sha1="f0d0907edccfc4f6ab4f181b0d2e9a3b18f81e73" />
-			</diskarea>
-		</part>
-	</software> 
-  
 	<software name="ironbld">
 		<description>Iron Blood</description>
 		<year>1996</year>
@@ -137,17 +148,6 @@
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="ironbld" sha1="45f44fa1a8feb98daba2b7befb6a8360ad39b352" />
-			</diskarea>
-		</part>
-	</software>
-
-	<software name="krondora" cloneof="krondor">
-		<description>Betrayal at Krondor (1998 release, no CDDA)</description>
-		<year>1998</year>
-		<publisher>Dynamix</publisher>
-		<part name="cdrom" interface="cdrom">
-			<diskarea name="cdrom">
-				<disk name="betrayal_at_krondor_1998" sha1="d58acdb5bc10c2ad9a4b6dd51438102785c44216" />
 			</diskarea>
 		</part>
 	</software>
@@ -205,7 +205,7 @@
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<!-- Windows 3.1 / Mac LCIII -->
 	<software name="orgaslave">
 		<description>Orgaslave</description>
@@ -235,7 +235,7 @@
 			</diskarea>			
 		</part>
 	</software>
-	
+
 	<!-- Can't install to hard disk, can't save game, default text speed is very slow on 486 -->
 	<!-- (set option 5 from 100 to 0 to make text and voices to sync) -->
 	<software name="pompei" supported="partial">
@@ -249,7 +249,7 @@
 			</diskarea>
 		</part>
 	</software>
-  
+ 
 	<software name="prototyp">
 		<description>Prototype</description>
 		<year>1995</year>
@@ -278,7 +278,7 @@
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<!-- Windows 95 / Mac OS Japan AppleTalk 7.5 -->
 	<!-- Requires 16-bit True Color and 800x600 screen resolution -->
 	<software name="segata" supported="partial">
@@ -292,7 +292,7 @@
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="sideline">
 		<description>Sideline</description>
 		<year>1996</year>
@@ -305,7 +305,7 @@
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<!-- Windows 3.1 -->
 	<!-- TODO: gfx shift issue on 256 color mode -->
 	<software name="spaceinv" supported="partial">
@@ -316,6 +316,17 @@
 			<feature name="disk_label" value="Sideline" />
 			<diskarea name="cdrom">
 				<disk name="si_4" sha1="0827a8a8f6602fd0947396b9ef96e449eb7a4d5c" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="turricn2">
+		<description>Turrican II - The Final Fight</description>
+		<year>1996</year>
+		<publisher>Factor 5</publisher>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="turricn2" sha1="7efd6bd06b9c05ea1be1d2f2f7538954e044b5c9" />
 			</diskarea>
 		</part>
 	</software>
@@ -332,7 +343,7 @@
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="v16rise">
 		<description>Viper -V16- RISE (International)</description>
 		<year>2001</year>
@@ -343,11 +354,22 @@
 			</diskarea>
 		</part>
 	</software>
-	
+
+	<software name="zyclunt" supported="no">
+		<description>Zyclunt</description>
+		<year>1995</year>
+		<publisher>Phantagram</publisher>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="zyclunt" sha1="cc6e69cdd5bdda70361778c3515571114a97b662" />
+			</diskarea>
+		</part>
+	</software>
+
 	<!--                                         -->
 	<!-- Drivers / Utilities / Operating Systems -->
 	<!--                                         -->
-	
+
 	<software name="acercpr" supported="no">
 		<!-- Floppy dumped via Kryoflux, three tracks show as modified -->
 		<description>Acer CPR</description>
@@ -369,13 +391,26 @@
 		</part>
 	</software>
 
-	<software name="turricn2">
-		<description>Turrican II - The Final Fight</description>
-		<year>1996</year>
-		<publisher>Factor 5</publisher>
+	<software name="nasfdu12">
+		<description>NASLite NAS Server Operating System (v1.x)</description>
+		<year>2004</year>
+		<publisher>Server Elements</publisher>
+
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
-				<disk name="turricn2" sha1="7efd6bd06b9c05ea1be1d2f2f7538954e044b5c9" />
+				<disk name="naslite-fdu-v1.2" sha1="cb996013c327fd6d5c323fd03f8e9c8061cb4820" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="pcdos2k">
+		<description>PC DOS 2000</description>
+		<year>1998</year>
+		<publisher>IBM</publisher>
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="pcdos2k" sha1="ae69e305e82f24d908296ba9f45a1321a1c9dd58" />
 			</diskarea>
 		</part>
 	</software>
@@ -409,30 +444,6 @@
 		</part>
 	</software>
 
-	<software name="pcdos2k">
-		<description>PC DOS 2000</description>
-		<year>1998</year>
-		<publisher>IBM</publisher>
-
-		<part name="cdrom" interface="cdrom">
-			<diskarea name="cdrom">
-				<disk name="pcdos2k" sha1="ae69e305e82f24d908296ba9f45a1321a1c9dd58" />
-			</diskarea>
-		</part>
-	</software>
-
-	<software name="win31sdk">
-		<description>Windows Software Development Kit Version 3.1</description>
-		<year>1992</year>
-		<publisher>Microsoft</publisher>
-
-		<part name="cdrom" interface="cdrom">
-			<diskarea name="cdrom">
-				<disk name="050-151-320" sha1="4840cb3624e4032456434e099cd0362bc278e680" />
-			</diskarea>
-		</part>
-	</software>
-
 	<software name="win31ddk">
 		<description>Windows Device Development Kit Version 3.1</description>
 		<year>1992</year>
@@ -441,18 +452,6 @@
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="win31ddk" sha1="0208c3299cb206ea8b9b7d99e75131661898bae2" />
-			</diskarea>
-		</part>
-	</software>
-
-	<software name="win31rk">
-		<description>Windows Resource Kit for Operating System Version 3.1</description>
-		<year>1992</year>
-		<publisher>Microsoft</publisher>
-
-		<part name="cdrom" interface="cdrom">
-			<diskarea name="cdrom">
-				<disk name="win31rk" sha1="0813d90cf00e296676ecd0259cd425ab50670e8a" />
 			</diskarea>
 		</part>
 	</software>
@@ -469,14 +468,26 @@
 		</part>
 	</software>
 
-	<software name="nasfdu12">
-		<description>NASLite NAS Server Operating System (v1.x)</description>
-		<year>2004</year>
-		<publisher>Server Elements</publisher>
+	<software name="win31rk">
+		<description>Windows Resource Kit for Operating System Version 3.1</description>
+		<year>1992</year>
+		<publisher>Microsoft</publisher>
 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
-				<disk name="naslite-fdu-v1.2" sha1="cb996013c327fd6d5c323fd03f8e9c8061cb4820" />
+				<disk name="win31rk" sha1="0813d90cf00e296676ecd0259cd425ab50670e8a" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="win31sdk">
+		<description>Windows Software Development Kit Version 3.1</description>
+		<year>1992</year>
+		<publisher>Microsoft</publisher>
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="050-151-320" sha1="4840cb3624e4032456434e099cd0362bc278e680" />
 			</diskarea>
 		</part>
 	</software>
@@ -576,17 +587,6 @@
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="en_win2000_pro_sp4" sha1="9344cce041f092f0194944bdc690af7df7185cf6" />
-			</diskarea>
-		</part>
-	</software>
-
-	<software name="zyclunt" supported="no">
-		<description>Zyclunt</description>
-		<year>1995</year>
-		<publisher>Phantagram</publisher>
-		<part name="cdrom" interface="cdrom">
-			<diskarea name="cdrom">
-				<disk name="zyclunt" sha1="cc6e69cdd5bdda70361778c3515571114a97b662" />
 			</diskarea>
 		</part>
 	</software>
