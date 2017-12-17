@@ -566,7 +566,7 @@
 		</part>
 	</software>
 
-	<software name="zyclunt">
+	<software name="zyclunt" supported="no">
 		<description>Zyclunt</description>
 		<year>1995</year>
 		<publisher>Phantagram</publisher>
