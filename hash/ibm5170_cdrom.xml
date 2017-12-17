@@ -256,12 +256,12 @@
 		<publisher>Acclaim</publisher>
 		<part name="cdrom1" interface="cdrom">
 			<diskarea name="cdrom">
-				<disk name="rise 2 resurrection - director's cut (disc 1).chd" sha1="cd62b2bde9355b2625d8bdeaece3ec2ccfff5310" />
+				<disk name="rise 2 resurrection - director's cut (disc 1)" sha1="cd62b2bde9355b2625d8bdeaece3ec2ccfff5310" />
 			</diskarea>
 		</part>
 		<part name="cdrom2" interface="cdrom">
 			<diskarea name="cdrom">
-				<disk name="rise 2 resurrection - director's cut (disc 2).chd" sha1="e6c6c4876d18fbb5916ed13885f1ea614aad05eb" />
+				<disk name="rise 2 resurrection - director's cut (disc 2)" sha1="e6c6c4876d18fbb5916ed13885f1ea614aad05eb" />
 			</diskarea>
 		</part>
 	</software>
