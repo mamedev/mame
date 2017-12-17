@@ -3473,9 +3473,8 @@ Ram M1 are NEC D43001GU-70LL
 Ram M2 are LGS GM76C8128ALLFW70
 
 Notes about sets:
-penbros: Original version for Japan with non descript ROM labels. There is a Japan region
-         warning & the title screen as well as all game text are in Japanese. However the
-         Subsino logo is the wrong color
+penbros: Original Japanese version with Japan region warning, title screen and all game text
+         in Japanese. However the Subsino logo is the wrong color
  ablast: Title screen is in traditional Chinese. ROM labels imply Taiwan with "TWN" printed
          on them. The region warning states Japan only & all game text is in Japanese. Lastly
          the Subsino logo has correct color. The bootleg is a copy of A-Blast.
@@ -3483,18 +3482,18 @@ penbros: Original version for Japan with non descript ROM labels. There is a Jap
 
 ROM_START( penbros ) // Genuine P0-142A PCB
 	ROM_REGION( 0x100000, "maincpu", 0 )    // TMP68301 Code
-	ROM_LOAD16_BYTE( "u06.bin", 0x000000, 0x080000, CRC(7bbdffac) SHA1(d5766cb171b8d2e4c04a6bae37181fa5ada9d797) )
-	ROM_LOAD16_BYTE( "u07.bin", 0x000001, 0x080000, CRC(d50cda5f) SHA1(fc66f55f2070b447c5db85c948ce40adc37512f7) )
+	ROM_LOAD16_BYTE( "a-blast_jpn_u06.u06", 0x000000, 0x080000, CRC(7bbdffac) SHA1(d5766cb171b8d2e4c04a6bae37181fa5ada9d797) )
+	ROM_LOAD16_BYTE( "a-blast_jpn_u07.u07", 0x000001, 0x080000, CRC(d50cda5f) SHA1(fc66f55f2070b447c5db85c948ce40adc37512f7) )
 
 	ROM_REGION( 0x1000000, "sprites", 0 )   // Sprites
-	ROM_LOAD( "u38.bin", 0x000000, 0x400000, CRC(4247b39e) SHA1(f273931293beced312e02c870bf35e9cf0c91a8b) )
-	ROM_LOAD( "u39.bin", 0x400000, 0x400000, CRC(f9f07faf) SHA1(66fc4a9ad422fb384d2c775e43619137226898fc) )
-	ROM_LOAD( "u40.bin", 0x800000, 0x400000, CRC(dc9e0a96) SHA1(c2c8ccf9039ee0e179b08fdd2d37f29899349cda) )
-	ROM_FILL(            0xc00000, 0x400000, 0x00 )    // 6bpp instead of 8bpp
+	ROM_LOAD( "a-blast_jpn_u38.u38", 0x000000, 0x400000, CRC(4247b39e) SHA1(f273931293beced312e02c870bf35e9cf0c91a8b) )
+	ROM_LOAD( "a-blast_jpn_u39.u39", 0x400000, 0x400000, CRC(f9f07faf) SHA1(66fc4a9ad422fb384d2c775e43619137226898fc) )
+	ROM_LOAD( "a-blast_jpn_u40.u40", 0x800000, 0x400000, CRC(dc9e0a96) SHA1(c2c8ccf9039ee0e179b08fdd2d37f29899349cda) )
+	ROM_FILL(                        0xc00000, 0x400000, 0x00 )    // 6bpp instead of 8bpp
 
 	ROM_REGION( 0x300000, "x1snd", 0 )  // Samples
 	// Leave 1MB empty (addressable by the chip)
-	ROM_LOAD( "u18.bin", 0x100000, 0x200000, CRC(de4e65e2) SHA1(82d4e590c714b3e9bf0ffaf1500deb24fd315595) )
+	ROM_LOAD( "a-blast_jpn_u18.u18", 0x100000, 0x200000, CRC(de4e65e2) SHA1(82d4e590c714b3e9bf0ffaf1500deb24fd315595) )
 ROM_END
 
 ROM_START( ablast ) // Genuine P0-142A PCB & original ROM labels
