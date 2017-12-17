@@ -38,7 +38,7 @@ P-FG-03                 ????    Endless Riches                          E.N.Tige
 P0-140B                 2000    Funcube                                 Namco
 P0-140B                 2000    Namco Stars                             Namco
 P0-142A                 1999    Puzzle De Bowling                       MOSS / Nihon System
-P0-142A + extra parts   2000    Penguin Brothers                        Subsino
+P0-142A + extra parts   2000    Penguin Brothers / A-Blast              Subsino
 B0-003A (or B0-003B)    2000    Deer Hunting USA                        Sammy
 B0-003A (or B0-003B)    2001    Turkey Hunting USA                      Sammy
 B0-006B                 2001-2  Funcube 2 - 5                           Namco
@@ -80,7 +80,7 @@ grdians:
   ignore the individual color codes in the tiles data. Note: the frontmost frame
   has the shadow bit set, and has become invisible after implementing it.
 
-penbros:
+penbros/ablast:
 - Zooming is used briefly.
 
 deerhunt,wschamp:
@@ -3480,7 +3480,7 @@ penbros: Original Japanese version with Japan region warning, title screen and a
          the Subsino logo has correct color. The bootleg is a copy of A-Blast.
 ***************************************************************************/
 
-ROM_START( penbros ) // Genuine P0-142A PCB
+ROM_START( penbros ) // Genuine P0-142A PCB & original ROM labels
 	ROM_REGION( 0x100000, "maincpu", 0 )    // TMP68301 Code
 	ROM_LOAD16_BYTE( "a-blast_jpn_u06.u06", 0x000000, 0x080000, CRC(7bbdffac) SHA1(d5766cb171b8d2e4c04a6bae37181fa5ada9d797) )
 	ROM_LOAD16_BYTE( "a-blast_jpn_u07.u07", 0x000001, 0x080000, CRC(d50cda5f) SHA1(fc66f55f2070b447c5db85c948ce40adc37512f7) )
