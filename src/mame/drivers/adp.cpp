@@ -2,7 +2,7 @@
 // copyright-holders:Tomasz Slanina
 /*
 
-ADP (Merkur?) games from '90 running on similar hardware.
+adp Gauselmann (Merkur) games from '90 running on similar hardware.
 (68k + HD63484 + YM2149)
 
 Skeleton driver by TS -  analog at op.pl
@@ -84,14 +84,15 @@ Connectors:
 
 Sound  and I/O board:
 ---------------------
+"Steuereinheit 68000"
  _________________________________________________________________________________
  |                        TS271CN    74HC02                        ****  ****    |
- |*                      ________________                          P1    P2     *|
- |*         74HC574      | YM2149F      |                                       *|
- |*                  ||| |______________|   74HC393  74HC4015 |||               *|
- |P3        74HC245  |||                                      |||              P6|
- |*                  ||| ________________          X          ||| TL7705ACP     *|
- |*                  ||| |SCN68681C1N40 |                     |||               *|
+ |*         74HC573      ________________                          P1    P2     *|
+ |*                      | YM2149F      |                                       *|
+ |*         74HC574  ||| |______________|   74HC393  74HC4015 ||| MX7224KN      *|
+ |P3                 |||                                      |||              P6|
+ |*         74HC245  ||| ________________   3.6864M  74HC125  ||| TL7705ACP     *|
+ |*   L4974A         ||| |SCN68681C1N40 |                     |||               *|
  |*                  ||| |______________|   74HC32   74AC138  |||               *|
  |P7                 |||                                      |||              P8|
  |*                        TC428CPA                                             *|
@@ -105,33 +106,34 @@ Parts:
  YM2149F         - Yamaha PSG
  SCN68681C1N40   - Dual Asynchronous Receiver/transmitter (DUART);
  TS271CN         - Programmable Low Power CMOS Single Op-amp
+ MX7224KN        - Maxim CMOS 8-bit DAC with Output Amplifier
  TL7705ACP       - Supply Voltage Supervisor
  TC428CPA        - Dual CMOS High-speed Driver
- OO              - LEDs (red)
- X               - 3.6864MHz xtal
+ L4974A          - ST 3.5A Switching Regulator
+ OO              - LEDs (red); "Fehelerdiagnose siehe Fehlertable"
 
 Connectors:
 
  Two connectors to link with Video Board
- P1  - Tueroeffn
- P2  - PSG In/Out
- P3  - Lautsprecher
- P6  - Service - Tast.
- P7  - Maschine (barely readable)
- P8  - Muenzeinheit
- P9  - Atzepter
- P10 - Reset Fadenfoul
- P11 - Netzteil
- P12 - Serienplan
- P13 - Serienplan 2
- P14 - Muenzeinheit 2
- P15 - I2C Bus
- P16 - Kodierg.
- P17 - TTL Ein-Aueg.
- P18 - Out
- P19 - In
- P20 - Serielle-S.
- P21 - Tuerschalter
+ P1  - Türöffnungen [1-6]
+ P2  - PSG In/Out [1-6]
+ P3  - Lautsprecher [1-6]
+ P6  - Service - Test gerät [1-6]
+ P7  - Maschine [1-8]
+ P8  - Münzeinheit [1-8]
+ P9  - Akzeptor [1-4]
+ P10 - Fadenfoul [1-4]
+ P11 - Netzteil [1-5]
+ P12 - Serienplan [1-8]
+ P13 - Serienplan 2 [1-8]
+ P14 - Münzeinheit 2 [1-8]
+ P15 - I2C-Bus [1-4]
+ P16 - Kodierg. [1-4]
+ P17 - TTL-Ein-/Ausgänge (PSG-Port) [1-10]
+ P18 - RS485 Aus [1-2]
+ P19 - RS485 Ein [1-2]
+ P20 - Serielle-S. [1-5]
+ P21 - Türschalter [1-4]
 
 There's also (external) JAMMA adapter - 4th board filled with resistors and diodes.
 
