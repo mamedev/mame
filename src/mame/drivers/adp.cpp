@@ -17,7 +17,6 @@ Supported games :
 - Skat TV           ("COPYRIGHT BY ADP LUEBBECKE GERMANY 1994")
 - Skat TV v. TS3  ("COPYRIGHT BY ADP LUEBBECKE GERMANY 1995")
 - Fashion Gambler ("COPYRIGHT BY ADP LUEBBECKE GERMANY 1997")
-- Backgammon        ("COPYRIGHT BY ADP LUEBBECKE GERMANY 1994")
 - Funny Land de Luxe ("Copyright 1992-99 by Stella International Germany")
 - Fun Station Spielekoffer 9 Spiele ("COPYRIGHT BY ADP LUEBBECKE GERMANY 2000")
 
@@ -158,7 +157,6 @@ Quick Jack administration/service mode:
 
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
-#include "machine/68230pit.h"
 #include "machine/mc68681.h"
 #include "machine/microtch.h"
 #include "machine/msm6242.h"
@@ -321,16 +319,6 @@ static ADDRESS_MAP_START( quickjac_mem, AS_PROGRAM, 16, adp_state )
 	AM_RANGE(0x800140, 0x800143) AM_DEVREADWRITE8("aysnd", ay8910_device, data_r, address_data_w, 0x00ff) //18b too
 	AM_RANGE(0x800180, 0x80019f) AM_DEVREADWRITE8("duart", mc68681_device, read, write, 0x00ff)
 	AM_RANGE(0xff0000, 0xffffff) AM_RAM AM_SHARE("nvram")
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( backgamn_mem, AS_PROGRAM, 16, adp_state )
-	AM_RANGE(0x000000, 0x01ffff) AM_ROM
-	AM_RANGE(0x100000, 0x10003f) AM_DEVREADWRITE8("pit", pit68230_device, read, write, 0x00ff)
-	AM_RANGE(0x200000, 0x20001f) AM_DEVREADWRITE8("duart", mc68681_device, read, write, 0x00ff)
-	AM_RANGE(0x300000, 0x300003) AM_NOP // ?
-	AM_RANGE(0x400000, 0x40001f) AM_DEVREADWRITE8("rtc", msm6242_device, read, write, 0x00ff)
-	AM_RANGE(0x500000, 0x503fff) AM_RAM AM_SHARE("nvram") //work RAM
-	AM_RANGE(0x600006, 0x600007) AM_NOP //(r) is discarded (watchdog?)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( funland_mem, AS_PROGRAM, 16, adp_state )
@@ -591,17 +579,6 @@ static MACHINE_CONFIG_DERIVED( skattva, quickjac )
 	MCFG_NVRAM_REPLACE_CUSTOM_DRIVER("nvram", adp_state, skattva_nvram_init)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( backgamn, skattv )
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(backgamn_mem)
-
-	MCFG_DEVICE_ADD("pit", PIT68230, 800000)
-
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_SIZE(640, 480)
-	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
-MACHINE_CONFIG_END
-
 static MACHINE_CONFIG_DERIVED( fashiong, skattv )
 	MCFG_DEVICE_MODIFY("acrtc")
 	MCFG_HD63484_ADDRESS_MAP(fashiong_hd63484_map)
@@ -666,16 +643,6 @@ ROM_START( skattva )
 	ROM_LOAD16_BYTE( "skat_tv_videoprom_t2.2.u5.bin", 0x00001, 0x20000, CRC(af3e60f9) SHA1(c88976ea42cf29a092fdee18377b32ffe91e9f33) )
 ROM_END
 
-ROM_START( backgamn )
-	ROM_REGION( 0x100000, "maincpu", 0 )
-	ROM_LOAD16_BYTE( "b_f2_i.bin", 0x00000, 0x10000, CRC(9e42937c) SHA1(85d462a560b85b03ee9d341e18815b7c396118ac) )
-	ROM_LOAD16_BYTE( "b_f2_ii.bin", 0x00001, 0x10000, CRC(8e0ee50c) SHA1(2a05c337db1131b873646aa4109593636ebaa356) )
-
-	ROM_REGION16_BE( 0x40000, "gfx1", 0 )
-	ROM_LOAD16_BYTE( "b_f1_i.bin", 0x00000, 0x20000, NO_DUMP )
-	ROM_LOAD16_BYTE( "b_f1_ii.bin", 0x00001, 0x20000, NO_DUMP )
-ROM_END
-
 ROM_START( fashiong )
 	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "fashion_gambler_s6_i.bin", 0x00000, 0x80000, CRC(827a164d) SHA1(dc16380226cabdefbfd893cb50cbfca9e134be40) )
@@ -727,7 +694,6 @@ ROM_START( fstation )
 ROM_END
 
 
-GAME( 1990, backgamn,  0,        backgamn,    skattv,   adp_state, 0, ROT0,  "ADP",     "Backgammon",                        MACHINE_NOT_WORKING )
 GAME( 1993, quickjac,  0,        quickjac,    quickjac, adp_state, 0, ROT0,  "ADP",     "Quick Jack",                        MACHINE_NOT_WORKING )
 GAME( 1994, skattv,    0,        skattv,      skattv,   adp_state, 0, ROT0,  "ADP",     "Skat TV",                           MACHINE_NOT_WORKING )
 GAME( 1995, skattva,   skattv,   skattva,     skattva,  adp_state, 0, ROT0,  "ADP",     "Skat TV (version TS3)",             MACHINE_NOT_WORKING )

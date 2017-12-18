@@ -887,7 +887,6 @@ viruscl                         // (c) 2004 Access Gmbh
 adam                            // Coleco Adam
 
 @source:adp.cpp
-backgamn                        // (c) 1990
 fashiong                        // (c) 1997
 fashiong2                       // (c) 1997
 fstation                        // (c) 2000
@@ -2660,6 +2659,9 @@ babbage                         //
 @source:backfire.cpp
 backfire                        // MBZ (c) 1995
 backfirea                       // MBZ (c) 1995
+
+@source:backgamn.cpp
+backgamn                        // (c) 1990
 
 @source:badlands.cpp
 badlands                        // 136074           (c) 1989
