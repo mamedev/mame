@@ -11,6 +11,7 @@ Skeleton driver for HP-2620 series display terminals.
 #include "machine/mos6551.h"
 #include "machine/nvram.h"
 //#include "video/dp8350.h"
+#include "screen.h"
 
 class hp2620_state : public driver_device
 {
@@ -24,6 +25,7 @@ public:
 
 	DECLARE_READ8_MEMBER(nvram_r);
 	DECLARE_WRITE8_MEMBER(nvram_w);
+	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -31,6 +33,11 @@ private:
 	required_shared_ptr<u8> m_nvram;
 };
 
+
+u32 hp2620_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+{
+	return 0;
+}
 
 READ8_MEMBER(hp2620_state::nvram_r)
 {
@@ -49,6 +56,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( io_map, AS_PROGRAM, 8, hp2620_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x7f) AM_READWRITE(nvram_r, nvram_w) AM_SHARE("nvram")
+	AM_RANGE(0x80, 0x80) AM_READNOP
 	AM_RANGE(0xa8, 0xab) AM_DEVWRITE("acia", mos6551_device, write)
 	AM_RANGE(0xac, 0xaf) AM_DEVREAD("acia", mos6551_device, read)
 ADDRESS_MAP_END
@@ -62,6 +70,10 @@ static MACHINE_CONFIG_START( hp2622 )
 	MCFG_CPU_IO_MAP(io_map)
 
 	MCFG_NVRAM_ADD_0FILL("nvram") // 5101 (A7 tied to GND) + battery (+ wait states)
+
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_RAW_PARAMS(XTAL_25_7715MHz, 1035, 0, 720, 415, 0, 390) // 498 total lines in 50 Hz mode
+	MCFG_SCREEN_UPDATE_DRIVER(hp2620_state, screen_update)
 
 	//MCFG_DEVICE_ADD("crtc", DP8367, XTAL_25_7715MHz)
 
