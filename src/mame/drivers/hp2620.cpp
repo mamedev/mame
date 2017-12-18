@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:
+// copyright-holders:AJR
 /***********************************************************************************************************************************
 
 Skeleton driver for HP-2620 series display terminals.
@@ -25,6 +25,11 @@ public:
 
 	DECLARE_READ8_MEMBER(nvram_r);
 	DECLARE_WRITE8_MEMBER(nvram_w);
+	DECLARE_READ8_MEMBER(keystat_r);
+	DECLARE_WRITE8_MEMBER(keydisp_w);
+	DECLARE_READ8_MEMBER(sysstat_r);
+	DECLARE_WRITE8_MEMBER(modem_w);
+
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 private:
@@ -49,16 +54,38 @@ WRITE8_MEMBER(hp2620_state::nvram_w)
 	m_nvram[offset] = data & 0x0f;
 }
 
+READ8_MEMBER(hp2620_state::keystat_r)
+{
+	return 0xff;
+}
+
+WRITE8_MEMBER(hp2620_state::keydisp_w)
+{
+}
+
+READ8_MEMBER(hp2620_state::sysstat_r)
+{
+	return 0xff;
+}
+
+WRITE8_MEMBER(hp2620_state::modem_w)
+{
+}
+
 static ADDRESS_MAP_START( mem_map, AS_PROGRAM, 8, hp2620_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM AM_REGION("maincpu", 0)
+	AM_RANGE(0xc000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( io_map, AS_PROGRAM, 8, hp2620_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x7f) AM_READWRITE(nvram_r, nvram_w) AM_SHARE("nvram")
-	AM_RANGE(0x80, 0x80) AM_READNOP
-	AM_RANGE(0xa8, 0xab) AM_DEVWRITE("acia", mos6551_device, write)
-	AM_RANGE(0xac, 0xaf) AM_DEVREAD("acia", mos6551_device, read)
+	AM_RANGE(0x80, 0x80) AM_READ(keystat_r)
+	AM_RANGE(0x90, 0x90) AM_READ(sysstat_r)
+	AM_RANGE(0xa0, 0xa3) AM_DEVWRITE("acia", mos6551_device, write)
+	AM_RANGE(0xa4, 0xa7) AM_DEVREAD("acia", mos6551_device, read)
+	AM_RANGE(0xa8, 0xa8) AM_WRITE(modem_w)
+	AM_RANGE(0xb8, 0xb8) AM_WRITE(keydisp_w)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( hp2622 )
