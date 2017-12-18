@@ -1283,6 +1283,7 @@ system_time::system_time(time_t t)
 
 void system_time::set(time_t t)
 {
+	// FIXME: this crashes if localtime or gmtime returns nullptr
 	time = t;
 	local_time.set(*localtime(&t));
 	utc_time.set(*gmtime(&t));
