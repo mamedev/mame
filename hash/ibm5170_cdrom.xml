@@ -179,8 +179,21 @@
 				<disk name="kings_quest_6_enhanced" sha1="0d237ee8c2d15be3b47f3676eddce41a00bca094" />
 			</diskarea>
 		</part>
-	</software>	
+	</software>
 
+	<!-- DOS 5.0 / Windows 3.1 -->
+	<!-- Pentium class 166 MHz + 32 MB RAM -->
+	<software name="kingsq8i" supported="no">
+		<description>King's Quest - La Maschera dell'Eternità</description>
+		<year>1998</year>
+		<publisher>Sierra</publisher>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="mask" sha1="07c511088e8b7e5773b3126a72b4781af5c3c5df" />
+			</diskarea>
+		</part>
+	</software>
+	
 	<!-- Windows 3.1/95 -->
 	<!-- Simulmondo is credited when you finish the game -->
 	<software name="noiangi">
@@ -259,6 +272,19 @@
 			<feature name="disk_label" value="Prototype" />
 			<diskarea name="cdrom">
 				<disk name="prototyp" sha1="0cdfabab37e5e9b219b3c8a381c937ae52749bb1" />
+			</diskarea>
+		</part>
+	</software>
+	
+	<!-- DOS 5.0 / Windows 95 -->
+	<!-- TODO: return errno 1 under DOS and MSCDEX -->
+	<software name="rayman" supported="partial">
+		<description>Rayman (US v1.21)</description>
+		<year>1995</year>
+		<publisher>Ubi Soft</publisher>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="rayman" sha1="7e2eeda69210a4d862f3f3b29c8b984d4aa443fd" />
 			</diskarea>
 		</part>
 	</software>
@@ -391,6 +417,31 @@
 		</part>
 	</software>
 
+	<software name="lexz22z32">
+		<description>Z22 / Z32 Color Jetprinter</description>
+		<year>2000</year>
+		<publisher>Lexmark</publisher>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Lexmark Z22 Z32" sha1="e8e39d2a15ffb1c7d675b98d06fb7c8bad5892e5" />
+			</diskarea>
+		</part>
+	</software>
+	
+	<!-- Win 3.1 / 95 -->
+	<!-- Mac OS with System 7.0 -->
+	<!-- includes unknown type scanner driver-->
+	<software name="muscan">
+		<description>Power of Scanning</description>
+		<year>1997</year>
+		<publisher>Mustek</publisher>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="mustek_scanner" sha1="5f708270ed5885c07a49fadc79ab3ffed420af52" />
+			</diskarea>
+		</part>
+	</software>
+	
 	<software name="nasfdu12">
 		<description>NASLite NAS Server Operating System (v1.x)</description>
 		<year>2004</year>
