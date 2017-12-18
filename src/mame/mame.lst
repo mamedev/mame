@@ -15020,6 +15020,9 @@ hp49gp                          // HP 49G+
 @source:hp64k.cpp
 hp64k                           //
 
+@source:hp64k.cpp
+hp700_92                        //
+
 @source:hp9845.cpp
 hp9835a                         //
 hp9835b                         //
@@ -36415,7 +36418,6 @@ t4490                           // Terco 4490 Mill CNC Control (c) 1986
 
 @source:terminals.cpp
 aaa
-hp700_92
 qvt70
 qvt102
 qvt103

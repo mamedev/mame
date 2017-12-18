@@ -2153,6 +2153,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/hp80.cpp",
 	MAME_DIR .. "src/mame/drivers/hp2100.cpp",
 	MAME_DIR .. "src/mame/drivers/hp2620.cpp",
+	MAME_DIR .. "src/mame/drivers/hp700.cpp",
 }
 
 createMESSProjects(_target, _subtarget, "hec2hrp")

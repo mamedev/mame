@@ -60,23 +60,6 @@ COMP( 1981, aaa, 0, 0, terminals, terminals, terminals_state, 0, "Ann Arbor", "A
 
 /**************************************************************************************************************
 
-Hewlett-Packard HP-700/92.
-Chips: TC5564APL-15, proprietory square chip, D70108C (V20), SCN2681, Beeper
-Crystals: 29.4912
-
-***************************************************************************************************************/
-
-ROM_START( hp700_92 )
-	ROM_REGION(0x20000, "maincpu", 0)
-	ROM_LOAD( "5181-8672.u803", 0x00000, 0x20000, CRC(21440d2f) SHA1(69a3de064ae2b18adc46c2fdd0bf69620375efe7) )
-ROM_END
-
-COMP( 1987, hp700_92, 0, 0, terminals, terminals, terminals_state, 0, "HP", "HP-700/92", MACHINE_IS_SKELETON )
-
-
-
-/**************************************************************************************************************
-
 Qume QVT-70.
 Chips: Z80, Z80 DART, 5x CXK5864CM-70LL/W242575-70LL, 801000-02, 303489-01, DS1231, Button battery, Beeper
 Crystals: unreadable
