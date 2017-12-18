@@ -15001,6 +15001,9 @@ hp165ka0                        //
 @source:hp2100.cpp
 hp2100                          // HP 2100 and HP 1000
 
+@source:hp2620.cpp
+hp2622a                         //
+
 @source:hp48.cpp
 hp38g                           //
 hp39g                           //
@@ -36413,7 +36416,6 @@ t4490                           // Terco 4490 Mill CNC Control (c) 1986
 @source:terminals.cpp
 aaa
 hp700_92
-hp2622a
 qvt70
 qvt102
 qvt103

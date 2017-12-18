@@ -77,28 +77,6 @@ COMP( 1987, hp700_92, 0, 0, terminals, terminals, terminals_state, 0, "HP", "HP-
 
 /**************************************************************************************************************
 
-Hewlett-Packard HP-2622A.
-Chips: National 8367 CRTC (labeled B8250), SY6551 (labeled 8251), Z8400A (Z80)
-Crystal: 25.7715
-
-***************************************************************************************************************/
-
-ROM_START( hp2622a )
-	ROM_REGION(0x10000, "maincpu", 0)
-	ROM_LOAD( "1818-1685.xu63", 0x0000, 0x2000, CRC(a57ffe5e) SHA1(4d7844320deba916d9ec289927af987fea025b02) )
-	ROM_LOAD( "1818-1686.xu64", 0x2000, 0x2000, CRC(bee9274c) SHA1(20796c559031a91cb2666776fcf7ffdb52a0a318) )
-	ROM_LOAD( "1818-1687.xu65", 0x4000, 0x2000, CRC(e9ecd489) SHA1(9b249b8d066d256069ccdb8809bb808c414f106a) )
-
-	ROM_REGION(0x2000, "chargen", 0)
-	ROM_LOAD( "1818-1489.xu311", 0x0000, 0x2000, CRC(9879b153) SHA1(fc1705d6de38eb6d3a67f1ae439e359e5124d028) )
-ROM_END
-
-COMP( 1982, hp2622a, 0, 0, terminals, terminals, terminals_state, 0, "HP", "HP-2622A", MACHINE_IS_SKELETON )
-
-
-
-/**************************************************************************************************************
-
 Qume QVT-70.
 Chips: Z80, Z80 DART, 5x CXK5864CM-70LL/W242575-70LL, 801000-02, 303489-01, DS1231, Button battery, Beeper
 Crystals: unreadable
