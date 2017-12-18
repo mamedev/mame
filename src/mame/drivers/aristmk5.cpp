@@ -7438,6 +7438,29 @@ ROM_START( wcougarub )
 ROM_END
 
 
+// AHG1531 / MV4055 / 5 Line / 10 Credit Multiplier
+// Wild Cougar / Export / B - 13/05/97
+// Marked as SPC.
+ROM_START( wcougaruc )
+	ARISTOCRAT_MK5_BIOS
+	/*
+	    Checksum code found at 0x000d18
+	    Checksum is stored at 0x000020-0x000027
+	        Expected Checksum   0xa27eaf6f
+	        Calculated Checksum 0xa27eaf6f  (OK)
+	*/
+	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
+	ROM_LOAD32_WORD( "ahg1531.u7",  0x000000, 0x80000, CRC(53889e2d) SHA1(f204426aaf07a668878769c12d51f9a721b7bdee) )  // game
+	ROM_LOAD32_WORD( "ahg1531.u11", 0x000002, 0x80000, CRC(c138fece) SHA1(4653e4518bdf73da7380da931af85fd41d359a53) )  // game
+	ROM_LOAD32_WORD( "ahg1531.u8",  0x100000, 0x80000, CRC(8e2226c5) SHA1(1dc7fff8c56af8102f3de9bbb9d0085546ec877c) )  // base
+	ROM_LOAD32_WORD( "ahg1531.u12", 0x100002, 0x80000, CRC(5aac8336) SHA1(d1bfd21579bdcf5b46e0f4db1181d10159f0b643) )  // base
+
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
+	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
+ROM_END
+
+
 // AHG1515 / MV4134 / 5,10,25,50 Credit Multiplier / 20 Line Multiline
 // Wild Coyote / Export / A - 30/07/01
 ROM_START( wcoyote )
@@ -7824,6 +7847,7 @@ GAMEL( 1996, wcougar,    aristmk5,  aristmk5,           wcougar,      aristmk5_s
 GAMEL( 1997, wcougaru,   wcougar,   aristmk5_usa,       aristmk5_usa, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Wild Cougar (NHG0296-04, US)",                         MACHINE_FLAGS, layout_aristmk5_us )     // 569/8, D - 19/05/97
 GAMEL( 1997, wcougarua,  wcougar,   aristmk5_usa,       aristmk5_usa, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Wild Cougar (NHG0296-07, US)",                         MACHINE_FLAGS, layout_aristmk5_us )     // 569/8, D - 19/05/97
 GAMEL( 1997, wcougarub,  wcougar,   aristmk5_usa,       aristmk5_usa, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Wild Cougar (NHG0296-99, US)",                         MACHINE_FLAGS, layout_aristmk5_us )     // 569/8, D - 19/05/97
+GAMEL( 1997, wcougaruc,  wcougar,   aristmk5_usa,       aristmk5_usa, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Wild Cougar (AHG1531, US)",                            MACHINE_FLAGS, layout_aristmk5_us )     // MV4055, B - 13/05/97
 GAMEL( 1996, wizways,    aristmk5,  aristmk5,           wizways,      aristmk5_state, aristmk5, ROT0, "Aristocrat", "Wizard Ways (0200396V, NSW/ACT)",                      MACHINE_FLAGS, layout_wizways )         // 598/3, A - 04/11/96, Rev 9
 GAMEL( 1997, wnpost,     aristmk5,  aristmk5_usa,       wnpost,       aristmk5_state, aristmk5, ROT0, "Aristocrat", "Winning Post (RHG0418-04, US)",                        MACHINE_FLAGS, layout_wnpost )          // 541/2, G - 11/02/97
 GAMEL( 1999, wthing,     aristmk5,  aristmk5,           retrsam,      aristmk5_state, aristmk5, ROT0, "Aristocrat", "Wild Thing (0101158V, NSW/ACT)",                       MACHINE_FLAGS, layout_sbuk3 )           // 608/4, B - 14/12/99, Rev 8
