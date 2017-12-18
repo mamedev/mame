@@ -105,6 +105,7 @@ class towns_state : public driver_device
 			m_icmemcard(*this, "icmemcard"),
 			m_i8251(*this, "i8251"),
 			m_rs232(*this, "rs232c"),
+			m_screen(*this, "screen"),
 			m_nvram(*this, "nvram"),
 			m_nvram16(*this, "nvram16"),
 			m_ctrltype(*this, "ctrltype"),
@@ -142,6 +143,7 @@ class towns_state : public driver_device
 	required_device<fmt_icmem_device> m_icmemcard;
 	required_device<i8251_device> m_i8251;
 	required_device<rs232_port_device> m_rs232;
+	required_device<screen_device> m_screen;
 	ram_device* m_messram;
 	cdrom_image_device* m_cdrom;
 	cdda_device* m_cdda;

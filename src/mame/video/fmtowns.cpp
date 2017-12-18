@@ -504,6 +504,8 @@ void towns_state::towns_update_palette()
 			m_palette->set_pen_color(entry, r, g, b);
 			break;
 	}
+	if(!m_screen->vblank())
+		m_screen->update_partial(m_screen->vpos());
 }
 
 /* Video/CRTC
@@ -1545,52 +1547,56 @@ void towns_state::towns_crtc_draw_layer(bitmap_rgb32 &bitmap,const rectangle* re
 {
 	int line;
 	int scanline;
-	int height;
+	int bottom;
+	int top;
 	uint8_t zoom;
 	uint8_t count;
 
 	if(layer == 0)
 	{
 		scanline = rect->min_y;
-		height = (rect->max_y - rect->min_y);
+		top = (scanline - m_video.towns_crtc_layerscr[0].min_y);
+		bottom = (rect->max_y - rect->min_y) + top;
 		zoom = ((m_video.towns_crtc_reg[27] & 0x00f0) >> 4) + 1;
-		height /= zoom;
+		count = top % zoom;
+		bottom /= zoom;
+		top /= zoom;
 		switch(m_video.towns_video_reg[0] & 0x03)
 		{
 			case 0x01:
-				for(line=0;line<height;line++)
+				for(line=top;line<=bottom;line++)
 				{
-					count = 0;
 					do
 					{
 						towns_crtc_draw_scan_layer_16(bitmap,rect,layer,line,scanline);
 						scanline++;
 						count++;
 					} while(count < zoom);
+					count = 0;
 				}
 				break;
 			case 0x02:
-				for(line=0;line<height;line++)
+				for(line=top;line<=bottom;line++)
 				{
-					count = 0;
 					do
 					{
 						towns_crtc_draw_scan_layer_256(bitmap,rect,layer,line,scanline);
 						scanline++;
 						count++;
 					} while(count < zoom);
+					count = 0;
 				}
 				break;
 			case 0x03:
-				for(line=0;line<height;line++)
+				for(line=top;line<=bottom;line++)
 				{
-					count = 0;
 					do
 					{
 						towns_crtc_draw_scan_layer_hicolour(bitmap,rect,layer,line,scanline);
 						scanline++;
 						count++;
 					} while(count < zoom);
+					count = 0;
 				}
 				break;
 		}
@@ -1598,45 +1604,48 @@ void towns_state::towns_crtc_draw_layer(bitmap_rgb32 &bitmap,const rectangle* re
 	else
 	{
 		scanline = rect->min_y;
-		height = (rect->max_y - rect->min_y);
+		top = (scanline - m_video.towns_crtc_layerscr[1].min_y);
+		bottom = (rect->max_y - rect->min_y) + top;
 		zoom = ((m_video.towns_crtc_reg[27] & 0xf000) >> 12) + 1;
-		height /= zoom;
+		count = top % zoom;
+		bottom /= zoom;
+		top /= zoom;
 		switch(m_video.towns_video_reg[0] & 0x0c)
 		{
 			case 0x04:
-				for(line=0;line<height;line++)
+				for(line=top;line<=bottom;line++)
 				{
-					count = 0;
 					do
 					{
 						towns_crtc_draw_scan_layer_16(bitmap,rect,layer,line,scanline);
 						scanline++;
 						count++;
 					} while(count < zoom);
+					count = 0;
 				}
 				break;
 			case 0x08:
-				for(line=0;line<height;line++)
+				for(line=top;line<=bottom;line++)
 				{
-					count = 0;
 					do
 					{
 						towns_crtc_draw_scan_layer_256(bitmap,rect,layer,line,scanline);
 						scanline++;
 						count++;
 					} while(count < zoom);
+					count = 0;
 				}
 				break;
 			case 0x0c:
-				for(line=0;line<height;line++)
+				for(line=top;line<=bottom;line++)
 				{
-					count = 0;
 					do
 					{
 						towns_crtc_draw_scan_layer_hicolour(bitmap,rect,layer,line,scanline);
 						scanline++;
 						count++;
 					} while(count < zoom);
+					count = 0;
 				}
 				break;
 		}
@@ -1806,19 +1815,24 @@ uint32_t towns_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap,
 			layer2_en = false;
 	}
 
+	rectangle cliplayer0 = m_video.towns_crtc_layerscr[0];
+	cliplayer0 &= cliprect;
+	rectangle cliplayer1 = m_video.towns_crtc_layerscr[1];
+	cliplayer1 &= cliprect;
+
 	if(!(m_video.towns_video_reg[1] & 0x01))
 	{
 		if((m_video.towns_layer_ctrl & 0x03) != 0 && layer1_en)
-			towns_crtc_draw_layer(bitmap,&m_video.towns_crtc_layerscr[1],1);
+			towns_crtc_draw_layer(bitmap,&cliplayer1,1);
 		if((m_video.towns_layer_ctrl & 0x0c) != 0 && layer2_en)
-			towns_crtc_draw_layer(bitmap,&m_video.towns_crtc_layerscr[0],0);
+			towns_crtc_draw_layer(bitmap,&cliplayer0,0);
 	}
 	else
 	{
 		if((m_video.towns_layer_ctrl & 0x0c) != 0 && layer1_en)
-			towns_crtc_draw_layer(bitmap,&m_video.towns_crtc_layerscr[0],0);
+			towns_crtc_draw_layer(bitmap,&cliplayer0,0);
 		if((m_video.towns_layer_ctrl & 0x03) != 0 && layer2_en)
-			towns_crtc_draw_layer(bitmap,&m_video.towns_crtc_layerscr[1],1);
+			towns_crtc_draw_layer(bitmap,&cliplayer1,1);
 	}
 
 #if 0
