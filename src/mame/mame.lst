@@ -2660,9 +2660,6 @@ babbage                         //
 backfire                        // MBZ (c) 1995
 backfirea                       // MBZ (c) 1995
 
-@source:backgamn.cpp
-backgamn                        // (c) 1990
-
 @source:badlands.cpp
 badlands                        // 136074           (c) 1989
 badlandsb                       // bootleg
@@ -18295,6 +18292,7 @@ malzak                          // (c) 1980? Kitronix
 malzak2                         // (c) 1980? Kitronix
 
 @source:manohman.cpp
+backgamn                        // (c) 1990
 manohman                        // 199?, Merkur.
 
 @source:mappy.cpp
