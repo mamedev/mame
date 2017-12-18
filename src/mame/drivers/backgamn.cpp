@@ -13,6 +13,7 @@
 #include "machine/68230pit.h"
 #include "machine/mc68681.h"
 #include "machine/msm6242.h"
+#include "machine/nvram.h"
 #include "sound/saa1099.h"
 #include "speaker.h"
 
@@ -55,7 +56,7 @@ static ADDRESS_MAP_START( backgamn_mem, AS_PROGRAM, 16, backgamn_state )
 	AM_RANGE(0x200000, 0x20001f) AM_DEVREADWRITE8("duart", mc68681_device, read, write, 0x00ff)
 	AM_RANGE(0x300000, 0x300003) AM_DEVWRITE8("saa", saa1099_device, write, 0x00ff) AM_READNOP
 	AM_RANGE(0x400000, 0x40001f) AM_DEVREADWRITE8("rtc", msm6242_device, read, write, 0x00ff)
-	AM_RANGE(0x500000, 0x503fff) AM_RAM //work RAM
+	AM_RANGE(0x500000, 0x503fff) AM_RAM AM_SHARE("nvram") //work RAM
 	AM_RANGE(0x600006, 0x600007) AM_NOP //(r) is discarded (watchdog?)
 ADDRESS_MAP_END
 
@@ -65,16 +66,18 @@ INPUT_PORTS_END
 
 
 static MACHINE_CONFIG_START( backgamn )
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_8MHz)
+	MCFG_CPU_ADD("maincpu", M68000, XTAL_8MHz) // MC68000P8
 	MCFG_CPU_PROGRAM_MAP(backgamn_mem)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(backgamn_state, iack_handler)
 
-	MCFG_DEVICE_ADD("pit", PIT68230, XTAL_8MHz / 10) // clock not verified
+	MCFG_DEVICE_ADD("pit", PIT68230, XTAL_8MHz) // MC68230P8
 
 	MCFG_DEVICE_ADD("duart", MC68681, XTAL_3_6864MHz)
 	MCFG_MC68681_IRQ_CALLBACK(INPUTLINE("maincpu", M68K_IRQ_4))
 
-	MCFG_DEVICE_ADD("rtc", MSM6242, XTAL_32_768kHz)
+	MCFG_DEVICE_ADD("rtc", MSM6242, XTAL_32_768kHz) // M62X42B
+
+	MCFG_NVRAM_ADD_NO_FILL("nvram") // KM6264BL-10 x2 + MAX696CFL + battery
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("saa", SAA1099, XTAL_8MHz / 2) // clock not verified
