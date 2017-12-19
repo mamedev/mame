@@ -403,7 +403,6 @@ K28 modules:
 
 #include "bus/generic/carts.h"
 #include "bus/generic/slot.h"
-#include "machine/timer.h"
 #include "machine/tms6100.h"
 #include "sound/tms5110.h"
 

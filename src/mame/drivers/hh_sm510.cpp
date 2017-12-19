@@ -19,6 +19,7 @@
 
 #include "emu.h"
 #include "includes/hh_sm510.h"
+
 #include "cpu/sm510/sm510.h"
 #include "cpu/sm510/sm500.h"
 #include "rendlay.h"

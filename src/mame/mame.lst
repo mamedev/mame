@@ -29980,6 +29980,9 @@ supercon                        //
 @source:novag68k.cpp
 diablo68                        //
 
+@source:novagf8.cpp
+ccdelta1                        //
+
 @source:novagmcs48.cpp
 nocto                           //
 npresto                         //

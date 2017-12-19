@@ -224,6 +224,6 @@ ROM_END
 ***************************************************************************/
 
 
-//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT  CLASS      INIT  COMPANY  FULLNAME                FLAGS
-CONS( 1979, ccmk2,  0,      0,      mk2,     mk2,   mk2_state, 0,    "Novag", "Chess Champion MK II", 0 )
+//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT  CLASS      INIT  COMPANY  FULLNAME                 FLAGS
+CONS( 1979, ccmk2,  0,      0,      mk2,     mk2,   mk2_state, 0,    "Novag", "Chess Champion: MK II", 0 )
 // second design sold (same computer/program?)

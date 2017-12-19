@@ -206,5 +206,5 @@ ROM_END
 ***************************************************************************/
 
 // seams to be developed by mostek (MK)
-//    YEAR   NAME    PARENT  COMPAT  MACHINE  INPUT  STATE      INIT  COMPANY  FULLNAME               FLAGS
-CONS( 1979,  ccmk1,  0,      0,      mk1,     mk1,   mk1_state, 0,    "Novag", "Chess Champion MK I", MACHINE_NO_SOUND_HW )
+//    YEAR   NAME    PARENT  COMPAT  MACHINE  INPUT  STATE      INIT  COMPANY  FULLNAME                FLAGS
+CONS( 1979,  ccmk1,  0,      0,      mk1,     mk1,   mk1_state, 0,    "Novag", "Chess Champion: MK I", MACHINE_NO_SOUND_HW )

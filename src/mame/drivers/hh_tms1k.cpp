@@ -145,7 +145,6 @@
 #include "includes/hh_tms1k.h"
 
 #include "machine/tms1024.h"
-#include "machine/timer.h"
 #include "sound/beep.h"
 #include "sound/s14001a.h"
 #include "sound/sn76477.h"
