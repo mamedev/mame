@@ -1515,7 +1515,8 @@ TIMER_CALLBACK_MEMBER( dcs_audio_device::dcs_delayed_data_w_callback )
 void dcs_audio_device::data_w(uint16_t data)
 {
 	/* preprocess the write */
-	if (preprocess_write(data))
+	// ADSP2181 variants use IDMA to transfer data
+	if (m_rev <= REV_DCS2 && preprocess_write(data))
 		return;
 
 	/* if we are DCS1, set a timer to latch the data */
