@@ -185,6 +185,9 @@ WRITE8_MEMBER(mephisto_risc_state::latch1_w)
 {
 	m_com_latch1 = data;
 	m_subcpu->set_input_line(ARM_FIRQ_LINE, ASSERT_LINE);
+	m_subcpu->set_input_line(INPUT_LINE_RESET, (data & 0x02) ? ASSERT_LINE : CLEAR_LINE);
+	if (data & 0x02)
+		m_subcpu->space(AS_PROGRAM).install_rom(0x00000000, 0x0000007f, memregion("arm_bootstrap")->base());
 }
 
 
