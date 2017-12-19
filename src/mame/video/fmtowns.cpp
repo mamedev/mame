@@ -738,17 +738,17 @@ void towns_state::render_sprite_4(uint32_t poffset, uint32_t coffset, uint16_t x
 
 	if(xflip)
 	{
-		xstart = x+14;
 		if (xhalfsize) 
 		{
-			xend = x+6;
+			xstart = x+6;
 			xdir = -1;
 		}
 		else
 		{
-			xend = x-2;
+			xstart = x+14;
 			xdir = -2;
 		}
+		xend = x-2;
 	}
 	else
 	{
@@ -766,11 +766,11 @@ void towns_state::render_sprite_4(uint32_t poffset, uint32_t coffset, uint16_t x
 	}
 	if(yflip)
 	{
-		ystart = y+15;
 		if (yhalfsize)
-			yend = y+7;
+			ystart = y+7;
 		else
-			yend = y-1;
+			ystart = y+15;
+		yend = y-1;
 		ydir = -1;
 	}
 	else
@@ -874,11 +874,11 @@ void towns_state::render_sprite_16(uint32_t poffset, uint16_t x, uint16_t y, boo
 
 	if(xflip)
 	{
-		xstart = x+16;
 		if (xhalfsize)
-			xend = x+8;
+			xstart = x+8;
 		else
-			xend = x;
+			xstart = x+16;
+		xend = x;
 		xdir = -1;
 	}
 	else
@@ -892,11 +892,11 @@ void towns_state::render_sprite_16(uint32_t poffset, uint16_t x, uint16_t y, boo
 	}
 	if(yflip)
 	{
-		ystart = y+15;
 		if (yhalfsize)
-			yend = y+7;
+			ystart = y+7;
 		else
-			yend = y-1;
+			ystart = y+15;
+		yend = y-1;
 		ydir = -1;
 	}
 	else
