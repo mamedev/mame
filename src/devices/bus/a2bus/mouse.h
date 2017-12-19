@@ -41,9 +41,9 @@ protected:
 	virtual void device_reset() override;
 
 	// overrides of standard a2bus slot functions
-	virtual uint8_t read_c0nx(address_space &space, uint8_t offset) override;
-	virtual void write_c0nx(address_space &space, uint8_t offset, uint8_t data) override;
-	virtual uint8_t read_cnxx(address_space &space, uint8_t offset) override;
+	virtual uint8_t read_c0nx(uint8_t offset) override;
+	virtual void write_c0nx(uint8_t offset, uint8_t data) override;
+	virtual uint8_t read_cnxx(uint8_t offset) override;
 
 	DECLARE_WRITE8_MEMBER(pia_out_a);
 	DECLARE_WRITE8_MEMBER(pia_out_b);

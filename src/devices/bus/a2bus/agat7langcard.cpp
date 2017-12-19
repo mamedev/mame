@@ -106,7 +106,7 @@ void a2bus_agat7langcard_device::do_io(int offset)
     read_cnxx - called for reads from this card's cnxx space
 -------------------------------------------------*/
 
-uint8_t a2bus_agat7langcard_device::read_cnxx(address_space &space, uint8_t offset)
+uint8_t a2bus_agat7langcard_device::read_cnxx(uint8_t offset)
 {
 	return (0x80 | m_csr);
 }
@@ -116,12 +116,12 @@ uint8_t a2bus_agat7langcard_device::read_cnxx(address_space &space, uint8_t offs
     write_cnxx - called for writes to this card's cnxx space
 -------------------------------------------------*/
 
-void a2bus_agat7langcard_device::write_cnxx(address_space &space, uint8_t offset, uint8_t data)
+void a2bus_agat7langcard_device::write_cnxx(uint8_t offset, uint8_t data)
 {
 	do_io(offset);
 }
 
-uint8_t a2bus_agat7langcard_device::read_inh_rom(address_space &space, uint16_t offset)
+uint8_t a2bus_agat7langcard_device::read_inh_rom(uint16_t offset)
 {
 	assert(m_inh_state & INH_READ); // this should never happen
 
@@ -133,7 +133,7 @@ uint8_t a2bus_agat7langcard_device::read_inh_rom(address_space &space, uint16_t 
 	return m_ram[(offset & 0x1fff) + 0x2000 + m_main_bank];
 }
 
-void a2bus_agat7langcard_device::write_inh_rom(address_space &space, uint16_t offset, uint8_t data)
+void a2bus_agat7langcard_device::write_inh_rom(uint16_t offset, uint8_t data)
 {
 	// are writes enabled?
 	if (!(m_inh_state & INH_WRITE))

@@ -27,8 +27,8 @@ public:
 	// construction/destruction
 	mcms_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_WRITE8_MEMBER(voiceregs_w);
-	DECLARE_WRITE8_MEMBER(control_w);
+	void voiceregs_w(offs_t offset, uint8_t data);
+	void control_w(offs_t offset, uint8_t data);
 	uint8_t get_pen_rand(void) { m_stream->update(); return m_rand; }
 
 	void set_bus_device(a2bus_mcms1_device *pDev) { m_pBusDevice = pDev; }
@@ -79,9 +79,9 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 
 	// overrides of standard a2bus slot functions
-	virtual uint8_t read_c0nx(address_space &space, uint8_t offset) override;
-	virtual uint8_t read_cnxx(address_space &space, uint8_t offset) override;
-	virtual void write_cnxx(address_space &space, uint8_t offset, uint8_t data) override;
+	virtual uint8_t read_c0nx(uint8_t offset) override;
+	virtual uint8_t read_cnxx(uint8_t offset) override;
+	virtual void write_cnxx(uint8_t offset, uint8_t data) override;
 	virtual bool take_c800() override { return false; }
 
 private:
@@ -104,9 +104,9 @@ protected:
 	virtual void device_reset() override;
 
 	// overrides of standard a2bus slot functions
-	virtual uint8_t read_c0nx(address_space &space, uint8_t offset) override;
-	virtual void write_c0nx(address_space &space, uint8_t offset, uint8_t data) override;
-	virtual void write_cnxx(address_space &space, uint8_t offset, uint8_t data) override;
+	virtual uint8_t read_c0nx(uint8_t offset) override;
+	virtual void write_c0nx(uint8_t offset, uint8_t data) override;
+	virtual void write_cnxx(uint8_t offset, uint8_t data) override;
 	virtual bool take_c800() override { return false; }
 
 private:

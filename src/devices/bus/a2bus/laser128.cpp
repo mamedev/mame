@@ -68,21 +68,21 @@ void a2bus_laser128_device::device_reset()
 	m_slot7_ram_bank = 0;
 }
 
-uint8_t a2bus_laser128_device::read_c0nx(address_space &space, uint8_t offset)
+uint8_t a2bus_laser128_device::read_c0nx(uint8_t offset)
 {
 	return 0x00;
 }
 
-void a2bus_laser128_device::write_c0nx(address_space &space, uint8_t offset, uint8_t data)
+void a2bus_laser128_device::write_c0nx(uint8_t offset, uint8_t data)
 {
 }
 
-uint8_t a2bus_laser128_device::read_cnxx(address_space &space, uint8_t offset)
+uint8_t a2bus_laser128_device::read_cnxx(uint8_t offset)
 {
 	return m_rom[offset + (m_slot * 0x100) + 0x4000];
 }
 
-uint8_t a2bus_laser128_device::read_c800(address_space &space, uint16_t offset)
+uint8_t a2bus_laser128_device::read_c800(uint16_t offset)
 {
 	switch (m_slot)
 	{
@@ -109,7 +109,7 @@ uint8_t a2bus_laser128_device::read_c800(address_space &space, uint16_t offset)
 	return 0xff;
 }
 
-void a2bus_laser128_device::write_c800(address_space &space, uint16_t offset, uint8_t data)
+void a2bus_laser128_device::write_c800(uint16_t offset, uint8_t data)
 {
 	if ((m_slot == 7) && (offset < 0x400))
 	{

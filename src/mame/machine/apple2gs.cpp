@@ -1661,7 +1661,7 @@ uint8_t apple2gs_state::apple2gs_xxCxxx_r(address_space &space, offs_t address)
 						m_a2_cnxx_slot = slot;
 						apple2_update_memory();
 					}
-					result = slotdevice->read_cnxx(space, address&0xff);
+					result = slotdevice->read_cnxx(address&0xff);
 				}
 				else
 				{
@@ -1690,7 +1690,7 @@ uint8_t apple2gs_state::apple2gs_xxCxxx_r(address_space &space, offs_t address)
 
 			if (slotdevice)
 			{
-				result = slotdevice->read_c800(space, address&0x7ff);
+				result = slotdevice->read_c800(address&0x7ff);
 			}
 			else
 			{
@@ -1753,7 +1753,7 @@ void apple2gs_state::apple2gs_xxCxxx_w(address_space &space, offs_t address, uin
 						m_a2_cnxx_slot = slot;
 						apple2_update_memory();
 					}
-					slotdevice->write_cnxx(space, address&0xff, data);
+					slotdevice->write_cnxx(address&0xff, data);
 				}
 				// (else slot is your card but there's no card inserted so the write goes nowhere)
 			}
@@ -1776,7 +1776,7 @@ void apple2gs_state::apple2gs_xxCxxx_w(address_space &space, offs_t address, uin
 
 			if (slotdevice)
 			{
-				slotdevice->write_c800(space, address&0x7ff, data);
+				slotdevice->write_c800(address&0x7ff, data);
 			}
 			else
 			{

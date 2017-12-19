@@ -469,7 +469,7 @@ READ8_MEMBER(agat7_state::c080_r)
 
 		if (m_slotdevice[slot] != nullptr)
 		{
-			return m_slotdevice[slot]->read_c0nx(space, offset % 0x10);
+			return m_slotdevice[slot]->read_c0nx(offset % 0x10);
 		}
 	}
 
@@ -487,7 +487,7 @@ WRITE8_MEMBER(agat7_state::c080_w)
 
 	if (m_slotdevice[slot] != nullptr)
 	{
-		m_slotdevice[slot]->write_c0nx(space, offset % 0x10, data);
+		m_slotdevice[slot]->write_c0nx(offset % 0x10, data);
 	}
 }
 
@@ -507,7 +507,7 @@ READ8_MEMBER(agat7_state::c100_r)
 
 		logerror("%s: c100_r %04X (slot %d) == %02X\n", machine().describe_context(), offset+0xc100, slotnum, data);
 
-		return m_slotdevice[slotnum]->read_cnxx(space, offset & 0xff);
+		return m_slotdevice[slotnum]->read_cnxx(offset & 0xff);
 	}
 
 	return read_floatingbus();
@@ -528,7 +528,7 @@ WRITE8_MEMBER(agat7_state::c100_w)
 			m_cnxx_slot = slotnum;
 		}
 
-		m_slotdevice[slotnum]->write_cnxx(space, offset & 0xff, data);
+		m_slotdevice[slotnum]->write_cnxx(offset & 0xff, data);
 	}
 }
 
@@ -548,7 +548,7 @@ READ8_MEMBER(agat7_state::c800_r)
 
 	if ((m_cnxx_slot != -1) && (m_slotdevice[m_cnxx_slot] != nullptr))
 	{
-		return m_slotdevice[m_cnxx_slot]->read_c800(space, offset & 0xfff);
+		return m_slotdevice[m_cnxx_slot]->read_c800(offset & 0xfff);
 	}
 
 	return read_floatingbus();
@@ -570,7 +570,7 @@ WRITE8_MEMBER(agat7_state::c800_w)
 
 	if ((m_cnxx_slot != -1) && (m_slotdevice[m_cnxx_slot] != nullptr))
 	{
-		m_slotdevice[m_cnxx_slot]->write_c800(space, offset & 0xfff, data);
+		m_slotdevice[m_cnxx_slot]->write_c800(offset & 0xfff, data);
 	}
 }
 
@@ -578,7 +578,7 @@ READ8_MEMBER(agat7_state::inh_r)
 {
 	if (m_inh_slot != -1)
 	{
-		return m_slotdevice[m_inh_slot]->read_inh_rom(space, offset + 0xd000);
+		return m_slotdevice[m_inh_slot]->read_inh_rom(offset + 0xd000);
 	}
 
 	assert(0); // hitting inh_r with invalid m_inh_slot should not be possible
@@ -589,7 +589,7 @@ WRITE8_MEMBER(agat7_state::inh_w)
 {
 	if (m_inh_slot != -1)
 	{
-		m_slotdevice[m_inh_slot]->write_inh_rom(space, offset + 0xd000, data);
+		m_slotdevice[m_inh_slot]->write_inh_rom(offset + 0xd000, data);
 	}
 }
 
@@ -633,7 +633,7 @@ READ8_MEMBER(agat7_state::agat7_ram_r)
 	else
 	{
 		if (m_agat7_ram_slot != -1)
-			return m_slotdevice[m_agat7_ram_slot]->read_inh_rom(space, offset + 0x8000);
+			return m_slotdevice[m_agat7_ram_slot]->read_inh_rom(offset + 0x8000);
 		if (offset < m_ram_size)
 		{
 			if (m_agat7_membank == 0)
@@ -661,7 +661,7 @@ WRITE8_MEMBER(agat7_state::agat7_ram_w)
 	else
 	{
 		if (m_agat7_ram_slot != -1)
-			m_slotdevice[m_agat7_ram_slot]->write_inh_rom(space, offset + 0x8000, data);
+			m_slotdevice[m_agat7_ram_slot]->write_inh_rom(offset + 0x8000, data);
 		else if (offset < m_ram_size)
 		{
 			if (m_agat7_membank == 0)

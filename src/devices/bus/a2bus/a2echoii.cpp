@@ -69,23 +69,23 @@ void a2bus_echoii_device::device_reset()
 {
 }
 
-uint8_t a2bus_echoii_device::read_c0nx(address_space &space, uint8_t offset)
+uint8_t a2bus_echoii_device::read_c0nx(uint8_t offset)
 {
 	switch (offset)
 	{
 		case 0:
-			return 0x1f | m_tms->status_r(space, 0);
+			return 0x1f | m_tms->status_r();
 	}
 
 	return 0;
 }
 
-void a2bus_echoii_device::write_c0nx(address_space &space, uint8_t offset, uint8_t data)
+void a2bus_echoii_device::write_c0nx(uint8_t offset, uint8_t data)
 {
 	switch (offset)
 	{
 		case 0:
-			m_tms->data_w(space, offset, data);
+			m_tms->data_w(data);
 			break;
 	}
 }

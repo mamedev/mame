@@ -99,7 +99,7 @@ void a2bus_zipdrivebase_device::device_reset()
     read_c0nx - called for reads from this card's c0nx space
 -------------------------------------------------*/
 
-uint8_t a2bus_zipdrivebase_device::read_c0nx(address_space &space, uint8_t offset)
+uint8_t a2bus_zipdrivebase_device::read_c0nx(uint8_t offset)
 {
 	switch (offset)
 	{
@@ -134,7 +134,7 @@ uint8_t a2bus_zipdrivebase_device::read_c0nx(address_space &space, uint8_t offse
     write_c0nx - called for writes to this card's c0nx space
 -------------------------------------------------*/
 
-void a2bus_zipdrivebase_device::write_c0nx(address_space &space, uint8_t offset, uint8_t data)
+void a2bus_zipdrivebase_device::write_c0nx(uint8_t offset, uint8_t data)
 {
 	switch (offset)
 	{
@@ -172,7 +172,7 @@ void a2bus_zipdrivebase_device::write_c0nx(address_space &space, uint8_t offset,
     read_cnxx - called for reads from this card's cnxx space
 -------------------------------------------------*/
 
-uint8_t a2bus_zipdrivebase_device::read_cnxx(address_space &space, uint8_t offset)
+uint8_t a2bus_zipdrivebase_device::read_cnxx(uint8_t offset)
 {
 	int slotimg = m_slot * 0x100;
 
@@ -184,7 +184,7 @@ uint8_t a2bus_zipdrivebase_device::read_cnxx(address_space &space, uint8_t offse
     read_c800 - called for reads from this card's c800 space
 -------------------------------------------------*/
 
-uint8_t a2bus_zipdrivebase_device::read_c800(address_space &space, uint16_t offset)
+uint8_t a2bus_zipdrivebase_device::read_c800(uint16_t offset)
 {
 	offset &= 0x7ff;
 

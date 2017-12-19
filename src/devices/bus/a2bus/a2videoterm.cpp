@@ -236,7 +236,7 @@ void a2bus_videx80_device::device_reset()
     read_c0nx - called for reads from this card's c0nx space
 -------------------------------------------------*/
 
-uint8_t a2bus_videx80_device::read_c0nx(address_space &space, uint8_t offset)
+uint8_t a2bus_videx80_device::read_c0nx(uint8_t offset)
 {
 //    printf("Read c0n%x (PC=%x)\n", offset, space.device().safe_pc());
 
@@ -244,7 +244,7 @@ uint8_t a2bus_videx80_device::read_c0nx(address_space &space, uint8_t offset)
 
 	if (offset == 1)
 	{
-		return m_crtc->register_r(space, offset);   // status_r?
+		return m_crtc->register_r();   // status_r?
 	}
 
 	return 0xff;
@@ -255,17 +255,17 @@ uint8_t a2bus_videx80_device::read_c0nx(address_space &space, uint8_t offset)
     write_c0nx - called for writes to this card's c0nx space
 -------------------------------------------------*/
 
-void a2bus_videx80_device::write_c0nx(address_space &space, uint8_t offset, uint8_t data)
+void a2bus_videx80_device::write_c0nx(uint8_t offset, uint8_t data)
 {
 //    printf("Write %02x to c0n%x (PC=%x)\n", data, offset, space.device().safe_pc());
 
 	if (offset == 0)
 	{
-		m_crtc->address_w(space, offset, data);
+		m_crtc->address_w(data);
 	}
 	else if (offset == 1)
 	{
-		m_crtc->register_w(space, offset, data);
+		m_crtc->register_w(data);
 	}
 
 	m_rambank = ((offset>>2) & 3) * 512;
@@ -275,17 +275,17 @@ void a2bus_videx80_device::write_c0nx(address_space &space, uint8_t offset, uint
     read_cnxx - called for reads from this card's cnxx space
 -------------------------------------------------*/
 
-uint8_t a2bus_videx80_device::read_cnxx(address_space &space, uint8_t offset)
+uint8_t a2bus_videx80_device::read_cnxx(uint8_t offset)
 {
 	return m_rom[offset+0x300];
 }
 
-uint8_t a2bus_ap16_device::read_cnxx(address_space &space, uint8_t offset)
+uint8_t a2bus_ap16_device::read_cnxx(uint8_t offset)
 {
 	return m_rom[offset+0x1f00];
 }
 
-uint8_t a2bus_ap16alt_device::read_cnxx(address_space &space, uint8_t offset)
+uint8_t a2bus_ap16alt_device::read_cnxx(uint8_t offset)
 {
 	return m_rom[offset+0xb00];
 }
@@ -294,7 +294,7 @@ uint8_t a2bus_ap16alt_device::read_cnxx(address_space &space, uint8_t offset)
     write_cnxx - called for writes to this card's cnxx space
     the firmware writes here to switch in our $C800 a lot
 -------------------------------------------------*/
-void a2bus_videx80_device::write_cnxx(address_space &space, uint8_t offset, uint8_t data)
+void a2bus_videx80_device::write_cnxx(uint8_t offset, uint8_t data)
 {
 }
 
@@ -302,7 +302,7 @@ void a2bus_videx80_device::write_cnxx(address_space &space, uint8_t offset, uint
     read_c800 - called for reads from this card's c800 space
 -------------------------------------------------*/
 
-uint8_t a2bus_videx80_device::read_c800(address_space &space, uint16_t offset)
+uint8_t a2bus_videx80_device::read_c800(uint16_t offset)
 {
 	// ROM at c800-cbff
 	// bankswitched RAM at cc00-cdff
@@ -320,7 +320,7 @@ uint8_t a2bus_videx80_device::read_c800(address_space &space, uint16_t offset)
 /*-------------------------------------------------
     write_c800 - called for writes to this card's c800 space
 -------------------------------------------------*/
-void a2bus_videx80_device::write_c800(address_space &space, uint16_t offset, uint8_t data)
+void a2bus_videx80_device::write_c800(uint16_t offset, uint8_t data)
 {
 	if (offset >= 0x400)
 	{

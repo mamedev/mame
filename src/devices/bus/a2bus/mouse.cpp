@@ -203,25 +203,25 @@ void a2bus_mouse_device::device_reset()
     read_c0nx - called for reads from this card's c0nx space
 -------------------------------------------------*/
 
-uint8_t a2bus_mouse_device::read_c0nx(address_space &space, uint8_t offset)
+uint8_t a2bus_mouse_device::read_c0nx(uint8_t offset)
 {
-	return m_pia->read(space, offset & 3);
+	return m_pia->reg_r(offset & 3);
 }
 
 /*-------------------------------------------------
     write_c0nx - called for writes to this card's c0nx space
 -------------------------------------------------*/
 
-void a2bus_mouse_device::write_c0nx(address_space &space, uint8_t offset, uint8_t data)
+void a2bus_mouse_device::write_c0nx(uint8_t offset, uint8_t data)
 {
-	m_pia->write(space, offset & 3, data);
+	m_pia->reg_w(offset & 3, data);
 }
 
 /*-------------------------------------------------
     read_cnxx - called for reads from this card's cnxx space
 -------------------------------------------------*/
 
-uint8_t a2bus_mouse_device::read_cnxx(address_space &space, uint8_t offset)
+uint8_t a2bus_mouse_device::read_cnxx(uint8_t offset)
 {
 	return m_rom[offset+m_rom_bank];
 }

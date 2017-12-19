@@ -131,11 +131,21 @@ void mc6845_device::call_on_update_address(int strobe)
 
 WRITE8_MEMBER( mc6845_device::address_w )
 {
+	address_w(data);
+}
+
+void mc6845_device::address_w(uint8_t data)
+{
 	m_register_address_latch = data & 0x1f;
 }
 
 
 READ8_MEMBER( mc6845_device::status_r )
+{
+	return status_r();
+}
+
+uint8_t mc6845_device::status_r()
 {
 	uint8_t ret = 0;
 
@@ -180,6 +190,11 @@ void mc6845_device::transparent_update()
 
 READ8_MEMBER( mc6845_device::register_r )
 {
+	return register_r();
+}
+
+uint8_t mc6845_device::register_r()
+{
 	uint8_t ret = 0;
 
 	switch (m_register_address_latch)
@@ -201,6 +216,11 @@ READ8_MEMBER( mc6845_device::register_r )
 
 
 WRITE8_MEMBER( mc6845_device::register_w )
+{
+	register_w(data);
+}
+
+void mc6845_device::register_w(uint8_t data)
 {
 	LOG("%s:M6845 reg 0x%02x = 0x%02x\n", machine().describe_context(), m_register_address_latch, data);
 

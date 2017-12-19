@@ -93,9 +93,9 @@ void a2bus_diskiing_device::device_reset()
     read_c0nx - called for reads from this card's c0nx space
 -------------------------------------------------*/
 
-uint8_t a2bus_diskiing_device::read_c0nx(address_space &space, uint8_t offset)
+uint8_t a2bus_diskiing_device::read_c0nx(uint8_t offset)
 {
-	return m_wozfdc->read(space, offset);
+	return m_wozfdc->read(offset);
 }
 
 
@@ -103,16 +103,16 @@ uint8_t a2bus_diskiing_device::read_c0nx(address_space &space, uint8_t offset)
     write_c0nx - called for writes to this card's c0nx space
 -------------------------------------------------*/
 
-void a2bus_diskiing_device::write_c0nx(address_space &space, uint8_t offset, uint8_t data)
+void a2bus_diskiing_device::write_c0nx(uint8_t offset, uint8_t data)
 {
-	m_wozfdc->write(space, offset, data);
+	m_wozfdc->write(offset, data);
 }
 
 /*-------------------------------------------------
     read_cnxx - called for reads from this card's cnxx space
 -------------------------------------------------*/
 
-uint8_t a2bus_diskiing_device::read_cnxx(address_space &space, uint8_t offset)
+uint8_t a2bus_diskiing_device::read_cnxx(uint8_t offset)
 {
 	return m_rom[offset];
 }

@@ -101,7 +101,7 @@ void a2bus_agat7ram_device::do_io(int offset)
     read_cnxx - called for reads from this card's cnxx space
 -------------------------------------------------*/
 
-uint8_t a2bus_agat7ram_device::read_cnxx(address_space &space, uint8_t offset)
+uint8_t a2bus_agat7ram_device::read_cnxx(uint8_t offset)
 {
 	return m_csr;
 }
@@ -111,19 +111,19 @@ uint8_t a2bus_agat7ram_device::read_cnxx(address_space &space, uint8_t offset)
     write_cnxx - called for writes to this card's cnxx space
 -------------------------------------------------*/
 
-void a2bus_agat7ram_device::write_cnxx(address_space &space, uint8_t offset, uint8_t data)
+void a2bus_agat7ram_device::write_cnxx(uint8_t offset, uint8_t data)
 {
 	do_io(offset);
 }
 
-uint8_t a2bus_agat7ram_device::read_inh_rom(address_space &space, uint16_t offset)
+uint8_t a2bus_agat7ram_device::read_inh_rom(uint16_t offset)
 {
 	assert(m_inh_state & INH_READ); // this should never happen
 
 	return m_ram[(offset & 0x3fff) + m_main_bank];
 }
 
-void a2bus_agat7ram_device::write_inh_rom(address_space &space, uint16_t offset, uint8_t data)
+void a2bus_agat7ram_device::write_inh_rom(uint16_t offset, uint8_t data)
 {
 	// are writes enabled?
 	if ((m_inh_state & INH_WRITE) && !BIT(m_csr, 4))

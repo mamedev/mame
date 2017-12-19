@@ -92,32 +92,32 @@ void a2bus_mcms1_device::device_reset()
 
 // read once at c0n0 to disable 125 Hz IRQs
 // read once at c0n1 to enable 125 Hz IRQs
-uint8_t a2bus_mcms1_device::read_c0nx(address_space &space, uint8_t offset)
+uint8_t a2bus_mcms1_device::read_c0nx(uint8_t offset)
 {
 	if (offset == 0)
 	{
-		m_mcms->control_w(space, CTRL_IRQS, 0);
+		m_mcms->control_w(CTRL_IRQS, 0);
 	}
 	else if (offset == 1)
 	{
-		m_mcms->control_w(space, CTRL_IRQS, 1);
+		m_mcms->control_w(CTRL_IRQS, 1);
 	}
 
 	return 0xff;
 }
 
 // read at Cn00: light gun in bit 7, bits 0-5 = 'random' number
-uint8_t a2bus_mcms1_device::read_cnxx(address_space &space, uint8_t offset)
+uint8_t a2bus_mcms1_device::read_cnxx(uint8_t offset)
 {
 	return m_mcms->get_pen_rand();
 }
 
 // write 0-255 to Cn00 to set the master volume
-void a2bus_mcms1_device::write_cnxx(address_space &space, uint8_t offset, uint8_t data)
+void a2bus_mcms1_device::write_cnxx(uint8_t offset, uint8_t data)
 {
 	if (offset == 0)
 	{
-		m_mcms->control_w(space, CTRL_MASTERVOL, data);
+		m_mcms->control_w(CTRL_MASTERVOL, data);
 	}
 }
 
@@ -175,28 +175,28 @@ void a2bus_mcms2_device::device_reset()
 }
 
 // here to soak up false reads from indexed accesses
-uint8_t a2bus_mcms2_device::read_c0nx(address_space &space, uint8_t offset)
+uint8_t a2bus_mcms2_device::read_c0nx(uint8_t offset)
 {
 	return 0xff;
 }
 
 // write once to c0n0 to disable the card (reset also disables)
 // write twice to c0n1 to enable the card (value doesn't matter)
-void a2bus_mcms2_device::write_c0nx(address_space &space, uint8_t offset, uint8_t data)
+void a2bus_mcms2_device::write_c0nx(uint8_t offset, uint8_t data)
 {
 	if (offset == 0)
 	{
-		m_engine->control_w(space, CTRL_DMA, 0);
+		m_engine->control_w(CTRL_DMA, 0);
 	}
 	else if (offset == 1)
 	{
-		m_engine->control_w(space, CTRL_DMA, 1);
+		m_engine->control_w(CTRL_DMA, 1);
 	}
 }
 
-void a2bus_mcms2_device::write_cnxx(address_space &space, uint8_t offset, uint8_t data)
+void a2bus_mcms2_device::write_cnxx(uint8_t offset, uint8_t data)
 {
-	m_engine->voiceregs_w(space, offset, data);
+	m_engine->voiceregs_w(offset, data);
 }
 
 
@@ -307,7 +307,7 @@ void mcms_device::sound_stream_update(sound_stream &stream, stream_sample_t **in
 	}
 }
 
-WRITE8_MEMBER(mcms_device::voiceregs_w)
+void mcms_device::voiceregs_w(offs_t offset, uint8_t data)
 {
 	m_stream->update();
 	if (offset >= 0x20)
@@ -346,7 +346,7 @@ WRITE8_MEMBER(mcms_device::voiceregs_w)
 	}
 }
 
-WRITE8_MEMBER(mcms_device::control_w)
+void mcms_device::control_w(offs_t offset, uint8_t data)
 {
 	m_stream->update();
 

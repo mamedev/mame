@@ -145,7 +145,7 @@ void a2bus_scsi_device::device_reset()
     read_c0nx - called for reads from this card's c0nx space
 -------------------------------------------------*/
 
-uint8_t a2bus_scsi_device::read_c0nx(address_space &space, uint8_t offset)
+uint8_t a2bus_scsi_device::read_c0nx(uint8_t offset)
 {
 	switch (offset)
 	{
@@ -157,8 +157,8 @@ uint8_t a2bus_scsi_device::read_c0nx(address_space &space, uint8_t offset)
 		case 5:
 		case 6:
 		case 7:
-//          printf("Read 5380 @ %x\n", offset);
-			return m_ncr5380->read(space, offset);
+//          logerror("Read 5380 @ %x\n", offset);
+			return m_ncr5380->read(machine().dummy_space(), offset);
 
 		case 8:     // read and DACK
 			return m_ncr5380->dma_r();
@@ -173,7 +173,7 @@ uint8_t a2bus_scsi_device::read_c0nx(address_space &space, uint8_t offset)
 			return m_drq;
 
 		default:
-			printf("Read c0n%x (PC=%x)\n", offset, space.device().safe_pc());
+			logerror("Read c0n%x (%s)\n", offset, machine().describe_context());
 			break;
 	}
 
@@ -185,7 +185,7 @@ uint8_t a2bus_scsi_device::read_c0nx(address_space &space, uint8_t offset)
     write_c0nx - called for writes to this card's c0nx space
 -------------------------------------------------*/
 
-void a2bus_scsi_device::write_c0nx(address_space &space, uint8_t offset, uint8_t data)
+void a2bus_scsi_device::write_c0nx(uint8_t offset, uint8_t data)
 {
 	switch (offset)
 	{
@@ -197,8 +197,8 @@ void a2bus_scsi_device::write_c0nx(address_space &space, uint8_t offset, uint8_t
 		case 5:
 		case 6:
 		case 7:
-//          printf("%02x to 5380 reg %x\n", data, offset);
-			m_ncr5380->write(space, offset, data);
+//          logerror("%02x to 5380 reg %x\n", data, offset);
+			m_ncr5380->write(machine().dummy_space(), offset, data);
 			break;
 
 		case 8: // write and DACK
@@ -223,28 +223,28 @@ void a2bus_scsi_device::write_c0nx(address_space &space, uint8_t offset, uint8_t
 			m_rambank = ((data>>4) & 0x7) * 0x400;
 			m_rombank = (data & 0xf) * 0x400;
 			m_bank = data;
-//          printf("RAM bank to %x, ROM bank to %x\n", m_rambank, m_rombank);
+//          logerror("RAM bank to %x, ROM bank to %x\n", m_rambank, m_rombank);
 			m_816block = false; // does this reset block mode?
 			break;
 
 		case 0xb:   // reset 5380
-//          printf("Resetting SCSI: %02x at %x\n", data, space.device().safe_pc());
+//          logerror("Resetting SCSI: %02x at %s\n", data, machine().describe_context());
 			m_ncr5380->reset();
 			m_816block = false;
 			break;
 
 		case 0xc:   // set IIgs block mode DMA
-			printf("%02x to block-mode DMA mode\n", data);
+			logerror("%02x to block-mode DMA mode\n", data);
 			m_816block = true;
 			break;
 
 		case 0xd:   // set Mac-style pseudo-DMA
-//          printf("%02x to pseudo-DMA mode\n", data);
+//          logerror("%02x to pseudo-DMA mode\n", data);
 			m_816block = false;
 			break;
 
 		default:
-			printf("Write %02x to c0n%x (PC=%x)\n", data, offset, space.device().safe_pc());
+			logerror("Write %02x to c0n%x (%s)\n", data, offset, machine().describe_context());
 			break;
 	}
 }
@@ -253,29 +253,29 @@ void a2bus_scsi_device::write_c0nx(address_space &space, uint8_t offset, uint8_t
     read_cnxx - called for reads from this card's cnxx space
 -------------------------------------------------*/
 
-uint8_t a2bus_scsi_device::read_cnxx(address_space &space, uint8_t offset)
+uint8_t a2bus_scsi_device::read_cnxx(uint8_t offset)
 {
 	// one slot image at the start of the ROM, it appears
 	return m_rom[offset];
 }
 
-void a2bus_scsi_device::write_cnxx(address_space &space, uint8_t offset, uint8_t data)
+void a2bus_scsi_device::write_cnxx(uint8_t offset, uint8_t data)
 {
 	// there are writes to cn0A, possibly misguided C0nA (bank select?) writes?
-//  printf("Write %02x to cn%02x (PC=%x)\n", data, offset, space.device().safe_pc());
+//  logerror("Write %02x to cn%02x (%s)\n", data, offset, machine().describe_context());
 }
 
 /*-------------------------------------------------
     read_c800 - called for reads from this card's c800 space
 -------------------------------------------------*/
 
-uint8_t a2bus_scsi_device::read_c800(address_space &space, uint16_t offset)
+uint8_t a2bus_scsi_device::read_c800(uint16_t offset)
 {
 	// bankswitched RAM at c800-cbff
 	// bankswitched ROM at cc00-cfff
 	if (offset < 0x400)
 	{
-//      printf("Read RAM at %x = %02x\n", offset+m_rambank, m_ram[offset + m_rambank]);
+//      logerror("Read RAM at %x = %02x\n", offset+m_rambank, m_ram[offset + m_rambank]);
 		if (m_816block)
 		{
 			return m_ncr5380->dma_r();
@@ -292,11 +292,11 @@ uint8_t a2bus_scsi_device::read_c800(address_space &space, uint16_t offset)
 /*-------------------------------------------------
     write_c800 - called for writes to this card's c800 space
 -------------------------------------------------*/
-void a2bus_scsi_device::write_c800(address_space &space, uint16_t offset, uint8_t data)
+void a2bus_scsi_device::write_c800(uint16_t offset, uint8_t data)
 {
 	if (offset < 0x400)
 	{
-//      printf("%02x to RAM at %x\n", data, offset+m_rambank);
+//      logerror("%02x to RAM at %x\n", data, offset+m_rambank);
 		if (m_816block)
 		{
 			m_ncr5380->dma_w(data);

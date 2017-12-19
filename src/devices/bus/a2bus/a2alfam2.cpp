@@ -116,7 +116,7 @@ void a2bus_sn76489_device::device_reset()
 	m_latch0 = m_latch1 = m_latch2 = m_latch3 = 0;
 }
 
-uint8_t a2bus_sn76489_device::read_c0nx(address_space &space, uint8_t offset)
+uint8_t a2bus_sn76489_device::read_c0nx(uint8_t offset)
 {
 	// SN76489 can't be read, it appears from the schematics this is what happens
 	switch (offset)
@@ -137,29 +137,29 @@ uint8_t a2bus_sn76489_device::read_c0nx(address_space &space, uint8_t offset)
 	return 0xff;
 }
 
-void a2bus_sn76489_device::write_c0nx(address_space &space, uint8_t offset, uint8_t data)
+void a2bus_sn76489_device::write_c0nx(uint8_t offset, uint8_t data)
 {
 	switch (offset)
 	{
 		case 0:
-			m_sn1->write(space, 0, data);
+			m_sn1->write(data);
 			m_latch0 = data;
 			break;
 
 		case 1:
-			m_sn2->write(space, 0, data);
+			m_sn2->write(data);
 			m_latch1 = data;
 			break;
 
 		case 2:
-			m_sn3->write(space, 0, data);
+			m_sn3->write(data);
 			m_latch2 = data;
 			break;
 
 		case 3:
 			if (m_has4thsn)
 			{
-				m_sn4->write(space, 0, data);
+				m_sn4->write(data);
 				m_latch3 = data;
 			}
 			break;

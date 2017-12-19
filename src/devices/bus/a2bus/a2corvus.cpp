@@ -129,18 +129,18 @@ void a2bus_corvus_device::device_reset()
     read_c0nx - called for reads from this card's c0nx space
 -------------------------------------------------*/
 
-uint8_t a2bus_corvus_device::read_c0nx(address_space &space, uint8_t offset)
+uint8_t a2bus_corvus_device::read_c0nx(uint8_t offset)
 {
 	switch (offset)
 	{
 		case 0:
-			return m_corvushd->read(space, 0);
+			return m_corvushd->read(machine().dummy_space(), 0);
 
 		case 1:
-			return m_corvushd->status_r(space, 0);
+			return m_corvushd->status_r(machine().dummy_space(), 0);
 
 		default:
-			logerror("Corvus: read unhandled c0n%x (PC=%x)\n", offset, space.device().safe_pc());
+			logerror("Corvus: read unhandled c0n%x (%s)\n", offset, machine().describe_context());
 			break;
 	}
 
@@ -152,11 +152,11 @@ uint8_t a2bus_corvus_device::read_c0nx(address_space &space, uint8_t offset)
     write_c0nx - called for writes to this card's c0nx space
 -------------------------------------------------*/
 
-void a2bus_corvus_device::write_c0nx(address_space &space, uint8_t offset, uint8_t data)
+void a2bus_corvus_device::write_c0nx(uint8_t offset, uint8_t data)
 {
 	if (offset == 0)
 	{
-		m_corvushd->write(space, 0, data);
+		m_corvushd->write(machine().dummy_space(), 0, data);
 	}
 }
 
@@ -164,7 +164,7 @@ void a2bus_corvus_device::write_c0nx(address_space &space, uint8_t offset, uint8
     read_cnxx - called for reads from this card's cnxx space
 -------------------------------------------------*/
 
-uint8_t a2bus_corvus_device::read_cnxx(address_space &space, uint8_t offset)
+uint8_t a2bus_corvus_device::read_cnxx(uint8_t offset)
 {
 	// one slot image at the end of the ROM, it appears
 	return m_rom[offset+0x700];
@@ -174,7 +174,7 @@ uint8_t a2bus_corvus_device::read_cnxx(address_space &space, uint8_t offset)
     read_c800 - called for reads from this card's c800 space
 -------------------------------------------------*/
 
-uint8_t a2bus_corvus_device::read_c800(address_space &space, uint16_t offset)
+uint8_t a2bus_corvus_device::read_c800(uint16_t offset)
 {
 	return m_rom[offset & 0x7ff];
 }

@@ -260,18 +260,18 @@ void a2bus_agat840k_hle_device::device_timer(emu_timer &timer, device_timer_id i
     read_c0nx - called for reads from this card's c0nx space
 -------------------------------------------------*/
 
-uint8_t a2bus_agat840k_hle_device::read_c0nx(address_space &space, uint8_t offset)
+uint8_t a2bus_agat840k_hle_device::read_c0nx(uint8_t offset)
 {
 	u8 data;
 
 	switch (offset)
 	{
 	case 0: case 1: case 2: case 3:
-		data = m_d14->read(space, offset);
+		data = m_d14->read(machine().dummy_space(), offset);
 		break;
 
 	case 4: case 5: case 6: case 7:
-		data = m_d15->read(space, offset - 4);
+		data = m_d15->read(machine().dummy_space(), offset - 4);
 		break;
 
 	default:
@@ -287,16 +287,16 @@ uint8_t a2bus_agat840k_hle_device::read_c0nx(address_space &space, uint8_t offse
     write_c0nx - called for writes to this card's c0nx space
 -------------------------------------------------*/
 
-void a2bus_agat840k_hle_device::write_c0nx(address_space &space, uint8_t offset, uint8_t data)
+void a2bus_agat840k_hle_device::write_c0nx(uint8_t offset, uint8_t data)
 {
 	switch (offset)
 	{
 	case 0: case 1: case 2: case 3:
-		m_d14->write(space, offset, data);
+		m_d14->write(machine().dummy_space(), offset, data);
 		break;
 
 	case 4: case 5: case 6: case 7:
-		m_d15->write(space, offset - 4, data);
+		m_d15->write(machine().dummy_space(), offset - 4, data);
 		break;
 
 	case 8: // write desync
@@ -323,7 +323,7 @@ void a2bus_agat840k_hle_device::write_c0nx(address_space &space, uint8_t offset,
     read_cnxx - called for reads from this card's c0nx space
 -------------------------------------------------*/
 
-uint8_t a2bus_agat840k_hle_device::read_cnxx(address_space &space, uint8_t offset)
+uint8_t a2bus_agat840k_hle_device::read_cnxx(uint8_t offset)
 {
 	return m_rom[offset];
 }
