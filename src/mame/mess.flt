@@ -773,6 +773,7 @@ z9001.cpp
 zapcomputer.cpp
 zaurus.cpp
 zexall.cpp
+zms8085.cpp
 zorba.cpp
 zrt80.cpp
 zsbc3.cpp

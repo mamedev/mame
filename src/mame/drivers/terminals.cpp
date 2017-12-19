@@ -309,26 +309,3 @@ ROM_START( vt420 )
 ROM_END
 
 COMP( 1990, vt420, 0, 0, terminals, terminals, terminals_state, 0, "DEC", "VT-420", MACHINE_IS_SKELETON )
-
-
-
-/**************************************************************************************************************
-
-Zentec Zephyr (Model 00-441-01).
-Chips: COM2017, i8085A, 2x unreadable (40-pin AMI DIP), Beeper
-Crystal: 15.582000
-Cf. U.S. Patent No. 4,203,107.
-
-***************************************************************************************************************/
-
-ROM_START( zephyr )
-	ROM_REGION(0x10000, "maincpu", 0)
-	ROM_LOAD( "23-006-32c.bin",  0x0000, 0x0800, CRC(0a3a5447) SHA1(a8c25730a1d7e5b9c86e0d504afc923e931f9025) )
-	ROM_LOAD( "23-067-004b.bin", 0x0800, 0x0800, CRC(37741104) SHA1(52b9998e0a8d4949e0dc7c3349b3681e13345061) )
-	ROM_LOAD( "23-067-03b.bin",  0x1000, 0x0800, CRC(29cfa003) SHA1(9de7a8402173a2c448e54ee433ba3050db7b70bb) ) // this doesn't seem to fit
-
-	ROM_REGION(0x0800, "chargen", 0)
-	ROM_LOAD( "23-066-02a.bin",  0x0000, 0x0800, CRC(d5650b6c) SHA1(e6333e59018d9904f12abb270db4ba28aeff1995) )
-ROM_END
-
-COMP( 1979, zephyr, 0, 0, terminals, terminals, terminals_state, 0, "Zentec", "Zephyr", MACHINE_IS_SKELETON )

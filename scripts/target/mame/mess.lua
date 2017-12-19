@@ -3635,6 +3635,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/xor100.cpp",
 	MAME_DIR .. "src/mame/includes/xor100.h",
 	MAME_DIR .. "src/mame/drivers/xavix.cpp",
+	MAME_DIR .. "src/mame/drivers/zms8085.cpp",
 	MAME_DIR .. "src/mame/drivers/zorba.cpp",
 	MAME_DIR .. "src/mame/includes/zorba.h",
 	MAME_DIR .. "src/mame/machine/zorbakbd.cpp",

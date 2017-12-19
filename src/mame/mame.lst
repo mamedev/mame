@@ -36430,7 +36430,6 @@ tv965
 v100
 v102
 vt420
-zephyr
 
 @source:terracre.cpp
 amatelas                        // (c) 1986
@@ -38980,6 +38979,9 @@ zerozone                        // (c) 1993 Comad
 
 @source:zexall.cpp
 zexall                          // zexall z80 test suite with kevtris' preloader/serial interface at 0000-00ff
+
+@source:zms8085.cpp
+zephyr                          //
 
 @source:zn.cpp
 1on1gov                         // 1 on 1 Government (JAPAN)
