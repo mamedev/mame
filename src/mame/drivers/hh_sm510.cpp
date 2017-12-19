@@ -3152,8 +3152,8 @@ ROM_START( kcontra ) // except for filler/unused bytes, ROM listing in patent US
 	ROM_REGION( 0x100, "maincpu:melody", 0 )
 	ROM_LOAD( "773.melody", 0x000, 0x100, CRC(23d02b99) SHA1(703938e496db0eeacd14fe7605d4b5c39e0a5bc8) )
 
-	ROM_REGION( 719935, "svg", 0)
-	ROM_LOAD( "kcontra.svg", 0, 719935, CRC(38fb0ba5) SHA1(6de17610923e3323522ade086932d97f6d209781) )
+	ROM_REGION( 721005, "svg", 0)
+	ROM_LOAD( "kcontra.svg", 0, 721005, SHA1(2f401222d24fa32a4659ef2b64ddac8ac3973c69) )
 ROM_END
 
 
@@ -3302,11 +3302,11 @@ ROM_START( gnw_jr55 )
 	ROM_REGION( 0x1000, "maincpu", 0 )
 	ROM_LOAD( "jr-55_560", 0x0000, 0x1000, CRC(46aed0ae) SHA1(72f75ccbd84aea094148c872fc7cc1683619a18a) )
 
-	ROM_REGION( 267484, "svg_top", 0)
-	ROM_LOAD( "gnw_jr55_top.svg", 0, 267484, CRC(e14441ba) SHA1(79ba96f1b8a78c85bf96e2753b9455f33203a674) )
+	ROM_REGION( 267443, "svg_top", 0)
+	ROM_LOAD( "gnw_jr55_top.svg", 0, 267443, CRC(33b26edb) SHA1(600afdf22ff4ac4a4af2de9159287cc6e53dfe3a) )
 
-	ROM_REGION( 391119, "svg_bottom", 0)
-	ROM_LOAD( "gnw_jr55_bottom.svg", 0, 391119, CRC(8ed3d1ef) SHA1(36886df1f3bffaa5343103689185baeca6ecbf0a) )
+	ROM_REGION( 390558, "svg_bottom", 0)
+	ROM_LOAD( "gnw_jr55_bottom.svg", 0, 390558, CRC(92d68958) SHA1(aba829bf89b93bf3a4e425c9a8f6eec9e5869bc4) )
 ROM_END
 
 
@@ -3347,8 +3347,8 @@ ROM_START( gnw_bx301 )
 	ROM_REGION( 0x100, "maincpu:melody", 0 )
 	ROM_LOAD( "bx-301_744.melody", 0x000, 0x100, CRC(439d943d) SHA1(52880df15ec7513f96482f455ef3d9778aa24750) )
 
-	ROM_REGION( 265240, "svg", 0)
-	ROM_LOAD( "gnw_bx301.svg", 0, 265240, CRC(199a5683) SHA1(fd0db0f325ef08879a44da5558b6774cda46bf83) )
+	ROM_REGION( 265174, "svg", 0)
+	ROM_LOAD( "gnw_bx301.svg", 0, 265174, CRC(e8a3ab25) SHA1(53e32542b582dcdf4ddd051f182738eee6c732c9) )
 ROM_END
 
 
@@ -3382,8 +3382,8 @@ ROM_START( tkarnov )
 	ROM_REGION( 0x1000, "maincpu", 0 )
 	ROM_LOAD( "582", 0x0000, 0x1000, CRC(cee85bdd) SHA1(143e39524f1dea523e0575f327ed189343cc87f5) )
 
-	ROM_REGION( 527360, "svg", 0)
-	ROM_LOAD( "tkarnov.svg", 0, 527360, CRC(ee918299) SHA1(2d8ccf7650ec9b71fcdbdf3f5228e17dca990216) )
+	ROM_REGION( 527377, "svg", 0)
+	ROM_LOAD( "tkarnov.svg", 0, 527377, CRC(971840fc) SHA1(48db7139fa875e60b44340fb475b6d1081ef5c10) )
 ROM_END
 
 
@@ -3445,8 +3445,8 @@ ROM_START( tbtoads )
 	ROM_REGION( 0x1000, "maincpu", 0 )
 	ROM_LOAD( "mb3", 0x0000, 0x1000, CRC(8fa4c55a) SHA1(2be97e63dfed51313e180d7388dd431058db5a51) )
 
-	ROM_REGION( 694523, "svg", 0)
-	ROM_LOAD( "tbtoads.svg", 0, 694523, CRC(9a5c3ac5) SHA1(569e8ecd6dee75842e23eebf17611cef8d06ccf5) )
+	ROM_REGION( 694365, "svg", 0)
+	ROM_LOAD( "tbtoads.svg", 0, 694365, CRC(3af488e9) SHA1(d0e9ec61fac23bb22e508da4fa8bf2a7b8f186cf) )
 ROM_END
 
 
@@ -3475,8 +3475,8 @@ ROM_START( tbatfor )
 	ROM_REGION( 0x1000, "maincpu", 0 )
 	ROM_LOAD( "mk3", 0x0000, 0x1000, CRC(9993c382) SHA1(0c89e21024315ce7c086af5390c60f5766028c4f) )
 
-	ROM_REGION( 876501, "svg", 0)
-	ROM_LOAD( "tbatfor.svg", 0, 876501, CRC(2506eb20) SHA1(329dddc514d9c0c6e658b489059371b18b45d301) )
+	ROM_REGION( 902364, "svg", 0)
+	ROM_LOAD( "tbatfor.svg", 0, 902364, CRC(56889c05) SHA1(dda393ca99196de38ad2e989ec6c292adc36ec5e) )
 ROM_END
 
 
@@ -3502,8 +3502,8 @@ ROM_START( tsjam )
 	ROM_REGION( 0x1000, "maincpu", 0 )
 	ROM_LOAD( "10_23", 0x0000, 0x1000, CRC(6eaabfbd) SHA1(f0ecbd6f65fe72ce2d8a452685be2e77a63fc9f0) )
 
-	ROM_REGION( 1044643, "svg", 0)
-	ROM_LOAD( "tsjam.svg", 0, 1044643, CRC(f91d9429) SHA1(57a843673bf4c5753ae795d49da29ceb6fe095f3) )
+	ROM_REGION( 1046147, "svg", 0)
+	ROM_LOAD( "tsjam.svg", 0, 1046147, CRC(6d24e1c9) SHA1(ddbfbd85f70ec964c68f982a8ee8070e3786a85e) )
 ROM_END
 
 
