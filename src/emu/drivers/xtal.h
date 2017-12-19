@@ -168,10 +168,12 @@ enum
 	XTAL_14_7456MHz     = 14745600,     /* Namco System 12 & System Super 22/23 for JVS */
 	XTAL_14_916MHz      = 14916000,     /* ADDS Viewpoint 122 */
 	XTAL_15MHz          = 15000000,     /* Sinclair QL, Amusco Poker */
+	XTAL_15_1488MHz     = 15148800,     /* Zentec 9002/9003 */
 	XTAL_15_30072MHz    = 15300720,     /* Microterm 420 */
 	XTAL_15_36MHz       = 15360000,     /* Visual 1050 */
 	XTAL_15_4MHz        = 15400000,     /* DVK KSM */
 	XTAL_15_468MHz      = 15468480,     /* Bank Panic h/w, Sega G80 */
+	XTAL_15_582MHz      = 15582000,     /* Zentec Zephyr */
 	XTAL_15_8976MHz     = 15897600,     /* IAI Swyft */
 	XTAL_15_92MHz       = 15920000,     /* HP Integral PC */
 	XTAL_15_9744MHz     = 15974400,     /* Osborne 1 (9600 * 52 * 32) */
@@ -271,7 +273,6 @@ enum
 	XTAL_44_4528MHz     = 44452800,     /* TeleVideo 965 */
 	XTAL_45MHz          = 45000000,     /* Eolith with Hyperstone CPUs */
 	XTAL_45_158MHz      = 45158000,     /* Sega Model 2A video board, Model 3 CPU board */
-	XTAL_45_582MHz      = 45582000,     /* Zentec Zephyr */
 	XTAL_45_6192MHz     = 45619200,     /* DEC VK100 */
 	XTAL_45_8304MHz     = 45830400,     /* Microterm 5510 */
 	XTAL_47_736MHz      = 47736000,     /* Visual 100 */

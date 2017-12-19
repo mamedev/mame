@@ -316,7 +316,8 @@ COMP( 1990, vt420, 0, 0, terminals, terminals, terminals_state, 0, "DEC", "VT-42
 
 Zentec Zephyr (Model 00-441-01).
 Chips: COM2017, i8085A, 2x unreadable (40-pin AMI DIP), Beeper
-Crystal: 45.582000
+Crystal: 15.582000
+Cf. U.S. Patent No. 4,203,107.
 
 ***************************************************************************************************************/
 
