@@ -82,6 +82,8 @@ private:
 
 	uint16_t m_pc; // For the debugger
 
+	uint8_t do_ad(uint8_t augend, uint8_t addend);
+
 	void ROMC_00(int insttim);
 	void ROMC_01();
 	void ROMC_02();
@@ -205,7 +207,6 @@ private:
 	void f8_ns_isar();
 	void f8_ns_isar_i();
 	void f8_ns_isar_d();
-
 };
 
 
