@@ -767,7 +767,7 @@ std::vector<char32_t> ioport_field::keyboard_codes(int which) const
 		throw emu_fatalerror("Tried to access keyboard_code with out-of-range index %d\n", which);
 
 	std::vector<char32_t> result;
-	for (int i = 0; i < ARRAY_LENGTH(m_chars[which]) && m_chars[which] != 0; i++)
+	for (int i = 0; i < ARRAY_LENGTH(m_chars[which]) && m_chars[which][i] != 0; i++)
 		result.push_back(m_chars[which][i]);
 
 	return result;
