@@ -14,12 +14,12 @@
     FM-7         | 1982-11 | M68B09 @ 2MHz  |  M68B09   |    64K (main) + 48K (VRAM)    |
     FM-NEW7      | 1984-05 | M68B09 @ 2MHz  |  M68B09   |    64K (main) + 48K (VRAM)    |
     FM-77        | 1984-05 | M68B09 @ 2MHz  |  M68B09E  |  64/256K (main) + 48K (VRAM)  |
-    FM-77AV      | 1985-10 | M68B09E @ 2MHz |  M68B09   | 128/192K (main) + 96K (VRAM)  |
-    FM-77AV20    | 1986-10 | M68B09E @ 2MHz |  M68B09   | 128/192K (main) + 96K (VRAM)  |
-    FM-77AV40    | 1986-10 | M68B09E @ 2MHz |  M68B09   | 192/448K (main) + 144K (VRAM) |
-    FM-77AV20EX  | 1987-11 | M68B09E @ 2MHz |  M68B09   | 128/192K (main) + 96K (VRAM)  |
-    FM-77AV40EX  | 1987-11 | M68B09E @ 2MHz |  M68B09   | 192/448K (main) + 144K (VRAM) |
-    FM-77AV40SX  | 1988-11 | M68B09E @ 2MHz |  M68B09   | 192/448K (main) + 144K (VRAM) |
+    FM-77AV      | 1985-10 | M68B09E @ 2MHz |  M68B09E  | 128/192K (main) + 96K (VRAM)  |
+    FM-77AV20    | 1986-10 | M68B09E @ 2MHz |  M68B09E  | 128/192K (main) + 96K (VRAM)  |
+    FM-77AV40    | 1986-10 | M68B09E @ 2MHz |  M68B09E  | 192/448K (main) + 144K (VRAM) |
+    FM-77AV20EX  | 1987-11 | M68B09E @ 2MHz |  M68B09E  | 128/192K (main) + 96K (VRAM)  |
+    FM-77AV40EX  | 1987-11 | M68B09E @ 2MHz |  M68B09E  | 192/448K (main) + 144K (VRAM) |
+    FM-77AV40SX  | 1988-11 | M68B09E @ 2MHz |  M68B09E  | 192/448K (main) + 144K (VRAM) |
 
     Note: FM-77AV dumps probably come from a FM-77AV40SX. Shall we confirm that both computers
     used the same BIOS components?
@@ -2057,12 +2057,12 @@ MCFG_ADDRESS_MAP_BANK_STRIDE(0x1000)
 
 static MACHINE_CONFIG_START( fm7 )
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", MC6809, 8000000)
+	MCFG_CPU_ADD("maincpu", MC6809, XTAL_16_128MHz / 2)
 	MCFG_CPU_PROGRAM_MAP(fm7_mem)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(fm7_state,fm7_irq_ack)
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 
-	MCFG_CPU_ADD("sub", MC6809, 8000000)
+	MCFG_CPU_ADD("sub", MC6809, XTAL_16_128MHz / 2)
 	MCFG_CPU_PROGRAM_MAP(fm7_sub_mem)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(fm7_state,fm7_sub_irq_ack)
 	MCFG_QUANTUM_PERFECT_CPU("sub")
@@ -2112,12 +2112,12 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( fm8 )
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", MC6809, 4800000)  // 1.2MHz 68A09
+	MCFG_CPU_ADD("maincpu", MC6809, XTAL_4_9152MHz)  // 1.2MHz 68A09
 	MCFG_CPU_PROGRAM_MAP(fm8_mem)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(fm7_state,fm7_irq_ack)
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 
-	MCFG_CPU_ADD("sub", MC6809, 4000000)
+	MCFG_CPU_ADD("sub", MC6809, XTAL_16_128MHz / 2)
 	MCFG_CPU_PROGRAM_MAP(fm7_sub_mem)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(fm7_state,fm7_sub_irq_ack)
 	MCFG_QUANTUM_PERFECT_CPU("sub")
@@ -2160,12 +2160,12 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( fm77av )
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6809, XTAL_2MHz)  // actually MB68B09E, but the 6809E core runs too slowly
+	MCFG_CPU_ADD("maincpu", MC6809E, XTAL_16_128MHz / 8)
 	MCFG_CPU_PROGRAM_MAP(fm77av_mem)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(fm7_state,fm7_irq_ack)
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 
-	MCFG_CPU_ADD("sub", M6809, XTAL_2MHz)
+	MCFG_CPU_ADD("sub", MC6809E, XTAL_16_128MHz / 8)
 	MCFG_CPU_PROGRAM_MAP(fm77av_sub_mem)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(fm7_state,fm7_sub_irq_ack)
 	MCFG_QUANTUM_PERFECT_CPU("sub")
@@ -2202,7 +2202,7 @@ static MACHINE_CONFIG_START( fm77av )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(16128000, 1024, 0, 640, 262, 0, 200)
+	MCFG_SCREEN_RAW_PARAMS(XTAL_16_128MHz, 1024, 0, 640, 262, 0, 200)
 	MCFG_SCREEN_UPDATE_DRIVER(fm7_state, screen_update_fm7)
 
 	MCFG_PALETTE_ADD_3BIT_BRG("palette")
@@ -2236,17 +2236,17 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( fm11 )
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6809, XTAL_2MHz)  // 2MHz 68B09E
+	MCFG_CPU_ADD("maincpu", MC6809E, 2000000)  // 2MHz 68B09E
 	MCFG_CPU_PROGRAM_MAP(fm11_mem)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(fm7_state,fm7_irq_ack)
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 
-	MCFG_CPU_ADD("sub", M6809, XTAL_2MHz)  // 2MHz 68B09
+	MCFG_CPU_ADD("sub", MC6809, 8000000)  // 2MHz 68B09
 	MCFG_CPU_PROGRAM_MAP(fm11_sub_mem)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(fm7_state,fm7_sub_irq_ack)
 	MCFG_QUANTUM_PERFECT_CPU("sub")
 
-	MCFG_CPU_ADD("x86", I8088, XTAL_8MHz)  // 8MHz i8088
+	MCFG_CPU_ADD("x86", I8088, 8000000)  // 8MHz i8088
 	MCFG_CPU_PROGRAM_MAP(fm11_x86_mem)
 	MCFG_CPU_IO_MAP(fm11_x86_io)
 
@@ -2305,12 +2305,12 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( fm16beta )
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I8086, XTAL_8MHz)  // 8MHz i8086
+	MCFG_CPU_ADD("maincpu", I8086, 8000000)  // 8MHz i8086
 	MCFG_CPU_PROGRAM_MAP(fm16_mem)
 	MCFG_CPU_IO_MAP(fm16_io)
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 
-	MCFG_CPU_ADD("sub", M6809, XTAL_2MHz)
+	MCFG_CPU_ADD("sub", MC6809, 8000000)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(fm7_state,fm7_sub_irq_ack)
 	MCFG_CPU_PROGRAM_MAP(fm16_sub_mem)
 	MCFG_QUANTUM_PERFECT_CPU("sub")
