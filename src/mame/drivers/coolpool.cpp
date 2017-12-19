@@ -118,7 +118,7 @@ TMS340X0_TO_SHIFTREG_CB_MEMBER(coolpool_state::to_shiftreg)
 
 TMS340X0_FROM_SHIFTREG_CB_MEMBER(coolpool_state::from_shiftreg)
 {
-	memcpy(&m_vram_base[(address & ~0xfff) >> 4], shiftreg, 0x2000);
+	memcpy(&m_vram_base[(address & ~0xfff) >> 4], shiftreg, 0x200);
 }
 
 
