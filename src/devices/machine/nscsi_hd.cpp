@@ -92,7 +92,7 @@ void nscsi_harddisk_device::scsi_put_data(int id, int pos, uint8_t data)
 void nscsi_harddisk_device::scsi_command()
 {
 	
-	if ((VERBOSE & LOG_COMMAND) && scsi_cmdbuf[0] != SC_READ_6)
+	if((VERBOSE & LOG_COMMAND) && scsi_cmdbuf[0] != SC_READ_6)
 	{
 		LOGMASKED(LOG_COMMAND, "%02x %02x %02x %02x %02x %02x\n",
 			scsi_cmdbuf[0], scsi_cmdbuf[1], scsi_cmdbuf[2],
@@ -150,7 +150,7 @@ void nscsi_harddisk_device::scsi_command()
 			scsi_cmdbuf[1] = 0x00; // media is not removable
 			scsi_cmdbuf[2] = 0x05; // device complies with SPC-3 standard
 			scsi_cmdbuf[3] = 0x01; // response data format = CCS
-			if (m_inquiry_data.empty())
+			if(m_inquiry_data.empty())
 			{
 				LOG("IDNT tag not found in chd metadata, using default inquiry data\n");
 
