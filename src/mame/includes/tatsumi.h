@@ -52,6 +52,8 @@ public:
 	DECLARE_READ8_MEMBER(tatsumi_hack_ym2151_r);
 	DECLARE_READ8_MEMBER(tatsumi_hack_oki_r);
 	void tatsumi_reset();
+	template<class _BitmapClass> void draw_sprites(_BitmapClass &bitmap, const rectangle &cliprect, int write_priority_only, int rambank);
+	void update_cluts(int fake_palette_offset, int object_base, int length);
 };
 
 class apache3_state : public tatsumi_state
@@ -85,6 +87,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(apache3_68000_reset);
 
 private:
+	void draw_sky(bitmap_rgb32 &bitmap, const rectangle &cliprect, int palette_base, int start_offset);
 	void draw_ground(bitmap_rgb32 &dst, const rectangle &cliprect);
 
 	required_device<cpu_device> m_subcpu2;
@@ -200,4 +203,6 @@ private:
 	uint16_t m_bigfight_a40000[2];
 	uint16_t m_bigfight_bank;
 	uint16_t m_bigfight_last_bank;
+
+	void draw_bg(bitmap_rgb32 &dst, tilemap_t *src, const uint16_t* scrollx, const uint16_t* scrolly, const uint16_t* tilemap_ram, int tile_bank, int xscroll_offset, int yscroll_offset, int xsize, int ysize);
 };
