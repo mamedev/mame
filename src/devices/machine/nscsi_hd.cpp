@@ -46,7 +46,7 @@ void nscsi_harddisk_device::device_reset()
 		bytes_per_sector = hdinfo->sectorbytes;
 
 		chd_file *chd = hd->get_chd_file();
-		if (chd != nullptr)
+		if(chd != nullptr)
 			chd->read_metadata(HARD_DISK_IDENT_METADATA_TAG, 0, m_inquiry_data);
 	}
 	cur_lba = -1;
