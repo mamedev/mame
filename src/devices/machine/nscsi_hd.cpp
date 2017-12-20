@@ -150,8 +150,7 @@ void nscsi_harddisk_device::scsi_command()
 			scsi_cmdbuf[1] = 0x00; // media is not removable
 			scsi_cmdbuf[2] = 0x05; // device complies with SPC-3 standard
 			scsi_cmdbuf[3] = 0x01; // response data format = CCS
-			if(m_inquiry_data.empty())
-			{
+			if(m_inquiry_data.empty()) {
 				LOG("IDNT tag not found in chd metadata, using default inquiry data\n");
 
 				// Apple HD SC setup utility needs to see this
