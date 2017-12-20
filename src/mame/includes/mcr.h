@@ -27,50 +27,21 @@ public:
 	mcr_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_ipu(*this, "ipu"),
-		m_watchdog(*this, "watchdog"),
 		m_spriteram(*this, "spriteram"),
 		m_videoram(*this, "videoram"),
 		m_paletteram(*this, "paletteram"),
-		m_sio(*this, "ipu_sio"),
+		m_ctc(*this, "ctc"),
 		m_ssio(*this, "ssio"),
 		m_cheap_squeak_deluxe(*this, "csd"),
 		m_sounds_good(*this, "sg"),
 		m_turbo_cheap_squeak(*this, "tcs"),
 		m_squawk_n_talk(*this, "snt"),
-		m_dpoker_coin_in_timer(*this, "dp_coinin"),
-		m_dpoker_hopper_timer(*this, "dp_hopper"),
 		m_samples(*this, "samples"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette")
 	{ }
 
-	required_device<z80_device> m_maincpu;
-	optional_device<cpu_device> m_ipu;
-	required_device<watchdog_timer_device> m_watchdog;
-	optional_shared_ptr<uint8_t> m_spriteram;
-	optional_shared_ptr<uint8_t> m_videoram;
-	optional_shared_ptr<uint8_t> m_paletteram;
-
-	optional_device<z80dart_device> m_sio;
-	optional_device<midway_ssio_device> m_ssio;
-	optional_device<midway_cheap_squeak_deluxe_device> m_cheap_squeak_deluxe;
-	optional_device<midway_sounds_good_device> m_sounds_good;
-	optional_device<midway_turbo_cheap_squeak_device> m_turbo_cheap_squeak;
-	optional_device<midway_squawk_n_talk_device> m_squawk_n_talk;
-	optional_device<timer_device> m_dpoker_coin_in_timer;
-	optional_device<timer_device> m_dpoker_hopper_timer;
-	optional_device<samples_device> m_samples;
-	required_device<gfxdecode_device> m_gfxdecode;
-	required_device<palette_device> m_palette;
-
-	int m_sio_txda;
-	int m_sio_txdb;
-
 	DECLARE_WRITE8_MEMBER(mcr_control_port_w);
-	DECLARE_WRITE8_MEMBER(mcr_ipu_laserdisk_w);
-	DECLARE_READ8_MEMBER(mcr_ipu_watchdog_r);
-	DECLARE_WRITE8_MEMBER(mcr_ipu_watchdog_w);
 	DECLARE_WRITE8_MEMBER(mcr_paletteram9_w);
 	DECLARE_WRITE8_MEMBER(mcr_90009_videoram_w);
 	DECLARE_WRITE8_MEMBER(mcr_90010_videoram_w);
@@ -79,11 +50,6 @@ public:
 	DECLARE_WRITE8_MEMBER(mcr_91490_videoram_w);
 	DECLARE_READ8_MEMBER(solarfox_ip0_r);
 	DECLARE_READ8_MEMBER(solarfox_ip1_r);
-	DECLARE_READ8_MEMBER(dpoker_ip0_r);
-	DECLARE_WRITE8_MEMBER(dpoker_lamps1_w);
-	DECLARE_WRITE8_MEMBER(dpoker_lamps2_w);
-	DECLARE_WRITE8_MEMBER(dpoker_output_w);
-	DECLARE_WRITE8_MEMBER(dpoker_meters_w);
 	DECLARE_READ8_MEMBER(kick_ip1_r);
 	DECLARE_WRITE8_MEMBER(wacko_op4_w);
 	DECLARE_READ8_MEMBER(wacko_ip1_r);
@@ -93,62 +59,140 @@ public:
 	DECLARE_WRITE8_MEMBER(journey_op4_w);
 	DECLARE_WRITE8_MEMBER(twotiger_op4_w);
 	DECLARE_WRITE8_MEMBER(dotron_op4_w);
-	DECLARE_READ8_MEMBER(nflfoot_ip2_r);
-	DECLARE_WRITE8_MEMBER(nflfoot_op4_w);
 	DECLARE_READ8_MEMBER(demoderb_ip1_r);
 	DECLARE_READ8_MEMBER(demoderb_ip2_r);
 	DECLARE_WRITE8_MEMBER(demoderb_op4_w);
-
-	DECLARE_INPUT_CHANGED_MEMBER(dpoker_coin_in_hit);
 
 	DECLARE_DRIVER_INIT(mcr_91490);
 	DECLARE_DRIVER_INIT(kroozr);
 	DECLARE_DRIVER_INIT(solarfox);
 	DECLARE_DRIVER_INIT(kick);
-	DECLARE_DRIVER_INIT(dpoker);
 	DECLARE_DRIVER_INIT(twotiger);
 	DECLARE_DRIVER_INIT(demoderb);
 	DECLARE_DRIVER_INIT(wacko);
 	DECLARE_DRIVER_INIT(mcr_90010);
 	DECLARE_DRIVER_INIT(dotrone);
-	DECLARE_DRIVER_INIT(nflfoot);
 	DECLARE_DRIVER_INIT(journey);
+
+	uint32_t screen_update_mcr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	TIMER_DEVICE_CALLBACK_MEMBER(mcr_interrupt);
+	
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 
 	TILE_GET_INFO_MEMBER(mcr_90009_get_tile_info);
 	TILE_GET_INFO_MEMBER(mcr_90010_get_tile_info);
 	TILE_GET_INFO_MEMBER(mcr_91490_get_tile_info);
-	DECLARE_MACHINE_START(mcr);
-	DECLARE_MACHINE_RESET(mcr);
-	DECLARE_VIDEO_START(mcr);
-	DECLARE_MACHINE_START(nflfoot);
-	uint32_t screen_update_mcr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	TIMER_CALLBACK_MEMBER(ipu_watchdog_reset);
-	TIMER_DEVICE_CALLBACK_MEMBER(dpoker_hopper_callback);
-	TIMER_DEVICE_CALLBACK_MEMBER(dpoker_coin_in_callback);
-	TIMER_DEVICE_CALLBACK_MEMBER(mcr_interrupt);
-	TIMER_DEVICE_CALLBACK_MEMBER(mcr_ipu_interrupt);
-	DECLARE_WRITE_LINE_MEMBER(sio_txda_w);
-	DECLARE_WRITE_LINE_MEMBER(sio_txdb_w);
 	void mcr_set_color(int index, int data);
 	void journey_set_color(int index, int data);
 	void render_sprites_91399(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void render_sprites_91464(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int primask, int sprmask, int colormask);
 	void mcr_init(int cpuboard, int vidboard, int ssioboard);
+
+	int8_t m_mcr12_sprite_xoffs_flip;
+	uint8_t m_input_mux;
+	uint8_t m_last_op4;
+	tilemap_t *m_bg_tilemap;
+
+	uint8_t m_mcr_cocktail_flip;
+
+	required_device<z80_device> m_maincpu;
+	optional_shared_ptr<uint8_t> m_spriteram;
+	optional_shared_ptr<uint8_t> m_videoram;
+	optional_shared_ptr<uint8_t> m_paletteram;
+
+	required_device<z80ctc_device> m_ctc;
+	optional_device<midway_ssio_device> m_ssio;
+	optional_device<midway_cheap_squeak_deluxe_device> m_cheap_squeak_deluxe;
+	optional_device<midway_sounds_good_device> m_sounds_good;
+	optional_device<midway_turbo_cheap_squeak_device> m_turbo_cheap_squeak;
+	optional_device<midway_squawk_n_talk_device> m_squawk_n_talk;
+	optional_device<samples_device> m_samples;
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
+
+private:
+	uint32_t m_mcr_cpu_board;
+	uint32_t m_mcr_sprite_board;
+
+	int8_t m_mcr12_sprite_xoffs;
 };
 
-/*----------- defined in machine/mcr.c -----------*/
+class mcr_dpoker_state : public mcr_state
+{
+public:
+	mcr_dpoker_state(const machine_config &mconfig, device_type type, const char *tag)
+		: mcr_state(mconfig, type, tag),
+		m_coin_in_timer(*this, "coinin"),
+		m_hopper_timer(*this, "hopper") {}
+
+	DECLARE_READ8_MEMBER(ip0_r);
+	DECLARE_WRITE8_MEMBER(lamps1_w);
+	DECLARE_WRITE8_MEMBER(lamps2_w);
+	DECLARE_WRITE8_MEMBER(output_w);
+	DECLARE_WRITE8_MEMBER(meters_w);
+
+	DECLARE_INPUT_CHANGED_MEMBER(coin_in_hit);
+
+	TIMER_DEVICE_CALLBACK_MEMBER(hopper_callback);
+	TIMER_DEVICE_CALLBACK_MEMBER(coin_in_callback);
+
+	DECLARE_DRIVER_INIT(dpoker);
+
+private:
+	uint8_t m_coin_status;
+	uint8_t m_output;
+
+	required_device<timer_device> m_coin_in_timer;
+	required_device<timer_device> m_hopper_timer;
+};
+
+class mcr_nflfoot_state : public mcr_state
+{
+public:
+	mcr_nflfoot_state(const machine_config &mconfig, device_type type, const char *tag)
+		: mcr_state(mconfig, type, tag),
+		m_ipu(*this, "ipu"),
+		m_ipu_sio(*this, "ipu_sio"),
+		m_ipu_ctc(*this, "ipu_ctc"),
+		m_ipu_pio0(*this, "ipu_pio0"),
+		m_ipu_pio1(*this, "ipu_pio1") {}
+
+	DECLARE_WRITE_LINE_MEMBER(sio_txda_w);
+	DECLARE_WRITE_LINE_MEMBER(sio_txdb_w);
+	DECLARE_WRITE8_MEMBER(ipu_laserdisk_w);
+	DECLARE_READ8_MEMBER(ipu_watchdog_r);
+	DECLARE_WRITE8_MEMBER(ipu_watchdog_w);
+	DECLARE_READ8_MEMBER(ip2_r);
+	DECLARE_WRITE8_MEMBER(op4_w);
+
+	TIMER_CALLBACK_MEMBER(ipu_watchdog_reset);
+	TIMER_DEVICE_CALLBACK_MEMBER(ipu_interrupt);
+
+	DECLARE_DRIVER_INIT(nflfoot);
+
+protected:
+	virtual void machine_start() override;
+
+private:
+	int m_ipu_sio_txda;
+	int m_ipu_sio_txdb;
+	emu_timer *m_ipu_watchdog_timer;
+
+	required_device<cpu_device> m_ipu;
+	required_device<z80dart_device> m_ipu_sio;
+	required_device<z80ctc_device> m_ipu_ctc;
+	required_device<z80pio_device> m_ipu_pio0;
+	required_device<z80pio_device> m_ipu_pio1;
+};
+
+/*----------- defined in machine/mcr.cpp -----------*/
 
 extern const z80_daisy_config mcr_daisy_chain[];
 extern const z80_daisy_config mcr_ipu_daisy_chain[];
-extern uint8_t mcr_cocktail_flip;
 
 extern const gfx_layout mcr_bg_layout;
 extern const gfx_layout mcr_sprite_layout;
 
-extern uint32_t mcr_cpu_board;
-extern uint32_t mcr_sprite_board;
-
-/*----------- defined in video/mcr.c -----------*/
-
-extern int8_t mcr12_sprite_xoffs;
-extern int8_t mcr12_sprite_xoffs_flip;

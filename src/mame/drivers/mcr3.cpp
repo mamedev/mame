@@ -106,12 +106,8 @@
 #include "emu.h"
 #include "includes/mcr.h"
 #include "includes/mcr3.h"
-#include "audio/midway.h"
-#include "audio/csd.h"
 
-#include "cpu/z80/z80.h"
 #include "machine/nvram.h"
-#include "machine/z80ctc.h"
 
 #include "speaker.h"
 
@@ -138,7 +134,7 @@ WRITE8_MEMBER(mcr3_state::mcrmono_control_port_w)
 	*/
 
 	machine().bookkeeping().coin_counter_w(0, (data >> 0) & 1);
-	mcr_cocktail_flip = (data >> 6) & 1;
+	m_mcr_cocktail_flip = (data >> 6) & 1;
 }
 
 
@@ -611,7 +607,7 @@ static INPUT_PORTS_START( demoderm )
 INPUT_PORTS_END
 
 
-/* inputs not verfied yet, DIP switches from manual */
+/* inputs not verified yet, DIP switches from manual */
 static INPUT_PORTS_START( sarge )
 	PORT_START("MONO.IP0")  /* J2 1-8 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
@@ -1101,8 +1097,6 @@ static MACHINE_CONFIG_START( mcrmono )
 	MCFG_WATCHDOG_ADD("watchdog")
 	MCFG_WATCHDOG_VBLANK_INIT("screen", 16)
 
-	MCFG_MACHINE_START_OVERRIDE(mcr3_state,mcr)
-	MCFG_MACHINE_RESET_OVERRIDE(mcr3_state,mcr)
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	// sound hardware
@@ -1120,8 +1114,6 @@ static MACHINE_CONFIG_START( mcrmono )
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", mcr3)
 	MCFG_PALETTE_ADD("palette", 64)
-
-	MCFG_VIDEO_START_OVERRIDE(mcr3_state,mcrmono)
 MACHINE_CONFIG_END
 
 
@@ -1635,9 +1627,9 @@ DRIVER_INIT_MEMBER(mcr3_state,stargrds)
 DRIVER_INIT_MEMBER(mcr3_state,spyhunt)
 {
 	mcr_common_init();
-	machine().device<midway_ssio_device>("ssio")->set_custom_input(1, 0x60, read8_delegate(FUNC(mcr3_state::spyhunt_ip1_r),this));
-	machine().device<midway_ssio_device>("ssio")->set_custom_input(2, 0xff, read8_delegate(FUNC(mcr3_state::spyhunt_ip2_r),this));
-	machine().device<midway_ssio_device>("ssio")->set_custom_output(4, 0xff, write8_delegate(FUNC(mcr3_state::spyhunt_op4_w),this));
+	m_ssio->set_custom_input(1, 0x60, read8_delegate(FUNC(mcr3_state::spyhunt_ip1_r),this));
+	m_ssio->set_custom_input(2, 0xff, read8_delegate(FUNC(mcr3_state::spyhunt_ip2_r),this));
+	m_ssio->set_custom_output(4, 0xff, write8_delegate(FUNC(mcr3_state::spyhunt_op4_w),this));
 
 	m_spyhunt_lamp.resolve();
 
@@ -1659,9 +1651,9 @@ DRIVER_INIT_MEMBER(mcr3_state,crater)
 DRIVER_INIT_MEMBER(mcr3_state,turbotag)
 {
 	mcr_common_init();
-	machine().device<midway_ssio_device>("ssio")->set_custom_input(1, 0x60, read8_delegate(FUNC(mcr3_state::spyhunt_ip1_r),this));
-	machine().device<midway_ssio_device>("ssio")->set_custom_input(2, 0xff, read8_delegate(FUNC(mcr3_state::turbotag_ip2_r),this));
-	machine().device<midway_ssio_device>("ssio")->set_custom_output(4, 0xff, write8_delegate(FUNC(mcr3_state::spyhunt_op4_w),this));
+	m_ssio->set_custom_input(1, 0x60, read8_delegate(FUNC(mcr3_state::spyhunt_ip1_r),this));
+	m_ssio->set_custom_input(2, 0xff, read8_delegate(FUNC(mcr3_state::turbotag_ip2_r),this));
+	m_ssio->set_custom_output(4, 0xff, write8_delegate(FUNC(mcr3_state::spyhunt_op4_w),this));
 
 	m_spyhunt_lamp.resolve();
 
