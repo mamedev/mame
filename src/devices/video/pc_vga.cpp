@@ -221,7 +221,7 @@ void svga_device::zero()
 /* VBLANK callback, start address definitely updates AT vblank, not before. */
 TIMER_CALLBACK_MEMBER(vga_device::vblank_timer_cb)
 {
-	vga.crtc.start_addr = vga.crtc.start_addr_latch;
+	vga.crtc.start_addr = vga.crtc.start_addr_latch << 2;
 	vga.attribute.pel_shift = vga.attribute.pel_shift_latch;
 	m_vblank_timer->adjust( machine().first_screen()->time_until_pos(vga.crtc.vert_blank_start + vga.crtc.vert_blank_end) );
 }
@@ -1489,6 +1489,7 @@ void vga_device::crtc_reg_write(uint8_t index, uint8_t data)
 			break;
 		case 0x0c:
 		case 0x0d:
+			//if(machine().first_screen()->vpos() < (vga.crtc.vert_retrace_start)) break;
 			vga.crtc.start_addr_latch &= ~(0xff << (((index & 1)^1) * 8));
 			vga.crtc.start_addr_latch |= (data << (((index & 1)^1) * 8));
 			break;
