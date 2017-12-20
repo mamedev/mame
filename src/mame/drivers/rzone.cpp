@@ -306,7 +306,7 @@ ROM_START( rzindy500 )
 ROM_END
 
 ROM_START( rzbatfor )
-	ROM_REGION( 0x1000, "maincpu", 0 ) // SM512 under epoxy, KMN1202
+	ROM_REGION( 0x1000, "maincpu", 0 ) // SM512 under epoxy, KMN1202 (not the same game as the standalone Tiger handheld)
 	ROM_LOAD( "kmn1202.program", 0x0000, 0x1000, CRC(27abdb52) SHA1(b356ff80b628244da588b4748404b78d7a57eccd) )
 
 	ROM_REGION( 0x100, "maincpu:melody", 0 )
