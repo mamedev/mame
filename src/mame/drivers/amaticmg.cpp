@@ -449,6 +449,7 @@ public:
 	uint8_t m_nmi_mask;
 	DECLARE_WRITE8_MEMBER(out_a_w);
 	DECLARE_WRITE8_MEMBER(out_c_w);
+	DECLARE_DRIVER_INIT(ama8000_4_v);
 	DECLARE_DRIVER_INIT(ama8000_3_o);
 	DECLARE_DRIVER_INIT(ama8000_2_i);
 	DECLARE_DRIVER_INIT(ama8000_2_v);
@@ -1045,6 +1046,23 @@ ROM_START( am_mg35i )
 	ROM_LOAD( "ama80003_fprom.bin", 0x0000, 0x4000, BAD_DUMP CRC(65a784b8) SHA1(bd23136261e22f0294cff90040f3015ba0c10d7e) )
 ROM_END
 
+//******** MG IV ********
+
+ROM_START( am_mg4v )
+	ROM_REGION( 0x40000, "maincpu", ROMREGION_ERASE00 )
+
+	ROM_REGION( 0x40000, "mainprg", 0 ) /* encrypted program ROM...*/
+	ROM_LOAD( "mg_iv_vger_3__3.44_v_8373.bin", 0x00000, 0x40000, CRC(fab3aa28) SHA1(889870ca6ebfb0361e74803b7b50ff78c5e0df46) )
+
+	ROM_REGION( 0x180000, "gfx1", 0 )
+	ROM_LOAD( "mg_iv_vger_3__zg_1.bin", 0x100000, 0x80000, CRC(da9a1282) SHA1(15c6e4b460184603108d79bc104b8a0d036aad43) )
+	ROM_LOAD( "mg_iv_vger_3__zg_2.bin", 0x080000, 0x80000, CRC(98dc36ed) SHA1(53ee317198730a8b34fec51f9fa237f980424fb9) )
+	ROM_LOAD( "mg_iv_vger_3__zg_3.bin", 0x000000, 0x80000, CRC(1525c235) SHA1(b873f0b8dc8537558e43b37c95b5663fbddc09cc) )
+
+	ROM_REGION( 0x20000, "proms", 0 )
+	ROM_LOAD( "v.bin", 0x00000, 0x20000, CRC(77c82358) SHA1(a126aa123523965b62503ffd1ee99afaad7c77a1) )
+ROM_END
+
 
 /************************************
 *       Driver Initialization       *
@@ -1100,6 +1118,11 @@ DRIVER_INIT_MEMBER(amaticmg_state,ama8000_3_o)
 	decrypt(0x56e, 0xa7);
 }
 
+DRIVER_INIT_MEMBER(amaticmg_state,ama8000_4_v)
+{
+	// Needs proper decryption 
+}
+
 
 /************************************
 *           Game Drivers            *
@@ -1115,3 +1138,4 @@ GAME(  2000, am_mg35i, 0,        amaticmg2, amaticmg, amaticmg_state, ama8000_3_
 GAME(  2000, am_mg34i, am_mg35i, amaticmg2, amaticmg, amaticmg_state, ama8000_3_o, ROT0,  "Amatic Trading GmbH", "Multi Game III (S.Ita 3.4)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_WRONG_COLORS | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 GAME(  2000, am_mg33i, am_mg35i, amaticmg2, amaticmg, amaticmg_state, ama8000_3_o, ROT0,  "Amatic Trading GmbH", "Multi Game III (S.Ita 3.3)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_WRONG_COLORS | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 GAME(  2000, am_mg31i, am_mg35i, amaticmg2, amaticmg, amaticmg_state, ama8000_3_o, ROT0,  "Amatic Trading GmbH", "Multi Game III (S.Ita 3.1)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_WRONG_COLORS | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME(  2000, am_mg4v,  0,        amaticmg2, amaticmg, amaticmg_state, ama8000_4_v, ROT0,  "Amatic Trading GmbH", "Multi Game IV (V.Ger 3.44)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_WRONG_COLORS | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
