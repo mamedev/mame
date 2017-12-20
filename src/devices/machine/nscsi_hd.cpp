@@ -91,9 +91,7 @@ void nscsi_harddisk_device::scsi_put_data(int id, int pos, uint8_t data)
 
 void nscsi_harddisk_device::scsi_command()
 {
-	
-	if((VERBOSE & LOG_COMMAND) && scsi_cmdbuf[0] != SC_READ_6)
-	{
+	if(scsi_cmdbuf[0] != SC_READ_6) {
 		LOGMASKED(LOG_COMMAND, "%02x %02x %02x %02x %02x %02x\n",
 			scsi_cmdbuf[0], scsi_cmdbuf[1], scsi_cmdbuf[2],
 			scsi_cmdbuf[3], scsi_cmdbuf[4], scsi_cmdbuf[5]);
