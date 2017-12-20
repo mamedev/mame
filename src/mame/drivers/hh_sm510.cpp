@@ -3246,7 +3246,7 @@ ROM_START( kcontra ) // except for filler/unused bytes, ROM listing in patent US
 	ROM_LOAD( "773.melody", 0x000, 0x100, CRC(23d02b99) SHA1(703938e496db0eeacd14fe7605d4b5c39e0a5bc8) )
 
 	ROM_REGION( 721005, "svg", 0)
-	ROM_LOAD( "kcontra.svg", 0, 721005, SHA1(2f401222d24fa32a4659ef2b64ddac8ac3973c69) )
+	ROM_LOAD( "kcontra.svg", 0, 721005, CRC(b5370d0f) SHA1(2f401222d24fa32a4659ef2b64ddac8ac3973c69) )
 ROM_END
 
 
