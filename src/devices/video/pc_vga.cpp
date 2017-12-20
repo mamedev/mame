@@ -84,7 +84,7 @@ enum
 #define EGA_LINE_LENGTH (vga.crtc.offset<<1)
 
 #define VGA_COLUMNS (vga.crtc.horz_disp_end+1)
-#define VGA_START_ADDRESS (vga.crtc.start_addr)
+#define VGA_START_ADDRESS ((vga.crtc.start_addr<<2)&0xffff)
 #define VGA_LINE_LENGTH (vga.crtc.offset<<3)
 
 #define IBM8514_LINE_LENGTH (m_vga->offset())
@@ -221,9 +221,9 @@ void svga_device::zero()
 /* VBLANK callback, start address definitely updates AT vblank, not before. */
 TIMER_CALLBACK_MEMBER(vga_device::vblank_timer_cb)
 {
-	vga.crtc.start_addr = vga.crtc.start_addr_latch << 2;
+	vga.crtc.start_addr = vga.crtc.start_addr_latch;
 	vga.attribute.pel_shift = vga.attribute.pel_shift_latch;
-	m_vblank_timer->adjust( machine().first_screen()->time_until_pos(vga.crtc.vert_blank_start + vga.crtc.vert_blank_end) );
+	m_vblank_timer->adjust( machine().first_screen()->time_until_pos(vga.crtc.vert_blank_start) );
 }
 
 TIMER_CALLBACK_MEMBER(s3_vga_device::vblank_timer_cb)
@@ -234,7 +234,7 @@ TIMER_CALLBACK_MEMBER(s3_vga_device::vblank_timer_cb)
 	else
 		vga.crtc.start_addr = vga.crtc.start_addr_latch;
 	vga.attribute.pel_shift = vga.attribute.pel_shift_latch;
-	m_vblank_timer->adjust( machine().first_screen()->time_until_pos(vga.crtc.vert_blank_start + vga.crtc.vert_blank_end) );
+	m_vblank_timer->adjust( machine().first_screen()->time_until_pos(vga.crtc.vert_blank_start) );
 }
 
 void vga_device::device_start()
@@ -1386,7 +1386,7 @@ void vga_device::recompute_params_clock(int divisor, int xtal)
 	refresh  = HZ_TO_ATTOSECONDS(pixel_clock) * (hblank_period) * vblank_period;
 	machine().first_screen()->configure((hblank_period), (vblank_period), visarea, refresh );
 	//popmessage("%d %d\n",vga.crtc.horz_total * 8,vga.crtc.vert_total);
-	m_vblank_timer->adjust( machine().first_screen()->time_until_pos(vga.crtc.vert_blank_start + vga.crtc.vert_blank_end) );
+	m_vblank_timer->adjust( machine().first_screen()->time_until_pos(vga.crtc.vert_blank_start) );
 }
 
 void vga_device::recompute_params()
@@ -1489,7 +1489,6 @@ void vga_device::crtc_reg_write(uint8_t index, uint8_t data)
 			break;
 		case 0x0c:
 		case 0x0d:
-			if(machine().first_screen()->vpos() < (vga.crtc.vert_retrace_start)) break;
 			vga.crtc.start_addr_latch &= ~(0xff << (((index & 1)^1) * 8));
 			vga.crtc.start_addr_latch |= (data << (((index & 1)^1) * 8));
 			break;
