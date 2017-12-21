@@ -6,6 +6,19 @@
 	<!--                  Games                  -->
 	<!--                                         -->
 
+	<!-- Windows 95 / 98 / ME / 2000 -->
+	<!-- Pentium II class 233 MHz -->
+	<software name="akimboj" supported="no">
+		<description>Kung-Fu Hero Akimbo Lee (Japan)</description>
+		<year>2001</year>
+		<publisher>Iridon / MSD-JAPAN / Salva Corporation</publisher>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="akimbo" sha1="08e03c5abce6f95582368d1d6734f6f1b323b823" />
+			</diskarea>
+		</part>
+	</software>
+	
 	<software name="alieninc">
 		<!--
 		Alien Incident
@@ -105,6 +118,7 @@
 		<description>Claw (Japan v1.2)</description>
 		<year>1997</year>
 		<publisher>Monolith Productions Inc.</publisher>
+		<info name="version" value="1.2" />
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="clawj" sha1="eb48e779ba6cb342fa661f3aa64df23149f16449" />
@@ -166,13 +180,15 @@
 		</part>
 	</software>
 	
-	<software name="ironbld">
-		<description>Iron Blood</description>
-		<year>1996</year>
-		<publisher>Microforum</publisher>
+	<!-- Windows 95/98 -->
+	<!-- TODO: create character screen is unusable (sets up True Color Mode) -->
+	<software name="geo" supported="no">
+		<description>GEO ~The Iron Age~ (Japan)</description>
+		<year>1999</year>
+		<publisher>Bakuretsukoubou / ASCII</publisher>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
-				<disk name="ironbld" sha1="45f44fa1a8feb98daba2b7befb6a8360ad39b352" />
+				<disk name="geo" sha1="08458018473f8d6e1ddd98b30c30bd955264fd75" />
 			</diskarea>
 		</part>
 	</software>
@@ -192,6 +208,57 @@
 		</part>
 	</software>
 	
+	<software name="heartdrkj">
+		<description>Heart of Darkness (Japan v1.1.05)</description>
+		<year>1998</year>
+		<publisher>Infogrames / Amazing Studio / Sammy / Spike</publisher>
+		<info name="version" value="1.1.05" />
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="hod" sha1="455fb25c0610b321b3356570c5062eda05c9b659" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="ironbld">
+		<description>Iron Blood</description>
+		<year>1996</year>
+		<publisher>Microforum</publisher>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="ironbld" sha1="45f44fa1a8feb98daba2b7befb6a8360ad39b352" />
+			</diskarea>
+		</part>
+	</software>
+	
+	<!-- Windows 95 -->
+	<!-- 16-bit True Color and 800x600 required -->
+	<software name="iwadejig" supported="partial">
+		<description>Iwatobi Penguin Rocky &amp; Hopper DeJig Puzzle (Japan)</description>
+		<year>199?</year>
+		<publisher>Polygon Pictures</publisher>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="dejig lite" sha1="1300dbaf3aa961a7b5f490b03884e95124048a7d" />
+			</diskarea>
+		</part>
+	</software>
+	
+	<!-- Windows 95 -->
+	<!-- Pentium class 60 MHz minimum -->
+	<software name="jakebrstj" supported="no">
+		<description>Jake Burst (Japan)</description>
+		<year>1997</year>
+		<publisher>Sierra / Pioneer Inc</publisher>
+		<info name="alt_title" value=" ジェイクバースト" />
+		<part name="cdrom" interface="cdrom">
+			<feature name="disk_label" value="SPRW·5015" />
+			<diskarea name="cdrom">
+				<disk name="jake_b" sha1="5efd03633979db40cd37a4c1ba1176cdb8b35c83" />
+			</diskarea>
+		</part>
+	</software>
+
 	<!-- Untouched image from original CD created with an ASUS DRW-1814BLT (EAC drive sample read offset reported as +6)
 	   If you subtract 0x18 (4 * 6) bytes from a .wav extracted from this CHD the audio matches a rip done with EAC (verified) -->
 	<software name="kingsq6e">
@@ -209,7 +276,7 @@
 	<!-- DOS 5.0 / Windows 3.1 -->
 	<!-- Pentium class 166 MHz + 32 MB RAM -->
 	<software name="kingsq8i" supported="no">
-		<description>King's Quest - La Maschera dell'Eternità</description>
+		<description>King's Quest - La Maschera dell'Eternità (Italy)</description>
 		<year>1998</year>
 		<publisher>Sierra</publisher>
 		<part name="cdrom" interface="cdrom">
@@ -218,11 +285,26 @@
 			</diskarea>
 		</part>
 	</software>
+
+	<!-- Windows 95 -->
+	<!-- Pentium class -->
+	<!-- Direct 3D -->
+	<!-- Missing dependency on English Win 98, requires Japanese OS? -->
+	<software name="moondrg" supported="no">
+		<description>Moon Dragon (Japan)</description>
+		<year>1997</year>
+		<publisher>Gaea</publisher>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="moon" sha1="fc79ee0bbc66f22c32fa4a171ba7c97094b195e6" />
+			</diskarea>
+		</part>
+	</software>
 	
 	<!-- Windows 3.1/95 -->
 	<!-- Simulmondo is credited when you finish the game -->
 	<software name="noiangi">
-		<description>Noi Siamo Angeli (Italian)</description>
+		<description>Noi Siamo Angeli (Italy)</description>
 		<year>1997</year>
 		<publisher>Smile Interactive / Simulmondo</publisher>
 		<part name="cdrom" interface="cdrom">
@@ -234,7 +316,7 @@
 	</software>
 
 	<software name="noiangd" cloneof="noiangi">
-		<description>We Are Angels - Ein Engel schlägt zu! (German)</description>
+		<description>We Are Angels - Ein Engel schlägt zu! (Germany)</description>
 		<year>1997</year>
 		<publisher>Smile Interactive / Simulmondo</publisher>
 		<part name="cdrom" interface="cdrom">
@@ -274,10 +356,23 @@
 		</part>
 	</software>
 
+	<!-- Windows 95 -->
+	<software name="poipon">
+		<description>PoiPon (Japan)</description>
+		<year>1997</year>
+		<publisher>Witty Wolf</publisher>
+		<info name="alt_title" value="ﾎﾟｲﾎﾟﾝ" />
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="poipon" sha1="91c230bd6e14551794a1c28fd65c901187ce7786" />
+			</diskarea>			
+		</part>
+	</software>
+	
 	<!-- Can't install to hard disk, can't save game, default text speed is very slow on 486 -->
 	<!-- (set option 5 from 100 to 0 to make text and voices to sync) -->
 	<software name="pompei" supported="partial">
-		<description>Pompei A.D. LXXIX</description>
+		<description>Pompei A.D. LXXIX (Italy)</description>
 		<year>1995</year>
 		<publisher>Finson / Antinomia</publisher>
 		<part name="cdrom" interface="cdrom">
