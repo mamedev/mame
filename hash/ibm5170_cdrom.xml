@@ -18,7 +18,7 @@
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="alieninc">
 		<!--
 		Alien Incident
@@ -125,7 +125,7 @@
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<!-- Requires VESA driver to install and play -->
 	<software name="crusader">
 		<description>Crusader - No Remorse (v1.23)</description>
@@ -179,7 +179,7 @@
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<!-- Windows 95/98 -->
 	<!-- TODO: create character screen is unusable (sets up True Color Mode) -->
 	<software name="geo" supported="no">
@@ -207,7 +207,7 @@
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="heartdrkj">
 		<description>Heart of Darkness (Japan v1.1.05)</description>
 		<year>1998</year>
@@ -230,7 +230,7 @@
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<!-- Windows 95 -->
 	<!-- 16-bit True Color and 800x600 required -->
 	<software name="iwadejig" supported="partial">
@@ -243,14 +243,14 @@
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<!-- Windows 95 -->
 	<!-- Pentium class 60 MHz minimum -->
 	<software name="jakebrstj" supported="no">
 		<description>Jake Burst (Japan)</description>
 		<year>1997</year>
 		<publisher>Sierra / Pioneer Inc</publisher>
-		<info name="alt_title" value=" ジェイクバースト" />
+		<info name="alt_title" value="ジェイクバースト" />
 		<part name="cdrom" interface="cdrom">
 			<feature name="disk_label" value="SPRW·5015" />
 			<diskarea name="cdrom">
@@ -300,7 +300,7 @@
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<!-- Windows 3.1/95 -->
 	<!-- Simulmondo is credited when you finish the game -->
 	<software name="noiangi">
@@ -342,7 +342,7 @@
 				<disk name="cd2" sha1="11e9986c9b33aeee9cc42fc623f2909f9883ae49" />
 			</diskarea>
 		</part>
-	</software>	
+	</software>
 
 	<!-- Windows 3.1 -->
 	<software name="paulymou" supported="partial">
@@ -352,7 +352,7 @@
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="pmouse" sha1="c135e153fc7f9accfa4d1c2fa9213e8587af24fc" />
-			</diskarea>			
+			</diskarea>
 		</part>
 	</software>
 
@@ -365,10 +365,10 @@
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="poipon" sha1="91c230bd6e14551794a1c28fd65c901187ce7786" />
-			</diskarea>			
+			</diskarea>
 		</part>
 	</software>
-	
+
 	<!-- Can't install to hard disk, can't save game, default text speed is very slow on 486 -->
 	<!-- (set option 5 from 100 to 0 to make text and voices to sync) -->
 	<software name="pompei" supported="partial">
@@ -382,7 +382,7 @@
 			</diskarea>
 		</part>
 	</software>
- 
+
 	<software name="prototyp">
 		<description>Prototype</description>
 		<year>1995</year>
@@ -395,7 +395,7 @@
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<!-- DOS 5.0 / Windows 95 -->
 	<!-- TODO: return errno 1 under DOS and MSCDEX -->
 	<software name="rayman" supported="partial">
@@ -548,7 +548,7 @@
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<!-- Win 3.1 / 95 -->
 	<!-- Mac OS with System 7.0 -->
 	<!-- includes unknown type scanner driver-->
@@ -562,7 +562,7 @@
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="nasfdu12">
 		<description>NASLite NAS Server Operating System (v1.x)</description>
 		<year>2004</year>
