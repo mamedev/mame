@@ -304,6 +304,10 @@ static MACHINE_CONFIG_START( upscope )
 	/* fdc */
 	MCFG_DEVICE_ADD("fdc", AMIGA_FDC, amiga_state::CLK_7M_NTSC)
 	MCFG_AMIGA_FDC_INDEX_CALLBACK(DEVWRITELINE("cia_1", mos8520_device, flag_w))
+	MCFG_AMIGA_FDC_READ_DMA_CALLBACK(READ16(amiga_state, chip_ram_r))
+	MCFG_AMIGA_FDC_WRITE_DMA_CALLBACK(WRITE16(amiga_state, chip_ram_w))
+	MCFG_AMIGA_FDC_DSKBLK_CALLBACK(WRITELINE(amiga_state, fdc_dskblk_w))
+	MCFG_AMIGA_FDC_DSKSYN_CALLBACK(WRITELINE(amiga_state, fdc_dsksyn_w))
 
 	// i/o extension
 	MCFG_DEVICE_ADD("ppi", I8255, 0)

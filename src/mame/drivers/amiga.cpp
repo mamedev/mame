@@ -827,7 +827,17 @@ WRITE32_MEMBER( a4000_state::motherboard_w )
 	logerror("motherboard_w(%06x): %08x & %08x\n", offset, data, mem_mask);
 }
 
-WRITE_LINE_MEMBER( cd32_state::akiko_int_w )
+WRITE_LINE_MEMBER(amiga_state::fdc_dskblk_w)
+{
+	set_interrupt(INTENA_SETCLR | INTENA_DSKBLK);
+}
+
+WRITE_LINE_MEMBER(amiga_state::fdc_dsksyn_w)
+{
+	set_interrupt(INTENA_SETCLR | INTENA_DSKSYN);
+}
+
+WRITE_LINE_MEMBER(cd32_state::akiko_int_w)
 {
 	set_interrupt(INTENA_SETCLR | INTENA_PORTS);
 }
@@ -1346,6 +1356,10 @@ static MACHINE_CONFIG_START( amiga_base )
 
 	// floppy drives
 	MCFG_DEVICE_ADD("fdc", AMIGA_FDC, amiga_state::CLK_7M_PAL)
+	MCFG_AMIGA_FDC_READ_DMA_CALLBACK(READ16(amiga_state, chip_ram_r))
+	MCFG_AMIGA_FDC_WRITE_DMA_CALLBACK(WRITE16(amiga_state, chip_ram_w))
+	MCFG_AMIGA_FDC_DSKBLK_CALLBACK(WRITELINE(amiga_state, fdc_dskblk_w))
+	MCFG_AMIGA_FDC_DSKSYN_CALLBACK(WRITELINE(amiga_state, fdc_dsksyn_w))
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", amiga_floppies, "35dd", amiga_fdc_device::floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", amiga_floppies, nullptr, amiga_fdc_device::floppy_formats)
