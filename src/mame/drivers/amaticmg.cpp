@@ -481,21 +481,21 @@ void amaticmg_state::video_start()
 uint32_t amaticmg_state::screen_update_amaticmg(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	gfx_element *gfx = m_gfxdecode->gfx(0);
-	int y,x;
+	int y, x;
 	int count = 0;
 
-	for (y=0;y<32;y++)
+	for (y = 0; y < 32; y++)
 	{
-		for (x=0;x<96;x++)
+		for (x = 0; x < 96; x++)
 		{
 			uint16_t tile = m_vram[count];
 			uint8_t color;
 
-			tile += ((m_attr[count]&0x0f)<<8);
+			tile += ((m_attr[count] & 0x0f) << 8);
 			/* TODO: this looks so out of place ... */
-			color = (m_attr[count]&0xf0)>>3;
+			color = (m_attr[count] & 0xf0) >> 3;
 
-			gfx->opaque(bitmap,cliprect,tile,color,0,0,x*4,y*8);
+			gfx->opaque(bitmap, cliprect, tile, color, 0, 0, x * 4, y * 8);
 			count++;
 		}
 	}
@@ -506,20 +506,20 @@ uint32_t amaticmg_state::screen_update_amaticmg(screen_device &screen, bitmap_in
 uint32_t amaticmg_state::screen_update_amaticmg2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	gfx_element *gfx = m_gfxdecode->gfx(0);
-	int y,x;
+	int y, x;
 	int count = 16;
 
-	for (y=0;y<32;y++)
+	for (y = 0; y < 32; y++)
 	{
-		for (x=0;x<96;x++)
+		for (x = 0; x < 96; x++)
 		{
 			uint16_t tile = m_vram[count];
 			uint8_t color;
 
-			tile += ((m_attr[count]&0xff)<<8);
+			tile += ((m_attr[count] & 0xff) << 8);
 			color = 0;
 
-			gfx->opaque(bitmap,cliprect,tile,color,0,0,x*4,y*8);
+			gfx->opaque(bitmap, cliprect, tile, color, 0, 0, x * 4, y * 8);
 			count++;
 		}
 	}
@@ -644,8 +644,6 @@ static ADDRESS_MAP_START( amaticmg_map, AS_PROGRAM, 8, amaticmg_state )
 	AM_RANGE(0x8000, 0x9fff) AM_RAM // AM_SHARE("nvram")
 	AM_RANGE(0xa000, 0xafff) AM_RAM AM_SHARE("vram")
 	AM_RANGE(0xb000, 0xbfff) AM_RAM AM_SHARE("attr")
-//  AM_RANGE(0xa010, 0xafff) AM_RAM AM_SHARE("vram")
-//  AM_RANGE(0xb010, 0xbfff) AM_RAM AM_SHARE("attr")
 	AM_RANGE(0xc000, 0xffff) AM_ROMBANK("bank1")
 ADDRESS_MAP_END
 
@@ -658,7 +656,6 @@ static ADDRESS_MAP_START( amaticmg_portmap, AS_IO, 8, amaticmg_state )
 	AM_RANGE(0x61, 0x61) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
 	AM_RANGE(0x80, 0x80) AM_WRITE(unk80_w)
 	AM_RANGE(0xc0, 0xc0) AM_WRITE(rombank_w)
-//  AM_RANGE(0x00, 0x00) AM_DEVREADWRITE("ppi8255_2", ppi8255_device, read, write)
 //  AM_RANGE(0x00, 0x00) AM_DEVWRITE("dac1", dac_byte_interface, write)
 //  AM_RANGE(0x00, 0x00) AM_DEVWRITE("dac2", dac_byte_interface, write)
 ADDRESS_MAP_END
