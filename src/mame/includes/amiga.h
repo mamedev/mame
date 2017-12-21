@@ -459,6 +459,9 @@ public:
 	DECLARE_READ16_MEMBER( rom_mirror_r );
 	DECLARE_READ32_MEMBER( rom_mirror32_r );
 
+	DECLARE_WRITE_LINE_MEMBER(fdc_dskblk_w);
+	DECLARE_WRITE_LINE_MEMBER(fdc_dsksyn_w);
+
 	// standard clocks
 	static const int CLK_28M_PAL = XTAL_28_37516MHz;
 	static const int CLK_7M_PAL = CLK_28M_PAL / 4;
