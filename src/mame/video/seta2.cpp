@@ -70,7 +70,7 @@
                 ---- ---8 7654 3210     "Tilemap" scroll Y
 
 
-    Shadows (same principle as ssv.c):
+    Shadows (same principle as ssv.cpp):
 
     The low bits of the pens from a "shadowing" tile (regardless of color code)
     substitute the top bits of the color index (0-7fff) in the frame buffer.
@@ -483,8 +483,15 @@ uint32_t seta2_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 	// Black or pen 0?
 	bitmap.fill(m_palette->pen(0), cliprect);
 
-	if ( (m_vregs[0x30/2] & 1) == 0 )   // 1 = BLANK SCREEN
+	if (m_vregs.found())
+	{
+		if ( (m_vregs[0x30/2] & 1) == 0 )   // 1 = BLANK SCREEN
+			draw_sprites(bitmap, cliprect);
+	}
+	else // ablastb doesn't seem to have the same vregs
+	{
 		draw_sprites(bitmap, cliprect);
+	}
 
 	return 0;
 }
