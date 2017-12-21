@@ -84,7 +84,7 @@ enum
 #define EGA_LINE_LENGTH (vga.crtc.offset<<1)
 
 #define VGA_COLUMNS (vga.crtc.horz_disp_end+1)
-#define VGA_START_ADDRESS ((vga.crtc.start_addr<<2)&0xffff)
+#define VGA_START_ADDRESS (vga.crtc.start_addr)
 #define VGA_LINE_LENGTH (vga.crtc.offset<<3)
 
 #define IBM8514_LINE_LENGTH (m_vga->offset())
@@ -223,7 +223,7 @@ TIMER_CALLBACK_MEMBER(vga_device::vblank_timer_cb)
 {
 	vga.crtc.start_addr = vga.crtc.start_addr_latch;
 	vga.attribute.pel_shift = vga.attribute.pel_shift_latch;
-	m_vblank_timer->adjust( machine().first_screen()->time_until_pos(vga.crtc.vert_blank_start) );
+	m_vblank_timer->adjust( machine().first_screen()->time_until_pos(vga.crtc.vert_blank_start + vga.crtc.vert_blank_end) );
 }
 
 TIMER_CALLBACK_MEMBER(s3_vga_device::vblank_timer_cb)
@@ -234,7 +234,7 @@ TIMER_CALLBACK_MEMBER(s3_vga_device::vblank_timer_cb)
 	else
 		vga.crtc.start_addr = vga.crtc.start_addr_latch;
 	vga.attribute.pel_shift = vga.attribute.pel_shift_latch;
-	m_vblank_timer->adjust( machine().first_screen()->time_until_pos(vga.crtc.vert_blank_start) );
+	m_vblank_timer->adjust( machine().first_screen()->time_until_pos(vga.crtc.vert_blank_start + vga.crtc.vert_blank_end) );
 }
 
 void vga_device::device_start()
@@ -439,6 +439,17 @@ uint16_t vga_device::offset()
 		return vga.crtc.offset << 2;
 }
 
+uint32_t vga_device::start_addr()
+{
+//  popmessage("Offset: %04x  %s %s **",vga.crtc.offset,vga.crtc.dw?"DW":"--",vga.crtc.word_mode?"BYTE":"WORD");
+	if(vga.crtc.dw)
+		return vga.crtc.start_addr << 2; 
+	if(vga.crtc.word_mode)
+		return vga.crtc.start_addr << 0;
+	else
+		return vga.crtc.start_addr << 1;
+}
+
 void vga_device::vga_vh_text(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	uint8_t ch, attr;
@@ -579,7 +590,7 @@ void vga_device::vga_vh_vga(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 	curr_addr = 0;
 	if(!(vga.sequencer.data[4] & 0x08))
 	{
-		for (addr = VGA_START_ADDRESS, line=0; line<LINES; line+=height, addr+=offset(), curr_addr+=offset())
+		for (addr = start_addr(), line=0; line<LINES; line+=height, addr+=offset(), curr_addr+=offset())
 		{
 			for(yi = 0;yi < height; yi++)
 			{
@@ -1386,7 +1397,7 @@ void vga_device::recompute_params_clock(int divisor, int xtal)
 	refresh  = HZ_TO_ATTOSECONDS(pixel_clock) * (hblank_period) * vblank_period;
 	machine().first_screen()->configure((hblank_period), (vblank_period), visarea, refresh );
 	//popmessage("%d %d\n",vga.crtc.horz_total * 8,vga.crtc.vert_total);
-	m_vblank_timer->adjust( machine().first_screen()->time_until_pos(vga.crtc.vert_blank_start) );
+	m_vblank_timer->adjust( machine().first_screen()->time_until_pos(vga.crtc.vert_blank_start + vga.crtc.vert_blank_end) );
 }
 
 void vga_device::recompute_params()
