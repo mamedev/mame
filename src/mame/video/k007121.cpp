@@ -157,7 +157,7 @@ void k007121_device::device_reset()
     DEVICE HANDLERS
 *****************************************************************************/
 
-READ8_MEMBER( k007121_device::ctrlram_r )
+uint8_t k007121_device::ctrlram_r(int offset)
 {
 	assert(offset < 8);
 

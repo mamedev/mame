@@ -31,8 +31,7 @@ Dip locations and factory settings verified with manual
 
 INTERRUPT_GEN_MEMBER(contra_state::contra_interrupt)
 {
-	address_space &space = generic_space();
-	if (m_k007121_1->ctrlram_r(space, 7) & 0x02)
+	if (m_k007121_1->ctrlram_r(7) & 0x02)
 		device.execute().set_input_line(HD6309_IRQ_LINE, HOLD_LINE);
 }
 
