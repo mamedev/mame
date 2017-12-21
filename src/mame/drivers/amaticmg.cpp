@@ -1072,13 +1072,13 @@ ROM_END
 void amaticmg_state::encf(uint8_t ciphertext, int address, uint8_t &plaintext, int &newaddress)
 {
 	int aux = address & 0xfff;
-	aux = aux ^ (aux>>6);
-	aux = ((aux<<6) | (aux>>6)) & 0xfff;
-	uint8_t aux2 = bitswap<8>(aux, 9,10,4,1,6,0,7,3);
-	aux2 ^= aux2>>4;
-	aux2 = (aux2<<4) | (aux2>>4);
-	ciphertext ^= ciphertext<<4;
-	plaintext = (ciphertext<<4) | (ciphertext>>4);
+	aux = aux ^ (aux >> 6);
+	aux = ((aux << 6) | (aux >> 6)) & 0xfff;
+	uint8_t aux2 = bitswap<8>(aux, 9, 10, 4, 1, 6, 0, 7, 3);
+	aux2 ^= aux2 >> 4;
+	aux2 = (aux2 << 4) | (aux2 >> 4);
+	ciphertext ^= ciphertext << 4;
+	plaintext = (ciphertext << 4) | (ciphertext >> 4);
 	plaintext ^= aux2;
 	newaddress = (address & ~0xfff) | aux;
 }
@@ -1095,7 +1095,7 @@ void amaticmg_state::decrypt(int key1, int key2)
 	for (int i = 0; i < len; i++)
 	{
 		encf(src[i], i, plaintext, newaddress);
-		dest[newaddress^(key1^(key1>>6))] = plaintext^key2;
+		dest[newaddress ^ (key1 ^ (key1 >> 6))] = plaintext ^ key2;
 	}
 }
 
