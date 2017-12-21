@@ -619,7 +619,7 @@ void vga_device::vga_vh_vga(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 	}
 	else
 	{
-		for (addr = VGA_START_ADDRESS, line=0; line<LINES; line+=height, addr+=offset(), curr_addr+=offset())
+		for (addr = start_addr(), line=0; line<LINES; line+=height, addr+=offset(), curr_addr+=offset())
 		{
 			for(yi = 0;yi < height; yi++)
 			{
