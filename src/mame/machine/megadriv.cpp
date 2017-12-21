@@ -30,19 +30,6 @@ Known Non-Issues (confirmed on Real Genesis)
 
 MACHINE_CONFIG_EXTERN( megadriv );
 
-void megadriv_z80_hold(running_machine &machine)
-{
-	md_base_state *state = machine.driver_data<md_base_state>();
-	if ((state->m_genz80.z80_has_bus == 1) && (state->m_genz80.z80_is_reset == 0))
-		state->m_z80snd->set_input_line(0, HOLD_LINE);
-}
-
-void megadriv_z80_clear(running_machine &machine)
-{
-	md_base_state *state = machine.driver_data<md_base_state>();
-	state->m_z80snd->set_input_line(0, CLEAR_LINE);
-}
-
 void md_base_state::megadriv_z80_bank_w(uint16_t data)
 {
 	m_genz80.z80_bank_addr = ((m_genz80.z80_bank_addr >> 1) | (data << 23)) & 0xff8000;
@@ -844,11 +831,12 @@ WRITE_LINE_MEMBER(md_base_state::vdp_sndirqline_callback_genesis_z80)
 	{
 		if (state == ASSERT_LINE)
 		{
-			megadriv_z80_hold(machine());
+			if ((m_genz80.z80_has_bus == 1) && (m_genz80.z80_is_reset == 0))
+				m_z80snd->set_input_line(0, HOLD_LINE);
 		}
 		else if (state == CLEAR_LINE)
 		{
-			megadriv_z80_clear(machine());
+			m_z80snd->set_input_line(0, CLEAR_LINE);
 		}
 	}
 }
