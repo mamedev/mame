@@ -158,7 +158,7 @@ void menu_select_software::handle()
 				ui_globals::switch_image = true;
 				ui_globals::default_image = false;
 			}
-			else if (ui_globals::rpanel == RP_INFOS && ui_globals::cur_sw_dats_view < ui_globals::cur_sw_dats_total)
+			else if (ui_globals::rpanel == RP_INFOS && ui_globals::cur_sw_dats_view < (ui_globals::cur_sw_dats_total - 1))
 			{
 				// Infos
 				ui_globals::cur_sw_dats_view++;

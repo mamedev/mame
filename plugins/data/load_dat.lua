@@ -91,7 +91,7 @@ function datfile.open(file, vertag, fixupcb)
 			local function iter()
 				local tag1, tag2, data, start, inblock = false
 				while not data do
-					local spos, epos, match = buffer:find("\n($[^\n]*)", pos)
+					local spos, epos, match = buffer:find("\n($[^\n\r]*)", pos)
 					if not spos then
 						return nil
 					end
