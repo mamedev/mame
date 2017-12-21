@@ -959,7 +959,7 @@ void debug_disasm_buffer::debug_data_buffer::setup_methods()
 			for(offs_t i=0; i != size; i++) {
 				if(i)
 					out << ' ';
-				util::stream_format(out, "%016x", r64(pc));
+				util::stream_format(out, "%016X", r64(pc));
 				pc = m_next_pc_wrap(pc, 1);
 			}
 			return out.str();
@@ -974,7 +974,7 @@ void debug_disasm_buffer::debug_data_buffer::setup_methods()
 				for(offs_t i=0; i != size; i++) {
 					if(i)
 						out << ' ';
-					util::stream_format(out, "%08x", r32(pc));
+					util::stream_format(out, "%08X", r32(pc));
 					pc = m_next_pc_wrap(pc, 1);
 				}
 				return out.str();
@@ -987,7 +987,7 @@ void debug_disasm_buffer::debug_data_buffer::setup_methods()
 				for(offs_t i=0; i != size; i += 2) {
 					if(i)
 						out << ' ';
-					util::stream_format(out, "%016x", r64(pc));
+					util::stream_format(out, "%016X", r64(pc));
 					pc = m_next_pc_wrap(pc, 2);
 				}
 				return out.str();
@@ -1004,7 +1004,7 @@ void debug_disasm_buffer::debug_data_buffer::setup_methods()
 				for(offs_t i=0; i != size; i++) {
 					if(i)
 						out << ' ';
-					util::stream_format(out, "%04x", r16(pc));
+					util::stream_format(out, "%04X", r16(pc));
 					pc = m_next_pc_wrap(pc, 1);
 				}
 				return out.str();
@@ -1017,7 +1017,7 @@ void debug_disasm_buffer::debug_data_buffer::setup_methods()
 				for(offs_t i=0; i != size; i += 2) {
 					if(i)
 						out << ' ';
-					util::stream_format(out, "%08x", r32(pc));
+					util::stream_format(out, "%08X", r32(pc));
 					pc = m_next_pc_wrap(pc, 2);
 				}
 				return out.str();
@@ -1030,7 +1030,7 @@ void debug_disasm_buffer::debug_data_buffer::setup_methods()
 				for(offs_t i=0; i != size; i += 4) {
 					if(i)
 						out << ' ';
-					util::stream_format(out, "%016x", r64(pc));
+					util::stream_format(out, "%016X", r64(pc));
 					pc = m_next_pc_wrap(pc, 4);
 				}
 				return out.str();
@@ -1047,7 +1047,7 @@ void debug_disasm_buffer::debug_data_buffer::setup_methods()
 				for(offs_t i=0; i != size; i++) {
 					if(i)
 						out << ' ';
-					util::stream_format(out, "%02x", r8(pc));
+					util::stream_format(out, "%02X", r8(pc));
 					pc = m_next_pc_wrap(pc, 1);
 				}
 				return out.str();
@@ -1060,7 +1060,7 @@ void debug_disasm_buffer::debug_data_buffer::setup_methods()
 				for(offs_t i=0; i != size; i += 2) {
 					if(i)
 						out << ' ';
-					util::stream_format(out, "%04x", r16(pc));
+					util::stream_format(out, "%04X", r16(pc));
 					pc = m_next_pc_wrap(pc, 2);
 				}
 				return out.str();
@@ -1073,7 +1073,7 @@ void debug_disasm_buffer::debug_data_buffer::setup_methods()
 				for(offs_t i=0; i != size; i += 4) {
 					if(i)
 						out << ' ';
-					util::stream_format(out, "%08x", r32(pc));
+					util::stream_format(out, "%08X", r32(pc));
 					pc = m_next_pc_wrap(pc, 4);
 				}
 				return out.str();
@@ -1086,7 +1086,7 @@ void debug_disasm_buffer::debug_data_buffer::setup_methods()
 				for(offs_t i=0; i != size; i += 8) {
 					if(i)
 						out << ' ';
-					util::stream_format(out, "%016x", r64(pc));
+					util::stream_format(out, "%016X", r64(pc));
 					pc = m_next_pc_wrap(pc, 8);
 				}
 				return out.str();
@@ -1101,7 +1101,7 @@ void debug_disasm_buffer::debug_data_buffer::setup_methods()
 			for(offs_t i=0; i != size; i += 16) {
 				if(i)
 					out << ' ';
-				util::stream_format(out, "%04x", r16(pc));
+				util::stream_format(out, "%04X", r16(pc));
 				pc = m_next_pc_wrap(pc, 16);
 			}
 			return out.str();
@@ -1281,7 +1281,7 @@ debug_disasm_buffer::debug_disasm_buffer(device_t &device) :
 			int nc2 = (bits2+3)/4;
 			int nc3 = (bits3+3)/4;
 			m_pc_to_string = [nc1, nc2, nc3, sm1, sm2, sh2, sh3](offs_t pc) -> std::string {
-				return util::string_format("%0*x:%0*x:%0*x", 
+				return util::string_format("%0*X:%0*X:%0*X", 
 										   nc3, pc >> sh3,
 										   nc2, (pc >> sh2) & sm2,
 										   nc1, pc & sm1);
@@ -1306,7 +1306,7 @@ debug_disasm_buffer::debug_disasm_buffer(device_t &device) :
 			int nc1 = (bits1+3)/4;
 			int nc2 = (bits2+3)/4;
 			m_pc_to_string = [nc1, nc2, sm1, sh2](offs_t pc) -> std::string {
-				return util::string_format("%0*x:%0*x", 
+				return util::string_format("%0*X:%0*X", 
 										   nc2, pc >> sh2,
 										   nc1, pc & sm1);
 			};
@@ -1324,7 +1324,7 @@ debug_disasm_buffer::debug_disasm_buffer(device_t &device) :
 		} else {
 			int nc1 = (bits1+3)/4;
 			m_pc_to_string = [nc1](offs_t pc) -> std::string {
-				return util::string_format("%0*x", 
+				return util::string_format("%0*X", 
 										   nc1, pc);
 			};
 		}
