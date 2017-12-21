@@ -26,7 +26,7 @@
 
   1x Unknown 40-pins IC (maybe 6845).
   1x Altera EPM5130LC (84-pins).
-  1x KS82C55A (2x PPI).
+  1x KS82C55A (8255A PPI variant).
   1x Unknown 40-pins IC (maybe another PPI).
 
   1x Dallas DS1236-10 (micro manager).
@@ -661,7 +661,6 @@ static ADDRESS_MAP_START( amaticmg_portmap, AS_IO, 8, amaticmg_state )
 //  AM_RANGE(0x00, 0x00) AM_DEVREADWRITE("ppi8255_2", ppi8255_device, read, write)
 //  AM_RANGE(0x00, 0x00) AM_DEVWRITE("dac1", dac_byte_interface, write)
 //  AM_RANGE(0x00, 0x00) AM_DEVWRITE("dac2", dac_byte_interface, write)
-	AM_RANGE(0xe8, 0xeb) AM_DEVREADWRITE("ppi8255_2", i8255_device, read, write)  // not sure if exist.
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( amaticmg2_portmap, AS_IO, 8, amaticmg_state )
@@ -846,8 +845,6 @@ static MACHINE_CONFIG_START( amaticmg )
 	MCFG_I8255_IN_PORTB_CB(IOPORT("SW1"))
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(amaticmg_state, out_c_w))
 
-	MCFG_DEVICE_ADD("ppi8255_2", I8255A, 0)	// MG4: 0x89 -> A:out; B:out; C(h):in; C(l):in.
-
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -887,6 +884,8 @@ static MACHINE_CONFIG_DERIVED( amaticmg2, amaticmg )
 	MCFG_CPU_IO_MAP(amaticmg2_portmap)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", amaticmg_state,  amaticmg2_irq)
 
+	MCFG_DEVICE_ADD("ppi8255_2", I8255A, 0)	// MG4: 0x89 -> A:out; B:out; C(h):in; C(l):in.
+
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(amaticmg_state, screen_update_amaticmg2)
 
@@ -902,6 +901,8 @@ static MACHINE_CONFIG_DERIVED( amaticmg4, amaticmg )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(amaticmg4_portmap)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", amaticmg_state,  amaticmg2_irq)
+
+	MCFG_DEVICE_ADD("ppi8255_2", I8255A, 0)	// MG4: 0x89 -> A:out; B:out; C(h):in; C(l):in.
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(amaticmg_state, screen_update_amaticmg2)
