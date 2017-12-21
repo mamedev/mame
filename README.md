@@ -67,7 +67,7 @@ Where can I find out more?
 =============
 
 * [Official MAME Development Team Site](http://mamedev.org/) (includes binary downloads for MAME and MESS, wiki, forums, and more)
-* [Official MESS Wiki](http://www.mess.org/)
+* [Official MESS Wiki](http://mess.redump.net/)
 * [MAME Testers](http://mametesters.org/) (official bug tracker for MAME and MESS)
 
 
