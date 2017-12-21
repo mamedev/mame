@@ -97,8 +97,22 @@
 			</diskarea>
 		</part>
 	</software>
-  
-  <!-- Requires VESA driver to install and play -->
+
+	<!-- Windows 95 -->
+	<!-- Very slow on 486 -->
+	<!-- TODO: has transparency issues on main menu -->
+	<software name="clawj" supported="partial">
+		<description>Claw (Japan v1.2)</description>
+		<year>1997</year>
+		<publisher>Monolith Productions Inc.</publisher>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="clawj" sha1="eb48e779ba6cb342fa661f3aa64df23149f16449" />
+			</diskarea>
+		</part>
+	</software>
+	
+	<!-- Requires VESA driver to install and play -->
 	<software name="crusader">
 		<description>Crusader - No Remorse (v1.23)</description>
 		<year>1996</year>
@@ -133,7 +147,6 @@
 		<year>1996</year>
 		<publisher>Id Software / Imagineer</publisher>
 		<info name="alt_title" value="ドゥームＩＩ" />
-
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="doom2j" sha1="61dd4c9a81d4d354a14533dcbd257a5bcffd22c6" />
@@ -141,6 +154,18 @@
 		</part>
 	</software>
 
+	<software name="elecpop">
+		<description>Electronic Popple (Japan)</description>
+		<year>1997</year>
+		<publisher>Nativesoft Inc. / Fujitsu / Byteshock!</publisher>
+		<info name="alt_title" value="Electronic ぽっぷる" />
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="popple" sha1="1132afe937c5d2b914fbb705c90e1ec0c0c9f7ad" />
+			</diskarea>
+		</part>
+	</software>
+	
 	<software name="ironbld">
 		<description>Iron Blood</description>
 		<year>1996</year>
@@ -282,6 +307,7 @@
 		<description>Rayman (US v1.21)</description>
 		<year>1995</year>
 		<publisher>Ubi Soft</publisher>
+		<info name="version" value="1.21" />
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="rayman" sha1="7e2eeda69210a4d862f3f3b29c8b984d4aa443fd" />
