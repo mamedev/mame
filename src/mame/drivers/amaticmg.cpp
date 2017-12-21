@@ -1049,7 +1049,8 @@ ROM_END
 //******** MG IV ********
 
 ROM_START( am_mg4v )
-	ROM_REGION( 0x40000, "maincpu", ROMREGION_ERASE00 )
+	ROM_REGION( 0x40000, "maincpu", 0 )
+	ROM_LOAD( "mg_iv_vger_3__3.44_v_8373__decrypted.bin", 0x00000, 0x40000, CRC(30ae00a4) SHA1(3c26de25f6121a1330acebd1a5ff785c33d8d408) )
 
 	ROM_REGION( 0x40000, "mainprg", 0 ) /* encrypted program ROM...*/
 	ROM_LOAD( "mg_iv_vger_3__3.44_v_8373.bin", 0x00000, 0x40000, CRC(fab3aa28) SHA1(889870ca6ebfb0361e74803b7b50ff78c5e0df46) )
