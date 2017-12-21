@@ -9913,8 +9913,8 @@ ROM_START( xl25 )
 	ROM_REGION( 0x0400, "maincpu", 0 )
 	ROM_LOAD( "mp4486a", 0x0000, 0x0400, CRC(bd84b515) SHA1(377fcc68a517260acd51eb9746cd62914a75d739) )
 
-	ROM_REGION( 867, "maincpu:mpla", 0 )
-	ROM_LOAD( "tms1000_common2_micro.pla", 0, 867, BAD_DUMP CRC(d33da3cf) SHA1(13c4ebbca227818db75e6db0d45b66ba5e207776) ) // placeholder
+	ROM_REGION( 922, "maincpu:mpla", 0 )
+	ROM_LOAD( "tms1000c_xl25_micro.pla", 0, 922, CRC(8823e7f2) SHA1(676b0eace9d8730f2caa9087e8c51e540c7fabf8) )
 	ROM_REGION( 558, "maincpu:opla", 0 )
 	ROM_LOAD( "tms1000c_xl25_output.pla", 0, 558, CRC(06ecc6e0) SHA1(e0fa1b9388948197b4de2edd3cd02fbde1dbabbb) )
 ROM_END

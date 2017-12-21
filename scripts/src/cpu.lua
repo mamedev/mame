@@ -2072,6 +2072,7 @@ end
 --------------------------------------------------
 -- Texas Instruments TMS1000 series
 --@src/devices/cpu/tms1000/tms1000.h,CPUS["TMS1000"] = true
+--@src/devices/cpu/tms1000/tms1000c.h,CPUS["TMS1000"] = true
 --@src/devices/cpu/tms1000/tms1100.h,CPUS["TMS1000"] = true
 --@src/devices/cpu/tms1000/tms1400.h,CPUS["TMS1000"] = true
 --@src/devices/cpu/tms1000/tms0970.h,CPUS["TMS1000"] = true
@@ -2086,6 +2087,8 @@ if (CPUS["TMS1000"]~=null) then
 		MAME_DIR .. "src/devices/cpu/tms1000/tms1k_base.h",
 		MAME_DIR .. "src/devices/cpu/tms1000/tms1000.cpp",
 		MAME_DIR .. "src/devices/cpu/tms1000/tms1000.h",
+		MAME_DIR .. "src/devices/cpu/tms1000/tms1000c.cpp",
+		MAME_DIR .. "src/devices/cpu/tms1000/tms1000c.h",
 		MAME_DIR .. "src/devices/cpu/tms1000/tms1100.cpp",
 		MAME_DIR .. "src/devices/cpu/tms1000/tms1100.h",
 		MAME_DIR .. "src/devices/cpu/tms1000/tms1400.cpp",

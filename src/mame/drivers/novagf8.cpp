@@ -75,7 +75,7 @@ WRITE8_MEMBER(novagf8_state::delta1_io0_w)
 {
 	m_io[0] = data;
 
-	// IO00-02: MC14028B A-C
+	// IO00-02: MC14028B A-C (IO03: GND)
 	// MC14028B Q3-Q7: input mux
 	// MC14028B Q4-Q7: digit select through 75492
 	u16 sel = 1 << (~data & 7);

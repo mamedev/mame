@@ -8,7 +8,6 @@
 
 #include "emu.h"
 #include "tms0970.h"
-#include "debugger.h"
 
 // TMS0950 is a TMS1000 with a TMS0980 style opla, it was quickly succeeded by the TMS0970
 // - RAM, ROM, microinstructions is the same as TMS1000
