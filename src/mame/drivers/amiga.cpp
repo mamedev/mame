@@ -827,16 +827,6 @@ WRITE32_MEMBER( a4000_state::motherboard_w )
 	logerror("motherboard_w(%06x): %08x & %08x\n", offset, data, mem_mask);
 }
 
-WRITE_LINE_MEMBER(amiga_state::fdc_dskblk_w)
-{
-	set_interrupt(INTENA_SETCLR | INTENA_DSKBLK);
-}
-
-WRITE_LINE_MEMBER(amiga_state::fdc_dsksyn_w)
-{
-	set_interrupt(INTENA_SETCLR | INTENA_DSKSYN);
-}
-
 WRITE_LINE_MEMBER(cd32_state::akiko_int_w)
 {
 	set_interrupt(INTENA_SETCLR | INTENA_PORTS);

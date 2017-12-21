@@ -184,6 +184,16 @@ void amiga_state::machine_reset()
 	m_overlay->set_bank(1);
 }
 
+WRITE_LINE_MEMBER(amiga_state::fdc_dskblk_w)
+{
+	set_interrupt(INTENA_SETCLR | INTENA_DSKBLK);
+}
+
+WRITE_LINE_MEMBER(amiga_state::fdc_dsksyn_w)
+{
+	set_interrupt(INTENA_SETCLR | INTENA_DSKSYN);
+}
+
 WRITE_LINE_MEMBER( amiga_state::kbreset_w )
 {
 	// this is connected to the gary chip, gary then resets the 68k, agnus, paula and the cias
