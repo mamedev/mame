@@ -661,7 +661,6 @@ static ADDRESS_MAP_START( amaticmg_portmap, AS_IO, 8, amaticmg_state )
 //  AM_RANGE(0x00, 0x00) AM_DEVREADWRITE("ppi8255_2", ppi8255_device, read, write)
 //  AM_RANGE(0x00, 0x00) AM_DEVWRITE("dac1", dac_byte_interface, write)
 //  AM_RANGE(0x00, 0x00) AM_DEVWRITE("dac2", dac_byte_interface, write)
-
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( amaticmg2_portmap, AS_IO, 8, amaticmg_state )
@@ -683,6 +682,18 @@ ADDRESS_MAP_END
 
 
 */
+
+static ADDRESS_MAP_START( amaticmg4_portmap, AS_IO, 8, amaticmg_state )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
+//  ADDRESS_MAP_UNMAP_HIGH
+	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("ppi8255_0", i8255_device, read, write)
+	AM_RANGE(0x04, 0x07) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write)
+	AM_RANGE(0x50, 0x51) AM_DEVWRITE("ymsnd", ym3812_device, write)
+	AM_RANGE(0x0e, 0x0e) AM_DEVWRITE("crtc", mc6845_device, address_w)
+	AM_RANGE(0x0f, 0x0f) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
+//	AM_RANGE(0xc0, 0xc0) AM_WRITE(rombank_w)
+	AM_RANGE(0xe6, 0xe6) AM_WRITE(nmi_mask_w)
+ADDRESS_MAP_END
 
 
 /************************************
@@ -879,6 +890,22 @@ static MACHINE_CONFIG_DERIVED( amaticmg2, amaticmg )
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(amaticmg2_portmap)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", amaticmg_state,  amaticmg2_irq)
+
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_UPDATE_DRIVER(amaticmg_state, screen_update_amaticmg2)
+
+	MCFG_GFXDECODE_MODIFY("gfxdecode", amaticmg2)
+	MCFG_PALETTE_MODIFY("palette")
+	MCFG_PALETTE_ENTRIES(0x10000)
+	MCFG_PALETTE_INIT_OWNER(amaticmg_state,amaticmg2)
+MACHINE_CONFIG_END
+
+
+static MACHINE_CONFIG_DERIVED( amaticmg4, amaticmg )
+
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_IO_MAP(amaticmg4_portmap)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", amaticmg_state,  amaticmg2_irq)
 
 	MCFG_SCREEN_MODIFY("screen")
@@ -1139,4 +1166,4 @@ GAME(  2000, am_mg35i, 0,        amaticmg2, amaticmg, amaticmg_state, ama8000_3_
 GAME(  2000, am_mg34i, am_mg35i, amaticmg2, amaticmg, amaticmg_state, ama8000_3_o, ROT0,  "Amatic Trading GmbH", "Multi Game III (S.Ita 3.4)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_WRONG_COLORS | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 GAME(  2000, am_mg33i, am_mg35i, amaticmg2, amaticmg, amaticmg_state, ama8000_3_o, ROT0,  "Amatic Trading GmbH", "Multi Game III (S.Ita 3.3)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_WRONG_COLORS | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 GAME(  2000, am_mg31i, am_mg35i, amaticmg2, amaticmg, amaticmg_state, ama8000_3_o, ROT0,  "Amatic Trading GmbH", "Multi Game III (S.Ita 3.1)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_WRONG_COLORS | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-GAME(  2000, am_mg4v,  0,        amaticmg2, amaticmg, amaticmg_state, ama8000_4_v, ROT0,  "Amatic Trading GmbH", "Multi Game IV (V.Ger 3.44)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_WRONG_COLORS | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME(  2000, am_mg4v,  0,        amaticmg4, amaticmg, amaticmg_state, ama8000_4_v, ROT0,  "Amatic Trading GmbH", "Multi Game IV (V.Ger 3.44)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_WRONG_COLORS | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
