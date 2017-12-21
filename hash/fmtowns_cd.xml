@@ -7786,8 +7786,8 @@ User/save disks that can be created from the game itself are not included.
 	</software>
 
 	<!--
-	This image is missing the IPL data in sector 0. It's possible to run AUTOEXEC.BAT
-	manually from TownsOS, but it should be considered a bad dump.
+	The orginal img file is missing the IPL data in sector 0. This one has it injected
+	from a working image.  To recreate the img, fill the first two sectors with 'U'.
 	-->
 	<software name="rbisland">
 		<!--
@@ -7803,7 +7803,7 @@ User/save disks that can be created from the game itself are not included.
 		<info name="release" value="199204xx" />
 		<part name="cdrom" interface="fmt_cdrom">
 			<diskarea name="cdrom">
-				<disk name="rainbow islands extra" sha1="2c480a769d0f0340ab2c26988b5d37404606dc7e" status="baddump" />
+				<disk name="rainbow islands extra" sha1="5dc2afbffca0ccdeba87d036ddcf5e53ad9df8f2" status="baddump" />
 			</diskarea>
 		</part>
 	</software>
