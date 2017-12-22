@@ -219,16 +219,26 @@ P2 keyboard:
 [   ][ ! ][ " ][ § ][ $ ][ % ][ & ][ / ][ ( ][ ) ][ = ][ ? ][ ` ][ F ][ F ][ F ][ F ][ F ][ F ]
 [_SM][_1_][_2_][_3_][_4_][_5_][_6_][_7_][_8_][_9_][_0_][_ß_][_´_][_1_][_2_][_3_][_4_][_5_][_6_]
 [     ][   ][   ][   ][   ][   ][   ][   ][   ][   ][   ][   ][ * ][   ]   [   ][   ][   ][   ]
-[_(C)_][_Q_][_W_][_E_][_R_][_T_][_Z_][_U_][_I_][_O_][_P_][_Ü_][_+_][___]   [_7_][_8_][_9_][_/_]
+[_(C)_][_Q_][_W_][_E_][_R_][_T_][_Z_][_U_][_I_][_O_][_P_][_Ü_][_+_][_TB]   [_7_][_8_][_9_][_/_]
 [      ][   ][   ][   ][   ][   ][   ][   ][   ][   ][   ][   ][ ^ ][   | ][   ][   ][   ][   ]
 [__CL__][_A_][_S_][_D_][_F_][_G_][_H_][_J_][_K_][_L_][_Ö_][_Ä_][_#_][_<=| ][_4_][_5_][_6_][_x_]
 [    ][ > ][   ][   ][   ][   ][   ][   ][   ][ ; ][ : ][ _ ][    ][[] ]   [   ][   ][   ][   ]
 [_SH_][ < ][_Y_][_X_][_C_][_V_][_B_][_N_][_M_][_,_][_._][_-_][_SH_][ []]   [_1_][_2_][_3_][_-_]
 [   ][   ][   ][                                      ][   ][   ][   ][   ][        ][   ][   ]
-[(R)][_UP][LFT][_______________SPACE__________________][RGH][DWN][PS1][ C ][____0___][_._][_+_9
+[(R)][_UP][LFT][_______________SPACE__________________][RGH][DWN][PS1][ C ][____0___][_._][_+_]
 
-
-
+The SH(ift), C(aps)L(ock) and Space keys are unmarked, to the right of + / * is unmarked as well.
+SM is "Schreibmaschinen-Modus", typewriter mode
+The direction keys and Pos1 are marked with arrows
+<- moves the cursor left one position and deletes the character
+-> moves the cursor right one position
+(C) has a red LED and is the RESET key
+The C key is called "Korrektur" in the manual. You have to press it if the keyboard locks up, e.g. when characters have been 
+entered too quickly.
+[]
+ [] is two overlapping squares, the manual calls it "Kontroll-Taste", i.e. CTRL
+TB is the TAB key and is unmarked
+ 
 P3 keyboard:
 
  [RST]
@@ -253,11 +263,15 @@ The SH(ift), C(aps)L(ock) and Space keys are unmarked
  [] is two overlapping squares
 SM is an abbreviation of the German "Schreibmaschinen-Modus", typewriter mode. It has a green status LED.
 Up, Down, Left, Right and Pos1 are marked with arrows
+The C key is called "Korrektur" in the manual. You have to press it if the keyboard locks up, e.g. when characters have been 
+entered too quickly.
+
 
 P30 keyboard differences:
 (R) is now marked CTRL for use under DOS on the P30
 []
  [] is now marked ESC
+C can be used as ALT(ernate) in DOS
 
  
 */
@@ -269,7 +283,7 @@ PORT_START("COL.0")
 	PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("W") 			PORT_CODE(KEYCODE_W) 		PORT_CHAR('w')		PORT_CHAR('W')
 	PORT_BIT(0x0002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("S") 			PORT_CODE(KEYCODE_S) 		PORT_CHAR('s')		PORT_CHAR('S')
 	PORT_BIT(0x0004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("X") 			PORT_CODE(KEYCODE_X) 		PORT_CHAR('x')		PORT_CHAR('X')
-	PORT_BIT(0x0008, IP_ACTIVE_HIGH, IPT_KEYBOARD) 							PORT_CODE(KEYCODE_BACKSPACE)				PORT_CHAR(8)
+	PORT_BIT(0x0008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("LEFT")		PORT_CODE(KEYCODE_LEFT)		PORT_CHAR(8) 					// left arrow works as backspace
 	PORT_BIT(0x0010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Q")			PORT_CODE(KEYCODE_Q) 		PORT_CHAR('q')		PORT_CHAR('Q')
 	PORT_BIT(0x0080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("1")			PORT_CODE(KEYCODE_1) 		PORT_CHAR('1')		PORT_CHAR('!')
 	
@@ -277,7 +291,7 @@ PORT_START("COL.1")
 	PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("E")			PORT_CODE(KEYCODE_E) 		PORT_CHAR('e')		PORT_CHAR('E')
 	PORT_BIT(0x0002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("D")			PORT_CODE(KEYCODE_D)		PORT_CHAR('d')		PORT_CHAR('D')
 	PORT_BIT(0x0004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("C")			PORT_CODE(KEYCODE_C)		PORT_CHAR('c')		PORT_CHAR('C')
-	PORT_BIT(0x0008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("SPACE")		PORT_CODE(KEYCODE_SPACE)						PORT_CHAR(' ')
+	PORT_BIT(0x0008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("SPACE")		PORT_CODE(KEYCODE_SPACE)	PORT_CHAR(' ')
 	PORT_BIT(0x0010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("F5")			PORT_CODE(KEYCODE_F5)		PORT_CHAR(UCHAR_MAMEKEY(F5)) // SCAN:=0Dh ->8Ah-funct F5 ok
 	PORT_BIT(0x0080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("2")			PORT_CODE(KEYCODE_2)		PORT_CHAR('2')		PORT_CHAR('"')
 
@@ -285,7 +299,7 @@ PORT_START("COL.2")
 	PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("R")			PORT_CODE(KEYCODE_R)		PORT_CHAR('r')		PORT_CHAR('R')
 	PORT_BIT(0x0002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("F")			PORT_CODE(KEYCODE_F)		PORT_CHAR('f')		PORT_CHAR('F')
 	PORT_BIT(0x0004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("V")			PORT_CODE(KEYCODE_V)		PORT_CHAR('v')		PORT_CHAR('V')
-	PORT_BIT(0x0008, IP_ACTIVE_HIGH, IPT_UNKNOWN) 					// 0x82
+	PORT_BIT(0x0008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("RIGHT")		PORT_CODE(KEYCODE_RIGHT)	PORT_CHAR(UCHAR_MAMEKEY(RIGHT))	// 0x82
 	PORT_BIT(0x0010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("F6")			PORT_CODE(KEYCODE_F6)		PORT_CHAR(UCHAR_MAMEKEY(F6)) // scan:=15h 8Ch-> F6 ok
 	PORT_BIT(0x0080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("3")			PORT_CODE(KEYCODE_3)		PORT_CHAR('3')		PORT_CHAR(0x00a7)
 
@@ -293,7 +307,7 @@ PORT_START("COL.3")
 	PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("T")			PORT_CODE(KEYCODE_T)		PORT_CHAR('t')		PORT_CHAR('T')
 	PORT_BIT(0x0002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("G")			PORT_CODE(KEYCODE_G)		PORT_CHAR('g')		PORT_CHAR('G')
 	PORT_BIT(0x0004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("B")			PORT_CODE(KEYCODE_B)		PORT_CHAR('b')		PORT_CHAR('B')
-	PORT_BIT(0x0008, IP_ACTIVE_HIGH, IPT_UNKNOWN) 					// 0x8b
+	PORT_BIT(0x0008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("DOWN")		PORT_CODE(KEYCODE_DOWN)		PORT_CHAR(UCHAR_MAMEKEY(DOWN))		// 0x8b
 	PORT_BIT(0x0010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("A")			PORT_CODE(KEYCODE_A)		PORT_CHAR('a')		PORT_CHAR('A')
 	PORT_BIT(0x0080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("4")			PORT_CODE(KEYCODE_4)		PORT_CHAR('4')		PORT_CHAR('$')
 	
@@ -308,7 +322,7 @@ PORT_START("COL.5")
 	PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("U")			PORT_CODE(KEYCODE_U)		PORT_CHAR('u')		PORT_CHAR('U')
 	PORT_BIT(0x0002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("J")			PORT_CODE(KEYCODE_J)		PORT_CHAR('j')		PORT_CHAR('J')
 	PORT_BIT(0x0004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("M")			PORT_CODE(KEYCODE_M)		PORT_CHAR('m')		PORT_CHAR('M')
-	PORT_BIT(0x0008, IP_ACTIVE_HIGH, IPT_UNKNOWN) 					// 0x89
+	PORT_BIT(0x0008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("UP")			PORT_CODE(KEYCODE_UP)		PORT_CHAR(UCHAR_MAMEKEY(UP)) 		// 0x89
 	PORT_BIT(0x0010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Y")			PORT_CODE(KEYCODE_Y)		PORT_CHAR('y')		PORT_CHAR('Y')
 	PORT_BIT(0x0080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("6")			PORT_CODE(KEYCODE_6)		PORT_CHAR('6')		PORT_CHAR('&')
 
@@ -324,8 +338,8 @@ PORT_START("COL.7")
 	PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("O")			PORT_CODE(KEYCODE_O)		PORT_CHAR('o')		PORT_CHAR('O')
 	PORT_BIT(0x0002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("L")			PORT_CODE(KEYCODE_L)		PORT_CHAR('l')		PORT_CHAR('L')
 	PORT_BIT(0x0004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(". :")			PORT_CODE(KEYCODE_STOP)		PORT_CHAR('.')		PORT_CHAR(':')
-	PORT_BIT(0x0008, IP_ACTIVE_HIGH, IPT_UNKNOWN) 					// 0x8f// 	
-	PORT_BIT(0x0010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("L_SHIFT")		PORT_CODE(KEYCODE_LSHIFT)	PORT_CHAR(UCHAR_MAMEKEY(LSHIFT))  // 3Dh ->C1h-function P3 key left
+	PORT_BIT(0x0008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Pos 1")		PORT_CODE(KEYCODE_HOME)		PORT_CHAR(UCHAR_MAMEKEY(HOME))		// 0x8f	
+	PORT_BIT(0x0010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("L_SHIFT")		PORT_CODE(KEYCODE_LSHIFT)	PORT_CHAR(UCHAR_MAMEKEY(LSHIFT))	// 3Dh ->C1h-function P3 key left
 	PORT_BIT(0x0080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("8")			PORT_CODE(KEYCODE_8)		PORT_CHAR('8')		PORT_CHAR('(')	
 	
 PORT_START("COL.8")
@@ -346,7 +360,7 @@ PORT_START("COL.9")
 PORT_START("COL.10")
 	PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_KEYBOARD) 	PORT_NAME("+ *")		PORT_CODE(KEYCODE_CLOSEBRACE)PORT_CHAR('+')		PORT_CHAR('*')
 	PORT_BIT(0x0002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("# ^")			PORT_CODE(KEYCODE_BACKSLASH)PORT_CHAR('#')		PORT_CHAR('^')
-	PORT_BIT(0x0004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("ESC")			PORT_CODE(KEYCODE_ESC)		PORT_CHAR(UCHAR_MAMEKEY(ESC))			// Esc test this work ?!
+	PORT_BIT(0x0004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("[][]/ESC")	PORT_CODE(KEYCODE_ESC)		PORT_CHAR(UCHAR_MAMEKEY(ESC))			// Esc test this work ?!
 	PORT_BIT(0x0008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("DEL Pad")		PORT_CODE(KEYCODE_DEL_PAD)	PORT_CHAR(UCHAR_MAMEKEY(DEL_PAD))
 	PORT_BIT(0x0080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("ß ?")			PORT_CODE(KEYCODE_MINUS)	PORT_CHAR(0x00df)	PORT_CHAR('?')		// ß and ?
 	
@@ -366,7 +380,7 @@ PORT_START("COL.12")
 PORT_START("COL.13")
 	PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("/ Pad")		PORT_CODE(KEYCODE_SLASH_PAD)PORT_CHAR(UCHAR_MAMEKEY(SLASH_PAD))
 	PORT_BIT(0x0002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("*")			PORT_CODE(KEYCODE_ASTERISK)	PORT_CHAR(UCHAR_MAMEKEY(ASTERISK))	// test ?
-	PORT_BIT(0x0004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("(R) Repeat")	PORT_CODE(KEYCODE_LCONTROL)	PORT_CODE(KEYCODE_LCONTROL)			// scan 6Bh -> C2h funct.
+	PORT_BIT(0x0004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("\xc2\xae /Ctrl")PORT_CODE(KEYCODE_LCONTROL)	PORT_CODE(KEYCODE_LCONTROL)			// scan 6Bh -> C2h funct.
 	PORT_BIT(0x0008, IP_ACTIVE_HIGH, IPT_UNKNOWN)					// 0xc2 ?? 
 	PORT_BIT(0x0010, IP_ACTIVE_HIGH, IPT_UNKNOWN)
 	PORT_BIT(0x0080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("F3")			PORT_CODE(KEYCODE_F3)		PORT_CHAR(UCHAR_MAMEKEY(F3)) // scan:=68h 88h-> F3 ok
@@ -741,5 +755,5 @@ ROM_END
 //    YEAR  NAME       PARENT   COMPAT   MACHINE   INPUT       CLASS           INIT  COMPANY          FULLNAME  FLAGS
 COMP( 198?, alphatp2,  alphatp3, 0,     alphatp2, alphatp3, alphatpx_state, 0,    "Triumph-Adler", "alphatronic P2", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 COMP( 198?, alphatp2u, alphatp3, 0,     alphatp2u,alphatp3, alphatpx_state, 0,    "Triumph-Adler", "alphatronic P2U", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-COMP( 1982, alphatp3,  0,        0,     alphatp3, alphatp3, alphatpx_state, 0,    "Triumph-Adler", "alphatronic P3", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1982, alphatp3,  0,        0,     alphatp3, alphatp3, alphatpx_state, 0,    "Triumph-Adler", "alphatronic P3", MACHINE_NOT_WORKING )
 COMP( 198?, alphatp30, alphatp3, 0,		alphatp3, alphatp3, alphatpx_state, 0,	"Triumph-Adler", "alphatronic P30",MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
