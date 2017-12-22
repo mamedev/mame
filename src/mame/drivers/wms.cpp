@@ -545,7 +545,22 @@ ROM_START( wdun )    // Who Dunnit (Russian)
 ROM_END
 
 
-ROM_START( winbid )    // Winning Bid (Russian)
+ROM_START( winbid )    // Winning Bid (English)
+	ROM_REGION(0x100000, "maincpu", 0)
+	ROM_LOAD( "winning_bid.xu3", 0x0000, 0x100000, CRC(a60afb19) SHA1(461e6b8ac1a8874ecd4ecd709ed0f0e6d9aab989) )
+
+	ROM_REGION(0x100000, "rom", 0)
+	ROM_LOAD( "winning_bid.xu2", 0x0000, 0x100000, CRC(9b8d153e) SHA1(24e5500f90eb0c903f09ac62b3496bea9a6cd640) )
+	ROM_LOAD( "winning_bid.xu4", 0x0000, 0x100000, CRC(80079c9a) SHA1(296cea5e7aa2f0f0bfb03af335cc4c65a9cb68c3) )
+	// sound
+	ROM_LOAD( "winning_bid.xu30", 0x0000, 0x100000, CRC(2ef7bc4d) SHA1(f287098341de34d79f18fcd38f9e5cdd13bdaaeb) )
+	ROM_LOAD( "winning_bid.xu31", 0x0000, 0x100000, CRC(068e4cab) SHA1(7ea3804353601c82ebc2d4cb4dd8bf1f8a48132e) )
+	ROM_LOAD( "winning_bid.xu17", 0x0000, 0x100000, CRC(6f7bcadf) SHA1(9ddd0a0259dc2d7e69fcb58a16fac4ddc344e41e) )
+	ROM_LOAD( "winning_bid.xu18", 0x0000, 0x100000, CRC(f7f8814e) SHA1(274e669df9e6e33eb5867906069f43a9c8898d45) )
+ROM_END
+
+
+ROM_START( winbidr )    // Winning Bid (Russian)
 	ROM_REGION(0x100000, "maincpu", 0)
 	ROM_LOAD( "xu-3.bin", 0x0000, 0x100000, CRC(873eecfb) SHA1(35960c9a2a4efeac8b8cea94f1eac6ffb175b9a9) )
 
@@ -632,6 +647,7 @@ GAME( 200?, sonoth,     0,        wms,     wms,      wms_state, wms,  ROT0, "WMS
 GAME( 200?, swingin,    0,        wms,     wms,      wms_state, wms,  ROT0, "WMS",   "Swingin In The Green (Russian)",  MACHINE_IS_SKELETON )
 GAME( 200?, wmstopb,    0,        wms,     wms,      wms_state, wms,  ROT0, "WMS",   "Top Banana (Russian)",            MACHINE_IS_SKELETON )
 GAME( 200?, wdun,       0,        wms,     wms,      wms_state, wms,  ROT0, "WMS",   "Who Dunnit (Russian)",            MACHINE_IS_SKELETON )
-GAME( 200?, winbid,     0,        wms,     wms,      wms_state, wms,  ROT0, "WMS",   "Winning Bid (Russian)",           MACHINE_IS_SKELETON )
+GAME( 200?, winbid,     0,        wms,     wms,      wms_state, wms,  ROT0, "WMS",   "Winning Bid (English)",           MACHINE_IS_SKELETON )
+GAME( 200?, winbidr,    winbid,   wms,     wms,      wms_state, wms,  ROT0, "WMS",   "Winning Bid (Russian)",           MACHINE_IS_SKELETON )
 GAME( 200?, wldstrek,   0,        wms,     wms,      wms_state, wms,  ROT0, "WMS",   "Wild Streak (Russian)",           MACHINE_IS_SKELETON )
 GAME( 200?, yukongld,   0,        wms,     wms,      wms_state, wms,  ROT0, "WMS",   "Yukon Gold (Russian)",            MACHINE_IS_SKELETON )
