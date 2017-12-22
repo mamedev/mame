@@ -106,10 +106,11 @@ protected:
 
 	// device_execute_interface overrides
 	virtual u32 execute_min_cycles() const override { return 1; }
-	virtual u32 execute_max_cycles() const override { return 6; }
+	virtual u32 execute_max_cycles() const override { return 1; }
 	virtual u32 execute_input_lines() const override { return 1; }
 	virtual void execute_set_input(int line, int state) override;
 	virtual void execute_run() override;
+	virtual void execute_one();
 
 	// device_memory_interface overrides
 	virtual space_config_vector memory_space_config() const override;
@@ -151,28 +152,28 @@ protected:
 	// standard/fixed instructions - these are documented more in their specific handlers
 	enum
 	{
-		F_BR =    (1<<0),
-		F_CALL =  (1<<1),
-		F_CLO =   (1<<2),
-		F_COMC =  (1<<3),
-		F_COMX =  (1<<4),
+		F_BR    = (1<<0),
+		F_CALL  = (1<<1),
+		F_CLO   = (1<<2),
+		F_COMC  = (1<<3),
+		F_COMX  = (1<<4),
 		F_COMX8 = (1<<5),
-		F_LDP =   (1<<6),
-		F_LDX =   (1<<7),
-		F_RBIT =  (1<<8),
-		F_RETN =  (1<<9),
-		F_RSTR =  (1<<10),
-		F_SBIT =  (1<<11),
-		F_SETR =  (1<<12),
-		F_TDO =   (1<<13),
-		F_TPC =   (1<<14),
+		F_LDP   = (1<<6),
+		F_LDX   = (1<<7),
+		F_RBIT  = (1<<8),
+		F_RETN  = (1<<9),
+		F_RSTR  = (1<<10),
+		F_SBIT  = (1<<11),
+		F_SETR  = (1<<12),
+		F_TDO   = (1<<13),
+		F_TPC   = (1<<14),
 
-		F_OFF =   (1<<15),
-		F_REAC =  (1<<16),
-		F_SAL =   (1<<17),
-		F_SBL =   (1<<18),
-		F_SEAC =  (1<<19),
-		F_XDA =   (1<<20)
+		F_OFF   = (1<<15),
+		F_REAC  = (1<<16),
+		F_SAL   = (1<<17),
+		F_SBL   = (1<<18),
+		F_SEAC  = (1<<19),
+		F_XDA   = (1<<20)
 	};
 
 	void next_pc();
@@ -256,7 +257,7 @@ protected:
 	int m_subcycle;
 	int m_icount;
 	u8 m_o_index;
-	bool m_halt;    // halt pin state
+	bool m_halt_pin;
 
 	u8 m_o_pins;    // how many O pins
 	u8 m_r_pins;    // how many R pins

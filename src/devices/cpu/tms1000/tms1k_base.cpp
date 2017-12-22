@@ -144,7 +144,7 @@ void tms1k_base_device::device_start()
 	m_r = 0;
 	m_o = 0;
 	m_o_index = 0;
-	m_halt = false;
+	m_halt_pin = false;
 	m_cki_bus = 0;
 	m_c4 = 0;
 	m_p = 0;
@@ -184,7 +184,7 @@ void tms1k_base_device::device_start()
 	save_item(NAME(m_r));
 	save_item(NAME(m_o));
 	save_item(NAME(m_o_index));
-	save_item(NAME(m_halt));
+	save_item(NAME(m_halt_pin));
 	save_item(NAME(m_cki_bus));
 	save_item(NAME(m_c4));
 	save_item(NAME(m_p));
@@ -314,7 +314,7 @@ void tms1k_base_device::execute_set_input(int line, int state)
 		return;
 
 	// HALT pin (CMOS only)
-	m_halt = bool(state);
+	m_halt_pin = bool(state);
 }
 
 void tms1k_base_device::write_o_output(u8 index)
@@ -604,145 +604,142 @@ void tms1k_base_device::op_sbl()
 
 
 //-------------------------------------------------
-//  execute_run
+//  execute
 //-------------------------------------------------
+
+void tms1k_base_device::execute_one()
+{
+	switch (m_subcycle)
+	{
+	case 0:
+		// fetch: rom address 1/2
+
+		// execute: br/call 2/2
+		if (m_fixed & F_BR)    op_br();
+		if (m_fixed & F_CALL)  op_call();
+		if (m_fixed & F_RETN)  op_retn();
+
+		// execute: k input valid, read ram, clear alu inputs
+		dynamic_output();
+		set_cki_bus();
+		m_ram_in = m_data->read_byte(m_ram_address) & 0xf;
+		m_dam_in = m_data->read_byte(m_ram_address | (0x10 << (m_x_bits-1))) & 0xf;
+		m_p = 0;
+		m_n = 0;
+		m_carry_in = 0;
+
+		break;
+
+	case 1:
+		// fetch: rom address 2/2
+		m_rom_address = (m_ca << (m_pc_bits+4)) | (m_pa << m_pc_bits) | m_pc;
+
+		// execute: update alu inputs
+		// N inputs
+		if (m_micro & M_15TN)  m_n |= 0xf;
+		if (m_micro & M_ATN)   m_n |= m_a;
+		if (m_micro & M_NATN)  m_n |= (~m_a & 0xf);
+		if (m_micro & M_CKN)   m_n |= m_cki_bus;
+		if (m_micro & M_MTN)   m_n |= m_ram_in;
+
+		// P inputs
+		if (m_micro & M_CKP)   m_p |= m_cki_bus;
+		if (m_micro & M_MTP)   m_p |= m_ram_in;
+		if (m_micro & M_YTP)   m_p |= m_y;
+		if (m_micro & M_DMTP)  m_p |= m_dam_in;
+		if (m_micro & M_NDMTP) m_p |= (~m_dam_in & 0xf);
+
+		// carry input
+		if (m_micro & M_CIN)   m_carry_in |= 1;
+		if (m_micro & M_SSS)   m_carry_in |= m_eac;
+
+		break;
+
+	case 2:
+	{
+		// fetch: nothing
+
+		// execute: perform alu logic
+		// note: officially, only 1 alu operation is allowed per opcode
+		m_adder_out = m_p + m_n + m_carry_in;
+		int carry_out = m_adder_out >> 4 & 1;
+		int status = 1;
+		m_ram_out = -1;
+
+		if (m_micro & M_C8)    status &= carry_out;
+		if (m_micro & M_NE)    status &= (m_n != m_p); // COMP
+		if (m_micro & M_CKM)   m_ram_out = m_cki_bus;
+
+		// special status circuit
+		if (m_micro & M_SSE)
+		{
+			m_eac = m_carry_out;
+			if (m_add)
+				m_eac |= carry_out;
+		}
+		m_carry_out = carry_out;
+
+		if (m_micro & M_STO || (m_micro & M_CME && m_eac == m_add))
+			m_ram_out = m_a;
+
+		// handle the other fixed opcodes here
+		if (m_fixed & F_SBIT)  op_sbit();
+		if (m_fixed & F_RBIT)  op_rbit();
+		if (m_fixed & F_SETR)  op_setr();
+		if (m_fixed & F_RSTR)  op_rstr();
+		if (m_fixed & F_TDO)   op_tdo();
+		if (m_fixed & F_CLO)   op_clo();
+		if (m_fixed & F_LDX)   op_ldx();
+		if (m_fixed & F_COMX)  op_comx();
+		if (m_fixed & F_COMX8) op_comx8();
+		if (m_fixed & F_LDP)   op_ldp();
+		if (m_fixed & F_COMC)  op_comc();
+		if (m_fixed & F_TPC)   op_tpc();
+		if (m_fixed & F_OFF)   op_off();
+		if (m_fixed & F_SEAC)  op_seac();
+		if (m_fixed & F_REAC)  op_reac();
+		if (m_fixed & F_SAL)   op_sal();
+		if (m_fixed & F_SBL)   op_sbl();
+		if (m_fixed & F_XDA)   op_xda();
+
+		// after fixed opcode handling: store status, write ram
+		m_status = status;
+		if (m_ram_out != -1)
+			m_data->write_byte(m_ram_address, m_ram_out);
+
+		break;
+	}
+
+	case 3:
+		// fetch: update pc, ram address 1/2
+		// execute: register store 1/2
+		break;
+
+	case 4:
+		// execute: register store 2/2
+		if (m_micro & M_AUTA)  m_a = m_adder_out & 0xf;
+		if (m_micro & M_AUTY)  m_y = m_adder_out & 0xf;
+		if (m_micro & M_STSL)  m_status_latch = m_status;
+
+		// fetch: update pc, ram address 2/2
+		read_opcode();
+		m_ram_address = m_x << 4 | m_y;
+		break;
+
+	case 5:
+		// fetch: instruction decode (handled above, before next_pc)
+		// execute: br/call 1/2
+		break;
+	}
+
+	m_subcycle = (m_subcycle + 1) % 6;
+}
 
 void tms1k_base_device::execute_run()
 {
 	while (m_icount > 0)
 	{
 		m_icount--;
-
-		if (m_halt)
-		{
-			// not running (output pins remain unchanged)
-			m_icount = 0;
-			return;
-		}
-
-		switch (m_subcycle)
-		{
-		case 0:
-			// fetch: rom address 1/2
-
-			// execute: br/call 2/2
-			if (m_fixed & F_BR)    op_br();
-			if (m_fixed & F_CALL)  op_call();
-			if (m_fixed & F_RETN)  op_retn();
-
-			// execute: k input valid, read ram, clear alu inputs
-			dynamic_output();
-			set_cki_bus();
-			m_ram_in = m_data->read_byte(m_ram_address) & 0xf;
-			m_dam_in = m_data->read_byte(m_ram_address | (0x10 << (m_x_bits-1))) & 0xf;
-			m_p = 0;
-			m_n = 0;
-			m_carry_in = 0;
-
-			break;
-
-		case 1:
-			// fetch: rom address 2/2
-			m_rom_address = (m_ca << (m_pc_bits+4)) | (m_pa << m_pc_bits) | m_pc;
-
-			// execute: update alu inputs
-			// N inputs
-			if (m_micro & M_15TN)  m_n |= 0xf;
-			if (m_micro & M_ATN)   m_n |= m_a;
-			if (m_micro & M_NATN)  m_n |= (~m_a & 0xf);
-			if (m_micro & M_CKN)   m_n |= m_cki_bus;
-			if (m_micro & M_MTN)   m_n |= m_ram_in;
-
-			// P inputs
-			if (m_micro & M_CKP)   m_p |= m_cki_bus;
-			if (m_micro & M_MTP)   m_p |= m_ram_in;
-			if (m_micro & M_YTP)   m_p |= m_y;
-			if (m_micro & M_DMTP)  m_p |= m_dam_in;
-			if (m_micro & M_NDMTP) m_p |= (~m_dam_in & 0xf);
-
-			// carry input
-			if (m_micro & M_CIN)   m_carry_in |= 1;
-			if (m_micro & M_SSS)   m_carry_in |= m_eac;
-
-			break;
-
-		case 2:
-		{
-			// fetch: nothing
-
-			// execute: perform alu logic
-			// note: officially, only 1 alu operation is allowed per opcode
-			m_adder_out = m_p + m_n + m_carry_in;
-			int carry_out = m_adder_out >> 4 & 1;
-			int status = 1;
-			m_ram_out = -1;
-
-			if (m_micro & M_C8)    status &= carry_out;
-			if (m_micro & M_NE)    status &= (m_n != m_p); // COMP
-			if (m_micro & M_CKM)   m_ram_out = m_cki_bus;
-
-			// special status circuit
-			if (m_micro & M_SSE)
-			{
-				m_eac = m_carry_out;
-				if (m_add)
-					m_eac |= carry_out;
-			}
-			m_carry_out = carry_out;
-
-			if (m_micro & M_STO || (m_micro & M_CME && m_eac == m_add))
-				m_ram_out = m_a;
-
-			// handle the other fixed opcodes here
-			if (m_fixed & F_SBIT)  op_sbit();
-			if (m_fixed & F_RBIT)  op_rbit();
-			if (m_fixed & F_SETR)  op_setr();
-			if (m_fixed & F_RSTR)  op_rstr();
-			if (m_fixed & F_TDO)   op_tdo();
-			if (m_fixed & F_CLO)   op_clo();
-			if (m_fixed & F_LDX)   op_ldx();
-			if (m_fixed & F_COMX)  op_comx();
-			if (m_fixed & F_COMX8) op_comx8();
-			if (m_fixed & F_LDP)   op_ldp();
-			if (m_fixed & F_COMC)  op_comc();
-			if (m_fixed & F_TPC)   op_tpc();
-			if (m_fixed & F_OFF)   op_off();
-			if (m_fixed & F_SEAC)  op_seac();
-			if (m_fixed & F_REAC)  op_reac();
-			if (m_fixed & F_SAL)   op_sal();
-			if (m_fixed & F_SBL)   op_sbl();
-			if (m_fixed & F_XDA)   op_xda();
-
-			// after fixed opcode handling: store status, write ram
-			m_status = status;
-			if (m_ram_out != -1)
-				m_data->write_byte(m_ram_address, m_ram_out);
-
-			break;
-		}
-
-		case 3:
-			// fetch: update pc, ram address 1/2
-			// execute: register store 1/2
-			break;
-
-		case 4:
-			// execute: register store 2/2
-			if (m_micro & M_AUTA)  m_a = m_adder_out & 0xf;
-			if (m_micro & M_AUTY)  m_y = m_adder_out & 0xf;
-			if (m_micro & M_STSL)  m_status_latch = m_status;
-
-			// fetch: update pc, ram address 2/2
-			read_opcode();
-			m_ram_address = m_x << 4 | m_y;
-			break;
-
-		case 5:
-			// fetch: instruction decode (handled above, before next_pc)
-			// execute: br/call 1/2
-			break;
-		}
-
-		m_subcycle = (m_subcycle + 1) % 6;
+		execute_one();
 	}
 }
