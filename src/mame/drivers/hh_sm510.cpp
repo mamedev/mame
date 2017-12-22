@@ -2591,7 +2591,6 @@ WRITE8_MEMBER(tsonic_state::write_s)
 	hh_sm510_state::input_w(space, 0, data >> 1);
 }
 
-
 // config
 
 static INPUT_PORTS_START( tsonic )
@@ -2771,7 +2770,17 @@ public:
 		m_inp_lines = 5;
 		m_inp_fixed = 5;
 	}
+
+	virtual DECLARE_WRITE8_MEMBER(input_w) override;
 };
+
+// handlers
+
+WRITE8_MEMBER(tnmarebc_state::input_w)
+{
+	// S5 and S6 tied together
+	hh_sm510_state::input_w(space, 0, (data & 0x1f) | (data >> 1 & 0x10));
+}
 
 // config
 
@@ -2793,7 +2802,7 @@ static INPUT_PORTS_START( tnmarebc )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr) // Action
 	PORT_BIT( 0x0e, IP_ACTIVE_HIGH, IPT_UNUSED )
 
-	PORT_START("IN.4") // S5
+	PORT_START("IN.4") // S5/S6
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr) PORT_NAME("Pause")
 	PORT_BIT( 0x0e, IP_ACTIVE_HIGH, IPT_UNUSED )
 
@@ -2817,7 +2826,7 @@ static MACHINE_CONFIG_START( tnmarebc )
 	MCFG_CPU_ADD("maincpu", SM510, XTAL_32_768kHz)
 	MCFG_SM510_WRITE_SEGS_CB(WRITE16(hh_sm510_state, sm510_lcd_segment_w))
 	MCFG_SM510_READ_K_CB(READ8(hh_sm510_state, input_r))
-	MCFG_SM510_WRITE_S_CB(WRITE8(hh_sm510_state, input_w))
+	MCFG_SM510_WRITE_S_CB(WRITE8(tnmarebc_state, input_w))
 	MCFG_SM510_WRITE_R_CB(WRITE8(hh_sm510_state, piezo_r1_w))
 	MCFG_SM510_READ_BA_CB(IOPORT("BA"))
 	MCFG_SM510_READ_B_CB(IOPORT("B"))
