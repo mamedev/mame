@@ -15008,6 +15008,9 @@ hp2100                          // HP 2100 and HP 1000
 @source:hp2620.cpp
 hp2622a                         //
 
+@source:hp2640.cpp
+hp2645                          //
+
 @source:hp48.cpp
 hp38g                           //
 hp39g                           //
