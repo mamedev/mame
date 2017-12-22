@@ -83,6 +83,7 @@ protected:
 	void attribute_reg_write(uint8_t index, uint8_t data);
 	void gc_reg_write(uint8_t index,uint8_t data);
 	virtual uint16_t offset();
+	virtual uint32_t start_addr();
 	inline uint8_t vga_latch_write(int offs, uint8_t data);
 	inline uint8_t rotate_right(uint8_t val) { return (val >> vga.gc.rotate_count) | (val << (8 - vga.gc.rotate_count)); }
 	inline uint8_t vga_logical_op(uint8_t data, uint8_t plane, uint8_t mask)
