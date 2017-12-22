@@ -267,7 +267,7 @@ void i8087_device::execute()
 			return;
 	}
 	m_busy_handler(0);
-	if(!((m_sw & ~m_cw) & 0x3f)) // no exceptions
+//  if(!((m_sw & ~m_cw) & 0x3f)) // no exceptions
 		m_timer->adjust(attotime::from_hz((m_icount ? m_icount : 1) * clock()));
 }
 
