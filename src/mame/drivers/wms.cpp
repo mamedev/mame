@@ -263,7 +263,21 @@ ROM_START( cashcrop )    // Cash Crop (Russian)
 ROM_END
 
 
-ROM_START( filthyr )    // Filthy Rich (Russian)
+ROM_START( filthyr )    // Filthy Rich (English)
+	ROM_REGION(0x100000, "maincpu", 0)
+	ROM_LOAD( "filthy_rich.xu3", 0x0000, 0x100000, CRC(0673102d) SHA1(1d69e0f7b4d5faa37ecb8edba5a1eb63210d7032) )
+
+	ROM_REGION(0x100000, "rom", 0)
+	ROM_LOAD( "filthy_rich.xu2", 0x0000, 0x100000, CRC(095c5a44) SHA1(37bf83160bac1c4ab3b64abd207fe111da6b7a1b) )
+	// sound
+	ROM_LOAD( "filthy_rich.xu30", 0x0000, 0x100000, CRC(28d97696) SHA1(1bee36610ed5123ac3cb63fef7069e7975fffe6f) )
+	ROM_LOAD( "filthy_rich.xu31", 0x0000, 0x100000, CRC(29ec4d17) SHA1(fbdb7775d4e1abf2241eb29ee042aeb9deb5bbeb) )
+	ROM_LOAD( "filthy_rich.xu17", 0x0000, 0x100000, CRC(6ef1ca21) SHA1(c0e98c2430b85623a9481262c9d06103e22c4fdd) )
+	ROM_LOAD( "filthy_rich.xu18", 0x0000, 0x100000, CRC(f74c48c7) SHA1(e62d2691ad579291c8cbb6f2c61399dbe52515c3) )
+ROM_END
+
+
+ROM_START( filthyrr )    // Filthy Rich (Russian)
 	ROM_REGION(0x100000, "maincpu", 0)
 	ROM_LOAD( "xu-3.bin", 0x0000, 0x100000, CRC(4b57aa15) SHA1(076ef6c1782a0ec34c15bffd5e93644ba179c1f7) )
 
@@ -570,7 +584,8 @@ GAME( 200?, wmsb,       wms,      wms,     wms,      wms_state, wms,  ROT0, "WMS
 GAME( 200?, btippers,   0,        wms,     wms,      wms_state, wms,  ROT0, "WMS",   "Big Tippers (Russian)",           MACHINE_IS_SKELETON )
 GAME( 200?, wmsboom,    0,        wms,     wms,      wms_state, wms,  ROT0, "WMS",   "Boom (Russian)",                  MACHINE_IS_SKELETON )
 GAME( 200?, cashcrop,   0,        wms,     wms,      wms_state, wms,  ROT0, "WMS",   "Cash Crop (Russian)",             MACHINE_IS_SKELETON )
-GAME( 200?, filthyr,    0,        wms,     wms,      wms_state, wms,  ROT0, "WMS",   "Filthy Rich (Russian)",           MACHINE_IS_SKELETON )
+GAME( 200?, filthyr,    0,        wms,     wms,      wms_state, wms,  ROT0, "WMS",   "Filthy Rich (English)",           MACHINE_IS_SKELETON )
+GAME( 200?, filthyrr,   filthyr,  wms,     wms,      wms_state, wms,  ROT0, "WMS",   "Filthy Rich (Russian)",           MACHINE_IS_SKELETON )
 GAME( 200?, hottop,     0,        wms,     wms,      wms_state, wms,  ROT0, "WMS",   "Hot Toppings (English)",          MACHINE_IS_SKELETON )
 GAME( 200?, hottopa,    hottop,   wms,     wms,      wms_state, wms,  ROT0, "WMS",   "Hot Toppings (Russian?)",         MACHINE_IS_SKELETON )
 GAME( 200?, inwinner,   0,        wms,     wms,      wms_state, wms,  ROT0, "WMS",   "Instant Winner (Russian)",        MACHINE_IS_SKELETON )
