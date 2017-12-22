@@ -2,7 +2,7 @@
 // copyright-holders:Wilbert Pol
 /***************************************************************************
 
-  pcfx.c
+  pcfx.cpp
 
   Driver file to handle emulation of the NEC PC-FX.
 
@@ -17,13 +17,6 @@
 #include "video/huc6272.h"
 #include "screen.h"
 
-struct pcfx_pad_t
-{
-	uint8_t ctrl[2];
-	uint8_t status[2];
-	uint32_t latch[2];
-};
-
 class pcfx_state : public driver_device
 {
 public:
@@ -37,19 +30,7 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_huc6261(*this, "huc6261") { }
 
-	required_device<cpu_device> m_maincpu;
-	required_device<huc6261_device> m_huc6261;
-
-	virtual void machine_reset() override;
-
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-
-	// Interrupt controller (component unknown)
-	uint16_t m_irq_mask;
-	uint16_t m_irq_pending;
-	uint8_t m_irq_priority[8];
-
-	pcfx_pad_t m_pad;
 
 	DECLARE_READ16_MEMBER( irq_read );
 	DECLARE_WRITE16_MEMBER( irq_write );
@@ -58,8 +39,6 @@ public:
 	DECLARE_READ8_MEMBER( extio_r );
 	DECLARE_WRITE8_MEMBER( extio_w );
 
-	inline void check_irqs();
-	inline void set_irq_line(int line, int state);
 	DECLARE_WRITE_LINE_MEMBER( irq8_w );
 	DECLARE_WRITE_LINE_MEMBER( irq9_w );
 	DECLARE_WRITE_LINE_MEMBER( irq10_w );
@@ -72,6 +51,29 @@ public:
 
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+
+	virtual void machine_reset() override;
+
+private:
+	// Interrupt controller (component unknown)
+	uint16_t m_irq_mask;
+	uint16_t m_irq_pending;
+	uint8_t m_irq_priority[8];
+
+	struct pcfx_pad_t
+	{
+		uint8_t ctrl[2];
+		uint8_t status[2];
+		uint32_t latch[2];
+	};
+
+	pcfx_pad_t m_pad;
+
+	inline void check_irqs();
+	inline void set_irq_line(int line, int state);
+
+	required_device<cpu_device> m_maincpu;
+	required_device<huc6261_device> m_huc6261;
 };
 
 
@@ -435,6 +437,8 @@ static MACHINE_CONFIG_START( pcfx )
 	MCFG_HUC6272_RAINBOW("huc6271")
 
 	MCFG_HUC6271_ADD( "huc6271", XTAL_21_4772MHz )
+
+	MCFG_SOFTWARE_LIST_ADD("cd_list", "pcfx")
 MACHINE_CONFIG_END
 
 
