@@ -407,7 +407,21 @@ ROM_START( lovewin )    // Love To Win (Russian)
 ROM_END
 
 
-ROM_START( mtburn )    // Money To Burn (Russian)
+ROM_START( mtburn )    // Money To Burn (English)
+	ROM_REGION(0x100000, "maincpu", 0)
+	ROM_LOAD( "money_to_burn.xu3", 0x0000, 0x100000, CRC(92d94269) SHA1(8f7e342837067b6c2180c3a161bc34671c0fab72) )
+
+	ROM_REGION(0x100000, "rom", 0)
+	ROM_LOAD( "money_to_burn.xu2", 0x0000, 0x100000, CRC(cf496bf5) SHA1(8cc8b9106316fef3bd1436b08488ae8552411f9d) )
+	// sound
+	ROM_LOAD( "money_to_burn.xu30", 0x0000, 0x100000, CRC(86255bc7) SHA1(75b6876d72c9f4c576f807fe970d49e8c208b477) )
+	ROM_LOAD( "money_to_burn.xu31", 0x0000, 0x100000, CRC(f5c80417) SHA1(097d9fc73f44674cff3b24be917a0db7e4117553) )
+	ROM_LOAD( "money_to_burn.xu17", 0x0000, 0x100000, CRC(0ec9579a) SHA1(8f78282f4691426a0ca49387ab58f63a578b96a2) )
+	ROM_LOAD( "money_to_burn.xu18", 0x0000, 0x100000, CRC(69fe5e04) SHA1(532d9a6b1326543227a8f64c595b1f8bfc0dbf4a) )
+ROM_END
+
+
+ROM_START( mtburnr )    // Money To Burn (Russian)
 	ROM_REGION(0x100000, "maincpu", 0)
 	ROM_LOAD( "xu-3.bin", 0x0000, 0x100000, CRC(a329aff0) SHA1(2f631783bd15b8a695d92d0861e167130f914046) )
 
@@ -594,7 +608,8 @@ GAME( 200?, leprgld,    0,        wms,     wms,      wms_state, wms,  ROT0, "WMS
 GAME( 200?, leprglds,   leprgld,  wms,     wms,      wms_state, wms,  ROT0, "WMS",   "Leprechaun's Gold (Spanish)",     MACHINE_IS_SKELETON )
 GAME( 200?, lol,        0,        wms,     wms,      wms_state, wms,  ROT0, "WMS",   "Life of Luxury (Russian)",        MACHINE_IS_SKELETON )
 GAME( 200?, lovewin,    0,        wms,     wms,      wms_state, wms,  ROT0, "WMS",   "Love To Win (Russian)",           MACHINE_IS_SKELETON )
-GAME( 200?, mtburn,     0,        wms,     wms,      wms_state, wms,  ROT0, "WMS",   "Money To Burn (Russian)",         MACHINE_IS_SKELETON )
+GAME( 200?, mtburn,     0,        wms,     wms,      wms_state, wms,  ROT0, "WMS",   "Money To Burn (English)",         MACHINE_IS_SKELETON )
+GAME( 200?, mtburnr,    mtburn,   wms,     wms,      wms_state, wms,  ROT0, "WMS",   "Money To Burn (Russian)",         MACHINE_IS_SKELETON )
 GAME( 200?, otchart,    0,        wms,     wms,      wms_state, wms,  ROT0, "WMS",   "Off The Charts (Russian)",        MACHINE_IS_SKELETON )
 GAME( 200?, perfect,    0,        wms,     wms,      wms_state, wms,  ROT0, "WMS",   "Perfect Game (Russian)",          MACHINE_IS_SKELETON )
 GAME( 200?, reelemin,   0,        wms,     wms,      wms_state, wms,  ROT0, "WMS",   "Reel 'Em In (Russian)",           MACHINE_IS_SKELETON )
