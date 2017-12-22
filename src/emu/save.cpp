@@ -745,7 +745,7 @@ bool rewinder::step()
 bool rewinder::check_size()
 {
 	if (!m_enabled)
-		false;
+		return false;
 
 	// state sizes in bytes
 	const size_t singlesize = ram_state::get_size(m_save);
