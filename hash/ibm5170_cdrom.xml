@@ -328,7 +328,7 @@
 
 	<!-- Windows 3.1 / Mac LCIII -->
 	<software name="orgaslave">
-		<description>Orgaslave</description>
+		<description>Orgaslave (Japan)</description>
 		<year>1996</year>
 		<publisher>Kuki</publisher>
 		<info name="alt_title" value="オルガスレイブ" />
@@ -453,6 +453,21 @@
 		</part>
 	</software>
 
+	<!-- Windows 95 -->
+	<!-- Pentium class 133 MHz -->
+	<!-- Direct X 5 -->
+	<software name="silkroad">
+		<description>Silkroad Hoshi No Shima No Monogatari</description>
+		<year>1998</year>
+		<publisher>Anjin / Sprite</publisher>
+		<info name="alt_title" value="シルクロード 星の島の物語" />
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="silkroad" sha1="e1b532b3acaf6dfb16d7165e6cbebbf92e98ee49" />
+			</diskarea>
+		</part>
+	</software>
+	
 	<!-- Windows 3.1 -->
 	<!-- TODO: gfx shift issue on 256 color mode -->
 	<software name="spaceinv" supported="partial">
@@ -478,6 +493,26 @@
 		</part>
 	</software>
 
+	<!-- Windows 95 -->
+	<!-- Doesn't work in non-Japanese OS -->
+	<software name="twinbeep" supported="no">
+		<description>Twinbee Paradise In Donburi Shima (Japan)</description>
+		<year>1998</year>
+		<publisher>Konami</publisher>
+		<info name="alt_title" value="ツインビー Paradise in どんぶり島" />
+		<part name="cdrom1" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="twinbee_p" sha1="a8b07f5cbbef3f88e4c17a5ec323a0a5bff6a961" />
+			</diskarea>
+		</part>
+		<part name="cdrom2" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="twinscr" sha1="2597aef2821200fd218a1ae86d38122d4b9b049b" />
+			</diskarea>
+		</part>
+	</software>
+
+	
 	<!-- Windows 95/98/ME/XP and Mac OS supported -->
 	<!-- Requires 256 colors minimum otherwise they crashes at boot -->
 	<software name="v16imagine">
@@ -501,7 +536,34 @@
 			</diskarea>
 		</part>
 	</software>
+	
+	<!-- Windows 95 -->
+	<!-- Contains Pressure Drop and Under Pressure games -->
+	<software name="wpressure">
+		<description>W.Pressure (Japan)</description>
+		<year>1995</year>
+		<publisher>Millenium Interactive / Efecto Caos / Starhill Productions</publisher>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="wpressure" sha1="77b464665b1d827551a3bcd09b4f32c7cb621d17" />
+			</diskarea>
+		</part>
+	</software>
 
+	<!-- Windows required -->
+	<!-- TODO: Pressing F12 in-game causes an OS crash / switch to DOS prompt??? -->
+	<software name="zombiewrj" supported="partial">
+		<description>Halloween Harry in Zombie Wars (Japan ver 1.0R)</description>
+		<year>1996</year>
+		<publisher>Gee Whiz! Entertainment / G.A.M. Corporation</publisher>
+		<info name="version" value="1.0R" />
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="zwgam01" sha1="5b79550e2b5f4f1342c1bad105712e3e5c01d925" />
+			</diskarea>
+		</part>
+	</software>
+	
 	<software name="zyclunt" supported="no">
 		<description>Zyclunt</description>
 		<year>1995</year>
