@@ -465,7 +465,21 @@ ROM_START( perfect )    // Perfect Game (Russian)
 ROM_END
 
 
-ROM_START( reelemin )    // Reel 'Em In (Russian)
+ROM_START( reelemin )    // Reel 'Em In (English)
+	ROM_REGION(0x100000, "maincpu", 0)
+	ROM_LOAD( "reel_'em_in.xu3", 0x0000, 0x100000, CRC(a3840965) SHA1(1e782bb5eaeabce0d1a07eb895d344028364cd4f) )
+
+	ROM_REGION(0x100000, "rom", 0)
+	ROM_LOAD( "reel_'em_in.xu2", 0x0000, 0x100000, CRC(04658d90) SHA1(1180b2596175394e079c8498bfc5e956426d0e1c) )
+	// sound
+	ROM_LOAD( "reel_'em_in.xu30", 0x0000, 0x100000, CRC(742590b2) SHA1(65df9d346b1f69f79e6e79c91724813f052c64ee) )
+	ROM_LOAD( "reel_'em_in.xu31", 0x0000, 0x100000, CRC(bf3aabb8) SHA1(251c1bcf28f117152902b37915c41be1e912dda0) )
+	ROM_LOAD( "reel_'em_in.xu17", 0x0000, 0x100000, CRC(f99bf909) SHA1(4dac7aac0cf815d0b67f4c8d55d84f529e45f27d) )
+	ROM_LOAD( "reel_'em_in.xu18", 0x0000, 0x100000, CRC(1e4b64f1) SHA1(f082b2a7b6e029ffded1eec6fbc5f755bdd8d9eb) )
+ROM_END
+
+
+ROM_START( reeleminr )    // Reel 'Em In (Russian)
 	ROM_REGION(0x100000, "maincpu", 0)
 	ROM_LOAD( "xu-3.bin", 0x0000, 0x100000, CRC(a3840965) SHA1(1e782bb5eaeabce0d1a07eb895d344028364cd4f) )
 
@@ -612,7 +626,8 @@ GAME( 200?, mtburn,     0,        wms,     wms,      wms_state, wms,  ROT0, "WMS
 GAME( 200?, mtburnr,    mtburn,   wms,     wms,      wms_state, wms,  ROT0, "WMS",   "Money To Burn (Russian)",         MACHINE_IS_SKELETON )
 GAME( 200?, otchart,    0,        wms,     wms,      wms_state, wms,  ROT0, "WMS",   "Off The Charts (Russian)",        MACHINE_IS_SKELETON )
 GAME( 200?, perfect,    0,        wms,     wms,      wms_state, wms,  ROT0, "WMS",   "Perfect Game (Russian)",          MACHINE_IS_SKELETON )
-GAME( 200?, reelemin,   0,        wms,     wms,      wms_state, wms,  ROT0, "WMS",   "Reel 'Em In (Russian)",           MACHINE_IS_SKELETON )
+GAME( 200?, reelemin,   0,        wms,     wms,      wms_state, wms,  ROT0, "WMS",   "Reel 'Em In (English)",           MACHINE_IS_SKELETON )
+GAME( 200?, reeleminr,  reelemin, wms,     wms,      wms_state, wms,  ROT0, "WMS",   "Reel 'Em In (Russian)",           MACHINE_IS_SKELETON )
 GAME( 200?, sonoth,     0,        wms,     wms,      wms_state, wms,  ROT0, "WMS",   "Something For Nothing (Russian)", MACHINE_IS_SKELETON )
 GAME( 200?, swingin,    0,        wms,     wms,      wms_state, wms,  ROT0, "WMS",   "Swingin In The Green (Russian)",  MACHINE_IS_SKELETON )
 GAME( 200?, wmstopb,    0,        wms,     wms,      wms_state, wms,  ROT0, "WMS",   "Top Banana (Russian)",            MACHINE_IS_SKELETON )
