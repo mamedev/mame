@@ -31430,6 +31430,7 @@ phunsy                          //
 
 @source:picno.cpp
 picno                           // Konami Picno (1993)
+picno2                          // Konami Picno 2 (1993)
 
 @source:piggypas.cpp
 3lilpigs                        //
