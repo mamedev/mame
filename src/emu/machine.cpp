@@ -687,10 +687,9 @@ void running_machine::immediate_load(const char *filename)
 //  state to the rewind list
 //-------------------------------------------------
 
-void running_machine::rewind_capture()
+bool running_machine::rewind_capture()
 {
-	if (m_save.rewind()->enabled())
-		m_save.rewind()->capture();
+	return m_save.rewind()->capture();
 }
 
 
@@ -699,10 +698,9 @@ void running_machine::rewind_capture()
 //  rewind states
 //-------------------------------------------------
 
-void running_machine::rewind_step()
+bool running_machine::rewind_step()
 {
-	if (m_save.rewind()->enabled())
-		m_save.rewind()->step();
+	return m_save.rewind()->step();
 }
 
 
@@ -713,8 +711,7 @@ void running_machine::rewind_step()
 
 void running_machine::rewind_invalidate()
 {
-	if (m_save.rewind()->enabled())
-		m_save.rewind()->invalidate();
+	m_save.rewind()->invalidate();
 }
 
 
@@ -960,6 +957,9 @@ void running_machine::handle_saveload()
 				if (saverr != STATERR_NONE && m_saveload_schedule == saveload_schedule::SAVE)
 					file.remove_on_close();
 			}
+			else if (openflags == OPEN_FLAG_READ && filerr == osd_file::error::NOT_FOUND)
+				// attempt to load a non-existent savestate, report empty slot
+				popmessage("Error: No savestate file to load.", opname);
 			else
 				popmessage("Error: Failed to open file for %s operation.", opname);
 		}

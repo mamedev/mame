@@ -230,8 +230,8 @@ public:
 	void immediate_load(const char *filename);
 
 	// rewind operations
-	void rewind_capture();
-	void rewind_step();
+	bool rewind_capture();
+	bool rewind_step();
 	void rewind_invalidate();
 
 	// scheduled operations

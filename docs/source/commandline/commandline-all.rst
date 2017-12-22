@@ -334,6 +334,16 @@ Core Output Directory Options
 Core state/playback options
 ---------------------------
 
+**-[no]rewind**
+
+	When enabled and emulation is paused, automatically creates a save state in memory every time a frame is advanced. Rewind save states can then be loaded consecutively by pressing the rewind single step shortcut key (*Left Shift + Tilde by default*). The default rewind value is OFF (-norewind).
+	
+	If debugger is in a 'break' state, a save state is instead created every time step in, step over, or step out occurs. In that mode, rewind save states can be loaded by executing the debugger 'rewind'(or 'rw') command.
+	
+**-rewind_capacity** *<value>*
+
+	Sets the rewind capacity value, in megabytes. It is the total amount of memory rewind savestates can occupy. When capacity is hit, old savestates get erased as new ones are captured. Setting capacity lower than the current savestate size disables rewind. Values below 0 are automatically clamped to 0.
+
 **-state** *<slot>*
 
 	Immediately after starting the specified game, will cause the save state in the specified <slot> to be loaded.

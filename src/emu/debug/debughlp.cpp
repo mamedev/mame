@@ -463,7 +463,7 @@ static const help_item static_help_list[] =
 		"The rewind command loads the most recent RAM-based state.  Rewind states, when enabled, are "
 		"saved when \"step\", \"over\", or \"out\" command gets executed, storing the machine state as "
 		"of the moment before actually stepping.  Consecutively loading rewind states can work like "
-		"reverse execution.  Depending on which steps forward were taken previously, the bahavior can "
+		"reverse execution.  Depending on which steps forward were taken previously, the behavior can "
 		"be similar to GDB's \"reverse-stepi\" or \"reverse-next\".  All output for this command is "
 		"currently echoed into the running machine window.  Previous memory and PC tracking statistics "
 		"are cleared, actual reverse execution does not occur.\n"
