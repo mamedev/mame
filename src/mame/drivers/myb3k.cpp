@@ -51,8 +51,9 @@
 #define LOG_PIC     (1U << 3)
 #define LOG_CRT     (1U << 4)
 #define LOG_DMA     (1U << 5)
+#define LOG_KBD     (1U << 6)
 
-//#define VERBOSE (LOG_GENERAL | LOG_DMA )
+//#define VERBOSE (LOG_GENERAL | LOG_CRT)
 //#define LOG_OUTPUT_STREAM std::cout
 
 #include "logmacro.h"
@@ -62,6 +63,7 @@
 #define LOGPIC(...) LOGMASKED(LOG_PIC, __VA_ARGS__)
 #define LOGCRT(...) LOGMASKED(LOG_CRT, __VA_ARGS__)
 #define LOGDMA(...) LOGMASKED(LOG_DMA, __VA_ARGS__)
+#define LOGKBD(...) LOGMASKED(LOG_KBD, __VA_ARGS__)
 
 #ifdef _MSC_VER
 #define FUNCNAME __func__
@@ -100,6 +102,7 @@ public:
 
 	DECLARE_WRITE8_MEMBER(ppi_porta_w);
 	DECLARE_READ8_MEMBER(ppi_portb_r);
+	DECLARE_WRITE8_MEMBER(ppi_portc_w);
 
 	DECLARE_READ8_MEMBER( io_dack0_r ){ uint8_t tmp = m_isabus->dack_r(0); LOGDMA("%s: %02x\n", FUNCNAME, tmp); return tmp; }
 	DECLARE_READ8_MEMBER( io_dack1_r ){ uint8_t tmp = m_isabus->dack_r(1); LOGDMA("%s: %02x\n", FUNCNAME, tmp); return tmp; }
@@ -151,13 +154,16 @@ void myb3k_state::video_start()
 
 READ8_MEMBER( myb3k_state::myb3k_kbd_r )
 {
+	LOGKBD("%s: %02x\n", FUNCNAME, m_kbd_data);
 	// IN from port 0x04 enables a 74LS244 buffer that
 	// presents to the CPU the parallell bits from the 74LS164
 	// serial to parallel converter.
+	m_pic8259->ir1_w(CLEAR_LINE);
 	return m_kbd_data;
 }
 
 void myb3k_state::kbd_set_data_and_interrupt(u8 data) {
+	LOGKBD("%s: %02x\n", FUNCNAME, data);
 	m_kbd_data = data;
 	m_pic8259->ir1_w(ASSERT_LINE);
 }
@@ -190,9 +196,9 @@ uint32_t myb3k_state::screen_update_myb3k(screen_device &screen, bitmap_ind16 &b
 
 	//popmessage("%02x %d",m_vmode,h_step);
 
-	for(y=0;y<mc6845_v_display;y++)
+	for(y = 0; y < mc6845_v_display; y++)
 	{
-		for(x=0;x<mc6845_h_display;x++)
+		for(x = 0; x < mc6845_h_display; x++)
 		{
 			/* 8x8 grid gfxs, weird format too ... */
 			for(yi=0;yi<mc6845_tile_height;yi++)
@@ -298,6 +304,14 @@ WRITE8_MEMBER( myb3k_state::myb3k_video_mode_w )
  *       OFF ON  - ?
  *       ON  ON  - ?
  **********************************************************/
+#define PC0_STROBE  0x01 // Printer interface
+#define PC1_SETPAGE 0x02 // Graphics circuit
+#define PC2_DISPST  0x04 // Graphics circuit
+#define PC3_LPENB   0x08 // Lightpen enable
+#define PC4_CURSR   0x10 // Cursor Odd/Even
+#define PC5_BUZON   0x20 // Speaker On/Off
+#define PC6_CMTWRD  0x40
+#define PC7_CMTEN   0x80 // Cassette or Speaker
 
 static ADDRESS_MAP_START(myb3k_map, AS_PROGRAM, 8, myb3k_state)
 	ADDRESS_MAP_UNMAP_HIGH
@@ -336,7 +350,7 @@ static INPUT_PORTS_START( myb3k )
 	PORT_START("DSW1")
 	PORT_DIPUNUSED_DIPLOC(0x01, 0x01, "SW1:1")
 	PORT_DIPUNUSED_DIPLOC(0x02, 0x02, "SW1:2")
-	PORT_DIPNAME( 0x0c, 0x0c, "Display Mode") PORT_DIPLOCATION("SW1:3,4")
+	PORT_DIPNAME( 0x0c, 0x08, "Display Mode") PORT_DIPLOCATION("SW1:3,4")
 	PORT_DIPSETTING(    0x0c, "80CH 8 raster" )
 	PORT_DIPSETTING(    0x08, "80CH 16 raster" )
 	PORT_DIPSETTING(    0x04, "40CH 8 raster" )
@@ -344,16 +358,16 @@ static INPUT_PORTS_START( myb3k )
 	PORT_DIPNAME( 0x10, 0x10, "Expansion Unit" ) PORT_DIPLOCATION("SW1:5")
 	PORT_DIPSETTING(    0x00, "Attached" )
 	PORT_DIPSETTING(    0x10, "None" )
-	PORT_DIPNAME( 0x60, 0x00, "Flexible Disk Drive for boot" )  PORT_DIPLOCATION("SW1:6,7")
+	PORT_DIPNAME( 0x60, 0x60, "Flexible Disk Drive for boot" )  PORT_DIPLOCATION("SW1:6,7")
 	PORT_DIPSETTING(    0x60, "Drive A" )
 	PORT_DIPSETTING(    0x20, "Drive B" )
 	PORT_DIPSETTING(    0x40, "Drive C" )
 	PORT_DIPSETTING(    0x00, "Drive D" )
-	PORT_DIPNAME( 0x80, 0x00, "Flexible Disk Drive type for boot" )  PORT_DIPLOCATION("SW1:8")
+	PORT_DIPNAME( 0x80, 0x80, "Flexible Disk Drive type for boot" )  PORT_DIPLOCATION("SW1:8")
 	PORT_DIPSETTING(    0x00, "8-inch Flexible Disk Unit" )     // 0x520-0x524 range
 	PORT_DIPSETTING(    0x80, "5.25-inch Flexible Disk Drive" ) // 0x20-0x24 range
 	PORT_START("DSW2")
-	PORT_DIPNAME( 0x01, 0x01, "Check mode" )  PORT_DIPLOCATION("SW2:1") // ROM information
+	PORT_DIPNAME( 0x01, 0x00, "Check mode" )  PORT_DIPLOCATION("SW2:1") // ROM information
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPUNUSED_DIPLOC(0x02, 0x02, "SW2:2")
@@ -390,12 +404,7 @@ void myb3k_state::machine_reset()
 
 void myb3k_state::select_dma_channel(int channel, bool state)
 {
-	LOGDMA("%s: %d\n", FUNCNAME, state);
-	if (channel == 0)
-	{
-		logerror("ISA8 bus incompatible DMA channel 0 is not implemented\n");
-		return;
-	}
+	LOGDMA("%s: %d:%d\n", FUNCNAME, channel, state);
 	if(!state) {
 		m_dma_channel = channel;
 		if(!m_cur_tc)
@@ -425,8 +434,7 @@ WRITE_LINE_MEMBER(myb3k_state::pic_int_w)
 WRITE_LINE_MEMBER( myb3k_state::pit_out1_changed )
 {
 	LOGPIT("%s: %d\n", FUNCNAME, state);
-	// TODO: Check that port C bit 5 is low
-//	m_speaker->level_w(state ? 1 : 0);
+	m_speaker->level_w(state ? 1 : 0);
 }
 
 WRITE8_MEMBER(myb3k_state::dma_segment_w)
@@ -466,7 +474,7 @@ WRITE8_MEMBER(myb3k_state::dma_memory_write_byte)
 
 WRITE8_MEMBER( myb3k_state::ppi_porta_w )
 {
-	LOGPPI("%s: %d\n", FUNCNAME, data);
+	LOGPPI("%s: %02x\n", FUNCNAME, data);
 
 	return;
 }
@@ -475,6 +483,31 @@ READ8_MEMBER( myb3k_state::ppi_portb_r )
 {
 	LOGPPI("%s\n", FUNCNAME);
 	return ioport("DSW1")->read();
+}
+
+WRITE8_MEMBER( myb3k_state::ppi_portc_w )
+{
+	LOGPPI("%s: %02x\n", FUNCNAME, data);
+	LOGPPI(" - STROBE : %d\n", (data & PC0_STROBE)  ? 1 : 0);
+	LOGPPI(" - SETPAGE: %d\n", (data & PC1_SETPAGE) ? 1 : 0);
+	LOGPPI(" - DISPST : %d\n", (data & PC2_DISPST)  ? 1 : 0);
+	LOGPPI(" - LPENB  : %d\n", (data & PC3_LPENB)   ? 1 : 0);
+	LOGPPI(" - CURSR  : %d\n", (data & PC4_CURSR)   ? 1 : 0);
+	LOGPPI(" - BUZON  : %d\n", (data & PC5_BUZON)   ? 1 : 0);
+	LOGPPI(" - CMTWRD : %d\n", (data & PC6_CMTWRD)  ? 1 : 0);
+	LOGPPI(" - CMTEN  : %d\n", (data & PC7_CMTEN)   ? 1 : 0);
+	LOGPPI(" => CMTEN: %d BUZON: %d\n", (data & PC7_CMTEN) ? 1 : 0, (data & PC5_BUZON)? 1 : 0);
+
+	/* 
+	 * The actual logic around enabling the buzzer is a bit more complicated involving the cassette interface 
+	 * According to the schematics gate1 is enabled if either 
+	 *  (CMTEN is inactive high and BUZON active high) OR
+	 *  (CMTEN is active   low  and CMTRD is inactive high)
+	 * and CMTRD is low). Problem is that the schematics fails to show where CMTRD comes from so only the first case is emulated 
+	 */
+	m_pit8253->write_gate1(!(data & PC5_BUZON) && (data & PC7_CMTEN)? 1 : 0);
+
+	return;
 }
 
 static const gfx_layout myb3k_charlayout =
@@ -531,7 +564,7 @@ static MACHINE_CONFIG_START( myb3k )
 	MCFG_DEVICE_ADD("ppi", I8255A, 0)
 	MCFG_I8255_OUT_PORTA_CB(WRITE8(myb3k_state, ppi_porta_w))
 	MCFG_I8255_IN_PORTB_CB(READ8(myb3k_state, ppi_portb_r))
-//	MCFG_I8255_IN_PORTC_CB(READ8(myb3k_state, ppi_portc_r))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(myb3k_state, ppi_portc_w))
 
 	/* DMA chip */
 	MCFG_DEVICE_ADD("dma", I8257, XTAL_14_31818MHz / 6)
