@@ -389,6 +389,7 @@ static ADDRESS_MAP_START( pgm2_map, AS_PROGRAM, 32, pgm2_state )
 
 	// internal IGS036 - most of them is standard ATMEL peripherals followed by custom bits
 	// AM_RANGE(0xffffec00, 0xffffec7f) SMC (Static Memory Controller)
+	// AM_RANGE(0xffffee00, 0xffffee57) MATRIX (Bus Matrix)
 	AM_RANGE(0xfffff000, 0xfffff14b) AM_DEVICE("arm_aic", arm_aic_device, regs_map)
 	// AM_RANGE(0xfffff200, 0xfffff247) DBGU (Debug Unit)
 	// AM_RANGE(0xfffff400, 0xfffff4af) PIO (Parallel Input Output Controller)

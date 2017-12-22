@@ -2,7 +2,7 @@
 // copyright-holders:Olivier Galibert, R. Belmont, MetalliC
 /***************************************************************************
 
-    Yamaha YMZ770C and YMZ774
+    Yamaha YMZ770C "AMMS-A" and YMZ774 "AMMS2C"
 
     Emulation by R. Belmont and MetalliC
     AMM decode by Olivier Galibert
@@ -10,17 +10,22 @@
 -----
 TODO:
 - What does channel ATBL mean?
-- SAC (Simple Access Codes) what it for and how used ?
+- how triggered SAC (Simple Access Codes) playback ?
  770:
-- verify if pan 100% correct
 - sequencer timers and triggers not implemented (seems used in Deathsmiles ending tune)
  774:
 - 4 channel output
 - Equalizer
-- volume/pan delayed transition (used few times during orleg2 attract mode)
-- channel pause/resume (seems not used in games)
-- sequencer pause/resume (seems not used in games)
-- sequencer off trigger (seems not used in games)
+- pan delayed transition (not used in games)
+- sequencer off trigger (not used in games)
+
+ known SPUs in this series:
+  YMZ770B  ????     Capcom medal hardware (alien.cpp), sample format is not AMM, in other parts looks like 770C
+  YMZ770C  AMMS-A   Cave CV1000
+  YMZ773   AMMS2
+  YMZ775   AMMS2B
+  YMZ774   AMMS2C   IGS PGM2
+  YMZ776   AMMS3    uses AM3 sample format (.mp3 derivative ?)
 
 ***************************************************************************/
 
@@ -30,7 +35,7 @@ TODO:
 
 // device type definition
 DEFINE_DEVICE_TYPE(YMZ770, ymz770_device, "ymz770", "Yamaha YMZ770C AMMS-A")
-DEFINE_DEVICE_TYPE(YMZ774, ymz774_device, "ymz774", "Yamaha YMZ774 AMMS2")
+DEFINE_DEVICE_TYPE(YMZ774, ymz774_device, "ymz774", "Yamaha YMZ774 AMMS2C")
 
 //-------------------------------------------------
 //  ymz770_device - constructor
@@ -94,11 +99,13 @@ void ymz770_device::device_start()
 		save_item(NAME(m_channels[ch].pan1), ch);
 		save_item(NAME(m_channels[ch].pan1_delay), ch);
 		save_item(NAME(m_channels[ch].volume), ch);
+		save_item(NAME(m_channels[ch].volume_target), ch);
 		save_item(NAME(m_channels[ch].volume_delay), ch);
 		save_item(NAME(m_channels[ch].volume2), ch);
 		save_item(NAME(m_channels[ch].loop), ch);
 		save_item(NAME(m_channels[ch].is_playing), ch);
 		save_item(NAME(m_channels[ch].last_block), ch);
+		save_item(NAME(m_channels[ch].is_paused), ch);
 		save_item(NAME(m_channels[ch].output_remaining), ch);
 		save_item(NAME(m_channels[ch].output_ptr), ch);
 		save_item(NAME(m_channels[ch].atbl), ch);
@@ -114,6 +121,7 @@ void ymz770_device::device_start()
 		save_item(NAME(m_sequences[ch].loop), ch);
 		save_item(NAME(m_sequences[ch].bank), ch);
 		save_item(NAME(m_sequences[ch].is_playing), ch);
+		save_item(NAME(m_sequences[ch].is_paused), ch);
 		save_item(NAME(m_sequences[ch].offset), ch);
 	}
 	for (int ch = 0; ch < 8; ch++)
@@ -141,10 +149,12 @@ void ymz770_device::device_reset()
 		channel.pan1 = 64;
 		channel.pan1_delay = 0;
 		channel.volume = 0;
+		channel.volume_target = 0;
 		channel.volume_delay = 0;
 		channel.volume2 = 0;
 		channel.loop = 0;
 		channel.is_playing = false;
+		channel.is_paused = false;
 		channel.output_remaining = 0;
 		channel.decoder->clear();
 	}
@@ -157,6 +167,7 @@ void ymz770_device::device_reset()
 		sequence.loop = 0;
 		sequence.bank = 0;
 		sequence.is_playing = false;
+		sequence.is_paused = false;
 	}
 	for (auto & sqc : m_sqcs)
 	{
@@ -191,7 +202,7 @@ void ymz770_device::sound_stream_update(sound_stream &stream, stream_sample_t **
 			if (channel.output_remaining > 0)
 			{
 				// force finish current block
-				int32_t smpl = (channel.output_data[channel.output_ptr++] * channel.volume) >> 7;   // volume is linear, 0 - 128 (100%)
+				int32_t smpl = ((int32_t)channel.output_data[channel.output_ptr++] * (channel.volume >> 17)) >> 7;   // volume is linear, 0 - 128 (100%)
 				smpl = (smpl * channel.volume2) >> 7;
 				mixr += (smpl * channel.pan) >> 7;  // pan seems linear, 0 - 128, where 0 = 100% left, 128 = 100% right, 64 = 50% left 50% right
 				mixl += (smpl * (128 - channel.pan)) >> 7;
@@ -201,7 +212,7 @@ void ymz770_device::sound_stream_update(sound_stream &stream, stream_sample_t **
 					channel.decoder->clear();
 			}
 
-			else if (channel.is_playing)
+			else if (channel.is_playing && !channel.is_paused)
 			{
 retry:
 				if (channel.last_block)
@@ -239,7 +250,7 @@ retry:
 					channel.output_remaining--;
 					channel.output_ptr = 1;
 
-					int32_t smpl = (channel.output_data[0] * channel.volume) >> 7;
+					int32_t smpl = ((int32_t)channel.output_data[0] * (channel.volume >> 17)) >> 7;
 					smpl = (smpl * channel.volume2) >> 7;
 					mixr += (smpl * channel.pan) >> 7;
 					mixl += (smpl * (128 - channel.pan)) >> 7;
@@ -251,7 +262,7 @@ retry:
 		mixl *= m_vlma;
 		mixr >>= 7 - m_bsl;
 		mixl >>= 7 - m_bsl;
-		// Clip limiter: 0 - off, 1 - 6.02 dB (100%), 2 - 4.86 dB (87.5%), 3 - 3.52 dB (75%). values taken from YMZ773 docs, might be incorrect for YMZ770.
+		// Clip limiter: 0 - off, 1 - 6.02 dB (100%), 2 - 4.86 dB (87.5%), 3 - 3.52 dB (75%)
 		constexpr int32_t ClipMax3 = 32768 * 75 / 100;
 		constexpr int32_t ClipMax2 = 32768 * 875 / 1000;
 		switch (m_cpl)
@@ -364,8 +375,8 @@ void ymz770_device::internal_reg_write(uint8_t reg, uint8_t data)
 				break;
 
 			case 1:
-				m_channels[ch].volume = data;
-				m_channels[ch].volume2 = 128;
+				m_channels[ch].volume2 = data;
+				m_channels[ch].volume = 128 << 17;
 				break;
 
 			case 2:
@@ -373,7 +384,7 @@ void ymz770_device::internal_reg_write(uint8_t reg, uint8_t data)
 				break;
 
 			case 3:
-				if (data & 6)
+				if ((data & 6) == 2 || ((data & 6) == 6 && !m_channels[ch].is_playing)) // both KON bits is 1 = "Keep Playing", do not restart channel in this case
 				{
 					uint8_t phrase = m_channels[ch].phrase;
 					m_channels[ch].atbl = m_rom[(4*phrase)+0] >> 4 & 7;
@@ -382,7 +393,7 @@ void ymz770_device::internal_reg_write(uint8_t reg, uint8_t data)
 
 					m_channels[ch].is_playing = true;
 				}
-				else
+				else if ((data & 6) == 0)
 					m_channels[ch].is_playing = false;
 
 				m_channels[ch].loop = (data & 1) ? 255 : 0;
@@ -391,7 +402,7 @@ void ymz770_device::internal_reg_write(uint8_t reg, uint8_t data)
 	}
 
 	// sequencer registers
-	else
+	else if (reg >= 0x80)
 	{
 		int ch = reg >> 4 & 0x07;
 
@@ -401,22 +412,26 @@ void ymz770_device::internal_reg_write(uint8_t reg, uint8_t data)
 				m_sequences[ch].sequence = data;
 				break;
 			case 1:
-				if (data & 6)
+				if ((data & 6) == 2 || ((data & 6) == 6 && !m_sequences[ch].is_playing)) // both KON bits 1 is "Keep Playing"
 				{
 					m_sequences[ch].offset = get_seq_offs(m_sequences[ch].sequence);
 					m_sequences[ch].delay = 0;
 					m_sequences[ch].is_playing = true;
 				}
-				else
+				else if ((data & 6) == 0)
 					m_sequences[ch].is_playing = false;
 
 				m_sequences[ch].loop = data & 1;
 				break;
 
 			default:
+				if (data)
+					logerror("unimplemented write %02X %02X\n", reg, data);
 				break;
 		}
 	}
+	else
+		logerror("unimplemented write %02X %02X\n", reg, data);
 }
 
 //-------------------------------------------------
@@ -427,6 +442,18 @@ ymz774_device::ymz774_device(const machine_config &mconfig, const char *tag, dev
 	: ymz770_device(mconfig, YMZ774, tag, owner, clock, 44100)
 {
 }
+
+// volume increments, fractions of 0x20000, likely typical for Yamaha log-linear
+static const uint32_t volinc[256] = {
+	0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,
+	32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,
+	64,66,68,70,72,74,76,78,80,82,84,86,88,90,92,94,96,98,100,102,104,106,108,110,112,114,116,118,120,122,124,126,
+	128,132,136,140,144,148,152,156,160,164,168,172,176,180,184,188,192,196,200,204,208,212,216,220,224,228,232,236,240,244,248,252,
+	256,264,272,280,288,296,304,312,320,328,336,344,351,360,368,376,384,392,400,408,416,424,432,440,448,456,464,471,480,488,495,504,
+	511,528,543,559,576,592,608,624,639,656,671,688,703,719,736,752,767,783,799,815,831,847,863,879,895,910,928,942,958,975,991,1006,
+	1023,1054,1087,1119,1149,1181,1215,1247,1277,1312,1340,1373,1404,1436,1469,1504,1534,1566,1598,1626,1661,1691,1721,1753,1786,1820,1856,1883,1912,1951,1981,2013,
+	2045,2102,2174,2238,2292,2363,2423,2487,2553,2624,2679,2737,2797,2860,2926,2996,3068,3118,3197,3252,3308,3367,3427,3490,3555,3623,3694,3767,3804,3882,3963,4005
+};
 
 READ8_MEMBER(ymz774_device::read)
 {
@@ -464,10 +491,9 @@ void ymz774_device::internal_reg_write(uint8_t reg, uint8_t data)
 		switch (reg & 0xf8)
 		{
 		case 0x10: // Volume 1
-			m_channels[ch].volume = data;
+			m_channels[ch].volume_target = data;
 			break;
 		case 0x18: // Volume 1 delayed transition
-			if (data) logerror("unimplemented write %02X %02X\n", reg, data);
 			m_channels[ch].volume_delay = data;
 			break;
 		case 0x20: // Volume 2
@@ -499,12 +525,14 @@ void ymz774_device::internal_reg_write(uint8_t reg, uint8_t data)
 				m_channels[ch].last_block = false;
 
 				m_channels[ch].is_playing = true;
+				m_channels[ch].is_paused = false; // checkme, might be not needed
 			}
 			else
 				m_channels[ch].is_playing = false;
 			break;
 		case 0x58: // Pause / Resume
-			if (data) logerror("pause/resume unimplemented %02X %02X\n", reg, data);
+			m_channels[ch].is_paused = data ? true : false;
+			if (data) logerror("CHECKME: CHAN pause/resume %02X %02X\n", reg, data);
 			break;
 		}
 	}
@@ -521,7 +549,7 @@ void ymz774_device::internal_reg_write(uint8_t reg, uint8_t data)
 				if (reg & 1)
 					m_sequences[sq].sequence = (m_sequences[sq].sequence & 0xff00) | data;
 				else
-					m_sequences[sq].sequence = (m_sequences[sq].sequence & 0x00ff) | ((data & 0x0f) << 8);
+					m_sequences[sq].sequence = (m_sequences[sq].sequence & 0x00ff) | ((data & 0x07) << 8);
 				break;
 			case 0x70: // Start / Stop
 				if (data)
@@ -530,6 +558,7 @@ void ymz774_device::internal_reg_write(uint8_t reg, uint8_t data)
 					m_sequences[sq].offset = get_seq_offs(m_sequences[sq].sequence);
 					m_sequences[sq].delay = 0;
 					m_sequences[sq].is_playing = true;
+					m_sequences[sq].is_paused = false; // checkme, might be not needed
 				}
 				else
 				{
@@ -542,7 +571,8 @@ void ymz774_device::internal_reg_write(uint8_t reg, uint8_t data)
 				}
 				break;
 			case 0x78: // Pause / Resume
-				if (data) logerror("SEQ pause/resume unimplemented %02X %02X\n", reg, data);
+				m_sequences[sq].is_paused = data ? true : false;
+				if (data) logerror("CHECKME: SEQ pause/resume %02X %02X\n", reg, data);
 				break;
 			case 0x80: // Loop count, 0 = off, 255 - infinite
 				m_sequences[sq].loop = data;
@@ -603,18 +633,27 @@ void ymz774_device::internal_reg_write(uint8_t reg, uint8_t data)
 	else
 	{
 		switch (reg) {
-		case 0xd0:
+		case 0xd0: // Total Volume L0/R0
 			m_vlma = data;
 			break;
-		case 0xd1:
+		case 0xd1: // Total Volume L1/R1
 			m_vlma1 = data;
 			break;
-		case 0xd2:
+		case 0xd2: // Clip limit
 			m_cpl = data;
 			break;
+		//case 0xd3: // Digital/PWM output
+		//case 0xd4: // Digital audio IF/IS L0/R0
+		//case 0xd5: // Digital audio IF/IS L1/R1
+		//case 0xd8: // GPIO A
+		//case 0xdd: // GPIO B
+		//case 0xde: // GPIO C
 		case 0xf0:
 			m_bank = data & 1;
 			if (data > 1) logerror("Set bank %02X!\n", data);
+			break;
+		default:
+			logerror("unimplemented write %02X %02X\n", reg, data);
 			break;
 		}
 	}
@@ -622,6 +661,22 @@ void ymz774_device::internal_reg_write(uint8_t reg, uint8_t data)
 
 void ymz774_device::sequencer()
 {
+	for (auto & chan : m_channels)
+	{
+		if (chan.is_playing && !chan.is_paused && (chan.volume >> 17) != chan.volume_target)
+		{
+			if (chan.volume_delay)
+			{
+				if ((chan.volume >> 17) < chan.volume_target)
+					chan.volume += volinc[chan.volume_delay];
+				else
+					chan.volume -= volinc[chan.volume_delay];
+			}
+			else
+				chan.volume = chan.volume_target << 17;
+		}
+	}
+
 	for (int i = 0; i < 8; i++)
 	{
 		auto & sqc = m_sqcs[i];
@@ -630,12 +685,13 @@ void ymz774_device::sequencer()
 		if (sqc.is_playing && !sqc.is_waiting)
 		{
 			// SQC consists of 4 byte records: SEQ num H, SEQ num L, SEQ Loop count, End flag (0xff)
-			sequence.sequence = ((get_rom_byte(sqc.offset) << 8) | get_rom_byte(sqc.offset + 1)) & 0xfff;
+			sequence.sequence = ((get_rom_byte(sqc.offset) << 8) | get_rom_byte(sqc.offset + 1)) & 0x7ff;
 			sqc.offset += 2;
 			sequence.loop = get_rom_byte(sqc.offset++);
 			sequence.offset = get_seq_offs(sequence.sequence);
 			sequence.delay = 0;
 			sequence.is_playing = true;
+			sequence.is_paused = false; // checkme, might be not needed
 			sqc.is_waiting = true;
 			if (get_rom_byte(sqc.offset++) == 0xff)
 			{
@@ -650,7 +706,7 @@ void ymz774_device::sequencer()
 			}
 		}
 
-		if (sequence.is_playing)
+		if (sequence.is_playing && !sequence.is_paused)
 		{
 			if (sequence.delay > 0)
 				--sequence.delay;

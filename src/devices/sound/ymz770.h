@@ -79,12 +79,13 @@ protected:
 		uint8_t pan_delay;
 		uint8_t pan1;
 		uint8_t pan1_delay;
-		uint8_t volume;
+		int32_t volume;
+		uint8_t volume_target;
 		uint8_t volume_delay;
 		uint8_t volume2;
 		uint8_t loop;
 
-		bool is_playing, last_block;
+		bool is_playing, last_block, is_paused;
 
 		mpeg_audio *decoder;
 
@@ -104,6 +105,7 @@ protected:
 		uint32_t offset;
 		uint8_t bank;
 		bool is_playing;
+		bool is_paused;
 	};
 	struct ymz_sqc
 	{
