@@ -35,7 +35,7 @@ Wiz-A-Tron or Little Professor. But the popularity of this product was much
 above expectations. TI continued to manufacture many products for this line.
 
     Speak & Spell (US), 1978
-    - MCU: TMC0271*, label TMC0271NL (die label unknown)
+    - MCU: TMC0271, label TMC0271NL DBS (die label 0271B T0270B)
     - TMS51xx: TMC0281
     - VSM(1/2): 16KB TMC0351NL
     - VSM(2/2): 16KB TMC0352NL
@@ -43,7 +43,7 @@ above expectations. TI continued to manufacture many products for this line.
     - notes: keyboard has buttons instead of cheap membrane
 
     Speak & Spell (US), 1979
-    - MCU: TMC0271, label TMC0271H-N2L (die label 0271H T0270D)
+    - MCU: TMC0271, label TMC0271H-N2L FDS (die label 0271H T0270D)
     - TMS51xx: TMC0281
     - VSM(1/2): 16KB TMC0351N2L
     - VSM(2/2): 16KB TMC0352N2L
@@ -64,7 +64,7 @@ above expectations. TI continued to manufacture many products for this line.
     - notes: no local name for the product, words are in English but very low difficulty
 
     Speak & Spell (UK), 1978
-    - MCU: TMC0271* (assume same as US 1978 version)
+    - MCU: TMC0271 (assume same as US 1978 version)
     - TMS51xx: TMC0281
     - VSM(1/2): 16KB CD2303
     - VSM(2/2): 16KB CD2304
@@ -1456,14 +1456,14 @@ MACHINE_CONFIG_END
 
 ROM_START( snspell )
 	ROM_REGION( 0x1000, "maincpu", 0 )
-	ROM_LOAD( "tmc0271h-n2l", 0x0000, 0x1000, CRC(f83b5d2d) SHA1(10155b0b7f7f1583c7def8a693553cd35944ea6f) )
+	ROM_LOAD( "tmc0271h-n2l_fds", 0x0000, 0x1000, CRC(f83b5d2d) SHA1(10155b0b7f7f1583c7def8a693553cd35944ea6f) )
 
 	ROM_REGION( 1246, "maincpu:ipla", 0 )
 	ROM_LOAD( "tms0980_common1_instr.pla", 0, 1246, CRC(42db9a38) SHA1(2d127d98028ec8ec6ea10c179c25e447b14ba4d0) )
 	ROM_REGION( 2127, "maincpu:mpla", 0 )
 	ROM_LOAD( "tms0270_common2_micro.pla", 0, 2127, CRC(86737ac1) SHA1(4aa0444f3ddf88738ea74aec404c684bf54eddba) )
 	ROM_REGION( 1246, "maincpu:opla", 0 )
-	ROM_LOAD( "tms0270_tmc0271h_output.pla", 0, 1246, CRC(2478c595) SHA1(9a8ac690902731e1e01533279a1c9223011e1537) )
+	ROM_LOAD( "tms0270_t0270d_output.pla", 0, 1246, CRC(2478c595) SHA1(9a8ac690902731e1e01533279a1c9223011e1537) )
 
 	ROM_REGION( 0x10000, "tms6100", ROMREGION_ERASEFF ) // 8000-bfff = space reserved for cartridge
 	ROM_LOAD( "tmc0351n2l.vsm", 0x0000, 0x4000, CRC(2d03b292) SHA1(a3e9a365307ae936c7472f720a7a8240741531d6) )
@@ -1479,7 +1479,7 @@ ROM_START( snspellp )
 	ROM_REGION( 2127, "maincpu:mpla", 0 )
 	ROM_LOAD( "tms0270_common2_micro.pla", 0, 2127, CRC(86737ac1) SHA1(4aa0444f3ddf88738ea74aec404c684bf54eddba) )
 	ROM_REGION( 1246, "maincpu:opla", 0 )
-	ROM_LOAD( "tms0270_tmc0271_output.pla", 0, 1246, CRC(9ebe12ab) SHA1(acb4e07ba26f2daca5f1c234885ac0371c7ce87f) ) // using the one from 1st version
+	ROM_LOAD( "tms0270_t0270b_output.pla", 0, 1246, CRC(9ebe12ab) SHA1(acb4e07ba26f2daca5f1c234885ac0371c7ce87f) ) // using the one from 1st version
 
 	ROM_REGION( 0x10000, "tms6100", ROMREGION_ERASEFF ) // 8000-bfff = space reserved for cartridge
 	ROM_LOAD( "tmc0351nl.vsm", 0x0000, 0x4000, CRC(beea3373) SHA1(8b0f7586d2f12c3d4a885fdb528cf23feffa1a3b) ) // using the one from 1st version
@@ -1488,14 +1488,14 @@ ROM_END
 
 ROM_START( snspellua )
 	ROM_REGION( 0x1000, "maincpu", 0 )
-	ROM_LOAD( "tmc0271h-n2l", 0x0000, 0x1000, BAD_DUMP CRC(f83b5d2d) SHA1(10155b0b7f7f1583c7def8a693553cd35944ea6f) ) // placeholder, use the one we have
+	ROM_LOAD( "tmc0271nl_dbs", 0x0000, 0x1000, CRC(c2a7b747) SHA1(05f3716cd3cc33b8dc897e75301efdd531932ec5) )
 
 	ROM_REGION( 1246, "maincpu:ipla", 0 )
 	ROM_LOAD( "tms0980_common1_instr.pla", 0, 1246, CRC(42db9a38) SHA1(2d127d98028ec8ec6ea10c179c25e447b14ba4d0) )
 	ROM_REGION( 2127, "maincpu:mpla", 0 )
 	ROM_LOAD( "tms0270_common2_micro.pla", 0, 2127, CRC(86737ac1) SHA1(4aa0444f3ddf88738ea74aec404c684bf54eddba) )
 	ROM_REGION( 1246, "maincpu:opla", 0 )
-	ROM_LOAD( "tms0270_tmc0271_output.pla", 0, 1246, CRC(9ebe12ab) SHA1(acb4e07ba26f2daca5f1c234885ac0371c7ce87f) )
+	ROM_LOAD( "tms0270_t0270b_output.pla", 0, 1246, CRC(9ebe12ab) SHA1(acb4e07ba26f2daca5f1c234885ac0371c7ce87f) )
 
 	ROM_REGION( 0x10000, "tms6100", ROMREGION_ERASEFF ) // 8000-bfff = space reserved for cartridge
 	ROM_LOAD( "tmc0351nl.vsm", 0x0000, 0x4000, CRC(beea3373) SHA1(8b0f7586d2f12c3d4a885fdb528cf23feffa1a3b) )
@@ -1504,14 +1504,14 @@ ROM_END
 
 ROM_START( snspellub )
 	ROM_REGION( 0x1000, "maincpu", 0 )
-	ROM_LOAD( "tmc0271h-n2l", 0x0000, 0x1000, CRC(f83b5d2d) SHA1(10155b0b7f7f1583c7def8a693553cd35944ea6f) )
+	ROM_LOAD( "tmc0271h-n2l_fds", 0x0000, 0x1000, CRC(f83b5d2d) SHA1(10155b0b7f7f1583c7def8a693553cd35944ea6f) )
 
 	ROM_REGION( 1246, "maincpu:ipla", 0 )
 	ROM_LOAD( "tms0980_common1_instr.pla", 0, 1246, CRC(42db9a38) SHA1(2d127d98028ec8ec6ea10c179c25e447b14ba4d0) )
 	ROM_REGION( 2127, "maincpu:mpla", 0 )
 	ROM_LOAD( "tms0270_common2_micro.pla", 0, 2127, CRC(86737ac1) SHA1(4aa0444f3ddf88738ea74aec404c684bf54eddba) )
 	ROM_REGION( 1246, "maincpu:opla", 0 )
-	ROM_LOAD( "tms0270_tmc0271h_output.pla", 0, 1246, CRC(2478c595) SHA1(9a8ac690902731e1e01533279a1c9223011e1537) )
+	ROM_LOAD( "tms0270_t0270d_output.pla", 0, 1246, CRC(2478c595) SHA1(9a8ac690902731e1e01533279a1c9223011e1537) )
 
 	ROM_REGION( 0x10000, "tms6100", ROMREGION_ERASEFF ) // uses only 1 rom, 8000-bfff = space reserved for cartridge
 	ROM_LOAD( "cd2350a.vsm", 0x0000, 0x4000, CRC(2adda742) SHA1(3f868ed8284b723c815a30343057e03467c043b5) )
@@ -1519,14 +1519,14 @@ ROM_END
 
 ROM_START( snspelluk )
 	ROM_REGION( 0x1000, "maincpu", 0 )
-	ROM_LOAD( "tmc0271h-n2l", 0x0000, 0x1000, BAD_DUMP CRC(f83b5d2d) SHA1(10155b0b7f7f1583c7def8a693553cd35944ea6f) ) // placeholder, use the one we have
+	ROM_LOAD( "tmc0271nl_dbs", 0x0000, 0x1000, CRC(c2a7b747) SHA1(05f3716cd3cc33b8dc897e75301efdd531932ec5) )
 
 	ROM_REGION( 1246, "maincpu:ipla", 0 )
 	ROM_LOAD( "tms0980_common1_instr.pla", 0, 1246, CRC(42db9a38) SHA1(2d127d98028ec8ec6ea10c179c25e447b14ba4d0) )
 	ROM_REGION( 2127, "maincpu:mpla", 0 )
 	ROM_LOAD( "tms0270_common2_micro.pla", 0, 2127, CRC(86737ac1) SHA1(4aa0444f3ddf88738ea74aec404c684bf54eddba) )
 	ROM_REGION( 1246, "maincpu:opla", 0 )
-	ROM_LOAD( "tms0270_tmc0271_output.pla", 0, 1246, CRC(9ebe12ab) SHA1(acb4e07ba26f2daca5f1c234885ac0371c7ce87f) )
+	ROM_LOAD( "tms0270_t0270b_output.pla", 0, 1246, CRC(9ebe12ab) SHA1(acb4e07ba26f2daca5f1c234885ac0371c7ce87f) )
 
 	ROM_REGION( 0x10000, "tms6100", ROMREGION_ERASEFF ) // 8000-bfff = space reserved for cartridge
 	ROM_LOAD( "cd2303.vsm", 0x0000, 0x4000, CRC(0fae755c) SHA1(b68c3120a63a61db474feb5d71a6e5dd67910d80) )
@@ -1535,14 +1535,14 @@ ROM_END
 
 ROM_START( snspelluka )
 	ROM_REGION( 0x1000, "maincpu", 0 )
-	ROM_LOAD( "tmc0271h-n2l", 0x0000, 0x1000, CRC(f83b5d2d) SHA1(10155b0b7f7f1583c7def8a693553cd35944ea6f) )
+	ROM_LOAD( "tmc0271h-n2l_fds", 0x0000, 0x1000, CRC(f83b5d2d) SHA1(10155b0b7f7f1583c7def8a693553cd35944ea6f) )
 
 	ROM_REGION( 1246, "maincpu:ipla", 0 )
 	ROM_LOAD( "tms0980_common1_instr.pla", 0, 1246, CRC(42db9a38) SHA1(2d127d98028ec8ec6ea10c179c25e447b14ba4d0) )
 	ROM_REGION( 2127, "maincpu:mpla", 0 )
 	ROM_LOAD( "tms0270_common2_micro.pla", 0, 2127, CRC(86737ac1) SHA1(4aa0444f3ddf88738ea74aec404c684bf54eddba) )
 	ROM_REGION( 1246, "maincpu:opla", 0 )
-	ROM_LOAD( "tms0270_tmc0271h_output.pla", 0, 1246, CRC(2478c595) SHA1(9a8ac690902731e1e01533279a1c9223011e1537) )
+	ROM_LOAD( "tms0270_t0270d_output.pla", 0, 1246, CRC(2478c595) SHA1(9a8ac690902731e1e01533279a1c9223011e1537) )
 
 	ROM_REGION( 0x10000, "tms6100", ROMREGION_ERASEFF ) // uses only 1 rom, 8000-bfff = space reserved for cartridge
 	ROM_LOAD( "cd62175.vsm", 0x0000, 0x4000, CRC(6e1063d4) SHA1(b5c66c51148c5921ecb8ffccd7a460ae639cdb68) )
@@ -1550,14 +1550,14 @@ ROM_END
 
 ROM_START( snspelljp )
 	ROM_REGION( 0x1000, "maincpu", 0 )
-	ROM_LOAD( "tmc0271h-n2l", 0x0000, 0x1000, CRC(f83b5d2d) SHA1(10155b0b7f7f1583c7def8a693553cd35944ea6f) )
+	ROM_LOAD( "tmc0271h-n2l_fds", 0x0000, 0x1000, CRC(f83b5d2d) SHA1(10155b0b7f7f1583c7def8a693553cd35944ea6f) )
 
 	ROM_REGION( 1246, "maincpu:ipla", 0 )
 	ROM_LOAD( "tms0980_common1_instr.pla", 0, 1246, CRC(42db9a38) SHA1(2d127d98028ec8ec6ea10c179c25e447b14ba4d0) )
 	ROM_REGION( 2127, "maincpu:mpla", 0 )
 	ROM_LOAD( "tms0270_common2_micro.pla", 0, 2127, CRC(86737ac1) SHA1(4aa0444f3ddf88738ea74aec404c684bf54eddba) )
 	ROM_REGION( 1246, "maincpu:opla", 0 )
-	ROM_LOAD( "tms0270_tmc0271h_output.pla", 0, 1246, CRC(2478c595) SHA1(9a8ac690902731e1e01533279a1c9223011e1537) )
+	ROM_LOAD( "tms0270_t0270d_output.pla", 0, 1246, CRC(2478c595) SHA1(9a8ac690902731e1e01533279a1c9223011e1537) )
 
 	ROM_REGION( 0x10000, "tms6100", ROMREGION_ERASEFF ) // 8000-bfff = space reserved for cartridge
 	ROM_LOAD( "cd2321.vsm", 0x0000, 0x4000, CRC(ac010cce) SHA1(c0200d857b62be696248ac2d684a390c66ab0c31) )
@@ -1731,7 +1731,7 @@ ROM_START( lantutor )
 	ROM_REGION( 2127, "maincpu:mpla", 0 )
 	ROM_LOAD( "tms0270_common1_micro.pla", 0, 2127, BAD_DUMP CRC(504b96bb) SHA1(67b691e7c0b97239410587e50e5182bf46475b43) ) // not verified
 	ROM_REGION( 1246, "maincpu:opla", 0 )
-	ROM_LOAD( "tms0270_tmc0271_output.pla", 0, 1246, BAD_DUMP CRC(9ebe12ab) SHA1(acb4e07ba26f2daca5f1c234885ac0371c7ce87f) ) // taken from snspell, mostly looks correct
+	ROM_LOAD( "tms0270_t0270b_output.pla", 0, 1246, BAD_DUMP CRC(9ebe12ab) SHA1(acb4e07ba26f2daca5f1c234885ac0371c7ce87f) ) // taken from snspell, mostly looks correct
 
 	ROM_REGION( 0x10000, "tms6100", ROMREGION_ERASEFF ) // cartridge area
 ROM_END
@@ -1823,8 +1823,8 @@ ROM_END
 COMP( 1979, snspell,    0,        0, sns_tmc0281,  snspell,    tispeak_state, snspell,  "Texas Instruments", "Speak & Spell (US, 1979 version)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
 COMP( 1978, snspellp,   snspell,  0, sns_tmc0281,  snspell,    tispeak_state, snspell,  "Texas Instruments", "Speak & Spell (US, patent)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
 COMP( 1980, snspellub,  snspell,  0, sns_tmc0281d, snspell,    tispeak_state, snspell,  "Texas Instruments", "Speak & Spell (US, 1980 version)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
-COMP( 1978, snspellua,  snspell,  0, sns_tmc0281,  snspell,    tispeak_state, snspell,  "Texas Instruments", "Speak & Spell (US, 1978 version)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND ) // incomplete dump, using 1979 MCU ROM instead
-COMP( 1978, snspelluk,  snspell,  0, sns_tmc0281,  snspell,    tispeak_state, snspell,  "Texas Instruments", "Speak & Spell (UK, 1978 version)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND ) // "
+COMP( 1978, snspellua,  snspell,  0, sns_tmc0281,  snspell,    tispeak_state, snspell,  "Texas Instruments", "Speak & Spell (US, 1978 version)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+COMP( 1978, snspelluk,  snspell,  0, sns_tmc0281,  snspell,    tispeak_state, snspell,  "Texas Instruments", "Speak & Spell (UK, 1978 version)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
 COMP( 1981, snspelluka, snspell,  0, sns_cd2801,   snspell,    tispeak_state, snspell,  "Texas Instruments", "Speak & Spell (UK, 1981 version)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
 COMP( 1979, snspelljp,  snspell,  0, sns_tmc0281,  snspell,    tispeak_state, snspell,  "Texas Instruments", "Speak & Spell (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
 COMP( 1981, snspellsp,  snspell,  0, snspellsp,    snspellsp,  tispeak_state, snspell,  "Texas Instruments", "Speak & Spell (Spanish, prototype)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
