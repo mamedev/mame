@@ -20,6 +20,10 @@ Can't do anything until the internal ROM is dumped.
 
 #include "emu.h"
 #include "cpu/h8/h83002.h"
+
+#include "bus/generic/slot.h"
+#include "bus/generic/carts.h"
+
 //#include "sound/multipcm.h"
 //#include "screen.h"
 //#include "speaker.h"
@@ -59,6 +63,11 @@ static MACHINE_CONFIG_START( picno )
 	//MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker") // no speaker in the unit, but there's a couple of sockets on the back
 	//MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	//MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
+
+	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_linear_slot, "picno_cart")
+	MCFG_GENERIC_MANDATORY
+
+	MCFG_SOFTWARE_LIST_ADD("cart_list", "picno")
 MACHINE_CONFIG_END
 
 ROM_START( picno )

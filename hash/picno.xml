@@ -1,0 +1,42 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+List of games, taken from http://videogamesdensetsu.tumblr.com/post/142354502350/the-konami-picno-%E3%83%94%E3%82%AF%E3%83%8E-1992-a-drawing-tablet:
+(* denotes dumped)
+   RX101 Save Card / セーブカード
+  *RX102 Montage / モンタージュ
+   RX103 Fushigi no kuni no Alice / ふしぎの国のアリス
+   RX105 Picno de A B C
+   RX106 Anime enikki / アニメ絵日記
+   RX107 Picno de A I U E O / ピクノであいうえお
+   RX108 Picno de 1 2 3 / ピクノで123
+   RX109 Picno Art Puzzle / ピクノアートパズル
+   RX110 Real Montage / リアルモンタージュ
+   RX111 Kīroi Kyōryū-kun Parasa no Obake Taiji / きいろい恐竜くん パラサのオバケ退治
+   RX115 Dokkin Shinri Game / どっきん心理ゲーム
+   RX117 Picno de kuku / ピクノで九九
+   RX118 Shira Yuki Hime Monogatari / しらゆきひめ物語
+   RX119 Nontan to issho anime stamp / ノンタンといっしょ アニメスタンプ
+   RX120 Manfī no fushigina bōken / マンフィーのふしぎなぼうけん
+   RX122 Son Gokū no Bōken / そんごくうの冒険
+   RX123 Sen'yō Card Soft / 専用カードソフト
+   RX??? Picno de Nihon chizu / ピクノでにほんちず
+-->
+
+<softwarelist name="picno" description="Konami Picno cartridges">
+
+	<software name="montage" supported="no">
+		<description>Montage</description>
+		<year>1992</year>
+		<publisher>Konami</publisher>
+		<info name="serial" value="RX-102"/>
+		<info name="alt_title" value="モンタージュ"/>
+		<part name="cart" interface="picno_cart">
+			<feature name="pcb" value="R0-028" />
+			<dataarea name="rom" size="262144">
+				<rom name="rx102.bin" size="262144" crc="014b1da5" sha1="718000598da119fde15899e0b746e0d1b3c9b038" offset="00000" />
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>
