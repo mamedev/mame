@@ -702,13 +702,15 @@ MACHINE_RESET_MEMBER(ti99_8_state, ti99_8)
 
 	// Pulling down the line on RESET configures the CPU to insert one wait
 	// state on external memory accesses
-	m_cpu->ready_line(CLEAR_LINE);
+//  m_cpu->ready_line(ASSERT_LINE);
 
 	// m_gromport->set_grom_base(0x9800, 0xfff1);
 
 	// Clear INT1 and INT2 latch
 	m_int1 = CLEAR_LINE;
 	m_int2 = CLEAR_LINE;
+	console_reset(ASSERT_LINE);
+	console_reset(CLEAR_LINE);
 }
 
 static MACHINE_CONFIG_START( ti99_8 )

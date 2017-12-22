@@ -291,7 +291,7 @@ void tms9995_device::device_start()
 	save_item(NAME(m_mid_flag));
 	save_item(NAME(m_mid_active));
 	save_item(NAME(m_decrementer_clkdiv));
-	save_item(NAME(m_servicing_interrupt));
+	save_item(NAME(m_log_interrupt));
 	save_item(NAME(m_int_pending));
 	save_item(NAME(m_check_overflow));
 	save_item(NAME(m_intmask));
@@ -324,27 +324,6 @@ void tms9995_device::device_start()
 	save_item(NAME(MPC));
 	save_item(NAME(m_caller_MPC));
 	// save_item(NAME(m_first_cycle)); // only for log output
-}
-
-void tms9995_device::device_stop()
-{
-}
-
-/*
-    TMS9995 hard reset
-    The device reset is just the emulator's trigger for the reset procedure
-    which is invoked via the main loop.
-
-    This also allows us to check the READY line at reset time, which is used
-    to enable automatic wait state creation.
-*/
-void tms9995_device::device_reset()
-{
-	m_reset = true;     // for the main loop
-	m_servicing_interrupt = false;   // only for debugging
-	m_request_auto_wait_state = false;
-	m_hold_requested = false;
-	memset(m_flag, 0, sizeof(m_flag));
 }
 
 const char* tms9995_device::s_statename[20] =
@@ -1316,7 +1295,7 @@ void tms9995_device::execute_set_input(int irqline, int state)
 		if (state == ASSERT_LINE)
 		{
 			logerror("RESET interrupt line; READY=%d\n", m_ready_bufd);
-			m_reset = true;
+			reset_line(ASSERT_LINE);
 		}
 	}
 	else
@@ -1363,7 +1342,14 @@ void tms9995_device::execute_set_input(int irqline, int state)
 */
 WRITE_LINE_MEMBER( tms9995_device::reset_line )
 {
-	if (state==ASSERT_LINE) m_reset = true;
+	if (state==ASSERT_LINE)
+	{
+		m_reset = true;     // for the main loop
+		m_log_interrupt = false;   // only for debugging
+		m_request_auto_wait_state = false;
+		m_hold_requested = false;
+		memset(m_flag, 0, sizeof(m_flag));
+	}
 }
 
 /*
@@ -1616,7 +1602,7 @@ void tms9995_device::next_command()
 
 		if (TRACE_EXEC)
 		{
-			if (m_servicing_interrupt) logerror("i%04x\n", PC-2);
+			if (m_log_interrupt) logerror("i%04x\n", PC-2);
 			else logerror("%04x\n", PC-2);
 		}
 		PC_debug = PC - 2;
@@ -1752,7 +1738,7 @@ void tms9995_device::service_interrupt()
 	if (TRACE_INT) logerror("********* triggered an interrupt with vector %04x/%04x\n", vectorpos, vectorpos+2);
 
 	// just for debugging purposes
-	if (!m_reset) m_servicing_interrupt = true;
+	if (!m_reset) m_log_interrupt = true;
 
 	// The microinstructions will do the context switch
 	m_address = vectorpos;
@@ -3081,7 +3067,7 @@ void tms9995_device::alu_rtwp()
 		WP = m_current_value & 0xfffe;
 
 		// Just for debugging purposes
-		m_servicing_interrupt = false;
+		m_log_interrupt = false;
 
 		if (TRACE_OP) logerror("RTWP restored old context (WP=%04x, PC=%04x, ST=%04x)\n", WP, PC, ST);
 		break;

@@ -162,6 +162,7 @@ void cortex_state::machine_reset()
 	membank("bankr0")->set_entry(1); // point at rom
 	membank("bankw0")->set_entry(0); // always write to ram
 	m_maincpu->ready_line(ASSERT_LINE);
+	m_maincpu->reset_line(ASSERT_LINE);
 }
 
 DRIVER_INIT_MEMBER( cortex_state, init )

@@ -234,7 +234,9 @@ WRITE8_MEMBER(jpmmps_state::jpmmps_ic22_portc_w)
 void jpmmps_state::machine_reset()
 {
 	// Disable auto wait state generation by raising the READY line on reset
-	static_cast<tms9995_device*>(machine().device("maincpu"))->ready_line(ASSERT_LINE);
+	tms9995_device* cpu = static_cast<tms9995_device*>(machine().device("maincpu"));
+	cpu->ready_line(ASSERT_LINE);
+	cpu->reset_line(ASSERT_LINE);
 }
 
 static MACHINE_CONFIG_START( jpmmps )

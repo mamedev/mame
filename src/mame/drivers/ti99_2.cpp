@@ -90,6 +90,9 @@ public:
 	ti99_2_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_videoram(*this, "videoram"),
+		m_ROM_paged(0),
+		m_irq_state(0),
+		m_keyRow(0),
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette") { }
@@ -97,7 +100,7 @@ public:
 	required_shared_ptr<uint8_t> m_videoram;
 	int m_ROM_paged;
 	int m_irq_state;
-	int m_KeyRow;
+	int m_keyRow;
 	DECLARE_WRITE8_MEMBER(ti99_2_write_kbd);
 	DECLARE_WRITE8_MEMBER(ti99_2_write_misc_cru);
 	DECLARE_READ8_MEMBER(ti99_2_read_kbd);
@@ -140,7 +143,9 @@ void ti99_2_state::machine_reset()
 	// Configure CPU to insert 1 wait state for each external memory access
 	// by lowering the READY line on reset
 	// TODO: Check with specs
-	static_cast<tms9995_device*>(machine().device("maincpu"))->ready_line(CLEAR_LINE);
+	tms9995_device* cpu = static_cast<tms9995_device*>(machine().device("maincpu"));
+	cpu->ready_line(CLEAR_LINE);
+	cpu->reset_line(ASSERT_LINE);
 }
 
 INTERRUPT_GEN_MEMBER(ti99_2_state::ti99_2_vblank_interrupt)
@@ -237,14 +242,14 @@ WRITE8_MEMBER(ti99_2_state::ti99_2_write_kbd)
 	{
 		/* this implementation is just a guess */
 		if (data)
-			m_KeyRow |= 1 << offset;
+			m_keyRow |= 1 << offset;
 		else
-			m_KeyRow &= ~ (1 << offset);
+			m_keyRow &= ~ (1 << offset);
 	}
 	/* now, we handle ROM paging */
 	if (m_ROM_paged)
 	{   /* if we have paged ROMs, page according to S0 keyboard interface line */
-		membank("bank1")->set_base((m_KeyRow == 0) ? TI99_2_32_ROMPAGE1 : TI99_2_32_ROMPAGE0);
+		membank("bank1")->set_base((m_keyRow == 0) ? TI99_2_32_ROMPAGE1 : TI99_2_32_ROMPAGE0);
 	}
 }
 
@@ -280,7 +285,7 @@ READ8_MEMBER(ti99_2_state::ti99_2_read_kbd)
 {
 	static const char *const keynames[] = { "LINE0", "LINE1", "LINE2", "LINE3", "LINE4", "LINE5", "LINE6", "LINE7" };
 
-	return ioport(keynames[m_KeyRow])->read();
+	return ioport(keynames[m_keyRow])->read();
 }
 
 READ8_MEMBER(ti99_2_state::ti99_2_read_misc_cru)

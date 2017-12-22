@@ -104,6 +104,7 @@ void evmbug_state::machine_reset()
 	m_rbrl = 0;
 	// Disable auto wait state generation by raising the READY line on reset
 	m_maincpu->ready_line(ASSERT_LINE);
+	m_maincpu->reset_line(ASSERT_LINE);
 }
 
 static MACHINE_CONFIG_START( evmbug )
