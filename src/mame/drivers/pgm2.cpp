@@ -123,12 +123,20 @@ WRITE32_MEMBER(pgm2_state::sprite_encryption_w)
 		m_realspritekey = bitswap<32>(m_spritekey ^ 0x90055555, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31);
 }
 
+
 WRITE32_MEMBER(pgm2_state::encryption_do_w)
 {
-	if (m_has_decrypted == 0)
+	if (m_romboard_ram)
 	{
 		igs036_decryptor decrypter(m_encryption_table);
-		decrypter.decrypter_rom(memregion("user1"));
+		decrypter.decrypter_rom((uint16_t*)&m_romboard_ram[0], 0x0200000, 0);
+		decrypter.decrypter_rom((uint16_t*)memregion("user1")->base(), memregion("user1")->bytes(), 0x0200000);   // assume the rom at 0x0200000 also gets decrypted as if it was at 0x0200000 even if it isn't used (the game has already copied it to RAM where it properly decrypted)
+		m_has_decrypted = 1;
+	}
+	else
+	{
+		igs036_decryptor decrypter(m_encryption_table);
+		decrypter.decrypter_rom((uint16_t*)memregion("user1")->base(), memregion("user1")->bytes(), 0);
 		m_has_decrypted = 1;
 	}
 }
@@ -352,7 +360,6 @@ static ADDRESS_MAP_START( pgm2_map, AS_PROGRAM, 32, pgm2_state )
 	AM_RANGE(0x03900000, 0x03900003) AM_READ_PORT("INPUTS0")
 	AM_RANGE(0x03a00000, 0x03a00003) AM_READ_PORT("INPUTS1")
 
-	AM_RANGE(0x10000000, 0x10ffffff) AM_ROM AM_REGION("user1", 0) // external ROM
 	AM_RANGE(0x20000000, 0x2007ffff) AM_RAM AM_SHARE("mainram")
 
 	AM_RANGE(0x30000000, 0x30001fff) AM_RAM AM_SHARE("sp_videoram") // spriteram ('move' ram in test mode)
@@ -402,6 +409,18 @@ static ADDRESS_MAP_START( pgm2_map, AS_PROGRAM, 32, pgm2_state )
 	AM_RANGE(0xfffffa08, 0xfffffa0b) AM_WRITE(encryption_do_w) // after uploading encryption? table might actually send it or enable external ROM? when read bits0-1 called FUSE 0 and 1, must be 0
 	AM_RANGE(0xfffffa0c, 0xfffffa0f) AM_READ(unk_startup_r) // written 0, then 0x1c, then expected to return (result&0x180)==0x180, then written 0x7c
 	AM_RANGE(0xfffffc00, 0xfffffcff) AM_READWRITE8(encryption_r, encryption_w, 0xffffffff)
+ADDRESS_MAP_END
+
+
+static ADDRESS_MAP_START( pgm2_rom_map, AS_PROGRAM, 32, pgm2_state )
+	AM_RANGE(0x10000000, 0x10ffffff) AM_ROM AM_REGION("user1", 0) // external ROM
+	AM_IMPORT_FROM(pgm2_map)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( pgm2_ram_rom_map, AS_PROGRAM, 32, pgm2_state )
+	AM_RANGE(0x10000000, 0x101fffff) AM_RAM AM_SHARE("romboard_ram") // we should also probably decrypt writes once the encryption is enabled, but the game never writes with it turned on anyway
+	AM_RANGE(0x10200000, 0x103fffff) AM_ROM AM_REGION("user1", 0) // external ROM
+	AM_IMPORT_FROM(pgm2_map)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( pgm2 )
@@ -517,6 +536,11 @@ void pgm2_state::machine_reset()
 	m_realspritekey = 0;
 	m_mcu_last_cmd = 0;
 	m_share_bank = 0;
+	
+	// as the decryption is dynamic controlled by the program, restore the encrypted copy
+	memcpy(memregion("user1")->base(), &m_encrypted_copy[0], memregion("user1")->bytes());
+
+	m_has_decrypted = 0;
 }
 
 static const gfx_layout tiles8x8_layout =
@@ -556,7 +580,7 @@ static MACHINE_CONFIG_START( pgm2 )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", IGS036, 100000000) // ?? ARM based CPU, has internal ROM.
-	MCFG_CPU_PROGRAM_MAP(pgm2_map)
+	MCFG_CPU_PROGRAM_MAP(pgm2_rom_map)
 
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", pgm2_state,  igs_interrupt)
 	MCFG_TIMER_DRIVER_ADD("mcu_timer", pgm2_state, igs_interrupt2)
@@ -605,6 +629,10 @@ static MACHINE_CONFIG_DERIVED( pgm2_lores, pgm2 )
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 240-1)
 MACHINE_CONFIG_END
 
+static MACHINE_CONFIG_DERIVED( pgm2_ramrom, pgm2 )
+	MCFG_CPU_MODIFY("maincpu") 
+	MCFG_CPU_PROGRAM_MAP(pgm2_ram_rom_map)
+MACHINE_CONFIG_END
 
 /* using macros for the video / sound roms because the locations never change between sets, and
    we're going to have a LOT of clones to cover all the internal rom regions and external rom revision
@@ -799,9 +827,8 @@ ROM_START( ddpdojh )
 	ROM_REGION( 0x04000, "maincpu", 0 )
 	ROM_LOAD( "ddpdoj_igs036_china.rom",       0x00000000, 0x0004000, CRC(5db91464) SHA1(723d8086285805bd815e62120dfa9a4269bcd932) )
 
-	ROM_REGION( 0x1000000, "user1", 0 )
-	ROM_LOAD( "ddpdoj_v201cn.u4",        0x00200000, 0x0200000, CRC(89e4b760) SHA1(9fad1309da31d12a413731b416a8bbfdb304ed9e) )
-	ROM_RELOAD( 0x000000, 0x200000 ) // HACK! actually here is RAM, ROM (encrypted) copied here by internal firmware
+	ROM_REGION( 0x0200000, "user1", 0 )
+	ROM_LOAD( "ddpdoj_v201cn.u4",        0x00000000, 0x0200000, CRC(89e4b760) SHA1(9fad1309da31d12a413731b416a8bbfdb304ed9e) )
 
 	DDPDOJH_VIDEO_SOUND_ROMS
 ROM_END
@@ -1075,6 +1102,10 @@ READ32_MEMBER(pgm2_state::ddpdojh_speedup2_r)
 // for games with the internal ROMs fully dumped that provide the sprite key and program rom key at runtime
 void pgm2_state::common_encryption_init()
 {
+	// store off a copy of the encrypted rom so we can restore it later when needed
+	m_encrypted_copy.resize(memregion("user1")->bytes());
+	memcpy(&m_encrypted_copy[0], memregion("user1")->base(), memregion("user1")->bytes());
+
 	uint16_t *src = (uint16_t *)memregion("sprites_mask")->base();
 
 	iga_u12_decode(src, memregion("sprites_mask")->bytes(), 0x0000);
@@ -1118,8 +1149,12 @@ DRIVER_INIT_MEMBER(pgm2_state,kov3)
 	sprite_colour_decode(src, 0x8000000);
 
 	igs036_decryptor decrypter(kov3_key);
-	decrypter.decrypter_rom(memregion("user1"));
+	decrypter.decrypter_rom((uint16_t*)memregion("user1")->base(), memregion("user1")->bytes(), 0);
 	m_has_decrypted = 1;
+
+	m_encrypted_copy.resize(memregion("user1")->bytes());
+	memcpy(&m_encrypted_copy[0], memregion("user1")->base(), memregion("user1")->bytes());
+
 }
 
 void pgm2_state::decrypt_kov3_module(uint32_t addrxor, uint16_t dataxor)
@@ -1180,7 +1215,7 @@ GAME( 2008, kov2nl_301,   kov2nl,    pgm2,    pgm2, pgm2_state,     kov2nl,     
 GAME( 2008, kov2nl_300,   kov2nl,    pgm2,    pgm2, pgm2_state,     kov2nl,       ROT0, "IGS", "Knights of Valour 2 New Legend (V300, China)", 0 ) // was dumped from a Taiwan board tho
 
 // Dodonpachi Daioujou Tamashii - should be a V200 too
-GAME( 2010, ddpdojh,      0,    pgm2,    pgm2, pgm2_state,     ddpdojh,    ROT270, "IGS", "Dodonpachi Daioujou Tamashii (V201, China)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 2010, ddpdojh,      0,    pgm2_ramrom,    pgm2, pgm2_state,     ddpdojh,    ROT270, "IGS", "Dodonpachi Daioujou Tamashii (V201, China)", MACHINE_IMPERFECT_GRAPHICS )
 
 // Knights of Valour 3 - should be a V103 and V101 too
 GAME( 2011, kov3,         0,    pgm2,    pgm2, pgm2_state,     kov3_104,   ROT0, "IGS", "Knights of Valour 3 (V104, China)", MACHINE_NOT_WORKING )
