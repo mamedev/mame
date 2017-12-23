@@ -1041,7 +1041,7 @@ void towns_state::towns_crtc_draw_scan_layer_hicolour(bitmap_rgb32 &bitmap,const
 		linesize = m_video.towns_crtc_reg[24] * 4;
 	
 	// TODO: figure out how to wrap when there are sprites on layer 1
-	auto wrap = [layer,sprites_enabled,linesize](int line, uint32_t off)->bool
+	auto wrap = [layer,sprites_enabled,linesize](int line, uint32_t off)->int
 	{
 		return ((layer == 0 || !sprites_enabled) && off >= (line * linesize) && off - (line * linesize) >= linesize);
 	};
@@ -1250,7 +1250,7 @@ void towns_state::towns_crtc_draw_scan_layer_256(bitmap_rgb32 &bitmap,const rect
 		linesize = m_video.towns_crtc_reg[24] * 8;
 
 	// TODO: figure out how to wrap when there are sprites on layer 1
-	auto wrap = [layer,sprites_enabled,linesize](int line, uint32_t off)->bool
+	auto wrap = [layer,sprites_enabled,linesize](int line, uint32_t off)->int
 	{
 		return ((layer == 0 || !sprites_enabled) && off >= (line * linesize) && off - (line * linesize) >= linesize);
 	};
@@ -1403,7 +1403,7 @@ void towns_state::towns_crtc_draw_scan_layer_16(bitmap_rgb32 &bitmap,const recta
 		linesize = m_video.towns_crtc_reg[24] * 4;
 	
 	// TODO: figure out how to wrap when there are sprites on layer 1
-	auto wrap = [layer,sprites_enabled,linesize](int line, uint32_t off)->bool
+	auto wrap = [layer,sprites_enabled,linesize](int line, uint32_t off)->int
 	{
 		return ((layer == 0 || !sprites_enabled) && off >= (line * linesize) && off - (line * linesize) >= linesize);
 	};
