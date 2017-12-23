@@ -7079,6 +7079,22 @@ has been replaced with an all-zero block. -->
 		</part>
 	</software>
 
+	<software name="echecs3d">
+		<!-- Dumped via Kryoflux, all tracks show as good and unmodified -->
+		<!-- French version of Cyrus -->
+		<description>Echecs 3D (French)</description>
+		<year>1986</year>
+		<info name="developer" value="Intelligent Chess Software" />
+		<publisher>France Image Logiciel</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="disk_serial" value="EC IB 028" />
+			<!-- Copy-protected -->
+			<dataarea name="flop" size = "2912101">
+				<rom name="[PC] Echecs 3D - FIL [5.25DD] [Disk 1 of 1].mfm" size="2912101" crc="665f82e3" sha1="61bcddbe1f648a694e0d330b372967b2f79a7a96" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="f19">
 		<!-- Dumped via Kryoflux, shows as good and unmodified -->
 		<description>F-19 Stealth Fighter (Version 435.04)</description>
@@ -7113,17 +7129,6 @@ has been replaced with an all-zero block. -->
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size = "368640">
 				<rom name="[PC] Ferrari Formula One [5.25][2 of 2].img" size="368640" crc="9815c5b6" sha1="ddb8e3bcea701b3a325a0e2a4359c491fde47a59" offset="0"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="1samurai" supported="no">
-		<description>First Samurai</description>
-		<year>1992</year>
-		<publisher>Vivid Image</publisher>
-		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size = "737280">
-				<rom name="[PC] First Samurai.img" size="737280" crc="49264976" sha1="3178d690ad32a3565e4fa6c68a84b4232acea251" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -9184,7 +9189,7 @@ has been replaced with an all-zero block. -->
 		<info name="developer" value="SEGA-AM2" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size = "368640">
-				<rom name="Super Hang-On [Data East] [1989] [3.5DD] [Disk 1 of 1].img" size="368640" crc="ee83ac71" sha1="b8606231fca62ffb5c8b89035382825fc0449841" offset="0"/>
+				<rom name="Super Hang-On [Data East] [1989] [5.25DD] [Disk 1 of 1].img" size="368640" crc="ee83ac71" sha1="b8606231fca62ffb5c8b89035382825fc0449841" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
