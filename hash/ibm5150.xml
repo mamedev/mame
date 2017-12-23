@@ -7084,8 +7084,8 @@ has been replaced with an all-zero block. -->
 		<!-- French version of Cyrus -->
 		<description>Echecs 3D (French)</description>
 		<year>1986</year>
-		<info name="developer" value="Intelligent Chess Software" />
 		<publisher>France Image Logiciel</publisher>
+		<info name="developer" value="Intelligent Chess Software" />
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="disk_serial" value="EC IB 028" />
 			<!-- Copy-protected -->
