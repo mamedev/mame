@@ -66,13 +66,11 @@ igs036_decryptor::igs036_decryptor(const uint8_t* game_key)
 {
 }
 
-void igs036_decryptor::decrypter_rom(memory_region* region)
+void igs036_decryptor::decrypter_rom(uint16_t* rom, int size, int offset)
 {
-	int size = region->bytes();
-	uint16_t* rom = (uint16_t*)region->base();
 	for (int i = 0; i < size / 2; i++)
 	{
-		rom[i] = decrypt(rom[i], i);
+		rom[i] = decrypt(rom[i], i+offset);
 	}
 }
 

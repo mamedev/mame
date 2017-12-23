@@ -294,7 +294,7 @@ DRIVER_INIT_MEMBER(igs_m036_state, cjdh2)
 	DRIVER_INIT_CALL(igs_m036);
 
 	igs036_decryptor decrypter(cjdh2_key);
-	decrypter.decrypter_rom(memregion("user1"));
+	decrypter.decrypter_rom((uint16_t*)memregion("user1")->base(), memregion("user1")->bytes(), 0);
 }
 
 DRIVER_INIT_MEMBER(igs_m036_state, cjddzsp)
@@ -302,7 +302,7 @@ DRIVER_INIT_MEMBER(igs_m036_state, cjddzsp)
 	DRIVER_INIT_CALL(igs_m036);
 
 	igs036_decryptor decrypter(cjddzsp_key);
-	decrypter.decrypter_rom(memregion("user1"));
+	decrypter.decrypter_rom((uint16_t*)memregion("user1")->base(), memregion("user1")->bytes(), 0);
 }
 
 DRIVER_INIT_MEMBER(igs_m036_state, igsm312)
@@ -310,7 +310,7 @@ DRIVER_INIT_MEMBER(igs_m036_state, igsm312)
 	DRIVER_INIT_CALL(igs_m036);
 
 	igs036_decryptor decrypter(m312cn_key);
-	decrypter.decrypter_rom(memregion("user1"));
+	decrypter.decrypter_rom((uint16_t*)memregion("user1")->base(), memregion("user1")->bytes(), 0);
 }
 
 /***************************************************************************

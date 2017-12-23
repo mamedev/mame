@@ -28,6 +28,7 @@ public:
 		m_lineram(*this, "lineram"),
 		m_sp_zoom(*this, "sp_zoom"),
 		m_mainram(*this, "mainram"),
+		m_romboard_ram(*this, "romboard_ram"),
 		m_fg_videoram(*this, "fg_videoram"),
 		m_bg_videoram(*this, "bg_videoram"),
 		m_sp_videoram(*this, "sp_videoram"),
@@ -127,12 +128,15 @@ private:
 	uint8_t m_mcu_last_cmd;
 	void mcu_command(address_space &space, bool is_command);
 
+	std::vector<uint8_t> m_encrypted_copy;
+
 	// devices
 	required_device<cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;
 	required_shared_ptr<uint32_t> m_lineram;
 	required_shared_ptr<uint32_t> m_sp_zoom;
 	required_shared_ptr<uint32_t> m_mainram;
+	optional_shared_ptr<uint32_t> m_romboard_ram;
 	required_shared_ptr<uint32_t> m_fg_videoram;
 	required_shared_ptr<uint32_t> m_bg_videoram;
 	required_shared_ptr<uint32_t> m_sp_videoram;
