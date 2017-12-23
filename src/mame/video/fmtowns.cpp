@@ -903,9 +903,9 @@ void towns_state::render_sprite_16(uint32_t poffset, uint16_t x, uint16_t y, boo
 	{
 		ystart = y;
 		if (yhalfsize)
-			yend = y+16;
-		else
 			yend = y+8;
+		else
+			yend = y+16;
 		ydir = 1;
 	}
 	xstart &= 0x1ff;
@@ -1084,7 +1084,11 @@ void towns_state::towns_crtc_draw_scan_layer_hicolour(bitmap_rgb32 &bitmap,const
 			else
 				off &= 0x7ffff;  // 1 layer
 
-			colour = (m_towns_gfxvram[off+(layer*0x40000)+1] << 8) | m_towns_gfxvram[off+(layer*0x40000)];
+			// TODO: figure out how to wrap when there are sprites on layer 1
+			if ((layer == 0 || !(m_video.towns_sprite_reg[1] & 0x80)) && off >= (line * linesize) && off - (line * linesize) >= linesize)
+				colour = (m_towns_gfxvram[off+(layer*0x40000)-linesize+1] << 8) | m_towns_gfxvram[off+(layer*0x40000)-linesize];
+			else
+				colour = (m_towns_gfxvram[off+(layer*0x40000)+1] << 8) | m_towns_gfxvram[off+(layer*0x40000)];
 			if(colour < 0x8000)
 			{
 				bitmap.pix32(scanline, x) =
@@ -1104,7 +1108,11 @@ void towns_state::towns_crtc_draw_scan_layer_hicolour(bitmap_rgb32 &bitmap,const
 				off &= 0x3ffff;  // 2 layers
 			else
 				off &= 0x7ffff;  // 1 layer
-			colour = (m_towns_gfxvram[off+(layer*0x40000)+1] << 8) | m_towns_gfxvram[off+(layer*0x40000)];
+			// TODO: figure out how to wrap when there are sprites on layer 1
+			if ((layer == 0 || !(m_video.towns_sprite_reg[1] & 0x80)) && off >= (line * linesize) && off - (line * linesize) >= linesize)
+				colour = (m_towns_gfxvram[off+(layer*0x40000)-linesize+1] << 8) | m_towns_gfxvram[off+(layer*0x40000)-linesize];
+			else
+				colour = (m_towns_gfxvram[off+(layer*0x40000)+1] << 8) | m_towns_gfxvram[off+(layer*0x40000)];
 			if(colour < 0x8000)
 			{
 				bitmap.pix32(scanline, x) =
@@ -1128,7 +1136,11 @@ void towns_state::towns_crtc_draw_scan_layer_hicolour(bitmap_rgb32 &bitmap,const
 				off &= 0x3ffff;  // 2 layers
 			else
 				off &= 0x7ffff;  // 1 layer
-			colour = (m_towns_gfxvram[off+(layer*0x40000)+1] << 8) | m_towns_gfxvram[off+(layer*0x40000)];
+			// TODO: figure out how to wrap when there are sprites on layer 1
+			if ((layer == 0 || !(m_video.towns_sprite_reg[1] & 0x80)) && off >= (line * linesize) && off - (line * linesize) >= linesize)
+				colour = (m_towns_gfxvram[off+(layer*0x40000)-linesize+1] << 8) | m_towns_gfxvram[off+(layer*0x40000)-linesize];
+			else
+				colour = (m_towns_gfxvram[off+(layer*0x40000)+1] << 8) | m_towns_gfxvram[off+(layer*0x40000)];
 			if(colour < 0x8000)
 			{
 				bitmap.pix32(scanline, x) =
@@ -1156,7 +1168,11 @@ void towns_state::towns_crtc_draw_scan_layer_hicolour(bitmap_rgb32 &bitmap,const
 				off &= 0x3ffff;  // 2 layers
 			else
 				off &= 0x7ffff;  // 1 layer
-			colour = (m_towns_gfxvram[off+(layer*0x40000)+1] << 8) | m_towns_gfxvram[off+(layer*0x40000)];
+			// TODO: figure out how to wrap when there are sprites on layer 1
+			if ((layer == 0 || !(m_video.towns_sprite_reg[1] & 0x80)) && off >= (line * linesize) && off - (line * linesize) >= linesize)
+				colour = (m_towns_gfxvram[off+(layer*0x40000)-linesize+1] << 8) | m_towns_gfxvram[off+(layer*0x40000)-linesize];
+			else
+				colour = (m_towns_gfxvram[off+(layer*0x40000)+1] << 8) | m_towns_gfxvram[off+(layer*0x40000)];
 			if(colour < 0x8000)
 			{
 				bitmap.pix32(scanline, x) =
@@ -1188,7 +1204,11 @@ void towns_state::towns_crtc_draw_scan_layer_hicolour(bitmap_rgb32 &bitmap,const
 				off &= 0x3ffff;  // 2 layers
 			else
 				off &= 0x7ffff;  // 1 layer
-			colour = (m_towns_gfxvram[off+(layer*0x40000)+1] << 8) | m_towns_gfxvram[off+(layer*0x40000)];
+			// TODO: figure out how to wrap when there are sprites on layer 1
+			if ((layer == 0 || !(m_video.towns_sprite_reg[1] & 0x80)) && off >= (line * linesize) && off - (line * linesize) >= linesize)
+				colour = (m_towns_gfxvram[off+(layer*0x40000)-linesize+1] << 8) | m_towns_gfxvram[off+(layer*0x40000)-linesize];
+			else
+				colour = (m_towns_gfxvram[off+(layer*0x40000)+1] << 8) | m_towns_gfxvram[off+(layer*0x40000)];
 			if(colour < 0x8000)
 			{
 				bitmap.pix32(scanline, x) =
@@ -1274,7 +1294,11 @@ void towns_state::towns_crtc_draw_scan_layer_256(bitmap_rgb32 &bitmap,const rect
 				off &= 0x3ffff;  // 2 layers
 			else
 				off &= 0x7ffff;  // 1 layer
-			colour = m_towns_gfxvram[off+(layer*0x40000)];
+			// TODO: figure out how to wrap when there are sprites on layer 1
+			if ((layer == 0 || !(m_video.towns_sprite_reg[1] & 0x80)) && off >= (line * linesize) && off - (line * linesize) >= linesize)
+				colour = m_towns_gfxvram[off+(layer*0x40000)-linesize];
+			else
+				colour = m_towns_gfxvram[off+(layer*0x40000)];
 			if(colour != 0)
 			{
 				bitmap.pix32(scanline, x) = m_palette->pen(colour);
@@ -1291,7 +1315,11 @@ void towns_state::towns_crtc_draw_scan_layer_256(bitmap_rgb32 &bitmap,const rect
 				off &= 0x3ffff;  // 2 layers
 			else
 				off &= 0x7ffff;  // 1 layer
-			colour = m_towns_gfxvram[off+(layer*0x40000)+1];
+			// TODO: figure out how to wrap when there are sprites on layer 1
+			if ((layer == 0 || !(m_video.towns_sprite_reg[1] & 0x80)) && off >= (line * linesize) && off - (line * linesize) >= linesize)
+				colour = m_towns_gfxvram[off+(layer*0x40000)-linesize];
+			else
+				colour = m_towns_gfxvram[off+(layer*0x40000)+1];
 			if(colour != 0)
 			{
 				bitmap.pix32(scanline, x) = m_palette->pen(colour);
@@ -1309,7 +1337,11 @@ void towns_state::towns_crtc_draw_scan_layer_256(bitmap_rgb32 &bitmap,const rect
 				off &= 0x3ffff;  // 2 layers
 			else
 				off &= 0x7ffff;  // 1 layer
-			colour = m_towns_gfxvram[off+(layer*0x40000)+1];
+			// TODO: figure out how to wrap when there are sprites on layer 1
+			if ((layer == 0 || !(m_video.towns_sprite_reg[1] & 0x80)) && off >= (line * linesize) && off - (line * linesize) >= linesize)
+				colour = m_towns_gfxvram[off+(layer*0x40000)-linesize];
+			else
+				colour = m_towns_gfxvram[off+(layer*0x40000)+1];
 			if(colour != 0)
 			{
 				bitmap.pix32(scanline, x) = m_palette->pen(colour);
@@ -1328,7 +1360,11 @@ void towns_state::towns_crtc_draw_scan_layer_256(bitmap_rgb32 &bitmap,const rect
 				off &= 0x3ffff;  // 2 layers
 			else
 				off &= 0x7ffff;  // 1 layer
-			colour = m_towns_gfxvram[off+(layer*0x40000)+1];
+			// TODO: figure out how to wrap when there are sprites on layer 1
+			if ((layer == 0 || !(m_video.towns_sprite_reg[1] & 0x80)) && off >= (line * linesize) && off - (line * linesize) >= linesize)
+				colour = m_towns_gfxvram[off+(layer*0x40000)-linesize];
+			else
+				colour = m_towns_gfxvram[off+(layer*0x40000)+1];
 			if(colour != 0)
 			{
 				bitmap.pix32(scanline, x) = m_palette->pen(colour);
@@ -1348,7 +1384,11 @@ void towns_state::towns_crtc_draw_scan_layer_256(bitmap_rgb32 &bitmap,const rect
 				off &= 0x3ffff;  // 2 layers
 			else
 				off &= 0x7ffff;  // 1 layer
-			colour = m_towns_gfxvram[off+(layer*0x40000)+1];
+			// TODO: figure out how to wrap when there are sprites on layer 1
+			if ((layer == 0 || !(m_video.towns_sprite_reg[1] & 0x80)) && off >= (line * linesize) && off - (line * linesize) >= linesize)
+				colour = m_towns_gfxvram[off+(layer*0x40000)-linesize];
+			else
+				colour = m_towns_gfxvram[off+(layer*0x40000)+1];
 			if(colour != 0)
 			{
 				bitmap.pix32(scanline, x) = m_palette->pen(colour);
@@ -1420,12 +1460,20 @@ void towns_state::towns_crtc_draw_scan_layer_16(bitmap_rgb32 &bitmap,const recta
 				off &= 0x3ffff;  // 2 layers
 			else
 				off &= 0x7ffff;  // 1 layer
-			colour = m_towns_gfxvram[off+(layer*0x40000)] >> 4;
+			// TODO: figure out how to wrap when there are sprites on layer 1
+			if ((layer == 0 || !(m_video.towns_sprite_reg[1] & 0x80)) && off >= (line * linesize) && off - (line * linesize) >= linesize)
+				colour = m_towns_gfxvram[off+(layer*0x40000)-linesize] >> 4;
+			else
+				colour = m_towns_gfxvram[off+(layer*0x40000)] >> 4;
 			if(colour != 0)
 			{
 				bitmap.pix32(scanline, x+1) = pal->pen(colour);
 			}
-			colour = m_towns_gfxvram[off+(layer*0x40000)] & 0x0f;
+			// TODO: figure out how to wrap when there are sprites on layer 1
+			if ((layer == 0 || !(m_video.towns_sprite_reg[1] & 0x80)) && off >= (line * linesize) && off - (line * linesize) >= linesize)
+				colour = m_towns_gfxvram[off+(layer*0x40000)-linesize] & 0x0f;
+			else
+				colour = m_towns_gfxvram[off+(layer*0x40000)] & 0x0f;
 			if(colour != 0)
 			{
 				bitmap.pix32(scanline, x) = pal->pen(colour);
@@ -1442,13 +1490,21 @@ void towns_state::towns_crtc_draw_scan_layer_16(bitmap_rgb32 &bitmap,const recta
 				off &= 0x3ffff;  // 2 layers
 			else
 				off &= 0x7ffff;  // 1 layer
-			colour = m_towns_gfxvram[off+(layer*0x40000)] >> 4;
+			// TODO: figure out how to wrap when there are sprites on layer 1
+			if ((layer == 0 || !(m_video.towns_sprite_reg[1] & 0x80)) && off >= (line * linesize) && off - (line * linesize) >= linesize)
+				colour = m_towns_gfxvram[off+(layer*0x40000)-linesize] >> 4;
+			else
+				colour = m_towns_gfxvram[off+(layer*0x40000)] >> 4;
 			if(colour != 0)
 			{
 				bitmap.pix32(scanline, x+2) = pal->pen(colour);
 				bitmap.pix32(scanline, x+3) = pal->pen(colour);
 			}
-			colour = m_towns_gfxvram[off+(layer*0x40000)] & 0x0f;
+			// TODO: figure out how to wrap when there are sprites on layer 1
+			if ((layer == 0 || !(m_video.towns_sprite_reg[1] & 0x80)) && off >= (line * linesize) && off - (line * linesize) >= linesize)
+				colour = m_towns_gfxvram[off+(layer*0x40000)-linesize] & 0x0f;
+			else
+				colour = m_towns_gfxvram[off+(layer*0x40000)] & 0x0f;
 			if(colour != 0)
 			{
 				bitmap.pix32(scanline, x) = pal->pen(colour);
@@ -1466,14 +1522,22 @@ void towns_state::towns_crtc_draw_scan_layer_16(bitmap_rgb32 &bitmap,const recta
 				off &= 0x3ffff;  // 2 layers
 			else
 				off &= 0x7ffff;  // 1 layer
-			colour = m_towns_gfxvram[off+(layer*0x40000)] >> 4;
+			// TODO: figure out how to wrap when there are sprites on layer 1
+			if ((layer == 0 || !(m_video.towns_sprite_reg[1] & 0x80)) && off >= (line * linesize) && off - (line * linesize) >= linesize)
+				colour = m_towns_gfxvram[off+(layer*0x40000)-linesize] >> 4;
+			else
+				colour = m_towns_gfxvram[off+(layer*0x40000)] >> 4;
 			if(colour != 0)
 			{
 				bitmap.pix32(scanline, x+3) = pal->pen(colour);
 				bitmap.pix32(scanline, x+4) = pal->pen(colour);
 				bitmap.pix32(scanline, x+5) = pal->pen(colour);
 			}
-			colour = m_towns_gfxvram[off+(layer*0x40000)] & 0x0f;
+			// TODO: figure out how to wrap when there are sprites on layer 1
+			if ((layer == 0 || !(m_video.towns_sprite_reg[1] & 0x80)) && off >= (line * linesize) && off - (line * linesize) >= linesize)
+				colour = m_towns_gfxvram[off+(layer*0x40000)-linesize] & 0x0f;
+			else
+				colour = m_towns_gfxvram[off+(layer*0x40000)] & 0x0f;
 			if(colour != 0)
 			{
 				bitmap.pix32(scanline, x) = pal->pen(colour);
@@ -1492,7 +1556,11 @@ void towns_state::towns_crtc_draw_scan_layer_16(bitmap_rgb32 &bitmap,const recta
 				off &= 0x3ffff;  // 2 layers
 			else
 				off &= 0x7ffff;  // 1 layer
-			colour = m_towns_gfxvram[off+(layer*0x40000)] >> 4;
+			// TODO: figure out how to wrap when there are sprites on layer 1
+			if ((layer == 0 || !(m_video.towns_sprite_reg[1] & 0x80)) && off >= (line * linesize) && off - (line * linesize) >= linesize)
+				colour = m_towns_gfxvram[off+(layer*0x40000)-linesize] >> 4;
+			else
+				colour = m_towns_gfxvram[off+(layer*0x40000)] >> 4;
 			if(colour != 0)
 			{
 				bitmap.pix32(scanline, x+4) = pal->pen(colour);
@@ -1500,7 +1568,11 @@ void towns_state::towns_crtc_draw_scan_layer_16(bitmap_rgb32 &bitmap,const recta
 				bitmap.pix32(scanline, x+6) = pal->pen(colour);
 				bitmap.pix32(scanline, x+7) = pal->pen(colour);
 			}
-			colour = m_towns_gfxvram[off+(layer*0x40000)] & 0x0f;
+			// TODO: figure out how to wrap when there are sprites on layer 1
+			if ((layer == 0 || !(m_video.towns_sprite_reg[1] & 0x80)) && off >= (line * linesize) && off - (line * linesize) >= linesize)
+				colour = m_towns_gfxvram[off+(layer*0x40000)-linesize] & 0x0f;
+			else
+				colour = m_towns_gfxvram[off+(layer*0x40000)] & 0x0f;
 			if(colour != 0)
 			{
 				bitmap.pix32(scanline, x) = pal->pen(colour);
@@ -1520,7 +1592,11 @@ void towns_state::towns_crtc_draw_scan_layer_16(bitmap_rgb32 &bitmap,const recta
 				off &= 0x3ffff;  // 2 layers
 			else
 				off &= 0x7ffff;  // 1 layer
-			colour = m_towns_gfxvram[off+(layer*0x40000)] >> 4;
+			// TODO: figure out how to wrap when there are sprites on layer 1
+			if ((layer == 0 || !(m_video.towns_sprite_reg[1] & 0x80)) && off >= (line * linesize) && off - (line * linesize) >= linesize)
+				colour = m_towns_gfxvram[off+(layer*0x40000)-linesize] >> 4;
+			else
+				colour = m_towns_gfxvram[off+(layer*0x40000)] >> 4;
 			if(colour != 0)
 			{
 				bitmap.pix32(scanline, x+5) = pal->pen(colour);
@@ -1529,7 +1605,11 @@ void towns_state::towns_crtc_draw_scan_layer_16(bitmap_rgb32 &bitmap,const recta
 				bitmap.pix32(scanline, x+8) = pal->pen(colour);
 				bitmap.pix32(scanline, x+9) = pal->pen(colour);
 			}
-			colour = m_towns_gfxvram[off+(layer*0x40000)] & 0x0f;
+			// TODO: figure out how to wrap when there are sprites on layer 1
+			if ((layer == 0 || !(m_video.towns_sprite_reg[1] & 0x80)) && off >= (line * linesize) && off - (line * linesize) >= linesize)
+				colour = m_towns_gfxvram[off+(layer*0x40000)-linesize] & 0x0f;
+			else
+				colour = m_towns_gfxvram[off+(layer*0x40000)] & 0x0f;
 			if(colour != 0)
 			{
 				bitmap.pix32(scanline, x) = pal->pen(colour);
