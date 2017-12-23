@@ -977,7 +977,7 @@ void arm7_cpu_device::tg05_0(uint32_t pc, uint32_t op)  /* STR Rd, [Rn, Rm] */
 	uint32_t rn = (op & THUMB_GROUP5_RN) >> THUMB_GROUP5_RN_SHIFT;
 	uint32_t rd = (op & THUMB_GROUP5_RD) >> THUMB_GROUP5_RD_SHIFT;
 	uint32_t addr = GetRegister(rn) + GetRegister(rm);
-	WRITE32(addr, GetRegister(rd));
+	WRITE32(addr & ~3, GetRegister(rd));
 	R15 += 2;
 }
 
@@ -987,7 +987,7 @@ void arm7_cpu_device::tg05_1(uint32_t pc, uint32_t op)  /* STRH Rd, [Rn, Rm] */
 	uint32_t rn = (op & THUMB_GROUP5_RN) >> THUMB_GROUP5_RN_SHIFT;
 	uint32_t rd = (op & THUMB_GROUP5_RD) >> THUMB_GROUP5_RD_SHIFT;
 	uint32_t addr = GetRegister(rn) + GetRegister(rm);
-	WRITE16(addr, GetRegister(rd));
+	WRITE16(addr & ~1, GetRegister(rd));
 	R15 += 2;
 }
 
@@ -1022,7 +1022,7 @@ void arm7_cpu_device::tg05_4(uint32_t pc, uint32_t op)  /* LDR Rd, [Rn, Rm] */
 	uint32_t rn = (op & THUMB_GROUP5_RN) >> THUMB_GROUP5_RN_SHIFT;
 	uint32_t rd = (op & THUMB_GROUP5_RD) >> THUMB_GROUP5_RD_SHIFT;
 	uint32_t addr = GetRegister(rn) + GetRegister(rm);
-	uint32_t op2 = READ32(addr);
+	uint32_t op2 = READ32(addr & ~3);
 	SetRegister(rd, op2);
 	R15 += 2;
 }
@@ -1033,7 +1033,7 @@ void arm7_cpu_device::tg05_5(uint32_t pc, uint32_t op)  /* LDRH Rd, [Rn, Rm] */
 	uint32_t rn = (op & THUMB_GROUP5_RN) >> THUMB_GROUP5_RN_SHIFT;
 	uint32_t rd = (op & THUMB_GROUP5_RD) >> THUMB_GROUP5_RD_SHIFT;
 	uint32_t addr = GetRegister(rn) + GetRegister(rm);
-	uint32_t op2 = READ16(addr);
+	uint32_t op2 = READ16(addr & ~1);
 	SetRegister(rd, op2);
 	R15 += 2;
 }
@@ -1055,7 +1055,7 @@ void arm7_cpu_device::tg05_7(uint32_t pc, uint32_t op)  /* LDSH Rd, [Rn, Rm] */
 	uint32_t rn = (op & THUMB_GROUP5_RN) >> THUMB_GROUP5_RN_SHIFT;
 	uint32_t rd = (op & THUMB_GROUP5_RD) >> THUMB_GROUP5_RD_SHIFT;
 	uint32_t addr = GetRegister(rn) + GetRegister(rm);
-	uint32_t op2 = READ16(addr);
+	uint32_t op2 = READ16(addr & ~1);
 	if (op2 & 0x00008000)
 	{
 		op2 |= 0xffff0000;
@@ -1071,7 +1071,7 @@ void arm7_cpu_device::tg06_0(uint32_t pc, uint32_t op) /* Store */
 	uint32_t rn = (op & THUMB_ADDSUB_RS) >> THUMB_ADDSUB_RS_SHIFT;
 	uint32_t rd = op & THUMB_ADDSUB_RD;
 	int32_t offs = ((op & THUMB_LSOP_OFFS) >> THUMB_LSOP_OFFS_SHIFT) << 2;
-	WRITE32(GetRegister(rn) + offs, GetRegister(rd));
+	WRITE32((GetRegister(rn) + offs) & ~3, GetRegister(rd));
 	R15 += 2;
 }
 
@@ -1080,7 +1080,7 @@ void arm7_cpu_device::tg06_1(uint32_t pc, uint32_t op) /* Load */
 	uint32_t rn = (op & THUMB_ADDSUB_RS) >> THUMB_ADDSUB_RS_SHIFT;
 	uint32_t rd = op & THUMB_ADDSUB_RD;
 	int32_t offs = ((op & THUMB_LSOP_OFFS) >> THUMB_LSOP_OFFS_SHIFT) << 2;
-	SetRegister(rd, READ32(GetRegister(rn) + offs)); // fix
+	SetRegister(rd, READ32((GetRegister(rn) + offs) & ~3)); // fix
 	R15 += 2;
 }
 
@@ -1111,7 +1111,7 @@ void arm7_cpu_device::tg08_0(uint32_t pc, uint32_t op) /* Store */
 	uint32_t imm = (op & THUMB_HALFOP_OFFS) >> THUMB_HALFOP_OFFS_SHIFT;
 	uint32_t rs = (op & THUMB_ADDSUB_RS) >> THUMB_ADDSUB_RS_SHIFT;
 	uint32_t rd = (op & THUMB_ADDSUB_RD) >> THUMB_ADDSUB_RD_SHIFT;
-	WRITE16(GetRegister(rs) + (imm << 1), GetRegister(rd));
+	WRITE16((GetRegister(rs) + (imm << 1)) & ~1, GetRegister(rd));
 	R15 += 2;
 }
 
@@ -1120,7 +1120,7 @@ void arm7_cpu_device::tg08_1(uint32_t pc, uint32_t op) /* Load */
 	uint32_t imm = (op & THUMB_HALFOP_OFFS) >> THUMB_HALFOP_OFFS_SHIFT;
 	uint32_t rs = (op & THUMB_ADDSUB_RS) >> THUMB_ADDSUB_RS_SHIFT;
 	uint32_t rd = (op & THUMB_ADDSUB_RD) >> THUMB_ADDSUB_RD_SHIFT;
-	SetRegister(rd, READ16(GetRegister(rs) + (imm << 1)));
+	SetRegister(rd, READ16((GetRegister(rs) + (imm << 1)) & ~1));
 	R15 += 2;
 }
 
@@ -1130,7 +1130,7 @@ void arm7_cpu_device::tg09_0(uint32_t pc, uint32_t op) /* Store */
 {
 	uint32_t rd = (op & THUMB_STACKOP_RD) >> THUMB_STACKOP_RD_SHIFT;
 	int32_t offs = (uint8_t)(op & THUMB_INSN_IMM);
-	WRITE32(GetRegister(13) + ((uint32_t)offs << 2), GetRegister(rd));
+	WRITE32((GetRegister(13) + ((uint32_t)offs << 2)) & ~3, GetRegister(rd));
 	R15 += 2;
 }
 
@@ -1138,7 +1138,7 @@ void arm7_cpu_device::tg09_1(uint32_t pc, uint32_t op) /* Load */
 {
 	uint32_t rd = (op & THUMB_STACKOP_RD) >> THUMB_STACKOP_RD_SHIFT;
 	int32_t offs = (uint8_t)(op & THUMB_INSN_IMM);
-	uint32_t readword = READ32(GetRegister(13) + ((uint32_t)offs << 2));
+	uint32_t readword = READ32((GetRegister(13) + ((uint32_t)offs << 2)) & ~3);
 	SetRegister(rd, readword);
 	R15 += 2;
 }
@@ -1193,7 +1193,7 @@ void arm7_cpu_device::tg0b_4(uint32_t pc, uint32_t op) /* PUSH {Rlist} */
 		if (op & (1 << offs))
 		{
 			SetRegister(13, GetRegister(13) - 4);
-			WRITE32(GetRegister(13), GetRegister(offs));
+			WRITE32(GetRegister(13) & ~3, GetRegister(offs));
 		}
 	}
 	R15 += 2;
@@ -1202,13 +1202,13 @@ void arm7_cpu_device::tg0b_4(uint32_t pc, uint32_t op) /* PUSH {Rlist} */
 void arm7_cpu_device::tg0b_5(uint32_t pc, uint32_t op) /* PUSH {Rlist}{LR} */
 {
 	SetRegister(13, GetRegister(13) - 4);
-	WRITE32(GetRegister(13), GetRegister(14));
+	WRITE32(GetRegister(13) & ~3, GetRegister(14));
 	for (int32_t offs = 7; offs >= 0; offs--)
 	{
 		if (op & (1 << offs))
 		{
 			SetRegister(13, GetRegister(13) - 4);
-			WRITE32(GetRegister(13), GetRegister(offs));
+			WRITE32(GetRegister(13) & ~3, GetRegister(offs));
 		}
 	}
 	R15 += 2;
@@ -1250,7 +1250,7 @@ void arm7_cpu_device::tg0b_c(uint32_t pc, uint32_t op) /* POP {Rlist} */
 	{
 		if (op & (1 << offs))
 		{
-			SetRegister(offs, READ32(GetRegister(13)));
+			SetRegister(offs, READ32(GetRegister(13) & ~3));
 			SetRegister(13, GetRegister(13) + 4);
 		}
 	}
@@ -1263,11 +1263,11 @@ void arm7_cpu_device::tg0b_d(uint32_t pc, uint32_t op) /* POP {Rlist}{PC} */
 	{
 		if (op & (1 << offs))
 		{
-			SetRegister(offs, READ32(GetRegister(13)));
+			SetRegister(offs, READ32(GetRegister(13) & ~3));
 			SetRegister(13, GetRegister(13) + 4);
 		}
 	}
-	uint32_t addr = READ32(GetRegister(13));
+	uint32_t addr = READ32(GetRegister(13) & ~3);
 	if (m_archRev < 5)
 	{
 		R15 = addr & ~1;
