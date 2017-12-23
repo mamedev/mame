@@ -3195,7 +3195,7 @@ GAME( 1998, technodr,  0,        technodr, technodr,  namcos12_boothack_state, t
 GAME( 1998, tenkomor,  0,        coh700,   namcos12,  namcos12_boothack_state, namcos12, ROT90,"Namco",           "Tenkomori Shooting (World, TKM2/VER.A1)", MACHINE_IMPERFECT_GRAPHICS ) /* KC036 */
 GAME( 1998, tenkomorja,tenkomor, coh700,   namcos12,  namcos12_boothack_state, namcos12, ROT90,"Namco",           "Tenkomori Shooting (Japan, TKM1/VER.A1)", MACHINE_IMPERFECT_GRAPHICS ) /* KC036 */
 GAME( 1998, fgtlayer,  0,        coh700,   namcos12,  namcos12_boothack_state, namcos12, ROT0, "Arika / Namco",   "Fighting Layer (Japan, FTL1/VER.A)", MACHINE_IMPERFECT_GRAPHICS ) /* KC037 */
-GAME( 1999, pacapp,    0,        coh700,   namcos12,  namcos12_boothack_state, namcos12, ROT0, "Produce / Namco", "Paca Paca Passion (Japan, PPP1/VER.A2)", MACHINE_IMPERFECT_GRAPHICS ) /* KC038 */
+GAME( 1998, pacapp,    0,        coh700,   namcos12,  namcos12_boothack_state, namcos12, ROT0, "Produce / Namco", "Paca Paca Passion (Japan, PPP1/VER.A2)", MACHINE_IMPERFECT_GRAPHICS ) /* KC038 */
 GAME( 1999, ptblank2,  0,        ptblank2, ptblank2,  namcos12_boothack_state, ptblank2, ROT0, "Namco",           "Point Blank 2 (GNB5/VER.A)", MACHINE_IMPERFECT_GRAPHICS ) /* KC042 */
 GAME( 1999, gunbarl,   ptblank2, ptblank2, ptblank2,  namcos12_boothack_state, ptblank2, ROT0, "Namco",           "Gunbarl (Japan, GNB4/VER.A)", MACHINE_IMPERFECT_GRAPHICS ) /* KC042 */
 GAME( 1999, sws99,     0,        coh700,   namcos12,  namcos12_state,          namcos12, ROT0, "Namco",           "Super World Stadium '99 (Japan, SS91/VER.A3)", MACHINE_IMPERFECT_GRAPHICS ) /* KC043 */
