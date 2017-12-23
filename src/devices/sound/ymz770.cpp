@@ -25,7 +25,7 @@ TODO:
   YMZ773   AMMS2
   YMZ775   AMMS2B
   YMZ774   AMMS2C   IGS PGM2
-  YMZ776   AMMS3    uses AM3 sample format (.mp3 derivative ?)
+  YMZ776   AMMS3    uses AM3 sample format (modified Ogg?)
 
 ***************************************************************************/
 

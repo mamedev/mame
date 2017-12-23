@@ -790,14 +790,18 @@ ROM_END
 	ROM_LOAD32_WORD( "ddpdoj_spb0.u18",  0x00000002, 0x1000000, CRC(6a9e2cbf) SHA1(8e0a4ea90f5ef534820303d62f0873f8ac9f080e) ) \
 	\
 	ROM_REGION( 0x1000000, "ymz774", ROMREGION_ERASEFF ) /* ymz770 */ \
-	ROM_LOAD16_WORD_SWAP( "ddpdoj_wave0.u12",        0x00000000, 0x1000000, CRC(2b71a324) SHA1(f69076cc561f40ca564d804bc7bd455066f8d77c) )
+	ROM_LOAD16_WORD_SWAP( "ddpdoj_wave0.u12",        0x00000000, 0x1000000, CRC(2b71a324) SHA1(f69076cc561f40ca564d804bc7bd455066f8d77c) ) \
+	\
+	ROM_REGION( 0x10000, "sram", 0 ) \
+	ROM_LOAD( "ddpdojh_sram",            0x00000000, 0x10000, CRC(af99e304) SHA1(e44fed22b902431298748eca84533f8685926afd) )
 
 ROM_START( ddpdojh )
 	ROM_REGION( 0x04000, "maincpu", 0 )
-	ROM_LOAD( "ddpdoj_igs036.rom",       0x00000000, 0x0004000, NO_DUMP ) // CRC(5db91464) SHA1(723d8086285805bd815e62120dfa9a4269bcd932)
+	ROM_LOAD( "ddpdoj_igs036_china.rom",       0x00000000, 0x0004000, CRC(5db91464) SHA1(723d8086285805bd815e62120dfa9a4269bcd932) )
 
 	ROM_REGION( 0x1000000, "user1", 0 )
-	ROM_LOAD( "ddpdoj_v201cn.u4",        0x00000000, 0x0200000, CRC(89e4b760) SHA1(9fad1309da31d12a413731b416a8bbfdb304ed9e) )
+	ROM_LOAD( "ddpdoj_v201cn.u4",        0x00200000, 0x0200000, CRC(89e4b760) SHA1(9fad1309da31d12a413731b416a8bbfdb304ed9e) )
+	ROM_RELOAD( 0x000000, 0x200000 ) // HACK! actually here is RAM, ROM (encrypted) copied here by internal firmware
 
 	DDPDOJH_VIDEO_SOUND_ROMS
 ROM_END
@@ -1029,6 +1033,44 @@ READ32_MEMBER(pgm2_state::kof98umh_speedup_r)
 	return m_mainram[0x00060 / 4];
 }
 
+READ32_MEMBER(pgm2_state::ddpdojh_speedup_r)
+{
+	int pc = space.device().safe_pc();
+
+	if (pc == 0x10001a7e)
+	{
+		if ((m_mainram[0x00060 / 4] == 0x00) && (m_mainram[0x00064 / 4] == 0x00))
+			space.device().execute().spin_until_interrupt();
+	}
+	/*
+	else
+	{
+	printf("pc is %08x\n", pc);
+	}
+	*/
+
+	return m_mainram[0x00060 / 4];
+}
+
+READ32_MEMBER(pgm2_state::ddpdojh_speedup2_r)
+{
+	int pc = space.device().safe_pc();
+
+	if (pc == 0x1008fefe || pc == 0x1008fbe8)
+	{
+		if ((m_mainram[0x21e04 / 4] & 0x00ff0000) != 0) // not sure if this endian safe ?
+			space.device().execute().spin_until_interrupt();
+	}
+	/*
+	else
+	{
+	printf("pc is %08x\n", pc);
+	}
+	*/
+
+	return m_mainram[0x21e04 / 4];
+}
+
 
 // for games with the internal ROMs fully dumped that provide the sprite key and program rom key at runtime
 void pgm2_state::common_encryption_init()
@@ -1059,18 +1101,9 @@ DRIVER_INIT_MEMBER(pgm2_state,kov2nl)
 
 DRIVER_INIT_MEMBER(pgm2_state,ddpdojh)
 {
-	uint16_t *src = (uint16_t *)memregion("sprites_mask")->base();
-
-	iga_u12_decode(src, 0x1000000, 0x1e96);
-	iga_u16_decode(src, 0x1000000, 0x869c);
-	m_sprite_predecrypted = 1;
-
-	src = (uint16_t *)memregion("sprites_colour")->base();
-	sprite_colour_decode(src, 0x2000000);
-
-	igs036_decryptor decrypter(ddpdoj_key);
-	decrypter.decrypter_rom(memregion("user1"));
-	m_has_decrypted = 1;
+	common_encryption_init();
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0x20000060, 0x20000063, read32_delegate(FUNC(pgm2_state::ddpdojh_speedup_r), this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0x20021e04, 0x20021e07, read32_delegate(FUNC(pgm2_state::ddpdojh_speedup2_r), this));
 }
 
 DRIVER_INIT_MEMBER(pgm2_state,kov3)
@@ -1147,7 +1180,7 @@ GAME( 2008, kov2nl_301,   kov2nl,    pgm2,    pgm2, pgm2_state,     kov2nl,     
 GAME( 2008, kov2nl_300,   kov2nl,    pgm2,    pgm2, pgm2_state,     kov2nl,       ROT0, "IGS", "Knights of Valour 2 New Legend (V300, China)", 0 ) // was dumped from a Taiwan board tho
 
 // Dodonpachi Daioujou Tamashii - should be a V200 too
-GAME( 2010, ddpdojh,      0,    pgm2,    pgm2, pgm2_state,     ddpdojh,    ROT270, "IGS", "Dodonpachi Daioujou Tamashii (V201, China)", MACHINE_NOT_WORKING )
+GAME( 2010, ddpdojh,      0,    pgm2,    pgm2, pgm2_state,     ddpdojh,    ROT270, "IGS", "Dodonpachi Daioujou Tamashii (V201, China)", MACHINE_IMPERFECT_GRAPHICS )
 
 // Knights of Valour 3 - should be a V103 and V101 too
 GAME( 2011, kov3,         0,    pgm2,    pgm2, pgm2_state,     kov3_104,   ROT0, "IGS", "Knights of Valour 3 (V104, China)", MACHINE_NOT_WORKING )
