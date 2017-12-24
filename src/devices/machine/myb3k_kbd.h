@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Fredrik Öhrström
+// copyright-holders:Fredrik Ã–hrstrÃ¶m
 /**********************************************************************
 
     myb3k_kbd.h
@@ -74,9 +74,9 @@ protected:
 
 private:
 
-	output_delegate m_keyboard_cb;
-	required_ioport m_io_kbd_t[12];
-	u8              m_io_kbd_state[12][8];
+	output_delegate             m_keyboard_cb;
+	required_ioport_array<12>	m_io_kbd_t;
+	u8                          m_io_kbd_state[12][8];
 
 	int m_x, m_y;
 	u8 m_first_byte;

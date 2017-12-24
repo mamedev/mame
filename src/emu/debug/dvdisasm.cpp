@@ -239,7 +239,7 @@ bool debug_view_disasm::generate_with_pc(debug_disasm_buffer &buffer, offs_t pc)
 	else if(shift == 0)
 		backwards_offset = 64;
 	else
-		backwards_offset = 64 << shift;	
+		backwards_offset = 64 << shift;
 
 	m_dasm.clear();
 	offs_t address = (pc - m_backwards_steps*backwards_offset) & source.m_space.logaddrmask();
@@ -250,7 +250,7 @@ bool debug_view_disasm::generate_with_pc(debug_disasm_buffer &buffer, offs_t pc)
 	util::disasm_interface *intf = dynamic_cast<device_disasm_interface &>(*source.device()).get_disassembler();
 	if(intf->interface_flags() & util::disasm_interface::NONLINEAR_PC) {
 		offs_t lpc = intf->pc_real_to_linear(pc);
-		while(intf->pc_real_to_linear(address) < lpc) {	
+		while(intf->pc_real_to_linear(address) < lpc) {
 			std::string dasm;
 			offs_t size;
 			offs_t next_address;
@@ -410,7 +410,7 @@ void debug_view_disasm::print(int row, std::string text, int start, int end, u8 
 			*dest++ = { ' ', attrib };
 		else
 			*dest++ = { u8(text[spos]), attrib };
-	}  
+	}
 }
 
 

@@ -115,11 +115,11 @@ READ16_MEMBER(metro_state::metro_irq_cause_r)
 	/* interrupt cause, used by
 
 	int[0] vblank
-	int[1] hblank (bangball for faster intermission skip, 
-	               puzzli for gameplay water effect, 
-				   blzntrnd title screen scroll (enabled all the time then?),
-				   unused/empty in balcube, daitoride, karatour,
-				   unchecked mouja & other i4300 games )
+	int[1] hblank (bangball for faster intermission skip,
+	               puzzli for gameplay water effect,
+	               blzntrnd title screen scroll (enabled all the time then?),
+	               unused/empty in balcube, daitoride, karatour,
+	               unchecked mouja & other i4300 games )
 	int[2] blitter
 	int[3] ?            KARATOUR
 	int[4] ?

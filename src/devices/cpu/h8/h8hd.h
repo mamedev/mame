@@ -22,7 +22,7 @@ public:
 	virtual ~h8h_disassembler() = default;
 
 protected:
-	static const disasm_entry disasm_entries[];	
+	static const disasm_entry disasm_entries[];
 };
 
 #endif

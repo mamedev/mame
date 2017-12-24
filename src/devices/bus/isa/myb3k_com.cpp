@@ -24,7 +24,7 @@ SLOT_INTERFACE_END
 //**************************************************************************
 //  GLOBAL VARIABLES
 //**************************************************************************
-  
+
 DEFINE_DEVICE_TYPE(ISA8_MYB3K_COM, isa8_myb3k_com_device, "isa8_myb3k_com", "ADP4703 RS-232C Serial Card")
 
 //-------------------------------------------------
@@ -106,11 +106,11 @@ void isa8_myb3k_com_device::device_reset()
 		m_isa->install_device(base + 1, base + 1,
 					read8_delegate(FUNC(i8251_device::status_r), subdevice<i8251_device>("usart")),
 					write8_delegate(FUNC(i8251_device::control_w), subdevice<i8251_device>("usart")) );
-		
+
 		m_isa->install_device(base + 2, base + 2,
 					read8_delegate(FUNC(isa8_myb3k_com_device::dce_status), this),
 					write8_delegate(FUNC(isa8_myb3k_com_device::dce_control), this) );
-		
+
 		m_isa->install_device(base + 4, base + 7,
 					read8_delegate(FUNC(pit8253_device::read), subdevice<pit8253_device>("pit")),
 					write8_delegate(FUNC(pit8253_device::write), subdevice<pit8253_device>("pit")) );
@@ -121,7 +121,7 @@ void isa8_myb3k_com_device::device_reset()
 }
 
 //-----------------------------------------------------------
-// pit_rxc - write receive clock if pit is selected source 
+// pit_rxc - write receive clock if pit is selected source
 //-----------------------------------------------------------
 #define CLK_SEL 0x80
 WRITE_LINE_MEMBER(isa8_myb3k_com_device::pit_rxc)
@@ -133,7 +133,7 @@ WRITE_LINE_MEMBER(isa8_myb3k_com_device::pit_rxc)
 }
 
 //------------------------------------------------------------
-// pit_txc - write transmit clock if pit is selected source 
+// pit_txc - write transmit clock if pit is selected source
 //------------------------------------------------------------
 WRITE_LINE_MEMBER(isa8_myb3k_com_device::pit_txc)
 {
@@ -192,15 +192,15 @@ void isa8_myb3k_com_device::com_int()
 	// Schematics allows for more than one interrupt to be triggered but there is probably only one jumper
 	switch (m_irq)
 	{
-	case 2:	m_isa->irq2_w(state); break;
-	case 3:	m_isa->irq3_w(state); break;
-	case 4:	m_isa->irq4_w(state); break;
-	case 5:	m_isa->irq5_w(state); break;
+	case 2: m_isa->irq2_w(state); break;
+	case 3: m_isa->irq3_w(state); break;
+	case 4: m_isa->irq4_w(state); break;
+	case 5: m_isa->irq5_w(state); break;
 	}
 }
 
 //------------------------------------------------
-// dcd_w - DCD line value gated by a LS368 
+// dcd_w - DCD line value gated by a LS368
 //------------------------------------------------
 #define DCD_BIT 0x02
 WRITE_LINE_MEMBER(isa8_myb3k_com_device::dcd_w)
@@ -216,7 +216,7 @@ WRITE_LINE_MEMBER(isa8_myb3k_com_device::dcd_w)
 }
 
 //------------------------------------------------
-// ri_w - RI line value gated by a LS368 
+// ri_w - RI line value gated by a LS368
 //------------------------------------------------
 #define RI_BIT 0x01
 WRITE_LINE_MEMBER(isa8_myb3k_com_device::ri_w)
@@ -232,7 +232,7 @@ WRITE_LINE_MEMBER(isa8_myb3k_com_device::ri_w)
 }
 
 //------------------------------------------------
-// dce_control - 
+// dce_control -
 //------------------------------------------------
 #define TX_IRQ_RESET_BIT 0x40
 WRITE8_MEMBER(isa8_myb3k_com_device::dce_control)
@@ -260,13 +260,13 @@ READ8_MEMBER(isa8_myb3k_com_device::dce_status)
 static INPUT_PORTS_START( myb3k_com_dpsw )
 	PORT_START("DPSW2")
 	PORT_DIPNAME( 0x0f, 0x04, "USART ISA IRQ")
- 	PORT_DIPSETTING( 0x01, "IRQ2" )
- 	PORT_DIPSETTING( 0x02, "IRQ3" )
- 	PORT_DIPSETTING( 0x04, "IRQ4" )
- 	PORT_DIPSETTING( 0x08, "IRQ5" )
+	PORT_DIPSETTING( 0x01, "IRQ2" )
+	PORT_DIPSETTING( 0x02, "IRQ3" )
+	PORT_DIPSETTING( 0x04, "IRQ4" )
+	PORT_DIPSETTING( 0x08, "IRQ5" )
 	PORT_START("DPSW1")
 	PORT_DIPNAME( 0x7fc, 0x530, "I/O Base address")
- 	PORT_DIPSETTING( 0x000, "0x000" )
+	PORT_DIPSETTING( 0x000, "0x000" )
 	PORT_DIPSETTING( 0x008, "0x008" )
 	PORT_DIPSETTING( 0x010, "0x010" )
 	PORT_DIPSETTING( 0x018, "0x018" )

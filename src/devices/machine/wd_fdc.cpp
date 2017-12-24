@@ -6,34 +6,34 @@
 #include "debugger.h"
 
 //#define LOG_GENERAL   (1U << 0) //defined in logmacro.h already
-#define LOG_SETUP  	(1U << 1) // Shows register setup
-#define LOG_SHIFT	(1U << 2) // Shows shift register contents
-#define LOG_COMP	(1U << 3) // Shows operations on the CPU side
-#define LOG_COMMAND	(1U << 4) // Shows command invocation
-#define LOG_SYNC	(1U << 5) // Shows sync actions
-#define LOG_LINES	(1U << 6) // Show control lines
-#define LOG_EVENT	(1U << 7) // Show events
-#define LOG_MATCH	(1U << 8) // Show sector match operation
-#define LOG_DESC	(1U << 9) // Show track description
-#define LOG_WRITE	(1U << 10) // Show write operation on image
-#define LOG_TRANSITION	(1U << 11) // Show transitions
-#define LOG_STATE	(1U << 12) // Show state machine
+#define LOG_SETUP   (1U << 1) // Shows register setup
+#define LOG_SHIFT   (1U << 2) // Shows shift register contents
+#define LOG_COMP    (1U << 3) // Shows operations on the CPU side
+#define LOG_COMMAND (1U << 4) // Shows command invocation
+#define LOG_SYNC    (1U << 5) // Shows sync actions
+#define LOG_LINES   (1U << 6) // Show control lines
+#define LOG_EVENT   (1U << 7) // Show events
+#define LOG_MATCH   (1U << 8) // Show sector match operation
+#define LOG_DESC    (1U << 9) // Show track description
+#define LOG_WRITE   (1U << 10) // Show write operation on image
+#define LOG_TRANSITION  (1U << 11) // Show transitions
+#define LOG_STATE   (1U << 12) // Show state machine
 
 //#define VERBOSE (LOG_GENERAL | LOG_SETUP| LOG_COMMAND | LOG_STATE | LOG_LINES )
 //#define LOG_OUTPUT_STREAM std::cout
 
 #include "logmacro.h"
 
-#define LOGSETUP(...)	LOGMASKED(LOG_SETUP,  __VA_ARGS__)
-#define LOGSHIFT(...)	LOGMASKED(LOG_SHIFT, __VA_ARGS__)
-#define LOGCOMP(...)	LOGMASKED(LOG_COMP, __VA_ARGS__)
+#define LOGSETUP(...)   LOGMASKED(LOG_SETUP,  __VA_ARGS__)
+#define LOGSHIFT(...)   LOGMASKED(LOG_SHIFT, __VA_ARGS__)
+#define LOGCOMP(...)    LOGMASKED(LOG_COMP, __VA_ARGS__)
 #define LOGCOMMAND(...) LOGMASKED(LOG_COMMAND, __VA_ARGS__)
-#define LOGSYNC(...)	LOGMASKED(LOG_SYNC, __VA_ARGS__)
-#define LOGLINES(...)	LOGMASKED(LOG_LINES, __VA_ARGS__)
-#define LOGEVENT(...)	LOGMASKED(LOG_EVENT, __VA_ARGS__)
-#define LOGMATCH(...)	LOGMASKED(LOG_MATCH, __VA_ARGS__)
-#define LOGDESC(...)	LOGMASKED(LOG_DESC, __VA_ARGS__)
-#define LOGWRITE(...)	LOGMASKED(LOG_WRITE, __VA_ARGS__)
+#define LOGSYNC(...)    LOGMASKED(LOG_SYNC, __VA_ARGS__)
+#define LOGLINES(...)   LOGMASKED(LOG_LINES, __VA_ARGS__)
+#define LOGEVENT(...)   LOGMASKED(LOG_EVENT, __VA_ARGS__)
+#define LOGMATCH(...)   LOGMASKED(LOG_MATCH, __VA_ARGS__)
+#define LOGDESC(...)    LOGMASKED(LOG_DESC, __VA_ARGS__)
+#define LOGWRITE(...)   LOGMASKED(LOG_WRITE, __VA_ARGS__)
 #define LOGTRANSITION(...) LOGMASKED(LOG_TRANSITION, __VA_ARGS__)
 #define LOGSTATE(...) LOGMASKED(LOG_STATE, __VA_ARGS__)
 
@@ -244,7 +244,7 @@ void wd_fdc_device_base::device_timer(emu_timer &timer, device_timer_id id, int 
 
 void wd_fdc_device_base::command_end()
 {
-	LOGCOMMAND("%s\n", FUNCNAME);  
+	LOGCOMMAND("%s\n", FUNCNAME);
 	main_state = sub_state = IDLE;
 	motor_timeout = 0;
 
@@ -421,7 +421,7 @@ void wd_fdc_device_base::seek_continue()
 
 bool wd_fdc_device_base::sector_matches() const
 {
-       LOGMATCH("matching read T=%02x H=%02x S=%02x L=%02x - searched T=%02x S=%02x\n",
+	   LOGMATCH("matching read T=%02x H=%02x S=%02x L=%02x - searched T=%02x S=%02x\n",
 					cur_live.idbuf[0], cur_live.idbuf[1], cur_live.idbuf[2], cur_live.idbuf[3],
 					track, sector);
 
@@ -1031,8 +1031,8 @@ void wd_fdc_device_base::do_cmd_w()
 
 	LOGCOMMAND("%s %02x: %s\n", FUNCNAME, cmd_buffer, std::array<char const *, 16>
 		   {{"RESTORE", "SEEK", "STEP", "STEP", "STEP", "STEP", "STEP", "STEP",
-		     "READ sector start", "READ sector start", "WRITE sector start", "WRITE sector start",
-		     "READ ID start",     "INTERRUPT start",   "READ track start",   "WRITE track start"}}[(command >> 4) & 0x0f]);
+			 "READ sector start", "READ sector start", "WRITE sector start", "WRITE sector start",
+			 "READ ID start",     "INTERRUPT start",   "READ track start",   "WRITE track start"}}[(command >> 4) & 0x0f]);
 	switch(command & 0xf0) {
 	case 0x00:
 		last_dir = 1;
@@ -1558,7 +1558,7 @@ void wd_fdc_device_base::live_write_fm(uint8_t fm)
 
 void wd_fdc_device_base::live_run(attotime limit)
 {
-  //	LOG("%s\n", FUNCNAME);
+  //    LOG("%s\n", FUNCNAME);
 	if(cur_live.state == IDLE || cur_live.next_state != -1)
 		return;
 

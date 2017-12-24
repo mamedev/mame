@@ -1370,7 +1370,6 @@ files {
 	MAME_DIR .. "src/mame/machine/apricotkb.cpp",
 	MAME_DIR .. "src/mame/machine/apricotkb.h",
 	MAME_DIR .. "src/mame/drivers/victor9k.cpp",
---  MAME_DIR .. "src/mame/includes/victor9k.h",
 	MAME_DIR .. "src/mame/machine/victor9k_kb.cpp",
 	MAME_DIR .. "src/mame/machine/victor9k_kb.h",
 	MAME_DIR .. "src/mame/machine/victor9k_fdc.cpp",
@@ -2141,8 +2140,8 @@ files {
 	MAME_DIR .. "src/mame/drivers/hp48.cpp",
 	MAME_DIR .. "src/mame/includes/hp48.h",
 	MAME_DIR .. "src/mame/machine/hp48.cpp",
-        MAME_DIR .. "src/mame/machine/hp9845_printer.cpp",
-        MAME_DIR .. "src/mame/machine/hp9845_printer.h",
+	MAME_DIR .. "src/mame/machine/hp9845_printer.cpp",
+	MAME_DIR .. "src/mame/machine/hp9845_printer.h",
 	MAME_DIR .. "src/mame/video/hp48.cpp",
 	MAME_DIR .. "src/mame/drivers/hp49gp.cpp",
 	MAME_DIR .. "src/mame/drivers/hp9845.cpp",
@@ -2681,7 +2680,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/prodigy.cpp",
 	MAME_DIR .. "src/mame/machine/nl_prodigy.cpp",
 	MAME_DIR .. "src/mame/machine/nl_prodigy.h",
-      }
+}
 includedirs {
 	MAME_DIR .. "3rdparty/rapidjson/include",
 }

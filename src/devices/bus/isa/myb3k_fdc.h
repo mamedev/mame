@@ -33,7 +33,7 @@ protected:
 
 	virtual uint8_t dack_r(int line) override;
 	virtual void dack_w(int line, uint8_t data) override;
-	//	virtual void eop_w(int state) override;
+	//  virtual void eop_w(int state) override;
 
 	DECLARE_READ8_MEMBER(myb3k_inv_fdc_data_r);
 	DECLARE_WRITE8_MEMBER(myb3k_inv_fdc_data_w);

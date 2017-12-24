@@ -640,7 +640,7 @@ do                                                                              
 	if (m_delay_slot)                                                               \
 	{                                                                               \
 		PC = m_delay_pc;                                                            \
-		m_delay_slot = 0;                                                       	\
+		m_delay_slot = 0;                                                           \
 	}                                                                               \
 } while (0)
 

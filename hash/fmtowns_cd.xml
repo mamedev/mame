@@ -4978,7 +4978,7 @@ User/save disks that can be created from the game itself are not included.
 		Origin: Private dump (Reuental)
 		<rom name="ISHIN_NO_ARASHI.mdf" size="502741200" crc="33a4b201" sha1="4666a1c55405acefd13f17608645df0bac1583fc"/>
 		<rom name="ISHIN_NO_ARASHI.mds" size="1024" crc="cfb06454" sha1="05e023f2567feca6c984aeba9385cbfaac878cab"/>
-		
+
 		*after conversion with IsoBuster+EAC *
 		<rom name="ishin.cue" size="1123" crc="ab69674c" sha1="6ac864e1572e04e6382fe4bac453bc14ba8ef461"/>
 		<rom name="ishin_track01.bin" size="20462400" crc="be4b061a" sha1="99fca8c1ef5dedb879d82eb932b6cf1f70a8659a"/>

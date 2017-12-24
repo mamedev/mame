@@ -1625,7 +1625,7 @@ void memory_manager::allocate(device_memory_interface &memory)
 						memory.allocate<address_space_8_8be_small>(*this, spacenum);
 				}
 				break;
-	
+
 			case 16:
 				switch (spaceconfig->addr_shift())
 				{
@@ -1681,7 +1681,7 @@ void memory_manager::allocate(device_memory_interface &memory)
 					break;
 				}
 				break;
-	
+
 			case 32:
 				switch (spaceconfig->addr_shift())
 				{
@@ -1737,7 +1737,7 @@ void memory_manager::allocate(device_memory_interface &memory)
 					break;
 				}
 				break;
-	
+
 			case 64:
 				switch (spaceconfig->addr_shift())
 				{
@@ -1810,7 +1810,7 @@ void memory_manager::allocate(device_memory_interface &memory)
 					break;
 				}
 				break;
-	
+
 			default:
 				throw emu_fatalerror("Invalid width %d specified for address_space::allocate", spaceconfig->data_width());
 			}
@@ -3057,7 +3057,7 @@ void address_space::invalidate_read_caches()
 	case -1: static_cast<direct_read_data<-1> *>(m_direct)->force_update(); break;
 	case -2: static_cast<direct_read_data<-2> *>(m_direct)->force_update(); break;
 	case -3: static_cast<direct_read_data<-3> *>(m_direct)->force_update(); break;
-	}	
+	}
 }
 
 void address_space::invalidate_read_caches(u16 entry)
@@ -3068,7 +3068,7 @@ void address_space::invalidate_read_caches(u16 entry)
 	case -1: static_cast<direct_read_data<-1> *>(m_direct)->force_update(entry); break;
 	case -2: static_cast<direct_read_data<-2> *>(m_direct)->force_update(entry); break;
 	case -3: static_cast<direct_read_data<-3> *>(m_direct)->force_update(entry); break;
-	}	
+	}
 }
 
 void address_space::invalidate_read_caches(offs_t start, offs_t end)
@@ -3079,7 +3079,7 @@ void address_space::invalidate_read_caches(offs_t start, offs_t end)
 	case -1: static_cast<direct_read_data<-1> *>(m_direct)->remove_intersecting_ranges(start, end); break;
 	case -2: static_cast<direct_read_data<-2> *>(m_direct)->remove_intersecting_ranges(start, end); break;
 	case -3: static_cast<direct_read_data<-3> *>(m_direct)->remove_intersecting_ranges(start, end); break;
-	}	
+	}
 }
 
 

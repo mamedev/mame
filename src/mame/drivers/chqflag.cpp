@@ -7,12 +7,12 @@
     Notes:
     - 007232 volume & panning control is almost certainly wrong;
     - 051733 opponent cars have wrong RNG colors compared to references;
-    - 051733 opponent car-to-car collisions direction are wrong, according 
-	  to reference orange car should shift to the left instead (current emulation 
-	  makes them to wall crash most of the time instead);
-	- needs proper shadow/highlight factor values for sprites and tilemap;
-	- compared to references, emulation is a bit slower (around 2/3 seconds 
-	  behind on a full lap of stage 2);
+    - 051733 opponent car-to-car collisions direction are wrong, according
+      to reference orange car should shift to the left instead (current emulation
+      makes them to wall crash most of the time instead);
+    - needs proper shadow/highlight factor values for sprites and tilemap;
+    - compared to references, emulation is a bit slower (around 2/3 seconds
+      behind on a full lap of stage 2);
 
     2008-07
     Dip locations and recommended settings verified with manual

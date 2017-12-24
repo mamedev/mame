@@ -13,15 +13,15 @@
     - inputs for i4300;
     - hyprduel.cpp uses scanline attribute which crawls to unusable state
       with current video routines here;
- 	- CRT Controller, also understand why it needs so many writes before actual parameters;
-	- Wrong color bars in service mode (e.g. balcube, toride2g). They use solid color tiles (80xx), 
-	  but the right palette is not at 00-ff.
-	  Related to the unknown table in the RAM mapped just before the palette?
-	  Update: the colors should have a common bank of 0xb (so 0x8bxx), it's unknown why the values 
-	  diverges, the blitter is responsible of that upload fwiw;
-    - Some gfx problems in ladykill, 3kokushi, puzzli, gakusai, seem related to how we handle 
-	  windows, wrapping, read-modify-write areas;
-	- puzzli: emulate hblank irq and fix video routines here (water effect not emulated?);
+    - CRT Controller, also understand why it needs so many writes before actual parameters;
+    - Wrong color bars in service mode (e.g. balcube, toride2g). They use solid color tiles (80xx),
+      but the right palette is not at 00-ff.
+      Related to the unknown table in the RAM mapped just before the palette?
+      Update: the colors should have a common bank of 0xb (so 0x8bxx), it's unknown why the values
+      diverges, the blitter is responsible of that upload fwiw;
+    - Some gfx problems in ladykill, 3kokushi, puzzli, gakusai, seem related to how we handle
+      windows, wrapping, read-modify-write areas;
+    - puzzli: emulate hblank irq and fix video routines here (water effect not emulated?);
 
 ============================================================================
 

@@ -13,7 +13,7 @@
 
   TODO:
   - fix set_unscaled_clock() changes (currently done only by vgmplay driver)
-  
+
 ***************************************************************************/
 
 #include "emu.h"

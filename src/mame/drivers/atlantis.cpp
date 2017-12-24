@@ -21,7 +21,7 @@
         * Actiontec PM560LKI PCI Data/Fax Modem (PCI\VEN_11C1&DEV_0480&SUBSYS_04801668)
         * TL16c552 dual UART
         * ADSP-2181 based DCS2 audio (unclear which variant)
-		* Micron MT48LC1M16A1 1Mx16 SDRAM, 2X (4MB) for audio
+        * Micron MT48LC1M16A1 1Mx16 SDRAM, 2X (4MB) for audio
         * ICS AV9110 Serially Programmable Frequency Generator.  Programmed through ADSP FL0,FL1,FL2 pins.
         * Cirrus Logic CS4338 16 bit stereo audio serial DAC, PCB has space for 3 chips (6-channels), only 1 is populated
         * Maxim MAX192 8 channel 10 bit serial ADC

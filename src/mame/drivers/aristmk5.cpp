@@ -2965,7 +2965,7 @@ ROM_END
 ROM_START( chickna5b )
 	ARISTOCRAT_MK5_BIOS
 	/*
-        (need proper info about the checksum routines).
+	    (need proper info about the checksum routines).
 	*/
 	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
 	ROM_LOAD32_WORD( "01j01886.u7",  0x000000, 0x80000, CRC(6852bf73) SHA1(a53c8467f4a128da26707a1fe239f32330dffe0a) )
@@ -3837,7 +3837,7 @@ ROM_END
 // Green Lizard [Reel Game] / Export / A - 05/01/01
 // Requires set chip version: 4.04.xx
 // Variation (% and NO):
-// Doesn't requires touch screen 
+// Doesn't requires touch screen
 ROM_START( glizardu )
 	ARISTOCRAT_MK5_BIOS
 	/*
@@ -4458,7 +4458,7 @@ ROM_END
 // KEEP YOUR HAT ON / Export / B - 08/05/2000
 // Requires set chip version: 4.01.xx
 // Variation (% and NO)
-// Requires touch screen 
+// Requires touch screen
 ROM_START( kyhatonu )
 	ARISTOCRAT_MK5_BIOS
 	/*
@@ -4548,12 +4548,12 @@ ROM_END
 ROM_START( locolootu )
 	ARISTOCRAT_MK5_BIOS
 /*
-	Checksum code found at 0x000d18
-	0x000000-0x0e94fb is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
-	    Expected Checksum   0xbd28f614
-	    Calculated Checksum 0xbd28f614  (OK)
-	0x0e94fc-0x170993 is the non-Checksummed range still containing data but NOT covered by Checksum
-	0x0e94fc-0x1fffff is the non-Checksummed range if the additional vectors? at the end are included
+    Checksum code found at 0x000d18
+    0x000000-0x0e94fb is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
+        Expected Checksum   0xbd28f614
+        Calculated Checksum 0xbd28f614  (OK)
+    0x0e94fc-0x170993 is the non-Checksummed range still containing data but NOT covered by Checksum
+    0x0e94fc-0x1fffff is the non-Checksummed range if the additional vectors? at the end are included
 */
 	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
 	ROM_LOAD32_WORD( "ahg1513.u7",  0x000000, 0x80000, CRC(16854250) SHA1(a3b6e112dcce38310ca13eb9e9851901ee213fcf) )

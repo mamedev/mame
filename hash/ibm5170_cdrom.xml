@@ -24,7 +24,7 @@
 		Alien Incident
 		English - French - German
 
-		Gametek(R)		compro games
+		Gametek(R)      compro games
 
 		(C) 1996 Gametek UK
 		All rights reserved
@@ -467,7 +467,7 @@
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<!-- Windows 3.1 -->
 	<!-- TODO: gfx shift issue on 256 color mode -->
 	<software name="spaceinv" supported="partial">
@@ -512,7 +512,7 @@
 		</part>
 	</software>
 
-	
+
 	<!-- Windows 95/98/ME/XP and Mac OS supported -->
 	<!-- Requires 256 colors minimum otherwise they crashes at boot -->
 	<software name="v16imagine">
@@ -536,7 +536,7 @@
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<!-- Windows 95 -->
 	<!-- Contains Pressure Drop and Under Pressure games -->
 	<software name="wpressure">
@@ -563,7 +563,7 @@
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="zyclunt" supported="no">
 		<description>Zyclunt</description>
 		<year>1995</year>

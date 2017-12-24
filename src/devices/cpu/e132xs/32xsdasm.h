@@ -37,7 +37,7 @@ private:
 
 	int size;
 	u8 global_fp;
-	
+
 	void LL_format(char *source, char *dest, uint16_t op);
 	void LR_format(char *source, char *dest, uint16_t op);
 	void RR_format(char *source, char *dest, uint16_t op, unsigned h_flag);

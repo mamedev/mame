@@ -683,7 +683,7 @@ void running_machine::immediate_load(const char *filename)
 
 
 //-------------------------------------------------
-//  rewind_capture - capture and append a new 
+//  rewind_capture - capture and append a new
 //  state to the rewind list
 //-------------------------------------------------
 

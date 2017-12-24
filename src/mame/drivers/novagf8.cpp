@@ -7,8 +7,8 @@
 
     TODO:
     - ccdelta1 doesn't work, goes bonkers when you press Enter. CPU core bug?
-	- hardware is similar to MK I, the drivers can be merged in theory.
-	  But I prefer my source code to be licensed BSD3, mk1.cpp is GPL2.
+    - hardware is similar to MK I, the drivers can be merged in theory.
+      But I prefer my source code to be licensed BSD3, mk1.cpp is GPL2.
 
 ******************************************************************************
 

@@ -717,7 +717,7 @@ void ymz774_device::sequencer()
 				switch (reg)
 				{
 				case 0xff: // end
-					for (int ch = 0; ch < 16; ch++)	// might be wrong, ie not needed in case of loop
+					for (int ch = 0; ch < 16; ch++) // might be wrong, ie not needed in case of loop
 						if (sequence.stopchan & (1 << ch))
 							m_channels[ch].is_playing = false;
 					if (sequence.loop)

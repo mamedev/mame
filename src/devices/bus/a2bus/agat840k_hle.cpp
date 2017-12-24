@@ -66,7 +66,7 @@ MACHINE_CONFIG_MEMBER( a2bus_agat840k_hle_device::device_add_mconfig )
 
 	MCFG_DEVICE_ADD("d15", I8255, 0)
 	MCFG_I8255_IN_PORTA_CB(READ8(a2bus_agat840k_hle_device, d15_i_a)) // read data
-//	MCFG_I8255_OUT_PORTB_CB(WRITE8(a2bus_agat840k_hle_device, d15_o_b)) // write data
+//  MCFG_I8255_OUT_PORTB_CB(WRITE8(a2bus_agat840k_hle_device, d15_o_b)) // write data
 	MCFG_I8255_IN_PORTC_CB(READ8(a2bus_agat840k_hle_device, d15_i_c))
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(a2bus_agat840k_hle_device, d15_o_c))
 MACHINE_CONFIG_END
@@ -352,7 +352,7 @@ READ8_MEMBER(a2bus_agat840k_hle_device::d14_i_b)
 	m_floppy->floppy_drive_set_ready_state(FLOPPY_DRIVE_READY, 1);
 
 	data |= (m_floppy->floppy_index_r() << 4) ^ 0x10;
-//	data |= m_floppy->floppy_wpt_r() << 5;
+//  data |= m_floppy->floppy_wpt_r() << 5;
 	data |= m_floppy->floppy_tk00_r() << 6;
 	data |= m_floppy->floppy_ready_r() << 7;
 
@@ -364,14 +364,14 @@ READ8_MEMBER(a2bus_agat840k_hle_device::d14_i_b)
 }
 
 /*
- * b0	AH	strong write precomp
- * b1	--	NC
- * b2	--	step direction (1 - inward, 0 - outward)
- * b3	--	drive select (0 - drive 1, 1 - drive 2)
- * b4	--	head select (0 - bottom, 1 - top)
- * b5	AH	write precomp off
- * b6	AH	write enable
- * b7	AH	motor on
+ * b0   AH  strong write precomp
+ * b1   --  NC
+ * b2   --  step direction (1 - inward, 0 - outward)
+ * b3   --  drive select (0 - drive 1, 1 - drive 2)
+ * b4   --  head select (0 - bottom, 1 - top)
+ * b5   AH  write precomp off
+ * b6   AH  write enable
+ * b7   AH  motor on
  *
  * C0x2
  */
@@ -411,7 +411,7 @@ READ8_MEMBER(a2bus_agat840k_hle_device::d15_i_a)
 {
 	const u16 data = m_tracks[(2 * m_floppy->floppy_drive_get_current_track()) + m_side][m_count_read];
 	LOG("sector data: %02x @ %4d (head %d track %2d)%s\n", data & 0xff, m_count_read,
-		m_side, m_floppy->floppy_drive_get_current_track(), 
+		m_side, m_floppy->floppy_drive_get_current_track(),
 		BIT(data, 14) ? " volume" : (BIT(data, 13) ? " cksum" : ""));
 
 	return data & 0xff;
@@ -419,8 +419,8 @@ READ8_MEMBER(a2bus_agat840k_hle_device::d15_i_a)
 
 // C0x6
 //
-// b6	AL	desync detected
-// b7	AH	read or write data ready
+// b6   AL  desync detected
+// b7   AH  read or write data ready
 READ8_MEMBER(a2bus_agat840k_hle_device::d15_i_c)
 {
 	LOG("status B:       @ %4d %s %s (%s)\n", m_count_read,
@@ -432,10 +432,10 @@ READ8_MEMBER(a2bus_agat840k_hle_device::d15_i_c)
 
 // C0x7
 //
-// b0	--	connected to b7, set if m_intr[PORT_B]
-// b2	AH	b7 = ready for write data
-// b3	--	connected to b7, set if m_intr[PORT_A]
-// b4	AH	b7 = read data ready
+// b0   --  connected to b7, set if m_intr[PORT_B]
+// b2   AH  b7 = ready for write data
+// b3   --  connected to b7, set if m_intr[PORT_A]
+// b4   AH  b7 = read data ready
 WRITE8_MEMBER(a2bus_agat840k_hle_device::d15_o_c)
 {
 	if (BIT(data, 0) || BIT(data, 3))

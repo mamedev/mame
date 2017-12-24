@@ -728,7 +728,7 @@ void towns_state::render_sprite_4(uint32_t poffset, uint32_t coffset, uint16_t x
 	int xdir,ydir;
 	int width = (m_video.towns_crtc_reg[12] - m_video.towns_crtc_reg[11]) / (((m_video.towns_crtc_reg[27] & 0x0f00) >> 8)+1);
 	int height = (m_video.towns_crtc_reg[16] - m_video.towns_crtc_reg[15]) / (((m_video.towns_crtc_reg[27] & 0xf000) >> 12)+2);
-	
+
 	if (rotation)
 	{
 		std::swap (x,y);
@@ -738,7 +738,7 @@ void towns_state::render_sprite_4(uint32_t poffset, uint32_t coffset, uint16_t x
 
 	if(xflip)
 	{
-		if (xhalfsize) 
+		if (xhalfsize)
 		{
 			xstart = x+6;
 			xdir = -1;
@@ -753,7 +753,7 @@ void towns_state::render_sprite_4(uint32_t poffset, uint32_t coffset, uint16_t x
 	else
 	{
 		xstart = x+1;
-		if (xhalfsize) 
+		if (xhalfsize)
 		{
 			xend = x+9;
 			xdir = 1;
@@ -776,7 +776,7 @@ void towns_state::render_sprite_4(uint32_t poffset, uint32_t coffset, uint16_t x
 	else
 	{
 		ystart = y;
-		if (yhalfsize) 
+		if (yhalfsize)
 			yend = y+8;
 		else
 			yend = y+16;
@@ -787,12 +787,12 @@ void towns_state::render_sprite_4(uint32_t poffset, uint32_t coffset, uint16_t x
 	ystart &= 0x1ff;
 	yend &= 0x1ff;
 	poffset &= 0x1ffff;
-	
+
 	for(ypos=ystart;ypos!=yend;ypos+=ydir,ypos&=0x1ff)
 	{
 		for(xpos=xstart;xpos!=xend;xpos+=xdir,xpos&=0x1ff)
 		{
-			
+
 			if(m_video.towns_sprite_page != 0)
 				voffset = 0x20000;
 			else
@@ -831,7 +831,7 @@ void towns_state::render_sprite_4(uint32_t poffset, uint32_t coffset, uint16_t x
 						voffset-=(m_video.towns_crtc_reg[24] * 4);
 					else
 						voffset-=2;
-				
+
 				pixel = m_towns_txtvram[poffset] & 0x0f;
 				col = m_towns_txtvram[coffset+(pixel*2)] | (m_towns_txtvram[coffset+(pixel*2)+1] << 8);
 				if((m_video.towns_sprite_page != 0 && voffset > 0x1ffff && voffset < 0x40000)
@@ -948,7 +948,7 @@ void towns_state::render_sprite_16(uint32_t poffset, uint16_t x, uint16_t y, boo
 				poffset+=2;
 			poffset &= 0x1ffff;
 		}
-		
+
 		if (yhalfsize)
 			poffset+=16;
 	}
@@ -984,7 +984,7 @@ void towns_state::draw_sprites(const rectangle* rect)
 		rotation = (attr & 0x4000) >> 14;
 		xhalfsize = (attr & 0x400) >> 10;
 		yhalfsize = (attr & 0x800) >> 11;
-		
+
 		if(attr & 0x8000)
 		{
 			x += xoff;
