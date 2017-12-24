@@ -72,27 +72,20 @@
 		</part>
 	</software>
 
-	<!-- Untouched image from original CD created with an ASUS DRW-1814BLT (EAC drive sample read offset reported as +6)
-	   If you subtract 0x18 (4 * 6) bytes from a .wav extracted from this CHD the audio matches a rip done with EAC (verified) -->
-	<software name="krondor">
-		<description>Betrayal at Krondor (1994 release, CDDA)</description>
-		<year>1994</year>
-		<publisher>Dynamix</publisher>
+	
+	<!-- 
+	Register key:
+	BB2KLEJP-50008573
+	2640849512
+	-->
+	<software name="batlbeatle" supported="no">
+		<description>Battle BEAT 2000 L.E (Japan)</description>
+		<year>2000</year>
+		<publisher>NEC Interchannel</publisher>
 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
-				<disk name="betrayal_at_krondor" sha1="f0d0907edccfc4f6ab4f181b0d2e9a3b18f81e73" />
-			</diskarea>
-		</part>
-	</software>
-
-	<software name="krondora" cloneof="krondor">
-		<description>Betrayal at Krondor (1998 release, no CDDA)</description>
-		<year>1998</year>
-		<publisher>Dynamix</publisher>
-		<part name="cdrom" interface="cdrom">
-			<diskarea name="cdrom">
-				<disk name="betrayal_at_krondor_1998" sha1="d58acdb5bc10c2ad9a4b6dd51438102785c44216" />
+				<disk name="bb2kle" sha1="a31e35f15dda264e88ff5457d1b620c6fad4a15c" />
 			</diskarea>
 		</part>
 	</software>
@@ -111,6 +104,33 @@
 		</part>
 	</software>
 
+	<!-- TODO: black screens after introduction scenes, i.e. when it's supposed to switch to the 1st actual gameplay scene -->
+	<software name="briganty" supported="no">
+		<description>Briganty - The Roots of Darkness for Windows (Japan)</description>
+		<year>1999</year>
+		<publisher>Giga</publisher>
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="briganty" sha1="f83dd61213eccb7b037eae81508b44bc12690e97" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Windows & Macintosh -->
+	<!-- TODO: huge gfx issues -->
+	<software name="choroq" supported="no">
+		<description>Bakusou PC Choro Q (Japan)</description>
+		<year>1998</year>
+		<publisher>Takara / Inner Brain</publisher>
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="choroq" sha1="485d19839da7c16d34ad4a5b929a7e60d174d1e6" />
+			</diskarea>
+		</part>
+	</software>
+	
 	<!-- Windows 95 -->
 	<!-- Very slow on 486 -->
 	<!-- TODO: has transparency issues on main menu -->
@@ -119,6 +139,7 @@
 		<year>1997</year>
 		<publisher>Monolith Productions Inc.</publisher>
 		<info name="version" value="1.2" />
+		
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="clawj" sha1="eb48e779ba6cb342fa661f3aa64df23149f16449" />
@@ -193,6 +214,22 @@
 		</part>
 	</software>
 
+	<!-- Windows 95 -->
+	<!-- 256 colors / 800x600 -->
+	<!-- TODO: no sound? -->
+	<software name="geolight" supported="partial">
+		<description>Geo Light Moon (Japan v1.00)</description>
+		<year>1997</year>
+		<publisher>Nihon Softec / J-Ware</publisher>
+		<info name="version" value="1.00" />
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="geolight" sha1="e49202c3ff76db5f7fb5f794655d40cc91acb4d9" />
+			</diskarea>
+		</part>
+	</software>
+	
 	<!-- Windows 3.1 / Windows 95 -->
 	<!-- 256 colors minimum -->
 	<!-- TODO: gfx issues -->
@@ -286,6 +323,42 @@
 		</part>
 	</software>
 
+	<!-- Untouched image from original CD created with an ASUS DRW-1814BLT (EAC drive sample read offset reported as +6)
+	   If you subtract 0x18 (4 * 6) bytes from a .wav extracted from this CHD the audio matches a rip done with EAC (verified) -->
+	<software name="krondor">
+		<description>Betrayal at Krondor (1994 release, CDDA)</description>
+		<year>1994</year>
+		<publisher>Dynamix</publisher>
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="betrayal_at_krondor" sha1="f0d0907edccfc4f6ab4f181b0d2e9a3b18f81e73" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="krondora" cloneof="krondor">
+		<description>Betrayal at Krondor (1998 release, no CDDA)</description>
+		<year>1998</year>
+		<publisher>Dynamix</publisher>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="betrayal_at_krondor_1998" sha1="d58acdb5bc10c2ad9a4b6dd51438102785c44216" />
+			</diskarea>
+		</part>
+	</software>
+	
+	<software name="moon" supported="no">
+		<description>Moon (Japan)</description>
+		<year>1998</year>
+		<publisher>Over Rise</publisher>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="moon" sha1="fbed194fc5a070dd7be8dc20f990dda9e73a2322" />
+			</diskarea>
+		</part>
+	</software>
+	
 	<!-- Windows 95 -->
 	<!-- Pentium class -->
 	<!-- Direct 3D -->
@@ -426,6 +499,17 @@
 		</part>
 	</software>
 
+	<software name="sasuberi">
+		<description>Saru Suberi (Japan)</description>
+		<year>1997</year>
+		<publisher>Witty Wolf</publisher>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="sarusuberi" sha1="44b9dac3e60169b45a774a2e3f1986275309c4df" />
+			</diskarea>
+		</part>
+	</software>
+	
 	<!-- Windows 95 / Mac OS Japan AppleTalk 7.5 -->
 	<!-- Requires 16-bit True Color and 800x600 screen resolution -->
 	<software name="segata" supported="partial">
@@ -433,6 +517,7 @@
 		<year>1998</year>
 		<publisher>Sega</publisher>
 		<info name="alt_title" value="せがた三四郎超人伝説" />
+		
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="segata" sha1="0d7a6d9a7143d0309d44c1356f68c15a05949257" />
@@ -440,11 +525,41 @@
 		</part>
 	</software>
 
+	<!-- Windows 95 / NT 4 -->
+	<!-- High Color 16-bit -->
+	<software name="seraphim" supported="partial">
+		<description>Seraphim Saigo No Tenshi (Japan)</description>
+		<year>1997</year>
+		<publisher>Soeishinsha</publisher>
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="seraphim" sha1="ebf5dfec275ff0427ac8bcff34ddf84972636602" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Windows 95 & Macintosh -->
+	<software name="silicon" supported="partial">
+		<description>Silicon Scream (Japan)</description>
+		<year>1995</year>
+		<publisher>JVC Advanced Media / NEC Interchannel / Off-World Communications</publisher>
+		<info name="alt_title" value="シリコンスクリーム" />
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="silicon" sha1="b20f8e685d17a0a4def35a5a11672e6779846b30" />
+			</diskarea>
+		</part>
+	</software>
+
+	
 	<software name="sideline">
 		<description>Sideline</description>
 		<year>1996</year>
 		<publisher>EMAG Soft</publisher>
 		<info name="version" value="1.20" />
+
 		<part name="cdrom" interface="cdrom">
 			<feature name="disk_label" value="Sideline" />
 			<diskarea name="cdrom">
@@ -461,6 +576,7 @@
 		<year>1998</year>
 		<publisher>Anjin / Sprite</publisher>
 		<info name="alt_title" value="シルクロード 星の島の物語" />
+
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="silkroad" sha1="e1b532b3acaf6dfb16d7165e6cbebbf92e98ee49" />
@@ -474,8 +590,8 @@
 		<description>Space Invaders for Windows</description>
 		<year>1997</year>
 		<publisher>Wiz / Taito</publisher>
+
 		<part name="cdrom" interface="cdrom">
-			<feature name="disk_label" value="Sideline" />
 			<diskarea name="cdrom">
 				<disk name="si_4" sha1="0827a8a8f6602fd0947396b9ef96e449eb7a4d5c" />
 			</diskarea>
@@ -551,7 +667,7 @@
 	</software>
 
 	<!-- Windows required -->
-	<!-- TODO: Pressing F12 in-game causes an OS crash / switch to DOS prompt??? -->
+	<!-- TODO: Pressing F12 in-game supposedly should switch to full screen mode but instead it hardlocks OS by switching to a DOS text mode -->
 	<software name="zombiewrj" supported="partial">
 		<description>Halloween Harry in Zombie Wars (Japan ver 1.0R)</description>
 		<year>1996</year>
