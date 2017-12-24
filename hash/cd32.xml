@@ -3,6 +3,18 @@
 <softwarelist name="cd32" description="Amiga CD-32 CD-ROMs">
 
 	<!--- Sourced from Redump -->
+	
+	<!-- Doesn't boot -->
+	<software name="arabian" supported="no">
+		<description>Arabian Nights</description>
+		<year>1993</year>
+		<publisher>Krisalis Software</publisher>
+		<part name="cdrom" interface="cd32_cdrom">
+			<diskarea name="cdrom">
+				<disk name="arabian nights (europe) (en,fr,de,it)" sha1="1199d1e5303f6e9cac6df78d0c032ad5a97387bd"/>
+			</diskarea>
+		</part>
+	</software>
 
 	<software name="abseqwak" supported="no">
 		<description>Alien Breed - Special Edition + Qwak</description>
@@ -73,6 +85,102 @@
 		</part>
 	</software>
 
+	<!-- Appears to work? -->
+	<software name="basejump" supported="partial">
+		<description>Base Jumpers</description>
+		<year>1995</year>
+		<publisher>Rasputin Software</publisher>
+		<part name="cdrom" interface="cd32_cdrom">
+			<diskarea name="cdrom">
+				<disk name="base jumpers (europe)" sha1="9ef68bd83d199015dc3180333da79a8292908365"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Works as far as tested -->
+	<software name="beavers" supported="partial">
+		<description>Beavers</description>
+		<year>1994</year>
+		<publisher>Grandslam</publisher>
+		<part name="cdrom" interface="cd32_cdrom">
+			<diskarea name="cdrom">
+				<disk name="beavers (europe)" sha1="5d7e7b4dcbacf92c6ec17632f124dcd27ab333fd"/>
+			</diskarea>
+		</part>
+	</software>
+	
+	<!-- Doesn't boot -->
+	<software name="benefact" supported="no">
+		<description>Benefactor</description>
+		<year>1994</year>
+		<publisher>Psygnosis</publisher>
+		<part name="cdrom" interface="cd32_cdrom">
+			<diskarea name="cdrom">
+				<disk name="benefactor (europe)" sha1="3a2add193cc9869a16a37090eaddc5ce98b36bc8"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Doesn't boot -->
+	<software name="blkviper" supported="no">
+		<description>Black Viper</description>
+		<year>1996</year>
+		<publisher>Neo Software</publisher>
+		<part name="cdrom" interface="cd32_cdrom">
+			<diskarea name="cdrom">
+				<disk name="black viper (europe) (en,de,it)" sha1="9fffbfb004596330d5befd2011216c1640cfa5d5"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Doesn't boot -->
+	<software name="btoads" supported="no">
+		<description>Battletoads</description>
+		<year>1994</year>
+		<publisher>Mindscape</publisher>
+		<part name="cdrom" interface="cd32_cdrom">
+			<diskarea name="cdrom">
+				<disk name="battletoads (europe)" sha1="31278a9d639c93cc48f2780a682d3c86e6e6ab5d"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Doesn't boot -->
+	<software name="bubba" supported="no">
+		<description>Bubba 'N' Stix</description>
+		<year>1994</year>
+		<publisher>Core</publisher>
+		<part name="cdrom" interface="cd32_cdrom">
+			<diskarea name="cdrom">
+				<disk name="bubba n stix (europe)" sha1="32f0704bc31e357c9bc98c85d16718ae5302d569"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Doesn't boot -->
+	<software name="bubblesq" supported="no">
+		<description>Bubble 'N Squeak</description>
+		<year>1994</year>
+		<publisher>Audiogenic</publisher>
+		<part name="cdrom" interface="cd32_cdrom">
+			<diskarea name="cdrom">
+				<disk name="bubble and squeak (europe)" sha1="fc9bc6d45a891a88c517870923bba0be6f5cb74e"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Freezes on high score screen? -->
+	<software name="bumpburn" supported="partial">
+		<description>Bump 'N Burn</description>
+		<year>1994</year>
+		<publisher>Grandslam</publisher>
+		<part name="cdrom" interface="cd32_cdrom">
+			<diskarea name="cdrom">
+				<disk name="bump n burn (europe)" sha1="15c624de3acbbc6e23b45deefbe5b007e4eaf8ab"/>
+			</diskarea>
+		</part>
+	</software>	
+
 	<!-- Freezes after the intro, glitchy graphics-->
 	<software name="chaoseng" supported="no">
 		<description>The Chaos Engine</description>
@@ -84,7 +192,67 @@
 			</diskarea>
 		</part>
 	</software>
+	
+	<!-- Doesn't boot -->
+	<software name="chuckrck" supported="no">
+		<description>Chuck Rock</description>
+		<year>1994</year>
+		<publisher>Core</publisher>
+		<part name="cdrom" interface="cd32_cdrom">
+			<diskarea name="cdrom">
+				<disk name="chuck rock (europe)" sha1="23f177c36a219d5b604bbf9091231c0133f94926"/>
+			</diskarea>
+		</part>
+	</software>
 
+	<!-- Doesn't boot -->
+	<software name="chukrck2" supported="no">
+		<description>Chuck Rock II - Son of Chuck</description>
+		<year>1994</year>
+		<publisher>Core</publisher>
+		<part name="cdrom" interface="cd32_cdrom">
+			<diskarea name="cdrom">
+				<disk name="chuck rock ii - son of chuck (europe)" sha1="6fc1f9194487d4431a0b39510d10575fcd5d09ad"/>
+			</diskarea>
+		</part>
+	</software>
+	
+	<!-- Doesn't boot -->
+	<software name="darkseed" supported="no">
+		<description>Darkseed</description>
+		<year>1994</year>
+		<publisher>Cyberdreams</publisher>
+		<part name="cdrom" interface="cd32_cdrom">
+			<diskarea name="cdrom">
+				<disk name="darkseed (europe)" sha1="6122a88390ed1e258190bc3f3009997f3a7e778e"/>
+			</diskarea>
+		</part>
+	</software>
+	
+	<!-- v1.01, appears to work -->
+	<software name="deepcore" supported="partial">
+		<description>Deep Core</description>
+		<year>1993</year>
+		<publisher>ICE</publisher>
+		<part name="cdrom" interface="cd32_cdrom">
+			<diskarea name="cdrom">
+				<disk name="deep core (europe)" sha1="653a2112634619ec6df2be3f4ac98a1a61fbee1e"/>
+			</diskarea>
+		</part>
+	</software>
+	
+	<!-- Appears to work? -->
+	<software name="dgen">
+		<description>D-Generation</description>
+		<year>1993</year>
+		<publisher>Mindscape</publisher>
+		<part name="cdrom" interface="cd32_cdrom">
+			<diskarea name="cdrom">
+				<disk name="d-generation (europe)" sha1="caefe01fe46eee977e9d46f32ecc3bbf37acb613"/>
+			</diskarea>
+		</part>
+	</software>	
+	
 	<!-- Doesn't progress past loading screen-->
 	<software name="disphero" supported="no">
 		<description>Disposable Hero</description>
@@ -96,10 +264,70 @@
 			</diskarea>
 		</part>
 	</software>
+	
+	<!-- Doesn't boot -->
+	<software name="donk" supported="no">
+		<description>Donk! The Samurai Duck!</description>
+		<year>1994</year>
+		<publisher>Supervision</publisher>
+		<part name="cdrom" interface="cd32_cdrom">
+			<diskarea name="cdrom">
+				<disk name="donk (europe)" sha1="ea2998f8d0a0728c3e6c1d9f7cdf0f6723792bbc"/>
+			</diskarea>
+		</part>
+	</software>
+	
+	<!-- Doesn't boot -->
+	<software name="dstone" supported="no">
+		<description>Dragonstone</description>
+		<year>1995</year>
+		<publisher>Core</publisher>
+		<part name="cdrom" interface="cd32_cdrom">
+			<diskarea name="cdrom">
+				<disk name="dragonstone (europe)" sha1="43b3408395549c877ddcbc405b35d13d26b085b0"/>
+			</diskarea>
+		</part>
+	</software>
 
+	<!-- Doesn't boot -->
+	<software name="dstreets" supported="no">
+		<description>Dangerous Streets</description>
+		<year>1994</year>
+		<publisher>Flair</publisher>
+		<part name="cdrom" interface="cd32_cdrom">
+			<diskarea name="cdrom">
+				<disk name="dangerous streets (europe) (en,fr,de,it)" sha1="1f5e47178af36e299489589065ec0354c9ed3136"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Doesn't boot -->
+	<software name="emerald" supported="no">
+		<description>Emerald Mines</description>
+		<year>1994</year>
+		<publisher>Almathera</publisher>
+		<part name="cdrom" interface="cd32_cdrom">
+			<diskarea name="cdrom">
+				<disk name="emerald mines (europe)" sha1="0b12f7863bc94f3f8b2e0b362242be4daec6b43f"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Appears to work as far as tested -->
+	<software name="fireforc" supported="partial">
+		<description>Fireforce</description>
+		<year>1994</year>
+		<publisher>ICE</publisher>
+		<part name="cdrom" interface="cd32_cdrom">
+			<diskarea name="cdrom">
+				<disk name="fire force (europe)" sha1="9172161a616b456983f149a1eb8659375d35cd90"/>
+			</diskarea>
+		</part>
+	</software>
+	
 	<!-- Glitchy graphics -->
 	<software name="fireice" supported="partial">
-		<description>Fire Ice - The Daring Adventures of Cool Coyote</description>
+		<description>Fire And Ice - The Daring Adventures of Cool Coyote</description>
 		<year>1994</year>
 		<publisher>Graftgold</publisher>
 		<part name="cdrom" interface="cd32_cdrom">
@@ -108,6 +336,102 @@
 			</diskarea>
 		</part>
 	</software>
+	
+	<!-- Doesn't boot -->
+	<software name="flink" supported="no">
+		<description>Flink</description>
+		<year>1994</year>
+		<publisher>Psygnosis</publisher>
+		<part name="cdrom" interface="cd32_cdrom">
+			<diskarea name="cdrom">
+				<disk name="flink (europe)" sha1="cff2b90f271818b540d6670e689f6dcc2b5ebe58"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Freezes at loading screen -->
+	<software name="flyhard" supported="no">
+		<description>Fly Harder</description>
+		<year>1994</year>
+		<publisher>Buzz</publisher>
+		<part name="cdrom" interface="cd32_cdrom">
+			<diskarea name="cdrom">
+				<disk name="fly harder (europe)" sha1="334fd2661914f7dc3355c40c44011bf39b36263b"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Doesn't boot -->
+	<software name="frontier" supported="no">
+		<description>Frontier - Elite II</description>
+		<year>1993</year>
+		<publisher>GameTek</publisher>
+		<part name="cdrom" interface="cd32_cdrom">
+			<diskarea name="cdrom">
+				<disk name="frontier - elite ii (europe)" sha1="be555965d60784428787bb923c900c535c101474"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Glitchy graphics, freezes after title screen? -->
+	<software name="global" supported="no">
+		<description>Global Effect</description>
+		<year>1994</year>
+		<publisher>Millennium</publisher>
+		<part name="cdrom" interface="cd32_cdrom">
+			<diskarea name="cdrom">
+				<disk name="global effect (europe)" sha1="daa68df85bf70e202dce8e323dfd2090be92ff24"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Glitchy graphics, freezes at title screen? -->
+	<software name="gloom" supported="no">
+		<description>Gloom</description>
+		<year>1995</year>
+		<publisher>Guildhall</publisher>
+		<part name="cdrom" interface="cd32_cdrom">
+			<diskarea name="cdrom">
+				<disk name="gloom (europe)" sha1="b19ec06a135c04bbfe4a355908129a230395f309"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Glitchy graphics, unplayable -->
+	<software name="guardian" supported="partial">
+		<description>Guardian</description>
+		<year>1994</year>
+		<publisher>Acid Software</publisher>
+		<part name="cdrom" interface="cd32_cdrom">
+			<diskarea name="cdrom">
+				<disk name="guardian (europe)" sha1="4a1101de8fd10e4c2f6c59894ac97663d360a623"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Doesn't boot -->
+	<software name="ikplus" supported="no">
+		<description>International Karate +</description>
+		<year>1994</year>
+		<publisher>System 3</publisher>
+		<part name="cdrom" interface="cd32_cdrom">
+			<diskarea name="cdrom">
+				<disk name="international karate plus (europe)" sha1="6f69a642e1f4104bbe7d1f66353473752c14e64c"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Glitchy graphics, hangs at boot while music plays -->
+	<software name="kidchaos" supported="no">
+		<description>Kid Chaos</description>
+		<year>1994</year>
+		<publisher>Ocean Software</publisher>
+		<part name="cdrom" interface="cd32_cdrom">
+			<diskarea name="cdrom">
+				<disk name="kid chaos (europe)" sha1="5c0345d317f19501fe0ecb3c1df54a3b7a7cde31"/>
+			</diskarea>
+		</part>
+	</software>	
 
 	<!-- Doesn't boot -->
 	<software name="lotus" supported="no">
@@ -121,6 +445,54 @@
 		</part>
 	</software>
 
+	<!-- Doesn't boot -->
+	<software name="marvin" supported="no">
+		<description>Marvin's Marvellous Adventure</description>
+		<year>1994</year>
+		<publisher>21st Century Entertainment</publisher>
+		<part name="cdrom" interface="cd32_cdrom">
+			<diskarea name="cdrom">
+				<disk name="marvins marvellous adventure (europe) (en,fr,de,es,it)" sha1="37ad971a24da23a15d45735737d396e0dec7a44f"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Doesn't boot -->
+	<software name="myth" supported="no">
+		<description>Myth - History in the Making</description>
+		<year>1993</year>
+		<publisher>System 3</publisher>
+		<part name="cdrom" interface="cd32_cdrom">
+			<diskarea name="cdrom">
+				<disk name="myth - history in the making (europe)" sha1="b6dea115e02f5016f01ce18e155de4525159583e"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Glitchy graphics, seems to run otherwise -->
+	<software name="naughty" supported="partial">
+		<description>Naughty Ones</description>
+		<year>1994</year>
+		<publisher>Interactivision</publisher>
+		<part name="cdrom" interface="cd32_cdrom">
+			<diskarea name="cdrom">
+				<disk name="naughty ones (europe)" sha1="ad33482cdd6d82303f624f4e5472236fdcc5ee51"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Doesn't boot -->
+	<software name="okillunc" supported="no">
+		<description>Overkill + Lunar-C</description>
+		<year>1994</year>
+		<publisher>Mindscape</publisher>
+		<part name="cdrom" interface="cd32_cdrom">
+			<diskarea name="cdrom">
+				<disk name="overkill and lunar-c (europe)" sha1="b17f3f64dedada407ddb3cd7b835bc1da17cb0ee"/>
+			</diskarea>
+		</part>
+	</software>	
+
 	<!-- Doesn't boot? -->
 	<software name="projxubb" supported="no">
 		<description>Project-X + Ultimate Body Blows</description>
@@ -132,6 +504,18 @@
 			</diskarea>
 		</part>
 	</software>
+	
+	<!-- Seems to run? -->
+	<software name="quik" supported="partial">
+		<description>Quik the Thunder Rabbit</description>
+		<year>1994</year>
+		<publisher>Titus</publisher>
+		<part name="cdrom" interface="cd32_cdrom">
+			<diskarea name="cdrom">
+				<disk name="quik the thunder rabbit (europe)" sha1="18f6fc02352b650edeaf4c479c8f2043899aa220"/>
+			</diskarea>
+		</part>
+	</software>	
 
 	<!-- Glitchy graphics, gameplay too fast? -->
 	<software name="riserobo" supported="partial">
@@ -144,6 +528,18 @@
 			</diskarea>
 		</part>
 	</software>
+	
+	<!-- Doesn't boot -->
+	<software name="roadkill" supported="no">
+		<description>Roadkill</description>
+		<year>1995</year>
+		<publisher>Guildhall</publisher>
+		<part name="cdrom" interface="cd32_cdrom">
+			<diskarea name="cdrom">
+				<disk name="roadkill (europe)" sha1="234bd47866333732f74a7563e149f0ab73529294"/>
+			</diskarea>
+		</part>
+	</software>	
 
 	<!-- Glitchy graphics, works okay otherwise -->
 	<software name="seekdest" supported="partial">
@@ -180,6 +576,18 @@
 			</diskarea>
 		</part>
 	</software>
+
+	<!-- Doesn't boot -->
+	<software name="skelkrew" supported="no">
+		<description>Skeleton Krew</description>
+		<year>1995</year>
+		<publisher>Core</publisher>
+		<part name="cdrom" interface="cd32_cdrom">
+			<diskarea name="cdrom">
+				<disk name="skeleton krew (europe)" sha1="cd23102a322ff40fad7b2c50f43d7135ebeb16b4"/>
+			</diskarea>
+		</part>
+	</software>	
 
 	<!-- Doesn't work -->
 	<software name="suprputt" supported="no">
