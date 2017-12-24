@@ -776,6 +776,52 @@ static INPUT_PORTS_START( tekken )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
 
+        PORT_MODIFY( "PLAYER1" ) 
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("P1 Left Punch") 
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("P1 Right Punch")  
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
+        PORT_MODIFY( "PLAYER2" ) 
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("P2 Left Punch") PORT_PLAYER( 2 ) 
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("P2 Right Punch") PORT_PLAYER( 2 ) 
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_MODIFY( "ADC0" )
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_MODIFY( "ADC1" )
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_BUTTON4 )
+
+	PORT_MODIFY( "ADC2" )
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_BUTTON3 )
+
+	PORT_MODIFY( "ADC3" )
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_MODIFY( "ADC4" )
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_MODIFY( "ADC5" )
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_MODIFY( "ADC6" )
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_MODIFY( "ADC7" )
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_MODIFY( "PLAYER4" )
+	PORT_BIT( 0xcf, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER( 2 )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER( 2 )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( primglex )
+	PORT_INCLUDE( namcos11 )
+
+	PORT_MODIFY( "SWITCH" )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
+
 	PORT_MODIFY( "PLAYER1" )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
 
@@ -818,7 +864,15 @@ static INPUT_PORTS_START( souledge )
 	PORT_MODIFY( "SWITCH" )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
-
+	
+ 	PORT_MODIFY( "PLAYER1" ) 
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("P1 Horizontal Attack") 
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("P1 Vertical Attack")  
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("P1 Kick")
+ 	PORT_MODIFY( "PLAYER2" ) 
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("P2 Horizontal Attack") PORT_PLAYER( 2 ) 
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("P2 Vertical Attack") PORT_PLAYER( 2 ) 
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("P2 Kick") PORT_PLAYER( 2 )
 	PORT_MODIFY( "ADC0" )
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
@@ -1673,7 +1727,7 @@ GAME( 1995, dunkmnia,   0,        dunkmnia,   namcos11,   namcos11_state, 0, ROT
 GAME( 1995, dunkmniajc, dunkmnia, dunkmnia,   namcos11,   namcos11_state, 0, ROT0, "Namco",         "Dunk Mania (Japan, DM1/VER.C)",                MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1995, xevi3dg,    0,        xevi3dg,    namcos11,   namcos11_state, 0, ROT0, "Namco",         "Xevious 3D/G (World, XV32/VER.A)",             MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1995, xevi3dgj,   xevi3dg,  xevi3dg,    namcos11,   namcos11_state, 0, ROT0, "Namco",         "Xevious 3D/G (Japan, XV31/VER.A)",             MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1996, primglex,   0,        primglex,   tekken,     namcos11_state, 0, ROT0, "Namco",         "Prime Goal EX (Japan, PG1/VER.A)",             MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1996, primglex,   0,        primglex,   primglex,   namcos11_state, 0, ROT0, "Namco",         "Prime Goal EX (Japan, PG1/VER.A)",             MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1996, danceyes,   0,        danceyes,   namcos11,   namcos11_state, 0, ROT0, "Namco",         "Dancing Eyes (US, DC3/VER.C)",                 MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1996, danceyesj,  danceyes, danceyes,   namcos11,   namcos11_state, 0, ROT0, "Namco",         "Dancing Eyes (Japan, DC1/VER.A)",              MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1996, pocketrc,   0,        pocketrc,   pocketrc,   namcos11_state, 0, ROT0, "Namco",         "Pocket Racer (Japan, PKR1/VER.B)",             MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN )
