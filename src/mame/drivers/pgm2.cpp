@@ -51,8 +51,8 @@
 
     Debug features (require DIP SW1:8 On and SW1:1 Off):
     - QC TEST mode: hold P1 A+B during boot
-    - Debug/Cheat mode: hold P1 B+C during boot, when ingame pressing P1 Start skips to next location, where might be more unknown debug features.
-    works for both currently dumped games (orleg2, kov2nl)
+    - Debug/Cheat mode: hold P1 B+C during boot
+      orleg2 and kov2nl: when ingame pressing P1 Start skips to next location, where might be more unknown debug features.
 
 
     Holographic Stickers
@@ -76,15 +76,15 @@
     08 - fg scroll x
     0a - fg scroll y
     0e - resolution, 0 - low (kof98), 1 - high (rest of games)
-    10 - ? orleg2 - 0x13, kov2nl, kof98 - 0x14 at init
+    10 - ? orleg2 - 0x13, kov2nl, kof98, ddpdojh - 0x14 at init
     14 - sprite enable ? set to 0 before spriteram update, to 1 after
-    16 - enable access to vrams/palettes/etc ? (bitmask)
+    16 - set to 1 before access to vrams/palettes, reset after. bits: 0 - bg ram and palette, 1 - fg ram and palette, 2 - sprite palette.
     18 - vblank ack
     1a - ? 0 at init
-    1c - ? orleg2 - 5, kov2nl, kof - 7 at init
+    1c - ? orleg2 - 5, kov2nl, kof, ddpdojh - 7 at init
     1e - ? 2 at init
     32 - shared RAM bank
-    34, 36 - ? 0 at init, some unused xor feature ?
+    34, 36 - ? 0 at init
     38, 3a - sprite mask xor key
 
 */
@@ -656,7 +656,7 @@ MACHINE_CONFIG_END
 	ROM_LOAD32_WORD( "ig-a_cgl.u18",     0x00000000, 0x2000000, BAD_DUMP CRC(43501fa6) SHA1(58ccce6d393964b771fec3f5c583e3ede57482a3) ) \
 	ROM_LOAD32_WORD( "ig-a_cgh.u26",     0x00000002, 0x2000000, BAD_DUMP CRC(7051d020) SHA1(3d9b24c6fda4c9699bb9f00742e0888059b623e1) ) \
 	\
-	ROM_REGION( 0x1000000, "ymz774", ROMREGION_ERASEFF ) /* ymz770 */ \
+	ROM_REGION( 0x1000000, "ymz774", ROMREGION_ERASEFF ) /* ymz774 */ \
 	ROM_LOAD16_WORD_SWAP( "ig-a_sp.u2",  0x00000000, 0x1000000, CRC(8250688c) SHA1(d2488477afc528aeee96826065deba2bce4f0a7d) ) \
 	\
 	ROM_REGION( 0x10000, "sram", 0 ) \
@@ -756,7 +756,7 @@ ROM_END
 	ROM_LOAD32_WORD( "ig-a3_cgl.u18",    0x00000000, 0x2000000, CRC(8d923e1f) SHA1(14371cf385dd8857017d3111cd4710f4291b1ae2) ) \
 	ROM_LOAD32_WORD( "ig-a3_cgh.u26",    0x00000002, 0x2000000, CRC(5b6fbf3f) SHA1(d1f52e230b91ee6cde939d7c2b74da7fd6527e73) ) \
 	\
-	ROM_REGION( 0x2000000, "ymz774", ROMREGION_ERASEFF ) /* ymz770 */ \
+	ROM_REGION( 0x2000000, "ymz774", ROMREGION_ERASEFF ) /* ymz774 */ \
 	ROM_LOAD16_WORD_SWAP( "ig-a3_sp.u37",            0x00000000, 0x2000000, CRC(45cdf422) SHA1(8005d284bcee73cff37a147fcd1c3e9f039a7203) ) \
 	\
 	ROM_REGION(0x10000, "sram", 0) \
@@ -817,7 +817,7 @@ ROM_END
 	ROM_LOAD32_WORD( "ddpdoj_spa0.u9",   0x00000000, 0x1000000, CRC(1232c1b4) SHA1(ecc1c549ae19d2f052a85fe4a993608aedf49a25) ) \
 	ROM_LOAD32_WORD( "ddpdoj_spb0.u18",  0x00000002, 0x1000000, CRC(6a9e2cbf) SHA1(8e0a4ea90f5ef534820303d62f0873f8ac9f080e) ) \
 	\
-	ROM_REGION( 0x1000000, "ymz774", ROMREGION_ERASEFF ) /* ymz770 */ \
+	ROM_REGION( 0x1000000, "ymz774", ROMREGION_ERASEFF ) /* ymz774 */ \
 	ROM_LOAD16_WORD_SWAP( "ddpdoj_wave0.u12",        0x00000000, 0x1000000, CRC(2b71a324) SHA1(f69076cc561f40ca564d804bc7bd455066f8d77c) ) \
 	\
 	ROM_REGION( 0x10000, "sram", 0 ) \
@@ -858,7 +858,7 @@ ROM_END
 	ROM_LOAD32_WORD( "kov3_spa0.u17",    0x00000000, 0x4000000, CRC(3a1e58a9) SHA1(6ba251407c69ee62f7ea0baae91bc133acc70c6f) ) \
 	ROM_LOAD32_WORD( "kov3_spb0.u10",    0x00000002, 0x4000000, CRC(90396065) SHA1(01bf9f69d77a792d5b39afbba70fbfa098e194f1) ) \
 	\
-	ROM_REGION( 0x4000000, "ymz774", ROMREGION_ERASEFF ) /* ymz770 */ \
+	ROM_REGION( 0x4000000, "ymz774", ROMREGION_ERASEFF ) /* ymz774 */ \
 	ROM_LOAD16_WORD_SWAP( "kov3_wave0.u13",              0x00000000, 0x4000000, CRC(aa639152) SHA1(2314c6bd05524525a31a2a4668a36a938b924ba4) )
 
 ROM_START( kov3 )
@@ -923,7 +923,7 @@ all others:         SPANSION S99-50070
 	ROM_LOAD32_WORD( "ig-d3_spb2.u20",  0x10000002, 0x4000000, CRC(9aaa840b) SHA1(3c6078d53bb5eca5c501540214287dd102102ea1) ) \
 	/* spa3/spb3 unpopulated */ \
 	\
-	ROM_REGION( 0x08000000, "ymz774", ROMREGION_ERASEFF ) /* ymz770 */ \
+	ROM_REGION( 0x08000000, "ymz774", ROMREGION_ERASEFF ) /* ymz774 */ \
 	ROM_LOAD16_WORD_SWAP( "ig-d3_wave0.u12",        0x00000000, 0x4000000, CRC(edf2332d) SHA1(7e01c7e03e515814d7de117c265c3668d32842fa) ) \
 	ROM_LOAD16_WORD_SWAP( "ig-d3_wave1.u11",        0x04000000, 0x4000000, CRC(62321b20) SHA1(a388c8a2489430fbe92fb26b3ef81c66ce97f318) ) \
 	\
@@ -1215,7 +1215,7 @@ GAME( 2008, kov2nl_301,   kov2nl,    pgm2,    pgm2, pgm2_state,     kov2nl,     
 GAME( 2008, kov2nl_300,   kov2nl,    pgm2,    pgm2, pgm2_state,     kov2nl,       ROT0, "IGS", "Knights of Valour 2 New Legend (V300, China)", 0 ) // was dumped from a Taiwan board tho
 
 // Dodonpachi Daioujou Tamashii - should be a V200 too
-GAME( 2010, ddpdojh,      0,    pgm2_ramrom,    pgm2, pgm2_state,     ddpdojh,    ROT270, "IGS", "Dodonpachi Daioujou Tamashii (V201, China)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 2010, ddpdojh,      0,    pgm2_ramrom,    pgm2, pgm2_state,     ddpdojh,    ROT270, "IGS", "Dodonpachi Daioujou Tamashii (V201, China)", 0 )
 
 // Knights of Valour 3 - should be a V103 and V101 too
 GAME( 2011, kov3,         0,    pgm2,    pgm2, pgm2_state,     kov3_104,   ROT0, "IGS", "Knights of Valour 3 (V104, China)", MACHINE_NOT_WORKING )
