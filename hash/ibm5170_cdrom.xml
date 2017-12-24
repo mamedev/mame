@@ -717,7 +717,7 @@
 	</software>
 
 	<software name="lexz22z32">
-		<description>Z22 / Z32 Color Jetprinter</description>
+		<description>Lexmark Z22 / Z32 Color Jetprinter</description>
 		<year>2000</year>
 		<publisher>Lexmark</publisher>
 		<part name="cdrom" interface="cdrom">
@@ -731,7 +731,7 @@
 	<!-- Mac OS with System 7.0 -->
 	<!-- includes unknown type scanner driver-->
 	<software name="muscan">
-		<description>Power of Scanning</description>
+		<description>Mustek Power of Scanning</description>
 		<year>1997</year>
 		<publisher>Mustek</publisher>
 		<part name="cdrom" interface="cdrom">
