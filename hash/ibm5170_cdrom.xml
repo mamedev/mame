@@ -143,7 +143,7 @@
 	<!-- Windows 95/98/ME -->
 	<!-- TODO: some transparency issues -->
 	<software name="dobupanic" supported="partial">
-		<description>Doka Chan No Building Panic (Japan)</description>
+		<description>Doka-chan no Building Panic (Japan)</description>
 		<year>2001</year>
 		<publisher>MSD-JAPAN / Salva Corporation / D-YAMA</publisher>
 		<info name="alt_title" value="どかちゃんのビルパニック" />

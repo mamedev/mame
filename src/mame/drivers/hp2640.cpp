@@ -358,7 +358,7 @@ void hp2645_state::video_fill_buffer(bool buff_idx , unsigned max_cycles)
 	bool curr_iv = false;   // U310-5
 	uint8_t curr_attrs = 0;
 	bool link_lsb = false;
-	uint8_t dma_byte;
+	uint8_t dma_byte = 0;
 
 	for (unsigned i = 0 , mem_cycles = 0; i < VIDEO_VIS_COLS && mem_cycles < max_cycles; mem_cycles++) {
 		if (link_lsb) {
