@@ -4835,7 +4835,7 @@ ROM_START( sailormnnj )
 ROM_END
 
 ROM_START( sailormnnk )
-	ROMS_SAILORMN
+	ROMS_SAILORMNN
 
 	ROM_REGION16_BE( 0x80, "eeprom", 0 )
 	ROM_LOAD16_WORD( "sailormn_korea.nv", 0x0000, 0x0080, CRC(0e7de398) SHA1(b495bf43d8596a0dc9843c74fc04fd21499bd115) )
