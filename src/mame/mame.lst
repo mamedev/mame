@@ -10766,6 +10766,9 @@ cybikov1                        // Cybiko Wireless Intertainment System - Classi
 cybikov2                        // Cybiko Wireless Intertainment System - Classic V2
 cybikoxt                        // Cybiko Wireless Intertainment System - Xtreme
 
+@source:cybstorm.cpp
+cybstorm                        // (proto)          (c) 1993
+
 @source:cyclemb.cpp
 cyclemb                         // P0  (c) 1984 Taito Corporation [+ Seta]
 skydest                         // PD0 (c) 1985 Taito Corporation

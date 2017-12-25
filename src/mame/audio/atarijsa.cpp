@@ -959,7 +959,9 @@ MACHINE_CONFIG_MEMBER( atari_jsa_iiis_device::device_add_mconfig )
 
 	atari_jsa_iii_device::device_add_mconfig(config);
 
-	MCFG_DEVICE_MODIFY("ym2151")
+	MCFG_SOUND_MODIFY("ym2151")
+	MCFG_SOUND_ROUTES_RESET()
+	MCFG_MIXER_ROUTE(0, DEVICE_SELF_OWNER, 0.60, 0)
 	MCFG_MIXER_ROUTE(1, DEVICE_SELF_OWNER, 0.60, 1)
 
 	MCFG_OKIM6295_ADD("oki2", JSA_MASTER_CLOCK/3, PIN7_HIGH)

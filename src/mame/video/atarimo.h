@@ -93,7 +93,7 @@ public:
 	int bank() const { return m_bank; }
 	int xscroll() const { return m_xscroll; }
 	int yscroll() const { return m_yscroll; }
-	std::vector<uint16_t> &code_lookup() { return m_codelookup; }
+	std::vector<uint32_t> &code_lookup() { return m_codelookup; }
 	std::vector<uint8_t> &color_lookup() { return m_colorlookup; }
 	std::vector<uint8_t> &gfx_lookup() { return m_gfxlookup; }
 
@@ -158,8 +158,8 @@ private:
 	public:
 		dual_sprite_parameter();
 		bool set(const atari_motion_objects_config::dual_entry &input);
-		uint16_t extract(const uint16_t *data) const { return m_lower.extract(data) | (m_upper.extract(data) << m_uppershift); }
-		uint16_t mask() const { return m_lower.mask() | (m_upper.mask() << m_uppershift); }
+		uint32_t extract(const uint16_t *data) const { return m_lower.extract(data) | (m_upper.extract(data) << m_uppershift); }
+		uint32_t mask() const { return m_lower.mask() | (m_upper.mask() << m_uppershift); }
 
 	private:
 		sprite_parameter    m_lower;            // lower parameter
@@ -212,7 +212,7 @@ private:
 
 	// arrays
 	optional_shared_ptr<uint16_t> m_slipram;    // pointer to the SLIP RAM
-	std::vector<uint16_t>   m_codelookup;       // lookup table for codes
+	std::vector<uint32_t>   m_codelookup;       // lookup table for codes
 	std::vector<uint8_t>    m_colorlookup;       // lookup table for colors
 	std::vector<uint8_t>    m_gfxlookup;         // lookup table for graphics
 
