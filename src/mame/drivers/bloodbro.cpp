@@ -724,7 +724,7 @@ ROM_START( bloodbrou )
 	ROM_LOAD( "cb006.u083.6c", 0x0000, 0x0100, CRC(b2b89a74) SHA1(1878823801048d677aef9702feedd5bf775e62d0) ) // N82S135N
 ROM_END
 
-ROM_START( weststory )
+ROM_START( weststry )
 	ROM_REGION( 0x80000, "maincpu", 0 ) /* 64k for cpu code; based on bloodbrob */
 	ROM_LOAD16_BYTE( "ws13.bin",  0x00001, 0x20000, CRC(158e302a) SHA1(52cc1bf526424ff025a6b79f3fc7bba4b9bbfcbb) )
 	ROM_LOAD16_BYTE( "ws15.bin",  0x00000, 0x20000, CRC(672e9027) SHA1(71cb9fcef04edb972ba88de45d605dcff539ea2d) )
@@ -770,7 +770,7 @@ ROM_START( weststory )
 	ROM_LOAD( "ws18.bin", 0x00000, 0x20000, CRC(deb1b975) SHA1(08f2e9a0a23171201b71d381d091edcd3787c287) )
 ROM_END
 
-ROM_START( weststorya )
+ROM_START( weststrya )
 	ROM_REGION( 0x80000, "maincpu", 0 ) /* 64k for cpu code; based on bloodbrob */
 	ROM_LOAD16_BYTE( "13.bin",    0x00001, 0x20000, CRC(d50e1dfd) SHA1(b0ed90a602ae079c897de6d4cbed61f389f4b220) )
 	ROM_LOAD16_BYTE( "15.bin",    0x00000, 0x20000, CRC(fd419c7b) SHA1(f3b23a3f1d550b1739059aeb0fa92076d2b86f69) )
@@ -877,6 +877,6 @@ GAME( 1990, bloodbro,   0,        bloodbro, bloodbro, bloodbro_state, 0,        
 GAME( 1990, bloodbroj,  bloodbro, bloodbro, bloodbro, bloodbro_state, 0,        ROT0,   "TAD Corporation", "Blood Bros. (Japan, rev A)",                 MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 GAME( 1990, bloodbroja, bloodbro, bloodbro, bloodbro, bloodbro_state, 0,        ROT0,   "TAD Corporation", "Blood Bros. (Japan)",                        MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 GAME( 1990, bloodbrou,  bloodbro, bloodbro, bloodbro, bloodbro_state, 0,        ROT0,   "TAD Corporation (Fabtek license)", "Blood Bros. (US)",          MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1990, weststory,  bloodbro, weststry, weststry, bloodbro_state, weststry, ROT0,   "bootleg (Datsu)", "West Story (bootleg of Blood Bros., set 1)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1990, weststorya, bloodbro, weststry, weststry, bloodbro_state, weststry, ROT0,   "bootleg (Datsu)", "West Story (bootleg of Blood Bros., set 2)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1990, weststry,   bloodbro, weststry, weststry, bloodbro_state, weststry, ROT0,   "bootleg (Datsu)", "West Story (bootleg of Blood Bros., set 1)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1990, weststrya,  bloodbro, weststry, weststry, bloodbro_state, weststry, ROT0,   "bootleg (Datsu)", "West Story (bootleg of Blood Bros., set 2)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 GAME( 1990, skysmash,   0,        skysmash, skysmash, bloodbro_state, 0,        ROT270, "Nihon System",    "Sky Smasher",                                MACHINE_SUPPORTS_SAVE )

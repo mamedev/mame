@@ -8840,8 +8840,8 @@ bloodbroj                       // (c) 1990 Tad
 bloodbroja                      // (c) 1990 Tad
 bloodbrou                       // (c) 1990 Tad + Fabtek license
 skysmash                        // (c) 1990 Nihon System Inc.
-weststory                       // bootleg
-weststorya                      // bootleg
+weststry                        // bootleg
+weststrya                       // bootleg
 
 @source:blstroid.cpp
 blstroid                        // 136057           (c) 1987
