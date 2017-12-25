@@ -9270,6 +9270,10 @@ lynx128k                        //
 lynx48k                         //
 lynx96k                         //
 
+@source:candela.cpp
+can09t                          //
+can09                           //
+
 @source:canon_s80.cpp
 canons80                        //
 
@@ -11313,8 +11317,6 @@ xfilesk                         // (c) 1999 dgPIX Entertainment Inc (censored fo
 md6802                          //
 mp68a                           //
 e100                            //
-can09t                          //
-can09                           //
 
 @source:dietgo.cpp
 dietgo                          // MAY (c) 1993
