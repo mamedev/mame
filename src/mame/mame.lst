@@ -9270,6 +9270,10 @@ lynx128k                        //
 lynx48k                         //
 lynx96k                         //
 
+@source:candela.cpp
+can09t                          //
+can09                           //
+
 @source:canon_s80.cpp
 canons80                        //
 
@@ -11321,9 +11325,6 @@ xfilesk                         // (c) 1999 dgPIX Entertainment Inc (censored fo
 @source:didact.cpp
 md6802                          //
 mp68a                           //
-e100                            //
-can09t                          //
-can09                           //
 
 @source:dietgo.cpp
 dietgo                          // MAY (c) 1993
@@ -11664,6 +11665,9 @@ dyndukea                        // (c) 1989 Seibu Kaihatsu (25JUL89)
 dyndukej                        // (c) 1989 Seibu Kaihatsu (03SEP89
 dyndukeja                       // (c) 1989 Seibu Kaihatsu (25JUL89)
 dyndukeu                        // (c) 1989 Seibu Kaihatsu + Fabtek license (25JUL89)
+
+@source:e100.cpp
+e100                            //
 
 @source:eacc.cpp
 eacc                            //
