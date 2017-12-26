@@ -1965,7 +1965,7 @@ void debugger_commands::execute_dump(int ref, const std::vector<std::string> &pa
 		if (ascii)
 		{
 			util::stream_format(output, "  ");
-			for (u64 j = 0; j < rowsize && (i + j) <= endoffset; j++)
+			for (u64 j = 0; j < rowsize && (i + j) <= endoffset; j += width)
 			{
 				offs_t curaddr = i + j;
 				if (space->device().memory().translate(space->spacenum(), TRANSLATE_READ_DEBUG, curaddr))
