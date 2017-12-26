@@ -79,7 +79,7 @@ private:
 	/* timer shifter polynomial values (will be used for timer interrupts) */
 	u8 timer_shifter[256];
 
-	u16 m_pc; // For the debugger
+	u16 m_debug_pc; // only for the MAME debugger
 
 	inline u8 do_ad(u8 augend, u8 addend);
 	inline void CLR_OZCS();

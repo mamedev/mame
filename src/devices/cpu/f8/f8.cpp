@@ -41,7 +41,7 @@ f8_cpu_device::f8_cpu_device(const machine_config &mconfig, const char *tag, dev
 	, m_a(0)
 	, m_w(0)
 	, m_is(0)
-	, m_pc(0)
+	, m_debug_pc(0)
 {
 	memset(m_r, 0x00, sizeof(m_r));
 }
@@ -80,6 +80,7 @@ void f8_cpu_device::device_start()
 	m_direct = m_program->direct<0>();
 	m_iospace = &space(AS_IO);
 
+	save_item(NAME(m_debug_pc));
 	save_item(NAME(m_pc0));
 	save_item(NAME(m_pc1));
 	save_item(NAME(m_dc0));
@@ -165,8 +166,8 @@ void f8_cpu_device::device_start()
 	state_add( F8_R62, "R62", m_r[62]).formatstr("%02X");
 	state_add( F8_R63, "R63", m_r[63]).formatstr("%02X");
 
-	state_add(STATE_GENPC, "GENPC", m_pc).formatstr("%04X").noshow();
-	state_add(STATE_GENPCBASE, "CURPC", m_pc).formatstr("%04X").noshow();
+	state_add(STATE_GENPC, "GENPC", m_debug_pc).formatstr("%04X").noshow();
+	state_add(STATE_GENPCBASE, "CURPC", m_debug_pc).formatstr("%04X").noshow();
 	state_add(STATE_GENFLAGS, "GENFLAGS", m_w).formatstr("%5s").noshow();
 
 	m_icountptr = &m_icount;
@@ -174,6 +175,7 @@ void f8_cpu_device::device_start()
 
 void f8_cpu_device::device_reset()
 {
+	m_debug_pc = 0;
 	m_pc0 = 0;
 	m_pc1 = 0;
 	m_dc0 = 0;
@@ -1685,10 +1687,10 @@ void f8_cpu_device::execute_run()
 {
 	do
 	{
-		u8 op=m_dbus;
+		u8 op = m_dbus;
 
-		m_pc = (m_pc0 - 1) & 0xffff;
-		debugger_instruction_hook(this, (m_pc0 - 1) & 0xffff);
+		m_debug_pc = (m_pc0 - 1) & 0xffff;
+		debugger_instruction_hook(this, m_debug_pc);
 
 		switch( op )
 		{
