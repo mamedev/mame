@@ -2,64 +2,67 @@
 // copyright-holders:Juergen Buchmueller
 /*****************************************************************************
  *
- *   f8.c
- *   Portable F8 emulator (Fairchild 3850)
+ *  Portable F8 emulator (Fairchild 3850)
  *
  *  This work is based on Frank Palazzolo's F8 emulation in a standalone
  *  Fairchild Channel F emulator and the 'Fairchild F3850 CPU' data sheets.
  *
  *****************************************************************************/
 
-/* PeT 25.June 2001
-   added interrupt functionality
- */
-
 #include "emu.h"
 #include "f8.h"
 #include "f8dasm.h"
 #include "debugger.h"
 
-#define S   0x01
-#define C   0x02
-#define Z   0x04
-#define O   0x08
-#define I   0x10
 
-#define cS  4
-#define cL  6
+/* status flags */
+static constexpr u8 S = 0x01;
+static constexpr u8 C = 0x02;
+static constexpr u8 Z = 0x04;
+static constexpr u8 O = 0x08;
+static constexpr u8 I = 0x10;
+
+/* cycle (short/long) */
+static constexpr int cS = 4;
+static constexpr int cL = 6;
 
 
 /* clear all flags */
-#define CLR_OZCS                \
-	m_w &= ~(O|Z|C|S)
+inline void f8_cpu_device::CLR_OZCS()
+{
+	m_w &= ~(O|Z|C|S);
+}
 
 /* set sign and zero flags (note: the S flag is complementary) */
-#define SET_SZ(n)               \
-	if (n == 0)                 \
-		m_w |= Z | S;           \
-	else                        \
-	if (n < 128)                \
-		m_w |= S
+inline void f8_cpu_device::SET_SZ(u8 n)
+{
+	if (n == 0)
+		m_w |= Z;
+	if (~n & 0x80)
+		m_w |= S;
+}
 
 /* set overflow and carry flags */
-#define SET_OC(n,m)             \
-	if (n + m > 255)            \
-		m_w |= C;               \
-	if ((n&127)+(m&127) > 127)  \
-	{                           \
-		if (!(m_w & C))     \
-			m_w |= O;           \
-	}                           \
-	else                        \
-	{                           \
-		if (m_w & C)            \
-			m_w |= O;           \
+inline void f8_cpu_device::SET_OC(u16 n, u16 m)
+{
+	if (n + m > 255)
+		m_w |= C;
+	if ((n&127)+(m&127) > 127)
+	{
+		if (!(m_w & C))
+			m_w |= O;
 	}
+	else
+	{
+		if (m_w & C)
+			m_w |= O;
+	}
+}
 
 /* decimal add helper */
-uint8_t f8_cpu_device::do_ad(uint8_t augend, uint8_t addend)
+inline uint8_t f8_cpu_device::do_ad(uint8_t augend, uint8_t addend)
 {
-	/* SKR from F8 Guide To programming description of AMD
+	/* From F8 Guide To programming description of AMD
 	 * binary add the addend to the binary sum of the augend and $66
 	 * *NOTE* the binary addition of the augend to $66 is done before AMD is called
 	 * record the status of the carry and intermediate carry
@@ -81,7 +84,7 @@ uint8_t f8_cpu_device::do_ad(uint8_t augend, uint8_t addend)
 	if ((augend & 0x0f) + (addend & 0x0f) > 0x0F)
 		ic = 1;
 
-	CLR_OZCS;
+	CLR_OZCS();
 	SET_OC(augend,addend);
 	SET_SZ(tmp);
 
@@ -134,8 +137,7 @@ device_memory_interface::space_config_vector f8_cpu_device::memory_space_config(
  * Currently the emulation does not handle distinct PCs and DCs, but
  * only one instance inside the CPU context.
  ******************************************************************************/
-void f8_cpu_device::ROMC_00(int insttim) /* SKR - added parameter to tell if  */
-									/* it is long or short based on inst */
+void f8_cpu_device::ROMC_00(int insttim)
 {
 	/*
 	 * Instruction Fetch. The device whose address space includes the
@@ -146,8 +148,7 @@ void f8_cpu_device::ROMC_00(int insttim) /* SKR - added parameter to tell if  */
 
 	m_dbus = m_direct->read_byte(m_pc0);
 	m_pc0 += 1;
-	m_icount -= insttim;    /* SKR - ROMC00 is usually short, not short+long, */
-							/* but DS is long */
+	m_icount -= insttim; /* ROMC00 is usually short, not short+long, but DS is long */
 }
 
 void f8_cpu_device::ROMC_01()
@@ -176,8 +177,8 @@ void f8_cpu_device::ROMC_02()
 	m_icount -= cL;
 }
 
-void f8_cpu_device::ROMC_03(int insttim) /* SKR - added parameter to tell if  */
-{                                   /* it is long or short based on inst */
+void f8_cpu_device::ROMC_03(int insttim)
+{
 	/*
 	 * Similiar to 0x00, except that it is used for immediate operands
 	 * fetches (using PC0) instead of instruction fetches.
@@ -453,8 +454,7 @@ void f8_cpu_device::ROMC_1B()
 	m_icount -= cL;
 }
 
-void f8_cpu_device::ROMC_1C(int insttim) /* SKR - added parameter to tell if  */
-									/* it is long or short based on inst */
+void f8_cpu_device::ROMC_1C(int insttim)
 {
 	/*
 	 * None.
@@ -695,7 +695,7 @@ void f8_cpu_device::f8_lr_h_dc()
 void f8_cpu_device::f8_sr_1()
 {
 	m_a >>= 1;
-	CLR_OZCS;
+	CLR_OZCS();
 	SET_SZ(m_a);
 }
 
@@ -706,7 +706,7 @@ void f8_cpu_device::f8_sr_1()
 void f8_cpu_device::f8_sl_1()
 {
 	m_a <<= 1;
-	CLR_OZCS;
+	CLR_OZCS();
 	SET_SZ(m_a);
 }
 
@@ -717,7 +717,7 @@ void f8_cpu_device::f8_sl_1()
 void f8_cpu_device::f8_sr_4()
 {
 	m_a >>= 4;
-	CLR_OZCS;
+	CLR_OZCS();
 	SET_SZ(m_a);
 }
 
@@ -728,7 +728,7 @@ void f8_cpu_device::f8_sr_4()
 void f8_cpu_device::f8_sl_4()
 {
 	m_a <<= 4;
-	CLR_OZCS;
+	CLR_OZCS();
 	SET_SZ(m_a);
 }
 
@@ -759,7 +759,7 @@ void f8_cpu_device::f8_st()
 void f8_cpu_device::f8_com()
 {
 	m_a = ~m_a;
-	CLR_OZCS;
+	CLR_OZCS();
 	SET_SZ(m_a);
 }
 
@@ -769,15 +769,11 @@ void f8_cpu_device::f8_com()
  ***************************************************/
 void f8_cpu_device::f8_lnk()
 {
+	CLR_OZCS();
 	if (m_w & C)
 	{
-	CLR_OZCS;
-	SET_OC(m_a,1);
-	m_a += 1;
-	}
-	else
-	{
-	CLR_OZCS;
+		SET_OC(m_a,1);
+		m_a += 1;
 	}
 	SET_SZ(m_a);
 }
@@ -836,7 +832,7 @@ void f8_cpu_device::f8_lr_j_w()
  ***************************************************/
 void f8_cpu_device::f8_inc()
 {
-	CLR_OZCS;
+	CLR_OZCS();
 	SET_OC(m_a,1);
 	m_a += 1;
 	SET_SZ(m_a);
@@ -859,7 +855,7 @@ void f8_cpu_device::f8_li()
 void f8_cpu_device::f8_ni()
 {
 	ROMC_03(cL);
-	CLR_OZCS;
+	CLR_OZCS();
 	m_a &= m_dbus;
 	SET_SZ(m_a);
 }
@@ -871,7 +867,7 @@ void f8_cpu_device::f8_ni()
 void f8_cpu_device::f8_oi()
 {
 	ROMC_03(cL);
-	CLR_OZCS;
+	CLR_OZCS();
 	m_a |= m_dbus;
 	SET_SZ(m_a);
 }
@@ -883,7 +879,7 @@ void f8_cpu_device::f8_oi()
 void f8_cpu_device::f8_xi()
 {
 	ROMC_03(cL);
-	CLR_OZCS;
+	CLR_OZCS();
 	m_a ^= m_dbus;
 	SET_SZ(m_a);
 }
@@ -895,7 +891,7 @@ void f8_cpu_device::f8_xi()
 void f8_cpu_device::f8_ai()
 {
 	ROMC_03(cL);
-	CLR_OZCS;
+	CLR_OZCS();
 	SET_OC(m_a,m_dbus);
 	m_a += m_dbus;
 	SET_SZ(m_a);
@@ -909,10 +905,10 @@ void f8_cpu_device::f8_ci()
 {
 	uint16_t tmp = ((uint8_t)~m_a) + 1;
 	ROMC_03(cL);
-	CLR_OZCS;
+	CLR_OZCS();
 	SET_OC(tmp,m_dbus);
 	tmp += m_dbus;
-	SET_SZ((uint8_t)tmp);
+	SET_SZ(tmp);
 }
 
 /***************************************************
@@ -922,7 +918,7 @@ void f8_cpu_device::f8_ci()
 void f8_cpu_device::f8_in()
 {
 	ROMC_03(cL);
-	CLR_OZCS;
+	CLR_OZCS();
 	ROMC_1B();
 	m_a = m_dbus;
 	SET_SZ(m_a);
@@ -1001,7 +997,7 @@ void f8_cpu_device::f8_xdc()
  ***************************************************/
 void f8_cpu_device::f8_ds_r(int r)
 {
-	CLR_OZCS;
+	CLR_OZCS();
 	SET_OC(m_r[r], 0xff);
 	m_r[r] = m_r[r] + 0xff;
 	SET_SZ(m_r[r]);
@@ -1013,7 +1009,7 @@ void f8_cpu_device::f8_ds_r(int r)
  ***************************************************/
 void f8_cpu_device::f8_ds_isar()
 {
-	CLR_OZCS;
+	CLR_OZCS();
 	SET_OC(m_r[m_is], 0xff);
 	m_r[m_is] = m_r[m_is] + 0xff;
 	SET_SZ(m_r[m_is]);
@@ -1025,7 +1021,7 @@ void f8_cpu_device::f8_ds_isar()
  ***************************************************/
 void f8_cpu_device::f8_ds_isar_i()
 {
-	CLR_OZCS;
+	CLR_OZCS();
 	SET_OC(m_r[m_is], 0xff);
 	m_r[m_is] = m_r[m_is] + 0xff;
 	SET_SZ(m_r[m_is]);
@@ -1038,7 +1034,7 @@ void f8_cpu_device::f8_ds_isar_i()
  ***************************************************/
 void f8_cpu_device::f8_ds_isar_d()
 {
-	CLR_OZCS;
+	CLR_OZCS();
 	SET_OC(m_r[m_is], 0xff);
 	m_r[m_is] = m_r[m_is] + 0xff;
 	SET_SZ(m_r[m_is]);
@@ -1168,7 +1164,7 @@ void f8_cpu_device::f8_bt(int e)
 void f8_cpu_device::f8_am()
 {
 	ROMC_02();
-	CLR_OZCS;
+	CLR_OZCS();
 	SET_OC(m_a, m_dbus);
 	m_a += m_dbus;
 	SET_SZ(m_a);
@@ -1193,7 +1189,7 @@ void f8_cpu_device::f8_amd()
 void f8_cpu_device::f8_nm()
 {
 	ROMC_02();
-	CLR_OZCS;
+	CLR_OZCS();
 	m_a &= m_dbus;
 	SET_SZ(m_a);
 }
@@ -1205,7 +1201,7 @@ void f8_cpu_device::f8_nm()
 void f8_cpu_device::f8_om()
 {
 	ROMC_02();
-	CLR_OZCS;
+	CLR_OZCS();
 	m_a |= m_dbus;
 	SET_SZ(m_a);
 }
@@ -1217,7 +1213,7 @@ void f8_cpu_device::f8_om()
 void f8_cpu_device::f8_xm()
 {
 	ROMC_02();
-	CLR_OZCS;
+	CLR_OZCS();
 	m_a ^= m_dbus;
 	SET_SZ(m_a);
 }
@@ -1226,14 +1222,14 @@ void f8_cpu_device::f8_xm()
  *  O Z C S 1000 1101
  *  x x x x CM
  ***************************************************/
-void f8_cpu_device::f8_cm()    /* SKR changed to match f8_ci() */
+void f8_cpu_device::f8_cm()
 {
 	uint16_t tmp = ((uint8_t)~m_a) + 1;
 	ROMC_02();
-	CLR_OZCS;
+	CLR_OZCS();
 	SET_OC(tmp,m_dbus);
 	tmp += m_dbus;
-	SET_SZ((uint8_t)tmp);
+	SET_SZ(tmp);
 }
 
 /***************************************************
@@ -1278,7 +1274,7 @@ void f8_cpu_device::f8_bf(int t)
 void f8_cpu_device::f8_ins_0(int n)
 {
 	ROMC_1C(cS);
-	CLR_OZCS;
+	CLR_OZCS();
 	m_a = m_iospace->read_byte(n);
 	SET_SZ(m_a);
 }
@@ -1292,7 +1288,7 @@ void f8_cpu_device::f8_ins_1(int n)
 	ROMC_1C(cL);
 	m_io = n;
 	ROMC_1B();
-	CLR_OZCS;
+	CLR_OZCS();
 	m_a = m_dbus;
 	SET_SZ(m_a);
 }
@@ -1325,7 +1321,7 @@ void f8_cpu_device::f8_outs_1(int n)
  ***************************************************/
 void f8_cpu_device::f8_as(int r)
 {
-	CLR_OZCS;
+	CLR_OZCS();
 	SET_OC(m_a, m_r[r]);
 	m_a += m_r[r];
 	SET_SZ(m_a);
@@ -1337,7 +1333,7 @@ void f8_cpu_device::f8_as(int r)
  ***************************************************/
 void f8_cpu_device::f8_as_isar()
 {
-	CLR_OZCS;
+	CLR_OZCS();
 	SET_OC(m_a, m_r[m_is]);
 	m_a += m_r[m_is];
 	SET_SZ(m_a);
@@ -1349,7 +1345,7 @@ void f8_cpu_device::f8_as_isar()
  ***************************************************/
 void f8_cpu_device::f8_as_isar_i()
 {
-	CLR_OZCS;
+	CLR_OZCS();
 	SET_OC(m_a, m_r[m_is]);
 	m_a += m_r[m_is];
 	SET_SZ(m_a);
@@ -1362,7 +1358,7 @@ void f8_cpu_device::f8_as_isar_i()
  ***************************************************/
 void f8_cpu_device::f8_as_isar_d()
 {
-	CLR_OZCS;
+	CLR_OZCS();
 	SET_OC(m_a, m_r[m_is]);
 	m_a += m_r[m_is];
 	SET_SZ(m_a);
@@ -1425,7 +1421,7 @@ void f8_cpu_device::f8_asd_isar_d()
  ***************************************************/
 void f8_cpu_device::f8_xs(int r)
 {
-	CLR_OZCS;
+	CLR_OZCS();
 	m_a ^= m_r[r];
 	SET_SZ(m_a);
 }
@@ -1436,7 +1432,7 @@ void f8_cpu_device::f8_xs(int r)
  ***************************************************/
 void f8_cpu_device::f8_xs_isar()
 {
-	CLR_OZCS;
+	CLR_OZCS();
 	m_a ^= m_r[m_is];
 	SET_SZ(m_a);
 }
@@ -1447,7 +1443,7 @@ void f8_cpu_device::f8_xs_isar()
  ***************************************************/
 void f8_cpu_device::f8_xs_isar_i()
 {
-	CLR_OZCS;
+	CLR_OZCS();
 	m_a ^= m_r[m_is];
 	SET_SZ(m_a);
 	m_is = (m_is & 0x38) | ((m_is + 1) & 0x07);
@@ -1459,7 +1455,7 @@ void f8_cpu_device::f8_xs_isar_i()
  ***************************************************/
 void f8_cpu_device::f8_xs_isar_d()
 {
-	CLR_OZCS;
+	CLR_OZCS();
 	m_a ^= m_r[m_is];
 	SET_SZ(m_a);
 	m_is = (m_is & 0x38) | ((m_is - 1) & 0x07);
@@ -1471,7 +1467,7 @@ void f8_cpu_device::f8_xs_isar_d()
  ***************************************************/
 void f8_cpu_device::f8_ns(int r)
 {
-	CLR_OZCS;
+	CLR_OZCS();
 	m_a &= m_r[r];
 	SET_SZ(m_a);
 }
@@ -1482,7 +1478,7 @@ void f8_cpu_device::f8_ns(int r)
  ***************************************************/
 void f8_cpu_device::f8_ns_isar()
 {
-	CLR_OZCS;
+	CLR_OZCS();
 	m_a &= m_r[m_is];
 	SET_SZ(m_a);
 }
@@ -1493,7 +1489,7 @@ void f8_cpu_device::f8_ns_isar()
  ***************************************************/
 void f8_cpu_device::f8_ns_isar_i()
 {
-	CLR_OZCS;
+	CLR_OZCS();
 	m_a &= m_r[m_is];
 	SET_SZ(m_a);
 	m_is = (m_is & 0x38) | ((m_is + 1) & 0x07);
@@ -1505,7 +1501,7 @@ void f8_cpu_device::f8_ns_isar_i()
  ***************************************************/
 void f8_cpu_device::f8_ns_isar_d()
 {
-	CLR_OZCS;
+	CLR_OZCS();
 	m_a &= m_r[m_is];
 	SET_SZ(m_a);
 	m_is = (m_is & 0x38) | ((m_is - 1) & 0x07);
@@ -1862,7 +1858,7 @@ void f8_cpu_device::execute_run()
 					ROMC_0F();
 					ROMC_13();
 				}
-				if( ( op >= 0x30 ) && ( op <= 0x3f) )  /* SKR - DS is a long cycle inst */
+				if( ( op >= 0x30 ) && ( op <= 0x3f) )  /* DS is a long cycle inst */
 				{
 					ROMC_00(cL);
 				}

@@ -2,7 +2,6 @@
 // copyright-holders:Juergen Buchmueller
 /*****************************************************************************
  *
- *   f8.h
  *   Portable Fairchild F8 emulator interface
  *
  *****************************************************************************/
@@ -82,7 +81,10 @@ private:
 
 	uint16_t m_pc; // For the debugger
 
-	uint8_t do_ad(uint8_t augend, uint8_t addend);
+	inline uint8_t do_ad(uint8_t augend, uint8_t addend);
+	inline void CLR_OZCS();
+	inline void SET_SZ(u8 n);
+	inline void SET_OC(u16 n, u16 m);
 
 	void ROMC_00(int insttim);
 	void ROMC_01();
