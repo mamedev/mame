@@ -35,7 +35,7 @@
          D - SPG243 - The Batman
          D - SPG243 - Wall-E
          D - SPG243 - Chintendo / KenSingTon / Siatronics / Jungle Soft Vii
- Partial D - SPG200 - V-Tech V-Smile
+ Partial D - SPG200 - VTech V.Smile
         ND - unknown - Zone 40
          D - SPG243 - Zone 60
          D - SPG243 - Wireless 60
@@ -44,7 +44,7 @@
 
 
 Similar Systems: ( from http://en.wkikpedia.org/wiki/V.Smile )
-- V.Smile by Vtech, a system designed for children under the age of 10
+- V.Smile by VTech, a system designed for children under the age of 10
 - V.Smile Pocket (2 versions)
 - V.Smile Cyber Pocket
 - V.Smile PC Pal
@@ -1339,10 +1339,10 @@ ROM_END
 
 //    YEAR  NAME      PARENT    COMPAT    MACHINE   INPUT     STATE      INIT      COMPANY                                              FULLNAME             FLAGS
 CONS( 2004, batmantv, vii,      0,        batman,   batman,   vii_state, batman,   "JAKKS Pacific Inc / HotGen Ltd",                    "The Batman",        MACHINE_NO_SOUND )
-CONS( 2005, vsmile,   0,        0,        vsmile,   vsmile,   vii_state, vsmile,   "V-Tech",                                            "V-Smile (US)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-CONS( 2005, vsmileg,  vsmile,   0,        vsmile,   vsmile,   vii_state, vsmile,   "V-Tech",                                            "V-Smile (Germany)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-CONS( 2005, vsmilef,  vsmile,   0,        vsmile,   vsmile,   vii_state, vsmile,   "V-Tech",                                            "V-Smile (France)",  MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-CONS( 2005, vsmileb,  0,        0,        vsmile,   vsmile,   vii_state, vsmile,   "V-Tech",                                            "V-Smile Baby (US)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+CONS( 2005, vsmile,   0,        0,        vsmile,   vsmile,   vii_state, vsmile,   "VTech",                                             "V.Smile (US)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+CONS( 2005, vsmileg,  vsmile,   0,        vsmile,   vsmile,   vii_state, vsmile,   "VTech",                                             "V.Smile (Germany)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+CONS( 2005, vsmilef,  vsmile,   0,        vsmile,   vsmile,   vii_state, vsmile,   "VTech",                                             "V.Smile (France)",  MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+CONS( 2005, vsmileb,  0,        0,        vsmile,   vsmile,   vii_state, vsmile,   "VTech",                                             "V.Smile Baby (US)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 CONS( 2007, vii,      0,        0,        vii,      vii,      vii_state, vii,      "Jungle Soft / KenSingTon / Chintendo / Siatronics", "Vii",               MACHINE_NO_SOUND )
 CONS( 2008, walle,    vii,      0,        batman,   walle,    vii_state, walle,    "JAKKS Pacific Inc",                                 "Wall-E",            MACHINE_NO_SOUND )
 CONS( 2010, zone60,   0,        0,        wirels60, wirels60, vii_state, wirels60, "Jungle Soft / Ultimate Products (HK) Ltd",          "Zone 60",           MACHINE_NO_SOUND )

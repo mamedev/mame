@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Wilbert Pol, Curt Coder
 /*
-    This 1980s computer was manufactured by Vtech of Hong Kong.
+    This 1980s computer was manufactured by VTech of Hong Kong.
     known as: CreatiVision, Dick Smith Wizzard, Funvision, Rameses, VZ 2000 and possibly others.
 
     There is also a CreatiVision Mk 2, possibly also known as the Laser 500. This was a hardware variant,
