@@ -27,6 +27,206 @@ static constexpr int cS = 4;
 static constexpr int cL = 6;
 
 
+DEFINE_DEVICE_TYPE(F8, f8_cpu_device, "f8", "Fairchild F8")
+
+
+f8_cpu_device::f8_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: cpu_device(mconfig, F8, tag, owner, clock)
+	, m_program_config("program", ENDIANNESS_BIG, 8, 16, 0)
+	, m_io_config("io", ENDIANNESS_BIG, 8, 8, 0)
+	, m_pc0(0)
+	, m_pc1(0)
+	, m_dc0(0)
+	, m_dc1(0)
+	, m_a(0)
+	, m_w(0)
+	, m_is(0)
+	, m_pc(0)
+{
+	memset(m_r, 0x00, sizeof(m_r));
+}
+
+device_memory_interface::space_config_vector f8_cpu_device::memory_space_config() const
+{
+	return space_config_vector {
+		std::make_pair(AS_PROGRAM, &m_program_config),
+		std::make_pair(AS_IO,      &m_io_config)
+	};
+}
+
+util::disasm_interface *f8_cpu_device::create_disassembler()
+{
+	return new f8_disassembler;
+}
+
+void f8_cpu_device::state_string_export(const device_state_entry &entry, std::string &str) const
+{
+	switch (entry.index())
+	{
+		case STATE_GENFLAGS:
+			str = string_format("%c%c%c%c%c",
+					m_w & 0x10 ? 'I':'.',
+					m_w & 0x08 ? 'O':'.',
+					m_w & 0x04 ? 'Z':'.',
+					m_w & 0x02 ? 'C':'.',
+					m_w & 0x01 ? 'S':'.');
+			break;
+	}
+}
+
+void f8_cpu_device::device_start()
+{
+	m_program = &space(AS_PROGRAM);
+	m_direct = m_program->direct<0>();
+	m_iospace = &space(AS_IO);
+
+	save_item(NAME(m_pc0));
+	save_item(NAME(m_pc1));
+	save_item(NAME(m_dc0));
+	save_item(NAME(m_dc1));
+	save_item(NAME(m_a));
+	save_item(NAME(m_w));
+	save_item(NAME(m_is));
+	save_item(NAME(m_dbus));
+	save_item(NAME(m_io));
+	save_item(NAME(m_irq_vector));
+	save_item(NAME(m_irq_request));
+	save_item(NAME(m_r));
+
+	state_add( F8_PC0, "PC0", m_pc0).formatstr("%04X");
+	state_add( F8_PC1, "PC1", m_pc1).formatstr("%04X");
+	state_add( F8_DC0, "DC0", m_dc0).formatstr("%04X");
+	state_add( F8_DC1, "DC1", m_dc1).formatstr("%04X");
+	state_add( F8_W,   "W",   m_w).formatstr("%02X");
+	state_add( F8_A,   "A",   m_a).formatstr("%02X");
+	state_add( F8_IS,  "IS",  m_is).mask(0x3f).formatstr("%02X");
+	state_add( F8_J,   "J",   m_r[9]).formatstr("%02X");
+	state_add( F8_HU,  "HU",  m_r[10]).formatstr("%02X");
+	state_add( F8_HL,  "HL",  m_r[11]).formatstr("%02X");
+	state_add( F8_KU,  "KU",  m_r[12]).formatstr("%02X");
+	state_add( F8_KL,  "KL",  m_r[13]).formatstr("%02X");
+	state_add( F8_QU,  "QU",  m_r[14]).formatstr("%02X");
+	state_add( F8_QL,  "QL",  m_r[15]).formatstr("%02X");
+	state_add( F8_R0,  "R0",  m_r[0]).formatstr("%02X");
+	state_add( F8_R1,  "R1",  m_r[1]).formatstr("%02X");
+	state_add( F8_R2,  "R2",  m_r[2]).formatstr("%02X");
+	state_add( F8_R3,  "R3",  m_r[3]).formatstr("%02X");
+	state_add( F8_R4,  "R4",  m_r[4]).formatstr("%02X");
+	state_add( F8_R5,  "R5",  m_r[5]).formatstr("%02X");
+	state_add( F8_R6,  "R6",  m_r[6]).formatstr("%02X");
+	state_add( F8_R7,  "R7",  m_r[7]).formatstr("%02X");
+	state_add( F8_R8,  "R8",  m_r[8]).formatstr("%02X");
+	state_add( F8_R16, "R16", m_r[16]).formatstr("%02X");
+	state_add( F8_R17, "R17", m_r[17]).formatstr("%02X");
+	state_add( F8_R18, "R18", m_r[18]).formatstr("%02X");
+	state_add( F8_R19, "R19", m_r[19]).formatstr("%02X");
+	state_add( F8_R20, "R20", m_r[20]).formatstr("%02X");
+	state_add( F8_R21, "R21", m_r[21]).formatstr("%02X");
+	state_add( F8_R22, "R22", m_r[22]).formatstr("%02X");
+	state_add( F8_R23, "R23", m_r[23]).formatstr("%02X");
+	state_add( F8_R24, "R24", m_r[24]).formatstr("%02X");
+	state_add( F8_R25, "R25", m_r[25]).formatstr("%02X");
+	state_add( F8_R26, "R26", m_r[26]).formatstr("%02X");
+	state_add( F8_R27, "R27", m_r[27]).formatstr("%02X");
+	state_add( F8_R28, "R28", m_r[28]).formatstr("%02X");
+	state_add( F8_R29, "R29", m_r[29]).formatstr("%02X");
+	state_add( F8_R30, "R30", m_r[30]).formatstr("%02X");
+	state_add( F8_R31, "R31", m_r[31]).formatstr("%02X");
+	state_add( F8_R32, "R32", m_r[32]).formatstr("%02X");
+	state_add( F8_R33, "R33", m_r[33]).formatstr("%02X");
+	state_add( F8_R34, "R34", m_r[34]).formatstr("%02X");
+	state_add( F8_R35, "R35", m_r[35]).formatstr("%02X");
+	state_add( F8_R36, "R36", m_r[36]).formatstr("%02X");
+	state_add( F8_R37, "R37", m_r[37]).formatstr("%02X");
+	state_add( F8_R38, "R38", m_r[38]).formatstr("%02X");
+	state_add( F8_R39, "R39", m_r[39]).formatstr("%02X");
+	state_add( F8_R40, "R40", m_r[40]).formatstr("%02X");
+	state_add( F8_R41, "R41", m_r[41]).formatstr("%02X");
+	state_add( F8_R42, "R42", m_r[42]).formatstr("%02X");
+	state_add( F8_R43, "R43", m_r[43]).formatstr("%02X");
+	state_add( F8_R44, "R44", m_r[44]).formatstr("%02X");
+	state_add( F8_R45, "R45", m_r[45]).formatstr("%02X");
+	state_add( F8_R46, "R46", m_r[46]).formatstr("%02X");
+	state_add( F8_R47, "R47", m_r[47]).formatstr("%02X");
+	state_add( F8_R48, "R48", m_r[48]).formatstr("%02X");
+	state_add( F8_R49, "R49", m_r[49]).formatstr("%02X");
+	state_add( F8_R50, "R50", m_r[50]).formatstr("%02X");
+	state_add( F8_R51, "R51", m_r[51]).formatstr("%02X");
+	state_add( F8_R52, "R52", m_r[52]).formatstr("%02X");
+	state_add( F8_R53, "R53", m_r[53]).formatstr("%02X");
+	state_add( F8_R54, "R54", m_r[54]).formatstr("%02X");
+	state_add( F8_R55, "R55", m_r[55]).formatstr("%02X");
+	state_add( F8_R56, "R56", m_r[56]).formatstr("%02X");
+	state_add( F8_R57, "R57", m_r[57]).formatstr("%02X");
+	state_add( F8_R58, "R58", m_r[58]).formatstr("%02X");
+	state_add( F8_R59, "R59", m_r[59]).formatstr("%02X");
+	state_add( F8_R60, "R60", m_r[60]).formatstr("%02X");
+	state_add( F8_R61, "R61", m_r[61]).formatstr("%02X");
+	state_add( F8_R62, "R62", m_r[62]).formatstr("%02X");
+	state_add( F8_R63, "R63", m_r[63]).formatstr("%02X");
+
+	state_add(STATE_GENPC, "GENPC", m_pc).formatstr("%04X").noshow();
+	state_add(STATE_GENPCBASE, "CURPC", m_pc).formatstr("%04X").noshow();
+	state_add(STATE_GENFLAGS, "GENFLAGS", m_w).formatstr("%5s").noshow();
+
+	m_icountptr = &m_icount;
+}
+
+void f8_cpu_device::device_reset()
+{
+	m_pc0 = 0;
+	m_pc1 = 0;
+	m_dc0 = 0;
+	m_dc1 = 0;
+	m_a = 0;
+	m_w = 0;
+	m_is = 0;
+	m_dbus = 0;
+	m_io = 0;
+	m_irq_vector = 0;
+	memset(m_r, 0, sizeof(m_r));
+	m_irq_request = 0;
+
+	m_w&=~I;
+
+	/* save PC0 to PC1 and reset PC0 */
+	ROMC_08();
+	/* fetch the first opcode */
+	ROMC_00(cS);
+
+	/* initialize the timer shift register
+	 * this is an 8 bit polynomial counter which can be loaded parallel
+	 * with 0xff the outputs never change and thus the timer is disabled.
+	 * with 0xfe the shifter starts cycling through 255 states until it
+	 * reaches 0xfe again (and then issues an interrupt).
+	 * the counter output values are not sequential, but go like this:
+	 * 0xfe, 0xfd, 0xfb, 0xf7, 0xee, 0xdc ... etc. :-)
+	 * We have to build a lookup table to tell how many cycles a write
+
+	 */
+	uint8_t data = 0xfe;    /* initial value */
+	for (int i = 0; i < 256; i++)
+	{
+		timer_shifter[i] = data;
+		if ( (((data >> 3) ^ (data >> 4)) ^ ((data >> 5) ^ (data >> 7))) & 1 )
+		{
+			data <<= 1;
+		}
+		else
+		{
+			data = (data << 1) | 1;
+		}
+	}
+}
+
+
+void f8_cpu_device::execute_set_input( int inptnum, int state )
+{
+	m_irq_request = state;
+}
+
+/*****************************************************************************/
+
 /* clear all flags */
 inline void f8_cpu_device::CLR_OZCS()
 {
@@ -96,34 +296,6 @@ inline uint8_t f8_cpu_device::do_ad(uint8_t augend, uint8_t addend)
 		tmp = (tmp & 0xf0) + ((tmp + 0x0a) & 0x0f);
 
 	return tmp;
-}
-
-
-DEFINE_DEVICE_TYPE(F8, f8_cpu_device, "f8", "Fairchild F8")
-
-
-f8_cpu_device::f8_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: cpu_device(mconfig, F8, tag, owner, clock)
-	, m_program_config("program", ENDIANNESS_BIG, 8, 16, 0)
-	, m_io_config("io", ENDIANNESS_BIG, 8, 8, 0)
-	, m_pc0(0)
-	, m_pc1(0)
-	, m_dc0(0)
-	, m_dc1(0)
-	, m_a(0)
-	, m_w(0)
-	, m_is(0)
-	, m_pc(0)
-{
-	memset(m_r, 0x00, sizeof(m_r));
-}
-
-device_memory_interface::space_config_vector f8_cpu_device::memory_space_config() const
-{
-	return space_config_vector {
-		std::make_pair(AS_PROGRAM, &m_program_config),
-		std::make_pair(AS_IO,      &m_io_config)
-	};
 }
 
 
@@ -1507,55 +1679,6 @@ void f8_cpu_device::f8_ns_isar_d()
 	m_is = (m_is & 0x38) | ((m_is - 1) & 0x07);
 }
 
-void f8_cpu_device::device_reset()
-{
-	uint8_t data;
-	int i;
-
-	m_pc0 = 0;
-	m_pc1 = 0;
-	m_dc0 = 0;
-	m_dc1 = 0;
-	m_a = 0;
-	m_w = 0;
-	m_is = 0;
-	m_dbus = 0;
-	m_io = 0;
-	m_irq_vector = 0;
-	memset(m_r, 0, sizeof(m_r));
-	m_irq_request = 0;
-
-	m_w&=~I;
-
-	/* save PC0 to PC1 and reset PC0 */
-	ROMC_08();
-	/* fetch the first opcode */
-	ROMC_00(cS);
-
-	/* initialize the timer shift register
-	 * this is an 8 bit polynomial counter which can be loaded parallel
-	 * with 0xff the outputs never change and thus the timer is disabled.
-	 * with 0xfe the shifter starts cycling through 255 states until it
-	 * reaches 0xfe again (and then issues an interrupt).
-	 * the counter output values are not sequential, but go like this:
-	 * 0xfe, 0xfd, 0xfb, 0xf7, 0xee, 0xdc ... etc. :-)
-	 * We have to build a lookup table to tell how many cycles a write
-
-	 */
-	data = 0xfe;    /* initial value */
-	for (i = 0; i < 256; i++)
-	{
-		timer_shifter[i] = data;
-		if ( (((data >> 3) ^ (data >> 4)) ^ ((data >> 5) ^ (data >> 7))) & 1 )
-		{
-			data <<= 1;
-		}
-		else
-		{
-			data = (data << 1) | 1;
-		}
-	}
-}
 
 /* Execute cycles - returns number of cycles actually run */
 void f8_cpu_device::execute_run()
@@ -1869,131 +1992,4 @@ void f8_cpu_device::execute_run()
 				break;
 		}
 	} while( m_icount > 0 );
-}
-
-
-void f8_cpu_device::device_start()
-{
-	m_program = &space(AS_PROGRAM);
-	m_direct = m_program->direct<0>();
-	m_iospace = &space(AS_IO);
-
-	save_item(NAME(m_pc0));
-	save_item(NAME(m_pc1));
-	save_item(NAME(m_dc0));
-	save_item(NAME(m_dc1));
-	save_item(NAME(m_a));
-	save_item(NAME(m_w));
-	save_item(NAME(m_is));
-	save_item(NAME(m_dbus));
-	save_item(NAME(m_io));
-	save_item(NAME(m_irq_vector));
-	save_item(NAME(m_irq_request));
-	save_item(NAME(m_r));
-
-	state_add( F8_PC0, "PC0", m_pc0).formatstr("%04X");
-	state_add( F8_PC1, "PC1", m_pc1).formatstr("%04X");
-	state_add( F8_DC0, "DC0", m_dc0).formatstr("%04X");
-	state_add( F8_DC1, "DC1", m_dc1).formatstr("%04X");
-	state_add( F8_W,   "W",   m_w).formatstr("%02X");
-	state_add( F8_A,   "A",   m_a).formatstr("%02X");
-	state_add( F8_IS,  "IS",  m_is).mask(0x3f).formatstr("%02X");
-	state_add( F8_J,   "J",   m_r[9]).formatstr("%02X");
-	state_add( F8_HU,  "HU",  m_r[10]).formatstr("%02X");
-	state_add( F8_HL,  "HL",  m_r[11]).formatstr("%02X");
-	state_add( F8_KU,  "KU",  m_r[12]).formatstr("%02X");
-	state_add( F8_KL,  "KL",  m_r[13]).formatstr("%02X");
-	state_add( F8_QU,  "QU",  m_r[14]).formatstr("%02X");
-	state_add( F8_QL,  "QL",  m_r[15]).formatstr("%02X");
-	state_add( F8_R0,  "R0",  m_r[0]).formatstr("%02X");
-	state_add( F8_R1,  "R1",  m_r[1]).formatstr("%02X");
-	state_add( F8_R2,  "R2",  m_r[2]).formatstr("%02X");
-	state_add( F8_R3,  "R3",  m_r[3]).formatstr("%02X");
-	state_add( F8_R4,  "R4",  m_r[4]).formatstr("%02X");
-	state_add( F8_R5,  "R5",  m_r[5]).formatstr("%02X");
-	state_add( F8_R6,  "R6",  m_r[6]).formatstr("%02X");
-	state_add( F8_R7,  "R7",  m_r[7]).formatstr("%02X");
-	state_add( F8_R8,  "R8",  m_r[8]).formatstr("%02X");
-	state_add( F8_R16, "R16", m_r[16]).formatstr("%02X");
-	state_add( F8_R17, "R17", m_r[17]).formatstr("%02X");
-	state_add( F8_R18, "R18", m_r[18]).formatstr("%02X");
-	state_add( F8_R19, "R19", m_r[19]).formatstr("%02X");
-	state_add( F8_R20, "R20", m_r[20]).formatstr("%02X");
-	state_add( F8_R21, "R21", m_r[21]).formatstr("%02X");
-	state_add( F8_R22, "R22", m_r[22]).formatstr("%02X");
-	state_add( F8_R23, "R23", m_r[23]).formatstr("%02X");
-	state_add( F8_R24, "R24", m_r[24]).formatstr("%02X");
-	state_add( F8_R25, "R25", m_r[25]).formatstr("%02X");
-	state_add( F8_R26, "R26", m_r[26]).formatstr("%02X");
-	state_add( F8_R27, "R27", m_r[27]).formatstr("%02X");
-	state_add( F8_R28, "R28", m_r[28]).formatstr("%02X");
-	state_add( F8_R29, "R29", m_r[29]).formatstr("%02X");
-	state_add( F8_R30, "R30", m_r[30]).formatstr("%02X");
-	state_add( F8_R31, "R31", m_r[31]).formatstr("%02X");
-	state_add( F8_R32, "R32", m_r[32]).formatstr("%02X");
-	state_add( F8_R33, "R33", m_r[33]).formatstr("%02X");
-	state_add( F8_R34, "R34", m_r[34]).formatstr("%02X");
-	state_add( F8_R35, "R35", m_r[35]).formatstr("%02X");
-	state_add( F8_R36, "R36", m_r[36]).formatstr("%02X");
-	state_add( F8_R37, "R37", m_r[37]).formatstr("%02X");
-	state_add( F8_R38, "R38", m_r[38]).formatstr("%02X");
-	state_add( F8_R39, "R39", m_r[39]).formatstr("%02X");
-	state_add( F8_R40, "R40", m_r[40]).formatstr("%02X");
-	state_add( F8_R41, "R41", m_r[41]).formatstr("%02X");
-	state_add( F8_R42, "R42", m_r[42]).formatstr("%02X");
-	state_add( F8_R43, "R43", m_r[43]).formatstr("%02X");
-	state_add( F8_R44, "R44", m_r[44]).formatstr("%02X");
-	state_add( F8_R45, "R45", m_r[45]).formatstr("%02X");
-	state_add( F8_R46, "R46", m_r[46]).formatstr("%02X");
-	state_add( F8_R47, "R47", m_r[47]).formatstr("%02X");
-	state_add( F8_R48, "R48", m_r[48]).formatstr("%02X");
-	state_add( F8_R49, "R49", m_r[49]).formatstr("%02X");
-	state_add( F8_R50, "R50", m_r[50]).formatstr("%02X");
-	state_add( F8_R51, "R51", m_r[51]).formatstr("%02X");
-	state_add( F8_R52, "R52", m_r[52]).formatstr("%02X");
-	state_add( F8_R53, "R53", m_r[53]).formatstr("%02X");
-	state_add( F8_R54, "R54", m_r[54]).formatstr("%02X");
-	state_add( F8_R55, "R55", m_r[55]).formatstr("%02X");
-	state_add( F8_R56, "R56", m_r[56]).formatstr("%02X");
-	state_add( F8_R57, "R57", m_r[57]).formatstr("%02X");
-	state_add( F8_R58, "R58", m_r[58]).formatstr("%02X");
-	state_add( F8_R59, "R59", m_r[59]).formatstr("%02X");
-	state_add( F8_R60, "R60", m_r[60]).formatstr("%02X");
-	state_add( F8_R61, "R61", m_r[61]).formatstr("%02X");
-	state_add( F8_R62, "R62", m_r[62]).formatstr("%02X");
-	state_add( F8_R63, "R63", m_r[63]).formatstr("%02X");
-
-	state_add(STATE_GENPC, "GENPC", m_pc).formatstr("%04X").noshow();
-	state_add(STATE_GENPCBASE, "CURPC", m_pc).formatstr("%04X").noshow();
-	state_add(STATE_GENFLAGS, "GENFLAGS", m_w).formatstr("%5s").noshow();
-
-	m_icountptr = &m_icount;
-}
-
-
-void f8_cpu_device::state_string_export(const device_state_entry &entry, std::string &str) const
-{
-	switch (entry.index())
-	{
-		case STATE_GENFLAGS:
-			str = string_format("%c%c%c%c%c",
-					m_w & 0x10 ? 'I':'.',
-					m_w & 0x08 ? 'O':'.',
-					m_w & 0x04 ? 'Z':'.',
-					m_w & 0x02 ? 'C':'.',
-					m_w & 0x01 ? 'S':'.');
-			break;
-	}
-}
-
-
-util::disasm_interface *f8_cpu_device::create_disassembler()
-{
-	return new f8_disassembler;
-}
-
-
-void f8_cpu_device::execute_set_input( int inptnum, int state )
-{
-	m_irq_request = state;
 }
