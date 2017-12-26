@@ -110,6 +110,7 @@ c65.cpp
 c80.cpp
 c900.cpp
 camplynx.cpp
+candela.cpp
 canon_s80.cpp
 casloopy.cpp
 cat.cpp
@@ -181,6 +182,7 @@ dsb46.cpp
 dual68.cpp
 dvk_kcgd.cpp
 dvk_ksm.cpp
+e100.cpp
 eacc.cpp
 ec184x.cpp
 ec65.cpp
