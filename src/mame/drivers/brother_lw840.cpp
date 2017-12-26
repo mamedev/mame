@@ -2,7 +2,6 @@
 // copyright-holders:Bartman/Abyss
 
 #include "emu.h"
-#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 #include "machine/timer.h"
@@ -10,12 +9,13 @@
 #include "debug/debugcpu.h"
 #include "sound/beep.h"
 #include "machine/upd765.h"
-#include "imagedev/floppy.h"
 #include "formats/pc_dsk.h"
+
+// fixed eepmov.b instruction in h8.lst
 
 // if updating project, c:\msys64\win32env.bat
 // cd \schreibmaschine\mame_src
-// make SUBTARGET=schreibmaschine NO_USE_MIDI=1 NO_USE_PORTAUDIO=1 vs2019
+// make SUBTARGET=schreibmaschine NO_USE_MIDI=1 NO_USE_PORTAUDIO=1 vs2017
 
 // command line parameters:
 // -window -debug -log lw840 -flop "c:\schreibmaschine\Brother LW-840ic\LW840-ic_V1.0_Disk1_Graphic_Art_Print_Program, etc..img"
@@ -83,15 +83,20 @@ class gm82c765b_device : public upd765_family_device {
 public:
 	gm82c765b_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	void map(address_map& map) override {
-		map(0x0, 0x0).r(FUNC(gm82c765b_device::msr_r));
-		map(0x1, 0x1).rw(FUNC(gm82c765b_device::fifo_r), FUNC(gm82c765b_device::fifo_w));
-		map(0x2, 0x2).w(FUNC(gm82c765b_device::dor_w));
-		map(0x6, 0x6).rw(FUNC(gm82c765b_device::dma_r), FUNC(gm82c765b_device::dma_w));
-	}
+	virtual DECLARE_ADDRESS_MAP(map, 8) override;
 };
 
 DEFINE_DEVICE_TYPE(GM82C765B, gm82c765b_device, "gm82c765b", "GM82C765B")
+
+#define MCFG_GM82C765B_ADD(_tag) \
+	MCFG_DEVICE_ADD(_tag, GM82C765B, 0)
+
+DEVICE_ADDRESS_MAP_START(map, 8, gm82c765b_device)
+	AM_RANGE(0x0, 0x0) AM_READ(msr_r)
+	AM_RANGE(0x1, 0x1) AM_READWRITE(fifo_r, fifo_w)
+	AM_RANGE(0x2, 0x2) AM_WRITE(dor_w)
+	AM_RANGE(0x6, 0x6) AM_READWRITE(mdma_r, mdma_w)
+ADDRESS_MAP_END
 
 gm82c765b_device::gm82c765b_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : 
 	upd765_family_device(mconfig, GM82C765B, tag, owner, clock)
@@ -109,13 +114,12 @@ public:
 	lw840_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		maincpu(*this, "maincpu"),
-		screen(*this, "screen"),
+		palette(*this, "palette"),
+		io_kbrow(*this, "kbrow.%u", 0),
 		fdc(*this, "fdc"),
-		beeper(*this, "beeper"),
-		io_kbrow(*this, "kbrow.%u", 0)
+		//floppy(*this, "floppy"),
+		beeper(*this, "beeper")
 	{ }
-
-	void lw840(machine_config& config);
 
 	// helpers
 	std::string pc();
@@ -124,7 +128,8 @@ public:
 
 	// devices
 	required_device<h83002_device> maincpu;
-	required_device<screen_device> screen;
+	required_device<palette_device> palette;
+	//required_device<lw840_floppy_connector> floppy;
 	required_device<gm82c765b_device> fdc;
 	required_device<beep_device> beeper;
 	optional_ioport_array<9> io_kbrow;
@@ -132,15 +137,8 @@ public:
 	// screen updates
 	uint32_t screen_update(screen_device& screen, bitmap_rgb32& bitmap, const rectangle& cliprect);
 
-	uint8_t illegal_r(offs_t offset, uint8_t mem_mask = ~0) {
-		logerror("%s: unmapped memory read from %0*X & %0*X\n", pc(), 6, offset, 2, mem_mask);
-		return 0;
-	}
-	void illegal_w(offs_t offset, uint8_t data, uint8_t mem_mask = ~0) {
-		logerror("%s: unmapped memory write to %0*X = %0*X & %0*X\n", pc(), 6, offset, 2, data, 2, mem_mask);
-	}
-
-	uint16_t port7_r(offs_t, uint16_t mem_mask = ~0) {
+	DECLARE_READ8_MEMBER(illegal_r); DECLARE_WRITE8_MEMBER(illegal_w);
+	DECLARE_READ16_MEMBER(port7_r) {
 		auto row = keyboard & 0x0f;
 		if(row <= 8) {
 			if(io_kbrow[row].found())
@@ -150,10 +148,10 @@ public:
 		// seems to be able to control power-on self test if not 0xff
 		return 0xffff & mem_mask;
 	}
-	uint16_t keyboard_r(offs_t, uint16_t mem_mask = ~0) {
+	DECLARE_READ16_MEMBER(keyboard_r) { 
 		return (keyboard << 8) & mem_mask; 
 	}
-	void keyboard_w(uint16_t data) { 
+	DECLARE_WRITE16_MEMBER(keyboard_w) { 
 		keyboard = data >> 8; 
 	}
 	TIMER_DEVICE_CALLBACK_MEMBER(int2_timer_callback) {
@@ -161,17 +159,14 @@ public:
 		maincpu->set_input_line(INPUT_LINE_IRQ2, irq_toggle ? ASSERT_LINE : CLEAR_LINE);
 	}
 
-	static void floppy_formats(format_registration& fr) {
-		fr.add(FLOPPY_PC_FORMAT);
-	}
-
+	DECLARE_FLOPPY_FORMATS(floppy_formats);
 	DECLARE_WRITE_LINE_MEMBER(fdc_interrupt) {
 		maincpu->set_input_line(INPUT_LINE_IRQ4, state ? ASSERT_LINE : CLEAR_LINE);
 	}
 	DECLARE_WRITE_LINE_MEMBER(fdc_drq) {
 		maincpu->set_input_line(H8_INPUT_LINE_DREQ0, state ? ASSERT_LINE : CLEAR_LINE);
 	}
-	uint16_t disk_inserted_r(offs_t, uint16_t mem_mask = ~0) {
+	DECLARE_READ16_MEMBER(disk_inserted_r) {
 		// bit#6: disk inserted
 		// bit#7: ??1.44mb
 		// bit#1: ???
@@ -183,24 +178,10 @@ public:
 
 protected:
 	// driver_device overrides
-	void machine_start() override;
-	void machine_reset() override;
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
-	void video_start() override;
-
-	void map_program(address_map& map) {
-		map(0x000000, 0x3fffff).rom();
-		map(0x5f8000, 0x5fffff).ram().share("sram"); // SRAM
-		map(0x600000, 0x67ffff).ram(); // DRAM
-		map(0xe00000, 0xe00007).m(fdc, FUNC(gm82c765b_device::map));
-		map(0xe00030, 0xe00041).noprw(); // just to shut up the error.log
-		map(0xec0000, 0xec0001).r(FUNC(lw840_state::keyboard_r)).w(FUNC(lw840_state::keyboard_w));
-		map(0xec0004, 0xec0005).r(FUNC(lw840_state::disk_inserted_r));
-	}
-
-	void map_io(address_map& map) {
-		map(h8_device::PORT_7, h8_device::PORT_7).r(FUNC(lw840_state::port7_r));
-	}
+	virtual void video_start() override;
 
 	uint8_t keyboard{};
 	uint8_t irq_toggle{};
@@ -210,13 +191,27 @@ protected:
 	std::map<uint32_t, std::string> symbols;
 };
 
+static ADDRESS_MAP_START(lw840_map, AS_PROGRAM, 16, lw840_state)
+ 	AM_RANGE(0x000000, 0x3fffff) AM_ROM
+	AM_RANGE(0x5f8000, 0x5fffff) AM_RAM AM_SHARE("sram") // SRAM
+	AM_RANGE(0x600000, 0x67ffff) AM_RAM // DRAM
+	AM_RANGE(0xe00000, 0xe00007) AM_DEVICE8("fdc", gm82c765b_device, map, 0xff)
+	AM_RANGE(0xe00030, 0xe00041) AM_NOP // just to shut up the error.log
+	AM_RANGE(0xec0000, 0xec0001) AM_READWRITE(keyboard_r, keyboard_w)
+	AM_RANGE(0xec0004, 0xec0005) AM_READ(disk_inserted_r)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START(lw840_io_map, AS_IO, 16, lw840_state)
+	AM_RANGE(h8_device::PORT_7, h8_device::PORT_7) AM_READ(port7_r)
+ADDRESS_MAP_END
+
 void lw840_state::video_start()
 {
 }
 
 std::string lw840_state::pc()
 {
-	auto pc = machine().device<cpu_device>("maincpu")->pc();
+	auto pc = machine().scheduler().currently_executing()->device().safe_pc();
  	return symbolize(pc);
 }
 
@@ -238,13 +233,10 @@ std::string lw840_state::callstack()
 
 uint32_t lw840_state::screen_update(screen_device& screen, bitmap_rgb32& bitmap, const rectangle& cliprect)
 {
-	const rgb_t palette[]{
-		0xffffffff,
-		0xff000000,
-	};
+	const rgb_t *palette = this->palette->palette()->entry_list_raw();
 
 	for(auto y = 0; y < 400; y++) {
-		uint32_t* p = &bitmap.pix(y);
+		uint32_t* p = &bitmap.pix32(y);
 		for(auto x = 0; x < 640; x += 16) {
 			auto gfx = vram[(y * 640 + x) / 16];
 			for(int i = 15; i >= 0; i--)
@@ -254,12 +246,21 @@ uint32_t lw840_state::screen_update(screen_device& screen, bitmap_rgb32& bitmap,
 	return 0;
 }
 
+READ8_MEMBER(lw840_state::illegal_r)
+{
+	space.device().logerror("%s: unmapped %s memory read from %0*X & %0*X\n", pc(), space.name(), space.addrchars(), space.byte_to_address(offset), 2, mem_mask);
+	return 0;
+}
+
+WRITE8_MEMBER(lw840_state::illegal_w)
+{
+	space.device().logerror("%s: unmapped %s memory write to %0*X = %0*X & %0*X\n", pc(), space.name(), space.addrchars(), space.byte_to_address(offset), 2, data, 2, mem_mask);
+}
+
 void lw840_state::machine_start()
 {
-	screen->set_visible_area(0, 640 - 1, 0, 400 - 1);
-
 	// try to load map file
-/*	FILE* f;
+	FILE* f;
 	if(fopen_s(&f, "lw840.map", "rt") == 0) {
 		char line[512];
 		do {
@@ -275,11 +276,11 @@ void lw840_state::machine_start()
 		} while(!feof(f));
 		fclose(f);
 	}
-*/
 
 	vram = reinterpret_cast<uint16_t *>(reinterpret_cast<uintptr_t>(memshare("sram")->ptr()) + 0x300);
 
 	fdc->set_rate(500000);
+
 
 	// patches here; byte-swapped!!
 	rom = memregion("maincpu")->base();
@@ -344,7 +345,7 @@ static INPUT_PORTS_START(lw840)
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_RIGHT)      PORT_CHAR(UCHAR_MAMEKEY(RIGHT)) //works
 
 	PORT_START("kbrow.5")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_MINUS)      PORT_CHAR(0x00df) PORT_CHAR('?') // ÃŸ
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_MINUS)      PORT_CHAR(L'ß') PORT_CHAR('?')
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_0)          PORT_CHAR('0')
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_P)          PORT_CHAR('p')
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_O)          PORT_CHAR('o')
@@ -355,9 +356,9 @@ static INPUT_PORTS_START(lw840)
 
 	PORT_START("kbrow.6")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Inhalt")                PORT_CODE(KEYCODE_HOME)       PORT_CHAR(UCHAR_MAMEKEY(HOME)) //works
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_COLON)      PORT_CHAR(0x00f6) PORT_CHAR(0x00d6) // Ã¶ Ã– //works
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_COLON)      PORT_CHAR(L'ö') PORT_CHAR(L'Ö') //works
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_CLOSEBRACE) PORT_CHAR('+') PORT_CHAR('*') //works
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_OPENBRACE)  PORT_CHAR(0x00fc) PORT_CHAR(0x00dc) // Ã¼ Ãœ //works
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_OPENBRACE)  PORT_CHAR(L'ü') PORT_CHAR(L'Ü') //works
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_LEFT)       PORT_CHAR(UCHAR_MAMEKEY(LEFT)) //works
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_DOWN)       PORT_CHAR(UCHAR_MAMEKEY(DOWN)) //works
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_LCONTROL)   PORT_CHAR(UCHAR_MAMEKEY(LCONTROL))
@@ -374,51 +375,56 @@ static INPUT_PORTS_START(lw840)
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_LSHIFT)     PORT_CHAR(UCHAR_MAMEKEY(LSHIFT)) //works
 
 	PORT_START("kbrow.8")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_QUOTE)      PORT_CHAR(0x00b4) PORT_CHAR(0x02cb) // Â´ ` //works
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_QUOTE)      PORT_CHAR(L'´') PORT_CHAR('`') //works
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_L)          PORT_CHAR('l') //works
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_TILDE)      PORT_CHAR('\'')
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_K)          PORT_CHAR('k') //works
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_STOP)       PORT_CHAR('.') PORT_CHAR(':') //works
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_SLASH)      PORT_CHAR('-') PORT_CHAR('_') //works
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_QUOTE)      PORT_CHAR(0x00e4) PORT_CHAR(0x00c4) // Ã¤ Ã„
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_QUOTE)      PORT_CHAR(L'ä') PORT_CHAR(L'Ä')
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_UNUSED)
 INPUT_PORTS_END
 
-static void lw840_floppies(device_slot_interface& device) {
-	device.option_add("35hd", FLOPPY_35_HD);
-}
+FLOPPY_FORMATS_MEMBER(lw840_state::floppy_formats)
+	FLOPPY_PC_FORMAT
+FLOPPY_FORMATS_END
 
-void lw840_state::lw840(machine_config& config) {
+static SLOT_INTERFACE_START( lw840_floppies )
+	SLOT_INTERFACE( "35hd", FLOPPY_35_HD )
+SLOT_INTERFACE_END
+
+static MACHINE_CONFIG_START( lw840 )
 	// basic machine hardware
-	H83002(config, maincpu, 14'745'600);
-	maincpu->set_addrmap(AS_PROGRAM, &lw840_state::map_program);
-	maincpu->set_addrmap(AS_IO, &lw840_state::map_io);
-	maincpu->tend0().set("fdc", FUNC(gm82c765b_device::tc_line_w));
-	TIMER(config, "2khz").configure_periodic(FUNC(lw840_state::int2_timer_callback), attotime::from_hz(2*1000));
+	MCFG_CPU_ADD("maincpu", H83002, XTAL_14_7456MHz)
+	MCFG_CPU_PROGRAM_MAP(lw840_map)
+	MCFG_CPU_IO_MAP(lw840_io_map)
+	MCFG_H83002_TEND0_CALLBACK(DEVWRITELINE("fdc", gm82c765b_device, tc_line_w))
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("1khz", lw840_state, int2_timer_callback, attotime::from_hz(2*1000))
 
 	// video hardware
-	SCREEN(config, screen, SCREEN_TYPE_RASTER);
-	screen->set_color(rgb_t::white());
-	screen->set_physical_aspect(640, 400);
-	screen->set_screen_update(FUNC(lw840_state::screen_update));
-	screen->set_refresh_hz(78.1); // TODO: measure!
-	screen->set_size(640, 400);
+	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::white())
+	MCFG_SCREEN_REFRESH_RATE(78.1) // TODO: measure!
+	MCFG_SCREEN_UPDATE_DRIVER(lw840_state, screen_update)
+	MCFG_SCREEN_SIZE(640, 400)
+	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 400-1)
+	MCFG_PALETTE_ADD_MONOCHROME_INVERTED("palette")
 
 	// floppy
-	GM82C765B(config, fdc, 0);
-	fdc->intrq_wr_callback().set(FUNC(lw840_state::fdc_interrupt));
-	fdc->drq_wr_callback().set(FUNC(lw840_state::fdc_drq));
-	FLOPPY_CONNECTOR(config, "fdc:0", lw840_floppies, "35hd", lw840_state::floppy_formats);
+	MCFG_GM82C765B_ADD("fdc")
+	MCFG_UPD765_INTRQ_CALLBACK(WRITELINE(lw840_state, fdc_interrupt))
+	MCFG_UPD765_DRQ_CALLBACK(WRITELINE(lw840_state, fdc_drq))
+	MCFG_FLOPPY_DRIVE_ADD("fdc:0", lw840_floppies, "35hd", lw840_state::floppy_formats)
 
-	// sound hardware
-	SPEAKER(config, "mono").front_center();
-	BEEP(config, "beeper", 4'000).add_route(ALL_OUTPUTS, "mono", 1.0); // 4.0 kHz
-}
+	// sound hardware - dummy
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("beeper", BEEP, 4000) // 4.0 kHz
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+MACHINE_CONFIG_END
 
 ROM_START( lw840 )
 	ROM_REGION(0x400000, "maincpu", 0)
 	ROM_LOAD("us3122-a", 0x00000, 0x400000, CRC(70A3A4A6) SHA1(11e32c7da58800d69af29089f7e7deeab513b1ae))
 ROM_END
 
-//    YEAR  NAME  PARENT COMPAT   MACHINE INPUT  CLASS         INIT        COMPANY         FULLNAME            FLAGS
-COMP( 1997, lw840,  0,   0,       lw840,  lw840, lw840_state,  empty_init, "Brother",      "Brother LW-840ic", MACHINE_NODEVICE_PRINTER )
+//    YEAR  NAME  PARENT COMPAT   MACHINE INPUT  CLASS           INIT     COMPANY         FULLNAME            FLAGS
+COMP( 1997, lw840,  0,   0,       lw840,  lw840, lw840_state,    0,       "Brother",      "Brother LW-840ic", MACHINE_NODEVICE_PRINTER )

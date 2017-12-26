@@ -2,7 +2,6 @@
 // copyright-holders:Bartman/Abyss
 
 #include "emu.h"
-#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 #include "machine/timer.h"
@@ -11,13 +10,25 @@
 #include "sound/beep.h"
 #include "video/mc6845.h"
 
+// fixed quite a few DMA related bugs in z180 core!
+
 // if updating project, c:\msys64\win32env.bat
 // cd \schreibmaschine\mame_src
-// make SUBTARGET=schreibmaschine NO_USE_MIDI=1 NO_USE_PORTAUDIO=1 vs2019
+// make SUBTARGET=schreibmaschine NO_USE_MIDI=1 NO_USE_PORTAUDIO=1 vs2017
 
 // command line parameters:
 // -log -debug -window -intscalex 2 -intscaley 2 lw30 -resolution 960x256 -flop roms\lw30\tetris.img
-// -debug -autoboot_script c:\schreibmaschine\mame_src\lw30.lua -log -window -intscalex 8 -intscaley 8 -resolution 1920x512 lw30 -flop c:\brothers\mame\disks\lw30\tetris.img 
+
+
+// **TIMING**
+// timing: Tetris Copyright screen
+// hardware: 23:19 - 38:43 = 15.40 s
+// mame:           - 35:15 = 11.93 s
+
+// Z180 datasheet, pg. 86ff "Dynamic RAM Refresh Control"; LW-30 sets RCR to 0xFF
+// doesn't seem to be implemented in Z180 core; however this would only account for about 2.5% time difference
+// Z180 datasheet, pg. 27ff "Wait State Generator"; LW-30 sets DCNTL to 0x40; insert 1 wait state for memory access; external I/O 1 wait state
+// doesn't seem to be implemented in Z180 core; could explain the timing difference
 
 #pragma region(LW-30)
 
@@ -49,7 +60,7 @@ UA5445-B LC-1
 NEC
 D23C4001EC-172
 UA2849-A
-4MBit Mask ROM for Dictionary
+4MBit Mask ROM
 
 #5
 LH532H07
@@ -92,7 +103,7 @@ Floppy - custom single sided 3.5" DD
 custom 5-to-8 GCR encoding (very similar to Apple II's 5-and-3 encoding)
 300 rpm
 FF FF FF used as sync-start, AB sync-mark for sector header, DE sync-mark for sector data
-FAT12 File System
+FAT File System
 
 ROHM
 BA6580DK
@@ -101,8 +112,8 @@ Read/Write Amplifier for FDD
 Emulation Status:
 Printer not working
 Floppy Disk writing not working
-Floppy Disk Sync not implemented (reading works)
 Dictionary ROM not working
+Different beeper frequencies not working (Tetris)
 Cursor shapes not implemented except block cursor
 
 TODO: find self-test; verify RAM address map
@@ -118,30 +129,32 @@ class lw30_floppy_connector : public device_t, public device_slot_interface
 {
 public:
 	lw30_floppy_connector(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	virtual ~lw30_floppy_connector();
 
 	lw30_floppy_image_device *get_device();
 
 protected:
-	void device_start() override {}
-	void device_config_complete() override {}
+	virtual void device_start() override;
+	virtual void device_config_complete() override;
 };
 
-class lw30_floppy_image_device : public device_t, public device_image_interface
+class lw30_floppy_image_device : public device_t, public device_image_interface, public device_slot_card_interface
 {
 public:
 	lw30_floppy_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	virtual ~lw30_floppy_image_device();
 
 public:
-	iodevice_t image_type() const noexcept override { return IO_FLOPPY; }
-	bool is_readable() const noexcept override { return true; }
-	bool is_writeable() const noexcept override { return true; }
-	bool is_creatable() const noexcept override { return true; }
-	bool must_be_loaded() const noexcept override { return false; }
-	bool is_reset_on_load() const noexcept override { return false; }
-	const char *file_extensions() const noexcept override { return "img"; }
-	const char *image_interface() const noexcept override { return "lw30_floppy_35"; }
-	image_init_result call_load() override;
-	void call_unload() override;
+	virtual iodevice_t image_type() const override { return IO_FLOPPY; }
+	virtual bool is_readable()  const override { return true; }
+	virtual bool is_writeable() const override { return true; }
+	virtual bool is_creatable() const override { return true; }
+	virtual bool must_be_loaded() const override { return false; }
+	virtual bool is_reset_on_load() const override { return false; }
+	virtual const char *file_extensions() const override { return "img"; }
+	virtual const char *image_interface() const override { return "floppy_35"; }
+	virtual image_init_result call_load() override;
+	virtual void call_unload() override;
 
 	bool loaded = false;
 	bool dirty = false;
@@ -153,15 +166,27 @@ public:
 	std::array<std::array<uint8_t, track_length + 1024/*safety, temporary*/>, 78> tracks;
 
 protected:
-	void device_start() override { }
+	virtual void device_start() override { }
 };
 
-DEFINE_DEVICE_TYPE(LW30_FLOPPY_CONNECTOR, lw30_floppy_connector, "lw30_floppy_connector", "LW-30 Floppy drive connector abstraction")
-DEFINE_DEVICE_TYPE(LW30_FLOPPY, lw30_floppy_image_device, "lw30_floppy_35", "LW-30 3.5\" floppy drive")
+DEFINE_DEVICE_TYPE(LW30_FLOPPY_CONNECTOR, lw30_floppy_connector, "floppy_connector", "Floppy drive connector abstraction")
+DEFINE_DEVICE_TYPE(LW30_FLOPPY, lw30_floppy_image_device, "floppy_35", "3.5\" floppy drive")
 
 lw30_floppy_connector::lw30_floppy_connector(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, LW30_FLOPPY_CONNECTOR, tag, owner, clock),
 	device_slot_interface(mconfig, *this)
+{
+}
+
+lw30_floppy_connector::~lw30_floppy_connector()
+{
+}
+
+void lw30_floppy_connector::device_start()
+{
+}
+
+void lw30_floppy_connector::device_config_complete()
 {
 }
 
@@ -172,7 +197,12 @@ lw30_floppy_image_device *lw30_floppy_connector::get_device()
 
 lw30_floppy_image_device::lw30_floppy_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, LW30_FLOPPY, tag, owner, clock),
-	device_image_interface(mconfig, *this)
+	device_image_interface(mconfig, *this),
+	device_slot_card_interface(mconfig, *this)
+{
+}
+
+lw30_floppy_image_device::~lw30_floppy_image_device()
 {
 }
 
@@ -270,7 +300,7 @@ namespace {
 			e ^= input[i++];
 		}
 
-		return { c, d, e };
+		return{ c, d, e };
 	}
 
 	std::array<uint8_t, 416> gcr_encode_and_checksum(const uint8_t* input /* 256 bytes */) {
@@ -343,10 +373,10 @@ public:
 
 protected:
 	// device-level overrides
-	void device_start() override;
+	virtual void device_start() override;
 
 	// sound stream update overrides
-	void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
+	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
 
 public:
 	DECLARE_WRITE_LINE_MEMBER(set_state);   // enable/disable sound output
@@ -386,9 +416,9 @@ void brother_beep_device::device_start()
 	save_item(NAME(m_signal));
 }
 
-void brother_beep_device::sound_stream_update(sound_stream& stream, std::vector<read_stream_view> const& inputs, std::vector<write_stream_view>& outputs)
+void brother_beep_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
 {
-	auto& buffer = outputs[0];
+	stream_sample_t *buffer = outputs[0];
 	auto signal = m_signal;
 	int clock = 0, rate = BROTHER_BEEP_RATE / 2;
 
@@ -401,17 +431,17 @@ void brother_beep_device::sound_stream_update(sound_stream& stream, std::vector<
 	/* if we're not enabled, just fill with 0 */
 	if(m_state == 0xff || clock == 0)
 	{
-		buffer.fill(0);
+		memset(buffer, 0, samples * sizeof(*buffer));
 		return;
 	}
 
 	/* fill in the sample */
-	for(int sampindex = 0; sampindex < buffer.samples(); sampindex++)
+	while(samples-- > 0)
 	{
 		if(BIT(m_state, 7) != 0)
-			buffer.put(sampindex, signal > 0 ? 1.f : -1.f);
+			*buffer++ = signal > 0 ? 0x7fff : -0x8000;
 		else
-			buffer.put(sampindex, 0.f);
+			*buffer++ = 0;
 
 		incr -= clock;
 		while(incr < 0)
@@ -460,16 +490,12 @@ class lw30_state : public driver_device
 public:
 	lw30_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		maincpu(*this, "maincpu"),
-		screen(*this, "screen"),
+		m_maincpu(*this, "maincpu"),
+		m_palette(*this, "palette"),
+		m_io_kbrow(*this, "kbrow.%u", 0),
 		floppy(*this, "floppy"),
-		beeper(*this, "beeper"),
-		m_io_kbrow(*this, "kbrow.%u", 0)
-	{ 
-		//video_control = 0b00000010; // TEST LW-10 screen height
-	}
-
-	void lw30(machine_config& config);
+		m_speaker(*this, "beeper")
+	{ }
 
 	// helpers
 	std::string pc();
@@ -477,80 +503,41 @@ public:
 	std::string callstack();
 
 	// devices
-	required_device<hd64180rp_device> maincpu;
-	required_device<screen_device> screen;
-
+	required_device<z180_device> m_maincpu;
+	required_device<palette_device> m_palette;
 	required_device<lw30_floppy_connector> floppy;
-	required_device<brother_beep_device> beeper;
+	required_device<brother_beep_device> m_speaker;
 	optional_ioport_array<9> m_io_kbrow;
 
 	// screen updates
 	uint32_t screen_update(screen_device& screen, bitmap_rgb32& bitmap, const rectangle& cliprect);
 
-	uint8_t illegal_r(offs_t offset, uint8_t mem_mask = ~0) {
-		logerror("%s: unmapped memory read from %0*X & %0*X\n", pc(), 6, offset, 2, mem_mask);
-		return 0;
-	}
-	void illegal_w(offs_t offset, uint8_t data, uint8_t mem_mask = ~0) {
-		logerror("%s: unmapped memory write to %0*X = %0*X & %0*X\n", pc(), 6, offset, 2, data, 2, mem_mask);
-	}
+	DECLARE_READ8_MEMBER(illegal_r); DECLARE_WRITE8_MEMBER(illegal_w);
 
 	// ROM
-	uint8_t rom42000_r(offs_t offset, uint8_t mem_mask = ~0) {
-		return rom[0x02000 + offset] & mem_mask;
-	}
+	DECLARE_READ8_MEMBER(rom42000_r);
 
 	// IO
-	void video_cursor_x_w(uint8_t data) { // 70
+	DECLARE_WRITE8_MEMBER(video_cursor_x_w) { // 70
 		video_cursor_x = data;
 	}
-	void video_cursor_y_w(uint8_t data) { // 71
+	DECLARE_WRITE8_MEMBER(video_cursor_y_w) { // 71
 		video_cursor_y = data;
 	}
-	void video_pos_x_w(uint8_t data) { // 72
+	DECLARE_WRITE8_MEMBER(video_pos_x_w) { // 72
 		video_pos_x = data;
 	}
-	void video_pos_y_w(uint8_t data) { // 73
+	DECLARE_WRITE8_MEMBER(video_pos_y_w) { // 73
 		video_pos_y = data;
 	}
-	uint8_t video_data_r() { // 74
-		uint8_t data = 0x00;
-		if(video_pos_y < 0x20)
-			data = videoram[video_pos_y * 256 + video_pos_x];
-		else
-			logerror("%s: video_data_r out of range: x=%u, y=%u\n", callstack(), video_pos_x, video_pos_y);
-
-		return data;
+	DECLARE_READ8_MEMBER(video_data_r); DECLARE_WRITE8_MEMBER(video_data_w); // 74
+	DECLARE_WRITE8_MEMBER(video_control_w) { // 75
+		video_control = data;
 	}
-
-	void video_data_w(uint8_t data) { // 74
-		if(video_pos_y < 0x20)
-			videoram[video_pos_y * 256 + video_pos_x] = data;
-		else
-			logerror("%s: video_data_w out of range: x=%u, y=%u\n", callstack(), video_pos_x, video_pos_y);
-
-		video_pos_x++;
-		if(video_pos_x == 0)
-			video_pos_y++;
-	}
-
-	uint8_t video_control_r() { // 75 
-		return video_control; 
-	}
-	void video_control_w(uint8_t data) { 
-		video_control = data; // | 0b00000010; // TEST LW-10 screen height
-	} 
-	// 76
-	uint8_t io_77_r() { // config
-		uint8_t out = 0x20; // 14 lines
-		out |= 0x00; // german
-		//out |= 0x01; // french
-		//out |= 0x02; // german
-		return ~out;
-	}
+	DECLARE_READ8_MEMBER(io_77_r); // config
 
 	// Floppy
-	uint8_t io_80_r() {
+	DECLARE_READ8_MEMBER(io_80_r) {
 		auto fd = floppy->get_device();
 		if(!fd->loaded)
 			return 0;
@@ -566,12 +553,12 @@ public:
 		floppy_track_offset++;
 		return ret;
 	}
-	uint8_t io_90_r() {
+	DECLARE_READ8_MEMBER(io_90_r) {
 		// bit 7 set; data ready from floppy
 		// bit 6 clear; unknown meaning
 		return 0b10000000;
 	}
-	void io_90_w(uint8_t data) {
+	DECLARE_WRITE8_MEMBER(io_90_w) {
 		// write directly to 4-wire bipolar stepper motor (see stepper_table)
 		// a rotation to the left means decrease quarter-track
 		// a rotation to the right means increase quarter-track
@@ -600,62 +587,10 @@ public:
 	uint8_t floppy_steps{}; // quarter track
 	uint16_t floppy_track_offset{}; // current offset within track data
 
-	uint8_t illegal_io_r(offs_t offset, uint8_t mem_mask = ~0) {
-		logerror("%s: unmapped IO read from %0*X & %0*X\n", pc(), 4, offset + 0x40, 2, mem_mask);
-		return 0;
-	}
-	void illegal_io_w(offs_t offset, uint8_t data, uint8_t mem_mask = ~0) {
-		logerror("%s: unmapped IO write to %0*X = %0*X & %0*X\n", pc(), 4, offset + 0x40, 2, data, 2, mem_mask);
-	}
-
-	uint8_t io_b0_r() {
-		// Tetris reads bit 3, needed for correct keyboard layout
-		return 0b1000;
-	}
-	uint8_t lw30_state::io_b8_r() { // B8 (keyboard)
-		// keyboard matrix
-		if(io_b8 <= 8) {
-			if(m_io_kbrow[io_b8].found()) {
-				return m_io_kbrow[io_b8].read_safe(0);
-			}
-		}
-		return 0x00;
-	}
-	void io_b8_w(uint8_t data) {
-		io_b8 = data;
-	}
-
-	// Tetris Game Over Melody:
-	// according to oscilloscope:
-	// - total length 2.630s, wavosaur shows 2.043s
-	// - last note: 600Âµs on, 600Âµs off, on-to-on: 1260Âµs, wavosaur shows 1083Âµs
-	// according to MAME
-	// - 11Âµs between writes to beeper
-	// - 476Âµs (value=0x310=784) => 0.6071x between writes of 01 and 81 to beeper
-	// - 713Âµs
-	// - 724Âµs
-	// - last note: 543Âµs (value=0x2ba=698) => 0.7779x
-
-	void beeper_w(uint8_t data) { // F0
-		#if 0
-			static uint8_t lastData{};
-			static attotime last{};
-			static attotime lastDifferent{};
-			attotime cur{ maincpu->local_time() };
-
-			logerror("beeper_w(%02X) @ %s (delta=%sÂµs diff_delta=%sÂµs)\n", data, cur.as_string(), ((cur - last) * 1000000).as_string(0), ((cur - lastDifferent) * 1000000).as_string(0));
-			if(data != lastData)
-				lastDifferent = cur;
-			last = cur;
-			lastData = data;
-		#endif
-
-		beeper->set_state(data);
-	}
-
-	void lw30_state::irqack_w(uint8_t) { // F8
-		maincpu->set_input_line(INPUT_LINE_IRQ1, CLEAR_LINE);
-	}
+	DECLARE_READ8_MEMBER(illegal_io_r); DECLARE_WRITE8_MEMBER(illegal_io_w);
+	DECLARE_READ8_MEMBER(io_b8_r); DECLARE_WRITE8_MEMBER(io_b8_w);
+	DECLARE_WRITE8_MEMBER(beeper_w); // F0
+	DECLARE_WRITE8_MEMBER(irqack_w); // F8
 
 	uint8_t videoram[0x2000]; // 80 chars * 14 lines; 2 bytes per char (attribute, char)
 	uint8_t video_cursor_x, video_cursor_y, video_pos_x, video_pos_y, video_control, io_b8;
@@ -666,50 +601,10 @@ public:
 
 protected:
 	// driver_device overrides
-	void machine_start() override;
-	void machine_reset() override;
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
-	void video_start() override;
-
-	void map_program(address_map& map) {
-		map(0x00000, 0x01fff).rom();
-		map(0x02000, 0x05fff).ram();
-		map(0x06000, 0x3ffff).rom();
-		map(0x50000, 0x51fff).ram(); // ???
-		map(0x61000, 0x61fff).ram();
-		map(0x42000, 0x45fff).rw(FUNC(lw30_state::rom42000_r), FUNC(lw30_state::illegal_w)); // => ROM 0x02000-0x05fff
-		map(0x65000, 0x70fff).ram();
-	}
-
-	void map_io(address_map& map) {
-		map.global_mask(0xff);
-		map(0x00, 0x3f).noprw(); // Z180 internal registers
-
-		// video
-		map(0x70, 0x70).w(FUNC(lw30_state::video_cursor_x_w));
-		map(0x71, 0x71).w(FUNC(lw30_state::video_cursor_y_w));
-		map(0x72, 0x72).w(FUNC(lw30_state::video_pos_x_w));
-		map(0x73, 0x73).w(FUNC(lw30_state::video_pos_y_w));
-		map(0x74, 0x74).rw(FUNC(lw30_state::video_data_r), FUNC(lw30_state::video_data_w));
-		map(0x75, 0x75).rw(FUNC(lw30_state::video_control_r), FUNC(lw30_state::video_control_w));
-		map(0x76, 0x76).noprw(); // NOP just to shut up the log
-		map(0x77, 0x77).r(FUNC(lw30_state::io_77_r)).nopw(); // NOP just to shut up the log
-
-		// floppy
-		map(0x80, 0x80).r(FUNC(lw30_state::io_80_r));
-		map(0x88, 0x88).noprw(); // NOP just to shut up the log
-		map(0x90, 0x90).rw(FUNC(lw30_state::io_90_r), FUNC(lw30_state::io_90_w));
-		map(0x98, 0x98).noprw(); // NOP just to shut up the log
-
-		map(0xa8, 0xa8).noprw(); // NOP just to shut up the log
-		map(0xb0, 0xb0).r(FUNC(lw30_state::io_b0_r));
-		map(0xb8, 0xb8).rw(FUNC(lw30_state::io_b8_r), FUNC(lw30_state::io_b8_w));
-		map(0xd8, 0xd8).noprw(); // NOP just to shut up the log
-		map(0xf0, 0xf0).w(FUNC(lw30_state::beeper_w));
-		map(0xf8, 0xf8).w(FUNC(lw30_state::irqack_w));
-
-		//map(0x40, 0xff).rw(FUNC(lw30_state::illegal_io_r), FUNC(lw30_state::illegal_io_w));
-	}
+	virtual void video_start() override;
 
 	uint8_t* rom{};
 	std::map<uint32_t, std::string> symbols;
@@ -721,7 +616,7 @@ void lw30_state::video_start()
 
 std::string lw30_state::pc()
 {
-	class z180_friend : public z180_device { public: using z180_device::memory_translate; friend class lw350_state; };
+	class z180_friend : z180_device { friend class lw30_state; };
 	auto cpu = static_cast<z180_friend*>(dynamic_cast<z180_device*>(&machine().scheduler().currently_executing()->device()));
 	offs_t phys = cpu->pc();
 	cpu->memory_translate(AS_PROGRAM, 0, phys);
@@ -745,7 +640,7 @@ std::string lw30_state::symbolize(uint32_t adr)
 
 std::string lw30_state::callstack()
 {
-	class z180_friend : public z180_device { public: using z180_device::memory_translate; friend class lw350_state; };
+	class z180_friend : z180_device { friend class lw30_state; };
 	auto cpu = static_cast<z180_friend*>(dynamic_cast<z180_device*>(&machine().scheduler().currently_executing()->device()));
 	offs_t pc = cpu->pc();
 	cpu->memory_translate(AS_PROGRAM, 0, pc);
@@ -1122,14 +1017,11 @@ uint32_t lw30_state::screen_update(screen_device& screen, bitmap_rgb32& bitmap, 
 		invert_lower_half	= 0b01000000
 	};
 
-	const rgb_t palette[]{
-		0xffffffff,
-		0xff000000,
-	};
+	const rgb_t *palette = m_palette->palette()->entry_list_raw();
 
 	enum control : uint8_t {
 		display_on          = 0b00000001,
-		half_height         = 0b00000010, // 64px height (LW-10/20) instead of 128px height (LW-30)
+		full_height         = 0b00000010, // 128px height (LW-30) instead of 64px height (LW-10)
 		bitmap_mode         = 0b00001000,
 		tile_mode           = 0b00100000, // 8x8 tiles at videoram[0x1000]
 	};
@@ -1161,7 +1053,7 @@ uint32_t lw30_state::screen_update(screen_device& screen, bitmap_rgb32& bitmap, 
 				}
 			}
 			for(auto y = 0; y < 128; y++) {
-				uint32_t* p = &bitmap.pix(y);
+				uint32_t* p = &bitmap.pix32(y);
 				for(auto x = 0; x < 480; x += 8) {
 					auto gfx = pixmap[y * 60 + x / 8];
 					*p++ = palette[BIT(gfx, 7)];
@@ -1176,7 +1068,7 @@ uint32_t lw30_state::screen_update(screen_device& screen, bitmap_rgb32& bitmap, 
 			}
 		} else if(video_control & bitmap_mode) {
 			for(auto y = 0; y < 128; y++) {
-				uint32_t* p = &bitmap.pix(y);
+				uint32_t* p = &bitmap.pix32(y);
 				for(auto x = 0; x < 480; x += 8) {
 					auto gfx = videoram[y * 64 + x / 8];
 					*p++ = palette[BIT(gfx, 7)];
@@ -1247,7 +1139,7 @@ uint32_t lw30_state::screen_update(screen_device& screen, bitmap_rgb32& bitmap, 
 				}
 			}
 			for(auto y = 0; y < 128; y++) {
-				uint32_t* p = &bitmap.pix(y);
+				uint32_t* p = &bitmap.pix32(y);
 				for(auto x = 0; x < 640; x += 8) {
 					auto gfx = pixmap[y * 80 + x / 8];
 					//*p++ = palette[BIT(gfx, 7)];
@@ -1264,7 +1156,7 @@ uint32_t lw30_state::screen_update(screen_device& screen, bitmap_rgb32& bitmap, 
 	} else { 
 		// display off
 		for(auto y = 0; y < 128; y++) {
-			uint32_t* p = &bitmap.pix(y);
+			uint32_t* p = &bitmap.pix32(y);
 			for(auto x = 0; x < 480; x++) {
 				*p++ = palette[0];
 			}
@@ -1274,21 +1166,166 @@ uint32_t lw30_state::screen_update(screen_device& screen, bitmap_rgb32& bitmap, 
 	return 0;
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(lw30_state::int1_timer_callback)
+static ADDRESS_MAP_START( lw30_map, AS_PROGRAM, 8, lw30_state )
+	AM_RANGE(0x00000, 0x01fff) AM_ROM
+	AM_RANGE(0x02000, 0x05fff) AM_RAM
+	AM_RANGE(0x06000, 0x3ffff) AM_ROM
+	AM_RANGE(0x50000, 0x51fff) AM_RAM // ???
+	AM_RANGE(0x61000, 0x61fff) AM_RAM
+	AM_RANGE(0x42000, 0x45fff) AM_READWRITE(rom42000_r, illegal_w) // => ROM 0x02000-0x05fff
+	AM_RANGE(0x65000, 0x70fff) AM_RAM
+	ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( lw30_io, AS_IO, 8, lw30_state )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	AM_RANGE(0x00, 0x3f) AM_NOP // Z180 internal registers
+
+	AM_RANGE(0x70, 0x70) AM_WRITE(video_cursor_x_w)
+	AM_RANGE(0x71, 0x71) AM_WRITE(video_cursor_y_w)
+	AM_RANGE(0x72, 0x72) AM_WRITE(video_pos_x_w)
+	AM_RANGE(0x73, 0x73) AM_WRITE(video_pos_y_w)
+	AM_RANGE(0x74, 0x74) AM_READWRITE(video_data_r, video_data_w)
+	AM_RANGE(0x75, 0x75) AM_WRITE(video_control_w)
+	AM_RANGE(0x76, 0x76) AM_NOP // NOP just to shut up the log
+	AM_RANGE(0x77, 0x77) AM_READ(io_77_r) AM_WRITENOP // NOP just to shut up the log
+
+	// floppy
+	AM_RANGE(0x80, 0x80) AM_READ(io_80_r)
+	AM_RANGE(0x88, 0x88) AM_NOP // NOP just to shut up the log
+	AM_RANGE(0x90, 0x90) AM_READWRITE(io_90_r, io_90_w)
+	AM_RANGE(0x98, 0x98) AM_NOP // NOP just to shut up the log
+
+	AM_RANGE(0xa8, 0xa8) AM_NOP // NOP just to shut up the log
+	AM_RANGE(0xb0, 0xb0) AM_NOP // NOP just to shut up the log
+	AM_RANGE(0xb8, 0xb8) AM_READWRITE(io_b8_r, io_b8_w)
+	AM_RANGE(0xd8, 0xd8) AM_NOP // NOP just to shut up the log
+	AM_RANGE(0xf0, 0xf0) AM_WRITE(beeper_w)
+	AM_RANGE(0xf8, 0xf8) AM_WRITE(irqack_w)
+
+	AM_RANGE(0x40, 0xff) AM_READWRITE(illegal_io_r, illegal_io_w)
+ADDRESS_MAP_END
+
+READ8_MEMBER(lw30_state::rom42000_r)
 {
-	maincpu->set_input_line(INPUT_LINE_IRQ1, ASSERT_LINE);
+	return rom[0x02000 + offset] & mem_mask;
 }
 
+READ8_MEMBER(lw30_state::illegal_r)
+{
+	space.device().logerror("%s: unmapped %s memory read from %0*X & %0*X\n", pc(), space.name(), space.addrchars(), space.byte_to_address(offset), 2, mem_mask);
+	return 0;
+}
+
+WRITE8_MEMBER(lw30_state::illegal_w)
+{
+	space.device().logerror("%s: unmapped %s memory write to %0*X = %0*X & %0*X\n", pc(), space.name(), space.addrchars(), space.byte_to_address(offset), 2, data, 2, mem_mask);
+}
+
+READ8_MEMBER(lw30_state::illegal_io_r)
+{
+	space.device().logerror("%s: unmapped %s memory read from %0*X & %0*X\n", callstack(), space.name(), space.addrchars(), space.byte_to_address(offset + 0x40), 2, mem_mask);
+	return 0;
+}
+
+WRITE8_MEMBER(lw30_state::illegal_io_w)
+{
+	space.device().logerror("%s: unmapped %s memory write to %0*X = %0*X & %0*X\n", pc(), space.name(), space.addrchars(), space.byte_to_address(offset + 0x40), 2, data, 2, mem_mask);
+}
+
+TIMER_DEVICE_CALLBACK_MEMBER(lw30_state::int1_timer_callback)
+{
+	m_maincpu->set_input_line(INPUT_LINE_IRQ1, ASSERT_LINE);
+}
+
+// Tetris Game Over Melody:
+// according to oscilloscope:
+// - total length 2.630s, wavosaur shows 2.043s
+// - last note: 600µs on, 600µs off, on-to-on: 1260µs, wavosaur shows 1083µs
+// according to MAME
+// - 11µs between writes to beeper
+// - 476µs (value=0x310=784) => 0.6071x between writes of 01 and 81 to beeper
+// - 713µs
+// - 724µs
+// - last note: 543µs (value=0x2ba=698) => 0.7779x
+
+WRITE8_MEMBER(lw30_state::beeper_w)
+{
+#if 1
+	static uint8_t lastData{};
+	static attotime last{};
+	static attotime lastDifferent{};
+	attotime cur{ m_maincpu->local_time() };
+
+	logerror("beeper_w(%02X) @ %s (delta=%sµs diff_delta=%sµs)\n", data, cur.as_string(), ((cur - last) * 1000000).as_string(0), ((cur - lastDifferent) * 1000000).as_string(0));
+	if(data != lastData)
+		lastDifferent = cur;
+	last = cur;
+	lastData = data;
+#endif
+
+	m_speaker->set_state(data);
+}
+
+WRITE8_MEMBER(lw30_state::irqack_w)
+{
+	m_maincpu->set_input_line(INPUT_LINE_IRQ1, CLEAR_LINE);
+}
+
+WRITE8_MEMBER(lw30_state::video_data_w)
+{
+	if(video_pos_y < 0x20)
+		videoram[video_pos_y * 256 + video_pos_x] = data;
+	else
+		logerror("%s: video_data_w out of range: x=%u, y=%u\n", callstack(), video_pos_x, video_pos_y);
+
+	video_pos_x++;
+	if(video_pos_x == 0)
+		video_pos_y++;
+}
+
+READ8_MEMBER(lw30_state::video_data_r)
+{
+	uint8_t data = 0x00;
+	if(video_pos_y < 0x20)
+		data = videoram[video_pos_y * 256 + video_pos_x];
+	else
+		logerror("%s: video_data_r out of range: x=%u, y=%u\n", callstack(), video_pos_x, video_pos_y);
+
+	return data;
+}
+
+READ8_MEMBER(lw30_state::io_77_r)
+{
+	uint8_t out = 0x20; // 14 lines
+	out |= 0x00; // german
+	//out |= 0x01; // french
+	//out |= 0x02; // german
+	return ~out;
+}
 
 // Keyboard
 //////////////////////////////////////////////////////////////////////////
 
+WRITE8_MEMBER(lw30_state::io_b8_w)
+{
+	io_b8 = data;
+}
+
+READ8_MEMBER(lw30_state::io_b8_r)
+{
+	// keyboard matrix
+	if(io_b8 <= 8) {
+		if(m_io_kbrow[io_b8].found()) {
+			return m_io_kbrow[io_b8].read_safe(0);
+		}
+	}
+	return 0x00;
+}
+
 void lw30_state::machine_start()
 {
-	screen->set_visible_area(0, 480 - 1, 0, 128 - 1);
-
 	// try to load map file
-/*	FILE* f;
+	FILE* f;
 	if(fopen_s(&f, "lw30.map", "rt") == 0) {
 		char line[512];
 		do {
@@ -1303,7 +1340,7 @@ void lw30_state::machine_start()
 			}
 		} while(!feof(f));
 		fclose(f);
-	}*/
+	}
 
 	rom = memregion("maincpu")->base();
 
@@ -1377,7 +1414,7 @@ static INPUT_PORTS_START(lw30)
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_RIGHT)      PORT_CHAR(UCHAR_MAMEKEY(RIGHT))
 
 	PORT_START("kbrow.5")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_MINUS)      PORT_CHAR(0x00df) PORT_CHAR('?') // ÃŸ
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_MINUS)      PORT_CHAR(L'ß') PORT_CHAR('?')
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_0)          PORT_CHAR('0')
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_P)          PORT_CHAR('p')
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_O)          PORT_CHAR('o')
@@ -1388,9 +1425,9 @@ static INPUT_PORTS_START(lw30)
 
 	PORT_START("kbrow.6")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Inhalt")                PORT_CODE(KEYCODE_HOME)       PORT_CHAR(UCHAR_MAMEKEY(HOME))
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_COLON)      PORT_CHAR(0x00f6) PORT_CHAR(0x00d6) // Ã¶ Ã–
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_COLON)      PORT_CHAR(L'ö') PORT_CHAR(L'Ö')
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_CLOSEBRACE) PORT_CHAR('+') PORT_CHAR('*')
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_OPENBRACE)  PORT_CHAR(0x00fc) PORT_CHAR(0x00dc) // Ã¼ Ãœ
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_OPENBRACE)  PORT_CHAR(L'ü') PORT_CHAR(L'Ü')
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_LEFT)       PORT_CHAR(UCHAR_MAMEKEY(LEFT))
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_DOWN)       PORT_CHAR(UCHAR_MAMEKEY(DOWN))
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_LCONTROL)   PORT_CHAR(UCHAR_MAMEKEY(LCONTROL))
@@ -1407,44 +1444,48 @@ static INPUT_PORTS_START(lw30)
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_LSHIFT)     PORT_CHAR(UCHAR_MAMEKEY(LSHIFT))
 
 	PORT_START("kbrow.8")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_QUOTE)      PORT_CHAR(0x00b4) PORT_CHAR(0x02cb) // Â´ `
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_QUOTE)      PORT_CHAR(L'´') PORT_CHAR('`')
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_L)          PORT_CHAR('l')
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_TILDE)      PORT_CHAR('\'')
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_K)          PORT_CHAR('k')
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_STOP)       PORT_CHAR('.') PORT_CHAR(':')
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_SLASH)      PORT_CHAR('-') PORT_CHAR('_')
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_QUOTE)      PORT_CHAR(0x00e4) PORT_CHAR(0x00c4) // Ã¤ Ã„
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_QUOTE)      PORT_CHAR(L'ä') PORT_CHAR(L'Ä')
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_UNUSED)
 INPUT_PORTS_END
 
 #pragma endregion
 
-void lw30_state::lw30(machine_config& config) {
+static SLOT_INTERFACE_START(lw30_floppies)
+	SLOT_INTERFACE("35dd", LW30_FLOPPY)
+SLOT_INTERFACE_END
+
+static MACHINE_CONFIG_START( lw30 )
 	// basic machine hardware
-	HD64180RP(config, maincpu, 12'000'000 / 2);
-	maincpu->set_addrmap(AS_PROGRAM, &lw30_state::map_program);
-	maincpu->set_addrmap(AS_IO, &lw30_state::map_io);
-	TIMER(config, "1khz").configure_periodic(FUNC(lw30_state::int1_timer_callback), attotime::from_hz(1000));
+	MCFG_CPU_ADD("maincpu", Z180, XTAL_12MHz/2 /* 10314285/2 */)
+	MCFG_CPU_PROGRAM_MAP(lw30_map)
+	MCFG_CPU_IO_MAP(lw30_io)
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("1khz", lw30_state, int1_timer_callback, attotime::from_hz(1000))
 
 	// video hardware
-	SCREEN(config, screen, SCREEN_TYPE_RASTER);
-	screen->set_color(rgb_t(6, 245, 206));
-	screen->set_physical_aspect(480, 128);
-	screen->set_refresh_hz(78.1);
-	screen->set_screen_update(FUNC(lw30_state::screen_update));
-	screen->set_size(480, 128);
+	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t(6, 245, 206))
+	MCFG_SCREEN_REFRESH_RATE(78.1)
+	MCFG_SCREEN_UPDATE_DRIVER(lw30_state, screen_update)
+	MCFG_SCREEN_SIZE(480, 128)
+	MCFG_SCREEN_VISIBLE_AREA(0, 480-1, 0, 128-1)
+	MCFG_PALETTE_ADD_MONOCHROME_INVERTED("palette")
 
-	TIMER(config, "cursor").configure_periodic(FUNC(lw30_state::cursor_timer_callback), attotime::from_msec(512));
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("cursor", lw30_state, cursor_timer_callback, attotime::from_msec(512))
 
 	// floppy disk
-	LW30_FLOPPY_CONNECTOR(config, floppy, 0);
-	floppy->option_add("35dd", LW30_FLOPPY);
-	floppy->set_default_option("35dd");
+ 	MCFG_DEVICE_ADD("floppy", LW30_FLOPPY_CONNECTOR, 0);
+ 	MCFG_DEVICE_SLOT_INTERFACE(lw30_floppies, "35dd", false);
 
 	// sound hardware
-	SPEAKER(config, "mono").front_center();
-	BROTHER_BEEP(config, beeper, 4'000).add_route(ALL_OUTPUTS, "mono", 1.0); // 4.0 kHz
-}
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("beeper", BROTHER_BEEP, 4000) // 4.0 kHz
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+MACHINE_CONFIG_END
 
 #pragma endregion
 
@@ -1461,4 +1502,4 @@ ROM_START( lw30 )
 ROM_END
 
 //    YEAR  NAME  PARENT COMPAT   MACHINE INPUT  CLASS           INIT     COMPANY         FULLNAME          FLAGS
-COMP( 1991, lw30,   0,   0,       lw30,   lw30,  lw30_state,     empty_init,       "Brother",      "Brother LW-30",  MACHINE_NODEVICE_PRINTER )
+COMP( 1991, lw30,   0,   0,       lw30,   lw30,  lw30_state,     0,       "Brother",      "Brother LW-30",  MACHINE_NODEVICE_PRINTER )

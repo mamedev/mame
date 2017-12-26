@@ -1,8 +1,7 @@
-// license:BSD-3-Clause
+﻿// license:BSD-3-Clause
 // copyright-holders:Bartman/Abyss
 
 #include "emu.h"
-#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 #include "machine/timer.h"
@@ -11,9 +10,11 @@
 #include "sound/beep.h"
 #include "video/mc6845.h"
 
+// fixed quite a few DMA related bugs in z180 core!
+
 // if updating project, c:\msys64\win32env.bat
 // cd \schreibmaschine\mame_src
-// make SUBTARGET=schreibmaschine NO_USE_MIDI=1 NO_USE_PORTAUDIO=1 vs2019
+// make SUBTARGET=schreibmaschine NO_USE_MIDI=1 NO_USE_PORTAUDIO=1 vs2017
 
 // command line parameters:
 // -log -debug -window -intscalex 2 -intscaley 2 lw350 -resolution 960x256 -flop roms\lw350\Brother_LW-200-300_GW-24-45_Ver1.0_SpreadsheetProgramAndDataStorageDisk.img
@@ -62,7 +63,6 @@ fully compatible with Zilog Z80180 (Z180)
 Murata Ceralock CST-MXW 16.00 MHz Ceramic Resonator
 
 1.44MB Floppy Drive
-MS-DOS compatible FAT12 disk format
 
 Hidden Keys during "DECKEL OFFEN!" ("Case Open!")
 - Ctrl+Shift+Cursor Right: LCD Test Menu
@@ -86,30 +86,32 @@ class lw350_floppy_connector : public device_t, public device_slot_interface
 {
 public:
 	lw350_floppy_connector(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	virtual ~lw350_floppy_connector();
 
 	lw350_floppy_image_device *get_device();
 
 protected:
-	void device_start() override {}
-	void device_config_complete() override {}
+	virtual void device_start() override;
+	virtual void device_config_complete() override;
 };
 
-class lw350_floppy_image_device : public device_t, public device_image_interface
+class lw350_floppy_image_device : public device_t, public device_image_interface, public device_slot_card_interface
 {
 public:
 	lw350_floppy_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	virtual ~lw350_floppy_image_device();
 
 public:
-	iodevice_t image_type() const noexcept override { return IO_FLOPPY; }
-	bool is_readable()  const noexcept override { return true; }
-	bool is_writeable() const noexcept override { return true; }
-	bool is_creatable() const noexcept override { return true; }
-	bool must_be_loaded() const noexcept override { return false; }
-	bool is_reset_on_load() const noexcept override { return false; }
-	const char *file_extensions() const noexcept override { return "img"; }
-	const char *image_interface() const noexcept override { return "lw350_floppy_35"; }
-	image_init_result call_load() override;
-	void call_unload() override;
+	virtual iodevice_t image_type() const override { return IO_FLOPPY; }
+	virtual bool is_readable()  const override { return true; }
+	virtual bool is_writeable() const override { return true; }
+	virtual bool is_creatable() const override { return true; }
+	virtual bool must_be_loaded() const override { return false; }
+	virtual bool is_reset_on_load() const override { return false; }
+	virtual const char *file_extensions() const override { return "img"; }
+	virtual const char *image_interface() const override { return "floppy_35"; }
+	virtual image_init_result call_load() override;
+	virtual void call_unload() override;
 
 	bool loaded = false;
 	bool dirty = false;
@@ -117,15 +119,28 @@ public:
 	uint32_t image_length{};
 
 protected:
-	void device_start() override {}
+	virtual void device_start() override { }
+	//virtual void device_config_complete() override { update_names(); } // needed; otherwise infinite loop during startup
 };
 
-DEFINE_DEVICE_TYPE(LW350_FLOPPY_CONNECTOR, lw350_floppy_connector, "lw350_floppy_connector", "LW350 Floppy drive connector abstraction")
-DEFINE_DEVICE_TYPE(LW350_FLOPPY, lw350_floppy_image_device, "lw350_floppy_35", "LW350 3.5\" floppy drive")
+DEFINE_DEVICE_TYPE(LW350_FLOPPY_CONNECTOR, lw350_floppy_connector, "floppy_connector", "Floppy drive connector abstraction")
+DEFINE_DEVICE_TYPE(LW350_FLOPPY, lw350_floppy_image_device, "floppy_35", "3.5\" floppy drive")
 
 lw350_floppy_connector::lw350_floppy_connector(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, LW350_FLOPPY_CONNECTOR, tag, owner, clock),
 	device_slot_interface(mconfig, *this)
+{
+}
+
+lw350_floppy_connector::~lw350_floppy_connector()
+{
+}
+
+void lw350_floppy_connector::device_start()
+{
+}
+
+void lw350_floppy_connector::device_config_complete()
 {
 }
 
@@ -136,7 +151,12 @@ lw350_floppy_image_device *lw350_floppy_connector::get_device()
 
 lw350_floppy_image_device::lw350_floppy_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, LW350_FLOPPY, tag, owner, clock),
-	device_image_interface(mconfig, *this)
+	device_image_interface(mconfig, *this),
+	device_slot_card_interface(mconfig, *this)
+{
+}
+
+lw350_floppy_image_device::~lw350_floppy_image_device()
 {
 }
 
@@ -145,7 +165,7 @@ image_init_result lw350_floppy_image_device::call_load()
 	// copy image into our buffer
 	auto p = ptr();
 	auto l = length();
-	image = std::make_unique<uint8_t[]>(l);
+	image.reset(new uint8_t[l]);
 	memcpy(image.get(), p, l);
 	image_length = l;
 
@@ -170,13 +190,25 @@ void lw350_floppy_image_device::call_unload()
 // FDC high-level emulation (not timing accurate) based on "Hitachi 8-Bit Microcomputer HD63265 FDC Floppy Disk Controller User's Manual"
 // https://archive.org/details/bitsavers_hitachidatDiskControllerUsersManual2edMar89_3858532
 
+#define MCFG_HD63266F_ADD(_tag, _clock)  \
+	MCFG_DEVICE_ADD(_tag, HD63266F, _clock)
+
+#define MCFG_HD63266F_IRQ_CALLBACK(_write) \
+	devcb = &hd63266f_t::set_irq_wr_callback(*device, DEVCB_##_write);
+
+#define MCFG_HD63266F_DREQ_CALLBACK(_write) \
+	devcb = &hd63266f_t::set_dreq_wr_callback(*device, DEVCB_##_write);
+
+#define MCFG_HD63266F_DEND_CALLBACK(_read) \
+	devcb = &hd63266f_t::set_dend_rd_callback(*device, DEVCB_##_read);
+
 class hd63266f_t : public device_t {
 public:
 	hd63266f_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	auto irq_wr_cb() { return irq_cb.bind(); }
-	auto dreq_wr_cb() { return dreq_cb.bind(); }
-	auto dend_rd_cb() { return dend_cb.bind(); }
+	template<class _Object> static devcb_base &set_irq_wr_callback(device_t &device, _Object object) { return downcast<hd63266f_t&>(device).irq_cb.set_callback(object); }
+	template<class _Object> static devcb_base &set_dreq_wr_callback(device_t &device, _Object object) { return downcast<hd63266f_t&>(device).dreq_cb.set_callback(object); }
+	template<class _Object> static devcb_base &set_dend_rd_callback(device_t &device, _Object object) { return downcast<hd63266f_t&>(device).dend_cb.set_callback(object); }
 
 	void set_floppy(lw350_floppy_image_device* floppy) { this->floppy = floppy; }
 
@@ -186,10 +218,10 @@ public:
 	void execute();
 	void abort();
 
-	uint8_t status_r() { return STR; }
-	void abort_w(uint8_t data) { if(data == 0xff) abort(); else logerror("fdc:abort_w %02x is ignored %s\n", data, callstack()); }
-	void data_w(uint8_t data) { write(data); }
-	uint8_t data_r() { return read(); }
+	DECLARE_READ8_MEMBER(status_r) { return STR; }
+	DECLARE_WRITE8_MEMBER(abort_w) { if(data == 0xff) abort(); else logerror("fdc:abort_w %02x is ignored %s\n", data, callstack()); }
+	DECLARE_WRITE8_MEMBER(data_w) { write(data); }
+	DECLARE_READ8_MEMBER(data_r) { return read(); }
 
 protected:
 	uint8_t STR; // status register
@@ -236,7 +268,7 @@ protected:
 	devcb_write_line irq_cb, dreq_cb;
 	devcb_read_line dend_cb;
 
-	void device_start() override;
+	virtual void device_start() override;
 
 	lw350_floppy_image_device *floppy;
 
@@ -845,11 +877,11 @@ public:
 	lw350_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		maincpu(*this, "maincpu"),
-		screen(*this, "screen"),
-		floppy(*this, "floppy"),
+		palette(*this, "palette"),
+		io_kbrow(*this, "kbrow.%u", 0),
 		fdc(*this, "fdc"),
-		beeper(*this, "beeper"),
-		io_kbrow(*this, "kbrow.%u", 0)
+		floppy(*this, "floppy"),
+		beeper(*this, "beeper")
 	{ }
 
 	// helpers
@@ -858,8 +890,8 @@ public:
 	std::string callstack();
 
 	// devices
-	required_device<hd64180rp_device> maincpu;
-	required_device<screen_device> screen;
+	required_device<z180_device> maincpu;
+	required_device<palette_device> palette;
 	required_device<lw350_floppy_connector> floppy;
 	required_device<hd63266f_t> fdc;
 	required_device<beep_device> beeper;
@@ -868,95 +900,27 @@ public:
 	// screen updates
 	uint32_t screen_update(screen_device& screen, bitmap_rgb32& bitmap, const rectangle& cliprect);
 
-	uint8_t illegal_r(offs_t offset, uint8_t mem_mask = ~0) {
-		logerror("%s: unmapped memory read from %0*X & %0*X\n", pc(), 6, offset, 2, mem_mask);
-		return 0;
-	}
-	void illegal_w(offs_t offset, uint8_t data, uint8_t mem_mask = ~0) {
-		logerror("%s: unmapped memory write to %0*X = %0*X & %0*X\n", pc(), 6, offset, 2, data, 2, mem_mask);
-	}
+	DECLARE_READ8_MEMBER(illegal_r); DECLARE_WRITE8_MEMBER(illegal_w);
 
 	// ROM
-	uint8_t rom40000_r(offs_t offset, uint8_t mem_mask = ~0) {
-		if(rombank == 0x02)
-			return rom[0x40000 + offset] & mem_mask;
-		else if(rombank == 0x03)
-			return rom[0x60000 + offset] & mem_mask;
-		else {
-			logerror("%s: illegal rombank (IO E0=%02x) read offset %06x \n", pc(), rombank, offset);
-			return 0x00;
-		}
-	}
-	uint8_t rom72000_r(offs_t offset, uint8_t mem_mask = ~0) {
-		return rom[0x02000 + offset] & mem_mask;
-	}
+	DECLARE_READ8_MEMBER(rom40000_r);
+	DECLARE_READ8_MEMBER(rom72000_r);
 
 	// IO
-	void io_70_w(uint8_t data) {
-		io_70 = data;
-	}
-	uint8_t io_74_r() {
-		// 0x00: 7 lines display (64 pixels height)
-		// 0x80: 14 lines display (128 pixels height)
-		return 0x80;
-	}
-	uint8_t io_a8_r() {
-		// bit 0: case open
-		// bit 2: carriage return indicator
-		//return 0x01; // case open
-		return 0x00;
-	}
-	uint8_t io_b8_r() {
-		// keyboard matrix
- 		if(io_b8 <= 8) {
-			if(io_kbrow[io_b8].found()) {
-				return io_kbrow[io_b8].read_safe(0);
-			}
- 		}
-
-		switch(io_b8) {
-		// get language
-		case 0x09:  // valid results (see get_index_from_language)
-			//return ~0x20; // french
-			//return ~0x10; // french
-			//return ~0x08; // german
-			//return ~0x04; // french
-			//return ~0x02; // french
-			//return ~0x01; // german
-			return ~0x00; // german
-		default:   return 0x00;
-		}
-	}
-	void io_b8_w(uint8_t data) {
-		io_b8 = data;
-	}
-	void rombank_w(uint8_t data) { // E0
-		rombank = data;
-	}
-	void beeper_w(uint8_t data) { // F0
-		beeper->set_state(data == 0);
-	}
-	void irqack_w(uint8_t) { // F8
-		maincpu->set_input_line(INPUT_LINE_IRQ1, CLEAR_LINE);
-	}
+	DECLARE_READ8_MEMBER(illegal_io_r); DECLARE_WRITE8_MEMBER(illegal_io_w);
+	DECLARE_WRITE8_MEMBER(io_70_w);
+	DECLARE_READ8_MEMBER(io_74_r);
+	DECLARE_READ8_MEMBER(io_a8_r);
+	DECLARE_READ8_MEMBER(io_b8_r); DECLARE_WRITE8_MEMBER(io_b8_w);
+	DECLARE_WRITE8_MEMBER(rombank_w); // E0
+	DECLARE_WRITE8_MEMBER(beeper_w); // F0
+	DECLARE_WRITE8_MEMBER(irqack_w); // F8
 
 	// Floppy
-	void fdc_dtr_w(uint8_t data) { // 79
-		fdc->set_floppy(floppy->get_device());
-		fdc->write(data);
-	}
-	uint8_t io_7a_r() { // 7a
-		return io_7a;
-	}
-	uint8_t io_7e_r() {
-		return 0x80; // 1.44mb floppy
-	}
-	void io_7e_w(uint8_t) { // 7e
-	}
-	uint8_t io_90_r() { // 90
-		return io_90;
-	}
-
+	DECLARE_WRITE8_MEMBER(fdc_dtr_w); // 79
+	DECLARE_READ8_MEMBER(io_7a_r); // 7a
+	DECLARE_READ8_MEMBER(io_7e_r); DECLARE_WRITE8_MEMBER(io_7e_w); // 7e
+	DECLARE_READ8_MEMBER(io_90_r); // 90
 	TIMER_DEVICE_CALLBACK_MEMBER(io_90_timer_callback);
 
 	DECLARE_WRITE_LINE_MEMBER(fdc_irq_w) { io_7a &= ~0x40; if(state) io_7a |= 0x40; }
@@ -964,12 +928,7 @@ public:
 	DECLARE_READ_LINE_MEMBER(fdc_dend_r) { return maincpu->get_tend0(); }
 
 	// VRAM
-	uint8_t vram_r(offs_t offset, uint8_t mem_mask = ~0) {
-		return vram[offset] & mem_mask;
-	}
-	void vram_w(offs_t offset, uint8_t data, uint8_t mem_mask = ~0) {
-		vram[offset] = (vram[offset] & ~mem_mask) | data;
-	}
+	DECLARE_READ8_MEMBER(vram_r); DECLARE_WRITE8_MEMBER(vram_w);
 
 	uint8_t vram[80*128];
 	uint8_t io_70, io_7a, io_b8, io_90;
@@ -977,54 +936,52 @@ public:
 
 	TIMER_DEVICE_CALLBACK_MEMBER(int1_timer_callback);
 
-	void lw350(machine_config& config);
-
 protected:
 	// driver_device overrides
-	void machine_start() override;
-	void machine_reset() override;
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
-	void video_start() override;
-
-	void map_program(address_map& map) {
-		map(0x00000, 0x01fff).rom();
-		map(0x02000, 0x05fff).ram();
-		map(0x06000, 0x3ffff).rom();
-		map(0x40000, 0x5ffff).r(FUNC(lw350_state::rom40000_r)); // => ROM 0x40000 or 0x60000 or ??? (bank switching IO E0)
-		map(0x60000, 0x617ff).ram();
-		map(0x61800, 0x63fff).rw(FUNC(lw350_state::vram_r), FUNC(lw350_state::vram_w));
-		map(0x64000, 0x71fff).ram();
-		map(0x72000, 0x75fff).r(FUNC(lw350_state::rom72000_r)); // => ROM 0x02000-0x05fff
-		map(0x76000, 0x7ffff).ram();
-	}
-
-	void map_io(address_map& map) {
-		map.global_mask(0xff);
-		map(0x00, 0x3f).noprw(); // Z180 internal registers
-		map(0x70, 0x70).w(FUNC(lw350_state::io_70_w));
-		map(0x74, 0x74).r(FUNC(lw350_state::io_74_r));
-
-		// floppy
-		map(0x78, 0x78).rw("fdc", FUNC(hd63266f_t::status_r), FUNC(hd63266f_t::abort_w));
-		map(0x79, 0x79).r("fdc", FUNC(hd63266f_t::data_r)).w(FUNC(lw350_state::fdc_dtr_w));
-		map(0x7a, 0x7a).r(FUNC(lw350_state::io_7a_r));
-		map(0x7e, 0x7e).rw(FUNC(lw350_state::io_7e_r), FUNC(lw350_state::io_7e_w));
-		map(0x90, 0x90).r(FUNC(lw350_state::io_90_r));
-
-		// printer
-		map(0xa8, 0xa8).r(FUNC(lw350_state::io_a8_r));
-
-		map(0xb8, 0xb8).rw(FUNC(lw350_state::io_b8_r), FUNC(lw350_state::io_b8_w));
-		map(0xe0, 0xe0).w(FUNC(lw350_state::rombank_w));
-		map(0xf0, 0xf0).w(FUNC(lw350_state::beeper_w));
-		map(0xf8, 0xf8).w(FUNC(lw350_state::irqack_w));
-
-		//map(0x40, 0xff).rw(FUNC(lw350_state::illegal_io_r), FUNC(lw350_state::illegal_io_w));
-	}
+	virtual void video_start() override;
 
 	uint8_t* rom{};
 	std::map<uint32_t, std::string> symbols;
 };
+
+static ADDRESS_MAP_START( lw350_map, AS_PROGRAM, 8, lw350_state )
+	AM_RANGE(0x00000, 0x01fff) AM_ROM
+	AM_RANGE(0x02000, 0x05fff) AM_RAM
+	AM_RANGE(0x06000, 0x3ffff) AM_ROM
+	AM_RANGE(0x40000, 0x5ffff) AM_READ(rom40000_r) // => ROM 0x40000 or 0x60000 or ??? (bank switching IO E0)
+	AM_RANGE(0x60000, 0x617ff) AM_RAM
+	AM_RANGE(0x61800, 0x63fff) AM_READWRITE(vram_r, vram_w)
+	AM_RANGE(0x64000, 0x71fff) AM_RAM
+	AM_RANGE(0x72000, 0x75fff) AM_READ(rom72000_r) // => ROM 0x02000-0x05fff
+	AM_RANGE(0x76000, 0x7ffff) AM_RAM
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( lw350_io, AS_IO, 8, lw350_state )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	AM_RANGE(0x00, 0x3f) AM_NOP // Z180 internal registers
+	AM_RANGE(0x70, 0x70) AM_WRITE(io_70_w)
+	AM_RANGE(0x74, 0x74) AM_READ(io_74_r)
+
+	// floppy
+	AM_RANGE(0x78, 0x78) AM_DEVREADWRITE("fdc", hd63266f_t, status_r, abort_w)
+	AM_RANGE(0x79, 0x79) AM_DEVREAD("fdc", hd63266f_t, data_r) AM_WRITE(fdc_dtr_w)
+	AM_RANGE(0x7a, 0x7a) AM_READ(io_7a_r)
+	AM_RANGE(0x7e, 0x7e) AM_READWRITE(io_7e_r, io_7e_w)
+	AM_RANGE(0x90, 0x90) AM_READ(io_90_r)
+
+	// printer
+	AM_RANGE(0xa8, 0xa8) AM_READ(io_a8_r)
+
+	AM_RANGE(0xb8, 0xb8) AM_READWRITE(io_b8_r, io_b8_w)
+	AM_RANGE(0xe0, 0xe0) AM_WRITE(rombank_w)
+	AM_RANGE(0xf0, 0xf0) AM_WRITE(beeper_w)
+	AM_RANGE(0xf8, 0xf8) AM_WRITE(irqack_w)
+
+	AM_RANGE(0x40, 0xff) AM_READWRITE(illegal_io_r, illegal_io_w)
+ADDRESS_MAP_END
 
 void lw350_state::video_start()
 {
@@ -1032,7 +989,7 @@ void lw350_state::video_start()
 
 std::string lw350_state::pc()
 {
-	class z180_friend : public z180_device { public: using z180_device::memory_translate; friend class lw350_state; };
+	class z180_friend : z180_device { friend class lw350_state; };
 	auto cpu = static_cast<z180_friend*>(dynamic_cast<z180_device*>(&machine().scheduler().currently_executing()->device()));
 	offs_t phys = cpu->pc();
 	cpu->memory_translate(AS_PROGRAM, 0, phys);
@@ -1056,7 +1013,7 @@ std::string lw350_state::symbolize(uint32_t adr)
 
 std::string lw350_state::callstack()
 {
-	class z180_friend : public z180_device { public: using z180_device::memory_translate; friend class lw350_state; };
+	class z180_friend : z180_device { friend class lw350_state; };
 	auto cpu = static_cast<z180_friend*>(dynamic_cast<z180_device*>(&machine().scheduler().currently_executing()->device()));
 	offs_t pc = cpu->pc();
 	cpu->memory_translate(AS_PROGRAM, 0, pc);
@@ -1097,13 +1054,11 @@ uint32_t lw350_state::screen_update(screen_device& screen, bitmap_rgb32& bitmap,
 	//if(BIT(io_70, 7))
 		//...
 
-	const rgb_t palette[]{
-		0xffffffff,
-		0xff000000,
-	};
+
+	const rgb_t *palette = this->palette->palette()->entry_list_raw();
 
 	for(auto y = 0; y < 128; y++) {
-		uint32_t* p = &bitmap.pix(y);
+		uint32_t* p = &bitmap.pix32(y);
 		for(auto x = 0; x < 640; x += 8) {
 			auto gfx = vram[y * 80 + x / 8];
 			//*p++ = palette[BIT(gfx, 7)];
@@ -1117,6 +1072,33 @@ uint32_t lw350_state::screen_update(screen_device& screen, bitmap_rgb32& bitmap,
 		}
 	}
 	return 0;
+}
+
+READ8_MEMBER(lw350_state::rom40000_r)
+{
+	if(rombank == 0x02)
+		return rom[0x40000 + offset] & mem_mask;
+	else if(rombank == 0x03)
+		return rom[0x60000 + offset] & mem_mask;
+	else {
+		space.device().logerror("%s: illegal rombank (IO E0=%02x) read offset %06x \n", pc(), rombank, space.byte_to_address(offset));
+		return 0x00;
+	}
+}
+
+READ8_MEMBER(lw350_state::rom72000_r)
+{
+	return rom[0x02000 + offset] & mem_mask;
+}
+
+READ8_MEMBER(lw350_state::vram_r)
+{
+	return vram[offset] & mem_mask;
+}
+
+WRITE8_MEMBER(lw350_state::vram_w)
+{
+	vram[offset] = (vram[offset] & ~mem_mask) | data;
 }
 
 #pragma region(LW-350 Keyboard)
@@ -1173,7 +1155,7 @@ static INPUT_PORTS_START(lw350)
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_RIGHT)      PORT_CHAR(UCHAR_MAMEKEY(RIGHT))
 
 	PORT_START("kbrow.5")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_MINUS)      PORT_CHAR(0x00df) PORT_CHAR('?') // ß
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_MINUS)      PORT_CHAR(L'ß') PORT_CHAR('?')
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_0)          PORT_CHAR('0')
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_P)          PORT_CHAR('p')
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_O)          PORT_CHAR('o')
@@ -1184,9 +1166,9 @@ static INPUT_PORTS_START(lw350)
 
 	PORT_START("kbrow.6")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Inhalt")                PORT_CODE(KEYCODE_HOME)       PORT_CHAR(UCHAR_MAMEKEY(HOME))
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_COLON)      PORT_CHAR(0x00f6) PORT_CHAR(0x00d6) // ö Ö
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_COLON)      PORT_CHAR(L'ö') PORT_CHAR(L'Ö')
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_CLOSEBRACE) PORT_CHAR('+') PORT_CHAR('*')
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_OPENBRACE)  PORT_CHAR(0x00fc) PORT_CHAR(0x00dc) // ü Ü
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_OPENBRACE)  PORT_CHAR(L'ü') PORT_CHAR(L'Ü')
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_LEFT)       PORT_CHAR(UCHAR_MAMEKEY(LEFT))
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_DOWN)       PORT_CHAR(UCHAR_MAMEKEY(DOWN))
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_LCONTROL)   PORT_CHAR(UCHAR_MAMEKEY(LCONTROL))
@@ -1203,21 +1185,106 @@ static INPUT_PORTS_START(lw350)
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_LSHIFT)     PORT_CHAR(UCHAR_MAMEKEY(LSHIFT))
 
 	PORT_START("kbrow.8")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_QUOTE)      PORT_CHAR(0x00b4) PORT_CHAR(0x02cb) // ´ `
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_QUOTE)      PORT_CHAR(L'´') PORT_CHAR('`')
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_L)          PORT_CHAR('l')
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_TILDE)      PORT_CHAR('\'')
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_K)          PORT_CHAR('k')
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_STOP)       PORT_CHAR('.') PORT_CHAR(':')
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_SLASH)      PORT_CHAR('-') PORT_CHAR('_')
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_QUOTE)      PORT_CHAR(0x00e4) PORT_CHAR(0x00c4) // ä Ä
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_QUOTE)	     PORT_CHAR(L'ä') PORT_CHAR(L'Ä')
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_UNUSED)
 INPUT_PORTS_END
 
 #pragma endregion
 
+READ8_MEMBER(lw350_state::illegal_r)
+{
+	space.device().logerror("%s: unmapped %s memory read from %0*X & %0*X\n", pc(), space.name(), space.addrchars(), space.byte_to_address(offset), 2, mem_mask);
+	return 0;
+}
+
+WRITE8_MEMBER(lw350_state::illegal_w)
+{
+	space.device().logerror("%s: unmapped %s memory write to %0*X = %0*X & %0*X\n", pc(), space.name(), space.addrchars(), space.byte_to_address(offset), 2, data, 2, mem_mask);
+}
+
+READ8_MEMBER(lw350_state::illegal_io_r)
+{
+	space.device().logerror("%s: unmapped %s memory read from %0*X & %0*X\n", callstack(), space.name(), space.addrchars(), space.byte_to_address(offset + 0x40), 2, mem_mask);
+	return 0;
+}
+
+WRITE8_MEMBER(lw350_state::illegal_io_w)
+{
+	space.device().logerror("%s: unmapped %s memory write to %0*X = %0*X & %0*X\n", pc(), space.name(), space.addrchars(), space.byte_to_address(offset + 0x40), 2, data, 2, mem_mask);
+}
+
 TIMER_DEVICE_CALLBACK_MEMBER(lw350_state::int1_timer_callback)
 {
 	maincpu->set_input_line(INPUT_LINE_IRQ1, ASSERT_LINE);
+}
+
+WRITE8_MEMBER(lw350_state::rombank_w)
+{
+	rombank = data;
+}
+
+WRITE8_MEMBER(lw350_state::beeper_w)
+{
+	beeper->set_state(data == 0);
+}
+
+WRITE8_MEMBER(lw350_state::irqack_w)
+{
+	maincpu->set_input_line(INPUT_LINE_IRQ1, CLEAR_LINE);
+}
+
+WRITE8_MEMBER(lw350_state::io_70_w)
+{
+	io_70 = data;
+}
+
+READ8_MEMBER(lw350_state::io_74_r)
+{
+	// 0x00: 7 lines display (64 pixels height)
+	// 0x80: 14 lines display (128 pixels height)
+	return 0x80;
+}
+
+READ8_MEMBER(lw350_state::io_a8_r)
+{
+	// bit 0: case open
+	// bit 2: carriage return indicator
+	//return 0x01; // case open
+	return 0x00;
+}
+
+// Floppy
+//////////////////////////////////////////////////////////////////////////
+
+WRITE8_MEMBER(lw350_state::fdc_dtr_w)
+{
+	fdc->set_floppy(floppy->get_device());
+	fdc->write(data);
+}
+
+READ8_MEMBER(lw350_state::io_7a_r)
+{
+	return io_7a;
+}
+
+READ8_MEMBER(lw350_state::io_7e_r)
+{
+	return 0x80; // 1.44mb floppy
+}
+
+WRITE8_MEMBER(lw350_state::io_7e_w)
+{
+}
+
+READ8_MEMBER(lw350_state::io_90_r)
+{
+	return io_90;
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER(lw350_state::io_90_timer_callback)
@@ -1226,14 +1293,43 @@ TIMER_DEVICE_CALLBACK_MEMBER(lw350_state::io_90_timer_callback)
 		io_90 ^= 1 << 6; // int1_process_floppy wants this to toggle, 150 ms, HACK
 }
 
+// Keyboard
+//////////////////////////////////////////////////////////////////////////
+
+WRITE8_MEMBER(lw350_state::io_b8_w)
+{
+	io_b8 = data;
+}
+
+READ8_MEMBER(lw350_state::io_b8_r)
+{
+	// keyboard matrix
+ 	if(io_b8 <= 8) {
+		if(io_kbrow[io_b8].found()) {
+			return io_kbrow[io_b8].read_safe(0);
+		}
+ 	}
+
+	switch(io_b8) {
+	// get language
+	case 0x09:  // valid results (see get_index_from_language)
+		//return ~0x20; // french
+		//return ~0x10; // french
+		//return ~0x08; // german
+		//return ~0x04; // french
+		//return ~0x02; // french
+		//return ~0x01; // german
+		return ~0x00; // german
+	default:   return 0x00;
+	}
+}
+
 //uint8_t char_attribute = 0x00;
 
 void lw350_state::machine_start()
 {
-	screen->set_visible_area(0, 480 - 1, 0, 128 - 1);
-
 	// try to load map file
-/*	FILE* f;
+	FILE* f;
 	if(fopen_s(&f, "lw350.map", "rt") == 0) {
 		char line[512];
 		do {
@@ -1249,11 +1345,8 @@ void lw350_state::machine_start()
 		} while(!feof(f));
 		fclose(f);
 	}
-*/
 
 	rom = memregion("maincpu")->base();
-
-	// ROM patches
 
 	// force jump to self-test menu
 //	rom[0x280f2] = 0x20;
@@ -1302,36 +1395,39 @@ void lw350_state::machine_reset()
 	fdc->reset();
 }
 
-void lw350_state::lw350(machine_config& config) {
+static SLOT_INTERFACE_START(lw350_floppies)
+	SLOT_INTERFACE("35hd", LW350_FLOPPY)
+SLOT_INTERFACE_END
+
+static MACHINE_CONFIG_START( lw350 )
 	// basic machine hardware
-	HD64180RP(config, maincpu, 16'000'000 / 2);
-	maincpu->set_addrmap(AS_PROGRAM, &lw350_state::map_program);
-	maincpu->set_addrmap(AS_IO, &lw350_state::map_io);
-	TIMER(config, "1khz").configure_periodic(FUNC(lw350_state::int1_timer_callback), attotime::from_hz(1000));
+	MCFG_CPU_ADD("maincpu", Z180, XTAL_16MHz/2)
+	MCFG_CPU_PROGRAM_MAP(lw350_map)
+	MCFG_CPU_IO_MAP(lw350_io)
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("1khz", lw350_state, int1_timer_callback, attotime::from_hz(1000))
 
 	// video hardware
-	SCREEN(config, screen, SCREEN_TYPE_RASTER);
-	screen->set_color(rgb_t(6, 245, 206));
-	screen->set_physical_aspect(480, 128);
-	screen->set_refresh_hz(78.1);
-	screen->set_screen_update(FUNC(lw350_state::screen_update));
-	screen->set_size(480, 128);
+	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t(6, 245, 206))
+	MCFG_SCREEN_REFRESH_RATE(78.1)
+	MCFG_SCREEN_UPDATE_DRIVER(lw350_state, screen_update)
+	MCFG_SCREEN_SIZE(480, 128)
+	MCFG_SCREEN_VISIBLE_AREA(0, 480-1, 0, 128-1)
+	MCFG_PALETTE_ADD_MONOCHROME_INVERTED("palette")
 
 	// floppy disk
-	TIMER(config, "io_90").configure_periodic(FUNC(lw350_state::io_90_timer_callback), attotime::from_msec(160));
-	LW350_FLOPPY_CONNECTOR(config, floppy, 0);
-	floppy->option_add("35hd", LW350_FLOPPY);
-	floppy->set_default_option("35hd");
-
-	HD63266F(config, fdc, XTAL(16'000'000));
-	fdc->irq_wr_cb().set(FUNC(lw350_state::fdc_irq_w));
-	fdc->dreq_wr_cb().set(FUNC(lw350_state::fdc_dreq_w));
-	fdc->dend_rd_cb().set(FUNC(lw350_state::fdc_dend_r));
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("io_90", lw350_state, io_90_timer_callback, attotime::from_msec(160))
+	MCFG_DEVICE_ADD("floppy", LW350_FLOPPY_CONNECTOR, 0);
+	MCFG_DEVICE_SLOT_INTERFACE(lw350_floppies, "35hd", false);
+	MCFG_HD63266F_ADD("fdc", XTAL_16MHz);
+	MCFG_HD63266F_IRQ_CALLBACK(WRITELINE(lw350_state, fdc_irq_w))
+	MCFG_HD63266F_DREQ_CALLBACK(WRITELINE(lw350_state, fdc_dreq_w))
+	MCFG_HD63266F_DEND_CALLBACK(READLINE(lw350_state, fdc_dend_r))
 
 	// sound hardware
-	SPEAKER(config, "mono").front_center();
-	BEEP(config, "beeper", 4'000).add_route(ALL_OUTPUTS, "mono", 1.0); // 4.0 kHz
-}
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("beeper", BEEP, 4000) // 4.0 kHz
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+MACHINE_CONFIG_END
 
 #pragma endregion
 
@@ -1438,7 +1534,7 @@ Dictionary ROM probably not correctly mapped
 
 ***************************************************************************/
 
-constexpr int MDA_CLOCK = 16'257'000;
+constexpr int MDA_CLOCK = 16257000;
 
 class lw450_state : public driver_device
 {
@@ -1446,14 +1542,13 @@ public:
 	lw450_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		maincpu(*this, "maincpu"),
-		screen(*this, "screen"),
 		palette(*this, "palette"),
-		floppy(*this, "floppy"),
-		fdc(*this, "fdc"),
-		m_crtc(*this, "hd6445"),
+		io_kbrow(*this, "kbrow.%u", 0),
 		vram(*this, "vram"),
-		speaker(*this, "beeper"),
-		io_kbrow(*this, "kbrow.%u", 0)
+		m_crtc(*this, "hd6445"),
+		fdc(*this, "fdc"),
+		floppy(*this, "floppy"),
+		speaker(*this, "beeper")
 	{ }
 
 	// helpers
@@ -1461,13 +1556,8 @@ public:
 	std::string symbolize(uint32_t adr);
 	std::string callstack();
 
-	void lw450(machine_config& config);
-	void map_program(address_map& map);
-	void map_io(address_map& map);
-
 	// devices
-	required_device<z80180_device> maincpu; // use z80180 instead of hd64180rp, because hd64180rf doesn't have hd64180rp's 19-bit address width
-	required_device<screen_device> screen;
+	required_device<z180_device> maincpu;
 	required_device<palette_device> palette;
 	required_device<lw350_floppy_connector> floppy;
 	required_device<hd63266f_t> fdc;
@@ -1476,69 +1566,23 @@ public:
 	required_device<beep_device> speaker;
 	optional_ioport_array<9> io_kbrow;
 
-	uint8_t illegal_r(offs_t offset, uint8_t mem_mask = ~0) {
-		logerror("%s: unmapped memory read from %0*X & %0*X\n", pc(), 6, offset, 2, mem_mask);
-		return 0;
-	}
-	void illegal_w(offs_t offset, uint8_t data, uint8_t mem_mask = ~0) {
-		logerror("%s: unmapped memory write to %0*X = %0*X & %0*X\n", pc(), 6, offset, 2, data, 2, mem_mask);
-	}
+	DECLARE_READ8_MEMBER(illegal_r); DECLARE_WRITE8_MEMBER(illegal_w);
 
 	// ROM
-	uint8_t rom40000_r(offs_t offset, uint8_t mem_mask = ~0) {
-		if(rombank == 0x04)
-			return dict_rom[offset] & mem_mask;
-		else if(rombank == 0x05)
-			return dict_rom[0x20000 + offset] & mem_mask;
-		else if(rombank == 0x06)
-			return dict_rom[0x40000 + offset] & mem_mask;
-		else if(rombank == 0x07)
-			return dict_rom[0x60000 + offset] & mem_mask;
-		else {
-			logerror("%s: illegal rombank (IO E0=%02x) read offset %06x \n", pc(), rombank, offset);
-			return 0x00;
-		}
-	}
-
-	uint8_t rom72000_r(offs_t offset, uint8_t mem_mask = ~0) {
-		return rom[0x02000 + offset] & mem_mask;
-	}
+	DECLARE_READ8_MEMBER(rom40000_r);
+	DECLARE_READ8_MEMBER(rom72000_r);
 
 	// IO
-	uint8_t io_b0_r() { return ~0x00; }
-	uint8_t io_b8_r() {
-		// keyboard matrix
-		if(io_b8 <= 8) {
-			if(io_kbrow[io_b8].found()) {
-				return io_kbrow[io_b8].read_safe(0);
-			}
-		}
-		return 0x00;
-	}
-	void io_b8_w(uint8_t data) {
-		io_b8 = data;
-	}
-	void rombank_w(uint8_t data) { // E0
-		rombank = data;
-	}
-	void beeper_w(uint8_t data) { // F0
-		speaker->set_state(data == 0);
-	}
-	void irqack_w(uint8_t) { // F8
-		maincpu->set_input_line(INPUT_LINE_IRQ1, CLEAR_LINE);
-	}
+	DECLARE_READ8_MEMBER(illegal_io_r); DECLARE_WRITE8_MEMBER(illegal_io_w);
+	DECLARE_READ8_MEMBER(io_b0_r);
+	DECLARE_READ8_MEMBER(io_b8_r); DECLARE_WRITE8_MEMBER(io_b8_w);
+	DECLARE_WRITE8_MEMBER(rombank_w); // E0
+	DECLARE_WRITE8_MEMBER(beeper_w); // F0
+	DECLARE_WRITE8_MEMBER(irqack_w); // F8
 
 	// Floppy
-	//////////////////////////////////////////////////////////////////////////
-
-	// Floppy
-	void fdc_dtr_w(uint8_t data) { // 79
-		fdc->set_floppy(floppy->get_device());
-		fdc->write(data);
-	}
-	uint8_t io_7a_r() { // 7a
-		return io_7a;
-	}
+	DECLARE_WRITE8_MEMBER(fdc_dtr_w); // 79
+	DECLARE_READ8_MEMBER(io_7a_r); // 7a
 	DECLARE_WRITE_LINE_MEMBER(fdc_irq_w) { io_7a &= ~0x40; if(state) io_7a |= 0x40; }
 	DECLARE_WRITE_LINE_MEMBER(fdc_dreq_w) { maincpu->set_input_line(Z180_INPUT_LINE_DREQ0, state ? ASSERT_LINE : CLEAR_LINE); }
 	DECLARE_READ_LINE_MEMBER(fdc_dend_r) { return maincpu->get_tend0(); }
@@ -1547,10 +1591,10 @@ public:
 	MC6845_UPDATE_ROW(crtc_update_row);
 	MC6845_ON_UPDATE_ADDR_CHANGED(crtc_addr);
 	DECLARE_WRITE_LINE_MEMBER(crtc_vsync);
-	void io_72_w(uint8_t data) { io_72 = data; }
-	void io_73_w(uint8_t data) { io_73 = data; }
-	void io_74_w(uint8_t data);
-	void io_75_w(uint8_t data) { io_75 = data; }
+	DECLARE_WRITE8_MEMBER(io_72_w) { io_72 = data; }
+	DECLARE_WRITE8_MEMBER(io_73_w) { io_73 = data; }
+	DECLARE_WRITE8_MEMBER(io_74_w);
+	DECLARE_WRITE8_MEMBER(io_75_w) { io_75 = data; }
 
 	uint8_t io_72, io_73, io_74, io_75; // gfx
 	uint8_t io_7a, io_b8, rombank;
@@ -1560,16 +1604,54 @@ public:
 
 protected:
 	// driver_device overrides
-	void machine_start() override;
-	void machine_reset() override;
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
-	void video_start() override;
+	virtual void video_start() override;
 
 	uint8_t* rom{};
 	uint8_t* dict_rom{};
 	uint8_t framebuffer[720 * 350]; // pixel data
 	std::map<uint32_t, std::string> symbols;
 };
+
+static ADDRESS_MAP_START( lw450_map, AS_PROGRAM, 8, lw450_state )
+	AM_RANGE(0x00000, 0x01fff) AM_ROM
+	AM_RANGE(0x02000, 0x05fff) AM_RAM
+	AM_RANGE(0x06000, 0x3ffff) AM_ROM
+	AM_RANGE(0x40000, 0x5ffff) AM_READ(rom40000_r) // dictionary ROM, banked according to I/O E0
+	AM_RANGE(0x62000, 0x71fff) AM_RAM // D-RAM UPPER/LOWER
+	AM_RANGE(0x72000, 0x75fff) AM_READ(rom72000_r) // => ROM 0x02000-0x05fff
+	AM_RANGE(0x78000, 0x7ffff) AM_RAM // PS-RAM
+	AM_RANGE(0xf8000, 0xfffff) AM_RAM AM_SHARE("vram") // VRAM
+	// text vram @ F8000-F8C80 (2*80 bytes/line)
+	// font @ FC000-FD000 pitch 16
+	ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( lw450_io, AS_IO, 8, lw450_state )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	AM_RANGE(0x00, 0x3f) AM_NOP // Z180 internal registers
+
+	AM_RANGE(0x70, 0x70) AM_DEVWRITE("hd6445", hd6345_device, address_w)
+	AM_RANGE(0x71, 0x71) AM_DEVWRITE("hd6445", hd6345_device, register_w)
+	AM_RANGE(0x72, 0x72) AM_WRITE(io_72_w)
+	AM_RANGE(0x73, 0x73) AM_WRITE(io_73_w)
+	AM_RANGE(0x74, 0x74) AM_WRITE(io_74_w)
+	AM_RANGE(0x75, 0x75) AM_WRITE(io_75_w)
+
+	// floppy
+	AM_RANGE(0x78, 0x78) AM_DEVREADWRITE("fdc", hd63266f_t, status_r, abort_w)
+	AM_RANGE(0x79, 0x79) AM_DEVREAD("fdc", hd63266f_t, data_r) AM_WRITE(fdc_dtr_w)
+	AM_RANGE(0x7a, 0x7a) AM_READ(io_7a_r)
+
+	AM_RANGE(0xb0, 0xb0) AM_READ(io_b0_r)
+	AM_RANGE(0xb8, 0xb8) AM_READWRITE(io_b8_r, io_b8_w)
+	AM_RANGE(0xe0, 0xe0) AM_WRITE(rombank_w)
+	AM_RANGE(0xf0, 0xf0) AM_WRITE(beeper_w)
+	AM_RANGE(0xf8, 0xf8) AM_WRITE(irqack_w)
+
+	AM_RANGE(0x40, 0xff) AM_READWRITE(illegal_io_r, illegal_io_w)
+ADDRESS_MAP_END
 
 void lw450_state::video_start()
 {
@@ -1606,7 +1688,7 @@ std::string lw450_state::callstack()
 	offs_t pc = cpu->pc();
 	cpu->memory_translate(AS_PROGRAM, 0, pc);
 
-	//int depth = 0;
+	int depth = 0;
 	std::string output;
 	output += symbolize(pc) + " >> ";
 
@@ -1632,53 +1714,109 @@ std::string lw450_state::callstack()
 	return output;
 }
 
-void lw450_state::map_program(address_map& map)
+READ8_MEMBER(lw450_state::rom40000_r)
 {
-	map(0x00000, 0x01fff).rom();
-	map(0x02000, 0x05fff).ram();
-	map(0x06000, 0x3ffff).rom();
-	map(0x40000, 0x5ffff).r(FUNC(lw450_state::rom40000_r)); // dictionary ROM, banked according to I/O E0
-	map(0x62000, 0x71fff).ram(); // D-RAM UPPER/LOWER
-	map(0x72000, 0x75fff).r(FUNC(lw450_state::rom72000_r)); // => ROM 0x02000-0x05fff
-	map(0x78000, 0x7ffff).ram(); // PS-RAM
-	map(0xf8000, 0xfffff).ram().share("vram"); // VRAM
-	// text vram @ F8000-F8C80 (2*80 bytes/line)
-	// font @ FC000-FD000 pitch 16
+	if(rombank == 0x04)
+		return dict_rom[offset] & mem_mask;
+	else if(rombank == 0x05)
+		return dict_rom[0x20000 + offset] & mem_mask;
+	else if(rombank == 0x06)
+		return dict_rom[0x40000 + offset] & mem_mask;
+	else if(rombank == 0x07)
+		return dict_rom[0x60000 + offset] & mem_mask;
+	else {
+		space.device().logerror("%s: illegal rombank (IO E0=%02x) read offset %06x \n", pc(), rombank, space.byte_to_address(offset));
+		return 0x00;
+	}
 }
 
-void lw450_state::map_io(address_map& map)
+READ8_MEMBER(lw450_state::rom72000_r)
 {
-	map.global_mask(0xff);
-	map(0x00, 0x3f).noprw(); // Z180 internal registers
-
-	map(0x70, 0x70).w("hd6445", FUNC(hd6345_device::address_w));
-	map(0x71, 0x71).w("hd6445", FUNC(hd6345_device::register_w));
-	map(0x72, 0x72).w(FUNC(lw450_state::io_72_w));
-	map(0x73, 0x73).w(FUNC(lw450_state::io_73_w));
-	map(0x74, 0x74).w(FUNC(lw450_state::io_74_w));
-	map(0x75, 0x75).w(FUNC(lw450_state::io_75_w));
-
-	// floppy
-	map(0x78, 0x78).rw("fdc", FUNC(hd63266f_t::status_r), FUNC(hd63266f_t::abort_w));
-	map(0x79, 0x79).r("fdc", FUNC(hd63266f_t::data_r)).w(FUNC(lw450_state::fdc_dtr_w));
-	map(0x7a, 0x7a).r(FUNC(lw450_state::io_7a_r));
-
-	map(0xb0, 0xb0).r(FUNC(lw450_state::io_b0_r));
-	map(0xb8, 0xb8).rw(FUNC(lw450_state::io_b8_r), FUNC(lw450_state::io_b8_w));
-	map(0xe0, 0xe0).w(FUNC(lw450_state::rombank_w));
-	map(0xf0, 0xf0).w(FUNC(lw450_state::beeper_w));
-	map(0xf8, 0xf8).w(FUNC(lw450_state::irqack_w));
-
-	//map(0x40, 0xff) AM_READWRITE(illegal_io_r, illegal_io_w)
+	return rom[0x02000 + offset] & mem_mask;
 }
 
-// CRTC
-//////////////////////////////////////////////////////////////////////////
+READ8_MEMBER(lw450_state::illegal_r)
+{
+	space.device().logerror("%s: unmapped %s memory read from %0*X & %0*X\n", pc(), space.name(), space.addrchars(), space.byte_to_address(offset), 2, mem_mask);
+	return 0;
+}
+
+WRITE8_MEMBER(lw450_state::illegal_w)
+{
+	space.device().logerror("%s: unmapped %s memory write to %0*X = %0*X & %0*X\n", pc(), space.name(), space.addrchars(), space.byte_to_address(offset), 2, data, 2, mem_mask);
+}
+
+READ8_MEMBER(lw450_state::illegal_io_r)
+{
+	space.device().logerror("%s: unmapped %s memory read from %0*X & %0*X\n", callstack(), space.name(), space.addrchars(), space.byte_to_address(offset + 0x40), 2, mem_mask);
+	return 0;
+}
+
+WRITE8_MEMBER(lw450_state::illegal_io_w)
+{
+	space.device().logerror("%s: unmapped %s memory write to %0*X = %0*X & %0*X\n", pc(), space.name(), space.addrchars(), space.byte_to_address(offset + 0x40), 2, data, 2, mem_mask);
+}
 
 TIMER_DEVICE_CALLBACK_MEMBER(lw450_state::int1_timer_callback)
 {
 	maincpu->set_input_line(INPUT_LINE_IRQ1, ASSERT_LINE);
 }
+
+READ8_MEMBER(lw450_state::io_b0_r)
+{
+	return ~0x00;
+}
+
+WRITE8_MEMBER(lw450_state::rombank_w)
+{
+	rombank = data;
+}
+
+WRITE8_MEMBER(lw450_state::beeper_w)
+{
+	speaker->set_state(data == 0);
+}
+
+WRITE8_MEMBER(lw450_state::irqack_w)
+{
+	maincpu->set_input_line(INPUT_LINE_IRQ1, CLEAR_LINE);
+}
+
+// Keyboard
+//////////////////////////////////////////////////////////////////////////
+
+WRITE8_MEMBER(lw450_state::io_b8_w)
+{
+	io_b8 = data;
+}
+
+READ8_MEMBER(lw450_state::io_b8_r)
+{
+	// keyboard matrix
+	if(io_b8 <= 8) {
+		if(io_kbrow[io_b8].found()) {
+			return io_kbrow[io_b8].read_safe(0);
+		}
+	}
+	return 0x00;
+}
+
+// Floppy
+//////////////////////////////////////////////////////////////////////////
+
+WRITE8_MEMBER(lw450_state::fdc_dtr_w)
+{
+	fdc->set_floppy(floppy->get_device());
+	fdc->write(data);
+}
+
+READ8_MEMBER(lw450_state::io_7a_r)
+{
+	return io_7a;
+}
+
+// CRTC
+//////////////////////////////////////////////////////////////////////////
 
 WRITE_LINE_MEMBER(lw450_state::crtc_vsync) 
 { 
@@ -1687,16 +1825,16 @@ WRITE_LINE_MEMBER(lw450_state::crtc_vsync)
 	}
 }
 
-void lw450_state::io_74_w(uint8_t data)
+WRITE8_MEMBER(lw450_state::io_74_w)
 {
 	io_74 = data;
 	if(io_74 & 0x04) {
 		// graphics mode
-		m_crtc->set_char_width(8);
+		hd6345_device::set_char_width(*m_crtc, 8);
 		m_crtc->set_clock(MDA_CLOCK / 8);
 	} else {
 		// text mode
-		m_crtc->set_char_width(9);
+		hd6345_device::set_char_width(*m_crtc, 9);
 		m_crtc->set_clock(MDA_CLOCK / 9);
 	}
 }
@@ -1720,7 +1858,7 @@ MC6845_UPDATE_ROW(lw450_state::crtc_update_row)
 	};
 
 	const rgb_t *palette = this->palette->palette()->entry_list_raw();
-	uint32_t* p = &bitmap.pix(y);
+	uint32_t* p = &bitmap.pix32(y);
 	uint16_t chr_base = ra;
 
 	// video off
@@ -1789,6 +1927,8 @@ MC6845_UPDATE_ROW(lw450_state::crtc_update_row)
 			*p++ = BIT(bit9, 7) ? palette[fg] : palette[bg];
 		}
 	}
+
+	// TODO: cursor
 }
 
 MC6845_ON_UPDATE_ADDR_CHANGED(lw450_state::crtc_addr)
@@ -1804,8 +1944,6 @@ MC6845_ON_UPDATE_ADDR_CHANGED(lw450_state::crtc_addr)
 
 void lw450_state::machine_start()
 {
-	screen->set_visible_area(0, 720 - 1, 0, 320 - 1);
-
 	/*
 		// try to load map file
 		FILE* f;
@@ -1851,50 +1989,50 @@ static const gfx_layout pc_16_charlayout {
 	16*8                 // every char takes 2 x 8 bytes
 };
 
-static GFXDECODE_START( gfx_lw450 )
+static GFXDECODE_START( lw450 )
 	GFXDECODE_RAM("vram", 0x4000, pc_16_charlayout, 0, 1)
 GFXDECODE_END
 
-void lw450_state::lw450(machine_config& config) {
+static SLOT_INTERFACE_START(lw450_floppies)
+	SLOT_INTERFACE("35dd", LW350_FLOPPY)
+SLOT_INTERFACE_END
+
+static MACHINE_CONFIG_START( lw450 )
 	// basic machine hardware
-	Z80180(config, maincpu, 12'000'000 / 2);
-	maincpu->set_addrmap(AS_PROGRAM, &lw450_state::map_program);
-	maincpu->set_addrmap(AS_IO, &lw450_state::map_io);
-	TIMER(config, "1khz").configure_periodic(FUNC(lw450_state::int1_timer_callback), attotime::from_hz(1000));
+	MCFG_CPU_ADD("maincpu", Z180, XTAL_12MHz/2)
+	MCFG_CPU_PROGRAM_MAP(lw450_map)
+	MCFG_CPU_IO_MAP(lw450_io)
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("1khz", lw450_state, int1_timer_callback, attotime::from_hz(1000))
 
 	// video hardware
-	SCREEN(config, screen, SCREEN_TYPE_RASTER);
-	screen->set_color(rgb_t::white());
-	screen->set_physical_aspect(720, 320);
-	screen->set_screen_update("hd6445", FUNC(hd6345_device::screen_update));
-	screen->set_refresh_hz(50);
-	screen->set_size(720, 320);
-
-	GFXDECODE(config, "gfxdecode", palette, gfx_lw450);
-	PALETTE(config, palette).set_entries(4);
+	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::white())
+	MCFG_SCREEN_REFRESH_RATE(50)
+	MCFG_SCREEN_UPDATE_DEVICE("hd6445", hd6345_device, screen_update)
+	MCFG_SCREEN_SIZE(720, 320)
+	MCFG_SCREEN_VISIBLE_AREA(0, 720-1, 0, 320-1)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", lw450)
+	MCFG_PALETTE_ADD("palette", 3)
 
 	// CRTC
-	HD6345(config, m_crtc, MDA_CLOCK / 9);
-	m_crtc->set_screen(screen);
-	m_crtc->set_show_border_area(false);
-	m_crtc->set_char_width(9);
-	m_crtc->set_on_update_addr_change_callback(FUNC(lw450_state::crtc_addr));
-	m_crtc->set_update_row_callback(FUNC(lw450_state::crtc_update_row));
-	m_crtc->out_vsync_callback().set(FUNC(lw450_state::crtc_vsync));
+	MCFG_MC6845_ADD("hd6445", HD6345, "screen", MDA_CLOCK / 9)
+	MCFG_MC6845_SHOW_BORDER_AREA(false)
+	MCFG_MC6845_CHAR_WIDTH(9)
+	MCFG_MC6845_ADDR_CHANGED_CB(lw450_state, crtc_addr)
+	MCFG_MC6845_UPDATE_ROW_CB(lw450_state, crtc_update_row)
+	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(lw450_state, crtc_vsync))
 
-	LW350_FLOPPY_CONNECTOR(config, floppy, 0);
-	floppy->option_add("35dd", LW350_FLOPPY);
-	floppy->set_default_option("35dd");
-
-	HD63266F(config, fdc, XTAL(16'000'000));
-	fdc->irq_wr_cb().set(FUNC(lw450_state::fdc_irq_w));
-	fdc->dreq_wr_cb().set(FUNC(lw450_state::fdc_dreq_w));
-	fdc->dend_rd_cb().set(FUNC(lw450_state::fdc_dend_r));
+	MCFG_DEVICE_ADD("floppy", LW350_FLOPPY_CONNECTOR, 0);
+	MCFG_DEVICE_SLOT_INTERFACE(lw450_floppies, "35dd", false);
+	MCFG_HD63266F_ADD("fdc", XTAL_16MHz);
+	MCFG_HD63266F_IRQ_CALLBACK(WRITELINE(lw450_state, fdc_irq_w))
+	MCFG_HD63266F_DREQ_CALLBACK(WRITELINE(lw450_state, fdc_dreq_w))
+	MCFG_HD63266F_DEND_CALLBACK(READLINE(lw450_state, fdc_dend_r))
 
 	// sound hardware
-	SPEAKER(config, "mono").front_center();
-	BEEP(config, "beeper", 4'000).add_route(ALL_OUTPUTS, "mono", 1.0); // 4.0 kHz
-}
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("beeper", BEEP, 4000) // 4.0 kHz
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+MACHINE_CONFIG_END
 
 #pragma endregion
 
@@ -1916,5 +2054,5 @@ ROM_START( lw450 )
 ROM_END
 
 //    YEAR  NAME  PARENT COMPAT   MACHINE INPUT  CLASS           INIT     COMPANY         FULLNAME          FLAGS
-COMP( 1995, lw350,  0,   0,       lw350,  lw350, lw350_state,    empty_init,       "Brother",      "Brother LW-350", MACHINE_NODEVICE_PRINTER )
-COMP( 1992, lw450,  0,   0,       lw450,  lw350, lw450_state,    empty_init,       "Brother",      "Brother LW-450", MACHINE_NODEVICE_PRINTER )
+COMP( 1995, lw350,  0,   0,       lw350,  lw350, lw350_state,    0,       "Brother",      "Brother LW-350", MACHINE_NODEVICE_PRINTER )
+COMP( 1992, lw450,  0,   0,       lw450,  lw350, lw450_state,    0,       "Brother",      "Brother LW-450", MACHINE_NODEVICE_PRINTER )
