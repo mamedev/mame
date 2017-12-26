@@ -28,7 +28,7 @@
 // Z180 datasheet, pg. 86ff "Dynamic RAM Refresh Control"; LW-30 sets RCR to 0xFF
 // doesn't seem to be implemented in Z180 core; however this would only account for about 2.5% time difference
 // Z180 datasheet, pg. 27ff "Wait State Generator"; LW-30 sets DCNTL to 0x40; insert 1 wait state for memory access; external I/O 1 wait state
-// doesn't seem to be implemented in Z180 core; could explain the timing difference
+// **fixed in Z180 core*** timing now works
 
 #pragma region(LW-30)
 
