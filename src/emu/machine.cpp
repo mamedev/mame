@@ -372,7 +372,8 @@ int running_machine::run(bool quiet)
 
 		// save the NVRAM and configuration
 		sound().ui_mute(true);
-		nvram_save();
+		if (options().nvram_save())
+			nvram_save();
 		m_configuration->save_settings();
 	}
 	catch (emu_fatalerror &fatal)
