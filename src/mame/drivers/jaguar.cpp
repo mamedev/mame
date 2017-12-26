@@ -2192,10 +2192,10 @@ ROM_END
 
 ROM_START( maxforce ) /* R3000 based, labeled as "Maximum Force 5-23-97 v1.05" */
 	ROM_REGION( 0x200000, "maincpu", 0 )    /* 2MB for IDT 79R3041 code */
-	ROM_LOAD32_BYTE( "maxf_105.hh", 0x00000, 0x80000, CRC(ec7f8167) SHA1(0cf057bfb1f30c2c9621d3ed25021e7ba7bdd46e) ) /* Usually found with "light grey" labels */
-	ROM_LOAD32_BYTE( "maxf_105.hl", 0x00001, 0x80000, CRC(3172611c) SHA1(00f14f871b737c66c20f95743740d964d0be3f24) ) /* Also found labeled as "MAXIMUM FORCE EE FIX PROG" */
-	ROM_LOAD32_BYTE( "maxf_105.lh", 0x00002, 0x80000, CRC(84d49423) SHA1(88d9a6724f1118f2bbef5dfa27accc2b65c5ba1d) )
-	ROM_LOAD32_BYTE( "maxf_105.ll", 0x00003, 0x80000, CRC(16d0768d) SHA1(665a6d7602a7f2f5b1f332b0220b1533143d56b1) )
+	ROM_LOAD32_BYTE( "1.05_maximum_force_hh_5-23-97.hh", 0x00000, 0x80000, CRC(ec7f8167) SHA1(0cf057bfb1f30c2c9621d3ed25021e7ba7bdd46e) ) /* Usually found with "light grey" labels */
+	ROM_LOAD32_BYTE( "1.05_maximum_force_hl_5-23-97.hl", 0x00001, 0x80000, CRC(3172611c) SHA1(00f14f871b737c66c20f95743740d964d0be3f24) ) /* Also found labeled as "MAXIMUM FORCE EE FIX PROG" */
+	ROM_LOAD32_BYTE( "1.05_maximum_force_lh_5-23-97.lh", 0x00002, 0x80000, CRC(84d49423) SHA1(88d9a6724f1118f2bbef5dfa27accc2b65c5ba1d) )
+	ROM_LOAD32_BYTE( "1.05_maximum_force_ll_5-23-97.ll", 0x00003, 0x80000, CRC(16d0768d) SHA1(665a6d7602a7f2f5b1f332b0220b1533143d56b1) )
 
 	ROM_REGION16_BE( 0x1000, "waverom", 0 )
 	ROM_LOAD16_WORD("jagwave.rom", 0x0000, 0x1000, CRC(7a25ee5b) SHA1(58117e11fd6478c521fbd3fdbe157f39567552f0) )
@@ -2207,10 +2207,10 @@ ROM_END
 
 ROM_START( maxf_102 ) /* R3000 based, labeled as "Maximum Force 2-27-97 v1.02" */
 	ROM_REGION( 0x200000, "maincpu", 0 )    /* 2MB for IDT 79R3041 code */
-	ROM_LOAD32_BYTE( "maxf_102.hh", 0x00000, 0x80000, CRC(8ff7009d) SHA1(da22eae298a6e0e36f503fa091ac3913423dcd0f) ) /* Usually found with "yellow" labels */
-	ROM_LOAD32_BYTE( "maxf_102.hl", 0x00001, 0x80000, CRC(96c2cc1d) SHA1(b332b8c042b92c736131c478cefac1c3c2d2673b) )
-	ROM_LOAD32_BYTE( "maxf_102.lh", 0x00002, 0x80000, CRC(459ffba5) SHA1(adb40db6904e84c17f32ac6518fd2e994da7883f) )
-	ROM_LOAD32_BYTE( "maxf_102.ll", 0x00003, 0x80000, CRC(e491be7f) SHA1(cbe281c099a4aa87067752d68cf2bb0ab3900531) )
+	ROM_LOAD32_BYTE( "1.02_maximum_force_hh_2-27-97.hh", 0x00000, 0x80000, CRC(8ff7009d) SHA1(da22eae298a6e0e36f503fa091ac3913423dcd0f) ) /* Usually found with "yellow" labels */
+	ROM_LOAD32_BYTE( "1.02_maximum_force_hl_2-27-97.hl", 0x00001, 0x80000, CRC(96c2cc1d) SHA1(b332b8c042b92c736131c478cefac1c3c2d2673b) )
+	ROM_LOAD32_BYTE( "1.02_maximum_force_lh_2-27-97.lh", 0x00002, 0x80000, CRC(459ffba5) SHA1(adb40db6904e84c17f32ac6518fd2e994da7883f) )
+	ROM_LOAD32_BYTE( "1.02_maximum_force_ll_2-27-97.ll", 0x00003, 0x80000, CRC(e491be7f) SHA1(cbe281c099a4aa87067752d68cf2bb0ab3900531) )
 
 	ROM_REGION16_BE( 0x1000, "waverom", 0 )
 	ROM_LOAD16_WORD("jagwave.rom", 0x0000, 0x1000, CRC(7a25ee5b) SHA1(58117e11fd6478c521fbd3fdbe157f39567552f0) )
@@ -2220,12 +2220,12 @@ ROM_START( maxf_102 ) /* R3000 based, labeled as "Maximum Force 2-27-97 v1.02" *
 ROM_END
 
 
-ROM_START( maxf_ng ) /* R3000 based, stickers say 'NO GORE' */
+ROM_START( maxf_ng ) /* R3000 based - MAIN: Apr 18 1997 11:08:45 */
 	ROM_REGION( 0x200000, "maincpu", 0 )    /* 2MB for IDT 79R3041 code */
-	ROM_LOAD32_BYTE( "mf_ng_hh.21v", 0x00000, 0x80000, CRC(08791c02) SHA1(9befbff3201c7d345109b26c296fd8548dbfc95b) )
-	ROM_LOAD32_BYTE( "mf_ng_hl.17v", 0x00001, 0x80000, CRC(52cf482c) SHA1(ff98b3f04987acef82a97a2ad35a9085fa84e6d5) )
-	ROM_LOAD32_BYTE( "mf_ng_lh.21y", 0x00002, 0x80000, CRC(ab4ee992) SHA1(69f0fe111d3f5f31151d2922579e5073e484b1e1) )
-	ROM_LOAD32_BYTE( "mf_ng_ll.17y", 0x00003, 0x80000, CRC(674aab43) SHA1(f79d790538756d1100b7e4ffed192a62a031a2cb) )
+	ROM_LOAD32_BYTE( "maximum_force_no_gore_hh.hh", 0x00000, 0x80000, CRC(08791c02) SHA1(9befbff3201c7d345109b26c296fd8548dbfc95b) )
+	ROM_LOAD32_BYTE( "maximum_force_no_gore_hl.hl", 0x00001, 0x80000, CRC(52cf482c) SHA1(ff98b3f04987acef82a97a2ad35a9085fa84e6d5) )
+	ROM_LOAD32_BYTE( "maximum_force_no_gore_lh.lh", 0x00002, 0x80000, CRC(ab4ee992) SHA1(69f0fe111d3f5f31151d2922579e5073e484b1e1) )
+	ROM_LOAD32_BYTE( "maximum_force_no_gore_ll.ll", 0x00003, 0x80000, CRC(674aab43) SHA1(f79d790538756d1100b7e4ffed192a62a031a2cb) )
 
 	ROM_REGION16_BE( 0x1000, "waverom", 0 )
 	ROM_LOAD16_WORD("jagwave.rom", 0x0000, 0x1000, CRC(7a25ee5b) SHA1(58117e11fd6478c521fbd3fdbe157f39567552f0) )
@@ -2238,12 +2238,12 @@ ROM_START( maxf_ng ) /* R3000 based, stickers say 'NO GORE' */
 ROM_END
 
 
-ROM_START( area51mx )   /* 68020 based, Labeled as "68020 MAX/A51 KIT 2.0" Date: Apr 22, 1998 */
+ROM_START( area51mx )   /* 68020 based - MAIN: Apr 22 1998 17:53:57 */
 	ROM_REGION( 0x200000, "maincpu", 0 ) /* 2MB for 68020 code */
-	ROM_LOAD32_BYTE( "area51mx.3h", 0x00000, 0x80000, CRC(47cbf30b) SHA1(23377bcc65c0fc330d5bc7e76e233bae043ac364) )
-	ROM_LOAD32_BYTE( "area51mx.3p", 0x00001, 0x80000, CRC(a3c93684) SHA1(f6b3357bb69900a176fd6bc6b819b2f57b7d0f59) )
-	ROM_LOAD32_BYTE( "area51mx.3m", 0x00002, 0x80000, CRC(d800ac17) SHA1(3d515c8608d8101ee9227116175b3c3f1fe22e0c) )
-	ROM_LOAD32_BYTE( "area51mx.3k", 0x00003, 0x80000, CRC(0e78f308) SHA1(adc4c8e441eb8fe525d0a6220eb3a2a8791a7289) )
+	ROM_LOAD32_BYTE( "2.0_68020_max-a51_kit_3h.3h", 0x00000, 0x80000, CRC(47cbf30b) SHA1(23377bcc65c0fc330d5bc7e76e233bae043ac364) ) /* Labeled as 2.0 68020 MAX/A51 KIT 3H */
+	ROM_LOAD32_BYTE( "2.0_68020_max-a51_kit_3p.3p", 0x00001, 0x80000, CRC(a3c93684) SHA1(f6b3357bb69900a176fd6bc6b819b2f57b7d0f59) ) /* Labeled as 2.0 68020 MAX/A51 KIT 3P */
+	ROM_LOAD32_BYTE( "2.0_68020_max-a51_kit_3m.3m", 0x00002, 0x80000, CRC(d800ac17) SHA1(3d515c8608d8101ee9227116175b3c3f1fe22e0c) ) /* Labeled as 2.0 68020 MAX/A51 KIT 3M */
+	ROM_LOAD32_BYTE( "2.0_68020_max-a51_kit_3k.3k", 0x00003, 0x80000, CRC(0e78f308) SHA1(adc4c8e441eb8fe525d0a6220eb3a2a8791a7289) ) /* Labeled as 2.0 68020 MAX/A51 KIT 3K */
 
 	ROM_REGION16_BE( 0x1000, "waverom", 0 )
 	ROM_LOAD16_WORD("jagwave.rom", 0x0000, 0x1000, CRC(7a25ee5b) SHA1(58117e11fd6478c521fbd3fdbe157f39567552f0) )
@@ -2253,12 +2253,27 @@ ROM_START( area51mx )   /* 68020 based, Labeled as "68020 MAX/A51 KIT 2.0" Date:
 ROM_END
 
 
-ROM_START( a51mxr3k ) /* R3000 based, Labeled as "R3K Max/A51 Kit Ver 1.0" */
+ROM_START( a51mxr3k ) /* R3000 based - MAIN: Feb 10 1998 11:52:51 */
 	ROM_REGION( 0x200000, "maincpu", 0 )    /* 2MB for IDT 79R3041 code */
-	ROM_LOAD32_BYTE( "a51mxr3k.hh", 0x00000, 0x80000, CRC(a984dab2) SHA1(debb3bc11ff49e87a52e89a69533a1bab7db700e) )
-	ROM_LOAD32_BYTE( "a51mxr3k.hl", 0x00001, 0x80000, CRC(0af49d74) SHA1(c19f26056a823fd32293e9a7b3ea868640eabf49) )
-	ROM_LOAD32_BYTE( "a51mxr3k.lh", 0x00002, 0x80000, CRC(d7d94dac) SHA1(2060a74715f36a0d7f5dd0855eda48ad1f20f095) )
-	ROM_LOAD32_BYTE( "a51mxr3k.ll", 0x00003, 0x80000, CRC(ece9e5ae) SHA1(7e44402726f5afa6d1670b27aa43ad13d21c4ad9) )
+	ROM_LOAD32_BYTE( "1.0_r3k_max-a51_kit_hh.hh", 0x00000, 0x80000, CRC(a984dab2) SHA1(debb3bc11ff49e87a52e89a69533a1bab7db700e) ) /* Labeled as 1.0 R3K MAX/A51 KIT HH */
+	ROM_LOAD32_BYTE( "1.0_r3k_max-a51_kit_hl.hl", 0x00001, 0x80000, CRC(0af49d74) SHA1(c19f26056a823fd32293e9a7b3ea868640eabf49) ) /* Labeled as 1.0 R3K MAX/A51 KIT HL */
+	ROM_LOAD32_BYTE( "1.0_r3k_max-a51_kit_lh.lh", 0x00002, 0x80000, CRC(d7d94dac) SHA1(2060a74715f36a0d7f5dd0855eda48ad1f20f095) ) /* Labeled as 1.0 R3K MAX/A51 KIT LH */
+	ROM_LOAD32_BYTE( "1.0_r3k_max-a51_kit_ll.ll", 0x00003, 0x80000, CRC(ece9e5ae) SHA1(7e44402726f5afa6d1670b27aa43ad13d21c4ad9) ) /* Labeled as 1.0 R3K MAX/A51 KIT LL */
+
+	ROM_REGION16_BE( 0x1000, "waverom", 0 )
+	ROM_LOAD16_WORD("jagwave.rom", 0x0000, 0x1000, CRC(7a25ee5b) SHA1(58117e11fd6478c521fbd3fdbe157f39567552f0) )
+
+	DISK_REGION( "ide:0:hdd:image" )
+	DISK_IMAGE( "area51mx", 0, SHA1(5ff10f4e87094d4449eabf3de7549564ca568c7e) )
+ROM_END
+
+
+ROM_START( a51mxr3ka ) /* R3000 based - MAIN: Feb  2 1998 14:10:29 */
+	ROM_REGION( 0x200000, "maincpu", 0 )    /* 2MB for IDT 79R3041 code */
+	ROM_LOAD32_BYTE( "maxa51_combo_r3k_hh_prog_2-02-98_67ff.hh", 0x00000, 0x80000, CRC(6af8950a) SHA1(33ae123065b14ed8d83635f3351ac5b5c136d206) ) /* Labeled as MAXA51  COMBO  R3K  HH  PROG  2/02/98  67FF (each item on a seperate line) */
+	ROM_LOAD32_BYTE( "maxa51_combo_r3k_hl_prog_2-02-98_72fe.hl", 0x00001, 0x80000, CRC(30dc3eea) SHA1(2b4e8d43ee28b2d1446c84ff79553a7ce1909f60) ) /* Labeled as MAXA51  COMBO  R3K  HL  PROG  2/02/98  72FE (each item on a seperate line) */
+	ROM_LOAD32_BYTE( "maxa51_combo_r3k_lh_prog_2-02-98_7ffd.lh", 0x00002, 0x80000, CRC(2c2124af) SHA1(6158644ef126f842a1a4f145141ce847302bbd62) ) /* Labeled as MAXA51  COMBO  R3K  LH  PROG  2/02/98  7FFD (each item on a seperate line) */
+	ROM_LOAD32_BYTE( "maxa51_combo_r3k_ll_prog_2-02-98_b3fc.ll", 0x00003, 0x80000, CRC(083f4429) SHA1(2be8db7c756a095c87f056da49b8e8832f18bca9) ) /* Labeled as MAXA51  COMBO  R3K  LL  PROG  2/02/98  B3FC (each item on a seperate line) */
 
 	ROM_REGION16_BE( 0x1000, "waverom", 0 )
 	ROM_LOAD16_WORD("jagwave.rom", 0x0000, 0x1000, CRC(7a25ee5b) SHA1(58117e11fd6478c521fbd3fdbe157f39567552f0) )
@@ -2710,5 +2725,6 @@ GAME( 1996, maxforce,  0,        cojagr3k,      area51,   jaguar_state, maxforce
 GAME( 1996, maxf_102,  maxforce, cojagr3k,      area51,   jaguar_state, maxforce,  ROT0, "Atari Games", "Maximum Force v1.02", 0 )
 GAME( 1996, maxf_ng,   maxforce, cojagr3k,      area51,   jaguar_state, maxforce,  ROT0, "Atari Games", "Maximum Force (No Gore version)", 0 )
 GAME( 1998, area51mx,  0,        cojag68k,      area51,   jaguar_state, area51mx,  ROT0, "Atari Games", "Area 51 / Maximum Force Duo v2.0", 0 )
-GAME( 1998, a51mxr3k,  area51mx, cojagr3k,      area51,   jaguar_state, a51mxr3k,  ROT0, "Atari Games", "Area 51 / Maximum Force Duo (R3000)", 0 )
+GAME( 1998, a51mxr3k,  area51mx, cojagr3k,      area51,   jaguar_state, a51mxr3k,  ROT0, "Atari Games", "Area 51 / Maximum Force Duo (R3000, 2/10/98)", 0 )
+GAME( 1998, a51mxr3ka, area51mx, cojagr3k,      area51,   jaguar_state, a51mxr3k,  ROT0, "Atari Games", "Area 51 / Maximum Force Duo (R3000, 2/02/98)", 0 )
 GAME( 1996, vcircle,   0,        cojagr3k,      vcircle,  jaguar_state, vcircle,   ROT0, "Atari Games", "Vicious Circle (prototype)", 0 )
