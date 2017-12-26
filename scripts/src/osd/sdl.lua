@@ -68,7 +68,8 @@ function maintargetosdoptions(_target,_subtarget)
 			if _OPTIONS["USE_LIBSDL"]~="1" then
 				configuration { "mingw*"}
 					links {
-						"SDL2.dll",
+						"SDL2main",
+						"SDL2",
 					}
 				configuration { "vs*" }
 					links {
