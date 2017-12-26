@@ -57,6 +57,9 @@
   The WMS CPU 1.5 Plus board has an upgrade: The WMS 360 / 550 Bluebird CPU NXT board,
   based on a Pentium processor.
 
+  About the dates: There is an internal string containing the game date, but wms seems to be quite
+  purposefully subtracted 1900 from the year and stored the result.
+
 ***************************************************************************************************
 
   Settings...
@@ -624,30 +627,30 @@ GAME( 200?, wms,        0,        wms,     wms,      wms_state, wms,  ROT0, "WMS
 GAME( 200?, wmsa,       wms,      wms,     wms,      wms_state, wms,  ROT0, "WMS",   "WMS SetUp/Clear Chips (set 2)",   MACHINE_IS_SKELETON )
 GAME( 200?, wmsb,       wms,      wms,     wms,      wms_state, wms,  ROT0, "WMS",   "WMS SetUp/Clear Chips (set 3)",   MACHINE_IS_SKELETON )
 
-GAME( 200?, btippers,   0,        wms,     wms,      wms_state, wms,  ROT0, "WMS",   "Big Tippers (Russian)",           MACHINE_IS_SKELETON )  // U5 03/09/01
-GAME( 200?, wmsboom,    0,        wms,     wms,      wms_state, wms,  ROT0, "WMS",   "Boom (Russian)",                  MACHINE_IS_SKELETON )  // U5 02/12/98
-GAME( 200?, cashcrop,   0,        wms,     wms,      wms_state, wms,  ROT0, "WMS",   "Cash Crop (Russian)",             MACHINE_IS_SKELETON )  // U5 09/05/100
-GAME( 200?, filthyr,    0,        wms,     wms,      wms_state, wms,  ROT0, "WMS",   "Filthy Rich (English)",           MACHINE_IS_SKELETON )  // U4 09/03/97
-GAME( 200?, filthyrr,   filthyr,  wms,     wms,      wms_state, wms,  ROT0, "WMS",   "Filthy Rich (Russian)",           MACHINE_IS_SKELETON )  // U4 09/03/97
-GAME( 200?, hottop,     0,        wms,     wms,      wms_state, wms,  ROT0, "WMS",   "Hot Toppings (English)",          MACHINE_IS_SKELETON )  // U5 04/22/103
-GAME( 200?, hottopa,    hottop,   wms,     wms,      wms_state, wms,  ROT0, "WMS",   "Hot Toppings (Russian?)",         MACHINE_IS_SKELETON )  // U5 06/26/101
-GAME( 200?, inwinner,   0,        wms,     wms,      wms_state, wms,  ROT0, "WMS",   "Instant Winner (Russian)",        MACHINE_IS_SKELETON )  // U5 11/25/98
-GAME( 200?, jptparty,   0,        wms,     wms,      wms_state, wms,  ROT0, "WMS",   "Jackpot Party (Russian)",         MACHINE_IS_SKELETON )  // U5 04/01/98
-GAME( 200?, leprgld,    0,        wms,     wms,      wms_state, wms,  ROT0, "WMS",   "Leprechaun's Gold (Russian)",     MACHINE_IS_SKELETON )  // U5 08/20/101
-GAME( 200?, leprglds,   leprgld,  wms,     wms,      wms_state, wms,  ROT0, "WMS",   "Leprechaun's Gold (Spanish)",     MACHINE_IS_SKELETON )  // U5 08/20/101
-GAME( 200?, lol,        0,        wms,     wms,      wms_state, wms,  ROT0, "WMS",   "Life of Luxury (Russian)",        MACHINE_IS_SKELETON )  // U3 08/30/100
-GAME( 200?, lovewin,    0,        wms,     wms,      wms_state, wms,  ROT0, "WMS",   "Love To Win (Russian)",           MACHINE_IS_SKELETON )  // U5 04/18/101
-GAME( 200?, mtburn,     0,        wms,     wms,      wms_state, wms,  ROT0, "WMS",   "Money To Burn (English)",         MACHINE_IS_SKELETON )  // U5 08/02/101
-GAME( 200?, mtburnr,    mtburn,   wms,     wms,      wms_state, wms,  ROT0, "WMS",   "Money To Burn (Russian)",         MACHINE_IS_SKELETON )  // U5 02/11/100
-GAME( 200?, otchart,    0,        wms,     wms,      wms_state, wms,  ROT0, "WMS",   "Off The Charts (Russian)",        MACHINE_IS_SKELETON )  // U5 07/31/100
-GAME( 200?, perfect,    0,        wms,     wms,      wms_state, wms,  ROT0, "WMS",   "Perfect Game (Russian)",          MACHINE_IS_SKELETON )  // U5 03/17/100
+GAME( 2001, btippers,   0,        wms,     wms,      wms_state, wms,  ROT0, "WMS",   "Big Tippers (Russian)",           MACHINE_IS_SKELETON )  // U5 03/09/01
+GAME( 1998, wmsboom,    0,        wms,     wms,      wms_state, wms,  ROT0, "WMS",   "Boom (Russian)",                  MACHINE_IS_SKELETON )  // U5 02/12/98
+GAME( 2000, cashcrop,   0,        wms,     wms,      wms_state, wms,  ROT0, "WMS",   "Cash Crop (Russian)",             MACHINE_IS_SKELETON )  // U5 09/05/100
+GAME( 1997, filthyr,    0,        wms,     wms,      wms_state, wms,  ROT0, "WMS",   "Filthy Rich (English)",           MACHINE_IS_SKELETON )  // U4 09/03/97
+GAME( 1997, filthyrr,   filthyr,  wms,     wms,      wms_state, wms,  ROT0, "WMS",   "Filthy Rich (Russian)",           MACHINE_IS_SKELETON )  // U4 09/03/97
+GAME( 2003, hottop,     0,        wms,     wms,      wms_state, wms,  ROT0, "WMS",   "Hot Toppings (English)",          MACHINE_IS_SKELETON )  // U5 04/22/103
+GAME( 2001, hottopa,    hottop,   wms,     wms,      wms_state, wms,  ROT0, "WMS",   "Hot Toppings (Russian?)",         MACHINE_IS_SKELETON )  // U5 06/26/101
+GAME( 1998, inwinner,   0,        wms,     wms,      wms_state, wms,  ROT0, "WMS",   "Instant Winner (Russian)",        MACHINE_IS_SKELETON )  // U5 11/25/98
+GAME( 1998, jptparty,   0,        wms,     wms,      wms_state, wms,  ROT0, "WMS",   "Jackpot Party (Russian)",         MACHINE_IS_SKELETON )  // U5 04/01/98
+GAME( 2001, leprgld,    0,        wms,     wms,      wms_state, wms,  ROT0, "WMS",   "Leprechaun's Gold (Russian)",     MACHINE_IS_SKELETON )  // U5 08/20/101
+GAME( 2001, leprglds,   leprgld,  wms,     wms,      wms_state, wms,  ROT0, "WMS",   "Leprechaun's Gold (Spanish)",     MACHINE_IS_SKELETON )  // U5 08/20/101
+GAME( 2000, lol,        0,        wms,     wms,      wms_state, wms,  ROT0, "WMS",   "Life of Luxury (Russian)",        MACHINE_IS_SKELETON )  // U3 08/30/100
+GAME( 2001, lovewin,    0,        wms,     wms,      wms_state, wms,  ROT0, "WMS",   "Love To Win (Russian)",           MACHINE_IS_SKELETON )  // U5 04/18/101
+GAME( 2001, mtburn,     0,        wms,     wms,      wms_state, wms,  ROT0, "WMS",   "Money To Burn (English)",         MACHINE_IS_SKELETON )  // U5 08/02/101
+GAME( 2000, mtburnr,    mtburn,   wms,     wms,      wms_state, wms,  ROT0, "WMS",   "Money To Burn (Russian)",         MACHINE_IS_SKELETON )  // U5 02/11/100
+GAME( 2000, otchart,    0,        wms,     wms,      wms_state, wms,  ROT0, "WMS",   "Off The Charts (Russian)",        MACHINE_IS_SKELETON )  // U5 07/31/100
+GAME( 2000, perfect,    0,        wms,     wms,      wms_state, wms,  ROT0, "WMS",   "Perfect Game (Russian)",          MACHINE_IS_SKELETON )  // U5 03/17/100
 GAME( 1997, reelemin,   0,        wms,     wms,      wms_state, wms,  ROT0, "WMS",   "Reel 'Em In (English)",           MACHINE_IS_SKELETON )  // U4 01/22/97
 GAME( 1997, reeleminr,  reelemin, wms,     wms,      wms_state, wms,  ROT0, "WMS",   "Reel 'Em In (Russian)",           MACHINE_IS_SKELETON )  // U4 01/22/97
 GAME( 200?, sonoth,     0,        wms,     wms,      wms_state, wms,  ROT0, "WMS",   "Something For Nothing (Russian)", MACHINE_IS_SKELETON )  // ???
-GAME( 200?, swingin,    0,        wms,     wms,      wms_state, wms,  ROT0, "WMS",   "Swingin In The Green (Russian)",  MACHINE_IS_SKELETON )  // U5 03/17/100
-GAME( 200?, wmstopb,    0,        wms,     wms,      wms_state, wms,  ROT0, "WMS",   "Top Banana (Russian)",            MACHINE_IS_SKELETON )  // U4 04/30/99
-GAME( 200?, wdun,       0,        wms,     wms,      wms_state, wms,  ROT0, "WMS",   "Who Dunnit (Russian)",            MACHINE_IS_SKELETON )  // U5 09/02/99
-GAME( 200?, winbid,     0,        wms,     wms,      wms_state, wms,  ROT0, "WMS",   "Winning Bid (English)",           MACHINE_IS_SKELETON )  // U5 10/09/100
-GAME( 200?, winbidr,    winbid,   wms,     wms,      wms_state, wms,  ROT0, "WMS",   "Winning Bid (Russian)",           MACHINE_IS_SKELETON )  // U5 09/07/99
-GAME( 200?, wldstrek,   0,        wms,     wms,      wms_state, wms,  ROT0, "WMS",   "Wild Streak (Russian)",           MACHINE_IS_SKELETON )  // U4 04/11/100
-GAME( 200?, yukongld,   0,        wms,     wms,      wms_state, wms,  ROT0, "WMS",   "Yukon Gold (Russian)",            MACHINE_IS_SKELETON )  // U5 11/06/00
+GAME( 2000, swingin,    0,        wms,     wms,      wms_state, wms,  ROT0, "WMS",   "Swingin In The Green (Russian)",  MACHINE_IS_SKELETON )  // U5 03/17/100
+GAME( 1999, wmstopb,    0,        wms,     wms,      wms_state, wms,  ROT0, "WMS",   "Top Banana (Russian)",            MACHINE_IS_SKELETON )  // U4 04/30/99
+GAME( 1999, wdun,       0,        wms,     wms,      wms_state, wms,  ROT0, "WMS",   "Who Dunnit (Russian)",            MACHINE_IS_SKELETON )  // U5 09/02/99
+GAME( 2000, winbid,     0,        wms,     wms,      wms_state, wms,  ROT0, "WMS",   "Winning Bid (English)",           MACHINE_IS_SKELETON )  // U5 10/09/100
+GAME( 1999, winbidr,    winbid,   wms,     wms,      wms_state, wms,  ROT0, "WMS",   "Winning Bid (Russian)",           MACHINE_IS_SKELETON )  // U5 09/07/99
+GAME( 2000, wldstrek,   0,        wms,     wms,      wms_state, wms,  ROT0, "WMS",   "Wild Streak (Russian)",           MACHINE_IS_SKELETON )  // U4 04/11/100
+GAME( 2000, yukongld,   0,        wms,     wms,      wms_state, wms,  ROT0, "WMS",   "Yukon Gold (Russian)",            MACHINE_IS_SKELETON )  // U5 11/06/00
