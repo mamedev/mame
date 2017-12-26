@@ -247,7 +247,7 @@ ROM_START( wmsboom )    // Boom (Russian) / U5 02/12/98
 ROM_END
 
 
-ROM_START( cashcrop )    // Cash Crop (Russian)
+ROM_START( cashcrop )    // Cash Crop (Russian) / U5 09/05/100 (typo for 00?)
 	ROM_REGION(0x100000, "maincpu", 0)
 	ROM_LOAD( "xu-3.bin", 0x0000, 0x100000, CRC(e1918f25) SHA1(55c33c1f604a44caef65e712e69d21792161dfbc) )
 
@@ -626,7 +626,7 @@ GAME( 200?, wmsb,       wms,      wms,     wms,      wms_state, wms,  ROT0, "WMS
 
 GAME( 2001, btippers,   0,        wms,     wms,      wms_state, wms,  ROT0, "WMS",   "Big Tippers (Russian)",           MACHINE_IS_SKELETON )  // U5 03/09/01
 GAME( 1998, wmsboom,    0,        wms,     wms,      wms_state, wms,  ROT0, "WMS",   "Boom (Russian)",                  MACHINE_IS_SKELETON )  // U5 02/12/98
-GAME( 200?, cashcrop,   0,        wms,     wms,      wms_state, wms,  ROT0, "WMS",   "Cash Crop (Russian)",             MACHINE_IS_SKELETON )
+GAME( 2000, cashcrop,   0,        wms,     wms,      wms_state, wms,  ROT0, "WMS",   "Cash Crop (Russian)",             MACHINE_IS_SKELETON )  // U5 09/05/100 (typo for 00?)
 GAME( 1997, filthyr,    0,        wms,     wms,      wms_state, wms,  ROT0, "WMS",   "Filthy Rich (English)",           MACHINE_IS_SKELETON )  // U4 09/03/97
 GAME( 1997, filthyrr,   filthyr,  wms,     wms,      wms_state, wms,  ROT0, "WMS",   "Filthy Rich (Russian)",           MACHINE_IS_SKELETON )  // U4 09/03/97
 GAME( 200?, hottop,     0,        wms,     wms,      wms_state, wms,  ROT0, "WMS",   "Hot Toppings (English)",          MACHINE_IS_SKELETON )
