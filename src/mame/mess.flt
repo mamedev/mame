@@ -594,6 +594,7 @@ sbc6510.cpp
 sbrain.cpp
 sc1.cpp
 sc2.cpp
+scopus.cpp
 scorpion.cpp
 scv.cpp
 sdk80.cpp
