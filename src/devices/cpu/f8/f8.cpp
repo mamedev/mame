@@ -61,15 +61,15 @@ uint8_t f8_cpu_device::do_ad(uint8_t augend, uint8_t addend)
 {
 	/* SKR from F8 Guide To programming description of AMD
 	 * binary add the addend to the binary sum of the augend and $66
-     * *NOTE* the binary addition of the augend to $66 is done before AMD is called
-     * record the status of the carry and intermediate carry
-     * add a factor to the sum based on the carry and intermediate carry:
-     * - no carry, no intermediate carry, add $AA
-     * - no carry, intermediate carry, add $A0
-     * - carry, no intermediate carry, add $0A
-     * - carry, intermediate carry, add $00
-     * any carry from the low-order digit is suppressed
-     * *NOTE* status flags are updated prior to the factor being added
+	 * *NOTE* the binary addition of the augend to $66 is done before AMD is called
+	 * record the status of the carry and intermediate carry
+	 * add a factor to the sum based on the carry and intermediate carry:
+	 * - no carry, no intermediate carry, add $AA
+	 * - no carry, intermediate carry, add $A0
+	 * - carry, no intermediate carry, add $0A
+	 * - carry, intermediate carry, add $00
+	 * any carry from the low-order digit is suppressed
+	 * *NOTE* status flags are updated prior to the factor being added
 	 */
 	uint8_t tmp = augend + addend;
 

@@ -143,7 +143,7 @@ void debug_disasm_buffer::debug_data_buffer::fill(offs_t lstart, offs_t size) co
 					n_lend = std::min(m_lend, lend);
 					m_wrapped = true;
 				}
-			}			
+			}
 		}
 
 		if(n_lstart != m_lstart) {
@@ -200,7 +200,7 @@ void debug_disasm_buffer::debug_data_buffer::setup_methods()
 	// Define the filler
 	if(m_space) {
 		// get the data from given space
-		if(m_intf->interface_flags() & util::disasm_interface::NONLINEAR_PC) {	
+		if(m_intf->interface_flags() & util::disasm_interface::NONLINEAR_PC) {
 			switch(shift) {
 			case -1:
 				m_do_fill = [this](offs_t lstart, offs_t lend) {
@@ -688,7 +688,7 @@ void debug_disasm_buffer::debug_data_buffer::setup_methods()
 			m_do_r8  = [](offs_t pc) -> u8  { throw emu_fatalerror("debug_disasm_buffer::debug_data_buffer: r8 access on 64-bits granularity bus\n"); };
 			m_do_r16 = [](offs_t pc) -> u16 { throw emu_fatalerror("debug_disasm_buffer::debug_data_buffer: r16 access on 64-bits granularity bus\n"); };
 			m_do_r32 = [](offs_t pc) -> u32 { throw emu_fatalerror("debug_disasm_buffer::debug_data_buffer: r32 access on 64-bits granularity bus\n"); };
-			m_do_r64 = [this](offs_t pc) -> u64 { 
+			m_do_r64 = [this](offs_t pc) -> u64 {
 				fill(pc, 1);
 				const u64 *src = get_ptr<u64>(pc);
 				return src[0];
@@ -706,7 +706,7 @@ void debug_disasm_buffer::debug_data_buffer::setup_methods()
 			switch(endian) {
 			case ENDIANNESS_LITTLE:
 				if(m_page_mask) {
-					m_do_r64 = [this](offs_t pc) -> u64 { 
+					m_do_r64 = [this](offs_t pc) -> u64 {
 						fill(pc, 2);
 						u64 r = 0;
 						for(int j=0; j != 2; j++) {
@@ -716,7 +716,7 @@ void debug_disasm_buffer::debug_data_buffer::setup_methods()
 						return r;
 					};
 				} else {
-					m_do_r64 = [this](offs_t pc) -> u64 { 
+					m_do_r64 = [this](offs_t pc) -> u64 {
 						fill(pc, 2);
 						const u32 *src = get_ptr<u32>(pc);
 						return src[0] | (u64(src[1]) << 32);
@@ -725,7 +725,7 @@ void debug_disasm_buffer::debug_data_buffer::setup_methods()
 				break;
 			case ENDIANNESS_BIG:
 				if(m_page_mask) {
-					m_do_r64 = [this](offs_t pc) -> u64 { 
+					m_do_r64 = [this](offs_t pc) -> u64 {
 						fill(pc, 2);
 						u64 r = 0;
 						for(int j=0; j != 2; j++) {
@@ -735,7 +735,7 @@ void debug_disasm_buffer::debug_data_buffer::setup_methods()
 						return r;
 					};
 				} else {
-					m_do_r64 = [this](offs_t pc) -> u64 { 
+					m_do_r64 = [this](offs_t pc) -> u64 {
 						fill(pc, 2);
 						const u32 *src = get_ptr<u32>(pc);
 						return (u64(src[0]) << 32) | u64(src[1]);
@@ -755,7 +755,7 @@ void debug_disasm_buffer::debug_data_buffer::setup_methods()
 			switch(endian) {
 			case ENDIANNESS_LITTLE:
 				if(m_page_mask) {
-					m_do_r32 = [this](offs_t pc) -> u32 { 
+					m_do_r32 = [this](offs_t pc) -> u32 {
 						fill(pc, 2);
 						u32 r = 0;
 						for(int j=0; j != 2; j++) {
@@ -764,7 +764,7 @@ void debug_disasm_buffer::debug_data_buffer::setup_methods()
 						}
 						return r;
 					};
-					m_do_r64 = [this](offs_t pc) -> u64 { 
+					m_do_r64 = [this](offs_t pc) -> u64 {
 						fill(pc, 4);
 						u64 r = 0;
 						for(int j=0; j != 4; j++) {
@@ -774,12 +774,12 @@ void debug_disasm_buffer::debug_data_buffer::setup_methods()
 						return r;
 					};
 				} else {
-					m_do_r32 = [this](offs_t pc) -> u32 { 
+					m_do_r32 = [this](offs_t pc) -> u32 {
 						fill(pc, 2);
 						const u16 *src = get_ptr<u16>(pc);
 						return src[0] | (src[1] << 16);
 					};
-					m_do_r64 = [this](offs_t pc) -> u64 { 
+					m_do_r64 = [this](offs_t pc) -> u64 {
 						fill(pc, 4);
 						const u16 *src = get_ptr<u16>(pc);
 						return src[0] | (src[1] << 16) | (u64(src[2]) << 32) | (u64(src[3]) << 48);
@@ -788,7 +788,7 @@ void debug_disasm_buffer::debug_data_buffer::setup_methods()
 				break;
 			case ENDIANNESS_BIG:
 				if(m_page_mask) {
-					m_do_r32 = [this](offs_t pc) -> u32 { 
+					m_do_r32 = [this](offs_t pc) -> u32 {
 						fill(pc, 2);
 						u32 r = 0;
 						for(int j=0; j != 2; j++) {
@@ -797,7 +797,7 @@ void debug_disasm_buffer::debug_data_buffer::setup_methods()
 						}
 						return r;
 					};
-					m_do_r64 = [this](offs_t pc) -> u64 { 
+					m_do_r64 = [this](offs_t pc) -> u64 {
 						fill(pc, 4);
 						u64 r = 0;
 						for(int j=0; j != 4; j++) {
@@ -807,12 +807,12 @@ void debug_disasm_buffer::debug_data_buffer::setup_methods()
 						return r;
 					};
 				} else {
-					m_do_r32 = [this](offs_t pc) -> u32 { 
+					m_do_r32 = [this](offs_t pc) -> u32 {
 						fill(pc, 2);
 						const u16 *src = get_ptr<u16>(pc);
 						return (src[0] << 16) | src[1];
 					};
-					m_do_r64 = [this](offs_t pc) -> u64 { 
+					m_do_r64 = [this](offs_t pc) -> u64 {
 						fill(pc, 4);
 						const u16 *src = get_ptr<u16>(pc);
 						return (u64(src[0]) << 48) | (u64(src[1]) << 32) | u32(src[2] << 16) | src[3];
@@ -831,7 +831,7 @@ void debug_disasm_buffer::debug_data_buffer::setup_methods()
 			switch(endian) {
 			case ENDIANNESS_LITTLE:
 				if(m_page_mask) {
-					m_do_r16 = [this](offs_t pc) -> u16 { 
+					m_do_r16 = [this](offs_t pc) -> u16 {
 						fill(pc, 2);
 						u16 r = 0;
 						for(int j=0; j != 2; j++) {
@@ -840,7 +840,7 @@ void debug_disasm_buffer::debug_data_buffer::setup_methods()
 						}
 						return r;
 					};
-					m_do_r32 = [this](offs_t pc) -> u32 { 
+					m_do_r32 = [this](offs_t pc) -> u32 {
 						fill(pc, 4);
 						u32 r = 0;
 						for(int j=0; j != 4; j++) {
@@ -849,7 +849,7 @@ void debug_disasm_buffer::debug_data_buffer::setup_methods()
 						}
 						return r;
 					};
-					m_do_r64 = [this](offs_t pc) -> u64 { 
+					m_do_r64 = [this](offs_t pc) -> u64 {
 						fill(pc, 8);
 						u64 r = 0;
 						for(int j=0; j != 8; j++) {
@@ -859,17 +859,17 @@ void debug_disasm_buffer::debug_data_buffer::setup_methods()
 						return r;
 					};
 				} else {
-					m_do_r16 = [this](offs_t pc) -> u16 { 
+					m_do_r16 = [this](offs_t pc) -> u16 {
 						fill(pc, 2);
 						const u8 *src = get_ptr<u8>(pc);
 						return src[0] | (src[1] << 8);
 					};
-					m_do_r32 = [this](offs_t pc) -> u32 { 
+					m_do_r32 = [this](offs_t pc) -> u32 {
 						fill(pc, 4);
 						const u8 *src = get_ptr<u8>(pc);
 						return src[0] | (src[1] << 8) | (src[2] << 16) | (src[3] << 24);
 					};
-					m_do_r64 = [this](offs_t pc) -> u64 { 
+					m_do_r64 = [this](offs_t pc) -> u64 {
 						fill(pc, 8);
 						const u8 *src = get_ptr<u8>(pc);
 						return src[0] | (src[1] << 8) | (src[2] << 16) | u32(src[3] << 24) |
@@ -879,7 +879,7 @@ void debug_disasm_buffer::debug_data_buffer::setup_methods()
 				break;
 			case ENDIANNESS_BIG:
 				if(m_page_mask) {
-					m_do_r16 = [this](offs_t pc) -> u16 { 
+					m_do_r16 = [this](offs_t pc) -> u16 {
 						fill(pc, 2);
 						u16 r = 0;
 						for(int j=0; j != 2; j++) {
@@ -888,7 +888,7 @@ void debug_disasm_buffer::debug_data_buffer::setup_methods()
 						}
 						return r;
 					};
-					m_do_r32 = [this](offs_t pc) -> u32 { 
+					m_do_r32 = [this](offs_t pc) -> u32 {
 						fill(pc, 4);
 						u32 r = 0;
 						for(int j=0; j != 4; j++) {
@@ -897,7 +897,7 @@ void debug_disasm_buffer::debug_data_buffer::setup_methods()
 						}
 						return r;
 					};
-					m_do_r64 = [this](offs_t pc) -> u64 { 
+					m_do_r64 = [this](offs_t pc) -> u64 {
 						fill(pc, 8);
 						u64 r = 0;
 						for(int j=0; j != 8; j++) {
@@ -907,20 +907,20 @@ void debug_disasm_buffer::debug_data_buffer::setup_methods()
 						return r;
 					};
 				} else {
-					m_do_r16 = [this](offs_t pc) -> u16 { 
+					m_do_r16 = [this](offs_t pc) -> u16 {
 						fill(pc, 2);
 						const u8 *src = get_ptr<u8>(pc);
 						return (src[0] << 8) | src[1];
 					};
-					m_do_r32 = [this](offs_t pc) -> u32 { 
+					m_do_r32 = [this](offs_t pc) -> u32 {
 						fill(pc, 4);
 						const u8 *src = get_ptr<u8>(pc);
 						return (src[0] << 24) | (src[1] << 16) | (src[2] << 8) | src[3];
 					};
-					m_do_r64 = [this](offs_t pc) -> u64 { 
+					m_do_r64 = [this](offs_t pc) -> u64 {
 						fill(pc, 8);
 						const u8 *src = get_ptr<u8>(pc);
-						return (u64(src[0]) << 56) | (u64(src[1]) << 32) | (u64(src[2]) << 40) | (u64(src[3]) << 32) | 
+						return (u64(src[0]) << 56) | (u64(src[1]) << 32) | (u64(src[2]) << 40) | (u64(src[3]) << 32) |
 						(src[4] << 24) | (src[5] << 16) | (src[6] << 8) | src[7];
 					};
 				}
@@ -937,19 +937,19 @@ void debug_disasm_buffer::debug_data_buffer::setup_methods()
 				const u16 *src = reinterpret_cast<u16 *>(&m_buffer[0]) + ((pc - m_lstart) >> 4);
 				return src[0];
 			};
-			m_do_r32 = [this](offs_t pc) -> u32 { 
+			m_do_r32 = [this](offs_t pc) -> u32 {
 				fill(pc, 32);
 				const u16 *src = reinterpret_cast<u16 *>(&m_buffer[0]) + ((pc - m_lstart) >> 4);
 				return src[0] | (src[1] << 16);
 			};
-			m_do_r64 = [this](offs_t pc) -> u64 { 
+			m_do_r64 = [this](offs_t pc) -> u64 {
 				fill(pc, 64);
 				const u16 *src = reinterpret_cast<u16 *>(&m_buffer[0]) + ((pc - m_lstart) >> 4);
 				return src[0] | (src[1] << 16) | (u64(src[2]) << 32) | (u64(src[3]) << 48);
 			};
 			break;
 		}
-	}			
+	}
 
 	// Define the data -> string conversion
 	switch(shift) {
@@ -1271,7 +1271,7 @@ debug_disasm_buffer::debug_disasm_buffer(device_t &device) :
 			int nc2 = (bits2+2)/3;
 			int nc3 = (bits3+2)/3;
 			m_pc_to_string = [nc1, nc2, nc3, sm1, sm2, sh2, sh3](offs_t pc) -> std::string {
-				return util::string_format("%0*o:%0*o:%0*o", 
+				return util::string_format("%0*o:%0*o:%0*o",
 										   nc3, pc >> sh3,
 										   nc2, (pc >> sh2) & sm2,
 										   nc1, pc & sm1);
@@ -1281,7 +1281,7 @@ debug_disasm_buffer::debug_disasm_buffer(device_t &device) :
 			int nc2 = (bits2+3)/4;
 			int nc3 = (bits3+3)/4;
 			m_pc_to_string = [nc1, nc2, nc3, sm1, sm2, sh2, sh3](offs_t pc) -> std::string {
-				return util::string_format("%0*X:%0*X:%0*X", 
+				return util::string_format("%0*X:%0*X:%0*X",
 										   nc3, pc >> sh3,
 										   nc2, (pc >> sh2) & sm2,
 										   nc1, pc & sm1);
@@ -1298,7 +1298,7 @@ debug_disasm_buffer::debug_disasm_buffer(device_t &device) :
 			int nc1 = (bits1+2)/3;
 			int nc2 = (bits2+2)/3;
 			m_pc_to_string = [nc1, nc2, sm1, sh2](offs_t pc) -> std::string {
-				return util::string_format("%0*o:%0*o", 
+				return util::string_format("%0*o:%0*o",
 										   nc2, pc >> sh2,
 										   nc1, pc & sm1);
 			};
@@ -1306,7 +1306,7 @@ debug_disasm_buffer::debug_disasm_buffer(device_t &device) :
 			int nc1 = (bits1+3)/4;
 			int nc2 = (bits2+3)/4;
 			m_pc_to_string = [nc1, nc2, sm1, sh2](offs_t pc) -> std::string {
-				return util::string_format("%0*X:%0*X", 
+				return util::string_format("%0*X:%0*X",
 										   nc2, pc >> sh2,
 										   nc1, pc & sm1);
 			};
@@ -1318,13 +1318,13 @@ debug_disasm_buffer::debug_disasm_buffer(device_t &device) :
 		if(is_octal) {
 			int nc1 = (bits1+2)/3;
 			m_pc_to_string = [nc1](offs_t pc) -> std::string {
-				return util::string_format("%0*o", 
+				return util::string_format("%0*o",
 										   nc1, pc);
 			};
 		} else {
 			int nc1 = (bits1+3)/4;
 			m_pc_to_string = [nc1](offs_t pc) -> std::string {
-				return util::string_format("%0*X", 
+				return util::string_format("%0*X",
 										   nc1, pc);
 			};
 		}

@@ -681,7 +681,7 @@ static ADDRESS_MAP_START( amaticmg4_portmap, AS_IO, 8, amaticmg_state )
 	AM_RANGE(0x50, 0x51) AM_DEVWRITE("ymsnd", ym3812_device, write)
 	AM_RANGE(0x0e, 0x0e) AM_DEVWRITE("crtc", mc6845_device, address_w)
 	AM_RANGE(0x0f, 0x0f) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
-//	AM_RANGE(0xc0, 0xc0) AM_WRITE(rombank_w)
+//  AM_RANGE(0xc0, 0xc0) AM_WRITE(rombank_w)
 	AM_RANGE(0xe6, 0xe6) AM_WRITE(nmi_mask_w)
 ADDRESS_MAP_END
 
@@ -880,7 +880,7 @@ static MACHINE_CONFIG_DERIVED( amaticmg2, amaticmg )
 	MCFG_CPU_IO_MAP(amaticmg2_portmap)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", amaticmg_state,  amaticmg2_irq)
 
-	MCFG_DEVICE_ADD("ppi8255_2", I8255A, 0)	// MG4: 0x89 -> A:out; B:out; C(h):in; C(l):in.
+	MCFG_DEVICE_ADD("ppi8255_2", I8255A, 0) // MG4: 0x89 -> A:out; B:out; C(h):in; C(l):in.
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(amaticmg_state, screen_update_amaticmg2)
@@ -898,7 +898,7 @@ static MACHINE_CONFIG_DERIVED( amaticmg4, amaticmg )
 	MCFG_CPU_IO_MAP(amaticmg4_portmap)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", amaticmg_state,  amaticmg2_irq)
 
-	MCFG_DEVICE_ADD("ppi8255_2", I8255A, 0)	// MG4: 0x89 -> A:out; B:out; C(h):in; C(l):in.
+	MCFG_DEVICE_ADD("ppi8255_2", I8255A, 0) // MG4: 0x89 -> A:out; B:out; C(h):in; C(l):in.
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(amaticmg_state, screen_update_amaticmg2)

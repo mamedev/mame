@@ -728,7 +728,7 @@ void towns_state::render_sprite_4(uint32_t poffset, uint32_t coffset, uint16_t x
 	int xdir,ydir;
 	int width = (m_video.towns_crtc_reg[12] - m_video.towns_crtc_reg[11]) / (((m_video.towns_crtc_reg[27] & 0x0f00) >> 8)+1);
 	int height = (m_video.towns_crtc_reg[16] - m_video.towns_crtc_reg[15]) / (((m_video.towns_crtc_reg[27] & 0xf000) >> 12)+2);
-	
+
 	if (rotation)
 	{
 		std::swap (x,y);
@@ -738,7 +738,7 @@ void towns_state::render_sprite_4(uint32_t poffset, uint32_t coffset, uint16_t x
 
 	if(xflip)
 	{
-		if (xhalfsize) 
+		if (xhalfsize)
 		{
 			xstart = x+6;
 			xdir = -1;
@@ -753,7 +753,7 @@ void towns_state::render_sprite_4(uint32_t poffset, uint32_t coffset, uint16_t x
 	else
 	{
 		xstart = x+1;
-		if (xhalfsize) 
+		if (xhalfsize)
 		{
 			xend = x+9;
 			xdir = 1;
@@ -776,7 +776,7 @@ void towns_state::render_sprite_4(uint32_t poffset, uint32_t coffset, uint16_t x
 	else
 	{
 		ystart = y;
-		if (yhalfsize) 
+		if (yhalfsize)
 			yend = y+8;
 		else
 			yend = y+16;
@@ -787,12 +787,12 @@ void towns_state::render_sprite_4(uint32_t poffset, uint32_t coffset, uint16_t x
 	ystart &= 0x1ff;
 	yend &= 0x1ff;
 	poffset &= 0x1ffff;
-	
+
 	for(ypos=ystart;ypos!=yend;ypos+=ydir,ypos&=0x1ff)
 	{
 		for(xpos=xstart;xpos!=xend;xpos+=xdir,xpos&=0x1ff)
 		{
-			
+
 			if(m_video.towns_sprite_page != 0)
 				voffset = 0x20000;
 			else
@@ -831,7 +831,7 @@ void towns_state::render_sprite_4(uint32_t poffset, uint32_t coffset, uint16_t x
 						voffset-=(m_video.towns_crtc_reg[24] * 4);
 					else
 						voffset-=2;
-				
+
 				pixel = m_towns_txtvram[poffset] & 0x0f;
 				col = m_towns_txtvram[coffset+(pixel*2)] | (m_towns_txtvram[coffset+(pixel*2)+1] << 8);
 				if((m_video.towns_sprite_page != 0 && voffset > 0x1ffff && voffset < 0x40000)
@@ -903,9 +903,9 @@ void towns_state::render_sprite_16(uint32_t poffset, uint16_t x, uint16_t y, boo
 	{
 		ystart = y;
 		if (yhalfsize)
-			yend = y+16;
-		else
 			yend = y+8;
+		else
+			yend = y+16;
 		ydir = 1;
 	}
 	xstart &= 0x1ff;
@@ -948,7 +948,7 @@ void towns_state::render_sprite_16(uint32_t poffset, uint16_t x, uint16_t y, boo
 				poffset+=2;
 			poffset &= 0x1ffff;
 		}
-		
+
 		if (yhalfsize)
 			poffset+=16;
 	}
@@ -984,7 +984,7 @@ void towns_state::draw_sprites(const rectangle* rect)
 		rotation = (attr & 0x4000) >> 14;
 		xhalfsize = (attr & 0x400) >> 10;
 		yhalfsize = (attr & 0x800) >> 11;
-		
+
 		if(attr & 0x8000)
 		{
 			x += xoff;
@@ -1033,11 +1033,18 @@ void towns_state::towns_crtc_draw_scan_layer_hicolour(bitmap_rgb32 &bitmap,const
 	int hzoom = 1;
 	int linesize;
 	uint32_t scroll;
+	bool sprites_enabled = (m_video.towns_sprite_reg[1] & 0x80) >> 7;
 
 	if(layer == 0)
 		linesize = m_video.towns_crtc_reg[20] * 4;
 	else
 		linesize = m_video.towns_crtc_reg[24] * 4;
+	
+	// TODO: figure out how to wrap when there are sprites on layer 1
+	auto wrap = [layer,sprites_enabled,linesize](int line, uint32_t off)->int
+	{
+		return ((layer == 0 || !sprites_enabled) && off >= (line * linesize) && off - (line * linesize) >= linesize);
+	};
 
 	if(m_video.towns_display_page_sel != 0)
 		off = 0x20000;
@@ -1084,7 +1091,11 @@ void towns_state::towns_crtc_draw_scan_layer_hicolour(bitmap_rgb32 &bitmap,const
 			else
 				off &= 0x7ffff;  // 1 layer
 
-			colour = (m_towns_gfxvram[off+(layer*0x40000)+1] << 8) | m_towns_gfxvram[off+(layer*0x40000)];
+			// TODO: figure out how to wrap when there are sprites on layer 1
+			if ((layer == 0 || !(m_video.towns_sprite_reg[1] & 0x80)) && off >= (line * linesize) && off - (line * linesize) >= linesize)
+				colour = (m_towns_gfxvram[off+(layer*0x40000)-linesize+1] << 8) | m_towns_gfxvram[off+(layer*0x40000)-linesize];
+			else
+				colour = (m_towns_gfxvram[off+(layer*0x40000)+1] << 8) | m_towns_gfxvram[off+(layer*0x40000)];
 			if(colour < 0x8000)
 			{
 				bitmap.pix32(scanline, x) =
@@ -1104,7 +1115,7 @@ void towns_state::towns_crtc_draw_scan_layer_hicolour(bitmap_rgb32 &bitmap,const
 				off &= 0x3ffff;  // 2 layers
 			else
 				off &= 0x7ffff;  // 1 layer
-			colour = (m_towns_gfxvram[off+(layer*0x40000)+1] << 8) | m_towns_gfxvram[off+(layer*0x40000)];
+			colour = (m_towns_gfxvram[off+(layer*0x40000)-(wrap(line,off)*linesize)+1] << 8) | m_towns_gfxvram[off+(layer*0x40000)-(wrap(line,off)*linesize)];
 			if(colour < 0x8000)
 			{
 				bitmap.pix32(scanline, x) =
@@ -1128,7 +1139,7 @@ void towns_state::towns_crtc_draw_scan_layer_hicolour(bitmap_rgb32 &bitmap,const
 				off &= 0x3ffff;  // 2 layers
 			else
 				off &= 0x7ffff;  // 1 layer
-			colour = (m_towns_gfxvram[off+(layer*0x40000)+1] << 8) | m_towns_gfxvram[off+(layer*0x40000)];
+			colour = (m_towns_gfxvram[off+(layer*0x40000)-(wrap(line,off)*linesize)+1] << 8) | m_towns_gfxvram[off+(layer*0x40000)-(wrap(line,off)*linesize)];
 			if(colour < 0x8000)
 			{
 				bitmap.pix32(scanline, x) =
@@ -1156,7 +1167,7 @@ void towns_state::towns_crtc_draw_scan_layer_hicolour(bitmap_rgb32 &bitmap,const
 				off &= 0x3ffff;  // 2 layers
 			else
 				off &= 0x7ffff;  // 1 layer
-			colour = (m_towns_gfxvram[off+(layer*0x40000)+1] << 8) | m_towns_gfxvram[off+(layer*0x40000)];
+			colour = (m_towns_gfxvram[off+(layer*0x40000)-(wrap(line,off)*linesize)+1] << 8) | m_towns_gfxvram[off+(layer*0x40000)-(wrap(line,off)*linesize)];
 			if(colour < 0x8000)
 			{
 				bitmap.pix32(scanline, x) =
@@ -1188,7 +1199,7 @@ void towns_state::towns_crtc_draw_scan_layer_hicolour(bitmap_rgb32 &bitmap,const
 				off &= 0x3ffff;  // 2 layers
 			else
 				off &= 0x7ffff;  // 1 layer
-			colour = (m_towns_gfxvram[off+(layer*0x40000)+1] << 8) | m_towns_gfxvram[off+(layer*0x40000)];
+			colour = (m_towns_gfxvram[off+(layer*0x40000)-(wrap(line,off)*linesize)+1] << 8) | m_towns_gfxvram[off+(layer*0x40000)-(wrap(line,off)*linesize)];
 			if(colour < 0x8000)
 			{
 				bitmap.pix32(scanline, x) =
@@ -1225,6 +1236,7 @@ void towns_state::towns_crtc_draw_scan_layer_256(bitmap_rgb32 &bitmap,const rect
 	int hzoom = 1;
 	int linesize;
 	uint32_t scroll;
+	bool sprites_enabled = (m_video.towns_sprite_reg[1] & 0x80) >> 7;
 
 	if(m_video.towns_display_page_sel != 0)
 		off = 0x20000;
@@ -1237,6 +1249,12 @@ void towns_state::towns_crtc_draw_scan_layer_256(bitmap_rgb32 &bitmap,const rect
 	else
 		linesize = m_video.towns_crtc_reg[24] * 8;
 
+	// TODO: figure out how to wrap when there are sprites on layer 1
+	auto wrap = [layer,sprites_enabled,linesize](int line, uint32_t off)->int
+	{
+		return ((layer == 0 || !sprites_enabled) && off >= (line * linesize) && off - (line * linesize) >= linesize);
+	};
+	
 	if(layer != 0)
 	{
 		if(!(m_video.towns_video_reg[0] & 0x10))
@@ -1274,7 +1292,7 @@ void towns_state::towns_crtc_draw_scan_layer_256(bitmap_rgb32 &bitmap,const rect
 				off &= 0x3ffff;  // 2 layers
 			else
 				off &= 0x7ffff;  // 1 layer
-			colour = m_towns_gfxvram[off+(layer*0x40000)];
+			colour = m_towns_gfxvram[off+(layer*0x40000)-(wrap(line,off)*linesize)];
 			if(colour != 0)
 			{
 				bitmap.pix32(scanline, x) = m_palette->pen(colour);
@@ -1291,7 +1309,7 @@ void towns_state::towns_crtc_draw_scan_layer_256(bitmap_rgb32 &bitmap,const rect
 				off &= 0x3ffff;  // 2 layers
 			else
 				off &= 0x7ffff;  // 1 layer
-			colour = m_towns_gfxvram[off+(layer*0x40000)+1];
+			colour = m_towns_gfxvram[off+(layer*0x40000)-(wrap(line,off)*linesize)];
 			if(colour != 0)
 			{
 				bitmap.pix32(scanline, x) = m_palette->pen(colour);
@@ -1309,7 +1327,7 @@ void towns_state::towns_crtc_draw_scan_layer_256(bitmap_rgb32 &bitmap,const rect
 				off &= 0x3ffff;  // 2 layers
 			else
 				off &= 0x7ffff;  // 1 layer
-			colour = m_towns_gfxvram[off+(layer*0x40000)+1];
+			colour = m_towns_gfxvram[off+(layer*0x40000)-(wrap(line,off)*linesize)];
 			if(colour != 0)
 			{
 				bitmap.pix32(scanline, x) = m_palette->pen(colour);
@@ -1328,7 +1346,7 @@ void towns_state::towns_crtc_draw_scan_layer_256(bitmap_rgb32 &bitmap,const rect
 				off &= 0x3ffff;  // 2 layers
 			else
 				off &= 0x7ffff;  // 1 layer
-			colour = m_towns_gfxvram[off+(layer*0x40000)+1];
+			colour = m_towns_gfxvram[off+(layer*0x40000)-(wrap(line,off)*linesize)];
 			if(colour != 0)
 			{
 				bitmap.pix32(scanline, x) = m_palette->pen(colour);
@@ -1348,7 +1366,7 @@ void towns_state::towns_crtc_draw_scan_layer_256(bitmap_rgb32 &bitmap,const rect
 				off &= 0x3ffff;  // 2 layers
 			else
 				off &= 0x7ffff;  // 1 layer
-			colour = m_towns_gfxvram[off+(layer*0x40000)+1];
+			colour = m_towns_gfxvram[off+(layer*0x40000)-(wrap(line,off)*linesize)];
 			if(colour != 0)
 			{
 				bitmap.pix32(scanline, x) = m_palette->pen(colour);
@@ -1370,6 +1388,7 @@ void towns_state::towns_crtc_draw_scan_layer_16(bitmap_rgb32 &bitmap,const recta
 	int hzoom = 1;
 	int linesize;
 	uint32_t scroll;
+	bool sprites_enabled = (m_video.towns_sprite_reg[1] & 0x80) >> 7;
 	palette_device* pal = (layer == 0) ? m_palette16_0 : m_palette16_1;
 
 	if(m_video.towns_display_page_sel != 0)
@@ -1382,6 +1401,12 @@ void towns_state::towns_crtc_draw_scan_layer_16(bitmap_rgb32 &bitmap,const recta
 		linesize = m_video.towns_crtc_reg[20] * 4;
 	else
 		linesize = m_video.towns_crtc_reg[24] * 4;
+	
+	// TODO: figure out how to wrap when there are sprites on layer 1
+	auto wrap = [layer,sprites_enabled,linesize](int line, uint32_t off)->int
+	{
+		return ((layer == 0 || !sprites_enabled) && off >= (line * linesize) && off - (line * linesize) >= linesize);
+	};
 
 	if(layer != 0)
 	{
@@ -1420,12 +1445,12 @@ void towns_state::towns_crtc_draw_scan_layer_16(bitmap_rgb32 &bitmap,const recta
 				off &= 0x3ffff;  // 2 layers
 			else
 				off &= 0x7ffff;  // 1 layer
-			colour = m_towns_gfxvram[off+(layer*0x40000)] >> 4;
+			colour = m_towns_gfxvram[off+(layer*0x40000)-(wrap(line,off)*linesize)] >> 4;
 			if(colour != 0)
 			{
 				bitmap.pix32(scanline, x+1) = pal->pen(colour);
 			}
-			colour = m_towns_gfxvram[off+(layer*0x40000)] & 0x0f;
+			colour = m_towns_gfxvram[off+(layer*0x40000)-(wrap(line,off)*linesize)] & 0x0f;
 			if(colour != 0)
 			{
 				bitmap.pix32(scanline, x) = pal->pen(colour);
@@ -1442,13 +1467,13 @@ void towns_state::towns_crtc_draw_scan_layer_16(bitmap_rgb32 &bitmap,const recta
 				off &= 0x3ffff;  // 2 layers
 			else
 				off &= 0x7ffff;  // 1 layer
-			colour = m_towns_gfxvram[off+(layer*0x40000)] >> 4;
+			colour = m_towns_gfxvram[off+(layer*0x40000)-(wrap(line,off)*linesize)] >> 4;
 			if(colour != 0)
 			{
 				bitmap.pix32(scanline, x+2) = pal->pen(colour);
 				bitmap.pix32(scanline, x+3) = pal->pen(colour);
 			}
-			colour = m_towns_gfxvram[off+(layer*0x40000)] & 0x0f;
+			colour = m_towns_gfxvram[off+(layer*0x40000)-(wrap(line,off)*linesize)] & 0x0f;
 			if(colour != 0)
 			{
 				bitmap.pix32(scanline, x) = pal->pen(colour);
@@ -1466,14 +1491,14 @@ void towns_state::towns_crtc_draw_scan_layer_16(bitmap_rgb32 &bitmap,const recta
 				off &= 0x3ffff;  // 2 layers
 			else
 				off &= 0x7ffff;  // 1 layer
-			colour = m_towns_gfxvram[off+(layer*0x40000)] >> 4;
+			colour = m_towns_gfxvram[off+(layer*0x40000)-(wrap(line,off)*linesize)] >> 4;
 			if(colour != 0)
 			{
 				bitmap.pix32(scanline, x+3) = pal->pen(colour);
 				bitmap.pix32(scanline, x+4) = pal->pen(colour);
 				bitmap.pix32(scanline, x+5) = pal->pen(colour);
 			}
-			colour = m_towns_gfxvram[off+(layer*0x40000)] & 0x0f;
+			colour = m_towns_gfxvram[off+(layer*0x40000)-(wrap(line,off)*linesize)] & 0x0f;
 			if(colour != 0)
 			{
 				bitmap.pix32(scanline, x) = pal->pen(colour);
@@ -1492,7 +1517,7 @@ void towns_state::towns_crtc_draw_scan_layer_16(bitmap_rgb32 &bitmap,const recta
 				off &= 0x3ffff;  // 2 layers
 			else
 				off &= 0x7ffff;  // 1 layer
-			colour = m_towns_gfxvram[off+(layer*0x40000)] >> 4;
+			colour = m_towns_gfxvram[off+(layer*0x40000)-(wrap(line,off)*linesize)] >> 4;
 			if(colour != 0)
 			{
 				bitmap.pix32(scanline, x+4) = pal->pen(colour);
@@ -1500,7 +1525,7 @@ void towns_state::towns_crtc_draw_scan_layer_16(bitmap_rgb32 &bitmap,const recta
 				bitmap.pix32(scanline, x+6) = pal->pen(colour);
 				bitmap.pix32(scanline, x+7) = pal->pen(colour);
 			}
-			colour = m_towns_gfxvram[off+(layer*0x40000)] & 0x0f;
+			colour = m_towns_gfxvram[off+(layer*0x40000)-(wrap(line,off)*linesize)] & 0x0f;
 			if(colour != 0)
 			{
 				bitmap.pix32(scanline, x) = pal->pen(colour);
@@ -1520,7 +1545,7 @@ void towns_state::towns_crtc_draw_scan_layer_16(bitmap_rgb32 &bitmap,const recta
 				off &= 0x3ffff;  // 2 layers
 			else
 				off &= 0x7ffff;  // 1 layer
-			colour = m_towns_gfxvram[off+(layer*0x40000)] >> 4;
+			colour = m_towns_gfxvram[off+(layer*0x40000)-(wrap(line,off)*linesize)] >> 4;
 			if(colour != 0)
 			{
 				bitmap.pix32(scanline, x+5) = pal->pen(colour);
@@ -1529,7 +1554,7 @@ void towns_state::towns_crtc_draw_scan_layer_16(bitmap_rgb32 &bitmap,const recta
 				bitmap.pix32(scanline, x+8) = pal->pen(colour);
 				bitmap.pix32(scanline, x+9) = pal->pen(colour);
 			}
-			colour = m_towns_gfxvram[off+(layer*0x40000)] & 0x0f;
+			colour = m_towns_gfxvram[off+(layer*0x40000)-(wrap(line,off)*linesize)] & 0x0f;
 			if(colour != 0)
 			{
 				bitmap.pix32(scanline, x) = pal->pen(colour);

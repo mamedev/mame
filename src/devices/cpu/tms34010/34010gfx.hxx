@@ -210,7 +210,7 @@ void tms340x0_device::memory_w(address_space &space, offs_t offset,uint16_t data
 	//logerror("memory_w %08x %04x\n", offset << 3, data);
 	if((offset << 3) == 0x02005010 && data == 0x0000) {
 		machine().debug_break();
-		//		abort();
+		//      abort();
 	}
 	space.write_word(offset, data);
 }

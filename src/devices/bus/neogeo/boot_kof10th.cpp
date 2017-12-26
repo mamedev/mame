@@ -31,7 +31,6 @@ neogeo_kof10th_cart_device::neogeo_kof10th_cart_device(const machine_config &mco
 
 void neogeo_kof10th_cart_device::device_start()
 {
-	save_pointer(NAME(m_fixed), 0x40000);
 	save_item(NAME(m_special_bank));
 	save_item(NAME(m_cart_ram));
 	save_item(NAME(m_cart_ram2));
@@ -59,6 +58,7 @@ void neogeo_kof10th_cart_device::decrypt_all(DECRYPT_ALL_PARAMS)
 	m_prot->kof10th_decrypt(cpuregion, cpuregion_size);
 	memcpy(m_cart_ram2, (uint8_t *)cpuregion + 0xe0000, 0x20000);
 	m_fixed = (get_fixed_size()) ? get_fixed_base() : get_region_fixed_base();
+	save_pointer(NAME(m_fixed), 0x40000);
 }
 
 

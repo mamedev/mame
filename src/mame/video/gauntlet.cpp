@@ -82,7 +82,7 @@ const atari_motion_objects_config gauntlet_state::s_mob_config =
 VIDEO_START_MEMBER(gauntlet_state,gauntlet)
 {
 	/* modify the motion object code lookup table to account for the code XOR */
-	std::vector<uint16_t> &codelookup = m_mob->code_lookup();
+	std::vector<uint32_t> &codelookup = m_mob->code_lookup();
 	for (auto & elem : codelookup)
 		elem ^= 0x800;
 

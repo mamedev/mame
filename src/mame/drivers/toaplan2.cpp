@@ -2746,11 +2746,11 @@ static INPUT_PORTS_START( sstriker )
 INPUT_PORTS_END
 
 
-static INPUT_PORTS_START( sstrikera )
+static INPUT_PORTS_START( sstrikerk ) // Although the region jumper is functional, it's a Korean board / version
 	PORT_INCLUDE( sstriker )
 
 	PORT_MODIFY("JMPR")
-	PORT_CONFNAME( 0x000e,  0x0004, DEF_STR( Region ) ) //PORT_CONFLOCATION("JP:!3,!2,!1")
+	PORT_CONFNAME( 0x000e,  0x000a, DEF_STR( Region ) ) //PORT_CONFLOCATION("JP:!3,!2,!1")
 	PORT_CONFSETTING(       0x0004, DEF_STR( Europe ) )
 	PORT_CONFSETTING(       0x0002, DEF_STR( USA ) )
 	PORT_CONFSETTING(       0x0000, DEF_STR( Japan ) )
@@ -4905,7 +4905,7 @@ ROM_START( sstriker )
 ROM_END
 
 
-ROM_START( sstrikera )
+ROM_START( sstrikerk )
 	ROM_REGION( 0x080000, "maincpu", 0 )            /* Main 68K code */
 	ROM_LOAD16_WORD_SWAP( "ra-ma-01_01.u65", 0x000000, 0x080000, CRC(92259f84) SHA1(127e62e407d95efd360bfe2cac9577f326abf6ef) )
 
@@ -5637,9 +5637,9 @@ GAME( 1995, othldrby,    0,        othldrby,   othldrby,   toaplan2_state, 0,   
 GAME( 1994, snowbro2,    0,        snowbro2,   snowbro2,   toaplan2_state, 0,        ROT0,   "Hanafram", "Snow Bros. 2 - With New Elves / Otenki Paradise",           MACHINE_SUPPORTS_SAVE )
 GAME( 1998, snowbro2b,   snowbro2, snowbro2,   snowbro2,   toaplan2_state, 0,        ROT0,   "bootleg",  "Snow Bros. 2 - With New Elves / Otenki Paradise (bootleg)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1993, sstriker,    0,        mahoudai,   sstriker,   toaplan2_state, 0,        ROT270, "Raizing",                "Sorcer Striker (set 1)" ,  MACHINE_SUPPORTS_SAVE ) // verified on two different PCBs
-GAME( 1993, sstrikera,   sstriker, mahoudai,   sstrikera,  toaplan2_state, 0,        ROT270, "Raizing",                "Sorcer Striker (set 2)" ,  MACHINE_SUPPORTS_SAVE ) // from Korean board
-GAME( 1993, mahoudai,    sstriker, mahoudai,   mahoudai,   toaplan2_state, 0,        ROT270, "Raizing (Able license)", "Mahou Daisakusen (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, sstriker,    0,        mahoudai,   sstriker,   toaplan2_state, 0,        ROT270, "Raizing",                         "Sorcer Striker",           MACHINE_SUPPORTS_SAVE ) // verified on two different PCBs
+GAME( 1993, sstrikerk,   sstriker, mahoudai,   sstrikerk,  toaplan2_state, 0,        ROT270, "Raizing (Unite Trading license)", "Sorcer Striker (Korea)" ,  MACHINE_SUPPORTS_SAVE ) // Although the region jumper is functional, it's a Korean board / version
+GAME( 1993, mahoudai,    sstriker, mahoudai,   mahoudai,   toaplan2_state, 0,        ROT270, "Raizing (Able license)",          "Mahou Daisakusen (Japan)", MACHINE_SUPPORTS_SAVE )
 
 GAME( 1994, kingdmgp,    0,        shippumd,   kingdmgp,   toaplan2_state, 0,        ROT270, "Raizing / Eighting", "Kingdom Grandprix",               MACHINE_SUPPORTS_SAVE ) // from Korean board, missing letters on credits screen but this is correct
 GAME( 1994, shippumd,    kingdmgp, shippumd,   shippumd,   toaplan2_state, 0,        ROT270, "Raizing / Eighting", "Shippu Mahou Daisakusen (Japan)", MACHINE_SUPPORTS_SAVE )

@@ -3717,7 +3717,7 @@ ROM_END
    This PCB has an Altera EP910PC CPLD on board
 
    This set doesn't need any NVRAM initialization.
-  
+
    5 & 6 are coins.
    W is payout.
 */

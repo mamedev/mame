@@ -144,7 +144,7 @@ for num1, entry in ipairs(sorted) do
 								entry.comment[#entry.comment + 1] = comment
 							end
 						end
-						sorted[num2] = 	{}
+						sorted[num2] =  {}
 					end
 				end
 			end

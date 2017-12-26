@@ -460,10 +460,10 @@ void smc91c9x_device::update_ethernet_irq()
 		m_reg[EREG_INTERRUPT] &= ~EINT_TX_EMPTY;
 	}
 	//if (m_comp_tx.empty()) {
-	//	m_reg[EREG_INTERRUPT] &= ~EINT_TX;
+	//  m_reg[EREG_INTERRUPT] &= ~EINT_TX;
 	//}
 	//else {
-	//	m_reg[EREG_INTERRUPT] |= EINT_TX;
+	//  m_reg[EREG_INTERRUPT] |= EINT_TX;
 	//}
 	// Check rx completion fifo empty
 	if (m_comp_rx.empty())

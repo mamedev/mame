@@ -10,8 +10,8 @@
    the CPU folder alongside the ARM instead
    TODO:
     low/high input source types
-	check if level/edge input source types logic correct
-	FIQ output
+    check if level/edge input source types logic correct
+    FIQ output
 */
 
 #include "emu.h"
@@ -67,7 +67,7 @@ READ32_MEMBER(arm_aic_device::irq_vector_r)
 			m_current_irq_vector = m_aic_svr[midx];
 			// note: Debug PROTect mode not implemented (new level pushed on stack and pending line clear only when this register writen after read)
 			push_level(m_aic_smr[midx] & 7);
-			if (m_aic_smr[midx] & 0x20)			// auto clear pending if edge trigger mode
+			if (m_aic_smr[midx] & 0x20)         // auto clear pending if edge trigger mode
 				m_irqs_pending ^= 1 << midx;
 		}
 	}
@@ -130,7 +130,7 @@ void arm_aic_device::set_irq(int line, int state)
 	else
 		if (m_aic_smr[line] & 0x40)
 			m_irqs_pending &= ~(1 << line);
-		
+
 	check_irqs();
 }
 

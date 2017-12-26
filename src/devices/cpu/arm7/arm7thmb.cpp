@@ -1055,11 +1055,9 @@ void arm7_cpu_device::tg05_7(uint32_t pc, uint32_t op)  /* LDSH Rd, [Rn, Rm] */
 	uint32_t rn = (op & THUMB_GROUP5_RN) >> THUMB_GROUP5_RN_SHIFT;
 	uint32_t rd = (op & THUMB_GROUP5_RD) >> THUMB_GROUP5_RD_SHIFT;
 	uint32_t addr = GetRegister(rn) + GetRegister(rm);
-	uint32_t op2 = READ16(addr);
-	if (op2 & 0x00008000)
-	{
-		op2 |= 0xffff0000;
-	}
+	int32_t op2 = (int32_t)(int16_t)(uint16_t)READ16(addr & ~1);
+	if ((addr & 1) && m_archRev < 5)
+		op2 >>= 8;
 	SetRegister(rd, op2);
 	R15 += 2;
 }
@@ -1138,7 +1136,7 @@ void arm7_cpu_device::tg09_1(uint32_t pc, uint32_t op) /* Load */
 {
 	uint32_t rd = (op & THUMB_STACKOP_RD) >> THUMB_STACKOP_RD_SHIFT;
 	int32_t offs = (uint8_t)(op & THUMB_INSN_IMM);
-	uint32_t readword = READ32(GetRegister(13) + ((uint32_t)offs << 2));
+	uint32_t readword = READ32((GetRegister(13) + ((uint32_t)offs << 2)) & ~3);
 	SetRegister(rd, readword);
 	R15 += 2;
 }
@@ -1250,7 +1248,7 @@ void arm7_cpu_device::tg0b_c(uint32_t pc, uint32_t op) /* POP {Rlist} */
 	{
 		if (op & (1 << offs))
 		{
-			SetRegister(offs, READ32(GetRegister(13)));
+			SetRegister(offs, READ32(GetRegister(13) & ~3));
 			SetRegister(13, GetRegister(13) + 4);
 		}
 	}
@@ -1263,11 +1261,11 @@ void arm7_cpu_device::tg0b_d(uint32_t pc, uint32_t op) /* POP {Rlist}{PC} */
 	{
 		if (op & (1 << offs))
 		{
-			SetRegister(offs, READ32(GetRegister(13)));
+			SetRegister(offs, READ32(GetRegister(13) & ~3));
 			SetRegister(13, GetRegister(13) + 4);
 		}
 	}
-	uint32_t addr = READ32(GetRegister(13));
+	uint32_t addr = READ32(GetRegister(13) & ~3);
 	if (m_archRev < 5)
 	{
 		R15 = addr & ~1;

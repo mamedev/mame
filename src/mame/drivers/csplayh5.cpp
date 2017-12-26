@@ -96,7 +96,7 @@ public:
 	DECLARE_DRIVER_INIT(thenanpa);
 	DECLARE_DRIVER_INIT(torarech);
 	DECLARE_DRIVER_INIT(tsuwaku);
-	
+
 	virtual void machine_reset() override;
 	TIMER_DEVICE_CALLBACK_MEMBER(csplayh5_irq);
 	DECLARE_WRITE_LINE_MEMBER(csplayh5_vdp0_interrupt);
@@ -939,7 +939,7 @@ GAME( 1998, nichidvd,   0,   csplayh5,  csplayh5, csplayh5_state,  0,           
 /* 15 */ GAME( 2000, fuudol,    nichidvd,   csplayh5,  csplayh5, csplayh5_state,  fuudol,    ROT0, "Nichibutsu/eic", "Fuudol (Japan)", MACHINE_NOT_WORKING )
 /* 16 */ GAME( 2000, nuretemi,  nichidvd,   csplayh5,  csplayh5, csplayh5_state,  nuretemi,  ROT0, "Nichibutsu/Love Factory", "Nurete Mitaino... - Net Idol Hen (Japan)", MACHINE_NOT_WORKING )
 /* 17 */ GAME( 2000, tsuwaku,   nichidvd,   csplayh5,  csplayh5, csplayh5_state,  tsuwaku,   ROT0, "Nichibutsu/Love Factory/Just&Just", "Tsuugakuro no Yuuwaku (Japan)", MACHINE_NOT_WORKING )
-/* 18 */ GAME( 2000, torarech,  nichidvd,   csplayh5,  csplayh5, csplayh5_state,  torarech, ROT0,  "Nichibutsu/Love Factory/M Friend", "Torarechattano - AV Kantoku Hen (Japan)", MACHINE_NOT_WORKING ) 
+/* 18 */ GAME( 2000, torarech,  nichidvd,   csplayh5,  csplayh5, csplayh5_state,  torarech, ROT0,  "Nichibutsu/Love Factory/M Friend", "Torarechattano - AV Kantoku Hen (Japan)", MACHINE_NOT_WORKING )
 /* sp */ GAME( 2000, nichisel,  nichidvd,   csplayh5,  csplayh5, csplayh5_state,  nichisel,  ROT0, "Nichibutsu", "DVD Select (Japan)", MACHINE_NOT_WORKING )
 
 // 2001

@@ -1425,29 +1425,20 @@ uint32_t arm946es_cpu_device::arm7_cpu_read32(uint32_t addr)
 
 uint32_t arm946es_cpu_device::arm7_cpu_read16(uint32_t addr)
 {
-	uint32_t result;
+	addr &= ~1;
 
 	if ((addr >= cp15_itcm_base) && (addr <= cp15_itcm_end))
 	{
-		uint16_t *wp = (uint16_t *)&ITCM[(addr & ~1)&0x7fff];
-		result = *wp;
+		uint16_t *wp = (uint16_t *)&ITCM[addr & 0x7fff];
+		return *wp;
 	}
 	else if ((addr >= cp15_dtcm_base) && (addr <= cp15_dtcm_end))
 	{
-		uint16_t *wp = (uint16_t *)&DTCM[(addr & ~1)&0x3fff];
-		result = *wp;
-	}
-	else
-	{
-		result = m_program->read_word(addr & ~1);
+		uint16_t *wp = (uint16_t *)&DTCM[addr &0x3fff];
+		return *wp;
 	}
 
-	if (addr & 1)
-	{
-		result = ((result >> 8) & 0xff) | ((result & 0xff) << 24);
-	}
-
-	return result;
+	return m_program->read_word(addr);
 }
 
 uint8_t arm946es_cpu_device::arm7_cpu_read8(uint32_t addr)

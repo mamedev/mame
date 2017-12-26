@@ -188,7 +188,7 @@ constexpr unsigned LP_FOV = 9;  // Field of view
 constexpr unsigned LP_XOFFSET = 5;  // x-offset of LP (due to delay in hit recognition)
 
 // Peripheral Addresses (PA)
-#define PRINTER_PA			0
+#define PRINTER_PA          0
 #define IO_SLOT_FIRST_PA    1
 #define IO_SLOT_LAST_PA     12
 #define GVIDEO_PA           13

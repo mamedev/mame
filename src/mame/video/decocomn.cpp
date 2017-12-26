@@ -119,7 +119,7 @@ WRITE16_MEMBER( decocomn_device::priority_w )
 	m_priority = data;
 }
 
-READ16_MEMBER( decocomn_device::priority_r )
+uint16_t decocomn_device::priority_r()
 {
 	return m_priority;
 }

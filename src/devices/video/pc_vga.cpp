@@ -443,7 +443,7 @@ uint32_t vga_device::start_addr()
 {
 //  popmessage("Offset: %04x  %s %s **",vga.crtc.offset,vga.crtc.dw?"DW":"--",vga.crtc.word_mode?"BYTE":"WORD");
 	if(vga.crtc.dw)
-		return vga.crtc.start_addr << 2; 
+		return vga.crtc.start_addr << 2;
 	if(vga.crtc.word_mode)
 		return vga.crtc.start_addr << 0;
 	else

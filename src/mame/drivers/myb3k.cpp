@@ -20,12 +20,12 @@
     PC INCOMPATIBILITIES:
     - COM card lives at io address 0x540
     - FDC card lives at io address 0x20
-    - DMA channel 0 is not part of ISA8 but implemented on B8 (DREQ0/SRDY) 
+    - DMA channel 0 is not part of ISA8 but implemented on B8 (DREQ0/SRDY)
       and B19 (DACK0/MEMREF)
     - Keyboard is not interfaced through 8255
     - Non standard graphics board
 
-    These and other incompatibilities required many PC software's to be 
+    These and other incompatibilities required many PC software's to be
     recompiled to work on this computer.
 
 ****************************************************************************/
@@ -330,7 +330,7 @@ static ADDRESS_MAP_START(myb3k_io, AS_IO, 8, myb3k_state)
 // Discrete latches
 	AM_RANGE(0x04, 0x04) AM_READ(myb3k_kbd_r)
 	AM_RANGE(0x04, 0x04) AM_WRITE(myb3k_video_mode_w) // b0=40CH, b1=80CH, b2=16 raster
-//	AM_RANGE(0x05, 0x05) AM_READ(myb3k_io_status_r)
+//  AM_RANGE(0x05, 0x05) AM_READ(myb3k_io_status_r)
 	AM_RANGE(0x05, 0x05) AM_WRITE(dma_segment_w) // b0-b3=addr, b6=A b7=B
 	AM_RANGE(0x06, 0x06) AM_READ_PORT("DSW2")
 // 8-9 8259A interrupt controller
@@ -342,7 +342,7 @@ static ADDRESS_MAP_START(myb3k_io, AS_IO, 8, myb3k_state)
 // 1c-1d HD46505S CRTC
 	AM_RANGE(0x1c, 0x1c) AM_WRITE(myb3k_6845_address_w)
 	AM_RANGE(0x1d, 0x1d) AM_WRITE(myb3k_6845_data_w)
-//	AM_RANGE(0x800,0xfff) // Expansion Unit
+//  AM_RANGE(0x800,0xfff) // Expansion Unit
 ADDRESS_MAP_END
 
 /* Input ports - from Step/One service manual */
@@ -498,12 +498,12 @@ WRITE8_MEMBER( myb3k_state::ppi_portc_w )
 	LOGPPI(" - CMTEN  : %d\n", (data & PC7_CMTEN)   ? 1 : 0);
 	LOGPPI(" => CMTEN: %d BUZON: %d\n", (data & PC7_CMTEN) ? 1 : 0, (data & PC5_BUZON)? 1 : 0);
 
-	/* 
-	 * The actual logic around enabling the buzzer is a bit more complicated involving the cassette interface 
-	 * According to the schematics gate1 is enabled if either 
+	/*
+	 * The actual logic around enabling the buzzer is a bit more complicated involving the cassette interface
+	 * According to the schematics gate1 is enabled if either
 	 *  (CMTEN is inactive high and BUZON active high) OR
 	 *  (CMTEN is active   low  and CMTRD is inactive high)
-	 * and CMTRD is low). Problem is that the schematics fails to show where CMTRD comes from so only the first case is emulated 
+	 * and CMTRD is low). Problem is that the schematics fails to show where CMTRD comes from so only the first case is emulated
 	 */
 	m_pit8253->write_gate1(!(data & PC5_BUZON) && (data & PC7_CMTEN)? 1 : 0);
 
@@ -547,7 +547,7 @@ static MACHINE_CONFIG_START( myb3k )
 	MCFG_ISA_OUT_IRQ5_CB(DEVWRITELINE("pic", pic8259_device, ir5_w)) // Jumper J4 selectable
 	MCFG_ISA_OUT_IRQ6_CB(DEVWRITELINE("pic", pic8259_device, ir6_w))
 	MCFG_ISA_OUT_IRQ7_CB(DEVWRITELINE("pic", pic8259_device, ir7_w)) // Jumper J5 selectable
-//	MCFG_ISA_OUT_DRQ0_CB(DEVWRITELINE("dma", i8257_device, dreq0_w)) // Part of ISA16 but not ISA8 standard but implemented on ISA8 B8 (SRDY) on this motherboard
+//  MCFG_ISA_OUT_DRQ0_CB(DEVWRITELINE("dma", i8257_device, dreq0_w)) // Part of ISA16 but not ISA8 standard but implemented on ISA8 B8 (SRDY) on this motherboard
 	MCFG_ISA_OUT_DRQ1_CB(DEVWRITELINE("dma", i8257_device, dreq1_w))
 	MCFG_ISA_OUT_DRQ2_CB(DEVWRITELINE("dma", i8257_device, dreq2_w))
 	MCFG_ISA_OUT_DRQ3_CB(DEVWRITELINE("dma", i8257_device, dreq3_w))
@@ -568,22 +568,22 @@ static MACHINE_CONFIG_START( myb3k )
 
 	/* DMA chip */
 	MCFG_DEVICE_ADD("dma", I8257, XTAL_14_31818MHz / 6)
-        MCFG_I8257_OUT_HRQ_CB(WRITELINE(myb3k_state, hrq_w))
-        MCFG_I8257_OUT_TC_CB(WRITELINE(myb3k_state, tc_w))
-        MCFG_I8257_IN_MEMR_CB(READ8(myb3k_state, dma_memory_read_byte))
-        MCFG_I8257_OUT_MEMW_CB(WRITE8(myb3k_state, dma_memory_write_byte))
-        MCFG_I8257_IN_IOR_0_CB(READ8(myb3k_state, io_dack0_r))
-        MCFG_I8257_IN_IOR_1_CB(READ8(myb3k_state, io_dack1_r))
-        MCFG_I8257_IN_IOR_2_CB(READ8(myb3k_state, io_dack2_r))
-        MCFG_I8257_IN_IOR_3_CB(READ8(myb3k_state, io_dack3_r))
-        MCFG_I8257_OUT_IOW_0_CB(WRITE8(myb3k_state, io_dack0_w))
-        MCFG_I8257_OUT_IOW_1_CB(WRITE8(myb3k_state, io_dack1_w))
-        MCFG_I8257_OUT_IOW_2_CB(WRITE8(myb3k_state, io_dack2_w))
-        MCFG_I8257_OUT_IOW_3_CB(WRITE8(myb3k_state, io_dack3_w))
-        MCFG_I8257_OUT_DACK_0_CB(WRITELINE(myb3k_state, dack0_w))
-        MCFG_I8257_OUT_DACK_1_CB(WRITELINE(myb3k_state, dack1_w))
-        MCFG_I8257_OUT_DACK_2_CB(WRITELINE(myb3k_state, dack2_w))
-        MCFG_I8257_OUT_DACK_3_CB(WRITELINE(myb3k_state, dack3_w))
+	MCFG_I8257_OUT_HRQ_CB(WRITELINE(myb3k_state, hrq_w))
+	MCFG_I8257_OUT_TC_CB(WRITELINE(myb3k_state, tc_w))
+	MCFG_I8257_IN_MEMR_CB(READ8(myb3k_state, dma_memory_read_byte))
+	MCFG_I8257_OUT_MEMW_CB(WRITE8(myb3k_state, dma_memory_write_byte))
+	MCFG_I8257_IN_IOR_0_CB(READ8(myb3k_state, io_dack0_r))
+	MCFG_I8257_IN_IOR_1_CB(READ8(myb3k_state, io_dack1_r))
+	MCFG_I8257_IN_IOR_2_CB(READ8(myb3k_state, io_dack2_r))
+	MCFG_I8257_IN_IOR_3_CB(READ8(myb3k_state, io_dack3_r))
+	MCFG_I8257_OUT_IOW_0_CB(WRITE8(myb3k_state, io_dack0_w))
+	MCFG_I8257_OUT_IOW_1_CB(WRITE8(myb3k_state, io_dack1_w))
+	MCFG_I8257_OUT_IOW_2_CB(WRITE8(myb3k_state, io_dack2_w))
+	MCFG_I8257_OUT_IOW_3_CB(WRITE8(myb3k_state, io_dack3_w))
+	MCFG_I8257_OUT_DACK_0_CB(WRITELINE(myb3k_state, dack0_w))
+	MCFG_I8257_OUT_DACK_1_CB(WRITELINE(myb3k_state, dack1_w))
+	MCFG_I8257_OUT_DACK_2_CB(WRITELINE(myb3k_state, dack2_w))
+	MCFG_I8257_OUT_DACK_3_CB(WRITELINE(myb3k_state, dack3_w))
 
 	/* Timer chip */
 	MCFG_DEVICE_ADD("pit", PIT8253, 0)
@@ -591,8 +591,8 @@ static MACHINE_CONFIG_START( myb3k )
 	MCFG_PIT8253_OUT0_HANDLER(DEVWRITELINE("pic", pic8259_device, ir0_w))
 	MCFG_PIT8253_CLK1(XTAL_14_31818MHz / 12.0) /* speaker if port c bit 5 is low */
 	MCFG_PIT8253_OUT1_HANDLER(WRITELINE(myb3k_state, pit_out1_changed))
-//	MCFG_PIT8253_CLK2(XTAL_14_31818MHz / 12.0) /* ANDed with port c bit 6 but marked as "not use"*/
-//	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(myb3k_state, pit_out2_changed))
+//  MCFG_PIT8253_CLK2(XTAL_14_31818MHz / 12.0) /* ANDed with port c bit 6 but marked as "not use"*/
+//  MCFG_PIT8253_OUT2_HANDLER(WRITELINE(myb3k_state, pit_out2_changed))
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -600,7 +600,7 @@ static MACHINE_CONFIG_START( myb3k )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	MCFG_DEVICE_ADD("myb3k_keyboard", MYB3K_KEYBOARD, 0)
-        MCFG_MYB3K_KEYBOARD_CB(PUT(myb3k_state, kbd_set_data_and_interrupt))
+	MCFG_MYB3K_KEYBOARD_CB(PUT(myb3k_state, kbd_set_data_and_interrupt))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green())

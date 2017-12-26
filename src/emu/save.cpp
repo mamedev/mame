@@ -670,7 +670,7 @@ bool rewinder::capture()
 		// update the existing state
 		ram_state *state = m_state_list.at(m_current_index).get();
 		const save_error error = state->save();
-		
+
 		// validate the state
 		if (error != STATERR_NONE)
 		{

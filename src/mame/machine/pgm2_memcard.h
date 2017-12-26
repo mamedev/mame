@@ -5,7 +5,7 @@
     pgm2_memcard.h
 
     PGM2 Memory card functions.
-	(based on ng_memcard.h)
+    (based on ng_memcard.h)
 
 *********************************************************************/
 #ifndef MAME_MACHINE_PGM2_MEMCARD_H

@@ -931,7 +931,7 @@ ROM_END
 1x oscillator 18.432 MHz on main PCB 5a
 
 sub PCB is marked: "10-27 P1"
-sound section is heavily modified with jumper wires 
+sound section is heavily modified with jumper wires
 */
 
 ROM_START( sbagmani )

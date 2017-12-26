@@ -2778,7 +2778,7 @@ void debugger_commands::execute_history(int ref, const std::vector<std::string> 
 	}
 
 	debug_disasm_buffer buffer(space->device());
-	
+
 	for (int index = 0; index < (int) count; index++)
 	{
 		offs_t pc = debug->history_pc(-index);

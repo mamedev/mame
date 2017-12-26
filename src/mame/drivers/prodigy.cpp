@@ -218,11 +218,11 @@ void prodigy_state::device_start()
 		using namespace std::placeholders;
 		m_server->add_http_handler("/layout*", std::bind(&prodigy_state::on_update, this, _1, _2));
 		m_server->add_endpoint("/socket",
-				       std::bind(&prodigy_state::on_open,    this, _1),
-				       std::bind(&prodigy_state::on_message, this, _1, _2, _3),
-				       std::bind(&prodigy_state::on_close,   this, _1, _2, _3),
-				       std::bind(&prodigy_state::on_error,   this, _1, _2)
-				       );
+					   std::bind(&prodigy_state::on_open,    this, _1),
+					   std::bind(&prodigy_state::on_message, this, _1, _2, _3),
+					   std::bind(&prodigy_state::on_close,   this, _1, _2, _3),
+					   std::bind(&prodigy_state::on_error,   this, _1, _2)
+					   );
 	}
 #endif
 }
@@ -272,7 +272,7 @@ const std::string prodigy_state::decompress_layout_data(const internal_layout *l
 		return fail; // return empty buffer
 	}
 
-	return std::string((const char *)tempout.get(), layout_data->decompressed_size + 1); 
+	return std::string((const char *)tempout.get(), layout_data->decompressed_size + 1);
 }
 
 

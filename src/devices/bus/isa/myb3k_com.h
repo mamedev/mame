@@ -6,13 +6,13 @@
 #pragma once
 
 /*
- * This card is part of Matsushita MyBrain 3000 and branded Panasonic JB-3000 
- * and Ericsson Step/One computers. These are not really PC compatibles but 
- * mimics the IBM PC in feature set and stays close on hardware but not 100%
+ * This card is part of Matsushita MyBrain 3000 and branded Panasonic JB-3000
+ * and Ericsson Step/One computers. These are not really PC compatibles but
+ * mimic the IBM PC in feature set and stay close on hardware but not 100%
  *
  * Serial connector from Step/One service manual
  * ---------------------------------------------
- * Pin numbering------====------------------+  1 - FG (AA) Chassi GND 
+ * Pin numbering------====------------------+  1 - FG (AA) Chassis GND
  * | 25 23 21 19 17 15 13 11  9  7  5  3  1 |  3 - SD (BA) TxD
  * | 26 24 22 20 18 16 14 12 10  8  6  4  2 |  4 - ST (DB) TxC
  * +----------------------------------------+  5 - RD (BB) RxD

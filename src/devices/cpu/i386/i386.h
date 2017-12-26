@@ -27,9 +27,9 @@
 
 #define MCFG_I386_SMIACT(_devcb) \
 	devcb = &i386_device::set_smiact(*device, DEVCB_##_devcb);
-  
+
 #define MCFG_I486_FERR_HANDLER(_devcb) \
- 	devcb = &i386_device::set_ferr(*device, DEVCB_##_devcb);
+	devcb = &i386_device::set_ferr(*device, DEVCB_##_devcb);
 
 #define X86_NUM_CPUS        4
 

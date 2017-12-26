@@ -362,7 +362,7 @@ void vgmplay_device::execute_run()
 				m_io->write_byte(A_YM2608+1+((code & 1) << 1), m_file->read_byte(m_pc+2));
 				m_pc += 3;
 				break;
-			
+
 			case 0xA5:
 				m_io->write_byte(A_YM2203B+0, m_file->read_byte(m_pc+1));
 				m_io->write_byte(A_YM2203B+1, m_file->read_byte(m_pc+2));
@@ -1469,7 +1469,7 @@ static MACHINE_CONFIG_START( vgmplay )
 	MCFG_YMZ280B_EXT_READ_HANDLER(DEVREAD8("vgmplay", vgmplay_device, ymz280b_rom_r))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1)
-	
+
 	MCFG_SOUND_ADD("ym2608", YM2608, 8000000)
 	MCFG_SOUND_ROUTE(0, "lspeaker",  0.25)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 0.25)

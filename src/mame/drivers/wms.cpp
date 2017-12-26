@@ -217,7 +217,7 @@ ROM_END
 // ----------------- Regular Sets ------------------
 
 
-ROM_START( btippers )    // Big Tippers (Russian)
+ROM_START( btippers )    // Big Tippers (Russian) / U5 03/09/01
 	ROM_REGION(0x100000, "maincpu", 0)
 	ROM_LOAD( "xu-3.bin", 0x0000, 0x100000, CRC(96e362e3) SHA1(a0c35e9aa6bcbc5ffbf8750fa728294ef1e21b02) )
 
@@ -233,7 +233,7 @@ ROM_START( btippers )    // Big Tippers (Russian)
 ROM_END
 
 
-ROM_START( wmsboom )    // Boom (Russian)
+ROM_START( wmsboom )    // Boom (Russian) / U5 02/12/98
 	ROM_REGION(0x100000, "maincpu", 0)
 	ROM_LOAD( "xu-3.bin", 0x0000, 0x100000, CRC(5008854d) SHA1(8d9d11775b6cbdef1c71683c4d92e64af26e8939) )
 
@@ -247,7 +247,7 @@ ROM_START( wmsboom )    // Boom (Russian)
 ROM_END
 
 
-ROM_START( cashcrop )    // Cash Crop (Russian)
+ROM_START( cashcrop )    // Cash Crop (Russian) / U5 09/05/100
 	ROM_REGION(0x100000, "maincpu", 0)
 	ROM_LOAD( "xu-3.bin", 0x0000, 0x100000, CRC(e1918f25) SHA1(55c33c1f604a44caef65e712e69d21792161dfbc) )
 
@@ -291,7 +291,7 @@ ROM_START( filthyrr )    // Filthy Rich (Russian) / U4 09/03/97
 ROM_END
 
 
-ROM_START( hottop )    // Hot Toppings (English)
+ROM_START( hottop )    // Hot Toppings (English) / U5 04/22/103
 	ROM_REGION(0x100000, "maincpu", 0)
 	ROM_LOAD( "hot_topping_9fbah.xu03", 0x0000, 0x100000, CRC(9da8d2d7) SHA1(722809ec9df83c866ec7cbcc83b619d65134b523) )
 
@@ -305,7 +305,7 @@ ROM_START( hottop )    // Hot Toppings (English)
 	ROM_LOAD( "hot_topping_1600h.xu18", 0x0000, 0x100000, CRC(2ad1b2e2) SHA1(47832422be66acace22fe411062010303b9ce899) )
 ROM_END
 
-ROM_START( hottopa )    // Hot Toppings (Russian?)
+ROM_START( hottopa )    // Hot Toppings (Russian?) / U5 06/26/101
 	ROM_REGION(0x100000, "maincpu", 0)
 	ROM_LOAD( "xu-3.bin", 0x0000, 0x100000, NO_DUMP ) // missing
 
@@ -320,7 +320,7 @@ ROM_START( hottopa )    // Hot Toppings (Russian?)
 ROM_END
 
 
-ROM_START( inwinner )    // Instant Winner (Russian)
+ROM_START( inwinner )    // Instant Winner (Russian) / U5 11/25/98
 	ROM_REGION(0x100000, "maincpu", 0)
 	ROM_LOAD( "xu-3.bin", 0x0000, 0x100000, CRC(f5c26579) SHA1(4ef22c0115417320ef17f0c3fc7550db24bdcb8c) )
 
@@ -334,7 +334,7 @@ ROM_START( inwinner )    // Instant Winner (Russian)
 ROM_END
 
 
-ROM_START( jptparty )    // Jackpot Party (Russian)
+ROM_START( jptparty )    // Jackpot Party (Russian) / U5 04/01/98
 	ROM_REGION(0x100000, "maincpu", 0)
 	ROM_LOAD( "xu-3.bin", 0x0000, 0x100000, CRC(750bfd36) SHA1(161c98455cb2ceb1d7d1a35941b5bb0784129b25) )
 
@@ -348,7 +348,7 @@ ROM_START( jptparty )    // Jackpot Party (Russian)
 ROM_END
 
 
-ROM_START( leprgld )    // Leprechaun's Gold (Russian)
+ROM_START( leprgld )    // Leprechaun's Gold (Russian) / U5 08/20/101
 	ROM_REGION(0x100000, "maincpu", 0)
 	ROM_LOAD( "xu-3.bin", 0x0000, 0x100000, CRC(0985d6b6) SHA1(291c124a9ae813942b14620789370b4a7b9cf85e) )
 
@@ -363,7 +363,7 @@ ROM_START( leprgld )    // Leprechaun's Gold (Russian)
 	ROM_LOAD( "xu-18.bin", 0x0000, 0x100000, CRC(a3f82467) SHA1(0971f32bff0d4bda43cd98e975e49710d73f9286) )
 ROM_END
 
-ROM_START( leprglds )    // Leprechaun's Gold (Spanish)
+ROM_START( leprglds )    // Leprechaun's Gold (Spanish) / U5 08/20/101
 	ROM_REGION(0x100000, "maincpu", 0)
 	ROM_LOAD( "leprechaun's_gold.xu03", 0x0000, 0x100000, CRC(a750e5b9) SHA1(891bbfded9ece4d81aa8415cbb5a2728c118300e) )
 
@@ -379,7 +379,7 @@ ROM_START( leprglds )    // Leprechaun's Gold (Spanish)
 ROM_END
 
 
-ROM_START( lol )    // Life of Luxury (Russian)
+ROM_START( lol )    // Life of Luxury (Russian) / U3 08/30/100
 	ROM_REGION(0x100000, "maincpu", 0)
 	ROM_LOAD( "xu-3.bin", 0x0000, 0x100000, CRC(28af87a0) SHA1(c94b98b6922b5f5551eff239226bfe007535fc21) )
 
@@ -391,7 +391,7 @@ ROM_START( lol )    // Life of Luxury (Russian)
 ROM_END
 
 
-ROM_START( lovewin )    // Love To Win (Russian)
+ROM_START( lovewin )    // Love To Win (Russian) / U5 04/18/101
 	ROM_REGION(0x100000, "maincpu", 0)
 	ROM_LOAD( "xu-3.bin", 0x0000, 0x100000, CRC(b1b2c7da) SHA1(96430bfa062467bba1daaf2e6180068b3211a739) )
 
@@ -407,7 +407,7 @@ ROM_START( lovewin )    // Love To Win (Russian)
 ROM_END
 
 
-ROM_START( mtburn )    // Money To Burn (English)
+ROM_START( mtburn )    // Money To Burn (English) / U5 08/02/101
 	ROM_REGION(0x100000, "maincpu", 0)
 	ROM_LOAD( "money_to_burn.xu3", 0x0000, 0x100000, CRC(92d94269) SHA1(8f7e342837067b6c2180c3a161bc34671c0fab72) )
 
@@ -421,7 +421,7 @@ ROM_START( mtburn )    // Money To Burn (English)
 ROM_END
 
 
-ROM_START( mtburnr )    // Money To Burn (Russian)
+ROM_START( mtburnr )    // Money To Burn (Russian) / U5 02/11/100
 	ROM_REGION(0x100000, "maincpu", 0)
 	ROM_LOAD( "xu-3.bin", 0x0000, 0x100000, CRC(a329aff0) SHA1(2f631783bd15b8a695d92d0861e167130f914046) )
 
@@ -435,7 +435,7 @@ ROM_START( mtburnr )    // Money To Burn (Russian)
 ROM_END
 
 
-ROM_START( otchart )    // Off The Charts (Russian)
+ROM_START( otchart )    // Off The Charts (Russian) / U5 07/31/100
 	ROM_REGION(0x100000, "maincpu", 0)
 	ROM_LOAD( "xu-3.bin", 0x0000, 0x100000, CRC(b1baee77) SHA1(9f8e87bb10499fa73d961bce4fd75d31c880ea51) )
 
@@ -449,7 +449,7 @@ ROM_START( otchart )    // Off The Charts (Russian)
 ROM_END
 
 
-ROM_START( perfect )    // Perfect Game (Russian)
+ROM_START( perfect )    // Perfect Game (Russian) / U5 03/17/100
 	ROM_REGION(0x100000, "maincpu", 0)
 	ROM_LOAD( "xu-3.bin", 0x0000, 0x100000, CRC(1e90dc52) SHA1(6ac1762ce979e1259e03025d89271034565d8f4a) )
 
@@ -624,23 +624,23 @@ GAME( 200?, wms,        0,        wms,     wms,      wms_state, wms,  ROT0, "WMS
 GAME( 200?, wmsa,       wms,      wms,     wms,      wms_state, wms,  ROT0, "WMS",   "WMS SetUp/Clear Chips (set 2)",   MACHINE_IS_SKELETON )
 GAME( 200?, wmsb,       wms,      wms,     wms,      wms_state, wms,  ROT0, "WMS",   "WMS SetUp/Clear Chips (set 3)",   MACHINE_IS_SKELETON )
 
-GAME( 200?, btippers,   0,        wms,     wms,      wms_state, wms,  ROT0, "WMS",   "Big Tippers (Russian)",           MACHINE_IS_SKELETON )
-GAME( 200?, wmsboom,    0,        wms,     wms,      wms_state, wms,  ROT0, "WMS",   "Boom (Russian)",                  MACHINE_IS_SKELETON )
-GAME( 200?, cashcrop,   0,        wms,     wms,      wms_state, wms,  ROT0, "WMS",   "Cash Crop (Russian)",             MACHINE_IS_SKELETON )
-GAME( 1997, filthyr,    0,        wms,     wms,      wms_state, wms,  ROT0, "WMS",   "Filthy Rich (English)",           MACHINE_IS_SKELETON )  // U4 09/03/97
-GAME( 1997, filthyrr,   filthyr,  wms,     wms,      wms_state, wms,  ROT0, "WMS",   "Filthy Rich (Russian)",           MACHINE_IS_SKELETON )  // U4 09/03/97
-GAME( 200?, hottop,     0,        wms,     wms,      wms_state, wms,  ROT0, "WMS",   "Hot Toppings (English)",          MACHINE_IS_SKELETON )
-GAME( 200?, hottopa,    hottop,   wms,     wms,      wms_state, wms,  ROT0, "WMS",   "Hot Toppings (Russian?)",         MACHINE_IS_SKELETON )
-GAME( 200?, inwinner,   0,        wms,     wms,      wms_state, wms,  ROT0, "WMS",   "Instant Winner (Russian)",        MACHINE_IS_SKELETON )
-GAME( 200?, jptparty,   0,        wms,     wms,      wms_state, wms,  ROT0, "WMS",   "Jackpot Party (Russian)",         MACHINE_IS_SKELETON )
-GAME( 200?, leprgld,    0,        wms,     wms,      wms_state, wms,  ROT0, "WMS",   "Leprechaun's Gold (Russian)",     MACHINE_IS_SKELETON )
-GAME( 200?, leprglds,   leprgld,  wms,     wms,      wms_state, wms,  ROT0, "WMS",   "Leprechaun's Gold (Spanish)",     MACHINE_IS_SKELETON )
-GAME( 200?, lol,        0,        wms,     wms,      wms_state, wms,  ROT0, "WMS",   "Life of Luxury (Russian)",        MACHINE_IS_SKELETON )
-GAME( 200?, lovewin,    0,        wms,     wms,      wms_state, wms,  ROT0, "WMS",   "Love To Win (Russian)",           MACHINE_IS_SKELETON )
-GAME( 200?, mtburn,     0,        wms,     wms,      wms_state, wms,  ROT0, "WMS",   "Money To Burn (English)",         MACHINE_IS_SKELETON )
-GAME( 200?, mtburnr,    mtburn,   wms,     wms,      wms_state, wms,  ROT0, "WMS",   "Money To Burn (Russian)",         MACHINE_IS_SKELETON )
-GAME( 200?, otchart,    0,        wms,     wms,      wms_state, wms,  ROT0, "WMS",   "Off The Charts (Russian)",        MACHINE_IS_SKELETON )
-GAME( 200?, perfect,    0,        wms,     wms,      wms_state, wms,  ROT0, "WMS",   "Perfect Game (Russian)",          MACHINE_IS_SKELETON )
+GAME( 200?, btippers,   0,        wms,     wms,      wms_state, wms,  ROT0, "WMS",   "Big Tippers (Russian)",           MACHINE_IS_SKELETON )  // U5 03/09/01
+GAME( 200?, wmsboom,    0,        wms,     wms,      wms_state, wms,  ROT0, "WMS",   "Boom (Russian)",                  MACHINE_IS_SKELETON )  // U5 02/12/98
+GAME( 200?, cashcrop,   0,        wms,     wms,      wms_state, wms,  ROT0, "WMS",   "Cash Crop (Russian)",             MACHINE_IS_SKELETON )  // U5 09/05/100
+GAME( 200?, filthyr,    0,        wms,     wms,      wms_state, wms,  ROT0, "WMS",   "Filthy Rich (English)",           MACHINE_IS_SKELETON )  // U4 09/03/97
+GAME( 200?, filthyrr,   filthyr,  wms,     wms,      wms_state, wms,  ROT0, "WMS",   "Filthy Rich (Russian)",           MACHINE_IS_SKELETON )  // U4 09/03/97
+GAME( 200?, hottop,     0,        wms,     wms,      wms_state, wms,  ROT0, "WMS",   "Hot Toppings (English)",          MACHINE_IS_SKELETON )  // U5 04/22/103
+GAME( 200?, hottopa,    hottop,   wms,     wms,      wms_state, wms,  ROT0, "WMS",   "Hot Toppings (Russian?)",         MACHINE_IS_SKELETON )  // U5 06/26/101
+GAME( 200?, inwinner,   0,        wms,     wms,      wms_state, wms,  ROT0, "WMS",   "Instant Winner (Russian)",        MACHINE_IS_SKELETON )  // U5 11/25/98
+GAME( 200?, jptparty,   0,        wms,     wms,      wms_state, wms,  ROT0, "WMS",   "Jackpot Party (Russian)",         MACHINE_IS_SKELETON )  // U5 04/01/98
+GAME( 200?, leprgld,    0,        wms,     wms,      wms_state, wms,  ROT0, "WMS",   "Leprechaun's Gold (Russian)",     MACHINE_IS_SKELETON )  // U5 08/20/101
+GAME( 200?, leprglds,   leprgld,  wms,     wms,      wms_state, wms,  ROT0, "WMS",   "Leprechaun's Gold (Spanish)",     MACHINE_IS_SKELETON )  // U5 08/20/101
+GAME( 200?, lol,        0,        wms,     wms,      wms_state, wms,  ROT0, "WMS",   "Life of Luxury (Russian)",        MACHINE_IS_SKELETON )  // U3 08/30/100
+GAME( 200?, lovewin,    0,        wms,     wms,      wms_state, wms,  ROT0, "WMS",   "Love To Win (Russian)",           MACHINE_IS_SKELETON )  // U5 04/18/101
+GAME( 200?, mtburn,     0,        wms,     wms,      wms_state, wms,  ROT0, "WMS",   "Money To Burn (English)",         MACHINE_IS_SKELETON )  // U5 08/02/101
+GAME( 200?, mtburnr,    mtburn,   wms,     wms,      wms_state, wms,  ROT0, "WMS",   "Money To Burn (Russian)",         MACHINE_IS_SKELETON )  // U5 02/11/100
+GAME( 200?, otchart,    0,        wms,     wms,      wms_state, wms,  ROT0, "WMS",   "Off The Charts (Russian)",        MACHINE_IS_SKELETON )  // U5 07/31/100
+GAME( 200?, perfect,    0,        wms,     wms,      wms_state, wms,  ROT0, "WMS",   "Perfect Game (Russian)",          MACHINE_IS_SKELETON )  // U5 03/17/100
 GAME( 1997, reelemin,   0,        wms,     wms,      wms_state, wms,  ROT0, "WMS",   "Reel 'Em In (English)",           MACHINE_IS_SKELETON )  // U4 01/22/97
 GAME( 1997, reeleminr,  reelemin, wms,     wms,      wms_state, wms,  ROT0, "WMS",   "Reel 'Em In (Russian)",           MACHINE_IS_SKELETON )  // U4 01/22/97
 GAME( 200?, sonoth,     0,        wms,     wms,      wms_state, wms,  ROT0, "WMS",   "Something For Nothing (Russian)", MACHINE_IS_SKELETON )

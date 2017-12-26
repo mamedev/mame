@@ -78,7 +78,7 @@ uint32_t dassault_state::screen_update_dassault(screen_device &screen, bitmap_rg
 {
 	address_space &space = machine().dummy_space();
 	uint16_t flip = m_deco_tilegen1->pf_control_r(space, 0, 0xffff);
-	uint16_t priority = m_decocomn->priority_r(space, 0, 0xffff);
+	uint16_t priority = m_decocomn->priority_r();
 
 	m_sprgen2->draw_sprites(bitmap, cliprect, m_spriteram2->buffer(), 0x400, false);
 	m_sprgen1->draw_sprites(bitmap, cliprect, m_spriteram->buffer(), 0x400, false);

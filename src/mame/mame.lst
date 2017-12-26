@@ -8840,8 +8840,8 @@ bloodbroj                       // (c) 1990 Tad
 bloodbroja                      // (c) 1990 Tad
 bloodbrou                       // (c) 1990 Tad + Fabtek license
 skysmash                        // (c) 1990 Nihon System Inc.
-weststory                       // bootleg
-weststorya                      // bootleg
+weststry                        // bootleg
+weststrya                       // bootleg
 
 @source:blstroid.cpp
 blstroid                        // 136057           (c) 1987
@@ -9270,6 +9270,10 @@ lynx128k                        //
 lynx48k                         //
 lynx96k                         //
 
+@source:candela.cpp
+can09t                          //
+can09                           //
+
 @source:canon_s80.cpp
 canons80                        //
 
@@ -9378,18 +9382,24 @@ plegendsj                       // (c) 1994 Atlus
 ppsatan                         // (c) 1996 <unknown>
 pwrinst2                        // (c) 1994 Atlus
 pwrinst2j                       // (c) 1994 Atlus
-sailormn                        // (c) 1995 Banpresto (country is in EEPROM)
-sailormnh                       // (c) 1995 Banpresto (country is in EEPROM)
-sailormnj                       // (c) 1995 Banpresto (country is in EEPROM)
-sailormnk                       // (c) 1995 Banpresto (country is in EEPROM)
-sailormno                       // (c) 1995 Banpresto (country is in EEPROM)
-sailormnoh                      // (c) 1995 Banpresto (country is in EEPROM)
-sailormnoj                      // (c) 1995 Banpresto (country is in EEPROM)
-sailormnok                      // (c) 1995 Banpresto (country is in EEPROM)
-sailormnot                      // (c) 1995 Banpresto (country is in EEPROM)
-sailormnou                      // (c) 1995 Banpresto (country is in EEPROM)
-sailormnt                       // (c) 1995 Banpresto (country is in EEPROM)
-sailormnu                       // (c) 1995 Banpresto (country is in EEPROM)
+sailormn                        // (c) 1995 Banpresto (Ver. 95/03/22B, country is in EEPROM)
+sailormnh                       // (c) 1995 Banpresto (Ver. 95/03/22B, country is in EEPROM)
+sailormnj                       // (c) 1995 Banpresto (Ver. 95/03/22B, country is in EEPROM)
+sailormnk                       // (c) 1995 Banpresto (Ver. 95/03/22B, country is in EEPROM)
+sailormnn                       // (c) 1995 Banpresto (Ver. 95/03/22, country is in EEPROM)
+sailormnnh                      // (c) 1995 Banpresto (Ver. 95/03/22, country is in EEPROM)
+sailormnnj                      // (c) 1995 Banpresto (Ver. 95/03/22, country is in EEPROM)
+sailormnnk                      // (c) 1995 Banpresto (Ver. 95/03/22, country is in EEPROM)
+sailormnnt                      // (c) 1995 Banpresto (Ver. 95/03/22, country is in EEPROM)
+sailormnnu                      // (c) 1995 Banpresto (Ver. 95/03/22, country is in EEPROM)
+sailormno                       // (c) 1995 Banpresto (Ver. 95/03/21, country is in EEPROM)
+sailormnoh                      // (c) 1995 Banpresto (Ver. 95/03/21, country is in EEPROM)
+sailormnoj                      // (c) 1995 Banpresto (Ver. 95/03/21, country is in EEPROM)
+sailormnok                      // (c) 1995 Banpresto (Ver. 95/03/21, country is in EEPROM)
+sailormnot                      // (c) 1995 Banpresto (Ver. 95/03/21, country is in EEPROM)
+sailormnou                      // (c) 1995 Banpresto (Ver. 95/03/21, country is in EEPROM)
+sailormnt                       // (c) 1995 Banpresto (Ver. 95/03/22B, country is in EEPROM)
+sailormnu                       // (c) 1995 Banpresto (Ver. 95/03/22B, country is in EEPROM)
 tekkenbs                        // (c) 1998 Namco
 tekkencw                        // (c) 1997 Namco
 theroes                         // (c) 2001 Primetek Investments
@@ -10642,7 +10652,7 @@ pokoachu                        // (c) 1999
 renaimj                         // (c) 1999
 sengomjk                        // (c) 1998
 thenanpa                        // (c) 1999
-torarech						// (c) 2000
+torarech                        // (c) 2000
 tsuwaku                         // (c) 2000
 
 @source:cswat.cpp
@@ -10759,6 +10769,9 @@ cybertnk                        // (c) 1990 Coreland
 cybikov1                        // Cybiko Wireless Intertainment System - Classic V1
 cybikov2                        // Cybiko Wireless Intertainment System - Classic V2
 cybikoxt                        // Cybiko Wireless Intertainment System - Xtreme
+
+@source:cybstorm.cpp
+cybstorm                        // (proto)          (c) 1993
 
 @source:cyclemb.cpp
 cyclemb                         // P0  (c) 1984 Taito Corporation [+ Seta]
@@ -11312,9 +11325,6 @@ xfilesk                         // (c) 1999 dgPIX Entertainment Inc (censored fo
 @source:didact.cpp
 md6802                          //
 mp68a                           //
-e100                            //
-can09t                          //
-can09                           //
 
 @source:dietgo.cpp
 dietgo                          // MAY (c) 1993
@@ -11655,6 +11665,9 @@ dyndukea                        // (c) 1989 Seibu Kaihatsu (25JUL89)
 dyndukej                        // (c) 1989 Seibu Kaihatsu (03SEP89
 dyndukeja                       // (c) 1989 Seibu Kaihatsu (25JUL89)
 dyndukeu                        // (c) 1989 Seibu Kaihatsu + Fabtek license (25JUL89)
+
+@source:e100.cpp
+e100                            //
 
 @source:eacc.cpp
 eacc                            //
@@ -31364,7 +31377,7 @@ orleg2_101                      //
 orleg2_104cn                    //
 orleg2_103cn                    //
 orleg2_101cn                    //
-kof98umh						// (c) 2009
+kof98umh                        // (c) 2009
 
 @source:pgm3.cpp
 kov3hd
@@ -36972,7 +36985,7 @@ shippumd                        // (c) 1994 Raizing/8ing
 snowbro2                        // TP-033 (c) 1994 Hanafram
 snowbro2b                       //
 sstriker                        // (c) 1993 Raizing
-sstrikera                       // (c) 1993 Raizing
+sstrikerk                       // (c) 1993 Raizing
 tekipaki                        // TP-020 (c) 1991 Toaplan
 tekipakit                       // TP-020 (c) 1991 Toaplan (location test)
 truxton2                        // TP-024 (c) 1992 Toaplan
@@ -38415,8 +38428,8 @@ wmg                             // Williams 6in1 Multigame, Clay Cowgill
 @source:wms.cpp
 btippers                        // Big Tippers (Russian)
 cashcrop                        // Cash Crop (Russian)
-filthyr                         // Filthy Rich (English) - (c) 1997 WMS
-filthyrr                        // Filthy Rich (Russian) - (c) 1997 WMS
+filthyr                         // Filthy Rich (English)
+filthyrr                        // Filthy Rich (Russian)
 hottop                          // Hot Toppings (English)
 hottopa                         // Hot Toppings (Russian?)
 inwinner                        // In Winner (Russian)
@@ -38429,8 +38442,8 @@ mtburn                          // Money To Burn (English)
 mtburnr                         // Money To Burn (Russian)
 otchart                         // Off The Charts (Russian)
 perfect                         // Perfect Game (Russian)
-reelemin                        // Reel 'Em In (English) - (c) 1997 WMS
-reeleminr                       // Reel 'Em In (Russian) - (c) 1997 WMS
+reelemin                        // Reel 'Em In (English)
+reeleminr                       // Reel 'Em In (Russian)
 sonoth                          // Sum Of Nothing (Russian)
 swingin                         // Swingin' Green (Russian)
 wdun                            // Who Dunnit (Russian)

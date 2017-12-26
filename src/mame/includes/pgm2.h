@@ -58,7 +58,7 @@ public:
 	DECLARE_WRITE8_MEMBER(shareram_w);
 	DECLARE_WRITE16_MEMBER(vbl_ack_w);
 	DECLARE_WRITE16_MEMBER(unk30120014_w);
-	
+
 	DECLARE_READ32_MEMBER(orleg2_speedup_r);
 	DECLARE_READ32_MEMBER(kov2nl_speedup_r);
 	DECLARE_READ32_MEMBER(kof98umh_speedup_r);
@@ -112,10 +112,10 @@ private:
 
 	uint32_t m_sprites_mask_mask;
 	uint32_t m_sprites_colour_mask;
-	
+
 	void common_encryption_init();
 	uint8_t m_encryption_table[0x100];
-	int m_has_decrypted;	// so we only do it once.
+	int m_has_decrypted;    // so we only do it once.
 	uint32_t m_spritekey;
 	uint32_t m_realspritekey;
 	int m_sprite_predecrypted;

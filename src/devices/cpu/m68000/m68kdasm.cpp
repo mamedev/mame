@@ -213,7 +213,7 @@ std::string m68k_disassembler::get_ea_mode_str(u16 instruction, u32 size)
 				u32 base = ext_base_displacement_present(extension) ? (ext_base_displacement_long(extension) ? read_imm_32() : read_imm_16()) : 0;
 				u32 outer = ext_outer_displacement_present(extension) ? (ext_outer_displacement_long(extension) ? read_imm_32() : read_imm_16()) : 0;
 				std::string base_reg = ext_base_register_present(extension) ? "PC" : "";
-				std::string index_reg = 
+				std::string index_reg =
 					ext_index_register_present(extension) ?
 					util::string_format("%c%d.%c%s", ext_index_ar(extension) ? 'A' : 'D', ext_index_register(extension), ext_index_long(extension) ? 'l' : 'w',
 										ext_index_scale(extension) ?
@@ -1395,7 +1395,7 @@ std::string m68k_disassembler::d68881_ftrap()
 			return util::string_format("ftrap%s", m_cpcc[w2 & 0x3f]);
 	}
 	return util::string_format("ftrap%s<%d>?", m_cpcc[w2 & 0x3f], m_cpu_ir & 7);
-	
+
 }
 
 std::string m68k_disassembler::d68040_fpu()
@@ -1408,7 +1408,7 @@ std::string m68k_disassembler::d68040_fpu()
 	auto limit = limit_cpu_types(M68020_PLUS);
 	if(limit.first)
 		return limit.second;
-	
+
 	u16 w2 = read_imm_16();
 
 	u16 src = (w2 >> 10) & 0x7;

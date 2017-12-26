@@ -78,7 +78,7 @@ private:
 		branchBnotzero, returnBnotzero,
 		branchCnotzero, returnCnotzero,
 		branchDnotzero, returnDnotzero,
-		
+
 		branchAgreaterB, returnAgreaterB,
 		branchBgreaterC, returnBgreaterC,
 		branchCgreaterA, returnCgreaterA,

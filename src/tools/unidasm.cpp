@@ -315,15 +315,15 @@ static const dasm_table_entry dasm_table[] =
 	{ "dsp32c",          le,  0, []() -> util::disasm_interface * { return new dsp32c_disassembler; } },
 	{ "dsp56k",          le, -1, []() -> util::disasm_interface * { return new dsp56k_disassembler; } },
 	{ "e0c6200",         be, -1, []() -> util::disasm_interface * { return new e0c6200_disassembler; } },
-//	{ "es5510",          be,  0, []() -> util::disasm_interface * { return new es5510_disassembler; } }, // Currently does nothing
+//  { "es5510",          be,  0, []() -> util::disasm_interface * { return new es5510_disassembler; } }, // Currently does nothing
 	{ "esrip",           be,  0, []() -> util::disasm_interface * { return new esrip_disassembler; } },
 	{ "f8",              le,  0, []() -> util::disasm_interface * { return new f8_disassembler; } },
 	{ "g65816",          le,  0, []() -> util::disasm_interface * { return new g65816_disassembler(&g65816_unidasm); } },
 	{ "h6280",           le,  0, []() -> util::disasm_interface * { return new h6280_disassembler; } },
-    { "h8",              be,  0, []() -> util::disasm_interface * { return new h8_disassembler; } },
+	{ "h8",              be,  0, []() -> util::disasm_interface * { return new h8_disassembler; } },
 	{ "h8h",             be,  0, []() -> util::disasm_interface * { return new h8h_disassembler; } },
-    { "h8s2000",         be,  0, []() -> util::disasm_interface * { return new h8s2000_disassembler; } },
-    { "h8s2600",         be,  0, []() -> util::disasm_interface * { return new h8s2600_disassembler; } },
+	{ "h8s2000",         be,  0, []() -> util::disasm_interface * { return new h8s2000_disassembler; } },
+	{ "h8s2600",         be,  0, []() -> util::disasm_interface * { return new h8s2600_disassembler; } },
 	{ "hc11",            le,  0, []() -> util::disasm_interface * { return new hc11_disassembler; } },
 	{ "hcd62121",        le,  0, []() -> util::disasm_interface * { return new hcd62121_disassembler; } },
 	{ "hd61700",         le,  0, []() -> util::disasm_interface * { return new hd61700_disassembler; } },
@@ -1093,7 +1093,7 @@ int main(int argc, char *argv[])
 			int nc2 = (bits2+2)/3;
 			int nc3 = (bits3+2)/3;
 			pc_to_string = [nc1, nc2, nc3, sm1, sm2, sh2, sh3](offs_t pc) -> std::string {
-				return util::string_format("%0*o:%0*o:%0*o", 
+				return util::string_format("%0*o:%0*o:%0*o",
 										   nc3, pc >> sh3,
 										   nc2, (pc >> sh2) & sm2,
 										   nc1, pc & sm1);
@@ -1103,7 +1103,7 @@ int main(int argc, char *argv[])
 			int nc2 = (bits2+3)/4;
 			int nc3 = (bits3+3)/4;
 			pc_to_string = [nc1, nc2, nc3, sm1, sm2, sh2, sh3](offs_t pc) -> std::string {
-				return util::string_format("%0*x:%0*x:%0*x", 
+				return util::string_format("%0*x:%0*x:%0*x",
 										   nc3, pc >> sh3,
 										   nc2, (pc >> sh2) & sm2,
 										   nc1, pc & sm1);
@@ -1120,7 +1120,7 @@ int main(int argc, char *argv[])
 			int nc1 = (bits1+2)/3;
 			int nc2 = (bits2+2)/3;
 			pc_to_string = [nc1, nc2, sm1, sh2](offs_t pc) -> std::string {
-				return util::string_format("%0*o:%0*o", 
+				return util::string_format("%0*o:%0*o",
 										   nc2, pc >> sh2,
 										   nc1, pc & sm1);
 			};
@@ -1128,7 +1128,7 @@ int main(int argc, char *argv[])
 			int nc1 = (bits1+3)/4;
 			int nc2 = (bits2+3)/4;
 			pc_to_string = [nc1, nc2, sm1, sh2](offs_t pc) -> std::string {
-				return util::string_format("%0*x:%0*x", 
+				return util::string_format("%0*x:%0*x",
 										   nc2, pc >> sh2,
 										   nc1, pc & sm1);
 			};
@@ -1140,13 +1140,13 @@ int main(int argc, char *argv[])
 		if(is_octal) {
 			int nc1 = (bits1+2)/3;
 			pc_to_string = [nc1](offs_t pc) -> std::string {
-				return util::string_format("%0*o", 
+				return util::string_format("%0*o",
 										   nc1, pc);
 			};
 		} else {
 			int nc1 = (bits1+3)/4;
 			pc_to_string = [nc1](offs_t pc) -> std::string {
-				return util::string_format("%0*x", 
+				return util::string_format("%0*x",
 										   nc1, pc);
 			};
 		}

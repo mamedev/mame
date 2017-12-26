@@ -12,8 +12,8 @@
 
     TODO:
     - ckmaster 1 WAIT CLK per M1, workaround with z80_set_cycle_tables is possible
-	  (wait state is similar to MSX) but I can't be bothered, better solution
-	  is to add M1 pin to the z80 core. Until then, it'll run ~20% too fast.
+      (wait state is similar to MSX) but I can't be bothered, better solution
+      is to add M1 pin to the z80 core. Until then, it'll run ~20% too fast.
 
 ******************************************************************************
 
