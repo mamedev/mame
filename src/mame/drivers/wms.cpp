@@ -247,7 +247,7 @@ ROM_START( wmsboom )    // Boom (Russian) / U5 02/12/98
 ROM_END
 
 
-ROM_START( cashcrop )    // Cash Crop (Russian) / U5 09/05/100 (typo for 00?)
+ROM_START( cashcrop )    // Cash Crop (Russian) / U5 09/05/100
 	ROM_REGION(0x100000, "maincpu", 0)
 	ROM_LOAD( "xu-3.bin", 0x0000, 0x100000, CRC(e1918f25) SHA1(55c33c1f604a44caef65e712e69d21792161dfbc) )
 
@@ -291,7 +291,7 @@ ROM_START( filthyrr )    // Filthy Rich (Russian) / U4 09/03/97
 ROM_END
 
 
-ROM_START( hottop )    // Hot Toppings (English)
+ROM_START( hottop )    // Hot Toppings (English) / U5 04/22/103
 	ROM_REGION(0x100000, "maincpu", 0)
 	ROM_LOAD( "hot_topping_9fbah.xu03", 0x0000, 0x100000, CRC(9da8d2d7) SHA1(722809ec9df83c866ec7cbcc83b619d65134b523) )
 
@@ -624,12 +624,12 @@ GAME( 200?, wms,        0,        wms,     wms,      wms_state, wms,  ROT0, "WMS
 GAME( 200?, wmsa,       wms,      wms,     wms,      wms_state, wms,  ROT0, "WMS",   "WMS SetUp/Clear Chips (set 2)",   MACHINE_IS_SKELETON )
 GAME( 200?, wmsb,       wms,      wms,     wms,      wms_state, wms,  ROT0, "WMS",   "WMS SetUp/Clear Chips (set 3)",   MACHINE_IS_SKELETON )
 
-GAME( 2001, btippers,   0,        wms,     wms,      wms_state, wms,  ROT0, "WMS",   "Big Tippers (Russian)",           MACHINE_IS_SKELETON )  // U5 03/09/01
-GAME( 1998, wmsboom,    0,        wms,     wms,      wms_state, wms,  ROT0, "WMS",   "Boom (Russian)",                  MACHINE_IS_SKELETON )  // U5 02/12/98
-GAME( 2000, cashcrop,   0,        wms,     wms,      wms_state, wms,  ROT0, "WMS",   "Cash Crop (Russian)",             MACHINE_IS_SKELETON )  // U5 09/05/100 (typo for 00?)
-GAME( 1997, filthyr,    0,        wms,     wms,      wms_state, wms,  ROT0, "WMS",   "Filthy Rich (English)",           MACHINE_IS_SKELETON )  // U4 09/03/97
-GAME( 1997, filthyrr,   filthyr,  wms,     wms,      wms_state, wms,  ROT0, "WMS",   "Filthy Rich (Russian)",           MACHINE_IS_SKELETON )  // U4 09/03/97
-GAME( 200?, hottop,     0,        wms,     wms,      wms_state, wms,  ROT0, "WMS",   "Hot Toppings (English)",          MACHINE_IS_SKELETON )
+GAME( 200?, btippers,   0,        wms,     wms,      wms_state, wms,  ROT0, "WMS",   "Big Tippers (Russian)",           MACHINE_IS_SKELETON )  // U5 03/09/01
+GAME( 200?, wmsboom,    0,        wms,     wms,      wms_state, wms,  ROT0, "WMS",   "Boom (Russian)",                  MACHINE_IS_SKELETON )  // U5 02/12/98
+GAME( 200?, cashcrop,   0,        wms,     wms,      wms_state, wms,  ROT0, "WMS",   "Cash Crop (Russian)",             MACHINE_IS_SKELETON )  // U5 09/05/100
+GAME( 200?, filthyr,    0,        wms,     wms,      wms_state, wms,  ROT0, "WMS",   "Filthy Rich (English)",           MACHINE_IS_SKELETON )  // U4 09/03/97
+GAME( 200?, filthyrr,   filthyr,  wms,     wms,      wms_state, wms,  ROT0, "WMS",   "Filthy Rich (Russian)",           MACHINE_IS_SKELETON )  // U4 09/03/97
+GAME( 200?, hottop,     0,        wms,     wms,      wms_state, wms,  ROT0, "WMS",   "Hot Toppings (English)",          MACHINE_IS_SKELETON )  // U5 04/22/103
 GAME( 200?, hottopa,    hottop,   wms,     wms,      wms_state, wms,  ROT0, "WMS",   "Hot Toppings (Russian?)",         MACHINE_IS_SKELETON )
 GAME( 200?, inwinner,   0,        wms,     wms,      wms_state, wms,  ROT0, "WMS",   "Instant Winner (Russian)",        MACHINE_IS_SKELETON )
 GAME( 200?, jptparty,   0,        wms,     wms,      wms_state, wms,  ROT0, "WMS",   "Jackpot Party (Russian)",         MACHINE_IS_SKELETON )

@@ -38426,10 +38426,10 @@ wizta                           // (c) 1985 Taito Corporation
 wmg                             // Williams 6in1 Multigame, Clay Cowgill
 
 @source:wms.cpp
-btippers                        // Big Tippers (Russian) - (c) 2001 WMS
-cashcrop                        // Cash Crop (Russian) - (c) 2000? WMS
-filthyr                         // Filthy Rich (English) - (c) 1997 WMS
-filthyrr                        // Filthy Rich (Russian) - (c) 1997 WMS
+btippers                        // Big Tippers (Russian)
+cashcrop                        // Cash Crop (Russian)
+filthyr                         // Filthy Rich (English)
+filthyrr                        // Filthy Rich (Russian)
 hottop                          // Hot Toppings (English)
 hottopa                         // Hot Toppings (Russian?)
 inwinner                        // In Winner (Russian)
@@ -38442,8 +38442,8 @@ mtburn                          // Money To Burn (English)
 mtburnr                         // Money To Burn (Russian)
 otchart                         // Off The Charts (Russian)
 perfect                         // Perfect Game (Russian)
-reelemin                        // Reel 'Em In (English) - (c) 1997 WMS
-reeleminr                       // Reel 'Em In (Russian) - (c) 1997 WMS
+reelemin                        // Reel 'Em In (English)
+reeleminr                       // Reel 'Em In (Russian)
 sonoth                          // Sum Of Nothing (Russian)
 swingin                         // Swingin' Green (Russian)
 wdun                            // Who Dunnit (Russian)
@@ -38453,7 +38453,7 @@ wldstrek                        // Wild Streak (Russian)
 wms                             // Set Chips
 wmsa                            //
 wmsb                            //
-wmsboom                         // Boom (Russian) - (c) 1998 WMS
+wmsboom                         // Boom (Russian)
 wmstopb                         // Top Banana (Russian)
 yukongld                        // Yukon Gold (Russian)
 
