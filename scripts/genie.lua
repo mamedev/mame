@@ -1133,8 +1133,13 @@ configuration { "osx* or xcode4" }
 		}
 
 configuration { "mingw*" }
+		if _OPTIONS["osd"]~="sdl"
+		then
+			linkoptions {
+				"-static",
+			}
+		end
 		linkoptions {
-			"-static",
 			"-Wl,--start-group",
 		}
 		links {
