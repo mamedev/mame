@@ -81,10 +81,10 @@ private:
 
 	u16 m_debug_pc; // only for the MAME debugger
 
-	inline u8 do_ad(u8 augend, u8 addend);
 	inline void CLR_OZCS();
 	inline void SET_SZ(u8 n);
-	inline void SET_OC(u16 n, u16 m);
+	inline u8 do_add(u8 n, u8 m, u8 c = 0);
+	inline u8 do_add_decimal(u8 augend, u8 addend);
 
 	void ROMC_00(int insttim);
 	void ROMC_01();
