@@ -30,7 +30,7 @@ static constexpr int cL = 6;
 DEFINE_DEVICE_TYPE(F8, f8_cpu_device, "f8", "Fairchild F8")
 
 
-f8_cpu_device::f8_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+f8_cpu_device::f8_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: cpu_device(mconfig, F8, tag, owner, clock)
 	, m_program_config("program", ENDIANNESS_BIG, 8, 16, 0)
 	, m_io_config("io", ENDIANNESS_BIG, 8, 8, 0)
@@ -204,7 +204,7 @@ void f8_cpu_device::device_reset()
 	 * We have to build a lookup table to tell how many cycles a write
 
 	 */
-	uint8_t data = 0xfe;    /* initial value */
+	u8 data = 0xfe;    /* initial value */
 	for (int i = 0; i < 256; i++)
 	{
 		timer_shifter[i] = data;
@@ -260,7 +260,7 @@ inline void f8_cpu_device::SET_OC(u16 n, u16 m)
 }
 
 /* decimal add helper */
-inline uint8_t f8_cpu_device::do_ad(uint8_t augend, uint8_t addend)
+inline u8 f8_cpu_device::do_ad(u8 augend, u8 addend)
 {
 	/* From F8 Guide To programming description of AMD
 	 * binary add the addend to the binary sum of the augend and $66
@@ -274,10 +274,10 @@ inline uint8_t f8_cpu_device::do_ad(uint8_t augend, uint8_t addend)
 	 * any carry from the low-order digit is suppressed
 	 * *NOTE* status flags are updated prior to the factor being added
 	 */
-	uint8_t tmp = augend + addend;
+	u8 tmp = augend + addend;
 
-	uint8_t c = 0; // high order carry
-	uint8_t ic = 0; // low order carry
+	u8 c = 0; // high order carry
+	u8 ic = 0; // low order carry
 
 	if (((augend + addend) & 0xff0) > 0xf0)
 		c = 1;
@@ -332,7 +332,7 @@ void f8_cpu_device::ROMC_01()
 	 * on the data bus as signed binary number to PC0.
 	 */
 	m_dbus = m_direct->read_byte(m_pc0);
-	m_pc0 += (int8_t)m_dbus;
+	m_pc0 += (s8)m_dbus;
 	m_icount -= cL;
 }
 
@@ -427,7 +427,7 @@ void f8_cpu_device::ROMC_0A()
 	 * All devices add the 8-bit value on the data bus, treated as
 	 * signed binary number, to the data counter.
 	 */
-	m_dc0 += (int8_t)m_dbus;
+	m_dc0 += (s8)m_dbus;
 	m_icount -= cL;
 }
 
@@ -640,7 +640,7 @@ void f8_cpu_device::ROMC_1D()
 	 * Devices with DC0 and DC1 registers must switch registers.
 	 * Devices without a DC1 register perform no operation.
 	 */
-	uint16_t tmp = m_dc0;
+	u16 tmp = m_dc0;
 	m_dc0 = m_dc1;
 	m_dc1 = tmp;
 	m_icount -= cS;
@@ -1075,7 +1075,7 @@ void f8_cpu_device::f8_ai()
  ***************************************************/
 void f8_cpu_device::f8_ci()
 {
-	uint16_t tmp = ((uint8_t)~m_a) + 1;
+	u16 tmp = ((u8)~m_a) + 1;
 	ROMC_03(cL);
 	CLR_OZCS();
 	SET_OC(tmp,m_dbus);
@@ -1348,7 +1348,7 @@ void f8_cpu_device::f8_am()
  ***************************************************/
 void f8_cpu_device::f8_amd()
 {
-	uint8_t tmp = m_a;
+	u8 tmp = m_a;
 	ROMC_02();
 	tmp = do_ad(tmp, m_dbus);
 	m_a = tmp;
@@ -1396,7 +1396,7 @@ void f8_cpu_device::f8_xm()
  ***************************************************/
 void f8_cpu_device::f8_cm()
 {
-	uint16_t tmp = ((uint8_t)~m_a) + 1;
+	u16 tmp = ((u8)~m_a) + 1;
 	ROMC_02();
 	CLR_OZCS();
 	SET_OC(tmp,m_dbus);
@@ -1543,7 +1543,7 @@ void f8_cpu_device::f8_as_isar_d()
  ***************************************************/
 void f8_cpu_device::f8_asd(int r)
 {
-	uint8_t tmp = m_a;
+	u8 tmp = m_a;
 	ROMC_1C(cS);
 	tmp = do_ad(tmp, m_r[r]);
 	m_a = tmp;
@@ -1555,7 +1555,7 @@ void f8_cpu_device::f8_asd(int r)
  ***************************************************/
 void f8_cpu_device::f8_asd_isar()
 {
-	uint8_t tmp = m_a;
+	u8 tmp = m_a;
 	ROMC_1C(cS);
 	tmp = do_ad(tmp, m_r[m_is]);
 	m_a = tmp;
@@ -1567,7 +1567,7 @@ void f8_cpu_device::f8_asd_isar()
  ***************************************************/
 void f8_cpu_device::f8_asd_isar_i()
 {
-	uint8_t tmp = m_a;
+	u8 tmp = m_a;
 	ROMC_1C(cS);
 	tmp = do_ad(tmp, m_r[m_is]);
 	m_a = tmp;
@@ -1580,7 +1580,7 @@ void f8_cpu_device::f8_asd_isar_i()
  ***************************************************/
 void f8_cpu_device::f8_asd_isar_d()
 {
-	uint8_t tmp = m_a;
+	u8 tmp = m_a;
 	ROMC_1C(cS);
 	tmp = do_ad(tmp, m_r[m_is]);
 	m_a = tmp;
@@ -1685,7 +1685,7 @@ void f8_cpu_device::execute_run()
 {
 	do
 	{
-		uint8_t op=m_dbus;
+		u8 op=m_dbus;
 
 		m_pc = (m_pc0 - 1) & 0xffff;
 		debugger_instruction_hook(this, (m_pc0 - 1) & 0xffff);
