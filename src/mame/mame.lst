@@ -38430,36 +38430,36 @@ wizta                           // (c) 1985 Taito Corporation
 wmg                             // Williams 6in1 Multigame, Clay Cowgill
 
 @source:wms.cpp
-btippers                        // Big Tippers (Russian)
-cashcrop                        // Cash Crop (Russian)
-filthyr                         // Filthy Rich (English)
-filthyrr                        // Filthy Rich (Russian)
-hottop                          // Hot Toppings (English)
-hottopa                         // Hot Toppings (Russian?)
-inwinner                        // In Winner (Russian)
-jptparty                        // Jackpot Party (Russian)
-leprgld                         // Leprecorns Gold (Russian)
-leprglds                        // Leprecorns Gold (Spanish)
-lol                             // Life of Luxury (Russian)
-lovewin                         // Love To Win (Russian)
-mtburn                          // Money To Burn (English)
-mtburnr                         // Money To Burn (Russian)
-otchart                         // Off The Charts (Russian)
-perfect                         // Perfect Game (Russian)
-reelemin                        // Reel 'Em In (English)
-reeleminr                       // Reel 'Em In (Russian)
-sonoth                          // Sum Of Nothing (Russian)
-swingin                         // Swingin' Green (Russian)
-wdun                            // Who Dunnit (Russian)
-winbid                          // Winning Bid (English)
-winbidr                         // Winning Bid (Russian)
-wldstrek                        // Wild Streak (Russian)
-wms                             // Set Chips
-wmsa                            //
-wmsb                            //
-wmsboom                         // Boom (Russian)
-wmstopb                         // Top Banana (Russian)
-yukongld                        // Yukon Gold (Russian)
+btippers                        // (c) 2001 WMS - Big Tippers (Russian)
+cashcrop                        // (c) 2000 WMS - Cash Crop (Russian)
+filthyr                         // (c) 1997 WMS - Filthy Rich (English)
+filthyrr                        // (c) 1997 WMS - Filthy Rich (Russian)
+hottop                          // (c) 2003 WMS - Hot Toppings (English)
+hottopa                         // (c) 2001 WMS - Hot Toppings (Russian?)
+inwinner                        // (c) 1998 WMS - Instant Winner (Russian)
+jptparty                        // (c) 1998 WMS - Jackpot Party (Russian)
+leprgld                         // (c) 2001 WMS - Leprechaun's Gold (Russian)
+leprglds                        // (c) 2001 WMS - Leprechaun's Gold (Spanish)
+lol                             // (c) 2000 WMS - Life of Luxury (Russian)
+lovewin                         // (c) 2001 WMS - Love To Win (Russian)
+mtburn                          // (c) 2001 WMS - Money To Burn (English)
+mtburnr                         // (c) 2000 WMS - Money To Burn (Russian)
+otchart                         // (c) 2000 WMS - Off The Charts (Russian)
+perfect                         // (c) 2000 WMS - Perfect Game (Russian)
+reelemin                        // (c) 1997 WMS - Reel 'Em In (English)
+reeleminr                       // (c) 1997 WMS - Reel 'Em In (Russian)
+sonoth                          // (c) 200? WMS - Something For Nothing (Russian)
+swingin                         // (c) 2000 WMS - Swingin In The Green (Russian)
+wdun                            // (c) 1999 WMS - Who Dunnit (Russian)
+winbid                          // (c) 2000 WMS - Winning Bid (English)
+winbidr                         // (c) 1999 WMS - Winning Bid (Russian)
+wldstrek                        // (c) 2000 WMS - Wild Streak (Russian)
+wms                             // Clear/Set Chip
+wmsa                            // Clear/Set Chip
+wmsb                            // Clear/Set Chip
+wmsboom                         // (c) 1998 WMS - Boom (Russian)
+wmstopb                         // (c) 1999 WMS - Top Banana (Russian)
+yukongld                        // (c) 2000 WMS - Yukon Gold (Russian)
 
 @source:wolfpack.cpp
 wolfpack                        // ?????? prototype         [6502]
