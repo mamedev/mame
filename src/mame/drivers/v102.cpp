@@ -43,13 +43,14 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( io_map, AS_IO, 8, v102_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	//AM_RANGE(0x00, 0x1f) AM_DEVWRITE("vpac", crt9007_device, write)
+	//AM_RANGE(0x00, 0x3f) AM_DEVREADWRITE("vpac", crt9007_device, read, write)
 	AM_RANGE(0x18, 0x19) AM_WRITENOP
 	AM_RANGE(0x40, 0x43) AM_DEVREADWRITE("mpsc", upd7201_new_device, ba_cd_r, ba_cd_w)
 	AM_RANGE(0x60, 0x60) AM_DEVREADWRITE("usart", i8251_device, data_r, data_w)
 	AM_RANGE(0x61, 0x61) AM_DEVREADWRITE("usart", i8251_device, status_r, control_w)
 	AM_RANGE(0x80, 0x83) AM_DEVWRITE("pit", pit8253_device, write)
 	AM_RANGE(0xa0, 0xa3) AM_DEVREADWRITE("ppi", i8255_device, read, write)
+	//AM_RANGE(0xbf, 0xbf) ???
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( kbd_map, AS_PROGRAM, 8, v102_state )
