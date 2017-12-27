@@ -323,6 +323,19 @@
 		</part>
 	</software>
 
+	<!-- Windows 95 -->
+	<!-- Cannot be installed on non-Japanese OS -->
+	<software name="kotobuki" supported="partial">
+		<description>Kotobuki (Japan)</description>
+		<year>1997</year>
+		<publisher>C's Ware</publisher>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="kotobuki" sha1="9bae69ba85d54d98d2a1b3cf256a0b4d2a35d00d" />
+			</diskarea>
+		</part>
+	</software>
+	
 	<!-- Untouched image from original CD created with an ASUS DRW-1814BLT (EAC drive sample read offset reported as +6)
 	   If you subtract 0x18 (4 * 6) bytes from a .wav extracted from this CHD the audio matches a rip done with EAC (verified) -->
 	<software name="krondor">
@@ -348,6 +361,18 @@
 		</part>
 	</software>
 	
+	<!-- Windows 95 -->
+	<software name="ku2impact">
+		<description>KU2 Impact (Japan)</description>
+		<year>1995</year>
+		<publisher>Panther Software</publisher>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="ku2impact" sha1="f7470a5ea219ad410bea1475953c550827381a98" />
+			</diskarea>
+		</part>
+	</software>
+
 	<software name="moon" supported="no">
 		<description>Moon (Japan)</description>
 		<year>1998</year>
@@ -483,6 +508,26 @@
 		</part>
 	</software>
 
+	<!-- DOS / Windows 95 -->
+	<!-- TODO: no sound in DOS installer with SB16 --> 
+	<!-- TODO: eventually black screen when launching game in either OSes -->
+	<software name="redalert" supported="no">
+		<description>Command &amp; Conquer - Red Alert</description>
+		<year>1996</year>
+		<publisher>Virgin / Westwood Studios</publisher>
+		
+		<part name="cdrom1" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="redalert_1" sha1="30e980766b5de27296c4f49cd41a7baec50736c4" />
+			</diskarea>
+		</part>
+		<part name="cdrom2" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="redalert_2" sha1="1e51fd94731a631903603207bae5d4313757fb92" />
+			</diskarea>
+		</part>
+	</software>
+	
 	<software name="rise2dc" supported="partial">
 		<description>Rise 2 Resurrection - Director's Cut</description>
 		<year>1995</year>
@@ -598,6 +643,19 @@
 		</part>
 	</software>
 
+	<software name="stg" supported="partial">
+		<description>S.T.G.</description>
+		<year>1999</year>
+		<publisher>GameLand  / DaiCom Software</publisher>
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="stg" sha1="553a04c67860c49d2c5fa1da983c4bc3ab5267fd" />
+			</diskarea>
+		</part>
+	</software>
+
+	
 	<software name="turricn2">
 		<description>Turrican II - The Final Fight</description>
 		<year>1996</year>
@@ -764,6 +822,19 @@
 			</diskarea>
 		</part>
 	</software>
+
+	<!-- DOS / Windows 3.1 / 95 -->
+	<software name="sb16">
+		<description>Sound Blaster 16 CD driver</description>
+		<year>1996</year>
+		<publisher>Creative labs</publisher>
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="sb16" sha1="c87097c58d1c3fcea03e5e4b50d2cafdcb870f16" />
+			</diskarea>
+		</part>
+	</software>	
 
 	<software name="ultrasnd" supported="partial">
 		<!-- includes Gravis UltraSound (GUS) Installation - V4.11 -->
