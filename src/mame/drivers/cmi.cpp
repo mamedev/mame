@@ -122,7 +122,7 @@
 #include "speaker.h"
 
 
-#define Q209_CPU_CLOCK      4000000 // ?
+#define Q209_CPU_CLOCK      40210000 / 40 // divider not verified (very complex circuit)
 
 #define M6809_CLOCK             8000000 // wrong
 #define MASTER_OSCILLATOR       34291712
@@ -2738,13 +2738,13 @@ static SLOT_INTERFACE_START( cmi2x_floppies )
 SLOT_INTERFACE_END
 
 static MACHINE_CONFIG_START( cmi2x )
-	MCFG_CPU_ADD("maincpu1", M6809E, Q209_CPU_CLOCK)
+	MCFG_CPU_ADD("maincpu1", MC6809E, Q209_CPU_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(maincpu1_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", cmi_state, cmi_iix_vblank)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(cmi_state, cpu1_interrupt_callback)
 	MCFG_QUANTUM_PERFECT_CPU("maincpu1")
 
-	MCFG_CPU_ADD("maincpu2", M6809E, Q209_CPU_CLOCK)
+	MCFG_CPU_ADD("maincpu2", MC6809E, Q209_CPU_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(maincpu2_map)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(cmi_state, cpu2_interrupt_callback)
 	MCFG_QUANTUM_PERFECT_CPU("maincpu2")
