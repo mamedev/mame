@@ -3333,6 +3333,7 @@ files {
 
 createMESSProjects(_target, _subtarget, "visual")
 files {
+	MAME_DIR .. "src/mame/drivers/v100.cpp",
 	MAME_DIR .. "src/mame/drivers/v1050.cpp",
 	MAME_DIR .. "src/mame/includes/v1050.h",
 	MAME_DIR .. "src/mame/machine/v1050kb.cpp",

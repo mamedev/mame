@@ -36457,7 +36457,6 @@ tr175
 tv912c
 tv955
 tv965
-v100
 v102
 vt420
 
@@ -37428,6 +37427,9 @@ ut88mini                        //
 
 @source:uzebox.cpp
 uzebox                          //
+
+@source:v100.cpp
+v100                            //
 
 @source:v1050.cpp
 v1050                           //

@@ -252,27 +252,6 @@ COMP( 1989, tv965, 0, 0, terminals, terminals, terminals_state, 0, "TeleVideo", 
 
 /**************************************************************************************************************
 
-Visual 100. (VT-100 clone)
-Chips: D780C-1 (Z80), CRT5037, D8255AC-5, uPB8214C, COM8116T-020, D8251AC, ER1400, 8-sw dip
-Crystal: 47.736
-
-***************************************************************************************************************/
-
-ROM_START( v100 )
-	ROM_REGION(0x10000, "maincpu", 0)
-	ROM_LOAD( "262-047.u108",  0x0000, 0x1000, CRC(e82f708c) SHA1(20ed83a41fd0703d72a20e170af971181cfbd575) )
-	ROM_LOAD( "262-048.u110",  0x1000, 0x1000, CRC(830923d3) SHA1(108590234ff84b5856cc2784d738a2a625305953) )
-
-	ROM_REGION(0x0800, "chargen", 0)
-	ROM_LOAD( "241-001.u29",   0x0000, 0x0800, CRC(ef807141) SHA1(cbf3fed001811c5840b9a131d2d3133843cb3b6a) )
-ROM_END
-
-COMP( 1982, v100, 0, 0, terminals, terminals, terminals_state, 0, "Visual Technology", "Visual 100", MACHINE_IS_SKELETON )
-
-
-
-/**************************************************************************************************************
-
 Visual 102. (VT-102 clone plus graphics)
 Chips: D780C-1 (Z80), CRT9021B-018, COM8251A, D8255AC-5, 2x CRT9006-135, CRT9007, M5L8253P-5, X2804AP-35, D7201C
 Crystals: 18.575000
