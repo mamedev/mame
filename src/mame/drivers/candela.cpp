@@ -661,7 +661,7 @@ DEVICE_INPUT_DEFAULTS_END
 #define CAN09T_ACIA_CLOCK (CAN09T_BAUDGEN_CLOCK / 12)
 
 static MACHINE_CONFIG_START( can09t )
-	MCFG_CPU_ADD("maincpu", M6809, XTAL_4_9152MHz) // IPL crystal
+	MCFG_CPU_ADD("maincpu", MC6809, XTAL_4_9152MHz) // IPL crystal
 	MCFG_CPU_PROGRAM_MAP(can09t_map)
 
 	/* --PIA inits----------------------- */
@@ -705,7 +705,7 @@ MACHINE_CONFIG_END
 #define CAN09_X1_CLOCK XTAL_22_1184MHz        /* UKI 22118.40 Khz */
 #define CAN09_CPU_CLOCK (CAN09_X1_CLOCK / 16) /* ~1.38MHz Divider needs to be check but is the most likelly */
 static MACHINE_CONFIG_START( can09 )
-	MCFG_CPU_ADD("maincpu", M6809E, CAN09_CPU_CLOCK)
+	MCFG_CPU_ADD("maincpu", MC6809E, CAN09_CPU_CLOCK) // MC68A09EP
 	MCFG_CPU_PROGRAM_MAP(can09_map)
 
 	/* RAM banks */
