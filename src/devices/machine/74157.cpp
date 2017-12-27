@@ -148,14 +148,8 @@ WRITE8_MEMBER(ls157_device::interleave_w)
 
 void ls157_device::interleave_w(u8 data)
 {
-	m_b = ((data >> 4) & 8)
-		| ((data >> 3) & 4)
-		| ((data >> 2) & 2)
-		| ((data >> 1) & 1);
-	m_a = ((data >> 3) & 8)
-		| ((data >> 2) & 4)
-		| ((data >> 1) & 2)
-		| ((data >> 0) & 1);
+	m_b = bitswap<4>(data, 7, 5, 3, 1);
+	m_a = bitswap<4>(data, 6, 4, 2, 0);
 	update_output();
 }
 
