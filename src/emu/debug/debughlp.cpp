@@ -1598,59 +1598,104 @@ const char *debug_get_help(const char *tag)
 	return ambig_message;
 }
 
-void debug_format_chapter_html(std::string &chapter, const std::string &preopen, const std::string &preclose)
+bool debug_format_chapter_html(std::ofstream &file, s32 index)
 {
+	std::string &&chapter = static_help_list[index].help;
+	const std::string &&tag = static_help_list[index].tag;
+	const size_t length = chapter.length();
+	bool preopened = false;
+
 	/* substitute what html can't ignore */
 	strreplace(chapter, "<", "&lt;");
 
-	/* iterate through all lines */
-	for (size_t linebreak = 0; ; )
+	/* first chapter doesn't need to link to the top */
+	if (index > 0)
 	{
-		/* find line break */
-		linebreak = chapter.find_first_of('\n', linebreak);
+		util::stream_format(file,
+			"<a href=\"#Top\">Up</a>\n"
+			"<a name=\"%s\">"
+			"<h3>%s</h3>"
+			"</a>\n",
+			tag, tag);
 
-		/* check validity and advance */
-		if (linebreak >= chapter.length() || linebreak++ == std::string::npos)
-			break;
-
-		/* check if the new line starts with a space */
-		if (chapter[linebreak] != ' ')
-		{
-			/* close the tag and advance */
-			chapter.insert(linebreak, preclose);
-			linebreak += preclose.length();
-
-			/* find the end of the line */
-			linebreak = chapter.find_first_of('\n', linebreak);
-
-			/* check validity again */
-			if (linebreak >= chapter.length() || linebreak == std::string::npos)
-				break;
-
-			/* open a new tag at the line end and advance */
-			chapter.insert(linebreak, preopen);
-			linebreak += preopen.length();
-		}
+		if (!file)
+			return false;
 	}
+
+	for (size_t pos = 0, oldpos = 0; ; pos++)
+	{
+		/* handle this so we could close the tag */
+		if (pos >= length)
+		{
+			/* close the tag if we need */
+			if (preopened)
+				file << "</pre><br>\n";
+
+			return true;
+		}
+
+		/* update the backup */
+		oldpos = pos;
+
+		/* search for line end */
+		pos = chapter.find('\n', pos);
+		
+		/* increment pos and consume the next line */
+		std::string out = chapter.substr(oldpos, pos - oldpos);
+
+		/* look for code */
+		if (out[0] == ' ')
+		{
+			// nest this condition to avoid erroneous tag close
+			if (!preopened)
+			{
+				/* open the preformatted tag */
+				file << "<pre>\n";
+				preopened = true;
+			}
+		}
+		else if (preopened)
+		{
+			/* close the tag */
+			file << "</pre>\n";
+			preopened = false;
+		}
+
+		if (!file)
+			return false;
+
+		/* print the substring */
+		file << out + ((preopened || out == "") ? "\n" : "<br>\n");
+
+		if (!file)
+			return false;
+	}
+
+	return true;
 }
 
 bool debug_generate_html(const std::string &filename)
 {
-	const std::string preopen = "<pre>";
-	const std::string preclose = "</pre>";
 	std::set<std::string> tags;
-	std::string chapter;
 	std::ofstream file(filename);
+
 	if (!file)
 		return false;
 
-	/* fetch the first chapter and format it to html */
-	chapter = static_help_list[0].help;
-	debug_format_chapter_html(chapter, preopen, preclose);
+	/* print html header */
+	file << "<!DOCTYPE html>\n"
+		"<html>\n"
+		"<head>\n"
+		"<title>MAME Debugger Help</title>\n"
+		"</head>\n"
+		"<body>\n"
+		"<a name=\"Top\"></a>";
 
-	/* print the help header */
-	util::stream_format(file, "<a name=\"Top\"></a>%s<br>", chapter);
 	if (!file)
+		return false;
+
+	/* print the first chapter */
+	if (!debug_format_chapter_html(file, 0))
 		return false;
 
 	/* sort the tags */
@@ -1662,32 +1707,31 @@ bool debug_generate_html(const std::string &filename)
 	/* print the links to all chapters */
 	for (auto &tag : tags)
 	{
-		util::stream_format(file, "<a href=\"#%s\">%s</a><br>\n", tag, tag);
+		util::stream_format(file,
+			"<a href=\"#%s\">"
+			"%s"
+			"</a><br>\n",
+			tag, tag);
+
 		if (!file)
 			return false;
 	}
 	
 	/* empty line */
 	file << "<br>";
+
 	if (!file)
 		return false;
 
 	/* print chapters */
 	for (int i = 1; i < ARRAY_LENGTH(static_help_list); i++)
-	{
-		/* fetch every chapter and format to html */
-		chapter = static_help_list[i].help; 
-		debug_format_chapter_html(chapter, preopen, preclose);
-
-		/* link to the top, anchorize the chapter header, open the tag, print the contents */
-		util::stream_format(file, "<a href=\"#Top\">Up</a> <a name=\"%s\"><h3>%s</h3></a>%s%s<br>",
-			static_help_list[i].tag, static_help_list[i].tag, preopen, chapter);
-		if (!file)
+		if (!debug_format_chapter_html(file, i))
 			return false;
-	}
 
-	/* close the tag */
-	file << preclose;
+	/* close the tags */
+	file << "</body>\n"
+		"</html>";
+
 	if (!file)
 		return false;
 
