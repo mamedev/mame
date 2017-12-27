@@ -2756,10 +2756,10 @@ static MACHINE_CONFIG_START( cmi2x )
 	MCFG_CPU_PROGRAM_MAP(alphakeys_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(cmi_state, irq0_line_hold, 9600) // TODO: PIA controls this
 
-	MCFG_CPU_ADD("smptemidi", M68000, 10000000)
+	MCFG_CPU_ADD("smptemidi", M68000, XTAL_20MHz / 2)
 	MCFG_CPU_PROGRAM_MAP(midicpu_map)
 
-	MCFG_CPU_ADD("cmi07cpu", M6809E, 4000000) // ?
+	MCFG_CPU_ADD("cmi07cpu", MC6809E, Q209_CPU_CLOCK) // ?
 	MCFG_CPU_PROGRAM_MAP(cmi07cpu_map)
 
 	/* alpha-numeric display */
