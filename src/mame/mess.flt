@@ -724,6 +724,7 @@ unixpc.cpp
 ut88.cpp
 uzebox.cpp
 v100.cpp
+v102.cpp
 v1050.cpp
 v6809.cpp
 vax11.cpp

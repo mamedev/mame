@@ -36457,7 +36457,6 @@ tr175
 tv912c
 tv955
 tv965
-v102
 vt420
 
 @source:terracre.cpp
@@ -37430,6 +37429,9 @@ uzebox                          //
 
 @source:v100.cpp
 v100                            //
+
+@source:v102.cpp
+v102                            //
 
 @source:v1050.cpp
 v1050                           //
