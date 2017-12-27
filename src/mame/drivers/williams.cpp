@@ -1459,7 +1459,7 @@ static MACHINE_CONFIG_START( williams )
 
 	MCFG_MACHINE_START_OVERRIDE(williams_state,williams)
 	MCFG_MACHINE_RESET_OVERRIDE(williams_state,williams)
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	MCFG_NVRAM_ADD_0FILL("nvram") // 5101 (Defender), 5114 or 6514 (later games) + battery
 
 	MCFG_TIMER_DRIVER_ADD("scan_timer", williams_state, williams_va11_callback)
 	MCFG_TIMER_DRIVER_ADD("240_timer", williams_state, williams_count240_callback)
@@ -1711,7 +1711,7 @@ static MACHINE_CONFIG_START( williams2 )
 
 	MCFG_MACHINE_START_OVERRIDE(williams2_state,williams2)
 	MCFG_MACHINE_RESET_OVERRIDE(williams2_state,williams2)
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	MCFG_NVRAM_ADD_0FILL("nvram") // 5114 + battery
 
 	MCFG_TIMER_DRIVER_ADD("scan_timer", williams2_state, williams2_va11_callback)
 	MCFG_TIMER_DRIVER_ADD("254_timer", williams2_state, williams2_endscreen_callback)
