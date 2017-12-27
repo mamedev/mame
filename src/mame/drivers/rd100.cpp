@@ -6,9 +6,14 @@
 
     2015-10-02 Skeleton [Robbbert]
 
-    Nothing is known about this system, except that it uses a 6809 CPU.
-    No manuals, schematic or circuit description have been found. It was
-    apparently sold in France under the "Superkit" brand.
+    Little is known about this system except for a few PCB pictures. No
+    manuals, schematic or circuit description have been found.
+
+    The RD100 was apparently sold in France under the "Superkit" brand. There
+    appear to have been several versions, the earliest having 7-segment LEDs
+    and rudimentary keyboards. The model dumped here is apparently the K32K,
+    which had a 16x2 character LCD display, a QWERTY keyboard and non-numeric
+    keypad, Centronics and RS-232 ports, and an extension board for prototyping.
 
 *********************************************************************************/
 
