@@ -320,19 +320,19 @@ ROM_START( trbwtchs )
 ROM_END
 
 
-GAME( 2004, chaosbrk,  0,    taito_type_x, taito_type_x, driver_device,  0, ROT0, "Taito Corporation", "Chaos Breaker (v2.02J)",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 2004, gwinggen,  0,    taito_type_x, taito_type_x, driver_device,  0, ROT0, "Takumi Corporation", "Giga Wing Generations (v2.02J)",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 2005, homura,    0,    taito_type_x, taito_type_x, driver_device,  0, ROT0, "SKonec Entertainment", "Homura (v2.04J)",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 2005, hotgmkmp,  0,    taito_type_x, taito_type_x, driver_device,  0, ROT0, "XNauts", "Taisen Hot Gimmick Mix Party",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 2005, raiden3,   0,    taito_type_x, taito_type_x, driver_device,  0, ROT0, "MOSS / Seibu Kaihatsu", "Raiden III (v2.01J)",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 2005, spicaadv,  0,    taito_type_x, taito_type_x, driver_device,  0, ROT0, "Taito Corporation", "Spica Adventure (v2.03J)",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 2005, usagiol,   0,    taito_type_x, taito_type_x, driver_device,  0, ROT0, "Taito Corporation/Warashi", "Usagi Online (v2.04J)",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 2006, shikiga3,  0,    taito_type_x, taito_type_x, driver_device,  0, ROT0, "Alfa System/SKonec Entertainment", "Shikigami no Shiro III (v2.06J)",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 2007, raiden4,   0,    taito_type_x, taito_type_x, driver_device,  0, ROT0, "MOSS / Seibu Kaihatsu", "Raiden IV (v1.00J)",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 2008, kof98um,   0,    taito_type_x, taito_type_x, driver_device,  0, ROT0, "SNK", "The King of Fighters '98: Ultimate Match (v1.00)",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 2008, trbwtchs,  0,    taito_type_x, taito_type_x, driver_device,  0, ROT0, "Adventure Planning Service/Studio SiestA", "Trouble Witches AC (v1.00J)",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 2009, goketsuj,  0,    taito_type_x, taito_type_x, driver_device,  0, ROT0, "Atlus", "Goketsuji Ichizoku: Matsuri Senzo Kuyou (v200906230)",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 2010, kofskyst,  0,    taito_type_x, taito_type_x, driver_device,  0, ROT0, "Moss / SNK Playmore", "KOF Sky Stage (v1.00J)",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 2004, chaosbrk,  0,    taito_type_x, taito_type_x, taito_type_x_state,  0, ROT0, "Taito Corporation", "Chaos Breaker (v2.02J)",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 2004, gwinggen,  0,    taito_type_x, taito_type_x, taito_type_x_state,  0, ROT0, "Takumi Corporation", "Giga Wing Generations (v2.02J)",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 2005, homura,    0,    taito_type_x, taito_type_x, taito_type_x_state,  0, ROT0, "SKonec Entertainment", "Homura (v2.04J)",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 2005, hotgmkmp,  0,    taito_type_x, taito_type_x, taito_type_x_state,  0, ROT0, "XNauts", "Taisen Hot Gimmick Mix Party",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 2005, raiden3,   0,    taito_type_x, taito_type_x, taito_type_x_state,  0, ROT0, "MOSS / Seibu Kaihatsu", "Raiden III (v2.01J)",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 2005, spicaadv,  0,    taito_type_x, taito_type_x, taito_type_x_state,  0, ROT0, "Taito Corporation", "Spica Adventure (v2.03J)",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 2005, usagiol,   0,    taito_type_x, taito_type_x, taito_type_x_state,  0, ROT0, "Taito Corporation/Warashi", "Usagi Online (v2.04J)",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 2006, shikiga3,  0,    taito_type_x, taito_type_x, taito_type_x_state,  0, ROT0, "Alfa System/SKonec Entertainment", "Shikigami no Shiro III (v2.06J)",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 2007, raiden4,   0,    taito_type_x, taito_type_x, taito_type_x_state,  0, ROT0, "MOSS / Seibu Kaihatsu", "Raiden IV (v1.00J)",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 2008, kof98um,   0,    taito_type_x, taito_type_x, taito_type_x_state,  0, ROT0, "SNK", "The King of Fighters '98: Ultimate Match (v1.00)",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 2008, trbwtchs,  0,    taito_type_x, taito_type_x, taito_type_x_state,  0, ROT0, "Adventure Planning Service/Studio SiestA", "Trouble Witches AC (v1.00J)",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 2009, goketsuj,  0,    taito_type_x, taito_type_x, taito_type_x_state,  0, ROT0, "Atlus", "Goketsuji Ichizoku: Matsuri Senzo Kuyou (v200906230)",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 2010, kofskyst,  0,    taito_type_x, taito_type_x, taito_type_x_state,  0, ROT0, "Moss / SNK Playmore", "KOF Sky Stage (v1.00J)",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 
 
 // Type X+
@@ -353,7 +353,7 @@ ROM_START( wontmuch )
 ROM_END
 
 
-GAME( 2006, wontmuch,   0,    taito_type_x, taito_type_x, driver_device,  0, ROT0, "Capcom", "Won!Tertainment Music Channel (v1.00)",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 2006, wontmuch,   0,    taito_type_x, taito_type_x, taito_type_x_state,  0, ROT0, "Capcom", "Won!Tertainment Music Channel (v1.00)",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 
 
 // Type X2
