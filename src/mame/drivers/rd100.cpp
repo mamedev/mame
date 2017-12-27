@@ -10,7 +10,7 @@
     manuals, schematic or circuit description have been found.
 
     The RD100 was apparently sold in France under the "Superkit" brand. There
-    appear to have been several versions, the earliest having 7-segment LEDs
+    appear to have been several versions. Earlier models had 7-segment LEDs
     and rudimentary keyboards. The model dumped here is apparently the K32K,
     which had a 16x2 character LCD display, a QWERTY keyboard and non-numeric
     keypad, Centronics and RS-232 ports, and an extension board for prototyping.
