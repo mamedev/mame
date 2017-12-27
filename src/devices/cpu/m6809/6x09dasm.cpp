@@ -564,7 +564,7 @@ const m6x09_base_disassembler::opcodeinfo m6x09_disassembler::m6x09_opcodes[] =
 	{ 0x103A, 2, "PSHUW", INH,  HD6309_EXCLUSIVE },
 	{ 0x103B, 2, "PULUW", INH,  HD6309_EXCLUSIVE },
 
-	{ 0x103F, 2, "SWI2",  INH,  HD6309_EXCLUSIVE },
+	{ 0x103F, 2, "SWI2",  INH,  M6x09_GENERAL },
 
 	{ 0x1040, 2, "NEGD",  INH,  HD6309_EXCLUSIVE },
 	{ 0x1043, 2, "COMD",  INH,  HD6309_EXCLUSIVE },
