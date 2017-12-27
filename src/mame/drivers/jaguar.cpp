@@ -2134,7 +2134,7 @@ ROM_END
 
 ****************************************/
 
-ROM_START( area51t ) /* 68020 based, Area51 Time Warner License  Date: Oct 17, 1996 */
+ROM_START( area51t ) /* 68020 based, Area51 Time Warner License - MAIN: Oct 17 1996 17:15:41 / OS: 2.03CJ Oct 17 1996 17:15:01 */
 	ROM_REGION( 0x200000, "maincpu", 0 )    /* 2MB for 68020 code */
 	ROM_LOAD32_BYTE( "136105-0003-q_h.3h", 0x00000, 0x80000, CRC(0681f398) SHA1(9e96db5a4ff90800685a5b95f8d758d211d3b982) ) /* Also found labeled as AREA51, 68K, D2FF, 3H, 11/20/96 (each item on a seperate line) */
 	ROM_LOAD32_BYTE( "136105-0002-q_p.3p", 0x00001, 0x80000, CRC(f76cfc68) SHA1(01a781b42b61279e09e0cb1d924e2a3e0df44591) ) /* Also found labeled as AREA51, 68K, 69FE, 3P, 11/20/96 (each item on a seperate line) */
@@ -2148,7 +2148,7 @@ ROM_START( area51t ) /* 68020 based, Area51 Time Warner License  Date: Oct 17, 1
 	DISK_IMAGE( "area51t", 0, SHA1(d2865cc7b1bb08a4393a72013a90e18d8a8f9860) )
 ROM_END
 
-ROM_START( area51ta ) /* 68020 based, Area51 Time Warner License  Date: Nov 15, 1995 */
+ROM_START( area51ta ) /* 68020 based, Area51 Time Warner License - MAIN: Nov 27 1995 15:51:56 / OS 2.03CJ Nov 15 1995 13:32:32 */
 	ROM_REGION( 0x200000, "maincpu", 0 )    /* 2MB for 68020 code */
 	ROM_LOAD32_BYTE( "136105-0003c.3h", 0x00000, 0x80000, CRC(e70a97c4) SHA1(39dabf6bf3dc6f717a587f362d040bfb332be9e1) ) /* Usually found with "orange" labels */
 	ROM_LOAD32_BYTE( "136105-0002c.3p", 0x00001, 0x80000, CRC(e9c9f4bd) SHA1(7c6c50372d45dca8929767241b092339f3bab4d2) )
@@ -2162,7 +2162,7 @@ ROM_START( area51ta ) /* 68020 based, Area51 Time Warner License  Date: Nov 15, 
 	DISK_IMAGE( "area51t", 0, SHA1(d2865cc7b1bb08a4393a72013a90e18d8a8f9860) )
 ROM_END
 
-ROM_START( area51a ) /* 68020 based, Area51 Atari Games License  Date: Oct 25, 1995 */
+ROM_START( area51a ) /* 68020 based, Area51 Atari Games License - MAIN: Oct 25 1995 11:08:10 / OS: 2.03CJ Oct 25 1995 10:19:38 */
 	ROM_REGION( 0x200000, "maincpu", 0 )    /* 2MB for 68020 code */
 	ROM_LOAD32_BYTE( "136105-0003a.3h", 0x00000, 0x80000, CRC(116d37e6) SHA1(5d36cae792dd349faa77cd2d8018722a28ee55c1) ) /* Usually found with "green" labels */
 	ROM_LOAD32_BYTE( "136105-0002a.3p", 0x00001, 0x80000, CRC(eb10f539) SHA1(dadc4be5a442dd4bd17385033056555e528ed994) )
@@ -2176,12 +2176,12 @@ ROM_START( area51a ) /* 68020 based, Area51 Atari Games License  Date: Oct 25, 1
 	DISK_IMAGE( "area51", 0, SHA1(3b303bc37e206a6d7339352c869f050d04186f11) )
 ROM_END
 
-ROM_START( area51 ) /* R3000 based, labeled as "Area51 2-C"  Date: Nov 11 1996 */
+ROM_START( area51 ) /* R3000 based, Area51 Atari Games License - MAIN: Oct 24 1996 12:02:23 / GUTS: 2.06CJ Nov 11 1996 11:46:43 */
 	ROM_REGION( 0x200000, "maincpu", 0 )    /* 2MB for IDT 79R3041 code */
-	ROM_LOAD32_BYTE( "a51_2-c.hh", 0x00000, 0x80000, CRC(13af6a1e) SHA1(69da54ed6886e825156bbcc256e8d7abd4dc1ff8) ) /* Usually found with "green" labels */
-	ROM_LOAD32_BYTE( "a51_2-c.hl", 0x00001, 0x80000, CRC(8ab6649b) SHA1(9b4945bc04f8a73161638a2c5fa2fd84c6fd31b4) )
-	ROM_LOAD32_BYTE( "a51_2-c.lh", 0x00002, 0x80000, CRC(a6524f73) SHA1(ae377a6803a4f7d1bbcc111725af121a3e82317d) )
-	ROM_LOAD32_BYTE( "a51_2-c.ll", 0x00003, 0x80000, CRC(471b15d2) SHA1(4b5f45ee140b03a6be61475cae1c2dbef0f07457) )
+	ROM_LOAD32_BYTE( "2-c_area_51_hh.hh", 0x00000, 0x80000, CRC(13af6a1e) SHA1(69da54ed6886e825156bbcc256e8d7abd4dc1ff8) ) /* Grean labels: 2-C AREA 51 HH */
+	ROM_LOAD32_BYTE( "2-c_area_51_hl.hl", 0x00001, 0x80000, CRC(8ab6649b) SHA1(9b4945bc04f8a73161638a2c5fa2fd84c6fd31b4) ) /* Grean labels: 2-C AREA 51 HL */
+	ROM_LOAD32_BYTE( "2-c_area_51_lh.lh", 0x00002, 0x80000, CRC(a6524f73) SHA1(ae377a6803a4f7d1bbcc111725af121a3e82317d) ) /* Grean labels: 2-C AREA 51 LH */
+	ROM_LOAD32_BYTE( "2-c_area_51_ll.ll", 0x00003, 0x80000, CRC(471b15d2) SHA1(4b5f45ee140b03a6be61475cae1c2dbef0f07457) ) /* Grean labels: 2-C AREA 51 LL */
 
 	ROM_REGION16_BE( 0x1000, "waverom", 0 )
 	ROM_LOAD16_WORD("jagwave.rom", 0x0000, 0x1000, CRC(7a25ee5b) SHA1(58117e11fd6478c521fbd3fdbe157f39567552f0) )
@@ -2238,7 +2238,7 @@ ROM_START( maxf_ng ) /* R3000 based - MAIN: Apr 18 1997 11:08:45 */
 ROM_END
 
 
-ROM_START( area51mx )   /* 68020 based - MAIN: Apr 22 1998 17:53:57 */
+ROM_START( area51mx )   /* 68020 based - MAIN: Apr 22 1998 17:53:57 / GUTS: 2.04CJ Apr 22 1998 17:45:35 */
 	ROM_REGION( 0x200000, "maincpu", 0 ) /* 2MB for 68020 code */
 	ROM_LOAD32_BYTE( "2.0_68020_max-a51_kit_3h.3h", 0x00000, 0x80000, CRC(47cbf30b) SHA1(23377bcc65c0fc330d5bc7e76e233bae043ac364) ) /* Labeled as 2.0 68020 MAX/A51 KIT 3H */
 	ROM_LOAD32_BYTE( "2.0_68020_max-a51_kit_3p.3p", 0x00001, 0x80000, CRC(a3c93684) SHA1(f6b3357bb69900a176fd6bc6b819b2f57b7d0f59) ) /* Labeled as 2.0 68020 MAX/A51 KIT 3P */
@@ -2253,7 +2253,7 @@ ROM_START( area51mx )   /* 68020 based - MAIN: Apr 22 1998 17:53:57 */
 ROM_END
 
 
-ROM_START( a51mxr3k ) /* R3000 based - MAIN: Feb 10 1998 11:52:51 */
+ROM_START( a51mxr3k ) /* R3000 based - MAIN: Feb 10 1998 11:52:51 / GUTS: 2.07CJ Feb  5 1998 18:52:26 */
 	ROM_REGION( 0x200000, "maincpu", 0 )    /* 2MB for IDT 79R3041 code */
 	ROM_LOAD32_BYTE( "1.0_r3k_max-a51_kit_hh.hh", 0x00000, 0x80000, CRC(a984dab2) SHA1(debb3bc11ff49e87a52e89a69533a1bab7db700e) ) /* Labeled as 1.0 R3K MAX/A51 KIT HH */
 	ROM_LOAD32_BYTE( "1.0_r3k_max-a51_kit_hl.hl", 0x00001, 0x80000, CRC(0af49d74) SHA1(c19f26056a823fd32293e9a7b3ea868640eabf49) ) /* Labeled as 1.0 R3K MAX/A51 KIT HL */
@@ -2268,7 +2268,7 @@ ROM_START( a51mxr3k ) /* R3000 based - MAIN: Feb 10 1998 11:52:51 */
 ROM_END
 
 
-ROM_START( a51mxr3ka ) /* R3000 based - MAIN: Feb  2 1998 14:10:29 */
+ROM_START( a51mxr3ka ) /* R3000 based - MAIN: Feb  2 1998 14:10:29 / GUTS: 2.07CJ Jan  9 1998 21:11:55 */
 	ROM_REGION( 0x200000, "maincpu", 0 )    /* 2MB for IDT 79R3041 code */
 	ROM_LOAD32_BYTE( "maxa51_combo_r3k_hh_prog_2-02-98_67ff.hh", 0x00000, 0x80000, CRC(6af8950a) SHA1(33ae123065b14ed8d83635f3351ac5b5c136d206) ) /* Labeled as MAXA51  COMBO  R3K  HH  PROG  2/02/98  67FF (each item on a seperate line) */
 	ROM_LOAD32_BYTE( "maxa51_combo_r3k_hl_prog_2-02-98_72fe.hl", 0x00001, 0x80000, CRC(30dc3eea) SHA1(2b4e8d43ee28b2d1446c84ff79553a7ce1909f60) ) /* Labeled as MAXA51  COMBO  R3K  HL  PROG  2/02/98  72FE (each item on a seperate line) */
@@ -2711,7 +2711,7 @@ CONS( 1995,  jaguarcd, jaguar,   0,      jaguarcd, jaguar,   jaguar_state, jagua
 /*    YEAR   NAME      PARENT    MACHINE        INPUT                   INIT             COMPANY        FULLNAME */
 GAME( 1996, area51,    0,        cojagr3k,      area51,   jaguar_state, area51,    ROT0, "Atari Games", "Area 51 (R3000)", 0 )
 GAME( 1995, area51t,   area51,   cojag68k,      area51,   jaguar_state, area51a,   ROT0, "Atari Games (Time Warner license)", "Area 51 (Time Warner license, Oct 17, 1996)", 0 )
-GAME( 1995, area51ta,  area51,   cojag68k,      area51,   jaguar_state, area51a,   ROT0, "Atari Games (Time Warner license)", "Area 51 (Time Warner license, Nov 15, 1995)", 0 )
+GAME( 1995, area51ta,  area51,   cojag68k,      area51,   jaguar_state, area51a,   ROT0, "Atari Games (Time Warner license)", "Area 51 (Time Warner license, Nov 27, 1995)", 0 )
 GAME( 1995, area51a,   area51,   cojag68k,      area51,   jaguar_state, area51a,   ROT0, "Atari Games", "Area 51 (Atari Games license, Oct 25, 1995)", 0 )
 GAME( 1995, fishfren,  0,        cojagr3k_rom,  fishfren, jaguar_state, fishfren,  ROT0, "Time Warner Interactive", "Fishin' Frenzy (prototype)", 0 )
 GAME( 1996, freezeat,  0,        cojagr3k_rom,  freezeat, jaguar_state, freezeat,  ROT0, "Atari Games", "Freeze (Atari) (prototype, English voice, 96/10/25)", 0 )
