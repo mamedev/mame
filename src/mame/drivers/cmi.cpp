@@ -559,12 +559,12 @@ public:
 
 protected:
 
-	required_device<m6809e_device> m_maincpu1;
-	required_device<m6809e_device> m_maincpu2;
+	required_device<mc6809e_device> m_maincpu1;
+	required_device<mc6809e_device> m_maincpu2;
 	required_device<m6802_cpu_device> m_muskeyscpu;
 	required_device<m6802_cpu_device> m_alphakeyscpu;
 	required_device<m68000_device> m_midicpu;
-	required_device<m6809e_device> m_cmi07cpu;
+	required_device<mc6809e_device> m_cmi07cpu;
 
 	required_device<msm5832_device> m_msm5832;
 	required_device<i8214_device> m_i8214_0;
