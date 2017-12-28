@@ -29,7 +29,7 @@ public:
 
 	// devices
 	required_device<cpu_device> m_maincpu;
-	optional_ioport_array<7> m_inp_matrix; // max 7
+	optional_ioport_array<8> m_inp_matrix; // max 8
 	output_finder<16, 16, 4> m_out_x;
 	optional_device<speaker_sound_device> m_speaker;
 
