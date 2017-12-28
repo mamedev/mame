@@ -11,78 +11,30 @@
 #include "sound/c140.h"
 #include "screen.h"
 
-enum
-{
-	NAMCO_CGANGPZL,
-	NAMCO_EMERALDA,
-	NAMCO_KNCKHEAD,
-	NAMCO_BKRTMAQ,
-	NAMCO_EXBANIA,
-	NAMCO_QUIZTOU,
-	NAMCO_SWCOURT,
-	NAMCO_TINKLPIT,
-	NAMCO_NUMANATH,
-	NAMCO_FA,
-	NAMCO_XDAY2
-};
-
 
 class namcona1_state : public driver_device
 {
 public:
 	namcona1_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_maincpu(*this,"maincpu"),
-		m_mcu(*this,"mcu"),
+		m_maincpu(*this, "maincpu"),
+		m_mcu(*this, "mcu"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
 		m_c140(*this, "c140"),
 		m_muxed_inputs(*this, { { "P4", "DSW", "P1", "P2" } }),
 		m_io_p3(*this, "P3"),
-		m_workram(*this,"workram"),
-		m_vreg(*this,"vreg"),
+		m_workram(*this, "workram"),
+		m_vreg(*this, "vreg"),
 		m_paletteram(*this, "paletteram"),
 		m_cgram(*this, "cgram"),
-		m_videoram(*this,"videoram"),
-		m_scroll(*this,"scroll"),
-		m_spriteram(*this,"spriteram")
+		m_videoram(*this, "videoram"),
+		m_scroll(*this, "scroll"),
+		m_spriteram(*this, "spriteram"),
+		m_prgrom(*this, "maincpu"),
+		m_maskrom(*this, "maskrom")
 	{ }
-
-	required_device<cpu_device> m_maincpu;
-	required_device<cpu_device> m_mcu;
-	required_device<gfxdecode_device> m_gfxdecode;
-	required_device<screen_device> m_screen;
-	required_device<palette_device> m_palette;
-	required_device<c140_device> m_c140;
-
-	required_ioport_array<4> m_muxed_inputs;
-	required_ioport          m_io_p3;
-
-	required_shared_ptr<uint16_t> m_workram;
-	required_shared_ptr<uint16_t> m_vreg;
-	required_shared_ptr<uint16_t> m_paletteram;
-	required_shared_ptr<uint16_t> m_cgram;
-	required_shared_ptr<uint16_t> m_videoram;
-	required_shared_ptr<uint16_t> m_scroll;
-	required_shared_ptr<uint16_t> m_spriteram;
-
-	// this has to be uint8_t to be in the right byte order for the tilemap system
-	std::vector<uint8_t> m_shaperam;
-
-	uint16_t *m_prgrom;
-	uint16_t *m_maskrom;
-	int m_mEnableInterrupts;
-	int m_gametype;
-	uint16_t m_count;
-	uint32_t m_keyval;
-	uint16_t m_mcu_mailbox[8];
-	uint8_t m_mcu_port4;
-	uint8_t m_mcu_port5;
-	uint8_t m_mcu_port6;
-	uint8_t m_mcu_port8;
-	tilemap_t *m_bg_tilemap[4+1];
-	int m_palette_is_dirty;
 
 	DECLARE_READ16_MEMBER(custom_key_r);
 	DECLARE_WRITE16_MEMBER(custom_key_w);
@@ -103,19 +55,10 @@ public:
 	DECLARE_READ8_MEMBER(port8_r);
 	DECLARE_WRITE8_MEMBER(port8_w);
 	DECLARE_READ8_MEMBER(portana_r);
-	void simulate_mcu();
-	void write_version_info();
-	int transfer_dword(uint32_t dest, uint32_t source);
-	void blit();
-	void UpdatePalette(int offset);
 	DECLARE_WRITE16_MEMBER(videoram_w);
 	DECLARE_WRITE16_MEMBER(paletteram_w);
 	DECLARE_READ16_MEMBER(gfxram_r);
 	DECLARE_WRITE16_MEMBER(gfxram_w);
-	void pdraw_tile( screen_device &screen, bitmap_ind16 &dest_bmp, const rectangle &clip, uint32_t code, int color,
-		int sx, int sy, int flipx, int flipy, int priority, int bShadow, int bOpaque, int gfx_region );
-	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void draw_background(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int which, int primask );
 	DECLARE_READ16_MEMBER(snd_r);
 	DECLARE_WRITE16_MEMBER(snd_w);
 
@@ -131,21 +74,86 @@ public:
 	DECLARE_DRIVER_INIT(xday2);
 	DECLARE_DRIVER_INIT(exbania);
 	DECLARE_DRIVER_INIT(emeraldj);
+	DECLARE_DRIVER_INIT(swcourtb);
+
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+	TIMER_DEVICE_CALLBACK_MEMBER(interrupt);
+
+protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 
+private:
+	enum
+	{
+		NAMCO_CGANGPZL,
+		NAMCO_EMERALDA,
+		NAMCO_KNCKHEAD,
+		NAMCO_BKRTMAQ,
+		NAMCO_EXBANIA,
+		NAMCO_QUIZTOU,
+		NAMCO_SWCOURT,
+		NAMCO_TINKLPIT,
+		NAMCO_NUMANATH,
+		NAMCO_FA,
+		NAMCO_XDAY2,
+		NAMCO_SWCOURTB
+	};
+
+	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_mcu;
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<screen_device> m_screen;
+	required_device<palette_device> m_palette;
+	required_device<c140_device> m_c140;
+
+	required_ioport_array<4> m_muxed_inputs;
+	required_ioport          m_io_p3;
+
+	required_shared_ptr<uint16_t> m_workram;
+	required_shared_ptr<uint16_t> m_vreg;
+	required_shared_ptr<uint16_t> m_paletteram;
+	required_shared_ptr<uint16_t> m_cgram;
+	required_shared_ptr<uint16_t> m_videoram;
+	required_shared_ptr<uint16_t> m_scroll;
+	required_shared_ptr<uint16_t> m_spriteram;
+
+	required_region_ptr<uint16_t> m_prgrom;
+	required_region_ptr<uint16_t> m_maskrom;
+
+	// this has to be uint8_t to be in the right byte order for the tilemap system
+	std::vector<uint8_t> m_shaperam;
+
+	int m_mEnableInterrupts;
+	int m_gametype;
+	uint16_t m_count;
+	uint32_t m_keyval;
+	uint16_t m_mcu_mailbox[8];
+	uint8_t m_mcu_port4;
+	uint8_t m_mcu_port5;
+	uint8_t m_mcu_port6;
+	uint8_t m_mcu_port8;
+	tilemap_t *m_bg_tilemap[4+1];
+	int m_palette_is_dirty;
+
+	void simulate_mcu();
+	void write_version_info();
+	int transfer_dword(uint32_t dest, uint32_t source);
+
+	void blit();
+	void UpdatePalette(int offset);
+	void pdraw_tile( screen_device &screen, bitmap_ind16 &dest_bmp, const rectangle &clip, uint32_t code, int color,
+		int sx, int sy, int flipx, int flipy, int priority, int bShadow, int bOpaque, int gfx_region );
+	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void draw_background(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int which, int primask );
+	void tilemap_get_info(tile_data &tileinfo, int tile_index, const uint16_t *tilemap_videoram, bool use_4bpp_gfx);
 	TILE_GET_INFO_MEMBER(tilemap_get_info0);
 	TILE_GET_INFO_MEMBER(tilemap_get_info1);
 	TILE_GET_INFO_MEMBER(tilemap_get_info2);
 	TILE_GET_INFO_MEMBER(tilemap_get_info3);
 	TILE_GET_INFO_MEMBER(roz_get_info);
 
-	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-
-	TIMER_DEVICE_CALLBACK_MEMBER(interrupt);
 	void postload();
-
-private:
-	void tilemap_get_info(tile_data &tileinfo, int tile_index, const uint16_t *tilemap_videoram, bool use_4bpp_gfx);
 };
