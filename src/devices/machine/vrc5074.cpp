@@ -241,6 +241,7 @@ void vrc5074_device::device_start()
 	save_item(NAME(m_nile_irq_state));
 	save_item(NAME(m_sdram_addr));
 	save_item(NAME(m_uart_irq));
+	save_item(NAME(m_irq_pins));
 	save_item(NAME(m_timer_period));
 	machine().save().register_postload(save_prepost_delegate(FUNC(vrc5074_device::postload), this));
 }
@@ -262,6 +263,7 @@ void vrc5074_device::device_reset()
 	m_sdram_addr[0] = 0;
 	m_sdram_addr[1] = 0;
 	m_uart_irq = 0;
+	m_irq_pins = 0;
 }
 
 void vrc5074_device::map_cpu_space()
@@ -678,7 +680,7 @@ void vrc5074_device::update_nile_irqs()
 {
 	uint32_t intctll = m_cpu_regs[NREG_INTCTRL + 0];
 	uint32_t intctlh = m_cpu_regs[NREG_INTCTRL + 1];
-	uint8_t irq[6];
+	uint8_t irq = 0;
 	int i;
 
 	/* check for UART transmit IRQ enable and synthsize one */
@@ -687,7 +689,6 @@ void vrc5074_device::update_nile_irqs()
 	else
 		m_nile_irq_state &= ~0x0010;
 
-	irq[0] = irq[1] = irq[2] = irq[3] = irq[4] = irq[5] = 0;
 	m_cpu_regs[NREG_INTSTAT0 + 0] = 0;
 	m_cpu_regs[NREG_INTSTAT0 + 1] = 0;
 	m_cpu_regs[NREG_INTSTAT1 + 0] = 0;
@@ -701,7 +702,7 @@ void vrc5074_device::update_nile_irqs()
 				int vector = (intctll >> (4 * i)) & 7;
 				if (vector < 6)
 				{
-					irq[vector] = 1;
+					irq |= 1 << vector;
 					m_cpu_regs[NREG_INTSTAT0 + vector / 2] |= 1 << (i + 16 * (vector & 1));
 				}
 			}
@@ -714,26 +715,30 @@ void vrc5074_device::update_nile_irqs()
 				int vector = (intctlh >> (4 * i)) & 7;
 				if (vector < 6)
 				{
-					irq[vector] = 1;
+					irq |= 1 << vector;
 					m_cpu_regs[NREG_INTSTAT0 + vector / 2] |= 1 << (i + 8 + 16 * (vector & 1));
 				}
 			}
 
 	/* push out the state */
+	uint8_t change = m_irq_pins ^ irq;
 	if (LOG_NILE_IRQS) logerror("NILE IRQs:");
 	for (i = 0; i < 6; i++)
 	{
-		if (irq[i])
-		{
-			if (LOG_NILE_IRQS) logerror(" 1");
-			m_cpu->set_input_line(MIPS3_IRQ0 + i, ASSERT_LINE);
-		}
-		else
-		{
-			if (LOG_NILE_IRQS) logerror(" 0");
-			m_cpu->set_input_line(MIPS3_IRQ0 + i, CLEAR_LINE);
+		if (change & (1 << i)) {
+			if (irq & (1 << i))
+			{
+				if (LOG_NILE_IRQS) logerror(" 1");
+				m_cpu->set_input_line(MIPS3_IRQ0 + i, ASSERT_LINE);
+			}
+			else
+			{
+				if (LOG_NILE_IRQS) logerror(" 0");
+				m_cpu->set_input_line(MIPS3_IRQ0 + i, CLEAR_LINE);
+			}
 		}
 	}
+	m_irq_pins = irq;
 	if (LOG_NILE_IRQS) logerror("\n");
 }
 
