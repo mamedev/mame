@@ -12,7 +12,7 @@
      IS61LV25616AL(SRAM)
      IGS037(GFX PROCESSOR)
      YMZ774-S(SOUND)
-     R5F21256SN(extra MCU for protection and ICcard communication)
+     R5F21256SN(extra MCU for ICcard communication)
       - Appears to be referred to by the games as MPU
 
     Cartridges
@@ -863,7 +863,7 @@ ROM_END
 
 ROM_START( kov3 )
 	ROM_REGION( 0x04000, "maincpu", 0 )
-	ROM_LOAD( "kov3_igs036.rom",         0x00000000, 0x0004000, NO_DUMP ) // CRC(c7d33764) SHA1(5cd48f876e637d60391d39ac6e40bf243300cc75)
+	ROM_LOAD( "kov3_igs036_china.rom", 0x00000000, 0x0004000, CRC(c7d33764) SHA1(5cd48f876e637d60391d39ac6e40bf243300cc75) )
 
 	ROM_REGION( 0x108, "default_card", 0 )
 	ROM_LOAD( "blank_kov3_china_card.pg2", 0x000, 0x108, CRC(bd5a968f) SHA1(b9045eb70e02afda7810431c592208053d863980) )
@@ -1139,22 +1139,10 @@ DRIVER_INIT_MEMBER(pgm2_state,ddpdojh)
 
 DRIVER_INIT_MEMBER(pgm2_state,kov3)
 {
-	uint16_t *src = (uint16_t *)memregion("sprites_mask")->base();
-
-	iga_u12_decode(src, 0x4000000, 0x956d);
-	iga_u16_decode(src, 0x4000000, 0x3d17);
-	m_sprite_predecrypted = 1;
-
-	src = (uint16_t *)memregion("sprites_colour")->base();
-	sprite_colour_decode(src, 0x8000000);
-
-	igs036_decryptor decrypter(kov3_key);
-	decrypter.decrypter_rom((uint16_t*)memregion("user1")->base(), memregion("user1")->bytes(), 0);
-	m_has_decrypted = 1;
-
-	m_encrypted_copy.resize(memregion("user1")->bytes());
-	memcpy(&m_encrypted_copy[0], memregion("user1")->base(), memregion("user1")->bytes());
-
+	common_encryption_init();
+	// patch FPGA check
+	uint32_t* rom = (uint32_t*)memregion("maincpu")->base();
+	rom[0x2a8c / 4] = 0xe320f000; // not endian safe ?
 }
 
 void pgm2_state::decrypt_kov3_module(uint32_t addrxor, uint16_t dataxor)
