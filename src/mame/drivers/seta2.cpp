@@ -28,16 +28,17 @@ Ordered by Board        Year    Game                                    By
 -------------------------------------------------------------------------------------------
 P-FG01-1                1995    Guardians / Denjin Makai II             Banpresto
 P0-113A                 1994    Mobile Suit Gundam EX Revue             Banpresto
+P0-121A ; 2MP1-E00 (Ss) 1996    TelePachi Fever Lion                    Sunsoft
 P0-123A                 1996    Wakakusamonogatari Mahjong Yonshimai    Maboroshi Ware
 P0-125A ; KE (Namco)    1996    Kosodate Quiz My Angel                  Namco
 P0-130B ; M-133 (Namco) 1997    Star Audition                           Namco
 P0-136A ; KL (Namco)    1997    Kosodate Quiz My Angel 2                Namco
 P-FG-02                 1997    Reel'N Quake                            <unknown>
-P-FG-03              <unknown>  Endless Riches                          E.N.Tiger
+P-FG-03                 ????    Endless Riches                          E.N.Tiger
 P0-140B                 2000    Funcube                                 Namco
 P0-140B                 2000    Namco Stars                             Namco
 P0-142A                 1999    Puzzle De Bowling                       MOSS / Nihon System
-P0-142A + extra parts   2000    Penguin Brothers                        Subsino
+P0-142A + extra parts   2000    Penguin Brothers / A-Blast              Subsino
 B0-003A (or B0-003B)    2000    Deer Hunting USA                        Sammy
 B0-003A (or B0-003B)    2001    Turkey Hunting USA                      Sammy
 B0-006B                 2001-2  Funcube 2 - 5                           Namco
@@ -79,7 +80,7 @@ grdians:
   ignore the individual color codes in the tiles data. Note: the frontmost frame
   has the shadow bit set, and has become invisible after implementing it.
 
-penbros:
+penbros/ablast:
 - Zooming is used briefly.
 
 deerhunt,wschamp:
@@ -374,35 +375,36 @@ ADDRESS_MAP_END
 ***************************************************************************/
 
 static ADDRESS_MAP_START( penbros_base_map, AS_PROGRAM, 16, seta2_state )
-	AM_RANGE(0x000000, 0x0fffff) AM_ROM                             // ROM
-	AM_RANGE(0x200000, 0x20ffff) AM_RAM                             // RAM
-	AM_RANGE(0x210000, 0x23ffff) AM_RAM                             // RAM
-	AM_RANGE(0x300000, 0x30ffff) AM_RAM                             // RAM
-	AM_RANGE(0x600000, 0x600001) AM_READ_PORT("P1")                 // P1
-	AM_RANGE(0x600002, 0x600003) AM_READ_PORT("P2")                 // P2
-	AM_RANGE(0x600004, 0x600005) AM_READ_PORT("SYSTEM")             // Coins
-	AM_RANGE(0x600004, 0x600005) AM_WRITE(pzlbowl_coin_counter_w)   // Coins Counter
+	AM_RANGE(0x000000, 0x0fffff) AM_ROM
+	AM_RANGE(0x200000, 0x20ffff) AM_RAM
+	AM_RANGE(0x210000, 0x21ffff) AM_RAM // zeroed at startup, then never written again on originals, used on the bootleg
+	AM_RANGE(0x220000, 0x22ffff) AM_RAM // zeroed at startup, then never written again
+	AM_RANGE(0x230000, 0x23ffff) AM_RAM // zeroed at startup, then never written again on originals, used on the bootleg
+	AM_RANGE(0x600000, 0x600001) AM_READ_PORT("P1")
+	AM_RANGE(0x600002, 0x600003) AM_READ_PORT("P2")
+	AM_RANGE(0x600004, 0x600005) AM_READ_PORT("SYSTEM")
+	AM_RANGE(0x600004, 0x600005) AM_WRITE(pzlbowl_coin_counter_w)
 	AM_RANGE(0x600006, 0x600007) AM_DEVREAD("watchdog", watchdog_timer_device, reset16_r)
-	//AM_RANGE(0x700000, 0x700001) AM_READ(pzlbowl_protection_r)      // Protection
-	AM_RANGE(0xb00000, 0xb3ffff) AM_RAM AM_SHARE("spriteram")       // Sprites
-	AM_RANGE(0xb40000, 0xb4ffff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")    // Palette
-	AM_RANGE(0xb60000, 0xb6003f) AM_WRITE(vregs_w) AM_SHARE("vregs")
-	AM_RANGE(0xa00000, 0xa03fff) AM_DEVREADWRITE("x1snd", x1_010_device, word_r, word_w)   // Sound
-	AM_RANGE(0xfffc00, 0xffffff) AM_DEVREADWRITE("tmp68301", tmp68301_device, regs_r, regs_w)      // TMP68301 Registers
+	AM_RANGE(0xa00000, 0xa03fff) AM_DEVREADWRITE("x1snd", x1_010_device, word_r, word_w)
+	AM_RANGE(0xb00000, 0xb3ffff) AM_RAM AM_SHARE("spriteram")
+	AM_RANGE(0xb40000, 0xb4ffff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( penbros_map, AS_PROGRAM, 16, seta2_state )
 	AM_IMPORT_FROM(penbros_base_map)
-	AM_RANGE(0x500300, 0x500301) AM_READ_PORT("DSW1")               // DSW 1
-	AM_RANGE(0x500302, 0x500303) AM_READ_PORT("DSW2")               // DSW 2
-	AM_RANGE(0x500300, 0x50030f) AM_WRITE(sound_bank_w)       // Samples Banks
+	AM_RANGE(0x300000, 0x30ffff) AM_RAM
+	AM_RANGE(0x500300, 0x500301) AM_READ_PORT("DSW1")
+	AM_RANGE(0x500302, 0x500303) AM_READ_PORT("DSW2")
+	AM_RANGE(0x500300, 0x50030f) AM_WRITE(sound_bank_w)
+	AM_RANGE(0xb60000, 0xb6003f) AM_WRITE(vregs_w) AM_SHARE("vregs")
+	AM_RANGE(0xfffc00, 0xffffff) AM_DEVREADWRITE("tmp68301", tmp68301_device, regs_r, regs_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( penbrosk_map, AS_PROGRAM, 16, seta2_state )
+static ADDRESS_MAP_START( ablastb_map, AS_PROGRAM, 16, seta2_state )
 	AM_IMPORT_FROM(penbros_base_map)
-	AM_RANGE(0x508300, 0x508301) AM_READ_PORT("DSW1")               // DSW 1
-	AM_RANGE(0x508302, 0x508303) AM_READ_PORT("DSW2")               // DSW 2
-	// TODO: Where are the samples banks?
+	AM_RANGE(0x508300, 0x508301) AM_READ_PORT("DSW1")
+	AM_RANGE(0x508302, 0x508303) AM_READ_PORT("DSW2")
+	// TODO: Is there samples banking like in the original?
 ADDRESS_MAP_END
 
 
@@ -424,7 +426,7 @@ WRITE16_MEMBER(seta2_state::reelquak_leds_w)
 	}
 	if (ACCESSING_BITS_8_15)
 	{
-		machine().device<ticket_dispenser_device>("ticket")->write(space, 0, (data & 0x0100) >> 1); // ticket dispenser
+		m_dispenser->motor_w(BIT(data, 8)); // ticket dispenser
 	}
 
 //  popmessage("LED %04X", data);
@@ -622,6 +624,79 @@ static ADDRESS_MAP_START( staraudi_map, AS_PROGRAM, 16, staraudi_state )
 	AM_RANGE(0xc50000, 0xc5ffff) AM_RAM                             // cleared
 	AM_RANGE(0xc60000, 0xc6003f) AM_WRITE(vregs_w) AM_SHARE("vregs")  // Video Registers
 	AM_RANGE(0xfffc00, 0xffffff) AM_DEVREADWRITE("tmp68301", tmp68301_device, regs_r, regs_w)  // TMP68301 Registers
+ADDRESS_MAP_END
+
+
+/***************************************************************************
+                            TelePachi Fever Lion
+***************************************************************************/
+
+WRITE16_MEMBER(seta2_state::telpacfl_lamp1_w)
+{
+	if (ACCESSING_BITS_0_7)
+	{
+		output().set_lamp_value(0, data & 0x0001 ); //
+		output().set_lamp_value(1, data & 0x0002 ); //
+		output().set_lamp_value(2, data & 0x0004 ); //
+		output().set_lamp_value(3, data & 0x0008 ); //
+		output().set_lamp_value(4, data & 0x0010 ); //
+		output().set_lamp_value(5, data & 0x0020 ); //
+		output().set_lamp_value(6, data & 0x0040 ); //
+		output().set_lamp_value(7, data & 0x0080 ); //
+	}
+
+//  popmessage("LAMP1 %04X", data);
+}
+
+WRITE16_MEMBER(seta2_state::telpacfl_lamp2_w)
+{
+	if (ACCESSING_BITS_0_7)
+	{
+		output().set_lamp_value( 8, data & 0x0001 ); // on/off lamp (throughout)
+		output().set_lamp_value( 9, data & 0x0002 ); // bet lamp
+		output().set_lamp_value(10, data & 0x0004 ); // payout lamp
+		m_dispenser->motor_w(       data & 0x0008 ); // coin out motor
+		machine().bookkeeping().coin_counter_w(0,  data & 0x0010); // coin out counter
+		//                          data & 0x0020 ); // on credit increase
+	}
+
+//  popmessage("LAMP2 %04X", data);
+}
+
+WRITE16_MEMBER(seta2_state::telpacfl_lockout_w)
+{
+	if (ACCESSING_BITS_0_7)
+	{
+		machine().bookkeeping().coin_counter_w(1,  data & 0x0002); // 100yen in
+		machine().bookkeeping().coin_lockout_w(0, ~data & 0x0004); // coin blocker
+		machine().bookkeeping().coin_lockout_w(1, ~data & 0x0008); // 100yen blocker
+		// bits 0x30 ?
+	}
+
+//  popmessage("LOCK %04X", data);
+}
+
+static ADDRESS_MAP_START( telpacfl_map, AS_PROGRAM, 16, seta2_state )
+	AM_RANGE(0x000000, 0x0fffff) AM_ROM                              // ROM
+	AM_RANGE(0x200000, 0x20ffff) AM_RAM                              // RAM
+	AM_RANGE(0x300000, 0x303fff) AM_RAM AM_SHARE("nvram")            // NVRAM (Battery Backed)
+	AM_RANGE(0x600000, 0x600001) AM_READ_PORT("DSW1")                // DSW 1
+	AM_RANGE(0x600002, 0x600003) AM_READ_PORT("DSW2")                // DSW 2
+	AM_RANGE(0x700000, 0x700001) AM_READ_PORT("COIN")                // Coin
+	AM_RANGE(0x700002, 0x700003) AM_READ_PORT("P1")                  // P1 + Dispenser
+	AM_RANGE(0x700004, 0x700005) AM_READ_PORT("SERVICE")             // Service
+	AM_RANGE(0x700006, 0x700007) AM_READ_PORT("UNKNOWN")             // (unused?)
+	AM_RANGE(0x700008, 0x700009) AM_WRITE(telpacfl_lamp1_w)          // Lamps
+	AM_RANGE(0x70000c, 0x70000d) AM_WRITE(telpacfl_lamp2_w)          // ""
+	AM_RANGE(0x800000, 0x800001) AM_WRITE(telpacfl_lockout_w)        // Coin Blockers
+	AM_RANGE(0x900000, 0x903fff) AM_DEVREADWRITE("x1snd", x1_010_device, word_r, word_w)   // Sound
+	AM_RANGE(0xb00000, 0xb3ffff) AM_RAM AM_SHARE("spriteram")        // Sprites
+	AM_RANGE(0xb40000, 0xb4ffff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")    // Palette
+	AM_RANGE(0xb60000, 0xb6003f) AM_WRITE(vregs_w) AM_SHARE("vregs") // Video Registers
+	AM_RANGE(0xd00006, 0xd00007) AM_DEVREAD("watchdog", watchdog_timer_device, reset16_r)
+//  AM_RANGE(0xe00000, 0xe00001) AM_WRITE
+	AM_RANGE(0xe00010, 0xe0001f) AM_WRITE(sound_bank_w)              // Samples Banks
+	AM_RANGE(0xfffc00, 0xffffff) AM_DEVREADWRITE("tmp68301", tmp68301_device, regs_r, regs_w)      // TMP68301 Registers
 ADDRESS_MAP_END
 
 
@@ -1707,7 +1782,7 @@ static INPUT_PORTS_START( reelquak )
 	PORT_DIPSETTING(      0x0040, DEF_STR( 1C_5C ) )
 	PORT_DIPSETTING(      0x0000, "1 Coin/10 Credits" )
 
-	PORT_START("DSW2")  // $400302.w    PORT_START("DSW2")  // $400302.w
+	PORT_START("DSW2")  // $400302.w
 	PORT_DIPNAME( 0x0001, 0x0001, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW2:1")  // used
 	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
@@ -1744,7 +1819,7 @@ static INPUT_PORTS_START( reelquak )
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN       )
 
 	PORT_START("TICKET")    // $400003.b
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_SPECIAL       ) PORT_READ_LINE_DEVICE_MEMBER("ticket", ticket_dispenser_device, line_r)    // ticket sensor
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_SPECIAL       ) PORT_READ_LINE_DEVICE_MEMBER("dispenser", ticket_dispenser_device, line_r)    // ticket sensor
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_UNKNOWN       )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_UNKNOWN       )
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT ) PORT_NAME("Knock Down")    // knock down
@@ -2030,6 +2105,113 @@ static INPUT_PORTS_START( trophyh )
 	PORT_DIPNAME( 0x0020, 0x0020, "Blood Color" ) PORT_DIPLOCATION("SW2:6") /* WSChamp doesn't use Blood Color, so add it back in */
 	PORT_DIPSETTING(      0x0020, "Red" )
 	PORT_DIPSETTING(      0x0000, "Yellow" )
+INPUT_PORTS_END
+
+
+/***************************************************************************
+                            TelePachi Fever Lion
+***************************************************************************/
+
+static INPUT_PORTS_START( telpacfl )
+	PORT_START("DSW1")  // $600001.b ($200020.b)
+	PORT_DIPNAME( 0x0001, 0x0001, "Clear NVRAM" )          PORT_DIPLOCATION("SW1:1")
+	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0002, 0x0002, "Use Medal Sensor" )     PORT_DIPLOCATION("SW1:2")
+	PORT_DIPSETTING(      0x0000, DEF_STR( No ) )
+	PORT_DIPSETTING(      0x0002, DEF_STR( Yes ) )
+	PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Unknown ) )     PORT_DIPLOCATION("SW1:3") // used
+	PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW1:4")
+	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0008, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Unknown ) )     PORT_DIPLOCATION("SW1:5") // read but unsed?
+	PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Unknown ) )     PORT_DIPLOCATION("SW1:6")
+	PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0040, 0x0040, "Force Hopper?" )        PORT_DIPLOCATION("SW1:7")
+	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0080, 0x0080, "Freeze Screen" )        PORT_DIPLOCATION("SW1:8")
+	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+
+	PORT_START("DSW2")  // $600003.b ($200021.b)
+	PORT_DIPNAME( 0x000f, 0x000f, "Bonus Multiplier? (Low Hex Digit)" ) PORT_DIPLOCATION("SW2:1,2,3,4")
+	PORT_DIPSETTING(      0x000f, "0" )
+	PORT_DIPSETTING(      0x000e, "1" )
+	PORT_DIPSETTING(      0x000d, "2" )
+	PORT_DIPSETTING(      0x000c, "3" )
+	PORT_DIPSETTING(      0x000b, "4" )
+	PORT_DIPSETTING(      0x000a, "5" )
+	PORT_DIPSETTING(      0x0009, "6" )
+	PORT_DIPSETTING(      0x0008, "7" )
+	PORT_DIPSETTING(      0x0007, "8" )
+	PORT_DIPSETTING(      0x0006, "9" )
+	PORT_DIPSETTING(      0x0005, "A" )
+	PORT_DIPSETTING(      0x0004, "B" )
+	PORT_DIPSETTING(      0x0003, "C" )
+	PORT_DIPSETTING(      0x0002, "D" )
+	PORT_DIPSETTING(      0x0001, "E" )
+	PORT_DIPSETTING(      0x0000, "F" )
+	PORT_DIPNAME( 0x0070, 0x0070, "Bonus Multiplier? (High Hex Digit)" ) PORT_DIPLOCATION("SW2:5,6,7")
+	PORT_DIPSETTING(      0x0070, "0" )
+	PORT_DIPSETTING(      0x0060, "1" )
+	PORT_DIPSETTING(      0x0050, "2" )
+	PORT_DIPSETTING(      0x0040, "3" )
+	PORT_DIPSETTING(      0x0030, "4" )
+	PORT_DIPSETTING(      0x0020, "5" )
+	PORT_DIPSETTING(      0x0010, "6" )
+	PORT_DIPSETTING(      0x0000, "7" )
+	PORT_DIPNAME( 0x0080, 0x0080, "Use Bonus Multiplier?" ) PORT_DIPLOCATION("SW2:8")
+	PORT_DIPSETTING(      0x0080, DEF_STR( No ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( Yes ) )
+
+	PORT_START("COIN")    // $700000.w
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_UNKNOWN       ) // -
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_OTHER         ) // coin1 connection
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_SERVICE2      ) PORT_NAME("Reset") // reset switch (clear errors, play sound in sound test)
+	PORT_BIT( 0x0008, IP_ACTIVE_HIGH,IPT_OTHER         ) // empty switch (out of medals error when low i.e. メダル切れ)
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_OTHER         ) // coin2 connection
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_OTHER         ) // coin3 connection
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_OTHER         ) // coin4 connection
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT ) // pay out switch
+
+	PORT_START("P1")    // $700002.w
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON1       ) PORT_NAME("Bet") // bet switch (converts credits into balls)
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_UNKNOWN       ) // -
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_GAMBLE_DOOR   ) // door switch
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_SPECIAL       ) PORT_READ_LINE_DEVICE_MEMBER("dispenser", ticket_dispenser_device, line_r) // coin out switch (medals jam error when stuck i.e. メダルづまり)
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_UNKNOWN       ) // -
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNKNOWN       ) // -
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN       ) // -
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH,IPT_BUTTON2       ) PORT_NAME("Stop") // stop switch (active high)
+
+	PORT_START("SERVICE")    // $700004.w
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1         ) PORT_IMPULSE(5) // coin in switch
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_COIN2         ) PORT_IMPULSE(5) // 100yen in switch
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_SERVICE1      ) // service switch (next item in service mode)
+	PORT_SERVICE_NO_TOGGLE(0x0008, IP_ACTIVE_LOW       ) // test switch
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_UNKNOWN       ) // -
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNKNOWN       ) // -
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN       ) // -
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_OTHER         ) // (freezes the game if high, eventually triggering the watchdog)
+
+	PORT_START("UNKNOWN")    // $700006.w
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_UNKNOWN       ) // -
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_UNKNOWN       ) // -
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_UNKNOWN       ) // -
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNKNOWN       ) // -
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_UNKNOWN       ) // -
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNKNOWN       ) // -
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN       ) // -
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN       ) // -
+
+	PORT_START("KNOB")    // $fffd0a (parallel port read)
+	PORT_BIT( 0xff, 0x00, IPT_PADDLE ) PORT_MINMAX(0,0xff) PORT_SENSITIVITY(15) PORT_KEYDELTA(15) PORT_CENTERDELTA(0) PORT_CODE_DEC(KEYCODE_LEFT) PORT_CODE_INC(KEYCODE_RIGHT)
 INPUT_PORTS_END
 
 
@@ -2428,12 +2610,12 @@ static MACHINE_CONFIG_DERIVED( penbros, seta2 )
 	MCFG_SCREEN_VISIBLE_AREA(0, 0x140-1, 0x80, 0x160-1)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( penbrosk, penbros )
-	MCFG_CPU_MODIFY("maincpu") // actually TMP68HC000P-16
-	MCFG_CPU_PROGRAM_MAP(penbrosk_map)
+static MACHINE_CONFIG_DERIVED( ablastb, penbros )
+	MCFG_CPU_REPLACE("maincpu", M68000, XTAL_16MHz) // TMP68HC000P-16
+	MCFG_CPU_PROGRAM_MAP(ablastb_map)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", seta2_state, irq2_line_hold)
 
-	//TODO:
-	//MCFG_DEVICE_REMOVE("tmp68301")
+	MCFG_DEVICE_REMOVE("tmp68301")
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( reelquak, seta2 )
@@ -2444,7 +2626,7 @@ static MACHINE_CONFIG_DERIVED( reelquak, seta2 )
 	MCFG_TMP68301_OUT_PARALLEL_CB(WRITE16(seta2_state, reelquak_leds_w))
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
-	MCFG_TICKET_DISPENSER_ADD("ticket", attotime::from_msec(200), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW)
+	MCFG_TICKET_DISPENSER_ADD("dispenser", attotime::from_msec(200), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW)
 
 	// video hardware
 	MCFG_SCREEN_MODIFY("screen")
@@ -2483,6 +2665,25 @@ static MACHINE_CONFIG_DERIVED( staraudi, seta2 )
 	MCFG_SCREEN_VISIBLE_AREA(0x10, 0x150-1, 0x100, 0x1f0-1)
 
 	MCFG_GFXDECODE_MODIFY("gfxdecode", staraudi)
+MACHINE_CONFIG_END
+
+
+static MACHINE_CONFIG_DERIVED( telpacfl, seta2 )
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(telpacfl_map)
+
+	MCFG_DEVICE_MODIFY("tmp68301")
+	MCFG_TMP68301_IN_PARALLEL_CB(IOPORT("KNOB"))
+
+	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom") // not hooked up, seems unused
+
+	MCFG_NVRAM_ADD_0FILL("nvram")
+	MCFG_HOPPER_ADD("dispenser", attotime::from_msec(200), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW)
+
+	// video hardware
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_VISIBLE_AREA(0x0, 0x180-1, 0xff, 0x1ef-1)
+	MCFG_VIDEO_START_OVERRIDE(seta2_state,xoffset1)
 MACHINE_CONFIG_END
 
 
@@ -3212,7 +3413,7 @@ ROM_END
 
 /***************************************************************************
 
-Penguin Brothers (Japan)
+Penguin Brothers / A-Blast
 (c)2000 Subsino
 
    CPU: Toshiba TMP68301AF-16 (100 Pin PQFP)
@@ -3272,27 +3473,47 @@ BAT1* Unpopulated CR2032 3Volt battery
 Ram M1 are NEC D43001GU-70LL
 Ram M2 are LGS GM76C8128ALLFW70
 
+Notes about sets:
+penbros: Original Japanese version with Japan region warning, title screen and all game text
+         in Japanese. However the Subsino logo is the wrong color
+ ablast: Title screen is in traditional Chinese. ROM labels imply Taiwan with "TWN" printed
+         on them. The region warning states Japan only & all game text is in Japanese. Lastly
+         the Subsino logo has correct color. The bootleg is a copy of A-Blast.
 ***************************************************************************/
 
-ROM_START( penbros )
+ROM_START( penbros ) // Genuine P0-142A PCB & original ROM labels
 	ROM_REGION( 0x100000, "maincpu", 0 )    // TMP68301 Code
-	ROM_LOAD16_BYTE( "u06.bin", 0x000000, 0x080000, CRC(7bbdffac) SHA1(d5766cb171b8d2e4c04a6bae37181fa5ada9d797) )
-	ROM_LOAD16_BYTE( "u07.bin", 0x000001, 0x080000, CRC(d50cda5f) SHA1(fc66f55f2070b447c5db85c948ce40adc37512f7) )
+	ROM_LOAD16_BYTE( "a-blast_jpn_u06.u06", 0x000000, 0x080000, CRC(7bbdffac) SHA1(d5766cb171b8d2e4c04a6bae37181fa5ada9d797) )
+	ROM_LOAD16_BYTE( "a-blast_jpn_u07.u07", 0x000001, 0x080000, CRC(d50cda5f) SHA1(fc66f55f2070b447c5db85c948ce40adc37512f7) )
 
 	ROM_REGION( 0x1000000, "sprites", 0 )   // Sprites
-	ROM_LOAD( "u38.bin", 0x000000, 0x400000, CRC(4247b39e) SHA1(f273931293beced312e02c870bf35e9cf0c91a8b) )
-	ROM_LOAD( "u39.bin", 0x400000, 0x400000, CRC(f9f07faf) SHA1(66fc4a9ad422fb384d2c775e43619137226898fc) )
-	ROM_LOAD( "u40.bin", 0x800000, 0x400000, CRC(dc9e0a96) SHA1(c2c8ccf9039ee0e179b08fdd2d37f29899349cda) )
-	ROM_FILL(            0xc00000, 0x400000, 0x00 )    // 6bpp instead of 8bpp
+	ROM_LOAD( "a-blast_jpn_u38.u38", 0x000000, 0x400000, CRC(4247b39e) SHA1(f273931293beced312e02c870bf35e9cf0c91a8b) )
+	ROM_LOAD( "a-blast_jpn_u39.u39", 0x400000, 0x400000, CRC(f9f07faf) SHA1(66fc4a9ad422fb384d2c775e43619137226898fc) )
+	ROM_LOAD( "a-blast_jpn_u40.u40", 0x800000, 0x400000, CRC(dc9e0a96) SHA1(c2c8ccf9039ee0e179b08fdd2d37f29899349cda) )
+	ROM_FILL(                        0xc00000, 0x400000, 0x00 )    // 6bpp instead of 8bpp
 
 	ROM_REGION( 0x300000, "x1snd", 0 )  // Samples
 	// Leave 1MB empty (addressable by the chip)
-	ROM_LOAD( "u18.bin", 0x100000, 0x200000, CRC(de4e65e2) SHA1(82d4e590c714b3e9bf0ffaf1500deb24fd315595) )
+	ROM_LOAD( "a-blast_jpn_u18.u18", 0x100000, 0x200000, CRC(de4e65e2) SHA1(82d4e590c714b3e9bf0ffaf1500deb24fd315595) )
 ROM_END
 
-// bootleg PCB with standard 68000 instead of TMP68301 and 4 FPGAs (3 A40MX04 and 1 A54SX16A)
+ROM_START( ablast ) // Genuine P0-142A PCB & original ROM labels
+	ROM_REGION( 0x100000, "maincpu", 0 )    // TMP68301 Code
+	ROM_LOAD16_BYTE( "a-blast_twn_u06.u06", 0x000000, 0x080000, CRC(e62156d7) SHA1(509fd41a0109dc5c00d83250383d578fd75502f3) )
+	ROM_LOAD16_BYTE( "a-blast_twn_u07.u07", 0x000001, 0x080000, CRC(d4ddc16b) SHA1(63312ce9ec6dffb47aa6aed505f077f20713e5ac) )
 
-ROM_START( penbrosk )
+	ROM_REGION( 0x1000000, "sprites", 0 )   // Sprites
+	ROM_LOAD( "a-blast_twn_u38.u38", 0x000000, 0x400000, CRC(090923da) SHA1(c1eaa8847fe183819af040d97d0e6d1cd9928991) )
+	ROM_LOAD( "a-blast_twn_u39.u39", 0x400000, 0x400000, CRC(6bb17d83) SHA1(b53d8cfc3833df937b92993f9eca17c805c5f58d) )
+	ROM_LOAD( "a-blast_twn_u40.u40", 0x800000, 0x400000, CRC(db94847d) SHA1(fd2e29a45bb0acbd9e709256c7fc27bdd64a6634) )
+	ROM_FILL(                        0xc00000, 0x400000, 0x00 )    // 6bpp instead of 8bpp
+
+	ROM_REGION( 0x300000, "x1snd", 0 )  // Samples
+	// Leave 1MB empty (addressable by the chip)
+	ROM_LOAD( "a-blast_twn_u18.u18", 0x100000, 0x200000, CRC(de4e65e2) SHA1(82d4e590c714b3e9bf0ffaf1500deb24fd315595) )
+ROM_END
+
+ROM_START( ablastb ) // bootleg PCB with standard 68000 instead of TMP68301 and 4 FPGAs (3 A40MX04 and 1 A54SX16A)
 	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD16_WORD_SWAP( "1.bin", 0x000000, 0x100000, CRC(4adbd826) SHA1(004e3d0d5cb44c00283bc02f6d727e023690226d) )
 
@@ -3300,11 +3521,10 @@ ROM_START( penbrosk )
 	ROM_LOAD( "2.bin", 0x000000, 0x400000, CRC(090923da) SHA1(c1eaa8847fe183819af040d97d0e6d1cd9928991) )
 	ROM_LOAD( "3.bin", 0x400000, 0x400000, CRC(6bb17d83) SHA1(b53d8cfc3833df937b92993f9eca17c805c5f58d) )
 	ROM_LOAD( "4.bin", 0x800000, 0x400000, CRC(db94847d) SHA1(fd2e29a45bb0acbd9e709256c7fc27bdd64a6634) )
-	ROM_FILL(            0xc00000, 0x400000, 0x00 )    // 6bpp instead of 8bpp
+	ROM_FILL(          0xc00000, 0x400000, 0x00 )    // 6bpp instead of 8bpp
 
-	ROM_REGION( 0x300000, "x1snd", 0 )  // Samples
-	// Leave 1MB empty (addressable by the chip)
-	ROM_LOAD( "29F1610.bin", 0x100000, 0x200000, CRC(de4e65e2) SHA1(82d4e590c714b3e9bf0ffaf1500deb24fd315595) )
+	ROM_REGION( 0x200000, "x1snd", 0 )  // Samples. ROM content matches the penbros' one, but there's no proper X1-010 on the PCB. Possibly one of the FPGAs acts as a substitute?
+	ROM_LOAD( "29F1610.bin", 0x000000, 0x200000, CRC(de4e65e2) SHA1(82d4e590c714b3e9bf0ffaf1500deb24fd315595) )
 ROM_END
 
 /***************************************************************************
@@ -3398,8 +3618,8 @@ Reel'N Quake! is also known to be available on the P-FG-03 PCB which is
 
 ROM_START( reelquak )
 	ROM_REGION( 0x100000, "maincpu", 0 )    // TMP68301 Code
-	ROM_LOAD16_BYTE( "rq_ver1.05.u2", 0x00000, 0x80000, CRC(7740d7a4) SHA1(21c28db5d4d7eea5a2506cb51b58533eba28c2cb) ) /* Should be KF00x002, x = revision */
-	ROM_LOAD16_BYTE( "rq_ver1.05.u3", 0x00001, 0x80000, CRC(8c78889e) SHA1(584ba123e9caafdbddc96a4d9b2b6f6994fa84b0) ) /* Should be KF00x004, x = revision */
+	ROM_LOAD16_BYTE( "rq_ver1.05.u2", 0x00000, 0x80000, CRC(7740d7a4) SHA1(21c28db5d4d7eea5a2506cb51b58533eba28c2cb) ) // Should be KF00x002, x = revision
+	ROM_LOAD16_BYTE( "rq_ver1.05.u3", 0x00001, 0x80000, CRC(8c78889e) SHA1(584ba123e9caafdbddc96a4d9b2b6f6994fa84b0) ) // Should be KF00x004, x = revision
 
 	ROM_REGION( 0x800000, "sprites", 0 )    // Sprites
 	ROM_LOAD( "kf-001-005_t42.u16", 0x000000, 0x200000, CRC(25e07d5c) SHA1(dd0818611f39be25dc6f0c737da4e79c6c0f9659) )
@@ -3879,32 +4099,79 @@ ROM_START( trophyh ) /* V1.0 is currently the only known version */
 	ROM_LOAD( "as1105m01.u18", 0x100000, 0x400000, CRC(633d0df8) SHA1(3401c424f5c207ef438a9269e0c0e7d482771fed) )
 ROM_END
 
+/***************************************************************************
 
-GAME( 1994, gundamex,  0,        gundamex, gundamex, seta2_state, 0,        ROT0, "Banpresto",             "Mobile Suit Gundam EX Revue",                  0 )
-GAME( 1995, grdians,   0,        grdians,  grdians,  seta2_state, 0,        ROT0, "Winkysoft (Banpresto license)", "Guardians / Denjin Makai II",          MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1996, mj4simai,  0,        mj4simai, mj4simai, seta2_state, 0,        ROT0, "Maboroshi Ware",        "Wakakusamonogatari Mahjong Yonshimai (Japan)", MACHINE_NO_COCKTAIL )
-GAME( 1996, myangel,   0,        myangel,  myangel,  seta2_state, 0,        ROT0, "MOSS / Namco",          "Kosodate Quiz My Angel (Japan)",               MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1997, myangel2,  0,        myangel2, myangel2, seta2_state, 0,        ROT0, "MOSS / Namco",          "Kosodate Quiz My Angel 2 (Japan)",             MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1997, reelquak,  0,        reelquak, reelquak, seta2_state, 0,        ROT0, "<unknown>",             "Reel'N Quake! (Version 1.05)",                 MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 199?, endrichs,  0,        reelquak, endrichs, seta2_state, 0,        ROT0, "E.N.Tiger",             "Endless Riches (Ver 1.20)",                    MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1997, staraudi,  0,        staraudi, staraudi, staraudi_state, 0,     ROT0, "Namco",                 "Star Audition",                                MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-GAME( 1999, pzlbowl,   0,        pzlbowl,  pzlbowl,  seta2_state, 0,        ROT0, "MOSS / Nihon System",   "Puzzle De Bowling (Japan)",                    MACHINE_NO_COCKTAIL )
-GAME( 2000, penbros,   0,        penbros,  penbros,  seta2_state, 0,        ROT0, "Subsino",               "Penguin Brothers (Japan)",                     MACHINE_NO_COCKTAIL )
-GAME( 2000, penbrosk,  penbros,  penbrosk, penbros,  seta2_state, 0,        ROT0, "bootleg",               "Penguin Brothers (Japan, bootleg)",            MACHINE_NO_COCKTAIL | MACHINE_NOT_WORKING )
-GAME( 2000, namcostr,  0,        namcostr, funcube,  seta2_state, 0,        ROT0, "Namco",                 "Namco Stars",                                  MACHINE_NO_COCKTAIL | MACHINE_NOT_WORKING )
-GAME( 2000, deerhunt,  0,        samshoot, deerhunt, seta2_state, 0,        ROT0, "Sammy USA Corporation", "Deer Hunting USA V4.3",                        MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 2000, deerhunta, deerhunt, samshoot, deerhunt, seta2_state, 0,        ROT0, "Sammy USA Corporation", "Deer Hunting USA V4.2",                        MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 2000, deerhuntb, deerhunt, samshoot, deerhunt, seta2_state, 0,        ROT0, "Sammy USA Corporation", "Deer Hunting USA V4.0",                        MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 2000, deerhuntc, deerhunt, samshoot, deerhunt, seta2_state, 0,        ROT0, "Sammy USA Corporation", "Deer Hunting USA V3",                          MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 2000, deerhuntd, deerhunt, samshoot, deerhunt, seta2_state, 0,        ROT0, "Sammy USA Corporation", "Deer Hunting USA V2",                          MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 2000, deerhunte, deerhunt, samshoot, deerhunt, seta2_state, 0,        ROT0, "Sammy USA Corporation", "Deer Hunting USA V1",                          MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 2001, turkhunt,  0,        samshoot, turkhunt, seta2_state, 0,        ROT0, "Sammy USA Corporation", "Turkey Hunting USA V1.0",                      MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 2001, wschamp,   0,        samshoot, wschamp,  seta2_state, 0,        ROT0, "Sammy USA Corporation", "Wing Shooting Championship V2.00",             MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 2001, wschampa,  wschamp,  samshoot, wschamp,  seta2_state, 0,        ROT0, "Sammy USA Corporation", "Wing Shooting Championship V1.01",             MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 2001, wschampb,  wschamp,  samshoot, wschamp,  seta2_state, 0,        ROT0, "Sammy USA Corporation", "Wing Shooting Championship V1.00",             MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 2002, trophyh,   0,        samshoot, trophyh,  seta2_state, 0,        ROT0, "Sammy USA Corporation", "Trophy Hunting - Bear & Moose V1.0",           MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 2000, funcube,   0,        funcube,  funcube,  seta2_state, funcube,  ROT0, "Namco",                 "Funcube (v1.5)",                               MACHINE_NO_COCKTAIL )
-GAME( 2001, funcube2,  0,        funcube2, funcube,  seta2_state, funcube2, ROT0, "Namco",                 "Funcube 2 (v1.1)",                             MACHINE_NO_COCKTAIL )
-GAME( 2001, funcube3,  0,        funcube3, funcube,  seta2_state, funcube3, ROT0, "Namco",                 "Funcube 3 (v1.1)",                             MACHINE_NO_COCKTAIL )
-GAME( 2001, funcube4,  0,        funcube2, funcube,  seta2_state, funcube2, ROT0, "Namco",                 "Funcube 4 (v1.0)",                             MACHINE_NO_COCKTAIL )
-GAME( 2002, funcube5,  0,        funcube2, funcube,  seta2_state, funcube2, ROT0, "Namco",                 "Funcube 5 (v1.0)",                             MACHINE_NO_COCKTAIL )
+ TelePachi Fever Lion
+ (C) 1996 Sunsoft
+
+ PCB: Sunsoft 2MP1-E00 (P0-121A, serial 0503), similar to Reel'N Quake.
+
+   CPU: Toshiba TMP68301AF-16 (100 Pin PQFP @ U1)
+ Video: Allumer X1-020 9426HK003 (@ U9 - Same as DX-101?)
+        NEC DX-102               (52 Pin PQFP @ U8)
+        Allumer X1-007 505100    (SDIP42 @ U110 - Feeds RGB DACs)
+ Sound: X1-010 (Mitsubishi M60016 Gate Array, 80 Pin PQFP @ U26)
+Inputs: Allumer X1-004 546100    (SDIP52)
+   OSC: 50.0000 MHz (@ X1) & 32.5304 MHz (@ X2)
+ Other: 8 Position Dipswitch x 2 (@ DSW1, DSW2)
+        Push Button
+        Battery (@ BT1)
+        93C46 EEPROM (@ U101)
+        Jamma Connector
+        GALs - labeled "KC-001C", "KC-002C" (@ U51, U52)
+
+***************************************************************************/
+
+ROM_START( telpacfl )
+	ROM_REGION( 0x100000, "maincpu", 0 )    // TMP68301 Code
+	ROM_LOAD16_BYTE( "mp3_prgeven__u2_v1.0.u2", 0x000000, 0x080000, CRC(9ab450c5) SHA1(57d9118df8a444e295cbda453a7c3238bd672ddd) )
+	ROM_LOAD16_BYTE( "mp3_prgodd__u3_v1.0.u3",  0x000001, 0x080000, CRC(2a324139) SHA1(1812a7a8a2c4e222a1e5c7cb6d39cf7bf7f037db) )
+	// Empty sockets: 27C4001 TBL EVEN (@ U4) & 27C4001 TBL ODD (@ U5)
+
+	ROM_REGION( 0x800000, "sprites", ROMREGION_ERASE00 )    // Sprites
+	ROM_LOAD( "mp3_cg-0__u16_v1.0.u16", 0x000000, 0x200000, CRC(9d8453ba) SHA1(d97240ce68d6e64527930e919710764a7b669cdf) )
+	ROM_LOAD( "mp3_cg-1__u15_v1.0.u15", 0x200000, 0x200000, CRC(8ab83f38) SHA1(5ebc682b80d0d97025a97824a899946712e7acd4) )
+	ROM_LOAD( "mp3_cg-2__u21_v1.0.u21", 0x400000, 0x200000, BAD_DUMP CRC(54dc430b) SHA1(a2e55866249d01f6f2f2dd998421baf9fe0c6972) ) // physically damaged eprom
+	ROM_FILL (                          0x400000, 0x200000, 0 ) // wipe out the bad rom
+	// Empty sockets: 23C16000 (@ U17-20, U22-23)
+
+	ROM_REGION( 0x200000, "x1snd", 0 )  // Samples
+	// Leave 1MB empty (addressable by the chip)
+	ROM_LOAD( "mp3_sound0__u111_v1.0.u111", 0x100000, 0x080000, CRC(711c915e) SHA1(d654a0c158cf54aab5faca913583c5620388aa46) )
+	ROM_LOAD( "mp3_sound1__u112_v1.0.u112", 0x180000, 0x080000, CRC(27fd83cd) SHA1(d0261b2c5354ea17061e71bcea747d70efc18a49) )
+
+	ROM_REGION( 0x117 * 2, "plds", 0 )
+	ROM_LOAD( "kc-001c.u51", 0x000, 0x117, NO_DUMP )
+	ROM_LOAD( "kc-002c.u52", 0x117, 0x117, NO_DUMP )
+ROM_END
+
+GAME( 1994, gundamex,  0,        gundamex, gundamex, seta2_state, 0,        ROT0,   "Banpresto",             "Mobile Suit Gundam EX Revue",                  0 )
+GAME( 1995, grdians,   0,        grdians,  grdians,  seta2_state, 0,        ROT0,   "Winkysoft (Banpresto license)", "Guardians / Denjin Makai II",          MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1996, mj4simai,  0,        mj4simai, mj4simai, seta2_state, 0,        ROT0,   "Maboroshi Ware",        "Wakakusamonogatari Mahjong Yonshimai (Japan)", MACHINE_NO_COCKTAIL )
+GAME( 1996, myangel,   0,        myangel,  myangel,  seta2_state, 0,        ROT0,   "MOSS / Namco",          "Kosodate Quiz My Angel (Japan)",               MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1997, myangel2,  0,        myangel2, myangel2, seta2_state, 0,        ROT0,   "MOSS / Namco",          "Kosodate Quiz My Angel 2 (Japan)",             MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1996, telpacfl,  0,        telpacfl, telpacfl, seta2_state, 0,        ROT270, "Sunsoft",               "TelePachi Fever Lion (V1.0)",                  MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1997, reelquak,  0,        reelquak, reelquak, seta2_state, 0,        ROT0,   "<unknown>",             "Reel'N Quake! (Version 1.05)",                 MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 199?, endrichs,  0,        reelquak, endrichs, seta2_state, 0,        ROT0,   "E.N.Tiger",             "Endless Riches (Ver 1.20)",                    MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1997, staraudi,  0,        staraudi, staraudi, staraudi_state, 0,     ROT0,   "Namco",                 "Star Audition",                                MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1999, pzlbowl,   0,        pzlbowl,  pzlbowl,  seta2_state, 0,        ROT0,   "MOSS / Nihon System",   "Puzzle De Bowling (Japan)",                    MACHINE_NO_COCKTAIL )
+GAME( 2000, penbros,   0,        penbros,  penbros,  seta2_state, 0,        ROT0,   "Subsino",               "Penguin Brothers (Japan)",                     MACHINE_NO_COCKTAIL )
+GAME( 2000, ablast,    penbros,  penbros,  penbros,  seta2_state, 0,        ROT0,   "Subsino",               "A-Blast (Japan)",                              MACHINE_NO_COCKTAIL )
+GAME( 2000, ablastb,   penbros,  ablastb,  penbros,  seta2_state, 0,        ROT0,   "bootleg",               "A-Blast (bootleg)",                            MACHINE_NO_COCKTAIL | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND  ) // at least "tilemap sprite" scrolly flag differs, FPGA instead of x1-010
+GAME( 2000, namcostr,  0,        namcostr, funcube,  seta2_state, 0,        ROT0,   "Namco",                 "Namco Stars",                                  MACHINE_NO_COCKTAIL | MACHINE_NOT_WORKING )
+GAME( 2000, deerhunt,  0,        samshoot, deerhunt, seta2_state, 0,        ROT0,   "Sammy USA Corporation", "Deer Hunting USA V4.3",                        MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 2000, deerhunta, deerhunt, samshoot, deerhunt, seta2_state, 0,        ROT0,   "Sammy USA Corporation", "Deer Hunting USA V4.2",                        MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 2000, deerhuntb, deerhunt, samshoot, deerhunt, seta2_state, 0,        ROT0,   "Sammy USA Corporation", "Deer Hunting USA V4.0",                        MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 2000, deerhuntc, deerhunt, samshoot, deerhunt, seta2_state, 0,        ROT0,   "Sammy USA Corporation", "Deer Hunting USA V3",                          MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 2000, deerhuntd, deerhunt, samshoot, deerhunt, seta2_state, 0,        ROT0,   "Sammy USA Corporation", "Deer Hunting USA V2",                          MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 2000, deerhunte, deerhunt, samshoot, deerhunt, seta2_state, 0,        ROT0,   "Sammy USA Corporation", "Deer Hunting USA V1",                          MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 2001, turkhunt,  0,        samshoot, turkhunt, seta2_state, 0,        ROT0,   "Sammy USA Corporation", "Turkey Hunting USA V1.0",                      MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 2001, wschamp,   0,        samshoot, wschamp,  seta2_state, 0,        ROT0,   "Sammy USA Corporation", "Wing Shooting Championship V2.00",             MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 2001, wschampa,  wschamp,  samshoot, wschamp,  seta2_state, 0,        ROT0,   "Sammy USA Corporation", "Wing Shooting Championship V1.01",             MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 2001, wschampb,  wschamp,  samshoot, wschamp,  seta2_state, 0,        ROT0,   "Sammy USA Corporation", "Wing Shooting Championship V1.00",             MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 2002, trophyh,   0,        samshoot, trophyh,  seta2_state, 0,        ROT0,   "Sammy USA Corporation", "Trophy Hunting - Bear & Moose V1.0",           MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 2000, funcube,   0,        funcube,  funcube,  seta2_state, funcube,  ROT0,   "Namco",                 "Funcube (v1.5)",                               MACHINE_NO_COCKTAIL )
+GAME( 2001, funcube2,  0,        funcube2, funcube,  seta2_state, funcube2, ROT0,   "Namco",                 "Funcube 2 (v1.1)",                             MACHINE_NO_COCKTAIL )
+GAME( 2001, funcube3,  0,        funcube3, funcube,  seta2_state, funcube3, ROT0,   "Namco",                 "Funcube 3 (v1.1)",                             MACHINE_NO_COCKTAIL )
+GAME( 2001, funcube4,  0,        funcube2, funcube,  seta2_state, funcube2, ROT0,   "Namco",                 "Funcube 4 (v1.0)",                             MACHINE_NO_COCKTAIL )
+GAME( 2002, funcube5,  0,        funcube2, funcube,  seta2_state, funcube2, ROT0,   "Namco",                 "Funcube 5 (v1.0)",                             MACHINE_NO_COCKTAIL )

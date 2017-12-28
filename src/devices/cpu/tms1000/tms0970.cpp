@@ -8,7 +8,6 @@
 
 #include "emu.h"
 #include "tms0970.h"
-#include "debugger.h"
 
 // TMS0950 is a TMS1000 with a TMS0980 style opla, it was quickly succeeded by the TMS0970
 // - RAM, ROM, microinstructions is the same as TMS1000
@@ -110,7 +109,7 @@ void tms0970_cpu_device::device_reset()
 		if (imask & 0x40 && (imask & 0x20) == 0)
 			msel = (op & 0xf) | (op >> 1 & 0x10);
 
-		msel = BITSWAP8(msel,7,6,5,0,1,2,3,4); // lines are reversed
+		msel = bitswap<8>(msel,7,6,5,0,1,2,3,4); // lines are reversed
 		u32 mmask = m_mpla->read(msel);
 		mmask ^= 0x09fe; // invert active-negative
 

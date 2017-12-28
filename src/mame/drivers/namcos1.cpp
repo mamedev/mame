@@ -1015,19 +1015,19 @@ GFXDECODE_END
 static MACHINE_CONFIG_START( ns1 )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6809,XTAL_49_152MHz/32)
+	MCFG_CPU_ADD("maincpu", MC6809E, XTAL_49_152MHz/32)
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", namcos1_state,  irq0_line_assert)
 
-	MCFG_CPU_ADD("subcpu", M6809,XTAL_49_152MHz/32)
+	MCFG_CPU_ADD("subcpu", MC6809E, XTAL_49_152MHz/32)
 	MCFG_CPU_PROGRAM_MAP(sub_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", namcos1_state,  irq0_line_assert)
 
-	MCFG_CPU_ADD("audiocpu", M6809,XTAL_49_152MHz/32)
+	MCFG_CPU_ADD("audiocpu", MC6809E, XTAL_49_152MHz/32)
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", namcos1_state,  irq0_line_assert)
 
-	MCFG_CPU_ADD("mcu",HD63701,XTAL_49_152MHz/8)
+	MCFG_CPU_ADD("mcu", HD63701, XTAL_49_152MHz/8)
 	MCFG_CPU_PROGRAM_MAP(mcu_map)
 	MCFG_CPU_IO_MAP(mcu_port_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", namcos1_state,  irq0_line_assert)

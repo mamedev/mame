@@ -117,7 +117,7 @@ READ32_MEMBER(ide_pci_device::ide_read_cs1)
 {
 	// PCI offset starts at 0x3f4, idectrl expects 0x3f0
 	uint32_t data;
-	data = m_ide->read_cs1(space, 1, mem_mask);
+	data = m_ide->read_cs1(1, mem_mask);
 	if (0)
 		logerror("%s:ide_read_cs1 offset=%08X data=%08X mask=%08X\n", machine().describe_context(), offset, data, mem_mask);
 	return data;
@@ -126,21 +126,21 @@ READ32_MEMBER(ide_pci_device::ide_read_cs1)
 WRITE32_MEMBER(ide_pci_device::ide_write_cs1)
 {
 	// PCI offset starts at 0x3f4, idectrl expects 0x3f0
-	m_ide->write_cs1(space, 1, data, mem_mask);
+	m_ide->write_cs1(1, data, mem_mask);
 }
 
 READ32_MEMBER(ide_pci_device::ide2_read_cs1)
 {
 	// PCI offset starts at 0x374, idectrl expects 0x370
 	uint32_t data;
-	data = m_ide2->read_cs1(space, 1, mem_mask);
+	data = m_ide2->read_cs1(1, mem_mask);
 	return data;
 }
 
 WRITE32_MEMBER(ide_pci_device::ide2_write_cs1)
 {
 	// PCI offset starts at 0x374, idectrl expects 0x370
-	m_ide2->write_cs1(space, 1, data, mem_mask);
+	m_ide2->write_cs1(1, data, mem_mask);
 }
 
 WRITE_LINE_MEMBER(ide_pci_device::ide_interrupt)

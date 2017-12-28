@@ -871,7 +871,7 @@ READ8_MEMBER(sega8_janggun_device::read_cart)
 	if (m_rom_bank_base[bank] < 0x80)
 		return m_rom[(m_rom_bank_base[bank] & 0x3f) * 0x2000 + (offset & 0x1fff)];
 	else
-		return BITSWAP8(m_rom[(m_rom_bank_base[bank] & 0x3f) * 0x2000 + (offset & 0x1fff)], 0, 1, 2, 3, 4, 5, 6, 7);
+		return bitswap<8>(m_rom[(m_rom_bank_base[bank] & 0x3f) * 0x2000 + (offset & 0x1fff)], 0, 1, 2, 3, 4, 5, 6, 7);
 }
 
 

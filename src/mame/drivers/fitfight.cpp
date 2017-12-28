@@ -96,7 +96,7 @@ Stephh's notes :
 READ16_MEMBER( fitfight_state::hotmindff_unk_r )
 {
 	// won't boot unless things in here change, this is p1/p2 inputs in fitfight
-	return space.machine().rand();
+	return machine().rand();
 }
 
 READ16_MEMBER(fitfight_state::fitfight_700000_r)

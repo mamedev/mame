@@ -66,8 +66,8 @@ READ16_MEMBER(niyanpai_state::dipsw_r)
 	uint8_t dipsw_a = ioport("DSWA")->read();
 	uint8_t dipsw_b = ioport("DSWB")->read();
 
-	dipsw_a = BITSWAP8(dipsw_a,0,1,2,3,4,5,6,7);
-	dipsw_b = BITSWAP8(dipsw_b,0,1,2,3,4,5,6,7);
+	dipsw_a = bitswap<8>(dipsw_a,0,1,2,3,4,5,6,7);
+	dipsw_b = bitswap<8>(dipsw_b,0,1,2,3,4,5,6,7);
 
 	return ((dipsw_a << 8) | dipsw_b);
 }

@@ -17,28 +17,28 @@
 #include "debugger.h"
 
 
-void ata_interface_device::set_irq(int state)
+void abstract_ata_interface_device::set_irq(int state)
 {
 //  logerror( "%s: irq %d\n", machine().describe_context(), state );
 
 	m_irq_handler(state);
 }
 
-void ata_interface_device::set_dmarq(int state)
+void abstract_ata_interface_device::set_dmarq(int state)
 {
 //  logerror( "%s: dmarq %d\n", machine().describe_context(), state );
 
 	m_dmarq_handler(state);
 }
 
-void ata_interface_device::set_dasp(int state)
+void abstract_ata_interface_device::set_dasp(int state)
 {
 //  logerror( "%s: dasp %d\n", machine().describe_context(), state );
 
 	m_dasp_handler(state);
 }
 
-WRITE_LINE_MEMBER( ata_interface_device::irq0_write_line )
+WRITE_LINE_MEMBER( abstract_ata_interface_device::irq0_write_line )
 {
 	if (m_irq[0] != state)
 	{
@@ -48,7 +48,7 @@ WRITE_LINE_MEMBER( ata_interface_device::irq0_write_line )
 	}
 }
 
-WRITE_LINE_MEMBER( ata_interface_device::irq1_write_line )
+WRITE_LINE_MEMBER( abstract_ata_interface_device::irq1_write_line )
 {
 	if (m_irq[1] != state)
 	{
@@ -58,7 +58,7 @@ WRITE_LINE_MEMBER( ata_interface_device::irq1_write_line )
 	}
 }
 
-WRITE_LINE_MEMBER( ata_interface_device::dasp0_write_line )
+WRITE_LINE_MEMBER( abstract_ata_interface_device::dasp0_write_line )
 {
 	if (m_dasp[0] != state)
 	{
@@ -68,7 +68,7 @@ WRITE_LINE_MEMBER( ata_interface_device::dasp0_write_line )
 	}
 }
 
-WRITE_LINE_MEMBER( ata_interface_device::dasp1_write_line )
+WRITE_LINE_MEMBER( abstract_ata_interface_device::dasp1_write_line )
 {
 	if (m_dasp[1] != state)
 	{
@@ -82,7 +82,7 @@ WRITE_LINE_MEMBER( ata_interface_device::dasp1_write_line )
 	}
 }
 
-WRITE_LINE_MEMBER( ata_interface_device::dmarq0_write_line )
+WRITE_LINE_MEMBER( abstract_ata_interface_device::dmarq0_write_line )
 {
 	if (m_dmarq[0] != state)
 	{
@@ -92,7 +92,7 @@ WRITE_LINE_MEMBER( ata_interface_device::dmarq0_write_line )
 	}
 }
 
-WRITE_LINE_MEMBER( ata_interface_device::dmarq1_write_line )
+WRITE_LINE_MEMBER( abstract_ata_interface_device::dmarq1_write_line )
 {
 	if (m_dmarq[1] != state)
 	{
@@ -102,12 +102,12 @@ WRITE_LINE_MEMBER( ata_interface_device::dmarq1_write_line )
 	}
 }
 
-WRITE_LINE_MEMBER( ata_interface_device::pdiag0_write_line )
+WRITE_LINE_MEMBER( abstract_ata_interface_device::pdiag0_write_line )
 {
 	m_pdiag[0] = state;
 }
 
-WRITE_LINE_MEMBER( ata_interface_device::pdiag1_write_line )
+WRITE_LINE_MEMBER( abstract_ata_interface_device::pdiag1_write_line )
 {
 	if (m_pdiag[1] != state)
 	{
@@ -125,7 +125,7 @@ WRITE_LINE_MEMBER( ata_interface_device::pdiag1_write_line )
  *
  *************************************/
 
-uint16_t ata_interface_device::read_dma()
+uint16_t abstract_ata_interface_device::read_dma()
 {
 	uint16_t result = 0xffff;
 	for (auto & elem : m_slot)
@@ -136,12 +136,12 @@ uint16_t ata_interface_device::read_dma()
 	return result;
 }
 
-READ16_MEMBER( ata_interface_device::read_cs0 )
+uint16_t abstract_ata_interface_device::internal_read_cs0(offs_t offset, uint16_t mem_mask)
 {
 	uint16_t result = mem_mask;
 	for (auto & elem : m_slot)
 		if (elem->dev() != nullptr)
-			result &= elem->dev()->read_cs0(space, offset, mem_mask);
+			result &= elem->dev()->read_cs0(offset, mem_mask);
 
 //  { static int last_status = -1; if (offset == 7 ) { if( result == last_status ) return last_status; last_status = result; } else last_status = -1; }
 
@@ -150,18 +150,17 @@ READ16_MEMBER( ata_interface_device::read_cs0 )
 	return result;
 }
 
-READ16_MEMBER( ata_interface_device::read_cs1 )
+uint16_t abstract_ata_interface_device::internal_read_cs1(offs_t offset, uint16_t mem_mask)
 {
 	uint16_t result = mem_mask;
 	for (auto & elem : m_slot)
 		if (elem->dev() != nullptr)
-			result &= elem->dev()->read_cs1(space, offset, mem_mask);
+			result &= elem->dev()->read_cs1(offset, mem_mask);
 
 //  logerror( "%s: read cs1 %04x %04x %04x\n", machine().describe_context(), offset, result, mem_mask );
 
 	return result;
 }
-
 
 /*************************************
  *
@@ -169,7 +168,7 @@ READ16_MEMBER( ata_interface_device::read_cs1 )
  *
  *************************************/
 
-void ata_interface_device::write_dma( uint16_t data )
+void abstract_ata_interface_device::write_dma( uint16_t data )
 {
 //  logerror( "%s: write_dma %04x\n", machine().describe_context(), data );
 
@@ -178,25 +177,25 @@ void ata_interface_device::write_dma( uint16_t data )
 			elem->dev()->write_dma(data);
 }
 
-WRITE16_MEMBER( ata_interface_device::write_cs0 )
+void abstract_ata_interface_device::internal_write_cs0(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 //  logerror( "%s: write cs0 %04x %04x %04x\n", machine().describe_context(), offset, data, mem_mask );
 
 	for (auto & elem : m_slot)
 		if (elem->dev() != nullptr)
-			elem->dev()->write_cs0(space, offset, data, mem_mask);
+			elem->dev()->write_cs0(offset, data, mem_mask);
 }
 
-WRITE16_MEMBER( ata_interface_device::write_cs1 )
+void abstract_ata_interface_device::internal_write_cs1(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 //  logerror( "%s: write cs1 %04x %04x %04x\n", machine().describe_context(), offset, data, mem_mask );
 
 	for (auto & elem : m_slot)
 		if (elem->dev() != nullptr)
-			elem->dev()->write_cs1(space, offset, data, mem_mask);
+			elem->dev()->write_cs1(offset, data, mem_mask);
 }
 
-WRITE_LINE_MEMBER( ata_interface_device::write_dmack )
+WRITE_LINE_MEMBER( abstract_ata_interface_device::write_dmack )
 {
 //  logerror( "%s: write_dmack %04x\n", machine().describe_context(), state );
 
@@ -210,7 +209,7 @@ SLOT_INTERFACE_START(ata_devices)
 	SLOT_INTERFACE("cdrom", ATAPI_CDROM)
 SLOT_INTERFACE_END
 
-ata_interface_device::ata_interface_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+abstract_ata_interface_device::abstract_ata_interface_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, type, tag, owner, clock),
 	m_irq_handler(*this),
 	m_dmarq_handler(*this),
@@ -221,7 +220,7 @@ ata_interface_device::ata_interface_device(const machine_config &mconfig, device
 DEFINE_DEVICE_TYPE(ATA_INTERFACE, ata_interface_device, "ata_interface", "ATA Interface")
 
 ata_interface_device::ata_interface_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	ata_interface_device(mconfig, ATA_INTERFACE, tag, owner, clock)
+	abstract_ata_interface_device(mconfig, ATA_INTERFACE, tag, owner, clock)
 {
 }
 
@@ -229,7 +228,7 @@ ata_interface_device::ata_interface_device(const machine_config &mconfig, const 
 //  device_start - device-specific startup
 //-------------------------------------------------
 
-void ata_interface_device::device_start()
+void abstract_ata_interface_device::device_start()
 {
 	m_irq_handler.resolve_safe();
 	m_dmarq_handler.resolve_safe();
@@ -251,17 +250,17 @@ void ata_interface_device::device_start()
 		{
 			if (i == 0)
 			{
-				dev->m_irq_handler.set_callback(DEVCB_DEVWRITELINE("^", ata_interface_device, irq0_write_line));
-				dev->m_dmarq_handler.set_callback(DEVCB_DEVWRITELINE("^", ata_interface_device, dmarq0_write_line));
-				dev->m_dasp_handler.set_callback(DEVCB_DEVWRITELINE("^", ata_interface_device, dasp0_write_line));
-				dev->m_pdiag_handler.set_callback(DEVCB_DEVWRITELINE("^", ata_interface_device, pdiag0_write_line));
+				dev->m_irq_handler.set_callback(DEVCB_DEVWRITELINE("^", abstract_ata_interface_device, irq0_write_line));
+				dev->m_dmarq_handler.set_callback(DEVCB_DEVWRITELINE("^", abstract_ata_interface_device, dmarq0_write_line));
+				dev->m_dasp_handler.set_callback(DEVCB_DEVWRITELINE("^", abstract_ata_interface_device, dasp0_write_line));
+				dev->m_pdiag_handler.set_callback(DEVCB_DEVWRITELINE("^", abstract_ata_interface_device, pdiag0_write_line));
 			}
 			else
 			{
-				dev->m_irq_handler.set_callback(DEVCB_DEVWRITELINE("^", ata_interface_device, irq1_write_line));
-				dev->m_dmarq_handler.set_callback(DEVCB_DEVWRITELINE("^", ata_interface_device, dmarq1_write_line));
-				dev->m_dasp_handler.set_callback(DEVCB_DEVWRITELINE("^", ata_interface_device, dasp1_write_line));
-				dev->m_pdiag_handler.set_callback(DEVCB_DEVWRITELINE("^", ata_interface_device, pdiag1_write_line));
+				dev->m_irq_handler.set_callback(DEVCB_DEVWRITELINE("^", abstract_ata_interface_device, irq1_write_line));
+				dev->m_dmarq_handler.set_callback(DEVCB_DEVWRITELINE("^", abstract_ata_interface_device, dmarq1_write_line));
+				dev->m_dasp_handler.set_callback(DEVCB_DEVWRITELINE("^", abstract_ata_interface_device, dasp1_write_line));
+				dev->m_pdiag_handler.set_callback(DEVCB_DEVWRITELINE("^", abstract_ata_interface_device, pdiag1_write_line));
 			}
 
 			dev->write_csel(i);
@@ -274,7 +273,7 @@ void ata_interface_device::device_start()
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( ata_interface_device::device_add_mconfig )
+MACHINE_CONFIG_MEMBER( abstract_ata_interface_device::device_add_mconfig )
 	MCFG_DEVICE_ADD( "0", ATA_SLOT, 0 )
 	MCFG_DEVICE_ADD( "1", ATA_SLOT, 0 )
 MACHINE_CONFIG_END

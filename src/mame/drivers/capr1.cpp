@@ -20,7 +20,8 @@ TODO:
   * unknown reads and writes
   * should have a rombank somewhere
   * what causes the nmi?
-  * what kind of device lives at C008-C009 and C00C-C00D?
+  * what kind of device lives at C008-C009 and C00C-C00D? looks like a
+    Mitsubishi M66300 Parallel-In Serial-Out Data Buffer with FIFO
     (each is initialized with 80 to control port, then operated by writing
     0A, 08, 00 to control port and transferring five bytes from memory to
     the data port, finishing by writing 01 to the control port)
@@ -69,8 +70,8 @@ static ADDRESS_MAP_START( cspin2_map, AS_PROGRAM, 8, capr1_state )
 	AM_RANGE(0xa000, 0xa00f) AM_DEVREADWRITE("te7750", te7750_device, read, write)
 	AM_RANGE(0xc000, 0xc001) AM_DEVREADWRITE("ym", ym2203_device, read, write)
 	AM_RANGE(0xc004, 0xc004) AM_DEVREADWRITE("oki", okim6295_device, read, write)
-//  AM_RANGE(0xc008, 0xc009) AM_WRITENOP
-//  AM_RANGE(0xc00c, 0xc00d) AM_WRITENOP
+//  AM_RANGE(0xc008, 0xc009) AM_DEVWRITE("fifo1", m66300_device, write)
+//  AM_RANGE(0xc00c, 0xc00d) AM_DEVWRITE("fifo2", m66300_device, write)
 //  AM_RANGE(0xe000, 0xe001) AM_WRITENOP
 //  AM_RANGE(0xe002, 0xe004) AM_WRITENOP
 ADDRESS_MAP_END

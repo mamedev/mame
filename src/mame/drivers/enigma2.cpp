@@ -401,7 +401,7 @@ WRITE8_MEMBER(enigma2_state::sound_data_w)
 
 READ8_MEMBER(enigma2_state::sound_latch_r)
 {
-	return BITSWAP8(m_sound_latch,0,1,2,3,4,5,6,7);
+	return bitswap<8>(m_sound_latch,0,1,2,3,4,5,6,7);
 }
 
 
@@ -700,7 +700,7 @@ DRIVER_INIT_MEMBER(enigma2_state,enigma2)
 
 	for(i = 0; i < 0x2000; i++)
 	{
-		rom[i] = BITSWAP8(rom[i],4,5,6,0,7,1,3,2);
+		rom[i] = bitswap<8>(rom[i],4,5,6,0,7,1,3,2);
 	}
 }
 

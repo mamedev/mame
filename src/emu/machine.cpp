@@ -688,6 +688,39 @@ void running_machine::immediate_load(const char *filename)
 
 
 //-------------------------------------------------
+//  rewind_capture - capture and append a new
+//  state to the rewind list
+//-------------------------------------------------
+
+bool running_machine::rewind_capture()
+{
+	return m_save.rewind()->capture();
+}
+
+
+//-------------------------------------------------
+//  rewind_step - a single step back through
+//  rewind states
+//-------------------------------------------------
+
+bool running_machine::rewind_step()
+{
+	return m_save.rewind()->step();
+}
+
+
+//-------------------------------------------------
+//  rewind_invalidate - mark all the future rewind
+//  states as invalid
+//-------------------------------------------------
+
+void running_machine::rewind_invalidate()
+{
+	m_save.rewind()->invalidate();
+}
+
+
+//-------------------------------------------------
 //  pause - pause the system
 //-------------------------------------------------
 
@@ -726,7 +759,10 @@ void running_machine::resume()
 void running_machine::toggle_pause()
 {
 	if (paused())
+	{
+		rewind_invalidate();
 		resume();
+	}
 	else
 		pause();
 }
@@ -926,6 +962,9 @@ void running_machine::handle_saveload()
 				if (saverr != STATERR_NONE && m_saveload_schedule == saveload_schedule::SAVE)
 					file.remove_on_close();
 			}
+			else if (openflags == OPEN_FLAG_READ && filerr == osd_file::error::NOT_FOUND)
+				// attempt to load a non-existent savestate, report empty slot
+				popmessage("Error: No savestate file to load.", opname);
 			else
 				popmessage("Error: Failed to open file for %s operation.", opname);
 		}
@@ -1249,6 +1288,7 @@ system_time::system_time(time_t t)
 
 void system_time::set(time_t t)
 {
+	// FIXME: this crashes if localtime or gmtime returns nullptr
 	time = t;
 	local_time.set(*localtime(&t));
 	utc_time.set(*gmtime(&t));

@@ -533,6 +533,7 @@ the keypad symbols seem to use a different matrix pattern from the rest?
 #include "cpu/i86/i86.h"
 #include "machine/i8251.h"
 #include "machine/i8257.h"
+#include "machine/i8087.h"
 #include "machine/pic8259.h"
 #include "machine/pit8253.h"
 #include "machine/ram.h"
@@ -960,6 +961,14 @@ static MACHINE_CONFIG_START( fanucspmg )
 	MCFG_CPU_PROGRAM_MAP(maincpu_mem)
 	MCFG_CPU_IO_MAP(maincpu_io)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE(PIC0_TAG, pic8259_device, inta_cb)
+	MCFG_I8086_ESC_OPCODE_HANDLER(DEVWRITE32("i8087", i8087_device, insn_w))
+	MCFG_I8086_ESC_DATA_HANDLER(DEVWRITE32("i8087", i8087_device, addr_w))
+
+	MCFG_DEVICE_ADD("i8087", I8087, XTAL_15MHz/3)
+	MCFG_DEVICE_PROGRAM_MAP(maincpu_mem)
+	MCFG_I8087_DATA_WIDTH(16)
+	//MCFG_I8087_INT_HANDLER(INPUTLINE("maincpu", INPUT_LINE_NMI))  // TODO: presumably this is connected to the pic
+	MCFG_I8087_BUSY_HANDLER(INPUTLINE("maincpu", INPUT_LINE_TEST))
 
 	MCFG_CPU_ADD(SUBCPU_TAG, I8085A, XTAL_16MHz/2/2)
 	MCFG_CPU_PROGRAM_MAP(subcpu_mem)

@@ -132,7 +132,7 @@ void a2bus_floppy_device::device_reset()
     read_c0nx - called for reads from this card's c0nx space
 -------------------------------------------------*/
 
-uint8_t a2bus_floppy_device::read_c0nx(address_space &space, uint8_t offset)
+uint8_t a2bus_floppy_device::read_c0nx(uint8_t offset)
 {
 	return m_fdc->read(offset);
 }
@@ -142,7 +142,7 @@ uint8_t a2bus_floppy_device::read_c0nx(address_space &space, uint8_t offset)
     write_c0nx - called for writes to this card's c0nx space
 -------------------------------------------------*/
 
-void a2bus_floppy_device::write_c0nx(address_space &space, uint8_t offset, uint8_t data)
+void a2bus_floppy_device::write_c0nx(uint8_t offset, uint8_t data)
 {
 	m_fdc->write(offset, data);
 }
@@ -151,7 +151,7 @@ void a2bus_floppy_device::write_c0nx(address_space &space, uint8_t offset, uint8
     read_cnxx - called for reads from this card's c0nx space
 -------------------------------------------------*/
 
-uint8_t a2bus_floppy_device::read_cnxx(address_space &space, uint8_t offset)
+uint8_t a2bus_floppy_device::read_cnxx(uint8_t offset)
 {
 	return m_rom[offset];
 }

@@ -608,7 +608,7 @@ DRIVER_INIT_MEMBER(blktiger_state,blktigerb3)
 	{
 		int addr;
 
-		addr = BITSWAP16(i, 15,14,13,12,11,10,9,8, 3,4,5,6, 7,2,1,0);
+		addr = bitswap<16>(i, 15,14,13,12,11,10,9,8, 3,4,5,6, 7,2,1,0);
 		buffer[i] = src[addr];
 
 	}

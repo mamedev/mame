@@ -1957,10 +1957,10 @@ void dec8_state::machine_reset()
 static MACHINE_CONFIG_START( lastmisn )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6809, 2000000)
+	MCFG_CPU_ADD("maincpu", MC6809E, 2000000)
 	MCFG_CPU_PROGRAM_MAP(lastmisn_map)
 
-	MCFG_CPU_ADD("sub", M6809, 2000000)
+	MCFG_CPU_ADD("sub", MC6809E, 2000000)
 	MCFG_CPU_PROGRAM_MAP(lastmisn_sub_map)
 
 	MCFG_CPU_ADD("audiocpu", M6502, 1500000)
@@ -2010,10 +2010,10 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( shackled )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6809, 2000000)
+	MCFG_CPU_ADD("maincpu", MC6809E, 2000000)
 	MCFG_CPU_PROGRAM_MAP(shackled_map)
 
-	MCFG_CPU_ADD("sub", M6809, 2000000)
+	MCFG_CPU_ADD("sub", MC6809E, 2000000)
 	MCFG_CPU_PROGRAM_MAP(shackled_sub_map)
 
 	MCFG_CPU_ADD("audiocpu", M6502, 1500000)
@@ -2233,10 +2233,10 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( csilver )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6809, XTAL_12MHz/8) /* verified on pcb */
+	MCFG_CPU_ADD("maincpu", MC6809E, XTAL_12MHz/8) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(csilver_map)
 
-	MCFG_CPU_ADD("sub", M6809, XTAL_12MHz/8) /* verified on pcb */
+	MCFG_CPU_ADD("sub", MC6809E, XTAL_12MHz/8) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(csilver_sub_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", dec8_state,  nmi_line_pulse)
 
@@ -2350,7 +2350,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( srdarwin )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6809,2000000)  /* MC68A09EP */
+	MCFG_CPU_ADD("maincpu", MC6809E, 2000000)  /* MC68A09EP */
 	MCFG_CPU_PROGRAM_MAP(srdarwin_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", dec8_state,  nmi_line_pulse)
 
@@ -2400,7 +2400,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( cobracom )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6809, 2000000)
+	MCFG_CPU_ADD("maincpu", MC6809E, 2000000)
 	MCFG_CPU_PROGRAM_MAP(cobra_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", dec8_state,  nmi_line_pulse)
 

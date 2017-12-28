@@ -694,7 +694,7 @@ DRIVER_INIT_MEMBER(hnayayoi_state,hnfubuki)
 	/* swap data bits 0 and 1 */
 	for (i = 0; i < len; i++)
 	{
-		rom[i] = BITSWAP8(rom[i],7,6,5,4,3,2,0,1);
+		rom[i] = bitswap<8>(rom[i],7,6,5,4,3,2,0,1);
 	}
 }
 

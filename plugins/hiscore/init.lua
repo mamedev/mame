@@ -50,7 +50,6 @@ function hiscore.startplugin()
 		end
 		hiscore_path = lfs.env_replace(_conf["hi_path"] or hiscore_path);
 		timed_save = _conf["only_save_at_exit"] ~= "1"
-		print(timed_save)
 		-- hiscoredata_path = _conf["dat_path"]; -- don't know if I should do it, but wathever
 		return true
 	  end
@@ -61,7 +60,7 @@ function hiscore.startplugin()
 	  local _table = {};
 	  for line in string.gmatch(dsting, '([^\n]+)') do
 		local cpu, mem;
-		cputag, space, offs, len, chk_st, chk_ed, fill = string.match(line, '^@([^,]+),([^,]+),([^,]+),([^,]+),([^,]+),([^,]+),?(%x?%x?)');
+		local cputag, space, offs, len, chk_st, chk_ed, fill = string.match(line, '^@([^,]+),([^,]+),([^,]+),([^,]+),([^,]+),([^,]+),?(%x?%x?)');
 		cpu = manager:machine().devices[cputag];
 		if not cpu then
 		  emu.print_verbose("hiscore: " .. cputag .. " device not found")

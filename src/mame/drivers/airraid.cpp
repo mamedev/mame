@@ -601,14 +601,14 @@ DRIVER_INIT_MEMBER(airraid_state,cshootere)
 			m_decrypted_opcodes[A] ^= 0x02;
 
 		if (BIT(A,9) || !BIT(A,5) || BIT(A,3))
-			m_decrypted_opcodes[A] = BITSWAP8(m_decrypted_opcodes[A],7,6,1,4,3,2,5,0);
+			m_decrypted_opcodes[A] = bitswap<8>(m_decrypted_opcodes[A],7,6,1,4,3,2,5,0);
 
 		/* decode the data */
 		if (BIT(A,5))
 			rom[A] ^= 0x40;
 
 		if (BIT(A,9) || !BIT(A,5))
-			rom[A] = BITSWAP8(rom[A],7,6,1,4,3,2,5,0);
+			rom[A] = bitswap<8>(rom[A],7,6,1,4,3,2,5,0);
 	}
 
 	DRIVER_INIT_CALL(cshooter);

@@ -1670,7 +1670,7 @@ WRITE64_MEMBER(cobra_state::main_fifo_w)
 		if (m_main_debug_state == 0x6b)
 		{
 			// install HD patches for bujutsu
-			if (strcmp(space.machine().system().name, "bujutsu") == 0)
+			if (strcmp(machine().system().name, "bujutsu") == 0)
 			{
 				uint32_t *main_ram = (uint32_t*)(uint64_t*)m_main_ram;
 				uint32_t *sub_ram = (uint32_t*)m_sub_ram;
@@ -1685,7 +1685,7 @@ WRITE64_MEMBER(cobra_state::main_fifo_w)
 				gfx_ram[(0x38632c^4) / 4] = 0x38600000;     // skip check_one_scene()
 			}
 			// racjamdx
-			else if (strcmp(space.machine().system().name, "racjamdx") == 0)
+			else if (strcmp(machine().system().name, "racjamdx") == 0)
 			{
 			}
 		}
@@ -1947,7 +1947,7 @@ READ16_MEMBER(cobra_state::sub_ata0_r)
 {
 	mem_mask = ( mem_mask << 8 ) | ( mem_mask >> 8 );
 
-	uint32_t data = m_ata->read_cs0(space, offset, mem_mask);
+	uint32_t data = m_ata->read_cs0(offset, mem_mask);
 	data = ( data << 8 ) | ( data >> 8 );
 
 	return data;
@@ -1958,14 +1958,14 @@ WRITE16_MEMBER(cobra_state::sub_ata0_w)
 	mem_mask = ( mem_mask << 8 ) | ( mem_mask >> 8 );
 	data = ( data << 8 ) | ( data >> 8 );
 
-	m_ata->write_cs0(space, offset, data, mem_mask);
+	m_ata->write_cs0(offset, data, mem_mask);
 }
 
 READ16_MEMBER(cobra_state::sub_ata1_r)
 {
 	mem_mask = ( mem_mask << 8 ) | ( mem_mask >> 8 );
 
-	uint32_t data = m_ata->read_cs1(space, offset, mem_mask);
+	uint32_t data = m_ata->read_cs1(offset, mem_mask);
 
 	return ( data << 8 ) | ( data >> 8 );
 }
@@ -1975,7 +1975,7 @@ WRITE16_MEMBER(cobra_state::sub_ata1_w)
 	mem_mask = ( mem_mask << 8 ) | ( mem_mask >> 8 );
 	data = ( data << 8 ) | ( data >> 8 );
 
-	m_ata->write_cs1(space, offset, data, mem_mask);
+	m_ata->write_cs1(offset, data, mem_mask);
 }
 
 READ32_MEMBER(cobra_state::sub_comram_r)

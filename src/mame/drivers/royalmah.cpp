@@ -312,9 +312,9 @@ PALETTE_INIT_MEMBER(royalmah_state,mjderngr)
 		uint16_t data = (prom[i] << 8) | prom[i + 0x200];
 
 		/* the bits are in reverse order */
-		uint8_t r = BITSWAP8((data >>  0) & 0x1f,7,6,5,0,1,2,3,4 );
-		uint8_t g = BITSWAP8((data >>  5) & 0x1f,7,6,5,0,1,2,3,4 );
-		uint8_t b = BITSWAP8((data >> 10) & 0x1f,7,6,5,0,1,2,3,4 );
+		uint8_t r = bitswap<8>((data >>  0) & 0x1f,7,6,5,0,1,2,3,4 );
+		uint8_t g = bitswap<8>((data >>  5) & 0x1f,7,6,5,0,1,2,3,4 );
+		uint8_t b = bitswap<8>((data >> 10) & 0x1f,7,6,5,0,1,2,3,4 );
 
 		palette.set_pen_color(i, pal5bit(r), pal5bit(g), pal5bit(b));
 	}

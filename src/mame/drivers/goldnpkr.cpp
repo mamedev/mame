@@ -4656,8 +4656,8 @@ static MACHINE_CONFIG_START( megadpkr )
 
 	MCFG_DEVICE_ADD("bankdev", ADDRESS_MAP_BANK, 0)
 	MCFG_DEVICE_PROGRAM_MAP(megadpkr_banked_map)
-	MCFG_ADDRESS_MAP_BANK_DATABUS_WIDTH(8)
-	MCFG_ADDRESS_MAP_BANK_ADDRBUS_WIDTH(16)
+	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
+	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(16)
 	MCFG_ADDRESS_MAP_BANK_STRIDE(0x4000)
 
 	MCFG_CPU_ADD("mcu", M68705P5, CPU_CLOCK) /* unknown */
@@ -11042,7 +11042,7 @@ DRIVER_INIT_MEMBER(goldnpkr_state, flcnw)
 	for (i = start; i < size; i++)
 	{
 		ROM[i] = ROM[i] ^ 0xa0;
-		ROM[i] = BITSWAP8(ROM[i], 7, 6, 3, 4, 5, 2, 1, 0);
+		ROM[i] = bitswap<8>(ROM[i], 7, 6, 3, 4, 5, 2, 1, 0);
 	}
 }
 

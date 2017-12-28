@@ -57,6 +57,8 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
+		m_hopper(*this, "hopper"),
+		m_ticket(*this, "ticket"),
 		m_spriteram(*this, "spriteram")
 	{ }
 
@@ -66,6 +68,8 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
+	optional_device<ticket_dispenser_device> m_hopper;
+	optional_device<ticket_dispenser_device> m_ticket;
 
 	// memory pointers
 	required_shared_ptr<uint16_t> m_spriteram;
@@ -263,23 +267,23 @@ WRITE16_MEMBER(astrocorp_state::skilldrp_outputs_w)
 
 	if (ACCESSING_BITS_0_7)
 	{
-		machine().bookkeeping().coin_counter_w(0,    (data & 0x0001));   // key in  |
-		machine().bookkeeping().coin_counter_w(0,    (data & 0x0002));   // coin in |- manual shows 1 in- and 1 out- counter
-		machine().bookkeeping().coin_counter_w(1,    (data & 0x0004));   // key out |
-		machine().device<ticket_dispenser_device>("hopper")->write(space, 0, (data & 0x0008)<<4);   // hopper motor?
-		//                                  (data & 0x0010)     // hopper?
-		output().set_led_value(0,    (data & 0x0020));   // error lamp (coin/hopper jam: "call attendant")
-		machine().device<ticket_dispenser_device>("ticket")->write(space, 0, data & 0x0080);    // ticket motor?
+		machine().bookkeeping().coin_counter_w(0, BIT(data, 0));   // key in  |
+		machine().bookkeeping().coin_counter_w(0, BIT(data, 1));   // coin in |- manual shows 1 in- and 1 out- counter
+		machine().bookkeeping().coin_counter_w(1, BIT(data, 2));   // key out |
+		m_hopper->motor_w(BIT(data, 3));                           // hopper motor?
+		//                                  BIT(data, 4)           // hopper?
+		output().set_led_value(0, BIT(data, 5));                   // error lamp (coin/hopper jam: "call attendant")
+		m_ticket->motor_w(BIT(data, 7));                           // ticket motor?
 	}
 	if (ACCESSING_BITS_8_15)
 	{
 		// lamps:
-		output().set_led_value(1,    (data & 0x0100));   // select
-		output().set_led_value(2,    (data & 0x0400));   // take
-		output().set_led_value(3,    (data & 0x0800));   // bet
-		output().set_led_value(4,    (data & 0x1000));   // start
-		output().set_led_value(5,    (data & 0x4000));   // win / test
-		output().set_led_value(6,    (data & 0x8000));   // ticket?
+		output().set_led_value(1, BIT(data, 8));    // select
+		output().set_led_value(2, BIT(data, 10));   // take
+		output().set_led_value(3, BIT(data, 11));   // bet
+		output().set_led_value(4, BIT(data, 12));   // start
+		output().set_led_value(5, BIT(data, 14));   // win / test
+		output().set_led_value(6, BIT(data, 15));   // ticket?
 	}
 
 //  popmessage("%04X",data);

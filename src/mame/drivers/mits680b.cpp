@@ -50,8 +50,7 @@ READ8_MEMBER( mits680b_state::status_check_r )
 static ADDRESS_MAP_START(mem_map, AS_PROGRAM, 8, mits680b_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x03ff) AM_RAM // 1024 bytes RAM
-	AM_RANGE(0xf000, 0xf000) AM_DEVREADWRITE("acia", acia6850_device, status_r, control_w)
-	AM_RANGE(0xf001, 0xf001) AM_DEVREADWRITE("acia", acia6850_device, data_r, data_w)
+	AM_RANGE(0xf000, 0xf001) AM_DEVREADWRITE("acia", acia6850_device, read, write)
 	AM_RANGE(0xf002, 0xf002) AM_READ(status_check_r)
 	AM_RANGE(0xff00, 0xffff) AM_ROM AM_REGION("roms", 0)
 ADDRESS_MAP_END

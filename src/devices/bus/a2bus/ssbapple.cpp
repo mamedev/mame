@@ -80,12 +80,12 @@ bool a2bus_ssb_device::take_c800()
 	return false;
 }
 
-uint8_t a2bus_ssb_device::read_cnxx(address_space &space, uint8_t offset)
+uint8_t a2bus_ssb_device::read_cnxx(uint8_t offset)
 {
-	return 0x1f | m_tms->status_r(space, 0);
+	return 0x1f | m_tms->status_r();
 }
 
-void a2bus_ssb_device::write_cnxx(address_space &space, uint8_t offset, uint8_t data)
+void a2bus_ssb_device::write_cnxx(uint8_t offset, uint8_t data)
 {
-	m_tms->data_w(space, 0, data);
+	m_tms->data_w(data);
 }

@@ -724,7 +724,7 @@ GFXDECODE_END
 static MACHINE_CONFIG_START( firefox )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6809E, MASTER_XTAL/2)
+	MCFG_CPU_ADD("maincpu", MC6809E, MASTER_XTAL/8) // 68B09E
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	/* interrupts count starting at end of VBLANK, which is 44, so add 44 */
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("32v", firefox_state, video_timer_callback, "screen", 96+44, 128)

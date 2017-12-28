@@ -64,7 +64,7 @@ WRITE8_MEMBER( chesstrv_state::ram_w )
 
 WRITE8_MEMBER( chesstrv_state::display_w )
 {
-	uint8_t seg_data = BITSWAP8(data,0,1,2,3,4,5,6,7);
+	uint8_t seg_data = bitswap<8>(data,0,1,2,3,4,5,6,7);
 
 	if(!(m_matrix & 0x01))
 		output().set_digit_value( 3, seg_data );

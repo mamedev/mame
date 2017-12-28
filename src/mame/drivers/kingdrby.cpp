@@ -904,7 +904,7 @@ PALETTE_INIT_MEMBER(kingdrby_state,kingdrbb)
 	for(i = 0; i < 0x200; i++)
 	{
 		/* this set has an extra address line shuffle applied on the prom */
-		prom[i] = raw_prom[BITSWAP16(i, 15,14,13,12,11,10,9,8,7,6,5,0,1,2,3,4)+0x1000];
+		prom[i] = raw_prom[bitswap<16>(i, 15,14,13,12,11,10,9,8,7,6,5,0,1,2,3,4)+0x1000];
 	}
 
 	for(i = 0; i < 0x200; i++)

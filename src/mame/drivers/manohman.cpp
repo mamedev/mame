@@ -133,11 +133,12 @@
 
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
+#include "machine/68230pit.h"
+#include "machine/mc68681.h"
+#include "machine/msm6242.h"
+#include "machine/nvram.h"
 #include "sound/saa1099.h"
 #include "speaker.h"
-
-#define MASTER_CLOCK        XTAL_8MHz
-#define SECONDARY_CLOCK     XTAL_3_6864MHz
 
 
 class manohman_state : public driver_device
@@ -145,23 +146,46 @@ class manohman_state : public driver_device
 public:
 	manohman_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_duart(*this, "duart"),
+		m_pit(*this, "pit")
+	{ }
+
+	IRQ_CALLBACK_MEMBER(iack_handler);
+
+private:
+	virtual void machine_start() override;
 
 	required_device<cpu_device> m_maincpu;
+	required_device<mc68681_device> m_duart;
+	required_device<pit68230_device> m_pit;
 };
+
+
+void manohman_state::machine_start()
+{
+}
+
+
+IRQ_CALLBACK_MEMBER(manohman_state::iack_handler)
+{
+	// TODO: fetch 68230 vector
+	return m_duart->get_irq_vector();
+}
 
 
 /*********************************************
 *           Memory Map Definition            *
 *********************************************/
 
-static ADDRESS_MAP_START( manohman_map, AS_PROGRAM, 16, manohman_state )
+static ADDRESS_MAP_START( mem_map, AS_PROGRAM, 16, manohman_state )
 	AM_RANGE(0x000000, 0x01ffff) AM_ROM
-	AM_RANGE(0x100000, 0x100001) AM_NOP     // smell to MAX696 watchdog...
-	AM_RANGE(0x300000, 0x300003) AM_DEVWRITE8("saa", saa1099_device, write, 0x00ff)
-	AM_RANGE(0x500000, 0x503fff) AM_RAM
-	AM_RANGE(0x600006, 0x600007) AM_RAM     // write bitpatterns to compare with the 500000-503ff8 RAM testing.
-//  AM_RANGE(0xYYYYYY, 0xYYYYYY) AM_RAM
+	AM_RANGE(0x100000, 0x10003f) AM_DEVREADWRITE8("pit", pit68230_device, read, write, 0x00ff)
+	AM_RANGE(0x200000, 0x20001f) AM_DEVREADWRITE8("duart", mc68681_device, read, write, 0x00ff)
+	AM_RANGE(0x300000, 0x300003) AM_DEVWRITE8("saa", saa1099_device, write, 0x00ff) AM_READNOP
+	AM_RANGE(0x400000, 0x40001f) AM_DEVREADWRITE8("rtc", msm6242_device, read, write, 0x00ff)
+	AM_RANGE(0x500000, 0x503fff) AM_RAM AM_SHARE("nvram") //work RAM
+	AM_RANGE(0x600006, 0x600007) AM_NOP //(r) is discarded (watchdog?)
 ADDRESS_MAP_END
 
 /*
@@ -209,14 +233,22 @@ INPUT_PORTS_END
 *********************************************/
 
 static MACHINE_CONFIG_START( manohman )
-	// basic machine hardware
-	MCFG_CPU_ADD("maincpu", M68000, MASTER_CLOCK)   // 8 MHz
-	MCFG_CPU_PROGRAM_MAP(manohman_map)
+	MCFG_CPU_ADD("maincpu", M68000, XTAL_8MHz) // MC68000P8
+	MCFG_CPU_PROGRAM_MAP(mem_map)
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(manohman_state, iack_handler)
 
-	// sound hardware
+	MCFG_DEVICE_ADD("pit", PIT68230, XTAL_8MHz) // MC68230P8
+
+	MCFG_DEVICE_ADD("duart", MC68681, XTAL_3_6864MHz)
+	MCFG_MC68681_IRQ_CALLBACK(INPUTLINE("maincpu", M68K_IRQ_4))
+
+	MCFG_DEVICE_ADD("rtc", MSM6242, XTAL_32_768kHz) // M62X42B
+
+	MCFG_NVRAM_ADD_NO_FILL("nvram") // KM6264BL-10 x2 + MAX696CFL + battery
+
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SAA1099_ADD("saa", MASTER_CLOCK)  // guess
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ADD("saa", SAA1099, XTAL_8MHz / 2) // clock not verified
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 MACHINE_CONFIG_END
 
 
@@ -225,9 +257,15 @@ MACHINE_CONFIG_END
 *********************************************/
 
 ROM_START( manohman )
-	ROM_REGION( 0x100000, "maincpu", 0 )    /* 68000 code */
-	ROM_LOAD16_BYTE( "mom_austria_vorserie_ii.bin", 0x000000, 0x010000, CRC(4b57409c) SHA1(0438f5d52f4de2ece8fb684cf2d82bdea0eacf0b) )
-	ROM_LOAD16_BYTE( "mom_austria_vorserie_i.bin",  0x000001, 0x010000, CRC(3c9507f9) SHA1(489a6aadfb7d61be0873bf48d428e9d915268f95) )
+	ROM_REGION( 0x20000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "mom_austria_vorserie_ii.bin", 0x00000, 0x10000, CRC(4b57409c) SHA1(0438f5d52f4de2ece8fb684cf2d82bdea0eacf0b) )
+	ROM_LOAD16_BYTE( "mom_austria_vorserie_i.bin",  0x00001, 0x10000, CRC(3c9507f9) SHA1(489a6aadfb7d61be0873bf48d428e9d915268f95) )
+ROM_END
+
+ROM_START( backgamn )
+	ROM_REGION( 0x20000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "b_f2_i.bin",  0x00000, 0x10000, CRC(9e42937c) SHA1(85d462a560b85b03ee9d341e18815b7c396118ac) )
+	ROM_LOAD16_BYTE( "b_f2_ii.bin", 0x00001, 0x10000, CRC(8e0ee50c) SHA1(2a05c337db1131b873646aa4109593636ebaa356) )
 ROM_END
 
 
@@ -237,3 +275,4 @@ ROM_END
 
 //    YEAR  NAME      PARENT  MACHINE   INPUT     STATE           INIT    ROT   COMPANY   FULLNAME         FLAGS
 GAME( 199?, manohman, 0,      manohman, manohman, manohman_state, 0,      ROT0, "Merkur", "Mann, oh-Mann", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_REQUIRES_ARTWORK )
+GAME( 1990, backgamn, 0,      manohman, manohman, manohman_state, 0,      ROT0, "Merkur", "Backgammon",    MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_REQUIRES_ARTWORK )

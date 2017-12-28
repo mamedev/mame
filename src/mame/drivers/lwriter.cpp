@@ -376,7 +376,7 @@ static MACHINE_CONFIG_START( lwriter )
 #if TPI
 	MCFG_DEVICE_ADD("tpi", TPI6525, 0)
 #else
-	MCFG_DEVICE_ADD("via", VIA6522, 0)
+	MCFG_DEVICE_ADD("via", VIA6522, CPU_CLK/10) // 68000 E clock presumed
 	MCFG_VIA6522_READPA_HANDLER(READ8(lwriter_state, via_pa_r))
 	MCFG_VIA6522_READPB_HANDLER(READ8(lwriter_state, via_pb_r))
 	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(lwriter_state, via_pa_w))

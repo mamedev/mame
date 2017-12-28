@@ -351,7 +351,7 @@ static void voodoo_0_pci_w(device_t *busdevice, device_t *device, int function, 
 #if defined(USE_TWO_3DFX)
 static uint32_t voodoo_1_pci_r(device_t *busdevice, device_t *device, int function, int reg, uint32_t mem_mask)
 {
-	magictg_state* state = space.machine().driver_data<magictg_state>();
+	magictg_state* state = machine().driver_data<magictg_state>();
 	uint32_t val = 0;
 
 	switch (reg)
@@ -373,7 +373,7 @@ static uint32_t voodoo_1_pci_r(device_t *busdevice, device_t *device, int functi
 
 static void voodoo_1_pci_w(device_t *busdevice, device_t *device, int function, int reg, uint32_t data, uint32_t mem_mask)
 {
-	magictg_state* state = space.machine().driver_data<magictg_state>();
+	magictg_state* state = machine().driver_data<magictg_state>();
 
 	switch (reg)
 	{
@@ -490,7 +490,7 @@ READ32_MEMBER( magictg_state::zr36120_r )
 	else
 	{
 		/* Post office */
-		res = 0;//mame_rand(space.machine);//m_zr36120.as_regs[0x48/4];
+		res = 0;//mame_rand(machine);//m_zr36120.as_regs[0x48/4];
 	}
 	osd_printf_debug("PINKEYE_R[%x]\n", offset);
 	return res;
@@ -728,7 +728,7 @@ WRITE32_MEMBER( magictg_state::adsp_idma_addr_w )
 READ32_MEMBER( magictg_state::adsp_status_r )
 {
 	// ADSP_IACK = Bit 2
-	return (0 << 2) | (space.machine().rand() & 1);
+	return (0 << 2) | (machine().rand() & 1);
 }
 
 READ16_MEMBER( magictg_state::adsp_control_r )
@@ -741,7 +741,7 @@ READ16_MEMBER( magictg_state::adsp_control_r )
 			res = m_adsp_regs.bdma_word_count;
 			break;
 		case 0x5:
-			res = space.machine().rand() & 0xff;
+			res = machine().rand() & 0xff;
 			break;
 		default:
 			osd_printf_debug("Unhandled register: %x\n", 0x3fe0 + offset);

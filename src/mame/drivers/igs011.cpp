@@ -827,7 +827,7 @@ void igs011_state::lhb2_decrypt()
 		if ((i & 0x3080) != 0x3080 && (i & 0x3090) != 0x3010)
 			x ^= 0x0020;
 
-		j = BITSWAP24(i, 23,22,21,20,19,18,17,16,15,14,13, 8, 11,10, 9, 2, 7,6,5,4,3, 12, 1,0);
+		j = bitswap<24>(i, 23,22,21,20,19,18,17,16,15,14,13, 8, 11,10, 9, 2, 7,6,5,4,3, 12, 1,0);
 
 		result_data[j] = x;
 	}
@@ -849,7 +849,7 @@ void igs011_state::nkishusp_decrypt()
 		uint16_t x = src[i];
 
 		// lhb2 address scrambling
-		j = BITSWAP24(i, 23,22,21,20,19,18,17,16,15,14,13, 8, 11,10, 9, 2, 7,6,5,4,3, 12, 1,0);
+		j = bitswap<24>(i, 23,22,21,20,19,18,17,16,15,14,13, 8, 11,10, 9, 2, 7,6,5,4,3, 12, 1,0);
 
 		// ryukobou xor:
 
@@ -1047,7 +1047,7 @@ void igs011_state::lhb2_gfx_decrypt()
 	std::vector<uint8_t> result_data(rom_size);
 
 	for (i=0; i<rom_size; i++)
-		result_data[i] = src[BITSWAP24(i, 23,22,21,20, 19, 17,16,15, 13,12, 10,9,8,7,6,5,4, 2,1, 3, 11, 14, 18, 0)];
+		result_data[i] = src[bitswap<24>(i, 23,22,21,20, 19, 17,16,15, 13,12, 10,9,8,7,6,5,4, 2,1, 3, 11, 14, 18, 0)];
 
 	memcpy(src,&result_data[0],rom_size);
 }
@@ -1060,7 +1060,7 @@ void igs011_state::drgnwrld_gfx_decrypt()
 	std::vector<uint8_t> result_data(rom_size);
 
 	for (i=0; i<rom_size; i++)
-		result_data[i] = src[BITSWAP24(i, 23,22,21,20,19,18,17,16,15, 12, 13, 14, 11,10,9,8,7,6,5,4,3,2,1,0)];
+		result_data[i] = src[bitswap<24>(i, 23,22,21,20,19,18,17,16,15, 12, 13, 14, 11,10,9,8,7,6,5,4,3,2,1,0)];
 
 	memcpy(src,&result_data[0],rom_size);
 }
@@ -1742,7 +1742,7 @@ READ16_MEMBER(igs011_state::lhb2_igs003_r)
 			break;
 
 		case 0x03:
-			return BITSWAP16(m_igs003_prot_hold, 14,11,8,6,4,3,1,0, 5,2,9,7,10,13,12,15) & 0xff;
+			return bitswap<16>(m_igs003_prot_hold, 14,11,8,6,4,3,1,0, 5,2,9,7,10,13,12,15) & 0xff;
 
 		// Protection:
 		// 0544FE: 20 21 22 24 25 26 27 28 2A 2B 2C 2D 2E 30 31 32 33 34
@@ -2010,7 +2010,7 @@ READ16_MEMBER(igs011_state::vbowl_igs003_r)
 		case 0x01:  return ioport("IN1")->read();
 
 		case 0x03:
-			return BITSWAP16(m_igs003_prot_hold, 14,11,8,6,4,3,1,0, 5,2,9,7,10,13,12,15) & 0xff;
+			return bitswap<16>(m_igs003_prot_hold, 14,11,8,6,4,3,1,0, 5,2,9,7,10,13,12,15) & 0xff;
 
 		case 0x20:  return 0x49;
 		case 0x21:  return 0x47;

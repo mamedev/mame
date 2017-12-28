@@ -11,7 +11,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "i860.h"
+#include "i860dis.h"
 
 /* Macros for accessing register fields in instruction word.  */
 #define get_isrc1(bits) (((bits) >> 11) & 0x1f)
@@ -28,12 +28,12 @@
 
 
 /* Control register names.  */
-static const char *const cr2str[] =
+const char *const i860_disassembler::cr2str[] =
 	{"fir", "psr", "dirbase", "db", "fsr", "epsr", "!", "!"};
 
 
 /* Sign extend N-bit number.  */
-static int32_t sign_ext(uint32_t x, int n)
+int32_t i860_disassembler::sign_ext(uint32_t x, int n)
 {
 	int32_t t;
 	t = x >> (n - 1);
@@ -44,7 +44,7 @@ static int32_t sign_ext(uint32_t x, int n)
 
 /* Basic integer 3-address register format:
  *   mnemonic %rs1,%rs2,%rd  */
-static void int_12d(std::ostream &stream, char *mnemonic, uint32_t pc, uint32_t insn)
+void i860_disassembler::int_12d(std::ostream &stream, char *mnemonic, uint32_t pc, uint32_t insn)
 {
 	/* Possibly prefix shrd with 'd.' */
 	if (((insn & 0xfc000000) == 0xb0000000) && (insn & 0x200))
@@ -58,7 +58,7 @@ static void int_12d(std::ostream &stream, char *mnemonic, uint32_t pc, uint32_t 
 
 /* Basic integer 3-address imm16 format:
  *   mnemonic #imm16,%rs2,%rd  */
-static void int_i2d(std::ostream &stream, char *mnemonic, uint32_t pc, uint32_t insn)
+void i860_disassembler::int_i2d(std::ostream &stream, char *mnemonic, uint32_t pc, uint32_t insn)
 {
 	/* Sign extend the 16-bit immediate.
 	   Print as hex for the bitwise operations.  */
@@ -73,21 +73,21 @@ static void int_i2d(std::ostream &stream, char *mnemonic, uint32_t pc, uint32_t 
 
 
 /* Integer (mixed) 2-address  isrc1ni,fdest.  */
-static void int_1d(std::ostream &stream, char *mnemonic, uint32_t pc, uint32_t insn)
+void i860_disassembler::int_1d(std::ostream &stream, char *mnemonic, uint32_t pc, uint32_t insn)
 {
 	util::stream_format(stream, "%s\t%%r%d,%%f%d", mnemonic, get_isrc1 (insn), get_fdest (insn));
 }
 
 
 /* Integer (mixed) 2-address  csrc2,idest.  */
-static void int_cd(std::ostream &stream, char *mnemonic, uint32_t pc, uint32_t insn)
+void i860_disassembler::int_cd(std::ostream &stream, char *mnemonic, uint32_t pc, uint32_t insn)
 {
 	util::stream_format(stream, "%s\t%%%s,%%r%d", mnemonic, cr2str[get_creg (insn)], get_idest (insn));
 }
 
 
 /* Integer (mixed) 2-address  isrc1,csrc2.  */
-static void int_1c(std::ostream &stream, char *mnemonic, uint32_t pc, uint32_t insn)
+void i860_disassembler::int_1c(std::ostream &stream, char *mnemonic, uint32_t pc, uint32_t insn)
 {
 	util::stream_format(stream, "%s\t%%r%d,%%%s", mnemonic, get_isrc1(insn), cr2str[get_creg (insn)]);
 }
@@ -95,7 +95,7 @@ static void int_1c(std::ostream &stream, char *mnemonic, uint32_t pc, uint32_t i
 
 /* Integer 1-address register format:
  *   mnemonic %rs1  */
-static void int_1(std::ostream &stream, char *mnemonic, uint32_t pc, uint32_t insn)
+void i860_disassembler::int_1(std::ostream &stream, char *mnemonic, uint32_t pc, uint32_t insn)
 {
 	util::stream_format(stream, "%s\t%%r%d", mnemonic, get_isrc1 (insn));
 }
@@ -103,7 +103,7 @@ static void int_1(std::ostream &stream, char *mnemonic, uint32_t pc, uint32_t in
 
 /* Integer no-address register format:
  *   mnemonic  */
-static void int_0(std::ostream &stream, char *mnemonic, uint32_t pc, uint32_t insn)
+void i860_disassembler::int_0(std::ostream &stream, char *mnemonic, uint32_t pc, uint32_t insn)
 {
 	util::stream_format(stream, "%s", mnemonic);
 }
@@ -111,7 +111,7 @@ static void int_0(std::ostream &stream, char *mnemonic, uint32_t pc, uint32_t in
 
 /* Basic floating-point 3-address register format:
  *   mnemonic %fs1,%fs2,%fd  */
-static void flop_12d(std::ostream &stream, char *mnemonic, uint32_t pc, uint32_t insn)
+void i860_disassembler::flop_12d(std::ostream &stream, char *mnemonic, uint32_t pc, uint32_t insn)
 {
 	char newname[256];
 	const char *const suffix[4] = { "ss", "sd", "ds", "dd" };
@@ -165,7 +165,7 @@ static void flop_12d(std::ostream &stream, char *mnemonic, uint32_t pc, uint32_t
 
 /* Floating-point 2-address register format:
  *   mnemonic %fs1,%fd  */
-static void flop_1d(std::ostream &stream, char *mnemonic, uint32_t pc, uint32_t insn)
+void i860_disassembler::flop_1d(std::ostream &stream, char *mnemonic, uint32_t pc, uint32_t insn)
 {
 	const char *const suffix[4] = { "ss", "sd", "ds", "dd" };
 	const char *prefix_d, *prefix_p;
@@ -179,7 +179,7 @@ static void flop_1d(std::ostream &stream, char *mnemonic, uint32_t pc, uint32_t 
 
 /* Floating-point 2-address register format:
  *   mnemonic %fs2,%fd  */
-static void flop_2d(std::ostream &stream, char *mnemonic, uint32_t pc, uint32_t insn)
+void i860_disassembler::flop_2d(std::ostream &stream, char *mnemonic, uint32_t pc, uint32_t insn)
 {
 	const char *const suffix[4] = { "ss", "sd", "ds", "dd" };
 	const char *prefix_d;
@@ -192,7 +192,7 @@ static void flop_2d(std::ostream &stream, char *mnemonic, uint32_t pc, uint32_t 
 
 /* Floating-point (mixed) 2-address register format:
  *  fxfr fsrc1,idest.  */
-static void flop_fxfr(std::ostream &stream, char *mnemonic, uint32_t pc, uint32_t insn)
+void i860_disassembler::flop_fxfr(std::ostream &stream, char *mnemonic, uint32_t pc, uint32_t insn)
 {
 	const char *prefix_d = (insn & 0x200) ? "d." : "";
 	util::stream_format(stream, "%s%s\t%%f%d,%%r%d", prefix_d, mnemonic, get_fsrc1 (insn),
@@ -202,7 +202,7 @@ static void flop_fxfr(std::ostream &stream, char *mnemonic, uint32_t pc, uint32_
 
 /* Branch with reg,reg,sbroff format:
  *   mnemonic %rs1,%rs2,sbroff  */
-static void int_12S(std::ostream &stream, char *mnemonic, uint32_t pc, uint32_t insn)
+void i860_disassembler::int_12S(std::ostream &stream, char *mnemonic, uint32_t pc, uint32_t insn)
 {
 	int32_t sbroff = sign_ext ((((insn >> 5) & 0xf800) | (insn & 0x07ff)), 16);
 	int32_t rel = (int32_t)pc + (sbroff << 2) + 4;
@@ -214,7 +214,7 @@ static void int_12S(std::ostream &stream, char *mnemonic, uint32_t pc, uint32_t 
 
 /* Branch with #const5,reg,sbroff format:
  *   mnemonic #const5,%rs2,sbroff  */
-static void int_i2S(std::ostream &stream, char *mnemonic, uint32_t pc, uint32_t insn)
+void i860_disassembler::int_i2S(std::ostream &stream, char *mnemonic, uint32_t pc, uint32_t insn)
 {
 	int32_t sbroff = sign_ext ((((insn >> 5) & 0xf800) | (insn & 0x07ff)), 16);
 	int32_t rel = (int32_t)pc + (sbroff << 2) + 4;
@@ -226,7 +226,7 @@ static void int_i2S(std::ostream &stream, char *mnemonic, uint32_t pc, uint32_t 
 
 /* Branch with lbroff format:
  *   mnemonic lbroff  */
-static void int_L(std::ostream &stream, char *mnemonic, uint32_t pc, uint32_t insn)
+void i860_disassembler::int_L(std::ostream &stream, char *mnemonic, uint32_t pc, uint32_t insn)
 {
 	int32_t lbroff =  sign_ext ((insn & 0x03ffffff), 26);
 	int32_t rel = (int32_t)pc + (lbroff << 2) + 4;
@@ -238,7 +238,7 @@ static void int_L(std::ostream &stream, char *mnemonic, uint32_t pc, uint32_t in
 /* Integer load.
  *  ld.{b,s,l} isrc1(isrc2),idest
  *  ld.{b,s,l} #const(isrc2),idest  */
-static void int_ldx(std::ostream &stream, char *mnemonic, uint32_t pc, uint32_t insn)
+void i860_disassembler::int_ldx(std::ostream &stream, char *mnemonic, uint32_t pc, uint32_t insn)
 {
 	/* Operand size, in bytes.  */
 	int sizes[4] = { 1, 1, 2, 4 };
@@ -265,7 +265,7 @@ static void int_ldx(std::ostream &stream, char *mnemonic, uint32_t pc, uint32_t 
 
 
 /* Integer store: st.b isrc1ni,#const(isrc2)  */
-static void int_stx(std::ostream &stream, char *mnemonic, uint32_t pc, uint32_t insn)
+void i860_disassembler::int_stx(std::ostream &stream, char *mnemonic, uint32_t pc, uint32_t insn)
 {
 	/* Operand size, in bytes.  */
 	int sizes[4] = { 1, 1, 2, 4 };
@@ -291,7 +291,7 @@ static void int_stx(std::ostream &stream, char *mnemonic, uint32_t pc, uint32_t 
  *  "fst.y fdest,isrc1(isrc2)", "fst.y fdest,isrc1(isrc2)++",
  *  "fst.y fdest,#const(isrc2)" or "fst.y fdest,#const(isrc2)++"
  *  Where y = {l,d,q}.  Note, there is no pfld.q, though.  */
-static void int_fldst(std::ostream &stream, char *mnemonic, uint32_t pc, uint32_t insn)
+void i860_disassembler::int_fldst(std::ostream &stream, char *mnemonic, uint32_t pc, uint32_t insn)
 {
 	int32_t immsrc1 = sign_ext (get_imm16 (insn), 16);
 	/* Operand size, in bytes.  */
@@ -353,7 +353,7 @@ static void int_fldst(std::ostream &stream, char *mnemonic, uint32_t pc, uint32_
 
 
 /* flush #const(isrc2)[++].  */
-static void int_flush(std::ostream &stream, char *mnemonic, uint32_t pc, uint32_t insn)
+void i860_disassembler::int_flush(std::ostream &stream, char *mnemonic, uint32_t pc, uint32_t insn)
 {
 	const char *const auto_suff[2] = { "", "++" };
 	int32_t immsrc = sign_ext (get_imm16 (insn), 16);
@@ -363,257 +363,234 @@ static void int_flush(std::ostream &stream, char *mnemonic, uint32_t pc, uint32_
 }
 
 
-/* Flags for the decode table.  */
-enum
-{
-	DEC_MORE    = 1,    /* More decoding necessary.  */
-	DEC_DECODED = 2     /* Fully decoded, go.  */
-};
-
-
-struct decode_tbl_t
-{
-	/* Disassembly function for this opcode.
-	   Call with buffer, mnemonic, pc, insn.  */
-	void (*insn_dis)(std::ostream &, char *, uint32_t, uint32_t);
-
-	/* Flags for this opcode.  */
-	char flags;
-
-	/* Mnemonic of this opcode (sometimes partial when more decode is
-	   done in disassembly routines-- e.g., loads and stores).  */
-	const char *mnemonic;
-};
-
-
 /* First-level decode table (i.e., for the 6 primary opcode bits).  */
-static const decode_tbl_t decode_tbl[64] =
+const i860_disassembler::decode_tbl_t i860_disassembler::decode_tbl[64] =
 {
 	/* A slight bit of decoding for loads and stores is done in the
 	   execution routines (operand size and addressing mode), which
 	   is why their respective entries are identical.  */
-	{ int_ldx,   DEC_DECODED, "ld."        }, /* ld.b isrc1(isrc2),idest.  */
-	{ int_ldx,   DEC_DECODED, "ld."        }, /* ld.b #const(isrc2),idest.  */
-	{ int_1d,    DEC_DECODED, "ixfr"       }, /* ixfr isrc1ni,fdest.        */
-	{ int_stx,   DEC_DECODED, "st."        }, /* st.b isrc1ni,#const(isrc2).  */
-	{ int_ldx,   DEC_DECODED, "ld."        }, /* ld.{s,l} isrc1(isrc2),idest.  */
-	{ int_ldx,   DEC_DECODED, "ld."        }, /* ld.{s,l} #const(isrc2),idest.  */
-	{ nullptr,         0           , nullptr           },
-	{ int_stx,   DEC_DECODED, "st."        }, /* st.{s,l} isrc1ni,#const(isrc2),idest.*/
-	{ int_fldst, DEC_DECODED, "fld."       }, /* fld.{l,d,q} isrc1(isrc2)[++],fdest.  */
-	{ int_fldst, DEC_DECODED, "fld."       }, /* fld.{l,d,q} #const(isrc2)[++],fdest. */
-	{ int_fldst, DEC_DECODED, "fst."       }, /* fst.{l,d,q} fdest,isrc1(isrc2)[++]   */
-	{ int_fldst, DEC_DECODED, "fst."       }, /* fst.{l,d,q} fdest,#const(isrc2)[++]  */
-	{ int_cd,    DEC_DECODED, "ld.c"       }, /* ld.c csrc2,idest.                    */
-	{ int_flush, DEC_DECODED, "flush"      }, /* flush #const(isrc2) (or autoinc).    */
-	{ int_1c,    DEC_DECODED, "st.c"       }, /* st.c isrc1,csrc2.                    */
-	{ int_fldst, DEC_DECODED, "pstd."      }, /* pst.d fdest,#const(isrc2)[++].       */
-	{ int_1,     DEC_DECODED, "bri"        }, /* bri isrc1ni.                         */
-	{ int_12d,   DEC_DECODED, "trap"       }, /* trap isrc1ni,isrc2,idest.            */
-	{ nullptr,         DEC_MORE,    nullptr            }, /* FP ESCAPE FORMAT, more decode.       */
-	{ nullptr,         DEC_MORE,    nullptr            }, /* CORE ESCAPE FORMAT, more decode.     */
-	{ int_12S,   DEC_DECODED, "btne"       }, /* btne isrc1,isrc2,sbroff.             */
-	{ int_i2S,   DEC_DECODED, "btne"       }, /* btne #const,isrc2,sbroff.            */
-	{ int_12S,   DEC_DECODED, "bte"        }, /* bte isrc1,isrc2,sbroff.              */
-	{ int_i2S,   DEC_DECODED, "bte"        }, /* bte #const5,isrc2,idest.             */
-	{ int_fldst, DEC_DECODED, "pfld."      }, /* pfld.{l,d,q} isrc1(isrc2)[++],fdest. */
-	{ int_fldst, DEC_DECODED, "pfld."      }, /* pfld.{l,d,q} #const(isrc2)[++],fdest.*/
-	{ int_L,     DEC_DECODED, "br"         }, /* br lbroff.    */
-	{ int_L,     DEC_DECODED, "call"       }, /* call lbroff . */
-	{ int_L,     DEC_DECODED, "bc"         }, /* bc lbroff.    */
-	{ int_L,     DEC_DECODED, "bc.t"       }, /* bc.t lbroff.  */
-	{ int_L,     DEC_DECODED, "bnc"        }, /* bnc lbroff.   */
-	{ int_L,     DEC_DECODED, "bnc.t"      }, /* bnc.t lbroff. */
-	{ int_12d,   DEC_DECODED, "addu"       }, /* addu isrc1,isrc2,idest.    */
-	{ int_i2d,   DEC_DECODED, "addu"       }, /* addu #const,isrc2,idest.   */
-	{ int_12d,   DEC_DECODED, "subu"       }, /* subu isrc1,isrc2,idest.    */
-	{ int_i2d,   DEC_DECODED, "subu"       }, /* subu #const,isrc2,idest.   */
-	{ int_12d,   DEC_DECODED, "adds"       }, /* adds isrc1,isrc2,idest.    */
-	{ int_i2d,   DEC_DECODED, "adds"       }, /* adds #const,isrc2,idest.   */
-	{ int_12d,   DEC_DECODED, "subs"       }, /* subs isrc1,isrc2,idest.    */
-	{ int_i2d,   DEC_DECODED, "subs"       }, /* subs #const,isrc2,idest.   */
-	{ int_12d,   DEC_DECODED, "shl"        }, /* shl isrc1,isrc2,idest.     */
-	{ int_i2d,   DEC_DECODED, "shl"        }, /* shl #const,isrc2,idest.    */
-	{ int_12d,   DEC_DECODED, "shr"        }, /* shr isrc1,isrc2,idest.     */
-	{ int_i2d,   DEC_DECODED, "shr"        }, /* shr #const,isrc2,idest.    */
-	{ int_12d,   DEC_DECODED, "shrd"       }, /* shrd isrc1ni,isrc2,idest.  */
-	{ int_12S,   DEC_DECODED, "bla"        }, /* bla isrc1ni,isrc2,sbroff.  */
-	{ int_12d,   DEC_DECODED, "shra"       }, /* shra isrc1,isrc2,idest.    */
-	{ int_i2d,   DEC_DECODED, "shra"       }, /* shra #const,isrc2,idest.   */
-	{ int_12d,   DEC_DECODED, "and"        }, /* and isrc1,isrc2,idest.     */
-	{ int_i2d,   DEC_DECODED, "and"        }, /* and #const,isrc2,idest.    */
-	{ nullptr,         0           , nullptr           },
-	{ int_i2d,   DEC_DECODED, "andh"       }, /* andh #const,isrc2,idest.   */
-	{ int_12d,   DEC_DECODED, "andnot"     }, /* andnot isrc1,isrc2,idest.  */
-	{ int_i2d,   DEC_DECODED, "andnot"     }, /* andnot #const,isrc2,idest. */
-	{ nullptr,         0           , nullptr           },
-	{ int_i2d,   DEC_DECODED, "andnoth"    }, /* andnoth #const,isrc2,idest.*/
-	{ int_12d,   DEC_DECODED, "or"         }, /* or isrc1,isrc2,idest.      */
-	{ int_i2d,   DEC_DECODED, "or"         }, /* or #const,isrc2,idest.     */
-	{ nullptr,         0           , nullptr           },
-	{ int_i2d,   DEC_DECODED, "orh"        }, /* orh #const,isrc2,idest.    */
-	{ int_12d,   DEC_DECODED, "xor"        }, /* xor isrc1,isrc2,idest.     */
-	{ int_i2d,   DEC_DECODED, "xor"        }, /* xor #const,isrc2,idest.    */
-	{ nullptr,         0           , nullptr           },
-	{ int_i2d,   DEC_DECODED, "xorh"       }, /* xorh #const,isrc2,idest.   */
+	{ &i860_disassembler::int_ldx,   DEC_DECODED, "ld."        }, /* ld.b isrc1(isrc2),idest.  */
+	{ &i860_disassembler::int_ldx,   DEC_DECODED, "ld."        }, /* ld.b #const(isrc2),idest.  */
+	{ &i860_disassembler::int_1d,    DEC_DECODED, "ixfr"       }, /* ixfr isrc1ni,fdest.        */
+	{ &i860_disassembler::int_stx,   DEC_DECODED, "st."        }, /* st.b isrc1ni,#const(isrc2).  */
+	{ &i860_disassembler::int_ldx,   DEC_DECODED, "ld."        }, /* ld.{s,l} isrc1(isrc2),idest.  */
+	{ &i860_disassembler::int_ldx,   DEC_DECODED, "ld."        }, /* ld.{s,l} #const(isrc2),idest.  */
+	{ nullptr,                       0           , nullptr     },
+	{ &i860_disassembler::int_stx,   DEC_DECODED, "st."        }, /* st.{s,l} isrc1ni,#const(isrc2),idest.*/
+	{ &i860_disassembler::int_fldst, DEC_DECODED, "fld."       }, /* fld.{l,d,q} isrc1(isrc2)[++],fdest.  */
+	{ &i860_disassembler::int_fldst, DEC_DECODED, "fld."       }, /* fld.{l,d,q} #const(isrc2)[++],fdest. */
+	{ &i860_disassembler::int_fldst, DEC_DECODED, "fst."       }, /* fst.{l,d,q} fdest,isrc1(isrc2)[++]   */
+	{ &i860_disassembler::int_fldst, DEC_DECODED, "fst."       }, /* fst.{l,d,q} fdest,#const(isrc2)[++]  */
+	{ &i860_disassembler::int_cd,    DEC_DECODED, "ld.c"       }, /* ld.c csrc2,idest.                    */
+	{ &i860_disassembler::int_flush, DEC_DECODED, "flush"      }, /* flush #const(isrc2) (or autoinc).    */
+	{ &i860_disassembler::int_1c,    DEC_DECODED, "st.c"       }, /* st.c isrc1,csrc2.                    */
+	{ &i860_disassembler::int_fldst, DEC_DECODED, "pstd."      }, /* pst.d fdest,#const(isrc2)[++].       */
+	{ &i860_disassembler::int_1,     DEC_DECODED, "bri"        }, /* bri isrc1ni.                         */
+	{ &i860_disassembler::int_12d,   DEC_DECODED, "trap"       }, /* trap isrc1ni,isrc2,idest.            */
+	{ nullptr,                       DEC_MORE,    nullptr      }, /* FP ESCAPE FORMAT, more decode.       */
+	{ nullptr,                       DEC_MORE,    nullptr      }, /* CORE ESCAPE FORMAT, more decode.     */
+	{ &i860_disassembler::int_12S,   DEC_DECODED, "btne"       }, /* btne isrc1,isrc2,sbroff.             */
+	{ &i860_disassembler::int_i2S,   DEC_DECODED, "btne"       }, /* btne #const,isrc2,sbroff.            */
+	{ &i860_disassembler::int_12S,   DEC_DECODED, "bte"        }, /* bte isrc1,isrc2,sbroff.              */
+	{ &i860_disassembler::int_i2S,   DEC_DECODED, "bte"        }, /* bte #const5,isrc2,idest.             */
+	{ &i860_disassembler::int_fldst, DEC_DECODED, "pfld."      }, /* pfld.{l,d,q} isrc1(isrc2)[++],fdest. */
+	{ &i860_disassembler::int_fldst, DEC_DECODED, "pfld."      }, /* pfld.{l,d,q} #const(isrc2)[++],fdest.*/
+	{ &i860_disassembler::int_L,     DEC_DECODED, "br"         }, /* br lbroff.    */
+	{ &i860_disassembler::int_L,     DEC_DECODED, "call"       }, /* call lbroff . */
+	{ &i860_disassembler::int_L,     DEC_DECODED, "bc"         }, /* bc lbroff.    */
+	{ &i860_disassembler::int_L,     DEC_DECODED, "bc.t"       }, /* bc.t lbroff.  */
+	{ &i860_disassembler::int_L,     DEC_DECODED, "bnc"        }, /* bnc lbroff.   */
+	{ &i860_disassembler::int_L,     DEC_DECODED, "bnc.t"      }, /* bnc.t lbroff. */
+	{ &i860_disassembler::int_12d,   DEC_DECODED, "addu"       }, /* addu isrc1,isrc2,idest.    */
+	{ &i860_disassembler::int_i2d,   DEC_DECODED, "addu"       }, /* addu #const,isrc2,idest.   */
+	{ &i860_disassembler::int_12d,   DEC_DECODED, "subu"       }, /* subu isrc1,isrc2,idest.    */
+	{ &i860_disassembler::int_i2d,   DEC_DECODED, "subu"       }, /* subu #const,isrc2,idest.   */
+	{ &i860_disassembler::int_12d,   DEC_DECODED, "adds"       }, /* adds isrc1,isrc2,idest.    */
+	{ &i860_disassembler::int_i2d,   DEC_DECODED, "adds"       }, /* adds #const,isrc2,idest.   */
+	{ &i860_disassembler::int_12d,   DEC_DECODED, "subs"       }, /* subs isrc1,isrc2,idest.    */
+	{ &i860_disassembler::int_i2d,   DEC_DECODED, "subs"       }, /* subs #const,isrc2,idest.   */
+	{ &i860_disassembler::int_12d,   DEC_DECODED, "shl"        }, /* shl isrc1,isrc2,idest.     */
+	{ &i860_disassembler::int_i2d,   DEC_DECODED, "shl"        }, /* shl #const,isrc2,idest.    */
+	{ &i860_disassembler::int_12d,   DEC_DECODED, "shr"        }, /* shr isrc1,isrc2,idest.     */
+	{ &i860_disassembler::int_i2d,   DEC_DECODED, "shr"        }, /* shr #const,isrc2,idest.    */
+	{ &i860_disassembler::int_12d,   DEC_DECODED, "shrd"       }, /* shrd isrc1ni,isrc2,idest.  */
+	{ &i860_disassembler::int_12S,   DEC_DECODED, "bla"        }, /* bla isrc1ni,isrc2,sbroff.  */
+	{ &i860_disassembler::int_12d,   DEC_DECODED, "shra"       }, /* shra isrc1,isrc2,idest.    */
+	{ &i860_disassembler::int_i2d,   DEC_DECODED, "shra"       }, /* shra #const,isrc2,idest.   */
+	{ &i860_disassembler::int_12d,   DEC_DECODED, "and"        }, /* and isrc1,isrc2,idest.     */
+	{ &i860_disassembler::int_i2d,   DEC_DECODED, "and"        }, /* and #const,isrc2,idest.    */
+	{ nullptr,                       0           , nullptr     },
+	{ &i860_disassembler::int_i2d,   DEC_DECODED, "andh"       }, /* andh #const,isrc2,idest.   */
+	{ &i860_disassembler::int_12d,   DEC_DECODED, "andnot"     }, /* andnot isrc1,isrc2,idest.  */
+	{ &i860_disassembler::int_i2d,   DEC_DECODED, "andnot"     }, /* andnot #const,isrc2,idest. */
+	{ nullptr,                       0           , nullptr     },
+	{ &i860_disassembler::int_i2d,   DEC_DECODED, "andnoth"    }, /* andnoth #const,isrc2,idest.*/
+	{ &i860_disassembler::int_12d,   DEC_DECODED, "or"         }, /* or isrc1,isrc2,idest.      */
+	{ &i860_disassembler::int_i2d,   DEC_DECODED, "or"         }, /* or #const,isrc2,idest.     */
+	{ nullptr,                       0           , nullptr     },
+	{ &i860_disassembler::int_i2d,   DEC_DECODED, "orh"        }, /* orh #const,isrc2,idest.    */
+	{ &i860_disassembler::int_12d,   DEC_DECODED, "xor"        }, /* xor isrc1,isrc2,idest.     */
+	{ &i860_disassembler::int_i2d,   DEC_DECODED, "xor"        }, /* xor #const,isrc2,idest.    */
+	{ nullptr,                       0           , nullptr     },
+	{ &i860_disassembler::int_i2d,   DEC_DECODED, "xorh"       }, /* xorh #const,isrc2,idest.   */
 };
 
 
 /* Second-level decode table (i.e., for the 3 core escape opcode bits).  */
-static const decode_tbl_t core_esc_decode_tbl[8] =
+const i860_disassembler::decode_tbl_t i860_disassembler::core_esc_decode_tbl[8] =
 {
-	{ nullptr,         0          , nullptr           },
-	{ int_0,     DEC_DECODED, "lock"      }, /* lock.           */
-	{ int_1,     DEC_DECODED, "calli"     }, /* calli isrc1ni.  */
-	{ nullptr,         0          , nullptr           },
-	{ int_0,     DEC_DECODED, "intovr"    }, /* intovr.         */
-	{ nullptr,         0          , nullptr           },
-	{ nullptr,         0          , nullptr           },
-	{ int_0,     DEC_DECODED, "unlock"    }, /* unlock.         */
+	{ nullptr,                       0          , nullptr     },
+	{ &i860_disassembler::int_0,     DEC_DECODED, "lock"      }, /* lock.           */
+	{ &i860_disassembler::int_1,     DEC_DECODED, "calli"     }, /* calli isrc1ni.  */
+	{ nullptr,                       0          , nullptr     },
+	{ &i860_disassembler::int_0,     DEC_DECODED, "intovr"    }, /* intovr.         */
+	{ nullptr,                       0          , nullptr     },
+	{ nullptr,                       0          , nullptr     },
+	{ &i860_disassembler::int_0,     DEC_DECODED, "unlock"    }, /* unlock.         */
 };
 
 
 /* Second-level decode table (i.e., for the 7 FP extended opcode bits).  */
-static const decode_tbl_t fp_decode_tbl[128] =
+const i860_disassembler::decode_tbl_t i860_disassembler::fp_decode_tbl[128] =
 {
 	/* Floating point instructions.  The least significant 7 bits are
 	   the (extended) opcode and bits 10:7 are P,D,S,R respectively
 	   ([p]ipelined, [d]ual, [s]ource prec., [r]esult prec.).
 	   For some operations, I defer decoding the P,S,R bits to the
 	   emulation routine for them.  */
-	{ flop_12d,  DEC_DECODED, "r2p1."     }, /* 0x00 pf[m]am */
-	{ flop_12d,  DEC_DECODED, "r2pt."     }, /* 0x01 pf[m]am */
-	{ flop_12d,  DEC_DECODED, "r2ap1."    }, /* 0x02 pf[m]am */
-	{ flop_12d,  DEC_DECODED, "r2apt."    }, /* 0x03 pf[m]am */
-	{ flop_12d,  DEC_DECODED, "i2p1."     }, /* 0x04 pf[m]am */
-	{ flop_12d,  DEC_DECODED, "i2pt."     }, /* 0x05 pf[m]am */
-	{ flop_12d,  DEC_DECODED, "i2ap1."    }, /* 0x06 pf[m]am */
-	{ flop_12d,  DEC_DECODED, "i2apt."    }, /* 0x07 pf[m]am */
-	{ flop_12d,  DEC_DECODED, "rat1p2."   }, /* 0x08 pf[m]am */
-	{ flop_12d,  DEC_DECODED, "m12apm."   }, /* 0x09 pf[m]am */
-	{ flop_12d,  DEC_DECODED, "ra1p2."    }, /* 0x0A pf[m]am */
-	{ flop_12d,  DEC_DECODED, "m12ttpa."  }, /* 0x0B pf[m]am */
-	{ flop_12d,  DEC_DECODED, "iat1p2."   }, /* 0x0C pf[m]am */
-	{ flop_12d,  DEC_DECODED, "m12tpm."   }, /* 0x0D pf[m]am */
-	{ flop_12d,  DEC_DECODED, "ia1p2."    }, /* 0x0E pf[m]am */
-	{ flop_12d,  DEC_DECODED, "m12tpa."   }, /* 0x0F pf[m]am */
-	{ flop_12d,  DEC_DECODED, "r2s1."     }, /* 0x10 pf[m]sm */
-	{ flop_12d,  DEC_DECODED, "r2st."     }, /* 0x11 pf[m]sm */
-	{ flop_12d,  DEC_DECODED, "r2as1."    }, /* 0x12 pf[m]sm */
-	{ flop_12d,  DEC_DECODED, "r2ast."    }, /* 0x13 pf[m]sm */
-	{ flop_12d,  DEC_DECODED, "i2s1."     }, /* 0x14 pf[m]sm */
-	{ flop_12d,  DEC_DECODED, "i2st."     }, /* 0x15 pf[m]sm */
-	{ flop_12d,  DEC_DECODED, "i2as1."    }, /* 0x16 pf[m]sm */
-	{ flop_12d,  DEC_DECODED, "i2ast."    }, /* 0x17 pf[m]sm */
-	{ flop_12d,  DEC_DECODED, "rat1s2."   }, /* 0x18 pf[m]sm */
-	{ flop_12d,  DEC_DECODED, "m12asm."   }, /* 0x19 pf[m]sm */
-	{ flop_12d,  DEC_DECODED, "ra1s2."    }, /* 0x1A pf[m]sm */
-	{ flop_12d,  DEC_DECODED, "m12ttsa."  }, /* 0x1B pf[m]sm */
-	{ flop_12d,  DEC_DECODED, "iat1s2."   }, /* 0x1C pf[m]sm */
-	{ flop_12d,  DEC_DECODED, "m12tsm."   }, /* 0x1D pf[m]sm */
-	{ flop_12d,  DEC_DECODED, "ia1s2."    }, /* 0x1E pf[m]sm */
-	{ flop_12d,  DEC_DECODED, "m12tsa."   }, /* 0x1F pf[m]sm */
-	{ flop_12d,  DEC_DECODED, "fmul."     }, /* 0x20 [p]fmul */
-	{ flop_12d,  DEC_DECODED, "fmlow."    }, /* 0x21 fmlow.dd */
-	{ flop_2d,   DEC_DECODED, "frcp."     }, /* 0x22 frcp.{ss,sd,dd} */
-	{ flop_2d,   DEC_DECODED, "frsqr."    }, /* 0x23 frsqr.{ss,sd,dd} */
-	{ flop_12d,  DEC_DECODED, "pfmul3.dd" }, /* 0x24 pfmul3.dd */
-	{ nullptr,         0          , nullptr           }, /* 0x25 */
-	{ nullptr,         0          , nullptr           }, /* 0x26 */
-	{ nullptr,         0          , nullptr           }, /* 0x27 */
-	{ nullptr,         0          , nullptr           }, /* 0x28 */
-	{ nullptr,         0          , nullptr           }, /* 0x29 */
-	{ nullptr,         0          , nullptr           }, /* 0x2A */
-	{ nullptr,         0          , nullptr           }, /* 0x2B */
-	{ nullptr,         0          , nullptr           }, /* 0x2C */
-	{ nullptr,         0          , nullptr           }, /* 0x2D */
-	{ nullptr,         0          , nullptr           }, /* 0x2E */
-	{ nullptr,         0          , nullptr           }, /* 0x2F */
-	{ flop_12d,  DEC_DECODED, "fadd."     }, /* 0x30, [p]fadd.{ss,sd,dd} */
-	{ flop_12d,  DEC_DECODED, "fsub."     }, /* 0x31, [p]fsub.{ss,sd,dd} */
-	{ flop_1d,   DEC_DECODED, "fix."      }, /* 0x32, [p]fix.{ss,sd,dd} */
-	{ flop_1d,   DEC_DECODED, "famov."    }, /* 0x33, [p]famov.{ss,sd,ds,dd} */
-	{ flop_12d,  DEC_DECODED, "f{gt,le}"  }, /* 0x34, pf{gt,le}.{ss,dd} */
-	{ flop_12d,  DEC_DECODED, "feq."      }, /* 0x35, pfeq.{ss,dd} */
-	{ nullptr,         0          , nullptr           }, /* 0x36 */
-	{ nullptr,         0          , nullptr           }, /* 0x37 */
-	{ nullptr,         0          , nullptr           }, /* 0x38 */
-	{ nullptr,         0          , nullptr           }, /* 0x39 */
-	{ flop_1d,   DEC_DECODED, "ftrunc."   }, /* 0x3A, [p]ftrunc.{ss,sd,dd} */
-	{ nullptr,         0          , nullptr           }, /* 0x3B */
-	{ nullptr,         0          , nullptr           }, /* 0x3C */
-	{ nullptr,         0          , nullptr           }, /* 0x3D */
-	{ nullptr,         0          , nullptr           }, /* 0x3E */
-	{ nullptr,         0          , nullptr           }, /* 0x3F */
-	{ flop_fxfr, DEC_DECODED, "fxfr"      }, /* 0x40, fxfr fsrc1,idest. */
-	{ nullptr,         0          , nullptr           }, /* 0x41 */
-	{ nullptr,         0          , nullptr           }, /* 0x42 */
-	{ nullptr,         0          , nullptr           }, /* 0x43 */
-	{ nullptr,         0          , nullptr           }, /* 0x44 */
-	{ nullptr,         0          , nullptr           }, /* 0x45 */
-	{ nullptr,         0          , nullptr           }, /* 0x46 */
-	{ nullptr,         0          , nullptr           }, /* 0x47 */
-	{ nullptr,         0          , nullptr           }, /* 0x48 */
-	{ flop_12d,  DEC_DECODED, "fiadd."    }, /* 0x49, [p]fiadd.{ss,dd} */
-	{ nullptr,         0          , nullptr           }, /* 0x4A */
-	{ nullptr,         0          , nullptr           }, /* 0x4B */
-	{ nullptr,         0          , nullptr           }, /* 0x4C */
-	{ flop_12d,  DEC_DECODED, "fisub."    }, /* 0x4D, [p]fisub.{ss,dd} */
-	{ nullptr,         0          , nullptr           }, /* 0x4E */
-	{ nullptr,         0          , nullptr           }, /* 0x4F */
-	{ flop_12d,  DEC_DECODED, "faddp"     }, /* 0x50, [p]faddp */
-	{ flop_12d,  DEC_DECODED, "faddz"     }, /* 0x51, [p]faddz */
-	{ nullptr,         0          , nullptr           }, /* 0x52 */
-	{ nullptr,         0          , nullptr           }, /* 0x53 */
-	{ nullptr,         0          , nullptr           }, /* 0x54 */
-	{ nullptr,         0          , nullptr           }, /* 0x55 */
-	{ nullptr,         0          , nullptr           }, /* 0x56 */
-	{ flop_12d,  DEC_DECODED, "fzchkl"    }, /* 0x57, [p]fzchkl */
-	{ nullptr,         0          , nullptr           }, /* 0x58 */
-	{ nullptr,         0          , nullptr           }, /* 0x59 */
-	{ flop_1d,   DEC_DECODED, "form"      }, /* 0x5A, [p]form.dd */
-	{ nullptr,         0          , nullptr           }, /* 0x5B */
-	{ nullptr,         0          , nullptr           }, /* 0x5C */
-	{ nullptr,         0          , nullptr           }, /* 0x5D */
-	{ nullptr,         0          , nullptr           }, /* 0x5E */
-	{ flop_12d,  DEC_DECODED, "fzchks"    }, /* 0x5F, [p]fzchks */
-	{ nullptr,         0          , nullptr           }, /* 0x60 */
-	{ nullptr,         0          , nullptr           }, /* 0x61 */
-	{ nullptr,         0          , nullptr           }, /* 0x62 */
-	{ nullptr,         0          , nullptr           }, /* 0x63 */
-	{ nullptr,         0          , nullptr           }, /* 0x64 */
-	{ nullptr,         0          , nullptr           }, /* 0x65 */
-	{ nullptr,         0          , nullptr           }, /* 0x66 */
-	{ nullptr,         0          , nullptr           }, /* 0x67 */
-	{ nullptr,         0          , nullptr           }, /* 0x68 */
-	{ nullptr,         0          , nullptr           }, /* 0x69 */
-	{ nullptr,         0          , nullptr           }, /* 0x6A */
-	{ nullptr,         0          , nullptr           }, /* 0x6B */
-	{ nullptr,         0          , nullptr           }, /* 0x6C */
-	{ nullptr,         0          , nullptr           }, /* 0x6D */
-	{ nullptr,         0          , nullptr           }, /* 0x6E */
-	{ nullptr,         0          , nullptr           }, /* 0x6F */
-	{ nullptr,         0          , nullptr           }, /* 0x70 */
-	{ nullptr,         0          , nullptr           }, /* 0x71 */
-	{ nullptr,         0          , nullptr           }, /* 0x72 */
-	{ nullptr,         0          , nullptr           }, /* 0x73 */
-	{ nullptr,         0          , nullptr           }, /* 0x74 */
-	{ nullptr,         0          , nullptr           }, /* 0x75 */
-	{ nullptr,         0          , nullptr           }, /* 0x76 */
-	{ nullptr,         0          , nullptr           }, /* 0x77 */
-	{ nullptr,         0          , nullptr           }, /* 0x78 */
-	{ nullptr,         0          , nullptr           }, /* 0x79 */
-	{ nullptr,         0          , nullptr           }, /* 0x7A */
-	{ nullptr,         0          , nullptr           }, /* 0x7B */
-	{ nullptr,         0          , nullptr           }, /* 0x7C */
-	{ nullptr,         0          , nullptr           }, /* 0x7D */
-	{ nullptr,         0          , nullptr           }, /* 0x7E */
-	{ nullptr,         0          , nullptr           }, /* 0x7F */
+	{ &i860_disassembler::flop_12d,  DEC_DECODED, "r2p1."     }, /* 0x00 pf[m]am */
+	{ &i860_disassembler::flop_12d,  DEC_DECODED, "r2pt."     }, /* 0x01 pf[m]am */
+	{ &i860_disassembler::flop_12d,  DEC_DECODED, "r2ap1."    }, /* 0x02 pf[m]am */
+	{ &i860_disassembler::flop_12d,  DEC_DECODED, "r2apt."    }, /* 0x03 pf[m]am */
+	{ &i860_disassembler::flop_12d,  DEC_DECODED, "i2p1."     }, /* 0x04 pf[m]am */
+	{ &i860_disassembler::flop_12d,  DEC_DECODED, "i2pt."     }, /* 0x05 pf[m]am */
+	{ &i860_disassembler::flop_12d,  DEC_DECODED, "i2ap1."    }, /* 0x06 pf[m]am */
+	{ &i860_disassembler::flop_12d,  DEC_DECODED, "i2apt."    }, /* 0x07 pf[m]am */
+	{ &i860_disassembler::flop_12d,  DEC_DECODED, "rat1p2."   }, /* 0x08 pf[m]am */
+	{ &i860_disassembler::flop_12d,  DEC_DECODED, "m12apm."   }, /* 0x09 pf[m]am */
+	{ &i860_disassembler::flop_12d,  DEC_DECODED, "ra1p2."    }, /* 0x0A pf[m]am */
+	{ &i860_disassembler::flop_12d,  DEC_DECODED, "m12ttpa."  }, /* 0x0B pf[m]am */
+	{ &i860_disassembler::flop_12d,  DEC_DECODED, "iat1p2."   }, /* 0x0C pf[m]am */
+	{ &i860_disassembler::flop_12d,  DEC_DECODED, "m12tpm."   }, /* 0x0D pf[m]am */
+	{ &i860_disassembler::flop_12d,  DEC_DECODED, "ia1p2."    }, /* 0x0E pf[m]am */
+	{ &i860_disassembler::flop_12d,  DEC_DECODED, "m12tpa."   }, /* 0x0F pf[m]am */
+	{ &i860_disassembler::flop_12d,  DEC_DECODED, "r2s1."     }, /* 0x10 pf[m]sm */
+	{ &i860_disassembler::flop_12d,  DEC_DECODED, "r2st."     }, /* 0x11 pf[m]sm */
+	{ &i860_disassembler::flop_12d,  DEC_DECODED, "r2as1."    }, /* 0x12 pf[m]sm */
+	{ &i860_disassembler::flop_12d,  DEC_DECODED, "r2ast."    }, /* 0x13 pf[m]sm */
+	{ &i860_disassembler::flop_12d,  DEC_DECODED, "i2s1."     }, /* 0x14 pf[m]sm */
+	{ &i860_disassembler::flop_12d,  DEC_DECODED, "i2st."     }, /* 0x15 pf[m]sm */
+	{ &i860_disassembler::flop_12d,  DEC_DECODED, "i2as1."    }, /* 0x16 pf[m]sm */
+	{ &i860_disassembler::flop_12d,  DEC_DECODED, "i2ast."    }, /* 0x17 pf[m]sm */
+	{ &i860_disassembler::flop_12d,  DEC_DECODED, "rat1s2."   }, /* 0x18 pf[m]sm */
+	{ &i860_disassembler::flop_12d,  DEC_DECODED, "m12asm."   }, /* 0x19 pf[m]sm */
+	{ &i860_disassembler::flop_12d,  DEC_DECODED, "ra1s2."    }, /* 0x1A pf[m]sm */
+	{ &i860_disassembler::flop_12d,  DEC_DECODED, "m12ttsa."  }, /* 0x1B pf[m]sm */
+	{ &i860_disassembler::flop_12d,  DEC_DECODED, "iat1s2."   }, /* 0x1C pf[m]sm */
+	{ &i860_disassembler::flop_12d,  DEC_DECODED, "m12tsm."   }, /* 0x1D pf[m]sm */
+	{ &i860_disassembler::flop_12d,  DEC_DECODED, "ia1s2."    }, /* 0x1E pf[m]sm */
+	{ &i860_disassembler::flop_12d,  DEC_DECODED, "m12tsa."   }, /* 0x1F pf[m]sm */
+	{ &i860_disassembler::flop_12d,  DEC_DECODED, "fmul."     }, /* 0x20 [p]fmul */
+	{ &i860_disassembler::flop_12d,  DEC_DECODED, "fmlow."    }, /* 0x21 fmlow.dd */
+	{ &i860_disassembler::flop_2d,   DEC_DECODED, "frcp."     }, /* 0x22 frcp.{ss,sd,dd} */
+	{ &i860_disassembler::flop_2d,   DEC_DECODED, "frsqr."    }, /* 0x23 frsqr.{ss,sd,dd} */
+	{ &i860_disassembler::flop_12d,  DEC_DECODED, "pfmul3.dd" }, /* 0x24 pfmul3.dd */
+	{ nullptr,                       0          , nullptr     }, /* 0x25 */
+	{ nullptr,                       0          , nullptr     }, /* 0x26 */
+	{ nullptr,                       0          , nullptr     }, /* 0x27 */
+	{ nullptr,                       0          , nullptr     }, /* 0x28 */
+	{ nullptr,                       0          , nullptr     }, /* 0x29 */
+	{ nullptr,                       0          , nullptr     }, /* 0x2A */
+	{ nullptr,                       0          , nullptr     }, /* 0x2B */
+	{ nullptr,                       0          , nullptr     }, /* 0x2C */
+	{ nullptr,                       0          , nullptr     }, /* 0x2D */
+	{ nullptr,                       0          , nullptr     }, /* 0x2E */
+	{ nullptr,                       0          , nullptr     }, /* 0x2F */
+	{ &i860_disassembler::flop_12d,  DEC_DECODED, "fadd."     }, /* 0x30, [p]fadd.{ss,sd,dd} */
+	{ &i860_disassembler::flop_12d,  DEC_DECODED, "fsub."     }, /* 0x31, [p]fsub.{ss,sd,dd} */
+	{ &i860_disassembler::flop_1d,   DEC_DECODED, "fix."      }, /* 0x32, [p]fix.{ss,sd,dd} */
+	{ &i860_disassembler::flop_1d,   DEC_DECODED, "famov."    }, /* 0x33, [p]famov.{ss,sd,ds,dd} */
+	{ &i860_disassembler::flop_12d,  DEC_DECODED, "f{gt,le}"  }, /* 0x34, pf{gt,le}.{ss,dd} */
+	{ &i860_disassembler::flop_12d,  DEC_DECODED, "feq."      }, /* 0x35, pfeq.{ss,dd} */
+	{ nullptr,                       0          , nullptr     }, /* 0x36 */
+	{ nullptr,                       0          , nullptr     }, /* 0x37 */
+	{ nullptr,                       0          , nullptr     }, /* 0x38 */
+	{ nullptr,                       0          , nullptr     }, /* 0x39 */
+	{ &i860_disassembler::flop_1d,   DEC_DECODED, "ftrunc."   }, /* 0x3A, [p]ftrunc.{ss,sd,dd} */
+	{ nullptr,                       0          , nullptr     }, /* 0x3B */
+	{ nullptr,                       0          , nullptr     }, /* 0x3C */
+	{ nullptr,                       0          , nullptr     }, /* 0x3D */
+	{ nullptr,                       0          , nullptr     }, /* 0x3E */
+	{ nullptr,                       0          , nullptr     }, /* 0x3F */
+	{ &i860_disassembler::flop_fxfr, DEC_DECODED, "fxfr"      }, /* 0x40, fxfr fsrc1,idest. */
+	{ nullptr,                       0          , nullptr     }, /* 0x41 */
+	{ nullptr,                       0          , nullptr     }, /* 0x42 */
+	{ nullptr,                       0          , nullptr     }, /* 0x43 */
+	{ nullptr,                       0          , nullptr     }, /* 0x44 */
+	{ nullptr,                       0          , nullptr     }, /* 0x45 */
+	{ nullptr,                       0          , nullptr     }, /* 0x46 */
+	{ nullptr,                       0          , nullptr     }, /* 0x47 */
+	{ nullptr,                       0          , nullptr     }, /* 0x48 */
+	{ &i860_disassembler::flop_12d,  DEC_DECODED, "fiadd."    }, /* 0x49, [p]fiadd.{ss,dd} */
+	{ nullptr,                       0          , nullptr     }, /* 0x4A */
+	{ nullptr,                       0          , nullptr     }, /* 0x4B */
+	{ nullptr,                       0          , nullptr     }, /* 0x4C */
+	{ &i860_disassembler::flop_12d,  DEC_DECODED, "fisub."    }, /* 0x4D, [p]fisub.{ss,dd} */
+	{ nullptr,                       0          , nullptr     }, /* 0x4E */
+	{ nullptr,                       0          , nullptr     }, /* 0x4F */
+	{ &i860_disassembler::flop_12d,  DEC_DECODED, "faddp"     }, /* 0x50, [p]faddp */
+	{ &i860_disassembler::flop_12d,  DEC_DECODED, "faddz"     }, /* 0x51, [p]faddz */
+	{ nullptr,                       0          , nullptr     }, /* 0x52 */
+	{ nullptr,                       0          , nullptr     }, /* 0x53 */
+	{ nullptr,                       0          , nullptr     }, /* 0x54 */
+	{ nullptr,                       0          , nullptr     }, /* 0x55 */
+	{ nullptr,                       0          , nullptr     }, /* 0x56 */
+	{ &i860_disassembler::flop_12d,  DEC_DECODED, "fzchkl"    }, /* 0x57, [p]fzchkl */
+	{ nullptr,                       0          , nullptr     }, /* 0x58 */
+	{ nullptr,                       0          , nullptr     }, /* 0x59 */
+	{ &i860_disassembler::flop_1d,   DEC_DECODED, "form"      }, /* 0x5A, [p]form.dd */
+	{ nullptr,                       0          , nullptr     }, /* 0x5B */
+	{ nullptr,                       0          , nullptr     }, /* 0x5C */
+	{ nullptr,                       0          , nullptr     }, /* 0x5D */
+	{ nullptr,                       0          , nullptr     }, /* 0x5E */
+	{ &i860_disassembler::flop_12d,  DEC_DECODED, "fzchks"    }, /* 0x5F, [p]fzchks */
+	{ nullptr,                       0          , nullptr     }, /* 0x60 */
+	{ nullptr,                       0          , nullptr     }, /* 0x61 */
+	{ nullptr,                       0          , nullptr     }, /* 0x62 */
+	{ nullptr,                       0          , nullptr     }, /* 0x63 */
+	{ nullptr,                       0          , nullptr     }, /* 0x64 */
+	{ nullptr,                       0          , nullptr     }, /* 0x65 */
+	{ nullptr,                       0          , nullptr     }, /* 0x66 */
+	{ nullptr,                       0          , nullptr     }, /* 0x67 */
+	{ nullptr,                       0          , nullptr     }, /* 0x68 */
+	{ nullptr,                       0          , nullptr     }, /* 0x69 */
+	{ nullptr,                       0          , nullptr     }, /* 0x6A */
+	{ nullptr,                       0          , nullptr     }, /* 0x6B */
+	{ nullptr,                       0          , nullptr     }, /* 0x6C */
+	{ nullptr,                       0          , nullptr     }, /* 0x6D */
+	{ nullptr,                       0          , nullptr     }, /* 0x6E */
+	{ nullptr,                       0          , nullptr     }, /* 0x6F */
+	{ nullptr,                       0          , nullptr     }, /* 0x70 */
+	{ nullptr,                       0          , nullptr     }, /* 0x71 */
+	{ nullptr,                       0          , nullptr     }, /* 0x72 */
+	{ nullptr,                       0          , nullptr     }, /* 0x73 */
+	{ nullptr,                       0          , nullptr     }, /* 0x74 */
+	{ nullptr,                       0          , nullptr     }, /* 0x75 */
+	{ nullptr,                       0          , nullptr     }, /* 0x76 */
+	{ nullptr,                       0          , nullptr     }, /* 0x77 */
+	{ nullptr,                       0          , nullptr     }, /* 0x78 */
+	{ nullptr,                       0          , nullptr     }, /* 0x79 */
+	{ nullptr,                       0          , nullptr     }, /* 0x7A */
+	{ nullptr,                       0          , nullptr     }, /* 0x7B */
+	{ nullptr,                       0          , nullptr     }, /* 0x7C */
+	{ nullptr,                       0          , nullptr     }, /* 0x7D */
+	{ nullptr,                       0          , nullptr     }, /* 0x7E */
+	{ nullptr,                       0          , nullptr     }, /* 0x7F */
 };
 
 
 /* Replaces tabs with spaces.  */
-static void i860_dasm_tab_replacer(std::ostream &stream, const std::string &buf, int tab_size)
+void i860_disassembler::i860_dasm_tab_replacer(std::ostream &stream, const std::string &buf, int tab_size)
 {
 	int tab_count = 0;
 
@@ -636,14 +613,11 @@ static void i860_dasm_tab_replacer(std::ostream &stream, const std::string &buf,
 }
 
 
-static offs_t internal_disasm_i860(cpu_device *device, std::ostream &main_stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, int options)
+offs_t i860_disassembler::disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params)
 {
-	std::stringstream stream;
+	std::stringstream tstream;
 
-	uint32_t insn = (oprom[0] << 0) |
-		(oprom[1] << 8)  |
-		(oprom[2] << 16) |
-		(oprom[3] << 24);
+	uint32_t insn = opcodes.r32(pc);
 
 	int unrecognized_op = 1;
 	int upper_6bits = (insn >> 26) & 0x3f;
@@ -651,7 +625,7 @@ static offs_t internal_disasm_i860(cpu_device *device, std::ostream &main_stream
 	if (flags & DEC_DECODED)
 	{
 		const char *s = decode_tbl[upper_6bits].mnemonic;
-		decode_tbl[upper_6bits].insn_dis (stream, (char *)s, pc, insn);
+		(this->*(decode_tbl[upper_6bits].insn_dis)) (tstream, (char *)s, pc, insn);
 		unrecognized_op = 0;
 	}
 	else if (flags & DEC_MORE)
@@ -663,7 +637,7 @@ static offs_t internal_disasm_i860(cpu_device *device, std::ostream &main_stream
 			const char *s = fp_decode_tbl[insn & 0x7f].mnemonic;
 			if (fp_flags & DEC_DECODED)
 			{
-				fp_decode_tbl[insn & 0x7f].insn_dis (stream, (char *)s, pc, insn);
+				(this->*(fp_decode_tbl[insn & 0x7f].insn_dis)) (tstream, (char *)s, pc, insn);
 				unrecognized_op = 0;
 			}
 		}
@@ -674,25 +648,24 @@ static offs_t internal_disasm_i860(cpu_device *device, std::ostream &main_stream
 			const char *s = core_esc_decode_tbl[insn & 0x3].mnemonic;
 			if (esc_flags & DEC_DECODED)
 			{
-				core_esc_decode_tbl[insn & 0x3].insn_dis (stream, (char *)s, pc, insn);
+				(this->*(core_esc_decode_tbl[insn & 0x3].insn_dis)) (tstream, (char *)s, pc, insn);
 				unrecognized_op = 0;
 			}
 		}
 	}
 
 	if (unrecognized_op)
-		util::stream_format(stream, ".long\t%#08x", insn);
+		util::stream_format(tstream, ".long\t%#08x", insn);
 
 	/* Replace tabs with spaces */
-	i860_dasm_tab_replacer(main_stream, stream.str(), 10);
+	i860_dasm_tab_replacer(stream, tstream.str(), 10);
 
 	/* Return number of bytes disassembled.  */
 	/* MAME dasm flags haven't been added yet */
 	return (4);
 }
 
-
-CPU_DISASSEMBLE(i860)
+u32 i860_disassembler::opcode_alignment() const
 {
-	return internal_disasm_i860(device, stream, pc, oprom, opram, options);
+	return 4;
 }

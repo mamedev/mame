@@ -1093,7 +1093,7 @@ WRITE16_MEMBER( supracan_state::supracan_pram_w )
 // swap address around so that 64x64 tile can be decoded as 8x8 tiles..
 void supracan_state::write_swapped_byte( int offset, uint8_t byte )
 {
-	int swapped_offset = BITSWAP32(offset, 31,30,29,28,27,26,25,24,23,22,21,20,19,18,17,16,15,14,13,12,11,10,9,8,7,2,1,0,6,5,4,3);
+	int swapped_offset = bitswap<32>(offset, 31,30,29,28,27,26,25,24,23,22,21,20,19,18,17,16,15,14,13,12,11,10,9,8,7,2,1,0,6,5,4,3);
 
 	m_vram_addr_swapped[swapped_offset] = byte;
 }

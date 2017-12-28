@@ -224,7 +224,7 @@ READ16_MEMBER(qdrmfgp_state::gp2_ide_std_r)
 				break;
 		}
 	}
-	return m_ata->read_cs0(space, offset, mem_mask);
+	return m_ata->read_cs0(offset, mem_mask);
 }
 
 

@@ -13,6 +13,15 @@
     - inputs for i4300;
     - hyprduel.cpp uses scanline attribute which crawls to unusable state
       with current video routines here;
+    - CRT Controller, also understand why it needs so many writes before actual parameters;
+    - Wrong color bars in service mode (e.g. balcube, toride2g). They use solid color tiles (80xx),
+      but the right palette is not at 00-ff.
+      Related to the unknown table in the RAM mapped just before the palette?
+      Update: the colors should have a common bank of 0xb (so 0x8bxx), it's unknown why the values
+      diverges, the blitter is responsible of that upload fwiw;
+    - Some gfx problems in ladykill, 3kokushi, puzzli, gakusai, seem related to how we handle
+      windows, wrapping, read-modify-write areas;
+    - puzzli: emulate hblank irq and fix video routines here (water effect not emulated?);
 
 ============================================================================
 
@@ -614,7 +623,7 @@ void imagetek_i4100_device::blt_write( address_space &space, const int tmap, con
 		case 2: vram_1_w(space, offs, data, mask);    break;
 		case 3: vram_2_w(space, offs, data, mask);    break;
 	}
-//  logerror("%s : Blitter %X] %04X <- %04X & %04X\n", space.machine().describe_context(), tmap, offs, data, mask);
+//  logerror("%s : Blitter %X] %04X <- %04X & %04X\n", machine().describe_context(), tmap, offs, data, mask);
 }
 
 /***************************************************************************

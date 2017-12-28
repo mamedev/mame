@@ -61,7 +61,7 @@ READ16_MEMBER(pgm_asic3_state::pgm_asic3_r)
 			return (m_asic3_latch[2] & 0x7f) | ((ioport("Region")->read() << 6) & 0x80);
 
 		case 0x03:
-			return BITSWAP8(m_asic3_hold, 5,2,9,7,10,13,12,15);
+			return bitswap<8>(m_asic3_hold, 5,2,9,7,10,13,12,15);
 
 		// case $157674, expected return $157686
 		case 0x20: return 0x49; // "IGS"

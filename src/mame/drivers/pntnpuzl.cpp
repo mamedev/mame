@@ -11,72 +11,75 @@ Label:
 Board Num.
 90
 
-The PCB has no silkscreen or reference designators, so the numbers I am
-providing are made up.
+The PCB has no silkscreen or reference designators. All locations
+provided here are from the published schematics.
 
-U1 32 pin IC
+U1 64 pin IC
+MC68000P12
+OB26M8829
+
+U2 32 pin IC
 27C010A
 Label:
 Paint N Puzzle
 Ver. 1.09
 Odd
 
-U2 5 pin audio amp
-LM383T
-
-U3 40 pin IC
-8926S
-UM6522A
-
-U4 28 pin IC
-Mosel
-MS62256L-85PC
-8911 5D
-
-U5 18 pin IC
-PIC16C54-HS/P
-9344 CGA
-
-U6 48 pin IC
-P8798
-L3372718E
-Intel
-Label:
-MicroTouch
-5603670 REV 1.0
-
-U7 28 pin IC
-MicroTouch Systems
-c 1992
-19-507 Rev 2
-ICS1578N 9334
-
-U8 28 pin IC
-Mosel
-MS62256L-85PC
-8911 5D
-
-U9 32 pin IC
+U3 32 pin IC
 27C010A
 Label:
 Paint N Puzzle
 Ver. 1.09
 Even
 
-U10 64 pin IC
-MC68000P12
-OB26M8829
+U4 & U5 28 pin ICs
+Mosel
+MS62256L-85PC
+8911 5D
 
-The 6522 and 8798 each have a 93C46N EEPROM attached.
+U14 28 pin IC
+MicroTouch Systems
+c 1992
+19-507 Rev 2
+ICS1578N 9334 (ASIC 1578 on schematic)
 
-X1
-16.000MHz -connected to U5
+U15 48 pin IC
+P8798 (8797 on schematic)
+L3372718E
+Intel
+Label:
+MicroTouch
+5603670 REV 1.0
 
-X2
+U17 8 pin IC
+National 8538A
+93C46N
+-connected to U15
+
+U35 18 pin IC
+PIC16C54-HS/P
+9344 CGA
+
+U36 5 pin audio amp
+LM383T
+
+U37 8 pin IC
+National 8538A
+93C46N
+-connected to U41
+
+U41 40 pin IC
+8926S
+UM6522A
+
+Y1
 ECS-120
 32-1
-China -connected to U7
-Other side is unreadable
+China -connected to U14
+Other side is unreadable (schematic reads 12.000MHz?)
+
+Y2
+16.000MHz -connected to U35
 
 CN1 JAMMA
 CN2 ISA? Video card slot
@@ -84,8 +87,19 @@ CN3 Touchscreen input (12 pins)
 CN4 2 pins, unused
 
 1 blue potentiometer connected to audio amp
-There doesnt seem to be any dedicated sound chip, and sounds are just bleeps
-really.
+
+There is no dedicated sound generator, and sounds are just bleeps
+really. The sounds come from a binary-weighted DAC attached to the
+PIC's RB outputs:
+
+R34 7.5K
+R33 15.4K
+R32 30.9K
+R31 61.8K
+R30 124K
+R29 249K
+R28 499K
+R27 1M
 
 -----------------------------------------------
 Video card (has proper silk screen and designators)
@@ -220,8 +234,8 @@ READ16_MEMBER(pntnpuzl_state::pntnpuzl_280014_r)
 		if (ioport("IN0")->read() & 0x10)
 		{
 			m_touchscr[0] = 0x1b;
-			m_touchscr[2] = BITSWAP8(ioport("TOUCHX")->read(),0,1,2,3,4,5,6,7);
-			m_touchscr[4] = BITSWAP8(ioport("TOUCHY")->read(),0,1,2,3,4,5,6,7);
+			m_touchscr[2] = bitswap<8>(ioport("TOUCHX")->read(),0,1,2,3,4,5,6,7);
+			m_touchscr[4] = bitswap<8>(ioport("TOUCHY")->read(),0,1,2,3,4,5,6,7);
 		}
 		else
 			m_touchscr[0] = 0;
@@ -331,19 +345,20 @@ static INPUT_PORTS_START( pntnpuzl )
 INPUT_PORTS_END
 
 static MACHINE_CONFIG_START( pntnpuzl )
-	MCFG_CPU_ADD("maincpu", M68000, 12000000)//??
+	MCFG_CPU_ADD("maincpu", M68000, XTAL_12MHz)
 	MCFG_CPU_PROGRAM_MAP(pntnpuzl_map)
 
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 
-	MCFG_DEVICE_ADD("via", VIA6522, 1200000) // ??
+	MCFG_DEVICE_ADD("via", VIA6522, XTAL_12MHz / 10)
 	MCFG_VIA6522_READPA_HANDLER(IOPORT("IN2"))
 	MCFG_VIA6522_READPB_HANDLER(IOPORT("IN1"))
 	MCFG_VIA6522_WRITEPB_HANDLER(DEVWRITELINE("eeprom", eeprom_serial_93cxx_device, di_write)) MCFG_DEVCB_BIT(4)
 	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("eeprom", eeprom_serial_93cxx_device, cs_write)) MCFG_DEVCB_BIT(6)
 	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("eeprom", eeprom_serial_93cxx_device, clk_write)) MCFG_DEVCB_BIT(5)
+	// CB2 used for serial communication with 8798
 
-	MCFG_CPU_ADD("mcu", P8098, 12000000) // ??
+	MCFG_CPU_ADD("mcu", P8098, XTAL_12MHz)
 	MCFG_CPU_PROGRAM_MAP(mcu_map) // FIXME: this is all internal
 
 	/* video hardware */
@@ -357,6 +372,9 @@ ROM_START( pntnpuzl )
 
 	ROM_REGION( 0x2000, "mcu", 0 )
 	ROM_LOAD( "pntnpzl8798.bin", 0x0000, 0x2000, CRC(3ff98e89) SHA1(c48665992cb5377b69902f2a352c9214602a0b84) )
+
+	ROM_REGION( 0x400, "pic", 0 )
+	ROM_LOAD( "16c54.bin", 0x000, 0x400, NO_DUMP )
 
 	/* for reference, probably not used in any way by the game */
 	ROM_REGION( 0x10000, "video_bios", 0 )
@@ -372,4 +390,4 @@ DRIVER_INIT_MEMBER(pntnpuzl_state,pip)
 
 }
 
-GAME( 199?, pntnpuzl,    0, pntnpuzl,    pntnpuzl, pntnpuzl_state,    pip, ROT90,  "Century?", "Paint & Puzzle",MACHINE_NO_SOUND|MACHINE_NOT_WORKING )
+GAME( 1993, pntnpuzl, 0, pntnpuzl, pntnpuzl, pntnpuzl_state, pip, ROT90, "Century Vending", "Paint 'N Puzzle", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

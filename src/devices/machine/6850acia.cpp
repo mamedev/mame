@@ -277,6 +277,19 @@ READ8_MEMBER( acia6850_device::data_r )
 	return m_rdr;
 }
 
+WRITE8_MEMBER( acia6850_device::write )
+{
+	if (BIT(offset, 0))
+		data_w(space, 0, data);
+	else
+		control_w(space, 0, data);
+}
+
+READ8_MEMBER( acia6850_device::read )
+{
+	return BIT(offset, 0) ? data_r(space, 0) : status_r(space, 0);
+}
+
 DECLARE_WRITE_LINE_MEMBER( acia6850_device::write_cts )
 {
 	if (state)

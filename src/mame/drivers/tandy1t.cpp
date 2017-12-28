@@ -408,7 +408,7 @@ READ8_MEMBER( tandy1000_state::tandy1000_bank_r )
 {
 	uint8_t data = 0xFF;
 
-	logerror( "%s: tandy1000_bank_r: offset = %x\n", space.machine().describe_context(), offset );
+	logerror( "%s: tandy1000_bank_r: offset = %x\n", machine().describe_context(), offset );
 
 	switch( offset )
 	{
@@ -423,7 +423,7 @@ READ8_MEMBER( tandy1000_state::tandy1000_bank_r )
 
 WRITE8_MEMBER( tandy1000_state::tandy1000_bank_w )
 {
-	logerror( "%s: tandy1000_bank_w: offset = %x, data = %02x\n", space.machine().describe_context(), offset, data );
+	logerror( "%s: tandy1000_bank_w: offset = %x, data = %02x\n", machine().describe_context(), offset, data );
 
 	switch( offset )
 	{
@@ -702,8 +702,8 @@ static MACHINE_CONFIG_START( t1000rl )
 	MCFG_DEVICE_ADD("biosbank", ADDRESS_MAP_BANK, 0)
 	MCFG_DEVICE_PROGRAM_MAP(biosbank_map)
 	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_ADDRESS_MAP_BANK_DATABUS_WIDTH(16)
-	MCFG_ADDRESS_MAP_BANK_ADDRBUS_WIDTH(20)
+	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(16)
+	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(20)
 	MCFG_ADDRESS_MAP_BANK_STRIDE(0x10000)
 
 	MCFG_MACHINE_RESET_OVERRIDE(tandy1000_state,tandy1000rl)

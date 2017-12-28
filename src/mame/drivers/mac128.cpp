@@ -152,13 +152,7 @@ public:
 		m_mouse0(*this, "MOUSE0"),
 		m_mouse1(*this, "MOUSE1"),
 		m_mouse2(*this, "MOUSE2"),
-		m_key0(*this, "KEY0"),
-		m_key1(*this, "KEY1"),
-		m_key2(*this, "KEY2"),
-		m_key3(*this, "KEY3"),
-		m_key4(*this, "KEY4"),
-		m_key5(*this, "KEY5"),
-		m_key6(*this, "KEY6"),
+		m_key_port(*this, "KEY%u", 0),
 		m_screen(*this, "screen"),
 		m_dac(*this, DAC_TAG),
 		m_scc(*this, SCC_TAG)
@@ -173,8 +167,7 @@ public:
 	optional_device<rtc3430042_device> m_rtc;
 
 	required_ioport m_mouse0, m_mouse1, m_mouse2;
-	required_ioport m_key0, m_key1, m_key2, m_key3, m_key4, m_key5;
-	optional_ioport m_key6;
+	optional_ioport_array<7> m_key_port;
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -636,7 +629,7 @@ READ16_MEMBER ( mac128_state::mac_iwm_r )
 	 */
 
 	uint16_t result = 0;
-	applefdc_base_device *fdc = space.machine().device<applefdc_base_device>("fdc");
+	applefdc_base_device *fdc = machine().device<applefdc_base_device>("fdc");
 
 	result = fdc->read(offset >> 8);
 
@@ -648,7 +641,7 @@ READ16_MEMBER ( mac128_state::mac_iwm_r )
 
 WRITE16_MEMBER ( mac128_state::mac_iwm_w )
 {
-	applefdc_base_device *fdc = space.machine().device<applefdc_base_device>("fdc");
+	applefdc_base_device *fdc = machine().device<applefdc_base_device>("fdc");
 
 	if (LOG_MAC_IWM)
 		printf("mac_iwm_w: offset=0x%08x data=0x%04x mask %04x (PC=%x)\n", offset, data, mem_mask, space.device().safe_pc());
@@ -815,7 +808,6 @@ int mac128_state::scan_keyboard()
 	int i, j;
 	int keybuf = 0;
 	int keycode;
-	ioport_port *ports[7] = { m_key0, m_key1, m_key2, m_key3, m_key4, m_key5, m_key6 };
 
 	if (m_keycode_buf_index)
 	{
@@ -824,7 +816,7 @@ int mac128_state::scan_keyboard()
 
 	for (i=0; i<7; i++)
 	{
-		keybuf = ports[i]->read();
+		keybuf = m_key_port[i]->read();
 
 		if (keybuf != m_key_matrix[i])
 		{

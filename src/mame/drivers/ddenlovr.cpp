@@ -1806,8 +1806,8 @@ READ8_MEMBER(ddenlovr_state::quiz365_input_r )
 	if (!BIT(m_dsw_sel, 0))  return ioport("DSW1")->read();
 	if (!BIT(m_dsw_sel, 1))  return ioport("DSW2")->read();
 	if (!BIT(m_dsw_sel, 2))  return ioport("DSW3")->read();
-	if (!BIT(m_dsw_sel, 3))  return 0xff;//space.machine().rand();
-	if (!BIT(m_dsw_sel, 4))  return 0xff;//space.machine().rand();
+	if (!BIT(m_dsw_sel, 3))  return 0xff;//machine().rand();
+	if (!BIT(m_dsw_sel, 4))  return 0xff;//machine().rand();
 	return 0xff;
 }
 
@@ -3159,7 +3159,7 @@ READ8_MEMBER(ddenlovr_state::hginga_dsw_r )
 	if (!BIT(m_dsw_sel, 3))   return ioport("DSW1")->read();
 	if (!BIT(m_dsw_sel, 4))   return ioport("DSW5")->read();
 
-	logerror("%s: warning, unknown bits read, ddenlovr_select = %02x\n", space.machine().describe_context(), m_dsw_sel);
+	logerror("%s: warning, unknown bits read, ddenlovr_select = %02x\n", machine().describe_context(), m_dsw_sel);
 	return 0xff;
 }
 
@@ -4054,7 +4054,7 @@ READ8_MEMBER(ddenlovr_state::seljan2_dsw_r )
 	if (!BIT(m_dsw_sel, 3))   return ioport("DSW4")->read();
 	if (!BIT(m_dsw_sel, 4))   return ioport("DSWTOP")->read();
 
-	logerror("%s: warning, unknown bits read, ddenlovr_select = %02x\n", space.machine().describe_context(), m_dsw_sel);
+	logerror("%s: warning, unknown bits read, ddenlovr_select = %02x\n", machine().describe_context(), m_dsw_sel);
 	return 0xff;
 }
 
@@ -4273,8 +4273,8 @@ static MACHINE_CONFIG_START( htengoku )
 
 	MCFG_DEVICE_ADD("bankdev", ADDRESS_MAP_BANK, 0)
 	MCFG_DEVICE_PROGRAM_MAP(htengoku_banked_map)
-	MCFG_ADDRESS_MAP_BANK_DATABUS_WIDTH(8)
-	MCFG_ADDRESS_MAP_BANK_ADDRBUS_WIDTH(20)
+	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
+	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(20)
 	MCFG_ADDRESS_MAP_BANK_STRIDE(0x8000)
 
 	MCFG_MACHINE_START_OVERRIDE(ddenlovr_state,dynax)

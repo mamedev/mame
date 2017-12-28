@@ -109,6 +109,7 @@
 #include "emu.h"
 #include "debugger.h"
 #include "i8085.h"
+#include "8085dasm.h"
 
 #define VERBOSE 0
 #include "logmacro.h"
@@ -337,8 +338,8 @@ void i8085a_cpu_device::device_start()
 	}
 
 	m_program = &space(AS_PROGRAM);
-	m_direct = &m_program->direct();
-	m_opcode_direct = has_space(AS_OPCODES) ? &space(AS_OPCODES).direct() : m_direct;
+	m_direct = m_program->direct<0>();
+	m_opcode_direct = has_space(AS_OPCODES) ? space(AS_OPCODES).direct<0>() : m_direct;
 	m_io = &space(AS_IO);
 
 	/* resolve callbacks */
@@ -456,10 +457,9 @@ void i8085a_cpu_device::state_string_export(const device_state_entry &entry, std
 	}
 }
 
-offs_t i8085a_cpu_device::disasm_disassemble(std::ostream &stream, offs_t pc, const u8 *oprom, const u8 *opram, u32 options)
+util::disasm_interface *i8085a_cpu_device::create_disassembler()
 {
-	extern CPU_DISASSEMBLE( i8085 );
-	return CPU_DISASSEMBLE_NAME(i8085)(this, stream, pc, oprom, opram, options);
+	return new i8085_disassembler;
 }
 
 
@@ -735,7 +735,7 @@ void i8085a_cpu_device::op_ana(u8 v)
 u8 i8085a_cpu_device::op_inr(u8 v)
 {
 	u8 hc = ((v & 0x0f) == 0x0f) ? HF : 0;
-	m_AF.b.l = (m_AF.b.l & CF ) | lut_zsp[++v] | hc;
+	m_AF.b.l = (m_AF.b.l & CF) | lut_zsp[++v] | hc;
 	return v;
 }
 
@@ -906,7 +906,7 @@ void i8085a_cpu_device::execute_one(int opcode)
 				m_HL.b.l = q;
 				q = m_HL.b.h - m_BC.b.h - (m_AF.b.l & CF);
 				m_AF.b.l = lut_zs[q & 0xff] | ((q >> 8) & CF) | VF | ((m_HL.b.h ^ q ^ m_BC.b.h) & HF) | (((m_BC.b.h ^ m_HL.b.h) & (m_HL.b.h ^ q) & SF) >> 5);
-				if (m_HL.b.l != 0 )
+				if (m_HL.b.l != 0)
 					m_AF.b.l &= ~ZF;
 			}
 			break;

@@ -297,8 +297,8 @@ static MACHINE_CONFIG_START( arcadia )
 	MCFG_DEVICE_ADD("overlay", ADDRESS_MAP_BANK, 0)
 	MCFG_DEVICE_PROGRAM_MAP(overlay_512kb_map)
 	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_BIG)
-	MCFG_ADDRESS_MAP_BANK_DATABUS_WIDTH(16)
-	MCFG_ADDRESS_MAP_BANK_ADDRBUS_WIDTH(22)
+	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(16)
+	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(22)
 	MCFG_ADDRESS_MAP_BANK_STRIDE(0x200000)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
@@ -335,6 +335,10 @@ static MACHINE_CONFIG_START( arcadia )
 	/* fdc */
 	MCFG_DEVICE_ADD("fdc", AMIGA_FDC, amiga_state::CLK_7M_NTSC)
 	MCFG_AMIGA_FDC_INDEX_CALLBACK(DEVWRITELINE("cia_1", mos8520_device, flag_w))
+	MCFG_AMIGA_FDC_READ_DMA_CALLBACK(READ16(amiga_state, chip_ram_r))
+	MCFG_AMIGA_FDC_WRITE_DMA_CALLBACK(WRITE16(amiga_state, chip_ram_w))
+	MCFG_AMIGA_FDC_DSKBLK_CALLBACK(WRITELINE(amiga_state, fdc_dskblk_w))
+	MCFG_AMIGA_FDC_DSKSYN_CALLBACK(WRITELINE(amiga_state, fdc_dsksyn_w))
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( argh, arcadia )
@@ -896,7 +900,7 @@ void arcadia_amiga_state::generic_decode(const char *tag, int bit7, int bit6, in
 
 	/* only the low byte of ROMs are encrypted in these games */
 	for (i = 0; i < 0x20000/2; i++)
-		rom[i] = BITSWAP16(rom[i], 15,14,13,12,11,10,9,8, bit7,bit6,bit5,bit4,bit3,bit2,bit1,bit0);
+		rom[i] = bitswap<16>(rom[i], 15,14,13,12,11,10,9,8, bit7,bit6,bit5,bit4,bit3,bit2,bit1,bit0);
 
 	#if 0
 	{

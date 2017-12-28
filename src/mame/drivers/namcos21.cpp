@@ -1889,7 +1889,7 @@ static MACHINE_CONFIG_START( namcos21 )
 	MCFG_CPU_ADD("slave", M68000,12288000) /* Slave */
 	MCFG_CPU_PROGRAM_MAP(slave_map)
 
-	MCFG_CPU_ADD("audiocpu", M6809,3072000) /* Sound */
+	MCFG_CPU_ADD("audiocpu", MC6809E, 3072000) /* Sound */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(namcos21_state, irq0_line_hold, 2*60)
 	MCFG_CPU_PERIODIC_INT_DRIVER(namcos21_state, irq1_line_hold, 120)
@@ -1956,7 +1956,7 @@ static MACHINE_CONFIG_START( driveyes )
 	MCFG_CPU_ADD("slave", M68000,12288000) /* Slave */
 	MCFG_CPU_PROGRAM_MAP(driveyes_slave_map)
 
-	MCFG_CPU_ADD("audiocpu", M6809,3072000) /* Sound */
+	MCFG_CPU_ADD("audiocpu", MC6809E, 3072000) /* Sound */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(namcos21_state, irq0_line_hold, 2*60)
 	MCFG_CPU_PERIODIC_INT_DRIVER(namcos21_state, irq1_line_hold, 120)
@@ -2016,7 +2016,7 @@ static MACHINE_CONFIG_START( winrun )
 	MCFG_CPU_ADD("slave", M68000,12288000) /* Slave */
 	MCFG_CPU_PROGRAM_MAP(winrun_slave_map)
 
-	MCFG_CPU_ADD("audiocpu", M6809,3072000) /* Sound */
+	MCFG_CPU_ADD("audiocpu", MC6809E, 3072000) /* Sound */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(namcos21_state, irq0_line_hold, 2*60)
 	MCFG_CPU_PERIODIC_INT_DRIVER(namcos21_state, irq1_line_hold, 120)

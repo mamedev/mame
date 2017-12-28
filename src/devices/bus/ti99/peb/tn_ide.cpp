@@ -160,7 +160,7 @@ READ8Z_MEMBER(nouspikel_ide_interface_device::readz)
 			case 2:     /* IDE registers set 1 (CS1Fx) */
 				if (m_tms9995_mode ? (!(addr & 1)) : (addr & 1))
 				{   /* first read triggers 16-bit read cycle */
-					m_input_latch = (! (addr & 0x10)) ? m_ata->read_cs0(space, (addr >> 1) & 0x7, 0xffff) : 0;
+					m_input_latch = (! (addr & 0x10)) ? m_ata->read_cs0((addr >> 1) & 0x7) : 0;
 				}
 
 				/* return latched input */
@@ -171,7 +171,7 @@ READ8Z_MEMBER(nouspikel_ide_interface_device::readz)
 			case 3:     /* IDE registers set 2 (CS3Fx) */
 				if (m_tms9995_mode ? (!(addr & 1)) : (addr & 1))
 				{   /* first read triggers 16-bit read cycle */
-					m_input_latch = (! (addr & 0x10)) ? m_ata->read_cs1(space, (addr >> 1) & 0x7, 0xffff) : 0;
+					m_input_latch = (! (addr & 0x10)) ? m_ata->read_cs1((addr >> 1) & 0x7) : 0;
 				}
 
 				/* return latched input */
@@ -243,7 +243,7 @@ WRITE8_MEMBER(nouspikel_ide_interface_device::write)
 
 				if (m_tms9995_mode ? (addr & 1) : (!(addr & 1)))
 				{   /* second write triggers 16-bit write cycle */
-					m_ata->write_cs0(space, (addr >> 1) & 0x7, m_output_latch, 0xffff);
+					m_ata->write_cs0((addr >> 1) & 0x7, m_output_latch);
 				}
 				break;
 			case 3:     /* IDE registers set 2 (CS3Fx) */
@@ -261,7 +261,7 @@ WRITE8_MEMBER(nouspikel_ide_interface_device::write)
 
 				if (m_tms9995_mode ? (addr & 1) : (!(addr & 1)))
 				{   /* second write triggers 16-bit write cycle */
-					m_ata->write_cs1(space, (addr >> 1) & 0x7, m_output_latch, 0xffff);
+					m_ata->write_cs1((addr >> 1) & 0x7, m_output_latch);
 				}
 				break;
 			}

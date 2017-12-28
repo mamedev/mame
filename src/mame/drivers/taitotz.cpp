@@ -2176,7 +2176,7 @@ WRITE8_MEMBER(taitotz_state::tlcs_rtc_w)
 
 READ16_MEMBER(taitotz_state::tlcs_ide0_r)
 {
-	uint16_t d = m_ata->read_cs0(space, offset, mem_mask);
+	uint16_t d = m_ata->read_cs0(offset, mem_mask);
 	if (offset == 7)
 		d &= ~0x2;      // Type Zero doesn't like the index bit. It's defined as vendor-specific, so it probably shouldn't be up...
 						// The status check explicitly checks for 0x50 (drive ready, seek complete).
@@ -2185,7 +2185,7 @@ READ16_MEMBER(taitotz_state::tlcs_ide0_r)
 
 READ16_MEMBER(taitotz_state::tlcs_ide1_r)
 {
-	uint16_t d = m_ata->read_cs1(space, offset, mem_mask);
+	uint16_t d = m_ata->read_cs1(offset, mem_mask);
 	if (offset == 6)
 		d &= ~0x2;      // Type Zero doesn't like the index bit. It's defined as vendor-specific, so it probably shouldn't be up...
 						// The status check explicitly checks for 0x50 (drive ready, seek complete).
@@ -2949,9 +2949,9 @@ ROM_START( styphp )
 ROM_END
 
 GAME( 1999, taitotz,   0,        taitotz,  taitotz,  taitotz_state, 0,        ROT0, "Taito", "Type Zero BIOS", MACHINE_NO_SOUND|MACHINE_NOT_WORKING|MACHINE_IS_BIOS_ROOT)
+GAME( 1998, batlgear,  taitotz,  taitotz,  batlgr2,  taitotz_state, batlgear, ROT0, "Taito", "Battle Gear (Ver 2.40 A)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 GAME( 1999, landhigh,  taitotz,  landhigh, landhigh, taitotz_state, landhigh, ROT0, "Taito", "Landing High Japan (Ver 2.01 OK)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 GAME( 1999, landhigha, landhigh, landhigh, landhigh, taitotz_state, landhigha,ROT0, "Taito", "Landing High Japan (Ver 2.02 O)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 1999, batlgear,  taitotz,  taitotz,  batlgr2,  taitotz_state, batlgear, ROT0, "Taito", "Battle Gear (Ver 2.40 A)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 GAME( 1999, pwrshovl,  taitotz,  taitotz,  pwrshovl, taitotz_state, pwrshovl, ROT0, "Taito", "Power Shovel ni Norou!! - Power Shovel Simulator (v2.07J)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // 1999/8/5 19:13:35
 GAME( 1999, pwrshovla, pwrshovl, taitotz,  pwrshovl, taitotz_state, pwrshovl, ROT0, "Taito", "Power Shovel ni Norou!! - Power Shovel Simulator (v2.07J, alt)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // seem to be some differences in drive content, but identifies as the same revision, is it just user data changes??
 GAME( 2000, batlgr2,   taitotz,  taitotz,  batlgr2,  taitotz_state, batlgr2,  ROT0, "Taito", "Battle Gear 2 (v2.04J)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

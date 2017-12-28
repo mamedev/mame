@@ -963,7 +963,7 @@ INTERRUPT_GEN_MEMBER(trackfld_state::yieartf_timer_irq)
 static MACHINE_CONFIG_START( yieartf )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6809, MASTER_CLOCK/6/2)    /* a guess for now */
+	MCFG_CPU_ADD("maincpu", MC6809E, MASTER_CLOCK/6/2)    /* a guess for now */
 	MCFG_CPU_PROGRAM_MAP(yieartf_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", trackfld_state,  vblank_irq)
 	MCFG_CPU_PERIODIC_INT_DRIVER(trackfld_state, yieartf_timer_irq, 480)
@@ -1047,7 +1047,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( mastkin, trackfld )
 
 	/* basic machine hardware */
-	MCFG_CPU_REPLACE("maincpu", M6809, MASTER_CLOCK/6/2)    /* a guess for now */
+	MCFG_CPU_REPLACE("maincpu", MC6809E, MASTER_CLOCK/6/2)    /* a guess for now */
 	MCFG_CPU_PROGRAM_MAP(mastkin_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", trackfld_state, vblank_irq)
 
@@ -1574,7 +1574,7 @@ DRIVER_INIT_MEMBER(trackfld_state, trackfldnz)
 
 	/* decrypt program rom */
 	for (i = 0x6000; i < 0x10000; i++)
-		ROM[i] = BITSWAP8(ROM[i], 6, 7, 5, 4, 3, 2, 1, 0);
+		ROM[i] = bitswap<8>(ROM[i], 6, 7, 5, 4, 3, 2, 1, 0);
 }
 
 DRIVER_INIT_MEMBER(trackfld_state,atlantol)
@@ -1627,13 +1627,13 @@ DRIVER_INIT_MEMBER(trackfld_state,wizzquiz)
 
 	/* decrypt program rom */
 	for (i = 0; i < 0x2000; i++)
-		ROM[i] = BITSWAP8(ROM[i],0,1,2,3,4,5,6,7);
+		ROM[i] = bitswap<8>(ROM[i],0,1,2,3,4,5,6,7);
 
 	ROM = memregion("user1")->base();
 
 	/* decrypt questions roms */
 	for (i = 0; i < 0x40000; i++)
-		ROM[i] = BITSWAP8(ROM[i],0,1,2,3,4,5,6,7);
+		ROM[i] = bitswap<8>(ROM[i],0,1,2,3,4,5,6,7);
 
 	membank("bank1")->configure_entries(0, 8, ROM, 0x8000);
 }

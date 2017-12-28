@@ -9,6 +9,7 @@
 
 #include "emu.h"
 #include "es5510.h"
+#include "es5510d.h"
 
 #include "cpu/m68000/m68000.h"
 #include "debugger.h"
@@ -359,7 +360,7 @@ READ8_MEMBER(es5510_device::host_r)
 	//  printf("%06x: DSP read offset %04x (data is %04x)\n",space.device().safe_pc(),offset,dsp_ram[offset]);
 
 	// VFX hack
-	if (core_stricmp(space.machine().system().name, "vfx") == 0)
+	if (core_stricmp(machine().system().name, "vfx") == 0)
 	{
 		if (space.device().safe_pc() == 0xc091f0)
 		{
@@ -924,19 +925,9 @@ void es5510_device::execute_run() {
 	}
 }
 
-uint32_t es5510_device::disasm_min_opcode_bytes() const
+util::disasm_interface *es5510_device::create_disassembler()
 {
-	return 6;
-}
-
-uint32_t es5510_device::disasm_max_opcode_bytes() const
-{
-	return 6;
-}
-
-offs_t es5510_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
-{
-	return pc;
+	return new es5510_disassembler;
 }
 
 #if VERBOSE_EXEC

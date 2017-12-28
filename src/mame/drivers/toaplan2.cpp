@@ -18,6 +18,7 @@ Supported games:
     Name        Board No      Maker         Game name
     ----------------------------------------------------------------------------
     tekipaki    TP-020        Toaplan       Teki Paki
+    tekipakit   TP-020        Toaplan       Teki Paki (location test)
     ghox        TP-021        Toaplan       Ghox (Spinner with single up/down axis control)
     ghoxj       TP-021        Toaplan       Ghox (8-Way Joystick controls)
     dogyuun     TP-022        Toaplan       Dogyuun
@@ -472,10 +473,10 @@ DRIVER_INIT_MEMBER(toaplan2_state,pipibibsbl)
 
 	for (int i = 0; i < (0x040000/2); i += 4)
 	{
-		ROM[i+0] = BITSWAP16(ROM[i+0],0x1,0x5,0x6,0x7,0x8,0x2,0x0,0x9,0xe,0xd,0x4,0x3,0xf,0xa,0xb,0xc);
-		ROM[i+1] = BITSWAP16(ROM[i+1],0x5,0x3,0x1,0xf,0xd,0xb,0x9,0x0,0x2,0x4,0x6,0x8,0xa,0xc,0xe,0x7);
-		ROM[i+2] = BITSWAP16(ROM[i+2],0xc,0xd,0xe,0xf,0x8,0x9,0xa,0xb,0x3,0x2,0x1,0x0,0x7,0x6,0x5,0x4);
-		ROM[i+3] = BITSWAP16(ROM[i+3],0x8,0x9,0xa,0xb,0xc,0xd,0xe,0xf,0x3,0x2,0x1,0x0,0x7,0x6,0x5,0x4);
+		ROM[i+0] = bitswap<16>(ROM[i+0],0x1,0x5,0x6,0x7,0x8,0x2,0x0,0x9,0xe,0xd,0x4,0x3,0xf,0xa,0xb,0xc);
+		ROM[i+1] = bitswap<16>(ROM[i+1],0x5,0x3,0x1,0xf,0xd,0xb,0x9,0x0,0x2,0x4,0x6,0x8,0xa,0xc,0xe,0x7);
+		ROM[i+2] = bitswap<16>(ROM[i+2],0xc,0xd,0xe,0xf,0x8,0x9,0xa,0xb,0x3,0x2,0x1,0x0,0x7,0x6,0x5,0x4);
+		ROM[i+3] = bitswap<16>(ROM[i+3],0x8,0x9,0xa,0xb,0xc,0xd,0xe,0xf,0x3,0x2,0x1,0x0,0x7,0x6,0x5,0x4);
 	}
 }
 
@@ -538,23 +539,17 @@ READ16_MEMBER(toaplan2_state::video_count_r)
 	/* +---------+---------+--------+---------------------------+ */
 	/*************** Control Signals are active low ***************/
 
-	int hpos = m_screen->hpos();
 	int vpos = m_screen->vpos();
 
 	int video_status = 0xff00;    // Set signals inactive
 
 	vpos = (vpos + 15) % 262;
 
-	bool hblank, vblank;
-
-	hblank = (hpos > 325) && (hpos < 380);
-	vblank = (vpos >= 247) && (vpos <= 250);
-
-	if (hblank)
+	if (!m_vdp0->hsync_r())
 		video_status &= ~0x8000;
-	if (vblank)
+	if (!m_vdp0->vsync_r())
 		video_status &= ~0x4000;
-	if (vblank || hblank) // ?? Dogyuun is too slow if this is wrong
+	if (!m_vdp0->fblank_r())
 		video_status &= ~0x0100;
 	if (vpos < 256)
 		video_status |= (vpos & 0xff);
@@ -595,7 +590,7 @@ WRITE8_MEMBER(toaplan2_state::pwrkick_coin_w)
 	machine().bookkeeping().coin_counter_w(0, (data & 2) >> 1 ); // medal
 	machine().bookkeeping().coin_counter_w(1, (data & 8) >> 3 ); // 10 yen
 	machine().bookkeeping().coin_counter_w(2, (data & 1) ); // 100 yen
-	m_hopper->write(space, 0, data & 0x80);
+	m_hopper->motor_w(BIT(data, 7));
 }
 
 WRITE8_MEMBER(toaplan2_state::pwrkick_coin_lockout_w)
@@ -4068,10 +4063,10 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( batrider )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_32MHz/2)       /* 16MHz , 32MHz Oscillator */
+	MCFG_CPU_ADD("maincpu", M68000, XTAL_32MHz/2) /* 16MHz , 32MHz Oscillator (verified) */
 	MCFG_CPU_PROGRAM_MAP(batrider_68k_mem)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_32MHz/8)     /* 4MHz , 32MHz Oscillator */
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL_32MHz/6) /* 5.333MHz , 32MHz Oscillator (verified) */
 	MCFG_CPU_PROGRAM_MAP(batrider_sound_z80_mem)
 	MCFG_CPU_IO_MAP(batrider_sound_z80_port)
 
@@ -4108,7 +4103,7 @@ static MACHINE_CONFIG_START( batrider )
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch3")
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch4")
 
-	MCFG_YM2151_ADD("ymsnd", XTAL_32MHz/8)
+	MCFG_YM2151_ADD("ymsnd", XTAL_32MHz/8) /* 4MHz , 32MHz Oscillator (verified) */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MCFG_OKIM6295_ADD("oki1", XTAL_32MHz/10, PIN7_HIGH)
@@ -4182,6 +4177,7 @@ MACHINE_CONFIG_END
 ***************************************************************************/
 
 /* -------------------------- Toaplan games ------------------------- */
+
 ROM_START( tekipaki )
 	ROM_REGION( 0x040000, "maincpu", 0 )            /* Main 68K code */
 	ROM_LOAD16_BYTE( "tp020-1.bin", 0x000000, 0x010000, CRC(d8420bd5) SHA1(30c1ad9e053cd7e79adb42aa428ebee28e144755) )
@@ -4195,6 +4191,19 @@ ROM_START( tekipaki )
 	ROM_LOAD( "tp020-3.bin", 0x080000, 0x080000, CRC(2d5e2201) SHA1(5846c844eedd48305c1c67dc645b6e070b3f5b98) )
 ROM_END
 
+
+ROM_START( tekipakit ) /* Location Test version */
+	ROM_REGION( 0x040000, "maincpu", 0 )            /* Main 68K code */
+	ROM_LOAD16_BYTE( "e.e5", 0x000000, 0x010000, CRC(89affc73) SHA1(3930bf0c2528de28dcb0cf2cd537adb62a2172e3) ) /* hand written "E"  27C512 chip */
+	ROM_LOAD16_BYTE( "o.e6", 0x000001, 0x010000, CRC(a2244558) SHA1(5291cfbea4d4d1c45d6d4bd21b3c466459a0fa17) ) /* hand written "O"  27C512 chip */
+
+	ROM_REGION( 0x8000, "audiocpu", 0 )    /* Sound HD647180 code */
+	ROM_LOAD( "hd647180.020", 0x00000, 0x08000, CRC(d5157c12) SHA1(b2c6c087bb539456a9e562d0b40f05dde26cacd3) )
+
+	ROM_REGION( 0x100000, "gp9001", 0 )
+	ROM_LOAD( "0-1_4.4_cb45.a16", 0x000000, 0x080000, CRC(35e14729) SHA1(8c929604953b78c6e72744a38e06a988510193a5) ) /* hand written "0-1  4/4  CB45"  27C402 chip */
+	ROM_LOAD( "3-4_4.4_547d.a15", 0x080000, 0x080000, CRC(41975fcc) SHA1(f850d5a9638d41bb69f204a9cd54e2fd693b57ef) ) /* hand written "3-4  4/4  547D"  27C402 chip */
+ROM_END
 
 
 ROM_START( ghox ) /* Spinner with single axis (up/down) controls */
@@ -5570,6 +5579,7 @@ ROM_END
 
 //  ( YEAR  NAME         PARENT    MACHINE       INPUT       STATE           INIT        MONITOR COMPANY            FULLNAME                     FLAGS )
 GAME( 1991, tekipaki,    0,        tekipaki,     tekipaki,   toaplan2_state, 0,          ROT0,   "Toaplan",         "Teki Paki",                 MACHINE_SUPPORTS_SAVE )
+GAME( 1991, tekipakit,   tekipaki, tekipaki,     tekipaki,   toaplan2_state, 0,          ROT0,   "Toaplan",         "Teki Paki (location test)", MACHINE_SUPPORTS_SAVE )
 
 GAME( 1991, ghox,        0,        ghox,         ghox,       toaplan2_state, 0,          ROT270, "Toaplan",         "Ghox (spinner)",            MACHINE_SUPPORTS_SAVE )
 GAME( 1991, ghoxj,       ghox,     ghox,         ghox,       toaplan2_state, 0,          ROT270, "Toaplan",         "Ghox (joystick)",           MACHINE_SUPPORTS_SAVE )

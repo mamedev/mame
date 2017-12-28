@@ -23,15 +23,13 @@
 
 INTERRUPT_GEN_MEMBER(labyrunr_state::labyrunr_vblank_interrupt)
 {
-	address_space &space = generic_space();
-	if (m_k007121->ctrlram_r(space, 7) & 0x02)
+	if (m_k007121->ctrlram_r(7) & 0x02)
 		device.execute().set_input_line(HD6309_IRQ_LINE, HOLD_LINE);
 }
 
 INTERRUPT_GEN_MEMBER(labyrunr_state::labyrunr_timer_interrupt)
 {
-	address_space &space = generic_space();
-	if (m_k007121->ctrlram_r(space, 7) & 0x01)
+	if (m_k007121->ctrlram_r(7) & 0x01)
 		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 

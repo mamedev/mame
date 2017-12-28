@@ -63,7 +63,6 @@ instead of magnet sensors.
 #include "cpu/m6502/r65c02.h"
 #include "machine/mos6551.h"
 #include "machine/nvram.h"
-#include "machine/timer.h"
 #include "video/hlcd0538.h"
 #include "screen.h"
 #include "speaker.h"
@@ -349,7 +348,7 @@ WRITE64_MEMBER(novag6502_state::cforte_lcd_output_w)
 		for (int i = 0; i < 4; i++)
 			m_display_state[dig+3] |= ((rowdata[i] >> (2*dig) & 3) << (2*i));
 
-		m_display_state[dig+3] = BITSWAP8(m_display_state[dig+3],7,2,0,4,6,5,3,1);
+		m_display_state[dig+3] = bitswap<8>(m_display_state[dig+3],7,2,0,4,6,5,3,1);
 	}
 
 	cforte_prepare_display();

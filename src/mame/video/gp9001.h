@@ -54,22 +54,21 @@ public:
 	}
 
 	// access to VDP
-	DECLARE_READ16_MEMBER( gp9001_vdp_r );
-	DECLARE_WRITE16_MEMBER( gp9001_vdp_w );
-	DECLARE_READ16_MEMBER( gp9001_vdp_alt_r );
-	DECLARE_WRITE16_MEMBER( gp9001_vdp_alt_w );
+	DECLARE_READ16_MEMBER(gp9001_vdp_r);
+	DECLARE_WRITE16_MEMBER(gp9001_vdp_w);
+	DECLARE_READ16_MEMBER(gp9001_vdp_alt_r);
+	DECLARE_WRITE16_MEMBER(gp9001_vdp_alt_w);
+
+	DECLARE_READ_LINE_MEMBER(hsync_r);
+	DECLARE_READ_LINE_MEMBER(vsync_r);
+	DECLARE_READ_LINE_MEMBER(fblank_r);
 
 	// this bootleg has strange access
-	DECLARE_READ16_MEMBER( pipibibi_bootleg_videoram16_r );
-	DECLARE_WRITE16_MEMBER( pipibibi_bootleg_videoram16_w );
-	DECLARE_READ16_MEMBER( pipibibi_bootleg_spriteram16_r );
-	DECLARE_WRITE16_MEMBER( pipibibi_bootleg_spriteram16_w );
-	DECLARE_WRITE16_MEMBER( pipibibi_bootleg_scroll_w );
-
-	// internal handlers
-	DECLARE_WRITE16_MEMBER( gp9001_bg_tmap_w );
-	DECLARE_WRITE16_MEMBER( gp9001_fg_tmap_w );
-	DECLARE_WRITE16_MEMBER( gp9001_top_tmap_w );
+	DECLARE_READ16_MEMBER(pipibibi_bootleg_videoram16_r);
+	DECLARE_WRITE16_MEMBER(pipibibi_bootleg_videoram16_w);
+	DECLARE_READ16_MEMBER(pipibibi_bootleg_spriteram16_r);
+	DECLARE_WRITE16_MEMBER(pipibibi_bootleg_spriteram16_w);
+	DECLARE_WRITE16_MEMBER(pipibibi_bootleg_scroll_w);
 
 protected:
 	virtual void device_start() override;
@@ -85,6 +84,11 @@ protected:
 	TILE_GET_INFO_MEMBER(get_bg0_tile_info);
 
 private:
+	// internal handlers
+	DECLARE_WRITE16_MEMBER(bg_tmap_w);
+	DECLARE_WRITE16_MEMBER(fg_tmap_w);
+	DECLARE_WRITE16_MEMBER(top_tmap_w);
+
 	static constexpr unsigned BG_VRAM_SIZE   = 0x1000;   /* Background RAM size */
 	static constexpr unsigned FG_VRAM_SIZE   = 0x1000;   /* Foreground RAM size */
 	static constexpr unsigned TOP_VRAM_SIZE  = 0x1000;   /* Top Layer  RAM size */

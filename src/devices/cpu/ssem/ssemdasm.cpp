@@ -7,8 +7,9 @@
 */
 
 #include "emu.h"
+#include "ssemdasm.h"
 
-static inline uint32_t reverse(uint32_t v)
+inline uint32_t ssem_disassembler::reverse(uint32_t v)
 {
 	// Taken from http://www-graphics.stanford.edu/~seander/bithacks.html#ReverseParallel
 	// swap odd and even bits
@@ -25,8 +26,14 @@ static inline uint32_t reverse(uint32_t v)
 	return v;
 }
 
-static offs_t ssem_dasm_one(std::ostream &stream, offs_t pc, uint32_t op)
+u32 ssem_disassembler::opcode_alignment() const
 {
+	return 4;
+}
+
+offs_t ssem_disassembler::disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params)
+{
+	uint32_t op = opcodes.r32(pc);
 	uint8_t instr = (reverse(op) >> 13) & 7;
 	uint8_t addr = reverse(op) & 0x1f;
 
@@ -59,16 +66,5 @@ static offs_t ssem_dasm_one(std::ostream &stream, offs_t pc, uint32_t op)
 			break;
 	}
 
-	return 4 | DASMFLAG_SUPPORTED;
-}
-
-/*****************************************************************************/
-
-CPU_DISASSEMBLE( ssem )
-{
-	uint32_t op = (*(uint8_t *)(opram + 0) << 24) |
-				(*(uint8_t *)(opram + 1) << 16) |
-				(*(uint8_t *)(opram + 2) <<  8) |
-				(*(uint8_t *)(opram + 3) <<  0);
-	return ssem_dasm_one(stream, pc, op);
+	return 4 | SUPPORTED;
 }

@@ -16,12 +16,12 @@
 
 READ8_MEMBER(isa16_ide_device::ide16_alt_r )
 {
-	return m_ide->read_cs1(space, 6/2, 0xff);
+	return m_ide->read_cs1(6/2, 0xff);
 }
 
 WRITE8_MEMBER(isa16_ide_device::ide16_alt_w )
 {
-	m_ide->write_cs1(space, 6/2, data, 0xff);
+	m_ide->write_cs1(6/2, data, 0xff);
 }
 
 DEVICE_ADDRESS_MAP_START(map, 16, isa16_ide_device)

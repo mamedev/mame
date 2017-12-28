@@ -482,7 +482,7 @@ u8 bigbord2_state::crt8002(u8 ac_ra, u8 ac_chr, u8 ac_attr, uint16_t ac_cnt, boo
 			}
 			break;
 		case 1: // external mode
-			gfx = BITSWAP8(ac_chr, 0,1,2,3,4,5,6,7);
+			gfx = bitswap<8>(ac_chr, 0,1,2,3,4,5,6,7);
 			break;
 		case 2: // thin gfx
 			break;

@@ -653,7 +653,7 @@ INTERRUPT_GEN_MEMBER(namcos16_state::slave_vblank_irq)
 }
 
 static MACHINE_CONFIG_START( liblrabl )
-	MCFG_CPU_ADD("maincpu", M6809, MASTER_CLOCK/4)
+	MCFG_CPU_ADD("maincpu", MC6809E, MASTER_CLOCK/4)
 	MCFG_CPU_PROGRAM_MAP(master_liblrabl_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", namcos16_state, master_scanline, "screen", 0, 1)
 
@@ -661,7 +661,7 @@ static MACHINE_CONFIG_START( liblrabl )
 	MCFG_CPU_PROGRAM_MAP(slave_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", namcos16_state,  slave_vblank_irq)
 
-	MCFG_CPU_ADD("audiocpu", M6809, MASTER_CLOCK/4)
+	MCFG_CPU_ADD("audiocpu", MC6809E, MASTER_CLOCK/4)
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(namcos16_state,  irq0_line_hold, 60)
 

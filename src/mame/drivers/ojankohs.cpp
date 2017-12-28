@@ -604,13 +604,13 @@ READ8_MEMBER( ojankohs_state::ojankoc_keymatrix_p2_r )
 READ8_MEMBER( ojankohs_state::ojankohs_dipsw1_r )
 {
 	uint8_t data = m_dsw1->read();
-	return BITSWAP8(data, 0, 1, 2, 3, 4, 5, 6, 7);
+	return bitswap<8>(data, 0, 1, 2, 3, 4, 5, 6, 7);
 }
 
 READ8_MEMBER( ojankohs_state::ojankohs_dipsw2_r )
 {
 	uint8_t data = m_dsw2->read();
-	return BITSWAP8(data, 0, 1, 2, 3, 4, 5, 6, 7);
+	return bitswap<8>(data, 0, 1, 2, 3, 4, 5, 6, 7);
 }
 
 READ8_MEMBER( ojankohs_state::ccasino_dipsw3_r )

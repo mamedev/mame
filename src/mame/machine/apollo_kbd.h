@@ -147,6 +147,7 @@ private:
 	uint16_t m_delay;         // key press delay after initial press
 	uint16_t m_repeat;        // key press repeat rate
 	uint16_t m_last_pressed;  // last key pressed, for repeat key handling
+	uint16_t m_numlock_state; // current num lock state
 	int m_keytime[0x80];    // time until next key press (1 ms)
 	uint8_t m_keyon[0x80];    // is 1 if key is pressed
 

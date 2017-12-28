@@ -76,11 +76,11 @@ static void decode(uint8_t *rom, uint8_t *decrypted,
 
 		/* decode the opcodes */
 		tbl = swaptable[swap_table[2*row]];
-		decrypted[A] = BITSWAP8(src,7,tbl[0],5,tbl[1],3,tbl[2],1,tbl[3]) ^ xor_table[2*row];
+		decrypted[A] = bitswap<8>(src,7,tbl[0],5,tbl[1],3,tbl[2],1,tbl[3]) ^ xor_table[2*row];
 
 		/* decode the data */
 		tbl = swaptable[swap_table[2*row+1]];
-		rom[A] = BITSWAP8(src,7,tbl[0],5,tbl[1],3,tbl[2],1,tbl[3]) ^ xor_table[2*row+1];
+		rom[A] = bitswap<8>(src,7,tbl[0],5,tbl[1],3,tbl[2],1,tbl[3]) ^ xor_table[2*row+1];
 	}
 }
 

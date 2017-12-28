@@ -177,9 +177,9 @@ WRITE8_MEMBER( s11b_state::dig1_w )
 	if((seg & 0x70000) == 0x30000)
 	{
 		if(m_invert)
-			output().set_digit_value(get_strobe()+16, BITSWAP16(~seg, 7, 15, 12, 10, 8, 14, 13, 9, 11, 6, 5, 4, 3, 2, 1, 0));
+			output().set_digit_value(get_strobe()+16, bitswap<16>(~seg, 7, 15, 12, 10, 8, 14, 13, 9, 11, 6, 5, 4, 3, 2, 1, 0));
 		else
-			output().set_digit_value(get_strobe()+16, BITSWAP16(seg, 7, 15, 12, 10, 8, 14, 13, 9, 11, 6, 5, 4, 3, 2, 1, 0));
+			output().set_digit_value(get_strobe()+16, bitswap<16>(seg, 7, 15, 12, 10, 8, 14, 13, 9, 11, 6, 5, 4, 3, 2, 1, 0));
 		seg |= 0x40000;
 	}
 	set_segment2(seg);
@@ -193,9 +193,9 @@ WRITE8_MEMBER( s11b_state::pia2c_pa_w )
 	if((seg & 0x70000) == 0x30000)
 	{
 		if(m_invert)
-			output().set_digit_value(get_strobe(), BITSWAP16(~seg, 7, 15, 12, 10, 8, 14, 13, 9, 11, 6, 5, 4, 3, 2, 1, 0));
+			output().set_digit_value(get_strobe(), bitswap<16>(~seg, 7, 15, 12, 10, 8, 14, 13, 9, 11, 6, 5, 4, 3, 2, 1, 0));
 		else
-			output().set_digit_value(get_strobe(), BITSWAP16(seg, 7, 15, 12, 10, 8, 14, 13, 9, 11, 6, 5, 4, 3, 2, 1, 0));
+			output().set_digit_value(get_strobe(), bitswap<16>(seg, 7, 15, 12, 10, 8, 14, 13, 9, 11, 6, 5, 4, 3, 2, 1, 0));
 		seg |= 0x40000;
 	}
 	set_segment1(seg);
@@ -209,9 +209,9 @@ WRITE8_MEMBER( s11b_state::pia2c_pb_w )
 	if((seg & 0x70000) == 0x30000)
 	{
 		if(m_invert)
-			output().set_digit_value(get_strobe(), BITSWAP16(~seg, 7, 15, 12, 10, 8, 14, 13, 9, 11, 6, 5, 4, 3, 2, 1, 0));
+			output().set_digit_value(get_strobe(), bitswap<16>(~seg, 7, 15, 12, 10, 8, 14, 13, 9, 11, 6, 5, 4, 3, 2, 1, 0));
 		else
-			output().set_digit_value(get_strobe(), BITSWAP16(seg, 7, 15, 12, 10, 8, 14, 13, 9, 11, 6, 5, 4, 3, 2, 1, 0));
+			output().set_digit_value(get_strobe(), bitswap<16>(seg, 7, 15, 12, 10, 8, 14, 13, 9, 11, 6, 5, 4, 3, 2, 1, 0));
 		seg |= 0x40000;
 	}
 	set_segment1(seg);
@@ -225,9 +225,9 @@ WRITE8_MEMBER( s11b_state::pia34_pa_w )
 	if((seg & 0x70000) == 0x30000)
 	{
 		if(m_invert)
-			output().set_digit_value(get_strobe()+16, BITSWAP16(~seg, 7, 15, 12, 10, 8, 14, 13, 9, 11, 6, 5, 4, 3, 2, 1, 0));
+			output().set_digit_value(get_strobe()+16, bitswap<16>(~seg, 7, 15, 12, 10, 8, 14, 13, 9, 11, 6, 5, 4, 3, 2, 1, 0));
 		else
-			output().set_digit_value(get_strobe()+16, BITSWAP16(seg, 7, 15, 12, 10, 8, 14, 13, 9, 11, 6, 5, 4, 3, 2, 1, 0));
+			output().set_digit_value(get_strobe()+16, bitswap<16>(seg, 7, 15, 12, 10, 8, 14, 13, 9, 11, 6, 5, 4, 3, 2, 1, 0));
 		seg |= 0x40000;
 	}
 	set_segment2(seg);
@@ -329,7 +329,7 @@ static MACHINE_CONFIG_START( s11b )
 	MCFG_PIA_IRQB_HANDLER(INPUTLINE("audiocpu", M6802_IRQ_LINE))
 
 	/* Add the background music card */
-	MCFG_CPU_ADD("bgcpu", M6809E, XTAL_8MHz) // MC68B09E (note: schematics show this as 8mhz/2, but games crash very quickly with that speed?)
+	MCFG_CPU_ADD("bgcpu", MC6809E, XTAL_8MHz / 4) // MC68B09E
 	MCFG_CPU_PROGRAM_MAP(s11b_bg_map)
 	MCFG_QUANTUM_TIME(attotime::from_hz(50))
 

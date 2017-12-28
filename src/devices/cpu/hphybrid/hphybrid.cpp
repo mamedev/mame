@@ -33,6 +33,7 @@
 
 #include "emu.h"
 #include "hphybrid.h"
+#include "hphybrid_dasm.h"
 #include "debugger.h"
 
 #include "hphybrid_defs.h"
@@ -201,7 +202,7 @@ void hp_hybrid_cpu_device::device_start()
 	}
 
 	m_program = &space(AS_PROGRAM);
-	m_direct = &m_program->direct();
+	m_direct = m_program->direct<-1>();
 	m_io = &space(AS_IO);
 
 	save_item(NAME(m_reg_A));
@@ -296,808 +297,809 @@ uint16_t hp_hybrid_cpu_device::execute_one(uint16_t opcode)
  */
 uint16_t hp_hybrid_cpu_device::execute_one_sub(uint16_t opcode)
 {
-				uint32_t ea;
-				uint16_t tmp;
+	uint32_t ea;
+	uint16_t tmp;
 
-				switch (opcode & 0x7800) {
-				case 0x0000:
-								// LDA
-								m_icount -= 13;
-								m_reg_A = RM(get_ea(opcode));
-								break;
+	switch (opcode & 0x7800) {
+	case 0x0000:
+		// LDA
+		m_icount -= 13;
+		m_reg_A = RM(get_ea(opcode));
+		break;
 
-				case 0x0800:
-								// LDB
-								m_icount -= 13;
-								m_reg_B = RM(get_ea(opcode));
-								break;
+	case 0x0800:
+		// LDB
+		m_icount -= 13;
+		m_reg_B = RM(get_ea(opcode));
+		break;
 
-				case 0x1000:
-								// CPA
-								m_icount -= 16;
-								if (m_reg_A != RM(get_ea(opcode))) {
-												// Skip next instruction
-												return m_reg_P + 2;
-								}
-								break;
+	case 0x1000:
+		// CPA
+		m_icount -= 16;
+		if (m_reg_A != RM(get_ea(opcode))) {
+			// Skip next instruction
+			return m_reg_P + 2;
+		}
+		break;
 
-				case 0x1800:
-								// CPB
-								m_icount -= 16;
-								if (m_reg_B != RM(get_ea(opcode))) {
-												// Skip next instruction
-												return m_reg_P + 2;
-								}
-								break;
+	case 0x1800:
+		// CPB
+		m_icount -= 16;
+		if (m_reg_B != RM(get_ea(opcode))) {
+			// Skip next instruction
+			return m_reg_P + 2;
+		}
+		break;
 
-				case 0x2000:
-								// ADA
-								m_icount -= 13;
-								do_add(m_reg_A , RM(get_ea(opcode)));
-								break;
+	case 0x2000:
+		// ADA
+		m_icount -= 13;
+		do_add(m_reg_A , RM(get_ea(opcode)));
+		break;
 
-				case 0x2800:
-								// ADB
-								m_icount -= 13;
-								do_add(m_reg_B , RM(get_ea(opcode)));
-								break;
+	case 0x2800:
+		// ADB
+		m_icount -= 13;
+		do_add(m_reg_B , RM(get_ea(opcode)));
+		break;
 
-				case 0x3000:
-								// STA
-								m_icount -= 13;
-								WM(get_ea(opcode) , m_reg_A);
-								break;
+	case 0x3000:
+		// STA
+		m_icount -= 13;
+		WM(get_ea(opcode) , m_reg_A);
+		break;
 
-				case 0x3800:
-								// STB
-								m_icount -= 13;
-								WM(get_ea(opcode) , m_reg_B);
-								break;
+	case 0x3800:
+		// STB
+		m_icount -= 13;
+		WM(get_ea(opcode) , m_reg_B);
+		break;
 
-				case 0x4000:
-								// JSM
-								m_icount -= 17;
-								WM(AEC_CASE_C , ++m_reg_R , m_reg_P);
-								return remove_mae(get_ea(opcode));
+	case 0x4000:
+		// JSM
+		m_icount -= 17;
+		WM(AEC_CASE_C , ++m_reg_R , m_reg_P);
+		return remove_mae(get_ea(opcode));
 
-				case 0x4800:
-								// ISZ
-								m_icount -= 19;
-								ea = get_ea(opcode);
-								tmp = RM(ea) + 1;
-								WM(ea , tmp);
-								if (tmp == 0) {
-												// Skip next instruction
-												return m_reg_P + 2;
-								}
-								break;
+	case 0x4800:
+		// ISZ
+		m_icount -= 19;
+		ea = get_ea(opcode);
+		tmp = RM(ea) + 1;
+		WM(ea , tmp);
+		if (tmp == 0) {
+			// Skip next instruction
+			return m_reg_P + 2;
+		}
+		break;
 
-				case 0x5000:
-								// AND
-								m_icount -= 13;
-								m_reg_A &= RM(get_ea(opcode));
-								break;
+	case 0x5000:
+		// AND
+		m_icount -= 13;
+		m_reg_A &= RM(get_ea(opcode));
+		break;
 
-				case 0x5800:
-								// DSZ
-								m_icount -= 19;
-								ea = get_ea(opcode);
-								tmp = RM(ea) - 1;
-								WM(ea , tmp);
-								if (tmp == 0) {
-												// Skip next instruction
-												return m_reg_P + 2;
-								}
-								break;
+	case 0x5800:
+		// DSZ
+		m_icount -= 19;
+		ea = get_ea(opcode);
+		tmp = RM(ea) - 1;
+		WM(ea , tmp);
+		if (tmp == 0) {
+			// Skip next instruction
+			return m_reg_P + 2;
+		}
+		break;
 
-				case 0x6000:
-								// IOR
-								m_icount -= 13;
-								m_reg_A |= RM(get_ea(opcode));
-								break;
+	case 0x6000:
+		// IOR
+		m_icount -= 13;
+		m_reg_A |= RM(get_ea(opcode));
+		break;
 
-				case 0x6800:
-								// JMP
-								m_icount -= 8;
-								return remove_mae(get_ea(opcode));
+	case 0x6800:
+		// JMP
+		m_icount -= 8;
+		return remove_mae(get_ea(opcode));
+
+	default:
+		switch (opcode & 0xfec0) {
+		case 0x7400:
+			// RZA
+			// SZA
+			m_icount -= 14;
+			return get_skip_addr(opcode , m_reg_A == 0);
+
+		case 0x7440:
+			// RIA
+			// SIA
+			m_icount -= 14;
+			return get_skip_addr(opcode , m_reg_A++ == 0);
+
+		case 0x7480:
+			// SFS
+			// SFC
+			m_icount -= 14;
+			return get_skip_addr(opcode , !BIT(m_flags , HPHYBRID_FLG_BIT));
+
+		case 0x7C00:
+			// RZB
+			// SZB
+			m_icount -= 14;
+			return get_skip_addr(opcode , m_reg_B == 0);
+
+		case 0x7C40:
+			// RIB
+			// SIB
+			m_icount -= 14;
+			return get_skip_addr(opcode , m_reg_B++ == 0);
+
+		case 0x7c80:
+			// SSS
+			// SSC
+			m_icount -= 14;
+			return get_skip_addr(opcode , !BIT(m_flags , HPHYBRID_STS_BIT));
+
+		case 0x7cc0:
+			// SHS
+			// SHC
+			m_icount -= 14;
+			return get_skip_addr(opcode , !BIT(m_flags , HPHYBRID_HALT_BIT));
+
+		default:
+			switch (opcode & 0xfe00) {
+			case 0x7600:
+				// SLA
+				// RLA
+				m_icount -= 14;
+				return get_skip_addr_sc(opcode , m_reg_A , 0);
+
+			case 0x7e00:
+				// SLB
+				// RLB
+				m_icount -= 14;
+				return get_skip_addr_sc(opcode , m_reg_B , 0);
+
+			case 0xf400:
+				// SAP
+				// SAM
+				m_icount -= 14;
+				return get_skip_addr_sc(opcode , m_reg_A , 15);
+
+			case 0xf600:
+				// SOC
+				// SOS
+				m_icount -= 14;
+				return get_skip_addr_sc(opcode , m_flags , HPHYBRID_O_BIT);
+
+			case 0xfc00:
+				// SBP
+				// SBM
+				m_icount -= 14;
+				return get_skip_addr_sc(opcode , m_reg_B , 15);
+
+			case 0xfe00:
+				// SEC
+				// SES
+				m_icount -= 14;
+				return get_skip_addr_sc(opcode , m_flags , HPHYBRID_C_BIT);
+
+			default:
+				switch (opcode & 0xfff0) {
+				case 0xf100:
+					// AAR
+					tmp = (opcode & 0xf) + 1;
+					m_icount -= (9 + tmp);
+					// A shift by 16 positions is equivalent to a shift by 15
+					tmp = tmp > 15 ? 15 : tmp;
+					m_reg_A = ((m_reg_A ^ 0x8000) >> tmp) - (0x8000 >> tmp);
+					break;
+
+				case 0xf900:
+					// ABR
+					tmp = (opcode & 0xf) + 1;
+					m_icount -= (9 + tmp);
+					tmp = tmp > 15 ? 15 : tmp;
+					m_reg_B = ((m_reg_B ^ 0x8000) >> tmp) - (0x8000 >> tmp);
+					break;
+
+				case 0xf140:
+					// SAR
+					tmp = (opcode & 0xf) + 1;
+					m_icount -= (9 + tmp);
+					m_reg_A >>= tmp;
+					break;
+
+				case 0xf940:
+					// SBR
+					tmp = (opcode & 0xf) + 1;
+					m_icount -= (9 + tmp);
+					m_reg_B >>= tmp;
+					break;
+
+				case 0xf180:
+					// SAL
+					tmp = (opcode & 0xf) + 1;
+					m_icount -= (9 + tmp);
+					m_reg_A <<= tmp;
+					break;
+
+				case 0xf980:
+					// SBL
+					tmp = (opcode & 0xf) + 1;
+					m_icount -= (9 + tmp);
+					m_reg_B <<= tmp;
+					break;
+
+				case 0xf1c0:
+					// RAR
+					tmp = (opcode & 0xf) + 1;
+					m_icount -= (9 + tmp);
+					m_reg_A = (m_reg_A >> tmp) | (m_reg_A << (16 - tmp));
+					break;
+
+				case 0xf9c0:
+					// RBR
+					tmp = (opcode & 0xf) + 1;
+					m_icount -= (9 + tmp);
+					m_reg_B = (m_reg_B >> tmp) | (m_reg_B << (16 - tmp));
+					break;
 
 				default:
-								switch (opcode & 0xfec0) {
-								case 0x7400:
-												// RZA
-												// SZA
-												m_icount -= 14;
-												return get_skip_addr(opcode , m_reg_A == 0);
+					if ((opcode & 0xf760) == 0x7160) {
+						// Place/withdraw instructions
+						m_icount -= 23;
+						do_pw(opcode);
+					} else if ((opcode & 0xff80) == 0xf080) {
+						// RET
+						m_icount -= 16;
+						if (BIT(opcode , 6)) {
+							// Pop PA stack
+							if (BIT(m_flags , HPHYBRID_IRH_SVC_BIT)) {
+								BIT_CLR(m_flags , HPHYBRID_IRH_SVC_BIT);
+								memmove(&m_reg_PA[ 0 ] , &m_reg_PA[ 1 ] , HPHYBRID_INT_LVLS);
+								m_pa_changed_func((uint8_t)CURRENT_PA);
+							} else if (BIT(m_flags , HPHYBRID_IRL_SVC_BIT)) {
+								BIT_CLR(m_flags , HPHYBRID_IRL_SVC_BIT);
+								memmove(&m_reg_PA[ 0 ] , &m_reg_PA[ 1 ] , HPHYBRID_INT_LVLS);
+								m_pa_changed_func((uint8_t)CURRENT_PA);
+							}
+							tmp = RM(AEC_CASE_C , m_reg_R--) + (opcode & 0x1f);
+							BIT_CLR(m_flags, HPHYBRID_IM_BIT);
+						} else {
+							tmp = RM(AEC_CASE_C , m_reg_R--) + (opcode & 0x1f);
+						}
+						return BIT(opcode , 5) ? tmp - 0x20 : tmp;
+					} else {
+						switch (opcode) {
+						case 0x7100:
+							// SDO
+							m_icount -= 12;
+							BIT_SET(m_flags , HPHYBRID_DMADIR_BIT);
+							break;
 
-								case 0x7440:
-												// RIA
-												// SIA
-												m_icount -= 14;
-												return get_skip_addr(opcode , m_reg_A++ == 0);
+						case 0x7108:
+							// SDI
+							m_icount -= 12;
+							BIT_CLR(m_flags , HPHYBRID_DMADIR_BIT);
+							break;
 
-								case 0x7480:
-												// SFS
-												// SFC
-												m_icount -= 14;
-												return get_skip_addr(opcode , !BIT(m_flags , HPHYBRID_FLG_BIT));
+						case 0x7110:
+							// EIR
+							m_icount -= 12;
+							BIT_SET(m_flags , HPHYBRID_INTEN_BIT);
+							break;
 
-								case 0x7C00:
-												// RZB
-												// SZB
-												m_icount -= 14;
-												return get_skip_addr(opcode , m_reg_B == 0);
+						case 0x7118:
+							// DIR
+							m_icount -= 12;
+							BIT_CLR(m_flags , HPHYBRID_INTEN_BIT);
+							break;
 
-								case 0x7C40:
-												// RIB
-												// SIB
-												m_icount -= 14;
-												return get_skip_addr(opcode , m_reg_B++ == 0);
+						case 0x7120:
+							// DMA
+							m_icount -= 12;
+							BIT_SET(m_flags , HPHYBRID_DMAEN_BIT);
+							break;
 
-								case 0x7c80:
-												// SSS
-												// SSC
-												m_icount -= 14;
-												return get_skip_addr(opcode , !BIT(m_flags , HPHYBRID_STS_BIT));
+						case 0x7138:
+							// DDR
+							m_icount -= 12;
+							BIT_CLR(m_flags , HPHYBRID_DMAEN_BIT);
+							break;
 
-								case 0x7cc0:
-												// SHS
-												// SHC
-												m_icount -= 14;
-												return get_skip_addr(opcode , !BIT(m_flags , HPHYBRID_HALT_BIT));
+						case 0x7140:
+							// DBL
+							m_icount -= 12;
+							BIT_CLR(m_flags , HPHYBRID_DB_BIT);
+							break;
 
-								default:
-												switch (opcode & 0xfe00) {
-												case 0x7600:
-																// SLA
-																// RLA
-																m_icount -= 14;
-																return get_skip_addr_sc(opcode , m_reg_A , 0);
+						case 0x7148:
+							// CBL
+							m_icount -= 12;
+							BIT_CLR(m_flags , HPHYBRID_CB_BIT);
+							break;
 
-												case 0x7e00:
-																// SLB
-																// RLB
-																m_icount -= 14;
-																return get_skip_addr_sc(opcode , m_reg_B , 0);
+						case 0x7150:
+							// DBU
+							m_icount -= 12;
+							BIT_SET(m_flags , HPHYBRID_DB_BIT);
+							break;
 
-												case 0xf400:
-																// SAP
-																// SAM
-																m_icount -= 14;
-																return get_skip_addr_sc(opcode , m_reg_A , 15);
+						case 0x7158:
+							// CBU
+							m_icount -= 12;
+							BIT_SET(m_flags , HPHYBRID_CB_BIT);
+							break;
 
-												case 0xf600:
-																// SOC
-																// SOS
-																m_icount -= 14;
-																return get_skip_addr_sc(opcode , m_flags , HPHYBRID_O_BIT);
+						case 0xf020:
+							// TCA
+							m_icount -= 9;
+							m_reg_A = ~m_reg_A;
+							do_add(m_reg_A , 1);
+							break;
 
-												case 0xfc00:
-																// SBP
-																// SBM
-																m_icount -= 14;
-																return get_skip_addr_sc(opcode , m_reg_B , 15);
+						case 0xf060:
+							// CMA
+							m_icount -= 9;
+							m_reg_A = ~m_reg_A;
+							break;
 
-												case 0xfe00:
-																// SEC
-																// SES
-																m_icount -= 14;
-																return get_skip_addr_sc(opcode , m_flags , HPHYBRID_C_BIT);
+						case 0xf820:
+							// TCB
+							m_icount -= 9;
+							m_reg_B = ~m_reg_B;
+							do_add(m_reg_B , 1);
+							break;
 
-												default:
-																switch (opcode & 0xfff0) {
-																case 0xf100:
-																				// AAR
-																				tmp = (opcode & 0xf) + 1;
-																				m_icount -= (9 + tmp);
-																				// A shift by 16 positions is equivalent to a shift by 15
-																				tmp = tmp > 15 ? 15 : tmp;
-																				m_reg_A = ((m_reg_A ^ 0x8000) >> tmp) - (0x8000 >> tmp);
-																				break;
+						case 0xf860:
+							// CMB
+							m_icount -= 9;
+							m_reg_B = ~m_reg_B;
+							break;
 
-																case 0xf900:
-																				// ABR
-																				tmp = (opcode & 0xf) + 1;
-																				m_icount -= (9 + tmp);
-																				tmp = tmp > 15 ? 15 : tmp;
-																				m_reg_B = ((m_reg_B ^ 0x8000) >> tmp) - (0x8000 >> tmp);
-																				break;
+						default:
+							// Unrecognized instruction: pass it on for further processing (by EMC if present)
+							return execute_no_bpc_ioc(opcode);
+						}
+					}
+				}
+			}
+		}
+	}
 
-																case 0xf140:
-																				// SAR
-																				tmp = (opcode & 0xf) + 1;
-																				m_icount -= (9 + tmp);
-																				m_reg_A >>= tmp;
-																				break;
-
-																case 0xf940:
-																				// SBR
-																				tmp = (opcode & 0xf) + 1;
-																				m_icount -= (9 + tmp);
-																				m_reg_B >>= tmp;
-																				break;
-
-																case 0xf180:
-																				// SAL
-																				tmp = (opcode & 0xf) + 1;
-																				m_icount -= (9 + tmp);
-																				m_reg_A <<= tmp;
-																				break;
-
-																case 0xf980:
-																				// SBL
-																				tmp = (opcode & 0xf) + 1;
-																				m_icount -= (9 + tmp);
-																				m_reg_B <<= tmp;
-																				break;
-
-																case 0xf1c0:
-																				// RAR
-																				tmp = (opcode & 0xf) + 1;
-																				m_icount -= (9 + tmp);
-																				m_reg_A = (m_reg_A >> tmp) | (m_reg_A << (16 - tmp));
-																				break;
-
-																case 0xf9c0:
-																				// RBR
-																				tmp = (opcode & 0xf) + 1;
-																				m_icount -= (9 + tmp);
-																				m_reg_B = (m_reg_B >> tmp) | (m_reg_B << (16 - tmp));
-																				break;
-
-																default:
-																				if ((opcode & 0xf760) == 0x7160) {
-																								// Place/withdraw instructions
-																								m_icount -= 23;
-																								do_pw(opcode);
-																				} else if ((opcode & 0xff80) == 0xf080) {
-																								// RET
-																								m_icount -= 16;
-																								if (BIT(opcode , 6)) {
-																												// Pop PA stack
-																												if (BIT(m_flags , HPHYBRID_IRH_SVC_BIT)) {
-																																BIT_CLR(m_flags , HPHYBRID_IRH_SVC_BIT);
-																																memmove(&m_reg_PA[ 0 ] , &m_reg_PA[ 1 ] , HPHYBRID_INT_LVLS);
-																																																																m_pa_changed_func((uint8_t)CURRENT_PA);
-																												} else if (BIT(m_flags , HPHYBRID_IRL_SVC_BIT)) {
-																																BIT_CLR(m_flags , HPHYBRID_IRL_SVC_BIT);
-																																memmove(&m_reg_PA[ 0 ] , &m_reg_PA[ 1 ] , HPHYBRID_INT_LVLS);
-																																																																m_pa_changed_func((uint8_t)CURRENT_PA);
-																												}
-																												tmp = RM(AEC_CASE_C , m_reg_R--) + (opcode & 0x1f);
-																												BIT_CLR(m_flags, HPHYBRID_IM_BIT);
-																								} else {
-																									tmp = RM(AEC_CASE_C , m_reg_R--) + (opcode & 0x1f);
-																								}
-																								return BIT(opcode , 5) ? tmp - 0x20 : tmp;
-																				} else {
-																								switch (opcode) {
-																								case 0x7100:
-																												// SDO
-																												m_icount -= 12;
-																												BIT_SET(m_flags , HPHYBRID_DMADIR_BIT);
-																												break;
-
-																								case 0x7108:
-																												// SDI
-																												m_icount -= 12;
-																												BIT_CLR(m_flags , HPHYBRID_DMADIR_BIT);
-																												break;
-
-																								case 0x7110:
-																												// EIR
-																												m_icount -= 12;
-																												BIT_SET(m_flags , HPHYBRID_INTEN_BIT);
-																												break;
-
-																								case 0x7118:
-																												// DIR
-																												m_icount -= 12;
-																												BIT_CLR(m_flags , HPHYBRID_INTEN_BIT);
-																												break;
-
-																								case 0x7120:
-																												// DMA
-																												m_icount -= 12;
-																												BIT_SET(m_flags , HPHYBRID_DMAEN_BIT);
-																												break;
-
-																								case 0x7138:
-																												// DDR
-																												m_icount -= 12;
-																												BIT_CLR(m_flags , HPHYBRID_DMAEN_BIT);
-																												break;
-
-																								case 0x7140:
-																												// DBL
-																												m_icount -= 12;
-																												BIT_CLR(m_flags , HPHYBRID_DB_BIT);
-																												break;
-
-																								case 0x7148:
-																												// CBL
-																												m_icount -= 12;
-																												BIT_CLR(m_flags , HPHYBRID_CB_BIT);
-																												break;
-
-																								case 0x7150:
-																												// DBU
-																												m_icount -= 12;
-																												BIT_SET(m_flags , HPHYBRID_DB_BIT);
-																												break;
-
-																								case 0x7158:
-																												// CBU
-																												m_icount -= 12;
-																												BIT_SET(m_flags , HPHYBRID_CB_BIT);
-																												break;
-
-																								case 0xf020:
-																												// TCA
-																												m_icount -= 9;
-																												m_reg_A = ~m_reg_A;
-																												do_add(m_reg_A , 1);
-																												break;
-
-																								case 0xf060:
-																												// CMA
-																												m_icount -= 9;
-																												m_reg_A = ~m_reg_A;
-																												break;
-
-																								case 0xf820:
-																												// TCB
-																												m_icount -= 9;
-																												m_reg_B = ~m_reg_B;
-																												do_add(m_reg_B , 1);
-																												break;
-
-																								case 0xf860:
-																												// CMB
-																												m_icount -= 9;
-																												m_reg_B = ~m_reg_B;
-																												break;
-
-																								default:
-																																																		// Unrecognized instruction: pass it on for further processing (by EMC if present)
-																																																		return execute_no_bpc_ioc(opcode);
-																																																}
-																																								}
-																																}
-																								}
-																}
-								}
-
-				return m_reg_P + 1;
+	return m_reg_P + 1;
 }
 
 void hp_hybrid_cpu_device::state_string_export(const device_state_entry &entry, std::string &str) const
 {
 	if (entry.index() == STATE_GENFLAGS) {
 		str = string_format("%s %s %c %c",
-					BIT(m_flags , HPHYBRID_DB_BIT) ? "Db":"..",
-					BIT(m_flags , HPHYBRID_CB_BIT) ? "Cb":"..",
-					BIT(m_flags , HPHYBRID_O_BIT) ? 'O':'.',
-					BIT(m_flags , HPHYBRID_C_BIT) ? 'E':'.');
+							BIT(m_flags , HPHYBRID_DB_BIT) ? "Db":"..",
+							BIT(m_flags , HPHYBRID_CB_BIT) ? "Cb":"..",
+							BIT(m_flags , HPHYBRID_O_BIT) ? 'O':'.',
+							BIT(m_flags , HPHYBRID_C_BIT) ? 'E':'.');
 	}
 }
 
-offs_t hp_hybrid_cpu_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+util::disasm_interface *hp_hybrid_cpu_device::create_disassembler()
 {
-				extern CPU_DISASSEMBLE(hp_hybrid);
-				return CPU_DISASSEMBLE_NAME(hp_hybrid)(this, stream, pc, oprom, opram, options);
+	return new hp_hybrid_disassembler;
 }
 
 uint16_t hp_hybrid_cpu_device::remove_mae(uint32_t addr)
 {
-		return (uint16_t)(addr & 0xffff);
+	return (uint16_t)(addr & 0xffff);
 }
 
 uint16_t hp_hybrid_cpu_device::RM(aec_cases_t aec_case , uint16_t addr)
 {
-		return RM(add_mae(aec_case , addr));
+	return RM(add_mae(aec_case , addr));
 }
 
 uint16_t hp_hybrid_cpu_device::RM(uint32_t addr)
 {
-		uint16_t tmp;
-		uint16_t addr_wo_bsc = remove_mae(addr);
+	uint16_t tmp;
+	uint16_t addr_wo_bsc = remove_mae(addr);
 
-		if (addr_wo_bsc <= HP_REG_LAST_ADDR) {
-				// Any access to internal registers removes forcing of BSC 2x
-				m_forced_bsc_25 = false;
+	if (addr_wo_bsc <= HP_REG_LAST_ADDR) {
+		// Any access to internal registers removes forcing of BSC 2x
+		m_forced_bsc_25 = false;
 
-				// Memory mapped registers that are present in both 3001 & 3011
-				switch (addr_wo_bsc) {
-				case HP_REG_A_ADDR:
-						return m_reg_A;
+		// Memory mapped registers that are present in both 3001 & 3011
+		switch (addr_wo_bsc) {
+		case HP_REG_A_ADDR:
+			return m_reg_A;
 
-				case HP_REG_B_ADDR:
-						return m_reg_B;
+		case HP_REG_B_ADDR:
+			return m_reg_B;
 
-				case HP_REG_P_ADDR:
-						return m_reg_P;
+		case HP_REG_P_ADDR:
+			return m_reg_P;
 
-				case HP_REG_R_ADDR:
-						return m_reg_R;
+		case HP_REG_R_ADDR:
+			return m_reg_R;
 
-				case HP_REG_R4_ADDR:
-				case HP_REG_R5_ADDR:
-				case HP_REG_R6_ADDR:
-				case HP_REG_R7_ADDR:
-						return RIO(CURRENT_PA , addr_wo_bsc - HP_REG_R4_ADDR);
+		case HP_REG_R4_ADDR:
+		case HP_REG_R5_ADDR:
+		case HP_REG_R6_ADDR:
+		case HP_REG_R7_ADDR:
+			return RIO(CURRENT_PA , addr_wo_bsc - HP_REG_R4_ADDR);
 
-				case HP_REG_IV_ADDR:
-										return m_reg_IV;
+		case HP_REG_IV_ADDR:
+			return m_reg_IV;
 
-				case HP_REG_PA_ADDR:
-						return CURRENT_PA;
+		case HP_REG_PA_ADDR:
+			return CURRENT_PA;
 
-				case HP_REG_W_ADDR:
-						return m_reg_W;
+		case HP_REG_W_ADDR:
+			return m_reg_W;
 
-				case HP_REG_DMAPA_ADDR:
-						tmp = m_dmapa & HP_REG_PA_MASK;
-						if (BIT(m_flags , HPHYBRID_CB_BIT)) {
-								BIT_SET(tmp , 15);
-						}
-						if (BIT(m_flags , HPHYBRID_DB_BIT)) {
-								BIT_SET(tmp , 14);
-						}
-						return tmp;
+		case HP_REG_DMAPA_ADDR:
+			tmp = m_dmapa & HP_REG_PA_MASK;
+			if (BIT(m_flags , HPHYBRID_CB_BIT)) {
+				BIT_SET(tmp , 15);
+			}
+			if (BIT(m_flags , HPHYBRID_DB_BIT)) {
+				BIT_SET(tmp , 14);
+			}
+			return tmp;
 
-				case HP_REG_DMAMA_ADDR:
-						return m_dmama;
+		case HP_REG_DMAMA_ADDR:
+			return m_dmama;
 
-				case HP_REG_DMAC_ADDR:
-						return m_dmac;
+		case HP_REG_DMAC_ADDR:
+			return m_dmac;
 
-				case HP_REG_C_ADDR:
-						return m_reg_C;
+		case HP_REG_C_ADDR:
+			return m_reg_C;
 
-				case HP_REG_D_ADDR:
-						return m_reg_D;
+		case HP_REG_D_ADDR:
+			return m_reg_D;
 
-				default:
-						return read_non_common_reg(addr_wo_bsc);
-				}
-		} else {
-				return m_direct->read_word(addr << 1);
+		default:
+			return read_non_common_reg(addr_wo_bsc);
 		}
+	} else {
+		return m_direct->read_word(addr);
+	}
 }
 
 void hp_hybrid_cpu_device::WM(aec_cases_t aec_case , uint16_t addr , uint16_t v)
 {
-		WM(add_mae(aec_case , addr) , v);
+	WM(add_mae(aec_case , addr) , v);
 }
 
 void hp_hybrid_cpu_device::WM(uint32_t addr , uint16_t v)
 {
-		uint16_t addr_wo_bsc = remove_mae(addr);
+	uint16_t addr_wo_bsc = remove_mae(addr);
 
-		if (addr_wo_bsc <= HP_REG_LAST_ADDR) {
-				// Any access to internal registers removes forcing of BSC 2x
-				m_forced_bsc_25 = false;
+	if (addr_wo_bsc <= HP_REG_LAST_ADDR) {
+		// Any access to internal registers removes forcing of BSC 2x
+		m_forced_bsc_25 = false;
 
-				// Memory mapped registers
-				switch (addr_wo_bsc) {
-				case HP_REG_A_ADDR:
-						m_reg_A = v;
-						break;
+		// Memory mapped registers
+		switch (addr_wo_bsc) {
+		case HP_REG_A_ADDR:
+			m_reg_A = v;
+			break;
 
-				case HP_REG_B_ADDR:
-						m_reg_B = v;
-						break;
+		case HP_REG_B_ADDR:
+			m_reg_B = v;
+			break;
 
-				case HP_REG_P_ADDR:
-						m_reg_P = v;
-						break;
+		case HP_REG_P_ADDR:
+			m_reg_P = v;
+			break;
 
-				case HP_REG_R_ADDR:
-						m_reg_R = v;
-						break;
+		case HP_REG_R_ADDR:
+			m_reg_R = v;
+			break;
 
-				case HP_REG_R4_ADDR:
-				case HP_REG_R5_ADDR:
-				case HP_REG_R6_ADDR:
-				case HP_REG_R7_ADDR:
-						WIO(CURRENT_PA , addr_wo_bsc - HP_REG_R4_ADDR , v);
-						break;
+		case HP_REG_R4_ADDR:
+		case HP_REG_R5_ADDR:
+		case HP_REG_R6_ADDR:
+		case HP_REG_R7_ADDR:
+			WIO(CURRENT_PA , addr_wo_bsc - HP_REG_R4_ADDR , v);
+			break;
 
-				case HP_REG_IV_ADDR:
-						m_reg_IV = v & HP_REG_IV_MASK;
-						break;
+		case HP_REG_IV_ADDR:
+			m_reg_IV = v & HP_REG_IV_MASK;
+			break;
 
-				case HP_REG_PA_ADDR:
-						CURRENT_PA = v & HP_REG_PA_MASK;
-						m_pa_changed_func((uint8_t)CURRENT_PA);
-						break;
+		case HP_REG_PA_ADDR:
+			CURRENT_PA = v & HP_REG_PA_MASK;
+			m_pa_changed_func((uint8_t)CURRENT_PA);
+			break;
 
-				case HP_REG_W_ADDR:
-						m_reg_W = v;
-						break;
+		case HP_REG_W_ADDR:
+			m_reg_W = v;
+			break;
 
-				case HP_REG_DMAPA_ADDR:
-						m_dmapa = v & HP_REG_PA_MASK;
-						break;
+		case HP_REG_DMAPA_ADDR:
+			m_dmapa = v & HP_REG_PA_MASK;
+			break;
 
-				case HP_REG_DMAMA_ADDR:
-						m_dmama = v;
-						break;
+		case HP_REG_DMAMA_ADDR:
+			m_dmama = v;
+			break;
 
-				case HP_REG_DMAC_ADDR:
-						m_dmac = v;
-						break;
+		case HP_REG_DMAC_ADDR:
+			m_dmac = v;
+			break;
 
-				case HP_REG_C_ADDR:
-						m_reg_C = v;
-						break;
+		case HP_REG_C_ADDR:
+			m_reg_C = v;
+			break;
 
-				case HP_REG_D_ADDR:
-						m_reg_D = v;
-						break;
+		case HP_REG_D_ADDR:
+			m_reg_D = v;
+			break;
 
-				default:
-						write_non_common_reg(addr_wo_bsc , v);
-						break;
-				}
-		} else {
-				m_program->write_word(addr << 1 , v);
+		default:
+			write_non_common_reg(addr_wo_bsc , v);
+			break;
 		}
+	} else {
+		m_program->write_word(addr , v);
+	}
 }
 
 uint16_t hp_hybrid_cpu_device::fetch(void)
 {
-		m_genpc = add_mae(AEC_CASE_A , m_reg_P);
-		return RM(m_genpc);
+	m_genpc = add_mae(AEC_CASE_A , m_reg_P);
+	return RM(m_genpc);
 }
 
 uint32_t hp_hybrid_cpu_device::get_ea(uint16_t opcode)
 {
-		uint16_t base;
-		uint16_t off;
-		aec_cases_t aec;
+	uint16_t base;
+	uint16_t off;
+	aec_cases_t aec;
 
-		if (BIT(opcode , 10)) {
-				// Current page
-				base = m_reg_P;
-				aec = AEC_CASE_A;
-		} else {
-				// Base page
-				base = 0;
-				aec = AEC_CASE_B;
-		}
+	if (BIT(opcode , 10)) {
+		// Current page
+		base = m_reg_P;
+		aec = AEC_CASE_A;
+	} else {
+		// Base page
+		base = 0;
+		aec = AEC_CASE_B;
+	}
 
-		off = opcode & 0x3ff;
-		if (off & 0x200) {
-				off -= 0x400;
-		}
+	off = opcode & 0x3ff;
+	if (off & 0x200) {
+		off -= 0x400;
+	}
 
-		base += off;
+	base += off;
 
-		if (BIT(opcode , 15)) {
-				// Indirect addressing
-				m_icount -= 6;
-				return add_mae(AEC_CASE_C , RM(aec , base));
-		} else {
-				// Direct addressing
-				return add_mae(aec , base);
-		}
+	if (BIT(opcode , 15)) {
+		// Indirect addressing
+		m_icount -= 6;
+		return add_mae(AEC_CASE_C , RM(aec , base));
+	} else {
+		// Direct addressing
+		return add_mae(aec , base);
+	}
 }
 
 void hp_hybrid_cpu_device::do_add(uint16_t& addend1 , uint16_t addend2)
 {
-				uint32_t tmp = addend1 + addend2;
+	uint32_t tmp = addend1 + addend2;
 
-				if (BIT(tmp , 16)) {
-								// Carry
-								BIT_SET(m_flags , HPHYBRID_C_BIT);
-				}
+	if (BIT(tmp , 16)) {
+		// Carry
+		BIT_SET(m_flags , HPHYBRID_C_BIT);
+	}
 
-				if (BIT((tmp ^ addend1) & (tmp ^ addend2) , 15)) {
-								// Overflow
-								BIT_SET(m_flags , HPHYBRID_O_BIT);
-				}
+	if (BIT((tmp ^ addend1) & (tmp ^ addend2) , 15)) {
+		// Overflow
+		BIT_SET(m_flags , HPHYBRID_O_BIT);
+	}
 
-				addend1 = (uint16_t)tmp;
+	addend1 = (uint16_t)tmp;
 }
 
 uint16_t hp_hybrid_cpu_device::get_skip_addr(uint16_t opcode , bool condition) const
 {
-				bool skip_val = BIT(opcode , 8) != 0;
+	bool skip_val = BIT(opcode , 8) != 0;
 
-				if (condition == skip_val) {
-								uint16_t off = opcode & 0x1f;
+	if (condition == skip_val) {
+		uint16_t off = opcode & 0x1f;
 
-								if (BIT(opcode , 5)) {
-												off -= 0x20;
-								}
-								return m_reg_P + off;
-				} else {
-								return m_reg_P + 1;
-				}
+		if (BIT(opcode , 5)) {
+			off -= 0x20;
+		}
+		return m_reg_P + off;
+	} else {
+		return m_reg_P + 1;
+	}
 }
 
 uint16_t hp_hybrid_cpu_device::get_skip_addr_sc(uint16_t opcode , uint16_t& v , unsigned n)
 {
-				bool val = BIT(v , n);
+	bool val = BIT(v , n);
 
-				if (BIT(opcode , 7)) {
-								if (BIT(opcode , 6)) {
-												BIT_SET(v , n);
-								} else {
-												BIT_CLR(v , n);
-								}
-				}
+	if (BIT(opcode , 7)) {
+		if (BIT(opcode , 6)) {
+			BIT_SET(v , n);
+		} else {
+			BIT_CLR(v , n);
+		}
+	}
 
-				return get_skip_addr(opcode , val);
+	return get_skip_addr(opcode , val);
 }
 
 uint16_t hp_hybrid_cpu_device::get_skip_addr_sc(uint16_t opcode , uint32_t& v , unsigned n)
 {
-		bool val = BIT(v , n);
+	bool val = BIT(v , n);
 
-		if (BIT(opcode , 7)) {
-				if (BIT(opcode , 6)) {
-						BIT_SET(v , n);
-				} else {
-						BIT_CLR(v , n);
-				}
+	if (BIT(opcode , 7)) {
+		if (BIT(opcode , 6)) {
+			BIT_SET(v , n);
+		} else {
+			BIT_CLR(v , n);
 		}
+	}
 
-		return get_skip_addr(opcode , val);
+	return get_skip_addr(opcode , val);
 }
 
 void hp_hybrid_cpu_device::do_pw(uint16_t opcode)
 {
-				uint16_t tmp;
-				uint16_t reg_addr = opcode & 7;
-				uint16_t *ptr_reg;
-				uint16_t b_mask;
+	uint16_t tmp;
+	uint16_t reg_addr = opcode & 7;
+	uint16_t *ptr_reg;
+	uint16_t b_mask;
 
-				if (BIT(opcode , 3)) {
-								ptr_reg = &m_reg_D;
-								b_mask = BIT_MASK(HPHYBRID_DB_BIT);
+	if (BIT(opcode , 3)) {
+		ptr_reg = &m_reg_D;
+		b_mask = BIT_MASK(HPHYBRID_DB_BIT);
+	} else {
+		ptr_reg = &m_reg_C;
+		b_mask = BIT_MASK(HPHYBRID_CB_BIT);
+	}
+
+	if (BIT(opcode , 4)) {
+		// Withdraw
+		if (BIT(opcode , 11)) {
+			// Byte
+			uint32_t tmp_addr = (uint32_t)(*ptr_reg);
+			if (m_flags & b_mask) {
+				tmp_addr |= 0x10000;
+			}
+			tmp = RM(AEC_CASE_C , (uint16_t)(tmp_addr >> 1));
+			if (BIT(tmp_addr , 0)) {
+				tmp &= 0xff;
+			} else {
+				tmp >>= 8;
+			}
+		} else {
+			// Word
+			tmp = RM(AEC_CASE_C , *ptr_reg);
+		}
+		WM(reg_addr , tmp);
+
+		if (BIT(opcode , 7)) {
+			// Post-decrement
+			if ((*ptr_reg)-- == 0) {
+				m_flags ^= b_mask;
+			}
+		} else {
+			// Post-increment
+			if (++(*ptr_reg) == 0) {
+				m_flags ^= b_mask;
+			}
+		}
+	} else {
+		// Place
+		if (BIT(opcode , 7)) {
+			// Pre-decrement
+			if ((*ptr_reg)-- == 0) {
+				m_flags ^= b_mask;
+			}
+		} else {
+			// Pre-increment
+			if (++(*ptr_reg) == 0) {
+				m_flags ^= b_mask;
+			}
+		}
+		tmp = RM(reg_addr);
+		if (BIT(opcode , 11)) {
+			// Byte
+			uint32_t tmp_addr = (uint32_t)(*ptr_reg);
+			if (m_flags & b_mask) {
+				tmp_addr |= 0x10000;
+			}
+			if (tmp_addr <= (HP_REG_LAST_ADDR * 2 + 1)) {
+				// Single bytes can be written to registers.
+				// The addressed register gets the written byte in the proper position
+				// and a 0 in the other byte because access to registers is always done in
+				// 16 bits units.
+				if (BIT(tmp_addr , 0)) {
+					tmp &= 0xff;
 				} else {
-								ptr_reg = &m_reg_C;
-								b_mask = BIT_MASK(HPHYBRID_CB_BIT);
+					tmp <<= 8;
 				}
-
-				if (BIT(opcode , 4)) {
-								// Withdraw
-								if (BIT(opcode , 11)) {
-												// Byte
-												uint32_t tmp_addr = (uint32_t)(*ptr_reg);
-												if (m_flags & b_mask) {
-																tmp_addr |= 0x10000;
-												}
-												tmp = RM(AEC_CASE_C , (uint16_t)(tmp_addr >> 1));
-												if (BIT(tmp_addr , 0)) {
-																tmp &= 0xff;
-												} else {
-																tmp >>= 8;
-												}
-								} else {
-												// Word
-												tmp = RM(AEC_CASE_C , *ptr_reg);
-								}
-								WM(reg_addr , tmp);
-
-								if (BIT(opcode , 7)) {
-												// Post-decrement
-												if ((*ptr_reg)-- == 0) {
-																m_flags ^= b_mask;
-												}
-								} else {
-												// Post-increment
-												if (++(*ptr_reg) == 0) {
-																m_flags ^= b_mask;
-												}
-								}
-				} else {
-								// Place
-								if (BIT(opcode , 7)) {
-												// Pre-decrement
-												if ((*ptr_reg)-- == 0) {
-																m_flags ^= b_mask;
-												}
-								} else {
-												// Pre-increment
-												if (++(*ptr_reg) == 0) {
-																m_flags ^= b_mask;
-												}
-								}
-								tmp = RM(reg_addr);
-								if (BIT(opcode , 11)) {
-												// Byte
-												uint32_t tmp_addr = (uint32_t)(*ptr_reg);
-												if (m_flags & b_mask) {
-																tmp_addr |= 0x10000;
-												}
-																								if (tmp_addr <= (HP_REG_LAST_ADDR * 2 + 1)) {
-																										// Single bytes can be written to registers.
-																										// The addressed register gets the written byte in the proper position
-																										// and a 0 in the other byte because access to registers is always done in
-																										// 16 bits units.
-																										if (BIT(tmp_addr , 0)) {
-																												tmp &= 0xff;
-																										} else {
-																												tmp <<= 8;
-																										}
-																										WM(tmp_addr >> 1 , tmp);
-																								} else {
-																										// Extend address, preserve LSB & form byte address
-																										tmp_addr = (add_mae(AEC_CASE_C , tmp_addr >> 1) << 1) | (tmp_addr & 1);
-																										m_program->write_byte(tmp_addr , (uint8_t)tmp);
-																								}
-								} else {
-												// Word
-												WM(AEC_CASE_C , *ptr_reg , tmp);
-								}
-				}
+				WM(tmp_addr >> 1 , tmp);
+			} else {
+				// Extend address, form byte address
+				uint16_t val  = (tmp_addr & 1) ? uint8_t(tmp) : (tmp << 8);
+				uint16_t mask = (tmp_addr & 1) ? 0x00ff : 0xff00;
+				tmp_addr = add_mae(AEC_CASE_C , tmp_addr >> 1);
+				m_program->write_word(tmp_addr , val, mask);
+			}
+		} else {
+			// Word
+			WM(AEC_CASE_C , *ptr_reg , tmp);
+		}
+	}
 }
 
 void hp_hybrid_cpu_device::check_for_interrupts(void)
 {
-		if (!BIT(m_flags , HPHYBRID_INTEN_BIT) || BIT(m_flags , HPHYBRID_IRH_SVC_BIT) || BIT(m_flags , HPHYBRID_IM_BIT)) {
-								return;
-				}
+	if (!BIT(m_flags , HPHYBRID_INTEN_BIT) || BIT(m_flags , HPHYBRID_IRH_SVC_BIT) || BIT(m_flags , HPHYBRID_IM_BIT)) {
+		return;
+	}
 
-				int irqline;
+	int irqline;
 
-				if (BIT(m_flags , HPHYBRID_IRH_BIT)) {
-								// Service high-level interrupt
-								BIT_SET(m_flags , HPHYBRID_IRH_SVC_BIT);
-								irqline = HPHYBRID_IRH;
-																if (BIT(m_flags , HPHYBRID_IRL_SVC_BIT)) {
-																		logerror("H pre-empted L @ %06x\n" , m_genpc);
-																}
-				} else if (BIT(m_flags , HPHYBRID_IRL_BIT) && !BIT(m_flags , HPHYBRID_IRL_SVC_BIT)) {
-								// Service low-level interrupt
-								BIT_SET(m_flags , HPHYBRID_IRL_SVC_BIT);
-								irqline = HPHYBRID_IRL;
-				} else {
-								return;
-				}
+	if (BIT(m_flags , HPHYBRID_IRH_BIT)) {
+		// Service high-level interrupt
+		BIT_SET(m_flags , HPHYBRID_IRH_SVC_BIT);
+		irqline = HPHYBRID_IRH;
+		if (BIT(m_flags , HPHYBRID_IRL_SVC_BIT)) {
+			logerror("H pre-empted L @ %06x\n" , m_genpc);
+		}
+	} else if (BIT(m_flags , HPHYBRID_IRL_BIT) && !BIT(m_flags , HPHYBRID_IRL_SVC_BIT)) {
+		// Service low-level interrupt
+		BIT_SET(m_flags , HPHYBRID_IRL_SVC_BIT);
+		irqline = HPHYBRID_IRL;
+	} else {
+		return;
+	}
 
-				// Get interrupt vector in low byte
-				uint8_t vector = (uint8_t)standard_irq_callback(irqline);
-				uint8_t new_PA;
+	// Get interrupt vector in low byte
+	uint8_t vector = (uint8_t)standard_irq_callback(irqline);
+	uint8_t new_PA;
 
-				// Get highest numbered 1
-				// Don't know what happens if vector is 0, here we assume bit 7 = 1
-				if (vector == 0) {
-								new_PA = 7;
-				} else {
-								for (new_PA = 7; new_PA && !BIT(vector , 7); new_PA--, vector <<= 1) {
-								}
-				}
-				if (irqline == HPHYBRID_IRH) {
-								BIT_SET(new_PA , 3);
-				}
+	// Get highest numbered 1
+	// Don't know what happens if vector is 0, here we assume bit 7 = 1
+	if (vector == 0) {
+		new_PA = 7;
+	} else {
+		for (new_PA = 7; new_PA && !BIT(vector , 7); new_PA--, vector <<= 1) {
+		}
+	}
+	if (irqline == HPHYBRID_IRH) {
+		BIT_SET(new_PA , 3);
+	}
 
-				// Push PA stack
-				memmove(&m_reg_PA[ 1 ] , &m_reg_PA[ 0 ] , HPHYBRID_INT_LVLS);
+	// Push PA stack
+	memmove(&m_reg_PA[ 1 ] , &m_reg_PA[ 0 ] , HPHYBRID_INT_LVLS);
 
-				CURRENT_PA = new_PA;
+	CURRENT_PA = new_PA;
 
-								m_pa_changed_func((uint8_t)CURRENT_PA);
+	m_pa_changed_func((uint8_t)CURRENT_PA);
 
-				// Is this correct? Patent @ pg 210 suggests that the whole interrupt recognition sequence
-				// lasts for 32 cycles
-				m_icount -= 32;
+	// Is this correct? Patent @ pg 210 suggests that the whole interrupt recognition sequence
+	// lasts for 32 cycles
+	m_icount -= 32;
 
-								// Allow special processing in 5061-3001
-								enter_isr();
+	// Allow special processing in 5061-3001
+	enter_isr();
 
-				// Do a double-indirect JSM IV,I instruction
-				WM(AEC_CASE_C , ++m_reg_R , m_reg_P);
-				m_reg_P = RM(AEC_CASE_C , m_reg_IV + CURRENT_PA);
-				m_reg_I = fetch();
+	// Do a double-indirect JSM IV,I instruction
+	WM(AEC_CASE_C , ++m_reg_R , m_reg_P);
+	m_reg_P = RM(AEC_CASE_C , m_reg_IV + CURRENT_PA);
+	m_reg_I = fetch();
 }
 
 void hp_hybrid_cpu_device::enter_isr(void)
 {
-		// Do nothing special
+	// Do nothing special
 }
 
 void hp_hybrid_cpu_device::handle_dma(void)
@@ -1108,7 +1110,7 @@ void hp_hybrid_cpu_device::handle_dma(void)
 
 	if (BIT(m_flags , HPHYBRID_DMADIR_BIT)) {
 		// "Outward" DMA: memory -> peripheral
-										tmp = RM(AEC_CASE_D , m_dmama++);
+		tmp = RM(AEC_CASE_D , m_dmama++);
 		WIO(m_dmapa , tc ? 2 : 0 , tmp);
 		m_icount -= 10;
 	} else {
@@ -1123,12 +1125,12 @@ void hp_hybrid_cpu_device::handle_dma(void)
 
 uint16_t hp_hybrid_cpu_device::RIO(uint8_t pa , uint8_t ic)
 {
-	return m_io->read_word(HP_MAKE_IOADDR(pa, ic) << 1);
+	return m_io->read_word(HP_MAKE_IOADDR(pa, ic));
 }
 
 void hp_hybrid_cpu_device::WIO(uint8_t pa , uint8_t ic , uint16_t v)
 {
-	m_io->write_word(HP_MAKE_IOADDR(pa, ic) << 1 , v);
+	m_io->write_word(HP_MAKE_IOADDR(pa, ic) , v);
 }
 
 hp_5061_3001_cpu_device::hp_5061_3001_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
@@ -1397,16 +1399,16 @@ uint16_t hp_5061_3001_cpu_device::execute_no_bpc_ioc(uint16_t opcode)
 			break;
 
 		case 0x7280:
-				// FXA
-				m_icount -= 40;
-				tmp_ar2 = get_ar2();
-				carry = do_dec_add(BIT(m_flags , HPHYBRID_DC_BIT) , tmp_ar2 , get_ar1());
-				set_ar2(tmp_ar2);
-				if (carry)
-					BIT_SET(m_flags, HPHYBRID_DC_BIT);
-				else
-					BIT_CLR(m_flags, HPHYBRID_DC_BIT);
-				break;
+			// FXA
+			m_icount -= 40;
+			tmp_ar2 = get_ar2();
+			carry = do_dec_add(BIT(m_flags , HPHYBRID_DC_BIT) , tmp_ar2 , get_ar1());
+			set_ar2(tmp_ar2);
+			if (carry)
+				BIT_SET(m_flags, HPHYBRID_DC_BIT);
+			else
+				BIT_CLR(m_flags, HPHYBRID_DC_BIT);
+			break;
 
 		case 0x7340:
 			// NRM
@@ -1539,10 +1541,9 @@ uint16_t hp_5061_3001_cpu_device::execute_no_bpc_ioc(uint16_t opcode)
 	return m_reg_P + 1;
 }
 
-offs_t hp_5061_3001_cpu_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+util::disasm_interface *hp_5061_3001_cpu_device::create_disassembler()
 {
-	extern CPU_DISASSEMBLE(hp_5061_3001);
-	return CPU_DISASSEMBLE_NAME(hp_5061_3001)(this, stream, pc, oprom, opram, options);
+	return new hp_5061_3001_disassembler;
 }
 
 uint32_t hp_5061_3001_cpu_device::add_mae(aec_cases_t aec_case , uint16_t addr)
@@ -1599,7 +1600,7 @@ uint32_t hp_5061_3001_cpu_device::add_mae(aec_cases_t aec_case , uint16_t addr)
 
 	case AEC_CASE_D:
 		bsc_reg = top_half ? m_reg_aec[ HP_REG_R32_ADDR - HP_REG_R32_ADDR ] : m_reg_aec[ HP_REG_R37_ADDR - HP_REG_R32_ADDR ];
-		break;
+			break;
 
 	default:
 		logerror("hphybrid: aec_case=%d\n" , aec_case);

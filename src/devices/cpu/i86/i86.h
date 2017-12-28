@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include <cpu/i386/i386dasm.h>
 
 /////////////////////////////////////////////////////////////////
 
@@ -30,6 +31,12 @@ DECLARE_DEVICE_TYPE(I8088, i8088_cpu_device)
 #define MCFG_I8086_EXTRA_MAP(map) \
 	MCFG_DEVICE_ADDRESS_MAP(i8086_cpu_device::AS_EXTRA, map)
 
+#define MCFG_I8086_ESC_OPCODE_HANDLER(_write) \
+	devcb = &i8086_cpu_device::set_esc_opcode_handler(*device, DEVCB_##_write);
+
+#define MCFG_I8086_ESC_DATA_HANDLER(_write) \
+	devcb = &i8086_cpu_device::set_esc_data_handler(*device, DEVCB_##_write);
+
 enum
 {
 	I8086_PC = STATE_GENPC,
@@ -39,7 +46,7 @@ enum
 };
 
 
-class i8086_common_cpu_device : public cpu_device
+class i8086_common_cpu_device : public cpu_device, public i386_disassembler::config
 {
 public:
 	template <class Object> static devcb_base &set_lock_handler(device_t &device, Object &&cb)
@@ -134,9 +141,8 @@ protected:
 	virtual void execute_set_input(int inputnum, int state) override;
 
 	// device_disasm_interface overrides
-	virtual uint32_t disasm_min_opcode_bytes() const override { return 1; }
-	virtual uint32_t disasm_max_opcode_bytes() const override { return 8; }
-	virtual offs_t disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
+	virtual util::disasm_interface *create_disassembler() override;
+	virtual int get_mode() const override;
 
 	// device_state_interface overrides
 	virtual void state_import(const device_state_entry &entry) override;
@@ -314,7 +320,7 @@ protected:
 	uint8_t   m_test_state;
 
 	address_space *m_program, *m_opcodes, *m_stack, *m_code, *m_extra;
-	direct_read_data *m_direct, *m_direct_opcodes;
+	direct_read_data<0> *m_direct, *m_direct_opcodes;
 	address_space *m_io;
 	offs_t m_fetch_xor;
 	int m_icount;
@@ -370,6 +376,12 @@ public:
 	template <class Object> static devcb_base &set_if_handler(device_t &device, Object &&cb)
 	{ return downcast<i8086_cpu_device &>(device).m_out_if_func.set_callback(std::forward<Object>(cb)); }
 
+	template <class Object> static devcb_base &set_esc_opcode_handler(device_t &device, Object &&cb)
+	{ return downcast<i8086_cpu_device &>(device).m_esc_opcode_handler.set_callback(std::forward<Object>(cb)); }
+
+	template <class Object> static devcb_base &set_esc_data_handler(device_t &device, Object &&cb)
+	{ return downcast<i8086_cpu_device &>(device).m_esc_data_handler.set_callback(std::forward<Object>(cb)); }
+
 protected:
 	i8086_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int data_bus_size);
 
@@ -388,6 +400,8 @@ protected:
 	address_space_config m_io_config;
 	static const uint8_t m_i8086_timing[200];
 	devcb_write_line m_out_if_func;
+	devcb_write32 m_esc_opcode_handler;
+	devcb_write32 m_esc_data_handler;
 };
 
 class i8088_cpu_device : public i8086_cpu_device

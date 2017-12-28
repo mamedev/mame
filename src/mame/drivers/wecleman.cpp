@@ -1150,7 +1150,7 @@ static MACHINE_CONFIG_START( hotchase )
 	MCFG_CPU_ADD("sub", M68000, 10000000)   /* 10 MHz - PCB is drawn in one set's readme */
 	MCFG_CPU_PROGRAM_MAP(hotchase_sub_map)
 
-	MCFG_CPU_ADD("audiocpu", M6809, 3579545 / 2)    /* 3.579/2 MHz - PCB is drawn in one set's readme */
+	MCFG_CPU_ADD("audiocpu", MC6809E, 3579545 / 2)    /* 3.579/2 MHz - PCB is drawn in one set's readme */
 	MCFG_CPU_PROGRAM_MAP(hotchase_sound_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(wecleman_state, hotchase_sound_timer,  496)
 
@@ -1386,7 +1386,7 @@ void wecleman_state::bitswap(uint8_t *src,size_t len,int _14,int _13,int _12,int
 	for (i = 0;i < len;i++)
 	{
 		src[i] =
-			buffer[BITSWAP24(i,23,22,21,_14,_13,_12,_11,_10,_f,_e,_d,_c,_b,_a,_9,_8,_7,_6,_5,_4,_3,_2,_1,_0)];
+			buffer[::bitswap<24>(i,23,22,21,_14,_13,_12,_11,_10,_f,_e,_d,_c,_b,_a,_9,_8,_7,_6,_5,_4,_3,_2,_1,_0)];
 	}
 }
 
@@ -1412,7 +1412,7 @@ DRIVER_INIT_MEMBER(wecleman_state,wecleman)
 		/* TODO: could be wrong, colors have to be fixed.       */
 		/* The only certain thing is that 87 must convert to f0 */
 		/* otherwise stray lines appear, made of pens 7 & 8     */
-		RAM[i] = BITSWAP8(RAM[i],7,0,1,2,3,4,5,6);
+		RAM[i] = ::bitswap<8>(RAM[i],7,0,1,2,3,4,5,6);
 	}
 
 	bitswap(memregion("gfx1")->base(), memregion("gfx1")->bytes(),

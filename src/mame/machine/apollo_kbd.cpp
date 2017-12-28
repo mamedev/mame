@@ -112,6 +112,7 @@ void apollo_kbd_device::device_reset()
 	m_delay = 500;
 	m_repeat = 33;
 	m_last_pressed = 0;
+	m_numlock_state = 0;
 	memset(m_keytime, 0, sizeof(m_keytime));
 	memset(m_keyon, 0, sizeof(m_keyon));
 
@@ -522,7 +523,15 @@ int apollo_kbd_device::push_scancode(uint8_t code, uint8_t repeat)
 	}
 
 #if MAP_APOLLO_KEYS
-	if (numlock)
+
+	// FIXME: numlock was ok for MAME with SDL1.2 but never worked for MAME with SDL2
+	// nasty hack: we toggle the numlock state from the numlock Key Up transition (starting with 0 for numlock off)
+	if (code == 0xe6)
+		m_numlock_state = !m_numlock_state;
+
+	LOG1(("scan_code = 0x%02x numlock = %d numlock_state = %d", code, numlock, m_numlock_state));
+
+	if (m_numlock_state)
 	{
 		// don't map function keys to Apollo left keypad
 		switch (code)

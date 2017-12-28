@@ -13,6 +13,7 @@
 #include "rspcp2d.h"
 
 #include "rsp.h"
+#include "rsp_dasm.h"
 #include "rspcp2.h"
 
 #include "cpu/drcfe.h"
@@ -138,8 +139,9 @@ void rsp_cop2_drc::cfunc_unimplemented_opcode()
 	const uint32_t ppc = m_rsp.m_ppc;
 	if ((m_machine.debug_flags & DEBUG_FLAG_ENABLED) != 0)
 	{
+		rsp_disassembler rspd;
 		std::ostringstream stream;
-		rsp_dasm_one(stream, ppc, m_rspcop2_state->op);
+		rspd.dasm_one(stream, ppc, m_rspcop2_state->op);
 		const std::string stream_string = stream.str();
 		osd_printf_debug("%08X: %s\n", ppc, stream_string.c_str());
 	}

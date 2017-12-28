@@ -511,22 +511,22 @@ WRITE8_MEMBER(pc9801_state::ide_ctrl_w)
 
 READ16_MEMBER(pc9801_state::ide_cs0_r)
 {
-	return (m_ide_sel ? m_ide2 : m_ide1)->read_cs0(space, offset, mem_mask);
+	return (m_ide_sel ? m_ide2 : m_ide1)->read_cs0(offset, mem_mask);
 }
 
 WRITE16_MEMBER(pc9801_state::ide_cs0_w)
 {
-	(m_ide_sel ? m_ide2 : m_ide1)->write_cs0(space, offset, data, mem_mask);
+	(m_ide_sel ? m_ide2 : m_ide1)->write_cs0(offset, data, mem_mask);
 }
 
 READ16_MEMBER(pc9801_state::ide_cs1_r)
 {
-	return (m_ide_sel ? m_ide2 : m_ide1)->read_cs1(space, offset, mem_mask);
+	return (m_ide_sel ? m_ide2 : m_ide1)->read_cs1(offset, mem_mask);
 }
 
 WRITE16_MEMBER(pc9801_state::ide_cs1_w)
 {
-	(m_ide_sel ? m_ide2 : m_ide1)->write_cs1(space, offset, data, mem_mask);
+	(m_ide_sel ? m_ide2 : m_ide1)->write_cs1(offset, data, mem_mask);
 }
 
 WRITE_LINE_MEMBER(pc9801_state::ide1_irq_w)
@@ -855,7 +855,7 @@ WRITE8_MEMBER(pc9801_state::grcg_w)
 	else if(offset == 7)
 	{
 //      logerror("%02x GRCG TILE %02x\n",data,m_grcg.tile_index);
-		m_grcg.tile[m_grcg.tile_index] = BITSWAP8(data,0,1,2,3,4,5,6,7);
+		m_grcg.tile[m_grcg.tile_index] = bitswap<8>(data,0,1,2,3,4,5,6,7);
 		m_grcg.tile_index ++;
 		m_grcg.tile_index &= 3;
 		return;
@@ -1061,24 +1061,24 @@ WRITE8_MEMBER(pc9801_state::pic_w)
 READ16_MEMBER(pc9801_state::grcg_gvram_r)
 {
 	uint16_t ret = upd7220_grcg_r(space, (offset + 0x4000) | (m_vram_bank << 16), mem_mask);
-	return BITSWAP16(ret,8,9,10,11,12,13,14,15,0,1,2,3,4,5,6,7);
+	return bitswap<16>(ret,8,9,10,11,12,13,14,15,0,1,2,3,4,5,6,7);
 }
 
 WRITE16_MEMBER(pc9801_state::grcg_gvram_w)
 {
-	data = BITSWAP16(data,8,9,10,11,12,13,14,15,0,1,2,3,4,5,6,7);
+	data = bitswap<16>(data,8,9,10,11,12,13,14,15,0,1,2,3,4,5,6,7);
 	upd7220_grcg_w(space, (offset + 0x4000) | (m_vram_bank << 16), data, mem_mask);
 }
 
 READ16_MEMBER(pc9801_state::grcg_gvram0_r)
 {
 	uint16_t ret = upd7220_grcg_r(space, offset | (m_vram_bank << 16), mem_mask);
-	return BITSWAP16(ret,8,9,10,11,12,13,14,15,0,1,2,3,4,5,6,7);
+	return bitswap<16>(ret,8,9,10,11,12,13,14,15,0,1,2,3,4,5,6,7);
 }
 
 WRITE16_MEMBER(pc9801_state::grcg_gvram0_w)
 {
-	data = BITSWAP16(data,8,9,10,11,12,13,14,15,0,1,2,3,4,5,6,7);
+	data = bitswap<16>(data,8,9,10,11,12,13,14,15,0,1,2,3,4,5,6,7);
 	upd7220_grcg_w(space, offset | (m_vram_bank << 16), data, mem_mask);
 }
 
@@ -2396,8 +2396,8 @@ static MACHINE_CONFIG_START( pc9801rs )
 	MCFG_DEVICE_ADD("ipl_bank", ADDRESS_MAP_BANK, 0)
 	MCFG_DEVICE_PROGRAM_MAP(ipl_bank)
 	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_ADDRESS_MAP_BANK_DATABUS_WIDTH(16)
-	MCFG_ADDRESS_MAP_BANK_ADDRBUS_WIDTH(18)
+	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(16)
+	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(18)
 	MCFG_ADDRESS_MAP_BANK_STRIDE(0x18000)
 
 	MCFG_MACHINE_START_OVERRIDE(pc9801_state,pc9801rs)
@@ -2889,7 +2889,7 @@ DRIVER_INIT_MEMBER(pc9801_state,pc9801_kanji)
 	{
 		for(j=0;j<0x20;j++)
 		{
-			pcg_tile = BITSWAP16(i,15,14,13,12,11,7,6,5,10,9,8,4,3,2,1,0) << 5;
+			pcg_tile = bitswap<16>(i,15,14,13,12,11,7,6,5,10,9,8,4,3,2,1,0) << 5;
 			kanji[j+(i << 5)] = raw_kanji[j+pcg_tile];
 		}
 	}

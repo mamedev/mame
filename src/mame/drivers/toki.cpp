@@ -959,7 +959,7 @@ DRIVER_INIT_MEMBER(toki_state,toki)
 	memcpy(&buffer[0],ROM,0x20000);
 	for( i = 0; i < 0x20000; i++ )
 	{
-		ROM[i] = buffer[BITSWAP24(i,23,22,21,20,19,18,17,16,13,14,15,12,11,10,9,8,7,6,5,4,3,2,1,0)];
+		ROM[i] = buffer[bitswap<24>(i,23,22,21,20,19,18,17,16,13,14,15,12,11,10,9,8,7,6,5,4,3,2,1,0)];
 	}
 }
 
@@ -1014,7 +1014,7 @@ DRIVER_INIT_MEMBER(toki_state,jujuba)
 
 		for (i = 0; i < 0x60000/2; i++)
 		{
-			prgrom[i] = BITSWAP16(prgrom[i],15,12,13,14,
+			prgrom[i] = bitswap<16>(prgrom[i],15,12,13,14,
 											11,10, 9, 8,
 											7, 6,  5, 3,
 											4, 2,  1, 0);
@@ -1029,7 +1029,7 @@ DRIVER_INIT_MEMBER(toki_state,jujuba)
 		memcpy(&buffer[0],ROM,0x20000);
 		for( i = 0; i < 0x20000; i++ )
 		{
-			ROM[i] = buffer[BITSWAP24(i,23,22,21,20,19,18,17,16,13,14,15,12,11,10,9,8,7,6,5,4,3,2,1,0)];
+			ROM[i] = buffer[bitswap<24>(i,23,22,21,20,19,18,17,16,13,14,15,12,11,10,9,8,7,6,5,4,3,2,1,0)];
 		}
 	}
 }

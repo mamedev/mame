@@ -448,12 +448,12 @@ READ32_MEMBER(firebeat_state::ata_command_r )
 //  printf("ata_command_r: %08X, %08X\n", offset, mem_mask);
 	if (ACCESSING_BITS_16_31)
 	{
-		r = m_ata->read_cs0(space, offset*2, BYTESWAP16((mem_mask >> 16) & 0xffff));
+		r = m_ata->read_cs0(offset*2, BYTESWAP16((mem_mask >> 16) & 0xffff));
 		return BYTESWAP16(r) << 16;
 	}
 	else
 	{
-		r = m_ata->read_cs0(space, (offset*2) + 1, BYTESWAP16((mem_mask >> 0) & 0xffff));
+		r = m_ata->read_cs0((offset*2) + 1, BYTESWAP16((mem_mask >> 0) & 0xffff));
 		return BYTESWAP16(r) << 0;
 	}
 }
@@ -464,11 +464,11 @@ WRITE32_MEMBER(firebeat_state::ata_command_w )
 
 	if (ACCESSING_BITS_16_31)
 	{
-		m_ata->write_cs0(space, offset*2, BYTESWAP16((data >> 16) & 0xffff), BYTESWAP16((mem_mask >> 16) & 0xffff));
+		m_ata->write_cs0(offset*2, BYTESWAP16((data >> 16) & 0xffff), BYTESWAP16((mem_mask >> 16) & 0xffff));
 	}
 	else
 	{
-		m_ata->write_cs0(space, (offset*2) + 1, BYTESWAP16((data >> 0) & 0xffff), BYTESWAP16((mem_mask >> 0) & 0xffff));
+		m_ata->write_cs0((offset*2) + 1, BYTESWAP16((data >> 0) & 0xffff), BYTESWAP16((mem_mask >> 0) & 0xffff));
 	}
 }
 
@@ -480,12 +480,12 @@ READ32_MEMBER(firebeat_state::ata_control_r )
 
 	if (ACCESSING_BITS_16_31)
 	{
-		r = m_ata->read_cs1(space, offset*2, BYTESWAP16((mem_mask >> 16) & 0xffff));
+		r = m_ata->read_cs1(offset*2, BYTESWAP16((mem_mask >> 16) & 0xffff));
 		return BYTESWAP16(r) << 16;
 	}
 	else
 	{
-		r = m_ata->read_cs1(space, (offset*2) + 1, BYTESWAP16((mem_mask >> 0) & 0xffff));
+		r = m_ata->read_cs1((offset*2) + 1, BYTESWAP16((mem_mask >> 0) & 0xffff));
 		return BYTESWAP16(r) << 0;
 	}
 }
@@ -494,11 +494,11 @@ WRITE32_MEMBER(firebeat_state::ata_control_w )
 {
 	if (ACCESSING_BITS_16_31)
 	{
-		m_ata->write_cs1(space, offset*2, BYTESWAP16(data >> 16) & 0xffff, BYTESWAP16((mem_mask >> 16) & 0xffff));
+		m_ata->write_cs1(offset*2, BYTESWAP16(data >> 16) & 0xffff, BYTESWAP16((mem_mask >> 16) & 0xffff));
 	}
 	else
 	{
-		m_ata->write_cs1(space, (offset*2) + 1, BYTESWAP16(data >> 0) & 0xffff, BYTESWAP16((mem_mask >> 0) & 0xffff));
+		m_ata->write_cs1((offset*2) + 1, BYTESWAP16(data >> 0) & 0xffff, BYTESWAP16((mem_mask >> 0) & 0xffff));
 	}
 }
 

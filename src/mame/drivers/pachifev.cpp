@@ -283,9 +283,11 @@ WRITE_LINE_MEMBER(pachifev_state::pf_adpcm_int)
 
 void pachifev_state::machine_reset()
 {
+	tms9995_device* cpu = static_cast<tms9995_device*>(machine().device("maincpu"));
 	// Pulling down the line on RESET configures the CPU to insert one wait
 	// state on external memory accesses
-	static_cast<tms9995_device*>(machine().device("maincpu"))->ready_line(CLEAR_LINE);
+	cpu->ready_line(CLEAR_LINE);
+	cpu->reset_line(ASSERT_LINE);
 
 	m_power=0;
 	m_max_power=0;

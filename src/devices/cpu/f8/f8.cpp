@@ -16,6 +16,7 @@
 
 #include "emu.h"
 #include "f8.h"
+#include "f8dasm.h"
 #include "debugger.h"
 
 #define S   0x01
@@ -54,6 +55,45 @@
 		if (m_w & C)            \
 			m_w |= O;           \
 	}
+
+/* decimal add helper */
+uint8_t f8_cpu_device::do_ad(uint8_t augend, uint8_t addend)
+{
+	/* SKR from F8 Guide To programming description of AMD
+	 * binary add the addend to the binary sum of the augend and $66
+	 * *NOTE* the binary addition of the augend to $66 is done before AMD is called
+	 * record the status of the carry and intermediate carry
+	 * add a factor to the sum based on the carry and intermediate carry:
+	 * - no carry, no intermediate carry, add $AA
+	 * - no carry, intermediate carry, add $A0
+	 * - carry, no intermediate carry, add $0A
+	 * - carry, intermediate carry, add $00
+	 * any carry from the low-order digit is suppressed
+	 * *NOTE* status flags are updated prior to the factor being added
+	 */
+	uint8_t tmp = augend + addend;
+
+	uint8_t c = 0; // high order carry
+	uint8_t ic = 0; // low order carry
+
+	if (((augend + addend) & 0xff0) > 0xf0)
+		c = 1;
+	if ((augend & 0x0f) + (addend & 0x0f) > 0x0F)
+		ic = 1;
+
+	CLR_OZCS;
+	SET_OC(augend,addend);
+	SET_SZ(tmp);
+
+	if (c == 0 && ic == 0)
+		tmp = ((tmp + 0xa0) & 0xf0) + ((tmp + 0x0a) & 0x0f);
+	if (c == 0 && ic == 1)
+		tmp = ((tmp + 0xa0) & 0xf0) + (tmp & 0x0f);
+	if (c == 1 && ic == 0)
+		tmp = (tmp & 0xf0) + ((tmp + 0x0a) & 0x0f);
+
+	return tmp;
+}
 
 
 DEFINE_DEVICE_TYPE(F8, f8_cpu_device, "f8", "Fairchild F8")
@@ -1116,9 +1156,9 @@ void f8_cpu_device::f8_bt(int e)
 {
 	ROMC_1C(cS);
 	if (m_w & e)
-	ROMC_01();     /* take the relative branch */
+		ROMC_01();     /* take the relative branch */
 	else
-	ROMC_03(cS);     /* just read the argument on the data bus */
+		ROMC_03(cS);     /* just read the argument on the data bus */
 }
 
 /***************************************************
@@ -1140,43 +1180,9 @@ void f8_cpu_device::f8_am()
  ***************************************************/
 void f8_cpu_device::f8_amd()
 {
-/*SKR from F8 Guide To programming description of AMD
-
- binary add the addend to the binary sum of the augend and $66
-   *NOTE* the binary addition of the augend to $66 is done before AMD is called
-   record the status of the carry and intermediate carry
-   add a factor to the sum based on the carry and intermediate carry:
-     no carry, no intermediate carry, add $AA
-     no carry, intermediate carry, add $A0
-     carry, no intermediate carry, add $0A
-     carry, intermediate carry, add $00
-     any carry from the low-order digit is suppressed
-   *NOTE* status flags are updated prior to the factor being added
-*/
-
-	uint8_t augend=m_a;
+	uint8_t tmp = m_a;
 	ROMC_02();
-	uint8_t addend=m_dbus;
-	uint8_t tmp=addend+augend;
-
-	uint8_t c=0;              /* high order carry */
-	uint8_t ic=0;             /* low order carry */
-	if(((augend+addend)&0xff0)>0xf0)
-	c=1;
-	if((augend&0x0f)+(addend&0x0f)>0x0F)
-	ic=1;
-
-	CLR_OZCS;
-	SET_OC(augend,addend);
-	SET_SZ(tmp);
-
-	if(c==0&&ic==0)
-	tmp=((tmp+0xa0)&0xf0)+((tmp+0x0a)&0x0f);
-	if(c==0&&ic==1)
-	tmp=((tmp+0xa0)&0xf0)+(tmp&0x0f);
-	if(c==1&&ic==0)
-	tmp=(tmp&0xf0)+((tmp+0x0a)&0x0f);
-
+	tmp = do_ad(tmp, m_dbus);
 	m_a = tmp;
 }
 
@@ -1247,9 +1253,9 @@ void f8_cpu_device::f8_adc()
 void f8_cpu_device::f8_br7()
 {
 	if ((m_is & 7) == 7)
-	ROMC_03(cS);      /* just read the argument on the data bus */
+		ROMC_03(cS);      /* just read the argument on the data bus */
 	else
-	ROMC_01();      /* take the relative branch */
+		ROMC_01();      /* take the relative branch */
 }
 
 /***************************************************
@@ -1369,30 +1375,9 @@ void f8_cpu_device::f8_as_isar_d()
  ***************************************************/
 void f8_cpu_device::f8_asd(int r)
 {
-/*SKR from F8 Guide To programming description of AMD */
-	uint8_t augend=m_a;
+	uint8_t tmp = m_a;
 	ROMC_1C(cS);
-	uint8_t addend=m_r[r];
-	uint8_t tmp=augend+addend;
-
-	uint8_t c=0;
-	uint8_t ic=0;
-	if(((augend+addend)&0xff0)>0xf0)
-	c=1;
-	if((augend&0x0f)+(addend&0x0f)>0x0F)
-	ic=1;
-
-	CLR_OZCS;
-	SET_OC(augend,addend);
-	SET_SZ(tmp);
-
-	if(c==0&&ic==0)
-	tmp=((tmp+0xa0)&0xf0)+((tmp+0x0a)&0x0f);
-	if(c==0&&ic==1)
-	tmp=((tmp+0xa0)&0xf0)+(tmp&0x0f);
-	if(c==1&&ic==0)
-	tmp=(tmp&0xf0)+((tmp+0x0a)&0x0f);
-
+	tmp = do_ad(tmp, m_r[r]);
 	m_a = tmp;
 }
 
@@ -1402,30 +1387,9 @@ void f8_cpu_device::f8_asd(int r)
  ***************************************************/
 void f8_cpu_device::f8_asd_isar()
 {
-/*SKR from F8 Guide To programming description of AMD */
-	uint8_t augend=m_a;
+	uint8_t tmp = m_a;
 	ROMC_1C(cS);
-	uint8_t addend=m_r[m_is];
-	uint8_t tmp=augend+addend;
-
-	uint8_t c=0;
-	uint8_t ic=0;
-	if(((augend+addend)&0xff0)>0xf0)
-	c=1;
-	if((augend&0x0f)+(addend&0x0f)>0x0F)
-	ic=1;
-
-	CLR_OZCS;
-	SET_OC(augend,addend);
-	SET_SZ(tmp);
-
-	if(c==0&&ic==0)
-	tmp=((tmp+0xa0)&0xf0)+((tmp+0x0a)&0x0f);
-	if(c==0&&ic==1)
-	tmp=((tmp+0xa0)&0xf0)+(tmp&0x0f);
-	if(c==1&&ic==0)
-	tmp=(tmp&0xf0)+((tmp+0x0a)&0x0f);
-
+	tmp = do_ad(tmp, m_r[m_is]);
 	m_a = tmp;
 }
 
@@ -1435,30 +1399,9 @@ void f8_cpu_device::f8_asd_isar()
  ***************************************************/
 void f8_cpu_device::f8_asd_isar_i()
 {
-/*SKR from F8 Guide To programming description of AMD */
-	uint8_t augend=m_a;
+	uint8_t tmp = m_a;
 	ROMC_1C(cS);
-	uint8_t addend=m_r[m_is];
-	uint8_t tmp=augend+addend;
-
-	uint8_t c=0;
-	uint8_t ic=0;
-	if(((augend+addend)&0xff0)>0xf0)
-	c=1;
-	if((augend&0x0f)+(addend&0x0f)>0x0F)
-	ic=1;
-
-	CLR_OZCS;
-	SET_OC(augend,addend);
-	SET_SZ(tmp);
-
-	if(c==0&&ic==0)
-	tmp=((tmp+0xa0)&0xf0)+((tmp+0x0a)&0x0f);
-	if(c==0&&ic==1)
-	tmp=((tmp+0xa0)&0xf0)+(tmp&0x0f);
-	if(c==1&&ic==0)
-	tmp=(tmp&0xf0)+((tmp+0x0a)&0x0f);
-
+	tmp = do_ad(tmp, m_r[m_is]);
 	m_a = tmp;
 	m_is = (m_is & 0x38) | ((m_is + 1) & 0x07);
 }
@@ -1469,30 +1412,9 @@ void f8_cpu_device::f8_asd_isar_i()
  ***************************************************/
 void f8_cpu_device::f8_asd_isar_d()
 {
-/*SKR from F8 Guide To programming description of AMD */
-	uint8_t augend=m_a;
+	uint8_t tmp = m_a;
 	ROMC_1C(cS);
-	uint8_t addend=m_r[m_is];
-	uint8_t tmp=augend+addend;
-
-	uint8_t c=0;
-	uint8_t ic=0;
-	if(((augend+addend)&0xff0)>0xf0)
-	c=1;
-	if((augend&0x0f)+(addend&0x0f)>0x0F)
-	ic=1;
-
-	CLR_OZCS;
-	SET_OC(augend,addend);
-	SET_SZ(tmp);
-
-	if(c==0&&ic==0)
-	tmp=((tmp+0xa0)&0xf0)+((tmp+0x0a)&0x0f);
-	if(c==0&&ic==1)
-	tmp=((tmp+0xa0)&0xf0)+(tmp&0x0f);
-	if(c==1&&ic==0)
-	tmp=(tmp&0xf0)+((tmp+0x0a)&0x0f);
-
+	tmp = do_ad(tmp, m_r[m_is]);
 	m_a = tmp;
 	m_is = (m_is & 0x38) | ((m_is - 1) & 0x07);
 }
@@ -1956,9 +1878,8 @@ void f8_cpu_device::execute_run()
 
 void f8_cpu_device::device_start()
 {
-	// TODO register debug state
 	m_program = &space(AS_PROGRAM);
-	m_direct = &m_program->direct();
+	m_direct = m_program->direct<0>();
 	m_iospace = &space(AS_IO);
 
 	save_item(NAME(m_pc0));
@@ -2070,10 +1991,9 @@ void f8_cpu_device::state_string_export(const device_state_entry &entry, std::st
 }
 
 
-offs_t f8_cpu_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+util::disasm_interface *f8_cpu_device::create_disassembler()
 {
-	extern CPU_DISASSEMBLE( f8 );
-	return CPU_DISASSEMBLE_NAME(f8)(this, stream, pc, oprom, opram, options);
+	return new f8_disassembler;
 }
 
 

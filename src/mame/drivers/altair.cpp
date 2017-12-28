@@ -62,8 +62,7 @@ static ADDRESS_MAP_START(io_map, AS_IO, 8, altair_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	// TODO: Remove AM_MIRROR() and use SIO address S0-S7
-	AM_RANGE( 0x00, 0x00 ) AM_MIRROR(0x10) AM_DEVREADWRITE("acia", acia6850_device, status_r, control_w)
-	AM_RANGE( 0x01, 0x01 ) AM_MIRROR(0x10) AM_DEVREADWRITE("acia", acia6850_device, data_r, data_w)
+	AM_RANGE(0x00, 0x01) AM_MIRROR(0x10) AM_DEVREADWRITE("acia", acia6850_device, read, write)
 ADDRESS_MAP_END
 
 /* Input ports */

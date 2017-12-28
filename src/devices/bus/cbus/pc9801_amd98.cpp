@@ -125,7 +125,7 @@ void pc9801_amd98_device::device_validity_check(validity_checker &valid) const
 
 void pc9801_amd98_device::install_device(offs_t start, offs_t end, read8_delegate rhandler, write8_delegate whandler)
 {
-	int buswidth = machine().firstcpu->space_config(AS_IO)->m_databus_width;
+	int buswidth = machine().firstcpu->space_config(AS_IO)->m_data_width;
 	switch(buswidth)
 	{
 		case 8:

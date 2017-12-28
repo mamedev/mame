@@ -349,7 +349,9 @@ void looping_state::machine_start()
 void looping_state::machine_reset()
 {
 	// Disable auto wait state generation by raising the READY line on reset
-	static_cast<tms9995_device*>(machine().device("maincpu"))->ready_line(ASSERT_LINE);
+	tms9995_device* cpu = static_cast<tms9995_device*>(machine().device("maincpu"));
+	cpu->ready_line(ASSERT_LINE);
+	cpu->reset_line(ASSERT_LINE);
 }
 
 /*************************************
@@ -913,7 +915,7 @@ DRIVER_INIT_MEMBER(looping_state,looping)
 
 	/* bitswap the TMS9995 ROMs */
 	for (i = 0; i < length; i++)
-		rom[i] = BITSWAP8(rom[i], 0,1,2,3,4,5,6,7);
+		rom[i] = bitswap<8>(rom[i], 0,1,2,3,4,5,6,7);
 
 	/* install protection handlers */
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x7000, 0x7007, read8_delegate(FUNC(looping_state::protection_r), this));

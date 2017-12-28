@@ -275,12 +275,12 @@ WRITE8_MEMBER(igrosoft_gamble_state::igrosoft_gamble_vid_w)
 			case 1:
 				coldat ^= m_xor_palette;
 				coldat ^= ((coldat&0x2) >>1) | ((coldat&0x80) >>3) ;
-				coldat = BITSWAP16(coldat,10,15,5,13,8,12,11,2,0,4,7,14,9,3,1,6);
+				coldat = bitswap<16>(coldat,10,15,5,13,8,12,11,2,0,4,7,14,9,3,1,6);
 				break;
 			case 2:
 				coldat ^= m_xor_palette;
 				coldat ^= ((coldat&0x0001) <<1) ^ ((coldat&0x0010) <<1) ^ ((coldat&0x0010) <<2) ^ ((coldat&0x0020) <<1) ^ ((coldat&0x0080) >>1);
-				coldat = BITSWAP16(coldat,4,10,13,14,8,11,15,12,2,6,5,0,7,3,1,9);
+				coldat = bitswap<16>(coldat,4,10,13,14,8,11,15,12,2,6,5,0,7,3,1,9);
 				break;
 			case 3:
 				// WRONG
@@ -463,7 +463,7 @@ A12 <-> A13
 
 		for (j = 0; j < (igrosoft_gamble_ROM_SIZE/0x40); j++)
 		{
-			jscr =  BITSWAP16(j,15,14,13,4,3,2,0,1,6,7,5,12,11,10,8,9);
+			jscr =  bitswap<16>(j,15,14,13,4,3,2,0,1,6,7,5,12,11,10,8,9);
 			memcpy(&temprom[j*0x40],&igrosoft_gamble_gfx[romoffset+(jscr*0x40)],0x40);
 
 		}
@@ -477,7 +477,7 @@ static inline void rom_decodel(uint8_t *romptr, uint8_t *tmprom, uint8_t xor_dat
 
 	for (i = 0; i < igrosoft_gamble_ROM_SIZE; i++)
 	{
-		jscr =  BITSWAP24(i,23,22,21,20,19,17,14,18,16,15,12,13,11,9,6,10,8,7,4,5,3,2,1,0) ^ xor_add ^ 8;
+		jscr =  bitswap<24>(i,23,22,21,20,19,17,14,18,16,15,12,13,11,9,6,10,8,7,4,5,3,2,1,0) ^ xor_add ^ 8;
 		tmprom[i] = romptr[jscr] ^ xor_data;
 	}
 	memcpy(romptr,tmprom,igrosoft_gamble_ROM_SIZE);
@@ -488,7 +488,7 @@ static inline void rom_decodeh(uint8_t *romptr, uint8_t *tmprom, uint8_t xor_dat
 
 	for (i = 0; i < igrosoft_gamble_ROM_SIZE; i++)
 	{
-		jscr =  BITSWAP24(i,23,22,21,20,19,17,14,18,16,15,12,13,11,9,6,10,8,7,4,5,2,3,1,0) ^ xor_add;
+		jscr =  bitswap<24>(i,23,22,21,20,19,17,14,18,16,15,12,13,11,9,6,10,8,7,4,5,2,3,1,0) ^ xor_add;
 		tmprom[i] = romptr[jscr] ^ xor_data;
 	}
 	memcpy(romptr,tmprom,igrosoft_gamble_ROM_SIZE);
@@ -516,7 +516,7 @@ static inline void roment_decodel(uint8_t *romptr, uint8_t *tmprom, uint8_t xor_
 
 	for (i = 0; i < igrosoft_gamble_ROM_SIZE; i++)
 	{
-		jscr =  BITSWAP24(i,23,22,21,20,19,16,18,17,14,15,12,13,11,8,10,9,6,7,4,5,3,2,1,0) ^ xor_add ^ 8;
+		jscr =  bitswap<24>(i,23,22,21,20,19,16,18,17,14,15,12,13,11,8,10,9,6,7,4,5,3,2,1,0) ^ xor_add ^ 8;
 		tmprom[i] = romptr[jscr] ^ xor_data;
 	}
 	memcpy(romptr,tmprom,igrosoft_gamble_ROM_SIZE);
@@ -527,7 +527,7 @@ static inline void roment_decodeh(uint8_t *romptr, uint8_t *tmprom, uint8_t xor_
 
 	for (i = 0; i < igrosoft_gamble_ROM_SIZE; i++)
 	{
-		jscr =  BITSWAP24(i,23,22,21,20,19,16,18,17,14,15,12,13,11,8,10,9,6,7,4,5,2,3,1,0) ^ xor_add;
+		jscr =  bitswap<24>(i,23,22,21,20,19,16,18,17,14,15,12,13,11,8,10,9,6,7,4,5,2,3,1,0) ^ xor_add;
 		tmprom[i] = romptr[jscr] ^ xor_data;
 	}
 	memcpy(romptr,tmprom,igrosoft_gamble_ROM_SIZE);

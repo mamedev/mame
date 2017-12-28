@@ -272,7 +272,7 @@ READ16_MEMBER( harddriv_state::hdc68k_wheel_r )
 	uint16_t new_wheel = m_12badc[0].read_safe(0xffff);
 
 	/* hack to display the wheel position */
-	if (space.machine().input().code_pressed(KEYCODE_LSHIFT))
+	if (machine().input().code_pressed(KEYCODE_LSHIFT))
 		popmessage("%04X", new_wheel);
 
 	/* if we crossed the center line, latch the edge bit */
@@ -356,7 +356,7 @@ WRITE16_MEMBER( harddriv_state::hd68k_wr0_write )
 
 		case 6: /* CC1 */
 		case 7: /* CC2 */
-			space.machine().bookkeeping().coin_counter_w(offset - 6, data);
+			machine().bookkeeping().coin_counter_w(offset - 6, data);
 			break;
 
 		default:
@@ -612,7 +612,7 @@ WRITE16_MEMBER( harddriv_state::hd68k_adsp_data_w )
 	if (offset == 0x1fff)
 	{
 		logerror("%06X:ADSP sync address written (%04X)\n", space.device().safe_pcbase(), data);
-		space.machine().scheduler().synchronize();
+		machine().scheduler().synchronize();
 		m_adsp->signal_interrupt_trigger();
 	}
 	else
@@ -714,7 +714,7 @@ WRITE16_MEMBER( harddriv_state::hd68k_adsp_control_w )
 
 		case 3:
 			logerror("ADSP bank = %d (deferred)\n", val);
-			space.machine().scheduler().synchronize(timer_expired_delegate(FUNC(harddriv_state::deferred_adsp_bank_switch),this), val);
+			machine().scheduler().synchronize(timer_expired_delegate(FUNC(harddriv_state::deferred_adsp_bank_switch),this), val);
 			break;
 
 		case 5:
@@ -1022,7 +1022,7 @@ READ16_MEMBER( harddriv_state::hd68k_ds3_gdata_r )
 	/* it is important that all the CPUs be in sync before we continue, so spin a little */
 	/* while to let everyone else catch up */
 	space.device().execute().spin_until_trigger(DS3_TRIGGER);
-	space.machine().scheduler().trigger(DS3_TRIGGER, attotime::from_usec(5));
+	machine().scheduler().trigger(DS3_TRIGGER, attotime::from_usec(5));
 
 	return m_ds3_gdata;
 }
@@ -1075,7 +1075,7 @@ READ16_MEMBER( harddriv_state::hd68k_ds3_sdata_r )
 	/* it is important that all the CPUs be in sync before we continue, so spin a little */
 	/* while to let everyone else catch up */
 	space.device().execute().spin_until_trigger(DS3_STRIGGER);
-	space.machine().scheduler().trigger(DS3_STRIGGER, attotime::from_usec(5));
+	machine().scheduler().trigger(DS3_STRIGGER, attotime::from_usec(5));
 
 	return m_ds3_sdata;
 }
@@ -1141,7 +1141,7 @@ WRITE16_MEMBER( harddriv_state::hdds3_sdsp_special_w )
 			update_ds3_sirq();
 
 			/* once we've written data, trigger the main CPU to wake up again */
-			space.machine().scheduler().trigger(DS3_STRIGGER);
+			machine().scheduler().trigger(DS3_STRIGGER);
 			break;
 
 		case 1:
@@ -1431,7 +1431,7 @@ WRITE16_MEMBER( harddriv_state::hdds3_special_w )
 			update_ds3_irq();
 
 			/* once we've written data, trigger the main CPU to wake up again */
-			space.machine().scheduler().trigger(DS3_TRIGGER);
+			machine().scheduler().trigger(DS3_TRIGGER);
 			break;
 
 		case 1:
@@ -1650,7 +1650,7 @@ WRITE32_MEMBER( harddriv_state::rddsp32_sync0_w )
 		COMBINE_DATA(&newdata);
 		m_dataptr[m_next_msp_sync % MAX_MSP_SYNC] = dptr;
 		m_dataval[m_next_msp_sync % MAX_MSP_SYNC] = newdata;
-		space.machine().scheduler().synchronize(timer_expired_delegate(FUNC(harddriv_state::rddsp32_sync_cb),this), m_next_msp_sync++ % MAX_MSP_SYNC);
+		machine().scheduler().synchronize(timer_expired_delegate(FUNC(harddriv_state::rddsp32_sync_cb),this), m_next_msp_sync++ % MAX_MSP_SYNC);
 	}
 	else
 		COMBINE_DATA(&m_rddsp32_sync[0][offset]);
@@ -1666,7 +1666,7 @@ WRITE32_MEMBER( harddriv_state::rddsp32_sync1_w )
 		COMBINE_DATA(&newdata);
 		m_dataptr[m_next_msp_sync % MAX_MSP_SYNC] = dptr;
 		m_dataval[m_next_msp_sync % MAX_MSP_SYNC] = newdata;
-		space.machine().scheduler().synchronize(timer_expired_delegate(FUNC(harddriv_state::rddsp32_sync_cb),this), m_next_msp_sync++ % MAX_MSP_SYNC);
+		machine().scheduler().synchronize(timer_expired_delegate(FUNC(harddriv_state::rddsp32_sync_cb),this), m_next_msp_sync++ % MAX_MSP_SYNC);
 	}
 	else
 		COMBINE_DATA(&m_rddsp32_sync[1][offset]);

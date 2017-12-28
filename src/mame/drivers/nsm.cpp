@@ -106,7 +106,7 @@ WRITE8_MEMBER( nsm_state::cru_w )
 				for (j = 0; j < 5; j++)
 				{
 					segments = m_cru_data[8-j]^0xff;
-					output().set_digit_value(j * 10 + i, BITSWAP16(segments, 8, 8, 8, 8, 8, 8, 0, 0, 1, 1, 2, 3, 4, 5, 6, 7));
+					output().set_digit_value(j * 10 + i, bitswap<16>(segments, 8, 8, 8, 8, 8, 8, 0, 0, 1, 1, 2, 3, 4, 5, 6, 7));
 				}
 			}
 		}
@@ -116,7 +116,9 @@ WRITE8_MEMBER( nsm_state::cru_w )
 void nsm_state::machine_reset()
 {
 	// Disable auto wait state generation by raising the READY line on reset
-	static_cast<tms9995_device*>(machine().device("maincpu"))->ready_line(ASSERT_LINE);
+	tms9995_device* cpu = static_cast<tms9995_device*>(machine().device("maincpu"));
+	cpu->ready_line(ASSERT_LINE);
+	cpu->reset_line(ASSERT_LINE);
 }
 
 static MACHINE_CONFIG_START( nsm )

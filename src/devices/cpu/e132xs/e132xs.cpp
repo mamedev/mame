@@ -33,6 +33,7 @@
  TODO:
  - some wrong cycle counts
  - verify register wrapping with sregf/dregf on hardware
+
  CHANGELOG:
 
  Pierpaolo Prazzoli
@@ -194,10 +195,10 @@ ADDRESS_MAP_END
 
 hyperstone_device::hyperstone_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock,
 										const device_type type, uint32_t prg_data_width, uint32_t io_data_width, address_map_constructor internal_map)
-	: cpu_device(mconfig, type, tag, owner, clock),
-		m_program_config("program", ENDIANNESS_BIG, prg_data_width, 32, 0, internal_map),
-		m_io_config("io", ENDIANNESS_BIG, io_data_width, 15),
-		m_icount(0)
+	: cpu_device(mconfig, type, tag, owner, clock)
+	, m_program_config("program", ENDIANNESS_BIG, prg_data_width, 32, 0, internal_map)
+	, m_io_config("io", ENDIANNESS_BIG, io_data_width, 15)
+	, m_icount(0)
 {
 }
 
@@ -373,46 +374,26 @@ uint32_t hyperstone_device::get_emu_code_addr(uint8_t num) /* num is OP */
 	return addr;
 }
 
-void hyperstone_device::hyperstone_set_trap_entry(int which)
-{
-	switch( which )
-	{
-		case E132XS_ENTRY_MEM0:
-			m_trap_entry = 0x00000000;
-			break;
+/*static*/ const uint32_t hyperstone_device::s_trap_entries[8] = {
+	0x00000000, // MEM0
+	0x40000000, // MEM1
+	0x80000000, // MEM2
+	0xc0000000, // IRAM
+	0,
+	0,
+	0,
+	0xffffff00, // MEM3
+};
 
-		case E132XS_ENTRY_MEM1:
-			m_trap_entry = 0x40000000;
-			break;
-
-		case E132XS_ENTRY_MEM2:
-			m_trap_entry = 0x80000000;
-			break;
-
-		case E132XS_ENTRY_MEM3:
-			m_trap_entry = 0xffffff00;
-			break;
-
-		case E132XS_ENTRY_IRAM:
-			m_trap_entry = 0xc0000000;
-			break;
-
-		default:
-			LOG("Set entry point to a reserved value: %d\n", which);
-			break;
-	}
-}
-
-uint32_t hyperstone_device::compute_tr()
+void hyperstone_device::compute_tr()
 {
 	uint64_t cycles_since_base = total_cycles() - m_tr_base_cycles;
 	uint64_t clocks_since_base = cycles_since_base >> m_clck_scale;
-	return m_tr_base_value + (clocks_since_base / m_tr_clocks_per_tick);
+	m_tr_result = m_tr_base_value + (clocks_since_base / m_tr_clocks_per_tick);
 }
 
 void hyperstone_device::update_timer_prescale()
 {
-	uint32_t prevtr = compute_tr();
 	TPR &= ~0x80000000;
 	m_clck_scale = (TPR >> 26) & m_clock_scale_mask;
 	m_clock_cycles_1 = 1 << m_clck_scale;
@@ -421,7 +402,7 @@ void hyperstone_device::update_timer_prescale()
 	m_clock_cycles_4 = 4 << m_clck_scale;
 	m_clock_cycles_6 = 6 << m_clck_scale;
 	m_tr_clocks_per_tick = ((TPR >> 16) & 0xff) + 2;
-	m_tr_base_value = prevtr;
+	m_tr_base_value = m_tr_result;
 	m_tr_base_cycles = total_cycles();
 }
 
@@ -471,10 +452,13 @@ TIMER_CALLBACK_MEMBER( hyperstone_device::timer_callback )
 
 	/* update the values if necessary */
 	if (update)
+	{
 		update_timer_prescale();
+	}
 
 	/* see if the timer is right for firing */
-	if (!((compute_tr() - TCR) & 0x80000000))
+	compute_tr();
+	if (!((m_tr_result - TCR) & 0x80000000))
 		m_timer_int_pending = 1;
 
 	/* adjust ourselves for the next time */
@@ -524,7 +508,8 @@ uint32_t hyperstone_device::get_global_register(uint8_t code)
 		/* it is common to poll this in a loop */
 		if (m_icount > m_tr_clocks_per_tick / 2)
 			m_icount -= m_tr_clocks_per_tick / 2;
-		return compute_tr();
+		compute_tr();
+		return m_tr_result;
 	}
 	return m_global_regs[code & 0x1f];
 }
@@ -578,7 +563,10 @@ void hyperstone_device::set_global_register(uint8_t code, uint32_t val)
 		case TPR_REGISTER:
 			m_global_regs[code] = val;
 			if (!(val & 0x80000000)) /* change immediately */
+			{
+				compute_tr();
 				update_timer_prescale();
+			}
 			adjust_timer_interrupt();
 			return;
 		case TCR_REGISTER:
@@ -609,10 +597,14 @@ void hyperstone_device::set_global_register(uint8_t code, uint32_t val)
 				m_intblock = 1;
 			return;
 		case MCR_REGISTER:
+		{
 			// bits 14..12 EntryTableMap
-			hyperstone_set_trap_entry((val & 0x7000) >> 12);
+			const int which = (val & 0x7000) >> 12;
+			assert(which < 4 || which == 7);
+			m_trap_entry = s_trap_entries[which];
 			m_global_regs[code] = val;
 			return;
+		}
 		case 28:
 		case 29:
 		case 30:
@@ -633,10 +625,8 @@ void hyperstone_device::set_global_register(uint8_t code, uint32_t val)
 #define SIGN_BIT(val)           ((val & 0x80000000) >> 31)
 #define SIGN_TO_N(val)          ((val & 0x80000000) >> 29)
 
-static constexpr int32_t immediate_values[32] =
+/*static*/ const int32_t hyperstone_device::s_immediate_values[16] =
 {
-	0, 1, 2, 3, 4, 5, 6, 7,
-	8, 9, 10, 11, 12, 13, 14, 15,
 	16, 0, 0, 0, 32, 64, 128, int32_t(0x80000000),
 	-8, -7, -6, -5, -4, -3, -2, -1
 };
@@ -650,7 +640,7 @@ do                                                                              
 	if (m_delay_slot)                                                               \
 	{                                                                               \
 		PC = m_delay_pc;                                                            \
-		m_delay_slot = false;                                                       \
+		m_delay_slot = 0;                                                           \
 	}                                                                               \
 } while (0)
 
@@ -669,8 +659,7 @@ uint32_t hyperstone_device::decode_immediate_s()
 	switch (nybble)
 	{
 		case 0:
-		default:
-			return immediate_values[0x10 + nybble];
+			return 16;
 		case 1:
 		{
 			m_instruction_length = (3<<19);
@@ -692,6 +681,8 @@ uint32_t hyperstone_device::decode_immediate_s()
 			PC += 2;
 			return extra_u;
 		}
+		default:
+			return s_immediate_values[nybble];
 	}
 }
 
@@ -763,7 +754,7 @@ void hyperstone_device::ignore_pcrel()
 	}
 }
 
-void hyperstone_device::execute_br()
+void hyperstone_device::hyperstone_br()
 {
 	const int32_t offset = decode_pcrel();
 	check_delay_PC();
@@ -776,24 +767,18 @@ void hyperstone_device::execute_br()
 
 void hyperstone_device::execute_trap(uint32_t addr)
 {
-	uint8_t reg;
-	uint32_t oldSR;
-	reg = GET_FP + GET_FL;
-
+	const uint8_t reg = GET_FP + GET_FL;
 	SET_ILC(m_instruction_length);
-
-	oldSR = SR;
+	const uint32_t oldSR = SR;
 
 	SET_FL(6);
 	SET_FP(reg);
 
-	set_local_register(0, (PC & 0xfffffffe) | GET_S);
-	set_local_register(1, oldSR);
+	m_local_regs[(0 + reg) & 0x3f] = (PC & ~1) | GET_S;
+	m_local_regs[(1 + reg) & 0x3f] = oldSR;
 
-	SET_M(0);
-	SET_T(0);
-	SET_L(1);
-	SET_S(1);
+	SR &= ~(M_MASK | T_MASK);
+	SR |= (L_MASK | S_MASK);
 
 	PC = addr;
 
@@ -828,8 +813,8 @@ void hyperstone_device::execute_exception(uint32_t addr)
 	SET_ILC(m_instruction_length);
 	const uint32_t oldSR = SR;
 
-	SET_FP(reg);
 	SET_FL(2);
+	SET_FP(reg);
 
 	m_local_regs[(0 + reg) & 0x3f] = (PC & ~1) | GET_S;
 	m_local_regs[(1 + reg) & 0x3f] = oldSR;
@@ -1020,6 +1005,7 @@ void hyperstone_device::init(int scale_mask)
 
 	m_tr_base_cycles = 0;
 	m_tr_base_value = 0;
+	m_tr_result = 0;
 	m_tr_clocks_per_tick = 0;
 	m_timer_int_pending = 0;
 
@@ -1029,7 +1015,7 @@ void hyperstone_device::init(int scale_mask)
 	m_icount = 0;
 
 	m_program = &space(AS_PROGRAM);
-	m_direct = &m_program->direct();
+	m_direct = m_program->direct<0>();
 	m_io = &space(AS_IO);
 
 	m_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(hyperstone_device::timer_callback), this));
@@ -1268,12 +1254,12 @@ void hyperstone_device::device_reset()
 	//TODO: Add different reset initializations for BCR, MCR, FCR, TPR
 
 	m_program = &space(AS_PROGRAM);
-	m_direct = &m_program->direct();
+	m_direct = m_program->direct<0>();
 	m_io = &space(AS_IO);
 
 	m_tr_clocks_per_tick = 2;
 
-	hyperstone_set_trap_entry(E132XS_ENTRY_MEM3); /* default entry point @ MEM3 */
+	m_trap_entry = s_trap_entries[E132XS_ENTRY_MEM3]; // default entry point @ MEM3
 
 	set_global_register(BCR_REGISTER, ~0);
 	set_global_register(MCR_REGISTER, ~0);
@@ -1349,108 +1335,51 @@ void hyperstone_device::state_string_export(const device_state_entry &entry, std
 
 
 //-------------------------------------------------
-//  disasm_min_opcode_bytes - return the length
-//  of the shortest instruction, in bytes
-//-------------------------------------------------
-
-uint32_t hyperstone_device::disasm_min_opcode_bytes() const
-{
-	return 2;
-}
-
-
-//-------------------------------------------------
-//  disasm_max_opcode_bytes - return the length
-//  of the longest instruction, in bytes
-//-------------------------------------------------
-
-uint32_t hyperstone_device::disasm_max_opcode_bytes() const
-{
-	return 6;
-}
-
-
-//-------------------------------------------------
-//  disasm_disassemble - call the disassembly
+//  disassemble - call the disassembly
 //  helper function
 //-------------------------------------------------
 
-offs_t hyperstone_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+util::disasm_interface *hyperstone_device::create_disassembler()
 {
-	extern CPU_DISASSEMBLE( hyperstone );
-	return dasm_hyperstone(stream, pc, oprom, GET_H, GET_FP);
+	return new hyperstone_disassembler(this);
+}
+
+u8 hyperstone_device::get_fp() const
+{
+	return GET_FP;
+}
+
+bool hyperstone_device::get_h() const
+{
+	return GET_H;
 }
 
 /* Opcodes */
 
 void hyperstone_device::hyperstone_trap()
 {
+	static const uint32_t conditions[16] = {
+		0, 0, 0, 0, N_MASK | Z_MASK, N_MASK | Z_MASK, N_MASK, N_MASK, C_MASK | Z_MASK, C_MASK | Z_MASK, C_MASK, C_MASK, Z_MASK, Z_MASK, V_MASK, 0
+	};
+	static const bool trap_if_set[16] = {
+		false, false, false, false, true, false, true, false, true, false, true, false, true, false, true, false
+	};
+
 	check_delay_PC();
 
 	const uint8_t trapno = (m_op & 0xfc) >> 2;
 	const uint32_t addr = get_trap_addr(trapno);
 	const uint8_t code = ((m_op & 0x300) >> 6) | (m_op & 0x03);
 
-	switch (code)
+	if (trap_if_set[code])
 	{
-		case TRAPLE:
-			if (SR & (N_MASK | Z_MASK))
-				execute_trap(addr);
-			break;
-
-		case TRAPGT:
-			if(!(SR & (N_MASK | Z_MASK)))
-				execute_trap(addr);
-			break;
-
-		case TRAPLT:
-			if (SR & N_MASK)
-				execute_trap(addr);
-			break;
-
-		case TRAPGE:
-			if (!(SR & N_MASK))
-				execute_trap(addr);
-			break;
-
-		case TRAPSE:
-			if (SR & (C_MASK | Z_MASK))
-				execute_trap(addr);
-			break;
-
-		case TRAPHT:
-			if (!(SR & (C_MASK | Z_MASK)))
-				execute_trap(addr);
-			break;
-
-		case TRAPST:
-			if (SR & C_MASK)
-				execute_trap(addr);
-			break;
-
-		case TRAPHE:
-			if (!(SR & C_MASK))
-				execute_trap(addr);
-			break;
-
-		case TRAPE:
-			if (SR & Z_MASK)
-				execute_trap(addr);
-			break;
-
-		case TRAPNE:
-			if (!(SR & Z_MASK))
-				execute_trap(addr);
-			break;
-
-		case TRAPV:
-			if (SR & V_MASK)
-				execute_trap(addr);
-			break;
-
-		case TRAP:
+		if (SR & conditions[code])
 			execute_trap(addr);
-			break;
+	}
+	else
+	{
+		if (!(SR & conditions[code]))
+			execute_trap(addr);
 	}
 
 	m_icount -= m_clock_cycles_1;
@@ -1537,7 +1466,7 @@ void hyperstone_device::execute_run()
 
 		m_instruction_length = (1<<19);
 
-		switch ((OP >> 8) & 0x00ff)
+		switch (m_op >> 8)
 		{
 			case 0x00: hyperstone_chk<GLOBAL, GLOBAL>(); break;
 			case 0x01: hyperstone_chk<GLOBAL, LOCAL>(); break;
@@ -1751,8 +1680,8 @@ void hyperstone_device::execute_run()
 			case 0xd1: hyperstone_ldwr<LOCAL>(); break;
 			case 0xd2: hyperstone_lddr<GLOBAL>(); break;
 			case 0xd3: hyperstone_lddr<LOCAL>(); break;
-			case 0xd4: hypesrtone_ldwp<GLOBAL>(); break;
-			case 0xd5: hypesrtone_ldwp<LOCAL>(); break;
+			case 0xd4: hyperstone_ldwp<GLOBAL>(); break;
+			case 0xd5: hyperstone_ldwp<LOCAL>(); break;
 			case 0xd6: hyperstone_lddp<GLOBAL>(); break;
 			case 0xd7: hyperstone_lddp<LOCAL>(); break;
 			case 0xd8: hyperstone_stwr<GLOBAL>(); break;
@@ -1763,35 +1692,35 @@ void hyperstone_device::execute_run()
 			case 0xdd: hyperstone_stwp<LOCAL>(); break;
 			case 0xde: hyperstone_stdp<GLOBAL>(); break;
 			case 0xdf: hyperstone_stdp<LOCAL>(); break;
-			case 0xe0: hyperstone_dbv(); break;
-			case 0xe1: hyperstone_dbnv(); break;
-			case 0xe2: hyperstone_dbe(); break;
-			case 0xe3: hyperstone_dbne(); break;
-			case 0xe4: hyperstone_dbc(); break;
-			case 0xe5: hyperstone_dbnc(); break;
-			case 0xe6: hyperstone_dbse(); break;
-			case 0xe7: hyperstone_dbht(); break;
-			case 0xe8: hyperstone_dbn(); break;
-			case 0xe9: hyperstone_dbnn(); break;
-			case 0xea: hyperstone_dble(); break;
-			case 0xeb: hyperstone_dbgt(); break;
+			case 0xe0: hyperstone_db<COND_V,  IS_SET>(); break;
+			case 0xe1: hyperstone_db<COND_V,  IS_CLEAR>(); break;
+			case 0xe2: hyperstone_db<COND_Z,  IS_SET>(); break;
+			case 0xe3: hyperstone_db<COND_Z,  IS_CLEAR>(); break;
+			case 0xe4: hyperstone_db<COND_C,  IS_SET>(); break;
+			case 0xe5: hyperstone_db<COND_C,  IS_CLEAR>(); break;
+			case 0xe6: hyperstone_db<COND_CZ, IS_SET>(); break;
+			case 0xe7: hyperstone_db<COND_CZ, IS_CLEAR>(); break;
+			case 0xe8: hyperstone_db<COND_N,  IS_SET>(); break;
+			case 0xe9: hyperstone_db<COND_N,  IS_CLEAR>(); break;
+			case 0xea: hyperstone_db<COND_NZ, IS_SET>(); break;
+			case 0xeb: hyperstone_db<COND_NZ, IS_CLEAR>(); break;
 			case 0xec: hyperstone_dbr(); break;
 			case 0xed: hyperstone_frame(); break;
-			case 0xee: hyperstone_call_global(); break;
-			case 0xef: hyperstone_call_local(); break;
-			case 0xf0: hyperstone_bv(); break;
-			case 0xf1: hyperstone_bnv(); break;
-			case 0xf2: hyperstone_be(); break;
-			case 0xf3: hyperstone_bne(); break;
-			case 0xf4: hyperstone_bc(); break;
-			case 0xf5: hyperstone_bnc(); break;
-			case 0xf6: hyperstone_bse(); break;
-			case 0xf7: hyperstone_bht(); break;
-			case 0xf8: hyperstone_bn(); break;
-			case 0xf9: hyperstone_bnn(); break;
-			case 0xfa: hyperstone_ble(); break;
-			case 0xfb: hyperstone_bgt(); break;
-			case 0xfc: execute_br(); break;
+			case 0xee: hyperstone_call<GLOBAL>(); break;
+			case 0xef: hyperstone_call<LOCAL>(); break;
+			case 0xf0: hyperstone_b<COND_V,  IS_SET>(); break;
+			case 0xf1: hyperstone_b<COND_V,  IS_CLEAR>(); break;
+			case 0xf2: hyperstone_b<COND_Z,  IS_SET>(); break;
+			case 0xf3: hyperstone_b<COND_Z,  IS_CLEAR>(); break;
+			case 0xf4: hyperstone_b<COND_C,  IS_SET>(); break;
+			case 0xf5: hyperstone_b<COND_C,  IS_CLEAR>(); break;
+			case 0xf6: hyperstone_b<COND_CZ, IS_SET>(); break;
+			case 0xf7: hyperstone_b<COND_CZ, IS_CLEAR>(); break;
+			case 0xf8: hyperstone_b<COND_N,  IS_SET>(); break;
+			case 0xf9: hyperstone_b<COND_N,  IS_CLEAR>(); break;
+			case 0xfa: hyperstone_b<COND_NZ, IS_SET>(); break;
+			case 0xfb: hyperstone_b<COND_NZ, IS_CLEAR>(); break;
+			case 0xfc: hyperstone_br(); break;
 			case 0xfd: hyperstone_trap(); break;
 			case 0xfe: hyperstone_trap(); break;
 			case 0xff: hyperstone_trap(); break;

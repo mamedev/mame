@@ -112,13 +112,13 @@ TMS340X0_SCANLINE_RGB32_CB_MEMBER(coolpool_state::coolpool_scanline)
 
 TMS340X0_TO_SHIFTREG_CB_MEMBER(coolpool_state::to_shiftreg)
 {
-	memcpy(shiftreg, &m_vram_base[TOWORD(address) & ~TOWORD(0xfff)], TOBYTE(0x1000));
+	memcpy(shiftreg, &m_vram_base[(address & ~0xfff) >> 4], 0x200);
 }
 
 
 TMS340X0_FROM_SHIFTREG_CB_MEMBER(coolpool_state::from_shiftreg)
 {
-	memcpy(&m_vram_base[TOWORD(address) & ~TOWORD(0xfff)], shiftreg, TOBYTE(0x1000));
+	memcpy(&m_vram_base[(address & ~0xfff) >> 4], shiftreg, 0x200);
 }
 
 
@@ -1145,13 +1145,13 @@ DRIVER_INIT_MEMBER(coolpool_state,9ballsht)
 		hi = rom[a] >> 8;
 		lo = rom[a] & 0xff;
 
-		nhi = BITSWAP8(hi,5,2,0,7,6,4,3,1) ^ 0x29;
+		nhi = bitswap<8>(hi,5,2,0,7,6,4,3,1) ^ 0x29;
 		if (hi & 0x01) nhi ^= 0x03;
 		if (hi & 0x10) nhi ^= 0xc1;
 		if (hi & 0x20) nhi ^= 0x40;
 		if (hi & 0x40) nhi ^= 0x12;
 
-		nlo = BITSWAP8(lo,5,3,4,6,7,1,2,0) ^ 0x80;
+		nlo = bitswap<8>(lo,5,3,4,6,7,1,2,0) ^ 0x80;
 		if ((lo & 0x02) && (lo & 0x04)) nlo ^= 0x01;
 		if (lo & 0x04) nlo ^= 0x0c;
 		if (lo & 0x08) nlo ^= 0x10;

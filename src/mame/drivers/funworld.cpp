@@ -3712,6 +3712,30 @@ ROM_START( jolycdie )   /* Bootleg PCB, NON encrypted graphics */
 	ROM_LOAD( "82s147.bin", 0x0000, 0x0200, CRC(fc9a8aa3) SHA1(6f0a98bd0c7a64281bb1cce35de11b76978d7123) ) // sldh
 ROM_END
 
+/* Jolly Card Italian bootleg...
+
+   This PCB has an Altera EP910PC CPLD on board
+
+   This set doesn't need any NVRAM initialization.
+
+   5 & 6 are coins.
+   W is payout.
+*/
+ROM_START( jolycdif )   /* Altera EP910PC CPLD */
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "1.bin", 0x8000, 0x8000, CRC(80983f6a) SHA1(222ce5d4800887de92a73decbad31e96f8da3b4a) )
+
+	ROM_REGION( 0x10000, "gfx1", 0 )
+	ROM_LOAD( "2.bin", 0x0000, 0x8000, CRC(a4452751) SHA1(a0b32a8801ebaee7ede7873b244f1a424433fe94) )
+	ROM_CONTINUE( 0x0000, 0x8000) /* Discarding 1nd half 1ST AND 2ND HALF IDENTICAL*/
+	ROM_LOAD( "3.bin", 0x8000, 0x8000, CRC(2856c82d) SHA1(7ce835bc2246ffede180cff0d8d0d4528afcc297) )
+	ROM_CONTINUE( 0x8000, 0x8000) /* Discarding 1nd half 1ST AND 2ND HALF IDENTICAL*/
+
+	ROM_REGION( 0x0200, "proms", 0 )
+	ROM_LOAD( "82s147.bin", 0x0000, 0x0200, CRC(5ebc5659) SHA1(8d59011a181399682ab6e8ed14f83101e9bfa0c6) ) // proper dump
+ROM_END
+
+
 ROM_START( sjcd2kx3 )   /* Super Joly 2000 3x */
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "sj3.bin", 0x8000, 0x8000, CRC(c530b518) SHA1(36934d8e1e2cb2f71eb44a05b86ec970c9f398cd) )
@@ -6439,7 +6463,7 @@ DRIVER_INIT_MEMBER(funworld_state, saloon)
 
 	for (i = start; i < size; i++)
 	{
-		rom[i] = BITSWAP8(rom[i], 7, 6, 5, 4, 3, 0, 1, 2);
+		rom[i] = bitswap<8>(rom[i], 7, 6, 5, 4, 3, 0, 1, 2);
 	}
 
 	{
@@ -6451,7 +6475,7 @@ DRIVER_INIT_MEMBER(funworld_state, saloon)
 
 		for (i = start; i < size; i++)
 		{
-			a = ((i & 0xff00) | BITSWAP8(i & 0xff, 2, 0, 1, 3, 4, 5, 6, 7));
+			a = ((i & 0xff00) | bitswap<8>(i & 0xff, 2, 0, 1, 3, 4, 5, 6, 7));
 			rom[a] = buffer[i];
 		}
 	}
@@ -6469,7 +6493,7 @@ DRIVER_INIT_MEMBER(funworld_state, saloon)
 
 		for (i = startg; i < sizeg; i++)
 		{
-			a = BITSWAP16(i, 15, 14, 13, 12, 11, 6, 7, 5, 8, 4, 10, 3, 9, 0, 1, 2);
+			a = bitswap<16>(i, 15, 14, 13, 12, 11, 6, 7, 5, 8, 4, 10, 3, 9, 0, 1, 2);
 			gfxrom[a] = buffer[i];
 		}
 	}
@@ -6483,7 +6507,7 @@ DRIVER_INIT_MEMBER(funworld_state, saloon)
 
 	for (i = startp; i < sizep; i++)
 	{
-		prom[i] = BITSWAP8(prom[i], 2, 3, 5, 4, 6, 7, 1, 0);
+		prom[i] = bitswap<8>(prom[i], 2, 3, 5, 4, 6, 7, 1, 0);
 	}
 
 	{
@@ -6495,7 +6519,7 @@ DRIVER_INIT_MEMBER(funworld_state, saloon)
 
 		for (i = startp; i < sizep; i++)
 		{
-			a = BITSWAP16(i, 15, 14, 13, 12, 11, 10, 9, 4, 8, 7, 6, 5, 2, 0, 1, 3);
+			a = bitswap<16>(i, 15, 14, 13, 12, 11, 10, 9, 4, 8, 7, 6, 5, 2, 0, 1, 3);
 			prom[a] = buffer[i];
 		}
 	}
@@ -6521,7 +6545,7 @@ DRIVER_INIT_MEMBER(funworld_state, multiwin)
 		ROM[x] = ROM[x] ^ 0x91;
 		uint8_t code;
 
-		ROM[x] = BITSWAP8(ROM[x],5,6,7,2,3,0,1,4);
+		ROM[x] = bitswap<8>(ROM[x],5,6,7,2,3,0,1,4);
 
 		code = ROM[x];
 
@@ -6553,7 +6577,7 @@ DRIVER_INIT_MEMBER(funworld_state, royalcdc)
 		uint8_t code;
 
 		// this seems correct for the data, plaintext decrypts fine
-		ROM[x] = BITSWAP8(ROM[x],2,6,7,4,3,1,5,0);
+		ROM[x] = bitswap<8>(ROM[x],2,6,7,4,3,1,5,0);
 
 		// the code uses different encryption, there are conflicts here
 		// so it's probably address based
@@ -6618,7 +6642,7 @@ DRIVER_INIT_MEMBER(funworld_state, dino4)
 
 	for (i = start; i < size; i++)
 	{
-		rom[i] = BITSWAP8(rom[i], 7, 6, 5, 4, 3, 1, 2, 0);
+		rom[i] = bitswap<8>(rom[i], 7, 6, 5, 4, 3, 1, 2, 0);
 	}
 
 	{
@@ -6630,7 +6654,7 @@ DRIVER_INIT_MEMBER(funworld_state, dino4)
 
 		for (i = start; i < size; i++)
 		{
-			a = BITSWAP16(i, 15, 13, 14, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0);
+			a = bitswap<16>(i, 15, 13, 14, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0);
 			rom[a] = buffer[i];
 		}
 	}
@@ -6648,7 +6672,7 @@ DRIVER_INIT_MEMBER(funworld_state, dino4)
 
 		for (i = startg; i < sizeg; i++)
 		{
-			a = BITSWAP16(i, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 4, 5, 3, 2, 1, 0);
+			a = bitswap<16>(i, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 4, 5, 3, 2, 1, 0);
 			gfxrom[a] = buffer[i];
 		}
 	}
@@ -6678,7 +6702,7 @@ DRIVER_INIT_MEMBER(funworld_state, ctunk)
 
 	for (i = start; i < size; i++)
 	{
-		rom[i] = BITSWAP8(rom[i], 5, 6, 7, 3, 4, 0, 1, 2);
+		rom[i] = bitswap<8>(rom[i], 5, 6, 7, 3, 4, 0, 1, 2);
 	}
 
 	//buffer = std::make_unique<uint8_t[]>(size);
@@ -6722,7 +6746,7 @@ static void decrypt_rcdino4(uint8_t *rom, int size, uint8_t *gfxrom, int sizeg, 
 
 	for (i = start; i < size; i++)
 	{
-		rom[i] = BITSWAP8(rom[i], 7, 6, 5, 4, 3, 1, 2, 0);
+		rom[i] = bitswap<8>(rom[i], 7, 6, 5, 4, 3, 1, 2, 0);
 	}
 
 	{
@@ -6734,7 +6758,7 @@ static void decrypt_rcdino4(uint8_t *rom, int size, uint8_t *gfxrom, int sizeg, 
 
 		for (i = start; i < size; i++)
 		{
-			a = BITSWAP16(i, 15, 13, 14, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0);
+			a = bitswap<16>(i, 15, 13, 14, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0);
 			rom[a] = buffer[i];
 		}
 
@@ -6752,7 +6776,7 @@ static void decrypt_rcdino4(uint8_t *rom, int size, uint8_t *gfxrom, int sizeg, 
 
 		for (i = startg; i < sizeg; i++)
 		{
-			a = BITSWAP16(i, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 4, 5, 3, 2, 1, 0);
+			a = bitswap<16>(i, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 4, 5, 3, 2, 1, 0);
 			gfxrom[a] = buffer[i];
 		}
 	}
@@ -6763,7 +6787,7 @@ static void decrypt_rcdino4(uint8_t *rom, int size, uint8_t *gfxrom, int sizeg, 
 
 	for (x = 0x0000; x < 0x10000; x++)
 	{
-		src[x] = BITSWAP8(src[x], 7, 6, 4, 5, 3, 2, 1, 0);
+		src[x] = bitswap<8>(src[x], 7, 6, 4, 5, 3, 2, 1, 0);
 		src[x] = src[x] ^ 0x81;
 	}
 
@@ -7025,7 +7049,8 @@ GAMEL( 1985, sjcd2kx3,  jollycrd, fw1stpal, funworld,  funworld_state, 0,       
 GAME(  1986, jolycdab,  jollycrd, fw1stpal, funworld,  funworld_state, 0,        ROT0, "Inter Games",     "Jolly Card (Austrian, Fun World, bootleg)",       MACHINE_NOT_WORKING )
 GAMEL( 1992, jolycdsp,  jollycrd, cuoreuno, jolycdit,  funworld_state, ctunk,    ROT0, "TAB Austria",     "Jolly Card (Spanish, blue TAB board, encrypted)", 0,                       layout_royalcrd )
 GAMEL( 1990, jolycdid,  jollycrd, cuoreuno, jolycdcr,  funworld_state, 0,        ROT0, "bootleg",         "Jolly Card (Italian, different colors, set 1)",   0,                       layout_jollycrd ) // italian, CPLD, different colors.
-GAMEL( 1990, jolycdie,  jollycrd, cuoreuno, jolycdib,  funworld_state, 0,        ROT0, "bootleg",         "Jolly Card (Italian, different colors, set 2)",   0,                       layout_jollycrd ) // not from TAB blue PCB
+GAMEL( 1990, jolycdie,  jollycrd, cuoreuno, jolycdib,  funworld_state, 0,        ROT0, "bootleg",         "Jolly Card (Italian, different colors, set 2)",   0,                       layout_jollycrd ) // not from TAB blue PCB.
+GAMEL( 1990, jolycdif,  jollycrd, cuoreuno, jolycdib,  funworld_state, 0,        ROT0, "bootleg",         "Jolly Card (Italian, bootleg)",                   0,                       layout_jollycrd ) // italian, CPLD. doesn't need nvram init.
 
 // Bonus Card based...
 GAMEL( 1986, bonuscrd,  0,        fw2ndpal, bonuscrd,  funworld_state, 0,        ROT0, "Fun World",       "Bonus Card (Austrian)",                           MACHINE_IMPERFECT_COLORS,   layout_bonuscrd ) // use fw1stpal machine for green background

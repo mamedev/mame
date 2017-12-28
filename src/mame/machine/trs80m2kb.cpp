@@ -33,7 +33,7 @@ DEFINE_DEVICE_TYPE(TRS80M2_KEYBOARD, trs80m2_keyboard_device, "trs80m2kb", "TRS-
 
 ROM_START( trs80m2_keyboard )
 	ROM_REGION( 0x400, I8021_TAG, 0 )
-	ROM_LOAD( "65-1991.z4", 0x0000, 0x0400, NO_DUMP )
+	ROM_LOAD( "65-1991.z4", 0x0000, 0x0400, CRC(0a50e977) SHA1(c944cb9be062c9eed4f20a5b2568c8019dc71e27))
 ROM_END
 
 
@@ -347,5 +347,5 @@ WRITE8_MEMBER( trs80m2_keyboard_device::kb_p2_w )
 
 	*/
 
-	m_keylatch = BITSWAP8(data, 7, 6, 5, 4, 0, 1, 2, 3) & 0x0f;
+	m_keylatch = bitswap<8>(data, 7, 6, 5, 4, 0, 1, 2, 3) & 0x0f;
 }

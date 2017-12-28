@@ -183,12 +183,12 @@ DRIVER_INIT_MEMBER(scramble_state,frogger)
 	/* the first ROM of the second CPU has data lines D0 and D1 swapped. Decode it. */
 	ROM = memregion("audiocpu")->base();
 	for (A = 0;A < 0x0800;A++)
-		ROM[A] = BITSWAP8(ROM[A],7,6,5,4,3,2,0,1);
+		ROM[A] = bitswap<8>(ROM[A],7,6,5,4,3,2,0,1);
 
 	/* likewise, the 2nd gfx ROM has data lines D0 and D1 swapped. Decode it. */
 	ROM = memregion("gfx1")->base();
 	for (A = 0x0800;A < 0x1000;A++)
-		ROM[A] = BITSWAP8(ROM[A],7,6,5,4,3,2,0,1);
+		ROM[A] = bitswap<8>(ROM[A],7,6,5,4,3,2,0,1);
 }
 
 DRIVER_INIT_MEMBER(scramble_state,froggers)
@@ -199,7 +199,7 @@ DRIVER_INIT_MEMBER(scramble_state,froggers)
 	/* the first ROM of the second CPU has data lines D0 and D1 swapped. Decode it. */
 	ROM = memregion("audiocpu")->base();
 	for (A = 0;A < 0x0800;A++)
-		ROM[A] = BITSWAP8(ROM[A],7,6,5,4,3,2,0,1);
+		ROM[A] = bitswap<8>(ROM[A],7,6,5,4,3,2,0,1);
 }
 #endif
 
@@ -223,7 +223,7 @@ DRIVER_INIT_MEMBER(scramble_state,devilfsh)
 
 		for (j = 0; j < 16; j++)
 		{
-			offs_t newval = BITSWAP8(j,7,6,5,4,2,0,3,1);
+			offs_t newval = bitswap<8>(j,7,6,5,4,2,0,3,1);
 
 			swapbuffer[j] = RAM[i + newval];
 		}
@@ -502,7 +502,7 @@ DRIVER_INIT_MEMBER(scramble_state,hustler)
 
 
 		for (A = 0;A < 0x0800;A++)
-			rom[A] = BITSWAP8(rom[A],7,6,5,4,3,2,0,1);
+			rom[A] = bitswap<8>(rom[A],7,6,5,4,3,2,0,1);
 	}
 }
 
@@ -514,7 +514,7 @@ DRIVER_INIT_MEMBER(scramble_state,hustlerd)
 
 
 	for (A = 0;A < 0x0800;A++)
-		rom[A] = BITSWAP8(rom[A],7,6,5,4,3,2,0,1);
+		rom[A] = bitswap<8>(rom[A],7,6,5,4,3,2,0,1);
 }
 
 DRIVER_INIT_MEMBER(scramble_state,billiard)
@@ -545,7 +545,7 @@ DRIVER_INIT_MEMBER(scramble_state,billiard)
 
 		rom[A] ^= xormask;
 
-		rom[A] = BITSWAP8(rom[A],6,1,2,5,4,3,0,7);
+		rom[A] = bitswap<8>(rom[A],6,1,2,5,4,3,0,7);
 	}
 
 	/* the first ROM of the second CPU has data lines D0 and D1 swapped. Decode it. */
@@ -554,7 +554,7 @@ DRIVER_INIT_MEMBER(scramble_state,billiard)
 
 
 		for (A = 0;A < 0x0800;A++)
-			rom[A] = BITSWAP8(rom[A],7,6,5,4,3,2,0,1);
+			rom[A] = bitswap<8>(rom[A],7,6,5,4,3,2,0,1);
 	}
 }
 
@@ -580,7 +580,7 @@ DRIVER_INIT_MEMBER(scramble_state,ad2083)
 	for (i=0; i<len; i++)
 	{
 		c = ROM[i] ^ 0x35;
-		c = BITSWAP8(c, 6,2,5,1,7,3,4,0); /* also swapped inside of the bigger module */
+		c = bitswap<8>(c, 6,2,5,1,7,3,4,0); /* also swapped inside of the bigger module */
 		ROM[i] = c;
 	}
 }
@@ -650,24 +650,24 @@ DRIVER_INIT_MEMBER(scramble_state,harem)
 	for (int i = 0; i < size; i++)
 	{
 		uint8_t x = ROM[i];
-		opcodes[size * 0 + i]   =   BITSWAP8(x, 7,0,5,2,3,4,1,6);
-		data   [size * 0 + i]   =   BITSWAP8(x, 7,6,5,0,3,4,1,2);
+		opcodes[size * 0 + i]   =   bitswap<8>(x, 7,0,5,2,3,4,1,6);
+		data   [size * 0 + i]   =   bitswap<8>(x, 7,6,5,0,3,4,1,2);
 	}
 
 	// decryption 09
 	for (int i = 0; i < size; i++)
 	{
 		uint8_t x = ROM[i];
-		opcodes[size * 1 + i]   =   BITSWAP8(x, 7,0,5,6,3,2,1,4);
-		data   [size * 1 + i]   =   BITSWAP8(x, 7,4,5,0,3,6,1,2);
+		opcodes[size * 1 + i]   =   bitswap<8>(x, 7,0,5,6,3,2,1,4);
+		data   [size * 1 + i]   =   bitswap<8>(x, 7,4,5,0,3,6,1,2);
 	}
 
 	// decryption 0a
 	for (int i = 0; i < size; i++)
 	{
 		uint8_t x = ROM[i];
-		opcodes[size * 2 + i]   =   BITSWAP8(x, 7,2,5,6,3,0,1,4);
-		data   [size * 2 + i]   =   BITSWAP8(x, 7,2,5,4,3,0,1,6);
+		opcodes[size * 2 + i]   =   bitswap<8>(x, 7,2,5,6,3,0,1,4);
+		data   [size * 2 + i]   =   bitswap<8>(x, 7,2,5,4,3,0,1,6);
 	}
 
 	membank("rombank")->set_base            (m_harem_decrypted_data.get());

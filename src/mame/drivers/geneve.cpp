@@ -670,9 +670,11 @@ void geneve_state::machine_reset()
 	m_int2 = CLEAR_LINE;    // flag reflecting the INT2 line
 	m_keyint = CLEAR_LINE;
 
-	// No automatic wait state (auto wait state is enabled with READY=CLEAR at RESET)
+	// READY=ASSERT; RESET -> no additional wait states
+	// READY=CLEAR; RESET -> create wait state in every memory cycle
 	m_cpu->ready_line(ASSERT_LINE);
 	m_cpu->hold_line(CLEAR_LINE);
+	m_cpu->reset_line(ASSERT_LINE);
 
 	m_ready_line = m_ready_line1 = ASSERT_LINE;
 

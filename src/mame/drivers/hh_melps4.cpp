@@ -235,8 +235,8 @@ public:
 
 void cfrogger_state::prepare_display()
 {
-	u16 grid = BITSWAP16(m_grid,15,14,13,12,0,1,2,3,4,5,6,7,8,9,10,11);
-	u16 plate = BITSWAP16(m_plate,12,4,13,5,14,6,15,7,3,11,2,10,1,9,0,8);
+	u16 grid = bitswap<16>(m_grid,15,14,13,12,0,1,2,3,4,5,6,7,8,9,10,11);
+	u16 plate = bitswap<16>(m_plate,12,4,13,5,14,6,15,7,3,11,2,10,1,9,0,8);
 	display_matrix(16, 12, plate, grid);
 }
 
@@ -246,7 +246,7 @@ WRITE8_MEMBER(cfrogger_state::plate_w)
 	if (offset == MELPS4_PORTF)
 		m_inp_mux = data & 3;
 
-	// Sx,Fx,Gx: vfd matrix plate
+	// Sx,Fx,Gx: vfd plate
 	int mask = (offset == MELPS4_PORTS) ? 0xff : 0xf; // port S is 8-bit
 	int shift = (offset == MELPS4_PORTS) ? 0 : (offset + 1) * 4;
 	m_plate = (m_plate & ~(mask << shift)) | (data << shift);
@@ -255,7 +255,7 @@ WRITE8_MEMBER(cfrogger_state::plate_w)
 
 WRITE16_MEMBER(cfrogger_state::grid_w)
 {
-	// D0-D11: vfd matrix grid
+	// D0-D11: vfd grid
 	m_grid = data;
 	prepare_display();
 }
@@ -351,8 +351,8 @@ public:
 
 void gjungler_state::prepare_display()
 {
-	u16 grid = BITSWAP16(m_grid,15,14,13,12,11,10,9,8,7,6,5,4,3,2,0,1);
-	u32 plate = BITSWAP24(m_plate,23,22,21,20,19,18,8,9,10,11,13,16,15,14,13,12,7,0,6,1,5,2,4,3) | 0x2000;
+	u16 grid = bitswap<16>(m_grid,15,14,13,12,11,10,9,8,7,6,5,4,3,2,0,1);
+	u32 plate = bitswap<24>(m_plate,23,22,21,20,19,18,8,9,10,11,13,16,15,14,13,12,7,0,6,1,5,2,4,3) | 0x2000;
 	display_matrix(18, 12, plate, grid);
 }
 
@@ -362,7 +362,7 @@ WRITE8_MEMBER(gjungler_state::plate_w)
 	if (offset == MELPS4_PORTG)
 		m_inp_mux = data & 3;
 
-	// Sx,Fx,Gx,U: vfd matrix plate
+	// Sx,Fx,Gx,U: vfd plate
 	int mask = (offset == MELPS4_PORTS) ? 0xff : 0xf; // port S is 8-bit
 	int shift = (offset == MELPS4_PORTS) ? 0 : (offset + 1) * 4;
 	m_plate = (m_plate & ~(mask << shift)) | (data << shift);
@@ -371,7 +371,7 @@ WRITE8_MEMBER(gjungler_state::plate_w)
 
 WRITE16_MEMBER(gjungler_state::grid_w)
 {
-	// D0-D11: vfd matrix grid
+	// D0-D11: vfd grid
 	m_grid = data;
 	prepare_display();
 }

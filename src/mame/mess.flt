@@ -127,6 +127,7 @@ chaos.cpp
 chessmst.cpp
 chesstrv.cpp
 cit220.cpp
+ckz80.cpp
 clcd.cpp
 cm1800.cpp
 cmi.cpp
@@ -267,9 +268,12 @@ horizon.cpp
 hp_ipc.cpp
 hp16500.cpp
 hp2100.cpp
+hp2620.cpp
+hp2640.cpp
 hp48.cpp
 hp49gp.cpp
 hp64k.cpp
+hp700.cpp
 hp9845.cpp
 hp9k.cpp
 hp9k_3xx.cpp
@@ -447,6 +451,7 @@ nokia_3310.cpp
 notetaker.cpp
 novag6502.cpp
 novag68k.cpp
+novagf8.cpp
 novagmcs48.cpp
 ob68k1a.cpp
 octopus.cpp
@@ -508,6 +513,7 @@ phc25.cpp
 phunsy.cpp
 pimps.cpp
 pipbug.cpp
+picno.cpp
 pitagjr.cpp
 pk8000.cpp
 pk8020.cpp
@@ -769,6 +775,7 @@ z9001.cpp
 zapcomputer.cpp
 zaurus.cpp
 zexall.cpp
+zms8085.cpp
 zorba.cpp
 zrt80.cpp
 zsbc3.cpp

@@ -2,20 +2,23 @@
 // copyright-holders:Robbbert
 /***************************************************************************
 
-        SWTPC 6800
+        SWTPC 6800 Computer System
 
         10/12/2009 Skeleton driver.
 
         http://www.swtpc.com/mholley/swtpc_6800.htm
 
-    bios 0 (SWTBUG) is made for a PIA (parallel) interface.
-    bios 1 (MIKBUG) is made for a ACIA (serial) interface at the same address.
+    MIKBUG is made for a PIA (parallel) interface.
+    SWTBUG is made for a ACIA (serial) interface at the same address.
     MIKBUG will actually read the bits as they arrive and assemble a byte.
+    Its delay loops are based on an underclocked XTAL.
 
     Note: All commands must be in uppercase. See the SWTBUG manual.
 
     ToDo:
-        - Split into 2 systems each with different hardware.
+        - Add more SS-50 interface slot options
+        - Emulate MP-A2 revision of CPU board, with four 2716 ROM sockets
+          and allowance for extra RAM boards at A000-BFFF and C000-DFFF
 
 
 Commands:
@@ -37,9 +40,11 @@ Z Goto Prom (0xC000)
 
 #include "emu.h"
 #include "cpu/m6800/m6800.h"
-#include "machine/6850acia.h"
-#include "machine/clock.h"
-#include "bus/rs232/rs232.h"
+#include "machine/input_merger.h"
+#include "machine/mc14411.h"
+#include "machine/ram.h"
+#include "bus/ss50/interface.h"
+#include "bus/ss50/mps.h"
 
 class swtpc_state : public driver_device
 {
@@ -47,18 +52,30 @@ public:
 	swtpc_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
+		, m_ram(*this, "ram")
+		, m_brg(*this, "brg")
 	{ }
+
+	virtual void machine_start() override;
 
 private:
 	required_device<cpu_device> m_maincpu;
+	required_device<ram_device> m_ram;
+	required_device<mc14411_device> m_brg;
 };
 
 static ADDRESS_MAP_START(mem_map, AS_PROGRAM, 8, swtpc_state)
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x8004, 0x8004) AM_MIRROR(2) AM_DEVREADWRITE("uart", acia6850_device, status_r, control_w)
-	AM_RANGE(0x8005, 0x8005) AM_MIRROR(2) AM_DEVREADWRITE("uart", acia6850_device, data_r, data_w)
-	AM_RANGE(0xa000, 0xa07f) AM_RAM
-	AM_RANGE(0xe000, 0xe3ff) AM_MIRROR(0x1c00) AM_ROM
+	AM_RANGE(0x8000, 0x8003) AM_MIRROR(0x1fc0) AM_DEVREADWRITE("io0", ss50_interface_port_device, read, write)
+	AM_RANGE(0x8004, 0x8007) AM_MIRROR(0x1fc0) AM_DEVREADWRITE("io1", ss50_interface_port_device, read, write)
+	AM_RANGE(0x8008, 0x800b) AM_MIRROR(0x1fc0) AM_DEVREADWRITE("io2", ss50_interface_port_device, read, write)
+	AM_RANGE(0x800c, 0x800f) AM_MIRROR(0x1fc0) AM_DEVREADWRITE("io3", ss50_interface_port_device, read, write)
+	AM_RANGE(0x8010, 0x8013) AM_MIRROR(0x1fc0) AM_DEVREADWRITE("io4", ss50_interface_port_device, read, write)
+	AM_RANGE(0x8014, 0x8017) AM_MIRROR(0x1fc0) AM_DEVREADWRITE("io5", ss50_interface_port_device, read, write)
+	AM_RANGE(0x8018, 0x801b) AM_MIRROR(0x1fc0) AM_DEVREADWRITE("io6", ss50_interface_port_device, read, write)
+	AM_RANGE(0x801c, 0x801f) AM_MIRROR(0x1fc0) AM_DEVREADWRITE("io7", ss50_interface_port_device, read, write)
+	AM_RANGE(0xa000, 0xa07f) AM_RAM // MCM6810
+	AM_RANGE(0xe000, 0xe3ff) AM_MIRROR(0x1c00) AM_ROM AM_REGION("mcm6830", 0)
 ADDRESS_MAP_END
 
 /* Input ports */
@@ -66,35 +83,120 @@ static INPUT_PORTS_START( swtpc )
 INPUT_PORTS_END
 
 
+void swtpc_state::machine_start()
+{
+	m_brg->rsa_w(0);
+	m_brg->rsb_w(1);
+
+	m_maincpu->space(AS_PROGRAM).install_ram(0, m_ram->size() - 1, m_ram->pointer());
+}
+
 static MACHINE_CONFIG_START( swtpc )
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6800, XTAL_1MHz)
+	MCFG_CPU_ADD("maincpu", M6800, XTAL_1_8432MHz / 2)
 	MCFG_CPU_PROGRAM_MAP(mem_map)
 
-	/* video hardware */
-	MCFG_DEVICE_ADD("uart_clock", CLOCK, 153600)
-	MCFG_CLOCK_SIGNAL_HANDLER(DEVWRITELINE("uart", acia6850_device, write_txc))
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("uart", acia6850_device, write_rxc))
+	MCFG_DEVICE_ADD("brg", MC14411, XTAL_1_8432MHz)
+	MCFG_MC14411_F7_CB(DEVWRITELINE("io0", ss50_interface_port_device, f600_1200_w)) // 1200b
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("io1", ss50_interface_port_device, f600_1200_w))
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("io2", ss50_interface_port_device, f600_1200_w))
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("io3", ss50_interface_port_device, f600_1200_w))
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("io4", ss50_interface_port_device, f600_1200_w))
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("io5", ss50_interface_port_device, f600_1200_w))
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("io6", ss50_interface_port_device, f600_1200_w))
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("io7", ss50_interface_port_device, f600_1200_w))
+	MCFG_MC14411_F8_CB(DEVWRITELINE("io0", ss50_interface_port_device, f600_4800_w)) // 600b
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("io1", ss50_interface_port_device, f600_4800_w))
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("io2", ss50_interface_port_device, f600_4800_w))
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("io3", ss50_interface_port_device, f600_4800_w))
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("io4", ss50_interface_port_device, f600_4800_w))
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("io5", ss50_interface_port_device, f600_4800_w))
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("io6", ss50_interface_port_device, f600_4800_w))
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("io7", ss50_interface_port_device, f600_4800_w))
+	MCFG_MC14411_F9_CB(DEVWRITELINE("io0", ss50_interface_port_device, f300_w)) // 300b
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("io1", ss50_interface_port_device, f300_w))
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("io2", ss50_interface_port_device, f300_w))
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("io3", ss50_interface_port_device, f300_w))
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("io4", ss50_interface_port_device, f300_w))
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("io5", ss50_interface_port_device, f300_w))
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("io6", ss50_interface_port_device, f300_w))
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("io7", ss50_interface_port_device, f300_w))
+	MCFG_MC14411_F11_CB(DEVWRITELINE("io0", ss50_interface_port_device, f150_9600_w)) // 150b
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("io1", ss50_interface_port_device, f150_9600_w))
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("io2", ss50_interface_port_device, f150_9600_w))
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("io3", ss50_interface_port_device, f150_9600_w))
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("io4", ss50_interface_port_device, f150_9600_w))
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("io5", ss50_interface_port_device, f150_9600_w))
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("io6", ss50_interface_port_device, f150_9600_w))
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("io7", ss50_interface_port_device, f150_9600_w))
+	MCFG_MC14411_F13_CB(DEVWRITELINE("io0", ss50_interface_port_device, f110_w)) // 110b
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("io1", ss50_interface_port_device, f110_w))
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("io2", ss50_interface_port_device, f110_w))
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("io3", ss50_interface_port_device, f110_w))
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("io4", ss50_interface_port_device, f110_w))
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("io5", ss50_interface_port_device, f110_w))
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("io6", ss50_interface_port_device, f110_w))
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("io7", ss50_interface_port_device, f110_w))
 
-	MCFG_DEVICE_ADD("uart", ACIA6850, XTAL_1MHz)
-	MCFG_ACIA6850_TXD_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_txd))
-	MCFG_ACIA6850_RTS_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_rts))
+	MCFG_SS50_INTERFACE_PORT_ADD("io0", default_2rs_devices, nullptr)
+	MCFG_SS50_INTERFACE_IRQ_CALLBACK(DEVWRITELINE("mainirq", input_merger_device, in_w<0>))
+	MCFG_SS50_INTERFACE_FIRQ_CALLBACK(DEVWRITELINE("mainnmi", input_merger_device, in_w<0>))
+	MCFG_SS50_INTERFACE_PORT_ADD("io1", default_2rs_devices, "mps")
+	MCFG_SS50_INTERFACE_IRQ_CALLBACK(DEVWRITELINE("mainirq", input_merger_device, in_w<1>))
+	MCFG_SS50_INTERFACE_FIRQ_CALLBACK(DEVWRITELINE("mainnmi", input_merger_device, in_w<1>))
+	MCFG_SS50_INTERFACE_PORT_ADD("io2", default_2rs_devices, nullptr)
+	MCFG_SS50_INTERFACE_IRQ_CALLBACK(DEVWRITELINE("mainirq", input_merger_device, in_w<2>))
+	MCFG_SS50_INTERFACE_FIRQ_CALLBACK(DEVWRITELINE("mainnmi", input_merger_device, in_w<2>))
+	MCFG_SS50_INTERFACE_PORT_ADD("io3", default_2rs_devices, nullptr)
+	MCFG_SS50_INTERFACE_IRQ_CALLBACK(DEVWRITELINE("mainirq", input_merger_device, in_w<3>))
+	MCFG_SS50_INTERFACE_FIRQ_CALLBACK(DEVWRITELINE("mainnmi", input_merger_device, in_w<3>))
+	MCFG_SS50_INTERFACE_PORT_ADD("io4", default_2rs_devices, nullptr)
+	MCFG_SS50_INTERFACE_IRQ_CALLBACK(DEVWRITELINE("mainirq", input_merger_device, in_w<4>))
+	MCFG_SS50_INTERFACE_FIRQ_CALLBACK(DEVWRITELINE("mainnmi", input_merger_device, in_w<4>))
+	MCFG_SS50_INTERFACE_PORT_ADD("io5", default_2rs_devices, nullptr)
+	MCFG_SS50_INTERFACE_IRQ_CALLBACK(DEVWRITELINE("mainirq", input_merger_device, in_w<5>))
+	MCFG_SS50_INTERFACE_FIRQ_CALLBACK(DEVWRITELINE("mainnmi", input_merger_device, in_w<5>))
+	MCFG_SS50_INTERFACE_PORT_ADD("io6", default_2rs_devices, nullptr)
+	MCFG_SS50_INTERFACE_IRQ_CALLBACK(DEVWRITELINE("mainirq", input_merger_device, in_w<6>))
+	MCFG_SS50_INTERFACE_FIRQ_CALLBACK(DEVWRITELINE("mainnmi", input_merger_device, in_w<6>))
+	MCFG_SS50_INTERFACE_PORT_ADD("io7", default_2rs_devices, nullptr)
+	MCFG_SS50_INTERFACE_IRQ_CALLBACK(DEVWRITELINE("mainirq", input_merger_device, in_w<7>))
+	MCFG_SS50_INTERFACE_FIRQ_CALLBACK(DEVWRITELINE("mainnmi", input_merger_device, in_w<7>))
 
-	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, "terminal")
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("uart", acia6850_device, write_rxd))
-	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("uart", acia6850_device, write_cts))
+	MCFG_INPUT_MERGER_ANY_HIGH("mainirq")
+	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("maincpu", M6800_IRQ_LINE))
+	MCFG_INPUT_MERGER_ANY_HIGH("mainnmi")
+	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("maincpu", INPUT_LINE_NMI))
+
+	MCFG_RAM_ADD(RAM_TAG)
+	MCFG_RAM_DEFAULT_SIZE("2K")
+	MCFG_RAM_EXTRA_OPTIONS("4K,8K,12K,16K,20K,24K,28K,32K")
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( swtpcm, swtpc )
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_CLOCK(XTAL_1_7971MHz / 2)
+
+	MCFG_DEVICE_MODIFY("brg")
+	MCFG_DEVICE_CLOCK(XTAL_1_7971MHz)
+
+	MCFG_DEVICE_MODIFY("io1")
+	MCFG_SLOT_DEFAULT_OPTION("mpc")
 MACHINE_CONFIG_END
 
 /* ROM definition */
 ROM_START( swtpc )
-	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
-	ROM_SYSTEM_BIOS( 0, "swt", "SWTBUG" )
-	ROMX_LOAD( "swtbug.bin", 0xe000, 0x0400, CRC(f9130ef4) SHA1(089b2d2a56ce9526c3e78ce5d49ce368b9eabc0c), ROM_BIOS(1))
-	ROM_SYSTEM_BIOS( 1, "mik", "MIKBUG" )
-	ROMX_LOAD( "mikbug.bin", 0xe000, 0x0400, CRC(e7f4d9d0) SHA1(5ad585218f9c9c70f38b3c74e3ed5dfe0357621c), ROM_BIOS(2))
+	ROM_REGION( 0x0400, "mcm6830", 0 )
+	ROM_LOAD("swtbug.bin", 0x0000, 0x0400, CRC(f9130ef4) SHA1(089b2d2a56ce9526c3e78ce5d49ce368b9eabc0c))
+ROM_END
+
+ROM_START( swtpcm )
+	ROM_REGION( 0x0400, "mcm6830", 0 )
+	ROM_LOAD("mikbug.bin", 0x0000, 0x0400, CRC(e7f4d9d0) SHA1(5ad585218f9c9c70f38b3c74e3ed5dfe0357621c))
 ROM_END
 
 /* Driver */
 
 //    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT  STATE        INIT  COMPANY                                     FULLNAME      FLAGS
-COMP( 1975, swtpc,  0,      0,      swtpc,   swtpc, swtpc_state, 0,    "Southwest Technical Products Corporation", "SWTPC 6800", MACHINE_NO_SOUND_HW )
+COMP( 1977, swtpc,  0,      0,      swtpc,   swtpc, swtpc_state, 0,    "Southwest Technical Products Corporation", "SWTPC 6800 Computer System (with SWTBUG)", MACHINE_NO_SOUND_HW )
+COMP( 1975, swtpcm, swtpc,  0,      swtpcm,  swtpc, swtpc_state, 0,    "Southwest Technical Products Corporation", "SWTPC 6800 Computer System (with MIKBUG)", MACHINE_NO_SOUND_HW )

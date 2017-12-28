@@ -435,18 +435,18 @@ WRITE8_MEMBER( buggyboy_sound_device::ym2_a_w )
 
 WRITE8_MEMBER( buggyboy_sound_device::ym2_b_w )
 {
-	device_t *ym1 = space.machine().device("ym1");
-	device_t *ym2 = space.machine().device("ym2");
+	device_t *ym1 = machine().device("ym1");
+	device_t *ym2 = machine().device("ym2");
 	double gain;
 
 	m_stream->update();
 
 	m_ym2_outputb = data ^ 0xff;
 
-	if (!strcmp(space.machine().system().name, "buggyboyjr"))
+	if (!strcmp(machine().system().name, "buggyboyjr"))
 	{
-		space.machine().bookkeeping().coin_counter_w(0, data & 0x01);
-		space.machine().bookkeeping().coin_counter_w(1, data & 0x02);
+		machine().bookkeeping().coin_counter_w(0, data & 0x01);
+		machine().bookkeeping().coin_counter_w(1, data & 0x02);
 	}
 
 	/*

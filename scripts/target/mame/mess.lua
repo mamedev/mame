@@ -353,6 +353,7 @@ VIDEOS["GB_LCD"] = true
 VIDEOS["GBA_LCD"] = true
 VIDEOS["MGA2064W"] = true
 VIDEOS["PPU2C0X"] = true
+VIDEOS["DP8510"] = true
 
 --------------------------------------------------
 -- specify available machine cores
@@ -423,7 +424,7 @@ MACHINES["1MB5"] = true
 MACHINES["I2CMEM"] = true
 MACHINES["I7220"] = true
 MACHINES["I80130"] = true
-MACHINES["I8089"] = true
+MACHINES["I8087"] = true
 MACHINES["I8155"] = true
 MACHINES["I8212"] = true
 MACHINES["I8214"] = true
@@ -523,6 +524,7 @@ MACHINES["PROM82S129"] = true
 MACHINES["R64H156"] = true
 MACHINES["RF5C296"] = true
 MACHINES["RIOT6532"] = true
+MACHINES["RIPPLE_COUNTER"] = true
 MACHINES["ROC10937"] = true
 MACHINES["RP5C01"] = true
 MACHINES["RP5C15"] = true
@@ -731,6 +733,7 @@ BUSES["SNES"] = true
 BUSES["SNES_CTRL"] = true
 BUSES["SPC1000"] = true
 BUSES["SPECTRUM"] = true
+BUSES["SS50"] = true
 BUSES["SUNKBD"] = true
 BUSES["SVI_EXPANDER"] = true
 BUSES["SVI_SLOT"] = true
@@ -773,6 +776,7 @@ FORMATS["ACORN_DSK"] = true
 FORMATS["ADAM_CAS"] = true
 FORMATS["ADAM_DSK"] = true
 FORMATS["AFS_DSK"] = true
+FORMATS["AGAT840K_HLE_DSK"] = true
 FORMATS["AMI_DSK"] = true
 FORMATS["AP2_DSK"] = true
 FORMATS["APD_DSK"] = true
@@ -951,6 +955,7 @@ function linkProjects_mame_mess(_target, _subtarget)
 		"cccp",
 		"cce",
 		"ccs",
+		"chessking",
 		"chromatics",
 		"chrysler",
 		"coleco",
@@ -1072,7 +1077,7 @@ function linkProjects_mame_mess(_target, _subtarget)
 		"samsung",
 		"sanyo",
 		"saturn",
-		"sega",
+		"segacons",
 		"sequential",
 		"sgi",
 		"sharp",
@@ -1245,8 +1250,6 @@ files {
 	MAME_DIR .. "src/mame/machine/dc.cpp",
 	MAME_DIR .. "src/mame/machine/dc-ctrl.cpp",
 	MAME_DIR .. "src/mame/machine/dc-ctrl.h",
-	MAME_DIR .. "src/mame/machine/gdrom.cpp",
-	MAME_DIR .. "src/mame/machine/gdrom.h",
 	MAME_DIR .. "src/mame/machine/jvs13551.cpp",
 	MAME_DIR .. "src/mame/machine/jvs13551.h",
 	MAME_DIR .. "src/mame/machine/maple-dc.cpp",
@@ -1367,7 +1370,6 @@ files {
 	MAME_DIR .. "src/mame/machine/apricotkb.cpp",
 	MAME_DIR .. "src/mame/machine/apricotkb.h",
 	MAME_DIR .. "src/mame/drivers/victor9k.cpp",
---  MAME_DIR .. "src/mame/includes/victor9k.h",
 	MAME_DIR .. "src/mame/machine/victor9k_kb.cpp",
 	MAME_DIR .. "src/mame/machine/victor9k_kb.h",
 	MAME_DIR .. "src/mame/machine/victor9k_fdc.cpp",
@@ -1723,6 +1725,11 @@ createMESSProjects(_target, _subtarget, "ccs")
 files {
 	MAME_DIR .. "src/mame/drivers/ccs2810.cpp",
 	MAME_DIR .. "src/mame/drivers/ccs300.cpp",
+}
+
+createMESSProjects(_target, _subtarget, "chessking")
+files {
+	MAME_DIR .. "src/mame/drivers/ckz80.cpp",
 }
 
 createMESSProjects(_target, _subtarget, "chromatics")
@@ -2133,6 +2140,8 @@ files {
 	MAME_DIR .. "src/mame/drivers/hp48.cpp",
 	MAME_DIR .. "src/mame/includes/hp48.h",
 	MAME_DIR .. "src/mame/machine/hp48.cpp",
+	MAME_DIR .. "src/mame/machine/hp9845_printer.cpp",
+	MAME_DIR .. "src/mame/machine/hp9845_printer.h",
 	MAME_DIR .. "src/mame/video/hp48.cpp",
 	MAME_DIR .. "src/mame/drivers/hp49gp.cpp",
 	MAME_DIR .. "src/mame/drivers/hp9845.cpp",
@@ -2142,6 +2151,9 @@ files {
 	MAME_DIR .. "src/mame/drivers/hp_ipc.cpp",
 	MAME_DIR .. "src/mame/drivers/hp80.cpp",
 	MAME_DIR .. "src/mame/drivers/hp2100.cpp",
+	MAME_DIR .. "src/mame/drivers/hp2620.cpp",
+	MAME_DIR .. "src/mame/drivers/hp700.cpp",
+	MAME_DIR .. "src/mame/drivers/hp2640.cpp",
 }
 
 createMESSProjects(_target, _subtarget, "hec2hrp")
@@ -2536,6 +2548,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/novag6502.cpp",
 	MAME_DIR .. "src/mame/includes/novagbase.h",
 	MAME_DIR .. "src/mame/drivers/novag68k.cpp",
+	MAME_DIR .. "src/mame/drivers/novagf8.cpp",
 	MAME_DIR .. "src/mame/drivers/novagmcs48.cpp",
 	MAME_DIR .. "src/mame/drivers/ssystem3.cpp",
 	MAME_DIR .. "src/mame/includes/ssystem3.h",
@@ -2668,6 +2681,9 @@ files {
 	MAME_DIR .. "src/mame/machine/nl_prodigy.cpp",
 	MAME_DIR .. "src/mame/machine/nl_prodigy.h",
 }
+includedirs {
+	MAME_DIR .. "3rdparty/rapidjson/include",
+}
 
 createMESSProjects(_target, _subtarget, "psion")
 files {
@@ -2792,11 +2808,18 @@ files {
 	MAME_DIR .. "src/mame/includes/phc25.h",
 }
 
-createMESSProjects(_target, _subtarget, "sega")
+-- Don't call this project "sega" or it collides with the arcade one
+-- and merges with it, which ends up with libsega.a linked after
+-- libshared.a.  The link then fails on linux because SEGAM1AUDIO and RAX
+-- are in shared while model* and stv are in sega.
+
+createMESSProjects(_target, _subtarget, "segacons")
 files {
 	MAME_DIR .. "src/mame/drivers/dccons.cpp",
 	MAME_DIR .. "src/mame/includes/dccons.h",
 	MAME_DIR .. "src/mame/machine/dccons.cpp",
+	MAME_DIR .. "src/mame/machine/gdrom.cpp",
+	MAME_DIR .. "src/mame/machine/gdrom.h",
 	MAME_DIR .. "src/mame/drivers/megadriv.cpp",
 	MAME_DIR .. "src/mame/includes/megadriv.h",
 	MAME_DIR .. "src/mame/drivers/segapico.cpp",
@@ -3559,6 +3582,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/perq.cpp",
 	MAME_DIR .. "src/mame/drivers/pes.cpp",
 	MAME_DIR .. "src/mame/includes/pes.h",
+	MAME_DIR .. "src/mame/drivers/picno.cpp",
 	MAME_DIR .. "src/mame/drivers/pipbug.cpp",
 	MAME_DIR .. "src/mame/drivers/plan80.cpp",
 	MAME_DIR .. "src/mame/drivers/pm68k.cpp",
@@ -3612,6 +3636,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/xor100.cpp",
 	MAME_DIR .. "src/mame/includes/xor100.h",
 	MAME_DIR .. "src/mame/drivers/xavix.cpp",
+	MAME_DIR .. "src/mame/drivers/zms8085.cpp",
 	MAME_DIR .. "src/mame/drivers/zorba.cpp",
 	MAME_DIR .. "src/mame/includes/zorba.h",
 	MAME_DIR .. "src/mame/machine/zorbakbd.cpp",

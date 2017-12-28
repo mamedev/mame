@@ -153,8 +153,7 @@ static ADDRESS_MAP_START( bbca_mem, AS_PROGRAM, 8, bbc_state )
 																																																							/*    fe00-feff                 SHEILA Address Page             */
 	AM_RANGE(0xfe00, 0xfe00) AM_MIRROR(0x06) AM_DEVREADWRITE("hd6845", hd6845_device, status_r, address_w)      /*    fe00-fe07  6845 CRTC      Video controller                */
 	AM_RANGE(0xfe01, 0xfe01) AM_MIRROR(0x06) AM_DEVREADWRITE("hd6845", hd6845_device, register_r, register_w)
-	AM_RANGE(0xfe08, 0xfe08) AM_MIRROR(0x06) AM_DEVREADWRITE("acia6850", acia6850_device, status_r, control_w)  /*    fe08-fe0F  6850 ACIA      Serial controller               */
-	AM_RANGE(0xfe09, 0xfe09) AM_MIRROR(0x06) AM_DEVREADWRITE("acia6850", acia6850_device, data_r, data_w)
+	AM_RANGE(0xfe08, 0xfe09) AM_MIRROR(0x06) AM_DEVREADWRITE("acia6850", acia6850_device, read, write)          /*    fe08-fe0f  6850 ACIA      Serial controller               */
 	AM_RANGE(0xfe10, 0xfe17) AM_READWRITE(bbc_fe_r, bbc_SerialULA_w)                                            /*    fe10-fe17  Serial ULA     Serial system chip              */
 	AM_RANGE(0xfe18, 0xfe1f) AM_NOP                                                                             /*    fe18-fe1f  INTOFF/STATID  # ECONET Interrupt Off / ID No. */
 	AM_RANGE(0xfe20, 0xfe2f) AM_READWRITE(bbc_fe_r, bbc_videoULA_w)                                             /* R: fe20-fe2f  INTON          # ECONET Interrupt On           */
@@ -179,8 +178,7 @@ static ADDRESS_MAP_START( bbc_base, AS_PROGRAM, 8, bbc_state )
 																																																							/*    fe00-feff                 SHEILA Address Page             */
 	AM_RANGE(0xfe00, 0xfe00) AM_MIRROR(0x06) AM_DEVREADWRITE("hd6845", hd6845_device, status_r, address_w)      /*    fe00-fe07  6845 CRTC      Video controller                */
 	AM_RANGE(0xfe01, 0xfe01) AM_MIRROR(0x06) AM_DEVREADWRITE("hd6845", hd6845_device, register_r, register_w)
-	AM_RANGE(0xfe08, 0xfe08) AM_MIRROR(0x06) AM_DEVREADWRITE("acia6850", acia6850_device, status_r, control_w)  /*    fe08-fe0F  6850 ACIA      Serial controller               */
-	AM_RANGE(0xfe09, 0xfe09) AM_MIRROR(0x06) AM_DEVREADWRITE("acia6850", acia6850_device, data_r, data_w)
+	AM_RANGE(0xfe08, 0xfe09) AM_MIRROR(0x06) AM_DEVREADWRITE("acia6850", acia6850_device, read, write)          /*    fe08-fe0f  6850 ACIA      Serial controller               */
 	AM_RANGE(0xfe10, 0xfe17) AM_READWRITE(bbc_fe_r, bbc_SerialULA_w)                                            /*    fe10-fe17  Serial ULA     Serial system chip              */
 	AM_RANGE(0xfe18, 0xfe1f) AM_READ_PORT("STATID")                                                             /*    fe18-fe1f  INTOFF/STATID  ECONET Interrupt Off / ID No.   */
 	AM_RANGE(0xfe20, 0xfe2f) AM_READWRITE(bbc_fe_r, bbc_videoULA_w)                                             /* R: fe20-fe2f  INTON          ECONET Interrupt On             */

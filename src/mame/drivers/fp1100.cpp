@@ -246,7 +246,7 @@ d7     - 1=display area; 0=cursor
 */
 WRITE8_MEMBER( fp1100_state::colour_control_w )
 {
-	data = BITSWAP8(data, 7, 4, 6, 5, 3, 0, 2, 1);  // change BRG to RGB
+	data = bitswap<8>(data, 7, 4, 6, 5, 3, 0, 2, 1);  // change BRG to RGB
 
 	m_col_border = data & 7;
 

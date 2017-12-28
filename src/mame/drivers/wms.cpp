@@ -263,7 +263,21 @@ ROM_START( cashcrop )    // Cash Crop (Russian)
 ROM_END
 
 
-ROM_START( filthyr )    // Filthy Rich (Russian)
+ROM_START( filthyr )    // Filthy Rich (English) / U4 09/03/97
+	ROM_REGION(0x100000, "maincpu", 0)
+	ROM_LOAD( "filthy_rich.xu3", 0x0000, 0x100000, CRC(0673102d) SHA1(1d69e0f7b4d5faa37ecb8edba5a1eb63210d7032) )
+
+	ROM_REGION(0x100000, "rom", 0)
+	ROM_LOAD( "filthy_rich.xu2", 0x0000, 0x100000, CRC(095c5a44) SHA1(37bf83160bac1c4ab3b64abd207fe111da6b7a1b) )
+	// sound
+	ROM_LOAD( "filthy_rich.xu30", 0x0000, 0x100000, CRC(28d97696) SHA1(1bee36610ed5123ac3cb63fef7069e7975fffe6f) )
+	ROM_LOAD( "filthy_rich.xu31", 0x0000, 0x100000, CRC(29ec4d17) SHA1(fbdb7775d4e1abf2241eb29ee042aeb9deb5bbeb) )
+	ROM_LOAD( "filthy_rich.xu17", 0x0000, 0x100000, CRC(6ef1ca21) SHA1(c0e98c2430b85623a9481262c9d06103e22c4fdd) )
+	ROM_LOAD( "filthy_rich.xu18", 0x0000, 0x100000, CRC(f74c48c7) SHA1(e62d2691ad579291c8cbb6f2c61399dbe52515c3) )
+ROM_END
+
+
+ROM_START( filthyrr )    // Filthy Rich (Russian) / U4 09/03/97
 	ROM_REGION(0x100000, "maincpu", 0)
 	ROM_LOAD( "xu-3.bin", 0x0000, 0x100000, CRC(4b57aa15) SHA1(076ef6c1782a0ec34c15bffd5e93644ba179c1f7) )
 
@@ -393,7 +407,21 @@ ROM_START( lovewin )    // Love To Win (Russian)
 ROM_END
 
 
-ROM_START( mtburn )    // Money To Burn (Russian)
+ROM_START( mtburn )    // Money To Burn (English)
+	ROM_REGION(0x100000, "maincpu", 0)
+	ROM_LOAD( "money_to_burn.xu3", 0x0000, 0x100000, CRC(92d94269) SHA1(8f7e342837067b6c2180c3a161bc34671c0fab72) )
+
+	ROM_REGION(0x100000, "rom", 0)
+	ROM_LOAD( "money_to_burn.xu2", 0x0000, 0x100000, CRC(cf496bf5) SHA1(8cc8b9106316fef3bd1436b08488ae8552411f9d) )
+	// sound
+	ROM_LOAD( "money_to_burn.xu30", 0x0000, 0x100000, CRC(86255bc7) SHA1(75b6876d72c9f4c576f807fe970d49e8c208b477) )
+	ROM_LOAD( "money_to_burn.xu31", 0x0000, 0x100000, CRC(f5c80417) SHA1(097d9fc73f44674cff3b24be917a0db7e4117553) )
+	ROM_LOAD( "money_to_burn.xu17", 0x0000, 0x100000, CRC(0ec9579a) SHA1(8f78282f4691426a0ca49387ab58f63a578b96a2) )
+	ROM_LOAD( "money_to_burn.xu18", 0x0000, 0x100000, CRC(69fe5e04) SHA1(532d9a6b1326543227a8f64c595b1f8bfc0dbf4a) )
+ROM_END
+
+
+ROM_START( mtburnr )    // Money To Burn (Russian)
 	ROM_REGION(0x100000, "maincpu", 0)
 	ROM_LOAD( "xu-3.bin", 0x0000, 0x100000, CRC(a329aff0) SHA1(2f631783bd15b8a695d92d0861e167130f914046) )
 
@@ -437,7 +465,21 @@ ROM_START( perfect )    // Perfect Game (Russian)
 ROM_END
 
 
-ROM_START( reelemin )    // Reel 'Em In (Russian)
+ROM_START( reelemin )    // Reel 'Em In (English) / U4 01/22/97
+	ROM_REGION(0x100000, "maincpu", 0)
+	ROM_LOAD( "reel_'em_in.xu3", 0x0000, 0x100000, CRC(a3840965) SHA1(1e782bb5eaeabce0d1a07eb895d344028364cd4f) )
+
+	ROM_REGION(0x100000, "rom", 0)
+	ROM_LOAD( "reel_'em_in.xu2", 0x0000, 0x100000, CRC(04658d90) SHA1(1180b2596175394e079c8498bfc5e956426d0e1c) )
+	// sound
+	ROM_LOAD( "reel_'em_in.xu30", 0x0000, 0x100000, CRC(742590b2) SHA1(65df9d346b1f69f79e6e79c91724813f052c64ee) )
+	ROM_LOAD( "reel_'em_in.xu31", 0x0000, 0x100000, CRC(bf3aabb8) SHA1(251c1bcf28f117152902b37915c41be1e912dda0) )
+	ROM_LOAD( "reel_'em_in.xu17", 0x0000, 0x100000, CRC(f99bf909) SHA1(4dac7aac0cf815d0b67f4c8d55d84f529e45f27d) )
+	ROM_LOAD( "reel_'em_in.xu18", 0x0000, 0x100000, CRC(1e4b64f1) SHA1(f082b2a7b6e029ffded1eec6fbc5f755bdd8d9eb) )
+ROM_END
+
+
+ROM_START( reeleminr )    // Reel 'Em In (Russian) / U4 01/22/97
 	ROM_REGION(0x100000, "maincpu", 0)
 	ROM_LOAD( "xu-3.bin", 0x0000, 0x100000, CRC(a3840965) SHA1(1e782bb5eaeabce0d1a07eb895d344028364cd4f) )
 
@@ -503,7 +545,22 @@ ROM_START( wdun )    // Who Dunnit (Russian)
 ROM_END
 
 
-ROM_START( winbid )    // Winning Bid (Russian)
+ROM_START( winbid )    // Winning Bid (English)
+	ROM_REGION(0x100000, "maincpu", 0)
+	ROM_LOAD( "winning_bid.xu3", 0x0000, 0x100000, CRC(a60afb19) SHA1(461e6b8ac1a8874ecd4ecd709ed0f0e6d9aab989) )
+
+	ROM_REGION(0x100000, "rom", 0)
+	ROM_LOAD( "winning_bid.xu2", 0x0000, 0x100000, CRC(9b8d153e) SHA1(24e5500f90eb0c903f09ac62b3496bea9a6cd640) )
+	ROM_LOAD( "winning_bid.xu4", 0x0000, 0x100000, CRC(80079c9a) SHA1(296cea5e7aa2f0f0bfb03af335cc4c65a9cb68c3) )
+	// sound
+	ROM_LOAD( "winning_bid.xu30", 0x0000, 0x100000, CRC(2ef7bc4d) SHA1(f287098341de34d79f18fcd38f9e5cdd13bdaaeb) )
+	ROM_LOAD( "winning_bid.xu31", 0x0000, 0x100000, CRC(068e4cab) SHA1(7ea3804353601c82ebc2d4cb4dd8bf1f8a48132e) )
+	ROM_LOAD( "winning_bid.xu17", 0x0000, 0x100000, CRC(6f7bcadf) SHA1(9ddd0a0259dc2d7e69fcb58a16fac4ddc344e41e) )
+	ROM_LOAD( "winning_bid.xu18", 0x0000, 0x100000, CRC(f7f8814e) SHA1(274e669df9e6e33eb5867906069f43a9c8898d45) )
+ROM_END
+
+
+ROM_START( winbidr )    // Winning Bid (Russian)
 	ROM_REGION(0x100000, "maincpu", 0)
 	ROM_LOAD( "xu-3.bin", 0x0000, 0x100000, CRC(873eecfb) SHA1(35960c9a2a4efeac8b8cea94f1eac6ffb175b9a9) )
 
@@ -570,7 +627,8 @@ GAME( 200?, wmsb,       wms,      wms,     wms,      wms_state, wms,  ROT0, "WMS
 GAME( 200?, btippers,   0,        wms,     wms,      wms_state, wms,  ROT0, "WMS",   "Big Tippers (Russian)",           MACHINE_IS_SKELETON )
 GAME( 200?, wmsboom,    0,        wms,     wms,      wms_state, wms,  ROT0, "WMS",   "Boom (Russian)",                  MACHINE_IS_SKELETON )
 GAME( 200?, cashcrop,   0,        wms,     wms,      wms_state, wms,  ROT0, "WMS",   "Cash Crop (Russian)",             MACHINE_IS_SKELETON )
-GAME( 200?, filthyr,    0,        wms,     wms,      wms_state, wms,  ROT0, "WMS",   "Filthy Rich (Russian)",           MACHINE_IS_SKELETON )
+GAME( 1997, filthyr,    0,        wms,     wms,      wms_state, wms,  ROT0, "WMS",   "Filthy Rich (English)",           MACHINE_IS_SKELETON )  // U4 09/03/97
+GAME( 1997, filthyrr,   filthyr,  wms,     wms,      wms_state, wms,  ROT0, "WMS",   "Filthy Rich (Russian)",           MACHINE_IS_SKELETON )  // U4 09/03/97
 GAME( 200?, hottop,     0,        wms,     wms,      wms_state, wms,  ROT0, "WMS",   "Hot Toppings (English)",          MACHINE_IS_SKELETON )
 GAME( 200?, hottopa,    hottop,   wms,     wms,      wms_state, wms,  ROT0, "WMS",   "Hot Toppings (Russian?)",         MACHINE_IS_SKELETON )
 GAME( 200?, inwinner,   0,        wms,     wms,      wms_state, wms,  ROT0, "WMS",   "Instant Winner (Russian)",        MACHINE_IS_SKELETON )
@@ -579,14 +637,17 @@ GAME( 200?, leprgld,    0,        wms,     wms,      wms_state, wms,  ROT0, "WMS
 GAME( 200?, leprglds,   leprgld,  wms,     wms,      wms_state, wms,  ROT0, "WMS",   "Leprechaun's Gold (Spanish)",     MACHINE_IS_SKELETON )
 GAME( 200?, lol,        0,        wms,     wms,      wms_state, wms,  ROT0, "WMS",   "Life of Luxury (Russian)",        MACHINE_IS_SKELETON )
 GAME( 200?, lovewin,    0,        wms,     wms,      wms_state, wms,  ROT0, "WMS",   "Love To Win (Russian)",           MACHINE_IS_SKELETON )
-GAME( 200?, mtburn,     0,        wms,     wms,      wms_state, wms,  ROT0, "WMS",   "Money To Burn (Russian)",         MACHINE_IS_SKELETON )
+GAME( 200?, mtburn,     0,        wms,     wms,      wms_state, wms,  ROT0, "WMS",   "Money To Burn (English)",         MACHINE_IS_SKELETON )
+GAME( 200?, mtburnr,    mtburn,   wms,     wms,      wms_state, wms,  ROT0, "WMS",   "Money To Burn (Russian)",         MACHINE_IS_SKELETON )
 GAME( 200?, otchart,    0,        wms,     wms,      wms_state, wms,  ROT0, "WMS",   "Off The Charts (Russian)",        MACHINE_IS_SKELETON )
 GAME( 200?, perfect,    0,        wms,     wms,      wms_state, wms,  ROT0, "WMS",   "Perfect Game (Russian)",          MACHINE_IS_SKELETON )
-GAME( 200?, reelemin,   0,        wms,     wms,      wms_state, wms,  ROT0, "WMS",   "Reel 'Em In (Russian)",           MACHINE_IS_SKELETON )
+GAME( 1997, reelemin,   0,        wms,     wms,      wms_state, wms,  ROT0, "WMS",   "Reel 'Em In (English)",           MACHINE_IS_SKELETON )  // U4 01/22/97
+GAME( 1997, reeleminr,  reelemin, wms,     wms,      wms_state, wms,  ROT0, "WMS",   "Reel 'Em In (Russian)",           MACHINE_IS_SKELETON )  // U4 01/22/97
 GAME( 200?, sonoth,     0,        wms,     wms,      wms_state, wms,  ROT0, "WMS",   "Something For Nothing (Russian)", MACHINE_IS_SKELETON )
 GAME( 200?, swingin,    0,        wms,     wms,      wms_state, wms,  ROT0, "WMS",   "Swingin In The Green (Russian)",  MACHINE_IS_SKELETON )
 GAME( 200?, wmstopb,    0,        wms,     wms,      wms_state, wms,  ROT0, "WMS",   "Top Banana (Russian)",            MACHINE_IS_SKELETON )
 GAME( 200?, wdun,       0,        wms,     wms,      wms_state, wms,  ROT0, "WMS",   "Who Dunnit (Russian)",            MACHINE_IS_SKELETON )
-GAME( 200?, winbid,     0,        wms,     wms,      wms_state, wms,  ROT0, "WMS",   "Winning Bid (Russian)",           MACHINE_IS_SKELETON )
+GAME( 200?, winbid,     0,        wms,     wms,      wms_state, wms,  ROT0, "WMS",   "Winning Bid (English)",           MACHINE_IS_SKELETON )
+GAME( 200?, winbidr,    winbid,   wms,     wms,      wms_state, wms,  ROT0, "WMS",   "Winning Bid (Russian)",           MACHINE_IS_SKELETON )
 GAME( 200?, wldstrek,   0,        wms,     wms,      wms_state, wms,  ROT0, "WMS",   "Wild Streak (Russian)",           MACHINE_IS_SKELETON )
 GAME( 200?, yukongld,   0,        wms,     wms,      wms_state, wms,  ROT0, "WMS",   "Yukon Gold (Russian)",            MACHINE_IS_SKELETON )

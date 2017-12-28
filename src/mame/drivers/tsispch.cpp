@@ -270,19 +270,19 @@ DRIVER_INIT_MEMBER(tsispch_state,prose2k)
 	uint16_t byte23t;
 		for (int i = 0; i < 0x600; i+= 3)
 		{
-			byte1t = BITSWAP8(dspsrc[0+i], 0, 1, 2, 3, 4, 5, 6, 7);
+			byte1t = bitswap<8>(dspsrc[0+i], 0, 1, 2, 3, 4, 5, 6, 7);
 			// here's where things get disgusting: if the first byte was an OP or RT, do the following:
 			if ((byte1t&0x80) == 0x00) // op or rt instruction
 			{
-				byte23t = BITSWAP16( (((uint16_t)dspsrc[1+i]<<8)|dspsrc[2+i]), 8, 9, 10, 15, 11, 12, 13, 14, 0, 1, 2, 3, 4, 5, 6, 7);
+				byte23t = bitswap<16>( (((uint16_t)dspsrc[1+i]<<8)|dspsrc[2+i]), 8, 9, 10, 15, 11, 12, 13, 14, 0, 1, 2, 3, 4, 5, 6, 7);
 			}
 			else if ((byte1t&0xC0) == 0x80) // jp instruction
 			{
-				byte23t = BITSWAP16( (((uint16_t)dspsrc[1+i]<<8)|dspsrc[2+i]), 8, 9, 15, 15, 15, 10, 11, 12, 13, 14, 0, 1, 2, 3, 6, 7);
+				byte23t = bitswap<16>( (((uint16_t)dspsrc[1+i]<<8)|dspsrc[2+i]), 8, 9, 15, 15, 15, 10, 11, 12, 13, 14, 0, 1, 2, 3, 6, 7);
 			}
 			else // ld instruction
 			{
-				byte23t = BITSWAP16( (((uint16_t)dspsrc[1+i]<<8)|dspsrc[2+i]), 8, 9, 10, 11, 12, 13, 14, 0, 1, 2, 3, 3, 4, 5, 6, 7);
+				byte23t = bitswap<16>( (((uint16_t)dspsrc[1+i]<<8)|dspsrc[2+i]), 8, 9, 10, 11, 12, 13, 14, 0, 1, 2, 3, 3, 4, 5, 6, 7);
 			}
 
 			*dspprg = byte1t<<24 | byte23t<<8;

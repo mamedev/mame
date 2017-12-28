@@ -1550,7 +1550,7 @@ void _39in1_state::machine_start()
 
 	for (i = 0; i < 0x80000; i += 2)
 	{
-		ROM[i] = BITSWAP8(ROM[i],7,2,5,6,0,3,1,4) ^ BITSWAP8((i>>3)&0xf, 3,2,4,1,4,4,0,4) ^ 0x90;
+		ROM[i] = bitswap<8>(ROM[i],7,2,5,6,0,3,1,4) ^ bitswap<8>((i>>3)&0xf, 3,2,4,1,4,4,0,4) ^ 0x90;
 	}
 
 	pxa255_start();
@@ -1565,7 +1565,7 @@ MACHINE_START_MEMBER(_39in1_state,60in1)
 	{
 		if ((i%2)==0)
 		{
-			ROM[i] = BITSWAP8(ROM[i],5,1,4,2,0,7,6,3)^BITSWAP8(i, 6,0,4,13,0,5,3,11);
+			ROM[i] = bitswap<8>(ROM[i],5,1,4,2,0,7,6,3)^bitswap<8>(i, 6,0,4,13,0,5,3,11);
 		}
 	}
 

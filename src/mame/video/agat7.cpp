@@ -172,11 +172,11 @@ void agat7video_device::text_update_lores(screen_device &screen, bitmap_ind16 &b
 			ch = m_ram_dev->read(address);
 			attr = m_ram_dev->read(address + 1);
 			if (BIT(attr, 5)) {
-				fg = BITSWAP8(attr,7,6,5,3,4,2,1,0) & 15;
+				fg = bitswap<8>(attr,7,6,5,3,4,2,1,0) & 15;
 				bg = 0;
 			} else {
 				fg = 0;
-				bg = BITSWAP8(attr,7,6,5,3,4,2,1,0) & 15;
+				bg = bitswap<8>(attr,7,6,5,3,4,2,1,0) & 15;
 			}
 			plot_text_character(bitmap, col * 16, row, 2, ch, m_char_ptr, m_char_size, fg, bg);
 		}

@@ -60,45 +60,6 @@ COMP( 1981, aaa, 0, 0, terminals, terminals, terminals_state, 0, "Ann Arbor", "A
 
 /**************************************************************************************************************
 
-Hewlett-Packard HP-700/92.
-Chips: TC5564APL-15, proprietory square chip, D70108C (V20), SCN2681, Beeper
-Crystals: 29.4912
-
-***************************************************************************************************************/
-
-ROM_START( hp700_92 )
-	ROM_REGION(0x20000, "maincpu", 0)
-	ROM_LOAD( "5181-8672.u803", 0x00000, 0x20000, CRC(21440d2f) SHA1(69a3de064ae2b18adc46c2fdd0bf69620375efe7) )
-ROM_END
-
-COMP( 1987, hp700_92, 0, 0, terminals, terminals, terminals_state, 0, "HP", "HP-700/92", MACHINE_IS_SKELETON )
-
-
-
-/**************************************************************************************************************
-
-Hewlett-Packard HP-2622A.
-Chips: National 8367 CRTC (labeled B8250), SY6551 (labeled 8251), Z8400A (Z80)
-Crystal: 25.7715
-
-***************************************************************************************************************/
-
-ROM_START( hp2622a )
-	ROM_REGION(0x10000, "maincpu", 0)
-	ROM_LOAD( "1818-1685.xu63", 0x0000, 0x2000, CRC(a57ffe5e) SHA1(4d7844320deba916d9ec289927af987fea025b02) )
-	ROM_LOAD( "1818-1686.xu64", 0x2000, 0x2000, CRC(bee9274c) SHA1(20796c559031a91cb2666776fcf7ffdb52a0a318) )
-	ROM_LOAD( "1818-1687.xu65", 0x4000, 0x2000, CRC(e9ecd489) SHA1(9b249b8d066d256069ccdb8809bb808c414f106a) )
-
-	ROM_REGION(0x2000, "chargen", 0)
-	ROM_LOAD( "1818-1489.xu311", 0x0000, 0x2000, CRC(9879b153) SHA1(fc1705d6de38eb6d3a67f1ae439e359e5124d028) )
-ROM_END
-
-COMP( 1982, hp2622a, 0, 0, terminals, terminals, terminals_state, 0, "HP", "HP-2622A", MACHINE_IS_SKELETON )
-
-
-
-/**************************************************************************************************************
-
 Qume QVT-70.
 Chips: Z80, Z80 DART, 5x CXK5864CM-70LL/W242575-70LL, 801000-02, 303489-01, DS1231, Button battery, Beeper
 Crystals: unreadable
@@ -347,26 +308,4 @@ ROM_START( vt420 )
 	ROM_LOAD( "23-068e9-00.e2", 0x00000, 0x20000, CRC(22c3f93b) SHA1(b212911c41e4dba2e09d91fdd1f72d6c7536b0af) )
 ROM_END
 
-COMP( 1990, vt420, 0, 0, terminals, terminals, terminals_state, 0, "DEC", "VT-240", MACHINE_IS_SKELETON )
-
-
-
-/**************************************************************************************************************
-
-Zentec Zephyr (Model 00-441-01).
-Chips: COM2017, i8085A, 2x unreadable (40-pin AMI DIP), Beeper
-Crystal: 45.582000
-
-***************************************************************************************************************/
-
-ROM_START( zephyr )
-	ROM_REGION(0x10000, "maincpu", 0)
-	ROM_LOAD( "23-006-32c.bin",  0x0000, 0x0800, CRC(0a3a5447) SHA1(a8c25730a1d7e5b9c86e0d504afc923e931f9025) )
-	ROM_LOAD( "23-067-004b.bin", 0x0800, 0x0800, CRC(37741104) SHA1(52b9998e0a8d4949e0dc7c3349b3681e13345061) )
-	ROM_LOAD( "23-067-03b.bin",  0x1000, 0x0800, CRC(29cfa003) SHA1(9de7a8402173a2c448e54ee433ba3050db7b70bb) ) // this doesn't seem to fit
-
-	ROM_REGION(0x0800, "chargen", 0)
-	ROM_LOAD( "23-066-02a.bin",  0x0000, 0x0800, CRC(d5650b6c) SHA1(e6333e59018d9904f12abb270db4ba28aeff1995) )
-ROM_END
-
-COMP( 1979, zephyr, 0, 0, terminals, terminals, terminals_state, 0, "Zentec", "Zephyr", MACHINE_IS_SKELETON )
+COMP( 1990, vt420, 0, 0, terminals, terminals, terminals_state, 0, "DEC", "VT-420", MACHINE_IS_SKELETON )

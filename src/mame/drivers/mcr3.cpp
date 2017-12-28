@@ -106,12 +106,8 @@
 #include "emu.h"
 #include "includes/mcr.h"
 #include "includes/mcr3.h"
-#include "audio/midway.h"
-#include "audio/csd.h"
 
-#include "cpu/z80/z80.h"
 #include "machine/nvram.h"
-#include "machine/z80ctc.h"
 
 #include "speaker.h"
 
@@ -138,7 +134,7 @@ WRITE8_MEMBER(mcr3_state::mcrmono_control_port_w)
 	*/
 
 	machine().bookkeeping().coin_counter_w(0, (data >> 0) & 1);
-	mcr_cocktail_flip = (data >> 6) & 1;
+	m_mcr_cocktail_flip = (data >> 6) & 1;
 }
 
 
@@ -268,7 +264,7 @@ WRITE8_MEMBER(mcr3_state::maxrpm_op6_w)
 
 	/* when both the write and the enable are low, it's a write to the ADC0844 */
 	if (!(data & 0x40) && !(data & 0x20))
-		m_maxrpm_adc->write(space, 0, BITSWAP8(m_maxrpm_adc_control, 7, 6, 5, 4, 2, 3, 1, 0));
+		m_maxrpm_adc->write(space, 0, bitswap<8>(m_maxrpm_adc_control, 7, 6, 5, 4, 2, 3, 1, 0));
 
 	/* low 5 bits control the turbo CS */
 	m_turbo_cheap_squeak->write(space, offset, data);
@@ -415,31 +411,34 @@ WRITE8_MEMBER(mcr3_state::spyhunt_op4_w)
 
 	/*
 	    Lamp Driver:
-	        A 3-to-8 latching demuxer is connected to the input bits.
+	        A 3-to-8 latching demuxer (MC14099) is connected to the input bits.
 	        Three of the inputs (J1-11,10,12) specify which output to write
 	        to, and the fourth input (J1-14) is the data value. A fifth input
 	        (J1-13) controls the strobe to latch the data value for the
-	        demuxer. The eight outputs directly control 8 lamps.
+	        demuxer. The eight outputs control 8 lamps through a pair of
+	        Darlington drivers (ULN2068B).
 	*/
 	/* bit 5 = STR1 (J1-13) */
 	if (((m_last_op4 ^ data) & 0x20) && !(data & 0x20))
 	{
-		static const char *const lampname[8] =
-		{
-			"lamp0", "lamp1", "lamp2", "lamp3",
-			"lamp4", "lamp5", "lamp6", "lamp7"
-		};
 		/* bit 3 -> J1-14 (DATA) */
 		/* bit 2 -> J1-11 (A2) */
 		/* bit 1 -> J1-10 (A1) */
 		/* bit 0 -> J1-12 (A0) */
-		output().set_value(lampname[data & 7], (data >> 3) & 1);
+		m_lamplatch->write_bit(data & 7, BIT(data, 3));
 	}
 	m_last_op4 = data;
 
 	/* low 5 bits go to control the Cheap Squeak Deluxe */
 	m_cheap_squeak_deluxe->sr_w(space, offset, data & 0x0f);
 	m_cheap_squeak_deluxe->sirq_w(BIT(data, 4));
+}
+
+
+template<int n>
+WRITE_LINE_MEMBER(mcr3_state::spyhunt_lamp_w)
+{
+	m_spyhunt_lamp[n] = state;
 }
 
 
@@ -608,7 +607,7 @@ static INPUT_PORTS_START( demoderm )
 INPUT_PORTS_END
 
 
-/* inputs not verfied yet, DIP switches from manual */
+/* inputs not verified yet, DIP switches from manual */
 static INPUT_PORTS_START( sarge )
 	PORT_START("MONO.IP0")  /* J2 1-8 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
@@ -1098,8 +1097,6 @@ static MACHINE_CONFIG_START( mcrmono )
 	MCFG_WATCHDOG_ADD("watchdog")
 	MCFG_WATCHDOG_VBLANK_INIT("screen", 16)
 
-	MCFG_MACHINE_START_OVERRIDE(mcr3_state,mcr)
-	MCFG_MACHINE_RESET_OVERRIDE(mcr3_state,mcr)
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	// sound hardware
@@ -1117,8 +1114,6 @@ static MACHINE_CONFIG_START( mcrmono )
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", mcr3)
 	MCFG_PALETTE_ADD("palette", 64)
-
-	MCFG_VIDEO_START_OVERRIDE(mcr3_state,mcrmono)
 MACHINE_CONFIG_END
 
 
@@ -1189,6 +1184,16 @@ static MACHINE_CONFIG_DERIVED( mcrsc_csd, mcrscroll )
 	MCFG_SOUND_ADD("csd", MIDWAY_CHEAP_SQUEAK_DELUXE, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
+
+	MCFG_DEVICE_ADD("lamplatch", CD4099, 0) // U1 on Lamp Driver Board
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(mcr3_state, spyhunt_lamp_w<0>))
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(mcr3_state, spyhunt_lamp_w<1>))
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(mcr3_state, spyhunt_lamp_w<2>))
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(mcr3_state, spyhunt_lamp_w<3>))
+	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(mcr3_state, spyhunt_lamp_w<4>))
+	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(mcr3_state, spyhunt_lamp_w<5>))
+	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(mcr3_state, spyhunt_lamp_w<6>))
+	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(mcr3_state, spyhunt_lamp_w<7>))
 MACHINE_CONFIG_END
 
 
@@ -1622,9 +1627,11 @@ DRIVER_INIT_MEMBER(mcr3_state,stargrds)
 DRIVER_INIT_MEMBER(mcr3_state,spyhunt)
 {
 	mcr_common_init();
-	machine().device<midway_ssio_device>("ssio")->set_custom_input(1, 0x60, read8_delegate(FUNC(mcr3_state::spyhunt_ip1_r),this));
-	machine().device<midway_ssio_device>("ssio")->set_custom_input(2, 0xff, read8_delegate(FUNC(mcr3_state::spyhunt_ip2_r),this));
-	machine().device<midway_ssio_device>("ssio")->set_custom_output(4, 0xff, write8_delegate(FUNC(mcr3_state::spyhunt_op4_w),this));
+	m_ssio->set_custom_input(1, 0x60, read8_delegate(FUNC(mcr3_state::spyhunt_ip1_r),this));
+	m_ssio->set_custom_input(2, 0xff, read8_delegate(FUNC(mcr3_state::spyhunt_ip2_r),this));
+	m_ssio->set_custom_output(4, 0xff, write8_delegate(FUNC(mcr3_state::spyhunt_op4_w),this));
+
+	m_spyhunt_lamp.resolve();
 
 	m_spyhunt_sprite_color_mask = 0x00;
 	m_spyhunt_scroll_offset = 16;
@@ -1644,9 +1651,11 @@ DRIVER_INIT_MEMBER(mcr3_state,crater)
 DRIVER_INIT_MEMBER(mcr3_state,turbotag)
 {
 	mcr_common_init();
-	machine().device<midway_ssio_device>("ssio")->set_custom_input(1, 0x60, read8_delegate(FUNC(mcr3_state::spyhunt_ip1_r),this));
-	machine().device<midway_ssio_device>("ssio")->set_custom_input(2, 0xff, read8_delegate(FUNC(mcr3_state::turbotag_ip2_r),this));
-	machine().device<midway_ssio_device>("ssio")->set_custom_output(4, 0xff, write8_delegate(FUNC(mcr3_state::spyhunt_op4_w),this));
+	m_ssio->set_custom_input(1, 0x60, read8_delegate(FUNC(mcr3_state::spyhunt_ip1_r),this));
+	m_ssio->set_custom_input(2, 0xff, read8_delegate(FUNC(mcr3_state::turbotag_ip2_r),this));
+	m_ssio->set_custom_output(4, 0xff, write8_delegate(FUNC(mcr3_state::spyhunt_op4_w),this));
+
+	m_spyhunt_lamp.resolve();
 
 	m_spyhunt_sprite_color_mask = 0x00;
 	m_spyhunt_scroll_offset = 88;

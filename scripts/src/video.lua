@@ -1033,3 +1033,15 @@ if (VIDEOS["I4100"]~=null) then
 		MAME_DIR .. "src/devices/video/imagetek_i4100.h",
 	}
 end
+
+--------------------------------------------------
+--
+--@src/devices/video/dp8510.h,VIDEOS["DP8510"] = true
+--------------------------------------------------
+
+if (VIDEOS["DP8510"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/video/dp8510.cpp",
+		MAME_DIR .. "src/devices/video/dp8510.h",
+	}
+end

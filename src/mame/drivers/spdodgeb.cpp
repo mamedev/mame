@@ -410,7 +410,7 @@ static MACHINE_CONFIG_START( spdodgeb )
 	MCFG_CPU_PROGRAM_MAP(spdodgeb_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", spdodgeb_state, interrupt, "screen", 0, 1) /* 1 IRQ every 8 visible scanlines, plus NMI for vblank */
 
-	MCFG_CPU_ADD("audiocpu", M6809, XTAL_12MHz/6)  /* 2MHz ? */
+	MCFG_CPU_ADD("audiocpu", MC6809, XTAL_12MHz/2) // HD68A09P (1.5MHz internally)
 	MCFG_CPU_PROGRAM_MAP(spdodgeb_sound_map)
 
 	/* video hardware */

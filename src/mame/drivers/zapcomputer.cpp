@@ -63,7 +63,7 @@ uint8_t zapcomp_state::decode7seg(uint8_t data)
 
 	// Bit order for the FAIRCHILD FND-70
 	//                     7-SEGMENT LCD:  .  g  f  e  d  c  b  a
-	return BITSWAP8(patterns[data & 0x0F], 7, 3, 4, 2, 1, 0, 6, 5);
+	return bitswap<8>(patterns[data & 0x0F], 7, 3, 4, 2, 1, 0, 6, 5);
 }
 
 WRITE8_MEMBER( zapcomp_state::display_7seg_w )

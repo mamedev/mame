@@ -232,6 +232,11 @@ void retro_loop();
 	void immediate_save(const char *filename);
 	void immediate_load(const char *filename);
 
+	// rewind operations
+	bool rewind_capture();
+	bool rewind_step();
+	void rewind_invalidate();
+
 	// scheduled operations
 	void schedule_exit();
 	void schedule_hard_reset();

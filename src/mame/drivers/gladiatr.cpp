@@ -141,7 +141,7 @@ Address          Dir Data     Name      Description
 --------111-----   W xxxxxxxx ADCS      command to 6809
 
 
-Third CPU (6809)
+Third CPU (HD6809)
 ----------------
 
 Address          Dir Data     Name      Description
@@ -299,7 +299,7 @@ READ8_MEMBER(gladiatr_state::cctl_p2_r)
 
 READ8_MEMBER(gladiatr_state::ucpu_p2_r)
 {
-	return BITSWAP8(m_dsw1->read(), 0,1,2,3,4,5,6,7);
+	return bitswap<8>(m_dsw1->read(), 0,1,2,3,4,5,6,7);
 }
 
 WRITE8_MEMBER(gladiatr_state::ccpu_p2_w)
@@ -356,7 +356,7 @@ WRITE8_MEMBER(gladiatr_state::csnd_p1_w)
 
 READ8_MEMBER(gladiatr_state::csnd_p2_r)
 {
-	return BITSWAP8(m_dsw2->read(), 2,3,4,5,6,7,1,0);
+	return bitswap<8>(m_dsw2->read(), 2,3,4,5,6,7,1,0);
 }
 
 
@@ -946,7 +946,7 @@ static MACHINE_CONFIG_START( ppking )
 	MCFG_CPU_IO_MAP(ppking_cpu2_io)
 	MCFG_CPU_PERIODIC_INT_DRIVER(ppking_state,  irq0_line_assert, 60)
 
-	MCFG_CPU_ADD("audiocpu", M6809, XTAL_12MHz/16) /* verified on pcb */
+	MCFG_CPU_ADD("audiocpu", MC6809, XTAL_12MHz/4) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(ppking_cpu3_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
@@ -1010,7 +1010,7 @@ static MACHINE_CONFIG_START( gladiatr )
 	MCFG_CPU_PROGRAM_MAP(cpu2_map)
 	MCFG_CPU_IO_MAP(gladiatr_cpu2_io)
 
-	MCFG_CPU_ADD("audiocpu", M6809, XTAL_12MHz/16) /* verified on pcb */
+	MCFG_CPU_ADD("audiocpu", MC6809, XTAL_12MHz/4) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(gladiatr_cpu3_map)
 
 	MCFG_MACHINE_RESET_OVERRIDE(gladiatr_state,gladiator)

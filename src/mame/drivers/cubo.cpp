@@ -1033,8 +1033,8 @@ static MACHINE_CONFIG_START( cubo )
 	MCFG_DEVICE_ADD("overlay", ADDRESS_MAP_BANK, 0)
 	MCFG_DEVICE_PROGRAM_MAP(overlay_2mb_map32)
 	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_BIG)
-	MCFG_ADDRESS_MAP_BANK_DATABUS_WIDTH(32)
-	MCFG_ADDRESS_MAP_BANK_ADDRBUS_WIDTH(22)
+	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(32)
+	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(22)
 	MCFG_ADDRESS_MAP_BANK_STRIDE(0x200000)
 
 	MCFG_I2CMEM_ADD("i2cmem")
@@ -1089,6 +1089,10 @@ static MACHINE_CONFIG_START( cubo )
 	/* fdc */
 	MCFG_DEVICE_ADD("fdc", AMIGA_FDC, amiga_state::CLK_7M_PAL)
 	MCFG_AMIGA_FDC_INDEX_CALLBACK(DEVWRITELINE("cia_1", mos8520_device, flag_w))
+	MCFG_AMIGA_FDC_READ_DMA_CALLBACK(READ16(amiga_state, chip_ram_r))
+	MCFG_AMIGA_FDC_WRITE_DMA_CALLBACK(WRITE16(amiga_state, chip_ram_w))
+	MCFG_AMIGA_FDC_DSKBLK_CALLBACK(WRITELINE(amiga_state, fdc_dskblk_w))
+	MCFG_AMIGA_FDC_DSKSYN_CALLBACK(WRITELINE(amiga_state, fdc_dsksyn_w))
 MACHINE_CONFIG_END
 
 
@@ -1193,7 +1197,7 @@ void cubo_state::chip_ram_w8_hack(offs_t byteoffs, uint8_t data)
 
 void cubo_state::cndypuzl_input_hack()
 {
-	if (m_maincpu->pc < m_chip_ram.bytes())
+	if (m_maincpu->pc() < m_chip_ram.bytes())
 	{
 		uint32_t r_A5 = m_maincpu->state_int(M68K_A5);
 		chip_ram_w(r_A5 - 0x7ebe, 0x0000);
@@ -1208,7 +1212,7 @@ DRIVER_INIT_MEMBER( cubo_state, cndypuzl )
 
 void cubo_state::haremchl_input_hack()
 {
-	if (m_maincpu->pc < m_chip_ram.bytes())
+	if (m_maincpu->pc() < m_chip_ram.bytes())
 	{
 		uint32_t r_A5 = m_maincpu->state_int(M68K_A5);
 		uint32_t r_A2 = (chip_ram_r(r_A5 - 0x7f00 + 0) << 16) | (chip_ram_r(r_A5 - 0x7f00 + 2));
@@ -1224,7 +1228,7 @@ DRIVER_INIT_MEMBER( cubo_state, haremchl )
 
 void cubo_state::lsrquiz_input_hack()
 {
-	if (m_maincpu->pc < m_chip_ram.bytes())
+	if (m_maincpu->pc() < m_chip_ram.bytes())
 	{
 		uint32_t r_A5 = m_maincpu->state_int(M68K_A5);
 		uint32_t r_A2 = (chip_ram_r(r_A5 - 0x7fe0 + 0) << 16) | (chip_ram_r(r_A5 - 0x7fe0 + 2));
@@ -1241,7 +1245,7 @@ DRIVER_INIT_MEMBER( cubo_state, lsrquiz )
 /* The hack isn't working if you exit the test mode with P1 button 2 ! */
 void cubo_state::lsrquiz2_input_hack()
 {
-	if (m_maincpu->pc < m_chip_ram.bytes())
+	if (m_maincpu->pc() < m_chip_ram.bytes())
 	{
 		uint32_t r_A5 = m_maincpu->state_int(M68K_A5);
 		uint32_t r_A2 = (chip_ram_r(r_A5 - 0x7fdc + 0) << 16) | (chip_ram_r(r_A5 - 0x7fdc + 2));
@@ -1257,7 +1261,7 @@ DRIVER_INIT_MEMBER( cubo_state, lsrquiz2 )
 
 void cubo_state::lasstixx_input_hack()
 {
-	if (m_maincpu->pc < m_chip_ram.bytes())
+	if (m_maincpu->pc() < m_chip_ram.bytes())
 	{
 		uint32_t r_A5 = m_maincpu->state_int(M68K_A5);
 		uint32_t r_A2 = (chip_ram_r(r_A5 - 0x7fa2 + 0) << 16) | (chip_ram_r(r_A5 - 0x7fa2 + 2));
@@ -1273,7 +1277,7 @@ DRIVER_INIT_MEMBER(cubo_state, lasstixx)
 
 void cubo_state::mgnumber_input_hack()
 {
-	if (m_maincpu->pc < m_chip_ram.bytes())
+	if (m_maincpu->pc() < m_chip_ram.bytes())
 	{
 		uint32_t r_A5 = m_maincpu->state_int(M68K_A5);
 		chip_ram_w(r_A5 - 0x7ed8, 0x0000);
@@ -1288,7 +1292,7 @@ DRIVER_INIT_MEMBER( cubo_state, mgnumber )
 
 void cubo_state::mgprem11_input_hack()
 {
-	if (m_maincpu->pc < m_chip_ram.bytes())
+	if (m_maincpu->pc() < m_chip_ram.bytes())
 	{
 		uint32_t r_A5 = m_maincpu->state_int(M68K_A5);
 		chip_ram_w8_hack(r_A5 - 0x7eca, 0x00);

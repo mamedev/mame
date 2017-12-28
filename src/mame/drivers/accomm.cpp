@@ -39,35 +39,6 @@
 #define INT_SET             0x100
 #define INT_CLEAR           0x200
 
-/* ULA context */
-
-struct ULA
-{
-	uint8_t interrupt_status;
-	uint8_t interrupt_control;
-	uint8_t rompage;
-	uint16_t screen_start;
-	uint16_t screen_base;
-	int screen_size;
-	uint16_t screen_addr;
-	uint8_t *vram;
-	int current_pal[16];
-	int communication_mode;
-	int screen_mode;
-	int shiftlock_mode;
-	int capslock_mode;
-//  int scanline;
-	/* tape reading related */
-	uint32_t tape_value;
-	int tape_steps;
-	int bit_count;
-	int high_tone_set;
-	int start_bit;
-	int stop_bit;
-	int tape_running;
-	uint8_t tape_byte;
-};
-
 class accomm_state : public driver_device
 {
 public:
@@ -125,6 +96,37 @@ protected:
 
 private:
 	bool m_ch00rom_enabled;
+
+	/* ULA context */
+
+	struct ULA
+	{
+		uint8_t interrupt_status;
+		uint8_t interrupt_control;
+		uint8_t rompage;
+		uint16_t screen_start;
+		uint16_t screen_base;
+		int screen_size;
+		uint16_t screen_addr;
+		uint8_t *vram;
+		int current_pal[16];
+		int communication_mode;
+		int screen_mode;
+		int shiftlock_mode;
+		int capslock_mode;
+		//  int scanline;
+		/* tape reading related */
+		uint32_t tape_value;
+		int tape_steps;
+		int bit_count;
+		int high_tone_set;
+		int start_bit;
+		int stop_bit;
+		int tape_running;
+		uint8_t tape_byte;
+	};
+
+
 	ULA m_ula;
 	int m_map4[256];
 	int m_map16[256];
@@ -636,8 +638,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, accomm_state )
 	AM_RANGE(0x400000, 0x400000) AM_NOP                                                           /* MODEM */
 	AM_RANGE(0x410000, 0x410000) AM_RAM                                                           /* Econet ID */
 	AM_RANGE(0x420000, 0x42000f) AM_DEVREADWRITE("via6522", via6522_device, read, write)          /* 6522 VIA (printer etc) */
-	AM_RANGE(0x430000, 0x430000) AM_DEVREADWRITE("acia", acia6850_device, status_r, control_w)    /* 2641 ACIA (RS423) */
-	AM_RANGE(0x430001, 0x430001) AM_DEVREADWRITE("acia", acia6850_device, data_r, data_w)         /* 2641 ACIA (RS423) */
+	AM_RANGE(0x430000, 0x430001) AM_DEVREADWRITE("acia", acia6850_device, read, write)            /* 2641 ACIA (RS423) */
 	AM_RANGE(0x440000, 0x440000) AM_WRITE(ch00switch_w)                                           /* CH00SWITCH */
 	AM_RANGE(0x450000, 0x457fff) AM_RAM AM_SHARE("vram")                                          /* Video RAM */
 	AM_RANGE(0x458000, 0x459fff) AM_READ(read_keyboard1)                                          /* Video ULA */

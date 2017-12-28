@@ -450,7 +450,7 @@ READ8_MEMBER(witch_state::prot_read_700x)
     Otherwise later in game some I/O (controls) reads are skipped.
 */
 
-	switch(space.device().safe_pc())
+	switch(m_subcpu->pc())
 	{
 	case 0x23f:
 	case 0x246:

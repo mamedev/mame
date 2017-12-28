@@ -616,9 +616,9 @@ WRITE8_MEMBER( z100_state::video_pia_A_w )
 	*/
 
 	m_vram_enable = ((data & 0x80) >> 7) ^ 1;
-	m_gbank = BITSWAP8(((data & 0x70) >> 4) ^ 0x7,7,6,5,4,3,1,0,2);
+	m_gbank = bitswap<8>(((data & 0x70) >> 4) ^ 0x7,7,6,5,4,3,1,0,2);
 	m_flash = ((data & 8) >> 3) ^ 1;
-	m_display_mask = BITSWAP8((data & 7) ^ 7,7,6,5,4,3,1,0,2);
+	m_display_mask = bitswap<8>((data & 7) ^ 7,7,6,5,4,3,1,0,2);
 }
 
 WRITE8_MEMBER( z100_state::video_pia_B_w )

@@ -2445,7 +2445,7 @@ WRITE8_MEMBER(setaroul_state::pay_w)
 	machine().bookkeeping().coin_counter_w(1,   data  & 0x20);  // note in         (meter 1 in input test, touch '2')
 	//                                          data  & 0x40    // hopper lock-out (lock.o  in input test, touch '8')
 	//                                          data  & 0x80    // hopper motor    (hop.h   in input test, touch '0')
-	m_hopper->write(space, 0,(!(data & 0x40) && (data & 0x80)) ? 0x80 : 0x00);
+	m_hopper->motor_w((!(data & 0x40) && (data & 0x80)) ? 1 : 0);
 
 	show_outputs();
 }

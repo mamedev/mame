@@ -11,9 +11,7 @@
  *****************************************************************************/
 
 #include "emu.h"
-#include "debugger.h"
-
-#include "sc61860.h"
+#include "scdasm.h"
 
 /*
   new:
@@ -67,21 +65,7 @@
    ex exchange
 */
 
-
-enum Adr
-{
-	Ill,
-	Imp,
-	Imm, ImmW,
-	RelP, RelM,
-	Abs,
-	Ptc,
-	Etc,
-	Cal,
-	Lp
-};
-
-static const struct { const char *mnemonic; Adr adr; } table[]={
+const sc61860_disassembler::opcode sc61860_disassembler::table[]={
 	{ "LII",    Imm }, { "LIJ",     Imm }, { "LIA",     Imm }, { "LIB",     Imm },
 	{ "IX",     Imp }, { "DX",      Imp }, { "IY",      Imp }, { "DY",      Imp },
 	{ "MVW",    Imp }, { "EXW",     Imp }, { "MVB",     Imp }, { "EXB",     Imp },
@@ -152,10 +136,15 @@ static const struct { const char *mnemonic; Adr adr; } table[]={
 	{ nullptr }, { nullptr }, { nullptr }, { nullptr },  { nullptr }, { nullptr }, { nullptr }, { nullptr },
 };
 
-CPU_DISASSEMBLE(sc61860)
+u32 sc61860_disassembler::opcode_alignment() const
 {
-	const uint8_t *base_oprom = oprom;
-	int oper=*(oprom++);
+	return 1;
+}
+
+offs_t sc61860_disassembler::disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params)
+{
+	offs_t pos = pc;
+	int oper=opcodes.r8(pos++);
 	int t;
 	uint16_t adr;
 
@@ -167,32 +156,32 @@ CPU_DISASSEMBLE(sc61860)
 		switch(oper&0xe0) {
 		case 0xe0:
 			util::stream_format(stream,"%-6s%04x",table[oper&0xe0].mnemonic,
-					*(oprom++)|((oper&0x1f)<<8));
+					opcodes.r8(pos++)|((oper&0x1f)<<8));
 			break;
 		default:
 			switch (table[oper].adr) {
 			case Ill: util::stream_format(stream,"?%02x",oper);break;
 			case Imp: util::stream_format(stream,"%s",table[oper].mnemonic); break;
-			case Imm: util::stream_format(stream,"%-6s%02x",table[oper].mnemonic, *(oprom++)); break;
+			case Imm: util::stream_format(stream,"%-6s%02x",table[oper].mnemonic, opcodes.r8(pos++)); break;
 			case ImmW:
-				adr=(oprom[0]<<8)|oprom[1];oprom+=2;
+				adr=opcodes.r16(pos); pos+=2;
 				util::stream_format(stream,"%-6s%04x",table[oper].mnemonic, adr);
 				break;
 			case Abs:
-				adr=(oprom[0]<<8)|oprom[1];oprom+=2;
+				adr=opcodes.r16(pos); pos+=2;
 				util::stream_format(stream,"%-6s%04x",table[oper].mnemonic, adr);
 				break;
 			case RelM:
-				adr=pc-*(oprom++);
+				adr=pc-opcodes.r8(pos++);
 				util::stream_format(stream,"%-6s%04x",table[oper].mnemonic, adr&0xffff);
 				break;
 			case RelP:
-				adr=pc+*(oprom++);
+				adr=pc+opcodes.r8(pos++);
 				util::stream_format(stream,"%-6s%04x",table[oper].mnemonic, adr&0xffff);
 				break;
 			case Ptc:
-				t=*(oprom++);
-				adr=(oprom[0]<<8)|oprom[1];oprom+=2;
+				t=opcodes.r8(pos++);
+				adr=opcodes.r16(pos); pos+=2;
 				util::stream_format(stream,"%-6s%02x,%04x",table[oper].mnemonic,t, adr);
 				break;
 			case Etc:
@@ -206,5 +195,5 @@ CPU_DISASSEMBLE(sc61860)
 		}
 		break;
 	}
-	return oprom - base_oprom;
+	return pos - pc;
 }

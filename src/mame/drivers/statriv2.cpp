@@ -1576,7 +1576,7 @@ DRIVER_INIT_MEMBER(statriv2_state, addr_lmhe)
 	uint32_t address;
 
 	for (address = 0; address < length; address++)
-		qrom[address] ^= BITSWAP8(address, 4,3,3,2,2,1,1,0);
+		qrom[address] ^= bitswap<8>(address, 4,3,3,2,2,1,1,0);
 
 	DRIVER_INIT_CALL(addr_lmh);
 }

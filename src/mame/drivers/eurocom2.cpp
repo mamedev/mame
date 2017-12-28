@@ -330,8 +330,7 @@ static ADDRESS_MAP_START(eurocom2_map, AS_PROGRAM, 8, eurocom2_state)
 	AM_RANGE(0x0000, 0xefff) AM_RAM AM_SHARE("videoram")
 	AM_RANGE(0xf000, 0xfcef) AM_ROM AM_REGION("maincpu", 0)
 	AM_RANGE(0xfcf0, 0xfcf3) AM_DEVREADWRITE("pia1", pia6821_device, read, write)
-	AM_RANGE(0xfcf4, 0xfcf4) AM_DEVREADWRITE("acia", acia6850_device, status_r, control_w)
-	AM_RANGE(0xfcf5, 0xfcf5) AM_DEVREADWRITE("acia", acia6850_device, data_r, data_w)
+	AM_RANGE(0xfcf4, 0xfcf5) AM_DEVREADWRITE("acia", acia6850_device, read, write)
 	AM_RANGE(0xfcf6, 0xfcf7) AM_WRITE(vico_w)
 	AM_RANGE(0xfcf8, 0xfcfb) AM_DEVREADWRITE("pia2", pia6821_device, read, write)
 	AM_RANGE(0xfd30, 0xfd37) AM_DEVREADWRITE("fdc", fd1793_device, read, write)
@@ -428,11 +427,11 @@ static SLOT_INTERFACE_START( eurocom_floppies )
 SLOT_INTERFACE_END
 
 static MACHINE_CONFIG_START( eurocom2 )
-	MCFG_CPU_ADD("maincpu", M6809, XTAL_5_3586MHz/4)
+	MCFG_CPU_ADD("maincpu", MC6809, XTAL_10_7172MHz/2) // EXTAL = CLK/2 = 5.3586 MHz; Q = E = 1.33965 MHz
 	MCFG_CPU_PROGRAM_MAP(eurocom2_map)
 
 	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green())
-	MCFG_SCREEN_RAW_PARAMS(XTAL_5_3586MHz*2, VC_TOTAL_HORZ, 0, VC_DISP_HORZ, VC_TOTAL_VERT, 0, VC_DISP_VERT)
+	MCFG_SCREEN_RAW_PARAMS(XTAL_10_7172MHz, VC_TOTAL_HORZ, 0, VC_DISP_HORZ, VC_TOTAL_VERT, 0, VC_DISP_VERT)
 	MCFG_SCREEN_UPDATE_DRIVER(eurocom2_state, screen_update)
 
 	MCFG_SCREEN_PALETTE("palette")

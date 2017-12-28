@@ -80,15 +80,15 @@ bgfx_target::~bgfx_target()
 	{
 		for (int page = 0; page < m_page_count; page++)
 		{
-			bgfx::destroyFrameBuffer(m_targets[page]);
-			bgfx::destroyTexture(m_textures[page]);
+			bgfx::destroy(m_targets[page]);
+			bgfx::destroy(m_textures[page]);
 		}
 		delete [] m_textures;
 		delete [] m_targets;
 	}
 	else
 	{
-		bgfx::destroyFrameBuffer(m_targets[0]);
+		bgfx::destroy(m_targets[0]);
 		delete [] m_targets;
 	}
 }

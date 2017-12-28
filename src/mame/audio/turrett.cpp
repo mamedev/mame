@@ -44,7 +44,7 @@ device_memory_interface::space_config_vector turrett_device::memory_space_config
 void turrett_device::device_start()
 {
 	// Find our direct access
-	m_direct = &space().direct();
+	m_direct = space().direct<0>();
 
 	// Create the sound stream
 	m_stream = machine().sound().stream_alloc(*this, 0, 2, 44100);

@@ -41,8 +41,8 @@ Development and user discussions happen on the [noto-font Google Group](https://
 
 ## Special Note on Droid Fonts
 
-The Droid fonts are superseded by Noto. Noto began as Droid, and since renaming all updates are made to the Noto fonts. 
-Today Noto gives better support to all languages covered by Droid fonts, with more characters and fewer bugs, and covers many more languages. 
+The Droid fonts are superseded by Noto. Noto began as Droid, and since renaming all updates are made to the Noto fonts.
+Today Noto gives better support to all languages covered by Droid fonts, with more characters and fewer bugs, and covers many more languages.
 Both Android and ChromeOS have switched to Noto, and we strongly recommend everyone to replace Droid with Noto.
 
 Similarly, the Droid Sans Fallback font is superseded by Noto Sans CJK, available from [noto-cjk](https://github.com/googlei18n/noto-cjk).

@@ -248,11 +248,11 @@ void rockrage_state::machine_reset()
 static MACHINE_CONFIG_START( rockrage )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", HD6309, 3000000*4)      /* 24MHz/8 */
+	MCFG_CPU_ADD("maincpu", HD6309E, XTAL_24MHz / 8)
 	MCFG_CPU_PROGRAM_MAP(rockrage_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", rockrage_state,  rockrage_interrupt)
 
-	MCFG_CPU_ADD("audiocpu", M6809, 1500000)        /* 24MHz/16 */
+	MCFG_CPU_ADD("audiocpu", MC6809E, XTAL_24MHz / 16)
 	MCFG_CPU_PROGRAM_MAP(rockrage_sound_map)
 
 	MCFG_WATCHDOG_ADD("watchdog")

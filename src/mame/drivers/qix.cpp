@@ -601,7 +601,7 @@ INPUT_PORTS_END
 static MACHINE_CONFIG_START( qix_base )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6809, MAIN_CLOCK_OSC/4/4)  /* 1.25 MHz */
+	MCFG_CPU_ADD("maincpu", MC6809E, MAIN_CLOCK_OSC/4/4)  /* 1.25 MHz */
 	MCFG_CPU_PROGRAM_MAP(main_map)
 
 	/* high interleave needed to ensure correct text in service mode */
@@ -632,9 +632,9 @@ static MACHINE_CONFIG_DERIVED( qix, qix_base )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( kram3, qix )
-	MCFG_CPU_REPLACE("maincpu", M6809E, MAIN_CLOCK_OSC/4)  /* 1.25 MHz */
+	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(kram3_main_map)
-	MCFG_M6809E_LIC_CB(WRITELINE(qix_state,kram3_lic_maincpu_changed))
+	MCFG_MC6809E_LIC_CB(WRITELINE(qix_state, kram3_lic_maincpu_changed))
 
 	MCFG_FRAGMENT_ADD(kram3_video)
 MACHINE_CONFIG_END
@@ -1312,10 +1312,10 @@ int qix_state::kram3_permut1(int idx, int value)
 	switch (idx)
 	{
 		default:
-		case 0: return BITSWAP8(value, 7,6,5,4, 3,2,1,0);
-		case 1: return BITSWAP8(value, 7,6,5,4, 0,3,2,1);
-		case 2: return BITSWAP8(value, 7,6,5,4, 1,0,3,2);
-		case 3: return BITSWAP8(value, 7,6,5,4, 2,3,0,1);
+		case 0: return bitswap<8>(value, 7,6,5,4, 3,2,1,0);
+		case 1: return bitswap<8>(value, 7,6,5,4, 0,3,2,1);
+		case 2: return bitswap<8>(value, 7,6,5,4, 1,0,3,2);
+		case 3: return bitswap<8>(value, 7,6,5,4, 2,3,0,1);
 	}
 }
 
@@ -1335,7 +1335,7 @@ int qix_state::kram3_permut2(int tbl_index, int idx, const uint8_t *xor_table)
 	xorval ^= 0x02;
 
 	if (idx == 3)
-		xorval = BITSWAP8(xorval, 7,6,5,4, 0,2,3,1);
+		xorval = bitswap<8>(xorval, 7,6,5,4, 0,2,3,1);
 
 	return xorval;
 }

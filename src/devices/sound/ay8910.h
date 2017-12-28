@@ -96,8 +96,12 @@ public:
 	DECLARE_READ8_MEMBER( data_r );
 	DECLARE_WRITE8_MEMBER( address_w );
 	DECLARE_WRITE8_MEMBER( data_w );
+	u8 data_r();
+	void address_w(u8 data);
+	void data_w(u8 data);
 
 	/* /RES */
+	void reset_w();
 	DECLARE_WRITE8_MEMBER( reset_w );
 
 	/* use this when BC1 == A0; here, BC1=0 selects 'data' and BC1=1 selects 'latch address' */

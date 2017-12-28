@@ -2233,7 +2233,7 @@ DRIVER_INIT_MEMBER(centiped_state,multiped)
 
 	// descramble rom and put in maincpu region
 	for (int i = 0; i < 0x10000; i++)
-		dest[0x10000 + (i ^ (~i << 4 & 0x1000) ^ (~i >> 3 & 0x400))] = BITSWAP8(src[BITSWAP16(i,15,14,13,1,8,11,4,7,10,5,6,9,12,0,3,2)],0,2,1,3,4,5,6,7);
+		dest[0x10000 + (i ^ (~i << 4 & 0x1000) ^ (~i >> 3 & 0x400))] = bitswap<8>(src[bitswap<16>(i,15,14,13,1,8,11,4,7,10,5,6,9,12,0,3,2)],0,2,1,3,4,5,6,7);
 
 	// (this can be removed when prg bankswitch is implemented)
 	memmove(dest+0x0000, dest+0x10000, 0x8000);

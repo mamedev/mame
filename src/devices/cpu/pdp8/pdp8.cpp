@@ -9,8 +9,7 @@
 #include "emu.h"
 #include "debugger.h"
 #include "pdp8.h"
-
-CPU_DISASSEMBLE( pdp8 );
+#include "pdp8dasm.h"
 
 #define OP          ((op >> 011) & 07)
 
@@ -148,36 +147,13 @@ void pdp8_device::state_string_export(const device_state_entry &entry, std::stri
 
 
 //-------------------------------------------------
-//  disasm_min_opcode_bytes - return the length
-//  of the shortest instruction, in bytes
-//-------------------------------------------------
-
-uint32_t pdp8_device::disasm_min_opcode_bytes() const
-{
-	return 2;
-}
-
-
-//-------------------------------------------------
-//  disasm_max_opcode_bytes - return the length
-//  of the longest instruction, in bytes
-//-------------------------------------------------
-
-uint32_t pdp8_device::disasm_max_opcode_bytes() const
-{
-	return 2;
-}
-
-
-//-------------------------------------------------
-//  disasm_disassemble - call the disassembly
+//  disassemble - call the disassembly
 //  helper function
 //-------------------------------------------------
 
-offs_t pdp8_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+util::disasm_interface *pdp8_cpu_device::create_disassembler()
 {
-	extern CPU_DISASSEMBLE( pdp8 );
-	return CPU_DISASSEMBLE_NAME(pdp8)(this, stream, pc, oprom, opram, options);
+	return new pdp8_disassembler;
 }
 
 

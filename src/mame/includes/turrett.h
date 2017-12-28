@@ -118,7 +118,7 @@ protected:
 	const address_space_config  m_space_config;
 
 private:
-	direct_read_data *m_direct;
+	direct_read_data<0> *m_direct;
 	sound_stream *m_stream;
 
 	struct

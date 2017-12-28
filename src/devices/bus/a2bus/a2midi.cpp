@@ -87,22 +87,17 @@ void a2bus_midi_device::device_reset()
     read_c0nx - called for reads from this card's c0nx space
 -------------------------------------------------*/
 
-uint8_t a2bus_midi_device::read_c0nx(address_space &space, uint8_t offset)
+uint8_t a2bus_midi_device::read_c0nx(uint8_t offset)
 {
 	// PTM at C0n0-C0n7, ACIA at C0n8-C0n9, drum sync (?) at C0nA-C0nB
 
 	if (offset < 8)
 	{
-		return m_ptm->read(space, offset & 7);
+		return m_ptm->read(machine().dummy_space(), offset & 7);
 	}
-	else if (offset == 8)
+	else if (offset == 8 || offset == 9)
 	{
-		return m_acia->status_r(space, 0);
-	}
-	else if (offset == 9)
-	{
-		uint8_t ret = m_acia->data_r(space, 0);
-		return ret;
+		return m_acia->read(machine().dummy_space(), offset & 1);
 	}
 
 	return 0;
@@ -112,19 +107,15 @@ uint8_t a2bus_midi_device::read_c0nx(address_space &space, uint8_t offset)
     write_c0nx - called for writes to this card's c0nx space
 -------------------------------------------------*/
 
-void a2bus_midi_device::write_c0nx(address_space &space, uint8_t offset, uint8_t data)
+void a2bus_midi_device::write_c0nx(uint8_t offset, uint8_t data)
 {
 	if (offset < 8)
 	{
-		m_ptm->write(space, offset & 7, data);
+		m_ptm->write(machine().dummy_space(), offset & 7, data);
 	}
-	else if (offset == 8)
+	else if (offset == 8 || offset == 9)
 	{
-		m_acia->control_w(space, 0, data);
-	}
-	else if (offset == 9)
-	{
-		m_acia->data_w(space, 0, data);
+		m_acia->write(machine().dummy_space(), offset & 1, data);
 	}
 }
 

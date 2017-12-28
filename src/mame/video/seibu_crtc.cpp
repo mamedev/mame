@@ -370,10 +370,10 @@ WRITE16_MEMBER( seibu_crtc_device::write )
 /* Sky Smasher / Raiden DX swaps registers [0x10] with [0x20] */
 READ16_MEMBER( seibu_crtc_device::read_alt )
 {
-	return read_word(BITSWAP16(offset,15,14,13,12,11,10,9,8,7,6,5,3,4,2,1,0));
+	return read_word(bitswap<16>(offset,15,14,13,12,11,10,9,8,7,6,5,3,4,2,1,0));
 }
 
 WRITE16_MEMBER( seibu_crtc_device::write_alt )
 {
-	write_word(BITSWAP16(offset,15,14,13,12,11,10,9,8,7,6,5,3,4,2,1,0),data);
+	write_word(bitswap<16>(offset,15,14,13,12,11,10,9,8,7,6,5,3,4,2,1,0),data);
 }

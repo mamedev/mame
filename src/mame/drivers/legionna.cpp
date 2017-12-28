@@ -1054,7 +1054,7 @@ void legionna_state::descramble_legionnaire_gfx(uint8_t* src)
 		int i;
 		for (i = 0;i < len; i++)
 		{
-			buffer[i] = src[BITSWAP24(i,
+			buffer[i] = src[bitswap<24>(i,
 			23,22,21,20,
 			19,18,17,16,
 			6,5,15,14,13,12,

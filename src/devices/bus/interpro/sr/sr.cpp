@@ -266,16 +266,16 @@ sr_slot_device::sr_slot_device(const machine_config &mconfig, const char *tag, d
 	: device_t(mconfig, SR_SLOT, tag, owner, clock)
 	, device_slot_interface(mconfig, *this)
 	, m_sr_tag(nullptr)
-	, m_sr_slottag(nullptr)
+	, m_sr_slot_tag(nullptr)
 {
 }
 
-void sr_slot_device::static_set_sr_slot(device_t &device, const char *tag, const char *slottag)
+void sr_slot_device::static_set_sr_slot(device_t &device, const char *tag, const char *slot_tag)
 {
 	sr_slot_device &sr_card = dynamic_cast<sr_slot_device &>(device);
 
 	sr_card.m_sr_tag = tag;
-	sr_card.m_sr_slottag = slottag;
+	sr_card.m_sr_slot_tag = slot_tag;
 }
 
 void sr_slot_device::device_start()
@@ -283,28 +283,38 @@ void sr_slot_device::device_start()
 	device_sr_card_interface *dev = dynamic_cast<device_sr_card_interface *>(get_card_device());
 
 	if (dev)
-		device_sr_card_interface::static_set_sr_tag(*dev, m_sr_tag, m_sr_slottag);
+		device_sr_card_interface::static_set_sr_tag(*dev, m_sr_tag, m_sr_slot_tag);
 }
 
 DEFINE_DEVICE_TYPE(SR, sr_device, "sr", "InterPro SR bus")
 
 sr_device::sr_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, SR, tag, owner, clock)
-	, m_data_space(nullptr)
-	, m_io_space(nullptr)
 	, m_out_irq0_cb(*this)
 	, m_out_irq1_cb(*this)
 	, m_out_irq2_cb(*this)
+	, m_memory_tag(nullptr)
 {
+}
+
+void sr_device::static_set_memory(device_t &device, const char *const tag, const int data_spacenum, const int io_spacenum)
+{
+	sr_device &sr = dynamic_cast<sr_device &>(device);
+
+	sr.m_memory_tag = tag;
+	sr.m_data_spacenum = data_spacenum;
+	sr.m_io_spacenum = io_spacenum;
 }
 
 void sr_device::device_start()
 {
-	// grab the main memory space from the mmu
-	device_memory_interface *mmu;
-	siblingdevice("mmu")->interface(mmu);
-	m_data_space = &mmu->space(0);
-	m_io_space = &mmu->space(1);
+	assert_always(m_memory_tag != nullptr, "memory tag and address spaces must be configured");
+
+	// get the memory spaces
+	device_memory_interface *memory;
+	siblingdevice(m_memory_tag)->interface(memory);
+	m_data_space = &memory->space(m_data_spacenum);
+	m_io_space = &memory->space(m_io_spacenum);
 
 	// resolve callbacks
 	m_out_irq0_cb.resolve_safe();
@@ -325,7 +335,7 @@ device_sr_card_interface::device_sr_card_interface(const machine_config &mconfig
 	: device_slot_card_interface(mconfig, device)
 	, m_sr(nullptr)
 	, m_sr_tag(nullptr)
-	, m_sr_slottag(nullptr)
+	, m_sr_slot_tag(nullptr)
 {
 }
 
@@ -333,12 +343,12 @@ device_sr_card_interface::~device_sr_card_interface()
 {
 }
 
-void device_sr_card_interface::static_set_sr_tag(device_t &device, const char *tag, const char *slottag)
+void device_sr_card_interface::static_set_sr_tag(device_t &device, const char *tag, const char *slot_tag)
 {
 	device_sr_card_interface &sr_card = dynamic_cast<device_sr_card_interface &>(device);
 
 	sr_card.m_sr_tag = tag;
-	sr_card.m_sr_slottag = slottag;
+	sr_card.m_sr_slot_tag = slot_tag;
 }
 
 void device_sr_card_interface::set_sr_device()

@@ -217,7 +217,7 @@ WRITE8_MEMBER( beta_state::riot_pa_w )
 //  logerror("PA %02x\n", data);
 
 	/* display */
-	m_segment = BITSWAP8(data, 7, 3, 4, 1, 0, 2, 5, 6) & 0x7f;
+	m_segment = bitswap<8>(data, 7, 3, 4, 1, 0, 2, 5, 6) & 0x7f;
 	m_led_refresh_timer->adjust(attotime::from_usec(70));
 
 	/* EPROM data */

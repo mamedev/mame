@@ -178,7 +178,7 @@ WRITE8_MEMBER( vcs80_state::pio_pb_w )
 
 	*/
 
-	uint8_t led_data = BITSWAP8(data & 0x7f, 7, 5, 6, 4, 3, 2, 1, 0);
+	uint8_t led_data = bitswap<8>(data & 0x7f, 7, 5, 6, 4, 3, 2, 1, 0);
 	int digit = m_keylatch;
 
 	/* skip middle digit */
@@ -236,7 +236,7 @@ static MACHINE_CONFIG_START( vcs80 )
 	MCFG_DEVICE_ADD("bdmem", ADDRESS_MAP_BANK, 0)
 	MCFG_DEVICE_PROGRAM_MAP(vcs80_bd_mem)
 	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_BIG)
-	MCFG_ADDRESS_MAP_BANK_DATABUS_WIDTH(8)
+	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
 	MCFG_ADDRESS_MAP_BANK_STRIDE(0x10000)
 MACHINE_CONFIG_END
 

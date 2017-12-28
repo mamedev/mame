@@ -5,9 +5,14 @@
     Chequered Flag / Checkered Flag (GX717) (c) Konami 1988
 
     Notes:
-    - 007232 volume & panning control is almost certainly wrong.
-    - Needs HW tests or side-by-side tests to determine if the protection
-      is 100% ok now;
+    - 007232 volume & panning control is almost certainly wrong;
+    - 051733 opponent cars have wrong RNG colors compared to references;
+    - 051733 opponent car-to-car collisions direction are wrong, according
+      to reference orange car should shift to the left instead (current emulation
+      makes them to wall crash most of the time instead);
+    - needs proper shadow/highlight factor values for sprites and tilemap;
+    - compared to references, emulation is a bit slower (around 2/3 seconds
+      behind on a full lap of stage 2);
 
     2008-07
     Dip locations and recommended settings verified with manual
@@ -332,8 +337,8 @@ static MACHINE_CONFIG_START( chqflag )
 	MCFG_DEVICE_ADD("bank1000", ADDRESS_MAP_BANK, 0)
 	MCFG_DEVICE_PROGRAM_MAP(bank1000_map)
 	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_BIG)
-	MCFG_ADDRESS_MAP_BANK_DATABUS_WIDTH(8)
-	MCFG_ADDRESS_MAP_BANK_ADDRBUS_WIDTH(13)
+	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
+	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(13)
 	MCFG_ADDRESS_MAP_BANK_STRIDE(0x1000)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
@@ -456,5 +461,5 @@ ROM_END
 
 
 //     YEAR, NAME,     PARENT,  MACHINE, INPUT,    STATE,         INIT, MONITOR, COMPANY,  FULLNAME,                 FLAGS,                                           LAYOUT
-GAMEL( 1988, chqflag,  0,       chqflag, chqflag,  chqflag_state, 0,    ROT90,   "Konami", "Chequered Flag",         MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_chqflag )
-GAMEL( 1988, chqflagj, chqflag, chqflag, chqflagj, chqflag_state, 0,    ROT90,   "Konami", "Chequered Flag (Japan)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_chqflag )
+GAMEL( 1988, chqflag,  0,       chqflag, chqflag,  chqflag_state, 0,    ROT90,   "Konami", "Chequered Flag",         MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_chqflag )
+GAMEL( 1988, chqflagj, chqflag, chqflag, chqflagj, chqflag_state, 0,    ROT90,   "Konami", "Chequered Flag (Japan)", MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_chqflag )
