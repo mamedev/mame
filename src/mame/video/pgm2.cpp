@@ -261,20 +261,21 @@ void pgm2_state::copy_sprites_from_bitmap(screen_device &screen, bitmap_rgb32 &b
 
 uint32_t pgm2_state::screen_update_pgm2(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
+	int mode = m_vidmode[0] & 0x00030000; // other bits not used?
 
-	int mode = m_vidmode[0] & 0x00010000; // other bits not used?
-
-	if (mode)
-		m_screen->set_visible_area(0, 448 - 1, 0, 224 - 1);
-	else
-		m_screen->set_visible_area(0, 320 - 1, 0, 240 - 1);
-
+	switch (mode>>16)
+	{
+		default:
+		case 0x00: m_screen->set_visible_area(0, 320 - 1, 0, 240 - 1); break;
+		case 0x01: m_screen->set_visible_area(0, 448 - 1, 0, 224 - 1); break;
+		case 0x02: m_screen->set_visible_area(0, 512 - 1, 0, 240 - 1); break;
+	}
 
 	m_fg_tilemap->set_scrollx(0, m_fgscroll[0] & 0xffff);
 	m_fg_tilemap->set_scrolly(0, m_fgscroll[0] >> 16);
 	m_bg_tilemap->set_scrolly(0, (m_bgscroll[0x0/4] & 0xffff0000)>>16 );
 
-	for (int y = 0; y < 224; y++)
+	for (int y = 0; y <= cliprect.max_y; y++)
 	{
 		uint16_t linescroll = (y & 1) ? ((m_lineram[(y >> 1)] & 0xffff0000) >> 16) : (m_lineram[(y >> 1)] & 0x0000ffff);
 		m_bg_tilemap->set_scrollx((y + ((m_bgscroll[0x0 / 4] & 0xffff0000) >> 16)) & 0x3ff, ((m_bgscroll[0x0 / 4] & 0x0000ffff) >> 0) + linescroll);
