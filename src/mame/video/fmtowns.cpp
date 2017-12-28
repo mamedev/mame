@@ -504,8 +504,9 @@ void towns_state::towns_update_palette()
 			m_palette->set_pen_color(entry, r, g, b);
 			break;
 	}
+	// chasehq wants the + 8, the real hardware appears to be less consistent, revisit if other software doesn't like it
 	if(!m_screen->vblank())
-		m_screen->update_partial(m_screen->vpos());
+		m_screen->update_partial(m_screen->vpos() + 8);
 }
 
 /* Video/CRTC
@@ -723,8 +724,9 @@ void towns_state::render_sprite_4(uint32_t poffset, uint32_t coffset, uint16_t x
 {
 	uint16_t xpos,ypos;
 	uint16_t col,pixel;
-	uint32_t voffset;
+	uint32_t vbase = m_video.towns_sprite_page ? 0x20000 : 0, voffset;
 	uint16_t xstart,xend,ystart,yend;
+	int linesize = m_video.towns_crtc_reg[24] * 4;
 	int xdir,ydir;
 	int width = (m_video.towns_crtc_reg[12] - m_video.towns_crtc_reg[11]) / (((m_video.towns_crtc_reg[27] & 0x0f00) >> 8)+1);
 	int height = (m_video.towns_crtc_reg[16] - m_video.towns_crtc_reg[15]) / (((m_video.towns_crtc_reg[27] & 0xf000) >> 12)+2);
@@ -793,30 +795,23 @@ void towns_state::render_sprite_4(uint32_t poffset, uint32_t coffset, uint16_t x
 		for(xpos=xstart;xpos!=xend;xpos+=xdir,xpos&=0x1ff)
 		{
 
-			if(m_video.towns_sprite_page != 0)
-				voffset = 0x20000;
-			else
-				voffset = 0x00000;
+			voffset = 0;
 			pixel = (m_towns_txtvram[poffset] & 0xf0) >> 4;
 			col = m_towns_txtvram[coffset+(pixel*2)] | (m_towns_txtvram[coffset+(pixel*2)+1] << 8);
 			if (rotation)
 			{
-				voffset += (m_video.towns_crtc_reg[24] * 4) * (xpos & 0x1ff);  // scanline size in bytes * y pos
+				voffset += linesize * (xpos & 0x1ff);  // scanline size in bytes * y pos
 				voffset += (ypos & 0x1ff) * 2;
 			}
 			else
 			{
-				voffset += (m_video.towns_crtc_reg[24] * 4) * (ypos & 0x1ff);  // scanline size in bytes * y pos
+				voffset += linesize * (ypos & 0x1ff);  // scanline size in bytes * y pos
 				voffset += (xpos & 0x1ff) * 2;
 			}
-			if((m_video.towns_sprite_page != 0 && voffset > 0x1ffff && voffset < 0x40000)
-					|| (m_video.towns_sprite_page == 0 && voffset < 0x20000))
+			if(voffset < 0x20000 && xpos < width && ypos < height && pixel != 0 && voffset > linesize)
 			{
-				if(xpos < width && ypos < height && pixel != 0)
-				{
-					m_towns_gfxvram[0x40000+voffset+1] = (col & 0xff00) >> 8;
-					m_towns_gfxvram[0x40000+voffset] = col & 0x00ff;
-				}
+				m_towns_gfxvram[0x40000+voffset+vbase+1] = (col & 0xff00) >> 8;
+				m_towns_gfxvram[0x40000+voffset+vbase] = col & 0x00ff;
 			}
 
 			if (!xhalfsize)
@@ -834,14 +829,10 @@ void towns_state::render_sprite_4(uint32_t poffset, uint32_t coffset, uint16_t x
 
 				pixel = m_towns_txtvram[poffset] & 0x0f;
 				col = m_towns_txtvram[coffset+(pixel*2)] | (m_towns_txtvram[coffset+(pixel*2)+1] << 8);
-				if((m_video.towns_sprite_page != 0 && voffset > 0x1ffff && voffset < 0x40000)
-						|| (m_video.towns_sprite_page == 0 && voffset < 0x20000))
+				if(voffset < 0x20000 && xpos < width && ypos < height && pixel != 0 && voffset > linesize)
 				{
-					if(xpos < width && ypos < height && pixel != 0)
-					{
-						m_towns_gfxvram[0x40000+voffset+1] = (col & 0xff00) >> 8;
-						m_towns_gfxvram[0x40000+voffset] = col & 0x00ff;
-					}
+					m_towns_gfxvram[0x40000+voffset+vbase+1] = (col & 0xff00) >> 8;
+					m_towns_gfxvram[0x40000+voffset+vbase] = col & 0x00ff;
 				}
 			}
 
@@ -859,8 +850,9 @@ void towns_state::render_sprite_16(uint32_t poffset, uint16_t x, uint16_t y, boo
 {
 	uint16_t xpos,ypos;
 	uint16_t col;
-	uint32_t voffset;
+	uint32_t vbase = m_video.towns_sprite_page ? 0x20000 : 0, voffset;
 	uint16_t xstart,ystart,xend,yend;
+	int linesize = m_video.towns_crtc_reg[24] * 4;
 	int xdir,ydir;
 	int width = (m_video.towns_crtc_reg[12] - m_video.towns_crtc_reg[11]) / (((m_video.towns_crtc_reg[27] & 0x0f00) >> 8)+1);
 	int height = (m_video.towns_crtc_reg[16] - m_video.towns_crtc_reg[15]) / (((m_video.towns_crtc_reg[27] & 0xf000) >> 12)+2);
@@ -918,29 +910,22 @@ void towns_state::render_sprite_16(uint32_t poffset, uint16_t x, uint16_t y, boo
 	{
 		for(xpos=xstart;xpos!=xend;xpos+=xdir,xpos&=0x1ff)
 		{
-			if(m_video.towns_sprite_page != 0)
-				voffset = 0x20000;
-			else
-				voffset = 0x00000;
+			voffset = 0;
 			col = m_towns_txtvram[poffset] | (m_towns_txtvram[poffset+1] << 8);
 			if (rotation)
 			{
-				voffset += (m_video.towns_crtc_reg[24] * 4) * (xpos & 0x1ff);  // scanline size in bytes * y pos
+				voffset += linesize * (xpos & 0x1ff);  // scanline size in bytes * y pos
 				voffset += (ypos & 0x1ff) * 2;
 			}
 			else
 			{
-				voffset += (m_video.towns_crtc_reg[24] * 4) * (ypos & 0x1ff);  // scanline size in bytes * y pos
+				voffset += linesize * (ypos & 0x1ff);  // scanline size in bytes * y pos
 				voffset += (xpos & 0x1ff) * 2;
 			}
-			if((m_video.towns_sprite_page != 0 && voffset > 0x1ffff && voffset < 0x40000)
-					|| (m_video.towns_sprite_page == 0 && voffset < 0x20000))
+			if(voffset < 0x20000 && xpos < width && ypos < height && col< 0x8000 && voffset > linesize)
 			{
-				if(xpos < width && ypos < height && col < 0x8000)
-				{
-					m_towns_gfxvram[0x40000+voffset+1] = (col & 0xff00) >> 8;
-					m_towns_gfxvram[0x40000+voffset] = col & 0x00ff;
-				}
+				m_towns_gfxvram[0x40000+vbase+voffset+1] = (col & 0xff00) >> 8;
+				m_towns_gfxvram[0x40000+vbase+voffset] = col & 0x00ff;
 			}
 			if (xhalfsize)
 				poffset+=4;
@@ -962,16 +947,23 @@ void towns_state::draw_sprites(const rectangle* rect)
 	uint16_t xoff = (m_video.towns_sprite_reg[2] | (m_video.towns_sprite_reg[3] << 8)) & 0x1ff;
 	uint16_t yoff = (m_video.towns_sprite_reg[4] | (m_video.towns_sprite_reg[5] << 8)) & 0x1ff;
 	uint32_t poffset,coffset;
+	int linesize = m_video.towns_crtc_reg[24] * 4;
 	bool xflip, yflip, xhalfsize, yhalfsize, rotation;
 
 	if(!(m_video.towns_sprite_reg[1] & 0x80))
 		return;
 
-	// clears VRAM for each frame?
+	// TODO: I'm not confident about this but based on the behavior of aburner and rbisland, it's probably in the ballpark
+	// aburner writes the backgound color from 0 to 0x400 in both pages while rbisland from 0 to 0x800 (What's the difference?)
+	// it's only written when the color changes so the sprite engine has to be prevented from writing there
+	uint8_t *vram;
 	if(m_video.towns_sprite_page == 0)
-		memset(m_towns_gfxvram.get()+0x40000,0x80,0x20000);
+		vram = m_towns_gfxvram.get() + 0x40000;
 	else
-		memset(m_towns_gfxvram.get()+0x60000,0x80,0x20000);
+		vram = m_towns_gfxvram.get() + 0x60000;
+
+	for(int i = linesize; i < 0x20000; i += linesize)
+		memcpy(vram + i, vram, linesize);
 
 	for(n=sprite_limit;n<1024;n++)
 	{
@@ -1110,6 +1102,8 @@ void towns_state::towns_crtc_draw_scan_layer_256(bitmap_rgb32 &bitmap,const rect
 	if(m_video.towns_display_page_sel != 0)
 		off = 0x20000;
 
+	bool bottom_layer = (m_video.towns_video_reg[1] & 0x01) != layer;
+
 //  if((layer == 1) && (m_video.towns_sprite_reg[1] & 0x80) && (m_video.towns_sprite_page == 1))
 //      off = 0x20000;
 
@@ -1154,7 +1148,7 @@ void towns_state::towns_crtc_draw_scan_layer_256(bitmap_rgb32 &bitmap,const rect
 		else
 			off &= 0x7ffff;  // 1 layer
 		colour = m_towns_gfxvram[off+(layer*0x40000)];
-		if(colour != 0)
+		if(colour != 0 || bottom_layer)
 		{
 			for (pixel = 0; pixel < hzoom; pixel++)
 				bitmap.pix32(scanline, x+pixel) = m_palette->pen(colour);
@@ -1178,6 +1172,8 @@ void towns_state::towns_crtc_draw_scan_layer_16(bitmap_rgb32 &bitmap,const recta
 
 	if(m_video.towns_display_page_sel != 0)
 		off = 0x20000;
+
+	bool bottom_layer = (m_video.towns_video_reg[1] & 0x01) != layer;
 
 //  if((layer == 1) && (m_video.towns_sprite_reg[1] & 0x80) && (m_video.towns_sprite_page == 1))
 //      off = 0x20000;
@@ -1223,13 +1219,13 @@ void towns_state::towns_crtc_draw_scan_layer_16(bitmap_rgb32 &bitmap,const recta
 		else
 			off &= 0x7ffff;  // 1 layer
 		colour = m_towns_gfxvram[off+(layer*0x40000)] >> 4;
-		if(colour != 0)
+		if(colour != 0 || bottom_layer)
 		{
 			for (pixel = 0; pixel < hzoom; pixel++)
 				bitmap.pix32(scanline, x+hzoom+pixel) = pal->pen(colour);
 		}
 		colour = m_towns_gfxvram[off+(layer*0x40000)] & 0x0f;
-		if(colour != 0)
+		if(colour != 0 || bottom_layer)
 		{
 			for (pixel = 0; pixel < hzoom; pixel++)
 				bitmap.pix32(scanline, x+pixel) = pal->pen(colour);
