@@ -531,7 +531,7 @@ TIMER_CALLBACK_MEMBER(gba_state::handle_irq)
 	m_irq_timer->adjust(attotime::never);
 }
 
-static const char *reg_names[] = {
+static const char *const reg_names[] = {
 	/* Sound Registers */
 	"SOUND1CNT_L", "SOUND1CNT_H", "SOUND1CNT_X", "Unused",
 	"SOUND2CNT_L", "Unused",      "SOUND2CNT_H", "Unused",
