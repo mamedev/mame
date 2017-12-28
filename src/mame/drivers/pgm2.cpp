@@ -629,6 +629,11 @@ static MACHINE_CONFIG_DERIVED( pgm2_lores, pgm2 )
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 240-1)
 MACHINE_CONFIG_END
 
+static MACHINE_CONFIG_DERIVED( pgm2_hires, pgm2 )
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 240-1)
+MACHINE_CONFIG_END
+
 static MACHINE_CONFIG_DERIVED( pgm2_ramrom, pgm2 )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(pgm2_ram_rom_map)
@@ -859,14 +864,20 @@ ROM_END
 	ROM_LOAD32_WORD( "kov3_spb0.u10",    0x00000002, 0x4000000, CRC(90396065) SHA1(01bf9f69d77a792d5b39afbba70fbfa098e194f1) ) \
 	\
 	ROM_REGION( 0x4000000, "ymz774", ROMREGION_ERASEFF ) /* ymz774 */ \
-	ROM_LOAD16_WORD_SWAP( "kov3_wave0.u13",              0x00000000, 0x4000000, CRC(aa639152) SHA1(2314c6bd05524525a31a2a4668a36a938b924ba4) )
+	ROM_LOAD16_WORD_SWAP( "kov3_wave0.u13",              0x00000000, 0x4000000, CRC(aa639152) SHA1(2314c6bd05524525a31a2a4668a36a938b924ba4) ) \
+	\
+	ROM_REGION( 0x10000, "sram", 0 ) \
+	ROM_LOAD( "kov3_sram",            0x00000000, 0x10000, CRC(d9608102) SHA1(dec5631642393f4ec76912c81fd60249bb45aa13) )
+
+#define KOV3_INTERNAL_CHINA \
+	ROM_REGION( 0x04000, "maincpu", 0 ) \
+	ROM_LOAD( "kov3_igs036_china.rom", 0x00000000, 0x0004000, CRC(c7d33764) SHA1(5cd48f876e637d60391d39ac6e40bf243300cc75) ) \
+	ROM_REGION( 0x108, "default_card", 0 ) \
+	ROM_LOAD( "blank_kov3_china_card.pg2", 0x000, 0x108, CRC(bd5a968f) SHA1(b9045eb70e02afda7810431c592208053d863980) )
+
 
 ROM_START( kov3 )
-	ROM_REGION( 0x04000, "maincpu", 0 )
-	ROM_LOAD( "kov3_igs036_china.rom", 0x00000000, 0x0004000, CRC(c7d33764) SHA1(5cd48f876e637d60391d39ac6e40bf243300cc75) )
-
-	ROM_REGION( 0x108, "default_card", 0 )
-	ROM_LOAD( "blank_kov3_china_card.pg2", 0x000, 0x108, CRC(bd5a968f) SHA1(b9045eb70e02afda7810431c592208053d863980) )
+	KOV3_INTERNAL_CHINA
 
 	ROM_REGION( 0x1000000, "user1", 0 )
 	ROM_LOAD( "kov3_v104cn_raw.bin",         0x00000000, 0x0800000, CRC(1b5cbd24) SHA1(6471d4842a08f404420dea2bd1c8b88798c80fd5) )
@@ -875,8 +886,7 @@ ROM_START( kov3 )
 ROM_END
 
 ROM_START( kov3_102 )
-	ROM_REGION( 0x04000, "maincpu", 0 )
-	ROM_LOAD( "kov3_igs036.rom",         0x00000000, 0x0004000, NO_DUMP )
+	KOV3_INTERNAL_CHINA
 
 	ROM_REGION( 0x1000000, "user1", 0 )
 	ROM_LOAD( "kov3_v102cn_raw.bin",         0x00000000, 0x0800000, CRC(61d0dabd) SHA1(959b22ef4e342ca39c2386549ac7274f9d580ab8) )
@@ -885,8 +895,7 @@ ROM_START( kov3_102 )
 ROM_END
 
 ROM_START( kov3_100 )
-	ROM_REGION( 0x04000, "maincpu", 0 )
-	ROM_LOAD( "kov3_igs036.rom",         0x00000000, 0x0004000, NO_DUMP )
+	KOV3_INTERNAL_CHINA
 
 	ROM_REGION( 0x1000000, "user1", 0 )
 	ROM_LOAD( "kov3_v100cn_raw.bin",         0x00000000, 0x0800000, CRC(93bca924) SHA1(ecaf2c4676eb3d9f5e4fdbd9388be41e51afa0e4) )
@@ -1060,6 +1069,28 @@ READ32_MEMBER(pgm2_state::kof98umh_speedup_r)
 	return m_mainram[0x00060 / 4];
 }
 
+READ32_MEMBER(pgm2_state::kov3_speedup_r)
+{
+	int pc = space.device().safe_pc();
+
+	if ((pc == 0x1000729a) || (pc == 0x1000729e))
+	{
+		if ((m_mainram[0x000b4 / 4] == 0x00) && (m_mainram[0x000b8 / 4] == 0x00))
+			space.device().execute().spin_until_interrupt();
+	}
+	/*
+	else
+	{
+	    printf("pc is %08x\n", pc);
+	}
+	*/
+
+	return m_mainram[0x000b4 / 4];
+}
+
+
+
+
 READ32_MEMBER(pgm2_state::ddpdojh_speedup_r)
 {
 	int pc = space.device().safe_pc();
@@ -1143,6 +1174,8 @@ DRIVER_INIT_MEMBER(pgm2_state,kov3)
 	// patch FPGA check
 	uint32_t* rom = (uint32_t*)memregion("maincpu")->base();
 	rom[0x2a8c / 4] = 0xe320f000; // not endian safe ?
+
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0x200000b4, 0x200000b7, read32_delegate(FUNC(pgm2_state::kov3_speedup_r),this));
 }
 
 void pgm2_state::decrypt_kov3_module(uint32_t addrxor, uint16_t dataxor)
@@ -1206,9 +1239,9 @@ GAME( 2008, kov2nl_300,   kov2nl,    pgm2,    pgm2, pgm2_state,     kov2nl,     
 GAME( 2010, ddpdojh,      0,    pgm2_ramrom,    pgm2, pgm2_state,     ddpdojh,    ROT270, "IGS", "Dodonpachi Daioujou Tamashii (V201, China)", 0 )
 
 // Knights of Valour 3 - should be a V103 and V101 too
-GAME( 2011, kov3,         0,    pgm2,    pgm2, pgm2_state,     kov3_104,   ROT0, "IGS", "Knights of Valour 3 (V104, China)", MACHINE_NOT_WORKING )
-GAME( 2011, kov3_102,     kov3, pgm2,    pgm2, pgm2_state,     kov3_102,   ROT0, "IGS", "Knights of Valour 3 (V102, China)", MACHINE_NOT_WORKING )
-GAME( 2011, kov3_100,     kov3, pgm2,    pgm2, pgm2_state,     kov3_100,   ROT0, "IGS", "Knights of Valour 3 (V100, China)", MACHINE_NOT_WORKING )
+GAME( 2011, kov3,         0,    pgm2_hires, pgm2, pgm2_state,     kov3_104,   ROT0, "IGS", "Knights of Valour 3 (V104, China, Hong Kong, Taiwan)", MACHINE_NOT_WORKING )
+GAME( 2011, kov3_102,     kov3, pgm2_hires, pgm2, pgm2_state,     kov3_102,   ROT0, "IGS", "Knights of Valour 3 (V102, China, Hong Kong, Taiwan)", MACHINE_NOT_WORKING )
+GAME( 2011, kov3_100,     kov3, pgm2_hires, pgm2, pgm2_state,     kov3_100,   ROT0, "IGS", "Knights of Valour 3 (V100, China, Hong Kong, Taiwan)", MACHINE_NOT_WORKING )
 
 // King of Fighters '98: Ultimate Match Hero
 GAME( 2009, kof98umh,     0,    pgm2_lores, pgm2, pgm2_state,  kof98umh,   ROT0, "IGS / SNK Playmore / New Channel", "The King of Fighters '98: Ultimate Match HERO (China, V100, 09-08-23)", 0 )

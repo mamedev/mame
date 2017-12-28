@@ -64,6 +64,7 @@ public:
 	DECLARE_READ32_MEMBER(kof98umh_speedup_r);
 	DECLARE_READ32_MEMBER(ddpdojh_speedup_r);
 	DECLARE_READ32_MEMBER(ddpdojh_speedup2_r);
+	DECLARE_READ32_MEMBER(kov3_speedup_r);
 
 	DECLARE_READ8_MEMBER(encryption_r);
 	DECLARE_WRITE8_MEMBER(encryption_w);
