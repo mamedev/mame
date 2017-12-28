@@ -200,7 +200,7 @@ public:
 	taitol_1cpu_state(const machine_config &mconfig, device_type type, const char *tag)
 		: taitol_state(mconfig, type, tag)
 		, m_ymsnd(*this, "ymsnd")
-		, m_mux(*this, {"dswmuxl", "dswmuxh", "inmuxl", "inmuxh"})
+		, m_mux(*this, {"dswmux", "inmux"})
 	{
 	}
 
@@ -218,7 +218,7 @@ protected:
 	virtual void taito_machine_reset() override;
 
 	required_device<ym2203_device>  m_ymsnd;
-	optional_device_array<ls157_device, 4> m_mux;
+	optional_device_array<ls157_x2_device, 2> m_mux;
 };
 
 

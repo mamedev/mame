@@ -252,51 +252,6 @@ COMP( 1989, tv965, 0, 0, terminals, terminals, terminals_state, 0, "TeleVideo", 
 
 /**************************************************************************************************************
 
-Visual 100. (VT-100 clone)
-Chips: D780C-1 (Z80), CRT5037, D8255AC-5, uPB8214C, COM8116T-020, D8251AC, ER1400, 8-sw dip
-Crystal: 47.736
-
-***************************************************************************************************************/
-
-ROM_START( v100 )
-	ROM_REGION(0x10000, "maincpu", 0)
-	ROM_LOAD( "262-047.u108",  0x0000, 0x1000, CRC(e82f708c) SHA1(20ed83a41fd0703d72a20e170af971181cfbd575) )
-	ROM_LOAD( "262-048.u110",  0x1000, 0x1000, CRC(830923d3) SHA1(108590234ff84b5856cc2784d738a2a625305953) )
-
-	ROM_REGION(0x0800, "chargen", 0)
-	ROM_LOAD( "241-001.u29",   0x0000, 0x0800, CRC(ef807141) SHA1(cbf3fed001811c5840b9a131d2d3133843cb3b6a) )
-ROM_END
-
-COMP( 1982, v100, 0, 0, terminals, terminals, terminals_state, 0, "Visual Technology", "Visual 100", MACHINE_IS_SKELETON )
-
-
-
-/**************************************************************************************************************
-
-Visual 102. (VT-102 clone plus graphics)
-Chips: D780C-1 (Z80), CRT9021B-018, COM8251A, D8255AC-5, 2x CRT9006-135, CRT9007, M5L8253P-5, X2804AP-35, D7201C
-Crystals: 18.575000
-Keyboard: TMP8039P-6
-
-***************************************************************************************************************/
-
-ROM_START( v102 )
-	ROM_REGION(0x10000, "maincpu", 0)
-	ROM_LOAD( "245-001.u1",  0x0000, 0x4000, CRC(c36cc525) SHA1(a45e75ded10979c8e3ad262e2cf5818e08db762c) )
-
-	ROM_REGION(0x1000, "chargen", 0)
-	ROM_LOAD( "260-001.u50", 0x0000, 0x1000, CRC(732f5b99) SHA1(d105bf9f3ed41109d7181bcf0223bb280afe3f0a) )
-
-	ROM_REGION(0x10000, "keyboard", 0)
-	ROM_LOAD( "150.kbd",     0x0000, 0x0800, CRC(afe55cff) SHA1(b26ebdde63ec0e94c08780285def39a282e128b3) )
-ROM_END
-
-COMP( 1984, v102, 0, 0, terminals, terminals, terminals_state, 0, "Visual Technology", "Visual 102", MACHINE_IS_SKELETON )
-
-
-
-/**************************************************************************************************************
-
 DEC VT420.
 Chips: SCN8031HFCN40, SCN2681TC1N40, M5M4464AP, HM62256LFP-10T, TC23SC070AT, TC531001CP-1815
 Crystals: 43.320

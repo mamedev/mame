@@ -4724,7 +4724,7 @@ GAME( 1987, aburner,  aburner2, sega_aburner2,       aburner,  segaxbd_new_state
 GAME( 1987, thndrbld, 0,        sega_xboard_fd1094,  thndrbld, segaxbd_new_state, 0,        ROT0,   "Sega", "Thunder Blade (upright) (FD1094 317-0056)", 0 )
 GAME( 1987, thndrbld1,thndrbld, sega_xboard,         thndrbd1, segaxbd_new_state, 0,        ROT0,   "Sega", "Thunder Blade (deluxe/standing) (unprotected)", 0 )
 
-GAME( 1989, lastsurv, 0,        sega_lastsurv_fd1094,lastsurv, driver_device,     0,        ROT0,   "Sega", "Last Survivor (Japan) (FD1094 317-0083)", 0 )
+GAME( 1989, lastsurv, 0,        sega_lastsurv_fd1094,lastsurv, segaxbd_new_state, 0,        ROT0,   "Sega", "Last Survivor (Japan) (FD1094 317-0083)", 0 )
 
 GAME( 1989, loffire,  0,        sega_xboard_fd1094,  loffire,  segaxbd_new_state, loffire,  ROT0,   "Sega", "Line of Fire / Bakudan Yarou (World) (FD1094 317-0136)", 0 )
 GAME( 1989, loffireu, loffire,  sega_xboard_fd1094,  loffire,  segaxbd_new_state, loffire,  ROT0,   "Sega", "Line of Fire / Bakudan Yarou (US) (FD1094 317-0135)", 0 )
