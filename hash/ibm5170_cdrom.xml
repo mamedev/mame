@@ -518,12 +518,12 @@
 		
 		<part name="cdrom1" interface="cdrom">
 			<diskarea name="cdrom">
-				<disk name="redalert_1" sha1="30e980766b5de27296c4f49cd41a7baec50736c4" />
+				<disk name="Command &amp; Conquer - Red Alert (1996)(Virgin)(Disc 1 of 2)[!]" sha1="30e980766b5de27296c4f49cd41a7baec50736c4" />
 			</diskarea>
 		</part>
 		<part name="cdrom2" interface="cdrom">
 			<diskarea name="cdrom">
-				<disk name="redalert_2" sha1="1e51fd94731a631903603207bae5d4313757fb92" />
+				<disk name="Command &amp; Conquer - Red Alert (1996)(Virgin)(Disc 2 of 2)" sha1="1e51fd94731a631903603207bae5d4313757fb92" />
 			</diskarea>
 		</part>
 	</software>
