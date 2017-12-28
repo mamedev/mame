@@ -94,8 +94,8 @@ static const help_item static_help_list[] =
 		"  trackmem [<bool>,<bool>] -- record which PC writes to each memory address [boolean to turn on and off, clear]\n"
 		"  pcatmemp <address>[,<cpu>] -- query which PC wrote to a given program memory address for the current CPU\n"
 		"  pcatmemd <address>[,<cpu>] -- query which PC wrote to a given data memory address for the current CPU\n"
-		"  pcatmemi <address>[,<cpu>] -- query which PC wrote to a given I/O memory address for the current CPU\n"
-		"                                (Note: you can also query this info by right clicking in a memory window\n"
+		"  pcatmemi <address>[,<cpu>] -- query which PC wrote to a given I/O memory address for the current CPU "
+		"(Note: you can also query this info by right clicking in a memory window)\n"
 		"  rewind[rw] -- go back in time by loading the most recent rewind state\n"
 		"  statesave[ss] <filename> -- save a state file for the current driver\n"
 		"  stateload[sl] <filename> -- load a state file for the current driver\n"
@@ -1398,34 +1398,45 @@ static const help_item static_help_list[] =
 		"  cheatnext <condition>[,<comparisonvalue>]\n"
 		"\n"
 		"The cheatnext command will make comparisons with the last search matches.\n"
-		"Possible <condition>:\n"
+		"\n"
+		"Possible <condition>s:\n"
+		"\n"
 		"  all\n"
 		"No <comparisonvalue> needed.\n"
 		"Use to update the last value without changing the current matches.\n"
+		"\n"
 		"  equal [eq]\n"
 		"Without <comparisonvalue> search for all bytes that are equal to the last search.\n"
 		"With <comparisonvalue> search for all bytes that are equal to the <comparisonvalue>.\n"
+		"\n"
 		"  notequal [ne]\n"
 		"Without <comparisonvalue> search for all bytes that are not equal to the last search.\n"
 		"With <comparisonvalue> search for all bytes that are not equal to the <comparisonvalue>.\n"
+		"\n"
 		"  decrease [de, +]\n"
 		"Without <comparisonvalue> search for all bytes that have decreased since the last search.\n"
 		"With <comparisonvalue> search for all bytes that have decreased by the <comparisonvalue> since the last search.\n"
+		"\n"
 		"  increase [in, -]\n"
 		"Without <comparisonvalue> search for all bytes that have increased since the last search.\n"
 		"With <comparisonvalue> search for all bytes that have increased by the <comparisonvalue> since the last search.\n"
+		"\n"
 		"  decreaseorequal [deeq]\n"
 		"No <comparisonvalue> needed.\n"
 		"Search for all bytes that have decreased or have same value since the last search.\n"
+		"\n"
 		"  increaseorequal [ineq]\n"
 		"No <comparisonvalue> needed.\n"
 		"Search for all bytes that have decreased or have same value since the last search.\n"
+		"\n"
 		"  smallerof [lt]\n"
 		"Without <comparisonvalue> this condition is invalid\n"
 		"With <comparisonvalue> search for all bytes that are smaller than the <comparisonvalue>.\n"
+		"\n"
 		"  greaterof [gt]\n"
 		"Without <comparisonvalue> this condition is invalid\n"
 		"With <comparisonvalue> search for all bytes that are larger than the <comparisonvalue>.\n"
+		"\n"
 		"  changedby [ch, ~]\n"
 		"Without <comparisonvalue> this condition is invalid\n"
 		"With <comparisonvalue> search for all bytes that have changed by the <comparisonvalue> since the last search.\n"
@@ -1444,34 +1455,45 @@ static const help_item static_help_list[] =
 		"  cheatnextf <condition>[,<comparisonvalue>]\n"
 		"\n"
 		"The cheatnextf command will make comparisons with the initial search.\n"
-		"Possible <condition>:\n"
+		"\n"
+		"Possible <condition>s:\n"
+		"\n"
 		"  all\n"
 		"No <comparisonvalue> needed.\n"
 		"Use to update the last value without changing the current matches.\n"
+		"\n"
 		"  equal [eq]\n"
 		"Without <comparisonvalue> search for all bytes that are equal to the initial search.\n"
 		"With <comparisonvalue> search for all bytes that are equal to the <comparisonvalue>.\n"
+		"\n"
 		"  notequal [ne]\n"
 		"Without <comparisonvalue> search for all bytes that are not equal to the initial search.\n"
 		"With <comparisonvalue> search for all bytes that are not equal to the <comparisonvalue>.\n"
+		"\n"
 		"  decrease [de, +]\n"
 		"Without <comparisonvalue> search for all bytes that have decreased since the initial search.\n"
 		"With <comparisonvalue> search for all bytes that have decreased by the <comparisonvalue> since the initial search.\n"
+		"\n"
 		"  increase [in, -]\n"
 		"Without <comparisonvalue> search for all bytes that have increased since the initial search.\n"
 		"With <comparisonvalue> search for all bytes that have increased by the <comparisonvalue> since the initial search.\n"
+		"\n"
 		"  decreaseorequal [deeq]\n"
 		"No <comparisonvalue> needed.\n"
 		"Search for all bytes that have decreased or have same value since the initial search.\n"
+		"\n"
 		"  increaseorequal [ineq]\n"
 		"No <comparisonvalue> needed.\n"
 		"Search for all bytes that have decreased or have same value since the initial search.\n"
+		"\n"
 		"  smallerof [lt]\n"
 		"Without <comparisonvalue> this condition is invalid.\n"
 		"With <comparisonvalue> search for all bytes that are smaller than the <comparisonvalue>.\n"
+		"\n"
 		"  greaterof [gt]\n"
 		"Without <comparisonvalue> this condition is invalid.\n"
 		"With <comparisonvalue> search for all bytes that are larger than the <comparisonvalue>.\n"
+		"\n"
 		"  changedby [ch, ~]\n"
 		"Without <comparisonvalue> this condition is invalid\n"
 		"With <comparisonvalue> search for all bytes that have changed by the <comparisonvalue> since the initial search.\n"
@@ -1496,6 +1518,7 @@ static const help_item static_help_list[] =
 		"\n"
 		"  cheatlist\n"
 		"Show the current matches in the debug console.\n"
+		"\n"
 		"  cheatlist cheat.txt\n"
 		"Save the current matches to cheat.txt.\n"
 	},
@@ -1603,69 +1626,53 @@ bool debug_format_chapter_html(std::ofstream &file, s32 index)
 	std::string &&chapter = static_help_list[index].help;
 	const std::string &&tag = static_help_list[index].tag;
 	const size_t length = chapter.length();
-	bool preopened = false;
+	bool code = false;
 
 	/* substitute what html can't ignore */
 	strreplace(chapter, "<", "&lt;");
 
 	/* first chapter doesn't need to link to the top */
 	if (index > 0)
-	{
 		util::stream_format(file,
+			"\n<br>\n"
 			"<a href=\"#Top\">Up</a>\n"
 			"<a name=\"%s\">"
 			"<h3>%s</h3>"
 			"</a>\n",
 			tag, tag);
 
-		if (!file)
-			return false;
-	}
-
 	for (size_t pos = 0, oldpos = 0; ; pos++)
 	{
-		/* handle this so we could close the tag */
 		if (pos >= length)
-		{
-			/* close the tag if we need */
-			if (preopened)
-				file << "</pre><br>\n";
-
 			return true;
-		}
 
-		/* update the backup */
+		/* consume the new line */
 		oldpos = pos;
-
-		/* search for line end */
-		pos = chapter.find('\n', pos);
-		
-		/* increment pos and consume the next line */
+		pos = chapter.find("\n", pos);
 		std::string out = chapter.substr(oldpos, pos - oldpos);
+		std::string remainder = "";
+		code = out[0] == ' ';
 
-		/* look for code */
-		if (out[0] == ' ')
+		/* don't include inline explanations into <code> */
+		if (code)
 		{
-			// nest this condition to avoid erroneous tag close
-			if (!preopened)
+			std::string delimiter = tag == "expressions" ? " : " : " -- ";
+			size_t subpos = out.find(delimiter);
+
+			if (subpos != std::string::npos)
 			{
-				/* open the preformatted tag */
-				file << "<pre>\n";
-				preopened = true;
+				remainder = out.substr(subpos);
+				out = out.substr(0, subpos);
 			}
 		}
-		else if (preopened)
-		{
-			/* close the tag */
-			file << "</pre>\n";
-			preopened = false;
-		}
-
-		if (!file)
-			return false;
 
 		/* print the substring */
-		file << out + ((preopened || out == "") ? "\n" : "<br>\n");
+		file << (code ? "&emsp;<font face=\"courier new\" color=#000080 size=2>" : "")
+			+ out
+			+ (code ? "</font>" : "")
+			+ remainder
+			+ (oldpos > 0 ? "<br>" : "")
+			+ "\n";
 
 		if (!file)
 			return false;
@@ -1684,15 +1691,10 @@ bool debug_generate_html(const std::string &filename)
 
 	/* print html header */
 	file << "<!DOCTYPE html>\n"
-		"<html>\n"
-		"<head>\n"
+		"<html>\n<head>\n"
 		"<title>MAME Debugger Help</title>\n"
-		"</head>\n"
-		"<body>\n"
+		"</head>\n<body>\n"
 		"<a name=\"Top\"></a>";
-
-	if (!file)
-		return false;
 
 	/* print the first chapter */
 	if (!debug_format_chapter_html(file, 0))
@@ -1707,21 +1709,11 @@ bool debug_generate_html(const std::string &filename)
 	/* print the links to all chapters */
 	for (auto &tag : tags)
 	{
-		util::stream_format(file,
-			"<a href=\"#%s\">"
-			"%s"
-			"</a><br>\n",
-			tag, tag);
-
-		if (!file)
-			return false;
+		util::stream_format(file, "<br>\n<a href=\"#%s\">%s</a>", tag, tag);
 	}
 	
 	/* empty line */
 	file << "<br>";
-
-	if (!file)
-		return false;
 
 	/* print chapters */
 	for (int i = 1; i < ARRAY_LENGTH(static_help_list); i++)
@@ -1729,8 +1721,7 @@ bool debug_generate_html(const std::string &filename)
 			return false;
 
 	/* close the tags */
-	file << "</body>\n"
-		"</html>";
+	file << "</body>\n</html>";
 
 	if (!file)
 		return false;
