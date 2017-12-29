@@ -29,7 +29,7 @@
 // internal artwork
 #include "gnw_dualv.lh"
 #include "gnw_dualh.lh"
-#include "hh_sm510_test.lh" // common test-layout - use external artwork
+//#include "hh_sm510_test.lh" // common test-layout - use external artwork
 //#include "hh_sm500_test.lh" // "
 
 
@@ -3575,8 +3575,13 @@ static MACHINE_CONFIG_START( nummunch )
 	MCFG_SM510_WRITE_R_CB(WRITE8(hh_sm510_state, piezo_r1_w))
 
 	/* video hardware */
+	MCFG_SCREEN_SVG_ADD("screen", "svg")
+	MCFG_SCREEN_REFRESH_RATE(50)
+	MCFG_SCREEN_SIZE(1920, 875)
+	MCFG_SCREEN_VISIBLE_AREA(0, 1920-1, 0, 875-1)
+
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_sm510_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_hh_sm510_test)
+	MCFG_DEFAULT_LAYOUT(layout_svg)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -4019,6 +4024,9 @@ ROM_START( nummunch )
 
 	ROM_REGION( 0x100, "maincpu:melody", 0 )
 	ROM_LOAD( "nummunch.melody", 0x000, 0x100, NO_DUMP )
+
+	ROM_REGION( 140664, "svg", 0)
+	ROM_LOAD( "nummunch.svg", 0, 140664, CRC(879df7e2) SHA1(78d8500a445cbbea0090d4e97b781c1e4ed11dd3) )
 ROM_END
 
 
