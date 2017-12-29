@@ -6,6 +6,223 @@
 	<!--                  Games                  -->
 	<!--                                         -->
 
+	<!-- Windows 3.1 / 95 -->
+	<software name="3dupin">
+		<description>3-D Ultra Pinball (Budget Sierra Originals Version)</description>
+		<year>1995</year>
+		<publisher>Sierra</publisher>
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="3-d ultra pinball (1995)(sierra)[budget sierra originals]" sha1="e80e3ec21233bea55b6a07a814b5b193982afda8" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- DOS (with Adobe Acrobat 2.1 for Windows) -->
+	<!-- disc label: pack34 -->
+	<!-- Super Tetris has manual copy protection -->
+	<!-- Other games (shareware): Green, Aldo II Adventure, Phylox, Draw Poker, Space Miner -->
+	<software name="5p1stet">
+		<description>5 Plus One - Super Tetris (Compilation)</description>
+		<year>1996</year>
+		<publisher>Prism Leisure Corporation PLC</publisher>
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="5 plus one - super tetris (1996)(prism leisure)[compilation]" sha1="a39d6ee739ad1aa2056f690770c4f3137aa762ea" />
+			</diskarea>
+		</part>
+	</software>
+	
+	<!-- Windows 95, Direct X 3.0 -->
+	<!-- disc label: 688i_hk -->
+	<!-- Requires High Color -->
+	<software name="688ihuki" supported="no">
+		<description>688I Hunter-Killer</description>
+		<year>1997</year>
+		<publisher>Electronic Arts</publisher>
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="688i hunter-killer (1997)(electronic arts)" sha1="51352c95bcb4a9fbc74291b03c65591b3e7dd5bd" />
+			</diskarea>
+		</part>
+	</software>
+	
+	<!-- Windows 95 -->
+	<!-- 486 class with 8MB RAM and 256 colors -->
+	<!-- has some game demos on disc -->
+	<!-- TODO: Unreadable install strings -->
+	<!-- TODO: black screen/hangs when launching a demo play in 640x480 resolution (ibm8514_cmd_w with invalid BitBLT params) -->
+	<software name="a10cuba" supported="partial">
+		<description>A-10 Cuba!</description>
+		<year>1996</year>
+		<publisher>Activision / Parsoft Interactive</publisher>
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="a-10 cuba! (1996)(activision)" sha1="a9bc7e3b7306c46acf33b93ae168862d18734245" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="a10cubam" cloneof="a10cuba" supported="partial">
+		<description>A-10 Cuba! (Megamedia Megaten Pack)</description>
+		<year>1997</year>
+		<publisher>Megamedia / Parsoft Interactive</publisher>
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="a-10 cuba! (1997)(megamedia)[compilation megapak 7]" sha1="5fc89dde64013ab6d070572ac2b9a8829bbde084" />
+			</diskarea>
+		</part>
+	</software>	
+	
+	<software name="aceventd">
+		<description>Ace Ventura (Germany)</description>
+		<year>1996</year>
+		<publisher>Bomico</publisher>
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="ace ventura (1996)(bomico)(de)" sha1="e07d870a94ae435e80a03b6fa1677bb820cb8a9a" />
+			</diskarea>
+		</part>
+	</software>
+	
+	<!-- Direct X 3.0 -->
+	<software name="acmidway2">
+		<description>Arcade's Greatest Hits - The Midway Collection 2</description>
+		<year>1997</year>
+		<publisher>GT Interactive</publisher>
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="arcade's greatest hits - the midway collection 2 (1997)(gt interactive)" sha1="ff8fe48c76edd0fc5dc1321ea85e9d367b5e6400" />
+			</diskarea>
+		</part>
+	</software>
+	
+	<!-- Windows 3.1 -->
+	<!-- According to the readme, running this on Windows 95 causes issues -->
+	<!-- disc label: Actionpack5 -->
+	<!-- Multi-5 language support: English, French, German, Italian, Spanish -->
+	<software name="actatari">
+		<description>Activision's Atari 2600 Action Pack (Megapak 8) (Europe)</description>
+		<year>1997</year>
+		<publisher>Megamedia</publisher>
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="activision's atari 2600 action pack (1997)(megamedia)(m5)[compilation megapak 8]" sha1="279c4f6bc3de53083e30cfc9e0ce16b9d5815a6b" />
+			</diskarea>
+		</part>
+	</software>
+	
+	<!-- English -->
+	<!-- disc label: Actionpack2 -->
+	<software name="actatari2">
+		<description>Activision's Atari 2600 Action Pack 2</description>
+		<year>1995</year>
+		<publisher>Activision</publisher>
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="activision's atari 2600 action pack 2 (1995)(activision)[compilation]" sha1="03ef65a0db996d8dc092037b94af930c8a638b13" />
+			</diskarea>
+		</part>
+	</software>
+	
+	<!-- disc label: Vault3 -->
+	<!-- TODO: unreadable install strings -->
+	<!-- contains atari1 / atari2 / atari3 and Commodore 64 15 Pack -->
+	<software name="actgvv3" supported="partial">
+		<description>Activision Game Vault Volume 3</description>
+		<year>1997</year>
+		<publisher>Activision</publisher>
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="activision game vault volume 3 (1997)(activision)[compilation]" sha1="93c4d5d7ab0f2da31b122eb5dedeccdc53b03266" />
+			</diskarea>
+		</part>
+	</software>
+	
+	<!-- DOS (crashes in Windows 95) -->
+	<!-- Disc label: ads -->
+	<!-- TODO: bad color pen (DOS cyan color issue) -->
+	<software name="advdesim">
+		<description>Advanced Destroyer Simulator</description>
+		<year>1996</year>
+		<publisher>Action Sixteen / Futura</publisher>
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="advanced destroyer simulator (1996)(action sixteen)" sha1="15d429c53ded4840a6d0365b3ba141558fcdc34f" />
+			</diskarea>
+		</part>
+	</software>	
+
+	<!-- DOS / Windows 3.1 -->
+	<!-- TODO: cannot setup emm386.exe for this in any way or form, might be a bug? -->
+	<software name="aeurope" supported="no">
+		<description>Aces over Europe</description>
+		<year>1995</year>
+		<publisher>Sierra</publisher>
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="aces over europe (1995)(sierra)[budget sierra originals]" sha1="09ed6d42a2d61b636aae54f69b6680d96165a5af" />
+			</diskarea>
+		</part>
+	</software>
+	
+	<!-- DOS -->
+	<software name="aftlifeu">
+		<description>Afterlife (US v1.1)</description>
+		<year>1996</year>
+		<publisher>LucasArts</publisher>
+		<info name="version" value="1.1" />
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="afterlife (1996)(lucasarts)(us)[compilation lucas arts archives vol. iii]" sha1="1a606741a00f0a3008d59da978ab0bab0d8aec1e" />
+			</diskarea>
+		</part>
+	</software>
+	
+	<!-- Windows 95, Direct X 5.0 -->
+	<!-- Pentium class 90 MHz -->
+	<!-- S3 "software video" is really slow -->
+	<!-- Disc label: Air War 3 -->
+	<software name="airwar3" supported="partial">
+		<description>Air Warrior III</description>
+		<year>1997</year>
+		<publisher>Interactive Magic / Kesmai Corporation</publisher>
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="air warrior iii (1997)(interactive magic)" sha1="8cf74e4da52b66cbd3b0ba4a0f3807680f9b73aa" />
+			</diskarea>
+		</part>
+	</software>
+	
+	<!-- DOS / Mac -->
+	<!-- Has two Windows utilities, BREAK (cockpit art editor) and VFILM (shareware film editor) --> 
+	<!-- Disc label: awplus -->
+	<software name="airwarpl">
+		<description>Air Warrior Plus (v1.16b)</description>
+		<year>1995</year>
+		<publisher>Kesmai Corporation</publisher>
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="air warrior plus v1.16b (1995)(on-line)[pc-mac]" sha1="8e4e21b7ac87016874e13d1c9fa02969757cf4ad" />
+			</diskarea>
+		</part>
+	</software>
+	
 	<!-- Windows 95 / 98 / ME / 2000 -->
 	<!-- Pentium II class 233 MHz -->
 	<software name="akimboj" supported="no">
@@ -19,6 +236,20 @@
 		</part>
 	</software>
 
+	<!-- DOS -->
+	<!-- TODO: weird fade in/out effects at every transition (inverted?) -->
+	<software name="aliencrn">
+		<description>Halloween Harry - Alien Carnage</description>
+		<year>1994</year>
+		<publisher>Multi Media International / Apogee / Interactive Binary Illusions / Sub Zer0</publisher>
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="alien carnage (1994)(multi media international)(nl)(en)" sha1="de45bd5492cb07bd1de9167bcf8b2f55e5f1780c" />
+			</diskarea>
+		</part>
+	</software>
+	
 	<software name="alieninc">
 		<!--
 		Alien Incident
@@ -46,11 +277,101 @@
 		</part>
 	</software>
 
-  <software name="arampage">
+	<software name="alienleg">
+		<description>Alien Legacy (v1.10)</description>
+		<year>1995</year>
+		<publisher>Sierra</publisher>
+		<info name="version" value="1.10" />
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="alien legacy (1995)(sierra)" sha1="e40dd8dd278e34e32edd7b1478f62195627773ae" />
+			</diskarea>
+		</part>
+	</software>
+	
+	<!-- language support: English, Dutch, German, French, Spanish, Italian -->
+	<!-- TODO: locks up on movies -->
+	<software name="alienody" supported="no">
+		<description>Alien Odyssey (Europe)</description>
+		<year>1995</year>
+		<publisher>Philips / Argonaut Software LTD</publisher>
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="alien odyssey (1995)(philips)" sha1="536635f92489b146f693aa724cd5938794b8190c" />
+			</diskarea>
+		</part>
+	</software>
+	
+	<!-- TODO: can't setup sb16 sound card properly, hangs at "TimerRegister Event" -->
+	<!-- TODO: disc swap doesn't work properly -->
+	<software name="alienscb" supported="partial">
+		<description>Aliens - A Comic Book Adventure (v1.01A)</description>
+		<year>1995</year>
+		<publisher>Mindscape</publisher>
+		<info name="version" value="1.01a" />
+		
+		<part name="cdrom1" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="aliens - a comic book adventure v1.01a (1995)(mindscape)(disc 1 of 2)" sha1="364bb9677c93db8a3f8b68328ddf360eac2aae88" />
+			</diskarea>
+		</part>
+		<part name="cdrom2" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="aliens - a comic book adventure v1.0 (1995)(mindscape)(disc 2 of 2)" sha1="13aba65247d17645fe9522f0eaf5a89b3cda5783" />
+			</diskarea>
+		</part>
+	</software>
+	
+	<!-- DOS -->
+	<!-- Requires 570KB of conventional memory -->
+	<software name="amazonge">
+		<description>Amazon - Guardians of Eden</description>
+		<year>1993</year>
+		<publisher>Access Software</publisher>
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="amazon - guardians of eden (1993)(access software)" sha1="ec783cbcd3fed9e6f0f0e32a4cd8c390e2fecf4d" />
+			</diskarea>
+		</part>
+	</software>
+	
+	<!-- DOS -->
+	<!-- TODO: black screen at game launch -->
+	<software name="animal" supported="no">
+		<description>Animal</description>
+		<year>1997</year>
+		<publisher>Microtime</publisher>
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="animal (1997)(microtime)" sha1="8f5c7791bf89e662a0dfc8f08858788c28c33895" />
+			</diskarea>
+		</part>
+	</software>
+	
+	<!-- DOS / Windows 3.1 -->
+	<!-- TODO: cannot setup emm386.exe for this in any way or form, might be a bug? -->
+	<software name="apacific" supported="no">
+		<description>Aces of the Pacific</description>
+		<year>1994</year>
+		<publisher>Sierra</publisher>
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="aces of the pacific (1994)(sierra)" sha1="42422f83009e0771968243cb0ea1172699bf8787" />
+			</diskarea>
+		</part>
+	</software>
+	
+	<software name="arampage">
 		<description>Alien Rampage (v1.13)</description>
 		<year>1996</year>
 		<publisher>Softdisk</publisher>
 		<info name="version" value="1.13" />
+
 		<part name="cdrom" interface="cdrom">
 			<feature name="disk_label" value="Alien Rampage" />
 			<diskarea name="cdrom">
@@ -65,14 +386,151 @@
 		<year>1996</year>
 		<publisher>ASCII / Yellow Horn</publisher>
 		<info name="alt_title" value="あらびあんKid" />
+
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="kid" sha1="a837c3f4cde66b244bccbae22cb1cec83df6698d" />
 			</diskarea>
 		</part>
 	</software>
-
 	
+	<!-- DOS -->
+	<!-- TODO: videos farts/doesn't complete playback, eventually dies with a out of conventional memory error -->
+	<software name="arcappled" supported="no">
+		<description>Archibald Applebrook's Abenteuer (Germany v1.00)</description>
+		<year>1995</year>
+		<publisher>Software 2000</publisher>
+		<info name="version" value="1.00" />
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="archibald applebrook's abenteuer (1995)(software 2000)(de)" sha1="37bdb42590fadfb0ad857bd4876ec4708d4569e0" />
+			</diskarea>
+		</part>
+	</software>
+	
+	<!-- DOS -->
+	<!-- TODO: black screen at game launch -->
+	<software name="archonul" supported="no">
+		<description>Archon Ultra (v1.1)</description>
+		<year>1996</year>
+		<publisher>Strategic Simulations</publisher>
+		<info name="version" value="1.1" />
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="archon ultra v1.1 (1996)(strategic simulations)" sha1="025039ccc5f048b5c6e30523d39b3b8afedd040c" />
+			</diskarea>
+		</part>
+	</software>
+	
+	<!-- DOS -->
+	<software name="armofist">
+		<description>Armored Fist</description>
+		<year>1994</year>
+		<publisher>Nova Logic</publisher>
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="armored fist (1994)(nova logic)" sha1="96211c6dc7a179f5e25af7f4527cf51afe1c3934" />
+			</diskarea>
+		</part>
+	</software>
+	
+	<!-- DOS -->
+	<software name="ascend">
+		<description>Ascendancy</description>
+		<year>1995</year>
+		<publisher>Virgin / The Logic Factory</publisher>
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="ascendancy (1995)(virgin)" sha1="611fa4261d2b9b454bad01011f7e10f2f55d3c11" />
+			</diskarea>
+		</part>
+	</software>
+	
+	<software name="ascendd" cloneof="ascend">
+		<description>Ascendancy (Germany)</description>
+		<year>1995</year>
+		<publisher>Softgold / The Logic Factory</publisher>
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="ascendancy (1995)(softgold)(de)" sha1="dd2f22050c372a0f8f91966bb31580c2a743dcb9" />
+			</diskarea>
+		</part>
+	</software>
+	
+	<!-- Windows 95 -->
+	<!-- TODO: Menus are in High color mode -->
+	<software name="atariac1">
+		<description>Atari Arcade Hits 1</description>
+		<year>1999</year>
+		<publisher>Hasbro Interactive</publisher>
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="atari arcade hits 1 (1999)(hasbro interactive)" sha1="89f9ef71790e880fd8c72bec268f424b5b04e189" />
+			</diskarea>
+		</part>
+	</software>
+	
+	<!-- DOS (won't run in Windows 95) -->
+	<!-- disc label: atf_1_03f-->
+	<software name="atf">
+		<description>A.T.F. - Advanced Tactical Fighters (v1.03f)</description>
+		<year>1996</year>
+		<publisher>Electronic Arts / Jane's Information Group Limited</publisher>
+		<info name="version" value="1.03f" />
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="a.t.f. - advanced tactical fighters (1996)(electronic arts)" sha1="f5352fa4715369d20509aad64f7a32dba057b782" />
+			</diskarea>
+		</part>
+	</software>
+	
+	<!-- disc label: gatf_1_01f-->
+	<software name="atfd" cloneof="atf">
+		<description>A.T.F. - Advanced Tactical Fighters (Germany v1.01f)</description>
+		<year>1996</year>
+		<publisher>Electronic Arts</publisher>
+		<info name="version" value="1.01f" />
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="a.t.f. - advanced tactical fighters (1996)(electronic arts)(de)" sha1="1363020d9e4f295191ad14c25cb1d01704f13712" />
+			</diskarea>
+		</part>
+	</software>
+	
+	<!-- Untested, presumably needs above -->
+	<software name="atfnatof" cloneof="atf">
+		<description>A.T.F. - NATO Fighters (Data Disc)</description>
+		<year>1996</year>
+		<publisher>Electronic Arts</publisher>
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="atf nato fighters (1996)(electronic arts)[data disc]" sha1="5f1e63d5b42f67a826576edcead7e52b6fc62044" />
+			</diskarea>
+		</part>
+	</software>
+	
+	<!-- DOS -->
+	<software name="aworld80">
+		<description>Around the World in 80 Days</description>
+		<year>1994</year>
+		<publisher>EA Kids</publisher>
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="around the world in 80 days (1994)(ea kids)" sha1="0441b9f94df42b3f5edeb3135ce9739af17fc8d5" />
+			</diskarea>
+		</part>
+	</software>
+
 	<!-- 
 	Register key:
 	BB2KLEJP-50008573
@@ -423,7 +881,7 @@
 			</diskarea>
 		</part>
 	</software>
-
+	
 	<!-- Windows 3.1 / Mac LCIII -->
 	<software name="orgaslave">
 		<description>Orgaslave (Japan)</description>
@@ -442,6 +900,18 @@
 		</part>
 	</software>
 
+	<software name="orpheocr">
+		<description>Are You Afraid of the Dark - The Tale of Orpheo's Curse</description>
+		<year>1994</year>
+		<publisher>Viacom New Media / Nickelodeon</publisher>
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="are you afraid of the dark - the tale of orpheo's curse (1994)(viacom new media)" sha1="487f7f1fc8a30507f1ec990bf7ccfc102657a123" />
+			</diskarea>
+		</part>
+	</software>
+	
 	<!-- Windows 3.1 -->
 	<software name="paulymou" supported="partial">
 		<description>Pauly Mouse (Japan)</description>
@@ -686,6 +1156,20 @@
 		</part>
 	</software>
 
+	<!-- Windows 3.1 -->
+	<!-- Disc label: Cyberplasm_ -->
+	<!-- TODO: gfx shift issue on 256 color mode -->
+	<software name="vcyondo" supported="partial">
+		<description>Awesome Adventures of Victor Vector &amp; Yondo, The - The Cyberplasm Formula</description>
+		<year>1994</year>
+		<publisher>Sanctuary Woods</publisher>
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="awesome adventures of victor vector &amp; yondo, the - the cyberplasm formula (1994)(sanctuary woods)" sha1="e359d345ec6657122b50f5904d5c4324c32a2658" />
+			</diskarea>
+		</part>
+	</software>
 
 	<!-- Windows 95/98/ME/XP and Mac OS supported -->
 	<!-- Requires 256 colors minimum otherwise they crashes at boot -->
@@ -748,7 +1232,7 @@
 			</diskarea>
 		</part>
 	</software>
-
+	
 	<!--                                         -->
 	<!-- Drivers / Utilities / Operating Systems -->
 	<!--                                         -->
@@ -827,7 +1311,7 @@
 	<software name="sb16">
 		<description>Sound Blaster 16 CD driver</description>
 		<year>1996</year>
-		<publisher>Creative labs</publisher>
+		<publisher>Creative Labs</publisher>
 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
