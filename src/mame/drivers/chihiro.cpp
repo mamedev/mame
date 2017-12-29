@@ -1787,6 +1787,38 @@ void chihiro_state::machine_start()
 	save_item(NAME(hack_counter));
 }
 
+class sega_network_board : public device_t
+{
+public:
+	sega_network_board(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	virtual const tiny_rom_entry *device_rom_region() const override;
+
+protected:
+	virtual void device_start() override;
+};
+
+DEFINE_DEVICE_TYPE(SEGA_NETWORK_BOARD, sega_network_board, "seganetw", "Sega Network Board")
+
+sega_network_board::sega_network_board(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, SEGA_NETWORK_BOARD, tag, owner, clock)
+{
+}
+
+void sega_network_board::device_start()
+{
+}
+
+ROM_START(seganetw)
+	ROM_REGION( 0x200000, "seganetw", 0)
+	ROM_LOAD16_WORD_SWAP( "ver1305.bin", 0x000000, 0x200000, CRC(a738ea1c) SHA1(45d94d0c39be1cb3db9fab6610a88a550adda4e9) )
+ROM_END
+
+const tiny_rom_entry *sega_network_board::device_rom_region() const
+{
+	return ROM_NAME(seganetw);
+}
+
 static SLOT_INTERFACE_START(ide_baseboard)
 	SLOT_INTERFACE("bb", IDE_BASEBOARD)
 SLOT_INTERFACE_END
@@ -1829,6 +1861,7 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED(chihirogd, chihiro_base)
 	MCFG_NAOMI_GDROM_BOARD_ADD("rom_board", ":gdrom", "^pic", nullptr, NOOP)
+	MCFG_DEVICE_ADD("network", SEGA_NETWORK_BOARD, 0)
 MACHINE_CONFIG_END
 
 #define ROM_LOAD16_WORD_SWAP_BIOS(bios,name,offset,length,hash) \
@@ -1846,8 +1879,7 @@ MACHINE_CONFIG_END
 	ROM_REGION( 0x204080, "others", 0) \
 	ROM_LOAD16_WORD_SWAP_BIOS( 0,  "ic10_g24lc64.bin", 0x0000, 0x2000,   CRC(cfc5e06f) SHA1(3ababd4334d8d57abb22dd98bd2d347df39648d9) ) \
 	ROM_LOAD16_WORD_SWAP_BIOS( 0,  "ic11_24lc024.bin", 0x2000, 0x80,     CRC(8dc8374e) SHA1(cc03a0650bfac4bf6cb66e414bbef121cba53efe) ) \
-	ROM_LOAD16_WORD_SWAP_BIOS( 0,  "pc20_g24lc64.bin", 0x2080, 0x2000,   CRC(7742ab62) SHA1(82dad6e2a75bab4a4840dc6939462f1fb9b95101) ) \
-	ROM_LOAD16_WORD_SWAP_BIOS( 0,  "ver1305.bin",      0x4080, 0x200000, CRC(a738ea1c) SHA1(45d94d0c39be1cb3db9fab6610a88a550adda4e9) )
+	ROM_LOAD16_WORD_SWAP_BIOS( 0,  "pc20_g24lc64.bin", 0x2080, 0x2000,   CRC(7742ab62) SHA1(82dad6e2a75bab4a4840dc6939462f1fb9b95101) )
 
 ROM_START( chihiro )
 	CHIHIRO_BIOS
