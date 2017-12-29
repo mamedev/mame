@@ -113,13 +113,13 @@ void towns_state::towns_crtc_refresh_mode()
 	m_video.towns_crtc_layerscr[0].min_x = m_video.towns_crtc_reg[9] - m_video.towns_crtc_reg[0];
 	m_video.towns_crtc_layerscr[0].min_y = (m_video.towns_crtc_reg[13] - m_video.towns_crtc_reg[6]) / 2;
 	m_video.towns_crtc_layerscr[0].max_x = m_video.towns_crtc_reg[10] - m_video.towns_crtc_reg[0];
-	m_video.towns_crtc_layerscr[0].max_y = (m_video.towns_crtc_reg[14] - m_video.towns_crtc_reg[6]) / 2;
+	m_video.towns_crtc_layerscr[0].max_y = ((m_video.towns_crtc_reg[14] - m_video.towns_crtc_reg[6]) / 2) - 1;
 
 	// layer 1
 	m_video.towns_crtc_layerscr[1].min_x = m_video.towns_crtc_reg[11] - m_video.towns_crtc_reg[0];
 	m_video.towns_crtc_layerscr[1].min_y = (m_video.towns_crtc_reg[15] - m_video.towns_crtc_reg[6]) / 2;
 	m_video.towns_crtc_layerscr[1].max_x = m_video.towns_crtc_reg[12] - m_video.towns_crtc_reg[0];
-	m_video.towns_crtc_layerscr[1].max_y = (m_video.towns_crtc_reg[16] - m_video.towns_crtc_reg[6]) / 2;
+	m_video.towns_crtc_layerscr[1].max_y = ((m_video.towns_crtc_reg[16] - m_video.towns_crtc_reg[6]) / 2) - 1;
 
 	// sanity checks
 	if(scr.max_x == 0 || scr.max_y == 0)
@@ -1026,14 +1026,23 @@ void towns_state::towns_crtc_draw_scan_layer_hicolour(bitmap_rgb32 &bitmap,const
 	int linesize;
 	uint32_t scroll;
 	int pixel;
+	int page = 0;
 
-	if(layer == 0)
-		linesize = m_video.towns_crtc_reg[20] * 4;
+	if(m_video.towns_video_reg[0] & 0x10)
+	{
+		if(layer == 0)
+			linesize = m_video.towns_crtc_reg[20] * 4;
+		else
+			linesize = m_video.towns_crtc_reg[24] * 4;
+	}
 	else
-		linesize = m_video.towns_crtc_reg[24] * 4;
+		linesize = m_video.towns_crtc_reg[20] * 8;
 	
 	if(m_video.towns_display_page_sel != 0)
+	{
 		off = 0x20000;
+		page = 1;
+	}
 
 //  if((layer == 1) && (m_video.towns_sprite_reg[1] & 0x80) && (m_video.towns_sprite_page == 1))
 //      off = 0x20000;
@@ -1084,7 +1093,7 @@ void towns_state::towns_crtc_draw_scan_layer_hicolour(bitmap_rgb32 &bitmap,const
 					| ((colour & 0x03e0) << 14);
 		}
 		off+=2;
-		if (off % linesize == 0)
+		if ((off - (page * 0x20000)) % linesize == 0)
 			off -= linesize;
 	}
 }
@@ -1098,9 +1107,13 @@ void towns_state::towns_crtc_draw_scan_layer_256(bitmap_rgb32 &bitmap,const rect
 	int linesize;
 	uint32_t scroll;
 	int pixel;
+	int page = 0;
 
 	if(m_video.towns_display_page_sel != 0)
+	{
 		off = 0x20000;
+		page = 1;
+	}
 
 	bool bottom_layer = (m_video.towns_video_reg[1] & 0x01) != layer;
 
@@ -1154,7 +1167,7 @@ void towns_state::towns_crtc_draw_scan_layer_256(bitmap_rgb32 &bitmap,const rect
 				bitmap.pix32(scanline, x+pixel) = m_palette->pen(colour);
 		}
 		off++;
-		if (off % linesize == 0)
+		if ((off - (page * 0x20000)) % linesize == 0)
 			off -= linesize;
 	}
 }
@@ -1168,10 +1181,14 @@ void towns_state::towns_crtc_draw_scan_layer_16(bitmap_rgb32 &bitmap,const recta
 	int linesize;
 	uint32_t scroll;
 	int pixel;
+	int page = 0;
 	palette_device* pal = (layer == 0) ? m_palette16_0 : m_palette16_1;
 
 	if(m_video.towns_display_page_sel != 0)
+	{
 		off = 0x20000;
+		page = 1;
+	}
 
 	bool bottom_layer = (m_video.towns_video_reg[1] & 0x01) != layer;
 
@@ -1231,7 +1248,7 @@ void towns_state::towns_crtc_draw_scan_layer_16(bitmap_rgb32 &bitmap,const recta
 				bitmap.pix32(scanline, x+pixel) = pal->pen(colour);
 		}
 		off++;
-		if (off % linesize == 0)
+		if ((off - (page * 0x20000)) % linesize == 0)
 			off -= linesize;
 	}
 }
