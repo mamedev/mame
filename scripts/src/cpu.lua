@@ -810,6 +810,9 @@ if (CPUS["E1"]~=null) then
 		MAME_DIR .. "src/devices/cpu/e132xs/e132xs.h",
 		MAME_DIR .. "src/devices/cpu/e132xs/32xsdefs.h",
 		MAME_DIR .. "src/devices/cpu/e132xs/e132xsop.hxx",
+		MAME_DIR .. "src/devices/cpu/e132xs/e132xsfe.cpp",
+		MAME_DIR .. "src/devices/cpu/e132xs/e132xsdrc.cpp",
+		MAME_DIR .. "src/devices/cpu/e132xs/e132xsdrc_ops.hxx",
 	}
 end
 

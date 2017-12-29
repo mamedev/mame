@@ -682,7 +682,7 @@ do                                                                              
 	if (m_delay_slot)                                                               \
 	{                                                                               \
 		PC = m_delay_pc;                                                            \
-		m_delay_slot = 0;                                                           \
+		m_delay_slot = 0;                                                       	\
 	}                                                                               \
 } while (0)
 
@@ -1094,7 +1094,11 @@ void hyperstone_device::device_start()
 
 void hyperstone_device::init(int scale_mask)
 {
+#if ENABLE_E132XS_DRC
 	m_enable_drc = allow_drc();
+#else
+	m_enable_drc = false;
+#endif
 
 #if E132XS_LOG_DRC_REGS || E132XS_LOG_INTERPRETER_REGS
 	if (m_enable_drc)
@@ -1103,6 +1107,7 @@ void hyperstone_device::init(int scale_mask)
 		m_trace_log = fopen("e1_interpreter.log", "wb");
 #endif
 
+	memset(m_op_counts, 0, sizeof(uint32_t) * 256);
 	memset(m_global_regs, 0, sizeof(uint32_t) * 32);
 	memset(m_local_regs, 0, sizeof(uint32_t) * 64);
 	m_op = 0;
@@ -1138,6 +1143,38 @@ void hyperstone_device::init(int scale_mask)
 	{
 		m_fl_lut[i] = (i ? i : 16);
 	}
+
+	uint32_t umlflags = 0;
+	m_drcuml = std::make_unique<drcuml_state>(*this, m_cache, umlflags, 1, 32, 1);
+
+	// add UML symbols-
+	m_drcuml->symbol_add(&m_global_regs[0], sizeof(uint32_t), "pc");
+	m_drcuml->symbol_add(&m_global_regs[1], sizeof(uint32_t), "sr");
+	m_drcuml->symbol_add(&m_icount, sizeof(m_icount), "icount");
+
+	char buf[4];
+	for (int i=0; i < 32; i++)
+	{
+		sprintf(buf, "g%d", i);
+		m_drcuml->symbol_add(&m_global_regs[i], sizeof(uint32_t), buf);
+	}
+
+	for (int i=0; i < 64; i++)
+	{
+		sprintf(buf, "l%d", i);
+		m_drcuml->symbol_add(&m_local_regs[i], sizeof(uint32_t), buf);
+	}
+
+	m_drcuml->symbol_add(&m_drc_arg0, sizeof(uint32_t), "arg0");
+	m_drcuml->symbol_add(&m_drc_arg1, sizeof(uint32_t), "arg1");
+	m_drcuml->symbol_add(&m_drc_arg2, sizeof(uint32_t), "arg2");
+	m_drcuml->symbol_add(&m_drc_arg3, sizeof(uint32_t), "arg3");
+
+	/* initialize the front-end helper */
+	m_drcfe = std::make_unique<e132xs_frontend>(this, COMPILE_BACKWARDS_BYTES, COMPILE_FORWARDS_BYTES, SINGLE_INSTRUCTION_MODE ? 1 : COMPILE_MAX_SEQUENCE);
+
+	/* mark the cache dirty so it is updated on next execute */
+	m_cache_dirty = true;
 
 	// register our state for the debugger
 	state_add(STATE_GENPC,    "GENPC",     m_global_regs[0]).noshow();
@@ -1412,6 +1449,34 @@ void hyperstone_device::device_stop()
 #if E132XS_LOG_DRC_REGS || E132XS_LOG_INTERPRETER_REGS
 	fclose(m_trace_log);
 #endif
+#if E132XS_COUNT_INSTRUCTIONS
+	uint32_t indices[256];
+	for (uint32_t i = 0; i < 256; i++)
+		indices[i] = i;
+	for (uint32_t i = 0; i < 256; i++)
+	{
+		for (uint32_t j = 0; j < 256; j++)
+		{
+			if (m_op_counts[j] < m_op_counts[i])
+			{
+				uint32_t temp = m_op_counts[i];
+				m_op_counts[i] = m_op_counts[j];
+				m_op_counts[j] = temp;
+
+				temp = indices[i];
+				indices[i] = indices[j];
+				indices[j] = temp;
+			}
+		}
+	}
+	for (uint32_t i = 0; i < 256; i++)
+	{
+		if (m_op_counts[i] != 0)
+		{
+			printf("%02x: %d\n", (uint8_t)indices[i], m_op_counts[i]);
+		}
+	}
+#endif
 }
 
 
@@ -1578,6 +1643,12 @@ void hyperstone_device::hyperstone_do()
 
 void hyperstone_device::execute_run()
 {
+	if (m_enable_drc)
+	{
+		execute_run_drc();
+		return;
+	}
+
 	if (m_intblock < 0)
 		m_intblock = 0;
 
@@ -1599,6 +1670,9 @@ void hyperstone_device::execute_run()
 
 		m_instruction_length = (1<<19);
 
+#if E132XS_COUNT_INSTRUCTIONS
+		m_op_counts[m_op >> 8]++;
+#endif
 		switch (m_op >> 8)
 		{
 			case 0x00: hyperstone_chk<GLOBAL, GLOBAL>(); break;

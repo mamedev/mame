@@ -54,6 +54,7 @@
 
 #define E132XS_LOG_DRC_REGS				(0)
 #define E132XS_LOG_INTERPRETER_REGS		(0)
+#define E132XS_COUNT_INSTRUCTIONS       (0)
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -292,6 +293,7 @@ protected:
 	static const uint32_t s_trap_entries[8];
 	static const int32_t s_immediate_values[16];
 
+	uint32_t m_op_counts[256];
 	uint32_t get_trap_addr(uint8_t trapno);
 
 private:
