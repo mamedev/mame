@@ -27,10 +27,10 @@
 //**************************************************************************
 
 // base class so that GIME emulation can use some functionality
-class sam6883_friend_device
+class sam6883_friend_device_interface : public device_interface
 {
 public:
-	sam6883_friend_device() { m_cpu = nullptr; m_sam_state = 0x0000; }
+	sam6883_friend_device_interface(const machine_config &mconfig, device_t &device, int divider);
 
 protected:
 	// SAM state constants
@@ -56,6 +56,9 @@ protected:
 
 	// device state
 	uint16_t                  m_sam_state;
+
+	// base clock divider (/4 for MC6883, /8 for GIME)
+	int m_divider;
 
 	ATTR_FORCE_INLINE uint16_t display_offset(void)
 	{
@@ -83,7 +86,7 @@ protected:
 	void update_cpu_clock(void);
 };
 
-class sam6883_device : public device_t, public sam6883_friend_device
+class sam6883_device : public device_t, public sam6883_friend_device_interface
 {
 public:
 	sam6883_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);

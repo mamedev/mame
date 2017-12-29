@@ -1108,7 +1108,7 @@ void coco_state::poll_hires_joystick(void)
 			double value = m_joystick.input(joystick_index, axis) / 255.0;
 			value *= is_cocomax3 ? 2500.0 : 4160.0;
 			value += is_cocomax3 ? 400.0 : 592.0;
-			attotime duration = maincpu().clocks_to_attotime((uint64_t) value) * 8;
+			attotime duration = maincpu().clocks_to_attotime((uint64_t) value) * 2;
 			m_hiresjoy_transition_timer[axis]->adjust(duration);
 		}
 		else if (!m_hiresjoy_ca && newvalue)

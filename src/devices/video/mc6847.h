@@ -93,7 +93,7 @@ public:
 
 protected:
 	mc6847_friend_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock,
-			const uint8_t *fontdata, bool is_mc6847t1, double tpfs, int field_sync_falling_edge_scanline, bool supports_partial_body_scanlines);
+			const uint8_t *fontdata, bool is_mc6847t1, double tpfs, int field_sync_falling_edge_scanline, int divider, bool supports_partial_body_scanlines);
 
 	// timer constants
 	static constexpr device_timer_id TIMER_FRAME = 0;
@@ -479,6 +479,7 @@ private:
 
 	// incidentals
 	double m_tpfs;
+	int m_divider;
 	int m_field_sync_falling_edge_scanline;
 	bool m_wide;
 	bool m_video_changed;

@@ -109,7 +109,8 @@
 //-------------------------------------------------
 
 gime_device::gime_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, const uint8_t *fontdata)
-	: mc6847_friend_device(mconfig, type, tag, owner, clock, fontdata, true, 263, 25+192+26+3, false)
+	: mc6847_friend_device(mconfig, type, tag, owner, clock, fontdata, true, 263, 25+192+26+3, 8, false)
+	, sam6883_friend_device_interface(mconfig, *this, 8)
 	, m_write_irq(*this)
 	, m_write_firq(*this)
 	, m_read_floating_bus(*this)
@@ -464,20 +465,17 @@ void gime_device::reset_timer(void)
 			m_timer_value += 2; /* the 1986 GIME reset to the value plus two */
 	}
 
-	attotime duration;
 	if ((timer_type() == GIME_TIMER_CLOCK) && (m_timer_value > 0))
 	{
 		/* we're starting a countdown on the GIME clock timer */
-		attotime current_time = machine().time();
-		uint64_t current_tick = current_time.as_ticks(m_clock);
-		duration = attotime::from_ticks(current_tick + m_timer_value, m_clock) - current_time;
+		attotime duration = clocks_to_attotime(m_timer_value * 8);
+		m_gime_clock_timer->adjust(duration);
 	}
 	else
 	{
 		/* either the timer is off, or were not using the GIME clock timer */
-		duration = attotime::never;
+		m_gime_clock_timer->adjust(attotime::never);
 	}
-	m_gime_clock_timer->adjust(duration);
 
 	if (LOG_TIMER)
 		logerror("%s: reset_timer(): timer_type=%s value=%d\n", describe_context(), timer_type_string(), m_timer_value);
@@ -2051,5 +2049,5 @@ namespace
 	};
 };
 
-DEFINE_DEVICE_TYPE(GIME_NTSC, gime_ntsc_device, "gime_ntsc", "CoCo GIME (NTSC)")
-DEFINE_DEVICE_TYPE(GIME_PAL,  gime_pal_device,  "gime_pal",  "CoCo GIME (PAL)")
+DEFINE_DEVICE_TYPE(GIME_NTSC, gime_ntsc_device, "gime_ntsc", "TCC1014 (VC2645QC) GIME (NTSC)")
+DEFINE_DEVICE_TYPE(GIME_PAL,  gime_pal_device,  "gime_pal",  "TCC1014 (VC2645QC) GIME (PAL)")
