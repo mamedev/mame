@@ -46,8 +46,8 @@ namespace {
 }
 
 // **** Constants ****
-constexpr unsigned SYS_CLOCK = 4915200;
-constexpr unsigned VIDEO_DOT_CLOCK   = 21060000;
+constexpr unsigned SYS_CLOCK = XTAL_4_9152MHz;
+constexpr unsigned VIDEO_DOT_CLOCK   = XTAL_21_06MHz;
 constexpr unsigned VIDEO_VIS_ROWS    = 24;
 constexpr unsigned VIDEO_TOT_ROWS    = 25;
 constexpr unsigned VIDEO_VIS_COLS    = 80;

@@ -122,10 +122,10 @@
 #include "speaker.h"
 
 
-#define Q209_CPU_CLOCK      40210000 / 40 // divider not verified (very complex circuit)
+#define Q209_CPU_CLOCK      XTAL_40_210MHz / 40 // divider not verified (very complex circuit)
 
 #define M6809_CLOCK             8000000 // wrong
-#define MASTER_OSCILLATOR       34291712
+#define MASTER_OSCILLATOR       XTAL_34_291712MHz
 
 #define CPU_1                   0
 #define CPU_2                   1
@@ -141,7 +141,7 @@
 #define PAGE_MASK               (PAGE_SIZE - 1)
 #define PAGE_SHIFT              5
 
-#define PIXEL_CLOCK             10380000        // Add to xtal.h
+#define PIXEL_CLOCK             XTAL_10_38MHz
 #define HTOTAL                  672
 #define HBLANK_END              0
 #define HBLANK_START            512
@@ -2749,12 +2749,12 @@ static MACHINE_CONFIG_START( cmi2x )
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(cmi_state, cpu2_interrupt_callback)
 	MCFG_QUANTUM_PERFECT_CPU("maincpu2")
 
-	MCFG_CPU_ADD("muskeys", M6802, 3840000)
+	MCFG_CPU_ADD("muskeys", M6802, XTAL_4MHz)
 	MCFG_CPU_PROGRAM_MAP(muskeys_map)
 
-	MCFG_CPU_ADD("alphakeys", M6802, 3840000)
+	MCFG_CPU_ADD("alphakeys", M6802, XTAL_3_84MHz)
 	MCFG_CPU_PROGRAM_MAP(alphakeys_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(cmi_state, irq0_line_hold, 9600) // TODO: PIA controls this
+	MCFG_CPU_PERIODIC_INT_DRIVER(cmi_state, irq0_line_hold, XTAL_3_84MHz / 400) // TODO: PIA controls this
 
 	MCFG_CPU_ADD("smptemidi", M68000, XTAL_20MHz / 2)
 	MCFG_CPU_PROGRAM_MAP(midicpu_map)
@@ -2815,7 +2815,7 @@ static MACHINE_CONFIG_START( cmi2x )
 	MCFG_PTM6840_OUT1_CB(WRITELINE(cmi_state, cmi02_ptm_o1))
 	MCFG_PTM6840_IRQ_CB(WRITELINE(cmi_state, cmi02_ptm_irq))
 
-	MCFG_DEVICE_ADD("mkbd_acia_clock", CLOCK, 9600*16)
+	MCFG_DEVICE_ADD("mkbd_acia_clock", CLOCK, XTAL_1_8432MHz / 12)
 	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(cmi_state, mkbd_acia_clock))
 
 	MCFG_DEVICE_ADD("q133_acia_0", MOS6551, XTAL_1_8432MHz)
