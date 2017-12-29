@@ -6,6 +6,35 @@
 	<!--                  Games                  -->
 	<!--                                         -->
 
+	<!-- DOS -->
+	<!-- TODO: after install it returns to DOS with mangled text graphics -->
+	<software name="11hourd" supported="no">
+		<description>The 11th Hour - Der Nachfolger von 7th Guest (Germany)</description>
+		<year>1995</year>
+		<publisher>Virgin</publisher>
+		
+		<part name="cdrom1" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="11th hour, the - der nachfolger von 7th guest (1995)(virgin)(de)(disc 1 of 4)" sha1="eb0471c3d431dee4b5bcbc2811af6a474b63ac6d" />
+			</diskarea>
+		</part>
+		<part name="cdrom2" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="11th hour, the - der nachfolger von 7th guest (1995)(virgin)(de)(disc 2 of 4)" sha1="b0ebebb747eb26f232540b36f1c56c834b8c87cf" />
+			</diskarea>
+		</part>
+		<part name="cdrom3" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="11th hour, the - der nachfolger von 7th guest (1995)(virgin)(de)(disc 3 of 4)" sha1="34d57fdcb0b5d6e86d100f0d27519b9b4ed7bef7" />
+			</diskarea>
+		</part>
+		<part name="cdrom4" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="11th hour, the - der nachfolger von 7th guest (1995)(virgin)(de)(disc 4 of 4)" sha1="082aaadad9ecac63de51eafee7248c663c8722bf" />
+			</diskarea>
+		</part>
+	</software>
+	
 	<!-- Windows 3.1 / 95 -->
 	<software name="3dupin">
 		<description>3-D Ultra Pinball (Budget Sierra Originals Version)</description>
@@ -149,6 +178,36 @@
 		</part>
 	</software>
 	
+	<!-- DOS -->
+	<!-- TODO: no second disc available -->
+	<software name="add2mc" supported="partial">
+		<description>Advanced Dungeons &amp; Dragons 2nd Edition Masterpiece Collection</description>
+		<year>1995</year>
+		<publisher>Mindscape</publisher>
+		
+		<part name="cdrom1" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="advanced dungeons &amp; dragons 2nd edition masterpiece collection (1995)(mindscape)(disc 1 of 4)[compilation]" sha1="adb4cc2ce2ae70724a78b8a3c1fc9b8c09996930" />
+			</diskarea>
+		</part>
+		<part name="cdrom2" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="advanced dungeons &amp; dragons 2nd edition masterpiece collection (1995)(mindscape)(disc 2 of 4)[compilation]" status="nodump" />
+			</diskarea>
+		</part>
+		<part name="cdrom3" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="advanced dungeons &amp; dragons 2nd edition masterpiece collection (1995)(mindscape)(disc 3 of 4)[compilation]" sha1="eb3a8b15c7b21ee50cedfcf1870e8644396acfad" />
+			</diskarea>
+		</part>
+		<part name="cdrom4" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="advanced dungeons &amp; dragons 2nd edition masterpiece collection (1995)(mindscape)(disc 4 of 4)[compilation]" sha1="f98d047b64169a19c72f0ebd94d1667086a1c76a" />
+			</diskarea>
+		</part>
+	</software>
+
+	
 	<!-- DOS (crashes in Windows 95) -->
 	<!-- Disc label: ads -->
 	<!-- TODO: bad color pen (DOS cyan color issue) -->
@@ -191,7 +250,26 @@
 			</diskarea>
 		</part>
 	</software>
+
+	<!-- TODO: disc swap not working -->
+	<software name="ah64dles" supported="partial">
+		<description>AH-64D Longbow (Spain)</description>
+		<year>1996</year>
+		<publisher>Electronic Arts</publisher>
+		
+		<part name="cdrom1" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="ah-64d longbow (1996)(electronic arts)(es)(disc 1 of 2)" sha1="0352e3f301c8e7eb0fd1f1af695a5991e6c4cfa2" />
+			</diskarea>
+		</part>
+		<part name="cdrom2" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="ah-64d longbow (1996)(electronic arts)(es)(disc 2 of 2)" sha1="5ed254fdfabcfde936eb971ae9652c28bf0c3fa4" />
+			</diskarea>
+		</part>
+	</software>
 	
+
 	<!-- Windows 95, Direct X 5.0 -->
 	<!-- Pentium class 90 MHz -->
 	<!-- S3 "software video" is really slow -->
@@ -517,6 +595,37 @@
 			</diskarea>
 		</part>
 	</software>
+	
+	<!-- DOS / Windows 95 -->
+	<!-- Pentium class 133 MHz -->
+	<!-- TODO: Under DOS hangs if sb16 is selected, "initialization problem with sound card" if that's disabled -->
+	<software name="atlantisd" supported="partial">
+		<description>Atlantis - Das sagenhafte Abenteuer (Germany)</description>
+		<year>1997</year>
+		<publisher>Cryo</publisher>
+		
+		<part name="cdrom1" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="atlantis - das sagenhafte abenteuer (1997)(cryo)(de)(disc 1 of 4)" sha1="6b9ad0cc67383d918597a4045995be9c242d1acf" />
+			</diskarea>
+		</part>
+		<part name="cdrom2" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="atlantis - das sagenhafte abenteuer (1997)(cryo)(de)(disc 2 of 4)" sha1="73fe7c4a42357ecfcc17b45d203ca63ae0bfa668" />
+			</diskarea>
+		</part>
+		<part name="cdrom3" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="atlantis - das sagenhafte abenteuer (1997)(cryo)(de)(disc 3 of 4)" sha1="5ce2a617b69ca6773a81f4df9c0560ddb1b9f8cb" />
+			</diskarea>
+		</part>
+		<part name="cdrom4" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="atlantis - das sagenhafte abenteuer (1997)(cryo)(de)(disc 4 of 4)" sha1="8822942cc93c3c6cebb547b5696c696a44a15d72" />
+			</diskarea>
+		</part>
+	</software>
+
 	
 	<!-- DOS -->
 	<software name="aworld80">
