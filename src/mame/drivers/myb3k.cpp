@@ -71,6 +71,18 @@
 #define FUNCNAME __PRETTY_FUNCTION__
 #endif
 
+// PPI Port C uses
+enum {
+	PC0_STROBE  = 0x01, // Printer interface
+	PC1_SETPAGE = 0x02, // Graphics circuit
+	PC2_DISPST  = 0x04, // Graphics circuit
+	PC3_LPENB   = 0x08, // Lightpen enable
+	PC4_CURSR   = 0x10, // Cursor Odd/Even
+	PC5_BUZON   = 0x20, // Speaker On/Off
+	PC6_CMTWRD  = 0x40,
+	PC7_CMTEN   = 0x80 // Cassette or Speaker
+};
+
 class myb3k_state : public driver_device
 {
 public:
@@ -84,16 +96,18 @@ public:
 		, m_speaker(*this, "speaker")
 		, m_kb(*this, "myb3k_keyboard")
 		, m_crtc(*this, "crtc")
-		, m_p_vram(*this, "p_vram")
-		, m_palette(*this, "palette")
+		  //, m_p_vram(*this, "p_vram")
+		, m_vram(*this, "vram")
+		  //, m_palette(*this, "palette")
 		, m_isabus(*this, "isa")
 	{ }
 
 	DECLARE_READ8_MEMBER(myb3k_kbd_r);
 	void kbd_set_data_and_interrupt(u8 data);
 
-	DECLARE_WRITE8_MEMBER(myb3k_6845_address_w);
-	DECLARE_WRITE8_MEMBER(myb3k_6845_data_w);
+	MC6845_UPDATE_ROW(crtc_update_row);
+  //	DECLARE_WRITE8_MEMBER(myb3k_6845_address_w);
+  //	DECLARE_WRITE8_MEMBER(myb3k_6845_data_w);
 	DECLARE_WRITE8_MEMBER(myb3k_video_mode_w);
 	DECLARE_WRITE8_MEMBER(myb3k_fdc_output_w);
 	uint32_t screen_update_myb3k(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -132,8 +146,9 @@ protected:
 	required_device<speaker_sound_device>   m_speaker;
 	required_device<myb3k_keyboard_device> m_kb;
 	required_device<h46505_device> m_crtc;
-	required_shared_ptr<uint8_t> m_p_vram;
-	required_device<palette_device> m_palette;
+  //required_shared_ptr<uint8_t> m_p_vram;
+	required_shared_ptr<uint8_t> m_vram;
+  //required_device<palette_device> m_palette;
 	required_device<isa8_device> m_isabus;
 	int m_dma_channel;
 	bool m_cur_tc;
@@ -141,6 +156,7 @@ protected:
 	uint8_t m_kbd_second_byte;
 	uint8_t m_crtc_vreg[0x100],m_crtc_index;
 	uint8_t m_vmode;
+	uint8_t m_portc;
 	uint8_t m_dma_page[4]; // a 74670, 4 x 4 bit storage latch
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -168,6 +184,7 @@ void myb3k_state::kbd_set_data_and_interrupt(u8 data) {
 	m_pic8259->ir1_w(ASSERT_LINE);
 }
 
+#if 0
 #define mc6845_h_char_total     (m_crtc_vreg[0])
 #define mc6845_h_display        (m_crtc_vreg[1])
 #define mc6845_h_sync_pos       (m_crtc_vreg[2])
@@ -184,33 +201,83 @@ void myb3k_state::kbd_set_data_and_interrupt(u8 data) {
 #define mc6845_cursor_addr      (((m_crtc_vreg[0x0e]<<8) & 0x3f00) | (m_crtc_vreg[0x0f] & 0xff))
 #define mc6845_light_pen_addr   (((m_crtc_vreg[0x10]<<8) & 0x3f00) | (m_crtc_vreg[0x11] & 0xff))
 #define mc6845_update_addr      (((m_crtc_vreg[0x12]<<8) & 0x3f00) | (m_crtc_vreg[0x13] & 0xff))
+#endif
 
+/*
+		      crtc_update_row() - ma:0000 ra:0 y:0 x_count:40 cursor_x:-1 de:1 hbp:64 vbp:24
+		      crtc_update_row() - ma:0000 ra:1 y:1 x_count:40 cursor_x:-1 de:1 hbp:64 vbp:24
+		      crtc_update_row() - ma:0000 ra:2 y:2 x_count:40 cursor_x:-1 de:1 hbp:64 vbp:24
+		      crtc_update_row() - ma:0000 ra:3 y:3 x_count:40 cursor_x:-1 de:1 hbp:64 vbp:24
+		      crtc_update_row() - ma:0000 ra:4 y:4 x_count:40 cursor_x:-1 de:1 hbp:64 vbp:24
+		      crtc_update_row() - ma:0000 ra:5 y:5 x_count:40 cursor_x:-1 de:1 hbp:64 vbp:24
+		      crtc_update_row() - ma:0000 ra:6 y:6 x_count:40 cursor_x:-1 de:1 hbp:64 vbp:24
+		      crtc_update_row() - ma:0000 ra:7 y:7 x_count:40 cursor_x:-1 de:1 hbp:64 vbp:24
+		      crtc_update_row() - ma:0028 ra:0 y:8 x_count:40 cursor_x:-1 de:1 hbp:64 vbp:24
+		      crtc_update_row() - ma:0028 ra:1 y:9 x_count:40 cursor_x:-1 de:1 hbp:64 vbp:24
+		      crtc_update_row() - ma:0028 ra:2 y:10 x_count:40 cursor_x:-1 de:1 hbp:64 vbp:24
+		      crtc_update_row() - ma:0028 ra:3 y:11 x_count:40 cursor_x:-1 de:1 hbp:64 vbp:24
+		      crtc_update_row() - ma:0028 ra:4 y:12 x_count:40 cursor_x:-1 de:1 hbp:64 vbp:24
+		      crtc_update_row() - ma:0028 ra:5 y:13 x_count:40 cursor_x:-1 de:1 hbp:64 vbp:24
+		      crtc_update_row() - ma:0028 ra:6 y:14 x_count:40 cursor_x:-1 de:1 hbp:64 vbp:24
+		      crtc_update_row() - ma:0028 ra:7 y:15 x_count:40 cursor_x:-1 de:1 hbp:64 vbp:24
+		      crtc_update_row() - ma:0050 ra:0 y:16 x_count:40 cursor_x:-1 de:1 hbp:64 vbp:24
+*/
+
+MC6845_UPDATE_ROW( myb3k_state::crtc_update_row )
+{
+  if (m_portc & PC2_DISPST) 
+	LOGCRT("crtc_update_row() - ma:%04x ra:%d y:%d x_count:%d cursor_x:%d de:%d hbp:%d vbp:%d\n",
+	       ma, ra, y, x_count, cursor_x, de, hbp, vbp);
+
+	for (int x_pos = 0; x_pos < x_count; x_pos++)
+	{
+		uint16_t page = (m_portc & PC1_SETPAGE) ? 0x7fff : 0;
+		uint16_t i = m_vram[ma * 0x10 + x_pos * 0x10 + ra + page + 1];
+		for (int pxl = 0; pxl < 8; pxl++)
+		  {
+//			uint16_t i = (m_vram[((ma * 8) + ra + x_pos + pxl) * 2 + page] << 8) + m_vram[((ma * 8) + ra + x_pos + pxl) * 2 + page + 1];
+
+			//if (m_portc & PC2_DISPST)
+			//LOGCRT(" - Offset: %04x pixel: %04x\n",(ma + x_pos + pxl) * 2, i );
+
+//			rgb_t col = rgb_t(((i & 0xf000) >> 8), ((i & 0x0f00) >> 4), (i & 0x00ff));
+		    rgb_t col = ((i & (0x80 >> pxl)) != 0 ? rgb_t::green() : rgb_t::black());
+
+			//col ^= ((cursor_x != -1 && x_pos >= cursor_x && x_pos < (cursor_x + m_cursor_size)) ? 7 : 0);
+
+			bitmap.pix32(y, ( x_pos * 8) + pxl) = (m_portc & PC2_DISPST) ? col : rgb_t::black();
+		}
+	}
+}
+
+#if 0
 uint32_t myb3k_state::screen_update_myb3k(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	int x,y;
-	int xi,yi;
+	int x, y;
+	int xi, yi;
 	int dot;
 	int h_step;
 
 	h_step = 64 >> (m_vmode & 3);
 
-	//popmessage("%02x %d",m_vmode,h_step);
+	LOGCRT("%02x %d", m_vmode, h_step);
 
 	for(y = 0; y < mc6845_v_display; y++)
 	{
 		for(x = 0; x < mc6845_h_display; x++)
 		{
 			/* 8x8 grid gfxs, weird format too ... */
-			for(yi=0;yi<mc6845_tile_height;yi++)
+			for(yi = 0; yi < mc6845_tile_height; yi++)
 			{
-				for(xi=0;xi<8;xi++)
+				for(xi = 0; xi < 8; xi++)
 				{
-					dot = (m_p_vram[(x+y*mc6845_h_display)*h_step+yi+0x8000] >> (7-xi)) & 1;
-					if((yi & ~7 && (!(m_vmode & 4))) || (yi & ~0xf && (m_vmode & 4)))
+					dot = (m_p_vram[(x + y * mc6845_h_display) * h_step + yi + 0x8000] >> (7 - xi)) & 1;
+
+					if( (yi & ~7 && (!(m_vmode & 4))) || (yi & ~0xf && (m_vmode & 4)))
 						dot = 0;
 
-					if(y*mc6845_tile_height+yi < 200 && x*8+xi < 320) /* TODO: safety check */
-						bitmap.pix16(y*mc6845_tile_height+yi, x*8+xi) = m_palette->pen(dot);
+					if(y * mc6845_tile_height + yi < 200 && x * 8 + xi < 320) /* TODO: safety check */
+						bitmap.pix16( y * mc6845_tile_height + yi, x * 8 + xi) = m_palette->pen(dot);
 				}
 			}
 		}
@@ -234,6 +301,7 @@ WRITE8_MEMBER( myb3k_state::myb3k_6845_data_w )
 	m_crtc_vreg[m_crtc_index] = data;
 	m_crtc->register_w(space, offset, data);
 }
+#endif
 
 WRITE8_MEMBER( myb3k_state::myb3k_video_mode_w )
 {
@@ -304,21 +372,13 @@ WRITE8_MEMBER( myb3k_state::myb3k_video_mode_w )
  *       OFF ON  - ?
  *       ON  ON  - ?
  **********************************************************/
-#define PC0_STROBE  0x01 // Printer interface
-#define PC1_SETPAGE 0x02 // Graphics circuit
-#define PC2_DISPST  0x04 // Graphics circuit
-#define PC3_LPENB   0x08 // Lightpen enable
-#define PC4_CURSR   0x10 // Cursor Odd/Even
-#define PC5_BUZON   0x20 // Speaker On/Off
-#define PC6_CMTWRD  0x40
-#define PC7_CMTEN   0x80 // Cassette or Speaker
-
 static ADDRESS_MAP_START(myb3k_map, AS_PROGRAM, 8, myb3k_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00000,0x3ffff) AM_RAM // It's either 128Kb or 256Kb RAM
 	AM_RANGE(0x40000,0x7ffff) AM_NOP
 	AM_RANGE(0x80000,0xcffff) AM_NOP // Expansion Unit connected through an ISA8 cable
-	AM_RANGE(0xd0000,0xdffff) AM_RAM AM_SHARE("p_vram")  // Area 6, physical at 30000-3FFFF (128Kb RAM) or 10000-1FFFF (256KB RAM)
+//	AM_RANGE(0xd0000,0xdffff) AM_RAM AM_SHARE("p_vram")  // Area 6, physical at 30000-3FFFF (128Kb RAM) or 10000-1FFFF (256KB RAM)
+	AM_RANGE(0xd0000,0xdffff) AM_RAM AM_SHARE("vram")  // Area 6, physical at 30000-3FFFF (128Kb RAM) or 10000-1FFFF (256KB RAM)
 	AM_RANGE(0xf0000,0xfffff) AM_ROM AM_REGION("ipl", 0) // Area 7, 8 x 8Kb
 ADDRESS_MAP_END
 
@@ -340,9 +400,14 @@ static ADDRESS_MAP_START(myb3k_io, AS_IO, 8, myb3k_state)
 // 10-18 8257 DMA
 	AM_RANGE(0x10, 0x18) AM_DEVREADWRITE("dma", i8257_device, read, write)
 // 1c-1d HD46505S CRTC
+#if 1
+	AM_RANGE(0x1c, 0x1c) AM_DEVREADWRITE("crtc", h46505_device, status_r, address_w)
+	AM_RANGE(0x1d, 0x1d) AM_DEVREADWRITE("crtc", h46505_device, register_r, register_w)
+#else
 	AM_RANGE(0x1c, 0x1c) AM_WRITE(myb3k_6845_address_w)
 	AM_RANGE(0x1d, 0x1d) AM_WRITE(myb3k_6845_data_w)
-//  AM_RANGE(0x800,0xfff) // Expansion Unit
+#endif
+//	AM_RANGE(0x800,0xfff) // Expansion Unit
 ADDRESS_MAP_END
 
 /* Input ports - from Step/One service manual */
@@ -399,6 +464,8 @@ void myb3k_state::machine_reset()
 	LOG("%s\n", FUNCNAME);
 	m_cur_tc = false;
 	m_dma_channel = -1;
+	m_vmode = 0;
+	m_portc = 0;
 	memset(m_dma_page, 0, sizeof(m_dma_page));
 }
 
@@ -507,6 +574,8 @@ WRITE8_MEMBER( myb3k_state::ppi_portc_w )
 	 */
 	m_pit8253->write_gate1(!(data & PC5_BUZON) && (data & PC7_CMTEN)? 1 : 0);
 
+	m_portc = data;
+	
 	return;
 }
 
@@ -603,21 +672,24 @@ static MACHINE_CONFIG_START( myb3k )
 	MCFG_MYB3K_KEYBOARD_CB(PUT(myb3k_state, kbd_set_data_and_interrupt))
 
 	/* video hardware */
-	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green())
+	//MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green())
+	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_SIZE(320, 200)
-	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 200-1)
-	MCFG_SCREEN_UPDATE_DRIVER(myb3k_state, screen_update_myb3k)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_SIZE(640, 400)
+	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 400-1)
+//MCFG_SCREEN_UPDATE_DRIVER(myb3k_state, screen_update_myb3k)
+	MCFG_SCREEN_UPDATE_DEVICE("crtc", h46505_device, screen_update)
+//	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", myb3k)
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+//MCFG_GFXDECODE_ADD("gfxdecode", "palette", myb3k)
+//MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	/* devices */
 	MCFG_MC6845_ADD("crtc", H46505, "screen", XTAL_14_31818MHz / 16) /* Main crystal divided by 16 through a 74163 4 bit counter */
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(8)
+	MCFG_MC6845_CHAR_WIDTH(10)
+	MCFG_MC6845_UPDATE_ROW_CB(myb3k_state, crtc_update_row)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( jb3000, myb3k )
@@ -646,6 +718,6 @@ ROM_START( stepone )
 ROM_END
 
 //    YEAR  NAME     PARENT  COMPAT   MACHINE    INPUT  STATE           INIT   COMPANY        FULLNAME        FLAGS
-COMP( 1982, myb3k,   0,      0,       myb3k,     myb3k, myb3k_state,    0,     "Matsushita",  "MyBrain 3000", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
-COMP( 1982, jb3000,  myb3k,  0,       jb3000,    myb3k, myb3k_state,    0,     "Panasonic",   "JB-3000",      MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
-COMP( 1984, stepone, myb3k,  0,       stepone,   myb3k, myb3k_state,    0,     "Ericsson",    "Step/One",     MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+COMP( 1982, myb3k,   0,      0,       myb3k,     myb3k, myb3k_state,    0,     "Matsushita",  "MyBrain 3000", MACHINE_NOT_WORKING)
+COMP( 1982, jb3000,  myb3k,  0,       jb3000,    myb3k, myb3k_state,    0,     "Panasonic",   "JB-3000",      MACHINE_NOT_WORKING)
+COMP( 1984, stepone, myb3k,  0,       stepone,   myb3k, myb3k_state,    0,     "Ericsson",    "Step/One",     MACHINE_NOT_WORKING)
