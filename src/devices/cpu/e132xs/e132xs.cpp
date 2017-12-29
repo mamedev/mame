@@ -144,6 +144,7 @@
 
 #include "emu.h"
 #include "e132xs.h"
+#include "e132xsfe.h"
 
 #include "debugger.h"
 
@@ -151,6 +152,9 @@
 
 //#define VERBOSE 1
 #include "logmacro.h"
+
+/* size of the execution code cache */
+#define CACHE_SIZE                      (32 * 1024 * 1024)
 
 //**************************************************************************
 //  INTERNAL ADDRESS MAP
@@ -199,6 +203,27 @@ hyperstone_device::hyperstone_device(const machine_config &mconfig, const char *
 	, m_program_config("program", ENDIANNESS_BIG, prg_data_width, 32, 0, internal_map)
 	, m_io_config("io", ENDIANNESS_BIG, io_data_width, 15)
 	, m_icount(0)
+	, m_cache(CACHE_SIZE + sizeof(hyperstone_device))
+	, m_drcuml(nullptr)
+	, m_drcfe(nullptr)
+	, m_drcoptions(0)
+	, m_cache_dirty(0)
+	, m_entry(nullptr)
+	, m_nocode(nullptr)
+	, m_out_of_cycles(nullptr)
+	, m_drc_arg0(0)
+	, m_drc_arg1(0)
+	, m_drc_arg2(0)
+	, m_drc_arg3(0)
+	, m_mem_read8(nullptr)
+	, m_mem_write8(nullptr)
+	, m_mem_read16(nullptr)
+	, m_mem_write16(nullptr)
+	, m_mem_read32(nullptr)
+	, m_mem_write32(nullptr)
+	, m_io_read32(nullptr)
+	, m_io_write32(nullptr)
+	, m_enable_drc(false)
 {
 }
 

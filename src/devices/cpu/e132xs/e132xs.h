@@ -6,6 +6,9 @@
 #pragma once
 
 #include "32xsdasm.h"
+#include "cpu/drcfe.h"
+#include "cpu/drcuml.h"
+#include "cpu/drcumlsh.h"
 
 /*
     A note about clock multipliers and dividers:
