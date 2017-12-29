@@ -25,7 +25,7 @@ Then it puts settings at 0x9e08 and 0x9e0a (bp 91acb)
      - This is a 2-in-1 board.  The current game to boot is stored in the EEPROM.
        If you wish to change game then on powerup you must hold down all 4 (P1) joystick
        directions simultaneously along with either button 1 or button 2.
-       Obviously this is impossible with a real joystck!
+       Obviously this is impossible with a real joystick!
 
        It is also impossible in MAME unless you enable -joystick_contradictory
        to disable MAME from preventing opposing joystick directions being pressed
@@ -82,14 +82,11 @@ class r2dx_v33_state : public raiden2_state
 public:
 	r2dx_v33_state(const machine_config &mconfig, device_type type, const char *tag)
 		: raiden2_state(mconfig, type, tag),
-		m_eeprom(*this, "eeprom"),
-		m_math(*this, "math"),
 		m_r2dxbank(0),
-		m_r2dxgameselect(0)
+		m_r2dxgameselect(0),
+		m_eeprom(*this, "eeprom"),
+		m_math(*this, "math")
 	{ }
-
-	optional_device<eeprom_serial_93cxx_device> m_eeprom;
-	required_region_ptr<uint8_t> m_math;
 
 	DECLARE_WRITE16_MEMBER(r2dx_angle_w);
 	DECLARE_WRITE16_MEMBER(r2dx_dx_w);
@@ -121,22 +118,29 @@ public:
 	DECLARE_WRITE16_MEMBER(r2dx_paldma_w);
 	DECLARE_READ16_MEMBER(r2dx_debug_r);
 
-	void r2dx_setbanking(void);
+	INTERRUPT_GEN_MEMBER(rdx_v33_interrupt);
 
 	DECLARE_MACHINE_RESET(r2dx_v33);
 	DECLARE_MACHINE_RESET(nzeroteam);
 
-	int m_r2dxbank;
-	int m_r2dxgameselect;
-	int16_t m_r2dx_angle;
-
-	uint16_t r2dx_i_dx, r2dx_i_dy, r2dx_i_angle;
-	uint32_t r2dx_i_sdist;
-
-	INTERRUPT_GEN_MEMBER(rdx_v33_interrupt);
-
 protected:
 	virtual void machine_start() override;
+
+private:
+	void r2dx_setbanking(void);
+
+	int m_r2dxbank;
+	int m_r2dxgameselect;
+
+	uint16_t m_r2dx_i_dx, m_r2dx_i_dy, m_r2dx_i_angle;
+	uint32_t m_r2dx_i_sdist;
+	uint16_t m_mcu_prog[0x800];
+	int m_mcu_prog_offs;
+	uint16_t m_mcu_xval, m_mcu_yval;
+	uint16_t m_mcu_data[9];
+
+	optional_device<eeprom_serial_93cxx_device> m_eeprom;
+	required_region_ptr<uint8_t> m_math;
 };
 
 void r2dx_v33_state::machine_start()
@@ -145,11 +149,15 @@ void r2dx_v33_state::machine_start()
 
 	save_item(NAME(m_r2dxbank));
 	save_item(NAME(m_r2dxgameselect));
-	save_item(NAME(m_r2dx_angle));
-	save_item(NAME(r2dx_i_dx));
-	save_item(NAME(r2dx_i_dy));
-	save_item(NAME(r2dx_i_angle));
-	save_item(NAME(r2dx_i_sdist));
+	save_item(NAME(m_r2dx_i_dx));
+	save_item(NAME(m_r2dx_i_dy));
+	save_item(NAME(m_r2dx_i_angle));
+	save_item(NAME(m_r2dx_i_sdist));
+	save_item(NAME(m_mcu_prog));
+	save_item(NAME(m_mcu_prog_offs));
+	save_item(NAME(m_mcu_xval));
+	save_item(NAME(m_mcu_yval));
+	save_item(NAME(m_mcu_data));
 }
 
 WRITE16_MEMBER(r2dx_v33_state::tile_bank_w)
@@ -213,18 +221,14 @@ WRITE16_MEMBER(r2dx_v33_state::rdx_v33_eeprom_w)
 
 /* new zero team uses the copd3 protection... and uploads a 0x400 byte table, probably the mcu code, encrypted */
 
-
-static uint16_t mcu_prog[0x800];
-static int mcu_prog_offs = 0;
-
 WRITE16_MEMBER(r2dx_v33_state::mcu_prog_w)
 {
-	mcu_prog[mcu_prog_offs*2] = data;
+	m_mcu_prog[m_mcu_prog_offs*2] = data;
 }
 
 WRITE16_MEMBER(r2dx_v33_state::mcu_prog_w2)
 {
-	mcu_prog[mcu_prog_offs*2+1] = data;
+	m_mcu_prog[m_mcu_prog_offs*2+1] = data;
 
 	// both new zero team and raiden2/dx v33 version upload the same table..
 #if 0
@@ -236,7 +240,7 @@ WRITE16_MEMBER(r2dx_v33_state::mcu_prog_w2)
 		fp=fopen(tmp, "w+b");
 		if (fp)
 		{
-			fwrite(mcu_prog, 0x400, 2, fp);
+			fwrite(m_mcu_prog, 0x400, 2, fp);
 			fclose(fp);
 		}
 	}
@@ -245,7 +249,7 @@ WRITE16_MEMBER(r2dx_v33_state::mcu_prog_w2)
 
 WRITE16_MEMBER(r2dx_v33_state::mcu_prog_offs_w)
 {
-	mcu_prog_offs = data;
+	m_mcu_prog_offs = data;
 }
 
 READ16_MEMBER(r2dx_v33_state::rdx_v33_unknown_r)
@@ -254,38 +258,35 @@ READ16_MEMBER(r2dx_v33_state::rdx_v33_unknown_r)
 }
 
 
-static uint16_t mcu_xval,mcu_yval;
-
 /* something sent to the MCU for X/Y global screen calculating ... */
 WRITE16_MEMBER(r2dx_v33_state::mcu_xval_w)
 {
-	mcu_xval = data;
-	//popmessage("%04x %04x",mcu_xval,mcu_yval);
+	m_mcu_xval = data;
+	//popmessage("%04x %04x",m_mcu_xval,m_mcu_yval);
 }
 
 WRITE16_MEMBER(r2dx_v33_state::mcu_yval_w)
 {
-	mcu_yval = data;
-	//popmessage("%04x %04x",mcu_xval,mcu_yval);
+	m_mcu_yval = data;
+	//popmessage("%04x %04x",m_mcu_xval,m_mcu_yval);
 }
 
-static uint16_t mcu_data[9];
 
 /* 0x400-0x407 seems some DMA hook-up, 0x420-0x427 looks like some x/y sprite calculation routine */
 WRITE16_MEMBER(r2dx_v33_state::mcu_table_w)
 {
-	mcu_data[offset] = data;
+	m_mcu_data[offset] = data;
 
-	//popmessage("%04x %04x %04x %04x | %04x %04x %04x %04x",mcu_data[0/2],mcu_data[2/2],mcu_data[4/2],mcu_data[6/2],mcu_data[8/2],mcu_data[0xa/2],mcu_data[0xc/2],mcu_data[0xe/2]);
+	//popmessage("%04x %04x %04x %04x | %04x %04x %04x %04x",m_mcu_data[0/2],m_mcu_data[2/2],m_mcu_data[4/2],m_mcu_data[6/2],m_mcu_data[8/2],m_mcu_data[0xa/2],m_mcu_data[0xc/2],m_mcu_data[0xe/2]);
 }
 
 WRITE16_MEMBER(r2dx_v33_state::mcu_table2_w)
 {
 //  printf("mcu_table2_w %04x %04x\n", data, mem_mask);
 
-	mcu_data[offset+4] = data;
+	m_mcu_data[offset+4] = data;
 
-	//popmessage("%04x %04x %04x %04x | %04x %04x %04x %04x",mcu_data[0/2],mcu_data[2/2],mcu_data[4/2],mcu_data[6/2],mcu_data[8/2],mcu_data[0xa/2],mcu_data[0xc/2],mcu_data[0xe/2]);
+	//popmessage("%04x %04x %04x %04x | %04x %04x %04x %04x",m_mcu_data[0/2],m_mcu_data[2/2],m_mcu_data[4/2],m_mcu_data[6/2],m_mcu_data[8/2],m_mcu_data[0xa/2],m_mcu_data[0xc/2],m_mcu_data[0xe/2]);
 }
 
 WRITE16_MEMBER(r2dx_v33_state::r2dx_rom_bank_w)
@@ -298,49 +299,49 @@ WRITE16_MEMBER(r2dx_v33_state::r2dx_rom_bank_w)
 
 WRITE16_MEMBER(r2dx_v33_state::r2dx_angle_w)
 {
-	COMBINE_DATA(&r2dx_i_angle);
+	COMBINE_DATA(&m_r2dx_i_angle);
 }
 
 WRITE16_MEMBER(r2dx_v33_state::r2dx_dx_w)
 {
-	COMBINE_DATA(&r2dx_i_dx);
+	COMBINE_DATA(&m_r2dx_i_dx);
 }
 
 WRITE16_MEMBER(r2dx_v33_state::r2dx_dy_w)
 {
-	COMBINE_DATA(&r2dx_i_dy);
+	COMBINE_DATA(&m_r2dx_i_dy);
 }
 
 READ16_MEMBER(r2dx_v33_state::r2dx_angle_r)
 {
-	return m_math[((r2dx_i_dy & 0xff) << 8) | (r2dx_i_dx & 0xff)];
+	return m_math[((m_r2dx_i_dy & 0xff) << 8) | (m_r2dx_i_dx & 0xff)];
 }
 
 READ16_MEMBER(r2dx_v33_state::r2dx_dist_r)
 {
-	return sqrt(double(r2dx_i_sdist));
+	return sqrt(double(m_r2dx_i_sdist));
 }
 
 READ16_MEMBER(r2dx_v33_state::r2dx_sin_r)
 {
-	int off = 65536 + (r2dx_i_angle & 0xff)*4;
+	int off = 65536 + (m_r2dx_i_angle & 0xff)*4;
 	return (m_math[off+0]) | (m_math[off+1] << 8);
 }
 
 READ16_MEMBER(r2dx_v33_state::r2dx_cos_r)
 {
-	int off = 65536 + (r2dx_i_angle & 0xff)*4;
+	int off = 65536 + (m_r2dx_i_angle & 0xff)*4;
 	return (m_math[off+2]) | (m_math[off+3] << 8);
 }
 
 WRITE16_MEMBER(r2dx_v33_state::r2dx_sdistl_w)
 {
-	r2dx_i_sdist = (r2dx_i_sdist & (0xffff0000 | uint16_t(~mem_mask))) | (data & mem_mask);
+	m_r2dx_i_sdist = (m_r2dx_i_sdist & (0xffff0000 | uint16_t(~mem_mask))) | (data & mem_mask);
 }
 
 WRITE16_MEMBER(r2dx_v33_state::r2dx_sdisth_w)
 {
-	r2dx_i_sdist = (r2dx_i_sdist & (0x0000ffff | (uint16_t(~mem_mask)) << 16)) | ((data & mem_mask) << 16);
+	m_r2dx_i_sdist = (m_r2dx_i_sdist & (0x0000ffff | (uint16_t(~mem_mask)) << 16)) | ((data & mem_mask) << 16);
 }
 
 // these DMA operations seem to use hardcoded addresses on this hardware
@@ -398,7 +399,7 @@ static ADDRESS_MAP_START( rdx_v33_map, AS_PROGRAM, 16, r2dx_v33_state )
 	AM_RANGE(0x00600, 0x0063f) AM_DEVREADWRITE("crtc", seibu_crtc_device, read, write)
 	//AM_RANGE(0x00640, 0x006bf) AM_DEVREADWRITE("obj", seibu_encrypted_sprite_device, read, write)
 	AM_RANGE(0x0068e, 0x0068f) AM_WRITENOP // sprite buffering
-	AM_RANGE(0x006b0, 0x006b1) AM_WRITE(mcu_prog_w) // could be encryption key uploads just like raiden2.c ?
+	AM_RANGE(0x006b0, 0x006b1) AM_WRITE(mcu_prog_w) // could be encryption key uploads just like raiden2.cpp ?
 	AM_RANGE(0x006b2, 0x006b3) AM_WRITE(mcu_prog_w2)
 //  AM_RANGE(0x006b4, 0x006b5) AM_WRITENOP
 //  AM_RANGE(0x006b6, 0x006b7) AM_WRITENOP
@@ -450,7 +451,7 @@ static ADDRESS_MAP_START( nzeroteam_base_map, AS_PROGRAM, 16, r2dx_v33_state )
 	// 0x404 is bank on r2dx, this doesn't need it
 	// AM_RANGE(0x00406, 0x00407) AM_WRITE(tile_bank_w) // not the same?
 
-	AM_RANGE(0x00406, 0x00407) AM_NOP // always 6022, supposed to be the tile bank but ignroes the actual value???
+	AM_RANGE(0x00406, 0x00407) AM_NOP // always 6022, supposed to be the tile bank but ignores the actual value???
 
 	AM_RANGE(0x00420, 0x00421) AM_WRITE(r2dx_dx_w)
 	AM_RANGE(0x00422, 0x00423) AM_WRITE(r2dx_dy_w)
@@ -915,7 +916,7 @@ Seibu Kaihatsu, 1993/1996
 Note! PCB seems like an updated version. It uses _entirely_ SMD technology and
 is smaller than the previous hardware. I guess the game is still popular, so
 Seibu re-manufactured it using newer technology to meet demand.
-Previous version hardware is similar to Heated Barrel/Legionairre/Seibu Cup Soccer etc.
+Previous version hardware is similar to Heated Barrel/Legionnaire/Seibu Cup Soccer etc.
 It's possible that the BG and OBJ ROMs from this set can be used to complete the
 previous (incomplete) dump that runs on the V30 hardware, since most GFX chips are the same.
 
