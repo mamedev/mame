@@ -113,13 +113,13 @@ void towns_state::towns_crtc_refresh_mode()
 	m_video.towns_crtc_layerscr[0].min_x = m_video.towns_crtc_reg[9] - m_video.towns_crtc_reg[0];
 	m_video.towns_crtc_layerscr[0].min_y = (m_video.towns_crtc_reg[13] - m_video.towns_crtc_reg[6]) / 2;
 	m_video.towns_crtc_layerscr[0].max_x = m_video.towns_crtc_reg[10] - m_video.towns_crtc_reg[0];
-	m_video.towns_crtc_layerscr[0].max_y = (m_video.towns_crtc_reg[14] - m_video.towns_crtc_reg[6]) / 2;
+	m_video.towns_crtc_layerscr[0].max_y = ((m_video.towns_crtc_reg[14] - m_video.towns_crtc_reg[6]) / 2) - 1;
 
 	// layer 1
 	m_video.towns_crtc_layerscr[1].min_x = m_video.towns_crtc_reg[11] - m_video.towns_crtc_reg[0];
 	m_video.towns_crtc_layerscr[1].min_y = (m_video.towns_crtc_reg[15] - m_video.towns_crtc_reg[6]) / 2;
 	m_video.towns_crtc_layerscr[1].max_x = m_video.towns_crtc_reg[12] - m_video.towns_crtc_reg[0];
-	m_video.towns_crtc_layerscr[1].max_y = (m_video.towns_crtc_reg[16] - m_video.towns_crtc_reg[6]) / 2;
+	m_video.towns_crtc_layerscr[1].max_y = ((m_video.towns_crtc_reg[16] - m_video.towns_crtc_reg[6]) / 2) - 1;
 
 	// sanity checks
 	if(scr.max_x == 0 || scr.max_y == 0)
