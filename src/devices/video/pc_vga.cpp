@@ -2194,12 +2194,12 @@ WRITE8_MEMBER(vga_device::mem_w)
 
 READ8_MEMBER(vga_device::mem_linear_r)
 {
-	return vga.memory[offset];
+	return vga.memory[offset % vga.svga_intf.vram_size];
 }
 
 WRITE8_MEMBER(vga_device::mem_linear_w)
 {
-	vga.memory[offset] = data;
+	vga.memory[offset % vga.svga_intf.vram_size] = data;
 }
 
 MACHINE_CONFIG_START( pcvideo_vga )
@@ -3867,6 +3867,7 @@ WRITE16_MEMBER(ibm8514a_device::ibm8514_cmd_w)
 		ibm8514.gpbusy = false;
 		break;
 	case 0xc000:  // BitBLT
+		// TODO: a10cuba sets up blantantly invalid parameters here, CPU core bug maybe?
 		if(LOG_8514) logerror("8514/A: Command (%04x) - BitBLT from %i,%i to %i,%i  Width: %i  Height: %i\n",ibm8514.current_cmd,
 				ibm8514.curr_x,ibm8514.curr_y,ibm8514.dest_x,ibm8514.dest_y,ibm8514.rect_width,ibm8514.rect_height);
 		off = 0;
