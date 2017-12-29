@@ -25,8 +25,29 @@
 #define S_BIT_CONST(val) ((val & 0x4000) >> 14)
 #define DD(val)          ((val & 0x3000) >> 12)
 
+#define S_BIT                   ((OP & 0x100) >> 8)
+#define D_BIT                   ((OP & 0x200) >> 9)
+#define N_VALUE                 (((OP & 0x100) >> 4) | (OP & 0x0f))
+#define HI_N_VALUE              (0x10 | (OP & 0x0f))
+#define LO_N_VALUE              (OP & 0x0f)
+#define N_OP_MASK               (m_op & 0x10f)
+#define DRC_HI_N_VALUE          (0x10 | (op & 0x0f))
+#define DRC_LO_N_VALUE          (op & 0x0f)
+#define DRC_N_OP_MASK           (op & 0x10f)
+#define DST_CODE                ((OP & 0xf0) >> 4)
+#define SRC_CODE                (OP & 0x0f)
+#define SIGN_BIT(val)           ((val & 0x80000000) >> 31)
+#define SIGN_TO_N(val)          ((val & 0x80000000) >> 29)
+#define SIGN64_TO_N(val)        ((val & 0x8000000000000000ULL) >> 61)
 
 /* Extended DSP instructions */
+#define EHMAC           0x02a
+#define EHMACD          0x02e
+#define EHCMULD         0x046
+#define EHCMACD         0x04e
+#define EHCSUMD         0x086
+#define EHCFFTD         0x096
+#define EMUL_N			0x100
 #define EMUL            0x102
 #define EMULU           0x104
 #define EMULS           0x106
@@ -34,12 +55,6 @@
 #define EMACD           0x10e
 #define EMSUB           0x11a
 #define EMSUBD          0x11e
-#define EHMAC           0x02a
-#define EHMACD          0x02e
-#define EHCMULD         0x046
-#define EHCMACD         0x04e
-#define EHCSUMD         0x086
-#define EHCFFTD         0x096
 #define EHCFFTSD        0x296
 
 /* IRQ numbers */

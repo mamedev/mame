@@ -45,7 +45,7 @@ const char *const hyperstone_disassembler::SETxx[] =
 #define SOURCEBIT(op)           ((op & 0x100) >> 8)
 #define DESTBIT(op)             ((op & 0x200) >> 9)
 
-#define N_VALUE(op)             ((((op & 0x100) >> 8) << 4 ) | (op & 0x0f))
+#define DASM_N_VALUE(op)             ((((op & 0x100) >> 8) << 4 ) | (op & 0x0f))
 
 void hyperstone_disassembler::LL_format(char *source, char *dest, uint16_t op)
 {
@@ -200,7 +200,7 @@ int32_t hyperstone_disassembler::Rimm_format(char *dest, uint16_t op, offs_t &pc
 	uint16_t imm1, imm2;
 	int32_t ret;
 
-	int n = N_VALUE(op);
+	int n = DASM_N_VALUE(op);
 
 	if( DESTBIT(op) )
 	{
@@ -287,7 +287,7 @@ uint8_t hyperstone_disassembler::Ln_format(char *dest, uint16_t op)
 {
 	strcpy(dest, L_REG[(DESTCODE(op)+global_fp)%64]);
 
-	return N_VALUE(op);
+	return DASM_N_VALUE(op);
 }
 
 uint8_t hyperstone_disassembler::Rn_format(char *dest, uint16_t op)
@@ -301,7 +301,7 @@ uint8_t hyperstone_disassembler::Rn_format(char *dest, uint16_t op)
 		strcpy(dest, G_REG[DESTCODE(op)]);
 	}
 
-	return N_VALUE(op);
+	return DASM_N_VALUE(op);
 }
 
 int32_t hyperstone_disassembler::PCrel_format(uint16_t op, offs_t pc, const data_buffer &opcodes)
@@ -796,7 +796,7 @@ offs_t hyperstone_disassembler::disassemble(std::ostream &stream, offs_t pc, con
 		{
 			uint32_t imm = Rimm_format(dest, op, pc, opcodes, 0);
 
-			if( !N_VALUE(op) )
+			if( !DASM_N_VALUE(op) )
 			{
 				util::stream_format(stream, "ADDI %s, CZ", dest);
 			}
@@ -813,7 +813,7 @@ offs_t hyperstone_disassembler::disassemble(std::ostream &stream, offs_t pc, con
 		{
 			uint32_t imm = Rimm_format(dest, op, pc, opcodes, 0);
 
-			if( !N_VALUE(op) )
+			if( !DASM_N_VALUE(op) )
 			{
 				util::stream_format(stream, "ADDSI %s, CZ", dest);
 			}
@@ -830,13 +830,13 @@ offs_t hyperstone_disassembler::disassemble(std::ostream &stream, offs_t pc, con
 		{
 			uint32_t imm = Rimm_format(dest, op, pc, opcodes, 0);
 
-			if( !N_VALUE(op) )
+			if( !DASM_N_VALUE(op) )
 			{
 				util::stream_format(stream, "CMPBI %s, ANYBZ", dest);
 			}
 			else
 			{
-				if( N_VALUE(op) == 31 )
+				if( DASM_N_VALUE(op) == 31 )
 					imm = 0x7fffffff; //bit 31 = 0, others = 1
 
 				util::stream_format(stream, "CMPBI %s, $%x", dest, imm);
@@ -850,7 +850,7 @@ offs_t hyperstone_disassembler::disassemble(std::ostream &stream, offs_t pc, con
 		{
 			uint32_t imm = Rimm_format(dest, op, pc, opcodes, 0);
 
-			if( N_VALUE(op) == 31 )
+			if( DASM_N_VALUE(op) == 31 )
 				imm = 0x7fffffff; //bit 31 = 0, others = 1
 
 			util::stream_format(stream, "ANDNI %s, $%x", dest, imm);

@@ -385,6 +385,33 @@ uint32_t hyperstone_device::get_emu_code_addr(uint8_t num) /* num is OP */
 	0xffffff00, // MEM3
 };
 
+#if E132XS_LOG_INTERPRETER_REGS
+void hyperstone_device::dump_registers()
+{
+	static uint64_t total_ops = 0;
+	//static uint64_t total_11094 = 0;
+	total_ops++;
+	if (total_ops < 389000000ULL)
+	{
+		//if (m_global_regs[0] == 0x11094)
+		//{
+		//	total_11094++;
+		//}
+		return;
+	} else if (total_ops == 389000000ULL) {
+		//printf("Total non-log hits of 0x11094: %d\n", (uint32_t)total_11094);
+	}
+	uint8_t packed[4];
+	packed[0] = (uint8_t)m_intblock;
+	packed[1] = (uint8_t)(m_icount >> 16);
+	packed[2] = (uint8_t)(m_icount >>  8);
+	packed[3] = (uint8_t)(m_icount >>  0);
+	fwrite(packed, 1, 4, m_trace_log);
+	fwrite(m_global_regs, 4, 32, m_trace_log);
+	fwrite(m_local_regs, 4, 64, m_trace_log);
+}
+#endif
+
 void hyperstone_device::compute_tr()
 {
 	uint64_t cycles_since_base = total_cycles() - m_tr_base_cycles;
@@ -401,6 +428,7 @@ void hyperstone_device::update_timer_prescale()
 	m_clock_cycles_3 = 3 << m_clck_scale;
 	m_clock_cycles_4 = 4 << m_clck_scale;
 	m_clock_cycles_6 = 6 << m_clck_scale;
+	m_clock_cycles_36 = 36 << m_clck_scale;
 	m_tr_clocks_per_tick = ((TPR >> 16) & 0xff) + 2;
 	m_tr_base_value = m_tr_result;
 	m_tr_base_cycles = total_cycles();
@@ -613,17 +641,6 @@ void hyperstone_device::set_global_register(uint8_t code, uint32_t val)
 			return;
 	}
 }
-
-#define S_BIT                   ((OP & 0x100) >> 8)
-#define D_BIT                   ((OP & 0x200) >> 9)
-#define N_VALUE                 (((OP & 0x100) >> 4) | (OP & 0x0f))
-#define HI_N_VALUE              (0x10 | (OP & 0x0f))
-#define LO_N_VALUE              (OP & 0x0f)
-#define N_OP_MASK               (m_op & 0x10f)
-#define DST_CODE                ((OP & 0xf0) >> 4)
-#define SRC_CODE                (OP & 0x0f)
-#define SIGN_BIT(val)           ((val & 0x80000000) >> 31)
-#define SIGN_TO_N(val)          ((val & 0x80000000) >> 29)
 
 /*static*/ const int32_t hyperstone_device::s_immediate_values[16] =
 {
@@ -844,18 +861,16 @@ void hyperstone_device::execute_software()
 	//since it's sure the register is in the register part of the stack,
 	//set the stack address to a value above the highest address
 	//that can be set by a following frame instruction
-	const uint32_t stack_of_dst = (SP & ~0xff) + 64*4 + (((fp + DST_CODE) % 64) * 4); //converted to 32bits offset
-
-	const uint32_t oldSR = SR;
-
-	SET_FL(6);
-	SET_FP(reg);
+	const uint32_t stack_of_dst = (SP & ~0xff) + 0x100 + (((fp + DST_CODE) & 0x3f) << 2); //converted to 32bits offset
 
 	m_local_regs[(reg + 0) & 0x3f] = stack_of_dst;
 	m_local_regs[(reg + 1) & 0x3f] = sreg;
 	m_local_regs[(reg + 2) & 0x3f] = sregf;
 	m_local_regs[(reg + 3) & 0x3f] = (PC & ~1) | GET_S;
-	m_local_regs[(reg + 4) & 0x3f] = oldSR;
+	m_local_regs[(reg + 4) & 0x3f] = SR;
+
+	SET_FL(6);
+	SET_FP(reg);
 
 	SR &= ~(M_MASK | T_MASK);
 	SR |= L_MASK;
@@ -878,14 +893,15 @@ void hyperstone_device::execute_software()
         7 - TIMER   (trap 55)
 */
 
-#define INT1_LINE_STATE     ((ISR >> 0) & 1)
-#define INT2_LINE_STATE     ((ISR >> 1) & 1)
-#define INT3_LINE_STATE     ((ISR >> 2) & 1)
-#define INT4_LINE_STATE     ((ISR >> 3) & 1)
-#define IO1_LINE_STATE      ((ISR >> 4) & 1)
-#define IO2_LINE_STATE      ((ISR >> 5) & 1)
-#define IO3_LINE_STATE      ((ISR >> 6) & 1)
+#define INT1_LINE_STATE     (ISR & 0x01)
+#define INT2_LINE_STATE     (ISR & 0x02)
+#define INT3_LINE_STATE     (ISR & 0x04)
+#define INT4_LINE_STATE     (ISR & 0x08)
+#define IO1_LINE_STATE      (ISR & 0x10)
+#define IO2_LINE_STATE      (ISR & 0x20)
+#define IO3_LINE_STATE      (ISR & 0x40)
 
+template <hyperstone_device::is_timer TIMER>
 void hyperstone_device::check_interrupts()
 {
 	/* Interrupt-Lock flag isn't set */
@@ -893,95 +909,156 @@ void hyperstone_device::check_interrupts()
 		return;
 
 	/* quick exit if nothing */
-	if (!m_timer_int_pending && (ISR & 0x7f) == 0)
+	if (TIMER == NO_TIMER && (ISR & 0x7f) == 0)
 		return;
 
-	/* IO3 is priority 5; state is in bit 6 of ISR; FCR bit 10 enables input and FCR bit 8 inhibits interrupt */
-	if (IO3_LINE_STATE && (FCR & 0x00000500) == 0x00000400)
+	if (TIMER == NO_TIMER)
 	{
-		execute_int(get_trap_addr(TRAPNO_IO3));
-		standard_irq_callback(IRQ_IO3);
-		return;
+		/* IO3 is priority 5; state is in bit 6 of ISR; FCR bit 10 enables input and FCR bit 8 inhibits interrupt */
+		if (IO3_LINE_STATE && (FCR & 0x00000500) == 0x00000400)
+		{
+			execute_int(get_trap_addr(TRAPNO_IO3));
+			standard_irq_callback(IRQ_IO3);
+			return;
+		}
+
+		/* INT1 is priority 7; state is in bit 0 of ISR; FCR bit 28 inhibits interrupt */
+		if (INT1_LINE_STATE && (FCR & 0x10000000) == 0x00000000)
+		{
+			execute_int(get_trap_addr(TRAPNO_INT1));
+			standard_irq_callback(IRQ_INT1);
+			return;
+		}
+
+		/* INT2 is priority 9; state is in bit 1 of ISR; FCR bit 29 inhibits interrupt */
+		if (INT2_LINE_STATE && (FCR & 0x20000000) == 0x00000000)
+		{
+			execute_int(get_trap_addr(TRAPNO_INT2));
+			standard_irq_callback(IRQ_INT2);
+			return;
+		}
+
+		/* INT3 is priority 11; state is in bit 2 of ISR; FCR bit 30 inhibits interrupt */
+		if (INT3_LINE_STATE && (FCR & 0x40000000) == 0x00000000)
+		{
+			execute_int(get_trap_addr(TRAPNO_INT3));
+			standard_irq_callback(IRQ_INT3);
+			return;
+		}
+
+		/* INT4 is priority 13; state is in bit 3 of ISR; FCR bit 31 inhibits interrupt */
+		if (INT4_LINE_STATE && (FCR & 0x80000000) == 0x00000000)
+		{
+			execute_int(get_trap_addr(TRAPNO_INT4));
+			standard_irq_callback(IRQ_INT4);
+			return;
+		}
+
+		/* IO1 is priority 14; state is in bit 4 of ISR; FCR bit 2 enables input and FCR bit 0 inhibits interrupt */
+		if (IO1_LINE_STATE && (FCR & 0x00000005) == 0x00000004)
+		{
+			execute_int(get_trap_addr(TRAPNO_IO1));
+			standard_irq_callback(IRQ_IO1);
+			return;
+		}
+
+		/* IO2 is priority 15; state is in bit 5 of ISR; FCR bit 6 enables input and FCR bit 4 inhibits interrupt */
+		if (IO2_LINE_STATE && (FCR & 0x00000050) == 0x00000040)
+		{
+			execute_int(get_trap_addr(TRAPNO_IO2));
+			standard_irq_callback(IRQ_IO2);
+			return;
+		}
 	}
-
-	/* timer int might be priority 6 if FCR bits 20-21 == 3; FCR bit 23 inhibits interrupt */
-	if (m_timer_int_pending && (FCR & 0x00b00000) == 0x00300000)
+	else
 	{
-		m_timer_int_pending = 0;
-		execute_int(get_trap_addr(TRAPNO_TIMER));
-		return;
-	}
+		/* IO3 is priority 5; state is in bit 6 of ISR; FCR bit 10 enables input and FCR bit 8 inhibits interrupt */
+		if (IO3_LINE_STATE && (FCR & 0x00000500) == 0x00000400)
+		{
+			execute_int(get_trap_addr(TRAPNO_IO3));
+			standard_irq_callback(IRQ_IO3);
+			return;
+		}
 
-	/* INT1 is priority 7; state is in bit 0 of ISR; FCR bit 28 inhibits interrupt */
-	if (INT1_LINE_STATE && (FCR & 0x10000000) == 0x00000000)
-	{
-		execute_int(get_trap_addr(TRAPNO_INT1));
-		standard_irq_callback(IRQ_INT1);
-		return;
-	}
+		/* timer int might be priority 6 if FCR bits 20-21 == 3; FCR bit 23 inhibits interrupt */
+		if (TIMER && (FCR & 0x00b00000) == 0x00300000)
+		{
+			m_timer_int_pending = 0;
+			execute_int(get_trap_addr(TRAPNO_TIMER));
+			return;
+		}
 
-	/* timer int might be priority 8 if FCR bits 20-21 == 2; FCR bit 23 inhibits interrupt */
-	if (m_timer_int_pending && (FCR & 0x00b00000) == 0x00200000)
-	{
-		m_timer_int_pending = 0;
-		execute_int(get_trap_addr(TRAPNO_TIMER));
-		return;
-	}
+		/* INT1 is priority 7; state is in bit 0 of ISR; FCR bit 28 inhibits interrupt */
+		if (INT1_LINE_STATE && (FCR & 0x10000000) == 0x00000000)
+		{
+			execute_int(get_trap_addr(TRAPNO_INT1));
+			standard_irq_callback(IRQ_INT1);
+			return;
+		}
 
-	/* INT2 is priority 9; state is in bit 1 of ISR; FCR bit 29 inhibits interrupt */
-	if (INT2_LINE_STATE && (FCR & 0x20000000) == 0x00000000)
-	{
-		execute_int(get_trap_addr(TRAPNO_INT2));
-		standard_irq_callback(IRQ_INT2);
-		return;
-	}
+		/* timer int might be priority 8 if FCR bits 20-21 == 2; FCR bit 23 inhibits interrupt */
+		if (TIMER && (FCR & 0x00b00000) == 0x00200000)
+		{
+			m_timer_int_pending = 0;
+			execute_int(get_trap_addr(TRAPNO_TIMER));
+			return;
+		}
 
-	/* timer int might be priority 10 if FCR bits 20-21 == 1; FCR bit 23 inhibits interrupt */
-	if (m_timer_int_pending && (FCR & 0x00b00000) == 0x00100000)
-	{
-		m_timer_int_pending = 0;
-		execute_int(get_trap_addr(TRAPNO_TIMER));
-		return;
-	}
+		/* INT2 is priority 9; state is in bit 1 of ISR; FCR bit 29 inhibits interrupt */
+		if (INT2_LINE_STATE && (FCR & 0x20000000) == 0x00000000)
+		{
+			execute_int(get_trap_addr(TRAPNO_INT2));
+			standard_irq_callback(IRQ_INT2);
+			return;
+		}
 
-	/* INT3 is priority 11; state is in bit 2 of ISR; FCR bit 30 inhibits interrupt */
-	if (INT3_LINE_STATE && (FCR & 0x40000000) == 0x00000000)
-	{
-		execute_int(get_trap_addr(TRAPNO_INT3));
-		standard_irq_callback(IRQ_INT3);
-		return;
-	}
+		/* timer int might be priority 10 if FCR bits 20-21 == 1; FCR bit 23 inhibits interrupt */
+		if (TIMER && (FCR & 0x00b00000) == 0x00100000)
+		{
+			m_timer_int_pending = 0;
+			execute_int(get_trap_addr(TRAPNO_TIMER));
+			return;
+		}
 
-	/* timer int might be priority 12 if FCR bits 20-21 == 0; FCR bit 23 inhibits interrupt */
-	if (m_timer_int_pending && (FCR & 0x00b00000) == 0x00000000)
-	{
-		m_timer_int_pending = 0;
-		execute_int(get_trap_addr(TRAPNO_TIMER));
-		return;
-	}
+		/* INT3 is priority 11; state is in bit 2 of ISR; FCR bit 30 inhibits interrupt */
+		if (INT3_LINE_STATE && (FCR & 0x40000000) == 0x00000000)
+		{
+			execute_int(get_trap_addr(TRAPNO_INT3));
+			standard_irq_callback(IRQ_INT3);
+			return;
+		}
 
-	/* INT4 is priority 13; state is in bit 3 of ISR; FCR bit 31 inhibits interrupt */
-	if (INT4_LINE_STATE && (FCR & 0x80000000) == 0x00000000)
-	{
-		execute_int(get_trap_addr(TRAPNO_INT4));
-		standard_irq_callback(IRQ_INT4);
-		return;
-	}
+		/* timer int might be priority 12 if FCR bits 20-21 == 0; FCR bit 23 inhibits interrupt */
+		if (TIMER && (FCR & 0x00b00000) == 0x00000000)
+		{
+			m_timer_int_pending = 0;
+			execute_int(get_trap_addr(TRAPNO_TIMER));
+			return;
+		}
 
-	/* IO1 is priority 14; state is in bit 4 of ISR; FCR bit 2 enables input and FCR bit 0 inhibits interrupt */
-	if (IO1_LINE_STATE && (FCR & 0x00000005) == 0x00000004)
-	{
-		execute_int(get_trap_addr(TRAPNO_IO1));
-		standard_irq_callback(IRQ_IO1);
-		return;
-	}
+		/* INT4 is priority 13; state is in bit 3 of ISR; FCR bit 31 inhibits interrupt */
+		if (INT4_LINE_STATE && (FCR & 0x80000000) == 0x00000000)
+		{
+			execute_int(get_trap_addr(TRAPNO_INT4));
+			standard_irq_callback(IRQ_INT4);
+			return;
+		}
 
-	/* IO2 is priority 15; state is in bit 5 of ISR; FCR bit 6 enables input and FCR bit 4 inhibits interrupt */
-	if (IO2_LINE_STATE && (FCR & 0x00000050) == 0x00000040)
-	{
-		execute_int(get_trap_addr(TRAPNO_IO2));
-		standard_irq_callback(IRQ_IO2);
-		return;
+		/* IO1 is priority 14; state is in bit 4 of ISR; FCR bit 2 enables input and FCR bit 0 inhibits interrupt */
+		if (IO1_LINE_STATE && (FCR & 0x00000005) == 0x00000004)
+		{
+			execute_int(get_trap_addr(TRAPNO_IO1));
+			standard_irq_callback(IRQ_IO1);
+			return;
+		}
+
+		/* IO2 is priority 15; state is in bit 5 of ISR; FCR bit 6 enables input and FCR bit 4 inhibits interrupt */
+		if (IO2_LINE_STATE && (FCR & 0x00000050) == 0x00000040)
+		{
+			execute_int(get_trap_addr(TRAPNO_IO2));
+			standard_irq_callback(IRQ_IO2);
+			return;
+		}
 	}
 }
 
@@ -992,6 +1069,15 @@ void hyperstone_device::device_start()
 
 void hyperstone_device::init(int scale_mask)
 {
+	m_enable_drc = allow_drc();
+
+#if E132XS_LOG_DRC_REGS || E132XS_LOG_INTERPRETER_REGS
+	if (m_enable_drc)
+		m_trace_log = fopen("e1_drc.log", "wb");
+	else
+		m_trace_log = fopen("e1_interpreter.log", "wb");
+#endif
+
 	memset(m_global_regs, 0, sizeof(uint32_t) * 32);
 	memset(m_local_regs, 0, sizeof(uint32_t) * 64);
 	m_op = 0;
@@ -1000,8 +1086,10 @@ void hyperstone_device::init(int scale_mask)
 	m_clck_scale = 0;
 	m_clock_cycles_1 = 0;
 	m_clock_cycles_2 = 0;
+	m_clock_cycles_3 = 0;
 	m_clock_cycles_4 = 0;
 	m_clock_cycles_6 = 0;
+	m_clock_cycles_36 = 0;
 
 	m_tr_base_cycles = 0;
 	m_tr_base_value = 0;
@@ -1150,6 +1238,7 @@ void hyperstone_device::init(int scale_mask)
 	save_item(NAME(m_instruction_length));
 	save_item(NAME(m_intblock));
 	save_item(NAME(m_delay_slot));
+	save_item(NAME(m_delay_slot_taken));
 	save_item(NAME(m_tr_clocks_per_tick));
 	save_item(NAME(m_tr_base_value));
 	save_item(NAME(m_tr_base_cycles));
@@ -1158,8 +1247,10 @@ void hyperstone_device::init(int scale_mask)
 	save_item(NAME(m_clock_scale_mask));
 	save_item(NAME(m_clock_cycles_1));
 	save_item(NAME(m_clock_cycles_2));
+	save_item(NAME(m_clock_cycles_3));
 	save_item(NAME(m_clock_cycles_4));
 	save_item(NAME(m_clock_cycles_6));
+	save_item(NAME(m_clock_cycles_36));
 
 	// set our instruction counter
 	m_icountptr = &m_icount;
@@ -1275,6 +1366,7 @@ void hyperstone_device::device_reset()
 	SET_T(0);
 	SET_L(1);
 	SET_S(1);
+	SET_ILC(1<<19);
 
 	set_local_register(0, (PC & 0xfffffffe) | GET_S);
 	set_local_register(1, SR);
@@ -1284,6 +1376,17 @@ void hyperstone_device::device_reset()
 
 void hyperstone_device::device_stop()
 {
+	if (m_drcfe != nullptr)
+	{
+		m_drcfe = nullptr;
+	}
+	if (m_drcuml != nullptr)
+	{
+		m_drcuml = nullptr;
+	}
+#if E132XS_LOG_DRC_REGS || E132XS_LOG_INTERPRETER_REGS
+	fclose(m_trace_log);
+#endif
 }
 
 
@@ -1358,6 +1461,8 @@ bool hyperstone_device::get_h() const
 
 void hyperstone_device::hyperstone_trap()
 {
+	m_icount -= m_clock_cycles_1;
+
 	static const uint32_t conditions[16] = {
 		0, 0, 0, 0, N_MASK | Z_MASK, N_MASK | Z_MASK, N_MASK, N_MASK, C_MASK | Z_MASK, C_MASK | Z_MASK, C_MASK, C_MASK, Z_MASK, Z_MASK, V_MASK, 0
 	};
@@ -1381,8 +1486,6 @@ void hyperstone_device::hyperstone_trap()
 		if (!(SR & conditions[code]))
 			execute_trap(addr);
 	}
-
-	m_icount -= m_clock_cycles_1;
 }
 
 
@@ -1453,11 +1556,16 @@ void hyperstone_device::execute_run()
 	if (m_intblock < 0)
 		m_intblock = 0;
 
-	check_interrupts();
+	if (m_timer_int_pending)
+		check_interrupts<IS_TIMER>();
+	else
+		check_interrupts<NO_TIMER>();
 
-	do
+	while (m_icount > 0)
 	{
-		uint32_t oldh = SR & 0x00000020;
+#if E132XS_LOG_INTERPRETER_REGS
+		dump_registers();
+#endif
 
 		debugger_instruction_hook(this, PC);
 
@@ -1726,9 +1834,6 @@ void hyperstone_device::execute_run()
 			case 0xff: hyperstone_trap(); break;
 		}
 
-		/* clear the H state if it was previously set */
-		SR ^= oldh;
-
 		SET_ILC(m_instruction_length);
 
 		if (GET_T && GET_P && !m_delay_slot) /* Not in a Delayed Branch instructions */
@@ -1737,10 +1842,15 @@ void hyperstone_device::execute_run()
 			execute_exception(addr);
 		}
 
-		if (--m_intblock == 0)
-			check_interrupts();
-
-	} while( m_icount > 0 );
+		if (--m_intblock <= 0)
+		{
+			m_intblock = 0;
+			if (m_timer_int_pending)
+				check_interrupts<IS_TIMER>();
+			else
+				check_interrupts<NO_TIMER>();
+		}
+	}
 }
 
 DEFINE_DEVICE_TYPE(E116T,      e116t_device,      "e116t",      "E1-16T")
