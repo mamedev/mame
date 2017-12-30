@@ -210,10 +210,6 @@ hyperstone_device::hyperstone_device(const machine_config &mconfig, const char *
 	, m_entry(nullptr)
 	, m_nocode(nullptr)
 	, m_out_of_cycles(nullptr)
-	, m_drc_arg0(0)
-	, m_drc_arg1(0)
-	, m_drc_arg2(0)
-	, m_drc_arg3(0)
 	, m_mem_read8(nullptr)
 	, m_mem_write8(nullptr)
 	, m_mem_read16(nullptr)
@@ -1149,10 +1145,8 @@ void hyperstone_device::init(int scale_mask)
 		m_drcuml->symbol_add(&m_core->local_regs[i], sizeof(uint32_t), buf);
 	}
 
-	m_drcuml->symbol_add(&m_drc_arg0, sizeof(uint32_t), "arg0");
-	m_drcuml->symbol_add(&m_drc_arg1, sizeof(uint32_t), "arg1");
-	m_drcuml->symbol_add(&m_drc_arg2, sizeof(uint32_t), "arg2");
-	m_drcuml->symbol_add(&m_drc_arg3, sizeof(uint32_t), "arg3");
+	m_drcuml->symbol_add(&m_core->arg0, sizeof(uint32_t), "arg0");
+	m_drcuml->symbol_add(&m_core->arg1, sizeof(uint32_t), "arg1");
 
 	/* initialize the front-end helper */
 	m_drcfe = std::make_unique<e132xs_frontend>(this, COMPILE_BACKWARDS_BYTES, COMPILE_FORWARDS_BYTES, SINGLE_INSTRUCTION_MODE ? 1 : COMPILE_MAX_SEQUENCE);

@@ -174,6 +174,9 @@ protected:
 
 		int32_t   intblock;
 
+		uint32_t  arg0;
+		uint32_t  arg1;
+
 		// other internal state
 		int       icount;
 	};
@@ -424,12 +427,6 @@ private:
 	uml::code_handle *m_nocode;
 	uml::code_handle *m_interrupt_checks;
 	uml::code_handle *m_out_of_cycles;
-
-	uint32_t m_drc_arg0;
-	uint32_t m_drc_arg1;
-	uint32_t m_drc_arg2;
-	uint32_t m_drc_arg3;
-	uint32_t m_branch_dest;
 
 	uml::code_handle *m_mem_read8;
 	uml::code_handle *m_mem_write8;
