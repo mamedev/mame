@@ -53,6 +53,7 @@ static ADDRESS_MAP_START( mem_map, AS_PROGRAM, 16, tr175_state )
 	AM_RANGE(0xff0000, 0xff7fff) AM_RAM // video RAM?
 	AM_RANGE(0xffe000, 0xffe01f) AM_DEVREADWRITE8("duart", scn2681_device, read, write, 0xff00)
 	AM_RANGE(0xffe400, 0xffe40f) AM_DEVREADWRITE8("avdc", scn2674_device, read, write, 0xff00)
+	AM_RANGE(0xffe800, 0xffe805) AM_UNMAP //AM_DEVREADWRITE8("pai", um82c11_device, read, write, 0xff00)
 	AM_RANGE(0xffec00, 0xffec01) AM_WRITE8(ffec01_w, 0x00ff)
 	AM_RANGE(0xfff000, 0xfff001) AM_WRITE8(fff000_w, 0xff00)
 	AM_RANGE(0xfff400, 0xfff401) AM_READ8(fff400_r, 0xff00)
