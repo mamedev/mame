@@ -1032,20 +1032,21 @@ inline void ygv608_device::draw_layer_roz(screen_device &screen, bitmap_ind16 &b
 
 void ygv608_device::ygv608_draw_mosaic(bitmap_ind16 &bitmap, const rectangle &cliprect, int n)
 {
-	int x, y, x0, y0;
+	int x, y, mask;
 
 	if (n <= 0)
 	{
 		return;
 	}
 
+	// mask to drop the lowest n-bits
+	mask = ~((1 << n) - 1);
+
 	for (y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
 		for (x = cliprect.min_x; x <= cliprect.max_x; x++)
 		{
-			x0 = (x >> n) << n;
-			y0 = (y >> n) << n;
-			bitmap.pix16(y, x) = bitmap.pix16(y0, x0);
+			bitmap.pix16(y, x) = bitmap.pix16(y & mask, x & mask);
 		}
 	}
 }
