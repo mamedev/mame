@@ -36455,7 +36455,6 @@ qvt102
 qvt103
 qvt190
 qvt201
-tr175
 tv912c
 tv955
 tv965
@@ -37049,6 +37048,9 @@ toypop                          // (c) 1986
 tp84                            // GX388 (c) 1984
 tp84a                           // GX388 (c) 1984
 tp84b                           // GX388 (c) 1984
+
+@source:tr175.cpp
+tr175                           // Relisys
 
 @source:tr606.cpp
 tr606                           // Roland

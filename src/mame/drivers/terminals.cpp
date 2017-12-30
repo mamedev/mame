@@ -169,25 +169,6 @@ COMP( 1986, qvt201, 0, 0, terminals, terminals, terminals_state, 0, "Qume", "QVT
 
 /**************************************************************************************************************
 
-Relisys TR175 II.
-Chips: MC68000P12, HM82C11C, SCN2681, 3x W24257-70L, KDA0476BCN-66 (RAMDAC), 4 undumped proms, Beeper, Button battery
-Crystals: 28.322, 46.448, 11.0592, unknown.
-Colour screen.
-
-***************************************************************************************************************/
-
-ROM_START( tr175 )
-	ROM_REGION(0x20000, "maincpu", 0)
-	ROM_LOAD16_BYTE( "v6.05.u50", 0x00000, 0x10000, CRC(5a33b6b3) SHA1(d673f50dd88f8a154ddaabe34cfcc9ab91435a4c) )
-	ROM_LOAD16_BYTE( "v6.05.u45", 0x00001, 0x10000, CRC(e220befe) SHA1(8402280577e6de4b85843222bbd6b06a3f625b3b) )
-ROM_END
-
-COMP( 1982, tr175, 0, 0, terminals, terminals, terminals_state, 0, "Relisys", "TR175II", MACHINE_IS_SKELETON )
-
-
-
-/**************************************************************************************************************
-
 Televideo TVI-912C.
 Chips: i8035, TMS9927NL, AY5-1013A (COM2502)
 Crystals: 23.814 (divide by 4 for CPU clock)
