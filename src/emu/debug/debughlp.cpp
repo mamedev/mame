@@ -79,7 +79,7 @@ static const help_item static_help_list[] =
 		"Type help <command> for further details on each command\n"
 		"\n"
 		"  help [<topic>] -- get help on a particular topic\n"
-		"  helphtml [<filename>] -- print all debugger help to an html file\n"
+		"  helphtml <filename> -- print all debugger help to an html file\n"
 		"  do <expression> -- evaluates the given expression\n"
 		"  symlist [<cpu>] -- lists registered symbols\n"
 		"  softreset -- executes a soft reset\n"
@@ -460,11 +460,11 @@ static const help_item static_help_list[] =
 	{
 		"helphtml",
 		"\n"
-		"  helphtml [<filename>]\n"
+		"  helphtml <filename>\n"
 		"\n"
-		"The helphtml command prints all the contents of debugger help to an html file.  If no <filename> "
-		"is provided, the default filename 'debughelp' is used.  No extension is necessary, as it gets "
-		"automatically appended.\n"
+		"The helphtml command prints all the contents of debugger help to an html file.  "
+		"The .html extension is not necessary, as it gets automatically appended if it's not present "
+		"in the provided filename.\n"
 	},
 	{
 		"rewind[rw]",
