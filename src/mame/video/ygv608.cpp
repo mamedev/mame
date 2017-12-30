@@ -1103,7 +1103,7 @@ uint32_t ygv608_device::update_screen(screen_device &screen, bitmap_ind16 &bitma
 			m_tilemap_A = m_tilemap_A_cache_16[index];
 		m_tilemap_A->mark_all_dirty();
 
-		m_tilemap_A->set_transparent_pen(0);
+		m_tilemap_A->set_transparent_pen(m_border_color);
 
 		if (m_h_div_size == 0) {
 			m_tilemap_A->set_scroll_cols(m_page_x);
