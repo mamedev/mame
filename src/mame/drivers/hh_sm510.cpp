@@ -4023,7 +4023,7 @@ ROM_START( nummunch )
 	ROM_LOAD( "nummunch.program", 0x0000, 0x1000, CRC(2f7ff516) SHA1(132e7c5c4d69170953b2e51731992d6d6ba829f9) )
 
 	ROM_REGION( 0x100, "maincpu:melody", 0 )
-	ROM_LOAD( "nummunch.melody", 0x000, 0x100, NO_DUMP )
+	ROM_LOAD( "nummunch.melody", 0x000, 0x100, CRC(96fe463a) SHA1(dcef5eee15a3f6d21e0db1b8ae3fbddc81633fc8) )
 
 	ROM_REGION( 140664, "svg", 0)
 	ROM_LOAD( "nummunch.svg", 0, 140664, CRC(879df7e2) SHA1(78d8500a445cbbea0090d4e97b781c1e4ed11dd3) )
@@ -4080,4 +4080,4 @@ CONS( 1995, tjdredd,   0,        0, tjdredd,   tjdredd,   tjdredd_state,   0, "T
 CONS( 1995, tapollo13, 0,        0, tapollo13, tapollo13, tapollo13_state, 0, "Tiger Electronics", "Apollo 13 (handheld)", MACHINE_SUPPORTS_SAVE )
 CONS( 1996, tsjam,     0,        0, tsjam,     tsjam,     tsjam_state,     0, "Tiger Electronics", "Space Jam (handheld)", MACHINE_SUPPORTS_SAVE )
 
-CONS( 1989, nummunch,  0,        0, nummunch,  nummunch,  nummunch_state,  0, "VTech", "Electronic Number Muncher", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+CONS( 1989, nummunch,  0,        0, nummunch,  nummunch,  nummunch_state,  0, "VTech", "Electronic Number Muncher", MACHINE_SUPPORTS_SAVE )
