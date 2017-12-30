@@ -573,7 +573,7 @@ void hyperstone_device::generate_interrupt_checks_no_timer(drcuml_block *block, 
 	generate_get_trap_addr(block, labelnum, TRAPNO_IO3);
 	UML_MOV(block, mem(&m_drc_arg0), IRQ_IO3);
 	UML_CALLC(block, cfunc_standard_irq_callback, this);
-	generate_trap_or_int<IS_INT>(block);
+	generate_trap_exception_or_int<IS_INT>(block);
 	UML_LABEL(block, skip_io3);
 
 	int skip_int1 = labelnum++;
@@ -584,7 +584,7 @@ void hyperstone_device::generate_interrupt_checks_no_timer(drcuml_block *block, 
 	generate_get_trap_addr(block, labelnum, TRAPNO_INT1);
 	UML_MOV(block, mem(&m_drc_arg0), IRQ_INT1);
 	UML_CALLC(block, cfunc_standard_irq_callback, this);
-	generate_trap_or_int<IS_INT>(block);
+	generate_trap_exception_or_int<IS_INT>(block);
 	UML_LABEL(block, skip_int1);
 
 	int skip_int2 = labelnum++;
@@ -595,7 +595,7 @@ void hyperstone_device::generate_interrupt_checks_no_timer(drcuml_block *block, 
 	generate_get_trap_addr(block, labelnum, TRAPNO_INT2);
 	UML_MOV(block, mem(&m_drc_arg0), IRQ_INT2);
 	UML_CALLC(block, cfunc_standard_irq_callback, this);
-	generate_trap_or_int<IS_INT>(block);
+	generate_trap_exception_or_int<IS_INT>(block);
 	UML_LABEL(block, skip_int2);
 
 	int skip_int3 = labelnum++;
@@ -606,7 +606,7 @@ void hyperstone_device::generate_interrupt_checks_no_timer(drcuml_block *block, 
 	generate_get_trap_addr(block, labelnum, TRAPNO_INT3);
 	UML_MOV(block, mem(&m_drc_arg0), IRQ_INT3);
 	UML_CALLC(block, cfunc_standard_irq_callback, this);
-	generate_trap_or_int<IS_INT>(block);
+	generate_trap_exception_or_int<IS_INT>(block);
 	UML_LABEL(block, skip_int3);
 
 	int skip_int4 = labelnum++;
@@ -617,7 +617,7 @@ void hyperstone_device::generate_interrupt_checks_no_timer(drcuml_block *block, 
 	generate_get_trap_addr(block, labelnum, TRAPNO_INT4);
 	UML_MOV(block, mem(&m_drc_arg0), IRQ_INT4);
 	UML_CALLC(block, cfunc_standard_irq_callback, this);
-	generate_trap_or_int<IS_INT>(block);
+	generate_trap_exception_or_int<IS_INT>(block);
 	UML_LABEL(block, skip_int4);
 
 	int skip_io1 = labelnum++;
@@ -629,7 +629,7 @@ void hyperstone_device::generate_interrupt_checks_no_timer(drcuml_block *block, 
 	generate_get_trap_addr(block, labelnum, TRAPNO_IO1);
 	UML_MOV(block, mem(&m_drc_arg0), IRQ_IO1);
 	UML_CALLC(block, cfunc_standard_irq_callback, this);
-	generate_trap_or_int<IS_INT>(block);
+	generate_trap_exception_or_int<IS_INT>(block);
 	UML_LABEL(block, skip_io1);
 
 	int skip_io2 = labelnum++;
@@ -641,7 +641,7 @@ void hyperstone_device::generate_interrupt_checks_no_timer(drcuml_block *block, 
 	generate_get_trap_addr(block, labelnum, TRAPNO_IO2);
 	UML_MOV(block, mem(&m_drc_arg0), IRQ_IO2);
 	UML_CALLC(block, cfunc_standard_irq_callback, this);
-	generate_trap_or_int<IS_INT>(block);
+	generate_trap_exception_or_int<IS_INT>(block);
 	UML_LABEL(block, skip_io2);
 }
 
@@ -656,7 +656,7 @@ void hyperstone_device::generate_interrupt_checks_with_timer(drcuml_block *block
 	generate_get_trap_addr(block, labelnum, TRAPNO_IO3);
 	UML_MOV(block, mem(&m_drc_arg0), IRQ_IO3);
 	UML_CALLC(block, cfunc_standard_irq_callback, this);
-	generate_trap_or_int<IS_INT>(block);
+	generate_trap_exception_or_int<IS_INT>(block);
 	UML_LABEL(block, skip_io3);
 
 	int skip_timer_pri6 = labelnum++;
@@ -664,7 +664,7 @@ void hyperstone_device::generate_interrupt_checks_with_timer(drcuml_block *block
 	UML_JMPc(block, uml::COND_NE, skip_timer_pri6);
 	UML_MOV(block, mem(&m_timer_int_pending), 0);
 	generate_get_trap_addr(block, labelnum, TRAPNO_TIMER);
-	generate_trap_or_int<IS_INT>(block);
+	generate_trap_exception_or_int<IS_INT>(block);
 	UML_LABEL(block, skip_timer_pri6);
 
 	int skip_int1 = labelnum++;
@@ -675,7 +675,7 @@ void hyperstone_device::generate_interrupt_checks_with_timer(drcuml_block *block
 	generate_get_trap_addr(block, labelnum, TRAPNO_INT1);
 	UML_MOV(block, mem(&m_drc_arg0), IRQ_INT1);
 	UML_CALLC(block, cfunc_standard_irq_callback, this);
-	generate_trap_or_int<IS_INT>(block);
+	generate_trap_exception_or_int<IS_INT>(block);
 	UML_LABEL(block, skip_int1);
 
 	int skip_timer_pri8 = labelnum++;
@@ -683,7 +683,7 @@ void hyperstone_device::generate_interrupt_checks_with_timer(drcuml_block *block
 	UML_JMPc(block, uml::COND_NE, skip_timer_pri8);
 	UML_MOV(block, mem(&m_timer_int_pending), 0);
 	generate_get_trap_addr(block, labelnum, TRAPNO_TIMER);
-	generate_trap_or_int<IS_INT>(block);
+	generate_trap_exception_or_int<IS_INT>(block);
 	UML_LABEL(block, skip_timer_pri8);
 
 	int skip_int2 = labelnum++;
@@ -694,7 +694,7 @@ void hyperstone_device::generate_interrupt_checks_with_timer(drcuml_block *block
 	generate_get_trap_addr(block, labelnum, TRAPNO_INT2);
 	UML_MOV(block, mem(&m_drc_arg0), IRQ_INT2);
 	UML_CALLC(block, cfunc_standard_irq_callback, this);
-	generate_trap_or_int<IS_INT>(block);
+	generate_trap_exception_or_int<IS_INT>(block);
 	UML_LABEL(block, skip_int2);
 
 	int skip_timer_pri10 = labelnum++;
@@ -702,7 +702,7 @@ void hyperstone_device::generate_interrupt_checks_with_timer(drcuml_block *block
 	UML_JMPc(block, uml::COND_NE, skip_timer_pri10);
 	UML_MOV(block, mem(&m_timer_int_pending), 0);
 	generate_get_trap_addr(block, labelnum, TRAPNO_TIMER);
-	generate_trap_or_int<IS_INT>(block);
+	generate_trap_exception_or_int<IS_INT>(block);
 	UML_LABEL(block, skip_timer_pri10);
 
 	int skip_int3 = labelnum++;
@@ -713,7 +713,7 @@ void hyperstone_device::generate_interrupt_checks_with_timer(drcuml_block *block
 	generate_get_trap_addr(block, labelnum, TRAPNO_INT3);
 	UML_MOV(block, mem(&m_drc_arg0), IRQ_INT3);
 	UML_CALLC(block, cfunc_standard_irq_callback, this);
-	generate_trap_or_int<IS_INT>(block);
+	generate_trap_exception_or_int<IS_INT>(block);
 	UML_LABEL(block, skip_int3);
 
 	int skip_timer_pri12 = labelnum++;
@@ -721,7 +721,7 @@ void hyperstone_device::generate_interrupt_checks_with_timer(drcuml_block *block
 	UML_JMPc(block, uml::COND_NE, skip_timer_pri12);
 	UML_MOV(block, mem(&m_timer_int_pending), 0);
 	generate_get_trap_addr(block, labelnum, TRAPNO_TIMER);
-	generate_trap_or_int<IS_INT>(block);
+	generate_trap_exception_or_int<IS_INT>(block);
 	UML_LABEL(block, skip_timer_pri12);
 
 	int skip_int4 = labelnum++;
@@ -732,7 +732,7 @@ void hyperstone_device::generate_interrupt_checks_with_timer(drcuml_block *block
 	generate_get_trap_addr(block, labelnum, TRAPNO_INT4);
 	UML_MOV(block, mem(&m_drc_arg0), IRQ_INT4);
 	UML_CALLC(block, cfunc_standard_irq_callback, this);
-	generate_trap_or_int<IS_INT>(block);
+	generate_trap_exception_or_int<IS_INT>(block);
 	UML_LABEL(block, skip_int4);
 
 	int skip_io1 = labelnum++;
@@ -744,7 +744,7 @@ void hyperstone_device::generate_interrupt_checks_with_timer(drcuml_block *block
 	generate_get_trap_addr(block, labelnum, TRAPNO_IO1);
 	UML_MOV(block, mem(&m_drc_arg0), IRQ_IO1);
 	UML_CALLC(block, cfunc_standard_irq_callback, this);
-	generate_trap_or_int<IS_INT>(block);
+	generate_trap_exception_or_int<IS_INT>(block);
 	UML_LABEL(block, skip_io1);
 
 	int skip_io2 = labelnum++;
@@ -756,7 +756,7 @@ void hyperstone_device::generate_interrupt_checks_with_timer(drcuml_block *block
 	generate_get_trap_addr(block, labelnum, TRAPNO_IO2);
 	UML_MOV(block, mem(&m_drc_arg0), IRQ_IO2);
 	UML_CALLC(block, cfunc_standard_irq_callback, this);
-	generate_trap_or_int<IS_INT>(block);
+	generate_trap_exception_or_int<IS_INT>(block);
 	UML_LABEL(block, skip_io2);
 }
 

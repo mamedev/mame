@@ -644,22 +644,18 @@ void hyperstone_device::hyperstone_subs()
 
 	SR &= ~(V_MASK | Z_MASK | N_MASK);
 
-//#ifdef SETCARRYS
-//  SR |= (tmp & 0x100000000) >> 32;
-//#endif
-
 	SR |= ((tmp ^ dreg) & (dreg ^ sreg) & 0x80000000) >> 28;
 
-	const int32_t res = dreg - sreg;
+	dreg -= sreg;
 
-	if (res == 0)
+	if (dreg == 0)
 		SR |= Z_MASK;
-	SR |= SIGN_TO_N(res);
+	SR |= SIGN_TO_N(dreg);
 
 	if (DST_GLOBAL)
-		set_global_register(dst_code, res);
+		set_global_register(dst_code, dreg);
 	else
-		m_local_regs[dst_code] = res;
+		m_local_regs[dst_code] = dreg;
 
 	m_icount -= m_clock_cycles_1;
 

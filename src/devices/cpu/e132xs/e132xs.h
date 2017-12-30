@@ -179,10 +179,11 @@ protected:
 		IS_SET = 1
 	};
 
-	enum trap_or_int
+	enum trap_exception_or_int
 	{
 		IS_TRAP = 0,
-		IS_INT = 1
+		IS_INT = 1,
+		IS_EXCEPTION = 2
 	};
 
 	enum is_timer
@@ -474,7 +475,7 @@ private:
 	void generate_get_global_register(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
 	void generate_set_global_register(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
 
-	template <trap_or_int IS_INT> void generate_trap_or_int(drcuml_block *block);
+	template <trap_exception_or_int TYPE> void generate_trap_exception_or_int(drcuml_block *block);
 	void generate_int(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint32_t addr);
 	void generate_exception(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint32_t addr);
 	void generate_software(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
