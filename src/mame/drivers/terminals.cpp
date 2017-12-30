@@ -247,20 +247,3 @@ ROM_START( tv965 )
 ROM_END
 
 COMP( 1989, tv965, 0, 0, terminals, terminals, terminals_state, 0, "TeleVideo", "TVI-965", MACHINE_IS_SKELETON )
-
-
-
-/**************************************************************************************************************
-
-DEC VT420.
-Chips: SCN8031HFCN40, SCN2681TC1N40, M5M4464AP, HM62256LFP-10T, TC23SC070AT, TC531001CP-1815
-Crystals: 43.320
-
-***************************************************************************************************************/
-
-ROM_START( vt420 )
-	ROM_REGION(0x20000, "maincpu", 0)
-	ROM_LOAD( "23-068e9-00.e2", 0x00000, 0x20000, CRC(22c3f93b) SHA1(b212911c41e4dba2e09d91fdd1f72d6c7536b0af) )
-ROM_END
-
-COMP( 1990, vt420, 0, 0, terminals, terminals, terminals_state, 0, "DEC", "VT-420", MACHINE_IS_SKELETON )

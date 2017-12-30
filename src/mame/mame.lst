@@ -36459,7 +36459,6 @@ tr175
 tv912c
 tv955
 tv965
-vt420
 
 @source:terracre.cpp
 amatelas                        // (c) 1986
@@ -37889,6 +37888,7 @@ vt320                           // 1987 Digital Equipment Corporation
 vt330                           // 1987 Digital Equipment Corporation
 
 @source:vt520.cpp
+vt420                           // 1990 Digital Equipment Corporation
 vt520                           // 1994 Digital Equipment Corporation
 
 @source:vta2000.cpp
