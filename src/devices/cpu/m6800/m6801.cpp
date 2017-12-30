@@ -839,7 +839,7 @@ READ8_MEMBER( m6801_cpu_device::m6801_io_r )
 		break;
 
 	case IO_P3DDR:
-		logerror("M6801 '%s' Port 3 DDR is a write-only register\n", space.device().tag());
+		logerror("M6801 '%s' Port 3 DDR is a write-only register\n", tag());
 		break;
 
 	case IO_P4DDR:
@@ -851,7 +851,7 @@ READ8_MEMBER( m6801_cpu_device::m6801_io_r )
 		{
 			if (m_p3csr_is3_flag_read)
 			{
-				//logerror("M6801 '%s' Cleared IS3\n", space.device().tag());
+				//logerror("M6801 '%s' Cleared IS3\n", tag());
 				m_p3csr &= ~M6801_P3CSR_IS3_FLAG;
 				m_p3csr_is3_flag_read = 0;
 			}
@@ -976,14 +976,14 @@ READ8_MEMBER( m6801_cpu_device::m6801_io_r )
 		{
 			if (m_trcsr_read_orfe)
 			{
-				//logerror("M6801 '%s' Cleared ORFE\n", space.device().tag());
+				//logerror("M6801 '%s' Cleared ORFE\n", tag());
 				m_trcsr_read_orfe = 0;
 				m_trcsr &= ~M6801_TRCSR_ORFE;
 			}
 
 			if (m_trcsr_read_rdrf)
 			{
-				//logerror("M6801 '%s' Cleared RDRF\n", space.device().tag());
+				//logerror("M6801 '%s' Cleared RDRF\n", tag());
 				m_trcsr_read_rdrf = 0;
 				m_trcsr &= ~M6801_TRCSR_RDRF;
 			}
@@ -1012,7 +1012,7 @@ READ8_MEMBER( m6801_cpu_device::m6801_io_r )
 	case IO_ICR2H:
 	case IO_ICR2L:
 	default:
-		logerror("M6801 '%s' PC %04x: warning - read from reserved internal register %02x\n",space.device().tag(),space.device().safe_pc(),offset);
+		logerror("PC %04x: warning - read from reserved internal register %02x\n", pc(),offset);
 	}
 
 	return data;
@@ -1023,7 +1023,7 @@ WRITE8_MEMBER( m6801_cpu_device::m6801_io_w )
 	switch (offset)
 	{
 	case IO_P1DDR:
-		//logerror("M6801 '%s' Port 1 Data Direction Register: %02x\n", space.device().tag(), data);
+		//logerror("M6801 '%s' Port 1 Data Direction Register: %02x\n", tag(), data);
 
 		if (m_port1_ddr != data)
 		{
@@ -1036,7 +1036,7 @@ WRITE8_MEMBER( m6801_cpu_device::m6801_io_w )
 		break;
 
 	case IO_P2DDR:
-		//logerror("M6801 '%s' Port 2 Data Direction Register: %02x\n", space.device().tag(), data);
+		//logerror("M6801 '%s' Port 2 Data Direction Register: %02x\n", tag(), data);
 
 		if (m_port2_ddr != data)
 		{
@@ -1046,7 +1046,7 @@ WRITE8_MEMBER( m6801_cpu_device::m6801_io_w )
 		break;
 
 	case IO_P1DATA:
-		//logerror("M6801 '%s' Port 1 Data Register: %02x\n", space.device().tag(), data);
+		//logerror("M6801 '%s' Port 1 Data Register: %02x\n", tag(), data);
 
 		m_port1_data = data;
 		if(m_port1_ddr == 0xff)
@@ -1056,7 +1056,7 @@ WRITE8_MEMBER( m6801_cpu_device::m6801_io_w )
 		break;
 
 	case IO_P2DATA:
-		//logerror("M6801 '%s' Port 2 Data Register: %02x\n", space.device().tag(), data);
+		//logerror("M6801 '%s' Port 2 Data Register: %02x\n", tag(), data);
 
 		m_port2_data = data;
 		m_port2_written = 1;
@@ -1064,7 +1064,7 @@ WRITE8_MEMBER( m6801_cpu_device::m6801_io_w )
 		break;
 
 	case IO_P3DDR:
-		//logerror("M6801 '%s' Port 3 Data Direction Register: %02x\n", space.device().tag(), data);
+		//logerror("M6801 '%s' Port 3 Data Direction Register: %02x\n", tag(), data);
 
 		if (m_port3_ddr != data)
 		{
@@ -1077,7 +1077,7 @@ WRITE8_MEMBER( m6801_cpu_device::m6801_io_w )
 		break;
 
 	case IO_P4DDR:
-		//logerror("M6801 '%s' Port 4 Data Direction Register: %02x\n", space.device().tag(), data);
+		//logerror("M6801 '%s' Port 4 Data Direction Register: %02x\n", tag(), data);
 
 		if (m_port4_ddr != data)
 		{
@@ -1090,11 +1090,11 @@ WRITE8_MEMBER( m6801_cpu_device::m6801_io_w )
 		break;
 
 	case IO_P3DATA:
-		//logerror("M6801 '%s' Port 3 Data Register: %02x\n", space.device().tag(), data);
+		//logerror("M6801 '%s' Port 3 Data Register: %02x\n", tag(), data);
 
 		if (m_p3csr_is3_flag_read)
 		{
-			//logerror("M6801 '%s' Cleared IS3\n", space.device().tag());
+			//logerror("M6801 '%s' Cleared IS3\n", tag());
 			m_p3csr &= ~M6801_P3CSR_IS3_FLAG;
 			m_p3csr_is3_flag_read = 0;
 		}
@@ -1117,7 +1117,7 @@ WRITE8_MEMBER( m6801_cpu_device::m6801_io_w )
 		break;
 
 	case IO_P4DATA:
-		//logerror("M6801 '%s' Port 4 Data Register: %02x\n", space.device().tag(), data);
+		//logerror("M6801 '%s' Port 4 Data Register: %02x\n", tag(), data);
 
 		m_port4_data = data;
 		if(m_port4_ddr == 0xff)
@@ -1127,7 +1127,7 @@ WRITE8_MEMBER( m6801_cpu_device::m6801_io_w )
 		break;
 
 	case IO_TCSR:
-		//logerror("M6801 '%s' Timer Control and Status Register: %02x\n", space.device().tag(), data);
+		//logerror("M6801 '%s' Timer Control and Status Register: %02x\n", tag(), data);
 
 		m_tcsr = data;
 		m_pending_tcsr &= m_tcsr;
@@ -1137,7 +1137,7 @@ WRITE8_MEMBER( m6801_cpu_device::m6801_io_w )
 		break;
 
 	case IO_CH:
-		//logerror("M6801 '%s' Counter High Register: %02x\n", space.device().tag(), data);
+		//logerror("M6801 '%s' Counter High Register: %02x\n", tag(), data);
 
 		m_latch09 = data & 0xff;    /* 6301 only */
 		CT  = 0xfff8;
@@ -1146,7 +1146,7 @@ WRITE8_MEMBER( m6801_cpu_device::m6801_io_w )
 		break;
 
 	case IO_CL: /* 6301 only */
-		//logerror("M6801 '%s' Counter Low Register: %02x\n", space.device().tag(), data);
+		//logerror("M6801 '%s' Counter Low Register: %02x\n", tag(), data);
 
 		CT = (m_latch09 << 8) | (data & 0xff);
 		TOH = CTH;
@@ -1154,7 +1154,7 @@ WRITE8_MEMBER( m6801_cpu_device::m6801_io_w )
 		break;
 
 	case IO_OCRH:
-		//logerror("M6801 '%s' Output Compare High Register: %02x\n", space.device().tag(), data);
+		//logerror("M6801 '%s' Output Compare High Register: %02x\n", tag(), data);
 
 		if( m_output_compare.b.h != data)
 		{
@@ -1164,7 +1164,7 @@ WRITE8_MEMBER( m6801_cpu_device::m6801_io_w )
 		break;
 
 	case IO_OCRL:
-		//logerror("M6801 '%s' Output Compare Low Register: %02x\n", space.device().tag(), data);
+		//logerror("M6801 '%s' Output Compare Low Register: %02x\n", tag(), data);
 
 		if( m_output_compare.b.l != data)
 		{
@@ -1176,23 +1176,23 @@ WRITE8_MEMBER( m6801_cpu_device::m6801_io_w )
 	case IO_ICRH:
 	case IO_ICRL:
 	case IO_RDR:
-		//logerror("CPU '%s' PC %04x: warning - write %02x to read only internal register %02x\n",space.device().tag(),space.device().safe_pc(),data,offset);
+		//logerror("PC %04x: warning - write %02x to read only internal register %02x\n",pc(),data,offset);
 		break;
 
 	case IO_P3CSR:
-		//logerror("M6801 '%s' Port 3 Control and Status Register: %02x\n", space.device().tag(), data);
+		//logerror("M6801 '%s' Port 3 Control and Status Register: %02x\n", tag(), data);
 
 		m_p3csr = data;
 		break;
 
 	case IO_RMCR:
-		//logerror("M6801 '%s' Rate and Mode Control Register: %02x\n", space.device().tag(), data);
+		//logerror("M6801 '%s' Rate and Mode Control Register: %02x\n", tag(), data);
 
 		set_rmcr(data);
 		break;
 
 	case IO_TRCSR:
-		//logerror("M6801 '%s' Transmit/Receive Control and Status Register: %02x\n", space.device().tag(), data);
+		//logerror("M6801 '%s' Transmit/Receive Control and Status Register: %02x\n", tag(), data);
 
 		if ((data & M6801_TRCSR_TE) && !(m_trcsr & M6801_TRCSR_TE))
 		{
@@ -1210,7 +1210,7 @@ WRITE8_MEMBER( m6801_cpu_device::m6801_io_w )
 		break;
 
 	case IO_TDR:
-		//logerror("M6800 '%s' Transmit Data Register: %02x\n", space.device().tag(), data);
+		//logerror("M6800 '%s' Transmit Data Register: %02x\n", tag(), data);
 
 		if (m_trcsr_read_tdre)
 		{
@@ -1221,7 +1221,7 @@ WRITE8_MEMBER( m6801_cpu_device::m6801_io_w )
 		break;
 
 	case IO_RCR:
-		//logerror("M6801 '%s' RAM Control Register: %02x\n", space.device().tag(), data);
+		//logerror("M6801 '%s' RAM Control Register: %02x\n", tag(), data);
 
 		m_ram_ctrl = data;
 		break;
@@ -1238,7 +1238,7 @@ WRITE8_MEMBER( m6801_cpu_device::m6801_io_w )
 	case IO_ICR2H:
 	case IO_ICR2L:
 	default:
-		logerror("M6801 '%s' PC %04x: warning - write %02x to reserved internal register %02x\n",space.device().tag(),space.device().safe_pc(),data,offset);
+		logerror("PC %04x: warning - write %02x to reserved internal register %02x\n", pc(),data,offset);
 		break;
 	}
 }

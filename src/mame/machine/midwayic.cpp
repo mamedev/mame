@@ -700,11 +700,11 @@ void midway_ioasic_device::device_start()
 
 	if (m_has_dcs)
 	{
-		m_dcs_cpu = m_dcs->subdevice("dcs2");
+		m_dcs_cpu = m_dcs->subdevice<cpu_device>("dcs2");
 		if (m_dcs_cpu == nullptr)
-			m_dcs_cpu = m_dcs->subdevice("dsio");
+			m_dcs_cpu = m_dcs->subdevice<cpu_device>("dsio");
 		if (m_dcs_cpu == nullptr)
-			m_dcs_cpu = m_dcs->subdevice("denver");
+			m_dcs_cpu = m_dcs->subdevice<cpu_device>("denver");
 	}
 
 	m_shuffle_map = &shuffle_maps[m_shuffle_type][0];
@@ -842,7 +842,7 @@ READ16_MEMBER(midway_ioasic_device::fifo_r)
 		/* main CPU is handling the I/O ASIC interrupt */
 		if (m_fifo_bytes == 0 && m_has_dcs)
 		{
-			m_fifo_force_buffer_empty_pc = m_dcs_cpu->safe_pc();
+			m_fifo_force_buffer_empty_pc = m_dcs_cpu->pc();
 			if (LOG_FIFO)
 				logerror("fifo_r(%04X): FIFO empty, PC = %04X\n", result, m_fifo_force_buffer_empty_pc);
 		}
@@ -872,7 +872,7 @@ READ16_MEMBER(midway_ioasic_device::fifo_status_r)
 	/* sure the FIFO clear bit is set */
 	if (m_fifo_force_buffer_empty_pc && &space.device() == m_dcs_cpu)
 	{
-		offs_t currpc = m_dcs_cpu->safe_pc();
+		offs_t currpc = m_dcs_cpu->pc();
 		if (currpc >= m_fifo_force_buffer_empty_pc && currpc < m_fifo_force_buffer_empty_pc + 0x10)
 		{
 			m_fifo_force_buffer_empty_pc = 0;
@@ -987,7 +987,7 @@ READ32_MEMBER( midway_ioasic_device::read )
 		case IOASIC_UARTIN:
 			m_reg[offset] &= ~0x1000;
 			if (result & 0x1000)
-				logerror("%06X:ioasic_r(%d) = %08X\n", machine().device("maincpu")->safe_pc(), offset, result);
+				logerror("%06X:ioasic_r(%d) = %08X\n", machine().device<cpu_device>("maincpu")->pc(), offset, result);
 			// Add lf
 			if ((result & 0xff)==0x0d)
 				m_reg[offset] = 0x300a;
@@ -1037,7 +1037,7 @@ READ32_MEMBER( midway_ioasic_device::read )
 	}
 
 	if (LOG_IOASIC && offset != IOASIC_SOUNDSTAT && offset != IOASIC_SOUNDIN)
-		logerror("%08X:ioasic_r(%d) = %08X\n", space.device().safe_pc(), offset, result);
+		logerror("%s:ioasic_r(%d) = %08X\n", machine().describe_context(), offset, result);
 
 	return result;
 }
@@ -1081,7 +1081,7 @@ WRITE32_MEMBER( midway_ioasic_device::write )
 	newreg = m_reg[offset];
 
 	if (LOG_IOASIC && offset != IOASIC_SOUNDOUT)
-		logerror("%06X:ioasic_w(%d) = %08X\n", space.device().safe_pc(), offset, data);
+		logerror("%s ioasic_w(%d) = %08X\n", machine().describe_context(), offset, data);
 
 	switch (offset)
 	{
@@ -1104,7 +1104,7 @@ WRITE32_MEMBER( midway_ioasic_device::write )
 			break;
 
 		case IOASIC_UARTCONTROL:
-			logerror("%08X IOASIC uart control = %04X INTCTRL=%04x\n", machine().device("maincpu")->safe_pc(), data, m_reg[IOASIC_INTCTL]);
+			logerror("%08X IOASIC uart control = %04X INTCTRL=%04x\n", machine().device<cpu_device>("maincpu")->pc(), data, m_reg[IOASIC_INTCTL]);
 			break;
 
 		case IOASIC_UARTOUT:
@@ -1128,7 +1128,7 @@ WRITE32_MEMBER( midway_ioasic_device::write )
 
 		case IOASIC_SOUNDCTL:
 			if (LOG_IOASIC)
-				logerror("%08X write IOASIC_SOUNDCTL=%04x\n", machine().device("maincpu")->safe_pc(), data);
+				logerror("%08X write IOASIC_SOUNDCTL=%04x\n", machine().device<cpu_device>("maincpu")->pc(), data);
 			/* sound reset? */
 			if (m_has_dcs)
 			{

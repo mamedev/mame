@@ -1869,7 +1869,7 @@ READ8_MEMBER(vga_device::port_03d0_r)
 		data = vga_crtc_r(space, offset, mem_mask);
 	if(offset == 8)
 	{
-		logerror("VGA: 0x3d8 read at %08x\n",space.device().safe_pc());
+		logerror("VGA: 0x3d8 read %s\n", machine().describe_context());
 		data = 0; // TODO: PC-200 reads back CGA register here, everything else returns open bus OR CGA emulation of register 0x3d8
 	}
 

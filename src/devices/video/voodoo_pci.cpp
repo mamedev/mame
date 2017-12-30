@@ -190,7 +190,7 @@ READ32_MEMBER(voodoo_pci_device::vga_r)
 	if (ACCESSING_BITS_24_31)
 		result |= downcast<voodoo_banshee_device *>(m_voodoo.target())->banshee_vga_r(space, offset * 4 + 3 + 0xb0, mem_mask >> 24) << 24;
 	if (0)
-		logerror("%06X:voodoo_pci_device vga_r from offset %02X = %08X & %08X\n", space.device().safe_pc(), offset * 4, result, mem_mask);
+		logerror("%s voodoo_pci_device vga_r from offset %02X = %08X & %08X\n", machine().describe_context(), offset * 4, result, mem_mask);
 	return result;
 }
 WRITE32_MEMBER(voodoo_pci_device::vga_w)
@@ -205,5 +205,5 @@ WRITE32_MEMBER(voodoo_pci_device::vga_w)
 		downcast<voodoo_banshee_device *>(m_voodoo.target())->banshee_vga_w(space, offset * 4 + 3 + 0xb0, data >> 24, mem_mask >> 24);
 
 	if (0)
-		logerror("%06X:voodoo_pci_device vga_w to offset %04X = %08X & %08X\n", space.device().safe_pc(), offset * 4, data, mem_mask);
+		logerror("%s voodoo_pci_device vga_w to offset %04X = %08X & %08X\n", machine().describe_context(), offset * 4, data, mem_mask);
 }

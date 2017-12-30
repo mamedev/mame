@@ -559,19 +559,19 @@ READ8_MEMBER( scn2674_device::read )
 		*/
 
 		case 0:
-			LOG("Read Irq Register %02x %06x\n",m_irq_register,space.device().safe_pc());
+			LOG("Read Irq Register %02x %s\n",m_irq_register,machine().describe_context());
 			return m_irq_register;
 
 		case 1:
-			LOG("Read Status Register %02X %06x\n",m_status_register,space.device().safe_pc());
+			LOG("Read Status Register %02X %s\n",m_status_register,machine().describe_context());
 			return m_status_register;
 
-		case 2: LOG("Read Screen1_l Register %06x\n",space.device().safe_pc());return m_screen1_l;
-		case 3: LOG("Read Screen1_h Register %06x\n",space.device().safe_pc());return m_screen1_h & 0x3f;
-		case 4: LOG("Read Cursor_l Register %06x\n",space.device().safe_pc());return m_cursor_l;
-		case 5: LOG("Read Cursor_h Register %06x\n",space.device().safe_pc());return m_cursor_h;
-		case 6: LOG("Read Screen2_l Register %06x\n",space.device().safe_pc());return m_screen2_l;
-		case 7: LOG("Read Screen2_h Register %06x\n",space.device().safe_pc());return m_screen2_h;
+		case 2: LOG("Read Screen1_l Register %s\n",machine().describe_context());return m_screen1_l;
+		case 3: LOG("Read Screen1_h Register %s\n",machine().describe_context());return m_screen1_h & 0x3f;
+		case 4: LOG("Read Cursor_l Register %s\n",machine().describe_context());return m_cursor_l;
+		case 5: LOG("Read Cursor_h Register %s\n",machine().describe_context());return m_cursor_h;
+		case 6: LOG("Read Screen2_l Register %s\n",machine().describe_context());return m_screen2_l;
+		case 7: LOG("Read Screen2_h Register %s\n",machine().describe_context());return m_screen2_h;
 	}
 
 	return 0xff;

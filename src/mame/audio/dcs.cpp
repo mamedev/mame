@@ -1194,7 +1194,7 @@ READ16_MEMBER( dcs_audio_device::dsio_r )
 		dsio.channelbits ^= 0x0010;
 		result = (result & ~0x0010) | dsio.channelbits;
 	}
-	if (LOG_DCS_IO && offset != 2) logerror("%04X: dsio_r 0x%x = %04x\n", space.device().safe_pc(), offset, result);
+	if (LOG_DCS_IO && offset != 2) logerror("%s dsio_r 0x%x = %04x\n", machine().describe_context(), offset, result);
 	return result;
 }
 
@@ -1223,7 +1223,7 @@ WRITE16_MEMBER( dcs_audio_device::dsio_w )
 			m_data_bank->set_entry(DSIO_DM_PG % m_sounddata_banks);
 			break;
 	}
-	if (LOG_DCS_IO) logerror("%04X: dsio_w 0x%x = %04x\n", space.device().safe_pc(), offset, data);
+	if (LOG_DCS_IO) logerror("%s dsio_w 0x%x = %04x\n", machine().describe_context(), offset, data);
 }
 
 
@@ -1269,7 +1269,7 @@ READ16_MEMBER( dcs_audio_device::denver_r )
 		// SDRC Revision
 		result = 0x0003;
 	}
-	if (LOG_DCS_IO) logerror("%04X: denver_r %s 0x%x = %04x\n", space.device().safe_pc(), denver_regname[offset], offset, result);
+	if (LOG_DCS_IO) logerror("%s denver_r %s 0x%x = %04x\n", machine().describe_context(), denver_regname[offset], offset, result);
 	return result;
 }
 
@@ -1316,7 +1316,7 @@ WRITE16_MEMBER( dcs_audio_device::denver_w )
 				m_fifo_reset_w(1);
 			break;
 	}
-	if (LOG_DCS_IO) logerror("%04X: denver_w %s 0x%x = %04x\n", space.device().safe_pc(), denver_regname[offset], offset, data);
+	if (LOG_DCS_IO) logerror("%s denver_w %s 0x%x = %04x\n", machine().describe_context(), denver_regname[offset], offset, data);
 }
 
 
@@ -1331,7 +1331,7 @@ WRITE32_MEMBER( dcs_audio_device::dsio_idma_addr_w )
 {
 	dsio_state &dsio = m_dsio;
 	if (LOG_DCS_TRANSFERS)
-		logerror("%08X:IDMA_addr = %04X\n", space.device().safe_pc(), data);
+		logerror("%s IDMA_addr = %04X\n", machine().describe_context(), data);
 	downcast<adsp2181_device *>(m_cpu)->idma_addr_w(data);
 	if (data == 0)
 		dsio.start_on_next_write = 2;
@@ -1341,24 +1341,23 @@ WRITE32_MEMBER( dcs_audio_device::dsio_idma_addr_w )
 WRITE32_MEMBER( dcs_audio_device::dsio_idma_data_w )
 {
 	dsio_state &dsio = m_dsio;
-	uint32_t pc = space.device().safe_pc();
 	// IDMA is to internal memory only
 	m_ram_map->set_bank(0);
 	if (ACCESSING_BITS_0_15)
 	{
 		if (LOG_DCS_TRANSFERS && !(downcast<adsp2181_device *>(m_cpu)->idma_addr_r() & 0x0ffc))
-			logerror("%08X:IDMA_data_w(%04X) = %04X\n", pc, downcast<adsp2181_device *>(m_cpu)->idma_addr_r(), data & 0xffff);
+			logerror("%s IDMA_data_w(%04X) = %04X\n", machine().describe_context(), downcast<adsp2181_device *>(m_cpu)->idma_addr_r(), data & 0xffff);
 		downcast<adsp2181_device *>(m_cpu)->idma_data_w(data & 0xffff);
 	}
 	if (ACCESSING_BITS_16_31)
 	{
 		if (LOG_DCS_TRANSFERS && !(downcast<adsp2181_device *>(m_cpu)->idma_addr_r() & 0x0ffc))
-			logerror("%08X:IDMA_data_w(%04X) = %04X\n", pc, downcast<adsp2181_device *>(m_cpu)->idma_addr_r(), data >> 16);
+			logerror("%s IDMA_data_w(%04X) = %04X\n", machine().describe_context(), downcast<adsp2181_device *>(m_cpu)->idma_addr_r(), data >> 16);
 		downcast<adsp2181_device *>(m_cpu)->idma_data_w(data >> 16);
 	}
 	if (dsio.start_on_next_write && --dsio.start_on_next_write == 0)
 	{
-		logerror("%08X: Starting DSIO CPU\n", machine().device("maincpu")->safe_pc());
+		logerror("%08X: Starting DSIO CPU\n", machine().device<cpu_device>("maincpu")->pc());
 		m_cpu->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
 	}
 	// Restore internal/external mapping
@@ -1375,7 +1374,7 @@ READ32_MEMBER( dcs_audio_device::dsio_idma_data_r )
 	// Restore internal/external mapping
 	m_ram_map->set_bank(m_dmovlay_val);
 	if (LOG_DCS_TRANSFERS)
-		logerror("%08X:IDMA_data_r(%04X) = %04X\n", space.device().safe_pc(), downcast<adsp2181_device *>(m_cpu)->idma_addr_r(), result);
+		logerror("%s IDMA_data_r(%04X) = %04X\n", machine().describe_context(), downcast<adsp2181_device *>(m_cpu)->idma_addr_r(), result);
 	return result;
 }
 
@@ -1541,7 +1540,7 @@ READ16_MEMBER( dcs_audio_device::input_latch_r )
 	if (m_auto_ack)
 		input_latch_ack_w(space,0,0,0xffff);
 	if (LOG_DCS_IO)
-		logerror("%08X:input_latch_r(%04X)\n", space.device().safe_pc(), m_input_data);
+		logerror("%s input_latch_r(%04X)\n", machine().describe_context(), m_input_data);
 	return m_input_data;
 }
 
@@ -1550,7 +1549,7 @@ READ32_MEMBER( dcs_audio_device::input_latch32_r )
 	if (m_auto_ack)
 		input_latch_ack_w(space,0,0,0xffff);
 	if (LOG_DCS_IO)
-		logerror("%08X:input_latch32_r(%04X)\n", space.device().safe_pc(), m_input_data);
+		logerror("%s input_latch32_r(%04X)\n", machine().describe_context(), m_input_data);
 	return m_input_data << 8;
 }
 
@@ -1571,7 +1570,7 @@ WRITE16_MEMBER( dcs_audio_device::output_latch_w )
 {
 	m_pre_output_data = data;
 	if (LOG_DCS_IO)
-		logerror("%08X:output_latch_w(%04X) (empty=%d)\n", space.device().safe_pc(), data, IS_OUTPUT_EMPTY());
+		logerror("%s output_latch_w(%04X) (empty=%d)\n", machine().describe_context(), data, IS_OUTPUT_EMPTY());
 
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(dcs_audio_device::latch_delayed_w),this), data>>8);
 }
@@ -1580,7 +1579,7 @@ WRITE32_MEMBER( dcs_audio_device::output_latch32_w )
 {
 	m_pre_output_data = data >> 8;
 	if (LOG_DCS_IO)
-		logerror("%08X:output_latch32_w(%04X) (empty=%d)\n", space.device().safe_pc(), data>>8, IS_OUTPUT_EMPTY());
+		logerror("%s output_latch32_w(%04X) (empty=%d)\n", machine().describe_context(), data>>8, IS_OUTPUT_EMPTY());
 
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(dcs_audio_device::latch_delayed_w),this), data>>8);
 }
@@ -1637,8 +1636,7 @@ TIMER_CALLBACK_MEMBER( dcs_audio_device::output_control_delayed_w )
 WRITE16_MEMBER( dcs_audio_device::output_control_w )
 {
 	if (LOG_DCS_IO)
-		logerror("%04X:output_control_w = %04X\n", space.device().safe_pc(), data);
-	//printf("%04X:output_control_w = %04X\n", space.device().safe_pc(), data);
+		logerror("%s output_control_w = %04X\n", machine().describe_context(), data);
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(dcs_audio_device::output_control_delayed_w),this), data);
 }
 
@@ -1646,7 +1644,7 @@ WRITE16_MEMBER( dcs_audio_device::output_control_w )
 READ16_MEMBER( dcs_audio_device::output_control_r )
 {
 	if (LOG_DCS_IO)
-		logerror("%04X:output_control_r = %04X\n", space.device().safe_pc(), m_output_control);
+		logerror("%s output_control_r = %04X\n", machine().describe_context(), m_output_control);
 	m_output_control_cycles = m_cpu->total_cycles();
 	return m_output_control;
 }
@@ -1655,7 +1653,7 @@ READ16_MEMBER( dcs_audio_device::output_control_r )
 int dcs_audio_device::data2_r()
 {
 	if (LOG_DCS_IO)
-		logerror("%08X dcs:data2_r = %04X\n", machine().device("maincpu")->safe_pc(), m_output_control);
+		logerror("%08X dcs:data2_r = %04X\n", machine().device<cpu_device>("maincpu")->pc(), m_output_control);
 	if (m_rev >= REV_DSIO) {
 		// Not sure about this but allows sf2049 and roadburn to pass audio initialization tests at boot
 		return m_output_control << 8;
@@ -1832,7 +1830,7 @@ READ16_MEMBER( dcs_audio_device::adsp_control_r )
 			break;
 	}
 	if (LOG_DCS_IO)
-		logerror("%04X: adsp_control_r(%06x) = %04X\n", space.device().safe_pc(), offset + 0x3fe0, result);
+		logerror("%s adsp_control_r(%06x) = %04X\n", machine().describe_context(), offset + 0x3fe0, result);
 	return result;
 }
 
@@ -1847,7 +1845,7 @@ WRITE16_MEMBER(dcs_audio_device:: adsp_control_w )
 			/* bit 9 forces a reset (not on 2181) */
 			if ((data & 0x0200) && !(m_rev == REV_DSIO || m_rev == REV_DENV))
 			{
-				logerror("%04X:Rebooting DCS due to SYSCONTROL write = %04X\n", space.device().safe_pc(), data);
+				logerror("%s Rebooting DCS due to SYSCONTROL write = %04X\n", machine().describe_context(), data);
 				m_cpu->set_input_line(INPUT_LINE_RESET, PULSE_LINE);
 				dcs_boot();
 				m_control_regs[SYSCONTROL_REG] = 0;
@@ -1922,7 +1920,7 @@ WRITE16_MEMBER(dcs_audio_device:: adsp_control_w )
 			break;
 	}
 	if (LOG_DCS_IO)
-		logerror("%04X: adsp_control_w(%06x) = %04X\n", space.device().safe_pc(), offset + 0x3fe0, data);
+		logerror("%s adsp_control_w(%06x) = %04X\n", machine().describe_context(), offset + 0x3fe0, data);
 }
 
 

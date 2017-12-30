@@ -218,14 +218,14 @@ WRITE16_MEMBER(l7a1045_sound_device::sound_select_w)
 	if (ACCESSING_BITS_0_7)
 	{
 		m_audiochannel = data;
-		if (m_audiochannel & 0xe0) printf("%08x: l7a1045_sound_select_w unknown channel %01x\n", space.device().safe_pc(), m_audiochannel & 0xff);
+		if (m_audiochannel & 0xe0) logerror("%s l7a1045_sound_select_w unknown channel %01x\n", machine().describe_context(), m_audiochannel & 0xff);
 		m_audiochannel &= 0x1f;
 	}
 
 	if (ACCESSING_BITS_8_15)
 	{
 		m_audioregister = (data >> 8);
-		if (m_audioregister >0x0a) printf("%08x: l7a1045_sound_select_w unknown register %01x\n", space.device().safe_pc(), m_audioregister & 0xff);
+		if (m_audioregister >0x0a) logerror("%s l7a1045_sound_select_w unknown register %01x\n", machine().describe_context(), m_audioregister & 0xff);
 		m_audioregister &= 0x0f;
 	}
 

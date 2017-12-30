@@ -648,7 +648,7 @@ READ16_MEMBER( k056832_device::k_5bpp_rom_word_r )
 	else if (mem_mask == 0x00ff)
 		return rom_read_b(offset * 2 + 1, 4, 5, 0)<<16;
 	else
-		LOG("Non-byte read of tilemap ROM, PC=%x (mask=%x)\n", space.device().safe_pc(), mem_mask);
+		LOG("%s Non-byte read of tilemap ROM (mask=%x)\n", machine().describe_context(), mem_mask);
 	return 0;
 }
 
@@ -663,7 +663,7 @@ READ32_MEMBER( k056832_device::k_5bpp_rom_long_r )
 	else if (mem_mask == 0x000000ff)
 		return rom_read_b(offset * 4 + 3, 4, 5, 1);
 	else
-		LOG("Non-byte read of tilemap ROM, PC=%x (mask=%x)\n", space.device().safe_pc(), mem_mask);
+		LOG("%s Non-byte read of tilemap ROM (mask=%x)\n", machine().describe_context(), mem_mask);
 	return 0;
 }
 
@@ -678,7 +678,7 @@ READ32_MEMBER( k056832_device::k_6bpp_rom_long_r )
 	else if (mem_mask == 0x000000ff)
 		return rom_read_b(offset * 4 + 3, 4, 6, 0);
 	else
-		LOG("Non-byte read of tilemap ROM, PC=%x (mask=%x)\n", space.device().safe_pc(), mem_mask);
+		LOG("%s Non-byte read of tilemap ROM (mask=%x)\n", machine().describe_context(), mem_mask);
 	return 0;
 }
 

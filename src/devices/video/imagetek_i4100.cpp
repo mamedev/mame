@@ -689,7 +689,7 @@ WRITE16_MEMBER( imagetek_i4100_device::blitter_w )
 		int shift   = (dst_offs & 0x80) ? 0 : 8;
 		uint16_t mask = (dst_offs & 0x80) ? 0x00ff : 0xff00;
 
-//      logerror("CPU #0 PC %06X : Blitter regs %08X, %08X, %08X\n", space.device().safe_pc(), tmap, src_offs, dst_offs);
+//      logerror("%s Blitter regs %08X, %08X, %08X\n", machine().describe_context(), tmap, src_offs, dst_offs);
 
 		dst_offs >>= 7 + 1;
 		switch (tmap)
@@ -699,7 +699,7 @@ WRITE16_MEMBER( imagetek_i4100_device::blitter_w )
 			case 3:
 				break;
 			default:
-				logerror("CPU #0 PC %06X : Blitter unknown destination: %08X\n", space.device().safe_pc(), tmap);
+				logerror("%s Blitter unknown destination: %08X\n", machine().describe_context(), tmap);
 				return;
 		}
 
@@ -709,7 +709,7 @@ WRITE16_MEMBER( imagetek_i4100_device::blitter_w )
 
 			src_offs %= m_gfxrom_size;
 			b1 = m_gfxrom[src_offs];
-//          logerror("CPU #0 PC %06X : Blitter opcode %02X at %06X\n", space.device().safe_pc(), b1, src_offs);
+//          logerror("%s Blitter opcode %02X at %06X\n", machine().describe_context(), b1, src_offs);
 			src_offs++;
 
 			count = ((~b1) & 0x3f) + 1;
@@ -785,7 +785,7 @@ WRITE16_MEMBER( imagetek_i4100_device::blitter_w )
 				break;
 
 			default:
-				//logerror("CPU #0 PC %06X : Blitter unknown opcode %02X at %06X\n",space.device().safe_pc(),b1,src_offs-1);
+				//logerror("%s Blitter unknown opcode %02X at %06X\n",machine().describe_context(),b1,src_offs-1);
 				return;
 			}
 

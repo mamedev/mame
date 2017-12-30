@@ -3527,7 +3527,7 @@ READ32_MEMBER( powervr2_device::elan_regs_r )
 		case 0x78/4: // IRQ MASK
 			return 0;
 		default:
-			printf("%08x %08x\n",space.device().safe_pc(),offset*4);
+			logerror("%s %08x\n", machine().describe_context(),offset*4);
 			break;
 	}
 
@@ -3539,7 +3539,7 @@ WRITE32_MEMBER( powervr2_device::elan_regs_w )
 	switch(offset)
 	{
 		default:
-			printf("%08x %08x %08x W\n",space.device().safe_pc(),offset*4,data);
+			logerror("%s %08x %08x W\n", machine().describe_context(),offset*4,data);
 			break;
 	}
 }

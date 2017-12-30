@@ -348,16 +348,17 @@ WRITE8_MEMBER( phillips_22vp931_device::i8049_output0_w )
 
 	if (LOG_PORTS && (m_i8049_out0 ^ data) & 0xff)
 	{
-		printf("%03X:out0:", space.device().safe_pc());
-		if ( (data & 0x80)) printf(" ???");
-		if ( (data & 0x40)) printf(" LED1");
-		if ( (data & 0x20)) printf(" LED2");
-		if ( (data & 0x10)) printf(" LED3");
-		if ( (data & 0x08)) printf(" EJECT");
-		if (!(data & 0x04)) printf(" AUDMUTE2");
-		if (!(data & 0x02)) printf(" AUDMUTE1");
-		if (!(data & 0x01)) printf(" VIDMUTE");
-		printf("\n");
+		std::string flags;
+		if ( (data & 0x80)) flags += " ???";
+		if ( (data & 0x40)) flags += " LED1";
+		if ( (data & 0x20)) flags += " LED2";
+		if ( (data & 0x10)) flags += " LED3";
+		if ( (data & 0x08)) flags += " EJECT";
+		if (!(data & 0x04)) flags += " AUDMUTE2";
+		if (!(data & 0x02)) flags += " AUDMUTE1";
+		if (!(data & 0x01)) flags += " VIDMUTE";
+
+		logerror("out0: %s %s\n", flags, machine().describe_context());
 		m_i8049_out0 = data;
 	}
 
@@ -388,9 +389,9 @@ WRITE8_MEMBER( phillips_22vp931_device::i8049_output1_w )
 
 	if (LOG_PORTS && (m_i8049_out1 ^ data) & 0x08)
 	{
-		osd_printf_debug("%03X:out1:", space.device().safe_pc());
-		if (!(data & 0x08)) osd_printf_debug(" SMS");
-		osd_printf_debug("\n");
+		std::string flags;
+		if (!(data & 0x08)) flags += " SMS";
+		logerror("out1: %s %s\n", flags, machine().describe_context());
 		m_i8049_out1 = data;
 	}
 
@@ -536,13 +537,13 @@ WRITE8_MEMBER( phillips_22vp931_device::i8049_port1_w )
 
 	if (LOG_PORTS && (m_i8049_port1 ^ data) & 0x1f)
 	{
-		printf("%03X:port1:", space.device().safe_pc());
-		if (!(data & 0x10)) printf(" SPEED");
-		if (!(data & 0x08)) printf(" TIMENABLE");
-		if (!(data & 0x04)) printf(" REV");
-		if (!(data & 0x02)) printf(" FORW");
-		if (!(data & 0x01)) printf(" OPAMP");
-		printf("\n");
+		std::string flags;
+		if (!(data & 0x10)) flags += " SPEED";
+		if (!(data & 0x08)) flags += " TIMENABLE";
+		if (!(data & 0x04)) flags += " REV";
+		if (!(data & 0x02)) flags += " FORW";
+		if (!(data & 0x01)) flags += " OPAMP";
+		logerror("port1: %s %s\n", flags, machine().describe_context());
 	}
 
 	// if bit 0 is set, we are not tracking

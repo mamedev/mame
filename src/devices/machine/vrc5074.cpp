@@ -448,7 +448,7 @@ READ32_MEMBER (vrc5074_device::pci0_r)
 		break;
 	}
 	if (LOG_NILE_MASTER)
-		logerror("%06X:nile pci0_r offset %08X = %08X & %08X\n", space.device().safe_pc(), pci_addr, result, mem_mask);
+		logerror("%s nile pci0_r offset %08X = %08X & %08X\n", machine().describe_context(), pci_addr, result, mem_mask);
 	return result;
 }
 WRITE32_MEMBER (vrc5074_device::pci0_w)
@@ -487,7 +487,7 @@ WRITE32_MEMBER (vrc5074_device::pci0_w)
 	}
 	//this->space(AS_DATA).write_dword(m_pci0_laddr | (offset*4), data, mem_mask);
 	if (LOG_NILE_MASTER)
-		logerror("%06X:nile pci0_w offset %08X = %08X & %08X\n", space.device().safe_pc(), pci_addr, data, mem_mask);
+		logerror("%s nile pci0_w offset %08X = %08X & %08X\n", machine().describe_context(), pci_addr, data, mem_mask);
 }
 
 // PCI Master Window 1
@@ -526,7 +526,7 @@ READ32_MEMBER (vrc5074_device::pci1_r)
 		break;
 	}
 	if (LOG_NILE_MASTER)
-		logerror("%06X:nile pci1_r offset %08X = %08X & %08X\n", space.device().safe_pc(), pci_addr, result, mem_mask);
+		logerror("%s nile pci1_r offset %08X = %08X & %08X\n", machine().describe_context(), pci_addr, result, mem_mask);
 	return result;
 }
 WRITE32_MEMBER (vrc5074_device::pci1_w)
@@ -564,7 +564,7 @@ WRITE32_MEMBER (vrc5074_device::pci1_w)
 	}
 	//this->space(AS_DATA).write_dword(m_pci0_laddr | (offset*4), data, mem_mask);
 	if (LOG_NILE_MASTER)
-		logerror("%06X:nile pci1_w offset %08X = %08X & %08X\n", space.device().safe_pc(), pci_addr, data, mem_mask);
+		logerror("%s nile pci1_w offset %08X = %08X & %08X\n", machine().describe_context(), pci_addr, data, mem_mask);
 }
 
 // PCI Target Window 1
@@ -572,7 +572,7 @@ READ32_MEMBER (vrc5074_device::target1_r)
 {
 	uint32_t result = m_sdram[0][offset];
 	if (LOG_NILE_TARGET)
-		logerror("%08X:nile target1 read from offset %02X = %08X & %08X\n", m_cpu->device_t::safe_pc(), offset*4, result, mem_mask);
+		logerror("%s nile target1 read from offset %02X = %08X & %08X\n", machine().describe_context(), offset*4, result, mem_mask);
 	return result;
 }
 WRITE32_MEMBER (vrc5074_device::target1_w)
@@ -581,7 +581,7 @@ WRITE32_MEMBER (vrc5074_device::target1_w)
 	COMBINE_DATA(&m_sdram[0][offset]);
 	//m_sdram[0][offset] = data;
 	if (LOG_NILE_TARGET)
-		logerror("%08X:nile target1 write to offset %02X = %08X & %08X\n", m_cpu->device_t::safe_pc(), offset*4, data, mem_mask);
+		logerror("%s nile target1 write to offset %02X = %08X & %08X\n", machine().describe_context(), offset*4, data, mem_mask);
 }
 
 // DMA Transfer
@@ -592,7 +592,7 @@ TIMER_CALLBACK_MEMBER (vrc5074_device::dma_transfer)
 	//// Check for dma suspension
 	//if (m_cpu_regs[NREG_DMACR1 + which * 0xc] & DMA_SUS) {
 	//  if (LOG_NILE)
-	//      logerror("%08X:nile DMA Suspended PCI: %08X MEM: %08X Words: %X\n", m_cpu->space(AS_PROGRAM).device().safe_pc(), m_cpu_regs[NREG_DMA_CPAR], m_cpu_regs[NREG_DMA_CMAR], m_cpu_regs[NREG_DMA_REM]);
+	//      logerror("%s nile DMA Suspended PCI: %08X MEM: %08X Words: %X\n", machine().describe_context(), m_cpu_regs[NREG_DMA_CPAR], m_cpu_regs[NREG_DMA_CMAR], m_cpu_regs[NREG_DMA_REM]);
 	//  return;
 	//}
 
@@ -781,38 +781,38 @@ READ32_MEMBER(vrc5074_device::cpu_reg_r)
 	{
 	case NREG_CPUSTAT + 0:    /* CPU status */
 	case NREG_CPUSTAT + 1:    /* CPU status */
-		if (LOG_NILE) logerror("%08X:NILE READ: CPU status(%03X) = %08X\n", m_cpu_space->device().safe_pc(), offset * 4, result);
+		if (LOG_NILE) logerror("%s NILE READ: CPU status(%03X) = %08X\n", machine().describe_context(), offset * 4, result);
 		logit = 0;
 		break;
 
 	case NREG_INTCTRL + 0:    /* Interrupt control */
 	case NREG_INTCTRL + 1:    /* Interrupt control */
-		if (LOG_NILE) logerror("%08X:NILE READ: interrupt control(%03X) = %08X\n", m_cpu_space->device().safe_pc(), offset * 4, result);
+		if (LOG_NILE) logerror("%s NILE READ: interrupt control(%03X) = %08X\n", machine().describe_context(), offset * 4, result);
 		update_nile_irqs();
 		logit = 0;
 		break;
 
 	case NREG_INTSTAT0 + 0:   /* Interrupt status 0 */
 	case NREG_INTSTAT0 + 1:   /* Interrupt status 0 */
-		if (LOG_NILE) logerror("%08X:NILE READ: interrupt status 0(%03X) = %08X\n", m_cpu_space->device().safe_pc(), offset * 4, result);
+		if (LOG_NILE) logerror("%s NILE READ: interrupt status 0(%03X) = %08X\n", machine().describe_context(), offset * 4, result);
 		logit = 0;
 		break;
 
 	case NREG_INTSTAT1 + 0:   /* Interrupt status 1 */
 	case NREG_INTSTAT1 + 1:   /* Interrupt status 1 */
-		if (LOG_NILE) logerror("%08X:NILE READ: interrupt status 1/enable(%03X) = %08X\n", m_cpu_space->device().safe_pc(), offset * 4, result);
+		if (LOG_NILE) logerror("%s NILE READ: interrupt status 1/enable(%03X) = %08X\n", machine().describe_context(), offset * 4, result);
 		logit = 0;
 		break;
 
 	case NREG_INTCLR + 0:     /* Interrupt clear */
 	case NREG_INTCLR + 1:     /* Interrupt clear */
-		if (LOG_NILE) logerror("%08X:NILE READ: interrupt clear(%03X) = %08X\n", m_cpu_space->device().safe_pc(), offset * 4, result);
+		if (LOG_NILE) logerror("%s NILE READ: interrupt clear(%03X) = %08X\n", machine().describe_context(), offset * 4, result);
 		logit = 0;
 		break;
 
 	case NREG_INTPPES + 0:    /* PCI Interrupt control */
 	case NREG_INTPPES + 1:    /* PCI Interrupt control */
-		if (LOG_NILE) logerror("%08X:NILE READ: PCI interrupt ppes(%03X) = %08X\n", m_cpu_space->device().safe_pc(), offset * 4, result);
+		if (LOG_NILE) logerror("%s NILE READ: PCI interrupt ppes(%03X) = %08X\n", machine().describe_context(), offset * 4, result);
 		logit = 0;
 		break;
 
@@ -838,12 +838,12 @@ READ32_MEMBER(vrc5074_device::cpu_reg_r)
 			result = m_cpu_regs[offset] = m_timer[which]->remaining().as_double() * SYSTEM_CLOCK;
 		}
 
-		if (LOG_TIMERS) logerror("%08X:NILE READ: timer %d counter(%03X) = %08X\n", m_cpu_space->device().safe_pc(), which, offset * 4, result);
+		if (LOG_TIMERS) logerror("%s NILE READ: timer %d counter(%03X) = %08X\n", machine().describe_context(), which, offset * 4, result);
 		logit = 0;
 		break;
 	}
 	if (LOG_NILE && logit)
-		logerror("%06X:cpu_reg_r offset %03X = %08X\n", m_cpu_space->device().safe_pc(), offset * 4, result);
+		logerror("%s cpu_reg_r offset %03X = %08X\n", machine().describe_context(), offset * 4, result);
 	return result;
 }
 
@@ -885,34 +885,34 @@ WRITE32_MEMBER(vrc5074_device::cpu_reg_w)
 		if (data & 0x1) logerror("cpu_reg_w: System Cold Reset\n");
 		if (data & 0x2) logerror("cpu_reg_w: CPU Warm Reset\n");
 	case NREG_CPUSTAT + 1:    /* CPU status */
-		if (LOG_NILE) logerror("%08X:NILE WRITE: CPU status(%03X) = %08X & %08X\n", m_cpu_space->device().safe_pc(), offset * 4, data, mem_mask);
+		if (LOG_NILE) logerror("%s NILE WRITE: CPU status(%03X) = %08X & %08X\n", machine().describe_context(), offset * 4, data, mem_mask);
 		logit = 0;
 		break;
 
 	case NREG_INTCTRL + 0:    /* Interrupt control */
 	case NREG_INTCTRL + 1:    /* Interrupt control */
-		if (LOG_NILE) logerror("%08X:NILE WRITE: interrupt control(%03X) = %08X & %08X\n", m_cpu_space->device().safe_pc(), offset * 4, data, mem_mask);
+		if (LOG_NILE) logerror("%s NILE WRITE: interrupt control(%03X) = %08X & %08X\n", machine().describe_context(), offset * 4, data, mem_mask);
 		logit = 0;
 		update_nile_irqs();
 		break;
 
 	case NREG_INTSTAT0 + 0:   /* Interrupt status 0 */
 	case NREG_INTSTAT0 + 1:   /* Interrupt status 0 */
-		if (LOG_NILE) logerror("%08X:NILE WRITE: interrupt status 0(%03X) = %08X & %08X\n", m_cpu_space->device().safe_pc(), offset * 4, data, mem_mask);
+		if (LOG_NILE) logerror("%s NILE WRITE: interrupt status 0(%03X) = %08X & %08X\n", machine().describe_context(), offset * 4, data, mem_mask);
 		logit = 0;
 		update_nile_irqs();
 		break;
 
 	case NREG_INTSTAT1 + 0:   /* Interrupt status 1 */
 	case NREG_INTSTAT1 + 1:   /* Interrupt status 1 */
-		if (LOG_NILE) logerror("%08X:NILE WRITE: interrupt status 1/enable(%03X) = %08X & %08X\n", m_cpu_space->device().safe_pc(), offset * 4, data, mem_mask);
+		if (LOG_NILE) logerror("%s NILE WRITE: interrupt status 1/enable(%03X) = %08X & %08X\n", machine().describe_context(), offset * 4, data, mem_mask);
 		logit = 0;
 		update_nile_irqs();
 		break;
 
 	case NREG_INTCLR + 0:     /* Interrupt clear */
 	//case NREG_INTCLR + 1:     /* Interrupt clear */
-		if (LOG_NILE) logerror("%08X:NILE WRITE: interrupt clear(%03X) = %08X & %08X\n", m_cpu_space->device().safe_pc(), offset * 4, data, mem_mask);
+		if (LOG_NILE) logerror("%s NILE WRITE: interrupt clear(%03X) = %08X & %08X\n", machine().describe_context(), offset * 4, data, mem_mask);
 		logit = 0;
 		//m_nile_irq_state &= ~(m_cpu_regs[offset] & ~0xf00);
 		m_nile_irq_state &= ~(data);
@@ -921,7 +921,7 @@ WRITE32_MEMBER(vrc5074_device::cpu_reg_w)
 
 	case NREG_INTPPES + 0:    /* PCI Interrupt control */
 	case NREG_INTPPES + 1:    /* PCI Interrupt control */
-		if (LOG_NILE) logerror("%08X:NILE WRITE: PCI interrupt ppes(%03X) = %08X & %08X\n", m_cpu_space->device().safe_pc(), offset * 4, data, mem_mask);
+		if (LOG_NILE) logerror("%s NILE WRITE: PCI interrupt ppes(%03X) = %08X & %08X\n", machine().describe_context(), offset * 4, data, mem_mask);
 		logit = 0;
 		break;
 
@@ -945,7 +945,7 @@ WRITE32_MEMBER(vrc5074_device::cpu_reg_w)
 	case NREG_DMACTRL0:
 	case NREG_DMACTRL1:
 		which = (offset - NREG_DMACTRL0) / 6;
-		logerror("%08X:NILE WRITE: DMACTRL %d = %08X\n", m_cpu_space->device().safe_pc(), which, data);
+		logerror("%s NILE WRITE: DMACTRL %d = %08X\n", machine().describe_context(), which, data);
 		logit = 0;
 		break;
 	case NREG_T0CTRL + 1:     /* SDRAM timer control (control bits) */
@@ -953,7 +953,7 @@ WRITE32_MEMBER(vrc5074_device::cpu_reg_w)
 	case NREG_T2CTRL + 1:     /* general purpose timer control (control bits) */
 	case NREG_T3CTRL + 1:     /* watchdog timer control (control bits) */
 		which = (offset - NREG_T0CTRL) / 4;
-		if (LOG_NILE | LOG_TIMERS) logerror("%08X:NILE WRITE: timer %d control(%03X) = %08X & %08X\n", m_cpu_space->device().safe_pc(), which, offset * 4, data, mem_mask);
+		if (LOG_NILE | LOG_TIMERS) logerror("%s NILE WRITE: timer %d control(%03X) = %08X & %08X\n", machine().describe_context(), which, offset * 4, data, mem_mask);
 		logit = 0;
 		m_timer_period[which] = (uint64_t(m_cpu_regs[NREG_T0CTRL + which * 4]) + 1) * attotime::from_hz(SYSTEM_CLOCK).as_double();
 		if (m_cpu_regs[offset] & 2) {
@@ -982,7 +982,7 @@ WRITE32_MEMBER(vrc5074_device::cpu_reg_w)
 	case NREG_T2CNTR:       /* general purpose timer control (counter) */
 	case NREG_T3CNTR:       /* watchdog timer control (counter) */
 		which = (offset - NREG_T0CNTR) / 4;
-		if (LOG_TIMERS) logerror("%08X:NILE WRITE: timer %d counter(%03X) = %08X & %08X\n", m_cpu_space->device().safe_pc(), which, offset * 4, data, mem_mask);
+		if (LOG_TIMERS) logerror("%s NILE WRITE: timer %d counter(%03X) = %08X & %08X\n", machine().describe_context(), which, offset * 4, data, mem_mask);
 		logit = 0;
 
 		if (m_cpu_regs[offset - 1] & 1)
@@ -993,7 +993,7 @@ WRITE32_MEMBER(vrc5074_device::cpu_reg_w)
 	}
 
 	if (LOG_NILE && logit)
-		logerror("%06X:cpu_reg_w offset %03X = %08X & %08X\n", m_cpu_space->device().safe_pc(), offset * 4, data, mem_mask);
+		logerror("%s cpu_reg_w offset %03X = %08X & %08X\n", machine().describe_context(), offset * 4, data, mem_mask);
 }
 
 WRITE_LINE_MEMBER(vrc5074_device::uart_irq_callback)
@@ -1011,7 +1011,7 @@ READ32_MEMBER(vrc5074_device::serial_r)
 	uint32_t result = m_uart->ins8250_r(space, offset>>1);
 
 	if (0 && LOG_NILE)
-		logerror("%06X:serial_r offset %03X = %08X (%08x)\n", m_cpu_space->device().safe_pc(), offset>>1, result, offset*4);
+		logerror("%s serial_r offset %03X = %08X (%08x)\n", machine().describe_context(), offset>>1, result, offset*4);
 	return result;
 }
 
@@ -1030,5 +1030,5 @@ WRITE32_MEMBER(vrc5074_device::serial_w)
 		}
 	}
 	if (0 && LOG_NILE)
-		logerror("%06X:serial_w offset %03X = %08X & %08X (%08x)\n", m_cpu_space->device().safe_pc(), offset>>1, data, mem_mask, offset*4);
+		logerror("%s serial_w offset %03X = %08X & %08X (%08x)\n", machine().describe_context(), offset>>1, data, mem_mask, offset*4);
 }

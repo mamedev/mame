@@ -1072,7 +1072,7 @@ TIMER_CALLBACK_MEMBER(pce_cd_device::adpcm_fadein_callback)
 
 WRITE8_MEMBER(pce_cd_device::intf_w)
 {
-	logerror("%04X: write to CD interface offset %02X, data %02X\n", space.device().safe_pc(), offset, data);
+	logerror("%s write to CD interface offset %02X, data %02X\n", machine().describe_context(), offset, data);
 
 	switch (offset & 0xf)
 	{
@@ -1307,7 +1307,7 @@ READ8_MEMBER(pce_cd_device::intf_r)
 {
 	uint8_t data = m_regs[offset & 0x0F];
 
-	logerror("%04X: read from CD interface offset %02X\n", space.device().safe_pc(), offset );
+	logerror("%s: read from CD interface offset %02X\n", machine().describe_context(), offset );
 
 	switch (offset & 0xf)
 	{
