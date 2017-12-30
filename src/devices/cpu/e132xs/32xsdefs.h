@@ -130,7 +130,7 @@
 #define IO_WRITE_W(addr, data)  m_io->write_dword(((addr) >> 11) & 0x7ffc, data)
 
 
-#define READ_OP(addr)          m_direct->read_word((addr), m_opcodexor)
+#define READ_OP(addr)          m_direct->read_word((addr), m_core->opcodexor)
 
 // set C in adds/addsi/subs/sums
 #define SETCARRYS 0
@@ -141,21 +141,21 @@
 /* Internal registers */
 
 #define OP              m_op
-#define PC              m_global_regs[0] //Program Counter
-#define SR              m_global_regs[1] //Status Register
-#define FER             m_global_regs[2] //Floating-Point Exception Register
+#define PC              m_core->global_regs[0] //Program Counter
+#define SR              m_core->global_regs[1] //Status Register
+#define FER             m_core->global_regs[2] //Floating-Point Exception Register
 // 03 - 15  General Purpose Registers
 // 16 - 17  Reserved
-#define SP              m_global_regs[18] //Stack Pointer
-#define UB              m_global_regs[19] //Upper Stack Bound
-#define BCR             m_global_regs[20] //Bus Control Register
-#define TPR             m_global_regs[21] //Timer Prescaler Register
-#define TCR             m_global_regs[22] //Timer Compare Register
+#define SP              m_core->global_regs[18] //Stack Pointer
+#define UB              m_core->global_regs[19] //Upper Stack Bound
+#define BCR             m_core->global_regs[20] //Bus Control Register
+#define TPR             m_core->global_regs[21] //Timer Prescaler Register
+#define TCR             m_core->global_regs[22] //Timer Compare Register
 #define TR              compute_tr() //Timer Register
-#define WCR             m_global_regs[24] //Watchdog Compare Register
-#define ISR             m_global_regs[25] //Input Status Register
-#define FCR             m_global_regs[26] //Function Control Register
-#define MCR             m_global_regs[27] //Memory Control Register
+#define WCR             m_core->global_regs[24] //Watchdog Compare Register
+#define ISR             m_core->global_regs[25] //Input Status Register
+#define FCR             m_core->global_regs[26] //Function Control Register
+#define MCR             m_core->global_regs[27] //Memory Control Register
 // 28 - 31  Reserved
 
 #define C_MASK                  0x00000001
@@ -194,7 +194,7 @@
 #define GET_S                   ((SR & S_MASK)>>18)     // bit 18 //SUPERVISOR STATE
 #define GET_ILC                 ((SR & 0x00180000)>>19) // bits 20 - 19 //INSTRUCTION-LENGTH
 /* if FL is zero it is always interpreted as 16 */
-#define GET_FL                  m_fl_lut[((SR >> 21) & 0xf)] // bits 24 - 21 //FRAME LENGTH
+#define GET_FL                  m_core->fl_lut[((SR >> 21) & 0xf)] // bits 24 - 21 //FRAME LENGTH
 #define GET_FP                  ((SR & 0xfe000000)>>25) // bits 31 - 25 //FRAME POINTER
 
 #define SET_C(val)              (SR = (SR & ~C_MASK) | (val))

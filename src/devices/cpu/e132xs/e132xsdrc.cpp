@@ -8,8 +8,8 @@
 
 using namespace uml;
 
-#define DRC_PC mem(m_global_regs)
-#define DRC_SR mem(&m_global_regs[1])
+#define DRC_PC mem(m_core->global_regs)
+#define DRC_SR mem(&m_core->global_regs[1])
 
 void hyperstone_device::execute_run_drc()
 {
@@ -33,11 +33,11 @@ void hyperstone_device::execute_run_drc()
 		/* if we need to recompile, do it */
 		if (execute_result == EXECUTE_MISSING_CODE)
 		{
-			code_compile_block(m_global_regs[0]);
+			code_compile_block(m_core->global_regs[0]);
 		}
 		else if (execute_result == EXECUTE_UNMAPPED_CODE)
 		{
-			fatalerror("Attempted to execute unmapped code at PC=%08X\n", m_global_regs[0]);
+			fatalerror("Attempted to execute unmapped code at PC=%08X\n", m_core->global_regs[0]);
 		}
 		else if (execute_result == EXECUTE_RESET_CACHE)
 		{
@@ -117,7 +117,7 @@ static void cfunc_dump_registers(void *param)
 
 void hyperstone_device::ccfunc_total_cycles()
 {
-	m_numcycles = total_cycles();
+	m_core->numcycles = total_cycles();
 }
 
 static void cfunc_total_cycles(void *param)
@@ -198,13 +198,13 @@ void hyperstone_device::generate_get_trap_addr(drcuml_block *block, uml::code_la
 {
 	int no_subtract;
 	UML_MOV(block, I0, trapno);
-	UML_CMP(block, mem(&m_trap_entry), 0xffffff00);
+	UML_CMP(block, mem(&m_core->trap_entry), 0xffffff00);
 	UML_JMPc(block, uml::COND_E, no_subtract = label++);
 	UML_SUB(block, I0, 63, I0);
 
 	UML_LABEL(block, no_subtract);
 	UML_SHL(block, I0, I0, 2);
-	UML_OR(block, I0, I0, mem(&m_trap_entry));
+	UML_OR(block, I0, I0, mem(&m_core->trap_entry));
 }
 
 /*-------------------------------------------------
@@ -370,16 +370,16 @@ void hyperstone_device::static_generate_exception(uint32_t exception, const char
 	UML_AND(block, I1, DRC_PC, ~1);
 	UML_ROLAND(block, I2, DRC_SR, 14, 1);
 	UML_OR(block, I1, I1, I2);
-	UML_STORE(block, (void *)m_local_regs, I3, I1, SIZE_DWORD, SCALE_x4);
+	UML_STORE(block, (void *)m_core->local_regs, I3, I1, SIZE_DWORD, SCALE_x4);
 	UML_ADD(block, I3, I3, 1);
 	UML_AND(block, I3, I3, 0x3f);
-	UML_STORE(block, (void *)m_local_regs, I3, I4, SIZE_DWORD, SCALE_x4);
+	UML_STORE(block, (void *)m_core->local_regs, I3, I4, SIZE_DWORD, SCALE_x4);
 
 	UML_AND(block, DRC_SR, DRC_SR, ~(M_MASK | T_MASK));
 	UML_OR(block, DRC_SR, DRC_SR, (L_MASK | S_MASK));
 
 	UML_MOV(block, DRC_PC, I0);
-	UML_SUB(block, mem(&m_icount), mem(&m_icount), 2);
+	UML_SUB(block, mem(&m_core->icount), mem(&m_core->icount), 2);
 	UML_EXHc(block, uml::COND_S, *m_out_of_cycles, 0);
 
 	UML_HASHJMP(block, 0, I0, *m_nocode);// hashjmp <mode>,i0,nocode
@@ -404,11 +404,11 @@ void hyperstone_device::static_generate_interrupt_checks()
 	int done_int = labelnum++;
 	int int_pending = labelnum++;
 	int timer_int_pending = labelnum++;
-	UML_CMP(block, mem(&m_intblock), 0);
+	UML_CMP(block, mem(&m_core->intblock), 0);
 	UML_JMPc(block, uml::COND_G, done_int);
 	UML_TEST(block, DRC_SR, L_MASK);
 	UML_JMPc(block, uml::COND_NZ, done_int);
-	UML_TEST(block, mem(&m_timer_int_pending), 1);
+	UML_TEST(block, mem(&m_core->timer_int_pending), 1);
 	UML_JMPc(block, uml::COND_NZ, timer_int_pending);
 	UML_TEST(block, mem(&ISR), 0x7f);
 	UML_JMPc(block, uml::COND_NZ, int_pending);
@@ -455,7 +455,7 @@ void hyperstone_device::static_generate_entry_point()
 	//load_fast_iregs(block);
 
 	/* generate a hash jump via the current mode and PC */
-	UML_HASHJMP(block, 0, mem(&m_global_regs[0]), *m_nocode);
+	UML_HASHJMP(block, 0, mem(&m_core->global_regs[0]), *m_nocode);
 	block->end();
 }
 
@@ -662,7 +662,7 @@ void hyperstone_device::generate_interrupt_checks_with_timer(drcuml_block *block
 	int skip_timer_pri6 = labelnum++;
 	UML_CMP(block, I2, 0x3);
 	UML_JMPc(block, uml::COND_NE, skip_timer_pri6);
-	UML_MOV(block, mem(&m_timer_int_pending), 0);
+	UML_MOV(block, mem(&m_core->timer_int_pending), 0);
 	generate_get_trap_addr(block, labelnum, TRAPNO_TIMER);
 	generate_trap_exception_or_int<IS_INT>(block);
 	UML_LABEL(block, skip_timer_pri6);
@@ -681,7 +681,7 @@ void hyperstone_device::generate_interrupt_checks_with_timer(drcuml_block *block
 	int skip_timer_pri8 = labelnum++;
 	UML_CMP(block, I2, 0x2);
 	UML_JMPc(block, uml::COND_NE, skip_timer_pri8);
-	UML_MOV(block, mem(&m_timer_int_pending), 0);
+	UML_MOV(block, mem(&m_core->timer_int_pending), 0);
 	generate_get_trap_addr(block, labelnum, TRAPNO_TIMER);
 	generate_trap_exception_or_int<IS_INT>(block);
 	UML_LABEL(block, skip_timer_pri8);
@@ -700,7 +700,7 @@ void hyperstone_device::generate_interrupt_checks_with_timer(drcuml_block *block
 	int skip_timer_pri10 = labelnum++;
 	UML_CMP(block, I2, 0x1);
 	UML_JMPc(block, uml::COND_NE, skip_timer_pri10);
-	UML_MOV(block, mem(&m_timer_int_pending), 0);
+	UML_MOV(block, mem(&m_core->timer_int_pending), 0);
 	generate_get_trap_addr(block, labelnum, TRAPNO_TIMER);
 	generate_trap_exception_or_int<IS_INT>(block);
 	UML_LABEL(block, skip_timer_pri10);
@@ -719,7 +719,7 @@ void hyperstone_device::generate_interrupt_checks_with_timer(drcuml_block *block
 	int skip_timer_pri12 = labelnum++;
 	UML_CMP(block, I2, 0x0);
 	UML_JMPc(block, uml::COND_NE, skip_timer_pri12);
-	UML_MOV(block, mem(&m_timer_int_pending), 0);
+	UML_MOV(block, mem(&m_core->timer_int_pending), 0);
 	generate_get_trap_addr(block, labelnum, TRAPNO_TIMER);
 	generate_trap_exception_or_int<IS_INT>(block);
 	UML_LABEL(block, skip_timer_pri12);
@@ -770,18 +770,18 @@ void hyperstone_device::generate_update_cycles(drcuml_block *block, bool check_i
 {
 	if (check_interrupts)
 	{
-		UML_SUB(block, mem(&m_intblock), mem(&m_intblock), 1);
-		UML_MOVc(block, uml::COND_S, mem(&m_intblock), 0);
+		UML_SUB(block, mem(&m_core->intblock), mem(&m_core->intblock), 1);
+		UML_MOVc(block, uml::COND_S, mem(&m_core->intblock), 0);
 
 		UML_CALLH(block, *m_interrupt_checks);
 	}
 	else
 	{
-		UML_SUB(block, mem(&m_intblock), mem(&m_intblock), 1);
-		UML_MOVc(block, uml::COND_S, mem(&m_intblock), 0);
+		UML_SUB(block, mem(&m_core->intblock), mem(&m_core->intblock), 1);
+		UML_MOVc(block, uml::COND_S, mem(&m_core->intblock), 0);
 	}
 
-	UML_SUB(block, mem(&m_icount), mem(&m_icount), I7);
+	UML_SUB(block, mem(&m_core->icount), mem(&m_core->icount), I7);
 	UML_EXHc(block, uml::COND_S, *m_out_of_cycles, DRC_PC);
 	UML_EXHc(block, uml::COND_Z, *m_out_of_cycles, DRC_PC);
 	UML_MOV(block, I7, 0);
@@ -806,7 +806,7 @@ void hyperstone_device::generate_checksum_block(drcuml_block *block, compiler_st
 		{
 			uint32_t sum = seqhead->opptr.w[0];
 			uint32_t addr = seqhead->physpc;
-			void *base = m_direct->read_ptr(addr, m_opcodexor);
+			void *base = m_direct->read_ptr(addr, m_core->opcodexor);
 			if (base == nullptr)
 			{
 				printf("m_direct->read_ptr returned nullptr for address %08x\n", addr);
@@ -817,7 +817,7 @@ void hyperstone_device::generate_checksum_block(drcuml_block *block, compiler_st
 			if (seqhead->delay.first() != nullptr && seqhead->physpc != seqhead->delay.first()->physpc)
 			{
 				addr = seqhead->delay.first()->physpc;
-				base = m_direct->read_ptr(addr, m_opcodexor);
+				base = m_direct->read_ptr(addr, m_core->opcodexor);
 				assert(base != nullptr);
 				UML_LOAD(block, I1, base, 0, SIZE_WORD, SCALE_x1);
 				UML_ADD(block, I0, I0, I1);
@@ -832,7 +832,7 @@ void hyperstone_device::generate_checksum_block(drcuml_block *block, compiler_st
 	else /* full verification; sum up everything */
 	{
 		uint32_t addr = seqhead->physpc;
-		void *base = m_direct->read_ptr(addr, m_opcodexor);
+		void *base = m_direct->read_ptr(addr, m_core->opcodexor);
 		if (base == nullptr)
 		{
 			printf("m_direct->read_ptr returned nullptr for address %08x\n", addr);
@@ -844,7 +844,7 @@ void hyperstone_device::generate_checksum_block(drcuml_block *block, compiler_st
 			if (!(curdesc->flags & OPFLAG_VIRTUAL_NOOP))
 			{
 				addr = curdesc->physpc;
-				base = m_direct->read_ptr(addr, m_opcodexor);
+				base = m_direct->read_ptr(addr, m_core->opcodexor);
 				assert(base != nullptr);
 				UML_LOAD(block, I1, base, 0, SIZE_WORD, SCALE_x1);
 				UML_ADD(block, I0, I0, I1);
@@ -853,7 +853,7 @@ void hyperstone_device::generate_checksum_block(drcuml_block *block, compiler_st
 				if (curdesc->delay.first() != nullptr && (curdesc == seqlast || (curdesc->next() != nullptr && curdesc->next()->physpc != curdesc->delay.first()->physpc)))
 				{
 					addr = curdesc->delay.first()->physpc;
-					base = m_direct->read_ptr(addr, m_opcodexor);
+					base = m_direct->read_ptr(addr, m_core->opcodexor);
 					assert(base != nullptr);
 					UML_LOAD(block, I1, base, 0, SIZE_WORD, SCALE_x1);
 					UML_ADD(block, I0, I0, I1);
@@ -1214,9 +1214,9 @@ bool hyperstone_device::generate_opcode(drcuml_block *block, compiler_state *com
 	}
 
 	int no_delay_taken = compiler->m_labelnum++;
-	UML_TEST(block, mem(&m_delay_slot_taken), ~0);
+	UML_TEST(block, mem(&m_core->delay_slot_taken), ~0);
 	UML_JMPc(block, uml::COND_Z, no_delay_taken);
-	UML_MOV(block, mem(&m_delay_slot_taken), 0);
+	UML_MOV(block, mem(&m_core->delay_slot_taken), 0);
 	generate_update_cycles(block);
 	UML_HASHJMP(block, 0, DRC_PC, *m_nocode);
 	UML_LABEL(block, no_delay_taken);
@@ -1225,7 +1225,7 @@ bool hyperstone_device::generate_opcode(drcuml_block *block, compiler_state *com
 	UML_AND(block, I0, DRC_SR, (T_MASK | P_MASK));
 	UML_CMP(block, I0, (T_MASK | P_MASK));
 	UML_JMPc(block, uml::COND_NE, done = compiler->m_labelnum++);
-	UML_TEST(block, mem(&m_delay_slot), 1);
+	UML_TEST(block, mem(&m_core->delay_slot), 1);
 	UML_EXHc(block, uml::COND_E, *m_exception[EXCEPTION_TRACE], 0);
 
 	UML_LABEL(block, done);

@@ -139,6 +139,45 @@ public:
 	void adjust_timer_interrupt();
 
 protected:
+	struct internal_hyperstone_state
+	{
+		// CPU registers
+		uint32_t  global_regs[32];
+		uint32_t  local_regs[64];
+		uint8_t   fl_lut[16];
+
+		/* internal stuff */
+		uint32_t  trap_entry;   // entry point to get trap address
+
+		uint8_t   clock_scale_mask;
+		uint8_t   clck_scale;
+		uint32_t  clock_cycles_1;
+		uint32_t  clock_cycles_2;
+		uint32_t  clock_cycles_3;
+		uint32_t  clock_cycles_4;
+		uint32_t  clock_cycles_6;
+		uint32_t  clock_cycles_36;
+
+		uint64_t  tr_base_cycles;
+		uint32_t  tr_base_value;
+		uint32_t  tr_result;
+		uint32_t  tr_clocks_per_tick;
+		uint32_t  timer_int_pending;
+
+		uint64_t  numcycles;
+
+		uint32_t  delay_pc;
+		uint32_t  delay_slot;
+		uint32_t  delay_slot_taken;
+
+		uint32_t  opcodexor;
+
+		int32_t   intblock;
+
+		// other internal state
+		int       icount;
+	};
+
 	enum reg_bank
 	{
 		LOCAL = 0,
@@ -251,46 +290,15 @@ protected:
 	direct_read_data<0> *m_direct;
 	address_space *m_io;
 
-	// CPU registers
-	uint32_t  m_global_regs[32];
-	uint32_t  m_local_regs[64];
-
-	/* internal stuff */
 	uint16_t  m_op;           // opcode
-	uint32_t  m_trap_entry;   // entry point to get trap address
 
-	uint8_t   m_clock_scale_mask;
-	uint8_t   m_clck_scale;
-	uint32_t   m_clock_cycles_1;
-	uint32_t   m_clock_cycles_2;
-	uint32_t   m_clock_cycles_3;
-	uint32_t   m_clock_cycles_4;
-	uint32_t   m_clock_cycles_6;
-	uint32_t   m_clock_cycles_36;
+	/* core state */
+	internal_hyperstone_state *m_core;
 
-	uint64_t  m_tr_base_cycles;
-	uint32_t  m_tr_base_value;
-	uint32_t  m_tr_result;
-	uint32_t  m_tr_clocks_per_tick;
-	uint32_t  m_timer_int_pending;
+	int32_t   m_instruction_length;
+
 	emu_timer *m_timer;
 
-	uint64_t m_numcycles;
-
-	uint32_t m_prev_pc;
-	uint32_t m_delay_pc;
-	uint32_t m_delay_slot;
-	uint32_t m_delay_slot_taken;
-
-	uint32_t m_opcodexor;
-
-	int32_t m_instruction_length;
-	int32_t m_intblock;
-
-	// other internal state
-	int     m_icount;
-
-	uint8_t m_fl_lut[16];
 	static const uint32_t s_trap_entries[8];
 	static const int32_t s_immediate_values[16];
 
