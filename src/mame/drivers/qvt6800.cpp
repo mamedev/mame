@@ -8,7 +8,11 @@ Skeleton driver for M6800-based display terminals by Qume.
 
 #include "emu.h"
 #include "cpu/m6800/m6800.h"
+#include "cpu/mcs48/mcs48.h"
 #include "machine/6850acia.h"
+#include "machine/clock.h"
+#include "machine/nvram.h"
+#include "machine/z80ctc.h"
 //#include "video/mc6845.h"
 
 class qvt6800_state : public driver_device
@@ -26,7 +30,8 @@ private:
 };
 
 static ADDRESS_MAP_START( qvt102_mem_map, AS_PROGRAM, 8, qvt6800_state )
-	AM_RANGE(0x0000, 0x03ff) AM_RAM
+	AM_RANGE(0x0000, 0x03ff) AM_RAM AM_SHARE("nvram")
+	AM_RANGE(0x2800, 0x2803) AM_DEVWRITE("ctc", z80ctc_device, write)
 	AM_RANGE(0x4000, 0x47ff) AM_RAM
 	//AM_RANGE(0x8000, 0x8000) AM_DEVREADWRITE("crtc", mc6845_device, status_r, address_w)
 	//AM_RANGE(0x8001, 0x8001) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
@@ -48,10 +53,24 @@ static INPUT_PORTS_START( qvt6800 )
 INPUT_PORTS_END
 
 static MACHINE_CONFIG_START( qvt102 )
-	MCFG_CPU_ADD("maincpu", M6800, 1'000'000)
+	MCFG_CPU_ADD("maincpu", M6800, XTAL_16_6698MHz / 18)
 	MCFG_CPU_PROGRAM_MAP(qvt102_mem_map)
 
+	MCFG_NVRAM_ADD_0FILL("nvram") // 2x TC5514-APL + 3V battery
+
+	//MCFG_DEVICE_ADD("crtc", MC6845, XTAL_16_6698MHz / 9)
+
 	MCFG_DEVICE_ADD("acia", ACIA6850, 0)
+
+	MCFG_DEVICE_ADD("ctc", Z80CTC, XTAL_16_6698MHz / 9)
+	MCFG_Z80CTC_ZC0_CB(DEVWRITELINE("acia", acia6850_device, write_txc))
+	MCFG_Z80CTC_ZC1_CB(DEVWRITELINE("acia", acia6850_device, write_rxc))
+
+	MCFG_DEVICE_ADD("ctcclk", CLOCK, XTAL_16_6698MHz / 18) // OR of CRTC CLK and ϕ1
+	MCFG_CLOCK_SIGNAL_HANDLER(DEVWRITELINE("ctc", z80ctc_device, trg0))
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("ctc", z80ctc_device, trg1))
+
+	MCFG_CPU_ADD("kbdmcu", I8748, XTAL_6MHz)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( qvt190 )
@@ -81,7 +100,7 @@ ROM_START( qvt102 )
 	ROM_REGION(0x1000, "chargen", 0)
 	ROM_LOAD( "c3205m.u32", 0x0000, 0x1000, CRC(f6d86e87) SHA1(c0885e4a35095a730d760bf91a1cf4e8edd6a2bb) )
 
-	ROM_REGION(0x0400, "keyboard", 0)
+	ROM_REGION(0x0400, "kbdmcu", 0)
 	ROM_LOAD( "k301.u302",  0x0000, 0x0400, CRC(67564b20) SHA1(5897ff920f8fae4aa498d3a4dfd45b58183c041d) )
 ROM_END
 
