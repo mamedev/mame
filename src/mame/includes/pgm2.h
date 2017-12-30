@@ -59,6 +59,14 @@ public:
 	DECLARE_WRITE16_MEMBER(vbl_ack_w);
 	DECLARE_WRITE16_MEMBER(unk30120014_w);
 
+	DECLARE_WRITE32_MEMBER(pio_sodr_w);
+	DECLARE_WRITE32_MEMBER(pio_codr_w);
+	DECLARE_READ32_MEMBER(pio_pdsr_r);
+	DECLARE_WRITE32_MEMBER(module_scramble_w);
+	DECLARE_READ_LINE_MEMBER(module_data_r);
+	DECLARE_WRITE_LINE_MEMBER(module_data_w);
+	DECLARE_WRITE_LINE_MEMBER(module_clk_w);
+
 	DECLARE_READ32_MEMBER(orleg2_speedup_r);
 	DECLARE_READ32_MEMBER(kov2nl_speedup_r);
 	DECLARE_READ32_MEMBER(kof98umh_speedup_r);
@@ -130,6 +138,16 @@ private:
 	void mcu_command(address_space &space, bool is_command);
 
 	std::vector<uint8_t> m_encrypted_copy;
+
+	uint32_t pio_out_data;
+	uint32_t module_addr_xor, module_data_xor;
+	const uint8_t *module_key;
+	uint32_t module_in_latch;
+	uint32_t module_out_latch;
+	int module_prev_state;
+	int module_clk_cnt;
+	uint8_t module_rcv_buf[10];
+	uint8_t module_send_buf[9];
 
 	// devices
 	required_device<cpu_device> m_maincpu;
