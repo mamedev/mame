@@ -78,30 +78,6 @@ COMP( 1992, qvt70, 0, 0, terminals, terminals, terminals_state, 0, "Qume", "QVT-
 
 /**************************************************************************************************************
 
-Qume QVT-102.
-Chips: HD46800DP (6800), HD46505SP (6845), HD46850P (6850), M58725P-15 (16k RAM), LH0082 (Z80CTC), Button battery
-Crystals: 16.6698
-Keyboard: D8748D, 6.000, Beeper
-
-***************************************************************************************************************/
-
-ROM_START( qvt102 )
-	ROM_REGION(0x10000, "maincpu", 0)
-	ROM_LOAD( "t205m.u8",   0x0000, 0x2000, CRC(59cc04f6) SHA1(ee2e3a3ea7b57a231483fcc74266f0f3f51204af) )
-
-	ROM_REGION(0x1000, "chargen", 0)
-	ROM_LOAD( "c3205m.u32", 0x0000, 0x1000, CRC(f6d86e87) SHA1(c0885e4a35095a730d760bf91a1cf4e8edd6a2bb) )
-
-	ROM_REGION(0x10000, "keyboard", 0)
-	ROM_LOAD( "k301.u302",  0x0000, 0x0400, CRC(67564b20) SHA1(5897ff920f8fae4aa498d3a4dfd45b58183c041d) )
-ROM_END
-
-COMP( 1983, qvt102, 0, 0, terminals, terminals, terminals_state, 0, "Qume", "QVT-102", MACHINE_IS_SKELETON )
-
-
-
-/**************************************************************************************************************
-
 Qume QVT-103.
 Chips: Z80A, Z80A DART, Z80A CTC, 2x CRT9212, 5x HM6116P-2, TC5516APL, D8741AD, CRT9007, 1x 10-sw dip, Button battery.
 Crystals: (all hard to read) 29.876, 6.000
@@ -122,26 +98,6 @@ ROM_START( qvt103 )
 ROM_END
 
 COMP( 1983, qvt103, 0, 0, terminals, terminals, terminals_state, 0, "Qume", "QVT-103", MACHINE_IS_SKELETON )
-
-
-
-/**************************************************************************************************************
-
-Qume QVT-190.
-Chips: MC68B00P, 2x MC68B50P, MC68B45P, V61C16P55L, M5M5165P-70L, ABHGA101006, button battery, 7-DIL-jumper
-Crystal: unreadable
-
-***************************************************************************************************************/
-
-ROM_START( qvt190 )
-	ROM_REGION(0x10000, "maincpu", 0)
-	ROM_LOAD( "95987-267.u19", 0x0000, 0x8000, CRC(78894d8e) SHA1(0a0f6883dd18872bddeb3ed18ebe496080e6591b) )
-
-	ROM_REGION(0x2000, "chargen", 0)
-	ROM_LOAD( "95864-304.u17", 0x0000, 0x2000, CRC(2792e99b) SHA1(4a84d029d0e63975fc95dc7056d2523193dff986) )
-ROM_END
-
-COMP( 1987, qvt190, 0, 0, terminals, terminals, terminals_state, 0, "Qume", "QVT-190", MACHINE_IS_SKELETON )
 
 
 

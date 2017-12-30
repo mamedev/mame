@@ -1093,7 +1093,7 @@ function linkProjects_mame_mess(_target, _subtarget)
 		"sun",
 		"svi",
 		"svision",
-		"swtpc09",
+		"swtpc",
 		"synertec",
 		"ta",
 		"tandberg",
@@ -3021,8 +3021,9 @@ files {
 	MAME_DIR .. "src/mame/audio/svis_snd.h",
 }
 
-createMESSProjects(_target, _subtarget, "swtpc09")
+createMESSProjects(_target, _subtarget, "swtpc")
 files {
+	MAME_DIR .. "src/mame/drivers/swtpc.cpp",
 	MAME_DIR .. "src/mame/drivers/swtpc09.cpp",
 	MAME_DIR .. "src/mame/includes/swtpc09.h",
 	MAME_DIR .. "src/mame/machine/swtpc09.cpp",
@@ -3604,6 +3605,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/pulsar.cpp",
 	MAME_DIR .. "src/mame/drivers/pv9234.cpp",
 	MAME_DIR .. "src/mame/drivers/qtsbc.cpp",
+	MAME_DIR .. "src/mame/drivers/qvt6800.cpp",
 	MAME_DIR .. "src/mame/drivers/rd100.cpp",
 	MAME_DIR .. "src/mame/drivers/rvoice.cpp",
 	MAME_DIR .. "src/mame/drivers/sacstate.cpp",
@@ -3616,7 +3618,6 @@ files {
 	MAME_DIR .. "src/mame/includes/softbox.h",
 	MAME_DIR .. "src/mame/drivers/squale.cpp",
 	MAME_DIR .. "src/mame/drivers/solbourne.cpp",
-	MAME_DIR .. "src/mame/drivers/swtpc.cpp",
 	MAME_DIR .. "src/mame/drivers/swyft.cpp",
 	MAME_DIR .. "src/mame/drivers/symbolics.cpp",
 	MAME_DIR .. "src/mame/drivers/sys2900.cpp",
