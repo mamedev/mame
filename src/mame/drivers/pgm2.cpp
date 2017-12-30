@@ -364,6 +364,11 @@ WRITE16_MEMBER(pgm2_state::unk30120014_w)
 
  It is not clear if real address/data xor values derived from written "key",
  or FPGA just waiting to be be written magic value at specific address in ROM area, and if this happen enable descrambling using hardcoded values.
+
+ Current implementation assume "expected sum" read at step 6) is regular data from ROM (descrambled),
+ our keys calculated assuming this, so further ROM sum check passes OK.
+ But, there is chances in hardware its not like that, but these bytes comes from FPGA (some indication of this is the fact 5) and 6) is actually single routine).
+ In this case we have 2 unknowns (key and summ) and can not guess both. Will be needed serial comm logs from real hardware.
 */
 
 READ_LINE_MEMBER(pgm2_state::module_data_r)
