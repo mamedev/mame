@@ -1685,7 +1685,7 @@ WRITE16_MEMBER(seta_state::ipl2_ack_w)
 
 static ADDRESS_MAP_START( tndrcade_map, AS_PROGRAM, 16, seta_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM                             // ROM
-	AM_RANGE(0x200000, 0x200001) AM_WRITENOP                        // ? 0
+	AM_RANGE(0x200000, 0x200001) AM_WRITE(ipl1_ack_w)
 	AM_RANGE(0x280000, 0x280001) AM_WRITENOP                        // ? 0 / 1 (sub cpu related?)
 	AM_RANGE(0x300000, 0x300001) AM_WRITENOP                        // ? 0 / 1
 	AM_RANGE(0x380000, 0x3803ff) AM_RAM AM_SHARE("paletteram") // Palette
@@ -7755,7 +7755,7 @@ static MACHINE_CONFIG_START( tndrcade )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 16000000/2) /* 8 MHz */
 	MCFG_CPU_PROGRAM_MAP(tndrcade_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", seta_state,  irq2_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", seta_state, irq2_line_assert)
 
 	MCFG_CPU_ADD("sub", M65C02, 16000000/8) /* 2 MHz */
 	MCFG_CPU_PROGRAM_MAP(tndrcade_sub_map)
