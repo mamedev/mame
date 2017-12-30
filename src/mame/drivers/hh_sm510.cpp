@@ -3498,7 +3498,7 @@ MACHINE_CONFIG_END
 /***************************************************************************
 
   VTech Electronic Number Muncher
-  * Sharp SM511 under epoxy (die label ?)
+  * Sharp SM511 under epoxy (die label 772)
   * lcd screen with custom segments, 1-bit sound
 
 ***************************************************************************/
@@ -4020,10 +4020,10 @@ ROM_END
 
 ROM_START( nummunch )
 	ROM_REGION( 0x1000, "maincpu", 0 )
-	ROM_LOAD( "nummunch.program", 0x0000, 0x1000, CRC(2f7ff516) SHA1(132e7c5c4d69170953b2e51731992d6d6ba829f9) )
+	ROM_LOAD( "772.program", 0x0000, 0x1000, CRC(2f7ff516) SHA1(132e7c5c4d69170953b2e51731992d6d6ba829f9) )
 
 	ROM_REGION( 0x100, "maincpu:melody", 0 )
-	ROM_LOAD( "nummunch.melody", 0x000, 0x100, CRC(96fe463a) SHA1(dcef5eee15a3f6d21e0db1b8ae3fbddc81633fc8) )
+	ROM_LOAD( "772.melody", 0x000, 0x100, CRC(96fe463a) SHA1(dcef5eee15a3f6d21e0db1b8ae3fbddc81633fc8) )
 
 	ROM_REGION( 140664, "svg", 0)
 	ROM_LOAD( "nummunch.svg", 0, 140664, CRC(879df7e2) SHA1(78d8500a445cbbea0090d4e97b781c1e4ed11dd3) )
