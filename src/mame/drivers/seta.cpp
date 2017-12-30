@@ -2831,7 +2831,7 @@ static ADDRESS_MAP_START( thunderl_map, AS_PROGRAM, 16, seta_state )
 	AM_RANGE(0x000000, 0x00ffff) AM_ROM                             // ROM
 	AM_RANGE(0xffc000, 0xffffff) AM_RAM                             // RAM
 	AM_RANGE(0x100000, 0x103fff) AM_DEVREADWRITE("x1snd", x1_010_device, word_r, word_w)   // Sound
-	AM_RANGE(0x200000, 0x200001) AM_WRITENOP                        // ?
+	AM_RANGE(0x200000, 0x200001) AM_READWRITE(ipl1_ack_r, ipl1_ack_w)
 	AM_RANGE(0x300000, 0x300001) AM_WRITENOP                        // ?
 	AM_RANGE(0x400000, 0x40ffff) AM_WRITE(thunderl_protection_w)    // Protection (not in wits)
 	AM_RANGE(0x500000, 0x500001) AM_RAM_WRITE(seta_vregs_w) AM_SHARE("vregs")   // Coin Lockout
@@ -2855,7 +2855,7 @@ static ADDRESS_MAP_START( thunderlbl_map, AS_PROGRAM, 16, seta_state )
 	AM_RANGE(0x000000, 0x00ffff) AM_ROM                             // ROM
 	AM_RANGE(0xffc000, 0xffffff) AM_RAM                             // RAM
 //  AM_RANGE(0x100000, 0x103fff) AM_DEVREADWRITE("x1snd", x1_010_device, word_r, word_w)  // Sound
-	AM_RANGE(0x200000, 0x200001) AM_WRITENOP                        // ?
+	AM_RANGE(0x200000, 0x200001) AM_READWRITE(ipl1_ack_r, ipl1_ack_w)
 	AM_RANGE(0x300000, 0x300001) AM_WRITENOP                        // ?
 //  AM_RANGE(0x400000, 0x40ffff) AM_WRITE(thunderl_protection_w)    // Protection (not in wits)
 	AM_RANGE(0x500000, 0x500001) AM_RAM_WRITE(seta_vregs_w) AM_SHARE("vregs")   // Coin Lockout
@@ -2882,7 +2882,7 @@ static ADDRESS_MAP_START( wiggie_map, AS_PROGRAM, 16, seta_state )
 	AM_RANGE(0x000000, 0x01ffff) AM_ROM                             // ROM
 	AM_RANGE(0xffc000, 0xffffff) AM_RAM                             // RAM
 	AM_RANGE(0x100000, 0x103fff) AM_NOP                             // X1_010 is not used
-	AM_RANGE(0x200000, 0x200001) AM_WRITENOP                        // ?
+	AM_RANGE(0x200000, 0x200001) AM_READWRITE(ipl1_ack_r, ipl1_ack_w)
 	AM_RANGE(0x300000, 0x300001) AM_WRITENOP                        // ?
 	AM_RANGE(0x400000, 0x40ffff) AM_WRITE(thunderl_protection_w)    // Protection (not in wits)
 	AM_RANGE(0x500000, 0x500001) AM_RAM_WRITE(seta_vregs_w) AM_SHARE("vregs")   // Coin Lockout
@@ -9218,7 +9218,7 @@ static MACHINE_CONFIG_START( thunderl )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 16000000/2) /* 8 MHz */
 	MCFG_CPU_PROGRAM_MAP(thunderl_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", seta_state,  irq2_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", seta_state, irq2_line_assert)
 
 	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
 	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
@@ -9266,7 +9266,7 @@ static MACHINE_CONFIG_DERIVED( thunderlbl, thunderl )
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(thunderlbl_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", seta_state,  irq2_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", seta_state, irq2_line_assert)
 
 	MCFG_CPU_ADD("audiocpu", Z80, 10000000/2)
 	MCFG_CPU_PROGRAM_MAP(thunderlbl_sound_map)
@@ -9288,7 +9288,7 @@ static MACHINE_CONFIG_START( wiggie )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 16000000/2) /* 8 MHz */
 	MCFG_CPU_PROGRAM_MAP(wiggie_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", seta_state,  irq2_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", seta_state, irq2_line_assert)
 
 	MCFG_CPU_ADD("audiocpu", Z80, 16000000/4)   /* 4 MHz */
 	MCFG_CPU_PROGRAM_MAP(wiggie_sound_map)
@@ -9331,7 +9331,7 @@ static MACHINE_CONFIG_START( wits )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 16000000/2) /* 8 MHz */
 	MCFG_CPU_PROGRAM_MAP(thunderl_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", seta_state,  irq2_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", seta_state, irq2_line_assert)
 
 	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
 	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
