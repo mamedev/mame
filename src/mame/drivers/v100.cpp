@@ -13,7 +13,7 @@ Skeleton driver for Visual 100 display terminal.
 #include "machine/i8214.h"
 #include "machine/i8251.h"
 #include "machine/i8255.h"
-//#include "video/crt5027.h"
+//#include "video/tms9927.h"
 //#include "screen.h"
 
 class v100_state : public driver_device
@@ -38,7 +38,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( io_map, AS_IO, 8, v100_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	//AM_RANGE(0x00, 0x0f) AM_DEVWRITE("vtac", crt5027_device, write)
+	//AM_RANGE(0x00, 0x0f) AM_DEVWRITE("vtac", crt5037_device, write)
 	// 0x10 - 8116T baud rate
 	AM_RANGE(0x12, 0x12) AM_DEVREADWRITE("usart", i8251_device, data_r, data_w)
 	AM_RANGE(0x13, 0x13) AM_DEVREADWRITE("usart", i8251_device, status_r, control_w)
