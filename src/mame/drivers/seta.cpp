@@ -11782,16 +11782,31 @@ DRIVER_INIT_MEMBER(seta_state,arbalest)
 }
 
 
+READ16_MEMBER(seta_state::metafox_protection_r)
+{
+	// very simplified protection simulation
+	// 21c000-21c3ff, 21d000-21d3ff, and 21e000-21e3ff are tested as 8 bit reads/writes
+	// the first address in each range is special and returns data written elsewhere in that range
+	// 21fde0-21fdff appears to be control bytes?
+
+	switch (offset)
+	{
+		case 0x0001/2:
+			return 0x3d;
+
+		case 0x1001/2:
+			return 0x76;
+
+		case 0x2001/2:
+			return 0x10;
+	}
+
+	return offset * 0x1f;
+}
+
 DRIVER_INIT_MEMBER(seta_state,metafox)
 {
-	uint16_t *RAM = (uint16_t *) memregion("maincpu")->base();
-
-	/* This game uses the 21c000-21ffff area for protection? */
-//  m_maincpu->space(AS_PROGRAM).nop_readwrite(0x21c000, 0x21ffff);
-
-	RAM[0x8ab1c/2] = 0x4e71;    // patch protection test: "cp error"
-	RAM[0x8ab1e/2] = 0x4e71;
-	RAM[0x8ab20/2] = 0x4e71;
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x21c000, 0x21ffff,read16_delegate(FUNC(seta_state::metafox_protection_r),this));
 }
 
 
