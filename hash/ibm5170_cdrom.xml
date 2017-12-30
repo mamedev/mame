@@ -626,7 +626,6 @@
 		</part>
 	</software>
 
-	
 	<!-- DOS -->
 	<software name="aworld80">
 		<description>Around the World in 80 Days</description>
@@ -640,6 +639,77 @@
 		</part>
 	</software>
 
+	<!-- DOS -->
+	<!-- TODO: hangs when starting mission -->
+	<software name="backbagh" supported="no">
+		<description>Back to Baghdad (v1.00)</description>
+		<year>1996</year>
+		<publisher>Military Simulations</publisher>
+		<info name="version" value="1.00"/>
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="back to baghdad (1996)(military simulations)" sha1="25e308bdde703282d7f79c2c0b782bff5cad5583" />
+			</diskarea>
+		</part>
+	</software>
+	
+	<!-- Windows 3.1 -->
+	<!-- Disc label Bad_mojo_uk -->
+	<!-- TODO: weird installer, missing graphics? -->
+	<!-- TODO: doesn't seem to do anything in game, missing mouse pointer? -->
+	<software name="badmojo" supported="partial">
+		<description>Bad Mojo</description>
+		<year>1996</year>
+		<publisher>Acclaim</publisher>
+		
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="bad mojo (1996)(acclaim)" sha1="9956a05e9aab4cbaaebe19ee355f2d54fca39636" />
+			</diskarea>
+		</part>
+	</software>
+	
+	<software name="badmojod" cloneof="badmojo" supported="partial">
+		<description>Bad Mojo (Germany)</description>
+		<year>1996</year>
+		<publisher>Acclaim</publisher>
+		
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="bad mojo (1996)(acclaim)(de)" sha1="3eadb0fbb84af68f15653c3f3a6eb79fdb3f9210" />
+			</diskarea>
+		</part>
+	</software>
+	
+	<!-- Windows 95 -->
+	<!-- TODO: uses High Color -->
+	<software name="banzaib" supported="partial">
+		<description>Banzai Bug</description>
+		<year>1996</year>
+		<publisher>Multi Media International</publisher>
+		
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="banzai bug (1996)(multi media international)(nl)" sha1="3dbf3846902ce85f6175f7d2b25ced2933c1a4af" />
+			</diskarea>
+		</part>
+	</software>
+	
+	<!-- DOS / Windows -->
+	<!-- TODO: trying to install causes access denied error, game can be run anyway -->
+	<software name="barq">
+		<description>BARQ - The Rise of Freedom</description>
+		<year>1996</year>
+		<publisher>UAV</publisher>
+		
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="barq - the rise of freedom (1996)(uav)" sha1="66a4d6d18daf1db97ea08aaf5c80ab803275bcb1" />
+			</diskarea>
+		</part>
+	</software>
+	
 	<!-- 
 	Register key:
 	BB2KLEJP-50008573
@@ -656,7 +726,23 @@
 			</diskarea>
 		</part>
 	</software>
+	
+	<!-- DOS -->
+	<!-- English / French / German -->
+	<!-- TODO: Cannot install, get stuck at uncompressing files screen -->
+	<software name="batlbugs" supported="no">
+		<description>Battle Bugs</description>
+		<year>1995</year>
+		<publisher>Sierra</publisher>
+		
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="battle bugs (1995)(sierra)(m3)" sha1="7216a7e82f4c09f89845dd90b32cde706bc43883" />
+			</diskarea>
+		</part>
+	</software>	
 
+	
 	<!-- Pentium class 200 MHz / Direct X 7.0 / Windows 95 -->
 	<!-- TODO: invalid opcode exception after install -->
 	<software name="boorball" supported="no">
