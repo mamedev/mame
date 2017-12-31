@@ -3658,10 +3658,10 @@ ROM_END
 
    This PCB has an Altera EP910PC CPLD on board
 
-   to init nvram dsw must be
-   ON OFF OFF OFF OFF OFF OFF
+   To init NVRAM, DSW must be:
+   OFF ON ON ON ON ON ON ON
 
-   then service1+service2 and reset,
+   Then (SERVICE1 + SERVICE2) and reset,
    then another reset.
 
    Q is remote (x100)
@@ -3687,10 +3687,10 @@ ROM_END
 
 /*  Jolly Card Italian bootleg...
 
-   to init nvram dsw must be
+   To init NVRAM, DSW must be:
    OFF ON ON ON ON ON ON ON
 
-   then service1+service2 and reset,
+   Then (SERVICE1 + SERVICE2) and reset,
    then another reset.
 
    This set has spam graphics, but seems
@@ -3733,6 +3733,31 @@ ROM_START( jolycdif )   /* Altera EP910PC CPLD */
 
 	ROM_REGION( 0x0200, "proms", 0 )
 	ROM_LOAD( "82s147.bin", 0x0000, 0x0200, CRC(5ebc5659) SHA1(8d59011a181399682ab6e8ed14f83101e9bfa0c6) ) // proper dump
+ROM_END
+
+
+/* Jolly Card Italian bootleg...
+
+   To init NVRAM, DSW must be:
+   OFF ON ON ON ON ON ON ON
+
+   Then (SERVICE1 + SERVICE2) and reset,
+   then another reset.
+
+   Once NVRAM is initialized, the hardware gives errors about it. Need to be analyzed.
+*/
+ROM_START( jolycdig )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "3__27c256.bin", 0x8000, 0x8000, CRC(e939ed2a) SHA1(a413623499971517569bcf97860caad65ff5535f) )
+
+	ROM_REGION( 0x10000, "gfx1", 0 )
+	ROM_LOAD( "2__27c512.bin", 0x0000, 0x8000, CRC(a4452751) SHA1(a0b32a8801ebaee7ede7873b244f1a424433fe94) )
+	ROM_CONTINUE( 0x0000, 0x8000) /* Discarding 1nd half 1ST AND 2ND HALF IDENTICAL*/
+	ROM_LOAD( "1__27c512.bin", 0x8000, 0x8000, CRC(8b64d4c6) SHA1(8106cba31cd3fbda0855e6070182d248e3d52495) )
+	ROM_CONTINUE( 0x8000, 0x8000) /* Discarding 1nd half 1ST AND 2ND HALF IDENTICAL*/
+
+	ROM_REGION( 0x0200, "proms", 0 )
+	ROM_LOAD( "27s29pc.bin", 0x0000, 0x0200, CRC(5ebc5659) SHA1(8d59011a181399682ab6e8ed14f83101e9bfa0c6) )
 ROM_END
 
 
@@ -7050,7 +7075,8 @@ GAME(  1986, jolycdab,  jollycrd, fw1stpal, funworld,  funworld_state, 0,       
 GAMEL( 1992, jolycdsp,  jollycrd, cuoreuno, jolycdit,  funworld_state, ctunk,    ROT0, "TAB Austria",     "Jolly Card (Spanish, blue TAB board, encrypted)", 0,                       layout_royalcrd )
 GAMEL( 1990, jolycdid,  jollycrd, cuoreuno, jolycdcr,  funworld_state, 0,        ROT0, "bootleg",         "Jolly Card (Italian, different colors, set 1)",   0,                       layout_jollycrd ) // italian, CPLD, different colors.
 GAMEL( 1990, jolycdie,  jollycrd, cuoreuno, jolycdib,  funworld_state, 0,        ROT0, "bootleg",         "Jolly Card (Italian, different colors, set 2)",   0,                       layout_jollycrd ) // not from TAB blue PCB.
-GAMEL( 1990, jolycdif,  jollycrd, cuoreuno, jolycdib,  funworld_state, 0,        ROT0, "bootleg",         "Jolly Card (Italian, bootleg)",                   0,                       layout_jollycrd ) // italian, CPLD. doesn't need nvram init.
+GAMEL( 1990, jolycdif,  jollycrd, cuoreuno, jolycdib,  funworld_state, 0,        ROT0, "bootleg",         "Jolly Card (Italian, bootleg, set 1)",            0,                       layout_jollycrd ) // italian, CPLD. doesn't need nvram init.
+GAME ( 1990, jolycdig,  jollycrd, cuoreuno, jolycdib,  funworld_state, 0,        ROT0, "bootleg",         "Jolly Card (Italian, bootleg, set 2)",            MACHINE_NOT_WORKING )
 
 // Bonus Card based...
 GAMEL( 1986, bonuscrd,  0,        fw2ndpal, bonuscrd,  funworld_state, 0,        ROT0, "Fun World",       "Bonus Card (Austrian)",                           MACHINE_IMPERFECT_COLORS,   layout_bonuscrd ) // use fw1stpal machine for green background
