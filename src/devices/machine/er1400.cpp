@@ -253,7 +253,10 @@ WRITE_LINE_MEMBER(er1400_device::clock_w)
 
 		case 2: // erase
 			if (m_erase_time == attotime::never)
+			{
+				logerror("Entering erase command\n");
 				m_erase_time = machine().time() + attotime::from_msec(15);
+			}
 			break;
 
 		case 3: // accept address
@@ -272,7 +275,10 @@ WRITE_LINE_MEMBER(er1400_device::clock_w)
 
 		case 6: // write
 			if (m_write_time == attotime::never)
+			{
+				logerror("Entering write command\n");
 				m_write_time = machine().time() + attotime::from_msec(15);
+			}
 			break;
 
 		case 7: // accept data
