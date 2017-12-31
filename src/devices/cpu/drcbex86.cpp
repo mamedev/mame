@@ -6720,7 +6720,8 @@ int drcbe_x86::ddivu(uint64_t &dstlo, uint64_t &dsthi, uint64_t src1, uint64_t s
 		return FLAG_V;
 
 	dstlo = src1 / src2;
-	dsthi = src1 % src2;
+	if (&dstlo != &dsthi)
+		dsthi = src1 % src2;
 	return ((dstlo == 0) << 2) | ((dstlo >> 60) & FLAG_S);
 }
 
@@ -6736,7 +6737,8 @@ int drcbe_x86::ddivs(uint64_t &dstlo, uint64_t &dsthi, int64_t src1, int64_t src
 		return FLAG_V;
 
 	dstlo = src1 / src2;
-	dsthi = src1 % src2;
+	if (&dstlo != &dsthi)
+		dsthi = src1 % src2;
 	return ((dstlo == 0) << 2) | ((dstlo >> 60) & FLAG_S);
 }
 
