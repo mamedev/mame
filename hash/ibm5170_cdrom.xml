@@ -696,6 +696,27 @@
 		</part>
 	</software>
 	
+	
+	<!-- DOS -->
+	<!-- German version of Broken Sword -->
+	<!-- TODO: SB16 sound stops working after intro? -->
+	<software name="baphof1d" supported="partial">
+		<description>Baphomets Fluch (Germany)</description>
+		<year>1997</year>
+		<publisher>Megamedia / Revolution / Virgin</publisher>
+		
+		<part name="cdrom1" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="baphomets fluch (1997)(megamedia)(de)(disc 1 of 2)[compilation megapak 8]" sha1="ce2a0d98bb579efad8e6297ac15dee52d637822f" />
+			</diskarea>
+		</part>
+		<part name="cdrom2" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="baphomets fluch (1997)(megamedia)(de)(disc 2 of 2)[compilation megapak 8]" sha1="3e53de504a2a1c806400206fc1d5c85e605cdbb4" />
+			</diskarea>
+		</part>
+	</software>
+	
 	<!-- DOS / Windows -->
 	<!-- TODO: trying to install causes access denied error, game can be run anyway -->
 	<software name="barq">
@@ -742,8 +763,93 @@
 		</part>
 	</software>	
 
+	<!-- Windows 3.1 -->
+	<!-- TODO: setup AVI test stalls to a DOS text mode-->
+	<software name="batlisl3" supported="partial">
+		<description>Battle Isle 3 - Shadow of the Emperor</description>
+		<year>1995</year>
+		<publisher>Blue Byte</publisher>
+		
+		<part name="cdrom1" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="battle isle 3 - shadow of the empire (1995)(blue byte)(disc 1 of 2)" sha1="fa140978350d679335f8bbef0ccd54a0042628ad" />
+			</diskarea>
+		</part>
+		<part name="cdrom2" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="battle isle 3 - shadow of the empire (1995)(blue byte)(disc 2 of 2)" sha1="587eba131db7eb9652025d8810b303a6e9382d26" />
+			</diskarea>
+		</part>
+	</software>
 	
-	<!-- Pentium class 200 MHz / Direct X 7.0 / Windows 95 -->
+	<!-- Windows 3.1 -->
+	<!-- Pentium class 100 MHz -->
+	<!-- Has Italian strings in installer? -->
+	<software name="beantara">
+		<description>Betrayal in Antara</description>
+		<year>1997</year>
+		<publisher>Sierra</publisher>
+		
+		<part name="cdrom1" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="betrayal in antara (1997)(sierra)(disc 1 of 3)" sha1="df24bd61462238c91174c5adacb4ecf04e41ec14" />
+			</diskarea>
+		</part>
+		<part name="cdrom2" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="betrayal in antara (1997)(sierra)(disc 2 of 3)" sha1="b5c87d1698918c034682fff4e24d1d54cc1b9e4a" />
+			</diskarea>
+		</part>
+		<part name="cdrom3" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="betrayal in antara (1997)(sierra)(disc 3 of 3)" sha1="aeb47dc31c8e3ce3144b89181bf335b28caab225" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Windows 3.1 -->
+	<software name="bermusynd">
+		<description>Bermuda Syndrome (Germany)</description>
+		<year>1995</year>
+		<publisher>Century Interactive / BMG Interactive Entertainment</publisher>
+		
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="bermuda syndrome (1995)(bmg interactive entertainment)(de)" sha1="45c0aebb68b5ef6bf9ee6dca3713b08dcb252928" />
+			</diskarea>
+		</part>
+	</software>
+	
+	<!-- DOS / Windows 3.1 -->
+	<software name="bfchess">
+		<description>Bobby Fischer Teaches Chess</description>
+		<year>1996</year>
+		<publisher>Interplay / Mission Studios</publisher>
+		
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="bobby fischer teaches chess (1996)(interplay)(en-fr)" sha1="2c178eaaf9a21fdf2847b37fdaa5ad2d8fbddafb" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- DOS -->
+	<!-- English / French / German -->
+	<software name="bioforge">
+		<description>Bioforge (vf1.01)</description>
+		<year>1995</year>
+		<publisher>Origin</publisher>
+		<info name="version" value="f1.01" />
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="bioforge vf1.01 (1995)(origin)(m3)[!]" sha1="2bc3734682a461aae4e07d8a419fde407cefd4c1" />
+			</diskarea>
+		</part>
+	</software>
+	
+	<!-- Windows 95, Direct X 7.0 -->
+	<!-- Pentium class 200 MHz -->
 	<!-- TODO: invalid opcode exception after install -->
 	<software name="boorball" supported="no">
 		<description>Boorp's Balls</description>
@@ -786,6 +892,7 @@
 	
 	<!-- Windows 95 -->
 	<!-- Very slow on 486 -->
+	<!-- also known as Captain Claw -->
 	<!-- TODO: has transparency issues on main menu -->
 	<software name="clawj" supported="partial">
 		<description>Claw (Japan v1.2)</description>
