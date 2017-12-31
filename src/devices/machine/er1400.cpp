@@ -120,7 +120,7 @@ void er1400_device::read_data()
 			if (BIT(m_address_register, tens) && BIT(m_address_register, units))
 			{
 				offs_t offset = 10 * (tens - 10) + units;
-				logerror("Reading data at %d into register\n", offset);
+				logerror("Reading data at %d (%04X) into register\n", offset, m_data_array[offset]);
 				m_data_register |= m_data_array[offset];
 			}
 		}
