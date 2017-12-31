@@ -420,6 +420,8 @@ uint32_t alphatpx_state::screen_update(screen_device &screen, bitmap_rgb32 &bitm
 {
 	const pen_t *pen = m_palette->pens();
 	int start = m_crtc->upscroll_offset();
+	rectangle cursor;
+	m_crtc->cursor_bounds(cursor);
 	for (int y = 0; y < 24; y++)
 	{
 		int vramy = (start + y) % 24;
@@ -427,9 +429,12 @@ uint32_t alphatpx_state::screen_update(screen_device &screen, bitmap_rgb32 &bitm
 		{
 			uint8_t code = m_vram[(vramy * 128) + x];   // helwie44 must be 128d is 080h physical display-ram step line
 			// draw 12 lines of the character
+			bool cursoren = cursor.contains(x * 8, y * 12);
 			for (int line = 0; line < 12; line++)
 			{
 				uint8_t data = m_gfx[((code & 0x7f) * 16) + line];
+				if(cursoren)
+					data ^= 0xff;
 				bitmap.pix32(y * 12 + line, x * 8 + 0) = pen[BIT(data, 0) ^ BIT(code, 7)];
 				bitmap.pix32(y * 12 + line, x * 8 + 1) = pen[BIT(data, 1) ^ BIT(code, 7)];
 				bitmap.pix32(y * 12 + line, x * 8 + 2) = pen[BIT(data, 2) ^ BIT(code, 7)];
