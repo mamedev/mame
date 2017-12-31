@@ -926,6 +926,7 @@ bool renderer_bgfx::update_dimensions()
 
 			bgfx::setViewFrameBuffer(s_current_view, m_framebuffer->target());
 			bgfx::setViewClear(s_current_view, BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH, 0x00000000, 1.0f, 0);
+			bgfx::setViewMode(s_current_view, bgfx::ViewMode::Sequential);
 			bgfx::touch(s_current_view);
 			bgfx::frame();
 			return true;
@@ -967,6 +968,7 @@ void renderer_bgfx::setup_view(uint32_t view_index, bool screen)
 			bgfx::setViewFrameBuffer(view_index, m_avi_target->target());
 		}
 		bgfx::setViewClear(view_index, BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH, 0x00000000, 1.0f, 0);
+		bgfx::setViewMode(s_current_view, bgfx::ViewMode::Sequential);
 	}
 
 	setup_matrices(view_index, screen);
