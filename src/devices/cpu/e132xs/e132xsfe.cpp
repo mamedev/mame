@@ -873,7 +873,7 @@ bool e132xs_frontend::describe(opcode_desc &desc, const opcode_desc *prev)
 
 			desc.regin[0] |= 1 << gdst_code;
 			desc.regout[0] |= 1 << gsrc_code;
-			if ((imm1 & 0x3000) == 3 && (extra_s & 2)) desc.regout[0] |= 1 << gsrcf_code;
+			if ((imm1 & 0x3000) == 0x3000 && (extra_s & 2)) desc.regout[0] |= 1 << gsrcf_code;
 
 			desc.length = (imm1 & 0x8000) ? 6 : 4;
 			desc.flags |= OPFLAG_READS_MEMORY;
@@ -892,7 +892,7 @@ bool e132xs_frontend::describe(opcode_desc &desc, const opcode_desc *prev)
 			desc.regin[0] |= SR_CODE;
 			desc.regin[0] |= 1 << gdst_code;
 			desc.regout[lsrc_group] |= 1 << lsrc_code;
-			if ((imm1 & 0x3000) == 3 && (extra_s & 2)) desc.regout[lsrcf_group] |= 1 << lsrcf_code;
+			if ((imm1 & 0x3000) == 0x3000 && (extra_s & 2)) desc.regout[lsrcf_group] |= 1 << lsrcf_code;
 
 			desc.length = (imm1 & 0x8000) ? 6 : 4;
 			desc.flags |= OPFLAG_READS_MEMORY;
@@ -911,7 +911,7 @@ bool e132xs_frontend::describe(opcode_desc &desc, const opcode_desc *prev)
 			desc.regin[0] |= SR_CODE;
 			desc.regin[ldst_group] |= 1 << ldst_code;
 			desc.regout[0] |= 1 << gsrc_code;
-			if ((imm1 & 0x3000) == 3 && (extra_s & 2)) desc.regout[0] |= 1 << gsrcf_code;
+			if ((imm1 & 0x3000) == 0x3000 && (extra_s & 2)) desc.regout[0] |= 1 << gsrcf_code;
 
 			desc.length = (imm1 & 0x8000) ? 6 : 4;
 			desc.flags |= OPFLAG_READS_MEMORY;
@@ -925,7 +925,7 @@ bool e132xs_frontend::describe(opcode_desc &desc, const opcode_desc *prev)
 			desc.regin[0] |= SR_CODE;
 			desc.regin[ldst_group] |= 1 << ldst_code;
 			desc.regout[lsrc_group] |= 1 << lsrc_code;
-			if ((imm1 & 0x3000) == 3 && (extra_s & 2)) desc.regout[lsrcf_group] |= 1 << lsrcf_code;
+			if ((imm1 & 0x3000) == 0x3000 && (extra_s & 2)) desc.regout[lsrcf_group] |= 1 << lsrcf_code;
 
 			desc.length = (imm1 & 0x8000) ? 6 : 4;
 			desc.flags |= OPFLAG_READS_MEMORY;
@@ -939,7 +939,7 @@ bool e132xs_frontend::describe(opcode_desc &desc, const opcode_desc *prev)
 			desc.regin[0] |= 1 << gdst_code;
 			desc.regout[0] |= 1 << gdst_code;
 			desc.regout[0] |= 1 << gsrc_code;
-			if ((imm1 & 0x3000) == 3 && (extra_s & 2)) desc.regout[0] |= 1 << gsrcf_code;
+			if ((imm1 & 0x3000) == 0x3000 && (extra_s & 2)) desc.regout[0] |= 1 << gsrcf_code;
 
 			desc.length = (imm1 & 0x8000) ? 6 : 4;
 			desc.flags |= OPFLAG_READS_MEMORY;
@@ -959,7 +959,7 @@ bool e132xs_frontend::describe(opcode_desc &desc, const opcode_desc *prev)
 			desc.regin[0] |= 1 << gdst_code;
 			desc.regout[0] |= 1 << gdst_code;
 			desc.regout[lsrc_group] |= 1 << lsrc_code;
-			if ((imm1 & 0x3000) == 3 && (extra_s & 2)) desc.regout[lsrcf_group] |= 1 << lsrcf_code;
+			if ((imm1 & 0x3000) == 0x3000 && (extra_s & 2)) desc.regout[lsrcf_group] |= 1 << lsrcf_code;
 
 			desc.length = (imm1 & 0x8000) ? 6 : 4;
 			desc.flags |= OPFLAG_READS_MEMORY;
@@ -979,7 +979,7 @@ bool e132xs_frontend::describe(opcode_desc &desc, const opcode_desc *prev)
 			desc.regin[ldst_group] |= 1 << ldst_code;
 			desc.regout[ldst_group] |= 1 << ldst_code;
 			desc.regout[0] |= 1 << gsrc_code;
-			if ((imm1 & 0x3000) == 3 && (extra_s & 2)) desc.regout[0] |= 1 << gsrcf_code;
+			if ((imm1 & 0x3000) == 0x3000 && (extra_s & 2)) desc.regout[0] |= 1 << gsrcf_code;
 
 			desc.length = (imm1 & 0x8000) ? 6 : 4;
 			desc.flags |= OPFLAG_READS_MEMORY;
@@ -994,7 +994,7 @@ bool e132xs_frontend::describe(opcode_desc &desc, const opcode_desc *prev)
 			desc.regin[ldst_group] |= 1 << ldst_code;
 			desc.regout[ldst_group] |= 1 << ldst_code;
 			desc.regout[lsrc_group] |= 1 << lsrc_code;
-			if ((imm1 & 0x3000) == 3 && (extra_s & 2)) desc.regout[lsrcf_group] |= 1 << lsrcf_code;
+			if ((imm1 & 0x3000) == 0x3000 && (extra_s & 2)) desc.regout[lsrcf_group] |= 1 << lsrcf_code;
 
 			desc.length = (imm1 & 0x8000) ? 6 : 4;
 			desc.flags |= OPFLAG_READS_MEMORY;
@@ -1007,7 +1007,7 @@ bool e132xs_frontend::describe(opcode_desc &desc, const opcode_desc *prev)
 
 			desc.regin[0] |= 1 << gdst_code;
 			desc.regin[0] |= 1 << gsrc_code;
-			if ((imm1 & 0x3000) == 3 && (extra_s & 2)) desc.regin[0] |= 1 << gsrcf_code;
+			if ((imm1 & 0x3000) == 0x3000 && (extra_s & 2)) desc.regin[0] |= 1 << gsrcf_code;
 
 			desc.length = (imm1 & 0x8000) ? 6 : 4;
 			desc.flags |= OPFLAG_WRITES_MEMORY;
@@ -1021,7 +1021,7 @@ bool e132xs_frontend::describe(opcode_desc &desc, const opcode_desc *prev)
 			desc.regin[0] |= SR_CODE;
 			desc.regin[0] |= 1 << gdst_code;
 			desc.regin[lsrc_group] |= 1 << lsrc_code;
-			if ((imm1 & 0x3000) == 3 && (extra_s & 2)) desc.regin[lsrcf_group] |= 1 << lsrcf_code;
+			if ((imm1 & 0x3000) == 0x3000 && (extra_s & 2)) desc.regin[lsrcf_group] |= 1 << lsrcf_code;
 
 			desc.length = (imm1 & 0x8000) ? 6 : 4;
 			desc.flags |= OPFLAG_WRITES_MEMORY;
@@ -1035,7 +1035,7 @@ bool e132xs_frontend::describe(opcode_desc &desc, const opcode_desc *prev)
 			desc.regin[0] |= SR_CODE;
 			desc.regin[ldst_group] |= 1 << ldst_code;
 			desc.regin[0] |= 1 << gsrc_code;
-			if ((imm1 & 0x3000) == 3 && (extra_s & 2)) desc.regin[0] |= 1 << gsrcf_code;
+			if ((imm1 & 0x3000) == 0x3000 && (extra_s & 2)) desc.regin[0] |= 1 << gsrcf_code;
 
 			desc.length = (imm1 & 0x8000) ? 6 : 4;
 			desc.flags |= OPFLAG_WRITES_MEMORY;
@@ -1049,7 +1049,7 @@ bool e132xs_frontend::describe(opcode_desc &desc, const opcode_desc *prev)
 			desc.regin[0] |= SR_CODE;
 			desc.regin[ldst_group] |= 1 << ldst_code;
 			desc.regin[lsrc_group] |= 1 << lsrc_code;
-			if ((imm1 & 0x3000) == 3 && (extra_s & 2)) desc.regin[lsrcf_group] |= 1 << lsrcf_code;
+			if ((imm1 & 0x3000) == 0x3000 && (extra_s & 2)) desc.regin[lsrcf_group] |= 1 << lsrcf_code;
 
 			desc.length = (imm1 & 0x8000) ? 6 : 4;
 			desc.flags |= OPFLAG_WRITES_MEMORY;
@@ -1062,7 +1062,7 @@ bool e132xs_frontend::describe(opcode_desc &desc, const opcode_desc *prev)
 
 			desc.regin[0] |= 1 << gdst_code;
 			desc.regin[0] |= 1 << gsrc_code;
-			if ((imm1 & 0x3000) == 3 && (extra_s & 2)) desc.regin[0] |= 1 << gsrcf_code;
+			if ((imm1 & 0x3000) == 0x3000 && (extra_s & 2)) desc.regin[0] |= 1 << gsrcf_code;
 			desc.regout[0] |= 1 << gdst_code;
 
 			desc.length = (imm1 & 0x8000) ? 6 : 4;
@@ -1077,7 +1077,7 @@ bool e132xs_frontend::describe(opcode_desc &desc, const opcode_desc *prev)
 			desc.regin[0] |= SR_CODE;
 			desc.regin[0] |= 1 << gdst_code;
 			desc.regin[lsrc_group] |= 1 << lsrc_code;
-			if ((imm1 & 0x3000) == 3 && (extra_s & 2)) desc.regin[lsrcf_group] |= 1 << lsrcf_code;
+			if ((imm1 & 0x3000) == 0x3000 && (extra_s & 2)) desc.regin[lsrcf_group] |= 1 << lsrcf_code;
 			desc.regout[0] |= 1 << gdst_code;
 
 			desc.length = (imm1 & 0x8000) ? 6 : 4;
@@ -1092,7 +1092,7 @@ bool e132xs_frontend::describe(opcode_desc &desc, const opcode_desc *prev)
 			desc.regin[0] |= SR_CODE;
 			desc.regin[ldst_group] |= 1 << ldst_code;
 			desc.regin[0] |= 1 << gsrc_code;
-			if ((imm1 & 0x3000) == 3 && (extra_s & 2)) desc.regin[0] |= 1 << gsrcf_code;
+			if ((imm1 & 0x3000) == 0x3000 && (extra_s & 2)) desc.regin[0] |= 1 << gsrcf_code;
 			desc.regout[ldst_group] |= 1 << ldst_code;
 
 			desc.length = (imm1 & 0x8000) ? 6 : 4;
@@ -1107,7 +1107,7 @@ bool e132xs_frontend::describe(opcode_desc &desc, const opcode_desc *prev)
 			desc.regin[0] |= SR_CODE;
 			desc.regin[ldst_group] |= 1 << ldst_code;
 			desc.regin[lsrc_group] |= 1 << lsrc_code;
-			if ((imm1 & 0x3000) == 3 && (extra_s & 2)) desc.regin[lsrcf_group] |= 1 << lsrcf_code;
+			if ((imm1 & 0x3000) == 0x3000 && (extra_s & 2)) desc.regin[lsrcf_group] |= 1 << lsrcf_code;
 			desc.regout[ldst_group] |= 1 << ldst_code;
 
 			desc.length = (imm1 & 0x8000) ? 6 : 4;

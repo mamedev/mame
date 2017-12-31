@@ -637,6 +637,10 @@ void hyperstone_device::generate_divsu(drcuml_block *block, compiler_state *comp
 		UML_LOAD(block, I0, (void *)m_core->local_regs, I4, SIZE_DWORD, SCALE_x4);
 	}
 
+#ifndef PTR64
+	UML_DAND(block, I0, I0, 0x00000000ffffffffULL);
+#endif
+
 	if (DST_GLOBAL)
 	{
 		UML_LOAD(block, I1, (void *)m_core->global_regs, dst_code, SIZE_DWORD, SCALE_x4);
@@ -653,7 +657,7 @@ void hyperstone_device::generate_divsu(drcuml_block *block, compiler_state *comp
 	}
 
 #ifndef PTR64
-	UML_DAND(block, I2, I2, 0x00000000ffffffff);
+	UML_DAND(block, I2, I2, 0x00000000ffffffffULL);
 #endif
 
 	UML_DSHL(block, I1, I1, 32);
@@ -830,11 +834,18 @@ void hyperstone_device::generate_mask(drcuml_block *block, compiler_state *compi
 
 	if (DST_GLOBAL)
 	{
-		UML_MOV(block, I4, dst_code);
-		UML_MOV(block, I5, I1);
-		generate_set_global_register(block, compiler, desc);
-		if (dst_code == PC_REGISTER)
-			generate_branch(block, desc->targetpc);
+		if (dst_code < 2)
+		{
+			UML_MOV(block, I4, dst_code);
+			UML_MOV(block, I5, I1);
+			generate_set_global_register(block, compiler, desc);
+			if (dst_code == PC_REGISTER)
+				generate_branch(block, desc->targetpc);
+		}
+		else
+		{
+			UML_STORE(block, (void *)m_core->global_regs, dst_code, I1, SIZE_DWORD, SCALE_x4);
+		}
 	}
 	else
 	{
@@ -899,16 +910,23 @@ void hyperstone_device::generate_sum(drcuml_block *block, compiler_state *compil
 
 	if (DST_GLOBAL)
 	{
-		UML_MOV(block, I4, dst_code);
-		generate_set_global_register(block, compiler, desc);
-		if (dst_code == PC_REGISTER)
-			generate_branch(block, desc->targetpc);
+		if (dst_code < 2)
+		{
+			UML_MOV(block, I4, dst_code);
+			generate_set_global_register(block, compiler, desc);
+			if (dst_code == PC_REGISTER)
+				generate_branch(block, desc->targetpc);
+		}
+		else
+		{
+			UML_STORE(block, (void *)m_core->global_regs, dst_code, I5, SIZE_DWORD, SCALE_x4);
+		}
 	}
 	else
 	{
 		UML_ADD(block, I0, I3, dst_code);
-		UML_AND(block, I2, I0, 0x3f);
-		UML_STORE(block, (void *)m_core->local_regs, I2, I5, SIZE_DWORD, SCALE_x4);
+		UML_AND(block, I0, I0, 0x3f);
+		UML_STORE(block, (void *)m_core->local_regs, I0, I5, SIZE_DWORD, SCALE_x4);
 	}
 }
 
@@ -1295,12 +1313,19 @@ void hyperstone_device::generate_subc(drcuml_block *block, compiler_state *compi
 
 	if (DST_GLOBAL)
 	{
-		UML_MOV(block, I4, dst_code);
-		UML_MOV(block, I5, I1);
-		generate_set_global_register(block, compiler, desc);
+		if (dst_code < 2)
+		{
+			UML_MOV(block, I4, dst_code);
+			UML_MOV(block, I5, I1);
+			generate_set_global_register(block, compiler, desc);
 
-		if (dst_code == PC_REGISTER)
-			generate_branch(block, desc->targetpc);
+			if (dst_code == PC_REGISTER)
+				generate_branch(block, desc->targetpc);
+		}
+		else
+		{
+			UML_STORE(block, (void *)m_core->global_regs, dst_code, I1, SIZE_DWORD, SCALE_x4);
+		}
 	}
 	else
 	{
@@ -2116,13 +2141,6 @@ void hyperstone_device::generate_addi(drcuml_block *block, compiler_state *compi
 	{
 		generate_decode_immediate_s(block, compiler, desc); // I1 <-- imm32
 	}
-	else if (!(op & 0x10f))
-	{
-		UML_ROLAND(block, I3, DRC_SR, 32-Z_SHIFT, 1);
-		UML_AND(block, I4, I0, 1);
-		UML_OR(block, I3, I3, I4);
-		UML_AND(block, I1, DRC_SR, I3);
-	}
 	else
 	{
 		UML_MOV(block, I1, src_code);
@@ -2140,6 +2158,15 @@ void hyperstone_device::generate_addi(drcuml_block *block, compiler_state *compi
 		UML_ADD(block, I2, I2, dst_code);
 		UML_AND(block, I2, I2, 0x3f);
 		UML_LOAD(block, I0, (void *)m_core->local_regs, I2, SIZE_DWORD, SCALE_x4);
+	}
+
+	if (!(op & 0x10f))
+	{
+		UML_ROLAND(block, I3, DRC_SR, 32-Z_SHIFT, 1);
+		UML_XOR(block, I3, I3, 1);
+		UML_AND(block, I4, I0, 1);
+		UML_OR(block, I3, I3, I4);
+		UML_AND(block, I1, DRC_SR, I3);
 	}
 
 #ifndef PTR64
@@ -2668,8 +2695,15 @@ void hyperstone_device::generate_shri(drcuml_block *block, compiler_state *compi
 
 	if (DST_GLOBAL)
 	{
-		UML_MOV(block, I4, dst_code);
-		generate_set_global_register(block, compiler, desc);
+		if (dst_code < 2)
+		{
+			UML_MOV(block, I4, dst_code);
+			generate_set_global_register(block, compiler, desc);
+		}
+		else
+		{
+			UML_STORE(block, (void *)m_core->global_regs, dst_code, I5, SIZE_DWORD, SCALE_x4);
+		}
 	}
 	else
 	{
@@ -3123,8 +3157,15 @@ void hyperstone_device::generate_shli(drcuml_block *block, compiler_state *compi
 
 	if (DST_GLOBAL)
 	{
-		UML_MOV(block, I4, dst_code);
-		generate_set_global_register(block, compiler, desc);
+		if (dst_code < 2)
+		{
+			UML_MOV(block, I4, dst_code);
+			generate_set_global_register(block, compiler, desc);
+		}
+		else
+		{
+			UML_STORE(block, (void *)m_core->global_regs, dst_code, I5, SIZE_DWORD, SCALE_x4);
+		}
 	}
 	else
 	{
@@ -3402,8 +3443,6 @@ void hyperstone_device::generate_ldxx1(drcuml_block *block, compiler_state *comp
 						UML_MOV(block, I5, I1);
 						UML_MOV(block, I4, srcf_code);
 						generate_set_global_register(block, compiler, desc);
-						if (srcf_code == PC_REGISTER)
-							generate_branch(block, desc->targetpc);
 					}
 					else
 					{
@@ -3461,8 +3500,6 @@ void hyperstone_device::generate_ldxx1(drcuml_block *block, compiler_state *comp
 						UML_MOV(block, I5, I1);
 						UML_MOV(block, I4, srcf_code);
 						generate_set_global_register(block, compiler, desc);
-						if (srcf_code == PC_REGISTER)
-							generate_branch(block, desc->targetpc);
 					}
 					else
 					{
@@ -4347,11 +4384,20 @@ void hyperstone_device::generate_ldwr(drcuml_block *block, compiler_state *compi
 
 	if (SRC_GLOBAL)
 	{
-		UML_MOV(block, I4, src_code);
-		UML_MOV(block, I5, I1);
-		generate_set_global_register(block, compiler, desc);
-		if (src_code == PC_REGISTER)
-			generate_branch(block, desc->targetpc);
+		if (src_code < 2)
+		{
+			UML_MOV(block, I4, src_code);
+			UML_MOV(block, I5, I1);
+			generate_set_global_register(block, compiler, desc);
+			if (src_code == PC_REGISTER)
+			{
+				generate_branch(block, desc->targetpc);
+			}
+		}
+		else
+		{
+			UML_STORE(block, (void *)m_core->global_regs, src_code, I1, SIZE_DWORD, SCALE_x4);
+		}
 	}
 	else
 	{
