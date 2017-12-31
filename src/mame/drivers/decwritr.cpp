@@ -20,7 +20,8 @@
 
 
 #define KBD_VERBOSE 1
-#define LED_VERBOSE 1
+#define LED_VERBOSE 0
+#define DC305_VERBOSE 0
 
 //**************************************************************************
 //  DRIVER STATE
@@ -78,9 +79,8 @@ READ8_MEMBER( decwriter_state::la120_KBD_r )
 	uint8_t code = 0;
 	if (offset&0x8) code |= m_col_array[offset&0x7]->read();
 	if (offset&0x10) code |= m_col_array[(offset&0x7)+8]->read();
-#ifdef KBD_VERBOSE
-	logerror("Keyboard column %X read, returning %02X\n", offset&0xF, code);
-#endif
+	if (KBD_VERBOSE)
+		logerror("Keyboard column %X read, returning %02X\n", offset&0xF, code);
 	return code;
 }
 
@@ -95,9 +95,8 @@ WRITE8_MEMBER( decwriter_state::la120_LED_w )
 	 */
 	if (!(offset&0x10)) // we're updating an led state
 	{
-#ifdef LED_VERBOSE
-		logerror("Updated LED status array: LED #%d is now %d\n", ((offset&0xe)>>1), (offset&1));
-#endif
+		if (LED_VERBOSE)
+			logerror("Updated LED status array: LED #%d is now %d\n", ((offset&0xe)>>1), (offset&1));
 		m_led_array &= ((1<<((offset&0xe)>>1))^0xFF); // mask out the old bit
 		m_led_array |= ((offset&1)<<((offset&0xe)>>1)); // OR in the new bit
 		m_led_7seg_counter = 0;
@@ -106,9 +105,8 @@ WRITE8_MEMBER( decwriter_state::la120_LED_w )
 	{
 		m_led_7seg_counter++;
 		m_led_7seg_counter &= 0xF;
-#ifdef LED_VERBOSE
-		logerror("Updated 7seg display: displaying a digit of %d in position %d\n", (offset&0xF)^0xF, m_led_7seg_counter-1);
-#endif
+		if (LED_VERBOSE)
+			logerror("Updated 7seg display: displaying a digit of %d in position %d\n", (offset&0xF)^0xF, m_led_7seg_counter-1);
 		if ((m_led_7seg_counter >= 1) && (m_led_7seg_counter <= 4))
 		{
 			m_led_7seg[m_led_7seg_counter-1] = (offset&0xF)^0xF;
@@ -150,7 +148,7 @@ WRITE8_MEMBER( decwriter_state::la120_NVR_w )
 	m_nvm->c1_w(BIT(offset, 8));
 
 	// C2 is used to disable pullup on data line
-	m_nvm->data_w(!BIT(offset, 9) ? 0 : BIT(data, 7));
+	m_nvm->data_w(!BIT(offset, 9) ? 0 : !BIT(data, 7));
 
 	m_nvm->clock_w(BIT(offset, 0));
 }
@@ -173,7 +171,8 @@ WRITE8_MEMBER( decwriter_state::la120_NVR_w )
 READ8_MEMBER( decwriter_state::la120_DC305_r )
 {
 	uint8_t data = 0x00;
-	logerror("DC305 Read from offset %01x, returning %02X\n", offset, data);
+	if (DC305_VERBOSE)
+		logerror("DC305 Read from offset %01x, returning %02X\n", offset, data);
 	return data;
 }
 /* write registers:
@@ -188,7 +187,8 @@ READ8_MEMBER( decwriter_state::la120_DC305_r )
  */
 WRITE8_MEMBER( decwriter_state::la120_DC305_w )
 {
-	logerror("DC305 Write of %02X to offset %01X\n", data, offset);
+	if (DC305_VERBOSE)
+		logerror("DC305 Write of %02X to offset %01X\n", data, offset);
 }
 
 /*

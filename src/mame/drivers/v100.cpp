@@ -9,7 +9,7 @@ Skeleton driver for Visual 100 display terminal.
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "machine/com8116.h"
-//#include "machine/er1400.h"
+#include "machine/er1400.h"
 #include "machine/i8214.h"
 #include "machine/i8251.h"
 #include "machine/i8255.h"
@@ -22,14 +22,28 @@ public:
 	v100_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
+		, m_earom(*this, "earom")
 		, m_p_chargen(*this, "chargen")
 	{ }
 
+	DECLARE_READ8_MEMBER(earom_r);
+	DECLARE_WRITE8_MEMBER(ppi_porta_w);
+
 private:
 	required_device<cpu_device> m_maincpu;
+	required_device<er1400_device> m_earom;
 	required_region_ptr<u8> m_p_chargen;
 };
 
+READ8_MEMBER(v100_state::earom_r)
+{
+	return m_earom->data_r();
+}
+
+WRITE8_MEMBER(v100_state::ppi_porta_w)
+{
+	logerror("Writing %02X to PPI port A\n", data);
+}
 
 static ADDRESS_MAP_START( mem_map, AS_PROGRAM, 8, v100_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM AM_REGION("maincpu", 0)
@@ -44,7 +58,7 @@ static ADDRESS_MAP_START( io_map, AS_IO, 8, v100_state )
 	AM_RANGE(0x13, 0x13) AM_DEVREADWRITE("usart", i8251_device, status_r, control_w)
 	// 0x14-0x15 - second 8251 (not populated)
 	// 0x16 - second 8116T (not populated)
-	// 0x20 - read ???
+	AM_RANGE(0x20, 0x20) AM_READ(earom_r)
 	// 0x30 - write ???
 	AM_RANGE(0x40, 0x40) AM_NOP // read/write ???
 	// 0x48 - write ???
@@ -73,6 +87,14 @@ static MACHINE_CONFIG_START( v100 )
 	MCFG_DEVICE_ADD("picu", I8214, XTAL_47_736MHz / 12)
 
 	MCFG_DEVICE_ADD("ppi", I8255, 0)
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(v100_state, ppi_porta_w))
+	MCFG_I8255_OUT_PORTB_CB(DEVWRITELINE("earom", er1400_device, c3_w)) MCFG_DEVCB_BIT(6) MCFG_DEVCB_INVERT
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("earom", er1400_device, c2_w)) MCFG_DEVCB_BIT(5) MCFG_DEVCB_INVERT
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("earom", er1400_device, c1_w)) MCFG_DEVCB_BIT(4) MCFG_DEVCB_INVERT
+	MCFG_I8255_OUT_PORTC_CB(DEVWRITELINE("earom", er1400_device, data_w)) MCFG_DEVCB_BIT(6) MCFG_DEVCB_INVERT
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("earom", er1400_device, clock_w)) MCFG_DEVCB_BIT(0) MCFG_DEVCB_INVERT
+
+	MCFG_DEVICE_ADD("earom", ER1400, 0)
 MACHINE_CONFIG_END
 
 

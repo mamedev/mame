@@ -169,7 +169,7 @@ void er1400_device::erase_data()
 				offs_t offset = 10 * (tens - 10) + units;
 				if (m_data_array[offset] != 0x3fff)
 				{
-					logerror("Erasing data at %d\n", m_data_register, offset);
+					logerror("Erasing data at %d\n", offset);
 					m_data_array[offset] = 0x3fff;
 				}
 			}
