@@ -66,8 +66,7 @@ PARAMETERS
 ***************************************************************************/
 
 #define VERBOSE         1
-
-#define LOG(x)      do { if (VERBOSE) logerror x; } while (0)
+#include "logmacro.h"
 
 
 DEFINE_DEVICE_TYPE(VT100_VIDEO, vt100_video_device, "vt100_video", "VT100 Video")
@@ -120,7 +119,7 @@ void vt100_video_device::device_start()
 	save_item(NAME(m_height));
 	save_item(NAME(m_height_MAX));
 	save_item(NAME(m_fill_lines));
-	save_item(NAME(m_frequency));
+	save_item(NAME(m_is_50hz));
 	save_item(NAME(m_interlaced));
 }
 
@@ -147,9 +146,9 @@ void vt100_video_device::device_reset()
 	m_basic_attribute = 0;
 
 	m_columns = 80;
-	m_frequency = 60;
+	m_is_50hz = false;
 
-	m_interlaced = 1;
+	m_interlaced = true;
 	m_fill_lines = 2; // for 60Hz
 	recompute_parameters();
 }
@@ -179,9 +178,9 @@ void rainbow_video_device::device_reset()
 
 	m_columns = 80;
 
-	m_frequency = 60;
+	m_is_50hz = false;
 
-	m_interlaced = 1;
+	m_interlaced = true;
 	m_fill_lines = 2; // for 60Hz (not in use any longer -> detected)
 	recompute_parameters();
 }
@@ -193,33 +192,30 @@ IMPLEMENTATION
 // Also used by Rainbow-100 ************
 void vt100_video_device::recompute_parameters()
 {
-	rectangle visarea;
-	int horiz_pix_total = 0;
-
 	// RAINBOW: 240 scan lines in non-interlaced mode (480 interlaced). VT-100 : same (?)
 	m_linedoubler = false; // 24 "true" lines (240)  -OR-  48 lines with NO ghost lines (true 480)
-	if ((m_interlaced) && (m_height == 24))
+	if ((m_interlaced) && (m_height == 24 || m_height == 25))
 		m_linedoubler = true; // 24 lines with 'double scan' (false 480)
 
-	int vert_pix_total = ((m_linedoubler == false) ? m_height : m_height_MAX) * 10;
+	int vert_pix_visible = m_height * (m_linedoubler ? 20 : 10);
+	int vert_pix_total = m_is_50hz ? (m_interlaced ? 629 : 630/2) : (m_interlaced ? 525 : 524/2);
+	attoseconds_t frame_period = clocks_to_attotime(vert_pix_total * 1530).as_attoseconds();
 
-	if (m_columns == 132)
-		horiz_pix_total = m_columns * 9; // display 1 less filler pixel in 132 char. mode
-	else
-		horiz_pix_total = m_columns * 10; // normal 80 character mode.
+	// display 1 less filler pixel in 132 char. mode
+	int horiz_pix_visible = m_columns * (m_columns == 132 ? 9 : 10);
+	int horiz_pix_total = m_columns == 132 ? 1530 : 1020;
 
-	visarea.set(0, horiz_pix_total - 1, 0, vert_pix_total - 1);
-	screen().configure(horiz_pix_total, vert_pix_total, visarea, HZ_TO_ATTOSECONDS((m_interlaced == 0) ? m_frequency : (m_frequency/2) ));
+	// dot clock is divided by 1.5 in 80 column mode
+	screen().set_unscaled_clock(m_columns == 132 ? clock() : clock() * 2 / 3);
+	rectangle visarea(0, horiz_pix_visible - 1, 0, vert_pix_visible - 1);
+	screen().configure(horiz_pix_total, vert_pix_total, visarea, frame_period);
 
-	if (VERBOSE)
-	{
-		printf("\n(RECOMPUTE) HPIX: %d - VPIX: %d", horiz_pix_total, vert_pix_total);
-		printf("\n(RECOMPUTE) FREQUENCY: %d", (m_interlaced == 0) ? m_frequency : (m_frequency / 2));
-		if (m_interlaced)
-			printf("\n(RECOMPUTE) * INTERLACED *");
-		if (m_linedoubler)
-			printf("\n(RECOMPUTE) * LINEDOUBLER *");
-	}
+	LOG("(RECOMPUTE) HPIX: %d (%d) - VPIX: %d (%d)\n", horiz_pix_visible, horiz_pix_total, vert_pix_visible, vert_pix_total);
+	LOG("(RECOMPUTE) FREQUENCY: %f\n", ATTOSECONDS_TO_HZ(frame_period));
+	if (m_interlaced)
+		LOG("(RECOMPUTE) * INTERLACED *\n");
+	if (m_linedoubler)
+		LOG("(RECOMPUTE) * LINEDOUBLER *\n");
 }
 
 
@@ -236,13 +232,13 @@ WRITE8_MEMBER(vt100_video_device::dc012_w)
 	if ((offset & 0x100) ) // MHFU is disabled by writing a value to port 010C.
 	{
 //      if (MHFU_FLAG == true)
-//                      printf("MHFU  *** DISABLED *** \n");
+//                      LOG("MHFU  *** DISABLED *** \n");
 		MHFU_FLAG = false;
 	}
 	else
 	{
 //      if (MHFU_FLAG == false)
-//          printf("MHFU  ___ENABLED___ %05x \n", space.device().safe_pc());
+//          LOG("MHFU  ___ENABLED___ %05x \n", space.device().safe_pc());
 		MHFU_FLAG = true;
 		MHFU_counter = 0;
 	}
@@ -325,7 +321,7 @@ WRITE8_MEMBER(vt100_video_device::dc011_w)
 {
 	if (!BIT(data, 5))
 	{
-		m_interlaced = 1;
+		m_interlaced = true;
 
 		if (!BIT(data, 4))
 			m_columns = 80;
@@ -334,18 +330,9 @@ WRITE8_MEMBER(vt100_video_device::dc011_w)
 	}
 	else
 	{
-		m_interlaced = 0;
-
-		if (!BIT(data, 4))
-		{
-			m_frequency = 60;
-			m_fill_lines = 2;
-		}
-		else
-		{
-			m_frequency = 50;
-			m_fill_lines = 5;
-		}
+		m_interlaced = false;
+		m_is_50hz = BIT(data, 4);
+		m_fill_lines = m_is_50hz ? 5 : 2;
 	}
 
 	recompute_parameters();
@@ -364,17 +351,20 @@ void vt100_video_device::display_char(bitmap_ind16 &bitmap, uint8_t code, int x,
 	int bit = 0, prevbit, invert = 0, j;
 	int double_width = (display_type == 2) ? 1 : 0;
 
-	for (int i = 0; i < 10; i++)
+	int char_lines = m_linedoubler ? 20 : 10;
+	for (int i = 0; i < char_lines; i++)
 	{
+		int yy = y * 10 + i;
+
 		switch (display_type)
 		{
 		case 0: // bottom half, double height
-			j = (i >> 1) + 5; break;
+			j = (i >> (m_linedoubler ? 2 : 1)) + 5; break;
 		case 1: // top half, double height
-			j = (i >> 1); break;
+			j = i >> (m_linedoubler ? 2 : 1); break;
 		case 2: // double width
 		case 3: // normal
-			j = i;  break;
+			j = i >> (m_linedoubler ? 1 : 0);  break;
 		default: j = 0; break;
 		}
 		// modify line since that is how it is stored in rom
@@ -396,27 +386,27 @@ void vt100_video_device::display_char(bitmap_ind16 &bitmap, uint8_t code, int x,
 			bit = BIT((line << b), 7);
 			if (double_width)
 			{
-				bitmap.pix16(y * 10 + i, x * 20 + b * 2) = (bit | prevbit) ^ invert;
-				bitmap.pix16(y * 10 + i, x * 20 + b * 2 + 1) = bit ^ invert;
+				bitmap.pix16(yy, x * 20 + b * 2) = (bit | prevbit) ^ invert;
+				bitmap.pix16(yy, x * 20 + b * 2 + 1) = bit ^ invert;
 			}
 			else
 			{
-				bitmap.pix16(y * 10 + i, x * 10 + b) = (bit | prevbit) ^ invert;
+				bitmap.pix16(yy, x * 10 + b) = (bit | prevbit) ^ invert;
 			}
 		}
 		prevbit = bit;
 		// char interleave is filled with last bit
 		if (double_width)
 		{
-			bitmap.pix16(y * 10 + i, x * 20 + 16) = (bit | prevbit) ^ invert;
-			bitmap.pix16(y * 10 + i, x * 20 + 17) = bit ^ invert;
-			bitmap.pix16(y * 10 + i, x * 20 + 18) = bit ^ invert;
-			bitmap.pix16(y * 10 + i, x * 20 + 19) = bit ^ invert;
+			bitmap.pix16(yy, x * 20 + 16) = (bit | prevbit) ^ invert;
+			bitmap.pix16(yy, x * 20 + 17) = bit ^ invert;
+			bitmap.pix16(yy, x * 20 + 18) = bit ^ invert;
+			bitmap.pix16(yy, x * 20 + 19) = bit ^ invert;
 		}
 		else
 		{
-			bitmap.pix16(y * 10 + i, x * 10 + 8) = (bit | prevbit) ^ invert;
-			bitmap.pix16(y * 10 + i, x * 10 + 9) = bit ^ invert;
+			bitmap.pix16(yy, x * 10 + 8) = (bit | prevbit) ^ invert;
+			bitmap.pix16(yy, x * 10 + 9) = bit ^ invert;
 		}
 	}
 }
@@ -436,7 +426,10 @@ void vt100_video_device::video_update(bitmap_ind16 &bitmap, const rectangle &cli
 	if (m_read_ram(0) != 0x7f)
 		return;
 
-	while (line < (m_height + m_fill_lines))
+	int vert_charlines_MAX = m_height;
+	if (m_linedoubler)
+		vert_charlines_MAX *= 2;
+	while (line < vert_charlines_MAX)
 	{
 		code = m_read_ram(addr + xpos);
 		if (code == 0x7f)
@@ -459,6 +452,8 @@ void vt100_video_device::video_update(bitmap_ind16 &bitmap, const rectangle &cli
 			if (line >= m_fill_lines)
 			{
 				ypos++;
+				if (m_linedoubler)
+					ypos++;
 			}
 			xpos = 0;
 			line++;
@@ -724,8 +719,10 @@ void rainbow_video_device::video_update(bitmap_ind16 &bitmap, const rectangle &c
 			break;
 	}
 
-	int vert_charlines_MAX = ((m_linedoubler == false) ? m_height : m_height_MAX);
-	while (line < vert_charlines_MAX )
+	int vert_charlines_MAX = m_height;
+	if (m_linedoubler)
+		vert_charlines_MAX *= 2;
+	while (line < vert_charlines_MAX)
 	{
 		code = m_read_ram(addr + xpos);
 

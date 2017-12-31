@@ -65,8 +65,8 @@ protected:
 	uint8_t m_height;
 	uint8_t m_height_MAX;
 	uint8_t m_fill_lines;
-	uint8_t m_frequency;
-	uint8_t m_interlaced;
+	bool m_is_50hz;
+	bool m_interlaced;
 	emu_timer * m_lba7_change_timer;
 
 	required_region_ptr<uint8_t> m_char_rom; /* character rom region */
