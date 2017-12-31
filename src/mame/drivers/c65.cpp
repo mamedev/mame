@@ -19,6 +19,10 @@ Hardware pics:
 http://www.zimmers.net/cbmpics/cbm/c65/c65-2b-lhs.JPG
 http://www.zimmers.net/cbmpics/cbm/c65/c65-2b-rhs.JPG
 
+Schematics:
+http://www.zimmers.net/anonftp/pub/cbm/schematics/computers/C65%20Rev%202A%20Schematic.pdf
+http://www.zimmers.net/anonftp/pub/cbm/schematics/computers/C64DX_aka_C65_System_Specifications_Preliminary_(1991_Mar).pdf
+
 ***************************************************************************/
 
 

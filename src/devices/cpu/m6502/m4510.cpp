@@ -2,9 +2,12 @@
 // copyright-holders:Olivier Galibert
 /***************************************************************************
 
-    m4510.c
+    m4510.cpp
 
     65ce02 with a mmu and a cia integrated
+
+    differences between the standard 65ce02 and this CPU:
+    http://www.zimmers.net/anonftp/pub/cbm/c65/65ce02.txt
 
 ***************************************************************************/
 
