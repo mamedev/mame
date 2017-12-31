@@ -3203,7 +3203,7 @@ MCFG_SCREEN_UPDATE_DRIVER(rainbow_state, screen_update_rainbow)
 MCFG_SCREEN_PALETTE("vt100_video:palette")
 MCFG_GFXDECODE_ADD("gfxdecode", "vt100_video:palette", rainbow)
 
-MCFG_DEVICE_ADD("vt100_video", RAINBOW_VIDEO, 0)
+MCFG_DEVICE_ADD("vt100_video", RAINBOW_VIDEO, XTAL_24_0734MHz)
 
 MCFG_VT_SET_SCREEN("screen")
 MCFG_VT_CHARGEN("chargen")

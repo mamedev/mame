@@ -209,7 +209,7 @@ void vt100_video_device::recompute_parameters()
 		horiz_pix_total = m_columns * 10; // normal 80 character mode.
 
 	visarea.set(0, horiz_pix_total - 1, 0, vert_pix_total - 1);
-	machine().first_screen()->configure(horiz_pix_total, vert_pix_total, visarea, HZ_TO_ATTOSECONDS((m_interlaced == 0) ? m_frequency : (m_frequency/2) ));
+	screen().configure(horiz_pix_total, vert_pix_total, visarea, HZ_TO_ATTOSECONDS((m_interlaced == 0) ? m_frequency : (m_frequency/2) ));
 
 	if (VERBOSE)
 	{
