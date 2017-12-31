@@ -12,6 +12,7 @@
 
 #include "emu.h"
 #include "cpu/i8085/i8085.h"
+#include "machine/er1400.h"
 #include "machine/i8251.h"
 #include "sound/beep.h"
 #include "render.h"
@@ -33,13 +34,14 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_speaker(*this, "beeper"),
-		m_uart(*this, "i8251")
+		m_uart(*this, "i8251"),
+		m_nvm(*this, "nvm")
 	{
 	}
 	required_device<cpu_device> m_maincpu;
 	required_device<beep_device> m_speaker;
 	required_device<i8251_device> m_uart;
-	//required_device<generic_terminal_device> m_terminal;
+	required_device<er1400_device> m_nvm;
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 	{
 		bitmap.fill(rgb_t::black(), cliprect);
@@ -124,7 +126,6 @@ WRITE8_MEMBER( decwriter_state::la120_LED_w )
 	(m_led_array&0x1)?"PAPER OUT":"---------" );
 }
 
-/* todo: er1400 device */
 /* control lines:
    3 2 1
    0 0 0 Standby
@@ -138,11 +139,20 @@ WRITE8_MEMBER( decwriter_state::la120_LED_w )
    */
 READ8_MEMBER( decwriter_state::la120_NVR_r )
 {
-	return 0xFF;
+	return (m_nvm->data_r() << 7) | 0x7e;
 }
 
 WRITE8_MEMBER( decwriter_state::la120_NVR_w )
 {
+	// ER1400 has negative logic, but 7406 inverters are used
+	m_nvm->c3_w(BIT(offset, 10));
+	m_nvm->c2_w(BIT(offset, 9));
+	m_nvm->c1_w(BIT(offset, 8));
+
+	// C2 is used to disable pullup on data line
+	m_nvm->data_w(!BIT(offset, 9) ? 0 : BIT(data, 7));
+
+	m_nvm->clock_w(BIT(offset, 0));
 }
 
 /* todo: fully reverse engineer DC305 ASIC */
@@ -417,6 +427,8 @@ static MACHINE_CONFIG_START( la120 )
 	MCFG_COM8116_FR_HANDLER(DEVWRITELINE("i8251", i8251_device, write_rxc))
 	MCFG_COM8116_FT_HANDLER(DEVWRITELINE("i8251", i8251_device, write_txc))
 	*/
+
+	MCFG_DEVICE_ADD("nvm", ER1400, 0)
 MACHINE_CONFIG_END
 
 
