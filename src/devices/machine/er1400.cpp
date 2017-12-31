@@ -112,6 +112,7 @@ void er1400_device::nvram_write(emu_file &file)
 
 void er1400_device::read_data()
 {
+	int selected = 0;
 	m_data_register = 0;
 	for (int tens = 10; tens < 20; tens++)
 	{
@@ -122,9 +123,13 @@ void er1400_device::read_data()
 				offs_t offset = 10 * (tens - 10) + units;
 				logerror("Reading data at %d (%04X) into register\n", offset, m_data_array[offset]);
 				m_data_register |= m_data_array[offset];
+				selected++;
 			}
 		}
 	}
+
+	if (selected != 1)
+		logerror("%d addresses selected for read operation\n", selected);
 }
 
 
@@ -135,6 +140,7 @@ void er1400_device::read_data()
 
 void er1400_device::write_data()
 {
+	int selected = 0;
 	for (int tens = 10; tens < 20; tens++)
 	{
 		for (int units = 0; units < 10; units++)
@@ -147,9 +153,13 @@ void er1400_device::write_data()
 					logerror("Writing data %04X at %d\n", m_data_register, offset);
 					m_data_array[offset] &= m_data_register;
 				}
+				selected++;
 			}
 		}
 	}
+
+	if (selected != 1)
+		logerror("%d addresses selected for write operation\n", selected);
 }
 
 
@@ -160,6 +170,7 @@ void er1400_device::write_data()
 
 void er1400_device::erase_data()
 {
+	int selected = 0;
 	for (int tens = 10; tens < 20; tens++)
 	{
 		for (int units = 0; units < 10; units++)
@@ -172,9 +183,13 @@ void er1400_device::erase_data()
 					logerror("Erasing data at %d\n", offset);
 					m_data_array[offset] = 0x3fff;
 				}
+				selected++;
 			}
 		}
 	}
+
+	if (selected != 1)
+		logerror("%d addresses selected for erase operation\n", selected);
 }
 
 
