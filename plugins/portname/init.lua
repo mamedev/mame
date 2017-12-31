@@ -24,15 +24,17 @@ function portname.startplugin()
 	end
 	
 	emu.register_start(function()
-		local file = io.open(ctrlrpath .. "/" .. get_filename(), "r")
-		if not file then
-			file = io.open(ctrlrpath .. "/" .. get_filename(true), "r")
-			if not file then
+		local file = emu.file(ctrlrpath .. "/portname", "r")
+		local ret = file:open(get_filename())
+		if ret then
+			ret = file:open(get_filename(true))
+			if ret then
 				return
 			end
 		end
+		local names = file:read(file:size())
 		local orig, rep
-		for line in file:lines() do
+		names:gsub("[^\n\r]*", function (line)
 			if line:find("^msgid") then
 				orig = line:match("^msgid \"(.+)\"")
 			elseif line:find("^msgstr") then
@@ -47,8 +49,8 @@ function portname.startplugin()
 					end
 				end
 			end
-		end
-		file:close()
+			return line
+		end)
 	end)
 
 	local function menu_populate()
@@ -69,35 +71,44 @@ function portname.startplugin()
 					end
 				end
 			end
-			local attr = lfs.attributes(ctrlrpath)
-			if not attr then
-				lfs.mkdir(ctrlrpath)
-				if not lfs.attributes(ctrlrpath) then
+			local function check_path(path)
+				local attr = lfs.attributes(path)
+				if not attr then
+					lfs.mkdir(path)
+					if not lfs.attributes(path) then
+						manager:machine():popmessage(_("Failed to save input name file"))
+						emu.print_verbose("portname: unable to create path " .. path .. "\n")
+						return false
+				end
+				elseif attr.mode ~= "directory" then
 					manager:machine():popmessage(_("Failed to save input name file"))
-					emu.print_verbose("portname: unable to create ctrlrpath " .. ctrlrpath .. "\n")
+					emu.print_verbose("portname: path exists but isn't directory " .. path .. "\n")
 					return false
 				end
-			elseif attr.mode ~= "directory" then
-				manager:machine():popmessage(_("Failed to save input name file"))
-				emu.print_verbose("portname: ctrlrpath exists but isn't directory " .. ctrlrpath .. "\n")
+				return true
+			end
+			if not check_path(ctrlrpath) then
+				return false
+			end
+			if not check_path(ctrlrpath .. "/portname") then
 				return false
 			end
 			local filename = get_filename()
-			local file = io.open(ctrlrpath .. "/" .. filename, "r")
+			local file = io.open(ctrlrpath .. "/portname/" .. filename, "r")
 			if file then
 				emu.print_verbose("portname: input name file exists " .. filename .. "\n")
 				manager:machine():popmessage(_("Failed to save input name file"))
 				file:close()
 				return false
 			end
-			file = io.open(ctrlrpath .. "/" .. filename, "w")
+			file = io.open(ctrlrpath .. "/portname/" .. filename, "w")
 			for def, custom in pairs(fields) do
 				def = def:gsub("[\\\"]", function (s) return "\\" .. s end)
 				custom = custom:gsub("[\\\"]", function (s) return "\\" .. s end)
 				file:write("msgid \"" .. def .."\"\nmsgstr \"" .. custom .. "\"\n\n")
 			end
 			file:close()
-			manager:machine():popmessage(_("Input port name file saved to ") .. ctrlrpath .. "/" .. filename)
+			manager:machine():popmessage(_("Input port name file saved to ") .. ctrlrpath .. "/portname/" .. filename)
 		end
 		return false
 	end
