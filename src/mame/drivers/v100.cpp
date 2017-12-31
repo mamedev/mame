@@ -22,18 +22,27 @@ public:
 	v100_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
+		, m_brg(*this, "brg")
 		, m_earom(*this, "earom")
 		, m_p_chargen(*this, "chargen")
 	{ }
 
+	DECLARE_WRITE8_MEMBER(brg_w);
 	DECLARE_READ8_MEMBER(earom_r);
 	DECLARE_WRITE8_MEMBER(ppi_porta_w);
 
 private:
 	required_device<cpu_device> m_maincpu;
+	required_device<com8116_device> m_brg;
 	required_device<er1400_device> m_earom;
 	required_region_ptr<u8> m_p_chargen;
 };
+
+WRITE8_MEMBER(v100_state::brg_w)
+{
+	m_brg->str_w(data & 0x0f);
+	m_brg->stt_w(data >> 4);
+}
 
 READ8_MEMBER(v100_state::earom_r)
 {
@@ -53,7 +62,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( io_map, AS_IO, 8, v100_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	//AM_RANGE(0x00, 0x0f) AM_DEVWRITE("vtac", crt5037_device, write)
-	// 0x10 - 8116T baud rate
+	AM_RANGE(0x10, 0x10) AM_WRITE(brg_w)
 	AM_RANGE(0x12, 0x12) AM_DEVREADWRITE("usart", i8251_device, data_r, data_w)
 	AM_RANGE(0x13, 0x13) AM_DEVREADWRITE("usart", i8251_device, status_r, control_w)
 	// 0x14-0x15 - second 8251 (not populated)
