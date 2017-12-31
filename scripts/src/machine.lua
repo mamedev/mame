@@ -970,6 +970,18 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/machine/er1400.h,MACHINES["ER1400"] = true
+---------------------------------------------------
+
+if (MACHINES["ER1400"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/er1400.cpp",
+		MAME_DIR .. "src/devices/machine/er1400.h",
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/machine/er2055.h,MACHINES["ER2055"] = true
 ---------------------------------------------------
 

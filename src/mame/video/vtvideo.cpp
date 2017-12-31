@@ -78,6 +78,7 @@ vt100_video_device::vt100_video_device(const machine_config &mconfig, device_typ
 	, device_video_interface(mconfig, *this)
 	, m_read_ram(*this)
 	, m_write_clear_video_interrupt(*this)
+	, m_write_lba7(*this)
 	, m_char_rom(*this, finder_base::DUMMY_TAG)
 	, m_palette(*this, "palette")
 {
@@ -105,6 +106,7 @@ void vt100_video_device::device_start()
 	/* resolve callbacks */
 	m_read_ram.resolve_safe(0);
 	m_write_clear_video_interrupt.resolve_safe();
+	m_write_lba7.resolve_safe();
 
 	// LBA7 is scan line frequency update
 	m_lba7_change_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(vt100_video_device::lba7_change), this));
@@ -875,6 +877,7 @@ int rainbow_video_device::MHFU(int ASK)
 TIMER_CALLBACK_MEMBER(vt100_video_device::lba7_change)
 {
 	m_lba7 = (m_lba7) ? 0 : 1;
+	m_write_lba7(m_lba7);
 }
 
 

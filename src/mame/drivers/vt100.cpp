@@ -25,6 +25,7 @@
 #include "cpu/i8085/i8085.h"
 #include "cpu/z80/z80.h"
 #include "machine/com8116.h"
+#include "machine/er1400.h"
 #include "machine/i8251.h"
 #include "machine/timer.h"
 #include "sound/beep.h"
@@ -48,6 +49,7 @@ public:
 		m_speaker(*this, "beeper"),
 		m_uart(*this, "i8251"),
 		m_dbrg(*this, COM5016T_TAG),
+		m_nvr(*this, "nvr"),
 		m_p_ram(*this, "p_ram")
 	{
 	}
@@ -57,6 +59,7 @@ public:
 	required_device<beep_device> m_speaker;
 	required_device<i8251_device> m_uart;
 	required_device<com8116_device> m_dbrg;
+	required_device<er1400_device> m_nvr;
 	DECLARE_READ8_MEMBER(vt100_flags_r);
 	DECLARE_WRITE8_MEMBER(vt100_keyboard_w);
 	DECLARE_READ8_MEMBER(vt100_keyboard_r);
@@ -116,6 +119,8 @@ ADDRESS_MAP_END
 READ8_MEMBER( vt100_state::vt100_flags_r )
 {
 	uint8_t ret = 0;
+
+	ret |= !m_nvr->data_r() << 5;
 	ret |= m_crtc->lba7_r() << 6;
 	ret |= m_keyboard_int << 7;
 	return ret;
@@ -182,6 +187,13 @@ WRITE8_MEMBER( vt100_state::vt100_baud_rate_w )
 
 WRITE8_MEMBER( vt100_state::vt100_nvr_latch_w )
 {
+	// data inverted due to negative logic
+	m_nvr->c3_w(!BIT(data, 3));
+	m_nvr->c2_w(!BIT(data, 2));
+	m_nvr->c1_w(!BIT(data, 1));
+
+	// C2 is used to disable pullup on data line
+	m_nvr->data_w(BIT(data, 2) ? 0 : !BIT(data, 0));
 }
 
 static ADDRESS_MAP_START(vt100_io, AS_IO, 8, vt100_state)
@@ -367,6 +379,8 @@ void vt100_state::machine_reset()
 	output().set_value("l4_led", 1);
 
 	m_key_scan = 0;
+
+	vt100_nvr_latch_w(machine().dummy_space(), 0, 0);
 }
 
 READ8_MEMBER( vt100_state::vt100_read_video_ram_r )
@@ -428,6 +442,7 @@ static MACHINE_CONFIG_START( vt100 )
 	MCFG_VT_CHARGEN("chargen")
 	MCFG_VT_VIDEO_RAM_CALLBACK(READ8(vt100_state, vt100_read_video_ram_r))
 	MCFG_VT_VIDEO_CLEAR_VIDEO_INTERRUPT_CALLBACK(WRITELINE(vt100_state, vt100_clear_video_interrupt))
+	MCFG_VT_VIDEO_LBA7_CALLBACK(DEVWRITELINE("nvr", er1400_device, clock_w))
 
 	MCFG_DEVICE_ADD("i8251", I8251, 0) // 2.7648Mhz phi-clock (not used for tx clock or rx clock?)
 	MCFG_I8251_TXD_HANDLER(DEVWRITELINE(RS232_TAG, rs232_port_device, write_txd))
@@ -441,6 +456,8 @@ static MACHINE_CONFIG_START( vt100 )
 	MCFG_DEVICE_ADD(COM5016T_TAG, COM8116, 5068800/*XTAL_24_8832MHz / 9*/) // COM5016T-013, 2.7648Mhz Clock, currently hacked wrongly
 	MCFG_COM8116_FR_HANDLER(DEVWRITELINE("i8251", i8251_device, write_rxc))
 	MCFG_COM8116_FT_HANDLER(DEVWRITELINE("i8251", i8251_device, write_txc))
+
+	MCFG_DEVICE_ADD("nvr", ER1400, 0)
 
 	/* audio hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
