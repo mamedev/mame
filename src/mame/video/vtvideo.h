@@ -26,7 +26,7 @@ public:
 
 	static void set_chargen_tag(device_t &device, const char *tag) { downcast<vt100_video_device &>(device).m_char_rom.set_tag(tag); }
 
-	DECLARE_READ8_MEMBER(lba7_r);
+	DECLARE_READ_LINE_MEMBER(lba7_r);
 	DECLARE_WRITE8_MEMBER(dc012_w);
 	DECLARE_WRITE8_MEMBER(dc011_w);
 	DECLARE_WRITE8_MEMBER(brightness_w);

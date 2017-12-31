@@ -219,7 +219,7 @@ void vt100_video_device::recompute_parameters()
 }
 
 
-READ8_MEMBER(vt100_video_device::lba7_r)
+READ_LINE_MEMBER(vt100_video_device::lba7_r)
 {
 	return m_lba7;
 }
