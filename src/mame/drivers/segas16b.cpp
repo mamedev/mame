@@ -6941,6 +6941,7 @@ ROM_END
 //  MVP, Sega System 16B
 //  CPU: FD1094 (317-0143)
 //  ROM Board type: 171-5797
+//  Sega ID# for ROM board: 834-7365-02
 //
 ROM_START( mvp )
 	ROM_REGION( 0x80000, "maincpu", 0 ) // 68000 code
