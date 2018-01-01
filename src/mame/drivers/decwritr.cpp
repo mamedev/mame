@@ -151,14 +151,13 @@ WRITE8_MEMBER( decwriter_state::la120_NVR_w )
 		m_maincpu->adjust_icount(-1);
 
 	// ER1400 has negative logic, but 7406 inverters are used
+	m_nvm->clock_w(BIT(offset, 0));
 	m_nvm->c3_w(BIT(offset, 10));
 	m_nvm->c2_w(BIT(offset, 9));
 	m_nvm->c1_w(BIT(offset, 8));
 
 	// C2 is used to disable pullup on data line
 	m_nvm->data_w(!BIT(offset, 9) ? 0 : !BIT(data, 7));
-
-	m_nvm->clock_w(!BIT(offset, 0));
 }
 
 /* todo: fully reverse engineer DC305 ASIC */

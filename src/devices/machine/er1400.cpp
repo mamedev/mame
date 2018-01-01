@@ -116,14 +116,17 @@ void er1400_device::read_data()
 	m_data_register = 0;
 	for (int tens = 10; tens < 20; tens++)
 	{
-		for (int units = 0; units < 10; units++)
+		if (BIT(m_address_register, tens))
 		{
-			if (BIT(m_address_register, tens) && BIT(m_address_register, units))
+			for (int units = 0; units < 10; units++)
 			{
-				offs_t offset = 10 * (tens - 10) + units;
-				logerror("Reading data at %d (%04X) into register\n", offset, m_data_array[offset]);
-				m_data_register |= m_data_array[offset];
-				selected++;
+				if (BIT(m_address_register, units))
+				{
+					offs_t offset = 10 * (tens - 10) + units;
+					logerror("Reading data at %d (%04X) into register\n", offset, m_data_array[offset]);
+					m_data_register |= m_data_array[offset];
+					selected++;
+				}
 			}
 		}
 	}
@@ -143,17 +146,20 @@ void er1400_device::write_data()
 	int selected = 0;
 	for (int tens = 10; tens < 20; tens++)
 	{
-		for (int units = 0; units < 10; units++)
+		if (BIT(m_address_register, tens))
 		{
-			if (BIT(m_address_register, tens) && BIT(m_address_register, units))
+			for (int units = 0; units < 10; units++)
 			{
-				offs_t offset = 10 * (tens - 10) + units;
-				if ((m_data_array[offset] & ~m_data_register) != 0)
+				if (BIT(m_address_register, units))
 				{
-					logerror("Writing data %04X at %d\n", m_data_register, offset);
-					m_data_array[offset] &= m_data_register;
+					offs_t offset = 10 * (tens - 10) + units;
+					if ((m_data_array[offset] & ~m_data_register) != 0)
+					{
+						logerror("Writing data %04X at %d\n", m_data_register, offset);
+						m_data_array[offset] &= m_data_register;
+					}
+					selected++;
 				}
-				selected++;
 			}
 		}
 	}
@@ -173,17 +179,20 @@ void er1400_device::erase_data()
 	int selected = 0;
 	for (int tens = 10; tens < 20; tens++)
 	{
-		for (int units = 0; units < 10; units++)
+		if (BIT(m_address_register, tens))
 		{
-			if (BIT(m_address_register, tens) && BIT(m_address_register, units))
+			for (int units = 0; units < 10; units++)
 			{
-				offs_t offset = 10 * (tens - 10) + units;
-				if (m_data_array[offset] != 0x3fff)
+				if (BIT(m_address_register, units))
 				{
-					logerror("Erasing data at %d\n", offset);
-					m_data_array[offset] = 0x3fff;
+					offs_t offset = 10 * (tens - 10) + units;
+					if (m_data_array[offset] != 0x3fff)
+					{
+						logerror("Erasing data at %d\n", offset);
+						m_data_array[offset] = 0x3fff;
+					}
+					selected++;
 				}
-				selected++;
 			}
 		}
 	}
