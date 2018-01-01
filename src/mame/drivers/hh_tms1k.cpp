@@ -14,7 +14,7 @@
   - tispeak: TI Speak & Spell series gen. 1
 
   Let's use this driver for a list of known devices and their serials,
-  excluding TI's own products.
+  excluding TI's own products(they didn't use "MP" codes).
 
   serial   device    etc.
 --------------------------------------------------------------------
@@ -219,6 +219,7 @@
 #include "tc4.lh"
 #include "tcfball.lh"
 #include "tcfballa.lh"
+#include "timaze.lh"
 #include "xl25.lh" // clickable
 #include "zodiac.lh"
 
@@ -8245,6 +8246,83 @@ MACHINE_CONFIG_END
 
 /***************************************************************************
 
+  Texas Instruments maze game (unreleased, from patent GB2040172A)
+  * TMS1000 (development version)
+  * 1 7seg LED digit, no sound
+
+  The title of this game is unknown, the patent describes it simply as a maze game.
+  Several electronic maze game concepts are listed in the patent. The PCB schematic
+  and program source code is included for one of them: A predefined 12*8 maze,
+  walls close to the player are displayed on a 7seg digit.
+
+  In the end Texas Instruments didn't release any electronic maze game. This version
+  is too simple and obviously unfinished, start and goal positions are always the same
+  and there is a lot of ROM space left for more levels.
+
+***************************************************************************/
+
+class timaze_state : public hh_tms1k_state
+{
+public:
+	timaze_state(const machine_config &mconfig, device_type type, const char *tag)
+		: hh_tms1k_state(mconfig, type, tag)
+	{ }
+
+	DECLARE_WRITE16_MEMBER(write_r);
+	DECLARE_WRITE16_MEMBER(write_o);
+	DECLARE_READ8_MEMBER(read_k);
+};
+
+// handlers
+
+WRITE16_MEMBER(timaze_state::write_r)
+{
+	// R0: input mux
+	m_inp_mux = data & 1;
+}
+
+WRITE16_MEMBER(timaze_state::write_o)
+{
+	// O3210: 7seg EGCD?
+	set_display_segmask(1, 0x5c);
+	display_matrix(8, 1, bitswap<8>(data, 7,1,6,0,3,2,5,4), 1);
+}
+
+READ8_MEMBER(timaze_state::read_k)
+{
+	// K: multiplexed inputs
+	return read_inputs(1);
+}
+
+
+// config
+
+static INPUT_PORTS_START( timaze )
+	PORT_START("IN.0") // R0
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_16WAY
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_16WAY
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_16WAY
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_16WAY
+INPUT_PORTS_END
+
+static MACHINE_CONFIG_START( timaze )
+
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu", TMS1000, 200000) // approximation - RC osc. R=80K, C=27pF
+	MCFG_TMS1XXX_READ_K_CB(READ8(timaze_state, read_k))
+	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(timaze_state, write_r))
+	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(timaze_state, write_o))
+
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
+	MCFG_DEFAULT_LAYOUT(layout_timaze)
+MACHINE_CONFIG_END
+
+
+
+
+
+/***************************************************************************
+
   Tiger Electronics Copy Cat (model 7-520)
   * PCB label CC REV B
   * TMS1000 MCU, label 69-11513 MP0919 (die label MP0919)
@@ -9967,6 +10045,17 @@ ROM_START( speechp )
 ROM_END
 
 
+ROM_START( timaze )
+	ROM_REGION( 0x0400, "maincpu", 0 )
+	ROM_LOAD( "gb2040172a", 0x0000, 0x0400, CRC(0bab4dc6) SHA1(c9d40649fbb27a8b7cf7460d66c7e217b63376f0) ) // from patent GB2040172A, verified with source code
+
+	ROM_REGION( 867, "maincpu:mpla", 0 )
+	ROM_LOAD( "tms1000_common2_micro.pla", 0, 867, BAD_DUMP CRC(d33da3cf) SHA1(13c4ebbca227818db75e6db0d45b66ba5e207776) ) // not in patent, use default one
+	ROM_REGION( 365, "maincpu:opla", 0 )
+	ROM_LOAD( "tms1000_timaze_output.pla", 0, 365, BAD_DUMP CRC(f0f36970) SHA1(a6ad1f5e804ac98e5e1a1d07466b3db3a8d6c256) ) // described in patent, but unsure about pin order
+ROM_END
+
+
 ROM_START( copycat )
 	ROM_REGION( 0x0400, "maincpu", 0 )
 	ROM_LOAD( "mp0919", 0x0000, 0x0400, CRC(92a21299) SHA1(16daadb8dbf53aaab8a71833017b4a578d035d6d) )
@@ -10136,6 +10225,8 @@ CONS( 1981, tandy12,    0,         0, tandy12,   tandy12,   tandy12_state,   0, 
 CONS( 1982, monkeysee,  0,         0, monkeysee, monkeysee, monkeysee_state, 0, "Tandy Radio Shack", "Monkey See (1982 version)", MACHINE_SUPPORTS_SAVE )
 
 COMP( 1976, speechp,    0,         0, speechp,   speechp,   speechp_state,   0, "Telesensory Systems, Inc.", "Speech+", MACHINE_SUPPORTS_SAVE )
+
+CONS( 1979, timaze,     0,         0, timaze,    timaze,    timaze_state,    0, "Texas Instruments", "unknown electronic maze game (patent)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
 
 CONS( 1979, copycat,    0,         0, copycat,   copycat,   copycat_state,   0, "Tiger Electronics", "Copy Cat (model 7-520)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 CONS( 1989, copycatm2,  copycat,   0, copycatm2, copycatm2, copycatm2_state, 0, "Tiger Electronics", "Copy Cat (model 7-522)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
