@@ -683,7 +683,7 @@ READ8_MEMBER(dkong_state::epos_decrypt_rom)
 WRITE8_MEMBER(dkong_state::s2650_data_w)
 {
 #if DEBUG_PROTECTION
-	logerror("write : pc = %04x, loopback = %02x\n",space.device().safe_pc(), data);
+	logerror("write : pc = %04x, loopback = %02x\n",m_maincpu->pc(), data);
 #endif
 
 	m_hunchloopback = data;
@@ -704,7 +704,7 @@ WRITE_LINE_MEMBER(dkong_state::s2650_fo_w)
 READ8_MEMBER(dkong_state::s2650_port0_r)
 {
 #if DEBUG_PROTECTION
-	logerror("port 0 : pc = %04x, loopback = %02x fo=%d\n",space.device().safe_pc(), m_hunchloopback, m_main_fo);
+	logerror("port 0 : pc = %04x, loopback = %02x fo=%d\n",m_maincpu->pc(), m_hunchloopback, m_main_fo);
 #endif
 
 	switch (m_protect_type)
@@ -721,14 +721,14 @@ READ8_MEMBER(dkong_state::s2650_port0_r)
 			else
 				return m_hunchloopback--;
 	}
-	fatalerror("Unhandled read from port 0 : pc = %4x\n",space.device().safe_pc());
+	fatalerror("Unhandled read from port 0 : pc = %4x\n",m_maincpu->pc());
 }
 
 
 READ8_MEMBER(dkong_state::s2650_port1_r)
 {
 #if DEBUG_PROTECTION
-	logerror("port 1 : pc = %04x, loopback = %02x fo=%d\n",space.device().safe_pc(), m_hunchloopback, m_main_fo);
+	logerror("port 1 : pc = %04x, loopback = %02x fo=%d\n",m_maincpu->pc(), m_hunchloopback, m_main_fo);
 #endif
 
 	switch (m_protect_type)
@@ -742,7 +742,7 @@ READ8_MEMBER(dkong_state::s2650_port1_r)
 			else
 				return ++m_prot_cnt;
 	}
-	fatalerror("Unhandled read from port 1 : pc = %4x\n",space.device().safe_pc());
+	fatalerror("Unhandled read from port 1 : pc = %4x\n",m_maincpu->pc());
 }
 
 

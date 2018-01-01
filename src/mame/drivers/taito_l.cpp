@@ -356,7 +356,7 @@ WRITE8_MEMBER(taitol_state::rambankswitch_w)
 		}
 		else
 		{
-			logerror("unknown rambankswitch %d, %02x (%04x)\n", offset, data, space.device().safe_pc());
+			logerror("unknown rambankswitch %d, %02x (%04x)\n", offset, data, m_main_cpu->pc());
 			m_current_notifier[offset] = nullptr;
 			m_current_base[offset] = m_empty_ram;
 		}

@@ -135,7 +135,7 @@ WRITE8_MEMBER(quizo_state::port60_w)
 {
 	if(data>9)
 	{
-		logerror("ROMBANK %x @ %x\n", data, space.device().safe_pc());
+		logerror("ROMBANK %x @ %x\n", data, m_maincpu->pc());
 		data=0;
 	}
 	m_port60=data;

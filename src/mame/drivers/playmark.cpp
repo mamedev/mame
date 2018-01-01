@@ -171,7 +171,7 @@ WRITE16_MEMBER(playmark_state::playmark_snd_command_w)
 
 		m_snd_command = (data & 0xff);
 		m_snd_flag = 1;
-		space.device().execute().yield();
+		m_maincpu->yield();
 	}
 }
 

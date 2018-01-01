@@ -715,7 +715,7 @@ WRITE8_MEMBER(pacman_state::porky_banking_w)
 
 READ8_MEMBER(pacman_state::drivfrcp_port1_r)
 {
-	switch (space.device().safe_pc())
+	switch (m_maincpu->pc())
 	{
 		case 0x0030:
 		case 0x0291:
@@ -727,7 +727,7 @@ READ8_MEMBER(pacman_state::drivfrcp_port1_r)
 
 READ8_MEMBER(pacman_state::_8bpm_port1_r)
 {
-	switch (space.device().safe_pc())
+	switch (m_maincpu->pc())
 	{
 		case 0x0030:
 		case 0x0466:
@@ -739,7 +739,7 @@ READ8_MEMBER(pacman_state::_8bpm_port1_r)
 
 READ8_MEMBER(pacman_state::porky_port1_r)
 {
-	switch (space.device().safe_pc())
+	switch (m_maincpu->pc())
 	{
 		case 0x0034:
 			return 0x01;

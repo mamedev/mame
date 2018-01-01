@@ -220,7 +220,7 @@ WRITE16_MEMBER(taitoair_state::system_control_w)
 	m_dsp->set_input_line(INPUT_LINE_RESET, (data & 1) ? CLEAR_LINE : ASSERT_LINE);
 
 	m_gradbank = (data & 0x40);
-	logerror("68K:%06x writing %04x to TMS32025.  %s HOLD , %s RESET\n", space.device().safe_pcbase(), data, ((data & 4) ? "Clear" : "Assert"), ((data & 1) ? "Clear" : "Assert"));
+	logerror("68K:%06x writing %04x to TMS32025.  %s HOLD , %s RESET\n", m_maincpu->pcbase(), data, ((data & 4) ? "Clear" : "Assert"), ((data & 1) ? "Clear" : "Assert"));
 }
 
 READ16_MEMBER(taitoair_state::lineram_r)

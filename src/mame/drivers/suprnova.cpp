@@ -685,11 +685,11 @@ WRITE32_MEMBER(skns_state::io_w)
                 m_maincpu->set_input_line(0xf,CLEAR_LINE);*/
 
 			/* idle skip for vblokbrk/sarukani, i can't find a better place to put it :-( but i think it works ok unless its making the game too fast */
-			if (space.device().safe_pc()==0x04013B42)
+			if (m_maincpu->pc()==0x04013B42)
 			{
 				if (!strcmp(machine().system().name,"vblokbrk") ||
 					!strcmp(machine().system().name,"sarukani"))
-					space.device().execute().spin_until_interrupt();
+					m_maincpu->spin_until_interrupt();
 			}
 
 		}

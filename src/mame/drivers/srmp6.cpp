@@ -371,7 +371,7 @@ WRITE16_MEMBER(srmp6_state::video_regs_w)
 		case 0x56/2: // written 8,9,8,9 successively
 
 		default:
-			logerror("video_regs_w (PC=%06X): %04x = %04x & %04x\n", space.device().safe_pcbase(), offset*2, data, mem_mask);
+			logerror("video_regs_w (PC=%06X): %04x = %04x & %04x\n", m_maincpu->pcbase(), offset*2, data, mem_mask);
 			break;
 	}
 	COMBINE_DATA(&m_video_regs[offset]);
@@ -379,7 +379,7 @@ WRITE16_MEMBER(srmp6_state::video_regs_w)
 
 READ16_MEMBER(srmp6_state::video_regs_r)
 {
-	logerror("video_regs_r (PC=%06X): %04x\n", space.device().safe_pcbase(), offset*2);
+	logerror("video_regs_r (PC=%06X): %04x\n", m_maincpu->pcbase(), offset*2);
 	return m_video_regs[offset];
 }
 

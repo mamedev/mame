@@ -521,7 +521,7 @@ WRITE32_MEMBER(apollo_state::apollo_unmapped_w)
 WRITE32_MEMBER(apollo_state::apollo_rom_w)
 {
 	offs_t address =  offset * 4;
-	offs_t pc = space.device().safe_pcbase();
+	offs_t pc = m_maincpu->pcbase();
 
 	if (pc == 0x00002c1c && address == 0x00000004 && VERBOSE < 2) {
 		// don't log invalid code in 3500_boot_12191_7.bin

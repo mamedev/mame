@@ -755,7 +755,7 @@ WRITE8_MEMBER(pc88va_state::idp_command_w)
 
 		/* TODO: 0x89 shouldn't trigger, should be one of the above commands */
 		/* Update: actually 0x89 is mask command */
-		default:   m_cmd = 0x00; printf("PC=%05x: Unknown IDP %02x cmd set\n",space.device().safe_pc(),data); break;
+		default:   m_cmd = 0x00; printf("PC=%05x: Unknown IDP %02x cmd set\n",m_maincpu->pc(),data); break;
 	}
 }
 

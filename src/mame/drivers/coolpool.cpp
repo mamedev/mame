@@ -206,7 +206,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(coolpool_state::amerdart_audio_int_gen)
 
 WRITE16_MEMBER(coolpool_state::amerdart_misc_w)
 {
-	logerror("%08x:IOP_system_w %04x\n",space.device().safe_pc(),data);
+	logerror("%08x:IOP_system_w %04x\n",m_maincpu->pc(),data);
 
 	machine().bookkeeping().coin_counter_w(0, ~data & 0x0001);
 	machine().bookkeeping().coin_counter_w(1, ~data & 0x0002);
@@ -420,7 +420,7 @@ READ16_MEMBER(coolpool_state::amerdart_trackball_r)
 
 WRITE16_MEMBER(coolpool_state::coolpool_misc_w)
 {
-	logerror("%08x:IOP_system_w %04x\n",space.device().safe_pc(),data);
+	logerror("%08x:IOP_system_w %04x\n",m_maincpu->pc(),data);
 
 	machine().bookkeeping().coin_counter_w(0, ~data & 0x0001);
 	machine().bookkeeping().coin_counter_w(1, ~data & 0x0002);
@@ -450,14 +450,14 @@ TIMER_CALLBACK_MEMBER(coolpool_state::deferred_iop_w)
 
 WRITE16_MEMBER(coolpool_state::coolpool_iop_w)
 {
-	logerror("%08x:IOP write %04x\n", space.device().safe_pc(), data);
+	logerror("%08x:IOP write %04x\n", m_maincpu->pc(), data);
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(coolpool_state::deferred_iop_w),this), data);
 }
 
 
 READ16_MEMBER(coolpool_state::coolpool_iop_r)
 {
-	logerror("%08x:IOP read %04x\n",space.device().safe_pc(),m_iop_answer);
+	logerror("%08x:IOP read %04x\n",m_maincpu->pc(),m_iop_answer);
 	m_maincpu->set_input_line(1, CLEAR_LINE);
 
 	return m_iop_answer;
@@ -475,14 +475,14 @@ READ16_MEMBER(coolpool_state::coolpool_iop_r)
 READ16_MEMBER(coolpool_state::dsp_cmd_r)
 {
 	m_cmd_pending = 0;
-	logerror("%08x:IOP cmd_r %04x\n", space.device().safe_pc(), m_iop_cmd);
+	logerror("%08x:IOP cmd_r %04x\n", m_dsp->pc(), m_iop_cmd);
 	return m_iop_cmd;
 }
 
 
 WRITE16_MEMBER(coolpool_state::dsp_answer_w)
 {
-	logerror("%08x:IOP answer %04x\n", space.device().safe_pc(), data);
+	logerror("%08x:IOP answer %04x\n", m_dsp->pc(), data);
 	m_iop_answer = data;
 	m_maincpu->set_input_line(1, ASSERT_LINE);
 }

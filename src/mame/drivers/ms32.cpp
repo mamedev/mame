@@ -227,7 +227,7 @@ WRITE32_MEMBER(ms32_state::ms32_sound_w)
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 
 	// give the Z80 time to respond
-	space.device().execute().spin_until_time(attotime::from_usec(40));
+	m_maincpu->spin_until_time(attotime::from_usec(40));
 }
 
 READ32_MEMBER(ms32_state::ms32_sound_r)

@@ -92,7 +92,7 @@ WRITE16_MEMBER(cabal_state::sound_irq_trigger_word_w)
 		m_seibu_sound->main_w(space, 4, data & 0x00ff);
 
 	/* spin for a while to let the Z80 read the command, otherwise coins "stick" */
-	space.device().execute().spin_until_time(attotime::from_usec(50));
+	m_maincpu->spin_until_time(attotime::from_usec(50));
 }
 
 WRITE16_MEMBER(cabal_state::cabalbl_sound_irq_trigger_word_w)

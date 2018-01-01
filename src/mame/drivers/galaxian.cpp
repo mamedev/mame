@@ -707,7 +707,7 @@ WRITE8_MEMBER(galaxian_state::irq_enable_w)
 
 	/* if CLEAR is held low, we must make sure the interrupt signal is clear */
 	if (!m_irq_enabled)
-		space.device().execute().set_input_line(m_irq_line, CLEAR_LINE);
+		m_maincpu->set_input_line(m_irq_line, CLEAR_LINE);
 }
 
 /*************************************
@@ -1407,7 +1407,7 @@ READ8_MEMBER(galaxian_state::jumpbug_protection_r)
 		case 0x0235:  return 0x02;
 		case 0x0311:  return 0xff;  /* not checked */
 	}
-	logerror("Unknown protection read. Offset: %04X  PC=%04X\n",0xb000+offset,space.device().safe_pc());
+	logerror("Unknown protection read. Offset: %04X  PC=%04X\n",0xb000+offset,m_maincpu->pc());
 	return 0xff;
 }
 

@@ -265,7 +265,7 @@ READ8_MEMBER(cvs_state::cvs_input_r)
 	case 0x04:  ret = ioport("IN3")->read(); break;
 	case 0x06:  ret = ioport("DSW3")->read(); break;
 	case 0x07:  ret = ioport("DSW2")->read(); break;
-	default:    logerror("%04x : CVS: Reading unmapped input port 0x%02x\n", space.device().safe_pc(), offset & 0x0f); break;
+	default:    logerror("%04x : CVS: Reading unmapped input port 0x%02x\n", m_maincpu->pc(), offset & 0x0f); break;
 	}
 
 	return ret;

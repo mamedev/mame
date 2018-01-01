@@ -258,8 +258,8 @@ READ16_MEMBER(nmk16_state::tharrier_mcu_r)
 
 		int res;
 
-		if (space.device().safe_pc()==0x8aa) res = (m_mainram[0x9064/2])|0x20; /* Task Force Harrier */
-		else if (space.device().safe_pc()==0x8ce) res = (m_mainram[0x9064/2])|0x60; /* Task Force Harrier */
+		if (m_maincpu->pc()==0x8aa) res = (m_mainram[0x9064/2])|0x20; /* Task Force Harrier */
+		else if (m_maincpu->pc()==0x8ce) res = (m_mainram[0x9064/2])|0x60; /* Task Force Harrier */
 		else
 		{
 			res = to_main[m_prot_count++];

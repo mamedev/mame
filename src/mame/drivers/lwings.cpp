@@ -113,7 +113,7 @@ INTERRUPT_GEN_MEMBER(lwings_state::avengers_interrupt)
 
 WRITE8_MEMBER(lwings_state::avengers_protection_w)
 {
-	int pc = space.device().safe_pc();
+	int pc = m_maincpu->pc();
 
 	if (pc == 0x2eeb)
 	{
@@ -243,7 +243,7 @@ READ8_MEMBER(lwings_state::avengers_protection_r)
 	int x, y;
 	int dx, dy, dist, dir;
 
-	if (space.device().safe_pc() == 0x7c7)
+	if (m_maincpu->pc() == 0x7c7)
 	{
 		/* palette data */
 		return avengers_fetch_paldata();

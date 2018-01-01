@@ -327,8 +327,8 @@ READ16_MEMBER(tmnt_state::ssriders_protection_r)
 			return data;
 
 		default:
-			popmessage("%06x: unknown protection read",space.device().safe_pc());
-			logerror("%06x: read 1c0800 (D7=%02x 1058fc=%02x 105a0a=%02x)\n",space.device().safe_pc(),(uint32_t)space.device().state().state_int(M68K_D7),cmd,data);
+			popmessage("%06x: unknown protection read",m_maincpu->pc());
+			logerror("%06x: read 1c0800 (D7=%02x 1058fc=%02x 105a0a=%02x)\n",m_maincpu->pc(),(uint32_t)space.device().state().state_int(M68K_D7),cmd,data);
 			return 0xffff;
 	}
 }

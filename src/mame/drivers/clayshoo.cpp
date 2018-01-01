@@ -130,8 +130,8 @@ WRITE8_MEMBER(clayshoo_state::analog_reset_w)
 
 	m_analog_port_val = 0xff;
 
-	m_analog_timer_1->adjust(compute_duration(&space.device(), ioport("AN1")->read()), 0x02);
-	m_analog_timer_2->adjust(compute_duration(&space.device(), ioport("AN2")->read()), 0x01);
+	m_analog_timer_1->adjust(compute_duration(m_maincpu.target(), ioport("AN1")->read()), 0x02);
+	m_analog_timer_2->adjust(compute_duration(m_maincpu.target(), ioport("AN2")->read()), 0x01);
 }
 
 

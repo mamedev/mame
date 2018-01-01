@@ -1475,7 +1475,7 @@ WRITE16_MEMBER(seta_state::timer_regs_w)
 			uPD71054->max[offset] = (uPD71054->max[offset]&0x00ff)+(data<<8);
 		}
 		if( uPD71054->max[offset] != 0 ) {
-			uPD71054_update_timer( &space.device(), offset );
+			uPD71054_update_timer( m_maincpu.target(), offset );
 		}
 		break;
 		case 0x0003:
@@ -2791,7 +2791,7 @@ READ16_MEMBER(seta_state::kiwame_input_r)
 		case 0x08/2:    return 0xffff;
 
 		default:
-			logerror("PC %06X - Read input %02X !\n", space.device().safe_pc(), offset*2);
+			logerror("PC %06X - Read input %02X !\n", m_maincpu->pc(), offset*2);
 			return 0x0000;
 	}
 }
@@ -3443,7 +3443,7 @@ WRITE8_MEMBER(seta_state::calibr50_sub_bankswitch_w)
 WRITE8_MEMBER(seta_state::calibr50_soundlatch2_w)
 {
 	m_soundlatch2->write(space,0,data);
-	space.device().execute().spin_until_time(attotime::from_usec(50));  // Allow the other cpu to reply
+	m_subcpu->spin_until_time(attotime::from_usec(50));  // Allow the other cpu to reply
 }
 
 static ADDRESS_MAP_START( calibr50_sub_map, AS_PROGRAM, 8, seta_state )

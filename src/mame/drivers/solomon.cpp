@@ -29,11 +29,11 @@ WRITE8_MEMBER(solomon_state::solomon_sh_command_w)
 
 READ8_MEMBER(solomon_state::solomon_0xe603_r)
 {
-	if (space.device().safe_pc() == 0x161) // all the time .. return 0 to act as before  for coin / startup etc.
+	if (m_maincpu->pc() == 0x161) // all the time .. return 0 to act as before  for coin / startup etc.
 	{
 		return 0;
 	}
-	else if (space.device().safe_pc() == 0x4cf0) // stop it clearing the screen at certain scores
+	else if (m_maincpu->pc() == 0x4cf0) // stop it clearing the screen at certain scores
 	{
 		return (space.device().state().state_int(Z80_BC) & 0x08);
 	}

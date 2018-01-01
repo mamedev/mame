@@ -101,13 +101,13 @@ READ8_MEMBER(liberate_state::prosoccr_bank_r)
 		return m_spriteram[offset - 0xc00];
 	if (offset < 0x2200)
 	{
-		logerror("%04x: Unmapped bank read %04x\n", space.device().safe_pc(), offset);
+		logerror("%04x: Unmapped bank read %04x\n", m_maincpu->pc(), offset);
 		return 0;
 	}
 	if (offset < 0x2800)
 		return m_scratchram[offset - 0x2200];
 
-	logerror("%04x: Unmapped bank read %04x\n", space.device().safe_pc(), offset);
+	logerror("%04x: Unmapped bank read %04x\n", m_maincpu->pc(), offset);
 	return 0;
 }
 

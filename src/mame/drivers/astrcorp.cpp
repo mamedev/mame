@@ -294,7 +294,7 @@ WRITE16_MEMBER(astrocorp_state::astrocorp_screen_enable_w)
 	COMBINE_DATA(&m_screen_enable);
 //  popmessage("%04X",data);
 	if (m_screen_enable & (~1))
-		logerror("CPU #0 PC %06X: screen enable = %04X\n", space.device().safe_pc(), m_screen_enable);
+		logerror("CPU #0 PC %06X: screen enable = %04X\n", m_maincpu->pc(), m_screen_enable);
 }
 
 READ16_MEMBER(astrocorp_state::astrocorp_unk_r)

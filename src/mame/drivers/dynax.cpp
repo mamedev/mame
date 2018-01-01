@@ -1086,7 +1086,7 @@ WRITE8_MEMBER(dynax_state::tenkai_ip_w)
 			break;
 		return;
 	}
-	logerror("%04x: unmapped ip_sel=%02x written with %02x\n", space.device().safe_pc(), m_input_sel, data);
+	logerror("%04x: unmapped ip_sel=%02x written with %02x\n", m_maincpu->pc(), m_input_sel, data);
 }
 
 READ8_MEMBER(dynax_state::tenkai_ip_r)
@@ -1104,7 +1104,7 @@ READ8_MEMBER(dynax_state::tenkai_ip_r)
 					return ioport("COINS")->read(); // coins
 
 				default:
-					logerror("%04x: unmapped ip_sel=%02x read from offs %x\n", space.device().safe_pc(), m_input_sel, offset);
+					logerror("%04x: unmapped ip_sel=%02x read from offs %x\n", m_maincpu->pc(), m_input_sel, offset);
 					return 0xff;
 			}
 		}
@@ -1119,7 +1119,7 @@ READ8_MEMBER(dynax_state::tenkai_ip_r)
 				// player 2
 				case 0x81:
 					if (m_keyb >= 5)
-						logerror("%04x: unmapped keyb=%02x read\n", space.device().safe_pc(), m_keyb);
+						logerror("%04x: unmapped keyb=%02x read\n", m_maincpu->pc(), m_keyb);
 					return 0xff;//ioport(keynames1[m_keyb++])->read();
 
 				// player 1
@@ -1254,7 +1254,7 @@ WRITE8_MEMBER(dynax_state::tenkai_blit_romregion_w)
 		case 0x83:  dynax_blit_romregion_w(space, 0, 1);    return;
 		case 0x80:  dynax_blit_romregion_w(space, 0, 2);    return;
 	}
-	logerror("%04x: unmapped romregion=%02X\n", space.device().safe_pc(), data);
+	logerror("%04x: unmapped romregion=%02X\n", m_maincpu->pc(), data);
 }
 
 static ADDRESS_MAP_START( tenkai_map, AS_PROGRAM, 8, dynax_state )

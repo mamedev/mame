@@ -1289,7 +1289,7 @@ WRITE16_MEMBER(namcos21_state::winrun_dspcomram_w)
 
 READ16_MEMBER(namcos21_state::winrun_cuskey_r)
 {
-	int pc = space.device().safe_pc();
+	int pc = m_dsp->pc();
 	switch( pc )
 	{
 	case 0x0064: /* winrun91 */

@@ -51,7 +51,7 @@ WRITE16_MEMBER(suna16_state::soundlatch_w)
 	{
 		m_soundlatch->write(space, 0, data & 0xff );
 	}
-	if (data & ~0xff)   logerror("CPU#0 PC %06X - Sound latch unknown bits: %04X\n", space.device().safe_pc(), data);
+	if (data & ~0xff)   logerror("CPU#0 PC %06X - Sound latch unknown bits: %04X\n", m_maincpu->pc(), data);
 }
 
 
@@ -65,7 +65,7 @@ WRITE16_MEMBER(suna16_state::bssoccer_leds_w)
 		output().set_led_value(3, data & 0x08);
 		machine().bookkeeping().coin_counter_w(0, data & 0x10);
 	}
-	if (data & ~0x1f)   logerror("CPU#0 PC %06X - Leds unknown bits: %04X\n", space.device().safe_pc(), data);
+	if (data & ~0x1f)   logerror("CPU#0 PC %06X - Leds unknown bits: %04X\n", m_maincpu->pc(), data);
 }
 
 
@@ -77,7 +77,7 @@ WRITE16_MEMBER(suna16_state::uballoon_leds_w)
 		output().set_led_value(0, data & 0x02);
 		output().set_led_value(1, data & 0x04);
 	}
-	if (data & ~0x07)   logerror("CPU#0 PC %06X - Leds unknown bits: %04X\n", space.device().safe_pc(), data);
+	if (data & ~0x07)   logerror("CPU#0 PC %06X - Leds unknown bits: %04X\n", m_maincpu->pc(), data);
 }
 
 
@@ -87,7 +87,7 @@ WRITE16_MEMBER(suna16_state::bestbest_coin_w)
 	{
 		machine().bookkeeping().coin_counter_w(0, data & 0x04);
 	}
-	if (data & ~0x04)   logerror("CPU#0 PC %06X - Leds unknown bits: %04X\n", space.device().safe_pc(), data);
+	if (data & ~0x04)   logerror("CPU#0 PC %06X - Leds unknown bits: %04X\n", m_maincpu->pc(), data);
 }
 
 

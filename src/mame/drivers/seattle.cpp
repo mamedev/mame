@@ -613,7 +613,7 @@ READ32_MEMBER(seattle_state::analog_port_r)
 WRITE32_MEMBER(seattle_state::analog_port_w)
 {
 	if (data < 8 || data > 15)
-		logerror("%08X:Unexpected analog port select = %08X\n", space.device().safe_pc(), data);
+		logerror("%08X:Unexpected analog port select = %08X\n", m_maincpu->pc(), data);
 	int index = data & 7;
 	uint8_t currValue = m_io_analog[index].read_safe(0);
 	if (!m_wheel_calibrated && ((m_wheel_force > 20) || (m_wheel_force < -20))) {
@@ -969,7 +969,7 @@ READ32_MEMBER(seattle_state::cmos_protect_r)
 
 WRITE32_MEMBER(seattle_state::seattle_watchdog_w)
 {
-	space.device().execute().eat_cycles(100);
+	m_maincpu->eat_cycles(100);
 }
 
 READ32_MEMBER(seattle_state::asic_reset_r)

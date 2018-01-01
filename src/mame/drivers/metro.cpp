@@ -291,7 +291,7 @@ WRITE16_MEMBER(metro_state::metro_soundlatch_w)
 	{
 		m_soundlatch->write(space, 0, data & 0xff);
 		m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
-		space.device().execute().spin_until_interrupt();
+		m_maincpu->spin_until_interrupt();
 		m_busy_sndcpu = 1;
 	}
 }
@@ -460,7 +460,7 @@ WRITE16_MEMBER(metro_state::metro_coin_lockout_1word_w)
 		machine().bookkeeping().coin_counter_w(0, data & 1);
 		machine().bookkeeping().coin_counter_w(1, data & 2);
 	}
-	if (data & ~3)  logerror("CPU #0 PC %06X : unknown bits of coin lockout written: %04X\n", space.device().safe_pc(), data);
+	if (data & ~3)  logerror("CPU #0 PC %06X : unknown bits of coin lockout written: %04X\n", m_maincpu->pc(), data);
 }
 
 // value written doesn't matter, also each counted coin gets reported after one full second.
@@ -470,7 +470,7 @@ WRITE16_MEMBER(metro_state::metro_coin_lockout_4words_w)
 	machine().bookkeeping().coin_counter_w((offset >> 1) & 1, offset & 1);
 //  machine().bookkeeping().coin_lockout_w((offset >> 1) & 1, offset & 1);
 
-	if (data & ~1)  logerror("CPU #0 PC %06X : unknown bits of coin lockout written: %04X\n", space.device().safe_pc(), data);
+	if (data & ~1)  logerror("CPU #0 PC %06X : unknown bits of coin lockout written: %04X\n", m_maincpu->pc(), data);
 }
 
 WRITE_LINE_MEMBER(metro_state::vdp_blit_end_w)
@@ -539,7 +539,7 @@ READ16_MEMBER(metro_state::balcube_dsw_r)
 		case 0x17FFE:   return BIT(dsw2, 6) ? 0x40 : 0;
 		case 0x0FFFE:   return BIT(dsw2, 7) ? 0x40 : 0;
 	}
-	logerror("CPU #0 PC %06X : unknown dsw address read: %04X\n", space.device().safe_pc(), offset);
+	logerror("CPU #0 PC %06X : unknown dsw address read: %04X\n", m_maincpu->pc(), offset);
 	return 0xffff;
 }
 

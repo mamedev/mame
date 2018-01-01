@@ -634,7 +634,7 @@ READ16_MEMBER ( mac128_state::mac_iwm_r )
 	result = fdc->read(offset >> 8);
 
 	if (LOG_MAC_IWM)
-		printf("mac_iwm_r: offset=0x%08x mem_mask %04x = %02x (PC %x)\n", offset, mem_mask, result, space.device().safe_pc());
+		printf("mac_iwm_r: offset=0x%08x mem_mask %04x = %02x (PC %x)\n", offset, mem_mask, result, m_maincpu->pc());
 
 	return (result << 8) | result;
 }
@@ -644,7 +644,7 @@ WRITE16_MEMBER ( mac128_state::mac_iwm_w )
 	applefdc_base_device *fdc = machine().device<applefdc_base_device>("fdc");
 
 	if (LOG_MAC_IWM)
-		printf("mac_iwm_w: offset=0x%08x data=0x%04x mask %04x (PC=%x)\n", offset, data, mem_mask, space.device().safe_pc());
+		printf("mac_iwm_w: offset=0x%08x data=0x%04x mask %04x (PC=%x)\n", offset, data, mem_mask, m_maincpu->pc());
 
 	if (ACCESSING_BITS_0_7)
 		fdc->write((offset >> 8), data & 0xff);

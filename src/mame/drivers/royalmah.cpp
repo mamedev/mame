@@ -449,7 +449,7 @@ WRITE8_MEMBER(royalmah_state::suzume_bank_w)
 {
 	m_suzume_bank = data;
 
-	logerror("%04x: bank %02x\n",space.device().safe_pc(),data);
+	logerror("%04x: bank %02x\n",m_maincpu->pc(),data);
 
 	/* bits 6, 4 and 3 used for something input related? */
 
@@ -480,7 +480,7 @@ READ8_MEMBER(royalmah_state::mjapinky_dsw_r)
 
 WRITE8_MEMBER(royalmah_state::tontonb_bank_w)
 {
-	logerror("%04x: bank %02x\n",space.device().safe_pc(),data);
+	logerror("%04x: bank %02x\n",m_maincpu->pc(),data);
 
 	if (data == 0) return;  // tontonb fix?
 
@@ -963,7 +963,7 @@ READ8_MEMBER(royalmah_state::mjifb_rom_io_r)
 		case 0x9011:    return ioport("SYSTEM")->read();
 	}
 
-	logerror("%04X: unmapped input read at %04X\n", space.device().safe_pc(), offset);
+	logerror("%04X: unmapped input read at %04X\n", m_maincpu->pc(), offset);
 	return 0xff;
 }
 
@@ -991,7 +991,7 @@ WRITE8_MEMBER(royalmah_state::mjifb_rom_io_w)
 			return;
 	}
 
-	logerror("%04X: unmapped input write at %04X = %02X\n", space.device().safe_pc(), offset,data);
+	logerror("%04X: unmapped input write at %04X = %02X\n", m_maincpu->pc(), offset,data);
 }
 
 WRITE8_MEMBER(royalmah_state::mjifb_videoram_w)
@@ -1061,7 +1061,7 @@ READ8_MEMBER(royalmah_state::mjdejavu_rom_io_r)
 		case 0x9011:    return ioport("SYSTEM")->read();
 	}
 
-	logerror("%04X: unmapped input read at %04X\n", space.device().safe_pc(), offset);
+	logerror("%04X: unmapped input read at %04X\n", m_maincpu->pc(), offset);
 	return 0xff;
 }
 
@@ -1086,7 +1086,7 @@ WRITE8_MEMBER(royalmah_state::mjdejavu_rom_io_w)
 			return;
 	}
 
-	logerror("%04X: unmapped input write at %04X = %02X\n", space.device().safe_pc(), offset,data);
+	logerror("%04X: unmapped input write at %04X = %02X\n", m_maincpu->pc(), offset,data);
 }
 
 static ADDRESS_MAP_START( mjdejavu_map, AS_PROGRAM, 8, royalmah_state )
@@ -1171,7 +1171,7 @@ READ8_MEMBER(royalmah_state::cafetime_dsw_r)
 		case 0x03: return ioport("DSW4")->read();
 		case 0x04: return ioport("DSWTOP")->read();
 	}
-	logerror("%04X: unmapped dsw read %02X\n", space.device().safe_pc(), m_dsw_select);
+	logerror("%04X: unmapped dsw read %02X\n", m_maincpu->pc(), m_dsw_select);
 	return 0xff;
 }
 
@@ -1232,7 +1232,7 @@ READ8_MEMBER(royalmah_state::mjvegasa_rom_io_r)
 		return m_rtc->read(space, offset & 0xf);
 	}
 
-	logerror("%04X: unmapped IO read at %04X\n", space.device().safe_pc(), offset);
+	logerror("%04X: unmapped IO read at %04X\n", m_maincpu->pc(), offset);
 	return 0xff;
 }
 
@@ -1252,7 +1252,7 @@ WRITE8_MEMBER(royalmah_state::mjvegasa_rom_io_w)
 		return;
 	}
 
-	logerror("%04X: unmapped IO write at %04X = %02X\n", space.device().safe_pc(), offset,data);
+	logerror("%04X: unmapped IO write at %04X = %02X\n", m_maincpu->pc(), offset,data);
 }
 
 WRITE8_MEMBER(royalmah_state::mjvegasa_coin_counter_w)

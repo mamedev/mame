@@ -699,7 +699,7 @@ WRITE8_MEMBER(neogeo_state::io_control_w)
 //  case 0x33: break; // coin lockout
 
 		default:
-			logerror("PC: %x  Unmapped I/O control write.  Offset: %x  Data: %x\n", space.device().safe_pc(), offset, data);
+			logerror("PC: %x  Unmapped I/O control write.  Offset: %x  Data: %x\n", m_maincpu->pc(), offset, data);
 			break;
 	}
 }
@@ -724,7 +724,7 @@ READ16_MEMBER(neogeo_state::unmapped_r)
 	else
 	{
 		m_recurse = true;
-		ret = space.read_word(space.device().safe_pc());
+		ret = space.read_word(m_maincpu->pc());
 		m_recurse = false;
 	}
 	return ret;

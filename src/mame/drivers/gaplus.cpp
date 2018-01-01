@@ -197,7 +197,7 @@ WRITE8_MEMBER(gaplus_state::freset_w)
 {
 	int bit = !BIT(offset, 11);
 
-	logerror("%04x: freset %d\n",space.device().safe_pc(), bit);
+	logerror("%04x: freset %d\n",m_maincpu->pc(), bit);
 
 	m_namco58xx->set_reset_line(bit ? CLEAR_LINE : ASSERT_LINE);
 	m_namco56xx->set_reset_line(bit ? CLEAR_LINE : ASSERT_LINE);

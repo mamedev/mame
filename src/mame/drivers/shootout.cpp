@@ -70,7 +70,7 @@ WRITE8_MEMBER(shootout_state::sound_cpu_command_w)
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 
 	// Allow the other CPU to reply. This fixes the missing music on the title screen (parent set).
-	space.device ().execute ().spin_until_time (attotime :: from_usec (200));
+	m_maincpu->spin_until_time (attotime :: from_usec (200));
 }
 
 WRITE8_MEMBER(shootout_state::flipscreen_w)

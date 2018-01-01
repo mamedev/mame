@@ -152,7 +152,7 @@ WRITE8_MEMBER(cabaret_state::cabaret_nmi_and_coins_w)
 {
 	if ((m_nmi_enable ^ data) & (~0xdd))
 	{
-		logerror("PC %06X: nmi_and_coins = %02x\n",space.device().safe_pc(),data);
+		logerror("PC %06X: nmi_and_coins = %02x\n",m_maincpu->pc(),data);
 //      popmessage("%02x",data);
 	}
 

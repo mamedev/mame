@@ -74,7 +74,7 @@ ADDRESS_MAP_END
 READ64_MEMBER(bebox_state::bb_slave_64be_r)
 {
 	// 2e94 is the real address, 2e84 is where the PC appears to be under full DRC
-	if ((space.device().safe_pc() == 0xfff02e94) || (space.device().safe_pc() == 0xfff02e84))
+	if ((m_ppc2->pc() == 0xfff02e94) || (m_ppc2->pc() == 0xfff02e84))
 	{
 		return 0x108000ff;  // indicate slave CPU
 	}

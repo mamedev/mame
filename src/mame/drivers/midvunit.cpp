@@ -243,7 +243,7 @@ READ32_MEMBER(midvunit_state::tms32031_control_r)
 
 	/* log anything else except the memory control register */
 	if (offset != 0x64)
-		logerror("%06X:tms32031_control_r(%02X)\n", space.device().safe_pc(), offset);
+		logerror("%06X:tms32031_control_r(%02X)\n", m_maincpu->pc(), offset);
 
 	return m_tms32031_control[offset];
 }
@@ -272,7 +272,7 @@ WRITE32_MEMBER(midvunit_state::tms32031_control_w)
 			m_timer_rate = 10000000.;
 	}
 	else
-		logerror("%06X:tms32031_control_w(%02X) = %08X\n", space.device().safe_pc(), offset, data);
+		logerror("%06X:tms32031_control_w(%02X) = %08X\n", m_maincpu->pc(), offset, data);
 }
 
 
@@ -519,7 +519,7 @@ READ32_MEMBER(midvunit_state::midvplus_misc_r)
 	}
 
 	if (offset != 0 && offset != 3)
-		logerror("%06X:midvplus_misc_r(%d) = %08X\n", space.device().safe_pc(), offset, result);
+		logerror("%06X:midvplus_misc_r(%d) = %08X\n", m_maincpu->pc(), offset, result);
 	return result;
 }
 
@@ -548,7 +548,7 @@ WRITE32_MEMBER(midvunit_state::midvplus_misc_w)
 	}
 
 	if (logit)
-		logerror("%06X:midvplus_misc_w(%d) = %08X\n", space.device().safe_pc(), offset, data);
+		logerror("%06X:midvplus_misc_w(%d) = %08X\n", m_maincpu->pc(), offset, data);
 }
 
 

@@ -280,7 +280,7 @@ READ32_MEMBER(mpu5_state::asic_r32)
 
 READ32_MEMBER(mpu5_state::mpu5_mem_r)
 {
-	int pc = space.device().safe_pc();
+	int pc = m_maincpu->pc();
 	int addr = offset *4;
 	int cs = m_maincpu->get_cs(addr);
 
@@ -476,7 +476,7 @@ WRITE32_MEMBER(mpu5_state::pic_w)
 
 WRITE32_MEMBER(mpu5_state::mpu5_mem_w)
 {
-	int pc = space.device().safe_pc();
+	int pc = m_maincpu->pc();
 	int addr = offset *4;
 	int cs = m_maincpu->get_cs(addr);
 

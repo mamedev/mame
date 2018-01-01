@@ -627,7 +627,7 @@ READ32_MEMBER( next_state::dsp_r)
 
 WRITE32_MEMBER( next_state::fdc_control_w )
 {
-	logerror("FDC write %02x (%08x)\n", data >> 24, space.device().safe_pc());
+	logerror("FDC write %02x (%08x)\n", data >> 24, maincpu->pc());
 }
 
 READ32_MEMBER( next_state::fdc_control_r )

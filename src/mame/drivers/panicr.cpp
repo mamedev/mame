@@ -379,7 +379,7 @@ READ8_MEMBER(panicr_state::collision_r)
 	ret |= (srcline[(actual_column+2)&0xff]&3) << 2;
 	ret |= (srcline[(actual_column+3)&0xff]&3) << 0;
 
-	logerror("%06x: (scroll x upper bits is %04x (full %04x)) read %d %d\n", space.device().safe_pc(), (m_scrollx&0xff00)>>8, m_scrollx,  actual_line, actual_column);
+	logerror("%06x: (scroll x upper bits is %04x (full %04x)) read %d %d\n", m_maincpu->pc(), (m_scrollx&0xff00)>>8, m_scrollx,  actual_line, actual_column);
 
 
 	return ret;

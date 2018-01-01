@@ -408,7 +408,7 @@ WRITE8_MEMBER(dunhuang_state::block_h_w)
 			break;
 
 		default:
-			popmessage("%06x: block dst=%x", space.device().safe_pc(), m_block_dest);
+			popmessage("%06x: block dst=%x", m_maincpu->pc(), m_block_dest);
 	}
 }
 

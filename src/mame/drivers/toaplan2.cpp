@@ -851,7 +851,7 @@ READ16_MEMBER(toaplan2_state::bbakraid_eeprom_r)
 WRITE16_MEMBER(toaplan2_state::bbakraid_eeprom_w)
 {
 	if (data & ~0x001f)
-		logerror("CPU #0 PC:%06X - Unknown EEPROM data being written %04X\n",space.device().safe_pc(),data);
+		logerror("CPU #0 PC:%06X - Unknown EEPROM data being written %04X\n",m_maincpu->pc(),data);
 
 	if ( ACCESSING_BITS_0_7 )
 		ioport("EEPROMOUT")->write(data, 0xff);

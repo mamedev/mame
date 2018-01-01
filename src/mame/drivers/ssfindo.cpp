@@ -416,7 +416,7 @@ READ32_MEMBER(ssfindo_state::PS7500_IO_r)
 
 		case IOLINES: //TODO: eeprom  24c01
 #if 0
-		osd_printf_debug("IOLINESR %i @%x\n", offset, space.device().safe_pc());
+		osd_printf_debug("IOLINESR %i @%x\n", offset, m_maincpu->pc());
 #endif
 
 		if(m_flashType == 1)
@@ -472,13 +472,13 @@ WRITE32_MEMBER(ssfindo_state::PS7500_IO_w)
 				if(data&0xc0)
 					m_adrLatch=0;
 
-			if(space.device().safe_pc() == 0xbac0 && m_flashType == 1)
+			if(m_maincpu->pc() == 0xbac0 && m_flashType == 1)
 			{
 				m_flashN=data&1;
 			}
 
 #if 0
-				logerror("IOLINESW %i = %x  @%x\n",offset,data,space.device().safe_pc());
+				logerror("IOLINESW %i = %x  @%x\n",offset,data,m_maincpu->pc());
 #endif
 			break;
 
@@ -560,7 +560,7 @@ WRITE32_MEMBER(ssfindo_state::io_w)
 	COMBINE_DATA(&temp);
 
 #if 0
-	logerror("[io_w] = %x @%x [latch=%x]\n",data,space.device().safe_pc(),m_adrLatch);
+	logerror("[io_w] = %x @%x [latch=%x]\n",data,m_maincpu->pc(),m_adrLatch);
 #endif
 
 	if(m_adrLatch==1)

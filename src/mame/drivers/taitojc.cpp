@@ -561,7 +561,7 @@ READ8_MEMBER(taitojc_state::mcu_comm_r)
 			return m_mcu_comm_main | 0x14;
 
 		default:
-			logerror("mcu_comm_r: %02X at %08X\n", offset, space.device().safe_pc());
+			logerror("mcu_comm_r: %02X at %08X\n", offset, m_maincpu->pc());
 			break;
 	}
 
@@ -582,7 +582,7 @@ WRITE8_MEMBER(taitojc_state::mcu_comm_w)
 			break;
 
 		default:
-			logerror("mcu_comm_w: %02X, %02X at %08X\n", offset, data, space.device().safe_pc());
+			logerror("mcu_comm_w: %02X, %02X at %08X\n", offset, data, m_maincpu->pc());
 			break;
 	}
 }

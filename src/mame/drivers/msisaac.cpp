@@ -148,7 +148,7 @@ MCU simulation TODO:
 			return 0x45;
 
 		default:
-			logerror("CPU#0 read from MCU pc=%4x, mcu_val=%2x\n", space.device().safe_pc(), m_mcu_val);
+			logerror("CPU#0 read from MCU pc=%4x, mcu_val=%2x\n", m_maincpu->pc(), m_mcu_val);
 			return m_mcu_val;
 	}
 #endif

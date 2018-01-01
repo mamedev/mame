@@ -826,9 +826,9 @@ READ32_MEMBER(model2_state::copro_fifo_r)
 		if (m_tgpx4->is_fifoout0_empty())
 		{
 			/* Reading from empty FIFO causes the i960 to enter wait state */
-			downcast<i960_cpu_device &>(space.device()).i960_stall();
+			downcast<i960_cpu_device &>(*m_maincpu).i960_stall();
 			/* spin the main cpu and let the TGP catch up */
-			space.device().execute().spin_until_time(attotime::from_usec(100));
+			m_maincpu->spin_until_time(attotime::from_usec(100));
 			printf("stalled\n");
 		}
 		else
@@ -882,9 +882,9 @@ WRITE32_MEMBER(model2_state::copro_fifo_w)
 			if (m_tgpx4->is_fifoin_full())
 			{
 				/* Writing to full FIFO causes the i960 to enter wait state */
-				downcast<i960_cpu_device &>(space.device()).i960_stall();
+				downcast<i960_cpu_device &>(*m_maincpu).i960_stall();
 				/* spin the main cpu and let the TGP catch up */
-				space.device().execute().spin_until_time(attotime::from_usec(100));
+				m_maincpu->spin_until_time(attotime::from_usec(100));
 				printf("write stalled\n");
 			}
 			else
@@ -1073,7 +1073,7 @@ READ32_MEMBER(model2_state::geo_r)
 	}
 
 //  fatalerror("geo_r: %08X, %08X\n", address, mem_mask);
-	osd_printf_debug("geo_r: PC:%08x - %08X\n", space.device().safe_pc(), address);
+	osd_printf_debug("geo_r: PC:%08x - %08X\n", m_maincpu->pc(), address);
 
 	return 0;
 }
@@ -1305,7 +1305,7 @@ WRITE32_MEMBER(model2_state::model2_serial_w)
 			m_scsp->midi_in(space, 0, data&0xff, 0);
 
 			// give the 68k time to notice
-			space.device().execute().spin_until_time(attotime::from_usec(40));
+			m_maincpu->spin_until_time(attotime::from_usec(40));
 		}
 	}
 	if (ACCESSING_BITS_16_23 && (offset == 0))

@@ -414,7 +414,7 @@ WRITE8_MEMBER(segas1x_bootleg_state::tturfbl_soundbank_w)
 			break;
 		default:
 			m_soundbank_ptr = nullptr;
-			logerror("Invalid bank setting %02X (%04X)\n", data, space.device().safe_pc());
+			logerror("Invalid bank setting %02X (%04X)\n", data, m_soundcpu->pc());
 			break;
 	}
 }
@@ -1205,7 +1205,7 @@ WRITE8_MEMBER(segas1x_bootleg_state::shdancbl_bankctrl_w)
 			break;
 		default:
 			m_soundbank_ptr = nullptr;
-			logerror("Invalid bank setting %02X (%04X)\n", data, space.device().safe_pc());
+			logerror("Invalid bank setting %02X (%04X)\n", data, m_soundcpu->pc());
 			break;
 	}
 }

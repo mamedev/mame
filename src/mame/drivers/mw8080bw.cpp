@@ -2188,7 +2188,7 @@ WRITE8_MEMBER(mw8080bw_state::spcenctr_io_w)
 		m_spcenctr_bright_control = ~data & 0x08;    /*  -  -  -  -  -  0  0  0 */
 
 	else
-		logerror("%04x:  Unmapped I/O port write to %02x = %02x\n", space.device().safe_pc(), offset, data);
+		logerror("%04x:  Unmapped I/O port write to %02x = %02x\n", m_maincpu->pc(), offset, data);
 }
 
 

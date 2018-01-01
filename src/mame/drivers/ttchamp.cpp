@@ -492,7 +492,7 @@ WRITE16_MEMBER(ttchamp_state::mem_w)
 		else
 		{
 			// sometimes happens, why? special meanings? wrong interpretation of something else?
-			printf("%06x: spider_blitter_w unhandled RAM access %08x %04x %04x\n", space.device().safe_pc(), offset * 2, data, mem_mask);
+			printf("%06x: spider_blitter_w unhandled RAM access %08x %04x %04x\n", m_maincpu->pc(), offset * 2, data, mem_mask);
 		}
 	}
 }

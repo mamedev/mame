@@ -268,7 +268,7 @@ WRITE16_MEMBER(sandscrp_state::soundlatch_word_w)
 		m_latch1_full = 1;
 		m_soundlatch->write(space, 0, data & 0xff);
 		m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
-		space.device().execute().spin_until_time(attotime::from_usec(100)); // Allow the other cpu to reply
+		m_maincpu->spin_until_time(attotime::from_usec(100)); // Allow the other cpu to reply
 	}
 }
 

@@ -474,8 +474,8 @@ WRITE_LINE_MEMBER(looping_state::ballon_enable_w)
 WRITE8_MEMBER(looping_state::out_0_w){ osd_printf_debug("out0 = %02X\n", data); }
 WRITE8_MEMBER(looping_state::out_2_w){ osd_printf_debug("out2 = %02X\n", data); }
 
-READ8_MEMBER(looping_state::adc_r){ osd_printf_debug("%04X:ADC read\n", space.device().safe_pc()); return 0xff; }
-WRITE8_MEMBER(looping_state::adc_w){ osd_printf_debug("%04X:ADC write = %02X\n", space.device().safe_pc(), data); }
+READ8_MEMBER(looping_state::adc_r){ osd_printf_debug("%04X:ADC read\n", m_maincpu->pc()); return 0xff; }
+WRITE8_MEMBER(looping_state::adc_w){ osd_printf_debug("%04X:ADC write = %02X\n", m_maincpu->pc(), data); }
 
 WRITE_LINE_MEMBER(looping_state::plr2_w)
 {

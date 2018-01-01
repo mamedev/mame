@@ -136,7 +136,7 @@ WRITE16_MEMBER(seta2_state::sound_bank_w)
 		int banks = (memregion( "x1snd" )->bytes() - 0x100000) / 0x20000;
 		if (data >= banks)
 		{
-			logerror("CPU #0 PC %06X: invalid sound bank %04X\n",space.device().safe_pc(),data);
+			logerror("CPU #0 PC %06X: invalid sound bank %04X\n",m_maincpu->pc(),data);
 			data %= banks;
 		}
 		memcpy(ROM + offset * 0x20000, ROM + 0x100000 + data * 0x20000, 0x20000);

@@ -540,7 +540,7 @@ WRITE8_MEMBER(esripsys_state::tms5220_w)
 /* Not used in later revisions */
 WRITE8_MEMBER(esripsys_state::control_w)
 {
-	logerror("Sound control write: %.2x (PC:0x%.4x)\n", data, space.device().safe_pcbase());
+	logerror("Sound control write: %.2x (PC:0x%.4x)\n", data, m_soundcpu->pcbase());
 }
 
 

@@ -125,11 +125,11 @@ WRITE16_MEMBER(gradius3_state::cpuB_irqtrigger_w)
 {
 	if (m_irqBmask & 4)
 	{
-		logerror("%04x trigger cpu B irq 4 %02x\n",space.device().safe_pc(),data);
+		logerror("%04x trigger cpu B irq 4 %02x\n",m_maincpu->pc(),data);
 		m_subcpu->set_input_line(4, HOLD_LINE);
 	}
 	else
-		logerror("%04x MISSED cpu B irq 4 %02x\n",space.device().safe_pc(),data);
+		logerror("%04x MISSED cpu B irq 4 %02x\n",m_maincpu->pc(),data);
 }
 
 WRITE16_MEMBER(gradius3_state::sound_irq_w)

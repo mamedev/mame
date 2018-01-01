@@ -599,7 +599,7 @@ WRITE8_MEMBER(system1_state::mcu_io_w)
 
 		default:
 			logerror("%03X: MCU movx write mode %02X offset %04X = %02X\n",
-						space.device().safe_pc(), m_mcu_control, offset, data);
+						m_mcu->pc(), m_mcu_control, offset, data);
 			break;
 	}
 }
@@ -620,7 +620,7 @@ READ8_MEMBER(system1_state::mcu_io_r)
 
 		default:
 			logerror("%03X: MCU movx read mode %02X offset %04X\n",
-						space.device().safe_pc(), m_mcu_control, offset);
+						m_mcu->pc(), m_mcu_control, offset);
 			return 0xff;
 	}
 }
@@ -669,7 +669,7 @@ WRITE8_MEMBER(system1_state::nob_mcu_control_p2_w)
 
 	/* bit 2 is toggled once near the end of an IRQ */
 	if (((m_mcu_control ^ data) & 0x04) && !(data & 0x04))
-		space.device().execute().set_input_line(MCS51_INT0_LINE, CLEAR_LINE);
+		m_mcu->set_input_line(MCS51_INT0_LINE, CLEAR_LINE);
 
 	/* bit 3 is toggled once at the start of an IRQ, and again at the end */
 	if (((m_mcu_control ^ data) & 0x08) && !(data & 0x08))

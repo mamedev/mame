@@ -497,7 +497,7 @@ WRITE8_MEMBER(kurukuru_state::kurukuru_out_latch_w)
 	m_hopper->motor_w(BIT(data, 6));
 
 	if (data & 0x9e)
-		logerror("kurukuru_out_latch_w %02X @ %04X\n", data, space.device().safe_pc());
+		logerror("kurukuru_out_latch_w %02X @ %04X\n", data, m_maincpu->pc());
 }
 
 WRITE8_MEMBER(kurukuru_state::kurukuru_bankswitch_w)

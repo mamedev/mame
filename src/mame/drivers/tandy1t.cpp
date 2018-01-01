@@ -256,7 +256,7 @@ WRITE8_MEMBER( tandy1000_state::pc_t1t_p37x_w )
 {
 //  DBG_LOG(2,"T1T_p37x_w",("%.5x #%d $%02x\n", space.device().safe_pc( ),offset, data));
 	if (offset!=4)
-		logerror("T1T_p37x_w %.5x #%d $%02x\n", space.device().safe_pc( ),offset, data);
+		logerror("T1T_p37x_w %.5x #%d $%02x\n", m_maincpu->pc( ),offset, data);
 	m_tandy_data[offset]=data;
 	switch( offset )
 	{

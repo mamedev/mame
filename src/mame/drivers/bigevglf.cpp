@@ -85,7 +85,7 @@ TIMER_CALLBACK_MEMBER(bigevglf_state::from_sound_latch_callback)
 }
 WRITE8_MEMBER(bigevglf_state::beg_fromsound_w)/* write to D800 sets bit 1 in status */
 {
-	machine().scheduler().synchronize(timer_expired_delegate(FUNC(bigevglf_state::from_sound_latch_callback),this), (space.device().safe_pc() << 16) | data);
+	machine().scheduler().synchronize(timer_expired_delegate(FUNC(bigevglf_state::from_sound_latch_callback),this), (m_audiocpu->pc() << 16) | data);
 }
 
 READ8_MEMBER(bigevglf_state::beg_fromsound_r)

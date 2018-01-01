@@ -90,7 +90,7 @@ WRITE16_MEMBER(esd16_state::esd16_sound_command_w)
 	{
 		m_soundlatch->write(space, 0, data & 0xff);
 		m_audiocpu->set_input_line(0, ASSERT_LINE);      // Generate an IRQ
-		space.device().execute().spin_until_time(attotime::from_usec(50));  // Allow the other CPU to reply
+		m_maincpu->spin_until_time(attotime::from_usec(50));  // Allow the other CPU to reply
 	}
 }
 

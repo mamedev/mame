@@ -510,7 +510,7 @@ READ32_MEMBER(hng64_state::hng64_sysregs_r)
 
 #if 0
 	if((offset*4) != 0x1084)
-		printf("HNG64 port read (PC=%08x) 0x%08x\n", space.device().safe_pc(), offset*4);
+		printf("HNG64 port read (PC=%08x) 0x%08x\n", m_maincpu->pc(), offset*4);
 #endif
 
 	rtc_addr = offset >> 1;
@@ -584,7 +584,7 @@ WRITE32_MEMBER(hng64_state::hng64_sysregs_w)
 
 #if 0
 	if(((offset*4) & 0xff00) == 0x1100)
-		printf("HNG64 writing to SYSTEM Registers 0x%08x == 0x%08x. (PC=%08x)\n", offset*4, m_sysregs[offset], space.device().safe_pc());
+		printf("HNG64 writing to SYSTEM Registers 0x%08x == 0x%08x. (PC=%08x)\n", offset*4, m_sysregs[offset], m_maincpu->pc());
 #endif
 
 	switch(offset*4)

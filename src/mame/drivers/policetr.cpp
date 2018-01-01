@@ -162,7 +162,7 @@ WRITE32_MEMBER(policetr_state::control_w)
 
 	/* log any unknown bits */
 	if (data & 0x4f1fffff)
-		logerror("%08X: control_w = %08X & %08X\n", space.device().safe_pcbase(), data, mem_mask);
+		logerror("%08X: control_w = %08X & %08X\n", m_maincpu->pcbase(), data, mem_mask);
 }
 
 

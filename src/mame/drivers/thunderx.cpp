@@ -75,7 +75,7 @@ READ8_MEMBER(thunderx_state::pmc_r)
 	}
 	else
 	{
-		LOG(("%04x read pmc internal ram %04x\n",space.device().safe_pc(),offset));
+		LOG(("%04x read pmc internal ram %04x\n",m_audiocpu->pc(),offset));
 		return 0;
 	}
 }
@@ -84,12 +84,12 @@ WRITE8_MEMBER(thunderx_state::pmc_w)
 {
 	if (PMC_BK)
 	{
-		LOG(("%04x pmcram %04x = %02x\n",space.device().safe_pc(),offset,data));
+		LOG(("%04x pmcram %04x = %02x\n",m_audiocpu->pc(),offset,data));
 		m_pmcram[offset] = data;
 	}
 	else
 	{
-		LOG(("%04x pmc internal ram %04x = %02x\n",space.device().safe_pc(),offset,data));
+		LOG(("%04x pmc internal ram %04x = %02x\n",m_audiocpu->pc(),offset,data));
 	}
 }
 

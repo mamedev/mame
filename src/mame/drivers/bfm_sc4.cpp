@@ -273,14 +273,14 @@ uint8_t sc4_state::read_input_matrix(int row)
 
 READ16_MEMBER(sc4_state::sc4_cs1_r)
 {
-	int pc = space.device().safe_pc();
+	int pc = m_maincpu->pc();
 
 	if (offset<0x100000/2)
 	{
 		// allow some sets to boot, should probably return this data on Mbus once we figure out what it is
 		if ((pc == m_chk41addr) && (offset == m_chk41addr>>1))
 		{
-			uint32_t r_A0 = space.device().state().state_int(M68K_A0);
+			uint32_t r_A0 = m_maincpu->state_int(M68K_A0);
 			uint32_t r_A1 = space.device().state().state_int(M68K_A1);
 			uint32_t r_D1 = space.device().state().state_int(M68K_D1);
 
@@ -322,7 +322,7 @@ READ16_MEMBER(sc4_state::sc4_cs1_r)
 
 READ16_MEMBER(sc4_state::sc4_mem_r)
 {
-	int pc = space.device().safe_pc();
+	int pc = m_maincpu->pc();
 	int cs = m_maincpu->get_cs(offset * 2);
 	int base = 0, end = 0, base2 = 0, end2 = 0;
 //  if (!(debugger_access())) printf("cs is %d\n", cs);
@@ -500,7 +500,7 @@ WRITE8_MEMBER(bfm_sc45_state::mux_output2_w)
 
 WRITE16_MEMBER(sc4_state::sc4_mem_w)
 {
-	int pc = space.device().safe_pc();
+	int pc = m_maincpu->pc();
 	int cs = m_maincpu->get_cs(offset * 2);
 	int base = 0, end = 0, base2 = 0, end2 = 0;
 
@@ -625,7 +625,7 @@ ADDRESS_MAP_END
 
 READ32_MEMBER(sc4_adder4_state::adder4_mem_r)
 {
-	int pc = space.device().safe_pc();
+	int pc = m_adder4cpu->pc();
 	int cs = m_adder4cpu->get_cs(offset * 4);
 
 	switch ( cs )
@@ -647,7 +647,7 @@ READ32_MEMBER(sc4_adder4_state::adder4_mem_r)
 
 WRITE32_MEMBER(sc4_adder4_state::adder4_mem_w)
 {
-	int pc = space.device().safe_pc();
+	int pc = m_adder4cpu->pc();
 	int cs = m_adder4cpu->get_cs(offset * 4);
 
 	switch ( cs )

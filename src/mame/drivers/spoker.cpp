@@ -171,7 +171,7 @@ WRITE8_MEMBER(spoker_state::nmi_and_coins_w)
 {
 	if ((data) & (0x22))
 	{
-		logerror("PC %06X: nmi_and_coins = %02x\n",space.device().safe_pc(),data);
+		logerror("PC %06X: nmi_and_coins = %02x\n",m_maincpu->pc(),data);
 //      popmessage("%02x",data);
 	}
 
@@ -229,7 +229,7 @@ WRITE8_MEMBER(spoker_state::magic_w)
 
 		default:
 //          popmessage("magic %x <- %04x",igs_magic[0],data);
-			logerror("%06x: warning, writing to igs_magic %02x = %02x\n", space.device().safe_pc(), m_igs_magic[0], data);
+			logerror("%06x: warning, writing to igs_magic %02x = %02x\n", m_maincpu->pc(), m_igs_magic[0], data);
 	}
 }
 
@@ -243,11 +243,11 @@ READ8_MEMBER(spoker_state::magic_r)
 			if ( !(m_igs_magic[1] & 0x04) ) return ioport("DSW3")->read();
 			if ( !(m_igs_magic[1] & 0x08) ) return ioport("DSW4")->read();
 			if ( !(m_igs_magic[1] & 0x10) ) return ioport("DSW5")->read();
-			logerror("%06x: warning, reading dsw with igs_magic[1] = %02x\n", space.device().safe_pc(), m_igs_magic[1]);
+			logerror("%06x: warning, reading dsw with igs_magic[1] = %02x\n", m_maincpu->pc(), m_igs_magic[1]);
 			break;
 
 		default:
-			logerror("%06x: warning, reading with igs_magic = %02x\n", space.device().safe_pc(), m_igs_magic[0]);
+			logerror("%06x: warning, reading with igs_magic = %02x\n", m_maincpu->pc(), m_igs_magic[0]);
 	}
 
 	return 0;

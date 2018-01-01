@@ -317,7 +317,7 @@ WRITE32_MEMBER(dgpix_state::coin_w)
 READ32_MEMBER(dgpix_state::vblank_r)
 {
 	/* burn a bunch of cycles because this is polled frequently during busy loops */
-	space.device().execute().eat_cycles(100);
+	m_maincpu->eat_cycles(100);
 	return m_vblank->read();
 }
 

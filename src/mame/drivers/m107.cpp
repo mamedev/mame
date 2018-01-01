@@ -86,7 +86,7 @@ WRITE8_MEMBER(m107_state::bankswitch_w)
 {
 	membank("bank1")->set_entry((data & 0x06) >> 1);
 	if (data & 0xf9)
-		logerror("%05x: bankswitch %04x\n", space.device().safe_pc(), data);
+		logerror("%05x: bankswitch %04x\n", m_maincpu->pc(), data);
 }
 
 WRITE16_MEMBER(m107_state::sound_reset_w)

@@ -857,11 +857,11 @@ READ32_MEMBER(viper_state::epic_r)
 		const char *regname = epic_get_register_name(reg);
 		if (regname)
 		{
-			printf("EPIC: read %08X (%s) at %08X\n", reg, regname, space.device().safe_pc());
+			printf("EPIC: read %08X (%s) at %08X\n", reg, regname, m_maincpu->pc());
 		}
 		else
 		{
-			printf("EPIC: read %08X at %08X\n", reg, space.device().safe_pc());
+			printf("EPIC: read %08X at %08X\n", reg, m_maincpu->pc());
 		}
 	}
 #endif
@@ -1056,11 +1056,11 @@ WRITE32_MEMBER(viper_state::epic_w)
 		const char *regname = epic_get_register_name(reg);
 		if (regname)
 		{
-			printf("EPIC: write %08X, %08X (%s) at %08X\n", data, reg, regname, space.device().safe_pc());
+			printf("EPIC: write %08X, %08X (%s) at %08X\n", data, reg, regname, m_maincpu->pc());
 		}
 		else
 		{
-			printf("EPIC: write %08X, %08X at %08X\n", data, reg, space.device().safe_pc());
+			printf("EPIC: write %08X, %08X at %08X\n", data, reg, m_maincpu->pc());
 		}
 	}
 #endif

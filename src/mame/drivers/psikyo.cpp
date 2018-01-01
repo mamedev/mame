@@ -303,7 +303,7 @@ READ32_MEMBER(psikyo_state::sngkace_input_r)
 		case 0x0:   return ioport("P1_P2")->read();
 		case 0x1:   return ioport("DSW")->read();
 		case 0x2:   return ioport("COIN")->read();
-		default:    logerror("PC %06X - Read input %02X !\n", space.device().safe_pc(), offset * 2);
+		default:    logerror("PC %06X - Read input %02X !\n", m_maincpu->pc(), offset * 2);
 				return 0;
 	}
 }
@@ -344,7 +344,7 @@ READ32_MEMBER(psikyo_state::gunbird_input_r)
 	{
 		case 0x0:   return ioport("P1_P2")->read();
 		case 0x1:   return ioport("DSW")->read();
-		default:    logerror("PC %06X - Read input %02X !\n", space.device().safe_pc(), offset * 2);
+		default:    logerror("PC %06X - Read input %02X !\n", m_maincpu->pc(), offset * 2);
 				return 0;
 	}
 }
@@ -391,7 +391,7 @@ READ32_MEMBER(psikyo_state::s1945_input_r)
 		case 0x0:   return ioport("P1_P2")->read();
 		case 0x1:   return (ioport("DSW")->read() & 0xffff000f) | s1945_mcu_r(space, offset - 1, mem_mask);
 		case 0x2:   return s1945_mcu_r(space, offset - 1, mem_mask);
-		default:    logerror("PC %06X - Read input %02X !\n", space.device().safe_pc(), offset * 2);
+		default:    logerror("PC %06X - Read input %02X !\n", m_maincpu->pc(), offset * 2);
 					return 0;
 	}
 }

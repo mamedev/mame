@@ -511,7 +511,7 @@ WRITE8_MEMBER(cntsteer_state::cntsteer_sound_w)
 WRITE8_MEMBER(cntsteer_state::zerotrgt_ctrl_w)
 {
 	/*TODO: check this.*/
-	logerror("CTRL: %04x: %04x: %04x\n", space.device().safe_pc(), offset, data);
+	logerror("CTRL: %04x: %04x: %04x\n", m_maincpu->pc(), offset, data);
 //  if (offset == 0) m_subcpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 
 	// Wrong - bits 0 & 1 used on this

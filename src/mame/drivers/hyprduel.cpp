@@ -120,7 +120,7 @@ WRITE16_MEMBER(hyprduel_state::subcpu_control_w)
 				m_subcpu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
 				m_subcpu_resetline = 0;
 			}
-			space.device().execute().spin_until_interrupt();
+			m_maincpu->spin_until_interrupt();
 			break;
 
 		case 0x0c:
@@ -306,7 +306,7 @@ WRITE16_MEMBER(hyprduel_state::blitter_w)
 			case 3:
 				break;
 			default:
-				logerror("CPU #0 PC %06X : Blitter unknown destination: %08X\n", space.device().safe_pc(), tmap);
+				logerror("CPU #0 PC %06X : Blitter unknown destination: %08X\n", m_maincpu->pc(), tmap);
 				return;
 		}
 
@@ -400,7 +400,7 @@ WRITE16_MEMBER(hyprduel_state::blitter_w)
 
 
 				default:
-					logerror("CPU #0 PC %06X : Blitter unknown opcode %02X at %06X\n", space.device().safe_pc(), b1, src_offs - 1);
+					logerror("CPU #0 PC %06X : Blitter unknown opcode %02X at %06X\n", m_maincpu->pc(), b1, src_offs - 1);
 					return;
 			}
 

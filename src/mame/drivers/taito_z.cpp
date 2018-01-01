@@ -1177,7 +1177,7 @@ READ16_MEMBER(taitoz_state::bshark_stick_r)
 			return ioport("Y_ADJUST")->read();
 	}
 
-	logerror("CPU #0 PC %06x: warning - read unmapped stick offset %06x\n", space.device().safe_pc(), offset);
+	logerror("CPU #0 PC %06x: warning - read unmapped stick offset %06x\n", m_maincpu->pc(), offset);
 
 	return 0xff;
 }
@@ -1200,7 +1200,7 @@ READ16_MEMBER(taitoz_state::nightstr_stick_r)
 			return ioport("Y_ADJUST")->read();
 	}
 
-	logerror("CPU #0 PC %06x: warning - read unmapped stick offset %06x\n", space.device().safe_pc(), offset);
+	logerror("CPU #0 PC %06x: warning - read unmapped stick offset %06x\n", m_maincpu->pc(), offset);
 
 	return 0xff;
 }
@@ -1213,7 +1213,7 @@ WRITE16_MEMBER(taitoz_state::bshark_stick_w)
 	   but we don't want CPUA to have an int6 before int4 is over (?)
 	*/
 
-	timer_set(downcast<cpu_device *>(&space.device())->cycles_to_attotime(10000), TIMER_TAITOZ_INTERRUPT6);
+	timer_set(m_maincpu->cycles_to_attotime(10000), TIMER_TAITOZ_INTERRUPT6);
 }
 
 
@@ -1230,7 +1230,7 @@ READ16_MEMBER(taitoz_state::sci_steer_input_r)
 			return (steer & 0xff00) >> 8;
 	}
 
-	logerror("CPU #0 PC %06x: warning - read unmapped steer input offset %06x\n", space.device().safe_pc(), offset);
+	logerror("CPU #0 PC %06x: warning - read unmapped steer input offset %06x\n", m_maincpu->pc(), offset);
 
 	return 0xff;
 }
@@ -1266,7 +1266,7 @@ WRITE16_MEMBER(taitoz_state::spacegun_lightgun_w)
 	   Four lightgun interrupts happen before the collected coords
 	   are moved to shared ram where CPUA can use them. */
 
-	timer_set(downcast<cpu_device *>(&space.device())->cycles_to_attotime(10000), TIMER_TAITOZ_CPUB_INTERRUPT5);
+	timer_set(m_subcpu->cycles_to_attotime(10000), TIMER_TAITOZ_CPUB_INTERRUPT5);
 }
 
 WRITE16_MEMBER(taitoz_state::spacegun_gun_output_w)
@@ -1289,7 +1289,7 @@ READ16_MEMBER(taitoz_state::dblaxle_steer_input_r)
 			return steer & 0xff;
 	}
 
-	logerror("CPU #0 PC %06x: warning - read unmapped steer input offset %02x\n", space.device().safe_pc(), offset);
+	logerror("CPU #0 PC %06x: warning - read unmapped steer input offset %02x\n", m_maincpu->pc(), offset);
 
 	return 0x00;
 }
@@ -1306,7 +1306,7 @@ READ16_MEMBER(taitoz_state::chasehq_motor_r)
 			return 0x55;    /* motor cpu status ? */
 
 		default:
-			logerror("CPU #0 PC %06x: warning - read motor cpu %03x\n",space.device().safe_pc(),offset);
+			logerror("CPU #0 PC %06x: warning - read motor cpu %03x\n",m_maincpu->pc(),offset);
 			return 0;
 	}
 }
@@ -1324,7 +1324,7 @@ WRITE16_MEMBER(taitoz_state::chasehq_motor_w)
 			break;
 	}
 
-	logerror("CPU #0 PC %06x: warning - write %04x to motor cpu %03x\n",space.device().safe_pc(),data,offset);
+	logerror("CPU #0 PC %06x: warning - write %04x to motor cpu %03x\n",m_maincpu->pc(),data,offset);
 }
 
 

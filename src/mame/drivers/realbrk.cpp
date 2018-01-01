@@ -126,7 +126,7 @@ READ16_MEMBER(realbrk_state::backup_ram_r)
 {
 	/*TODO: understand the format & cmds of the backup-ram,maybe it's an
 	        unemulated tmp68301 feature?*/
-	if(space.device().safe_pcbase() == 0x02c08e)
+	if(m_maincpu->pcbase() == 0x02c08e)
 		return 0xffff;
 	else
 		return m_backup_ram[offset];
@@ -137,7 +137,7 @@ READ16_MEMBER(realbrk_state::backup_ram_dx_r)
 {
 	/*TODO: understand the format & cmds of the backup-ram,maybe it's an
 	        unemulated tmp68301 feature?*/
-	if(space.device().safe_pcbase() == 0x02f046)
+	if(m_maincpu->pcbase() == 0x02f046)
 		return 0xffff;
 	else
 		return m_backup_ram[offset];

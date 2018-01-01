@@ -84,7 +84,7 @@ READ32_MEMBER(nds_state::arm7_io_r)
 				double time, ticks;
 				int timer = (offset - TIMER_OFFSET) + 4;
 
-				printf("Read timer reg %x (PC=%x)\n", timer, space.device().safe_pc());
+				printf("Read timer reg %x (PC=%x)\n", timer, m_arm7->pc());
 
 				// update times for
 				if (m_timer_regs[timer] & 0x800000)
@@ -213,7 +213,7 @@ WRITE32_MEMBER(nds_state::arm7_io_w)
 
 				m_timer_regs[timer] = (m_timer_regs[timer] & ~(mem_mask & 0xFFFF0000)) | (data & (mem_mask & 0xFFFF0000));
 
-				printf("%08x to timer %d (mask %08x PC %x)\n", data, timer, ~mem_mask, space.device().safe_pc());
+				printf("%08x to timer %d (mask %08x PC %x)\n", data, timer, ~mem_mask, m_arm7->pc());
 
 				if (ACCESSING_BITS_0_15)
 				{
@@ -450,7 +450,7 @@ WRITE32_MEMBER(nds_state::arm9_io_w)
 
 				m_timer_regs[timer] = (m_timer_regs[timer] & ~(mem_mask & 0xFFFF0000)) | (data & (mem_mask & 0xFFFF0000));
 
-				printf("%x to timer %d (mask %x PC %x)\n", data, timer, ~mem_mask, space.device().safe_pc());
+				printf("%x to timer %d (mask %x PC %x)\n", data, timer, ~mem_mask, m_arm9->pc());
 
 				if (ACCESSING_BITS_0_15)
 				{

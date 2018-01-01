@@ -239,7 +239,7 @@ WRITE16_MEMBER(cave_state::sound_cmd_w)
 //  m_sound_flag2 = 1;
 	m_soundlatch->write(space, offset, data, mem_mask);
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
-	space.device().execute().spin_until_time(attotime::from_usec(50));  // Allow the other cpu to reply
+	m_maincpu->spin_until_time(attotime::from_usec(50));  // Allow the other cpu to reply
 }
 
 /* Sound CPU: read the low 8 bits of the 16 bit sound latch */
@@ -268,7 +268,7 @@ READ16_MEMBER(cave_state::soundlatch_ack_r)
 	}
 	else
 	{
-		logerror("CPU #1 - PC %04X: Sound Buffer 2 Underflow Error\n", space.device().safe_pc());
+		logerror("CPU #1 - PC %04X: Sound Buffer 2 Underflow Error\n", m_maincpu->pc());
 		return 0xff;
 	}
 }
@@ -281,7 +281,7 @@ WRITE8_MEMBER(cave_state::soundlatch_ack_w)
 	if (m_soundbuf_len < 32)
 		m_soundbuf_len++;
 	else
-		logerror("CPU #1 - PC %04X: Sound Buffer 2 Overflow Error\n", space.device().safe_pc());
+		logerror("CPU #1 - PC %04X: Sound Buffer 2 Overflow Error\n", m_audiocpu->pc());
 }
 
 
@@ -1226,7 +1226,7 @@ ADDRESS_MAP_END
 WRITE8_MEMBER(cave_state::hotdogst_rombank_w)
 {
 	if (data & ~0x0f)
-		logerror("CPU #1 - PC %04X: Bank %02X\n", space.device().safe_pc(), data);
+		logerror("CPU #1 - PC %04X: Bank %02X\n", m_audiocpu->pc(), data);
 
 	membank("z80bank")->set_entry(data & 0x0f);
 }
@@ -1263,7 +1263,7 @@ ADDRESS_MAP_END
 WRITE8_MEMBER(cave_state::mazinger_rombank_w)
 {
 	if (data & ~0x07)
-		logerror("CPU #1 - PC %04X: Bank %02X\n", space.device().safe_pc(), data);
+		logerror("CPU #1 - PC %04X: Bank %02X\n", m_audiocpu->pc(), data);
 
 	membank("z80bank")->set_entry(data & 0x07);
 }
@@ -1294,7 +1294,7 @@ ADDRESS_MAP_END
 WRITE8_MEMBER(cave_state::metmqstr_rombank_w)
 {
 	if (data & ~0x0f)
-		logerror("CPU #1 - PC %04X: Bank %02X\n", space.device().safe_pc(), data);
+		logerror("CPU #1 - PC %04X: Bank %02X\n", m_audiocpu->pc(), data);
 
 	membank("z80bank")->set_entry(data & 0x0f);
 }
@@ -1342,7 +1342,7 @@ ADDRESS_MAP_END
 WRITE8_MEMBER(cave_state::pwrinst2_rombank_w)
 {
 	if (data & ~0x07)
-		logerror("CPU #1 - PC %04X: Bank %02X\n", space.device().safe_pc(), data);
+		logerror("CPU #1 - PC %04X: Bank %02X\n", m_audiocpu->pc(), data);
 
 	membank("z80bank")->set_entry(data & 0x07);
 }
@@ -1374,7 +1374,7 @@ ADDRESS_MAP_END
 WRITE8_MEMBER(cave_state::sailormn_rombank_w)
 {
 	if (data & ~0x1f)
-		logerror("CPU #1 - PC %04X: Bank %02X\n", space.device().safe_pc(), data);
+		logerror("CPU #1 - PC %04X: Bank %02X\n", m_audiocpu->pc(), data);
 
 	membank("z80bank")->set_entry(data & 0x1f);
 }

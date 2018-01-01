@@ -2383,7 +2383,7 @@ WRITE16_MEMBER(namcos22_state::upload_code_to_slave_dsp_w)
 					break;
 
 				default:
-					logerror("%08x: master port#7: 0x%04x\n", space.device().safe_pcbase(), data);
+					logerror("%08x: master port#7: 0x%04x\n", m_master->pcbase(), data);
 					break;
 			}
 			break;

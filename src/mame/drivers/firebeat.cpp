@@ -882,7 +882,7 @@ READ32_MEMBER(firebeat_state::ppc_spu_share_r)
 	uint32_t r = 0;
 
 #if PRINT_SPU_MEM
-	printf("ppc_spu_share_r: %08X, %08X at %08X\n", offset, mem_mask, space.device().safe_pc());
+	printf("ppc_spu_share_r: %08X, %08X at %08X\n", offset, mem_mask, m_maincpu->pc());
 #endif
 
 	if (ACCESSING_BITS_24_31)
@@ -913,7 +913,7 @@ READ32_MEMBER(firebeat_state::ppc_spu_share_r)
 WRITE32_MEMBER(firebeat_state::ppc_spu_share_w)
 {
 #if PRINT_SPU_MEM
-	printf("ppc_spu_share_w: %08X, %08X, %08X at %08X\n", data, offset, mem_mask, space.device().safe_pc());
+	printf("ppc_spu_share_w: %08X, %08X, %08X at %08X\n", data, offset, mem_mask, m_maincpu->pc());
 #endif
 
 	if (ACCESSING_BITS_24_31)

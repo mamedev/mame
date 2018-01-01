@@ -774,7 +774,7 @@ WRITE32_MEMBER(jaguar_state::joystick_w)
 
 WRITE32_MEMBER(jaguar_state::latch_w)
 {
-	logerror("%08X:latch_w(%X)\n", space.device().safe_pcbase(), data);
+	logerror("%08X:latch_w(%X)\n", m_maincpu->pcbase(), data);
 
 	/* adjust banking */
 	if (m_romboard_region != nullptr)

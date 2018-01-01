@@ -762,7 +762,7 @@ WRITE8_MEMBER(missile_state::missile_w)
 
 	/* anything else */
 	else
-		logerror("%04X:Unknown write to %04X = %02X\n", space.device().safe_pc(), offset, data);
+		logerror("%04X:Unknown write to %04X = %02X\n", m_maincpu->pc(), offset, data);
 }
 
 
@@ -816,7 +816,7 @@ READ8_MEMBER(missile_state::missile_r)
 
 	/* anything else */
 	else
-		logerror("%04X:Unknown read from %04X\n", space.device().safe_pc(), offset);
+		logerror("%04X:Unknown read from %04X\n", m_maincpu->pc(), offset);
 
 
 	/* update the MADSEL state */
@@ -875,7 +875,7 @@ WRITE8_MEMBER(missile_state::bootleg_w)
 
 	/* anything else */
 	else
-		logerror("%04X:Unknown write to %04X = %02X\n", space.device().safe_pc(), offset, data);
+		logerror("%04X:Unknown write to %04X = %02X\n", m_maincpu->pc(), offset, data);
 }
 
 
@@ -923,7 +923,7 @@ READ8_MEMBER(missile_state::bootleg_r)
 
 	/* anything else */
 	else
-		logerror("%04X:Unknown read from %04X\n", space.device().safe_pc(), offset);
+		logerror("%04X:Unknown read from %04X\n", m_maincpu->pc(), offset);
 
 
 	/* update the MADSEL state */

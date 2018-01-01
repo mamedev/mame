@@ -359,7 +359,7 @@ READ8_MEMBER(enigma2_state::dip_switch_r)
 {
 	uint8_t ret = 0x00;
 
-	if (LOG_PROT) logerror("DIP SW Read: %x at %x (prot data %x)\n", offset, space.device().safe_pc(), m_protection_data);
+	if (LOG_PROT) logerror("DIP SW Read: %x at %x (prot data %x)\n", offset, m_maincpu->pc(), m_protection_data);
 	switch (offset)
 	{
 	case 0x01:
@@ -372,7 +372,7 @@ READ8_MEMBER(enigma2_state::dip_switch_r)
 		break;
 
 	case 0x02:
-		if (space.device().safe_pc() == 0x07e5)
+		if (m_maincpu->pc() == 0x07e5)
 			ret = 0xaa;
 		else
 			ret = 0xf4;

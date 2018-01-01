@@ -846,7 +846,7 @@ READ8_MEMBER(bfcobra_state::chipset_r)
 		}
 		default:
 		{
-			osd_printf_debug("Flare One unknown read: 0x%.2x (PC:0x%.4x)\n", offset, space.device().safe_pcbase());
+			osd_printf_debug("Flare One unknown read: 0x%.2x (PC:0x%.4x)\n", offset, m_maincpu->pcbase());
 		}
 	}
 
@@ -862,7 +862,7 @@ WRITE8_MEMBER(bfcobra_state::chipset_w)
 		case 0x03:
 		{
 			if (data > 0x3f)
-				popmessage("%x: Unusual bank access (%x)\n", space.device().safe_pcbase(), data);
+				popmessage("%x: Unusual bank access (%x)\n", m_maincpu->pcbase(), data);
 
 			data &= 0x3f;
 			m_bank_data[offset] = data;
@@ -936,7 +936,7 @@ WRITE8_MEMBER(bfcobra_state::chipset_w)
 		}
 		default:
 		{
-			osd_printf_debug("Flare One unknown write: 0x%.2x with 0x%.2x (PC:0x%.4x)\n", offset, data, space.device().safe_pcbase());
+			osd_printf_debug("Flare One unknown write: 0x%.2x with 0x%.2x (PC:0x%.4x)\n", offset, data, m_maincpu->pcbase());
 		}
 	}
 }
@@ -1329,7 +1329,7 @@ WRITE8_MEMBER(bfcobra_state::meter_w)
 		if (changed & (1 << i))
 		{
 			m_meters->update(i, data & (1 << i) );
-			space.device().execute().set_input_line(M6809_FIRQ_LINE, HOLD_LINE);
+			m_audiocpu->set_input_line(M6809_FIRQ_LINE, HOLD_LINE);
 		}
 	}
 }

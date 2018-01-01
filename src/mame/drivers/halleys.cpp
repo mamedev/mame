@@ -1039,7 +1039,7 @@ WRITE8_MEMBER(halleys_state::bgtile_w)
 
 READ8_MEMBER(halleys_state::blitter_status_r)
 {
-	if (m_game_id==GAME_HALLEYS && space.device().safe_pc()==0x8017) return(0x55); // HACK: trick SRAM test on startup
+	if (m_game_id==GAME_HALLEYS && m_maincpu->pc()==0x8017) return(0x55); // HACK: trick SRAM test on startup
 
 	return(0);
 }
@@ -1079,7 +1079,7 @@ WRITE8_MEMBER(halleys_state::blitter_w)
 		else
 		{
 			m_blitter_busy = 1;
-			m_blitter_reset_timer->adjust(downcast<cpu_device *>(&space.device())->cycles_to_attotime(100)); // free blitter if no updates in 100 cycles
+			m_blitter_reset_timer->adjust(m_maincpu->cycles_to_attotime(100)); // free blitter if no updates in 100 cycles
 		}
 	}
 }
@@ -1109,7 +1109,7 @@ READ8_MEMBER(halleys_state::collision_id_r)
     UPDATE: re-implemented pixel collision to accompany the hack method.
 */
 
-	if (m_game_id==GAME_HALLEYS && space.device().safe_pc()==m_collision_detection) // HACK: collision detection bypass
+	if (m_game_id==GAME_HALLEYS && m_maincpu->pc()==m_collision_detection) // HACK: collision detection bypass
 	{
 		if (m_collision_count) { m_collision_count--; return(m_collision_list[m_collision_count]); }
 

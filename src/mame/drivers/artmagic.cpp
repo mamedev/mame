@@ -106,7 +106,7 @@ WRITE16_MEMBER(artmagic_state::control_w)
 		m_oki->set_rom_bank((data >> 4) & 1);
 	}
 
-	logerror("%06X:control_w(%d) = %04X\n", space.device().safe_pc(), offset, data);
+	logerror("%06X:control_w(%d) = %04X\n", m_maincpu->pc(), offset, data);
 }
 
 

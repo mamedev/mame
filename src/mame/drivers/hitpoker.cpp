@@ -226,8 +226,8 @@ READ8_MEMBER(hitpoker_state::hitpoker_pic_r)
 
 	if(offset == 0)
 	{
-		if(space.device().safe_pc() == 0x3143 ||
-			space.device().safe_pc() == 0x314e ||
+		if(m_maincpu->pc() == 0x3143 ||
+			m_maincpu->pc() == 0x314e ||
 			space.device().safe_pc() == 0x3164 ||
 			space.device().safe_pc() == 0x3179)
 			return m_pic_data;

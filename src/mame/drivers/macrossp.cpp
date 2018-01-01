@@ -314,7 +314,7 @@ WRITE32_MEMBER(macrossp_state::macrossp_soundcmd_w)
 		m_sndpending = 1;
 		m_audiocpu->set_input_line(2, HOLD_LINE);
 		/* spin for a while to let the sound CPU read the command */
-		space.device().execute().spin_until_time(attotime::from_usec(50));
+		m_maincpu->spin_until_time(attotime::from_usec(50));
 	}
 }
 

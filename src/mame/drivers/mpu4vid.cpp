@@ -1375,11 +1375,11 @@ WRITE8_MEMBER(mpu4vid_state::vidcharacteriser_w )
 {
 	int x;
 	int call=(data&0xff);
-	LOG_CHR_FULL(("%04x Characteriser write offset %02X data %02X", space.device().safe_pcbase(),offset,data));
+	LOG_CHR_FULL(("%04x Characteriser write offset %02X data %02X", m_videocpu->pcbase(),offset,data));
 
 	if (!m_current_chr_table)
 	{
-		logerror("No Characteriser Table @ %04x\n", space.device().safe_pcbase());
+		logerror("No Characteriser Table @ %04x\n", m_videocpu->pcbase());
 		return;
 	}
 
@@ -1404,13 +1404,13 @@ WRITE8_MEMBER(mpu4vid_state::vidcharacteriser_w )
 
 READ8_MEMBER(mpu4vid_state::vidcharacteriser_r )
 {
-	LOG_CHR_FULL(("%04x Characteriser read offset %02X,data %02X", space.device().safe_pcbase(),offset,m_current_chr_table[m_prot_col].response));
+	LOG_CHR_FULL(("%04x Characteriser read offset %02X,data %02X", m_videocpu->pcbase(),offset,m_current_chr_table[m_prot_col].response));
 	LOG_CHR(("Characteriser read offset %02X \n",offset));
 	LOG_CHR(("Characteriser read data %02X \n",m_current_chr_table[m_prot_col].response));
 
 	if (!m_current_chr_table)
 	{
-		logerror("No Characteriser Table @ %04x\n", space.device().safe_pcbase());
+		logerror("No Characteriser Table @ %04x\n", m_videocpu->pcbase());
 		return 0x00;
 	}
 

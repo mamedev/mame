@@ -29,7 +29,7 @@ INTERRUPT_GEN_MEMBER(surpratk_state::surpratk_interrupt)
 WRITE8_MEMBER(surpratk_state::surpratk_videobank_w)
 {
 	if (data & 0xf8)
-		logerror("%04x: videobank = %02x\n",space.device().safe_pc(),data);
+		logerror("%04x: videobank = %02x\n",m_maincpu->pc(),data);
 
 	/* bit 0 = select 053245 at 0000-07ff */
 	/* bit 1 = select palette at 0000-07ff */
@@ -43,7 +43,7 @@ WRITE8_MEMBER(surpratk_state::surpratk_videobank_w)
 WRITE8_MEMBER(surpratk_state::surpratk_5fc0_w)
 {
 	if ((data & 0xf4) != 0x10)
-		logerror("%04x: 3fc0 = %02x\n",space.device().safe_pc(),data);
+		logerror("%04x: 3fc0 = %02x\n",m_maincpu->pc(),data);
 
 	/* bit 0/1 = coin counters */
 	machine().bookkeeping().coin_counter_w(0, data & 0x01);
