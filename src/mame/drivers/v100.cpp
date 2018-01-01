@@ -24,17 +24,21 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_brg(*this, "brg")
 		, m_earom(*this, "earom")
+		, m_picu(*this, "picu")
 		, m_p_chargen(*this, "chargen")
 	{ }
 
 	DECLARE_WRITE8_MEMBER(brg_w);
 	DECLARE_READ8_MEMBER(earom_r);
+	DECLARE_WRITE8_MEMBER(picu_w);
+	IRQ_CALLBACK_MEMBER(irq_ack);
 	DECLARE_WRITE8_MEMBER(ppi_porta_w);
 
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<com8116_device> m_brg;
 	required_device<er1400_device> m_earom;
+	required_device<i8214_device> m_picu;
 	required_region_ptr<u8> m_p_chargen;
 };
 
@@ -47,6 +51,18 @@ WRITE8_MEMBER(v100_state::brg_w)
 READ8_MEMBER(v100_state::earom_r)
 {
 	return m_earom->data_r();
+}
+
+WRITE8_MEMBER(v100_state::picu_w)
+{
+	m_picu->b_w((data & 0x0e) >> 1);
+	m_picu->sgs_w(BIT(data, 4));
+}
+
+IRQ_CALLBACK_MEMBER(v100_state::irq_ack)
+{
+	m_maincpu->set_input_line(0, CLEAR_LINE);
+	return (m_picu->a_r() << 1) | 0xf0;
 }
 
 WRITE8_MEMBER(v100_state::ppi_porta_w)
@@ -71,7 +87,7 @@ static ADDRESS_MAP_START( io_map, AS_IO, 8, v100_state )
 	// 0x30 - write ???
 	AM_RANGE(0x40, 0x40) AM_NOP // read/write ???
 	// 0x48 - write ???
-	// 0x60 - write ???
+	AM_RANGE(0x60, 0x60) AM_WRITE(picu_w)
 	AM_RANGE(0x70, 0x73) AM_DEVREADWRITE("ppi", i8255_device, read, write)
 ADDRESS_MAP_END
 
@@ -84,6 +100,7 @@ static MACHINE_CONFIG_START( v100 )
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_47_736MHz / 12) // divider not verified
 	MCFG_CPU_PROGRAM_MAP(mem_map)
 	MCFG_CPU_IO_MAP(io_map)
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(v100_state, irq_ack)
 
 	MCFG_DEVICE_ADD("usart", I8251, XTAL_47_736MHz / 12) // divider not verified
 
@@ -94,6 +111,7 @@ static MACHINE_CONFIG_START( v100 )
 	//MCFG_DEVICE_ADD("vtac", CRT5037, XTAL_47_736MHz / 12) // divider not verified
 
 	MCFG_DEVICE_ADD("picu", I8214, XTAL_47_736MHz / 12)
+	MCFG_I8214_INT_CALLBACK(ASSERTLINE("maincpu", 0))
 
 	MCFG_DEVICE_ADD("ppi", I8255, 0)
 	MCFG_I8255_OUT_PORTA_CB(WRITE8(v100_state, ppi_porta_w))
