@@ -158,7 +158,10 @@ void pgm2_state::draw_sprites(screen_device &screen, const rectangle &cliprect, 
 			int pal =   (spriteram[i + 0] & 0x0fc00000) >> 22;
 			int pri =   (spriteram[i + 0] & 0x80000000) >> 31;
 
-			int unk0 =  (spriteram[i + 0] & 0x70000000) >> 0;
+			int unk0 =  (spriteram[i + 0] & 0x30000000) >> 0;
+			int disable = (spriteram[i + 0] & 0x40000000) >> 30; // kov3 uses this in places (eg. horsemen special move heads) when it can only possibly mean 'disable' also used in places on kov2nl and orleg2, often the 'power up' effects - verify it is disable there too
+
+			if (disable) continue;
 
 			int sizex = (spriteram[i + 1] & 0x0000003f) >> 0;
 			int sizey = (spriteram[i + 1] & 0x00007fc0) >> 6;
@@ -172,7 +175,6 @@ void pgm2_state::draw_sprites(screen_device &screen, const rectangle &cliprect, 
 
 			if (unk0 || unk1)
 			{
-				// unk0 & 0x40000000 set during gameplay on kov2nl, why? more pri bits?
 				//popmessage("sprite rendering unused bits set unk0 %08x unk1 %08x\n", unk0, unk1);
 			}
 
