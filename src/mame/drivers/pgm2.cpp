@@ -494,6 +494,7 @@ static ADDRESS_MAP_START( pgm2_map, AS_PROGRAM, 32, pgm2_state )
 	AM_RANGE(0x40000000, 0x40000003) AM_DEVREADWRITE8("ymz774", ymz774_device, read, write, 0xffffffff)
 
 	// internal IGS036 - most of them is standard ATMEL peripherals followed by custom bits
+	// AM_RANGE(0xfffa0000, 0xfffa00ff) TC (Timer Counter) not used, mentioned in disabled / unused code
 	// AM_RANGE(0xffffec00, 0xffffec7f) SMC (Static Memory Controller)
 	// AM_RANGE(0xffffee00, 0xffffee57) MATRIX (Bus Matrix)
 	AM_RANGE(0xfffff000, 0xfffff14b) AM_DEVICE("arm_aic", arm_aic_device, regs_map)
@@ -778,8 +779,8 @@ MACHINE_CONFIG_END
 	ROM_LOAD32_WORD( "ig-a_bmh.u16",     0x00000002, 0x1000000, CRC(fbf411c8) SHA1(5089b5cc9bbf6496ef1367c6255e63e9ab895117) ) \
 	\
 	ROM_REGION( 0x4000000, "sprites_colour", 0 ) /* sprite colour data (6bpp data, 2 bits unused except for 4 bytes that are randomly 0xff - check dump?) */ \
-	ROM_LOAD32_WORD( "ig-a_cgl.u18",     0x00000000, 0x2000000, BAD_DUMP CRC(43501fa6) SHA1(58ccce6d393964b771fec3f5c583e3ede57482a3) ) \
-	ROM_LOAD32_WORD( "ig-a_cgh.u26",     0x00000002, 0x2000000, BAD_DUMP CRC(7051d020) SHA1(3d9b24c6fda4c9699bb9f00742e0888059b623e1) ) \
+	ROM_LOAD32_WORD( "ig-a_cgl.u18",     0x00000000, 0x2000000, CRC(43501fa6) SHA1(58ccce6d393964b771fec3f5c583e3ede57482a3) ) \
+	ROM_LOAD32_WORD( "ig-a_cgh.u26",     0x00000002, 0x2000000, CRC(7051d020) SHA1(3d9b24c6fda4c9699bb9f00742e0888059b623e1) ) \
 	\
 	ROM_REGION( 0x1000000, "ymz774", ROMREGION_ERASEFF ) /* ymz774 */ \
 	ROM_LOAD16_WORD_SWAP( "ig-a_sp.u2",  0x00000000, 0x1000000, CRC(8250688c) SHA1(d2488477afc528aeee96826065deba2bce4f0a7d) ) \
