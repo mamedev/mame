@@ -114,8 +114,8 @@ private:
 
 	void skip_sprite_chunk(int &palette_offset, uint32_t maskdata, int reverse);
 	void draw_sprite_pixel(const rectangle &cliprect, int palette_offset, int realx, int realy, int pal);
-	void draw_sprite_chunk(const rectangle &cliprect, int &palette_offset, int x, int realy, int sizex, int xdraw, int pal, uint32_t maskdata, uint32_t zoomx_bits, int growx, int &realxdraw, int realdraw_inc, int palette_inc);
-	void draw_sprite_line(const rectangle &cliprect, int &mask_offset, int &palette_offset, int x, int realy, int flipx, int reverse, int sizex, int pal, int zoomybit, int zoomx_bits, int growx);
+	void draw_sprite_chunk(const rectangle &cliprect, int &palette_offset, int x, int realy, int sizex, int xdraw, int pal, uint32_t maskdata, uint32_t zoomx_bits, int repeats, int &realxdraw, int realdraw_inc, int palette_inc);
+	void draw_sprite_line(const rectangle &cliprect, int &mask_offset, int &palette_offset, int x, int realy, int flipx, int reverse, int sizex, int pal, int zoomybit, int zoomx_bits, int xrepeats);
 	void draw_sprites(screen_device &screen, const rectangle &cliprect, uint32_t* spriteram);
 	void copy_sprites_from_bitmap(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int pri);
 
