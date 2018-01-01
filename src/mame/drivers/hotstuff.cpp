@@ -5,6 +5,7 @@
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "machine/mc146818.h"
+#include "machine/z80scc.h"
 #include "screen.h"
 
 
@@ -76,6 +77,8 @@ static ADDRESS_MAP_START( hotstuff_map, AS_PROGRAM, 16, hotstuff_state )
 
 	AM_RANGE(0x400000, 0x40ffff) AM_RAM
 
+	AM_RANGE(0x600000, 0x600003) AM_DEVREADWRITE8("scc1", z80scc_device, ba_cd_inv_r, ba_cd_inv_w, 0xffff)
+	AM_RANGE(0x620000, 0x620003) AM_DEVREADWRITE8("scc2", z80scc_device, ba_cd_inv_r, ba_cd_inv_w, 0xffff)
 	AM_RANGE(0x680000, 0x680001) AM_DEVREADWRITE8_MOD("rtc", mc146818_device, read, write, xor<1>, 0xffff)
 
 	AM_RANGE(0x980000, 0x9bffff) AM_RAM AM_SHARE("bitmapram")
@@ -97,6 +100,12 @@ static MACHINE_CONFIG_START( hotstuff )
 	MCFG_SCREEN_UPDATE_DRIVER(hotstuff_state, screen_update_hotstuff)
 
 	MCFG_PALETTE_ADD("palette", 0x200)
+
+	MCFG_DEVICE_ADD("scc1", SCC8530N, 4915200)
+	MCFG_Z80SCC_OUT_INT_CB(INPUTLINE("maincpu", M68K_IRQ_4))
+
+	MCFG_DEVICE_ADD("scc2", SCC8530N, 4915200)
+	MCFG_Z80SCC_OUT_INT_CB(INPUTLINE("maincpu", M68K_IRQ_5))
 
 	MCFG_DEVICE_ADD("rtc", MC146818, XTAL_32_768kHz)
 	MCFG_MC146818_IRQ_HANDLER(INPUTLINE("maincpu", M68K_IRQ_1))
