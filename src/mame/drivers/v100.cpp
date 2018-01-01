@@ -35,12 +35,20 @@ public:
 	DECLARE_WRITE8_MEMBER(ppi_porta_w);
 
 private:
+	virtual void machine_start() override;
+
 	required_device<cpu_device> m_maincpu;
 	required_device<com8116_device> m_brg;
 	required_device<er1400_device> m_earom;
 	required_device<i8214_device> m_picu;
 	required_region_ptr<u8> m_p_chargen;
 };
+
+void v100_state::machine_start()
+{
+	m_picu->inte_w(1);
+	m_picu->etlg_w(1);
+}
 
 WRITE8_MEMBER(v100_state::brg_w)
 {
