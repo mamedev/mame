@@ -418,7 +418,7 @@ void ibm8514a_device::device_config_complete()
 {
 	if(m_vga_tag.length() != 0)
 	{
-		m_vga = machine().device<vga_device>(m_vga_tag.c_str());
+		m_vga = machine().device<svga_device>(m_vga_tag.c_str());
 	}
 }
 
@@ -1077,6 +1077,22 @@ uint8_t svga_device::pc_vga_choosevideomode()
 	return SCREEN_OFF;
 }
 
+uint8_t svga_device::get_video_depth()
+{
+	switch(pc_vga_choosevideomode())
+	{
+		case VGA_MODE:
+		case RGB8_MODE:
+			return 8;
+		case RGB15_MODE:
+		case RGB16_MODE:
+			return 16;
+		case RGB24_MODE:
+		case RGB32_MODE:
+			return 32;
+	}
+	return 0;
+}
 
 uint32_t vga_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
@@ -2703,6 +2719,8 @@ uint8_t s3_vga_device::s3_crtc_reg_read(uint8_t index)
 				break;
 			case 0x45:
 				res = s3.cursor_mode;
+				s3.cursor_fg_ptr = 0;
+				s3.cursor_bg_ptr = 0;
 				break;
 			case 0x46:
 				res = (s3.cursor_x & 0xff00) >> 8;
@@ -2717,12 +2735,12 @@ uint8_t s3_vga_device::s3_crtc_reg_read(uint8_t index)
 				res = s3.cursor_y & 0x00ff;
 				break;
 			case 0x4a:
-				res = s3.cursor_fg[s3.cursor_fg_ptr];
-				s3.cursor_fg_ptr = 0;
+				res = s3.cursor_fg[s3.cursor_fg_ptr++];
+				s3.cursor_fg_ptr %= 4;
 				break;
 			case 0x4b:
-				res = s3.cursor_bg[s3.cursor_bg_ptr];
-				s3.cursor_bg_ptr = 0;
+				res = s3.cursor_bg[s3.cursor_bg_ptr++];
+				s3.cursor_bg_ptr %= 4;
 				break;
 			case 0x4c:
 				res = (s3.cursor_start_addr & 0xff00) >> 8;
@@ -2973,9 +2991,11 @@ bit  0-9  (911,924) HCS_STADR. Hardware Graphics Cursor Storage Start Address
  */
 			case 0x4c:
 				s3.cursor_start_addr = (s3.cursor_start_addr & 0x00ff) | (data << 8);
+				popmessage("HW Cursor Data Address %04x\n",s3.cursor_start_addr);
 				break;
 			case 0x4d:
 				s3.cursor_start_addr = (s3.cursor_start_addr & 0xff00) | data;
+				popmessage("HW Cursor Data Address %04x\n",s3.cursor_start_addr);
 				break;
 /*
 3d4h index 4Eh (R/W):  CR4E HGC Pattern Disp Start X-Pixel Position
@@ -5276,16 +5296,20 @@ READ8_MEMBER(ati_vga_device::ati_port_ext_r)
 		switch(ati.ext_reg_select)
 		{
 		case 0x20:
-			ret = 0x10;  // 512kB memory
+			ret = 0x10;  // 16-bit ROM access
+			logerror("ATI20 read\n");
 			break;
 		case 0x28:  // Vertical line counter (high)
 			ret = (machine().first_screen()->vpos() >> 8) & 0x03;
+			logerror("ATI28 (vertical line high) read\n");
 			break;
 		case 0x29:  // Vertical line counter (low)
 			ret = machine().first_screen()->vpos() & 0xff;  // correct?
+			logerror("ATI29 (vertical line low) read\n");
 			break;
 		case 0x2a:
-			ret = ati.vga_chip_id;  // Chip revision (6 for the 28800-6, 5 for the 28800-5)
+			ret = ati.vga_chip_id;  // Chip revision (6 for the 28800-6, 5 for the 28800-5) This register is not listed in ATI's mach32 docs
+			logerror("ATI2A (VGA ID) read\n");
 			break;
 		case 0x37:
 			{
@@ -5297,6 +5321,7 @@ READ8_MEMBER(ati_vga_device::ati_port_ext_r)
 		case 0x3d:
 			ret = ati.ext_reg[ati.ext_reg_select] & 0x0f;
 			ret |= 0x10;  // EGA DIP switch emulation
+			logerror("ATI3D (EGA DIP emulation) read\n");
 			break;
 		default:
 			ret = ati.ext_reg[ati.ext_reg_select];
@@ -5321,7 +5346,16 @@ WRITE8_MEMBER(ati_vga_device::ati_port_ext_w)
 		case 0x23:
 			vga.crtc.start_addr_latch = (vga.crtc.start_addr_latch & 0xfffdffff) | ((data & 0x10) << 13);
 			vga.crtc.cursor_addr = (vga.crtc.cursor_addr & 0xfffdffff) | ((data & 0x08) << 14);
+			ati.ext_reg[ati.ext_reg_select] = data & 0x1f;
 			logerror("ATI: ATI23 write %02x\n",data);
+			break;
+		case 0x26:
+			ati.ext_reg[ati.ext_reg_select] = data & 0xc9;
+			logerror("ATI: ATI26 write %02x\n",data);
+			break;
+		case 0x2b:
+			ati.ext_reg[ati.ext_reg_select] = data & 0xdf;
+			logerror("ATI: ATI2B write %02x\n",data);
 			break;
 		case 0x2d:
 			if(data & 0x08)
@@ -5335,7 +5369,12 @@ WRITE8_MEMBER(ati_vga_device::ati_port_ext_w)
 		case 0x30:
 			vga.crtc.start_addr_latch = (vga.crtc.start_addr_latch & 0xfffeffff) | ((data & 0x40) << 10);
 			vga.crtc.cursor_addr = (vga.crtc.cursor_addr & 0xfffeffff) | ((data & 0x04) << 14);
+			ati.ext_reg[ati.ext_reg_select] = data & 0x7d;
 			logerror("ATI: ATI30 write %02x\n",data);
+			break;
+		case 0x31:
+			ati.ext_reg[ati.ext_reg_select] = data & 0x7f;
+			logerror("ATI: ATI31 write %02x\n",data);
 			break;
 		case 0x32:  // memory page select
 			if(ati.ext_reg[0x3e] & 0x08)
@@ -5351,6 +5390,7 @@ WRITE8_MEMBER(ati_vga_device::ati_port_ext_w)
 			//logerror("ATI: Memory Page Select write %02x (read: %i write %i)\n",data,svga.bank_r,svga.bank_w);
 			break;
 		case 0x33:  // EEPROM
+			ati.ext_reg[ati.ext_reg_select] = data & 0xef;
 			if(data & 0x04)
 			{
 				eeprom_serial_93cxx_device* eep = subdevice<eeprom_serial_93cxx_device>("ati_eeprom");
@@ -5363,6 +5403,34 @@ WRITE8_MEMBER(ati_vga_device::ati_port_ext_w)
 			}
 			else
 				logerror("ATI: ATI33 write %02x\n",data);
+			break;
+		case 0x38:
+			ati.ext_reg[ati.ext_reg_select] = data & 0xef;
+			logerror("ATI: ATI38 write %02x\n",data);
+			break;
+		case 0x39:
+			ati.ext_reg[ati.ext_reg_select] = data & 0xfe;
+			logerror("ATI: ATI39 write %02x\n",data);
+			break;
+		case 0x3a:  // General purpose read-write bits
+			ati.ext_reg[ati.ext_reg_select] = data & 0x07;
+			logerror("ATI: ATI3A write %02x\n",data);
+			break;
+		case 0x3c:  // Reserved, should be 0
+			ati.ext_reg[ati.ext_reg_select] = 0;
+			logerror("ATI: ATI3C write %02x\n",data);
+			break;
+		case 0x3d:
+			ati.ext_reg[ati.ext_reg_select] = data & 0xfd;
+			logerror("ATI: ATI3D write %02x\n",data);
+			break;
+		case 0x3e:
+			ati.ext_reg[ati.ext_reg_select] = data & 0x1f;
+			logerror("ATI: ATI3E write %02x\n",data);
+			break;
+		case 0x3f:
+			ati.ext_reg[ati.ext_reg_select] = data & 0x0f;
+			logerror("ATI: ATI3F write %02x\n",data);
 			break;
 		default:
 			logerror("ATI: Extended VGA register 0x01CE index %02x write %02x\n",ati.ext_reg_select,data);
@@ -5385,14 +5453,44 @@ bit     0  SENSE is the result of a wired-OR of 3 comparators, one
            This bit toggles every time a HSYNC pulse starts
      3-15  Reserved(0)
  */
-READ16_MEMBER(ibm8514a_device::ibm8514_status_r)
+READ8_MEMBER(ibm8514a_device::ibm8514_status_r)
 {
-	return m_vga->vga_vblank() << 1;
+	switch(offset)
+	{
+		case 0:
+			return m_vga->vga_vblank() << 1;
+		case 2:
+			return m_vga->port_03c0_r(space,6,mem_mask);
+		case 3:
+			return m_vga->port_03c0_r(space,7,mem_mask);
+		case 4:
+			return m_vga->port_03c0_r(space,8,mem_mask);
+		case 5:
+			return m_vga->port_03c0_r(space,9,mem_mask);
+	}
+	return 0;
 }
 
-WRITE16_MEMBER(ibm8514a_device::ibm8514_htotal_w)
+WRITE8_MEMBER(ibm8514a_device::ibm8514_htotal_w)
 {
-	ibm8514.htotal = data & 0x01ff;
+	switch(offset)
+	{
+		case 0:
+			ibm8514.htotal = data & 0xff;
+			break;
+		case 2:
+			m_vga->port_03c0_w(space,6,data,mem_mask);
+			break;
+		case 3:
+			m_vga->port_03c0_w(space,7,data,mem_mask);
+			break;
+		case 4:
+			m_vga->port_03c0_w(space,8,data,mem_mask);
+			break;
+		case 5:
+			m_vga->port_03c0_w(space,9,data,mem_mask);
+			break;
+	}
 	//vga.crtc.horz_total = data & 0x01ff;
 	if(LOG_8514) logerror("8514/A: Horizontal total write %04x\n",data);
 }
@@ -5546,7 +5644,7 @@ WRITE16_MEMBER(mach8_device::mach8_ec3_w)
 
 READ16_MEMBER(mach8_device::mach8_ext_fifo_r)
 {
-	return 0x00;  // for now, report all FIFO slots at free
+	return 0x00;  // for now, report all FIFO slots as free
 }
 
 WRITE16_MEMBER(mach8_device::mach8_linedraw_index_w)
@@ -5606,12 +5704,12 @@ WRITE16_MEMBER(mach8_device::mach8_linedraw_w)
 
 READ16_MEMBER(mach8_device::mach8_sourcex_r)
 {
-	return ibm8514.dest_x;
+	return ibm8514.dest_x & 0x07ff;
 }
 
 READ16_MEMBER(mach8_device::mach8_sourcey_r)
 {
-	return ibm8514.dest_y;
+	return ibm8514.dest_y & 0x07ff;
 }
 
 WRITE16_MEMBER(mach8_device::mach8_ext_leftscissor_w)

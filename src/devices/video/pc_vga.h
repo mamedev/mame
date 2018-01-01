@@ -248,6 +248,7 @@ class svga_device :  public vga_device
 public:
 	virtual void zero() override;
 	virtual uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect) override;
+	uint8_t get_video_depth();
 
 protected:
 	// construction/destruction
@@ -280,7 +281,7 @@ public:
 	ibm8514a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	void set_vga(const char* tag) { m_vga_tag.assign(tag); }
-	void set_vga_owner() { m_vga = dynamic_cast<vga_device*>(owner()); }
+	void set_vga_owner() { m_vga = dynamic_cast<svga_device*>(owner()); }
 
 	void enabled();
 
@@ -288,8 +289,8 @@ public:
 	WRITE16_MEMBER(ibm8514_cmd_w);
 	READ16_MEMBER(ibm8514_line_error_r);
 	WRITE16_MEMBER(ibm8514_line_error_w);
-	READ16_MEMBER(ibm8514_status_r);
-	WRITE16_MEMBER(ibm8514_htotal_w);
+	READ8_MEMBER(ibm8514_status_r);
+	WRITE8_MEMBER(ibm8514_htotal_w);
 	READ16_MEMBER(ibm8514_substatus_r);
 	WRITE16_MEMBER(ibm8514_subcontrol_w);
 	READ16_MEMBER(ibm8514_subcontrol_r);
@@ -387,7 +388,7 @@ protected:
 
 	virtual void device_start() override;
 	virtual void device_config_complete() override;
-	vga_device* m_vga;  // for pass-through
+	svga_device* m_vga;  // for pass-through
 	std::string m_vga_tag;  // pass-through device tag
 private:
 	void ibm8514_draw_vector(uint8_t len, uint8_t dir, bool draw);
@@ -540,15 +541,15 @@ protected:
 
 	virtual void device_start() override;
 	virtual void device_add_mconfig(machine_config &config) override;
-
-private:
-	void ati_define_video_mode();
 	struct
 	{
 		uint8_t ext_reg[64];
 		uint8_t ext_reg_select;
 		uint8_t vga_chip_id;
 	} ati;
+
+private:
+	void ati_define_video_mode();
 	mach8_device* m_8514;
 };
 
