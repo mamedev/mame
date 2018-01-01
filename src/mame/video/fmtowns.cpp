@@ -268,9 +268,9 @@ READ8_MEMBER( towns_state::towns_video_cff80_r )
 				return 0x00;
 		case 0x06:
 			if(m_video.towns_vblank_flag != 0)
-				return 0x10;
+				return 0x14;
 			else
-				return 0x00;
+				return 0x10;
 		case 0x16:  // Kanji character data
 			return ROM[(m_video.towns_kanji_offset << 1) + 0x180000];
 		case 0x17:  // Kanji character data
