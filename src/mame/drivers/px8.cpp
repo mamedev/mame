@@ -557,21 +557,6 @@ static ADDRESS_MAP_START( px8_slave_io, AS_IO, 8, px8_state )
 	AM_RANGE(M6801_PORT4, M6801_PORT4)
 ADDRESS_MAP_END
 
-/*-------------------------------------------------
-    ADDRESS_MAP( px8_sub_io )
--------------------------------------------------*/
-#ifdef UNUSED_CODE
-static ADDRESS_MAP_START( px8_sub_io, AS_IO, 8, px8_state )
-//  AM_RANGE(0x00, 0x00) AM_READWRITE()
-	AM_RANGE(0x01, 0x01) AM_READ(krtn_0_3_r)
-//  AM_RANGE(0x02, 0x02) AM_WRITE()
-	AM_RANGE(0x03, 0x03) AM_WRITE(ksc_w)
-//  AM_RANGE(0x04, 0x04) AM_WRITE()
-	AM_RANGE(0x05, 0x05) AM_READ(krtn_4_7_r)
-//  AM_RANGE(0x06, 0x06) AM_READ()
-//  AM_RANGE(0x07, 0x07) AM_WRITE()
-ADDRESS_MAP_END
-#endif
 /***************************************************************************
     INPUT PORTS
 ***************************************************************************/

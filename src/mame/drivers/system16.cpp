@@ -525,27 +525,6 @@ void segas1x_bootleg_state::set_bg_page( int data )
 	m_bg_page[3] = data & 0x0f;
 }
 
-#ifdef UNUSED_CODE
-static ADDRESS_MAP_START( bayroute_map, AS_PROGRAM, 16, segas1x_bootleg_state )
-	AM_RANGE(0x000000, 0x0bffff) AM_ROM
-	AM_RANGE(0x100000, 0x100003) AM_WRITENOP // tilebank control?
-	AM_RANGE(0x500000, 0x503fff) AM_RAM // work ram
-	AM_RANGE(0x600000, 0x600fff) AM_RAM AM_SHARE("sprites")
-	AM_RANGE(0x700000, 0x70ffff) AM_RAM_WRITE(sys16_tileram_w) AM_SHARE("tileram")
-	AM_RANGE(0x710000, 0x710fff) AM_RAM_WRITE(sys16_textram_w) AM_SHARE("textram")
-	AM_RANGE(0x800000, 0x800fff) AM_RAM_WRITE(paletteram_w) AM_SHARE("paletteram")
-	AM_RANGE(0x900000, 0x900001) AM_WRITE(sys16_coinctrl_w)
-	AM_RANGE(0x901002, 0x901003) AM_READ_PORT("P1")
-	AM_RANGE(0x901006, 0x901007) AM_READ_PORT("P2")
-	AM_RANGE(0x901000, 0x901001) AM_READ_PORT("SERVICE")
-	AM_RANGE(0x902002, 0x902003) AM_READ_PORT("DSW1")
-	AM_RANGE(0x902000, 0x902001) AM_READ_PORT("DSW2")
-	AM_RANGE(0xff0006, 0xff0007) AM_WRITE(sound_command_irq_w)
-	AM_RANGE(0xff0020, 0xff003f) AM_WRITENOP // config regs
-ADDRESS_MAP_END
-#endif
-
-
 
 /***************************************************************************/
 
