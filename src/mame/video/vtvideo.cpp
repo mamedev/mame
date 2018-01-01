@@ -356,7 +356,8 @@ void vt100_video_device::display_char(bitmap_ind16 &bitmap, uint8_t code, int x,
 	int char_lines = m_linedoubler ? 20 : 10;
 	for (int i = 0; i < char_lines; i++)
 	{
-		int yy = y * 10 + i;
+		int yy = y * char_lines + i;
+		assert(yy < bitmap.height());
 
 		switch (display_type)
 		{
@@ -429,15 +430,19 @@ void vt100_video_device::video_update(bitmap_ind16 &bitmap, const rectangle &cli
 		return;
 
 	int vert_charlines_MAX = m_height;
+	int fill_lines = m_fill_lines;
 	if (m_linedoubler)
+	{
 		vert_charlines_MAX *= 2;
+		fill_lines *= 2;
+	}
 	while (line < vert_charlines_MAX)
 	{
 		code = m_read_ram(addr + xpos);
 		if (code == 0x7f)
 		{
 			// end of line, fill empty till end of line
-			if (line >= m_fill_lines)
+			if (line >= fill_lines)
 			{
 				for (x = xpos; x < ((display_type == 2) ? (m_columns / 2) : m_columns); x++)
 				{
@@ -451,19 +456,17 @@ void vt100_video_device::video_update(bitmap_ind16 &bitmap, const rectangle &cli
 			if (addr & 0x1000) addr &= 0xfff; else addr |= 0x2000;
 			scroll_region = (temp >> 15) & 1;
 			display_type = (temp >> 13) & 3;
-			if (line >= m_fill_lines)
-			{
+			if (line >= fill_lines)
 				ypos++;
-				if (m_linedoubler)
-					ypos++;
-			}
 			xpos = 0;
 			line++;
+			if (m_linedoubler)
+				line++;
 		}
 		else
 		{
 			// display regular char
-			if (line >= m_fill_lines)
+			if (line >= fill_lines)
 			{
 				display_char(bitmap, code, xpos, ypos, scroll_region, display_type);
 			}
