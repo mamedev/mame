@@ -3738,16 +3738,20 @@ ROM_END
 
 /* Jolly Card Italian bootleg...
 
+   This PCB has a TI EP910DC-30 CPLD,
+   like others italian bootlegs that
+   have an Altera EP910PC CPLD on board.
+
    To init NVRAM, DSW must be:
    OFF ON ON ON ON ON ON ON
 
    Then (SERVICE1 + SERVICE2) and reset,
    then another reset.
 
-   Once NVRAM is initialized, the hardware gives errors about it. Need to be analyzed.
+   Once NVRAM is initialized, the hardware still complains about it. Need to be analyzed.
 */
 ROM_START( jolycdig )
-	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )  // TI EP910DC-30 CPLD (DIP-40 Ceramic)
 	ROM_LOAD( "3__27c256.bin", 0x8000, 0x8000, CRC(e939ed2a) SHA1(a413623499971517569bcf97860caad65ff5535f) )
 
 	ROM_REGION( 0x10000, "gfx1", 0 )
