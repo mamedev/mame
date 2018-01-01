@@ -50,7 +50,7 @@ const char glsl_bicubic_rgb32_dir_fsh_src[] =
 "    vec2 pos3 = xy + 2.0*one.xy;\n"
 "\n"
 "    // Finally - take the samples, multiply by weight, and sum\n"
-"    vec4 col = 0.0;\n"
+"    vec4 col = vec4(0.0);\n"
 "    col += TEX2D(vec2(pos0.x, pos0.y)) *  w0.x * w0.y;\n"
 "    col += TEX2D(vec2(pos1.x, pos0.y)) *  w1.x * w0.y;\n"
 "    col += TEX2D(vec2(pos2.x, pos0.y)) *  w2.x * w0.y;\n"

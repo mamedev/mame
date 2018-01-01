@@ -49,7 +49,7 @@ void main()
     vec2 pos3 = xy + 2.0*one.xy;
 
     // Finally - take the samples, multiply by weight, and sum
-    vec4 col = 0.0;
+    vec4 col = vec4(0.0);
     col += TEX2D(vec2(pos0.x, pos0.y)) *  w0.x * w0.y;
     col += TEX2D(vec2(pos1.x, pos0.y)) *  w1.x * w0.y;
     col += TEX2D(vec2(pos2.x, pos0.y)) *  w2.x * w0.y;
