@@ -219,14 +219,14 @@ READ8_MEMBER(snesb_state::sb2b_6a6xxx_r)
 		case 0xfb7: return 0x47;
 	}
 
-	logerror("Unknown protection read read %x @ %x\n",offset, space.device().safe_pc());
+	logerror("Unknown protection read read %x @ %x\n",offset, m_maincpu->pc());
 
 	return 0;
 }
 
 READ8_MEMBER(snesb_state::sb2b_7xxx_r)
 {
-	return space.read_byte(0xc07000 + offset);
+	return m_maincpu->space(AS_PROGRAM).read_byte(0xc07000 + offset);
 }
 
 
@@ -243,7 +243,7 @@ READ8_MEMBER(snesb_state::endless_580xxx_r)
 		case 0xe83: return 0x6b;
 	}
 
-	logerror("Unknown protection read read %x @ %x\n",offset, space.device().safe_pc());
+	logerror("Unknown protection read read %x @ %x\n",offset, m_maincpu->pc());
 
 	return 0;
 }

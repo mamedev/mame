@@ -50,7 +50,7 @@ READ8_MEMBER(strnskil_state::pettanp_protection_r)
 {
 	int res;
 
-	switch (space.device().safe_pc())
+	switch (m_maincpu->pc())
 	{
 		case 0x6066:    res = 0xa5; break;
 		case 0x60dc:    res = 0x20; break;  /* bits 0-3 unknown */
@@ -61,7 +61,7 @@ READ8_MEMBER(strnskil_state::pettanp_protection_r)
 		default:        res = 0xff; break;
 	}
 
-	logerror("%04x: protection_r -> %02x\n",space.device().safe_pc(),res);
+	logerror("%04x: protection_r -> %02x\n",m_maincpu->pc(),res);
 	return res;
 }
 
@@ -69,7 +69,7 @@ READ8_MEMBER(strnskil_state::banbam_protection_r)
 {
 	int res;
 
-	switch (space.device().safe_pc())
+	switch (m_maincpu->pc())
 	{
 		case 0x6094:    res = 0xa5; break;
 		case 0x6118:    res = 0x20; break;  /* bits 0-3 unknown */
@@ -80,13 +80,13 @@ READ8_MEMBER(strnskil_state::banbam_protection_r)
 		default:        res = 0xff; break;
 	}
 
-	logerror("%04x: protection_r -> %02x\n",space.device().safe_pc(),res);
+	logerror("%04x: protection_r -> %02x\n",m_maincpu->pc(),res);
 	return res;
 }
 
 WRITE8_MEMBER(strnskil_state::protection_w)
 {
-	logerror("%04x: protection_w %02x\n",space.device().safe_pc(),data);
+	logerror("%04x: protection_w %02x\n",m_maincpu->pc(),data);
 }
 
 /****************************************************************************/

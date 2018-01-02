@@ -251,7 +251,7 @@ WRITE16_MEMBER(taitoair_state::dspram_w)
 READ16_MEMBER(taitoair_state::dsp_HOLD_signal_r)
 {
 	/* HOLD signal is active low */
-	//  logerror("TMS32025:%04x Reading %01x level from HOLD signal\n", space.device().safe_pcbase(), m_dsp_hold_signal);
+	//  logerror("TMS32025:%04x Reading %01x level from HOLD signal\n", m_dsp->pcbase(), m_dsp_hold_signal);
 
 	return m_dsp_hold_signal;
 }
@@ -259,7 +259,7 @@ READ16_MEMBER(taitoair_state::dsp_HOLD_signal_r)
 WRITE16_MEMBER(taitoair_state::dsp_HOLDA_signal_w)
 {
 	if (offset)
-		logerror("TMS32025:%04x Writing %01x level to HOLD-Acknowledge signal\n", space.device().safe_pcbase(), data);
+		logerror("TMS32025:%04x Writing %01x level to HOLD-Acknowledge signal\n", m_dsp->pcbase(), data);
 }
 
 

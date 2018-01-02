@@ -1085,7 +1085,7 @@ DRIVER_INIT_MEMBER(splash_state,rebus)
 
 READ16_MEMBER(funystrp_state::protection_r)
 {
-	int pc = space.device().safe_pc();
+	int pc = m_maincpu->pc();
 
 	int ofst = offset+(0x100000/2);
 
@@ -1368,7 +1368,7 @@ WRITE16_MEMBER(funystrp_state::protection_w)
 {
 	int ofst = (0x100000/2)+offset;
 
-//  logerror ("PROTW: %5.5x, %4.4x, PC: %5.5x m: %4.4x\n", ofst*2, data, space.device().safe_pc(), mem_mask);
+//  logerror ("PROTW: %5.5x, %4.4x, PC: %5.5x m: %4.4x\n", ofst*2, data, m_maincpu->pc(), mem_mask);
 
 //  if (ACCESSING_BITS_0_7) // ??
 	{

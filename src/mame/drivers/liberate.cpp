@@ -68,7 +68,7 @@ READ8_MEMBER(liberate_state::deco16_io_r)
 	if (offset == 3) return ioport("DSW1")->read(); /* Dip 1 */
 	if (offset == 4) return ioport("DSW2")->read(); /* Dip 2 */
 
-	logerror("%04x:  Read input %d\n", space.device().safe_pc(), offset);
+	logerror("%04x:  Read input %d\n", m_maincpu->pc(), offset);
 	return 0xff;
 }
 

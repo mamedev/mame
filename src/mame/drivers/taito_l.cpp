@@ -425,14 +425,6 @@ READ8_MEMBER(taitol_state::mcu_control_r)
 	return 0x1;
 }
 
-#if 0
-WRITE8_MEMBER(taitol_state::sound_w)
-{
-	logerror("Sound_w %02x (%04x)\n", data, space.device().safe_pc());
-}
-#endif
-
-
 WRITE_LINE_MEMBER(champwr_state::msm5205_vck)
 {
 	if (m_adpcm_data != -1)

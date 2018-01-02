@@ -704,8 +704,8 @@ READ32_MEMBER(backfire_state::backfire_speedup_r)
 {
 	//osd_printf_debug( "%08x\n",space.device().safe_pc());
 
-	if (space.device() .safe_pc()== 0xce44)  space.device().execute().spin_until_time(attotime::from_usec(400)); // backfire
-	if (space.device().safe_pc() == 0xcee4)  space.device().execute().spin_until_time(attotime::from_usec(400)); // backfirea
+	if (m_maincpu->pc() == 0xce44) m_maincpu->spin_until_time(attotime::from_usec(400)); // backfire
+	if (m_maincpu->pc() == 0xcee4) m_maincpu->spin_until_time(attotime::from_usec(400)); // backfirea
 
 	return m_mainram[0x18/4];
 }

@@ -858,7 +858,7 @@ WRITE32_MEMBER(jaguar_state::gpu_jump_w)
 {
 	/* update the data in memory */
 	COMBINE_DATA(m_gpu_jump_address);
-	logerror("%08X:GPU jump address = %08X\n", space.device().safe_pcbase(), *m_gpu_jump_address);
+	logerror("%08X:GPU jump address = %08X\n", m_gpu->pcbase(), *m_gpu_jump_address);
 
 	/* if the GPU is suspended, release it now */
 	gpu_resume();
@@ -873,7 +873,7 @@ READ32_MEMBER(jaguar_state::gpu_jump_r)
 {
 	/* if the current GPU command is just pointing back to the spin loop, and */
 	/* we're reading it from the spin loop, we can optimize */
-	if (*m_gpu_jump_address == m_gpu_spin_pc && space.device().safe_pcbase() == m_gpu_spin_pc)
+	if (*m_gpu_jump_address == m_gpu_spin_pc && m_gpu->pcbase() == m_gpu_spin_pc)
 	{
 #if ENABLE_SPEEDUP_HACKS
 		/* spin if we're allowed */
@@ -920,7 +920,7 @@ READ32_MEMBER(jaguar_state::cojagr3k_main_speedup_r)
 		/* increment the count; if we hit 5, we can spin until an interrupt comes */
 		if (m_main_speedup_hits++ > 5)
 		{
-			space.device().execute().spin_until_interrupt();
+			m_maincpu->spin_until_interrupt();
 			m_main_speedup_hits = 0;
 		}
 	}
@@ -961,7 +961,7 @@ READ32_MEMBER(jaguar_state::cojagr3k_main_speedup_r)
 READ32_MEMBER(jaguar_state::main_gpu_wait_r)
 {
 	if (m_gpu_command_pending)
-		space.device().execute().spin_until_interrupt();
+		m_maincpu->spin_until_interrupt();
 	return *m_main_gpu_wait;
 }
 
@@ -997,7 +997,7 @@ WRITE32_MEMBER(jaguar_state::area51_main_speedup_w)
 		/* increment the count; if we hit 5, we can spin until an interrupt comes */
 		if (m_main_speedup_hits++ > 5)
 		{
-			space.device().execute().spin_until_interrupt();
+			m_maincpu->spin_until_interrupt();
 			m_main_speedup_hits = 0;
 		}
 	}
@@ -1031,7 +1031,7 @@ WRITE32_MEMBER(jaguar_state::area51mx_main_speedup_w)
 		/* increment the count; if we hit 5, we can spin until an interrupt comes */
 		if (m_main_speedup_hits++ > 10)
 		{
-			space.device().execute().spin_until_interrupt();
+			m_maincpu->spin_until_interrupt();
 			m_main_speedup_hits = 0;
 		}
 	}

@@ -504,7 +504,7 @@ READ32_MEMBER(mjsenpu_state::mjsenpu_speedup_r)
 
 	if (pc == 0xadb8)
 	{
-		space.device().execute().spin_until_interrupt();
+		m_maincpu->spin_until_interrupt();
 	}
 	else
 	{

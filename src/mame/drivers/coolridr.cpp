@@ -3856,7 +3856,7 @@ TODO: both irq routines writes 1 to 0x60d8894, sets up the Watchdog timer then e
 */
 READ32_MEMBER(coolridr_state::coolridr_hack2_r)
 {
-	offs_t pc = downcast<cpu_device *>(&space.device())->pc();
+	offs_t pc = m_maincpu->pc();
 
 	if(pc == 0x6002cba || pc == 0x6002d42)
 		return 0;
@@ -3871,7 +3871,7 @@ READ32_MEMBER(coolridr_state::coolridr_hack2_r)
 
 READ32_MEMBER(coolridr_state::aquastge_hack_r)
 {
-	offs_t pc = downcast<cpu_device *>(&space.device())->pc();
+	offs_t pc = m_maincpu->pc();
 
 	if ((pc == 0x6009e76) || (pc == 0x6009e78))
 		return 0;

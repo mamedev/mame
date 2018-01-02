@@ -956,7 +956,7 @@ READ16_MEMBER(seta2_state::funcube_coins_r)
 	else
 	{
 		if (!(ret & 1))
-			m_funcube_coin_start_cycles = downcast<cpu_device *>(&space.device())->total_cycles();
+			m_funcube_coin_start_cycles = m_sub->total_cycles();
 	}
 
 	return (ret & ~7) | (hopper_bit << 2) | (coin_bit1 << 1) | coin_bit0;

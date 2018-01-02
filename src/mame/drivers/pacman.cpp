@@ -578,7 +578,7 @@ READ8_MEMBER(pacman_state::alibaba_mystery_2_r)
 READ8_MEMBER(pacman_state::maketrax_special_port2_r)
 {
 	int data = ioport("DSW1")->read();
-	int pc = space.device().safe_pcbase();
+	int pc = m_maincpu->pcbase();
 
 	if ((pc == 0x1973) || (pc == 0x2389)) return data | 0x40;
 
@@ -598,7 +598,7 @@ READ8_MEMBER(pacman_state::maketrax_special_port2_r)
 
 READ8_MEMBER(pacman_state::maketrax_special_port3_r)
 {
-	int pc = space.device().safe_pcbase();
+	int pc = m_maincpu->pcbase();
 
 	if (pc == 0x040e) return 0x20;
 
@@ -620,7 +620,7 @@ READ8_MEMBER(pacman_state::maketrax_special_port3_r)
 READ8_MEMBER(pacman_state::korosuke_special_port2_r)
 {
 	int data = ioport("DSW1")->read();
-	int pc = space.device().safe_pcbase();
+	int pc = m_maincpu->pcbase();
 
 	if ((pc == 0x196e) || (pc == 0x2387)) return data | 0x40;
 
@@ -640,7 +640,7 @@ READ8_MEMBER(pacman_state::korosuke_special_port2_r)
 
 READ8_MEMBER(pacman_state::korosuke_special_port3_r)
 {
-	int pc = space.device().safe_pcbase();
+	int pc = m_maincpu->pcbase();
 
 	if (pc == 0x0445) return 0x20;
 
@@ -7195,7 +7195,7 @@ READ8_MEMBER(pacman_state::cannonbp_protection_r)
 	switch (offset)
 	{
 		default:
-			logerror("CPU0 %04x: Unhandled protection read, offset %04x\n", space.device().safe_pc(), offset);
+			logerror("CPU0 %04x: Unhandled protection read, offset %04x\n", m_maincpu->pc(), offset);
 			return 0x00;
 
 		case 0x0000: // unknown
@@ -7218,7 +7218,7 @@ READ8_MEMBER(pacman_state::cannonbp_protection_r)
 			m_cannonb_bit_to_read = 7;
 			return 0x00;
 		case 0x0001: // affects the ball hitting the blocks as well as jump address after bonus round
-			if (space.device().safe_pc() == 0x2b97)
+			if (m_maincpu->pc() == 0x2b97)
 				return (BIT(0x46, m_cannonb_bit_to_read--) << 7);
 			else
 				return 0xff;            /* value taken from the bootlegs */

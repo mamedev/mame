@@ -184,7 +184,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(snowbros_state::snowbros3_irq)
 
 READ16_MEMBER(snowbros_state::toto_read)
 {
-	int pc = space.device().safe_pc();
+	int pc = m_maincpu->pc();
 	if ((pc!= 0x3f010) && (pc!= 0x38008)) printf("toto prot %08x %04x\n", pc, mem_mask);
 	return 0x0700;
 }

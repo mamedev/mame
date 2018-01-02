@@ -199,7 +199,7 @@ WRITE8_MEMBER(toffy_state::toffy_bankswitch_w)
 
 READ8_MEMBER(darktowr_state::darktowr_mcu_bank_r)
 {
-	// logerror("BankRead %05x %08x\n",space.device().safe_pc(),offset);
+	// logerror("BankRead %05x %08x\n",m_maincpu->pc(),offset);
 
 	/* Horrible hack - the alternate TStrike set is mismatched against the MCU,
 	so just hack around the protection here.  (The hacks are 'right' as I have
@@ -208,9 +208,9 @@ READ8_MEMBER(darktowr_state::darktowr_mcu_bank_r)
 	if (!strcmp(machine().system().name, "tstrike"))
 	{
 		/* Static protection checks at boot-up */
-		if (space.device().safe_pc() == 0x9ace)
+		if (m_maincpu->pc() == 0x9ace)
 			return 0;
-		if (space.device().safe_pc() == 0x9ae4)
+		if (m_maincpu->pc() == 0x9ae4)
 			return 0x63;
 
 		/* Just return whatever the code is expecting */
@@ -227,7 +227,7 @@ READ8_MEMBER(darktowr_state::darktowr_mcu_bank_r)
 
 WRITE8_MEMBER(darktowr_state::darktowr_mcu_bank_w)
 {
-	logerror("BankWrite %05x %08x %08x\n", space.device().safe_pc(), offset, data);
+	logerror("BankWrite %05x %08x %08x\n", m_maincpu->pc(), offset, data);
 
 	if (offset == 0x1400 || offset == 0)
 	{
@@ -253,9 +253,9 @@ WRITE8_MEMBER(darktowr_state::darktowr_bankswitch_w)
 
 	membank("bank1")->set_entry(newbank);
 	if (newbank == 4 && oldbank != 4)
-		space.install_readwrite_handler(0x4000, 0x7fff, read8_delegate(FUNC(darktowr_state::darktowr_mcu_bank_r),this), write8_delegate(FUNC(darktowr_state::darktowr_mcu_bank_w),this));
+		m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x4000, 0x7fff, read8_delegate(FUNC(darktowr_state::darktowr_mcu_bank_r),this), write8_delegate(FUNC(darktowr_state::darktowr_mcu_bank_w),this));
 	else if (newbank != 4 && oldbank == 4)
-		space.install_readwrite_bank(0x4000, 0x7fff, "bank1");
+		m_maincpu->space(AS_PROGRAM).install_readwrite_bank(0x4000, 0x7fff, "bank1");
 }
 
 
@@ -356,14 +356,14 @@ CUSTOM_INPUT_MEMBER(ddragon_state::subcpu_bus_free)
 
 WRITE8_MEMBER(darktowr_state::mcu_port_a_w)
 {
-	logerror("McuWrite %05x %08x %08x\n", space.device().safe_pc(), offset, data);
+	logerror("%s: McuWrite %08x %08x\n", machine().describe_context(), offset, data);
 	m_mcu_port_a_out = data;
 }
 
 
 READ8_MEMBER(ddragon_state::ddragon_hd63701_internal_registers_r)
 {
-	logerror("%04x: read %d\n", space.device().safe_pc(), offset);
+	logerror("%s: read %d\n", machine().describe_context(), offset);
 	return 0;
 }
 

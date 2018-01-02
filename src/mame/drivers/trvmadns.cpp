@@ -239,7 +239,7 @@ WRITE8_MEMBER(trvmadns_state::trvmadns_tileram_w)
 {
 	if(offset==0)
 	{
-		if(space.device().safe_pcbase()==0x29e9)// || space.device().safe_pcbase()==0x1b3f) //29f5
+		if(m_maincpu->pcbase()==0x29e9)// || space.device().safe_pcbase()==0x1b3f) //29f5
 		{
 			m_maincpu->set_input_line(0, HOLD_LINE);
 		}

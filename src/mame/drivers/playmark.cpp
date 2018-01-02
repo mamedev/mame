@@ -207,7 +207,7 @@ READ8_MEMBER(playmark_state::playmark_snd_flag_r)
 
 WRITE8_MEMBER(playmark_state::playmark_oki_banking_w)
 {
-	logerror("PC$%03x Writing %02x to PortA  (OKI bank select)\n",space.device().safe_pcbase(),data);
+	logerror("%s Writing %02x to PortA  (OKI bank select)\n",machine().describe_context(),data);
 
 	int bank = data & 7;
 

@@ -220,13 +220,13 @@ WRITE32_MEMBER(polygonet_state::shared_ram_write)
 	{
 		logerror("68k WRITING %04x to shared ram %x (@%x)\n", (m_shared_ram[offset] & 0xffff0000) >> 16,
 			0xc000 + (offset<<1),
-			space.device().safe_pc());
+			m_maincpu->pc());
 	}
 	else if (mem_mask == 0x0000ffff)
 	{
 		logerror("68k WRITING %04x to shared ram %x (@%x)\n", (m_shared_ram[offset] & 0x0000ffff),
 			0xc000 +((offset<<1)+1),
-			space.device().safe_pc());
+			m_maincpu->pc());
 	}
 	else
 	{
@@ -235,7 +235,7 @@ WRITE32_MEMBER(polygonet_state::shared_ram_write)
 			0xc000 + (offset<<1),
 			0xc000 +((offset<<1)+1),
 			mem_mask,
-			space.device().safe_pc());
+			m_maincpu->pc());
 	}
 
 	/* write to the current dsp56k word */

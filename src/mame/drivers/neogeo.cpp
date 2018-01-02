@@ -869,14 +869,14 @@ WRITE16_MEMBER(neogeo_state::write_banksel)
 	uint32_t len = (!m_slots[m_curr_slot] || m_slots[m_curr_slot]->get_rom_size() == 0) ? m_region_maincpu->bytes() : m_slots[m_curr_slot]->get_rom_size();
 
 	if ((len <= 0x100000) && (data & 0x07))
-		logerror("PC %06x: warning: bankswitch to %02x but no banks available\n", space.device().safe_pc(), data);
+		logerror("PC %06x: warning: bankswitch to %02x but no banks available\n", m_maincpu->pc(), data);
 	else
 	{
 		int bank = data & 0x07;
 
 		if ((bank + 1) * 0x100000 >= len)
 		{
-			logerror("PC %06x: warning: bankswitch to empty bank %02x\n", space.device().safe_pc(), data);
+			logerror("PC %06x: warning: bankswitch to empty bank %02x\n", m_maincpu->pc(), data);
 			bank = 0;
 		}
 		uint8_t *ROM = (!m_slots[m_curr_slot] || m_slots[m_curr_slot]->get_rom_size() == 0) ? m_region_maincpu->base() : (uint8_t *)m_slots[m_curr_slot]->get_rom_base();
@@ -985,7 +985,7 @@ WRITE16_MEMBER(neogeo_state::write_bankprot_kf2k3bl)
 
 WRITE16_MEMBER(neogeo_state::write_bankprot_ms5p)
 {
-	logerror("ms5plus bankswitch - offset: %06x PC %06x: set banking %04x\n", offset, space.device().safe_pc(), data);
+	logerror("ms5plus bankswitch - offset: %06x PC %06x: set banking %04x\n", offset, m_maincpu->pc(), data);
 
 	if ((offset == 0) && (data == 0xa0))
 	{
