@@ -155,7 +155,7 @@ protected:
 	};
 
 	// Memory interface
-	memory_interface *          m_mintf;
+	std::unique_ptr<memory_interface> m_mintf;
 
 	// CPU registers
 	PAIR16                      m_pc;               // program counter

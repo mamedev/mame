@@ -14,14 +14,14 @@ deco_cpu7_device::deco_cpu7_device(const machine_config &mconfig, const char *ta
 
 void deco_cpu7_device::device_start()
 {
-	mintf = new mi_decrypt;
+	mintf = std::make_unique<mi_decrypt>();
 	init();
 }
 
 void deco_cpu7_device::device_reset()
 {
 	m6502_device::device_reset();
-	static_cast<mi_decrypt *>(mintf)->had_written = false;
+	downcast<mi_decrypt &>(*mintf).had_written = false;
 }
 
 uint8_t deco_cpu7_device::mi_decrypt::read_sync(uint16_t adr)
@@ -43,7 +43,7 @@ void deco_cpu7_device::mi_decrypt::write(uint16_t adr, uint8_t val)
 
 util::disasm_interface *deco_cpu7_device::create_disassembler()
 {
-	return new disassembler(static_cast<mi_decrypt *>(mintf));
+	return new disassembler(downcast<mi_decrypt *>(mintf.get()));
 }
 
 deco_cpu7_device::disassembler::disassembler(mi_decrypt *mi) : mintf(mi)

@@ -154,7 +154,7 @@ m6809_base_device::m6809_base_device(const machine_config &mconfig, const char *
 void m6809_base_device::device_start()
 {
 	if (!m_mintf)
-		m_mintf = new mi_default;
+		m_mintf = std::make_unique<mi_default>();
 
 	m_mintf->m_program  = &space(AS_PROGRAM);
 	m_mintf->m_sprogram = has_space(AS_OPCODES) ? &space(AS_OPCODES) : m_mintf->m_program;

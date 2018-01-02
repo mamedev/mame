@@ -123,7 +123,7 @@ protected:
 	uint8_t   IR;                     /* Prefetched instruction register */
 	int     inst_state_base;        /* Current instruction bank */
 
-	memory_interface *mintf;
+	std::unique_ptr<memory_interface> mintf;
 	int inst_state, inst_substate;
 	int icount;
 	bool nmi_state, irq_state, apu_irq_state, v_state;

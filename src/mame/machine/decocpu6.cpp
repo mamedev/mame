@@ -19,7 +19,7 @@ deco_cpu6_device::deco_cpu6_device(const machine_config &mconfig, const char *ta
 
 void deco_cpu6_device::device_start()
 {
-	mintf = new mi_decrypt;
+	mintf = std::make_unique<mi_decrypt>();
 	init();
 }
 

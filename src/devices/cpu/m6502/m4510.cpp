@@ -38,9 +38,9 @@ util::disasm_interface *m4510_device::create_disassembler()
 void m4510_device::device_start()
 {
 	if(direct_disabled)
-		mintf = new mi_4510_nd(this);
+		mintf = std::make_unique<mi_4510_nd>(this);
 	else
-		mintf = new mi_4510_normal(this);
+		mintf = std::make_unique<mi_4510_normal>(this);
 
 	m65ce02_device::init();
 
