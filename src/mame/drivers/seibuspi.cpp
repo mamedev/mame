@@ -2150,14 +2150,14 @@ DRIVER_INIT_MEMBER(seibuspi_state,rfjet)
 
 READ32_MEMBER(seibuspi_state::senkyu_speedup_r)
 {
-	if (space.device().safe_pc()==0x00305bb2) space.device().execute().spin_until_interrupt(); // idle
+	if (m_maincpu->pc()==0x00305bb2) m_maincpu->spin_until_interrupt(); // idle
 
 	return m_mainram[0x0018cb4/4];
 }
 
 READ32_MEMBER(seibuspi_state::senkyua_speedup_r)
 {
-	if (space.device().safe_pc()== 0x30582e) space.device().execute().spin_until_interrupt(); // idle
+	if (m_maincpu->pc()== 0x30582e) m_maincpu->spin_until_interrupt(); // idle
 
 	return m_mainram[0x0018c9c/4];
 }
@@ -2167,10 +2167,10 @@ READ32_MEMBER(seibuspi_state::batlball_speedup_r)
 //  printf("space.device().safe_pc() %06x\n", space.device().safe_pc());
 
 	/* batlbalu */
-	if (space.device().safe_pc()==0x00305996) space.device().execute().spin_until_interrupt(); // idle
+	if (m_maincpu->pc()==0x00305996) m_maincpu->spin_until_interrupt(); // idle
 
 	/* batlball */
-	if (space.device().safe_pc()==0x003058aa) space.device().execute().spin_until_interrupt(); // idle
+	if (m_maincpu->pc()==0x003058aa) m_maincpu->spin_until_interrupt(); // idle
 
 	return m_mainram[0x0018db4/4];
 }
@@ -2178,13 +2178,13 @@ READ32_MEMBER(seibuspi_state::batlball_speedup_r)
 READ32_MEMBER(seibuspi_state::viprp1_speedup_r)
 {
 	/* viprp1 */
-	if (space.device().safe_pc()==0x0202769) space.device().execute().spin_until_interrupt(); // idle
+	if (m_maincpu->pc()==0x0202769) m_maincpu->spin_until_interrupt(); // idle
 
 	/* viprp1s */
-	if (space.device().safe_pc()==0x02027e9) space.device().execute().spin_until_interrupt(); // idle
+	if (m_maincpu->pc()==0x02027e9) m_maincpu->spin_until_interrupt(); // idle
 
 	/* viprp1ot */
-	if (space.device().safe_pc()==0x02026bd) space.device().execute().spin_until_interrupt(); // idle
+	if (m_maincpu->pc()==0x02026bd) m_maincpu->spin_until_interrupt(); // idle
 
 //  osd_printf_debug("%08x\n",space.device().safe_pc());
 
@@ -2194,8 +2194,8 @@ READ32_MEMBER(seibuspi_state::viprp1_speedup_r)
 READ32_MEMBER(seibuspi_state::viprp1o_speedup_r)
 {
 	/* viperp1o */
-	if (space.device().safe_pc()==0x0201f99) space.device().execute().spin_until_interrupt(); // idle
-//  osd_printf_debug("%08x\n",space.device().safe_pc());
+	if (m_maincpu->pc()==0x0201f99) m_maincpu->spin_until_interrupt(); // idle
+//  osd_printf_debug("%08x\n",m_maincpu->pc());
 	return m_mainram[0x001d49c/4];
 }
 
@@ -2203,8 +2203,8 @@ READ32_MEMBER(seibuspi_state::viprp1o_speedup_r)
 // causes input problems?
 READ32_MEMBER(seibuspi_state::ejanhs_speedup_r)
 {
-// osd_printf_debug("%08x\n",space.device().safe_pc());
-	if (space.device().safe_pc()==0x03032c7) space.device().execute().spin_until_interrupt(); // idle
+// osd_printf_debug("%08x\n",m_maincpu->pc());
+	if (m_maincpu->pc()==0x03032c7) m_maincpu->spin_until_interrupt(); // idle
 	return m_mainram[0x002d224/4];
 }
 #endif
@@ -2212,27 +2212,27 @@ READ32_MEMBER(seibuspi_state::ejanhs_speedup_r)
 READ32_MEMBER(seibuspi_state::rdft_speedup_r)
 {
 	/* rdft */
-	if (space.device().safe_pc()==0x0203f06) space.device().execute().spin_until_interrupt(); // idle
+	if (m_maincpu->pc()==0x0203f06) m_maincpu->spin_until_interrupt(); // idle
 
 	/* rdftj? */
-	if (space.device().safe_pc()==0x0203f0a) space.device().execute().spin_until_interrupt(); // idle
+	if (m_maincpu->pc()==0x0203f0a) m_maincpu->spin_until_interrupt(); // idle
 
 	/* rdftau */
-	if (space.device().safe_pc()==0x0203f16) space.device().execute().spin_until_interrupt(); // idle
+	if (m_maincpu->pc()==0x0203f16) m_maincpu->spin_until_interrupt(); // idle
 
 	/* rdftja? */
-	if (space.device().safe_pc()==0x0203f22) space.device().execute().spin_until_interrupt(); // idle
+	if (m_maincpu->pc()==0x0203f22) m_maincpu->spin_until_interrupt(); // idle
 
 	/* rdfta, rdftadi, rdftam, rdftit */
-	if (space.device().safe_pc()==0x0203f46) space.device().execute().spin_until_interrupt(); // idle
+	if (m_maincpu->pc()==0x0203f46) m_maincpu->spin_until_interrupt(); // idle
 
 	/* rdftu */
-	if (space.device().safe_pc()==0x0203f3a) space.device().execute().spin_until_interrupt(); // idle
+	if (m_maincpu->pc()==0x0203f3a) m_maincpu->spin_until_interrupt(); // idle
 
 	/* rdftauge */
-	if (space.device().safe_pc()==0x0203f6e) space.device().execute().spin_until_interrupt(); // idle
+	if (m_maincpu->pc()==0x0203f6e) m_maincpu->spin_until_interrupt(); // idle
 
-//  osd_printf_debug("%08x\n",space.device().safe_pc());
+//  osd_printf_debug("%08x\n",m_maincpu->pc());
 
 	return m_mainram[0x00298d0/4];
 }
@@ -2240,18 +2240,18 @@ READ32_MEMBER(seibuspi_state::rdft_speedup_r)
 READ32_MEMBER(seibuspi_state::rf2_speedup_r)
 {
 	/* rdft22kc */
-	if (space.device().safe_pc()==0x0203926) space.device().execute().spin_until_interrupt(); // idle
+	if (m_maincpu->pc()==0x0203926) m_maincpu->spin_until_interrupt(); // idle
 
 	/* rdft2, rdft2j */
-	if (space.device().safe_pc()==0x0204372) space.device().execute().spin_until_interrupt(); // idle
+	if (m_maincpu->pc()==0x0204372) m_maincpu->spin_until_interrupt(); // idle
 
 	/* rdft2us */
-	if (space.device().safe_pc()==0x020420e) space.device().execute().spin_until_interrupt(); // idle
+	if (m_maincpu->pc()==0x020420e) m_maincpu->spin_until_interrupt(); // idle
 
 	/* rdft2a */
-	if (space.device().safe_pc()==0x0204366) space.device().execute().spin_until_interrupt(); // idle
+	if (m_maincpu->pc()==0x0204366) m_maincpu->spin_until_interrupt(); // idle
 
-//  osd_printf_debug("%08x\n",space.device().safe_pc());
+//  osd_printf_debug("%08x\n",m_maincpu->pc());
 
 	return m_mainram[0x0282ac/4];
 }
@@ -2259,22 +2259,22 @@ READ32_MEMBER(seibuspi_state::rf2_speedup_r)
 READ32_MEMBER(seibuspi_state::rfjet_speedup_r)
 {
 	/* rfjet, rfjetu, rfjeta */
-	if (space.device().safe_pc()==0x0206082) space.device().execute().spin_until_interrupt(); // idle
+	if (m_maincpu->pc()==0x0206082) m_maincpu->spin_until_interrupt(); // idle
 
 	/* rfjetus */
-	if (space.device().safe_pc()==0x0205b39)
+	if (m_maincpu->pc()==0x0205b39)
 	{
 		uint32_t r;
-		space.device().execute().spin_until_interrupt(); // idle
+		m_maincpu->spin_until_interrupt(); // idle
 		// Hack to enter test mode
 		r = m_mainram[0x002894c/4] & (~0x400);
 		return r | (((ioport("SYSTEM")->read() ^ 0xff)<<8) & 0x400);
 	}
 
 	/* rfjetj */
-	if (space.device().safe_pc()==0x0205f2e) space.device().execute().spin_until_interrupt(); // idle
+	if (m_maincpu->pc()==0x0205f2e) m_maincpu->spin_until_interrupt(); // idle
 
-//  osd_printf_debug("%08x\n",space.device().safe_pc());
+//  osd_printf_debug("%08x\n",m_maincpu->pc());
 
 	return m_mainram[0x002894c/4];
 }

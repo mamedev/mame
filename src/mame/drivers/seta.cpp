@@ -11697,12 +11697,12 @@ READ16_MEMBER(seta_state::twineagl_debug_r)
 READ16_MEMBER(seta_state::twineagl_200100_r)
 {
 	// protection check at boot
-	logerror("%04x: twineagl_200100_r %d\n",space.device().safe_pc(),offset);
+	logerror("%04x: twineagl_200100_r %d\n",m_maincpu->pc(),offset);
 	return m_twineagl_xram[offset];
 }
 WRITE16_MEMBER(seta_state::twineagl_200100_w)
 {
-	logerror("%04x: twineagl_200100_w %d = %02x\n",space.device().safe_pc(),offset,data);
+	logerror("%04x: twineagl_200100_w %d = %02x\n",m_maincpu->pc(),offset,data);
 
 	if (ACCESSING_BITS_0_7)
 	{

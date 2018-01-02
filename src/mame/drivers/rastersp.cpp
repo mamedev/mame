@@ -645,11 +645,11 @@ WRITE32_MEMBER( rastersp_state::dsp_ctrl_w )
 WRITE32_MEMBER( rastersp_state::dsp_speedup_w )
 {
 	// 809e90  48fd, 48d5
-	if (space.device().safe_pc() == 0x809c23)
+	if (m_dsp->pc() == 0x809c23)
 	{
-		int32_t cycles_left = space.device().execute().cycles_remaining();
+		int32_t cycles_left = m_dsp->cycles_remaining();
 		data += cycles_left / 6;
-		space.device().execute().spin();
+		m_dsp->spin();
 	}
 
 	m_speedup_count = data;

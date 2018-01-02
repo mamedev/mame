@@ -391,7 +391,7 @@ WRITE32_MEMBER(midzeus_state::disk_asic_jr_w)
 		/* unknown purpose */
 		default:
 			//if (oldval ^ data)
-				logerror("%06X:disk_asic_jr_w(%X) = %X\n", space.device().safe_pc(), offset, data);
+				logerror("%06X:disk_asic_jr_w(%X) = %X\n", m_maincpu->pc(), offset, data);
 			break;
 
 	}

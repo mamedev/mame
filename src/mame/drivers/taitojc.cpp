@@ -1139,16 +1139,16 @@ MACHINE_CONFIG_END
 
 READ16_MEMBER(taitojc_state::taitojc_dsp_idle_skip_r)
 {
-	if (space.device().safe_pc() == 0x404c)
-		space.device().execute().spin_until_time(attotime::from_usec(500));
+	if (m_dsp->pc() == 0x404c)
+		m_dsp->spin_until_time(attotime::from_usec(500));
 
 	return m_dsp_shared_ram[0x7f0];
 }
 
 READ16_MEMBER(taitojc_state::dendego2_dsp_idle_skip_r)
 {
-	if (space.device().safe_pc() == 0x402e)
-		space.device().execute().spin_until_time(attotime::from_usec(500));
+	if (m_dsp->pc() == 0x402e)
+		m_dsp->spin_until_time(attotime::from_usec(500));
 
 	return m_dsp_shared_ram[0x7f0];
 }

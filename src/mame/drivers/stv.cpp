@@ -463,16 +463,16 @@ DRIVER_INIT_MEMBER(stv_state,critcrsh)
 
 READ32_MEMBER(stv_state::magzun_hef_hack_r)
 {
-	if(space.device().safe_pc()==0x604bf20) return 0x00000001; //HWEF
+	if(m_maincpu->pc()==0x604bf20) return 0x00000001; //HWEF
 
-	if(space.device().safe_pc()==0x604bfbe) return 0x00000002; //HREF
+	if(m_maincpu->pc()==0x604bfbe) return 0x00000002; //HREF
 
 	return m_workram_h[0x08e830/4];
 }
 
 READ32_MEMBER(stv_state::magzun_rx_hack_r)
 {
-	if(space.device().safe_pc()==0x604c006) return 0x40;
+	if(m_maincpu->pc()==0x604c006) return 0x40;
 
 	return m_workram_h[0x0ff3b4/4];
 }

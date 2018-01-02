@@ -1343,7 +1343,7 @@ READ32_MEMBER(model2_state::model2_5881prot_r)
 			retval <<= 16;
 		}
 	}
-	else logerror("Unhandled Protection READ @ %x mask %x (PC=%x)\n", offset, mem_mask, space.device().safe_pc());
+	else logerror("Unhandled Protection READ @ %x mask %x (PC=%x)\n", offset, mem_mask, m_maincpu->pc());
 
 	logerror("model2_5881prot_r %08x: %08x (%08x)\n", offset*4, retval, mem_mask);
 
@@ -1374,7 +1374,7 @@ WRITE32_MEMBER(model2_state::model2_5881prot_w)
 		printf("subkey %08x (%08x)\n", data, mem_mask);
 		m_cryptdevice->set_subkey(data&0xffff);
 	}
-	else printf("Unhandled Protection WRITE %x @ %x mask %x (PC=%x)\n", data, offset, mem_mask, space.device().safe_pc());
+	else printf("Unhandled Protection WRITE %x @ %x mask %x (PC=%x)\n", data, offset, mem_mask, m_maincpu->pc());
 
 }
 

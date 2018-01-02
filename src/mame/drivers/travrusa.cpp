@@ -604,7 +604,7 @@ DRIVER_INIT_MEMBER(travrusa_state,shtridra)
 
 READ8_MEMBER(travrusa_state::shtridrb_port11_r)
 {
-	printf("shtridrb_port11_r %04x\n", space.device().safe_pc());
+	printf("shtridrb_port11_r %04x\n", m_maincpu->pc());
 	// reads, masks with 0xa8, checks for 0x88, resets game if not happy with value?
 	return 0x88;
 }

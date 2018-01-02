@@ -138,7 +138,7 @@
 	<!-- disc label: Actionpack5 -->
 	<!-- Multi-5 language support: English, French, German, Italian, Spanish -->
 	<software name="actatari">
-		<description>Activision's Atari 2600 Action Pack (Megapak 8) (Europe)</description>
+		<description>Activision's Atari 2600 Action Pack (Megapak 8) (Multi 5)</description>
 		<year>1997</year>
 		<publisher>Megamedia</publisher>
 
@@ -190,11 +190,13 @@
 				<disk name="advanced dungeons &amp; dragons 2nd edition masterpiece collection (1995)(mindscape)(disc 1 of 4)[compilation]" sha1="adb4cc2ce2ae70724a78b8a3c1fc9b8c09996930" />
 			</diskarea>
 		</part>
+		<!-- 
 		<part name="cdrom2" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="advanced dungeons &amp; dragons 2nd edition masterpiece collection (1995)(mindscape)(disc 2 of 4)[compilation]" status="nodump" />
 			</diskarea>
 		</part>
+		-->
 		<part name="cdrom3" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="advanced dungeons &amp; dragons 2nd edition masterpiece collection (1995)(mindscape)(disc 3 of 4)[compilation]" sha1="eb3a8b15c7b21ee50cedfcf1870e8644396acfad" />
@@ -626,7 +628,6 @@
 		</part>
 	</software>
 
-	
 	<!-- DOS -->
 	<software name="aworld80">
 		<description>Around the World in 80 Days</description>
@@ -640,6 +641,77 @@
 		</part>
 	</software>
 
+	<!-- DOS -->
+	<!-- TODO: hangs when starting mission -->
+	<software name="backbagh" supported="no">
+		<description>Back to Baghdad (v1.00)</description>
+		<year>1996</year>
+		<publisher>Military Simulations</publisher>
+		<info name="version" value="1.00"/>
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="back to baghdad (1996)(military simulations)" sha1="25e308bdde703282d7f79c2c0b782bff5cad5583" />
+			</diskarea>
+		</part>
+	</software>
+	
+	<!-- Windows 3.1 -->
+	<!-- Disc label Bad_mojo_uk -->
+	<!-- TODO: weird installer, missing graphics? -->
+	<!-- TODO: doesn't seem to do anything in game, missing mouse pointer? -->
+	<software name="badmojo" supported="partial">
+		<description>Bad Mojo</description>
+		<year>1996</year>
+		<publisher>Acclaim</publisher>
+		
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="bad mojo (1996)(acclaim)" sha1="9956a05e9aab4cbaaebe19ee355f2d54fca39636" />
+			</diskarea>
+		</part>
+	</software>
+	
+	<software name="badmojod" cloneof="badmojo" supported="partial">
+		<description>Bad Mojo (Germany)</description>
+		<year>1996</year>
+		<publisher>Acclaim</publisher>
+		
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="bad mojo (1996)(acclaim)(de)" sha1="3eadb0fbb84af68f15653c3f3a6eb79fdb3f9210" />
+			</diskarea>
+		</part>
+	</software>
+	
+	<!-- Windows 95 -->
+	<!-- TODO: uses High Color -->
+	<software name="banzaib" supported="partial">
+		<description>Banzai Bug</description>
+		<year>1996</year>
+		<publisher>Multi Media International</publisher>
+		
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="banzai bug (1996)(multi media international)(nl)" sha1="3dbf3846902ce85f6175f7d2b25ced2933c1a4af" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- DOS / Windows -->
+	<!-- TODO: trying to install causes access denied error, game can be run anyway -->
+	<software name="barq">
+		<description>BARQ - The Rise of Freedom</description>
+		<year>1996</year>
+		<publisher>UAV</publisher>
+		
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="barq - the rise of freedom (1996)(uav)" sha1="66a4d6d18daf1db97ea08aaf5c80ab803275bcb1" />
+			</diskarea>
+		</part>
+	</software>
+	
 	<!-- 
 	Register key:
 	BB2KLEJP-50008573
@@ -656,8 +728,194 @@
 			</diskarea>
 		</part>
 	</software>
+	
+	<!-- DOS -->
+	<!-- English / French / German -->
+	<!-- TODO: Cannot install, get stuck at uncompressing files screen -->
+	<software name="batlbugs" supported="no">
+		<description>Battle Bugs</description>
+		<year>1995</year>
+		<publisher>Sierra</publisher>
+		
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="battle bugs (1995)(sierra)(m3)" sha1="7216a7e82f4c09f89845dd90b32cde706bc43883" />
+			</diskarea>
+		</part>
+	</software>	
 
-	<!-- Pentium class 200 MHz / Direct X 7.0 / Windows 95 -->
+	<!-- Windows 3.1 -->
+	<!-- TODO: setup AVI test stalls to a DOS text mode-->
+	<software name="batlisl3" supported="partial">
+		<description>Battle Isle 3 - Shadow of the Emperor</description>
+		<year>1995</year>
+		<publisher>Blue Byte</publisher>
+		
+		<part name="cdrom1" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="battle isle 3 - shadow of the empire (1995)(blue byte)(disc 1 of 2)" sha1="fa140978350d679335f8bbef0ccd54a0042628ad" />
+			</diskarea>
+		</part>
+		<part name="cdrom2" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="battle isle 3 - shadow of the empire (1995)(blue byte)(disc 2 of 2)" sha1="587eba131db7eb9652025d8810b303a6e9382d26" />
+			</diskarea>
+		</part>
+	</software>
+	
+	<!-- Windows 3.1 -->
+	<!-- Pentium class 100 MHz -->
+	<!-- Has Italian strings in installer? -->
+	<software name="beantara">
+		<description>Betrayal in Antara</description>
+		<year>1997</year>
+		<publisher>Sierra</publisher>
+		
+		<part name="cdrom1" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="betrayal in antara (1997)(sierra)(disc 1 of 3)" sha1="df24bd61462238c91174c5adacb4ecf04e41ec14" />
+			</diskarea>
+		</part>
+		<part name="cdrom2" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="betrayal in antara (1997)(sierra)(disc 2 of 3)" sha1="b5c87d1698918c034682fff4e24d1d54cc1b9e4a" />
+			</diskarea>
+		</part>
+		<part name="cdrom3" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="betrayal in antara (1997)(sierra)(disc 3 of 3)" sha1="aeb47dc31c8e3ce3144b89181bf335b28caab225" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Windows 3.1 -->
+	<software name="bermusynd">
+		<description>Bermuda Syndrome (Germany)</description>
+		<year>1995</year>
+		<publisher>Century Interactive / BMG Interactive Entertainment</publisher>
+		
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="bermuda syndrome (1995)(bmg interactive entertainment)(de)" sha1="45c0aebb68b5ef6bf9ee6dca3713b08dcb252928" />
+			</diskarea>
+		</part>
+	</software>
+	
+	<!-- DOS / Windows 3.1 -->
+	<software name="bfchess">
+		<description>Bobby Fischer Teaches Chess</description>
+		<year>1996</year>
+		<publisher>Interplay / Mission Studios</publisher>
+		
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="bobby fischer teaches chess (1996)(interplay)(en-fr)" sha1="2c178eaaf9a21fdf2847b37fdaa5ad2d8fbddafb" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- DOS -->
+	<!-- English / French / German -->
+	<software name="bioforge">
+		<description>Bioforge (vf1.01)</description>
+		<year>1995</year>
+		<publisher>Origin</publisher>
+		<info name="version" value="f1.01" />
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="bioforge vf1.01 (1995)(origin)(m3)[!]" sha1="2bc3734682a461aae4e07d8a419fde407cefd4c1" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Windows 95, Direct X 5.0 -->
+	<!-- Pentium class 90 MHz -->
+	<!-- TODO: ESC menu briefly appears then goes back into game mode (btanb due of 486 CPU used?) -->
+	<software name="bladerun">
+		<description>Blade Runner</description>
+		<year>1997</year>
+		<publisher>Virgin</publisher>
+		
+		<part name="cdrom1" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="blade runner (1997)(virgin)(disc 1 of 4)[!]" sha1="449b907d4b85e67d3b7fe5832ea7ad4f555b31db" />
+			</diskarea>
+		</part>
+		<part name="cdrom2" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="blade runner (1997)(virgin)(disc 2 of 4)[!]" sha1="f1de28b44c7960d43451c1287e6fabfdb6018da5" />
+			</diskarea>
+		</part>
+		<part name="cdrom3" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="blade runner (1997)(virgin)(disc 3 of 4)[!]" sha1="aca716550f43468d4e786083d29c07610273d8e1" />
+			</diskarea>
+		</part>
+		<part name="cdrom4" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="blade runner (1997)(virgin)(disc 4 of 4)[!]" sha1="f4681e82c6cd1d17d449831102f5c9235b6d6659" />
+			</diskarea>
+		</part>
+	</software>
+	
+	<!-- DOS -->
+	<!-- TODO: "Internal Error: #1004 - out of memory allocating buffer" -->
+	<software name="bloodbwl" supported="no">
+		<description>Blood Bowl</description>
+		<year>1995</year>
+		<publisher>MicroLeague Interactive / Games Workshop</publisher>
+		
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="blood bowl (1995)(microleague)" sha1="d961b1455a71ee318367f6f6d030d5742656ddb6" />
+			</diskarea>
+		</part>
+	</software>
+	
+	<!-- DOS -->
+	<!-- TODO: selecting SB16 causes hang, using legacy SB driver works tho -->
+	<software name="bloodwng" supported="partial">
+		<description>Bloodwings - Pumpkinhead's Revenge</description>
+		<year>1995</year>
+		<publisher>MPCA Interactive</publisher>
+		
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="bloodwings - pumpkinhead's revenge (1995)(mpca interactive)" sha1="244406a26d1bd35fd59ef2159482c49e9222291f" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- DOS -->
+	<!-- Needs 590k of conventional memory -->
+	<software name="blueforc">
+		<description>Blue Force</description>
+		<year>1993</year>
+		<publisher>Tsunami Media</publisher>
+		
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="blue force (1993)(tsunami)" sha1="a02689612244b349465542b88beb0bc73b438e4d" />
+			</diskarea>
+		</part>
+	</software>
+	
+	<!-- DOS -->
+	<software name="bodyvoya">
+		<description>Bodyworks Voyager</description>
+		<year>1994</year>
+		<publisher>Software Marketing Corporation</publisher>
+		
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="bodyworks voyager (1994)(software marketing corporation)" sha1="f84f43ede878e226b5be89d83e5f8e02b7860732" />
+			</diskarea>
+		</part>
+	</software>
+	
+	<!-- Windows 95, Direct X 7.0 -->
+	<!-- Pentium class 200 MHz -->
 	<!-- TODO: invalid opcode exception after install -->
 	<software name="boorball" supported="no">
 		<description>Boorp's Balls</description>
@@ -671,6 +929,20 @@
 		</part>
 	</software>
 
+	<!-- DOS / Windows 95 -->
+	<!-- 256 colors / High Color Modes -->
+	<software name="braind13d">
+		<description>Brain Dead 13 Starring Fritz (Germany)</description>
+		<year>1995</year>
+		<publisher>Empire</publisher>
+		
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="brain dead 13 starring fritz (1995)(empire)(de)" sha1="973da4f1d546e4fb14d8fe927798e91a57df484f" />
+			</diskarea>
+		</part>
+	</software>
+	
 	<!-- TODO: black screens after introduction scenes, i.e. when it's supposed to switch to the 1st actual gameplay scene -->
 	<software name="briganty" supported="no">
 		<description>Briganty - The Roots of Darkness for Windows (Japan)</description>
@@ -683,6 +955,106 @@
 			</diskarea>
 		</part>
 	</software>
+
+	<!-- DOS -->
+	<!-- German version of Broken Sword -->
+	<!-- TODO: SB16 sound stops working after intro? -->
+	<software name="brokswdd" supported="partial">
+		<description>Baphomets Fluch (Germany)</description>
+		<year>1997</year>
+		<publisher>Megamedia / Revolution / Virgin</publisher>
+		
+		<part name="cdrom1" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="baphomets fluch (1997)(megamedia)(de)(disc 1 of 2)[compilation megapak 8]" sha1="ce2a0d98bb579efad8e6297ac15dee52d637822f" />
+			</diskarea>
+		</part>
+		<part name="cdrom2" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="baphomets fluch (1997)(megamedia)(de)(disc 2 of 2)[compilation megapak 8]" sha1="3e53de504a2a1c806400206fc1d5c85e605cdbb4" />
+			</diskarea>
+		</part>
+	</software>
+	
+	<!-- DOS -->
+	<!-- TODO: 384k of EMS memory? -->
+	<software name="bsdracula" supported="partial">
+		<description>Bram Stoker's Dracula (Multi 5)</description>
+		<year>1995</year>
+		<publisher>Psygnosis</publisher>
+		
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="bram stoker's dracula (1995)(psygnosis)" sha1="2a7c6e4619a9004d71a2adb8dea3bd05790a42a7" />
+			</diskarea>
+		</part>
+	</software>
+	
+	<!-- DOS -->
+	<!-- Multi 5 language support -->
+	<software name="bssky">
+		<description>Beneath a Steel Sky (Multi 5)</description>
+		<year>1995</year>
+		<publisher>Virgin / Revolution</publisher>
+		
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="beneath a steel sky (1995)(virgin)" sha1="061062ebca97d2e4c46918901419eeed98a6cbf7" />
+			</diskarea>
+		</part>
+	</software>
+	
+	<!-- DOS -->
+	<!-- TODO: no sound ingame with SB16, eventually hangs -->
+	<software name="budtdtd" supported="partial">
+		<description>Bud Tucker in Double Trouble (Germany)</description>
+		<year>1997</year>
+		<publisher>TopWare</publisher>
+		
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="bud tucker in double trouble (1997)(topware)(de)" sha1="0fc5971b2cfabd356fe1726aaf07e3694135c650" />
+			</diskarea>
+		</part>
+	</software>
+	
+	<!-- Windows 3.1 -->
+	<!-- TODO: new game requires disc swap -->
+	<software name="buriedtd" supported="partial">
+		<description>Buried in Time - Verschollen in der Zeit (Germany)</description>
+		<year>1995</year>
+		<publisher>Sanctuary Woods</publisher>
+		
+		<part name="cdrom1" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="buried in time - verschollen in der zeit (1995)(sanctuary woods)(de)(disc 1 of 3)" sha1="99ec86577cedf65a2e77543fa7970a99b1a50948" />
+			</diskarea>
+		</part>
+		<part name="cdrom2" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="buried in time - verschollen in der zeit (1995)(sanctuary woods)(de)(disc 2 of 3)" sha1="c77120365e053755500f2ec97451149c85e90b60" />
+			</diskarea>
+		</part>
+		<part name="cdrom3" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="buried in time - verschollen in der zeit (1995)(sanctuary woods)(de)(disc 3 of 3)" sha1="e4c81d111d7b590453d3053c17cdeadce9f00438" />
+			</diskarea>
+		</part>
+	</software>
+	
+	<!-- DOS -->
+	<!-- Uses manual copy protection -->
+	<software name="burntimed">
+		<description>Burntime</description>
+		<year>1993</year>
+		<publisher>MAX Design</publisher>
+		
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="burntime (1993)(max design)(de)" sha1="590fe4f9a0b5981bd5c30e17d145cb112765816d" />
+			</diskarea>
+		</part>
+	</software>	
 
 	<!-- Windows & Macintosh -->
 	<!-- TODO: huge gfx issues -->
@@ -700,6 +1072,7 @@
 	
 	<!-- Windows 95 -->
 	<!-- Very slow on 486 -->
+	<!-- also known as Captain Claw -->
 	<!-- TODO: has transparency issues on main menu -->
 	<software name="clawj" supported="partial">
 		<description>Claw (Japan v1.2)</description>
@@ -940,6 +1313,39 @@
 		</part>
 	</software>
 
+	<!-- Windows 3.1 -->
+	<software name="letlaw">
+		<description>Buichi Terasawa's Takeru - Letter of the Law</description>
+		<year>1996</year>
+		<publisher>Sunsoft</publisher>
+		
+		<part name="cdrom1" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="buichi terasawa's takeru - letter of the law (1996)(sunsoft)(disc 1 of 2)[chapter 1 &amp; 2]" sha1="340477ad38fc6dd0ddd8d47ac16e50281bf22b44" />
+			</diskarea>
+		</part>
+		<part name="cdrom2" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="buichi terasawa's takeru - letter of the law (1996)(sunsoft)(disc 2 of 2)[chapter 3]" sha1="ed0568d749cda155717289ab29d48013a9dfe9b5" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- DOS -->
+	<!-- Also known as "The Manager", originally released as floppy format in 1991 -->
+	<!-- TODO: choosing a team at new game then pressing the top bar causes shuffled team flags? -->
+	<software name="managerd">
+		<description>Bundesliga Manager Professional (Germany)</description>
+		<year>1996</year>
+		<publisher>Software 2000</publisher>
+		
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="bundesliga manager professional (1996)(software 2000)(de)[budget]" sha1="9a9454d2aead703de329499d2292dd0bd8495257" />
+			</diskarea>
+		</part>
+	</software>
+	
 	<software name="moon" supported="no">
 		<description>Moon (Japan)</description>
 		<year>1998</year>
@@ -1341,6 +1747,9 @@
 			</diskarea>
 		</part>
 	</software>
+
+
+	
 	
 	<!--                                         -->
 	<!-- Drivers / Utilities / Operating Systems -->

@@ -66,7 +66,7 @@ READ16_MEMBER(realbrk_state::realbrk_dsw_r)
 							((ioport("SW3")->read() & 0x0300) << 4) |
 							((ioport("SW4")->read() & 0x0300) << 6) ;
 
-	logerror("CPU #0 PC %06X: read with unknown dsw_select = %02x\n",space.device().safe_pc(),m_dsw_select[0]);
+	logerror("CPU #0 PC %06X: read with unknown dsw_select = %02x\n",m_maincpu->pc(),m_dsw_select[0]);
 	return 0xffff;
 }
 

@@ -261,7 +261,7 @@ public:
 	DECLARE_READ64_MEMBER(cde_r);
 	DECLARE_WRITE64_MEMBER(cde_w);
 	DECLARE_READ64_MEMBER(device2_r);
-	DECLARE_READ64_MEMBER(cpu_r);
+	template<bool maincpu> DECLARE_READ64_MEMBER(cpu_r);
 	DECLARE_READ8_MEMBER(id3_r);
 	DECLARE_READ8_MEMBER(id4_r);
 	DECLARE_READ8_MEMBER(id5_r);
@@ -1128,13 +1128,13 @@ READ64_MEMBER(konamim2_state::device2_r)
 	}
 }
 
-READ64_MEMBER(konamim2_state::cpu_r)
+template<bool maincpu> READ64_MEMBER(konamim2_state::cpu_r)
 {
 	uint64_t r = 0;
 
 	if (ACCESSING_BITS_32_63)
 	{
-		r = (uint64_t)((&space.device() != m_maincpu) ? 0x80000000 : 0);
+		r = (uint64_t)(maincpu ? 0 : 0x80000000);
 		r |= m_in_monitor->read() << 30;
 		return r << 32;
 	}
@@ -1199,12 +1199,21 @@ static ADDRESS_MAP_START( m2_main, AS_PROGRAM, 64, konamim2_state )
 
 	AM_RANGE(0x07000000, 0x07000007) AM_READ8(id7_r, 0x00ff000000000000U)
 
-	AM_RANGE(0x10000000, 0x10000007) AM_READ(cpu_r)
 	AM_RANGE(0x10000008, 0x10001007) AM_NOP     // ???
 
 	AM_RANGE(0x20000000, 0x201fffff) AM_ROM AM_SHARE("share2")
 	AM_RANGE(0x40000000, 0x407fffff) AM_RAM AM_SHARE("main_ram")
 	AM_RANGE(0xfff00000, 0xffffffff) AM_ROM AM_REGION("boot", 0) AM_SHARE("share2")
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( m2_main_m, AS_PROGRAM, 64, konamim2_state )
+	AM_IMPORT_FROM( m2_main )
+	AM_RANGE(0x10000000, 0x10000007) AM_READ(cpu_r<true>)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( m2_main_s, AS_PROGRAM, 64, konamim2_state )
+	AM_IMPORT_FROM( m2_main )
+	AM_RANGE(0x10000000, 0x10000007) AM_READ(cpu_r<false>)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( 3do_m2_main, AS_PROGRAM, 64, konamim2_state )
@@ -1213,6 +1222,17 @@ static ADDRESS_MAP_START( 3do_m2_main, AS_PROGRAM, 64, konamim2_state )
 
 //  AM_RANGE(0x00000000, 0x000cffff) devices?
 ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( 3do_m2_main_m, AS_PROGRAM, 64, konamim2_state )
+	AM_IMPORT_FROM( 3do_m2_main )
+	AM_RANGE(0x10000000, 0x10000007) AM_READ(cpu_r<true>)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( 3do_m2_main_s, AS_PROGRAM, 64, konamim2_state )
+	AM_IMPORT_FROM( 3do_m2_main )
+	AM_RANGE(0x10000000, 0x10000007) AM_READ(cpu_r<false>)
+ADDRESS_MAP_END
+
 
 static INPUT_PORTS_START( m2 )
 	// TODO: it's unknown if these are actual dip-switches or internal to something
@@ -1274,12 +1294,12 @@ static MACHINE_CONFIG_START( m2 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", PPC602, 66000000)   /* actually PPC602, 66MHz */
 	MCFG_PPC_BUS_FREQUENCY(33000000)  /* Multiplier 2, Bus = 33MHz, Core = 66MHz */
-	MCFG_CPU_PROGRAM_MAP(m2_main)
+	MCFG_CPU_PROGRAM_MAP(m2_main_m)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", konamim2_state,  m2)
 
 	MCFG_CPU_ADD("sub", PPC602, 66000000)   /* actually PPC602, 66MHz */
 	MCFG_PPC_BUS_FREQUENCY(33000000)  /* Multiplier 2, Bus = 33MHz, Core = 66MHz */
-	MCFG_CPU_PROGRAM_MAP(m2_main)
+	MCFG_CPU_PROGRAM_MAP(m2_main_s)
 
 	// TODO: declaring as second screen causes palette confusion (wants to use palette from the other screen?)
 	MCFG_DEVICE_ADD("terminal", GENERIC_TERMINAL, 0)
@@ -1305,10 +1325,10 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED ( 3do_m2, m2 )
 
 	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(3do_m2_main)
+	MCFG_CPU_PROGRAM_MAP(3do_m2_main_m)
 
 	MCFG_CPU_MODIFY("sub")
-	MCFG_CPU_PROGRAM_MAP(3do_m2_main)
+	MCFG_CPU_PROGRAM_MAP(3do_m2_main_s)
 
 	MCFG_SOFTWARE_LIST_ADD("cd_list","3do_m2")
 

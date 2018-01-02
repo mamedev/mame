@@ -159,7 +159,7 @@ WRITE16_MEMBER(kickgoal_state::kickgoal_snd_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		logerror("PC:%06x Writing %04x to Sound CPU\n",space.device().safe_pcbase(),data);
+		logerror("PC:%06x Writing %04x to Sound CPU\n",m_maincpu->pcbase(),data);
 		if (data >= 0x40) {
 			if (data == 0xfe) {
 				m_oki->write(0,0x40); /* Stop playing the melody */

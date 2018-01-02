@@ -81,24 +81,6 @@ uint32_t next_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, 
 	return 0;
 }
 
-/* Dummy catcher for any unknown r/w */
-READ8_MEMBER( next_state::io_r )
-{
-	if(!machine().side_effect_disabled())
-		printf("io_r %08x (%08x)\n",offset+0x02000000, space.device().safe_pc());
-
-	if(offset == 0xc0)
-		return 0;
-
-	return 0xff;
-}
-
-WRITE8_MEMBER( next_state::io_w )
-{
-	if(!machine().side_effect_disabled())
-		printf("io_w %08x, %02x (%08x)\n",offset+0x02000000,data, space.device().safe_pc());
-}
-
 /* map ROM at 0x01000000-0x0101ffff? */
 READ32_MEMBER( next_state::rom_map_r )
 {

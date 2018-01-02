@@ -129,15 +129,14 @@ READ16_MEMBER(eprom_state::sync_r)
 }
 
 
-WRITE16_MEMBER(eprom_state::sync_w)
+template<bool maincpu> WRITE16_MEMBER(eprom_state::sync_w)
 {
 	int oldword = m_sync_data;
 	COMBINE_DATA(&m_sync_data);
 
 	if ((oldword & 0xff00) != (m_sync_data & 0xff00))
-		space.device().execute().yield();
+		(maincpu ? m_maincpu : m_extra)->yield();
 }
-
 
 
 /*************************************
@@ -149,7 +148,7 @@ WRITE16_MEMBER(eprom_state::sync_w)
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, eprom_state )
 	AM_RANGE(0x000000, 0x09ffff) AM_ROM
 	AM_RANGE(0x0e0000, 0x0e0fff) AM_DEVREADWRITE8("eeprom", eeprom_parallel_28xx_device, read, write, 0x00ff)
-	AM_RANGE(0x16cc00, 0x16cc01) AM_READWRITE(sync_r, sync_w)
+	AM_RANGE(0x16cc00, 0x16cc01) AM_READWRITE(sync_r, sync_w<true>)
 	AM_RANGE(0x160000, 0x16ffff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0x1f0000, 0x1fffff) AM_DEVWRITE("eeprom", eeprom_parallel_28xx_device, unlock_write)
 	AM_RANGE(0x260000, 0x26000f) AM_READ_PORT("260000")
@@ -174,7 +173,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( guts_map, AS_PROGRAM, 16, eprom_state )
 	AM_RANGE(0x000000, 0x09ffff) AM_ROM
 	AM_RANGE(0x0e0000, 0x0e0fff) AM_DEVREADWRITE8("eeprom", eeprom_parallel_28xx_device, read, write, 0x00ff)
-	AM_RANGE(0x16cc00, 0x16cc01) AM_READWRITE(sync_r, sync_w)
+	AM_RANGE(0x16cc00, 0x16cc01) AM_READWRITE(sync_r, sync_w<true>)
 	AM_RANGE(0x160000, 0x16ffff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0x1f0000, 0x1fffff) AM_DEVWRITE("eeprom", eeprom_parallel_28xx_device, unlock_write)
 	AM_RANGE(0x260000, 0x26000f) AM_READ_PORT("260000")
@@ -206,7 +205,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( extra_map, AS_PROGRAM, 16, eprom_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
-	AM_RANGE(0x16cc00, 0x16cc01) AM_READWRITE(sync_r, sync_w) AM_SHARE("sync_data")
+	AM_RANGE(0x16cc00, 0x16cc01) AM_READWRITE(sync_r, sync_w<false>) AM_SHARE("sync_data")
 	AM_RANGE(0x160000, 0x16ffff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0x260000, 0x26000f) AM_READ_PORT("260000")
 	AM_RANGE(0x260010, 0x26001f) AM_READ(special_port1_r)

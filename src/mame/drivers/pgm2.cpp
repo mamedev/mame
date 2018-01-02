@@ -1181,11 +1181,11 @@ static void sprite_colour_decode(uint16_t* rom, int len)
 
 READ32_MEMBER(pgm2_state::orleg2_speedup_r)
 {
-	int pc = space.device().safe_pc();
+	int pc = m_maincpu->pc();
 	if ((pc == 0x1002faec) || (pc == 0x1002f9b8))
 	{
 		if ((m_mainram[0x20114 / 4] == 0x00) && (m_mainram[0x20118 / 4] == 0x00))
-			space.device().execute().spin_until_interrupt();
+			m_maincpu->spin_until_interrupt();
 	}
 	/*else
 	{
@@ -1197,12 +1197,12 @@ READ32_MEMBER(pgm2_state::orleg2_speedup_r)
 
 READ32_MEMBER(pgm2_state::kov2nl_speedup_r)
 {
-	int pc = space.device().safe_pc();
+	int pc = m_maincpu->pc();
 
 	if ((pc == 0x10053a94) || (pc == 0x1005332c) || (pc == 0x1005327c))
 	{
 		if ((m_mainram[0x20470 / 4] == 0x00) && (m_mainram[0x20474 / 4] == 0x00))
-			space.device().execute().spin_until_interrupt();
+			m_maincpu->spin_until_interrupt();
 	}
 	/*
 	else
@@ -1216,12 +1216,12 @@ READ32_MEMBER(pgm2_state::kov2nl_speedup_r)
 
 READ32_MEMBER(pgm2_state::kof98umh_speedup_r)
 {
-	int pc = space.device().safe_pc();
+	int pc = m_maincpu->pc();
 
 	if (pc == 0x100028f6)
 	{
 		if ((m_mainram[0x00060 / 4] == 0x00) && (m_mainram[0x00064 / 4] == 0x00))
-			space.device().execute().spin_until_interrupt();
+			m_maincpu->spin_until_interrupt();
 	}
 	/*
 	else
@@ -1235,12 +1235,12 @@ READ32_MEMBER(pgm2_state::kof98umh_speedup_r)
 
 READ32_MEMBER(pgm2_state::kov3_speedup_r)
 {
-	int pc = space.device().safe_pc();
+	int pc = m_maincpu->pc();
 
 	if ((pc == 0x1000729a) || (pc == 0x1000729e))
 	{
 		if ((m_mainram[0x000b4 / 4] == 0x00) && (m_mainram[0x000b8 / 4] == 0x00))
-			space.device().execute().spin_until_interrupt();
+			m_maincpu->spin_until_interrupt();
 	}
 	/*
 	else
@@ -1257,12 +1257,12 @@ READ32_MEMBER(pgm2_state::kov3_speedup_r)
 
 READ32_MEMBER(pgm2_state::ddpdojt_speedup_r)
 {
-	int pc = space.device().safe_pc();
+	int pc = m_maincpu->pc();
 
 	if (pc == 0x10001a7e)
 	{
 		if ((m_mainram[0x00060 / 4] == 0x00) && (m_mainram[0x00064 / 4] == 0x00))
-			space.device().execute().spin_until_interrupt();
+			m_maincpu->spin_until_interrupt();
 	}
 	/*
 	else
@@ -1276,12 +1276,12 @@ READ32_MEMBER(pgm2_state::ddpdojt_speedup_r)
 
 READ32_MEMBER(pgm2_state::ddpdojt_speedup2_r)
 {
-	int pc = space.device().safe_pc();
+	int pc = m_maincpu->pc();
 
 	if (pc == 0x1008fefe || pc == 0x1008fbe8)
 	{
 		if ((m_mainram[0x21e04 / 4] & 0x00ff0000) != 0) // not sure if this endian safe ?
-			space.device().execute().spin_until_interrupt();
+			m_maincpu->spin_until_interrupt();
 	}
 	/*
 	else
@@ -1316,20 +1316,20 @@ void pgm2_state::common_encryption_init()
 DRIVER_INIT_MEMBER(pgm2_state,orleg2)
 {
 	common_encryption_init();
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0x20020114, 0x20020117, read32_delegate(FUNC(pgm2_state::orleg2_speedup_r),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x20020114, 0x20020117, read32_delegate(FUNC(pgm2_state::orleg2_speedup_r),this));
 }
 
 DRIVER_INIT_MEMBER(pgm2_state,kov2nl)
 {
 	common_encryption_init();
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0x20020470, 0x20020473, read32_delegate(FUNC(pgm2_state::kov2nl_speedup_r), this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x20020470, 0x20020473, read32_delegate(FUNC(pgm2_state::kov2nl_speedup_r), this));
 }
 
 DRIVER_INIT_MEMBER(pgm2_state,ddpdojt)
 {
 	common_encryption_init();
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0x20000060, 0x20000063, read32_delegate(FUNC(pgm2_state::ddpdojt_speedup_r), this));
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0x20021e04, 0x20021e07, read32_delegate(FUNC(pgm2_state::ddpdojt_speedup2_r), this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x20000060, 0x20000063, read32_delegate(FUNC(pgm2_state::ddpdojt_speedup_r), this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x20021e04, 0x20021e07, read32_delegate(FUNC(pgm2_state::ddpdojt_speedup2_r), this));
 }
 
 static const uint8_t kov3_100_key[] = { 0xde, 0x29, 0x52, 0x84, 0x71, 0x9e, 0xed, 0x66 };
@@ -1339,7 +1339,7 @@ static const uint8_t kov3_104_key[] = { 0xaf, 0x35, 0x5f, 0xf9, 0x63, 0x78, 0xe8
 DRIVER_INIT_MEMBER(pgm2_state,kov3)
 {
 	common_encryption_init();
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0x200000b4, 0x200000b7, read32_delegate(FUNC(pgm2_state::kov3_speedup_r),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x200000b4, 0x200000b7, read32_delegate(FUNC(pgm2_state::kov3_speedup_r),this));
 }
 
 void pgm2_state::decrypt_kov3_module(uint32_t addrxor, uint16_t dataxor)

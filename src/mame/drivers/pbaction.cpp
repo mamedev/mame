@@ -480,7 +480,7 @@ ROM_END
 READ8_MEMBER(pbaction_state::pbactio3_prot_kludge_r)
 {
 	/* on startup, the game expect this location to NOT act as RAM */
-	if (space.device().safe_pc() == 0xab80)
+	if (m_maincpu->pc() == 0xab80)
 		return 0;
 
 	return m_work_ram[0];

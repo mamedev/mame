@@ -386,21 +386,21 @@ READ8_MEMBER(homedata_state::reikaids_io_r)
 
 	m_vblank = 0;
 
-	//logerror("%04x: io_r %02x\n", space.device().safe_pc(), res);
+	//logerror("%s: io_r %02x\n", machine().describe_context(), res);
 
 	return res;
 }
 
 READ8_MEMBER(homedata_state::reikaids_snd_command_r)
 {
-	//logerror("%04x: sndmcd_r (%02x)\n", space.device().safe_pc(), m_snd_command);
+	//logerror("%s: sndmcd_r (%02x)\n", machine().describe_context(), m_snd_command);
 	return m_snd_command;
 }
 
 WRITE8_MEMBER(homedata_state::reikaids_snd_command_w)
 {
 	m_snd_command = data;
-	//logerror("%04x: coprocessor_command_w %02x\n", space.device().safe_pc(), data);
+	//logerror("%s: coprocessor_command_w %02x\n", machine().describe_context(), data);
 }
 
 
@@ -414,13 +414,13 @@ WRITE8_MEMBER(homedata_state::reikaids_snd_command_w)
 
 WRITE8_MEMBER(homedata_state::pteacher_snd_command_w)
 {
-	//logerror("%04x: snd_command_w %02x\n", space.device().safe_pc(), data);
+	//logerror("%s: snd_command_w %02x\n", machine().describe_context(), data);
 	m_from_cpu = data;
 }
 
 READ8_MEMBER(homedata_state::pteacher_snd_r)
 {
-	//logerror("%04x: pteacher_snd_r %02x\n",space.device().safe_pc(),to_cpu);
+	//logerror("%s: pteacher_snd_r %02x\n",machine().describe_context(),to_cpu);
 	return m_to_cpu;
 }
 
@@ -446,7 +446,7 @@ READ8_MEMBER(homedata_state::pteacher_keyboard_r)
 	static const char *const keynames[] = { "KEY0", "KEY1", "KEY2", "KEY3", "KEY4", "KEY5" };
 	int dips = ioport("DSW")->read();
 
-	//  logerror("%04x: keyboard_r with port A = %02x\n",space.device().safe_pc(),upd7807_porta);
+	//  logerror("%s: keyboard_r with port A = %02x\n",machine().describe_context(),upd7807_porta);
 
 	if (m_upd7807_porta & 0x80)
 	{
@@ -469,7 +469,7 @@ READ8_MEMBER(homedata_state::pteacher_upd7807_porta_r)
 	if (!BIT(m_upd7807_portc, 6))
 		m_upd7807_porta = m_from_cpu;
 	else
-		logerror("%04x: read PA with PC *not* clear\n", space.device().safe_pc());
+		logerror("%s: read PA with PC *not* clear\n", machine().describe_context());
 
 	return m_upd7807_porta;
 }

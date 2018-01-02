@@ -3504,7 +3504,7 @@ READ16_MEMBER(tumbleb_state::bcstory_1a0_read)
 {
 	//osd_printf_debug("bcstory_io %06x\n",space.device().safe_pc());
 
-	if (space.device().safe_pc()==0x0560) return 0x1a0;
+	if (m_maincpu->pc()==0x0560) return 0x1a0;
 	else return ioport("SYSTEM")->read();
 }
 

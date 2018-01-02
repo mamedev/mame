@@ -150,7 +150,7 @@ WRITE16_MEMBER(hyprduel_state::hyprduel_cpusync_trigger1_w)
 	{
 		if (!m_cpu_trigger && !m_subcpu_resetline)
 		{
-			space.device().execute().spin_until_trigger(1001);
+			m_maincpu->spin_until_trigger(1001);
 			m_cpu_trigger = 1001;
 		}
 	}
@@ -176,7 +176,7 @@ WRITE16_MEMBER(hyprduel_state::hyprduel_cpusync_trigger2_w)
 	{
 		if (!m_cpu_trigger && !m_subcpu_resetline)
 		{
-			space.device().execute().spin_until_trigger(1002);
+			m_maincpu->spin_until_trigger(1002);
 			m_cpu_trigger = 1002;
 		}
 	}

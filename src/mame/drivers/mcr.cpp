@@ -636,17 +636,12 @@ READ8_MEMBER(mcr_nflfoot_state::ip2_r)
 {
 	/* bit 7 = J3-2 on IPU board = TXDA on SIO */
 	uint8_t val = m_ipu_sio_txda << 7;
-
-	if (space.device().safe_pc() != 0x107)
-		logerror("%04X:ip2_r = %02X\n", space.device().safe_pc(), val);
 	return val;
 }
 
 
 WRITE8_MEMBER(mcr_nflfoot_state::op4_w)
 {
-	logerror("%04X:op4_w(%d%d%d)\n", space.device().safe_pc(), (data >> 7) & 1, (data >> 6) & 1, (data >> 5) & 1);
-
 	/* bit 7 = J3-7 on IPU board = /RXDA on SIO */
 	m_ipu_sio->rxa_w(!((data >> 7) & 1));
 

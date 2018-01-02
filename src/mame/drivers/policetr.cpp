@@ -213,7 +213,7 @@ WRITE32_MEMBER(policetr_state::speedup_w)
 	COMBINE_DATA(m_speedup_data);
 
 	/* see if the PC matches */
-	if ((space.device().safe_pcbase() & 0x1fffffff) == m_speedup_pc)
+	if ((m_maincpu->pcbase() & 0x1fffffff) == m_speedup_pc)
 	{
 		uint64_t curr_cycles = m_maincpu->total_cycles();
 
@@ -224,7 +224,7 @@ WRITE32_MEMBER(policetr_state::speedup_w)
 
 			/* more than 2 in a row and we spin */
 			if (m_loop_count > 2)
-				space.device().execute().spin_until_interrupt();
+				m_maincpu->spin_until_interrupt();
 		}
 		else
 			m_loop_count = 0;

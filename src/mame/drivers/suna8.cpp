@@ -526,7 +526,7 @@ READ8_MEMBER(suna8_state::hardhead_ip_r)
 		case 2: return ioport("DSW1")->read();
 		case 3: return ioport("DSW2")->read();
 		default:
-			logerror("CPU #0 - PC %04X: Unknown IP read: %02X\n", space.device().safe_pc(), *m_hardhead_ip);
+			logerror("CPU #0 - PC %04X: Unknown IP read: %02X\n", m_maincpu->pc(), *m_hardhead_ip);
 			return 0xff;
 	}
 }

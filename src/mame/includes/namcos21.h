@@ -102,7 +102,7 @@ public:
 	DECLARE_WRITE16_MEMBER(dspcuskey_w);
 	DECLARE_READ16_MEMBER(dspcuskey_r);
 	DECLARE_READ16_MEMBER(dspram16_r);
-	DECLARE_WRITE16_MEMBER(dspram16_w);
+	template<bool maincpu> DECLARE_WRITE16_MEMBER(dspram16_w);
 	DECLARE_READ16_MEMBER(dsp_port0_r);
 	DECLARE_WRITE16_MEMBER(dsp_port0_w);
 	DECLARE_READ16_MEMBER(dsp_port1_r);

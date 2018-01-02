@@ -581,7 +581,7 @@ READ16_MEMBER(namcona1_state::na1mcu_shared_r)
 #if 0
 	if (offset >= 0x70000/2)
 	{
-		logerror("MD: %04x @ %x PC %x\n", data, offset*2, space.device().safe_pc());
+		logerror("MD: %04x @ %x %s\n", data, offset*2, machine().describe_context());
 	}
 #endif
 	return data;
@@ -634,7 +634,7 @@ WRITE8_MEMBER(namcona1_state::port4_w)
 {
 	if ((data & 0x08) && !(m_mcu_port4 & 0x08))
 	{
-		logerror("launching 68k, PC=%x\n", space.device().safe_pc());
+		logerror("launching 68k, %s\n", machine().describe_context());
 
 		// reset and launch the 68k
 		m_maincpu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);

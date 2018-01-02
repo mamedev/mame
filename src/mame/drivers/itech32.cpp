@@ -842,14 +842,14 @@ WRITE32_MEMBER(itech32_state::tms2_trigger_w)
 
 READ32_MEMBER(itech32_state::drivedge_tms1_speedup_r)
 {
-	if (m_tms1_ram[0x382] == 0 && space.device().safe_pc() == 0xee) START_TMS_SPINNING(0);
+	if (m_tms1_ram[0x382] == 0 && m_dsp1->pc() == 0xee) START_TMS_SPINNING(0);
 	return m_tms1_ram[0x382];
 }
 
 
 READ32_MEMBER(itech32_state::drivedge_tms2_speedup_r)
 {
-	if (m_tms2_ram[0x382] == 0 && space.device().safe_pc() == 0x809808) START_TMS_SPINNING(1);
+	if (m_tms2_ram[0x382] == 0 && m_dsp2->pc() == 0x809808) START_TMS_SPINNING(1);
 	return m_tms2_ram[0x382];
 }
 

@@ -266,7 +266,7 @@ READ16_MEMBER(polepos_state::polepos2_ic25_r)
 		m_last_result = (int8_t)m_last_signed * (uint8_t)m_last_unsigned;
 	}
 
-//  logerror("%04X: read IC25 @ %04X = %02X\n", space.device().safe_pc(), offset, result);
+//  logerror("%s: read IC25 @ %04X = %02X\n", machine().describe_context(), offset, result);
 
 	return result | (result << 8);
 }
@@ -320,13 +320,13 @@ WRITE_LINE_MEMBER(polepos_state::chacl_w)
 	polepos_chacl_w(machine().dummy_space(), 0, state);
 }
 
-WRITE16_MEMBER(polepos_state::polepos_z8002_nvi_enable_w)
+template<bool sub1> WRITE16_MEMBER(polepos_state::polepos_z8002_nvi_enable_w)
 {
 	data &= 1;
 
 	m_sub_irq_mask = data;
 	if (!data)
-		space.device().execute().set_input_line(0, CLEAR_LINE);
+		(sub1 ? m_subcpu : m_subcpu2)->set_input_line(0, CLEAR_LINE);
 }
 
 CUSTOM_INPUT_MEMBER(polepos_state::auto_start_r)
@@ -451,7 +451,6 @@ ADDRESS_MAP_END
 /* the same memory map is used by both Z8002 CPUs; all RAM areas are shared */
 static ADDRESS_MAP_START( z8002_map, AS_PROGRAM, 16, polepos_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x6000, 0x6001) AM_MIRROR(0x0ffe) AM_WRITE(polepos_z8002_nvi_enable_w) /* NVI enable - *NOT* shared by the two CPUs */
 	AM_RANGE(0x8000, 0x8fff) AM_READWRITE(polepos_sprite16_r, polepos_sprite16_w) AM_SHARE("sprite16_memory")   /* Motion Object */
 	AM_RANGE(0x9000, 0x97ff) AM_READWRITE(polepos_road16_r, polepos_road16_w) AM_SHARE("road16_memory")     /* Road Memory */
 	AM_RANGE(0x9800, 0x9fff) AM_READWRITE(polepos_alpha16_r, polepos_alpha16_w) AM_SHARE("alpha16_memory")  /* Alphanumeric (char ram) */
@@ -460,6 +459,15 @@ static ADDRESS_MAP_START( z8002_map, AS_PROGRAM, 16, polepos_state )
 	AM_RANGE(0xc100, 0xc101) AM_MIRROR(0x38fe) AM_WRITE(polepos_road16_vscroll_w)                       /* Road vertical position */
 ADDRESS_MAP_END
 
+static ADDRESS_MAP_START( z8002_map_1, AS_PROGRAM, 16, polepos_state )
+	AM_IMPORT_FROM(z8002_map)
+	AM_RANGE(0x6000, 0x6001) AM_MIRROR(0x0ffe) AM_WRITE(polepos_z8002_nvi_enable_w<true>) /* NVI enable - *NOT* shared by the two CPUs */
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( z8002_map_2, AS_PROGRAM, 16, polepos_state )
+	AM_IMPORT_FROM(z8002_map)
+	AM_RANGE(0x6000, 0x6001) AM_MIRROR(0x0ffe) AM_WRITE(polepos_z8002_nvi_enable_w<false>) /* NVI enable - *NOT* shared by the two CPUs */
+ADDRESS_MAP_END
 
 
 /*********************************************************************
@@ -848,10 +856,10 @@ static MACHINE_CONFIG_START( polepos )
 	MCFG_CPU_IO_MAP(z80_io)
 
 	MCFG_CPU_ADD("sub", Z8002, MASTER_CLOCK/8)  /* 3.072 MHz */
-	MCFG_CPU_PROGRAM_MAP(z8002_map)
+	MCFG_CPU_PROGRAM_MAP(z8002_map_1)
 
 	MCFG_CPU_ADD("sub2", Z8002, MASTER_CLOCK/8) /* 3.072 MHz */
-	MCFG_CPU_PROGRAM_MAP(z8002_map)
+	MCFG_CPU_PROGRAM_MAP(z8002_map_2)
 
 	MCFG_NAMCO_51XX_ADD("51xx", MASTER_CLOCK/8/2)      /* 1.536 MHz */
 	MCFG_NAMCO_51XX_INPUT_0_CB(IOPORT("IN0")) MCFG_DEVCB_MASK(0x0f)
@@ -979,10 +987,10 @@ static MACHINE_CONFIG_START( topracern )
 	MCFG_CPU_IO_MAP(topracern_io)
 
 	MCFG_CPU_ADD("sub", Z8002, MASTER_CLOCK/8)  /* 3.072 MHz */
-	MCFG_CPU_PROGRAM_MAP(z8002_map)
+	MCFG_CPU_PROGRAM_MAP(z8002_map_1)
 
 	MCFG_CPU_ADD("sub2", Z8002, MASTER_CLOCK/8) /* 3.072 MHz */
-	MCFG_CPU_PROGRAM_MAP(z8002_map)
+	MCFG_CPU_PROGRAM_MAP(z8002_map_2)
 
 	/* todo, remove these devices too, this bootleg doesn't have them, but the emulation doesn't boot without them.. */
 	/* doesn't exist on the bootleg, but required for now or the game only boots in test mode!

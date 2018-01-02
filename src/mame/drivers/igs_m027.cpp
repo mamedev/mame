@@ -88,7 +88,7 @@ WRITE32_MEMBER(igs_m027_state::igs_cg_videoram_w)
 {
 	COMBINE_DATA(&m_igs_cg_videoram[offset]);
 	//if(data!=0)
-	logerror("PC(%08X) CG @%x = %x!\n",space.device().safe_pc(),offset ,m_igs_cg_videoram[offset]);
+	logerror("PC(%08X) CG @%x = %x!\n",m_maincpu->pc(),offset ,m_igs_cg_videoram[offset]);
 
 	/*
 	ROM:08020520                 DCW 0x3E                                           ddd1        y

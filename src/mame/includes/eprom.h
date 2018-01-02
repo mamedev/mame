@@ -36,7 +36,7 @@ public:
 	DECLARE_READ16_MEMBER(adc_r);
 	DECLARE_WRITE16_MEMBER(eprom_latch_w);
 	DECLARE_READ16_MEMBER(sync_r);
-	DECLARE_WRITE16_MEMBER(sync_w);
+	template<bool maincpu> DECLARE_WRITE16_MEMBER(sync_w);
 	DECLARE_DRIVER_INIT(klaxp);
 	DECLARE_DRIVER_INIT(guts);
 	DECLARE_DRIVER_INIT(eprom);
