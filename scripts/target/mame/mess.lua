@@ -1866,6 +1866,8 @@ files {
 	MAME_DIR .. "src/mame/machine/dec_lk201.h",
 	MAME_DIR .. "src/mame/machine/rx01.cpp",
 	MAME_DIR .. "src/mame/machine/rx01.h",
+	MAME_DIR .. "src/mame/machine/vt100_kbd.cpp",
+	MAME_DIR .. "src/mame/machine/vt100_kbd.h",
 	MAME_DIR .. "src/mame/video/vtvideo.cpp",
 	MAME_DIR .. "src/mame/video/vtvideo.h",
 }
