@@ -65,8 +65,6 @@ public:
 	DECLARE_WRITE16_MEMBER(control_w);
 	DECLARE_READ16_MEMBER(ultennis_hack_r);
 	DECLARE_WRITE16_MEMBER(protection_bit_w);
-	DECLARE_READ16_MEMBER(shtstar_unk_r);
-	DECLARE_READ16_MEMBER(shtstar_unk_2_r);
 	DECLARE_READ16_MEMBER(artmagic_blitter_r);
 	DECLARE_WRITE16_MEMBER(artmagic_blitter_w);
 	DECLARE_WRITE_LINE_MEMBER(m68k_gen_int);
