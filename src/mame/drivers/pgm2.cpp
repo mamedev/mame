@@ -1409,7 +1409,7 @@ GAME( 2008, kov2nl_300cn, kov2nl,    pgm2,    pgm2, pgm2_state,     kov2nl,     
 
 
 // Dodonpachi Daioujou Tamashii - should be a V200 too
-GAME( 2010, ddpdojt,      0,    pgm2_ramrom,    pgm2, pgm2_state,     ddpdojt,    ROT270, "IGS", "DoDonPachi Dai-Ou-Jou Tamashii (V201, China)", 0 )
+GAME( 2010, ddpdojt,      0,    pgm2_ramrom,    pgm2, pgm2_state,     ddpdojt,    ROT270, "IGS / Cave", "DoDonPachi Dai-Ou-Jou Tamashii (V201, China)", 0 )
 
 // Knights of Valour 3 - should be a V103 and V101 too
 GAME( 2011, kov3,         0,    pgm2_hires, pgm2, pgm2_state,     kov3_104,   ROT0, "IGS", "Knights of Valour 3 (V104, China, Hong Kong, Taiwan)", 0 )
