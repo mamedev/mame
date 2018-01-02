@@ -109,7 +109,7 @@ ioport_constructor pc9801_26_device::device_input_ports() const
 
 pc9801_26_device::pc9801_26_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, PC9801_26, tag, owner, clock),
-//      m_maincpu(*this, "^maincpu"),
+		m_bus(*this, DEVICE_SELF_OWNER),
 		m_opn(*this, "opn")
 {
 }
@@ -130,17 +130,17 @@ void pc9801_26_device::device_validity_check(validity_checker &valid) const
 
 void pc9801_26_device::install_device(offs_t start, offs_t end, read8_delegate rhandler, write8_delegate whandler)
 {
-	int buswidth = machine().firstcpu->space_config(AS_IO)->m_data_width;
+	int buswidth = m_bus->io_space().data_width();
 	switch(buswidth)
 	{
 		case 8:
-			machine().firstcpu->space(AS_IO).install_readwrite_handler(start, end, rhandler, whandler, 0);
+			m_bus->io_space().install_readwrite_handler(start, end, rhandler, whandler, 0);
 			break;
 		case 16:
-			machine().firstcpu->space(AS_IO).install_readwrite_handler(start, end, rhandler, whandler, 0xffff);
+			m_bus->io_space().install_readwrite_handler(start, end, rhandler, whandler, 0xffff);
 			break;
 		case 32:
-			machine().firstcpu->space(AS_IO).install_readwrite_handler(start, end, rhandler, whandler, 0xffffffff);
+			m_bus->io_space().install_readwrite_handler(start, end, rhandler, whandler, 0xffffffff);
 			break;
 		default:
 			fatalerror("PC-9801-26: Bus width %d not supported\n", buswidth);

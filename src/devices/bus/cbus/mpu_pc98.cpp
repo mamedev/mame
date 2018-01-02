@@ -56,6 +56,7 @@ MACHINE_CONFIG_END
 
 mpu_pc98_device::mpu_pc98_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, MPU_PC98, tag, owner, clock)
+	, m_bus(*this, DEVICE_SELF_OWNER)
 	, m_mpu401(*this, MPU_CORE_TAG)
 {
 }
@@ -70,7 +71,7 @@ ADDRESS_MAP_END
 
 void mpu_pc98_device::device_start()
 {
-	address_space &iospace = machine().firstcpu->space(AS_IO);
+	address_space &iospace = m_bus->io_space();
 	iospace.install_device(0xe0d0, 0xe0d3, *this, &mpu_pc98_device::map, 16, 0xffffffffffffffffU >> (64 - iospace.data_width()));
 }
 

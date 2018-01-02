@@ -54,7 +54,8 @@ device_pc9801cbus_card_interface::~device_pc9801cbus_card_interface()
 
 pc9801_slot_device::pc9801_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, PC9801CBUS_SLOT, tag, owner, clock),
-	device_slot_interface(mconfig, *this)
+	device_slot_interface(mconfig, *this),
+	m_cpu(*this, "^maincpu")
 {
 }
 
