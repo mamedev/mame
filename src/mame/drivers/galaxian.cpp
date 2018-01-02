@@ -1434,7 +1434,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(galaxian_state::checkmaj_irq0_gen)
 
 READ8_MEMBER(galaxian_state::checkmaj_protection_r)
 {
-	switch (space.device().safe_pc())
+	switch (m_maincpu->pc())
 	{
 		case 0x0f15:  return 0xf5;
 		case 0x0f8f:  return 0x7c;
@@ -1443,7 +1443,7 @@ READ8_MEMBER(galaxian_state::checkmaj_protection_r)
 		case 0x10f1:  return 0xaa;
 		case 0x1402:  return 0xaa;
 		default:
-			logerror("Unknown protection read. PC=%04X\n",space.device().safe_pc());
+			logerror("Unknown protection read. PC=%04X\n", m_maincpu->pc());
 	}
 
 	return 0;

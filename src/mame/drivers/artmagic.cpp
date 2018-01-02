@@ -136,7 +136,7 @@ void artmagic_state::device_timer(emu_timer &timer, device_timer_id id, int para
 READ16_MEMBER(artmagic_state::ultennis_hack_r)
 {
 	/* IRQ5 points to: jsr (a5); rte */
-	uint32_t pc = space.device().safe_pc();
+	uint32_t pc = m_maincpu->pc();
 	if (pc == 0x18c2 || pc == 0x18e4)
 	{
 		m_hack_irq = 1;
