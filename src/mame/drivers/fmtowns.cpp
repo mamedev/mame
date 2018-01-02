@@ -1653,6 +1653,11 @@ void towns_state::towns_cdrom_execute_command(cdrom_image_device* device)
 				m_towns_cd.extra_status = 1;
 				towns_cd_set_status(0x00,0x00,0x00,0x00);
 				break;
+			case 0x1f:  // unknown
+				if(LOG_CD) logerror("CD: Command 0x1f: unknown\n");
+				m_towns_cd.extra_status = 1;
+				towns_cd_set_status(0x00,0x00,0x00,0x00);
+				break;
 			case 0x80:  // set state
 				if(LOG_CD) logerror("CD: Command 0x80: set state\n");
 				if(m_towns_cd.command & 0x20)
