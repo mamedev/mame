@@ -252,6 +252,8 @@ void towns_state::towns_update_kanji_offset()
 READ8_MEMBER( towns_state::towns_video_cff80_r )
 {
 	uint8_t* ROM = m_user->base();
+	uint8_t ret = 0;
+	uint16_t xpos;
 
 	switch(offset)
 	{
@@ -267,10 +269,13 @@ READ8_MEMBER( towns_state::towns_video_cff80_r )
 			else
 				return 0x00;
 		case 0x06:
+			ret |= 0x10;
+			xpos = machine().first_screen()->hpos();
+			if(xpos < m_video.towns_crtc_layerscr[0].max_x && xpos > m_video.towns_crtc_layerscr[0].min_x)
+				ret |= 0x80;
 			if(m_video.towns_vblank_flag != 0)
-				return 0x14;
-			else
-				return 0x10;
+				ret |= 0x04;
+			return ret;
 		case 0x16:  // Kanji character data
 			return ROM[(m_video.towns_kanji_offset << 1) + 0x180000];
 		case 0x17:  // Kanji character data
