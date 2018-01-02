@@ -259,7 +259,7 @@ WRITE8_MEMBER(exprraid_state::exprraid_prot_data_w)
 			break;
 
 		default:
-			logerror("Unknown protection write: %x at PC:%x\n", data, space.device().safe_pc());
+			logerror("Unknown protection write: %x at %s\n", data, machine().describe_context());
 	}
 }
 

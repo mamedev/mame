@@ -74,7 +74,8 @@ public:
 	uint8_t m_drawmode_table[16];
 
 	DECLARE_WRITE_LINE_MEMBER(subres_w);
-	DECLARE_WRITE8_MEMBER(irq_ack_w);
+	DECLARE_WRITE8_MEMBER(audiocpu_irq_ack_w);
+	DECLARE_WRITE8_MEMBER(mcu_irq_ack_w);
 	DECLARE_READ8_MEMBER(dsw_r);
 	DECLARE_WRITE8_MEMBER(coin_w);
 	DECLARE_WRITE8_MEMBER(dac_gain_w);

@@ -501,17 +501,17 @@ public:
 	uint32_t screen_update_cmi2x(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	// Memory mapping
-	DECLARE_READ8_MEMBER( rom_r );
+	template<int cpunum> DECLARE_READ8_MEMBER( rom_r );
 	DECLARE_WRITE8_MEMBER( map_ram_w );
-	DECLARE_READ8_MEMBER( vector_r );
-	DECLARE_READ8_MEMBER( map_r );
-	DECLARE_WRITE8_MEMBER( map_w );
+	template<int cpunum> DECLARE_READ8_MEMBER( vector_r );
+	template<int cpunum> DECLARE_READ8_MEMBER( map_r );
+	template<int cpunum> DECLARE_WRITE8_MEMBER( map_w );
 	DECLARE_READ8_MEMBER( atomic_r );
 	DECLARE_WRITE8_MEMBER( cpufunc_w );
 	DECLARE_READ8_MEMBER( parity_r );
 	DECLARE_WRITE8_MEMBER( mapsel_w );
-	DECLARE_READ8_MEMBER( irq_ram_r );
-	DECLARE_WRITE8_MEMBER( irq_ram_w );
+	template<int cpunum> DECLARE_READ8_MEMBER( irq_ram_r );
+	template<int cpunum> DECLARE_WRITE8_MEMBER( irq_ram_w );
 
 	// MIDI/SMPTE
 	DECLARE_WRITE16_MEMBER( midi_dma_w );
@@ -890,9 +890,9 @@ READ8_MEMBER( cmi_state::vram_r )
 
 /* Memory handling */
 
-READ8_MEMBER( cmi_state::rom_r )
+template<int cpunum> READ8_MEMBER( cmi_state::rom_r )
 {
-	uint16_t base = (&space == m_cpu2space ? 0x1000 : 0x2000);
+	uint16_t base = (cpunum ? 0x1000 : 0x2000);
 	return *(((uint8_t *)m_q133_region->base()) + base + offset);
 }
 
@@ -922,29 +922,24 @@ WRITE8_MEMBER( cmi_state::map_ram_w )
 	}
 }
 
-READ8_MEMBER( cmi_state::vector_r )
+template<int cpunum> READ8_MEMBER( cmi_state::vector_r )
 {
-	return m_q133_rom[((&space.device() == m_maincpu2) ? 0xbfe : 0xffe) + offset];
+	return m_q133_rom[(cpunum ? 0xbfe : 0xffe) + offset];
 }
 
-READ8_MEMBER( cmi_state::map_r )
+template<int cpunum> READ8_MEMBER( cmi_state::map_r )
 {
-	int cpunum = (&space.device() == m_maincpu1) ? 0 : 1;
 	uint8_t data = (m_cpu_active_space[1] << 2) | (m_cpu_active_space[0] << 1) | cpunum;
 	return data;
 }
 
-WRITE8_MEMBER( cmi_state::map_w )
+template<int cpunum> WRITE8_MEMBER( cmi_state::map_w )
 {
-	int cpunum = (&space.device() == m_maincpu1) ? 0 : 1;
-
 	m_map_switch_timer->adjust(attotime::from_ticks(data & 0xf, M6809_CLOCK), cpunum);
 }
 
-READ8_MEMBER( cmi_state::irq_ram_r )
+template<int cpunum> READ8_MEMBER( cmi_state::irq_ram_r )
 {
-	int cpunum = (&space.device() == m_maincpu1) ? 0 : 1;
-
 	if (machine().side_effect_disabled())
 		return m_scratch_ram[cpunum][0xf8 + offset];
 
@@ -956,9 +951,8 @@ READ8_MEMBER( cmi_state::irq_ram_r )
 	return m_scratch_ram[cpunum][0xf8 + offset];
 }
 
-WRITE8_MEMBER( cmi_state::irq_ram_w )
+template<int cpunum> WRITE8_MEMBER( cmi_state::irq_ram_w )
 {
-	int cpunum = (&space.device() == m_maincpu1) ? 0 : 1;
 	m_scratch_ram[cpunum][0xf8 + offset] = data;
 }
 
@@ -1069,11 +1063,11 @@ READ16_MEMBER( cmi_state::midi_dma_r )
 
 /* The maps are dynamically populated */
 static ADDRESS_MAP_START( maincpu1_map, AS_PROGRAM, 8, cmi_state )
-	AM_RANGE(0xfffe, 0xffff) AM_READ(vector_r)
+	AM_RANGE(0xfffe, 0xffff) AM_READ(vector_r<0>)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( maincpu2_map, AS_PROGRAM, 8, cmi_state )
-	AM_RANGE(0xfffe, 0xffff) AM_READ(vector_r)
+	AM_RANGE(0xfffe, 0xffff) AM_READ(vector_r<1>)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( muskeys_map, AS_PROGRAM, 8, cmi_state)
@@ -2240,14 +2234,20 @@ void cmi_state::install_peripherals(int cpunum)
 
 	space->install_readwrite_handler(0xe000, 0xe03f, read8_delegate(FUNC(cmi_state::cmi02_r),this), write8_delegate(FUNC(cmi_state::cmi02_w),this));
 
-	space->install_readwrite_handler(0xf000, 0xf7ff, read8_delegate(FUNC(cmi_state::rom_r),this), write8_delegate(FUNC(cmi_state::map_ram_w),this));
+	if (cpunum)
+		space->install_readwrite_handler(0xf000, 0xf7ff, read8_delegate(FUNC(cmi_state::rom_r<1>),this), write8_delegate(FUNC(cmi_state::map_ram_w),this));
+	else
+		space->install_readwrite_handler(0xf000, 0xf7ff, read8_delegate(FUNC(cmi_state::rom_r<0>),this), write8_delegate(FUNC(cmi_state::map_ram_w),this));
 
 	space->install_rom(0xf800, 0xfbff, m_q133_rom + (cpunum == CPU_2 ? 0x1800 : 0x2800));
 
 	space->install_readwrite_handler(0xfc40, 0xfc4f, read8_delegate(FUNC(cmi_state::parity_r),this), write8_delegate(FUNC(cmi_state::mapsel_w),this));
 	space->nop_readwrite(0xfc5a, 0xfc5b); // Q077 HDD controller - not installed
 	space->install_readwrite_handler(0xfc5e, 0xfc5e, read8_delegate(FUNC(cmi_state::atomic_r),this), write8_delegate(FUNC(cmi_state::cpufunc_w),this));
-	space->install_readwrite_handler(0xfc5f, 0xfc5f, read8_delegate(FUNC(cmi_state::map_r),this), write8_delegate(FUNC(cmi_state::map_w),this));
+	if (cpunum)
+		space->install_readwrite_handler(0xfc5f, 0xfc5f, read8_delegate(FUNC(cmi_state::map_r<1>),this), write8_delegate(FUNC(cmi_state::map_w<1>),this));
+	else
+		space->install_readwrite_handler(0xfc5f, 0xfc5f, read8_delegate(FUNC(cmi_state::map_r<0>),this), write8_delegate(FUNC(cmi_state::map_w<0>),this));
 
 	space->install_readwrite_handler(0xfc80, 0xfc83, read8_delegate(FUNC(mos6551_device::read),m_q133_acia_0.target()), write8_delegate(FUNC(mos6551_device::write),m_q133_acia_0.target()));
 	space->install_readwrite_handler(0xfc84, 0xfc87, read8_delegate(FUNC(mos6551_device::read),m_q133_acia_1.target()), write8_delegate(FUNC(mos6551_device::write),m_q133_acia_1.target()));
@@ -2274,8 +2274,13 @@ void cmi_state::install_peripherals(int cpunum)
 	space->install_ram(0xff00, 0xfff7, &m_scratch_ram[cpunum][0]);
 	space->install_ram(0xfffa, 0xfffd, &m_scratch_ram[cpunum][0xfa]);
 
-	space->install_readwrite_handler(0xfff8, 0xfff9, read8_delegate(FUNC(cmi_state::irq_ram_r),this), write8_delegate(FUNC(cmi_state::irq_ram_w),this));
-	space->install_read_handler(0xfffe, 0xffff, read8_delegate(FUNC(cmi_state::vector_r),this));
+	if (cpunum) {
+		space->install_readwrite_handler(0xfff8, 0xfff9, read8_delegate(FUNC(cmi_state::irq_ram_r<1>),this), write8_delegate(FUNC(cmi_state::irq_ram_w<1>),this));
+		space->install_read_handler(0xfffe, 0xffff, read8_delegate(FUNC(cmi_state::vector_r<1>),this));
+	} else {
+		space->install_readwrite_handler(0xfff8, 0xfff9, read8_delegate(FUNC(cmi_state::irq_ram_r<0>),this), write8_delegate(FUNC(cmi_state::irq_ram_w<0>),this));
+		space->install_read_handler(0xfffe, 0xffff, read8_delegate(FUNC(cmi_state::vector_r<0>),this));
+	}
 }
 
 

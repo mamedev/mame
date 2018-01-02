@@ -737,7 +737,7 @@ WRITE8_MEMBER(dynax_state::yarunara_blit_romregion_w)
 		case 0x81:  dynax_blit_romregion_w(space, 0, 3);    return;
 		case 0x82:  dynax_blit_romregion_w(space, 0, 4);    return; // mjcomv1
 	}
-	logerror("%04x: unmapped romregion=%02X\n", space.device().safe_pc(), data);
+	logerror("%s: unmapped romregion=%02X\n", machine().describe_context(), data);
 }
 
 static ADDRESS_MAP_START( yarunara_io_map, AS_IO, 8, dynax_state )

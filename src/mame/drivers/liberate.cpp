@@ -50,13 +50,13 @@ READ8_MEMBER(liberate_state::deco16_bank_r)
 		return m_spriteram[offset - 0x800];
 	if (offset < 0x2200)
 	{
-		logerror("%04x: Unmapped bank read %04x\n", space.device().safe_pc(), offset);
+		logerror("%s: Unmapped bank read %04x\n", machine().describe_context(), offset);
 		return 0;
 	}
 	if (offset < 0x2800)
 		return m_scratchram[offset - 0x2200];
 
-	logerror("%04x: Unmapped bank read %04x\n", space.device().safe_pc(), offset);
+	logerror("%s: Unmapped bank read %04x\n", machine().describe_context(), offset);
 	return 0;
 }
 

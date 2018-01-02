@@ -596,7 +596,7 @@ READ32_MEMBER(jaguar_state::misc_control_r)
 
 WRITE32_MEMBER(jaguar_state::misc_control_w)
 {
-	logerror("%08X:misc_control_w(%02X)\n", space.device().safe_pcbase(), data);
+	logerror("%s:misc_control_w(%02X)\n", machine().describe_context(), data);
 
 	/*  D7    = board reset (low)
 	    D6    = audio must & reset (high)
@@ -820,7 +820,7 @@ WRITE32_MEMBER(jaguar_state::eeprom_data_w)
 			m_nvram[offset] = data & 0xff000000;
 	}
 //  else
-//      logerror("%08X:error writing to disabled EEPROM\n", space.device().safe_pcbase());
+//      logerror("%s:error writing to disabled EEPROM\n", machine().describe_context());
 	m_eeprom_enable = false;
 }
 

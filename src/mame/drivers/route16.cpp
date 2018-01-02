@@ -89,7 +89,7 @@
 
 
 
-WRITE8_MEMBER(route16_state::route16_sharedram_w)
+template<bool cpu1> WRITE8_MEMBER(route16_state::route16_sharedram_w)
 {
 	m_sharedram[offset] = data;
 
@@ -97,7 +97,7 @@ WRITE8_MEMBER(route16_state::route16_sharedram_w)
 	if (offset >= 0x0313 && offset <= 0x0319 && data == 0xff)
 	{
 		// Let the other CPU run
-		space.device().execute().yield();
+		(cpu1 ? m_cpu1 : m_cpu2)->yield();
 	}
 }
 
@@ -220,7 +220,7 @@ WRITE8_MEMBER(route16_state::speakres_out2_w)
 static ADDRESS_MAP_START( route16_cpu1_map, AS_PROGRAM, 8, route16_state )
 	AM_RANGE(0x0000, 0x2fff) AM_ROM
 	AM_RANGE(0x3000, 0x3001) AM_READ(route16_prot_read)
-	AM_RANGE(0x4000, 0x43ff) AM_RAM_WRITE(route16_sharedram_w) AM_SHARE("sharedram")
+	AM_RANGE(0x4000, 0x43ff) AM_RAM_WRITE(route16_sharedram_w<true>) AM_SHARE("sharedram")
 	AM_RANGE(0x4800, 0x4800) AM_READ_PORT("DSW") AM_WRITE(out0_w)
 	AM_RANGE(0x5000, 0x5000) AM_READ_PORT("P1") AM_WRITE(out1_w)
 	AM_RANGE(0x5800, 0x5800) AM_READ_PORT("P2")
@@ -230,7 +230,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( routex_cpu1_map, AS_PROGRAM, 8, route16_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x43ff) AM_RAM_WRITE(route16_sharedram_w) AM_SHARE("sharedram")
+	AM_RANGE(0x4000, 0x43ff) AM_RAM_WRITE(route16_sharedram_w<true>) AM_SHARE("sharedram")
 	AM_RANGE(0x4800, 0x4800) AM_READ_PORT("DSW") AM_WRITE(out0_w)
 	AM_RANGE(0x5000, 0x5000) AM_READ_PORT("P1") AM_WRITE(out1_w)
 	AM_RANGE(0x5800, 0x5800) AM_READ_PORT("P2")
@@ -274,7 +274,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( route16_cpu2_map, AS_PROGRAM, 8, route16_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0x4000, 0x43ff) AM_RAM_WRITE(route16_sharedram_w) AM_SHARE("sharedram")
+	AM_RANGE(0x4000, 0x43ff) AM_RAM_WRITE(route16_sharedram_w<false>) AM_SHARE("sharedram")
 	AM_RANGE(0x8000, 0xbfff) AM_RAM AM_SHARE("videoram2")
 ADDRESS_MAP_END
 

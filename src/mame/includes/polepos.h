@@ -98,7 +98,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(gasel_w);
 	DECLARE_WRITE_LINE_MEMBER(sb0_w);
 	DECLARE_WRITE_LINE_MEMBER(chacl_w);
-	DECLARE_WRITE16_MEMBER(polepos_z8002_nvi_enable_w);
+	template<bool sub1> DECLARE_WRITE16_MEMBER(polepos_z8002_nvi_enable_w);
 	DECLARE_READ16_MEMBER(polepos_sprite16_r);
 	DECLARE_WRITE16_MEMBER(polepos_sprite16_w);
 	DECLARE_READ8_MEMBER(polepos_sprite_r);
