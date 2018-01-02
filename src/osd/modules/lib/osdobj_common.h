@@ -144,7 +144,7 @@ public:
 	bool gl_vbo() const { return bool_value(OSDOPTION_GL_VBO); }
 	bool gl_pbo() const { return bool_value(OSDOPTION_GL_PBO); }
 	bool gl_glsl() const { return bool_value(OSDOPTION_GL_GLSL); }
-	bool glsl_filter() const { return bool_value(OSDOPTION_GLSL_FILTER); }
+	int glsl_filter() const { return int_value(OSDOPTION_GLSL_FILTER); }
 	const char *shader_mame(int index) const { return value(string_format("%s%d", OSDOPTION_SHADER_MAME, index).c_str()); }
 	const char *shader_screen(int index) const { return value(string_format("%s%d", OSDOPTION_SHADER_SCREEN, index).c_str()); }
 
