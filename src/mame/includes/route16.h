@@ -7,6 +7,7 @@ class route16_state : public driver_device
 public:
 	route16_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
+		, m_cpu1(*this, "cpu1")
 		, m_sn(*this, "snsnd")
 		, m_sharedram(*this, "sharedram")
 		, m_videoram1(*this, "videoram1")
@@ -33,6 +34,7 @@ public:
 	uint32_t screen_update_ttmahjng(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 private:
+	required_device<cpu_device> m_cpu1;
 	optional_device<sn76477_device> m_sn;
 
 	required_shared_ptr<uint8_t> m_sharedram;

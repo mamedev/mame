@@ -12,8 +12,9 @@ class redclash_state : public ladybug_state
 {
 public:
 	redclash_state(const machine_config &mconfig, device_type type, const char *tag)
-		: ladybug_state(mconfig, type, tag) { }
+		: ladybug_state(mconfig, type, tag), m_sub(*this, "sub") { }
 
+	optional_device<cpu_device> m_sub;
 	tilemap_t    *m_fg_tilemap; // redclash
 	int        m_gfxbank;   // redclash only
 

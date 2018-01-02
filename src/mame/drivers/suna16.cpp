@@ -310,14 +310,14 @@ MACHINE_START_MEMBER(suna16_state, bssoccer)
 WRITE8_MEMBER(suna16_state::bssoccer_pcm_1_bankswitch_w)
 {
 	const int bank = data & 7;
-	if (bank & ~7)  logerror("CPU#2 PC %06X - ROM bank unknown bits: %02X\n", space.device().safe_pc(), data);
+	if (bank & ~7)  logerror("CPU#2 PC %06X - ROM bank unknown bits: %02X\n", m_pcm1->pc(), data);
 	m_bank1->set_entry(bank);
 }
 
 WRITE8_MEMBER(suna16_state::bssoccer_pcm_2_bankswitch_w)
 {
 	const int bank = data & 7;
-	if (bank & ~7)  logerror("CPU#3 PC %06X - ROM bank unknown bits: %02X\n", space.device().safe_pc(), data);
+	if (bank & ~7)  logerror("CPU#3 PC %06X - ROM bank unknown bits: %02X\n", m_pcm2->pc(), data);
 	m_bank2->set_entry(bank);
 }
 
@@ -363,7 +363,7 @@ ADDRESS_MAP_END
 WRITE8_MEMBER(suna16_state::uballoon_pcm_1_bankswitch_w)
 {
 	const int bank = data & 1;
-	if (bank & ~1)  logerror("CPU#2 PC %06X - ROM bank unknown bits: %02X\n", space.device().safe_pc(), data);
+	if (bank & ~1)  logerror("CPU#2 PC %06X - ROM bank unknown bits: %02X\n", m_pcm1->pc(), data);
 	m_bank1->set_entry(bank);
 }
 

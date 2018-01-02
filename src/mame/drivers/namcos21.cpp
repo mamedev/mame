@@ -583,7 +583,7 @@ READ16_MEMBER(namcos21_state::dspcuskey_r)
 	}
 	else if( m_gametype == NAMCOS21_CYBERSLED )
 	{
-		switch( space.device().safe_pc() )
+		switch( m_dspmaster->pc() )
 		{
 		case 0x8061: result = 0xfe95; break;
 		case 0x8069: result = 0xffff; break;

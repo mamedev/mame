@@ -11,6 +11,8 @@ public:
 	suna16_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this,"maincpu"),
+		m_pcm1(*this,"pcm1"),
+		m_pcm2(*this,"pcm2"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
@@ -24,6 +26,8 @@ public:
 	{ }
 
 	required_device<cpu_device> m_maincpu;
+	optional_device<cpu_device> m_pcm1;
+	optional_device<cpu_device> m_pcm2;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;

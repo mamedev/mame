@@ -386,7 +386,7 @@ WRITE32_MEMBER(midzeus_state::disk_asic_jr_w)
 		/* trackball reset; thegrid writes 1 at startup */
 		case 9:
 			if (data != 1)
-				logerror("%06X:disk_asic_jr_w(%X) = %X (unexpected)\n", space.device().safe_pc(), offset, data);
+				logerror("%06X:disk_asic_jr_w(%X) = %X (unexpected)\n", m_maincpu->pc(), offset, data);
 			break;
 		/* unknown purpose */
 		default:

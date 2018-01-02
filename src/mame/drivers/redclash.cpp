@@ -85,7 +85,7 @@ WRITE8_MEMBER(redclash_state::sraider_misc_w)
 			m_sraider_0x38 = data&0x3f;
 			break;
 		default:
-			osd_printf_debug("(%04X) write to %02X\n", space.device().safe_pc(), offset);
+			osd_printf_debug("(%04X) write to %02X\n", m_sub->pc(), offset);
 			break;
 	}
 }

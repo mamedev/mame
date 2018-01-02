@@ -363,13 +363,13 @@ WRITE8_MEMBER(cvs_state::cvs_speech_rom_address_lo_w)
 {
 	/* assuming that d0-d2 are cleared here */
 	m_speech_rom_bit_address = (m_speech_rom_bit_address & 0xf800) | (data << 3);
-	LOG(("%04x : CVS: Speech Lo %02x Address = %04x\n", space.device().safe_pc(), data, m_speech_rom_bit_address >> 3));
+	LOG(("%04x : CVS: Speech Lo %02x Address = %04x\n", m_speechcpu->pc(), data, m_speech_rom_bit_address >> 3));
 }
 
 WRITE8_MEMBER(cvs_state::cvs_speech_rom_address_hi_w)
 {
 	m_speech_rom_bit_address = (m_speech_rom_bit_address & 0x07ff) | (data << 11);
-	LOG(("%04x : CVS: Speech Hi %02x Address = %04x\n", space.device().safe_pc(), data, m_speech_rom_bit_address >> 3));
+	LOG(("%04x : CVS: Speech Hi %02x Address = %04x\n", m_speechcpu->pc(), data, m_speech_rom_bit_address >> 3));
 }
 
 

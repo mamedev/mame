@@ -944,7 +944,7 @@ READ16_MEMBER(seta2_state::funcube_coins_r)
 
 	if ( m_funcube_coin_start_cycles )
 	{
-		uint64_t elapsed = downcast<cpu_device *>(&space.device())->total_cycles() - m_funcube_coin_start_cycles;
+		uint64_t elapsed = m_sub->total_cycles() - m_funcube_coin_start_cycles;
 
 		if ( elapsed < coin_total_cycles/2 )
 			coin_bit0 = 0;

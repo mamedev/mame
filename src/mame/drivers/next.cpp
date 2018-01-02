@@ -513,7 +513,7 @@ READ32_MEMBER( next_state::dma_ctrl_r)
 	const char *name = dma_name(slot);
 
 	if(maincpu->pc() != 0x409bb4e)
-		logerror("dma_ctrl_r %s:%d %02x (%08x)\n", name, reg, dma_slots[slot].state, space.device().safe_pc());
+		logerror("dma_ctrl_r %s:%d %02x (%08x)\n", name, reg, dma_slots[slot].state, maincpu->pc());
 
 	return reg ? 0 : dma_slots[slot].state << 24;
 }
@@ -604,7 +604,7 @@ WRITE32_MEMBER( next_state::scsictrl_w )
 	}
 	if(ACCESSING_BITS_16_23) {
 		scsistat = data >> 16;
-		logerror("SCSIstat %02x (%08x)\n", data, space.device().safe_pc());
+		logerror("SCSIstat %02x (%08x)\n", data, maincpu->pc());
 	}
 }
 
