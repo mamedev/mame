@@ -6882,6 +6882,72 @@
 		</part>
 	</software>
 
+	<software name="atraincs">
+		<description>A-Train Construction Set</description>
+		<year>1992</year>
+		<publisher>Maxis</publisher>
+		<info name="version" value="1.00" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="A-Train Construction Set (USA) (Add-on).img" size="1474560" crc="fa4f2bbd" sha1="a944aac62d33c210ccab2dda2b7acbf6f87cf1d0" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="aopac">
+		<description>Aces of the Pacific</description>
+		<year>1992</year>
+		<publisher>Dynamix</publisher>
+		<info name="version" value="1.0" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="aopac201.img" size="1474560" crc="933f6eae" sha1="1941ec5c541508bb07d1b8dbdcf40d179508aab6" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="aopac202.img" size="1474560" crc="53d10b5d" sha1="20ee5006d5978ff2a1051210864ba87a8718bae5" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="aopac203.img" size="1474560" crc="511fe908" sha1="9f2169021e509cf50286a7965f5f855317272373" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="aopacex">
+		<description>Aces of the Pacific Expansion Disk - WWII: 1946</description>
+		<year>1992</year>
+		<publisher>Dynamix</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Aces of the Pacific - Expansion Disk - WWII - 1946 (USA, Europe) (v1.0).img" size="1474560" crc="6fae419b" sha1="3822bc87cea3be8e57e9b35d0d8bfcc3941cf00c" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="aoefr">
+		<description>Aces Over Europe (French)</description>
+		<year>1993</year>
+		<publisher>Dynamix</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Aces Over Europe (France) (Disk 1).img" size="1474560" crc="4659ac93" sha1="f1296c37734f6a2cc5d6bcfa55a810535413795a" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Aces Over Europe (France) (Disk 2).img" size="1474560" crc="cffa9daa" sha1="8a0aa92aed613de44b157d38b2b0fec94d0ffca3" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Aces Over Europe (France) (Disk 3).img" size="1474560" crc="945f95f5" sha1="ee1ecf7bbb8577f81a6bd1bfd4206c8b50bf2de9" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<!-- installer hangs -->
 	<software name="a4netwrk" supported="no">
 		<description>AIV Networks (German)</description>
@@ -7101,6 +7167,28 @@
 		<part name="flop2" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
 				<rom name="Boppin' - Super Ultimate (USA) (v1.1) (Disk 2).img" size="1474560" crc="20c4dc37" sha1="e39ac3f58f81813e515e8fa203dff7e9b9ebf9d3" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bytsz137">
+		<description>Byte Size Software #137 - Boppin' &amp; Dits and Dats</description>
+		<year>1995</year>
+		<publisher>Byte Size Software</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="bytesize_137.img" size="1474560" crc="fc09ffe5" sha1="30b848ebbd27c95e56270af80cf8ba2f72e88efa" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bytsz149">
+		<description>Byte Size Software #149 - AJ's Quest &amp; Machine Nation</description>
+		<year>1995</year>
+		<publisher>Byte Size Software</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="bytesize_149.img" size="1474560" crc="210fc964" sha1="93ed421c783e55f8030cf3074568aabe5c8a3fb1" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -8924,7 +9012,7 @@
 		</part>
 	</software>
 
-	<software name="omf2097" supported="partial">
+	<software name="omf2097">
 		<description>One Must Fall 2097</description>
 		<year>1994</year>
 		<publisher>Epic MegaGames</publisher>
@@ -9441,11 +9529,27 @@
 	</software>
 
 	<software name="spectrec">
-		<!-- Dumped via Kryoflux, track 0 shows as modified -->
-		<description>Spectre Challenger</description>
+		<!-- Dumped via Kryoflux, all tracks show as good and modified -->
+		<description>Spectre Challenger (V1.1, 1993-11-08)</description>
 		<year>1992</year>
 		<publisher>Velocity Development Corporation</publisher>
 		<info name="developer" value="Peninsula Gameworks" />
+		<info name="version" value="1.1" />
+		<info name="serial" value="XSP121OWW25300" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="disk1.img" size="737280" crc="5dabc1c8" sha1="4fb384ea7e070301c914b58c84593ab908ca372e" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spectreca" cloneof="spectrec">
+		<!-- Dumped via Kryoflux, track 0 shows as modified -->
+		<description>Spectre Challenger (V1.1, 1993-09-08)</description>
+		<year>1992</year>
+		<publisher>Velocity Development Corporation</publisher>
+		<info name="developer" value="Peninsula Gameworks" />
+		<info name="version" value="1.1" />
 		<info name="serial" value="333-3025" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
