@@ -892,11 +892,11 @@ ROM_END
 
 #define KOV2NL_PROGRAM_302(prefix, extension) \
 	ROM_REGION( 0x1000000, "user1", 0 ) \
-	ROM_LOAD( #prefix "v302" #extension ".u7", 0x00000000, 0x0800000, CRC(b19cf540) SHA1(25da5804bbfd7ef2cdf5cc5aabaa803d18b98929) )
+	ROM_LOAD( #prefix "_v302" #extension ".u7", 0x00000000, 0x0800000, CRC(b19cf540) SHA1(25da5804bbfd7ef2cdf5cc5aabaa803d18b98929) )
 
 #define KOV2NL_PROGRAM_301(prefix, extension) \
 	ROM_REGION( 0x1000000, "user1", 0 ) \
-	ROM_LOAD( #prefix "v301" #extension ".u7", 0x000000, 0x800000, CRC(c4595c2c) SHA1(09e379556ef76f81a63664f46d3f1415b315f384) )
+	ROM_LOAD( #prefix "_v301" #extension ".u7", 0x000000, 0x800000, CRC(c4595c2c) SHA1(09e379556ef76f81a63664f46d3f1415b315f384) )
 
 #define KOV2NL_PROGRAM_300(prefix, extension) \
 	ROM_REGION( 0x1000000, "user1", 0 ) \
