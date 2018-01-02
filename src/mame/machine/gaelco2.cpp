@@ -356,6 +356,6 @@ WRITE16_MEMBER(gaelco2_state::snowboar_protection_w)
 
 	snowboard_latch = (snowboard_latch << 16) | data;
 
-	logerror("%06x: protection write %04x to %04x\n", space.device().safe_pc(), data, offset*2);
+	logerror("%06x: protection write %04x to %04x\n", m_maincpu->pc(), data, offset*2);
 
 }

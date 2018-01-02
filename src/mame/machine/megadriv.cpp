@@ -311,7 +311,7 @@ READ16_MEMBER(md_base_state::megadriv_68k_io_read )
 	switch (offset)
 	{
 		case 0:
-			logerror("%06x read version register\n", space.device().safe_pc());
+			logerror("%06x read version register\n", m_maincpu->pc());
 			retdata = m_version_hi_nibble | 0x01; // Version number contained in bits 3-0
 			break;
 
@@ -488,7 +488,7 @@ READ16_MEMBER(md_base_state::megadriv_68k_read_z80_ram )
 	}
 	else
 	{
-		logerror("%06x: 68000 attempting to access Z80 (read) address space without bus\n", space.device().safe_pc());
+		logerror("%06x: 68000 attempting to access Z80 (read) address space without bus\n", m_maincpu->pc());
 		return machine().rand();
 	}
 }
@@ -514,7 +514,7 @@ WRITE16_MEMBER(md_base_state::megadriv_68k_write_z80_ram )
 	}
 	else
 	{
-		logerror("%06x: 68000 attempting to access Z80 (write) address space without bus\n", space.device().safe_pc());
+		logerror("%06x: 68000 attempting to access Z80 (write) address space without bus\n", m_maincpu->pc());
 	}
 }
 

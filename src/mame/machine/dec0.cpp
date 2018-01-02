@@ -43,7 +43,7 @@ READ16_MEMBER(dec0_state::dec0_controls_r)
 			return m_i8751_return;
 	}
 
-	logerror("CPU #0 PC %06x: warning - read unmapped memory address %06x\n", space.device().safe_pc(), 0x30c000+offset);
+	logerror("CPU #0 PC %06x: warning - read unmapped memory address %06x\n", m_maincpu->pc(), 0x30c000+offset);
 	return ~0;
 }
 
@@ -76,7 +76,7 @@ READ16_MEMBER(dec0_state::midres_controls_r)
 			return 0;   /* ?? watchdog ?? */
 	}
 
-	logerror("PC %06x unknown control read at %02x\n", space.device().safe_pc(), 0x180000+(offset<<1));
+	logerror("PC %06x unknown control read at %02x\n", m_maincpu->pc(), 0x180000+(offset<<1));
 	return ~0;
 }
 

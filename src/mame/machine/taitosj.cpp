@@ -79,18 +79,18 @@ WRITE8_MEMBER(taitosj_state::taitosj_bankswitch_w)
 ***************************************************************************/
 READ8_MEMBER(taitosj_state::taitosj_fake_data_r)
 {
-	LOG(("%04x: protection read\n",space.device().safe_pc()));
+	LOG(("%04x: protection read\n",m_maincpu->pc()));
 	return 0;
 }
 
 WRITE8_MEMBER(taitosj_state::taitosj_fake_data_w)
 {
-	LOG(("%04x: protection write %02x\n",space.device().safe_pc(),data));
+	LOG(("%04x: protection write %02x\n",m_maincpu->pc(),data));
 }
 
 READ8_MEMBER(taitosj_state::taitosj_fake_status_r)
 {
-	LOG(("%04x: protection status read\n",space.device().safe_pc()));
+	LOG(("%04x: protection status read\n",m_maincpu->pc()));
 	return 0xff;
 }
 

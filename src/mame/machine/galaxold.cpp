@@ -114,23 +114,23 @@ WRITE8_MEMBER(galaxold_state::galaxold_leds_w)
 
 READ8_MEMBER(galaxold_state::scramblb_protection_1_r)
 {
-	switch (space.device().safe_pc())
+	switch (m_maincpu->pc())
 	{
 	case 0x01da: return 0x80;
 	case 0x01e4: return 0x00;
 	default:
-		logerror("%04x: read protection 1\n",space.device().safe_pc());
+		logerror("%04x: read protection 1\n",m_maincpu->pc());
 		return 0;
 	}
 }
 
 READ8_MEMBER(galaxold_state::scramblb_protection_2_r)
 {
-	switch (space.device().safe_pc())
+	switch (m_maincpu->pc())
 	{
 	case 0x01ca: return 0x90;
 	default:
-		logerror("%04x: read protection 2\n",space.device().safe_pc());
+		logerror("%04x: read protection 2\n",m_maincpu->pc());
 		return 0;
 	}
 }

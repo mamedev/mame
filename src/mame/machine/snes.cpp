@@ -772,7 +772,7 @@ READ8_MEMBER(snes_state::snes_r_bank1)
 			}
 			else
 			{
-				logerror("(PC=%06x) snes_r_bank1: Unmapped external chip read: %X\n", space.device().safe_pc(), offset);
+				logerror("(PC=%06x) snes_r_bank1: Unmapped external chip read: %X\n", m_maincpu->pc(), offset);
 				value = snes_open_bus_r(space, 0);                              /* Reserved */
 			}
 		}
@@ -819,7 +819,7 @@ READ8_MEMBER(snes_state::snes_r_bank2)
 				}
 				else
 				{
-					logerror("(PC=%06x) snes_r_bank2: Unmapped external chip read: %X\n", space.device().safe_pc(), offset);
+					logerror("(PC=%06x) snes_r_bank2: Unmapped external chip read: %X\n", m_maincpu->pc(), offset);
 					value = snes_open_bus_r(space, 0);                              /* Reserved */
 				}
 			}
@@ -853,17 +853,17 @@ WRITE8_MEMBER(snes_state::snes_w_bank1)
 				m_cart.m_nvram[(offset - 0x6000) & mask] = data;
 			}
 			else
-				logerror("(PC=%06x) snes_w_bank1: Attempt to write to reserved address: %X = %02X\n", space.device().safe_pc(), offset, data);
+				logerror("(PC=%06x) snes_w_bank1: Attempt to write to reserved address: %X = %02X\n", m_maincpu->pc(), offset, data);
 		}
 		else
-			logerror("(PC=%06x) Attempt to write to ROM address: %X\n", space.device().safe_pc(), offset);
+			logerror("(PC=%06x) Attempt to write to ROM address: %X\n", m_maincpu->pc(), offset);
 	}
 	else if (offset >= 0x600000 && offset < 0x700000)
 	{
 		if (m_cart.mode & 5 && address < 0x8000)        /* Mode 20 & 22 */
-			logerror("(PC=%06x) snes_w_bank1: Attempt to write to reserved address: %X = %02X\n", space.device().safe_pc(), offset, data);
+			logerror("(PC=%06x) snes_w_bank1: Attempt to write to reserved address: %X = %02X\n", m_maincpu->pc(), offset, data);
 		else
-			logerror("(PC=%06x) Attempt to write to ROM address: %X\n", space.device().safe_pc(), offset);
+			logerror("(PC=%06x) Attempt to write to ROM address: %X\n", m_maincpu->pc(), offset);
 	}
 	else if (offset >= 0x700000)
 	{
@@ -882,10 +882,10 @@ WRITE8_MEMBER(snes_state::snes_w_bank1)
 				m_cart.m_nvram[offset & mask] = data;
 			}
 			else
-				logerror("(PC=%06x) snes_w_bank1: Attempt to write to reserved address: %X = %02X\n", space.device().safe_pc(), offset, data);
+				logerror("(PC=%06x) snes_w_bank1: Attempt to write to reserved address: %X = %02X\n", m_maincpu->pc(), offset, data);
 		}
 		else
-			logerror("(PC=%06x) Attempt to write to ROM address: %X\n", space.device().safe_pc(), offset);
+			logerror("(PC=%06x) Attempt to write to ROM address: %X\n", m_maincpu->pc(), offset);
 	}
 }
 
@@ -899,7 +899,7 @@ WRITE8_MEMBER(snes_state::snes_w_bank2)
 		if (address < 0x8000)
 			space.write_byte(offset, data);
 		else
-			logerror("(PC=%06x) Attempt to write to ROM address: %X\n", space.device().safe_pc(), offset + 0x800000);
+			logerror("(PC=%06x) Attempt to write to ROM address: %X\n", m_maincpu->pc(), offset + 0x800000);
 	}
 	else
 	{
@@ -922,11 +922,11 @@ WRITE8_MEMBER(snes_state::snes_w_bank2)
 					m_cart.m_nvram[offset & mask] = data;
 				}
 				else
-					logerror("(PC=%06x) snes_w_bank2: Attempt to write to reserved address: %X = %02X\n", space.device().safe_pc(), offset, data);
+					logerror("(PC=%06x) snes_w_bank2: Attempt to write to reserved address: %X = %02X\n", m_maincpu->pc(), offset, data);
 			}
 		}
 		else
-			logerror("(PC=%06x) Attempt to write to ROM address: %X\n", space.device().safe_pc(), offset);
+			logerror("(PC=%06x) Attempt to write to ROM address: %X\n", m_maincpu->pc(), offset);
 	}
 }
 

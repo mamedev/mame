@@ -486,7 +486,7 @@ WRITE8_MEMBER(leland_state::leland_master_alt_bankswitch_w)
 	/* update any bankswitching */
 	if (LOG_BANKSWITCHING_M)
 		if ((m_alternate_bank ^ data) & 0x0f)
-			logerror("%04X:alternate_bank = %02X\n", space.device().safe_pc(), data & 0x0f);
+			logerror("%04X:alternate_bank = %02X\n", m_master->pc(), data & 0x0f);
 	m_alternate_bank = data & 15;
 	(this->*m_update_master_bank)();
 
@@ -862,11 +862,11 @@ WRITE8_MEMBER(leland_state::leland_battery_ram_w)
 {
 	if (m_battery_ram_enable)
 	{
-		if (LOG_BATTERY_RAM) logerror("%04X:BatteryW@%04X=%02X\n", space.device().safe_pc(), offset, data);
+		if (LOG_BATTERY_RAM) logerror("%04X:BatteryW@%04X=%02X\n", m_master->pc(), offset, data);
 		m_battery_ram[offset] = data;
 	}
 	else
-		logerror("%04X:BatteryW@%04X (invalid!)\n", space.device().safe_pc(), offset);
+		logerror("%04X:BatteryW@%04X (invalid!)\n", m_master->pc(), offset);
 }
 
 
@@ -874,13 +874,13 @@ WRITE8_MEMBER(leland_state::ataxx_battery_ram_w)
 {
 	if (m_battery_ram_enable)
 	{
-		if (LOG_BATTERY_RAM) logerror("%04X:BatteryW@%04X=%02X\n", space.device().safe_pc(), offset, data);
+		if (LOG_BATTERY_RAM) logerror("%04X:BatteryW@%04X=%02X\n", m_master->pc(), offset, data);
 		m_battery_ram[offset] = data;
 	}
 	else if ((m_master_bank & 0x30) == 0x20)
 		m_ataxx_qram[((m_master_bank & 0xc0) << 8) + offset] = data;
 	else
-		logerror("%04X:BatteryW@%04X (invalid!)\n", space.device().safe_pc(), offset);
+		logerror("%04X:BatteryW@%04X (invalid!)\n", m_master->pc(), offset);
 }
 
 
@@ -1073,7 +1073,7 @@ WRITE8_MEMBER(leland_state::leland_master_analog_key_w)
 			/* update top board banking for some games */
 			if (LOG_BANKSWITCHING_M)
 				if ((m_top_board_bank ^ data) & 0xc0)
-					logerror("%04X:top_board_bank = %02X\n", space.device().safe_pc(), data & 0xc0);
+					logerror("%04X:top_board_bank = %02X\n", m_master->pc(), data & 0xc0);
 			m_top_board_bank = data & 0xc0;
 			(this->*m_update_master_bank)();
 			break;
@@ -1217,7 +1217,7 @@ WRITE8_MEMBER(leland_state::ataxx_master_output_w)
 		case 0x04:  /* /MBNK */
 			if (LOG_BANKSWITCHING_M)
 				if ((m_master_bank ^ data) & 0xff)
-					logerror("%04X:master_bank = %02X\n", space.device().safe_pc(), data & 0xff);
+					logerror("%04X:master_bank = %02X\n", m_master->pc(), data & 0xff);
 			m_master_bank = data;
 			ataxx_bankswitch();
 			break;
@@ -1270,22 +1270,22 @@ WRITE8_MEMBER(leland_state::ataxx_paletteram_and_misc_w)
 	else if (offset == 0x7fc)
 	{
 		m_xrom1_addr = (m_xrom1_addr & 0xff00) | (data & 0x00ff);
-		if (LOG_XROM) logerror("%04X:XROM1 address low write = %02X (addr=%04X)\n", space.device().safe_pc(), data, m_xrom1_addr);
+		if (LOG_XROM) logerror("%04X:XROM1 address low write = %02X (addr=%04X)\n", m_master->pc(), data, m_xrom1_addr);
 	}
 	else if (offset == 0x7fd)
 	{
 		m_xrom1_addr = (m_xrom1_addr & 0x00ff) | ((data << 8) & 0xff00);
-		if (LOG_XROM) logerror("%04X:XROM1 address high write = %02X (addr=%04X)\n", space.device().safe_pc(), data, m_xrom1_addr);
+		if (LOG_XROM) logerror("%04X:XROM1 address high write = %02X (addr=%04X)\n", m_master->pc(), data, m_xrom1_addr);
 	}
 	else if (offset == 0x7fe)
 	{
 		m_xrom2_addr = (m_xrom2_addr & 0xff00) | (data & 0x00ff);
-		if (LOG_XROM) logerror("%04X:XROM2 address low write = %02X (addr=%04X)\n", space.device().safe_pc(), data, m_xrom2_addr);
+		if (LOG_XROM) logerror("%04X:XROM2 address low write = %02X (addr=%04X)\n", m_master->pc(), data, m_xrom2_addr);
 	}
 	else if (offset == 0x7ff)
 	{
 		m_xrom2_addr = (m_xrom2_addr & 0x00ff) | ((data << 8) & 0xff00);
-		if (LOG_XROM) logerror("%04X:XROM2 address high write = %02X (addr=%04X)\n", space.device().safe_pc(), data, m_xrom2_addr);
+		if (LOG_XROM) logerror("%04X:XROM2 address high write = %02X (addr=%04X)\n", m_master->pc(), data, m_xrom2_addr);
 	}
 	else
 		m_extra_tram[offset] = data;
@@ -1299,13 +1299,13 @@ READ8_MEMBER(leland_state::ataxx_paletteram_and_misc_r)
 	else if (offset == 0x7fc || offset == 0x7fd)
 	{
 		int result = m_xrom_base[0x00000 | m_xrom1_addr | ((offset & 1) << 16)];
-		if (LOG_XROM) logerror("%04X:XROM1 read(%d) = %02X (addr=%04X)\n", space.device().safe_pc(), offset - 0x7fc, result, m_xrom1_addr);
+		if (LOG_XROM) logerror("%04X:XROM1 read(%d) = %02X (addr=%04X)\n", m_master->pc(), offset - 0x7fc, result, m_xrom1_addr);
 		return result;
 	}
 	else if (offset == 0x7fe || offset == 0x7ff)
 	{
 		int result = m_xrom_base[0x20000 | m_xrom2_addr | ((offset & 1) << 16)];
-		if (LOG_XROM) logerror("%04X:XROM2 read(%d) = %02X (addr=%04X)\n", space.device().safe_pc(), offset - 0x7fc, result, m_xrom2_addr);
+		if (LOG_XROM) logerror("%04X:XROM2 read(%d) = %02X (addr=%04X)\n", m_master->pc(), offset - 0x7fc, result, m_xrom2_addr);
 		return result;
 	}
 	else
@@ -1357,12 +1357,12 @@ WRITE8_MEMBER(leland_state::leland_slave_small_banksw_w)
 
 	if (bankaddress >= m_slave_length)
 	{
-		logerror("%04X:Slave bank %02X out of range!", space.device().safe_pc(), data & 1);
+		logerror("%04X:Slave bank %02X out of range!", m_slave->pc(), data & 1);
 		bankaddress = 0x10000;
 	}
 	membank("bank3")->set_base(&m_slave_base[bankaddress]);
 
-	if (LOG_BANKSWITCHING_S) logerror("%04X:Slave bank = %02X (%05X)\n", space.device().safe_pc(), data & 1, bankaddress);
+	if (LOG_BANKSWITCHING_S) logerror("%04X:Slave bank = %02X (%05X)\n", m_slave->pc(), data & 1, bankaddress);
 }
 
 
@@ -1372,12 +1372,12 @@ WRITE8_MEMBER(leland_state::leland_slave_large_banksw_w)
 
 	if (bankaddress >= m_slave_length)
 	{
-		logerror("%04X:Slave bank %02X out of range!", space.device().safe_pc(), data & 15);
+		logerror("%04X:Slave bank %02X out of range!", m_slave->pc(), data & 15);
 		bankaddress = 0x10000;
 	}
 	membank("bank3")->set_base(&m_slave_base[bankaddress]);
 
-	if (LOG_BANKSWITCHING_S) logerror("%04X:Slave bank = %02X (%05X)\n", space.device().safe_pc(), data & 15, bankaddress);
+	if (LOG_BANKSWITCHING_S) logerror("%04X:Slave bank = %02X (%05X)\n", m_slave->pc(), data & 15, bankaddress);
 }
 
 
@@ -1396,12 +1396,12 @@ WRITE8_MEMBER(leland_state::ataxx_slave_banksw_w)
 
 	if (bankaddress >= m_slave_length)
 	{
-		logerror("%04X:Slave bank %02X out of range!", space.device().safe_pc(), data & 0x3f);
+		logerror("%04X:Slave bank %02X out of range!", m_slave->pc(), data & 0x3f);
 		bankaddress = 0x2000;
 	}
 	membank("bank3")->set_base(&m_slave_base[bankaddress]);
 
-	if (LOG_BANKSWITCHING_S) logerror("%04X:Slave bank = %02X (%05X)\n", space.device().safe_pc(), data, bankaddress);
+	if (LOG_BANKSWITCHING_S) logerror("%04X:Slave bank = %02X (%05X)\n", m_slave->pc(), data, bankaddress);
 }
 
 

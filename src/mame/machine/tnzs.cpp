@@ -21,7 +21,7 @@
 READ8_MEMBER(tnzs_mcu_state::mcu_r)
 {
 	uint8_t data = m_mcu->upi41_master_r(space, offset & 1);
-	space.device().execute().yield();
+	m_subcpu->yield();
 
 //  logerror("PC %04x: read %02x from mcu $c00%01x\n", space.device().safe_pcbase(), data, offset);
 

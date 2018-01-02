@@ -883,7 +883,7 @@ WRITE32_MEMBER(archimedes_state::archimedes_ioc_w)
 	}
 
 
-	logerror("(PC=%08x) I/O: W %x @ %x (mask %08x)\n", space.device().safe_pc(), data, (offset*4)+0x3000000, mem_mask);
+	logerror("(PC=%08x) I/O: W %x @ %x (mask %08x)\n", m_maincpu->pc(), data, (offset*4)+0x3000000, mem_mask);
 }
 
 READ32_MEMBER(archimedes_state::archimedes_vidc_r)
@@ -970,7 +970,7 @@ WRITE32_MEMBER(archimedes_state::archimedes_vidc_w)
 		r = (val & 0x000f) >> 0;
 
 		if(reg == 0x40 && val & 0xfff)
-			logerror("WARNING: border color write here (PC=%08x)!\n",space.device().safe_pc());
+			logerror("WARNING: border color write here (PC=%08x)!\n",m_maincpu->pc());
 
 		m_palette->set_pen_color(reg >> 2, pal4bit(r), pal4bit(g), pal4bit(b) );
 
@@ -1110,7 +1110,7 @@ WRITE32_MEMBER(archimedes_state::archimedes_memc_w)
 			case 7: /* Control */
 				m_memc_pagesize = ((data>>2) & 3);
 
-				logerror("(PC = %08x) MEMC: %x to Control (page size %d, %s, %s)\n", space.device().safe_pc(), data & 0x1ffc, page_sizes[m_memc_pagesize], ((data>>10)&1) ? "Video DMA on" : "Video DMA off", ((data>>11)&1) ? "Sound DMA on" : "Sound DMA off");
+				logerror("(PC = %08x) MEMC: %x to Control (page size %d, %s, %s)\n", m_maincpu->pc(), data & 0x1ffc, page_sizes[m_memc_pagesize], ((data>>10)&1) ? "Video DMA on" : "Video DMA off", ((data>>11)&1) ? "Sound DMA on" : "Sound DMA off");
 
 				m_video_dma_on = ((data>>10)&1);
 				m_audio_dma_on = ((data>>11)&1);

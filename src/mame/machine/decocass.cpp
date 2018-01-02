@@ -56,7 +56,7 @@ READ8_MEMBER( decocass_state::decocass_sound_command_main_r)
 
 WRITE8_MEMBER(decocass_state::decocass_sound_command_w)
 {
-	LOG(2,("CPU %s sound command -> $%02x\n", space.device().tag(), data));
+	LOG(2,("CPU %s sound command -> $%02x\n", m_maincpu->tag(), data));
 	m_soundlatch->write(space, 0, data);
 	m_sound_ack |= 0x80;
 	/* remove snd cpu data ack bit. i don't see it in the schems, but... */
@@ -67,20 +67,20 @@ WRITE8_MEMBER(decocass_state::decocass_sound_command_w)
 READ8_MEMBER(decocass_state::decocass_sound_data_r)
 {
 	uint8_t data = m_soundlatch2->read(space, 0);
-	LOG(2,("CPU %s sound data    <- $%02x\n", space.device().tag(), data));
+	LOG(2,("CPU %s sound data    <- $%02x\n", m_maincpu->tag(), data));
 	return data;
 }
 
 READ8_MEMBER(decocass_state::decocass_sound_ack_r)
 {
 	uint8_t data = m_sound_ack;   /* D6+D7 */
-	LOG(4,("CPU %s sound ack     <- $%02x\n", space.device().tag(), data));
+	LOG(4,("CPU %s sound ack     <- $%02x\n", m_maincpu->tag(), data));
 	return data;
 }
 
 WRITE8_MEMBER(decocass_state::decocass_sound_data_w)
 {
-	LOG(2,("CPU %s sound data    -> $%02x\n", space.device().tag(), data));
+	LOG(2,("CPU %s sound data    -> $%02x\n", m_audiocpu->tag(), data));
 	m_soundlatch2->write(space, 0, data);
 	m_sound_ack |= 0x40;
 }
@@ -88,7 +88,7 @@ WRITE8_MEMBER(decocass_state::decocass_sound_data_w)
 READ8_MEMBER(decocass_state::decocass_sound_command_r)
 {
 	uint8_t data = m_soundlatch->read(space, 0);
-	LOG(4,("CPU %s sound command <- $%02x\n", space.device().tag(), data));
+	LOG(4,("CPU %s sound command <- $%02x\n", m_audiocpu->tag(), data));
 	m_audiocpu->set_input_line(M6502_IRQ_LINE, CLEAR_LINE);
 	m_sound_ack &= ~0x80;
 	return data;
@@ -117,14 +117,14 @@ READ8_MEMBER(decocass_state::decocass_sound_nmi_enable_r)
 READ8_MEMBER(decocass_state::decocass_sound_data_ack_reset_r)
 {
 	uint8_t data = 0xff;
-	LOG(2,("CPU %s sound ack rst <- $%02x\n", space.device().tag(), data));
+	LOG(2,("CPU %s sound ack rst <- $%02x\n", m_audiocpu->tag(), data));
 	m_sound_ack &= ~0x40;
 	return data;
 }
 
 WRITE8_MEMBER(decocass_state::decocass_sound_data_ack_reset_w)
 {
-	LOG(2,("CPU %s sound ack rst -> $%02x\n", space.device().tag(), data));
+	LOG(2,("CPU %s sound ack rst -> $%02x\n", m_audiocpu->tag(), data));
 	m_sound_ack &= ~0x40;
 }
 
@@ -192,7 +192,7 @@ READ8_MEMBER(decocass_state::decocass_input_r)
 
 WRITE8_MEMBER(decocass_state::decocass_reset_w)
 {
-	LOG(1,("%10s 6502-PC: %04x decocass_reset_w(%02x): $%02x\n", machine().time().as_string(6), space.device().safe_pcbase(), offset, data));
+	LOG(1,("%10s 6502-PC: %04x decocass_reset_w(%02x): $%02x\n", machine().time().as_string(6), m_maincpu->pcbase(), offset, data));
 	m_decocass_reset = data;
 
 	/* CPU #1 active high reset */
@@ -1138,7 +1138,7 @@ READ8_MEMBER(decocass_state::decocass_e5xx_r)
 
 		LOG(4,("%10s 6502-PC: %04x decocass_e5xx_r(%02x): $%02x <- STATUS (%s%s%s%s%s%s%s%s)\n",
 			machine().time().as_string(6),
-			space.device().safe_pcbase(),
+			m_maincpu->pcbase(),
 			offset, data,
 			data & 0x01 ? "" : "REQ/",
 			data & 0x02 ? "" : " FNO/",
@@ -1169,7 +1169,7 @@ WRITE8_MEMBER(decocass_state::decocass_e5xx_w)
 
 	if (0 == (offset & E5XX_MASK))
 	{
-		LOG(3,("%10s 6502-PC: %04x decocass_e5xx_w(%02x): $%02x -> %s\n", machine().time().as_string(6), space.device().safe_pcbase(), offset, data, offset & 1 ? "8041-CMND" : "8041-DATA"));
+		LOG(3,("%10s 6502-PC: %04x decocass_e5xx_w(%02x): $%02x -> %s\n", machine().time().as_string(6), m_maincpu->pcbase(), offset, data, offset & 1 ? "8041-CMND" : "8041-DATA"));
 		m_mcu->upi41_master_w(space,offset & 1, data);
 #ifdef MAME_DEBUG
 		decocass_fno(offset, data);
@@ -1177,7 +1177,7 @@ WRITE8_MEMBER(decocass_state::decocass_e5xx_w)
 	}
 	else
 	{
-		LOG(3,("%10s 6502-PC: %04x decocass_e5xx_w(%02x): $%02x -> dongle\n", machine().time().as_string(6), space.device().safe_pcbase(), offset, data));
+		LOG(3,("%10s 6502-PC: %04x decocass_e5xx_w(%02x): $%02x -> dongle\n", machine().time().as_string(6), m_maincpu->pcbase(), offset, data));
 	}
 }
 

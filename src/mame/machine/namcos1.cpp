@@ -19,13 +19,13 @@ WRITE8_MEMBER( namcos1_state::_3dcs_w )
 
 READ8_MEMBER( namcos1_state::no_key_r )
 {
-	popmessage("CPU %s PC %08x: keychip read %04x\n", space.device().tag(), space.device().safe_pc(), offset);
+	popmessage("CPU %s PC %08x: keychip read %04x\n", m_mcu->tag(), m_mcu->pc(), offset);
 	return 0;
 }
 
 WRITE8_MEMBER( namcos1_state::no_key_w )
 {
-	popmessage("CPU %s PC %08x: keychip write %04x=%02x\n", space.device().tag(), space.device().safe_pc(), offset, data);
+	popmessage("CPU %s PC %08x: keychip write %04x=%02x\n", m_mcu->tag(), m_mcu->pc(), offset, data);
 }
 
 

@@ -74,7 +74,7 @@ READ16_MEMBER(apache3_state::apache3_v30_v20_r)
 	else if ((m_control_word & 0xe0) == 0x80)
 		offset += 0x00000; // main ram
 	else
-		logerror("%08x: unmapped read z80 rom %08x\n", space.device().safe_pc(), offset);
+		logerror("%08x: unmapped read z80 rom %08x\n", m_maincpu->pc(), offset);
 	return 0xff00 | targetspace.read_byte(offset);
 }
 
@@ -83,7 +83,7 @@ WRITE16_MEMBER(apache3_state::apache3_v30_v20_w)
 	address_space &targetspace = m_audiocpu->space(AS_PROGRAM);
 
 	if ((m_control_word & 0xe0) != 0x80)
-		logerror("%08x: write unmapped v30 rom %08x\n", space.device().safe_pc(), offset);
+		logerror("%08x: write unmapped v30 rom %08x\n", m_maincpu->pc(), offset);
 
 	/* Only 8 bits of the V30 data bus are connected - ignore writes to the other half */
 	if (ACCESSING_BITS_0_7)
@@ -292,7 +292,7 @@ READ16_MEMBER(tatsumi_state::tatsumi_v30_68000_r)
 	if ((m_control_word&0x1f)==0x18)
 	{
 		// hack to make roundup 5 boot
-		if (space.device().safe_pc()==0xec575)
+		if (m_maincpu->pc()==0xec575)
 		{
 			uint8_t *dst = memregion("maincpu")->base();
 			dst[BYTE_XOR_LE(0xec57a)]=0x46;
@@ -331,9 +331,9 @@ READ8_MEMBER(tatsumi_state::tatsumi_hack_ym2151_r)
 {
 	int r=machine().device<ym2151_device>("ymsnd")->status_r(space,0);
 
-	if (space.device().safe_pc()==0x2aca || space.device().safe_pc()==0x29fe
-		|| space.device().safe_pc()==0xf9721
-		|| space.device().safe_pc()==0x1b96 || space.device().safe_pc()==0x1c65) // BigFight
+	if (m_audiocpu->pc()==0x2aca || m_audiocpu->pc()==0x29fe
+		|| m_audiocpu->pc()==0xf9721
+		|| m_audiocpu->pc()==0x1b96 || m_audiocpu->pc()==0x1c65) // BigFight
 		return 0x80;
 	return r;
 }
@@ -342,14 +342,14 @@ READ8_MEMBER(tatsumi_state::tatsumi_hack_oki_r)
 {
 	int r=m_oki->read(space,0);
 
-	if (space.device().safe_pc()==0x2b70 || space.device().safe_pc()==0x2bb5
-		|| space.device().safe_pc()==0x2acc
-		|| space.device().safe_pc()==0x1c79 // BigFight
-		|| space.device().safe_pc()==0x1cbe // BigFight
-		|| space.device().safe_pc()==0xf9881)
+	if (m_audiocpu->pc()==0x2b70 || m_audiocpu->pc()==0x2bb5
+		|| m_audiocpu->pc()==0x2acc
+		|| m_audiocpu->pc()==0x1c79 // BigFight
+		|| m_audiocpu->pc()==0x1cbe // BigFight
+		|| m_audiocpu->pc()==0xf9881)
 		return 0xf;
-	if (space.device().safe_pc()==0x2ba3 || space.device().safe_pc()==0x2a9b || space.device().safe_pc()==0x2adc
-		|| space.device().safe_pc()==0x1cac) // BigFight
+	if (m_audiocpu->pc()==0x2ba3 || m_audiocpu->pc()==0x2a9b || m_audiocpu->pc()==0x2adc
+		|| m_audiocpu->pc()==0x1cac) // BigFight
 		return 0;
 	return r;
 }

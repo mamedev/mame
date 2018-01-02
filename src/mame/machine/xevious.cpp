@@ -65,7 +65,7 @@ READ8_MEMBER( xevious_state::battles_customio3_r )
 {
 	int return_data;
 
-	if( space.device().safe_pc() == 0xAE ){
+	if( m_subcpu3->pc() == 0xAE ){
 		/* CPU4 0xAA - 0xB9 : waiting for MB8851 ? */
 		return_data =   ( (m_battles_customio_command & 0x10) << 3)
 						| 0x00
@@ -75,7 +75,7 @@ READ8_MEMBER( xevious_state::battles_customio3_r )
 						| 0x60
 						| (m_battles_customio_prev_command & 0x0f);
 	}
-	logerror("CPU3 %04x: custom I/O Read = %02x\n",space.device().safe_pc(),return_data);
+	logerror("CPU3 %04x: custom I/O Read = %02x\n",m_subcpu3->pc(),return_data);
 
 	return return_data;
 }
@@ -102,7 +102,7 @@ WRITE8_MEMBER( xevious_state::battles_customio0_w )
 
 WRITE8_MEMBER( xevious_state::battles_customio3_w )
 {
-	logerror("CPU3 %04x: custom I/O Write = %02x\n",space.device().safe_pc(),data);
+	logerror("CPU3 %04x: custom I/O Write = %02x\n",m_subcpu3->pc(),data);
 
 	m_battles_customio_command = data;
 }
@@ -118,7 +118,7 @@ READ8_MEMBER( xevious_state::battles_customio_data0_r )
 
 READ8_MEMBER( xevious_state::battles_customio_data3_r )
 {
-	logerror("CPU3 %04x: custom I/O parameter %02x Read = %02x\n",space.device().safe_pc(),offset,m_battles_customio_data);
+	logerror("CPU3 %04x: custom I/O parameter %02x Read = %02x\n",m_subcpu3->pc(),offset,m_battles_customio_data);
 	return m_battles_customio_data;
 }
 
@@ -131,7 +131,7 @@ WRITE8_MEMBER( xevious_state::battles_customio_data0_w )
 
 WRITE8_MEMBER( xevious_state::battles_customio_data3_w )
 {
-	logerror("CPU3 %04x: custom I/O parameter %02x Write = %02x\n",space.device().safe_pc(),offset,data);
+	logerror("CPU3 %04x: custom I/O parameter %02x Write = %02x\n",m_subcpu3->pc(),offset,data);
 	m_battles_customio_data = data;
 }
 
@@ -149,7 +149,7 @@ WRITE8_MEMBER( xevious_state::battles_CPU4_coin_w )
 
 WRITE8_MEMBER( xevious_state::battles_noise_sound_w )
 {
-	logerror("CPU3 %04x: 50%02x Write = %02x\n",space.device().safe_pc(),offset,data);
+	logerror("CPU3 %04x: 50%02x Write = %02x\n",m_subcpu3->pc(),offset,data);
 	if( (m_battles_sound_played == 0) && (data == 0xFF) ){
 		if( m_customio[0] == 0x40 ){
 			m_samples->start(0, 0);

@@ -83,7 +83,7 @@ WRITE16_MEMBER(midxunit_state::midxunit_io_w)
 			output().set_value("Player2_Gun_LED", (~data & 0x20) >> 5 );
 			output().set_value("Player3_Gun_LED", (~data & 0x40) >> 6 );
 
-			logerror("%08X:I/O write to %d = %04X\n", space.device().safe_pc(), offset, data);
+			logerror("%08X:I/O write to %d = %04X\n", m_maincpu->pc(), offset, data);
 //          logerror("%08X:Unknown I/O write to %d = %04X\n", space.device().safe_pc(), offset, data);
 			break;
 	}
@@ -99,7 +99,7 @@ WRITE16_MEMBER(midxunit_state::midxunit_unknown_w)
 		m_dcs->reset_w(data & 2);
 
 	if (ACCESSING_BITS_0_7 && offset % 0x40000 == 0)
-		logerror("%08X:midxunit_unknown_w @ %d = %02X\n", space.device().safe_pc(), offs, data & 0xff);
+		logerror("%08X:midxunit_unknown_w @ %d = %02X\n", m_maincpu->pc(), offs, data & 0xff);
 }
 
 

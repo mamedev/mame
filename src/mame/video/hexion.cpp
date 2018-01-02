@@ -122,7 +122,7 @@ WRITE8_MEMBER(hexion_state::bankedram_w)
 			m_bg_tilemap[m_rambank]->mark_tile_dirty(offset/4);
 		}
 		else
-			logerror("%04x pmc internal ram %04x = %02x\n",space.device().safe_pc(),offset,data);
+			logerror("%04x pmc internal ram %04x = %02x\n",m_maincpu->pc(),offset,data);
 	}
 	else if (m_bankctrl == 2 && offset < 0x800)
 	{
@@ -132,10 +132,10 @@ WRITE8_MEMBER(hexion_state::bankedram_w)
 			m_unkram[offset] = data;
 		}
 		else
-			logerror("%04x pmc internal ram %04x = %02x\n",space.device().safe_pc(),offset,data);
+			logerror("%04x pmc internal ram %04x = %02x\n",m_maincpu->pc(),offset,data);
 	}
 	else
-logerror("%04x: bankedram_w offset %04x, data %02x, bankctrl = %02x\n",space.device().safe_pc(),offset,data,m_bankctrl);
+logerror("%04x: bankedram_w offset %04x, data %02x, bankctrl = %02x\n",m_maincpu->pc(),offset,data,m_bankctrl);
 }
 
 WRITE8_MEMBER(hexion_state::bankctrl_w)

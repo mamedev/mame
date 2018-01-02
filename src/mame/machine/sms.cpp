@@ -1219,7 +1219,7 @@ WRITE8_MEMBER(smssdisp_state::sms_store_control_w)
 	int led_line = led_number % 4;
 	int game_number = (4 * led_column) + (3 - led_line);
 
-	logerror("0x%04X: sms_store_control write 0x%02X\n", space.device().safe_pc(), data);
+	logerror("0x%04X: sms_store_control write 0x%02X\n", m_control_cpu->pc(), data);
 	logerror("sms_store_control: LED #%d activated for game #%d\n", led_number, game_number);
 
 	if (data & 0x02)
