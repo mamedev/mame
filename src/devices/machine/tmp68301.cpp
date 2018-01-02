@@ -369,7 +369,7 @@ WRITE16_MEMBER( tmp68301_device::regs_w )
 
 	if (!ACCESSING_BITS_0_7)    return;
 
-//  logerror("CPU #0 PC %06X: TMP68301 Reg %04X<-%04X & %04X\n",space.device().safe_pc(),offset*2,data,mem_mask^0xffff);
+//  logerror("CPU #0 PC %06X: TMP68301 Reg %04X<-%04X & %04X\n", m_cpu->pc(),offset*2,data,mem_mask^0xffff);
 
 	switch( offset * 2 )
 	{
