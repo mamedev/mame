@@ -27,7 +27,11 @@ SLOT_INTERFACE_END
 
 ROM_START( bootbug )
 	ROM_REGION(0x10000, BOOTBUG_ROM_REGION, 0)
-	ROM_LOAD( "bootbug1.5.bin", 0x000000, 0x010000, CRC(432badf0) SHA1(914ad4bb28946cac732cf8b178508b69e4c1aae2) )
+	ROM_DEFAULT_BIOS("bb15")
+	ROM_SYSTEM_BIOS(0, "bb15", "BootBug v1.5")
+	ROMX_LOAD( "bootbug1.5.bin", 0x000000, 0x010000, CRC(432badf0) SHA1(914ad4bb28946cac732cf8b178508b69e4c1aae2), ROM_BIOS(1))
+	ROM_SYSTEM_BIOS(1, "bb13", "BootBug v1.3")
+	ROMX_LOAD( "bootbug1.3.bin", 0x000000, 0x010000, CRC(2902a234) SHA1(c783d19a5e4c536e58e1e7e201ec47e8fb78d435), ROM_BIOS(2))
 ROM_END
 
 //**************************************************************************
@@ -46,7 +50,6 @@ MACHINE_CONFIG_MEMBER( nubus_bootbug_device::device_add_mconfig )
 	MCFG_INS8250_OUT_TX_CB(DEVWRITELINE("serport0", rs232_port_device, write_txd))
 	MCFG_INS8250_OUT_DTR_CB(DEVWRITELINE("serport0", rs232_port_device, write_dtr))
 	MCFG_INS8250_OUT_RTS_CB(DEVWRITELINE("serport0", rs232_port_device, write_rts))
-	//MCFG_INS8250_OUT_INT_CB(WRITELINE(nubus_bootbug, pc_com_interrupt_1))
 
 	MCFG_RS232_PORT_ADD( "serport0", isa_com, "terminal" )
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("uart_0", ins8250_uart_device, rx_w))
