@@ -804,7 +804,7 @@ WRITE8_MEMBER(suna8_state::brickzn_multi_w)
 	}
 	else
 	{
-		logerror("CPU #0 - PC %04X: ignore = %02X\n",space.device().safe_pc(),data);
+		logerror("CPU #0 - PC %04X: ignore = %02X\n",m_maincpu->pc(),data);
 	}
 
 	if ((m_protection_val & 0x1f) == 0x1c)

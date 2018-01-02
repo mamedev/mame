@@ -354,7 +354,7 @@ READ16_MEMBER(md_boot_state::topshoot_200051_r )
 // jzth protection
 WRITE16_MEMBER(md_boot_state::bl_710000_w)
 {
-	int pc = space.device().safe_pc();
+	int pc = m_maincpu->pc();
 
 	logerror("%06x writing to bl_710000_w %04x %04x\n", pc, data, mem_mask);
 
@@ -410,7 +410,7 @@ WRITE16_MEMBER(md_boot_state::bl_710000_w)
 READ16_MEMBER(md_boot_state::bl_710000_r)
 {
 	uint16_t ret;
-	int pc = space.device().safe_pc();
+	int pc = m_maincpu->pc();
 	logerror("%06x reading from bl_710000_r\n", pc);
 
 	if (m_protcount==6) { ret = 0xe; }

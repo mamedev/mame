@@ -2331,12 +2331,12 @@ INPUT_PORTS_END
 
 READ8_MEMBER(_8080bw_state::indianbt_r)
 {
-	switch(space.device().safe_pc())
+	switch(m_maincpu->pc())
 	{
 		case 0x5fed:    return 0x10;
 		case 0x5ffc:    return 0;
 	}
-	logerror("unknown port 0 read @ %x\n",space.device().safe_pc());
+	logerror("unknown port 0 read @ %x\n",m_maincpu->pc());
 	return machine().rand();
 }
 

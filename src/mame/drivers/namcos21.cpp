@@ -570,14 +570,14 @@ READ16_MEMBER(namcos21_state::dspcuskey_r)
 	uint16_t result = 0;
 	if( m_gametype == NAMCOS21_SOLVALOU )
 	{
-		switch( space.device().safe_pc() )
+		switch( m_dspmaster->pc() )
 		{
 		case 0x805e: result = 0x0000; break;
 		case 0x805f: result = 0xfeba; break;
 		case 0x8067: result = 0xffff; break;
 		case 0x806e: result = 0x0145; break;
 		default:
-			logerror( "unk cuskey_r; pc=0x%x\n", space.device().safe_pc() );
+			logerror( "unk cuskey_r; pc=0x%x\n", m_dspmaster->pc() );
 			break;
 		}
 	}

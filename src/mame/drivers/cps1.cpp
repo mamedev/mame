@@ -377,7 +377,7 @@ READ16_MEMBER(cps_state::qsound_rom_r)
 	}
 	else
 	{
-		popmessage("%06x: read sound ROM byte %04x", space.device().safe_pc(), offset);
+		popmessage("%06x: read sound ROM byte %04x", m_maincpu->pc(), offset);
 		return 0;
 	}
 }

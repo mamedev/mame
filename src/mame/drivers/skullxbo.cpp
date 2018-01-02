@@ -68,7 +68,7 @@ void skullxbo_state::scanline_update(screen_device &screen, int scanline)
 
 WRITE16_MEMBER(skullxbo_state::skullxbo_halt_until_hblank_0_w)
 {
-	halt_until_hblank_0(space.device(), *m_screen);
+	halt_until_hblank_0(*m_maincpu, *m_screen);
 }
 
 

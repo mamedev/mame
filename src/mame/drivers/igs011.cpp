@@ -1723,7 +1723,7 @@ WRITE16_MEMBER(igs011_state::lhb2_igs003_w)
 
 		default:
 //          popmessage("igs003 %x <- %04x",m_igs003_reg[0],data);
-			logerror("%06x: warning, writing to igs003_reg %02x = %02x\n", space.device().safe_pc(), m_igs003_reg[0], data);
+			logerror("%06x: warning, writing to igs003_reg %02x = %02x\n", m_maincpu->pc(), m_igs003_reg[0], data);
 	}
 }
 READ16_MEMBER(igs011_state::lhb2_igs003_r)

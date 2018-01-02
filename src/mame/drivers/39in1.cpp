@@ -1430,7 +1430,7 @@ WRITE32_MEMBER(_39in1_state::cpld_w)
 #if 0
 	else
 	{
-		printf("%08x: CPLD_W: %08x = %08x & %08x\n", space.device().safe_pc(), offset, data, mem_mask);
+		printf("%08x: CPLD_W: %08x = %08x & %08x\n", m_maincpu->pc(), offset, data, mem_mask);
 	}
 #endif
 }

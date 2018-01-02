@@ -1416,7 +1416,7 @@ READ8_MEMBER(mpu4vid_state::vidcharacteriser_r )
 
 
 	/* hack for 'invalid questions' error on time machine.. I guess it wants them to decode properly for startup check? */
-	if (space.device().safe_pcbase()==0x283a)
+	if (m_videocpu->pcbase()==0x283a)
 	{
 		return 0x00;
 	}

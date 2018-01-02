@@ -221,7 +221,7 @@ READ16_MEMBER(bmcbowl_state::bmc_protection_r)
 				default:         return 0x46<<8;
 			}
 	}
-	logerror("Protection read @ %X\n",space.device().safe_pcbase());
+	logerror("Protection read @ %X\n",m_maincpu->pcbase());
 	return machine().rand();
 }
 

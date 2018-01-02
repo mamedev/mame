@@ -1462,7 +1462,7 @@ g_profiler.start(PROFILER_VIDEO);
 							;
 				#ifdef MAME_DEBUG
 					popmessage("unknown blitter command %02x", data);
-					logerror("%06x: unknown blitter command %02x\n", space.device().safe_pc(), data);
+					logerror("%06x: unknown blitter command %02x\n", m_maincpu->pc(), data);
 				#endif
 			}
 
@@ -1471,7 +1471,7 @@ g_profiler.start(PROFILER_VIDEO);
 			break;
 
 		default:
-			logerror("%06x: Blitter 0 reg %02x = %02x\n", space.device().safe_pc(), m_ddenlovr_blit_latch, data);
+			logerror("%06x: Blitter 0 reg %02x = %02x\n", m_maincpu->pc(), m_ddenlovr_blit_latch, data);
 			break;
 	}
 
@@ -1512,7 +1512,7 @@ READ8_MEMBER(ddenlovr_state::rongrong_gfxrom_r)
 
 	if (address >= size)
 	{
-		logerror("CPU#0 PC %06X: Error, Blitter address %06X out of range\n", space.device().safe_pc(), address);
+		logerror("CPU#0 PC %06X: Error, Blitter address %06X out of range\n", m_maincpu->pc(), address);
 		address %= size;
 	}
 
@@ -1830,7 +1830,7 @@ WRITE8_MEMBER(ddenlovr_state::rongrong_blitter_busy_w)
 	m_rongrong_blitter_busy_select = data;
 
 	if (data != 0x18)
-		logerror("%04x: rongrong_blitter_busy_w data = %02x\n", space.device().safe_pc(), data);
+		logerror("%04x: rongrong_blitter_busy_w data = %02x\n", m_maincpu->pc(), data);
 }
 
 READ8_MEMBER(ddenlovr_state::rongrong_blitter_busy_r)
@@ -1840,7 +1840,7 @@ READ8_MEMBER(ddenlovr_state::rongrong_blitter_busy_r)
 		case 0x18:  return 0;   // bit 5 = blitter busy
 
 		default:
-			logerror("%04x: rongrong_blitter_busy_r with select = %02x\n", space.device().safe_pc(), m_rongrong_blitter_busy_select);
+			logerror("%04x: rongrong_blitter_busy_r with select = %02x\n", m_maincpu->pc(), m_rongrong_blitter_busy_select);
 	}
 	return 0xff;
 }
@@ -2470,7 +2470,7 @@ READ8_MEMBER(ddenlovr_state::funkyfig_dsw_r)
 	if (!BIT(m_dsw_sel, 0))  return ioport("DSW1")->read();
 	if (!BIT(m_dsw_sel, 1))  return ioport("DSW2")->read();
 	if (!BIT(m_dsw_sel, 2))  return ioport("DSW3")->read();
-	logerror("%06x: warning, unknown bits read, ddenlovr_select = %02x\n", space.device().safe_pc(), m_dsw_sel);
+	logerror("%06x: warning, unknown bits read, ddenlovr_select = %02x\n", m_maincpu->pc(), m_dsw_sel);
 	return 0xff;
 }
 
@@ -2481,7 +2481,7 @@ READ8_MEMBER(ddenlovr_state::funkyfig_coin_r)
 		case 0x22:  return ioport("IN2")->read();
 		case 0x23:  return m_funkyfig_lockout;
 	}
-	logerror("%06x: warning, unknown bits read, ddenlovr_select2 = %02x\n", space.device().safe_pc(), m_input_sel);
+	logerror("%06x: warning, unknown bits read, ddenlovr_select2 = %02x\n", m_maincpu->pc(), m_input_sel);
 	return 0xff;
 }
 
@@ -2492,7 +2492,7 @@ READ8_MEMBER(ddenlovr_state::funkyfig_key_r)
 		case 0x20:  return ioport("IN0")->read();
 		case 0x21:  return ioport("IN1")->read();
 	}
-	logerror("%06x: warning, unknown bits read, ddenlovr_select2 = %02x\n", space.device().safe_pc(), m_input_sel);
+	logerror("%06x: warning, unknown bits read, ddenlovr_select2 = %02x\n", m_maincpu->pc(), m_input_sel);
 	return 0xff;
 }
 
@@ -2505,13 +2505,13 @@ WRITE8_MEMBER(ddenlovr_state::funkyfig_lockout_w)
 			machine().bookkeeping().coin_counter_w(0,   data  & 0x01);
 			machine().bookkeeping().coin_lockout_w(0, (~data) & 0x02);
 			if (data & ~0x03)
-				logerror("%06x: warning, unknown bits written, lockout = %02x\n", space.device().safe_pc(), data);
+				logerror("%06x: warning, unknown bits written, lockout = %02x\n", m_maincpu->pc(), data);
 			break;
 
 //      case 0xef:  16 bytes on startup
 
 		default:
-			logerror("%06x: warning, unknown bits written, ddenlovr_select2 = %02x, data = %02x\n", space.device().safe_pc(), m_input_sel, data);
+			logerror("%06x: warning, unknown bits written, ddenlovr_select2 = %02x, data = %02x\n", m_maincpu->pc(), m_input_sel, data);
 	}
 }
 
@@ -2625,7 +2625,7 @@ READ8_MEMBER(ddenlovr_state::hanakanz_gfxrom_r)
 
 	if (address >= size)
 	{
-		logerror("CPU#0 PC %06X: Error, Blitter address %06X out of range\n", space.device().safe_pc(), address);
+		logerror("CPU#0 PC %06X: Error, Blitter address %06X out of range\n", m_maincpu->pc(), address);
 		address %= size;
 	}
 
@@ -2656,7 +2656,7 @@ WRITE8_MEMBER(ddenlovr_state::hanakanz_coincounter_w)
 	machine().bookkeeping().coin_counter_w(1, data & 2);
 
 	if (data & 0xf0)
-		logerror("%04x: warning, coin counter = %02x\n", space.device().safe_pc(), data);
+		logerror("%04x: warning, coin counter = %02x\n", m_maincpu->pc(), data);
 
 #ifdef MAME_DEBUG
 //      popmessage("93 = %02x", data);
@@ -2900,7 +2900,7 @@ WRITE8_MEMBER(ddenlovr_state::mjchuuka_coincounter_w)
 	machine().bookkeeping().coin_lockout_w(0, (~data) & 0x08);
 
 	if (data & 0x74)
-		logerror("%04x: warning, coin counter = %02x\n", space.device().safe_pc(), data);
+		logerror("%04x: warning, coin counter = %02x\n", m_maincpu->pc(), data);
 
 #ifdef MAME_DEBUG
 //    popmessage("40 = %02x",data);
@@ -3038,7 +3038,7 @@ READ8_MEMBER(ddenlovr_state::mjmyster_coins_r)
 		case 0x03:  return 0xff;
 	}
 
-	logerror("%06x: warning, unknown bits read, ddenlovr_select2 = %02x\n", space.device().safe_pc(), m_input_sel);
+	logerror("%06x: warning, unknown bits read, ddenlovr_select2 = %02x\n", m_maincpu->pc(), m_input_sel);
 
 	return 0xff;
 }
@@ -3052,7 +3052,7 @@ READ8_MEMBER(ddenlovr_state::mjmyster_keyb_r)
 	else if (BIT(m_keyb, 2))   ret = ioport("KEY2")->read();
 	else if (BIT(m_keyb, 3))   ret = ioport("KEY3")->read();
 	else if (BIT(m_keyb, 4))   ret = ioport("KEY4")->read();
-	else    logerror("%06x: warning, unknown bits read, keyb = %02x\n", space.device().safe_pc(), m_keyb);
+	else    logerror("%06x: warning, unknown bits read, keyb = %02x\n", m_maincpu->pc(), m_keyb);
 
 	m_keyb <<= 1;
 
@@ -3066,7 +3066,7 @@ READ8_MEMBER(ddenlovr_state::mjmyster_dsw_r)
 	if (!BIT(m_dsw_sel, 2))   return ioport("DSW2")->read();
 	if (!BIT(m_dsw_sel, 3))   return ioport("DSW1")->read();
 	if (!BIT(m_dsw_sel, 4))   return ioport("DSW5")->read();
-	logerror("%06x: warning, unknown bits read, ddenlovr_select = %02x\n", space.device().safe_pc(), m_dsw_sel);
+	logerror("%06x: warning, unknown bits read, ddenlovr_select = %02x\n", m_maincpu->pc(), m_dsw_sel);
 	return 0xff;
 }
 
@@ -3084,7 +3084,7 @@ WRITE8_MEMBER(ddenlovr_state::mjmyster_coincounter_w)
 			break;
 
 		default:
-			logerror("%06x: warning, unknown bits written, ddenlovr_select2 = %02x, data = %02x\n", space.device().safe_pc(), m_input_sel, data);
+			logerror("%06x: warning, unknown bits written, ddenlovr_select2 = %02x, data = %02x\n", m_maincpu->pc(), m_input_sel, data);
 	}
 }
 
@@ -3178,7 +3178,7 @@ READ8_MEMBER(ddenlovr_state::hginga_coins_r)
 		case 0x22:  return 0x7f;    // bit 7 = blitter busy, bit 6 = hopper
 		case 0x23:  return m_coins;
 	}
-	logerror("%04x: coins_r with select = %02x\n", space.device().safe_pc(), m_input_sel);
+	logerror("%04x: coins_r with select = %02x\n", m_maincpu->pc(), m_input_sel);
 	return 0xff;
 }
 
@@ -3207,7 +3207,7 @@ WRITE8_MEMBER(ddenlovr_state::hginga_coins_w)
 			m_coins = data;
 			break;
 		default:
-			logerror("%04x: coins_w with select = %02x, data = %02x\n", space.device().safe_pc(), m_input_sel, data);
+			logerror("%04x: coins_w with select = %02x, data = %02x\n", m_maincpu->pc(), m_input_sel, data);
 	}
 }
 
@@ -3229,7 +3229,7 @@ READ8_MEMBER(ddenlovr_state::hginga_input_r)
 		case 0xa2:
 			return ioport(keynames1[m_keyb++])->read();
 	}
-	logerror("%04x: input_r with select = %02x\n", space.device().safe_pc(), m_input_sel);
+	logerror("%04x: input_r with select = %02x\n", m_maincpu->pc(), m_input_sel);
 	return 0xff;
 }
 
@@ -3321,7 +3321,7 @@ READ8_MEMBER(ddenlovr_state::hgokou_input_r)
 		case 0x22:  return hgokou_player_r(0);
 		case 0x23:  return m_coins;
 	}
-	logerror("%06x: warning, unknown bits read, dsw_sel = %02x\n", space.device().safe_pc(), m_dsw_sel);
+	logerror("%06x: warning, unknown bits read, dsw_sel = %02x\n", m_maincpu->pc(), m_dsw_sel);
 	return 0xff;
 }
 
@@ -3348,7 +3348,7 @@ WRITE8_MEMBER(ddenlovr_state::hgokou_input_w)
 		case 0x2f:  break;  // ? written with 2f (hgokou)
 
 		default:
-			logerror("%04x: input_w with select = %02x, data = %02x\n", space.device().safe_pc(), m_dsw_sel, data);
+			logerror("%04x: input_w with select = %02x, data = %02x\n", m_maincpu->pc(), m_dsw_sel, data);
 	}
 }
 
@@ -3424,7 +3424,7 @@ READ8_MEMBER(ddenlovr_state::hgokbang_input_r)
 			m_input_sel |= 1;
 			return ret;
 	}
-	logerror("%06x: warning, unknown bits read, dsw_sel = %02x\n", space.device().safe_pc(), m_dsw_sel);
+	logerror("%06x: warning, unknown bits read, dsw_sel = %02x\n", m_maincpu->pc(), m_dsw_sel);
 	return 0xff;
 }
 
@@ -3484,7 +3484,7 @@ READ8_MEMBER(ddenlovr_state::hparadis_input_r)
 		case 0x80:  return ioport(keynames0[m_keyb++])->read(); // P1 (Keys)
 		case 0x81:  return ioport(keynames1[m_keyb++])->read(); // P2 (Keys)
 	}
-	logerror("%06x: warning, unknown bits read, input_sel = %02x\n", space.device().safe_pc(), m_input_sel);
+	logerror("%06x: warning, unknown bits read, input_sel = %02x\n", m_maincpu->pc(), m_input_sel);
 	return 0xff;
 }
 
@@ -3505,7 +3505,7 @@ WRITE8_MEMBER(ddenlovr_state::hparadis_coin_w)
 		case 0x0c:  machine().bookkeeping().coin_counter_w(0, data & 1); break;
 		case 0x0d:  break;
 		default:
-			logerror("%04x: coins_w with select = %02x, data = %02x\n",space.device().safe_pc(), m_input_sel, data);
+			logerror("%04x: coins_w with select = %02x, data = %02x\n",m_maincpu->pc(), m_input_sel, data);
 	}
 }
 
@@ -3556,7 +3556,7 @@ READ8_MEMBER(ddenlovr_state::mjmywrld_coins_r)
 		case 0x83:  return 0x00;
 	}
 
-	logerror("%06x: warning, unknown bits read, input_sel = %02x\n", space.device().safe_pc(), m_input_sel);
+	logerror("%06x: warning, unknown bits read, input_sel = %02x\n", m_maincpu->pc(), m_input_sel);
 
 	return 0xff;
 }
@@ -3733,7 +3733,7 @@ WRITE8_MEMBER(ddenlovr_state::mjflove_coincounter_w)
 
 	if (data & 0xfe)
 	{
-		logerror("%04x: warning, coin counter = %02x\n", space.device().safe_pc(), data);
+		logerror("%04x: warning, coin counter = %02x\n", m_maincpu->pc(), data);
 //      popmessage("COIN = %02x", data);
 	}
 }
@@ -3822,7 +3822,7 @@ WRITE8_MEMBER(ddenlovr_state::mjgnight_coincounter_w)
 	machine().bookkeeping().coin_counter_w(1, data & 0x08);  // coin-in
 
 	if (data & 0xf2)
-		logerror("%04x: warning, coin counter = %02x\n", space.device().safe_pc(), data);
+		logerror("%04x: warning, coin counter = %02x\n", m_maincpu->pc(), data);
 
 #ifdef MAME_DEBUG
 //  popmessage("COIN = %02x", data);
@@ -3906,7 +3906,7 @@ WRITE8_MEMBER(ddenlovr_state::sryudens_coincounter_w)
 	m_hopper = data & 0x04;
 
 	if (data & 0x68)
-		logerror("%04x: warning, coin counter = %02x\n", space.device().safe_pc(), data);
+		logerror("%04x: warning, coin counter = %02x\n", m_maincpu->pc(), data);
 
 #ifdef MAME_DEBUG
 //  popmessage("COIN = %02x", data);
@@ -3966,7 +3966,7 @@ WRITE8_MEMBER(ddenlovr_state::janshinp_coincounter_w)
 	machine().bookkeeping().coin_counter_w(1, data & 2);
 
 	if (data & ~0x8b)
-		logerror("%04x: warning, coin counter = %02x\n", space.device().safe_pc(), data);
+		logerror("%04x: warning, coin counter = %02x\n", m_maincpu->pc(), data);
 
 #ifdef MAME_DEBUG
 //  popmessage("COIN = %02x", data);
@@ -4167,7 +4167,7 @@ WRITE8_MEMBER(ddenlovr_state::htengoku_coin_w)
 
 		case 0xff:  break;  // CRT controller?
 		default:
-			logerror("%04x: coins_w with select = %02x, data = %02x\n", space.device().safe_pc(), m_input_sel, data);
+			logerror("%04x: coins_w with select = %02x, data = %02x\n", m_maincpu->pc(), m_input_sel, data);
 	}
 }
 
@@ -4182,7 +4182,7 @@ READ8_MEMBER(ddenlovr_state::htengoku_input_r)
 		case 0x82:  return ioport(keynames0[m_keyb++])->read();
 		case 0x0d:  return 0xff;    // unused
 	}
-	logerror("%04x: input_r with select = %02x\n", space.device().safe_pc(), m_input_sel);
+	logerror("%04x: input_r with select = %02x\n", m_maincpu->pc(), m_input_sel);
 	return 0xff;
 }
 
@@ -4195,7 +4195,7 @@ READ8_MEMBER(ddenlovr_state::htengoku_coin_r)
 		case 0x02:  return 0xbf | ((m_hopper && !(m_screen->frame_number() % 10)) ? 0 : (1 << 6));  // bit 7 = blitter busy, bit 6 = hopper
 		case 0x03:  return m_coins;
 	}
-	logerror("%04x: coin_r with select = %02x\n", space.device().safe_pc(), m_input_sel);
+	logerror("%04x: coin_r with select = %02x\n", m_maincpu->pc(), m_input_sel);
 	return 0xff;
 }
 
@@ -4212,7 +4212,7 @@ WRITE8_MEMBER(ddenlovr_state::htengoku_blit_romregion_w)
 		case 0x81:  dynax_blit_romregion_w(space, 0, 1);    return;
 		case 0x00:  dynax_blit_romregion_w(space, 0, 2);    return;
 	}
-	logerror("%04x: unmapped romregion=%02X\n", space.device().safe_pc(), data);
+	logerror("%04x: unmapped romregion=%02X\n", m_maincpu->pc(), data);
 }
 
 static ADDRESS_MAP_START( htengoku_io_map, AS_IO, 8, ddenlovr_state )

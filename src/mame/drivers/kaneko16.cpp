@@ -609,7 +609,7 @@ READ16_MEMBER(kaneko16_gtmr_state::gtmr2_wheel_r)
 		case 0x0800:    // 360' Wheel
 			return  (ioport("WHEEL2")->read() << 8);
 		default:
-			logerror("gtmr2_wheel_r : read at %06x with joystick\n", space.device().safe_pc());
+			logerror("gtmr2_wheel_r : read at %06x with joystick\n", m_maincpu->pc());
 			return  (~0);
 	}
 }

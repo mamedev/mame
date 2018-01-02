@@ -394,7 +394,7 @@ WRITE16_MEMBER( taitox_state::cchip1_ram_w )
 	}
 	else
 	{
-		logerror("cchip1_w pc: %06x bank %02x offset %04x: %02x\n",space.device().safe_pc(),m_current_bank,offset,data);
+		logerror("cchip1_w pc: %06x bank %02x offset %04x: %02x\n",m_maincpu->pc(),m_current_bank,offset,data);
 	}
 }
 

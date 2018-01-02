@@ -86,7 +86,7 @@ ADDRESS_MAP_END
 WRITE16_MEMBER( mquake_state::output_w )
 {
 	if (ACCESSING_BITS_0_7)
-		logerror("%06x:output_w(%x) = %02x\n", space.device().safe_pc(), offset, data);
+		logerror("%06x:output_w(%x) = %02x\n", m_maincpu->pc(), offset, data);
 }
 
 
@@ -94,13 +94,13 @@ READ16_MEMBER( mquake_state::coin_chip_r )
 {
 	if (offset == 1)
 		return ioport("COINCHIP")->read();
-	logerror("%06x:coin_chip_r(%02x) & %04x\n", space.device().safe_pc(), offset, mem_mask);
+	logerror("%06x:coin_chip_r(%02x) & %04x\n", m_maincpu->pc(), offset, mem_mask);
 	return 0xffff;
 }
 
 WRITE16_MEMBER( mquake_state::coin_chip_w )
 {
-	logerror("%06x:coin_chip_w(%02x) = %04x & %04x\n", space.device().safe_pc(), offset, data, mem_mask);
+	logerror("%06x:coin_chip_w(%02x) = %04x & %04x\n", m_maincpu->pc(), offset, data, mem_mask);
 }
 
 // inputs at 282000, 282002 (full word)

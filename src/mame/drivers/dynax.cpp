@@ -1125,11 +1125,11 @@ READ8_MEMBER(dynax_state::tenkai_ip_r)
 				// player 1
 				case 0x82:
 					if (m_keyb >= 5)
-						logerror("%04x: unmapped keyb=%02x read\n", space.device().safe_pc(), m_keyb);
+						logerror("%04x: unmapped keyb=%02x read\n", m_maincpu->pc(), m_keyb);
 					return ioport(keynames0[m_keyb++])->read();
 
 				default:
-					logerror("%04x: unmapped ip_sel=%02x read from offs %x\n", space.device().safe_pc(), m_input_sel, offset);
+					logerror("%04x: unmapped ip_sel=%02x read from offs %x\n", m_maincpu->pc(), m_input_sel, offset);
 					return 0xff;
 			}
 		}

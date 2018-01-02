@@ -330,7 +330,7 @@ ADDRESS_MAP_END
 
 READ8_MEMBER(scramble_state::hncholms_prot_r)
 {
-	if(space.device().safe_pc() == 0x2b || space.device().safe_pc() == 0xa27)
+	if(m_maincpu->pc() == 0x2b || m_maincpu->pc() == 0xa27)
 		return 1;
 	else
 		return 0;

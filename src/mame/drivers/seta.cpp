@@ -3071,7 +3071,7 @@ READ16_MEMBER(jockeyc_state::mux_r)
 		case 0x40:  return (m_key2[3]->read() << 8) | m_key1[3]->read();
 		case 0x80:  return (m_key2[4]->read() << 8) | m_key1[4]->read();
 	}
-	logerror("%06X: unknown key read, mux = %04x\n", space.device().safe_pc(), m_mux);
+	logerror("%06X: unknown key read, mux = %04x\n", m_maincpu->pc(), m_mux);
 	return 0xffff;
 }
 

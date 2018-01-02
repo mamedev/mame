@@ -365,7 +365,7 @@ WRITE32_MEMBER(midzeus_state::disk_asic_jr_w)
 		/* unknown purpose; invasn writes 2 here at startup */
 		case 4:
 			if (data != 2)
-				logerror("%06X:disk_asic_jr_w(%X) = %X (unexpected)\n", space.device().safe_pc(), offset, data);
+				logerror("%06X:disk_asic_jr_w(%X) = %X (unexpected)\n", m_maincpu->pc(), offset, data);
 			break;
 
 		/* ROM bank selection on Zeus 2 */
@@ -380,7 +380,7 @@ WRITE32_MEMBER(midzeus_state::disk_asic_jr_w)
 		/* romsize; crusnexo writes 4 at startup; thegrid writes 6 */
 		case 8:
 			if (data != 4 && data != 6)
-				logerror("%06X:disk_asic_jr_w(%X) = %X (unexpected)\n", space.device().safe_pc(), offset, data);
+				logerror("%06X:disk_asic_jr_w(%X) = %X (unexpected)\n", m_maincpu->pc(), offset, data);
 			break;
 
 		/* trackball reset; thegrid writes 1 at startup */

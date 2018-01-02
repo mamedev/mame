@@ -281,8 +281,8 @@ READ16_MEMBER(sc4_state::sc4_cs1_r)
 		if ((pc == m_chk41addr) && (offset == m_chk41addr>>1))
 		{
 			uint32_t r_A0 = m_maincpu->state_int(M68K_A0);
-			uint32_t r_A1 = space.device().state().state_int(M68K_A1);
-			uint32_t r_D1 = space.device().state().state_int(M68K_D1);
+			uint32_t r_A1 = m_maincpu->state_int(M68K_A1);
+			uint32_t r_D1 = m_maincpu->state_int(M68K_D1);
 
 			if (r_D1 == 0x7)
 			{

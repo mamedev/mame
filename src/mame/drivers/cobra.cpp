@@ -3064,8 +3064,8 @@ WRITE64_MEMBER(cobra_state::gfx_unk1_w)
 			m_gfxfifo_in->pop(m_gfxcpu.target(), &in2);
 			m_gfx_unknown_v1 = (uint32_t)(in1 >> 32);         // FIFO number is read back from this same register
 
-			m_gfxfifo_out->push(&space.device(), in1 & 0xffffffff);
-			m_gfxfifo_out->push(&space.device(), in2 & 0xffffffff);
+			m_gfxfifo_out->push(m_gfxcpu.target(), in1 & 0xffffffff);
+			m_gfxfifo_out->push(m_gfxcpu.target(), in2 & 0xffffffff);
 		}
 		else if (value == 0x80)
 		{
@@ -3111,7 +3111,7 @@ WRITE64_MEMBER(cobra_state::gfx_buf_w)
 		// mbuslib_tex_ints() waits for bit 0x400 to be set
 		// memcheck_teximage() wants 0x400 cleared
 
-		m_gfxfifo_out->push(&space.device(), m_gfx_unk_status);
+		m_gfxfifo_out->push(m_gfxcpu.target(), m_gfx_unk_status);
 
 		m_gfx_unk_status &= ~0x400;
 	}
@@ -3119,7 +3119,7 @@ WRITE64_MEMBER(cobra_state::gfx_buf_w)
 	{
 		// prc_read always expects a value...
 
-		m_gfxfifo_out->push(&space.device(), 0);
+		m_gfxfifo_out->push(m_gfxcpu.target(), 0);
 	}
 }
 
