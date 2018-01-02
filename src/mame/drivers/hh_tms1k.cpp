@@ -138,6 +138,7 @@
   - bship discrete sound, netlist is documented
   - finish bshipb SN76477 sound
   - improve elecbowl driver
+  - is alphie(patent) the same as the final version?
 
 ***************************************************************************/
 
@@ -8315,6 +8316,8 @@ static MACHINE_CONFIG_START( timaze )
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_timaze)
+
+	/* no sound! */
 MACHINE_CONFIG_END
 
 

@@ -7,7 +7,6 @@
 
   TODO:
   - why does h2hbaskb(and clones) need a workaround on writing L pins?
-  - is h2hhockey supposed to show timer countdown? or only on TMS1000 version?
   - plus1: which sensor position is which colour?
 
 ***************************************************************************/
@@ -333,7 +332,7 @@ MACHINE_CONFIG_END
 
 /***************************************************************************
 
-  Coleco Head to Head Basketball/Hockey/Soccer
+  Coleco Head to Head Basketball/Hockey/Soccer (model 2150/2160/2170)
   * COP420 MCU label COP420L-NEZ/N
   * 2-digit 7seg display, 41 other leds, 1-bit sound
 
@@ -341,7 +340,9 @@ MACHINE_CONFIG_END
   the same, only differing on game time. The PCB is pre-configured on G1+IN2
   and IN3 to select the game.
 
-  An earlier revision of this runs on TMS1000.
+  An earlier revision of this runs on TMS1000. Model numbers are the same.
+  From the outside, an easy way to spot the difference is the Start/Display
+  button: TMS1000 version button label is D, COP420 label is a *.
 
 ***************************************************************************/
 

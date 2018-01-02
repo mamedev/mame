@@ -14733,14 +14733,14 @@ uspbball                        // US Games
 
 @source:hh_sm510.cpp
 exospace                        // Elektronika
-gnw_bx301                       // Nintendo
-gnw_dj101                       // Nintendo
-gnw_dm53                        // Nintendo
-gnw_eg26                        // Nintendo
-gnw_jr55                        // Nintendo
-gnw_mc25                        // Nintendo
-gnw_ml102                       // Nintendo
-gnw_mw56                        // Nintendo
+gnw_boxing                      // Nintendo
+gnw_dkjr                        // Nintendo
+gnw_dkong2                      // Nintendo
+gnw_egg                         // Nintendo
+gnw_mario                       // Nintendo
+gnw_mariocm                     // Nintendo
+gnw_mmouse                      // Nintendo
+gnw_mickdon                     // Nintendo
 kbilly                          // Konami
 kblades                         // Konami
 kbucky                          // Konami
@@ -31377,7 +31377,7 @@ ddpdojt                         // (c) 2010
 kov2nl                          // (c) 2008
 kov2nl_301                      //
 kov2nl_300                      //
-kov2nl_302cn                    // 
+kov2nl_302cn                    //
 kov2nl_301cn                    //
 kov2nl_300cn                    //
 kov3                            // (c) 2011
