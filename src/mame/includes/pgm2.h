@@ -70,8 +70,8 @@ public:
 	DECLARE_READ32_MEMBER(orleg2_speedup_r);
 	DECLARE_READ32_MEMBER(kov2nl_speedup_r);
 	DECLARE_READ32_MEMBER(kof98umh_speedup_r);
-	DECLARE_READ32_MEMBER(ddpdojh_speedup_r);
-	DECLARE_READ32_MEMBER(ddpdojh_speedup2_r);
+	DECLARE_READ32_MEMBER(ddpdojt_speedup_r);
+	DECLARE_READ32_MEMBER(ddpdojt_speedup2_r);
 	DECLARE_READ32_MEMBER(kov3_speedup_r);
 
 	DECLARE_READ8_MEMBER(encryption_r);
@@ -81,7 +81,7 @@ public:
 
 	DECLARE_DRIVER_INIT(kov2nl);
 	DECLARE_DRIVER_INIT(orleg2);
-	DECLARE_DRIVER_INIT(ddpdojh);
+	DECLARE_DRIVER_INIT(ddpdojt);
 	DECLARE_DRIVER_INIT(kov3);
 	DECLARE_DRIVER_INIT(kov3_104);
 	DECLARE_DRIVER_INIT(kov3_102);
