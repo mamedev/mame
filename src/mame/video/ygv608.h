@@ -176,8 +176,9 @@ private:
 	uint8_t m_tilemap_resize; // tilemap requires resize
 
 	/* These were statically allocated in the r/w routines */
-	int p0_state_r,m_color_state_r;
-	int p0_state_w,m_color_state_w;
+	int m_color_state_r;
+	int m_color_state_w;
+	int p0_state;
 	int pattern_name_base_r,pattern_name_base_w;     /* pattern name table base address */
 
 	// === new variable handling starts here ===
