@@ -2510,6 +2510,7 @@ static MACHINE_CONFIG_START( seta2 )
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("tmp68301",tmp68301_device,irq_callback)
 
 	MCFG_DEVICE_ADD("tmp68301", TMP68301, 0)
+	MCFG_TMP68301_CPU("maincpu")
 
 	MCFG_WATCHDOG_ADD("watchdog")
 
@@ -2786,6 +2787,7 @@ static MACHINE_CONFIG_START( namcostr )
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("tmp68301",tmp68301_device,irq_callback)
 
 	MCFG_DEVICE_ADD("tmp68301", TMP68301, 0)  // does this have a ticket dispenser?
+	MCFG_TMP68301_CPU("maincpu")
 
 	// video hardware
 	MCFG_SCREEN_ADD("screen", RASTER)

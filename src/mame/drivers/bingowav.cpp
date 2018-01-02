@@ -108,6 +108,7 @@ static MACHINE_CONFIG_START( bingowav )
 	MCFG_CPU_PROGRAM_MAP(bingowav_main_map)
 
 	MCFG_DEVICE_ADD("maintmp", TMP68301, 0) // wrong
+	MCFG_TMP68301_CPU("maincpu")
 
 	MCFG_DEVICE_ADD("mainioh", TE7750, 0)
 	MCFG_TE7750_IOS_CB(CONSTANT(5))
