@@ -190,13 +190,11 @@
 				<disk name="advanced dungeons &amp; dragons 2nd edition masterpiece collection (1995)(mindscape)(disc 1 of 4)[compilation]" sha1="adb4cc2ce2ae70724a78b8a3c1fc9b8c09996930" />
 			</diskarea>
 		</part>
-		<!-- 
 		<part name="cdrom2" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="advanced dungeons &amp; dragons 2nd edition masterpiece collection (1995)(mindscape)(disc 2 of 4)[compilation]" status="nodump" />
 			</diskarea>
 		</part>
-		-->
 		<part name="cdrom3" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="advanced dungeons &amp; dragons 2nd edition masterpiece collection (1995)(mindscape)(disc 3 of 4)[compilation]" sha1="eb3a8b15c7b21ee50cedfcf1870e8644396acfad" />
