@@ -23,14 +23,14 @@ READ8_MEMBER(tnzs_mcu_state::mcu_r)
 	uint8_t data = m_mcu->upi41_master_r(space, offset & 1);
 	m_subcpu->yield();
 
-//  logerror("PC %04x: read %02x from mcu $c00%01x\n", space.device().safe_pcbase(), data, offset);
+//  logerror("%s: read %02x from mcu $c00%01x\n", m_maincpu->pcbase(), data, offset);
 
 	return data;
 }
 
 WRITE8_MEMBER(tnzs_mcu_state::mcu_w)
 {
-//  logerror("PC %04x: write %02x to mcu $c00%01x\n", space.device().safe_pcbase(), data, offset);
+//  logerror("%s: write %02x to mcu $c00%01x\n", m_maincpu->pcbase(), data, offset);
 
 	m_mcu->upi41_master_w(space, offset & 1, data);
 }
@@ -47,7 +47,7 @@ READ8_MEMBER(tnzs_mcu_state::mcu_port1_r)
 		default:    data = 0xff; break;
 	}
 
-//  logerror("I8742:%04x  Read %02x from port 1\n", space.device().safe_pcbase(), data);
+//  logerror("%s:  Read %02x from port 1\n", m_maincpu->pcbase(), data);
 
 	return data;
 }
@@ -222,7 +222,7 @@ READ8_MEMBER(arknoid2_state::mcu_r)
 {
 	static const char mcu_startup[] = "\x55\xaa\x5a";
 
-	//logerror("PC %04x: read mcu %04x\n", space.device().safe_pc(), 0xc000 + offset);
+	//logerror("%s: read mcu %04x\n", m_maincpu->pc(), 0xc000 + offset);
 
 	if (offset == 0)
 	{
@@ -283,7 +283,7 @@ WRITE8_MEMBER(arknoid2_state::mcu_w)
 {
 	if (offset == 0)
 	{
-		//logerror("PC %04x: write %02x to mcu %04x\n", space.device().safe_pc(), data, 0xc000 + offset);
+		//logerror("%s: write %02x to mcu %04x\n", m_maincpu->pc(), data, 0xc000 + offset);
 		if (m_mcu_command == 0x41)
 		{
 			m_mcu_credits = (m_mcu_credits + data) & 0xff;
@@ -300,7 +300,7 @@ WRITE8_MEMBER(arknoid2_state::mcu_w)
 		0x80: release coin lockout (issued only in test mode)
 		during initialization, a sequence of 4 bytes sets coin/credit settings
 		*/
-		//logerror("PC %04x: write %02x to mcu %04x\n", space.device().safe_pc(), data, 0xc000 + offset);
+		//logerror("%s: write %02x to mcu %04x\n", m_maincpu->pc(), data, 0xc000 + offset);
 
 		if (m_mcu_initializing)
 		{
@@ -396,7 +396,7 @@ void kabukiz_state::machine_start()
 
 WRITE8_MEMBER(tnzs_base_state::ramrom_bankswitch_w)
 {
-//  logerror("PC %04x: writing %02x to bankswitch\n", space.device().safe_pc(),data);
+//  logerror("%s: writing %02x to bankswitch\n", m_maincpu->pc(),data);
 
 	/* bit 4 resets the second CPU */
 	if (data & 0x10)
@@ -461,7 +461,7 @@ WRITE8_MEMBER(tnzs_mcu_state::bankswitch1_w)
 
 WRITE8_MEMBER(tnzs_base_state::bankswitch1_w)
 {
-//  logerror("PC %04x: writing %02x to bankswitch 1\n", space.device().safe_pc(),data);
+//  logerror("%s: writing %02x to bankswitch 1\n", m_maincpu->pc(),data);
 
 	/* bits 0-1 select ROM bank */
 	m_bank2 = data & 0x03;

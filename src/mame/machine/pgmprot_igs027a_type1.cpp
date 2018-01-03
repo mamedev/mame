@@ -122,7 +122,7 @@ READ16_MEMBER(pgm_arm_type1_state::pgm_arm7_type1_ram_r )
 	uint16_t *share16 = reinterpret_cast<uint16_t *>(m_arm7_shareram.target());
 
 	if (PGMARM7LOGERROR)
-		logerror("M68K: ARM7 Shared RAM Read: %04x = %04x (%08x) (%06x)\n", BYTE_XOR_LE(offset), share16[BYTE_XOR_LE(offset)], mem_mask, space.device().safe_pc());
+		logerror("M68K: ARM7 Shared RAM Read: %04x = %04x (%08x) %s\n", BYTE_XOR_LE(offset), share16[BYTE_XOR_LE(offset)], mem_mask, machine().describe_context());
 	return share16[BYTE_XOR_LE(offset << 1)];
 }
 
@@ -131,7 +131,7 @@ WRITE16_MEMBER(pgm_arm_type1_state::pgm_arm7_type1_ram_w )
 	uint16_t *share16 = reinterpret_cast<uint16_t *>(m_arm7_shareram.target());
 
 	if (PGMARM7LOGERROR)
-		logerror("M68K: ARM7 Shared RAM Write: %04x = %04x (%04x) (%06x)\n", BYTE_XOR_LE(offset), data, mem_mask, space.device().safe_pc());
+		logerror("M68K: ARM7 Shared RAM Write: %04x = %04x (%04x) %s\n", BYTE_XOR_LE(offset), data, mem_mask, machine().describe_context());
 	COMBINE_DATA(&share16[BYTE_XOR_LE(offset << 1)]);
 }
 
@@ -151,14 +151,14 @@ READ32_MEMBER(pgm_arm_type1_state::pgm_arm7_type1_exrom_r )
 READ32_MEMBER(pgm_arm_type1_state::pgm_arm7_type1_shareram_r )
 {
 	if (PGMARM7LOGERROR)
-		logerror("ARM7: ARM7 Shared RAM Read: %04x = %08x (%08x) (%06x)\n", offset << 2, m_arm7_shareram[offset], mem_mask, space.device().safe_pc());
+		logerror("ARM7: ARM7 Shared RAM Read: %04x = %08x (%08x) %s\n", offset << 2, m_arm7_shareram[offset], mem_mask, machine().describe_context());
 	return m_arm7_shareram[offset];
 }
 
 WRITE32_MEMBER(pgm_arm_type1_state::pgm_arm7_type1_shareram_w )
 {
 	if (PGMARM7LOGERROR)
-		logerror("ARM7: ARM7 Shared RAM Write: %04x = %08x (%08x) (%06x)\n", offset << 2, data, mem_mask, space.device().safe_pc());
+		logerror("ARM7: ARM7 Shared RAM Write: %04x = %08x (%08x) %s\n", offset << 2, data, mem_mask, machine().describe_context());
 	COMBINE_DATA(&m_arm7_shareram[offset]);
 }
 
@@ -536,21 +536,21 @@ void pgm_arm_type1_state::command_handler_ddp3(int pc)
 			break;
 
 		case 0x67: // set high bits
-	//      printf("%06x command %02x | %04x\n", space.device().safe_pc(), m_ddp3lastcommand, m_value0);
+	//      printf("%s command %02x | %04x\n", machine().describe_context(), m_ddp3lastcommand, m_value0);
 			m_valueresponse = 0x880000;
 			m_curslots = (m_value0 & 0xff00)>>8;
 			m_slots[m_curslots] = (m_value0 & 0x00ff) << 16;
 			break;
 
 		case 0xe5: // set low bits for operation?
-		//  printf("%06x command %02x | %04x\n", space.device().safe_pc(), m_ddp3lastcommand, m_value0);
+		//  printf("%s command %02x | %04x\n", machine().describe_context(), m_ddp3lastcommand, m_value0);
 			m_valueresponse = 0x880000;
 			m_slots[m_curslots] |= (m_value0 & 0xffff);
 			break;
 
 
 		case 0x8e: // read back result of operations
-	//      printf("%06x command %02x | %04x\n", space.device().safe_pc(), m_ddp3lastcommand, m_value0);
+	//      printf("%s command %02x | %04x\n", machine().describe_context(), m_ddp3lastcommand, m_value0);
 			m_valueresponse = m_slots[m_value0&0xff];
 			break;
 
@@ -1737,7 +1737,7 @@ void pgm_arm_type1_state::command_handler_oldsplus(int pc)
 
 WRITE16_MEMBER(pgm_arm_type1_state::pgm_arm7_type1_sim_w )
 {
-	int pc = space.device().safe_pc();
+	int pc = m_maincpu->pc();
 
 	if (offset == 0)
 	{

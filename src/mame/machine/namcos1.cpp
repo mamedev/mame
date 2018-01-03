@@ -19,13 +19,13 @@ WRITE8_MEMBER( namcos1_state::_3dcs_w )
 
 READ8_MEMBER( namcos1_state::no_key_r )
 {
-	popmessage("CPU %s PC %08x: keychip read %04x\n", m_mcu->tag(), m_mcu->pc(), offset);
+	popmessage("%s: keychip read %04x\n", m_mcu->tag(), m_mcu->pc(), offset);
 	return 0;
 }
 
 WRITE8_MEMBER( namcos1_state::no_key_w )
 {
-	popmessage("CPU %s PC %08x: keychip write %04x=%02x\n", m_mcu->tag(), m_mcu->pc(), offset, data);
+	popmessage("%s: keychip write %04x=%02x\n", m_mcu->tag(), m_mcu->pc(), offset, data);
 }
 
 
@@ -130,7 +130,7 @@ CPU #0 PC e3d4: keychip read 0003     [AND #$37 = key no.]
 */
 READ8_MEMBER( namcos1_state::key_type1_r )
 {
-//  logerror("CPU %s PC %04x: keychip read %04x\n", space.device().tag(), space.device().safe_pc(), offset);
+//  logerror("%s: keychip read %04x\n", machine().describe_context(), offset);
 
 	if (offset < 3)
 	{
@@ -161,7 +161,7 @@ READ8_MEMBER( namcos1_state::key_type1_r )
 
 WRITE8_MEMBER( namcos1_state::key_type1_w )
 {
-//  logerror("CPU %s PC %04x: keychip write %04x=%02x\n", space.device().tag(), space.device().safe_pc(), offset, data);
+//  logerror("%s: keychip write %04x=%02x\n", machine().describe_context(), offset, data);
 
 	if (offset < 4)
 		m_key[offset] = data;
@@ -313,7 +313,7 @@ CPU #0 PC e574: keychip read 0001
 
 READ8_MEMBER( namcos1_state::key_type2_r )
 {
-//  logerror("CPU %s PC %04x: keychip read %04x\n", space.device().tag(), space.device().safe_pc(), offset);
+//  logerror("%s: keychip read %04x\n", machine().describe_context(), offset);
 
 	m_key_numerator_high_word = 0;
 
@@ -332,7 +332,7 @@ READ8_MEMBER( namcos1_state::key_type2_r )
 
 WRITE8_MEMBER( namcos1_state::key_type2_w )
 {
-//  logerror("CPU %s PC %04x: keychip write %04x=%02x\n", space.device().tag(), space.device().safe_pc(), offset, data);
+//  logerror("%s: keychip write %04x=%02x\n", machine().describe_context(), offset, data);
 
 	if (offset < 5)
 	{
@@ -439,7 +439,7 @@ CPU #0 PC e45a: keychip read 0030     [discarded]
 
 READ8_MEMBER( namcos1_state::key_type3_r )
 {
-//  logerror("CPU %s PC %04x: keychip read %04x\n", space.device().tag(), space.device().safe_pc(), offset);
+//  logerror("%s: keychip read %04x\n", machine().describe_context(), offset);
 
 	/* I need to handle blastoff's read from 0858. The game previously writes to 0858,
 	   using it as temporary storage, so maybe it expects to act as RAM, however
@@ -455,14 +455,14 @@ READ8_MEMBER( namcos1_state::key_type3_r )
 	if (op == m_key_bottom4) return (offset << 4) | (m_key[m_key_swap4_arg] & 0x0f);
 	if (op == m_key_top4)    return (offset << 4) | (m_key[m_key_swap4_arg] >> 4);
 
-	popmessage("CPU %s PC %08x: keychip read %04x", space.device().tag(), space.device().safe_pc(), offset);
+	popmessage("%s: keychip read %04x", machine().describe_context(), offset);
 
 	return 0;
 }
 
 WRITE8_MEMBER( namcos1_state::key_type3_w )
 {
-//  logerror("CPU %s PC %04x: keychip write %04x=%02x\n", space.device().tag(), space.device().safe_pc(), offset, data);
+//  logerror("%s: keychip write %04x=%02x\n", machine().describe_context(), offset, data);
 
 	m_key[(offset & 0x70) >> 4] = data;
 }
@@ -490,7 +490,7 @@ WRITE8_MEMBER(namcos1_state::sound_bankswitch_w)
 
 WRITE_LINE_MEMBER(namcos1_state::subres_w)
 {
-//  logerror("reset control pc=%04x %02x\n",space.device().safe_pc(),data);
+//  logerror("reset control %s %02x\n",machine().describe_context(),data);
 	if (state != m_reset)
 	{
 		m_mcu_patch_data = 0;
@@ -582,7 +582,7 @@ WRITE8_MEMBER(namcos1_state::mcu_bankswitch_w)
 
 WRITE8_MEMBER(namcos1_state::mcu_patch_w)
 {
-	//logerror("mcu C000 write pc=%04x data=%02x\n",space.device().safe_pc(),data);
+	//logerror("mcu C000 write %s data=%02x\n",machine().describe_context(),data);
 	if (m_mcu_patch_data == 0xa6) return;
 	m_mcu_patch_data = data;
 	m_triram[0] = data;

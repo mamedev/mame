@@ -134,9 +134,6 @@ WRITE8_MEMBER(flstory_state::flstory_gfxctrl_w)
 		m_bg_tilemap->mark_all_dirty();
 	}
 	m_palette_bank = (data & 0x20) >> 5;
-
-//popmessage("%04x: gfxctrl = %02x\n", space.device().safe_pc(), data);
-
 }
 
 READ8_MEMBER(flstory_state::victnine_gfxctrl_r)
@@ -152,9 +149,6 @@ WRITE8_MEMBER(flstory_state::victnine_gfxctrl_w)
 
 	if (data & 0x04)
 		flip_screen_set(data & 0x01);
-
-//popmessage("%04x: gfxctrl = %02x\n", space.device().safe_pc(), data);
-
 }
 
 WRITE8_MEMBER(flstory_state::flstory_scrlram_w)

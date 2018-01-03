@@ -208,13 +208,10 @@ READ8_MEMBER( k053247_device::k053246_r )
 
 		addr = (m_kx46_regs[6] << 17) | (m_kx46_regs[7] << 9) | (m_kx46_regs[4] << 1) | ((offset & 1) ^ 1);
 		addr &= machine().root_device().memregion(m_memory_region)->bytes() - 1;
-//      if (VERBOSE)
-//          popmessage("%04x: offset %02x addr %06x", space.device().safe_pc(), offset, addr);
 		return machine().root_device().memregion(m_memory_region)->base()[addr];
 	}
 	else
 	{
-//      LOG("%04x: read from unknown 053246 address %x\n", space.device().safe_pc(), offset);
 		return 0;
 	}
 }

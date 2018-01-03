@@ -240,7 +240,7 @@ WRITE8_MEMBER(vt100_video_device::dc012_w)
 	else
 	{
 //      if (MHFU_FLAG == false)
-//          LOG("MHFU  ___ENABLED___ %05x \n", space.device().safe_pc());
+//          LOG("MHFU  ___ENABLED___ %s \n", m_maincpu->pc());
 		MHFU_FLAG = true;
 		MHFU_counter = 0;
 	}

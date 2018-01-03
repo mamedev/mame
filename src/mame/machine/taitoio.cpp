@@ -176,7 +176,7 @@ READ8_MEMBER( tc0040ioc_device::portreg_r )
 			return m_read_7_cb(0);
 
 		default:
-//logerror("PC %06x: warning - read TC0040IOC address %02x\n",space.device().safe_pc(),m_port);
+//logerror("%s: warning - read TC0040IOC address %02x\n",m_maincpu->pc(),m_port);
 			return 0xff;
 	}
 }
@@ -191,12 +191,12 @@ WRITE8_MEMBER( tc0040ioc_device::portreg_w )
 			m_write_4_cb(data & 0x0f);
 
 //if (data & 0xf0)
-//logerror("PC %06x: warning - write %02x to TC0040IOC address %02x\n",space.device().safe_pc(),data,m_port);
+//logerror("%s: warning - write %02x to TC0040IOC address %02x\n",m_maincpu->pc(),data,m_port);
 
 			break;
 
 		default:
-//logerror("PC %06x: warning - write %02x to TC0040IOC address %02x\n",space.device().safe_pc(),data,m_port);
+//logerror("%s: warning - write %02x to TC0040IOC address %02x\n",m_maincpu->pc(),data,m_port);
 			break;
 	}
 }
@@ -287,7 +287,7 @@ READ8_MEMBER( tc0220ioc_device::read )
 			return m_read_7_cb(0);
 
 		default:
-//logerror("PC %06x: warning - read TC0220IOC address %02x\n",space.device().safe_pc(),offset);
+//logerror("%s: warning - read TC0220IOC address %02x\n",m_maincpu->pc(),offset);
 			return 0xff;
 	}
 }
@@ -309,12 +309,12 @@ WRITE8_MEMBER( tc0220ioc_device::write )
 			m_write_4_cb(data & 0x0f);
 
 //if (data & 0xf0)
-//logerror("PC %06x: warning - write %02x to TC0220IOC address %02x\n",space.device().safe_pc(),data,offset);
+//logerror("%s: warning - write %02x to TC0220IOC address %02x\n",m_maincpu->pc(),data,offset);
 
 			break;
 
 		default:
-//logerror("PC %06x: warning - write %02x to TC0220IOC address %02x\n",space.device().safe_pc(),data,offset);
+//logerror("%s: warning - write %02x to TC0220IOC address %02x\n",m_maincpu->pc(),data,offset);
 			break;
 	}
 }
@@ -403,7 +403,7 @@ READ8_MEMBER( tc0510nio_device::read )
 			return m_read_7_cb(0);
 
 		default:
-//logerror("PC %06x: warning - read TC0510NIO address %02x\n",space.device().safe_pc(),offset);
+//logerror("%s: warning - read TC0510NIO address %02x\n",m_maincpu->pc(),offset);
 			return 0xff;
 	}
 }
@@ -427,7 +427,7 @@ WRITE8_MEMBER( tc0510nio_device::write )
 			break;
 
 		default:
-//logerror("PC %06x: warning - write %02x to TC0510NIO address %02x\n",space.device().safe_pc(),data,offset);
+//logerror("%s: warning - write %02x to TC0510NIO address %02x\n",m_maincpu->pc(),data,offset);
 			break;
 	}
 }
@@ -444,7 +444,7 @@ WRITE16_MEMBER( tc0510nio_device::halfword_w )
 	else
 	{
 		/* driftout writes the coin counters here - bug? */
-//logerror("CPU #0 PC %06x: warning - write to MSB of TC0510NIO address %02x\n",space.device().safe_pc(),offset);
+//logerror("CPU #0 %s: warning - write to MSB of TC0510NIO address %02x\n",m_maincpu->pc(),offset);
 		write(space, offset, (data >> 8) & 0xff);
 	}
 }
@@ -543,7 +543,7 @@ READ8_MEMBER( tc0640fio_device::read )
 			return m_read_7_cb(0);
 
 		default:
-//logerror("PC %06x: warning - read TC0640FIO address %02x\n",space.device().safe_pc(),offset);
+//logerror("%s: warning - read TC0640FIO address %02x\n",m_maincpu->pc(),offset);
 			return 0xff;
 	}
 }
@@ -562,7 +562,7 @@ WRITE8_MEMBER( tc0640fio_device::write )
 			break;
 
 		default:
-//logerror("PC %06x: warning - write %02x to TC0640FIO address %02x\n",space.device().safe_pc(),data,offset);
+//logerror("%s: warning - write %02x to TC0640FIO address %02x\n",m_maincpu->pc(),data,offset);
 			break;
 	}
 }
@@ -579,7 +579,7 @@ WRITE16_MEMBER( tc0640fio_device::halfword_w )
 	else
 	{
 		write(space, offset, (data >> 8) & 0xff);
-//logerror("CPU #0 PC %06x: warning - write to MSB of TC0640FIO address %02x\n",space.device().safe_pc(),offset);
+//logerror("CPU #0 %s: warning - write to MSB of TC0640FIO address %02x\n",m_maincpu->pc(),offset);
 	}
 }
 
@@ -595,6 +595,6 @@ WRITE16_MEMBER( tc0640fio_device::halfword_byteswap_w )
 	else
 	{
 		write(space, offset, data & 0xff);
-//logerror("CPU #0 PC %06x: warning - write to LSB of TC0640FIO address %02x\n",space.device().safe_pc(),offset);
+//logerror("CPU #0 %s: warning - write to LSB of TC0640FIO address %02x\n",m_maincpu->pc(),offset);
 	}
 }

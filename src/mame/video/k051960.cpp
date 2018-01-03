@@ -304,7 +304,7 @@ READ8_MEMBER( k051960_device::k051937_r )
 	else if (offset == 0)
 		return m_screen->vblank() ? 1 : 0; // vblank?
 
-	//logerror("%04x: read unknown 051937 address %x\n", space.device().safe_pc(), offset);
+	//logerror("%s: read unknown 051937 address %x\n", m_maincpu->pc(), offset);
 	return 0;
 }
 
@@ -329,11 +329,11 @@ WRITE8_MEMBER( k051960_device::k051937_w )
 
 		/* bit 5 = enable gfx ROM reading */
 		m_readroms = data & 0x20;
-		//logerror("%04x: write %02x to 051937 address %x\n", space.device().safe_pc(), data, offset);
+		//logerror("%s: write %02x to 051937 address %x\n", m_maincpu->pc(), data, offset);
 	}
 	else if (offset == 1)
 	{
-		//popmessage("%04x: write %02x to 051937 address %x", space.device().safe_pc(), data, offset);
+		//popmessage("%04x: write %02x to 051937 address %x", m_maincpu->pc(), data, offset);
 		// Chequered Flag uses this bit to enable background palette dimming
 		// TODO: use a callback here for now, pending further investigation over this bit
 		m_vreg_contrast_handler(BIT(data,0));
@@ -347,8 +347,7 @@ WRITE8_MEMBER( k051960_device::k051937_w )
 	}
 	else
 	{
-	//  popmessage("%04x: write %02x to 051937 address %x", space.device().safe_pc(), data, offset);
-	//logerror("%04x: write %02x to unknown 051937 address %x\n", space.device().safe_pc(), data, offset);
+	//logerror("%s: write %02x to unknown 051937 address %x\n", m_maincpu->pc(), data, offset);
 	}
 }
 

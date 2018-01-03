@@ -87,7 +87,7 @@ void k054000_device::device_reset()
 
 WRITE8_MEMBER( k054000_device::write )
 {
-	//logerror("%04x: write %02x to 054000 address %02x\n",space.device().safe_pc(),data,offset);
+	//logerror("%s: write %02x to 054000 address %02x\n",m_maincpu->pc(),data,offset);
 	m_regs[offset] = data;
 }
 
@@ -96,7 +96,7 @@ READ8_MEMBER( k054000_device::read )
 	int Acx, Acy, Aax, Aay;
 	int Bcx, Bcy, Bax, Bay;
 
-	//logerror("%04x: read 054000 address %02x\n", space.device().safe_pc(), offset);
+	//logerror("%s: read 054000 address %02x\n", m_maincpu->pc(), offset);
 
 	if (offset != 0x18)
 		return 0;

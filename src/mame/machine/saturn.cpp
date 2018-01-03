@@ -75,7 +75,7 @@ READ16_MEMBER(saturn_state::saturn_soundram_r)
 /* communication,SLAVE CPU acquires data from the MASTER CPU and triggers an irq.  */
 WRITE32_MEMBER(saturn_state::minit_w)
 {
-	//logerror("cpu %s (PC=%08X) MINIT write = %08x\n", space.device().tag(), space.device().safe_pc(),data);
+	//logerror("%s MINIT write = %08x\n", machine().describe_context(),data);
 	machine().scheduler().boost_interleave(m_minit_boost_timeslice, attotime::from_usec(m_minit_boost));
 	machine().scheduler().trigger(1000);
 	machine().scheduler().synchronize(); // force resync
@@ -84,7 +84,7 @@ WRITE32_MEMBER(saturn_state::minit_w)
 
 WRITE32_MEMBER(saturn_state::sinit_w)
 {
-	//logerror("cpu %s (PC=%08X) SINIT write = %08x\n", space.device().tag(), space.device().safe_pc(),data);
+	//logerror("%s SINIT write = %08x\n", machine().describe_context(),data);
 	machine().scheduler().boost_interleave(m_sinit_boost_timeslice, attotime::from_usec(m_sinit_boost));
 	machine().scheduler().synchronize(); // force resync
 	m_maincpu->sh2_set_frt_input(PULSE_LINE);
@@ -111,7 +111,7 @@ Shinrei Jusatsushi Taromaru (options menu)
 
 WRITE32_MEMBER(saturn_state::saturn_minit_w)
 {
-	//logerror("cpu %s (PC=%08X) MINIT write = %08x\n", space.device().tag(), space.device().safe_pc(),data);
+	//logerror("%s MINIT write = %08x\n", machine().describe_context(),data);
 	if(m_fake_comms->read() & 1)
 		machine().scheduler().synchronize(); // force resync
 	else
@@ -125,7 +125,7 @@ WRITE32_MEMBER(saturn_state::saturn_minit_w)
 
 WRITE32_MEMBER(saturn_state::saturn_sinit_w)
 {
-	//logerror("cpu %s (PC=%08X) SINIT write = %08x\n", space.device().tag(), space.device().safe_pc(),data);
+	//logerror("%s SINIT write = %08x\n", machine().describe_context(),data);
 	if(m_fake_comms->read() & 1)
 		machine().scheduler().synchronize(); // force resync
 	else

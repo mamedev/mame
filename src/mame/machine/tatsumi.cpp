@@ -179,7 +179,7 @@ WRITE16_MEMBER(roundup5_state::roundup5_control_w)
 		m_audiocpu->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
 
 //  if (offset == 1 && (tatsumi_control_w & 0xfeff) != (last_bank & 0xfeff))
-//      logerror("%08x:  Changed bank to %04x (%d)\n", space.device().safe_pc(), tatsumi_control_w,offset);
+//      logerror("%s:  Changed bank to %04x (%d)\n", m_maincpu->pc(), tatsumi_control_w,offset);
 
 //todo - watchdog
 
@@ -225,7 +225,7 @@ WRITE16_MEMBER(roundup5_state::roundup5_control_w)
 WRITE16_MEMBER(roundup5_state::roundup5_d0000_w)
 {
 	COMBINE_DATA(&m_roundup5_d0000_ram[offset]);
-//  logerror("d_68k_d0000_w %06x %04x\n", space.device().safe_pc(), data);
+//  logerror("d_68k_d0000_w %s %04x\n", m_maincpu->pc(), data);
 }
 
 WRITE16_MEMBER(roundup5_state::roundup5_e0000_w)
@@ -237,7 +237,7 @@ WRITE16_MEMBER(roundup5_state::roundup5_e0000_w)
 	COMBINE_DATA(&m_roundup5_e0000_ram[offset]);
 	m_subcpu->set_input_line(INPUT_LINE_IRQ4, CLEAR_LINE); // guess, probably wrong
 
-//  logerror("d_68k_e0000_w %06x %04x\n", space.device().safe_pc(), data);
+//  logerror("d_68k_e0000_w %s %04x\n", m_maincpu->pc(), data);
 }
 
 /******************************************************************************/
@@ -247,7 +247,7 @@ WRITE8_MEMBER(cyclwarr_state::cyclwarr_control_w)
 	m_control_word = data;
 
 //  if ((m_control_word&0xfe) != (m_last_control&0xfe))
-//      logerror("%08x:  control_w %04x\n", space.device().safe_pc(), data);
+//      logerror("%s  control_w %04x\n", m_maincpu->pc(), data);
 
 /*
 
@@ -270,14 +270,6 @@ WRITE8_MEMBER(cyclwarr_state::cyclwarr_control_w)
 		m_subcpu->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
 	}
 
-
-	// hack
-	if (space.device().safe_pc() == 0x2c3c34)
-	{
-//      cpu_set_reset_line(1, CLEAR_LINE);
-//      logerror("hack 68k2 on\n");
-	}
-
 	m_last_control = m_control_word;
 }
 
@@ -287,7 +279,7 @@ READ16_MEMBER(tatsumi_state::tatsumi_v30_68000_r)
 {
 	const uint16_t* rom=(uint16_t*)memregion("sub")->base();
 
-//logerror("%05X:68000_r(%04X),cw=%04X\n", space.device().safe_pc(), offset*2, m_control_word);
+//logerror("%s:68000_r(%04X),cw=%04X\n", m_maincpu->pc(), offset*2, m_control_word);
 	/* Read from 68k RAM */
 	if ((m_control_word&0x1f)==0x18)
 	{

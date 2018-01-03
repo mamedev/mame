@@ -398,6 +398,6 @@ WRITE32_MEMBER( k001604_device::reg_w )
 
 	if (offset != 0x08 && offset != 0x09 && offset != 0x0a /*&& offset != 0x17 && offset != 0x18*/)
 	{
-		//printf("K001604_reg_w (%d), %02X, %08X, %08X at %08X\n", chip, offset, data, mem_mask, space.device().safe_pc());
+		//printf("K001604_reg_w (%d), %02X, %08X, %08X at %s\n", chip, offset, data, mem_mask, m_maincpu->pc());
 	}
 }

@@ -84,7 +84,7 @@ WRITE16_MEMBER(midxunit_state::midxunit_io_w)
 			output().set_value("Player3_Gun_LED", (~data & 0x40) >> 6 );
 
 			logerror("%08X:I/O write to %d = %04X\n", m_maincpu->pc(), offset, data);
-//          logerror("%08X:Unknown I/O write to %d = %04X\n", space.device().safe_pc(), offset, data);
+//          logerror("%08X:Unknown I/O write to %d = %04X\n", m_maincpu->pc(), offset, data);
 			break;
 	}
 	m_iodata[offset] = newword;
@@ -202,7 +202,7 @@ READ16_MEMBER(midxunit_state::midxunit_uart_r)
 			break;
 	}
 
-/*  logerror("%08X:UART R @ %X = %02X\n", space.device().safe_pc(), offset, result);*/
+/*  logerror("%08X:UART R @ %X = %02X\n", m_maincpu->pc(), offset, result);*/
 	return result;
 }
 
@@ -238,7 +238,7 @@ WRITE16_MEMBER(midxunit_state::midxunit_uart_w)
 			break;
 	}
 
-/*  logerror("%08X:UART W @ %X = %02X\n", space.device().safe_pc(), offset, data);*/
+/*  logerror("%08X:UART W @ %X = %02X\n", m_maincpu->pc(), offset, data);*/
 }
 
 
@@ -316,7 +316,7 @@ WRITE16_MEMBER(midxunit_state::midxunit_security_clock_w)
 
 READ16_MEMBER(midxunit_state::midxunit_sound_r)
 {
-	logerror("%08X:Sound read\n", space.device().safe_pc());
+	logerror("%08X:Sound read\n", m_maincpu->pc());
 
 	return m_dcs->data_r() & 0xff;
 }
@@ -333,14 +333,14 @@ WRITE16_MEMBER(midxunit_state::midxunit_sound_w)
 	/* check for out-of-bounds accesses */
 	if (offset)
 	{
-		logerror("%08X:Unexpected write to sound (hi) = %04X\n", space.device().safe_pc(), data);
+		logerror("%08X:Unexpected write to sound (hi) = %04X\n", m_maincpu->pc(), data);
 		return;
 	}
 
 	/* call through based on the sound type */
 	if (ACCESSING_BITS_0_7)
 	{
-		logerror("%08X:Sound write = %04X\n", space.device().safe_pc(), data);
+		logerror("%08X:Sound write = %04X\n", m_maincpu->pc(), data);
 		m_dcs->data_w(data & 0xff);
 	}
 }

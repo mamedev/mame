@@ -1021,7 +1021,7 @@ WRITE16_MEMBER ( mac_state::macii_scsi_w )
 {
 	int reg = (offset>>3) & 0xf;
 
-//  logerror("macplus_scsi_w: data %x offset %x mask %x (PC=%x)\n", data, offset, mem_mask, space.device().safe_pc());
+//  logerror("macplus_scsi_w: data %x offset %x mask %x (PC=%x)\n", data, offset, mem_mask, m_maincpu->pc());
 
 	if ((reg == 0) && (offset == 0x100))
 	{
@@ -1535,10 +1535,10 @@ WRITE8_MEMBER(mac_state::mac_via_out_b_bbadb)
 
 WRITE8_MEMBER(mac_state::mac_via_out_b_egadb)
 {
-//  printf("VIA1 OUT B: %02x (PC %x)\n", data, m_maincpu->safe_pc());
+//  printf("VIA1 OUT B: %02x (PC %x)\n", data, m_maincpu->pc());
 
 	#if LOG_ADB
-	printf("68K: New Egret state: SS %d VF %d (PC %x)\n", (data>>5)&1, (data>>4)&1, space.device().safe_pc());
+	printf("68K: New Egret state: SS %d VF %d (PC %x)\n", (data>>5)&1, (data>>4)&1, m_maincpu->pc());
 	#endif
 	m_egret->set_via_full((data&0x10) ? 1 : 0);
 	m_egret->set_sys_session((data&0x20) ? 1 : 0);
@@ -1546,10 +1546,10 @@ WRITE8_MEMBER(mac_state::mac_via_out_b_egadb)
 
 WRITE8_MEMBER(mac_state::mac_via_out_b_cdadb)
 {
-//  printf("VIA1 OUT B: %02x (PC %x)\n", data, m_maincpu->safe_pc());
+//  printf("VIA1 OUT B: %02x (PC %x)\n", data, m_maincpu->pc());
 
 	#if LOG_ADB
-	printf("68K: New Cuda state: TIP %d BYTEACK %d (PC %x)\n", (data>>5)&1, (data>>4)&1, space.device().safe_pc());
+	printf("68K: New Cuda state: TIP %d BYTEACK %d (PC %x)\n", (data>>5)&1, (data>>4)&1, m_maincpu->pc());
 	#endif
 	m_cuda->set_byteack((data&0x10) ? 1 : 0);
 	m_cuda->set_tip((data&0x20) ? 1 : 0);
