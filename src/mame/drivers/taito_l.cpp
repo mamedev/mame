@@ -302,7 +302,7 @@ WRITE8_MEMBER(taitol_state::rombankswitch_w)
 			logerror("New rom size : %x\n", (m_high + 1) * 0x2000);
 		}
 
-		//logerror("robs %d, %02x (%04x)\n", offset, data, space.device().safe_pc());
+		//logerror("robs %d, %02x (%04x)\n", offset, data, m_main_cpu->pc());
 		m_cur_rombank = data;
 		m_main_bnk->set_base(&m_main_prg[0x2000 * m_cur_rombank]);
 	}
@@ -320,7 +320,7 @@ WRITE8_MEMBER(fhawk_state::rombank2switch_w)
 			logerror("New rom2 size : %x\n", (m_high2 + 1) * 0x4000);
 		}
 
-		//logerror("robs2 %02x (%04x)\n", data, space.device().safe_pc());
+		//logerror("robs2 %02x (%04x)\n", data, m_main_cpu->pc());
 
 		m_cur_rombank2 = data;
 		m_slave_bnk->set_base(&m_slave_prg[0x4000 * m_cur_rombank2]);
@@ -342,7 +342,7 @@ WRITE8_MEMBER(taitol_state::rambankswitch_w)
 	if (m_cur_rambank[offset] != data)
 	{
 		m_cur_rambank[offset] = data;
-		//logerror("rabs %d, %02x (%04x)\n", offset, data, space.device().safe_pc());
+		//logerror("rabs %d, %02x (%04x)\n", offset, data, m_main_cpu->pc());
 		if (data >= 0x14 && data <= 0x1f)
 		{
 			data -= 0x14;
@@ -416,12 +416,12 @@ READ8_MEMBER(taitol_1cpu_state::extport_select_and_ym2203_r)
 
 WRITE8_MEMBER(taitol_state::mcu_control_w)
 {
-//  logerror("mcu control %02x (%04x)\n", data, space.device().safe_pc());
+//  logerror("mcu control %02x (%04x)\n", data, m_main_cpu->pc());
 }
 
 READ8_MEMBER(taitol_state::mcu_control_r)
 {
-//  logerror("mcu control read (%04x)\n", space.device().safe_pc());
+//  logerror("mcu control read (%04x)\n", m_main_cpu->pc());
 	return 0x1;
 }
 
@@ -1515,7 +1515,7 @@ WRITE8_MEMBER(fhawk_state::portA_w)
 		m_cur_audio_bnk = data & 0x03;
 		bankaddress = m_cur_audio_bnk * 0x4000;
 		m_audio_bnk->set_base(&m_audio_prg[bankaddress]);
-		//logerror ("YM2203 bank change val=%02x  pc=%04x\n", m_cur_audio_bnk, space.device().safe_pc() );
+		//logerror ("YM2203 bank change val=%02x  %s\n", m_cur_audio_bnk, machine().describe_context() );
 	}
 }
 

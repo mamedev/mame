@@ -47,12 +47,12 @@ READ8_MEMBER(spy_state::spy_bankedram1_r)
 	{
 		if (m_pmcbank)
 		{
-			//logerror("%04x read pmcram %04x\n", space.device().safe_pc(), offset);
+			//logerror("%04x read pmcram %04x\n",m_maincpu->pc(), offset);
 			return m_pmcram[offset];
 		}
 		else
 		{
-			//logerror("%04x read pmc internal ram %04x\n", space.device().safe_pc(), offset);
+			//logerror("%04x read pmc internal ram %04x\n", m_maincpu->pc(), offset);
 			return 0;
 		}
 	}
@@ -70,11 +70,11 @@ WRITE8_MEMBER(spy_state::spy_bankedram1_w)
 	{
 		if (m_pmcbank)
 		{
-			//logerror("%04x pmcram %04x = %02x\n", space.device().safe_pc(), offset, data);
+			//logerror("%04x pmcram %04x = %02x\n", m_maincpu->pc(), offset, data);
 			m_pmcram[offset] = data;
 		}
 		//else
-			//logerror("%04x pmc internal ram %04x = %02x\n", space.device().safe_pc(), offset, data);
+			//logerror("%04x pmc internal ram %04x = %02x\n", m_maincpu->pc(), offset, data);
 	}
 	else
 		m_ram[offset] = data;
@@ -303,7 +303,7 @@ WRITE8_MEMBER(spy_state::spy_3f90_w)
 	/* bit 7 = PMC-BK */
 	m_pmcbank = (data & 0x80) >> 7;
 
-//logerror("%04x: 3f90_w %02x\n", space.device().safe_pc(), data);
+//logerror("%04x: 3f90_w %02x\n", m_maincpu->pc(), data);
 	/* bit 6 = PMC-START */
 	if ((data & 0x40) && !(m_old_3f90 & 0x40))
 	{

@@ -70,7 +70,7 @@ READ8_MEMBER(thunderx_state::pmc_r)
 {
 	if (PMC_BK)
 	{
-//      logerror("%04x read pmcram %04x\n",space.device().safe_pc(),offset);
+//      logerror("%04x read pmcram %04x\n",m_audiocpu->pc(),offset);
 		return m_pmcram[offset];
 	}
 	else
@@ -299,7 +299,7 @@ READ8_MEMBER(thunderx_state::_1f98_r)
 
 WRITE8_MEMBER(thunderx_state::thunderx_1f98_w)
 {
-	// logerror("%04x: 1f98_w %02x\n", space.device().safe_pc(),data);
+	// logerror("%04x: 1f98_w %02x\n", m_maincpu->pc(),data);
 
 	// bit 0 = enable char ROM reading through the video RAM
 	m_k052109->set_rmrd_line((data & 0x01) ? ASSERT_LINE : CLEAR_LINE);

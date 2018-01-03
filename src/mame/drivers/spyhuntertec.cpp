@@ -407,7 +407,7 @@ READ8_MEMBER(spyhuntertec_state::spyhuntertec_in2_r)
 
 
 	*/
-//  printf("%04x spyhuntertec_in2_r\n", space.device().safe_pc());
+//  printf("%04x spyhuntertec_in2_r\n", m_maincpu->pc());
 
 	return (ioport("IN2")->read() & ~0x40) | ((m_analog_count == 0) ? 0x40 : 0x00);
 }
@@ -415,7 +415,7 @@ READ8_MEMBER(spyhuntertec_state::spyhuntertec_in2_r)
 READ8_MEMBER(spyhuntertec_state::spyhuntertec_in3_r)
 {
 	uint8_t ret = ioport("IN3")->read();
-//  printf("%04x spyhuntertec_in3_r\n", space.device().safe_pc());
+//  printf("%04x spyhuntertec_in3_r\n",m_maincpu->pc());
 	return ret;
 }
 

@@ -622,7 +622,7 @@ WRITE8_MEMBER(suna8_state::sranger_prot_w)
 {
 	/* check code at 0x2ce2 (in sranger), protection is so dire that I can't even exactly
 	   estabilish if what I'm doing can be considered or not a kludge... -AS */
-	space.write_byte(0xcd99,0xff);
+	m_maincpu->space(AS_PROGRAM).write_byte(0xcd99,0xff);
 }
 
 static ADDRESS_MAP_START( rranger_map, AS_PROGRAM, 8, suna8_state )
@@ -682,7 +682,7 @@ WRITE8_MEMBER(suna8_state::brickzn_sprbank_w)
 	m_spritebank = (data >> 1) & 1;
 
 	logerror("CPU #0 - PC %04X: protection_val = %02X\n",m_maincpu->pc(),data);
-//  if (data & ~0x03)   logerror("CPU #0 - PC %04X: unknown spritebank bits: %02X\n",space.device().safe_pc(),data);
+//  if (data & ~0x03)   logerror("CPU #0 - PC %04X: unknown spritebank bits: %02X\n",m_maincpu->pc(),data);
 }
 
 /*
@@ -811,7 +811,7 @@ WRITE8_MEMBER(suna8_state::brickzn_multi_w)
 	{
 		// controls opcode decryption
 		// see code at 71b, 45b7, 7380, 7a6b
-		//printf("CPU #0 - PC %04X: alt op-decrypt tog = %02X\n",space.device().safe_pc(),data);
+		//printf("CPU #0 - PC %04X: alt op-decrypt tog = %02X\n",m_maincpu->pc(),data);
 		m_prot_opcode_toggle ^= 1;
 
 		if (m_prot_opcode_toggle == 0)
@@ -833,9 +833,9 @@ WRITE8_MEMBER(suna8_state::brickzn_prot2_w)
 {
 	// Disable work RAM write, see code at 96a:
 	if ((m_prot2 ^ data) == 0x24)
-		space.unmap_write(0xc800, 0xdfff);
+		m_maincpu->space(AS_PROGRAM).unmap_write(0xc800, 0xdfff);
 	else
-		space.install_ram(0xc800, 0xdfff, m_wram);
+		m_maincpu->space(AS_PROGRAM).install_ram(0xc800, 0xdfff, m_wram);
 
 	m_remap_sound = ((m_prot2 ^ data) == 0xf8) ? 1 : 0;
 
@@ -907,7 +907,7 @@ ADDRESS_MAP_END
 WRITE8_MEMBER(suna8_state::hardhea2_nmi_w)
 {
 	m_nmi_enable = data & 0x01;
-//  if (data & ~0x01)   logerror("CPU #0 - PC %04X: unknown nmi bits: %02X\n",space.device().safe_pc(),data);
+//  if (data & ~0x01)   logerror("CPU #0 - PC %04X: unknown nmi bits: %02X\n",m_maincpu->pc(),data);
 }
 
 /*

@@ -22,7 +22,7 @@ void bublbobl_state::common_sreset(int state)
 		if (m_ym2203 != nullptr) m_ym2203->reset(); // ym2203, if present, is reset
 		if (m_ym3526 != nullptr) m_ym3526->reset(); // ym3526, if present, is reset
 		m_audiocpu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE); // if a sound irq is active, it is cleared. is this necessary? if the above two devices de-assert /IRQ on reset (as a device_line write) properly, it shouldn't be...
-		m_sound_to_main->acknowledge_w(m_audiocpu->device_t::memory().space(AS_PROGRAM), 0, 0x00, 0xFF); // sound->main semaphore is cleared
+		m_sound_to_main->acknowledge_w(m_audiocpu->space(AS_PROGRAM), 0, 0x00, 0xFF); // sound->main semaphore is cleared
 		m_soundnmi->in_w<0>(0); // sound nmi enable is unset
 	}
 	m_audiocpu->set_input_line(INPUT_LINE_RESET, state); // soundcpu is reset
@@ -203,14 +203,14 @@ WRITE8_MEMBER(bublbobl_state::bublbobl_mcu_ddr4_w)
 
 READ8_MEMBER(bublbobl_state::bublbobl_mcu_port1_r)
 {
-	//logerror("%04x: 6801U4 port 1 read\n", space.device().safe_pc());
+	//logerror("%04x: 6801U4 port 1 read\n", m_mcu->pc());
 	m_port1_in = ioport("IN0")->read();
 	return (m_port1_out & m_ddr1) | (m_port1_in & ~m_ddr1);
 }
 
 WRITE8_MEMBER(bublbobl_state::bublbobl_mcu_port1_w)
 {
-	//logerror("%04x: 6801U4 port 1 write %02x\n", space.device().safe_pc(), data);
+	//logerror("%04x: 6801U4 port 1 write %02x\n", m_mcu->pc(), data);
 
 	// bit 4: coin lockout
 	machine().bookkeeping().coin_lockout_global_w(~data & 0x10);
@@ -233,13 +233,13 @@ WRITE8_MEMBER(bublbobl_state::bublbobl_mcu_port1_w)
 
 READ8_MEMBER(bublbobl_state::bublbobl_mcu_port2_r)
 {
-	//logerror("%04x: 6801U4 port 2 read\n", space.device().safe_pc());
+	//logerror("%04x: 6801U4 port 2 read\n", m_mcu->pc());
 	return (m_port2_out & m_ddr2) | (m_port2_in & ~m_ddr2);
 }
 
 WRITE8_MEMBER(bublbobl_state::bublbobl_mcu_port2_w)
 {
-	//logerror("%04x: 6801U4 port 2 write %02x\n", space.device().safe_pc(), data);
+	//logerror("%04x: 6801U4 port 2 write %02x\n", m_mcu->pc(), data);
 	static const char *const portnames[] = { "DSW0", "DSW1", "IN1", "IN2" };
 
 	// bits 0-3: bits 8-11 of shared RAM address
@@ -273,25 +273,25 @@ WRITE8_MEMBER(bublbobl_state::bublbobl_mcu_port2_w)
 
 READ8_MEMBER(bublbobl_state::bublbobl_mcu_port3_r)
 {
-	//logerror("%04x: 6801U4 port 3 read\n", space.device().safe_pc());
+	//logerror("%04x: 6801U4 port 3 read\n", m_mcu->pc());
 	return (m_port3_out & m_ddr3) | (m_port3_in & ~m_ddr3);
 }
 
 WRITE8_MEMBER(bublbobl_state::bublbobl_mcu_port3_w)
 {
-	//logerror("%04x: 6801U4 port 3 write %02x\n", space.device().safe_pc(), data);
+	//logerror("%04x: 6801U4 port 3 write %02x\n", m_mcu->pc(), data);
 	m_port3_out = data;
 }
 
 READ8_MEMBER(bublbobl_state::bublbobl_mcu_port4_r)
 {
-	//logerror("%04x: 6801U4 port 4 read\n", space.device().safe_pc());
+	//logerror("%04x: 6801U4 port 4 read\n", m_mcu->pc());
 	return (m_port4_out & m_ddr4) | (m_port4_in & ~m_ddr4);
 }
 
 WRITE8_MEMBER(bublbobl_state::bublbobl_mcu_port4_w)
 {
-	//logerror("%04x: 6801U4 port 4 write %02x\n", space.device().safe_pc(), data);
+	//logerror("%04x: 6801U4 port 4 write %02x\n", m_mcu->pc(), data);
 
 	// bits 0-7 of shared RAM address
 
@@ -310,7 +310,7 @@ in boblbobl, so they don't matter. All checks are patched out in sboblbob.
 READ8_MEMBER(bublbobl_state::boblbobl_ic43_a_r)
 {
 	// if (offset >= 2)
-	//     logerror("%04x: ic43_a_r (offs %d) res = %02x\n", space.device().safe_pc(), offset, res);
+	//     logerror("%04x: ic43_a_r (offs %d) res = %02x\n", m_mcu->pc(), offset, res);
 
 	if (offset == 0)
 		return m_ic43_a << 4;
@@ -360,13 +360,13 @@ WRITE8_MEMBER(bublbobl_state::boblbobl_ic43_b_w)
 {
 	static const int xorval[4] = { 4, 1, 8, 2 };
 
-	//  logerror("%04x: ic43_b_w (offs %d) %02x\n", space.device().safe_pc(), offset, data);
+	//  logerror("%04x: ic43_b_w (offs %d) %02x\n", m_mcu->pc(), offset, data);
 	m_ic43_b = (data >> 4) ^ xorval[offset];
 }
 
 READ8_MEMBER(bublbobl_state::boblbobl_ic43_b_r)
 {
-	//  logerror("%04x: ic43_b_r (offs %d)\n", space.device().safe_pc(), offset);
+	//  logerror("%04x: ic43_b_r (offs %d)\n", m_mcu->pc(), offset);
 	if (offset == 0)
 		return m_ic43_b << 4;
 	else
@@ -394,7 +394,7 @@ INTERRUPT_GEN_MEMBER(bub68705_state::bublbobl_m68705_interrupt)
 
 WRITE8_MEMBER(bub68705_state::port_a_w)
 {
-	//logerror("%04x: 68705 port A write %02x\n", space.device().safe_pc(), data);
+	//logerror("%04x: 68705 port A write %02x\n", m_mcu->pc(), data);
 	m_port_a_out = data;
 }
 
@@ -421,7 +421,7 @@ WRITE8_MEMBER(bub68705_state::port_a_w)
 
 WRITE8_MEMBER(bub68705_state::port_b_w)
 {
-	//logerror("%04x: 68705 port B write %02x\n", space.device().safe_pc(), data);
+	//logerror("%04x: 68705 port B write %02x\n", m_mcu->pc(), data);
 
 	if (BIT(mem_mask, 0) && !BIT(data, 0) && BIT(m_port_b_out, 0))
 		m_mcu->pa_w(space, 0, m_latch);
@@ -429,7 +429,7 @@ WRITE8_MEMBER(bub68705_state::port_b_w)
 	if (BIT(mem_mask, 1) && BIT(data, 1) && !BIT(m_port_b_out, 1)) /* positive edge trigger */
 	{
 		m_address = (m_address & 0xff00) | m_port_a_out;
-		//logerror("%04x: 68705 address %02x\n", space.device().safe_pc(), m_port_a_out);
+		//logerror("%04x: 68705 address %02x\n", m_mcu->pc(), m_port_a_out);
 	}
 
 	if (BIT(mem_mask, 2) && BIT(data, 2) && !BIT(m_port_b_out, 2)) /* positive edge trigger */
@@ -441,29 +441,29 @@ WRITE8_MEMBER(bub68705_state::port_b_w)
 		{
 			if ((m_address & 0x0800) == 0x0000)
 			{
-				//logerror("%04x: 68705 read input port %02x\n", space.device().safe_pc(), m_address);
+				//logerror("%04x: 68705 read input port %02x\n", m_mcu->pc(), m_address);
 				m_latch = m_mux_ports[m_address & 3]->read();
 			}
 			else if ((m_address & 0x0c00) == 0x0c00)
 			{
-				//logerror("%04x: 68705 read %02x from address %04x\n", space.device().safe_pc(), m_mcu_sharedram[m_address], m_address);
+				//logerror("%04x: 68705 read %02x from address %04x\n", m_mcu->pc(), m_mcu_sharedram[m_address], m_address);
 				m_latch = m_mcu_sharedram[m_address & 0x03ff];
 			}
 			else
 			{
-				logerror("%04x: 68705 unknown read address %04x\n", space.device().safe_pc(), m_address);
+				logerror("%04x: 68705 unknown read address %04x\n", m_mcu->pc(), m_address);
 			}
 		}
 		else /* write */
 		{
 			if ((m_address & 0x0c00) == 0x0c00)
 			{
-				//logerror("%04x: 68705 write %02x to address %04x\n", space.device().safe_pc(), m_port_a_out, m_address);
+				//logerror("%04x: 68705 write %02x to address %04x\n", m_mcu->pc(), m_port_a_out, m_address);
 				m_mcu_sharedram[m_address & 0x03ff] = m_port_a_out;
 			}
 			else
 			{
-				logerror("%04x: 68705 unknown write to address %04x\n", space.device().safe_pc(), m_address);
+				logerror("%04x: 68705 unknown write to address %04x\n", m_mcu->pc(), m_address);
 			}
 		}
 	}
@@ -478,10 +478,10 @@ WRITE8_MEMBER(bub68705_state::port_b_w)
 	}
 
 	if (BIT(mem_mask, 6) && !BIT(data, 6) && BIT(m_port_b_out, 6))
-		logerror("%04x: 68705 unknown port B bit %02x\n", space.device().safe_pc(), data);
+		logerror("%04x: 68705 unknown port B bit %02x\n", m_mcu->pc(), data);
 
 	if (BIT(mem_mask, 7) && !BIT(data, 7) && BIT(m_port_b_out, 7))
-		logerror("%04x: 68705 unknown port B bit %02x\n", space.device().safe_pc(), data);
+		logerror("%04x: 68705 unknown port B bit %02x\n", m_mcu->pc(), data);
 
 	m_port_b_out = data;
 }

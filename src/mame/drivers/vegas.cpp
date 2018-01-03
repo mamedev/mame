@@ -770,7 +770,7 @@ WRITE8_MEMBER(vegas_state::sio_w)
 			m_timekeeper->watchdog_write(space, offset, data);
 			if (0 && LOG_SIO)
 				logerror("sio_w: Watchdog: %08x index: %d data: %02X\n", offset, index, data);
-			//space.device().execute().eat_cycles(100);
+			//m_maincpu->eat_cycles(100);
 			break;
 		}
 	}

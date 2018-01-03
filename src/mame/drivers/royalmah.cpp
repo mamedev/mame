@@ -491,7 +491,7 @@ WRITE8_MEMBER(royalmah_state::tontonb_bank_w)
 /* bits 5 and 6 seem to affect which Dip Switch to read in 'majs101b' */
 WRITE8_MEMBER(royalmah_state::dynax_bank_w)
 {
-//logerror("%04x: bank %02x\n",space.device().safe_pc(),data);
+//logerror("%04x: bank %02x\n",m_maincpu->pc(),data);
 
 	m_dsw_select = data & 0x60;
 

@@ -1351,7 +1351,7 @@ ADDRESS_MAP_END
 
 WRITE16_MEMBER(segas1x_bootleg_state::ddcrewbl_spritebank_w)
 {
-//  printf("banking write %08x: %04x (%04x %04x)\n", space.device().safe_pc(), offset*2, data&mem_mask, mem_mask);
+//  printf("banking write %08x: %04x (%04x %04x)\n", m_maincpu->pc(), offset*2, data&mem_mask, mem_mask);
 
 	data &= mem_mask;
 //  offset &= 0x7;

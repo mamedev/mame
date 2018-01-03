@@ -499,7 +499,7 @@ WRITE16_MEMBER(wgp_state::rotate_port_w)
 	{
 		case 0x00:
 		{
-//logerror("CPU #0 PC %06x: warning - port %04x write %04x\n",space.device().safe_pc(),port_sel,data);
+//logerror("CPU #0 PC %06x: warning - port %04x write %04x\n",m_maincpu->pc(),port_sel,data);
 
 			m_rotate_ctrl[m_port_sel] = data;
 			return;

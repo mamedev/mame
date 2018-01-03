@@ -231,7 +231,7 @@ WRITE16_MEMBER(tecmosys_state::unk880000_w)
 
 		case 0x22/2:
 			m_watchdog->watchdog_reset();
-			//logerror( "watchdog_w( %06x, %04x ) @ %06x\n", (offset * 2)+0x880000, data, space.device().safe_pc() );
+			//logerror( "watchdog_w( %06x, %04x ) @ %06x\n", (offset * 2)+0x880000, data, m_maincpu->_pc() );
 			break;
 
 		default:

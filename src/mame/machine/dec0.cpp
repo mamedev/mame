@@ -39,7 +39,7 @@ READ16_MEMBER(dec0_state::dec0_controls_r)
 			return ioport("DSW")->read();
 
 		case 8: /* Intel 8751 mc, Bad Dudes & Heavy Barrel only */
-			//logerror("CPU #0 PC %06x: warning - read i8751 %06x - %04x\n", space.device().safe_pc(), 0x30c000+offset, m_i8751_return);
+			//logerror("CPU #0 PC %06x: warning - read i8751 %06x - %04x\n", m_maincpu->pc(), 0x30c000+offset, m_i8751_return);
 			return m_i8751_return;
 	}
 
@@ -104,7 +104,7 @@ WRITE8_MEMBER(dec0_state::hippodrm_prot_w)
 
 READ16_MEMBER(dec0_state::hippodrm_68000_share_r)
 {
-	if (offset==0) space.device().execute().yield(); /* A wee helper */
+	if (offset==0) m_maincpu->yield(); /* A wee helper */
 	return m_hippodrm_shared_ram[offset]&0xff;
 }
 
@@ -319,14 +319,14 @@ WRITE16_MEMBER(dec0_state::sprite_mirror_w)
 
 READ16_MEMBER(dec0_state::robocop_68000_share_r)
 {
-//logerror("%08x: Share read %04x\n",space.device().safe_pc(),offset);
+//logerror("%08x: Share read %04x\n",m_maincpu->pc(),offset);
 
 	return m_robocop_shared_ram[offset];
 }
 
 WRITE16_MEMBER(dec0_state::robocop_68000_share_w)
 {
-//  logerror("%08x: Share write %04x %04x\n",space.device().safe_pc(),offset,data);
+//  logerror("%08x: Share write %04x %04x\n",m_maincpu->pc(),offset,data);
 
 	m_robocop_shared_ram[offset]=data&0xff;
 

@@ -299,7 +299,7 @@ WRITE8_MEMBER(suprgolf_state::rom_bank_select_w)
 	m_rom_bank = data;
 
 	//popmessage("%08x %02x",((data & 0x3f) * 0x4000),data);
-	//osd_printf_debug("ROM_BANK 0x8000 - %X @%X\n",data,space.device().safe_pcbase());
+	//osd_printf_debug("ROM_BANK 0x8000 - %X @%X\n",data,m_maincpu->pcbase());
 	membank("bank2")->set_entry(data & 0x3f);
 
 	m_msm_nmi_mask = data & 0x40;
@@ -308,7 +308,7 @@ WRITE8_MEMBER(suprgolf_state::rom_bank_select_w)
 
 WRITE8_MEMBER(suprgolf_state::rom2_bank_select_w)
 {
-	//osd_printf_debug("ROM_BANK 0x4000 - %X @%X\n",data,space.device().safe_pcbase());
+	//osd_printf_debug("ROM_BANK 0x4000 - %X @%X\n",data,m_maincpu->pcbase());
 	membank("bank1")->set_entry(data & 0x0f);
 
 	if(data & 0xf0)

@@ -2164,7 +2164,7 @@ READ32_MEMBER(seibuspi_state::senkyua_speedup_r)
 
 READ32_MEMBER(seibuspi_state::batlball_speedup_r)
 {
-//  printf("space.device().safe_pc() %06x\n", space.device().safe_pc());
+//  printf("space.device().safe_pc() %06x\n", m_maincpu->pc());
 
 	/* batlbalu */
 	if (m_maincpu->pc()==0x00305996) m_maincpu->spin_until_interrupt(); // idle
@@ -2186,7 +2186,7 @@ READ32_MEMBER(seibuspi_state::viprp1_speedup_r)
 	/* viprp1ot */
 	if (m_maincpu->pc()==0x02026bd) m_maincpu->spin_until_interrupt(); // idle
 
-//  osd_printf_debug("%08x\n",space.device().safe_pc());
+//  osd_printf_debug("%08x\n",m_maincpu->pc());
 
 	return m_mainram[0x001e2e0/4];
 }

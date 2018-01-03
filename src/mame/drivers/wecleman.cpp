@@ -334,7 +334,7 @@ WRITE16_MEMBER(wecleman_state::irqctrl_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		// logerror("CPU #0 - PC = %06X - $140005 <- %02X (old value: %02X)\n",space.device().safe_pc(), data&0xFF, old_data&0xFF);
+		// logerror("CPU #0 - PC = %06X - $140005 <- %02X (old value: %02X)\n",m_maincpu->pc(), data&0xFF, old_data&0xFF);
 
 		// Bit 0 : SUBINT
 		if ( (m_irqctrl & 1) && (!(data & 1)) ) // 1->0 transition
@@ -435,6 +435,7 @@ WRITE16_MEMBER(wecleman_state::blitter_w)
 	/* do a blit if $80010.b has been written */
 	if ( (offset == 0x10/2) && (ACCESSING_BITS_8_15) )
 	{
+		auto &mspace = m_maincpu->space(AS_PROGRAM);
 		/* 80000.b = ?? usually 0 - other values: 02 ; 00 - ? logic function ? */
 		/* 80001.b = ?? usually 0 - other values: 3f ; 01 - ? height ? */
 		int minterm  = ( m_blitter_regs[0x0/2] & 0xFF00 ) >> 8;
@@ -467,7 +468,7 @@ WRITE16_MEMBER(wecleman_state::blitter_w)
 			for ( ; size > 0 ; size--)
 			{
 				/* maybe slower than a memcpy but safer (and errors are logged) */
-				space.write_word(dest, space.read_word(src));
+				mspace.write_word(dest, mspace.read_word(src));
 				src += 2;
 				dest += 2;
 			}
@@ -480,23 +481,23 @@ WRITE16_MEMBER(wecleman_state::blitter_w)
 				int i, j, destptr;
 
 				/* Read offset of source from the list of blits */
-				i = src + space.read_word(list+2);
+				i = src + mspace.read_word(list+2);
 				j = i + (size<<1);
 				destptr = dest;
 
 				for (; i<j; destptr+=2, i+=2)
-					space.write_word(destptr, space.read_word(i));
+					mspace.write_word(destptr, mspace.read_word(i));
 
 				destptr = dest + 14;
-				i = space.read_word(list) + m_spr_color_offs;
-				space.write_word(destptr, i);
+				i = mspace.read_word(list) + m_spr_color_offs;
+				mspace.write_word(destptr, i);
 
 				dest += 16;
 				list += 4;
 			}
 
 			/* hack for the blit to Sprites RAM - Sprite list end-marker */
-			space.write_word(dest, 0xFFFF);
+			mspace.write_word(dest, 0xFFFF);
 		}
 	}
 }

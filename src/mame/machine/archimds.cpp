@@ -508,7 +508,7 @@ bool archimedes_state::check_floppy_ready()
 READ32_MEMBER( archimedes_state::ioc_ctrl_r )
 {
 	if(IOC_LOG)
-	logerror("IOC: R %s = %02x (PC=%x) %02x\n", ioc_regnames[offset&0x1f], m_ioc_regs[offset&0x1f], m_maincpu->pc(),offset & 0x1f);
+		logerror("IOC: R %s = %02x (PC=%x) %02x\n", ioc_regnames[offset&0x1f], m_ioc_regs[offset&0x1f], m_maincpu->pc(),offset & 0x1f);
 
 	switch (offset & 0x1f)
 	{
@@ -575,7 +575,7 @@ READ32_MEMBER( archimedes_state::ioc_ctrl_r )
 		case T3_LATCH_HI: return (m_ioc_timerout[3]>>8)&0xff;
 		default:
 			if(!IOC_LOG)
-				logerror("IOC: R %s = %02x (PC=%x) %02x\n", ioc_regnames[offset&0x1f], m_ioc_regs[offset&0x1f], space.device() .safe_pc( ),offset & 0x1f);
+				logerror("IOC: R %s = %02x (PC=%x) %02x\n", ioc_regnames[offset&0x1f], m_ioc_regs[offset&0x1f], m_maincpu->pc(), offset & 0x1f);
 			break;
 	}
 
@@ -586,7 +586,7 @@ READ32_MEMBER( archimedes_state::ioc_ctrl_r )
 WRITE32_MEMBER( archimedes_state::ioc_ctrl_w )
 {
 	if(IOC_LOG)
-	logerror("IOC: W %02x @ reg %s (PC=%x)\n", data&0xff, ioc_regnames[offset&0x1f], space.device() .safe_pc( ));
+	logerror("IOC: W %02x @ reg %s (PC=%x)\n", data&0xff, ioc_regnames[offset&0x1f], m_maincpu->pc());
 
 	switch (offset&0x1f)
 	{
@@ -704,7 +704,7 @@ WRITE32_MEMBER( archimedes_state::ioc_ctrl_w )
 
 		default:
 			if(!IOC_LOG)
-				logerror("IOC: W %02x @ reg %s (PC=%x)\n", data&0xff, ioc_regnames[offset&0x1f], space.device() .safe_pc( ));
+				logerror("IOC: W %02x @ reg %s (PC=%x)\n", data&0xff, ioc_regnames[offset&0x1f], m_maincpu->pc());
 
 			m_ioc_regs[offset&0x1f] = data & 0xff;
 			break;
@@ -1216,5 +1216,5 @@ WRITE32_MEMBER(archimedes_state::archimedes_memc_page_w)
 	// now go ahead and set the mapping in the page table
 	m_memc_pages[log] = phys + (memc*0x80);
 
-//  printf("PC=%08x = MEMC_PAGE(%d): W %08x: log %x to phys %x, MEMC %d, perms %d\n", space.device().safe_pc(),memc_pagesize, data, log, phys, memc, perms);
+//  printf("PC=%08x = MEMC_PAGE(%d): W %08x: log %x to phys %x, MEMC %d, perms %d\n", m_maincpu->pc(),memc_pagesize, data, log, phys, memc, perms);
 }

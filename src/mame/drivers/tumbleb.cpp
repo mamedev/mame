@@ -741,7 +741,7 @@ WRITE16_MEMBER(tumbleb_state::semicom_soundcmd_w)
 	{
 		m_soundlatch->write(space, 0, data & 0xff);
 		// needed for Super Trio which reads the sound with polling
-		// space.device().execute().spin_until_time(attotime::from_usec(100));
+		// m_maincpu->spin_until_time(attotime::from_usec(100));
 		machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(20));
 
 	}
@@ -3502,7 +3502,7 @@ DRIVER_INIT_MEMBER(tumbleb_state,fncywld)
 
 READ16_MEMBER(tumbleb_state::bcstory_1a0_read)
 {
-	//osd_printf_debug("bcstory_io %06x\n",space.device().safe_pc());
+	//osd_printf_debug("bcstory_io %06x\n",m_maincpu->pc());
 
 	if (m_maincpu->pc()==0x0560) return 0x1a0;
 	else return ioport("SYSTEM")->read();

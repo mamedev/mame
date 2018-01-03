@@ -993,7 +993,7 @@ void taitoz_state::parse_cpu_control(  )
 
 WRITE16_MEMBER(taitoz_state::cpua_ctrl_w)
 {
-	//logerror("CPU #0 PC %06x: write %04x to cpu control\n", space.device().safe_pc(), data);
+	//logerror("CPU #0 PC %06x: write %04x to cpu control\n", m_maincpu->pc(), data);
 
 	if (mem_mask == 0xff00) data >>= 8;
 	data &= 0xff;

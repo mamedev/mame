@@ -52,6 +52,7 @@ READ16_MEMBER(konamigx_state::K055550_word_r)
 
 WRITE16_MEMBER(konamigx_state::K055550_word_w)
 {
+	auto &mspace = m_maincpu->space(AS_PROGRAM);
 	uint32_t adr, bsize, count, i, lim;
 	int src, tgt, srcend, tgtend, skip, cx1, sx1, wx1, cy1, sy1, wy1, cz1, sz1, wz1, c2, s2, w2;
 	int dx, dy, angle;
@@ -71,7 +72,7 @@ WRITE16_MEMBER(konamigx_state::K055550_word_w)
 
 				lim = adr+bsize*count;
 				for(i=adr; i<lim; i+=2)
-					space.write_word(i, m_prot_data[0x1a/2]);
+					mspace.write_word(i, m_prot_data[0x1a/2]);
 			break;
 
 			// WARNING: The following cases are speculation based with questionable accuracy!(AAT)
@@ -102,41 +103,41 @@ WRITE16_MEMBER(konamigx_state::K055550_word_w)
 				// let's hope GCC will inline the mem24bew calls
 				for (src=adr; src<srcend; src+=bsize)
 				{
-					cx1 = (short)space.read_word(src);
-					sx1 = (short)space.read_word(src + 2);
-					wx1 = (short)space.read_word(src + 4);
+					cx1 = (short)mspace.read_word(src);
+					sx1 = (short)mspace.read_word(src + 2);
+					wx1 = (short)mspace.read_word(src + 4);
 
-					cy1 = (short)space.read_word(src + 6);
-					sy1 = (short)space.read_word(src + 8);
-					wy1 = (short)space.read_word(src +10);
+					cy1 = (short)mspace.read_word(src + 6);
+					sy1 = (short)mspace.read_word(src + 8);
+					wy1 = (short)mspace.read_word(src +10);
 
-					cz1 = (short)space.read_word(src +12);
-					sz1 = (short)space.read_word(src +14);
-					wz1 = (short)space.read_word(src +16);
+					cz1 = (short)mspace.read_word(src +12);
+					sz1 = (short)mspace.read_word(src +14);
+					wz1 = (short)mspace.read_word(src +16);
 
 					count = i = src + skip;
 					tgt = src + bsize;
 
-					for (; count<tgt; count++) space.write_byte(count, 0);
+					for (; count<tgt; count++) mspace.write_byte(count, 0);
 
 					for (; tgt<tgtend; i++, tgt+=bsize)
 					{
-						c2 = (short)space.read_word(tgt);
-						s2 = (short)space.read_word(tgt + 2);
-						w2 = (short)space.read_word(tgt + 4);
+						c2 = (short)mspace.read_word(tgt);
+						s2 = (short)mspace.read_word(tgt + 2);
+						w2 = (short)mspace.read_word(tgt + 4);
 						if (abs((cx1+sx1)-(c2+s2))>=wx1+w2) continue; // X rejection
 
-						c2 = (short)space.read_word(tgt + 6);
-						s2 = (short)space.read_word(tgt + 8);
-						w2 = (short)space.read_word(tgt +10);
+						c2 = (short)mspace.read_word(tgt + 6);
+						s2 = (short)mspace.read_word(tgt + 8);
+						w2 = (short)mspace.read_word(tgt +10);
 						if (abs((cy1+sy1)-(c2+s2))>=wy1+w2) continue; // Y rejection
 
-						c2 = (short)space.read_word(tgt +12);
-						s2 = (short)space.read_word(tgt +14);
-						w2 = (short)space.read_word(tgt +16);
+						c2 = (short)mspace.read_word(tgt +12);
+						s2 = (short)mspace.read_word(tgt +14);
+						w2 = (short)mspace.read_word(tgt +16);
 						if (abs((cz1+sz1)-(c2+s2))>=wz1+w2) continue; // Z rejection
 
-						space.write_byte(i, 0x80); // collision confirmed
+						mspace.write_byte(i, 0x80); // collision confirmed
 					}
 				}
 			break;
@@ -169,7 +170,7 @@ WRITE16_MEMBER(konamigx_state::K055550_word_w)
 			break;
 
 			default:
-//              logerror("%06x: unknown K055550 command %02x\n", space.device().safe_pc(), data);
+//              logerror("%06x: unknown K055550 command %02x\n", m_maincpu->pc(), data);
 			break;
 		}
 	}
@@ -177,6 +178,7 @@ WRITE16_MEMBER(konamigx_state::K055550_word_w)
 
 WRITE16_MEMBER(konamigx_state::K053990_martchmp_word_w)
 {
+	auto &mspace = m_maincpu->space(AS_PROGRAM);
 	int src_addr, src_count, src_skip;
 	int dst_addr, /*dst_count,*/ dst_skip;
 	int mod_addr, mod_count, mod_skip, mod_offs;
@@ -210,13 +212,13 @@ WRITE16_MEMBER(konamigx_state::K053990_martchmp_word_w)
 				if (element_size == 1)
 				for (i=src_count; i; i--)
 				{
-					space.write_byte(dst_addr, space.read_byte(src_addr));
+					mspace.write_byte(dst_addr, mspace.read_byte(src_addr));
 					src_addr += src_skip;
 					dst_addr += dst_skip;
 				}
 				else for (i=src_count; i; i--)
 				{
-					space.write_word(dst_addr, space.read_word(src_addr));
+					mspace.write_word(dst_addr, mspace.read_word(src_addr));
 					src_addr += src_skip;
 					dst_addr += dst_skip;
 				}
@@ -241,15 +243,15 @@ WRITE16_MEMBER(konamigx_state::K053990_martchmp_word_w)
 
 				for (i=mod_count; i; i--)
 				{
-					mod_val  = space.read_word(mod_addr);
+					mod_val  = mspace.read_word(mod_addr);
 					mod_addr += mod_skip;
 
-					mod_data = space.read_word(src_addr);
+					mod_data = mspace.read_word(src_addr);
 					src_addr += src_skip;
 
 					mod_data += mod_val;
 
-					space.write_word(dst_addr, mod_data);
+					mspace.write_word(dst_addr, mod_data);
 					dst_addr += dst_skip;
 				}
 			break;
@@ -475,6 +477,7 @@ void konamigx_state::fantjour_dma_install()
 
 WRITE32_MEMBER(konamigx_state::fantjour_dma_w)
 {
+	auto &mspace = m_maincpu->space(AS_PROGRAM);
 	COMBINE_DATA(m_fantjour_dma + offset);
 	if(!offset && ACCESSING_BITS_24_31) {
 		uint32_t sa = m_fantjour_dma[1];
@@ -495,14 +498,14 @@ WRITE32_MEMBER(konamigx_state::fantjour_dma_w)
 		if(mode == 0x93)
 			for(i1=0; i1 <= sz2; i1++)
 				for(i2=0; i2 < db; i2+=4) {
-					space.write_dword(da, space.read_dword(sa) ^ x);
+					mspace.write_dword(da, mspace.read_dword(sa) ^ x);
 					da += 4;
 					sa += 4;
 				}
 		else if(mode == 0x8f)
 			for(i1=0; i1 <= sz2; i1++)
 				for(i2=0; i2 < db; i2+=4) {
-					space.write_dword(da, x);
+					mspace.write_dword(da, x);
 					da += 4;
 				}
 	}

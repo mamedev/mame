@@ -713,11 +713,11 @@ TIMER_DEVICE_CALLBACK_MEMBER(segas32_state::signal_v60_irq_callback)
 }
 
 
-void segas32_state::int_control_w(address_space &space, int offset, uint8_t data)
+void segas32_state::int_control_w(int offset, uint8_t data)
 {
 	int duration;
 
-//  logerror("%06X:int_control_w(%X) = %02X\n", space.device().safe_pc(), offset, data);
+//  logerror("%06X:int_control_w(%X) = %02X\n", m_maincpu->pc(), offset, data);
 	switch (offset)
 	{
 		case 0:
@@ -795,9 +795,9 @@ READ16_MEMBER(segas32_state::interrupt_control_16_r)
 WRITE16_MEMBER(segas32_state::interrupt_control_16_w)
 {
 	if (ACCESSING_BITS_0_7)
-		int_control_w(space, offset*2+0, data);
+		int_control_w(offset*2+0, data);
 	if (ACCESSING_BITS_8_15)
-		int_control_w(space, offset*2+1, data >> 8);
+		int_control_w(offset*2+1, data >> 8);
 }
 
 
@@ -818,13 +818,13 @@ READ32_MEMBER(segas32_state::interrupt_control_32_r)
 WRITE32_MEMBER(segas32_state::interrupt_control_32_w)
 {
 	if (ACCESSING_BITS_0_7)
-		int_control_w(space, offset*4+0, data);
+		int_control_w(offset*4+0, data);
 	if (ACCESSING_BITS_8_15)
-		int_control_w(space, offset*4+1, data >> 8);
+		int_control_w(offset*4+1, data >> 8);
 	if (ACCESSING_BITS_16_23)
-		int_control_w(space, offset*4+2, data >> 16);
+		int_control_w(offset*4+2, data >> 16);
 	if (ACCESSING_BITS_24_31)
-		int_control_w(space, offset*4+3, data >> 24);
+		int_control_w(offset*4+3, data >> 24);
 }
 
 
