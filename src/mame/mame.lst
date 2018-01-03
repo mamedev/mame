@@ -29927,6 +29927,9 @@ vandykeb                        // bootleg
 vandykejal                      // UPL-90064 (c) Jaleco
 vandykejal2                     // UPL-90064 (c) Jaleco
 
+@source:nmkmedal.cpp
+trocana                         // NTC / NMK
+
 @source:nokia_3310.cpp
 noki3210                        //
 noki3310                        //

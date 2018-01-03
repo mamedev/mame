@@ -829,6 +829,7 @@ nitedrvr.cpp
 niyanpai.cpp
 nmg5.cpp
 nmk16.cpp
+nmkmedal.cpp
 norautp.cpp
 notechan.cpp
 nova2001.cpp

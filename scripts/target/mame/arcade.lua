@@ -2976,6 +2976,7 @@ files {
 	MAME_DIR .. "src/mame/machine/nmk004.cpp",
 	MAME_DIR .. "src/mame/machine/nmk004.h",
 	MAME_DIR .. "src/mame/video/nmk16.cpp",
+	MAME_DIR .. "src/mame/drivers/nmkmedal.cpp",
 	MAME_DIR .. "src/mame/drivers/quizdna.cpp",
 	MAME_DIR .. "src/mame/includes/quizdna.h",
 	MAME_DIR .. "src/mame/video/quizdna.cpp",
