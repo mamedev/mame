@@ -351,26 +351,32 @@ WRITE16_MEMBER(pgm2_state::unk30120014_w)
 }
 
 /*
- KOV3 ROM board uses special module intead of program ROM, tiny PCB with FPGA stamped "HW1" and BGA Flash ROM stamped "IG-L".
+ KOV3 ROM board uses special module intead of program ROM, tiny PCB with IC stamped "HW1" (might be FPGA, CPLD or ASIC) and BGA Flash ROM stamped "IG-L".
  This module uses few pins for serial comms (wired to IGS036 GPIO), it can not be dumped as regular ROM until special unlock procedure (return weird data pattern while locked).
 
  In case of KOV3 unlock sequence is:
   1) send via serial 0x0d and 64bit xor_value, result must be A3A3A3A36D6D6D6D
   2) send via serial 0x25 and 64bit xor_value, store result as 64bit key (after xor with xor_value)
   3) read first 10h bytes from ROM area (at this point ROM area read as scrambled or random data)
-  4) write "key" to ROM area, using 2x 16bit writes, write offsets and data depends on 64bit key
-  5) write static sequence of words to ROM area, which probably enable ROM descrambling and normal access
-  6) read "expected sum" from ROM 10000002-10000009 (presumable at this point ROM area read as descrambled)
-  7) read first 10h bytes from ROM area and check they are not same as was at step 3
-  8) perform whole ROM summing, result must match 64bit key xor "expected sum" read at step 6
+  4) write "key" to ROM area, using 2x 16bit writes, offsets and data is bitfields of 64bit key:
+      u32 key0, key1;
+      u16 *rom = (u16*)0x10000000;
+      rom[((key0 & 0x3f) << 16) | (key1 >> 16)] = key1 & 0xffff;
+      rom[key0 >> 22] = (key0 >> 6) & 0xffff;
+     it is possible, 22bit address xor value derived from 1st write offset.
+     meaning of other 10bit offset and 2x data words is not clear - each of them can be either "key bits" or "magic word" expected by security device.
+  5) write static sequence of 4x words to ROM area
+  6) read "expected sum" from ROM area 10000002-10000009
+  7) read first 10h bytes from ROM area and check they are not same as was at step 3)
+  8) perform whole ROM summing, result must match 64bit key xor "expected sum" read at step 6)
 
- It is not clear if real address/data xor values derived from written "key",
- or FPGA just waiting to be be written magic value at specific address in ROM area, and if this happen enable descrambling using hardcoded values.
+ It is not clear if/how real address/data xor values derived from written "key",
+ or security chip just waiting to be be written magic value at specific address in ROM area, and if this happen enable descrambling using hardcoded values.
 
  Current implementation assume "expected sum" read at step 6) is regular data from ROM (descrambled),
  our keys calculated assuming this, so further ROM sum check passes OK.
- But, there is chances in hardware its not like that, but these bytes comes from FPGA (some indication of this is the fact 5) and 6) is actually single routine).
- In this case we have 2 unknowns (key and summ) and can not guess both. Will be needed serial comm logs from real hardware.
+ But, there is chances in hardware its not like that, but these bytes comes from security IC (some indication of this is the fact 5) and 6) is actually single routine).
+ In this case we have 2 unknowns (key and summ), but know only their xor result, so can not guess each. Will be needed serial comm logs or IGS036 internal SRAM dump from real hardware.
 */
 
 READ_LINE_MEMBER(pgm2_state::module_data_r)
