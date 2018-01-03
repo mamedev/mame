@@ -1528,8 +1528,9 @@ void towns_state::towns_cdrom_read(cdrom_image_device* device)
 	}
 
 	// parameter 7 = sector count?
-	if(m_towns_cd.parameter[1] != 0)
-		m_towns_cd.lba_last += m_towns_cd.parameter[1];
+	// lemmings 2 sets this to 4 but hates 4 extra sectors being read
+//	if(m_towns_cd.parameter[1] != 0)
+//		m_towns_cd.lba_last += m_towns_cd.parameter[1];
 
 	if(LOG_CD) logerror("CD: Mode 1 read from LBA next:%i last:%i track:%i\n",m_towns_cd.lba_current,m_towns_cd.lba_last,track);
 
