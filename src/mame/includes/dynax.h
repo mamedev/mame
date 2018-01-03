@@ -155,7 +155,6 @@ public:
 	DECLARE_WRITE8_MEMBER(nanajign_palette_hi_w);
 	void nanajign_palette_update(offs_t offset);
 	DECLARE_WRITE8_MEMBER(adpcm_data_w);
-	DECLARE_WRITE8_MEMBER(hjingi_bank_w);
 	DECLARE_WRITE_LINE_MEMBER(hjingi_lockout_w);
 	DECLARE_WRITE_LINE_MEMBER(hjingi_hopper_w);
 	uint8_t hjingi_hopper_bit();
@@ -273,6 +272,7 @@ public:
 	DECLARE_MACHINE_RESET(dynax);
 	DECLARE_MACHINE_START(dynax);
 	DECLARE_MACHINE_START(hanamai);
+	DECLARE_MACHINE_START(hjingi);
 	DECLARE_VIDEO_START(hanamai);
 	DECLARE_VIDEO_START(hnoridur);
 	DECLARE_PALETTE_INIT(sprtmtch);

@@ -570,11 +570,6 @@ ADDRESS_MAP_END
                                 Hana Jingi
 ***************************************************************************/
 
-WRITE8_MEMBER(dynax_state::hjingi_bank_w)
-{
-	m_bankdev->set_bank(data);
-}
-
 WRITE_LINE_MEMBER(dynax_state::hjingi_lockout_w)
 {
 	machine().bookkeeping().coin_lockout_w(0, !state);
@@ -604,11 +599,11 @@ static ADDRESS_MAP_START( hjingi_mem_map, AS_PROGRAM, 8, dynax_state )
 	AM_RANGE( 0x0000, 0x01ff ) AM_ROM
 	AM_RANGE( 0x0200, 0x1fff ) AM_RAM AM_SHARE("nvram")
 	AM_RANGE( 0x2000, 0x7fff ) AM_ROM
+	AM_RANGE( 0x8000, 0xffff ) AM_ROMBANK("bank1")
 	AM_RANGE( 0x8000, 0xffff ) AM_DEVICE("bankdev", address_map_bank_device, amap8)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( hjingi_banked_map, AS_PROGRAM, 8, dynax_state )
-	AM_RANGE(0x00000, 0x1ffff) AM_ROM AM_REGION("maincpu", 0x10000)
 	AM_RANGE(0x80000, 0x800ff) AM_WRITE(hnoridur_palette_lo_w)
 	AM_RANGE(0xa0000, 0xa00ff) AM_WRITE(hnoridur_palette_hi_w)
 ADDRESS_MAP_END
@@ -648,7 +643,7 @@ static ADDRESS_MAP_START( hjingi_io_map, AS_IO, 8, dynax_state )
 	AM_RANGE( 0x50, 0x50 ) AM_WRITE(dynax_extra_scrollx_w)  // screen scroll X
 	AM_RANGE( 0x51, 0x51 ) AM_WRITE(dynax_extra_scrolly_w)  // screen scroll Y
 
-	AM_RANGE( 0x54, 0x54 ) AM_WRITE(hjingi_bank_w)          // BANK ROM Select
+	AM_RANGE( 0x54, 0x54 ) AM_WRITE(hnoridur_rombank_w)     // palette bank select
 
 	AM_RANGE( 0x56, 0x56 ) AM_WRITE(dynax_vblank_ack_w)     // VBlank IRQ Ack
 	AM_RANGE( 0x57, 0x57 ) AM_READ(ret_ff)              // Blitter Busy
@@ -657,7 +652,7 @@ static ADDRESS_MAP_START( hjingi_io_map, AS_IO, 8, dynax_state )
 
 	AM_RANGE( 0x70, 0x77 ) AM_DEVWRITE("outlatch", ls259_device, write_d0) // Coin Counters, Hopper, Coin Lockout
 
-	AM_RANGE( 0x80, 0x80 ) AM_WRITE(hnoridur_rombank_w)     // BANK ROM Select
+	AM_RANGE( 0x80, 0x80 ) AM_WRITE(dynax_rombank_w)        // BANK ROM Select
 ADDRESS_MAP_END
 
 
@@ -4167,6 +4162,14 @@ MACHINE_RESET_MEMBER(dynax_state,dynax)
 	memset(m_palette_ram, 0, ARRAY_LENGTH(m_palette_ram));
 }
 
+MACHINE_START_MEMBER(dynax_state,hjingi)
+{
+	uint8_t *ROM = memregion("maincpu")->base();
+	membank("bank1")->configure_entries(0, 0x10, &ROM[0x0000], 0x8000);
+
+	MACHINE_START_CALL_MEMBER(dynax);
+}
+
 MACHINE_START_MEMBER(dynax_state,hanamai)
 {
 	uint8_t *ROM = memregion("maincpu")->base();
@@ -4358,7 +4361,7 @@ static MACHINE_CONFIG_START( hjingi )
 	MCFG_CPU_IO_MAP(hjingi_io_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", dynax_state,  sprtmtch_vblank_interrupt)   /* IM 0 needs an opcode on the data bus */
 
-	MCFG_MACHINE_START_OVERRIDE(dynax_state,dynax)
+	MCFG_MACHINE_START_OVERRIDE(dynax_state,hjingi)
 	MCFG_MACHINE_RESET_OVERRIDE(dynax_state,dynax)
 
 	MCFG_DEVICE_ADD("bankdev", ADDRESS_MAP_BANK, 0)
@@ -7220,9 +7223,8 @@ Notes:
 ***************************************************************************/
 
 ROM_START( hjingi )
-	ROM_REGION( 0x90000, "maincpu", 0 )
+	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD( "h10b.4a", 0x00000, 0x20000, CRC(e1152b17) SHA1(ced822eafa96c89dda82fd8ea002e86c2eb4438a) )
-	ROM_RELOAD(          0x10000, 0x20000 )
 
 	ROM_REGION( 0x100000, "gfx1", 0 )   // blitter data
 	ROM_LOAD( "h02.21", 0x00000, 0x20000, CRC(9dde2d59) SHA1(96df4ba97ee9611d9a3c7bcaae9cd97815a7b8a5) )
@@ -7240,9 +7242,8 @@ ROM_END
 
 // dump of the program roms only?
 ROM_START( hjingia )
-	ROM_REGION( 0x90000, "maincpu", 0 )
+	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD( "h10b.4a", 0x00000, 0x20000, CRC(a77a062a) SHA1(cae76effd573c20e20172829220587a5d200eb9e) )
-	ROM_RELOAD(          0x10000, 0x20000 )
 
 	ROM_REGION( 0x100000, "gfx1", 0 )   // blitter data
 	ROM_LOAD( "h02.21", 0x00000, 0x20000, CRC(9dde2d59) SHA1(96df4ba97ee9611d9a3c7bcaae9cd97815a7b8a5) )
