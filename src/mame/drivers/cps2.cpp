@@ -9289,7 +9289,7 @@ ROM_START( xmcotab )
 	ROM_LOAD16_WORD_SWAP( "xmn.12m",   0x200000, 0x200000, CRC(729c188f) SHA1(3279774ad8aebbcf0fc779cdfcbe21044dd192ad) )
 
 	ROM_REGION( 0x20, "key", 0 )
-	ROM_LOAD( "xmcotab.key",  0x000000, 0x000014, CRC(69abff12) SHA1(d5eb235a1b5ed3d911372b3bd808a7aaac2807ac) )
+	ROM_LOAD( "xmcotab.key",  0x000000, 0x000014, CRC(bb70f10f) SHA1(99f9d1eccd81c906b6adb08b5f1547636e649298) )
 ROM_END
 
 ROM_START( xmvsf )
