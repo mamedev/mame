@@ -25,6 +25,7 @@ are the same of IGS.  AMT may be previous IGS name.
 
 #include "emu.h"
 #include "cpu/z180/z180.h"
+#include "machine/i8255.h"
 #include "sound/ym2413.h"
 #include "screen.h"
 #include "speaker.h"
@@ -55,7 +56,9 @@ public:
 	DECLARE_WRITE8_MEMBER(bg_tile_w);
 	DECLARE_WRITE8_MEMBER(fg_tile_w);
 	DECLARE_WRITE8_MEMBER(fg_color_w);
-	DECLARE_WRITE8_MEMBER(cabaret_nmi_and_coins_w);
+	DECLARE_WRITE8_MEMBER(nmi_and_coins_w);
+	DECLARE_WRITE8_MEMBER(ppi2_b_w);
+	DECLARE_WRITE8_MEMBER(ppi2_c_w);
 	void show_out();
 	DECLARE_DRIVER_INIT(cabaret);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
@@ -148,7 +151,7 @@ void cabaret_state::show_out()
 #endif
 }
 
-WRITE8_MEMBER(cabaret_state::cabaret_nmi_and_coins_w)
+WRITE8_MEMBER(cabaret_state::nmi_and_coins_w)
 {
 	if ((m_nmi_enable ^ data) & (~0xdd))
 	{
@@ -169,6 +172,18 @@ WRITE8_MEMBER(cabaret_state::cabaret_nmi_and_coins_w)
 	show_out();
 }
 
+WRITE8_MEMBER(cabaret_state::ppi2_b_w)
+{
+	m_out[1] = data;
+	show_out();
+}
+
+WRITE8_MEMBER(cabaret_state::ppi2_c_w)
+{
+	m_out[2] = data;
+	show_out();
+}
+
 
 
 static ADDRESS_MAP_START( cabaret_map, AS_PROGRAM, 8, cabaret_state )
@@ -179,14 +194,10 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( cabaret_portmap, AS_IO, 8, cabaret_state )
 	AM_RANGE( 0x0000, 0x003f ) AM_RAM // Z180 internal regs
 
-	AM_RANGE( 0x0080, 0x0080 ) AM_READ_PORT( "BUTTONS2" )
-	AM_RANGE( 0x0081, 0x0081 ) AM_READ_PORT( "SERVICE" )
-	AM_RANGE( 0x0082, 0x0082 ) AM_READ_PORT( "COINS" )
-	AM_RANGE( 0x0090, 0x0090 ) AM_READ_PORT( "BUTTONS1" )
-	AM_RANGE( 0x00a0, 0x00a0 ) AM_WRITE(cabaret_nmi_and_coins_w )
+	AM_RANGE( 0x0080, 0x0083 ) AM_DEVREADWRITE("ppi1", i8255_device, read, write)
+	AM_RANGE( 0x0090, 0x0093 ) AM_DEVREADWRITE("ppi2", i8255_device, read, write)
+	AM_RANGE( 0x00a0, 0x00a3 ) AM_DEVREADWRITE("ppi3", i8255_device, read, write)
 
-	AM_RANGE( 0x00a1, 0x00a1 ) AM_READ_PORT("DSW1")         /* DSW1 */
-	AM_RANGE( 0x00a2, 0x00a2 ) AM_READ_PORT("DSW2")         /* DSW2 */
 	AM_RANGE( 0x00b0, 0x00b0 ) AM_READ_PORT("DSW3")         /* DSW3 */
 
 	AM_RANGE( 0x00e0, 0x00e1 ) AM_DEVWRITE("ymsnd", ym2413_device, write)
@@ -348,6 +359,21 @@ static MACHINE_CONFIG_START( cabaret )
 	MCFG_CPU_IO_MAP(cabaret_portmap)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", cabaret_state, cabaret_interrupt)
 
+	MCFG_DEVICE_ADD("ppi1", I8255, 0)
+	MCFG_I8255_IN_PORTA_CB(IOPORT("BUTTONS2"))
+	MCFG_I8255_IN_PORTB_CB(IOPORT("SERVICE"))
+	MCFG_I8255_IN_PORTC_CB(IOPORT("COINS"))
+
+	MCFG_DEVICE_ADD("ppi2", I8255, 0)
+	MCFG_I8255_IN_PORTA_CB(IOPORT("BUTTONS1"))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(cabaret_state, ppi2_b_w))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(cabaret_state, ppi2_c_w))
+
+	MCFG_DEVICE_ADD("ppi3", I8255, 0)
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(cabaret_state, nmi_and_coins_w))
+	MCFG_I8255_TRISTATE_PORTA_CB(CONSTANT(0xf0))
+	MCFG_I8255_IN_PORTB_CB(IOPORT("DSW1"))
+	MCFG_I8255_IN_PORTC_CB(IOPORT("DSW2"))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
