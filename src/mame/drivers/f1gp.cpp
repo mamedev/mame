@@ -30,6 +30,8 @@
 #include "cpu/z80/z80.h"
 #include "cpu/m68000/m68000.h"
 
+#include "machine/clock.h"
+
 #include "sound/2610intf.h"
 #include "sound/okim6295.h"
 
@@ -404,8 +406,11 @@ static MACHINE_CONFIG_START( f1gp )
 
 	MCFG_DEVICE_ADD("acia", ACIA6850, 0)
 	MCFG_ACIA6850_IRQ_HANDLER(INPUTLINE("sub", M68K_IRQ_3))
-	//MCFG_ACIA6850_TXD_HANDLER(DEVWRITELINE("link", rs232_port_device, write_txd))
-	//MCFG_ACIA6850_RTS_HANDLER(DEVWRITELINE("link", rs232_port_device, write_rts))
+	MCFG_ACIA6850_TXD_HANDLER(DEVWRITELINE("acia", acia6850_device, write_rxd)) // loopback for now
+
+	MCFG_DEVICE_ADD("acia_clock", CLOCK, 1000000) // guessed
+	MCFG_CLOCK_SIGNAL_HANDLER(DEVWRITELINE("acia", acia6850_device, write_txc))
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("acia", acia6850_device, write_rxc))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -474,8 +479,11 @@ static MACHINE_CONFIG_START( f1gpb )
 
 	MCFG_DEVICE_ADD("acia", ACIA6850, 0)
 	MCFG_ACIA6850_IRQ_HANDLER(INPUTLINE("sub", M68K_IRQ_3))
-	//MCFG_ACIA6850_TXD_HANDLER(DEVWRITELINE("link", rs232_port_device, write_txd))
-	//MCFG_ACIA6850_RTS_HANDLER(DEVWRITELINE("link", rs232_port_device, write_rts))
+	MCFG_ACIA6850_TXD_HANDLER(DEVWRITELINE("acia", acia6850_device, write_rxd)) // loopback for now
+
+	MCFG_DEVICE_ADD("acia_clock", CLOCK, 1000000) // guessed
+	MCFG_CLOCK_SIGNAL_HANDLER(DEVWRITELINE("acia", acia6850_device, write_txc))
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("acia", acia6850_device, write_rxc))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
