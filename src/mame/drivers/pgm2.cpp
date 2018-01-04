@@ -125,6 +125,31 @@ WRITE32_MEMBER(pgm2_state::sprite_encryption_w)
 		m_realspritekey = bitswap<32>(m_spritekey ^ 0x90055555, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31);
 }
 
+void pgm2_state::postload()
+{
+	// make sure the encrypted area is in the correct state after we load a savestate because we don't want to have to save the whole rom.
+
+	memcpy(memregion("user1")->base(), &m_encrypted_copy[0], memregion("user1")->bytes());
+
+	if (m_has_decrypted_kov3_module)
+	{
+		decrypt_kov3_module(module_addr_xor, module_data_xor);
+	}
+
+	if (m_has_decrypted)
+	{
+		igs036_decryptor decrypter(m_encryption_table);
+
+		if (m_romboard_ram)
+		{
+			decrypter.decrypter_rom((uint16_t*)memregion("user1")->base(), memregion("user1")->bytes(), 0x0200000); 
+		}
+		else
+		{
+			decrypter.decrypter_rom((uint16_t*)memregion("user1")->base(), memregion("user1")->bytes(), 0);
+		}
+	}
+}
 
 WRITE32_MEMBER(pgm2_state::encryption_do_w)
 {
@@ -636,6 +661,7 @@ void pgm2_state::machine_start()
 {
 	save_item(NAME(m_encryption_table));
 	save_item(NAME(m_has_decrypted));
+	save_item(NAME(m_has_decrypted_kov3_module));
 	save_item(NAME(m_spritekey));
 	save_item(NAME(m_realspritekey));
 	save_item(NAME(m_mcu_regs));
@@ -651,6 +677,8 @@ void pgm2_state::machine_start()
 	save_item(NAME(module_clk_cnt));
 	save_item(NAME(module_rcv_buf));
 	save_item(NAME(module_send_buf));
+
+	machine().save().register_postload(save_prepost_delegate(FUNC(pgm2_state::postload), this));
 }
 
 void pgm2_state::machine_reset()
@@ -664,6 +692,7 @@ void pgm2_state::machine_reset()
 	memcpy(memregion("user1")->base(), &m_encrypted_copy[0], memregion("user1")->bytes());
 
 	m_has_decrypted = 0;
+	m_has_decrypted_kov3_module = 0;
 
 	pio_out_data = 0;
 	module_prev_state = 0;
@@ -1359,6 +1388,8 @@ void pgm2_state::decrypt_kov3_module(uint32_t addrxor, uint16_t dataxor)
 		buffer[i] = src[i^addrxor]^dataxor;
 
 	memcpy(src, &buffer[0], size);
+
+	m_has_decrypted_kov3_module = 1;
 }
 
 DRIVER_INIT_MEMBER(pgm2_state, kov3_104)
@@ -1396,34 +1427,34 @@ DRIVER_INIT_MEMBER(pgm2_state,kof98umh)
 /* PGM2 */
 
 // Oriental Legend 2 - should be a V102 and V100 too
-GAME( 2007, orleg2,       0,         pgm2,    pgm2, pgm2_state,     orleg2,       ROT0, "IGS", "Oriental Legend 2 (V104, Oversea)", 0 ) /* Overseas sets of OL2 do not use the card reader */
-GAME( 2007, orleg2_103,   orleg2,    pgm2,    pgm2, pgm2_state,     orleg2,       ROT0, "IGS", "Oriental Legend 2 (V103, Oversea)", 0 )
-GAME( 2007, orleg2_101,   orleg2,    pgm2,    pgm2, pgm2_state,     orleg2,       ROT0, "IGS", "Oriental Legend 2 (V101, Oversea)", 0 )
+GAME( 2007, orleg2,       0,         pgm2,    pgm2, pgm2_state,     orleg2,       ROT0, "IGS", "Oriental Legend 2 (V104, Oversea)", MACHINE_SUPPORTS_SAVE ) /* Overseas sets of OL2 do not use the card reader */
+GAME( 2007, orleg2_103,   orleg2,    pgm2,    pgm2, pgm2_state,     orleg2,       ROT0, "IGS", "Oriental Legend 2 (V103, Oversea)", MACHINE_SUPPORTS_SAVE )
+GAME( 2007, orleg2_101,   orleg2,    pgm2,    pgm2, pgm2_state,     orleg2,       ROT0, "IGS", "Oriental Legend 2 (V101, Oversea)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 2007, orleg2_104cn, orleg2,    pgm2,    pgm2, pgm2_state,     orleg2,       ROT0, "IGS", "Oriental Legend 2 (V104, China)", 0 )
-GAME( 2007, orleg2_103cn, orleg2,    pgm2,    pgm2, pgm2_state,     orleg2,       ROT0, "IGS", "Oriental Legend 2 (V103, China)", 0 )
-GAME( 2007, orleg2_101cn, orleg2,    pgm2,    pgm2, pgm2_state,     orleg2,       ROT0, "IGS", "Oriental Legend 2 (V101, China)", 0 )
+GAME( 2007, orleg2_104cn, orleg2,    pgm2,    pgm2, pgm2_state,     orleg2,       ROT0, "IGS", "Oriental Legend 2 (V104, China)", MACHINE_SUPPORTS_SAVE )
+GAME( 2007, orleg2_103cn, orleg2,    pgm2,    pgm2, pgm2_state,     orleg2,       ROT0, "IGS", "Oriental Legend 2 (V103, China)", MACHINE_SUPPORTS_SAVE )
+GAME( 2007, orleg2_101cn, orleg2,    pgm2,    pgm2, pgm2_state,     orleg2,       ROT0, "IGS", "Oriental Legend 2 (V101, China)", MACHINE_SUPPORTS_SAVE )
 
 // Knights of Valour 2 New Legend
-GAME( 2008, kov2nl,       0,         pgm2,    pgm2, pgm2_state,     kov2nl,       ROT0, "IGS", "Knights of Valour 2 New Legend (V302, Oversea)", 0 )
-GAME( 2008, kov2nl_301,   kov2nl,    pgm2,    pgm2, pgm2_state,     kov2nl,       ROT0, "IGS", "Knights of Valour 2 New Legend (V301, Oversea)", 0 )
-GAME( 2008, kov2nl_300,   kov2nl,    pgm2,    pgm2, pgm2_state,     kov2nl,       ROT0, "IGS", "Knights of Valour 2 New Legend (V300, Oversea)", 0 )
+GAME( 2008, kov2nl,       0,         pgm2,    pgm2, pgm2_state,     kov2nl,       ROT0, "IGS", "Knights of Valour 2 New Legend (V302, Oversea)", MACHINE_SUPPORTS_SAVE )
+GAME( 2008, kov2nl_301,   kov2nl,    pgm2,    pgm2, pgm2_state,     kov2nl,       ROT0, "IGS", "Knights of Valour 2 New Legend (V301, Oversea)", MACHINE_SUPPORTS_SAVE )
+GAME( 2008, kov2nl_300,   kov2nl,    pgm2,    pgm2, pgm2_state,     kov2nl,       ROT0, "IGS", "Knights of Valour 2 New Legend (V300, Oversea)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 2008, kov2nl_302cn, kov2nl,    pgm2,    pgm2, pgm2_state,     kov2nl,       ROT0, "IGS", "Knights of Valour 2 New Legend (V302, China)", 0 )
-GAME( 2008, kov2nl_301cn, kov2nl,    pgm2,    pgm2, pgm2_state,     kov2nl,       ROT0, "IGS", "Knights of Valour 2 New Legend (V301, China)", 0 )
-GAME( 2008, kov2nl_300cn, kov2nl,    pgm2,    pgm2, pgm2_state,     kov2nl,       ROT0, "IGS", "Knights of Valour 2 New Legend (V300, China)", 0 )
+GAME( 2008, kov2nl_302cn, kov2nl,    pgm2,    pgm2, pgm2_state,     kov2nl,       ROT0, "IGS", "Knights of Valour 2 New Legend (V302, China)", MACHINE_SUPPORTS_SAVE )
+GAME( 2008, kov2nl_301cn, kov2nl,    pgm2,    pgm2, pgm2_state,     kov2nl,       ROT0, "IGS", "Knights of Valour 2 New Legend (V301, China)", MACHINE_SUPPORTS_SAVE )
+GAME( 2008, kov2nl_300cn, kov2nl,    pgm2,    pgm2, pgm2_state,     kov2nl,       ROT0, "IGS", "Knights of Valour 2 New Legend (V300, China)", MACHINE_SUPPORTS_SAVE )
 
 
 // Dodonpachi Daioujou Tamashii - should be a V200 too
-GAME( 2010, ddpdojt,      0,    pgm2_ramrom,    pgm2, pgm2_state,     ddpdojt,    ROT270, "IGS / Cave", "DoDonPachi Dai-Ou-Jou Tamashii (V201, China)", 0 )
+GAME( 2010, ddpdojt,      0,    pgm2_ramrom,    pgm2, pgm2_state,     ddpdojt,    ROT270, "IGS / Cave", "DoDonPachi Dai-Ou-Jou Tamashii (V201, China)", MACHINE_SUPPORTS_SAVE )
 
 // Knights of Valour 3 - should be a V103 and V101 too
-GAME( 2011, kov3,         0,    pgm2_hires, pgm2, pgm2_state,     kov3_104,   ROT0, "IGS", "Knights of Valour 3 (V104, China, Hong Kong, Taiwan)", 0 )
-GAME( 2011, kov3_102,     kov3, pgm2_hires, pgm2, pgm2_state,     kov3_102,   ROT0, "IGS", "Knights of Valour 3 (V102, China, Hong Kong, Taiwan)", 0 )
-GAME( 2011, kov3_100,     kov3, pgm2_hires, pgm2, pgm2_state,     kov3_100,   ROT0, "IGS", "Knights of Valour 3 (V100, China, Hong Kong, Taiwan)", 0 )
+GAME( 2011, kov3,         0,    pgm2_hires, pgm2, pgm2_state,     kov3_104,   ROT0, "IGS", "Knights of Valour 3 (V104, China, Hong Kong, Taiwan)", MACHINE_SUPPORTS_SAVE )
+GAME( 2011, kov3_102,     kov3, pgm2_hires, pgm2, pgm2_state,     kov3_102,   ROT0, "IGS", "Knights of Valour 3 (V102, China, Hong Kong, Taiwan)", MACHINE_SUPPORTS_SAVE )
+GAME( 2011, kov3_100,     kov3, pgm2_hires, pgm2, pgm2_state,     kov3_100,   ROT0, "IGS", "Knights of Valour 3 (V100, China, Hong Kong, Taiwan)", MACHINE_SUPPORTS_SAVE )
 
 // King of Fighters '98: Ultimate Match Hero
-GAME( 2009, kof98umh,     0,    pgm2_lores, pgm2, pgm2_state,  kof98umh,   ROT0, "IGS / SNK Playmore / New Channel", "The King of Fighters '98: Ultimate Match HERO (China, V100, 09-08-23)", 0 )
+GAME( 2009, kof98umh,     0,    pgm2_lores, pgm2, pgm2_state,  kof98umh,   ROT0, "IGS / SNK Playmore / New Channel", "The King of Fighters '98: Ultimate Match HERO (China, V100, 09-08-23)", MACHINE_SUPPORTS_SAVE )
 
 // Jigsaw World Arena
 
