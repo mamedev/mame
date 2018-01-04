@@ -328,7 +328,7 @@ static const gfx_layout blackt96_text_layout =
 
 static GFXDECODE_START( blackt96 )
 	GFXDECODE_ENTRY( "gfx1", 0, blackt96_layout,      0, 8  )
-	GFXDECODE_ENTRY( "gfx2", 0, blackt962_layout,     0, 64 )
+	GFXDECODE_ENTRY( "gfx2", 0, blackt962_layout,     0, 128 )
 	GFXDECODE_ENTRY( "gfx3", 0, blackt96_text_layout, 0, 16 )
 GFXDECODE_END
 
