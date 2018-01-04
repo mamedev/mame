@@ -147,7 +147,8 @@ private:
 	int m_keytime[0x80];    // time until next key press (1 ms)
 	uint8_t m_keyon[0x80];    // is 1 if key is pressed
 
-	static uint16_t const s_code_table[];
+	struct code_entry { uint16_t down, up, unshifted, shifted, control, caps_lock, up_trans, auto_repeat; };
+	static code_entry const s_code_table[];
 };
 
 // device type definition
