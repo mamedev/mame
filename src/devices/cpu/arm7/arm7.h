@@ -112,6 +112,8 @@ protected:
 
 	arm7_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint8_t archRev, uint8_t archFlags, endianness_t endianness);
 
+	void postload();
+
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -628,6 +630,8 @@ public:
 
 protected:
 	arm946es_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
+	virtual void device_start() override;
 
 private:
 	uint32_t cp15_control, cp15_itcm_base, cp15_dtcm_base, cp15_itcm_size, cp15_dtcm_size;

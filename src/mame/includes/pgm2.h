@@ -125,6 +125,7 @@ private:
 	void common_encryption_init();
 	uint8_t m_encryption_table[0x100];
 	int m_has_decrypted;    // so we only do it once.
+	int m_has_decrypted_kov3_module;
 	uint32_t m_spritekey;
 	uint32_t m_realspritekey;
 	int m_sprite_predecrypted;
@@ -148,6 +149,8 @@ private:
 	int module_clk_cnt;
 	uint8_t module_rcv_buf[10];
 	uint8_t module_send_buf[9];
+
+	void postload();
 
 	// devices
 	required_device<cpu_device> m_maincpu;

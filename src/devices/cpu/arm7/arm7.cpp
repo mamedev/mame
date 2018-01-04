@@ -558,11 +558,21 @@ bool arm7_cpu_device::memory_translate(int spacenum, int intention, offs_t &addr
  * CPU SPECIFIC IMPLEMENTATIONS
  **************************************************************************/
 
+void arm7_cpu_device::postload()
+{
+	update_reg_ptr();
+}
+
 void arm7_cpu_device::device_start()
 {
 	m_program = &space(AS_PROGRAM);
 	m_direct = m_program->direct<0>();
 
+	save_item(NAME(m_insn_prefetch_depth));
+	save_item(NAME(m_insn_prefetch_count));
+	save_item(NAME(m_insn_prefetch_index));
+	save_item(NAME(m_insn_prefetch_buffer));
+	save_item(NAME(m_insn_prefetch_address));
 	save_item(NAME(m_r));
 	save_item(NAME(m_pendingIrq));
 	save_item(NAME(m_pendingFiq));
@@ -571,8 +581,16 @@ void arm7_cpu_device::device_start()
 	save_item(NAME(m_pendingUnd));
 	save_item(NAME(m_pendingSwi));
 	save_item(NAME(m_pending_interrupt));
+	save_item(NAME(m_control));
+	save_item(NAME(m_tlbBase));
+	save_item(NAME(m_tlb_base_mask));
+	save_item(NAME(m_faultStatus));
+	save_item(NAME(m_faultAddress));
 	save_item(NAME(m_fcsePID));
 	save_item(NAME(m_pid_offset));
+	save_item(NAME(m_domainAccessControl));
+	save_item(NAME(m_decoded_access_control));
+	machine().save().register_postload(save_prepost_delegate(FUNC(arm7_cpu_device::postload), this));
 
 	m_icountptr = &m_icount;
 
@@ -623,6 +641,24 @@ void arm7_cpu_device::device_start()
 	state_add( ARM7_USPSR, "UR16", m_r[eSPSR_UND]).formatstr("%08X");
 
 	state_add(STATE_GENFLAGS, "GENFLAGS", m_r[eCPSR]).formatstr("%13s").noshow();
+}
+
+
+void arm946es_cpu_device::device_start()
+{
+	arm9_cpu_device::device_start();
+
+	save_item(NAME(cp15_control));
+	save_item(NAME(cp15_itcm_base));
+	save_item(NAME(cp15_dtcm_base));
+	save_item(NAME(cp15_itcm_size));
+	save_item(NAME(cp15_dtcm_size));
+	save_item(NAME(cp15_itcm_end));
+	save_item(NAME(cp15_dtcm_end));
+	save_item(NAME(cp15_itcm_reg));
+	save_item(NAME(cp15_dtcm_reg));
+	save_item(NAME(ITCM));
+	save_item(NAME(DTCM));
 }
 
 
