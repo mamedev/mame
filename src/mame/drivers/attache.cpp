@@ -17,7 +17,7 @@
  *  Sound: GI AY-3-8912
  *  FDC: NEC D765A, 5.25" floppies
  *  Video: CRT5027, 320x240
- *  Serial: Z80-SIO
+ *  Serial: Z80-SIO, two RS-232C or RS-422/423 ports
  *
  *  Note:
  *  In terminal mode (when disk booting fails or no disk is inserted), press Ctrl+Linefeed (ctrl+pgdn by default)
@@ -68,7 +68,9 @@
 
 #include "cpu/z80/z80.h"
 #include "cpu/z80/z80daisy.h"
+#include "bus/rs232/rs232.h"
 #include "machine/am9517a.h"
+#include "machine/clock.h"
 #include "machine/msm5832.h"
 #include "machine/nvram.h"
 #include "machine/ram.h"
@@ -1112,16 +1114,36 @@ static MACHINE_CONFIG_START( attache )
 
 	MCFG_MSM5832_ADD("rtc",XTAL_32_768kHz)
 
-	MCFG_DEVICE_ADD("pio", Z80PIO, XTAL_8MHz/26)
+	MCFG_DEVICE_ADD("pio", Z80PIO, XTAL_8MHz / 2)
 	MCFG_Z80PIO_IN_PA_CB(READ8(attache_state, pio_portA_r))
 	MCFG_Z80PIO_OUT_PA_CB(WRITE8(attache_state, pio_portA_w))
 	MCFG_Z80PIO_IN_PB_CB(READ8(attache_state, pio_portB_r))
 	MCFG_Z80PIO_OUT_PB_CB(WRITE8(attache_state, pio_portB_w))
 
-	MCFG_DEVICE_ADD("sio", Z80SIO, XTAL_8MHz / 26)
+	MCFG_DEVICE_ADD("sio", Z80SIO, XTAL_8MHz / 2)
+	MCFG_Z80SIO_OUT_TXDA_CB(DEVWRITELINE("rs232a", rs232_port_device, write_txd))
+	MCFG_Z80SIO_OUT_RTSA_CB(DEVWRITELINE("rs232a", rs232_port_device, write_rts))
+	MCFG_Z80SIO_OUT_TXDB_CB(DEVWRITELINE("rs232b", rs232_port_device, write_txd))
+	MCFG_Z80SIO_OUT_RTSB_CB(DEVWRITELINE("rs232b", rs232_port_device, write_rts))
+	MCFG_Z80SIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
 
-	MCFG_DEVICE_ADD("ctc", Z80CTC, XTAL_8MHz / 4)
+	MCFG_RS232_PORT_ADD("rs232a", default_rs232_devices, nullptr)
+	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("sio", z80sio_device, rxa_w))
+	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("sio", z80sio_device, ctsa_w))
+
+	MCFG_RS232_PORT_ADD("rs232b", default_rs232_devices, nullptr)
+	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("sio", z80sio_device, rxb_w))
+	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("sio", z80sio_device, ctsb_w))
+
+	MCFG_DEVICE_ADD("ctc", Z80CTC, XTAL_8MHz / 2)
+	MCFG_Z80CTC_ZC0_CB(DEVWRITELINE("sio", z80sio_device, rxca_w))
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("sio", z80sio_device, txca_w))
+	MCFG_Z80CTC_ZC1_CB(DEVWRITELINE("sio", z80sio_device, rxtxcb_w))
 	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
+
+	MCFG_DEVICE_ADD("brc", CLOCK, XTAL_8MHz / 26) // 307.692 KHz
+	MCFG_CLOCK_SIGNAL_HANDLER(DEVWRITELINE("ctc", z80ctc_device, trg0))
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("ctc", z80ctc_device, trg1))
 
 	MCFG_DEVICE_ADD("dma", AM9517A, XTAL_8MHz / 4)
 	MCFG_AM9517A_OUT_HREQ_CB(WRITELINE(attache_state, hreq_w))
@@ -1175,16 +1197,36 @@ static MACHINE_CONFIG_START( attache816 )
 
 	MCFG_MSM5832_ADD("rtc",XTAL_32_768kHz)
 
-	MCFG_DEVICE_ADD("pio", Z80PIO, XTAL_8MHz/26)
+	MCFG_DEVICE_ADD("pio", Z80PIO, XTAL_8MHz / 2)
 	MCFG_Z80PIO_IN_PA_CB(READ8(attache_state, pio_portA_r))
 	MCFG_Z80PIO_OUT_PA_CB(WRITE8(attache_state, pio_portA_w))
 	MCFG_Z80PIO_IN_PB_CB(READ8(attache_state, pio_portB_r))
 	MCFG_Z80PIO_OUT_PB_CB(WRITE8(attache_state, pio_portB_w))
 
-	MCFG_DEVICE_ADD("sio", Z80SIO, XTAL_8MHz / 26)
+	MCFG_DEVICE_ADD("sio", Z80SIO, XTAL_8MHz / 2)
+	MCFG_Z80SIO_OUT_TXDA_CB(DEVWRITELINE("rs232a", rs232_port_device, write_txd))
+	MCFG_Z80SIO_OUT_RTSA_CB(DEVWRITELINE("rs232a", rs232_port_device, write_rts))
+	MCFG_Z80SIO_OUT_TXDB_CB(DEVWRITELINE("rs232b", rs232_port_device, write_txd))
+	MCFG_Z80SIO_OUT_RTSB_CB(DEVWRITELINE("rs232b", rs232_port_device, write_rts))
+	MCFG_Z80SIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
 
-	MCFG_DEVICE_ADD("ctc", Z80CTC, XTAL_8MHz / 4)
+	MCFG_RS232_PORT_ADD("rs232a", default_rs232_devices, nullptr)
+	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("sio", z80sio_device, rxa_w))
+	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("sio", z80sio_device, ctsa_w))
+
+	MCFG_RS232_PORT_ADD("rs232b", default_rs232_devices, nullptr)
+	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("sio", z80sio_device, rxb_w))
+	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("sio", z80sio_device, ctsb_w))
+
+	MCFG_DEVICE_ADD("ctc", Z80CTC, XTAL_8MHz / 2)
+	MCFG_Z80CTC_ZC0_CB(DEVWRITELINE("sio", z80sio_device, rxca_w))
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("sio", z80sio_device, txca_w))
+	MCFG_Z80CTC_ZC1_CB(DEVWRITELINE("sio", z80sio_device, rxtxcb_w))
 	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
+
+	MCFG_DEVICE_ADD("brc", CLOCK, XTAL_8MHz / 26) // 307.692 KHz
+	MCFG_CLOCK_SIGNAL_HANDLER(DEVWRITELINE("ctc", z80ctc_device, trg0))
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("ctc", z80ctc_device, trg1))
 
 	MCFG_DEVICE_ADD("ppi", I8255A, 0)
 	MCFG_I8255_OUT_PORTA_CB(WRITE8(attache816_state, x86_comms_w))
