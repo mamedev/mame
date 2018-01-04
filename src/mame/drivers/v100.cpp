@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:
+// copyright-holders:AJR
 /***********************************************************************************************************************************
 
 Skeleton driver for Visual 100 display terminal.
@@ -13,8 +13,11 @@ Skeleton driver for Visual 100 display terminal.
 #include "machine/i8214.h"
 #include "machine/i8251.h"
 #include "machine/i8255.h"
-//#include "video/tms9927.h"
-//#include "screen.h"
+#include "video/tms9927.h"
+#include "screen.h"
+
+// character matrix is supposed to be only 7x7, but 15 produces correct timings
+#define CHAR_WIDTH 15
 
 class v100_state : public driver_device
 {
@@ -22,6 +25,7 @@ public:
 	v100_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
+		, m_screen(*this, "screen")
 		, m_brg(*this, "brg")
 		, m_earom(*this, "earom")
 		, m_picu(*this, "picu")
@@ -34,15 +38,23 @@ public:
 	IRQ_CALLBACK_MEMBER(irq_ack);
 	DECLARE_WRITE8_MEMBER(ppi_porta_w);
 
+	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+
 private:
 	virtual void machine_start() override;
 
 	required_device<cpu_device> m_maincpu;
+	required_device<screen_device> m_screen;
 	required_device<com8116_device> m_brg;
 	required_device<er1400_device> m_earom;
 	required_device<i8214_device> m_picu;
 	required_region_ptr<u8> m_p_chargen;
 };
+
+u32 v100_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+{
+	return 0;
+}
 
 void v100_state::machine_start()
 {
@@ -85,7 +97,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( io_map, AS_IO, 8, v100_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	//AM_RANGE(0x00, 0x0f) AM_DEVWRITE("vtac", crt5037_device, write)
+	AM_RANGE(0x00, 0x0f) AM_DEVREADWRITE("vtac", crt5037_device, read, write)
 	AM_RANGE(0x10, 0x10) AM_WRITE(brg_w)
 	AM_RANGE(0x12, 0x12) AM_DEVREADWRITE("usart", i8251_device, data_r, data_w)
 	AM_RANGE(0x13, 0x13) AM_DEVREADWRITE("usart", i8251_device, status_r, control_w)
@@ -116,7 +128,15 @@ static MACHINE_CONFIG_START( v100 )
 	MCFG_COM8116_FR_HANDLER(DEVWRITELINE("usart", i8251_device, write_rxc))
 	MCFG_COM8116_FT_HANDLER(DEVWRITELINE("usart", i8251_device, write_txc))
 
-	//MCFG_DEVICE_ADD("vtac", CRT5037, XTAL_47_736MHz / 12) // divider not verified
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_RAW_PARAMS(XTAL_47_736MHz / 2, 102 * CHAR_WIDTH, 0, 80 * CHAR_WIDTH, 260, 0, 240)
+	//MCFG_SCREEN_RAW_PARAMS(XTAL_47_736MHz, 170 * CHAR_WIDTH, 0, 132 * CHAR_WIDTH, 312, 0, 240)
+	MCFG_SCREEN_UPDATE_DRIVER(v100_state, screen_update)
+
+	// FIXME: dot clock should be divided by char width, and not divided by 2 for 132-column mode
+	MCFG_DEVICE_ADD("vtac", CRT5037, XTAL_47_736MHz / 2)
+	MCFG_TMS9927_CHAR_WIDTH(CHAR_WIDTH)
+	MCFG_VIDEO_SET_SCREEN("screen")
 
 	MCFG_DEVICE_ADD("picu", I8214, XTAL_47_736MHz / 12)
 	MCFG_I8214_INT_CALLBACK(ASSERTLINE("maincpu", 0))
