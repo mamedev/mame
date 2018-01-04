@@ -309,7 +309,6 @@ WRITE8_MEMBER(ufombs_state::speaker_w)
 	m_speaker->level_w(data & 3);
 }
 
-
 // config
 
 static INPUT_PORTS_START( ufombs )
@@ -431,7 +430,6 @@ READ8_MEMBER(ssfball_state::input_b_r)
 	// B: input port 2, where B3 is multiplexed
 	return m_inp_matrix[2]->read() | read_inputs(2);
 }
-
 
 // config
 
@@ -578,7 +576,6 @@ READ8_MEMBER(bmsoccer_state::input_a_r)
 	return read_inputs(2);
 }
 
-
 // config
 
 static INPUT_PORTS_START( bmsoccer )
@@ -694,7 +691,6 @@ WRITE8_MEMBER(bmsafari_state::speaker_w)
 	m_speaker->level_w(data & 1);
 }
 
-
 // config
 
 static INPUT_PORTS_START( bmsafari )
@@ -809,7 +805,6 @@ READ8_MEMBER(splasfgt_state::input_b_r)
 	// B: multiplexed buttons
 	return read_inputs(4);
 }
-
 
 // config
 
@@ -949,7 +944,6 @@ WRITE8_MEMBER(bcclimbr_state::plate_w)
 	prepare_display();
 }
 
-
 // config
 
 static INPUT_PORTS_START( bcclimbr )
@@ -1053,7 +1047,6 @@ READ8_MEMBER(tactix_state::input_r)
 	// A: multiplexed inputs
 	return read_inputs(5);
 }
-
 
 // config
 
@@ -1167,7 +1160,6 @@ WRITE8_MEMBER(invspace_state::plate_w)
 	prepare_display();
 }
 
-
 // config
 
 static INPUT_PORTS_START( invspace )
@@ -1267,7 +1259,6 @@ WRITE8_MEMBER(efball_state::plate_w)
 	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
 	prepare_display();
 }
-
 
 // config
 
@@ -1381,7 +1372,6 @@ WRITE8_MEMBER(galaxy2_state::plate_w)
 	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
 	prepare_display();
 }
-
 
 // config
 
@@ -1499,7 +1489,6 @@ WRITE8_MEMBER(astrocmd_state::plate_w)
 		prepare_display();
 }
 
-
 // config
 
 static INPUT_PORTS_START( astrocmd )
@@ -1595,7 +1584,6 @@ WRITE8_MEMBER(edracula_state::plate_w)
 	display_matrix(18, 8, m_plate, m_grid);
 }
 
-
 // config
 
 static INPUT_PORTS_START( edracula )
@@ -1683,7 +1671,6 @@ WRITE8_MEMBER(mcompgin_state::lcd_w)
 	m_lcd->write_data(data >> 2 & 1);
 	m_lcd->write_clock(data >> 1 & 1);
 }
-
 
 // config
 
@@ -1778,7 +1765,6 @@ WRITE8_MEMBER(mvbfree_state::speaker_w)
 	// I0: speaker out
 	m_speaker->level_w(data & 1);
 }
-
 
 // config
 
@@ -1883,7 +1869,6 @@ READ8_MEMBER(grobot9_state::input_r)
 	// A: multiplexed inputs
 	return read_inputs(5);
 }
-
 
 // config
 
@@ -1992,7 +1977,6 @@ WRITE8_MEMBER(tccombat_state::plate_w)
 	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
 	prepare_display();
 }
-
 
 // config
 
@@ -2103,7 +2087,6 @@ READ8_MEMBER(tmtennis_state::input_r)
 	// A,B: multiplexed buttons
 	return ~read_inputs(2) >> (offset*4);
 }
-
 
 // config
 
@@ -2255,7 +2238,6 @@ WRITE8_MEMBER(tmpacman_state::plate_w)
 	prepare_display();
 }
 
-
 // config
 
 static INPUT_PORTS_START( tmpacman )
@@ -2359,7 +2341,6 @@ WRITE8_MEMBER(tmscramb_state::plate_w)
 	prepare_display();
 }
 
-
 // config
 
 static INPUT_PORTS_START( tmscramb )
@@ -2461,7 +2442,6 @@ WRITE8_MEMBER(tcaveman_state::plate_w)
 	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
 	prepare_display();
 }
-
 
 // config
 
@@ -2566,7 +2546,6 @@ READ8_MEMBER(alnchase_state::input_r)
 	// A: multiplexed buttons
 	return read_inputs(2);
 }
-
 
 // config
 

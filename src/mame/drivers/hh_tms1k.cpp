@@ -14,7 +14,7 @@
   - tispeak: TI Speak & Spell series gen. 1
 
   Let's use this driver for a list of known devices and their serials,
-  excluding TI's own products(they didn't use "MP" codes).
+  excluding most of TI's own products(they normally didn't use "MP" codes).
 
   serial   device    etc.
 --------------------------------------------------------------------
@@ -37,6 +37,7 @@
  @MP0919   TMS1000   1979, Tiger Copy Cat (model 7-520)
  @MP0920   TMS1000   1979, Entex Space Battle (6004)
  @MP0923   TMS1000   1979, Entex Baseball 2 (6002)
+ *MP1022   TMS1100   1979, Texas Instruments unknown thermostat
  @MP1030   TMS1100   1980, APF Mathemagician
  @MP1133   TMS1470   1979, Kosmos Astro
  @MP1180   TMS1100   1980, Tomy Power House Pinball
@@ -101,6 +102,7 @@
   M34047   TMS1100   1982, MicroVision cartridge: Super Blockbuster
  @M34078A  TMS1100   1983, Milton Bradley Electronic Arcade Mania
  @MP4486A  TMS1000C  1983, Vulcan XL 25
+ *MP6061   TMS0970   1979, Texas Instruments Electronic Digital Thermostat
  @MP6100A  TMS0980   1979, Ideal Electronic Detective
  @MP6101B  TMS0980   1979, Parker Brothers Stop Thief
  *MP6361   ?         1983, Defender Strikes (? note: VFD-capable)
@@ -480,7 +482,6 @@ READ8_MEMBER(matchnum_state::read_k)
 	return read_inputs(6);
 }
 
-
 // config
 
 static INPUT_PORTS_START( matchnum )
@@ -609,7 +610,6 @@ READ8_MEMBER(arrball_state::read_k)
 	return read_inputs(1);
 }
 
-
 // config
 
 static INPUT_PORTS_START( arrball )
@@ -716,7 +716,6 @@ READ8_MEMBER(mathmagi_state::read_k)
 	// K: multiplexed inputs
 	return read_inputs(6);
 }
-
 
 // config
 
@@ -879,7 +878,6 @@ READ8_MEMBER(bcheetah_state::read_k)
 	return read_inputs(5);
 }
 
-
 // config
 
 static INPUT_PORTS_START( bcheetah )
@@ -991,7 +989,6 @@ READ8_MEMBER(amaztron_state::read_k)
 	if (k & 0x10) k |= 0xc;
 	return k & 0xf;
 }
-
 
 // config
 
@@ -1116,7 +1113,6 @@ READ8_MEMBER(zodiac_state::read_k)
 	// K: multiplexed inputs
 	return read_inputs(6);
 }
-
 
 // config
 
@@ -1300,7 +1296,6 @@ READ8_MEMBER(cqback_state::read_k)
 	return read_rotated_inputs(5);
 }
 
-
 // config
 
 static INPUT_PORTS_START( cqback )
@@ -1413,7 +1408,6 @@ READ8_MEMBER(h2hfootb_state::read_k)
 	// K: multiplexed inputs, rotated matrix
 	return read_rotated_inputs(9);
 }
-
 
 // config
 
@@ -1536,7 +1530,6 @@ READ8_MEMBER(h2hbaseb_state::read_k)
 	// K: multiplexed inputs (note: K8(Vss row) is always on)
 	return m_inp_matrix[4]->read() | read_inputs(4);
 }
-
 
 // config
 
@@ -1665,7 +1658,6 @@ READ8_MEMBER(h2hboxing_state::read_k)
 	// K: multiplexed inputs
 	return read_inputs(5);
 }
-
 
 // config
 
@@ -1820,7 +1812,6 @@ READ8_MEMBER(quizwizc_state::read_k)
 	// K1: cartridge pin 4 (pin 5 N/C)
 	return read_inputs(6) | ((m_r & m_pinout) ? 1 : 0);
 }
-
 
 // config
 
@@ -1997,7 +1988,6 @@ READ8_MEMBER(tc4_state::read_k)
 	return read_inputs(6) | ((m_r & 0x200) ? m_pinout : 0);
 }
 
-
 // config
 
 static INPUT_PORTS_START( tc4 )
@@ -2139,7 +2129,6 @@ READ8_MEMBER(cnbaskb_state::read_k)
 	return read_inputs(3);
 }
 
-
 // config
 
 static INPUT_PORTS_START( cnbaskb )
@@ -2247,7 +2236,6 @@ READ8_MEMBER(cmsport_state::read_k)
 	// K: multiplexed inputs
 	return read_inputs(3);
 }
-
 
 // config
 
@@ -2375,7 +2363,6 @@ READ8_MEMBER(cnfball_state::read_k)
 	return read_inputs(2) | (m_r << 3 & 8);
 }
 
-
 // config
 
 static INPUT_PORTS_START( cnfball )
@@ -2487,7 +2474,6 @@ READ8_MEMBER(cnfball2_state::read_k)
 	// K: multiplexed inputs
 	return read_inputs(3);
 }
-
 
 // config
 
@@ -2615,7 +2601,6 @@ READ8_MEMBER(eleciq_state::read_k)
 	return read_inputs(7);
 }
 
-
 // config
 
 static INPUT_PORTS_START( eleciq )
@@ -2659,7 +2644,7 @@ static INPUT_PORTS_START( eleciq )
 	PORT_BIT( 0x0e, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("RESET")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_R) PORT_NAME("Reset") PORT_CHANGED_MEMBER(DEVICE_SELF, eleciq_state, reset_button, 0)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_R) PORT_NAME("Reset") PORT_CHANGED_MEMBER(DEVICE_SELF, eleciq_state, reset_button, nullptr)
 INPUT_PORTS_END
 
 INPUT_CHANGED_MEMBER(eleciq_state::reset_button)
@@ -2748,7 +2733,6 @@ READ8_MEMBER(esoccer_state::read_k)
 	// K: multiplexed inputs
 	return read_inputs(3);
 }
-
 
 // config
 
@@ -2873,7 +2857,6 @@ READ8_MEMBER(ebball_state::read_k)
 	// K: multiplexed inputs (note: K8(Vss row) is always on)
 	return m_inp_matrix[5]->read() | read_inputs(5);
 }
-
 
 // config
 
@@ -3002,7 +2985,6 @@ READ8_MEMBER(ebball2_state::read_k)
 	// K: multiplexed inputs
 	return read_inputs(4);
 }
-
 
 // config
 
@@ -3148,7 +3130,6 @@ READ8_MEMBER(ebball3_state::read_k)
 	// K: multiplexed inputs
 	return read_inputs(3);
 }
-
 
 // config
 
@@ -3302,7 +3283,6 @@ READ8_MEMBER(esbattle_state::read_k)
 	return read_inputs(2);
 }
 
-
 // config
 
 static INPUT_PORTS_START( esbattle )
@@ -3397,7 +3377,6 @@ WRITE16_MEMBER(einvader_state::write_o)
 	m_o = data;
 	prepare_display();
 }
-
 
 // config
 
@@ -3510,7 +3489,6 @@ READ8_MEMBER(efootb4_state::read_k)
 {
 	return read_inputs(5);
 }
-
 
 // config
 
@@ -3638,7 +3616,6 @@ READ8_MEMBER(ebaskb2_state::read_k)
 {
 	return read_inputs(4);
 }
-
 
 // config
 
@@ -3769,7 +3746,6 @@ READ8_MEMBER(raisedvl_state::read_k)
 	// K: multiplexed inputs
 	return read_inputs(2) & 0xf;
 }
-
 
 // config
 
@@ -3907,7 +3883,6 @@ READ8_MEMBER(f2pbball_state::read_k)
 	return read_inputs(3);
 }
 
-
 // config
 
 static INPUT_PORTS_START( f2pbball )
@@ -3932,7 +3907,7 @@ static INPUT_PORTS_START( f2pbball )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_COCKTAIL PORT_NAME("P2 Fast")
 
 	PORT_START("RESET")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_NAME("P1 Reset") PORT_CHANGED_MEMBER(DEVICE_SELF, f2pbball_state, reset_button, 0)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_NAME("P1 Reset") PORT_CHANGED_MEMBER(DEVICE_SELF, f2pbball_state, reset_button, nullptr)
 INPUT_PORTS_END
 
 INPUT_CHANGED_MEMBER(f2pbball_state::reset_button)
@@ -4027,7 +4002,6 @@ READ8_MEMBER(f3in1_state::read_k)
 	// K: multiplexed inputs
 	return read_inputs(4);
 }
-
 
 // config
 
@@ -4167,7 +4141,6 @@ READ8_MEMBER(gpoker_state::read_k)
 	return read_inputs(7);
 }
 
-
 // config
 
 /* physical button layout and labels is like this:
@@ -4275,7 +4248,6 @@ WRITE16_MEMBER(gjackpot_state::write_r)
 	gpoker_state::write_r(space, offset, data);
 	m_inp_mux = (data & 0x3f) | (data >> 4 & 0x40);
 }
-
 
 // config
 
@@ -4421,7 +4393,6 @@ READ8_MEMBER(ginv1000_state::read_k)
 	return m_inp_matrix[2]->read() | read_inputs(2);
 }
 
-
 // config
 
 static INPUT_PORTS_START( ginv1000 )
@@ -4545,7 +4516,6 @@ READ8_MEMBER(ginv2000_state::read_k)
 	// K1,K2: multiplexed inputs (K8 is fire button)
 	return m_inp_matrix[2]->read() | read_inputs(2);
 }
-
 
 // config
 
@@ -4677,7 +4647,6 @@ READ8_MEMBER(fxmcr165_state::read_k)
 	return read_inputs(5);
 }
 
-
 // config
 
 /* physical button layout and labels is like this:
@@ -4795,7 +4764,6 @@ READ8_MEMBER(elecdet_state::read_k)
 	// K: multiplexed inputs (note: the Vss row is always on)
 	return m_inp_matrix[4]->read() | read_inputs(4);
 }
-
 
 // config
 
@@ -4931,7 +4899,6 @@ READ8_MEMBER(starwbc_state::read_k)
 	return read_inputs(5);
 }
 
-
 // config
 
 /* physical button layout and labels is like this:
@@ -5051,7 +5018,6 @@ READ8_MEMBER(astro_state::read_k)
 	// K: multiplexed inputs
 	return read_inputs(8);
 }
-
 
 // config
 
@@ -5220,7 +5186,6 @@ READ8_MEMBER(elecbowl_state::read_k)
 	return read_inputs(4);
 }
 
-
 // config
 
 static INPUT_PORTS_START( elecbowl )
@@ -5361,7 +5326,6 @@ READ8_MEMBER(horseran_state::read_k)
 	return read_inputs(8);
 }
 
-
 // config
 
 /* physical button layout and labels is like this:
@@ -5490,7 +5454,6 @@ READ8_MEMBER(mdndclab_state::read_k)
 	// K: multiplexed inputs
 	return read_inputs(18);
 }
-
 
 // config
 
@@ -5685,7 +5648,6 @@ READ8_MEMBER(comp4_state::read_k)
 	return read_inputs(3);
 }
 
-
 // config
 
 static INPUT_PORTS_START( comp4 )
@@ -5780,7 +5742,6 @@ READ8_MEMBER(bship_state::read_k)
 	// K: multiplexed inputs (note: the Vss row is always on)
 	return m_inp_matrix[11]->read() | read_inputs(11);
 }
-
 
 // config
 
@@ -5956,7 +5917,6 @@ READ8_MEMBER(bshipb_state::read_k)
 	return m_inp_matrix[11]->read() | read_inputs(11);
 }
 
-
 // config
 
 // buttons are same as bship set
@@ -6047,7 +6007,6 @@ READ8_MEMBER(simon_state::read_k)
 	// K: multiplexed inputs
 	return read_inputs(4);
 }
-
 
 // config
 
@@ -6149,7 +6108,6 @@ READ8_MEMBER(ssimon_state::read_k)
 	// K: multiplexed inputs
 	return read_inputs(6);
 }
-
 
 // config
 
@@ -6330,7 +6288,6 @@ READ8_MEMBER(bigtrak_state::read_k)
 	// K8: IR sensor
 	return read_inputs(7) | (sensor_state() ? 8 : 0);
 }
-
 
 // config
 
@@ -6573,7 +6530,6 @@ READ8_MEMBER(mbdtower_state::read_k)
 	return read_inputs(3) | ((!m_sensor_blind && sensor_led_on()) ? 8 : 0);
 }
 
-
 // config
 
 /* physical button layout and labels is like this:
@@ -6705,7 +6661,6 @@ READ8_MEMBER(arcmania_state::read_k)
 	return read_inputs(3);
 }
 
-
 // config
 
 /* physical button layout and labels is like this:
@@ -6814,7 +6769,6 @@ READ8_MEMBER(cnsector_state::read_k)
 	// K: multiplexed inputs
 	return read_inputs(5);
 }
-
 
 // config
 
@@ -6946,7 +6900,6 @@ READ8_MEMBER(merlin_state::read_k)
 	return read_inputs(4);
 }
 
-
 // config
 
 static INPUT_PORTS_START( merlin )
@@ -7030,7 +6983,6 @@ public:
 };
 
 // handlers: uses the ones in merlin_state
-
 
 // config
 
@@ -7117,7 +7069,6 @@ READ8_MEMBER(stopthief_state::read_k)
 	// K: multiplexed inputs (note: the Vss row is always on)
 	return m_inp_matrix[2]->read() | read_inputs(2);
 }
-
 
 // config
 
@@ -7241,7 +7192,6 @@ READ8_MEMBER(bankshot_state::read_k)
 	// K: multiplexed inputs
 	return read_inputs(2);
 }
-
 
 // config
 
@@ -7371,7 +7321,6 @@ READ8_MEMBER(splitsec_state::read_k)
 	return read_inputs(2);
 }
 
-
 // config
 
 static INPUT_PORTS_START( splitsec )
@@ -7457,7 +7406,6 @@ READ8_MEMBER(lostreas_state::read_k)
 	// K: multiplexed inputs
 	return read_inputs(4);
 }
-
 
 // config
 
@@ -7597,7 +7545,6 @@ READ8_MEMBER(alphie_state::read_k)
 	return read_rotated_inputs(6);
 }
 
-
 // config
 
 static const ioport_value alphie_armpos_table[5] = { 0x01, 0x02, 0x04, 0x08, 0x10 };
@@ -7715,7 +7662,6 @@ READ8_MEMBER(tcfball_state::read_k)
 	return read_inputs(3);
 }
 
-
 // config
 
 static INPUT_PORTS_START( tcfball )
@@ -7783,7 +7729,6 @@ public:
 };
 
 // handlers: uses the ones in tcfball_state
-
 
 // config
 
@@ -7896,7 +7841,6 @@ READ8_MEMBER(tandy12_state::read_k)
 	// K: multiplexed inputs
 	return read_inputs(5);
 }
-
 
 // config
 
@@ -8040,7 +7984,6 @@ READ8_MEMBER(monkeysee_state::read_k)
 	return read_inputs(5);
 }
 
-
 // config
 
 static INPUT_PORTS_START( monkeysee )
@@ -8161,7 +8104,6 @@ READ8_MEMBER(speechp_state::read_k)
 	// K: multiplexed inputs
 	return m_inp_matrix[10]->read() | (read_inputs(10) & 7);
 }
-
 
 // config
 
@@ -8295,7 +8237,6 @@ READ8_MEMBER(timaze_state::read_k)
 	return read_inputs(1);
 }
 
-
 // config
 
 static INPUT_PORTS_START( timaze )
@@ -8374,7 +8315,6 @@ READ8_MEMBER(copycat_state::read_k)
 	// K: multiplexed inputs
 	return read_inputs(4);
 }
-
 
 // config
 
@@ -8473,7 +8413,6 @@ WRITE16_MEMBER(copycatm2_state::write_o)
 	m_speaker->level_w((data & 1) | (data >> 5 & 2));
 }
 
-
 // config
 
 static INPUT_PORTS_START( copycatm2 )
@@ -8543,7 +8482,6 @@ WRITE16_MEMBER(ditto_state::write_o)
 	// O5,O6: speaker out
 	m_speaker->level_w(data >> 5 & 3);
 }
-
 
 // config
 
@@ -8639,7 +8577,6 @@ READ8_MEMBER(ss7in1_state::read_k)
 {
 	return read_inputs(4);
 }
-
 
 // config
 
@@ -8815,7 +8752,6 @@ READ8_MEMBER(tbreakup_state::read_k)
 	return (m_inp_matrix[2]->read() & 4) | (read_inputs(2) & 8);
 }
 
-
 // config
 
 static INPUT_PORTS_START( tbreakup )
@@ -8977,7 +8913,6 @@ READ8_MEMBER(phpball_state::read_k)
 	return m_inp_matrix[1]->read() | read_inputs(1);
 }
 
-
 // config
 
 static INPUT_PORTS_START( phpball )
@@ -9077,7 +9012,6 @@ READ8_MEMBER(ssports4_state::read_k)
 	m_inp_mux = (m_r & 3) | (m_r >> 3 & 4) | (m_r >> 5 & 0x18) | (m_o >> 2 & 0x20);
 	return read_inputs(6);
 }
-
 
 // config
 
@@ -9224,7 +9158,6 @@ READ8_MEMBER(xl25_state::read_k)
 	// K4 also goes to MCU halt
 	return read_inputs(10);
 }
-
 
 // config
 

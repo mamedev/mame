@@ -274,7 +274,6 @@ READ16_MEMBER(cfrogger_state::input_r)
 	return (m_inp_matrix[2]->read() & 8) | (read_inputs(2) & 3);
 }
 
-
 // config
 
 static INPUT_PORTS_START( cfrogger )
@@ -388,7 +387,6 @@ READ16_MEMBER(gjungler_state::input_r)
 	// K2,K3: fixed inputs
 	return (m_inp_matrix[2]->read() & 0xc) | (read_inputs(2) & 3);
 }
-
 
 // config
 

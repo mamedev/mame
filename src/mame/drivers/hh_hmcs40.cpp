@@ -400,7 +400,6 @@ READ8_MEMBER(bambball_state::input_r)
 	return read_inputs(4);
 }
 
-
 // config
 
 static INPUT_PORTS_START( bambball )
@@ -515,7 +514,6 @@ READ8_MEMBER(bmboxing_state::input_r)
 	// R0x: multiplexed inputs
 	return read_inputs(4);
 }
-
 
 // config
 
@@ -663,7 +661,6 @@ void bfriskyt_state::update_int1()
 	set_interrupt(1, read_inputs(5));
 }
 
-
 // config
 
 static INPUT_PORTS_START( bfriskyt )
@@ -780,7 +777,6 @@ READ16_MEMBER(packmon_state::input_r)
 	// D5: multiplexed inputs
 	return read_inputs(5) & 0x20;
 }
-
 
 // config
 
@@ -905,7 +901,6 @@ void msthawk_state::update_int0()
 	set_interrupt(0, read_inputs(6));
 }
 
-
 // config
 
 static INPUT_PORTS_START( msthawk )
@@ -1028,7 +1023,6 @@ void bzaxxon_state::update_int1()
 	set_interrupt(1, read_inputs(4));
 }
 
-
 // config
 
 static INPUT_PORTS_START( bzaxxon )
@@ -1147,7 +1141,6 @@ void zackman_state::update_int0()
 	// INT0 on multiplexed inputs
 	set_interrupt(0, read_inputs(4));
 }
-
 
 // config
 
@@ -1268,7 +1261,6 @@ void bpengo_state::update_int0()
 	// INT0 on multiplexed inputs
 	set_interrupt(0, read_inputs(4));
 }
-
 
 // config
 
@@ -1397,7 +1389,6 @@ void bbtime_state::update_int0()
 	set_interrupt(0, read_inputs(5));
 }
 
-
 // config
 
 static INPUT_PORTS_START( bbtime )
@@ -1502,7 +1493,6 @@ WRITE16_MEMBER(bdoramon_state::grid_w)
 	plate_w(space, 4, data & 0xf);
 }
 
-
 // config
 
 static INPUT_PORTS_START( bdoramon )
@@ -1602,7 +1592,6 @@ WRITE16_MEMBER(bultrman_state::grid_w)
 	plate_w(space, 4, data & (1 << offset) & 7);
 }
 
-
 // config
 
 static INPUT_PORTS_START( bultrman )
@@ -1693,7 +1682,6 @@ WRITE16_MEMBER(machiman_state::grid_w)
 	m_grid = data & 0x1f;
 	prepare_display();
 }
-
 
 // config
 
@@ -1823,7 +1811,6 @@ WRITE16_MEMBER(pairmtch_state::speaker_w)
 	m_maincpu->set_input_line(0, (data & 2) ? ASSERT_LINE : CLEAR_LINE);
 }
 
-
 // config
 
 static INPUT_PORTS_START( pairmtch )
@@ -1948,7 +1935,6 @@ READ16_MEMBER(alnattck_state::input_r)
 	// D5: multiplexed inputs
 	return read_inputs(7) & 0x20;
 }
-
 
 // config
 
@@ -2080,7 +2066,6 @@ WRITE16_MEMBER(cdkong_state::grid_w)
 	prepare_display();
 }
 
-
 // config
 
 static INPUT_PORTS_START( cdkong )
@@ -2207,7 +2192,6 @@ READ8_MEMBER(cgalaxn_state::input_r)
 	return read_inputs(2);
 }
 
-
 // config
 
 static INPUT_PORTS_START( cgalaxn )
@@ -2333,7 +2317,6 @@ READ8_MEMBER(cpacman_state::input_r)
 	return read_inputs(3);
 }
 
-
 // config
 
 static INPUT_PORTS_START( cpacman )
@@ -2449,7 +2432,6 @@ READ8_MEMBER(cmspacmn_state::input_r)
 	// R0x: multiplexed inputs
 	return read_inputs(3);
 }
-
 
 // config
 
@@ -2574,7 +2556,6 @@ READ16_MEMBER(sag_state::input_r)
 	// D13-D15: multiplexed inputs
 	return read_inputs(6) << 13;
 }
-
 
 // config
 
@@ -2701,7 +2682,6 @@ READ8_MEMBER(egalaxn2_state::input_r)
 	// R0x: multiplexed inputs
 	return read_inputs(4);
 }
-
 
 // config
 
@@ -2938,7 +2918,6 @@ READ8_MEMBER(eturtles_state::cop_ack_r)
 	return m_d & 1;
 }
 
-
 // config
 
 static INPUT_PORTS_START( eturtles )
@@ -3060,7 +3039,6 @@ READ8_MEMBER(estargte_state::cop_data_r)
 	// L7: ack from maincpu D0
 	return m_r[0] | (m_d << 7 & 0x80);
 }
-
 
 // config
 
@@ -3192,7 +3170,6 @@ READ16_MEMBER(ghalien_state::input_r)
 	return read_inputs(7) & 0x8000;
 }
 
-
 // config
 
 static INPUT_PORTS_START( ghalien )
@@ -3316,7 +3293,6 @@ void gckong_state::update_int1()
 	set_interrupt(1, read_inputs(4));
 }
 
-
 // config
 
 static INPUT_PORTS_START( gckong )
@@ -3437,7 +3413,6 @@ void gdigdug_state::update_int1()
 	// INT1 on multiplexed inputs
 	set_interrupt(1, read_inputs(5));
 }
-
 
 // config
 
@@ -3561,7 +3536,6 @@ READ8_MEMBER(mwcbaseb_state::input_r)
 	// R4x: multiplexed inputs
 	return read_inputs(7);
 }
-
 
 // config
 
@@ -3704,7 +3678,6 @@ WRITE16_MEMBER(pbqbert_state::grid_w)
 	plate_w(space, 7, data >> 8 & 1);
 }
 
-
 // config
 
 static INPUT_PORTS_START( pbqbert )
@@ -3815,7 +3788,6 @@ void kingman_state::update_int0()
 	// INT0 on multiplexed inputs
 	set_interrupt(0, read_inputs(4));
 }
-
 
 // config
 
@@ -3937,7 +3909,6 @@ void tmtron_state::update_int1()
 	set_interrupt(1, read_inputs(4));
 }
 
-
 // config
 
 static INPUT_PORTS_START( tmtron )
@@ -4038,7 +4009,6 @@ WRITE16_MEMBER(vinvader_state::grid_w)
 	// D4-D6: more plates (update display there)
 	plate_w(space, 3 + hmcs40_cpu_device::PORT_R1X, data >> 4 & 7);
 }
-
 
 // config
 
