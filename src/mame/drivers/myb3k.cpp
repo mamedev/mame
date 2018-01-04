@@ -10,12 +10,12 @@
     Step/One service manuals: http://nivelleringslikaren.eu/stepone/
 
     TODO:
-    - Fix speed of "basica demo", emulation is more than twioce as fast as real thing
     - Add hi-res graphics mode (640x400 monochrome)
     - Add monochrome monitor settings
     - Hook up all interrupts and 8255 Port C signals
     - Add printer support on Port A
     - Expansion Unit with 6 more ISA8 slots
+    - Proper waitstate support when 8088 CPU core admits it and remove the workaround in machine_start 
 
     PC INCOMPATIBILITIES:
     - COM card lives at io address 0x540
@@ -55,7 +55,7 @@
 #define LOG_VMOD    (1U << 7)
 #define LOG_PIX    (1U << 8)
 
-//#define VERBOSE (LOG_VMOD|LOG_PIX)
+//#define VERBOSE (LOG_VMOD)
 //#define LOG_OUTPUT_STREAM std::cout
 
 #include "logmacro.h"
@@ -185,6 +185,8 @@ void myb3k_state::kbd_set_data_and_interrupt(u8 data) {
 
 MC6845_UPDATE_ROW( myb3k_state::crtc_update_row )
 {
+	//m_maincpu->eat_cycles(32 * 8 * 40 * 100);
+	//m_maincpu->adjust_icount(-1 * 32 * 8 * 40 * 100000);
 	for (int x_pos = 0; x_pos < x_count; x_pos++)
 	{
 		//int h_step = 64 >> (m_vmode & 3);
@@ -452,6 +454,10 @@ void myb3k_state::machine_start()
 	m_cpal[5] = rgb_t(  0, 255, 255); // cyan    0.80v
 	m_cpal[6] = rgb_t(255, 255,   0); // yellow  0.90v
 	m_cpal[7] = rgb_t(255, 255, 255); // white   1.04v
+
+	// CPU can only access RAM 50% of the time and the CRTC the other 50%. This waitstate workaround gives
+	// close enough performance of the DOS 1.25 "basica demo" compared to the real hardware
+	m_maincpu->set_clock_scale(0.5f);
 
 	m_kbd_data = 0;
 }
