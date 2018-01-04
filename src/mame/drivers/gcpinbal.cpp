@@ -123,7 +123,7 @@ INTERRUPT_GEN_MEMBER(gcpinbal_state::gcpinbal_interrupt)
 
 WRITE16_MEMBER(gcpinbal_state::d80010_w)
 {
-	//logerror("CPU #0 PC %06x: warning - write ioc offset %06x with %04x\n", space.device().safe_pc(), offset, data);
+	//logerror("CPU #0 PC %06x: warning - write ioc offset %06x with %04x\n", m_maincpu->space.device().safe_pc(), offset, data);
 	COMBINE_DATA(&m_d80010_ram[offset]);
 }
 
@@ -134,7 +134,7 @@ WRITE8_MEMBER(gcpinbal_state::d80040_w)
 
 WRITE16_MEMBER(gcpinbal_state::d80060_w)
 {
-	//logerror("CPU #0 PC %06x: warning - write ioc offset %06x with %04x\n", space.device().safe_pc(), offset, data);
+	//logerror("CPU #0 PC %06x: warning - write ioc offset %06x with %04x\n", m_maincpu->pc(), offset, data);
 	COMBINE_DATA(&m_d80060_ram[offset]);
 }
 

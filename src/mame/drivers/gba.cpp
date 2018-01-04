@@ -669,7 +669,7 @@ READ32_MEMBER(gba_state::gba_io_r)
 				double time, ticks;
 				int timer = offset + 0x60/4 - 0x100/4;
 
-//              printf("Read timer reg %x (PC=%x)\n", timer, space.device().safe_pc());
+//              printf("Read timer reg %x (PC=%x)\n", timer, m_maincpu->pc());
 
 				// update times for
 				if (m_timer_regs[timer] & 0x800000)
@@ -1059,7 +1059,7 @@ WRITE32_MEMBER(gba_state::gba_io_w)
 
 				m_timer_regs[timer] = (m_timer_regs[timer] & ~(mem_mask & 0xFFFF0000)) | (data & (mem_mask & 0xFFFF0000));
 
-//              printf("%x to timer %d (mask %x PC %x)\n", data, timer, ~mem_mask, space.device().safe_pc());
+//              printf("%x to timer %d (mask %x PC %x)\n", data, timer, ~mem_mask, m_maincpu->pc());
 
 				if (ACCESSING_BITS_0_15)
 				{
@@ -1179,6 +1179,7 @@ READ32_MEMBER(gba_state::gba_bios_r)
 
 READ32_MEMBER(gba_state::gba_10000000_r)
 {
+	auto &mspace = m_maincpu->space(AS_PROGRAM);
 	uint32_t data;
 	uint32_t pc = m_maincpu->state_int(ARM7_PC);
 	if (pc >= 0x10000000)
@@ -1188,11 +1189,11 @@ READ32_MEMBER(gba_state::gba_10000000_r)
 	uint32_t cpsr = m_maincpu->state_int(ARM7_CPSR);
 	if (T_IS_SET( cpsr))
 	{
-		data = space.read_dword(pc + 8);
+		data = mspace.read_dword(pc + 8);
 	}
 	else
 	{
-		uint16_t insn = space.read_word(pc + 4);
+		uint16_t insn = mspace.read_word(pc + 4);
 		data = (insn << 16) | (insn << 0);
 	}
 	logerror("%s: unmapped program memory read from %08X = %08X & %08X\n", machine().describe_context( ), 0x10000000 + (offset << 2), data, mem_mask);

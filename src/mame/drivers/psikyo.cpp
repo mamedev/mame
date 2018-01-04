@@ -184,12 +184,12 @@ WRITE32_MEMBER(psikyo_state::s1945_mcu_w)
 			m_s1945_mcu_latching |= 4;
 			break;
 		default:
-//          logerror("MCU: function %02x, direction %02x, latch1 %02x, latch2 %02x (%x)\n", data, m_s1945_mcu_direction, m_s1945_mcu_latch1, m_s1945_mcu_latch2, space.device().safe_pc());
+//          logerror("MCU: function %02x, direction %02x, latch1 %02x, latch2 %02x (%x)\n", data, m_s1945_mcu_direction, m_s1945_mcu_latch1, m_s1945_mcu_latch2, m_maincpu->pc());
 			break;
 		}
 		break;
 	default:
-//      logerror("MCU.w %x, %02x (%x)\n", offset, data, space.device().safe_pc());
+//      logerror("MCU.w %x, %02x (%x)\n", offset, data, m_maincpu->pc());
 		;
 	}
 }

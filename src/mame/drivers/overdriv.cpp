@@ -60,7 +60,7 @@ static const uint16_t overdriv_default_eeprom[64] =
 
 WRITE16_MEMBER(overdriv_state::eeprom_w)
 {
-//logerror("%06x: write %04x to eeprom_w\n",space.device().safe_pc(),data);
+//logerror("%s: write %04x to eeprom_w\n",machine.describe_context(),data);
 	if (ACCESSING_BITS_0_7)
 	{
 		/* bit 0 is data */
@@ -112,7 +112,7 @@ WRITE16_MEMBER(overdriv_state::cpuA_ctrl_w)
 		machine().bookkeeping().coin_counter_w(0, data & 0x10);
 		machine().bookkeeping().coin_counter_w(1, data & 0x20);
 
-//logerror("%06x: write %04x to cpuA_ctrl_w\n",space.device().safe_pc(),data);
+//logerror("%s: write %04x to cpuA_ctrl_w\n",machine().describe_context(),data);
 	}
 }
 

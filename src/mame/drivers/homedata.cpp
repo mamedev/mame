@@ -359,7 +359,7 @@ WRITE8_MEMBER(homedata_state::reikaids_upd7807_portc_w)
 	   1 \ ROM bank
 	   0 /
 	  */
-//  logerror("%04x: port C wr %02x (STATUS %d DATA %d)\n", space.device().safe_pc(), data, BIT(data, 2), BIT(data, 6));
+//  logerror("%s: port C wr %02x (STATUS %d DATA %d)\n", machine().describe_context(), data, BIT(data, 2), BIT(data, 6));
 
 	membank("bank2")->set_entry(data & 0x03);
 
@@ -477,7 +477,7 @@ READ8_MEMBER(homedata_state::pteacher_upd7807_porta_r)
 WRITE8_MEMBER(homedata_state::pteacher_snd_answer_w)
 {
 	m_to_cpu = data;
-	//logerror("%04x: to_cpu = %02x\n", space.device().safe_pc(), m_to_cpu);
+	//logerror("%s: to_cpu = %02x\n", machine().describe_context(), m_to_cpu);
 }
 
 WRITE8_MEMBER(homedata_state::pteacher_upd7807_porta_w)
@@ -498,7 +498,7 @@ WRITE8_MEMBER(homedata_state::pteacher_upd7807_portc_w)
 	   0 input (coin)
 	  */
 
-	//  logerror("%04x: port C wr %02x\n", space.device().safe_pc(), data);
+	//  logerror("%s: port C wr %02x\n", machine().describe_context(), data);
 
 	membank("bank2")->set_entry((data & 0x0c) >> 2);
 

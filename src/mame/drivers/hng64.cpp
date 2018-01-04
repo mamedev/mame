@@ -470,13 +470,13 @@ READ32_MEMBER(hng64_state::hng64_random_read)
 
 READ32_MEMBER(hng64_state::hng64_com_r)
 {
-	//logerror("com read  (PC=%08x): %08x %08x = %08x\n", space.device().safe_pc(), (offset*4)+0xc0000000, mem_mask, m_com_ram[offset]);
+	//logerror("com read  (PC=%08x): %08x %08x = %08x\n", m_maincpu->pc(), (offset*4)+0xc0000000, mem_mask, m_com_ram[offset]);
 	return m_com_ram[offset];
 }
 
 WRITE32_MEMBER(hng64_state::hng64_com_w)
 {
-	//logerror("com write (PC=%08x): %08x %08x = %08x\n", space.device().safe_pc(), (offset*4)+0xc0000000, mem_mask, data);
+	//logerror("com write (PC=%08x): %08x %08x = %08x\n", m_maincpu->pc(), (offset*4)+0xc0000000, mem_mask, data);
 	COMBINE_DATA(&m_com_ram[offset]);
 }
 
@@ -591,7 +591,7 @@ WRITE32_MEMBER(hng64_state::hng64_sysregs_w)
 	{
 		case 0x1084: //MIPS->MCU latch port
 			m_mcu_en = (data & 0xff); //command-based, i.e. doesn't control halt line and such?
-			//printf("HNG64 writing to SYSTEM Registers 0x%08x == 0x%08x. (PC=%08x)\n", offset*4, m_sysregs[offset], space.device().safe_pc());
+			//printf("HNG64 writing to SYSTEM Registers 0x%08x == 0x%08x. (PC=%08x)\n", offset*4, m_sysregs[offset], m_maincpu->pc());
 			break;
 		//0x110c global irq mask?
 		/* irq ack */
@@ -603,7 +603,7 @@ WRITE32_MEMBER(hng64_state::hng64_sysregs_w)
 			do_dma(space);
 			break;
 		//default:
-		//  printf("HNG64 writing to SYSTEM Registers 0x%08x == 0x%08x. (PC=%08x)\n", offset*4, m_sysregs[offset], space.device().safe_pc());
+		//  printf("HNG64 writing to SYSTEM Registers 0x%08x == 0x%08x. (PC=%08x)\n", offset*4, m_sysregs[offset], m_maincpu->pc());
 	}
 }
 
@@ -619,7 +619,7 @@ READ32_MEMBER(hng64_state::fight_io_r)
 	*/
 	if(ioport("SYSTEM")->read() & 0x00030000 && m_mcu_type == BURIKI_MCU)
 	{
-		space.write_byte(0xf3ce4, 1);
+		m_maincpu->space(AS_PROGRAM).write_byte(0xf3ce4, 1);
 	}
 
 	switch (offset*4)
@@ -745,7 +745,7 @@ READ32_MEMBER(hng64_state::racing_io_r)
 
 READ32_MEMBER(hng64_state::hng64_dualport_r)
 {
-	//printf("dualport R %08x %08x (PC=%08x)\n", offset*4, hng64_dualport[offset], space.device().safe_pc());
+	//printf("dualport R %08x %08x (PC=%08x)\n", offset*4, hng64_dualport[offset], m_maincpu->pc());
 
 	/*
 	command table:
@@ -783,7 +783,7 @@ Beast Busters 2 outputs (all at offset == 0x1c):
 
 WRITE32_MEMBER(hng64_state::hng64_dualport_w)
 {
-	//printf("dualport WRITE %08x %08x (PC=%08x)\n", offset*4, hng64_dualport[offset], space.device().safe_pc());
+	//printf("dualport WRITE %08x %08x (PC=%08x)\n", offset*4, hng64_dualport[offset], m_maincpu->pc());
 	COMBINE_DATA (&m_dualport[offset]);
 }
 
@@ -849,45 +849,47 @@ READ32_MEMBER(hng64_state::unk_vreg_r)
 /* The following is guesswork, needs confirmation with a test on the real board. */
 WRITE32_MEMBER(hng64_state::hng64_sprite_clear_even_w)
 {
+	auto &mspace = m_maincpu->space(AS_PROGRAM);
 	uint32_t spr_offs;
 
 	spr_offs = (offset) * 0x10 * 4;
 
 	if(ACCESSING_BITS_16_31)
 	{
-		space.write_dword(0x20000000+0x00+0x00+spr_offs, 0x00000000);
-		space.write_dword(0x20000000+0x08+0x00+spr_offs, 0x00000000);
-		space.write_dword(0x20000000+0x10+0x00+spr_offs, 0x00000000);
-		space.write_dword(0x20000000+0x18+0x00+spr_offs, 0x00000000);
+		mspace.write_dword(0x20000000+0x00+0x00+spr_offs, 0x00000000);
+		mspace.write_dword(0x20000000+0x08+0x00+spr_offs, 0x00000000);
+		mspace.write_dword(0x20000000+0x10+0x00+spr_offs, 0x00000000);
+		mspace.write_dword(0x20000000+0x18+0x00+spr_offs, 0x00000000);
 	}
 	if(ACCESSING_BITS_8_15)
 	{
-		space.write_dword(0x20000000+0x00+0x20+spr_offs, 0x00000000);
-		space.write_dword(0x20000000+0x08+0x20+spr_offs, 0x00000000);
-		space.write_dword(0x20000000+0x10+0x20+spr_offs, 0x00000000);
-		space.write_dword(0x20000000+0x18+0x20+spr_offs, 0x00000000);
+		mspace.write_dword(0x20000000+0x00+0x20+spr_offs, 0x00000000);
+		mspace.write_dword(0x20000000+0x08+0x20+spr_offs, 0x00000000);
+		mspace.write_dword(0x20000000+0x10+0x20+spr_offs, 0x00000000);
+		mspace.write_dword(0x20000000+0x18+0x20+spr_offs, 0x00000000);
 	}
 }
 
 WRITE32_MEMBER(hng64_state::hng64_sprite_clear_odd_w)
 {
+	auto &mspace = m_maincpu->space(AS_PROGRAM);
 	uint32_t spr_offs;
 
 	spr_offs = (offset) * 0x10 * 4;
 
 	if(ACCESSING_BITS_16_31)
 	{
-		space.write_dword(0x20000000+0x04+0x00+spr_offs, 0x00000000);
-		space.write_dword(0x20000000+0x0c+0x00+spr_offs, 0x00000000);
-		space.write_dword(0x20000000+0x14+0x00+spr_offs, 0x00000000);
-		space.write_dword(0x20000000+0x1c+0x00+spr_offs, 0x00000000);
+		mspace.write_dword(0x20000000+0x04+0x00+spr_offs, 0x00000000);
+		mspace.write_dword(0x20000000+0x0c+0x00+spr_offs, 0x00000000);
+		mspace.write_dword(0x20000000+0x14+0x00+spr_offs, 0x00000000);
+		mspace.write_dword(0x20000000+0x1c+0x00+spr_offs, 0x00000000);
 	}
 	if(ACCESSING_BITS_0_15)
 	{
-		space.write_dword(0x20000000+0x04+0x20+spr_offs, 0x00000000);
-		space.write_dword(0x20000000+0x0c+0x20+spr_offs, 0x00000000);
-		space.write_dword(0x20000000+0x14+0x20+spr_offs, 0x00000000);
-		space.write_dword(0x20000000+0x1c+0x20+spr_offs, 0x00000000);
+		mspace.write_dword(0x20000000+0x04+0x20+spr_offs, 0x00000000);
+		mspace.write_dword(0x20000000+0x0c+0x20+spr_offs, 0x00000000);
+		mspace.write_dword(0x20000000+0x14+0x20+spr_offs, 0x00000000);
+		mspace.write_dword(0x20000000+0x1c+0x20+spr_offs, 0x00000000);
 	}
 }
 

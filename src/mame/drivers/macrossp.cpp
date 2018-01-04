@@ -295,7 +295,7 @@ Notes:
 
 READ32_MEMBER(macrossp_state::macrossp_soundstatus_r)
 {
-	//  logerror("%08x read soundstatus\n", space.device().safe_pc());
+	//  logerror("%08x read soundstatus\n", m_maincpu->pc());
 
 	/* bit 1 is sound status */
 	/* bit 0 unknown - it is expected to toggle, vblank? */
@@ -309,7 +309,7 @@ WRITE32_MEMBER(macrossp_state::macrossp_soundcmd_w)
 {
 	if (ACCESSING_BITS_16_31)
 	{
-		//logerror("%08x write soundcmd %08x (%08x)\n",space.device().safe_pc(),data,mem_mask);
+		//logerror("%08x write soundcmd %08x (%08x)\n",m_maincpu->pc(),data,mem_mask);
 		m_soundlatch->write(space, 0, data >> 16, 0xffff);
 		m_sndpending = 1;
 		m_audiocpu->set_input_line(2, HOLD_LINE);
@@ -320,7 +320,7 @@ WRITE32_MEMBER(macrossp_state::macrossp_soundcmd_w)
 
 READ16_MEMBER(macrossp_state::macrossp_soundcmd_r)
 {
-	//  logerror("%06x read soundcmd\n",space.device().safe_pc());
+	//  logerror("%06x read soundcmd\n",m_audiocpu->pc());
 	m_sndpending = 0;
 	return m_soundlatch->read(space, offset, mem_mask);
 }

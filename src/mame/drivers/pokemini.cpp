@@ -524,7 +524,7 @@ WRITE8_MEMBER(pokemini_state::hwreg_w)
 	static const int timer_to_cycles_fast[8] = { 2, 8, 32, 64, 128, 256, 1024, 4096 };
 	static const int timer_to_cycles_slow[8] = { 128, 256, 512, 1024, 2048, 4096, 8192, 16384 };
 
-	//logerror( "%0X: Write to hardware address: %02X, %02X\n", space.device() .safe_pc( ), offset, data );
+	//logerror( "%0X: Write to hardware address: %02X, %02X\n", m_maincpu->pc(), offset, data );
 
 	switch( offset )
 	{

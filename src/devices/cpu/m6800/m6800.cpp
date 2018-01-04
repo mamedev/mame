@@ -390,7 +390,7 @@ void m6800_cpu_device::WM16(uint32_t Addr, PAIR *p )
 /* IRQ enter */
 void m6800_cpu_device::enter_interrupt(const char *message,uint16_t irq_vector)
 {
-	LOG((message, tag()));
+	LOG((message));
 	if( m_wai_state & (M6800_WAI|M6800_SLP) )
 	{
 		if( m_wai_state & M6800_WAI )

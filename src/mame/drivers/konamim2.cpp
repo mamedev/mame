@@ -387,7 +387,7 @@ READ64_MEMBER(konamim2_state::unk3_r)
 READ64_MEMBER(konamim2_state::unk4_r)
 {
 	uint64_t r = 0;
-//  logerror("unk4_r: %08X, %08X%08X at %08X\n", offset, (uint32_t)(mem_mask>>32), (uint32_t)(mem_mask), space.device().safe_pc());
+//  logerror("unk4_r: %08X, %08X%08X %s\n", offset, (uint32_t)(mem_mask>>32), (uint32_t)(mem_mask), machine().describe_context());
 
 	if (ACCESSING_BITS_32_63)
 	{
@@ -403,14 +403,13 @@ READ64_MEMBER(konamim2_state::unk4_r)
 
 WRITE64_MEMBER(konamim2_state::unk4_w)
 {
-//  logerror("unk4_w: %08X%08X, %08X, %08X%08X at %08X\n", (uint32_t)(data >> 32), (uint32_t)(data),
-//      offset, (uint32_t)(mem_mask>>32), (uint32_t)(mem_mask), space.device().safe_pc());
+//  logerror("unk4_w: %08X%08X, %08X, %08X%08X %s\n", (uint32_t)(data >> 32), (uint32_t)(data),
+//      offset, (uint32_t)(mem_mask>>32), (uint32_t)(mem_mask), machine().describe_context());
 
 	if (ACCESSING_BITS_0_31)
 	{
 		if (data & 0x800000)
 		{
-//          osd_printf_debug("CPU '%s': CPU1 IRQ at %08X\n", device().tag(), space.device().safe_pc());
 			m_subcpu->set_input_line(PPC_IRQ, ASSERT_LINE);
 		}
 
@@ -929,7 +928,6 @@ READ64_MEMBER(konamim2_state::cde_r)
 
 		default:
 		{
-//                      osd_printf_debug("cde_r: %08X at %08X\n", reg*4, space.device().safe_pc());
 			break;
 		}
 	}
@@ -963,8 +961,6 @@ WRITE64_MEMBER(konamim2_state::cde_w)
 	{
 		case 0x028/4:       // Command write
 		{
-			//printf("cde_w: %08X, %08X at %08X\n", d, reg*4, space.device().safe_pc());
-
 			if (d == 0x0180)
 			{
 				if (m_cde_response)
@@ -1091,7 +1087,6 @@ WRITE64_MEMBER(konamim2_state::cde_w)
 
 		default:
 		{
-//                      osd_printf_debug("cde_w: %08X, %08X at %08X\n", d, reg*4, space.device().safe_pc());
 			break;
 		}
 	}

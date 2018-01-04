@@ -109,7 +109,7 @@ WRITE16_MEMBER(playmark_state::hotmind_coin_eeprom_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-//      if (data & 0x80) logerror("PC$%06x Writing unknown bits %02x to the Coin/EEPROM port\n", space.device().safe_pcbase(), data);
+//      if (data & 0x80) logerror("PC$%06x Writing unknown bits %02x to the Coin/EEPROM port\n", m_maincpu->pcbase(), data);
 
 		if (data) {
 			if ((m_dispenser_latch & 0x80) == 0) m_dispenser_latch = 0;
@@ -137,7 +137,7 @@ WRITE16_MEMBER(playmark_state::luckboomh_dispenser_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-//      if (data & 0x87) logerror("PC$%06x Writing unknown bits %02x to the Coin/EEPROM port\n", space.device().safe_pcbase(), data);
+//      if (data & 0x87) logerror("PC$%06x Writing unknown bits %02x to the Coin/EEPROM port\n", m_maincpu->pcbase(), data);
 
 		if (data) {
 			if ((m_dispenser_latch & 0x80) == 0) m_dispenser_latch = 0;
@@ -167,7 +167,7 @@ WRITE16_MEMBER(playmark_state::playmark_snd_command_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-//      logerror("PC$%06x 68K Writing sound command %02x to OKI\n",space.device().safe_pcbase(), data);
+//      logerror("PC$%06x 68K Writing sound command %02x to OKI\n",m_maincpu->pcbase(), data);
 
 		m_snd_command = (data & 0xff);
 		m_snd_flag = 1;
@@ -182,12 +182,12 @@ READ8_MEMBER(playmark_state::playmark_snd_command_r)
 	if ((m_oki_control & 0x38) == 0x30)
 	{
 		data = m_snd_command;
-//      logerror("PC$%03x PortB reading %02x from the 68K\n", space.device().safe_pcbase(), data);
+//      logerror("PC$%03x PortB reading %02x from the 68K\n", m_maincpu->pcbase(), data);
 	}
 	else if ((m_oki_control & 0x38) == 0x28)
 	{
 		data = (m_oki->read(space, 0) & 0x0f);
-//      logerror("PC$%03x PortB reading %02x from the OKI status port\n", space.device().safe_pcbase(), data);
+//      logerror("PC$%03x PortB reading %02x from the OKI status port\n", m_maincpu->pcbase(), data);
 	}
 
 	return data;
@@ -237,7 +237,7 @@ WRITE8_MEMBER(playmark_state::playmark_snd_control_w)
 
 	if ((data & 0x38) == 0x18)
 	{
-//      logerror("PC$%03x Writing %02x to OKI1, PortC=%02x, Code=%02x\n",space.device().safe_pcbase(),m_oki_command,m_oki_control,m_snd_command);
+//      logerror("PC$%03x Writing %02x to OKI1, PortC=%02x, Code=%02x\n",m_maincpu->pcbase(),m_oki_command,m_oki_control,m_snd_command);
 		m_oki->write(space, 0, m_oki_command);
 	}
 }
@@ -253,7 +253,7 @@ WRITE8_MEMBER(playmark_state::hrdtimes_snd_control_w)
 
 	if ((data & 0x38) == 0x18)
 	{
-//      logerror("PC$%03x Writing %02x to OKI1, PortC=%02x, Code=%02x\n",space.device().safe_pcbase(),m_oki_command,m_oki_control,m_snd_command);
+//      logerror("PC$%03x Writing %02x to OKI1, PortC=%02x, Code=%02x\n",m_maincpu->pcbase(),m_oki_command,m_oki_control,m_snd_command);
 		m_oki->write(space, 0, m_oki_command);
 	}
 }

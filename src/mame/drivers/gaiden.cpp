@@ -178,7 +178,7 @@ WRITE16_MEMBER(gaiden_state::wildfang_protection_w)
 
 		data >>= 8;
 
-//      logerror("PC %06x: prot = %02x\n",space.device().safe_pc(),data);
+//      logerror("PC %06x: prot = %02x\n",m_maincpu->pc(),data);
 
 		switch (data & 0xf0)
 		{
@@ -216,7 +216,7 @@ WRITE16_MEMBER(gaiden_state::wildfang_protection_w)
 
 READ16_MEMBER(gaiden_state::wildfang_protection_r)
 {
-//  logerror("PC %06x: read prot %02x\n", space.device().safe_pc(), m_prot);
+//  logerror("PC %06x: read prot %02x\n", m_maincpu->pc(), m_prot);
 	return m_prot;
 }
 
@@ -333,7 +333,7 @@ WRITE16_MEMBER(gaiden_state::raiga_protection_w)
 	{
 		data >>= 8;
 
-//      logerror("PC %06x: prot = %02x\n", space.device().safe_pc(), data);
+//      logerror("PC %06x: prot = %02x\n", m_maincpu->pc(), data);
 
 		switch (data & 0xf0)
 		{
@@ -379,7 +379,7 @@ WRITE16_MEMBER(gaiden_state::raiga_protection_w)
 
 READ16_MEMBER(gaiden_state::raiga_protection_r)
 {
-//  logerror("PC %06x: read prot %02x\n", space.device().safe_pc(), m_prot);
+//  logerror("PC %06x: read prot %02x\n", m_maincpu->pc(), m_prot);
 	return m_prot;
 }
 

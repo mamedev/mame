@@ -1602,7 +1602,7 @@ READ16_MEMBER(namcos22_state::namcos22_keycus_r)
 	// where certain enemies will emerge.
 	// It works in combination with keycus_w, but not yet understood how.
 
-//  printf("Hit keycus offs %x mask %x PC=%x\n", offset, mem_mask, space.device().safe_pc());
+//  printf("Hit keycus offs %x mask %x PC=%x\n", offset, mem_mask, m_maincpu->pc());
 
 	// protection (not used for all games)
 	// note: some games will XOR this register against a magic value, but that doesn't mean

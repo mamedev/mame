@@ -48,7 +48,7 @@ WRITE16_MEMBER(gradius3_state::k052109_halfword_w)
 	/* is this a bug in the game or something else? */
 	if (!ACCESSING_BITS_0_7)
 		m_k052109->write(space, offset, (data >> 8) & 0xff);
-//      logerror("%06x half %04x = %04x\n",space.device().safe_pc(),offset,data);
+//      logerror("%s half %04x = %04x\n",machine().describe_context(),offset,data);
 }
 
 READ16_MEMBER(gradius3_state::k051937_halfword_r)
@@ -93,7 +93,7 @@ WRITE16_MEMBER(gradius3_state::cpuA_ctrl_w)
 		m_irqAen = data & 0x20;
 
 		/* other bits unknown */
-	//logerror("%06x: write %04x to c0000\n",space.device().safe_pc(),data);
+	//logerror("%s: write %04x to c0000\n",machine().describe_context(),data);
 	}
 }
 

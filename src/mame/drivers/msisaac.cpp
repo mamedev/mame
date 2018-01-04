@@ -169,7 +169,7 @@ WRITE8_MEMBER(msisaac_state::msisaac_mcu_w)
 	m_bmcu->buggychl_mcu_w(offset,data);
 #else
 	//if(data != 0x0a && data != 0x42 && data != 0x02)
-	//  popmessage("PC = %04x %02x", space.device().safe_pc(), data);
+	//  popmessage("PC = %04x %02x", m_maincpu->pc(), data);
 	m_mcu_val = data;
 #endif
 }

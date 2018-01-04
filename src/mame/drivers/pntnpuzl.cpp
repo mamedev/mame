@@ -214,7 +214,7 @@ WRITE16_MEMBER(pntnpuzl_state::pntnpuzl_200000_w)
 
 WRITE16_MEMBER(pntnpuzl_state::pntnpuzl_280018_w)
 {
-// logerror("%04x: 280018: %04x\n",space.device().safe_pc(),data);
+// logerror("%04x: 280018: %04x\n",m_maincpu->pc(),data);
 	m_serial >>= 1;
 	if (data & 0x2000)
 		m_serial |= 0x400;

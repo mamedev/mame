@@ -237,7 +237,7 @@ READ32_MEMBER(midvunit_state::tms32031_control_r)
 		/* timer is clocked at 100ns */
 		int which = (offset >> 4) & 1;
 		int32_t result = (m_timer[which]->time_elapsed() * m_timer_rate).as_double();
-//      logerror("%06X:tms32031_control_r(%02X) = %08X\n", space.device().safe_pc(), offset, result);
+//      logerror("%06X:tms32031_control_r(%02X) = %08X\n", m_maincpu->pc(), offset, result);
 		return result;
 	}
 
@@ -261,7 +261,7 @@ WRITE32_MEMBER(midvunit_state::tms32031_control_w)
 	else if (offset == 0x20 || offset == 0x30)
 	{
 		int which = (offset >> 4) & 1;
-//  logerror("%06X:tms32031_control_w(%02X) = %08X\n", space.device().safe_pc(), offset, data);
+//  logerror("%06X:tms32031_control_w(%02X) = %08X\n", m_maincpu->pc(), offset, data);
 		if (data & 0x40)
 			m_timer[which]->reset();
 

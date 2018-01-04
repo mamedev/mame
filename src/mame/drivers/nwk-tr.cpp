@@ -465,7 +465,7 @@ READ32_MEMBER(nwktr_state::lanc1_r)
 
 		default:
 		{
-			//printf("lanc1_r: %08X, %08X at %08X\n", offset, mem_mask, space.device().safe_pc());
+			//printf("lanc1_r: %08X, %08X at %08X\n", offset, mem_mask, m_maincpu->pc());
 			return 0xffffffff;
 		}
 	}
@@ -473,7 +473,7 @@ READ32_MEMBER(nwktr_state::lanc1_r)
 
 WRITE32_MEMBER(nwktr_state::lanc1_w)
 {
-	//printf("lanc1_w: %08X, %08X, %08X at %08X\n", data, offset, mem_mask, space.device().safe_pc());
+	//printf("lanc1_w: %08X, %08X, %08X at %08X\n", data, offset, mem_mask, m_maincpu->pc());
 }
 
 READ32_MEMBER(nwktr_state::lanc2_r)
@@ -501,7 +501,7 @@ READ32_MEMBER(nwktr_state::lanc2_r)
 		}
 	}
 
-	//printf("lanc2_r: %08X, %08X at %08X\n", offset, mem_mask, space.device().safe_pc());
+	//printf("lanc2_r: %08X, %08X at %08X\n", offset, mem_mask, m_maincpu->pc());
 
 	return r;
 }
@@ -526,7 +526,7 @@ WRITE32_MEMBER(nwktr_state::lanc2_w)
 			m_fpga_uploaded = 1;
 			m_lanc2_reg[0] = (uint8_t)(data >> 24);
 
-			//printf("lanc2_fpga_w: %02X at %08X\n", value, space.device().safe_pc());
+			//printf("lanc2_fpga_w: %02X at %08X\n", value, m_maincpu->pc());
 		}
 		else if (ACCESSING_BITS_8_15)
 		{
@@ -550,7 +550,7 @@ WRITE32_MEMBER(nwktr_state::lanc2_w)
 		}
 		else
 		{
-			//printf("lanc2_w: %08X, %08X, %08X at %08X\n", data, offset, mem_mask, space.device().safe_pc());
+			//printf("lanc2_w: %08X, %08X, %08X at %08X\n", data, offset, mem_mask, m_maincpu->pc());
 		}
 	}
 	if (offset == 4)
@@ -580,7 +580,7 @@ WRITE32_MEMBER(nwktr_state::lanc2_w)
 		}
 	}
 
-	//printf("lanc2_w: %08X, %08X, %08X at %08X\n", data, offset, mem_mask, space.device().safe_pc());
+	//printf("lanc2_w: %08X, %08X, %08X at %08X\n", data, offset, mem_mask, m_maincpu->pc());
 }
 
 /*****************************************************************************/

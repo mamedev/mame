@@ -311,7 +311,7 @@ WRITE16_MEMBER(m92_state::m92_soundlatch_w)
 
 READ16_MEMBER(m92_state::m92_sound_status_r)
 {
-//logerror("%06x: read sound status\n",space.device().safe_pc());
+//logerror("%06x: read sound status\n",m_maincpu->pc());
 	m_upd71059c->ir3_w(0);
 	return m_sound_status;
 }

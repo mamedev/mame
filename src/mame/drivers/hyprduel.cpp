@@ -296,7 +296,7 @@ WRITE16_MEMBER(hyprduel_state::blitter_w)
 		int shift = (dst_offs & 0x80) ? 0 : 8;
 		uint16_t mask = (dst_offs & 0x80) ? 0x00ff : 0xff00;
 
-//      logerror("CPU #0 PC %06X : Blitter regs %08X, %08X, %08X\n", space.device().safe_pc(), tmap, src_offs, dst_offs);
+//      logerror("CPU #0 PC %06X : Blitter regs %08X, %08X, %08X\n", m_maincpu->pc(), tmap, src_offs, dst_offs);
 
 		dst_offs >>= 7 + 1;
 		switch (tmap)
@@ -316,7 +316,7 @@ WRITE16_MEMBER(hyprduel_state::blitter_w)
 
 			src_offs %= src_len;
 			b1 = blt_read(src, src_offs);
-//          logerror("CPU #0 PC %06X : Blitter opcode %02X at %06X\n", space.device().safe_pc(), b1, src_offs);
+//          logerror("CPU #0 PC %06X : Blitter opcode %02X at %06X\n", m_maincpu->pc(), b1, src_offs);
 			src_offs++;
 
 			count = ((~b1) & 0x3f) + 1;

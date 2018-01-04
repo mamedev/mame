@@ -580,7 +580,7 @@ READ16_MEMBER(namcos10_state::sprot_r)
 READ16_MEMBER(namcos10_state::i2c_clock_r)
 {
 	uint16_t res = i2c_dev_clock & i2c_host_clock & 1;
-	//  logerror("i2c_clock_r %d (%x)\n", res, space.device().safe_pc());
+	//  logerror("i2c_clock_r %d (%x)\n", res, m_maincpu->pc());
 	return res;
 }
 
@@ -588,14 +588,14 @@ READ16_MEMBER(namcos10_state::i2c_clock_r)
 WRITE16_MEMBER(namcos10_state::i2c_clock_w)
 {
 	COMBINE_DATA(&i2c_host_clock);
-	//  logerror("i2c_clock_w %d (%x)\n", data, space.device().safe_pc());
+	//  logerror("i2c_clock_w %d (%x)\n", data, m_maincpu->pc());
 	i2c_update();
 }
 
 READ16_MEMBER(namcos10_state::i2c_data_r)
 {
 	uint16_t res = i2c_dev_data & i2c_host_data & 1;
-	//  logerror("i2c_data_r %d (%x)\n", res, space.device().safe_pc());
+	//  logerror("i2c_data_r %d (%x)\n", res, m_maincpu->pc());
 	return res;
 }
 
@@ -603,7 +603,7 @@ READ16_MEMBER(namcos10_state::i2c_data_r)
 WRITE16_MEMBER(namcos10_state::i2c_data_w)
 {
 	COMBINE_DATA(&i2c_host_data);
-	//  logerror("i2c_data_w %d (%x)\n", data, space.device().safe_pc());
+	//  logerror("i2c_data_w %d (%x)\n", data, m_maincpu->pc());
 	i2c_update();
 }
 

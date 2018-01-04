@@ -281,7 +281,7 @@ WRITE16_MEMBER(igs011_state::igs011_priority_w)
 {
 	COMBINE_DATA(&m_priority);
 
-//  logerror("%06x: priority = %02x\n", space.device().safe_pc(), m_priority);
+//  logerror("%06x: priority = %02x\n", m_maincpu->pc(), m_priority);
 
 	if (data & ~0x7)
 		logerror("%06x: warning, unknown bits written to priority = %02x\n", m_maincpu->pc(), m_priority);

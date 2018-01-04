@@ -179,7 +179,7 @@ IRQ_CALLBACK_MEMBER(metro_state::metro_irq_callback)
 
 WRITE16_MEMBER(metro_state::metro_irq_cause_w)
 {
-	//if (data & ~0x15) logerror("CPU #0 PC %06X : unknown bits of irqcause written: %04X\n", space.device().safe_pc(), data);
+	//if (data & ~0x15) logerror("CPU #0 PC %06X : unknown bits of irqcause written: %04X\n", m_maincpu->pc(), data);
 
 	if (ACCESSING_BITS_0_7)
 	{

@@ -386,7 +386,7 @@ WRITE8_MEMBER(monzagp_state::port_w)
 
 WRITE8_MEMBER(monzagp_state::port1_w)
 {
-//  printf("P1 %x = %x\n",space.device().safe_pc(),data);
+//  printf("P1 %x = %x\n",m_maincpu->pc(),data);
 	m_p1 = data;
 }
 
@@ -397,7 +397,7 @@ READ8_MEMBER(monzagp_state::port2_r)
 
 WRITE8_MEMBER(monzagp_state::port2_w)
 {
-//  printf("P2 %x = %x\n",space.device().safe_pc(),data);
+//  printf("P2 %x = %x\n",m_maincpu->pc(),data);
 	m_p2 = data;
 }
 

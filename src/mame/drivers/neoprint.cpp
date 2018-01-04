@@ -185,8 +185,8 @@ READ8_MEMBER(neoprint_state::neoprint_unk_r)
 
 	m_vblank = (m_screen->frame_number() & 0x1) ? 0x10 : 0x00;
 
-	//if(space.device().safe_pc() != 0x1504 && space.device().safe_pc() != 0x5f86 && space.device().safe_pc() != 0x5f90)
-	//  printf("%08x\n",space.device().safe_pc());
+	//if(m_maincpu->pc() != 0x1504 && m_maincpu->pc() != 0x5f86 &&s pace.device().safe_pc() != 0x5f90)
+	//  printf("%08x\n",m_maincpu->pc());
 
 	return m_vblank| 4 | 3;
 }
@@ -216,7 +216,7 @@ WRITE8_MEMBER(neoprint_state::audio_command_w)
 	/* boost the interleave to let the audio CPU read the command */
 	machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(50));
 
-	//if (LOG_CPU_COMM) logerror("MAIN CPU PC %06x: audio_command_w %04x - %04x\n", space.device().safe_pc(), data, mem_mask);
+	//if (LOG_CPU_COMM) logerror("MAIN CPU PC %06x: audio_command_w %04x - %04x\n", m_maincpu->pc(), data, mem_mask);
 }
 
 
@@ -224,7 +224,7 @@ READ8_MEMBER(neoprint_state::audio_command_r)
 {
 	uint8_t ret = m_soundlatch->read(space, 0);
 
-	//if (LOG_CPU_COMM) logerror(" AUD CPU PC   %04x: audio_command_r %02x\n", space.device().safe_pc(), ret);
+	//if (LOG_CPU_COMM) logerror(" AUD CPU PC   %04x: audio_command_r %02x\n", m_audiocpu->pc(), ret);
 
 	/* this is a guess */
 	audio_cpu_clear_nmi_w(space, 0, 0);
@@ -236,7 +236,7 @@ READ8_MEMBER(neoprint_state::audio_command_r)
 
 WRITE8_MEMBER(neoprint_state::audio_result_w)
 {
-	//if (LOG_CPU_COMM && (m_audio_result != data)) logerror(" AUD CPU PC   %04x: audio_result_w %02x\n", space.device().safe_pc(), data);
+	//if (LOG_CPU_COMM && (m_audio_result != data)) logerror(" AUD CPU PC   %04x: audio_result_w %02x\n", m_audiocpu->pc(), data);
 
 	m_audio_result = data;
 }

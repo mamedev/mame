@@ -391,7 +391,7 @@ WRITE_LINE_MEMBER(gaelco3d_state::fp_analog_clock_w)
 
 READ32_MEMBER(gaelco3d_state::tms_m68k_ram_r)
 {
-//  logerror("%06X:tms_m68k_ram_r(%04X) = %08X\n", space.device().safe_pc(), offset, !(offset & 1) ? ((int32_t)m_m68k_ram_base[offset/2] >> 16) : (int)(int16_t)m_m68k_ram_base[offset/2]);
+//  logerror("%s:tms_m68k_ram_r(%04X) = %08X\n", machine().describe_context(), offset, !(offset & 1) ? ((int32_t)m_m68k_ram_base[offset/2] >> 16) : (int)(int16_t)m_m68k_ram_base[offset/2]);
 	return (int32_t)(int16_t)m_m68k_ram_base[offset ^ m_tms_offset_xor];
 }
 

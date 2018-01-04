@@ -2661,7 +2661,7 @@ READ8_MEMBER(rainbow_state::diagnostic_r) // 8088 (port 0A READ). Fig.4-29 + tab
 
 WRITE8_MEMBER(rainbow_state::diagnostic_w) // 8088 (port 0A WRITTEN). Fig.4-28 + table 4-15
 {
-	//    printf("%02x to diag port (PC=%x)\n", data, space.device().safe_pc());
+	//    printf("%02x to diag port (PC=%x)\n", data, m_i8088->pc());
 
 	// ZRESET from 8088 to Z80 - - HIGH at powerup!
 	if (!(data & 1))
@@ -2705,7 +2705,7 @@ WRITE8_MEMBER(rainbow_state::diagnostic_w) // 8088 (port 0A WRITTEN). Fig.4-28 +
 			{   printf("\nALARM: GRAPHICS OPTION * SWITCHED OFF * VIA DIP. TEXT OUTPUT STILL ENABLED!\n");
 				m_ONBOARD_GRAPHICS_SELECTED = true;
 			}
-			printf("DATA: %x (PC=%x)\n", data, machine().device("maincpu")->safe_pc());
+			printf("DATA: %x (PC=%x)\n", data, m_i8088->pc());
 	}
 
 	// BIT 3: PARITY (1 enables parity test on memory board. Usually 64K per bank). -> ext_ram_w.

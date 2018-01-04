@@ -242,7 +242,7 @@ WRITE8_MEMBER(nmk16_state::ssmissin_soundbank_w)
 
 WRITE16_MEMBER(nmk16_state::tharrier_mcu_control_w)
 {
-//  logerror("%04x: mcu_control_w %02x\n",space.device().safe_pc(),data);
+//  logerror("%04x: mcu_control_w %02x\n",m_maincpu->pc(),data);
 }
 
 READ16_MEMBER(nmk16_state::tharrier_mcu_r)
@@ -5117,7 +5117,7 @@ WRITE8_MEMBER(nmk16_state::twinactn_oki_bank_w)
 	if (data & (~3))
 		logerror("%s: invalid oki bank %02x\n", machine().describe_context(), data);
 
-//  logerror("%04x: oki bank %02x\n", space.device().safe_pc(), data);
+//  logerror("%04x: oki bank %02x\n", m_audiocpu->pc(), data);
 }
 
 static ADDRESS_MAP_START( twinactn_sound_cpu, AS_PROGRAM, 8, nmk16_state )

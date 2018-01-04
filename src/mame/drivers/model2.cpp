@@ -237,10 +237,10 @@ uint32_t model2_state::copro_fifoout_pop(address_space &space,uint32_t offset, u
 	if (m_copro_fifoout_num == 0)
 	{
 		/* Reading from empty FIFO causes the i960 to enter wait state */
-		downcast<i960_cpu_device &>(space.device()).i960_stall();
+		m_maincpu->i960_stall();
 
 		/* spin the main cpu and let the TGP catch up */
-		space.device().execute().spin_until_time(attotime::from_usec(100));
+		m_maincpu->spin_until_time(attotime::from_usec(100));
 
 		return 0;
 	}
@@ -872,7 +872,7 @@ WRITE32_MEMBER(model2_state::copro_fifo_w)
 //      if(m_coprocnt == 0)
 //          return;
 
-		//osd_printf_debug("copro_fifo_w: %08X, %08X, %08X at %08X\n", data, offset, mem_mask, space.device().safe_pc());
+		//osd_printf_debug("copro_fifo_w: %08X, %08X, %08X at %08X\n", data, offset, mem_mask, m_maincpu->pc());
 		if (m_dsp_type == DSP_TYPE_SHARC)
 			copro_fifoin_push(machine().device("dsp"), data,offset,mem_mask);
 		else if (m_dsp_type == DSP_TYPE_TGP)
@@ -882,14 +882,14 @@ WRITE32_MEMBER(model2_state::copro_fifo_w)
 			if (m_tgpx4->is_fifoin_full())
 			{
 				/* Writing to full FIFO causes the i960 to enter wait state */
-				downcast<i960_cpu_device &>(*m_maincpu).i960_stall();
+				m_maincpu->i960_stall();
 				/* spin the main cpu and let the TGP catch up */
 				m_maincpu->spin_until_time(attotime::from_usec(100));
 				printf("write stalled\n");
 			}
 			else
 			{
-//              printf("push %08X at %08X\n", data, space.device().safe_pc());
+//              printf("push %08X at %08X\n", data, m_maincpu->pc());
 				m_tgpx4->fifoin_w(data);
 			}
 		}
@@ -959,79 +959,6 @@ WRITE32_MEMBER(model2_state::geo_ctl1_w)
 
 	m_geoctl = data;
 }
-
-
-#ifdef UNUSED_FUNCTION
-WRITE32_MEMBER(model2_state::geo_sharc_ctl1_w)
-{
-	// did hi bit change?
-	if ((data ^ m_geoctl) == 0x80000000)
-	{
-		if (data & 0x80000000)
-		{
-			logerror("Start geo upload\n");
-			m_geocnt = 0;
-		}
-		else
-		{
-			logerror("Boot geo, %d dwords\n", m_geocnt);
-			m_dsp2->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
-			//space.device().execute().spin_until_time(attotime::from_usec(1000));       // Give the SHARC enough time to boot itself
-		}
-	}
-
-	m_geoctl = data;
-}
-
-READ32_MEMBER(model2_state::geo_sharc_fifo_r)
-{
-	if ((strcmp(machine().system().name, "manxtt" ) == 0) || (strcmp(machine().system().name, "srallyc" ) == 0))
-	{
-		return 8;
-	}
-	else
-	{
-		//logerror("copro_fifo_r: %08X, %08X\n", offset, mem_mask);
-		return 0;
-	}
-}
-
-WRITE32_MEMBER(model2_state::geo_sharc_fifo_w)
-{
-	if (m_geoctl & 0x80000000)
-	{
-		machine().device<adsp21062_device>("dsp2")->external_dma_write(m_geocnt, data & 0xffff);
-
-		m_geocnt++;
-	}
-	else
-	{
-		//osd_printf_debug("copro_fifo_w: %08X, %08X, %08X at %08X\n", data, offset, mem_mask, space.device().safe_pc());
-	}
-}
-
-WRITE32_MEMBER(model2_state::geo_sharc_iop_w)
-{
-	if ((strcmp(machine().system().name, "schamp" ) == 0))
-	{
-		machine().device<adsp21062_device>("dsp2")->external_iop_write(offset, data);
-	}
-	else
-	{
-		if ((m_geo_iop_write_num & 1) == 0)
-		{
-			m_geo_iop_data = data & 0xffff;
-		}
-		else
-		{
-			m_geo_iop_data |= (data & 0xffff) << 16;
-			machine().device<adsp21062_device>("dsp2")->external_iop_write(offset, m_geo_iop_data);
-		}
-		m_geo_iop_write_num++;
-	}
-}
-#endif
-
 
 void model2_state::push_geo_data(uint32_t data)
 {
@@ -2143,7 +2070,6 @@ READ32_MEMBER(model2_state::copro_sharc_input_fifo_r)
 {
 	uint32_t result = 0;
 	bool type;
-	//osd_printf_debug("SHARC FIFOIN pop at %08X\n", space.device().safe_pc());
 
 	type = copro_fifoin_pop(machine().device("dsp"), &result,offset,mem_mask);
 	if(type == false)
@@ -2164,7 +2090,6 @@ READ32_MEMBER(model2_state::copro_sharc_buffer_r)
 
 WRITE32_MEMBER(model2_state::copro_sharc_buffer_w)
 {
-	//osd_printf_debug("sharc_buffer_w: %08X at %08X, %08X, %f\n", offset, space.device().safe_pc(), data, *(float*)&data);
 	m_bufferram[offset & 0x7fff] = data;
 }
 

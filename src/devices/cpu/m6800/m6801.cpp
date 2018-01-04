@@ -104,10 +104,10 @@ enum
 };
 
 /* take interrupt */
-#define TAKE_ICI enter_interrupt("M6800 '%s' take ICI\n",0xfff6)
-#define TAKE_OCI enter_interrupt("M6800 '%s' take OCI\n",0xfff4)
-#define TAKE_TOI enter_interrupt("M6800 '%s' take TOI\n",0xfff2)
-#define TAKE_SCI enter_interrupt("M6800 '%s' take SCI\n",0xfff0)
+#define TAKE_ICI enter_interrupt("take ICI\n",0xfff6)
+#define TAKE_OCI enter_interrupt("take OCI\n",0xfff4)
+#define TAKE_TOI enter_interrupt("take TOI\n",0xfff2)
+#define TAKE_SCI enter_interrupt("take SCI\n",0xfff0)
 
 /* mnemonicos for the Timer Control and Status Register bits */
 #define TCSR_OLVL 0x01
@@ -320,7 +320,7 @@ void m6801_cpu_device::m6800_check_irq2()
 				((m_trcsr & (M6801_TRCSR_RIE|M6801_TRCSR_ORFE)) == (M6801_TRCSR_RIE|M6801_TRCSR_ORFE)) ||
 				((m_trcsr & (M6801_TRCSR_TIE|M6801_TRCSR_TDRE)) == (M6801_TRCSR_TIE|M6801_TRCSR_TDRE)))
 	{
-		//logerror("M6800 '%s' SCI interrupt\n", tag());
+		//logerror("SCI interrupt\n");
 		TAKE_SCI;
 	}
 }
@@ -430,7 +430,7 @@ int m6801_cpu_device::m6800_rx()
 
 void m6801_cpu_device::serial_transmit()
 {
-	//logerror("M6800 '%s' Tx Tick\n", tag());
+	//logerror("Tx Tick\n");
 
 	if (m_trcsr & M6801_TRCSR_TE)
 	{
@@ -474,7 +474,7 @@ void m6801_cpu_device::serial_transmit()
 
 					m_txbits++;
 
-					//logerror("M6800 '%s' Transmit START Data %02x\n", tag(), m_tsr);
+					//logerror("Transmit START Data %02x\n", m_tsr);
 				}
 				break;
 
@@ -486,7 +486,7 @@ void m6801_cpu_device::serial_transmit()
 
 				m_txbits = M6801_SERIAL_START;
 
-				//logerror("M6800 '%s' Transmit STOP\n", tag());
+				//logerror("Transmit STOP\n");
 				break;
 
 			default:
@@ -496,7 +496,7 @@ void m6801_cpu_device::serial_transmit()
 				// shift transmit register
 				m_tsr >>= 1;
 
-				//logerror("M6800 '%s' Transmit Bit %u: %u\n", tag(), m_txbits, m_tx);
+				//logerror("Transmit Bit %u: %u\n", m_txbits, m_tx);
 
 				m_txbits++;
 				break;
@@ -512,7 +512,7 @@ void m6801_cpu_device::serial_transmit()
 
 void m6801_cpu_device::serial_receive()
 {
-	//logerror("M6800 '%s' Rx Tick TRCSR %02x bits %u check %02x\n", tag(), m_trcsr, m_rxbits, m_trcsr & M6801_TRCSR_RE);
+	//logerror("Rx Tick TRCSR %02x bits %u check %02x\n", m_trcsr, m_rxbits, m_trcsr & M6801_TRCSR_RE);
 
 	if (m_trcsr & M6801_TRCSR_RE)
 	{
@@ -523,11 +523,11 @@ void m6801_cpu_device::serial_receive()
 			{
 				m_rxbits++;
 
-				//logerror("M6800 '%s' Received WAKE UP bit %u\n", tag(), m_rxbits);
+				//logerror("Received WAKE UP bit %u\n", m_rxbits);
 
 				if (m_rxbits == 10)
 				{
-					//logerror("M6800 '%s' Receiver Wake Up\n", tag());
+					//logerror("Receiver Wake Up\n");
 
 					m_trcsr &= ~M6801_TRCSR_WU;
 					m_rxbits = M6801_SERIAL_START;
@@ -535,7 +535,7 @@ void m6801_cpu_device::serial_receive()
 			}
 			else
 			{
-				//logerror("M6800 '%s' Receiver Wake Up interrupted\n", tag());
+				//logerror("Receiver Wake Up interrupted\n");
 
 				m_rxbits = M6801_SERIAL_START;
 			}
@@ -551,21 +551,21 @@ void m6801_cpu_device::serial_receive()
 					// start bit found
 					m_rxbits++;
 
-					//logerror("M6800 '%s' Received START bit\n", tag());
+					//logerror("Received START bit\n");
 				}
 				break;
 
 			case M6801_SERIAL_STOP:
 				if (m6800_rx() == 1)
 				{
-					//logerror("M6800 '%s' Received STOP bit\n", tag());
+					//logerror("Received STOP bit\n");
 
 					if (m_trcsr & M6801_TRCSR_RDRF)
 					{
 						// overrun error
 						m_trcsr |= M6801_TRCSR_ORFE;
 
-						//logerror("M6800 '%s' Receive Overrun Error\n", tag());
+						//logerror("Receive Overrun Error\n");
 
 						CHECK_IRQ_LINES();
 					}
@@ -576,7 +576,7 @@ void m6801_cpu_device::serial_receive()
 							// transfer data into receive register
 							m_rdr = m_rsr;
 
-							//logerror("M6800 '%s' Receive Data Register: %02x\n", tag(), m_rdr);
+							//logerror("Receive Data Register: %02x\n", m_rdr);
 
 							// set RDRF flag
 							m_trcsr |= M6801_TRCSR_RDRF;
@@ -597,7 +597,7 @@ void m6801_cpu_device::serial_receive()
 					m_trcsr |= M6801_TRCSR_ORFE;
 					m_trcsr &= ~M6801_TRCSR_RDRF;
 
-					//logerror("M6800 '%s' Receive Framing Error\n", tag());
+					//logerror("Receive Framing Error\n");
 
 					CHECK_IRQ_LINES();
 				}
@@ -612,7 +612,7 @@ void m6801_cpu_device::serial_receive()
 				// receive bit into register
 				m_rsr |= (m6800_rx() << 7);
 
-				//logerror("M6800 '%s' Received DATA bit %u: %u\n", tag(), m_rxbits, BIT(m_rsr, 7));
+				//logerror("Received DATA bit %u: %u\n", m_rxbits, BIT(m_rsr, 7));
 
 				m_rxbits++;
 				break;
@@ -640,7 +640,7 @@ void m6801_cpu_device::execute_set_input(int irqline, int state)
 				// latch input data to port 3
 				m_port3_data = (m_io->read_byte(M6801_PORT3) & (m_port3_ddr ^ 0xff)) | (m_port3_data & m_port3_ddr);
 				m_port3_latched = 1;
-				//logerror("M6801 '%s' Latched Port 3 Data: %02x\n", tag(), m_port3_data);
+				//logerror("M6801 '%s' Latched Port 3 Data: %02x\n", m_port3_data);
 
 				// set IS3 flag bit
 				m_p3csr |= M6801_P3CSR_IS3_FLAG;
@@ -803,7 +803,7 @@ void m6801_cpu_device::write_port2()
 
 void m6801_cpu_device::set_os3(int state)
 {
-	//logerror("M6801 '%s' OS3: %u\n", tag(), state);
+	//logerror("M6801 '%s' OS3: %u\n", state);
 
 	m_out_sc2_func(state);
 }
@@ -839,7 +839,7 @@ READ8_MEMBER( m6801_cpu_device::m6801_io_r )
 		break;
 
 	case IO_P3DDR:
-		logerror("M6801 '%s' Port 3 DDR is a write-only register\n", tag());
+		logerror("M6801 '%s' Port 3 DDR is a write-only register\n");
 		break;
 
 	case IO_P4DDR:
@@ -851,7 +851,7 @@ READ8_MEMBER( m6801_cpu_device::m6801_io_r )
 		{
 			if (m_p3csr_is3_flag_read)
 			{
-				//logerror("M6801 '%s' Cleared IS3\n", tag());
+				//logerror("M6801 '%s' Cleared IS3\n");
 				m_p3csr &= ~M6801_P3CSR_IS3_FLAG;
 				m_p3csr_is3_flag_read = 0;
 			}
@@ -976,14 +976,14 @@ READ8_MEMBER( m6801_cpu_device::m6801_io_r )
 		{
 			if (m_trcsr_read_orfe)
 			{
-				//logerror("M6801 '%s' Cleared ORFE\n", tag());
+				//logerror("M6801 '%s' Cleared ORFE\n");
 				m_trcsr_read_orfe = 0;
 				m_trcsr &= ~M6801_TRCSR_ORFE;
 			}
 
 			if (m_trcsr_read_rdrf)
 			{
-				//logerror("M6801 '%s' Cleared RDRF\n", tag());
+				//logerror("M6801 '%s' Cleared RDRF\n");
 				m_trcsr_read_rdrf = 0;
 				m_trcsr &= ~M6801_TRCSR_RDRF;
 			}
@@ -1023,7 +1023,7 @@ WRITE8_MEMBER( m6801_cpu_device::m6801_io_w )
 	switch (offset)
 	{
 	case IO_P1DDR:
-		//logerror("M6801 '%s' Port 1 Data Direction Register: %02x\n", tag(), data);
+		//logerror("M6801 '%s' Port 1 Data Direction Register: %02x\n", data);
 
 		if (m_port1_ddr != data)
 		{
@@ -1036,7 +1036,7 @@ WRITE8_MEMBER( m6801_cpu_device::m6801_io_w )
 		break;
 
 	case IO_P2DDR:
-		//logerror("M6801 '%s' Port 2 Data Direction Register: %02x\n", tag(), data);
+		//logerror("M6801 '%s' Port 2 Data Direction Register: %02x\n", data);
 
 		if (m_port2_ddr != data)
 		{
@@ -1046,7 +1046,7 @@ WRITE8_MEMBER( m6801_cpu_device::m6801_io_w )
 		break;
 
 	case IO_P1DATA:
-		//logerror("M6801 '%s' Port 1 Data Register: %02x\n", tag(), data);
+		//logerror("M6801 '%s' Port 1 Data Register: %02x\n", data);
 
 		m_port1_data = data;
 		if(m_port1_ddr == 0xff)
@@ -1056,7 +1056,7 @@ WRITE8_MEMBER( m6801_cpu_device::m6801_io_w )
 		break;
 
 	case IO_P2DATA:
-		//logerror("M6801 '%s' Port 2 Data Register: %02x\n", tag(), data);
+		//logerror("M6801 '%s' Port 2 Data Register: %02x\n", data);
 
 		m_port2_data = data;
 		m_port2_written = 1;
@@ -1064,7 +1064,7 @@ WRITE8_MEMBER( m6801_cpu_device::m6801_io_w )
 		break;
 
 	case IO_P3DDR:
-		//logerror("M6801 '%s' Port 3 Data Direction Register: %02x\n", tag(), data);
+		//logerror("M6801 '%s' Port 3 Data Direction Register: %02x\n", data);
 
 		if (m_port3_ddr != data)
 		{
@@ -1077,7 +1077,7 @@ WRITE8_MEMBER( m6801_cpu_device::m6801_io_w )
 		break;
 
 	case IO_P4DDR:
-		//logerror("M6801 '%s' Port 4 Data Direction Register: %02x\n", tag(), data);
+		//logerror("M6801 '%s' Port 4 Data Direction Register: %02x\n", data);
 
 		if (m_port4_ddr != data)
 		{
@@ -1090,11 +1090,11 @@ WRITE8_MEMBER( m6801_cpu_device::m6801_io_w )
 		break;
 
 	case IO_P3DATA:
-		//logerror("M6801 '%s' Port 3 Data Register: %02x\n", tag(), data);
+		//logerror("M6801 '%s' Port 3 Data Register: %02x\n", data);
 
 		if (m_p3csr_is3_flag_read)
 		{
-			//logerror("M6801 '%s' Cleared IS3\n", tag());
+			//logerror("M6801 '%s' Cleared IS3\n");
 			m_p3csr &= ~M6801_P3CSR_IS3_FLAG;
 			m_p3csr_is3_flag_read = 0;
 		}
@@ -1117,7 +1117,7 @@ WRITE8_MEMBER( m6801_cpu_device::m6801_io_w )
 		break;
 
 	case IO_P4DATA:
-		//logerror("M6801 '%s' Port 4 Data Register: %02x\n", tag(), data);
+		//logerror("M6801 '%s' Port 4 Data Register: %02x\n", data);
 
 		m_port4_data = data;
 		if(m_port4_ddr == 0xff)
@@ -1127,7 +1127,7 @@ WRITE8_MEMBER( m6801_cpu_device::m6801_io_w )
 		break;
 
 	case IO_TCSR:
-		//logerror("M6801 '%s' Timer Control and Status Register: %02x\n", tag(), data);
+		//logerror("M6801 '%s' Timer Control and Status Register: %02x\n", data);
 
 		m_tcsr = data;
 		m_pending_tcsr &= m_tcsr;
@@ -1137,7 +1137,7 @@ WRITE8_MEMBER( m6801_cpu_device::m6801_io_w )
 		break;
 
 	case IO_CH:
-		//logerror("M6801 '%s' Counter High Register: %02x\n", tag(), data);
+		//logerror("M6801 '%s' Counter High Register: %02x\n", data);
 
 		m_latch09 = data & 0xff;    /* 6301 only */
 		CT  = 0xfff8;
@@ -1146,7 +1146,7 @@ WRITE8_MEMBER( m6801_cpu_device::m6801_io_w )
 		break;
 
 	case IO_CL: /* 6301 only */
-		//logerror("M6801 '%s' Counter Low Register: %02x\n", tag(), data);
+		//logerror("M6801 '%s' Counter Low Register: %02x\n", data);
 
 		CT = (m_latch09 << 8) | (data & 0xff);
 		TOH = CTH;
@@ -1154,7 +1154,7 @@ WRITE8_MEMBER( m6801_cpu_device::m6801_io_w )
 		break;
 
 	case IO_OCRH:
-		//logerror("M6801 '%s' Output Compare High Register: %02x\n", tag(), data);
+		//logerror("M6801 '%s' Output Compare High Register: %02x\n", data);
 
 		if( m_output_compare.b.h != data)
 		{
@@ -1164,7 +1164,7 @@ WRITE8_MEMBER( m6801_cpu_device::m6801_io_w )
 		break;
 
 	case IO_OCRL:
-		//logerror("M6801 '%s' Output Compare Low Register: %02x\n", tag(), data);
+		//logerror("M6801 '%s' Output Compare Low Register: %02x\n", data);
 
 		if( m_output_compare.b.l != data)
 		{
@@ -1180,19 +1180,19 @@ WRITE8_MEMBER( m6801_cpu_device::m6801_io_w )
 		break;
 
 	case IO_P3CSR:
-		//logerror("M6801 '%s' Port 3 Control and Status Register: %02x\n", tag(), data);
+		//logerror("M6801 '%s' Port 3 Control and Status Register: %02x\n", data);
 
 		m_p3csr = data;
 		break;
 
 	case IO_RMCR:
-		//logerror("M6801 '%s' Rate and Mode Control Register: %02x\n", tag(), data);
+		//logerror("M6801 '%s' Rate and Mode Control Register: %02x\n", data);
 
 		set_rmcr(data);
 		break;
 
 	case IO_TRCSR:
-		//logerror("M6801 '%s' Transmit/Receive Control and Status Register: %02x\n", tag(), data);
+		//logerror("M6801 '%s' Transmit/Receive Control and Status Register: %02x\n", data);
 
 		if ((data & M6801_TRCSR_TE) && !(m_trcsr & M6801_TRCSR_TE))
 		{
@@ -1210,7 +1210,7 @@ WRITE8_MEMBER( m6801_cpu_device::m6801_io_w )
 		break;
 
 	case IO_TDR:
-		//logerror("M6800 '%s' Transmit Data Register: %02x\n", tag(), data);
+		//logerror("Transmit Data Register: %02x\n", data);
 
 		if (m_trcsr_read_tdre)
 		{
@@ -1221,7 +1221,7 @@ WRITE8_MEMBER( m6801_cpu_device::m6801_io_w )
 		break;
 
 	case IO_RCR:
-		//logerror("M6801 '%s' RAM Control Register: %02x\n", tag(), data);
+		//logerror("M6801 '%s' RAM Control Register: %02x\n", data);
 
 		m_ram_ctrl = data;
 		break;
@@ -1281,5 +1281,5 @@ util::disasm_interface *hd63701_cpu_device::create_disassembler()
 
 void hd63701_cpu_device::TAKE_TRAP()
 {
-	enter_interrupt("M6800 '%s' take TRAP\n",0xffee);
+	enter_interrupt("take TRAP\n",0xffee);
 }

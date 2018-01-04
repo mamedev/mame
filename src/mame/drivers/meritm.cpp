@@ -398,7 +398,7 @@ void meritm_state::meritm_switch_banks(  )
 WRITE8_MEMBER(meritm_state::meritm_psd_a15_w)
 {
 	m_psd_a15 = data;
-	//logerror( "Writing PSD_A15 with %02x at PC=%04X\n", data, space.device().safe_pc() );
+	//logerror( "Writing PSD_A15 with %02x at PC=%04X\n", data, m_maincpu->pc() );
 	meritm_switch_banks();
 }
 

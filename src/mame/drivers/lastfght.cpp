@@ -203,7 +203,7 @@ WRITE16_MEMBER(lastfght_state::hi_w)
 	if (ACCESSING_BITS_0_7)
 	{
 		m_hi = data << 8;
-		//logerror("%06x: hi  = %02x\n", space.device().safe_pc(), data);
+		//logerror("%06x: hi  = %02x\n", m_maincpu->pc(), data);
 	}
 }
 
@@ -215,7 +215,7 @@ WRITE16_MEMBER(lastfght_state::x_w)
 	if (ACCESSING_BITS_0_7)
 	{
 		m_x = m_hi | data;
-		//logerror("%06x: x   = %02x\n", space.device().safe_pc(),data);
+		//logerror("%06x: x   = %02x\n", m_maincpu->pc(),data);
 	}
 }
 
@@ -225,12 +225,12 @@ WRITE16_MEMBER(lastfght_state::yw_w)
 	if (ACCESSING_BITS_8_15)
 	{
 		m_y = m_hi | (data >> 8);
-		//logerror("%06x: y   = %02x\n", space.device().safe_pc(), data >> 8);
+		//logerror("%06x: y   = %02x\n", m_maincpu->pc(), data >> 8);
 	}
 	if (ACCESSING_BITS_0_7)
 	{
 		m_w = m_hi | data;
-		//logerror("%06x: w   = %02x\n", space.device().safe_pc(), data);
+		//logerror("%06x: w   = %02x\n", m_maincpu->pc(), data);
 	}
 }
 
@@ -240,7 +240,7 @@ WRITE16_MEMBER(lastfght_state::h_w)
 	if (ACCESSING_BITS_8_15)
 	{
 		m_h = m_hi | (data >> 8);
-		//logerror("%06x: h   = %02x\n", space.device().safe_pc(), data >> 8);
+		//logerror("%06x: h   = %02x\n", m_maincpu->pc(), data >> 8);
 	}
 	if (ACCESSING_BITS_0_7)
 		logerror("%06x: 80000d.b = %02x\n", m_maincpu->pc(), data);
@@ -252,12 +252,12 @@ WRITE16_MEMBER(lastfght_state::sx_w)
 	if (ACCESSING_BITS_8_15)
 	{
 		m_dsx = m_hi | (data >> 8);
-		//logerror("%06x: dsx = %02x\n", space.device().safe_pc(), data >> 8);
+		//logerror("%06x: dsx = %02x\n", m_maincpu->pc(), data >> 8);
 	}
 	if (ACCESSING_BITS_0_7)
 	{
 		m_sx = m_hi | data;
-		//logerror("%06x: sx  = %02x\n", space.device().safe_pc(), data);
+		//logerror("%06x: sx  = %02x\n", m_maincpu->pc(), data);
 	}
 }
 
@@ -267,12 +267,12 @@ WRITE16_MEMBER(lastfght_state::sy_w)
 	if (ACCESSING_BITS_8_15)
 	{
 		m_sy = m_hi | (data >> 8);
-		//logerror("%06x: sy  = %02x\n", space.device().safe_pc(), data >> 8);
+		//logerror("%06x: sy  = %02x\n", m_maincpu->pc(), data >> 8);
 	}
 	if (ACCESSING_BITS_0_7)
 	{
 		m_sy1 = m_hi | data;
-		//logerror("%06x: sy1 = %02x\n", space.device().safe_pc(), data);
+		//logerror("%06x: sy1 = %02x\n", m_maincpu->pc(), data);
 	}
 }
 
@@ -282,12 +282,12 @@ WRITE16_MEMBER(lastfght_state::sr_w)
 	if (ACCESSING_BITS_8_15)
 	{
 		m_sp = (m_hi >> 8) >> 4;
-		//logerror("%06x: sp  = %02x\n", space.device().safe_pc(), data >> 8);
+		//logerror("%06x: sp  = %02x\n", m_maincpu->pc(), data >> 8);
 	}
 	if (ACCESSING_BITS_0_7)
 	{
 		m_sr = data;
-		//logerror("%06x: sr  = %02x\n", space.device().safe_pc(), data);
+		//logerror("%06x: sr  = %02x\n", m_maincpu->pc(), data);
 	}
 }
 
@@ -297,12 +297,12 @@ WRITE16_MEMBER(lastfght_state::sd_w)
 	if (ACCESSING_BITS_8_15)
 	{
 		m_sx1 = m_hi | (data >> 8);
-		//logerror("%06x: sx1 = %02x\n", space.device().safe_pc(), data >> 8);
+		//logerror("%06x: sx1 = %02x\n", m_maincpu->pc(), data >> 8);
 	}
 	if (ACCESSING_BITS_0_7)
 	{
 		m_dsy = m_hi | data;
-		//logerror("%06x: dsy = %02x\n", space.device().safe_pc(), data);
+		//logerror("%06x: dsy = %02x\n", m_maincpu->pc(), data);
 	}
 }
 

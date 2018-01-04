@@ -114,7 +114,7 @@ WRITE16_MEMBER(pirates_state::out_w)
 		/* bit 7 used (function unknown) */
 	}
 
-//  logerror("%06x: out_w %04x\n",space.device().safe_pc(),data);
+//  logerror("%06x: out_w %04x\n",m_maincpu->pc(),data);
 }
 
 CUSTOM_INPUT_MEMBER(pirates_state::prot_r)

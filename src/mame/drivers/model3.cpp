@@ -1517,7 +1517,7 @@ WRITE64_MEMBER(model3_state::model3_ctrl_w)
 						}
 						break;
 					default:
-						//osd_printf_debug("Lightgun: Unknown command %02X at %08X\n", (uint32_t)(data >> 24), space.device().safe_pc());
+						//osd_printf_debug("Lightgun: Unknown command %02X %s\n", (uint32_t)(data >> 24), machine().describe_context());
 						break;
 				}
 			}
@@ -1544,7 +1544,7 @@ WRITE64_MEMBER(model3_state::model3_ctrl_w)
 
 READ64_MEMBER(model3_state::model3_sys_r)
 {
-//  printf("model3_sys_r: mask %llx @ %x (PC %x)\n", mem_mask, offset, space.device().safe_pc());
+//  printf("model3_sys_r: mask %llx @ %x %s\n", mem_mask, offset, machine().describe_context());
 
 	switch (offset)
 	{
@@ -1569,7 +1569,7 @@ READ64_MEMBER(model3_state::model3_sys_r)
 			else logerror("m3_sys: Unk sys_r @ 0x10: mask = %x\n", (uint32_t)mem_mask);
 			break;
 		case 0x18/8:
-//          printf("read irq_state %x (PC %x)\n", m_irq_state, space.device().safe_pc());
+//          printf("read irq_state %x %s\n", m_irq_state, machine().describe_context());
 			return (uint64_t)m_irq_state<<56 | 0xff000000;
 	}
 

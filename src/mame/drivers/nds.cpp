@@ -371,7 +371,7 @@ READ32_MEMBER(nds_state::arm9_io_r)
 				double time, ticks;
 				int timer = (offset - TIMER_OFFSET);
 
-				//printf("Read timer reg %x (PC=%x)\n", timer, space.device().safe_pc());
+				//printf("Read timer reg %x (PC=%x)\n", timer, m_arm9->pc());
 
 				// update times for
 				if (m_timer_regs[timer] & 0x800000)
