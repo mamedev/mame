@@ -9,10 +9,10 @@
     Slotified and corrected by Joakim Larsson Edstrom based on
     Step/One service manuals: http://nivelleringslikaren.eu/stepone/
 
-
     TODO:
-    - Finalize the non 8255 based Keyboard interface
-    - Add more modes to the non standard video controller
+    - Fix speed of "basica demo", emulation is more than twioce as fast as real thing
+    - Add hi-res graphics mode (640x400 monochrome)
+    - Add monochrome monitor settings
     - Hook up all interrupts and 8255 Port C signals
     - Add printer support on Port A
     - Expansion Unit with 6 more ISA8 slots
@@ -52,18 +52,22 @@
 #define LOG_CRT     (1U << 4)
 #define LOG_DMA     (1U << 5)
 #define LOG_KBD     (1U << 6)
+#define LOG_VMOD    (1U << 7)
+#define LOG_PIX    (1U << 8)
 
-//#define VERBOSE (LOG_GENERAL | LOG_CRT)
+//#define VERBOSE (LOG_VMOD|LOG_PIX)
 //#define LOG_OUTPUT_STREAM std::cout
 
 #include "logmacro.h"
 
-#define LOGPPI(...) LOGMASKED(LOG_PPI, __VA_ARGS__)
-#define LOGPIT(...) LOGMASKED(LOG_PIT, __VA_ARGS__)
-#define LOGPIC(...) LOGMASKED(LOG_PIC, __VA_ARGS__)
-#define LOGCRT(...) LOGMASKED(LOG_CRT, __VA_ARGS__)
-#define LOGDMA(...) LOGMASKED(LOG_DMA, __VA_ARGS__)
-#define LOGKBD(...) LOGMASKED(LOG_KBD, __VA_ARGS__)
+#define LOGPPI(...)  LOGMASKED(LOG_PPI,  __VA_ARGS__)
+#define LOGPIT(...)  LOGMASKED(LOG_PIT,  __VA_ARGS__)
+#define LOGPIC(...)  LOGMASKED(LOG_PIC,  __VA_ARGS__)
+#define LOGCRT(...)  LOGMASKED(LOG_CRT,  __VA_ARGS__)
+#define LOGDMA(...)  LOGMASKED(LOG_DMA,  __VA_ARGS__)
+#define LOGKBD(...)  LOGMASKED(LOG_KBD,  __VA_ARGS__)
+#define LOGVMOD(...) LOGMASKED(LOG_VMOD, __VA_ARGS__)
+#define LOGPIX(...)  LOGMASKED(LOG_PIX, __VA_ARGS__)
 
 #ifdef _MSC_VER
 #define FUNCNAME __func__
@@ -96,9 +100,7 @@ public:
 		, m_speaker(*this, "speaker")
 		, m_kb(*this, "myb3k_keyboard")
 		, m_crtc(*this, "crtc")
-		  //, m_p_vram(*this, "p_vram")
 		, m_vram(*this, "vram")
-		  //, m_palette(*this, "palette")
 		, m_isabus(*this, "isa")
 	{ }
 
@@ -106,8 +108,6 @@ public:
 	void kbd_set_data_and_interrupt(u8 data);
 
 	MC6845_UPDATE_ROW(crtc_update_row);
-  //	DECLARE_WRITE8_MEMBER(myb3k_6845_address_w);
-  //	DECLARE_WRITE8_MEMBER(myb3k_6845_data_w);
 	DECLARE_WRITE8_MEMBER(myb3k_video_mode_w);
 	DECLARE_WRITE8_MEMBER(myb3k_fdc_output_w);
 	uint32_t screen_update_myb3k(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -146,9 +146,7 @@ protected:
 	required_device<speaker_sound_device>   m_speaker;
 	required_device<myb3k_keyboard_device> m_kb;
 	required_device<h46505_device> m_crtc;
-  //required_shared_ptr<uint8_t> m_p_vram;
 	required_shared_ptr<uint8_t> m_vram;
-  //required_device<palette_device> m_palette;
 	required_device<isa8_device> m_isabus;
 	int m_dma_channel;
 	bool m_cur_tc;
@@ -156,6 +154,7 @@ protected:
 	uint8_t m_kbd_second_byte;
 	uint8_t m_crtc_vreg[0x100],m_crtc_index;
 	uint8_t m_vmode;
+	rgb_t m_cpal[8];
 	uint8_t m_portc;
 	uint8_t m_dma_page[4]; // a 74670, 4 x 4 bit storage latch
 	virtual void machine_start() override;
@@ -184,134 +183,124 @@ void myb3k_state::kbd_set_data_and_interrupt(u8 data) {
 	m_pic8259->ir1_w(ASSERT_LINE);
 }
 
-#if 0
-#define mc6845_h_char_total     (m_crtc_vreg[0])
-#define mc6845_h_display        (m_crtc_vreg[1])
-#define mc6845_h_sync_pos       (m_crtc_vreg[2])
-#define mc6845_sync_width       (m_crtc_vreg[3])
-#define mc6845_v_char_total     (m_crtc_vreg[4])
-#define mc6845_v_total_adj      (m_crtc_vreg[5])
-#define mc6845_v_display        (m_crtc_vreg[6])
-#define mc6845_v_sync_pos       (m_crtc_vreg[7])
-#define mc6845_mode_ctrl        (m_crtc_vreg[8])
-#define mc6845_tile_height      (m_crtc_vreg[9]+1)
-#define mc6845_cursor_y_start   (m_crtc_vreg[0x0a])
-#define mc6845_cursor_y_end     (m_crtc_vreg[0x0b])
-#define mc6845_start_addr       (((m_crtc_vreg[0x0c]<<8) & 0x3f00) | (m_crtc_vreg[0x0d] & 0xff))
-#define mc6845_cursor_addr      (((m_crtc_vreg[0x0e]<<8) & 0x3f00) | (m_crtc_vreg[0x0f] & 0xff))
-#define mc6845_light_pen_addr   (((m_crtc_vreg[0x10]<<8) & 0x3f00) | (m_crtc_vreg[0x11] & 0xff))
-#define mc6845_update_addr      (((m_crtc_vreg[0x12]<<8) & 0x3f00) | (m_crtc_vreg[0x13] & 0xff))
-#endif
-
-/*
-		      crtc_update_row() - ma:0000 ra:0 y:0 x_count:40 cursor_x:-1 de:1 hbp:64 vbp:24
-		      crtc_update_row() - ma:0000 ra:1 y:1 x_count:40 cursor_x:-1 de:1 hbp:64 vbp:24
-		      crtc_update_row() - ma:0000 ra:2 y:2 x_count:40 cursor_x:-1 de:1 hbp:64 vbp:24
-		      crtc_update_row() - ma:0000 ra:3 y:3 x_count:40 cursor_x:-1 de:1 hbp:64 vbp:24
-		      crtc_update_row() - ma:0000 ra:4 y:4 x_count:40 cursor_x:-1 de:1 hbp:64 vbp:24
-		      crtc_update_row() - ma:0000 ra:5 y:5 x_count:40 cursor_x:-1 de:1 hbp:64 vbp:24
-		      crtc_update_row() - ma:0000 ra:6 y:6 x_count:40 cursor_x:-1 de:1 hbp:64 vbp:24
-		      crtc_update_row() - ma:0000 ra:7 y:7 x_count:40 cursor_x:-1 de:1 hbp:64 vbp:24
-		      crtc_update_row() - ma:0028 ra:0 y:8 x_count:40 cursor_x:-1 de:1 hbp:64 vbp:24
-		      crtc_update_row() - ma:0028 ra:1 y:9 x_count:40 cursor_x:-1 de:1 hbp:64 vbp:24
-		      crtc_update_row() - ma:0028 ra:2 y:10 x_count:40 cursor_x:-1 de:1 hbp:64 vbp:24
-		      crtc_update_row() - ma:0028 ra:3 y:11 x_count:40 cursor_x:-1 de:1 hbp:64 vbp:24
-		      crtc_update_row() - ma:0028 ra:4 y:12 x_count:40 cursor_x:-1 de:1 hbp:64 vbp:24
-		      crtc_update_row() - ma:0028 ra:5 y:13 x_count:40 cursor_x:-1 de:1 hbp:64 vbp:24
-		      crtc_update_row() - ma:0028 ra:6 y:14 x_count:40 cursor_x:-1 de:1 hbp:64 vbp:24
-		      crtc_update_row() - ma:0028 ra:7 y:15 x_count:40 cursor_x:-1 de:1 hbp:64 vbp:24
-		      crtc_update_row() - ma:0050 ra:0 y:16 x_count:40 cursor_x:-1 de:1 hbp:64 vbp:24
-*/
-
 MC6845_UPDATE_ROW( myb3k_state::crtc_update_row )
 {
-  if (m_portc & PC2_DISPST) 
-	LOGCRT("crtc_update_row() - ma:%04x ra:%d y:%d x_count:%d cursor_x:%d de:%d hbp:%d vbp:%d\n",
-	       ma, ra, y, x_count, cursor_x, de, hbp, vbp);
-
 	for (int x_pos = 0; x_pos < x_count; x_pos++)
 	{
-		uint16_t page = (m_portc & PC1_SETPAGE) ? 0x7fff : 0;
-		uint16_t i = m_vram[ma * 0x10 + x_pos * 0x10 + ra + page + 1];
-		for (int pxl = 0; pxl < 8; pxl++)
-		  {
-//			uint16_t i = (m_vram[((ma * 8) + ra + x_pos + pxl) * 2 + page] << 8) + m_vram[((ma * 8) + ra + x_pos + pxl) * 2 + page + 1];
+		//int h_step = 64 >> (m_vmode & 3);
+		uint16_t page = (m_portc & PC1_SETPAGE) ? 0x8000 : 0;
 
-			//if (m_portc & PC2_DISPST)
-			//LOGCRT(" - Offset: %04x pixel: %04x\n",(ma + x_pos + pxl) * 2, i );
-
-//			rgb_t col = rgb_t(((i & 0xf000) >> 8), ((i & 0x0f00) >> 4), (i & 0x00ff));
-		    rgb_t col = ((i & (0x80 >> pxl)) != 0 ? rgb_t::green() : rgb_t::black());
-
-			//col ^= ((cursor_x != -1 && x_pos >= cursor_x && x_pos < (cursor_x + m_cursor_size)) ? 7 : 0);
-
-			bitmap.pix32(y, ( x_pos * 8) + pxl) = (m_portc & PC2_DISPST) ? col : rgb_t::black();
-		}
-	}
-}
-
-#if 0
-uint32_t myb3k_state::screen_update_myb3k(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
-{
-	int x, y;
-	int xi, yi;
-	int dot;
-	int h_step;
-
-	h_step = 64 >> (m_vmode & 3);
-
-	LOGCRT("%02x %d", m_vmode, h_step);
-
-	for(y = 0; y < mc6845_v_display; y++)
-	{
-		for(x = 0; x < mc6845_h_display; x++)
+		if ((m_portc & PC2_DISPST) == 0)
 		{
-			/* 8x8 grid gfxs, weird format too ... */
-			for(yi = 0; yi < mc6845_tile_height; yi++)
+			for (int pxl = 0; pxl < 8; pxl++)
 			{
-				for(xi = 0; xi < 8; xi++)
+				bitmap.pix32(y, ( x_pos * 8) + pxl) = rgb_t::black();
+			}
+		}
+		else if (m_vmode == 1)
+		{
+			uint32_t pdat;
+			pdat  = ((m_vram[(x_pos + ma) * 32 + ra + page +  0]  & 0xff) << 16); // Green 8 bits
+			pdat |= ((m_vram[(x_pos + ma) * 32 + ra + page +  8]  & 0xf0) << 8);  // Red upper 4 bits
+			pdat |= ((m_vram[(x_pos + ma) * 32 + ra + page +  8]  & 0x0f) <<  4); // Blue upper 4 bits
+			pdat |= ((m_vram[(x_pos + ma) * 32 + ra + page +  24] & 0xf0) <<  4); // Red lower 4 bits
+			pdat |= ((m_vram[(x_pos + ma) * 32 + ra + page +  24] & 0x0f) <<  0); // Blue lower 4 bits
+			if (pdat != 0)
+			  LOGPIX(" - PDAT:%06x from offset %04x RA=%d\n", pdat, (x_pos + ma) * 32 + ra + page + 0, 0);
+
+			for (int pxl = 0; pxl < 8; pxl++)
+			{
+				uint16_t pind = 0;
+				/* Pixeldata for 8 pixels are stored in pdat as GGRRBB  */
+				pind = (((pdat & (0x800000 >> pxl)) ? 0x04 : 0x00) |
+					((pdat & (0x008000 >> pxl)) ? 0x02 : 0x00) |
+					((pdat & (0x000080 >> pxl)) ? 0x01 : 0x00) );
+
+				/* Pick up the color */
+				bitmap.pix32(y, ( x_pos * 8) + pxl) = m_cpal[pind & 0x07];
+			}
+		}
+		else
+		{
+			int h_step = 64 >> (m_vmode & 3);
+			uint16_t pdat = m_vram[(x_pos + ma) * h_step + ra + page + 8];
+			for (int pxl = 0; pxl < 8; pxl++)
+			{
+				if ((pdat & (0x80 >> pxl)) != 0)
 				{
-					dot = (m_p_vram[(x + y * mc6845_h_display) * h_step + yi + 0x8000] >> (7 - xi)) & 1;
-
-					if( (yi & ~7 && (!(m_vmode & 4))) || (yi & ~0xf && (m_vmode & 4)))
-						dot = 0;
-
-					if(y * mc6845_tile_height + yi < 200 && x * 8 + xi < 320) /* TODO: safety check */
-						bitmap.pix16( y * mc6845_tile_height + yi, x * 8 + xi) = m_palette->pen(dot);
+					//bitmap.pix32(y, ( x_pos * 8) + pxl) = m_cpal[pind & 0x07];
+					bitmap.pix32(y, ( x_pos * 8) + pxl) = rgb_t::green();
 				}
 			}
 		}
+		//col ^= ((cursor_x != -1 && x_pos >= cursor_x && x_pos < (cursor_x + m_cursor_size)) ? 7 : 0);
 	}
-
-	return 0;
 }
 
-WRITE8_MEMBER( myb3k_state::myb3k_6845_address_w )
-{
-	LOGCRT("%s: %02x\n", FUNCNAME, data);
-
-	m_crtc_index = data;
-	m_crtc->address_w(space, offset, data);
-}
-
-WRITE8_MEMBER( myb3k_state::myb3k_6845_data_w )
-{
-	LOGCRT("%s: %02x\n", FUNCNAME, data);
-
-	m_crtc_vreg[m_crtc_index] = data;
-	m_crtc->register_w(space, offset, data);
-}
-#endif
+/*
+ * Setup of 6845 in different graphics modes from basica command line
+ *  screen chars per row 36/40/80, rows 20/25, mode 0/1/2/3
+ *
+ *  chars 36  40  80  80  36  40  80  36  40
+ *  rows  25  25  25  25  20  20  20  25  25
+ *  mode   1   1   2   3   0   0   0   0   0
+ *----------------------------------------------------------------------
+ *  R0    55  55  55  55  55  55  55  55  55 - Horizontal Total
+ *  R1    40  40  40  40  40  40  40  40  40 - Horizontal Displayed
+ *  R2    44  44  44  44  44  44  44  44  44 - Horizontal Sync Position
+ *  R3   132 132 132  52 132 132 132  52  52 - Sync Width
+ *  R4    31  31  31  26  24  24  24  26  26 - Vertical Total
+ *  R5     0   0   0   7   9   9   9   7   7 - Vertical Total Adjust
+ *  R6    25  25  25  25  20  20  20  25  25 - Vertical Displayed
+ *  R7    27  27  27  25  22  22  22  25  25 - Vertical Sync Position
+ *  R8     0   0   0   3   0   0   0   3   3 - Interlace & Skew
+ *  R9     7   7   7  14   9   9   9  14  14 - Maximum Raster Address
+ *  R10   96  96  96  96  96  96  96  96  96 - Cursor Start Address
+ *  R11    7   7   7  15   9   9   9  15  15 - Cursor End Address
+ *  R12    0   0   0   0   0   0   0   0   0 - Start Address (H)
+ *  R13    0   0   0   0   0   0   0   0   0 - Start Address (L)
+ * -------------------------------------------------------------------
+ *  vmode  1   1   2   6   1   1   2   5   5 - 3 bits latch at I/O 0x04
+ *  xres 320 320 640 640 320 320 640 320 320
+ *  yres 200 200 200 400 200 200 200 400 400
+ *  char  40  40  80  80  40  40  80  40  40<
+ */
 
 WRITE8_MEMBER( myb3k_state::myb3k_video_mode_w )
 {
-	LOGCRT("%s: %02x\n", FUNCNAME, data);
+	LOG("%s: %02x\n", FUNCNAME, data);
+	LOGVMOD("Video Mode %02x\n", data);
 
 	/* ---- -x-- interlace mode */
 	/* ---- --xx horizontal step count (number of offsets of vram RAM data to skip, 64 >> n) */
 
 	m_vmode = data;
-
+	switch (data & 7)
+	{
+	case 0: /* Green connector 640x200 80x25 chars 1 tone or GRB 320x200 40x20 8 tones */
+		LOGVMOD(" - 640x200 on Green or 320x200 on GRB output...\n");
+		break;
+	case 1: /* 320x200 */
+		LOGVMOD(" - 320x200, 40 char, 8 color or 8 tones of green...\n");
+		break;
+	case 2: /* 640x200 - boots up in this mode */
+		LOGVMOD(" - 640x200, 80 char, white on black...\n");
+		break;
+	case 3: /* Fail  */
+		LOGVMOD(" - bad mode...\n");
+		break;
+	case 4: /* Fail  */
+		LOGVMOD(" - bad mode...\n");
+		break;
+	case 5: LOGVMOD("320x400, 40 char, white on black\n");
+		break;
+	case 6: LOGVMOD("640x400, 80 char, white on black\n");
+		break;
+	case 7: /* Fail  */
+		LOGVMOD(" - bad mode...\n");
+		break;
+	default: logerror("Wrong Video Mode %d, contact the maintainer\n", data);
+	}
 }
 
 /**********************************************************
@@ -377,7 +366,6 @@ static ADDRESS_MAP_START(myb3k_map, AS_PROGRAM, 8, myb3k_state)
 	AM_RANGE(0x00000,0x3ffff) AM_RAM // It's either 128Kb or 256Kb RAM
 	AM_RANGE(0x40000,0x7ffff) AM_NOP
 	AM_RANGE(0x80000,0xcffff) AM_NOP // Expansion Unit connected through an ISA8 cable
-//	AM_RANGE(0xd0000,0xdffff) AM_RAM AM_SHARE("p_vram")  // Area 6, physical at 30000-3FFFF (128Kb RAM) or 10000-1FFFF (256KB RAM)
 	AM_RANGE(0xd0000,0xdffff) AM_RAM AM_SHARE("vram")  // Area 6, physical at 30000-3FFFF (128Kb RAM) or 10000-1FFFF (256KB RAM)
 	AM_RANGE(0xf0000,0xfffff) AM_ROM AM_REGION("ipl", 0) // Area 7, 8 x 8Kb
 ADDRESS_MAP_END
@@ -415,10 +403,10 @@ static INPUT_PORTS_START( myb3k )
 	PORT_START("DSW1")
 	PORT_DIPUNUSED_DIPLOC(0x01, 0x01, "SW1:1")
 	PORT_DIPUNUSED_DIPLOC(0x02, 0x02, "SW1:2")
-	PORT_DIPNAME( 0x0c, 0x08, "Display Mode") PORT_DIPLOCATION("SW1:3,4")
+	PORT_DIPNAME( 0x0c, 0x00, "Display Mode") PORT_DIPLOCATION("SW1:3,4")
 	PORT_DIPSETTING(    0x0c, "80CH 8 raster" )
-	PORT_DIPSETTING(    0x08, "80CH 16 raster" )
-	PORT_DIPSETTING(    0x04, "40CH 8 raster" )
+	PORT_DIPSETTING(    0x04, "80CH 16 raster" )
+	PORT_DIPSETTING(    0x08, "40CH 8 raster" )
 	PORT_DIPSETTING(    0x00, "36CH 10 raster" )
 	PORT_DIPNAME( 0x10, 0x10, "Expansion Unit" ) PORT_DIPLOCATION("SW1:5")
 	PORT_DIPSETTING(    0x00, "Attached" )
@@ -455,6 +443,15 @@ INPUT_PORTS_END
 void myb3k_state::machine_start()
 {
 	LOG("%s\n", FUNCNAME);
+
+	m_cpal[0] = rgb_t(  0,   0,   0); // black   0.29v
+	m_cpal[1] = rgb_t(  0,   0, 255); // blue    0.52v
+	m_cpal[2] = rgb_t(255,   0,   0); // red     0.58v
+	m_cpal[3] = rgb_t(255,   0, 255); // magenta 0.63v
+	m_cpal[4] = rgb_t(  0, 255,   0); // green   0.71v
+	m_cpal[5] = rgb_t(  0, 255, 255); // cyan    0.80v
+	m_cpal[6] = rgb_t(255, 255,   0); // yellow  0.90v
+	m_cpal[7] = rgb_t(255, 255, 255); // white   1.04v
 
 	m_kbd_data = 0;
 }
@@ -678,17 +675,12 @@ static MACHINE_CONFIG_START( myb3k )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_SIZE(640, 400)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 400-1)
-//MCFG_SCREEN_UPDATE_DRIVER(myb3k_state, screen_update_myb3k)
 	MCFG_SCREEN_UPDATE_DEVICE("crtc", h46505_device, screen_update)
-//	MCFG_SCREEN_PALETTE("palette")
-
-//MCFG_GFXDECODE_ADD("gfxdecode", "palette", myb3k)
-//MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	/* devices */
 	MCFG_MC6845_ADD("crtc", H46505, "screen", XTAL_14_31818MHz / 16) /* Main crystal divided by 16 through a 74163 4 bit counter */
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(10)
+	MCFG_MC6845_CHAR_WIDTH(8)
 	MCFG_MC6845_UPDATE_ROW_CB(myb3k_state, crtc_update_row)
 MACHINE_CONFIG_END
 
@@ -718,6 +710,6 @@ ROM_START( stepone )
 ROM_END
 
 //    YEAR  NAME     PARENT  COMPAT   MACHINE    INPUT  STATE           INIT   COMPANY        FULLNAME        FLAGS
-COMP( 1982, myb3k,   0,      0,       myb3k,     myb3k, myb3k_state,    0,     "Matsushita",  "MyBrain 3000", MACHINE_NOT_WORKING)
-COMP( 1982, jb3000,  myb3k,  0,       jb3000,    myb3k, myb3k_state,    0,     "Panasonic",   "JB-3000",      MACHINE_NOT_WORKING)
-COMP( 1984, stepone, myb3k,  0,       stepone,   myb3k, myb3k_state,    0,     "Ericsson",    "Step/One",     MACHINE_NOT_WORKING)
+COMP( 1982, myb3k,   0,      0,       myb3k,     myb3k, myb3k_state,    0,     "Matsushita",  "MyBrain 3000", 0)
+COMP( 1982, jb3000,  myb3k,  0,       jb3000,    myb3k, myb3k_state,    0,     "Panasonic",   "JB-3000",      MACHINE_NOT_WORKING) // No rom dump available
+COMP( 1984, stepone, myb3k,  0,       stepone,   myb3k, myb3k_state,    0,     "Ericsson",    "Step/One",     0)
