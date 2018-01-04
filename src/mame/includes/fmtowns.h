@@ -378,7 +378,7 @@ public:
 	void render_sprite_16(uint32_t poffset, uint16_t x, uint16_t y, bool xflip, bool yflip, bool xhalfsize, bool yhalfsize, bool rotation, const rectangle* rect);
 	void draw_sprites(const rectangle* rect);
 	void towns_crtc_draw_scan_layer_hicolour(bitmap_rgb32 &bitmap,const rectangle* rect,int layer,int line,int scanline);
-	void towns_crtc_draw_scan_layer_256(bitmap_rgb32 &bitmap,const rectangle* rect,int layer,int line,int scanline);
+	void towns_crtc_draw_scan_layer_256(bitmap_rgb32 &bitmap,const rectangle* rect,int line,int scanline);
 	void towns_crtc_draw_scan_layer_16(bitmap_rgb32 &bitmap,const rectangle* rect,int layer,int line,int scanline);
 	void towns_crtc_draw_layer(bitmap_rgb32 &bitmap,const rectangle* rect,int layer);
 	void render_text_char(uint8_t x, uint8_t y, uint8_t ascii, uint16_t jis, uint8_t attr);
