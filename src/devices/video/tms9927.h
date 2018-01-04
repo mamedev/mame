@@ -42,6 +42,8 @@ public:
 	DECLARE_WRITE8_MEMBER(write);
 	DECLARE_READ8_MEMBER(read);
 
+	DECLARE_READ_LINE_MEMBER(bl_r);
+
 	int screen_reset();
 	int upscroll_offset();
 	int cursor_bounds(rectangle &bounds);
