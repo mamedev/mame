@@ -762,7 +762,7 @@ void renderer_d3d9::update_presentation_parameters()
 
 void renderer_d3d9::update_gamma_ramp()
 {
-	if (m_gamma_supported)
+	if (!m_gamma_supported)
 	{
 		return;
 	}
