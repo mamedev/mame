@@ -765,7 +765,7 @@ WRITE8_MEMBER (pit68230_device::write)
 		if (ow_cnt > 1)
 		{
 			logerror ("\npit68230_device::write: previous identical operation performed %02x times\n", ow_cnt);
-			logerror ("pit68230_device::write: offset=%02x data=%02x %lld\n", offset, data, machine ().firstcpu->total_cycles ());
+			logerror ("pit68230_device::write: offset=%02x data=%02x %s\n", offset, data, machine().describe_context());
 		}
 		ow_cnt = 0;
 		ow_data = data;
@@ -1015,7 +1015,7 @@ READ8_MEMBER (pit68230_device::read){
 		if (or_cnt > 1)
 		{
 			logerror ("\npit68230_device::read: previous identical operation performed %02x times\n", or_cnt);
-			logerror (" - pit68230_device::read: offset=%02x data=%02x %lld\n", offset, data, machine ().firstcpu->total_cycles ());
+			logerror (" - pit68230_device::read: offset=%02x data=%02x %s\n", offset, data, machine().describe_context());
 		}
 		or_cnt = 0;
 		or_data = data;

@@ -231,6 +231,9 @@ public:
 	void unmap_rom(offs_t start, offs_t end);
 	bool is_option_rom_space_available(offs_t start, int size);
 
+	// FIXME: shouldn't need to expose this
+	address_space &memspace() const { return m_maincpu->space(AS_PROGRAM); }
+
 	DECLARE_WRITE_LINE_MEMBER( irq2_w );
 	DECLARE_WRITE_LINE_MEMBER( irq3_w );
 	DECLARE_WRITE_LINE_MEMBER( irq4_w );
