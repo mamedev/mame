@@ -52,6 +52,7 @@ static char option_auto_save[50];
 static char option_throttle[50];
 static char option_nobuffer[50];
 static char option_saves[50];
+static char option_buttons_profiles[50];
 
 static char option_res[50];
 
@@ -149,6 +150,7 @@ void retro_set_environment(retro_environment_t cb)
    sprintf(option_throttle,"%s_%s",core,"throttle");
    sprintf(option_nobuffer,"%s_%s",core,"nobuffer");
    sprintf(option_res,"%s_%s",core,"altres");
+   sprintf(option_buttons_profiles, "%s_%s", core, "buttons_profiles");
 
    static const struct retro_variable vars[] = {
     { option_read_config, "Read configuration; disabled|enabled" },
@@ -156,6 +158,7 @@ void retro_set_environment(retro_environment_t cb)
     { option_saves, "Save state naming; game|system" },
     { option_auto_save, "Auto save/load states; disabled|enabled" },
     { option_mouse, "Enable in-game mouse; disabled|enabled" },
+    { option_buttons_profiles, "Profile Buttons according to games (Restart); enabled|disabled" },
     { option_throttle, "Enable throttle; disabled|enabled" },
     { option_cheats, "Enable cheats; disabled|enabled" },
     { option_renderer, "Alternate render method; disabled|enabled" },
@@ -201,6 +204,17 @@ static void check_variables(void)
          mouse_enable = false;
       if (!strcmp(var.value, "enabled"))
          mouse_enable = true;
+   }
+
+   var.key   = option_buttons_profiles;
+   var.value = NULL;
+
+   if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value)
+   {
+      if (!strcmp(var.value, "disabled"))
+         buttons_profiles = false;
+      if (!strcmp(var.value, "enabled"))
+         buttons_profiles = true;
    }
 
    var.key   = option_throttle;
