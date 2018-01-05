@@ -1,0 +1,35 @@
+msgid "P1 Button 1"
+msgstr "P1 Left Punch"
+
+msgid "P1 Button 2"
+msgstr "P1 Right Punch"
+
+msgid "P1 Button 3"
+msgstr "P1 Button 3 (Unused)"
+
+msgid "P1 Button 4"
+msgstr "P1 Left Kick"
+
+msgid "P1 Button 5"
+msgstr "P1 Right Kick"
+
+msgid "P1 Button 6"
+msgstr "P1 Button 6 (Unused)"
+
+msgid "P2 Button 1"
+msgstr "P2 Left Punch"
+
+msgid "P2 Button 2"
+msgstr "P2 Right Punch"
+
+msgid "P2 Button 3"
+msgstr "P2 Button 3 (Unused)"
+
+msgid "P2 Button 4"
+msgstr "P2 Left Kick"
+
+msgid "P2 Button 5"
+msgstr "P2 Right Kick"
+
+msgid "P2 Button 6"
+msgstr "P2 Button 6 (Unused)"
