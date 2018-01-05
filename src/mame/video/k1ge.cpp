@@ -53,10 +53,10 @@ READ8_MEMBER( k1ge_device::read )
 	switch( offset )
 	{
 	case 0x008:     /* RAS.H */
-		data = m_screen->hpos() >> 2;
+		data = screen().hpos() >> 2;
 		break;
 	case 0x009:     /* RAS.V */
-		data = m_screen->vpos();
+		data = screen().vpos();
 		break;
 	}
 	return data;
@@ -737,7 +737,7 @@ TIMER_CALLBACK_MEMBER( k1ge_device::hblank_on_timer_callback )
 
 TIMER_CALLBACK_MEMBER( k1ge_device::timer_callback )
 {
-	int y = m_screen->vpos();
+	int y = screen().vpos();
 
 	/* Check for start of VBlank */
 	if ( y >= 152 )
@@ -772,7 +772,7 @@ TIMER_CALLBACK_MEMBER( k1ge_device::timer_callback )
 			{
 				m_hblank_pin_w(1);
 			}
-			m_hblank_on_timer->adjust( m_screen->time_until_pos(y, 480 ) );
+			m_hblank_on_timer->adjust( screen().time_until_pos(y, 480 ) );
 		}
 	}
 
@@ -782,7 +782,7 @@ TIMER_CALLBACK_MEMBER( k1ge_device::timer_callback )
 		draw( y - 1 );
 	}
 
-	m_timer->adjust( m_screen->time_until_pos(( y + 1 ) % K1GE_SCREEN_HEIGHT, 0 ) );
+	m_timer->adjust( screen().time_until_pos(( y + 1 ) % K1GE_SCREEN_HEIGHT, 0 ) );
 }
 
 
@@ -804,7 +804,7 @@ void k1ge_device::device_start()
 	m_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(k1ge_device::timer_callback), this));
 	m_hblank_on_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(k1ge_device::hblank_on_timer_callback), this));
 	m_vram = make_unique_clear<uint8_t[]>(0x4000);
-	m_bitmap = std::make_unique<bitmap_ind16>(m_screen->width(), m_screen->height() );
+	m_bitmap = std::make_unique<bitmap_ind16>(screen().width(), screen().height() );
 
 	save_pointer(NAME(m_vram.get()), 0x4000);
 	save_item(NAME(m_wba_h));
@@ -858,7 +858,7 @@ void k1ge_device::device_reset()
 	m_vram[0x7e0] = 0x52;   /* RESET */
 	m_vram[0x7e2] = 0x00;   /* MODE */
 
-	m_timer->adjust( m_screen->time_until_pos(( m_screen->vpos() + 1 ) % K1GE_SCREEN_HEIGHT, 0 ) );
+	m_timer->adjust( screen().time_until_pos(( screen().vpos() + 1 ) % K1GE_SCREEN_HEIGHT, 0 ) );
 }
 
 

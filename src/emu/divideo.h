@@ -47,12 +47,14 @@ public:
 
 	// getters
 	screen_device &screen() const { return *m_screen; }
+	bool has_screen() const { return m_screen != nullptr; }
 
 protected:
 	// optional operation overrides
 	virtual void interface_validity_check(validity_checker &valid) const override;
 	virtual void interface_pre_start() override;
 
+private:
 	// configuration state
 	bool            m_screen_required;          // is a screen required?
 	const char *    m_screen_tag;               // configured tag for the target screen

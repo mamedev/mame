@@ -399,12 +399,12 @@ void sknsspr_device::skns_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cl
 			if (sprite_flip&2)
 			{
 				xflip ^= 1;
-				sx = m_screen->visible_area().max_x+1 - sx;
+				sx = screen().visible_area().max_x+1 - sx;
 			}
 			if (sprite_flip&1)
 			{
 				yflip ^= 1;
-				sy = m_screen->visible_area().max_y+1 - sy;
+				sy = screen().visible_area().max_y+1 - sy;
 			}
 
 			/* Palette linking */

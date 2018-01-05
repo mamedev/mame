@@ -1118,7 +1118,7 @@ void k053247_device::device_start()
 
 	if (VERBOSE)
 	{
-		if (m_screen->format() == BITMAP_FORMAT_RGB32)
+		if (screen().format() == BITMAP_FORMAT_RGB32)
 		{
 			if (!palette().shadows_enabled() || !palette().hilights_enabled())
 				popmessage("driver missing SHADOWS or HIGHLIGHTS flag");

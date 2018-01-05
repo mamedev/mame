@@ -216,7 +216,7 @@ READ8_MEMBER( zx8301_device::data_r )
 
 	if (m_vda)
 	{
-		m_cpu->spin_until_time(m_screen->time_until_pos(256, 0));
+		m_cpu->spin_until_time(screen().time_until_pos(256, 0));
 	}
 
 	return readbyte(offset);
@@ -233,7 +233,7 @@ WRITE8_MEMBER( zx8301_device::data_w )
 
 	if (m_vda)
 	{
-		m_cpu->spin_until_time(m_screen->time_until_pos(256, 0));
+		m_cpu->spin_until_time(screen().time_until_pos(256, 0));
 	}
 
 	writebyte(offset, data);

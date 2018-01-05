@@ -627,7 +627,7 @@ READ16_MEMBER( deco16ic_device::pf2_data_r )
 
 WRITE16_MEMBER( deco16ic_device::pf_control_w )
 {
-	m_screen->update_partial(m_screen->vpos());
+	screen().update_partial(screen().vpos());
 
 	COMBINE_DATA(&m_pf12_control[offset]);
 }

@@ -177,7 +177,7 @@ inline void cdp1869_device::update_prd_changed_timer()
 	int start = SCANLINE_PREDISPLAY_START_PAL;
 	int end = SCANLINE_PREDISPLAY_END_PAL;
 	int next_state;
-	int scanline = m_screen->vpos();
+	int scanline = screen().vpos();
 	int next_scanline;
 
 	if (is_ntsc())
@@ -207,7 +207,7 @@ inline void cdp1869_device::update_prd_changed_timer()
 		next_state = CLEAR_LINE;
 	}
 
-	attotime duration = m_screen->time_until_pos(next_scanline);
+	attotime duration = screen().time_until_pos(next_scanline);
 	m_prd_timer->adjust(duration, next_state);
 }
 

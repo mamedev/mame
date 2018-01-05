@@ -348,7 +348,7 @@ void antic_device::device_start()
 	m_gtia = machine().device<gtia_device>(m_gtia_tag);
 	assert(m_gtia);
 
-	m_bitmap = std::make_unique<bitmap_ind16>(m_screen->width(), m_screen->height());
+	m_bitmap = std::make_unique<bitmap_ind16>(screen().width(), screen().height());
 
 	m_cclk_expand = make_unique_clear<uint32_t[]>(21 * 256);
 
@@ -385,7 +385,7 @@ void antic_device::device_start()
 	LOG(("atari prio_init\n"));
 	prio_init();
 
-	for (int i = 0; i < m_screen->height(); i++)
+	for (int i = 0; i < screen().height(); i++)
 		m_video[i] = auto_alloc_clear(machine(), <VIDEO>());
 
 	/* save states */
@@ -1841,7 +1841,7 @@ void antic_device::linerefresh()
 	uint16_t *color_lookup = m_gtia->get_color_lookup();
 
 	/* increment the scanline */
-	if( ++m_scanline == m_screen->height() )
+	if( ++m_scanline == screen().height() )
 	{
 		/* and return to the top if the frame was complete */
 		m_scanline = 0;
@@ -1943,7 +1943,7 @@ void antic_device::linerefresh()
 
 
 #define ANTIC_TIME_FROM_CYCLES(cycles)  \
-(attotime)(m_screen->scan_period() * (cycles) / CYCLES_PER_LINE)
+(attotime)(screen().scan_period() * (cycles) / CYCLES_PER_LINE)
 
 void antic_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
@@ -1966,7 +1966,7 @@ void antic_device::device_timer(emu_timer &timer, device_timer_id id, int param,
 
 int antic_device::cycle()
 {
-	return m_screen->hpos() * CYCLES_PER_LINE / m_screen->width();
+	return screen().hpos() * CYCLES_PER_LINE / screen().width();
 }
 
 TIMER_CALLBACK_MEMBER( antic_device::issue_dli )
@@ -2217,7 +2217,7 @@ void antic_device::scanline_dma(int param)
 							/* produce empty scanlines until vblank start */
 							m_modelines = VBL_START + 1 - m_scanline;
 							if( m_modelines < 0 )
-								m_modelines = m_screen->height() - m_scanline;
+								m_modelines = screen().height() - m_scanline;
 							LOG(("           JVB $%04x\n", m_dpage|m_doffs));
 						}
 						else
@@ -2370,7 +2370,7 @@ void antic_device::generic_interrupt(int button_count)
 		m_gtia->button_interrupt(button_count, m_djoy_b.read_safe(0));
 
 		/* do nothing new for the rest of the frame */
-		m_modelines = m_screen->height() - VBL_START;
+		m_modelines = screen().height() - VBL_START;
 		m_render1 = 0;
 		m_render2 = 0;
 		m_render3 = 0;

@@ -78,7 +78,7 @@ nubus_spec8s3_device::nubus_spec8s3_device(const machine_config &mconfig, device
 	m_assembled_tag(util::string_format("%s:%s", tag, SPEC8S3_SCREEN_NAME)),
 	m_vbl_pending(false), m_parameter(0)
 {
-	m_screen_tag = m_assembled_tag.c_str();
+	static_set_screen(*this, m_assembled_tag.c_str());
 }
 
 //-------------------------------------------------
@@ -104,7 +104,7 @@ void nubus_spec8s3_device::device_start()
 	m_nubus->install_device(slotspace+0xd0000, slotspace+0xfffff, read32_delegate(FUNC(nubus_spec8s3_device::spec8s3_r), this), write32_delegate(FUNC(nubus_spec8s3_device::spec8s3_w), this));
 
 	m_timer = timer_alloc(0, nullptr);
-	m_timer->adjust(m_screen->time_until_pos(767, 0), 0);
+	m_timer->adjust(screen().time_until_pos(767, 0), 0);
 }
 
 //-------------------------------------------------
@@ -135,7 +135,7 @@ void nubus_spec8s3_device::device_timer(emu_timer &timer, device_timer_id tid, i
 		m_vbl_pending = true;
 	}
 
-	m_timer->adjust(m_screen->time_until_pos(767, 0), 0);
+	m_timer->adjust(screen().time_until_pos(767, 0), 0);
 }
 
 /***************************************************************************

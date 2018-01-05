@@ -1025,7 +1025,7 @@ WRITE32_MEMBER( powervr2_device::startrender_w )
 				//if(sanitycount>2000)
 				//  break;
 			}
-//          printf("ISP START %d %d\n",sanitycount,m_screen->vpos());
+//          printf("ISP START %d %d\n",sanitycount,screen().vpos());
 			/* Fire ISP irq after a set amount of time TODO: timing of this */
 			endofrender_timer_isp->adjust(state->m_maincpu->cycles_to_attotime(sanitycount*25 + 500000));   // hacky end of render delay for Capcom games, otherwise they works at ~1/10 speed
 			break;
@@ -1208,8 +1208,8 @@ WRITE32_MEMBER( powervr2_device::spg_vblank_int_w )
 //  vbin_timer->adjust(attotime::never);
 //  vbout_timer->adjust(attotime::never);
 
-//  vbin_timer->adjust(m_screen->time_until_pos(spg_vblank_int & 0x3ff));
-//  vbout_timer->adjust(m_screen->time_until_pos((spg_vblank_int >> 16) & 0x3ff));
+//  vbin_timer->adjust(screen().time_until_pos(spg_vblank_int & 0x3ff));
+//  vbout_timer->adjust(screen().time_until_pos((spg_vblank_int >> 16) & 0x3ff));
 }
 
 READ32_MEMBER( powervr2_device::spg_control_r )
@@ -1327,22 +1327,22 @@ WRITE32_MEMBER( powervr2_device::pal_ram_ctrl_w )
 
 READ32_MEMBER( powervr2_device::spg_status_r )
 {
-	uint32_t fieldnum = (m_screen->frame_number() & 1) ? 1 : 0;
+	uint32_t fieldnum = (screen().frame_number() & 1) ? 1 : 0;
 	int32_t spg_hbstart = spg_hblank & 0x3ff;
 	int32_t spg_hbend = (spg_hblank >> 16) & 0x3ff;
 	int32_t spg_vbstart = spg_vblank & 0x3ff;
 	int32_t spg_vbend = (spg_vblank >> 16) & 0x3ff;
 
-	uint32_t vsync = ((m_screen->vpos() >= spg_vbstart) || (m_screen->vpos() < spg_vbend)) ? 0 : 1;
-	uint32_t hsync = ((m_screen->hpos() >= spg_hbstart) || (m_screen->hpos() < spg_hbend)) ? 0 : 1;
+	uint32_t vsync = ((screen().vpos() >= spg_vbstart) || (screen().vpos() < spg_vbend)) ? 0 : 1;
+	uint32_t hsync = ((screen().hpos() >= spg_hbstart) || (screen().hpos() < spg_hbend)) ? 0 : 1;
 	/* FIXME: following is just a wild guess */
-	uint32_t blank = ((m_screen->vpos() >= spg_vbstart) || (m_screen->vpos() < spg_vbend) |
-					(m_screen->hpos() >= spg_hbstart) || (m_screen->hpos() < spg_hbend)) ? 0 : 1;
+	uint32_t blank = ((screen().vpos() >= spg_vbstart) || (screen().vpos() < spg_vbend) |
+					(screen().hpos() >= spg_hbstart) || (screen().hpos() < spg_hbend)) ? 0 : 1;
 	if(vo_control & 4) { blank^=1; }
 	if(vo_control & 2) { vsync^=1; }
 	if(vo_control & 1) { hsync^=1; }
 
-	return (vsync << 13) | (hsync << 12) | (blank << 11) | (fieldnum << 10) | (m_screen->vpos() & 0x3ff);
+	return (vsync << 13) | (hsync << 12) | (blank << 11) | (fieldnum << 10) | (screen().vpos() & 0x3ff);
 }
 
 
@@ -1570,7 +1570,7 @@ void powervr2_device::update_screen_format()
 
 	attoseconds_t refresh = HZ_TO_ATTOSECONDS(pclk) * spg_hsize * spg_vsize;
 
-	rectangle visarea = m_screen->visible_area();
+	rectangle visarea = screen().visible_area();
 
 	visarea.min_x = spg_hbend;
 	visarea.max_x = spg_hbstart - 1;
@@ -1587,7 +1587,7 @@ void powervr2_device::update_screen_format()
 	if(visarea.min_y > visarea.max_y)
 		visarea.min_y = visarea.max_y;
 
-	m_screen->configure(spg_hsize, spg_vsize, visarea, refresh );
+	screen().configure(spg_hsize, spg_vsize, visarea, refresh );
 }
 
 
@@ -1686,35 +1686,35 @@ WRITE32_MEMBER( powervr2_device::sb_pdapro_w )
 
 TIMER_CALLBACK_MEMBER(powervr2_device::transfer_opaque_list_irq)
 {
-//  printf("OPLST %d\n",m_screen->vpos());
+//  printf("OPLST %d\n",screen().vpos());
 
 	irq_cb(EOXFER_OPLST_IRQ);
 }
 
 TIMER_CALLBACK_MEMBER(powervr2_device::transfer_opaque_modifier_volume_list_irq)
 {
-//  printf("OPMV %d\n",m_screen->vpos());
+//  printf("OPMV %d\n",screen().vpos());
 
 	irq_cb(EOXFER_OPMV_IRQ);
 }
 
 TIMER_CALLBACK_MEMBER(powervr2_device::transfer_translucent_list_irq)
 {
-//  printf("TRLST %d\n",m_screen->vpos());
+//  printf("TRLST %d\n",screen().vpos());
 
 	irq_cb(EOXFER_TRLST_IRQ);
 }
 
 TIMER_CALLBACK_MEMBER(powervr2_device::transfer_translucent_modifier_volume_list_irq)
 {
-//  printf("TRMV %d\n",m_screen->vpos());
+//  printf("TRMV %d\n",screen().vpos());
 
 	irq_cb(EOXFER_TRMV_IRQ);
 }
 
 TIMER_CALLBACK_MEMBER(powervr2_device::transfer_punch_through_list_irq)
 {
-//  printf("PTLST %d\n",m_screen->vpos());
+//  printf("PTLST %d\n",screen().vpos());
 
 	irq_cb(EOXFER_PTLST_IRQ);
 }
@@ -1803,7 +1803,7 @@ void powervr2_device::process_ta_fifo()
 		#endif
 		/* Process transfer FIFO done irqs here */
 		/* FIXME: timing of these */
-		//printf("%d %d\n",tafifo_listtype,m_screen->vpos());
+		//printf("%d %d\n",tafifo_listtype,screen().vpos());
 		switch (tafifo_listtype)
 		{
 		case 0: machine().scheduler().timer_set(attotime::from_usec(100), timer_expired_delegate(FUNC(powervr2_device::transfer_opaque_list_irq), this)); break;
@@ -3364,14 +3364,14 @@ TIMER_CALLBACK_MEMBER(powervr2_device::vbin)
 	irq_cb(VBL_IN_IRQ);
 
 	//popmessage("VII %d VOI %d VI %d VO %d VS %d",spg_vblank_int & 0x3ff,(spg_vblank_int >> 16) & 0x3ff,spg_vblank & 0x3ff,(spg_vblank >> 16) & 0x3ff,(spg_load >> 16) & 0x3ff);
-//  vbin_timer->adjust(m_screen->time_until_pos(spg_vblank_int & 0x3ff));
+//  vbin_timer->adjust(screen().time_until_pos(spg_vblank_int & 0x3ff));
 }
 
 TIMER_CALLBACK_MEMBER(powervr2_device::vbout)
 {
 	irq_cb(VBL_OUT_IRQ);
 
-//  vbout_timer->adjust(m_screen->time_until_pos((spg_vblank_int >> 16) & 0x3ff));
+//  vbout_timer->adjust(screen().time_until_pos((spg_vblank_int >> 16) & 0x3ff));
 }
 
 TIMER_CALLBACK_MEMBER(powervr2_device::hbin)
@@ -3399,20 +3399,20 @@ TIMER_CALLBACK_MEMBER(powervr2_device::hbin)
 		next_y = spg_hblank_int & 0x3ff;
 	}
 
-	hbin_timer->adjust(m_screen->time_until_pos(scanline, ((spg_hblank_int >> 16) & 0x3ff)-1));
+	hbin_timer->adjust(screen().time_until_pos(scanline, ((spg_hblank_int >> 16) & 0x3ff)-1));
 }
 
 
 
 TIMER_CALLBACK_MEMBER(powervr2_device::endofrender_video)
 {
-	printf("VIDEO END %d\n",m_screen->vpos());
+	printf("VIDEO END %d\n",screen().vpos());
 //  endofrender_timer_video->adjust(attotime::never);
 }
 
 TIMER_CALLBACK_MEMBER(powervr2_device::endofrender_tsp)
 {
-	printf("TSP END %d\n",m_screen->vpos());
+	printf("TSP END %d\n",screen().vpos());
 
 //  endofrender_timer_tsp->adjust(attotime::never);
 //  endofrender_timer_video->adjust(attotime::from_usec(500) );
@@ -3424,7 +3424,7 @@ TIMER_CALLBACK_MEMBER(powervr2_device::endofrender_isp)
 	irq_cb(EOR_TSP_IRQ); // TSP end of render
 	irq_cb(EOR_VIDEO_IRQ); // VIDEO end of render
 
-//  printf("ISP END %d\n",m_screen->vpos());
+//  printf("ISP END %d\n",screen().vpos());
 
 	endofrender_timer_isp->adjust(attotime::never);
 //  endofrender_timer_tsp->adjust(attotime::from_usec(500) );
@@ -3773,9 +3773,9 @@ void powervr2_device::device_reset()
 	renderselect= -1;
 	grabsel=0;
 
-//  vbout_timer->adjust(m_screen->time_until_pos((spg_vblank_int >> 16) & 0x3ff));
-//  vbin_timer->adjust(m_screen->time_until_pos(spg_vblank_int & 0x3ff));
-	hbin_timer->adjust(m_screen->time_until_pos(0, ((spg_hblank_int >> 16) & 0x3ff)-1));
+//  vbout_timer->adjust(screen().time_until_pos((spg_vblank_int >> 16) & 0x3ff));
+//  vbin_timer->adjust(screen().time_until_pos(spg_vblank_int & 0x3ff));
+	hbin_timer->adjust(screen().time_until_pos(0, ((spg_hblank_int >> 16) & 0x3ff)-1));
 
 	scanline = 0;
 	next_y = 0;

@@ -849,7 +849,7 @@ TIMER_CALLBACK_MEMBER( tms340x0_device::scanline_callback )
 	int master;
 
 	/* fetch the core timing parameters */
-	const rectangle &current_visarea = m_screen->visible_area();
+	const rectangle &current_visarea = screen().visible_area();
 	enabled = SMART_IOREG(DPYCTL) & 0x8000;
 	master = (m_is_34020 || (SMART_IOREG(DPYCTL) & 0x2000));
 	vsblnk = SMART_IOREG(VSBLNK);
@@ -857,8 +857,8 @@ TIMER_CALLBACK_MEMBER( tms340x0_device::scanline_callback )
 	vtotal = SMART_IOREG(VTOTAL);
 	if (!master)
 	{
-		vtotal = std::min(m_screen->height() - 1, vtotal);
-		vcount = m_screen->vpos();
+		vtotal = std::min(screen().height() - 1, vtotal);
+		vcount = screen().vpos();
 	}
 
 	/* update the VCOUNT */
@@ -916,13 +916,13 @@ TIMER_CALLBACK_MEMBER( tms340x0_device::scanline_callback )
 					/* because many games play with the HEBLNK/HSBLNK for effects, we don't change
 					   if they are the only thing that has changed, unless they are stable for a couple
 					   of frames */
-					int current_width  = m_screen->width();
-					int current_height = m_screen->height();
+					int current_width  = screen().width();
+					int current_height = screen().height();
 
 					if (width != current_width || height != current_height || visarea.min_y != current_visarea.min_y || visarea.max_y != current_visarea.max_y ||
 						(m_hblank_stable > 2 && (visarea.min_x != current_visarea.min_x || visarea.max_x != current_visarea.max_x)))
 					{
-						m_screen->configure(width, height, visarea, refresh);
+						screen().configure(width, height, visarea, refresh);
 					}
 					m_hblank_stable++;
 				}
@@ -939,7 +939,7 @@ TIMER_CALLBACK_MEMBER( tms340x0_device::scanline_callback )
 
 	/* force a partial update within the visible area */
 	if (vcount >= current_visarea.min_y && vcount <= current_visarea.max_y && (!m_scanline_ind16_cb.isnull() || !m_scanline_rgb32_cb.isnull()))
-		m_screen->update_partial(vcount);
+		screen().update_partial(vcount);
 
 	/* if we are in the visible area, increment DPYADR by DUDATE */
 	if (vcount >= veblnk && vcount < vsblnk)
@@ -975,7 +975,7 @@ TIMER_CALLBACK_MEMBER( tms340x0_device::scanline_callback )
 
 	/* note that we add !master (0 or 1) as a attoseconds value; this makes no practical difference */
 	/* but helps ensure that masters are updated first before slaves */
-	m_scantimer->adjust(m_screen->time_until_pos(vcount) + attotime(0, !master), vcount);
+	m_scantimer->adjust(screen().time_until_pos(vcount) + attotime(0, !master), vcount);
 }
 
 
@@ -1210,7 +1210,7 @@ WRITE16_MEMBER( tms34010_device::io_register_w )
 			break;
 	}
 
-	LOGCONTROLREGS("%s: %s = %04X (%d)\n", machine().describe_context(), ioreg_name[offset], IOREG(offset), m_screen->vpos());
+	LOGCONTROLREGS("%s: %s = %04X (%d)\n", machine().describe_context(), ioreg_name[offset], IOREG(offset), screen().vpos());
 }
 
 
@@ -1245,7 +1245,7 @@ WRITE16_MEMBER( tms34020_device::io_register_w )
 	oldreg = IOREG(offset);
 	IOREG(offset) = data;
 
-	LOGCONTROLREGS("%s: %s = %04X (%d)\n", machine().describe_context(), ioreg020_name[offset], IOREG(offset), m_screen->vpos());
+	LOGCONTROLREGS("%s: %s = %04X (%d)\n", machine().describe_context(), ioreg020_name[offset], IOREG(offset), screen().vpos());
 
 	switch (offset)
 	{
@@ -1408,9 +1408,9 @@ READ16_MEMBER( tms34010_device::io_register_r )
 	{
 		case REG_HCOUNT:
 			/* scale the horizontal position from screen width to HTOTAL */
-			result = m_screen->hpos();
+			result = screen().hpos();
 			total = IOREG(REG_HTOTAL) + 1;
-			result = result * total / m_screen->width();
+			result = result * total / screen().width();
 
 			/* offset by the HBLANK end */
 			result += IOREG(REG_HEBLNK);
@@ -1449,9 +1449,9 @@ READ16_MEMBER( tms34020_device::io_register_r )
 	{
 		case REG020_HCOUNT:
 			/* scale the horizontal position from screen width to HTOTAL */
-			result = m_screen->hpos();
+			result = screen().hpos();
 			total = IOREG(REG020_HTOTAL) + 1;
-			result = result * total / m_screen->width();
+			result = result * total / screen().width();
 
 			/* offset by the HBLANK end */
 			result += IOREG(REG020_HEBLNK);

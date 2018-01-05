@@ -48,8 +48,8 @@ public:
 
 	void refresh_scanline(bitmap_rgb32 &bitmap, uint16_t curline);
 
-	int16_t current_x() const { return m_screen->hpos() / m_htmult; }
-	int16_t current_y() const { return m_screen->vpos(); }
+	int16_t current_x() const { return screen().hpos() / m_htmult; }
+	int16_t current_y() const { return screen().vpos(); }
 	void set_latch_hv(int16_t x, int16_t y);
 
 	uint8_t read(address_space &space, uint32_t offset, uint8_t wrio_bit7);

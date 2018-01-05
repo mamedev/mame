@@ -353,8 +353,8 @@ void tms9928a_device::device_timer(emu_timer &timer, device_timer_id id, int par
 		return;
 	}
 
-	int raw_vpos = m_screen->vpos();
-	int vpos = raw_vpos * m_vertical_size / m_screen->height();
+	int raw_vpos = screen().vpos();
+	int vpos = raw_vpos * m_vertical_size / screen().height();
 	uint16_t BackColour = m_Regs[7] & 15;
 	uint32_t *p = &m_tmpbmp.pix32(vpos);
 
@@ -647,7 +647,7 @@ void tms9928a_device::device_timer(emu_timer &timer, device_timer_id id, int par
 	}
 
 	/* Schedule next callback */
-	m_line_timer->adjust( m_screen->time_until_pos( ( raw_vpos + 1 ) % m_screen->height() , HORZ_DISPLAY_START ) );
+	m_line_timer->adjust( screen().time_until_pos( ( raw_vpos + 1 ) % screen().height() , HORZ_DISPLAY_START ) );
 }
 
 
@@ -780,7 +780,7 @@ void tms9928a_device::device_reset()
 	m_latch = 0;
 	m_mode = 0;
 
-	m_line_timer->adjust( m_screen->time_until_pos( 0, HORZ_DISPLAY_START ) );
+	m_line_timer->adjust( screen().time_until_pos( 0, HORZ_DISPLAY_START ) );
 
 	// TODO: Check clock freq settings in all drivers
 	if (!m_out_gromclk_cb.isnull() && m_99) m_gromclk_timer->adjust(attotime::zero, 0, attotime::from_hz(clock()/12));

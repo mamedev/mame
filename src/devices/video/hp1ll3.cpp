@@ -508,7 +508,7 @@ READ8_MEMBER( hp1ll3_device::read )
 	case 0:
 		data = m_busy ? 1 : 0;
 		data |= 2;
-		data |= (m_screen->vblank() ? 8 : 0);
+		data |= (screen().vblank() ? 8 : 0);
 		break;
 
 	case 2:

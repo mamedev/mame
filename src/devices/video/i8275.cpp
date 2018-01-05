@@ -133,7 +133,7 @@ i8275_device::i8275_device(const machine_config &mconfig, const char *tag, devic
 void i8275_device::device_start()
 {
 	// get the screen device
-	m_screen->register_screen_bitmap(m_bitmap);
+	screen().register_screen_bitmap(m_bitmap);
 
 	// resolve callbacks
 	m_display_cb.bind_relative_to(*owner());
@@ -197,8 +197,8 @@ void i8275_device::device_reset()
 
 void i8275_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
-	//int y = m_screen->vpos();
-	//int x = m_screen->hpos();
+	//int y = screen().vpos();
+	//int x = screen().hpos();
 	int rc = m_scanline / SCANLINES_PER_ROW;
 	int lc = m_scanline % SCANLINES_PER_ROW;
 
@@ -566,7 +566,7 @@ WRITE8_MEMBER( i8275_device::write )
 
 WRITE8_MEMBER( i8275_device::dack_w )
 {
-	//LOG("I8275 y %u x %u DACK %04x:%02x %u\n", m_screen->vpos(), m_screen->hpos(), offset, data, m_buffer_idx);
+	//LOG("I8275 y %u x %u DACK %04x:%02x %u\n", screen().vpos(), screen().hpos(), offset, data, m_buffer_idx);
 
 	m_write_drq(0);
 
@@ -631,8 +631,8 @@ WRITE_LINE_MEMBER( i8275_device::lpen_w )
 {
 	if (!m_lpen && state)
 	{
-		m_param[REG_LPEN_COL] = m_screen->hpos() / m_hpixels_per_column;
-		m_param[REG_LPEN_ROW] = m_screen->vpos() / SCANLINES_PER_ROW;
+		m_param[REG_LPEN_COL] = screen().hpos() / m_hpixels_per_column;
+		m_param[REG_LPEN_ROW] = screen().vpos() / SCANLINES_PER_ROW;
 
 		m_status |= ST_LP;
 	}
@@ -664,11 +664,11 @@ uint32_t i8275_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap
 
 void i8275_device::recompute_parameters()
 {
-	int y = m_screen->vpos();
+	int y = screen().vpos();
 
 	int horiz_pix_total = (CHARACTERS_PER_ROW + HRTC_COUNT) * m_hpixels_per_column;
 	int vert_pix_total = (CHARACTER_ROWS_PER_FRAME + VRTC_ROW_COUNT) * SCANLINES_PER_ROW;
-	attoseconds_t refresh = m_screen->frame_period().attoseconds();
+	attoseconds_t refresh = screen().frame_period().attoseconds();
 	int max_visible_x = (CHARACTERS_PER_ROW * m_hpixels_per_column) - 1;
 	int max_visible_y = (CHARACTER_ROWS_PER_FRAME * SCANLINES_PER_ROW) - 1;
 
@@ -676,10 +676,10 @@ void i8275_device::recompute_parameters()
 
 	rectangle visarea;
 	visarea.set(0, max_visible_x, 0, max_visible_y);
-	m_screen->configure(horiz_pix_total, vert_pix_total, visarea, refresh);
+	screen().configure(horiz_pix_total, vert_pix_total, visarea, refresh);
 
 	int hrtc_on_pos = CHARACTERS_PER_ROW * m_hpixels_per_column;
-	m_hrtc_on_timer->adjust(m_screen->time_until_pos(y, hrtc_on_pos), 0, m_screen->scan_period());
+	m_hrtc_on_timer->adjust(screen().time_until_pos(y, hrtc_on_pos), 0, screen().scan_period());
 
 	m_irq_scanline = (CHARACTER_ROWS_PER_FRAME - 1) * SCANLINES_PER_ROW;
 	m_vrtc_scanline = CHARACTER_ROWS_PER_FRAME * SCANLINES_PER_ROW;
@@ -687,7 +687,7 @@ void i8275_device::recompute_parameters()
 
 	LOG("irq_y %u vrtc_y %u drq_y %u\n", m_irq_scanline, m_vrtc_scanline, m_vrtc_drq_scanline);
 
-	m_scanline_timer->adjust(m_screen->time_until_pos(0, 0), 0, m_screen->scan_period());
+	m_scanline_timer->adjust(screen().time_until_pos(0, 0), 0, screen().scan_period());
 
 	if (DOUBLE_SPACED_ROWS) fatalerror("Double spaced rows not supported!");
 }

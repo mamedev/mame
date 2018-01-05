@@ -528,10 +528,10 @@ inline void hd63484_device::recompute_parameters()
 	if (BIT(m_dcr, 13)) vbstart += m_sp[0];
 	if (BIT(m_dcr, 11)) vbstart += m_sp[2];
 
-	rectangle visarea = m_screen->visible_area();
+	rectangle visarea = screen().visible_area();
 	visarea.set((m_hsw + m_hds) * ppmc, (m_hsw + m_hds + m_hdw) * ppmc - 1, m_vds, vbstart - 1);
-	attoseconds_t frame_period = m_screen->frame_period().attoseconds(); // TODO: use clock() to calculate the frame_period
-	m_screen->configure(m_hc * ppmc, m_vc, visarea, frame_period);
+	attoseconds_t frame_period = screen().frame_period().attoseconds(); // TODO: use clock() to calculate the frame_period
+	screen().configure(m_hc * ppmc, m_vc, visarea, frame_period);
 }
 
 
@@ -1785,7 +1785,7 @@ uint16_t hd63484_device::video_registers_r(int offset)
 			break;
 
 		case 0x80:
-			res = m_screen->vpos() & 0xfff; // Raster Count
+			res = screen().vpos() & 0xfff; // Raster Count
 			break;
 
 		default:

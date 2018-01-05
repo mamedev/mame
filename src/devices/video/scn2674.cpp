@@ -66,7 +66,7 @@ void scn2674_device::device_start()
 	m_display_cb.bind_relative_to(*owner());
 	m_intr_cb.resolve_safe();
 	m_scanline_timer = timer_alloc(TIMER_SCANLINE);
-	m_screen->register_screen_bitmap(m_bitmap);
+	screen().register_screen_bitmap(m_bitmap);
 
 	save_item(NAME(m_address));
 	save_item(NAME(m_linecounter));
@@ -604,7 +604,7 @@ WRITE8_MEMBER( scn2674_device::write )
 
 		case 2:
 			m_screen1_l = data;
-			if(!m_screen->vblank())
+			if(!screen().vblank())
 				m_start1change = (m_linecounter / m_IR0_scanline_per_char_row) + 1;
 			break;
 		case 3:
@@ -616,7 +616,7 @@ WRITE8_MEMBER( scn2674_device::write )
 				m_screen1_h &= 0x3f;
 				LOG("IR14 - Double 1 overridden %02x\n",m_IR14_double_1);
 			}
-			if(!m_screen->vblank())
+			if(!screen().vblank())
 				m_start1change = (m_linecounter / m_IR0_scanline_per_char_row) + 1;
 			break;
 
@@ -636,7 +636,7 @@ void scn2674_device::recompute_parameters()
 	m_hpixels_per_column = m_gfx_enabled ? m_gfx_hpixels_per_column : m_text_hpixels_per_column;
 	int horiz_pix_total = ((m_IR1_equalizing_constant + (m_IR2_horz_sync_width << 1)) << 1) * m_hpixels_per_column;
 	int vert_pix_total = m_IR4_rows_per_screen * m_IR0_scanline_per_char_row + m_IR3_vert_front_porch + m_IR3_vert_back_porch + m_IR7_vsync_width;
-	attoseconds_t refresh = m_screen->frame_period().attoseconds();
+	attoseconds_t refresh = screen().frame_period().attoseconds();
 	int max_visible_x = (m_IR5_character_per_row * m_hpixels_per_column) - 1;
 	int max_visible_y = (m_IR4_rows_per_screen * m_IR0_scanline_per_char_row) - 1;
 
@@ -650,9 +650,9 @@ void scn2674_device::recompute_parameters()
 
 	rectangle visarea;
 	visarea.set(0, max_visible_x, 0, max_visible_y);
-	m_screen->configure(horiz_pix_total, vert_pix_total, visarea, refresh);
+	screen().configure(horiz_pix_total, vert_pix_total, visarea, refresh);
 
-	m_scanline_timer->adjust(m_screen->time_until_pos(0, 0), 0, m_screen->scan_period());
+	m_scanline_timer->adjust(screen().time_until_pos(0, 0), 0, screen().scan_period());
 }
 
 void scn2674_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
@@ -671,7 +671,7 @@ void scn2674_device::device_timer(emu_timer &timer, device_timer_id id, int para
 
 			m_linecounter++;
 
-			if(m_linecounter >= m_screen->height())
+			if(m_linecounter >= screen().height())
 			{
 				m_linecounter = 0;
 				m_address = (m_screen1_h << 8) | m_screen1_l;
@@ -792,7 +792,7 @@ void scn2674_device::device_timer(emu_timer &timer, device_timer_id id, int para
 									dw != 0,
 									m_gfx_enabled != 0,
 									charrow == m_IR7_cursor_underline_position,
-									m_IR7_cursor_blink && (m_screen->frame_number() & (m_IR7_cursor_rate_divisor ? 0x40 : 0x20)));
+									m_IR7_cursor_blink && (screen().frame_number() & (m_IR7_cursor_rate_divisor ? 0x40 : 0x20)));
 				address = (address + 1) & 0xffff;
 
 				if(address > ((m_IR9_display_buffer_last_address << 10) | 0x3ff))
