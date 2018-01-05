@@ -11,6 +11,8 @@
 #include "emu.h"
 #include "tosh1000_bram.h"
 
+#include <algorithm>
+
 
 DEFINE_DEVICE_TYPE(TOSH1000_BRAM, tosh1000_bram_device, "tosh1000_bram", "Toshiba T1000 Backup RAM")
 
@@ -26,21 +28,25 @@ tosh1000_bram_device::tosh1000_bram_device(const machine_config &mconfig, const 
 
 uint8_t tosh1000_bram_device::read(int offset)
 {
+	assert(BRAM_SIZE > offset);
 	return m_bram[offset];
 }
 
 void tosh1000_bram_device::write(int offset, uint8_t data)
 {
+	assert(BRAM_SIZE > offset);
 	m_bram[offset] = data;
 }
 
 READ8_MEMBER( tosh1000_bram_device::read )
 {
+	assert(BRAM_SIZE > offset);
 	return m_bram[offset];
 }
 
 WRITE8_MEMBER( tosh1000_bram_device::write )
 {
+	assert(BRAM_SIZE > offset);
 	m_bram[offset] = data;
 }
 
@@ -51,7 +57,7 @@ WRITE8_MEMBER( tosh1000_bram_device::write )
 
 void tosh1000_bram_device::nvram_default()
 {
-	memset(m_bram, 0x1a, BRAM_SIZE);
+	std::fill(std::begin(m_bram), std::end(m_bram), 0x1a);
 }
 
 //-------------------------------------------------
