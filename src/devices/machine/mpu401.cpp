@@ -163,7 +163,7 @@ READ8_MEMBER(mpu401_device::regs_mode2_r)
 		case 6:
 		case 7:
 		case 0xf:
-//          printf("MPU401: read @ unk %x (PC=%x)\n", offset, space.device().safe_pc());
+//          logerror("MPU401: read @ unk %x %s\n", offset, machine().describe_context());
 			break;
 
 		default:
@@ -182,7 +182,7 @@ WRITE8_MEMBER(mpu401_device::regs_mode2_w)
 		case 6:
 		case 7:
 		case 0xf:
-//          printf("MPU401: %02x @ unk %x (PC=%x)\n", data, offset, space.device().safe_pc());
+//          logerror("MPU401: %02x @ unk %x %s\n", data, offset, machine().describe_context());
 			break;
 
 		default:
@@ -202,7 +202,7 @@ WRITE8_MEMBER(mpu401_device::port1_w)
 
 READ8_MEMBER(mpu401_device::port2_r)
 {
-//  printf("Read P2 (PC=%x)\n", space.device().safe_pc());
+//  printf("Read P2 %s\n", machine().describe_context());
 	return m_port2;
 }
 

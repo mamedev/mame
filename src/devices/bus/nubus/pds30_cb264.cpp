@@ -263,7 +263,7 @@ WRITE32_MEMBER( nubus_cb264se30_device::cb264se30_w )
 		case 0x38000:
 			if (mem_mask == 0xff000000)
 			{
-		//          printf("%08x to DAC control (PC=%x)\n", data, space.device().safe_pc());
+		//          logerror("%08x to DAC control %s\n", data, machine().describe_context());
 					m_clutoffs = (data>>24)&0xff;
 			}
 			else if (mem_mask == 0x0000ff00)
@@ -272,7 +272,7 @@ WRITE32_MEMBER( nubus_cb264se30_device::cb264se30_w )
 
 					if (m_count == 3)
 					{
-//                        printf("RAMDAC: color %02x = %02x %02x %02x (PC=%x)\n", m_clutoffs, m_colors[0], m_colors[1], m_colors[2], space.device().safe_pc() );
+//                        logerror("RAMDAC: color %02x = %02x %02x %02x %s\n", m_clutoffs, m_colors[0], m_colors[1], m_colors[2], machine().describe_context());
 						m_palette[m_clutoffs] = rgb_t(m_colors[0], m_colors[1], m_colors[2]);
 						m_clutoffs++;
 						if (m_clutoffs > 255)
@@ -297,7 +297,7 @@ WRITE32_MEMBER( nubus_cb264se30_device::cb264se30_w )
 			break;
 
 		default:
-//            printf("cb264se30_w: %08x @ %x, mask %08x (PC=%x)\n", data, offset, mem_mask, space.device().safe_pc());
+//            logerror("cb264se30_w: %08x @ %x, mask %08x %s\n", data, offset, mem_mask, machine().describe_context());
 			break;
 	}
 }

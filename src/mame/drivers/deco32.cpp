@@ -902,7 +902,7 @@ WRITE32_MEMBER( dragngun_state::gun_irq_ack_w )
 // TODO: improve this, Y axis not understood at all
 READ32_MEMBER( dragngun_state::lockload_gun_mirror_r )
 {
-//logerror("%08x:Read gun %d\n",space.device().safe_pc(),offset);
+//logerror("%08x:Read gun %d\n",m_maincpu->pc(),offset);
 
 	switch(offset)
 	{

@@ -8,8 +8,10 @@
 
 ***************************************************************************/
 
-#ifndef __TOSH1000_BRAM_H__
-#define __TOSH1000_BRAM_H__
+#ifndef MAME_MACHINE_TOSH1000_BRAM_H
+#define MAME_MACHINE_TOSH1000_BRAM_H
+
+#pragma once
 
 /***************************************************************************
     DEVICE CONFIGURATION MACROS
@@ -19,16 +21,19 @@
 	MCFG_DEVICE_ADD(_tag, TOSH1000_BRAM, 0)
 
 
-#define BRAM_SIZE  160
-
 // ======================> tosh1000_bram_device
 
-class tosh1000_bram_device :   public device_t,
-						public device_nvram_interface
+class tosh1000_bram_device : public device_t, public device_nvram_interface
 {
 public:
 	// construction/destruction
 	tosh1000_bram_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	DECLARE_READ8_MEMBER( read );
+	DECLARE_WRITE8_MEMBER( write );
+
+	uint8_t read(int offset);
+	void write(int offset, uint8_t data);
 
 protected:
 	// device-level overrides
@@ -40,18 +45,13 @@ protected:
 	virtual void nvram_read(emu_file &file) override;
 	virtual void nvram_write(emu_file &file) override;
 
-public:
-	DECLARE_READ8_MEMBER( read );
-	DECLARE_WRITE8_MEMBER( write );
-
-	uint8_t read(int offset);
-	void write(int offset, uint8_t data);
-
 private:
+	enum { BRAM_SIZE = 160 };
+
 	uint8_t m_bram[BRAM_SIZE];
 };
 
 // device type definition
-extern const device_type TOSH1000_BRAM;
+DECLARE_DEVICE_TYPE(TOSH1000_BRAM, tosh1000_bram_device)
 
-#endif
+#endif // MAME_MACHINE_TOSH1000_BRAM_H

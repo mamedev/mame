@@ -2164,7 +2164,7 @@ READ32_MEMBER(seibuspi_state::senkyua_speedup_r)
 
 READ32_MEMBER(seibuspi_state::batlball_speedup_r)
 {
-//  printf("space.device().safe_pc() %06x\n", m_maincpu->pc());
+//  printf("m_maincpu->pc() %06x\n", m_maincpu->pc());
 
 	/* batlbalu */
 	if (m_maincpu->pc()==0x00305996) m_maincpu->spin_until_interrupt(); // idle

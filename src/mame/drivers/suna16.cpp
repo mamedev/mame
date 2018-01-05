@@ -201,7 +201,7 @@ WRITE8_MEMBER(suna16_state::bestbest_prot_w)
 		case 0x00:  m_prot = m_prot ^ 0x0009;   break;
 		case 0x08:  m_prot = m_prot ^ 0x0002;   break;
 		case 0x0c:  m_prot = m_prot ^ 0x0003;   break;
-		//default:    logerror("CPU#0 PC %06X - Unknown protection value: %04X\n", space.device().safe_pc(), data);
+		//default:    logerror("CPU#0 PC %06X - Unknown protection value: %04X\n", m_maincpu->pc(), data);
 	}
 }
 

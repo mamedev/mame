@@ -224,7 +224,7 @@ READ8_MEMBER(firetrap_state::firetrap_8751_bootleg_r)
 
 READ8_MEMBER(firetrap_state::firetrap_8751_r)
 {
-	//logerror("PC:%04x read from 8751\n",space.device().safe_pc());
+	//logerror("PC:%04x read from 8751\n",m_maincpu->pc());
 	return m_i8751_return;
 }
 

@@ -111,14 +111,6 @@
 
 /***************************************************************************/
 
-READ32_MEMBER(deco_mlc_state::test2_r)
-{
-//  if (offset==0)
-//      return ioport("IN0")->read(); //0xffffffff;
-//   logerror("%08x:  Test2_r %d\n",space.device().safe_pc(),offset);
-	return machine().rand(); //0xffffffff;
-}
-
 READ32_MEMBER(deco_mlc_state::mlc_440008_r)
 {
 	return 0xffffffff;
@@ -132,7 +124,7 @@ READ32_MEMBER(deco_mlc_state::mlc_44001c_r)
 */
 //if (offset==0)
 //  return machine().rand()|(machine().rand()<<16);
-//  logerror("%08x:  Test3_r %d\n",space.device().safe_pc(),offset);
+//  logerror("%08x:  Test3_r %d\n",m_maincpu->pc(),offset);
 //  return 0x00100000;
 	return 0xffffffff;
 }
@@ -144,7 +136,7 @@ WRITE32_MEMBER(deco_mlc_state::mlc_44001c_w)
 READ32_MEMBER(deco_mlc_state::mlc_200070_r)
 {
 	m_vbl_i ^=0xffffffff;
-//logerror("vbl r %08x\n", space.device().safe_pc());
+//logerror("vbl r %08x\n", m_maincpu->pc());
 	// Todo: Vblank probably in $10
 	return m_vbl_i;
 }

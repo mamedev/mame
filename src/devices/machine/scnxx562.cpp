@@ -84,7 +84,7 @@ DONE (x) (p=partly)         NMOS         CMOS
 //  MACROS / CONSTANTS
 //**************************************************************************
 /* Useful temporary debug printout format */
-// printf("TAG %lld %s%s Data:%d\n", machine().firstcpu->total_cycles(), __PRETTY_FUNCTION__, owner()->tag(), data);
+// printf("TAG %s%s Data:%d\n", __PRETTY_FUNCTION__, owner()->tag(), data);
 
 #define LOG_GENERAL (1U << 0)
 #define LOG_R       (1U << 1)
@@ -105,10 +105,8 @@ DONE (x) (p=partly)         NMOS         CMOS
 
 #ifdef _MSC_VER
 #define FUNCNAME __func__
-#define LLFORMAT "%I64%"
 #else
 #define FUNCNAME __PRETTY_FUNCTION__
-#define LLFORMAT "%lld"
 #endif
 
 #define CHANA_TAG   "cha"
@@ -944,7 +942,7 @@ void duscc_channel::tra_callback()
 	{
 		int db = transmit_register_get_data_bit();
 
-		LOGR(LLFORMAT " %s() \"%s \"Channel %c transmit data bit %d\n", machine().firstcpu->total_cycles(), FUNCNAME, owner()->tag(), 'A' + m_index, db);
+		LOGR("%s() \"%s \"Channel %c transmit data bit %d\n", FUNCNAME, owner()->tag(), 'A' + m_index, db);
 
 		// transmit data
 		if (m_index == duscc_device::CHANNEL_A)
@@ -954,7 +952,7 @@ void duscc_channel::tra_callback()
 	}
 	else
 	{
-		LOG(LLFORMAT " %s() \"%s \"Channel %c Failed to transmit \n", machine().firstcpu->total_cycles(), FUNCNAME, owner()->tag(), 'A' + m_index);
+		LOG("%s() \"%s \"Channel %c Failed to transmit \n", FUNCNAME, owner()->tag(), 'A' + m_index);
 		logerror("%s Channel %c Failed to transmit\n", FUNCNAME, 'A' + m_index);
 	}
 }
@@ -994,7 +992,7 @@ void duscc_channel::rcv_callback()
 {
 	if (m_rcv == 1)
 	{
-		LOG(LLFORMAT " %s() \"%s \"Channel %c received data bit %d\n", machine().firstcpu->total_cycles(), FUNCNAME, owner()->tag(), 'A' + m_index, m_rxd);
+		LOG("%s() \"%s \"Channel %c received data bit %d\n", FUNCNAME, owner()->tag(), 'A' + m_index, m_rxd);
 		receive_register_update_bit(m_rxd);
 	}
 }
@@ -1010,7 +1008,7 @@ void duscc_channel::rcv_complete()
 
 	receive_register_extract();
 	data = get_received_char();
-	LOGINT(LLFORMAT " %s() \"%s \"Channel %c Received Data %c\n", machine().firstcpu->total_cycles(), FUNCNAME, owner()->tag(), 'A' + m_index, data);
+	LOGINT("%s() \"%s \"Channel %c Received Data %c\n", FUNCNAME, owner()->tag(), 'A' + m_index, data);
 	receive_data(data);
 }
 
@@ -2505,7 +2503,7 @@ void duscc_channel::update_serial()
 	else
 		parity = PARITY_NONE;
 
-	LOG(LLFORMAT " %s() \"%s \"Channel %c setting data frame %d+%d%c%d\n", machine().firstcpu->total_cycles(), FUNCNAME, owner()->tag(), 'A' + m_index, 1,
+	LOG("%s() \"%s \"Channel %c setting data frame %d+%d%c%d\n", FUNCNAME, owner()->tag(), 'A' + m_index, 1,
 			data_bit_count, parity == PARITY_NONE ? 'N' : parity == PARITY_EVEN ? 'E' : 'O', (stop_bits + 1) / 2);
 
 	set_data_frame(1, data_bit_count, parity, stop_bits);

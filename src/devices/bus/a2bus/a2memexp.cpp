@@ -133,8 +133,6 @@ uint8_t a2bus_memexp_device::read_c0nx(uint8_t offset)
 		m_regs[2] = ((m_liveptr>>16) & 0xff) | m_bankhior;
 	}
 
-//    printf("Read c0n%x (PC=%x) = %02x\n", offset, space.device().safe_pc(), retval);
-
 	return retval;
 }
 
@@ -145,8 +143,6 @@ uint8_t a2bus_memexp_device::read_c0nx(uint8_t offset)
 
 void a2bus_memexp_device::write_c0nx(uint8_t offset, uint8_t data)
 {
-//    printf("Write %02x to c0n%x (PC=%x)\n", data, offset, space.device().safe_pc());
-
 	switch (offset)
 	{
 		case 0:

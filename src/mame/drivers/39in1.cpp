@@ -1355,7 +1355,7 @@ READ32_MEMBER(_39in1_state::unknown_r)
 
 READ32_MEMBER(_39in1_state::cpld_r)
 {
-	//if (space.device().safe_pc() != 0xe3af4) printf("CPLD read @ %x (PC %x state %d)\n", offset, space.device().safe_pc(), state);
+	//if (m_maincpu->pc() != 0xe3af4) printf("CPLD read @ %x (PC %x state %d)\n", offset, m_maincpu->pc(), state);
 
 	if (m_maincpu->pc() == 0x3f04)
 	{

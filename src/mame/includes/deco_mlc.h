@@ -45,7 +45,6 @@ public:
 	std::unique_ptr<uint16_t[]> m_mlc_spriteram;
 	std::unique_ptr<uint16_t[]> m_mlc_spriteram_spare;
 	std::unique_ptr<uint16_t[]> m_mlc_buffered_spriteram;
-	DECLARE_READ32_MEMBER(test2_r);
 	DECLARE_READ32_MEMBER(mlc_440008_r);
 	DECLARE_READ32_MEMBER(mlc_44001c_r);
 	DECLARE_WRITE32_MEMBER(mlc_44001c_w);

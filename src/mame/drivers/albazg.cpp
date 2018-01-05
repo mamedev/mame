@@ -142,13 +142,13 @@ WRITE8_MEMBER(albazg_state::yumefuda_cram_w)
 /*Custom RAM (Thrash Protection)*/
 READ8_MEMBER(albazg_state::custom_ram_r)
 {
-//  logerror("Custom RAM read at %02x PC = %x\n", offset + 0xaf80, space.device().safe_pc());
+//  logerror("Custom RAM read at %02x PC = %x\n", offset + 0xaf80, m_maincpu->space(AS_PROGRAM).pc());
 	return m_cus_ram[offset];// ^ 0x55;
 }
 
 WRITE8_MEMBER(albazg_state::custom_ram_w)
 {
-//  logerror("Custom RAM write at %02x : %02x PC = %x\n", offset + 0xaf80, data, space.device().safe_pc());
+//  logerror("Custom RAM write at %02x : %02x PC = %x\n", offset + 0xaf80, data, m_maincpu->space(AS_PROGRAM).pc());
 	if(m_prot_lock)
 		m_cus_ram[offset] = data;
 }
@@ -156,7 +156,7 @@ WRITE8_MEMBER(albazg_state::custom_ram_w)
 /*this might be used as NVRAM commands btw*/
 WRITE8_MEMBER(albazg_state::prot_lock_w)
 {
-//  logerror("PC %04x Prot lock value written %02x\n", space.device().safe_pc(), data);
+//  logerror("PC %04x Prot lock value written %02x\n", m_maincpu->space(AS_PROGRAM).pc(), data);
 	m_prot_lock = data;
 }
 

@@ -260,14 +260,14 @@ TIMER_DEVICE_CALLBACK_MEMBER(m92_state::m92_scanline_interrupt)
 READ16_MEMBER(m92_state::m92_eeprom_r)
 {
 	uint8_t *RAM = memregion("eeprom")->base();
-//  logerror("%05x: EEPROM RE %04x\n",space.device().safe_pc(),offset);
+//  logerror("%05x: EEPROM RE %04x\n",m_maincpu->pc(),offset);
 	return RAM[offset] | 0xff00;
 }
 
 WRITE16_MEMBER(m92_state::m92_eeprom_w)
 {
 	uint8_t *RAM = memregion("eeprom")->base();
-//  logerror("%05x: EEPROM WR %04x\n",space.device().safe_pc(),offset);
+//  logerror("%05x: EEPROM WR %04x\n",m_maincpu->pc(),offset);
 	if (ACCESSING_BITS_0_7)
 		RAM[offset] = data;
 }
