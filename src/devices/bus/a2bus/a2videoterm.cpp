@@ -238,8 +238,6 @@ void a2bus_videx80_device::device_reset()
 
 uint8_t a2bus_videx80_device::read_c0nx(uint8_t offset)
 {
-//    printf("Read c0n%x (PC=%x)\n", offset, space.device().safe_pc());
-
 	m_rambank = ((offset>>2) & 3) * 512;
 
 	if (offset == 1)
@@ -257,8 +255,6 @@ uint8_t a2bus_videx80_device::read_c0nx(uint8_t offset)
 
 void a2bus_videx80_device::write_c0nx(uint8_t offset, uint8_t data)
 {
-//    printf("Write %02x to c0n%x (PC=%x)\n", data, offset, space.device().safe_pc());
-
 	if (offset == 0)
 	{
 		m_crtc->address_w(data);

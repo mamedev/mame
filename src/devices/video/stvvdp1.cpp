@@ -149,7 +149,7 @@ struct shaded_point
 
 READ16_MEMBER( saturn_state::saturn_vdp1_regs_r )
 {
-	//logerror ("cpu %s (PC=%08X) VDP1: Read from Registers, Offset %04x\n", space.device().tag(), space.device().safe_pc(), offset);
+	//logerror ("%s VDP1: Read from Registers, Offset %04x\n", machine().describe_context(), offset);
 
 	switch(offset)
 	{
@@ -176,7 +176,7 @@ READ16_MEMBER( saturn_state::saturn_vdp1_regs_r )
 			return modr;
 		default:
 			if(!machine().side_effect_disabled())
-				printf ("cpu %s (PC=%08X) VDP1: Read from Registers, Offset %04x\n", space.device().tag(), space.device().safe_pc(), offset*2);
+				logerror("%s VDP1: Read from Registers, Offset %04x\n", machine().describe_context(), offset*2);
 			break;
 	}
 
@@ -346,7 +346,7 @@ WRITE32_MEMBER ( saturn_state::saturn_vdp1_vram_w )
 
 //  if (((offset * 4) > 0xdf) && ((offset * 4) < 0x140))
 //  {
-//      logerror("cpu %s (PC=%08X): VRAM dword write to %08X = %08X & %08X\n", space.device().tag(), space.device().safe_pc(), offset*4, data, mem_mask);
+//      logerror("%s: VRAM dword write to %08X = %08X & %08X\n", machine().describe_context(), offset*4, data, mem_mask);
 //  }
 
 	data = m_vdp1_vram[offset];

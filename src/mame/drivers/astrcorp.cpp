@@ -214,7 +214,7 @@ WRITE16_MEMBER(astrocorp_state::astrocorp_sound_bank_w)
 	if (ACCESSING_BITS_8_15)
 	{
 		m_oki->set_rom_bank((data >> 8) & 1);
-//      logerror("CPU #0 PC %06X: OKI bank %08X\n", space.device().safe_pc(), data);
+//      logerror("CPU #0 PC %06X: OKI bank %08X\n", m_maincpu->pc(), data);
 	}
 }
 
@@ -223,7 +223,7 @@ WRITE16_MEMBER(astrocorp_state::skilldrp_sound_bank_w)
 	if (ACCESSING_BITS_0_7)
 	{
 		m_oki->set_rom_bank(data & 1);
-//      logerror("CPU #0 PC %06X: OKI bank %08X\n", space.device().safe_pc(), data);
+//      logerror("CPU #0 PC %06X: OKI bank %08X\n", m_maincpu->pc(), data);
 	}
 }
 

@@ -236,7 +236,7 @@ READ_LINE_MEMBER(coolpool_state::amerdart_dsp_bio_line_r)
 
 READ16_MEMBER(coolpool_state::amerdart_iop_r)
 {
-//  logerror("%08x:IOP read %04x\n",space.device().safe_pc(),m_iop_answer);
+//  logerror("%08x:IOP read %04x\n",m_maincpu->pc(),m_iop_answer);
 	m_maincpu->set_input_line(1, CLEAR_LINE);
 
 	return m_iop_answer;
@@ -244,21 +244,21 @@ READ16_MEMBER(coolpool_state::amerdart_iop_r)
 
 WRITE16_MEMBER(coolpool_state::amerdart_iop_w)
 {
-//  logerror("%08x:IOP write %04x\n", space.device().safe_pc(), data);
+//  logerror("%08x:IOP write %04x\n", m_maincpu->pc(), data);
 	COMBINE_DATA(&m_iop_cmd);
 	m_cmd_pending = 1;
 }
 
 READ16_MEMBER(coolpool_state::amerdart_dsp_cmd_r)
 {
-//  logerror("%08x:DSP cmd_r %04x\n", space.device().safe_pc(), m_iop_cmd);
+//  logerror("%08x:DSP cmd_r %04x\n", m_dsp->pc(), m_iop_cmd);
 	m_cmd_pending = 0;
 	return m_iop_cmd;
 }
 
 WRITE16_MEMBER(coolpool_state::amerdart_dsp_answer_w)
 {
-//  logerror("%08x:DSP answer %04x\n", space.device().safe_pc(), data);
+//  logerror("%08x:DSP answer %04x\n", m_maincpu->pc(), data);
 	m_iop_answer = data;
 	m_maincpu->set_input_line(1, ASSERT_LINE);
 }
@@ -404,7 +404,7 @@ READ16_MEMBER(coolpool_state::amerdart_trackball_r)
 	m_result = (m_result & 0x0fff) | (amerdart_trackball_direction(2, ((m_result >> 12) & 0xf)) << 12);
 
 
-//  logerror("%08X:read port 6 (X=%02X Y=%02X oldX=%02X oldY=%02X oldRes=%04X Res=%04X)\n", space.device().safe_pc(), m_newx, m_newy, m_oldx, m_oldy, m_lastresult, m_result);
+//  logerror("%08X:read port 6 (X=%02X Y=%02X oldX=%02X oldY=%02X oldRes=%04X Res=%04X)\n", m_dsp->pc(), m_newx, m_newy, m_oldx, m_oldy, m_lastresult, m_result);
 
 	m_lastresult = m_result;
 
@@ -591,7 +591,7 @@ READ16_MEMBER(coolpool_state::coolpool_input_r)
 		}
 	}
 
-//  logerror("%08X:read port 7 (X=%02X Y=%02X oldX=%02X oldY=%02X res=%04X)\n", space.device().safe_pc(),
+//  logerror("%08X:read port 7 (X=%02X Y=%02X oldX=%02X oldY=%02X res=%04X)\n", m_dsp->pc(),
 //      m_newx[1], m_newy[1], m_oldx[1], m_oldy[1], m_result);
 	m_lastresult = m_result;
 	return m_result;

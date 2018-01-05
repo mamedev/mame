@@ -271,7 +271,7 @@ WRITE32_MEMBER( nubus_procolor816_device::procolor816_w )
 		case 0x3d800:
 			if (mem_mask == 0x00ff0000)
 			{
-		//          printf("%08x to DAC control (PC=%x)\n", data, space.device().safe_pc());
+		//          printf("%08x to DAC control %s\n", data, machine().describe_context());
 					m_clutoffs = bitswap<8>((data>>16)&0xff, 0, 1, 2, 3, 4, 5, 6, 7);
 			}
 			else if (mem_mask == 0x000000ff)
@@ -280,7 +280,7 @@ WRITE32_MEMBER( nubus_procolor816_device::procolor816_w )
 
 					if (m_count == 3)
 					{
-//                        printf("RAMDAC: color %02x = %02x %02x %02x (PC=%x)\n", m_clutoffs, m_colors[0], m_colors[1], m_colors[2], space.device().safe_pc() );
+//                        printf("RAMDAC: color %02x = %02x %02x %02x %s\n", m_clutoffs, m_colors[0], m_colors[1], m_colors[2], machine().describe_context());
 						m_palette[m_clutoffs] = rgb_t(m_colors[0], m_colors[1], m_colors[2]);
 						m_clutoffs++;
 						if (m_clutoffs > 255)
@@ -308,7 +308,7 @@ WRITE32_MEMBER( nubus_procolor816_device::procolor816_w )
 			break;
 
 		default:
-//            printf("procolor816_w: %08x @ %x, mask %08x (PC=%x)\n", data, offset, mem_mask, space.device().safe_pc());
+//            printf("procolor816_w: %08x @ %x, mask %08x %s\n", data, offset, mem_mask, machine().describe_context());
 			break;
 	}
 }
@@ -326,7 +326,7 @@ READ32_MEMBER( nubus_procolor816_device::procolor816_r )
 	}
 	else
 	{
-//      printf("procolor816_r: @ %x, mask %08x [PC=%x]\n", offset, mem_mask, machine().device("maincpu")->safe_pc());
+//      printf("procolor816_r: @ %x, mask %08x [PC=%x]\n", offset, mem_mask, machine().device<cpu_device>("maincpu")->pc());
 	}
 
 	return 0;

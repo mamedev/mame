@@ -90,7 +90,7 @@ void nubus_m2hires_device::device_start()
 
 	slotspace = get_slotspace();
 
-//  printf("[m2hires %p] slotspace = %x\n", this, slotspace);
+//  logerror("[m2hires %p] slotspace = %x\n", this, slotspace);
 
 	m_vram.resize(VRAM_SIZE);
 	m_vram32 = (uint32_t *)&m_vram[0];
@@ -245,7 +245,7 @@ WRITE32_MEMBER( nubus_m2hires_device::m2hires_w )
 			break;
 
 		case 0x5038:    // DAC control
-//          printf("%08x to DAC control (PC=%x)\n", data, space.device().safe_pc());
+//          logerror("%08x to DAC control %s\n", data, machine().describe_context());
 			m_clutoffs = (data>>24)&0xff;
 			break;
 
@@ -254,7 +254,7 @@ WRITE32_MEMBER( nubus_m2hires_device::m2hires_w )
 
 			if (m_count == 3)
 			{
-//              printf("RAMDAC: color %d = %02x %02x %02x (PC=%x)\n", m_clutoffs, m_colors[0], m_colors[1], m_colors[2], space.device().safe_pc() );
+//              logerror("RAMDAC: color %d = %02x %02x %02x %s\n", m_clutoffs, m_colors[0], m_colors[1], m_colors[2], machine().describe_context() );
 				m_palette[m_clutoffs] = rgb_t(m_colors[0], m_colors[1], m_colors[2]);
 				m_clutoffs++;
 				if (m_clutoffs > 255)
@@ -275,7 +275,7 @@ WRITE32_MEMBER( nubus_m2hires_device::m2hires_w )
 			break;
 
 		default:
-//          printf("m2hires_w: %08x @ %x, mask %08x (PC=%x)\n", data, offset, mem_mask, space.device().safe_pc());
+//          logerror("m2hires_w: %08x @ %x, mask %08x %s\n", data, offset, mem_mask, machine().describe_context());
 			break;
 	}
 }
@@ -289,7 +289,7 @@ READ32_MEMBER( nubus_m2hires_device::m2hires_r )
 	}
 /*  else
     {
-        printf("m2hires_r: @ %x, mask %08x (PC=%x)\n", offset, mem_mask, space.device().safe_pc());
+        logerror("m2hires_r: @ %x, mask %08x %s\n", offset, mem_mask, machine().describe_context());
     }*/
 
 	return 0;

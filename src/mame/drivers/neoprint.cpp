@@ -185,7 +185,7 @@ READ8_MEMBER(neoprint_state::neoprint_unk_r)
 
 	m_vblank = (m_screen->frame_number() & 0x1) ? 0x10 : 0x00;
 
-	//if(m_maincpu->pc() != 0x1504 && m_maincpu->pc() != 0x5f86 &&s pace.device().safe_pc() != 0x5f90)
+	//if(m_maincpu->pc() != 0x1504 && m_maincpu->pc() != 0x5f86 && m_machine->safe_pc() != 0x5f90)
 	//  printf("%08x\n",m_maincpu->pc());
 
 	return m_vblank| 4 | 3;

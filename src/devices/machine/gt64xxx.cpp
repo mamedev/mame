@@ -643,9 +643,6 @@ READ32_MEMBER (gt64xxx_device::cpu_if_r)
 				result = (result > elapsed) ? (result - elapsed) : 0;
 			}
 
-			/* eat some time for those which poll this register */
-			//space.device().execute().eat_cycles(100);
-
 			LOGTIMERS("%s hires_timer_r = %08X\n", machine().describe_context(), result);
 			break;
 		}
@@ -1027,7 +1024,6 @@ TIMER_CALLBACK_MEMBER (gt64xxx_device::perform_dma)
 				bytesleft--;
 			}
 			else {
-				//space.write_byte(dstaddr, space.read_byte(srcaddr));
 				dstSpace->write_dword(dstaddr, srcSpace->read_dword(srcaddr));
 				srcaddr += srcinc * 4;
 				dstaddr += dstinc * 4;

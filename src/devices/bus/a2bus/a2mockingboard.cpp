@@ -163,7 +163,6 @@ void a2bus_ayboard_device::device_reset()
 
 uint8_t a2bus_ayboard_device::read_cnxx(uint8_t offset)
 {
-//    logerror("Mockingboard(%d): read @ Cn%02X (PC=%x)\n", m_slot, offset, space.device().safe_pc());
 	if (m_isPhasor)
 	{
 		uint8_t retVal = 0;
@@ -228,8 +227,6 @@ void a2bus_ayboard_device::write_cnxx(uint8_t offset, uint8_t data)
 			{
 				viaSel = (offset & 0x80) ? 2 : 1;
 			}
-
-//            logerror("Phasor(%d): write %02x to Cn%02X (PC=%x) (native %d viaSel %d)\n", m_slot, data, offset, space.device().safe_pc(), m_PhasorNative ? 1 : 0, viaSel);
 
 			if (viaSel & 1)
 			{

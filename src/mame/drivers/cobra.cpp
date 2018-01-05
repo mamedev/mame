@@ -3088,7 +3088,7 @@ WRITE64_MEMBER(cobra_state::gfx_buf_w)
 
 	// teximage_load() / mbuslib_prc_read():    0x00A00001 0x10520800
 
-//  printf("prc_read %08X%08X at %08X\n", (uint32_t)(data >> 32), (uint32_t)(data), space.device().safe_pc());
+//  printf("prc_read %08X%08X at %08X\n", (uint32_t)(data >> 32), (uint32_t)(data), m_gfxcpu->pc());
 
 	m_renderer->gfx_fifo_exec();
 

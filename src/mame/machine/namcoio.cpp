@@ -476,7 +476,7 @@ READ8_MEMBER( namcoio_device::read )
 	// RAM is 4-bit wide; Pac & Pal requires the | 0xf0 otherwise Easter egg doesn't work
 	offset &= 0x3f;
 
-//  LOG("%s: I/O read: mode %d, offset %d = %02x\n", machine().describe_context(), space.device().safe_pc(), offset / 16, namcoio_ram[(offset & 0x30) + 8], offset & 0x0f, namcoio_ram[offset]&0x0f);
+//  LOG("%s: I/O read: mode %d, offset %d = %02x\n", machine().describe_context(), offset / 16, namcoio_ram[(offset & 0x30) + 8], offset & 0x0f, namcoio_ram[offset]&0x0f);
 
 	return 0xf0 | m_ram[offset];
 }

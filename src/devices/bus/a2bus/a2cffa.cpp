@@ -235,7 +235,6 @@ void a2bus_cffa2000_device::write_c800(uint16_t offset, uint8_t data)
 {
 	if (!m_writeprotect)
 	{
-//      printf("Write %02x to EEPROM at %x (PC=%x)\n", data, offset, space.device().safe_pc());
 		m_eeprom[offset + 0x800] = data;
 	}
 }

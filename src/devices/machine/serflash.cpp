@@ -215,7 +215,7 @@ WRITE8_MEMBER( serflash_device::flash_cmd_w )
 
 			default:
 			{
-				//logerror("%08x FLASH: unknown cmd1 = %02X\n", cpu_get_pc(space.device()), data);
+				//logerror("%s FLASH: unknown cmd1 = %02X\n", machine().describe_context(), data);
 			}
 		}
 	}

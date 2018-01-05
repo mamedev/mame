@@ -243,7 +243,7 @@ WRITE32_MEMBER( nubus_wsportrait_device::wsportrait_w )
 
 			if (m_count == 3)
 			{
-//              printf("RAMDAC: color %d = %02x %02x %02x (PC=%x)\n", m_clutoffs, m_colors[0], m_colors[1], m_colors[2], space.device().safe_pc() );
+//              logerror("RAMDAC: color %d = %02x %02x %02x %s\n", m_clutoffs, m_colors[0], m_colors[1], m_colors[2], machine().describe_context());
 				m_palette[m_clutoffs] = rgb_t(m_colors[2], m_colors[2], m_colors[2]);
 				m_clutoffs++;
 				if (m_clutoffs > 255)

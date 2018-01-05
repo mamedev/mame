@@ -286,10 +286,11 @@ READ16_MEMBER(sc4_state::sc4_cs1_r)
 
 			if (r_D1 == 0x7)
 			{
+				auto &mspace = m_maincpu->space(AS_PROGRAM);
 				bool valid = true;
 				for (int i=0;i<8;i++)
 				{
-					uint8_t code = space.read_byte(r_A0+i);
+					uint8_t code = mspace.read_byte(r_A0+i);
 					if (code != 0xff) // assume our mbus code just returns 0xff for now..
 						valid = false;
 				}
@@ -302,9 +303,9 @@ READ16_MEMBER(sc4_state::sc4_cs1_r)
 					printf("Ident code? ");
 					for (int i=0;i<8;i++)
 					{
-						uint8_t code = space.read_byte(r_A1+i);
+						uint8_t code = mspace.read_byte(r_A1+i);
 						printf("%02x",code);
-						space.write_byte(r_A0+i, code);
+						mspace.write_byte(r_A0+i, code);
 					}
 					printf("\n");
 				}
@@ -773,8 +774,7 @@ void sc4_state::bfm_sc4_68307_portb_w(address_space &space, bool dedicated, uint
 {
 //  if (dedicated == false)
 	{
-		int pc = space.device().safe_pc();
-		//_m68ki_cpu_core *m68k = m68k_get_safe_token(&space.device());
+		int pc = m_maincpu->pc();
 		// serial output to the VFD at least..
 		logerror("%08x bfm_sc4_68307_portb_w %04x %04x\n", pc, data, line_mask);
 
@@ -786,7 +786,7 @@ void sc4_state::bfm_sc4_68307_portb_w(address_space &space, bool dedicated, uint
 }
 uint8_t sc4_state::bfm_sc4_68307_porta_r(address_space &space, bool dedicated, uint8_t line_mask)
 {
-	int pc = space.device().safe_pc();
+	int pc = m_maincpu->pc();
 	logerror("%08x bfm_sc4_68307_porta_r\n", pc);
 	return 0xbb;// machine().rand();
 }

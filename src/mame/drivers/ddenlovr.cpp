@@ -445,7 +445,7 @@ public:
 	void blit_horiz_line();
 	void blit_vert_line();
 	inline void log_blit(int data );
-	void blitter_w( address_space &space, int blitter, offs_t offset, uint8_t data, int irq_vector );
+	void blitter_w(int blitter, offs_t offset, uint8_t data, int irq_vector );
 	void blitter_w_funkyfig(int blitter, offs_t offset, uint8_t data, int irq_vector );
 	void copylayer(bitmap_ind16 &bitmap, const rectangle &cliprect, int layer );
 	void mmpanic_update_leds();
@@ -966,7 +966,7 @@ inline void ddenlovr_state::log_blit( int data )
 #endif
 }
 
-void ddenlovr_state::blitter_w( address_space &space, int blitter, offs_t offset, uint8_t data, int irq_vector )
+void ddenlovr_state::blitter_w(int blitter, offs_t offset, uint8_t data, int irq_vector )
 {
 	int hi_bits;
 
@@ -1097,26 +1097,26 @@ g_profiler.start(PROFILER_VIDEO);
 							;
 				#ifdef MAME_DEBUG
 					popmessage("unknown blitter command %02x", data);
-					logerror("%06x: unknown blitter command %02x\n", space.device().safe_pc(), data);
+					logerror("%06x: unknown blitter command %02x\n", m_maincpu->pc(), data);
 				#endif
 			}
 
 			if (irq_vector)
 				/* quizchq */
-				space.device().execute().set_input_line_and_vector(0, HOLD_LINE, irq_vector);
+				m_maincpu->set_input_line_and_vector(0, HOLD_LINE, irq_vector);
 			else
 			{
 				/* ddenlovr */
 				if (m_ddenlovr_blitter_irq_enable)
 				{
 					m_ddenlovr_blitter_irq_flag = 1;
-					space.device().execute().set_input_line(1, HOLD_LINE);
+					m_maincpu->set_input_line(1, HOLD_LINE);
 				}
 			}
 			break;
 
 		default:
-			logerror("%06x: Blitter %d reg %02x = %02x\n", space.device().safe_pc(), blitter, m_ddenlovr_blit_regs[blitter], data);
+			logerror("%06x: Blitter %d reg %02x = %02x\n", m_maincpu->pc(), blitter, m_ddenlovr_blit_regs[blitter], data);
 			break;
 		}
 	}
@@ -1481,12 +1481,12 @@ g_profiler.stop();
 
 WRITE8_MEMBER(ddenlovr_state::rongrong_blitter_w)
 {
-	blitter_w(space, 0, offset, data, 0xf8);
+	blitter_w(0, offset, data, 0xf8);
 }
 
 WRITE8_MEMBER(ddenlovr_state::ddenlovr_blitter_w)
 {
-	blitter_w(space, 0, offset, data, 0);
+	blitter_w(0, offset, data, 0);
 }
 
 
@@ -1789,7 +1789,7 @@ WRITE8_MEMBER(ddenlovr_state::ddenlovr_select2_w)
 
 READ8_MEMBER(ddenlovr_state::rongrong_input2_r)
 {
-//  logerror("%04x: input2_r offset %d select %x\n", space.device().safe_pc(), offset, m_input_sel);
+//  logerror("%04x: input2_r offset %d select %x\n", m_maincpu->pc(), offset, m_input_sel);
 	/* 0 and 1 are read from offset 1, 2 from offset 0... */
 	switch (m_input_sel)
 	{
@@ -1813,7 +1813,7 @@ READ8_MEMBER(ddenlovr_state::quiz365_input_r )
 
 READ16_MEMBER(ddenlovr_state::quiz365_input2_r)
 {
-//  logerror("%04x: input2_r offset %d select %x\n",space.device().safe_pc(), offset, m_input_sel);
+//  logerror("%04x: input2_r offset %d select %x\n",m_maincpu->pc(), offset, m_input_sel);
 	/* 0 and 1 are read from offset 1, 2 from offset 0... */
 	switch (m_input_sel)
 	{
@@ -2199,7 +2199,7 @@ READ8_MEMBER(ddenlovr_state::rongrong_input_r)
 
 WRITE8_MEMBER(ddenlovr_state::rongrong_select_w)
 {
-//logerror("%04x: rongrong_select_w %02x\n",space.device().safe_pc(),data);
+//logerror("%04x: rongrong_select_w %02x\n",m_maincpu->pc(),data);
 
 	/* bits 0-4 = **both** ROM bank **AND** input select */
 	membank("bank1")->set_entry(data & 0x1f);
@@ -2314,11 +2314,11 @@ WRITE8_MEMBER(ddenlovr_state::mmpanic_soundlatch_w)
 
 WRITE8_MEMBER(ddenlovr_state::mmpanic_blitter_w)
 {
-	blitter_w(space, 0, offset, data, 0xdf);    // RST 18
+	blitter_w(0, offset, data, 0xdf);    // RST 18
 }
 WRITE8_MEMBER(ddenlovr_state::mmpanic_blitter2_w)
 {
-	blitter_w(space, 1, offset, data, 0xdf);    // RST 18
+	blitter_w(1, offset, data, 0xdf);    // RST 18
 }
 
 void ddenlovr_state::mmpanic_update_leds()
@@ -3017,7 +3017,7 @@ ADDRESS_MAP_END
 WRITE8_MEMBER(ddenlovr_state::mjmyster_rambank_w)
 {
 	membank("bank2")->set_entry(data & 0x07);
-	//logerror("%04x: rambank = %02x\n", space.device().safe_pc(), data);
+	//logerror("%04x: rambank = %02x\n", m_maincpu->pc(), data);
 }
 
 WRITE8_MEMBER(ddenlovr_state::mjmyster_select2_w)
@@ -3090,7 +3090,7 @@ WRITE8_MEMBER(ddenlovr_state::mjmyster_coincounter_w)
 
 WRITE8_MEMBER(ddenlovr_state::mjmyster_blitter_w)
 {
-	blitter_w(space, 0, offset, data, 0xfc);
+	blitter_w(0, offset, data, 0xfc);
 }
 
 static ADDRESS_MAP_START( mjmyster_portmap, AS_IO, 8, ddenlovr_state )
@@ -3260,7 +3260,7 @@ WRITE8_MEMBER(ddenlovr_state::hginga_blitter_w)
 				break;
 		}
 	}
-	blitter_w(space, 0, offset, data, 0xfc);
+	blitter_w(0, offset, data, 0xfc);
 }
 
 static ADDRESS_MAP_START( hginga_portmap, AS_IO, 8, ddenlovr_state )
@@ -3723,7 +3723,7 @@ CUSTOM_INPUT_MEMBER(ddenlovr_state::mjflove_blitter_r)
 
 WRITE8_MEMBER(ddenlovr_state::mjflove_blitter_w)
 {
-	blitter_w(space, 0, offset, data, 0);
+	blitter_w(0, offset, data, 0);
 }
 
 WRITE8_MEMBER(ddenlovr_state::mjflove_coincounter_w)
@@ -3916,7 +3916,7 @@ WRITE8_MEMBER(ddenlovr_state::sryudens_coincounter_w)
 WRITE8_MEMBER(ddenlovr_state::sryudens_rambank_w)
 {
 	membank("bank2")->set_entry(data & 0x0f);
-	//logerror("%04x: rambank = %02x\n", space.device().safe_pc(), data);
+	//logerror("%04x: rambank = %02x\n", m_maincpu->pc(), data);
 }
 
 static ADDRESS_MAP_START( sryudens_portmap, AS_IO, 8, ddenlovr_state )
