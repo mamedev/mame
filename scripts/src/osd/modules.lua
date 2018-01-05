@@ -207,6 +207,7 @@ function osdmodulesbuild()
 		MAME_DIR .. "src/osd/modules/render/bgfx/uniformreader.cpp",
 		MAME_DIR .. "src/osd/modules/render/bgfx/valueuniform.cpp",
 		MAME_DIR .. "src/osd/modules/render/bgfx/valueuniformreader.cpp",
+		MAME_DIR .. "src/osd/modules/render/bgfx/view.cpp",
 		MAME_DIR .. "src/osd/modules/render/bgfx/writereader.cpp",
 	}
 	includedirs {
