@@ -37,8 +37,7 @@ u32 tv912_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, cons
 }
 
 static ADDRESS_MAP_START( prog_map, AS_PROGRAM, 8, tv912_state )
-	ADDRESS_MAP_GLOBAL_MASK(0x7ff)
-	AM_RANGE(0x000, 0x7ff) AM_ROM AM_REGION("maincpu", 0)
+	AM_RANGE(0x000, 0xfff) AM_ROM AM_REGION("maincpu", 0)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( io_map, AS_IO, 8, tv912_state )
@@ -68,7 +67,7 @@ Other: 1x 8-sw DIP, 1x 10-sw DIP (internal), 2x 10-sw DIP (available to user at 
 
 ROM_START( tv912c )
 	ROM_REGION(0x1000, "maincpu", 0)
-	ROM_LOAD( "a49c1.bin",    0x0000, 0x1000, CRC(d21851bf) SHA1(28fe77a218a5eee11de376f5d16e9380b616b3ca) ) // last half is all FF
+	ROM_LOAD( "a49c1.bin",    0x0000, 0x1000, CRC(d21851bf) SHA1(28fe77a218a5eee11de376f5d16e9380b616b3ca) BAD_DUMP ) // last half is all FF
 
 	ROM_REGION(0x0800, "chargen", 0)
 	ROM_LOAD( "a3-2.bin",     0x0000, 0x0800, CRC(bb9a7fbd) SHA1(5f1c4d41b25bd3ca4dbc336873362935daf283da) )
