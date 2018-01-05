@@ -1,0 +1,35 @@
+msgid "P1 Button 1"
+msgstr "P1 Horizontal Attack"
+
+msgid "P1 Button 2"
+msgstr "P1 Vertical Attack"
+
+msgid "P1 Button 3"
+msgstr "P1 Kick"
+
+msgid "P1 Button 4"
+msgstr "P1 Block"
+
+msgid "P1 Button 5"
+msgstr "P1 Button 5 (Unused)"
+
+msgid "P1 Button 6"
+msgstr "P1 Button 6 (Unused)"
+
+msgid "P2 Button 1"
+msgstr "P2 Horizontal Attack"
+
+msgid "P2 Button 2"
+msgstr "P2 Vertical Attack"
+
+msgid "P2 Button 3"
+msgstr "P2 Kick"
+
+msgid "P2 Button 4"
+msgstr "P2 Block"
+
+msgid "P2 Button 5"
+msgstr "P2 Button 5 (Unused)"
+
+msgid "P2 Button 6"
+msgstr "P2 Button 6 (Unused)"
