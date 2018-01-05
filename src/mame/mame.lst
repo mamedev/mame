@@ -36471,7 +36471,6 @@ aaa
 qvt70
 qvt103
 qvt201
-tv912c
 tv955
 tv965
 
@@ -37282,6 +37281,9 @@ tutor                           // 1983? Tomy Tutor
 
 @source:tv910.cpp
 tv910                           //
+
+@source:tv912.cpp
+tv912c                          //
 
 @source:tv950.cpp
 tv950                           //

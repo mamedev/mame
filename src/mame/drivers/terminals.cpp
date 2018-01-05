@@ -125,27 +125,6 @@ COMP( 1986, qvt201, 0, 0, terminals, terminals, terminals_state, 0, "Qume", "QVT
 
 /**************************************************************************************************************
 
-Televideo TVI-912C.
-Chips: i8035, TMS9927NL, AY5-1013A (COM2502)
-Crystals: 23.814 (divide by 4 for CPU clock)
-Other: 1x 8-sw DIP, 1x 10-sw DIP (internal), 2x 10-sw DIP (available to user at the back)
-
-***************************************************************************************************************/
-
-ROM_START( tv912c )
-	ROM_REGION(0x10000, "maincpu", 0)
-	ROM_LOAD( "a49c1.bin",    0x0000, 0x1000, CRC(d21851bf) SHA1(28fe77a218a5eee11de376f5d16e9380b616b3ca) ) // last half is all FF
-
-	ROM_REGION(0x0800, "chargen", 0)
-	ROM_LOAD( "a3-2.bin",     0x0000, 0x0800, CRC(bb9a7fbd) SHA1(5f1c4d41b25bd3ca4dbc336873362935daf283da) )
-ROM_END
-
-COMP( 1978, tv912c, 0, 0, terminals, terminals, terminals_state, 0, "TeleVideo", "TVI-912C", MACHINE_IS_SKELETON )
-
-
-
-/**************************************************************************************************************
-
 Televideo TVI-955
 Chips: G65SC02P-3, 3x S6551AP, SCN2674B, AMI 131406-00 (unknown 40-pin DIL), odd round silver thing, might be a battery
 Crystals: 19.3396, 31.684, 3.6864

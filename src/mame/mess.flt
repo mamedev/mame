@@ -712,6 +712,7 @@ tsispch.cpp
 tti.cpp
 tutor.cpp
 tv910.cpp
+tv912.cpp
 tv950.cpp
 tv990.cpp
 tvc.cpp
