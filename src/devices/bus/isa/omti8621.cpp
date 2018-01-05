@@ -23,7 +23,7 @@
 
 static int verbose = VERBOSE;
 
-#define LOG(x)  { logerror ("%s: ", cpu_context(this)); logerror x; logerror ("\n"); }
+#define LOG(x)  { logerror ("%s: ", cpu_context()); logerror x; logerror ("\n"); }
 #define LOG1(x) { if (verbose > 0) LOG(x)}
 #define LOG2(x) { if (verbose > 1) LOG(x)}
 #define LOG3(x) { if (verbose > 2) LOG(x)}
@@ -186,23 +186,13 @@ enum {
  cpu_context - return a string describing the current CPU context
  ***************************************************************************/
 
-static const char *cpu_context(const device_t *device) {
-	static char statebuf[64]; /* string buffer containing state description */
+std::string omti8621_device::cpu_context() const
+{
+	osd_ticks_t t = osd_ticks();
+	int s = (t / osd_ticks_per_second()) % 3600;
+	int ms = (t / (osd_ticks_per_second() / 1000)) % 1000;
 
-	device_t *cpu = device->machine().firstcpu;
-
-	/* if we have an executing CPU, output data */
-	if (cpu != nullptr) {
-		osd_ticks_t t = osd_ticks();
-		int s = (t / osd_ticks_per_second()) % 3600;
-		int ms = (t / (osd_ticks_per_second() / 1000)) % 1000;
-
-		sprintf(statebuf, "%d.%03d %s pc=%08x - %s", s, ms, cpu->tag(),
-				cpu->safe_pcbase(), device->tag());
-	} else {
-		strcpy(statebuf, "(no context)");
-	}
-	return statebuf;
+	return string_format("%d.%03d %s", s, ms, machine().describe_context());
 }
 
 static SLOT_INTERFACE_START( pc_hd_floppies )
@@ -699,7 +689,7 @@ void omti8621_device::log_command(const uint8_t cdb[], const uint16_t cdb_length
 {
 	if (verbose > 0) {
 		int i;
-		logerror("%s: OMTI command ", cpu_context(this));
+		logerror("%s: OMTI command ", cpu_context());
 		switch (cdb[0]) {
 		case OMTI_CMD_TEST_DRIVE_READY: // 0x00
 			logerror("Test Drive Ready");
@@ -798,7 +788,7 @@ void omti8621_device::log_data()
 {
 	if (verbose > 0) {
 		int i;
-		logerror("%s: OMTI data (length=%02x)", cpu_context(this),
+		logerror("%s: OMTI data (length=%02x)", cpu_context(),
 				data_length);
 		for (i = 0; i < data_length && i < OMTI_DISK_SECTOR_SIZE; i++) {
 			logerror(" %02x", data_buffer[i]);
@@ -1317,7 +1307,7 @@ omti_disk_image_device::omti_disk_image_device(const machine_config &mconfig, co
 
 void omti_disk_image_device::omti_disk_config(uint16_t disk_type)
 {
-	LOG1(("omti_disk_config: configuring disk with type %x", disk_type));
+	logerror("omti_disk_config: configuring disk with type %x\n", disk_type);
 
 	switch (disk_type)
 	{
@@ -1360,11 +1350,11 @@ void omti_disk_image_device::device_start()
 
 	if (!m_image->is_open())
 	{
-		LOG1(("device_start_omti_disk: no disk"));
+		logerror("device_start_omti_disk: no disk\n");
 	}
 	else
 	{
-		LOG1(("device_start_omti_disk: with disk image %s",m_image->basename() ));
+		logerror("device_start_omti_disk: with disk image %s\n", m_image->basename());
 	}
 
 	// default disk type
@@ -1377,14 +1367,14 @@ void omti_disk_image_device::device_start()
 
 void omti_disk_image_device::device_reset()
 {
-	LOG1(("device_reset_omti_disk"));
+	logerror("device_reset_omti_disk\n");
 
 	if (exists() && fseek(0, SEEK_END) == 0)
 	{
 		uint32_t disk_size = (uint32_t)(ftell() / OMTI_DISK_SECTOR_SIZE);
 		uint16_t disk_type = disk_size >= 300000 ? OMTI_DISK_TYPE_348_MB : OMTI_DISK_TYPE_155_MB;
 		if (disk_type != m_type) {
-			LOG1(("device_reset_omti_disk: disk size=%d blocks, disk type=%x", disk_size, disk_type ));
+			logerror("device_reset_omti_disk: disk size=%d blocks, disk type=%x\n", disk_size, disk_type);
 			omti_disk_config(disk_type);
 		}
 	}
@@ -1396,7 +1386,7 @@ void omti_disk_image_device::device_reset()
 
 image_init_result omti_disk_image_device::call_create(int format_type, util::option_resolution *format_options)
 {
-	LOG(("device_create_omti_disk: creating OMTI Disk with %d blocks", m_sector_count));
+	logerror("device_create_omti_disk: creating OMTI Disk with %d blocks\n", m_sector_count);
 
 	int x;
 	unsigned char sectordata[OMTI_DISK_SECTOR_SIZE]; // empty block data
