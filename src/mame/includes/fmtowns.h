@@ -276,6 +276,7 @@ class towns_state : public driver_device
 	DECLARE_WRITE8_MEMBER(towns_rtc_select_w);
 	DECLARE_READ8_MEMBER(towns_volume_r);
 	DECLARE_WRITE8_MEMBER(towns_volume_w);
+	DECLARE_READ8_MEMBER(unksnd_r);
 	DECLARE_READ8_MEMBER(towns_41ff_r);
 
 	DECLARE_READ8_MEMBER(towns_gfx_high_r);
