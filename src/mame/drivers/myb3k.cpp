@@ -53,9 +53,11 @@
 #define LOG_DMA     (1U << 5)
 #define LOG_KBD     (1U << 6)
 #define LOG_VMOD    (1U << 7)
-#define LOG_PIX    (1U << 8)
+#define LOG_PIX     (1U << 8)
+#define LOG_M2      (1U << 9)
+#define LOG_SCRL    (1U << 10)
 
-//#define VERBOSE (LOG_VMOD)
+//#define VERBOSE (LOG_VMOD|LOG_SCRL)
 //#define LOG_OUTPUT_STREAM std::cout
 
 #include "logmacro.h"
@@ -67,7 +69,9 @@
 #define LOGDMA(...)  LOGMASKED(LOG_DMA,  __VA_ARGS__)
 #define LOGKBD(...)  LOGMASKED(LOG_KBD,  __VA_ARGS__)
 #define LOGVMOD(...) LOGMASKED(LOG_VMOD, __VA_ARGS__)
-#define LOGPIX(...)  LOGMASKED(LOG_PIX, __VA_ARGS__)
+#define LOGPIX(...)  LOGMASKED(LOG_PIX,  __VA_ARGS__)
+#define LOGM2(...)   LOGMASKED(LOG_M2,   __VA_ARGS__)
+#define LOGSCRL(...) LOGMASKED(LOG_SCRL, __VA_ARGS__)
 
 #ifdef _MSC_VER
 #define FUNCNAME __func__
@@ -104,6 +108,7 @@ public:
 		, m_isabus(*this, "isa")
 	{ }
 
+  // uint8_t tmp;
 	DECLARE_READ8_MEMBER(myb3k_kbd_r);
 	void kbd_set_data_and_interrupt(u8 data);
 
@@ -185,11 +190,8 @@ void myb3k_state::kbd_set_data_and_interrupt(u8 data) {
 
 MC6845_UPDATE_ROW( myb3k_state::crtc_update_row )
 {
-	//m_maincpu->eat_cycles(32 * 8 * 40 * 100);
-	//m_maincpu->adjust_icount(-1 * 32 * 8 * 40 * 100000);
 	for (int x_pos = 0; x_pos < x_count; x_pos++)
 	{
-		//int h_step = 64 >> (m_vmode & 3);
 		uint16_t page = (m_portc & PC1_SETPAGE) ? 0x8000 : 0;
 
 		if ((m_portc & PC2_DISPST) == 0)
@@ -199,43 +201,60 @@ MC6845_UPDATE_ROW( myb3k_state::crtc_update_row )
 				bitmap.pix32(y, ( x_pos * 8) + pxl) = rgb_t::black();
 			}
 		}
-		else if (m_vmode == 1)
+		else 
 		{
+			uint32_t rowstart;
 			uint32_t pdat;
-			pdat  = ((m_vram[(x_pos + ma) * 32 + ra + page +  0]  & 0xff) << 16); // Green 8 bits
-			pdat |= ((m_vram[(x_pos + ma) * 32 + ra + page +  8]  & 0xf0) << 8);  // Red upper 4 bits
-			pdat |= ((m_vram[(x_pos + ma) * 32 + ra + page +  8]  & 0x0f) <<  4); // Blue upper 4 bits
-			pdat |= ((m_vram[(x_pos + ma) * 32 + ra + page +  24] & 0xf0) <<  4); // Red lower 4 bits
-			pdat |= ((m_vram[(x_pos + ma) * 32 + ra + page +  24] & 0x0f) <<  0); // Blue lower 4 bits
-			if (pdat != 0)
-			  LOGPIX(" - PDAT:%06x from offset %04x RA=%d\n", pdat, (x_pos + ma) * 32 + ra + page + 0, 0);
-
-			for (int pxl = 0; pxl < 8; pxl++)
+			uint16_t pdat16;
+			switch (m_vmode)
 			{
-				uint16_t pind = 0;
-				/* Pixeldata for 8 pixels are stored in pdat as GGRRBB  */
-				pind = (((pdat & (0x800000 >> pxl)) ? 0x04 : 0x00) |
-					((pdat & (0x008000 >> pxl)) ? 0x02 : 0x00) |
-					((pdat & (0x000080 >> pxl)) ? 0x01 : 0x00) );
+			case 1: // 320x200, 40 char, 8 color TODO: 8 green tones in monochrome
+				rowstart = (((x_pos + ma) * 32 + ra) & 0x7fff) + page;
+				pdat  = ((m_vram[rowstart +  0]  & 0xff) << 16); // Green 8 bits
+				pdat |= ((m_vram[rowstart +  8]  & 0xf0) << 8);  // Red upper 4 bits
+				pdat |= ((m_vram[rowstart +  8]  & 0x0f) <<  4); // Blue upper 4 bits
+				pdat |= ((m_vram[rowstart +  24] & 0xf0) <<  4); // Red lower 4 bits
+				pdat |= ((m_vram[rowstart +  24] & 0x0f) <<  0); // Blue lower 4 bits
 
-				/* Pick up the color */
-				bitmap.pix32(y, ( x_pos * 8) + pxl) = m_cpal[pind & 0x07];
-			}
-		}
-		else
-		{
-			int h_step = 64 >> (m_vmode & 3);
-			uint16_t pdat = m_vram[(x_pos + ma) * h_step + ra + page + 8];
-			for (int pxl = 0; pxl < 8; pxl++)
-			{
-				if ((pdat & (0x80 >> pxl)) != 0)
+				if (pdat != 0)
 				{
-					//bitmap.pix32(y, ( x_pos * 8) + pxl) = m_cpal[pind & 0x07];
-					bitmap.pix32(y, ( x_pos * 8) + pxl) = rgb_t::green();
+					LOGPIX(" - PDAT:%06x from offset %04x RA=%d\n", pdat, rowstart + 0, ra);
 				}
+
+				for (int pxl = 0; pxl < 8; pxl++)
+				{
+					uint16_t pind = 0;
+					/* Pixeldata for 8 pixels are stored in pdat as GGRRBB  */
+					pind = (((pdat & (0x800000 >> pxl)) ? 0x04 : 0x00) |
+						((pdat & (0x008000 >> pxl)) ? 0x02 : 0x00) |
+						((pdat & (0x000080 >> pxl)) ? 0x01 : 0x00) );
+
+					/* Pick up the color */
+					bitmap.pix32(y, ( x_pos * 8) + pxl) = m_cpal[pind & 0x07];
+				}
+				break;
+			case 2: // 640x200, 80 char, white on black
+				rowstart = (((x_pos + ma * 2) * 16 + ra) & 0x7fff) + page;
+				pdat16 = m_vram[rowstart];
+				if (pdat16 != 0)
+					LOGM2(" - PDAT:%06x from offset %04x RA=%d X:%d Y:%d\n", pdat16, (x_pos + ma * 2) * 16 + ra + page + 0, ra, x_pos, y);
+				for (int pxl = 0; pxl < 8; pxl++)
+				{
+					if ((pdat16 & (0x80 >> pxl)) != 0)
+					{
+						bitmap.pix32(y, ( x_pos * 8) + pxl) = m_cpal[0x07];
+					}
+					else
+					{
+						bitmap.pix32(y, ( x_pos * 8) + pxl) = rgb_t::black();
+					}
+				}
+				break;
+			default:
+				logerror("unimplemented video mode: %02x", m_vmode);
 			}
+			//col ^= ((cursor_x != -1 && x_pos >= cursor_x && x_pos < (cursor_x + m_cursor_size)) ? 7 : 0);
 		}
-		//col ^= ((cursor_x != -1 && x_pos >= cursor_x && x_pos < (cursor_x + m_cursor_size)) ? 7 : 0);
 	}
 }
 
@@ -368,7 +387,7 @@ static ADDRESS_MAP_START(myb3k_map, AS_PROGRAM, 8, myb3k_state)
 	AM_RANGE(0x00000,0x3ffff) AM_RAM // It's either 128Kb or 256Kb RAM
 	AM_RANGE(0x40000,0x7ffff) AM_NOP
 	AM_RANGE(0x80000,0xcffff) AM_NOP // Expansion Unit connected through an ISA8 cable
-	AM_RANGE(0xd0000,0xdffff) AM_RAM AM_SHARE("vram")  // Area 6, physical at 30000-3FFFF (128Kb RAM) or 10000-1FFFF (256KB RAM)
+	AM_RANGE(0xd0000,0xeffff) AM_RAM AM_SHARE("vram")  // Area 6, physical at 30000-3FFFF (128Kb RAM) or 10000-1FFFF (256KB RAM)
 	AM_RANGE(0xf0000,0xfffff) AM_ROM AM_REGION("ipl", 0) // Area 7, 8 x 8Kb
 ADDRESS_MAP_END
 
@@ -380,7 +399,7 @@ static ADDRESS_MAP_START(myb3k_io, AS_IO, 8, myb3k_state)
 // Discrete latches
 	AM_RANGE(0x04, 0x04) AM_READ(myb3k_kbd_r)
 	AM_RANGE(0x04, 0x04) AM_WRITE(myb3k_video_mode_w) // b0=40CH, b1=80CH, b2=16 raster
-//  AM_RANGE(0x05, 0x05) AM_READ(myb3k_io_status_r)
+//  AM_RANGE(0x05, 0x05) AM_READ(myb3k_io_status_r) // printer connector bits: b3=fault b2=paper out b1/b0=nc 
 	AM_RANGE(0x05, 0x05) AM_WRITE(dma_segment_w) // b0-b3=addr, b6=A b7=B
 	AM_RANGE(0x06, 0x06) AM_READ_PORT("DSW2")
 // 8-9 8259A interrupt controller
@@ -675,13 +694,21 @@ static MACHINE_CONFIG_START( myb3k )
 	MCFG_MYB3K_KEYBOARD_CB(PUT(myb3k_state, kbd_set_data_and_interrupt))
 
 	/* video hardware */
+#if 1
 	//MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green())
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_RAW_PARAMS(XTAL_14_31818MHz / 3, 600, 0, 600, 400, 0, 400)
+	MCFG_SCREEN_UPDATE_DEVICE("crtc", h46505_device, screen_update)
+//	MCFG_SCREEN_UPDATE_DRIVER(myb3k_state, screen_update_myb3k)
+
+#else // Funkar the old way
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_SIZE(640, 400)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 400-1)
 	MCFG_SCREEN_UPDATE_DEVICE("crtc", h46505_device, screen_update)
+#endif
 
 	/* devices */
 	MCFG_MC6845_ADD("crtc", H46505, "screen", XTAL_14_31818MHz / 16) /* Main crystal divided by 16 through a 74163 4 bit counter */
