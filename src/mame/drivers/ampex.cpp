@@ -1,16 +1,20 @@
 // license:BSD-3-Clause
 // copyright-holders:
-/***********************************************************************************************************************************
+/*******************************************************************************
 
 2017-11-05 Skeleton
 
 Ampex Dialogue 80 terminal
 
-Chips: CRT-5037, COM8017, SMC5016-5, MK3880N (Z80)
+Chips: CRT-5037, COM8017, SMC (COM)5016-5, MK3880N (Z80), SN74LS424N (TIM8224)
 Crystals: 4.9152, 23.814
 Other: Beeper, 5x 10sw-dips.
 
-************************************************************************************************************************************/
+The program code seems to have been designed with a 8080 CPU in mind, using no
+Z80-specific opcodes. This impression is reinforced by the IC types present on
+the PCB, which go so far as to include the standard 8224 clock generator.
+
+*******************************************************************************/
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
@@ -57,7 +61,7 @@ static INPUT_PORTS_START( ampex )
 INPUT_PORTS_END
 
 static MACHINE_CONFIG_START( ampex )
-	MCFG_CPU_ADD("maincpu", Z80, 2'000'000) // no idea of clock.
+	MCFG_CPU_ADD("maincpu", Z80, XTAL_23_814MHz / 9) // clocked by 8224?
 	MCFG_CPU_PROGRAM_MAP(mem_map)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -81,6 +85,10 @@ ROM_START( dialog80 )
 
 	ROM_REGION( 0x0800, "chargen", 0 )
 	ROM_LOAD( "3505240-07.u69",  0x0000, 0x0800, CRC(838a16cb) SHA1(4301324b9fe9453c2d277972f9464c4214c6793d) )
+
+	ROM_REGION( 0x0200, "proms", 0 ) // unknown TI 16-pin DIPs
+	ROM_LOAD( "417129-010.u16",  0x0000, 0x0100, NO_DUMP )
+	ROM_LOAD( "417129-010.u87",  0x0100, 0x0200, NO_DUMP )
 ROM_END
 
 COMP( 1980, dialog80, 0, 0, ampex, ampex, ampex_state, 0, "Ampex", "Dialogue 80", MACHINE_IS_SKELETON )
