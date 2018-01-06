@@ -4950,6 +4950,9 @@ WRITE32_MEMBER( voodoo_banshee_device::banshee_io_w )
 			int vtotal = banshee.crtc[6];
 			vtotal |= ((banshee.crtc[7] >> 0) & 0x1) << 8;
 			vtotal |= ((banshee.crtc[7] >> 5) & 0x1) << 9;
+			int vstart = banshee.crtc[0x10];
+			vstart |= ((banshee.crtc[7] >> 2) & 0x1) << 8;
+			vstart |= ((banshee.crtc[7] >> 7) & 0x1) << 9;
 
 			// Get pll k, m and n from pllCtrl0
 			const uint32_t k = (banshee.io[io_pllCtrl0] >> 0) & 0x3;
@@ -4966,16 +4969,15 @@ WRITE32_MEMBER( voodoo_banshee_device::banshee_io_w )
 				width = (fbi.width * banshee.io[io_vidOverlayDudx]) / 1048576;
 			if (banshee.io[io_vidOverlayDvdy] != 0)
 				height = (fbi.height * banshee.io[io_vidOverlayDvdy]) / 1048576;
-
 			if (LOG_REGISTERS)
-				logerror("configure screen: htotal: %d vtotal: %d width: %d height: %d refresh: %f\n",
-					htotal, vtotal, width, height, 1.0 / frame_period);
+				logerror("configure screen: htotal: %d vtotal: %d vstart: %d width: %d height: %d refresh: %f\n",
+					htotal, vtotal, vstart, width, height, 1.0 / frame_period);
 			if (htotal > 0 && vtotal > 0) {
 				rectangle visarea(0, width - 1, 0, height - 1);
 				screen->configure(htotal, vtotal, visarea, DOUBLE_TO_ATTOSECONDS(frame_period));
 
-				// Set the vsync to start at top of screen
-				fbi.vsyncscan = height;
+				// Set the vsync start
+				fbi.vsyncscan = vstart;
 				adjust_vblank_timer(this);
 			}
 			if (LOG_REGISTERS)
