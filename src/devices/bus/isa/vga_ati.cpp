@@ -189,6 +189,9 @@ void isa16_vga_gfxultra_device::device_start()
 	m_isa->install16_device(0x56ec, 0x56ef, read16_delegate(FUNC(mach8_device::mach8_scratch0_r),m_8514), write16_delegate(FUNC(mach8_device::mach8_scratch0_w),m_8514));
 	m_isa->install16_device(0x5ae8, 0x5aeb, read16_delegate(FUNC(mach8_device::mach8_ec2_r),m_8514), write16_delegate(FUNC(mach8_device::mach8_ec2_w),m_8514));
 	m_isa->install16_device(0x5ee8, 0x5eeb, read16_delegate(FUNC(mach8_device::mach8_ec3_r),m_8514), write16_delegate(FUNC(mach8_device::mach8_ec3_w),m_8514));
+	m_isa->install16_device(0x6eec, 0x6eef, read16_delegate(FUNC(mach8_device::mach8_readonly_r),m_8514), write16_delegate(FUNC(mach8_device::mach8_ge_offset_l_w),m_8514));
+	m_isa->install16_device(0x72ec, 0x72ef, read16_delegate(FUNC(mach8_device::mach8_readonly_r),m_8514), write16_delegate(FUNC(mach8_device::mach8_ge_offset_h_w),m_8514));
+	m_isa->install16_device(0x76ec, 0x76ef, read16_delegate(FUNC(mach8_device::mach8_readonly_r),m_8514), write16_delegate(FUNC(mach8_device::mach8_ge_pitch_w),m_8514));
 	m_isa->install16_device(0x82e8, 0x82eb, read16_delegate(FUNC(mach8_device::ibm8514_currenty_r),m_8514), write16_delegate(FUNC(mach8_device::ibm8514_currenty_w),m_8514));
 	m_isa->install16_device(0x86e8, 0x86eb, read16_delegate(FUNC(mach8_device::ibm8514_currentx_r),m_8514), write16_delegate(FUNC(mach8_device::ibm8514_currentx_w),m_8514));
 	m_isa->install16_device(0x8ae8, 0x8aeb, read16_delegate(FUNC(mach8_device::ibm8514_desty_r),m_8514), write16_delegate(FUNC(mach8_device::ibm8514_desty_w),m_8514));
@@ -206,7 +209,9 @@ void isa16_vga_gfxultra_device::device_start()
 	m_isa->install16_device(0xb6e8, 0xb6eb, read16_delegate(FUNC(mach8_device::ibm8514_backmix_r),m_8514), write16_delegate(FUNC(mach8_device::ibm8514_backmix_w),m_8514));
 	m_isa->install16_device(0xbae8, 0xbaeb, read16_delegate(FUNC(mach8_device::ibm8514_foremix_r),m_8514), write16_delegate(FUNC(mach8_device::ibm8514_foremix_w),m_8514));
 	m_isa->install16_device(0xbee8, 0xbeeb, read16_delegate(FUNC(mach8_device::ibm8514_multifunc_r),m_8514), write16_delegate(FUNC(mach8_device::ibm8514_multifunc_w),m_8514));
-	m_isa->install16_device(0xe2e8, 0xe2eb, read16_delegate(FUNC(mach8_device::ibm8514_pixel_xfer_r),m_8514), write16_delegate(FUNC(mach8_device::ibm8514_pixel_xfer_w),m_8514));
+	m_isa->install16_device(0xcaec, 0xcaef, read16_delegate(FUNC(mach8_device::mach8_readonly_r),m_8514), write16_delegate(FUNC(mach8_device::mach8_scan_x_w),m_8514));
+	m_isa->install16_device(0xceec, 0xceef, read16_delegate(FUNC(mach8_device::mach8_readonly_r),m_8514), write16_delegate(FUNC(mach8_device::mach8_dp_config_w),m_8514));
+	m_isa->install16_device(0xe2e8, 0xe2eb, read16_delegate(FUNC(mach8_device::ibm8514_pixel_xfer_r),m_8514), write16_delegate(FUNC(mach8_device::mach8_pixel_xfer_w),m_8514));
 	m_isa->install16_device(0xdaec, 0xdaef, read16_delegate(FUNC(mach8_device::mach8_sourcex_r),m_8514), write16_delegate(FUNC(mach8_device::mach8_ext_leftscissor_w),m_8514));
 	m_isa->install16_device(0xdeec, 0xdeef, read16_delegate(FUNC(mach8_device::mach8_sourcey_r),m_8514), write16_delegate(FUNC(mach8_device::mach8_ext_topscissor_w),m_8514));
 	m_isa->install16_device(0xfeec, 0xfeef, read16_delegate(FUNC(mach8_device::mach8_linedraw_r),m_8514), write16_delegate(FUNC(mach8_device::mach8_linedraw_w),m_8514));
@@ -250,6 +255,9 @@ void isa16_vga_gfxultrapro_device::device_start()
 	m_isa->install16_device(0x5ae8, 0x5aeb, read16_delegate(FUNC(mach32_device::mach8_ec2_r),m_vga), write16_delegate(FUNC(mach32_device::mach8_ec2_w),m_vga));
 	m_isa->install16_device(0x5ee8, 0x5eeb, read16_delegate(FUNC(mach32_device::mach8_ec3_r),m_vga), write16_delegate(FUNC(mach32_device::mach8_ec3_w),m_vga));
 	m_isa->install16_device(0x62ec, 0x62ef, read16_delegate(FUNC(mach32_device::mach32_ext_ge_r),m_vga), write16_delegate(FUNC(mach32_device::mach32_horz_overscan_w),m_vga));
+	m_isa->install16_device(0x6eec, 0x6eef, read16_delegate(FUNC(mach32_device::mach32_readonly_r),m_vga), write16_delegate(FUNC(mach32_device::mach8_ge_offset_l_w),m_vga));
+	m_isa->install16_device(0x72ec, 0x72ef, read16_delegate(FUNC(mach32_device::mach32_readonly_r),m_vga), write16_delegate(FUNC(mach32_device::mach8_ge_offset_h_w),m_vga));
+	m_isa->install16_device(0x76ec, 0x76ef, read16_delegate(FUNC(mach32_device::mach32_readonly_r),m_vga), write16_delegate(FUNC(mach32_device::mach8_ge_pitch_w),m_vga));
 	m_isa->install16_device(0x82e8, 0x82eb, read16_delegate(FUNC(mach32_device::ibm8514_currenty_r),m_vga), write16_delegate(FUNC(mach32_device::ibm8514_currenty_w),m_vga));
 	m_isa->install16_device(0x86e8, 0x86eb, read16_delegate(FUNC(mach32_device::ibm8514_currentx_r),m_vga), write16_delegate(FUNC(mach32_device::ibm8514_currentx_w),m_vga));
 	m_isa->install16_device(0x8ae8, 0x8aeb, read16_delegate(FUNC(mach32_device::ibm8514_desty_r),m_vga), write16_delegate(FUNC(mach32_device::ibm8514_desty_w),m_vga));
@@ -267,7 +275,9 @@ void isa16_vga_gfxultrapro_device::device_start()
 	m_isa->install16_device(0xb6e8, 0xb6eb, read16_delegate(FUNC(mach32_device::ibm8514_backmix_r),m_vga), write16_delegate(FUNC(mach32_device::ibm8514_backmix_w),m_vga));
 	m_isa->install16_device(0xbae8, 0xbaeb, read16_delegate(FUNC(mach32_device::ibm8514_foremix_r),m_vga), write16_delegate(FUNC(mach32_device::ibm8514_foremix_w),m_vga));
 	m_isa->install16_device(0xbee8, 0xbeeb, read16_delegate(FUNC(mach32_device::ibm8514_multifunc_r),m_vga), write16_delegate(FUNC(mach32_device::ibm8514_multifunc_w),m_vga));
-	m_isa->install16_device(0xe2e8, 0xe2eb, read16_delegate(FUNC(mach32_device::ibm8514_pixel_xfer_r),m_vga), write16_delegate(FUNC(mach32_device::ibm8514_pixel_xfer_w),m_vga));
+	m_isa->install16_device(0xcaec, 0xcaef, read16_delegate(FUNC(mach32_device::mach32_readonly_r),m_vga), write16_delegate(FUNC(mach32_device::mach8_scan_x_w),m_vga));
+	m_isa->install16_device(0xceec, 0xceef, read16_delegate(FUNC(mach32_device::mach32_readonly_r),m_vga), write16_delegate(FUNC(mach32_device::mach8_dp_config_w),m_vga));
+	m_isa->install16_device(0xe2e8, 0xe2eb, read16_delegate(FUNC(mach32_device::ibm8514_pixel_xfer_r),m_vga), write16_delegate(FUNC(mach32_device::mach8_pixel_xfer_w),m_vga));
 	m_isa->install16_device(0xdaec, 0xdaef, read16_delegate(FUNC(mach32_device::mach8_sourcex_r),m_vga), write16_delegate(FUNC(mach32_device::mach8_ext_leftscissor_w),m_vga));
 	m_isa->install16_device(0xdeec, 0xdeef, read16_delegate(FUNC(mach32_device::mach8_sourcey_r),m_vga), write16_delegate(FUNC(mach32_device::mach8_ext_topscissor_w),m_vga));
 	m_isa->install16_device(0xfaec, 0xfaef, read16_delegate(FUNC(mach32_device::mach32_chipid_r),m_vga), write16_delegate());
@@ -305,6 +315,9 @@ void isa16_vga_mach64_device::device_start()
 	m_isa->install16_device(0x56ec, 0x56ef, read16_delegate(FUNC(mach64_device::mach8_scratch0_r),m_vga), write16_delegate(FUNC(mach64_device::mach8_scratch0_w),m_vga));
 	m_isa->install16_device(0x5ae8, 0x5aeb, read16_delegate(FUNC(mach64_device::mach8_ec2_r),m_vga), write16_delegate(FUNC(mach64_device::mach8_ec2_w),m_vga));
 	m_isa->install16_device(0x5ee8, 0x5eeb, read16_delegate(FUNC(mach64_device::mach8_ec3_r),m_vga), write16_delegate(FUNC(mach64_device::mach8_ec3_w),m_vga));
+	m_isa->install16_device(0x6eec, 0x6eef, read16_delegate(FUNC(mach64_device::mach32_readonly_r),m_vga), write16_delegate(FUNC(mach64_device::mach8_ge_offset_l_w),m_vga));
+	m_isa->install16_device(0x72ec, 0x72ef, read16_delegate(FUNC(mach64_device::mach32_readonly_r),m_vga), write16_delegate(FUNC(mach64_device::mach8_ge_offset_h_w),m_vga));
+	m_isa->install16_device(0x76ec, 0x76ef, read16_delegate(FUNC(mach64_device::mach32_readonly_r),m_vga), write16_delegate(FUNC(mach64_device::mach8_ge_pitch_w),m_vga));
 	m_isa->install16_device(0x82e8, 0x82eb, read16_delegate(FUNC(mach64_device::ibm8514_currenty_r),m_vga), write16_delegate(FUNC(mach64_device::ibm8514_currenty_w),m_vga));
 	m_isa->install16_device(0x86e8, 0x86eb, read16_delegate(FUNC(mach64_device::ibm8514_currentx_r),m_vga), write16_delegate(FUNC(mach64_device::ibm8514_currentx_w),m_vga));
 	m_isa->install16_device(0x8ae8, 0x8aeb, read16_delegate(FUNC(mach64_device::ibm8514_desty_r),m_vga), write16_delegate(FUNC(mach64_device::ibm8514_desty_w),m_vga));
@@ -322,7 +335,9 @@ void isa16_vga_mach64_device::device_start()
 	m_isa->install16_device(0xb6e8, 0xb6eb, read16_delegate(FUNC(mach64_device::ibm8514_backmix_r),m_vga), write16_delegate(FUNC(mach64_device::ibm8514_backmix_w),m_vga));
 	m_isa->install16_device(0xbae8, 0xbaeb, read16_delegate(FUNC(mach64_device::ibm8514_foremix_r),m_vga), write16_delegate(FUNC(mach64_device::ibm8514_foremix_w),m_vga));
 	m_isa->install16_device(0xbee8, 0xbeeb, read16_delegate(FUNC(mach64_device::ibm8514_multifunc_r),m_vga), write16_delegate(FUNC(mach64_device::ibm8514_multifunc_w),m_vga));
-	m_isa->install16_device(0xe2e8, 0xe2eb, read16_delegate(FUNC(mach64_device::ibm8514_pixel_xfer_r),m_vga), write16_delegate(FUNC(mach64_device::ibm8514_pixel_xfer_w),m_vga));
+	m_isa->install16_device(0xcaec, 0xcaef, read16_delegate(FUNC(mach64_device::mach32_readonly_r),m_vga), write16_delegate(FUNC(mach64_device::mach8_scan_x_w),m_vga));
+	m_isa->install16_device(0xceec, 0xceef, read16_delegate(FUNC(mach64_device::mach32_readonly_r),m_vga), write16_delegate(FUNC(mach64_device::mach8_dp_config_w),m_vga));
+	m_isa->install16_device(0xe2e8, 0xe2eb, read16_delegate(FUNC(mach64_device::ibm8514_pixel_xfer_r),m_vga), write16_delegate(FUNC(mach64_device::mach8_pixel_xfer_w),m_vga));
 	m_isa->install16_device(0xdaec, 0xdaef, read16_delegate(FUNC(mach64_device::mach8_sourcex_r),m_vga), write16_delegate(FUNC(mach64_device::mach8_ext_leftscissor_w),m_vga));
 	m_isa->install16_device(0xdeec, 0xdeef, read16_delegate(FUNC(mach64_device::mach8_sourcey_r),m_vga), write16_delegate(FUNC(mach64_device::mach8_ext_topscissor_w),m_vga));
 	m_isa->install16_device(0xfaec, 0xfaef, read16_delegate(FUNC(mach64_device::mach32_chipid_r),m_vga), write16_delegate());

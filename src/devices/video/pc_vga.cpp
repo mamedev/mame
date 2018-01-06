@@ -68,7 +68,8 @@ enum
 	IBM8514_DRAWING_BITBLT,
 	IBM8514_DRAWING_PATTERN,
 	IBM8514_DRAWING_SSV_1,
-	IBM8514_DRAWING_SSV_2
+	IBM8514_DRAWING_SSV_2,
+	MACH8_DRAWING_SCAN
 };
 
 #define CRTC_PORT_ADDR ((vga.miscellaneous_output&1)?0x3d0:0x3b0)
@@ -4766,7 +4767,7 @@ WRITE16_MEMBER(ibm8514a_device::ibm8514_pixel_xfer_w)
 	if(ibm8514.state == IBM8514_DRAWING_LINE)
 		ibm8514_wait_draw_vector();
 
-	if(LOG_8514) logerror("S3: Pixel Transfer = %08x\n",ibm8514.pixel_xfer);
+	if(LOG_8514) logerror("8514/A: Pixel Transfer = %08x\n",ibm8514.pixel_xfer);
 }
 
 READ8_MEMBER(s3_vga_device::mem_r)
@@ -5742,6 +5743,104 @@ WRITE16_MEMBER(mach8_device::mach8_scratch1_w)
 {
 	mach8.scratch1 = data;
 	if(LOG_8514) logerror("Mach8: Scratch Pad 1 write %04x\n",data);
+}
+
+WRITE16_MEMBER(mach8_device::mach8_ge_offset_l_w)
+{
+	mach8.ge_offset = (mach8.ge_offset & 0x0f0000) | data;
+	if(LOG_8514) logerror("Mach8: Graphics Engine Offset (Low) write %05x\n",mach8.ge_offset);
+}
+
+WRITE16_MEMBER(mach8_device::mach8_ge_offset_h_w)
+{
+	mach8.ge_offset = (mach8.ge_offset & 0x00ffff) | ((data & 0x000f) << 16);
+	if(LOG_8514) logerror("Mach8: Graphics Engine Offset (High) write %05x\n",mach8.ge_offset);
+}
+
+WRITE16_MEMBER(mach8_device::mach8_ge_pitch_w)
+{
+	mach8.ge_pitch = mach8.ge_offset & 0x00ff;
+	if(LOG_8514) logerror("Mach8: Graphics Engine pitch write %05x\n",mach8.ge_pitch);
+}
+
+WRITE16_MEMBER(mach8_device::mach8_scan_x_w)
+{
+	mach8.scan_x = data & 0x07ff;
+
+	if((mach8.dp_config & 0xe000) == 0x4000)  // foreground source is the Pixel Transfer register
+	{
+		ibm8514.state = MACH8_DRAWING_SCAN;
+		ibm8514.bus_size = (mach8.dp_config & 0x0200) >> 9;
+		ibm8514.data_avail = true;
+	}
+	// TODO: non-wait version of Scan To X
+	if(LOG_8514) logerror("Mach8: Scan To X write %04x\n",mach8.scan_x);
+}
+
+WRITE16_MEMBER(mach8_device::mach8_pixel_xfer_w)
+{
+	ibm8514_pixel_xfer_w(space,offset,data,mem_mask);
+
+	if(ibm8514.state == MACH8_DRAWING_SCAN)
+		mach8_wait_scan();
+}
+
+void mach8_device::mach8_wait_scan()
+{
+	uint32_t offset = mach8.ge_offset << 2;
+	uint32_t addr = (ibm8514.prev_y * (mach8.ge_pitch * 8)) + ibm8514.prev_x;
+
+	// TODO: support reverse direction
+	if(mach8.dp_config & 0x0010) // drawing enabled
+	{
+		if(mach8.dp_config & 0x0200)  // 16-bit
+		{
+			ibm8514_write_fg(offset + addr);
+			ibm8514.pixel_xfer >>= 8;
+			ibm8514.prev_x++;
+			ibm8514_write_fg(offset + addr + 1);
+			ibm8514.prev_x++;
+			mach8.scan_x -= 2;
+			if(mach8.scan_x <= 0)
+			{
+				ibm8514.state = IBM8514_IDLE;
+				ibm8514.gpbusy = false;
+				ibm8514.data_avail = false;
+				ibm8514.curr_x = ibm8514.prev_x;
+			}
+		}
+		else  // 8-bit
+		{
+			ibm8514_write_fg(offset + addr);
+			ibm8514.prev_x++;
+			mach8.scan_x--;
+			if(mach8.scan_x <= 0)
+			{
+				ibm8514.state = IBM8514_IDLE;
+				ibm8514.gpbusy = false;
+				ibm8514.data_avail = false;
+				ibm8514.curr_x = ibm8514.prev_x;
+			}
+		}
+	}
+}
+
+/*
+ * CEEE (Write): Data Path Configuration
+ * bit  0: Read/Write data
+ *      1: Polygon-fill blit mode
+ *      2: Read host data - 0=colour, 1=monochrome
+ *      4: Enable Draw
+ *    5-6: Monochrome Data Source (0=always 1, 1=Mono pattern register, 2=Pixel Transfer register, 3=VRAM blit source)
+ *    7-8: Background Colour Source (0=Foreground Colour register, 1=Background Colour register, 2=Pixel Transfer register, 3=VRAM blit source)
+ *      9: Data width - 0=8-bit, 1=16-bit
+ *     12: LSB First (ignored in mach8 mode when data width is not set)
+ *  13-15: Foreground Colour Source (as Background Source, plus 5=Colour pattern shift register)
+ */
+WRITE16_MEMBER(mach8_device::mach8_dp_config_w)
+{
+	mach8.dp_config = data;
+	if(LOG_8514) logerror("Mach8: Data Path Configuration write %04x\n",mach8.dp_config);
 }
 
 /*

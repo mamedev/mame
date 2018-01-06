@@ -84,70 +84,6 @@ READ16_MEMBER(mach32_8514a_device::mach32_config1_r)
 	return 0x0430;  // enable VGA, 16-bit ISA, 256Kx16 DRAM, ATI68875
 }
 
-// mach32 Hardware Pointer
-WRITE16_MEMBER(mach32_8514a_device::mach32_cursor_l_w)
-{
-	if(offset == 1)
-		m_cursor_address = (m_cursor_address & 0xf0000) | data;
-}
-
-WRITE16_MEMBER(mach32_8514a_device::mach32_cursor_h_w)
-{
-	if(offset == 1)
-	{
-		m_cursor_address = (m_cursor_address & 0x0ffff) | ((data & 0x000f) << 16);
-		m_cursor_enable = data & 0x8000;
-		if(m_cursor_enable) popmessage("mach32 Hardware Cursor enabled");
-	}
-}
-
-WRITE16_MEMBER(mach32_8514a_device::mach32_cursor_pos_h)
-{
-	if(offset == 1)
-		m_cursor_horizontal = data & 0x07ff;
-}
-
-WRITE16_MEMBER(mach32_8514a_device::mach32_cursor_pos_v)
-{
-	if(offset == 1)
-		m_cursor_vertical = data & 0x0fff;
-}
-
-WRITE16_MEMBER(mach32_8514a_device::mach32_cursor_colour_b_w)
-{
-	if(offset == 1)
-	{
-		m_cursor_colour0_b = data & 0xff;
-		m_cursor_colour1_b = data >> 8;
-	}
-}
-
-WRITE16_MEMBER(mach32_8514a_device::mach32_cursor_colour_0_w)
-{
-	if(offset == 1)
-	{
-		m_cursor_colour0_g = data & 0xff;
-		m_cursor_colour0_r = data >> 8;
-	}
-}
-
-WRITE16_MEMBER(mach32_8514a_device::mach32_cursor_colour_1_w)
-{
-	if(offset == 1)
-	{
-		m_cursor_colour1_g = data & 0xff;
-		m_cursor_colour1_r = data >> 8;
-	}
-}
-
-WRITE16_MEMBER(mach32_8514a_device::mach32_cursor_offset_w)
-{
-	if(offset == 1)
-	{
-		m_cursor_horizontal = data & 0x00ff;
-		m_cursor_vertical = data >> 8;
-	}
-}
 
 void mach32_8514a_device::device_reset()
 {
@@ -157,11 +93,150 @@ void mach32_device::device_start()
 {
 	ati_vga_device::device_start();
 	ati.vga_chip_id = 0x00;  // correct?
+	vga.svga_intf.vram_size = 0x400000;
+	vga.memory.resize(vga.svga_intf.vram_size);
+	memset(&vga.memory[0], 0, vga.svga_intf.vram_size);
+	save_item(NAME(vga.memory));
 }
 
 void mach32_device::device_reset()
 {
 	ati_vga_device::device_reset();
+}
+
+uint32_t mach32_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+{
+	ati_vga_device::screen_update(screen,bitmap,cliprect);
+	uint8_t depth = get_video_depth();
+
+	if(!m_cursor_enable)
+		return 0;
+
+	uint32_t src = (m_cursor_address & 0x000fffff) << 2;
+	uint32_t* dst;  // destination pixel
+	uint8_t x,y,z;
+	uint32_t colour0;
+	uint32_t colour1;
+
+	if(depth == 8)
+	{
+		colour0 = m_palette->pen(m_cursor_colour0_b);
+		colour1 = m_palette->pen(m_cursor_colour1_b);
+	}
+	else  // 16/24/32bpp
+	{
+		colour0 = (m_cursor_colour0_r << 16) | (m_cursor_colour0_g << 8) | (m_cursor_colour0_b);
+		colour1 = (m_cursor_colour1_r << 16) | (m_cursor_colour1_g << 8) | (m_cursor_colour1_b);
+	}
+
+	// draw hardware pointer (64x64 max)
+	for(y=0;y<64;y++)
+	{
+		dst = &bitmap.pix32(m_cursor_vertical + y, m_cursor_horizontal);
+		for(x=0;x<64;x+=8)
+		{
+			uint16_t bits = (vga.memory[(src+0) % vga.svga_intf.vram_size] | ((vga.memory[(src+1) % vga.svga_intf.vram_size]) << 8));
+
+			for(z=0;z<8;z++)
+			{
+				if(((z + x) > (m_cursor_offset_horizontal-1)) && (y < (63 - m_cursor_offset_vertical)))
+				{
+					uint8_t val = (bits >> (z*2)) & 0x03;
+					switch(val)
+					{
+						case 0:  // cursor colour 0
+							*dst = colour0;
+							break;
+						case 1:  // cursor colour 1
+							*dst = colour1;
+							break;
+						case 2:  // transparent
+							break;
+						case 3:  // complement
+							*dst = ~(*dst);
+							break;
+					}
+					dst++;
+				}
+			}
+			src+=2;
+		}
+	}
+
+	return 0;
+}
+
+// mach32 Hardware Pointer
+WRITE16_MEMBER(mach32_device::mach32_cursor_l_w)
+{
+	if(offset == 1)
+		m_cursor_address = (m_cursor_address & 0xf0000) | data;
+	if(LOG_MACH32) logerror("mach32 HW pointer data address: %05x",m_cursor_address);
+}
+
+WRITE16_MEMBER(mach32_device::mach32_cursor_h_w)
+{
+	if(offset == 1)
+	{
+		m_cursor_address = (m_cursor_address & 0x0ffff) | ((data & 0x000f) << 16);
+		m_cursor_enable = data & 0x8000;
+		if(LOG_MACH32) logerror("mach32 HW pointer data address: %05x",m_cursor_address);
+	}
+}
+
+WRITE16_MEMBER(mach32_device::mach32_cursor_pos_h)
+{
+	if(offset == 1)
+		m_cursor_horizontal = data & 0x07ff;
+}
+
+WRITE16_MEMBER(mach32_device::mach32_cursor_pos_v)
+{
+	if(offset == 1)
+		m_cursor_vertical = data & 0x0fff;
+}
+
+WRITE16_MEMBER(mach32_device::mach32_cursor_colour_b_w)
+{
+	if(offset == 1)
+	{
+		m_cursor_colour0_b = data & 0xff;
+		m_cursor_colour1_b = data >> 8;
+		if(LOG_MACH32) logerror("Mach32: HW Cursor Colour Blue write RGB: 0: %02x %02x %02x  1: %02x %02x %02x\n"
+			,m_cursor_colour0_r,m_cursor_colour0_g,m_cursor_colour0_b,m_cursor_colour1_r,m_cursor_colour1_g,m_cursor_colour1_b);
+	}
+}
+
+WRITE16_MEMBER(mach32_device::mach32_cursor_colour_0_w)
+{
+	if(offset == 1)
+	{
+		m_cursor_colour0_g = data & 0xff;
+		m_cursor_colour0_r = data >> 8;
+		if(LOG_MACH32) logerror("Mach32: HW Cursor Colour 0 write RGB: %02x %02x %02x\n",m_cursor_colour0_r,m_cursor_colour0_g,m_cursor_colour0_b);
+	}
+}
+
+WRITE16_MEMBER(mach32_device::mach32_cursor_colour_1_w)
+{
+	if(offset == 1)
+	{
+		m_cursor_colour1_g = data & 0xff;
+		m_cursor_colour1_r = data >> 8;
+		if(LOG_MACH32) logerror("Mach32: HW Cursor Colour 1 write RGB: %02x %02x %02x\n",m_cursor_colour1_r,m_cursor_colour1_g,m_cursor_colour1_b);
+	}
+}
+
+WRITE16_MEMBER(mach32_device::mach32_cursor_offset_w)
+{
+	if(offset == 1)
+	{
+		if(ACCESSING_BITS_0_7)
+			m_cursor_offset_horizontal = data & 0x00ff;
+		if(ACCESSING_BITS_8_15)
+			m_cursor_offset_vertical = data >> 8;
+		if(LOG_MACH32) logerror("Mach32: HW Cursor Offset write H:%i V:%i\n",m_cursor_offset_horizontal,m_cursor_offset_vertical);
+	}
 }
 
 /*
