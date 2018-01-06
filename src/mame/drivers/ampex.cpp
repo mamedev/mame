@@ -14,6 +14,12 @@ Other: Beeper, 5x 10sw-dips.
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
+//#include "machine/ay31015.h"
+//#include "machine/com8116.h"
+#include "video/tms9927.h"
+#include "screen.h"
+
+#define CHAR_WIDTH 7
 
 class ampex_state : public driver_device
 {
@@ -24,10 +30,17 @@ public:
 		, m_p_chargen(*this, "chargen")
 	{ }
 
+	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+
 private:
 	required_device<cpu_device> m_maincpu;
 	required_region_ptr<u8> m_p_chargen;
 };
+
+u32 ampex_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+{
+	return 0;
+}
 
 static ADDRESS_MAP_START( mem_map, AS_PROGRAM, 8, ampex_state )
 	AM_RANGE(0x0000, 0x2fff) AM_ROM AM_REGION("roms", 0)
@@ -35,6 +48,7 @@ static ADDRESS_MAP_START( mem_map, AS_PROGRAM, 8, ampex_state )
 	AM_RANGE(0x4400, 0x57ff) AM_RAM // expansion RAM
 	AM_RANGE(0x5841, 0x5841) AM_WRITENOP // ???
 	AM_RANGE(0x5842, 0x5842) AM_READNOP // ???
+	AM_RANGE(0x5c00, 0x5c0f) AM_DEVREADWRITE("vtac", crt5037_device, read, write)
 	AM_RANGE(0x8000, 0x9fff) AM_RAM
 	AM_RANGE(0xc000, 0xcfff) AM_RAM // video RAM
 ADDRESS_MAP_END
@@ -45,6 +59,15 @@ INPUT_PORTS_END
 static MACHINE_CONFIG_START( ampex )
 	MCFG_CPU_ADD("maincpu", Z80, 2'000'000) // no idea of clock.
 	MCFG_CPU_PROGRAM_MAP(mem_map)
+
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_RAW_PARAMS(XTAL_23_814MHz / 2, 105 * CHAR_WIDTH, 0, 80 * CHAR_WIDTH, 270, 0, 250)
+	MCFG_SCREEN_UPDATE_DRIVER(ampex_state, screen_update)
+
+	// FIXME: dot clock should be divided by char width
+	MCFG_DEVICE_ADD("vtac", CRT5037, XTAL_23_814MHz / 2)
+	MCFG_TMS9927_CHAR_WIDTH(CHAR_WIDTH)
+	MCFG_VIDEO_SET_SCREEN("screen")
 MACHINE_CONFIG_END
 
 ROM_START( dialog80 )
