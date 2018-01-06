@@ -551,6 +551,7 @@ WRITE8_MEMBER( hp1ll3_device::write )
 		switch (m_command)
 		{
 		case CONF:
+			assert((m_conf_ptr >> 1) < ARRAY_LENGTH(m_conf));
 			if (m_conf_ptr & 1) {
 				m_conf[m_conf_ptr >> 1] |= data;
 			} else {
