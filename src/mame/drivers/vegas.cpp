@@ -350,7 +350,6 @@ public:
 	uint8_t m_vblank_state;
 	uint8_t m_cpuio_data[4];
 	uint8_t m_sio_reset_ctrl;
-	uint8_t m_sio_irq_clear;
 	uint8_t m_sio_irq_enable;
 	uint8_t m_sio_irq_state;
 	uint8_t m_sio_led_state;
@@ -448,7 +447,6 @@ void vegas_state::machine_start()
 	save_item(NAME(m_vblank_state));
 	save_item(NAME(m_cpuio_data));
 	save_item(NAME(m_sio_reset_ctrl));
-	save_item(NAME(m_sio_irq_clear));
 	save_item(NAME(m_sio_irq_enable));
 	save_item(NAME(m_sio_irq_state));
 	save_item(NAME(m_sio_led_state));
@@ -599,7 +597,7 @@ WRITE_LINE_MEMBER(vegas_state::duart_irq_cb)
 WRITE_LINE_MEMBER(vegas_state::vblank_assert)
 {
 	if (LOG_SIO)
-		logerror("vblank_assert: state: %d\n", state);
+		logerror("vblank_assert: m_sio_reset_ctrl: %04x state: %d\n", m_sio_reset_ctrl, state);
 	// latch on the correct polarity transition
 	if ((state && !(m_sio_reset_ctrl & 0x10)) || (!state && (m_sio_reset_ctrl & 0x10)))
 	{
@@ -630,7 +628,6 @@ WRITE_LINE_MEMBER(vegas_state::ethernet_interrupt)
 void vegas_state::reset_sio()
 {
 	m_sio_reset_ctrl = 0;
-	m_sio_irq_clear = 0;
 	m_sio_irq_enable = 0;
 	m_sio_irq_state = 0;
 	m_sio_led_state = 0;
@@ -644,7 +641,7 @@ READ8_MEMBER(vegas_state::sio_r)
 	switch (index) {
 	case 0:
 		// Reset Control:  Bit 0=>Reset IOASIC, Bit 1=>Reset NSS Connection, Bit 2=>Reset SMC, Bit 3=>Reset VSYNC, Bit 4=>VSYNC Polarity
-		result = m_sio_irq_clear;
+		result = m_sio_reset_ctrl;
 		// Hack for fpga programming finished
 		m_cpuio_data[3] |= 0x1;
 		break;
@@ -724,20 +721,22 @@ WRITE8_MEMBER(vegas_state::sio_w)
 			if (LOG_SIO)
 				logerror("sio_w: Reset Control offset: %08x index: %d data: %02X\n", offset, index, data);
 			// Reset Control:  Bit 0=>Reset IOASIC, Bit 1=>Reset NSS Connection, Bit 2=>Reset SMC, Bit 3=>Reset VSYNC, Bit 4=>VSYNC Polarity
-			m_sio_reset_ctrl = data;
-			/* bit 0x01 is used to reset the IOASIC */
-			if (!(data & 0x01))
+			/* bit 0 is used to reset the IOASIC */
+			if (!(data & (1 << 0)))
 			{
 				m_ioasic->ioasic_reset();
 				m_dcs->reset_w(data & 0x01);
 			}
-			/* toggle bit 0x08 low to reset the VBLANK */
-			if (!(data & 0x08))
+			if ((data & (1 << 2)) && !(m_sio_reset_ctrl & (1 << 2))) {
+				m_ethernet->reset();
+			}
+			/* toggle bit 3 low to reset the VBLANK */
+			if (!(data & (1 << 3)))
 			{
 				m_sio_irq_state &= ~0x20;
 				update_sio_irqs();
 			}
-			m_sio_irq_clear = data;
+			m_sio_reset_ctrl = data;
 			break;
 		case 1:
 			// Interrupt Enable
@@ -1714,6 +1713,7 @@ static MACHINE_CONFIG_START( vegascore )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
+	// Screeen size and timing is re-calculated later in voodoo card
 	MCFG_SCREEN_REFRESH_RATE(57)
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 479)
@@ -1740,11 +1740,6 @@ MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( vegasban, vegas32m)
-	// Short term hack to get nbashowt, nbanfl, nbagold to boot.
-	// Probably due to CRTC registers not used for timing in voodoo
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_REFRESH_RATE(120)
-
 	MCFG_DEVICE_REMOVE(PCI_ID_VIDEO)
 	MCFG_VOODOO_PCI_ADD(PCI_ID_VIDEO, TYPE_VOODOO_BANSHEE, ":maincpu")
 	MCFG_VOODOO_PCI_FBMEM(16)
@@ -1758,11 +1753,6 @@ static MACHINE_CONFIG_DERIVED( vegasv3, vegas32m)
 	MCFG_MIPS3_ICACHE_SIZE(16384)
 	MCFG_MIPS3_DCACHE_SIZE(16384)
 	MCFG_MIPS3_SYSTEM_CLOCK(vegas_state::SYSTEM_CLOCK)
-
-	// Short term hack to get cartfury to boot.
-	// Probably due to CRTC registers not used for timing in voodoo
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_REFRESH_RATE(120)
 
 	MCFG_DEVICE_REMOVE(PCI_ID_VIDEO)
 	MCFG_VOODOO_PCI_ADD(PCI_ID_VIDEO, TYPE_VOODOO_3, ":maincpu")
