@@ -137,6 +137,7 @@ debugger_commands::debugger_commands(running_machine& machine, debugger_cpu& cpu
 
 	/* add all the commands */
 	m_console.register_command("help",      CMDFLAG_NONE, 0, 0, 1, std::bind(&debugger_commands::execute_help, this, _1, _2));
+	m_console.register_command("helphtml",  CMDFLAG_NONE, 0, 1, 1, std::bind(&debugger_commands::execute_helphtml, this, _1, _2));
 	m_console.register_command("print",     CMDFLAG_NONE, 0, 1, MAX_COMMAND_PARAMS, std::bind(&debugger_commands::execute_print, this, _1, _2));
 	m_console.register_command("printf",    CMDFLAG_NONE, 0, 1, MAX_COMMAND_PARAMS, std::bind(&debugger_commands::execute_printf, this, _1, _2));
 	m_console.register_command("logerror",  CMDFLAG_NONE, 0, 1, MAX_COMMAND_PARAMS, std::bind(&debugger_commands::execute_logerror, this, _1, _2));
@@ -550,6 +551,27 @@ void debugger_commands::execute_help(int ref, const std::vector<std::string> &pa
 		m_console.printf_wrap(80, "%s\n", debug_get_help(""));
 	else
 		m_console.printf_wrap(80, "%s\n", debug_get_help(params[0].c_str()));
+}
+
+
+/*-------------------------------------------------
+    execute_helphtml - generate debughelp.html
+-------------------------------------------------*/
+
+void debugger_commands::execute_helphtml(int ref, const std::vector<std::string> &params)
+{
+	const std::string extension = ".html";
+	std::string filename = params[0];
+
+	/* append the proper file extension if needed */
+	if (filename.length() < extension.length() ||
+		!std::equal(extension.rbegin(), extension.rend(), filename.rbegin()))
+		filename += ".html";
+
+	if (debug_generate_html(filename))
+		m_console.printf("%s has been successfully created.\n", filename);
+	else
+		m_console.printf("Error creating %s.\n", filename);
 }
 
 
