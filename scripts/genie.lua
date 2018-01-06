@@ -387,6 +387,11 @@ newoption {
 }
 
 newoption {
+	trigger = "SANITIZE",
+	description = "Specifies the santizer(s) to use."
+}
+
+newoption {
 	trigger = "PROJECT",
 	description = "Select projects to be built. Will look into project folder for files.",
 }
@@ -950,13 +955,18 @@ end
 	buildoptions_cpp {
 		"-Woverloaded-virtual",
 	}
-
---ifdef SANITIZE
---CCOMFLAGS += -fsanitize=$(SANITIZE)
+	
+if _OPTIONS["SANITIZE"] then
+	buildoptions {
+		"-fsanitize=".. _OPTIONS["SANITIZE"]
+	}
+	linkoptions {
+		"-fsanitize=".. _OPTIONS["SANITIZE"]
+	}
+end
 
 --ifneq (,$(findstring thread,$(SANITIZE)))
 --CCOMFLAGS += -fPIE
---endif
 --endif
 
 
