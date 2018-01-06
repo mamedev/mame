@@ -921,7 +921,7 @@ ROM_START( pokeresp )
 	ROM_LOAD( "electro.9j",         0x1000, 0x0800, CRC(a0ca4bb1) SHA1(815d7af5a10f64d1ea74c87ba3387cc3f68db729) )
 	ROM_LOAD( "electro.9h",         0x1800, 0x0800, CRC(d344d75a) SHA1(9ec4d15aa0a91544c1f5572d034009049a78598f) )
 
-	ROM_REGION16_LE( 0x2000, "gfx1", 0 )
+	ROM_REGION16_LE( 0x4000, "gfx1", 0 )
 	ROM_LOAD16_BYTE( "electro.6a",  0x0000, 0x0800, CRC(13b60985) SHA1(6a8b36a128ccffd6fae6a40a4deb88d612df4942) )
 	ROM_LOAD16_BYTE( "electro.6b",  0x1000, 0x0800, CRC(edbbdea7) SHA1(854624a2b7ea70eea929b0145b2ea0012baf8101) )
 	ROM_LOAD16_BYTE( "electro.6c",  0x0001, 0x0800, CRC(1fc1ab41) SHA1(0f8a57abedaadcf5f13523702b89b8782dedebc4) )
