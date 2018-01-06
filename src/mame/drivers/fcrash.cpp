@@ -2354,7 +2354,7 @@ MACHINE_START_MEMBER(cps_state, punipic)
 	m_layer_mask_reg[3] = 0x0a;
 	m_layer_scroll1x_offset = 0x46; // text
 	m_layer_scroll3x_offset = 0x46; // green patch in the park
-	m_sprite_base = 0x000;
+	m_sprite_base = 0x1000;
 	m_sprite_list_end_marker = 0x8000;
 	m_sprite_x_offset = 0;
 }
