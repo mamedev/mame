@@ -1591,9 +1591,9 @@ void render_target::load_layout_files(const internal_layout *layoutfile, bool si
 	if (m_manager.machine().options().override_artwork())
 	{
 		if (load_layout_file(m_manager.machine().options().override_artwork(), m_manager.machine().options().override_artwork()))
-			have_override |= true;
-		if (load_layout_file(m_manager.machine().options().override_artwork(), "default"))
-			have_override |= true;
+			have_override = true;
+		else if (load_layout_file(m_manager.machine().options().override_artwork(), "default"))
+			have_override = true;
 	}
 
 	const game_driver &system = m_manager.machine().system();
@@ -1606,7 +1606,7 @@ void render_target::load_layout_files(const internal_layout *layoutfile, bool si
 		if (!load_layout_file(basename, system.name))
 			have_artwork |= load_layout_file(basename, "default");
 		else
-			have_artwork |= true;
+			have_artwork = true;
 
 		// if a default view has been specified, use that as a fallback
 		if (system.default_layout != nullptr)
@@ -1621,7 +1621,7 @@ void render_target::load_layout_files(const internal_layout *layoutfile, bool si
 			if (!load_layout_file(driver_list::driver(cloneof).name, driver_list::driver(cloneof).name))
 				have_artwork |= load_layout_file(driver_list::driver(cloneof).name, "default");
 			else
-				have_artwork |= true;
+				have_artwork = true;
 		}
 
 		// Check the parent of the parent to cover bios based artwork
@@ -1633,7 +1633,7 @@ void render_target::load_layout_files(const internal_layout *layoutfile, bool si
 				if (!load_layout_file(driver_list::driver(cloneofclone).name, driver_list::driver(cloneofclone).name))
 					have_artwork |= load_layout_file(driver_list::driver(cloneofclone).name, "default");
 				else
-					have_artwork |= true;
+					have_artwork = true;
 			}
 		}
 
@@ -1643,7 +1643,7 @@ void render_target::load_layout_files(const internal_layout *layoutfile, bool si
 			if (!load_layout_file(m_manager.machine().options().fallback_artwork(), m_manager.machine().options().fallback_artwork()))
 				have_artwork |= load_layout_file(m_manager.machine().options().fallback_artwork(), "default");
 			else
-				have_artwork |= true;
+				have_artwork = true;
 		}
 
 	}
