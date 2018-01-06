@@ -38,6 +38,7 @@
 #include "machine/i8257.h"
 #include "sound/spkrdev.h"
 #include "speaker.h"
+#include "machine/ram.h"
 #include "machine/wd_fdc.h"
 #include "bus/isa/isa.h"
 #include "bus/isa/myb3k_com.h"
@@ -57,7 +58,7 @@
 #define LOG_M2      (1U << 9)
 #define LOG_SCRL    (1U << 10)
 
-//#define VERBOSE (LOG_VMOD|LOG_SCRL)
+//#define VERBOSE (LOG_VMOD)
 //#define LOG_OUTPUT_STREAM std::cout
 
 #include "logmacro.h"
@@ -97,6 +98,7 @@ public:
 	myb3k_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
+		, m_ram(*this, RAM_TAG)
 		, m_pic8259(*this, "pic")
 		, m_pit8253(*this, "pit")
 		, m_ppi8255(*this, "ppi")
@@ -144,6 +146,7 @@ public:
 
 protected:
 	required_device<cpu_device> m_maincpu;
+	required_device<ram_device> m_ram;
 	required_device<pic8259_device> m_pic8259;
 	required_device<pit8253_device> m_pit8253;
 	required_device<i8255_device> m_ppi8255;
@@ -384,7 +387,7 @@ WRITE8_MEMBER( myb3k_state::myb3k_video_mode_w )
  **********************************************************/
 static ADDRESS_MAP_START(myb3k_map, AS_PROGRAM, 8, myb3k_state)
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x00000,0x3ffff) AM_RAM // It's either 128Kb or 256Kb RAM
+	//AM_RANGE(0x00000,0x3ffff) AM_RAM // It's either 128Kb or 256Kb RAM installed by machine_start()
 	AM_RANGE(0x40000,0x7ffff) AM_NOP
 	AM_RANGE(0x80000,0xcffff) AM_NOP // Expansion Unit connected through an ISA8 cable
 	AM_RANGE(0xd0000,0xeffff) AM_RAM AM_SHARE("vram")  // Area 6, physical at 30000-3FFFF (128Kb RAM) or 10000-1FFFF (256KB RAM)
@@ -477,6 +480,9 @@ void myb3k_state::machine_start()
 	// CPU can only access RAM 50% of the time and the CRTC the other 50%. This waitstate workaround gives
 	// close enough performance of the DOS 1.25 "basica demo" compared to the real hardware
 	m_maincpu->set_clock_scale(0.5f);
+
+	/* setup ram */
+	m_maincpu->space(AS_PROGRAM).install_ram(0, m_ram->size() - 1, m_ram->pointer());
 
 	m_kbd_data = 0;
 }
@@ -715,6 +721,11 @@ static MACHINE_CONFIG_START( myb3k )
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(8)
 	MCFG_MC6845_UPDATE_ROW_CB(myb3k_state, crtc_update_row)
+
+	// dual ported ram
+	MCFG_RAM_ADD(RAM_TAG)
+	MCFG_RAM_DEFAULT_SIZE("256K")
+	MCFG_RAM_EXTRA_OPTIONS("128K, 256K")
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( jb3000, myb3k )
