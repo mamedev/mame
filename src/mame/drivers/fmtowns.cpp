@@ -193,7 +193,7 @@ Notes:
 #define TOWNS_CD_IRQ_DMA 2
 
 #define LOG_SYS 0
-#define LOG_CD 1
+#define LOG_CD 0
 
 enum
 {
