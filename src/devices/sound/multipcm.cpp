@@ -566,7 +566,7 @@ void multipcm_device::device_start()
 	m_attack_step = auto_alloc_array_clear(machine(), uint32_t, 0x40);
 	m_decay_release_step = auto_alloc_array_clear(machine(), uint32_t, 0x40);
 	const double attack_rate_to_decay_rate = 14.32833;
-	for (int32_t i = 0; i < 0x40; ++i)
+	for (int32_t i = 4; i < 0x40; ++i)
 	{
 		// Times are based on 44100Hz clock, adjust to real chip clock
 		m_attack_step[i] = (float)(0x400 << EG_SHIFT) / (float)(BASE_TIMES[i] * 44100.0 / 1000.0);
