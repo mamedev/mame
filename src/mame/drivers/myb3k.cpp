@@ -193,7 +193,9 @@ void myb3k_state::kbd_set_data_and_interrupt(u8 data) {
 
 MC6845_UPDATE_ROW( myb3k_state::crtc_update_row )
 {
-	for (int x_pos = 0; x_pos < x_count; x_pos++)
+	/* The 6845 is not programmed to get 80 character modes or 400 pixels width but this is managed by external circuitry that selects 
+	   the apropriate pixelclock based on the video mode latch at i/o address 0x04. This callback always get x_count set to 40  */
+	for (int x_pos = 0; x_pos < (m_vmode & 0x02 ? x_count * 2 : x_count); x_pos++)
 	{
 		uint16_t page = (m_portc & PC1_SETPAGE) ? 0x8000 : 0;
 
@@ -238,9 +240,11 @@ MC6845_UPDATE_ROW( myb3k_state::crtc_update_row )
 				break;
 			case 2: // 640x200, 80 char, white on black
 				rowstart = (((x_pos + ma * 2) * 16 + ra) & 0x7fff) + page;
+				//rowstart = (((x_pos * 2 + ma * 2) * 16 + ra) & 0x7fff) + page;
 				pdat16 = m_vram[rowstart];
+				//pdat16 = ((m_vram[rowstart] << 8) & 0xff00) | ((m_vram[rowstart + 32]) & 0x00ff);
 				if (pdat16 != 0)
-					LOGM2(" - PDAT:%06x from offset %04x RA=%d X:%d Y:%d\n", pdat16, (x_pos + ma * 2) * 16 + ra + page + 0, ra, x_pos, y);
+					LOGM2(" - PDAT:%06x from offset %04x RA=%d X:%d Y:%d\n", pdat16, (x_pos * 2 + ma * 2) * 16 + ra + page + 0, ra, x_pos, y);
 				for (int pxl = 0; pxl < 8; pxl++)
 				{
 					if ((pdat16 & (0x80 >> pxl)) != 0)
@@ -304,22 +308,47 @@ WRITE8_MEMBER( myb3k_state::myb3k_video_mode_w )
 	case 0: /* Green connector 640x200 80x25 chars 1 tone or GRB 320x200 40x20 8 tones */
 		LOGVMOD(" - 640x200 on Green or 320x200 on GRB output...\n");
 		break;
+
 	case 1: /* 320x200 */
-		LOGVMOD(" - 320x200, 40 char, 8 color or 8 tones of green...\n");
+		{
+			LOGVMOD(" - 320x200, 40 char, 8 color or 8 tones of green...\n");
+			rectangle rect(0, 320 - 1, 0, 200 - 1);
+			machine().first_screen()->configure(320, 200, rect, HZ_TO_ATTOSECONDS(50));
+		}
 		break;
+		
 	case 2: /* 640x200 - boots up in this mode */
-		LOGVMOD(" - 640x200, 80 char, white on black...\n");
+		{
+			LOGVMOD(" - 640x200, 80 char, white on black...\n");
+			rectangle rect(0, 640 - 1, 0, 200 - 1);
+			machine().first_screen()->configure(640, 200, rect, HZ_TO_ATTOSECONDS(50));
+		}
 		break;
+		
 	case 3: /* Fail  */
 		LOGVMOD(" - bad mode...\n");
 		break;
+
 	case 4: /* Fail  */
 		LOGVMOD(" - bad mode...\n");
 		break;
-	case 5: LOGVMOD("320x400, 40 char, white on black\n");
+
+	case 5: /* 320x400 */
+		{
+			LOGVMOD("320x400, 40 char, white on black\n");
+			rectangle rect(0, 320 - 1, 0, 400 - 1);
+			machine().first_screen()->configure(320, 400, rect, HZ_TO_ATTOSECONDS(50));
+		}
 		break;
-	case 6: LOGVMOD("640x400, 80 char, white on black\n");
+
+	case 6: /* 640x400 */
+		{
+			LOGVMOD("640x400, 80 char, white on black\n");
+			rectangle rect(0, 640 - 1, 0, 400 - 1);
+			machine().first_screen()->configure(640, 400, rect, HZ_TO_ATTOSECONDS(50));
+		}
 		break;
+
 	case 7: /* Fail  */
 		LOGVMOD(" - bad mode...\n");
 		break;
