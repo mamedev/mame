@@ -463,7 +463,8 @@ static MACHINE_CONFIG_START( intv )
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
 	/* video hardware */
-	MCFG_STIC_ADD("stic")
+	MCFG_DEVICE_ADD("stic", STIC, XTAL_3_579545MHz)
+	MCFG_VIDEO_SET_SCREEN("screen")
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(59.92)
