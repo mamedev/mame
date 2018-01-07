@@ -361,8 +361,6 @@ WRITE_LINE_MEMBER(nwktr_state::voodoo_vblank_1)
 
 uint32_t nwktr_state::screen_update_nwktr(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	voodoo_device *voodoo = (voodoo_device*)machine().device("voodoo0");
-
 	bitmap.fill(m_palette->pen(0), cliprect);
 
 	if (strcmp(screen.tag(), ":lscreen") == 0)

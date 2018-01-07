@@ -168,6 +168,7 @@ void tms9927_device::device_timer(emu_timer &timer, device_timer_id id, int para
 				vpos = (vpos + 1) % m_total_vpix;
 			m_hsync_timer->adjust(screen().time_until_pos(vpos, m_hsyn_start));
 		}
+		break;
 	}
 }
 
