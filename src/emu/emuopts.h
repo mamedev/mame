@@ -102,6 +102,8 @@
 #define OPTION_USE_BEZELS           "use_bezels"
 #define OPTION_USE_CPANELS          "use_cpanels"
 #define OPTION_USE_MARQUEES         "use_marquees"
+#define OPTION_FALLBACK_ARTWORK     "fallback_artwork"
+#define OPTION_OVERRIDE_ARTWORK     "override_artwork"
 
 // core screen options
 #define OPTION_BRIGHTNESS           "brightness"
@@ -381,6 +383,8 @@ public:
 	bool use_bezels() const { return bool_value(OPTION_USE_BEZELS); }
 	bool use_cpanels() const { return bool_value(OPTION_USE_CPANELS); }
 	bool use_marquees() const { return bool_value(OPTION_USE_MARQUEES); }
+	const char *fallback_artwork() const { return value(OPTION_FALLBACK_ARTWORK); }
+	const char *override_artwork() const { return value(OPTION_OVERRIDE_ARTWORK); }
 
 	// core screen options
 	float brightness() const { return float_value(OPTION_BRIGHTNESS); }

@@ -1574,38 +1574,80 @@ void render_target::update_layer_config()
 
 void render_target::load_layout_files(const internal_layout *layoutfile, bool singlefile)
 {
-	bool have_default = false;
+	bool have_default  = false;
+	bool have_artwork  = false;
+	bool have_override = false;
 
 	// if there's an explicit file, load that first
 	const char *basename = m_manager.machine().basename();
 	if (layoutfile)
-		have_default |= load_layout_file(basename, layoutfile);
+		have_artwork |= load_layout_file(basename, layoutfile);
 
 	// if we're only loading this file, we know our final result
 	if (singlefile)
 		return;
 
-	// try to load a file based on the driver name
-	const game_driver &system = m_manager.machine().system();
-	if (!load_layout_file(basename, system.name))
-		have_default |= load_layout_file(basename, "default");
-	else
-		have_default |= true;
-
-	// if a default view has been specified, use that as a fallback
-	if (system.default_layout != nullptr)
-		have_default |= load_layout_file(nullptr, system.default_layout);
-	if (m_manager.machine().config().m_default_layout != nullptr)
-		have_default |= load_layout_file(nullptr, m_manager.machine().config().m_default_layout);
-
-	// try to load another file based on the parent driver name
-	int cloneof = driver_list::clone(system);
-	if (cloneof != -1) {
-		if (!load_layout_file(driver_list::driver(cloneof).name, driver_list::driver(cloneof).name))
-			have_default |= load_layout_file(driver_list::driver(cloneof).name, "default");
-		else
-			have_default |= true;
+	// if override_artwork defined, load that and skip artwork other than default
+	if (m_manager.machine().options().override_artwork())
+	{
+		if (load_layout_file(m_manager.machine().options().override_artwork(), m_manager.machine().options().override_artwork()))
+			have_override = true;
+		else if (load_layout_file(m_manager.machine().options().override_artwork(), "default"))
+			have_override = true;
 	}
+
+	const game_driver &system = m_manager.machine().system();
+
+	// Skip if override_artwork has found artwork
+	if (!have_override)
+	{
+
+		// try to load a file based on the driver name
+		if (!load_layout_file(basename, system.name))
+			have_artwork |= load_layout_file(basename, "default");
+		else
+			have_artwork = true;
+
+		// if a default view has been specified, use that as a fallback
+		if (system.default_layout != nullptr)
+			have_default |= load_layout_file(nullptr, system.default_layout);
+		if (m_manager.machine().config().m_default_layout != nullptr)
+			have_default |= load_layout_file(nullptr, m_manager.machine().config().m_default_layout);
+
+		// try to load another file based on the parent driver name
+		int cloneof = driver_list::clone(system);
+		if (cloneof != -1)
+		{
+			if (!load_layout_file(driver_list::driver(cloneof).name, driver_list::driver(cloneof).name))
+				have_artwork |= load_layout_file(driver_list::driver(cloneof).name, "default");
+			else
+				have_artwork = true;
+		}
+
+		// Check the parent of the parent to cover bios based artwork
+		if (cloneof != -1) {
+			const game_driver &clone(driver_list::driver(cloneof));
+			int cloneofclone = driver_list::clone(clone);
+			if (cloneofclone != -1 && cloneofclone != cloneof)
+			{
+				if (!load_layout_file(driver_list::driver(cloneofclone).name, driver_list::driver(cloneofclone).name))
+					have_artwork |= load_layout_file(driver_list::driver(cloneofclone).name, "default");
+				else
+					have_artwork = true;
+			}
+		}
+
+		// Use fallback artwork if defined and no artwork has been found yet
+		if (!have_artwork && m_manager.machine().options().fallback_artwork())
+		{
+			if (!load_layout_file(m_manager.machine().options().fallback_artwork(), m_manager.machine().options().fallback_artwork()))
+				have_artwork |= load_layout_file(m_manager.machine().options().fallback_artwork(), "default");
+			else
+				have_artwork = true;
+		}
+
+	}
+
 	screen_device_iterator iter(m_manager.machine().root_device());
 	unsigned const screens = iter.count();
 
@@ -1620,7 +1662,7 @@ void render_target::load_layout_files(const internal_layout *layoutfile, bool si
 			throw emu_fatalerror("Couldn't parse default layout??");
 	}
 
-	if (!have_default)
+	if (!have_default && !have_artwork)
 	{
 		if (screens == 0)
 		{
