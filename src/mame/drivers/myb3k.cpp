@@ -10,7 +10,7 @@
     Step/One service manuals: http://nivelleringslikaren.eu/stepone/
 
     TODO:
-    - Add hi-res graphics mode (640x400 monochrome)
+    - Fix proper cursor support
     - Add monochrome monitor settings
     - Hook up all interrupts and 8255 Port C signals
     - Add printer support on Port A
@@ -56,7 +56,8 @@
 #define LOG_VMOD    (1U << 7)
 #define LOG_PIX     (1U << 8)
 #define LOG_M2      (1U << 9)
-#define LOG_SCRL    (1U << 10)
+#define LOG_M3      (1U << 10)
+#define LOG_SCRL    (1U << 11)
 
 //#define VERBOSE (LOG_VMOD)
 //#define LOG_OUTPUT_STREAM std::cout
@@ -72,6 +73,7 @@
 #define LOGVMOD(...) LOGMASKED(LOG_VMOD, __VA_ARGS__)
 #define LOGPIX(...)  LOGMASKED(LOG_PIX,  __VA_ARGS__)
 #define LOGM2(...)   LOGMASKED(LOG_M2,   __VA_ARGS__)
+#define LOGM3(...)   LOGMASKED(LOG_M3,   __VA_ARGS__)
 #define LOGSCRL(...) LOGMASKED(LOG_SCRL, __VA_ARGS__)
 
 #ifdef _MSC_VER
@@ -234,10 +236,17 @@ MC6845_UPDATE_ROW( myb3k_state::crtc_update_row )
 						((pdat & (0x008000 >> pxl)) ? 0x02 : 0x00) |
 						((pdat & (0x000080 >> pxl)) ? 0x01 : 0x00) );
 
+					/* Check if we are in a cursor and create cursor if so */
+					pind ^= ((cursor_x != -1 && x_pos == cursor_x && ra == 7) ? 7 : 0);
+
 					/* Pick up the color */
 					bitmap.pix32(y, ( x_pos * 8) + pxl) = m_cpal[pind & 0x07];
 				}
 				break;
+
+			case 6: // 640x400, 80 char, white on black -  fall through to case 2 if monochrome monitor
+			  /* Mode 6 is an interlaced mode so should induce flicker on the color monitor but be ok on the monochrome green monitor */
+
 			case 2: // 640x200, 80 char, white on black
 				rowstart = (((x_pos + ma * 2) * 16 + ra) & 0x7fff) + page;
 				//rowstart = (((x_pos * 2 + ma * 2) * 16 + ra) & 0x7fff) + page;
@@ -245,6 +254,10 @@ MC6845_UPDATE_ROW( myb3k_state::crtc_update_row )
 				//pdat16 = ((m_vram[rowstart] << 8) & 0xff00) | ((m_vram[rowstart + 32]) & 0x00ff);
 				if (pdat16 != 0)
 					LOGM2(" - PDAT:%06x from offset %04x RA=%d X:%d Y:%d\n", pdat16, (x_pos * 2 + ma * 2) * 16 + ra + page + 0, ra, x_pos, y);
+
+				/* Check if we are in a cursor and create cursor if so */
+				//pdat ^= ((cursor_x != -1 && x_pos/2 == cursor_x && ra == 7) ? 0xff : 0);
+
 				for (int pxl = 0; pxl < 8; pxl++)
 				{
 					if ((pdat16 & (0x80 >> pxl)) != 0)
@@ -260,7 +273,6 @@ MC6845_UPDATE_ROW( myb3k_state::crtc_update_row )
 			default:
 				logerror("unimplemented video mode: %02x", m_vmode);
 			}
-			//col ^= ((cursor_x != -1 && x_pos >= cursor_x && x_pos < (cursor_x + m_cursor_size)) ? 7 : 0);
 		}
 	}
 }
