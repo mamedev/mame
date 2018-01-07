@@ -32,13 +32,16 @@
 #define MCFG_SM510_WRITE_S_CB(_devcb) \
 	devcb = &sm510_base_device::set_write_s_callback(*device, DEVCB_##_devcb);
 
-// 2/4-bit R (melody) output port
+// 1/2/4-bit R (buzzer/melody) output port
 #define MCFG_SM510_WRITE_R_CB(_devcb) \
 	devcb = &sm510_base_device::set_write_r_callback(*device, DEVCB_##_devcb);
-
-// R port can be set to direct control with a mask option (default false)
-#define MCFG_SM510_R_DIRECT_CONTROL(_direct) \
-	sm510_base_device::set_r_direct_control(*device, _direct);
+// For SM510, SM500, SM5A, R port output is selected with a mask option,
+// either from the divider or direct contol. Documented options are:
+// SM510/SM5A: control, 2(4096Hz meant for alarm sound)
+// SM500: 14, 11, 3 (divider f1, f4, f12)
+#define MCFG_SM510_R_MASK_OPTION(_bit) \
+	sm510_base_device::set_r_mask_option(*device, _bit);
+#define SM510_R_CONTROL_OUTPUT -1
 
 // LCD segment outputs: H1-4 as offset(low), a/b/c 1-16 as data d0-d15
 #define MCFG_SM510_WRITE_SEGA_CB(_devcb) \
@@ -112,7 +115,7 @@ public:
 		, m_prgwidth(prgwidth)
 		, m_datawidth(datawidth)
 		, m_stack_levels(stack_levels)
-		, m_r_direct(false)
+		, m_r_mask_option(SM510_R_CONTROL_OUTPUT)
 		, m_lcd_ram_a(*this, "lcd_ram_a"), m_lcd_ram_b(*this, "lcd_ram_b"), m_lcd_ram_c(*this, "lcd_ram_c")
 		, m_write_sega(*this), m_write_segb(*this), m_write_segc(*this), m_write_segbs(*this)
 		, m_melody_rom(*this, "melody")
@@ -128,7 +131,7 @@ public:
 	template <class Object> static devcb_base &set_read_b_callback(device_t &device, Object &&cb) { return downcast<sm510_base_device &>(device).m_read_b.set_callback(std::forward<Object>(cb)); }
 	template <class Object> static devcb_base &set_write_s_callback(device_t &device, Object &&cb) { return downcast<sm510_base_device &>(device).m_write_s.set_callback(std::forward<Object>(cb)); }
 	template <class Object> static devcb_base &set_write_r_callback(device_t &device, Object &&cb) { return downcast<sm510_base_device &>(device).m_write_r.set_callback(std::forward<Object>(cb)); }
-	static void set_r_direct_control(device_t &device, bool direct) { downcast<sm510_base_device &>(device).m_r_direct = direct; }
+	static void set_r_mask_option(device_t &device, int bit) { downcast<sm510_base_device &>(device).m_r_mask_option = bit; }
 
 	template <class Object> static devcb_base &set_write_sega_callback(device_t &device, Object &&cb) { return downcast<sm510_base_device &>(device).m_write_sega.set_callback(std::forward<Object>(cb)); }
 	template <class Object> static devcb_base &set_write_segb_callback(device_t &device, Object &&cb) { return downcast<sm510_base_device &>(device).m_write_segb.set_callback(std::forward<Object>(cb)); }
@@ -181,7 +184,7 @@ protected:
 	bool m_skip;
 	u8 m_w;
 	u8 m_r, m_r_out;
-	bool m_r_direct;
+	int m_r_mask_option;
 	bool m_k_active;
 	bool m_halt;
 	int m_clk_div;

@@ -242,11 +242,11 @@ static MACHINE_CONFIG_START( rzindy500 )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", SM510, XTAL_32_768kHz) // no external XTAL
+	MCFG_SM510_R_MASK_OPTION(SM510_R_CONTROL_OUTPUT) // confirmed
 	MCFG_SM510_WRITE_SEGS_CB(WRITE16(hh_sm510_state, sm510_lcd_segment_w))
 	MCFG_SM510_READ_K_CB(READ8(rzone_state, input_r))
 	MCFG_SM510_WRITE_S_CB(WRITE8(rzone_state, t1_write_s))
 	MCFG_SM510_WRITE_R_CB(WRITE8(rzone_state, t1_write_r))
-	MCFG_SM510_R_DIRECT_CONTROL(true)
 
 	/* video hardware */
 	MCFG_SCREEN_SVG_ADD("screen", "svg")

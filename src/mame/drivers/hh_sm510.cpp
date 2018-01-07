@@ -263,6 +263,7 @@ static MACHINE_CONFIG_START( kdribble )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", SM510, XTAL_32_768kHz)
+	MCFG_SM510_R_MASK_OPTION(2) // confirmed
 	MCFG_SM510_WRITE_SEGS_CB(WRITE16(hh_sm510_state, sm510_lcd_segment_w))
 	MCFG_SM510_READ_K_CB(READ8(hh_sm510_state, input_r))
 	MCFG_SM510_WRITE_S_CB(WRITE8(hh_sm510_state, input_w))
@@ -333,6 +334,7 @@ static MACHINE_CONFIG_START( ktopgun )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", SM510, XTAL_32_768kHz)
+	MCFG_SM510_R_MASK_OPTION(2) // confirmed
 	MCFG_SM510_WRITE_SEGS_CB(WRITE16(hh_sm510_state, sm510_lcd_segment_w))
 	MCFG_SM510_READ_K_CB(READ8(hh_sm510_state, input_r))
 	MCFG_SM510_WRITE_S_CB(WRITE8(hh_sm510_state, input_w))
@@ -1041,6 +1043,7 @@ static MACHINE_CONFIG_START( gnw_mmouse )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", SM5A, XTAL_32_768kHz)
+	MCFG_SM510_R_MASK_OPTION(SM510_R_CONTROL_OUTPUT) // ?
 	MCFG_SM500_WRITE_O_CB(WRITE8(hh_sm510_state, sm500_lcd_segment_w))
 	MCFG_SM510_READ_K_CB(READ8(hh_sm510_state, input_r))
 	MCFG_SM510_WRITE_R_CB(WRITE8(hh_sm510_state, piezo_input_w))
@@ -1073,6 +1076,7 @@ static MACHINE_CONFIG_DERIVED( nupogodi, gnw_mmouse )
 
 	/* basic machine hardware */
 	MCFG_CPU_REPLACE("maincpu", KB1013VK12, XTAL_32_768kHz)
+	MCFG_SM510_R_MASK_OPTION(SM510_R_CONTROL_OUTPUT)
 	MCFG_SM500_WRITE_O_CB(WRITE8(hh_sm510_state, sm500_lcd_segment_w))
 	MCFG_SM510_READ_K_CB(READ8(hh_sm510_state, input_r))
 	MCFG_SM510_WRITE_R_CB(WRITE8(hh_sm510_state, piezo_input_w))
@@ -1143,6 +1147,7 @@ static MACHINE_CONFIG_START( gnw_mickdon )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", SM510, XTAL_32_768kHz)
+	MCFG_SM510_R_MASK_OPTION(2) // confirmed
 	MCFG_SM510_WRITE_SEGS_CB(WRITE16(hh_sm510_state, sm510_lcd_segment_w))
 	MCFG_SM510_READ_K_CB(READ8(hh_sm510_state, input_r))
 	MCFG_SM510_WRITE_S_CB(WRITE8(hh_sm510_state, input_w))
@@ -1224,6 +1229,7 @@ static MACHINE_CONFIG_START( gnw_dkong2 )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", SM510, XTAL_32_768kHz)
+	MCFG_SM510_R_MASK_OPTION(2) // confirmed
 	MCFG_SM510_WRITE_SEGS_CB(WRITE16(hh_sm510_state, sm510_lcd_segment_w))
 	MCFG_SM510_READ_K_CB(READ8(hh_sm510_state, input_r))
 	MCFG_SM510_WRITE_S_CB(WRITE8(hh_sm510_state, input_w))
@@ -1306,6 +1312,7 @@ static MACHINE_CONFIG_START( gnw_mario )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", SM510, XTAL_32_768kHz)
+	MCFG_SM510_R_MASK_OPTION(2) // confirmed
 	MCFG_SM510_WRITE_SEGS_CB(WRITE16(hh_sm510_state, sm510_lcd_segment_w))
 	MCFG_SM510_READ_K_CB(READ8(hh_sm510_state, input_r))
 	MCFG_SM510_WRITE_S_CB(WRITE8(hh_sm510_state, input_w))
@@ -1395,6 +1402,7 @@ static MACHINE_CONFIG_START( gnw_dkjr )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", SM510, XTAL_32_768kHz)
+	MCFG_SM510_R_MASK_OPTION(2) // confirmed
 	MCFG_SM510_WRITE_SEGS_CB(WRITE16(hh_sm510_state, sm510_lcd_segment_w))
 	MCFG_SM510_READ_K_CB(READ8(hh_sm510_state, input_r))
 	MCFG_SM510_WRITE_S_CB(WRITE8(hh_sm510_state, input_w))
@@ -1474,6 +1482,7 @@ static MACHINE_CONFIG_START( gnw_mariocm )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", SM510, XTAL_32_768kHz)
+	MCFG_SM510_R_MASK_OPTION(2) // confirmed
 	MCFG_SM510_WRITE_SEGS_CB(WRITE16(hh_sm510_state, sm510_lcd_segment_w))
 	MCFG_SM510_READ_K_CB(READ8(hh_sm510_state, input_r))
 	MCFG_SM510_WRITE_S_CB(WRITE8(hh_sm510_state, input_w))
@@ -1682,11 +1691,11 @@ static MACHINE_CONFIG_START( tgaunt )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", SM510, XTAL_32_768kHz)
+	MCFG_SM510_R_MASK_OPTION(SM510_R_CONTROL_OUTPUT)
 	MCFG_SM510_WRITE_SEGS_CB(WRITE16(hh_sm510_state, sm510_lcd_segment_w))
 	MCFG_SM510_READ_K_CB(READ8(hh_sm510_state, input_r))
 	MCFG_SM510_WRITE_S_CB(WRITE8(hh_sm510_state, input_w))
 	MCFG_SM510_WRITE_R_CB(WRITE8(hh_sm510_state, piezo_r1_w))
-	MCFG_SM510_R_DIRECT_CONTROL(true)
 	MCFG_SM510_READ_BA_CB(IOPORT("BA"))
 	MCFG_SM510_READ_B_CB(IOPORT("B"))
 
@@ -1779,11 +1788,11 @@ static MACHINE_CONFIG_START( tddragon )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", SM510, XTAL_32_768kHz)
+	MCFG_SM510_R_MASK_OPTION(SM510_R_CONTROL_OUTPUT) // confirmed
 	MCFG_SM510_WRITE_SEGS_CB(WRITE16(hh_sm510_state, sm510_lcd_segment_w))
 	MCFG_SM510_READ_K_CB(READ8(hh_sm510_state, input_r))
 	MCFG_SM510_WRITE_S_CB(WRITE8(hh_sm510_state, input_w))
 	MCFG_SM510_WRITE_R_CB(WRITE8(hh_sm510_state, piezo_r1_w))
-	MCFG_SM510_R_DIRECT_CONTROL(true)
 	MCFG_SM510_READ_BA_CB(IOPORT("BA"))
 	MCFG_SM510_READ_B_CB(IOPORT("B"))
 
@@ -1872,11 +1881,11 @@ static MACHINE_CONFIG_START( tkarnov )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", SM510, XTAL_32_768kHz)
+	MCFG_SM510_R_MASK_OPTION(SM510_R_CONTROL_OUTPUT)
 	MCFG_SM510_WRITE_SEGS_CB(WRITE16(hh_sm510_state, sm510_lcd_segment_w))
 	MCFG_SM510_READ_K_CB(READ8(hh_sm510_state, input_r))
 	MCFG_SM510_WRITE_S_CB(WRITE8(hh_sm510_state, input_w))
 	MCFG_SM510_WRITE_R_CB(WRITE8(hh_sm510_state, piezo_r1_w))
-	MCFG_SM510_R_DIRECT_CONTROL(true)
 	MCFG_SM510_READ_BA_CB(IOPORT("BA"))
 	MCFG_SM510_READ_B_CB(IOPORT("B"))
 
@@ -1964,11 +1973,11 @@ static MACHINE_CONFIG_START( tvindictr )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", SM510, XTAL_32_768kHz)
+	MCFG_SM510_R_MASK_OPTION(SM510_R_CONTROL_OUTPUT)
 	MCFG_SM510_WRITE_SEGS_CB(WRITE16(hh_sm510_state, sm510_lcd_segment_w))
 	MCFG_SM510_READ_K_CB(READ8(hh_sm510_state, input_r))
 	MCFG_SM510_WRITE_S_CB(WRITE8(hh_sm510_state, input_w))
 	MCFG_SM510_WRITE_R_CB(WRITE8(hh_sm510_state, piezo_r1_w))
-	MCFG_SM510_R_DIRECT_CONTROL(true)
 	MCFG_SM510_READ_BA_CB(IOPORT("BA"))
 	MCFG_SM510_READ_B_CB(IOPORT("B"))
 
@@ -2020,7 +2029,7 @@ WRITE8_MEMBER(tgaiden_state::write_r)
 	piezo_r1_w(space, 0, data & 1);
 
 	// R2: led
-	//..
+	output().set_lamp_value(0, data >> 1 & 1);
 }
 
 // config
@@ -2066,11 +2075,11 @@ static MACHINE_CONFIG_START( tgaiden )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", SM510, XTAL_32_768kHz)
+	MCFG_SM510_R_MASK_OPTION(SM510_R_CONTROL_OUTPUT)
 	MCFG_SM510_WRITE_SEGS_CB(WRITE16(hh_sm510_state, sm510_lcd_segment_w))
 	MCFG_SM510_READ_K_CB(READ8(hh_sm510_state, input_r))
 	MCFG_SM510_WRITE_S_CB(WRITE8(hh_sm510_state, input_w))
 	MCFG_SM510_WRITE_R_CB(WRITE8(tgaiden_state, write_r))
-	MCFG_SM510_R_DIRECT_CONTROL(true)
 	MCFG_SM510_READ_BA_CB(IOPORT("BA"))
 	MCFG_SM510_READ_B_CB(IOPORT("B"))
 
@@ -2154,11 +2163,11 @@ static MACHINE_CONFIG_START( tbatman )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", SM510, XTAL_32_768kHz)
+	MCFG_SM510_R_MASK_OPTION(SM510_R_CONTROL_OUTPUT)
 	MCFG_SM510_WRITE_SEGS_CB(WRITE16(hh_sm510_state, sm510_lcd_segment_w))
 	MCFG_SM510_READ_K_CB(READ8(hh_sm510_state, input_r))
 	MCFG_SM510_WRITE_S_CB(WRITE8(hh_sm510_state, input_w))
 	MCFG_SM510_WRITE_R_CB(WRITE8(hh_sm510_state, piezo_r1_w))
-	MCFG_SM510_R_DIRECT_CONTROL(true)
 	MCFG_SM510_READ_BA_CB(IOPORT("BA"))
 	MCFG_SM510_READ_B_CB(IOPORT("B"))
 
@@ -2246,11 +2255,11 @@ static MACHINE_CONFIG_START( tsharr2 )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", SM510, XTAL_32_768kHz)
+	MCFG_SM510_R_MASK_OPTION(SM510_R_CONTROL_OUTPUT) // confirmed
 	MCFG_SM510_WRITE_SEGS_CB(WRITE16(hh_sm510_state, sm510_lcd_segment_w))
 	MCFG_SM510_READ_K_CB(READ8(hh_sm510_state, input_r))
 	MCFG_SM510_WRITE_S_CB(WRITE8(hh_sm510_state, input_w))
 	MCFG_SM510_WRITE_R_CB(WRITE8(hh_sm510_state, piezo_r1_w))
-	MCFG_SM510_R_DIRECT_CONTROL(true)
 	MCFG_SM510_READ_BA_CB(IOPORT("BA"))
 	MCFG_SM510_READ_B_CB(IOPORT("B"))
 
@@ -2339,11 +2348,11 @@ static MACHINE_CONFIG_START( tgoldnaxe )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", SM510, XTAL_32_768kHz)
+	MCFG_SM510_R_MASK_OPTION(SM510_R_CONTROL_OUTPUT)
 	MCFG_SM510_WRITE_SEGS_CB(WRITE16(hh_sm510_state, sm510_lcd_segment_w))
 	MCFG_SM510_READ_K_CB(READ8(hh_sm510_state, input_r))
 	MCFG_SM510_WRITE_S_CB(WRITE8(hh_sm510_state, input_w))
 	MCFG_SM510_WRITE_R_CB(WRITE8(hh_sm510_state, piezo_r1_w))
-	MCFG_SM510_R_DIRECT_CONTROL(true)
 	MCFG_SM510_READ_BA_CB(IOPORT("BA"))
 	MCFG_SM510_READ_B_CB(IOPORT("B"))
 
@@ -2432,11 +2441,11 @@ static MACHINE_CONFIG_START( trobocop2 )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", SM510, XTAL_32_768kHz)
+	MCFG_SM510_R_MASK_OPTION(SM510_R_CONTROL_OUTPUT)
 	MCFG_SM510_WRITE_SEGS_CB(WRITE16(hh_sm510_state, sm510_lcd_segment_w))
 	MCFG_SM510_READ_K_CB(READ8(hh_sm510_state, input_r))
 	MCFG_SM510_WRITE_S_CB(WRITE8(hh_sm510_state, input_w))
 	MCFG_SM510_WRITE_R_CB(WRITE8(hh_sm510_state, piezo_r1_w))
-	MCFG_SM510_R_DIRECT_CONTROL(true)
 	MCFG_SM510_READ_BA_CB(IOPORT("BA"))
 	MCFG_SM510_READ_B_CB(IOPORT("B"))
 
@@ -2529,11 +2538,11 @@ static MACHINE_CONFIG_START( taltbeast )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", SM510, XTAL_32_768kHz)
+	MCFG_SM510_R_MASK_OPTION(SM510_R_CONTROL_OUTPUT) // confirmed
 	MCFG_SM510_WRITE_SEGS_CB(WRITE16(hh_sm510_state, sm510_lcd_segment_w))
 	MCFG_SM510_READ_K_CB(READ8(hh_sm510_state, input_r))
 	MCFG_SM510_WRITE_S_CB(WRITE8(hh_sm510_state, input_w))
 	MCFG_SM510_WRITE_R_CB(WRITE8(hh_sm510_state, piezo_r1_w))
-	MCFG_SM510_R_DIRECT_CONTROL(true)
 	MCFG_SM510_READ_BA_CB(IOPORT("BA"))
 	MCFG_SM510_READ_B_CB(IOPORT("B"))
 
@@ -2618,11 +2627,11 @@ static MACHINE_CONFIG_START( tswampt )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", SM510, XTAL_32_768kHz)
+	MCFG_SM510_R_MASK_OPTION(SM510_R_CONTROL_OUTPUT)
 	MCFG_SM510_WRITE_SEGS_CB(WRITE16(hh_sm510_state, sm510_lcd_segment_w))
 	MCFG_SM510_READ_K_CB(READ8(hh_sm510_state, input_r))
 	MCFG_SM510_WRITE_S_CB(WRITE8(hh_sm510_state, input_w))
 	MCFG_SM510_WRITE_R_CB(WRITE8(hh_sm510_state, piezo_r1_w))
-	MCFG_SM510_R_DIRECT_CONTROL(true)
 	MCFG_SM510_READ_BA_CB(IOPORT("BA"))
 	MCFG_SM510_READ_B_CB(IOPORT("B"))
 
@@ -2804,11 +2813,11 @@ static MACHINE_CONFIG_START( tbtoads )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", SM510, XTAL_32_768kHz)
+	MCFG_SM510_R_MASK_OPTION(SM510_R_CONTROL_OUTPUT)
 	MCFG_SM510_WRITE_SEGS_CB(WRITE16(hh_sm510_state, sm510_lcd_segment_w))
 	MCFG_SM510_READ_K_CB(READ8(hh_sm510_state, input_r))
 	MCFG_SM510_WRITE_S_CB(WRITE8(hh_sm510_state, input_w))
 	MCFG_SM510_WRITE_R_CB(WRITE8(hh_sm510_state, piezo_r1_w))
-	MCFG_SM510_R_DIRECT_CONTROL(true)
 	MCFG_SM510_READ_BA_CB(IOPORT("BA"))
 	MCFG_SM510_READ_B_CB(IOPORT("B"))
 
@@ -3010,11 +3019,11 @@ static MACHINE_CONFIG_START( tdummies )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", SM510, XTAL_32_768kHz)
+	MCFG_SM510_R_MASK_OPTION(SM510_R_CONTROL_OUTPUT)
 	MCFG_SM510_WRITE_SEGS_CB(WRITE16(hh_sm510_state, sm510_lcd_segment_w))
 	MCFG_SM510_READ_K_CB(READ8(hh_sm510_state, input_r))
 	MCFG_SM510_WRITE_S_CB(WRITE8(hh_sm510_state, input_w))
 	MCFG_SM510_WRITE_R_CB(WRITE8(hh_sm510_state, piezo_r1_w))
-	MCFG_SM510_R_DIRECT_CONTROL(true)
 	MCFG_SM510_READ_BA_CB(IOPORT("BA"))
 	MCFG_SM510_READ_B_CB(IOPORT("B"))
 
@@ -3103,11 +3112,11 @@ static MACHINE_CONFIG_START( tsfight2 )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", SM510, XTAL_32_768kHz)
+	MCFG_SM510_R_MASK_OPTION(SM510_R_CONTROL_OUTPUT)
 	MCFG_SM510_WRITE_SEGS_CB(WRITE16(hh_sm510_state, sm510_lcd_segment_w))
 	MCFG_SM510_READ_K_CB(READ8(hh_sm510_state, input_r))
 	MCFG_SM510_WRITE_S_CB(WRITE8(hh_sm510_state, input_w))
 	MCFG_SM510_WRITE_R_CB(WRITE8(hh_sm510_state, piezo_r1_w))
-	MCFG_SM510_R_DIRECT_CONTROL(true)
 	MCFG_SM510_READ_BA_CB(IOPORT("BA"))
 	MCFG_SM510_READ_B_CB(IOPORT("B"))
 
@@ -3201,11 +3210,11 @@ static MACHINE_CONFIG_START( tnmarebc )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", SM510, XTAL_32_768kHz)
+	MCFG_SM510_R_MASK_OPTION(SM510_R_CONTROL_OUTPUT)
 	MCFG_SM510_WRITE_SEGS_CB(WRITE16(hh_sm510_state, sm510_lcd_segment_w))
 	MCFG_SM510_READ_K_CB(READ8(hh_sm510_state, input_r))
 	MCFG_SM510_WRITE_S_CB(WRITE8(tnmarebc_state, input_w))
 	MCFG_SM510_WRITE_R_CB(WRITE8(hh_sm510_state, piezo_r1_w))
-	MCFG_SM510_R_DIRECT_CONTROL(true)
 	MCFG_SM510_READ_BA_CB(IOPORT("BA"))
 	MCFG_SM510_READ_B_CB(IOPORT("B"))
 
@@ -3295,11 +3304,11 @@ static MACHINE_CONFIG_START( tmkombat )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", SM510, XTAL_32_768kHz)
+	MCFG_SM510_R_MASK_OPTION(SM510_R_CONTROL_OUTPUT)
 	MCFG_SM510_WRITE_SEGS_CB(WRITE16(hh_sm510_state, sm510_lcd_segment_w))
 	MCFG_SM510_READ_K_CB(READ8(hh_sm510_state, input_r))
 	MCFG_SM510_WRITE_S_CB(WRITE8(hh_sm510_state, input_w))
 	MCFG_SM510_WRITE_R_CB(WRITE8(hh_sm510_state, piezo_r1_w))
-	MCFG_SM510_R_DIRECT_CONTROL(true)
 	MCFG_SM510_READ_BA_CB(IOPORT("BA"))
 	MCFG_SM510_READ_B_CB(IOPORT("B"))
 
@@ -3388,11 +3397,11 @@ static MACHINE_CONFIG_START( tshadow )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", SM510, XTAL_32_768kHz)
+	MCFG_SM510_R_MASK_OPTION(SM510_R_CONTROL_OUTPUT)
 	MCFG_SM510_WRITE_SEGS_CB(WRITE16(hh_sm510_state, sm510_lcd_segment_w))
 	MCFG_SM510_READ_K_CB(READ8(hh_sm510_state, input_r))
 	MCFG_SM510_WRITE_S_CB(WRITE8(hh_sm510_state, input_w))
 	MCFG_SM510_WRITE_R_CB(WRITE8(hh_sm510_state, piezo_r1_w))
-	MCFG_SM510_R_DIRECT_CONTROL(true)
 	MCFG_SM510_READ_BA_CB(IOPORT("BA"))
 	MCFG_SM510_READ_B_CB(IOPORT("B"))
 
@@ -3482,11 +3491,11 @@ static MACHINE_CONFIG_START( tbatfor )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", SM510, XTAL_32_768kHz)
+	MCFG_SM510_R_MASK_OPTION(SM510_R_CONTROL_OUTPUT)
 	MCFG_SM510_WRITE_SEGS_CB(WRITE16(hh_sm510_state, sm510_lcd_segment_w))
 	MCFG_SM510_READ_K_CB(READ8(hh_sm510_state, input_r))
 	MCFG_SM510_WRITE_S_CB(WRITE8(hh_sm510_state, input_w))
 	MCFG_SM510_WRITE_R_CB(WRITE8(hh_sm510_state, piezo_r1_w))
-	MCFG_SM510_R_DIRECT_CONTROL(true)
 	MCFG_SM510_READ_BA_CB(IOPORT("BA"))
 	MCFG_SM510_READ_B_CB(IOPORT("B"))
 
@@ -3576,11 +3585,11 @@ static MACHINE_CONFIG_START( tjdredd )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", SM510, XTAL_32_768kHz)
+	MCFG_SM510_R_MASK_OPTION(SM510_R_CONTROL_OUTPUT)
 	MCFG_SM510_WRITE_SEGS_CB(WRITE16(hh_sm510_state, sm510_lcd_segment_w))
 	MCFG_SM510_READ_K_CB(READ8(hh_sm510_state, input_r))
 	MCFG_SM510_WRITE_S_CB(WRITE8(hh_sm510_state, input_w))
 	MCFG_SM510_WRITE_R_CB(WRITE8(hh_sm510_state, piezo_r1_w))
-	MCFG_SM510_R_DIRECT_CONTROL(true)
 	MCFG_SM510_READ_BA_CB(IOPORT("BA"))
 	MCFG_SM510_READ_B_CB(IOPORT("B"))
 
@@ -3670,11 +3679,11 @@ static MACHINE_CONFIG_START( tapollo13 )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", SM510, XTAL_32_768kHz)
+	MCFG_SM510_R_MASK_OPTION(SM510_R_CONTROL_OUTPUT)
 	MCFG_SM510_WRITE_SEGS_CB(WRITE16(hh_sm510_state, sm510_lcd_segment_w))
 	MCFG_SM510_READ_K_CB(READ8(hh_sm510_state, input_r))
 	MCFG_SM510_WRITE_S_CB(WRITE8(hh_sm510_state, input_w))
 	MCFG_SM510_WRITE_R_CB(WRITE8(hh_sm510_state, piezo_r1_w))
-	MCFG_SM510_R_DIRECT_CONTROL(true)
 	MCFG_SM510_READ_BA_CB(IOPORT("BA"))
 	MCFG_SM510_READ_B_CB(IOPORT("B"))
 
@@ -3759,11 +3768,11 @@ static MACHINE_CONFIG_START( tsjam )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", SM510, XTAL_32_768kHz) // no external XTAL
+	MCFG_SM510_R_MASK_OPTION(SM510_R_CONTROL_OUTPUT)
 	MCFG_SM510_WRITE_SEGS_CB(WRITE16(hh_sm510_state, sm510_lcd_segment_w))
 	MCFG_SM510_READ_K_CB(READ8(hh_sm510_state, input_r))
 	MCFG_SM510_WRITE_S_CB(WRITE8(hh_sm510_state, input_w))
 	MCFG_SM510_WRITE_R_CB(WRITE8(hh_sm510_state, piezo_r1_w))
-	MCFG_SM510_R_DIRECT_CONTROL(true)
 	MCFG_SM510_READ_BA_CB(IOPORT("BA"))
 	MCFG_SM510_READ_B_CB(IOPORT("B"))
 
@@ -3862,6 +3871,7 @@ static MACHINE_CONFIG_START( tigarden )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", SM510, XTAL_32_768kHz)
+	MCFG_SM510_R_MASK_OPTION(SM510_R_CONTROL_OUTPUT) // ?
 	MCFG_SM510_WRITE_SEGS_CB(WRITE16(hh_sm510_state, sm510_lcd_segment_w))
 	MCFG_SM510_READ_K_CB(READ8(hh_sm510_state, input_r))
 	MCFG_SM510_WRITE_S_CB(WRITE8(hh_sm510_state, input_w))
