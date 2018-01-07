@@ -1263,13 +1263,14 @@
 
 	<!-- Windows 95 -->
 	<!-- Cannot be installed on non-Japanese OS -->
+	<!-- Created from "Kotobuki.iso" size="90093568" crc="ff036452" sha1="ee62d7a2fa124b3535d0f1abc323a4aa3e1f1a35" -->
 	<software name="kotobuki" supported="partial">
 		<description>Kotobuki (Japan)</description>
 		<year>1997</year>
 		<publisher>C's Ware</publisher>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
-				<disk name="kotobuki" sha1="9bae69ba85d54d98d2a1b3cf256a0b4d2a35d00d" />
+				<disk name="kotobuki" sha1="7b0afa327d4b4d4be2c1069e60d9679900db93b8" />
 			</diskarea>
 		</part>
 	</software>
@@ -1300,13 +1301,15 @@
 	</software>
 	
 	<!-- Windows 95 -->
+	<!-- Created from "KU2_IMPACT.cue" size="1107" crc="c08e9181" sha1="d051cf135a5c238ff0a44c08b85a9facfb453f54" -->
+	<!-- Created from "KU2_IMPACT.bin" size="725053392" crc="6980d026" sha1="71ce80ba25d657968d914df9a834172b99487b4f" -->
 	<software name="ku2impact">
 		<description>KU2 Impact (Japan)</description>
 		<year>1995</year>
 		<publisher>Panther Software</publisher>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
-				<disk name="ku2impact" sha1="f7470a5ea219ad410bea1475953c550827381a98" />
+				<disk name="ku2impact" sha1="2e1f1c8ce81065fcdf2081daa97c72180243f1e0" />
 			</diskarea>
 		</part>
 	</software>
@@ -1365,7 +1368,7 @@
 		<publisher>Gaea</publisher>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
-				<disk name="moon" sha1="fc79ee0bbc66f22c32fa4a171ba7c97094b195e6" />
+				<disk name="moondrg" sha1="fc79ee0bbc66f22c32fa4a171ba7c97094b195e6" />
 			</diskarea>
 		</part>
 	</software>
