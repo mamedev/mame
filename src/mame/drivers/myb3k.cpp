@@ -112,7 +112,11 @@ public:
 		, m_isabus(*this, "isa")
 	{ }
 
-  // uint8_t tmp;
+	enum
+	{
+		TIMER_ID_KEY_INTERRUPT
+	};
+
 	DECLARE_READ8_MEMBER(myb3k_kbd_r);
 	void kbd_set_data_and_interrupt(u8 data);
 
@@ -145,6 +149,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( hrq_w );
 	DECLARE_WRITE_LINE_MEMBER( tc_w );
 	void select_dma_channel(int channel, bool state);
+
+        void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 
 protected:
 	required_device<cpu_device> m_maincpu;
@@ -190,7 +196,23 @@ READ8_MEMBER( myb3k_state::myb3k_kbd_r )
 void myb3k_state::kbd_set_data_and_interrupt(u8 data) {
 	LOGKBD("%s: %02x\n", FUNCNAME, data);
 	m_kbd_data = data;
-	m_pic8259->ir1_w(ASSERT_LINE);
+	// The INT7 line is pulled low when a clock is detected from the keyboard.
+	m_pic8259->ir1_w(CLEAR_LINE);
+	// When the clock stops, the INT7 line goes back high. This triggers the interrupt.
+	// We simulate the time it takes to send the 8 bits over the serial line
+	// here. It should be 0.8ms but is rounded off to 1ms.
+	timer_set(attotime::from_msec(1), TIMER_ID_KEY_INTERRUPT);
+}
+
+void myb3k_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+{
+	switch (id)
+	{
+	case TIMER_ID_KEY_INTERRUPT:
+  	        // The serial transfer of 8 bits is complete. Now trigger INT7.
+	        m_pic8259->ir1_w(ASSERT_LINE);
+		break;
+	}
 }
 
 MC6845_UPDATE_ROW( myb3k_state::crtc_update_row )
