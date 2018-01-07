@@ -40,7 +40,7 @@ private:
 
 u32 zms8085_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	u16 pos = m_mainram[17] | (u16(m_mainram[18]) << 8);
+	u16 pos = m_mainram[0x17] | (u16(m_mainram[0x18]) << 8);
 
 	for (unsigned y = 0; y < 250; y++)
 	{
