@@ -1003,6 +1003,12 @@ void saturn_state::drawpixel_generic(int x, int y, int patterndata, int offsetcn
 	/* MSBON */
 	// TODO: does this always applies to the frame buffer regardless of the mode?
 	pix |= stv2_current_sprite.CMDPMOD & 0x8000;
+	/*
+	TODO: from docs:
+	"Except for the color calculation of replace and shadow, color calculation can only be performed when the color code of the original picture is RGB code. 
+	Color calculation can be executed when the color code is color bank code, but the results are not guaranteed."
+	Currently no idea about the "result not guaranteed" part, let's disable this branch for the time being ...
+	*/
 	#if 0
 	if ( mode != 5 )
 	{
