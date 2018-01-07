@@ -95,6 +95,9 @@ public:
 	uint32_t screen_update_supbtime(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_tumblep(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
+	void chinatwn(machine_config &config);
+	void supbtime(machine_config &config);
+	void tumblep(machine_config &config);
 private:
 	required_shared_ptr<uint16_t> m_spriteram;
 	required_shared_ptr<uint16_t> m_pf1_rowscroll;
@@ -427,7 +430,7 @@ GFXDECODE_END
 //  MACHINE DEFINITIONS
 //**************************************************************************
 
-static MACHINE_CONFIG_START( supbtime )
+MACHINE_CONFIG_START(supbtime_state::supbtime)
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_28MHz / 2)
 	MCFG_CPU_PROGRAM_MAP(supbtime_map)
 
@@ -477,12 +480,12 @@ static MACHINE_CONFIG_START( supbtime )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( chinatwn, supbtime )
+MACHINE_CONFIG_DERIVED(supbtime_state::chinatwn, supbtime)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(chinatwn_map)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( tumblep, supbtime )
+MACHINE_CONFIG_DERIVED(supbtime_state::tumblep, supbtime)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(tumblep_map)
 

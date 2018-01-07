@@ -3608,7 +3608,7 @@ GFXDECODE_END
 
 /**********************************************************************/
 
-static MACHINE_CONFIG_START( marvins )
+MACHINE_CONFIG_START(snk_state::marvins)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 3360000)   /* 3.36 MHz */
@@ -3658,7 +3658,7 @@ static MACHINE_CONFIG_START( marvins )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( vangrd2, marvins )
+MACHINE_CONFIG_DERIVED(snk_state::vangrd2, marvins)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -3669,7 +3669,7 @@ static MACHINE_CONFIG_DERIVED( vangrd2, marvins )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( madcrush, marvins )
+MACHINE_CONFIG_DERIVED(snk_state::madcrush, marvins)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -3680,7 +3680,7 @@ static MACHINE_CONFIG_DERIVED( madcrush, marvins )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( jcross )
+MACHINE_CONFIG_START(snk_state::jcross)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 3350000) /* NOT verified */
@@ -3727,7 +3727,7 @@ static MACHINE_CONFIG_START( jcross )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( sgladiat, jcross )
+MACHINE_CONFIG_DERIVED(snk_state::sgladiat, jcross)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -3744,7 +3744,7 @@ static MACHINE_CONFIG_DERIVED( sgladiat, jcross )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( hal21, jcross )
+MACHINE_CONFIG_DERIVED(snk_state::hal21, jcross)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -3763,7 +3763,7 @@ static MACHINE_CONFIG_DERIVED( hal21, jcross )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( tnk3 )
+MACHINE_CONFIG_START(snk_state::tnk3)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_13_4MHz/4) /* verified on pcb */
@@ -3806,7 +3806,7 @@ static MACHINE_CONFIG_START( tnk3 )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( aso, tnk3 )
+MACHINE_CONFIG_DERIVED(snk_state::aso, tnk3)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -3823,7 +3823,7 @@ static MACHINE_CONFIG_DERIVED( aso, tnk3 )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( athena, tnk3 )
+MACHINE_CONFIG_DERIVED(snk_state::athena, tnk3)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("audiocpu")
@@ -3836,7 +3836,7 @@ static MACHINE_CONFIG_DERIVED( athena, tnk3 )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( fitegolf, tnk3 )
+MACHINE_CONFIG_DERIVED(snk_state::fitegolf, tnk3)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("audiocpu")
@@ -3849,13 +3849,13 @@ static MACHINE_CONFIG_DERIVED( fitegolf, tnk3 )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 2.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( fitegolf2, fitegolf )
+MACHINE_CONFIG_DERIVED(snk_state::fitegolf2, fitegolf)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(snk_state, screen_update_fitegolf2)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( ikari )
+MACHINE_CONFIG_START(snk_state::ikari)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_13_4MHz/4) /* verified on pcb */
@@ -3901,7 +3901,7 @@ static MACHINE_CONFIG_START( ikari )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( victroad, ikari )
+MACHINE_CONFIG_DERIVED(snk_state::victroad, ikari)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("audiocpu")
@@ -3914,7 +3914,7 @@ static MACHINE_CONFIG_DERIVED( victroad, ikari )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( bermudat )
+MACHINE_CONFIG_START(snk_state::bermudat)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_8MHz/2) /* verified on pcb */
@@ -3958,14 +3958,14 @@ static MACHINE_CONFIG_START( bermudat )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( psychos, bermudat )
+MACHINE_CONFIG_DERIVED(snk_state::psychos, bermudat)
 
 	/* video hardware */
 	MCFG_VIDEO_START_OVERRIDE(snk_state,psychos)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( gwar, bermudat )
+MACHINE_CONFIG_DERIVED(snk_state::gwar, bermudat)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -3977,7 +3977,7 @@ static MACHINE_CONFIG_DERIVED( gwar, bermudat )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( gwara, bermudat )
+MACHINE_CONFIG_DERIVED(snk_state::gwara, bermudat)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -3988,7 +3988,7 @@ static MACHINE_CONFIG_DERIVED( gwara, bermudat )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( chopper1, bermudat )
+MACHINE_CONFIG_DERIVED(snk_state::chopper1, bermudat)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("sub")
@@ -4004,7 +4004,7 @@ static MACHINE_CONFIG_DERIVED( chopper1, bermudat )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( choppera, chopper1 )
+MACHINE_CONFIG_DERIVED(snk_state::choppera, chopper1)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -4012,7 +4012,7 @@ static MACHINE_CONFIG_DERIVED( choppera, chopper1 )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( tdfever )
+MACHINE_CONFIG_START(snk_state::tdfever)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 4000000)
@@ -4058,7 +4058,7 @@ static MACHINE_CONFIG_START( tdfever )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( tdfever2, tdfever )
+MACHINE_CONFIG_DERIVED(snk_state::tdfever2, tdfever)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("audiocpu")

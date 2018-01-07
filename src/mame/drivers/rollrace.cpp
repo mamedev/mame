@@ -245,7 +245,7 @@ INTERRUPT_GEN_MEMBER(rollrace_state::sound_timer_irq)
 		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
-static MACHINE_CONFIG_START( rollrace )
+MACHINE_CONFIG_START(rollrace_state::rollrace)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80,XTAL_24MHz/8) /* verified on pcb */
@@ -293,7 +293,7 @@ static MACHINE_CONFIG_START( rollrace )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.10)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( rollace2, rollrace )
+MACHINE_CONFIG_DERIVED(rollrace_state::rollace2, rollrace)
 
 	/* basic machine hardware */
 

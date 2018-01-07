@@ -426,7 +426,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( nomcu )
+MACHINE_CONFIG_START(kangaroo_state::nomcu)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK/4)
@@ -457,7 +457,7 @@ static MACHINE_CONFIG_START( nomcu )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( mcu, nomcu )
+MACHINE_CONFIG_DERIVED(kangaroo_state::mcu, nomcu)
 
 	MCFG_MACHINE_START_OVERRIDE(kangaroo_state,kangaroo_mcu)
 

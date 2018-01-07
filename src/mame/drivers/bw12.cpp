@@ -543,7 +543,7 @@ GFXDECODE_END
 
 
 /* Machine Driver */
-static MACHINE_CONFIG_START( common )
+MACHINE_CONFIG_START(bw12_state::common)
 	/* basic machine hardware */
 	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL_16MHz/4)
 	MCFG_CPU_PROGRAM_MAP(bw12_mem)
@@ -634,7 +634,7 @@ static MACHINE_CONFIG_START( common )
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", CENTRONICS_TAG)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( bw12, common )
+MACHINE_CONFIG_DERIVED(bw12_state::bw12, common)
 	/* floppy drives */
 	MCFG_FLOPPY_DRIVE_ADD(UPD765_TAG ":1", bw12_floppies, "525dd", bw12_state::bw12_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(UPD765_TAG ":2", bw12_floppies, "525dd", bw12_state::bw12_floppy_formats)
@@ -647,7 +647,7 @@ static MACHINE_CONFIG_DERIVED( bw12, common )
 	MCFG_RAM_DEFAULT_SIZE("64K")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( bw14, common )
+MACHINE_CONFIG_DERIVED(bw12_state::bw14, common)
 	/* floppy drives */
 	MCFG_FLOPPY_DRIVE_ADD(UPD765_TAG ":1", bw14_floppies, "525dd", bw12_state::bw14_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(UPD765_TAG ":2", bw14_floppies, "525dd", bw12_state::bw14_floppy_formats)

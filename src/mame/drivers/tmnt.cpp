@@ -1892,7 +1892,7 @@ MACHINE_RESET_MEMBER(tmnt_state,common)
 }
 
 
-static MACHINE_CONFIG_START( cuebrick )
+MACHINE_CONFIG_START(tmnt_state::cuebrick)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 8000000)    /* 8 MHz */
@@ -1944,7 +1944,7 @@ static MACHINE_CONFIG_START( cuebrick )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( mia )
+MACHINE_CONFIG_START(tmnt_state::mia)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz/3)
@@ -2009,7 +2009,7 @@ MACHINE_RESET_MEMBER(tmnt_state,tmnt)
 	m_upd7759->reset_w(1);
 }
 
-static MACHINE_CONFIG_START( tmnt )
+MACHINE_CONFIG_START(tmnt_state::tmnt)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz/3)
@@ -2076,7 +2076,7 @@ static MACHINE_CONFIG_START( tmnt )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( punkshot )
+MACHINE_CONFIG_START(tmnt_state::punkshot)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz/2)
@@ -2130,7 +2130,7 @@ static MACHINE_CONFIG_START( punkshot )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( lgtnfght )
+MACHINE_CONFIG_START(tmnt_state::lgtnfght)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz/2)
@@ -2186,7 +2186,7 @@ static MACHINE_CONFIG_START( lgtnfght )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( blswhstl )
+MACHINE_CONFIG_START(tmnt_state::blswhstl)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_32MHz/2)       /* Confirmed */
@@ -2264,7 +2264,7 @@ static GFXDECODE_START( glfgreat )
 	GFXDECODE_ENTRY( "zoom", 0, zoomlayout, 0x400, 16 )
 GFXDECODE_END
 
-static MACHINE_CONFIG_START( glfgreat )
+MACHINE_CONFIG_START(tmnt_state::glfgreat)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_32MHz/2)       /* Confirmed */
@@ -2330,7 +2330,7 @@ MACHINE_START_MEMBER(tmnt_state,prmrsocr)
 	membank("bank1")->configure_entries(0, 8, &ROM[0x10000], 0x4000);
 }
 
-static MACHINE_CONFIG_START( prmrsocr )
+MACHINE_CONFIG_START(tmnt_state::prmrsocr)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_32MHz/2)       /* Confirmed */
@@ -2395,7 +2395,7 @@ static MACHINE_CONFIG_START( prmrsocr )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( tmnt2 )
+MACHINE_CONFIG_START(tmnt_state::tmnt2)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_32MHz/2)
@@ -2458,7 +2458,7 @@ static MACHINE_CONFIG_START( tmnt2 )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( ssriders )
+MACHINE_CONFIG_START(tmnt_state::ssriders)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_32MHz/2)
@@ -2517,7 +2517,7 @@ static MACHINE_CONFIG_START( ssriders )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( sunsetbl )
+MACHINE_CONFIG_START(tmnt_state::sunsetbl)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 16000000)   /* 16 MHz */
@@ -2563,7 +2563,7 @@ static MACHINE_CONFIG_START( sunsetbl )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( thndrx2 )
+MACHINE_CONFIG_START(tmnt_state::thndrx2)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 12000000)   /* 12 MHz */

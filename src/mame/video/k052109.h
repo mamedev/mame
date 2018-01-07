@@ -11,7 +11,7 @@ typedef device_delegate<void (int layer, int bank, int *code, int *color, int *f
 #define K052109_CB_MEMBER(_name)   void _name(int layer, int bank, int *code, int *color, int *flags, int *priority)
 
 #define MCFG_K052109_CB(_class, _method) \
-	k052109_device::set_k052109_callback(*device, k052109_cb_delegate(&_class::_method, #_class "::" #_method, downcast<_class *>(owner)));
+	k052109_device::set_k052109_callback(*device, k052109_cb_delegate(&_class::_method, #_class "::" #_method, this));
 
 #define MCFG_K052109_CHARRAM(_ram) \
 	k052109_device::set_ram(*device, _ram);

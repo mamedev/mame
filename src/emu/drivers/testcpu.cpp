@@ -162,6 +162,8 @@ public:
 		printf("Write to %08X & %08X%08X = %08X%08X\n", offset * 8, (int)((mem_mask&0xffffffff00000000LL) >> 32) , (int)(mem_mask&0xffffffff), (int)((data&0xffffffff00000000LL) >> 32), (int)(data&0xffffffff));
 	}
 
+	void testcpu(machine_config &config);
+
 private:
 	// internal state
 	required_device<ppc603e_device> m_cpu;
@@ -186,7 +188,7 @@ ADDRESS_MAP_END
 //  MACHINE DRIVERS
 //**************************************************************************
 
-static MACHINE_CONFIG_START( testcpu, testcpu_state )
+MACHINE_CONFIG_START(testcpu_state::testcpu)
 
 	// CPUs
 	MCFG_CPU_ADD("maincpu", PPC603E, 66000000)

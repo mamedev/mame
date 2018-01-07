@@ -910,7 +910,7 @@ MACHINE_RESET_MEMBER(mystwarr_state,gaiapols)
 }
 
 
-static MACHINE_CONFIG_START( mystwarr )
+MACHINE_CONFIG_START(mystwarr_state::mystwarr)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 16000000)   /* 16 MHz (confirmed) */
@@ -980,7 +980,7 @@ static MACHINE_CONFIG_START( mystwarr )
 	MCFG_SOUND_ROUTE(1, "lspeaker", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( viostorm, mystwarr )
+MACHINE_CONFIG_DERIVED(mystwarr_state::viostorm, mystwarr)
 
 	MCFG_MACHINE_RESET_OVERRIDE(mystwarr_state,viostorm)
 
@@ -1011,7 +1011,7 @@ static MACHINE_CONFIG_DERIVED( viostorm, mystwarr )
 	MCFG_K055673_CONFIG("gfx2", K055673_LAYOUT_RNG, -62, -23)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( metamrph, mystwarr )
+MACHINE_CONFIG_DERIVED(mystwarr_state::metamrph, mystwarr)
 
 	MCFG_MACHINE_RESET_OVERRIDE(mystwarr_state,metamrph)
 
@@ -1044,7 +1044,7 @@ static MACHINE_CONFIG_DERIVED( metamrph, mystwarr )
 	MCFG_K055673_CONFIG("gfx2", K055673_LAYOUT_RNG, -51, -24)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( dadandrn, mystwarr )
+MACHINE_CONFIG_DERIVED(mystwarr_state::dadandrn, mystwarr)
 
 	MCFG_MACHINE_RESET_OVERRIDE(mystwarr_state,dadandrn)
 
@@ -1077,7 +1077,7 @@ static MACHINE_CONFIG_DERIVED( dadandrn, mystwarr )
 	MCFG_K055673_CONFIG("gfx2", K055673_LAYOUT_GX, -42, -22)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( gaiapols, mystwarr )
+MACHINE_CONFIG_DERIVED(mystwarr_state::gaiapols, mystwarr)
 
 	MCFG_MACHINE_RESET_OVERRIDE(mystwarr_state,gaiapols)
 
@@ -1113,7 +1113,7 @@ static MACHINE_CONFIG_DERIVED( gaiapols, mystwarr )
 	MCFG_K055673_CONFIG("gfx2", K055673_LAYOUT_RNG, -61, -22) // stage2 brick walls
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( martchmp, mystwarr )
+MACHINE_CONFIG_DERIVED(mystwarr_state::martchmp, mystwarr)
 
 	MCFG_MACHINE_RESET_OVERRIDE(mystwarr_state,martchmp)
 

@@ -58,6 +58,7 @@ public:
 	required_device<rs232_port_device> m_rs232;
 	required_device<cpu_device> m_maincpu;
 	DECLARE_QUICKLOAD_LOAD_MEMBER( pipbug );
+	void pipbug(machine_config &config);
 };
 
 WRITE8_MEMBER( pipbug_state::pipbug_ctrl_w )
@@ -153,7 +154,7 @@ QUICKLOAD_LOAD_MEMBER( pipbug_state, pipbug )
 	return result;
 }
 
-static MACHINE_CONFIG_START( pipbug )
+MACHINE_CONFIG_START(pipbug_state::pipbug)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", S2650, XTAL_1MHz)
 	MCFG_CPU_PROGRAM_MAP(pipbug_mem)

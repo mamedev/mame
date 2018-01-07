@@ -72,4 +72,6 @@ public:
 	void palette_init_common( palette_device &palette, const uint8_t *color_prom,
 								int r_bit0, int r_bit1, int g_bit0, int g_bit1, int b_bit0, int b_bit1 );
 
+								void dorodon(machine_config &config);
+								void ladybug(machine_config &config);
 };

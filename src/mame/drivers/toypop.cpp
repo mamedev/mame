@@ -101,6 +101,8 @@ public:
 	DECLARE_WRITE8_MEMBER(sound_halt_ctrl_w);
 	DECLARE_READ8_MEMBER(bg_rmw_r);
 	DECLARE_WRITE8_MEMBER(bg_rmw_w);
+	void toypop(machine_config &config);
+	void liblrabl(machine_config &config);
 protected:
 	// driver_device overrides
 //  virtual void machine_start() override;
@@ -652,7 +654,7 @@ INTERRUPT_GEN_MEMBER(namcos16_state::slave_vblank_irq)
 		device.execute().set_input_line(6,HOLD_LINE);
 }
 
-static MACHINE_CONFIG_START( liblrabl )
+MACHINE_CONFIG_START(namcos16_state::liblrabl)
 	MCFG_CPU_ADD("maincpu", MC6809E, MASTER_CLOCK/4)
 	MCFG_CPU_PROGRAM_MAP(master_liblrabl_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", namcos16_state, master_scanline, "screen", 0, 1)
@@ -701,7 +703,7 @@ static MACHINE_CONFIG_START( liblrabl )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( toypop, liblrabl )
+MACHINE_CONFIG_DERIVED(namcos16_state::toypop, liblrabl)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(master_toypop_map)
 MACHINE_CONFIG_END

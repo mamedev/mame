@@ -239,6 +239,7 @@ public:
 	uint32_t screen_update_mpu12wbk(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
+	void mpu12wbk(machine_config &config);
 };
 
 
@@ -483,7 +484,7 @@ GFXDECODE_END
 *    Machine Drivers     *
 *************************/
 
-static MACHINE_CONFIG_START( mpu12wbk )
+MACHINE_CONFIG_START(mpu12wbk_state::mpu12wbk)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", MC6809, MASTER_CLOCK)

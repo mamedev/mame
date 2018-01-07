@@ -232,6 +232,7 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(hp64k_beeper_off);
 
 	DECLARE_WRITE_LINE_MEMBER(hp64k_baud_clk_w);
+	void hp64k(machine_config &config);
 private:
 	required_device<hp_5061_3011_cpu_device> m_cpu;
 	required_device<i8275_device> m_crtc;
@@ -1333,7 +1334,7 @@ static SLOT_INTERFACE_START(hp64k_floppies)
 	SLOT_INTERFACE("525dd" , FLOPPY_525_DD)
 SLOT_INTERFACE_END
 
-static MACHINE_CONFIG_START(hp64k)
+MACHINE_CONFIG_START(hp64k_state::hp64k)
 	MCFG_CPU_ADD("cpu" , HP_5061_3011 , 6250000)
 	MCFG_CPU_PROGRAM_MAP(cpu_mem_map)
 	MCFG_CPU_IO_MAP(cpu_io_map)

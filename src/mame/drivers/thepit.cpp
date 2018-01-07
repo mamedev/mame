@@ -711,7 +711,7 @@ INTERRUPT_GEN_MEMBER(thepit_state::vblank_irq)
 		device.execute().set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 }
 
-static MACHINE_CONFIG_START( thepit )
+MACHINE_CONFIG_START(thepit_state::thepit)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, PIXEL_CLOCK/2)     /* 3.072 MHz */
@@ -755,12 +755,12 @@ static MACHINE_CONFIG_START( thepit )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( fitter, thepit )
+MACHINE_CONFIG_DERIVED(thepit_state::fitter, thepit)
 	MCFG_DEVICE_MODIFY("mainlatch") // IC42
 	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(thepit_state, coin_lockout_w))
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( desertdn, fitter )
+MACHINE_CONFIG_DERIVED(thepit_state::desertdn, fitter)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -773,7 +773,7 @@ static MACHINE_CONFIG_DERIVED( desertdn, fitter )
 	MCFG_GFXDECODE_MODIFY("gfxdecode", intrepid)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( intrepid, fitter )
+MACHINE_CONFIG_DERIVED(thepit_state::intrepid, fitter)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -787,7 +787,7 @@ static MACHINE_CONFIG_DERIVED( intrepid, fitter )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( suprmous, intrepid )
+MACHINE_CONFIG_DERIVED(thepit_state::suprmous, intrepid)
 
 	/* basic machine hardware */
 

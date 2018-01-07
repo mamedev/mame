@@ -3732,7 +3732,7 @@ void namcos22_state::machine_start()
 }
 
 // System 22
-static MACHINE_CONFIG_START( namcos22 )
+MACHINE_CONFIG_START(namcos22_state::namcos22)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68020,SS22_MASTER_CLOCK/2) /* 25 MHz? */
@@ -3788,7 +3788,7 @@ static MACHINE_CONFIG_START( namcos22 )
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.00)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( cybrcomm, namcos22 )
+MACHINE_CONFIG_DERIVED(namcos22_state::cybrcomm, namcos22)
 
 	MCFG_SPEAKER_STANDARD_STEREO("rear_left","rear_right")
 
@@ -3798,7 +3798,7 @@ static MACHINE_CONFIG_DERIVED( cybrcomm, namcos22 )
 MACHINE_CONFIG_END
 
 // Super System 22
-static MACHINE_CONFIG_START( namcos22s )
+MACHINE_CONFIG_START(namcos22_state::namcos22s)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68EC020,SS22_MASTER_CLOCK/2)
@@ -3853,7 +3853,7 @@ static MACHINE_CONFIG_START( namcos22s )
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.00)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( airco22b, namcos22s )
+MACHINE_CONFIG_DERIVED(namcos22_state::airco22b, namcos22s)
 
 	MCFG_SPEAKER_STANDARD_MONO("bodysonic")
 
@@ -3861,7 +3861,7 @@ static MACHINE_CONFIG_DERIVED( airco22b, namcos22s )
 	MCFG_SOUND_ROUTE(2, "bodysonic", 0.50)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( alpine, namcos22s )
+MACHINE_CONFIG_DERIVED(namcos22_state::alpine, namcos22s)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("mcu")
@@ -3870,14 +3870,14 @@ static MACHINE_CONFIG_DERIVED( alpine, namcos22s )
 	MCFG_TIMER_DRIVER_ADD("motor_timer", namcos22_state, alpine_steplock_callback)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( alpinesa, alpine )
+MACHINE_CONFIG_DERIVED(namcos22_state::alpinesa, alpine)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(alpinesa_am)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( cybrcycc, namcos22s )
+MACHINE_CONFIG_DERIVED(namcos22_state::cybrcycc, namcos22s)
 
 	MCFG_SPEAKER_STANDARD_MONO("tank")
 
@@ -3885,7 +3885,7 @@ static MACHINE_CONFIG_DERIVED( cybrcycc, namcos22s )
 	MCFG_SOUND_ROUTE(2, "tank", 1.00)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( dirtdash, namcos22s )
+MACHINE_CONFIG_DERIVED(namcos22_state::dirtdash, namcos22s)
 
 	MCFG_SPEAKER_STANDARD_MONO("road")
 	MCFG_SPEAKER_STANDARD_MONO("under")
@@ -3895,14 +3895,14 @@ static MACHINE_CONFIG_DERIVED( dirtdash, namcos22s )
 	MCFG_SOUND_ROUTE(3, "under", 0.50) // from sound test
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( timecris, namcos22s )
+MACHINE_CONFIG_DERIVED(namcos22_state::timecris, namcos22s)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(timecris_am)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( tokyowar, namcos22s )
+MACHINE_CONFIG_DERIVED(namcos22_state::tokyowar, namcos22s)
 
 	MCFG_SPEAKER_STANDARD_MONO("seat")
 	MCFG_SPEAKER_STANDARD_MONO("vibration")
@@ -3912,7 +3912,7 @@ static MACHINE_CONFIG_DERIVED( tokyowar, namcos22s )
 	MCFG_SOUND_ROUTE(2, "vibration", 0.50)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( propcycl, namcos22s )
+MACHINE_CONFIG_DERIVED(namcos22_state::propcycl, namcos22s)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("mcu")
@@ -3930,7 +3930,7 @@ MACHINE_START_MEMBER(namcos22_state,adillor)
 		elem = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(namcos22_state::adillor_trackball_interrupt),this));
 }
 
-static MACHINE_CONFIG_DERIVED( adillor, namcos22s )
+MACHINE_CONFIG_DERIVED(namcos22_state::adillor, namcos22s)
 
 	/* basic machine hardware */
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("ar_tb_upd", namcos22_state, adillor_trackball_update, attotime::from_msec(20))

@@ -98,6 +98,9 @@ public:
 
 	static const atari_motion_objects_config s_mob_config;
 
+	void cyberbalt(machine_config &config);
+	void cyberbal2p(machine_config &config);
+	void cyberbal(machine_config &config);
 private:
 	void video_start_common(int screens);
 	void cyberbal_sound_reset();

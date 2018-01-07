@@ -70,6 +70,24 @@ public:
 	// video updates
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
+	void sound_board_2203(machine_config &config);
+	void sound_board_2203x2(machine_config &config);
+	void sound_board_2151(machine_config &config);
+	void shared_base(machine_config &config);
+	void hangon_base(machine_config &config);
+	void sharrier_base(machine_config &config);
+	void enduror_base(machine_config &config);
+	void endurord_base(machine_config &config);
+	void endurob2(machine_config &config);
+	void shangupb(machine_config &config);
+	void enduror(machine_config &config);
+	void shangonro(machine_config &config);
+	void enduror1d(machine_config &config);
+	void endurord(machine_config &config);
+	void sharrier(machine_config &config);
+	void endurobl(machine_config &config);
+	void enduror1(machine_config &config);
+	void hangon(machine_config &config);
 protected:
 	// internal types
 	typedef delegate<void ()> i8751_sim_delegate;

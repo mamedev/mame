@@ -42,6 +42,7 @@ public:
 	DECLARE_READ8_MEMBER(keyboard_r);
 	DECLARE_WRITE8_MEMBER(display_7seg_w);
 
+	void zapcomp(machine_config &config);
 private:
 	uint8_t decode7seg(uint8_t data);
 	virtual void machine_start() override;
@@ -156,7 +157,7 @@ void zapcomp_state::machine_start()
 {
 }
 
-static MACHINE_CONFIG_START( zapcomp )
+MACHINE_CONFIG_START(zapcomp_state::zapcomp)
 	// basic machine hardware
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_2MHz)
 	MCFG_CPU_PROGRAM_MAP(zapcomp_mem)

@@ -118,7 +118,7 @@ ADDRESS_MAP_END
 //-------------------------------------------------
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
-MACHINE_CONFIG_MEMBER( m68340_cpu_device::device_add_mconfig )
+MACHINE_CONFIG_START(m68340_cpu_device::device_add_mconfig)
 	MCFG_DEVICE_ADD("serial", MC68340_SERIAL_MODULE, 0)
 	MCFG_MC68340SER_IRQ_CALLBACK(DEVWRITELINE("serial", mc68340_serial_module_device, irq_w))
 	MCFG_DEVICE_ADD("timer1", MC68340_TIMER_MODULE, 0)

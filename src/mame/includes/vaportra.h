@@ -60,4 +60,5 @@ public:
 	void update_24bitcol( int offset );
 
 	DECO16IC_BANK_CB_MEMBER(bank_callback);
+	void vaportra(machine_config &config);
 };

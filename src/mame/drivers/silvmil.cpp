@@ -132,6 +132,9 @@ public:
 	virtual void video_start() override;
 	uint32_t screen_update_silvmil(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void tumblepb_gfx1_rearrange();
+	void puzzlovek(machine_config &config);
+	void puzzlove(machine_config &config);
+	void silvmil(machine_config &config);
 };
 
 
@@ -395,7 +398,7 @@ static ADDRESS_MAP_START( silvmil_sound_map, AS_PROGRAM, 8, silvmil_state )
 ADDRESS_MAP_END
 
 
-static MACHINE_CONFIG_START( silvmil )
+MACHINE_CONFIG_START(silvmil_state::silvmil)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_12MHz) /* Verified */
@@ -438,7 +441,7 @@ static MACHINE_CONFIG_START( silvmil )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( puzzlove, silvmil )
+MACHINE_CONFIG_DERIVED(silvmil_state::puzzlove, silvmil)
 	MCFG_DEVICE_REMOVE("audiocpu")
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL_4MHz) /* Verified */
 	MCFG_CPU_PROGRAM_MAP(silvmil_sound_map)
@@ -451,7 +454,7 @@ static MACHINE_CONFIG_DERIVED( puzzlove, silvmil )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( puzzlovek, puzzlove )
+MACHINE_CONFIG_DERIVED(silvmil_state::puzzlovek, puzzlove)
 		MCFG_DEVICE_REMOVE("ymsnd")
 		MCFG_YM2151_ADD("ymsnd", XTAL_15MHz/4) /* Verified */
 		MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 0))

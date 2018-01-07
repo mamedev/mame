@@ -908,7 +908,7 @@ DECOSPR_COLOUR_CB_MEMBER(rohga_state::schmeisr_col_callback)
 	return colour;
 }
 
-static MACHINE_CONFIG_START( rohga )
+MACHINE_CONFIG_START(rohga_state::rohga)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 14000000)
@@ -995,7 +995,7 @@ static MACHINE_CONFIG_START( rohga )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.40)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( wizdfire )
+MACHINE_CONFIG_START(rohga_state::wizdfire)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 14000000)
@@ -1087,7 +1087,7 @@ static MACHINE_CONFIG_START( wizdfire )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.40)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( nitrobal )
+MACHINE_CONFIG_START(rohga_state::nitrobal)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 14000000)
@@ -1180,7 +1180,7 @@ static MACHINE_CONFIG_START( nitrobal )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.40)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( schmeisr )
+MACHINE_CONFIG_START(rohga_state::schmeisr)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 14000000)
@@ -1269,7 +1269,7 @@ MACHINE_CONFIG_END
 
 
 
-static MACHINE_CONFIG_DERIVED( hangzo, schmeisr )
+MACHINE_CONFIG_DERIVED(rohga_state::hangzo, schmeisr)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")

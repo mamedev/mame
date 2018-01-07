@@ -92,6 +92,7 @@ public:
 	required_device<cpu_device> m_audiocpu;
 	required_device<generic_latch_8_device> m_soundlatch;
 	required_device<generic_latch_8_device> m_soundlatch2;
+	void r2dtank(machine_config &config);
 };
 
 
@@ -435,7 +436,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( r2dtank )
+MACHINE_CONFIG_START(r2dtank_state::r2dtank)
 	MCFG_CPU_ADD("maincpu", M6809,3000000)       /* ?? too fast ? */
 	MCFG_CPU_PROGRAM_MAP(r2dtank_main_map)
 

@@ -37,13 +37,13 @@
 	msm6253_device::static_set_input_tag(*device, 3, "^" _input);
 
 #define MCFG_MSM6253_IN0_ANALOG_READ(_class, _method) \
-	msm6253_device::static_set_input_cb(*device, 0, msm6253_device::port_read_delegate(&_class::_method, #_class "::" #_method, downcast<_class *>(owner)));
+	msm6253_device::static_set_input_cb(*device, 0, msm6253_device::port_read_delegate(&_class::_method, #_class "::" #_method, this));
 #define MCFG_MSM6253_IN1_ANALOG_READ(_class, _method) \
-	msm6253_device::static_set_input_cb(*device, 1, msm6253_device::port_read_delegate(&_class::_method, #_class "::" #_method, downcast<_class *>(owner)));
+	msm6253_device::static_set_input_cb(*device, 1, msm6253_device::port_read_delegate(&_class::_method, #_class "::" #_method, this));
 #define MCFG_MSM6253_IN2_ANALOG_READ(_class, _method) \
-	msm6253_device::static_set_input_cb(*device, 2, msm6253_device::port_read_delegate(&_class::_method, #_class "::" #_method, downcast<_class *>(owner)));
+	msm6253_device::static_set_input_cb(*device, 2, msm6253_device::port_read_delegate(&_class::_method, #_class "::" #_method, this));
 #define MCFG_MSM6253_IN3_ANALOG_READ(_class, _method) \
-	msm6253_device::static_set_input_cb(*device, 3, msm6253_device::port_read_delegate(&_class::_method, #_class "::" #_method, downcast<_class *>(owner)));
+	msm6253_device::static_set_input_cb(*device, 3, msm6253_device::port_read_delegate(&_class::_method, #_class "::" #_method, this));
 
 #define MCFG_MSM6253_IN0_ANALOG_DEVREAD(_tag, _class, _method) \
 	msm6253_device::static_set_input_cb(*device, 0, msm6253_device::port_read_delegate(&_class::_method, #_class "::" #_method, _tag));

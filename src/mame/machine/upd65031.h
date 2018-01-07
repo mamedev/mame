@@ -30,10 +30,10 @@
 	devcb = &upd65031_device::set_spkr_wr_callback(*device, DEVCB_##_write);
 
 #define MCFG_UPD65031_SCR_UPDATE_CB(_class, _method) \
-	upd65031_device::set_screen_update_callback(*device, upd65031_screen_update_delegate(&_class::_method, #_class "::" #_method, downcast<_class *>(owner)));
+	upd65031_device::set_screen_update_callback(*device, upd65031_screen_update_delegate(&_class::_method, #_class "::" #_method, this));
 
 #define MCFG_UPD65031_MEM_UPDATE_CB(_class, _method) \
-	upd65031_device::set_memory_update_callback(*device, upd65031_memory_update_delegate(&_class::_method, #_class "::" #_method, downcast<_class *>(owner)));
+	upd65031_device::set_memory_update_callback(*device, upd65031_memory_update_delegate(&_class::_method, #_class "::" #_method, this));
 
 
 //**************************************************************************

@@ -807,7 +807,7 @@ FLOPPY_FORMATS_MEMBER( amstrad_state::aleste_floppy_formats )
 	FLOPPY_MSX_FORMAT
 FLOPPY_FORMATS_END
 
-static MACHINE_CONFIG_START( cpcplus_cartslot )
+MACHINE_CONFIG_START(amstrad_state::cpcplus_cartslot)
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "gx4000_cart")
 	MCFG_GENERIC_EXTENSIONS("bin,cpr")
 	MCFG_GENERIC_MANDATORY
@@ -898,7 +898,7 @@ SLOT_INTERFACE_START(amstrad_centronics_devices)
 	SLOT_INTERFACE("digiblst", CENTRONICS_DIGIBLASTER)
 SLOT_INTERFACE_END
 
-static MACHINE_CONFIG_START( amstrad_base )
+MACHINE_CONFIG_START(amstrad_state::amstrad_base)
 	/* Machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_16MHz / 4)
 	MCFG_CPU_PROGRAM_MAP(amstrad_mem)
@@ -961,7 +961,7 @@ static MACHINE_CONFIG_START( amstrad_base )
 
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( cpc464, amstrad_base )
+MACHINE_CONFIG_DERIVED(amstrad_state::cpc464, amstrad_base)
 	MCFG_DEVICE_ADD("exp", CPC_EXPANSION_SLOT, 0)
 	MCFG_DEVICE_SLOT_INTERFACE(cpc464_exp_cards, nullptr, false)
 	MCFG_CPC_EXPANSION_SLOT_OUT_IRQ_CB(INPUTLINE("maincpu", 0))
@@ -975,7 +975,7 @@ static MACHINE_CONFIG_DERIVED( cpc464, amstrad_base )
 	MCFG_RAM_EXTRA_OPTIONS("128K,320K,576K")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( cpc664, amstrad_base )
+MACHINE_CONFIG_DERIVED(amstrad_state::cpc664, amstrad_base)
 	MCFG_UPD765A_ADD("upd765", true, true)
 	MCFG_FLOPPY_DRIVE_ADD("upd765:0", amstrad_floppies, "3ssdd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("upd765:1", amstrad_floppies, "35ssdd", floppy_image_device::default_floppy_formats)
@@ -994,7 +994,7 @@ static MACHINE_CONFIG_DERIVED( cpc664, amstrad_base )
 	MCFG_RAM_EXTRA_OPTIONS("128K,320K,576K")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( cpc6128, amstrad_base )
+MACHINE_CONFIG_DERIVED(amstrad_state::cpc6128, amstrad_base)
 	MCFG_UPD765A_ADD("upd765", true, true)
 	MCFG_FLOPPY_DRIVE_ADD("upd765:0", amstrad_floppies, "3ssdd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("upd765:1", amstrad_floppies, "35ssdd", floppy_image_device::default_floppy_formats)
@@ -1014,7 +1014,7 @@ static MACHINE_CONFIG_DERIVED( cpc6128, amstrad_base )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( kccomp, cpc6128 )
+MACHINE_CONFIG_DERIVED(amstrad_state::kccomp, cpc6128)
 	MCFG_MACHINE_START_OVERRIDE(amstrad_state,kccomp)
 	MCFG_MACHINE_RESET_OVERRIDE(amstrad_state,kccomp)
 
@@ -1023,7 +1023,7 @@ static MACHINE_CONFIG_DERIVED( kccomp, cpc6128 )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( cpcplus )
+MACHINE_CONFIG_START(amstrad_state::cpcplus)
 	/* Machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_40MHz / 10)
 	MCFG_CPU_PROGRAM_MAP(amstrad_mem)
@@ -1102,7 +1102,7 @@ static MACHINE_CONFIG_START( cpcplus )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( gx4000 )
+MACHINE_CONFIG_START(amstrad_state::gx4000)
 	/* Machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_40MHz / 10)
 	MCFG_CPU_PROGRAM_MAP(amstrad_mem)
@@ -1154,7 +1154,7 @@ static MACHINE_CONFIG_START( gx4000 )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( aleste, cpc6128 )
+MACHINE_CONFIG_DERIVED(amstrad_state::aleste, cpc6128)
 	MCFG_MACHINE_START_OVERRIDE(amstrad_state,aleste)
 	MCFG_MACHINE_RESET_OVERRIDE(amstrad_state,aleste)
 

@@ -40,6 +40,7 @@ public:
 
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
+	void altos2(machine_config &config);
 private:
 	virtual void machine_reset() override;
 
@@ -94,7 +95,7 @@ static const z80_daisy_config daisy_chain[] =
 	{ nullptr }
 };
 
-static MACHINE_CONFIG_START( altos2 )
+MACHINE_CONFIG_START(altos2_state::altos2)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80, XTAL_4MHz) // unknown clock
 	MCFG_CPU_PROGRAM_MAP(mem_map)

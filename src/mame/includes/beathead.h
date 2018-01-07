@@ -80,4 +80,5 @@ public:
 	DECLARE_READ32_MEMBER( hsync_ram_r );
 	DECLARE_WRITE32_MEMBER( hsync_ram_w );
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline_callback);
+	void beathead(machine_config &config);
 };

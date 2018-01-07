@@ -133,6 +133,7 @@ public:
 	IRQ_CALLBACK_MEMBER(neocd_int_callback);
 
 	std::unique_ptr<uint8_t[]> m_meminternal_data;
+	void neocd(machine_config &config);
 protected:
 
 	int32_t SekIdle(int32_t nCycles);
@@ -1037,7 +1038,7 @@ uint32_t ngcd_state::screen_update_neocd(screen_device &screen, bitmap_rgb32 &bi
 }
 
 
-static MACHINE_CONFIG_DERIVED( neocd, neogeo_base )
+MACHINE_CONFIG_DERIVED(ngcd_state::neocd, neogeo_base)
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(neocd_main_map)

@@ -146,6 +146,7 @@ kron180_state(const machine_config &mconfig, device_type type, const char *tag) 
 	DECLARE_WRITE8_MEMBER( txen_w ){        LOGIO(("%s %02x = %02x\n", FUNCNAME, offset, data)); }
 	DECLARE_WRITE8_MEMBER( kbd_reset_w ){   LOGIO(("%s %02x = %02x\n", FUNCNAME, offset, data)); }
 	DECLARE_WRITE8_MEMBER( dreq_w ){        LOGIO(("%s %02x = %02x\n", FUNCNAME, offset, data)); }
+	void kron180(machine_config &config);
 protected:
 	required_device<cpu_device> m_maincpu;
 	required_shared_ptr<uint8_t> m_videoram;
@@ -290,7 +291,7 @@ WRITE_LINE_MEMBER(kron180_state::keyb_interrupt)
 /*
  * Machine configuration
  */
-static MACHINE_CONFIG_START (kron180)
+MACHINE_CONFIG_START(kron180_state::kron180)
 	/* basic machine hardware */
 	MCFG_CPU_ADD ("maincpu", Z180, XTAL_12_288MHz)
 	MCFG_CPU_PROGRAM_MAP (kron180_mem)

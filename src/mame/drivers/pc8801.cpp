@@ -472,6 +472,10 @@ public:
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_PALETTE_INIT(pc8801);
+	void pc8801mc(machine_config &config);
+	void pc8801fh(machine_config &config);
+	void pc8801(machine_config &config);
+	void pc8801ma(machine_config &config);
 protected:
 
 	virtual void video_start() override;
@@ -2566,7 +2570,7 @@ WRITE_LINE_MEMBER( pc8801_state::rxrdy_w )
 	// ...
 }
 
-static MACHINE_CONFIG_START( pc8801 )
+MACHINE_CONFIG_START(pc8801_state::pc8801)
 	/* main CPU */
 	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK)        /* 4 MHz */
 	MCFG_CPU_PROGRAM_MAP(pc8801_mem)
@@ -2647,15 +2651,15 @@ static MACHINE_CONFIG_START( pc8801 )
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("rtc_timer", pc8801_state, pc8801_rtc_irq, attotime::from_hz(600))
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( pc8801fh, pc8801 )
+MACHINE_CONFIG_DERIVED(pc8801_state::pc8801fh, pc8801)
 	MCFG_MACHINE_RESET_OVERRIDE(pc8801_state, pc8801_clock_speed )
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( pc8801ma, pc8801 )
+MACHINE_CONFIG_DERIVED(pc8801_state::pc8801ma, pc8801)
 	MCFG_MACHINE_RESET_OVERRIDE(pc8801_state, pc8801_dic )
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( pc8801mc, pc8801 )
+MACHINE_CONFIG_DERIVED(pc8801_state::pc8801mc, pc8801)
 	MCFG_MACHINE_RESET_OVERRIDE(pc8801_state, pc8801_cdrom )
 MACHINE_CONFIG_END
 

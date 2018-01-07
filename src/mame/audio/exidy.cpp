@@ -8,6 +8,8 @@
 
 #include "emu.h"
 #include "audio/exidy.h"
+#include "includes/exidy.h"
+#include "includes/victory.h"
 
 #include "cpu/z80/z80.h"
 #include "machine/rescap.h"
@@ -737,7 +739,7 @@ static ADDRESS_MAP_START( venture_audio_map, AS_PROGRAM, 8, venture_sound_device
 ADDRESS_MAP_END
 
 
-MACHINE_CONFIG_START( venture_audio )
+MACHINE_CONFIG_START(exidy_state::venture_audio)
 
 	MCFG_CPU_ADD("audiocpu", M6502, 3579545/4)
 	MCFG_CPU_PROGRAM_MAP(venture_audio_map)
@@ -816,7 +818,7 @@ static ADDRESS_MAP_START( cvsd_iomap, AS_IO, 8, venture_sound_device )
 ADDRESS_MAP_END
 
 
-MACHINE_CONFIG_START( mtrap_cvsd_audio )
+MACHINE_CONFIG_START(exidy_state::mtrap_cvsd_audio)
 
 	MCFG_CPU_ADD("cvsdcpu", Z80, CVSD_Z80_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(cvsd_map)
@@ -991,7 +993,7 @@ static ADDRESS_MAP_START( victory_audio_map, AS_PROGRAM, 8, venture_sound_device
 ADDRESS_MAP_END
 
 
-MACHINE_CONFIG_START( victory_audio )
+MACHINE_CONFIG_START(victory_state::victory_audio)
 
 	MCFG_CPU_ADD("audiocpu", M6502, VICTORY_AUDIO_CPU_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(victory_audio_map)

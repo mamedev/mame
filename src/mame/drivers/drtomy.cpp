@@ -53,6 +53,7 @@ public:
 	required_device<okim6295_device> m_oki;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	void drtomy(machine_config &config);
 };
 
 
@@ -299,7 +300,7 @@ void drtomy_state::machine_reset()
 	m_oki_bank = 0;
 }
 
-static MACHINE_CONFIG_START( drtomy )
+MACHINE_CONFIG_START(drtomy_state::drtomy)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000,24000000/2)          /* ? MHz */

@@ -55,4 +55,6 @@ public:
 	virtual void machine_reset() override;
 	DECLARE_PALETTE_INIT(malzak);
 	uint32_t screen_update_malzak(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	void malzak(machine_config &config);
+	void malzak2(machine_config &config);
 };

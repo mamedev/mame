@@ -100,6 +100,28 @@ public:
 
 	void init_at_common(int xmsbase);
 	uint16_t m_ps1_reg[2];
+	void pc30iii(machine_config &config);
+	void k286i(machine_config &config);
+	void ibm5170(machine_config &config);
+	void ct386sx(machine_config &config);
+	void xb42639(machine_config &config);
+	void at486l(machine_config &config);
+	void megapcpla(machine_config &config);
+	void comportiii(machine_config &config);
+	void ibm5162(machine_config &config);
+	void neat(machine_config &config);
+	void at386l(machine_config &config);
+	void ibm5170a(machine_config &config);
+	void ec1842(machine_config &config);
+	void at486(machine_config &config);
+	void ficpio2(machine_config &config);
+	void at386sx(machine_config &config);
+	void pc40iii(machine_config &config);
+	void atvga(machine_config &config);
+	void ibmps1(machine_config &config);
+	void at386(machine_config &config);
+
+	static void cfg_single_1200K(device_t *device);
 };
 
 class megapc_state : public driver_device
@@ -127,6 +149,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( wd7600_hold );
 	DECLARE_WRITE8_MEMBER( wd7600_tc ) { m_isabus->eop_w(offset, data); }
 	DECLARE_WRITE_LINE_MEMBER( wd7600_spkr ) { m_speaker->level_w(state); }
+	void megapcpl(machine_config &config);
+	void megapc(machine_config &config);
 };
 
 
@@ -328,18 +352,17 @@ MACHINE_START_MEMBER(at_state,vrom_fix)
 	membank("vrom_bank")->set_base(machine().root_device().memregion("bios")->base());
 }
 
-static MACHINE_CONFIG_START( cfg_single_1200K )
-	MCFG_DEVICE_MODIFY("fdc:0")
-	MCFG_SLOT_DEFAULT_OPTION("525hd")
-	MCFG_DEVICE_MODIFY("fdc:1")
-	MCFG_SLOT_DEFAULT_OPTION("")
-MACHINE_CONFIG_END
+void at_state::cfg_single_1200K(device_t *device)
+{
+	device_slot_interface::static_set_default_option(*device->subdevice("fdc:0"), "525hd");
+	device_slot_interface::static_set_default_option(*device->subdevice("fdc:1"), "");
+}
 
 static SLOT_INTERFACE_START( pci_devices )
 	SLOT_INTERFACE_INTERNAL("vt82c505", VT82C505)
 SLOT_INTERFACE_END
 
-static MACHINE_CONFIG_START( ibm5170 )
+MACHINE_CONFIG_START(at_state::ibm5170)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I80286, XTAL_12MHz/2 /*6000000*/)
 	MCFG_CPU_PROGRAM_MAP(at16_map)
@@ -349,7 +372,7 @@ static MACHINE_CONFIG_START( ibm5170 )
 
 	MCFG_DEVICE_ADD("mb", AT_MB, 0)
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
-	MCFG_FRAGMENT_ADD(at_softlists)
+	downcast<at_mb_device *>(device)->at_softlists(config);
 
 	MCFG_ISA16_SLOT_ADD("mb:isabus","isa1", pc_isa16_cards, "ega", false)
 	MCFG_ISA16_SLOT_ADD("mb:isabus","isa2", pc_isa16_cards, "fdc", false)
@@ -364,24 +387,24 @@ static MACHINE_CONFIG_START( ibm5170 )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( ibm5170a, ibm5170 )
+MACHINE_CONFIG_DERIVED(at_state::ibm5170a, ibm5170)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_CLOCK(XTAL_16MHz/2)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( ec1842, ibm5170 )
+MACHINE_CONFIG_DERIVED(at_state::ec1842, ibm5170)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_CLOCK(12000000)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( ibm5162, ibm5170 )
+MACHINE_CONFIG_DERIVED(at_state::ibm5162, ibm5170)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_CLOCK(6000000)
 	MCFG_DEVICE_MODIFY("isa1")
 	MCFG_DEVICE_SLOT_INTERFACE(pc_isa16_cards, "cga", false)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( ibmps1, ibm5170 )
+MACHINE_CONFIG_DERIVED(at_state::ibmps1, ibm5170)
 	MCFG_MACHINE_START_OVERRIDE(at_state, vrom_fix)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_CLOCK(XTAL_10MHz)
@@ -393,7 +416,7 @@ static MACHINE_CONFIG_DERIVED( ibmps1, ibm5170 )
 	MCFG_DEVICE_SLOT_INTERFACE(pc_at_keyboards, STR_KBD_MICROSOFT_NATURAL, false)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( atvga, ibm5170 )
+MACHINE_CONFIG_DERIVED(at_state::atvga, ibm5170)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_CLOCK(12000000)
 	MCFG_DEVICE_MODIFY("isa1")
@@ -403,7 +426,7 @@ static MACHINE_CONFIG_DERIVED( atvga, ibm5170 )
 	MCFG_ISA16_SLOT_ADD("mb:isabus","isa5", pc_isa16_cards, nullptr, false)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( neat, atvga )
+MACHINE_CONFIG_DERIVED(at_state::neat, atvga)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(neat_io)
 	MCFG_DEVICE_REMOVE("mb:rtc")  // TODO: move this into the cs8221
@@ -413,12 +436,12 @@ static MACHINE_CONFIG_DERIVED( neat, atvga )
 	MCFG_CS8221_ADD("cs8221", "maincpu", "mb:isa", "bios")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( xb42639, atvga )
+MACHINE_CONFIG_DERIVED(at_state::xb42639, atvga)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_CLOCK(12500000)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( k286i, ibm5162 )
+MACHINE_CONFIG_DERIVED(at_state::k286i, ibm5162)
 	MCFG_DEVICE_MODIFY("kbd")
 	MCFG_DEVICE_SLOT_INTERFACE(pc_at_keyboards, STR_KBD_MICROSOFT_NATURAL, false)
 	MCFG_ISA16_SLOT_ADD("mb:isabus","isa5", pc_isa16_cards, nullptr, false)
@@ -427,7 +450,7 @@ static MACHINE_CONFIG_DERIVED( k286i, ibm5162 )
 	MCFG_ISA16_SLOT_ADD("mb:isabus","isa8", pc_isa16_cards, nullptr, false)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( at386 )
+MACHINE_CONFIG_START(at_state::at386)
 	MCFG_CPU_ADD("maincpu", I386, 12000000)
 	MCFG_CPU_PROGRAM_MAP(at32_map)
 	MCFG_CPU_IO_MAP(at32_io)
@@ -435,7 +458,7 @@ static MACHINE_CONFIG_START( at386 )
 
 	MCFG_DEVICE_ADD("mb", AT_MB, 0)
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
-	MCFG_FRAGMENT_ADD(at_softlists)
+	downcast<at_mb_device *>(device)->at_softlists(config);
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	// on board devices
@@ -457,38 +480,38 @@ static MACHINE_CONFIG_START( at386 )
 	MCFG_RAM_EXTRA_OPTIONS("2M,4M,8M,15M,16M,32M,64M")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( at386l, at386 )
+MACHINE_CONFIG_DERIVED(at_state::at386l, at386)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(at32l_map)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( at486, at386 )
+MACHINE_CONFIG_DERIVED(at_state::at486, at386)
 	MCFG_CPU_REPLACE("maincpu", I486, 25000000)
 	MCFG_CPU_PROGRAM_MAP(at32_map)
 	MCFG_CPU_IO_MAP(at32_io)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("mb:pic8259_master", pic8259_device, inta_cb)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( at486l, at486 )
+MACHINE_CONFIG_DERIVED(at_state::at486l, at486)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(at32l_map)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( at386sx, atvga )
+MACHINE_CONFIG_DERIVED(at_state::at386sx, atvga)
 	MCFG_CPU_REPLACE("maincpu", I386SX, 16000000)     /* 386SX */
 	MCFG_CPU_PROGRAM_MAP(at16_map)
 	MCFG_CPU_IO_MAP(at16_io)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("mb:pic8259_master", pic8259_device, inta_cb)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( ct386sx, at386sx )
+MACHINE_CONFIG_DERIVED(at_state::ct386sx, at386sx)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(neat_io)
 	MCFG_CS8221_ADD("cs8221", "maincpu", "mb:isa", "maincpu")
 MACHINE_CONFIG_END
 
 // Commodore PC 30-III
-static MACHINE_CONFIG_DERIVED( pc30iii, ibm5170 )
+MACHINE_CONFIG_DERIVED(at_state::pc30iii, ibm5170)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_CLOCK(6000000) // should be XTAL_24MHz/2, but doesn't post with that setting
 	MCFG_DEVICE_MODIFY("isa1")
@@ -496,14 +519,14 @@ static MACHINE_CONFIG_DERIVED( pc30iii, ibm5170 )
 MACHINE_CONFIG_END
 
 // Commodore PC 40-III
-static MACHINE_CONFIG_DERIVED( pc40iii, ibm5170 )
+MACHINE_CONFIG_DERIVED(at_state::pc40iii, ibm5170)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_CLOCK(6000000) // should be XTAL_24MHz/2, but doesn't post with that setting
 	MCFG_DEVICE_MODIFY("isa1")
 	MCFG_DEVICE_SLOT_INTERFACE(pc_isa16_cards, "vga", false) // should be onboard Paradise VGA, see ROM declarations
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( megapc )
+MACHINE_CONFIG_START(megapc_state::megapc)
 	MCFG_CPU_ADD("maincpu", I386SX, XTAL_50MHz / 2)
 	MCFG_CPU_PROGRAM_MAP(megapc_map)
 	MCFG_CPU_IO_MAP(megapc_io)
@@ -577,18 +600,17 @@ static MACHINE_CONFIG_START( megapc )
 	MCFG_PALETTE_ADD("palette", 256) // todo: really needed?
 
 	/* software lists */
-	MCFG_FRAGMENT_ADD( at_softlists )
 	MCFG_SOFTWARE_LIST_ADD("disk_list","megapc")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( megapcpl, megapc )
+MACHINE_CONFIG_DERIVED(megapc_state::megapcpl, megapc)
 	MCFG_CPU_REPLACE("maincpu", I486, 66000000 / 2)
 	MCFG_CPU_PROGRAM_MAP(megapcpl_map)
 	MCFG_CPU_IO_MAP(megapcpl_io)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("wd7600", wd7600_device, intack_cb)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( megapcpla )
+MACHINE_CONFIG_START(at_state::megapcpla)
 	MCFG_CPU_ADD("maincpu", I486, 66000000 / 2)  // 486SLC
 	MCFG_CPU_PROGRAM_MAP(at32l_map)
 	MCFG_CPU_IO_MAP(at32_io)
@@ -597,7 +619,7 @@ static MACHINE_CONFIG_START( megapcpla )
 
 	MCFG_DEVICE_ADD("mb", AT_MB, 0)
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
-	MCFG_FRAGMENT_ADD(at_softlists)
+	downcast<at_mb_device *>(device)->at_softlists(config);
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	// on board devices
@@ -622,7 +644,7 @@ static MACHINE_CONFIG_START( megapcpla )
 	MCFG_SOFTWARE_LIST_ADD("disk_list","megapc")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( ficpio2 )
+MACHINE_CONFIG_START(at_state::ficpio2)
 	MCFG_CPU_ADD("maincpu", I486, 25000000)
 	MCFG_CPU_PROGRAM_MAP(ficpio_map)
 	MCFG_CPU_IO_MAP(ficpio_io)
@@ -630,7 +652,7 @@ static MACHINE_CONFIG_START( ficpio2 )
 
 	MCFG_DEVICE_ADD("mb", AT_MB, 0)
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
-	MCFG_FRAGMENT_ADD(at_softlists)
+	downcast<at_mb_device *>(device)->at_softlists(config);
 
 	MCFG_DEVICE_REMOVE("mb:rtc")
 	MCFG_DS12885_ADD("mb:rtc")
@@ -665,7 +687,7 @@ static MACHINE_CONFIG_START( ficpio2 )
 MACHINE_CONFIG_END
 
 // Compaq Portable III
-static MACHINE_CONFIG_START( comportiii )
+MACHINE_CONFIG_START(at_state::comportiii)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I80286, XTAL_48MHz/4 /*12000000*/)
 	MCFG_CPU_PROGRAM_MAP(at16_map)
@@ -675,7 +697,7 @@ static MACHINE_CONFIG_START( comportiii )
 
 	MCFG_DEVICE_ADD("mb", AT_MB, 0)
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
-	MCFG_FRAGMENT_ADD(at_softlists)
+	downcast<at_mb_device *>(device)->at_softlists(config);
 
 	MCFG_ISA16_SLOT_ADD("mb:isabus","board1", pc_isa16_cards, "fdc", true)
 	MCFG_SLOT_OPTION_MACHINE_CONFIG("fdc", cfg_single_1200K)

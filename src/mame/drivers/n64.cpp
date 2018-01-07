@@ -38,6 +38,8 @@ public:
 	void disk_unload(device_image_interface &image);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( n64dd );
 	DECLARE_DEVICE_IMAGE_UNLOAD_MEMBER( n64dd );
+	void n64(machine_config &config);
+	void n64dd(machine_config &config);
 };
 
 READ32_MEMBER(n64_mess_state::dd_null_r)
@@ -418,7 +420,7 @@ INTERRUPT_GEN_MEMBER(n64_mess_state::n64_reset_poll)
 	periphs->poll_reset_button((ioport("RESET")->read() & 1) ? true : false);
 }
 
-static MACHINE_CONFIG_START( n64 )
+MACHINE_CONFIG_START(n64_mess_state::n64)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", VR4300BE, 93750000)
@@ -473,7 +475,7 @@ static MACHINE_CONFIG_START( n64 )
 	MCFG_SOFTWARE_LIST_ADD("cart_list", "n64")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( n64dd, n64 )
+MACHINE_CONFIG_DERIVED(n64_mess_state::n64dd, n64)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(n64dd_map)
 

@@ -97,6 +97,8 @@ public:
 	DECLARE_MACHINE_RESET(ivg09);
 	MC6845_UPDATE_ROW(crtc_update_row);
 
+	void ivg09(machine_config &config);
+	void cpu09(machine_config &config);
 private:
 	uint8_t m_term_data;
 	uint8_t m_pa;
@@ -286,7 +288,7 @@ void tavernie_state::kbd_put(u8 data)
 	m_pia_ivg->cb1_w(1);
 }
 
-static MACHINE_CONFIG_START( cpu09 )
+MACHINE_CONFIG_START(tavernie_state::cpu09)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", MC6809, XTAL_4MHz)
 	MCFG_CPU_PROGRAM_MAP(cpu09_mem)
@@ -327,7 +329,7 @@ static MACHINE_CONFIG_START( cpu09 )
 	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("acia", acia6850_device, write_rxc))
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( ivg09, cpu09 )
+MACHINE_CONFIG_DERIVED(tavernie_state::ivg09, cpu09)
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(ivg09_mem)

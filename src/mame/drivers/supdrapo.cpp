@@ -109,6 +109,7 @@ public:
 	DECLARE_PALETTE_INIT(supdrapo);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void supdrapo(machine_config &config);
 };
 
 
@@ -449,7 +450,7 @@ WRITE8_MEMBER(supdrapo_state::ay8910_outputb_w)
                            Machine Driver
 **********************************************************************/
 
-static MACHINE_CONFIG_START( supdrapo )
+MACHINE_CONFIG_START(supdrapo_state::supdrapo)
 
 	MCFG_CPU_ADD("maincpu", Z80, CPU_CLOCK) /* guess */
 	MCFG_CPU_PROGRAM_MAP(sdpoker_mem)

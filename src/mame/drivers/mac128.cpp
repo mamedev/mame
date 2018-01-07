@@ -259,6 +259,9 @@ public:
 	void mac_driver_init(mac128model_t model);
 	void update_volume();
 
+	void mac512ke(machine_config &config);
+	void mac128k(machine_config &config);
+	void macplus(machine_config &config);
 private:
 	// wait states for accessing the VIA
 	int m_via_cycles;
@@ -1320,7 +1323,7 @@ static const floppy_interface mac_floppy_interface =
 	"floppy_3_5"
 };
 
-static MACHINE_CONFIG_START( mac512ke )
+MACHINE_CONFIG_START(mac128_state::mac512ke)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, C7M)        /* 7.8336 MHz */
 	MCFG_CPU_PROGRAM_MAP(mac512ke_map)
@@ -1376,7 +1379,7 @@ static MACHINE_CONFIG_START( mac512ke )
 	MCFG_SOFTWARE_LIST_ADD("hdd_list", "mac_hdd")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( mac128k, mac512ke )
+MACHINE_CONFIG_DERIVED(mac128_state::mac128k, mac512ke)
 
 	/* internal ram */
 	MCFG_RAM_MODIFY(RAM_TAG)
@@ -1384,7 +1387,7 @@ static MACHINE_CONFIG_DERIVED( mac128k, mac512ke )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( macplus, mac512ke )
+MACHINE_CONFIG_DERIVED(mac128_state::macplus, mac512ke)
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_PROGRAM_MAP(macplus_map)
 

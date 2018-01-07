@@ -60,6 +60,8 @@ public:
 	DECLARE_WRITE8_MEMBER( sh8253_w );
 	DECLARE_READ8_MEMBER( sh8253_r );
 
+	void mtrap_cvsd_audio(machine_config &config);
+
 protected:
 	exidy_sound_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
@@ -129,6 +131,7 @@ public:
 
 	DECLARE_WRITE8_MEMBER( filter_w );
 
+	void venture_audio(machine_config &config);
 protected:
 	// device-level overrides
 	virtual void device_start() override;
@@ -151,6 +154,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( irq_clear_w );
 	DECLARE_WRITE_LINE_MEMBER( main_ack_w );
 
+	void victory_audio(machine_config &config);
 protected:
 	// device-level overrides
 	virtual void device_start() override;
@@ -170,11 +174,5 @@ private:
 };
 
 DECLARE_DEVICE_TYPE(EXIDY_VICTORY, victory_sound_device)
-
-MACHINE_CONFIG_EXTERN( venture_audio );
-
-MACHINE_CONFIG_EXTERN( mtrap_cvsd_audio );
-
-MACHINE_CONFIG_EXTERN( victory_audio );
 
 #endif // MAME_AUDIO_EXIDY_H

@@ -114,6 +114,8 @@ public:
 	void electron_interrupt_handler(int mode, int interrupt);
 	DECLARE_INPUT_CHANGED_MEMBER( trigger_reset );
 
+	void electron(machine_config &config);
+	void btm2105(machine_config &config);
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };

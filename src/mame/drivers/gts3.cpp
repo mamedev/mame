@@ -36,11 +36,11 @@ ToDo:
 #include "machine/6522via.h"
 #include "gts3.lh"
 
-class gts3_state : public driver_device
+class gts3_state : public genpin_class
 {
 public:
 	gts3_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag)
+		: genpin_class(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_u4(*this, "u4")
 		, m_u5(*this, "u5")
@@ -54,6 +54,7 @@ public:
 	DECLARE_WRITE8_MEMBER(u4b_w);
 	DECLARE_WRITE_LINE_MEMBER(nmi_w);
 	DECLARE_INPUT_CHANGED_MEMBER(test_inp);
+	void gts3(machine_config &config);
 private:
 	bool m_dispclk;
 	bool m_lampclk;
@@ -274,7 +275,7 @@ DRIVER_INIT_MEMBER( gts3_state, gts3 )
 {
 }
 
-static MACHINE_CONFIG_START( gts3 )
+MACHINE_CONFIG_START(gts3_state::gts3)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M65C02, XTAL_4MHz / 2)
 	MCFG_CPU_PROGRAM_MAP(gts3_map)

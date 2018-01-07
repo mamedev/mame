@@ -32,6 +32,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<palette_device> m_palette;
 	UPD7220_DISPLAY_PIXELS_MEMBER( hgdc_display_pixels );
+	void if800(machine_config &config);
 };
 
 UPD7220_DISPLAY_PIXELS_MEMBER( if800_state::hgdc_display_pixels )
@@ -80,7 +81,7 @@ static ADDRESS_MAP_START( upd7220_map, 0, 16, if800_state )
 	AM_RANGE(0x00000, 0x3ffff) AM_RAM AM_SHARE("video_ram")
 ADDRESS_MAP_END
 
-static MACHINE_CONFIG_START( if800 )
+MACHINE_CONFIG_START(if800_state::if800)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8086, 8000000)
 	MCFG_CPU_PROGRAM_MAP(if800_map)

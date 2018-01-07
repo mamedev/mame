@@ -445,7 +445,7 @@ void bigevglf_state::machine_reset()
 }
 
 
-static MACHINE_CONFIG_START( bigevglf )
+MACHINE_CONFIG_START(bigevglf_state::bigevglf)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80,10000000/2)     /* 5 MHz ? */

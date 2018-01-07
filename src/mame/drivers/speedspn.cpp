@@ -277,7 +277,7 @@ void speedspn_state::machine_start()
 }
 
 
-static MACHINE_CONFIG_START( speedspn )
+MACHINE_CONFIG_START(speedspn_state::speedspn)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80,6000000)      /* 6 MHz */

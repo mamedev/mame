@@ -30,6 +30,7 @@ public:
 
 	void update_panel(uint8_t ACC, uint8_t opcode, uint8_t mem_data, uint16_t mem_addr, uint16_t PC, uint8_t FLAGS, uint16_t RC, uint8_t mode);
 
+	void patinho_feio(machine_config &config);
 protected:
 	virtual void machine_start() override;
 

@@ -74,4 +74,5 @@ public:
 
 	INTERRUPT_GEN_MEMBER(mcu_irq);
 	TIMER_DEVICE_CALLBACK_MEMBER(interrupt);
+	void thedeep(machine_config &config);
 };

@@ -278,7 +278,7 @@ void yiear_state::machine_reset()
 	m_yiear_nmi_enable = 0;
 }
 
-static MACHINE_CONFIG_START( yiear )
+MACHINE_CONFIG_START(yiear_state::yiear)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", MC6809E, XTAL_18_432MHz/12)   /* verified on pcb */

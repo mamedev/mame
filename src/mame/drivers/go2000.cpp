@@ -72,6 +72,7 @@ public:
 	virtual void machine_start() override;
 	virtual void video_start() override;
 	uint32_t screen_update_go2000(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void go2000(machine_config &config);
 };
 
 
@@ -333,7 +334,7 @@ void go2000_state::machine_start()
 
 }
 
-static MACHINE_CONFIG_START( go2000 )
+MACHINE_CONFIG_START(go2000_state::go2000)
 
 	MCFG_CPU_ADD("maincpu", M68000, 10000000)
 	MCFG_CPU_PROGRAM_MAP(go2000_map)

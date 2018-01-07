@@ -41,6 +41,12 @@ public:
 	DECLARE_WRITE8_MEMBER(port2b_w);
 	DECLARE_WRITE8_MEMBER(port3a_w);
 	DECLARE_WRITE8_MEMBER(port3b_w);
+	void gts80b_s2(machine_config &config);
+	void gts80b_s3(machine_config &config);
+	void bonebstr(machine_config &config);
+	void gts80b_s1(machine_config &config);
+	void gts80b_s(machine_config &config);
+	void gts80b(machine_config &config);
 private:
 	uint8_t m_dispcmd;
 	uint8_t m_port2a;
@@ -374,7 +380,7 @@ DRIVER_INIT_MEMBER( gts80b_state, gts80b )
 }
 
 /* with Sound Board */
-static MACHINE_CONFIG_START( gts80b )
+MACHINE_CONFIG_START(gts80b_state::gts80b)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, XTAL_3_579545MHz/4)
 	MCFG_CPU_PROGRAM_MAP(gts80b_map)
@@ -409,7 +415,7 @@ static MACHINE_CONFIG_START( gts80b )
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( gts80b_s, gts80b )
+MACHINE_CONFIG_DERIVED(gts80b_state::gts80b_s, gts80b)
 	MCFG_SOUND_ADD("r0sound", GOTTLIEB_SOUND_REV0, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 MACHINE_CONFIG_END
@@ -420,25 +426,25 @@ MACHINE_CONFIG_END
 //  MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 //MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( gts80b_s1, gts80b )
+MACHINE_CONFIG_DERIVED(gts80b_state::gts80b_s1, gts80b)
 
 	/* related to src/mame/audio/gottlieb.c? */
 //  MCFG_IMPORT_FROM(gts80s_b1)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( gts80b_s2, gts80b )
+MACHINE_CONFIG_DERIVED(gts80b_state::gts80b_s2, gts80b)
 
 	/* related to src/mame/audio/gottlieb.c? */
 //  MCFG_IMPORT_FROM(gts80s_b2)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( gts80b_s3, gts80b )
+MACHINE_CONFIG_DERIVED(gts80b_state::gts80b_s3, gts80b)
 
 	/* related to src/mame/audio/gottlieb.c? */
 //  MCFG_IMPORT_FROM(gts80s_b3)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( bonebstr, gts80b )
+MACHINE_CONFIG_DERIVED(gts80b_state::bonebstr, gts80b)
 
 	/* related to src/mame/audio/gottlieb.c? */
 //  MCFG_IMPORT_FROM(gts80s_b3a)

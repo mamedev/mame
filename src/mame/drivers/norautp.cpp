@@ -1225,7 +1225,7 @@ GFXDECODE_END
 *    Machine Drivers     *
 *************************/
 
-static MACHINE_CONFIG_START( noraut_base )
+MACHINE_CONFIG_START(norautp_state::noraut_base)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, NORAUT_CPU_CLOCK)
@@ -1277,7 +1277,7 @@ static MACHINE_CONFIG_START( noraut_base )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( norautp, noraut_base )
+MACHINE_CONFIG_DERIVED(norautp_state::norautp, noraut_base)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1285,7 +1285,7 @@ static MACHINE_CONFIG_DERIVED( norautp, noraut_base )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( norautpl, noraut_base )
+MACHINE_CONFIG_DERIVED(norautp_state::norautpl, noraut_base)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1297,7 +1297,7 @@ static MACHINE_CONFIG_DERIVED( norautpl, noraut_base )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( norautxp, noraut_base )
+MACHINE_CONFIG_DERIVED(norautp_state::norautxp, noraut_base)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1306,7 +1306,7 @@ static MACHINE_CONFIG_DERIVED( norautxp, noraut_base )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( nortest1, noraut_base )
+MACHINE_CONFIG_DERIVED(norautp_state::nortest1, noraut_base)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1315,7 +1315,7 @@ static MACHINE_CONFIG_DERIVED( nortest1, noraut_base )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( norautx4, noraut_base )
+MACHINE_CONFIG_DERIVED(norautp_state::norautx4, noraut_base)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1335,7 +1335,7 @@ MACHINE_CONFIG_END
 #endif
 
 
-static MACHINE_CONFIG_DERIVED( kimble, noraut_base )
+MACHINE_CONFIG_DERIVED(norautp_state::kimble, noraut_base)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1347,7 +1347,7 @@ static MACHINE_CONFIG_DERIVED( kimble, noraut_base )
 	MCFG_DISCRETE_INTF(kimble)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( newhilop, noraut_base )
+MACHINE_CONFIG_DERIVED(norautp_state::newhilop, noraut_base)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1359,7 +1359,7 @@ MACHINE_CONFIG_END
 /********** 8080 based **********/
 
 
-static MACHINE_CONFIG_DERIVED( dphl, noraut_base )
+MACHINE_CONFIG_DERIVED(norautp_state::dphl, noraut_base)
 
 	/* basic machine hardware */
 	MCFG_CPU_REPLACE("maincpu", I8080, DPHL_CPU_CLOCK)
@@ -1372,7 +1372,7 @@ static MACHINE_CONFIG_DERIVED( dphl, noraut_base )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( dphla, noraut_base )
+MACHINE_CONFIG_DERIVED(norautp_state::dphla, noraut_base)
 
 	/* basic machine hardware */
 	MCFG_CPU_REPLACE("maincpu", I8080, DPHL_CPU_CLOCK)
@@ -1385,7 +1385,7 @@ static MACHINE_CONFIG_DERIVED( dphla, noraut_base )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( kimbldhl, noraut_base )
+MACHINE_CONFIG_DERIVED(norautp_state::kimbldhl, noraut_base)
 
 	/* basic machine hardware */
 	MCFG_CPU_REPLACE("maincpu", I8080, DPHL_CPU_CLOCK)
@@ -1398,7 +1398,7 @@ static MACHINE_CONFIG_DERIVED( kimbldhl, noraut_base )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( dphltest, noraut_base )
+MACHINE_CONFIG_DERIVED(norautp_state::dphltest, noraut_base)
 
 	/* basic machine hardware */
 	MCFG_CPU_REPLACE("maincpu", I8080, DPHL_CPU_CLOCK)
@@ -1411,7 +1411,7 @@ static MACHINE_CONFIG_DERIVED( dphltest, noraut_base )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( drhl, noraut_base )
+MACHINE_CONFIG_DERIVED(norautp_state::drhl, noraut_base)
 
 	/* basic machine hardware */
 	MCFG_CPU_REPLACE("maincpu", I8080, DPHL_CPU_CLOCK)
@@ -1424,7 +1424,7 @@ static MACHINE_CONFIG_DERIVED( drhl, noraut_base )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( ssjkrpkr, noraut_base )
+MACHINE_CONFIG_DERIVED(norautp_state::ssjkrpkr, noraut_base)
 
 	/* basic machine hardware */
 	MCFG_CPU_REPLACE("maincpu", I8080, DPHL_CPU_CLOCK)

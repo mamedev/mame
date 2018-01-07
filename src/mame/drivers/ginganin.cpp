@@ -243,7 +243,7 @@ WRITE_LINE_MEMBER(ginganin_state::ptm_irq)
 }
 
 
-static MACHINE_CONFIG_START( ginganin )
+MACHINE_CONFIG_START(ginganin_state::ginganin)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, MAIN_CLOCK)

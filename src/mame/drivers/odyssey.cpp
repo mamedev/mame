@@ -83,6 +83,7 @@ public:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	void odyssey(machine_config &config);
 };
 
 void odyssey_state::video_start()
@@ -128,7 +129,7 @@ void odyssey_state::machine_reset()
 *           Machine Config            *
 **************************************/
 
-static MACHINE_CONFIG_START( odyssey )
+MACHINE_CONFIG_START(odyssey_state::odyssey)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", PENTIUM, 133000000) // a Celeron at 1.70 GHz on the MB I checked.

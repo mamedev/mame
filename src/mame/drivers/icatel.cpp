@@ -62,6 +62,7 @@ public:
 
 	HD44780_PIXEL_UPDATE(icatel_pixel_update);
 
+	void icatel(machine_config &config);
 private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -239,7 +240,7 @@ HD44780_PIXEL_UPDATE(icatel_state::icatel_pixel_update)
 	}
 }
 
-static MACHINE_CONFIG_START( icatel )
+MACHINE_CONFIG_START(icatel_state::icatel)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I80C31, XTAL_2_097152MHz)
 	MCFG_CPU_PROGRAM_MAP(i80c31_prg)

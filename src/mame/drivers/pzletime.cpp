@@ -76,6 +76,7 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
+	void pzletime(machine_config &config);
 };
 
 
@@ -328,7 +329,7 @@ void pzletime_state::machine_reset()
 	m_ticket = 0;
 }
 
-static MACHINE_CONFIG_START( pzletime )
+MACHINE_CONFIG_START(pzletime_state::pzletime)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",M68000,10000000)

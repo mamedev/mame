@@ -195,6 +195,7 @@ public:
 	DECLARE_READ32_MEMBER(pluto5_mem_r);
 	DECLARE_WRITE32_MEMBER(pluto5_mem_w);
 
+	void pluto5(machine_config &config);
 protected:
 
 	// devices
@@ -251,7 +252,7 @@ void pluto5_state::machine_start()
 
 }
 
-static MACHINE_CONFIG_START( pluto5 )
+MACHINE_CONFIG_START(pluto5_state::pluto5)
 	MCFG_CPU_ADD("maincpu", M68340, 16000000)
 	MCFG_CPU_PROGRAM_MAP(pluto5_map)
 

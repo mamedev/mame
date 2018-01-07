@@ -54,6 +54,7 @@ public:
 	DECLARE_READ8_MEMBER(ti630_io_r);
 	DECLARE_DRIVER_INIT(ti630);
 	DECLARE_PALETTE_INIT(ti630);
+	void ti630(machine_config &config);
 private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -181,7 +182,7 @@ static GFXDECODE_START( ti630 )
 	GFXDECODE_ENTRY( "hd44780:cgrom", 0x0000, ti630_charlayout, 0, 1 )
 GFXDECODE_END
 
-static MACHINE_CONFIG_START( ti630 )
+MACHINE_CONFIG_START(ti630_state::ti630)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I80C31, XTAL_10MHz)
 	MCFG_CPU_PROGRAM_MAP(i80c31_prg)

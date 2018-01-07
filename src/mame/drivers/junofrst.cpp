@@ -132,6 +132,7 @@ public:
 	DECLARE_MACHINE_RESET(junofrst);
 
 	INTERRUPT_GEN_MEMBER(_30hz_irq);
+	void junofrst(machine_config &config);
 };
 
 
@@ -384,7 +385,7 @@ INTERRUPT_GEN_MEMBER(junofrst_state::_30hz_irq)
 		device.execute().set_input_line(0, ASSERT_LINE);
 }
 
-static MACHINE_CONFIG_START( junofrst )
+MACHINE_CONFIG_START(junofrst_state::junofrst)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", KONAMI1, 1500000)         /* 1.5 MHz ??? */

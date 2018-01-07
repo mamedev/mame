@@ -627,7 +627,7 @@ void rbisland_state::machine_start()
 {
 }
 
-static MACHINE_CONFIG_START( rbisland )
+MACHINE_CONFIG_START(rbisland_state::rbisland)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz/2) /* verified on pcb */
@@ -679,7 +679,7 @@ MACHINE_CONFIG_END
 
 
 /* Jumping: The PCB has 2 Xtals, 18.432MHz and 24MHz */
-static MACHINE_CONFIG_START( jumping )
+MACHINE_CONFIG_START(rbisland_state::jumping)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_18_432MHz/2)  /* verified on pcb */
@@ -723,7 +723,7 @@ static MACHINE_CONFIG_START( jumping )
 MACHINE_CONFIG_END
 
 /* Imnoe PCB uses 16MHz CPU crystal instead of 18.432 for CPU */
-static MACHINE_CONFIG_DERIVED( jumpingi, jumping )
+MACHINE_CONFIG_DERIVED(rbisland_state::jumpingi, jumping)
 	MCFG_CPU_REPLACE("maincpu", M68000, XTAL_16MHz/2)  /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(jumping_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", rbisland_state,  irq4_line_hold)

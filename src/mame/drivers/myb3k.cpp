@@ -123,6 +123,9 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( tc_w );
 	void select_dma_channel(int channel, bool state);
 
+	void stepone(machine_config &config);
+	void jb3000(machine_config &config);
+	void myb3k(machine_config &config);
 protected:
 	required_device<cpu_device> m_maincpu;
 	required_device<pic8259_device> m_pic8259;
@@ -531,7 +534,7 @@ static SLOT_INTERFACE_START(stepone_isa_cards)
 	SLOT_INTERFACE("myb3k_fdc4711", ISA8_MYB3K_FDC4711)
 SLOT_INTERFACE_END
 
-static MACHINE_CONFIG_START( myb3k )
+MACHINE_CONFIG_START(myb3k_state::myb3k)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8088, XTAL_14_31818MHz / 3) /* 14.3182 main crystal divided by three through a 8284A */
 	MCFG_CPU_PROGRAM_MAP(myb3k_map)
@@ -620,10 +623,10 @@ static MACHINE_CONFIG_START( myb3k )
 	MCFG_MC6845_CHAR_WIDTH(8)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( jb3000, myb3k )
+MACHINE_CONFIG_DERIVED(myb3k_state::jb3000, myb3k)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( stepone, myb3k )
+MACHINE_CONFIG_DERIVED(myb3k_state::stepone, myb3k)
 MACHINE_CONFIG_END
 
 /* ROM definitions, ROM area is 8 x 8Kb and can be populated with 2732 mask ROMs or 2764s */

@@ -500,7 +500,7 @@ MACHINE_RESET_MEMBER(n8080_state,helifire)
 }
 
 
-static MACHINE_CONFIG_START( spacefev )
+MACHINE_CONFIG_START(n8080_state::spacefev)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8080, MASTER_CLOCK / 10)
@@ -531,7 +531,7 @@ static MACHINE_CONFIG_START( spacefev )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( sheriff )
+MACHINE_CONFIG_START(n8080_state::sheriff)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8080, MASTER_CLOCK / 10)
@@ -562,7 +562,7 @@ static MACHINE_CONFIG_START( sheriff )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( westgun2, sheriff )
+MACHINE_CONFIG_DERIVED(n8080_state::westgun2, sheriff)
 
 	/* basic machine hardware */
 	MCFG_CPU_REPLACE("maincpu", I8080, XTAL_19_968MHz / 10)
@@ -574,7 +574,7 @@ static MACHINE_CONFIG_DERIVED( westgun2, sheriff )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( helifire )
+MACHINE_CONFIG_START(n8080_state::helifire)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8080, MASTER_CLOCK / 10)

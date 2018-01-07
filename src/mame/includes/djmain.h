@@ -77,4 +77,7 @@ public:
 	required_device<palette_device> m_palette;
 	K056832_CB_MEMBER(tile_callback);
 	optional_ioport_array<2> m_turntable;
+	void djmainj(machine_config &config);
+	void djmainu(machine_config &config);
+	void djmaina(machine_config &config);
 };

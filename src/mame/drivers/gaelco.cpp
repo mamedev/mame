@@ -566,7 +566,7 @@ void gaelco_state::machine_start()
 		membank("okibank")->configure_entries(0, 16, memregion("oki")->base(), 0x10000);
 }
 
-static MACHINE_CONFIG_START( bigkarnk )
+MACHINE_CONFIG_START(gaelco_state::bigkarnk)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 10000000)   /* MC68000P10, 10 MHz */
@@ -612,7 +612,7 @@ static MACHINE_CONFIG_START( bigkarnk )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( maniacsq )
+MACHINE_CONFIG_START(gaelco_state::maniacsq)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz/2 ) /* verified on pcb */
@@ -642,7 +642,7 @@ static MACHINE_CONFIG_START( maniacsq )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( squash )
+MACHINE_CONFIG_START(gaelco_state::squash)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_20MHz/2 ) /* verified on pcb */
@@ -681,7 +681,7 @@ static MACHINE_CONFIG_START( squash )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( thoop )
+MACHINE_CONFIG_START(gaelco_state::thoop)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz/2 ) /* verified on pcb */

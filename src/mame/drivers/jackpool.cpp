@@ -51,6 +51,7 @@ public:
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	void jackpool(machine_config &config);
 };
 
 
@@ -223,7 +224,7 @@ INTERRUPT_GEN_MEMBER(jackpool_state::jackpool_interrupt)
 }
 
 
-static MACHINE_CONFIG_START( jackpool )
+MACHINE_CONFIG_START(jackpool_state::jackpool)
 	MCFG_CPU_ADD("maincpu", M68000, 12000000) // ?
 	MCFG_CPU_PROGRAM_MAP(jackpool_mem)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", jackpool_state, jackpool_interrupt)  // ?

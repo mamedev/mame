@@ -171,7 +171,7 @@ void ultraman_state::machine_reset()
 	m_soundnmi->in_w<0>(0);
 }
 
-static MACHINE_CONFIG_START( ultraman )
+MACHINE_CONFIG_START(ultraman_state::ultraman)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000,24000000/2)      /* 12 MHz? */

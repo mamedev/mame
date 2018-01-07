@@ -77,6 +77,8 @@ public:
 	DECLARE_SNAPSHOT_LOAD_MEMBER(z1013);
 	uint32_t screen_update_z1013(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
+	void z1013k76(machine_config &config);
+	void z1013(machine_config &config);
 private:
 	uint8_t m_keyboard_line;
 	bool m_keyboard_part;
@@ -362,7 +364,7 @@ static GFXDECODE_START( z1013 )
 GFXDECODE_END
 
 /* Machine driver */
-static MACHINE_CONFIG_START( z1013 )
+MACHINE_CONFIG_START(z1013_state::z1013)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_1MHz )
 	MCFG_CPU_PROGRAM_MAP(z1013_mem)
@@ -396,7 +398,7 @@ static MACHINE_CONFIG_START( z1013 )
 	MCFG_SNAPSHOT_ADD("snapshot", z1013_state, z1013, "z80", 0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( z1013k76, z1013 )
+MACHINE_CONFIG_DERIVED(z1013_state::z1013k76, z1013)
 	MCFG_DEVICE_REMOVE("z80pio")
 	MCFG_DEVICE_ADD("z80pio", Z80PIO, XTAL_1MHz)
 	MCFG_Z80PIO_IN_PB_CB(READ8(z1013_state, k7659_port_b_r))

@@ -133,6 +133,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( centronics_busy_w ) { m_centronics_busy = state; }
 	DECLARE_WRITE_LINE_MEMBER( centronics_perror_w ) { m_centronics_perror = state; }
 
+	void px4(machine_config &config);
 protected:
 	// driver_device overrides
 	virtual void machine_start() override;
@@ -266,6 +267,7 @@ public:
 	DECLARE_WRITE8_MEMBER( ramdisk_data_w );
 	DECLARE_READ8_MEMBER( ramdisk_control_r );
 
+	void px4p(machine_config &config);
 protected:
 	// driver_device overrides
 	virtual void machine_start() override;
@@ -1472,7 +1474,7 @@ PALETTE_INIT_MEMBER( px4p_state, px4p )
 //  MACHINE DRIVERS
 //**************************************************************************
 
-static MACHINE_CONFIG_START( px4 )
+MACHINE_CONFIG_START(px4_state::px4)
 	// basic machine hardware
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_7_3728MHz / 2)    // uPD70008
 	MCFG_CPU_PROGRAM_MAP(px4_mem)
@@ -1538,7 +1540,7 @@ static MACHINE_CONFIG_START( px4 )
 	MCFG_SOFTWARE_LIST_ADD("epson_cpm_list", "epson_cpm")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( px4p, px4 )
+MACHINE_CONFIG_DERIVED(px4p_state::px4p, px4)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(px4p_io)
 

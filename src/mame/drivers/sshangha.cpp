@@ -378,7 +378,7 @@ DECO16IC_BANK_CB_MEMBER(sshangha_state::bank_callback)
 	return (bank >> 4) * 0x1000;
 }
 
-static MACHINE_CONFIG_START( sshangha )
+MACHINE_CONFIG_START(sshangha_state::sshangha)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 28000000/2)
@@ -442,7 +442,7 @@ static MACHINE_CONFIG_START( sshangha )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.27)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( sshanghb, sshangha )
+MACHINE_CONFIG_DERIVED(sshangha_state::sshanghb, sshangha)
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(sshanghb_map)

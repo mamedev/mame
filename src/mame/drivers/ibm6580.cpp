@@ -182,6 +182,7 @@ public:
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
+	void ibm6580(machine_config &config);
 private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -874,7 +875,7 @@ static SLOT_INTERFACE_START( dw_floppies )
 	SLOT_INTERFACE( "8sssd", IBM_6360 )
 SLOT_INTERFACE_END
 
-static MACHINE_CONFIG_START( ibm6580 )
+MACHINE_CONFIG_START(ibm6580_state::ibm6580)
 	MCFG_CPU_ADD("maincpu", I8086, XTAL_14_7456MHz/3)
 	MCFG_CPU_PROGRAM_MAP(ibm6580_mem)
 	MCFG_CPU_IO_MAP(ibm6580_io)

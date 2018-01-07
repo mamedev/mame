@@ -39,4 +39,5 @@ public:
 
 	INTERRUPT_GEN_MEMBER(vblank_irq);
 	INTERRUPT_GEN_MEMBER(sound_timer_irq);
+	void wiping(machine_config &config);
 };

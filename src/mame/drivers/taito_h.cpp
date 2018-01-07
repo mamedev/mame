@@ -635,7 +635,7 @@ void taitoh_state::machine_start()
 }
 
 
-static MACHINE_CONFIG_START( syvalion )
+MACHINE_CONFIG_START(taitoh_state::syvalion)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz / 2)     /* 12 MHz */
@@ -691,7 +691,7 @@ static MACHINE_CONFIG_START( syvalion )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( recordbr )
+MACHINE_CONFIG_START(taitoh_state::recordbr)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz / 2)     /* 12 MHz */
@@ -747,7 +747,7 @@ static MACHINE_CONFIG_START( recordbr )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( tetristh, recordbr )
+MACHINE_CONFIG_DERIVED(taitoh_state::tetristh, recordbr)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -755,7 +755,7 @@ static MACHINE_CONFIG_DERIVED( tetristh, recordbr )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( dleague )
+MACHINE_CONFIG_START(taitoh_state::dleague)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz / 2)     /* 12 MHz */

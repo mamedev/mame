@@ -103,6 +103,15 @@ public:
 	void armedf_drawgfx(bitmap_ind16 &dest_bmp,const rectangle &clip,gfx_element *gfx,
 						uint32_t code,uint32_t color, uint32_t clut,int flipx,int flipy,int offsx,int offsy,
 						int transparent_color);
+	void terraf_sound(machine_config &config);
+	void terrafb(machine_config &config);
+	void legion(machine_config &config);
+	void terraf(machine_config &config);
+	void legionjb(machine_config &config);
+	void cclimbr2(machine_config &config);
+	void terrafjb(machine_config &config);
+	void armedf(machine_config &config);
+	void kozure(machine_config &config);
 };
 
 class bigfghtr_state : public armedf_state
@@ -121,4 +130,5 @@ public:
 	DECLARE_WRITE8_MEMBER(main_sharedram_w);
 	DECLARE_READ8_MEMBER(main_sharedram_r);
 	DECLARE_WRITE8_MEMBER(mcu_spritelist_w);
+	void bigfghtr(machine_config &config);
 };

@@ -667,7 +667,7 @@ void welltris_state::machine_start()
 	membank("soundbank")->configure_entries(0, 4, memregion("audiocpu")->base(), 0x8000);
 }
 
-static MACHINE_CONFIG_START( welltris )
+MACHINE_CONFIG_START(welltris_state::welltris)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000,20000000/2)  /* 10 MHz */
@@ -712,7 +712,7 @@ static MACHINE_CONFIG_START( welltris )
 	MCFG_SOUND_ROUTE(2, "mono", 0.75)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( quiz18k, welltris )
+MACHINE_CONFIG_DERIVED(welltris_state::quiz18k, welltris)
 
 	/* basic machine hardware */
 

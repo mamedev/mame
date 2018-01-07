@@ -52,6 +52,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(ctc_z2_w);
 	TIMER_DEVICE_CALLBACK_MEMBER(keyboard_callback);
 
+	void babbage(machine_config &config);
 private:
 	uint8_t m_segment;
 	uint8_t m_key;
@@ -216,7 +217,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(babbage_state::keyboard_callback)
 
 ***************************************************************************/
 
-static MACHINE_CONFIG_START( babbage )
+MACHINE_CONFIG_START(babbage_state::babbage)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, MAIN_CLOCK) //2.5MHz
 	MCFG_CPU_PROGRAM_MAP(babbage_map)

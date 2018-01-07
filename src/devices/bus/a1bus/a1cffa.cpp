@@ -33,7 +33,7 @@ ROM_END
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( a1bus_cffa_device::device_add_mconfig )
+MACHINE_CONFIG_START(a1bus_cffa_device::device_add_mconfig)
 	MCFG_ATA_INTERFACE_ADD(CFFA_ATA_TAG, ata_devices, "hdd", nullptr, false)
 MACHINE_CONFIG_END
 

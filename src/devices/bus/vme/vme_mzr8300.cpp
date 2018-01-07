@@ -124,7 +124,7 @@ DEFINE_DEVICE_TYPE(VME_MZR8300, vme_mzr8300_card_device, "mzr8300", "Mizar 8300 
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( vme_mzr8300_card_device::device_add_mconfig )
+MACHINE_CONFIG_START(vme_mzr8300_card_device::device_add_mconfig)
 	MCFG_DEVICE_ADD("sio0", UPD7201_NEW, XTAL_4MHz)
 	MCFG_Z80SIO_OUT_TXDB_CB(DEVWRITELINE("rs232p1", rs232_port_device, write_txd))
 	MCFG_Z80SIO_OUT_DTRB_CB(DEVWRITELINE("rs232p1", rs232_port_device, write_dtr))

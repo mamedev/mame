@@ -99,6 +99,11 @@ public:
 	DECLARE_READ8_MEMBER ( m6844_r );
 	DECLARE_WRITE8_MEMBER ( m6844_w );
 
+	void swtpc09_base(machine_config &config);
+	void swtpc09i(machine_config &config);
+	void swtpc09d3(machine_config &config);
+	void swtpc09u(machine_config &config);
+	void swtpc09(machine_config &config);
 protected:
 	virtual void machine_start() override;
 

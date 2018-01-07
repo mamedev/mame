@@ -214,6 +214,7 @@ public:
 	int m_ds2;
 
 	int m_led[6];
+	void wangpc(machine_config &config);
 };
 
 
@@ -1265,7 +1266,7 @@ void wangpc_state::on_disk1_unload(floppy_image_device *image)
 //  MACHINE_CONFIG( wangpc )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( wangpc )
+MACHINE_CONFIG_START(wangpc_state::wangpc)
 	MCFG_CPU_ADD(I8086_TAG, I8086, 8000000)
 	MCFG_CPU_PROGRAM_MAP(wangpc_mem)
 	MCFG_CPU_IO_MAP(wangpc_io)

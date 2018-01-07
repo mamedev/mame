@@ -97,6 +97,10 @@ public:
 
 	INTERRUPT_GEN_MEMBER(interrupt);
 
+	void musobana(machine_config &config);
+	void zokumahj(machine_config &config);
+	void mhhonban(machine_config &config);
+	void niyanpai(machine_config &config);
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };

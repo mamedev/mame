@@ -301,6 +301,7 @@ public:
 	uint32_t screen_update_witch(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	virtual void machine_reset() override;
+	void witch(machine_config &config);
 };
 
 
@@ -767,7 +768,7 @@ void witch_state::machine_reset()
 	m_motor_active = (ioport("YM_PortB")->read() & 0x08) ? 0 : 1;
 }
 
-static MACHINE_CONFIG_START( witch )
+MACHINE_CONFIG_START(witch_state::witch)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, CPU_CLOCK)    /* 3 MHz */
 	MCFG_CPU_PROGRAM_MAP(map_main)

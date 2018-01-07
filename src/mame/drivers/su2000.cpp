@@ -65,6 +65,7 @@ public:
 	su2000_state(const machine_config &mconfig, device_type type, const char *tag)
 		: pcat_base_state(mconfig, type, tag){ }
 
+		void su2000(machine_config &config);
 };
 
 
@@ -119,7 +120,7 @@ static void ide_interrupt(device_t *device, int state)
  *
  *************************************/
 
-static MACHINE_CONFIG_START( su2000 )
+MACHINE_CONFIG_START(su2000_state::su2000)
 	/* Basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I486, I486_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(pcat_map)

@@ -279,6 +279,8 @@ public:
 	void cde_dma_transfer(address_space &space, int channel, int next);
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_subcpu;
+	void m2(machine_config &config);
+	void _3do_m2(machine_config &config);
 };
 
 
@@ -1284,7 +1286,7 @@ void konamim2_state::machine_reset()
 	cde_init();
 }
 
-static MACHINE_CONFIG_START( m2 )
+MACHINE_CONFIG_START(konamim2_state::m2)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", PPC602, 66000000)   /* actually PPC602, 66MHz */
@@ -1317,8 +1319,7 @@ static MACHINE_CONFIG_START( m2 )
 
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED ( 3do_m2, m2 )
-
+MACHINE_CONFIG_DERIVED(konamim2_state::_3do_m2, m2)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(3do_m2_main_m)
 
@@ -1326,7 +1327,6 @@ static MACHINE_CONFIG_DERIVED ( 3do_m2, m2 )
 	MCFG_CPU_PROGRAM_MAP(3do_m2_main_s)
 
 	MCFG_SOFTWARE_LIST_ADD("cd_list","3do_m2")
-
 MACHINE_CONFIG_END
 
 
@@ -1473,4 +1473,4 @@ GAME( 1998, evilngt,  0,        m2, m2, konamim2_state, m2, ROT0, "Konami", "Evi
 GAME( 1998, evilngte, evilngt,  m2, m2, konamim2_state, m2, ROT0, "Konami", "Evil Night (ver EAA)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 GAME( 1998, hellngt,  evilngt,  m2, m2, konamim2_state, m2, ROT0, "Konami", "Hell Night (ver EAA)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 
-CONS( 199?, 3do_m2,     0,      0,    3do_m2,    m2,    konamim2_state, 0,      "3DO",  "3DO M2",    MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+CONS( 199?, 3do_m2,     0,      0,    _3do_m2,    m2,    konamim2_state, 0,      "3DO",  "3DO M2",    MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

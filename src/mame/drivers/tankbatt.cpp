@@ -277,7 +277,7 @@ static const char *const tankbatt_sample_names[] =
 };
 
 
-static MACHINE_CONFIG_START( tankbatt )
+MACHINE_CONFIG_START(tankbatt_state::tankbatt)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, 1000000) /* 1 MHz ???? */

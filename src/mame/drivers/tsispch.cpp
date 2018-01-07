@@ -372,7 +372,7 @@ INPUT_PORTS_END
 /******************************************************************************
  Machine Drivers
 ******************************************************************************/
-static MACHINE_CONFIG_START( prose2k )
+MACHINE_CONFIG_START(tsispch_state::prose2k)
 	/* basic machine hardware */
 	/* There are two crystals on the board: a 24MHz xtal at Y2 and a 16MHz xtal at Y1 */
 	MCFG_CPU_ADD("maincpu", I8086, 8000000) /* VERIFIED clock, unknown divider */

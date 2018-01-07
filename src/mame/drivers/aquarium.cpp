@@ -284,7 +284,7 @@ static GFXDECODE_START( aquarium )
 	GFXDECODE_ENTRY( "gfx4", 0, char5bpplayout,   0x400, 32 )
 GFXDECODE_END
 
-static MACHINE_CONFIG_START( aquarium )
+MACHINE_CONFIG_START(aquarium_state::aquarium)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_32MHz/2) // clock not verified on pcb

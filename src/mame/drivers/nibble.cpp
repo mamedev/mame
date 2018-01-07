@@ -79,6 +79,7 @@ public:
 	INTERRUPT_GEN_MEMBER(nibble_interrupt);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
+	void nibble(machine_config &config);
 };
 
 
@@ -301,7 +302,7 @@ GFXDECODE_END
 *    Machine Drivers     *
 *************************/
 
-static MACHINE_CONFIG_START( nibble )
+MACHINE_CONFIG_START(nibble_state::nibble)
 
 	MCFG_TMS99xx_ADD("maincpu", TMS9900, MASTER_CLOCK/4, nibble_map, nibble_cru_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", nibble_state,  nibble_interrupt)

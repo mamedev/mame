@@ -163,7 +163,7 @@ static INPUT_PORTS_START( galeb )
 INPUT_PORTS_END
 
 /* Machine driver */
-static MACHINE_CONFIG_START( galeb )
+MACHINE_CONFIG_START(galeb_state::galeb)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, 1000000)
 	MCFG_CPU_PROGRAM_MAP(galeb_mem)

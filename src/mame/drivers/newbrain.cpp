@@ -805,7 +805,7 @@ void newbrain_state::device_timer(emu_timer &timer, device_timer_id id, int para
 //  MACHINE_CONFIG( newbrain )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( newbrain )
+MACHINE_CONFIG_START(newbrain_state::newbrain)
 	// basic system hardware
 	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL_16MHz/4)
 	MCFG_CPU_PROGRAM_MAP(newbrain_mreq)
@@ -846,7 +846,7 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( newbrain_ad )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_DERIVED( newbrain_ad, newbrain )
+MACHINE_CONFIG_DERIVED(newbrain_state::newbrain_ad, newbrain)
 	MCFG_DEFAULT_LAYOUT(layout_newbrain)
 MACHINE_CONFIG_END
 
@@ -855,7 +855,7 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( newbrain_a )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_DERIVED( newbrain_a, newbrain )
+MACHINE_CONFIG_DERIVED(newbrain_state::newbrain_a, newbrain)
 	MCFG_DEFAULT_LAYOUT(layout_newbraina)
 MACHINE_CONFIG_END
 
@@ -864,7 +864,7 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( newbrain_md )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_DERIVED( newbrain_md, newbrain )
+MACHINE_CONFIG_DERIVED(newbrain_state::newbrain_md, newbrain)
 	MCFG_DEFAULT_LAYOUT(layout_newbrain)
 MACHINE_CONFIG_END
 

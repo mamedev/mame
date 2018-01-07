@@ -241,6 +241,7 @@ public:
 		printf("leapster_aux004b_w %04x\n", data);
 	}
 
+	void leapster(machine_config &config);
 protected:
 	required_device<cpu_device> m_maincpu;
 	required_device<generic_slot_device> m_cart;
@@ -301,7 +302,7 @@ static ADDRESS_MAP_START( leapster_aux, AS_IO, 32, leapster_state )
 	AM_RANGE(0x00000004b, 0x00000004b) AM_WRITE(leapster_aux004b_w) // this address isn't used by ARC internal stuff afaik, so probably leapster specific
 ADDRESS_MAP_END
 
-static MACHINE_CONFIG_START( leapster )
+MACHINE_CONFIG_START(leapster_state::leapster)
 	/* basic machine hardware */
 	// CPU is ArcTangent-A5 '5.1' (ARCompact core)
 	MCFG_CPU_ADD("maincpu", ARCA5, 96000000/10)

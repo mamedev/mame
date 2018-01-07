@@ -55,6 +55,7 @@ public:
 	DECLARE_WRITE8_MEMBER(minicom_io_w);
 	DECLARE_READ8_MEMBER(minicom_io_r);
 	DECLARE_DRIVER_INIT(minicom);
+	void minicom(machine_config &config);
 private:
 	uint8_t m_p[4];
 	uint16_t m_display_data;
@@ -225,7 +226,7 @@ DRIVER_INIT_MEMBER( minicom_state, minicom )
 {
 }
 
-static MACHINE_CONFIG_START( minicom )
+MACHINE_CONFIG_START(minicom_state::minicom)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I87C52, XTAL_10MHz) /*FIX-ME: verify the correct clock frequency */
 	MCFG_CPU_IO_MAP(i87c52_io)

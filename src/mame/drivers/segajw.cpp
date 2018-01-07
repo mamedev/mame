@@ -61,6 +61,7 @@ public:
 	DECLARE_CUSTOM_INPUT_MEMBER(coin_sensors_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(hopper_sensors_r);
 
+	void segajw(machine_config &config);
 protected:
 
 	// devices
@@ -349,7 +350,7 @@ static ADDRESS_MAP_START( ramdac_map, 0, 8, segajw_state )
 	AM_RANGE(0x000, 0x3ff) AM_DEVREADWRITE("ramdac",ramdac_device,ramdac_pal_r,ramdac_rgb666_w)
 ADDRESS_MAP_END
 
-static MACHINE_CONFIG_START( segajw )
+MACHINE_CONFIG_START(segajw_state::segajw)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",M68000,8000000) // unknown clock
 	MCFG_CPU_PROGRAM_MAP(segajw_map)

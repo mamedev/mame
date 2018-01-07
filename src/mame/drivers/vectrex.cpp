@@ -95,7 +95,7 @@ static SLOT_INTERFACE_START(vectrex_cart)
 	SLOT_INTERFACE_INTERNAL("vec_sram",   VECTREX_ROM_SRAM)
 SLOT_INTERFACE_END
 
-static MACHINE_CONFIG_START( vectrex )
+MACHINE_CONFIG_START(vectrex_state::vectrex)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", MC6809, XTAL_6MHz) // 68A09
 	MCFG_CPU_PROGRAM_MAP(vectrex_map)
@@ -215,7 +215,7 @@ static INPUT_PORTS_START(raaspec)
 INPUT_PORTS_END
 
 
-static MACHINE_CONFIG_DERIVED( raaspec, vectrex )
+MACHINE_CONFIG_DERIVED(vectrex_state::raaspec, vectrex)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(raaspec_map)
 	MCFG_NVRAM_ADD_0FILL("nvram")

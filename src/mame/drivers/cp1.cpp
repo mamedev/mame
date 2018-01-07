@@ -53,6 +53,7 @@ public:
 	DECLARE_WRITE8_MEMBER(i8155_portb_w);
 	DECLARE_WRITE8_MEMBER(i8155_portc_w);
 
+	void cp1(machine_config &config);
 private:
 	uint8_t   m_7seg;
 	uint8_t   m_port2;
@@ -251,7 +252,7 @@ QUICKLOAD_LOAD_MEMBER( cp1_state, quickload )
 	return image_init_result::PASS;
 }
 
-static MACHINE_CONFIG_START( cp1 )
+MACHINE_CONFIG_START(cp1_state::cp1)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8049, XTAL_6MHz)
 	MCFG_CPU_IO_MAP(cp1_io)

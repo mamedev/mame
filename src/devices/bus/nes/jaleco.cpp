@@ -772,7 +772,7 @@ static const char *const jf33_sample_names[] =
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( nes_jf13_device::device_add_mconfig )
+MACHINE_CONFIG_START(nes_jf13_device::device_add_mconfig)
 
 	// additional sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("addon")
@@ -783,7 +783,7 @@ MACHINE_CONFIG_MEMBER( nes_jf13_device::device_add_mconfig )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "addon", 0.50)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_MEMBER( nes_jf17_adpcm_device::device_add_mconfig )
+MACHINE_CONFIG_START(nes_jf17_adpcm_device::device_add_mconfig)
 
 	// additional sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("addon")
@@ -794,7 +794,7 @@ MACHINE_CONFIG_MEMBER( nes_jf17_adpcm_device::device_add_mconfig )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "addon", 0.50)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_MEMBER( nes_jf19_adpcm_device::device_add_mconfig )
+MACHINE_CONFIG_START(nes_jf19_adpcm_device::device_add_mconfig)
 
 	// additional sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("addon")
@@ -805,7 +805,7 @@ MACHINE_CONFIG_MEMBER( nes_jf19_adpcm_device::device_add_mconfig )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "addon", 0.50)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_MEMBER( nes_jf23_device::device_add_mconfig )
+MACHINE_CONFIG_START(nes_jf23_device::device_add_mconfig)
 
 	// additional sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("addon")
@@ -816,7 +816,7 @@ MACHINE_CONFIG_MEMBER( nes_jf23_device::device_add_mconfig )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "addon", 0.50)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_MEMBER( nes_jf24_device::device_add_mconfig )
+MACHINE_CONFIG_START(nes_jf24_device::device_add_mconfig)
 
 	// additional sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("addon")
@@ -827,7 +827,7 @@ MACHINE_CONFIG_MEMBER( nes_jf24_device::device_add_mconfig )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "addon", 0.50)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_MEMBER( nes_jf29_device::device_add_mconfig )
+MACHINE_CONFIG_START(nes_jf29_device::device_add_mconfig)
 
 	// additional sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("addon")
@@ -838,7 +838,7 @@ MACHINE_CONFIG_MEMBER( nes_jf29_device::device_add_mconfig )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "addon", 0.50)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_MEMBER( nes_jf33_device::device_add_mconfig )
+MACHINE_CONFIG_START(nes_jf33_device::device_add_mconfig)
 
 	// additional sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("addon")

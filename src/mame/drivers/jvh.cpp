@@ -21,6 +21,8 @@ public:
 	m_maincpu(*this, "maincpu")
 	{ }
 
+	void jvh2(machine_config &config);
+	void jvh(machine_config &config);
 protected:
 
 	// devices
@@ -109,7 +111,7 @@ DRIVER_INIT_MEMBER(jvh_state,jvh)
 {
 }
 
-static MACHINE_CONFIG_START( jvh )
+MACHINE_CONFIG_START(jvh_state::jvh)
 	// CPU TMS9980A; no line connections
 	MCFG_TMS99xx_ADD("maincpu", TMS9980A, 1000000, jvh_map, escape_io)
 
@@ -120,7 +122,7 @@ static MACHINE_CONFIG_START( jvh )
 	MCFG_VIA6522_IRQ_HANDLER(INPUTLINE("soundcpu", M6802_IRQ_LINE))
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( jvh2 )
+MACHINE_CONFIG_START(jvh_state::jvh2)
 	// CPU TMS9980At; no line connections
 	MCFG_TMS99xx_ADD("maincpu", TMS9980A, 1000000, jvh_map, movmastr_io)
 

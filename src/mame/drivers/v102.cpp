@@ -29,6 +29,7 @@ public:
 
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
+	void v102(machine_config &config);
 private:
 	required_device<cpu_device> m_maincpu;
 	required_region_ptr<u8> m_p_chargen;
@@ -68,7 +69,7 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START( v102 )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( v102 )
+MACHINE_CONFIG_START(v102_state::v102)
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_18_575MHz / 5) // divider not verified
 	MCFG_CPU_PROGRAM_MAP(mem_map)
 	MCFG_CPU_IO_MAP(io_map)

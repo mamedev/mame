@@ -1537,7 +1537,7 @@ INTERRUPT_GEN_MEMBER(tx0_state::tx0_interrupt)
 	}
 }
 
-static MACHINE_CONFIG_START( tx0_64kw )
+MACHINE_CONFIG_START(tx0_state::tx0_64kw)
 	/* basic machine hardware */
 	/* TX0 CPU @ approx. 167 kHz (no master clock, but the memory cycle time is approximately 6usec) */
 	MCFG_CPU_ADD("maincpu", TX0_64KW, 166667)
@@ -1583,7 +1583,7 @@ static MACHINE_CONFIG_START( tx0_64kw )
 	MCFG_PALETTE_INIT_OWNER(tx0_state, tx0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( tx0_8kw, tx0_64kw )
+MACHINE_CONFIG_DERIVED(tx0_state::tx0_8kw, tx0_64kw)
 
 	/* basic machine hardware */
 	/* TX0 CPU @ approx. 167 kHz (no master clock, but the memory cycle time is

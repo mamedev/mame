@@ -22,7 +22,7 @@
 	MCFG_DEVICE_ADD( _tag, PCD8544, 0 )
 
 #define MCFG_PCD8544_SCREEN_UPDATE_CALLBACK(_class, _method) \
-	pcd8544_device::static_set_screen_update_cb(*device, pcd8544_device::screen_update_delegate(&_class::_method, #_class "::" #_method, downcast<_class *>(owner)));
+	pcd8544_device::static_set_screen_update_cb(*device, pcd8544_device::screen_update_delegate(&_class::_method, #_class "::" #_method, this));
 
 
 // ======================> pcd8544_device

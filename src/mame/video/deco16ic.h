@@ -167,10 +167,10 @@ DECLARE_DEVICE_TYPE(DECO16IC, deco16ic_device)
 #define MCFG_DECO16IC_SET_SCREEN MCFG_VIDEO_SET_SCREEN
 
 #define MCFG_DECO16IC_BANK1_CB(_class, _method) \
-	deco16ic_device::set_bank1_callback(*device, deco16_bank_cb_delegate(&_class::_method, #_class "::" #_method, downcast<_class *>(owner)));
+	deco16ic_device::set_bank1_callback(*device, deco16_bank_cb_delegate(&_class::_method, #_class "::" #_method, this));
 
 #define MCFG_DECO16IC_BANK2_CB(_class, _method) \
-	deco16ic_device::set_bank2_callback(*device, deco16_bank_cb_delegate(&_class::_method, #_class "::" #_method, downcast<_class *>(owner)));
+	deco16ic_device::set_bank2_callback(*device, deco16_bank_cb_delegate(&_class::_method, #_class "::" #_method, this));
 
 #define MCFG_DECO16IC_SPLIT(_split) \
 	deco16ic_device::set_split(*device, _split);

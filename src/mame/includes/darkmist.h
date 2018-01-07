@@ -69,4 +69,5 @@ public:
 	void decrypt_snd();
 
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline);
+	void darkmist(machine_config &config);
 };

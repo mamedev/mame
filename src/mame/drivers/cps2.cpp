@@ -1301,7 +1301,7 @@ MACHINE_START_MEMBER(cps_state,cps2)
 }
 
 
-static MACHINE_CONFIG_START( cps2 )
+MACHINE_CONFIG_START(cps_state::cps2)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz)
@@ -1339,13 +1339,13 @@ static MACHINE_CONFIG_START( cps2 )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( dead_cps2, cps2 )
+MACHINE_CONFIG_DERIVED(cps_state::dead_cps2, cps2)
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(dead_cps2_map)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( gigaman2, cps2 )
+MACHINE_CONFIG_DERIVED(cps_state::gigaman2, cps2)
 
 	MCFG_DEVICE_REMOVE("audiocpu")
 	// gigaman2 has an AT89C4051 (8051) MCU as an audio cpu, no qsound.

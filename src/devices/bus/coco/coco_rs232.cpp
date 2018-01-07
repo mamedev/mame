@@ -67,7 +67,7 @@ namespace
 IMPLEMENTATION
 ***************************************************************************/
 
-MACHINE_CONFIG_MEMBER(coco_rs232_device::device_add_mconfig)
+MACHINE_CONFIG_START(coco_rs232_device::device_add_mconfig)
 	MCFG_DEVICE_ADD(UART_TAG, MOS6551, 0)
 	MCFG_MOS6551_XTAL(XTAL_1_8432MHz)
 MACHINE_CONFIG_END

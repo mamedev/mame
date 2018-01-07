@@ -90,6 +90,7 @@ public:
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(kbd_scan);
 
+	void sbrain(machine_config &config);
 private:
 	bool m_busak;
 	u8 m_keydown;
@@ -526,7 +527,7 @@ u32 sbrain_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, con
 	return 0;
 }
 
-static MACHINE_CONFIG_START( sbrain )
+MACHINE_CONFIG_START(sbrain_state::sbrain)
 	// basic machine hardware
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_16MHz / 4)
 	MCFG_CPU_PROGRAM_MAP(sbrain_mem)

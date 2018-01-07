@@ -97,7 +97,7 @@ DEVICE_INPUT_DEFAULTS_END
 //  machine configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER(ss50_mps_device::device_add_mconfig)
+MACHINE_CONFIG_START(ss50_mps_device::device_add_mconfig)
 	MCFG_DEVICE_ADD("acia", ACIA6850, 0)
 	MCFG_ACIA6850_TXD_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_txd))
 	//MCFG_ACIA6850_RTS_HANDLER(WRITELINE(ss50_mps_device, reader_control_w))

@@ -36,7 +36,7 @@ DEFINE_DEVICE_TYPE(VME_MZR8105, vme_mzr8105_card_device, "mzr8105", "Mizar 8105 
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER(vme_mzr8105_card_device::device_add_mconfig)
+MACHINE_CONFIG_START(vme_mzr8105_card_device::device_add_mconfig)
 {
 	MCFG_CPU_ADD ("maincpu", M68000, XTAL_10MHz)
 	MCFG_CPU_PROGRAM_MAP (mzr8105_mem)

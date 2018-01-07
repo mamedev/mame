@@ -11,6 +11,7 @@ public:
 		m_maincpu(*this, "maincpu")
 	{ }
 
+	void bfm_sc5(machine_config &config);
 protected:
 
 

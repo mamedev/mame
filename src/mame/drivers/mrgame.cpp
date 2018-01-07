@@ -85,6 +85,7 @@ public:
 	required_shared_ptr<uint8_t> m_p_videoram;
 	required_shared_ptr<uint8_t> m_p_objectram;
 	required_device<gfxdecode_device> m_gfxdecode;
+	void mrgame(machine_config &config);
 private:
 	bool m_ack1;
 	bool m_ack2;
@@ -460,7 +461,7 @@ uint32_t mrgame_state::screen_update_mrgame(screen_device &screen, bitmap_ind16 
 	return 0;
 }
 
-static MACHINE_CONFIG_START( mrgame )
+MACHINE_CONFIG_START(mrgame_state::mrgame)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_6MHz)
 	MCFG_CPU_PROGRAM_MAP(main_map)

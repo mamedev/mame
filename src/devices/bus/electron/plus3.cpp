@@ -64,7 +64,7 @@ ROM_END
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( electron_plus3_device::device_add_mconfig )
+MACHINE_CONFIG_START(electron_plus3_device::device_add_mconfig)
 	/* fdc */
 	MCFG_WD1770_ADD("fdc", XTAL_16MHz / 2)
 	MCFG_FLOPPY_DRIVE_ADD_FIXED("fdc:0", electron_floppies, "35dd", floppy_formats)

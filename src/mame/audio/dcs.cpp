@@ -2441,7 +2441,7 @@ int dcs_audio_device::preprocess_write(uint16_t data)
 
 /* Basic DCS system with ADSP-2105 and 2k of SRAM (T-unit, V-unit, Killer Instinct) */
 
-MACHINE_CONFIG_MEMBER( dcs_audio_device::add_mconfig_dcs )
+MACHINE_CONFIG_START(dcs_audio_device::add_mconfig_dcs )
 	MCFG_CPU_ADD("dcs", ADSP2105, XTAL_10MHz)
 	MCFG_ADSP21XX_SPORT_TX_CB(WRITE32(dcs_audio_device, sound_tx_callback))      /* callback for serial transmit */
 	MCFG_ADSP21XX_TIMER_FIRED_CB(WRITELINE(dcs_audio_device, timer_enable_callback))   /* callback for timer fired */
@@ -2468,7 +2468,7 @@ dcs_audio_2k_device::dcs_audio_2k_device(const machine_config &mconfig, const ch
 {
 }
 
-MACHINE_CONFIG_MEMBER( dcs_audio_2k_device::device_add_mconfig )
+MACHINE_CONFIG_START(dcs_audio_2k_device::device_add_mconfig)
 
 	dcs_audio_device::add_mconfig_dcs(config);
 MACHINE_CONFIG_END
@@ -2485,7 +2485,7 @@ dcs_audio_2k_uart_device::dcs_audio_2k_uart_device(const machine_config &mconfig
 }
 
 /* Basic DCS system with ADSP-2105 and 2k of SRAM, using a UART for communications (X-unit) */
-MACHINE_CONFIG_MEMBER( dcs_audio_2k_uart_device::device_add_mconfig )
+MACHINE_CONFIG_START(dcs_audio_2k_uart_device::device_add_mconfig)
 
 	dcs_audio_device::add_mconfig_dcs(config);
 
@@ -2505,7 +2505,7 @@ dcs_audio_8k_device::dcs_audio_8k_device(const machine_config &mconfig, const ch
 }
 
 /* Basic DCS system with ADSP-2105 and 8k of SRAM (Wolf-unit) */
-MACHINE_CONFIG_MEMBER( dcs_audio_8k_device::device_add_mconfig )
+MACHINE_CONFIG_START(dcs_audio_8k_device::device_add_mconfig)
 
 	dcs_audio_device::add_mconfig_dcs(config);
 
@@ -2525,7 +2525,7 @@ dcs_audio_wpc_device::dcs_audio_wpc_device(const machine_config &mconfig, const 
 {
 }
 
-MACHINE_CONFIG_MEMBER( dcs_audio_wpc_device::device_add_mconfig )
+MACHINE_CONFIG_START(dcs_audio_wpc_device::device_add_mconfig)
 
 	dcs_audio_device::add_mconfig_dcs(config);
 
@@ -2544,7 +2544,7 @@ dcs2_audio_device::dcs2_audio_device(const machine_config &mconfig, device_type 
 {
 }
 
-MACHINE_CONFIG_MEMBER( dcs2_audio_device::add_mconfig_dcs2 )
+MACHINE_CONFIG_START(dcs2_audio_device::add_mconfig_dcs2 )
 	MCFG_CPU_ADD("dcs2", ADSP2115, XTAL_16MHz)
 	MCFG_ADSP21XX_SPORT_TX_CB(WRITE32(dcs_audio_device, sound_tx_callback))      /* callback for serial transmit */
 	MCFG_ADSP21XX_TIMER_FIRED_CB(WRITELINE(dcs_audio_device, timer_enable_callback))   /* callback for timer fired */
@@ -2576,7 +2576,7 @@ dcs2_audio_2115_device::dcs2_audio_2115_device(const machine_config &mconfig, co
 {
 }
 
-MACHINE_CONFIG_MEMBER( dcs2_audio_2115_device::device_add_mconfig )
+MACHINE_CONFIG_START(dcs2_audio_2115_device::device_add_mconfig)
 
 	dcs2_audio_device::add_mconfig_dcs2(config);
 
@@ -2594,7 +2594,7 @@ dcs2_audio_2104_device::dcs2_audio_2104_device(const machine_config &mconfig, co
 {
 }
 
-MACHINE_CONFIG_MEMBER( dcs2_audio_2104_device::device_add_mconfig )
+MACHINE_CONFIG_START(dcs2_audio_2104_device::device_add_mconfig)
 
 	dcs2_audio_device::add_mconfig_dcs2(config);
 
@@ -2616,7 +2616,7 @@ dcs2_audio_dsio_device::dcs2_audio_dsio_device(const machine_config &mconfig, co
 {
 }
 
-MACHINE_CONFIG_MEMBER( dcs2_audio_dsio_device::device_add_mconfig )
+MACHINE_CONFIG_START(dcs2_audio_dsio_device::device_add_mconfig)
 	MCFG_CPU_ADD("dsio", ADSP2181, XTAL_32MHz)
 	MCFG_ADSP21XX_SPORT_TX_CB(WRITE32(dcs_audio_device, sound_tx_callback))      /* callback for serial transmit */
 	MCFG_ADSP21XX_TIMER_FIRED_CB(WRITELINE(dcs_audio_device, timer_enable_callback))   /* callback for timer fired */
@@ -2657,7 +2657,7 @@ dcs2_audio_denver_device::dcs2_audio_denver_device(const machine_config &mconfig
 {
 }
 
-MACHINE_CONFIG_MEMBER( dcs2_audio_denver_device::device_add_mconfig )
+MACHINE_CONFIG_START(dcs2_audio_denver_device::device_add_mconfig)
 	MCFG_CPU_ADD("denver", ADSP2181, XTAL_33_333MHz)
 	MCFG_ADSP21XX_SPORT_TX_CB(WRITE32(dcs_audio_device, sound_tx_callback))      /* callback for serial transmit */
 	MCFG_ADSP21XX_TIMER_FIRED_CB(WRITELINE(dcs_audio_device, timer_enable_callback))   /* callback for timer fired */

@@ -74,6 +74,8 @@ public:
 	uint16_t read_touchscreen(uint8_t line);
 	DECLARE_PALETTE_INIT(pb1000);
 	TIMER_CALLBACK_MEMBER(keyboard_timer);
+	void pb2000c(machine_config &config);
+	void pb1000(machine_config &config);
 };
 
 static ADDRESS_MAP_START(pb1000_mem, AS_PROGRAM, 16, pb1000_state)
@@ -474,7 +476,7 @@ void pb1000_state::machine_start()
 	m_kb_timer->adjust(attotime::from_hz(192), 0, attotime::from_hz(192));
 }
 
-static MACHINE_CONFIG_START( pb1000 )
+MACHINE_CONFIG_START(pb1000_state::pb1000)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", HD61700, 910000)
 	MCFG_CPU_PROGRAM_MAP(pb1000_mem)
@@ -512,7 +514,7 @@ static MACHINE_CONFIG_START( pb1000 )
 	MCFG_SOUND_ROUTE( ALL_OUTPUTS, "mono", 1.00 )
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( pb2000c, pb1000 )
+MACHINE_CONFIG_DERIVED(pb1000_state::pb2000c, pb1000)
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(pb2000c_mem)

@@ -418,7 +418,7 @@ WRITE8_MEMBER( vendetta_state::banking_callback )
 		membank("bank1")->set_entry(data);
 }
 
-static MACHINE_CONFIG_START( vendetta )
+MACHINE_CONFIG_START(vendetta_state::vendetta)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", KONAMI, XTAL_24MHz/8)   /* 052001 (verified on pcb) */
@@ -487,7 +487,7 @@ static MACHINE_CONFIG_START( vendetta )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( esckids, vendetta )
+MACHINE_CONFIG_DERIVED(vendetta_state::esckids, vendetta)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")

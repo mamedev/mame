@@ -449,7 +449,7 @@ void gcpinbal_state::machine_reset()
 	m_msm_bank = 0;
 }
 
-static MACHINE_CONFIG_START( gcpinbal )
+MACHINE_CONFIG_START(gcpinbal_state::gcpinbal)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_32MHz/2) /* 16 MHz */

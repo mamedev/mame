@@ -1400,7 +1400,7 @@ MACHINE_RESET_MEMBER(aerofgt_state,aerofgt)
 	m_soundbank->set_entry(0); /* needed by spinlbrk */
 }
 
-static MACHINE_CONFIG_START( pspikes )
+MACHINE_CONFIG_START(aerofgt_state::pspikes)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",M68000,XTAL_20MHz/2)    /* verified on pcb */
@@ -1452,7 +1452,7 @@ static MACHINE_CONFIG_START( pspikes )
 	MCFG_SOUND_ROUTE(2, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( spikes91 )
+MACHINE_CONFIG_START(aerofgt_state::spikes91)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",M68000,20000000/2)   /* 10 MHz (?) */
@@ -1490,7 +1490,7 @@ static MACHINE_CONFIG_START( spikes91 )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( pspikesb )
+MACHINE_CONFIG_START(aerofgt_state::pspikesb)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",M68000,20000000/2)   /* 10 MHz (?) */
@@ -1531,7 +1531,7 @@ MACHINE_CONFIG_END
     tile banking and sound system are different like many of the bootlegs
 */
 
-static MACHINE_CONFIG_START( kickball )
+MACHINE_CONFIG_START(aerofgt_state::kickball)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",M68000,XTAL_10MHz) // 10Mhz XTAL near 10Mhz rated CPU
@@ -1582,7 +1582,7 @@ static MACHINE_CONFIG_START( kickball )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( pspikesc )
+MACHINE_CONFIG_START(aerofgt_state::pspikesc)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",M68000,20000000/2)   /* 10 MHz (?) */
@@ -1621,7 +1621,7 @@ static MACHINE_CONFIG_START( pspikesc )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( karatblz )
+MACHINE_CONFIG_START(aerofgt_state::karatblz)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",M68000,20000000/2)   /* 10 MHz (?) */
@@ -1678,7 +1678,7 @@ static MACHINE_CONFIG_START( karatblz )
 	MCFG_SOUND_ROUTE(2, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( karatblzbl )
+MACHINE_CONFIG_START(aerofgt_state::karatblzbl)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",M68000,20000000/2)   /* 10 MHz (?) */
@@ -1734,7 +1734,7 @@ static MACHINE_CONFIG_START( karatblzbl )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( spinlbrk )
+MACHINE_CONFIG_START(aerofgt_state::spinlbrk)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",M68000,XTAL_20MHz/2) /* verified on pcb */
@@ -1792,7 +1792,7 @@ static MACHINE_CONFIG_START( spinlbrk )
 	MCFG_SOUND_ROUTE(2, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( turbofrc )
+MACHINE_CONFIG_START(aerofgt_state::turbofrc)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",M68000,XTAL_20MHz/2) /* verified on pcb */
@@ -1849,7 +1849,7 @@ static MACHINE_CONFIG_START( turbofrc )
 	MCFG_SOUND_ROUTE(2, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( aerofgtb )
+MACHINE_CONFIG_START(aerofgt_state::aerofgtb)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",M68000,20000000/2)   /* 10 MHz (?) */
@@ -1907,7 +1907,7 @@ static MACHINE_CONFIG_START( aerofgtb )
 	MCFG_SOUND_ROUTE(2, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( aerofgt )
+MACHINE_CONFIG_START(aerofgt_state::aerofgt)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",M68000,XTAL_20MHz/2) /* verified on pcb */
@@ -1970,7 +1970,7 @@ static MACHINE_CONFIG_START( aerofgt )
 	MCFG_SOUND_ROUTE(2, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( aerfboot )
+MACHINE_CONFIG_START(aerofgt_state::aerfboot)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",M68000,20000000/2)   /* 10 MHz (?) */
@@ -2013,7 +2013,7 @@ static MACHINE_CONFIG_START( aerfboot )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( aerfboo2 )
+MACHINE_CONFIG_START(aerofgt_state::aerfboo2)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",M68000,20000000/2)   /* 10 MHz (?) */
@@ -2048,7 +2048,7 @@ static MACHINE_CONFIG_START( aerfboo2 )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( wbbc97 )
+MACHINE_CONFIG_START(aerofgt_state::wbbc97)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",M68000,20000000/2)   /* 10 MHz (?) */

@@ -98,6 +98,7 @@ public:
 	int m_cia_irq;
 	int m_vic_irq;
 	int m_exp_irq;
+	void vic10(machine_config &config);
 };
 
 
@@ -688,7 +689,7 @@ void vic10_state::machine_reset()
 //  MACHINE_CONFIG( vic10 )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( vic10 )
+MACHINE_CONFIG_START(vic10_state::vic10)
 	// basic hardware
 	MCFG_CPU_ADD(M6510_TAG, M6510, XTAL_8MHz/8)
 	MCFG_CPU_PROGRAM_MAP(vic10_mem)

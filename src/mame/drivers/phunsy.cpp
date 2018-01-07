@@ -63,6 +63,7 @@ public:
 	DECLARE_PALETTE_INIT(phunsy);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
+	void phunsy(machine_config &config);
 private:
 	uint8_t       m_data_out;
 	uint8_t       m_keyboard_input;
@@ -330,7 +331,7 @@ DRIVER_INIT_MEMBER( phunsy_state, phunsy )
 	membank("bankq")->set_entry(0);
 }
 
-static MACHINE_CONFIG_START( phunsy )
+MACHINE_CONFIG_START(phunsy_state::phunsy)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",S2650, XTAL_1MHz)
 	MCFG_CPU_PROGRAM_MAP(phunsy_mem)

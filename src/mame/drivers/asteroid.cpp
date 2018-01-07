@@ -187,7 +187,6 @@ There is not a rev 03 known or dumped. An Asteroids rev 03 is not mentioned in a
 
 #include "emu.h"
 #include "includes/asteroid.h"
-#include "audio/llander.h"
 #include "cpu/m6502/m6502.h"
 #include "machine/74259.h"
 #include "machine/atari_vg.h"
@@ -650,7 +649,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( asteroid_base )
+MACHINE_CONFIG_START(asteroid_state::asteroid_base)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, MASTER_CLOCK/8)
@@ -671,13 +670,13 @@ static MACHINE_CONFIG_START( asteroid_base )
 	MCFG_AVGDVG_VECTOR("vector")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( asteroid, asteroid_base )
+MACHINE_CONFIG_DERIVED(asteroid_state::asteroid, asteroid_base)
 
 	/* sound hardware */
 	MCFG_FRAGMENT_ADD(asteroid_sound)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( asterock, asteroid )
+MACHINE_CONFIG_DERIVED(asteroid_state::asterock, asteroid)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -685,7 +684,7 @@ static MACHINE_CONFIG_DERIVED( asterock, asteroid )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( astdelux, asteroid_base )
+MACHINE_CONFIG_DERIVED(asteroid_state::astdelux, asteroid_base)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -712,7 +711,7 @@ static MACHINE_CONFIG_DERIVED( astdelux, asteroid_base )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( llander, asteroid_base )
+MACHINE_CONFIG_DERIVED(asteroid_state::llander, asteroid_base)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")

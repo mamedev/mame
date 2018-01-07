@@ -37,6 +37,7 @@ public:
 //  DECLARE_WRITE8_MEMBER(tecnbras_io_w);
 //  DECLARE_READ8_MEMBER(tecnbras_io_r);
 	DECLARE_DRIVER_INIT(tecnbras);
+void tecnbras(machine_config &config);
 private:
 	int m_xcoord;
 	char m_digit[14][7];
@@ -99,7 +100,7 @@ void tecnbras_state::machine_reset()
 {
 }
 
-static MACHINE_CONFIG_START( tecnbras )
+MACHINE_CONFIG_START(tecnbras_state::tecnbras)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I80C31, XTAL_12MHz) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(i80c31_prg)

@@ -373,7 +373,7 @@ void drgnmst_state::machine_reset()
 	m_oki0_bank = 0;
 }
 
-static MACHINE_CONFIG_START( drgnmst )
+MACHINE_CONFIG_START(drgnmst_state::drgnmst)
 
 	MCFG_CPU_ADD("maincpu", M68000, 12000000) /* Confirmed */
 	MCFG_CPU_PROGRAM_MAP(drgnmst_main_map)

@@ -543,7 +543,7 @@ void airbustr_state::machine_reset()
 
 /* Machine Driver */
 
-static MACHINE_CONFIG_START( airbustr )
+MACHINE_CONFIG_START(airbustr_state::airbustr)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("master", Z80, XTAL_12MHz/2)   /* verified on pcb */
@@ -605,7 +605,7 @@ static MACHINE_CONFIG_START( airbustr )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( airbustrb, airbustr )
+MACHINE_CONFIG_DERIVED(airbustr_state::airbustrb, airbustr)
 	MCFG_WATCHDOG_MODIFY("watchdog")
 	MCFG_WATCHDOG_TIME_INIT(attotime::from_seconds(0)) // no protection device or watchdog
 MACHINE_CONFIG_END

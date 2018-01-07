@@ -22,6 +22,7 @@ public:
 		, m_lightcpu(*this, "lightcpu")
 	{ }
 
+	void strkzn(machine_config &config);
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_lightcpu;
@@ -45,7 +46,7 @@ static ADDRESS_MAP_START( light_io, AS_IO, 8, strkzn_state )
 	AM_RANGE(0x0007, 0x0007) AM_READNOP
 ADDRESS_MAP_END
 
-static MACHINE_CONFIG_START( strkzn )
+MACHINE_CONFIG_START(strkzn_state::strkzn)
 	MCFG_CPU_ADD("maincpu", Z80, 4000000)
 	MCFG_CPU_PROGRAM_MAP(main_mem)
 	MCFG_CPU_IO_MAP(main_io)

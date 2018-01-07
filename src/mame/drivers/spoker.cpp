@@ -97,6 +97,8 @@ public:
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void spoker(machine_config &config);
+	void _3super8(machine_config &config);
 };
 
 
@@ -589,7 +591,7 @@ void spoker_state::machine_reset()
                               Machine Drivers
 ***************************************************************************/
 
-static MACHINE_CONFIG_START( spoker )
+MACHINE_CONFIG_START(spoker_state::spoker)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z180, XTAL_12MHz / 2)   /* HD64180RP8, 8 MHz? */
@@ -632,7 +634,7 @@ static MACHINE_CONFIG_START( spoker )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( 3super8, spoker )
+MACHINE_CONFIG_DERIVED(spoker_state::_3super8, spoker)
 
 	MCFG_CPU_REPLACE("maincpu", Z80, XTAL_24MHz / 4)    /* z840006, 24/4 MHz? */
 	MCFG_CPU_MODIFY("maincpu")
@@ -969,4 +971,4 @@ GAME( 1993?, spk116itmx, spk306us, spoker,  spoker,  spoker_state,  0,          
 GAME( 1993?, spk115it,   spk306us, spoker,  spoker,  spoker_state,  spk116it,    ROT0,  "IGS",       "Super Poker (v115IT)",     MACHINE_SUPPORTS_SAVE )
 GAME( 1993?, spk114it,   spk306us, spoker,  spoker,  spoker_state,  0,           ROT0,  "IGS",       "Super Poker (v114IT)",     MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )  // needs proper machine driver
 GAME( 1996,  spk102ua,   spk306us, spoker,  spoker,  spoker_state,  spkleftover, ROT0,  "IGS",       "Super Poker (v102UA)",     MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )  // needs proper machine driver
-GAME( 1993?, 3super8,    0,        3super8, 3super8, spoker_state,  3super8,     ROT0,  "<unknown>", "3 Super 8 (Italy)",        MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) //roms are badly dumped
+GAME( 1993?, 3super8,    0,        _3super8,3super8, spoker_state,  3super8,     ROT0,  "<unknown>", "3 Super 8 (Italy)",        MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) //roms are badly dumped

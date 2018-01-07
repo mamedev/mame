@@ -1738,7 +1738,7 @@ MACHINE_RESET_MEMBER(snowbros_state,finalttr)
 		m_hyperpac_ram[0x2000/2 + i] = PROTDATA[i];
 }
 
-static MACHINE_CONFIG_START( snowbros )
+MACHINE_CONFIG_START(snowbros_state::snowbros)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz/2) /* 8 Mhz - confirmed */
@@ -1781,7 +1781,7 @@ static MACHINE_CONFIG_START( snowbros )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( wintbob, snowbros )
+MACHINE_CONFIG_DERIVED(snowbros_state::wintbob, snowbros)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1798,7 +1798,7 @@ static MACHINE_CONFIG_DERIVED( wintbob, snowbros )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( semicom, snowbros )
+MACHINE_CONFIG_DERIVED(snowbros_state::semicom, snowbros)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1828,7 +1828,7 @@ static MACHINE_CONFIG_DERIVED( semicom, snowbros )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( semicom_mcu, semicom )
+MACHINE_CONFIG_DERIVED(snowbros_state::semicom_mcu, semicom)
 
 	/* basic machine hardware */
 
@@ -1838,12 +1838,12 @@ static MACHINE_CONFIG_DERIVED( semicom_mcu, semicom )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( semiprot, semicom )
+MACHINE_CONFIG_DERIVED(snowbros_state::semiprot, semicom)
 	MCFG_MACHINE_RESET_OVERRIDE (snowbros_state, semiprot )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( honeydol )
+MACHINE_CONFIG_START(snowbros_state::honeydol)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_12MHz) /* MC68000P12 @ 12MHz */
@@ -1882,7 +1882,7 @@ static MACHINE_CONFIG_START( honeydol )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( twinadv )
+MACHINE_CONFIG_START(snowbros_state::twinadv)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_12MHz) /* 12MHz like Honey Dolls ? */
@@ -1940,7 +1940,7 @@ Intel P8752 (mcu)
 
 */
 
-static MACHINE_CONFIG_DERIVED( finalttr, semicom )
+MACHINE_CONFIG_DERIVED(snowbros_state::finalttr, semicom)
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_CLOCK(XTAL_12MHz)
@@ -1961,13 +1961,13 @@ static MACHINE_CONFIG_DERIVED( finalttr, semicom )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( _4in1, semicom )
+MACHINE_CONFIG_DERIVED(snowbros_state::_4in1, semicom)
 
 	/* basic machine hardware */
 	MCFG_GFXDECODE_MODIFY("gfxdecode", snowbros)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( snowbro3 ) /* PCB has 16MHz & 12MHz OSCs */
+MACHINE_CONFIG_START(snowbros_state::snowbro3) /* PCB has 16MHz & 12MHz OSCs */
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_12MHz) /* MC68000P10 CPU @ 12mhz or 8MHz (16MHz/2) ? */
@@ -1997,7 +1997,7 @@ MACHINE_CONFIG_END
 
 
 
-static MACHINE_CONFIG_START( yutnori )
+MACHINE_CONFIG_START(snowbros_state::yutnori)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz/2)

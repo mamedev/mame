@@ -46,6 +46,7 @@ public:
 	DECLARE_READ16_MEMBER(stat_r);
 	void kbd_put(u8 data);
 
+	void c900(machine_config &config);
 private:
 	uint8_t m_term_data;
 	required_device<cpu_device> m_maincpu;
@@ -106,7 +107,7 @@ static GFXDECODE_START( c900 )
 	GFXDECODE_ENTRY( "chargen", 0x0000, c900_charlayout, 0, 1 )
 GFXDECODE_END
 
-static MACHINE_CONFIG_START( c900 )
+MACHINE_CONFIG_START(c900_state::c900)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z8001, XTAL_12MHz / 2)
 	MCFG_CPU_PROGRAM_MAP(mem_map)

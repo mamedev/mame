@@ -917,7 +917,7 @@ MACHINE_START_MEMBER(taitox_state,superman)
 
 /**************************************************************************/
 
-static MACHINE_CONFIG_START( superman )
+MACHINE_CONFIG_START(taitox_state::superman)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz/2)   /* verified on pcb */
@@ -966,7 +966,7 @@ static MACHINE_CONFIG_START( superman )
 	MCFG_TC0140SYT_SLAVE_CPU("audiocpu")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( daisenpu )
+MACHINE_CONFIG_START(taitox_state::daisenpu)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz/2)   /* verified on pcb */
@@ -1011,7 +1011,7 @@ static MACHINE_CONFIG_START( daisenpu )
 	MCFG_PC060HA_SLAVE_CPU("audiocpu")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( gigandes )
+MACHINE_CONFIG_START(taitox_state::gigandes)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 8000000)    /* 8 MHz? */
@@ -1058,7 +1058,7 @@ static MACHINE_CONFIG_START( gigandes )
 	MCFG_TC0140SYT_SLAVE_CPU("audiocpu")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( ballbros )
+MACHINE_CONFIG_START(taitox_state::ballbros)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 8000000)    /* 8 MHz? */

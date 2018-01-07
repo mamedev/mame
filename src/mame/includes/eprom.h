@@ -54,4 +54,7 @@ public:
 	required_device<palette_device> m_palette;
 	static const atari_motion_objects_config s_mob_config;
 	static const atari_motion_objects_config s_guts_mob_config;
+	void guts(machine_config &config);
+	void eprom(machine_config &config);
+	void klaxp(machine_config &config);
 };

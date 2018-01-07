@@ -1698,7 +1698,7 @@ static INPUT_PORTS_START( supxevs )
 	PORT_DIPSETTING(    0xc0, "RP2C04-0004" )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( vsnes )
+MACHINE_CONFIG_START(vsnes_state::vsnes)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", N2A03, NTSC_APU_CLOCK)
@@ -1729,7 +1729,7 @@ static MACHINE_CONFIG_START( vsnes )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( jajamaru, vsnes )
+MACHINE_CONFIG_DERIVED(vsnes_state::jajamaru, vsnes)
 
 	MCFG_DEVICE_REMOVE( "ppu1" )
 	MCFG_PPU2C05_01_ADD("ppu1")
@@ -1738,7 +1738,7 @@ static MACHINE_CONFIG_DERIVED( jajamaru, vsnes )
 	MCFG_PPU2C0X_SET_NMI(vsnes_state, ppu_irq_1)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( mightybj, vsnes )
+MACHINE_CONFIG_DERIVED(vsnes_state::mightybj, vsnes)
 
 	MCFG_DEVICE_REMOVE( "ppu1" )
 	MCFG_PPU2C05_02_ADD("ppu1")
@@ -1747,7 +1747,7 @@ static MACHINE_CONFIG_DERIVED( mightybj, vsnes )
 	MCFG_PPU2C0X_SET_NMI(vsnes_state, ppu_irq_1)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( vsgshoe, vsnes )
+MACHINE_CONFIG_DERIVED(vsnes_state::vsgshoe, vsnes)
 
 	MCFG_DEVICE_REMOVE( "ppu1" )
 	MCFG_PPU2C05_03_ADD("ppu1")
@@ -1756,7 +1756,7 @@ static MACHINE_CONFIG_DERIVED( vsgshoe, vsnes )
 	MCFG_PPU2C0X_SET_NMI(vsnes_state, ppu_irq_1)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( topgun, vsnes )
+MACHINE_CONFIG_DERIVED(vsnes_state::topgun, vsnes)
 
 	MCFG_DEVICE_REMOVE( "ppu1" )
 	MCFG_PPU2C05_04_ADD("ppu1")
@@ -1765,7 +1765,7 @@ static MACHINE_CONFIG_DERIVED( topgun, vsnes )
 	MCFG_PPU2C0X_SET_NMI(vsnes_state, ppu_irq_1)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( vsdual )
+MACHINE_CONFIG_START(vsnes_state::vsdual)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", N2A03, NTSC_APU_CLOCK)
@@ -1815,7 +1815,7 @@ static MACHINE_CONFIG_START( vsdual )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( vsdual_pi, vsdual )
+MACHINE_CONFIG_DERIVED(vsnes_state::vsdual_pi, vsdual)
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 	// need high level of interleave to keep screens in sync in Balloon Fight.
 	// however vsmahjng doesn't like perfect interleave? you end up needing to reset it to boot? maybe something in a bad default state? watchdog?
@@ -1823,7 +1823,7 @@ static MACHINE_CONFIG_DERIVED( vsdual_pi, vsdual )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( vsnes_bootleg )
+MACHINE_CONFIG_START(vsnes_state::vsnes_bootleg)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502,XTAL_16MHz/4) // 4mhz? seems too high but flickers badly otherwise, issue elsewhere?

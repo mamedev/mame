@@ -108,6 +108,7 @@ public:
 
 	MC6845_UPDATE_ROW(crtc_update_row);
 
+	void h19(machine_config &config);
 private:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 	virtual void machine_reset() override;
@@ -512,7 +513,7 @@ static GFXDECODE_START( h19 )
 	GFXDECODE_ENTRY( "chargen", 0x0000, h19_charlayout, 0, 1 )
 GFXDECODE_END
 
-static MACHINE_CONFIG_START( h19 )
+MACHINE_CONFIG_START(h19_state::h19)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, H19_CLOCK) // From schematics
 	MCFG_CPU_PROGRAM_MAP(mem_map)

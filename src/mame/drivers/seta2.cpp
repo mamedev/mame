@@ -2503,7 +2503,7 @@ INTERRUPT_GEN_MEMBER(seta2_state::samshoot_interrupt)
 	m_tmp68301->external_interrupt_2();   // to do: hook up x1-10 interrupts
 }
 
-static MACHINE_CONFIG_START( seta2 )
+MACHINE_CONFIG_START(seta2_state::seta2)
 	MCFG_CPU_ADD("maincpu", M68301, XTAL_50MHz/3)   // !! TMP68301 !!
 	MCFG_CPU_PROGRAM_MAP(mj4simai_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", seta2_state,  seta2_interrupt)
@@ -2536,13 +2536,13 @@ static MACHINE_CONFIG_START( seta2 )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( mj4simai, seta2 )
+MACHINE_CONFIG_DERIVED(seta2_state::mj4simai, seta2)
 	MCFG_MACHINE_START_OVERRIDE(seta2_state, mj4simai)
 
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( gundamex, seta2 )
+MACHINE_CONFIG_DERIVED(seta2_state::gundamex, seta2)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(gundamex_map)
 
@@ -2558,7 +2558,7 @@ static MACHINE_CONFIG_DERIVED( gundamex, seta2 )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( grdians, seta2 )
+MACHINE_CONFIG_DERIVED(seta2_state::grdians, seta2)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(grdians_map)
 
@@ -2568,7 +2568,7 @@ static MACHINE_CONFIG_DERIVED( grdians, seta2 )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( myangel, seta2 )
+MACHINE_CONFIG_DERIVED(seta2_state::myangel, seta2)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(myangel_map)
 
@@ -2580,7 +2580,7 @@ static MACHINE_CONFIG_DERIVED( myangel, seta2 )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( myangel2, seta2 )
+MACHINE_CONFIG_DERIVED(seta2_state::myangel2, seta2)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(myangel2_map)
 
@@ -2592,7 +2592,7 @@ static MACHINE_CONFIG_DERIVED( myangel2, seta2 )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( pzlbowl, seta2 )
+MACHINE_CONFIG_DERIVED(seta2_state::pzlbowl, seta2)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(pzlbowl_map)
 
@@ -2602,7 +2602,7 @@ static MACHINE_CONFIG_DERIVED( pzlbowl, seta2 )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( penbros, seta2 )
+MACHINE_CONFIG_DERIVED(seta2_state::penbros, seta2)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(penbros_map)
 
@@ -2611,7 +2611,7 @@ static MACHINE_CONFIG_DERIVED( penbros, seta2 )
 	MCFG_SCREEN_VISIBLE_AREA(0, 0x140-1, 0x80, 0x160-1)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( ablastb, penbros )
+MACHINE_CONFIG_DERIVED(seta2_state::ablastb, penbros)
 	MCFG_CPU_REPLACE("maincpu", M68000, XTAL_16MHz) // TMP68HC000P-16
 	MCFG_CPU_PROGRAM_MAP(ablastb_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", seta2_state, irq2_line_hold)
@@ -2619,7 +2619,7 @@ static MACHINE_CONFIG_DERIVED( ablastb, penbros )
 	MCFG_DEVICE_REMOVE("tmp68301")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( reelquak, seta2 )
+MACHINE_CONFIG_DERIVED(seta2_state::reelquak, seta2)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(reelquak_map)
 
@@ -2637,7 +2637,7 @@ static MACHINE_CONFIG_DERIVED( reelquak, seta2 )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( samshoot, seta2 )
+MACHINE_CONFIG_DERIVED(seta2_state::samshoot, seta2)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(samshoot_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(seta2_state, samshoot_interrupt, 60)
@@ -2653,7 +2653,7 @@ static MACHINE_CONFIG_DERIVED( samshoot, seta2 )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( staraudi, seta2 )
+MACHINE_CONFIG_DERIVED(staraudi_state::staraudi, seta2)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(staraudi_map)
 
@@ -2669,7 +2669,7 @@ static MACHINE_CONFIG_DERIVED( staraudi, seta2 )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( telpacfl, seta2 )
+MACHINE_CONFIG_DERIVED(seta2_state::telpacfl, seta2)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(telpacfl_map)
 
@@ -2715,7 +2715,7 @@ MACHINE_RESET_MEMBER(seta2_state, funcube)
 	m_funcube_hopper_motor = 0;
 }
 
-static MACHINE_CONFIG_START( funcube )
+MACHINE_CONFIG_START(seta2_state::funcube)
 
 	MCFG_CPU_ADD("maincpu", MCF5206E, XTAL_25_447MHz)
 	MCFG_CPU_PROGRAM_MAP(funcube_map)
@@ -2760,7 +2760,7 @@ static MACHINE_CONFIG_START( funcube )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( funcube2, funcube )
+MACHINE_CONFIG_DERIVED(seta2_state::funcube2, funcube)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(funcube2_map)
 
@@ -2773,14 +2773,14 @@ static MACHINE_CONFIG_DERIVED( funcube2, funcube )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( funcube3, funcube2 )
+MACHINE_CONFIG_DERIVED(seta2_state::funcube3, funcube2)
 	// video hardware
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VISIBLE_AREA(0x0, 0x140-1, 0x80-0x40, 0x170-1-0x40)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( namcostr )
+MACHINE_CONFIG_START(seta2_state::namcostr)
 	MCFG_CPU_ADD("maincpu", M68301, XTAL_50MHz/3)   // !! TMP68301 !!
 	MCFG_CPU_PROGRAM_MAP(namcostr_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", seta2_state,  seta2_interrupt)

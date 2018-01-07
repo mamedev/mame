@@ -335,7 +335,7 @@ READ8_MEMBER(foodf_state::pot_r)
  *
  *************************************/
 
-static MACHINE_CONFIG_START( foodf )
+MACHINE_CONFIG_START(foodf_state::foodf)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, MASTER_CLOCK/2)

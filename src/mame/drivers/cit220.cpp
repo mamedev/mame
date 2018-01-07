@@ -30,6 +30,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(sod_w);
 	SCN2674_DRAW_CHARACTER_MEMBER(draw_character);
 
+	void cit220p(machine_config &config);
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;
@@ -72,7 +73,7 @@ static INPUT_PORTS_START( cit220p )
 INPUT_PORTS_END
 
 
-static MACHINE_CONFIG_START( cit220p )
+MACHINE_CONFIG_START(cit220_state::cit220p)
 	MCFG_CPU_ADD("maincpu", I8085A, 6000000)
 	MCFG_CPU_PROGRAM_MAP(mem_map)
 	MCFG_CPU_IO_MAP(io_map)

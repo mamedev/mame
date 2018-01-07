@@ -38,6 +38,7 @@ public:
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
+	void k2000(machine_config &config);
 };
 
 void k2000_state::machine_start()
@@ -54,7 +55,7 @@ static ADDRESS_MAP_START( k2000_map, AS_PROGRAM, 16, k2000_state )
 	AM_RANGE(0xfffc00, 0xffffff) AM_DEVREADWRITE("tmp68301", tmp68301_device, regs_r, regs_w)  // TMP68301 Registers
 ADDRESS_MAP_END
 
-static MACHINE_CONFIG_START( k2000 )
+MACHINE_CONFIG_START(k2000_state::k2000)
 	MCFG_CPU_ADD("maincpu", M68301, XTAL_12MHz)
 	MCFG_CPU_PROGRAM_MAP(k2000_map)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("tmp68301",tmp68301_device,irq_callback)

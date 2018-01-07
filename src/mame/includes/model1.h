@@ -182,6 +182,10 @@ public:
 		lightparam_t lightparams[32];
 	};
 
+	void model1(machine_config &config);
+	void swa(machine_config &config);
+	void netmerc(machine_config &config);
+	void model1_vr(machine_config &config);
 private:
 	// Machine
 	void irq_raise(int level);

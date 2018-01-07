@@ -156,6 +156,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(write_centronics_select);
 
 	int m_tmr0;
+	void compis(machine_config &config);
+	void compis2(machine_config &config);
 };
 
 
@@ -743,7 +745,7 @@ void compis_state::machine_reset()
 //  MACHINE_CONFIG( compis )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( compis )
+MACHINE_CONFIG_START(compis_state::compis)
 	// basic machine hardware
 	MCFG_CPU_ADD(I80186_TAG, I80186, XTAL_15_36MHz)
 	MCFG_CPU_PROGRAM_MAP(compis_mem)
@@ -837,7 +839,7 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( compis2 )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_DERIVED( compis2, compis )
+MACHINE_CONFIG_DERIVED(compis_state::compis2, compis)
 	// basic machine hardware
 	MCFG_CPU_MODIFY(I80186_TAG)
 	MCFG_CPU_PROGRAM_MAP(compis2_mem)

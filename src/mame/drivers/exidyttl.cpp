@@ -55,6 +55,8 @@ public:
 	required_device<netlist_mame_device> m_maincpu;
 	required_device<fixedfreq_device> m_video;
 
+	void attack(machine_config &config);
+	void deathrac(machine_config &config);
 protected:
 
 	// driver_device overrides
@@ -95,7 +97,7 @@ void exidyttl_state::video_start()
 {
 }
 
-static MACHINE_CONFIG_START( attack )
+MACHINE_CONFIG_START(exidyttl_state::attack)
 
 	/* basic machine hardware */
 	MCFG_DEVICE_ADD("maincpu", NETLIST_CPU, NETLIST_CLOCK)
@@ -110,7 +112,7 @@ static MACHINE_CONFIG_START( attack )
 	MCFG_FIXFREQ_SYNC_THRESHOLD(0.30)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( deathrac )
+MACHINE_CONFIG_START(exidyttl_state::deathrac)
 
 	/* basic machine hardware */
 	MCFG_DEVICE_ADD("maincpu", NETLIST_CPU, NETLIST_CLOCK)

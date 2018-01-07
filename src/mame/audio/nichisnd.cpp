@@ -76,7 +76,7 @@ static const z80_daisy_config daisy_chain[] =
 
 
 
-MACHINE_CONFIG_MEMBER(nichisnd_device::device_add_mconfig)
+MACHINE_CONFIG_START(nichisnd_device::device_add_mconfig)
 	MCFG_CPU_ADD("audiocpu", TMPZ84C011, 8000000) /* TMPZ84C011, 8.00 MHz */
 	MCFG_Z80_DAISY_CHAIN(daisy_chain)
 	MCFG_CPU_PROGRAM_MAP(nichisnd_map)

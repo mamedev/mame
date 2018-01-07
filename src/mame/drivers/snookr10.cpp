@@ -1037,7 +1037,7 @@ GFXDECODE_END
 *     Machine Drivers     *
 **************************/
 
-static MACHINE_CONFIG_START( snookr10 )
+MACHINE_CONFIG_START(snookr10_state::snookr10)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M65SC02, MASTER_CLOCK/8)    /* 2 MHz (1.999 MHz measured) */
@@ -1067,7 +1067,7 @@ static MACHINE_CONFIG_START( snookr10 )
 
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( apple10, snookr10 )
+MACHINE_CONFIG_DERIVED(snookr10_state::apple10, snookr10)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1079,7 +1079,7 @@ static MACHINE_CONFIG_DERIVED( apple10, snookr10 )
 
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( tenballs, snookr10 )
+MACHINE_CONFIG_DERIVED(snookr10_state::tenballs, snookr10)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1087,7 +1087,7 @@ static MACHINE_CONFIG_DERIVED( tenballs, snookr10 )
 
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( crystalc, snookr10 )
+MACHINE_CONFIG_DERIVED(snookr10_state::crystalc, snookr10)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")

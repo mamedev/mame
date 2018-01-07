@@ -522,7 +522,7 @@ static const atari_rle_objects_config modesc_0x400 =
  *
  *************************************/
 
-static MACHINE_CONFIG_START( atarig42 )
+MACHINE_CONFIG_START(atarig42_state::atarig42)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, ATARI_CLOCK_14MHz)
@@ -563,14 +563,14 @@ static MACHINE_CONFIG_START( atarig42 )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( atarig42_0x200, atarig42 )
+MACHINE_CONFIG_DERIVED(atarig42_state::atarig42_0x200, atarig42)
 	MCFG_ATARIRLE_ADD("rle", modesc_0x200)
 
 	/* ASIC65 */
 	MCFG_ASIC65_ADD("asic65", ASIC65_ROMBASED)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( atarig42_0x400, atarig42 )
+MACHINE_CONFIG_DERIVED(atarig42_state::atarig42_0x400, atarig42)
 	MCFG_ATARIRLE_ADD("rle", modesc_0x400)
 
 	/* ASIC65 */

@@ -344,7 +344,7 @@ GFXDECODE_END
 
 
 
-static MACHINE_CONFIG_START( taotaido )
+MACHINE_CONFIG_START(taotaido_state::taotaido)
 	MCFG_CPU_ADD("maincpu", M68000, 32000000/2)
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", taotaido_state,  irq1_line_hold)

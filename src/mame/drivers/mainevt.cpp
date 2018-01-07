@@ -406,7 +406,7 @@ INTERRUPT_GEN_MEMBER(mainevt_state::devstors_sound_timer_irq)
 		device.execute().set_input_line(0, HOLD_LINE);
 }
 
-static MACHINE_CONFIG_START( mainevt )
+MACHINE_CONFIG_START(mainevt_state::mainevt)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", HD6309, 3000000*4)  /* ?? */
@@ -454,7 +454,7 @@ static MACHINE_CONFIG_START( mainevt )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( devstors )
+MACHINE_CONFIG_START(mainevt_state::devstors)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", HD6309, 3000000*4)  /* ?? */

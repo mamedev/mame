@@ -1446,7 +1446,7 @@ void nemesis_state::machine_reset()
 	m_irq_port_last = 0;
 }
 
-static MACHINE_CONFIG_START( nemesis )
+MACHINE_CONFIG_START(nemesis_state::nemesis)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000,18432000/2)         /* 9.216 MHz? */
@@ -1513,7 +1513,7 @@ static MACHINE_CONFIG_START( nemesis )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( gx400 )
+MACHINE_CONFIG_START(nemesis_state::gx400)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000,18432000/2)     /* 9.216MHz */
@@ -1586,7 +1586,7 @@ static MACHINE_CONFIG_START( gx400 )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( konamigt )
+MACHINE_CONFIG_START(nemesis_state::konamigt)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000,18432000/2)         /* 9.216 MHz? */
@@ -1653,7 +1653,7 @@ static MACHINE_CONFIG_START( konamigt )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( rf2_gx400 )
+MACHINE_CONFIG_START(nemesis_state::rf2_gx400)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000,18432000/2)     /* 9.216MHz */
@@ -1726,7 +1726,7 @@ static MACHINE_CONFIG_START( rf2_gx400 )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( salamand )
+MACHINE_CONFIG_START(nemesis_state::salamand)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000,18432000/2)       /* 9.216MHz */
@@ -1777,7 +1777,7 @@ static MACHINE_CONFIG_START( salamand )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( blkpnthr )
+MACHINE_CONFIG_START(nemesis_state::blkpnthr)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000,18432000/2)         /* 9.216 MHz? */
@@ -1823,7 +1823,7 @@ static MACHINE_CONFIG_START( blkpnthr )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( citybomb )
+MACHINE_CONFIG_START(nemesis_state::citybomb)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000,18432000/2)         /* 9.216 MHz? */
@@ -1873,7 +1873,7 @@ static MACHINE_CONFIG_START( citybomb )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( nyanpani )
+MACHINE_CONFIG_START(nemesis_state::nyanpani)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000,18432000/2)         /* 9.216 MHz? */
@@ -1923,7 +1923,7 @@ static MACHINE_CONFIG_START( nyanpani )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( hcrash )
+MACHINE_CONFIG_START(nemesis_state::hcrash)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000,18432000/3)         /* 6.144MHz */
@@ -2676,7 +2676,7 @@ Manual says SW4, 5, 6, 7 & 8 not used, leave off
 
 */
 
-static MACHINE_CONFIG_START( bubsys )
+MACHINE_CONFIG_START(nemesis_state::bubsys)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000,18432000/2)     /* 9.216MHz */

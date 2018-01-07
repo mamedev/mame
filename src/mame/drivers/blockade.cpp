@@ -53,6 +53,7 @@ public:
 	DECLARE_WRITE8_MEMBER(env_on_w);
 	DECLARE_WRITE8_MEMBER(env_off_w);
 
+	void blockade(machine_config &config);
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -461,7 +462,7 @@ void blockade_state::device_timer(emu_timer &timer, device_timer_id id, int para
 //  MACHINE DEFINTIONS
 //**************************************************************************
 
-static MACHINE_CONFIG_START( blockade )
+MACHINE_CONFIG_START(blockade_state::blockade)
 	MCFG_CPU_ADD("maincpu", I8080A, XTAL_20_079MHz / 10)
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_IO_MAP(main_io_map)

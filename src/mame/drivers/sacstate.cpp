@@ -53,6 +53,7 @@ public:
 	DECLARE_READ8_MEMBER(port04_r);
 	DECLARE_WRITE8_MEMBER(port08_w);
 	void kbd_put(u8 data);
+	void sacstate(machine_config &config);
 private:
 	uint8_t m_term_data;
 	uint8_t m_val;
@@ -127,7 +128,7 @@ void sacstate_state::machine_reset()
 	m_val = ioport("CONFIG")->read();
 }
 
-static MACHINE_CONFIG_START( sacstate )
+MACHINE_CONFIG_START(sacstate_state::sacstate)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",I8008, 800000)
 	MCFG_CPU_PROGRAM_MAP(sacstate_mem)

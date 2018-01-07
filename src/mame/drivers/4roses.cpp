@@ -193,6 +193,7 @@ public:
 		: funworld_state(mconfig, type, tag) { }
 
 	DECLARE_DRIVER_INIT(4roses);
+	void _4roses(machine_config &config);
 };
 
 
@@ -353,7 +354,7 @@ GFXDECODE_END
 *     Machine Drivers     *
 **************************/
 
-static MACHINE_CONFIG_START( 4roses )
+MACHINE_CONFIG_START(_4roses_state::_4roses)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M65C02, MASTER_CLOCK/8) /* 2MHz, guess */
 	MCFG_CPU_PROGRAM_MAP(4roses_map)
@@ -466,6 +467,6 @@ DRIVER_INIT_MEMBER(_4roses_state,4roses)
 *************************/
 
 /*    YEAR  NAME     PARENT  MACHINE  INPUT   STATE          INIT    ROT   COMPANY      FULLNAME                         FLAGS  */
-GAME( 1999, 4roses,  0,      4roses,  4roses, _4roses_state, 4roses, ROT0, "<unknown>", "Four Roses (encrypted, set 1)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_WRONG_COLORS | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-GAME( 1999, 4rosesa, 4roses, 4roses,  4roses, _4roses_state, 4roses, ROT0, "<unknown>", "Four Roses (encrypted, set 2)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_WRONG_COLORS | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-GAME( 1999, rugby,   0,      4roses,  4roses, _4roses_state, 4roses, ROT0, "C.M.C.",    "Rugby? (four roses hardware)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_WRONG_COLORS | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 1999, 4roses,  0,      _4roses, 4roses, _4roses_state, 4roses, ROT0, "<unknown>", "Four Roses (encrypted, set 1)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_WRONG_COLORS | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 1999, 4rosesa, 4roses, _4roses, 4roses, _4roses_state, 4roses, ROT0, "<unknown>", "Four Roses (encrypted, set 2)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_WRONG_COLORS | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 1999, rugby,   0,      _4roses, 4roses, _4roses_state, 4roses, ROT0, "C.M.C.",    "Rugby? (four roses hardware)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_WRONG_COLORS | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

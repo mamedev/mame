@@ -55,7 +55,7 @@ SLOT_INTERFACE_END
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( sns_rom_sufami_device::device_add_mconfig )
+MACHINE_CONFIG_START(sns_rom_sufami_device::device_add_mconfig)
 	MCFG_SNS_SUFAMI_CARTRIDGE_ADD("st_slot1", sufamiturbo_cart, nullptr)
 	MCFG_SNS_SUFAMI_CARTRIDGE_ADD("st_slot2", sufamiturbo_cart, nullptr)
 MACHINE_CONFIG_END

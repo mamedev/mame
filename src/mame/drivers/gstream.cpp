@@ -208,6 +208,8 @@ public:
 
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	void x2222(machine_config &config);
+	void gstream(machine_config &config);
 };
 
 CUSTOM_INPUT_MEMBER(gstream_state::x2222_toggle_r) // or the game hangs when starting, might be a status flag for the sound?
@@ -866,7 +868,7 @@ void gstream_state::machine_reset()
 	m_oki_bank_2 = 0;
 }
 
-static MACHINE_CONFIG_START( gstream )
+MACHINE_CONFIG_START(gstream_state::gstream)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", E132XT, 16000000*4) /* 4x internal multiplier */
@@ -901,7 +903,7 @@ static MACHINE_CONFIG_START( gstream )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( x2222 )
+MACHINE_CONFIG_START(gstream_state::x2222)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", E132XT, 16000000*4) /* 4x internal multiplier */

@@ -92,6 +92,7 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(power_on);
 	void power_off();
 
+	void k28(machine_config &config);
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -450,7 +451,7 @@ INPUT_PORTS_END
 
 ***************************************************************************/
 
-static MACHINE_CONFIG_START( k28 )
+MACHINE_CONFIG_START(k28_state::k28)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8021, XTAL_3_579545MHz)

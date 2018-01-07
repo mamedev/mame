@@ -35,6 +35,7 @@ public:
 	DECLARE_WRITE8_MEMBER(rs232_w);
 	void kbd_put(u8 data);
 
+	void evmbug(machine_config &config);
 private:
 	virtual void machine_reset() override;
 	uint8_t m_term_data;
@@ -107,7 +108,7 @@ void evmbug_state::machine_reset()
 	m_maincpu->reset_line(ASSERT_LINE);
 }
 
-static MACHINE_CONFIG_START( evmbug )
+MACHINE_CONFIG_START(evmbug_state::evmbug)
 	// basic machine hardware
 	// TMS9995 CPU @ 12.0 MHz
 	// We have no lines connected yet

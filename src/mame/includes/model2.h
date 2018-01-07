@@ -248,6 +248,25 @@ public:
 	void copro_fifoout_push(device_t *device, uint32_t data,uint32_t offset,uint32_t mem_mask);
 
 	void model2_3d_frame_end( bitmap_rgb32 &bitmap, const rectangle &cliprect );
+
+	void daytona(machine_config &config);
+	void indy500(machine_config &config);
+	void manxtt(machine_config &config);
+	void manxttdx(machine_config &config);
+	void model2a(machine_config &config);
+	void model2a_0229(machine_config &config);
+	void model2a_5881(machine_config &config);
+	void model2b(machine_config &config);
+	void model2b_0229(machine_config &config);
+	void model2b_5881(machine_config &config);
+	void model2c(machine_config &config);
+	void model2c_5881(machine_config &config);
+	void model2o(machine_config &config);
+	void overrev2c(machine_config &config);
+	void rchase2(machine_config &config);
+	void sj25_0207_01(machine_config &config);
+	void srallyc(machine_config &config);
+	void stcc(machine_config &config);
 };
 
 

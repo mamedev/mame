@@ -459,6 +459,8 @@ public:
 	DECLARE_PALETTE_INIT(avt);
 	uint32_t screen_update_avt(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
+	void avtnfl(machine_config &config);
+	void avt(machine_config &config);
 private:
 	tilemap_t *m_bg_tilemap;
 	uint8_t m_crtc_vreg[0x100],m_crtc_index;
@@ -952,7 +954,7 @@ WRITE_LINE_MEMBER( avt_state::avtbingo_w )
 		m_pio0->port_b_write(ioport("IN0")->read());
 }
 
-static MACHINE_CONFIG_START( avt )
+MACHINE_CONFIG_START(avt_state::avt)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, CPU_CLOCK) /* guess */
 	MCFG_Z80_DAISY_CHAIN(daisy_chain)
@@ -1009,7 +1011,7 @@ WRITE_LINE_MEMBER( avt_state::avtnfl_w )
 	m_pio1->port_b_write((m_pio1->port_b_read() & 0xbf) | (state ? 0x40 : 0));
 }
 
-static MACHINE_CONFIG_DERIVED( avtnfl, avt )
+MACHINE_CONFIG_DERIVED(avt_state::avtnfl, avt)
 	MCFG_DEVICE_REMOVE("crtc")
 	MCFG_MC6845_ADD("crtc", MC6845, "screen", CRTC_CLOCK)    /* guess */
 	MCFG_MC6845_SHOW_BORDER_AREA(false)

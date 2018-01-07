@@ -385,7 +385,7 @@ void gng_state::machine_reset()
 	}
 }
 
-static MACHINE_CONFIG_START( gng )
+MACHINE_CONFIG_START(gng_state::gng)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", MC6809, XTAL_12MHz/2)        /* verified on pcb */
@@ -438,7 +438,7 @@ static MACHINE_CONFIG_START( gng )
 	MCFG_SOUND_ROUTE(3, "mono", 0.20)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( diamond, gng )
+MACHINE_CONFIG_DERIVED(gng_state::diamond, gng)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(diamond_map)
 

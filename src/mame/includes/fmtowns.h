@@ -338,6 +338,11 @@ class towns_state : public driver_device
 	required_memory_region m_user;
 	optional_memory_region m_serial;
 
+	void towns_base(machine_config &config);
+	void towns(machine_config &config);
+	void townsftv(machine_config &config);
+	void townshr(machine_config &config);
+	void townssj(machine_config &config);
 private:
 	static const device_timer_id TIMER_RTC = 0;
 	static const device_timer_id TIMER_FREERUN = 1;
@@ -404,6 +409,7 @@ class towns16_state : public towns_state
 	towns16_state(const machine_config &mconfig, device_type type, const char *tag)
 		: towns_state(mconfig, type, tag)
 	{ }
+	void townsux(machine_config &config);
 };
 
 class marty_state : public towns_state
@@ -414,6 +420,7 @@ class marty_state : public towns_state
 	{ }
 
 	virtual void driver_start() override;
+	void marty(machine_config &config);
 };
 
 #endif // MAME_INCLUDES_FMTOWNS_H

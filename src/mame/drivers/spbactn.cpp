@@ -402,7 +402,7 @@ static GFXDECODE_START( spbactnp )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( spbactn )
+MACHINE_CONFIG_START(spbactn_state::spbactn)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_12MHz)
@@ -455,7 +455,7 @@ static MACHINE_CONFIG_START( spbactn )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( spbactnp )
+MACHINE_CONFIG_START(spbactn_state::spbactnp)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_12MHz)

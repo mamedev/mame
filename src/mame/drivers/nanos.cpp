@@ -61,6 +61,7 @@ public:
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
+	void nanos(machine_config &config);
 private:
 	uint8_t m_key_command;
 	uint8_t m_last_code;
@@ -454,7 +455,7 @@ static GFXDECODE_START( nanos )
 	GFXDECODE_ENTRY( "chargen", 0x0000, nanos_charlayout, 0, 1 )
 GFXDECODE_END
 
-static MACHINE_CONFIG_START( nanos )
+MACHINE_CONFIG_START(nanos_state::nanos)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80, XTAL_4MHz)
 	MCFG_CPU_PROGRAM_MAP(nanos_mem)

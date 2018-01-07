@@ -1146,7 +1146,7 @@ GFXDECODE_END
 
 /*****************************************************************************/
 
-static MACHINE_CONFIG_START( legionna )
+MACHINE_CONFIG_START(legionna_state::legionna)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000,20000000/2)  /* ??? */
@@ -1197,7 +1197,7 @@ static MACHINE_CONFIG_START( legionna )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( heatbrl )
+MACHINE_CONFIG_START(legionna_state::heatbrl)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000,20000000/2)  /* ??? */
@@ -1249,7 +1249,7 @@ static MACHINE_CONFIG_START( heatbrl )
 	MCFG_SEIBU_SOUND_YM_WRITE_CB(DEVWRITE8("ymsnd", ym3812_device, write))
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( godzilla )
+MACHINE_CONFIG_START(legionna_state::godzilla)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 20000000/2)
@@ -1303,7 +1303,7 @@ static MACHINE_CONFIG_START( godzilla )
 	MCFG_SEIBU_SOUND_YM_WRITE_CB(DEVWRITE8("ymsnd", ym2151_device, write))
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( denjinmk )
+MACHINE_CONFIG_START(legionna_state::denjinmk)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 20000000/2)
@@ -1356,7 +1356,7 @@ static MACHINE_CONFIG_START( denjinmk )
 	MCFG_SEIBU_SOUND_YM_WRITE_CB(DEVWRITE8("ymsnd", ym2151_device, write))
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( grainbow )
+MACHINE_CONFIG_START(legionna_state::grainbow)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 20000000/2)
@@ -1410,7 +1410,7 @@ static MACHINE_CONFIG_START( grainbow )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( cupsoc )
+MACHINE_CONFIG_START(legionna_state::cupsoc)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000,20000000/2)
@@ -1462,7 +1462,7 @@ static MACHINE_CONFIG_START( cupsoc )
 	MCFG_SEIBU_SOUND_YM_WRITE_CB(DEVWRITE8("ymsnd", ym3812_device, write))
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( cupsocs, cupsoc )
+MACHINE_CONFIG_DERIVED(legionna_state::cupsocs, cupsoc)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(cupsocs_mem)
 MACHINE_CONFIG_END

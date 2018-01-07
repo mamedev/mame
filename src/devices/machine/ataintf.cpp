@@ -273,7 +273,7 @@ void abstract_ata_interface_device::device_start()
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( abstract_ata_interface_device::device_add_mconfig )
+MACHINE_CONFIG_START(abstract_ata_interface_device::device_add_mconfig)
 	MCFG_DEVICE_ADD( "0", ATA_SLOT, 0 )
 	MCFG_DEVICE_ADD( "1", ATA_SLOT, 0 )
 MACHINE_CONFIG_END

@@ -250,6 +250,7 @@ public:
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( gamecom_cart1 );
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( gamecom_cart2 );
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void gamecom(machine_config &config);
 private:
 	uint8_t *m_p_ram;
 	uint8_t *m_cart_ptr;

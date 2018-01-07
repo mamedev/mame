@@ -51,7 +51,7 @@ ROM_END
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( bbc_cv1797_device::device_add_mconfig )
+MACHINE_CONFIG_START(bbc_cv1797_device::device_add_mconfig)
 	MCFG_FD1797_ADD("fd1797", XTAL_8MHz / 8)
 	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(bbc_cv1797_device, fdc_intrq_w))
 	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(bbc_cv1797_device, fdc_drq_w))

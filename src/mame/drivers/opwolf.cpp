@@ -774,7 +774,7 @@ GFXDECODE_END
                  MACHINE DRIVERS
 ***********************************************************/
 
-static MACHINE_CONFIG_START( opwolf )
+MACHINE_CONFIG_START(opwolf_state::opwolf)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, CPU_CLOCK ) /* 8 MHz */
@@ -838,7 +838,7 @@ static MACHINE_CONFIG_START( opwolf )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( opwolfp, opwolf )
+MACHINE_CONFIG_DERIVED(opwolf_state::opwolfp, opwolf)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu") /* 8 MHz */
@@ -849,7 +849,7 @@ MACHINE_CONFIG_END
 
 
 
-static MACHINE_CONFIG_START( opwolfb ) /* OSC clocks unknown for the bootleg, but changed to match original sets */
+MACHINE_CONFIG_START(opwolf_state::opwolfb) /* OSC clocks unknown for the bootleg, but changed to match original sets */
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, CPU_CLOCK ) /* 8 MHz ??? */

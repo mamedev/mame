@@ -128,7 +128,7 @@ static ADDRESS_MAP_START( decodmd2_map, AS_PROGRAM, 8, decodmd_type2_device )
 	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("dmdbank2") // last 32k of ROM
 ADDRESS_MAP_END
 
-MACHINE_CONFIG_MEMBER( decodmd_type2_device::device_add_mconfig )
+MACHINE_CONFIG_START(decodmd_type2_device::device_add_mconfig)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("dmdcpu", MC6809E, XTAL_8MHz / 4)
 	MCFG_CPU_PROGRAM_MAP(decodmd2_map)

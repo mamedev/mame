@@ -184,6 +184,11 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(ay3600_data_ready_w);
 	DECLARE_WRITE_LINE_MEMBER(ay3600_ako_w);
 
+	void apple2_common(machine_config &config);
+	void apple2jp(machine_config &config);
+	void apple2(machine_config &config);
+	void space84(machine_config &config);
+	void apple2p(machine_config &config);
 private:
 	int m_speaker_state;
 	int m_cassette_state;
@@ -1353,7 +1358,7 @@ static SLOT_INTERFACE_START(apple2_cards)
 //  SLOT_INTERFACE("magicmusician", A2BUS_MAGICMUSICIAN)    /* Magic Musician Card */
 SLOT_INTERFACE_END
 
-static MACHINE_CONFIG_START( apple2_common )
+MACHINE_CONFIG_START(napple2_state::apple2_common)
 	/* basic machine hardware */
 	MCFG_CPU_ADD(A2_CPU_TAG, M6502, 1021800)     /* close to actual CPU frequency of 1.020484 MHz */
 	MCFG_CPU_PROGRAM_MAP(apple2_map)
@@ -1435,7 +1440,7 @@ static MACHINE_CONFIG_START( apple2_common )
 	MCFG_CASSETTE_INTERFACE("apple2_cass")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( apple2, apple2_common )
+MACHINE_CONFIG_DERIVED(napple2_state::apple2, apple2_common)
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("48K")
@@ -1443,7 +1448,7 @@ static MACHINE_CONFIG_DERIVED( apple2, apple2_common )
 	MCFG_RAM_DEFAULT_VALUE(0x00)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( apple2p, apple2_common )
+MACHINE_CONFIG_DERIVED(napple2_state::apple2p, apple2_common)
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("48K")
@@ -1451,10 +1456,10 @@ static MACHINE_CONFIG_DERIVED( apple2p, apple2_common )
 	MCFG_RAM_DEFAULT_VALUE(0x00)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( space84, apple2p )
+MACHINE_CONFIG_DERIVED(napple2_state::space84, apple2p)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( apple2jp, apple2p )
+MACHINE_CONFIG_DERIVED(napple2_state::apple2jp, apple2p)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(napple2_state, screen_update_jp)
 MACHINE_CONFIG_END

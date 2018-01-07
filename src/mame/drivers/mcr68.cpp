@@ -892,7 +892,7 @@ GFXDECODE_END
 
 =================================================================*/
 
-static MACHINE_CONFIG_START( mcr68 )
+MACHINE_CONFIG_START(mcr68_state::mcr68)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 7723800)
@@ -928,14 +928,14 @@ static MACHINE_CONFIG_START( mcr68 )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( xenophob, mcr68 )
+MACHINE_CONFIG_DERIVED(mcr68_state::xenophob, mcr68)
 
 	/* basic machine hardware */
 	MCFG_SOUND_ADD("sg", MIDWAY_SOUNDS_GOOD, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( intlaser, mcr68 )
+MACHINE_CONFIG_DERIVED(mcr68_state::intlaser, mcr68)
 
 	/* basic machine hardware */
 	MCFG_SOUND_ADD("sg", MIDWAY_SOUNDS_GOOD, 0)
@@ -946,7 +946,7 @@ static MACHINE_CONFIG_DERIVED( intlaser, mcr68 )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( spyhunt2, mcr68 )
+MACHINE_CONFIG_DERIVED(mcr68_state::spyhunt2, mcr68)
 
 	/* basic machine hardware */
 	MCFG_SOUND_ADD("sg", MIDWAY_SOUNDS_GOOD, 0)
@@ -962,7 +962,7 @@ static MACHINE_CONFIG_DERIVED( spyhunt2, mcr68 )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( archrivl, mcr68 )
+MACHINE_CONFIG_DERIVED(mcr68_state::archrivl, mcr68)
 
 	/* basic machine hardware */
 	MCFG_SOUND_ADD("cvsd", WILLIAMS_CVSD_SOUND, 0)
@@ -970,7 +970,7 @@ static MACHINE_CONFIG_DERIVED( archrivl, mcr68 )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( pigskin, mcr68 )
+MACHINE_CONFIG_DERIVED(mcr68_state::pigskin, mcr68)
 
 	/* basic machine hardware */
 	MCFG_SOUND_ADD("cvsd", WILLIAMS_CVSD_SOUND, 0)
@@ -981,7 +981,7 @@ static MACHINE_CONFIG_DERIVED( pigskin, mcr68 )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( trisport, mcr68 )
+MACHINE_CONFIG_DERIVED(mcr68_state::trisport, mcr68)
 
 	/* basic machine hardware */
 	MCFG_SOUND_ADD("cvsd", WILLIAMS_CVSD_SOUND, 0)

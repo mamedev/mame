@@ -74,6 +74,8 @@ public:
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
+	void mnumber(machine_config &config);
+	void itgamble(machine_config &config);
 protected:
 
 	// devices
@@ -208,7 +210,7 @@ void itgamble_state::machine_reset()
 *     Machine Drivers     *
 **************************/
 
-static MACHINE_CONFIG_START( itgamble )
+MACHINE_CONFIG_START(itgamble_state::itgamble)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", H83048, MAIN_CLOCK/2)
@@ -233,7 +235,7 @@ static MACHINE_CONFIG_START( itgamble )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( mnumber, itgamble )
+MACHINE_CONFIG_DERIVED(itgamble_state::mnumber, itgamble)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_CLOCK(MNUMBER_MAIN_CLOCK/2)    /* probably the wrong CPU */
 

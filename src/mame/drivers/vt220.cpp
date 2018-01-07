@@ -33,6 +33,7 @@ public:
 	uint32_t screen_update_vt220(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<ram_device> m_ram;
+	void vt220(machine_config &config);
 };
 
 
@@ -66,7 +67,7 @@ uint32_t vt220_state::screen_update_vt220(screen_device &screen, bitmap_ind16 &b
 }
 
 
-static MACHINE_CONFIG_START( vt220 )
+MACHINE_CONFIG_START(vt220_state::vt220)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8051, XTAL_11_0592MHz) // from schematic
 	MCFG_CPU_PROGRAM_MAP(vt220_mem)

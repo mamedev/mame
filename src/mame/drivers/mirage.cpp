@@ -92,6 +92,7 @@ public:
 	virtual void video_start() override;
 	uint32_t screen_update_mirage(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	DECO16IC_BANK_CB_MEMBER(bank_callback);
+	void mirage(machine_config &config);
 };
 
 void miragemj_state::video_start()
@@ -284,7 +285,7 @@ void miragemj_state::machine_reset()
 	m_mux_data = 0;
 }
 
-static MACHINE_CONFIG_START( mirage )
+MACHINE_CONFIG_START(miragemj_state::mirage)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 28000000/2)

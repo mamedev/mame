@@ -568,7 +568,7 @@ WRITE8_MEMBER( pc8401a_state::ppi_pc_w )
 
 /* Machine Drivers */
 
-static MACHINE_CONFIG_START( pc8401a )
+MACHINE_CONFIG_START(pc8401a_state::pc8401a)
 	/* basic machine hardware */
 	MCFG_CPU_ADD(Z80_TAG, Z80, 4000000) // NEC uPD70008C
 	MCFG_CPU_PROGRAM_MAP(pc8401a_mem)
@@ -610,7 +610,7 @@ static MACHINE_CONFIG_START( pc8401a )
 	MCFG_RAM_EXTRA_OPTIONS("96K")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( pc8500 )
+MACHINE_CONFIG_START(pc8500_state::pc8500)
 	/* basic machine hardware */
 	MCFG_CPU_ADD(Z80_TAG, Z80, 4000000) // NEC uPD70008C
 	MCFG_CPU_PROGRAM_MAP(pc8401a_mem)

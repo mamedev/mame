@@ -139,7 +139,7 @@ DEVICE_ADDRESS_MAP_START(target1_map, 32, vrc5074_device)
 	AM_RANGE(0x00000000, 0xFFFFFFFF) AM_READWRITE(target1_r, target1_w)
 ADDRESS_MAP_END
 
-MACHINE_CONFIG_MEMBER(vrc5074_device::device_add_mconfig)
+MACHINE_CONFIG_START(vrc5074_device::device_add_mconfig)
 	MCFG_DEVICE_ADD("uart", NS16550, SYSTEM_CLOCK / 12)
 	MCFG_INS8250_OUT_INT_CB(WRITELINE(vrc5074_device, uart_irq_callback))
 	MCFG_INS8250_OUT_TX_CB(DEVWRITELINE("ttys00", rs232_port_device, write_txd))

@@ -384,7 +384,7 @@ MACHINE_RESET_MEMBER(f1gp_state,f1gp)
 	m_scroll[1] = 0;
 }
 
-static MACHINE_CONFIG_START( f1gp )
+MACHINE_CONFIG_START(f1gp_state::f1gp)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",M68000,XTAL_20MHz/2) /* verified on pcb */
@@ -460,7 +460,7 @@ static MACHINE_CONFIG_START( f1gp )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( f1gpb )
+MACHINE_CONFIG_START(f1gp_state::f1gpb)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",M68000,10000000) /* 10 MHz ??? */
@@ -510,7 +510,7 @@ static MACHINE_CONFIG_START( f1gpb )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( f1gp2, f1gp )
+MACHINE_CONFIG_DERIVED(f1gp_state::f1gp2, f1gp)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")

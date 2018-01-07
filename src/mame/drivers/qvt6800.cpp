@@ -28,6 +28,8 @@ public:
 
 	MC6845_UPDATE_ROW(update_row);
 
+	void qvt190(machine_config &config);
+	void qvt102(machine_config &config);
 private:
 	required_device<cpu_device> m_maincpu;
 	required_region_ptr<u8> m_p_chargen;
@@ -61,7 +63,7 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START( qvt6800 )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( qvt102 )
+MACHINE_CONFIG_START(qvt6800_state::qvt102)
 	MCFG_CPU_ADD("maincpu", M6800, XTAL_16_6698MHz / 18)
 	MCFG_CPU_PROGRAM_MAP(qvt102_mem_map)
 
@@ -91,7 +93,7 @@ static MACHINE_CONFIG_START( qvt102 )
 	MCFG_CPU_ADD("kbdmcu", I8748, XTAL_6MHz)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( qvt190 )
+MACHINE_CONFIG_START(qvt6800_state::qvt190)
 	MCFG_CPU_ADD("maincpu", M6800, XTAL_16_6698MHz / 9)
 	MCFG_CPU_PROGRAM_MAP(qvt190_mem_map)
 

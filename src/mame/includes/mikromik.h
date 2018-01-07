@@ -126,12 +126,10 @@ public:
 	I8275_DRAW_CHARACTER_MEMBER( crtc_display_pixels );
 	UPD7220_DISPLAY_PIXELS_MEMBER( hgdc_display_pixels );
 	DECLARE_PALETTE_INIT( mm1 );
+	void mm1(machine_config &config);
+	void mm1m6(machine_config &config);
+	void mm1m6_video(machine_config &config);
+	void mm1m7(machine_config &config);
 };
-
-
-//----------- defined in video/mikromik.c -----------
-
-MACHINE_CONFIG_EXTERN( mm1m6_video );
-
 
 #endif

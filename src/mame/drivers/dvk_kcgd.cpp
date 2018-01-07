@@ -98,6 +98,7 @@ public:
 	emu_timer *m_vsync_off_timer;
 	emu_timer *m_500hz_timer;
 
+	void kcgd(machine_config &config);
 private:
 	void draw_scanline(uint16_t *p, uint16_t offset);
 	rectangle m_tmpclip;
@@ -343,7 +344,7 @@ static GFXDECODE_START( kcgd )
 	GFXDECODE_ENTRY("maincpu", 0112236, kcgd_charlayout, 0, 1)
 GFXDECODE_END
 
-static MACHINE_CONFIG_START( kcgd )
+MACHINE_CONFIG_START(kcgd_state::kcgd)
 	MCFG_CPU_ADD("maincpu", K1801VM2, XTAL_30_8MHz/4)
 	MCFG_CPU_PROGRAM_MAP(kcgd_mem)
 	MCFG_T11_INITIAL_MODE(0100000)

@@ -387,6 +387,36 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(mac_scsi_irq);
 	DECLARE_WRITE_LINE_MEMBER(mac_asc_irq);
 
+	void mac512ke(machine_config &config);
+	void macplus(machine_config &config);
+	void maclc(machine_config &config);
+	void macpb170(machine_config &config);
+	void macclasc(machine_config &config);
+	void maciisi(machine_config &config);
+	void maclc2(machine_config &config);
+	void macse(machine_config &config);
+	void maclc3(machine_config &config);
+	void macpd210(machine_config &config);
+	void maciici(machine_config &config);
+	void macprtb(machine_config &config);
+	void maciix(machine_config &config);
+	void maclc520(machine_config &config);
+	void pwrmac(machine_config &config);
+	void maciivx(machine_config &config);
+	void maccclas(machine_config &config);
+	void maciivi(machine_config &config);
+	void macpb160(machine_config &config);
+	void maciicx(machine_config &config);
+	void macqd700(machine_config &config);
+	void macse30(machine_config &config);
+	void macpb180(machine_config &config);
+	void macpb145(machine_config &config);
+	void macpb180c(machine_config &config);
+	void maciifx(machine_config &config);
+	void macpb140(machine_config &config);
+	void macclas2(machine_config &config);
+	void macii(machine_config &config);
+	void maciihmu(machine_config &config);
 private:
 	int has_adb();
 	void adb_reset();

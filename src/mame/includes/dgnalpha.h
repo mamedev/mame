@@ -66,6 +66,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( fdc_intrq_w );
 	DECLARE_WRITE_LINE_MEMBER( fdc_drq_w );
 
+	void dgnalpha(machine_config &config);
 protected:
 	/* driver overrides */
 	virtual void device_start(void) override;

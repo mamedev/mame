@@ -256,7 +256,7 @@ void ksayakyu_state::machine_reset()
 	m_flipscreen = 0;
 }
 
-static MACHINE_CONFIG_START( ksayakyu )
+MACHINE_CONFIG_START(ksayakyu_state::ksayakyu)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80,MAIN_CLOCK/8) //divider is guessed

@@ -253,6 +253,16 @@ public:
 	void vbowl_gfx_decrypt();
 	void drgnwrld_gfx_decrypt();
 	void prot_mem_range_set();
+	void igs011_base(machine_config &config);
+	void drgnwrld(machine_config &config);
+	void nkishusp(machine_config &config);
+	void wlcc(machine_config &config);
+	void vbowl(machine_config &config);
+	void vbowlhk(machine_config &config);
+	void xymg(machine_config &config);
+	void lhb2(machine_config &config);
+	void lhb(machine_config &config);
+	void drgnwrld_igs012(machine_config &config);
 };
 
 
@@ -4138,7 +4148,7 @@ static GFXDECODE_START( igs011_hi )
 GFXDECODE_END
 #endif
 
-static MACHINE_CONFIG_START( igs011_base )
+MACHINE_CONFIG_START(igs011_state::igs011_base)
 	MCFG_CPU_ADD("maincpu",M68000, XTAL_22MHz/3)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
@@ -4168,7 +4178,7 @@ TIMER_DEVICE_CALLBACK_MEMBER( igs011_state::lev5_timer_irq_cb )
 	m_maincpu->set_input_line(5, HOLD_LINE);
 }
 
-static MACHINE_CONFIG_DERIVED( drgnwrld, igs011_base )
+MACHINE_CONFIG_DERIVED(igs011_state::drgnwrld, igs011_base)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(drgnwrld)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", igs011_state, irq6_line_hold)
@@ -4178,7 +4188,7 @@ static MACHINE_CONFIG_DERIVED( drgnwrld, igs011_base )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 2.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( drgnwrld_igs012, drgnwrld )
+MACHINE_CONFIG_DERIVED(igs011_state::drgnwrld_igs012, drgnwrld)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(drgnwrld_igs012)
 MACHINE_CONFIG_END
@@ -4201,7 +4211,7 @@ TIMER_DEVICE_CALLBACK_MEMBER( igs011_state::lhb_timer_irq_cb )
 	m_maincpu->set_input_line(5, HOLD_LINE);
 }
 
-static MACHINE_CONFIG_DERIVED( lhb, igs011_base )
+MACHINE_CONFIG_DERIVED(igs011_state::lhb, igs011_base)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(lhb)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", igs011_state, lhb_vblank_irq)
@@ -4217,7 +4227,7 @@ TIMER_DEVICE_CALLBACK_MEMBER( igs011_state::lev3_timer_irq_cb )
 }
 
 
-static MACHINE_CONFIG_DERIVED( wlcc, igs011_base )
+MACHINE_CONFIG_DERIVED(igs011_state::wlcc, igs011_base)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(wlcc)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", igs011_state, irq6_line_hold)
@@ -4226,7 +4236,7 @@ MACHINE_CONFIG_END
 
 
 
-static MACHINE_CONFIG_DERIVED( xymg, igs011_base )
+MACHINE_CONFIG_DERIVED(igs011_state::xymg, igs011_base)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(xymg)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", igs011_state, irq6_line_hold)
@@ -4235,7 +4245,7 @@ MACHINE_CONFIG_END
 
 
 
-static MACHINE_CONFIG_DERIVED( lhb2, igs011_base )
+MACHINE_CONFIG_DERIVED(igs011_state::lhb2, igs011_base)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(lhb2)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", igs011_state, irq6_line_hold)
@@ -4249,7 +4259,7 @@ MACHINE_CONFIG_END
 
 
 
-static MACHINE_CONFIG_DERIVED( nkishusp, igs011_base )
+MACHINE_CONFIG_DERIVED(igs011_state::nkishusp, igs011_base)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(nkishusp)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", igs011_state, irq6_line_hold)
@@ -4270,7 +4280,7 @@ WRITE_LINE_MEMBER(igs011_state::sound_irq)
 //   m_maincpu->set_input_line(3, state);
 }
 
-static MACHINE_CONFIG_DERIVED( vbowl, igs011_base )
+MACHINE_CONFIG_DERIVED(igs011_state::vbowl, igs011_base)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(vbowl)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", igs011_state, irq6_line_hold)
@@ -4288,7 +4298,7 @@ static MACHINE_CONFIG_DERIVED( vbowl, igs011_base )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 5.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( vbowlhk, vbowl )
+MACHINE_CONFIG_DERIVED(igs011_state::vbowlhk, vbowl)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(vbowlhk)
 MACHINE_CONFIG_END

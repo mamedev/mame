@@ -238,7 +238,7 @@ static SLOT_INTERFACE_START( mbc55x_floppies )
 SLOT_INTERFACE_END
 
 
-static MACHINE_CONFIG_START( mbc55x )
+MACHINE_CONFIG_START(mbc55x_state::mbc55x)
 	/* basic machine hardware */
 	MCFG_CPU_ADD(MAINCPU_TAG, I8088, 3600000)
 	MCFG_CPU_PROGRAM_MAP(mbc55x_mem)

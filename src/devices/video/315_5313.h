@@ -41,13 +41,13 @@
 
 // Temporary solution while 32x VDP mixing and scanline interrupting is moved outside MD VDP
 #define MCFG_SEGA315_5313_32X_SCANLINE_CB(_class, _method) \
-	sega315_5313_device::set_md_32x_scanline(*device, sega315_5313_device::md_32x_scanline_delegate(&_class::_method, #_class "::" #_method, downcast<_class *>(owner)));
+	sega315_5313_device::set_md_32x_scanline(*device, sega315_5313_device::md_32x_scanline_delegate(&_class::_method, #_class "::" #_method, this));
 
 #define MCFG_SEGA315_5313_32X_INTERRUPT_CB(_class, _method) \
-	sega315_5313_device::set_md_32x_interrupt(*device, sega315_5313_device::md_32x_interrupt_delegate(&_class::_method, #_class "::" #_method, downcast<_class *>(owner)));
+	sega315_5313_device::set_md_32x_interrupt(*device, sega315_5313_device::md_32x_interrupt_delegate(&_class::_method, #_class "::" #_method, this));
 
 #define MCFG_SEGA315_5313_32X_SCANLINE_HELPER_CB(_class, _method) \
-	sega315_5313_device::set_md_32x_scanline_helper(*device, sega315_5313_device::md_32x_scanline_helper_delegate(&_class::_method, #_class "::" #_method, downcast<_class *>(owner)));
+	sega315_5313_device::set_md_32x_scanline_helper(*device, sega315_5313_device::md_32x_scanline_helper_delegate(&_class::_method, #_class "::" #_method, this));
 
 
 class sega315_5313_device : public sega315_5124_device

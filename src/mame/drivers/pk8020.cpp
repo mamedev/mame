@@ -175,7 +175,7 @@ SLOT_INTERFACE_END
 
 
 /* Machine driver */
-static MACHINE_CONFIG_START( pk8020 )
+MACHINE_CONFIG_START(pk8020_state::pk8020)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8080, XTAL_20MHz / 8)
 	MCFG_CPU_PROGRAM_MAP(pk8020_mem)

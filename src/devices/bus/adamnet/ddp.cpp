@@ -81,7 +81,7 @@ static const struct CassetteOptions adam_cassette_options =
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( adam_digital_data_pack_device::device_add_mconfig )
+MACHINE_CONFIG_START(adam_digital_data_pack_device::device_add_mconfig)
 	MCFG_CPU_ADD(M6801_TAG, M6801, XTAL_4MHz)
 	MCFG_CPU_PROGRAM_MAP(adam_ddp_mem)
 	MCFG_CPU_IO_MAP(adam_ddp_io)

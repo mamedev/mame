@@ -42,6 +42,7 @@ public:
 	I8275_DRAW_CHARACTER_MEMBER(display_pixels);
 
 	required_device<speaker_sound_device> m_speaker;
+	void apogee(machine_config &config);
 };
 
 
@@ -212,7 +213,7 @@ GFXDECODE_END
 
 
 /* Machine driver */
-static MACHINE_CONFIG_START( apogee )
+MACHINE_CONFIG_START(apogee_state::apogee)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8080, XTAL_16MHz / 9)
 	MCFG_CPU_PROGRAM_MAP(apogee_mem)

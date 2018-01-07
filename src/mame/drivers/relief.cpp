@@ -267,7 +267,7 @@ GFXDECODE_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( relief )
+MACHINE_CONFIG_START(relief_state::relief)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, ATARI_CLOCK_14MHz/2)

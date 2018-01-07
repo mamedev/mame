@@ -54,6 +54,7 @@ public:
 	DECLARE_PALETTE_INIT(ibm3153);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
+	void ibm3153(machine_config &config);
 private:
 	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
@@ -93,7 +94,7 @@ void ibm3153_state::machine_reset()
 {
 }
 
-static MACHINE_CONFIG_START( ibm3153 )
+MACHINE_CONFIG_START(ibm3153_state::ibm3153)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I80C32, XTAL_16MHz) // no idea of clock
 	MCFG_CPU_PROGRAM_MAP(mem_map)

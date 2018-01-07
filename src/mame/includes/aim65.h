@@ -69,6 +69,7 @@ public:
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(z14_load) { return load_cart(image, m_z14, "z14"); }
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(z15_load) { return load_cart(image, m_z15, "z15"); }
 
+	void aim65(machine_config &config);
 protected:
 	virtual void machine_start() override;
 

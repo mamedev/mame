@@ -188,7 +188,7 @@ void hcastle_state::machine_reset()
 	m_old_pf2 = -1;
 }
 
-static MACHINE_CONFIG_START( hcastle )
+MACHINE_CONFIG_START(hcastle_state::hcastle)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", KONAMI, 3000000)    /* Derived from 24 MHz clock */

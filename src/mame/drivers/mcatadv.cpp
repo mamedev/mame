@@ -428,7 +428,7 @@ void mcatadv_state::machine_start()
 	save_item(NAME(m_palette_bank2));
 }
 
-static MACHINE_CONFIG_START( mcatadv )
+MACHINE_CONFIG_START(mcatadv_state::mcatadv)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz) /* verified on pcb */
@@ -472,7 +472,7 @@ static MACHINE_CONFIG_START( mcatadv )
 	MCFG_SOUND_ROUTE(2, "rspeaker", 0.5)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( nost, mcatadv )
+MACHINE_CONFIG_DERIVED(mcatadv_state::nost, mcatadv)
 
 	MCFG_CPU_MODIFY("soundcpu")
 	MCFG_CPU_PROGRAM_MAP(nost_sound_map)

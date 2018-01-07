@@ -1319,7 +1319,7 @@ WRITE_LINE_MEMBER(segas18_state::ym3438_irq_handler)
 }
 
 
-static MACHINE_CONFIG_START( system18 )
+MACHINE_CONFIG_START(segas18_state::system18)
 
 	// basic machine hardware
 	MCFG_CPU_ADD("maincpu", M68000, 10000000)
@@ -1389,7 +1389,7 @@ static MACHINE_CONFIG_START( system18 )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( system18_fd1094, system18 )
+MACHINE_CONFIG_DERIVED(segas18_state::system18_fd1094, system18)
 
 	// basic machine hardware
 	MCFG_CPU_REPLACE("maincpu", FD1094, 10000000)
@@ -1398,21 +1398,21 @@ static MACHINE_CONFIG_DERIVED( system18_fd1094, system18 )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", segas18_state, irq4_line_hold)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( lghost_fd1094, system18_fd1094 )
+MACHINE_CONFIG_DERIVED(segas18_state::lghost_fd1094, system18_fd1094)
 
 	// basic machine hardware
 	MCFG_DEVICE_MODIFY("io")
 	MCFG_315_5296_OUT_PORTC_CB(WRITE8(segas18_state, lghost_gun_recoil_w))
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( lghost, system18 )
+MACHINE_CONFIG_DERIVED(segas18_state::lghost, system18)
 
 	// basic machine hardware
 	MCFG_DEVICE_MODIFY("io")
 	MCFG_315_5296_OUT_PORTC_CB(WRITE8(segas18_state, lghost_gun_recoil_w))
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( wwally_fd1094, system18_fd1094 )
+MACHINE_CONFIG_DERIVED(segas18_state::wwally_fd1094, system18_fd1094)
 	MCFG_DEVICE_ADD("upd1", UPD4701A, 0)
 	MCFG_UPD4701_PORTX("TRACKX1")
 	MCFG_UPD4701_PORTY("TRACKY1")
@@ -1426,7 +1426,7 @@ static MACHINE_CONFIG_DERIVED( wwally_fd1094, system18_fd1094 )
 	MCFG_UPD4701_PORTY("TRACKY3")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( wwally, system18 )
+MACHINE_CONFIG_DERIVED(segas18_state::wwally, system18)
 	MCFG_DEVICE_ADD("upd1", UPD4701A, 0)
 	MCFG_UPD4701_PORTX("TRACKX1")
 	MCFG_UPD4701_PORTY("TRACKY1")
@@ -1440,7 +1440,7 @@ static MACHINE_CONFIG_DERIVED( wwally, system18 )
 	MCFG_UPD4701_PORTY("TRACKY3")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( system18_i8751, system18 )
+MACHINE_CONFIG_DERIVED(segas18_state::system18_i8751, system18)
 
 	// basic machine hardware
 	MCFG_CPU_MODIFY("maincpu")
@@ -1451,7 +1451,7 @@ static MACHINE_CONFIG_DERIVED( system18_i8751, system18 )
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", segas18_state, irq0_line_hold)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( system18_fd1094_i8751, system18_fd1094 )
+MACHINE_CONFIG_DERIVED(segas18_state::system18_fd1094_i8751, system18_fd1094)
 
 	// basic machine hardware
 	MCFG_CPU_MODIFY("maincpu")

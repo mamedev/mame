@@ -58,6 +58,7 @@ public:
 	K052109_CB_MEMBER(tile_callback);
 	DECLARE_WRITE8_MEMBER(banking_callback);
 
+	void parodius(machine_config &config);
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };

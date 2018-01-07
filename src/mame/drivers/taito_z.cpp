@@ -2946,7 +2946,7 @@ MACHINE_RESET_MEMBER(taitoz_state,taitoz)
 
 /* Contcirc vis area seems narrower than the other games... */
 
-static MACHINE_CONFIG_START( contcirc )
+MACHINE_CONFIG_START(taitoz_state::contcirc)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 12000000)   /* 12 MHz ??? */
@@ -3025,7 +3025,7 @@ static MACHINE_CONFIG_START( contcirc )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( chasehq )
+MACHINE_CONFIG_START(taitoz_state::chasehq)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 12000000)   /* 12 MHz ??? */
@@ -3104,7 +3104,7 @@ static MACHINE_CONFIG_START( chasehq )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( enforce )
+MACHINE_CONFIG_START(taitoz_state::enforce)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 12000000)   /* 12 MHz ??? */
@@ -3184,7 +3184,7 @@ static MACHINE_CONFIG_START( enforce )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( bshark )
+MACHINE_CONFIG_START(taitoz_state::bshark)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 12000000)   /* 12 MHz ??? */
@@ -3253,7 +3253,7 @@ static MACHINE_CONFIG_START( bshark )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( bsharkjjs, bshark )
+MACHINE_CONFIG_DERIVED(taitoz_state::bsharkjjs, bshark)
 
 	/* basic machine hardware */
 
@@ -3263,7 +3263,7 @@ static MACHINE_CONFIG_DERIVED( bsharkjjs, bshark )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( sci )
+MACHINE_CONFIG_START(taitoz_state::sci)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 12000000)   /* 12 MHz ??? */
@@ -3340,7 +3340,7 @@ static MACHINE_CONFIG_START( sci )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( nightstr )
+MACHINE_CONFIG_START(taitoz_state::nightstr)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 12000000)   /* 12 MHz ??? */
@@ -3421,7 +3421,7 @@ static MACHINE_CONFIG_START( nightstr )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( aquajack )
+MACHINE_CONFIG_START(taitoz_state::aquajack)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 12000000)   /* 12 MHz ??? */
@@ -3501,7 +3501,7 @@ static MACHINE_CONFIG_START( aquajack )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( spacegun )
+MACHINE_CONFIG_START(taitoz_state::spacegun)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 16000000)   /* 16 MHz ??? */
@@ -3573,7 +3573,7 @@ static MACHINE_CONFIG_START( spacegun )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( dblaxle )
+MACHINE_CONFIG_START(taitoz_state::dblaxle)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_32MHz/2)
@@ -3651,7 +3651,7 @@ static MACHINE_CONFIG_START( dblaxle )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( racingb )
+MACHINE_CONFIG_START(taitoz_state::racingb)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_32MHz/2)

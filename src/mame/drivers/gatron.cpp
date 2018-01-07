@@ -563,7 +563,7 @@ GFXDECODE_END
 *    Machine Drivers     *
 *************************/
 
-static MACHINE_CONFIG_START( gat )
+MACHINE_CONFIG_START(gatron_state::gat)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK/24)   /* 666.66 kHz, guess */

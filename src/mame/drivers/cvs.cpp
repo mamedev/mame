@@ -957,7 +957,7 @@ MACHINE_RESET_MEMBER(cvs_state,cvs)
 }
 
 
-static MACHINE_CONFIG_START( cvs )
+MACHINE_CONFIG_START(cvs_state::cvs)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", S2650, XTAL_14_31818MHz/16)

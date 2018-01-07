@@ -397,7 +397,7 @@ const tiny_rom_entry *midway_ssio_device::device_rom_region() const
 // device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( midway_ssio_device::device_add_mconfig )
+MACHINE_CONFIG_START(midway_ssio_device::device_add_mconfig)
 	MCFG_CPU_ADD("cpu", Z80, SSIO_CLOCK/2/4)
 	MCFG_CPU_PROGRAM_MAP(ssio_map)
 	MCFG_DEVICE_PERIODIC_INT_DEVICE(DEVICE_SELF, midway_ssio_device, clock_14024, SSIO_CLOCK/2/16/10)
@@ -574,7 +574,7 @@ ADDRESS_MAP_END
 // device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER(midway_sounds_good_device::device_add_mconfig)
+MACHINE_CONFIG_START(midway_sounds_good_device::device_add_mconfig)
 	MCFG_CPU_ADD("cpu", M68000, SOUNDSGOOD_CLOCK/2)
 	MCFG_CPU_PROGRAM_MAP(soundsgood_map)
 
@@ -728,7 +728,7 @@ ADDRESS_MAP_END
 // device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER(midway_turbo_cheap_squeak_device::device_add_mconfig)
+MACHINE_CONFIG_START(midway_turbo_cheap_squeak_device::device_add_mconfig)
 	MCFG_CPU_ADD("cpu", MC6809E, TURBOCS_CLOCK / 4)
 	MCFG_CPU_PROGRAM_MAP(turbocs_map)
 
@@ -930,7 +930,7 @@ ADDRESS_MAP_END
 // device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER(midway_squawk_n_talk_device::device_add_mconfig)
+MACHINE_CONFIG_START(midway_squawk_n_talk_device::device_add_mconfig)
 	MCFG_CPU_ADD("cpu", M6802, SQUAWKTALK_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(squawkntalk_map)
 

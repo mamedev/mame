@@ -37,6 +37,7 @@ public:
 
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
+	void tv912(machine_config &config);
 private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -92,7 +93,7 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( tv912c )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( tv912 )
+MACHINE_CONFIG_START(tv912_state::tv912)
 	MCFG_CPU_ADD("maincpu", I8035, XTAL_23_814MHz / 4)
 	MCFG_CPU_PROGRAM_MAP(prog_map)
 	MCFG_CPU_IO_MAP(io_map)

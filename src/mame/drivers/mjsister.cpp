@@ -91,6 +91,7 @@ public:
 	void plot0( int offset, uint8_t data );
 	void plot1( int offset, uint8_t data );
 
+	void mjsister(machine_config &config);
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
@@ -484,7 +485,7 @@ INTERRUPT_GEN_MEMBER(mjsister_state::interrupt)
 		m_maincpu->set_input_line(0, ASSERT_LINE);
 }
 
-static MACHINE_CONFIG_START( mjsister )
+MACHINE_CONFIG_START(mjsister_state::mjsister)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, MCLK/2) /* 6.000 MHz */

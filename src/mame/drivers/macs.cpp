@@ -98,6 +98,7 @@ public:
 	optional_device<generic_slot_device> m_cart1;
 	optional_device<generic_slot_device> m_cart2;
 
+	void macs(machine_config &config);
 };
 
 
@@ -486,7 +487,7 @@ ST0016_DMA_OFFS_CB(macs_state::dma_offset)
 	return m_cart_bank;
 }
 
-static MACHINE_CONFIG_START( macs )
+MACHINE_CONFIG_START(macs_state::macs)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",ST0016_CPU,8000000) /* 8 MHz ? */
 	MCFG_CPU_PROGRAM_MAP(macs_mem)

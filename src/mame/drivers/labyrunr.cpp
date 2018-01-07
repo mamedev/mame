@@ -163,7 +163,7 @@ void labyrunr_state::machine_start()
 	membank("bank1")->configure_entries(0, 6, &ROM[0x10000], 0x4000);
 }
 
-static MACHINE_CONFIG_START( labyrunr )
+MACHINE_CONFIG_START(labyrunr_state::labyrunr)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", HD6309, 3000000*4)      /* 24MHz/8? */

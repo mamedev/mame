@@ -233,6 +233,9 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank_buggyboy);
 	INTERRUPT_GEN_MEMBER(z80_irq);
 	TIMER_CALLBACK_MEMBER(interrupt_callback);
+	void tx1(machine_config &config);
+	void buggyboy(machine_config &config);
+	void buggybjr(machine_config &config);
 };
 
 /*----------- defined in audio/tx1.c -----------*/

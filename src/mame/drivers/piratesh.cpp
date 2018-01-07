@@ -103,6 +103,7 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(piratesh_interrupt);
 	K056832_CB_MEMBER(piratesh_tile_callback);
 	K055673_CB_MEMBER(piratesh_sprite_callback);
+	void piratesh(machine_config &config);
 };
 
 
@@ -580,7 +581,7 @@ MACHINE_RESET_MEMBER(piratesh_state,piratesh)
 
 }
 
-static MACHINE_CONFIG_START( piratesh )
+MACHINE_CONFIG_START(piratesh_state::piratesh)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_32MHz/2)

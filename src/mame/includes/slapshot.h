@@ -91,6 +91,8 @@ public:
 
 	INTERRUPT_GEN_MEMBER(interrupt);
 
+	void opwolf3(machine_config &config);
+	void slapshot(machine_config &config);
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };

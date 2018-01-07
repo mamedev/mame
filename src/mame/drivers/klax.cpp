@@ -191,7 +191,7 @@ GFXDECODE_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( klax )
+MACHINE_CONFIG_START(klax_state::klax)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, ATARI_CLOCK_14MHz/2)
@@ -236,7 +236,7 @@ static ADDRESS_MAP_START( bootleg_sound_map, AS_PROGRAM, 8, klax_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 ADDRESS_MAP_END
 
-static MACHINE_CONFIG_DERIVED( klax2bl, klax )
+MACHINE_CONFIG_DERIVED(klax_state::klax2bl, klax)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(klax2bl_map)
 

@@ -84,6 +84,7 @@ public:
 	uint32_t screen_update_yumefuda(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
+	void yumefuda(machine_config &config);
 };
 
 TILE_GET_INFO_MEMBER(albazg_state::y_get_bg_tile_info)
@@ -346,7 +347,7 @@ void albazg_state::machine_reset()
 	m_prot_lock = 0;
 }
 
-static MACHINE_CONFIG_START( yumefuda )
+MACHINE_CONFIG_START(albazg_state::yumefuda)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80 , MASTER_CLOCK/2) /* xtal is 12 Mhz, unknown divider*/

@@ -313,7 +313,7 @@ void capbowl_state::machine_reset()
 }
 
 
-static MACHINE_CONFIG_START( capbowl )
+MACHINE_CONFIG_START(capbowl_state::capbowl)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", MC6809E, MASTER_CLOCK / 4) // MC68B09EP
@@ -363,7 +363,7 @@ static MACHINE_CONFIG_START( capbowl )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( bowlrama, capbowl )
+MACHINE_CONFIG_DERIVED(capbowl_state::bowlrama, capbowl)
 
 	/* basic machine hardware */
 

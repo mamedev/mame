@@ -775,7 +775,7 @@ void psikyosh_state::machine_start()
 }
 
 
-static MACHINE_CONFIG_START( psikyo3v1 )
+MACHINE_CONFIG_START(psikyosh_state::psikyo3v1)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", SH2, MASTER_CLOCK/2)
@@ -810,7 +810,7 @@ static MACHINE_CONFIG_START( psikyo3v1 )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( psikyo5, psikyo3v1 )
+MACHINE_CONFIG_DERIVED(psikyosh_state::psikyo5, psikyo3v1)
 
 	/* basic machine hardware */
 
@@ -818,7 +818,7 @@ static MACHINE_CONFIG_DERIVED( psikyo5, psikyo3v1 )
 	MCFG_CPU_PROGRAM_MAP(ps5_map)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( psikyo5_240, psikyo3v1 )
+MACHINE_CONFIG_DERIVED(psikyosh_state::psikyo5_240, psikyo3v1)
 
 	/* basic machine hardware */
 

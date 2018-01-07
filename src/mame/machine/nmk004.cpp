@@ -109,7 +109,7 @@ void nmk004_device::device_start()
 //-------------------------------------------------
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
-MACHINE_CONFIG_MEMBER( nmk004_device::device_add_mconfig )
+MACHINE_CONFIG_START(nmk004_device::device_add_mconfig)
 	MCFG_CPU_ADD("mcu",TMP90840, DERIVED_CLOCK(1,1)) // Toshiba TMP90C840AF in QFP64 package with 8Kbyte internal ROM
 	MCFG_CPU_PROGRAM_MAP(nmk004_sound_mem_map)
 	MCFG_TLCS90_PORT_P4_WRITE_CB(WRITE8(nmk004_device, nmk004_port4_w))

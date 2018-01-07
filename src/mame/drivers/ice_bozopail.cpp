@@ -33,6 +33,7 @@ public:
 	virtual void machine_reset() override;
 
 	required_device<cpu_device> m_maincpu;
+	void ice_bozo(machine_config &config);
 };
 
 static ADDRESS_MAP_START( ice_bozo_map, AS_PROGRAM, 8, ice_bozopail_state )
@@ -53,7 +54,7 @@ void ice_bozopail_state::machine_reset()
 }
 
 
-static MACHINE_CONFIG_START( ice_bozo )
+MACHINE_CONFIG_START(ice_bozopail_state::ice_bozo)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", MC68HC11, 8000000) // unknown clock

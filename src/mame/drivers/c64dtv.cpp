@@ -31,6 +31,7 @@ public:
 		bitmap.fill(rgb_t::black(), cliprect);
 		return 0;
 	}
+	void c64dtv(machine_config &config);
 };
 
 
@@ -48,7 +49,7 @@ INPUT_PORTS_END
 //  MACHINE DRIVERS
 //**************************************************************************
 
-static MACHINE_CONFIG_START( c64dtv )
+MACHINE_CONFIG_START(c64dtv_state::c64dtv)
 	// video hardware
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_UPDATE_DRIVER(c64dtv_state, screen_update)

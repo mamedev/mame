@@ -1277,7 +1277,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( balsente )
+MACHINE_CONFIG_START(balsente_state::balsente)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", MC6809E, XTAL_20MHz/16) /* xtal verified but not speed */
@@ -1362,7 +1362,7 @@ static MACHINE_CONFIG_START( balsente )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( shrike, balsente )
+MACHINE_CONFIG_DERIVED(balsente_state::shrike, balsente)
 
 	/* basic machine hardware */
 

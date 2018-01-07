@@ -191,7 +191,7 @@ static SLOT_INTERFACE_START( kaypro_floppies )
 SLOT_INTERFACE_END
 
 
-static MACHINE_CONFIG_START( kayproii )
+MACHINE_CONFIG_START(kaypro_state::kayproii)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_20MHz / 8)
 	MCFG_CPU_PROGRAM_MAP(kaypro_map)
@@ -269,7 +269,7 @@ static MACHINE_CONFIG_START( kayproii )
 	MCFG_SOFTWARE_LIST_ADD("flop_list","kayproii")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( kayproiv, kayproii )
+MACHINE_CONFIG_DERIVED(kaypro_state::kayproiv, kayproii)
 	MCFG_DEVICE_REMOVE("z80pio_s")
 	MCFG_DEVICE_ADD("z80pio_s", Z80PIO, 2500000)
 	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
@@ -282,7 +282,7 @@ static MACHINE_CONFIG_DERIVED( kayproiv, kayproii )
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", kaypro_floppies, "525dd", floppy_image_device::default_floppy_formats)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( kaypro484 )
+MACHINE_CONFIG_START(kaypro_state::kaypro484)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_16MHz / 4)
 	MCFG_CPU_PROGRAM_MAP(kaypro_map)
@@ -367,16 +367,16 @@ static MACHINE_CONFIG_START( kaypro484 )
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( kaypro10, kaypro484 )
+MACHINE_CONFIG_DERIVED(kaypro_state::kaypro10, kaypro484)
 	MCFG_DEVICE_REMOVE("fdc:1")  // only has 1 floppy drive
 	// need to add hard drive & controller
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( kaypronew2, kaypro484 )
+MACHINE_CONFIG_DERIVED(kaypro_state::kaypronew2, kaypro484)
 	MCFG_DEVICE_REMOVE("fdc:1")  // only has 1 floppy drive
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( kaypro284, kaypro484 )
+MACHINE_CONFIG_DERIVED(kaypro_state::kaypro284, kaypro484)
 	MCFG_DEVICE_REMOVE("fdc:0")
 	MCFG_DEVICE_REMOVE("fdc:1")
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", kaypro_floppies, "525ssdd", floppy_image_device::default_floppy_formats)
@@ -385,7 +385,7 @@ static MACHINE_CONFIG_DERIVED( kaypro284, kaypro484 )
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( omni2, kayproiv )
+MACHINE_CONFIG_DERIVED(kaypro_state::omni2, kayproiv)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(kaypro_state, screen_update_omni2)
 MACHINE_CONFIG_END

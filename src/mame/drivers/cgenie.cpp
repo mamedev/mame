@@ -72,6 +72,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(rs232_rx_w);
 	DECLARE_WRITE_LINE_MEMBER(rs232_dcd_w);
 
+	void cgenie(machine_config &config);
 protected:
 	virtual void machine_start() override;
 
@@ -433,7 +434,7 @@ const rgb_t cgenie_state::m_palette_nz[] =
 //  MACHINE DEFINTIONS
 //**************************************************************************
 
-static MACHINE_CONFIG_START( cgenie )
+MACHINE_CONFIG_START(cgenie_state::cgenie)
 	// basic machine hardware
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_17_73447MHz / 8)  // 2.2168 MHz
 	MCFG_CPU_PROGRAM_MAP(cgenie_mem)

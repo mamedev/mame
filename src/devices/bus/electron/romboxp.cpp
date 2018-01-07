@@ -75,7 +75,7 @@ ioport_constructor electron_romboxp_device::device_input_ports() const
 	return INPUT_PORTS_NAME( romboxp );
 }
 
-MACHINE_CONFIG_MEMBER( electron_romboxp_device::device_add_mconfig )
+MACHINE_CONFIG_START(electron_romboxp_device::device_add_mconfig)
 	/* printer */
 	MCFG_CENTRONICS_ADD("centronics", centronics_devices, "printer")
 	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(electron_romboxp_device, busy_w))

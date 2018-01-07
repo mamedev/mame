@@ -62,6 +62,7 @@ public:
 	virtual void video_start() override;
 	virtual void machine_reset() override;
 	virtual void machine_start() override;
+	void cswat(machine_config &config);
 };
 
 
@@ -253,7 +254,7 @@ void cswat_state::machine_start()
 	save_item(NAME(m_nmi_enabled));
 }
 
-static MACHINE_CONFIG_START( cswat )
+MACHINE_CONFIG_START(cswat_state::cswat)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", MC6809E, XTAL_18_432MHz/3/4) // HD68A09EP, 1.5MHz?

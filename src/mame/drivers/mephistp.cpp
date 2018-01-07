@@ -41,6 +41,7 @@ public:
 	DECLARE_READ8_MEMBER(ay8910_inputs_r);
 	DECLARE_WRITE8_MEMBER(sound_rombank_w);
 
+	void mephisto(machine_config &config);
 private:
 	u8 m_ay8910_data;
 	bool m_ay8910_bdir;
@@ -154,7 +155,7 @@ void mephisto_pinball_state::machine_reset()
 {
 }
 
-static MACHINE_CONFIG_START( mephisto )
+MACHINE_CONFIG_START(mephisto_pinball_state::mephisto)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8088, XTAL_18MHz/3)
 	MCFG_CPU_PROGRAM_MAP(mephisto_map)

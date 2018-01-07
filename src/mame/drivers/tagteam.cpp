@@ -207,7 +207,7 @@ INTERRUPT_GEN_MEMBER(tagteam_state::sound_timer_irq)
 }
 
 
-static MACHINE_CONFIG_START( tagteam )
+MACHINE_CONFIG_START(tagteam_state::tagteam)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, XTAL_12MHz/8)

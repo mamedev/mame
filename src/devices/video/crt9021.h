@@ -39,7 +39,7 @@
 
 
 #define MCFG_CRT9021_DRAW_CHARACTER_CALLBACK_OWNER(_class, _method) \
-	crt9021_device::static_set_display_callback(*device, crt9021_device::draw_character_delegate(&_class::_method, #_class "::" #_method, downcast<_class *>(owner)));
+	crt9021_device::static_set_display_callback(*device, crt9021_device::draw_character_delegate(&_class::_method, #_class "::" #_method, this));
 
 
 //**************************************************************************

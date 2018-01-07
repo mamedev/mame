@@ -84,4 +84,8 @@ public:
 
 	DECLARE_READ16_MEMBER( sh96_protection_region_0_146_r );
 	DECLARE_WRITE16_MEMBER( sh96_protection_region_0_146_w );
+	void mlc(machine_config &config);
+	void mlc_6bpp(machine_config &config);
+	void avengrgs(machine_config &config);
+	void mlc_5bpp(machine_config &config);
 };

@@ -48,6 +48,7 @@ public:
 	DECLARE_READ8_MEMBER(input_r);
 	DECLARE_WRITE8_MEMBER(input_select_w);
 
+	void bbcbc(machine_config &config);
 private:
 	uint8_t m_input_select;
 	virtual void machine_start() override;
@@ -105,7 +106,7 @@ static const z80_daisy_config bbcbc_daisy_chain[] =
 };
 
 
-static MACHINE_CONFIG_START( bbcbc )
+MACHINE_CONFIG_START(bbcbc_state::bbcbc)
 	MCFG_CPU_ADD( "maincpu", Z80, MAIN_CLOCK / 8 )
 	MCFG_CPU_PROGRAM_MAP(mem_map)
 	MCFG_CPU_IO_MAP(io_map)

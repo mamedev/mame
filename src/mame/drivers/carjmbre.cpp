@@ -82,6 +82,7 @@ public:
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TILE_GET_INFO_MEMBER(get_tile_info);
 
+	void carjmbre(machine_config &config);
 protected:
 	virtual void machine_start() override;
 	virtual void video_start() override;
@@ -345,7 +346,7 @@ static GFXDECODE_START( carjmbre )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( carjmbre )
+MACHINE_CONFIG_START(carjmbre_state::carjmbre)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_18_432MHz/6)

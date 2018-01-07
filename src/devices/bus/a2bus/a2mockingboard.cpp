@@ -38,7 +38,7 @@ DEFINE_DEVICE_TYPE(A2BUS_ECHOPLUS,     a2bus_echoplus_device,     "a2echop",  "S
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( a2bus_ayboard_device::device_add_mconfig )
+MACHINE_CONFIG_START(a2bus_ayboard_device::device_add_mconfig)
 	MCFG_DEVICE_ADD(VIA1_TAG, VIA6522, 1022727)
 	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(a2bus_ayboard_device, via1_out_a))
 	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(a2bus_ayboard_device, via1_out_b))
@@ -56,7 +56,7 @@ MACHINE_CONFIG_MEMBER( a2bus_ayboard_device::device_add_mconfig )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_MEMBER( a2bus_phasor_device::device_add_mconfig )
+MACHINE_CONFIG_START(a2bus_phasor_device::device_add_mconfig)
 	MCFG_DEVICE_ADD(VIA1_TAG, VIA6522, 1022727)
 	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(a2bus_ayboard_device, via1_out_a))
 	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(a2bus_ayboard_device, via1_out_b))
@@ -79,7 +79,7 @@ MACHINE_CONFIG_MEMBER( a2bus_phasor_device::device_add_mconfig )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker2", 1.0)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_MEMBER( a2bus_echoplus_device::device_add_mconfig )
+MACHINE_CONFIG_START(a2bus_echoplus_device::device_add_mconfig)
 	MCFG_DEVICE_ADD(VIA1_TAG, VIA6522, 1022727)
 	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(a2bus_ayboard_device, via1_out_a))
 	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(a2bus_ayboard_device, via1_out_b))

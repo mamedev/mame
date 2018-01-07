@@ -104,6 +104,7 @@ public:
 	DECLARE_WRITE8_MEMBER(rtc_w);
 	DECLARE_READ8_MEMBER(irq_callback);
 
+	void rc759(machine_config &config);
 protected:
 	// driver_device overrides
 	virtual void machine_start() override;
@@ -524,7 +525,7 @@ static SLOT_INTERFACE_START( rc759_floppies )
 	SLOT_INTERFACE("hd", FLOPPY_525_HD)
 SLOT_INTERFACE_END
 
-static MACHINE_CONFIG_START( rc759 )
+MACHINE_CONFIG_START(rc759_state::rc759)
 	MCFG_CPU_ADD("maincpu", I80186, 6000000)
 	MCFG_CPU_PROGRAM_MAP(rc759_map)
 	MCFG_CPU_IO_MAP(rc759_io)

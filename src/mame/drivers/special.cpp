@@ -358,7 +358,7 @@ static SLOT_INTERFACE_START( specimx_floppies )
 SLOT_INTERFACE_END
 
 /* Machine driver */
-static MACHINE_CONFIG_START( special )
+MACHINE_CONFIG_START(special_state::special)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8080, 2000000)
 	MCFG_CPU_PROGRAM_MAP(specialist_mem)
@@ -402,7 +402,7 @@ static MACHINE_CONFIG_START( special )
 	MCFG_SOFTWARE_LIST_ADD("cass_list","special_cass")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( specialp, special )
+MACHINE_CONFIG_DERIVED(special_state::specialp, special)
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(specialp_mem)
@@ -414,7 +414,7 @@ static MACHINE_CONFIG_DERIVED( specialp, special )
 	MCFG_VIDEO_START_OVERRIDE(special_state,specialp)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( specialm, special )
+MACHINE_CONFIG_DERIVED(special_state::specialm, special)
 	MCFG_DEVICE_REMOVE("ppi8255")
 	MCFG_DEVICE_ADD("ppi8255", I8255, 0)
 	MCFG_I8255_IN_PORTA_CB(READ8(special_state, specialist_8255_porta_r))
@@ -425,7 +425,7 @@ static MACHINE_CONFIG_DERIVED( specialm, special )
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(special_state, specialist_8255_portc_w))
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( specimx, special )
+MACHINE_CONFIG_DERIVED(special_state::specimx, special)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(specimx_mem)
 
@@ -475,7 +475,7 @@ static MACHINE_CONFIG_DERIVED( specimx, special )
 	MCFG_RAM_DEFAULT_VALUE(0x00)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( erik )
+MACHINE_CONFIG_START(special_state::erik)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 4000000)
 	MCFG_CPU_PROGRAM_MAP(erik_mem)

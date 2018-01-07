@@ -271,6 +271,10 @@ public:
 	DECLARE_WRITE8_MEMBER(pc6001_8255_portc_w);
 	DECLARE_READ8_MEMBER(pc6001_8255_portc_r);
 	IRQ_CALLBACK_MEMBER(pc6001_irq_callback);
+	void pc6001sr(machine_config &config);
+	void pc6001m2(machine_config &config);
+	void pc6601(machine_config &config);
+	void pc6001(machine_config &config);
 protected:
 	required_device<cpu_device> m_maincpu;
 	optional_device<cassette_image_device> m_cassette;
@@ -2271,7 +2275,7 @@ GFXDECODE_END
 
 #define PC6001_MAIN_CLOCK 7987200
 
-static MACHINE_CONFIG_START( pc6001 )
+MACHINE_CONFIG_START(pc6001_state::pc6001)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80, PC6001_MAIN_CLOCK / 2) // ~4 Mhz
 	MCFG_CPU_PROGRAM_MAP(pc6001_map)
@@ -2327,7 +2331,7 @@ MACHINE_CONFIG_END
 
 
 
-static MACHINE_CONFIG_DERIVED( pc6001m2, pc6001 )
+MACHINE_CONFIG_DERIVED(pc6001_state::pc6001m2, pc6001)
 
 	MCFG_MACHINE_RESET_OVERRIDE(pc6001_state,pc6001m2)
 
@@ -2350,7 +2354,7 @@ static MACHINE_CONFIG_DERIVED( pc6001m2, pc6001 )
 
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( pc6601, pc6001m2 )
+MACHINE_CONFIG_DERIVED(pc6001_state::pc6601, pc6001m2)
 
 	/* basic machine hardware */
 	MCFG_CPU_REPLACE("maincpu", Z80, PC6001_MAIN_CLOCK / 2)
@@ -2360,7 +2364,7 @@ static MACHINE_CONFIG_DERIVED( pc6601, pc6001m2 )
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(pc6001_state,pc6001_irq_callback)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( pc6001sr, pc6001m2 )
+MACHINE_CONFIG_DERIVED(pc6001_state::pc6001sr, pc6001m2)
 
 	MCFG_MACHINE_RESET_OVERRIDE(pc6001_state,pc6001sr)
 

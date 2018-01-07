@@ -68,4 +68,5 @@ public:
 	INTERRUPT_GEN_MEMBER(pandoras_master_interrupt);
 	INTERRUPT_GEN_MEMBER(pandoras_slave_interrupt);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, uint8_t* sr );
+	void pandoras(machine_config &config);
 };

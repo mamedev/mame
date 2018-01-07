@@ -288,7 +288,7 @@ INTERRUPT_GEN_MEMBER(hyperspt_state::vblank_irq)
 		device.execute().set_input_line(0, ASSERT_LINE);
 }
 
-static MACHINE_CONFIG_START( hyperspt )
+MACHINE_CONFIG_START(hyperspt_state::hyperspt)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", KONAMI1, XTAL_18_432MHz/12)   /* verified on pcb */
@@ -343,18 +343,50 @@ static MACHINE_CONFIG_START( hyperspt )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 MACHINE_CONFIG_END
 
+static ADDRESS_MAP_START( hyprolyb_adpcm_map, AS_PROGRAM, 8, hyprolyb_adpcm_device )
+	AM_RANGE(0x0000, 0x007f) AM_RAM
+	AM_RANGE(0x1000, 0x1000) AM_DEVREAD("hyprolyb_adpcm", hyprolyb_adpcm_device, data_r)
+	AM_RANGE(0x1001, 0x1001) AM_DEVREAD("hyprolyb_adpcm", hyprolyb_adpcm_device, ready_r)
+	AM_RANGE(0x1002, 0x1002) AM_DEVWRITE("hyprolyb_adpcm", hyprolyb_adpcm_device, msm_data_w)
+	AM_RANGE(0x1003, 0x1003) AM_DEVREAD("hyprolyb_adpcm", hyprolyb_adpcm_device, msm_vck_r)
+		// on init:
+		//    $1003 = $00
+		//    $1002 = $FF
+		//    $1003 = $34
+		//    $1001 = $36
+		//    $1002 = $80
+		// loops while ($1003) & 0x80 == 0
+		// 1002 = ADPCM data written (low 4 bits)
+		//
+		// $1003 & $80 (in) = 5205 DRQ
+		// $1002 & $0f (out) = 5205 data
+		// $1001 & $80 (in) = sound latch request
+		// $1000 (in) = sound latch data
+	AM_RANGE(0x8000, 0xffff) AM_ROM
+ADDRESS_MAP_END
 
-static MACHINE_CONFIG_DERIVED( hypersptb, hyperspt )
+
+MACHINE_CONFIG_DERIVED(hyperspt_state::hypersptb, hyperspt)
 	MCFG_DEVICE_REMOVE("vlm")
 
 	MCFG_CPU_MODIFY("audiocpu")
 	MCFG_CPU_PROGRAM_MAP(soundb_map)
 
-	MCFG_FRAGMENT_ADD(hyprolyb_adpcm)
+	MCFG_CPU_ADD("adpcm", M6802, XTAL_14_31818MHz/8)    /* unknown clock */
+	MCFG_CPU_PROGRAM_MAP(hyprolyb_adpcm_map)
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
+
+	MCFG_SOUND_ADD("hyprolyb_adpcm", HYPROLYB_ADPCM, 0)
+
+	MCFG_SOUND_ADD("msm", MSM5205, 384000)
+	MCFG_MSM5205_VCLK_CB(DEVWRITELINE("hyprolyb_adpcm", hyprolyb_adpcm_device, vck_callback)) /* VCK function */
+	MCFG_MSM5205_PRESCALER_SELECTOR(S96_4B)      /* 4 kHz */
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( roadf, hyperspt )
+MACHINE_CONFIG_DERIVED(hyperspt_state::roadf, hyperspt)
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(roadf_map)

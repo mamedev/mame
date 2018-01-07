@@ -172,6 +172,7 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
 	DECLARE_DRIVER_INIT(pip);
 	required_device<via6522_device> m_via;
+	void pntnpuzl(machine_config &config);
 };
 
 
@@ -344,7 +345,7 @@ static INPUT_PORTS_START( pntnpuzl )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_D)
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( pntnpuzl )
+MACHINE_CONFIG_START(pntnpuzl_state::pntnpuzl)
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_12MHz)
 	MCFG_CPU_PROGRAM_MAP(pntnpuzl_map)
 
@@ -362,7 +363,12 @@ static MACHINE_CONFIG_START( pntnpuzl )
 	MCFG_CPU_PROGRAM_MAP(mcu_map) // FIXME: this is all internal
 
 	/* video hardware */
-	MCFG_FRAGMENT_ADD( pcvideo_vga )
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_RAW_PARAMS(XTAL_25_1748MHz,900,0,640,526,0,480)
+	MCFG_SCREEN_UPDATE_DEVICE("vga", vga_device, screen_update)
+
+	MCFG_PALETTE_ADD("palette", 0x100)
+	MCFG_DEVICE_ADD("vga", VGA, 0)
 MACHINE_CONFIG_END
 
 ROM_START( pntnpuzl )

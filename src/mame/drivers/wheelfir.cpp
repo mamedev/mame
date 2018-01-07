@@ -288,6 +288,7 @@ public:
 	uint32_t screen_update_wheelfir(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank_wheelfir);
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline_timer_callback);
+	void wheelfir(machine_config &config);
 };
 
 
@@ -747,7 +748,7 @@ static ADDRESS_MAP_START( ramdac_map, 0, 8, wheelfir_state )
 	AM_RANGE(0x000, 0x3ff) AM_DEVREADWRITE("ramdac",ramdac_device,ramdac_pal_r,ramdac_rgb888_w)
 ADDRESS_MAP_END
 
-static MACHINE_CONFIG_START( wheelfir )
+MACHINE_CONFIG_START(wheelfir_state::wheelfir)
 
 	MCFG_CPU_ADD("maincpu", M68000, 32000000/2)
 	MCFG_CPU_PROGRAM_MAP(wheelfir_main)

@@ -2241,7 +2241,7 @@ GFXDECODE_END
  *************************************/
 
 
-MACHINE_CONFIG_MEMBER(segas32_state::device_add_mconfig)
+MACHINE_CONFIG_START(segas32_state::device_add_mconfig)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", V60, MASTER_CLOCK/2)
@@ -2318,7 +2318,7 @@ static ADDRESS_MAP_START( system32_analog_map, AS_PROGRAM, 16, segas32_state )
 	AM_IMPORT_FROM(system32_map)
 ADDRESS_MAP_END
 
-MACHINE_CONFIG_MEMBER(segas32_analog_state::device_add_mconfig)
+MACHINE_CONFIG_START(segas32_analog_state::device_add_mconfig)
 	segas32_state::device_add_mconfig(config);
 
 	MCFG_DEVICE_MODIFY("maincpu")
@@ -2356,7 +2356,7 @@ static ADDRESS_MAP_START( system32_trackball_map, AS_PROGRAM, 16, segas32_trackb
 	AM_IMPORT_FROM(system32_map)
 ADDRESS_MAP_END
 
-MACHINE_CONFIG_MEMBER(segas32_trackball_state::device_add_mconfig)
+MACHINE_CONFIG_START(segas32_trackball_state::device_add_mconfig)
 	segas32_state::device_add_mconfig(config);
 
 	MCFG_DEVICE_MODIFY("maincpu")
@@ -2394,7 +2394,7 @@ static ADDRESS_MAP_START( system32_4player_map, AS_PROGRAM, 16, segas32_state )
 	AM_IMPORT_FROM(system32_map)
 ADDRESS_MAP_END
 
-MACHINE_CONFIG_MEMBER(segas32_4player_state::device_add_mconfig)
+MACHINE_CONFIG_START(segas32_4player_state::device_add_mconfig)
 	segas32_state::device_add_mconfig(config);
 
 	MCFG_DEVICE_MODIFY("maincpu")
@@ -2428,7 +2428,7 @@ static ADDRESS_MAP_START( ga2_main_map, AS_PROGRAM, 16, segas32_state )
 	AM_IMPORT_FROM(system32_4player_map)
 ADDRESS_MAP_END
 
-MACHINE_CONFIG_MEMBER(segas32_v25_state::device_add_mconfig)
+MACHINE_CONFIG_START(segas32_v25_state::device_add_mconfig)
 	segas32_4player_state::device_add_mconfig(config);
 
 	MCFG_CPU_MODIFY("maincpu")
@@ -2452,7 +2452,7 @@ segas32_v25_state::segas32_v25_state(const machine_config &mconfig, const char *
 
 
 
-MACHINE_CONFIG_MEMBER(segas32_upd7725_state::device_add_mconfig)
+MACHINE_CONFIG_START(segas32_upd7725_state::device_add_mconfig)
 	segas32_analog_state::device_add_mconfig(config);
 
 	/* add a upd7725; this is on the 837-8341 daughterboard which plugs into the socket on the master pcb's rom board where an fd1149 could go */
@@ -2510,14 +2510,14 @@ static ADDRESS_MAP_START( system32_cd_map, AS_PROGRAM, 16, segas32_state )
 	AM_IMPORT_FROM(system32_map)
 ADDRESS_MAP_END
 
-static MACHINE_CONFIG_START( cdrom_config )
-	MCFG_DEVICE_MODIFY( "cdda" )
+void segas32_cd_state::cdrom_config(device_t *device)
+{
+	device = device->subdevice("cdda");
 	MCFG_SOUND_ROUTE( 0, "^^^^lspeaker", 0.30 )
 	MCFG_SOUND_ROUTE( 1, "^^^^rspeaker", 0.30 )
-MACHINE_CONFIG_END
+}
 
-
-MACHINE_CONFIG_MEMBER(segas32_cd_state::device_add_mconfig)
+MACHINE_CONFIG_START(segas32_cd_state::device_add_mconfig)
 	segas32_state::device_add_mconfig(config);
 
 	MCFG_DEVICE_MODIFY("maincpu")
@@ -2547,7 +2547,7 @@ segas32_cd_state::segas32_cd_state(const machine_config &mconfig, const char *ta
 
 
 
-MACHINE_CONFIG_MEMBER(sega_multi32_state::device_add_mconfig)
+MACHINE_CONFIG_START(sega_multi32_state::device_add_mconfig)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", V70, MULTI32_CLOCK/2)
 	MCFG_CPU_PROGRAM_MAP(multi32_map)
@@ -2641,7 +2641,7 @@ static ADDRESS_MAP_START( multi32_analog_map, AS_PROGRAM, 32, sega_multi32_analo
 	AM_IMPORT_FROM(multi32_map)
 ADDRESS_MAP_END
 
-MACHINE_CONFIG_MEMBER(sega_multi32_analog_state::device_add_mconfig)
+MACHINE_CONFIG_START(sega_multi32_analog_state::device_add_mconfig)
 	sega_multi32_state::device_add_mconfig(config);
 
 	MCFG_DEVICE_MODIFY("maincpu")
@@ -2685,7 +2685,7 @@ static ADDRESS_MAP_START( multi32_6player_map, AS_PROGRAM, 32, segas32_state )
 	AM_IMPORT_FROM(multi32_map)
 ADDRESS_MAP_END
 
-MACHINE_CONFIG_MEMBER(sega_multi32_6player_state::device_add_mconfig)
+MACHINE_CONFIG_START(sega_multi32_6player_state::device_add_mconfig)
 	sega_multi32_state::device_add_mconfig(config);
 
 	MCFG_DEVICE_MODIFY("maincpu")
@@ -2748,63 +2748,75 @@ public:
 	DECLARE_READ16_MEMBER(dual_pcb_slave);
 
 
+	void sega_multi32(machine_config &config);
+	void sega_system32(machine_config &config);
+	void sega_multi32_analog(machine_config &config);
+	void sega_multi32_6p(machine_config &config);
+	void sega_system32_dual_direct_upd7725(machine_config &config);
+	void sega_system32_dual_direct(machine_config &config);
+	void sega_system32_track(machine_config &config);
+	void sega_system32_ga2(machine_config &config);
+	void sega_system32_cd(machine_config &config);
+	void sega_system32_arf(machine_config &config);
+	void sega_system32_analog(machine_config &config);
+	void sega_system32_4p(machine_config &config);
 };
 
 
 
-static MACHINE_CONFIG_START( sega_system32 )
+MACHINE_CONFIG_START(segas32_new_state::sega_system32)
 	MCFG_DEVICE_ADD("mainpcb", SEGA_S32_REGULAR_DEVICE, 0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( sega_system32_analog )
+MACHINE_CONFIG_START(segas32_new_state::sega_system32_analog)
 	MCFG_DEVICE_ADD("mainpcb", SEGA_S32_ANALOG_DEVICE, 0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( sega_system32_track )
+MACHINE_CONFIG_START(segas32_new_state::sega_system32_track)
 	MCFG_DEVICE_ADD("mainpcb", SEGA_S32_TRACKBALL_DEVICE, 0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( sega_system32_4p )
+MACHINE_CONFIG_START(segas32_new_state::sega_system32_4p)
 	MCFG_DEVICE_ADD("mainpcb", SEGA_S32_4PLAYER_DEVICE, 0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( sega_system32_cd )
+MACHINE_CONFIG_START(segas32_new_state::sega_system32_cd)
 	MCFG_DEVICE_ADD("mainpcb", SEGA_S32_CD_DEVICE, 0)
 MACHINE_CONFIG_END
 
 // for f1en where there is a sub-board containing shared ram sitting underneath the ROM board bridging 2 PCBs (not a network link)
-static MACHINE_CONFIG_START( sega_system32_dual_direct )
+MACHINE_CONFIG_START(segas32_new_state::sega_system32_dual_direct)
 	MCFG_DEVICE_ADD("mainpcb", SEGA_S32_ANALOG_DEVICE, 0)
 	MCFG_DEVICE_ADD("slavepcb", SEGA_S32_ANALOG_DEVICE, 0)
 MACHINE_CONFIG_END
 
 // air rescue is like f1en above but also has the 837-8341 DSP daughterboard on the mainpcb side only
-static MACHINE_CONFIG_START( sega_system32_dual_direct_upd7725 )
+MACHINE_CONFIG_START(segas32_new_state::sega_system32_dual_direct_upd7725)
 	MCFG_DEVICE_ADD("mainpcb", SEGA_S32_UPD7725_DEVICE, 0)
 	MCFG_DEVICE_ADD("slavepcb", SEGA_S32_ANALOG_DEVICE, 0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( sega_system32_ga2 )
+MACHINE_CONFIG_START(segas32_new_state::sega_system32_ga2)
 	MCFG_DEVICE_ADD("mainpcb", SEGA_S32_V25_DEVICE, 0)
 	MCFG_CPU_MODIFY("mainpcb:mcu")
 	MCFG_V25_CONFIG(segas32_v25_state::ga2_opcode_table)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( sega_system32_arf )
+MACHINE_CONFIG_START(segas32_new_state::sega_system32_arf)
 	MCFG_DEVICE_ADD("mainpcb", SEGA_S32_V25_DEVICE, 0)
 	MCFG_CPU_MODIFY("mainpcb:mcu")
 	MCFG_V25_CONFIG(segas32_v25_state::arf_opcode_table)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( sega_multi32 )
+MACHINE_CONFIG_START(segas32_new_state::sega_multi32)
 	MCFG_DEVICE_ADD("mainpcb", SEGA_MULTI32_DEVICE, 0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( sega_multi32_analog )
+MACHINE_CONFIG_START(segas32_new_state::sega_multi32_analog)
 	MCFG_DEVICE_ADD("mainpcb", SEGA_MULTI32_ANALOG_DEVICE, 0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( sega_multi32_6p )
+MACHINE_CONFIG_START(segas32_new_state::sega_multi32_6p)
 	MCFG_DEVICE_ADD("mainpcb", SEGA_MULTI32_6PLAYER_DEVICE, 0)
 MACHINE_CONFIG_END
 

@@ -226,6 +226,7 @@ public:
 		emu_timer   *m_mouse_timer;
 	} m_nimbus_mouse;
 
+	void nimbus(machine_config &config);
 private:
 	void debug_command(int ref, const std::vector<std::string> &params);
 	void video_debug(int ref, const std::vector<std::string> &params);

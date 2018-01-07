@@ -51,6 +51,7 @@ public:
 	TIMER_CALLBACK_MEMBER(gamate_timer);
 	TIMER_CALLBACK_MEMBER(gamate_timer2);
 
+	void gamate(machine_config &config);
 private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -175,7 +176,7 @@ TIMER_CALLBACK_MEMBER(gamate_state::gamate_timer2)
 	timer2->reset(m_maincpu->cycles_to_attotime(32768/2));
 }
 
-static MACHINE_CONFIG_START( gamate )
+MACHINE_CONFIG_START(gamate_state::gamate)
 	MCFG_CPU_ADD("maincpu", M6502, 4433000/2) // NCR 65CX02
 	MCFG_CPU_PROGRAM_MAP(gamate_mem)
 

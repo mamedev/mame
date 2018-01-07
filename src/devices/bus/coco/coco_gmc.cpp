@@ -51,7 +51,7 @@ namespace
 };
 
 
-MACHINE_CONFIG_MEMBER(coco_pak_gmc_device::device_add_mconfig)
+MACHINE_CONFIG_START(coco_pak_gmc_device::device_add_mconfig)
 	MCFG_SPEAKER_STANDARD_MONO("gmc_speaker")
 	MCFG_SOUND_ADD(SN76489AN_TAG, SN76489A, XTAL_4MHz)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "gmc_speaker", 1.0)

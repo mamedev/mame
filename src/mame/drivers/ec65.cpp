@@ -44,6 +44,7 @@ public:
 	void kbd_put(u8 data);
 	MC6845_UPDATE_ROW(crtc_update_row);
 
+	void ec65(machine_config &config);
 private:
 	virtual void machine_reset() override;
 	required_device<via6522_device> m_via_0;
@@ -61,6 +62,7 @@ public:
 		: driver_device(mconfig, type, tag)
 	{
 	}
+	void ec65k(machine_config &config);
 };
 
 static ADDRESS_MAP_START(ec65_mem, AS_PROGRAM, 8, ec65_state)
@@ -164,7 +166,7 @@ static GFXDECODE_START( ec65 )
 	GFXDECODE_ENTRY( "chargen", 0x0000, ec65_charlayout, 0, 1 )
 GFXDECODE_END
 
-static MACHINE_CONFIG_START( ec65 )
+MACHINE_CONFIG_START(ec65_state::ec65)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",M6502, XTAL_4MHz / 4)
@@ -202,7 +204,7 @@ static MACHINE_CONFIG_START( ec65 )
 	MCFG_GENERIC_KEYBOARD_CB(PUT(ec65_state, kbd_put))
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( ec65k )
+MACHINE_CONFIG_START(ec65k_state::ec65k)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",G65816, XTAL_4MHz) // can use 4,2 or 1 MHz

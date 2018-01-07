@@ -509,7 +509,7 @@ static GFXDECODE_START( sprint2 )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( sprint2 )
+MACHINE_CONFIG_START(sprint2_state::sprint2)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, XTAL_12_096MHz / 16)
@@ -551,7 +551,7 @@ static MACHINE_CONFIG_START( sprint2 )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( sprint1, sprint2 )
+MACHINE_CONFIG_DERIVED(sprint2_state::sprint1, sprint2)
 
 	/* sound hardware */
 	MCFG_DEVICE_REMOVE("lspeaker")
@@ -566,7 +566,7 @@ static MACHINE_CONFIG_DERIVED( sprint1, sprint2 )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( dominos, sprint2 )
+MACHINE_CONFIG_DERIVED(sprint2_state::dominos, sprint2)
 
 	/* sound hardware */
 	MCFG_DEVICE_REMOVE("lspeaker")
@@ -580,7 +580,7 @@ static MACHINE_CONFIG_DERIVED( dominos, sprint2 )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( dominos4, dominos )
+MACHINE_CONFIG_DERIVED(sprint2_state::dominos4, dominos)
 	MCFG_DEVICE_MODIFY("outlatch")
 	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(sprint2_state, lamp3_w))
 	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(sprint2_state, lamp4_w))

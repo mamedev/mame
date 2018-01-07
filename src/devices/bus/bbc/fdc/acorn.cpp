@@ -120,7 +120,7 @@ ROM_END
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( bbc_acorn8271_device::device_add_mconfig )
+MACHINE_CONFIG_START(bbc_acorn8271_device::device_add_mconfig)
 	MCFG_DEVICE_ADD("i8271", I8271, 0)
 	MCFG_I8271_IRQ_CALLBACK(WRITELINE(bbc_acorn8271_device, fdc_intrq_w))
 	MCFG_I8271_HDL_CALLBACK(WRITELINE(bbc_acorn8271_device, motor_w))
@@ -131,7 +131,7 @@ MACHINE_CONFIG_MEMBER( bbc_acorn8271_device::device_add_mconfig )
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_MEMBER( bbc_acorn1770_device::device_add_mconfig )
+MACHINE_CONFIG_START(bbc_acorn1770_device::device_add_mconfig)
 	MCFG_WD1770_ADD("wd1770", XTAL_16MHz / 2)
 	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(bbc_acorn1770_device, fdc_intrq_w))
 	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(bbc_acorn1770_device, fdc_drq_w))

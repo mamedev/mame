@@ -284,7 +284,7 @@ SLOT_INTERFACE_END
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( nes_sunsoft_dcs_device::device_add_mconfig )
+MACHINE_CONFIG_START(nes_sunsoft_dcs_device::device_add_mconfig)
 	MCFG_NTB_MINICART_ADD("ntb_slot", ntb_cart)
 MACHINE_CONFIG_END
 

@@ -46,6 +46,8 @@ public:
 	DECLARE_PALETTE_INIT(ironhors);
 	DECLARE_VIDEO_START(farwest);
 
+	void farwest(machine_config &config);
+	void ironhors(machine_config &config);
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;

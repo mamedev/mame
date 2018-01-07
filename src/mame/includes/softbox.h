@@ -61,6 +61,7 @@ public:
 		LED_READY
 	};
 
+	void softbox(machine_config &config);
 	int m_ifc;  // Tracks previous state of IEEE-488 IFC line
 };
 

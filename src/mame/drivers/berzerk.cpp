@@ -93,6 +93,8 @@ public:
 	void create_nmi_timer();
 	void start_nmi_timer();
 	void get_pens(rgb_t *pens);
+	void berzerk(machine_config &config);
+	void frenzy(machine_config &config);
 };
 
 
@@ -1103,7 +1105,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( berzerk )
+MACHINE_CONFIG_START(berzerk_state::berzerk)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, MAIN_CPU_CLOCK)
@@ -1130,7 +1132,7 @@ static MACHINE_CONFIG_START( berzerk )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( frenzy, berzerk )
+MACHINE_CONFIG_DERIVED(berzerk_state::frenzy, berzerk)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")

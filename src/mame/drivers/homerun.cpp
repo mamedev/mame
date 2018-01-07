@@ -348,7 +348,7 @@ void homerun_state::machine_reset()
 
 /**************************************************************************/
 
-static MACHINE_CONFIG_START( dynashot )
+MACHINE_CONFIG_START(homerun_state::dynashot)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_20MHz/4)
@@ -382,7 +382,7 @@ static MACHINE_CONFIG_START( dynashot )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( homerun, dynashot )
+MACHINE_CONFIG_DERIVED(homerun_state::homerun, dynashot)
 
 	/* sound hardware */
 	MCFG_SOUND_ADD("d7756", UPD7756, UPD7759_STANDARD_CLOCK)
@@ -394,7 +394,7 @@ static MACHINE_CONFIG_DERIVED( homerun, dynashot )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( ganjaja, dynashot )
+MACHINE_CONFIG_DERIVED(homerun_state::ganjaja, dynashot)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")

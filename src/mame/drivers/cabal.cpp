@@ -489,7 +489,7 @@ static GFXDECODE_START( cabal )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( cabal )
+MACHINE_CONFIG_START(cabal_state::cabal)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_20MHz/2) /* verified on pcb */
@@ -535,7 +535,7 @@ static MACHINE_CONFIG_START( cabal )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( cabalt, cabal )
+MACHINE_CONFIG_DERIVED(cabal_state::cabalt, cabal)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(trackball_main_map)
 
@@ -548,7 +548,7 @@ static MACHINE_CONFIG_DERIVED( cabalt, cabal )
 	MCFG_UPD4701_PORTY("IN3")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( cabalbl2, cabal )
+MACHINE_CONFIG_DERIVED(cabal_state::cabalbl2, cabal)
 	MCFG_DEVICE_REMOVE("sei80bu")
 
 	MCFG_DEVICE_MODIFY("audiocpu")
@@ -558,7 +558,7 @@ MACHINE_CONFIG_END
 
 
 /* the bootleg has different sound hardware (2 extra Z80s for ADPCM playback) */
-static MACHINE_CONFIG_START( cabalbl )
+MACHINE_CONFIG_START(cabal_state::cabalbl)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_20MHz/2) /* verified on pcb */

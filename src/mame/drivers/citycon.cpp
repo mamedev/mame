@@ -186,7 +186,7 @@ void citycon_state::machine_reset()
 }
 
 
-static MACHINE_CONFIG_START( citycon )
+MACHINE_CONFIG_START(citycon_state::citycon)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", MC6809, XTAL_8MHz) // HD68B09P

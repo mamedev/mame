@@ -368,7 +368,7 @@ WRITE8_MEMBER( d9060_device_base::scsi_data_w )
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( d9060_device_base::device_add_mconfig )
+MACHINE_CONFIG_START(d9060_device_base::device_add_mconfig)
 	// DOS
 	MCFG_CPU_ADD(M6502_DOS_TAG, M6502, XTAL_4MHz/4)
 	MCFG_CPU_PROGRAM_MAP(d9060_main_mem)

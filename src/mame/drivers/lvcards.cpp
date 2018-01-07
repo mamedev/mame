@@ -451,7 +451,7 @@ GFXDECODE_END
 
 /* Sound Interfaces */
 
-static MACHINE_CONFIG_START( lvcards )
+MACHINE_CONFIG_START(lvcards_state::lvcards)
 	// basic machine hardware
 	MCFG_CPU_ADD("maincpu",Z80, 18432000/4) // unknown frequency, assume same as tehkanwc.cpp
 	MCFG_CPU_PROGRAM_MAP(lvcards_map)
@@ -480,7 +480,7 @@ static MACHINE_CONFIG_START( lvcards )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( lvpoker, lvcards )
+MACHINE_CONFIG_DERIVED(lvcards_state::lvpoker, lvcards)
 
 	// basic machine hardware
 	MCFG_NVRAM_ADD_1FILL("nvram")
@@ -490,7 +490,7 @@ static MACHINE_CONFIG_DERIVED( lvpoker, lvcards )
 	MCFG_MACHINE_RESET_OVERRIDE(lvcards_state,lvpoker)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( ponttehk, lvcards )
+MACHINE_CONFIG_DERIVED(lvcards_state::ponttehk, lvcards)
 
 	// basic machine hardware
 	MCFG_NVRAM_ADD_1FILL("nvram")

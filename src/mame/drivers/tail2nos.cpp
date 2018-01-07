@@ -228,7 +228,7 @@ void tail2nos_state::machine_reset()
 {
 }
 
-static MACHINE_CONFIG_START( tail2nos )
+MACHINE_CONFIG_START(tail2nos_state::tail2nos)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000,XTAL_20MHz/2)    /* verified on pcb */

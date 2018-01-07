@@ -83,7 +83,7 @@ static SLOT_INTERFACE_START( tf20_floppies )
 	SLOT_INTERFACE( "sd320", EPSON_SD_320 )
 SLOT_INTERFACE_END
 
-MACHINE_CONFIG_MEMBER( epson_tf20_device::device_add_mconfig )
+MACHINE_CONFIG_START(epson_tf20_device::device_add_mconfig)
 	MCFG_CPU_ADD("19b", Z80, XTAL_CR1 / 2) /* uPD780C */
 	MCFG_CPU_PROGRAM_MAP(cpu_mem)
 	MCFG_CPU_IO_MAP(cpu_io)

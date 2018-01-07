@@ -1801,7 +1801,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( cojagr3k )
+MACHINE_CONFIG_START(jaguar_state::cojagr3k)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", R3041, R3000_CLOCK)
@@ -1838,12 +1838,12 @@ static MACHINE_CONFIG_START( cojagr3k )
 	MCFG_SOUND_ROUTE_EX(0, "rdac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "rdac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( cojagr3k_rom, cojagr3k )
+MACHINE_CONFIG_DERIVED(jaguar_state::cojagr3k_rom, cojagr3k)
 	MCFG_DEVICE_MODIFY("ide:0")
 	MCFG_SLOT_DEFAULT_OPTION(nullptr)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( cojag68k, cojagr3k )
+MACHINE_CONFIG_DERIVED(jaguar_state::cojag68k, cojagr3k)
 
 	/* basic machine hardware */
 	MCFG_CPU_REPLACE("maincpu", M68EC020, M68K_CLOCK/2)
@@ -1851,7 +1851,7 @@ static MACHINE_CONFIG_DERIVED( cojag68k, cojagr3k )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( jaguar )
+MACHINE_CONFIG_START(jaguar_state::jaguar)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, JAGUAR_CLOCK/2)
@@ -1896,7 +1896,7 @@ static MACHINE_CONFIG_START( jaguar )
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( jaguarcd, jaguar )
+MACHINE_CONFIG_DERIVED(jaguar_state::jaguarcd, jaguar)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(jaguarcd_map)
 

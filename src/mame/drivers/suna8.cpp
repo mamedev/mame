@@ -1867,7 +1867,7 @@ GFXDECODE_END
 /* 1 x 24 MHz crystal */
 
 
-static MACHINE_CONFIG_START( hardhead )
+MACHINE_CONFIG_START(suna8_state::hardhead)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, SUNA8_MASTER_CLOCK / 4)    /* verified on pcb */
@@ -1925,7 +1925,7 @@ MACHINE_CONFIG_END
 /* 1 x 24 MHz crystal */
 
 /* 2203 + 8910 */
-static MACHINE_CONFIG_START( rranger )
+MACHINE_CONFIG_START(suna8_state::rranger)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, SUNA8_MASTER_CLOCK / 4)                    /* ? */
@@ -1993,7 +1993,7 @@ MACHINE_RESET_MEMBER(suna8_state,brickzn)
 		m_bank1d->set_entry(0);
 }
 
-static MACHINE_CONFIG_START( brickzn11 )
+MACHINE_CONFIG_START(suna8_state::brickzn11)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, SUNA8_MASTER_CLOCK / 4)        /* SUNA PROTECTION BLOCK */
@@ -2049,7 +2049,7 @@ static MACHINE_CONFIG_START( brickzn11 )
 	MCFG_SOUND_ROUTE_EX(0, "rdac2", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "rdac2", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( brickzn, brickzn11 )
+MACHINE_CONFIG_DERIVED(suna8_state::brickzn, brickzn11)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(brickzn_map)
 	MCFG_CPU_IO_MAP(brickzn_io_map)
@@ -2079,7 +2079,7 @@ MACHINE_RESET_MEMBER(suna8_state,hardhea2)
 	hardhea2_rambank_0_w(space,0,0);
 }
 
-static MACHINE_CONFIG_DERIVED( hardhea2, brickzn )
+MACHINE_CONFIG_DERIVED(suna8_state::hardhea2, brickzn)
 	MCFG_DEVICE_REMOVE("maincpu")
 
 	MCFG_CPU_ADD("maincpu", Z80, SUNA8_MASTER_CLOCK / 4)        /* SUNA T568009 */
@@ -2094,7 +2094,7 @@ static MACHINE_CONFIG_DERIVED( hardhea2, brickzn )
 	MCFG_PALETTE_ENDIANNESS(ENDIANNESS_BIG)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( hardhea2b, hardhea2 )
+MACHINE_CONFIG_DERIVED(suna8_state::hardhea2b, hardhea2)
 	MCFG_DEVICE_REMOVE("maincpu")
 
 	MCFG_CPU_ADD("maincpu", Z80, SUNA8_MASTER_CLOCK / 4)        //bootleg clock not verified (?)
@@ -2106,7 +2106,7 @@ MACHINE_CONFIG_END
                                 Star Fighter
 ***************************************************************************/
 
-static MACHINE_CONFIG_START( starfigh )
+MACHINE_CONFIG_START(suna8_state::starfigh)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, SUNA8_MASTER_CLOCK / 4)                    /* ? */
@@ -2161,7 +2161,7 @@ MACHINE_CONFIG_END
                                 Spark Man
 ***************************************************************************/
 
-static MACHINE_CONFIG_START( sparkman )
+MACHINE_CONFIG_START(suna8_state::sparkman)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, SUNA8_MASTER_CLOCK / 4)                    /* ? */

@@ -65,6 +65,7 @@ public:
 	required_device<cpu_device> m_subcpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	void istellar(machine_config &config);
 };
 
 
@@ -301,7 +302,7 @@ INTERRUPT_GEN_MEMBER(istellar_state::vblank_callback_istellar)
 
 
 /* DRIVER */
-static MACHINE_CONFIG_START( istellar )
+MACHINE_CONFIG_START(istellar_state::istellar)
 	/* main cpu */
 	MCFG_CPU_ADD("maincpu", Z80, GUESSED_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(z80_0_mem)

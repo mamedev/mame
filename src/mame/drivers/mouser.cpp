@@ -199,7 +199,7 @@ void mouser_state::machine_reset()
 	m_sound_byte = 0;
 }
 
-static MACHINE_CONFIG_START( mouser )
+MACHINE_CONFIG_START(mouser_state::mouser)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 4000000)   /* 4 MHz ? */

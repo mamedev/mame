@@ -63,7 +63,7 @@ static ADDRESS_MAP_START(z8000_io, AS_IO, 16, m24_z8000_device)
 	AM_RANGE(0x8000, 0x83ff) AM_READWRITE(i86_io_r, i86_io_w)
 ADDRESS_MAP_END
 
-MACHINE_CONFIG_MEMBER( m24_z8000_device::device_add_mconfig )
+MACHINE_CONFIG_START(m24_z8000_device::device_add_mconfig)
 	MCFG_CPU_ADD("z8000", Z8001, XTAL_8MHz/2)
 	MCFG_CPU_PROGRAM_MAP(z8000_prog)
 	MCFG_CPU_DATA_MAP(z8000_data)

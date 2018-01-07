@@ -44,6 +44,7 @@ public:
 	DECLARE_DRIVER_INIT(dps1);
 	DECLARE_MACHINE_RESET(dps1);
 
+	void dps1(machine_config &config);
 private:
 	bool m_dma_dir;
 	uint16_t m_dma_adr;
@@ -181,7 +182,7 @@ static SLOT_INTERFACE_START( floppies )
 	SLOT_INTERFACE( "floppy0", FLOPPY_8_DSDD )
 SLOT_INTERFACE_END
 
-static MACHINE_CONFIG_START( dps1 )
+MACHINE_CONFIG_START(dps1_state::dps1)
 	// basic machine hardware
 	MCFG_CPU_ADD("maincpu", Z80, 4000000)
 	MCFG_CPU_PROGRAM_MAP(mem_map)

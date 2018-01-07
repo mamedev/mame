@@ -393,4 +393,7 @@ public:
 	DECLARE_WRITE16_MEMBER(sound_comms_w);
 	uint16_t main_latch[2];
 	uint16_t sound_latch[2];
+	void hng64(machine_config &config);
+	void hng64_audio(machine_config &config);
+	void hng64_network(machine_config &config);
 };

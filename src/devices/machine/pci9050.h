@@ -19,7 +19,7 @@
 	MCFG_PCI_DEVICE_ADD(_tag, PCI9050, 0x10b59050, 0x01, 0x06800000, 0x10b59050)
 
 #define MCFG_PCI9050_SET_MAP(id, map) \
-	downcast<pci9050_device *>(device)->set_map(id, address_map_delegate(ADDRESS_MAP_NAME(map), #map), owner);
+	downcast<pci9050_device *>(device)->set_map(id, address_map_delegate(ADDRESS_MAP_NAME(map), #map), this);
 
 #define MCFG_PCI9050_USER_INPUT_CALLBACK(_write) \
 	devcb = &pci9050_device::set_user_input_callback(*device, DEVCB_##_write);

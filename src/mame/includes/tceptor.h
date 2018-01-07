@@ -89,4 +89,5 @@ public:
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int sprite_priority);
 	inline uint8_t fix_input0(uint8_t in1, uint8_t in2);
 	inline uint8_t fix_input1(uint8_t in1, uint8_t in2);
+	void tceptor(machine_config &config);
 };

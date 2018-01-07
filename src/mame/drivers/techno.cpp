@@ -47,6 +47,7 @@ public:
 	DECLARE_WRITE16_MEMBER(sol2_w);
 	DECLARE_WRITE16_MEMBER(sound_w);
 
+	void techno(machine_config &config);
 private:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 	virtual void machine_start() override;
@@ -276,7 +277,7 @@ void techno_state::machine_reset()
 	m_maincpu->set_input_line(M68K_IRQ_1, CLEAR_LINE);
 }
 
-static MACHINE_CONFIG_START( techno )
+MACHINE_CONFIG_START(techno_state::techno)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_8MHz)
 	MCFG_CPU_PROGRAM_MAP(techno_map)

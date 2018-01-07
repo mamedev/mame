@@ -171,6 +171,7 @@ public:
 	virtual void video_start() override;
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void ppmast93(machine_config &config);
 };
 
 
@@ -360,7 +361,7 @@ uint32_t ppmast93_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	return 0;
 }
 
-static MACHINE_CONFIG_START( ppmast93 )
+MACHINE_CONFIG_START(ppmast93_state::ppmast93)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80,5000000)         /* 5 MHz */
 	MCFG_CPU_PROGRAM_MAP(ppmast93_cpu1_map)

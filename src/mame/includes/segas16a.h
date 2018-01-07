@@ -100,6 +100,17 @@ public:
 	// video updates
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
+	void system16a_no7751(machine_config &config);
+	void system16a(machine_config &config);
+	void system16a_fd1089a_no7751(machine_config &config);
+	void system16a_fd1089b_no7751(machine_config &config);
+	void system16a_fd1089a(machine_config &config);
+	void system16a_fd1094(machine_config &config);
+	void system16a_no7751p(machine_config &config);
+	void system16a_fd1094_no7751(machine_config &config);
+	void system16a_i8751(machine_config &config);
+	void system16a_fd1089b(machine_config &config);
+	void aceattaca_fd1094(machine_config &config);
 protected:
 	// internal types
 	typedef delegate<void ()> i8751_sim_delegate;

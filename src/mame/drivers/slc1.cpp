@@ -67,6 +67,7 @@ public:
 
 	DECLARE_READ8_MEMBER( io_r );
 	DECLARE_WRITE8_MEMBER( io_w );
+	void slc1(machine_config &config);
 private:
 	uint8_t m_digit;
 	bool m_kbd_type;
@@ -253,7 +254,7 @@ INPUT_PORTS_END
 
 ***************************************************************************/
 
-static MACHINE_CONFIG_START( slc1 )
+MACHINE_CONFIG_START(slc1_state::slc1)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 2500000)
 	MCFG_CPU_PROGRAM_MAP(mem_map)

@@ -441,7 +441,6 @@ or Fatal Fury for example).
 #include "cpu/mips/mips3.h"
 #include "cpu/z80/z80.h"
 #include "machine/nvram.h"
-#include "machine/hng64_net.h"
 
 
 /* TODO: NOT measured! */
@@ -1532,9 +1531,7 @@ void hng64_state::machine_reset()
 	reset_sound();
 }
 
-MACHINE_CONFIG_EXTERN(hng64_audio);
-
-static MACHINE_CONFIG_START(hng64)
+MACHINE_CONFIG_START(hng64_state::hng64)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", VR4300BE, HNG64_MASTER_CLOCK)     // actually R4300
 	MCFG_MIPS3_ICACHE_SIZE(16384)

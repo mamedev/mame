@@ -35,6 +35,7 @@ public:
 	virtual void machine_reset() override;
 	uint32_t screen_update_embargo(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
+	void embargo(machine_config &config);
 };
 
 
@@ -257,7 +258,7 @@ void embargo_state::machine_reset()
  *
  *************************************/
 
-static MACHINE_CONFIG_START( embargo )
+MACHINE_CONFIG_START(embargo_state::embargo)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", S2650, 625000)

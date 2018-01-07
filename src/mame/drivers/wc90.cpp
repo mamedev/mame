@@ -343,7 +343,7 @@ void wc90_state::machine_start()
 }
 
 
-static MACHINE_CONFIG_START( wc90 )
+MACHINE_CONFIG_START(wc90_state::wc90)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_8MHz)     /* verified on pcb */
@@ -389,11 +389,11 @@ static MACHINE_CONFIG_START( wc90 )
 	MCFG_SOUND_ROUTE(2, "mono", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( wc90t, wc90 )
+MACHINE_CONFIG_DERIVED(wc90_state::wc90t, wc90)
 	MCFG_VIDEO_START_OVERRIDE(wc90_state, wc90t )
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( pac90, wc90 )
+MACHINE_CONFIG_DERIVED(wc90_state::pac90, wc90)
 	MCFG_DEVICE_MODIFY("spritegen")
 	MCFG_TECMO_SPRITE_YOFFSET(16) // sprites need shifting, why?
 MACHINE_CONFIG_END

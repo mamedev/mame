@@ -406,7 +406,7 @@ static GFXDECODE_START( naughtyb )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( naughtyb )
+MACHINE_CONFIG_START(naughtyb_state::naughtyb)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, CLOCK_XTAL / 4) /* 12 MHz clock, divided by 4. CPU is a Z80A */
@@ -443,7 +443,7 @@ MACHINE_CONFIG_END
 
 
 /* Exactly the same but for certain address writes */
-static MACHINE_CONFIG_START( popflame )
+MACHINE_CONFIG_START(naughtyb_state::popflame)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, CLOCK_XTAL / 4) /* 12 MHz clock, divided by 4. CPU is a Z80A */

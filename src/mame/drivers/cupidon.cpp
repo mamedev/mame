@@ -42,6 +42,7 @@ public:
 		return -1; // or it hits an illegal opcode (sleep on the 68340?)
 	};
 
+		void cupidon(machine_config &config);
 protected:
 
 
@@ -99,7 +100,7 @@ static INPUT_PORTS_START(  cupidon )
 INPUT_PORTS_END
 
 
-static MACHINE_CONFIG_START( cupidon )
+MACHINE_CONFIG_START(cupidon_state::cupidon)
 	MCFG_CPU_ADD("maincpu", M68340, 16000000)    // The access to 3FF00 at the start would suggest this is a 68340 so probably 16 or 25 mhz?
 	MCFG_CPU_PROGRAM_MAP(cupidon_map)
 

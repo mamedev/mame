@@ -155,7 +155,7 @@ void dmv_k220_device::device_reset()
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( dmv_k220_device::device_add_mconfig )
+MACHINE_CONFIG_START(dmv_k220_device::device_add_mconfig)
 	MCFG_DEVICE_ADD("ppi8255", I8255, 0)
 	MCFG_I8255_OUT_PORTA_CB(WRITE8(dmv_k220_device, porta_w))
 	MCFG_I8255_IN_PORTB_CB(IOPORT("SWITCH"))

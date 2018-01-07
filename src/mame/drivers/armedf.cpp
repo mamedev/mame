@@ -1237,7 +1237,7 @@ MACHINE_RESET_MEMBER(armedf_state,armedf)
 }
 
 
-static MACHINE_CONFIG_START( terraf_sound )
+MACHINE_CONFIG_START(armedf_state::terraf_sound)
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL_24MHz/6)      // 4mhz
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 	MCFG_CPU_IO_MAP(sound_portmap)
@@ -1257,7 +1257,7 @@ static MACHINE_CONFIG_START( terraf_sound )
 	MCFG_SOUND_ROUTE_EX(0, "dac2", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac2", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( terraf )
+MACHINE_CONFIG_START(armedf_state::terraf)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz/2)   // 8mhz?
@@ -1292,7 +1292,7 @@ static MACHINE_CONFIG_START( terraf )
 	MCFG_FRAGMENT_ADD(terraf_sound)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( terrafjb )
+MACHINE_CONFIG_START(armedf_state::terrafjb)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz/2)   // 8mhz
@@ -1344,11 +1344,11 @@ static MACHINE_CONFIG_START( terrafjb )
 	MCFG_SOUND_ROUTE_EX(0, "dac2", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac2", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( terrafb, terraf )
+MACHINE_CONFIG_DERIVED(armedf_state::terrafb, terraf)
 	MCFG_DEVICE_REMOVE("nb1414m4")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( kozure )
+MACHINE_CONFIG_START(armedf_state::kozure)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz/2)   // 8mhz
@@ -1382,7 +1382,7 @@ static MACHINE_CONFIG_START( kozure )
 	MCFG_FRAGMENT_ADD(terraf_sound)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( armedf )
+MACHINE_CONFIG_START(armedf_state::armedf)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz/2)   // 8mhz
@@ -1430,7 +1430,7 @@ static MACHINE_CONFIG_START( armedf )
 	MCFG_SOUND_ROUTE_EX(0, "dac2", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac2", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( cclimbr2 )
+MACHINE_CONFIG_START(armedf_state::cclimbr2)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz/2)   // 8mhz
@@ -1480,7 +1480,7 @@ static MACHINE_CONFIG_START( cclimbr2 )
 	MCFG_SOUND_ROUTE_EX(0, "dac2", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac2", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( legion )
+MACHINE_CONFIG_START(armedf_state::legion)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz/2)   // 8mhz
@@ -1530,7 +1530,7 @@ static MACHINE_CONFIG_START( legion )
 	MCFG_SOUND_ROUTE_EX(0, "dac2", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac2", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( legionjb )
+MACHINE_CONFIG_START(armedf_state::legionjb)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz/2)   // 8mhz
@@ -1578,7 +1578,7 @@ static MACHINE_CONFIG_START( legionjb )
 	MCFG_SOUND_ROUTE_EX(0, "dac2", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac2", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( bigfghtr )
+MACHINE_CONFIG_START(bigfghtr_state::bigfghtr)
 
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz/2)   // verified
 	MCFG_CPU_PROGRAM_MAP(bigfghtr_map)

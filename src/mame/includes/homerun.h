@@ -64,4 +64,7 @@ public:
 	uint32_t screen_update_homerun(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE8_MEMBER(homerun_banking_w);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
+	void ganjaja(machine_config &config);
+	void dynashot(machine_config &config);
+	void homerun(machine_config &config);
 };

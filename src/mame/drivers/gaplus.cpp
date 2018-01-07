@@ -512,7 +512,7 @@ void gaplus_state::machine_start()
 }
 
 
-static MACHINE_CONFIG_START( gaplus )
+MACHINE_CONFIG_START(gaplus_state::gaplus)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", MC6809E, XTAL_24_576MHz/16)    /* 1.536 MHz */
@@ -581,7 +581,7 @@ static MACHINE_CONFIG_START( gaplus )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( gaplusd, gaplus )
+MACHINE_CONFIG_DERIVED(gaplus_state::gaplusd, gaplus)
 
 	MCFG_DEVICE_REPLACE("namcoio_1", NAMCO_58XX, 0)
 	MCFG_NAMCO58XX_IN_0_CB(IOPORT("COINS"))
@@ -596,7 +596,7 @@ static MACHINE_CONFIG_DERIVED( gaplusd, gaplus )
 	MCFG_NAMCO56XX_IN_3_CB(IOPORT("DSWA_LOW"))
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( gapluso, gaplusd )
+MACHINE_CONFIG_DERIVED(gaplus_state::gapluso, gaplusd)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")

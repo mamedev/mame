@@ -294,7 +294,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(xmen_state::xmen_scanline)
 
 }
 
-static MACHINE_CONFIG_START( xmen )
+MACHINE_CONFIG_START(xmen_state::xmen)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz) /* verified on pcb */
@@ -346,7 +346,7 @@ static MACHINE_CONFIG_START( xmen )
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.00)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( xmen6p )
+MACHINE_CONFIG_START(xmen_state::xmen6p)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz)

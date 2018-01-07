@@ -114,6 +114,7 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(mekd2_c);
 	TIMER_DEVICE_CALLBACK_MEMBER(mekd2_p);
 
+	void mekd2(machine_config &config);
 private:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 	uint8_t m_cass_data[4];
@@ -362,7 +363,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(mekd2_state::mekd2_p)
 
 ************************************************************/
 
-static MACHINE_CONFIG_START( mekd2 )
+MACHINE_CONFIG_START(mekd2_state::mekd2)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6800, XTAL_MEKD2 / 2)        /* 614.4 kHz */
 	MCFG_CPU_PROGRAM_MAP(mekd2_mem)

@@ -37,6 +37,7 @@ public:
 
 	DECLARE_READ8_MEMBER(status_check_r);
 
+	void mits680b(machine_config &config);
 private:
 	required_device<cpu_device> m_maincpu;
 };
@@ -60,7 +61,7 @@ static INPUT_PORTS_START( mits680b )
 INPUT_PORTS_END
 
 
-static MACHINE_CONFIG_START( mits680b )
+MACHINE_CONFIG_START(mits680b_state::mits680b)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6800, XTAL_1MHz / 2)
 	MCFG_CPU_PROGRAM_MAP(mem_map)

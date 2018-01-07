@@ -177,6 +177,7 @@ public:
 	uint64_t      m_coin_start_cycles;
 	uint64_t      m_hopper_start_cycles;
 	int         m_audiocpu_cmd_irq;
+	void jwildb52(machine_config &config);
 };
 
 
@@ -572,7 +573,7 @@ void sigmab52_state::machine_reset()
 *    Machine Drivers     *
 *************************/
 
-static MACHINE_CONFIG_START( jwildb52 )
+MACHINE_CONFIG_START(sigmab52_state::jwildb52)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", MC6809, XTAL_8MHz)

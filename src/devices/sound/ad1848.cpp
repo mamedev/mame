@@ -21,7 +21,7 @@ ad1848_device::ad1848_device(const machine_config &mconfig, const char *tag, dev
 {
 }
 
-MACHINE_CONFIG_MEMBER( ad1848_device::device_add_mconfig )
+MACHINE_CONFIG_START(ad1848_device::device_add_mconfig)
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 	MCFG_SOUND_ADD("ldac", DAC_16BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.5) // unknown DAC
 	MCFG_SOUND_ADD("rdac", DAC_16BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.5) // unknown DAC

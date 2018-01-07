@@ -422,7 +422,7 @@ void himesiki_state::machine_reset()
 	m_flipscreen = 0;
 }
 
-static MACHINE_CONFIG_START( himesiki )
+MACHINE_CONFIG_START(himesiki_state::himesiki)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, CLK2) /* it's a 6.000 MHz rated part, but near the 8 Mhz XTAL?? - Android skips lots of frames at 6, crashes at 4 */

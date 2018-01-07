@@ -57,6 +57,8 @@ public:
 	DECLARE_WRITE8_MEMBER(pb_w);
 	DECLARE_INPUT_CHANGED_MEMBER(trigger_reset);
 	DECLARE_INPUT_CHANGED_MEMBER(trigger_nmi);
+	void mkit09a(machine_config &config);
+	void mkit09(machine_config &config);
 private:
 	uint8_t m_keydata;
 	virtual void machine_reset() override;
@@ -189,7 +191,7 @@ WRITE8_MEMBER( mkit09_state::pb_w )
 }
 
 
-static MACHINE_CONFIG_START( mkit09 )
+MACHINE_CONFIG_START(mkit09_state::mkit09)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", MC6809, XTAL_4MHz)
 	MCFG_CPU_PROGRAM_MAP(mkit09_mem)
@@ -215,7 +217,7 @@ static MACHINE_CONFIG_START( mkit09 )
 	MCFG_CASSETTE_ADD( "cassette" )
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( mkit09a )
+MACHINE_CONFIG_START(mkit09_state::mkit09a)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", MC6809, XTAL_4MHz)
 	MCFG_CPU_PROGRAM_MAP(mkit09a_mem)

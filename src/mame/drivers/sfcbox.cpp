@@ -154,6 +154,7 @@ public:
 	virtual void machine_reset() override;
 	DECLARE_READ8_MEMBER(spc_ram_100_r);
 	DECLARE_WRITE8_MEMBER(spc_ram_100_w);
+	void sfcbox(machine_config &config);
 };
 
 uint32_t sfcbox_state::screen_update( screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect )
@@ -445,7 +446,7 @@ void sfcbox_state::machine_reset()
 	m_soundcpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 }
 
-static MACHINE_CONFIG_START( sfcbox )
+MACHINE_CONFIG_START(sfcbox_state::sfcbox)
 
 	/* base snes hardware */
 	MCFG_CPU_ADD("maincpu", _5A22, 3580000*6)   /* 2.68Mhz, also 3.58Mhz */

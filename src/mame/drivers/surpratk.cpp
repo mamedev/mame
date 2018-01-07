@@ -166,7 +166,7 @@ WRITE8_MEMBER( surpratk_state::banking_callback )
 	membank("bank1")->set_entry(data & 0x1f);
 }
 
-static MACHINE_CONFIG_START( surpratk )
+MACHINE_CONFIG_START(surpratk_state::surpratk)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", KONAMI, XTAL_24MHz/2/4) /* 053248, the clock input is 12MHz, and internal CPU divider of 4 */

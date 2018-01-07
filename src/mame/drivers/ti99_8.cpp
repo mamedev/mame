@@ -261,6 +261,9 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(cassette_motor);
 	DECLARE_WRITE8_MEMBER(tms9901_interrupt);
 
+	void ti99_8(machine_config &config);
+	void ti99_8_60hz(machine_config &config);
+	void ti99_8_50hz(machine_config &config);
 private:
 	// Keyboard support
 	void    set_keyboard_column(int number, int data);
@@ -713,7 +716,7 @@ MACHINE_RESET_MEMBER(ti99_8_state, ti99_8)
 	console_reset(CLEAR_LINE);
 }
 
-static MACHINE_CONFIG_START( ti99_8 )
+MACHINE_CONFIG_START(ti99_8_state::ti99_8)
 	// basic machine hardware */
 	// TMS9995-MP9537 CPU @ 10.7 MHz
 	// MP9537 mask: This variant of the TMS9995 does not contain on-chip RAM
@@ -824,7 +827,7 @@ MACHINE_CONFIG_END
 /*
     TI-99/8 US version (NTSC, 60 Hz)
 */
-static MACHINE_CONFIG_DERIVED( ti99_8_60hz, ti99_8 )
+MACHINE_CONFIG_DERIVED(ti99_8_state::ti99_8_60hz, ti99_8)
 	// Video hardware
 	MCFG_DEVICE_ADD( TI_VDP_TAG, TMS9118, XTAL_10_738635MHz / 2 )
 	MCFG_TMS9928A_VRAM_SIZE(0x4000)
@@ -836,7 +839,7 @@ MACHINE_CONFIG_END
 /*
     TI-99/8 European version (PAL, 50 Hz)
 */
-static MACHINE_CONFIG_DERIVED( ti99_8_50hz, ti99_8 )
+MACHINE_CONFIG_DERIVED(ti99_8_state::ti99_8_50hz, ti99_8)
 	// Video hardware
 	MCFG_DEVICE_ADD( TI_VDP_TAG, TMS9129, XTAL_10_738635MHz / 2 )
 	MCFG_TMS9928A_VRAM_SIZE(0x4000)

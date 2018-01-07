@@ -311,6 +311,7 @@ public:
 	virtual void video_start() override;
 	void preprocess_texture_data();
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	void rollext(machine_config &config);
 };
 
 void rollext_state::preprocess_texture_data()
@@ -537,7 +538,7 @@ void rollext_state::machine_start()
 }
 
 
-static MACHINE_CONFIG_START(rollext)
+MACHINE_CONFIG_START(rollext_state::rollext)
 	MCFG_CPU_ADD("maincpu", TMS32082_MP, 60000000)
 	MCFG_CPU_PROGRAM_MAP(memmap)
 	//MCFG_CPU_VBLANK_INT_DRIVER("screen", rollext_state, vblank_interrupt)

@@ -213,6 +213,11 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	required_device<ticket_dispenser_device> m_hopper;
+	void neraidou(machine_config &config);
+	void sstar97(machine_config &config);
+	void bdream97(machine_config &config);
+	void skylncr(machine_config &config);
+	void mbutrfly(machine_config &config);
 };
 
 
@@ -1616,7 +1621,7 @@ INTERRUPT_GEN_MEMBER(skylncr_state::skylncr_vblank_interrupt)
 *           Machine Driver           *
 *************************************/
 
-static MACHINE_CONFIG_START( skylncr )
+MACHINE_CONFIG_START(skylncr_state::skylncr)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK/4)
@@ -1666,14 +1671,14 @@ static MACHINE_CONFIG_START( skylncr )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( mbutrfly, skylncr )
+MACHINE_CONFIG_DERIVED(skylncr_state::mbutrfly, skylncr)
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(io_map_mbutrfly)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( neraidou, skylncr )
+MACHINE_CONFIG_DERIVED(skylncr_state::neraidou, skylncr)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1681,7 +1686,7 @@ static MACHINE_CONFIG_DERIVED( neraidou, skylncr )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( sstar97, skylncr )
+MACHINE_CONFIG_DERIVED(skylncr_state::sstar97, skylncr)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1689,7 +1694,7 @@ static MACHINE_CONFIG_DERIVED( sstar97, skylncr )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( bdream97, skylncr )
+MACHINE_CONFIG_DERIVED(skylncr_state::bdream97, skylncr)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")

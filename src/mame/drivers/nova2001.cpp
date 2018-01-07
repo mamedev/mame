@@ -638,7 +638,7 @@ GFXDECODE_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( nova2001 )
+MACHINE_CONFIG_START(nova2001_state::nova2001)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, MAIN_CLOCK/4)  // 3 MHz verified on schematics
@@ -676,7 +676,7 @@ static MACHINE_CONFIG_START( nova2001 )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( ninjakun )
+MACHINE_CONFIG_START(nova2001_state::ninjakun)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, MAIN_CLOCK/4)  // 3 MHz
@@ -720,7 +720,7 @@ static MACHINE_CONFIG_START( ninjakun )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( pkunwar )
+MACHINE_CONFIG_START(nova2001_state::pkunwar)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, MAIN_CLOCK/4)  // 3 MHz
@@ -757,7 +757,7 @@ static MACHINE_CONFIG_START( pkunwar )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( raiders5 )
+MACHINE_CONFIG_START(nova2001_state::raiders5)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, MAIN_CLOCK/4)  // 3 MHz

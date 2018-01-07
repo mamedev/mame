@@ -131,6 +131,7 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(irq);
 
 	void postload();
+	void popobear(machine_config &config);
 };
 
 
@@ -635,7 +636,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(popobear_state::irq)
 		m_maincpu->set_input_line(2, ASSERT_LINE);
 }
 
-static MACHINE_CONFIG_START( popobear )
+MACHINE_CONFIG_START(popobear_state::popobear)
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_42MHz/4)  // XTAL CORRECT, DIVISOR GUESSED
 	MCFG_CPU_PROGRAM_MAP(popobear_mem)
 	// levels 2,3,5 look interesting

@@ -104,6 +104,8 @@ public:
 
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank_midas);
 
+	void hammer(machine_config &config);
+	void livequiz(machine_config &config);
 };
 
 
@@ -622,7 +624,7 @@ WRITE_LINE_MEMBER(midas_state::screen_vblank_midas)
 
 
 
-static MACHINE_CONFIG_START( livequiz )
+MACHINE_CONFIG_START(midas_state::livequiz)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz / 2)
@@ -650,7 +652,7 @@ static MACHINE_CONFIG_START( livequiz )
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.80)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( hammer )
+MACHINE_CONFIG_START(midas_state::hammer)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_28MHz / 2)

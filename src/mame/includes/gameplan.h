@@ -107,12 +107,12 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(trvquest_coin_w);
 	DECLARE_WRITE_LINE_MEMBER(trvquest_misc_w);
 
+	void gameplan(machine_config &config);
+	void gameplan_video(machine_config &config);
+	void leprechn(machine_config &config);
+	void leprechn_video(machine_config &config);
+	void trvquest(machine_config &config);
+	void trvquest_video(machine_config &config);
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
-
-/*----------- defined in video/gameplan.c -----------*/
-
-MACHINE_CONFIG_EXTERN( gameplan_video );
-MACHINE_CONFIG_EXTERN( leprechn_video );
-MACHINE_CONFIG_EXTERN( trvquest_video );

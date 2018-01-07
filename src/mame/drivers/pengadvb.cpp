@@ -68,6 +68,7 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	void pengadvb_decrypt(const char* region);
+	void pengadvb(machine_config &config);
 };
 
 
@@ -203,7 +204,7 @@ WRITE8_MEMBER(pengadvb_state::pengadvb_ppi_port_c_w)
 
 ***************************************************************************/
 
-static MACHINE_CONFIG_START( pengadvb )
+MACHINE_CONFIG_START(pengadvb_state::pengadvb)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_10_738635MHz/3)

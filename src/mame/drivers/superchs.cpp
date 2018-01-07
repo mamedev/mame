@@ -237,7 +237,7 @@ GFXDECODE_END
                  MACHINE DRIVERS
 ***********************************************************/
 
-static MACHINE_CONFIG_START( superchs )
+MACHINE_CONFIG_START(superchs_state::superchs)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68EC020, XTAL_40MHz/2) /* 20MHz - verified */
@@ -286,7 +286,7 @@ static MACHINE_CONFIG_START( superchs )
 	MCFG_DEVICE_ADD("taito_en", TAITO_EN, 0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( chase3, superchs )
+MACHINE_CONFIG_DERIVED(superchs_state::chase3, superchs)
 
 	MCFG_CPU_MODIFY("sub")
 	MCFG_CPU_PROGRAM_MAP(chase3_cpub_map)

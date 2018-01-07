@@ -746,7 +746,7 @@ void avigo_state::nvram_init(nvram_device &nvram, void *base, size_t size)
 	memset(base, 0x00, size);
 }
 
-static MACHINE_CONFIG_START( avigo )
+MACHINE_CONFIG_START(avigo_state::avigo)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 4000000)
 	MCFG_CPU_PROGRAM_MAP(avigo_mem)

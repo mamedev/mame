@@ -482,7 +482,7 @@ void lkage_state::machine_reset()
 	m_soundnmi->in_w<1>(0);
 }
 
-static MACHINE_CONFIG_START( lkage )
+MACHINE_CONFIG_START(lkage_state::lkage)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, MAIN_CPU_CLOCK)
@@ -535,7 +535,7 @@ static MACHINE_CONFIG_START( lkage )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( lkageb )
+MACHINE_CONFIG_START(lkage_state::lkageb)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80,MAIN_CPU_CLOCK)

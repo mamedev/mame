@@ -103,6 +103,7 @@ public:
 
 	int m_40_80;
 	int m_200_256;
+	void act_f1(machine_config &config);
 };
 
 
@@ -329,7 +330,7 @@ SLOT_INTERFACE_END
 //  MACHINE_CONFIG( act_f1 )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( act_f1 )
+MACHINE_CONFIG_START(f1_state::act_f1)
 	/* basic machine hardware */
 	MCFG_CPU_ADD(I8086_TAG, I8086, XTAL_14MHz/4)
 	MCFG_CPU_PROGRAM_MAP(act_f1_mem)

@@ -381,7 +381,7 @@ WRITE32_MEMBER( huc6272_device::write )
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( huc6272_device::device_add_mconfig )
+MACHINE_CONFIG_START(huc6272_device::device_add_mconfig)
 	MCFG_DEVICE_ADD("scsi", SCSI_PORT, 0)
 	MCFG_SCSI_RST_HANDLER(DEVWRITELINE("scsi_ctrl_in", input_buffer_device, write_bit7))
 	MCFG_SCSI_BSY_HANDLER(DEVWRITELINE("scsi_ctrl_in", input_buffer_device, write_bit6))

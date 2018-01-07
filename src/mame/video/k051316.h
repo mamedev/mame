@@ -11,7 +11,7 @@ typedef device_delegate<void (int *code, int *color, int *flags)> k051316_cb_del
 
 
 #define MCFG_K051316_CB(_class, _method) \
-	k051316_device::set_k051316_callback(*device, k051316_cb_delegate(&_class::_method, #_class "::" #_method, downcast<_class *>(owner)));
+	k051316_device::set_k051316_callback(*device, k051316_cb_delegate(&_class::_method, #_class "::" #_method, this));
 
 #define MCFG_K051316_OFFSETS(_xoffs, _yoffs) \
 	k051316_device::set_offsets(*device, _xoffs, _yoffs);

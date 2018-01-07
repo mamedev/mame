@@ -39,8 +39,6 @@
 #include "j5wsc.lh"
 
 
-MACHINE_CONFIG_EXTERN( jpmsys5 );
-MACHINE_CONFIG_EXTERN( jpmsys5_ym );
 INPUT_PORTS_EXTERN( popeye );
 
 /* SAA based board */

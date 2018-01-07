@@ -85,7 +85,7 @@ static ADDRESS_MAP_START( ramdac_map, 0, 8, inder_vid_device )
 	AM_RANGE(0x000, 0x3ff) AM_DEVREADWRITE("ramdac",ramdac_device,ramdac_pal_r,ramdac_rgb888_w)
 ADDRESS_MAP_END
 
-MACHINE_CONFIG_MEMBER( inder_vid_device::device_add_mconfig )
+MACHINE_CONFIG_START(inder_vid_device::device_add_mconfig)
 	MCFG_CPU_ADD("tms", TMS34010, XTAL_40MHz)
 	MCFG_CPU_PROGRAM_MAP(megaphx_tms_map)
 	MCFG_TMS340X0_HALT_ON_RESET(true) /* halt on reset */

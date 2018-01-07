@@ -121,6 +121,7 @@ public:
 	uint32_t screen_update_blackt96(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void tile_callback(int &tile, int& fx, int& fy, int& region);
 
+	void blackt96(machine_config &config);
 protected:
 	// overrides
 	virtual void machine_start() override;
@@ -469,7 +470,7 @@ void blackt96_state::tile_callback(int &tile, int& fx, int& fy, int& region)
 }
 
 
-static MACHINE_CONFIG_START( blackt96 )
+MACHINE_CONFIG_START(blackt96_state::blackt96)
 	MCFG_CPU_ADD("maincpu", M68000, 18000000 /2)
 	MCFG_CPU_PROGRAM_MAP(blackt96_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", blackt96_state,  irq1_line_hold)

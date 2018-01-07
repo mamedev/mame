@@ -38,6 +38,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(irq_w);
 	I8275_DRAW_CHARACTER_MEMBER( crtc_display_pixels );
 
+	void tim100(machine_config &config);
 private:
 	virtual void machine_start() override;
 	uint8_t *m_charmap;
@@ -154,7 +155,7 @@ WRITE_LINE_MEMBER( tim100_state::irq_w )
 }
 
 
-static MACHINE_CONFIG_START( tim100 )
+MACHINE_CONFIG_START(tim100_state::tim100)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",I8085A, XTAL_4_9152MHz) // divider unknown
 	MCFG_CPU_PROGRAM_MAP(tim100_mem)

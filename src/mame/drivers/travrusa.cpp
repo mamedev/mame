@@ -303,7 +303,7 @@ void travrusa_state::machine_reset()
 	m_scrollx[1] = 0;
 }
 
-static MACHINE_CONFIG_START( travrusa )
+MACHINE_CONFIG_START(travrusa_state::travrusa)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 4000000)   /* 4 MHz (?) */
@@ -334,7 +334,7 @@ static MACHINE_CONFIG_START( travrusa )
 
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( shtrider, travrusa )
+MACHINE_CONFIG_DERIVED(travrusa_state::shtrider, travrusa)
 
 	/* video hardware */
 	MCFG_GFXDECODE_MODIFY("gfxdecode", shtrider)
@@ -342,7 +342,7 @@ static MACHINE_CONFIG_DERIVED( shtrider, travrusa )
 	MCFG_PALETTE_INIT_OWNER(travrusa_state,shtrider)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( shtriderb, travrusa )
+MACHINE_CONFIG_DERIVED(travrusa_state::shtriderb, travrusa)
 
 	/* video hardware */
 	MCFG_GFXDECODE_MODIFY("gfxdecode", shtrider)

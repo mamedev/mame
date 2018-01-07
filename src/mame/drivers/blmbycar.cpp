@@ -343,7 +343,7 @@ MACHINE_RESET_MEMBER(blmbycar_state,blmbycar)
 }
 
 
-static MACHINE_CONFIG_START( blmbycar )
+MACHINE_CONFIG_START(blmbycar_state::blmbycar)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz/2)   /* 12MHz */
@@ -389,7 +389,7 @@ MACHINE_RESET_MEMBER(blmbycar_state,watrball)
 	m_retvalue = 0;
 }
 
-static MACHINE_CONFIG_DERIVED( watrball, blmbycar )
+MACHINE_CONFIG_DERIVED(blmbycar_state::watrball, blmbycar)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")

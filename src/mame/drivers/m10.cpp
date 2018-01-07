@@ -809,7 +809,7 @@ static const char *const m10_sample_names[] =
  *
  *************************************/
 
-static MACHINE_CONFIG_START( m10 )
+MACHINE_CONFIG_START(m10_state::m10)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502,IREMM10_CPU_CLOCK)
@@ -862,7 +862,7 @@ static MACHINE_CONFIG_START( m10 )
 
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( m11, m10 )
+MACHINE_CONFIG_DERIVED(m10_state::m11, m10)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -872,7 +872,7 @@ static MACHINE_CONFIG_DERIVED( m11, m10 )
 	/* sound hardware */
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( m15 )
+MACHINE_CONFIG_START(m10_state::m15)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502,IREMM15_CPU_CLOCK)
@@ -906,7 +906,7 @@ static MACHINE_CONFIG_START( m15 )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( headoni, m15 )
+MACHINE_CONFIG_DERIVED(m10_state::headoni, m15)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_CLOCK(11730000/16)
 MACHINE_CONFIG_END

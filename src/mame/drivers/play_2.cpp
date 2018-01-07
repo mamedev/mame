@@ -79,6 +79,8 @@ public:
 	DECLARE_READ8_MEMBER(sound_in_r);
 	DECLARE_DRIVER_INIT(zira);
 
+	void play_2(machine_config &config);
+	void zira(machine_config &config);
 private:
 	uint16_t m_clockcnt;
 	uint16_t m_resetcnt;
@@ -351,7 +353,7 @@ WRITE8_MEMBER( play_2_state::psg_w )
 }
 
 // **************** Machine *****************************
-static MACHINE_CONFIG_START( play_2 )
+MACHINE_CONFIG_START(play_2_state::play_2)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", CDP1802, XTAL_2_95MHz)
 	MCFG_CPU_PROGRAM_MAP(play_2_map)
@@ -390,7 +392,7 @@ static MACHINE_CONFIG_START( play_2 )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( zira, play_2 )
+MACHINE_CONFIG_DERIVED(play_2_state::zira, play_2)
 	MCFG_CPU_ADD("cop402", COP402, XTAL_2MHz)
 	MCFG_CPU_PROGRAM_MAP(zira_sound_map)
 	MCFG_COP400_CONFIG( COP400_CKI_DIVISOR_16, COP400_CKO_OSCILLATOR_OUTPUT, false )

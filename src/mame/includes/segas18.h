@@ -100,6 +100,14 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(set_grayscale);
 	DECLARE_WRITE_LINE_MEMBER(set_vdp_enable);
 
+	void wwally(machine_config &config);
+	void system18(machine_config &config);
+	void lghost_fd1094(machine_config &config);
+	void wwally_fd1094(machine_config &config);
+	void system18_fd1094(machine_config &config);
+	void system18_fd1094_i8751(machine_config &config);
+	void lghost(machine_config &config);
+	void system18_i8751(machine_config &config);
 protected:
 	// timer IDs
 	enum

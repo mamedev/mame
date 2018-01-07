@@ -128,4 +128,14 @@ public:
 	void nemesis_postload();
 	void draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect );
 	DECLARE_WRITE8_MEMBER(volume_callback);
+	void nyanpani(machine_config &config);
+	void konamigt(machine_config &config);
+	void rf2_gx400(machine_config &config);
+	void gx400(machine_config &config);
+	void bubsys(machine_config &config);
+	void hcrash(machine_config &config);
+	void salamand(machine_config &config);
+	void citybomb(machine_config &config);
+	void nemesis(machine_config &config);
+	void blkpnthr(machine_config &config);
 };

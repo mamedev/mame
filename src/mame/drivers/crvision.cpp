@@ -734,7 +734,7 @@ SLOT_INTERFACE_END
     MACHINE_CONFIG_START( creativision )
 -------------------------------------------------*/
 
-static MACHINE_CONFIG_START( creativision )
+MACHINE_CONFIG_START(crvision_state::creativision)
 	// basic machine hardware
 	MCFG_CPU_ADD(M6502_TAG, M6502, XTAL_2MHz)
 	MCFG_CPU_PROGRAM_MAP(crvision_map)
@@ -784,7 +784,7 @@ MACHINE_CONFIG_END
     MACHINE_CONFIG_DERIVED( ntsc, creativision )
 -------------------------------------------------*/
 
-static MACHINE_CONFIG_DERIVED( ntsc, creativision )
+MACHINE_CONFIG_DERIVED(crvision_state::ntsc, creativision)
 	// video hardware
 	MCFG_DEVICE_ADD( TMS9929_TAG, TMS9918, XTAL_10_738635MHz / 2 )
 	MCFG_TMS9928A_VRAM_SIZE(0x4000)
@@ -797,7 +797,7 @@ MACHINE_CONFIG_END
     MACHINE_CONFIG_DERIVED( pal, creativision )
 -------------------------------------------------*/
 
-static MACHINE_CONFIG_DERIVED( pal, creativision )
+MACHINE_CONFIG_DERIVED(crvision_pal_state::pal, creativision)
 	// video hardware
 	MCFG_DEVICE_ADD( TMS9929_TAG, TMS9929, XTAL_10_738635MHz / 2 )
 	MCFG_TMS9928A_VRAM_SIZE(0x4000)
@@ -810,7 +810,7 @@ MACHINE_CONFIG_END
     MACHINE_CONFIG_START( lasr2001 )
 -------------------------------------------------*/
 
-static MACHINE_CONFIG_START( lasr2001 )
+MACHINE_CONFIG_START(laser2001_state::lasr2001)
 	// basic machine hardware
 	MCFG_CPU_ADD(M6502_TAG, M6502, XTAL_17_73447MHz/9)
 	MCFG_CPU_PROGRAM_MAP(lasr2001_map)

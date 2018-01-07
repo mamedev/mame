@@ -59,6 +59,8 @@ public:
 	DECLARE_WRITE8_MEMBER(dma8237_1_dack_w);
 	virtual void machine_start() override;
 	void nvram_init(nvram_device &nvram, void *base, size_t size);
+	static void pcat_dyn_sb_conf(device_t *device);
+	void pcat_dyn(machine_config &config);
 };
 
 void pcat_dyn_state::machine_start()
@@ -147,12 +149,13 @@ static DEVICE_INPUT_DEFAULTS_START( pcat_dyn_sb_def )
 	DEVICE_INPUT_DEFAULTS("CONFIG", 0x03, 0x01)
 DEVICE_INPUT_DEFAULTS_END
 
-static MACHINE_CONFIG_START( pcat_dyn_sb_conf )
-	MCFG_DEVICE_MODIFY("pc_joy")
+void pcat_dyn_state::pcat_dyn_sb_conf(device_t *device)
+{
+	device = device->subdevice("pc_joy");
 	MCFG_DEVICE_SLOT_INTERFACE(pc_joysticks, nullptr, true) // remove joystick
-MACHINE_CONFIG_END
+}
 
-static MACHINE_CONFIG_START( pcat_dyn )
+MACHINE_CONFIG_START(pcat_dyn_state::pcat_dyn)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I486, 40000000) /* Am486 DX-40 */
 	MCFG_CPU_PROGRAM_MAP(pcat_map)

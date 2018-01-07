@@ -267,6 +267,11 @@ public:
 
 	TIMER_DEVICE_CALLBACK_MEMBER(sun3_timer);
 
+	void sun3(machine_config &config);
+	void sun3e(machine_config &config);
+	void sun3_60(machine_config &config);
+	void sun3200(machine_config &config);
+	void sun3_50(machine_config &config);
 private:
 	uint32_t *m_rom_ptr, *m_ram_ptr;
 	uint8_t *m_idprom_ptr;
@@ -951,7 +956,7 @@ void sun3_state::machine_reset()
 }
 
 // The base Sun 3004 CPU board
-static MACHINE_CONFIG_START( sun3 )
+MACHINE_CONFIG_START(sun3_state::sun3)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68020, 16670000)
 	MCFG_CPU_PROGRAM_MAP(sun3_mem)
@@ -1021,7 +1026,7 @@ static MACHINE_CONFIG_START( sun3 )
 MACHINE_CONFIG_END
 
 // Sun 3/60
-static MACHINE_CONFIG_DERIVED( sun3_60, sun3 )
+MACHINE_CONFIG_DERIVED(sun3_state::sun3_60, sun3)
 	MCFG_CPU_REPLACE("maincpu", M68020, 20000000)
 	MCFG_CPU_PROGRAM_MAP(sun3_mem)
 
@@ -1033,13 +1038,13 @@ static MACHINE_CONFIG_DERIVED( sun3_60, sun3 )
 MACHINE_CONFIG_END
 
 // Sun 3/E
-static MACHINE_CONFIG_DERIVED( sun3e, sun3 )
+MACHINE_CONFIG_DERIVED(sun3_state::sun3e, sun3)
 	MCFG_CPU_REPLACE("maincpu", M68020, 20000000)
 	MCFG_CPU_PROGRAM_MAP(sun3_mem)
 MACHINE_CONFIG_END
 
 // 3/260 and 3/280 (the Sun 3200 board)
-static MACHINE_CONFIG_DERIVED( sun3200, sun3 )
+MACHINE_CONFIG_DERIVED(sun3_state::sun3200, sun3)
 	MCFG_CPU_REPLACE("maincpu", M68020, 25000000)
 	MCFG_CPU_PROGRAM_MAP(sun3_mem)
 
@@ -1054,7 +1059,7 @@ static MACHINE_CONFIG_DERIVED( sun3200, sun3 )
 	MCFG_RAM_EXTRA_OPTIONS("64M,96M,128M")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( sun3_50 )
+MACHINE_CONFIG_START(sun3_state::sun3_50)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68020, 15700000)
 	MCFG_CPU_PROGRAM_MAP(sun3_mem)

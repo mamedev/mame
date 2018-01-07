@@ -36,6 +36,10 @@ public:
 	DECLARE_WRITE16_MEMBER( cchip1_ctrl_w );
 	DECLARE_WRITE16_MEMBER( cchip1_bank_w );
 	DECLARE_WRITE16_MEMBER( cchip1_ram_w );
+	void superman(machine_config &config);
+	void ballbros(machine_config &config);
+	void gigandes(machine_config &config);
+	void daisenpu(machine_config &config);
 };
 
 #endif // MAME_INCLUDES_TAITO_X_H

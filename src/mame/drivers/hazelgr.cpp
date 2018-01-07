@@ -22,6 +22,7 @@ public:
 		, m_maincpu(*this, "maincpu")
 	{ }
 
+	void haze(machine_config &config);
 private:
 	required_device<cpu_device> m_maincpu;
 };
@@ -65,7 +66,7 @@ static const z80_daisy_config daisy_chain[] =
 };
 
 // All frequencies are guesswork, in an effort to get something to happen
-static MACHINE_CONFIG_START( haze )
+MACHINE_CONFIG_START(haze_state::haze)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80,2000000)         /* ? MHz */
 	MCFG_CPU_PROGRAM_MAP(mem_map)

@@ -1668,7 +1668,7 @@ GFXDECODE_END
 
 /* Provided by Jim Hernandez: 3.5MHz for FM, 30KHz (!) for ADPCM */
 
-static MACHINE_CONFIG_START( system_A )
+MACHINE_CONFIG_START(megasys1_state::system_A)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, SYS_A_CPU_CLOCK) /* 6MHz verified */
@@ -1722,22 +1722,22 @@ static MACHINE_CONFIG_START( system_A )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.30)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( system_A_hachoo, system_A )
+MACHINE_CONFIG_DERIVED(megasys1_state::system_A_hachoo, system_A)
 	MCFG_MACHINE_RESET_OVERRIDE(megasys1_state,megasys1_hachoo)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( system_A_iganinju, system_A )
+MACHINE_CONFIG_DERIVED(megasys1_state::system_A_iganinju, system_A)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_DEVICE_REMOVE("scantimer")
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", megasys1_state, megasys1A_iganinju_scanline, "screen", 0, 1)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( system_A_soldam, system_A )
+MACHINE_CONFIG_DERIVED(megasys1_state::system_A_soldam, system_A)
 	MCFG_DEVICE_MODIFY("scroll1")
 	MCFG_MEGASYS1_TILEMAP_8X8_SCROLL_FACTOR(4)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( kickoffb, system_A )
+MACHINE_CONFIG_DERIVED(megasys1_state::kickoffb, system_A)
 	MCFG_CPU_MODIFY("audiocpu")
 	MCFG_CPU_PROGRAM_MAP(kickoffb_sound_map)
 
@@ -1750,7 +1750,7 @@ static MACHINE_CONFIG_DERIVED( kickoffb, system_A )
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.80)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( system_B, system_A )
+MACHINE_CONFIG_DERIVED(megasys1_state::system_B, system_A)
 
 	/* basic machine hardware */
 
@@ -1765,12 +1765,12 @@ static MACHINE_CONFIG_DERIVED( system_B, system_A )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( system_B_monkelf, system_B )
+MACHINE_CONFIG_DERIVED(megasys1_state::system_B_monkelf, system_B)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(megasys1B_monkelf_map)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( system_Bbl )
+MACHINE_CONFIG_START(megasys1_state::system_Bbl)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, SYS_B_CPU_CLOCK)
@@ -1809,7 +1809,7 @@ static MACHINE_CONFIG_START( system_Bbl )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.30)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( system_B_hayaosi1, system_B )
+MACHINE_CONFIG_DERIVED(megasys1_state::system_B_hayaosi1, system_B)
 
 	/* basic machine hardware */
 
@@ -1823,7 +1823,7 @@ static MACHINE_CONFIG_DERIVED( system_B_hayaosi1, system_B )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( system_C, system_A )
+MACHINE_CONFIG_DERIVED(megasys1_state::system_C, system_A)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1848,7 +1848,7 @@ MACHINE_CONFIG_END
 ***************************************************************************/
 
 
-static MACHINE_CONFIG_START( system_D )
+MACHINE_CONFIG_START(megasys1_state::system_D)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, SYS_D_CPU_CLOCK)    /* 8MHz */
@@ -1898,7 +1898,7 @@ MACHINE_CONFIG_END
 ***************************************************************************/
 
 
-static MACHINE_CONFIG_START( system_Z )
+MACHINE_CONFIG_START(megasys1_state::system_Z)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, SYS_A_CPU_CLOCK) /* 6MHz (12MHz / 2) */

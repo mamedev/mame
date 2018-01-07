@@ -150,6 +150,10 @@ public:
 	DECLARE_READ8_MEMBER(lx390_fdc_r);
 	DECLARE_WRITE8_MEMBER(lx390_fdc_w);
 
+	void z80net(machine_config &config);
+	void z80netf(machine_config &config);
+	void z80ne(machine_config &config);
+	void z80netb(machine_config &config);
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 

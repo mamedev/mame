@@ -93,6 +93,10 @@ public:
 	uint32_t screen_update_astrocorp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(skilldrp_scanline);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void skilldrp(machine_config &config);
+	void showhand(machine_config &config);
+	void speeddrp(machine_config &config);
+	void showhanc(machine_config &config);
 };
 
 /***************************************************************************
@@ -493,7 +497,7 @@ TODO: understand if later hardware uses different parameters (XTAL is almost sur
 #define ASTROCORP_VBEND 0
 #define ASTROCORP_VBSTART 240
 
-static MACHINE_CONFIG_START( showhand )
+MACHINE_CONFIG_START(astrocorp_state::showhand)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_20MHz / 2)
@@ -528,7 +532,7 @@ static MACHINE_CONFIG_START( showhand )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( showhanc, showhand )
+MACHINE_CONFIG_DERIVED(astrocorp_state::showhanc, showhand)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(showhanc_map)
 MACHINE_CONFIG_END
@@ -545,7 +549,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(astrocorp_state::skilldrp_scanline)
 		m_maincpu->set_input_line(2, HOLD_LINE);
 }
 
-static MACHINE_CONFIG_START( skilldrp )
+MACHINE_CONFIG_START(astrocorp_state::skilldrp)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz / 2) // JX-1689F1028N GRX586.V5
@@ -582,7 +586,7 @@ static MACHINE_CONFIG_START( skilldrp )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( speeddrp, skilldrp )
+MACHINE_CONFIG_DERIVED(astrocorp_state::speeddrp, skilldrp)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(speeddrp_map)
 MACHINE_CONFIG_END

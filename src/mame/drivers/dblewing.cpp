@@ -123,6 +123,7 @@ public:
 	READ16_MEMBER( wf_protection_region_0_104_r );
 	WRITE16_MEMBER( wf_protection_region_0_104_w );
 
+	void dblewing(machine_config &config);
 private:
 	bool m_soundlatch_pending;
 };
@@ -339,7 +340,7 @@ DECOSPR_PRIORITY_CB_MEMBER(dblewing_state::pri_callback)
 	return 0; // sprites always on top?
 }
 
-static MACHINE_CONFIG_START( dblewing )
+MACHINE_CONFIG_START(dblewing_state::dblewing)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_28MHz/2)   /* DE102 */

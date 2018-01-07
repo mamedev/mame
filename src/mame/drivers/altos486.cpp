@@ -39,6 +39,7 @@ public:
 	bool m_sys_mode;
 	uint8_t m_prot[256];
 	uint16_t m_viol[16];
+	void altos486(machine_config &config);
 };
 
 READ8_MEMBER(altos486_state::read_rmx_ack)
@@ -119,7 +120,7 @@ static ADDRESS_MAP_START(altos486_z80_io, AS_IO, 8, altos486_state)
 	//AM_RANGE(0x08, 0x0b) AM_DEVREADWRITE("sio2", z80sio0_device, read, write)
 ADDRESS_MAP_END
 
-static MACHINE_CONFIG_START( altos486 )
+MACHINE_CONFIG_START(altos486_state::altos486)
 	MCFG_CPU_ADD("maincpu", I80186, XTAL_8MHz)
 	MCFG_CPU_PROGRAM_MAP(altos486_mem)
 	MCFG_CPU_IO_MAP(altos486_io)

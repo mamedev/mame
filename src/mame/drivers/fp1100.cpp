@@ -91,6 +91,7 @@ public:
 	MC6845_UPDATE_ROW(crtc_update_row);
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_c);
 	required_device<palette_device> m_palette;
+	void fp1100(machine_config &config);
 private:
 	uint8_t m_irq_mask;
 	uint8_t m_main_latch;
@@ -625,7 +626,7 @@ DRIVER_INIT_MEMBER( fp1100_state, fp1100 )
 	membank("bankw0")->configure_entry(0, &wram[0x0000]);
 }
 
-static MACHINE_CONFIG_START( fp1100 )
+MACHINE_CONFIG_START(fp1100_state::fp1100)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, MAIN_CLOCK/4)
 	MCFG_CPU_PROGRAM_MAP(main_map)

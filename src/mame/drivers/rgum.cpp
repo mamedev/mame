@@ -43,6 +43,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	void rgum(machine_config &config);
 };
 
 
@@ -238,7 +239,7 @@ static GFXDECODE_START( rgum )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( rgum )
+MACHINE_CONFIG_START(rgum_state::rgum)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M65C02,24000000/16)      /* ? MHz */
 	MCFG_CPU_PROGRAM_MAP(rgum_map)

@@ -52,7 +52,7 @@ ADDRESS_MAP_END
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( a2bus_themill_device::device_add_mconfig )
+MACHINE_CONFIG_START(a2bus_themill_device::device_add_mconfig)
 	MCFG_CPU_ADD(M6809_TAG, M6809, 1021800)   // M6809 runs at ~1 MHz as per Stellation Two's print ads
 	MCFG_CPU_PROGRAM_MAP(m6809_mem)
 MACHINE_CONFIG_END

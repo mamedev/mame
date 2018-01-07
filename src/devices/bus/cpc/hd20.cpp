@@ -15,7 +15,7 @@
 
 DEFINE_DEVICE_TYPE(CPC_HD20, cpc_hd20_device, "cpc_hd20", "Dobbertin HD20")
 
-MACHINE_CONFIG_MEMBER( cpc_hd20_device::device_add_mconfig )
+MACHINE_CONFIG_START(cpc_hd20_device::device_add_mconfig)
 	MCFG_DEVICE_ADD("hdc",ST11M_HDC,0)
 	MCFG_XTHDC_IRQ_HANDLER(WRITELINE(cpc_hd20_device, irq_w))
 	MCFG_HARDDISK_ADD("hdc:primary")

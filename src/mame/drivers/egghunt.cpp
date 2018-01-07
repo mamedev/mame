@@ -97,6 +97,7 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	required_device<generic_latch_8_device> m_soundlatch;
+	void egghunt(machine_config &config);
 };
 
 
@@ -417,7 +418,7 @@ void egghunt_state::machine_reset()
 	m_vidram_bank = 0;
 }
 
-static MACHINE_CONFIG_START( egghunt )
+MACHINE_CONFIG_START(egghunt_state::egghunt)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80,12000000/2)      /* 6 MHz ?*/

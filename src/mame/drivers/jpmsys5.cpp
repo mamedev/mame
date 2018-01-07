@@ -616,7 +616,7 @@ MACHINE_RESET_MEMBER(jpmsys5_state,jpmsys5v)
  *
  *************************************/
 
-static MACHINE_CONFIG_START( jpmsys5v )
+MACHINE_CONFIG_START(jpmsys5_state::jpmsys5v)
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_8MHz)
 	MCFG_CPU_PROGRAM_MAP(68000_map)
 
@@ -832,7 +832,7 @@ MACHINE_RESET_MEMBER(jpmsys5_state,jpmsys5)
  *************************************/
 
 // later (incompatible with earlier revision) motherboards used a YM2413
-MACHINE_CONFIG_START( jpmsys5_ym )
+MACHINE_CONFIG_START(jpmsys5_state::jpmsys5_ym)
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_8MHz)
 
 	MCFG_CPU_PROGRAM_MAP(68000_awp_map)
@@ -886,7 +886,7 @@ MACHINE_CONFIG_START( jpmsys5_ym )
 MACHINE_CONFIG_END
 
 // the first rev PCB used an SAA1099
-MACHINE_CONFIG_START( jpmsys5 )
+MACHINE_CONFIG_START(jpmsys5_state::jpmsys5)
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_8MHz)
 	MCFG_CPU_PROGRAM_MAP(68000_awp_map_saa)
 

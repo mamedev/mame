@@ -338,6 +338,8 @@ public:
 	uint32_t screen_update_nwktr(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	void lanc2_init();
+	void thrilld(machine_config &config);
+	void nwktr(machine_config &config);
 };
 
 
@@ -812,7 +814,7 @@ void nwktr_state::machine_reset()
 	m_dsp2->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 }
 
-static MACHINE_CONFIG_START( nwktr )
+MACHINE_CONFIG_START(nwktr_state::nwktr)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", PPC403GA, XTAL_64MHz/2)   /* PowerPC 403GA 32MHz */
@@ -892,7 +894,7 @@ static MACHINE_CONFIG_START( nwktr )
 	MCFG_KONPPC_CGBOARD_TYPE(NWKTR)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( thrilld, nwktr )
+MACHINE_CONFIG_DERIVED(nwktr_state::thrilld, nwktr)
 
 	MCFG_DEVICE_REMOVE("k001604")
 	MCFG_DEVICE_ADD("k001604", K001604, 0)

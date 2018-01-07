@@ -257,7 +257,7 @@ SLOT_INTERFACE_END
 //  MACHINE_CONFIG( tdv2324 )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( tdv2324 )
+MACHINE_CONFIG_START(tdv2324_state::tdv2324)
 	// basic system hardware
 	MCFG_CPU_ADD(P8085AH_0_TAG, I8085A, 8700000/2) // ???
 	MCFG_CPU_PROGRAM_MAP(tdv2324_mem)

@@ -150,6 +150,11 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	void magic102(machine_config &config);
+	void magic10a(machine_config &config);
+	void magic10(machine_config &config);
+	void hotslot(machine_config &config);
+	void sgsafari(machine_config &config);
 };
 
 
@@ -737,7 +742,7 @@ GFXDECODE_END
 *      Machine Drivers      *
 ****************************/
 
-static MACHINE_CONFIG_START( magic10 )
+MACHINE_CONFIG_START(magic10_state::magic10)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, CPU_CLOCK)  // 10 MHz.
 	MCFG_CPU_PROGRAM_MAP(magic10_map)
@@ -765,7 +770,7 @@ static MACHINE_CONFIG_START( magic10 )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( magic10a, magic10 )
+MACHINE_CONFIG_DERIVED(magic10_state::magic10a, magic10)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -773,7 +778,7 @@ static MACHINE_CONFIG_DERIVED( magic10a, magic10 )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( magic102, magic10 )
+MACHINE_CONFIG_DERIVED(magic10_state::magic102, magic10)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -784,7 +789,7 @@ static MACHINE_CONFIG_DERIVED( magic102, magic10 )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( hotslot, magic10 )
+MACHINE_CONFIG_DERIVED(magic10_state::hotslot, magic10)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -795,7 +800,7 @@ static MACHINE_CONFIG_DERIVED( hotslot, magic10 )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( sgsafari, magic10 )
+MACHINE_CONFIG_DERIVED(magic10_state::sgsafari, magic10)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")

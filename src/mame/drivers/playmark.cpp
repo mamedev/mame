@@ -1033,7 +1033,7 @@ MACHINE_RESET_MEMBER(playmark_state,playmark)
 	m_dispenser_latch = 0;
 }
 
-static MACHINE_CONFIG_START( bigtwin )
+MACHINE_CONFIG_START(playmark_state::bigtwin)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 12000000)   /* 12 MHz */
@@ -1073,7 +1073,7 @@ static MACHINE_CONFIG_START( bigtwin )
 	MCFG_DEVICE_ADDRESS_MAP(0, oki_map)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( bigtwinb )
+MACHINE_CONFIG_START(playmark_state::bigtwinb)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz/2)
@@ -1113,7 +1113,7 @@ static MACHINE_CONFIG_START( bigtwinb )
 	MCFG_DEVICE_ADDRESS_MAP(0, oki_map)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( wbeachvl )
+MACHINE_CONFIG_START(playmark_state::wbeachvl)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 12000000)   /* 12 MHz */
@@ -1157,7 +1157,7 @@ static MACHINE_CONFIG_START( wbeachvl )
 	MCFG_DEVICE_ADDRESS_MAP(0, oki_map)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( excelsr )
+MACHINE_CONFIG_START(playmark_state::excelsr)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz/2)   /* 12 MHz */
@@ -1197,7 +1197,7 @@ static MACHINE_CONFIG_START( excelsr )
 	MCFG_DEVICE_ADDRESS_MAP(0, oki_map)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( hrdtimes )
+MACHINE_CONFIG_START(playmark_state::hrdtimes)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz/2)   /* verified on pcb */
@@ -1238,7 +1238,7 @@ static MACHINE_CONFIG_START( hrdtimes )
 	MCFG_DEVICE_ADDRESS_MAP(0, oki_map)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( hotmind )
+MACHINE_CONFIG_START(playmark_state::hotmind)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz/2)   /* verified on pcb */
@@ -1284,7 +1284,7 @@ static MACHINE_CONFIG_START( hotmind )
 	MCFG_DEVICE_ADDRESS_MAP(0, oki_map)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( luckboomh )
+MACHINE_CONFIG_START(playmark_state::luckboomh)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz/2)   /* verified on pcb */

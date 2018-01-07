@@ -39,4 +39,6 @@ public:
 	void blitter_execute(  );
 	required_device<cpu_device> m_maincpu;
 	required_device<palette_device> m_palette;
+	void nomcu(machine_config &config);
+	void mcu(machine_config &config);
 };

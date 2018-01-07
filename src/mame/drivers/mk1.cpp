@@ -63,6 +63,7 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(mk1_update_leds);
 	F3853_INTERRUPT_REQ_CB(mk1_interrupt);
 	required_device<cpu_device> m_maincpu;
+	void mk1(machine_config &config);
 };
 
 
@@ -175,7 +176,7 @@ F3853_INTERRUPT_REQ_CB(mk1_state::mk1_interrupt)
 	m_maincpu->set_input_line(F8_INPUT_LINE_INT_REQ, level ? ASSERT_LINE : CLEAR_LINE);
 }
 
-static MACHINE_CONFIG_START( mk1 )
+MACHINE_CONFIG_START(mk1_state::mk1)
 	/* basic machine hardware */
 	MCFG_CPU_ADD( "maincpu", F8, MAIN_CLOCK )        /* MK3850 */
 	MCFG_CPU_PROGRAM_MAP(mk1_mem)

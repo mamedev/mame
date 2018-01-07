@@ -603,7 +603,7 @@ DRIVER_INIT_MEMBER(route16_state, route16)
 	save_item(NAME(m_protection_data));
 }
 
-static MACHINE_CONFIG_START( route16 )
+MACHINE_CONFIG_START(route16_state::route16)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("cpu1", Z80, 2500000)  /* 10MHz / 4 = 2.5MHz */
@@ -631,7 +631,7 @@ static MACHINE_CONFIG_START( route16 )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( routex, route16 )
+MACHINE_CONFIG_DERIVED(route16_state::routex, route16)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("cpu1")
@@ -639,7 +639,7 @@ static MACHINE_CONFIG_DERIVED( routex, route16 )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( stratvox, route16 )
+MACHINE_CONFIG_DERIVED(route16_state::stratvox, route16)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("cpu1")
@@ -679,7 +679,7 @@ static MACHINE_CONFIG_DERIVED( stratvox, route16 )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( speakres, stratvox )
+MACHINE_CONFIG_DERIVED(route16_state::speakres, stratvox)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("cpu1")
@@ -689,7 +689,7 @@ static MACHINE_CONFIG_DERIVED( speakres, stratvox )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( spacecho, speakres )
+MACHINE_CONFIG_DERIVED(route16_state::spacecho, speakres)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("cpu2")
@@ -697,7 +697,7 @@ static MACHINE_CONFIG_DERIVED( spacecho, speakres )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( ttmahjng, route16 )
+MACHINE_CONFIG_DERIVED(route16_state::ttmahjng, route16)
 	MCFG_CPU_MODIFY("cpu1")
 	MCFG_CPU_PROGRAM_MAP(ttmahjng_cpu1_map)
 	MCFG_CPU_IO_MAP(0)

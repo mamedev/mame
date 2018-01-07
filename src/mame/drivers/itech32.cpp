@@ -1671,7 +1671,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( timekill )
+MACHINE_CONFIG_START(itech32_state::timekill)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, CPU_CLOCK)
@@ -1717,7 +1717,7 @@ static MACHINE_CONFIG_START( timekill )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( bloodstm, timekill )
+MACHINE_CONFIG_DERIVED(itech32_state::bloodstm, timekill)
 
 	/* basic machine hardware */
 
@@ -1732,7 +1732,7 @@ static MACHINE_CONFIG_DERIVED( bloodstm, timekill )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( drivedge, timekill )
+MACHINE_CONFIG_DERIVED(itech32_state::drivedge, timekill)
 
 	/* basic machine hardware */
 
@@ -1760,7 +1760,7 @@ static MACHINE_CONFIG_DERIVED( drivedge, timekill )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( sftm, timekill )
+MACHINE_CONFIG_DERIVED(itech32_state::sftm, timekill)
 
 	/* basic machine hardware */
 
@@ -1781,7 +1781,7 @@ static MACHINE_CONFIG_DERIVED( sftm, timekill )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( tourny, sftm )
+MACHINE_CONFIG_DERIVED(itech32_state::tourny, sftm)
 
 	/* basic machine hardware */
 

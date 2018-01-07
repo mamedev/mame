@@ -51,6 +51,7 @@ public:
 		, m_maincpu(*this, "maincpu")
 	{ }
 
+	void zsbc3(machine_config &config);
 private:
 	required_device<cpu_device> m_maincpu;
 };
@@ -76,7 +77,7 @@ static INPUT_PORTS_START( zsbc3 )
 INPUT_PORTS_END
 
 
-static MACHINE_CONFIG_START( zsbc3 )
+MACHINE_CONFIG_START(zsbc3_state::zsbc3)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80, XTAL_16MHz / 4)
 	MCFG_CPU_PROGRAM_MAP(zsbc3_mem)

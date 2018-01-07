@@ -737,7 +737,7 @@ void vixen_state::machine_reset()
 //  MACHINE_CONFIG( vixen )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( vixen )
+MACHINE_CONFIG_START(vixen_state::vixen)
 	// basic machine hardware
 	MCFG_CPU_ADD(Z8400A_TAG, Z80, XTAL_23_9616MHz/6)
 	MCFG_CPU_PROGRAM_MAP(vixen_mem)

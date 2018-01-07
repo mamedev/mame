@@ -92,7 +92,7 @@ SLOT_INTERFACE_END
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 /*  */
-MACHINE_CONFIG_MEMBER( isa8_myb3k_fdc4710_device::device_add_mconfig )
+MACHINE_CONFIG_START(isa8_myb3k_fdc4710_device::device_add_mconfig)
 	MCFG_DEVICE_ADD("fdc", MB8876, XTAL_15_9744MHz / 8) /* From StepOne schematics */
 	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(isa8_myb3k_fdc4710_device, irq_w))
 	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(isa8_myb3k_fdc4710_device, drq_w))
@@ -101,7 +101,7 @@ MACHINE_CONFIG_MEMBER( isa8_myb3k_fdc4710_device::device_add_mconfig )
 MACHINE_CONFIG_END
 
 /* Main difference from fdc4710 is that a Hitachi HA16632AP has replaced the descrete VFO enabling 720Kb disks */
-MACHINE_CONFIG_MEMBER( isa8_myb3k_fdc4711_device::device_add_mconfig )
+MACHINE_CONFIG_START(isa8_myb3k_fdc4711_device::device_add_mconfig)
 	MCFG_DEVICE_ADD("fdc", FD1791, XTAL_15_9744MHz / 16)
 	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(isa8_myb3k_fdc4711_device, irq_w))
 	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(isa8_myb3k_fdc4711_device, drq_w))
@@ -112,7 +112,7 @@ MACHINE_CONFIG_MEMBER( isa8_myb3k_fdc4711_device::device_add_mconfig )
 MACHINE_CONFIG_END
 
 #if 0
-MACHINE_CONFIG_MEMBER( isa8_myb3k_fdc4712_device::device_add_mconfig )
+MACHINE_CONFIG_START(isa8_myb3k_fdc4712_device::device_add_mconfig)
 	MCFG_DEVICE_ADD("fdc", FD1791, XTAL_15_9744MHz / 8)
 	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(isa8_myb3k_fdc4712_device, irq_w))
 	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(isa8_myb3k_fdc4712_device, drq_w))

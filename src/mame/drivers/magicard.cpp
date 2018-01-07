@@ -466,6 +466,8 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
+	void magicard(machine_config &config);
+	void hotslots(machine_config &config);
 };
 
 
@@ -983,7 +985,7 @@ static ADDRESS_MAP_START( ramdac_map, 0, 8, magicard_state )
 ADDRESS_MAP_END
 
 
-static MACHINE_CONFIG_START( magicard )
+MACHINE_CONFIG_START(magicard_state::magicard)
 	MCFG_CPU_ADD("maincpu", SCC68070, CLOCK_A / 2)    /* SCC-68070 CCA84 datasheet */
 	MCFG_CPU_PROGRAM_MAP(magicard_mem)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", magicard_state, magicard_irq) /* no interrupts? (it erases the vectors..) */
@@ -1003,7 +1005,7 @@ static MACHINE_CONFIG_START( magicard )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( hotslots, magicard )
+MACHINE_CONFIG_DERIVED(magicard_state::hotslots, magicard)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(hotslots_mem)
 

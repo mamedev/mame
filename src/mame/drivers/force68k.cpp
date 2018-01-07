@@ -202,6 +202,8 @@ public:
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER (exp1_load) { return force68k_load_cart(image, m_cart); }
 	DECLARE_READ16_MEMBER (read16_rom);
 
+	void fccpu1_eprom_sockets(machine_config &config);
+	void fccpu1(machine_config &config);
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<mm58167_device> m_rtc;
@@ -494,7 +496,7 @@ void force68k_state::write_acia_clocks(int id, int state)
 */
 // Implementation of static 2 x 64K EPROM in sockets J10/J11 as 16 bit wide cartridge for easier
 // software handling. TODO: make configurable according to table above.
-static MACHINE_CONFIG_START( fccpu1_eprom_sockets )
+MACHINE_CONFIG_START(force68k_state::fccpu1_eprom_sockets)
 	MCFG_GENERIC_CARTSLOT_ADD("exp_rom1", generic_plain_slot, "fccpu1_cart")
 	MCFG_GENERIC_EXTENSIONS("bin,rom")
 	MCFG_GENERIC_WIDTH(GENERIC_ROM16_WIDTH)
@@ -532,7 +534,7 @@ SLOT_INTERFACE_END
 /*
  * Machine configuration
  */
-static MACHINE_CONFIG_START (fccpu1)
+MACHINE_CONFIG_START(force68k_state::fccpu1)
 	/* basic machine hardware */
 	MCFG_CPU_ADD ("maincpu", M68000, XTAL_16MHz / 2)
 	MCFG_CPU_PROGRAM_MAP (force68k_mem)
@@ -605,27 +607,27 @@ MACHINE_CONFIG_END
        * CPU-6 family is device and adressmap compatible with CPU-1 but with additions
        * such as an optional 68881 FPU
        */
-static MACHINE_CONFIG_START (fccpu6)
+MACHINE_CONFIG_START (force68k_state::fccpu6)
 	MCFG_CPU_ADD ("maincpu", M68000, XTAL_8MHz)         /* Jumper B10 Mode B */
 	MCFG_CPU_PROGRAM_MAP (force68k_mem)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START (fccpu6a)
+MACHINE_CONFIG_START (force68k_state::fccpu6a)
 	MCFG_CPU_ADD ("maincpu", M68000, XTAL_12_5MHz)        /* Jumper B10 Mode A */
 	MCFG_CPU_PROGRAM_MAP (force68k_mem)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START (fccpu6v)
+MACHINE_CONFIG_START (force68k_state::fccpu6v)
 	MCFG_CPU_ADD ("maincpu", M68010, XTAL_8MHz)         /* Jumper B10 Mode B */
 	MCFG_CPU_PROGRAM_MAP (force68k_mem)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START (fccpu6va)
+MACHINE_CONFIG_START (force68k_state::fccpu6va)
 	MCFG_CPU_ADD ("maincpu", M68010, XTAL_12_5MHz)        /* Jumper B10 Mode A */
 	MCFG_CPU_PROGRAM_MAP (force68k_mem)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START (fccpu6vb)
+MACHINE_CONFIG_START (force68k_state::fccpu6vb)
 	MCFG_CPU_ADD ("maincpu", M68010, XTAL_12_5MHz)        /* Jumper B10 Mode A */
 	MCFG_CPU_PROGRAM_MAP (force68k_mem)
 MACHINE_CONFIG_END

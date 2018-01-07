@@ -192,7 +192,7 @@ static GFXDECODE_START( shaolins )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( shaolins )
+MACHINE_CONFIG_START(shaolins_state::shaolins)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", MC6809E, MASTER_CLOCK/12)        /* verified on pcb */

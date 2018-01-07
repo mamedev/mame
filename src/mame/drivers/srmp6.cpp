@@ -120,6 +120,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	void srmp6(machine_config &config);
 };
 
 #define VERBOSE 0
@@ -676,7 +677,7 @@ INPUT_PORTS_END
     Machine driver
 ***************************************************************************/
 
-static MACHINE_CONFIG_START( srmp6 )
+MACHINE_CONFIG_START(srmp6_state::srmp6)
 
 	MCFG_CPU_ADD("maincpu", M68000, 16000000)
 	MCFG_CPU_PROGRAM_MAP(srmp6_map)

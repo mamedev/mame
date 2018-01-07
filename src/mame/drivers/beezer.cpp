@@ -90,6 +90,7 @@ public:
 	DECLARE_WRITE8_MEMBER(via_system_pb_w);
 	DECLARE_WRITE8_MEMBER(bankswitch_w);
 
+	void beezer(machine_config &config);
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -459,7 +460,7 @@ void beezer_state::machine_reset()
 //  MACHINE DEFINTIONS
 //**************************************************************************
 
-static MACHINE_CONFIG_START( beezer )
+MACHINE_CONFIG_START(beezer_state::beezer)
 	// basic machine hardware
 	MCFG_CPU_ADD("maincpu", MC6809, XTAL_12MHz / 3)
 	MCFG_CPU_PROGRAM_MAP(main_map)

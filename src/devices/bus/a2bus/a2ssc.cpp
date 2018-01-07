@@ -96,7 +96,7 @@ ioport_constructor a2bus_ssc_device::device_input_ports() const
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( a2bus_ssc_device::device_add_mconfig )
+MACHINE_CONFIG_START(a2bus_ssc_device::device_add_mconfig)
 	MCFG_DEVICE_ADD(SSC_ACIA_TAG, MOS6551, 0)
 	MCFG_MOS6551_XTAL(XTAL_1_8432MHz)
 	MCFG_MOS6551_IRQ_HANDLER(WRITELINE(a2bus_ssc_device, acia_irq_w))

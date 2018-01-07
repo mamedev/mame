@@ -88,6 +88,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<cassette_image_device> m_cass;
 
+	void binbug(machine_config &config);
 private:
 	uint8_t m_framecnt;
 	required_shared_ptr<uint8_t> m_p_videoram;
@@ -293,7 +294,7 @@ static DEVICE_INPUT_DEFAULTS_START( keyboard )
 	DEVICE_INPUT_DEFAULTS( "RS232_STOPBITS", 0xff, RS232_STOPBITS_1 )
 DEVICE_INPUT_DEFAULTS_END
 
-static MACHINE_CONFIG_START( binbug )
+MACHINE_CONFIG_START(binbug_state::binbug)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",S2650, XTAL_1MHz)
 	MCFG_CPU_PROGRAM_MAP(binbug_mem)
@@ -422,6 +423,7 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(time_tick);
 	TIMER_DEVICE_CALLBACK_MEMBER(uart_tick);
 
+	void dg680(machine_config &config);
 private:
 	uint8_t m_pio_b;
 	uint8_t m_term_data;
@@ -525,7 +527,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(dg680_state::uart_tick)
 	m_ctc->trg3(0);
 }
 
-static MACHINE_CONFIG_START( dg680 )
+MACHINE_CONFIG_START(dg680_state::dg680)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80, XTAL_8MHz / 4)
 	MCFG_CPU_PROGRAM_MAP(dg680_mem)

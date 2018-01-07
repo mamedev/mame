@@ -247,7 +247,7 @@ INTERRUPT_GEN_MEMBER(gamecom_state::gamecom_interrupt)
 	m_maincpu->set_input_line(sm8500_cpu_device::LCDC_INT, ASSERT_LINE );
 }
 
-static MACHINE_CONFIG_START( gamecom )
+MACHINE_CONFIG_START(gamecom_state::gamecom)
 	/* basic machine hardware */
 	MCFG_CPU_ADD( "maincpu", SM8500, XTAL_11_0592MHz/2 )   /* actually it's an sm8521 microcontroller containing an sm8500 cpu */
 	MCFG_CPU_PROGRAM_MAP( gamecom_mem_map)

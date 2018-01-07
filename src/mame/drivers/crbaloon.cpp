@@ -359,7 +359,7 @@ INTERRUPT_GEN_MEMBER(crbaloon_state::vblank_irq)
 }
 
 
-static MACHINE_CONFIG_START( crbaloon )
+MACHINE_CONFIG_START(crbaloon_state::crbaloon)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, CRBALOON_MASTER_XTAL / 3)

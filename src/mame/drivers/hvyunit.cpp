@@ -149,6 +149,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline);
+	void hvyunit(machine_config &config);
 };
 
 
@@ -609,7 +610,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(hvyunit_state::scanline)
  *
  *************************************/
 
-static MACHINE_CONFIG_START( hvyunit )
+MACHINE_CONFIG_START(hvyunit_state::hvyunit)
 
 	MCFG_CPU_ADD("master", Z80, 6000000)
 	MCFG_CPU_PROGRAM_MAP(master_memory)

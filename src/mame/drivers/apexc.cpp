@@ -52,6 +52,7 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	required_device<screen_device> m_screen;
+	void apexc(machine_config &config);
 };
 
 void apexc_state::machine_start()
@@ -853,7 +854,7 @@ static ADDRESS_MAP_START(apexc_mem_map, AS_PROGRAM, 32, apexc_state )
 ADDRESS_MAP_END
 
 
-static MACHINE_CONFIG_START( apexc )
+MACHINE_CONFIG_START(apexc_state::apexc)
 
 	/* basic machine hardware */
 	/* APEXC CPU @ 2.0 kHz (memory word clock frequency) */

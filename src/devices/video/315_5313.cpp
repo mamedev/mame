@@ -183,7 +183,7 @@ void sega315_5313_device::static_set_palette_tag(device_t &device, const char *t
 //  add machine configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER(sega315_5313_device::device_add_mconfig)
+MACHINE_CONFIG_START(sega315_5313_device::device_add_mconfig)
 	MCFG_PALETTE_ADD("palette", 0x200)
 	MCFG_PALETTE_INIT_OWNER(sega315_5124_device, sega315_5124)
 MACHINE_CONFIG_END

@@ -260,7 +260,7 @@ GFXDECODE_END
 
 /****************************************************************************/
 
-static MACHINE_CONFIG_START( xxmissio )
+MACHINE_CONFIG_START(xxmissio_state::xxmissio)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80,12000000/4) /* 3.0MHz */

@@ -60,4 +60,8 @@ public:
 	uint32_t screen_update_bigkarnk(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_maniacsq(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect );
+	void bigkarnk(machine_config &config);
+	void thoop(machine_config &config);
+	void maniacsq(machine_config &config);
+	void squash(machine_config &config);
 };

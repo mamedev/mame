@@ -99,6 +99,7 @@ public:
 	DECLARE_PALETTE_INIT(roul);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void roul(machine_config &config);
 };
 
 
@@ -294,7 +295,7 @@ static INPUT_PORTS_START( roul )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( roul )
+MACHINE_CONFIG_START(roul_state::roul)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 4000000)
 	MCFG_CPU_PROGRAM_MAP(roul_map)

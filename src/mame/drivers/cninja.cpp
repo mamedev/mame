@@ -810,7 +810,7 @@ DECOSPR_PRIORITY_CB_MEMBER(cninja_state::pri_callback)
 }
 
 
-static MACHINE_CONFIG_START( cninja )
+MACHINE_CONFIG_START(cninja_state::cninja)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz / 2)
@@ -898,7 +898,7 @@ static MACHINE_CONFIG_START( cninja )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( stoneage )
+MACHINE_CONFIG_START(cninja_state::stoneage)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz / 2)
@@ -980,7 +980,7 @@ static MACHINE_CONFIG_START( stoneage )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( cninjabl2, stoneage )
+MACHINE_CONFIG_DERIVED(cninja_state::cninjabl2, stoneage)
 	MCFG_CPU_MODIFY("audiocpu")
 	MCFG_CPU_PROGRAM_MAP(cninjabl2_s_map)
 
@@ -997,7 +997,7 @@ static MACHINE_CONFIG_DERIVED( cninjabl2, stoneage )
 	MCFG_DEVICE_ADDRESS_MAP(0, cninjabl2_oki_map)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( cninjabl )
+MACHINE_CONFIG_START(cninja_state::cninjabl)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz / 2)
@@ -1069,7 +1069,7 @@ static MACHINE_CONFIG_START( cninjabl )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( edrandy )
+MACHINE_CONFIG_START(cninja_state::edrandy)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz / 2)
@@ -1156,7 +1156,7 @@ static MACHINE_CONFIG_START( edrandy )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( robocop2 )
+MACHINE_CONFIG_START(cninja_state::robocop2)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_28MHz / 2)
@@ -1251,7 +1251,7 @@ static MACHINE_CONFIG_START( robocop2 )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( mutantf )
+MACHINE_CONFIG_START(cninja_state::mutantf)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 14000000)

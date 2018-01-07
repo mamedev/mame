@@ -108,4 +108,11 @@ public:
 	pen_t cosmica_map_color(uint8_t x, uint8_t y);
 	pen_t cosmicg_map_color(uint8_t x, uint8_t y);
 	pen_t magspot_map_color(uint8_t x, uint8_t y);
+	void cosmic(machine_config &config);
+	void cosmica(machine_config &config);
+	void cosmicg(machine_config &config);
+	void nomnlnd(machine_config &config);
+	void devzone(machine_config &config);
+	void panic(machine_config &config);
+	void magspot(machine_config &config);
 };

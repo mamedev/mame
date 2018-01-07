@@ -79,4 +79,8 @@ public:
 	void borntofi_adpcm_start( msm5205_device *device, int voice );
 	void borntofi_adpcm_stop( msm5205_device *device, int voice );
 	void borntofi_adpcm_int( msm5205_device *device, int voice );
+	void fantland(machine_config &config);
+	void wheelrun(machine_config &config);
+	void borntofi(machine_config &config);
+	void galaxygn(machine_config &config);
 };

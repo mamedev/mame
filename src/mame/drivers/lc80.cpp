@@ -325,7 +325,7 @@ void lc80_state::machine_start()
 
 /* Machine Driver */
 
-static MACHINE_CONFIG_START( lc80 )
+MACHINE_CONFIG_START(lc80_state::lc80)
 	/* basic machine hardware */
 	MCFG_CPU_ADD(Z80_TAG, Z80, 900000) /* UD880D */
 	MCFG_CPU_PROGRAM_MAP(lc80_mem)
@@ -364,7 +364,7 @@ static MACHINE_CONFIG_START( lc80 )
 	MCFG_RAM_EXTRA_OPTIONS("2K,3K,4K")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( lc80_2 )
+MACHINE_CONFIG_START(lc80_state::lc80_2)
 	/* basic machine hardware */
 	MCFG_CPU_ADD(Z80_TAG, Z80, 1800000) /* UD880D */
 	MCFG_CPU_PROGRAM_MAP(lc80_mem)

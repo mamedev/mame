@@ -405,7 +405,7 @@ DEFINE_DEVICE_TYPE(IBM5160_MOTHERBOARD, ibm5160_mb_device, "ibm5160_mb", "IBM 51
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( ibm5160_mb_device::device_add_mconfig )
+MACHINE_CONFIG_START(ibm5160_mb_device::device_add_mconfig)
 	MCFG_DEVICE_ADD("pit8253", PIT8253, 0)
 	MCFG_PIT8253_CLK0(XTAL_14_31818MHz/12.0) /* heartbeat IRQ */
 	MCFG_PIT8253_OUT0_HANDLER(DEVWRITELINE("pic8259", pic8259_device, ir0_w))
@@ -596,7 +596,7 @@ DEFINE_DEVICE_TYPE(IBM5150_MOTHERBOARD, ibm5150_mb_device, "ibm5150_mb", "IBM 51
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( ibm5150_mb_device::device_add_mconfig )
+MACHINE_CONFIG_START(ibm5150_mb_device::device_add_mconfig)
 	ibm5160_mb_device::device_add_mconfig(config);
 
 	MCFG_DEVICE_MODIFY("pc_kbdc")
@@ -774,7 +774,7 @@ DEFINE_DEVICE_TYPE(EC1841_MOTHERBOARD, ec1841_mb_device, "ec1841_mb", "EC-1840 m
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( ec1841_mb_device::device_add_mconfig )
+MACHINE_CONFIG_START(ec1841_mb_device::device_add_mconfig)
 	ibm5160_mb_device::device_add_mconfig(config);
 
 	MCFG_DEVICE_MODIFY("ppi8255")
@@ -901,7 +901,7 @@ pc_noppi_mb_device::pc_noppi_mb_device(const machine_config &mconfig, device_typ
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( pc_noppi_mb_device::device_add_mconfig )
+MACHINE_CONFIG_START(pc_noppi_mb_device::device_add_mconfig)
 	ibm5160_mb_device::device_add_mconfig(config);
 
 	MCFG_DEVICE_REMOVE("pc_kbdc")

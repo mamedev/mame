@@ -189,6 +189,8 @@ public:
 	DECLARE_WRITE8_MEMBER( pipedrm_bankswitch_w );
 	DECLARE_WRITE8_MEMBER( sound_bankswitch_w );
 	DECLARE_READ8_MEMBER( pending_command_r );
+	void pipedrm(machine_config &config);
+	void hatris(machine_config &config);
 };
 
 
@@ -564,7 +566,7 @@ MACHINE_RESET_MEMBER(pipedrm_state,pipedrm)
 	m_flipscreen = 0;
 }
 
-static MACHINE_CONFIG_START( pipedrm )
+MACHINE_CONFIG_START(pipedrm_state::pipedrm)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80,12000000/2)
@@ -619,7 +621,7 @@ static MACHINE_CONFIG_START( pipedrm )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( hatris )
+MACHINE_CONFIG_START(pipedrm_state::hatris)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80,12000000/2)

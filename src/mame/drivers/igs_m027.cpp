@@ -65,6 +65,8 @@ public:
 
 	void sdwx_gfx_decrypt();
 	void pgm_create_dummy_internal_arm_region();
+	void igs_majhong(machine_config &config);
+	void amazonia(machine_config &config);
 };
 
 
@@ -333,7 +335,7 @@ INTERRUPT_GEN_MEMBER(igs_m027_state::igs_majhong_interrupt)
 }
 
 
-static MACHINE_CONFIG_START( igs_majhong )
+MACHINE_CONFIG_START(igs_m027_state::igs_majhong)
 	MCFG_CPU_ADD("maincpu",ARM7, 20000000)
 
 	MCFG_CPU_PROGRAM_MAP(igs_majhong_map)
@@ -367,7 +369,7 @@ MACHINE_CONFIG_END
 
 
 
-static MACHINE_CONFIG_START( amazonia )
+MACHINE_CONFIG_START(igs_m027_state::amazonia)
 	MCFG_CPU_ADD("maincpu",ARM7, 20000000)
 
 	MCFG_CPU_PROGRAM_MAP(igs_majhong_map)

@@ -50,6 +50,8 @@ public:
 	DECLARE_READ8_MEMBER(unk_r);
 	DECLARE_READ8_MEMBER(from_term);
 
+	void basic52(machine_config &config);
+	void basic31(machine_config &config);
 private:
 	uint8_t m_term_data;
 	required_device<mcs51_cpu_device> m_maincpu;
@@ -98,7 +100,7 @@ void basic52_state::kbd_put(u8 data)
 	m_term_data = data;
 }
 
-static MACHINE_CONFIG_START( basic31 )
+MACHINE_CONFIG_START(basic52_state::basic31)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8031, XTAL_11_0592MHz)
 	MCFG_CPU_PROGRAM_MAP(basic52_mem)
@@ -113,7 +115,7 @@ static MACHINE_CONFIG_START( basic31 )
 	MCFG_DEVICE_ADD("ppi8255", I8255, 0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( basic52, basic31 )
+MACHINE_CONFIG_DERIVED(basic52_state::basic52, basic31)
 	/* basic machine hardware */
 	MCFG_CPU_REPLACE("maincpu", I8052, XTAL_11_0592MHz)
 	MCFG_CPU_PROGRAM_MAP(basic52_mem)

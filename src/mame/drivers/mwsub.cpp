@@ -36,6 +36,7 @@ public:
 	DECLARE_WRITE8_MEMBER(submar_sound_w);
 	DECLARE_WRITE8_MEMBER(submar_led_w);
 	DECLARE_WRITE8_MEMBER(submar_irq_clear_w);
+	void submar(machine_config &config);
 };
 
 
@@ -196,7 +197,7 @@ INPUT_PORTS_END
 
 ***************************************************************************/
 
-static MACHINE_CONFIG_START( submar )
+MACHINE_CONFIG_START(submar_state::submar)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_19_968MHz/8)

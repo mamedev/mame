@@ -26,7 +26,7 @@ stereo_speaker_device::stereo_speaker_device(
 }
 
 
-MACHINE_CONFIG_MEMBER(stereo_speaker_device::device_add_mconfig)
+MACHINE_CONFIG_START(stereo_speaker_device::device_add_mconfig)
 	MCFG_SPEAKER_STANDARD_STEREO("outl", "outr")
 
 	MCFG_SOUND_ADD("lspkr", SPEAKER_SOUND, 0)
@@ -69,7 +69,7 @@ mono_speaker_device::mono_speaker_device(
 }
 
 
-MACHINE_CONFIG_MEMBER(mono_speaker_device::device_add_mconfig)
+MACHINE_CONFIG_START(mono_speaker_device::device_add_mconfig)
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("spkr", SPEAKER_SOUND, 0)

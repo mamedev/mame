@@ -455,7 +455,7 @@ void mm1_state::machine_reset()
 //  MACHINE_CONFIG( mm1 )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( mm1 )
+MACHINE_CONFIG_START(mm1_state::mm1)
 	// basic system hardware
 	MCFG_CPU_ADD(I8085A_TAG, I8085A, XTAL_6_144MHz)
 	MCFG_CPU_PROGRAM_MAP(mm1_map)
@@ -525,7 +525,7 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( mm1m6 )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_DERIVED( mm1m6, mm1 )
+MACHINE_CONFIG_DERIVED(mm1_state::mm1m6, mm1)
 	// video hardware
 	MCFG_FRAGMENT_ADD(mm1m6_video)
 MACHINE_CONFIG_END
@@ -535,7 +535,7 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( mm1m7 )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_DERIVED( mm1m7, mm1 )
+MACHINE_CONFIG_DERIVED(mm1_state::mm1m7, mm1)
 	// video hardware
 	MCFG_FRAGMENT_ADD(mm1m6_video)
 

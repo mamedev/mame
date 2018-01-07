@@ -82,6 +82,7 @@ public:
 		, m_maincpu(*this, "maincpu")
 	{ }
 
+	void pimps(machine_config &config);
 private:
 	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
@@ -122,7 +123,7 @@ static DEVICE_INPUT_DEFAULTS_START( terminal ) // set up terminal to default to 
 	DEVICE_INPUT_DEFAULTS( "RS232_STOPBITS", 0xff, RS232_STOPBITS_2 )
 DEVICE_INPUT_DEFAULTS_END
 
-static MACHINE_CONFIG_START( pimps )
+MACHINE_CONFIG_START(pimps_state::pimps)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",I8085A, XTAL_2MHz)
 	MCFG_CPU_PROGRAM_MAP(mem_map)

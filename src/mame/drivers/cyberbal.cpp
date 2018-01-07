@@ -395,7 +395,7 @@ GFXDECODE_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( cyberbal )
+MACHINE_CONFIG_START(cyberbal_state::cyberbal)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, ATARI_CLOCK_14MHz/2)
@@ -476,7 +476,7 @@ static MACHINE_CONFIG_START( cyberbal )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( cyberbalt, cyberbal )
+MACHINE_CONFIG_DERIVED(cyberbal_state::cyberbalt, cyberbal)
 	MCFG_DEVICE_REMOVE("eeprom")
 	MCFG_EEPROM_2816_ADD("eeprom")
 	MCFG_EEPROM_28XX_LOCK_AFTER_WRITE(true)
@@ -485,7 +485,7 @@ static MACHINE_CONFIG_DERIVED( cyberbalt, cyberbal )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( cyberbal2p )
+MACHINE_CONFIG_START(cyberbal_state::cyberbal2p)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, ATARI_CLOCK_14MHz/2)

@@ -50,7 +50,7 @@ const tiny_rom_entry *cst_q_plus4_device::device_rom_region() const
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( cst_q_plus4_device::device_add_mconfig )
+MACHINE_CONFIG_START(cst_q_plus4_device::device_add_mconfig)
 	MCFG_DEVICE_ADD(MC6821_TAG, PIA6821, 0)
 
 	MCFG_QL_EXPANSION_SLOT_ADD("exp1", ql_expansion_cards, nullptr)

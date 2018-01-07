@@ -70,6 +70,8 @@ public:
 	//INTERRUPT_GEN_MEMBER(drill_device_irq);
 	void tile_decode();
 	DECLARE_WRITE_LINE_MEMBER(irqhandler);
+
+	void drill(machine_config &config);
 	#ifdef UNUSED_FUNCTION
 	enum
 	{
@@ -348,7 +350,7 @@ MACHINE_RESET_MEMBER(_2mindril_state,drill)
 	m_irq_reg = 0;
 }
 
-static MACHINE_CONFIG_START( drill )
+MACHINE_CONFIG_START(_2mindril_state::drill)
 
 	MCFG_CPU_ADD("maincpu", M68000, 16000000 )
 	MCFG_CPU_PROGRAM_MAP(drill_map)

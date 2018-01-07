@@ -242,7 +242,7 @@ WRITE8_MEMBER( rollerg_state::banking_callback )
 }
 
 
-static MACHINE_CONFIG_START( rollerg )
+MACHINE_CONFIG_START(rollerg_state::rollerg)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", KONAMI, 3000000)        /* ? */

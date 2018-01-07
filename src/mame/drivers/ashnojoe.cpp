@@ -301,7 +301,7 @@ void ashnojoe_state::machine_reset()
 }
 
 
-static MACHINE_CONFIG_START( ashnojoe )
+MACHINE_CONFIG_START(ashnojoe_state::ashnojoe)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 8000000)

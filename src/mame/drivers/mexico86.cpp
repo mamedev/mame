@@ -423,7 +423,7 @@ void mexico86_state::machine_reset()
 	m_charbank = 0;
 }
 
-static MACHINE_CONFIG_START( mexico86 )
+MACHINE_CONFIG_START(mexico86_state::mexico86)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80, 24000000/4)      /* 6 MHz, Uses clock divided 24MHz OSC */
@@ -471,7 +471,7 @@ static MACHINE_CONFIG_START( mexico86 )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( knightb, mexico86 )
+MACHINE_CONFIG_DERIVED(mexico86_state::knightb, mexico86)
 
 	/* basic machine hardware */
 
@@ -483,7 +483,7 @@ static MACHINE_CONFIG_DERIVED( knightb, mexico86 )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( kikikai, knightb )
+MACHINE_CONFIG_DERIVED(mexico86_state::kikikai, knightb)
 
 	/* basic machine hardware */
 

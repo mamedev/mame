@@ -294,7 +294,7 @@ void goal92_state::machine_reset()
 	m_adpcm_toggle = 0;
 }
 
-static MACHINE_CONFIG_START( goal92 )
+MACHINE_CONFIG_START(goal92_state::goal92)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000,12000000)

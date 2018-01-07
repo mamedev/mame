@@ -13,13 +13,20 @@
 
 #include "emu.h"
 #include "includes/vertigo.h"
+#include "includes/exidy440.h"
+#include "audio/exidy440.h"
+#include "speaker.h"
 
 #include "cpu/m6805/m68705.h"
+#include "cpu/m6805/m6805.h"
+#include "cpu/m6809/m6809.h"
 #include "cpu/m68000/m68000.h"
 #include "machine/pit8253.h"
 #include "machine/nvram.h"
 #include "screen.h"
 
+#define EXIDY440_AUDIO_CLOCK    (XTAL_12_9792MHz / 4)
+#define EXIDY440_MC3418_CLOCK   (EXIDY440_AUDIO_CLOCK / 4 / 16)
 
 
 /*************************************
@@ -45,6 +52,19 @@ static ADDRESS_MAP_START( vertigo_map, AS_PROGRAM, 16, vertigo_state )
 	AM_RANGE(0x800000, 0x81ffff) AM_ROM
 ADDRESS_MAP_END
 
+static ADDRESS_MAP_START( exidy440_audio_map, AS_PROGRAM, 8, exidy440_sound_device )
+	AM_RANGE(0x0000, 0x7fff) AM_NOP
+	AM_RANGE(0x8000, 0x801f) AM_MIRROR(0x03e0) AM_DEVREADWRITE("custom", exidy440_sound_device, m6844_r, m6844_w)
+	AM_RANGE(0x8400, 0x840f) AM_MIRROR(0x03f0) AM_DEVREADWRITE("custom", exidy440_sound_device, sound_volume_r, sound_volume_w)
+	AM_RANGE(0x8800, 0x8800) AM_MIRROR(0x03ff) AM_DEVREAD("custom", exidy440_sound_device, sound_command_r) AM_WRITENOP
+	AM_RANGE(0x8c00, 0x93ff) AM_NOP
+	AM_RANGE(0x9400, 0x9403) AM_MIRROR(0x03fc) AM_READNOP AM_DEVWRITE("custom", exidy440_sound_device, sound_banks_w)
+	AM_RANGE(0x9800, 0x9800) AM_MIRROR(0x03ff) AM_READNOP AM_DEVWRITE("custom", exidy440_sound_device, sound_interrupt_clear_w)
+	AM_RANGE(0x9c00, 0x9fff) AM_NOP
+	AM_RANGE(0xa000, 0xbfff) AM_RAM
+	AM_RANGE(0xc000, 0xdfff) AM_NOP
+	AM_RANGE(0xe000, 0xffff) AM_ROM
+ADDRESS_MAP_END
 
 
 /*************************************
@@ -102,7 +122,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( vertigo )
+MACHINE_CONFIG_START(vertigo_state::vertigo)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz / 3)
@@ -135,6 +155,30 @@ static MACHINE_CONFIG_START( vertigo )
 	MCFG_SCREEN_UPDATE_DEVICE("vector", vector_device, screen_update)
 MACHINE_CONFIG_END
 
+MACHINE_CONFIG_START(vertigo_state::exidy440_audio)
+
+	MCFG_CPU_ADD("audiocpu", MC6809, EXIDY440_AUDIO_CLOCK)
+	MCFG_CPU_PROGRAM_MAP(exidy440_audio_map)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", driver_device, irq0_line_assert)
+
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+
+	MCFG_SOUND_ADD("custom", EXIDY440, EXIDY440_MC3418_CLOCK)
+	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
+
+//  MCFG_SOUND_ADD("cvsd1", MC3418, EXIDY440_MC3418_CLOCK)
+//  MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
+
+//  MCFG_SOUND_ADD("cvsd2", MC3418, EXIDY440_MC3418_CLOCK)
+//  MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
+
+//  MCFG_SOUND_ADD("cvsd3", MC3417, EXIDY440_MC3417_CLOCK)
+//  MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
+
+//  MCFG_SOUND_ADD("cvsd4", MC3417, EXIDY440_MC3417_CLOCK)
+//  MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
+MACHINE_CONFIG_END
 
 
 /*************************************

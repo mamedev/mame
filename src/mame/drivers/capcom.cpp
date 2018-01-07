@@ -16,6 +16,7 @@ public:
 			m_maincpu(*this, "maincpu")
 	{ }
 
+	void capcom(machine_config &config);
 protected:
 
 	// devices
@@ -43,7 +44,7 @@ DRIVER_INIT_MEMBER(capcom_state,capcom)
 {
 }
 
-static MACHINE_CONFIG_START( capcom )
+MACHINE_CONFIG_START(capcom_state::capcom)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 16670000) // M68306
 	MCFG_CPU_PROGRAM_MAP(capcom_map)

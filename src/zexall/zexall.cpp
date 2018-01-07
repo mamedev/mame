@@ -40,6 +40,7 @@ private:
 	std::string terminate_string;
 
 	virtual void machine_reset() override;
+	void zexall(machine_config &config);
 };
 
 
@@ -138,7 +139,7 @@ INPUT_PORTS_END
  Machine Drivers
 ******************************************************************************/
 
-static MACHINE_CONFIG_START( zexall )
+MACHINE_CONFIG_START(zexall_state::zexall)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_3_579545MHz)
 	MCFG_CPU_PROGRAM_MAP(z80_mem)

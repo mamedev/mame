@@ -888,10 +888,10 @@ TIMER_CALLBACK_MEMBER(vt100_video_device::lba7_change)
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER(vt100_video_device::device_add_mconfig)
+MACHINE_CONFIG_START(vt100_video_device::device_add_mconfig)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_MEMBER(rainbow_video_device::device_add_mconfig)
+MACHINE_CONFIG_START(rainbow_video_device::device_add_mconfig)
 	MCFG_PALETTE_ADD("palette", 4)
 MACHINE_CONFIG_END

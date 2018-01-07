@@ -617,6 +617,8 @@ public:
 	void video_reg_w(uint32_t reg, uint32_t data);
 	void init_taitotz_152();
 	void init_taitotz_111a();
+	void taitotz(machine_config &config);
+	void landhigh(machine_config &config);
 };
 
 class taitotz_renderer : public poly_manager<float, taitotz_polydata, 6, 50000>
@@ -2557,7 +2559,7 @@ WRITE_LINE_MEMBER(taitotz_state::ide_interrupt)
 	m_iocpu->set_input_line(TLCS900_INT2, state);
 }
 
-static MACHINE_CONFIG_START( taitotz )
+MACHINE_CONFIG_START(taitotz_state::taitotz)
 	/* IBM EMPPC603eBG-100 */
 	MCFG_CPU_ADD("maincpu", PPC603E, 100000000)
 	MCFG_PPC_BUS_FREQUENCY(XTAL_66_6667MHz)    /* Multiplier 1.5, Bus = 66MHz, Core = 100MHz */
@@ -2599,7 +2601,7 @@ static MACHINE_CONFIG_START( taitotz )
 
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( landhigh, taitotz )
+MACHINE_CONFIG_DERIVED(taitotz_state::landhigh, taitotz)
 	MCFG_CPU_MODIFY("iocpu")
 	MCFG_CPU_PROGRAM_MAP(landhigh_tlcs900h_mem)
 MACHINE_CONFIG_END

@@ -33,6 +33,7 @@ public:
 		, m_maincpu(*this, "maincpu")
 	{ }
 
+	void jade(machine_config &config);
 private:
 	required_device<cpu_device> m_maincpu;
 };
@@ -57,7 +58,7 @@ static INPUT_PORTS_START( jade )
 INPUT_PORTS_END
 
 
-static MACHINE_CONFIG_START( jade )
+MACHINE_CONFIG_START(jade_state::jade)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80, XTAL_4MHz)
 	MCFG_CPU_PROGRAM_MAP(mem_map)

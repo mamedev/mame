@@ -1445,6 +1445,7 @@ public:
 	// screen updates
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
+	void zaurus(machine_config &config);
 protected:
 	// driver_device overrides
 	virtual void machine_start() override;
@@ -1748,7 +1749,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(zaurus_state::rtc_irq_callback)
 }
 
 // TODO: main CPU differs greatly between versions!
-static MACHINE_CONFIG_START( zaurus )
+MACHINE_CONFIG_START(zaurus_state::zaurus)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",PXA255,MAIN_CLOCK)

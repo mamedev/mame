@@ -427,7 +427,7 @@ void tbowl_state::machine_reset()
 	m_soundlatch->acknowledge_w(machine().dummy_space(), 0, 0);
 }
 
-static MACHINE_CONFIG_START( tbowl )
+MACHINE_CONFIG_START(tbowl_state::tbowl)
 
 	/* CPU on Board '6206B' */
 	MCFG_CPU_ADD("maincpu", Z80, 8000000) /* NEC D70008AC-8 (Z80 Clone) */

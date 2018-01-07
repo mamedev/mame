@@ -588,7 +588,7 @@ void snk68_state::tile_callback_notpow(int &tile, int& fx, int& fy, int& region)
 	region = 1;
 }
 
-static MACHINE_CONFIG_START( pow )
+MACHINE_CONFIG_START(snk68_state::pow)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_18MHz/2) /* verified on pcb */
@@ -630,12 +630,12 @@ static MACHINE_CONFIG_START( pow )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( streetsm, pow )
+MACHINE_CONFIG_DERIVED(snk68_state::streetsm, pow)
 	MCFG_DEVICE_MODIFY("sprites")
 	MCFG_SNK68_SPR_SET_TILE_INDIRECT( snk68_state, tile_callback_notpow )
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( searchar, streetsm )
+MACHINE_CONFIG_DERIVED(snk68_state::searchar, streetsm)
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(searchar_map)

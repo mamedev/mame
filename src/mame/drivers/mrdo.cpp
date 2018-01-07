@@ -170,7 +170,7 @@ static GFXDECODE_START( mrdo )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( mrdo )
+MACHINE_CONFIG_START(mrdo_state::mrdo)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, MAIN_CLOCK/2)  /* Verified */
@@ -198,7 +198,7 @@ static MACHINE_CONFIG_START( mrdo )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( mrlo, mrdo )
+MACHINE_CONFIG_DERIVED(mrdo_state::mrlo, mrdo)
 	//MCFG_DEVICE_REMOVE("pal16r6")
 MACHINE_CONFIG_END
 

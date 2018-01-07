@@ -233,6 +233,7 @@ public:
 	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
 
+	void _4enlinea(machine_config &config);
 };
 
 
@@ -489,7 +490,7 @@ INTERRUPT_GEN_MEMBER(_4enlinea_state::_4enlinea_audio_irq)
 	device.execute().set_input_line(0, HOLD_LINE);
 }
 
-static MACHINE_CONFIG_START( 4enlinea )
+MACHINE_CONFIG_START(_4enlinea_state::_4enlinea)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, PRG_CPU_CLOCK)
@@ -549,5 +550,5 @@ ROM_END
 *           Game Drivers           *
 ***********************************/
 
-/*    YEAR  NAME       PARENT   MACHINE   INPUT     STATE            INIT   ROT   COMPANY       FULLNAME           FLAGS  */
-GAME( 1991, 4enlinea,  0,       4enlinea, 4enlinea, _4enlinea_state, 0,     ROT0, "Compumatic", "Cuatro en Linea", MACHINE_NOT_WORKING )
+/*    YEAR  NAME       PARENT   MACHINE    INPUT     STATE            INIT   ROT   COMPANY       FULLNAME           FLAGS  */
+GAME( 1991, 4enlinea,  0,       _4enlinea, 4enlinea, _4enlinea_state, 0,     ROT0, "Compumatic", "Cuatro en Linea", MACHINE_NOT_WORKING )

@@ -215,6 +215,7 @@ mvme147_state(const machine_config &mconfig, device_type type, const char *tag)
 	//DECLARE_WRITE16_MEMBER (vme_a16_w);
 	virtual void machine_start () override;
 	virtual void machine_reset () override;
+	void mvme147(machine_config &config);
 protected:
 
 private:
@@ -644,7 +645,7 @@ SLOT_INTERFACE_END
 /*
  * Machine configuration
  */
-static MACHINE_CONFIG_START (mvme147)
+MACHINE_CONFIG_START(mvme147_state::mvme147)
 	/* basic machine hardware */
 	MCFG_CPU_ADD ("maincpu", M68030, XTAL_16MHz)
 	MCFG_CPU_PROGRAM_MAP (mvme147_mem)

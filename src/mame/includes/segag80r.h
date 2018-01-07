@@ -165,6 +165,19 @@ public:
 	inline uint8_t demangle(uint8_t d7d6, uint8_t d5d4, uint8_t d3d2, uint8_t d1d0);
 	void monsterb_expand_gfx(const char *region);
 
+	void g80r_base(machine_config &config);
+	void monsterb(machine_config &config);
+	void sindbadm(machine_config &config);
+	void astrob(machine_config &config);
+	void pignewt(machine_config &config);
+	void monster2(machine_config &config);
+	void sega005(machine_config &config);
+	void spaceod(machine_config &config);
+	void astrob_sound_board(machine_config &config);
+	void sega005_sound_board(machine_config &config);
+	void spaceod_sound_board(machine_config &config);
+	void monsterb_sound_board(machine_config &config);
+	void sega_speech_board(machine_config &config);
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 	emu_timer *m_vblank_latch_clear_timer;
@@ -196,12 +209,6 @@ private:
 };
 
 DECLARE_DEVICE_TYPE(SEGA005, sega005_sound_device)
-
-
-MACHINE_CONFIG_EXTERN( astrob_sound_board );
-MACHINE_CONFIG_EXTERN( 005_sound_board );
-MACHINE_CONFIG_EXTERN( spaceod_sound_board );
-MACHINE_CONFIG_EXTERN( monsterb_sound_board );
 
 /*----------- defined in video/segag80r.c -----------*/
 

@@ -263,6 +263,7 @@ public:
 	DECLARE_READ8_MEMBER(radicasi_nmi_vector_r);
 	DECLARE_READ8_MEMBER(radicasi_irq_vector_r);
 
+	void radicasi(machine_config &config);
 protected:
 	// driver_device overrides
 	virtual void machine_start() override;
@@ -637,7 +638,7 @@ uint32_t radica_6502_state::screen_update(screen_device &screen, bitmap_ind16 &b
 		uint16_t dat = m_palram[offs++] << 8;
 		dat |= m_palram[offs++];
 
-		// llll lsss ---h hhhh
+		// llll lsss ---h hhhh
 		int l_raw = (dat & 0xf800) >> 11;
 		int sl_raw = (dat & 0x0700) >> 8;
 		int h_raw = (dat & 0x001f) >> 0;
@@ -1403,7 +1404,7 @@ INTERRUPT_GEN_MEMBER(radica_6502_state::interrupt)
 	*/
 }
 
-static MACHINE_CONFIG_START( radicasi )
+MACHINE_CONFIG_START(radica_6502_state::radicasi)
 
 	/* basic machine hardware */	
 	MCFG_CPU_ADD("maincpu",M6502,XTAL_21_28137MHz/2) // Tetris has a XTAL_21_28137MHz, not confirmed on Space Invaders, actual CPU clock unknown.

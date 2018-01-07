@@ -43,6 +43,7 @@ public:
 		, m_p_ram(*this, "ram")
 	{ }
 
+	void mccpm(machine_config &config);
 private:
 	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
@@ -73,7 +74,7 @@ void mccpm_state::machine_reset()
 	memcpy(m_p_ram, bios, 0x1000);
 }
 
-static MACHINE_CONFIG_START( mccpm )
+MACHINE_CONFIG_START(mccpm_state::mccpm)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80, XTAL_4MHz)
 	MCFG_CPU_PROGRAM_MAP(mccpm_mem)

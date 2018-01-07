@@ -85,4 +85,6 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank);
 	INTERRUPT_GEN_MEMBER(slave_interrupt);
 	TIMER_DEVICE_CALLBACK_MEMBER(airbustr_scanline);
+	void airbustr(machine_config &config);
+	void airbustrb(machine_config &config);
 };

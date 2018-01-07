@@ -119,6 +119,7 @@ public:
 	void famicombox_bankswitch(uint8_t bank);
 	void famicombox_reset();
 	void ppu_irq(int *ppu_regs);
+	void famibox(machine_config &config);
 };
 
 /******************************************************
@@ -544,7 +545,7 @@ void famibox_state::machine_start()
 	m_coins = 0;
 }
 
-static MACHINE_CONFIG_START( famibox )
+MACHINE_CONFIG_START(famibox_state::famibox)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", N2A03, NTSC_APU_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(famibox_map)

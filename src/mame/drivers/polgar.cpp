@@ -35,6 +35,8 @@ public:
 	DECLARE_WRITE8_MEMBER(polgar_led_w);
 	DECLARE_READ8_MEMBER(polgar_keys_r);
 
+	void polgar10(machine_config &config);
+	void polgar(machine_config &config);
 protected:
 	optional_ioport m_keys;
 };
@@ -56,6 +58,7 @@ public:
 	DECLARE_READ8_MEMBER(latch1_r);
 	DECLARE_READ32_MEMBER(disable_boot_rom_r);
 
+	void mrisc(machine_config &config);
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -85,6 +88,7 @@ public:
 	DECLARE_WRITE8_MEMBER(milano_led_w);
 	DECLARE_WRITE8_MEMBER(milano_io_w);
 
+	void milano(machine_config &config);
 protected:
 	virtual void machine_reset() override;
 	virtual void machine_start() override;
@@ -112,6 +116,7 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(nmi_on)  { m_maincpu->set_input_line(M6502_NMI_LINE, ASSERT_LINE); }
 	TIMER_DEVICE_CALLBACK_MEMBER(nmi_off) { m_maincpu->set_input_line(M6502_NMI_LINE, CLEAR_LINE);  }
 
+	void modena(machine_config &config);
 protected:
 	virtual void machine_reset() override;
 	virtual void machine_start() override;
@@ -139,6 +144,7 @@ public:
 	DECLARE_WRITE8_MEMBER(academy_led_w);
 	DECLARE_READ8_MEMBER(academy_input_r);
 
+	void academy(machine_config &config);
 protected:
 	virtual void machine_reset() override;
 
@@ -460,7 +466,7 @@ void mephisto_academy_state::machine_reset()
 	m_enable_nmi = true;
 }
 
-static MACHINE_CONFIG_START( polgar )
+MACHINE_CONFIG_START(mephisto_polgar_state::polgar)
 	MCFG_CPU_ADD("maincpu", M65C02, XTAL_4_9152MHz)
 	MCFG_CPU_PROGRAM_MAP(polgar_mem)
 	MCFG_CPU_PERIODIC_INT_DRIVER(mephisto_polgar_state, nmi_line_pulse, XTAL_4_9152MHz / (1 << 13))
@@ -472,12 +478,12 @@ static MACHINE_CONFIG_START( polgar )
 	MCFG_DEFAULT_LAYOUT(layout_mephisto_lcd)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( polgar10, polgar )
+MACHINE_CONFIG_DERIVED(mephisto_polgar_state::polgar10, polgar)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_CLOCK( XTAL_10MHz )
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( mrisc )
+MACHINE_CONFIG_START(mephisto_risc_state::mrisc)
 	MCFG_CPU_ADD("maincpu", M65C02, XTAL_10MHz / 4)     // G65SC02
 	MCFG_CPU_PROGRAM_MAP(mrisc_mem)
 	MCFG_CPU_PERIODIC_INT_DRIVER(mephisto_risc_state, irq0_line_hold, (double)XTAL_10MHz / (1 << 14))
@@ -498,7 +504,7 @@ static MACHINE_CONFIG_START( mrisc )
 	MCFG_DEFAULT_LAYOUT(layout_mephisto_lcd)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( milano, polgar )
+MACHINE_CONFIG_DERIVED(mephisto_milano_state::milano, polgar)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(milano_mem)
 
@@ -508,14 +514,14 @@ static MACHINE_CONFIG_DERIVED( milano, polgar )
 	MCFG_DEFAULT_LAYOUT(layout_mephisto_milano)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( academy, polgar )
+MACHINE_CONFIG_DERIVED(mephisto_academy_state::academy, polgar)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(academy_mem)
 
 	MCFG_DEFAULT_LAYOUT(layout_mephisto_academy)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( modena, milano )
+MACHINE_CONFIG_DERIVED(mephisto_modena_state::modena, polgar)
 	MCFG_CPU_MODIFY("maincpu")          // W65C02SP
 	MCFG_CPU_CLOCK(XTAL_4_194304Mhz)
 	MCFG_CPU_PROGRAM_MAP(modena_mem)
@@ -524,7 +530,10 @@ static MACHINE_CONFIG_DERIVED( modena, milano )
 	MCFG_TIMER_START_DELAY(attotime::from_hz((double)XTAL_4_194304Mhz / (1 << 13)) - attotime::from_usec(975))  // active for 975us
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("nmi_off", mephisto_modena_state, nmi_off, attotime::from_hz((double)XTAL_4_194304Mhz / (1 << 13)))
 
+	MCFG_DEVICE_REMOVE("board")
 	MCFG_DEVICE_REMOVE("display")
+	MCFG_MEPHISTO_BUTTONS_BOARD_ADD("board")
+	MCFG_MEPHISTO_BOARD_DISABLE_LEDS(true)
 	MCFG_DEFAULT_LAYOUT(layout_mephisto_modena)
 
 	/* sound hardware */

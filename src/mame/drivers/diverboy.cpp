@@ -90,6 +90,7 @@ public:
 	virtual void video_start() override;
 	uint32_t screen_update_diverboy(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(  bitmap_ind16 &bitmap, const rectangle &cliprect );
+	void diverboy(machine_config &config);
 };
 
 
@@ -265,7 +266,7 @@ void diverboy_state::machine_start()
 {
 }
 
-static MACHINE_CONFIG_START( diverboy )
+MACHINE_CONFIG_START(diverboy_state::diverboy)
 
 	MCFG_CPU_ADD("maincpu", M68000, 12000000) /* guess */
 	MCFG_CPU_PROGRAM_MAP(diverboy_map)

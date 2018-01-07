@@ -62,6 +62,7 @@ public:
 	uint32_t screen_update_wink(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	INTERRUPT_GEN_MEMBER(wink_sound);
+	void wink(machine_config &config);
 };
 
 
@@ -354,7 +355,7 @@ void wink_state::machine_reset()
 	m_sound_flag = 0;
 }
 
-static MACHINE_CONFIG_START( wink )
+MACHINE_CONFIG_START(wink_state::wink)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 12000000 / 4)
 	MCFG_CPU_PROGRAM_MAP(wink_map)

@@ -26,6 +26,7 @@ public:
 	DECLARE_READ8_MEMBER(inputs_r);
 	DECLARE_WRITE8_MEMBER(ay_porta_w);
 
+	void mmm(machine_config &config);
 private:
 	required_device<cpu_device> m_maincpu;
 	required_ioport_array<8> m_inputs;
@@ -158,7 +159,7 @@ static const z80_daisy_config mmm_daisy_chain[] =
 };
 
 
-static MACHINE_CONFIG_START( mmm )
+MACHINE_CONFIG_START(mmm_state::mmm)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80,2000000)         /* ? MHz */
 	MCFG_CPU_PROGRAM_MAP(mem_map)

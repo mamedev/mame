@@ -124,6 +124,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<discrete_device> m_discrete;
 	required_device<screen_device> m_screen;
+	void cliffhgr(machine_config &config);
 };
 
 
@@ -674,7 +675,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( cliffhgr )
+MACHINE_CONFIG_START(cliffhgr_state::cliffhgr)
 
 	MCFG_CPU_ADD("maincpu", Z80, 4000000)       /* 4MHz */
 	MCFG_CPU_PROGRAM_MAP(mainmem)

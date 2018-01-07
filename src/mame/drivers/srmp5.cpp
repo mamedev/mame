@@ -123,6 +123,7 @@ public:
 
 
 	DECLARE_WRITE8_MEMBER(st0016_rom_bank_w);
+	void srmp5(machine_config &config);
 };
 
 
@@ -551,7 +552,7 @@ static GFXDECODE_START( srmp5 )
 	//GFXDECODE_ENTRY( "gfx1", 0, tile_16x16x8_layout, 0x0, 0x800  )
 GFXDECODE_END
 
-static MACHINE_CONFIG_START( srmp5 )
+MACHINE_CONFIG_START(srmp5_state::srmp5)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",ST0016_CPU,8000000)

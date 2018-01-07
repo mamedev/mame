@@ -56,6 +56,7 @@ public:
 	required_device<generic_latch_8_device> m_soundlatch;
 
 	DECLARE_WRITE8_MEMBER(sound_nmi_w);
+	void kingpin(machine_config &config);
 };
 
 
@@ -127,7 +128,7 @@ static INPUT_PORTS_START( kingpin )
 INPUT_PORTS_END
 
 
-static MACHINE_CONFIG_START( kingpin )
+MACHINE_CONFIG_START(kingpin_state::kingpin)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_3_579545MHz)

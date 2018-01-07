@@ -259,7 +259,7 @@ static GFXDECODE_START( wrally )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( wrally )
+MACHINE_CONFIG_START(wrally_state::wrally)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000,XTAL_24MHz/2)        /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(wrally_map)

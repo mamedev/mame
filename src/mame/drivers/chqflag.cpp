@@ -325,7 +325,7 @@ WRITE_LINE_MEMBER(chqflag_state::background_brt_w)
 	}
 }
 
-static MACHINE_CONFIG_START( chqflag )
+MACHINE_CONFIG_START(chqflag_state::chqflag)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", KONAMI, XTAL_24MHz/2/4)    /* 052001 (verified on pcb) */

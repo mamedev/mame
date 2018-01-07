@@ -71,7 +71,7 @@ ioport_constructor a2bus_pic_device::device_input_ports() const
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( a2bus_pic_device::device_add_mconfig )
+MACHINE_CONFIG_START(a2bus_pic_device::device_add_mconfig)
 	MCFG_CENTRONICS_ADD(PIC_CENTRONICS_TAG, centronics_devices, "printer")
 	MCFG_CENTRONICS_DATA_INPUT_BUFFER("ctx_data_in")
 	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE(a2bus_pic_device, ack_w))

@@ -401,7 +401,7 @@ SLOT_INTERFACE_END
 
 
 /******************************************************************************/
-static MACHINE_CONFIG_START( hec2hr )
+MACHINE_CONFIG_START(hec2hrp_state::hec2hr)
 /******************************************************************************/
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80, XTAL_5MHz)
@@ -436,7 +436,7 @@ static MACHINE_CONFIG_START( hec2hr )
 MACHINE_CONFIG_END
 
 /*****************************************************************************/
-static MACHINE_CONFIG_START( hec2hrp )
+MACHINE_CONFIG_START(hec2hrp_state::hec2hrp)
 /*****************************************************************************/
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80, XTAL_5MHz)
@@ -475,7 +475,7 @@ static SLOT_INTERFACE_START( hector_floppies )
 SLOT_INTERFACE_END
 
 /*****************************************************************************/
-static MACHINE_CONFIG_START( hec2mx40 )
+MACHINE_CONFIG_START(hec2hrp_state::hec2mx40)
 /*****************************************************************************/
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80, XTAL_5MHz)
@@ -519,7 +519,7 @@ static MACHINE_CONFIG_START( hec2mx40 )
 
 MACHINE_CONFIG_END
 /*****************************************************************************/
-static MACHINE_CONFIG_START( hec2hrx )
+MACHINE_CONFIG_START(hec2hrp_state::hec2hrx)
 /*****************************************************************************/
 /* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80, XTAL_5MHz)
@@ -563,7 +563,7 @@ static MACHINE_CONFIG_START( hec2hrx )
 
 MACHINE_CONFIG_END
 /*****************************************************************************/
-static MACHINE_CONFIG_START( hec2mdhrx )
+MACHINE_CONFIG_START(hec2hrp_state::hec2mdhrx)
 /*****************************************************************************/
 // minidisc
 /* basic machine hardware */
@@ -605,7 +605,7 @@ static MACHINE_CONFIG_START( hec2mdhrx )
 MACHINE_CONFIG_END
 
 /*****************************************************************************/
-static MACHINE_CONFIG_START( hec2mx80 )
+MACHINE_CONFIG_START(hec2hrp_state::hec2mx80)
 /*****************************************************************************/
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80, XTAL_5MHz)

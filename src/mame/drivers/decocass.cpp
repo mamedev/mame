@@ -950,7 +950,7 @@ PALETTE_INIT_MEMBER(decocass_state, decocass)
 }
 
 
-static MACHINE_CONFIG_START( decocass )
+MACHINE_CONFIG_START(decocass_state::decocass)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", DECO_222, HCLK4) /* the earlier revision board doesn't have the 222 but must have the same thing implemented in logic for the M6502 */
@@ -997,118 +997,118 @@ static MACHINE_CONFIG_START( decocass )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( ctsttape, decocass )
+MACHINE_CONFIG_DERIVED(decocass_type1_state::ctsttape, decocass)
 
 	/* basic machine hardware */
 	MCFG_MACHINE_RESET_OVERRIDE(decocass_type1_state,ctsttape)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( cprogolfj, decocass )
+MACHINE_CONFIG_DERIVED(decocass_type1_state::cprogolfj, decocass)
 
 	/* basic machine hardware */
 	MCFG_MACHINE_RESET_OVERRIDE(decocass_type1_state,cprogolfj)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( cdsteljn, decocass )
+MACHINE_CONFIG_DERIVED(decocass_type1_state::cdsteljn, decocass)
 
 	/* basic machine hardware */
 	MCFG_MACHINE_RESET_OVERRIDE(decocass_type1_state,cdsteljn)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( cmanhat, decocass )
+MACHINE_CONFIG_DERIVED(decocass_type1_state::cmanhat, decocass)
 
 	/* basic machine hardware */
 	MCFG_MACHINE_RESET_OVERRIDE(decocass_type1_state,cmanhat)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( cfishing, decocass )
+MACHINE_CONFIG_DERIVED(decocass_type3_state::cfishing, decocass)
 
 	/* basic machine hardware */
 	MCFG_MACHINE_RESET_OVERRIDE(decocass_type3_state,cfishing)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( chwy, decocass )
+MACHINE_CONFIG_DERIVED(decocass_type1_state::chwy, decocass)
 
 	/* basic machine hardware */
 	MCFG_MACHINE_RESET_OVERRIDE(decocass_type1_state,chwy)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( cterrani, decocass )
+MACHINE_CONFIG_DERIVED(decocass_type1_state::cterrani, decocass)
 
 	/* basic machine hardware */
 	MCFG_MACHINE_RESET_OVERRIDE(decocass_type1_state,cterrani)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( castfant, decocass )
+MACHINE_CONFIG_DERIVED(decocass_type1_state::castfant, decocass)
 
 	/* basic machine hardware */
 	MCFG_MACHINE_RESET_OVERRIDE(decocass_type1_state,castfant)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( csuperas, decocass )
+MACHINE_CONFIG_DERIVED(decocass_type1_state::csuperas, decocass)
 
 	/* basic machine hardware */
 	MCFG_MACHINE_RESET_OVERRIDE(decocass_type1_state,csuperas)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( cocean1a, decocass ) /* 10 */
+MACHINE_CONFIG_DERIVED(decocass_type1_state::cocean1a, decocass) /* 10 */
 
 	/* basic machine hardware */
 	MCFG_MACHINE_RESET_OVERRIDE(decocass_type1_state,cocean1a)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( clocknch, decocass )
+MACHINE_CONFIG_DERIVED(decocass_type1_state::clocknch, decocass)
 
 	/* basic machine hardware */
 	MCFG_MACHINE_RESET_OVERRIDE(decocass_type1_state,clocknch)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( clocknchj, decocass )
+MACHINE_CONFIG_DERIVED(decocass_type1_state::clocknchj, decocass)
 
 	/* basic machine hardware */
 	MCFG_MACHINE_RESET_OVERRIDE(decocass_type1_state,clocknchj)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( cfboy0a1, decocass ) /* 12 */
+MACHINE_CONFIG_DERIVED(decocass_type1_state::cfboy0a1, decocass) /* 12 */
 
 	/* basic machine hardware */
 	MCFG_MACHINE_RESET_OVERRIDE(decocass_type1_state,cfboy0a1)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( cprogolf, decocass )
+MACHINE_CONFIG_DERIVED(decocass_type1_state::cprogolf, decocass)
 
 	/* basic machine hardware */
 	MCFG_MACHINE_RESET_OVERRIDE(decocass_type1_state,cprogolf)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( cluckypo, decocass )
+MACHINE_CONFIG_DERIVED(decocass_type1_state::cluckypo, decocass)
 
 	/* basic machine hardware */
 	MCFG_MACHINE_RESET_OVERRIDE(decocass_type1_state,cluckypo)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( ctisland, decocass )
+MACHINE_CONFIG_DERIVED(decocass_type1_state::ctisland, decocass)
 
 	/* basic machine hardware */
 	MCFG_MACHINE_RESET_OVERRIDE(decocass_type1_state,ctisland)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( ctisland3, decocass )
+MACHINE_CONFIG_DERIVED(decocass_type1_state::ctisland3, decocass)
 
 	/* basic machine hardware */
 	MCFG_MACHINE_RESET_OVERRIDE(decocass_type1_state,ctisland3)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( cexplore, decocass )
+MACHINE_CONFIG_DERIVED(decocass_type1_state::cexplore, decocass)
 
 	/* basic machine hardware */
 	MCFG_MACHINE_RESET_OVERRIDE(decocass_type1_state,cexplore)
@@ -1117,91 +1117,91 @@ MACHINE_CONFIG_END
 
 
 
-static MACHINE_CONFIG_DERIVED( cbtime, decocass )
+MACHINE_CONFIG_DERIVED(decocass_type3_state::cbtime, decocass)
 
 	/* basic machine hardware */
 	MCFG_MACHINE_RESET_OVERRIDE(decocass_type3_state,cbtime)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( cburnrub, decocass )
+MACHINE_CONFIG_DERIVED(decocass_type3_state::cburnrub, decocass)
 
 	/* basic machine hardware */
 	MCFG_MACHINE_RESET_OVERRIDE(decocass_type3_state,cburnrub)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( cgraplop, decocass )
+MACHINE_CONFIG_DERIVED(decocass_type3_state::cgraplop, decocass)
 
 	/* basic machine hardware */
 	MCFG_MACHINE_RESET_OVERRIDE(decocass_type3_state,cgraplop)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( cgraplop2, decocass )
+MACHINE_CONFIG_DERIVED(decocass_type3_state::cgraplop2, decocass)
 
 	/* basic machine hardware */
 	MCFG_MACHINE_RESET_OVERRIDE(decocass_type3_state,cgraplop2)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( clapapa, decocass )
+MACHINE_CONFIG_DERIVED(decocass_type3_state::clapapa, decocass)
 
 	/* basic machine hardware */
 	MCFG_MACHINE_RESET_OVERRIDE(decocass_type3_state,clapapa)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( cskater, decocass )
+MACHINE_CONFIG_DERIVED(decocass_type3_state::cskater, decocass)
 
 	/* basic machine hardware */
 	MCFG_MACHINE_RESET_OVERRIDE(decocass_type3_state,cskater)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( cprobowl, decocass )
+MACHINE_CONFIG_DERIVED(decocass_type3_state::cprobowl, decocass)
 
 	/* basic machine hardware */
 	MCFG_MACHINE_RESET_OVERRIDE(decocass_type3_state,cprobowl)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( cnightst, decocass )
+MACHINE_CONFIG_DERIVED(decocass_type3_state::cnightst, decocass)
 
 	/* basic machine hardware */
 	MCFG_MACHINE_RESET_OVERRIDE(decocass_type3_state,cnightst)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( cpsoccer, decocass )
+MACHINE_CONFIG_DERIVED(decocass_type3_state::cpsoccer, decocass)
 
 	/* basic machine hardware */
 	MCFG_MACHINE_RESET_OVERRIDE(decocass_type3_state,cpsoccer)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( csdtenis, decocass )
+MACHINE_CONFIG_DERIVED(decocass_type3_state::csdtenis, decocass)
 
 	/* basic machine hardware */
 	MCFG_MACHINE_RESET_OVERRIDE(decocass_type3_state,csdtenis)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( czeroize, decocass )
+MACHINE_CONFIG_DERIVED(decocass_type3_state::czeroize, decocass)
 
 	/* basic machine hardware */
 	MCFG_MACHINE_RESET_OVERRIDE(decocass_type3_state,czeroize)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( cppicf, decocass )
+MACHINE_CONFIG_DERIVED(decocass_type3_state::cppicf, decocass)
 
 	/* basic machine hardware */
 	MCFG_MACHINE_RESET_OVERRIDE(decocass_type3_state,cppicf)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( cfghtice, decocass )
+MACHINE_CONFIG_DERIVED(decocass_type3_state::cfghtice, decocass)
 
 	/* basic machine hardware */
 	MCFG_MACHINE_RESET_OVERRIDE(decocass_type3_state,cfghtice)

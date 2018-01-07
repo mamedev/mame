@@ -344,6 +344,9 @@ public:
 	I8275_DRAW_CHARACTER_MEMBER(display_pixels);
 	I8275_DRAW_CHARACTER_MEMBER(pesp_display_pixels);
 	I8275_DRAW_CHARACTER_MEMBER(qc_display_pixels);
+	void dwarfd(machine_config &config);
+	void pokeresp(machine_config &config);
+	void qc(machine_config &config);
 };
 
 
@@ -790,7 +793,7 @@ void dwarfd_state::machine_reset()
 	m_back_color = false;
 }
 
-static MACHINE_CONFIG_START( dwarfd )
+MACHINE_CONFIG_START(dwarfd_state::dwarfd)
 
 	/* basic machine hardware */
 	/* FIXME: The 8085A had a max clock of 6MHz, internally divided by 2! */
@@ -823,7 +826,7 @@ static MACHINE_CONFIG_START( dwarfd )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( pokeresp, dwarfd )
+MACHINE_CONFIG_DERIVED(dwarfd_state::pokeresp, dwarfd)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(pokeresp_map)
 	MCFG_CPU_IO_MAP(io_map)
@@ -832,7 +835,7 @@ static MACHINE_CONFIG_DERIVED( pokeresp, dwarfd )
 	MCFG_I8275_DRAW_CHARACTER_CALLBACK_OWNER(dwarfd_state, pesp_display_pixels)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( qc, dwarfd )
+MACHINE_CONFIG_DERIVED(dwarfd_state::qc, dwarfd)
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(qc_map)

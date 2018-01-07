@@ -105,4 +105,10 @@ public:
 	K055673_CB_MEMBER(gaiapols_sprite_callback);
 	K055673_CB_MEMBER(martchmp_sprite_callback);
 	void decode_tiles();
+	void martchmp(machine_config &config);
+	void mystwarr(machine_config &config);
+	void dadandrn(machine_config &config);
+	void viostorm(machine_config &config);
+	void gaiapols(machine_config &config);
+	void metamrph(machine_config &config);
 };

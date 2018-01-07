@@ -698,7 +698,7 @@ void darius_state::machine_reset()
 }
 
 
-static MACHINE_CONFIG_START( darius )
+MACHINE_CONFIG_START(darius_state::darius)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz/2)  /* 8 MHz */

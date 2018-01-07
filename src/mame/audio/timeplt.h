@@ -19,6 +19,9 @@ public:
 	DECLARE_WRITE8_MEMBER(filter_w);
 	DECLARE_READ8_MEMBER(portB_r);
 
+	void timeplt_sound(machine_config &config);
+	void locomotn_sound(machine_config &config);
+
 protected:
 	// device-level overrides
 	virtual void device_start() override;
@@ -40,9 +43,6 @@ private:
 
 	void filter_w( device_t *device, int data );
 };
-
-MACHINE_CONFIG_EXTERN( timeplt_sound );
-MACHINE_CONFIG_EXTERN( locomotn_sound );
 
 DECLARE_DEVICE_TYPE(TIMEPLT_AUDIO, timeplt_audio_device)
 

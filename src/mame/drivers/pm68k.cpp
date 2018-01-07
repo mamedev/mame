@@ -26,6 +26,7 @@ public:
 		, m_maincpu(*this, "maincpu")
 	{ }
 
+	void pm68k(machine_config &config);
 private:
 	virtual void machine_reset() override;
 	required_shared_ptr<uint16_t> m_p_base;
@@ -55,7 +56,7 @@ void pm68k_state::machine_reset()
 	m_maincpu->reset();
 }
 
-static MACHINE_CONFIG_START( pm68k )
+MACHINE_CONFIG_START(pm68k_state::pm68k)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 8000000)
 	MCFG_CPU_PROGRAM_MAP(pm68k_mem)

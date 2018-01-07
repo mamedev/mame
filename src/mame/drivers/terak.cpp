@@ -30,6 +30,7 @@ public:
 	DECLARE_WRITE16_MEMBER(terak_fdc_data_w);
 	uint32_t screen_update_terak(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
+	void terak(machine_config &config);
 private:
 	uint8_t m_unit;
 	uint8_t m_cmd;
@@ -96,7 +97,7 @@ uint32_t terak_state::screen_update_terak(screen_device &screen, bitmap_ind16 &b
 }
 
 
-static MACHINE_CONFIG_START( terak )
+MACHINE_CONFIG_START(terak_state::terak)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",T11, XTAL_4MHz)
 	MCFG_T11_INITIAL_MODE(6 << 13)

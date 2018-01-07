@@ -55,6 +55,8 @@ public:
 
 	DECLARE_MACHINE_RESET(c8002);
 
+	void c8002(machine_config &config);
+	void c5000(machine_config &config);
 private:
 	required_device<cpu_device> m_maincpu;
 };
@@ -112,7 +114,7 @@ ADDRESS_MAP_END
 
 ****************************************************************************/
 
-static MACHINE_CONFIG_START( c8002 )
+MACHINE_CONFIG_START(onyx_state::c8002)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z8002, XTAL_4MHz )
 	//MCFG_Z80_DAISY_CHAIN(main_daisy_chain)
@@ -222,7 +224,7 @@ static ADDRESS_MAP_START(c5000_io, AS_IO, 8, onyx_state)
 	AM_RANGE(0x10, 0x13) AM_DEVREADWRITE("sio1", z80sio_device, cd_ba_r, cd_ba_w )
 ADDRESS_MAP_END
 
-static MACHINE_CONFIG_START( c5000 )
+MACHINE_CONFIG_START(onyx_state::c5000)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_16MHz / 4 )
 	//MCFG_Z80_DAISY_CHAIN(sub_daisy_chain)

@@ -148,6 +148,7 @@ public:
 
 	DECLARE_WRITE16_MEMBER(vctl_w);
 
+	void invqix(machine_config &config);
 protected:
 	// devices
 	required_device<cpu_device> m_maincpu;
@@ -327,7 +328,7 @@ static INPUT_PORTS_START( invqix )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_UNUSED )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( invqix )
+MACHINE_CONFIG_START(invqix_state::invqix)
 	MCFG_CPU_ADD("maincpu", H8S2394, XTAL_20MHz)
 	MCFG_CPU_PROGRAM_MAP(invqix_prg_map)
 	MCFG_CPU_IO_MAP(invqix_io_map)

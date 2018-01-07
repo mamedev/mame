@@ -339,7 +339,7 @@ void tceptor_state::machine_reset()
 
 /*******************************************************************/
 
-static MACHINE_CONFIG_START( tceptor )
+MACHINE_CONFIG_START(tceptor_state::tceptor)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6809, XTAL_49_152MHz/32)

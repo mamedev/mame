@@ -69,6 +69,7 @@ public:
 	uint32_t screen_update_chance32(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
+	void chance32(machine_config &config);
 };
 
 
@@ -444,7 +445,7 @@ void chance32_state::machine_reset()
 }
 
 
-static MACHINE_CONFIG_START( chance32 )
+MACHINE_CONFIG_START(chance32_state::chance32)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80,12000000/2)

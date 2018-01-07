@@ -318,7 +318,7 @@ GFXDECODE_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( arcadecl )
+MACHINE_CONFIG_START(arcadecl_state::arcadecl)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, MASTER_CLOCK)
@@ -358,7 +358,7 @@ static MACHINE_CONFIG_START( arcadecl )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( sparkz, arcadecl )
+MACHINE_CONFIG_DERIVED(arcadecl_state::sparkz, arcadecl)
 	MCFG_DEVICE_REMOVE("mob")
 MACHINE_CONFIG_END
 

@@ -490,7 +490,7 @@ MACHINE_RESET_MEMBER(moo_state,moo)
 	m_sprite_colorbase = 0;
 }
 
-static MACHINE_CONFIG_START( moo )
+MACHINE_CONFIG_START(moo_state::moo)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_32MHz/2) // 16MHz verified
@@ -552,7 +552,7 @@ static MACHINE_CONFIG_START( moo )
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.75)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( moobl )
+MACHINE_CONFIG_START(moo_state::moobl)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 16100000)
@@ -602,7 +602,7 @@ static MACHINE_CONFIG_START( moobl )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( bucky, moo )
+MACHINE_CONFIG_DERIVED(moo_state::bucky, moo)
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(bucky_map)

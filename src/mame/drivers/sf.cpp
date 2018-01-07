@@ -534,7 +534,7 @@ void sf_state::machine_reset()
 	m_fgscroll = 0;
 }
 
-static MACHINE_CONFIG_START( sfan )
+MACHINE_CONFIG_START(sf_state::sfan)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_8MHz)
@@ -585,7 +585,7 @@ static MACHINE_CONFIG_START( sfan )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( sfus, sfan )
+MACHINE_CONFIG_DERIVED(sf_state::sfus, sfan)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -593,7 +593,7 @@ static MACHINE_CONFIG_DERIVED( sfus, sfan )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( sfjp, sfan )
+MACHINE_CONFIG_DERIVED(sf_state::sfjp, sfan)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -601,7 +601,7 @@ static MACHINE_CONFIG_DERIVED( sfjp, sfan )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( sfp, sfan )
+MACHINE_CONFIG_DERIVED(sf_state::sfp, sfan)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")

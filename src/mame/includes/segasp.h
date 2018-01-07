@@ -27,5 +27,6 @@ public:
 	DECLARE_WRITE64_MEMBER(sp_bank_w);
 	uint16_t m_sp_bank;
 
+	void segasp(machine_config &config);
 protected:
 };

@@ -80,7 +80,7 @@ uint8_t* dragon_jcbsnd_device::get_cart_base()
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( dragon_jcbsnd_device::device_add_mconfig )
+MACHINE_CONFIG_START(dragon_jcbsnd_device::device_add_mconfig)
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("ay8910", AY8910, DERIVED_CLOCK(1, 1)) /* AY-3-8910 - clock not verified */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)

@@ -429,7 +429,7 @@ ADDRESS_MAP_END
 // device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( harddriv_sound_board_device::device_add_mconfig )
+MACHINE_CONFIG_START(harddriv_sound_board_device::device_add_mconfig)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("soundcpu", M68000, XTAL_16MHz/2)

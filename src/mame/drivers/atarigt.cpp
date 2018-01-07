@@ -800,7 +800,7 @@ static const atari_rle_objects_config modesc =
  *
  *************************************/
 
-static MACHINE_CONFIG_START( atarigt )
+MACHINE_CONFIG_START(atarigt_state::atarigt)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68EC020, ATARI_CLOCK_50MHz/2)
@@ -833,21 +833,21 @@ static MACHINE_CONFIG_START( atarigt )
 
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( tmek, atarigt )
+MACHINE_CONFIG_DERIVED(atarigt_state::tmek, atarigt)
 	/* sound hardware */
 	MCFG_DEVICE_ADD("cage", ATARI_CAGE, 0)
 	MCFG_ATARI_CAGE_SPEEDUP(0x4fad)
 	MCFG_ATARI_CAGE_IRQ_CALLBACK(WRITE8(atarigt_state,cage_irq_callback))
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( primrage, atarigt )
+MACHINE_CONFIG_DERIVED(atarigt_state::primrage, atarigt)
 	/* sound hardware */
 	MCFG_DEVICE_ADD("cage", ATARI_CAGE, 0)
 	MCFG_ATARI_CAGE_SPEEDUP(0x42f2)
 	MCFG_ATARI_CAGE_IRQ_CALLBACK(WRITE8(atarigt_state,cage_irq_callback))
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( primrage20, atarigt )
+MACHINE_CONFIG_DERIVED(atarigt_state::primrage20, atarigt)
 	/* sound hardware */
 	MCFG_DEVICE_ADD("cage", ATARI_CAGE, 0)
 	MCFG_ATARI_CAGE_SPEEDUP(0x48a4)

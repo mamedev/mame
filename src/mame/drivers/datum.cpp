@@ -70,6 +70,7 @@ public:
 	DECLARE_WRITE8_MEMBER(pb_w);
 	DECLARE_INPUT_CHANGED_MEMBER(trigger_reset);
 	DECLARE_INPUT_CHANGED_MEMBER(trigger_nmi);
+	void datum(machine_config &config);
 private:
 	uint8_t m_keydata;
 	virtual void machine_reset() override;
@@ -176,7 +177,7 @@ WRITE8_MEMBER( datum_state::pb_w )
 }
 
 
-static MACHINE_CONFIG_START( datum )
+MACHINE_CONFIG_START(datum_state::datum)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",M6802, XTAL_4MHz) // internally divided to 1 MHz
 	MCFG_CPU_PROGRAM_MAP(datum_mem)

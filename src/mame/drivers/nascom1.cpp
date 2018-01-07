@@ -85,6 +85,7 @@ public:
 	DECLARE_DEVICE_IMAGE_UNLOAD_MEMBER( nascom1_cassette );
 	DECLARE_SNAPSHOT_LOAD_MEMBER( nascom1 );
 
+	void nascom1(machine_config &config);
 protected:
 	virtual void machine_reset() override;
 
@@ -100,7 +101,6 @@ public:
 	{ }
 
 	uint32_t screen_update_nascom(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-
 private:
 };
 
@@ -125,6 +125,8 @@ public:
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(socket1_load) { return load_cart(image, m_socket1, 1); }
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(socket2_load) { return load_cart(image, m_socket2, 2); }
 
+	void nascom2(machine_config &config);
+	void nascom2c(machine_config &config);
 protected:
 	virtual void machine_reset() override;
 
@@ -644,7 +646,7 @@ INPUT_PORTS_END
 //  MACHINE DRIVERS
 //**************************************************************************
 
-static MACHINE_CONFIG_START( nascom1 )
+MACHINE_CONFIG_START(nascom_state::nascom1)
 	// main cpu
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_16MHz / 8)
 	MCFG_CPU_PROGRAM_MAP(nascom1_mem)
@@ -684,7 +686,7 @@ static MACHINE_CONFIG_START( nascom1 )
 	MCFG_SNAPSHOT_ADD("snapshot", nascom_state, nascom1, "nas", 0.5)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( nascom2, nascom1 )
+MACHINE_CONFIG_DERIVED(nascom2_state::nascom2, nascom1)
 	MCFG_CPU_REPLACE("maincpu", Z80, XTAL_16MHz / 4)
 	MCFG_CPU_PROGRAM_MAP(nascom2_mem)
 	MCFG_CPU_IO_MAP(nascom2_io)
@@ -718,7 +720,7 @@ static MACHINE_CONFIG_DERIVED( nascom2, nascom1 )
 	MCFG_SOFTWARE_LIST_ADD("floppy_list", "nascom_flop")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( nascom2c, nascom2 )
+MACHINE_CONFIG_DERIVED(nascom2_state::nascom2c, nascom2)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(nascom2c_mem)
 

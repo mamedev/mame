@@ -366,7 +366,7 @@ ADDRESS_MAP_END
 
 /***************************************************************************************/
 
-static MACHINE_CONFIG_START( chinhero )
+MACHINE_CONFIG_START(shangkid_state::chinhero)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_18_432MHz/6) /* verified on pcb */
@@ -422,7 +422,7 @@ static MACHINE_CONFIG_START( chinhero )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( shangkid, chinhero )
+MACHINE_CONFIG_DERIVED(shangkid_state::shangkid, chinhero)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -472,7 +472,7 @@ static ADDRESS_MAP_START( dynamski_portmap, AS_IO, 8, shangkid_state )
 	AM_RANGE(0x00, 0x01) AM_DEVWRITE("aysnd", ay8910_device, data_address_w)
 ADDRESS_MAP_END
 
-static MACHINE_CONFIG_START( dynamski )
+MACHINE_CONFIG_START(shangkid_state::dynamski)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 3000000) /* ? */

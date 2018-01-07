@@ -337,6 +337,7 @@ public:
 	DECLARE_PALETTE_INIT(peplus);
 	void handle_lightpen();
 
+	void peplus(machine_config &config);
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
@@ -1325,7 +1326,7 @@ void peplus_state::machine_reset()
 *     Machine Driver     *
 *************************/
 
-static MACHINE_CONFIG_START( peplus )
+MACHINE_CONFIG_START(peplus_state::peplus)
 	// basic machine hardware
 	MCFG_CPU_ADD("maincpu", I80C32, XTAL_20MHz/2) /* 10MHz */
 	MCFG_CPU_PROGRAM_MAP(peplus_map)

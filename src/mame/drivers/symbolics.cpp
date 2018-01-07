@@ -105,6 +105,7 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
+	void symbolics(machine_config &config);
 //protected:
 //  virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
@@ -314,7 +315,7 @@ void symbolics_state::machine_reset()
 	*/
 }
 
-static MACHINE_CONFIG_START( symbolics )
+MACHINE_CONFIG_START(symbolics_state::symbolics)
 	/* basic machine hardware */
 	// per page 159 of http://bitsavers.trailing-edge.com/pdf/symbolics/3600_series/Lisp_Machine_Hardware_Memos.pdf:
 	//XTALS: 16MHz @H11 (68k CPU clock)

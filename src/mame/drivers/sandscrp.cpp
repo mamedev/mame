@@ -132,6 +132,7 @@ public:
 
 	INTERRUPT_GEN_MEMBER(interrupt);
 	void update_irq_state();
+	void sandscrp(machine_config &config);
 };
 
 
@@ -470,7 +471,7 @@ GFXDECODE_END
 ***************************************************************************/
 
 
-static MACHINE_CONFIG_START( sandscrp )
+MACHINE_CONFIG_START(sandscrp_state::sandscrp)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000,12000000)    /* TMP68HC000N-12 */

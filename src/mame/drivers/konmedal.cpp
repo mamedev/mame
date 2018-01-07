@@ -79,6 +79,9 @@ public:
 	DECLARE_READ8_MEMBER(shuri_irq_r);
 	DECLARE_WRITE8_MEMBER(shuri_irq_w);
 
+	void shuriboy(machine_config &config);
+	void ddboy(machine_config &config);
+	void tsukande(machine_config &config);
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -368,7 +371,7 @@ void konmedal_state::machine_reset()
 	m_control = m_control2 = m_shuri_irq = 0;
 }
 
-static MACHINE_CONFIG_START( tsukande )
+MACHINE_CONFIG_START(konmedal_state::tsukande)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_14_31818MHz/2) // z84c0008pec 8mhz part, 14.31818Mhz xtal verified on PCB, divisor unknown
 	MCFG_CPU_PROGRAM_MAP(medal_main)
@@ -401,7 +404,7 @@ static MACHINE_CONFIG_START( tsukande )
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( ddboy )
+MACHINE_CONFIG_START(konmedal_state::ddboy)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_14_31818MHz/2) // z84c0008pec 8mhz part, 14.31818Mhz xtal verified on PCB, divisor unknown
 	MCFG_CPU_PROGRAM_MAP(ddboy_main)
@@ -530,7 +533,7 @@ WRITE8_MEMBER(konmedal_state::shuri_vrom_bank_w)
 	m_vrom_base |= (data << 10);
 }
 
-static MACHINE_CONFIG_START( shuriboy )
+MACHINE_CONFIG_START(konmedal_state::shuriboy)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_24MHz / 3) // divisor unknown
 	MCFG_CPU_PROGRAM_MAP(shuriboy_main)

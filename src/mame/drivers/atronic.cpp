@@ -29,6 +29,7 @@ public:
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
+	void atronic(machine_config &config);
 protected:
 
 	// devices
@@ -58,7 +59,7 @@ static INPUT_PORTS_START( atronic )
 INPUT_PORTS_END
 
 
-static MACHINE_CONFIG_START( atronic )
+MACHINE_CONFIG_START(atronic_state::atronic)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z180, 6000000)
 	MCFG_CPU_PROGRAM_MAP(atronic_map)

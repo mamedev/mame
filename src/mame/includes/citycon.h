@@ -50,4 +50,5 @@ public:
 	uint32_t screen_update_citycon(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	inline void changecolor_RRRRGGGGBBBBxxxx( int color, int indx );
+	void citycon(machine_config &config);
 };

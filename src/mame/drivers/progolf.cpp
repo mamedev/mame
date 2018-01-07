@@ -105,6 +105,8 @@ public:
 	DECLARE_PALETTE_INIT(progolf);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void progolfa(machine_config &config);
+	void progolf(machine_config &config);
 };
 
 
@@ -409,7 +411,7 @@ PALETTE_INIT_MEMBER(progolf_state, progolf)
 	}
 }
 
-static MACHINE_CONFIG_START( progolf )
+MACHINE_CONFIG_START(progolf_state::progolf)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", DECO_222, 3000000/2) /* guess, 3 Mhz makes the game to behave worse? */
 	MCFG_CPU_PROGRAM_MAP(main_cpu)
@@ -450,7 +452,7 @@ static MACHINE_CONFIG_START( progolf )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.23)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( progolfa, progolf )
+MACHINE_CONFIG_DERIVED(progolf_state::progolfa, progolf)
 	MCFG_DEVICE_REMOVE("maincpu") /* different encrypted cpu to progolf */
 	MCFG_CPU_ADD("maincpu", DECO_CPU6, 3000000/2) /* guess, 3 Mhz makes the game to behave worse? */
 	MCFG_CPU_PROGRAM_MAP(main_cpu)

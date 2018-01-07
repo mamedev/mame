@@ -848,7 +848,7 @@ GFXDECODE_END
  * Machine driver
  *********************************************************************/
 
-static MACHINE_CONFIG_START( polepos )
+MACHINE_CONFIG_START(polepos_state::polepos)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK/8)    /* 3.072 MHz */
@@ -979,7 +979,7 @@ static ADDRESS_MAP_START( sound_z80_bootleg_iomap, AS_IO, 8, polepos_state )
 	AM_RANGE(0x00, 0x00) AM_DEVREADWRITE("tms", tms5220_device, status_r, data_w)
 ADDRESS_MAP_END
 
-static MACHINE_CONFIG_START( topracern )
+MACHINE_CONFIG_START(polepos_state::topracern)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK/8)    /* 3.072 MHz */
@@ -1058,7 +1058,7 @@ static MACHINE_CONFIG_START( topracern )
 	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( polepos2bi, topracern )
+MACHINE_CONFIG_DERIVED(polepos_state::polepos2bi, topracern)
 
 	MCFG_CPU_ADD("soundz80bl", Z80, MASTER_CLOCK/8) /*? MHz */
 	MCFG_CPU_PROGRAM_MAP(sound_z80_bootleg_map)

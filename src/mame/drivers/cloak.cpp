@@ -321,7 +321,7 @@ GFXDECODE_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( cloak )
+MACHINE_CONFIG_START(cloak_state::cloak)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, 1000000)     /* 1 MHz ???? */

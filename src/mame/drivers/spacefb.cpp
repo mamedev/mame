@@ -328,7 +328,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( spacefb )
+MACHINE_CONFIG_START(spacefb_state::spacefb)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, SPACEFB_MAIN_CPU_CLOCK)

@@ -86,6 +86,7 @@ public:
 	INTERRUPT_GEN_MEMBER(vblank);
 	TIMER_CALLBACK_MEMBER(delayed_bank_swap);
 	void swap_linecpu_banks();
+	void cubeqst(machine_config &config);
 };
 
 
@@ -512,7 +513,7 @@ WRITE16_MEMBER( cubeqst_state::sound_dac_w )
  *
  *************************************/
 
-static MACHINE_CONFIG_START( cubeqst )
+MACHINE_CONFIG_START(cubeqst_state::cubeqst)
 	MCFG_CPU_ADD("main_cpu", M68000, XTAL_16MHz / 2)
 	MCFG_CPU_PROGRAM_MAP(m68k_program_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", cubeqst_state,  vblank)

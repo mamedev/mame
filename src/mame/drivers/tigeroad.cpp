@@ -574,7 +574,7 @@ static GFXDECODE_START( tigeroad )
 	GFXDECODE_ENTRY( "sprites", 0, sprite_layout, 0x200, 16 )
 GFXDECODE_END
 
-static MACHINE_CONFIG_START( tigeroad )
+MACHINE_CONFIG_START(tigeroad_state::tigeroad)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_10MHz) /* verified on pcb */
@@ -622,7 +622,7 @@ MACHINE_CONFIG_END
 
 
 /* same as above but with additional Z80 for samples playback */
-static MACHINE_CONFIG_DERIVED( toramich, tigeroad )
+MACHINE_CONFIG_DERIVED(tigeroad_state::toramich, tigeroad)
 
 	/* basic machine hardware */
 
@@ -638,7 +638,7 @@ static MACHINE_CONFIG_DERIVED( toramich, tigeroad )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( f1dream_comad )
+MACHINE_CONFIG_START(tigeroad_state::f1dream_comad)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 8000000)
@@ -695,7 +695,7 @@ void pushman_state::machine_start()
 	save_item(NAME(m_mcu_latch_ctl));
 }
 
-static MACHINE_CONFIG_DERIVED(pushman, f1dream_comad)
+MACHINE_CONFIG_DERIVED(pushman_state::pushman, f1dream_comad)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(pushman_map)
 
@@ -706,7 +706,7 @@ static MACHINE_CONFIG_DERIVED(pushman, f1dream_comad)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED(bballs, pushman)
+MACHINE_CONFIG_DERIVED(pushman_state::bballs, pushman)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(bballs_map)
 MACHINE_CONFIG_END

@@ -610,7 +610,7 @@ static const char *const bowl3d_sample_names[] =
  *
  *************************************/
 
-static MACHINE_CONFIG_START( meadows )
+MACHINE_CONFIG_START(meadows_state::meadows)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", S2650, MASTER_CLOCK/8)  /* 5MHz / 8 = 625 kHz */
@@ -647,7 +647,7 @@ static MACHINE_CONFIG_START( meadows )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( minferno )
+MACHINE_CONFIG_START(meadows_state::minferno)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", S2650, MASTER_CLOCK/24)     /* 5MHz / 8 / 3 = 208.33 kHz */
@@ -671,7 +671,7 @@ static MACHINE_CONFIG_START( minferno )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( bowl3d )
+MACHINE_CONFIG_START(meadows_state::bowl3d)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", S2650, MASTER_CLOCK/8)  /* 5MHz / 8 = 625 kHz */

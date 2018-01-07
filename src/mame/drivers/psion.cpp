@@ -564,7 +564,7 @@ static GFXDECODE_START( psion )
 GFXDECODE_END
 
 /* basic configuration for 2 lines display */
-static MACHINE_CONFIG_START( psion_2lines )
+MACHINE_CONFIG_START(psion_state::psion_2lines)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", HD63701, 980000) // should be HD6303 at 0.98MHz
 
@@ -604,7 +604,7 @@ static MACHINE_CONFIG_START( psion_2lines )
 MACHINE_CONFIG_END
 
 /* basic configuration for 4 lines display */
-static MACHINE_CONFIG_DERIVED( psion_4lines, psion_2lines )
+MACHINE_CONFIG_DERIVED(psion_state::psion_4lines, psion_2lines)
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_SIZE(6*20, 9*4)
@@ -615,7 +615,7 @@ static MACHINE_CONFIG_DERIVED( psion_4lines, psion_2lines )
 	MCFG_HD44780_PIXEL_UPDATE_CB(psion_state,lz_pixel_update)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( psion1, psion_2lines )
+MACHINE_CONFIG_DERIVED(psion1_state::psion1, psion_2lines)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(psion1_mem)
 
@@ -635,25 +635,25 @@ static MACHINE_CONFIG_DERIVED( psion1, psion_2lines )
 	MCFG_SOFTWARE_LIST_ADD("pack_list", "psion1")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( psioncm, psion_2lines )
+MACHINE_CONFIG_DERIVED(psion_state::psioncm, psion_2lines)
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(psioncm_mem)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( psionla, psion_2lines )
+MACHINE_CONFIG_DERIVED(psion_state::psionla, psion_2lines)
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(psionla_mem)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( psionlam, psion_2lines )
+MACHINE_CONFIG_DERIVED(psion_state::psionlam, psion_2lines)
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(psionlam_mem)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( psionp350, psion_2lines )
+MACHINE_CONFIG_DERIVED(psion_state::psionp350, psion_2lines)
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(psionp350_mem)
@@ -661,7 +661,7 @@ static MACHINE_CONFIG_DERIVED( psionp350, psion_2lines )
 	MCFG_NVRAM_ADD_0FILL("nvram3") // paged RAM
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( psionlz, psion_4lines )
+MACHINE_CONFIG_DERIVED(psion_state::psionlz, psion_4lines)
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(psionlz_mem)

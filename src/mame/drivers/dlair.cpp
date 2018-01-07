@@ -132,6 +132,10 @@ public:
 	DECLARE_PALETTE_INIT(dleuro);
 	uint32_t screen_update_dleuro(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(write_speaker);
+	void dlair_base(machine_config &config);
+	void dlair_pr7820(machine_config &config);
+	void dleuro(machine_config &config);
+	void dlair_ldv1000(machine_config &config);
 };
 
 
@@ -707,7 +711,7 @@ GFXDECODE_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( dlair_base )
+MACHINE_CONFIG_START(dlair_state::dlair_base)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK_US/4)
@@ -727,7 +731,7 @@ static MACHINE_CONFIG_START( dlair_base )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( dlair_pr7820, dlair_base )
+MACHINE_CONFIG_DERIVED(dlair_state::dlair_pr7820, dlair_base)
 	MCFG_LASERDISC_PR7820_ADD("ld_pr7820")
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
@@ -735,7 +739,7 @@ static MACHINE_CONFIG_DERIVED( dlair_pr7820, dlair_base )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( dlair_ldv1000, dlair_base )
+MACHINE_CONFIG_DERIVED(dlair_state::dlair_ldv1000, dlair_base)
 	MCFG_LASERDISC_LDV1000_ADD("ld_ldv1000")
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
@@ -743,7 +747,7 @@ static MACHINE_CONFIG_DERIVED( dlair_ldv1000, dlair_base )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( dleuro )
+MACHINE_CONFIG_START(dlair_state::dleuro)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK_EURO/4)

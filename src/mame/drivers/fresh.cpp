@@ -101,6 +101,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	void fresh(machine_config &config);
 };
 
 
@@ -590,7 +591,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(fresh_state::fake_scanline)
 }
 
 
-static MACHINE_CONFIG_START( fresh )
+MACHINE_CONFIG_START(fresh_state::fresh)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 24000000/2 )

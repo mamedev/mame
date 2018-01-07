@@ -127,6 +127,8 @@ public:
 	MC6845_ON_UPDATE_ADDR_CHANGED(crtc_addr);
 	MC6845_UPDATE_ROW(update_row);
 	DECLARE_PALETTE_INIT(amusco);
+	void amusco(machine_config &config);
+	void draw88pkr(machine_config &config);
 protected:
 	virtual void video_start() override;
 	virtual void machine_start() override;
@@ -520,7 +522,7 @@ PALETTE_INIT_MEMBER(amusco_state,amusco)
 *    Machine Drivers     *
 *************************/
 
-static MACHINE_CONFIG_START( amusco )
+MACHINE_CONFIG_START(amusco_state::amusco)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8088, CPU_CLOCK)        // 5 MHz ?
@@ -587,7 +589,7 @@ static MACHINE_CONFIG_START( amusco )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( draw88pkr, amusco )
+MACHINE_CONFIG_DERIVED(amusco_state::draw88pkr, amusco)
 	//MCFG_DEVICE_MODIFY("ppi_outputs") // Some bits are definitely different
 MACHINE_CONFIG_END
 

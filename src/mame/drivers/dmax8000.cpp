@@ -54,6 +54,7 @@ public:
 	DECLARE_WRITE8_MEMBER(port40_w);
 	DECLARE_WRITE_LINE_MEMBER(fdc_drq_w);
 
+	void dmax8000(machine_config &config);
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<fd1793_device> m_fdc;
@@ -143,7 +144,7 @@ static SLOT_INTERFACE_START( floppies )
 SLOT_INTERFACE_END
 
 
-static MACHINE_CONFIG_START( dmax8000 )
+MACHINE_CONFIG_START(dmax8000_state::dmax8000)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_4MHz ) // no idea what crystal is used, but 4MHz clock is confirmed
 	MCFG_CPU_PROGRAM_MAP(dmax8000_mem)

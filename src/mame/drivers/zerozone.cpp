@@ -168,7 +168,7 @@ void zerozone_state::machine_reset()
 	m_tilebank = 0;
 }
 
-static MACHINE_CONFIG_START( zerozone )
+MACHINE_CONFIG_START(zerozone_state::zerozone)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 10000000)   /* 10 MHz */

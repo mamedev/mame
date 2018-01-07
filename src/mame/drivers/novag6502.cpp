@@ -114,6 +114,10 @@ public:
 	// Super Forte
 	DECLARE_WRITE8_MEMBER(sforte_lcd_control_w);
 	DECLARE_WRITE8_MEMBER(sforte_lcd_data_w);
+	void cforte(machine_config &config);
+	void sexpert(machine_config &config);
+	void supercon(machine_config &config);
+	void sforte(machine_config &config);
 };
 
 
@@ -850,7 +854,7 @@ INPUT_PORTS_END
     Machine Drivers
 ******************************************************************************/
 
-static MACHINE_CONFIG_START( supercon )
+MACHINE_CONFIG_START(novag6502_state::supercon)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, XTAL_8MHz/2)
@@ -868,7 +872,7 @@ static MACHINE_CONFIG_START( supercon )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( cforte )
+MACHINE_CONFIG_START(novag6502_state::cforte)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", R65C02, XTAL_10MHz/2)
@@ -892,7 +896,7 @@ static MACHINE_CONFIG_START( cforte )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( sexpert )
+MACHINE_CONFIG_START(novag6502_state::sexpert)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M65C02, XTAL_10MHz/2) // or XTAL_12MHz/2
@@ -939,7 +943,7 @@ static MACHINE_CONFIG_START( sexpert )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( sforte, sexpert )
+MACHINE_CONFIG_DERIVED(novag6502_state::sforte, sexpert)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")

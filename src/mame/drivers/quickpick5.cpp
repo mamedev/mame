@@ -79,6 +79,7 @@ public:
 	DECLARE_READ8_MEMBER(vram_r);
 	DECLARE_WRITE8_MEMBER(vram_w);
 
+	void quickpick5(machine_config &config);
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -395,7 +396,7 @@ void quickpick5_state::machine_reset()
 {
 }
 
-static MACHINE_CONFIG_START( quickpick5 )
+MACHINE_CONFIG_START(quickpick5_state::quickpick5)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_32MHz/4) // z84c0008pec 8mhz part, 32Mhz xtal verified on PCB, divisor unknown
 	MCFG_CPU_PROGRAM_MAP(quickpick5_main)

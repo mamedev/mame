@@ -165,6 +165,8 @@ public:
 	uint32_t screen_update_mil4000(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
+	void chewheel(machine_config &config);
+	void mil4000(machine_config &config);
 };
 
 
@@ -537,7 +539,7 @@ static GFXDECODE_START( mil4000 )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( mil4000 )
+MACHINE_CONFIG_START(mil4000_state::mil4000)
 	MCFG_CPU_ADD("maincpu", M68000, CPU_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(mil4000_map)
 	// irq 2/4/5 point to the same place, others invalid
@@ -564,7 +566,7 @@ static MACHINE_CONFIG_START( mil4000 )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( chewheel, mil4000 )
+MACHINE_CONFIG_DERIVED(mil4000_state::chewheel, mil4000)
 	MCFG_CPU_REPLACE("maincpu", M68000, CPU_CLOCK) /* 2MHz */
 	MCFG_CPU_PROGRAM_MAP(chewheel_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", mil4000_state,  irq5_line_hold)

@@ -428,7 +428,7 @@ const tiny_rom_entry *ti99_gkracker_device::device_rom_region() const
 	return ROM_NAME( gkracker_rom );
 }
 
-MACHINE_CONFIG_MEMBER( ti99_gkracker_device::device_add_mconfig )
+MACHINE_CONFIG_START(ti99_gkracker_device::device_add_mconfig)
 	MCFG_DEVICE_ADD("cartridge", TI99_CART, 0)
 MACHINE_CONFIG_END
 

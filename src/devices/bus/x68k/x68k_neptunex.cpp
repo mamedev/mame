@@ -17,7 +17,7 @@
 DEFINE_DEVICE_TYPE(X68K_NEPTUNEX, x68k_neptune_device, "x68k_neptunex", "Neptune-X")
 
 // device machine config
-MACHINE_CONFIG_MEMBER( x68k_neptune_device::device_add_mconfig )
+MACHINE_CONFIG_START(x68k_neptune_device::device_add_mconfig)
 	MCFG_DEVICE_ADD("dp8390d", DP8390D, 0)
 	MCFG_DP8390D_IRQ_CB(WRITELINE(x68k_neptune_device, x68k_neptune_irq_w))
 	MCFG_DP8390D_MEM_READ_CB(READ8(x68k_neptune_device, x68k_neptune_mem_read))

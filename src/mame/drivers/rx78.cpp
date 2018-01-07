@@ -99,6 +99,7 @@ public:
 	DECLARE_DRIVER_INIT(rx78);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
+	void rx78(machine_config &config);
 private:
 	uint8_t m_vram_read_bank;
 	uint8_t m_vram_write_bank;
@@ -462,7 +463,7 @@ static GFXDECODE_START( rx78 )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( rx78 )
+MACHINE_CONFIG_START(rx78_state::rx78)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80, MASTER_CLOCK/7) // unknown divider
 	MCFG_CPU_PROGRAM_MAP(rx78_mem)

@@ -206,7 +206,7 @@ static ADDRESS_MAP_START( sound_io, AS_IO, 8, inder_sb_device )
 ADDRESS_MAP_END
 
 
-MACHINE_CONFIG_MEMBER( inder_sb_device::device_add_mconfig )
+MACHINE_CONFIG_START(inder_sb_device::device_add_mconfig)
 	MCFG_CPU_ADD("audiocpu", Z80, 8000000) // unk freq
 	MCFG_Z80_DAISY_CHAIN(daisy_chain)
 	MCFG_CPU_PROGRAM_MAP(sound_map)

@@ -285,6 +285,7 @@ public:
 
 	int m_ready_line;
 	int m_ready_line1;
+	void geneve_60hz(machine_config &config);
 };
 
 /*
@@ -688,7 +689,7 @@ void geneve_state::machine_reset()
 	m_joyport->write_port(0x01);    // select Joystick 1
 }
 
-static MACHINE_CONFIG_START( geneve_60hz )
+MACHINE_CONFIG_START(geneve_state::geneve_60hz)
 	// basic machine hardware
 	// TMS9995 CPU @ 12.0 MHz
 	MCFG_TMS99xx_ADD("maincpu", TMS9995, 12000000, memmap, crumap)

@@ -99,6 +99,7 @@ public:
 	uint32_t screen_update_m14(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(m14_irq);
 
+	void m14(machine_config &config);
 private:
 	/* video-related */
 	tilemap_t  *m_m14_tilemap;
@@ -424,7 +425,7 @@ void m14_state::machine_reset()
 }
 
 
-static MACHINE_CONFIG_START( m14 )
+MACHINE_CONFIG_START(m14_state::m14)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",I8085A,6000000) //guess: 6 Mhz internally divided by 2

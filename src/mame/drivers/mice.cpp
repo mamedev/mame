@@ -45,6 +45,8 @@ public:
 		, m_maincpu(*this, "maincpu")
 	{ }
 
+	void mice2(machine_config &config);
+	void mice(machine_config &config);
 private:
 	required_device<cpu_device> m_maincpu;
 };
@@ -151,7 +153,7 @@ static DEVICE_INPUT_DEFAULTS_START( mice2_terminal )
 DEVICE_INPUT_DEFAULTS_END
 
 
-static MACHINE_CONFIG_START( mice )
+MACHINE_CONFIG_START(mice_state::mice)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8085A, XTAL_6_144MHz)
 	MCFG_CPU_PROGRAM_MAP(mice_mem)
@@ -178,7 +180,7 @@ static MACHINE_CONFIG_START( mice )
 	MCFG_DEVICE_ADD("ppi", I8255, 0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( mice2, mice )
+MACHINE_CONFIG_DERIVED(mice_state::mice2, mice)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(mice2_mem)
 	MCFG_CPU_IO_MAP(mice2_io)

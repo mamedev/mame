@@ -84,6 +84,13 @@ public:
 	std::unique_ptr<uint8_t[]> m_srcdata0;
 	std::unique_ptr<uint8_t[]> m_srcdata2;
 
+	void mcr68(machine_config &config);
+	void intlaser(machine_config &config);
+	void xenophob(machine_config &config);
+	void spyhunt2(machine_config &config);
+	void trisport(machine_config &config);
+	void pigskin(machine_config &config);
+	void archrivl(machine_config &config);
 private:
 	required_device<ptm6840_device> m_ptm;
 };

@@ -113,6 +113,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	void ti99_2(machine_config &config);
 };
 
 
@@ -372,7 +373,7 @@ static INPUT_PORTS_START(ti99_2)
 
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( ti99_2 )
+MACHINE_CONFIG_START(ti99_2_state::ti99_2)
 	// basic machine hardware
 	// TMS9995, standard variant
 	// We have no lines connected yet

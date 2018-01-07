@@ -198,6 +198,8 @@ public:
 	uint32_t screen_update_doraemon(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank_champbwl);
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank_doraemon);
+	void champbwl(machine_config &config);
+	void doraemon(machine_config &config);
 };
 
 PALETTE_INIT_MEMBER(champbwl_state,champbwl)
@@ -481,7 +483,7 @@ WRITE_LINE_MEMBER(champbwl_state::screen_vblank_champbwl)
 }
 
 
-static MACHINE_CONFIG_START( champbwl )
+MACHINE_CONFIG_START(champbwl_state::champbwl)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 16000000/4) /* 4MHz */
@@ -546,7 +548,7 @@ MACHINE_START_MEMBER(champbwl_state,doraemon)
 	membank("bank1")->configure_entries(0, 4, &ROM[0x10000], 0x4000);
 }
 
-static MACHINE_CONFIG_START( doraemon )
+MACHINE_CONFIG_START(champbwl_state::doraemon)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_14_31818MHz/4)

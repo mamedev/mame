@@ -104,6 +104,7 @@ public:
 	DECLARE_WRITE8_MEMBER(wmg_vram_select_w);
 	DECLARE_CUSTOM_INPUT_MEMBER(wmg_mux_r);
 
+	void wmg(machine_config &config);
 private:
 
 	uint8_t m_wmg_c400;
@@ -489,7 +490,7 @@ DRIVER_INIT_MEMBER( wmg_state, wmg )
  *  Machine Driver
  *
  *************************************/
-static MACHINE_CONFIG_START( wmg )
+MACHINE_CONFIG_START(wmg_state::wmg)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", MC6809E, MASTER_CLOCK/3/4)
