@@ -966,6 +966,19 @@ void saturn_state::drawpixel_generic(int x, int y, int patterndata, int offsetcn
 				//mode = 2;
 				pix = pix+(stv2_current_sprite.CMDCOLR&0xffc0);
 				transmask = 0x3f;
+				
+				// Scud: the disposable assassin wants transparent pen on 0
+				if ( !spd )
+				{
+					if ( (pix & 0x3f) == 0 )
+					{
+						return;
+					}
+					else
+					{
+						spd = 1;
+					}
+				}
 				break;
 			case 0x0018: // mode 3 128 colour bank mode (8bits) (little characters on hanagumi use this mode)
 				pix = m_vdp1.gfx_decode[(patterndata+offsetcnt) & 0xfffff];
