@@ -166,7 +166,7 @@ void uv201_device::device_reset()
 
 void uv201_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
-	int scanline = m_screen->vpos();
+	int scanline = screen().vpos();
 
 	switch (id)
 	{
@@ -244,7 +244,7 @@ void uv201_device::initialize_palette()
 
 int uv201_device::get_field_vpos()
 {
-	int vpos = m_screen->vpos();
+	int vpos = screen().vpos();
 
 	if (vpos >= SCREEN_HEIGHT)
 	{
@@ -262,7 +262,7 @@ int uv201_device::get_field_vpos()
 
 int uv201_device::get_field()
 {
-	return m_screen->vpos() < SCREEN_HEIGHT;
+	return screen().vpos() < SCREEN_HEIGHT;
 }
 
 
@@ -274,8 +274,8 @@ void uv201_device::set_y_interrupt()
 {
 	int scanline = ((m_cmd & COMMAND_YINT_H_O) << 1) | m_y_int;
 
-	m_timer_y_odd->adjust(m_screen->time_until_pos(scanline), 0, m_screen->frame_period());
-	//m_timer_y_even->adjust(m_screen->time_until_pos(scanline + SCREEN_HEIGHT), 0, m_screen->frame_period());
+	m_timer_y_odd->adjust(screen().time_until_pos(scanline), 0, screen().frame_period());
+	//m_timer_y_even->adjust(screen().time_until_pos(scanline + SCREEN_HEIGHT), 0, screen().frame_period());
 }
 
 
@@ -285,11 +285,11 @@ void uv201_device::set_y_interrupt()
 
 void uv201_device::do_partial_update()
 {
-	int vpos = m_screen->vpos();
+	int vpos = screen().vpos();
 
 	if (LOG) logerror("Partial screen update at scanline %u\n", vpos);
 
-	m_screen->update_partial(vpos);
+	screen().update_partial(vpos);
 }
 
 
@@ -464,7 +464,7 @@ WRITE_LINE_MEMBER( uv201_device::ext_int_w )
 	if (!state && (m_cmd & COMMAND_FRZ))
 	{
 		m_freeze_y = get_field_vpos();
-		m_freeze_x = m_screen->hpos();
+		m_freeze_x = screen().hpos();
 	}
 }
 

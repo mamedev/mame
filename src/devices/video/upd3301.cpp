@@ -585,12 +585,12 @@ void upd3301_device::reset_counters()
 
 void upd3301_device::update_hrtc_timer(int state)
 {
-	int y = m_screen->vpos();
+	int y = screen().vpos();
 
 	int next_x = state ? m_h : 0;
 	int next_y = state ? y : ((y + 1) % ((m_l + m_v) * m_width));
 
-	attotime duration = m_screen->time_until_pos(next_y, next_x);
+	attotime duration = screen().time_until_pos(next_y, next_x);
 
 	m_hrtc_timer->adjust(duration, !state);
 }
@@ -604,7 +604,7 @@ void upd3301_device::update_vrtc_timer(int state)
 {
 	int next_y = state ? (m_l * m_r) : 0;
 
-	attotime duration = m_screen->time_until_pos(next_y, 0);
+	attotime duration = screen().time_until_pos(next_y, 0);
 
 	m_vrtc_timer->adjust(duration, !state);
 }
@@ -628,7 +628,7 @@ void upd3301_device::recompute_parameters()
 	LOG("UPD3301 Screen: %u x %u @ %f Hz\n", horiz_pix_total, vert_pix_total, 1 / ATTOSECONDS_TO_DOUBLE(refresh));
 	LOG("UPD3301 Visible Area: (%u, %u) - (%u, %u)\n", visarea.min_x, visarea.min_y, visarea.max_x, visarea.max_y);
 
-	m_screen->configure(horiz_pix_total, vert_pix_total, visarea, refresh);
+	screen().configure(horiz_pix_total, vert_pix_total, visarea, refresh);
 
 	update_hrtc_timer(0);
 	update_vrtc_timer(0);

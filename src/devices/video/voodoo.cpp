@@ -860,8 +860,10 @@ void voodoo_device::swap_buffers(voodoo_device *vd)
 	/* reset the last_op_time to now and start processing the next command */
 	if (vd->pci.op_pending)
 	{
+		if (LOG_VBLANK_SWAP) vd->logerror("---- swap_buffers flush begin\n");
 		vd->pci.op_end_time = vd->machine().time();
 		flush_fifos(vd, vd->pci.op_end_time);
+		if (LOG_VBLANK_SWAP) vd->logerror("---- swap_buffers flush end\n");
 	}
 
 	/* we may be able to unstall now */
@@ -931,7 +933,7 @@ void voodoo_device::swap_buffers(voodoo_device *vd)
 static void adjust_vblank_timer(voodoo_device *vd)
 {
 	attotime vblank_period = vd->screen->time_until_pos(vd->fbi.vsyncscan);
-
+	if (LOG_VBLANK_SWAP) vd->logerror("adjust_vblank_timer: period: %s\n", vblank_period.as_string());
 	/* if zero, adjust to next frame, otherwise we may get stuck in an infinite loop */
 	if (vblank_period == attotime::zero)
 		vblank_period = vd->screen->frame_period();
@@ -4941,9 +4943,24 @@ WRITE32_MEMBER( voodoo_banshee_device::banshee_io_w )
 		case io_vidOverlayDudx:
 		case io_vidOverlayDvdy:
 		{
-			/* warning: this is a hack for now! We should really compute the screen size */
-			/* from the CRTC registers */
 			COMBINE_DATA(&banshee.io[offset]);
+
+			// Get horizontal total and vertical total from CRTC registers
+			int htotal = (banshee.crtc[0] + 5) * 8;
+			int vtotal = banshee.crtc[6];
+			vtotal |= ((banshee.crtc[7] >> 0) & 0x1) << 8;
+			vtotal |= ((banshee.crtc[7] >> 5) & 0x1) << 9;
+			int vstart = banshee.crtc[0x10];
+			vstart |= ((banshee.crtc[7] >> 2) & 0x1) << 8;
+			vstart |= ((banshee.crtc[7] >> 7) & 0x1) << 9;
+
+			// Get pll k, m and n from pllCtrl0
+			const uint32_t k = (banshee.io[io_pllCtrl0] >> 0) & 0x3;
+			const uint32_t m = (banshee.io[io_pllCtrl0] >> 2) & 0x3f;
+			const uint32_t n = (banshee.io[io_pllCtrl0] >> 8) & 0xff;
+			const double video_clock = XTAL_14_31818MHz * (n + 2) / double((m + 2) << k);
+			const double frame_period = vtotal * htotal / video_clock;
+			//osd_printf_info("k: %d m: %d n: %d clock: %f period: %f rate: %.2f\n", k, m, n, video_clock, frame_period, 1.0 / frame_period);
 
 			int width = fbi.width;
 			int height = fbi.height;
@@ -4952,10 +4969,17 @@ WRITE32_MEMBER( voodoo_banshee_device::banshee_io_w )
 				width = (fbi.width * banshee.io[io_vidOverlayDudx]) / 1048576;
 			if (banshee.io[io_vidOverlayDvdy] != 0)
 				height = (fbi.height * banshee.io[io_vidOverlayDvdy]) / 1048576;
+			if (LOG_REGISTERS)
+				logerror("configure screen: htotal: %d vtotal: %d vstart: %d width: %d height: %d refresh: %f\n",
+					htotal, vtotal, vstart, width, height, 1.0 / frame_period);
+			if (htotal > 0 && vtotal > 0) {
+				rectangle visarea(0, width - 1, 0, height - 1);
+				screen->configure(htotal, vtotal, visarea, DOUBLE_TO_ATTOSECONDS(frame_period));
 
-			screen->set_visible_area(0, width - 1, 0, height - 1);
-
-			adjust_vblank_timer(this);
+				// Set the vsync start
+				fbi.vsyncscan = vstart;
+				adjust_vblank_timer(this);
+			}
 			if (LOG_REGISTERS)
 				logerror("%s:banshee_io_w(%s) = %08X & %08X\n", machine().describe_context(), banshee_io_reg_name[offset], data, mem_mask);
 			break;
@@ -5295,7 +5319,7 @@ int32_t voodoo_device::swapbuffer(voodoo_device* vd, uint32_t data)
 
 	/* determine how many cycles to wait; we deliberately overshoot here because */
 	/* the final count gets updated on the VBLANK */
-	return (vd->fbi.vblank_swap + 1) * vd->freq / 30;
+	return (vd->fbi.vblank_swap + 1) * vd->freq / 10;
 }
 
 

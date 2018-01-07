@@ -343,7 +343,7 @@ void atari_motion_objects_device::device_start()
 
 	// allocate a timer to periodically force update
 	m_force_update_timer = timer_alloc(TID_FORCE_UPDATE);
-	m_force_update_timer->adjust(m_screen->time_until_pos(0));
+	m_force_update_timer->adjust(screen().time_until_pos(0));
 
 	// register for save states
 	save_item(NAME(m_bank));
@@ -378,11 +378,11 @@ void atari_motion_objects_device::device_timer(emu_timer &timer, device_timer_id
 	{
 		case TID_FORCE_UPDATE:
 			if (param > 0)
-				m_screen->update_partial(param - 1);
+				screen().update_partial(param - 1);
 			param += 64;
-			if (param >= m_screen->visible_area().max_y)
+			if (param >= screen().visible_area().max_y)
 				param = 0;
-			timer.adjust(m_screen->time_until_pos(param), param);
+			timer.adjust(screen().time_until_pos(param), param);
 			break;
 	}
 }

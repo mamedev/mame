@@ -154,7 +154,7 @@ void tms34061_device::update_interrupts()
 TIMER_CALLBACK_MEMBER( tms34061_device::interrupt )
 {
 	/* set timer for next frame */
-	m_timer->adjust(m_screen->frame_period());
+	m_timer->adjust(screen().frame_period());
 
 	/* set the interrupt bit in the status reg */
 	m_regs[TMS34061_STATUS] |= 1;
@@ -179,7 +179,7 @@ void tms34061_device::register_w(address_space &space, offs_t offset, uint8_t da
 	/* certain registers affect the display directly */
 	if ((regnum >= TMS34061_HORENDSYNC && regnum <= TMS34061_DISPSTART) ||
 		(regnum == TMS34061_CONTROL2))
-		m_screen->update_partial(m_screen->vpos());
+		screen().update_partial(screen().vpos());
 
 	/* store the hi/lo half */
 	if (regnum < ARRAY_LENGTH(m_regs))
@@ -203,7 +203,7 @@ void tms34061_device::register_w(address_space &space, offs_t offset, uint8_t da
 			if (scanline < 0)
 				scanline += m_regs[TMS34061_VERTOTAL];
 
-			m_timer->adjust(m_screen->time_until_pos(scanline, m_regs[TMS34061_HORSTARTBLNK]));
+			m_timer->adjust(screen().time_until_pos(scanline, m_regs[TMS34061_HORSTARTBLNK]));
 			break;
 
 		/* XY offset: set the X and Y masks */
@@ -264,7 +264,7 @@ uint8_t tms34061_device::register_r(address_space &space, offs_t offset)
 
 		/* vertical count register: return the current scanline */
 		case TMS34061_VERCOUNTER:
-			result = (m_screen->vpos()+ m_regs[TMS34061_VERENDBLNK]) % m_regs[TMS34061_VERTOTAL];
+			result = (screen().vpos()+ m_regs[TMS34061_VERENDBLNK]) % m_regs[TMS34061_VERTOTAL];
 			break;
 	}
 

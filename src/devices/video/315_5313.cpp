@@ -1267,7 +1267,7 @@ uint16_t sega315_5313_device::get_hposition()
 	}
 	else
 	{
-		value4 = m_screen->hpos();
+		value4 = screen().hpos();
 	}
 
 	return value4;
@@ -1278,7 +1278,7 @@ int sega315_5313_device::get_scanline_counter()
 	if (!m_use_alt_timing)
 		return m_scanline_counter;
 	else
-		return m_screen->vpos();
+		return screen().vpos();
 }
 
 
@@ -2849,7 +2849,7 @@ void sega315_5313_device::vdp_handle_eof()
 
 	visarea.set(0, scr_width - 1, 0, m_visible_scanlines - 1);
 
-	m_screen->configure(480, m_total_scanlines, visarea, m_screen->frame_period().attoseconds());
+	screen().configure(480, m_total_scanlines, visarea, screen().frame_period().attoseconds());
 }
 
 
@@ -2875,7 +2875,7 @@ TIMER_DEVICE_CALLBACK_MEMBER( sega315_5313_device::megadriv_scanline_timer_callb
 	{
 		if (param==0)
 		{
-			//printf("where are we? %d %d\n", m_screen->vpos(), screen().hpos());
+			//printf("where are we? %d %d\n", screen().vpos(), screen().hpos());
 			vdp_handle_eof();
 			//vdp_clear_bitmap();
 		}

@@ -868,6 +868,9 @@ READ8_MEMBER(towns_state::towns_sound_ctrl_r)
 
 	switch(offset)
 	{
+		case 0x00:
+			ret = 1;
+			break;
 		case 0x01:
 			if(m_towns_fm_irq_flag)
 				ret |= 0x01;
@@ -1646,8 +1649,16 @@ void towns_state::towns_cdrom_execute_command(cdrom_image_device* device)
 				break;
 			case 0x05:  // Read TOC
 				if(LOG_CD) logerror("CD: Command 0x05: READ TOC\n");
-				m_towns_cd.extra_status = 1;
-				towns_cd_set_status(0x00,0x00,0x00,0x00);
+				if(m_towns_cd.command & 0x20)
+				{
+					m_towns_cd.extra_status = 1;
+					towns_cd_set_status(0x00,0x00,0x00,0x00);
+				}
+				else
+				{
+					m_towns_cd.extra_status = 2;
+					towns_cd_set_status(0x16,0x00,0xa0,0x00);
+				}
 				break;
 			case 0x06:  // Read CD-DA state?
 				if(LOG_CD) logerror("CD: Command 0x06: READ CD-DA STATE\n");
@@ -1656,7 +1667,7 @@ void towns_state::towns_cdrom_execute_command(cdrom_image_device* device)
 				break;
 			case 0x1f:  // unknown
 				if(LOG_CD) logerror("CD: Command 0x1f: unknown\n");
-				m_towns_cd.extra_status = 1;
+				m_towns_cd.extra_status = 0;
 				towns_cd_set_status(0x00,0x00,0x00,0x00);
 				break;
 			case 0x80:  // set state
@@ -1736,7 +1747,6 @@ READ8_MEMBER(towns_state::towns_cdrom_r)
 		case 0x01:  // command status
 			if(m_towns_cd.cmd_status_ptr >= 3)
 			{
-				m_towns_cd.status &= ~0x02;
 				// check for more status bytes
 				if(m_towns_cd.extra_status != 0)
 				{
@@ -1753,18 +1763,22 @@ READ8_MEMBER(towns_state::towns_cdrom_r)
 							break;
 						case 0x04:  // play cdda
 							towns_cd_set_status(0x07,0x00,0x00,0x00);
+							m_towns_cd.status &= ~2;
 							m_towns_cd.extra_status = 0;
 							break;
 						case 0x05:  // read toc
 							switch(m_towns_cd.extra_status)
 							{
 								case 1:
-								case 3:
-									towns_cd_set_status(0x16,0x00,0x00,0x00);
+									towns_cd_set_status(0x16,0x00,0xa0,0x00);
 									m_towns_cd.extra_status++;
 									break;
 								case 2: // st1 = first track number (BCD)
 									towns_cd_set_status(0x17,0x01,0x00,0x00);
+									m_towns_cd.extra_status++;
+									break;
+								case 3:
+									towns_cd_set_status(0x16,0x00,0xa1,0x00);
 									m_towns_cd.extra_status++;
 									break;
 								case 4: // st1 = last track number (BCD)
@@ -1773,35 +1787,35 @@ READ8_MEMBER(towns_state::towns_cdrom_r)
 										0x00,0x00);
 									m_towns_cd.extra_status++;
 									break;
-								case 5:  // st1 = control/adr of track 0xaa?
-									towns_cd_set_status(0x16,
-										cdrom_get_adr_control(m_cdrom->get_cdrom_file(),0xaa),
-										0xaa,0x00);
+								case 5:
+									towns_cd_set_status(0x16, 0x00, 0xa2, 0x00);
 									m_towns_cd.extra_status++;
 									break;
 								case 6:  // st1/2/3 = address of track 0xaa? (BCD)
 									addr = cdrom_get_track_start(m_cdrom->get_cdrom_file(),0xaa);
-									addr = lba_to_msf(addr);
+									addr = lba_to_msf(addr + 150);
 									towns_cd_set_status(0x17,
 										(addr & 0xff0000) >> 16,(addr & 0x00ff00) >> 8,addr & 0x0000ff);
 									m_towns_cd.extra_status++;
 									break;
-								default:  // same as case 5 and 6, but for each individual track
+								default:
 									if(m_towns_cd.extra_status & 0x01)
 									{
 										towns_cd_set_status(0x16,
 											((cdrom_get_adr_control(m_cdrom->get_cdrom_file(),(m_towns_cd.extra_status/2)-3) & 0x0f) << 4)
 											| ((cdrom_get_adr_control(m_cdrom->get_cdrom_file(),(m_towns_cd.extra_status/2)-3) & 0xf0) >> 4),
-											(m_towns_cd.extra_status/2)-3,0x00);
+											byte_to_bcd((m_towns_cd.extra_status/2)-2),0x00);
 										m_towns_cd.extra_status++;
 									}
 									else
 									{
-										addr = cdrom_get_track_start(m_cdrom->get_cdrom_file(),(m_towns_cd.extra_status/2)-4);
-										addr = lba_to_msf(addr);
+										int track = (m_towns_cd.extra_status/2)-4;
+										addr = cdrom_get_track_start(m_cdrom->get_cdrom_file(),track);
+										addr += cdrom_get_toc(m_cdrom->get_cdrom_file())->tracks[track].pregap;
+										addr = lba_to_msf(addr + 150);
 										towns_cd_set_status(0x17,
 											(addr & 0xff0000) >> 16,(addr & 0x00ff00) >> 8,addr & 0x0000ff);
-										if(((m_towns_cd.extra_status/2)-3) >= cdrom_get_last_track(m_cdrom->get_cdrom_file()))
+										if(track >= cdrom_get_last_track(m_cdrom->get_cdrom_file()))
 										{
 											m_towns_cd.extra_status = 0;
 										}
@@ -1852,6 +1866,8 @@ READ8_MEMBER(towns_state::towns_cdrom_r)
 							break;
 					}
 				}
+				else
+					m_towns_cd.status &= ~0x02;
 			}
 			if(LOG_CD) logerror("CD: reading command status port (%i), returning %02x\n",m_towns_cd.cmd_status_ptr,ret);
 			m_towns_cd.cmd_status_ptr++;
@@ -2068,6 +2084,11 @@ WRITE8_MEMBER(towns_state::towns_volume_w)
 	default:
 		logerror("SND: Volume port %i set to %02x\n",offset,data);
 	}
+}
+
+READ8_MEMBER(towns_state::unksnd_r)
+{
+	return 0;
 }
 
 // some unknown ports...
@@ -2325,6 +2346,7 @@ static ADDRESS_MAP_START( towns_io , AS_IO, 32, towns_state)
 	// Sound (YM3438 [FM], RF5c68 [PCM])
 	AM_RANGE(0x04d8,0x04df) AM_DEVREADWRITE8("fm", ym3438_device, read, write, 0x00ff00ff)
 	AM_RANGE(0x04e0,0x04e3) AM_READWRITE8(towns_volume_r,towns_volume_w,0xffffffff)  // R/W  -- volume ports
+	AM_RANGE(0x04e4,0x04e7) AM_READ8(unksnd_r, 0xffffffff)
 	AM_RANGE(0x04e8,0x04ef) AM_READWRITE8(towns_sound_ctrl_r,towns_sound_ctrl_w,0xffffffff)
 	AM_RANGE(0x04f0,0x04fb) AM_DEVWRITE8("pcm", rf5c68_device, rf5c68_w, 0xffffffff)
 	// CRTC / Video
@@ -2382,6 +2404,7 @@ static ADDRESS_MAP_START( towns16_io , AS_IO, 16, towns_state)  // for the 386SX
 	// Sound (YM3438 [FM], RF5c68 [PCM])
 	AM_RANGE(0x04d8,0x04df) AM_DEVREADWRITE8("fm", ym3438_device, read, write, 0x00ff)
 	AM_RANGE(0x04e0,0x04e3) AM_READWRITE8(towns_volume_r,towns_volume_w,0xffff)  // R/W  -- volume ports
+	AM_RANGE(0x04e4,0x04e7) AM_READ8(unksnd_r, 0xffff)
 	AM_RANGE(0x04e8,0x04ef) AM_READWRITE8(towns_sound_ctrl_r,towns_sound_ctrl_w,0xffff)
 	AM_RANGE(0x04f0,0x04fb) AM_DEVWRITE8("pcm", rf5c68_device, rf5c68_w, 0xffff)
 	// CRTC / Video

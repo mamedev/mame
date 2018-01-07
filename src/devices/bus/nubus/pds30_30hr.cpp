@@ -76,7 +76,7 @@ nubus_xceed30hr_device::nubus_xceed30hr_device(const machine_config &mconfig, de
 	m_vram32(nullptr), m_mode(0), m_vbl_disable(0), m_toggle(0), m_count(0), m_clutoffs(0), m_timer(nullptr),
 	m_assembled_tag(util::string_format("%s:%s", tag, XCEED30HR_SCREEN_NAME))
 {
-	m_screen_tag = m_assembled_tag.c_str();
+	static_set_screen(*this, m_assembled_tag.c_str());
 }
 
 //-------------------------------------------------
@@ -102,7 +102,7 @@ void nubus_xceed30hr_device::device_start()
 	m_nubus->install_device(slotspace+0x800000, slotspace+0xefffff, read32_delegate(FUNC(nubus_xceed30hr_device::xceed30hr_r), this), write32_delegate(FUNC(nubus_xceed30hr_device::xceed30hr_w), this));
 
 	m_timer = timer_alloc(0, nullptr);
-	m_timer->adjust(m_screen->time_until_pos(479, 0), 0);
+	m_timer->adjust(screen().time_until_pos(479, 0), 0);
 }
 
 //-------------------------------------------------
@@ -130,7 +130,7 @@ void nubus_xceed30hr_device::device_timer(emu_timer &timer, device_timer_id tid,
 		raise_slot_irq();
 	}
 
-	m_timer->adjust(m_screen->time_until_pos(479, 0), 0);
+	m_timer->adjust(screen().time_until_pos(479, 0), 0);
 }
 
 /***************************************************************************

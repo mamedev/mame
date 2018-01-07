@@ -1069,7 +1069,7 @@ void imagetek_i4100_device::draw_tilemap( screen_device &screen, bitmap_ind16 &b
 {
 	int y;
 
-	bitmap_ind8 &priority_bitmap = m_screen->priority();
+	bitmap_ind8 &priority_bitmap = screen.priority();
 
 	int width  = big ? 4096 : 2048;
 	int height = big ? 4096 : 2048;

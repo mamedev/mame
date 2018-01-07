@@ -897,7 +897,8 @@ void saturn_state::drawpixel_4bpp_trans(int x, int y, int patterndata, int offse
 
 void saturn_state::drawpixel_generic(int x, int y, int patterndata, int offsetcnt)
 {
-	int pix,mode,transmask, spd = stv2_current_sprite.CMDPMOD & 0x40;
+	int pix,transmask, spd = stv2_current_sprite.CMDPMOD & 0x40;
+//	int mode;
 	int mesh = stv2_current_sprite.CMDPMOD & 0x100;
 	int pix2;
 
@@ -914,6 +915,7 @@ void saturn_state::drawpixel_generic(int x, int y, int patterndata, int offsetcn
 		pix = stv2_current_sprite.CMDCOLR&0xffff;
 
 		transmask = 0xffff;
+		#if 0
 		if ( pix & 0x8000 )
 		{
 			mode = 5;
@@ -922,6 +924,7 @@ void saturn_state::drawpixel_generic(int x, int y, int patterndata, int offsetcn
 		{
 			mode = 1;
 		}
+		#endif
 	}
 	else
 	{
@@ -932,7 +935,7 @@ void saturn_state::drawpixel_generic(int x, int y, int patterndata, int offsetcn
 				pix = m_vdp1.gfx_decode[(patterndata+offsetcnt/2) & 0xfffff];
 				pix = offsetcnt&1 ? (pix & 0x0f) : ((pix & 0xf0)>>4);
 				pix = pix+((stv2_current_sprite.CMDCOLR&0xfff0));
-				mode = 0;
+				//mode = 0;
 				transmask = 0xf;
 				break;
 			case 0x0008: // mode 1 16 colour lookup table mode (4bits)
@@ -943,7 +946,7 @@ void saturn_state::drawpixel_generic(int x, int y, int patterndata, int offsetcn
 				((((m_vdp1_vram[(((stv2_current_sprite.CMDCOLR&0xffff)*8)>>2)+((pix2&0xfffe)/2)])) & 0x0000ffff) >> 0):
 				((((m_vdp1_vram[(((stv2_current_sprite.CMDCOLR&0xffff)*8)>>2)+((pix2&0xfffe)/2)])) & 0xffff0000) >> 16);
 
-				mode = 5;
+				//mode = 5;
 				transmask = 0xffff;
 
 				if ( !spd )
@@ -960,7 +963,7 @@ void saturn_state::drawpixel_generic(int x, int y, int patterndata, int offsetcn
 				break;
 			case 0x0010: // mode 2 64 colour bank mode (8bits) (character select portraits on hanagumi)
 				pix = m_vdp1.gfx_decode[(patterndata+offsetcnt) & 0xfffff];
-				mode = 2;
+				//mode = 2;
 				pix = pix+(stv2_current_sprite.CMDCOLR&0xffc0);
 				transmask = 0x3f;
 				break;
@@ -968,22 +971,22 @@ void saturn_state::drawpixel_generic(int x, int y, int patterndata, int offsetcn
 				pix = m_vdp1.gfx_decode[(patterndata+offsetcnt) & 0xfffff];
 				pix = pix+(stv2_current_sprite.CMDCOLR&0xff80);
 				transmask = 0x7f;
-				mode = 3;
+				//mode = 3;
 				break;
 			case 0x0020: // mode 4 256 colour bank mode (8bits) (hanagumi title)
 				pix = m_vdp1.gfx_decode[(patterndata+offsetcnt) & 0xfffff];
 				pix = pix+(stv2_current_sprite.CMDCOLR&0xff00);
 				transmask = 0xff;
-				mode = 4;
+				//mode = 4;
 				break;
 			case 0x0028: // mode 5 32,768 colour RGB mode (16bits)
 				pix = m_vdp1.gfx_decode[(patterndata+offsetcnt*2+1) & 0xfffff] | (m_vdp1.gfx_decode[(patterndata+offsetcnt*2) & 0xfffff]<<8) ;
-				mode = 5;
+				//mode = 5;
 				transmask = -1; /* TODO: check me */
 				break;
 			default: // other settings illegal
 				pix = machine().rand();
-				mode = 0;
+				//mode = 0;
 				transmask = 0xff;
 				popmessage("Illegal Sprite Mode, contact MAMEdev");
 		}
@@ -998,7 +1001,9 @@ void saturn_state::drawpixel_generic(int x, int y, int patterndata, int offsetcn
 	}
 
 	/* MSBON */
+	// TODO: does this always applies to the frame buffer regardless of the mode?
 	pix |= stv2_current_sprite.CMDPMOD & 0x8000;
+	#if 0
 	if ( mode != 5 )
 	{
 		if ( (pix & transmask) || spd )
@@ -1007,6 +1012,7 @@ void saturn_state::drawpixel_generic(int x, int y, int patterndata, int offsetcn
 		}
 	}
 	else
+	#endif
 	{
 		if ( (pix & transmask) || spd )
 		{
@@ -1038,6 +1044,8 @@ void saturn_state::drawpixel_generic(int x, int y, int patterndata, int offsetcn
 					m_vdp1.framebuffer_draw_lines[y][x] = stv_vdp1_apply_gouraud_shading( x, y, pix );
 					break;
 				default:
+				    // TODO: mode 5: prohibited, mode 6: gouraud shading + half-luminance, mode 7: gouraud-shading + half-transparent
+					popmessage("VDP1 PMOD = %02x, contact MAMEdev",stv2_current_sprite.CMDPMOD & 0x7);
 					m_vdp1.framebuffer_draw_lines[y][x] = pix;
 					break;
 			}

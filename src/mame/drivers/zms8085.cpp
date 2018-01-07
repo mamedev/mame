@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:
+// copyright-holders:AJR
 /***********************************************************************************************************************************
 
 Skeleton driver for Zentec's 8085-based Zephyr/ZMS-series terminals.
@@ -40,6 +40,24 @@ private:
 
 u32 zms8085_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
+	u16 pos = m_mainram[0x17] | (u16(m_mainram[0x18]) << 8);
+
+	for (unsigned y = 0; y < 250; y++)
+	{
+		for (unsigned ch = 0; ch < 80; ch++)
+		{
+			unsigned x = ch * 10;
+			u8 code = m_mainram[(ch + pos) & 0xfff];
+			u8 data = m_p_chargen[(code & 0x7f) * 16 + y % 10];
+			for (int bit = 7; bit >= 0; bit--)
+				bitmap.pix(y, x++) = BIT(data, bit) ? rgb_t::black() : rgb_t::green();
+			bitmap.pix(y, x++) = rgb_t::black();
+			bitmap.pix(y, x++) = rgb_t::black();
+			bitmap.pix(y, x++) = rgb_t::black();
+		}
+		if ((y % 10) == 9)
+			pos += 80;
+	}
 	return 0;
 }
 

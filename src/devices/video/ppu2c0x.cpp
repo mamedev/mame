@@ -230,7 +230,7 @@ void ppu2c0x_device::device_start()
 	m_scanline_timer = timer_alloc(TIMER_SCANLINE);
 
 	/* initialize the scanline handling portion */
-	m_scanline_timer->adjust(m_screen->time_until_pos(1));
+	m_scanline_timer->adjust(screen().time_until_pos(1));
 	m_hblank_timer->adjust(m_cpu->cycles_to_attotime(86.67)); // ??? FIXME - hardcoding NTSC, need better calculation
 	m_nmi_timer->adjust(attotime::never);
 
@@ -522,7 +522,7 @@ void ppu2c0x_device::device_timer(emu_timer &timer, device_timer_id id, int para
 			/* increment our scanline count */
 			m_scanline++;
 
-			//  logerror("starting scanline %d (MAME %d, beam %d)\n", m_scanline, device->m_screen->vpos(), device->m_screen->hpos());
+			//  logerror("starting scanline %d (MAME %d, beam %d)\n", m_scanline, device->screen().vpos(), device->screen().hpos());
 
 			/* Note: this is called at the _end_ of each scanline */
 			if (m_scanline == m_vblank_first_scanline)
@@ -569,7 +569,7 @@ void ppu2c0x_device::device_timer(emu_timer &timer, device_timer_id id, int para
 			m_hblank_timer->adjust(m_cpu->cycles_to_attotime(86.67)); // ??? FIXME - hardcoding NTSC, need better calculation
 
 			// trigger again at the start of the next scanline
-			m_scanline_timer->adjust(m_screen->time_until_pos(next_scanline * m_scan_scale));
+			m_scanline_timer->adjust(screen().time_until_pos(next_scanline * m_scan_scale));
 			break;
 	}
 }
@@ -1191,7 +1191,7 @@ WRITE8_MEMBER( ppu2c0x_device::write )
 #ifdef MAME_DEBUG
 	if (m_scanline <= BOTTOM_VISIBLE_SCANLINE)
 	{
-		logerror("PPU register %d write %02x during non-vblank scanline %d (MAME %d, beam pos: %d)\n", offset, data, m_scanline, m_screen->vpos(), m_screen->hpos());
+		logerror("PPU register %d write %02x during non-vblank scanline %d (MAME %d, beam pos: %d)\n", offset, data, m_scanline, screen().vpos(), screen().hpos());
 	}
 #endif
 

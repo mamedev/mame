@@ -95,7 +95,7 @@ macpds_sedisplay_device::macpds_sedisplay_device(const machine_config &mconfig, 
 	m_vram(nullptr), m_vbl_disable(0), m_count(0), m_clutoffs(0), m_timer(nullptr),
 	m_assembled_tag(util::string_format("%s:%s", tag, SEDISPLAY_SCREEN_NAME))
 {
-	m_screen_tag = m_assembled_tag.c_str();
+	static_set_screen(*this, m_assembled_tag.c_str());
 }
 
 //-------------------------------------------------
@@ -118,7 +118,7 @@ void macpds_sedisplay_device::device_start()
 	m_macpds->install_device(0xc10000, 0xc2ffff, read16_delegate(FUNC(macpds_sedisplay_device::sedisplay_r), this), write16_delegate(FUNC(macpds_sedisplay_device::sedisplay_w), this));
 
 	m_timer = timer_alloc(0, nullptr);
-	m_timer->adjust(m_screen->time_until_pos(879, 0), 0);
+	m_timer->adjust(screen().time_until_pos(879, 0), 0);
 }
 
 //-------------------------------------------------
@@ -145,7 +145,7 @@ void macpds_sedisplay_device::device_timer(emu_timer &timer, device_timer_id tid
 		m_macpds->set_irq_line(M68K_IRQ_2, ASSERT_LINE);
 	}
 
-	m_timer->adjust(m_screen->time_until_pos(879, 0), 0);
+	m_timer->adjust(screen().time_until_pos(879, 0), 0);
 }
 
 /***************************************************************************

@@ -79,7 +79,7 @@ jmfb_device::jmfb_device(const machine_config &mconfig, device_type type, const 
 	m_is824(is824),
 	m_assembled_tag(util::string_format("%s:%s", tag, GC48_SCREEN_NAME))
 {
-	m_screen_tag = m_assembled_tag.c_str();
+	static_set_screen(*this, m_assembled_tag.c_str());
 }
 
 nubus_48gc_device::nubus_48gc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :

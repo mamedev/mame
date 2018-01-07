@@ -583,8 +583,8 @@ void mc6845_device::recompute_parameters(bool postload)
 			LOG("M6845 config screen: HTOTAL: %d  VTOTAL: %d  MAX_X: %d  MAX_Y: %d  HSYNC: %d-%d  VSYNC: %d-%d  Freq: %ffps\n",
 								horiz_pix_total, vert_pix_total, max_visible_x, max_visible_y, hsync_on_pos, hsync_off_pos - 1, vsync_on_pos, vsync_off_pos - 1, 1 / ATTOSECONDS_TO_DOUBLE(refresh));
 
-			if ( m_screen != nullptr )
-				m_screen->configure(horiz_pix_total, vert_pix_total, visarea, refresh);
+			if (has_screen())
+				screen().configure(horiz_pix_total, vert_pix_total, visarea, refresh);
 
 			if(!m_reconfigure_cb.isnull())
 				m_reconfigure_cb(horiz_pix_total, vert_pix_total, visarea, refresh);
@@ -754,8 +754,8 @@ void mc6845_device::handle_line_timer()
 			/* also update the cursor state now */
 			update_cursor_state();
 
-			if (m_screen != nullptr)
-				m_screen->reset_origin();
+			if (has_screen())
+				screen().reset_origin();
 		}
 		else
 		{

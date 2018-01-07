@@ -92,7 +92,7 @@ nubus_specpdq_device::nubus_specpdq_device(const machine_config &mconfig, device
 	m_width(0), m_height(0), m_patofsx(0), m_patofsy(0), m_vram_addr(0), m_vram_src(0),
 	m_palette(*this, "palette")
 {
-	m_screen_tag = m_assembled_tag.c_str();
+	static_set_screen(*this, m_assembled_tag.c_str());
 }
 
 //-------------------------------------------------
@@ -117,7 +117,7 @@ void nubus_specpdq_device::device_start()
 	m_nubus->install_device(slotspace+0x400000, slotspace+0xfbffff, read32_delegate(FUNC(nubus_specpdq_device::specpdq_r), this), write32_delegate(FUNC(nubus_specpdq_device::specpdq_w), this));
 
 	m_timer = timer_alloc(0, nullptr);
-	m_timer->adjust(m_screen->time_until_pos(843, 0), 0);
+	m_timer->adjust(screen().time_until_pos(843, 0), 0);
 }
 
 //-------------------------------------------------
@@ -145,7 +145,7 @@ void nubus_specpdq_device::device_timer(emu_timer &timer, device_timer_id tid, i
 		raise_slot_irq();
 	}
 
-	m_timer->adjust(m_screen->time_until_pos(843, 0), 0);
+	m_timer->adjust(screen().time_until_pos(843, 0), 0);
 }
 
 /***************************************************************************

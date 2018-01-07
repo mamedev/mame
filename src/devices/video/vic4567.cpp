@@ -172,8 +172,8 @@ void vic3_device::device_start()
 {
 	int width, height;
 
-	width = m_screen->width();
-	height = m_screen->height();
+	width = screen().width();
+	height = screen().height();
 
 	m_bitmap = std::make_unique<bitmap_ind16>(width, height);
 
@@ -1868,7 +1868,7 @@ void vic3_device::draw_bitplanes()
 {
 	int x, y, y1s, offset;
 	rectangle vis;
-	const rectangle &visarea = m_screen->visible_area();
+	const rectangle &visarea = screen().visible_area();
 
 	if (VIC3_LINES == 400)
 	{ /* interlaced! */
@@ -1972,13 +1972,13 @@ void vic3_device::raster_interrupt_gen()
 			m_rows = new_rows;
 			m_columns = new_columns;
 			if (m_type == vic3_type::PAL)
-				m_screen->set_visible_area(
+				screen().set_visible_area(
 									VIC2_STARTVISIBLECOLUMNS + 32,
 									VIC2_STARTVISIBLECOLUMNS + 32 + m_columns + 16 - 1,
 									VIC2_STARTVISIBLELINES + 34,
 									VIC2_STARTVISIBLELINES + 34 + m_rows + 16 - 1);
 			else
-				m_screen->set_visible_area(
+				screen().set_visible_area(
 									VIC2_STARTVISIBLECOLUMNS + 34,
 									VIC2_STARTVISIBLECOLUMNS + 34 + m_columns + 16 - 1,
 									VIC2_STARTVISIBLELINES + 10,

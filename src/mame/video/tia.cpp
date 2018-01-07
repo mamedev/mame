@@ -415,9 +415,9 @@ void tia_video_device::device_start()
 	m_vsync_cb.resolve();
 
 
-	int cx = m_screen->width();
+	int cx = screen().width();
 
-	screen_height = m_screen->height();
+	screen_height = screen().height();
 	helper[0] = std::make_unique<bitmap_ind16>(cx, TIA_MAX_SCREEN_HEIGHT);
 	helper[1] = std::make_unique<bitmap_ind16>(cx, TIA_MAX_SCREEN_HEIGHT);
 	helper[2] = std::make_unique<bitmap_ind16>(cx, TIA_MAX_SCREEN_HEIGHT);
@@ -1022,8 +1022,8 @@ WRITE8_MEMBER( tia_video_device::VSYNC_w )
 
 			if ( curr_y > 5 )
 				update_bitmap(
-					m_screen->width(),
-					m_screen->height());
+					screen().width(),
+					screen().height());
 
 			if ( !m_vsync_cb.isnull() ) {
 				m_vsync_cb(0, curr_y, 0xFFFF );

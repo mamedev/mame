@@ -77,7 +77,7 @@ void kaneko16_sprite_device::device_start()
 {
 	m_first_sprite = std::make_unique<struct kan_tempsprite[]>(0x400);
 	m_sprites_regs = make_unique_clear<uint16_t[]>(0x20/2);
-	m_screen->register_screen_bitmap(m_sprites_bitmap);
+	screen().register_screen_bitmap(m_sprites_bitmap);
 
 	save_item(NAME(m_sprite_flipx));
 	save_item(NAME(m_sprite_flipy));
@@ -215,12 +215,12 @@ int kaneko16_sprite_device::kaneko16_parse_sprite_type012(int i, struct kan_temp
 	if (m_sprite_flipy)
 	{
 		s->yoffs        -=      m_sprites_regs[0x2/2];
-		s->yoffs        -=      m_screen->visible_area().min_y<<6;
+		s->yoffs        -=      screen().visible_area().min_y<<6;
 	}
 	else
 	{
 		s->yoffs        -=      m_sprites_regs[0x2/2];
-		s->yoffs        +=      m_screen->visible_area().min_y<<6;
+		s->yoffs        +=      screen().visible_area().min_y<<6;
 	}
 
 	return                  ( (attr & 0x2000) ? USE_LATCHED_XY    : 0 ) |
@@ -353,7 +353,7 @@ void kaneko16_sprite_device::kaneko16_draw_sprites(_BitmapClass &bitmap, const r
 	   in a temp buffer, then draw the buffer's contents from last
 	   to first. */
 
-	int max =   (m_screen->width() > 0x100) ? (0x200<<6) : (0x100<<6);
+	int max =   (screen().width() > 0x100) ? (0x200<<6) : (0x100<<6);
 
 	int i = 0;
 	struct kan_tempsprite *s = m_first_sprite.get();

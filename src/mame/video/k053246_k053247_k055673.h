@@ -186,7 +186,7 @@ public:
 		// for Escape Kids (GX975)
 		if ( objset1 & 8 ) // Check only "Bit #3 is '1'?"
 		{
-			int screenwidth = m_screen->width();
+			int screenwidth = screen().width();
 
 			zoomx = zoomx>>1; // Fix sprite width to HALF size
 			ox = (ox>>1) + 1; // Fix sprite draw position
@@ -415,7 +415,7 @@ public:
 								color,
 								fx,fy,
 								sx,sy,
-								m_screen->priority(),primask,
+								screen().priority(),primask,
 								whichtable);
 					}
 					else
@@ -426,7 +426,7 @@ public:
 								fx,fy,
 								sx,sy,
 								(zw << 16) >> 4,(zh << 16) >> 4,
-								m_screen->priority(),primask,
+								screen().priority(),primask,
 								whichtable);
 					}
 
@@ -439,7 +439,7 @@ public:
 									color,
 									fx,!fy,
 									sx,sy,
-									m_screen->priority(),primask,
+									screen().priority(),primask,
 									whichtable);
 						}
 						else
@@ -450,7 +450,7 @@ public:
 									fx,!fy,
 									sx,sy,
 									(zw << 16) >> 4,(zh << 16) >> 4,
-									m_screen->priority(),primask,
+									screen().priority(),primask,
 									whichtable);
 						}
 					}

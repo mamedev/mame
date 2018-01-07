@@ -92,7 +92,7 @@ void nb1414m4_device::fill(uint16_t dst, uint8_t tile, uint8_t pal, uint8_t *vra
 void nb1414m4_device::insert_coin_msg(uint8_t *vram)
 {
 	int credit_count = (vram[0xf] & 0xff);
-	uint8_t fl_cond = m_screen->frame_number() & 0x10; /* for insert coin "flickering" */
+	uint8_t fl_cond = screen().frame_number() & 0x10; /* for insert coin "flickering" */
 	uint16_t dst;
 
 	if(credit_count == 0)
@@ -112,7 +112,7 @@ void nb1414m4_device::insert_coin_msg(uint8_t *vram)
 void nb1414m4_device::credit_msg(uint8_t *vram)
 {
 	int credit_count = (vram[0xf] & 0xff);
-	uint8_t fl_cond = m_screen->frame_number() & 0x10; /* for insert coin "flickering" */
+	uint8_t fl_cond = screen().frame_number() & 0x10; /* for insert coin "flickering" */
 	uint16_t dst;
 
 	dst = ((m_data[0x023]<<8)|(m_data[0x024]&0xff)) & 0x3fff;

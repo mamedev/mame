@@ -135,7 +135,7 @@ template<bool maincpu> WRITE16_MEMBER(eprom_state::sync_w)
 	COMBINE_DATA(&m_sync_data);
 
 	if ((oldword & 0xff00) != (m_sync_data & 0xff00))
-		(maincpu ? m_maincpu : m_extra)->yield();
+		(maincpu ? m_maincpu->yield() : m_extra->yield());
 }
 
 

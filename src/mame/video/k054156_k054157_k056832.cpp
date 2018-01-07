@@ -1149,6 +1149,7 @@ WRITE32_MEMBER( k056832_device::long_w )
 
 WRITE16_MEMBER( k056832_device::b_word_w )
 {
+	assert(offset < ARRAY_LENGTH(m_regsb));
 	COMBINE_DATA(&m_regsb[offset]);
 }
 

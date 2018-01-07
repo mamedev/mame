@@ -193,7 +193,7 @@ void v99x8_device::device_timer(emu_timer &timer, device_timer_id id, int param,
 			m_pal_ntsc = pal;
 			configure_pal_ntsc();
 		}
-		//m_screen->reset_origin();
+		//screen().reset_origin();
 		m_offset_y = position_offset(m_cont_reg[18] >> 4);
 		set_screen_parameters();
 	}
@@ -226,7 +226,7 @@ void v99x8_device::configure_pal_ntsc()
 		m_height = VTOTAL_PAL;
 		rectangle visible;
 		visible.set(0, HVISIBLE - 1, VERTICAL_ADJUST * 2, VVISIBLE_PAL * 2 - 1 - VERTICAL_ADJUST * 2);
-		m_screen->configure(HTOTAL, VTOTAL_PAL * 2, visible, HZ_TO_ATTOSECONDS(50.158974));
+		screen().configure(HTOTAL, VTOTAL_PAL * 2, visible, HZ_TO_ATTOSECONDS(50.158974));
 	}
 	else
 	{
@@ -234,7 +234,7 @@ void v99x8_device::configure_pal_ntsc()
 		m_height = VTOTAL_NTSC;
 		rectangle visible;
 		visible.set(0, HVISIBLE - 1, VERTICAL_ADJUST * 2, VVISIBLE_NTSC * 2 - 1 - VERTICAL_ADJUST * 2);
-		m_screen->configure(HTOTAL, VTOTAL_NTSC * 2, visible, HZ_TO_ATTOSECONDS(59.922743));
+		screen().configure(HTOTAL, VTOTAL_NTSC * 2, visible, HZ_TO_ATTOSECONDS(59.922743));
 	}
 	m_vblank_start = m_height - VERTICAL_SYNC - TOP_ERASE; /* Sync + top erase */
 }
@@ -571,7 +571,7 @@ void v99x8_device::device_start()
 	m_vdp_ops_count = 1;
 	m_vdp_engine = nullptr;
 
-	m_screen->register_screen_bitmap(m_bitmap);
+	screen().register_screen_bitmap(m_bitmap);
 
 	// Video RAM is allocated as an own address space
 	m_vram_space = &space(AS_DATA);
