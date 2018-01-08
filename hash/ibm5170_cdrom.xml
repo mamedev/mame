@@ -1814,6 +1814,19 @@
 		</part>
 	</software>
 
+	<software name="os2warp4" supported="partial">
+		<description>OS/2 Warp 4</description>
+		<year>1996</year>
+		<publisher>IBM</publisher>
+		<info name="version" value="4.00" />
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="ibm_os2_warp_4" sha1="4f296b68748882cd1207a555866cf509e01fdb38" />
+			</diskarea>
+		</part>
+	</software>
+	
 	<software name="pcdos2k">
 		<description>PC DOS 2000</description>
 		<year>1998</year>
