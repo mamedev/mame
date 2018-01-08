@@ -33,7 +33,7 @@
 
   1x Unknown sanded PLCC68 IC (identified as Zilog Z180).
   1x unknown sanded DIL24 IC labeled PLD-01.
-  1x unknown sanded DIL28 IC labeled PLD-02.
+  1x unknown sanded DIL28 IC labeled PLD-02 (identified as ST6265 MCU).
   1x unknown sanded DIL20 IC labeled PLD-03 @U21.
   1x unknown sanded DIL64 IC @U12 (identified as Yamaha 9938/58 VDP).
 
@@ -55,7 +55,7 @@
 
   1x 21.47727 MHz. crystal, near the Yamaha 9938/58 VDP.
   1x 12.288 MHz. crystal, near the Zilog Z180.
-  1x 8.000 MHz. sanded crystal(measured).
+  1x 8.000 MHz. sanded crystal near the ST6265 MCU (measured).
 
   1x 8 DIP Switches bank.
   1x pushbutton silkscreened 'PAGE'.
@@ -161,6 +161,7 @@
     the DIL28 IC (labeled PLD-02).
 
   - Identified the PLCC68 CPU as Zilog Z180.
+  - Identified the DIL28 IC as ST6265 MCU.
   - Identified the DIL64 IC as Yamaha 9938/58 VDP.
 
 *********************************************************************
@@ -247,6 +248,7 @@
 
 
 #define CPU_CLOCK       XTAL_12_288MHz
+#define MCU_CLOCK       XTAL_8MHz
 #define VID_CLOCK       XTAL_21_4772MHz
 
 #define VDP_MEM         0x20000  // 4x 4464 (64K x 4 DRAM)
