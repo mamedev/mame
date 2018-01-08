@@ -10,6 +10,18 @@
 
   Driver by Roberto Fresca.
 
+
+  4 sets dumped:
+  Version: 3.50 - 616
+  Version: 3.50 - 623
+  Version: 3.50 - 626
+  Version: 3.50 - 627
+
+  Each set has:
+  1x 64K program ROM (unknown CPU)
+  1x 512K sound ROM (unsigned 8-bit PCM @ 11025 KHz)
+
+
 *********************************************************************
 
   Notes:
@@ -65,7 +77,7 @@ public:
 
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, luckybal_state )
 	AM_RANGE(0x0000, 0x57ff) AM_ROM
-	AM_RANGE(0xe000, 0xffff) AM_RAM
+	AM_RANGE(0xe000, 0xffff) AM_RAM  // 6264 SRAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( main_io, AS_IO, 8, luckybal_state )
@@ -191,6 +203,33 @@ ROM_START( luckybal )  // luckyball96 v350-627
 ROM_END
 
 
+ROM_START( luckybala )  // luckyball96 v350-626
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "lb97_626_m27c512.u15", 0x00000, 0x10000, CRC(d25588c1) SHA1(fc24b1e869d726d2e2ab8cd38ab6304fdca6dfa9) )
+
+	ROM_REGION( 0x100000, "audiocpu", 0 )
+	ROM_LOAD( "lb96_sounds_001_m27c4001.u20", 0x00000, 0x80000, CRC(dbc45c4a) SHA1(720c6861fa2bfa9c9dad69d687f12bd1e0a71afb) )
+ROM_END
+
+
+ROM_START( luckybalb )  // luckyball96 v350-623
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "lb96_625_m27c512.u15", 0x00000, 0x10000, CRC(2017edf7) SHA1(0208423b116aeb139c5db193b567bc79fd2a21ac) )
+
+	ROM_REGION( 0x100000, "audiocpu", 0 )
+	ROM_LOAD( "lb96_625_m27c4001.u20", 0x00000, 0x80000, CRC(dbc45c4a) SHA1(720c6861fa2bfa9c9dad69d687f12bd1e0a71afb) )
+ROM_END
+
+
+ROM_START( luckybalc )  // luckyball96 v350-616
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "nosticker_a18e_m27c512.u15", 0x00000, 0x10000, CRC(9bdf0243) SHA1(e353a86c4b020784d084c4fa12feb6ccd8ebd77b) )
+
+	ROM_REGION( 0x100000, "audiocpu", 0 )
+	ROM_LOAD( "nosticker_af7c_m27c4001.u20", 0x00000, 0x80000, CRC(de796370) SHA1(6edee4de330a65ad6b2dbe59c7ac0ddecb3ed0f1) )
+ROM_END
+
+
 /************************************
 *            Driver Init            *
 ************************************/
@@ -206,3 +245,6 @@ DRIVER_INIT_MEMBER(luckybal_state, luckybal)
 
 /*    YEAR  NAME        PARENT    MACHINE   INPUT     STATE           INIT      ROT    COMPANY          FULLNAME                         FLAGS  */
 GAME( 1996, luckybal,   0,        luckybal, luckybal, luckybal_state, luckybal, ROT0, "Sielcon Games", "Lucky Ball 96 (Ver 3.50 - 627)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 1996, luckybala,  luckybal, luckybal, luckybal, luckybal_state, luckybal, ROT0, "Sielcon Games", "Lucky Ball 96 (Ver 3.50 - 626)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 1996, luckybalb,  luckybal, luckybal, luckybal, luckybal_state, luckybal, ROT0, "Sielcon Games", "Lucky Ball 96 (Ver 3.50 - 623)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 1996, luckybalc,  luckybal, luckybal, luckybal, luckybal_state, luckybal, ROT0, "Sielcon Games", "Lucky Ball 96 (Ver 3.50 - 616)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
