@@ -1794,6 +1794,25 @@ void v99x8_device::set_mode()
 	{
 		if ( (s_modes[i].m == n) || (s_modes[i].m == 0xff) ) break;
 	}
+
+	// MZ: What happens when the mode is changed during command execution?
+	// This is left unspecified in the docs. On a Geneve, experiments showed
+	// that the command is not aborted (the CE flag is still 1) and runs for
+	// about 90% of the nominal execution time, but VRAM is only correctly
+	// filled up to the time of switching, and after that, isolated locations
+	// within the normally affected area are changed, but inconsistently.
+	// Obviously, it depends on the time when the switch happened.
+	// This behavior occurs on every switch from a mode Graphics4 and higher
+	// to another mode, e.g. also from Graphics7 to Graphics6.
+	// Due to the lack of more information, we simply abort the command.
+
+	if (m_vdp_engine && m_mode != i)
+	{
+		LOG("Command aborted due to mode change\n");
+		m_vdp_engine = nullptr;
+		m_stat_reg[2] &= 0xFE;
+	}
+
 	m_mode = i;
 }
 
