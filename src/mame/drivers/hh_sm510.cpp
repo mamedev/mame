@@ -1732,6 +1732,9 @@ MACHINE_CONFIG_END
   * Sharp SM510 under epoxy (die label CMS54C, KMS570, 593)
   * lcd screen with custom segments, 1-bit sound
 
+  BTANB: On the baddie in the background throwing dynamite, the sparks
+  above his head are the same segment as the body, not the arm.
+
 ***************************************************************************/
 
 class tddragon_state : public hh_sm510_state
@@ -3141,6 +3144,104 @@ MACHINE_CONFIG_END
 
 /***************************************************************************
 
+  Tiger Super Double Dragon (model 78-528)
+  * Sharp SM510 under epoxy (die label MF5)
+  * lcd screen with custom segments, 1-bit sound
+
+  BTANB: The player char right arm muscle is part of the right kick segment.
+  They probably meant to use it for the right punch segment, but this is
+  how it shows on the LCD.
+
+***************************************************************************/
+
+class tsddragon_state : public hh_sm510_state
+{
+public:
+	tsddragon_state(const machine_config &mconfig, device_type type, const char *tag)
+		: hh_sm510_state(mconfig, type, tag)
+	{
+		m_inp_lines = 6;
+		m_inp_fixed = 6;
+	}
+};
+
+// config
+
+static INPUT_PORTS_START( tsddragon )
+	PORT_START("IN.0") // S1
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr) PORT_NAME("Kick Left")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr) // Jump
+	PORT_BIT( 0x0a, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.1") // S2
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr)
+	PORT_BIT( 0x09, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.2") // S3
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr) // Down/Pick
+	PORT_BIT( 0x0d, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.3") // S4
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr) PORT_NAME("Special Technique")
+	PORT_BIT( 0x0d, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.4") // S5
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr) PORT_NAME("Kick Right")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr) PORT_NAME("Punch")
+	PORT_BIT( 0x0c, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.5") // S6
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr) PORT_NAME("Select")
+	PORT_BIT( 0x0e, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.6") // GND!
+	PORT_BIT( 0x07, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_START ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr) PORT_NAME("Power On/Start")
+
+	PORT_START("BA")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_VOLUME_DOWN ) PORT_NAME("Sound")
+
+	PORT_START("B")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_POWER_OFF )
+
+	PORT_START("ACL")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, acl_button, nullptr) PORT_NAME("ACL")
+INPUT_PORTS_END
+
+static MACHINE_CONFIG_START( tsddragon )
+
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu", SM510, XTAL_32_768kHz)
+	MCFG_SM510_R_MASK_OPTION(SM510_R_CONTROL_OUTPUT)
+	MCFG_SM510_WRITE_SEGS_CB(WRITE16(hh_sm510_state, sm510_lcd_segment_w))
+	MCFG_SM510_READ_K_CB(READ8(hh_sm510_state, input_r))
+	MCFG_SM510_WRITE_S_CB(WRITE8(hh_sm510_state, input_w))
+	MCFG_SM510_WRITE_R_CB(WRITE8(hh_sm510_state, piezo_r1_w))
+	MCFG_SM510_READ_BA_CB(IOPORT("BA"))
+	MCFG_SM510_READ_B_CB(IOPORT("B"))
+
+	/* video hardware */
+	MCFG_SCREEN_SVG_ADD("screen", "svg")
+	MCFG_SCREEN_REFRESH_RATE(50)
+	MCFG_SCREEN_SIZE(1503, 1080)
+	MCFG_SCREEN_VISIBLE_AREA(0, 1503-1, 0, 1080-1)
+
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_sm510_state, display_decay_tick, attotime::from_msec(1))
+	MCFG_DEFAULT_LAYOUT(layout_svg)
+
+	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+MACHINE_CONFIG_END
+
+
+
+
+
+/***************************************************************************
+
   Tiger Nightmare Before Christmas (model 78-537)
   * Sharp SM510 under epoxy (die label MG0)
   * lcd screen with custom segments, 1-bit sound
@@ -3871,7 +3972,7 @@ static MACHINE_CONFIG_START( tigarden )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", SM510, XTAL_32_768kHz)
-	MCFG_SM510_R_MASK_OPTION(SM510_R_CONTROL_OUTPUT) // ?
+	MCFG_SM510_R_MASK_OPTION(2) // confirmed
 	MCFG_SM510_WRITE_SEGS_CB(WRITE16(hh_sm510_state, sm510_lcd_segment_w))
 	MCFG_SM510_READ_K_CB(READ8(hh_sm510_state, input_r))
 	MCFG_SM510_WRITE_S_CB(WRITE8(hh_sm510_state, input_w))
@@ -4246,8 +4347,8 @@ ROM_START( tddragon )
 	ROM_REGION( 0x1000, "maincpu", 0 )
 	ROM_LOAD( "593", 0x0000, 0x1000, CRC(2642f778) SHA1(fee77acf93e057a8b4627389dfd481c6d9cbd02b) )
 
-	ROM_REGION( 511435, "svg", 0)
-	ROM_LOAD( "tddragon.svg", 0, 511435, CRC(7d8f6e77) SHA1(c3200db662085c0f711145b2002ea2ff2f8a3af7) )
+	ROM_REGION( 511434, "svg", 0)
+	ROM_LOAD( "tddragon.svg", 0, 511434, CRC(641e7ceb) SHA1(bbfc37cc085e00921422f65d9aac9949f871e7b7) )
 ROM_END
 
 
@@ -4383,6 +4484,15 @@ ROM_START( tsfight2 )
 ROM_END
 
 
+ROM_START( tsddragon )
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD( "mf5", 0x0000, 0x1000, CRC(264c8e82) SHA1(470eb2f09a58ef05eb0b7c8e11380ad1d8ce4e1a) )
+
+	ROM_REGION( 753533, "svg", 0)
+	ROM_LOAD( "tsddragon.svg", 0, 753533, CRC(fb526049) SHA1(552fe005a6e23e083867b7d1c10d20daa8913a14) )
+ROM_END
+
+
 ROM_START( tnmarebc )
 	ROM_REGION( 0x1000, "maincpu", 0 )
 	ROM_LOAD( "mg0", 0x0000, 0x1000, CRC(5ef21421) SHA1(8fd458575111b89d7c33c969e76703bde5ad2c36) )
@@ -4512,6 +4622,7 @@ CONS( 1991, tbtoads,     0,          0, tbtoads,     tbtoads,     tbtoads_state,
 CONS( 1992, tsonic,      0,          0, tsonic,      tsonic,      tsonic_state,      0, "Tiger Electronics (licensed from Sega)", "Sonic The Hedgehog (handheld)", MACHINE_SUPPORTS_SAVE )
 CONS( 1993, tdummies,    0,          0, tdummies,    tdummies,    tdummies_state,    0, "Tiger Electronics", "The Incredible Crash Dummies (handheld)", MACHINE_SUPPORTS_SAVE )
 CONS( 1993, tsfight2,    0,          0, tsfight2,    tsfight2,    tsfight2_state,    0, "Tiger Electronics (licensed from Capcom)", "Street Fighter II (handheld)", MACHINE_SUPPORTS_SAVE )
+CONS( 1993, tsddragon,   0,          0, tsddragon,   tsddragon,   tsddragon_state,   0, "Tiger Electronics (licensed from Technos)", "Super Double Dragon (handheld)", MACHINE_SUPPORTS_SAVE )
 CONS( 1993, tnmarebc,    0,          0, tnmarebc,    tnmarebc,    tnmarebc_state,    0, "Tiger Electronics", "Nightmare Before Christmas (handheld)", MACHINE_SUPPORTS_SAVE ) // note: title has no "The"
 CONS( 1993, tmkombat,    0,          0, tmkombat,    tmkombat,    tmkombat_state,    0, "Tiger Electronics (licensed from Midway)", "Mortal Kombat (handheld)", MACHINE_SUPPORTS_SAVE )
 CONS( 1994, tshadow,     0,          0, tshadow,     tshadow,     tshadow_state,     0, "Tiger Electronics", "The Shadow (handheld)", MACHINE_SUPPORTS_SAVE )
