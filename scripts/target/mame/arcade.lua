@@ -2373,6 +2373,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/qdrmfgp.cpp",
 	MAME_DIR .. "src/mame/includes/qdrmfgp.h",
 	MAME_DIR .. "src/mame/video/qdrmfgp.cpp",
+	MAME_DIR .. "src/mame/video/quickpick5.cpp",
 	MAME_DIR .. "src/mame/drivers/rockrage.cpp",
 	MAME_DIR .. "src/mame/includes/rockrage.h",
 	MAME_DIR .. "src/mame/video/rockrage.cpp",
