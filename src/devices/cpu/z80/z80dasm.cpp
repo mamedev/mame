@@ -420,9 +420,10 @@ offs_t z80_disassembler::disassemble(std::ostream &stream, offs_t pc, const data
 	case 0xdd:
 	{
 		ixy = "ix";
-		u8 op1 = opcodes.r8(pos++);
+		u8 op1 = opcodes.r8(pos);
 		if( op1 == 0xcb )
 		{
+			pos++;
 			offset = params.r8(pos++);
 			op1 = params.r8(pos++);
 			d = &mnemonic_xx_cb[op1];
@@ -434,9 +435,10 @@ offs_t z80_disassembler::disassemble(std::ostream &stream, offs_t pc, const data
 	case 0xfd:
 	{
 		ixy = "iy";
-		u8 op1 = opcodes.r8(pos++);
+		u8 op1 = opcodes.r8(pos);
 		if( op1 == 0xcb )
 		{
+			pos++;
 			offset = params.r8(pos++);
 			op1 = params.r8(pos++);
 			d = &mnemonic_xx_cb[op1];
