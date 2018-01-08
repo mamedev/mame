@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:
+// copyright-holders:AJR
 /***********************************************************************************************************************************
 
 2017-11-03 Skeleton
@@ -10,7 +10,7 @@ Chips: Z80A, 2x Z80DART, Z80CTC, X2210D, 2x CRT9006, CRT9007, CRT9021A, 8x 6116
 
 Other: Beeper.  Crystals: 4.9152, 8.000, 40.000
 
-Keyboard: P8035L CPU, undumped 2716 labelled "358_2758"
+Keyboard: P8035L CPU, undumped 2716 labelled "358_2758", XTAL marked "4608-300-107 KSS4C"
 
 ************************************************************************************************************************************/
 
@@ -36,6 +36,8 @@ public:
 		, m_p_videoram(*this, "videoram")
 	{ }
 
+	DECLARE_WRITE8_MEMBER(video_mode_w);
+
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 private:
@@ -51,6 +53,13 @@ void altos2_state::machine_reset()
 {
 	m_novram->recall(ASSERT_LINE);
 	m_novram->recall(CLEAR_LINE);
+}
+
+WRITE8_MEMBER(altos2_state::video_mode_w)
+{
+	// D5 = 1 for 132-column mode (6-pixel char width)
+	// D5 = 0 for 80-column mode (10-pixel char width)
+	logerror("Writing %02X to mode register at %s\n", data, machine().describe_context());
 }
 
 u32 altos2_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
@@ -69,6 +78,7 @@ static ADDRESS_MAP_START( io_map, AS_IO, 8, altos2_state)
 	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("dart1", z80dart_device, ba_cd_r, ba_cd_w)
 	AM_RANGE(0x04, 0x07) AM_DEVREADWRITE("dart2", z80dart_device, ba_cd_r, ba_cd_w)
 	AM_RANGE(0x08, 0x0b) AM_DEVREADWRITE("ctc", z80ctc_device, read, write)
+	AM_RANGE(0x0c, 0x0c) AM_WRITE(video_mode_w)
 	AM_RANGE(0x40, 0x7f) AM_DEVREADWRITE("novram", x2210_device, read, write)
 	//AM_RANGE(0x80, 0xff) AM_DEVREADWRITE_MOD("vpac", crt9007_device, read, write, rshift<1>)
 ADDRESS_MAP_END
