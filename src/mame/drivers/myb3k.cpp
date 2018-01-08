@@ -11,7 +11,7 @@
 
     TODO:
     - Fix proper cursor support
-    - Add monochrome monitor settings
+    - Fix 36 character modes
     - Hook up all interrupts and 8255 Port C signals
     - Add printer support on Port A
     - Expansion Unit with 6 more ISA8 slots
@@ -544,6 +544,8 @@ void myb3k_state::machine_start()
 {
 	LOG("%s\n", FUNCNAME);
 
+	// Color palette for use with a RGB color CRT monitor such as the 12" Ericsson DU4720:
+	// 76 degrees deflection, WxHxD: 373x375x428mm, Weight 12.8 Kg, 215x134.4mm display area, RGB signal with separate syncs
 	m_cpal[0] = rgb_t(  0,   0,   0); // black   0.29v
 	m_cpal[1] = rgb_t(  0,   0, 255); // blue    0.52v
 	m_cpal[2] = rgb_t(255,   0,   0); // red     0.58v
@@ -553,14 +555,19 @@ void myb3k_state::machine_start()
 	m_cpal[6] = rgb_t(255, 255,   0); // yellow  0.90v
 	m_cpal[7] = rgb_t(255, 255, 255); // white   1.04v
 
-	m_mpal[0] = rgb_t(0, (uint8_t)(( 0.29 / 1.04 ) * 256), 0); // black   0.29v
-	m_mpal[1] = rgb_t(0, (uint8_t)(( 0.52 / 1.04 ) * 256), 0); // blue    0.52v
-	m_mpal[2] = rgb_t(0, (uint8_t)(( 0.58 / 1.04 ) * 256), 0); // red     0.58v
-	m_mpal[3] = rgb_t(0, (uint8_t)(( 0.63 / 1.04 ) * 256), 0); // magenta 0.63v
-	m_mpal[4] = rgb_t(0, (uint8_t)(( 0.71 / 1.04 ) * 256), 0); // green   0.71v
-	m_mpal[5] = rgb_t(0, (uint8_t)(( 0.80 / 1.04 ) * 256), 0); // cyan    0.80v
-	m_mpal[6] = rgb_t(0, (uint8_t)(( 0.90 / 1.04 ) * 256), 0); // yellow  0.90v
-	m_mpal[7] = rgb_t(0, (uint8_t)(( 1.04 / 1.04 ) * 256), 0); // white   1.04v
+	// Monochrome offset based on the voltage levels from the Service Manual, relation between colors anc voltage might
+	// not be linear though so may need visual tweaking for a Green P39 phospor CRT such as the 12" Ericsson DU4721 
+	// 90 degrees deflection, WxHxD: 373x370x351mm, Weight 9.3 Kg, 215x134.4mm display area, Composite video signal
+	m_mpal[0] = rgb_t((uint8_t)(( (0.29 - 0.29) / (1.04 - 0.29) ) * 74), (uint8_t)(( (0.29 - 0.29) / (1.04 - 0.29) ) * 255), 0); // 0.29v
+	m_mpal[1] = rgb_t((uint8_t)(( (0.52 - 0.29) / (1.04 - 0.29) ) * 74), (uint8_t)(( (0.52 - 0.29) / (1.04 - 0.29) ) * 255), 0); // 0.52v
+	m_mpal[2] = rgb_t((uint8_t)(( (0.58 - 0.29) / (1.04 - 0.29) ) * 74), (uint8_t)(( (0.58 - 0.29) / (1.04 - 0.29) ) * 255), 0); // 0.58v
+	m_mpal[3] = rgb_t((uint8_t)(( (0.63 - 0.29) / (1.04 - 0.29) ) * 74), (uint8_t)(( (0.63 - 0.29) / (1.04 - 0.29) ) * 255), 0); // 0.63v
+	m_mpal[4] = rgb_t((uint8_t)(( (0.71 - 0.29) / (1.04 - 0.29) ) * 74), (uint8_t)(( (0.71 - 0.29) / (1.04 - 0.29) ) * 255), 0); // 0.71v
+	m_mpal[5] = rgb_t((uint8_t)(( (0.80 - 0.29) / (1.04 - 0.29) ) * 74), (uint8_t)(( (0.80 - 0.29) / (1.04 - 0.29) ) * 255), 0); // 0.80v
+	m_mpal[6] = rgb_t((uint8_t)(( (0.90 - 0.29) / (1.04 - 0.29) ) * 74), (uint8_t)(( (0.90 - 0.29) / (1.04 - 0.29) ) * 255), 0); // 0.90v
+	m_mpal[7] = rgb_t((uint8_t)(( (1.04 - 0.29) / (1.04 - 0.29) ) * 74), (uint8_t)(( (1.04 - 0.29) / (1.04 - 0.29) ) * 255), 0); // 1.04v
+
+	m_pal = &m_mpal; // In case screen starts rendering before machine_reset where we read the settings
 
 	// CPU can only access RAM 50% of the time and the CRTC the other 50%. This waitstate workaround gives
 	// close enough performance of the DOS 1.25 "basica demo" compared to the real hardware
