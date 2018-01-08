@@ -20,7 +20,10 @@ Keyboard: P8035L CPU, undumped 2716 labelled "358_2758"
 #include "machine/z80ctc.h"
 #include "machine/z80dart.h"
 #include "machine/clock.h"
-//#include "screen.h"
+#include "machine/x2212.h"
+//#include "video/crt9007.h"
+//#include "video/crt9021.h"
+#include "screen.h"
 
 class altos2_state : public driver_device
 {
@@ -32,11 +35,18 @@ public:
 		, m_p_videoram(*this, "videoram")
 	{ }
 
+	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+
 private:
 	required_device<cpu_device> m_maincpu;
 	required_region_ptr<u8> m_p_chargen;
 	required_shared_ptr<u8> m_p_videoram;
 };
+
+u32 altos2_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+{
+	return 0;
+}
 
 static ADDRESS_MAP_START( mem_map, AS_PROGRAM, 8, altos2_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM AM_REGION("roms", 0)
@@ -49,6 +59,8 @@ static ADDRESS_MAP_START( io_map, AS_IO, 8, altos2_state)
 	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("uart1", z80dart_device, ba_cd_r, ba_cd_w)
 	AM_RANGE(0x04, 0x07) AM_DEVREADWRITE("uart2", z80dart_device, ba_cd_r, ba_cd_w)
 	AM_RANGE(0x08, 0x0b) AM_DEVREADWRITE("ctc", z80ctc_device, read, write)
+	AM_RANGE(0x40, 0x7f) AM_DEVREADWRITE("novram", x2210_device, read, write)
+	//AM_RANGE(0x80, 0xff) AM_DEVREADWRITE_MOD("vpac", crt9007_device, read, write, rshift<1>)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( altos2 )
@@ -88,6 +100,12 @@ static MACHINE_CONFIG_START( altos2 )
 	MCFG_Z80DART_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
 	MCFG_DEVICE_ADD("uart2", Z80DART, XTAL_4MHz)
 	MCFG_Z80DART_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
+
+	MCFG_DEVICE_ADD("novram", X2210, 0)
+
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_RAW_PARAMS(XTAL_40MHz / 2, 960, 0, 800, 347, 0, 325)
+	MCFG_SCREEN_UPDATE_DRIVER(altos2_state, screen_update)
 MACHINE_CONFIG_END
 
 ROM_START( altos2 )
