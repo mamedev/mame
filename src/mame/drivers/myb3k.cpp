@@ -117,6 +117,8 @@ public:
 		TIMER_ID_KEY_INTERRUPT
 	};
 
+	DECLARE_INPUT_CHANGED_MEMBER(monitor_changed);
+
 	DECLARE_READ8_MEMBER(myb3k_kbd_r);
 	void kbd_set_data_and_interrupt(u8 data);
 
@@ -170,7 +172,9 @@ protected:
 	uint8_t m_kbd_second_byte;
 	uint8_t m_crtc_vreg[0x100],m_crtc_index;
 	uint8_t m_vmode;
+	rgb_t (*m_pal)[8];
 	rgb_t m_cpal[8];
+	rgb_t m_mpal[8];
 	uint8_t m_portc;
 	uint8_t m_dma_page[4]; // a 74670, 4 x 4 bit storage latch
 	virtual void machine_start() override;
@@ -262,7 +266,7 @@ MC6845_UPDATE_ROW( myb3k_state::crtc_update_row )
 					pind ^= ((cursor_x != -1 && x_pos == cursor_x && ra == 7) ? 7 : 0);
 
 					/* Pick up the color */
-					bitmap.pix32(y, ( x_pos * 8) + pxl) = m_cpal[pind & 0x07];
+					bitmap.pix32(y, ( x_pos * 8) + pxl) = (*m_pal)[pind & 0x07];
 				}
 				break;
 
@@ -284,7 +288,7 @@ MC6845_UPDATE_ROW( myb3k_state::crtc_update_row )
 				{
 					if ((pdat16 & (0x80 >> pxl)) != 0)
 					{
-						bitmap.pix32(y, ( x_pos * 8) + pxl) = m_cpal[0x07];
+						bitmap.pix32(y, ( x_pos * 8) + pxl) = (*m_pal)[0x07];
 					}
 					else
 					{
@@ -487,6 +491,11 @@ ADDRESS_MAP_END
 
 /* Input ports - from Step/One service manual */
 static INPUT_PORTS_START( myb3k )
+	PORT_START("MONITOR")
+	PORT_CONFNAME( 0x01, 0x00, "Monitor") PORT_CHANGED_MEMBER(DEVICE_SELF, myb3k_state, monitor_changed, 0)
+	PORT_CONFSETTING(    0x00, "Color")
+	PORT_CONFSETTING(    0x01, "Monochrome")
+
 	PORT_START("DSW1")
 	PORT_DIPUNUSED_DIPLOC(0x01, 0x01, "SW1:1")
 	PORT_DIPUNUSED_DIPLOC(0x02, 0x02, "SW1:2")
@@ -526,6 +535,10 @@ static INPUT_PORTS_START( myb3k )
 	PORT_DIPSETTING(    0x00, "11" )
 INPUT_PORTS_END
 
+INPUT_CHANGED_MEMBER(myb3k_state::monitor_changed)
+{
+	m_pal = (ioport("MONITOR")->read() & 1) ? &m_mpal : &m_cpal;
+}
 
 void myb3k_state::machine_start()
 {
@@ -539,6 +552,15 @@ void myb3k_state::machine_start()
 	m_cpal[5] = rgb_t(  0, 255, 255); // cyan    0.80v
 	m_cpal[6] = rgb_t(255, 255,   0); // yellow  0.90v
 	m_cpal[7] = rgb_t(255, 255, 255); // white   1.04v
+
+	m_mpal[0] = rgb_t(0, (uint8_t)(( 0.29 / 1.04 ) * 256), 0); // black   0.29v
+	m_mpal[1] = rgb_t(0, (uint8_t)(( 0.52 / 1.04 ) * 256), 0); // blue    0.52v
+	m_mpal[2] = rgb_t(0, (uint8_t)(( 0.58 / 1.04 ) * 256), 0); // red     0.58v
+	m_mpal[3] = rgb_t(0, (uint8_t)(( 0.63 / 1.04 ) * 256), 0); // magenta 0.63v
+	m_mpal[4] = rgb_t(0, (uint8_t)(( 0.71 / 1.04 ) * 256), 0); // green   0.71v
+	m_mpal[5] = rgb_t(0, (uint8_t)(( 0.80 / 1.04 ) * 256), 0); // cyan    0.80v
+	m_mpal[6] = rgb_t(0, (uint8_t)(( 0.90 / 1.04 ) * 256), 0); // yellow  0.90v
+	m_mpal[7] = rgb_t(0, (uint8_t)(( 1.04 / 1.04 ) * 256), 0); // white   1.04v
 
 	// CPU can only access RAM 50% of the time and the CRTC the other 50%. This waitstate workaround gives
 	// close enough performance of the DOS 1.25 "basica demo" compared to the real hardware
@@ -558,6 +580,7 @@ void myb3k_state::machine_reset()
 	m_vmode = 0;
 	m_portc = 0;
 	memset(m_dma_page, 0, sizeof(m_dma_page));
+	m_pal = (ioport("MONITOR")->read() & 1) ? &m_mpal : &m_cpal;
 }
 
 void myb3k_state::select_dma_channel(int channel, bool state)
