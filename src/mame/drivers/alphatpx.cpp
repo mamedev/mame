@@ -708,12 +708,12 @@ MACHINE_CONFIG_END
 
 // Alphatronic P2
 ROM_START( alphatp2 ) // P2 ROM space 0x1800
+	ROM_REGION(0x1800, "boot", 0)
 	ROM_SYSTEM_BIOS(0, "caap94-96", "caap94-96")
 	ROM_SYSTEM_BIOS(1, "caap04-06", "caap04-06")
 	ROM_SYSTEM_BIOS(2, "p2_es", "p2_es")
 	ROM_SYSTEM_BIOS(3, "p2_sks", "p2_sks")
 
-	ROM_REGION(0x1800, "boot", 0)
 	ROMX_LOAD("caap_96_00_5a.bin", 0x0000, 0x0800, CRC(cb137796) SHA1(876bd0762faffc7b74093922d8fbf1c72ec70060), ROM_BIOS(1) ) // earlier P2, three 16K RAM boards
 	ROMX_LOAD("caap_05_02_12.bin", 0x0800, 0x0800, CRC(14f19693) SHA1(7ecb66818a3e352fede1857a18cd12bf742603a9), ROM_BIOS(1) )
 	ROMX_LOAD("caap_94_01_50.bin", 0x1000, 0x0800, CRC(fda8d4a4) SHA1(fa91e6e8504e7f84cf69d86f72826ad5405fd82d), ROM_BIOS(1) )
