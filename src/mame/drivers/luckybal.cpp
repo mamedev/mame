@@ -51,6 +51,7 @@
 
 #include "emu.h"
 #include "cpu/z180/z180.h"
+#include "machine/i8255.h"
 #include "video/v9938.h"
 #include "screen.h"
 
@@ -82,9 +83,47 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( main_io, AS_IO, 8, luckybal_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	AM_RANGE(0xc0, 0xc3) AM_DEVREADWRITE("ppi8255", i8255_device, read, write)
 	AM_RANGE(0xe0, 0xe3) AM_DEVREADWRITE("v9938", v9938_device, read, write)  // guess
 ADDRESS_MAP_END
+/*
+[:maincpu] ':maincpu' (00006): unmapped io memory write to 0010 = 00 & FF
+[:maincpu] ':maincpu' (00009): unmapped io memory read from 0018 & FF
+[:maincpu] ':maincpu' (002C9): unmapped io memory write to 003F = 00 & FF
+[:maincpu] ':maincpu' (002CE): unmapped io memory write to 0033 = A0 & FF
+[:maincpu] ':maincpu' (002D2): unmapped io memory write to 0034 = 00 & FF
+[:maincpu] ':maincpu' (049C3): unmapped io memory write to 0032 = 00 & FF
+[:maincpu] ':maincpu' (0498F): unmapped io memory write to 000C = 1B & FF
+[:maincpu] ':maincpu' (04993): unmapped io memory write to 000D = 00 & FF
+[:maincpu] ':maincpu' (04998): unmapped io memory write to 000E = 1B & FF
+[:maincpu] ':maincpu' (0499C): unmapped io memory write to 000F = 00 & FF
+[:maincpu] ':maincpu' (049A1): unmapped io memory write to 0014 = 00 & FF
+[:maincpu] ':maincpu' (049A6): unmapped io memory write to 0015 = 18 & FF
+[:maincpu] ':maincpu' (049AA): unmapped io memory write to 0016 = 00 & FF
+[:maincpu] ':maincpu' (049AF): unmapped io memory write to 0017 = 18 & FF
+[:maincpu] ':maincpu' (049B2): unmapped io memory read from 0010 & FF
+[:maincpu] ':maincpu' (049B9): unmapped io memory write to 0010 = 04 & FF
+[:maincpu] ':maincpu' (04A65): unmapped io memory write to 000A = 04 & FF
+[:maincpu] ':maincpu' (049C7): unmapped io memory write to 0002 = 00 & FF
+[:maincpu] ':maincpu' (049D1): unmapped io memory write to 0000 = 64 & FF
+[:maincpu] ':maincpu' (002F2): unmapped io memory write to 00C3 = 44 & FF
+[:maincpu] ':maincpu' (002F4): unmapped io memory write to 00C3 = 44 & FF
+[:maincpu] ':maincpu' (002F8): unmapped io memory write to 00C0 = 5A & FF
+[:maincpu] ':maincpu' (002FA): unmapped io memory read from 00C0 & FF
+*/
+/*
+;*********** PPI 8255 *******
+PORTCN    EQU  C0H    ;80H C
+P_AUDIO	  EQU  C0H    ;Port A ---> DAC
+PORTIN    EQU  C2H    ;Port C (High nibble) Inputs. (4=EE, 5=PLATE, 6=KEY, 7=DIP)
+PORT_EE	  EQU  C2H    ;Port C (Low nibble) EEPROM.  (0=DI, 1=CS, 2=SK)
+PORTIO    EQU  C1H    ;Port B I/O 4099 (0=A0, 1=A1, 2=A2, 3=WJ, 4=WC, 5=WP, 6=D, 7=LED)
+PPI_CTRL  EQU  C3H    ;Mode.
 
+;******* 74LS273 MEMORY MAPPED **********
+M_MAP     EQU  90H    ; [A]= Bank to select (BIT6=MEM, BIT7=EN_NMI)
+
+*/
 
 /**************************************
 *            Input Ports              *
@@ -182,6 +221,8 @@ static MACHINE_CONFIG_START( luckybal )
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_IO_MAP(main_io)
 
+	MCFG_DEVICE_ADD("ppi8255", I8255A, 0)
+	
 	/* video hardware */
 	MCFG_V9938_ADD("v9938", "screen", VDP_MEM, VID_CLOCK)
 	MCFG_V99X8_INTERRUPT_CALLBACK(INPUTLINE("maincpu", 0))
