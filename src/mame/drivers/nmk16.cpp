@@ -7396,6 +7396,7 @@ ROM_START( grdnstrmg ) /* Germany */
 	ROM_LOAD( "gs2_s2.uc18", 0x00000, 0x40000, CRC(e911ce33) SHA1(a29c4dea98a22235122303325c63c15fadd3431d) ) //
 ROM_END
 
+// 紅狐戰機 II (Hóng Hú Zhànjī II)
 ROM_START( redfoxwp2 )
 	ROM_REGION( 0x80000, "maincpu", 0 )     /* 68000 Code */
 	ROM_LOAD16_BYTE( "u112", 0x000000, 0x040000, CRC(3f31600b) SHA1(6c56e36178effb60ec27dfcd205393e2cfac4ed6) ) /* No label */
@@ -7426,6 +7427,7 @@ DRIVER_INIT_MEMBER(nmk16_state,redfoxwp2a)
 	decryptcode( machine(),23, 22, 21, 20,   19, 18, /* */ 16, 17, /* */    15,14,13,12,    11, 10, 9, 8,       7, 6, 5, 4,     3, 2, 1, 0 );
 }
 
+// 紅狐戰機 II (Hóng Hú Zhànjī II)
 ROM_START( redfoxwp2a )
 	ROM_REGION( 0x80000, "maincpu", 0 )     /* 68000 Code */
 	ROM_LOAD16_BYTE( "afega_4.u112", 0x000000, 0x040000, CRC(e6e6682a) SHA1(1a70ca3881b4ecc6d329814ff1fdafce16550ca2) )
@@ -8100,8 +8102,8 @@ GAME( 1998, grdnstrm, 0,        grdnstrm, grdnstrm, nmk16_state, 0,         ORIE
 GAME( 1998, grdnstrmv,grdnstrm, grdnstrmk,grdnstrk, nmk16_state, grdnstrm,  ROT270,             "Afega (Apples Industries license)", "Guardian Storm (vertical)", 0 )
 GAME( 1998, grdnstrmj,grdnstrm, grdnstrmk,grdnstrk, nmk16_state, grdnstrmg, ROT270,             "Afega",                             "Sen Jing - Guardian Storm (Japan)", 0 )
 GAME( 1998, grdnstrmk,grdnstrm, grdnstrmk,grdnstrk, nmk16_state, grdnstrm,  ROT270,             "Afega",                             "Jeon Sin - Guardian Storm (Korea)", 0 )
-GAME( 1998, redfoxwp2,grdnstrm, grdnstrmk,grdnstrk, nmk16_state, grdnstrm,  ROT270,             "Afega",                             "Red Fox War Planes II (China, set 1)", 0 )
-GAME( 1998, redfoxwp2a,grdnstrm,grdnstrmk,grdnstrk, nmk16_state, redfoxwp2a,ROT270,             "Afega",                             "Red Fox War Planes II (China, set 2)", 0 )
+GAME( 1998, redfoxwp2,grdnstrm, grdnstrmk,grdnstrk, nmk16_state, grdnstrm,  ROT270,             "Afega",                             "Hong Hu Zhanji II (China, set 1)", 0 )
+GAME( 1998, redfoxwp2a,grdnstrm,grdnstrmk,grdnstrk, nmk16_state, redfoxwp2a,ROT270,             "Afega",                             "Hong Hu Zhanji II (China, set 2)", 0 )
 GAME( 1998, grdnstrmg,grdnstrm, grdnstrmk,grdnstrk, nmk16_state, grdnstrmg, ROT270,             "Afega",                             "Guardian Storm (Germany)", 0 )
 
 // is there a 'bubble 2000' / 'hot bubble' version with Afega copyright, or is the only Afega release dolmen above, this seems like a sequel, not a clone?

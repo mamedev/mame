@@ -102,7 +102,7 @@
   To enter the Service Mode or Bookkeeping Menu, hold down Stop Reel 2/Up and Take along with the
   specific inputs.
 
-  * Butterfly Dream 97
+  * 蝴蝶梦 97 (Húdié Mèng 97)
 
   The program code has trivial opcode encryption which has been broken. However, the inputs tend
   to act out of control at many times. This may have to do with the large number of unknown reads
@@ -1919,7 +1919,7 @@ ROM_START( sstar97 )
 ROM_END
 
 /*
-  Butterfly Dream 97 / Hudie Meng 97
+  蝴蝶梦 97 (Húdié Mèng 97)
   Game is encrypted and needs better decoded graphics.
 */
 ROM_START( bdream97 )
@@ -2021,5 +2021,5 @@ GAME( 1995, leader,   0,       skylncr,  leader,   skylncr_state,  0,        ROT
 GAME( 199?, gallag50, 0,       skylncr,  gallag50, skylncr_state,  0,        ROT0, "bootleg",              "Gallag Video Game / Petalouda (Butterfly, x50)", 0 )
 GAME( 199?, neraidou, 0,       neraidou, neraidou, skylncr_state,  0,        ROT0, "bootleg",              "Neraidoula (Fairy Butterfly)",                   0 )
 GAME( 199?, sstar97,  0,       sstar97,  sstar97,  skylncr_state,  0,        ROT0, "Bordun International", "Super Star 97 / Ming Xing 97 (version V153B)",   0 )
-GAME( 1995, bdream97, 0,       bdream97, skylncr,  skylncr_state,  0,        ROT0, "bootleg (KKK)",        "Butterfly Dream 97 / Hudie Meng 97",             MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
+GAME( 1995, bdream97, 0,       bdream97, skylncr,  skylncr_state,  0,        ROT0, "bootleg (KKK)",        "Hudie Meng 97",                                  MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
 GAME( 2000, sonikfig, 0,       skylncr,  sonikfig, skylncr_state,  sonikfig, ROT0, "Z Games",              "Sonik Fighter (version 02, encrypted)",          MACHINE_WRONG_COLORS | MACHINE_NOT_WORKING )
