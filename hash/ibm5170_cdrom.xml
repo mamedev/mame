@@ -1052,8 +1052,51 @@
 				<disk name="burntime (1993)(max design)(de)" sha1="590fe4f9a0b5981bd5c30e17d145cb112765816d" />
 			</diskarea>
 		</part>
-	</software>	
+	</software>
 
+	<!-- DOS / Windows 95 -->
+	<!-- 28th August 1996 -->
+	<software name="caesar2">
+		<description>Caesar II (CMC v1.2)</description>
+		<year>1996</year>
+		<publisher>Sierra</publisher>
+		<info name="version" value="1.2" />
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="caesar ii (1997)(sierra)[cmc 370810-4]" sha1="ffb3e460dabb5243b131534165b8df7cddbea6d5" />
+			</diskarea>
+		</part>
+	</software>
+	
+	<!-- Identical version number / reported date than the one above -->
+	<software name="caesar2b" cloneof="caesar2">
+		<description>Caesar II (Budget v1.2)</description>
+		<year>1996</year>
+		<publisher>Sierra</publisher>
+		<info name="version" value="1.2" />
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="caesar ii (1997)(sierra)[!][budget][50011269]" sha1="1a3e489a3845963b4f833f613c89c8fffadeefbf" />
+			</diskarea>
+		</part>
+	</software>
+	
+	<!-- 10th October 1995 -->
+	<software name="caesar2d" cloneof="caesar2">
+		<description>Caesar II (Germany v1.0)</description>
+		<year>1995</year>
+		<publisher>Sierra</publisher>
+		<info name="version" value="1.0"/>
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="caesar ii (1995)(sierra)(de)" sha1="81456b19016bda9492937300264060df052e6cb4" />
+			</diskarea>
+		</part>
+	</software>
+	
 	<!-- Windows & Macintosh -->
 	<!-- TODO: huge gfx issues -->
 	<software name="choroq" supported="no">
@@ -1514,6 +1557,57 @@
 		</part>
 	</software>
 	
+	<software name="redalertnl" cloneof="redalert" supported="no">
+		<description>Command &amp; Conquer - Red Alert (Netherlands)</description>
+		<year>1996</year>
+		<publisher>Dice / Westwood Studios</publisher>
+		
+		<part name="cdrom1" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="command &amp; conquer - red alert (1996)(dice)(nl)(disc 1 of 2)" sha1="447c8e11a29b9ce76d5088ef6be416da389dac26" />
+			</diskarea>
+		</part>
+		<part name="cdrom2" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="command &amp; conquer - red alert (1996)(dice)(nl)(disc 2 of 2)" sha1="3262e3c2991e0ef9d25a69053f0c80b5954868ab" />
+			</diskarea>
+		</part>
+	</software>
+	
+	<software name="redalertbg" cloneof="redalert" supported="no">
+		<description>Command &amp; Conquer - Red Alert (Budget)</description>
+		<year>1996</year>
+		<publisher>Sold Out / Westwood Studios</publisher>
+		
+		<part name="cdrom1" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="command &amp; conquer - red alert (1996)(sold out)(disc 1 of 2)[budget]" sha1="583b3e6a9f504681cf35c5e8cc1643d2f7a60f1c" />
+			</diskarea>
+		</part>
+		<part name="cdrom2" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="command &amp; conquer - red alert (1996)(sold out)(disc 2 of 2)[budget]" sha1="82da2a8a7ebb16d35ae1a2d3b066d3ba2176f32c" />
+			</diskarea>
+		</part>
+	</software>
+	
+	<software name="redalertd" cloneof="redalert" supported="no">
+		<description>Command &amp; Conquer Teil 2 - Alarmstufe Rot (Germany)</description>
+		<year>1996</year>
+		<publisher>Virgin / Westwood Studios</publisher>
+		
+		<part name="cdrom1" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="command &amp; conquer teil 2 - alarmstufe rot (1996)(virgin)(de)(disc 1 of 2)" sha1="14295fc24d0be6b63132ccb11c41ff5564b76151" />
+			</diskarea>
+		</part>
+		<part name="cdrom2" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="command &amp; conquer teil 2 - alarmstufe rot (1996)(virgin)(de)(disc 2 of 2)" sha1="d80439cd151fe0d4225233ec83624fc5630626b2" />
+			</diskarea>
+		</part>
+	</software>
+	
 	<software name="rise2dc" supported="partial">
 		<description>Rise 2 Resurrection - Director's Cut</description>
 		<year>1995</year>
@@ -1747,10 +1841,7 @@
 				<disk name="zyclunt" sha1="cc6e69cdd5bdda70361778c3515571114a97b662" />
 			</diskarea>
 		</part>
-	</software>
-
-
-	
+	</software>	
 	
 	<!--                                         -->
 	<!-- Drivers / Utilities / Operating Systems -->
@@ -1777,6 +1868,21 @@
 		</part>
 	</software>
 
+	<!-- DOS -->
+	<!-- Rereleased software, apparently identical to the floppy counterpart -->
+	<software name="keycad">
+		<description>Key CAD Complete Creations (v6.0)</description>
+		<year>1996</year>
+		<publisher>SoftKey</publisher>
+		<info name="version" value="6.0" />
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="cad creations (1996)(softkey)" sha1="15586355d3cdb4aac612dac765e88cc682324fb2" />
+			</diskarea>
+		</part>
+	</software>
+	
 	<software name="lexz22z32">
 		<description>Lexmark Z22 / Z32 Color Jetprinter</description>
 		<year>2000</year>
