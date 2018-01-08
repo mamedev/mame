@@ -1096,6 +1096,160 @@
 			</diskarea>
 		</part>
 	</software>
+
+	<!-- DOS -->
+	<software name="campaign">
+		<description>Campaign</description>
+		<year>1996</year>
+		<publisher>Empire</publisher>
+		
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="campaign (1996)(empire)" sha1="cdbb44842cba29bb4d666ca1b1bbd579179dede3" />
+			</diskarea>
+		</part>
+	</software>
+	
+	<!-- DOS -->
+	<!-- TODO: selecting SB16 causes hang when testing sound / game hangs after install -->
+	<!-- TODO: apache demo throws interrupt 0Dh, general protection fault if not installed to HDD (also MAME fatalerrors) -->
+	<software name="capitald" supported="partial">
+		<description>Capitalism (Germany v1.02)</description>
+		<year>1996</year>
+		<publisher>Interactive Magic / Enlight Software</publisher>
+		<info name="version" value="1.02" />
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="capitalism (1996)(interactive magic)(de)" sha1="797e1c855a3e712e6eb796e2931a755336680cad" />
+			</diskarea>
+		</part>
+	</software>
+	
+	<!-- mixed English/German strings -->
+	<software name="capitalod" cloneof="capitald" supported="partial">
+		<description>Capitalism (Germany v1.0)</description>
+		<year>1995</year>
+		<publisher>Interactive Magic / Enlight Software</publisher>
+		<info name="version" value="1.0" />
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="capitalism (1995)(interactive magic)(de)" sha1="d9ea6d68d0f6fbddd1043fe62d38421255d4931c" />
+			</diskarea>
+		</part>
+	</software>
+	
+	<!-- DOS / Windows 3.1 -->
+	<software name="castledb">
+		<description>Castle of Dr. Brain </description>
+		<year>1996</year>
+		<publisher>Sierra</publisher>
+		
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="castle of dr. brain (1996)(sierra)" sha1="55a5cf1729d240a0b77333d9a0710e93c1b7f06c" />
+			</diskarea>
+		</part>
+	</software>
+	
+	<!-- DOS -->
+	<!-- At least 2 MB of EMM required -->
+	<software name="centint" supported="partial">
+		<description>Central Intelligence</description>
+		<year>1994</year>
+		<publisher>Ocean</publisher>
+		
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="central intelligence (1994)(ocean)" sha1="b2b86271aa2e1144b14140fea4bafaa6af76cff9" />
+			</diskarea>
+		</part>
+	</software>
+	
+	<!-- DOS -->
+	<!-- EMS386 v3.0 required -->
+	<software name="cfootman" supported="partial">
+		<description>Club Football - The Manager</description>
+		<year>1995</year>
+		<publisher>BOMS</publisher>
+		
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="club football - the manager (1995)(boms)(m6)" sha1="07f330b6f789f9d9fbd1572b5f799b5d90dc5403" />
+			</diskarea>
+		</part>
+	</software>
+	
+	<!-- OS/2 Warp, untested -->
+	<software name="cgameos2">
+		<description>Classic Games for OS/2 Warp</description>
+		<year>1995</year>
+		<publisher>IBM</publisher>
+		
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="classic games for os2 warp (1995)(ibm)" sha1="4a377af3d8de57c46870c8c3d56b0a5999123082" />
+			</diskarea>
+		</part>
+	</software>
+	
+	<!-- DOS / Windows 3.x -->
+	<!-- TODO: "not enough DOS memory" at launch -->
+	<software name="chewy" supported="partial">
+		<description>Chewy - Esc from F5</description>
+		<year>1997</year>
+		<publisher>Play Byte</publisher>
+		
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="chewy - esc from f5 (1997)(play byte)" sha1="907ab3a356c15cd03d5de3c9fd8a079e13183847" />
+			</diskarea>
+		</part>
+	</software>
+	
+	<software name="chewyod" cloneof="chewy" supported="partial">
+		<description>Chewy - Esc from F5 (Germany v1.0)</description>
+		<year>1995</year>
+		<publisher>Blue Byte</publisher>
+		<info name="version" value="1.0" />
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="chewy - esc von f5 v1.0 (1995)(blue byte)(de)" sha1="cb86f874143702d6930cff28b891856fb795915c" />
+			</diskarea>
+		</part>
+	</software>
+	
+	<!-- DOS -->
+	<!-- TODO: hangs with SB16 -->
+	<software name="chillman" supported="partial">
+		<description>Chill Manor (v1.99)</description>
+		<year>1996</year>
+		<publisher>Simon &amp; Schuster</publisher>
+		<info name="version" value="1.99" />
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="chill manor (1996)(simon &amp; schuster)" sha1="06532b9a8d041edb81ab4f1d9350990b76486fe0" />
+			</diskarea>
+		</part>
+	</software>
+	
+	<!-- DOS -->
+	<!-- Reportedly uses laserlok protection, which seems to work fine -->
+	<software name="chman2">
+		<description>Championship Manager 2 (v1.37)</description>
+		<year>1995</year>
+		<publisher>Domark</publisher>
+		<info name="version" value="1.37" />
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="championship manager 2 (1995)(domark)[laserlok]" sha1="cf23abdf92b24151afbe03328f92f2e858f493ea" />
+			</diskarea>
+		</part>
+	</software>
 	
 	<!-- Windows & Macintosh -->
 	<!-- TODO: huge gfx issues -->
@@ -1107,6 +1261,60 @@
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="choroq" sha1="485d19839da7c16d34ad4a5b929a7e60d174d1e6" />
+			</diskarea>
+		</part>
+	</software>
+	
+	<!-- DOS -->
+	<!-- TODO: fails reading file system -->
+	<software name="chronomst" supported="no">
+		<description>Chronomaster</description>
+		<year>1995</year>
+		<publisher>Capstone</publisher>
+		
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="chronomaster (1995)(capstone)" sha1="e780eabb9a271e28f5a9daac1620630cb61da4a5" />
+			</diskarea>
+		</part>
+	</software>
+	
+	<software name="civ">
+		<description>Civilization (Budget)</description>
+		<year>1994</year>
+		<publisher>MicroProse</publisher>
+		<info name="version" value="474.03" />
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="civilization (1994)(microprose)(m3)[budget]" sha1="c3a83bd30da53ecf6f122049f262c9bbd7ce24dc" />
+			</diskarea>
+		</part>
+	</software>
+	
+	<!-- DOS -->
+	<!-- Civilization version is 474.04 (but no Sound Blaster option is available?) -->
+	<software name="civmant">
+		<description>Civilization &amp; Mantis</description>
+		<year>1993</year>
+		<publisher>MicroProse</publisher>
+		
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="civilization &amp; mantis (1993)(microprose)(m3)" sha1="fc9919c49b19cce923a67f4f944810069324ccf8" />
+			</diskarea>
+		</part>
+	</software>
+	
+	<software name="civilwar">
+		<description>The Civil War</description>
+		<year>1995</year>
+		<publisher>Cyberium</publisher>
+		<info name="version" value="1.0.38" />
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="civil war, the (1995)(cyberium)(nl)" sha1="15601dd93c74deb0871e9302697d8c9fb69db45c" />
 			</diskarea>
 		</part>
 	</software>
@@ -1128,12 +1336,26 @@
 		</part>
 	</software>
 
+	<!-- Windows 3.1 -->
+	<software name="comixzone">
+		<description>Comix Zone</description>
+		<year>1995</year>
+		<publisher>Sega</publisher>
+		
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="comix zone (1995)(sega)" sha1="6b77dbc41cf493539980d7e45a792ceaf10b9bbe" />
+			</diskarea>
+		</part>
+	</software>
+	
 	<!-- Requires VESA driver to install and play -->
 	<software name="crusader">
 		<description>Crusader - No Remorse (v1.23)</description>
 		<year>1996</year>
 		<publisher>Origin</publisher>
 		<info name="version" value="1.23" />
+
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="crusader" sha1="fcf090cd321fd299339b8848ca4b723ef5a28475" />
