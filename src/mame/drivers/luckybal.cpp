@@ -35,14 +35,14 @@
   1x unknown sanded DIL24 IC labeled PLD-01.
   1x unknown sanded DIL28 IC labeled PLD-02.
   1x unknown sanded DIL20 IC labeled PLD-03 @U21.
-  1x unknown sanded DIL64 IC @U12.
+  1x unknown sanded DIL64 IC @U12 (identified as Yamaha 9938/58 VDP).
 
   1x PPI 8255 (@U10)
   3x 4099 (8-Bit Addressable Latch) @U1-U3-U5.
   3x 4512 (8-Channel Data Selector) @U2-U4-U7.
   
   1x INMOS B IMS1630K-70M (8K x 8 SRAM, DIL28)... NOTE: Replaced by UT6264CPC-70LL in another board.
-  4x sanded IC's (looks like RAM).
+  4x sanded IC's identified as 4464 (64K x 4 DRAM) @U16-U17-U18-U19, near the Yamaha 9938 for video RAM.
 
   1x 27C512   (program ROM).
   1x M27C4001 (GFX + sound samples).
@@ -53,9 +53,9 @@
 
   1x Maxim MAX691CPE (battery supervisor). 
 
-  1x 21.47727 MHz. crystal.
+  1x 21.47727 MHz. crystal, near the Yamaha 9938/58 VDP.
   1x 12.288 MHz. crystal, near the Zilog Z180.
-  1x 8.000 MHz.
+  1x 8.000 MHz. sanded crystal(measured).
 
   1x 8 DIP Switches bank.
   1x pushbutton silkscreened 'PAGE'.
@@ -249,7 +249,7 @@
 #define CPU_CLOCK       XTAL_12_288MHz
 #define VID_CLOCK       XTAL_21_4772MHz
 
-#define VDP_MEM         0x40000
+#define VDP_MEM         0x20000  // 4x 4464 (64K x 4 DRAM)
 
 
 #include "emu.h"
@@ -287,7 +287,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( main_io, AS_IO, 8, luckybal_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0xc0, 0xc3) AM_DEVREADWRITE("ppi8255", i8255_device, read, write)
-	AM_RANGE(0xe0, 0xe3) AM_DEVREADWRITE("v9938", v9938_device, read, write)  // guess
+	AM_RANGE(0xe0, 0xe3) AM_DEVREADWRITE("v9938", v9938_device, read, write)
 ADDRESS_MAP_END
 /*
 [:maincpu] ':maincpu' (00006): unmapped io memory write to 0010 = 00 & FF
@@ -322,6 +322,12 @@ PORTIN    EQU  C2H    ;Port C (High nibble) Inputs. (4=EE, 5=PLATE, 6=KEY, 7=DIP
 PORT_EE	  EQU  C2H    ;Port C (Low nibble) EEPROM.  (0=DI, 1=CS, 2=SK)
 PORTIO    EQU  C1H    ;Port B I/O 4099 (0=A0, 1=A1, 2=A2, 3=WJ, 4=WC, 5=WP, 6=D, 7=LED)
 PPI_CTRL  EQU  C3H    ;Mode.
+
+;---VDP
+PORT0     EQU  E0H
+PORT1     EQU  E1H
+PORT2     EQU  E2H
+PORT3     EQU  E3H
 
 ;******* 74LS273 MEMORY MAPPED **********
 M_MAP     EQU  90H    ; [A]= Bank to select (BIT6=MEM, BIT7=EN_NMI)
