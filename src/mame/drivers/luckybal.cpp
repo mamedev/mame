@@ -68,6 +68,42 @@
   1x RS232 connector silkscreened 'RS-232'.
   1x 2x28 JAMMA type connector.
 
+
+*********************************************************************
+
+  Edge Connector:
+
+
+           Solder side |  | Components
+  ---------------------|--|-----------------
+                 +5VCC |01| GND
+                 +5VCC |02| -5VCC
+             Jugador 2 |03| Jugador 1
+             Jugador 4 |04| Jugador 3
+             Jugador 6 |06| Jugador 5
+                       |07|
+                       |08| Izquierda
+               Derecha |09| Abajo
+               Entrada |10| Salida
+               Apuesta |11| Arriba
+                       |12|
+                       |13|
+                       |14|
+                       |15|
+                       |16|
+                       |17|
+                       |18| +5VCC
+     Contador Entradas |19|
+                       |20| Contador Salidas
+          Habilitacion |21|
+                       |22| Programacion
+                       |23|
+                 Verde |24| Sincronismo
+                  Azul |25| Rojo
+                +12VCC |26| Parlante
+                 +5VCC |27| GND
+                 +5VCC |28| GND
+
 *********************************************************************
 
   Notes:
