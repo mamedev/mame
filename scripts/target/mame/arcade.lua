@@ -4617,6 +4617,7 @@ files {
 	MAME_DIR .. "src/mame/video/lethalj.cpp",
 	MAME_DIR .. "src/mame/drivers/limenko.cpp",
 	MAME_DIR .. "src/mame/drivers/ltcasino.cpp",
+	MAME_DIR .. "src/mame/drivers/luckybal.cpp",
 	MAME_DIR .. "src/mame/drivers/magic10.cpp",
 	MAME_DIR .. "src/mame/drivers/magicard.cpp",
 	MAME_DIR .. "src/mame/drivers/magicfly.cpp",
