@@ -24,11 +24,60 @@
 
 *********************************************************************
 
+  PCB specs:
+
+  Sikscreened: 'PCB Ver 1.5'
+  Sikscreened: 'SIELCON GAMES'
+  Sikscreened: 'Copyright 1996'
+  Sikscreened: 'MADE IN ARGENTINA'
+
+  1x Unknown sanded PLCC68 IC (identified as Zilog Z180).
+  1x unknown sanded DIL24 IC labeled PLD-01.
+  1x unknown sanded DIL28 IC labeled PLD-02.
+  1x unknown sanded DIL20 IC labeled PLD-03 @U21.
+  1x unknown sanded DIL64 IC @U12.
+
+  1x PPI 8255 (@U10)
+  3x 4099 (8-Bit Addressable Latch) @U1-U3-U5.
+  3x 4512 (8-Channel Data Selector) @U2-U4-U7.
+  
+  1x INMOS B IMS1630K-70M (8K x 8 SRAM, DIL28)... NOTE: Replaced by UT6264CPC-70LL in another board.
+  4x sanded IC's (looks like RAM).
+
+  1x 27C512   (program ROM).
+  1x M27C4001 (GFX + sound samples).
+  1x 24C04 serial EEPROM (missing).
+
+  1x unknown DAC (DIL16) @U13.
+  1x LM324 (Single Supply Quad Operational Amplifier)
+
+  1x Maxim MAX691CPE (battery supervisor). 
+
+  1x 21.47727 MHz. crystal.
+  1x 12.288 MHz. crystal, near the Zilog Z180.
+
+  1x 8 DIP Switches bank.
+  1x pushbutton silkscreened 'PAGE'.
+  1x pushbutton silkscreened 'RESET'.
+
+  1x 3.6 V. battery.
+
+  1x 2x10 blind connector silkscreened 'EXPANSION PORT'.
+  1x 2x17 blind connector silkscreened 'EXPANSION SLOT'.
+  1x 6-pin connector silkscreened 'NET'.
+  1x RS232 connector silkscreened 'RS-232'.
+  1x 2x28 JAMMA type connector.
+
+*********************************************************************
+
   Notes:
 
   - Programming mode is driven through POS#5 controls (joystick + bet button)
 
-  - Identified the CPU as Zilog Z180.
+  - The roulette numbers lamps multiplexion & animation seems to be drive from
+    the DIL28 IC (labeled PLD-02).
+
+  - Identified the PLCC68 CPU as Zilog Z180.
 
 *********************************************************************
 
