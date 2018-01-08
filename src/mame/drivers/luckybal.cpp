@@ -55,6 +55,7 @@
 
   1x 21.47727 MHz. crystal.
   1x 12.288 MHz. crystal, near the Zilog Z180.
+  1x 8.000 MHz.
 
   1x 8 DIP Switches bank.
   1x pushbutton silkscreened 'PAGE'.
@@ -133,6 +134,23 @@
   | (Full Reset)                 Si (yes) |                                         | ON  |
   '---------------------------------------+-----------------------------------------+-----'
 
+
+*********************************************************************
+
+  Program ROM
+  Data Lines Scrambling.     
+
+  BUS     ROM
+
+  D0  ->  D1
+  D1  ->  D0
+  D2  ->  D3
+  D3  ->  D2
+  D4  ->  D5
+  D5  ->  D4
+  D6  ->  D7
+  D7  ->  D6
+
 *********************************************************************
 
   Notes:
@@ -143,6 +161,7 @@
     the DIL28 IC (labeled PLD-02).
 
   - Identified the PLCC68 CPU as Zilog Z180.
+  - Identified the DIL64 IC as Yamaha 9938/58 VDP.
 
 *********************************************************************
 
@@ -430,6 +449,15 @@ ROM_END
 
 DRIVER_INIT_MEMBER(luckybal_state, luckybal)
 {
+	uint8_t *rom = memregion("maincpu")->base();
+	int size = memregion("maincpu")->bytes();
+	int start = 0;
+	int i;
+
+	for (i = start; i < size; i++)
+	{
+		rom[i] = bitswap<8>(rom[i], 6, 7, 4, 5, 2, 3, 0, 1);
+	}
 }
 
 
