@@ -212,6 +212,37 @@
   '-------------'
 
 
+*********************************************************************
+
+  Dev notes:
+
+  Currently the program is resetting due to a couple of routines that
+  compare writes/reads and jump to offset 0000.
+  
+  002E5: F3          di
+  002E6: ED 5E       im    2
+  002E8: 31 F5 FE    ld    sp,$FEF5
+  002EB: CD C0 02    call  $02C0
+  002EE: 3E 44       ld    a,$44
+  002F0: D3 C3       out   ($C3),a
+  002F2: D3 C3       out   ($C3),a
+  002F4: 3E 5A       ld    a,$5A      ; loads $5A (bitpattern)
+  002F6: D3 C0       out   ($C0),a    ; out to DAC (through PPI, port A)
+  002F8: DB C0       in    a,($C0)    ; loads from DAC???
+  002FA: FE 5A       cp    $5A        ; compare for the same value like it was RAM
+  002FC: 28 04       jr    z,$00302   ; match?... jumps over the reset.
+  002FE: FB          ei               ; otherwise...
+  002FF: C3 00 00    jp    $0000      : RESET.
+  00302: 3E A5       ld    a,$A5      ; loads $A5 (inverted bitpattern)
+  00304: D3 C0       out   ($C0),a    ; out to DAC (through PPI, port A)
+  00306: DB C0       in    a,($C0)    ; loads from DAC???
+  00308: FE A5       cp    $A5        ; compare for the same value like it was RAM
+  0030A: 28 04       jr    z,$00310   ; match?... jumps over the reset.
+  0030C: FB          ei               ; otherwise...
+  0030D: C3 00 00    jp    $0000      : RESET.
+  00310: AF          xor   a
+  00311: D3 C0       out   ($C0),a
+
 *********************************************************************/
 
 
