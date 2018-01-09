@@ -12,8 +12,7 @@
     TODO:
     - Fix proper cursor support
     - Fix 36 character modes
-    - Hook up all interrupts and 8255 Port C signals
-    - Add printer support on Port A
+    - Fix japanese character support, eg remove the extra underscore
     - Expansion Unit with 6 more ISA8 slots
     - Proper waitstate support when 8088 CPU core admits it and remove the workaround in machine_start 
 
@@ -43,10 +42,10 @@
 #include "bus/isa/isa.h"
 #include "bus/isa/myb3k_com.h"
 #include "bus/isa/myb3k_fdc.h"
+#include "bus/centronics/ctronics.h"
 #include "video/mc6845.h"
 #include "screen.h"
 
-//#define LOG_GENERAL (1U << 0) //defined in logmacro.h already
 #define LOG_PPI     (1U << 1)
 #define LOG_PIT     (1U << 2)
 #define LOG_PIC     (1U << 3)
@@ -58,8 +57,9 @@
 #define LOG_M2      (1U << 9)
 #define LOG_M3      (1U << 10)
 #define LOG_SCRL    (1U << 11)
+#define LOG_CENT    (1U << 12)
 
-//#define VERBOSE (LOG_VMOD)
+//#define VERBOSE (LOG_PIC|LOG_CENT)
 //#define LOG_OUTPUT_STREAM std::cout
 
 #include "logmacro.h"
@@ -75,24 +75,13 @@
 #define LOGM2(...)   LOGMASKED(LOG_M2,   __VA_ARGS__)
 #define LOGM3(...)   LOGMASKED(LOG_M3,   __VA_ARGS__)
 #define LOGSCRL(...) LOGMASKED(LOG_SCRL, __VA_ARGS__)
+#define LOGCENT(...) LOGMASKED(LOG_CENT, __VA_ARGS__)
 
 #ifdef _MSC_VER
 #define FUNCNAME __func__
 #else
 #define FUNCNAME __PRETTY_FUNCTION__
 #endif
-
-// PPI Port C uses
-enum {
-	PC0_STROBE  = 0x01, // Printer interface
-	PC1_SETPAGE = 0x02, // Graphics circuit
-	PC2_DISPST  = 0x04, // Graphics circuit
-	PC3_LPENB   = 0x08, // Lightpen enable
-	PC4_CURSR   = 0x10, // Cursor Odd/Even
-	PC5_BUZON   = 0x20, // Speaker On/Off
-	PC6_CMTWRD  = 0x40,
-	PC7_CMTEN   = 0x80 // Cassette or Speaker
-};
 
 class myb3k_state : public driver_device
 {
@@ -110,11 +99,40 @@ public:
 		, m_crtc(*this, "crtc")
 		, m_vram(*this, "vram")
 		, m_isabus(*this, "isa")
+		, m_centronics(*this, "centronics")
 	{ }
+
+	// PPI Port C uses
+	enum {
+		PC0_STROBE  = 0x01, // Printer interface
+		PC1_SETPAGE = 0x02, // Graphics circuit
+		PC2_DISPST  = 0x04, // Graphics circuit
+		PC3_LPENB   = 0x08, // Lightpen enable
+		PC4_CURSR   = 0x10, // Cursor Odd/Even
+		PC5_BUZON   = 0x20, // Speaker On/Off
+		PC6_CMTWRD  = 0x40,
+		PC7_CMTEN   = 0x80  // Cassette or Speaker
+	};
 
 	enum
 	{
 		TIMER_ID_KEY_INTERRUPT
+	};
+
+	enum
+	{
+		IOSTAT_BUSY  = 0x01,
+		IOSTAT_NONE  = 0x02,
+		IOSTAT_PRPE  = 0x04,
+		IOSTAT_FAULT = 0x08
+	};
+
+	enum
+	{
+		PPI_PC3  = 0x01,
+		ISA_IRQ5 = 0x02,
+		ISA_IRQ7 = 0x04,
+		CENT_ACK = 0x08
 	};
 
 	DECLARE_INPUT_CHANGED_MEMBER(monitor_changed);
@@ -126,6 +144,10 @@ public:
 	DECLARE_WRITE8_MEMBER(myb3k_video_mode_w);
 	DECLARE_WRITE8_MEMBER(myb3k_fdc_output_w);
 	uint32_t screen_update_myb3k(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	DECLARE_WRITE_LINE_MEMBER( isa_irq5_w );
+	DECLARE_WRITE_LINE_MEMBER( isa_irq7_w );
+	void pic_ir5_w(int source, int state);
+	void pic_ir7_w(int source, int state);
 	DECLARE_WRITE_LINE_MEMBER( pic_int_w );
 	DECLARE_WRITE_LINE_MEMBER( pit_out1_changed );
 
@@ -148,11 +170,18 @@ public:
 	DECLARE_READ8_MEMBER(dma_memory_read_byte);
 	DECLARE_WRITE8_MEMBER(dma_memory_write_byte);
 	DECLARE_WRITE8_MEMBER(dma_segment_w);
+	DECLARE_READ8_MEMBER(myb3k_io_status_r);
 	DECLARE_WRITE_LINE_MEMBER( hrq_w );
 	DECLARE_WRITE_LINE_MEMBER( tc_w );
 	void select_dma_channel(int channel, bool state);
 
         void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+
+	// Centronics printer interface
+	DECLARE_WRITE_LINE_MEMBER (centronics_ack_w);
+	DECLARE_WRITE_LINE_MEMBER (centronics_busy_w);
+	DECLARE_WRITE_LINE_MEMBER (centronics_perror_w);
+	DECLARE_WRITE_LINE_MEMBER (centronics_select_w);
 
 protected:
 	required_device<cpu_device> m_maincpu;
@@ -180,11 +209,21 @@ protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
+private:
+	optional_device<centronics_device> m_centronics;
+
+	int8_t m_io_status;
 };
 
 void myb3k_state::video_start()
 {
 	LOG("%s\n", FUNCNAME);
+}
+
+READ8_MEMBER(myb3k_state::myb3k_io_status_r)
+{
+	LOGCENT("%s\n", FUNCNAME);
+	return m_io_status & 0x0f;
 }
 
 READ8_MEMBER( myb3k_state::myb3k_kbd_r )
@@ -275,9 +314,7 @@ MC6845_UPDATE_ROW( myb3k_state::crtc_update_row )
 
 			case 2: // 640x200, 80 char, white on black
 				rowstart = (((x_pos + ma * 2) * 16 + ra) & 0x7fff) + page;
-				//rowstart = (((x_pos * 2 + ma * 2) * 16 + ra) & 0x7fff) + page;
 				pdat16 = m_vram[rowstart];
-				//pdat16 = ((m_vram[rowstart] << 8) & 0xff00) | ((m_vram[rowstart + 32]) & 0x00ff);
 				if (pdat16 != 0)
 					LOGM2(" - PDAT:%06x from offset %04x RA=%d X:%d Y:%d\n", pdat16, (x_pos * 2 + ma * 2) * 16 + ra + page + 0, ra, x_pos, y);
 
@@ -463,34 +500,45 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(myb3k_io, AS_IO, 8, myb3k_state)
 	ADDRESS_MAP_UNMAP_LOW
-//  AM_RANGE(0x000,0x7ff) // Main Unit
-// 0-3 8255A PPI parallel port
+	// Main Unit 0-0x7ff
+
+	// 0-3 8255A PPI parallel port
 	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("ppi", i8255_device, read, write)
-// Discrete latches
+
+	// Discrete latches
 	AM_RANGE(0x04, 0x04) AM_READ(myb3k_kbd_r)
 	AM_RANGE(0x04, 0x04) AM_WRITE(myb3k_video_mode_w) // b0=40CH, b1=80CH, b2=16 raster
-//  AM_RANGE(0x05, 0x05) AM_READ(myb3k_io_status_r) // printer connector bits: b3=fault b2=paper out b1/b0=nc 
+	AM_RANGE(0x05, 0x05) AM_READ(myb3k_io_status_r) // printer connector bits: b3=fault b2=paper out b1 or b0=busy
 	AM_RANGE(0x05, 0x05) AM_WRITE(dma_segment_w) // b0-b3=addr, b6=A b7=B
 	AM_RANGE(0x06, 0x06) AM_READ_PORT("DSW2")
-// 8-9 8259A interrupt controller
+
+	// 8-9 8259A interrupt controller
 	AM_RANGE(0x08, 0x09) AM_DEVREADWRITE("pic", pic8259_device, read, write)
-// c-f 8253 PIT timer
+
+	// c-f 8253 PIT timer
 	AM_RANGE(0x0c, 0x0f) AM_DEVREADWRITE("pit", pit8253_device, read, write)
-// 10-18 8257 DMA
+
+	// 10-18 8257 DMA
 	AM_RANGE(0x10, 0x18) AM_DEVREADWRITE("dma", i8257_device, read, write)
-// 1c-1d HD46505S CRTC
-#if 1
+
+	// 1c-1d HD46505S CRTC
 	AM_RANGE(0x1c, 0x1c) AM_DEVREADWRITE("crtc", h46505_device, status_r, address_w)
 	AM_RANGE(0x1d, 0x1d) AM_DEVREADWRITE("crtc", h46505_device, register_r, register_w)
-#else
-	AM_RANGE(0x1c, 0x1c) AM_WRITE(myb3k_6845_address_w)
-	AM_RANGE(0x1d, 0x1d) AM_WRITE(myb3k_6845_data_w)
-#endif
-//	AM_RANGE(0x800,0xfff) // Expansion Unit
+	// Expansion Unit 0x800 - 0xfff
 ADDRESS_MAP_END
 
 /* Input ports - from Step/One service manual */
 static INPUT_PORTS_START( myb3k )
+	PORT_START("J4")
+	PORT_CONFNAME( 0x03, 0x01, "IRQ5 source")
+	PORT_CONFSETTING(    0x01, "ISA IRQ5")
+	PORT_CONFSETTING(    0x02, "PPI PC3 (Light Pen)")
+
+	PORT_START("J5")
+	PORT_CONFNAME( 0x0c, 0x08, "IRQ7 source")
+	PORT_CONFSETTING(    0x04, "ISA IRQ7")
+	PORT_CONFSETTING(    0x08, "Centronics Ack")
+
 	PORT_START("MONITOR")
 	PORT_CONFNAME( 0x01, 0x00, "Monitor") PORT_CHANGED_MEMBER(DEVICE_SELF, myb3k_state, monitor_changed, 0)
 	PORT_CONFSETTING(    0x00, "Color")
@@ -577,6 +625,8 @@ void myb3k_state::machine_start()
 	m_maincpu->space(AS_PROGRAM).install_ram(0, m_ram->size() - 1, m_ram->pointer());
 
 	m_kbd_data = 0;
+
+	save_item (NAME (m_io_status));
 }
 
 void myb3k_state::machine_reset()
@@ -617,6 +667,22 @@ WRITE_LINE_MEMBER(myb3k_state::pic_int_w)
 {
 	LOGPIC("%s: %d\n", FUNCNAME, state);
 	m_maincpu->set_input_line(0, state);
+}
+
+// pic_ir5_w - select interrupt source depending on jumper J4 setting, either ISA IRQ5 or PPI PC3 (Light Pen)
+void myb3k_state::pic_ir5_w(int source, int state)
+{
+	LOGPIC("%s: %d\n", FUNCNAME, state);
+	if (!machine().paused() && source & ioport("J4")->read())
+		m_pic8259->ir5_w(state);
+}
+
+// pic_ir7_w - select interrupt source depending on jumper J5 setting, either ISA IRQ7 or Centronics Ack 
+void myb3k_state::pic_ir7_w(int source, int state)
+{
+	LOGPIC("%s: %d\n", FUNCNAME, state);
+	if (!machine().paused() && source & ioport("J5")->read())
+		m_pic8259->ir7_w(state);
 }
 
 WRITE_LINE_MEMBER( myb3k_state::pit_out1_changed )
@@ -662,7 +728,7 @@ WRITE8_MEMBER(myb3k_state::dma_memory_write_byte)
 
 WRITE8_MEMBER( myb3k_state::ppi_porta_w )
 {
-	LOGPPI("%s: %02x\n", FUNCNAME, data);
+	LOGCENT("%s: %02x\n", FUNCNAME, data);
 
 	return;
 }
@@ -686,6 +752,10 @@ WRITE8_MEMBER( myb3k_state::ppi_portc_w )
 	LOGPPI(" - CMTEN  : %d\n", (data & PC7_CMTEN)   ? 1 : 0);
 	LOGPPI(" => CMTEN: %d BUZON: %d\n", (data & PC7_CMTEN) ? 1 : 0, (data & PC5_BUZON)? 1 : 0);
 
+	/* Centronics strobe signal */
+	LOGCENT("Centronics strobe %d\n", (data & PC0_STROBE) ? 1 : 0);
+	m_centronics->write_strobe((data & PC0_STROBE) ? 1 : 0);
+	
 	/*
 	 * The actual logic around enabling the buzzer is a bit more complicated involving the cassette interface
 	 * According to the schematics gate1 is enabled if either
@@ -695,9 +765,65 @@ WRITE8_MEMBER( myb3k_state::ppi_portc_w )
 	 */
 	m_pit8253->write_gate1(!(data & PC5_BUZON) && (data & PC7_CMTEN)? 1 : 0);
 
+	/* Update light pen interrupt */
+	pic_ir5_w(PPI_PC3, (data & PC3_LPENB) ? 1 : 0);
+
 	m_portc = data;
 	
 	return;
+}
+
+/* ISA IRQ5 handler
+ */
+WRITE_LINE_MEMBER (myb3k_state::isa_irq5_w)
+{
+		LOGCENT("%s %d\n", FUNCNAME, state);
+		pic_ir5_w(ISA_IRQ5, state);
+}
+
+/* ISA IRQ7 handler
+ */
+WRITE_LINE_MEMBER (myb3k_state::isa_irq7_w)
+{
+		LOGCENT("%s %d\n", FUNCNAME, state);
+		pic_ir7_w(ISA_IRQ7, state);
+}
+
+/* Centronics ACK handler
+ */
+WRITE_LINE_MEMBER (myb3k_state::centronics_ack_w)
+{
+		LOGCENT("%s %d\n", FUNCNAME, state);
+		pic_ir7_w(CENT_ACK, state);
+}
+
+/* Centronics BUSY handler
+ * The busy line is enterring the schematics from the connector but is lost to its way to the status latch
+ * but there is only two possibilities, either D0 or D1 
+ */
+WRITE_LINE_MEMBER (myb3k_state::centronics_busy_w){
+	LOGCENT("%s %d\n", FUNCNAME, state);
+	if (state == ASSERT_LINE)
+		m_io_status &= ~IOSTAT_BUSY;
+	else
+		m_io_status |= IOSTAT_BUSY;
+}
+
+/* Centronics PERROR handler
+ */
+WRITE_LINE_MEMBER (myb3k_state::centronics_perror_w){
+	LOGCENT("%s %d\n", FUNCNAME, state);
+	if (state == ASSERT_LINE)
+		m_io_status &= ~IOSTAT_FAULT;
+	else
+		m_io_status |= IOSTAT_FAULT;
+}
+
+/* Centronics SELECT handler
+ * The centronics select signal is not used
+ */
+WRITE_LINE_MEMBER (myb3k_state::centronics_select_w){
+		LOGCENT("%s %d - not used by machine\n", FUNCNAME, state);
 }
 
 static const gfx_layout myb3k_charlayout =
@@ -734,10 +860,10 @@ static MACHINE_CONFIG_START( myb3k )
 	MCFG_ISA_OUT_IRQ2_CB(DEVWRITELINE("pic", pic8259_device, ir2_w))
 	MCFG_ISA_OUT_IRQ3_CB(DEVWRITELINE("pic", pic8259_device, ir3_w))
 	MCFG_ISA_OUT_IRQ4_CB(DEVWRITELINE("pic", pic8259_device, ir4_w))
-	MCFG_ISA_OUT_IRQ5_CB(DEVWRITELINE("pic", pic8259_device, ir5_w)) // Jumper J4 selectable
+	MCFG_ISA_OUT_IRQ5_CB(WRITELINE(myb3k_state, isa_irq5_w)) // Jumper J4 selectable
 	MCFG_ISA_OUT_IRQ6_CB(DEVWRITELINE("pic", pic8259_device, ir6_w))
-	MCFG_ISA_OUT_IRQ7_CB(DEVWRITELINE("pic", pic8259_device, ir7_w)) // Jumper J5 selectable
-//  MCFG_ISA_OUT_DRQ0_CB(DEVWRITELINE("dma", i8257_device, dreq0_w)) // Part of ISA16 but not ISA8 standard but implemented on ISA8 B8 (SRDY) on this motherboard
+	MCFG_ISA_OUT_IRQ7_CB(WRITELINE(myb3k_state, isa_irq7_w)) // Jumper J5 selectable
+	//MCFG_ISA_OUT_DRQ0_CB(DEVWRITELINE("dma", i8257_device, dreq0_w)) // Part of ISA16 but not ISA8 standard but implemented on ISA8 B8 (SRDY) on this motherboard
 	MCFG_ISA_OUT_DRQ1_CB(DEVWRITELINE("dma", i8257_device, dreq1_w))
 	MCFG_ISA_OUT_DRQ2_CB(DEVWRITELINE("dma", i8257_device, dreq2_w))
 	MCFG_ISA_OUT_DRQ3_CB(DEVWRITELINE("dma", i8257_device, dreq3_w))
@@ -752,9 +878,17 @@ static MACHINE_CONFIG_START( myb3k )
 	MCFG_PIC8259_OUT_INT_CB(WRITELINE(myb3k_state, pic_int_w))
 
 	MCFG_DEVICE_ADD("ppi", I8255A, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(myb3k_state, ppi_porta_w))
+	MCFG_I8255_OUT_PORTA_CB(DEVWRITE8("cent_data_out", output_latch_device, write))
 	MCFG_I8255_IN_PORTB_CB(READ8(myb3k_state, ppi_portb_r))
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(myb3k_state, ppi_portc_w))
+
+	/* Centronics */
+	MCFG_CENTRONICS_ADD ("centronics", centronics_devices, "printer")
+	MCFG_CENTRONICS_ACK_HANDLER (WRITELINE (myb3k_state, centronics_ack_w))
+	MCFG_CENTRONICS_BUSY_HANDLER (WRITELINE (myb3k_state, centronics_busy_w))
+	MCFG_CENTRONICS_PERROR_HANDLER (WRITELINE (myb3k_state, centronics_perror_w))
+	MCFG_CENTRONICS_SELECT_HANDLER (WRITELINE (myb3k_state, centronics_select_w))
+	MCFG_CENTRONICS_OUTPUT_LATCH_ADD ("cent_data_out", "centronics")
 
 	/* DMA chip */
 	MCFG_DEVICE_ADD("dma", I8257, XTAL_14_31818MHz / 6)
@@ -781,8 +915,8 @@ static MACHINE_CONFIG_START( myb3k )
 	MCFG_PIT8253_OUT0_HANDLER(DEVWRITELINE("pic", pic8259_device, ir0_w))
 	MCFG_PIT8253_CLK1(XTAL_14_31818MHz / 12.0) /* speaker if port c bit 5 is low */
 	MCFG_PIT8253_OUT1_HANDLER(WRITELINE(myb3k_state, pit_out1_changed))
-//  MCFG_PIT8253_CLK2(XTAL_14_31818MHz / 12.0) /* ANDed with port c bit 6 but marked as "not use"*/
-//  MCFG_PIT8253_OUT2_HANDLER(WRITELINE(myb3k_state, pit_out2_changed))
+	//  MCFG_PIT8253_CLK2(XTAL_14_31818MHz / 12.0) /* ANDed with port c bit 6 but marked as "not use"*/
+	//  MCFG_PIT8253_OUT2_HANDLER(WRITELINE(myb3k_state, pit_out2_changed))
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -793,21 +927,9 @@ static MACHINE_CONFIG_START( myb3k )
 	MCFG_MYB3K_KEYBOARD_CB(PUT(myb3k_state, kbd_set_data_and_interrupt))
 
 	/* video hardware */
-#if 1
-	//MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green())
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(XTAL_14_31818MHz / 3, 600, 0, 600, 400, 0, 400)
 	MCFG_SCREEN_UPDATE_DEVICE("crtc", h46505_device, screen_update)
-//	MCFG_SCREEN_UPDATE_DRIVER(myb3k_state, screen_update_myb3k)
-
-#else // Funkar the old way
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_SIZE(640, 400)
-	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 400-1)
-	MCFG_SCREEN_UPDATE_DEVICE("crtc", h46505_device, screen_update)
-#endif
 
 	/* devices */
 	MCFG_MC6845_ADD("crtc", H46505, "screen", XTAL_14_31818MHz / 16) /* Main crystal divided by 16 through a 74163 4 bit counter */
