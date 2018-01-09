@@ -18,7 +18,7 @@ priority should be given to
 #include "includes/ms32.h"
 
 
-// kirarast, tp2m32, and 47pie2 require the sprites in a different order
+// kirarast, tp2m32, and suchie2 require the sprites in a different order
 
 /********** Tilemaps **********/
 
@@ -91,8 +91,8 @@ void ms32_state::video_start()
 	/* i hate per game patches...how should priority really work? tetrisp2.c ? i can't follow it */
 	if (!strcmp(machine().system().name,"kirarast"))    m_reverse_sprite_order = 0;
 	if (!strcmp(machine().system().name,"tp2m32"))  m_reverse_sprite_order = 0;
-	if (!strcmp(machine().system().name,"47pie2"))  m_reverse_sprite_order = 0;
-	if (!strcmp(machine().system().name,"47pie2o")) m_reverse_sprite_order = 0;
+	if (!strcmp(machine().system().name,"suchie2"))  m_reverse_sprite_order = 0;
+	if (!strcmp(machine().system().name,"suchie2o")) m_reverse_sprite_order = 0;
 	if (!strcmp(machine().system().name,"hayaosi3"))    m_reverse_sprite_order = 0;
 	if (!strcmp(machine().system().name,"bnstars")) m_reverse_sprite_order = 0;
 	if (!strcmp(machine().system().name,"wpksocv2"))    m_reverse_sprite_order = 0;

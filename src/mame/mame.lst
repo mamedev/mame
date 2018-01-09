@@ -15660,7 +15660,7 @@ daireika                        // (c) 1989 Jaleco/NMK
 kakumei                         // (c) 1990
 kakumei2                        // (c) 1992
 mjzoomin                        // (c) 1990
-suchipi                         // (c) 1993
+suchiesp                         // (c) 1993
 urashima                        // UPL-89052
 
 @source:jangou.cpp
@@ -27859,8 +27859,8 @@ ms0515                          //
 ms6102                          //
 
 @source:ms32.cpp
-47pie2                          // (c) 1994
-47pie2o                         // (c) 1994
+suchie2                         // (c) 1994
+suchie2o                        // (c) 1994
 akiss                           // (c) 1995
 bbbxing                         // (c) 1994
 bnstars                         // (c) 1997

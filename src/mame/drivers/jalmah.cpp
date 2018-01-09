@@ -22,7 +22,7 @@ Notes(general):
 
 TODO:
 -kakumei2: unemulated RNG;
--Back layer pens looks ugly in some circumstances (i.e. suchipi when you win, mjzoomin when coined up),
+-Back layer pens looks ugly in some circumstances (i.e. suchiesp when you win, mjzoomin when coined up),
  static or controlled by something else?
 -daireika: the ranking screen on the original pcb shows some hearts instead of the "0".
  Some investigation indicates that the game reads area "fe100" onwards for these to be filled.
@@ -33,7 +33,7 @@ TODO:
 -There could be timing issues caused by MCU simulation at $80004;
 -Fix the sound banking, protection-related for the first version of the MCU
  (should be somewhere on the work ram/shared ram)
--suchipi: I need a side-by-side to understand if the PAL shuffling is correct with the OKI bgm rom.
+-suchiesp: I need a side-by-side to understand if the PAL shuffling is correct with the OKI bgm rom.
 -urashima: might use three/four layers instead of two.It can be checked when you win
  a match in particular circumstances because there's a write in the 94000-9bfff region;
 -Massive clean-ups needed for the MCU snippet programs and the input-ports, also check if
@@ -58,7 +58,7 @@ Notes (1st MCU ver.):
 ============================================================================================
 Debug cheats:
 
--(suchipi)
+-(suchiesp)
 *
 $fe87e: bonus timer,used as a count-down.
 *
@@ -93,7 +93,7 @@ lev 5 : 0x74 : 0000 09c4 - "write to Text RAM" (?)
 lev 6 : 0x78 : 0000 09ce - "write to Text RAM" (?)
 lev 7 : 0x7c : 0000 09d8 - "write to Text RAM" (?)
 
-kakumei/kakumei2/suchipi 68k irq table vectors
+kakumei/kakumei2/suchiesp 68k irq table vectors
 lev 1 : 0x64 : 0000 0506 - rte
 lev 2 : 0x68 : 0000 050a - vblank
 lev 3 : 0x6c : 0000 051c - rte
@@ -196,8 +196,8 @@ public:
 	DECLARE_READ16_MEMBER(mjzoomin_mcu_r);
 	DECLARE_WRITE16_MEMBER(mjzoomin_mcu_w);
 	DECLARE_READ16_MEMBER(kakumei_mcu_r);
-	DECLARE_READ16_MEMBER(suchipi_mcu_r);
-	DECLARE_DRIVER_INIT(suchipi);
+	DECLARE_READ16_MEMBER(suchiesp_mcu_r);
+	DECLARE_DRIVER_INIT(suchiesp);
 	DECLARE_DRIVER_INIT(kakumei);
 	DECLARE_DRIVER_INIT(urashima);
 	DECLARE_DRIVER_INIT(kakumei2);
@@ -583,7 +583,7 @@ WRITE16_MEMBER(jalmah_state::sc2_vram_w)
 WRITE16_MEMBER(jalmah_state::jalmah_tilebank_w)
 {
 	/*
-	 xxxx ---- fg bank (used by suchipi)
+	 xxxx ---- fg bank (used by suchiesp)
 	 ---- xxxx Priority number (trusted,see mjzoomin)
 	*/
 	//popmessage("Write to tilebank %02x",data);
@@ -713,7 +713,7 @@ take it seriously...):
 0x13 = mjzoomin
 0x21 = kakumei
 0x22 = kakumei2
-0x23 = suchipi
+0x23 = suchiesp
 
 xxxx ---- MCU program revision
 ---- xxxx MCU program number assignment for each game.
@@ -1344,7 +1344,7 @@ static INPUT_PORTS_START( kakumei2 )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( suchipi )
+static INPUT_PORTS_START( suchiesp )
 	PORT_INCLUDE( kakumei2 )
 
 	PORT_MODIFY("DSW")
@@ -1706,7 +1706,7 @@ NEC D65012GF303 9050KX016 (80pin QFP) x4
 
 */
 
-ROM_START( suchipi )
+ROM_START( suchiesp )
 	ROM_REGION( 0x80000, "maincpu", 0 ) /* 68000 Code */
 	ROM_LOAD16_BYTE( "1.bin", 0x00001, 0x40000, CRC(e37cc745) SHA1(73b3314d27a0332068e0d2bbc08d7401e371da1b) )
 	ROM_LOAD16_BYTE( "2.bin", 0x00000, 0x40000, CRC(42ecf88a) SHA1(7bb85470bc9f94c867646afeb91c4730599ea299) )
@@ -2307,7 +2307,7 @@ WRITE16_MEMBER(jalmah_state::mjzoomin_mcu_w)
 		jm_mcu_code[0x0008/2] = 0x4e75;//rts
 		/*******************************************************
 		2nd M68k code uploaded by the MCU (Sound read/write)
-		(Note:copied from suchipi,check here the sound banking)
+		(Note:copied from suchiesp,check here the sound banking)
 		*******************************************************/
 		jm_shared_ram[0x0020/2] = 0x4ef9;
 		jm_shared_ram[0x0022/2] = 0x0010;
@@ -2414,7 +2414,7 @@ READ16_MEMBER(jalmah_state::kakumei_mcu_r)
 	return res;
 }
 
-READ16_MEMBER(jalmah_state::suchipi_mcu_r)
+READ16_MEMBER(jalmah_state::suchiesp_mcu_r)
 {
 	static const int resp[] = { 0x8a, 0xd8, 0x00,
 							0x3c, 0x7c, 0x00,
@@ -2472,9 +2472,9 @@ DRIVER_INIT_MEMBER(jalmah_state,kakumei2)
 	m_mcu_prg = 0x22;
 }
 
-DRIVER_INIT_MEMBER(jalmah_state,suchipi)
+DRIVER_INIT_MEMBER(jalmah_state,suchiesp)
 {
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x80004, 0x80005, read16_delegate(FUNC(jalmah_state::suchipi_mcu_r), this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x80004, 0x80005, read16_delegate(FUNC(jalmah_state::suchiesp_mcu_r), this));
 
 	m_mcu_prg = 0x23;
 }
@@ -2486,4 +2486,4 @@ GAME( 1990, mjzoomin, 0, jalmah,    mjzoomin,  jalmah_state,  mjzoomin, ROT0, "J
 /*Second version of the MCU*/
 GAME( 1990, kakumei,  0, jalmah,    kakumei,  jalmah_state,   kakumei,  ROT0, "Jaleco",       "Mahjong Kakumei (Japan)",                      MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1992, kakumei2, 0, jalmah,    kakumei2, jalmah_state,   kakumei2, ROT0, "Jaleco",       "Mahjong Kakumei 2 - Princess League (Japan)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_UNEMULATED_PROTECTION )
-GAME( 1993, suchipi,  0, jalmah,    suchipi,  jalmah_state,   suchipi,  ROT0, "Jaleco",       "Idol Janshi Suchie-Pai Special (Japan)",       MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1993, suchiesp,  0, jalmah,    suchiesp,  jalmah_state,   suchiesp,  ROT0, "Jaleco",       "Idol Janshi Suchie-Pai Special (Japan)",       MACHINE_IMPERFECT_GRAPHICS )

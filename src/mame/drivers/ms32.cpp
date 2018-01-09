@@ -149,7 +149,7 @@ Second Earth Gratia (92047-01 version) (gratia)
 *Second Earth Gratia  (91022-10 version) (gratiaa) (redump needed)
 F-1 Super Battle (f1superb)
 
-Idol Janshi Su-Chi-Pi 2 (47pie2)
+Idol Janshi Su-Chi-Pi 2 (suchie2)
 Ryuusei Janshi Kirara Star (kirarast)
 Mahjong Angel Kiss
 Vs. Janshi Brand New Stars
@@ -1095,7 +1095,7 @@ static INPUT_PORTS_START( kirarast )    // player 1 inputs done? others?
 	PORT_DIPSETTING(          0x00000020, DEF_STR( Hardest ) )
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( 47pie2 )  // player 1 inputs done? others?
+static INPUT_PORTS_START( suchie2 )  // player 1 inputs done? others?
 	PORT_INCLUDE( kirarast )
 
 	PORT_MODIFY("INPUTS")
@@ -1489,7 +1489,7 @@ ROM_START( bbbxing )
 	ROM_LOAD( "91022-01.ic83", 0x00000, 0x00001, NO_DUMP ) /* AMI 18CV8-15. */
 ROM_END
 
-ROM_START( 47pie2 )
+ROM_START( suchie2 )
 	ROM_REGION( 0x200000, "maincpu", 0 ) /* V70 code */
 	ROM_LOAD32_BYTE( "93166-26.v11", 0x000003, 0x80000, CRC(e4e62134) SHA1(224b3e8dba56009bf2af6eceb7495e60302a6360) )
 	ROM_LOAD32_BYTE( "93166-27.v11", 0x000002, 0x80000, CRC(7bd00919) SHA1(60565b5e1da5fee00ac4a7fb1202d7150dab49ee) )
@@ -1526,7 +1526,7 @@ ROM_START( 47pie2 )
 	ROM_LOAD( "91022-01.ic83", 0x00000, 0x00001, NO_DUMP ) /* AMI 18CV8-15. */
 ROM_END
 
-ROM_START( 47pie2o )
+ROM_START( suchie2o )
 	ROM_REGION( 0x200000, "maincpu", 0 ) /* V70 code */
 	ROM_LOAD32_BYTE( "93166-26.v10", 0x000003, 0x80000, CRC(21dc94dd) SHA1(faf2eea891cb061d5df47ef31d9538feb0c1233c) )
 	ROM_LOAD32_BYTE( "93166-27.v10", 0x000002, 0x80000, CRC(5bf18a7d) SHA1(70869dc37e6ad79ce4e85db71a03c5cccf9d732b) )
@@ -2233,7 +2233,7 @@ DRIVER_INIT_MEMBER(ms32_state,ss92047_01)
 	decrypt_ms32_bg(machine(), 0x24000,0x55, "gfx3");
 }
 
-/* SS92048-01: p47aces, 47pie2, 47pie2o */
+/* SS92048-01: p47aces, suchie2, suchie2o */
 DRIVER_INIT_MEMBER(ms32_state,ss92048_01)
 {
 	DRIVER_INIT_CALL(ms32_common);
@@ -2247,7 +2247,7 @@ DRIVER_INIT_MEMBER(ms32_state,kirarast)
 	DRIVER_INIT_CALL(ss92047_01);
 }
 
-DRIVER_INIT_MEMBER(ms32_state,47pie2)
+DRIVER_INIT_MEMBER(ms32_state,suchie2)
 {
 	DRIVER_INIT_CALL(ss92048_01);
 }
@@ -2273,18 +2273,18 @@ DRIVER_INIT_MEMBER(ms32_state,bnstars)
 GAME( 1994, hayaosi2, 0,        ms32, hayaosi2, ms32_state, ss92046_01, ROT0,   "Jaleco", "Hayaoshi Quiz Grand Champion Taikai", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 GAME( 1994, hayaosi3, 0,        ms32, hayaosi3, ms32_state, ss92046_01, ROT0,   "Jaleco", "Hayaoshi Quiz Nettou Namahousou", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 GAME( 1994, bbbxing,  0,        ms32, bbbxing,  ms32_state, ss92046_01, ROT0,   "Jaleco", "Best Bout Boxing", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-GAME( 1994, 47pie2,   0,        ms32, 47pie2,   ms32_state, 47pie2,     ROT0,   "Jaleco", "Idol Janshi Suchie-Pai II (v1.1)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1994, 47pie2o,  47pie2,   ms32, 47pie2,   ms32_state, 47pie2,     ROT0,   "Jaleco", "Idol Janshi Suchie-Pai II (v1.0)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1994, suchie2,   0,        ms32, suchie2,   ms32_state, suchie2,     ROT0,   "Jaleco", "Idol Janshi Suchie-Pai II (v1.1)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1994, suchie2o,  suchie2,   ms32, suchie2,   ms32_state, suchie2,     ROT0,   "Jaleco", "Idol Janshi Suchie-Pai II (v1.0)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1995, desertwr, 0,        ms32, desertwr, ms32_state, ss91022_10, ROT270, "Jaleco", "Desert War / Wangan Sensou", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1995, gametngk, 0,        ms32, gametngk, ms32_state, ss91022_10, ROT270, "Jaleco", "The Game Paradise - Master of Shooting! / Game Tengoku - The Game Paradise", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1995, tetrisp,  0,        ms32, tetrisp,  ms32_state, ss92046_01, ROT0,   "Jaleco / BPS", "Tetris Plus", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1995, p47aces,  0,        ms32, p47aces,  ms32_state, ss92048_01, ROT0,   "Jaleco", "P-47 Aces", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1995, akiss,    0,        ms32, 47pie2,   ms32_state, kirarast,   ROT0,   "Jaleco", "Mahjong Angel Kiss", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1995, akiss,    0,        ms32, suchie2,   ms32_state, kirarast,   ROT0,   "Jaleco", "Mahjong Angel Kiss", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1996, gratia,   0,        ms32, gratia,   ms32_state, ss92047_01, ROT0,   "Jaleco", "Gratia - Second Earth (92047-01 version)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1996, gratiaa,  gratia,   ms32, gratia,   ms32_state, ss91022_10, ROT0,   "Jaleco", "Gratia - Second Earth (91022-10 version)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1996, kirarast, 0,        ms32, kirarast, ms32_state, kirarast,   ROT0,   "Jaleco", "Ryuusei Janshi Kirara Star", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1997, tp2m32,   tetrisp2, ms32, tp2m32,   ms32_state, ss91022_10, ROT0,   "Jaleco", "Tetris Plus 2 (MegaSystem 32 Version)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1997, bnstars,  bnstars1, ms32, 47pie2,   ms32_state, bnstars,    ROT0,   "Jaleco", "Vs. Janshi Brandnew Stars (MegaSystem32 Version)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1997, bnstars,  bnstars1, ms32, suchie2,   ms32_state, bnstars,    ROT0,   "Jaleco", "Vs. Janshi Brandnew Stars (MegaSystem32 Version)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1996, wpksocv2, 0,        ms32, wpksocv2, ms32_state, ss92046_01, ROT0,   "Jaleco", "World PK Soccer V2 (ver 1.1)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 
 
