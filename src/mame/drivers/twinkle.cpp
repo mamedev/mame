@@ -164,7 +164,7 @@ Notes:
       CN7      - 5 pin plug for connection and control of external DVD player for background video
       CN11     - 15 pin DSUB connector
       RCA      - Yellow RCA connectors for video (input and/or output?) from external DVD player
-      MC141685 - Motorola MC141685 low cost 3CH D/A convertor
+      MC141685 - Motorola MC141685 low cost 3CH D/A converter
       AD817    - Analog Devices 18V high speed low power wide supply range amplifier
       AD724JR  - Analog Devices 6V 800mW 250MHz RGB to NTSC/PAL encoder
       Bt812KPF - Conexant Systems Inc. Bt812KPF NTSC/PAL to RGB/YCrCb decoder / video codec (QFP160)
@@ -212,7 +212,7 @@ Notes:
       CN4      - 40 pin flat cable connector for HDD data cable
       CN5      - DC power input connector
       CN7      - RCA left/right audio output
-      SM5875   - Nippon Precision Circuits SM5875 2-channel D/A convertor (SSOP24)
+      SM5875   - Nippon Precision Circuits SM5875 2-channel D/A converter (SSOP24)
       RF5C400  - Ricoh RF5C400 PCM 32Ch, 44.1 kHz Stereo, 3D Effect Spatializer, clock input 16.9344MHz [33.8688/2]
       M65851   - Mitsubishi M65851 single chip karaoke sound processor IC (QFP80)
       HY5117404- Hyundai Semiconductor HY5117404BJ-60 4M x 4-Bit CMOS EDO DRAM
@@ -254,30 +254,17 @@ class twinkle_state : public driver_device
 public:
 	twinkle_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_audiocpu(*this, "audiocpu"),
 		m_am53cf96(*this, "am53cf96"),
 		m_ata(*this, "ata"),
 		m_waveram(*this, "rfsnd"),
 		m_spu_ata_dma(0),
 		m_spu_ata_dmarq(0),
-		m_wave_bank(0),
-		m_maincpu(*this, "maincpu"),
-		m_audiocpu(*this, "audiocpu")
+		m_wave_bank(0)
 	{
 	}
 
-	required_device<am53cf96_device> m_am53cf96;
-	required_device<ata_interface_device> m_ata;
-	required_shared_ptr<uint16_t> m_waveram;
-
-	uint16_t m_spu_ctrl;      // SPU board control register
-	uint8_t m_spu_shared[0x400];  // SPU/PSX shared dual-ported RAM
-	uint32_t m_spu_ata_dma;
-	int m_spu_ata_dmarq;
-	uint32_t m_wave_bank;
-
-	int m_io_offset;
-	int m_output_last[ 0x100 ];
-	uint8_t m_sector_buffer[ 4096 ];
 	DECLARE_WRITE8_MEMBER(twinkle_io_w);
 	DECLARE_READ8_MEMBER(twinkle_io_r);
 	DECLARE_WRITE16_MEMBER(twinkle_output_w);
@@ -298,8 +285,25 @@ public:
 	DECLARE_READ16_MEMBER(unk_68k_r);
 	DECLARE_WRITE_LINE_MEMBER(spu_ata_irq);
 	DECLARE_WRITE_LINE_MEMBER(spu_ata_dmarq);
+	void scsi_dma_read( uint32_t *p_n_psxram, uint32_t n_address, int32_t n_size );
+	void scsi_dma_write( uint32_t *p_n_psxram, uint32_t n_address, int32_t n_size );
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
+	required_device<am53cf96_device> m_am53cf96;
+	required_device<ata_interface_device> m_ata;
+	required_shared_ptr<uint16_t> m_waveram;
+
+	uint16_t m_spu_ctrl;      // SPU board control register
+	uint8_t m_spu_shared[0x400];  // SPU/PSX shared dual-ported RAM
+	uint32_t m_spu_ata_dma;
+	int m_spu_ata_dmarq;
+	uint32_t m_wave_bank;
+
+	int m_io_offset;
+	int m_output_last[ 0x100 ];
+	uint8_t m_sector_buffer[ 4096 ];
 
 	int m_serial_shift;
 	int m_serial_bits;
@@ -929,16 +933,16 @@ ADDRESS_MAP_END
 
 /* SCSI */
 
-static void scsi_dma_read( twinkle_state *state, uint32_t *p_n_psxram, uint32_t n_address, int32_t n_size )
+void twinkle_state::scsi_dma_read( uint32_t *p_n_psxram, uint32_t n_address, int32_t n_size )
 {
 	int i;
 	int n_this;
 
 	while( n_size > 0 )
 	{
-		if( n_size > sizeof( state->m_sector_buffer ) / 4 )
+		if( n_size > sizeof( m_sector_buffer ) / 4 )
 		{
-			n_this = sizeof( state->m_sector_buffer ) / 4;
+			n_this = sizeof( m_sector_buffer ) / 4;
 		}
 		else
 		{
@@ -947,12 +951,12 @@ static void scsi_dma_read( twinkle_state *state, uint32_t *p_n_psxram, uint32_t 
 		if( n_this < 2048 / 4 )
 		{
 			/* non-READ commands */
-			state->m_am53cf96->dma_read_data( n_this * 4, state->m_sector_buffer );
+			m_am53cf96->dma_read_data( n_this * 4, m_sector_buffer );
 		}
 		else
 		{
 			/* assume normal 2048 byte data for now */
-			state->m_am53cf96->dma_read_data( 2048, state->m_sector_buffer );
+			m_am53cf96->dma_read_data( 2048, m_sector_buffer );
 			n_this = 2048 / 4;
 		}
 		n_size -= n_this;
@@ -961,10 +965,10 @@ static void scsi_dma_read( twinkle_state *state, uint32_t *p_n_psxram, uint32_t 
 		while( n_this > 0 )
 		{
 			p_n_psxram[ n_address / 4 ] =
-				( state->m_sector_buffer[ i + 0 ] << 0 ) |
-				( state->m_sector_buffer[ i + 1 ] << 8 ) |
-				( state->m_sector_buffer[ i + 2 ] << 16 ) |
-				( state->m_sector_buffer[ i + 3 ] << 24 );
+				( m_sector_buffer[ i + 0 ] << 0 ) |
+				( m_sector_buffer[ i + 1 ] << 8 ) |
+				( m_sector_buffer[ i + 2 ] << 16 ) |
+				( m_sector_buffer[ i + 3 ] << 24 );
 			n_address += 4;
 			i += 4;
 			n_this--;
@@ -972,16 +976,16 @@ static void scsi_dma_read( twinkle_state *state, uint32_t *p_n_psxram, uint32_t 
 	}
 }
 
-static void scsi_dma_write( twinkle_state *state, uint32_t *p_n_psxram, uint32_t n_address, int32_t n_size )
+void twinkle_state::scsi_dma_write( uint32_t *p_n_psxram, uint32_t n_address, int32_t n_size )
 {
 	int i;
 	int n_this;
 
 	while( n_size > 0 )
 	{
-		if( n_size > sizeof( state->m_sector_buffer ) / 4 )
+		if( n_size > sizeof( m_sector_buffer ) / 4 )
 		{
-			n_this = sizeof( state->m_sector_buffer ) / 4;
+			n_this = sizeof( m_sector_buffer ) / 4;
 		}
 		else
 		{
@@ -992,16 +996,16 @@ static void scsi_dma_write( twinkle_state *state, uint32_t *p_n_psxram, uint32_t
 		i = 0;
 		while( n_this > 0 )
 		{
-			state->m_sector_buffer[ i + 0 ] = ( p_n_psxram[ n_address / 4 ] >> 0 ) & 0xff;
-			state->m_sector_buffer[ i + 1 ] = ( p_n_psxram[ n_address / 4 ] >> 8 ) & 0xff;
-			state->m_sector_buffer[ i + 2 ] = ( p_n_psxram[ n_address / 4 ] >> 16 ) & 0xff;
-			state->m_sector_buffer[ i + 3 ] = ( p_n_psxram[ n_address / 4 ] >> 24 ) & 0xff;
+			m_sector_buffer[ i + 0 ] = ( p_n_psxram[ n_address / 4 ] >> 0 ) & 0xff;
+			m_sector_buffer[ i + 1 ] = ( p_n_psxram[ n_address / 4 ] >> 8 ) & 0xff;
+			m_sector_buffer[ i + 2 ] = ( p_n_psxram[ n_address / 4 ] >> 16 ) & 0xff;
+			m_sector_buffer[ i + 3 ] = ( p_n_psxram[ n_address / 4 ] >> 24 ) & 0xff;
 			n_address += 4;
 			i += 4;
 			n_this--;
 		}
 
-		state->m_am53cf96->dma_write_data( n_this * 4, state->m_sector_buffer );
+		m_am53cf96->dma_write_data( n_this * 4, m_sector_buffer );
 	}
 }
 
@@ -1020,8 +1024,8 @@ static MACHINE_CONFIG_START( twinkle )
 	MCFG_RAM_MODIFY("maincpu:ram")
 	MCFG_RAM_DEFAULT_SIZE("4M")
 
-	MCFG_PSX_DMA_CHANNEL_READ( "maincpu", 5, psxdma_device::read_delegate(&scsi_dma_read, (twinkle_state *) owner ) )
-	MCFG_PSX_DMA_CHANNEL_WRITE( "maincpu", 5, psxdma_device::write_delegate(&scsi_dma_write, (twinkle_state *) owner ) )
+	MCFG_PSX_DMA_CHANNEL_READ( "maincpu", 5, psxdma_device::read_delegate(&twinkle_state::scsi_dma_read, (twinkle_state *) owner ) )
+	MCFG_PSX_DMA_CHANNEL_WRITE( "maincpu", 5, psxdma_device::write_delegate(&twinkle_state::scsi_dma_write, (twinkle_state *) owner ) )
 
 	MCFG_CPU_ADD("audiocpu", M68000, 32000000/2)    /* 16.000 MHz */
 	MCFG_CPU_PROGRAM_MAP( sound_map )
