@@ -1,10 +1,16 @@
 // license:BSD-3-Clause
 // copyright-holders:
-/***********************************************************************************************************************************
+/*******************************************************************************
 
-Skeleton driver for TeleVideo TVI-912 and TVI-920 terminals.
+    TeleVideo TVI-912/TVI-920 terminals
 
-************************************************************************************************************************************/
+    This was the first series of terminals from TeleVideo. The models differed
+    from each other in the number and pattern of keys on the nondetachable
+    keyboard. Those with a B suffix had a TTY-style keyboard, while the C
+    suffix indicated a typewriter-style keyboard. The TVI-920 added a row of
+    function keys but was otherwise mostly identical to the TVI-912.
+
+*******************************************************************************/
 
 #include "emu.h"
 #include "cpu/mcs48/mcs48.h"
