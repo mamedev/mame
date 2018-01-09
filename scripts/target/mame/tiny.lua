@@ -102,8 +102,6 @@ function createProjects_mame_tiny(_target, _subtarget)
 	}
 
 files{
-	MAME_DIR .. "src/mame/machine/ticket.cpp",
-	MAME_DIR .. "src/mame/machine/ticket.h",
 	MAME_DIR .. "src/mame/drivers/carpolo.cpp",
 	MAME_DIR .. "src/mame/includes/carpolo.h",
 	MAME_DIR .. "src/mame/machine/carpolo.cpp",
