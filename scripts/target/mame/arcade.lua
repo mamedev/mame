@@ -870,16 +870,12 @@ function createProjects_mame_arcade(_target, _subtarget)
 
 createMAMEProjects(_target, _subtarget, "shared")
 files {
-	MAME_DIR .. "src/mame/machine/meters.cpp",
-	MAME_DIR .. "src/mame/machine/meters.h",
 	MAME_DIR .. "src/mame/machine/nmk112.cpp",
 	MAME_DIR .. "src/mame/machine/nmk112.h",
 	MAME_DIR .. "src/mame/machine/pcshare.cpp",
 	MAME_DIR .. "src/mame/machine/pcshare.h",
 	MAME_DIR .. "src/mame/machine/segacrpt_device.cpp",
 	MAME_DIR .. "src/mame/machine/segacrpt_device.h",
-	MAME_DIR .. "src/mame/machine/ticket.cpp",
-	MAME_DIR .. "src/mame/machine/ticket.h",
 	MAME_DIR .. "src/mame/video/avgdvg.cpp",
 	MAME_DIR .. "src/mame/video/avgdvg.h",
 	MAME_DIR .. "src/mame/video/awpvid.cpp",
