@@ -395,7 +395,12 @@ MACHINE_RESET_MEMBER(pacman_state,superabc)
 	superabc_bank_w(m_maincpu->space(AS_PROGRAM), 0, 0);
 }
 
-
+MACHINE_RESET_MEMBER(pacman_state,maketrax)
+{
+	m_maketrax_counter = 0;
+	m_maketrax_offset = 0;
+	m_maketrax_disable_protection = 0;
+}
 
 /*************************************
  *
@@ -575,13 +580,44 @@ READ8_MEMBER(pacman_state::alibaba_mystery_2_r)
  *
  *************************************/
 
+WRITE8_MEMBER(pacman_state::maketrax_protection_w)
+{
+	if (data == 0) // disable protection / reset?
+	{
+		m_maketrax_counter = 0;
+		m_maketrax_offset = 0;
+		m_maketrax_disable_protection = 1;
+		return;
+	}
+
+	if (data == 1)
+	{
+		m_maketrax_disable_protection = 0;
+
+		m_maketrax_counter++;
+		if (m_maketrax_counter == 0x3c)
+		{
+			m_maketrax_counter = 0;
+			m_maketrax_offset++;
+
+			if (m_maketrax_offset == 0x1e)
+				m_maketrax_offset = 0;
+		}
+	}
+}
+
 READ8_MEMBER(pacman_state::maketrax_special_port2_r)
 {
-	int data = ioport("DSW1")->read();
-	int pc = m_maincpu->pcbase();
+	const uint8_t protdata[0x1e] = { // table at $ebd (odd entries)
+		0x00, 0xc0, 0x00, 0x40, 0xc0, 0x40, 0x00, 0xc0, 0x00, 0x40, 0x00, 0xc0, 0x00, 0x40, 0xc0, 0x40,
+		0x00, 0xc0, 0x00, 0x40, 0x00, 0xc0, 0x00, 0x40, 0xc0, 0x40, 0x00, 0xc0, 0x00, 0x40
+	};
+ 
+	if (m_maketrax_disable_protection == 0)
+		return protdata[m_maketrax_offset];
 
-	if ((pc == 0x1973) || (pc == 0x2389)) return data | 0x40;
-
+	uint8_t data = ioport("DSW1")->read() & 0x3f;
+ 
 	switch (offset)
 	{
 		case 0x01:
@@ -598,11 +634,13 @@ READ8_MEMBER(pacman_state::maketrax_special_port2_r)
 
 READ8_MEMBER(pacman_state::maketrax_special_port3_r)
 {
-	int pc = m_maincpu->pcbase();
-
-	if (pc == 0x040e) return 0x20;
-
-	if ((pc == 0x115e) || (pc == 0x3ae2)) return 0x00;
+	const uint8_t protdata[0x1e] = { // table at $ebd (even entries)
+		0x1f, 0x3f, 0x2f, 0x2f, 0x0f, 0x0f, 0x0f, 0x3f, 0x0f, 0x0f, 0x1c, 0x3c, 0x2c, 0x2c, 0x0c, 0x0c,
+		0x0c, 0x3c, 0x0c, 0x0c, 0x11, 0x31, 0x21, 0x21, 0x01, 0x01, 0x01, 0x31, 0x01, 0x01
+	};
+ 
+	if (m_maketrax_disable_protection == 0)
+		return protdata[m_maketrax_offset];
 
 	switch (offset)
 	{
@@ -3512,7 +3550,11 @@ static MACHINE_CONFIG_START( pacman )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( maketrax, pacman )
-	MCFG_CPU_MODIFY("maincpu")
+	MCFG_MACHINE_RESET_OVERRIDE(pacman_state,maketrax)
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( korosuke, pacman )
+ 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_DECRYPTED_OPCODES_MAP(patched_opcodes_map)
 
 	MCFG_DEVICE_MODIFY("mainlatch") // 8K on original boards
@@ -6813,33 +6855,12 @@ ROM_END
  *
  *************************************/
 
-void pacman_state::maketrax_rom_decode()
-{
-	uint8_t *rom = memregion("maincpu")->base();
-
-	/* patch protection using a copy of the opcodes so ROM checksum */
-	/* tests will not fail */
-
-	memcpy(m_patched_opcodes,rom,0x4000);
-
-	m_patched_opcodes[0x0415] = 0xc9;
-	m_patched_opcodes[0x1978] = 0x18;
-	m_patched_opcodes[0x238e] = 0xc9;
-	m_patched_opcodes[0x3ae5] = 0xe6;
-	m_patched_opcodes[0x3ae7] = 0x00;
-	m_patched_opcodes[0x3ae8] = 0xc9;
-	m_patched_opcodes[0x3aed] = 0x86;
-	m_patched_opcodes[0x3aee] = 0xc0;
-	m_patched_opcodes[0x3aef] = 0xb0;
-}
-
 DRIVER_INIT_MEMBER(pacman_state,maketrax)
 {
 	/* set up protection handlers */
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x5004, 0x5004, write8_delegate(FUNC(pacman_state::maketrax_protection_w),this));
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x5080, 0x50bf, read8_delegate(FUNC(pacman_state::maketrax_special_port2_r),this));
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x50c0, 0x50ff, read8_delegate(FUNC(pacman_state::maketrax_special_port3_r),this));
-
-	maketrax_rom_decode();
 }
 
 void pacman_state::korosuke_rom_decode()
@@ -7323,7 +7344,7 @@ GAME( 1981, crush4,   crush,    pacman,   maketrax, pacman_state,  eyes,     ROT
 GAME( 1981, crush5,   crush,    crush4,   crush4,   pacman_state,  0,        ROT90,  "Alpha Denshi Co. / Kural TWT", "Crush Roller (set 5)", MACHINE_SUPPORTS_SAVE )
 GAME( 1981, maketrax, crush,    maketrax, maketrax, pacman_state,  maketrax, ROT270, "Alpha Denshi Co. / Kural (Williams license)", "Make Trax (US set 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1981, maketrxb, crush,    maketrax, maketrax, pacman_state,  maketrax, ROT270, "Alpha Denshi Co. / Kural (Williams license)", "Make Trax (US set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, korosuke, crush,    maketrax, korosuke, pacman_state,  korosuke, ROT90,  "Alpha Denshi Co. / Kural Electric, Ltd.", "Korosuke Roller (Japan)", MACHINE_SUPPORTS_SAVE ) // ADK considers it a sequel?
+GAME( 1981, korosuke, crush,    korosuke, korosuke, pacman_state,  korosuke, ROT90,  "Alpha Denshi Co. / Kural Electric, Ltd.", "Korosuke Roller (Japan)", MACHINE_SUPPORTS_SAVE ) // ADK considers it a sequel?
 GAME( 1981, crushrlf, crush,    pacman,   maketrax, pacman_state,  0,        ROT90,  "bootleg", "Crush Roller (Famare SA PCB)", MACHINE_SUPPORTS_SAVE )
 GAME( 1981, crushbl,  crush,    pacman,   maketrax, pacman_state,  0,        ROT90,  "bootleg", "Crush Roller (bootleg set 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1981, crushbl2, crush,    maketrax, mbrush,   pacman_state,  maketrax, ROT90,  "bootleg", "Crush Roller (bootleg set 2)", MACHINE_SUPPORTS_SAVE )
