@@ -36,6 +36,7 @@
 #include "machine/pit8253.h"
 #include "machine/i8257.h"
 #include "sound/spkrdev.h"
+#include "softlist.h"
 #include "speaker.h"
 #include "machine/ram.h"
 #include "machine/wd_fdc.h"
@@ -947,6 +948,8 @@ static MACHINE_CONFIG_DERIVED( jb3000, myb3k )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( stepone, myb3k )
+	/* software lists */
+	MCFG_SOFTWARE_LIST_ADD("stepone_flop_list", "stepone_flop")
 MACHINE_CONFIG_END
 
 /* ROM definitions, ROM area is 8 x 8Kb and can be populated with 2732 mask ROMs or 2764s */
