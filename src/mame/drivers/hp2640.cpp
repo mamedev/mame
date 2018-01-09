@@ -68,7 +68,7 @@
 #include "hp2640.lh"
 
 // Debugging
-#define VERBOSE 1
+#define VERBOSE 0
 #include "logmacro.h"
 
 // Bit manipulation
@@ -198,6 +198,7 @@ protected:
 	uint8_t m_cursor_x;
 	uint8_t m_cursor_y;
 	bool m_cursor_blink_inh;
+	bool m_blanking;
 
 	// Async line interface
 	uint8_t m_async_control;
@@ -235,6 +236,7 @@ void hp2645_state::machine_start()
 {
 	machine().first_screen()->register_screen_bitmap(m_bitmap);
 
+	// TODO: save more state
 	save_item(NAME(m_mode_byte));
 	save_item(NAME(m_timer_irq));
 	save_item(NAME(m_datacom_irq));
@@ -247,7 +249,9 @@ void hp2645_state::machine_reset()
 	m_datacom_irq = false;
 	m_timer_10ms->reset();
 	update_irq();
+	m_blanking = true;
 	m_dma_on = true;
+	m_eop = true;
 	m_uart->set_input_pin(AY31015_XR , 1);
 	m_uart->set_input_pin(AY31015_SWE , 0);
 	m_uart->set_input_pin(AY31015_CS , 1);
@@ -379,7 +383,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(hp2645_state::scanline_timer)
 				m_row_reset = true;
 				m_row_counter = 0;
 				m_dma_addr = START_DMA_ADDR;
-				m_eop = false;
+				m_eop = m_blanking;
 				m_skipeol = false;
 			} else {
 				m_even = !m_even;
@@ -400,16 +404,16 @@ WRITE8_MEMBER(hp2645_state::cx_w)
 
 WRITE8_MEMBER(hp2645_state::cy_w)
 {
-	// TODO: video enable
+	m_blanking = BIT(data , 7);
 	m_cursor_y = data & 0x1f;
-	m_dma_on = !BIT(data , 6);
+	m_dma_on = m_blanking || !BIT(data , 6);
 	if (m_cursor_y == m_row_counter) {
 		LOG("ROW MATCH %02x\n" , data);
-		if (m_dma_on && BIT(data , 5)) {
+		if (!BIT(data , 6) && BIT(data , 5)) {
 			LOG("EOP on cy\n");
 			m_eop = true;
 		}
-		if (!m_dma_on && !BIT(data , 5) && m_en_skipeol) {
+		if (BIT(data , 6) && !BIT(data , 5) && m_en_skipeol) {
 			LOG("SKIPEOL on cy\n");
 			m_skipeol = true;
 		}
@@ -603,6 +607,11 @@ void hp2645_state::video_fill_buffer(bool buff_idx , unsigned max_cycles)
 
 void hp2645_state::video_render_buffer(unsigned video_scanline , unsigned line_in_row , bool buff_idx , bool cyen)
 {
+	if (m_blanking) {
+		m_bitmap.fill(rgb_t::black() , rectangle(0 , VIDEO_VIS_COLS * VIDEO_CHAR_WIDTH * 2 , video_scanline , video_scanline));
+		return;
+	}
+
 	bool cursor_blink;
 	unsigned fn = (unsigned)m_screen->frame_number();
 	unsigned fn_12 = fn / 12;
