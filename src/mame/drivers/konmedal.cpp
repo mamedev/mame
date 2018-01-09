@@ -52,11 +52,11 @@ public:
 	DECLARE_PALETTE_INIT(konmedal);
 	DECLARE_MACHINE_START(shuriboy);
 
-	READ8_MEMBER(vram_r);
-	WRITE8_MEMBER(vram_w);
-	READ8_MEMBER(magic_r);
-	WRITE8_MEMBER(bankswitch_w);
-	WRITE8_MEMBER(control2_w);
+	DECLARE_READ8_MEMBER(vram_r);
+	DECLARE_WRITE8_MEMBER(vram_w);
+	DECLARE_READ8_MEMBER(magic_r);
+	DECLARE_WRITE8_MEMBER(bankswitch_w);
+	DECLARE_WRITE8_MEMBER(control2_w);
 	READ8_MEMBER(inputs_r)
 	{
 		return 0xff;
@@ -69,6 +69,7 @@ public:
 
 	K052109_CB_MEMBER(shuriboy_tile_callback);
 	INTERRUPT_GEN_MEMBER(shuriboy_interrupt);
+	DECLARE_WRITE8_MEMBER(shuri_bank_w);
 
 protected:
 	virtual void machine_start() override;
@@ -247,12 +248,13 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( shuriboy_main, AS_PROGRAM, 8, konmedal_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM AM_REGION("maincpu", 0)
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
+	AM_RANGE(0x8c00, 0x8c00) AM_WRITE(shuri_bank_w)
 	AM_RANGE(0x9800, 0x987f) AM_DEVREADWRITE("k051649", k051649_device, k051649_waveform_r, k051649_waveform_w)
 	AM_RANGE(0x9880, 0x9889) AM_DEVWRITE("k051649", k051649_device, k051649_frequency_w)
 	AM_RANGE(0x988a, 0x988e) AM_DEVWRITE("k051649", k051649_device, k051649_volume_w)
 	AM_RANGE(0x988f, 0x988f) AM_DEVWRITE("k051649", k051649_device, k051649_keyonoff_w)
 	AM_RANGE(0x98e0, 0x98ff) AM_DEVREADWRITE("k051649", k051649_device, k051649_test_r, k051649_test_w)
-	AM_RANGE(0xa000, 0xbfff) AM_RAM	// readback window for ROM?
+	AM_RANGE(0xa000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xffff) AM_DEVREADWRITE("k052109", k052109_device, read, write)
 ADDRESS_MAP_END
 
@@ -341,7 +343,8 @@ void konmedal_state::machine_start()
 
 MACHINE_START_MEMBER(konmedal_state, shuriboy)
 {
-
+	membank("bank1")->configure_entries(0, 0x8, memregion("maincpu")->base()+0x8000, 0x2000);
+	membank("bank1")->set_entry(0);
 }
 
 void konmedal_state::machine_reset()
@@ -439,6 +442,12 @@ INTERRUPT_GEN_MEMBER(konmedal_state::shuriboy_interrupt)
 {
 	if (m_k052109->is_irq_enabled())
 		device.execute().set_input_line(0, HOLD_LINE);
+}
+
+WRITE8_MEMBER(konmedal_state::shuri_bank_w)
+{
+	//printf("ROM bank %x (full %02x)\n", data>>4, data);
+	membank("bank1")->set_entry(data&0x3);
 }
 
 static MACHINE_CONFIG_START( shuriboy )
