@@ -14774,6 +14774,7 @@ tmkombat                        // Tiger
 tnmarebc                        // Tiger
 trobhood                        // Tiger
 trobocop2                       // Tiger
+tsddragon                       // Tiger
 tsfight2                        // Tiger
 tshadow                         // Tiger
 tsharr2                         // Tiger
@@ -17446,6 +17447,9 @@ ddboy
 shuriboy
 tsukande
 
+@source:quickpick5.cpp
+quickp5
+
 @source:kontest.cpp
 kontest                         // GX800 (c) 198? (Japan)
 
@@ -17944,6 +17948,12 @@ excitbj                         // (c) 1992 Wing Co. Ltd
 lucky74                         // (c) 1988 Wing Co. Ltd
 lucky74a                        // (c) 1988 Wing Co. Ltd
 lucky74b                        // (c) 1988 Wing Co. Ltd
+
+@source:luckybal.cpp
+luckybal                        // (c) 1996 Sielcon Games
+luckybala                       // (c) 1996 Sielcon Games
+luckybalb                       // (c) 1996 Sielcon Games
+luckybalc                       // (c) 1996 Sielcon Games
 
 @source:lvcards.cpp
 lvcards                         // (c) 1985 Tehkan
@@ -30074,6 +30084,9 @@ ob68k1a                         //
 @source:octopus.cpp
 octopus                         //
 
+@source:odyssey.cpp
+odyssey                         // (c) Silicon Gaming.
+
 @source:odyssey2.cpp
 g7400                           // 1983 Videopac Plus G7400
 jopac                           // 1983 Jopac JO7400
@@ -31900,6 +31913,8 @@ pooyans                         // GX320 (c) 1982 Stern
 @source:popeye.cpp
 popeye                          // (c) 1982
 popeyebl                        // bootleg
+popeyeb2                        // bootleg
+popeyeb3                        // bootleg
 popeyef                         // (c) 1982
 popeyeu                         // (c) 1982
 popeyej                         //
@@ -39203,7 +39218,4 @@ vgmplay
 @source:ldplayer.cpp
 simldv1000                      // Pioneer LD-V1000
 simpr8210                       // Pioneer PR-8210
-
-@source:odyssey.cpp
-odyssey
 

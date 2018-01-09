@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Tomasz Slanina, David Haywood
 /*
-Real Battle Mahjong King by 'Game Men System Co. Ltd.'
+实战麻将王 (Shízhàn Májiàng Wáng) by 'Game Men System Co. Ltd.'
 
 PCB Layout
 ----------
@@ -603,6 +603,7 @@ static MACHINE_CONFIG_DERIVED( rbspm, rbmk )
 	// PIC16F84 if decapped
 MACHINE_CONFIG_END
 
+// 实战麻将王 (Shízhàn Májiàng Wáng)
 ROM_START( rbmk )
 	ROM_REGION( 0x80000, "maincpu", 0 ) /* 68000 Code */
 	ROM_LOAD( "p1.u64", 0x00000, 0x80000, CRC(83b3c505) SHA1(b943d7312dacdf46d4a55f9dc3cf92e291c40ce7) )
@@ -627,6 +628,7 @@ ROM_START( rbmk )
 ROM_END
 
 /*
+实战頂凰麻雀 (Shízhàn Dǐng Huáng Máquè)
 Gameplay videos:
 http://youtu.be/pPk-6N1wXoE
 http://youtu.be/VGbrR7GfDck
@@ -658,5 +660,5 @@ ROM_START( rbspm )
 	ROM_LOAD16_WORD_SWAP( "93c46.u51", 0x00, 0x080, NO_DUMP )
 ROM_END
 
-GAME( 1998, rbmk, 0, rbmk, rbmk, rbmk_state, 0, ROT0,  "GMS", "Real Battle Mahjong King (Version 8.8)", MACHINE_NOT_WORKING )
-GAME( 1998, rbspm, 0, rbspm, rbspm, rbmk_state, 0, ROT0,  "GMS", "Real Battle Super Phoenix Mahjong (Version 4.1)", MACHINE_NOT_WORKING )
+GAME( 1998, rbmk,  0, rbmk,  rbmk,  rbmk_state, 0, ROT0,  "GMS", "Shizhan Majiang Wang (Version 8.8)", MACHINE_NOT_WORKING )
+GAME( 1998, rbspm, 0, rbspm, rbspm, rbmk_state, 0, ROT0,  "GMS", "Shizhan Ding Huang Maque (Version 4.1)", MACHINE_NOT_WORKING )

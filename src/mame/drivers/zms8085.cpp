@@ -30,6 +30,8 @@ public:
 
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
+	DECLARE_READ8_MEMBER(special_r);
+
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;
@@ -62,12 +64,19 @@ u32 zms8085_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, co
 }
 
 
+READ8_MEMBER(zms8085_state::special_r)
+{
+	return 0x40;
+}
+
+
 static ADDRESS_MAP_START( mem_map, AS_PROGRAM, 8, zms8085_state )
-	AM_RANGE(0x0000, 0x0fff) AM_ROM AM_REGION("maincpu", 0)
+	AM_RANGE(0x0000, 0x0fff) AM_ROM AM_REGION("maincpu", 0) AM_WRITENOP
 	AM_RANGE(0x1000, 0x1fff) AM_RAM AM_SHARE("mainram")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( io_map, AS_PROGRAM, 8, zms8085_state )
+	AM_RANGE(0x61, 0x61) AM_READ(special_r)
 	AM_RANGE(0x68, 0x68) AM_WRITENOP
 ADDRESS_MAP_END
 
@@ -93,10 +102,13 @@ Crystal: 15.582000
 ***************************************************************************************************************/
 
 ROM_START( zephyr )
-	ROM_REGION(0x10000, "maincpu", 0)
-	ROM_LOAD( "23-006-32c.bin",  0x0000, 0x0800, CRC(0a3a5447) SHA1(a8c25730a1d7e5b9c86e0d504afc923e931f9025) )
-	ROM_LOAD( "23-067-004b.bin", 0x0800, 0x0800, CRC(37741104) SHA1(52b9998e0a8d4949e0dc7c3349b3681e13345061) )
-	ROM_LOAD( "23-067-03b.bin",  0x1000, 0x0800, CRC(29cfa003) SHA1(9de7a8402173a2c448e54ee433ba3050db7b70bb) ) // this doesn't seem to fit
+	ROM_REGION(0x1000, "maincpu", 0)
+	ROM_DEFAULT_BIOS("test") // for now
+	ROM_SYSTEM_BIOS(0, "main", "Main program" )
+	ROMX_LOAD( "23-067-03b.bin",  0x0000, 0x0800, CRC(29cfa003) SHA1(9de7a8402173a2c448e54ee433ba3050db7b70bb), ROM_BIOS(1) )
+	ROMX_LOAD( "23-067-004b.bin", 0x0800, 0x0800, CRC(37741104) SHA1(52b9998e0a8d4949e0dc7c3349b3681e13345061), ROM_BIOS(1) )
+	ROM_SYSTEM_BIOS(1, "test", "Test program" )
+	ROMX_LOAD( "23-006-32c.bin",  0x0000, 0x0800, CRC(0a3a5447) SHA1(a8c25730a1d7e5b9c86e0d504afc923e931f9025), ROM_BIOS(2) )
 
 	ROM_REGION(0x0800, "chargen", 0)
 	ROM_LOAD( "23-066-02a.bin",  0x0000, 0x0800, CRC(d5650b6c) SHA1(e6333e59018d9904f12abb270db4ba28aeff1995) )

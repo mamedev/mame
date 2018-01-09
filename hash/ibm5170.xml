@@ -8384,6 +8384,120 @@
 		</part>
 	</software>
 
+	<software name="incait">
+		<description>Inca (Italian)</description>
+		<year>1992</year>
+		<publisher>Sierra On-Line</publisher>
+		<info name="developer" value="Coktel Vision" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Inca [Sierra On-Line] [1992] [Italian] [3.5HD] [Disk 01 of 10].img" size="1474560" crc="124fe8c9" sha1="75f6a558c1950cbcc3dbec61084326656a772f65" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Inca [Sierra On-Line] [1992] [Italian] [3.5HD] [Disk 02 of 10].img" size="1474560" crc="cff36eac" sha1="45cd1a36ac24d0f416552d239f2a68a8e85d5887" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Inca [Sierra On-Line] [1992] [Italian] [3.5HD] [Disk 03 of 10].img" size="1474560" crc="051c60c6" sha1="3cb6e49f5c85617b642c39dbc7a7113995fda343" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Inca [Sierra On-Line] [1992] [Italian] [3.5HD] [Disk 04 of 10].img" size="1474560" crc="eb9dd7d4" sha1="26cc06f971a1002eb82ef80ee9d3d11a7208023c" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Inca [Sierra On-Line] [1992] [Italian] [3.5HD] [Disk 05 of 10].img" size="1474560" crc="9175cc28" sha1="159189f47e408928f910da16ce515b3439ed5ea6" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Inca [Sierra On-Line] [1992] [Italian] [3.5HD] [Disk 06 of 10].img" size="1474560" crc="18451a6d" sha1="c6b448e0d300446c870d9f4e14d11eee8fa2cfd8" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop7" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Inca [Sierra On-Line] [1992] [Italian] [3.5HD] [Disk 07 of 10].img" size="1474560" crc="a0f7d798" sha1="f38c6b75808813952257d1febf6a067371aadad2" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop8" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Inca [Sierra On-Line] [1992] [Italian] [3.5HD] [Disk 08 of 10].img" size="1474560" crc="870661b1" sha1="1245f9a49a089fcb061ae46846d05210daca24d1" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop9" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Inca [Sierra On-Line] [1992] [Italian] [3.5HD] [Disk 09 of 10].img" size="1474560" crc="b2234232" sha1="d0598467582d36ac1259d0ba29a30cd2429a2e08" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop10" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Inca [Sierra On-Line] [1992] [Italian] [3.5HD] [Disk 10 of 10].img" size="1474560" crc="e5d36c0a" sha1="8a1a7615f1559f3a597ee7b8bc61de459488cc19" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="inca2">
+		<description>Inca 2: Wiracocha (French/German/English)</description>
+		<year>1993</year>
+		<publisher>Sierra On-Line</publisher>
+		<info name="developer" value="Coktel Vision" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Inca 2 [Sierra On-Line] [1993] [3.5HD] [Disk 01 of 10].img" size="1474560" crc="4d6c20c1" sha1="53fc21df728cd3eebbf6d038b727415391b6329a" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Inca 2 [Sierra On-Line] [1993] [3.5HD] [Disk 02 of 10].img" size="1474560" crc="9922bd34" sha1="6fc30f712d9985d2761ee6a9c1245ac54e801ace" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Inca 2 [Sierra On-Line] [1993] [3.5HD] [Disk 03 of 10].img" size="1474560" crc="b2509aa1" sha1="acc6d8b419477c1711190a52f071339e0a660cce" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Inca 2 [Sierra On-Line] [1993] [3.5HD] [Disk 04 of 10].img" size="1474560" crc="3c272165" sha1="058c27ba399c536ac0b4f5f1bf186788c2406d71" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Inca 2 [Sierra On-Line] [1993] [3.5HD] [Disk 05 of 10].img" size="1474560" crc="21c5a6c3" sha1="ca0624cbf795f856aaf14e23aab3e0900be1f990" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Inca 2 [Sierra On-Line] [1993] [3.5HD] [Disk 06 of 10].img" size="1474560" crc="cc3de8fb" sha1="e7a2cceee07d53b2a4fddaffac60ea87280691d4" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop7" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Inca 2 [Sierra On-Line] [1993] [3.5HD] [Disk 07 of 10].img" size="1474560" crc="372ae3cb" sha1="1c26820cdcf165071d96197dae0adbaa217ade4c" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop8" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Inca 2 [Sierra On-Line] [1993] [3.5HD] [Disk 08 of 10].img" size="1474560" crc="c3303cd7" sha1="b0953da58af6be48a227e3fc27ded726b7a74296" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop9" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Inca 2 [Sierra On-Line] [1993] [3.5HD] [Disk 09 of 10].img" size="1474560" crc="fbc00191" sha1="9c2cbc3664cf77354911fea926590394b4fadb3c" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop10" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Inca 2 [Sierra On-Line] [1993] [3.5HD] [Disk 10 of 10].img" size="1474560" crc="25c547ad" sha1="452d545c58f29ef0cf5be4386ad14b7b7cc07d7a" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="incrmach">
 		<description>Incredible Machine</description>
 		<year>1993</year>

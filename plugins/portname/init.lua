@@ -2,6 +2,8 @@
 -- copyright-holders:Carl
 -- use plugin options to save the input port list to a gettext formatted file
 -- the file is saved in the ctrlrpath dir
+-- use #import <filename.po> to load names from a different file
+-- use #set <set1>,<set2>,... to override names for a child set, common names should be listed at the top before any #set tags
 local exports = {}
 exports.name = "portname"
 exports.version = "0.0.1"
@@ -18,39 +20,69 @@ function portname.startplugin()
 		if emu.softname() ~= "" and not nosoft then
 			filename = emu.romname() .. "_" .. emu.softname() .. ".po"
 		else
-			filename =  emu.romname() .. ".po"
+			filename = emu.romname() .. ".po"
 		end
 		return filename
 	end
 	
 	emu.register_start(function()
+		local reclevel = 0
+		local function parse_names(names)
+			local orig, rep
+			local setfound = true
+			reclevel = reclevel + 1
+			if reclevel == 3 then
+				emu.print_verbose("portname: too many import levels\n")
+				return
+			end
+			names:gsub("[^\n\r]*", function (line)
+				if line:find("^#import") then
+					local impfile = emu.file(ctrlrpath .. "/portname", "r")
+					local ret = impfile:open(line:match("^#import (.*)"))
+					if ret then
+						emu.print_verbose("portname: import file not found\n")
+					else
+						parse_names(impfile:read(impfile:size()))
+					end
+				elseif line:find("^#set") then
+					local sets = line:match("^#set (.*)")
+					setfound = false
+					for s in sets:gmatch("[^,]*") do
+						if s == emu.romname() then
+							setfound = true
+							break
+						end
+					end
+				elseif line:find("^msgid") then
+					orig = line:match("^msgid \"(.+)\"")
+				elseif line:find("^msgstr") then
+					rep = line:match("^msgstr \"(.+)\"")
+					if rep and rep ~= "" and setfound then
+						rep = rep:gsub("\\(.)", "%1")
+						orig = orig:gsub("\\(.)", "%1")
+						for pname, port in pairs(manager:machine():ioport().ports) do
+							if port.fields[orig] then
+								port.fields[orig].live.name = rep
+							end
+						end
+					end
+				end
+				return line
+			end)
+			reclevel = reclevel - 1
+		end
 		local file = emu.file(ctrlrpath .. "/portname", "r")
 		local ret = file:open(get_filename())
 		if ret then
 			ret = file:open(get_filename(true))
 			if ret then
-				return
-			end
-		end
-		local names = file:read(file:size())
-		local orig, rep
-		names:gsub("[^\n\r]*", function (line)
-			if line:find("^msgid") then
-				orig = line:match("^msgid \"(.+)\"")
-			elseif line:find("^msgstr") then
-				rep = line:match("^msgstr \"(.+)\"")
-				if rep and rep ~= "" then
-					rep = rep:gsub("\\(.)", "%1")
-					orig = orig:gsub("\\(.)", "%1")
-					for pname, port in pairs(manager:machine():ioport().ports) do
-						if port.fields[orig] then
-							port.fields[orig].live.name = rep
-						end
-					end
+				ret = file:open(manager:machine():system().parent .. ".po")
+				if ret then
+					return
 				end
 			end
-			return line
-		end)
+		end
+		parse_names(file:read(file:size()))
 	end)
 
 	local function menu_populate()

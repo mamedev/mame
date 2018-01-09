@@ -429,7 +429,7 @@ uint32_t alphatpx_state::screen_update(screen_device &screen, bitmap_rgb32 &bitm
 		{
 			uint8_t code = m_vram[(vramy * 128) + x];   // helwie44 must be 128d is 080h physical display-ram step line
 			// draw 12 lines of the character
-			bool cursoren = cursor.contains(x * 8, y * 12);
+			bool cursoren = cursor.contains(x * 8, vramy * 12);
 			for (int line = 0; line < 12; line++)
 			{
 				uint8_t data = m_gfx[((code & 0x7f) * 16) + line];
@@ -644,14 +644,58 @@ static MACHINE_CONFIG_START( alphatp3 )
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", alphatp3_floppies, "525qd", floppy_image_device::default_floppy_formats)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED (alphatp2, alphatp3)
-	MCFG_DEVICE_REMOVE("fdc:0")
-	MCFG_DEVICE_REMOVE("fdc:1")
+static MACHINE_CONFIG_START( alphatp2 )
+	MCFG_CPU_ADD("maincpu", I8085A, XTAL_6MHz)
+	MCFG_CPU_PROGRAM_MAP(alphatp3_mem)
+	MCFG_CPU_IO_MAP(alphatp3_io)
+
+	MCFG_QUANTUM_PERFECT_CPU("maincpu")
+
+	MCFG_CPU_ADD("kbdmcu", I8041, XTAL_12_8544MHz/2)
+	MCFG_MCS48_PORT_T0_IN_CB(READLINE(alphatpx_state, kbd_matrix_r))
+	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(alphatpx_state, kbd_matrix_w))
+	MCFG_MCS48_PORT_P2_IN_CB(READ8(alphatpx_state, kbd_port2_r))
+	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(alphatpx_state, kbd_port2_w))
+
+	MCFG_DEVICE_ADD("bankdev", ADDRESS_MAP_BANK, 0)
+	MCFG_DEVICE_PROGRAM_MAP(alphatp3_map)
+	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
+	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
+	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(18)
+	MCFG_ADDRESS_MAP_BANK_STRIDE(0x10000)
+
+	// video hardware
+	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green())
+	MCFG_SCREEN_RAW_PARAMS(XTAL_12_8544MHz, 824, 0, 640, 312, 0, 288)
+	MCFG_SCREEN_UPDATE_DRIVER(alphatpx_state, screen_update)
+
+	MCFG_PALETTE_ADD_MONOCHROME("palette")
+
+	MCFG_DEVICE_ADD("crtc", CRT5037, XTAL_12_8544MHz)
+	MCFG_TMS9927_CHAR_WIDTH(8)
+	MCFG_TMS9927_HSYN_CALLBACK(INPUTLINE("maincpu", I8085_RST55_LINE))
+	MCFG_TMS9927_VSYN_CALLBACK(INPUTLINE("maincpu", I8085_RST65_LINE)) MCFG_DEVCB_XOR(1)
+	MCFG_VIDEO_SET_SCREEN("screen")
+
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", alphatp3)
+
+	// sound hardware
+	MCFG_SPEAKER_STANDARD_MONO( "mono" )
+	MCFG_SOUND_ADD( "beeper", BEEP, 1060 )
+	MCFG_SOUND_ROUTE( ALL_OUTPUTS, "mono", 1.00 )
+
+	MCFG_DEVICE_ADD("uart", I8251, 0)
+	// XTAL_4_9152MHz serial clock
+
+	MCFG_FD1791_ADD("fdc", XTAL_4MHz / 4)
+	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(alphatpx_state, fdcirq_w))
+	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(alphatpx_state, fdcdrq_w))
+	MCFG_WD_FDC_HLD_CALLBACK(WRITELINE(alphatpx_state, fdchld_w))
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", alphatp2_floppies, "525ssdd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", alphatp2_floppies, "525ssdd", floppy_image_device::default_floppy_formats)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED (alphatp2u, alphatp3)
+static MACHINE_CONFIG_DERIVED (alphatp2u, alphatp2)
 	MCFG_DEVICE_REMOVE("fdc:0")
 	MCFG_DEVICE_REMOVE("fdc:1")
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", alphatp2su_floppies, "525dd", floppy_image_device::default_floppy_formats)
@@ -664,12 +708,12 @@ MACHINE_CONFIG_END
 
 // Alphatronic P2
 ROM_START( alphatp2 ) // P2 ROM space 0x1800
+	ROM_REGION(0x1800, "boot", 0)
 	ROM_SYSTEM_BIOS(0, "caap94-96", "caap94-96")
 	ROM_SYSTEM_BIOS(1, "caap04-06", "caap04-06")
 	ROM_SYSTEM_BIOS(2, "p2_es", "p2_es")
 	ROM_SYSTEM_BIOS(3, "p2_sks", "p2_sks")
 
-	ROM_REGION(0x1800, "boot", 0)
 	ROMX_LOAD("caap_96_00_5a.bin", 0x0000, 0x0800, CRC(cb137796) SHA1(876bd0762faffc7b74093922d8fbf1c72ec70060), ROM_BIOS(1) ) // earlier P2, three 16K RAM boards
 	ROMX_LOAD("caap_05_02_12.bin", 0x0800, 0x0800, CRC(14f19693) SHA1(7ecb66818a3e352fede1857a18cd12bf742603a9), ROM_BIOS(1) )
 	ROMX_LOAD("caap_94_01_50.bin", 0x1000, 0x0800, CRC(fda8d4a4) SHA1(fa91e6e8504e7f84cf69d86f72826ad5405fd82d), ROM_BIOS(1) )

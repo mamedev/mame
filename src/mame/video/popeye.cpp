@@ -13,7 +13,7 @@
 #include "video/resnet.h"
 #include "includes/popeye.h"
 
-static const size_t popeye_bitmapram_size = 0x2000;
+static const size_t popeye_bitmapram_size = 0x2000; // 8k nybbles packed into 4k ram chip
 
 enum { TYPE_SKYSKIPR, TYPE_POPEYE };
 
@@ -296,7 +296,7 @@ WRITE8_MEMBER(popeye_state::popeye_bitmap_w)
 {
 	int sx,sy,x,y,colour;
 
-	m_bitmapram[offset] = data;
+	m_bitmapram[offset] = data & 0xf;
 
 	if (m_bitmap_type == TYPE_SKYSKIPR)
 	{

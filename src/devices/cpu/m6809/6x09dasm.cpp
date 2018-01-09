@@ -189,12 +189,12 @@ offs_t m6x09_base_disassembler::disassemble(std::ostream &stream, offs_t pc, con
 
 	case REL:
 		offset = (int8_t)params.r8(ppc);
-		util::stream_format(stream, "$%04X", (pc + offset) & 0xffff);
+		util::stream_format(stream, "$%04X", (pc + op->length() + offset) & 0xffff);
 		break;
 
 	case LREL:
 		offset = (int16_t)params.r16(ppc);
-		util::stream_format(stream, "$%04X", (pc + offset) & 0xffff);
+		util::stream_format(stream, "$%04X", (pc + op->length() + offset) & 0xffff);
 		break;
 
 	case EXT:

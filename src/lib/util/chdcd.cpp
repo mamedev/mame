@@ -665,6 +665,12 @@ chd_error chdcd_parse_iso(const char *tocfname, cdrom_toc &outtoc, chdcd_track_i
 		outtoc.tracks[0].frames = size / 2048;
 		outtoc.tracks[0].datasize = 2048;
 		outinfo.track[0].swap = false;
+	} else if ((size % 2336)==0 ) {
+		// 2352 byte mode 2
+		outtoc.tracks[0].trktype = CD_TRACK_MODE2;
+		outtoc.tracks[0].frames = size / 2336;
+		outtoc.tracks[0].datasize = 2336;
+		outinfo.track[0].swap = false;
 	} else if ((size % 2352)==0 ) {
 		// 2352 byte mode 2 raw
 		outtoc.tracks[0].trktype = CD_TRACK_MODE2_RAW;

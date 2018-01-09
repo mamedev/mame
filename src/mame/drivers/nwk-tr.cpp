@@ -272,8 +272,10 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_dsp(*this, "dsp"),
+		m_dsp2(*this, "dsp2"),
 		m_k056800(*this, "k056800"),
 		m_k001604(*this, "k001604"),
+		m_konppc(*this, "konppc"),
 		m_adc12138(*this, "adc12138"),
 		m_in0(*this, "IN0"),
 		m_in1(*this, "IN1"),
@@ -295,9 +297,11 @@ public:
 	required_shared_ptr<uint32_t> m_work_ram;
 	required_device<ppc_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
-	required_device<cpu_device> m_dsp;
+	required_device<adsp21062_device> m_dsp;
+	required_device<adsp21062_device> m_dsp2;
 	required_device<k056800_device> m_k056800;
 	required_device<k001604_device> m_k001604;
+	required_device<konppc_device> m_konppc;
 	required_device<adc12138_device> m_adc12138;
 	required_ioport m_in0, m_in1, m_in2, m_dsw, m_analog1, m_analog2, m_analog3, m_analog4, m_analog5;
 	required_device<palette_device> m_palette;
@@ -308,7 +312,8 @@ public:
 	int m_lanc2_ram_w;
 	uint8_t m_lanc2_reg[3];
 	std::unique_ptr<uint8_t[]> m_lanc2_ram;
-	std::unique_ptr<uint32_t[]> m_sharc_dataram;
+	std::unique_ptr<uint32_t[]> m_sharc0_dataram;
+	std::unique_ptr<uint32_t[]> m_sharc1_dataram;
 	DECLARE_WRITE32_MEMBER(paletteram32_w);
 	DECLARE_READ32_MEMBER(sysreg_r);
 	DECLARE_WRITE32_MEMBER(sysreg_w);
@@ -316,11 +321,14 @@ public:
 	DECLARE_WRITE32_MEMBER(lanc1_w);
 	DECLARE_READ32_MEMBER(lanc2_r);
 	DECLARE_WRITE32_MEMBER(lanc2_w);
-	DECLARE_READ32_MEMBER(dsp_dataram_r);
-	DECLARE_WRITE32_MEMBER(dsp_dataram_w);
+	DECLARE_READ32_MEMBER(dsp_dataram0_r);
+	DECLARE_WRITE32_MEMBER(dsp_dataram0_w);
+	DECLARE_READ32_MEMBER(dsp_dataram1_r);
+	DECLARE_WRITE32_MEMBER(dsp_dataram1_w);
 	DECLARE_WRITE16_MEMBER(soundtimer_en_w);
 	DECLARE_WRITE16_MEMBER(soundtimer_count_w);
 	DECLARE_WRITE_LINE_MEMBER(voodoo_vblank_0);
+	DECLARE_WRITE_LINE_MEMBER(voodoo_vblank_1);
 	ADC12138_IPT_CONVERT_CB(adc12138_input_callback);
 
 	TIMER_CALLBACK_MEMBER(sound_irq);
@@ -346,19 +354,37 @@ WRITE_LINE_MEMBER(nwktr_state::voodoo_vblank_0)
 	m_maincpu->set_input_line(INPUT_LINE_IRQ0, state);
 }
 
+WRITE_LINE_MEMBER(nwktr_state::voodoo_vblank_1)
+{
+}
+
 
 uint32_t nwktr_state::screen_update_nwktr(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	voodoo_device *voodoo = (voodoo_device*)machine().device("voodoo0");
-
 	bitmap.fill(m_palette->pen(0), cliprect);
 
-	voodoo->voodoo_update(bitmap, cliprect);
+	if (strcmp(screen.tag(), ":lscreen") == 0)
+	{
+		voodoo_device *voodoo = (voodoo_device*)machine().device("voodoo0");
 
-	const rectangle &visarea = screen.visible_area();
-	const rectangle tilemap_rect(visarea.min_x, visarea.max_x, visarea.min_y+16, visarea.max_y);
+		voodoo->voodoo_update(bitmap, cliprect);
 
-	m_k001604->draw_front_layer(screen, bitmap, tilemap_rect);
+		const rectangle &visarea = screen.visible_area();
+		const rectangle tilemap_rect(visarea.min_x, visarea.max_x, visarea.min_y + 16, visarea.max_y);
+
+		m_k001604->draw_front_layer(screen, bitmap, tilemap_rect);
+	}
+	else if (strcmp(screen.tag(), ":rscreen") == 0)
+	{
+		voodoo_device *voodoo = (voodoo_device*)machine().device("voodoo1");
+
+		voodoo->voodoo_update(bitmap, cliprect);
+
+		const rectangle &visarea = screen.visible_area();
+		const rectangle tilemap_rect(visarea.min_x, visarea.max_x, visarea.min_y + 16, visarea.max_y);
+
+		m_k001604->draw_front_layer(screen, bitmap, tilemap_rect);
+	}
 
 	draw_7segment_led(bitmap, 3, 3, m_led_reg0);
 	draw_7segment_led(bitmap, 9, 3, m_led_reg1);
@@ -434,7 +460,7 @@ WRITE32_MEMBER(nwktr_state::sysreg_w)
 			if (data & 0x40)    // CG Board 0 IRQ Ack
 				m_maincpu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
 
-			//set_cgboard_id((data >> 4) & 3);
+			m_konppc->set_cgboard_id((data >> 4) & 1);
 		}
 		return;
 	}
@@ -658,24 +684,44 @@ ADDRESS_MAP_END
 /*****************************************************************************/
 
 
-READ32_MEMBER(nwktr_state::dsp_dataram_r)
+READ32_MEMBER(nwktr_state::dsp_dataram0_r)
 {
-	return m_sharc_dataram[offset] & 0xffff;
+	return m_sharc0_dataram[offset] & 0xffff;
 }
 
-WRITE32_MEMBER(nwktr_state::dsp_dataram_w)
+WRITE32_MEMBER(nwktr_state::dsp_dataram0_w)
 {
-	m_sharc_dataram[offset] = data;
+	m_sharc0_dataram[offset] = data;
 }
 
-static ADDRESS_MAP_START( sharc_map, AS_DATA, 32, nwktr_state )
+READ32_MEMBER(nwktr_state::dsp_dataram1_r)
+{
+	return m_sharc1_dataram[offset] & 0xffff;
+}
+
+WRITE32_MEMBER(nwktr_state::dsp_dataram1_w)
+{
+	m_sharc1_dataram[offset] = data;
+}
+
+static ADDRESS_MAP_START( sharc0_map, AS_DATA, 32, nwktr_state )
 	AM_RANGE(0x0400000, 0x041ffff) AM_DEVREADWRITE("konppc", konppc_device, cgboard_0_shared_sharc_r, cgboard_0_shared_sharc_w)
-	AM_RANGE(0x0500000, 0x05fffff) AM_READWRITE(dsp_dataram_r, dsp_dataram_w)
+	AM_RANGE(0x0500000, 0x05fffff) AM_READWRITE(dsp_dataram0_r, dsp_dataram0_w)
 	AM_RANGE(0x1400000, 0x14fffff) AM_RAM
 	AM_RANGE(0x2400000, 0x27fffff) AM_DEVREADWRITE("konppc", konppc_device, nwk_voodoo_0_r, nwk_voodoo_0_w)
 	AM_RANGE(0x3400000, 0x34000ff) AM_DEVREADWRITE("konppc", konppc_device, cgboard_0_comm_sharc_r, cgboard_0_comm_sharc_w)
 	AM_RANGE(0x3500000, 0x35000ff) AM_DEVREADWRITE("konppc", konppc_device, K033906_0_r, K033906_0_w)
 	AM_RANGE(0x3600000, 0x37fffff) AM_ROMBANK("bank5")
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START(sharc1_map, AS_DATA, 32, nwktr_state)
+	AM_RANGE(0x0400000, 0x041ffff) AM_DEVREADWRITE("konppc", konppc_device, cgboard_1_shared_sharc_r, cgboard_1_shared_sharc_w)
+	AM_RANGE(0x0500000, 0x05fffff) AM_READWRITE(dsp_dataram1_r, dsp_dataram1_w)
+	AM_RANGE(0x1400000, 0x14fffff) AM_RAM
+	AM_RANGE(0x2400000, 0x27fffff) AM_DEVREADWRITE("konppc", konppc_device, nwk_voodoo_0_r, nwk_voodoo_0_w)
+	AM_RANGE(0x3400000, 0x34000ff) AM_DEVREADWRITE("konppc", konppc_device, cgboard_1_comm_sharc_r, cgboard_1_comm_sharc_w)
+	AM_RANGE(0x3500000, 0x35000ff) AM_DEVREADWRITE("konppc", konppc_device, K033906_1_r, K033906_1_w)
+	AM_RANGE(0x3600000, 0x37fffff) AM_ROMBANK("bank6")
 ADDRESS_MAP_END
 
 /*****************************************************************************/
@@ -763,6 +809,7 @@ ADC12138_IPT_CONVERT_CB(nwktr_state::adc12138_input_callback)
 void nwktr_state::machine_reset()
 {
 	m_dsp->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+	m_dsp2->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 }
 
 static MACHINE_CONFIG_START( nwktr )
@@ -776,7 +823,11 @@ static MACHINE_CONFIG_START( nwktr )
 
 	MCFG_CPU_ADD("dsp", ADSP21062, XTAL_36MHz)
 	MCFG_SHARC_BOOT_MODE(BOOT_MODE_EPROM)
-	MCFG_CPU_DATA_MAP(sharc_map)
+	MCFG_CPU_DATA_MAP(sharc0_map)
+
+	MCFG_CPU_ADD("dsp2", ADSP21062, XTAL_36MHz)
+	MCFG_SHARC_BOOT_MODE(BOOT_MODE_EPROM)
+	MCFG_CPU_DATA_MAP(sharc1_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(9000))
 
@@ -788,15 +839,24 @@ static MACHINE_CONFIG_START( nwktr )
 	MCFG_DEVICE_ADD("k033906_1", K033906, 0)
 	MCFG_K033906_VOODOO("voodoo0")
 
+	MCFG_DEVICE_ADD("k033906_2", K033906, 0)
+	MCFG_K033906_VOODOO("voodoo1")
+
 	/* video hardware */
 	MCFG_DEVICE_ADD("voodoo0", VOODOO_1, STD_VOODOO_1_CLOCK)
 	MCFG_VOODOO_FBMEM(2)
 	MCFG_VOODOO_TMUMEM(2,2)
-	MCFG_VOODOO_SCREEN_TAG("screen")
+	MCFG_VOODOO_SCREEN_TAG("lscreen")
 	MCFG_VOODOO_CPU_TAG("dsp")
 	MCFG_VOODOO_VBLANK_CB(WRITELINE(nwktr_state,voodoo_vblank_0))
 
-	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_DEVICE_ADD("voodoo1", VOODOO_1, STD_VOODOO_1_CLOCK)
+	MCFG_VOODOO_FBMEM(2)
+	MCFG_VOODOO_TMUMEM(2, 2)
+	MCFG_VOODOO_CPU_TAG("dsp2")
+	MCFG_VOODOO_VBLANK_CB(WRITELINE(nwktr_state, voodoo_vblank_1))
+
+	MCFG_SCREEN_ADD("lscreen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_SIZE(512, 384)
 	MCFG_SCREEN_VISIBLE_AREA(0, 511, 0, 383)
@@ -841,8 +901,10 @@ MACHINE_CONFIG_END
 DRIVER_INIT_MEMBER(nwktr_state, nwktr)
 {
 	machine().device<konppc_device>("konppc")->set_cgboard_texture_bank(0, "bank5", memregion("user5")->base());
+	machine().device<konppc_device>("konppc")->set_cgboard_texture_bank(0, "bank6", memregion("user5")->base());
 
-	m_sharc_dataram = std::make_unique<uint32_t[]>(0x100000/4);
+	m_sharc0_dataram = std::make_unique<uint32_t[]>(0x100000 / 4);
+	m_sharc1_dataram = std::make_unique<uint32_t[]>(0x100000 / 4);
 	m_led_reg0 = m_led_reg1 = 0x7f;
 
 	lanc2_init();
