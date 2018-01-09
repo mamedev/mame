@@ -23,8 +23,6 @@ files {
 	MAME_DIR .. "src/devices/machine/laserdsc.h",
 	MAME_DIR .. "src/devices/machine/latch.cpp",
 	MAME_DIR .. "src/devices/machine/latch.h",
-	MAME_DIR .. "src/devices/machine/myb3k_kbd.cpp",
-	MAME_DIR .. "src/devices/machine/myb3k_kbd.h",
 	MAME_DIR .. "src/devices/machine/nvram.cpp",
 	MAME_DIR .. "src/devices/machine/nvram.h",
 	MAME_DIR .. "src/devices/machine/ram.cpp",
@@ -1988,6 +1986,18 @@ if (MACHINES["MSM6253"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/machine/msm6253.cpp",
 		MAME_DIR .. "src/devices/machine/msm6253.h",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/devices/machine/myb3k_kbd.h,MACHINES["MYB3K_KEYBOARD"] = true
+---------------------------------------------------
+
+if (MACHINES["MYB3K_KEYBOARD"]~=null) then
+	files {
+	MAME_DIR .. "src/devices/machine/myb3k_kbd.cpp",
+	MAME_DIR .. "src/devices/machine/myb3k_kbd.h",
 	}
 end
 
