@@ -258,7 +258,10 @@
 #include "cpu/z180/z180.h"
 #include "machine/i8255.h"
 #include "video/v9938.h"
+#include "sound/dac.h"
+#include "sound/volt_reg.h"
 #include "screen.h"
+#include "speaker.h"
 
 
 class luckybal_state : public driver_device
@@ -268,12 +271,17 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_v9938(*this, "v9938")
 		, m_maincpu(*this, "maincpu")
+		, m_dac(*this, "dac")
 	{ }
 
+	DECLARE_WRITE8_MEMBER(output_port_a_w);
+	DECLARE_READ8_MEMBER(input_port_a_r);
 	DECLARE_DRIVER_INIT(luckybal);
+	uint8_t daclatch;
 
 	required_device<v9938_device> m_v9938;
 	required_device<cpu_device> m_maincpu;
+	required_device<dac_byte_interface> m_dac;
 };
 
 
@@ -288,6 +296,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( main_io, AS_IO, 8, luckybal_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
+//	AM_RANGE(0xc0, 0xc0) AM_DEVWRITE("dac", dac_byte_interface, write)
 	AM_RANGE(0xc0, 0xc3) AM_DEVREADWRITE("ppi8255", i8255_device, read, write)
 	AM_RANGE(0xe0, 0xe3) AM_DEVREADWRITE("v9938", v9938_device, read, write)
 ADDRESS_MAP_END
@@ -335,6 +344,28 @@ PORT3     EQU  E3H
 M_MAP     EQU  90H    ; [A]= Bank to select (BIT6=MEM, BIT7=EN_NMI)
 
 */
+
+
+/**************************************
+*            R/W handlers             *
+**************************************/
+
+WRITE8_MEMBER(luckybal_state::output_port_a_w)
+{
+	daclatch = data;
+	data = bitswap<8>(data, 0, 1, 2, 3, 4, 5, 6, 7);
+
+	// DAC should be here.
+
+	logerror("Write to PPI port A: %02X\n", data);
+}
+
+READ8_MEMBER(luckybal_state::input_port_a_r)
+{
+	return daclatch;
+	logerror("Read from PPI port A");
+}
+
 
 /**************************************
 *            Input Ports              *
@@ -432,12 +463,24 @@ static MACHINE_CONFIG_START( luckybal )
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_IO_MAP(main_io)
 
-	MCFG_DEVICE_ADD("ppi8255", I8255A, 0)
-	
+	MCFG_DEVICE_ADD("ppi8255", I8255A, 0)  // PPI is initialized with 0x44: mode2/mode1
+	MCFG_I8255_IN_PORTA_CB(READ8(luckybal_state, input_port_a_r))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(luckybal_state, output_port_a_w))
+	MCFG_I8255_IN_PORTB_CB(LOGGER("PPI8255 - unmapped read port B"))
+	MCFG_I8255_OUT_PORTB_CB(LOGGER("PPI8255 - unmapped write port B"))
+	MCFG_I8255_IN_PORTC_CB(LOGGER("PPI8255 - unmapped read port C"))
+	MCFG_I8255_OUT_PORTC_CB(LOGGER("PPI8255 - unmapped write port C"))
+
 	/* video hardware */
 	MCFG_V9938_ADD("v9938", "screen", VDP_MEM, VID_CLOCK)
 	MCFG_V99X8_INTERRUPT_CALLBACK(INPUTLINE("maincpu", 0))
 	MCFG_V99X8_SCREEN_ADD_NTSC("screen", "v9938", VID_CLOCK)
+
+	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	MCFG_SOUND_ADD("dac", DAC08, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5) // DAC 08
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 
 MACHINE_CONFIG_END
 
@@ -505,7 +548,7 @@ DRIVER_INIT_MEMBER(luckybal_state, luckybal)
 **************************************/
 
 /*    YEAR  NAME        PARENT    MACHINE   INPUT     STATE           INIT      ROT    COMPANY          FULLNAME                         FLAGS  */
-GAME( 1996, luckybal,   0,        luckybal, luckybal, luckybal_state, luckybal, ROT0, "Sielcon Games", "Lucky Ball 96 (Ver 3.50 - 627)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 1996, luckybal,   0,        luckybal, luckybal, luckybal_state, luckybal, ROT0, "Sielcon Games", "Lucky Ball 96 (Ver 3.50 - 627)", MACHINE_NOT_WORKING )//| MACHINE_NO_SOUND )
 GAME( 1996, luckybala,  luckybal, luckybal, luckybal, luckybal_state, luckybal, ROT0, "Sielcon Games", "Lucky Ball 96 (Ver 3.50 - 626)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 GAME( 1996, luckybalb,  luckybal, luckybal, luckybal, luckybal_state, luckybal, ROT0, "Sielcon Games", "Lucky Ball 96 (Ver 3.50 - 623)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 GAME( 1996, luckybalc,  luckybal, luckybal, luckybal, luckybal_state, luckybal, ROT0, "Sielcon Games", "Lucky Ball 96 (Ver 3.50 - 616)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
