@@ -11,17 +11,16 @@ class radicasi_state : public driver_device
 public:
 	radicasi_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, "maincpu")
+		m_maincpu(*this, "maincpu"),
+		m_ram(*this, "ram")
 	{ }
-
-	// devices
-	required_device<cpu_device> m_maincpu;
 
 	// screen updates
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	DECLARE_WRITE8_MEMBER(radicasi_500c_w);
 	DECLARE_WRITE8_MEMBER(radicasi_500d_w);
+	DECLARE_READ8_MEMBER(radicasi_5041_r);
 	DECLARE_READ8_MEMBER(radicasi_50a8_r);
 
 protected:
@@ -30,6 +29,10 @@ protected:
 	virtual void machine_reset() override;
 
 	virtual void video_start() override;
+
+private:
+	required_device<cpu_device> m_maincpu;
+	required_shared_ptr<uint8_t> m_ram;
 };
 
 void radicasi_state::video_start()
@@ -57,12 +60,21 @@ READ8_MEMBER(radicasi_state::radicasi_50a8_r)
 	return 0x3f;
 }
 
+READ8_MEMBER(radicasi_state::radicasi_5041_r)
+{
+	logerror("%s: radicasi_5041_r\n", machine().describe_context().c_str());
+	//return machine().rand();
+	return 0x00; // inputs? (causes further banking writes if random is returned at least)
+}
+
 static ADDRESS_MAP_START( radicasi_map, AS_PROGRAM, 8, radicasi_state )
-	AM_RANGE(0x0000, 0x3fff) AM_RAM
+	AM_RANGE(0x0000, 0x3fff) AM_RAM AM_SHARE("ram") // ends up copying code to ram, but could be due to banking issues
 	AM_RANGE(0x4800, 0x49ff) AM_RAM
 
 	AM_RANGE(0x500c, 0x500c) AM_WRITE(radicasi_500c_w)
 	AM_RANGE(0x500d, 0x500d) AM_WRITE(radicasi_500d_w)
+
+	AM_RANGE(0x5041, 0x5041) AM_READ(radicasi_5041_r)
 
 	AM_RANGE(0x50a8, 0x50a8) AM_READ(radicasi_50a8_r)
 	AM_RANGE(0x8000, 0xdfff) AM_ROM AM_REGION("maincpu", 0xfa000)
@@ -75,6 +87,14 @@ INPUT_PORTS_END
 
 void radicasi_state::machine_start()
 {
+	uint8_t *rom = memregion("maincpu")->base();
+	// both NMI and IRQ vectors just point to RTI
+	// there is a table of jumps just before that, those appear to be the real interrupt functions?
+
+	// patch the main IRQ to be the one that decreases an address the code is waiting for
+	// the others look like they might be timer service routines
+	rom[0xf9ffe] = 0xd4;
+	rom[0xf9fff] = 0xff;
 }
 
 void radicasi_state::machine_reset()
@@ -86,7 +106,7 @@ static MACHINE_CONFIG_START( radicasi )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",M6502,8000000) // unknown frequency
 	MCFG_CPU_PROGRAM_MAP(radicasi_map)
-	//MCFG_CPU_VBLANK_INT_DRIVER("screen", radicasi_state,  irq0_line_hold) // just points to an RTI, there are various other jumps before the vector table that look like the real IRQs?
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", radicasi_state,  irq0_line_hold)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
