@@ -24,7 +24,6 @@ public:
 	DECLARE_WRITE8_MEMBER(radicasi_500d_w);
 
 	DECLARE_READ8_MEMBER(radicasi_500d_r);
-	DECLARE_READ8_MEMBER(radicasi_5041_r);
 	DECLARE_READ8_MEMBER(radicasi_50a8_r);
 
 protected:
@@ -76,13 +75,6 @@ READ8_MEMBER(radicasi_state::radicasi_50a8_r)
 	return 0x3f;
 }
 
-READ8_MEMBER(radicasi_state::radicasi_5041_r)
-{
-	logerror("%s: radicasi_5041_r\n", machine().describe_context().c_str());
-	return machine().rand();
-	//return 0x00; // inputs? (causes further banking writes if random is returned at least)
-}
-
 static ADDRESS_MAP_START( radicasi_map, AS_PROGRAM, 8, radicasi_state )
 	AM_RANGE(0x0000, 0x3fff) AM_RAM AM_SHARE("ram") // ends up copying code to ram, but could be due to banking issues
 	AM_RANGE(0x4800, 0x49ff) AM_RAM
@@ -90,7 +82,7 @@ static ADDRESS_MAP_START( radicasi_map, AS_PROGRAM, 8, radicasi_state )
 	AM_RANGE(0x500c, 0x500c) AM_WRITE(radicasi_500c_w)
 	AM_RANGE(0x500d, 0x500d) AM_READWRITE(radicasi_500d_r, radicasi_500d_w)
 
-	AM_RANGE(0x5041, 0x5041) AM_READ(radicasi_5041_r)
+	AM_RANGE(0x5041, 0x5041) AM_READ_PORT("IN0") // AM_READ(radicasi_5041_r)
 
 	AM_RANGE(0x50a8, 0x50a8) AM_READ(radicasi_50a8_r)
 
@@ -106,6 +98,15 @@ static ADDRESS_MAP_START( radicasi_bank_map, AS_PROGRAM, 8, radicasi_state )
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( radicasi )
+	PORT_START("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON3 )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON4 )
 INPUT_PORTS_END
 
 void radicasi_state::machine_start()
