@@ -1328,7 +1328,7 @@
 		<year>1997</year>
 		<publisher>Monolith Productions Inc.</publisher>
 		<info name="version" value="1.2" />
-		
+
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="clawj" sha1="eb48e779ba6cb342fa661f3aa64df23149f16449" />
@@ -1336,6 +1336,140 @@
 		</part>
 	</software>
 
+	<!-- DOS -->
+	<software name="clubdead">
+		<description>Club Dead</description>
+		<year>1994</year>
+		<publisher>MTV</publisher>
+		
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="club dead (1994)(mtv)" sha1="eb0753e50e0d52192dffce87304f5f52cb3be1cc" />
+			</diskarea>
+		</part>
+	</software>
+	
+	<!-- DOS -->
+	<!-- Wants 582k of free RAM -->
+	<!-- TODO: crashes/hangs at intro or by selecting a mission (loaded without cdrom driver tho) -->
+	<software name="cmdadv" supported="no">
+		<description>Command Adventures: Starship</description>
+		<year>1995</year>
+		<publisher>Merit Studios</publisher>
+		
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="command adventures - starship (1995)(merit studios)" sha1="f1ecaa3f8f4f0bb4705678bba7f10a0b2dfd01bd" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- DOS / Windows 95 -->
+	<!-- TODO: SB16 doesn't playback any sound in install menu, also keyboard eventually stop responding -->
+	<software name="cmdconq" supported="partial">
+		<description>Command &amp; Conquer (v1.07)</description>
+		<year>1995</year>
+		<publisher>Virgin / Westwood Studios</publisher>
+		<info name="version" value="1.07" />
+
+		<part name="cdrom1" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="command &amp; conquer (1995)(virgin)(disc 1 of 2)" sha1="d66c196c4114dcb53077ce4fef9bc896b582082b" />
+			</diskarea>
+		</part>
+		<part name="cdrom2" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="command &amp; conquer (1995)(virgin)(disc 2 of 2)" sha1="b5409069a18e7afd880ed8983a0f89488dba4972" />
+			</diskarea>
+		</part>
+	</software>
+	
+	<software name="cmdconqd" cloneof="cmdconq">
+		<description>Command &amp; Conquer Teil 1 - Der Tiberiumkonflikt (Germany)</description>
+		<year>1995</year>
+		<publisher>Virgin / Westwood Studios</publisher>
+		<info name="version" value="1.07" />
+
+		<part name="cdrom1" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="command &amp; conquer teil 1 - der tiberiumkonflikt (1995)(virgin)(de)(disc 1 of 2)" sha1="484969bdb3d1250bd4c66fb5a4b461cd6466ffe6" />
+			</diskarea>
+		</part>
+		<part name="cdrom2" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="command &amp; conquer teil 1 - der tiberiumkonflikt (1995)(virgin)(de)(disc 2 of 2)" sha1="d531ea73f511f691f7698ea18d6e629f064fe41c" />
+			</diskarea>
+		</part>
+	</software>
+	
+	<!-- DOS -->
+	<!-- TODO: creating a new game throws "cd-rom not found" message at some point even if disc is in -->
+	<software name="cnwlrddx" supported="no">
+		<description>Conquest of the New World Deluxe Edition</description>
+		<year>1997</year>
+		<publisher>Dice / Interplay</publisher>
+		<info name="version" value="1.01" />
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="conquest of the new world deluxe edition (1996)(dice)(nl)(m3)" sha1="3c24ea63ca91748f47327bca221eced25e1a872b" />
+			</diskarea>
+		</part>
+	</software>
+	
+	<!-- DOS -->
+	<software name="comanche">
+		<description>Comanche CD - White Lightning</description>
+		<year>1993</year>
+		<publisher>Softgold</publisher>
+		
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="comanche cd (1993)(softgold)" sha1="368cf40b7470a73404daa6fbc047d02383dd1bc3" />
+			</diskarea>
+		</part>
+	</software>
+	
+	<!-- DOS / Windows 95 -->
+	<!-- Pentium class 100 MHz -->
+	<!-- TODO: install screen has gfx issue -->
+	<software name="comanche3">
+		<description>Comanche 3</description>
+		<year>1997</year>
+		<publisher>Nova Logic</publisher>
+		
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="comanche 3 (1997)(nova logic)" sha1="c8201261de5a149bd29c042d1777122f001a7589" />
+			</diskarea>
+		</part>
+	</software>
+	
+	<software name="comanche3d" cloneof="comanche3">
+		<description>Comanche 3 (Germany)</description>
+		<year>1997</year>
+		<publisher>Nova Logic</publisher>
+		
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="comanche 3 (1997)(nova logic)(de)" sha1="ec3034c0bf39bc2794f84f4be71feacbbc5c2985" />
+			</diskarea>
+		</part>
+	</software>
+	
+	<!-- DOS -->
+	<software name="combairp">
+		<description>Combat Air Patrol</description>
+		<year>1995</year>
+		<publisher>GT Interactive</publisher>
+		
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="combat air patrol (1995)(gt interactive)" sha1="5c05e9fa1747c45e9a38db725c341025ef46b55d" />
+			</diskarea>
+		</part>
+	</software>
+	
 	<!-- Windows 3.1 -->
 	<software name="comixzone">
 		<description>Comix Zone</description>
@@ -1345,6 +1479,69 @@
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="comix zone (1995)(sega)" sha1="6b77dbc41cf493539980d7e45a792ceaf10b9bbe" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- DOS -->
+	<!-- TODO: cdrom error when launching game -->
+	<software name="conq1086d" supported="no">
+		<description>Conqueror A.D. 1086 (Germany)</description>
+		<year>1996</year>
+		<publisher>Sierra</publisher>
+		
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="conqueror a.d. 1086 (1996)(sierra)(de)" sha1="355d5aaaf34a5d285ccb0d1fdde1fc9369c7a108" />
+			</diskarea>
+		</part>
+	</software>
+	
+	<software name="conspiry">
+		<description>Conspiracy</description>
+		<year>1994</year>
+		<publisher>Virgin</publisher>
+		
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="conspiracy (1994)(virgin)" sha1="747384f95b72b97cc2b570910aec0bbbdb70f38e" />
+			</diskarea>
+		</part>
+	</software>
+	
+	<!-- DOS -->
+	<!-- Multidisc collection featuring Around the World in 80 Days, Jungle Book and Peter Pan -->
+	<software name="creadcol">
+		<description>Creative Reader Collection</description>
+		<year>1995</year>
+		<publisher>Novotrade / Creative Wonders / EA Kids</publisher>
+		
+		<part name="cdrom1" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="around the world in 80 days (1994)(creative wonders)" sha1="40ad859399b9433d6c4e711f7bc6d20898cc1a45" />
+			</diskarea>
+		</part>
+		<part name="cdrom2" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="jungle book, the (1995)(creative wonders)" sha1="1495eb5a4c074d27697d49a895c79d049d6fbcfe" />
+			</diskarea>
+		</part>
+		<part name="cdrom3" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="peter pan (1993)(creative wonders)[mac-pc]" sha1="24d299e26e578f937eef7e2eb849c6be67348e1b" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- DOS -->
+	<software name="crimec">
+		<description>Crime City</description>
+		<year>1992</year>
+		<publisher>Impressions Games</publisher>
+		
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="crime city (1992)(impressions games)" sha1="40d53f138bab6b143a466d1610a1aa5f31d48a9e" />
 			</diskarea>
 		</part>
 	</software>
@@ -1363,6 +1560,98 @@
 		</part>
 	</software>
 
+	<!-- DOS / Windows 3.x -->
+	<software name="crusader2d">
+		<description>Crusader - No Regret (Germany)</description>
+		<year>1996</year>
+		<publisher>Origin</publisher>
+		
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="crusader - no regret (1996)(origin)(de)" sha1="45ccddf40803e6b3c0808fb4541d5adc02545793" />
+			</diskarea>
+		</part>
+	</software>	
+
+	<!-- DOS -->
+	<!-- Supports Cybermaxx VR headset -->
+	<software name="cyberbvr">
+		<description>CyberBykes - Shadow Racer VR</description>
+		<year>1995</year>
+		<publisher>GameTek</publisher>
+		
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="cyberbykes - shadow racer vr (1995)(gametek)" sha1="e700e236a8a6c7d699f42b6c2a99f9a4e68b3f4f" />
+			</diskarea>
+		</part>
+	</software>
+	
+	<!-- DOS -->
+	<software name="cyberia">
+		<description>Cyberia - Project Description (OEM)</description>
+		<year>1994</year>
+		<publisher>Interplay</publisher>
+		
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="cyberia - project description (1994)(interplay)[oem]" sha1="2e10b54535fe31919e3359d7bc83fae5b1e60821" />
+			</diskarea>
+		</part>
+	</software>
+	
+	<!-- partial version, contains about half of the game and bundled with sound cards etc. --> 
+	<software name="cyberian" cloneof="cyberia">
+		<description>Cyberia - Mission Norway (OEM v1.87)</description>
+		<year>1994</year>
+		<publisher>Interplay</publisher>
+		<info name="version" value="1.87" />
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="cyberia - mission norway v1.87 (1994)(interplay)(m3)[oem]" sha1="1" />
+			</diskarea>
+		</part>
+	</software>
+	
+	<!-- DOS / Windows 95 -->
+	<!-- 486 class at 50 MHz -->
+	<!-- Doesn't have install options, everything autodetects based off DOS env -->
+	<!-- TODO: cdrom fails loading under Win 95 version -->
+	<!-- TODO: SB16: no meaningful sound -->
+	<software name="cyberia2" supported="partial">
+		<description>Cyberia 2 - Resurrection</description>
+		<year>1995</year>
+		<publisher>Virgin / Xatrix Entertainment</publisher>
+		<info name="version" value="1.26E" />
+
+		<part name="cdrom1" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="cyberia 2 - resurrection (1995)(virgin)(disc 1 of 2)" sha1="e05b30e692fbd0cb07cc6334eb25c7284136759c" />
+			</diskarea>
+		</part>
+		<part name="cdrom2" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="cyberia 2 - resurrection (1995)(virgin)(disc 2 of 2)" sha1="c52a4e9c6d3196ae9d553f471ce79ba7825f6cda" />
+			</diskarea>
+		</part>
+	</software>
+	
+	<!-- DOS -->
+	<!-- TODO: General protection fault 0Dh at game launch --> 
+	<software name="cyberjud" supported="no">
+		<description>Cyber Judas</description>
+		<year>1996</year>
+		<publisher>Multi Media International</publisher>
+		<info name="version" value="1.0" />
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="cyber judas (1996)(multi media international)(nl)" sha1="4352708856baca0991790168eb626d38c8b17210" />
+			</diskarea>
+		</part>
+	</software>
+	
 	<!-- Pentium class 166 MHz / Direct X 7.0 -->
 	<!-- Windows 95/98/ME -->
 	<!-- TODO: some transparency issues -->
@@ -1752,6 +2041,7 @@
 		<year>1995</year>
 		<publisher>Ubi Soft</publisher>
 		<info name="version" value="1.21" />
+		
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="rayman" sha1="7e2eeda69210a4d862f3f3b29c8b984d4aa443fd" />
@@ -1761,8 +2051,8 @@
 
 	<!-- DOS / Windows 95 -->
 	<!-- TODO: no sound in DOS installer with SB16 --> 
-	<!-- TODO: eventually black screen when launching game in either OSes -->
-	<software name="redalert" supported="no">
+	<!-- TODO: With sound card black screens when launching game in either OSes -->
+	<software name="redalert" supported="partial">
 		<description>Command &amp; Conquer - Red Alert</description>
 		<year>1996</year>
 		<publisher>Virgin / Westwood Studios</publisher>
@@ -1779,11 +2069,12 @@
 		</part>
 	</software>
 	
-	<software name="redalertnl" cloneof="redalert" supported="no">
+	<software name="redalertnl" cloneof="redalert" supported="partial">
 		<description>Command &amp; Conquer - Red Alert (Netherlands)</description>
 		<year>1996</year>
 		<publisher>Dice / Westwood Studios</publisher>
-		
+		<info name="version" value="1.04" />
+
 		<part name="cdrom1" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="command &amp; conquer - red alert (1996)(dice)(nl)(disc 1 of 2)" sha1="447c8e11a29b9ce76d5088ef6be416da389dac26" />
@@ -1796,11 +2087,12 @@
 		</part>
 	</software>
 	
-	<software name="redalertbg" cloneof="redalert" supported="no">
+	<software name="redalertbg" cloneof="redalert" supported="partial">
 		<description>Command &amp; Conquer - Red Alert (Budget)</description>
 		<year>1996</year>
 		<publisher>Sold Out / Westwood Studios</publisher>
-		
+		<info name="version" value="1.04" />
+
 		<part name="cdrom1" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="command &amp; conquer - red alert (1996)(sold out)(disc 1 of 2)[budget]" sha1="583b3e6a9f504681cf35c5e8cc1643d2f7a60f1c" />
@@ -1813,11 +2105,12 @@
 		</part>
 	</software>
 	
-	<software name="redalertd" cloneof="redalert" supported="no">
+	<software name="redalertd" cloneof="redalert" supported="partial">
 		<description>Command &amp; Conquer Teil 2 - Alarmstufe Rot (Germany)</description>
 		<year>1996</year>
 		<publisher>Virgin / Westwood Studios</publisher>
-		
+		<info name="version" value="1.06" />
+
 		<part name="cdrom1" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="command &amp; conquer teil 2 - alarmstufe rot (1996)(virgin)(de)(disc 1 of 2)" sha1="14295fc24d0be6b63132ccb11c41ff5564b76151" />
@@ -1987,6 +2280,31 @@
 			</diskarea>
 		</part>
 	</software>
+	
+	<!-- DOS 3.30 -->
+	<software name="ultima7">
+		<description>The Complete Ultima VII</description>
+		<year>1995</year>
+		<publisher>Electronic Arts</publisher>
+		
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="complete ultima vii, the (1995)(electronic arts)" sha1="f4b80a35d8a1c395a13f5fa7bd6da7076313fd08" />
+			</diskarea>
+		</part>
+	</software>
+	
+	<software name="ultima7b" cloneof="ultima7">
+		<description>The Complete Ultima VII (Multi 3, Budget)</description>
+		<year>1995</year>
+		<publisher>Electronic Arts</publisher>
+		
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="complete ultima vii, the (1995)(electronic arts)(m3)[budget cd-rom classics]" sha1="240b3a30d288bf1c51b054bb27187f0457d5a012" />
+			</diskarea>
+		</part>
+	</software>
 
 	<!-- Windows 3.1 -->
 	<!-- Disc label: Cyberplasm_ -->
@@ -2064,6 +2382,9 @@
 			</diskarea>
 		</part>
 	</software>	
+	
+
+
 	
 	<!--                                         -->
 	<!-- Drivers / Utilities / Operating Systems -->
