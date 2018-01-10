@@ -14,7 +14,7 @@
     - Fix 36 character modes
     - Fix japanese character support, eg remove the extra underscore
     - Expansion Unit with 6 more ISA8 slots
-    - Proper waitstate support when 8088 CPU core admits it and remove the workaround in machine_start 
+    - Proper waitstate support when 8088 CPU core admits it and remove the workaround in machine_start
 
     PC INCOMPATIBILITIES:
     - COM card lives at io address 0x540
@@ -102,8 +102,80 @@ public:
 		, m_isabus(*this, "isa")
 		, m_centronics(*this, "centronics")
 	{ }
+public:
+	/* Interrupt controller */
+	DECLARE_WRITE_LINE_MEMBER( pic_int_w );
 
-	// PPI Port C uses
+	/* Parallel port */
+	DECLARE_READ8_MEMBER(ppi_portb_r);
+	DECLARE_WRITE8_MEMBER(ppi_portc_w);
+
+	/* DMA controller */
+	DECLARE_WRITE_LINE_MEMBER( hrq_w );
+	DECLARE_WRITE_LINE_MEMBER( tc_w );
+	DECLARE_WRITE8_MEMBER(dma_segment_w);
+	DECLARE_READ8_MEMBER(dma_memory_read_byte);
+	DECLARE_WRITE8_MEMBER(dma_memory_write_byte);
+	DECLARE_READ8_MEMBER( io_dack0_r )  { uint8_t tmp = m_isabus->dack_r(0); LOGDMA("%s: %02x\n", FUNCNAME, tmp); return tmp; }
+	DECLARE_READ8_MEMBER( io_dack1_r )  { uint8_t tmp = m_isabus->dack_r(1); LOGDMA("%s: %02x\n", FUNCNAME, tmp); return tmp; }
+	DECLARE_READ8_MEMBER( io_dack2_r )  { uint8_t tmp = m_isabus->dack_r(2); LOGDMA("%s: %02x\n", FUNCNAME, tmp); return tmp; }
+	DECLARE_READ8_MEMBER( io_dack3_r )  { uint8_t tmp = m_isabus->dack_r(3); LOGDMA("%s: %02x\n", FUNCNAME, tmp); return tmp; }
+	DECLARE_WRITE8_MEMBER( io_dack0_w ) { LOGDMA("%s: %02x\n", FUNCNAME, data); m_isabus->dack_w(0,data); }
+	DECLARE_WRITE8_MEMBER( io_dack1_w ) { LOGDMA("%s: %02x\n", FUNCNAME, data); m_isabus->dack_w(1,data); }
+	DECLARE_WRITE8_MEMBER( io_dack2_w ) { LOGDMA("%s: %02x\n", FUNCNAME, data); m_isabus->dack_w(2,data); }
+	DECLARE_WRITE8_MEMBER( io_dack3_w ) { LOGDMA("%s: %02x\n", FUNCNAME, data); m_isabus->dack_w(3,data); }
+	DECLARE_WRITE_LINE_MEMBER( dack0_w ){ LOGDMA("%s: %d\n", FUNCNAME, state); select_dma_channel(0, state); }
+	DECLARE_WRITE_LINE_MEMBER( dack1_w ){ LOGDMA("%s: %d\n", FUNCNAME, state); select_dma_channel(1, state); }
+	DECLARE_WRITE_LINE_MEMBER( dack2_w ){ LOGDMA("%s: %d\n", FUNCNAME, state); select_dma_channel(2, state); }
+	DECLARE_WRITE_LINE_MEMBER( dack3_w ){ LOGDMA("%s: %d\n", FUNCNAME, state); select_dma_channel(3, state); }
+
+	/* Timer */
+	DECLARE_WRITE_LINE_MEMBER( pit_out1_changed );
+
+	/* Video controller */
+	MC6845_UPDATE_ROW(crtc_update_row);
+
+	/* ISA+ Expansion bus */
+	DECLARE_WRITE_LINE_MEMBER( isa_irq5_w );
+	DECLARE_WRITE_LINE_MEMBER( isa_irq7_w );
+
+	/* Centronics  */
+	DECLARE_WRITE_LINE_MEMBER (centronics_ack_w);
+	DECLARE_WRITE_LINE_MEMBER (centronics_busy_w);
+	DECLARE_WRITE_LINE_MEMBER (centronics_perror_w);
+	DECLARE_WRITE_LINE_MEMBER (centronics_select_w);
+
+	/* Keyboard */
+	DECLARE_READ8_MEMBER(myb3k_kbd_r);
+	void kbd_set_data_and_interrupt(u8 data);
+
+	/* Video Controller */
+	DECLARE_WRITE8_MEMBER(myb3k_video_mode_w);
+
+	/* Monitor */
+	DECLARE_INPUT_CHANGED_MEMBER(monitor_changed);
+
+	/* Status bits */
+	DECLARE_READ8_MEMBER(myb3k_io_status_r);
+
+private:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
+	/* Interrupt Controller */
+	void pic_ir5_w(int source, int state);
+	void pic_ir7_w(int source, int state);
+
+	/* Jumper fields J4/J5 */
+	enum
+	{
+		PPI_PC3  = 0x01,
+		ISA_IRQ5 = 0x02,
+		ISA_IRQ7 = 0x04,
+		CENT_ACK = 0x08
+	};
+
+	/* Paralell port */
 	enum {
 		PC0_STROBE  = 0x01, // Printer interface
 		PC1_SETPAGE = 0x02, // Graphics circuit
@@ -115,11 +187,17 @@ public:
 		PC7_CMTEN   = 0x80  // Cassette or Speaker
 	};
 
+	/* DMA controller */
+	void select_dma_channel(int channel, bool state);
+
+	/* Timer */
 	enum
 	{
 		TIMER_ID_KEY_INTERRUPT
 	};
+		void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 
+	/* Status bits */
 	enum
 	{
 		IOSTAT_BUSY  = 0x01,
@@ -128,63 +206,6 @@ public:
 		IOSTAT_FAULT = 0x08
 	};
 
-	enum
-	{
-		PPI_PC3  = 0x01,
-		ISA_IRQ5 = 0x02,
-		ISA_IRQ7 = 0x04,
-		CENT_ACK = 0x08
-	};
-
-	DECLARE_INPUT_CHANGED_MEMBER(monitor_changed);
-
-	DECLARE_READ8_MEMBER(myb3k_kbd_r);
-	void kbd_set_data_and_interrupt(u8 data);
-
-	MC6845_UPDATE_ROW(crtc_update_row);
-	DECLARE_WRITE8_MEMBER(myb3k_video_mode_w);
-	DECLARE_WRITE8_MEMBER(myb3k_fdc_output_w);
-	uint32_t screen_update_myb3k(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE_LINE_MEMBER( isa_irq5_w );
-	DECLARE_WRITE_LINE_MEMBER( isa_irq7_w );
-	void pic_ir5_w(int source, int state);
-	void pic_ir7_w(int source, int state);
-	DECLARE_WRITE_LINE_MEMBER( pic_int_w );
-	DECLARE_WRITE_LINE_MEMBER( pit_out1_changed );
-
-	DECLARE_WRITE8_MEMBER(ppi_porta_w);
-	DECLARE_READ8_MEMBER(ppi_portb_r);
-	DECLARE_WRITE8_MEMBER(ppi_portc_w);
-
-	DECLARE_READ8_MEMBER( io_dack0_r ){ uint8_t tmp = m_isabus->dack_r(0); LOGDMA("%s: %02x\n", FUNCNAME, tmp); return tmp; }
-	DECLARE_READ8_MEMBER( io_dack1_r ){ uint8_t tmp = m_isabus->dack_r(1); LOGDMA("%s: %02x\n", FUNCNAME, tmp); return tmp; }
-	DECLARE_READ8_MEMBER( io_dack2_r ){ uint8_t tmp = m_isabus->dack_r(2); LOGDMA("%s: %02x\n", FUNCNAME, tmp); return tmp; }
-	DECLARE_READ8_MEMBER( io_dack3_r ){ uint8_t tmp = m_isabus->dack_r(3); LOGDMA("%s: %02x\n", FUNCNAME, tmp); return tmp; }
-	DECLARE_WRITE8_MEMBER( io_dack0_w ){ LOGDMA("%s: %02x\n", FUNCNAME, data); m_isabus->dack_w(0,data); }
-	DECLARE_WRITE8_MEMBER( io_dack1_w ){ LOGDMA("%s: %02x\n", FUNCNAME, data); m_isabus->dack_w(1,data); }
-	DECLARE_WRITE8_MEMBER( io_dack2_w ){ LOGDMA("%s: %02x\n", FUNCNAME, data); m_isabus->dack_w(2,data); }
-	DECLARE_WRITE8_MEMBER( io_dack3_w ){ LOGDMA("%s: %02x\n", FUNCNAME, data); m_isabus->dack_w(3,data); }
-	DECLARE_WRITE_LINE_MEMBER( dack0_w ) { LOGDMA("%s: %d\n", FUNCNAME, state); select_dma_channel(0, state); }
-	DECLARE_WRITE_LINE_MEMBER( dack1_w ) { LOGDMA("%s: %d\n", FUNCNAME, state); select_dma_channel(1, state); }
-	DECLARE_WRITE_LINE_MEMBER( dack2_w ) { LOGDMA("%s: %d\n", FUNCNAME, state); select_dma_channel(2, state); }
-	DECLARE_WRITE_LINE_MEMBER( dack3_w ) { LOGDMA("%s: %d\n", FUNCNAME, state); select_dma_channel(3, state); }
-	DECLARE_READ8_MEMBER(dma_memory_read_byte);
-	DECLARE_WRITE8_MEMBER(dma_memory_write_byte);
-	DECLARE_WRITE8_MEMBER(dma_segment_w);
-	DECLARE_READ8_MEMBER(myb3k_io_status_r);
-	DECLARE_WRITE_LINE_MEMBER( hrq_w );
-	DECLARE_WRITE_LINE_MEMBER( tc_w );
-	void select_dma_channel(int channel, bool state);
-
-        void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
-
-	// Centronics printer interface
-	DECLARE_WRITE_LINE_MEMBER (centronics_ack_w);
-	DECLARE_WRITE_LINE_MEMBER (centronics_busy_w);
-	DECLARE_WRITE_LINE_MEMBER (centronics_perror_w);
-	DECLARE_WRITE_LINE_MEMBER (centronics_select_w);
-
-protected:
 	required_device<cpu_device> m_maincpu;
 	required_device<ram_device> m_ram;
 	required_device<pic8259_device> m_pic8259;
@@ -196,30 +217,18 @@ protected:
 	required_device<h46505_device> m_crtc;
 	required_shared_ptr<uint8_t> m_vram;
 	required_device<isa8_device> m_isabus;
+	optional_device<centronics_device> m_centronics;
 	int m_dma_channel;
 	bool m_cur_tc;
 	uint8_t m_kbd_data; // Data inside the 74LS164 serial to parallel converter.
-	uint8_t m_kbd_second_byte;
-	uint8_t m_crtc_vreg[0x100],m_crtc_index;
 	uint8_t m_vmode;
 	rgb_t (*m_pal)[8];
 	rgb_t m_cpal[8];
 	rgb_t m_mpal[8];
 	uint8_t m_portc;
 	uint8_t m_dma_page[4]; // a 74670, 4 x 4 bit storage latch
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
-private:
-	optional_device<centronics_device> m_centronics;
-
 	int8_t m_io_status;
 };
-
-void myb3k_state::video_start()
-{
-	LOG("%s\n", FUNCNAME);
-}
 
 READ8_MEMBER(myb3k_state::myb3k_io_status_r)
 {
@@ -230,9 +239,10 @@ READ8_MEMBER(myb3k_state::myb3k_io_status_r)
 READ8_MEMBER( myb3k_state::myb3k_kbd_r )
 {
 	LOGKBD("%s: %02x\n", FUNCNAME, m_kbd_data);
-	// IN from port 0x04 enables a 74LS244 buffer that
-	// presents to the CPU the parallell bits from the 74LS164
-	// serial to parallel converter.
+
+	/* IN from port 0x04 enables a 74LS244 buffer that
+	   presents to the CPU the parallell bits from the 74LS164
+	   serial to parallel converter.*/
 	m_pic8259->ir1_w(CLEAR_LINE);
 	return m_kbd_data;
 }
@@ -240,11 +250,13 @@ READ8_MEMBER( myb3k_state::myb3k_kbd_r )
 void myb3k_state::kbd_set_data_and_interrupt(u8 data) {
 	LOGKBD("%s: %02x\n", FUNCNAME, data);
 	m_kbd_data = data;
-	// The INT7 line is pulled low when a clock is detected from the keyboard.
+
+	/* The INT7 line is pulled low when a clock is detected from the keyboard. */
 	m_pic8259->ir1_w(CLEAR_LINE);
-	// When the clock stops, the INT7 line goes back high. This triggers the interrupt.
-	// We simulate the time it takes to send the 8 bits over the serial line
-	// here. It should be 0.8ms but is rounded off to 1ms.
+
+	/* When the clock stops, the INT7 line goes back high. This triggers the interrupt.
+	   We simulate the time it takes to send the 8 bits over the serial line
+	   here. It should be 0.8ms but is rounded off to 1ms. */
 	timer_set(attotime::from_msec(1), TIMER_ID_KEY_INTERRUPT);
 }
 
@@ -253,15 +265,15 @@ void myb3k_state::device_timer(emu_timer &timer, device_timer_id id, int param, 
 	switch (id)
 	{
 	case TIMER_ID_KEY_INTERRUPT:
-  	        // The serial transfer of 8 bits is complete. Now trigger INT7.
-	        m_pic8259->ir1_w(ASSERT_LINE);
+		/* The serial transfer of 8 bits is complete. Now trigger INT7. */
+		m_pic8259->ir1_w(ASSERT_LINE);
 		break;
 	}
 }
 
 MC6845_UPDATE_ROW( myb3k_state::crtc_update_row )
 {
-	/* The 6845 is not programmed to get 80 character modes or 400 pixels width but this is managed by external circuitry that selects 
+	/* The 6845 is not programmed to get 80 character modes or 400 pixels width but this is managed by external circuitry that selects
 	   the apropriate pixelclock based on the video mode latch at i/o address 0x04. This callback always get x_count set to 40  */
 	for (int x_pos = 0; x_pos < (m_vmode & 0x02 ? x_count * 2 : x_count); x_pos++)
 	{
@@ -274,7 +286,7 @@ MC6845_UPDATE_ROW( myb3k_state::crtc_update_row )
 				bitmap.pix32(y, ( x_pos * 8) + pxl) = rgb_t::black();
 			}
 		}
-		else 
+		else
 		{
 			uint32_t rowstart;
 			uint32_t pdat;
@@ -310,10 +322,11 @@ MC6845_UPDATE_ROW( myb3k_state::crtc_update_row )
 				}
 				break;
 
-			case 6: // 640x400, 80 char, white on black -  fall through to case 2 if monochrome monitor
-			  /* Mode 6 is an interlaced mode so should induce flicker on the color monitor but be ok on the monochrome green monitor */
+			case 6: /* 640x400, 80 char, white on black -  fall through to case 2 if monochrome monitor
+			       Mode 6 is an interlaced mode so should induce flicker on the color monitor but be
+			       ok on the monochrome green monitor */
 
-			case 2: // 640x200, 80 char, white on black
+			case 2: /* 640x200, 80 char, white on black */
 				rowstart = (((x_pos + ma * 2) * 16 + ra) & 0x7fff) + page;
 				pdat16 = m_vram[rowstart];
 				if (pdat16 != 0)
@@ -392,7 +405,7 @@ WRITE8_MEMBER( myb3k_state::myb3k_video_mode_w )
 			machine().first_screen()->configure(320, 200, rect, HZ_TO_ATTOSECONDS(50));
 		}
 		break;
-		
+
 	case 2: /* 640x200 - boots up in this mode */
 		{
 			LOGVMOD(" - 640x200, 80 char, white on black...\n");
@@ -400,7 +413,7 @@ WRITE8_MEMBER( myb3k_state::myb3k_video_mode_w )
 			machine().first_screen()->configure(640, 200, rect, HZ_TO_ATTOSECONDS(50));
 		}
 		break;
-		
+
 	case 3: /* Fail  */
 		LOGVMOD(" - bad mode...\n");
 		break;
@@ -501,8 +514,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(myb3k_io, AS_IO, 8, myb3k_state)
 	ADDRESS_MAP_UNMAP_LOW
-	// Main Unit 0-0x7ff
-
+	/* Main Unit 0-0x7ff */
 	// 0-3 8255A PPI parallel port
 	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("ppi", i8255_device, read, write)
 
@@ -525,7 +537,8 @@ static ADDRESS_MAP_START(myb3k_io, AS_IO, 8, myb3k_state)
 	// 1c-1d HD46505S CRTC
 	AM_RANGE(0x1c, 0x1c) AM_DEVREADWRITE("crtc", h46505_device, status_r, address_w)
 	AM_RANGE(0x1d, 0x1d) AM_DEVREADWRITE("crtc", h46505_device, register_r, register_w)
-	// Expansion Unit 0x800 - 0xfff
+
+	/* Expansion Unit 0x800 - 0xfff */
 ADDRESS_MAP_END
 
 /* Input ports - from Step/One service manual */
@@ -564,6 +577,7 @@ static INPUT_PORTS_START( myb3k )
 	PORT_DIPNAME( 0x80, 0x80, "Flexible Disk Drive type for boot" )  PORT_DIPLOCATION("SW1:8")
 	PORT_DIPSETTING(    0x00, "8-inch Flexible Disk Unit" )     // 0x520-0x524 range
 	PORT_DIPSETTING(    0x80, "5.25-inch Flexible Disk Drive" ) // 0x20-0x24 range
+
 	PORT_START("DSW2")
 	PORT_DIPNAME( 0x01, 0x00, "Check mode" )  PORT_DIPLOCATION("SW2:1") // ROM information
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
@@ -593,8 +607,9 @@ void myb3k_state::machine_start()
 {
 	LOG("%s\n", FUNCNAME);
 
-	// Color palette for use with a RGB color CRT monitor such as the 12" Ericsson DU4720:
-	// 76 degrees deflection, WxHxD: 373x375x428mm, Weight 12.8 Kg, 215x134.4mm display area, RGB signal with separate syncs
+	/* Color palette for use with a RGB color CRT monitor such as the 12" Ericsson DU4720:
+	   76 degrees deflection, WxHxD: 373x375x428mm, Weight 12.8 Kg, 215x134.4mm display area,
+	   RGB signal with separate syncs */
 	m_cpal[0] = rgb_t(  0,   0,   0); // black   0.29v
 	m_cpal[1] = rgb_t(  0,   0, 255); // blue    0.52v
 	m_cpal[2] = rgb_t(255,   0,   0); // red     0.58v
@@ -604,9 +619,9 @@ void myb3k_state::machine_start()
 	m_cpal[6] = rgb_t(255, 255,   0); // yellow  0.90v
 	m_cpal[7] = rgb_t(255, 255, 255); // white   1.04v
 
-	// Monochrome offset based on the voltage levels from the Service Manual, relation between colors anc voltage might
-	// not be linear though so may need visual tweaking for a Green P39 phospor CRT such as the 12" Ericsson DU4721 
-	// 90 degrees deflection, WxHxD: 373x370x351mm, Weight 9.3 Kg, 215x134.4mm display area, Composite video signal
+	/* Monochrome offset based on the voltage levels from the Service Manual, relation between colors anc voltage might
+	   not be linear though so may need visual tweaking for a Green P39 phospor CRT such as the 12" Ericsson DU4721
+	   90 degrees deflection, WxHxD: 373x370x351mm, Weight 9.3 Kg, 215x134.4mm display area, Composite video signal */
 	m_mpal[0] = rgb_t((uint8_t)(( (0.29 - 0.29) / (1.04 - 0.29) ) * 74), (uint8_t)(( (0.29 - 0.29) / (1.04 - 0.29) ) * 255), 0); // 0.29v
 	m_mpal[1] = rgb_t((uint8_t)(( (0.52 - 0.29) / (1.04 - 0.29) ) * 74), (uint8_t)(( (0.52 - 0.29) / (1.04 - 0.29) ) * 255), 0); // 0.52v
 	m_mpal[2] = rgb_t((uint8_t)(( (0.58 - 0.29) / (1.04 - 0.29) ) * 74), (uint8_t)(( (0.58 - 0.29) / (1.04 - 0.29) ) * 255), 0); // 0.58v
@@ -616,17 +631,28 @@ void myb3k_state::machine_start()
 	m_mpal[6] = rgb_t((uint8_t)(( (0.90 - 0.29) / (1.04 - 0.29) ) * 74), (uint8_t)(( (0.90 - 0.29) / (1.04 - 0.29) ) * 255), 0); // 0.90v
 	m_mpal[7] = rgb_t((uint8_t)(( (1.04 - 0.29) / (1.04 - 0.29) ) * 74), (uint8_t)(( (1.04 - 0.29) / (1.04 - 0.29) ) * 255), 0); // 1.04v
 
+	/* Init a default palette */
 	m_pal = &m_mpal; // In case screen starts rendering before machine_reset where we read the settings
 
-	// CPU can only access RAM 50% of the time and the CRTC the other 50%. This waitstate workaround gives
-	// close enough performance of the DOS 1.25 "basica demo" compared to the real hardware
+	/* CPU can only access RAM 50% of the time and the CRTC the other 50%. This waitstate workaround gives
+	   close enough performance of the DOS 1.25 "basica demo" compared to the real hardware */
 	m_maincpu->set_clock_scale(0.5f);
 
-	/* setup ram */
+	/* Setup ram */
 	m_maincpu->space(AS_PROGRAM).install_ram(0, m_ram->size() - 1, m_ram->pointer());
 
+	/* No key presses allowed yet */
 	m_kbd_data = 0;
 
+	save_item (NAME (m_dma_channel));
+	save_item (NAME (m_cur_tc));
+	save_item (NAME (m_kbd_data));
+	save_item (NAME (m_vmode));
+	save_item (NAME (m_portc));
+	save_item (NAME (*m_pal));
+	save_pointer(NAME(m_mpal), sizeof(m_mpal));
+	save_pointer(NAME(m_cpal), sizeof(m_cpal));
+	save_pointer(NAME(m_dma_page), sizeof(m_dma_page));
 	save_item (NAME (m_io_status));
 }
 
@@ -670,19 +696,19 @@ WRITE_LINE_MEMBER(myb3k_state::pic_int_w)
 	m_maincpu->set_input_line(0, state);
 }
 
-// pic_ir5_w - select interrupt source depending on jumper J4 setting, either ISA IRQ5 or PPI PC3 (Light Pen)
+/* pic_ir5_w - select interrupt source depending on jumper J4 setting, either ISA IRQ5 or PPI PC3 (Light Pen) */
 void myb3k_state::pic_ir5_w(int source, int state)
 {
 	LOGPIC("%s: %d\n", FUNCNAME, state);
-	if (!machine().paused() && source & ioport("J4")->read())
+	if (!machine().paused() && (source & ioport("J4")->read()))
 		m_pic8259->ir5_w(state);
 }
 
-// pic_ir7_w - select interrupt source depending on jumper J5 setting, either ISA IRQ7 or Centronics Ack 
+/* pic_ir7_w - select interrupt source depending on jumper J5 setting, either ISA IRQ7 or Centronics Ack */
 void myb3k_state::pic_ir7_w(int source, int state)
 {
 	LOGPIC("%s: %d\n", FUNCNAME, state);
-	if (!machine().paused() && source & ioport("J5")->read())
+	if (!machine().paused() && (source & ioport("J5")->read()))
 		m_pic8259->ir7_w(state);
 }
 
@@ -701,6 +727,7 @@ WRITE8_MEMBER(myb3k_state::dma_segment_w)
 WRITE_LINE_MEMBER(myb3k_state::hrq_w)
 {
 	LOGDMA("%s: %d\n", FUNCNAME, state);
+
 	// Should connect to hold input clocked by DMA clock but hold isn't emulated
 	m_maincpu->set_input_line(INPUT_LINE_HALT, state);
 
@@ -715,6 +742,7 @@ READ8_MEMBER(myb3k_state::dma_memory_read_byte)
 	address_space& prog_space = m_maincpu->space(AS_PROGRAM);
 	uint8_t tmp = prog_space.read_byte(offset | m_dma_page[m_dma_channel & 3] << 16);
 	LOGDMA("%s: %x:%04x => %02x\n", FUNCNAME, m_dma_channel, offset, tmp);
+
 	return tmp;
 }
 
@@ -724,19 +752,14 @@ WRITE8_MEMBER(myb3k_state::dma_memory_write_byte)
 
 	address_space& prog_space = m_maincpu->space(AS_PROGRAM);
 	LOGDMA("%s: %x:%04x <= %02x\n", FUNCNAME, m_dma_channel, offset, data);
+
 	return prog_space.write_byte(offset |  m_dma_page[m_dma_channel & 3] << 16, data);
-}
-
-WRITE8_MEMBER( myb3k_state::ppi_porta_w )
-{
-	LOGCENT("%s: %02x\n", FUNCNAME, data);
-
-	return;
 }
 
 READ8_MEMBER( myb3k_state::ppi_portb_r )
 {
 	LOGPPI("%s\n", FUNCNAME);
+
 	return ioport("DSW1")->read();
 }
 
@@ -756,7 +779,7 @@ WRITE8_MEMBER( myb3k_state::ppi_portc_w )
 	/* Centronics strobe signal */
 	LOGCENT("Centronics strobe %d\n", (data & PC0_STROBE) ? 1 : 0);
 	m_centronics->write_strobe((data & PC0_STROBE) ? 1 : 0);
-	
+
 	/*
 	 * The actual logic around enabling the buzzer is a bit more complicated involving the cassette interface
 	 * According to the schematics gate1 is enabled if either
@@ -770,28 +793,25 @@ WRITE8_MEMBER( myb3k_state::ppi_portc_w )
 	pic_ir5_w(PPI_PC3, (data & PC3_LPENB) ? 1 : 0);
 
 	m_portc = data;
-	
+
 	return;
 }
 
-/* ISA IRQ5 handler
- */
+/* ISA IRQ5 handler */
 WRITE_LINE_MEMBER (myb3k_state::isa_irq5_w)
 {
 		LOGCENT("%s %d\n", FUNCNAME, state);
 		pic_ir5_w(ISA_IRQ5, state);
 }
 
-/* ISA IRQ7 handler
- */
+/* ISA IRQ7 handler */
 WRITE_LINE_MEMBER (myb3k_state::isa_irq7_w)
 {
 		LOGCENT("%s %d\n", FUNCNAME, state);
 		pic_ir7_w(ISA_IRQ7, state);
 }
 
-/* Centronics ACK handler
- */
+/* Centronics ACK handler */
 WRITE_LINE_MEMBER (myb3k_state::centronics_ack_w)
 {
 		LOGCENT("%s %d\n", FUNCNAME, state);
@@ -800,8 +820,7 @@ WRITE_LINE_MEMBER (myb3k_state::centronics_ack_w)
 
 /* Centronics BUSY handler
  * The busy line is enterring the schematics from the connector but is lost to its way to the status latch
- * but there is only two possibilities, either D0 or D1 
- */
+ * but there is only two possibilities, either D0 or D1  */
 WRITE_LINE_MEMBER (myb3k_state::centronics_busy_w){
 	LOGCENT("%s %d\n", FUNCNAME, state);
 	if (state == ASSERT_LINE)
@@ -810,8 +829,7 @@ WRITE_LINE_MEMBER (myb3k_state::centronics_busy_w){
 		m_io_status |= IOSTAT_BUSY;
 }
 
-/* Centronics PERROR handler
- */
+/* Centronics PERROR handler */
 WRITE_LINE_MEMBER (myb3k_state::centronics_perror_w){
 	LOGCENT("%s %d\n", FUNCNAME, state);
 	if (state == ASSERT_LINE)
@@ -820,27 +838,10 @@ WRITE_LINE_MEMBER (myb3k_state::centronics_perror_w){
 		m_io_status |= IOSTAT_FAULT;
 }
 
-/* Centronics SELECT handler
- * The centronics select signal is not used
- */
+/* Centronics SELECT handler - The centronics select signal is not used by this hardware */
 WRITE_LINE_MEMBER (myb3k_state::centronics_select_w){
 		LOGCENT("%s %d - not used by machine\n", FUNCNAME, state);
 }
-
-static const gfx_layout myb3k_charlayout =
-{
-	8, 8,
-	0x400,
-	1,
-	{ 0 },
-	{ STEP8(0,1) },
-	{ STEP8(0,8) },
-	8*8
-};
-
-static GFXDECODE_START( myb3k )
-	GFXDECODE_ENTRY( "ipl", 0x0000, myb3k_charlayout, 0, 1 )
-GFXDECODE_END
 
 static SLOT_INTERFACE_START(stepone_isa_cards)
 	SLOT_INTERFACE("myb3k_com", ISA8_MYB3K_COM)
@@ -855,43 +856,22 @@ static MACHINE_CONFIG_START( myb3k )
 	MCFG_CPU_IO_MAP(myb3k_io)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("pic", pic8259_device, inta_cb)
 
-	/* Expansion  bus */
-	MCFG_DEVICE_ADD("isa", ISA8, 0)
-	MCFG_ISA8_CPU(":maincpu")
-	MCFG_ISA_OUT_IRQ2_CB(DEVWRITELINE("pic", pic8259_device, ir2_w))
-	MCFG_ISA_OUT_IRQ3_CB(DEVWRITELINE("pic", pic8259_device, ir3_w))
-	MCFG_ISA_OUT_IRQ4_CB(DEVWRITELINE("pic", pic8259_device, ir4_w))
-	MCFG_ISA_OUT_IRQ5_CB(WRITELINE(myb3k_state, isa_irq5_w)) // Jumper J4 selectable
-	MCFG_ISA_OUT_IRQ6_CB(DEVWRITELINE("pic", pic8259_device, ir6_w))
-	MCFG_ISA_OUT_IRQ7_CB(WRITELINE(myb3k_state, isa_irq7_w)) // Jumper J5 selectable
-	//MCFG_ISA_OUT_DRQ0_CB(DEVWRITELINE("dma", i8257_device, dreq0_w)) // Part of ISA16 but not ISA8 standard but implemented on ISA8 B8 (SRDY) on this motherboard
-	MCFG_ISA_OUT_DRQ1_CB(DEVWRITELINE("dma", i8257_device, dreq1_w))
-	MCFG_ISA_OUT_DRQ2_CB(DEVWRITELINE("dma", i8257_device, dreq2_w))
-	MCFG_ISA_OUT_DRQ3_CB(DEVWRITELINE("dma", i8257_device, dreq3_w))
-	MCFG_ISA8_SLOT_ADD("isa", "isa1", stepone_isa_cards, "myb3k_fdc4711", false)
-	MCFG_ISA8_SLOT_ADD("isa", "isa2", stepone_isa_cards, "myb3k_com", false)
-	MCFG_ISA8_SLOT_ADD("isa", "isa3", stepone_isa_cards, nullptr, false)
+	/* RAM options */
+	MCFG_RAM_ADD(RAM_TAG)
+	MCFG_RAM_DEFAULT_SIZE("256K")
+	MCFG_RAM_EXTRA_OPTIONS("128K, 256K")
 
-	/* Interrupt Controller TODO: Add trampolin to read jumper J4 and J5 for IRQ sources */
-	/* Jumper J4 selects LPSTB or ISA interrupt 5 for IR5 */
-	/* Jumper J5 selects PRINT or ISA interrupt 7 for IR7 */
+	/* Interrupt controller */
 	MCFG_DEVICE_ADD("pic", PIC8259, 0)
 	MCFG_PIC8259_OUT_INT_CB(WRITELINE(myb3k_state, pic_int_w))
 
+	/* Parallel port */
 	MCFG_DEVICE_ADD("ppi", I8255A, 0)
 	MCFG_I8255_OUT_PORTA_CB(DEVWRITE8("cent_data_out", output_latch_device, write))
 	MCFG_I8255_IN_PORTB_CB(READ8(myb3k_state, ppi_portb_r))
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(myb3k_state, ppi_portc_w))
 
-	/* Centronics */
-	MCFG_CENTRONICS_ADD ("centronics", centronics_devices, "printer")
-	MCFG_CENTRONICS_ACK_HANDLER (WRITELINE (myb3k_state, centronics_ack_w))
-	MCFG_CENTRONICS_BUSY_HANDLER (WRITELINE (myb3k_state, centronics_busy_w))
-	MCFG_CENTRONICS_PERROR_HANDLER (WRITELINE (myb3k_state, centronics_perror_w))
-	MCFG_CENTRONICS_SELECT_HANDLER (WRITELINE (myb3k_state, centronics_select_w))
-	MCFG_CENTRONICS_OUTPUT_LATCH_ADD ("cent_data_out", "centronics")
-
-	/* DMA chip */
+	/* DMA controller */
 	MCFG_DEVICE_ADD("dma", I8257, XTAL_14_31818MHz / 6)
 	MCFG_I8257_OUT_HRQ_CB(WRITELINE(myb3k_state, hrq_w))
 	MCFG_I8257_OUT_TC_CB(WRITELINE(myb3k_state, tc_w))
@@ -910,7 +890,7 @@ static MACHINE_CONFIG_START( myb3k )
 	MCFG_I8257_OUT_DACK_2_CB(WRITELINE(myb3k_state, dack2_w))
 	MCFG_I8257_OUT_DACK_3_CB(WRITELINE(myb3k_state, dack3_w))
 
-	/* Timer chip */
+	/* Timer */
 	MCFG_DEVICE_ADD("pit", PIT8253, 0)
 	MCFG_PIT8253_CLK0(XTAL_14_31818MHz / 12.0) /* TIMINT straight into IRQ0 */
 	MCFG_PIT8253_OUT0_HANDLER(DEVWRITELINE("pic", pic8259_device, ir0_w))
@@ -919,29 +899,50 @@ static MACHINE_CONFIG_START( myb3k )
 	//  MCFG_PIT8253_CLK2(XTAL_14_31818MHz / 12.0) /* ANDed with port c bit 6 but marked as "not use"*/
 	//  MCFG_PIT8253_OUT2_HANDLER(WRITELINE(myb3k_state, pit_out2_changed))
 
-	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
-
-	MCFG_DEVICE_ADD("myb3k_keyboard", MYB3K_KEYBOARD, 0)
-	MCFG_MYB3K_KEYBOARD_CB(PUT(myb3k_state, kbd_set_data_and_interrupt))
-
-	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL_14_31818MHz / 3, 600, 0, 600, 400, 0, 400)
-	MCFG_SCREEN_UPDATE_DEVICE("crtc", h46505_device, screen_update)
-
-	/* devices */
+	/* Video controller */
 	MCFG_MC6845_ADD("crtc", H46505, "screen", XTAL_14_31818MHz / 16) /* Main crystal divided by 16 through a 74163 4 bit counter */
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(8)
 	MCFG_MC6845_UPDATE_ROW_CB(myb3k_state, crtc_update_row)
 
-	// dual ported ram
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("256K")
-	MCFG_RAM_EXTRA_OPTIONS("128K, 256K")
+	/* ISA8+ Expansion bus */
+	MCFG_DEVICE_ADD("isa", ISA8, 0)
+	MCFG_ISA8_CPU(":maincpu")
+	MCFG_ISA_OUT_IRQ2_CB(DEVWRITELINE("pic", pic8259_device, ir2_w))
+	MCFG_ISA_OUT_IRQ3_CB(DEVWRITELINE("pic", pic8259_device, ir3_w))
+	MCFG_ISA_OUT_IRQ4_CB(DEVWRITELINE("pic", pic8259_device, ir4_w))
+	MCFG_ISA_OUT_IRQ5_CB(WRITELINE(myb3k_state, isa_irq5_w)) // Jumper J4 selectable
+	MCFG_ISA_OUT_IRQ6_CB(DEVWRITELINE("pic", pic8259_device, ir6_w))
+	MCFG_ISA_OUT_IRQ7_CB(WRITELINE(myb3k_state, isa_irq7_w)) // Jumper J5 selectable
+	//MCFG_ISA_OUT_DRQ0_CB(DEVWRITELINE("dma", i8257_device, dreq0_w)) // Part of ISA16 but not ISA8 standard but implemented on ISA8 B8 (SRDY) on this motherboard
+	MCFG_ISA_OUT_DRQ1_CB(DEVWRITELINE("dma", i8257_device, dreq1_w))
+	MCFG_ISA_OUT_DRQ2_CB(DEVWRITELINE("dma", i8257_device, dreq2_w))
+	MCFG_ISA_OUT_DRQ3_CB(DEVWRITELINE("dma", i8257_device, dreq3_w))
+	MCFG_ISA8_SLOT_ADD("isa", "isa1", stepone_isa_cards, "myb3k_fdc4711", false)
+	MCFG_ISA8_SLOT_ADD("isa", "isa2", stepone_isa_cards, "myb3k_com", false)
+	MCFG_ISA8_SLOT_ADD("isa", "isa3", stepone_isa_cards, nullptr, false)
+
+	/* Centronics */
+	MCFG_CENTRONICS_ADD ("centronics", centronics_devices, "printer")
+	MCFG_CENTRONICS_ACK_HANDLER (WRITELINE (myb3k_state, centronics_ack_w))
+	MCFG_CENTRONICS_BUSY_HANDLER (WRITELINE (myb3k_state, centronics_busy_w))
+	MCFG_CENTRONICS_PERROR_HANDLER (WRITELINE (myb3k_state, centronics_perror_w))
+	MCFG_CENTRONICS_SELECT_HANDLER (WRITELINE (myb3k_state, centronics_select_w))
+	MCFG_CENTRONICS_OUTPUT_LATCH_ADD ("cent_data_out", "centronics")
+
+	/* Sound */
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+
+	/* Keyboard */
+	MCFG_DEVICE_ADD("myb3k_keyboard", MYB3K_KEYBOARD, 0)
+	MCFG_MYB3K_KEYBOARD_CB(PUT(myb3k_state, kbd_set_data_and_interrupt))
+
+	/* Monitor */
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_RAW_PARAMS(XTAL_14_31818MHz / 3, 600, 0, 600, 400, 0, 400)
+	MCFG_SCREEN_UPDATE_DEVICE("crtc", h46505_device, screen_update)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( jb3000, myb3k )
