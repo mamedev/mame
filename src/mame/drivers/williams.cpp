@@ -1680,7 +1680,6 @@ static MACHINE_CONFIG_DERIVED( blaster, blastkit )
 	/* sound hardware */
 	MCFG_DEVICE_REMOVE("speaker")
 	MCFG_DEVICE_REMOVE("dac")
-	MCFG_DEVICE_REMOVE("vref")
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 	MCFG_SOUND_ADD("ldac", MC1408, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.25) // unknown DAC
