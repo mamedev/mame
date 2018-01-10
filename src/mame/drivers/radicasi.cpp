@@ -20,6 +20,10 @@ public:
 	// screen updates
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
+	DECLARE_WRITE8_MEMBER(radicasi_500c_w);
+	DECLARE_WRITE8_MEMBER(radicasi_500d_w);
+	DECLARE_READ8_MEMBER(radicasi_50a8_r);
+
 protected:
 	// driver_device overrides
 	virtual void machine_start() override;
@@ -37,8 +41,32 @@ uint32_t radicasi_state::screen_update( screen_device &screen, bitmap_ind16 &bit
 	return 0;
 }
 
+WRITE8_MEMBER(radicasi_state::radicasi_500c_w)
+{
+	logerror("%s: radicasi_500c_w %02x\n", machine().describe_context().c_str(), data);
+}
+
+WRITE8_MEMBER(radicasi_state::radicasi_500d_w)
+{
+	logerror("%s: radicasi_500d_w %02x\n", machine().describe_context().c_str(), data);
+}
+
+READ8_MEMBER(radicasi_state::radicasi_50a8_r)
+{
+	logerror("%s: radicasi_50a8_r\n", machine().describe_context().c_str());
+	return 0x3f;
+}
+
 static ADDRESS_MAP_START( radicasi_map, AS_PROGRAM, 8, radicasi_state )
-	AM_RANGE(0x0000, 0x03ff) AM_RAM
+	AM_RANGE(0x0000, 0x3fff) AM_RAM
+	AM_RANGE(0x4800, 0x49ff) AM_RAM
+
+	AM_RANGE(0x500c, 0x500c) AM_WRITE(radicasi_500c_w)
+	AM_RANGE(0x500d, 0x500d) AM_WRITE(radicasi_500d_w)
+
+	AM_RANGE(0x50a8, 0x50a8) AM_READ(radicasi_50a8_r)
+	AM_RANGE(0x8000, 0xdfff) AM_ROM AM_REGION("maincpu", 0xfa000)
+
 	AM_RANGE(0xe000, 0xffff) AM_ROM AM_REGION("maincpu", 0xf8000)
 ADDRESS_MAP_END
 
@@ -58,6 +86,7 @@ static MACHINE_CONFIG_START( radicasi )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",M6502,8000000) // unknown frequency
 	MCFG_CPU_PROGRAM_MAP(radicasi_map)
+	//MCFG_CPU_VBLANK_INT_DRIVER("screen", radicasi_state,  irq0_line_hold) // just points to an RTI, there are various other jumps before the vector table that look like the real IRQs?
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
