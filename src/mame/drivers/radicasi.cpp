@@ -1,15 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood, R.Belmont
 
-/*
-
-There are no boot vectors in the rom, we have to force the CPU to execute the code that is at 0xf8000 in the ROM
-so it's possible there is a missing internal ROM, or the 6502 core is customized.
-
-As there is no interrupt vector either this may require a derived 6502 type to run.
-
-*/
-
 #include "emu.h"
 #include "cpu/m6502/m6502.h"
 #include "screen.h"
@@ -48,7 +39,7 @@ uint32_t radicasi_state::screen_update( screen_device &screen, bitmap_ind16 &bit
 
 static ADDRESS_MAP_START( radicasi_map, AS_PROGRAM, 8, radicasi_state )
 	AM_RANGE(0x0000, 0x03ff) AM_RAM
-	AM_RANGE(0xe000, 0xffff) AM_ROM AM_REGION("maincpu", 0xf8000) // very likely wrong, but we need to force the CPU somewhere to boot
+	AM_RANGE(0xe000, 0xffff) AM_ROM AM_REGION("maincpu", 0xf8000)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( radicasi )
@@ -60,8 +51,6 @@ void radicasi_state::machine_start()
 
 void radicasi_state::machine_reset()
 {
-	// force CPU somewhere due to lack of boot vectors
-	m_maincpu->set_state_int(M6502_PC, 0xe000);
 }
 
 static MACHINE_CONFIG_START( radicasi )
