@@ -133,7 +133,7 @@ void pgm2_state::postload()
 
 	if (m_has_decrypted_kov3_module)
 	{
-		decrypt_kov3_module(module_addr_xor, module_data_xor);
+		decrypt_kov3_module(module_key->addr_xor, module_key->data_xor);
 	}
 
 	if (m_has_decrypted)
@@ -381,7 +381,7 @@ WRITE16_MEMBER(pgm2_state::unk30120014_w)
 
  In case of KOV3 unlock sequence is:
   1) send via serial 0x0d and 64bit xor_value, result must be A3A3A3A36D6D6D6D
-  2) send via serial 0x25 and 64bit xor_value, store result as 64bit key (after xor with xor_value)
+  2) send via serial 0x25 and 64bit xor_value, result is 64bit key^xor_value
   3) read first 10h bytes from ROM area (at this point ROM area read as scrambled or random data)
   4) write "key" to ROM area, using 2x 16bit writes, offsets and data is bitfields of 64bit key:
       u32 key0, key1;
@@ -390,19 +390,14 @@ WRITE16_MEMBER(pgm2_state::unk30120014_w)
       rom[key0 >> 22] = (key0 >> 6) & 0xffff;
      it is possible, 22bit address xor value derived from 1st write offset.
      meaning of other 10bit offset and 2x data words is not clear - each of them can be either "key bits" or "magic word" expected by security device.
-  5) write static sequence of 4x words to ROM area
-  6) read "expected sum" from ROM area 10000002-10000009
+  5) write static sequence of 4x words to ROM area, which switch module to special mode - next 4x reads will return checksum^key parts instead of rom data.
+  6) read checksum from ROM area 10000002-10000009
   7) read first 10h bytes from ROM area and check they are not same as was at step 3)
-  8) perform whole ROM summing, result must match 64bit key xor "expected sum" read at step 6)
+  8) perform whole ROM summing, result must match key^checksum read at step 6)
 
  It is not clear if/how real address/data xor values derived from written "key",
  or security chip just waiting to be be written magic value at specific address in ROM area, and if this happen enable descrambling using hardcoded values.
-
- Current implementation assume "expected sum" read at step 6) is regular data from ROM (descrambled),
- our keys calculated assuming this, so further ROM sum check passes OK.
- But, there is chances in hardware its not like that, but these bytes comes from security IC (some indication of this is the fact 5) and 6) is actually single routine).
- In this case we have 2 unknowns (key and summ), but know only their xor result, so can not guess each. Will be needed serial comm logs or IGS036 internal SRAM dump from real hardware.
-*/
+ */
 
 READ_LINE_MEMBER(pgm2_state::module_data_r)
 {
@@ -434,7 +429,7 @@ WRITE_LINE_MEMBER(pgm2_state::module_clk_w)
 					break;
 				case 0x25: // get key
 					for (int i = 0; i < 8; i++)
-						module_send_buf[i] = module_key[i] ^ module_rcv_buf[i + 1];
+						module_send_buf[i] = module_key->key[i ^ 3] ^ module_rcv_buf[i + 1];
 					break;
 				default:
 					logerror("unknown FPGA command %02X!\n", module_rcv_buf[0]);
@@ -459,9 +454,44 @@ WRITE_LINE_MEMBER(pgm2_state::module_clk_w)
 	module_prev_state = state;
 }
 
-WRITE32_MEMBER(pgm2_state::module_scramble_w)
+READ16_MEMBER(pgm2_state::module_rom_r)
 {
-	decrypt_kov3_module(module_addr_xor, module_data_xor);
+	if (module_sum_read && offset > 0 && offset < 5) // checksum read mode
+	{
+		if (offset == 4)
+			module_sum_read = false;
+		uint32_t offs = ((offset - 1) * 2) ^ 2;
+		return (module_key->sum[offs] ^ module_key->key[offs]) | ((module_key->sum[offs + 1] ^ module_key->key[offs + 1]) << 8);
+	}
+
+	return ((uint16_t *)memregion("user1")->base())[offset];
+}
+
+WRITE16_MEMBER(pgm2_state::module_rom_w)
+{
+	//printf("module write %04X at %08X\n", data, offset);
+	switch (data)
+	{
+	case 0x4947: // "IG" 1st part of key
+		break;
+	case 0xc2b1: // 2nd part of key, assume it enables descramble
+		// might be wrong and normal data access enabled only after whole sequence complete
+		decrypt_kov3_module(module_key->addr_xor, module_key->data_xor);
+		break;
+	// following might be wrong, and trigger is address or both
+	case 0x00c2: // checksum read mode enable, step 1 and 4
+		module_sum_read = true;
+		if (offset != 0xe5a7 && offset != 0xa521)
+			popmessage("module write %04X at %08X\n", data, offset);
+		break;
+	case 0x0084: // checksum read mode enable, step 2 and 3
+		if (offset != 0x5e7a && offset != 0x5a12)
+			popmessage("module write %04X at %08X\n", data, offset);
+		break;
+	default:
+		popmessage("module write %04X at %08X\n", data, offset);
+		break;
+	}
 }
 
 // very primitive Atmel ARM PIO simulation, should be improved and devicified
@@ -557,7 +587,8 @@ static ADDRESS_MAP_START( pgm2_ram_rom_map, AS_PROGRAM, 32, pgm2_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( pgm2_module_rom_map, AS_PROGRAM, 32, pgm2_state )
-	AM_RANGE(0x10014a40, 0x10014a43) AM_WRITE(module_scramble_w)
+	AM_RANGE(0x10000000, 0x107fffff) AM_WRITE16(module_rom_w, 0xffffffff)
+	AM_RANGE(0x10000000, 0x1000000f) AM_READ16(module_rom_r, 0xffffffff)
 	AM_RANGE(0xfffff430, 0xfffff433) AM_WRITE(pio_sodr_w)
 	AM_RANGE(0xfffff434, 0xfffff437) AM_WRITE(pio_codr_w)
 	AM_RANGE(0xfffff43c, 0xfffff43f) AM_READ(pio_pdsr_r)
@@ -672,6 +703,7 @@ void pgm2_state::machine_start()
 	save_item(NAME(m_share_bank));
 	save_item(NAME(pio_out_data));
 	save_item(NAME(module_in_latch));
+	save_item(NAME(module_sum_read));
 	save_item(NAME(module_out_latch));
 	save_item(NAME(module_prev_state));
 	save_item(NAME(module_clk_cnt));
@@ -696,6 +728,7 @@ void pgm2_state::machine_reset()
 
 	pio_out_data = 0;
 	module_prev_state = 0;
+	module_sum_read = false;
 	module_clk_cnt = 151; // this needed because of "false" clock pulse happen during gpio init
 }
 
@@ -1367,9 +1400,10 @@ DRIVER_INIT_MEMBER(pgm2_state,ddpdojt)
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x20021e04, 0x20021e07, read32_delegate(FUNC(pgm2_state::ddpdojt_speedup2_r), this));
 }
 
-static const uint8_t kov3_100_key[] = { 0xde, 0x29, 0x52, 0x84, 0x71, 0x9e, 0xed, 0x66 };
-static const uint8_t kov3_102_key[] = { 0x0e, 0x49, 0x9f, 0x1b, 0xca, 0x14, 0xec, 0x33 };
-static const uint8_t kov3_104_key[] = { 0xaf, 0x35, 0x5f, 0xf9, 0x63, 0x78, 0xe8, 0xf9 };
+// currently we don't know how to derive address/data xor values from real keys, so we need both
+static const kov3_module_key kov3_104_key = { { 0x40,0xac,0x30,0x00,0x47,0x49,0x00,0x00 } ,{ 0xeb,0x7d,0x8d,0x90,0x2c,0xf4,0x09,0x82 }, 0x18ec71, 0xb89d }; // fake zero-key
+static const kov3_module_key kov3_102_key = { { 0x49,0xac,0xb0,0xec,0x47,0x49,0x95,0x38 } ,{ 0x09,0xbd,0xf1,0x31,0xe6,0xf0,0x65,0x2b }, 0x021d37, 0x81d0 };
+static const kov3_module_key kov3_100_key = { { 0x40,0xac,0x30,0x00,0x47,0x49,0x00,0x00 } ,{ 0x96,0xf0,0x91,0xe1,0xb3,0xf1,0xef,0x90 }, 0x3e8aa8, 0xc530 }; // fake zero-key
 
 DRIVER_INIT_MEMBER(pgm2_state,kov3)
 {
@@ -1394,23 +1428,19 @@ void pgm2_state::decrypt_kov3_module(uint32_t addrxor, uint16_t dataxor)
 
 DRIVER_INIT_MEMBER(pgm2_state, kov3_104)
 {
-	// currently we don't know how to derive address/data xor values from real keys, so we need both
-	module_addr_xor = 0x18ec71; module_data_xor = 0xb89d;
-	module_key = kov3_104_key;
+	module_key = &kov3_104_key;
 	DRIVER_INIT_CALL(kov3);
 }
 
 DRIVER_INIT_MEMBER(pgm2_state, kov3_102)
 {
-	module_addr_xor = 0x021d37; module_data_xor = 0x81d0;
-	module_key = kov3_102_key;
+	module_key = &kov3_102_key;
 	DRIVER_INIT_CALL(kov3);
 }
 
 DRIVER_INIT_MEMBER(pgm2_state, kov3_100)
 {
-	module_addr_xor = 0x3e8aa8; module_data_xor = 0xc530;
-	module_key = kov3_100_key;
+	module_key = &kov3_100_key;
 	DRIVER_INIT_CALL(kov3);
 }
 
