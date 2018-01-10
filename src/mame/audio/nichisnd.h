@@ -14,7 +14,6 @@
 #include "cpu/z80/tmpz84c011.h"
 #include "sound/3812intf.h"
 #include "sound/dac.h"
-#include "sound/volt_reg.h"
 #include "speaker.h"
 #include "machine/gen_latch.h"
 

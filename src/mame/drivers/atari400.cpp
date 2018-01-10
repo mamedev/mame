@@ -49,7 +49,6 @@
 #include "machine/atarifdc.h"
 #include "sound/dac.h"
 #include "sound/pokey.h"
-#include "sound/volt_reg.h"
 #include "bus/a800/a800_slot.h"
 #include "bus/a800/a800_carts.h"
 #include "bus/a800/a8sio.h"
@@ -2125,8 +2124,7 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( atari_common, atari_common_nodac )
 	MCFG_SOUND_ADD("dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.03)
-	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT)
+	MCFG_SOUND_REFERENCE_INPUT(DAC_VREF_POS_INPUT, 1.0)
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
