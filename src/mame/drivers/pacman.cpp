@@ -613,11 +613,11 @@ READ8_MEMBER(pacman_state::maketrax_special_port2_r)
 		0x00, 0xc0, 0x00, 0x40, 0x00, 0xc0, 0x00, 0x40, 0xc0, 0x40, 0x00, 0xc0, 0x00, 0x40
 	};
  
-	if (m_maketrax_disable_protection == 0)
-		return protdata[m_maketrax_offset];
-
 	uint8_t data = ioport("DSW1")->read() & 0x3f;
  
+	if (m_maketrax_disable_protection == 0)
+		return protdata[m_maketrax_offset] | data;
+
 	switch (offset)
 	{
 		case 0x01:
