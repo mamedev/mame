@@ -35340,6 +35340,9 @@ twinbratb                       // (c) 1995
 @source:stratos.cpp
 stratos                         // Kasparov Stratos Chess Computer
 
+@source:strkzn.cpp
+strkzn                          // (c) 1994 Purple Star
+
 @source:strnskil.cpp
 banbam                          // TVG16 (c) 1984 Sun Electronics
 guiness                         // TVG15 (c) 1984 Sun Electronics
