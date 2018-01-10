@@ -65,9 +65,6 @@ READ8_MEMBER(radicasi_state::radicasi_500d_r)
 
 WRITE8_MEMBER(radicasi_state::radicasi_500d_w)
 {
-	// but it ends up writing 0x00 here after 0x80/0x81 (which seem to ram tests)
-	// hopefully it isn't banking in an internal rom...
-
 	logerror("%s: radicasi_500d_w %02x\n", machine().describe_context().c_str(), data);
 	m_500d_data = data;
 	m_bank->set_bank(m_500d_data);
@@ -91,7 +88,7 @@ static ADDRESS_MAP_START( radicasi_map, AS_PROGRAM, 8, radicasi_state )
 	AM_RANGE(0x4800, 0x49ff) AM_RAM
 
 	AM_RANGE(0x500c, 0x500c) AM_WRITE(radicasi_500c_w)
-	AM_RANGE(0x500d, 0x500d) AM_WRITE(radicasi_500d_w)
+	AM_RANGE(0x500d, 0x500d) AM_READWRITE(radicasi_500d_r, radicasi_500d_w)
 
 	AM_RANGE(0x5041, 0x5041) AM_READ(radicasi_5041_r)
 
