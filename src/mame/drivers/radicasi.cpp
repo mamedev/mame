@@ -14,7 +14,8 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_ram(*this, "ram"),
-		m_bank(*this, "bank")
+		m_bank(*this, "bank"),
+		m_gfxdecode(*this, "gfxdecode")
 	{ }
 
 	// screen updates
@@ -37,17 +38,57 @@ private:
 	required_device<cpu_device> m_maincpu;
 	required_shared_ptr<uint8_t> m_ram;
 	required_device<address_map_bank_device> m_bank;
+	required_device<gfxdecode_device> m_gfxdecode;
 
 	uint8_t m_500d_data;
 
+	int m_hackmode;
 };
 
 void radicasi_state::video_start()
 {
+	m_hackmode = 0;
 }
 
 uint32_t radicasi_state::screen_update( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
+	bitmap.fill(0, cliprect);
+
+	if(machine().input().code_pressed_once(KEYCODE_Q))
+		m_hackmode^=1;
+
+	// it is unclear if the tilemap is an internal structure or something actually used by the video rendering
+	int offs = 0x600;
+
+	if (m_hackmode == 0) // 16x16 tiles (menu)
+	{
+		gfx_element *gfx = m_gfxdecode->gfx(1);
+
+		for (int y = 0; y < 16; y++)
+		{
+			for (int x = 0; x < 16; x++)
+			{
+				int tile = m_ram[offs];
+				gfx->transpen(bitmap,cliprect,tile,0,0,0,x*16,y*16,0);			
+				offs+=4;
+			}
+		}
+	}
+	else if (m_hackmode == 1) // 8x8 tiles (games?)
+	{
+		gfx_element *gfx = m_gfxdecode->gfx(0);
+
+		for (int y = 0; y < 32; y++)
+		{
+			for (int x = 0; x < 32; x++)
+			{
+				int tile = m_ram[offs];
+				gfx->transpen(bitmap,cliprect,tile,0,0,0,x*8,y*8,0);			
+				offs+=4;
+			}
+		}
+	}
+
 	return 0;
 }
 
@@ -139,6 +180,37 @@ void radicasi_state::machine_reset()
 {
 }
 
+// these are fake, should be decoded from RAM, or not tile based (although game does seem to have 'tilemap' structures in RAM
+static const gfx_layout helper_layout =
+{
+	8,8,
+	RGN_FRAC(1,1),
+	4,
+	{ 0,1,2,3 },
+	{ STEP8(0,4) },
+	{ STEP8(0,32) },
+	8 * 32
+};
+
+static const gfx_layout helper2_layout =
+{
+	16,16,
+	RGN_FRAC(1,1),
+	4,
+	{ 0,1,2,3 },
+	{ STEP16(0,4) },
+	{ STEP16(0,64) },
+	16 * 64
+};
+
+
+static GFXDECODE_START( radicasi_fake )
+	GFXDECODE_ENTRY( "maincpu", 0, helper_layout,  0x0, 16  )
+	GFXDECODE_ENTRY( "maincpu", 0, helper2_layout,  0x0, 16  )
+GFXDECODE_END
+
+
+
 static MACHINE_CONFIG_START( radicasi )
 
 	/* basic machine hardware */
@@ -160,10 +232,12 @@ static MACHINE_CONFIG_START( radicasi )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
 	MCFG_SCREEN_UPDATE_DRIVER(radicasi_state, screen_update)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 28*8-1)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 256)
+
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", radicasi_fake)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
