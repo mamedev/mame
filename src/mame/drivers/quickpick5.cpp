@@ -48,6 +48,24 @@ public:
 	K05324X_CB_MEMBER(sprite_callback);
 	TILE_GET_INFO_MEMBER(ttl_get_tile_info);
 
+	READ8_MEMBER(control_r) { return m_control; }
+
+	READ8_MEMBER(inp_magic_r) { return 0xff; }
+
+	WRITE8_MEMBER(control_w)
+	{
+		printf("%02x to control\n", data);
+		membank("bank1")->set_entry(data&0x1);
+		//m_k053245->set_rmrd_line((data & 0x40) ? ASSERT_LINE : CLEAR_LINE);
+		if (((m_control & 0x60) != 0x60) && ((data & 0x60) == 0x60))
+		{
+			m_ttlrom_offset = 0;
+		}
+		m_control = data;
+	}
+
+	DECLARE_READ8_MEMBER(vram_r);
+
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -63,7 +81,20 @@ private:
 
 	int         m_ttl_gfx_index;
 	tilemap_t   *m_ttl_tilemap;
+	uint8_t     m_control;
+	int         m_ttlrom_offset;
 };
+
+READ8_MEMBER(quickpick5_state::vram_r)
+{
+	if ((m_control & 0x60) == 0x60)
+	{
+		uint8_t *ROM = memregion("ttl")->base();
+		return ROM[m_ttlrom_offset++];
+	}
+
+	return m_vram[offset];
+}
 
 void quickpick5_state::video_start()
 {
@@ -93,6 +124,8 @@ void quickpick5_state::video_start()
 
 	m_ttl_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(quickpick5_state::ttl_get_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 	m_ttl_tilemap->set_transparent_pen(0);
+
+	m_ttlrom_offset = 0;
 }
 
 TILE_GET_INFO_MEMBER(quickpick5_state::ttl_get_tile_info)
@@ -101,7 +134,8 @@ TILE_GET_INFO_MEMBER(quickpick5_state::ttl_get_tile_info)
 	int attr, code;
 
 	attr = lvram[BYTE_XOR_LE((tile_index<<1)+1)];
-	code = lvram[BYTE_XOR_LE((tile_index<<1))];
+	code = lvram[BYTE_XOR_LE((tile_index<<1))] | ((attr & 0xf) << 8);
+	attr >>= 4;
 
 	SET_TILE_INFO_MEMBER(m_ttl_gfx_index, code, attr, 0);
 }
@@ -125,11 +159,14 @@ K05324X_CB_MEMBER(quickpick5_state::sprite_callback)
 }
 
 static ADDRESS_MAP_START( quickpick5_main, AS_PROGRAM, 8, quickpick5_state )
-	AM_RANGE(0x0000, 0xbfff) AM_ROM AM_REGION("maincpu", 0)
-	AM_RANGE(0xd800, 0xdfff) AM_RAM	// stack
-	AM_RANGE(0xe000, 0xefff) AM_RAM	AM_SHARE("vram")
-//	AM_RANGE(0xf000, 0xf7ff) AM_RAM
-//	AM_RANGE(0xf800, 0xffff) AM_RAM
+	AM_RANGE(0x0000, 0x7fff) AM_ROM AM_REGION("maincpu", 0)
+	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
+	AM_RANGE(0xc000, 0xc000) AM_READWRITE(control_r, control_w)
+	AM_RANGE(0xd800, 0xdbff) AM_RAM // stack
+	AM_RANGE(0xdc40, 0xdc4f) AM_DEVREADWRITE("k053245", k05324x_device, k053244_r, k053244_w)
+	AM_RANGE(0xdcc1, 0xdcc1) AM_READ(inp_magic_r)
+	AM_RANGE(0xe000, 0xefff) AM_RAM AM_SHARE("vram") AM_READ(vram_r)
+	AM_RANGE(0xf000, 0xf7ff) AM_RAM AM_DEVREADWRITE("k053245", k05324x_device, k053245_r, k053245_w)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( quickpick5 )
@@ -137,6 +174,8 @@ INPUT_PORTS_END
 
 void quickpick5_state::machine_start()
 {
+	membank("bank1")->configure_entries(0, 0x2, memregion("maincpu")->base()+0x8000, 0x4000);
+	membank("bank1")->set_entry(0);
 }
 
 void quickpick5_state::machine_reset()
@@ -153,7 +192,7 @@ static MACHINE_CONFIG_START( quickpick5 )
 	MCFG_SCREEN_REFRESH_RATE(59.62)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(80, 400-1, 16, 240-1)
+	MCFG_SCREEN_VISIBLE_AREA(80, 464-1, 24, 264-1)
 	MCFG_SCREEN_UPDATE_DRIVER(quickpick5_state, screen_update_quickpick5)
 	MCFG_SCREEN_PALETTE("palette")
 
@@ -180,23 +219,23 @@ MACHINE_CONFIG_END
 
 ROM_START( quickp5 )
 	ROM_REGION( 0x10000, "maincpu", 0 ) /* main program */
-	ROM_LOAD( "117.10e.bin",  0x000000, 0x010000, CRC(3645e1a5) SHA1(7d0d98772f3732510e7a58f50a622fcec74087c3) ) 
+	ROM_LOAD( "117.10e.bin",  0x000000, 0x010000, CRC(3645e1a5) SHA1(7d0d98772f3732510e7a58f50a622fcec74087c3) )
 
 	ROM_REGION( 0x40000, "k053245", 0 )   /* sprites */
-	ROM_LOAD16_BYTE( "117-a02-7k.bin", 0x000000, 0x010000, CRC(745a1dc9) SHA1(33d876fb70cb802d62f87ad3721740e0961c7bec) ) 
-	ROM_LOAD16_BYTE( "117-a03-7l.bin", 0x000001, 0x010000, CRC(07ec6db7) SHA1(7a94efc5f313fee6b9b63b7d2b6ba1cbf4158900) ) 
-	ROM_LOAD16_BYTE( "117-a04-3l.bin", 0x000002, 0x010000, CRC(08dba5df) SHA1(2174be21c5a7db31ccc20ca0b88e4a94145776a5) ) 
-	ROM_LOAD16_BYTE( "117-a05-3k.bin", 0x000003, 0x010000, CRC(9b2d0501) SHA1(3f1c69ef101153da5ac3335585541006c42e954d) ) 
+	ROM_LOAD16_BYTE( "117-a02-7k.bin", 0x000003, 0x010000, CRC(745a1dc9) SHA1(33d876fb70cb802d62f87ad3721740e0961c7bec) )
+	ROM_LOAD16_BYTE( "117-a03-7l.bin", 0x000002, 0x010000, CRC(07ec6db7) SHA1(7a94efc5f313fee6b9b63b7d2b6ba1cbf4158900) )
+	ROM_LOAD16_BYTE( "117-a04-3l.bin", 0x000001, 0x010000, CRC(08dba5df) SHA1(2174be21c5a7db31ccc20ca0b88e4a94145776a5) )
+	ROM_LOAD16_BYTE( "117-a05-3k.bin", 0x000000, 0x010000, CRC(9b2d0501) SHA1(3f1c69ef101153da5ac3335585541006c42e954d) )
 
-	ROM_REGION( 0x80000, "ttl", 0 )	/* TTL text tilemap characters? */
-	ROM_LOAD( "117-18e.bin",  0x000000, 0x020000, CRC(10e0d1e2) SHA1(f4ba190814d5e3f3e910c9da24845b6ddb259bff) ) 
+	ROM_REGION( 0x80000, "ttl", 0 ) /* TTL text tilemap characters? */
+	ROM_LOAD( "117-18e.bin",  0x000000, 0x020000, CRC(10e0d1e2) SHA1(f4ba190814d5e3f3e910c9da24845b6ddb259bff) )
 
-	ROM_REGION( 0x20000, "okim6295", 0 )	/* OKIM6295 samples */
-	ROM_LOAD( "117-a01-2e.bin", 0x000000, 0x020000, CRC(3d8fbd01) SHA1(f350da2a4e7bfff9975188a39acf73415bd85b3d) ) 
+	ROM_REGION( 0x20000, "okim6295", 0 )    /* OKIM6295 samples */
+	ROM_LOAD( "117-a01-2e.bin", 0x000000, 0x020000, CRC(3d8fbd01) SHA1(f350da2a4e7bfff9975188a39acf73415bd85b3d) )
 
 	ROM_REGION( 0x80000, "pals", 0 )
-	ROM_LOAD( "054590.11g",   0x000000, 0x040000, CRC(0442621c) SHA1(2e79bea4e37028a3c1223fb4e3b3e12ccad2b39b) ) 
-	ROM_LOAD( "054591.12g",   0x040000, 0x040000, CRC(eaa92d8f) SHA1(7a430f11127148f0c035973ce21cfec4cb60ce9d) ) 
+	ROM_LOAD( "054590.11g",   0x000000, 0x040000, CRC(0442621c) SHA1(2e79bea4e37028a3c1223fb4e3b3e12ccad2b39b) )
+	ROM_LOAD( "054591.12g",   0x040000, 0x040000, CRC(eaa92d8f) SHA1(7a430f11127148f0c035973ce21cfec4cb60ce9d) )
 
 ROM_END
 
