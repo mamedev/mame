@@ -217,32 +217,11 @@
 
   Dev notes:
 
-  Currently the program is resetting due to a couple of routines that
-  compare writes/reads and jump to offset 0000.
-  
-  002E5: F3          di
-  002E6: ED 5E       im    2
-  002E8: 31 F5 FE    ld    sp,$FEF5
-  002EB: CD C0 02    call  $02C0
-  002EE: 3E 44       ld    a,$44
-  002F0: D3 C3       out   ($C3),a
-  002F2: D3 C3       out   ($C3),a
-  002F4: 3E 5A       ld    a,$5A      ; loads $5A (bitpattern)
-  002F6: D3 C0       out   ($C0),a    ; out to DAC (through PPI, port A)
-  002F8: DB C0       in    a,($C0)    ; loads from DAC???
-  002FA: FE 5A       cp    $5A        ; compare for the same value like it was RAM
-  002FC: 28 04       jr    z,$00302   ; match?... jumps over the reset.
-  002FE: FB          ei               ; otherwise...
-  002FF: C3 00 00    jp    $0000      : RESET.
-  00302: 3E A5       ld    a,$A5      ; loads $A5 (inverted bitpattern)
-  00304: D3 C0       out   ($C0),a    ; out to DAC (through PPI, port A)
-  00306: DB C0       in    a,($C0)    ; loads from DAC???
-  00308: FE A5       cp    $A5        ; compare for the same value like it was RAM
-  0030A: 28 04       jr    z,$00310   ; match?... jumps over the reset.
-  0030C: FB          ei               ; otherwise...
-  0030D: C3 00 00    jp    $0000      : RESET.
-  00310: AF          xor   a
-  00311: D3 C0       out   ($C0),a
+  Not just the ROM, but all external read/write accesses may have
+  even and odd data lines swapped. The program includes subroutines
+  to perform this swapping, and the PPI needs it for initialization
+  (otherwise the invalid control word $44 gets written and the
+  program keeps resetting since the outputs can't be read back).
 
 *********************************************************************/
 
@@ -271,16 +250,22 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_v9938(*this, "v9938")
 		, m_maincpu(*this, "maincpu")
+		, m_ppi(*this, "ppi")
 		, m_dac(*this, "dac")
 	{ }
 
+	DECLARE_READ8_MEMBER(ppi_bitswap_r);
+	DECLARE_WRITE8_MEMBER(ppi_bitswap_w);
 	DECLARE_WRITE8_MEMBER(output_port_a_w);
-	DECLARE_READ8_MEMBER(input_port_a_r);
+	DECLARE_WRITE8_MEMBER(output_port_b_w);
+	DECLARE_READ8_MEMBER(input_port_c_r);
+	DECLARE_WRITE8_MEMBER(output_port_c_w);
 	DECLARE_DRIVER_INIT(luckybal);
 	uint8_t daclatch;
 
 	required_device<v9938_device> m_v9938;
 	required_device<cpu_device> m_maincpu;
+	required_device<i8255_device> m_ppi;
 	required_device<dac_byte_interface> m_dac;
 };
 
@@ -296,8 +281,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( main_io, AS_IO, 8, luckybal_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-//	AM_RANGE(0xc0, 0xc0) AM_DEVWRITE("dac", dac_byte_interface, write)
-	AM_RANGE(0xc0, 0xc3) AM_DEVREADWRITE("ppi8255", i8255_device, read, write)
+	AM_RANGE(0xc0, 0xc3) AM_READWRITE(ppi_bitswap_r, ppi_bitswap_w)
 	AM_RANGE(0xe0, 0xe3) AM_DEVREADWRITE("v9938", v9938_device, read, write)
 ADDRESS_MAP_END
 /*
@@ -350,6 +334,16 @@ M_MAP     EQU  90H    ; [A]= Bank to select (BIT6=MEM, BIT7=EN_NMI)
 *            R/W handlers             *
 **************************************/
 
+READ8_MEMBER(luckybal_state::ppi_bitswap_r)
+{
+	return bitswap<8>(m_ppi->read(space, offset), 6, 7, 4, 5, 2, 3, 0, 1);
+}
+
+WRITE8_MEMBER(luckybal_state::ppi_bitswap_w)
+{
+	m_ppi->write(space, offset, bitswap<8>(data, 6, 7, 4, 5, 2, 3, 0, 1));
+}
+
 WRITE8_MEMBER(luckybal_state::output_port_a_w)
 {
 	daclatch = data;
@@ -357,13 +351,24 @@ WRITE8_MEMBER(luckybal_state::output_port_a_w)
 
 	// DAC should be here.
 
-	logerror("Write to PPI port A: %02X\n", data);
+	logerror("%s: Write to PPI port A: %02X\n", machine().describe_context(), data);
 }
 
-READ8_MEMBER(luckybal_state::input_port_a_r)
+WRITE8_MEMBER(luckybal_state::output_port_b_w)
 {
-	return daclatch;
-	logerror("Read from PPI port A");
+	if ((data & 0xf8) != 0xf8)
+		logerror("%s: Write to PPI port B: %02X\n", machine().describe_context(), data);
+}
+
+READ8_MEMBER(luckybal_state::input_port_c_r)
+{
+	//logerror("%s: Read from PPI port C\n", machine().describe_context());
+	return 0xff;
+}
+
+WRITE8_MEMBER(luckybal_state::output_port_c_w)
+{
+	logerror("%s: Write to PPI port C: %02X\n", machine().describe_context(), data);
 }
 
 
@@ -463,13 +468,11 @@ static MACHINE_CONFIG_START( luckybal )
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_IO_MAP(main_io)
 
-	MCFG_DEVICE_ADD("ppi8255", I8255A, 0)  // PPI is initialized with 0x44: mode2/mode1
-	MCFG_I8255_IN_PORTA_CB(READ8(luckybal_state, input_port_a_r))
+	MCFG_DEVICE_ADD("ppi", I8255A, 0)
 	MCFG_I8255_OUT_PORTA_CB(WRITE8(luckybal_state, output_port_a_w))
-	MCFG_I8255_IN_PORTB_CB(LOGGER("PPI8255 - unmapped read port B"))
-	MCFG_I8255_OUT_PORTB_CB(LOGGER("PPI8255 - unmapped write port B"))
-	MCFG_I8255_IN_PORTC_CB(LOGGER("PPI8255 - unmapped read port C"))
-	MCFG_I8255_OUT_PORTC_CB(LOGGER("PPI8255 - unmapped write port C"))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(luckybal_state, output_port_b_w))
+	MCFG_I8255_IN_PORTC_CB(READ8(luckybal_state, input_port_c_r))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(luckybal_state, output_port_c_w))
 
 	/* video hardware */
 	MCFG_V9938_ADD("v9938", "screen", VDP_MEM, VID_CLOCK)
