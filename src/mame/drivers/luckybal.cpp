@@ -217,11 +217,15 @@
 
   Dev notes:
 
-  Not just the ROM, but all external read/write accesses may have
-  even and odd data lines swapped. The program includes subroutines
-  to perform this swapping, and the PPI needs it for initialization
-  (otherwise the invalid control word $44 gets written and the
-  program keeps resetting since the outputs can't be read back).
+  Not just the ROM, but most external read/write accesses may have
+  even and odd data lines swapped. The frequently-called subroutine
+  at $4A0D performs this swapping, and the PPI needs it for
+  initialization (otherwise the invalid control word $44 gets
+  written and the program keeps resetting when it can't read the
+  outputs back).
+
+  Currently the machine gets stuck polling the control register for
+  the Z180's unemulated clocked serial I/O.
 
 *********************************************************************/
 
@@ -254,6 +258,7 @@ public:
 		, m_dac(*this, "dac")
 	{ }
 
+	DECLARE_WRITE8_MEMBER(port90_bitswap_w);
 	DECLARE_READ8_MEMBER(ppi_bitswap_r);
 	DECLARE_WRITE8_MEMBER(ppi_bitswap_w);
 	DECLARE_WRITE8_MEMBER(output_port_a_w);
@@ -281,6 +286,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( main_io, AS_IO, 8, luckybal_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	AM_RANGE(0x90, 0x90) AM_WRITE(port90_bitswap_w)
 	AM_RANGE(0xc0, 0xc3) AM_READWRITE(ppi_bitswap_r, ppi_bitswap_w)
 	AM_RANGE(0xe0, 0xe3) AM_DEVREADWRITE("v9938", v9938_device, read, write)
 ADDRESS_MAP_END
@@ -333,6 +339,12 @@ M_MAP     EQU  90H    ; [A]= Bank to select (BIT6=MEM, BIT7=EN_NMI)
 /**************************************
 *            R/W handlers             *
 **************************************/
+
+WRITE8_MEMBER(luckybal_state::port90_bitswap_w)
+{
+	data = bitswap<8>(data, 6, 7, 4, 5, 2, 3, 0, 1);
+	logerror("%s: Write to port 90: %02X\n", machine().describe_context(), data);
+}
 
 READ8_MEMBER(luckybal_state::ppi_bitswap_r)
 {
