@@ -461,7 +461,7 @@ void beezer_state::machine_reset()
 
 static MACHINE_CONFIG_START( beezer )
 	// basic machine hardware
-	MCFG_CPU_ADD("maincpu", M6809, XTAL_12MHz / 12)
+	MCFG_CPU_ADD("maincpu", MC6809, XTAL_12MHz / 3)
 	MCFG_CPU_PROGRAM_MAP(main_map)
 
 	MCFG_DEVICE_ADD("sysbank", ADDRESS_MAP_BANK, 0)
@@ -497,7 +497,7 @@ static MACHINE_CONFIG_START( beezer )
 	MCFG_PALETTE_INIT_OWNER(beezer_state, beezer)
 
 	// sound hardware
-	MCFG_CPU_ADD("audiocpu", M6809, XTAL_4MHz / 4)
+	MCFG_CPU_ADD("audiocpu", MC6809, XTAL_4MHz)
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 
 	MCFG_INPUT_MERGER_ANY_HIGH("audio_irqs")

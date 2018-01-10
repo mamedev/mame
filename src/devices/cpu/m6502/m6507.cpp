@@ -23,9 +23,9 @@ m6507_device::m6507_device(const machine_config &mconfig, const char *tag, devic
 void m6507_device::device_start()
 {
 	if(direct_disabled)
-		mintf = new mi_6507_nd;
+		mintf = std::make_unique<mi_6507_nd>();
 	else
-		mintf = new mi_6507_normal;
+		mintf = std::make_unique<mi_6507_normal>();
 
 	init();
 }

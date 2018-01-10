@@ -210,14 +210,14 @@ READ32_MEMBER(backfire_state::backfire_eeprom_r)
 
 READ32_MEMBER(backfire_state::backfire_control2_r)
 {
-//  logerror("%08x:Read eprom %08x (%08x)\n", space.device().safe_pc(), offset << 1, mem_mask);
+//  logerror("%08x:Read eprom %08x (%08x)\n", m_maincpu->pc(), offset << 1, mem_mask);
 	return (m_eeprom->do_read() << 24) | m_io_in1->read() | (m_io_in1->read() << 16);
 }
 
 #ifdef UNUSED_FUNCTION
 READ32_MEMBER(backfire_state::backfire_control3_r)
 {
-//  logerror("%08x:Read eprom %08x (%08x)\n", space.device().safe_pc(), offset << 1, mem_mask);
+//  logerror("%08x:Read eprom %08x (%08x)\n", m_maincpu->pc(), offset << 1, mem_mask);
 	return (m_eeprom->do_read() << 24) | m_io_in2->read() | (m_io_in2->read() << 16);
 }
 #endif
@@ -687,7 +687,7 @@ void backfire_state::descramble_sound()
 	{
 		uint32_t addr;
 
-		addr = BITSWAP24 (x,23,22,21,0, 20,
+		addr = bitswap<24> (x,23,22,21,0, 20,
 							19,18,17,16,
 							15,14,13,12,
 							11,10,9, 8,
@@ -702,10 +702,10 @@ void backfire_state::descramble_sound()
 
 READ32_MEMBER(backfire_state::backfire_speedup_r)
 {
-	//osd_printf_debug( "%08x\n",space.device().safe_pc());
+	//osd_printf_debug( "%08x\n",m_maincpu->pc());
 
-	if (space.device() .safe_pc()== 0xce44)  space.device().execute().spin_until_time(attotime::from_usec(400)); // backfire
-	if (space.device().safe_pc() == 0xcee4)  space.device().execute().spin_until_time(attotime::from_usec(400)); // backfirea
+	if (m_maincpu->pc() == 0xce44) m_maincpu->spin_until_time(attotime::from_usec(400)); // backfire
+	if (m_maincpu->pc() == 0xcee4) m_maincpu->spin_until_time(attotime::from_usec(400)); // backfirea
 
 	return m_mainram[0x18/4];
 }

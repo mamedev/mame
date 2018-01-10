@@ -60,45 +60,6 @@ COMP( 1981, aaa, 0, 0, terminals, terminals, terminals_state, 0, "Ann Arbor", "A
 
 /**************************************************************************************************************
 
-Hewlett-Packard HP-700/92.
-Chips: TC5564APL-15, proprietory square chip, D70108C (V20), SCN2681, Beeper
-Crystals: 29.4912
-
-***************************************************************************************************************/
-
-ROM_START( hp700_92 )
-	ROM_REGION(0x20000, "maincpu", 0)
-	ROM_LOAD( "5181-8672.u803", 0x00000, 0x20000, CRC(21440d2f) SHA1(69a3de064ae2b18adc46c2fdd0bf69620375efe7) )
-ROM_END
-
-COMP( 1987, hp700_92, 0, 0, terminals, terminals, terminals_state, 0, "HP", "HP-700/92", MACHINE_IS_SKELETON )
-
-
-
-/**************************************************************************************************************
-
-Hewlett-Packard HP-2622A.
-Chips: National 8367 CRTC (labeled B8250), SY6551 (labeled 8251), Z8400A (Z80)
-Crystal: 25.7715
-
-***************************************************************************************************************/
-
-ROM_START( hp2622a )
-	ROM_REGION(0x10000, "maincpu", 0)
-	ROM_LOAD( "1818-1685.xu63", 0x0000, 0x2000, CRC(a57ffe5e) SHA1(4d7844320deba916d9ec289927af987fea025b02) )
-	ROM_LOAD( "1818-1686.xu64", 0x2000, 0x2000, CRC(bee9274c) SHA1(20796c559031a91cb2666776fcf7ffdb52a0a318) )
-	ROM_LOAD( "1818-1687.xu65", 0x4000, 0x2000, CRC(e9ecd489) SHA1(9b249b8d066d256069ccdb8809bb808c414f106a) )
-
-	ROM_REGION(0x2000, "chargen", 0)
-	ROM_LOAD( "1818-1489.xu311", 0x0000, 0x2000, CRC(9879b153) SHA1(fc1705d6de38eb6d3a67f1ae439e359e5124d028) )
-ROM_END
-
-COMP( 1982, hp2622a, 0, 0, terminals, terminals, terminals_state, 0, "HP", "HP-2622A", MACHINE_IS_SKELETON )
-
-
-
-/**************************************************************************************************************
-
 Qume QVT-70.
 Chips: Z80, Z80 DART, 5x CXK5864CM-70LL/W242575-70LL, 801000-02, 303489-01, DS1231, Button battery, Beeper
 Crystals: unreadable
@@ -112,30 +73,6 @@ ROM_START( qvt70 )
 ROM_END
 
 COMP( 1992, qvt70, 0, 0, terminals, terminals, terminals_state, 0, "Qume", "QVT-70", MACHINE_IS_SKELETON )
-
-
-
-/**************************************************************************************************************
-
-Qume QVT-102.
-Chips: HD46800DP (6800), HD46505SP (6845), HD46850P (6850), M58725P-15 (16k RAM), LH0082 (Z80CTC), Button battery
-Crystals: 16.6698
-Keyboard: D8748D, 6.000, Beeper
-
-***************************************************************************************************************/
-
-ROM_START( qvt102 )
-	ROM_REGION(0x10000, "maincpu", 0)
-	ROM_LOAD( "t205m.u8",   0x0000, 0x2000, CRC(59cc04f6) SHA1(ee2e3a3ea7b57a231483fcc74266f0f3f51204af) )
-
-	ROM_REGION(0x1000, "chargen", 0)
-	ROM_LOAD( "c3205m.u32", 0x0000, 0x1000, CRC(f6d86e87) SHA1(c0885e4a35095a730d760bf91a1cf4e8edd6a2bb) )
-
-	ROM_REGION(0x10000, "keyboard", 0)
-	ROM_LOAD( "k301.u302",  0x0000, 0x0400, CRC(67564b20) SHA1(5897ff920f8fae4aa498d3a4dfd45b58183c041d) )
-ROM_END
-
-COMP( 1983, qvt102, 0, 0, terminals, terminals, terminals_state, 0, "Qume", "QVT-102", MACHINE_IS_SKELETON )
 
 
 
@@ -166,26 +103,6 @@ COMP( 1983, qvt103, 0, 0, terminals, terminals, terminals_state, 0, "Qume", "QVT
 
 /**************************************************************************************************************
 
-Qume QVT-190.
-Chips: MC68B00P, 2x MC68B50P, MC68B45P, V61C16P55L, M5M5165P-70L, ABHGA101006, button battery, 7-DIL-jumper
-Crystal: unreadable
-
-***************************************************************************************************************/
-
-ROM_START( qvt190 )
-	ROM_REGION(0x10000, "maincpu", 0)
-	ROM_LOAD( "95987-267.u19", 0x0000, 0x8000, CRC(78894d8e) SHA1(0a0f6883dd18872bddeb3ed18ebe496080e6591b) )
-
-	ROM_REGION(0x2000, "chargen", 0)
-	ROM_LOAD( "95864-304.u17", 0x0000, 0x2000, CRC(2792e99b) SHA1(4a84d029d0e63975fc95dc7056d2523193dff986) )
-ROM_END
-
-COMP( 1987, qvt190, 0, 0, terminals, terminals, terminals_state, 0, "Qume", "QVT-190", MACHINE_IS_SKELETON )
-
-
-
-/**************************************************************************************************************
-
 Qume QVT-201.
 Chips: Z80A, SCN2681A, SCN2672B, 4x HM6116P-2, D446C-2, button battery
 Crystals: (from schematics, unreadable on photo) 48.654 MHz (Y1), 3.6864 MHz (Y2)
@@ -203,46 +120,6 @@ ROM_START( qvt201 )
 ROM_END
 
 COMP( 1986, qvt201, 0, 0, terminals, terminals, terminals_state, 0, "Qume", "QVT-201", MACHINE_IS_SKELETON )
-
-
-
-/**************************************************************************************************************
-
-Relisys TR175 II.
-Chips: MC68000P12, HM82C11C, SCN2681, 3x W24257-70L, KDA0476BCN-66 (RAMDAC), 4 undumped proms, Beeper, Button battery
-Crystals: 28.322, 46.448, 11.0592, unknown.
-Colour screen.
-
-***************************************************************************************************************/
-
-ROM_START( tr175 )
-	ROM_REGION(0x20000, "maincpu", 0)
-	ROM_LOAD16_BYTE( "v6.05.u50", 0x00000, 0x10000, CRC(5a33b6b3) SHA1(d673f50dd88f8a154ddaabe34cfcc9ab91435a4c) )
-	ROM_LOAD16_BYTE( "v6.05.u45", 0x00001, 0x10000, CRC(e220befe) SHA1(8402280577e6de4b85843222bbd6b06a3f625b3b) )
-ROM_END
-
-COMP( 1982, tr175, 0, 0, terminals, terminals, terminals_state, 0, "Relisys", "TR175II", MACHINE_IS_SKELETON )
-
-
-
-/**************************************************************************************************************
-
-Televideo TVI-912C.
-Chips: i8035, TMS9927NL, AY5-1013A (COM2502)
-Crystals: 23.814 (divide by 4 for CPU clock)
-Other: 1x 8-sw DIP, 1x 10-sw DIP (internal), 2x 10-sw DIP (available to user at the back)
-
-***************************************************************************************************************/
-
-ROM_START( tv912c )
-	ROM_REGION(0x10000, "maincpu", 0)
-	ROM_LOAD( "a49c1.bin",    0x0000, 0x1000, CRC(d21851bf) SHA1(28fe77a218a5eee11de376f5d16e9380b616b3ca) ) // last half is all FF
-
-	ROM_REGION(0x0800, "chargen", 0)
-	ROM_LOAD( "a3-2.bin",     0x0000, 0x0800, CRC(bb9a7fbd) SHA1(5f1c4d41b25bd3ca4dbc336873362935daf283da) )
-ROM_END
-
-COMP( 1978, tv912c, 0, 0, terminals, terminals, terminals_state, 0, "TeleVideo", "TVI-912C", MACHINE_IS_SKELETON )
 
 
 
@@ -286,87 +163,3 @@ ROM_START( tv965 )
 ROM_END
 
 COMP( 1989, tv965, 0, 0, terminals, terminals, terminals_state, 0, "TeleVideo", "TVI-965", MACHINE_IS_SKELETON )
-
-
-
-/**************************************************************************************************************
-
-Visual 100. (VT-100 clone)
-Chips: D780C-1 (Z80), CRT5037, D8255AC-5, uPB8214C, COM8116T-020, D8251AC, ER1400, 8-sw dip
-Crystal: 47.736
-
-***************************************************************************************************************/
-
-ROM_START( v100 )
-	ROM_REGION(0x10000, "maincpu", 0)
-	ROM_LOAD( "262-047.u108",  0x0000, 0x1000, CRC(e82f708c) SHA1(20ed83a41fd0703d72a20e170af971181cfbd575) )
-	ROM_LOAD( "262-048.u110",  0x1000, 0x1000, CRC(830923d3) SHA1(108590234ff84b5856cc2784d738a2a625305953) )
-
-	ROM_REGION(0x0800, "chargen", 0)
-	ROM_LOAD( "241-001.u29",   0x0000, 0x0800, CRC(ef807141) SHA1(cbf3fed001811c5840b9a131d2d3133843cb3b6a) )
-ROM_END
-
-COMP( 1982, v100, 0, 0, terminals, terminals, terminals_state, 0, "Visual Technology", "Visual 100", MACHINE_IS_SKELETON )
-
-
-
-/**************************************************************************************************************
-
-Visual 102. (VT-102 clone plus graphics)
-Chips: D780C-1 (Z80), CRT9021B-018, COM8251A, D8255AC-5, 2x CRT9006-135, CRT9007, M5L8253P-5, X2804AP-35, D7201C
-Crystals: 18.575000
-Keyboard: TMP8039P-6
-
-***************************************************************************************************************/
-
-ROM_START( v102 )
-	ROM_REGION(0x10000, "maincpu", 0)
-	ROM_LOAD( "245-001.u1",  0x0000, 0x4000, CRC(c36cc525) SHA1(a45e75ded10979c8e3ad262e2cf5818e08db762c) )
-
-	ROM_REGION(0x1000, "chargen", 0)
-	ROM_LOAD( "260-001.u50", 0x0000, 0x1000, CRC(732f5b99) SHA1(d105bf9f3ed41109d7181bcf0223bb280afe3f0a) )
-
-	ROM_REGION(0x10000, "keyboard", 0)
-	ROM_LOAD( "150.kbd",     0x0000, 0x0800, CRC(afe55cff) SHA1(b26ebdde63ec0e94c08780285def39a282e128b3) )
-ROM_END
-
-COMP( 1984, v102, 0, 0, terminals, terminals, terminals_state, 0, "Visual Technology", "Visual 102", MACHINE_IS_SKELETON )
-
-
-
-/**************************************************************************************************************
-
-DEC VT420.
-Chips: SCN8031HFCN40, SCN2681TC1N40, M5M4464AP, HM62256LFP-10T, TC23SC070AT, TC531001CP-1815
-Crystals: 43.320
-
-***************************************************************************************************************/
-
-ROM_START( vt420 )
-	ROM_REGION(0x20000, "maincpu", 0)
-	ROM_LOAD( "23-068e9-00.e2", 0x00000, 0x20000, CRC(22c3f93b) SHA1(b212911c41e4dba2e09d91fdd1f72d6c7536b0af) )
-ROM_END
-
-COMP( 1990, vt420, 0, 0, terminals, terminals, terminals_state, 0, "DEC", "VT-420", MACHINE_IS_SKELETON )
-
-
-
-/**************************************************************************************************************
-
-Zentec Zephyr (Model 00-441-01).
-Chips: COM2017, i8085A, 2x unreadable (40-pin AMI DIP), Beeper
-Crystal: 45.582000
-
-***************************************************************************************************************/
-
-ROM_START( zephyr )
-	ROM_REGION(0x10000, "maincpu", 0)
-	ROM_LOAD( "23-006-32c.bin",  0x0000, 0x0800, CRC(0a3a5447) SHA1(a8c25730a1d7e5b9c86e0d504afc923e931f9025) )
-	ROM_LOAD( "23-067-004b.bin", 0x0800, 0x0800, CRC(37741104) SHA1(52b9998e0a8d4949e0dc7c3349b3681e13345061) )
-	ROM_LOAD( "23-067-03b.bin",  0x1000, 0x0800, CRC(29cfa003) SHA1(9de7a8402173a2c448e54ee433ba3050db7b70bb) ) // this doesn't seem to fit
-
-	ROM_REGION(0x0800, "chargen", 0)
-	ROM_LOAD( "23-066-02a.bin",  0x0000, 0x0800, CRC(d5650b6c) SHA1(e6333e59018d9904f12abb270db4ba28aeff1995) )
-ROM_END
-
-COMP( 1979, zephyr, 0, 0, terminals, terminals, terminals_state, 0, "Zentec", "Zephyr", MACHINE_IS_SKELETON )

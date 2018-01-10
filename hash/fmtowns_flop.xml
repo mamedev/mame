@@ -100,7 +100,6 @@ Hunting Roulette                                              JAST              
 Hyper Album Omoide-kun                                        Computer System                   1991/2     FD×02
 Igo Taishou                                                   Shoudai Sangyou                   ?          FD×02
 Igo Taishou V2                                                Shoudai Sangyou                   1993/2     FD×02
-Image                                                         Software House Parsley            1994/5     FD×02
 Image II                                                      Software House Parsley            1994/6     FD×04
 Image Color System Pro                                        Raison                            1989/11    FD
 Jiman Grand Prix                                              Map Japan                         1992/3     FD
@@ -1031,6 +1030,23 @@ Zurukamashi Ver 2.0                                           Nikkonren Kikaku  
 		</part>
 	</software>
 
+	<software name="image" supported="no">
+		<description>Image</description>
+		<year>1992</year>
+		<publisher>Software House Parsley</publisher>
+		<info name="alt_title" value="イマージュ" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1261568">
+				<rom name="image (disk 1).xdf" size="1261568" crc="eff55b4f" sha1="595401dd34085b204200058f06518dbed30dab50" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1261568">
+				<rom name="image (disk 2).xdf" size="1261568" crc="b331f335" sha1="276e8185cda3ae10a49548a5b4762eda1be1ee6b" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="irium">
 		<description>Irium</description>
 		<year>1993</year>
@@ -1159,6 +1175,18 @@ Zurukamashi Ver 2.0                                           Nikkonren Kikaku  
 			<feature name="part_id" value="Disk 8" />
 			<dataarea name="flop" size="1261568">
 				<rom name="illusion city (disk 8).hdm" size="1261568" crc="cfc82740" sha1="f037c25c480807b15e77c3bec89185345c6e3d15" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mjfantt">
+		<description>Mahjong Gensoukyoku / Mahjong Fantasia Taikenban</description>
+		<year>1992</year>
+		<publisher>Active</publisher>
+		<info name="alt_title" value="麻雀幻想曲体験版" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1261568">
+				<rom name="mahjong gensoukyoku taikenban.bin" size="1261568" crc="bbd5391b" sha1="0d172601b6f1644b6389ffd721885f7ba5307ec2" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1709,6 +1737,42 @@ Zurukamashi Ver 2.0                                           Nikkonren Kikaku  
 
 <!-- DOUJIN / HOMEBREW DISCS -->
 
+	<software name="15puzzle">
+		<description>15 Puzzle</description>
+		<year>199?</year>
+		<publisher>&lt;doujin&gt;</publisher>
+		<info name="developer" value="H2SO4" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1261568">
+				<rom name="15 puzzle.bin" size="1261568" crc="bd08eb1e" sha1="c74ab5fb58ff31219d6365156cbb2eee1d53738f" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="abas">
+		<description>Abas</description>
+		<year>1997</year>
+		<publisher>&lt;doujin&gt;</publisher>
+		<info name="developer" value="Seiichi Hanai" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1261568">
+				<rom name="abas.bin" size="1261568" crc="8ceb7dc7" sha1="c448d1eaa1a0a11334cb798754167f1ac8da9ad1" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="abasnew">
+		<description>Abas New</description>
+		<year>1997</year>
+		<publisher>&lt;doujin&gt;</publisher>
+		<info name="developer" value="Seiichi Hanai" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1261568">
+				<rom name="abas new.bin" size="1261568" crc="977cabda" sha1="ad43310f17e707d27058d932d8757d9bc151ef60" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<!--
 	This program patches the executable of Afterburner II for FM-TOWNS  to make it easier to play
 	(original joypad design made it virtually unplayable, according to YS-11).
@@ -1734,6 +1798,57 @@ Zurukamashi Ver 2.0                                           Nikkonren Kikaku  
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1261568">
 				<rom name="air raider.hdm" size="1261568" crc="b59eb70b" sha1="464b0be803d03dbe514514242b0fa83bfcabf2e0" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bbraker3">
+		<description>B-Braker 3</description>
+		<year>199?</year>
+		<publisher>&lt;doujin&gt;</publisher>
+		<info name="developer" value="H2SO4" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1261568">
+				<rom name="b-braker 3.bin" size="1261568" crc="2f02a9dc" sha1="1755088ff6a8b4262459caf68914e93b8b297aaa" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="batfght2">
+		<description>Battle Fighters 2 - Yume o Kaketa Tatakai</description>
+		<year>1996</year>
+		<publisher>&lt;doujin&gt;</publisher>
+		<info name="developer" value="Fighters Progect" />
+		<info name="alt_title" value="BATTLE FIGHTERS 2 -夢を賭けた戦い-" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1261568">
+				<rom name="battle fighters 2.bin" size="1261568" crc="3e9b8b02" sha1="778f7ad583ee605af36859472f02366ca3c237e5" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="batfght3" supported="no">
+		<description>Battle Fighters 3 - Inishie no Jashin Densetsu</description>
+		<year>1997</year>
+		<publisher>&lt;doujin&gt;</publisher>
+		<info name="developer" value="Fighters Progect" />
+		<info name="alt_title" value="BATTLE FIGHTERS 3 -古の邪神伝説-" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="battle fighters 3.bin" size="1474560" crc="a9e0ecab" sha1="ea3a3e6d8760d998d9345c17db4b6190c6187e20" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bau">
+		<description>Bau</description>
+		<year>1993</year>
+		<publisher>&lt;doujin&gt;</publisher>
+		<info name="developer" value="H2SO4" />
+		<info name="alt_title" value="ばう" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1261568">
+				<rom name="bau.bin" size="1261568" crc="37707193" sha1="53e6b6e959e4f97fb5580c7bef7278088d6fc814" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1798,6 +1913,18 @@ Zurukamashi Ver 2.0                                           Nikkonren Kikaku  
 		</part>
 	</software>
 
+	<software name="breaktow">
+		<description>Break of Tower</description>
+		<year>199?</year>
+		<publisher>&lt;doujin&gt;</publisher>
+		<info name="developer" value="クエイト (Kueito)" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1261568">
+				<rom name="break of tower.bin" size="1261568" crc="6488afc7" sha1="d21bfd8586d90884f5967c808ab6e58d11178397" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="ayareiks">
 		<description>Doushite Ii ka Wakaranai - Ayanami Rei Kannou Shashin-shuu</description>
 		<year>199?</year>
@@ -1807,6 +1934,18 @@ Zurukamashi Ver 2.0                                           Nikkonren Kikaku  
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1261568">
 				<rom name="doushite ii ka wakaranai - ayanami rei kannou shashin-shuu.hdm" size="1261568" crc="f5377bd7" sha1="4139aa0eab2998fe206423fdd721cd1a0a8f0484" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dreamfgt" supported="no">
+		<description>Dream Fighters</description>
+		<year>199?</year>
+		<publisher>&lt;doujin&gt;</publisher>
+		<info name="developer" value="Kanju" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="dream fighters.bin" size="1474560" crc="1e4d480b" sha1="8f6ecba0caa582f05e446a7b4f9c51a32757d7c8" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1823,6 +1962,95 @@ Zurukamashi Ver 2.0                                           Nikkonren Kikaku  
 		</part>
 	</software>
 
+	<software name="grndatak">
+		<description>Ground Attack</description>
+		<year>1994</year>
+		<publisher>&lt;doujin&gt;</publisher>
+		<info name="developer" value="YS-11" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1261568">
+				<rom name="ground attack.xdf" size="1261568" crc="22a962fe" sha1="bc62681034a93e89a5a938ddfe571a4837cdabc4" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="batfight">
+		<description>Haou Soudatsu Battle Fighters</description>
+		<year>199?</year>
+		<publisher>&lt;doujin&gt;</publisher>
+		<info name="developer" value="クエイト (Kueito)" />
+		<info name="alt_title" value="覇王争奪バトルファイターズ" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1261568">
+				<rom name="battle fighters.bin" size="1261568" crc="911e58ab" sha1="4c379fb688e04c41e348fef8e483d925e0d55cd8" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="heboris">
+		<description>Heboris</description>
+		<year>1999</year>
+		<publisher>&lt;doujin&gt;</publisher>
+		<info name="alt_title" value="ヘボリス" />
+		<info name="developer" value="Kenji Hosimoto" />
+		<info name="version" value="0.6" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1261568">
+				<rom name="heboris.bin" size="1261568" crc="3bb75819" sha1="7ea2b0d71d4388f6221de81a16a9093cd206aeae" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="helicmd">
+		<description>Heli-Command</description>
+		<year>1995</year>
+		<publisher>&lt;doujin&gt;</publisher>
+		<info name="developer" value="H. Taira" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1261568">
+				<rom name="heli-command.bin" size="1261568" crc="3a293e26" sha1="100dcc10784925394e670dbb1f4cbd55d838995d" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="heliresq">
+		<description>Heli-Rescue</description>
+		<year>1995</year>
+		<publisher>&lt;doujin&gt;</publisher>
+		<info name="developer" value="H. Taira" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1261568">
+				<rom name="heli-rescue.bin" size="1261568" crc="c76213e0" sha1="e484c53db79a1bc27aec40b1c175f339c1f5a59c" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kastalia">
+		<description>An Illusional World Kastalia</description>
+		<year>1993</year>
+		<publisher>&lt;doujin&gt;</publisher>
+		<info name="developer" value="★YOU" />
+		<info name="alt_title" value="カスタリア" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1261568">
+				<rom name="kastalia.bin" size="1261568" crc="56f09e17" sha1="e38322747dd729a38a03d133ed678fa42bcb3a9d" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ironfist">
+		<description>Iron Fist - The Revised Edition</description>
+		<year>1994</year>
+		<publisher>&lt;doujin&gt;</publisher>
+		<info name="developer" value="MAR-RYLL" />
+		<info name="alt_title" value="Iron Fist 改訂版" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1261568">
+				<rom name="iron fist kaiteiban.bin" size="1261568" crc="cd13d7b3" sha1="04075a09ed137249c33d156b7331fb1a3e437e66" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="kiss">
 		<description>KISS - KISekae Set system</description>
 		<year>199?</year>
@@ -1831,6 +2059,31 @@ Zurukamashi Ver 2.0                                           Nikkonren Kikaku  
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1261568">
 				<rom name="kiss - kisekae set system.hdm" size="1261568" crc="642554e6" sha1="a462109795fa23e677cc7bdb6c5885a52cc92303" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mister">
+		<description>Mister - Meitantei Toujou</description>
+		<year>2014</year>
+		<publisher>&lt;doujin&gt;</publisher>
+		<info name="developer" value="H2SO4" />
+		<info name="alt_title" value="Mister・名探偵登場" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1261568">
+				<rom name="mister meitantei toujou.bin" size="1261568" crc="28f3c8c9" sha1="33ab0ee15e3f403ad5743119561f8649c03f3f94" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="panicbl2">
+		<description>Panic Ball II</description>
+		<year>199?</year>
+		<publisher>&lt;doujin&gt;</publisher>
+		<info name="developer" value="Junior" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1261568">
+				<rom name="panic ball ii.bin" size="1261568" crc="8de28ae6" sha1="6944feed861130d7712198950097d55b031efd61" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1847,6 +2100,19 @@ Zurukamashi Ver 2.0                                           Nikkonren Kikaku  
 		</part>
 	</software>
 
+	<software name="quazzle">
+		<description>Quazzle</description>
+		<year>1994</year>
+		<publisher>&lt;doujin&gt;</publisher>
+		<info name="alt_title" value="くぁずる" />
+		<info name="developer" value="Team B-2" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1261568">
+				<rom name="quazzle.bin" size="1261568" crc="59d635c4" sha1="66bc4ebdb7feaec191f10b74772572efc53835e2" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="rks">
 		<description>Realtime Kaigi Simulator</description>
 		<year>199?</year>
@@ -1854,6 +2120,30 @@ Zurukamashi Ver 2.0                                           Nikkonren Kikaku  
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1261568">
 				<rom name="realtime kaigi simulator.hdm" size="1261568" crc="489cce66" sha1="ce9c9cd28fc9f07e3a790cb31faff83243737231" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rumstorm" supported="no">
+		<description>Rumstorm</description>
+		<year>2000</year>
+		<publisher>&lt;doujin&gt;</publisher>
+		<info name="developer" value="Good-Chy" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="rumstorm.bin" size="1474560" crc="ef1b27e3" sha1="ead75dfa0ff7975d2b8e97163879fbed20b31aaf" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rumuder" supported="no">
+		<description>Rumuder</description>
+		<year>1997</year>
+		<publisher>&lt;doujin&gt;</publisher>
+		<info name="developer" value="Good-Chy" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="rumuder.bin" size="1474560" crc="6030e5cd" sha1="4f07f291b9e18e063ca7717af4905fd5b4f6686d" offset="0"/>
 			</dataarea>
 		</part>
 	</software>

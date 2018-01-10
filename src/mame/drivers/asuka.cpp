@@ -1698,12 +1698,12 @@ ROM_START( earthjkr )
 	ROM_LOAD16_WORD( "ej_30e.ic30", 0x80000, 0x80000, CRC(49d1f77f) SHA1(f6c9b2fc88b77cc9baa5be48da5c3eb72310e471) ) /* Fix ROM */
 
 	ROM_REGION( 0x80000, "gfx1", 0 )
-	ROM_LOAD( "ej_chr.ic3", 0x00000, 0x80000, CRC(ac675297) SHA1(2a34e1eae3a4be84dbf709053f5e8a781b1073fc) )    /* SCR tiles (8 x 8) */
+	ROM_LOAD( "ej_chr-0.ic3", 0x00000, 0x80000, CRC(ac675297) SHA1(2a34e1eae3a4be84dbf709053f5e8a781b1073fc) )    /* SCR tiles (8 x 8) - MASK ROM */
 
 	ROM_REGION( 0xa0000, "gfx2", 0 )
-	ROM_LOAD       ( "ej_obj.ic6", 0x00000, 0x80000, CRC(5f21ac47) SHA1(45c94ffb53ee9b822b0676f6fb151fed4ce6d967) ) /* Sprites (16 x 16) */
-	ROM_LOAD16_BYTE( "ej_1.ic5",   0x80000, 0x10000, CRC(cb4891db) SHA1(af1112608cdd897ef6028ef617f5ca69d7964861) )
-	ROM_LOAD16_BYTE( "ej_0.ic4",   0x80001, 0x10000, CRC(b612086f) SHA1(625748fcb698ec57b7b3ce46019cf85de99aaaa1) )
+	ROM_LOAD       ( "ej_obj-0.ic6", 0x00000, 0x80000, CRC(5f21ac47) SHA1(45c94ffb53ee9b822b0676f6fb151fed4ce6d967) ) /* Sprites (16 x 16) - MASK ROM */
+	ROM_LOAD16_BYTE( "ej_1.ic5",     0x80000, 0x10000, CRC(cb4891db) SHA1(af1112608cdd897ef6028ef617f5ca69d7964861) )
+	ROM_LOAD16_BYTE( "ej_0.ic4",     0x80001, 0x10000, CRC(b612086f) SHA1(625748fcb698ec57b7b3ce46019cf85de99aaaa1) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )    /* sound cpu */
 	ROM_LOAD( "ej_2.ic27", 0x00000, 0x10000, CRC(42ba2566) SHA1(c437388684b565c7504d6bad6accd73aa000faca) ) /* banked */
@@ -1713,6 +1713,9 @@ ROM_START( earthjkr )
 	ROM_LOAD( "b68-05.ic43", 0x00000, 0x104, CRC(d6524ccc) SHA1(f3b56253692aebb63278d47832fc27b8b212b59c) )
 ROM_END
 
+// Known to exist (not dumped) a US version of Earth Joker, title screen shows "DISTRIBUTED BY ROMSTAR, INC."  ROMs were numbered
+// from 0 through 4 and the fix rom at IC30 is labeled 1 even though IC5 is also labled as 1 similar to the below set:
+
 ROM_START( earthjkrp ) // was production PCB complete with MASK rom, could just be an early revision, not proto
 	ROM_REGION( 0x100000, "maincpu", 0 )     /* 1024k for 68000 code */
 	ROM_LOAD16_BYTE( "3.ic23", 0x00001, 0x20000, CRC(26c33225) SHA1(b039c47d0776c90813ab52c867e95989cab2c567) )
@@ -1721,15 +1724,15 @@ ROM_START( earthjkrp ) // was production PCB complete with MASK rom, could just 
 	ROM_LOAD16_WORD( "5.ic30", 0x80000, 0x80000, CRC(bf760b2d) SHA1(4aff36623e5a31ab86c77461fa93e40e77f08edd) ) /* Fix ROM */
 
 	ROM_REGION( 0x80000, "gfx1", 0 )
-	ROM_LOAD( "ej_chr.ic3", 0x00000, 0x80000, CRC(ac675297) SHA1(2a34e1eae3a4be84dbf709053f5e8a781b1073fc) )    /* SCR tiles (8 x 8) */
+	ROM_LOAD( "ej_chr-0.ic3", 0x00000, 0x80000, CRC(ac675297) SHA1(2a34e1eae3a4be84dbf709053f5e8a781b1073fc) )    /* SCR tiles (8 x 8) - MASK ROM */
 
 	ROM_REGION( 0xa0000, "gfx2", 0 )
-	ROM_LOAD       ( "ej_obj.ic6", 0x00000, 0x80000, CRC(5f21ac47) SHA1(45c94ffb53ee9b822b0676f6fb151fed4ce6d967) ) /* Sprites (16 x 16) */
-	ROM_LOAD16_BYTE( "ej_1.ic5",   0x80000, 0x10000, CRC(cb4891db) SHA1(af1112608cdd897ef6028ef617f5ca69d7964861) )
-	ROM_LOAD16_BYTE( "ej_0.ic4",   0x80001, 0x10000, CRC(b612086f) SHA1(625748fcb698ec57b7b3ce46019cf85de99aaaa1) )
+	ROM_LOAD       ( "ej_obj-0.ic6", 0x00000, 0x80000, CRC(5f21ac47) SHA1(45c94ffb53ee9b822b0676f6fb151fed4ce6d967) ) /* Sprites (16 x 16) - MASK ROM */
+	ROM_LOAD16_BYTE( "1.ic5",        0x80000, 0x10000, CRC(cb4891db) SHA1(af1112608cdd897ef6028ef617f5ca69d7964861) )
+	ROM_LOAD16_BYTE( "0.ic4",        0x80001, 0x10000, CRC(b612086f) SHA1(625748fcb698ec57b7b3ce46019cf85de99aaaa1) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )    /* sound cpu */
-	ROM_LOAD( "ej_2.ic27", 0x00000, 0x10000, CRC(42ba2566) SHA1(c437388684b565c7504d6bad6accd73aa000faca) ) /* banked */
+	ROM_LOAD( "2.ic27", 0x00000, 0x10000, CRC(42ba2566) SHA1(c437388684b565c7504d6bad6accd73aa000faca) ) /* banked */
 
 	ROM_REGION( 0x144, "pals", 0 )
 	ROM_LOAD( "b68-04.ic32", 0x00000, 0x144, CRC(9be618d1) SHA1(61ee33c3db448a05ff8f455e77fe17d51106baec) )

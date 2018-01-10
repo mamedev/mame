@@ -885,7 +885,7 @@ TIMER_DEVICE_CALLBACK_MEMBER( by35_state::timer_as2888 )
 	{
 		m_snd_sel = m_snd_prom[offs];
 //      logerror("SndSel read %02x from PROM addr %02x\n",m_snd_sel, offs );
-		m_snd_sel = BITSWAP8(m_snd_sel,0,1,2,3,4,5,6,7);
+		m_snd_sel = bitswap<8>(m_snd_sel,0,1,2,3,4,5,6,7);
 
 		m_snd_tone_gen = m_snd_sel;
 //      logerror("SndSel=%02x, Tone=%02x, Div=%02x\n",m_snd_sel, m_snd_tone_gen, m_snd_div);

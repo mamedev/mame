@@ -57,7 +57,7 @@
                                          S
 
     Block Diagram / Pin Descriptions:
-    http://www.mess.org/_media/datasheets/fujitsu/mb89363b_partial.pdf
+    http://mess.redump.net/_media/datasheets/fujitsu/mb89363b_partial.pdf
 
     D.C. Characteristics:
     (Recommended operating conditions unless otherwise noted)

@@ -528,7 +528,7 @@ READ16_MEMBER(namcos10_state::range_r)
 
 READ16_MEMBER(namcos10_state::control_r)
 {
-	logerror("control_r %d (%x)\n", offset, space.device().safe_pc());
+	logerror("control_r %d (%x)\n", offset, m_maincpu->pc());
 	if(offset == 2)
 		return 1^0xffff;
 	return 0;
@@ -536,12 +536,12 @@ READ16_MEMBER(namcos10_state::control_r)
 
 WRITE16_MEMBER(namcos10_state::control_w)
 {
-	logerror("control_w %d, %04x (%x)\n", offset, data, space.device().safe_pc());
+	logerror("control_w %d, %04x (%x)\n", offset, data, m_maincpu->pc());
 }
 
 WRITE16_MEMBER(namcos10_state::sprot_w)
 {
-	logerror("sprot_w %04x (%x)\n", data, space.device().safe_pc());
+	logerror("sprot_w %04x (%x)\n", data, m_maincpu->pc());
 	sprot_bit = 7;
 	sprot_byte = 0;
 }
@@ -580,7 +580,7 @@ READ16_MEMBER(namcos10_state::sprot_r)
 READ16_MEMBER(namcos10_state::i2c_clock_r)
 {
 	uint16_t res = i2c_dev_clock & i2c_host_clock & 1;
-	//  logerror("i2c_clock_r %d (%x)\n", res, space.device().safe_pc());
+	//  logerror("i2c_clock_r %d (%x)\n", res, m_maincpu->pc());
 	return res;
 }
 
@@ -588,14 +588,14 @@ READ16_MEMBER(namcos10_state::i2c_clock_r)
 WRITE16_MEMBER(namcos10_state::i2c_clock_w)
 {
 	COMBINE_DATA(&i2c_host_clock);
-	//  logerror("i2c_clock_w %d (%x)\n", data, space.device().safe_pc());
+	//  logerror("i2c_clock_w %d (%x)\n", data, m_maincpu->pc());
 	i2c_update();
 }
 
 READ16_MEMBER(namcos10_state::i2c_data_r)
 {
 	uint16_t res = i2c_dev_data & i2c_host_data & 1;
-	//  logerror("i2c_data_r %d (%x)\n", res, space.device().safe_pc());
+	//  logerror("i2c_data_r %d (%x)\n", res, m_maincpu->pc());
 	return res;
 }
 
@@ -603,7 +603,7 @@ READ16_MEMBER(namcos10_state::i2c_data_r)
 WRITE16_MEMBER(namcos10_state::i2c_data_w)
 {
 	COMBINE_DATA(&i2c_host_data);
-	//  logerror("i2c_data_w %d (%x)\n", data, space.device().safe_pc());
+	//  logerror("i2c_data_w %d (%x)\n", data, m_maincpu->pc());
 	i2c_update();
 }
 
@@ -682,26 +682,26 @@ READ16_MEMBER(namcos10_state::nand_status_r )
 
 WRITE8_MEMBER(namcos10_state::nand_address1_w )
 {
-	logerror("nand_a1_w %08x (%08x)\n", data, space.device().safe_pc());
+	logerror("nand_a1_w %08x (%08x)\n", data, m_maincpu->pc());
 	//  nand_address = ( nand_address & 0x00ffffff ) | ( data << 24 );
 }
 
 WRITE8_MEMBER( namcos10_state::nand_address2_w )
 {
-	logerror("nand_a2_w %08x (%08x)\n", data, space.device().safe_pc());
+	logerror("nand_a2_w %08x (%08x)\n", data, m_maincpu->pc());
 	nand_address = ( nand_address & 0xffffff00 ) | ( data << 0 );
 }
 
 WRITE8_MEMBER( namcos10_state::nand_address3_w )
 {
-	logerror("nand_a3_w %08x (%08x)\n", data, space.device().safe_pc());
+	logerror("nand_a3_w %08x (%08x)\n", data, m_maincpu->pc());
 	nand_address = ( nand_address & 0xffff00ff ) | ( data <<  8 );
 }
 
 WRITE8_MEMBER( namcos10_state::nand_address4_w )
 {
 	nand_address = ( nand_address & 0xff00ffff ) | ( data << 16 );
-	logerror("nand_a4_w %08x (%08x) -> %08x\n", data, space.device().safe_pc(), nand_address*2);
+	logerror("nand_a4_w %08x (%08x) -> %08x\n", data, m_maincpu->pc(), nand_address*2);
 }
 
 uint16_t namcos10_state::nand_read( uint32_t address )
@@ -789,7 +789,7 @@ static void decrypt_bios( running_machine &machine, const char *regionName, int 
 
 	for( int i = 0; i < len; i++ )
 	{
-		BIOS[ i ] = BITSWAP16( BIOS[ i ] ^ 0xaaaa,
+		BIOS[ i ] = bitswap<16>( BIOS[ i ] ^ 0xaaaa,
 			b15, b14, b13, b12, b11, b10, b9, b8, b7, b6, b5, b4, b3, b2, b1, b0 );
 	}
 }

@@ -15,6 +15,8 @@
 #include "cpu/mcs51/mcs51.h"
 #include "machine/mc68681.h"
 #include "machine/ram.h"
+//#include "machine/x2212.h"
+//#include "video/crt9007.h"
 #include "screen.h"
 
 
@@ -39,8 +41,10 @@ static ADDRESS_MAP_START(vt220_mem, AS_PROGRAM, 8, vt220_state)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(vt220_io, AS_IO, 8, vt220_state)
+	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x2000, 0x2fff) AM_MIRROR(0xc000) AM_RAM
-	AM_RANGE(0x3000, 0x300f) AM_MIRROR(0xc7f0) AM_DEVREADWRITE("duart", scn2681_device, read, write)
+	AM_RANGE(0x3800, 0x380f) AM_MIRROR(0xc7f0) AM_DEVREADWRITE("duart", scn2681_device, read, write)
+	AM_RANGE(MCS51_PORT_P1, MCS51_PORT_P1) AM_READNOP
 ADDRESS_MAP_END
 
 /* Input ports */
@@ -69,6 +73,7 @@ static MACHINE_CONFIG_START( vt220 )
 	MCFG_CPU_IO_MAP(vt220_io)
 
 	MCFG_DEVICE_ADD("duart", SCN2681, XTAL_3_6864MHz)
+	MCFG_MC68681_IRQ_CALLBACK(INPUTLINE("maincpu", MCS51_INT1_LINE))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

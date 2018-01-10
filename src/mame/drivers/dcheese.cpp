@@ -147,7 +147,7 @@ WRITE8_MEMBER(dcheese_state::sound_control_w)
 	if ((diff & 0x40) && (data & 0x40))
 		m_bsmt->reset();
 	if (data != 0x40 && data != 0x60)
-		logerror("%04X:sound_control_w = %02X\n", space.device().safe_pc(), data);
+		logerror("%04X:sound_control_w = %02X\n", m_audiocpu->pc(), data);
 }
 
 

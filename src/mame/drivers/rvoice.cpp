@@ -139,7 +139,7 @@ void rvoice_state::machine_reset()
 READ8_MEMBER(rvoice_state::main_hd63701_internal_registers_r)
 {
 	uint8_t data = 0;
-	logerror("main hd637B01Y0: %04x: read from 0x%02X: ", space.device().safe_pc(), offset);
+	logerror("main hd637B01Y0: %04x: read from 0x%02X: ", m_maincpu->pc(), offset);
 	switch(offset)
 	{
 		case 0x00: // Port 1 DDR
@@ -221,7 +221,7 @@ READ8_MEMBER(rvoice_state::main_hd63701_internal_registers_r)
 
 WRITE8_MEMBER(rvoice_state::main_hd63701_internal_registers_w)
 {
-	logerror("main hd637B01Y0: %04x: write to 0x%02X: ", space.device().safe_pc(), offset);
+	logerror("main hd637B01Y0: %04x: write to 0x%02X: ", m_maincpu->pc(), offset);
 	switch(offset)
 	{
 		case 0x00: // Port 1 DDR

@@ -23,10 +23,11 @@ public:
 
 	template <class Object> static devcb_base &set_ram_rd_callback(device_t &device, Object &&cb) { return downcast<vt100_video_device &>(device).m_read_ram.set_callback(std::forward<Object>(cb)); }
 	template <class Object> static devcb_base &set_clear_video_irq_wr_callback(device_t &device, Object &&cb) { return downcast<vt100_video_device &>(device).m_write_clear_video_interrupt.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_lba7_wr_callback(device_t &device, Object &&cb) { return downcast<vt100_video_device &>(device).m_write_lba7.set_callback(std::forward<Object>(cb)); }
 
 	static void set_chargen_tag(device_t &device, const char *tag) { downcast<vt100_video_device &>(device).m_char_rom.set_tag(tag); }
 
-	DECLARE_READ8_MEMBER(lba7_r);
+	DECLARE_READ_LINE_MEMBER(lba7_r);
 	DECLARE_WRITE8_MEMBER(dc012_w);
 	DECLARE_WRITE8_MEMBER(dc011_w);
 	DECLARE_WRITE8_MEMBER(brightness_w);
@@ -48,6 +49,7 @@ protected:
 
 	devcb_read8        m_read_ram;
 	devcb_write8       m_write_clear_video_interrupt;
+	devcb_write_line   m_write_lba7;
 
 	int m_lba7;
 
@@ -65,8 +67,8 @@ protected:
 	uint8_t m_height;
 	uint8_t m_height_MAX;
 	uint8_t m_fill_lines;
-	uint8_t m_frequency;
-	uint8_t m_interlaced;
+	bool m_is_50hz;
+	bool m_interlaced;
 	emu_timer * m_lba7_change_timer;
 
 	required_region_ptr<uint8_t> m_char_rom; /* character rom region */
@@ -111,5 +113,8 @@ DECLARE_DEVICE_TYPE(RAINBOW_VIDEO, rainbow_video_device)
 
 #define MCFG_VT_VIDEO_CLEAR_VIDEO_INTERRUPT_CALLBACK(_write) \
 	devcb = &vt100_video_device::set_clear_video_irq_wr_callback(*device, DEVCB_##_write);
+
+#define MCFG_VT_VIDEO_LBA7_CALLBACK(_write) \
+	devcb = &vt100_video_device::set_lba7_wr_callback(*device, DEVCB_##_write);
 
 #endif // MAME_VIDEO_VTVIDEO_H

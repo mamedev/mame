@@ -13,7 +13,7 @@
 -- Dynamic recompiler objects
 --------------------------------------------------
 
-if (CPUS["SH"]~=null or CPUS["MIPS"]~=null or CPUS["POWERPC"]~=null or CPUS["RSP"]~=null or CPUS["ARM7"]~=null or CPUS["ADSP21062"]~=null or CPUS["MB86235"]~=null) then
+if (CPUS["E1"]~=null or CPUS["SH"]~=null or CPUS["MIPS"]~=null or CPUS["POWERPC"]~=null or CPUS["RSP"]~=null or CPUS["ARM7"]~=null or CPUS["ADSP21062"]~=null or CPUS["MB86235"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/cpu/drcbec.cpp",
 		MAME_DIR .. "src/devices/cpu/drcbec.h",
@@ -810,6 +810,9 @@ if (CPUS["E1"]~=null) then
 		MAME_DIR .. "src/devices/cpu/e132xs/e132xs.h",
 		MAME_DIR .. "src/devices/cpu/e132xs/32xsdefs.h",
 		MAME_DIR .. "src/devices/cpu/e132xs/e132xsop.hxx",
+		MAME_DIR .. "src/devices/cpu/e132xs/e132xsfe.cpp",
+		MAME_DIR .. "src/devices/cpu/e132xs/e132xsdrc.cpp",
+		MAME_DIR .. "src/devices/cpu/e132xs/e132xsdrc_ops.hxx",
 	}
 end
 
@@ -2072,6 +2075,7 @@ end
 --------------------------------------------------
 -- Texas Instruments TMS1000 series
 --@src/devices/cpu/tms1000/tms1000.h,CPUS["TMS1000"] = true
+--@src/devices/cpu/tms1000/tms1000c.h,CPUS["TMS1000"] = true
 --@src/devices/cpu/tms1000/tms1100.h,CPUS["TMS1000"] = true
 --@src/devices/cpu/tms1000/tms1400.h,CPUS["TMS1000"] = true
 --@src/devices/cpu/tms1000/tms0970.h,CPUS["TMS1000"] = true
@@ -2086,6 +2090,8 @@ if (CPUS["TMS1000"]~=null) then
 		MAME_DIR .. "src/devices/cpu/tms1000/tms1k_base.h",
 		MAME_DIR .. "src/devices/cpu/tms1000/tms1000.cpp",
 		MAME_DIR .. "src/devices/cpu/tms1000/tms1000.h",
+		MAME_DIR .. "src/devices/cpu/tms1000/tms1000c.cpp",
+		MAME_DIR .. "src/devices/cpu/tms1000/tms1000c.h",
 		MAME_DIR .. "src/devices/cpu/tms1000/tms1100.cpp",
 		MAME_DIR .. "src/devices/cpu/tms1000/tms1100.h",
 		MAME_DIR .. "src/devices/cpu/tms1000/tms1400.cpp",

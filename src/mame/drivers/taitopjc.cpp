@@ -475,7 +475,7 @@ void taitopjc_state::print_display_list()
 
 WRITE64_MEMBER(taitopjc_state::dsp_w)
 {
-	//logerror("dsp_w: %08X, %08X%08X, %08X%08X at %08X\n", offset, (uint32_t)(data >> 32), (uint32_t)(data), (uint32_t)(mem_mask >> 32), (uint32_t)(mem_mask), space.device().safe_pc());
+	//logerror("dsp_w: %08X, %08X%08X, %08X%08X at %08X\n", offset, (uint32_t)(data >> 32), (uint32_t)(data), (uint32_t)(mem_mask >> 32), (uint32_t)(mem_mask), m_maincpu->pc());
 
 	if (offset == 0x7fe)
 	{

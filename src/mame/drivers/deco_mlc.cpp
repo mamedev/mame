@@ -111,14 +111,6 @@
 
 /***************************************************************************/
 
-READ32_MEMBER(deco_mlc_state::test2_r)
-{
-//  if (offset==0)
-//      return ioport("IN0")->read(); //0xffffffff;
-//   logerror("%08x:  Test2_r %d\n",space.device().safe_pc(),offset);
-	return machine().rand(); //0xffffffff;
-}
-
 READ32_MEMBER(deco_mlc_state::mlc_440008_r)
 {
 	return 0xffffffff;
@@ -132,7 +124,7 @@ READ32_MEMBER(deco_mlc_state::mlc_44001c_r)
 */
 //if (offset==0)
 //  return machine().rand()|(machine().rand()<<16);
-//  logerror("%08x:  Test3_r %d\n",space.device().safe_pc(),offset);
+//  logerror("%08x:  Test3_r %d\n",m_maincpu->pc(),offset);
 //  return 0x00100000;
 	return 0xffffffff;
 }
@@ -144,7 +136,7 @@ WRITE32_MEMBER(deco_mlc_state::mlc_44001c_w)
 READ32_MEMBER(deco_mlc_state::mlc_200070_r)
 {
 	m_vbl_i ^=0xffffffff;
-//logerror("vbl r %08x\n", space.device().safe_pc());
+//logerror("vbl r %08x\n", m_maincpu->pc());
 	// Todo: Vblank probably in $10
 	return m_vbl_i;
 }
@@ -273,7 +265,7 @@ WRITE32_MEMBER( deco_mlc_state::mlc_spriteram_w )
 READ16_MEMBER( deco_mlc_state::sh96_protection_region_0_146_r )
 {
 	int real_address = 0 + (offset *2);
-	int deco146_addr = BITSWAP32(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14,    10,9,8, 7,6,5,4, 3,2,1,0) & 0x7fff;
+	int deco146_addr = bitswap<32>(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14,    10,9,8, 7,6,5,4, 3,2,1,0) & 0x7fff;
 	uint8_t cs = 0;
 	uint16_t data = m_deco146->read_data( deco146_addr, mem_mask, cs );
 	return data;
@@ -282,7 +274,7 @@ READ16_MEMBER( deco_mlc_state::sh96_protection_region_0_146_r )
 WRITE16_MEMBER( deco_mlc_state::sh96_protection_region_0_146_w )
 {
 	int real_address = 0 + (offset *2);
-	int deco146_addr = BITSWAP32(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14,    10,9,8, 7,6,5,4, 3,2,1,0) & 0x7fff;
+	int deco146_addr = bitswap<32>(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14,    10,9,8, 7,6,5,4, 3,2,1,0) & 0x7fff;
 	uint8_t cs = 0;
 	m_deco146->write_data( space, deco146_addr, data, mem_mask, cs );
 }
@@ -887,7 +879,7 @@ void deco_mlc_state::descramble_sound(  )
 	{
 		uint32_t addr;
 
-		addr = BITSWAP24 (x,23,22,21,0, 20,
+		addr = bitswap<24> (x,23,22,21,0, 20,
 							19,18,17,16,
 							15,14,13,12,
 							11,10,9, 8,
@@ -903,9 +895,9 @@ void deco_mlc_state::descramble_sound(  )
 READ32_MEMBER(deco_mlc_state::avengrgs_speedup_r)
 {
 	uint32_t a=m_mlc_ram[0x89a0/4];
-	uint32_t p=space.device().safe_pc();
+	uint32_t p=m_maincpu->pc();
 
-	if ((p==0x3234 || p==0x32dc) && (a&1)) space.device().execute().spin_until_interrupt();
+	if ((p==0x3234 || p==0x32dc) && (a&1)) m_maincpu->spin_until_interrupt();
 
 	return a;
 }

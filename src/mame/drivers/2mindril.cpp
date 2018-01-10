@@ -86,7 +86,6 @@ protected:
 READ8_MEMBER(_2mindril_state::arm_pwr_r)
 {
 	int arm_pwr = m_in0->read();//throw
-	//popmessage("PC=%08x %02x",space.device().safe_pc(),arm_pwr);
 
 	if(arm_pwr > 0xe0) return ~0x18;
 	if(arm_pwr > 0xc0) return ~0x14;

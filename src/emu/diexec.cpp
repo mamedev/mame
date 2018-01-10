@@ -499,9 +499,6 @@ void device_execute_interface::interface_post_start()
 	assert_always(m_icountptr != nullptr, "m_icountptr never initialized!");
 
 	// register for save states
-	device().save_pointer(NAME(m_icountptr), 1);
-	device().save_item(NAME(m_cycles_running));
-	device().save_item(NAME(m_cycles_stolen));
 	device().save_item(NAME(m_suspend));
 	device().save_item(NAME(m_nextsuspend));
 	device().save_item(NAME(m_eatcycles));

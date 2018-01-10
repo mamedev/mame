@@ -798,10 +798,10 @@ WRITE32_MEMBER(nv2a_gpu_device::geforce_w)
 
 READ32_MEMBER(nv2a_gpu_device::nv2a_mirror_r)
 {
-	return m_program->read_dword(offset);
+	return m_program->read_dword(offset << 2);
 }
 
 WRITE32_MEMBER(nv2a_gpu_device::nv2a_mirror_w)
 {
-	m_program->write_dword(offset, data, mem_mask);
+	m_program->write_dword(offset << 2, data, mem_mask);
 }

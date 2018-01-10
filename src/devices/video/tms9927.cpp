@@ -32,9 +32,9 @@ static constexpr uint8_t skew_bits_value[4] = { 0, 1, 2, 2 };
 
 
 DEFINE_DEVICE_TYPE(TMS9927, tms9927_device, "tms9927", "TMS9927 VTC")
-DEFINE_DEVICE_TYPE(CRT5027, crt5027_device, "crt5027", "CRT5027")
-DEFINE_DEVICE_TYPE(CRT5037, crt5037_device, "crt5037", "CRT5037")
-DEFINE_DEVICE_TYPE(CRT5057, crt5057_device, "crt5057", "CRT5057")
+DEFINE_DEVICE_TYPE(CRT5027, crt5027_device, "crt5027", "CRT5027 VTAC")
+DEFINE_DEVICE_TYPE(CRT5037, crt5037_device, "crt5037", "CRT5037 VTAC")
+DEFINE_DEVICE_TYPE(CRT5057, crt5057_device, "crt5057", "CRT5057 VTAC")
 
 tms9927_device::tms9927_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: tms9927_device(mconfig, TMS9927, tag, owner, clock)
@@ -45,13 +45,14 @@ tms9927_device::tms9927_device(const machine_config &mconfig, device_type type, 
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_video_interface(mconfig, *this)
 	, m_write_vsyn(*this)
+	, m_write_hsyn(*this)
 	, m_hpixels_per_column(0)
 	, m_overscan_left(0)
 	, m_overscan_right(0)
 	, m_overscan_top(0)
 	, m_overscan_bottom(0)
 	, m_selfload(*this, finder_base::DUMMY_TAG)
-	, m_reset(0)
+	, m_reset(false)
 {
 	std::fill(std::begin(m_reg), std::end(m_reg), 0x00);
 }
@@ -86,9 +87,11 @@ void tms9927_device::device_start()
 
 	// resolve callbacks
 	m_write_vsyn.resolve_safe();
+	m_write_hsyn.resolve();
 
 	// allocate timers
 	m_vsync_timer = timer_alloc(TIMER_VSYNC);
+	m_hsync_timer = timer_alloc(TIMER_HSYNC);
 
 	/* register for state saving */
 	machine().save().register_postload(save_prepost_delegate(FUNC(tms9927_device::state_postload), this));
@@ -96,6 +99,8 @@ void tms9927_device::device_start()
 	save_item(NAME(m_reg));
 	save_item(NAME(m_start_datarow));
 	save_item(NAME(m_reset));
+	save_item(NAME(m_vsyn));
+	save_item(NAME(m_hsyn));
 }
 
 //-------------------------------------------------
@@ -133,16 +138,35 @@ void tms9927_device::device_timer(emu_timer &timer, device_timer_id id, int para
 	{
 	case TIMER_VSYNC:
 		m_vsyn = !m_vsyn;
-
-		m_write_vsyn(m_vsyn);
+		m_write_vsyn(m_vsyn ? 1 : 0);
 
 		if (m_vsyn)
 		{
-			m_vsync_timer->adjust(m_screen->time_until_pos(3));
+			m_vsync_timer->adjust(screen().time_until_pos(m_vsyn_end, m_hsyn_start));
 		}
 		else
 		{
-			m_vsync_timer->adjust(m_screen->time_until_pos(0));
+			m_vsync_timer->adjust(screen().time_until_pos(m_vsyn_start, m_hsyn_start));
+		}
+		break;
+
+	case TIMER_HSYNC:
+		m_hsyn = !m_hsyn;
+		m_write_hsyn(m_hsyn ? 1 : 0);
+
+		uint16_t vpos = screen().vpos();
+		if (m_hsyn)
+		{
+			screen().update_now();
+			if (screen().hpos() > m_hsyn_end)
+				vpos = (vpos + 1) % m_total_vpix;
+			m_hsync_timer->adjust(screen().time_until_pos(vpos, m_hsyn_end));
+		}
+		else
+		{
+			if (screen().hpos() > m_hsyn_start)
+				vpos = (vpos + 1) % m_total_vpix;
+			m_hsync_timer->adjust(screen().time_until_pos(vpos, m_hsyn_start));
 		}
 		break;
 	}
@@ -178,20 +202,20 @@ void tms9927_device::generic_access(address_space &space, offs_t offset)
 		case 0x0a:  /* Reset */
 			if (!m_reset)
 			{
-				m_screen->update_now();
+				screen().update_now();
 				m_reset = true;
 			}
 			break;
 
 		case 0x0b:  /* Up scroll */
-			m_screen->update_now();
+			screen().update_now();
 			m_start_datarow = (m_start_datarow + 1) % DATA_ROWS_PER_FRAME;
 			break;
 
 		case 0x0e:  /* Start timing chain */
 			if (m_reset)
 			{
-				m_screen->update_now();
+				screen().update_now();
 				m_reset = false;
 				recompute_parameters(false);
 			}
@@ -216,7 +240,6 @@ WRITE8_MEMBER( tms9927_device::write )
 
 		case 0x0c:  /* LOAD CURSOR CHARACTER ADDRESS */
 		case 0x0d:  /* LOAD CURSOR ROW ADDRESS */
-osd_printf_debug("Cursor address changed\n");
 			m_reg[offset - 0x0c + 7] = data;
 			/* Recomputing parameters here will break the scrollup on the Attachè
 			   and probably other machines due to m_start_datarow being reset ! */
@@ -246,7 +269,13 @@ READ8_MEMBER( tms9927_device::read )
 }
 
 
-int tms9927_device::screen_reset()
+READ_LINE_MEMBER(tms9927_device::bl_r)
+{
+	return (m_reset || screen().vblank() || screen().hblank()) ? 1 : 0;
+}
+
+
+bool tms9927_device::screen_reset()
 {
 	return m_reset;
 }
@@ -258,7 +287,7 @@ int tms9927_device::upscroll_offset()
 }
 
 
-int tms9927_device::cursor_bounds(rectangle &bounds)
+bool tms9927_device::cursor_bounds(rectangle &bounds)
 {
 	int cursorx = CURSOR_CHAR_ADDRESS;
 	int cursory = CURSOR_ROW_ADDRESS;
@@ -274,9 +303,6 @@ int tms9927_device::cursor_bounds(rectangle &bounds)
 
 void tms9927_device::recompute_parameters(bool postload)
 {
-	attoseconds_t refresh;
-	rectangle visarea;
-
 	if (m_reset)
 		return;
 
@@ -290,7 +316,13 @@ void tms9927_device::recompute_parameters(bool postload)
 
 	m_start_datarow = (LAST_DISP_DATA_ROW + 1) % DATA_ROWS_PER_FRAME;
 
-	osd_printf_debug("TMS9927: Total = %dx%d, Visible = %dx%d, Skew=%d, Upscroll=%d\n", m_total_hpix, m_total_vpix, m_visible_hpix, m_visible_vpix, SKEW_BITS, m_start_datarow);
+	m_hsyn_start = (m_visible_hpix + m_overscan_left + HSYNC_DELAY * m_hpixels_per_column) % m_total_hpix;
+	m_hsyn_end = (m_hsyn_start + HSYNC_WIDTH * m_hpixels_per_column) % m_total_hpix;
+
+	m_vsyn_start = (m_total_vpix + m_overscan_top - VERTICAL_DATA_START) % m_total_vpix;
+	m_vsyn_end = (m_vsyn_start + 3) % m_total_vpix;
+
+	osd_printf_debug("TMS9927: Total = %dx%d, Visible = %dx%d, HSync = %d-%d, VSync = %d-%d, Skew=%d, Upscroll=%d\n", m_total_hpix, m_total_vpix, m_visible_hpix, m_visible_vpix, m_hsyn_start, m_hsyn_end, m_vsyn_start, m_vsyn_end, SKEW_BITS, m_start_datarow);
 
 	/* see if it all makes sense */
 	m_valid_config = true;
@@ -312,14 +344,17 @@ void tms9927_device::recompute_parameters(bool postload)
 		return;
 
 	/* create a visible area */
-	visarea.set(0, m_overscan_left + m_visible_hpix + m_overscan_right - 1,
+	rectangle visarea(0, m_overscan_left + m_visible_hpix + m_overscan_right - 1,
 				0, m_overscan_top + m_visible_vpix + m_overscan_bottom - 1);
 
-	refresh = HZ_TO_ATTOSECONDS(m_clock) * m_total_hpix * m_total_vpix;
+	attoseconds_t refresh = HZ_TO_ATTOSECONDS(m_clock) * m_total_hpix * m_total_vpix;
 
-	m_screen->configure(m_total_hpix, m_total_vpix, visarea, refresh);
+	screen().configure(m_total_hpix, m_total_vpix, visarea, refresh);
 
-	m_vsyn = 0;
-	m_vsync_timer->adjust(m_screen->time_until_pos(0, 0));
+	m_hsyn = false;
+	if (!m_write_hsyn.isnull())
+		m_hsync_timer->adjust(screen().time_until_pos(m_vsyn_start, m_hsyn_start));
 
+	m_vsyn = false;
+	m_vsync_timer->adjust(screen().time_until_pos(m_vsyn_start, m_hsyn_start));
 }

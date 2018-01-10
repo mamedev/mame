@@ -140,6 +140,7 @@ public:
 
 	uint16_t m_kiwame_row_select;
 
+	DECLARE_READ16_MEMBER(metafox_protection_r);
 	DECLARE_WRITE16_MEMBER(seta_vregs_w);
 	DECLARE_WRITE16_MEMBER(seta_vram_0_w);
 	DECLARE_WRITE16_MEMBER(seta_vram_2_w);

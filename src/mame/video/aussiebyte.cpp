@@ -140,7 +140,7 @@ uint8_t aussiebyte_state::crt8002(uint8_t ac_ra, uint8_t ac_chr, uint8_t ac_attr
 			}
 			break;
 		case 1: // external mode
-			gfx = BITSWAP8(ac_chr, 0,1,2,3,4,5,6,7);
+			gfx = bitswap<8>(ac_chr, 0,1,2,3,4,5,6,7);
 			break;
 		case 2: // thin gfx
 			break;

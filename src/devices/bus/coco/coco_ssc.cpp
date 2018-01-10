@@ -153,7 +153,7 @@ DEFINE_DEVICE_TYPE(COCOSSC_SAC, cocossc_sac_device, "cocossc_sac", "CoCo SSC Sou
 //**************************************************************************
 
 MACHINE_CONFIG_MEMBER(coco_ssc_device::device_add_mconfig)
-	MCFG_CPU_ADD(PIC_TAG, TMS7040, DERIVED_CLOCK(1, 2))
+	MCFG_CPU_ADD(PIC_TAG, TMS7040, DERIVED_CLOCK(2, 1))
 	MCFG_TMS7000_IN_PORTA_CB(READ8(coco_ssc_device, ssc_port_a_r))
 	MCFG_TMS7000_OUT_PORTB_CB(WRITE8(coco_ssc_device, ssc_port_b_w))
 	MCFG_TMS7000_IN_PORTC_CB(READ8(coco_ssc_device, ssc_port_c_r))
@@ -171,11 +171,11 @@ MACHINE_CONFIG_MEMBER(coco_ssc_device::device_add_mconfig)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "ssc_audio", SP0256_GAIN)
 	MCFG_SP0256_DATA_REQUEST_CB(INPUTLINE(PIC_TAG, TMS7000_INT1_LINE))
 
-	MCFG_SOUND_ADD(AY_TAG, AY8913, DERIVED_CLOCK(1, 2))
+	MCFG_SOUND_ADD(AY_TAG, AY8913, DERIVED_CLOCK(2, 1))
 	MCFG_AY8910_OUTPUT_TYPE(AY8910_SINGLE_OUTPUT)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "coco_sac_tag", AY8913_GAIN)
 
-	MCFG_DEVICE_ADD("coco_sac_tag", COCOSSC_SAC, DERIVED_CLOCK(1, 2))
+	MCFG_DEVICE_ADD("coco_sac_tag", COCOSSC_SAC, DERIVED_CLOCK(2, 1))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "ssc_audio", 1.0)
 MACHINE_CONFIG_END
 

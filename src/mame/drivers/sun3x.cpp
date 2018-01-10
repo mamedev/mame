@@ -265,7 +265,7 @@ READ32_MEMBER( sun3x_state::p4id_r )
 
 WRITE32_MEMBER( sun3x_state::fdc_control_w )
 {
-	logerror("FDC write %02x (%08x)\n", data >> 24, space.device().safe_pc());
+	logerror("FDC write %02x (%08x)\n", data >> 24, m_maincpu->pc());
 }
 
 READ32_MEMBER( sun3x_state::fdc_control_r )

@@ -98,13 +98,13 @@
 
 WRITE16_MEMBER(bionicc_state::hacked_controls_w)
 {
-	logerror("%06x: hacked_controls_w %04x %02x\n", space.device().safe_pc(), offset, data);
+	logerror("%06x: hacked_controls_w %04x %02x\n", m_maincpu->pc(), offset, data);
 	COMBINE_DATA(&m_inp[offset]);
 }
 
 READ16_MEMBER(bionicc_state::hacked_controls_r)
 {
-	logerror("%06x: hacked_controls_r %04x %04x\n", space.device().safe_pc(), offset, m_inp[offset]);
+	logerror("%06x: hacked_controls_r %04x %04x\n", m_maincpu->pc(), offset, m_inp[offset]);
 	return m_inp[offset];
 }
 

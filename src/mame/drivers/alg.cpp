@@ -115,7 +115,7 @@ VIDEO_START_MEMBER(alg_state,alg)
 
 	/* configure pen 4096 as transparent in the renderer and use it for the genlock color */
 	m_palette->set_pen_color(4096, rgb_t(0,0,0,0));
-	amiga_set_genlock_color(machine(), 4096);
+	set_genlock_color(4096);
 }
 
 
@@ -344,6 +344,10 @@ static MACHINE_CONFIG_START( alg_r1 )
 	/* fdc */
 	MCFG_DEVICE_ADD("fdc", AMIGA_FDC, amiga_state::CLK_7M_NTSC)
 	MCFG_AMIGA_FDC_INDEX_CALLBACK(DEVWRITELINE("cia_1", mos8520_device, flag_w))
+	MCFG_AMIGA_FDC_READ_DMA_CALLBACK(READ16(amiga_state, chip_ram_r))
+	MCFG_AMIGA_FDC_WRITE_DMA_CALLBACK(WRITE16(amiga_state, chip_ram_w))
+	MCFG_AMIGA_FDC_DSKBLK_CALLBACK(WRITELINE(amiga_state, fdc_dskblk_w))
+	MCFG_AMIGA_FDC_DSKSYN_CALLBACK(WRITELINE(amiga_state, fdc_dsksyn_w))
 MACHINE_CONFIG_END
 
 

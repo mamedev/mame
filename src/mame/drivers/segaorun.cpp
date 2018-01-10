@@ -508,7 +508,7 @@ READ16_MEMBER( segaorun_state::misc_io_r )
 	if (!m_custom_io_r.isnull())
 		return m_custom_io_r(space, offset, mem_mask);
 
-	logerror("%06X:misc_io_r - unknown read access to address %04X\n", space.device().safe_pc(), offset * 2);
+	logerror("%06X:misc_io_r - unknown read access to address %04X\n", m_maincpu->pc(), offset * 2);
 	return open_bus_r(space, 0, mem_mask);
 }
 
@@ -525,7 +525,7 @@ WRITE16_MEMBER( segaorun_state::misc_io_w )
 		return;
 	}
 
-	logerror("%06X:misc_io_w - unknown write access to address %04X = %04X & %04X\n", space.device().safe_pc(), offset * 2, data, mem_mask);
+	logerror("%06X:misc_io_w - unknown write access to address %04X = %04X & %04X\n", m_maincpu->pc(), offset * 2, data, mem_mask);
 }
 
 
@@ -705,7 +705,7 @@ READ16_MEMBER( segaorun_state::outrun_custom_io_r )
 			break;
 	}
 
-	logerror("%06X:outrun_custom_io_r - unknown read access to address %04X\n", space.device().safe_pc(), offset * 2);
+	logerror("%06X:outrun_custom_io_r - unknown read access to address %04X\n", m_maincpu->pc(), offset * 2);
 	return open_bus_r(space, 0, mem_mask);
 }
 
@@ -757,7 +757,7 @@ WRITE16_MEMBER( segaorun_state::outrun_custom_io_w )
 			break;
 	}
 
-	logerror("%06X:misc_io_w - unknown write access to address %04X = %04X & %04X\n", space.device().safe_pc(), offset * 2, data, mem_mask);
+	logerror("%06X:misc_io_w - unknown write access to address %04X = %04X & %04X\n", m_maincpu->pc(), offset * 2, data, mem_mask);
 }
 
 
@@ -788,7 +788,7 @@ READ16_MEMBER( segaorun_state::shangon_custom_io_r )
 			break;
 	}
 
-	logerror("%06X:misc_io_r - unknown read access to address %04X\n", space.device().safe_pc(), offset * 2);
+	logerror("%06X:misc_io_r - unknown read access to address %04X\n", m_maincpu->pc(), offset * 2);
 	return open_bus_r(space,0,mem_mask);
 }
 
@@ -840,7 +840,7 @@ WRITE16_MEMBER( segaorun_state::shangon_custom_io_w )
 			break;
 	}
 
-	logerror("%06X:misc_io_w - unknown write access to address %04X = %04X & %04X\n", space.device().safe_pc(), offset * 2, data, mem_mask);
+	logerror("%06X:misc_io_w - unknown write access to address %04X = %04X & %04X\n", m_maincpu->pc(), offset * 2, data, mem_mask);
 }
 
 
@@ -2964,13 +2964,13 @@ DRIVER_INIT_MEMBER(segaorun_state,outrunb)
 	uint16_t *word = (uint16_t *)memregion("maincpu")->base();
 	uint32_t length = memregion("maincpu")->bytes() / 2;
 	for (uint32_t i = 0; i < length; i++)
-		word[i] = BITSWAP16(word[i], 15,14,11,12,13,10,9,8,6,7,5,4,3,2,1,0);
+		word[i] = bitswap<16>(word[i], 15,14,11,12,13,10,9,8,6,7,5,4,3,2,1,0);
 
 	// sub CPU: swap bits 14,15 and 2,3
 	word = (uint16_t *)memregion("subcpu")->base();
 	length = memregion("subcpu")->bytes() / 2;
 	for (uint32_t i = 0; i < length; i++)
-		word[i] = BITSWAP16(word[i], 14,15,13,12,11,10,9,8,7,6,5,4,2,3,1,0);
+		word[i] = bitswap<16>(word[i], 14,15,13,12,11,10,9,8,7,6,5,4,2,3,1,0);
 
 	// road gfx
 	// rom a-2.bin: swap bits 6,7
@@ -2979,15 +2979,15 @@ DRIVER_INIT_MEMBER(segaorun_state,outrunb)
 	length = memregion("gfx3")->bytes() / 2;
 	for (uint32_t i = 0; i < length; i++)
 	{
-		byte[i]        = BITSWAP8(byte[i],        6,7,5,4,3,2,1,0);
-		byte[i+length] = BITSWAP8(byte[i+length], 7,5,6,4,3,2,1,0);
+		byte[i]        = bitswap<8>(byte[i],        6,7,5,4,3,2,1,0);
+		byte[i+length] = bitswap<8>(byte[i+length], 7,5,6,4,3,2,1,0);
 	}
 
 	// Z80 code: swap bits 5,6
 	byte = memregion("soundcpu")->base();
 	length = memregion("soundcpu")->bytes();
 	for (uint32_t i = 0; i < length; i++)
-		byte[i] = BITSWAP8(byte[i], 7,5,6,4,3,2,1,0);
+		byte[i] = bitswap<8>(byte[i], 7,5,6,4,3,2,1,0);
 }
 
 DRIVER_INIT_MEMBER(segaorun_state,shangon)

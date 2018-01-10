@@ -196,7 +196,7 @@ WRITE16_MEMBER(tetrisp2_state::nndmseal_sound_bank_w)
 
 			memcpy(memregion("oki")->base(), rom + (m_bank_lo * 0x80000), 0x20000);
 
-//          logerror("PC:%06X sound bank_lo = %02X\n",space.device().safe_pc(),m_bank_lo);
+//          logerror("PC:%06X sound bank_lo = %02X\n",m_maincpu->pc(),m_bank_lo);
 		}
 		else
 		{
@@ -204,7 +204,7 @@ WRITE16_MEMBER(tetrisp2_state::nndmseal_sound_bank_w)
 
 			memcpy(memregion("oki")->base() + 0x20000, rom + (m_bank_lo * 0x80000) + (m_bank_hi * 0x20000), 0x20000);
 
-//          logerror("PC:%06X sound bank_hi = %02X\n",space.device().safe_pc(),m_bank_hi);
+//          logerror("PC:%06X sound bank_hi = %02X\n",m_maincpu->pc(),m_bank_hi);
 		}
 	}
 }

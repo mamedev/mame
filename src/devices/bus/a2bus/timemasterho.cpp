@@ -155,11 +155,11 @@ void a2bus_timemasterho_device::device_reset()
     read_c0nx - called for reads from this card's c0nx space
 -------------------------------------------------*/
 
-uint8_t a2bus_timemasterho_device::read_c0nx(address_space &space, uint8_t offset)
+uint8_t a2bus_timemasterho_device::read_c0nx(uint8_t offset)
 {
 	if (offset <= 3)
 	{
-		return m_pia->read(space, offset);
+		return m_pia->reg_r(offset);
 	}
 
 	return 0xff;
@@ -170,11 +170,11 @@ uint8_t a2bus_timemasterho_device::read_c0nx(address_space &space, uint8_t offse
     write_c0nx - called for writes to this card's c0nx space
 -------------------------------------------------*/
 
-void a2bus_timemasterho_device::write_c0nx(address_space &space, uint8_t offset, uint8_t data)
+void a2bus_timemasterho_device::write_c0nx(uint8_t offset, uint8_t data)
 {
 	if (offset <= 3)
 	{
-		m_pia->write(space, offset, data);
+		m_pia->reg_w(offset, data);
 	}
 }
 
@@ -182,7 +182,7 @@ void a2bus_timemasterho_device::write_c0nx(address_space &space, uint8_t offset,
     read_cnxx - called for reads from this card's cnxx space
 -------------------------------------------------*/
 
-uint8_t a2bus_timemasterho_device::read_cnxx(address_space &space, uint8_t offset)
+uint8_t a2bus_timemasterho_device::read_cnxx(uint8_t offset)
 {
 	if (m_started)
 	{
@@ -200,7 +200,7 @@ uint8_t a2bus_timemasterho_device::read_cnxx(address_space &space, uint8_t offse
     read_c800 - called for reads from this card's c800 space
 -------------------------------------------------*/
 
-uint8_t a2bus_timemasterho_device::read_c800(address_space &space, uint16_t offset)
+uint8_t a2bus_timemasterho_device::read_c800(uint16_t offset)
 {
 	return m_rom[offset+0xc00];
 }

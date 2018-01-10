@@ -600,7 +600,7 @@ WRITE8_MEMBER(gb_rom_mbc6_device::write_bank)
 {
 	if (offset < 0x2000)
 	{
-		logerror( "0x%04X: write to mbc6 ram enable area: %04X <- 0x%02X\n", space.device().safe_pc(), offset, data );
+		logerror( "%s write to mbc6 ram enable area: %04X <- 0x%02X\n", machine().describe_context(), offset, data );
 	}
 	else if (offset < 0x3000)
 	{
@@ -647,18 +647,18 @@ WRITE8_MEMBER(gb_rom_mbc7_device::write_bank)
 	if (offset < 0x2000)
 	{
 		// FIXME: Add RAM enable support
-		logerror("0x%04X: Write to ram enable register 0x%04X <- 0x%02X\n", space.device().safe_pc( ), offset, data);
+		logerror("%s Write to ram enable register 0x%04X <- 0x%02X\n", machine().describe_context(), offset, data);
 	}
 	else if (offset < 0x3000)
 	{
-		logerror( "0x%04X: write to mbc7 rom select register: 0x%04X <- 0x%02X\n", space.device() .safe_pc( ), 0x2000 + offset, data );
+		logerror( "%s write to mbc7 rom select register: 0x%04X <- 0x%02X\n", machine().describe_context(), 0x2000 + offset, data );
 		/* Bit 12 must be set for writing to the mbc register */
 		if (offset & 0x0100)
 			m_latch_bank2 = data;
 	}
 	else
 	{
-		logerror( "0x%04X: write to mbc7 rom area: 0x%04X <- 0x%02X\n", space.device() .safe_pc( ), 0x3000 + offset, data );
+		logerror( "%s write to mbc7 rom area: 0x%04X <- 0x%02X\n", machine().describe_context(), 0x3000 + offset, data );
 		/* Bit 12 must be set for writing to the mbc register */
 		if (offset & 0x0100)
 		{
@@ -1057,26 +1057,26 @@ WRITE8_MEMBER(gb_rom_sintax_device::write_bank)
 		switch (m_sintax_mode & 0x0f)
 		{
 			case 0x0d:
-				data = BITSWAP8(data, 1,0,7,6,5,4,3,2);
+				data = bitswap<8>(data, 1,0,7,6,5,4,3,2);
 				break;
 			case 0x09:
-				//data = BITSWAP8(data, 3,2,5,4,0,1,6,7); // Monkey..no
-				data = BITSWAP8(data, 4,5,2,3,0,1,6,7);
+				//data = bitswap<8>(data, 3,2,5,4,0,1,6,7); // Monkey..no
+				data = bitswap<8>(data, 4,5,2,3,0,1,6,7);
 				break;
 			case 0x00: // 0x10=lion 0x00 hmmmmm // 1 and 0 unconfirmed
-				data = BITSWAP8(data, 7,0,5,6,3,4,1,2);
+				data = bitswap<8>(data, 7,0,5,6,3,4,1,2);
 				break;
 			case 0x01:
-				data = BITSWAP8(data, 0,1,6,7,4,5,2,3);
+				data = bitswap<8>(data, 0,1,6,7,4,5,2,3);
 				break;
 			case 0x05:
-				data = BITSWAP8(data, 7,6,1,0,3,2,5,4); // Not 100% on this one
+				data = bitswap<8>(data, 7,6,1,0,3,2,5,4); // Not 100% on this one
 				break;
 			case 0x07:
-				data = BITSWAP8(data, 2,0,3,1,5,4,7,6); // 5 and 7 unconfirmed
+				data = bitswap<8>(data, 2,0,3,1,5,4,7,6); // 5 and 7 unconfirmed
 				break;
 			case 0x0b:
-				data = BITSWAP8(data, 2,3,0,1,6,7,4,5); // 5 and 6 unconfirmed
+				data = bitswap<8>(data, 2,3,0,1,6,7,4,5); // 5 and 6 unconfirmed
 				break;
 		}
 		m_latch_bank2 = (m_latch_bank2 & 0x100) | data;

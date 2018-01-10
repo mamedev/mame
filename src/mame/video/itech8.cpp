@@ -183,7 +183,7 @@ WRITE8_MEMBER(itech8_state::palette_w)
 WRITE8_MEMBER(itech8_state::page_w)
 {
 	m_screen->update_partial(m_screen->vpos());
-	logerror("%04x:display_page = %02X (%d)\n", space.device().safe_pc(), data, m_screen->vpos());
+	logerror("%04x:display_page = %02X (%d)\n", m_maincpu->pc(), data, m_screen->vpos());
 	m_page_select = data;
 }
 
@@ -480,7 +480,7 @@ WRITE8_MEMBER(itech8_state::blitter_w)
 	}
 
 	/* debugging */
-	if (FULL_LOGGING) logerror("%04x:blitter_w(%02x)=%02x\n", space.device().safe_pcbase(), offset, data);
+	if (FULL_LOGGING) logerror("%04x:blitter_w(%02x)=%02x\n", m_subcpu->pcbase(), offset, data);
 }
 
 

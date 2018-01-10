@@ -1054,7 +1054,8 @@ WRITE8_MEMBER( z8536_device::write )
 
 			case STATE_1:
 				write_register(m_pointer, data);
-				m_state = STATE_0;
+				if (m_state != STATE_RESET)
+					m_state = STATE_0;
 			}
 			break;
 		}

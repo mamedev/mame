@@ -78,7 +78,7 @@ private:
 		uint8_t   argument1;
 		uint8_t   argument2;
 	};
-	
+
 	static const char *const s_mnemonic[];
 	static const uint32_t s_flags[];
 	static const minxdasm mnemonic[256];

@@ -114,6 +114,8 @@ i8086_cpu_device::i8086_cpu_device(const machine_config &mconfig, device_type ty
 	, m_extra_config("extra", ENDIANNESS_LITTLE, data_bus_size, 20, 0)
 	, m_io_config("io", ENDIANNESS_LITTLE, data_bus_size, 16, 0)
 	, m_out_if_func(*this)
+	, m_esc_opcode_handler(*this)
+	, m_esc_data_handler(*this)
 {
 }
 
@@ -274,6 +276,23 @@ void i8086_cpu_device::execute_run()
 				}
 				break;
 
+			case 0xd8: // i_esc
+			case 0xd9:
+			case 0xda:
+			case 0xdb:
+			case 0xdc:
+			case 0xdd:
+			case 0xde:
+			case 0xdf:
+				m_esc_opcode_handler(pc() - 1);
+				m_modrm = fetch();
+				if(m_modrm < 0xc0)
+					m_esc_data_handler(get_ea(1, I8086_READ));
+				else
+					m_esc_data_handler(0);
+				CLK(NOP);
+				break;
+
 			default:
 				if(!common_op(op))
 				{
@@ -295,6 +314,8 @@ void i8086_cpu_device::device_start()
 {
 	i8086_common_cpu_device::device_start();
 	m_out_if_func.resolve_safe();
+	m_esc_opcode_handler.resolve_safe();
+	m_esc_data_handler.resolve_safe();
 	m_stack = has_space(AS_STACK) ? &space(AS_STACK) : m_program;
 	m_code = has_space(AS_CODE) ? &space(AS_CODE) : m_program;
 	m_extra = has_space(AS_EXTRA) ? &space(AS_EXTRA) : m_program;
@@ -1915,21 +1936,6 @@ bool i8086_common_cpu_device::common_op(uint8_t op)
 			m_regs.b[AL] = GetMemB( DS, m_regs.w[BX] + m_regs.b[AL] );
 			CLK(XLAT);
 			break;
-
-		case 0xd8: // i_esc
-		case 0xd9:
-		case 0xda:
-		case 0xdb:
-		case 0xdc:
-		case 0xdd:
-		case 0xde:
-		case 0xdf:
-			m_modrm = fetch();
-			GetRMByte();
-			CLK(NOP);
-			logerror("%06x: Unimplemented floating point escape %02x%02x\n", pc(), op, m_modrm);
-			break;
-
 
 		case 0xe0: // i_loopne
 			{

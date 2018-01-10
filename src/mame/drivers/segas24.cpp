@@ -558,13 +558,13 @@ WRITE8_MEMBER(segas24_state::hotrod_lamps_w)
 
 READ16_MEMBER( segas24_state::iod_r )
 {
-	logerror("IO daughterboard read %02x (%x)\n", offset, space.device().safe_pc());
+	logerror("IO daughterboard read %02x %s\n", offset, machine().describe_context());
 	return 0xffff;
 }
 
 WRITE16_MEMBER( segas24_state::iod_w )
 {
-	logerror("IO daughterboard write %02x, %04x & %04x (%x)\n", offset, data, mem_mask, space.device().safe_pc());
+	logerror("IO daughterboard write %02x, %04x & %04x %s\n", offset, data, mem_mask, machine().describe_context());
 }
 
 /* HACK for Gain Ground to avoid 'forced free play' issue
@@ -729,7 +729,7 @@ WRITE16_MEMBER( segas24_state::mlatch_w )
 		int i;
 		uint8_t mxor = 0;
 		if(!mlatch_table) {
-			logerror("Protection: magic latch accessed but no table loaded (%s:%x)\n", space.device().tag(), space.device().safe_pc());
+			logerror("Protection: magic latch accessed but no table loaded %s\n", machine().describe_context());
 			return;
 		}
 
@@ -740,9 +740,9 @@ WRITE16_MEMBER( segas24_state::mlatch_w )
 				if(mlatch & (1<<i))
 					mxor |= 1 << mlatch_table[i];
 			mlatch = data ^ mxor;
-			logerror("Magic latching %02x ^ %02x as %02x (%s:%x)\n", data & 0xff, mxor, mlatch, space.device().tag(), space.device().safe_pc());
+			logerror("Magic latching %02x ^ %02x as %02x %s\n", data & 0xff, mxor, mlatch, machine().describe_context());
 		} else {
-			logerror("Magic latch reset (%s:%x)\n", space.device().tag(), space.device().safe_pc());
+			logerror("Magic latch reset %s\n", machine().describe_context());
 			mlatch = 0x00;
 		}
 	}

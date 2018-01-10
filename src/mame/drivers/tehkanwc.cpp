@@ -177,7 +177,7 @@ WRITE8_MEMBER(tehkanwc_state::sound_answer_w)
 
 	/* in Gridiron, the sound CPU goes in a tight loop after the self test, */
 	/* probably waiting to be reset by a watchdog */
-	if (space.device().safe_pc() == 0x08bc) m_reset_timer->adjust(attotime::from_seconds(1));
+	if (m_audiocpu->pc() == 0x08bc) m_reset_timer->adjust(attotime::from_seconds(1));
 }
 
 

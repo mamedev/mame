@@ -11,7 +11,7 @@
 
 #pragma once
 
-
+#include "bus/cbus/pc9801_cbus.h"
 #include "machine/pic8259.h"
 #include "sound/2608intf.h"
 
@@ -45,7 +45,7 @@ protected:
 	void install_device(offs_t start, offs_t end, read8_delegate rhandler, write8_delegate whandler);
 
 private:
-//  required_device<cpu_device>  m_maincpu;
+	required_device<pc9801_slot_device> m_bus;
 	required_device<ym2608_device>  m_opn3;
 
 	uint8_t m_joy_sel;

@@ -29,17 +29,17 @@ WRITE8_MEMBER(solomon_state::solomon_sh_command_w)
 
 READ8_MEMBER(solomon_state::solomon_0xe603_r)
 {
-	if (space.device().safe_pc() == 0x161) // all the time .. return 0 to act as before  for coin / startup etc.
+	if (m_maincpu->pc() == 0x161) // all the time .. return 0 to act as before  for coin / startup etc.
 	{
 		return 0;
 	}
-	else if (space.device().safe_pc() == 0x4cf0) // stop it clearing the screen at certain scores
+	else if (m_maincpu->pc() == 0x4cf0) // stop it clearing the screen at certain scores
 	{
-		return (space.device().state().state_int(Z80_BC) & 0x08);
+		return (m_maincpu->state_int(Z80_BC) & 0x08);
 	}
 	else
 	{
-		osd_printf_debug("unhandled solomon_0xe603_r %04x\n", space.device().safe_pc());
+		osd_printf_debug("unhandled solomon_0xe603_r %04x\n", m_maincpu->pc());
 		return 0;
 	}
 }

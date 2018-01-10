@@ -373,9 +373,13 @@ public:
 
 	virtual image_init_result call_load() override;
 	virtual void call_unload() override;
+
 protected:
 	// device-level overrides
 	virtual void device_start() override { }
+
+private:
+	required_device<tx0_state> m_tx0;
 };
 
 DEFINE_DEVICE_TYPE(TX0_READTAPE, tx0_readtape_image_device, "tx0_readtape_image", "TX0 Tape Reader")
@@ -383,6 +387,7 @@ DEFINE_DEVICE_TYPE(TX0_READTAPE, tx0_readtape_image_device, "tx0_readtape_image"
 tx0_readtape_image_device::tx0_readtape_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, TX0_READTAPE, tag, owner, clock)
 	, device_image_interface(mconfig, *this)
+	, m_tx0(*this, DEVICE_SELF_OWNER)
 {
 }
 
@@ -405,9 +410,13 @@ public:
 
 	virtual image_init_result call_load() override;
 	virtual void call_unload() override;
+
 protected:
 	// device-level overrides
 	virtual void device_start() override { }
+
+private:
+	required_device<tx0_state> m_tx0;
 };
 
 DEFINE_DEVICE_TYPE(TX0_PUNCHTAPE, tx0_punchtape_image_device, "tx0_punchtape_image", "TX0 Tape Puncher")
@@ -415,6 +424,7 @@ DEFINE_DEVICE_TYPE(TX0_PUNCHTAPE, tx0_punchtape_image_device, "tx0_punchtape_ima
 tx0_punchtape_image_device::tx0_punchtape_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, TX0_PUNCHTAPE, tag, owner, clock)
 	, device_image_interface(mconfig, *this)
+	, m_tx0(*this, DEVICE_SELF_OWNER)
 {
 }
 
@@ -438,9 +448,13 @@ public:
 
 	virtual image_init_result call_load() override;
 	virtual void call_unload() override;
+
 protected:
 	// device-level overrides
 	virtual void device_start() override { }
+
+private:
+	required_device<tx0_state> m_tx0;
 };
 
 DEFINE_DEVICE_TYPE(TX0_PRINTER, tx0_printer_image_device, "tx0_printer_image", "TX0 Typewriter")
@@ -448,6 +462,7 @@ DEFINE_DEVICE_TYPE(TX0_PRINTER, tx0_printer_image_device, "tx0_printer_image", "
 tx0_printer_image_device::tx0_printer_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, TX0_PRINTER, tag, owner, clock)
 	, device_image_interface(mconfig, *this)
+	, m_tx0(*this, DEVICE_SELF_OWNER)
 {
 }
 
@@ -470,9 +485,13 @@ public:
 
 	virtual image_init_result call_load() override;
 	virtual void call_unload() override;
+
 protected:
 	// device-level overrides
 	virtual void device_start() override;
+
+private:
+	required_device<tx0_state> m_tx0;
 };
 
 DEFINE_DEVICE_TYPE(TX0_MAGTAPE, tx0_magtape_image_device, "tx0_magtape_image", "TX0 Magnetic Tape")
@@ -480,6 +499,7 @@ DEFINE_DEVICE_TYPE(TX0_MAGTAPE, tx0_magtape_image_device, "tx0_magtape_image", "
 tx0_magtape_image_device::tx0_magtape_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, TX0_MAGTAPE, tag, owner, clock)
 	, device_image_interface(mconfig, *this)
+	, m_tx0(*this, DEVICE_SELF_OWNER)
 {
 }
 
@@ -490,29 +510,27 @@ tx0_magtape_image_device::tx0_magtape_image_device(const machine_config &mconfig
 */
 image_init_result tx0_readtape_image_device::call_load()
 {
-	tx0_state *state = machine().driver_data<tx0_state>();
-
 	/* reader unit */
-	state->m_tape_reader.fd = this;
+	m_tx0->m_tape_reader.fd = this;
 
 	/* start motor */
-	state->m_tape_reader.motor_on = 1;
+	m_tx0->m_tape_reader.motor_on = 1;
 
 		/* restart reader IO when necessary */
 		/* note that this function may be called before tx0_init_machine, therefore
 		before tape_reader.timer is allocated.  It does not matter, as the clutch is never
 		down at power-up, but we must not call timer_enable with a nullptr parameter! */
 
-	if (state->m_tape_reader.timer)
+	if (m_tx0->m_tape_reader.timer)
 	{
-		if (state->m_tape_reader.motor_on && state->m_tape_reader.rcl)
+		if (m_tx0->m_tape_reader.motor_on && m_tx0->m_tape_reader.rcl)
 		{
 			/* delay is approximately 1/400s */
-			state->m_tape_reader.timer->adjust(attotime::from_usec(2500));
+			m_tx0->m_tape_reader.timer->adjust(attotime::from_usec(2500));
 		}
 		else
 		{
-			state->m_tape_reader.timer->enable(0);
+			m_tx0->m_tape_reader.timer->enable(0);
 		}
 	}
 
@@ -521,16 +539,14 @@ image_init_result tx0_readtape_image_device::call_load()
 
 void tx0_readtape_image_device::call_unload()
 {
-	tx0_state *state = machine().driver_data<tx0_state>();
-
 	/* reader unit */
-	state->m_tape_reader.fd = nullptr;
+	m_tx0->m_tape_reader.fd = nullptr;
 
 	/* stop motor */
-	state->m_tape_reader.motor_on = 0;
+	m_tx0->m_tape_reader.motor_on = 0;
 
-	if (state->m_tape_reader.timer)
-		state->m_tape_reader.timer->enable(0);
+	if (m_tx0->m_tape_reader.timer)
+		m_tx0->m_tape_reader.timer->enable(0);
 }
 
 /*
@@ -626,20 +642,16 @@ TIMER_CALLBACK_MEMBER(tx0_state::reader_callback)
 */
 image_init_result tx0_punchtape_image_device::call_load()
 {
-	tx0_state *state = machine().driver_data<tx0_state>();
-
 	/* punch unit */
-	state->m_tape_puncher.fd = this;
+	m_tx0->m_tape_puncher.fd = this;
 
 	return image_init_result::PASS;
 }
 
 void tx0_punchtape_image_device::call_unload()
 {
-	tx0_state *state = machine().driver_data<tx0_state>();
-
 	/* punch unit */
-	state->m_tape_puncher.fd = nullptr;
+	m_tx0->m_tape_puncher.fd = nullptr;
 }
 
 TIMER_CALLBACK_MEMBER(tx0_state::puncher_callback)
@@ -706,17 +718,15 @@ WRITE_LINE_MEMBER( tx0_state::tx0_io_p7h )
 */
 image_init_result tx0_printer_image_device::call_load()
 {
-	tx0_state *state = machine().driver_data<tx0_state>();
 	/* open file */
-	state->m_typewriter.fd = this;
+	m_tx0->m_typewriter.fd = this;
 
 	return image_init_result::PASS;
 }
 
 void tx0_printer_image_device::call_unload()
 {
-	tx0_state *state = machine().driver_data<tx0_state>();
-	state->m_typewriter.fd = nullptr;
+	m_tx0->m_typewriter.fd = nullptr;
 }
 
 /*
@@ -837,8 +847,7 @@ void tx0_state::schedule_unselect()
 
 void tx0_magtape_image_device::device_start()
 {
-	tx0_state *state = machine().driver_data<tx0_state>();
-	state->m_magtape.img = this;
+	m_tx0->m_magtape.img = this;
 }
 
 /*
@@ -846,19 +855,18 @@ void tx0_magtape_image_device::device_start()
 */
 image_init_result tx0_magtape_image_device::call_load()
 {
-	tx0_state *state = machine().driver_data<tx0_state>();
-	state->m_magtape.img = this;
+	m_tx0->m_magtape.img = this;
 
-	state->m_magtape.irg_pos = MTIRGP_END;
+	m_tx0->m_magtape.irg_pos = MTIRGP_END;
 
 	/* restart IO when necessary */
 	/* note that this function may be called before tx0_init_machine, therefore
 	before magtape.timer is allocated.  We must not call timer_enable with a
 	nullptr parameter! */
-	if (state->m_magtape.timer)
+	if (m_tx0->m_magtape.timer)
 	{
-		if (state->m_magtape.state == MTS_SELECTING)
-			state->schedule_select();
+		if (m_tx0->m_magtape.state == MTS_SELECTING)
+			m_tx0->schedule_select();
 	}
 
 	return image_init_result::PASS;
@@ -866,19 +874,18 @@ image_init_result tx0_magtape_image_device::call_load()
 
 void tx0_magtape_image_device::call_unload()
 {
-	tx0_state *state = machine().driver_data<tx0_state>();
-	state->m_magtape.img = nullptr;
+	m_tx0->m_magtape.img = nullptr;
 
-	if (state->m_magtape.timer)
+	if (m_tx0->m_magtape.timer)
 	{
-		if (state->m_magtape.state == MTS_SELECTING)
+		if (m_tx0->m_magtape.state == MTS_SELECTING)
 			/* I/O has not actually started, we can cancel the selection */
-			state->m_tape_reader.timer->enable(0);
-		if ((state->m_magtape.state == MTS_SELECTED) || ((state->m_magtape.state == MTS_SELECTING) && (state->m_magtape.command == 2)))
+			m_tx0->m_tape_reader.timer->enable(0);
+		if ((m_tx0->m_magtape.state == MTS_SELECTED) || ((m_tx0->m_magtape.state == MTS_SELECTING) && (m_tx0->m_magtape.command == 2)))
 		{   /* unit has become unavailable */
-			state->m_magtape.state = MTS_UNSELECTING;
-			state->m_maincpu->set_state_int(TX0_PF, state->m_maincpu->state_int(TX0_PF) | PF_RWC);
-			state->schedule_unselect();
+			m_tx0->m_magtape.state = MTS_UNSELECTING;
+			m_tx0->m_maincpu->set_state_int(TX0_PF, m_tx0->m_maincpu->state_int(TX0_PF) | PF_RWC);
+			m_tx0->schedule_unselect();
 		}
 	}
 }

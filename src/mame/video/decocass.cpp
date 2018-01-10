@@ -241,7 +241,7 @@ void decocass_state::draw_special_priority(bitmap_ind16 &bitmap, bitmap_ind8 &pr
 	if ((crossing == 0 || BIT(m_mode_set, 6)) && !BIT(m_mode_set, 5))
 		return;
 
-	int color = (BITSWAP8(m_color_center_bot, 0, 1, 7, 2, 3, 4, 5, 6) & 0x27) | 0x08;
+	int color = (bitswap<8>(m_color_center_bot, 0, 1, 7, 2, 3, 4, 5, 6) & 0x27) | 0x08;
 
 	int sy = 64 - m_part_v_shift + 1;
 	if (sy < 0)

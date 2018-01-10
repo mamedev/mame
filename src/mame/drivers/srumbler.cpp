@@ -246,7 +246,7 @@ GFXDECODE_END
 static MACHINE_CONFIG_START( srumbler )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6809, 1500000)        /* 1.5 MHz (?) */
+	MCFG_CPU_ADD("maincpu", MC6809, 6000000)        /* HD68B09P at 6 MHz (?) */
 	MCFG_CPU_PROGRAM_MAP(srumbler_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", srumbler_state, interrupt, "screen", 0, 1)
 

@@ -2,7 +2,7 @@
 // copyright-holders:Fabio Priuli
 /***************************************************************************
 
-    Skeleton driver for V-Tech VSmile Pro CD System
+    Skeleton driver for VTech V.Smile Pro CD System
 
     30/05/2016
 
@@ -66,5 +66,5 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT  COMPANY   FULLNAME       FLAGS
-COMP( 2007, vsmilpro, 0,      0,      vsmilpro, vsmilpro, vsmilpro_state, 0,    "V-Tech", "V-Smile Pro", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+//    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT COMPANY   FULLNAME       FLAGS
+COMP( 2007, vsmilpro, 0,      0,      vsmilpro, vsmilpro, vsmilpro_state, 0,    "VTech", "V.Smile Pro", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

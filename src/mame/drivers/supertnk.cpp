@@ -489,7 +489,7 @@ DRIVER_INIT_MEMBER(supertnk_state,supertnk)
 
 	for (offs = 0; offs < len; offs++)
 	{
-		rom[offs] = BITSWAP8(rom[offs],0,1,2,3,4,5,6,7);
+		rom[offs] = bitswap<8>(rom[offs],0,1,2,3,4,5,6,7);
 	}
 }
 

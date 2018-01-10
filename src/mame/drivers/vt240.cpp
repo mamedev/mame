@@ -338,7 +338,7 @@ READ8_MEMBER(vt240_state::char_buf_r)
 
 WRITE8_MEMBER(vt240_state::char_buf_w)
 {
-	m_char_buf[m_char_idx++] = BITSWAP8(data, 0, 1, 2, 3, 4, 5, 6, 7);
+	m_char_buf[m_char_idx++] = bitswap<8>(data, 0, 1, 2, 3, 4, 5, 6, 7);
 	m_char_idx &= 0xf;
 }
 
@@ -370,7 +370,7 @@ WRITE8_MEMBER(vt240_state::vom_w)
 	if(!BIT(m_reg0, 2))
 	{
 		m_vom[offset] = data;
-		data = ~BITSWAP8(data, 1, 0, 3, 2, 5, 4, 7, 6);
+		data = ~bitswap<8>(data, 1, 0, 3, 2, 5, 4, 7, 6);
 		m_palette->set_pen_color(offset, pal2bit(data >> 6), pal2bit(data >> 6), pal2bit(data >> 6));
 		m_palette->set_pen_color((offset + 16), pal2bit(data >> 0), pal2bit(data >> 2), pal2bit(data >> 4));
 	}
@@ -410,7 +410,7 @@ WRITE16_MEMBER(vt240_state::vram_w)
 	{
 		if(BIT(m_reg0, 6))
 		{
-			chr = BITSWAP8(m_vpat, m_patidx, m_patidx, m_patidx, m_patidx, m_patidx, m_patidx, m_patidx, m_patidx);
+			chr = bitswap<8>(m_vpat, m_patidx, m_patidx, m_patidx, m_patidx, m_patidx, m_patidx, m_patidx, m_patidx);
 			if(m_patcnt-- == 0)
 			{
 				m_patcnt = m_patmult;
@@ -494,7 +494,7 @@ WRITE16_MEMBER(vt240_state::vram_w)
 
 WRITE8_MEMBER(vt240_state::mask_w)
 {
-	m_mask = BITSWAP8(data, 0, 1, 2, 3, 4, 5, 6, 7);
+	m_mask = bitswap<8>(data, 0, 1, 2, 3, 4, 5, 6, 7);
 }
 
 READ8_MEMBER(vt240_state::nvr_store_r)
@@ -644,7 +644,7 @@ static MACHINE_CONFIG_START( vt240 )
 	MCFG_T11_INITIAL_MODE(5 << 13)
 	MCFG_T11_RESET(WRITELINE(vt240_state, t11_reset_w))
 
-	MCFG_CPU_ADD("charcpu", I8085A, XTAL_16MHz / 4)
+	MCFG_CPU_ADD("charcpu", I8085A, XTAL_16_09728MHz / 2)
 	MCFG_CPU_PROGRAM_MAP(vt240_char_mem)
 	MCFG_CPU_IO_MAP(vt240_char_io)
 	MCFG_I8085A_SOD(WRITELINE(vt240_state, i8085_rdy_w))
@@ -658,21 +658,19 @@ static MACHINE_CONFIG_START( vt240 )
 	MCFG_ADDRESS_MAP_BANK_STRIDE(0x1000)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_SIZE(800, 480)
-	MCFG_SCREEN_VISIBLE_AREA(0, 800-1, 0, 480-1)
+	MCFG_SCREEN_RAW_PARAMS(XTAL_16_09728MHz, 1024, 0, 800, 629, 0, 480)
 	MCFG_SCREEN_UPDATE_DEVICE("upd7220", upd7220_device, screen_update)
 	MCFG_PALETTE_ADD("palette", 32)
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", vt240)
 
-	MCFG_DEVICE_ADD("upd7220", UPD7220, XTAL_4MHz / 4)
+	MCFG_DEVICE_ADD("upd7220", UPD7220, XTAL_16_09728MHz / 16) // actually /8?
 	MCFG_DEVICE_ADDRESS_MAP(0, upd7220_map)
 	MCFG_UPD7220_DISPLAY_PIXELS_CALLBACK_OWNER(vt240_state, hgdc_draw)
 	MCFG_UPD7220_VSYNC_CALLBACK(INPUTLINE("charcpu", I8085_RST75_LINE))
 	MCFG_UPD7220_BLANK_CALLBACK(INPUTLINE("charcpu", I8085_RST55_LINE))
 	MCFG_VIDEO_SET_SCREEN("screen")
 
-	MCFG_DEVICE_ADD("duart", SCN2681, XTAL_3_6864MHz)
+	MCFG_DEVICE_ADD("duart", SCN2681, XTAL_7_3728MHz / 2)
 	MCFG_MC68681_IRQ_CALLBACK(WRITELINE(vt240_state, irq13_w))
 	MCFG_MC68681_A_TX_CALLBACK(DEVWRITELINE("host", rs232_port_device, write_txd))
 	MCFG_MC68681_B_TX_CALLBACK(DEVWRITELINE("printer", rs232_port_device, write_txd))

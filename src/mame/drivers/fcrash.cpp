@@ -196,7 +196,7 @@ WRITE16_MEMBER(cps_state::dinopic_layer_w)
 		m_cps_a_regs[0x14 / 2] = data;
 		break;
 	default:
-		logerror("%s: Unknown layer cmd %X %X\n",space.machine().describe_context(),offset<<1,data);
+		logerror("%s: Unknown layer cmd %X %X\n",machine().describe_context(),offset<<1,data);
 
 	}
 }
@@ -321,7 +321,7 @@ WRITE16_MEMBER(cps_state::punipic_layer_w)
 		// unknown
 		break;
 	default:
-		logerror("%s: Unknown layer cmd %X %X\n",space.machine().describe_context(),offset<<1,data);
+		logerror("%s: Unknown layer cmd %X %X\n",machine().describe_context(),offset<<1,data);
 
 	}
 }
@@ -379,7 +379,7 @@ WRITE16_MEMBER(cps_state::sf2m1_layer_w)
 		m_cps_a_regs[0x06 / 2] = data;
 		break;
 	default:
-		logerror("%s: Unknown layer cmd %X %X\n",space.machine().describe_context(),offset<<1,data);
+		logerror("%s: Unknown layer cmd %X %X\n",machine().describe_context(),offset<<1,data);
 
 	}
 }
@@ -2354,7 +2354,7 @@ MACHINE_START_MEMBER(cps_state, punipic)
 	m_layer_mask_reg[3] = 0x0a;
 	m_layer_scroll1x_offset = 0x46; // text
 	m_layer_scroll3x_offset = 0x46; // green patch in the park
-	m_sprite_base = 0x000;
+	m_sprite_base = 0x1000;
 	m_sprite_list_end_marker = 0x8000;
 	m_sprite_x_offset = 0;
 }

@@ -86,7 +86,7 @@ ADDRESS_MAP_END
 WRITE16_MEMBER( mquake_state::output_w )
 {
 	if (ACCESSING_BITS_0_7)
-		logerror("%06x:output_w(%x) = %02x\n", space.device().safe_pc(), offset, data);
+		logerror("%06x:output_w(%x) = %02x\n", m_maincpu->pc(), offset, data);
 }
 
 
@@ -94,13 +94,13 @@ READ16_MEMBER( mquake_state::coin_chip_r )
 {
 	if (offset == 1)
 		return ioport("COINCHIP")->read();
-	logerror("%06x:coin_chip_r(%02x) & %04x\n", space.device().safe_pc(), offset, mem_mask);
+	logerror("%06x:coin_chip_r(%02x) & %04x\n", m_maincpu->pc(), offset, mem_mask);
 	return 0xffff;
 }
 
 WRITE16_MEMBER( mquake_state::coin_chip_w )
 {
-	logerror("%06x:coin_chip_w(%02x) = %04x & %04x\n", space.device().safe_pc(), offset, data, mem_mask);
+	logerror("%06x:coin_chip_w(%02x) = %04x & %04x\n", m_maincpu->pc(), offset, data, mem_mask);
 }
 
 // inputs at 282000, 282002 (full word)
@@ -353,6 +353,10 @@ static MACHINE_CONFIG_START( mquake )
 	/* fdc */
 	MCFG_DEVICE_ADD("fdc", AMIGA_FDC, amiga_state::CLK_7M_NTSC)
 	MCFG_AMIGA_FDC_INDEX_CALLBACK(DEVWRITELINE("cia_1", mos8520_device, flag_w))
+	MCFG_AMIGA_FDC_READ_DMA_CALLBACK(READ16(amiga_state, chip_ram_r))
+	MCFG_AMIGA_FDC_WRITE_DMA_CALLBACK(WRITE16(amiga_state, chip_ram_w))
+	MCFG_AMIGA_FDC_DSKBLK_CALLBACK(WRITELINE(amiga_state, fdc_dskblk_w))
+	MCFG_AMIGA_FDC_DSKSYN_CALLBACK(WRITELINE(amiga_state, fdc_dsksyn_w))
 MACHINE_CONFIG_END
 
 

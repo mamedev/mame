@@ -269,8 +269,8 @@ inline void crt9007_device::trigger_interrupt(int line)
 
 inline void crt9007_device::update_cblank_line()
 {
-	int x = m_screen->hpos();
-	int y = m_screen->vpos();
+	int x = screen().hpos();
+	int y = screen().vpos();
 
 	// composite blank
 	int cblank = !(m_hs & m_vs);
@@ -292,12 +292,12 @@ inline void crt9007_device::update_cblank_line()
 
 inline void crt9007_device::update_hsync_timer(int state)
 {
-	int y = m_screen->vpos();
+	int y = screen().vpos();
 
 	int next_x = state ? m_hsync_start : m_hsync_end;
 	int next_y = state ? (y + 1) % SCAN_LINES_PER_FRAME : y;
 
-	attotime duration = m_screen->time_until_pos(next_y, next_x);
+	attotime duration = screen().time_until_pos(next_y, next_x);
 
 	m_hsync_timer->adjust(duration, !state);
 }
@@ -311,7 +311,7 @@ inline void crt9007_device::update_vsync_timer(int state)
 {
 	int next_y = state ? m_vsync_start : m_vsync_end;
 
-	attotime duration = m_screen->time_until_pos(next_y, 0);
+	attotime duration = screen().time_until_pos(next_y, 0);
 
 	m_vsync_timer->adjust(duration, !state);
 }
@@ -324,12 +324,12 @@ inline void crt9007_device::update_vsync_timer(int state)
 inline void crt9007_device::update_vlt_timer(int state)
 {
 	// this signal is active during all visible scan lines and during the horizontal trace at vertical retrace
-	int y = m_screen->vpos();
+	int y = screen().vpos();
 
 	int next_x = state ? m_vlt_end : m_vlt_start;
 	int next_y = state ? y : ((y == m_vlt_bottom) ? 0 : (y + 1));
 
-	attotime duration = m_screen->time_until_pos(next_y, next_x);
+	attotime duration = screen().time_until_pos(next_y, next_x);
 
 	m_vlt_timer->adjust(duration, !state);
 }
@@ -354,7 +354,7 @@ inline void crt9007_device::update_drb_timer(int state)
 {
 	// this signal is active for 1 full scan line (VLT edge to edge) at the top scan line of each new row
 	// there is 1 extra DRB signal during the 1st scanline of the vertical retrace interval
-	int y = m_screen->vpos();
+	int y = screen().vpos();
 
 	int next_x = m_vlt_end;
 	int next_y = y ? y + 1 : y;
@@ -376,7 +376,7 @@ inline void crt9007_device::update_drb_timer(int state)
 		}
 	}
 
-	attotime duration = m_screen->time_until_pos(next_y, next_x);
+	attotime duration = screen().time_until_pos(next_y, next_x);
 
 	m_drb_timer->adjust(duration, !state);
 }
@@ -432,12 +432,12 @@ inline void crt9007_device::recompute_parameters()
 	//LOG("CRT9007 Screen: %u x %u @ %f Hz\n", horiz_pix_total, vert_pix_total, 1 / ATTOSECONDS_TO_DOUBLE(refresh));
 	//LOG("CRT9007 Visible Area: (%u, %u) - (%u, %u)\n", visarea.min_x, visarea.min_y, visarea.max_x, visarea.max_y);
 
-	//m_screen->configure(horiz_pix_total, vert_pix_total, visarea, refresh);
+	//screen().configure(horiz_pix_total, vert_pix_total, visarea, refresh);
 
-	m_hsync_timer->adjust(m_screen->time_until_pos(0, 0));
-	m_vsync_timer->adjust(m_screen->time_until_pos(0, 0));
-	m_vlt_timer->adjust(m_screen->time_until_pos(0, m_vlt_start), 1);
-	m_drb_timer->adjust(m_screen->time_until_pos(0, 0));
+	m_hsync_timer->adjust(screen().time_until_pos(0, 0));
+	m_vsync_timer->adjust(screen().time_until_pos(0, 0));
+	m_vlt_timer->adjust(screen().time_until_pos(0, m_vlt_start), 1);
+	m_drb_timer->adjust(screen().time_until_pos(0, 0));
 }
 
 
@@ -563,8 +563,8 @@ void crt9007_device::device_clock_changed()
 
 void crt9007_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
-	int x = m_screen->hpos();
-	int y = m_screen->vpos();
+	int x = screen().hpos();
+	int y = screen().vpos();
 
 	switch (id)
 	{

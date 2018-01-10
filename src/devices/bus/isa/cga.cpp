@@ -1356,7 +1356,7 @@ void isa8_cga_pc1512_device::device_start()
 	m_isa->install_device(0x3d0, 0x3df, read8_delegate( FUNC(isa8_cga_pc1512_device::io_read), this ), write8_delegate( FUNC(isa8_cga_pc1512_device::io_write), this ) );
 	m_isa->install_bank(0xb8000, 0xbbfff, "bank1", &m_vram[0]);
 
-	address_space &space = machine().firstcpu->space( AS_PROGRAM );
+	address_space &space = m_isa->memspace();
 
 	space.install_write_handler( 0xb8000, 0xbbfff, write8_delegate( FUNC(isa8_cga_pc1512_device::vram_w), this ) );
 	space.install_write_handler( 0xbc000, 0xbffff, write8_delegate( FUNC(isa8_cga_pc1512_device::vram_w), this ) );

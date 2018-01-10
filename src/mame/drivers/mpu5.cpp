@@ -260,7 +260,7 @@ READ8_MEMBER(mpu5_state::asic_r8)
 		}
 		default:
 		{
-			int pc = space.device().safe_pc();
+			int pc = m_maincpu->pc();
 			logerror("%08x maincpu read from ASIC - offset %01x\n", pc, offset);
 			return 0;
 		}
@@ -280,7 +280,7 @@ READ32_MEMBER(mpu5_state::asic_r32)
 
 READ32_MEMBER(mpu5_state::mpu5_mem_r)
 {
-	int pc = space.device().safe_pc();
+	int pc = m_maincpu->pc();
 	int addr = offset *4;
 	int cs = m_maincpu->get_cs(addr);
 
@@ -396,7 +396,7 @@ WRITE8_MEMBER(mpu5_state::asic_w8)
 		break;
 		default:
 		{
-			int pc = space.device().safe_pc();
+			int pc = m_maincpu->pc();
 			logerror("%08x maincpu write to ASIC - offset %01x data %02x\n", pc, offset, data);
 		}
 	}
@@ -414,7 +414,7 @@ WRITE32_MEMBER(mpu5_state::asic_w32)
 
 READ32_MEMBER(mpu5_state::pic_r)
 {
-	int pc = space.device().safe_pc();
+	int pc = m_maincpu->pc();
 	logerror("%08x maincpu read from PIC - offset %01x\n", pc, offset);
 	return m_pic_output_bit;
 }
@@ -466,7 +466,7 @@ WRITE32_MEMBER(mpu5_state::pic_w)
 		}
 		default:
 		{
-			int pc = space.device().safe_pc();
+			int pc = m_maincpu->pc();
 			logerror("%08x maincpu write to PIC - offset %01x data %02x\n", pc, offset, data);
 			break;
 		}
@@ -476,7 +476,7 @@ WRITE32_MEMBER(mpu5_state::pic_w)
 
 WRITE32_MEMBER(mpu5_state::mpu5_mem_w)
 {
-	int pc = space.device().safe_pc();
+	int pc = m_maincpu->pc();
 	int addr = offset *4;
 	int cs = m_maincpu->get_cs(addr);
 

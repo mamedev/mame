@@ -70,12 +70,12 @@ READ8_MEMBER(thunderx_state::pmc_r)
 {
 	if (PMC_BK)
 	{
-//      logerror("%04x read pmcram %04x\n",space.device().safe_pc(),offset);
+//      logerror("%04x read pmcram %04x\n",m_audiocpu->pc(),offset);
 		return m_pmcram[offset];
 	}
 	else
 	{
-		LOG(("%04x read pmc internal ram %04x\n",space.device().safe_pc(),offset));
+		LOG(("%04x read pmc internal ram %04x\n",m_audiocpu->pc(),offset));
 		return 0;
 	}
 }
@@ -84,12 +84,12 @@ WRITE8_MEMBER(thunderx_state::pmc_w)
 {
 	if (PMC_BK)
 	{
-		LOG(("%04x pmcram %04x = %02x\n",space.device().safe_pc(),offset,data));
+		LOG(("%04x pmcram %04x = %02x\n",m_audiocpu->pc(),offset,data));
 		m_pmcram[offset] = data;
 	}
 	else
 	{
-		LOG(("%04x pmc internal ram %04x = %02x\n",space.device().safe_pc(),offset,data));
+		LOG(("%04x pmc internal ram %04x = %02x\n",m_audiocpu->pc(),offset,data));
 	}
 }
 
@@ -299,7 +299,7 @@ READ8_MEMBER(thunderx_state::_1f98_r)
 
 WRITE8_MEMBER(thunderx_state::thunderx_1f98_w)
 {
-	// logerror("%04x: 1f98_w %02x\n", space.device().safe_pc(),data);
+	// logerror("%04x: 1f98_w %02x\n", m_maincpu->pc(),data);
 
 	// bit 0 = enable char ROM reading through the video RAM
 	m_k052109->set_rmrd_line((data & 0x01) ? ASSERT_LINE : CLEAR_LINE);

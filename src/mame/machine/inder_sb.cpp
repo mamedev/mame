@@ -33,7 +33,7 @@ READ8_MEMBER(inder_sb_device::megaphx_0323_hack_r)  { /*logerror("%04x audicpu I
 
 READ16_MEMBER(inder_sb_device::megaphx_0x050002_r)
 {
-	space.machine().scheduler().synchronize();
+	machine().scheduler().synchronize();
 //  int pc = machine().device("maincpu")->safe_pc();
 	int ret = m_soundback;
 	m_soundback = 0;
@@ -44,7 +44,7 @@ READ16_MEMBER(inder_sb_device::megaphx_0x050002_r)
 WRITE16_MEMBER(inder_sb_device::megaphx_0x050000_w)
 {
 //  int pc = machine().device("maincpu")->safe_pc();
-	space.machine().scheduler().synchronize();
+	machine().scheduler().synchronize();
 
 	//logerror("(%06x) megaphx_0x050000_w (to z80?) %04x %04x\n", pc, data, mem_mask);
 	m_soundsent = 0xff;
@@ -130,13 +130,13 @@ ADDRESS_MAP_END
 
 READ8_MEMBER(inder_sb_device::megaphx_sound_cmd_r)
 {
-	space.machine().scheduler().synchronize();
+	machine().scheduler().synchronize();
 	return m_sounddata;
 }
 
 READ8_MEMBER(inder_sb_device::megaphx_sound_sent_r)
 {
-	space.machine().scheduler().synchronize();
+	machine().scheduler().synchronize();
 	int ret = m_soundsent;
 	m_soundsent = 0;
 	return ret;
@@ -145,7 +145,7 @@ READ8_MEMBER(inder_sb_device::megaphx_sound_sent_r)
 WRITE8_MEMBER(inder_sb_device::megaphx_sound_to_68k_w)
 {
 //  int pc = machine().device("audiocpu")->safe_pc();
-	space.machine().scheduler().synchronize();
+	machine().scheduler().synchronize();
 	//logerror("(%04x) megaphx_sound_to_68k_w (to 68k?) %02x\n", pc, data);
 
 	m_soundback = data;

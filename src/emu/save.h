@@ -30,7 +30,8 @@ enum save_error
 	STATERR_ILLEGAL_REGISTRATIONS,
 	STATERR_INVALID_HEADER,
 	STATERR_READ_ERROR,
-	STATERR_WRITE_ERROR
+	STATERR_WRITE_ERROR,
+	STATERR_DISABLED
 };
 
 
@@ -181,7 +182,7 @@ private:
 	running_machine &         m_machine;              // reference to our machine
 	std::unique_ptr<rewinder> m_rewind;               // rewinder
 	bool                      m_reg_allowed;          // are registrations allowed?
-	int                       m_illegal_regs;         // number of illegal registrations
+	s32                       m_illegal_regs;         // number of illegal registrations
 
 	std::vector<std::unique_ptr<state_entry>>    m_entry_list;       // list of registered entries
 	std::vector<std::unique_ptr<ram_state>>      m_ramstate_list;    // list of ram states
@@ -191,12 +192,12 @@ private:
 
 class ram_state
 {
-	save_manager &     m_save;  // reference to save_manager
-	util::vectorstream m_data;  // save data buffer
+	save_manager &     m_save;                        // reference to save_manager
+	util::vectorstream m_data;                        // save data buffer
 
 public:
-	bool               m_valid; // can we load this state?
-	attotime           m_time;  // machine timestamp
+	bool               m_valid;                       // can we load this state?
+	attotime           m_time;                        // machine timestamp
 
 	ram_state(save_manager &save);
 	static size_t get_size(save_manager &save);
@@ -206,9 +207,13 @@ public:
 
 class rewinder
 {
-	save_manager &                          m_save;       // reference to save_manager
-	bool                                    m_enabled;    // enable rewind savestates
-	uint32_t                                m_capacity;   // imposed limit of total states (1-500)
+	save_manager & m_save;                            // reference to save_manager
+	bool           m_enabled;                         // enable rewind savestates
+	size_t         m_capacity;                        // total memory rewind states can occupy (MB, limited to 1-2048 in options)
+	s32            m_current_index;                   // where we are in time
+	s32            m_first_invalid_index;             // all states before this one are guarateed to be valid
+	bool           m_first_time_warning;              // keep track of warnings we report
+	bool           m_first_time_note;                 // keep track of notes
 	std::vector<std::unique_ptr<ram_state>> m_state_list; // rewinder's own ram states
 
 	// load/save management
@@ -221,20 +226,20 @@ class rewinder
 	enum
 	{
 		REWIND_INDEX_NONE = -1,
-		REWIND_INDEX_FIRST = 0
+		REWIND_INDEX_FIRST
 	};
-	
-	int get_current_index();
-	int get_first_invalid_index();
-	void check_size();
-	void report_error(save_error type, rewind_operation operation, int index = REWIND_INDEX_FIRST);
+
+	bool check_size();
+	bool current_index_is_last() { return m_current_index == m_state_list.size() - 1; }
+	void report_error(save_error type, rewind_operation operation);
 
 public:
 	rewinder(save_manager &save);
 	bool enabled() { return m_enabled; }
-	int invalidate();
-	void capture();
-	void step();
+	void clamp_capacity();
+	void invalidate();
+	bool capture();
+	bool step();
 };
 
 

@@ -115,7 +115,7 @@ WRITE16_MEMBER(sf_state::protection_w)
 		}
 	default:
 		{
-			logerror("Write protection at %06x (%04x)\n", space.device().safe_pc(), data & 0xffff);
+			logerror("Write protection at %06x (%04x)\n", m_maincpu->pc(), data & 0xffff);
 			logerror("*** Unknown protection %d\n", space.read_byte(0xffc684));
 			break;
 		}

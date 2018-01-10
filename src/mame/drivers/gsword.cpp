@@ -280,7 +280,7 @@ READ8_MEMBER(gsword_state::i8741_2_r )
 	case 0x04: /* Player 2 Controller */
 		return ioport("IN3")->read();
 //  default:
-//      logerror("8741-2 unknown read %d PC=%04x\n",offset,space.device().safe_pc());
+//      logerror("8741-2 unknown read %d %s\n",offset,machine().describe_context());
 	}
 	/* unknown */
 	return 0;
@@ -298,7 +298,7 @@ READ8_MEMBER(gsword_state::i8741_3_r )
 		return ioport("IN3")->read();
 	}
 	/* unknown */
-//  logerror("8741-3 unknown read %d PC=%04x\n",offset,space.device().safe_pc());
+//  logerror("8741-3 unknown read %d %s\n",offset,machine().describe_context());
 	return 0;
 }
 

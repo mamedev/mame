@@ -35,6 +35,7 @@ const int com8116_device::divisors_16X_5_0688MHz[] =
 // SMC/COM8116-003
 // from http://www.vintagecomputer.net/fjkraan/comp/divcomp/doc/SMC_BaudGen.pdf page 283 (pdf page 20)
 // baud rates are 50, 75, 110, 134.5, 150, 200, 300, 600, 1200, 1800, 2000, 2400, 3600, 4800, 9600, 19200
+// SMC/COM8116T-020 should have similar output rates, but clock is unknown and probably different
 const int com8116_device::divisors_16X_6_01835MHz[] =
 	{ 7523, 5015, 3420, 2797, 2508, 1881, 1254, 627, 313, 209, 188, 157, 104, 78, 39, 20 };
 

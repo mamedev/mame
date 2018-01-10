@@ -588,6 +588,7 @@ static MACHINE_CONFIG_START( joystand )
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("tmp68301",tmp68301_device,irq_callback)
 
 	MCFG_DEVICE_ADD("tmp68301", TMP68301, 0)
+	MCFG_TMP68301_CPU("maincpu")
 	MCFG_TMP68301_IN_PARALLEL_CB(READ16(joystand_state, eeprom_r))
 	MCFG_TMP68301_OUT_PARALLEL_CB(WRITE16(joystand_state, eeprom_w))
 

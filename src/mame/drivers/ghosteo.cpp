@@ -271,7 +271,7 @@ READ32_MEMBER(ghosteo_state::s3c2410_core_pin_r)
 WRITE8_MEMBER(ghosteo_state::s3c2410_nand_command_w )
 {
 	struct nand_t &nand = m_nand;
-//  device_t *nand = space.machine().device( "nand");
+//  device_t *nand = machine().device( "nand");
 	#if NAND_LOG
 	logerror( "s3c2410_nand_command_w %02X\n", data);
 	#endif
@@ -296,7 +296,7 @@ WRITE8_MEMBER(ghosteo_state::s3c2410_nand_command_w )
 WRITE8_MEMBER(ghosteo_state::s3c2410_nand_address_w )
 {
 	struct nand_t &nand = m_nand;
-//  device_t *nand = space.machine().device( "nand");
+//  device_t *nand = machine().device( "nand");
 	#if NAND_LOG
 	logerror( "s3c2410_nand_address_w %02X\n", data);
 	#endif
@@ -331,7 +331,7 @@ WRITE8_MEMBER(ghosteo_state::s3c2410_nand_address_w )
 READ8_MEMBER(ghosteo_state::s3c2410_nand_data_r )
 {
 	struct nand_t &nand = m_nand;
-//  device_t *nand = space.machine().device( "nand");
+//  device_t *nand = machine().device( "nand");
 	uint8_t data = 0;
 	switch (nand.mode)
 	{
@@ -377,7 +377,7 @@ READ8_MEMBER(ghosteo_state::s3c2410_nand_data_r )
 
 WRITE8_MEMBER(ghosteo_state::s3c2410_nand_data_w )
 {
-//  device_t *nand = space.machine().device( "nand");
+//  device_t *nand = machine().device( "nand");
 	#if NAND_LOG
 	logerror( "s3c2410_nand_data_w %02X\n", data);
 	#endif
@@ -570,18 +570,18 @@ READ32_MEMBER(ghosteo_state::bballoon_speedup_r)
 	uint32_t ret = m_s3c2410->s3c24xx_lcd_r(space, offset+0x10/4, mem_mask);
 
 
-	int pc = space.device().safe_pc();
+	int pc = m_maincpu->pc();
 
 	// these are vblank waits
 	if (pc == 0x3001c0e4 || pc == 0x3001c0d8)
 	{
 		// BnB Arcade
-		space.device().execute().spin_until_time(attotime::from_usec(20));
+		m_maincpu->spin_until_time(attotime::from_usec(20));
 	}
 	else if (pc == 0x3002b580 || pc == 0x3002b550)
 	{
 		// Happy Tour
-		space.device().execute().spin_until_time(attotime::from_usec(20));
+		m_maincpu->spin_until_time(attotime::from_usec(20));
 	}
 	//else
 	//  printf("speedup %08x %08x\n", pc, ret);

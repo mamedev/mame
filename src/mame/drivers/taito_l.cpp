@@ -302,7 +302,7 @@ WRITE8_MEMBER(taitol_state::rombankswitch_w)
 			logerror("New rom size : %x\n", (m_high + 1) * 0x2000);
 		}
 
-		//logerror("robs %d, %02x (%04x)\n", offset, data, space.device().safe_pc());
+		//logerror("robs %d, %02x (%04x)\n", offset, data, m_main_cpu->pc());
 		m_cur_rombank = data;
 		m_main_bnk->set_base(&m_main_prg[0x2000 * m_cur_rombank]);
 	}
@@ -320,7 +320,7 @@ WRITE8_MEMBER(fhawk_state::rombank2switch_w)
 			logerror("New rom2 size : %x\n", (m_high2 + 1) * 0x4000);
 		}
 
-		//logerror("robs2 %02x (%04x)\n", data, space.device().safe_pc());
+		//logerror("robs2 %02x (%04x)\n", data, m_main_cpu->pc());
 
 		m_cur_rombank2 = data;
 		m_slave_bnk->set_base(&m_slave_prg[0x4000 * m_cur_rombank2]);
@@ -342,7 +342,7 @@ WRITE8_MEMBER(taitol_state::rambankswitch_w)
 	if (m_cur_rambank[offset] != data)
 	{
 		m_cur_rambank[offset] = data;
-		//logerror("rabs %d, %02x (%04x)\n", offset, data, space.device().safe_pc());
+		//logerror("rabs %d, %02x (%04x)\n", offset, data, m_main_cpu->pc());
 		if (data >= 0x14 && data <= 0x1f)
 		{
 			data -= 0x14;
@@ -356,7 +356,7 @@ WRITE8_MEMBER(taitol_state::rambankswitch_w)
 		}
 		else
 		{
-			logerror("unknown rambankswitch %d, %02x (%04x)\n", offset, data, space.device().safe_pc());
+			logerror("unknown rambankswitch %d, %02x (%04x)\n", offset, data, m_main_cpu->pc());
 			m_current_notifier[offset] = nullptr;
 			m_current_base[offset] = m_empty_ram;
 		}
@@ -416,22 +416,14 @@ READ8_MEMBER(taitol_1cpu_state::extport_select_and_ym2203_r)
 
 WRITE8_MEMBER(taitol_state::mcu_control_w)
 {
-//  logerror("mcu control %02x (%04x)\n", data, space.device().safe_pc());
+//  logerror("mcu control %02x (%04x)\n", data, m_main_cpu->pc());
 }
 
 READ8_MEMBER(taitol_state::mcu_control_r)
 {
-//  logerror("mcu control read (%04x)\n", space.device().safe_pc());
+//  logerror("mcu control read (%04x)\n", m_main_cpu->pc());
 	return 0x1;
 }
-
-#if 0
-WRITE8_MEMBER(taitol_state::sound_w)
-{
-	logerror("Sound_w %02x (%04x)\n", data, space.device().safe_pc());
-}
-#endif
-
 
 WRITE_LINE_MEMBER(champwr_state::msm5205_vck)
 {
@@ -1523,7 +1515,7 @@ WRITE8_MEMBER(fhawk_state::portA_w)
 		m_cur_audio_bnk = data & 0x03;
 		bankaddress = m_cur_audio_bnk * 0x4000;
 		m_audio_bnk->set_base(&m_audio_prg[bankaddress]);
-		//logerror ("YM2203 bank change val=%02x  pc=%04x\n", m_cur_audio_bnk, space.device().safe_pc() );
+		//logerror ("YM2203 bank change val=%02x  %s\n", m_cur_audio_bnk, machine().describe_context() );
 	}
 }
 
@@ -1723,30 +1715,20 @@ static MACHINE_CONFIG_START( plotting )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("ymsnd", YM2203, XTAL_13_33056MHz/4) /* verified on pcb */
-	MCFG_AY8910_PORT_A_READ_CB(DEVREAD8("dswmuxl", ls157_device, output_r)) MCFG_DEVCB_MASK(0x0f)
-	MCFG_DEVCB_CHAIN_INPUT(DEVREAD8("dswmuxh", ls157_device, output_r)) MCFG_DEVCB_RSHIFT(-4) MCFG_DEVCB_MASK(0xf0)
-	MCFG_AY8910_PORT_B_READ_CB(DEVREAD8("inmuxl", ls157_device, output_r)) MCFG_DEVCB_MASK(0x0f)
-	MCFG_DEVCB_CHAIN_INPUT(DEVREAD8("inmuxh", ls157_device, output_r)) MCFG_DEVCB_RSHIFT(-4) MCFG_DEVCB_MASK(0xf0)
+	MCFG_AY8910_PORT_A_READ_CB(DEVREAD8("dswmux", ls157_x2_device, output_r))
+	MCFG_AY8910_PORT_B_READ_CB(DEVREAD8("inmux", ls157_x2_device, output_r))
 	MCFG_SOUND_ROUTE(0, "mono", 0.20)
 	MCFG_SOUND_ROUTE(1, "mono", 0.20)
 	MCFG_SOUND_ROUTE(2, "mono", 0.20)
 	MCFG_SOUND_ROUTE(3, "mono", 0.80)
 
-	MCFG_DEVICE_ADD("dswmuxl", LS157, 0)
+	MCFG_DEVICE_ADD("dswmux", LS157_X2, 0)
 	MCFG_74157_A_IN_CB(IOPORT("DSWA"))
 	MCFG_74157_B_IN_CB(IOPORT("DSWB"))
 
-	MCFG_DEVICE_ADD("dswmuxh", LS157, 0)
-	MCFG_74157_A_IN_CB(IOPORT("DSWA")) MCFG_DEVCB_RSHIFT(4)
-	MCFG_74157_B_IN_CB(IOPORT("DSWB")) MCFG_DEVCB_RSHIFT(4)
-
-	MCFG_DEVICE_ADD("inmuxl", LS157, 0)
+	MCFG_DEVICE_ADD("inmux", LS157_X2, 0)
 	MCFG_74157_A_IN_CB(IOPORT("IN0"))
 	MCFG_74157_B_IN_CB(IOPORT("IN1"))
-
-	MCFG_DEVICE_ADD("inmuxh", LS157, 0)
-	MCFG_74157_A_IN_CB(IOPORT("IN0")) MCFG_DEVCB_RSHIFT(4)
-	MCFG_74157_B_IN_CB(IOPORT("IN1")) MCFG_DEVCB_RSHIFT(4)
 MACHINE_CONFIG_END
 
 
@@ -1794,10 +1776,8 @@ static MACHINE_CONFIG_DERIVED( palamed, plotting )
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSWA"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSWB"))
 
-	MCFG_DEVICE_REMOVE("dswmuxl")
-	MCFG_DEVICE_REMOVE("dswmuxh")
-	MCFG_DEVICE_REMOVE("inmuxl")
-	MCFG_DEVICE_REMOVE("inmuxh")
+	MCFG_DEVICE_REMOVE("dswmux")
+	MCFG_DEVICE_REMOVE("inmux")
 MACHINE_CONFIG_END
 
 
@@ -1816,10 +1796,8 @@ static MACHINE_CONFIG_DERIVED( cachat, plotting )
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSWA"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSWB"))
 
-	MCFG_DEVICE_REMOVE("dswmuxl")
-	MCFG_DEVICE_REMOVE("dswmuxh")
-	MCFG_DEVICE_REMOVE("inmuxl")
-	MCFG_DEVICE_REMOVE("inmuxh")
+	MCFG_DEVICE_REMOVE("dswmux")
+	MCFG_DEVICE_REMOVE("inmux")
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( evilston )
@@ -2443,7 +2421,7 @@ DRIVER_INIT_MEMBER(taitol_1cpu_state, plottinga)
 {
 	u8 tab[256];
 	for (unsigned i = 0; i < sizeof(tab); i++)
-		tab[i] = BITSWAP8(i, 0, 1, 2, 3, 4, 5, 6, 7);
+		tab[i] = bitswap<8>(i, 0, 1, 2, 3, 4, 5, 6, 7);
 
 	for (unsigned i = 0; i < m_main_prg.length(); i++)
 		m_main_prg[i] = tab[m_main_prg[i]];

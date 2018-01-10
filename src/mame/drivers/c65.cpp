@@ -11,6 +11,18 @@ Note:
   get the hang of the system (and checking where the old code fails
   eventually)
 
+Hardware infos can be found at:
+http://www.zimmers.net/cbmpics/cbm/c65/c65manual.txt
+http://www.zimmers.net/cbmpics/cbm/c65/c65faq20.txt
+
+Hardware pics:
+http://www.zimmers.net/cbmpics/cbm/c65/c65-2b-lhs.JPG
+http://www.zimmers.net/cbmpics/cbm/c65/c65-2b-rhs.JPG
+
+Schematics:
+http://www.zimmers.net/anonftp/pub/cbm/schematics/computers/C65%20Rev%202A%20Schematic.pdf
+http://www.zimmers.net/anonftp/pub/cbm/schematics/computers/C64DX_aka_C65_System_Specifications_Preliminary_(1991_Mar).pdf
+
 ***************************************************************************/
 
 
@@ -21,7 +33,7 @@ Note:
 #include "softlist_dev.h"
 #include "speaker.h"
 
-#define MAIN_CLOCK XTAL_3_5MHz
+#define MAIN_CLOCK XTAL_28_37516MHz/8
 
 class c65_state : public driver_device
 {
@@ -671,9 +683,9 @@ WRITE_LINE_MEMBER(c65_state::cia0_irq)
 static MACHINE_CONFIG_START( c65 )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",M4510,MAIN_CLOCK)
+	MCFG_CPU_ADD("maincpu", M4510, MAIN_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(c65_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen",c65_state,vic3_vblank_irq)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", c65_state, vic3_vblank_irq)
 
 	MCFG_DEVICE_ADD("cia_0", MOS6526, MAIN_CLOCK)
 	MCFG_MOS6526_TOD(60)
@@ -706,9 +718,8 @@ static MACHINE_CONFIG_START( c65 )
 	MCFG_PALETTE_INIT_OWNER(c65_state, c65)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-//  MCFG_SOUND_ADD("aysnd", AY8910, MAIN_CLOCK/4)
-//  MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	// 2x 8580 SID
 
 	// software list
 	MCFG_SOFTWARE_LIST_ADD("flop_list", "c65_flop")

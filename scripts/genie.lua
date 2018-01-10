@@ -847,7 +847,7 @@ end
 
 configuration { "mingw-clang" }
 	buildoptions {
-		"-O1", -- without this executable crash often
+		"-Xclang -flto-visibility-public-std", -- workround for __imp___ link errors
 	}
 configuration {  }
 
@@ -1133,8 +1133,7 @@ configuration { "osx* or xcode4" }
 		}
 
 configuration { "mingw*" }
-		local version = str_to_version(_OPTIONS["gcc_version"])
-		if not (_OPTIONS["gcc"]~=nil and string.find(_OPTIONS["gcc"], "clang")) or version < 40000
+		if _OPTIONS["osd"]~="sdl"
 		then
 			linkoptions {
 				"-static",

@@ -134,7 +134,7 @@ READ8_MEMBER(r2dtank_state::audio_command_r)
 {
 	uint8_t ret = m_soundlatch->read(space, 0);
 
-if (LOG_AUDIO_COMM) logerror("%08X  CPU#1  Audio Command Read: %x\n", space.device().safe_pc(), ret);
+if (LOG_AUDIO_COMM) logerror("%08X  CPU#1  Audio Command Read: %x\n", m_audiocpu->pc(), ret);
 
 	return ret;
 }
@@ -145,14 +145,14 @@ WRITE8_MEMBER(r2dtank_state::audio_command_w)
 	m_soundlatch->write(space, 0, ~data);
 	m_audiocpu->set_input_line(M6802_IRQ_LINE, HOLD_LINE);
 
-if (LOG_AUDIO_COMM) logerror("%08X   CPU#0  Audio Command Write: %x\n", space.device().safe_pc(), data^0xff);
+if (LOG_AUDIO_COMM) logerror("%08X   CPU#0  Audio Command Write: %x\n", m_maincpu->pc(), data^0xff);
 }
 
 
 READ8_MEMBER(r2dtank_state::audio_answer_r)
 {
 	uint8_t ret = m_soundlatch2->read(space, 0);
-if (LOG_AUDIO_COMM) logerror("%08X  CPU#0  Audio Answer Read: %x\n", space.device().safe_pc(), ret);
+if (LOG_AUDIO_COMM) logerror("%08X  CPU#0  Audio Answer Read: %x\n", m_maincpu->pc(), ret);
 
 	return ret;
 }
@@ -161,13 +161,13 @@ if (LOG_AUDIO_COMM) logerror("%08X  CPU#0  Audio Answer Read: %x\n", space.devic
 WRITE8_MEMBER(r2dtank_state::audio_answer_w)
 {
 	/* HACK - prevents lock-up, but causes game to end some in-between sreens prematurely */
-	if (space.device().safe_pc() == 0xfb12)
+	if (m_audiocpu->pc() == 0xfb12)
 		data = 0x00;
 
 	m_soundlatch2->write(space, 0, data);
 	m_maincpu->set_input_line(M6809_IRQ_LINE, HOLD_LINE);
 
-if (LOG_AUDIO_COMM) logerror("%08X  CPU#1  Audio Answer Write: %x\n", space.device().safe_pc(), data);
+if (LOG_AUDIO_COMM) logerror("%08X  CPU#1  Audio Answer Write: %x\n", m_audiocpu->pc(), data);
 }
 
 

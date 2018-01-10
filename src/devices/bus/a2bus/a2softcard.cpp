@@ -78,7 +78,7 @@ void a2bus_softcard_device::device_reset()
 	m_z80->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
 }
 
-void a2bus_softcard_device::write_cnxx(address_space &space, uint8_t offset, uint8_t data)
+void a2bus_softcard_device::write_cnxx(uint8_t offset, uint8_t data)
 {
 	if (!m_bEnabled)
 	{

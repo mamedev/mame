@@ -372,7 +372,7 @@ ROM_END
 // If you factory default it you get the string 'EB8'
 // the roms had no proper labels
 // maybe it's some interim / test revision
-ROM_START( gijoea )
+ROM_START( gijoeea )
 	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "rom3.14e",   0x000000,  0x40000, CRC(0a11f63a) SHA1(06174682907e718017146665b8636be20843b119) )
 	ROM_LOAD16_BYTE( "rom2.18e",   0x000001,  0x40000, CRC(8313c559) SHA1(00ae945c65439d4092eaa1780a182dbe3753bb02) )
@@ -396,7 +396,7 @@ ROM_START( gijoea )
 	ROM_LOAD( "069a04.1e", 0x000000, 0x200000, CRC(11d6dcd6) SHA1(04cbff9f61cd8641db538db809ddf20da29fd5ac) )
 
 	ROM_REGION( 0x80, "eeprom", 0 ) // default eeprom
-	ROM_LOAD( "er5911.7d", 0x0000, 0x080, CRC(64f5c87b) SHA1(af81abc54eb59ef7d2250b5ab6cc9642fbd9bfb2) ) // sldh - No actual label so create a unique one for this set
+	ROM_LOAD( "er5911.7d", 0x0000, 0x080, CRC(64f5c87b) SHA1(af81abc54eb59ef7d2250b5ab6cc9642fbd9bfb2) ) // sldh
 ROM_END
 
 ROM_START( gijoeu )
@@ -423,7 +423,7 @@ ROM_START( gijoeu )
 	ROM_LOAD( "069a04.1e", 0x000000, 0x200000, CRC(11d6dcd6) SHA1(04cbff9f61cd8641db538db809ddf20da29fd5ac) )
 
 	ROM_REGION( 0x80, "eeprom", 0 ) // default eeprom to prevent game booting upside down with error
-	ROM_LOAD( "er5911.7d", 0x0000, 0x080, CRC(ca966023) SHA1(6f07ece0f95213bc12387192986f468d23dfdfc8) ) // sldh - No actual label so create a unique one for this set
+	ROM_LOAD( "er5911.7d", 0x0000, 0x080, CRC(ca966023) SHA1(6f07ece0f95213bc12387192986f468d23dfdfc8) ) // sldh
 ROM_END
 
 ROM_START( gijoej )
@@ -450,11 +450,39 @@ ROM_START( gijoej )
 	ROM_LOAD( "069a04.1e", 0x000000, 0x200000, CRC(11d6dcd6) SHA1(04cbff9f61cd8641db538db809ddf20da29fd5ac) )
 
 	ROM_REGION( 0x80, "eeprom", 0 ) // default eeprom to prevent game booting upside down with error
-	ROM_LOAD( "er5911.7d", 0x0000, 0x080, CRC(c914fcf2) SHA1(b4f0a0b5d6d4075b004b061336d162336ce1a754) ) // sldh - No actual label so create a unique one for this set
+	ROM_LOAD( "er5911.7d", 0x0000, 0x080, CRC(c914fcf2) SHA1(b4f0a0b5d6d4075b004b061336d162336ce1a754) ) // sldh
+ROM_END
+
+ROM_START( gijoea )
+	ROM_REGION( 0x100000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "069aa03.14e", 0x000000,  0x40000, CRC(74355c6e) SHA1(01d7b5994c5b9b6e87fb9a35ffed9cc540cfcd05) )
+	ROM_LOAD16_BYTE( "069aa02.18e", 0x000001,  0x40000, CRC(d3dd0397) SHA1(6caac73d259ff6707ded2457b4968d3d0a3c4eb3) )
+	ROM_LOAD16_BYTE( "069a12.13e",  0x080000,  0x40000, CRC(75a7585c) SHA1(443d6dee99edbe81ab1b7289e6cad403fe01cc0d) )
+	ROM_LOAD16_BYTE( "069a11.16e",  0x080001,  0x40000, CRC(3153e788) SHA1(fde4543eac707ef24b431e64011cf0f923d4d3ac) )
+
+	ROM_REGION( 0x010000, "audiocpu", 0 )
+	ROM_LOAD( "069a01.7c", 0x000000, 0x010000, CRC(74172b99) SHA1(f5e0e0d43317454fdacd3df7cd3035fcae4aef68) )
+
+	ROM_REGION( 0x200000, "gfx1", 0 )
+	ROM_LOAD32_WORD( "069a10.18j", 0x000000, 0x100000, CRC(4c6743ee) SHA1(fa94fbfb55955fdb40705e79b49103676961d919) )
+	ROM_LOAD32_WORD( "069a09.16j", 0x000002, 0x100000, CRC(e6e36b05) SHA1(fecad503f2c285b2b0312e888c06dd6e87f95a07) )
+
+	ROM_REGION( 0x400000, "gfx2", 0 )
+	ROM_LOAD64_WORD( "069a08.6h", 0x000000, 0x100000, CRC(325477d4) SHA1(140c57b0ac9e5cf702d788f416408a5eeb5d6d3c) )
+	ROM_LOAD64_WORD( "069a05.1h", 0x000002, 0x100000, CRC(c4ab07ed) SHA1(dc806eff00937d9465b1726fae8fdc3022464a28) )
+	ROM_LOAD64_WORD( "069a07.4h", 0x000004, 0x100000, CRC(ccaa3971) SHA1(16989cbbd65fe1b41c4a85fea02ba1e9880818a9) )
+	ROM_LOAD64_WORD( "069a06.2h", 0x000006, 0x100000, CRC(63eba8e1) SHA1(aa318d356c2580765452106ea0d2228273a90523) )
+
+	ROM_REGION( 0x200000, "k054539", 0 )
+	ROM_LOAD( "069a04.1e", 0x000000, 0x200000, CRC(11d6dcd6) SHA1(04cbff9f61cd8641db538db809ddf20da29fd5ac) )
+
+	ROM_REGION( 0x80, "eeprom", 0 ) // default eeprom
+	ROM_LOAD( "er5911.7d", 0x0000, 0x080, CRC(6363513c) SHA1(181cbf2bd4960740d437c714dc70bb7e64c95348) ) // sldh
 ROM_END
 
 
-GAME( 1992, gijoe,  0,     gijoe, gijoe, gijoe_state, 0, ROT0, "Konami", "G.I. Joe (World, EAB, set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, gijoea, gijoe, gijoe, gijoe, gijoe_state, 0, ROT0, "Konami", "G.I. Joe (World, EB8, prototype?)", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, gijoeu, gijoe, gijoe, gijoe, gijoe_state, 0, ROT0, "Konami", "G.I. Joe (US, UAB)", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, gijoej, gijoe, gijoe, gijoe, gijoe_state, 0, ROT0, "Konami", "G.I. Joe (Japan, JAA)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, gijoe,   0,     gijoe, gijoe, gijoe_state, 0, ROT0, "Konami", "G.I. Joe (World, EAB, set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, gijoeea, gijoe, gijoe, gijoe, gijoe_state, 0, ROT0, "Konami", "G.I. Joe (World, EB8, prototype?)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, gijoeu,  gijoe, gijoe, gijoe, gijoe_state, 0, ROT0, "Konami", "G.I. Joe (US, UAB)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, gijoej,  gijoe, gijoe, gijoe, gijoe_state, 0, ROT0, "Konami", "G.I. Joe (Japan, JAA)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, gijoea,  gijoe, gijoe, gijoe, gijoe_state, 0, ROT0, "Konami", "G.I. Joe (Asia, AA)", MACHINE_SUPPORTS_SAVE )

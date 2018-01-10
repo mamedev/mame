@@ -358,6 +358,11 @@ WRITE8_MEMBER(upd765_family_device::tdr_w)
 
 READ8_MEMBER(upd765_family_device::msr_r)
 {
+	return msr_r();
+}
+
+uint8_t upd765_family_device::msr_r()
+{
 	uint32_t msr = 0;
 	switch(main_phase) {
 	case PHASE_CMD:
@@ -410,6 +415,11 @@ void upd765_family_device::set_rate(int rate)
 
 READ8_MEMBER(upd765_family_device::fifo_r)
 {
+	return fifo_r();
+}
+
+uint8_t upd765_family_device::fifo_r()
+{
 	uint8_t r = 0xff;
 	switch(main_phase) {
 	case PHASE_EXEC:
@@ -440,6 +450,11 @@ READ8_MEMBER(upd765_family_device::fifo_r)
 }
 
 WRITE8_MEMBER(upd765_family_device::fifo_w)
+{
+	fifo_w(data);
+}
+
+void upd765_family_device::fifo_w(uint8_t data)
 {
 	switch(main_phase) {
 	case PHASE_CMD: {

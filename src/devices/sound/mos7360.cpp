@@ -291,12 +291,12 @@ void mos7360_device::device_start()
 	m_timer2 = timer_alloc(TIMER_ID_2);
 	m_timer3 = timer_alloc(TIMER_ID_3);
 	m_line_timer = timer_alloc(TIMER_LINE);
-	m_line_timer->adjust(m_screen->scan_period(), 0, m_screen->scan_period());
+	m_line_timer->adjust(screen().scan_period(), 0, screen().scan_period());
 	m_frame_timer = timer_alloc(TIMER_FRAME);
-	m_frame_timer->adjust(m_screen->frame_period(), 0, m_screen->frame_period());
+	m_frame_timer->adjust(screen().frame_period(), 0, screen().frame_period());
 
 	// allocate screen bitmap
-	m_screen->register_screen_bitmap(m_bitmap);
+	screen().register_screen_bitmap(m_bitmap);
 
 	// create sound stream
 	m_stream = machine().sound().stream_alloc(*this, 0, 1, machine().sample_rate());

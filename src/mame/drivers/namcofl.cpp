@@ -252,7 +252,7 @@ WRITE16_MEMBER(namcofl_state::mcu_shared_w)
 	// C75 BIOS has a very short window on the CPU sync signal, so immediately let the i960 at it
 	if ((offset == 0x6000/2) && (data & 0x80))
 	{
-		space.device().execute().yield();
+		m_mcu->yield();
 	}
 }
 

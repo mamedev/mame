@@ -333,7 +333,7 @@ READ16_MEMBER(taitof2_state::cameltry_paddle_r)
 			return res;
 	}
 
-	logerror("CPU #0 PC %06x: warning - read unmapped paddle offset %06x\n", space.device().safe_pc(), offset);
+	logerror("CPU #0 PC %06x: warning - read unmapped paddle offset %06x\n", m_maincpu->pc(), offset);
 
 	return 0;
 }
@@ -353,7 +353,7 @@ READ16_MEMBER(taitof2_state::mjnquest_dsw_r)
 		}
 	}
 
-	logerror("CPU #0 PC %06x: warning - read unmapped dsw_r offset %06x\n", space.device().safe_pc(), offset);
+	logerror("CPU #0 PC %06x: warning - read unmapped dsw_r offset %06x\n", m_maincpu->pc(), offset);
 
 	return 0xff;
 }
@@ -379,7 +379,7 @@ READ16_MEMBER(taitof2_state::mjnquest_input_r)
 
 	}
 
-	logerror("CPU #0 mjnquest_input %06x: warning - read unknown input %06x\n", space.device().safe_pc(), m_mjnquest_input);
+	logerror("CPU #0 mjnquest_input %06x: warning - read unknown input %06x\n", m_maincpu->pc(), m_mjnquest_input);
 
 	return 0xff;
 }

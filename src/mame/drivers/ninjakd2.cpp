@@ -1658,7 +1658,7 @@ DRIVER_INIT_MEMBER(ninjakd2_state,mnight)
 READ8_MEMBER(ninjakd2_state::robokid_motion_error_verbose_r)
 {
 	popmessage("%s MOTION ERROR, contact MAMEdev", machine().system().name);
-	logerror("maincpu %04x MOTION ERROR\n", space.device().safe_pc());
+	logerror("maincpu %04x MOTION ERROR\n", m_maincpu->pc());
 	return 0xe6;
 }
 

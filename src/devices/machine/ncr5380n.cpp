@@ -102,11 +102,11 @@ void ncr5380n_device::scsi_ctrl_changed()
 {
 	uint32_t ctrl = scsi_bus->ctrl_r();
 
-//  printf("scsi_ctrl_changed: lines now %x\n", ctrl);
+//  logerror("scsi_ctrl_changed: lines now %x\n", ctrl);
 
 /*  if ((ctrl & (S_PHASE_MASK|S_SEL|S_BSY)) != last_phase)
     {
-        printf("phase now %d, REQ %x SEL %x BSY %x\n", ctrl & S_PHASE_MASK, ctrl & S_REQ, ctrl & S_SEL, ctrl & S_BSY);
+        logerror("phase now %d, REQ %x SEL %x BSY %x\n", ctrl & S_PHASE_MASK, ctrl & S_REQ, ctrl & S_SEL, ctrl & S_BSY);
         last_phase = (S_PHASE_MASK|S_SEL|S_BSY);
     }*/
 
@@ -122,7 +122,7 @@ void ncr5380n_device::scsi_ctrl_changed()
 		// if BSY drops or the phase goes mismatch, that terminates the DMA
 		if ((!(ctrl & S_BSY)) || !(m_busstatus & BAS_PHASEMATCH))
 		{
-//          printf("BSY dropped or phase mismatch during DMA, ending DMA\n");
+//          logerror("BSY dropped or phase mismatch during DMA, ending DMA\n");
 			m_mode &= ~MODE_DMA;
 			m_busstatus |= BAS_ENDOFDMA;
 			drq_clear();
@@ -148,7 +148,7 @@ void ncr5380n_device::step(bool timeout)
 	uint32_t data = scsi_bus->data_r();
 
 	if(0)
-		printf("%s: state=%d.%d %s\n",
+		logerror("%s: state=%d.%d %s\n",
 					tag(), state & STATE_MASK, (state & SUB_MASK) >> SUB_SHIFT,
 					timeout ? "timeout" : "change");
 
@@ -167,7 +167,7 @@ void ncr5380n_device::step(bool timeout)
 
 		int win;
 		for(win=7; win>=0 && !(data & (1<<win)); win--) {};
-//      printf("arb complete: data %02x win %02x scsi_id %02x\n", data, win, scsi_id);
+//      logerror("arb complete: data %02x win %02x scsi_id %02x\n", data, win, scsi_id);
 		if(win != scsi_id) {
 			scsi_bus->data_w(scsi_refid, 0);
 			scsi_bus->ctrl_w(scsi_refid, 0, S_ALL);
@@ -230,7 +230,7 @@ void ncr5380n_device::step(bool timeout)
 		break;
 
 	default:
-		printf("%s: step() unexpected state %d.%d\n",
+		logerror("%s: step() unexpected state %d.%d\n",
 					tag(),
 					state & STATE_MASK, (state & SUB_MASK) >> SUB_SHIFT);
 		exit(0);
@@ -313,7 +313,7 @@ WRITE8_MEMBER(ncr5380n_device::icmd_w)
 	// asserting to drive the data bus?
 	if ((data & IC_DBUS) && !(m_icommand & IC_DBUS))
 	{
-//      printf("%s: driving data bus with %02x\n", tag(), m_outdata);
+//      logerror("%s: driving data bus with %02x\n", tag(), m_outdata);
 		scsi_bus->data_w(scsi_refid, m_outdata);
 		delay(2);
 	}
@@ -331,7 +331,7 @@ WRITE8_MEMBER(ncr5380n_device::icmd_w)
 			(data & IC_SEL ? S_SEL : 0) |
 			(data & IC_ATN ? S_ATN : 0);
 
-//      printf("%s: changing control lines %04x\n", tag(), newdata);
+//      logerror("%s: changing control lines %04x\n", tag(), newdata);
 		scsi_bus->ctrl_w(scsi_refid, newdata, S_RST|S_ACK|S_BSY|S_SEL|S_ATN);
 	}
 
@@ -346,7 +346,7 @@ READ8_MEMBER(ncr5380n_device::mode_r)
 
 WRITE8_MEMBER(ncr5380n_device::mode_w)
 {
-//  printf("%s: mode_w %02x (%08x)\n", tag(), data, space.device().safe_pc());
+//  logerror("%s: mode_w %02x (%s)\n", tag(), data, machine().describe_context());
 	// arbitration bit being set?
 	if ((data & MODE_ARBITRATE) && !(m_mode & MODE_ARBITRATE))
 	{
@@ -374,13 +374,13 @@ WRITE8_MEMBER(ncr5380n_device::mode_w)
 
 READ8_MEMBER(ncr5380n_device::command_r)
 {
-//  logerror("%s: command_r %02x (%08x)\n", tag(), m_tcommand, space.device().safe_pc());
+//  logerror("%s: command_r %02x (%s)\n", tag(), m_tcommand, machine().describe_context());
 	return m_tcommand;
 }
 
 WRITE8_MEMBER(ncr5380n_device::command_w)
 {
-//  printf("%s: command_w %02x (%08x)\n", tag(), data, space.device().safe_pc());
+//  logerror("%s: command_w %02x (%s)\n", tag(), data, machine().describe_context());
 	m_tcommand = data;
 
 	// recalculate phase match
@@ -424,7 +424,7 @@ READ8_MEMBER(ncr5380n_device::status_r)
 		(ctrl & S_INP ? ST_IO  : 0) |
 		(ctrl & S_SEL ? ST_SEL : 0);
 
-//  printf("%s: status_r %02x (%08x)\n", tag(), res, space.device().safe_pc());
+//  logerror("%s: status_r %02x (%s)\n", tag(), res, machine().describe_context());
 	return res;
 }
 
@@ -439,14 +439,14 @@ READ8_MEMBER(ncr5380n_device::busandstatus_r)
 		(ctrl & S_ATN ? BAS_ATN : 0) |
 		(ctrl & S_ACK ? BAS_ACK : 0);
 
-//  printf("%s: busandstatus_r %02x (%08x)\n", tag(), res, space.device().safe_pc());
+//  logerror("%s: busandstatus_r %02x (%s)\n", tag(), res, machine().describe_context());
 
 	return res;
 }
 
 WRITE8_MEMBER(ncr5380n_device::startdmasend_w)
 {
-	printf("%02x to start dma send\n", data);
+	logerror("%02x to start dma send\n", data);
 	drq_set();
 }
 
@@ -457,7 +457,7 @@ READ8_MEMBER(ncr5380n_device::indata_r)
 
 WRITE8_MEMBER(ncr5380n_device::startdmatargetrx_w)
 {
-	printf("%02x to start dma target Rx\n", data);
+	logerror("%02x to start dma target Rx\n", data);
 }
 
 READ8_MEMBER(ncr5380n_device::resetparityirq_r)
@@ -467,7 +467,7 @@ READ8_MEMBER(ncr5380n_device::resetparityirq_r)
 
 WRITE8_MEMBER(ncr5380n_device::startdmainitrx_w)
 {
-//  printf("%02x to start dma initiator Rx\n", data);
+//  logerror("%02x to start dma initiator Rx\n", data);
 	recv_byte();
 }
 
@@ -551,7 +551,7 @@ READ8_MEMBER(ncr5380n_device::read)
 
 WRITE8_MEMBER(ncr5380n_device::write)
 {
-//  printf("%x to 5380 @ %x\n", data, offset);
+//  logerror("%x to 5380 @ %x\n", data, offset);
 	switch (offset & 7)
 	{
 		case 0:

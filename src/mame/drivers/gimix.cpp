@@ -545,7 +545,7 @@ MCFG_ADDRESS_MAP_BANK_STRIDE(0x1000)
 
 static MACHINE_CONFIG_START( gimix )
 	// basic machine hardware
-	MCFG_CPU_ADD("maincpu", M6809E, XTAL_8MHz)
+	MCFG_CPU_ADD("maincpu", MC6809, XTAL_8MHz)
 	MCFG_CPU_PROGRAM_MAP(gimix_mem)
 	MCFG_CPU_IO_MAP(gimix_io)
 

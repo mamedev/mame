@@ -117,12 +117,13 @@ public:
 
 WRITE8_MEMBER(pcat_nit_state::pcat_nit_rombank_w)
 {
-	//logerror( "rom bank #%02x at PC=%08X\n", data, space.device().safe_pc() );
+	auto &mspace = m_maincpu->space(AS_PROGRAM);
+	//logerror( "rom bank #%02x at PC=%08X\n", data, m_maincpu->pc() );
 	if ( data & 0x40 )
 	{
 		// rom bank
-		space.install_read_bank(0x000d8000, 0x000dffff, "rombank" );
-		space.unmap_write(0x000d8000, 0x000dffff);
+		mspace.install_read_bank(0x000d8000, 0x000dffff, "rombank" );
+		mspace.unmap_write(0x000d8000, 0x000dffff);
 
 		if ( data & 0x80 )
 		{
@@ -136,9 +137,9 @@ WRITE8_MEMBER(pcat_nit_state::pcat_nit_rombank_w)
 	else
 	{
 		// nvram bank
-		space.unmap_readwrite(0x000d8000, 0x000dffff);
+		mspace.unmap_readwrite(0x000d8000, 0x000dffff);
 
-		space.install_readwrite_bank(0x000d8000, 0x000d9fff, "nvrambank" );
+		mspace.install_readwrite_bank(0x000d8000, 0x000d9fff, "nvrambank" );
 
 		membank("nvrambank")->set_base(m_banked_nvram.get());
 

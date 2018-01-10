@@ -317,11 +317,11 @@ WRITE8_MEMBER(segag80r_state::sindbadm_misc_w)
 /* the data lines are flipped */
 WRITE8_MEMBER(segag80r_state::sindbadm_sn1_SN76496_w)
 {
-		m_sn1->write(space, offset, BITSWAP8(data, 0,1,2,3,4,5,6,7));
+		m_sn1->write(space, offset, bitswap<8>(data, 0,1,2,3,4,5,6,7));
 }
 WRITE8_MEMBER(segag80r_state::sindbadm_sn2_SN76496_w)
 {
-		m_sn2->write(space, offset, BITSWAP8(data, 0,1,2,3,4,5,6,7));
+		m_sn2->write(space, offset, bitswap<8>(data, 0,1,2,3,4,5,6,7));
 }
 
 

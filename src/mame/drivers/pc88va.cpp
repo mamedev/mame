@@ -254,7 +254,7 @@ void pc88va_state::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 				{
 					for(x_s=0;x_s<16;x_s++)
 					{
-						pen = (BITSWAP16(tvram[(spda+spr_count) / 2],7,6,5,4,3,2,1,0,15,14,13,12,11,10,9,8) >> (15-x_s)) & 1;
+						pen = (bitswap<16>(tvram[(spda+spr_count) / 2],7,6,5,4,3,2,1,0,15,14,13,12,11,10,9,8) >> (15-x_s)) & 1;
 
 						pen = pen & 1 ? fg_col : (bc) ? 8 : -1;
 
@@ -281,7 +281,7 @@ void pc88va_state::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 				{
 					for(x_s=0;x_s<2;x_s++)
 					{
-						pen = (BITSWAP16(tvram[(spda+spr_count) / 2],7,6,5,4,3,2,1,0,15,14,13,12,11,10,9,8)) >> (16-(x_s*8)) & 0xf;
+						pen = (bitswap<16>(tvram[(spda+spr_count) / 2],7,6,5,4,3,2,1,0,15,14,13,12,11,10,9,8)) >> (16-(x_s*8)) & 0xf;
 
 						//if(bc != -1) //transparent pen
 						bitmap.pix32(yp+y_i, xp+x_i+(x_s)) = m_palette->pen(pen);
@@ -755,7 +755,7 @@ WRITE8_MEMBER(pc88va_state::idp_command_w)
 
 		/* TODO: 0x89 shouldn't trigger, should be one of the above commands */
 		/* Update: actually 0x89 is mask command */
-		default:   m_cmd = 0x00; printf("PC=%05x: Unknown IDP %02x cmd set\n",space.device().safe_pc(),data); break;
+		default:   m_cmd = 0x00; printf("PC=%05x: Unknown IDP %02x cmd set\n",m_maincpu->pc(),data); break;
 	}
 }
 

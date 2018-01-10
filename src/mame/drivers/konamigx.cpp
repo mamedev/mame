@@ -492,7 +492,7 @@ WRITE32_MEMBER(konamigx_state::eeprom_w)
 		*/
 
 		m_gx_wrport1_1 = (data>>16)&0xff;
-//      logerror("write %x to IRQ register (PC=%x)\n", m_gx_wrport1_1, space.device().safe_pc());
+//      logerror("write %x to IRQ register (PC=%x)\n", m_gx_wrport1_1, m_maincpu->pc());
 
 		// m_gx_syncen is to ensure each IRQ is triggered at least once after being enabled
 		if (m_gx_wrport1_1 & 0x80)
@@ -945,20 +945,20 @@ WRITE32_MEMBER(konamigx_state::type4_prot_w)
 				else if(m_last_prot_op == 0x515) // vsnetscr screen 1
 				{
 					int adr;
-					//printf("GXT4: command %x %d (PC=%x)\n", m_last_prot_op, cc++, space.device().safe_pc());
+					//printf("GXT4: command %x %d (PC=%x)\n", m_last_prot_op, cc++, m_maincpu->pc());
 					for (adr = 0; adr < 0x400; adr += 2)
 						space.write_word(0xc01c00+adr, space.read_word(0xc01800+adr));
 				}
 				else if(m_last_prot_op == 0x115d) // vsnetscr screen 2
 				{
 					int adr;
-					//printf("GXT4: command %x %d (PC=%x)\n", m_last_prot_op, cc++, space.device().safe_pc());
+					//printf("GXT4: command %x %d (PC=%x)\n", m_last_prot_op, cc++, m_maincpu->pc());
 					for (adr = 0; adr < 0x400; adr += 2)
 						space.write_word(0xc18c00+adr, space.read_word(0xc18800+adr));
 				}
 				else
 				{
-					//printf("GXT4: unknown protection command %x (PC=%x)\n", m_last_prot_op, space.device().safe_pc());
+					//printf("GXT4: unknown protection command %x (PC=%x)\n", m_last_prot_op, m_maincpu->pc());
 				}
 
 				if (m_gx_wrport1_1 & 0x10)

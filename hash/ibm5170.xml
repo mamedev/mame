@@ -2241,6 +2241,44 @@
 		</part>
 	</software>
 
+	<software name="msdos62vu" cloneof="msdos62">
+		<description>MS-DOS (Version 6.2/V, Upgrade) (Japanese)</description>
+		<year>1993</year>
+		<publisher>Microsoft</publisher>
+		<info name="version" value="6.2/V" />
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1 - Setup" />
+			<dataarea name="flop" size = "1474560">
+				<rom name="disk01.img" size="1474560" crc="e92db5ca" sha1="ef9fee5797ae7db7478a3ce83961b6fd53abb5b2" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="disk02.img" size="1474560" crc="20502752" sha1="38b04f69a5657a4945f97f3f43705b97d3cbaa42" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="disk03.img" size="1474560" crc="55a795c9" sha1="5e898dc4e4ec2fbab55410fd456188ab5e6c5b1b" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="disk04.img" size="1474560" crc="b65ca131" sha1="929a46dc17458e3c106576c3689e709f9b694321" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="disk05.img" size="1474560" crc="17c26f9e" sha1="baa226b44864f62dd4065af86195694cbe0c1088" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="disk06.img" size="1474560" crc="4619289c" sha1="907aca37fe1867bff603d8a57cbb94d7c1ae652f" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="msdos621">
 		<description>MS-DOS (Version 6.21)</description>
 		<year>1994</year>
@@ -4716,6 +4754,30 @@
 		</part>
 	</software>
 
+	<software name="ontrakdm">
+		<description>Ontrack Disk Manager</description>
+		<year>1997</year>
+		<publisher>Quantum Data Systems</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<!--
+			Ontrack Disk Manager
+			For Quantum ATA (IDE) Disk Drives
+			Quantum(TM)
+			Capacity for the Extraordinary(TM)
+
+			Supports ATA disk drives greater than 528 MB under DOS, Windows 3.1X, Windows 95, Windows NT and OS/2
+
+			For detailed installation instructions and to view the on-line manual: insert Disk Manager diskette and type "A: HELP". This diskette is bootable with Ontrack's OS Boot Kernel.
+
+			Rev. G
+			Quantum P/N: 77-109028-01
+			-->
+			<dataarea name="flop" size="1474560">
+				<rom name="77-109028-01.img" size="1474560" crc="565510f6" sha1="d862aec61ee23e9499db92b1d955c01939eabdeb" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="rlt81398">
 		<description>Realtek RTL8139-810X Fast Ethernet Adapter (Version 5.502.1231.2001)</description>
 		<year>2002</year>
@@ -5010,6 +5072,17 @@
 
 	<!-- Application Disks -->
 
+	<software name="3000icon">
+		<description>3000 Icons for Windows</description>
+		<year>1995</year>
+		<publisher>Explore the World of Software</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="win529.img" size="1474560" crc="9578bf9a" sha1="6dd7b4ac9e18c6d9cd6685230b5245321ffc43ac" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="acerwin">
 		<!-- from Acer CPR 1.2 recovery CD-ROM -->
 		<description>Acer/Win Supplement</description>
@@ -5298,6 +5371,104 @@
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="368640">
 				<rom name="borland_eureka_1.0.img" size="368640" crc="7455a391" sha1="7be111d5b295ef9951454b1e84f121a34c2cd1a6" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="l123r3">
+		<description>Lotus 1-2-3 Release 3 (5.25")</description>
+		<year>1989</year>
+		<publisher>Lotus Development</publisher>
+		<info name="version" value="3" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "1228800">
+				<rom name="Disk01.img" size="1228800" crc="5204a70d" sha1="00824cf3b183fa9a716a0a8938685ee0bc337309" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="1-2-3 System Disk" />
+			<dataarea name="flop" size = "1228800">
+				<rom name="Disk02.img" size="1228800" crc="ce73206c" sha1="a1014e0057a00d678e060189c9ce8f99cae096ec" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Drivers Disk" />
+			<dataarea name="flop" size = "1228800">
+				<rom name="Disk03.img" size="1228800" crc="7f46cb99" sha1="6b00e4074797bfd57b36793a4581f9dd69751654" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Font Disk" />
+			<dataarea name="flop" size = "1228800">
+				<rom name="Disk04.img" size="1228800" crc="bf1ef322" sha1="40f6f1748d63e0b59719709815c4ef8a1c6d00bd" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="l123r3_35" cloneof="l123r3" supported="no">
+		<!-- missing all other disks -->
+		<description>Lotus 1-2-3 Release 3 (3.5")</description>
+		<year>1989</year>
+		<publisher>Lotus Development</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<!--
+			Lotus 1-2-3 Release 3
+			Drivers Disk 2
+
+			(C) Copyright 1989 Lotus Development Corporation.
+			All rights reserved. Part No. 100007L
+			-->
+			<feature name="part_id" value="Drivers Disk 2"/>
+			<dataarea name="flop" size="737280">
+				<rom name="100007l.img" size="737280" crc="bd2be994" sha1="3c3a3bcbf5b4b4a037ab896c5a607a930f7536fe" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="l123r31">
+		<description>Lotus 1-2-3 Release 3.1</description>
+		<year>1990</year>
+		<publisher>Lotus Development</publisher>
+		<info name="version" value="3.1" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Disk01.img" size="737280" crc="95e54478" sha1="87677cb9abacd2c9b8f4675eca9ee343556c0c06" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Disk02.img" size="737280" crc="e9cb7da1" sha1="dccb91c7d578c1ee2ac276e6c5073c22e23f3b07" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Disk03.img" size="737280" crc="7772fdd5" sha1="5e668d93eeb190ed8388f6fdfef6d798b1ecdd59" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Disk04.img" size="737280" crc="697b912d" sha1="50cb242649b65e114badfbe23800f9b7584f9a8e" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Disk05.img" size="737280" crc="357a80ec" sha1="2bb5ae9ae186a47074671a7147da1960df01f564" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Disk06.img" size="737280" crc="784a3012" sha1="0518d1b4f8f8a98dcf6b44572f9b6598dde79372" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop7" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Disk07.img" size="737280" crc="471ba49c" sha1="7bf50dc6f51edb15356cd319d419649100ceec3a" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop8" interface="floppy_3_5">
+			<feature name="part_id" value="Add-in Support" />
+			<dataarea name="flop" size = "737280">
+				<rom name="Add-in Support.img" size="737280" crc="55a813c8" sha1="a90d52b4cdabf03260772aa7210e251182dc91e4" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -6711,6 +6882,105 @@
 		</part>
 	</software>
 
+	<software name="atraincs">
+		<description>A-Train Construction Set</description>
+		<year>1992</year>
+		<publisher>Maxis</publisher>
+		<info name="version" value="1.00" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="A-Train Construction Set (USA) (Add-on).img" size="1474560" crc="fa4f2bbd" sha1="a944aac62d33c210ccab2dda2b7acbf6f87cf1d0" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="aopac">
+		<description>Aces of the Pacific</description>
+		<year>1992</year>
+		<publisher>Dynamix</publisher>
+		<info name="version" value="1.0" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="aopac201.img" size="1474560" crc="933f6eae" sha1="1941ec5c541508bb07d1b8dbdcf40d179508aab6" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="aopac202.img" size="1474560" crc="53d10b5d" sha1="20ee5006d5978ff2a1051210864ba87a8718bae5" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="aopac203.img" size="1474560" crc="511fe908" sha1="9f2169021e509cf50286a7965f5f855317272373" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="aopacex">
+		<description>Aces of the Pacific Expansion Disk - WWII: 1946</description>
+		<year>1992</year>
+		<publisher>Dynamix</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Aces of the Pacific - Expansion Disk - WWII - 1946 (USA, Europe) (v1.0).img" size="1474560" crc="6fae419b" sha1="3822bc87cea3be8e57e9b35d0d8bfcc3941cf00c" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="aoefr">
+		<description>Aces Over Europe (French)</description>
+		<year>1993</year>
+		<publisher>Dynamix</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Aces Over Europe (France) (Disk 1).img" size="1474560" crc="4659ac93" sha1="f1296c37734f6a2cc5d6bcfa55a810535413795a" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Aces Over Europe (France) (Disk 2).img" size="1474560" crc="cffa9daa" sha1="8a0aa92aed613de44b157d38b2b0fec94d0ffca3" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Aces Over Europe (France) (Disk 3).img" size="1474560" crc="945f95f5" sha1="ee1ecf7bbb8577f81a6bd1bfd4206c8b50bf2de9" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- installer hangs -->
+	<software name="a4netwrk" supported="no">
+		<description>AIV Networks (German)</description>
+		<year>1995</year>
+		<publisher>Infogrames</publisher>
+		<info name="developer" value="Artdink" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="AIV Networks (Europe) (Disk 1).img" size="1474560" crc="c158132a" sha1="6ac98aa2684b0a9eff3526dd6a09c8d8d3f1f2d6" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="AIV Networks (Europe) (Disk 2).img" size="1474560" crc="e4d7eba2" sha1="635594ea419a2da4c88a26754594ddd3b535cfd5" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="AIV Networks (Europe) (Disk 3).img" size="1474560" crc="2bd82f92" sha1="fcbc5686627f1462ea6710ebd1dddba74e4de72e" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="AIV Networks (Europe) (Disk 4).img" size="1474560" crc="61498d6c" sha1="b89ff1fcaa4245813b0f695c6213b48040158302" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="AIV Networks (Europe) (Disk 5).img" size="1474560" crc="7aa79431" sha1="f466593de75ce783ccd96f6c8874c07b086557ce" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="amazon">
 		<description>Amazon - Guardians of Eden</description>
 		<year>1992</year>
@@ -6897,6 +7167,28 @@
 		<part name="flop2" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
 				<rom name="Boppin' - Super Ultimate (USA) (v1.1) (Disk 2).img" size="1474560" crc="20c4dc37" sha1="e39ac3f58f81813e515e8fa203dff7e9b9ebf9d3" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bytsz137">
+		<description>Byte Size Software #137 - Boppin' &amp; Dits and Dats</description>
+		<year>1995</year>
+		<publisher>Byte Size Software</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="bytesize_137.img" size="1474560" crc="fc09ffe5" sha1="30b848ebbd27c95e56270af80cf8ba2f72e88efa" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bytsz149">
+		<description>Byte Size Software #149 - AJ's Quest &amp; Machine Nation</description>
+		<year>1995</year>
+		<publisher>Byte Size Software</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="bytesize_149.img" size="1474560" crc="210fc964" sha1="93ed421c783e55f8030cf3074568aabe5c8a3fb1" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -7848,6 +8140,18 @@
 		</part>
 	</software>
 
+	<software name="1samurai">
+		<!-- Dumped via Kryoflux, all tracks show as good and unmodified -->
+		<description>The First Samurai</description>
+		<year>1992</year>
+		<publisher>Vivid Image</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="[PC] The First Samurai.img" size="737280" crc="49264976" sha1="3178d690ad32a3565e4fa6c68a84b4232acea251" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="pharkas">
 		<description>Freddy Pharkas, Frontier Pharmacist</description>
 		<year>1993</year>
@@ -8076,6 +8380,120 @@
 		<part name="flop3" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="disk3.img" size="737280" crc="d4bd135f" sha1="78c48f2551f469aedcc80883f8555810e587285f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="incait">
+		<description>Inca (Italian)</description>
+		<year>1992</year>
+		<publisher>Sierra On-Line</publisher>
+		<info name="developer" value="Coktel Vision" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Inca [Sierra On-Line] [1992] [Italian] [3.5HD] [Disk 01 of 10].img" size="1474560" crc="124fe8c9" sha1="75f6a558c1950cbcc3dbec61084326656a772f65" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Inca [Sierra On-Line] [1992] [Italian] [3.5HD] [Disk 02 of 10].img" size="1474560" crc="cff36eac" sha1="45cd1a36ac24d0f416552d239f2a68a8e85d5887" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Inca [Sierra On-Line] [1992] [Italian] [3.5HD] [Disk 03 of 10].img" size="1474560" crc="051c60c6" sha1="3cb6e49f5c85617b642c39dbc7a7113995fda343" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Inca [Sierra On-Line] [1992] [Italian] [3.5HD] [Disk 04 of 10].img" size="1474560" crc="eb9dd7d4" sha1="26cc06f971a1002eb82ef80ee9d3d11a7208023c" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Inca [Sierra On-Line] [1992] [Italian] [3.5HD] [Disk 05 of 10].img" size="1474560" crc="9175cc28" sha1="159189f47e408928f910da16ce515b3439ed5ea6" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Inca [Sierra On-Line] [1992] [Italian] [3.5HD] [Disk 06 of 10].img" size="1474560" crc="18451a6d" sha1="c6b448e0d300446c870d9f4e14d11eee8fa2cfd8" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop7" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Inca [Sierra On-Line] [1992] [Italian] [3.5HD] [Disk 07 of 10].img" size="1474560" crc="a0f7d798" sha1="f38c6b75808813952257d1febf6a067371aadad2" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop8" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Inca [Sierra On-Line] [1992] [Italian] [3.5HD] [Disk 08 of 10].img" size="1474560" crc="870661b1" sha1="1245f9a49a089fcb061ae46846d05210daca24d1" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop9" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Inca [Sierra On-Line] [1992] [Italian] [3.5HD] [Disk 09 of 10].img" size="1474560" crc="b2234232" sha1="d0598467582d36ac1259d0ba29a30cd2429a2e08" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop10" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Inca [Sierra On-Line] [1992] [Italian] [3.5HD] [Disk 10 of 10].img" size="1474560" crc="e5d36c0a" sha1="8a1a7615f1559f3a597ee7b8bc61de459488cc19" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="inca2">
+		<description>Inca 2: Wiracocha (French/German/English)</description>
+		<year>1993</year>
+		<publisher>Sierra On-Line</publisher>
+		<info name="developer" value="Coktel Vision" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Inca 2 [Sierra On-Line] [1993] [3.5HD] [Disk 01 of 10].img" size="1474560" crc="4d6c20c1" sha1="53fc21df728cd3eebbf6d038b727415391b6329a" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Inca 2 [Sierra On-Line] [1993] [3.5HD] [Disk 02 of 10].img" size="1474560" crc="9922bd34" sha1="6fc30f712d9985d2761ee6a9c1245ac54e801ace" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Inca 2 [Sierra On-Line] [1993] [3.5HD] [Disk 03 of 10].img" size="1474560" crc="b2509aa1" sha1="acc6d8b419477c1711190a52f071339e0a660cce" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Inca 2 [Sierra On-Line] [1993] [3.5HD] [Disk 04 of 10].img" size="1474560" crc="3c272165" sha1="058c27ba399c536ac0b4f5f1bf186788c2406d71" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Inca 2 [Sierra On-Line] [1993] [3.5HD] [Disk 05 of 10].img" size="1474560" crc="21c5a6c3" sha1="ca0624cbf795f856aaf14e23aab3e0900be1f990" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Inca 2 [Sierra On-Line] [1993] [3.5HD] [Disk 06 of 10].img" size="1474560" crc="cc3de8fb" sha1="e7a2cceee07d53b2a4fddaffac60ea87280691d4" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop7" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Inca 2 [Sierra On-Line] [1993] [3.5HD] [Disk 07 of 10].img" size="1474560" crc="372ae3cb" sha1="1c26820cdcf165071d96197dae0adbaa217ade4c" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop8" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Inca 2 [Sierra On-Line] [1993] [3.5HD] [Disk 08 of 10].img" size="1474560" crc="c3303cd7" sha1="b0953da58af6be48a227e3fc27ded726b7a74296" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop9" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Inca 2 [Sierra On-Line] [1993] [3.5HD] [Disk 09 of 10].img" size="1474560" crc="fbc00191" sha1="9c2cbc3664cf77354911fea926590394b4fadb3c" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop10" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Inca 2 [Sierra On-Line] [1993] [3.5HD] [Disk 10 of 10].img" size="1474560" crc="25c547ad" sha1="452d545c58f29ef0cf5be4386ad14b7b7cc07d7a" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -8708,7 +9126,7 @@
 		</part>
 	</software>
 
-	<software name="omf2097" supported="partial">
+	<software name="omf2097">
 		<description>One Must Fall 2097</description>
 		<year>1994</year>
 		<publisher>Epic MegaGames</publisher>
@@ -9225,11 +9643,27 @@
 	</software>
 
 	<software name="spectrec">
-		<!-- Dumped via Kryoflux, track 0 shows as modified -->
-		<description>Spectre Challenger</description>
+		<!-- Dumped via Kryoflux, all tracks show as good and modified -->
+		<description>Spectre Challenger (V1.1, 1993-11-08)</description>
 		<year>1992</year>
 		<publisher>Velocity Development Corporation</publisher>
 		<info name="developer" value="Peninsula Gameworks" />
+		<info name="version" value="1.1" />
+		<info name="serial" value="XSP121OWW25300" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="disk1.img" size="737280" crc="5dabc1c8" sha1="4fb384ea7e070301c914b58c84593ab908ca372e" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spectreca" cloneof="spectrec">
+		<!-- Dumped via Kryoflux, track 0 shows as modified -->
+		<description>Spectre Challenger (V1.1, 1993-09-08)</description>
+		<year>1992</year>
+		<publisher>Velocity Development Corporation</publisher>
+		<info name="developer" value="Peninsula Gameworks" />
+		<info name="version" value="1.1" />
 		<info name="serial" value="333-3025" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
@@ -10207,50 +10641,6 @@
 		<part name="flop4" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
 				<rom name="diskd.img" size="1474560" crc="5d84110d" sha1="0140425ccb5aea27ccbff00a320941cccd86ac7a" offset="0" status="baddump" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="l123r3">
-		<!-- missing all other disks -->
-		<description>Lotus 1-2-3 Release 3</description>
-		<year>1989</year>
-		<publisher>Lotus Development</publisher>
-		<part name="flop1" interface="floppy_3_5">
-			<!--
-			Lotus 1-2-3 Release 3
-			Drivers Disk 2
-
-			(C) Copyright 1989 Lotus Development Corporation.
-			All rights reserved. Part No. 100007L
-			-->
-			<feature name="part_id" value="Drivers Disk 2"/>
-			<dataarea name="flop" size="737280">
-				<rom name="100007l.img" size="737280" crc="bd2be994" sha1="3c3a3bcbf5b4b4a037ab896c5a607a930f7536fe" offset="0"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="ontrakdm">
-		<description>Ontrack Disk Manager</description>
-		<year>1997</year>
-		<publisher>Quantum Data Systems</publisher>
-		<part name="flop1" interface="floppy_3_5">
-			<!--
-			Ontrack Disk Manager
-			For Quantum ATA (IDE) Disk Drives
-			Quantum(TM)
-			Capacity for the Extraordinary(TM)
-
-			Supports ATA disk drives greater than 528 MB under DOS, Windows 3.1X, Windows 95, Windows NT and OS/2
-
-			For detailed installation instructions and to view the on-line manual: insert Disk Manager diskette and type "A: HELP". This diskette is bootable with Ontrack's OS Boot Kernel.
-
-			Rev. G
-			Quantum P/N: 77-109028-01
-			-->
-			<dataarea name="flop" size="1474560">
-				<rom name="77-109028-01.img" size="1474560" crc="565510f6" sha1="d862aec61ee23e9499db92b1d955c01939eabdeb" offset="0"/>
 			</dataarea>
 		</part>
 	</software>

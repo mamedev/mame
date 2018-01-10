@@ -1646,21 +1646,16 @@ void debugger_commands::execute_stateload(int ref, const std::vector<std::string
 
 void debugger_commands::execute_rewind(int ref, const std::vector<std::string> &params)
 {
-	if (!m_machine.save().rewind()->enabled())
-	{
-		m_console.printf("Rewind not enabled\n");
-		return;
-	}
-
-	m_machine.rewind_step();
-
-	// clear all PC & memory tracks
-	for (device_t &device : device_iterator(m_machine.root_device()))
-	{
-		device.debug()->track_pc_data_clear();
-		device.debug()->track_mem_data_clear();
-	}
-	m_console.printf("Rewind step attempted.  Please refer to window message popup for results.\n");
+	bool success = m_machine.rewind_step();
+	if (success)
+		// clear all PC & memory tracks
+		for (device_t &device : device_iterator(m_machine.root_device()))
+		{
+			device.debug()->track_pc_data_clear();
+			device.debug()->track_mem_data_clear();
+		}
+	else
+		m_console.printf("Rewind error occured.  See error.log for details.\n");
 }
 
 
@@ -1696,7 +1691,7 @@ void debugger_commands::execute_save(int ref, const std::vector<std::string> &pa
 	}
 
 	/* now write the data out */
-	auto dis = space->machine().disable_side_effect();
+	auto dis = space->device().machine().disable_side_effect();
 	switch (space->addr_shift())
 	{
 	case -3:
@@ -1922,7 +1917,7 @@ void debugger_commands::execute_dump(int ref, const std::vector<std::string> &pa
 	else if(shift < 0)
 		width >>= -shift;
 
-	auto dis = space->machine().disable_side_effect();
+	auto dis = space->device().machine().disable_side_effect();
 	bool be = space->endianness() == ENDIANNESS_BIG;
 
 	for (offs_t i = offset; i <= endoffset; i += rowsize)
@@ -1970,7 +1965,7 @@ void debugger_commands::execute_dump(int ref, const std::vector<std::string> &pa
 		if (ascii)
 		{
 			util::stream_format(output, "  ");
-			for (u64 j = 0; j < rowsize && (i + j) <= endoffset; j++)
+			for (u64 j = 0; j < rowsize && (i + j) <= endoffset; j += width)
 			{
 				offs_t curaddr = i + j;
 				if (space->device().memory().translate(space->spacenum(), TRANSLATE_READ_DEBUG, curaddr))
@@ -2783,7 +2778,7 @@ void debugger_commands::execute_history(int ref, const std::vector<std::string> 
 	}
 
 	debug_disasm_buffer buffer(space->device());
-	
+
 	for (int index = 0; index < (int) count; index++)
 	{
 		offs_t pc = debug->history_pc(-index);

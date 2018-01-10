@@ -4,7 +4,9 @@
 device_rom_interface::device_rom_interface(const machine_config &mconfig, device_t &device, u8 addrwidth, endianness_t endian, u8 datawidth) :
 	device_memory_interface(mconfig, device),
 	m_rom_tag(device.basetag()),
-	m_rom_config("rom", endian, datawidth, addrwidth)
+	m_rom_config("rom", endian, datawidth, addrwidth),
+	m_bank(nullptr),
+	m_cur_bank(-1)
 {
 }
 
@@ -42,12 +44,14 @@ void device_rom_interface::set_rom_bank(int bank)
 		bank = bank % m_bank_count;
 	}
 
-	m_cur_bank = bank;
-	m_bank->set_entry(bank);
-	rom_bank_updated();
+	if (m_cur_bank != bank) {
+		m_cur_bank = bank;
+		m_bank->set_entry(bank);
+		rom_bank_updated();
+	}
 }
 
-void device_rom_interface::reset_bank()
+void device_rom_interface::interface_post_load()
 {
 	if(m_bank)
 		m_bank->set_entry(m_cur_bank);
@@ -85,12 +89,12 @@ void device_rom_interface::set_rom(const void *base, u32 size)
 
 void device_rom_interface::interface_pre_start()
 {
+	if(!has_space(0))
+		return;
+
 	m_rom_direct = space().direct<0>();
-	m_bank = nullptr;
-	m_cur_bank = -1;
 	device().save_item(NAME(m_cur_bank));
 	device().save_item(NAME(m_bank_count));
-	device().machine().save().register_postload(save_prepost_delegate(FUNC(device_rom_interface::reset_bank), this));
 
 	if(!has_configured_map(0)) {
 		memory_region *reg = device().owner()->memregion(m_rom_tag);

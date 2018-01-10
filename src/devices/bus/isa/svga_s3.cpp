@@ -77,7 +77,7 @@ isa16_svga_s3_device::isa16_svga_s3_device(const machine_config &mconfig, const 
 //-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
-READ8_MEMBER(isa16_svga_s3_device::input_port_0_r ) { return 0xff; } //return space.machine().root_device().ioport("IN0")->read(); }
+READ8_MEMBER(isa16_svga_s3_device::input_port_0_r ) { return 0xff; } //return machine().root_device().ioport("IN0")->read(); }
 
 void isa16_svga_s3_device::device_start()
 {
@@ -184,7 +184,7 @@ isa16_s3virge_device::isa16_s3virge_device(const machine_config &mconfig, const 
 //-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
-READ8_MEMBER(isa16_s3virge_device::input_port_0_r ) { return 0xff; } //return space.machine().root_device().ioport("IN0")->read(); }
+READ8_MEMBER(isa16_s3virge_device::input_port_0_r ) { return 0xff; } //return machine().root_device().ioport("IN0")->read(); }
 
 void isa16_s3virge_device::device_start()
 {
@@ -266,7 +266,7 @@ isa16_s3virgedx_device::isa16_s3virgedx_device(const machine_config &mconfig, co
 //-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
-READ8_MEMBER(isa16_s3virgedx_device::input_port_0_r ) { return 0xff; } //return space.machine().root_device().ioport("IN0")->read(); }
+READ8_MEMBER(isa16_s3virgedx_device::input_port_0_r ) { return 0xff; } //return machine().root_device().ioport("IN0")->read(); }
 
 void isa16_s3virgedx_device::device_start()
 {
@@ -349,7 +349,7 @@ isa16_stealth3d2kpro_device::isa16_stealth3d2kpro_device(const machine_config &m
 //-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
-READ8_MEMBER(isa16_stealth3d2kpro_device::input_port_0_r ) { return 0xff; } //return space.machine().root_device().ioport("IN0")->read(); }
+READ8_MEMBER(isa16_stealth3d2kpro_device::input_port_0_r ) { return 0xff; } //return machine().root_device().ioport("IN0")->read(); }
 
 void isa16_stealth3d2kpro_device::device_start()
 {

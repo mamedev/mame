@@ -76,7 +76,7 @@ nubus_wsportrait_device::nubus_wsportrait_device(const machine_config &mconfig, 
 	m_vram32(nullptr), m_mode(0), m_vbl_disable(0), m_toggle(0), m_count(0), m_clutoffs(0), m_timer(nullptr),
 	m_assembled_tag(util::string_format("%s:%s", tag, WSPORTRAIT_SCREEN_NAME))
 {
-	m_screen_tag = m_assembled_tag.c_str();
+	static_set_screen(*this, m_assembled_tag.c_str());
 }
 
 //-------------------------------------------------
@@ -103,7 +103,7 @@ void nubus_wsportrait_device::device_start()
 	m_nubus->install_device(slotspace+0x80000, slotspace+0xeffff, read32_delegate(FUNC(nubus_wsportrait_device::wsportrait_r), this), write32_delegate(FUNC(nubus_wsportrait_device::wsportrait_w), this));
 
 	m_timer = timer_alloc(0, nullptr);
-	m_timer->adjust(m_screen->time_until_pos(869, 0), 0);
+	m_timer->adjust(screen().time_until_pos(869, 0), 0);
 }
 
 //-------------------------------------------------
@@ -128,7 +128,7 @@ void nubus_wsportrait_device::device_timer(emu_timer &timer, device_timer_id tid
 		raise_slot_irq();
 	}
 
-	m_timer->adjust(m_screen->time_until_pos(869, 0), 0);
+	m_timer->adjust(screen().time_until_pos(869, 0), 0);
 }
 
 /***************************************************************************
@@ -243,7 +243,7 @@ WRITE32_MEMBER( nubus_wsportrait_device::wsportrait_w )
 
 			if (m_count == 3)
 			{
-//              printf("RAMDAC: color %d = %02x %02x %02x (PC=%x)\n", m_clutoffs, m_colors[0], m_colors[1], m_colors[2], space.device().safe_pc() );
+//              logerror("RAMDAC: color %d = %02x %02x %02x %s\n", m_clutoffs, m_colors[0], m_colors[1], m_colors[2], machine().describe_context());
 				m_palette[m_clutoffs] = rgb_t(m_colors[2], m_colors[2], m_colors[2]);
 				m_clutoffs++;
 				if (m_clutoffs > 255)

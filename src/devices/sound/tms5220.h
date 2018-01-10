@@ -84,6 +84,9 @@ public:
 	DECLARE_WRITE8_MEMBER( data_w );
 	DECLARE_READ8_MEMBER( status_r );
 
+	void data_w(uint8_t data);
+	uint8_t status_r();
+
 	READ_LINE_MEMBER( readyq_r );
 	READ_LINE_MEMBER( intq_r );
 

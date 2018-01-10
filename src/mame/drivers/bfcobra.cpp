@@ -92,7 +92,7 @@
     Defines
 */
 #define Z80_XTAL    5910000     /* Unconfirmed */
-#define M6809_XTAL  1000000
+#define M6809_XTAL  4000000     /* Unconfirmed */
 
 
 
@@ -846,7 +846,7 @@ READ8_MEMBER(bfcobra_state::chipset_r)
 		}
 		default:
 		{
-			osd_printf_debug("Flare One unknown read: 0x%.2x (PC:0x%.4x)\n", offset, space.device().safe_pcbase());
+			osd_printf_debug("Flare One unknown read: 0x%.2x (PC:0x%.4x)\n", offset, m_maincpu->pcbase());
 		}
 	}
 
@@ -862,7 +862,7 @@ WRITE8_MEMBER(bfcobra_state::chipset_w)
 		case 0x03:
 		{
 			if (data > 0x3f)
-				popmessage("%x: Unusual bank access (%x)\n", space.device().safe_pcbase(), data);
+				popmessage("%x: Unusual bank access (%x)\n", m_maincpu->pcbase(), data);
 
 			data &= 0x3f;
 			m_bank_data[offset] = data;
@@ -936,7 +936,7 @@ WRITE8_MEMBER(bfcobra_state::chipset_w)
 		}
 		default:
 		{
-			osd_printf_debug("Flare One unknown write: 0x%.2x with 0x%.2x (PC:0x%.4x)\n", offset, data, space.device().safe_pcbase());
+			osd_printf_debug("Flare One unknown write: 0x%.2x with 0x%.2x (PC:0x%.4x)\n", offset, data, m_maincpu->pcbase());
 		}
 	}
 }
@@ -1329,7 +1329,7 @@ WRITE8_MEMBER(bfcobra_state::meter_w)
 		if (changed & (1 << i))
 		{
 			m_meters->update(i, data & (1 << i) );
-			space.device().execute().set_input_line(M6809_FIRQ_LINE, HOLD_LINE);
+			m_audiocpu->set_input_line(M6809_FIRQ_LINE, HOLD_LINE);
 		}
 	}
 }
@@ -1633,7 +1633,7 @@ static MACHINE_CONFIG_START( bfcobra )
 	MCFG_CPU_IO_MAP(z80_io_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", bfcobra_state,  vblank_gen)
 
-	MCFG_CPU_ADD("audiocpu", M6809, M6809_XTAL)
+	MCFG_CPU_ADD("audiocpu", MC6809, M6809_XTAL) // MC6809P
 	MCFG_CPU_PROGRAM_MAP(m6809_prog_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(bfcobra_state, timer_irq, 1000)
 
@@ -1655,7 +1655,7 @@ static MACHINE_CONFIG_START( bfcobra )
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("aysnd", AY8910, M6809_XTAL)
+	MCFG_SOUND_ADD("aysnd", AY8910, M6809_XTAL / 4)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 
 	MCFG_SOUND_ADD("upd", UPD7759, UPD7759_STANDARD_CLOCK)

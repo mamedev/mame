@@ -599,7 +599,7 @@ WRITE8_MEMBER(system1_state::mcu_io_w)
 
 		default:
 			logerror("%03X: MCU movx write mode %02X offset %04X = %02X\n",
-						space.device().safe_pc(), m_mcu_control, offset, data);
+						m_mcu->pc(), m_mcu_control, offset, data);
 			break;
 	}
 }
@@ -620,7 +620,7 @@ READ8_MEMBER(system1_state::mcu_io_r)
 
 		default:
 			logerror("%03X: MCU movx read mode %02X offset %04X\n",
-						space.device().safe_pc(), m_mcu_control, offset);
+						m_mcu->pc(), m_mcu_control, offset);
 			return 0xff;
 	}
 }
@@ -669,7 +669,7 @@ WRITE8_MEMBER(system1_state::nob_mcu_control_p2_w)
 
 	/* bit 2 is toggled once near the end of an IRQ */
 	if (((m_mcu_control ^ data) & 0x04) && !(data & 0x04))
-		space.device().execute().set_input_line(MCS51_INT0_LINE, CLEAR_LINE);
+		m_mcu->set_input_line(MCS51_INT0_LINE, CLEAR_LINE);
 
 	/* bit 3 is toggled once at the start of an IRQ, and again at the end */
 	if (((m_mcu_control ^ data) & 0x08) && !(data & 0x08))
@@ -710,25 +710,25 @@ READ8_MEMBER(system1_state::nob_mcu_status_r)
 
 READ8_MEMBER(system1_state::nobb_inport1c_r)
 {
-//  logerror("IN  $1c : pc = %04x - data = 0x80\n",space.device().safe_pc());
+//  logerror("IN  $1c : pc = %04x - data = 0x80\n",m_maincpu->pc());
 	return(0x80);   // infinite loop (at 0x0fb3) until bit 7 is set
 }
 
 READ8_MEMBER(system1_state::nobb_inport22_r)
 {
-//  logerror("IN  $22 : pc = %04x - data = %02x\n",space.device().safe_pc(),nobb_inport17_step);
+//  logerror("IN  $22 : pc = %04x - data = %02x\n",m_maincpu->pc(),nobb_inport17_step);
 	return(0);//nobb_inport17_step);
 }
 
 READ8_MEMBER(system1_state::nobb_inport23_r)
 {
-//  logerror("IN  $23 : pc = %04x - step = %02x\n",space.device().safe_pc(),m_nobb_inport23_step);
+//  logerror("IN  $23 : pc = %04x - step = %02x\n",m_maincpu->pc(),m_nobb_inport23_step);
 	return(m_nobb_inport23_step);
 }
 
 WRITE8_MEMBER(system1_state::nobb_outport24_w)
 {
-//  logerror("OUT $24 : pc = %04x - data = %02x\n",space.device().safe_pc(),data);
+//  logerror("OUT $24 : pc = %04x - data = %02x\n",m_maincpu->pc(),data);
 	m_nobb_inport23_step = data;
 }
 
@@ -5322,7 +5322,7 @@ DRIVER_INIT_MEMBER(system1_state,dakkochn)
 READ8_MEMBER(system1_state::nob_start_r)
 {
 	/* in reality, it's likely some M1-dependent behavior */
-	return (space.device().safe_pc() <= 0x0003) ? 0x80 : m_maincpu_region->base()[1];
+	return (m_maincpu->pc() <= 0x0003) ? 0x80 : m_maincpu_region->base()[1];
 }
 
 DRIVER_INIT_MEMBER(system1_state,nob)

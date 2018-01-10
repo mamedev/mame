@@ -41,7 +41,7 @@ READ8_MEMBER(mrdo_state::mrdo_SECRE_r)
 {
 	uint8_t *RAM = memregion("maincpu")->base();
 
-	return RAM[space.device().state().state_int(Z80_HL)];
+	return RAM[m_maincpu->state_int(Z80_HL)];
 }
 
 

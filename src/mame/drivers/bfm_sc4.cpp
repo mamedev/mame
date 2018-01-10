@@ -273,23 +273,24 @@ uint8_t sc4_state::read_input_matrix(int row)
 
 READ16_MEMBER(sc4_state::sc4_cs1_r)
 {
-	int pc = space.device().safe_pc();
+	int pc = m_maincpu->pc();
 
 	if (offset<0x100000/2)
 	{
 		// allow some sets to boot, should probably return this data on Mbus once we figure out what it is
 		if ((pc == m_chk41addr) && (offset == m_chk41addr>>1))
 		{
-			uint32_t r_A0 = space.device().state().state_int(M68K_A0);
-			uint32_t r_A1 = space.device().state().state_int(M68K_A1);
-			uint32_t r_D1 = space.device().state().state_int(M68K_D1);
+			uint32_t r_A0 = m_maincpu->state_int(M68K_A0);
+			uint32_t r_A1 = m_maincpu->state_int(M68K_A1);
+			uint32_t r_D1 = m_maincpu->state_int(M68K_D1);
 
 			if (r_D1 == 0x7)
 			{
+				auto &mspace = m_maincpu->space(AS_PROGRAM);
 				bool valid = true;
 				for (int i=0;i<8;i++)
 				{
-					uint8_t code = space.read_byte(r_A0+i);
+					uint8_t code = mspace.read_byte(r_A0+i);
 					if (code != 0xff) // assume our mbus code just returns 0xff for now..
 						valid = false;
 				}
@@ -302,9 +303,9 @@ READ16_MEMBER(sc4_state::sc4_cs1_r)
 					printf("Ident code? ");
 					for (int i=0;i<8;i++)
 					{
-						uint8_t code = space.read_byte(r_A1+i);
+						uint8_t code = mspace.read_byte(r_A1+i);
 						printf("%02x",code);
-						space.write_byte(r_A0+i, code);
+						mspace.write_byte(r_A0+i, code);
 					}
 					printf("\n");
 				}
@@ -322,7 +323,7 @@ READ16_MEMBER(sc4_state::sc4_cs1_r)
 
 READ16_MEMBER(sc4_state::sc4_mem_r)
 {
-	int pc = space.device().safe_pc();
+	int pc = m_maincpu->pc();
 	int cs = m_maincpu->get_cs(offset * 2);
 	int base = 0, end = 0, base2 = 0, end2 = 0;
 //  if (!(debugger_access())) printf("cs is %d\n", cs);
@@ -493,14 +494,14 @@ WRITE8_MEMBER(bfm_sc45_state::mux_output2_w)
 	}
 	else
 	{
-		uint8_t bf7segdata = BITSWAP8(data,0,7,6,5,4,3,2,1);
+		uint8_t bf7segdata = bitswap<8>(data,0,7,6,5,4,3,2,1);
 		output().set_digit_value(offset, bf7segdata);
 	}
 }
 
 WRITE16_MEMBER(sc4_state::sc4_mem_w)
 {
-	int pc = space.device().safe_pc();
+	int pc = m_maincpu->pc();
 	int cs = m_maincpu->get_cs(offset * 2);
 	int base = 0, end = 0, base2 = 0, end2 = 0;
 
@@ -625,7 +626,7 @@ ADDRESS_MAP_END
 
 READ32_MEMBER(sc4_adder4_state::adder4_mem_r)
 {
-	int pc = space.device().safe_pc();
+	int pc = m_adder4cpu->pc();
 	int cs = m_adder4cpu->get_cs(offset * 4);
 
 	switch ( cs )
@@ -647,7 +648,7 @@ READ32_MEMBER(sc4_adder4_state::adder4_mem_r)
 
 WRITE32_MEMBER(sc4_adder4_state::adder4_mem_w)
 {
-	int pc = space.device().safe_pc();
+	int pc = m_adder4cpu->pc();
 	int cs = m_adder4cpu->get_cs(offset * 4);
 
 	switch ( cs )
@@ -773,8 +774,7 @@ void sc4_state::bfm_sc4_68307_portb_w(address_space &space, bool dedicated, uint
 {
 //  if (dedicated == false)
 	{
-		int pc = space.device().safe_pc();
-		//_m68ki_cpu_core *m68k = m68k_get_safe_token(&space.device());
+		int pc = m_maincpu->pc();
 		// serial output to the VFD at least..
 		logerror("%08x bfm_sc4_68307_portb_w %04x %04x\n", pc, data, line_mask);
 
@@ -786,7 +786,7 @@ void sc4_state::bfm_sc4_68307_portb_w(address_space &space, bool dedicated, uint
 }
 uint8_t sc4_state::bfm_sc4_68307_porta_r(address_space &space, bool dedicated, uint8_t line_mask)
 {
-	int pc = space.device().safe_pc();
+	int pc = m_maincpu->pc();
 	logerror("%08x bfm_sc4_68307_porta_r\n", pc);
 	return 0xbb;// machine().rand();
 }

@@ -72,7 +72,7 @@ WRITE8_MEMBER(tonton_state::tonton_outport_w)
 //  if(data & 0xfe)
 //      logerror("%02x %02x\n",data,offset);
 	if (data)
-		logerror("tonton_outport_w %02X @ %04X\n", data, space.device().safe_pc());
+		logerror("tonton_outport_w %02X @ %04X\n", data, m_maincpu->pc());
 }
 
 WRITE8_MEMBER(tonton_state::hopper_w)

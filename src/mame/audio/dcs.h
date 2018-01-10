@@ -119,6 +119,11 @@ protected:
 	virtual void device_reset() override;
 	void add_mconfig_dcs(machine_config &config);
 
+	// Formerly DCS1=1 DCS1P5=15 DCS2=2 DSIO=3 DENV=4
+	enum { REV_DCS1, REV_DCS1P5, REV_DCS2, REV_DSIO, REV_DENV };
+	static constexpr const char *const denver_regname[4] =
+	{ "SDRC_ROM", "SDRC_IO", "RAM_PAGE", "VER/FIFO_RESET" };
+
 	struct sdrc_state
 	{
 		uint16_t      reg[4];

@@ -3,7 +3,7 @@
 /*
  * PlayStation CPU emulator
  *
- * Copyright 2003-2013 smf
+ * Copyright 2003-2017 smf
  *
  */
 

@@ -79,7 +79,7 @@ WRITE8_MEMBER( fuuki16_state::sound_command_w )
 {
 	m_soundlatch->write(space,0,data & 0xff);
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
-//      space.device().execute().spin_until_time(attotime::from_usec(50));   // Allow the other CPU to reply
+//      m_maincpu->spin_until_time(attotime::from_usec(50));   // Allow the other CPU to reply
 	machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(50)); // Fixes glitching in rasters
 }
 
@@ -115,7 +115,7 @@ WRITE8_MEMBER(fuuki16_state::sound_rombank_w)
 	if (data <= 2)
 		membank("bank1")->set_entry(data);
 	else
-		logerror("CPU #1 - PC %04X: unknown bank bits: %02X\n", space.device().safe_pc(), data);
+		logerror("CPU #1 - PC %04X: unknown bank bits: %02X\n", m_audiocpu->pc(), data);
 }
 
 WRITE8_MEMBER(fuuki16_state::oki_banking_w)

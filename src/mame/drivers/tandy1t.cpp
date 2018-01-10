@@ -254,9 +254,9 @@ void tandy1000_state::tandy1000_write_eeprom(uint8_t data)
 
 WRITE8_MEMBER( tandy1000_state::pc_t1t_p37x_w )
 {
-//  DBG_LOG(2,"T1T_p37x_w",("%.5x #%d $%02x\n", space.device().safe_pc( ),offset, data));
+//  DBG_LOG(2,"T1T_p37x_w",("%.5x #%d $%02x\n", m_maincpu->pc( ),offset, data));
 	if (offset!=4)
-		logerror("T1T_p37x_w %.5x #%d $%02x\n", space.device().safe_pc( ),offset, data);
+		logerror("T1T_p37x_w %.5x #%d $%02x\n", m_maincpu->pc( ),offset, data);
 	m_tandy_data[offset]=data;
 	switch( offset )
 	{
@@ -269,7 +269,7 @@ WRITE8_MEMBER( tandy1000_state::pc_t1t_p37x_w )
 READ8_MEMBER( tandy1000_state::pc_t1t_p37x_r )
 {
 	int data = m_tandy_data[offset];
-//  DBG_LOG(1,"T1T_p37x_r",("%.5x #%d $%02x\n", space.device().safe_pc( ), offset, data));
+//  DBG_LOG(1,"T1T_p37x_r",("%.5x #%d $%02x\n", m_maincpu->pc( ), offset, data));
 	return data;
 }
 
@@ -408,7 +408,7 @@ READ8_MEMBER( tandy1000_state::tandy1000_bank_r )
 {
 	uint8_t data = 0xFF;
 
-	logerror( "%s: tandy1000_bank_r: offset = %x\n", space.machine().describe_context(), offset );
+	logerror( "%s: tandy1000_bank_r: offset = %x\n", machine().describe_context(), offset );
 
 	switch( offset )
 	{
@@ -423,7 +423,7 @@ READ8_MEMBER( tandy1000_state::tandy1000_bank_r )
 
 WRITE8_MEMBER( tandy1000_state::tandy1000_bank_w )
 {
-	logerror( "%s: tandy1000_bank_w: offset = %x, data = %02x\n", space.machine().describe_context(), offset, data );
+	logerror( "%s: tandy1000_bank_w: offset = %x, data = %02x\n", machine().describe_context(), offset, data );
 
 	switch( offset )
 	{

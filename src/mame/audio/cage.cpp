@@ -370,7 +370,7 @@ READ32_MEMBER( atari_cage_device::tms32031_io_r )
 	}
 
 	if (LOG_32031_IOPORTS)
-		logerror("CAGE:%06X:%s read -> %08X\n", space.device().safe_pc(), register_names[offset & 0x7f], result);
+		logerror("%s CAGE:%s read -> %08X\n", machine().describe_context(), register_names[offset & 0x7f], result);
 	return result;
 }
 
@@ -382,7 +382,7 @@ WRITE32_MEMBER( atari_cage_device::tms32031_io_w )
 	COMBINE_DATA(&tms32031_io_regs[offset]);
 
 	if (LOG_32031_IOPORTS)
-		logerror("CAGE:%06X:%s write = %08X\n", space.device().safe_pc(), register_names[offset & 0x7f], tms32031_io_regs[offset]);
+		logerror("%s CAGE:%s write = %08X\n", machine().describe_context(), register_names[offset & 0x7f], tms32031_io_regs[offset]);
 
 	switch (offset)
 	{
@@ -459,7 +459,7 @@ void atari_cage_device::update_control_lines()
 READ32_MEMBER( atari_cage_device::cage_from_main_r )
 {
 	if (LOG_COMM)
-		logerror("%06X:CAGE read command = %04X\n", space.device().safe_pc(), m_from_main);
+		logerror("%s CAGE read command = %04X\n", machine().describe_context(), m_from_main);
 	m_cpu_to_cage_ready = 0;
 	update_control_lines();
 	m_cpu->set_input_line(TMS3203X_IRQ0, CLEAR_LINE);
@@ -471,7 +471,7 @@ WRITE32_MEMBER( atari_cage_device::cage_from_main_ack_w )
 {
 	if (LOG_COMM)
 	{
-			logerror("%06X:CAGE ack command = %04X\n", space.device().safe_pc(), m_from_main);
+			logerror("%s CAGE ack command = %04X\n", machine().describe_context(), m_from_main);
 	}
 }
 
@@ -479,7 +479,7 @@ WRITE32_MEMBER( atari_cage_device::cage_from_main_ack_w )
 WRITE32_MEMBER( atari_cage_device::cage_to_main_w )
 {
 	if (LOG_COMM)
-		logerror("%06X:Data from CAGE = %04X\n", space.device().safe_pc(), data);
+		logerror("%s Data from CAGE = %04X\n", machine().describe_context(), data);
 	m_soundlatch->write(space, 0, data, mem_mask);
 	m_cage_to_cpu_ready = 1;
 	update_control_lines();

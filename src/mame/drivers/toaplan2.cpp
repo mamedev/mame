@@ -473,10 +473,10 @@ DRIVER_INIT_MEMBER(toaplan2_state,pipibibsbl)
 
 	for (int i = 0; i < (0x040000/2); i += 4)
 	{
-		ROM[i+0] = BITSWAP16(ROM[i+0],0x1,0x5,0x6,0x7,0x8,0x2,0x0,0x9,0xe,0xd,0x4,0x3,0xf,0xa,0xb,0xc);
-		ROM[i+1] = BITSWAP16(ROM[i+1],0x5,0x3,0x1,0xf,0xd,0xb,0x9,0x0,0x2,0x4,0x6,0x8,0xa,0xc,0xe,0x7);
-		ROM[i+2] = BITSWAP16(ROM[i+2],0xc,0xd,0xe,0xf,0x8,0x9,0xa,0xb,0x3,0x2,0x1,0x0,0x7,0x6,0x5,0x4);
-		ROM[i+3] = BITSWAP16(ROM[i+3],0x8,0x9,0xa,0xb,0xc,0xd,0xe,0xf,0x3,0x2,0x1,0x0,0x7,0x6,0x5,0x4);
+		ROM[i+0] = bitswap<16>(ROM[i+0],0x1,0x5,0x6,0x7,0x8,0x2,0x0,0x9,0xe,0xd,0x4,0x3,0xf,0xa,0xb,0xc);
+		ROM[i+1] = bitswap<16>(ROM[i+1],0x5,0x3,0x1,0xf,0xd,0xb,0x9,0x0,0x2,0x4,0x6,0x8,0xa,0xc,0xe,0x7);
+		ROM[i+2] = bitswap<16>(ROM[i+2],0xc,0xd,0xe,0xf,0x8,0x9,0xa,0xb,0x3,0x2,0x1,0x0,0x7,0x6,0x5,0x4);
+		ROM[i+3] = bitswap<16>(ROM[i+3],0x8,0x9,0xa,0xb,0xc,0xd,0xe,0xf,0x3,0x2,0x1,0x0,0x7,0x6,0x5,0x4);
 	}
 }
 
@@ -539,23 +539,17 @@ READ16_MEMBER(toaplan2_state::video_count_r)
 	/* +---------+---------+--------+---------------------------+ */
 	/*************** Control Signals are active low ***************/
 
-	int hpos = m_screen->hpos();
 	int vpos = m_screen->vpos();
 
 	int video_status = 0xff00;    // Set signals inactive
 
 	vpos = (vpos + 15) % 262;
 
-	bool hblank, vblank;
-
-	hblank = (hpos > 325) && (hpos < 380);
-	vblank = (vpos >= 247) && (vpos <= 250);
-
-	if (hblank)
+	if (!m_vdp0->hsync_r())
 		video_status &= ~0x8000;
-	if (vblank)
+	if (!m_vdp0->vsync_r())
 		video_status &= ~0x4000;
-	if (vblank || hblank) // ?? Dogyuun is too slow if this is wrong
+	if (!m_vdp0->fblank_r())
 		video_status &= ~0x0100;
 	if (vpos < 256)
 		video_status |= (vpos & 0xff);
@@ -857,7 +851,7 @@ READ16_MEMBER(toaplan2_state::bbakraid_eeprom_r)
 WRITE16_MEMBER(toaplan2_state::bbakraid_eeprom_w)
 {
 	if (data & ~0x001f)
-		logerror("CPU #0 PC:%06X - Unknown EEPROM data being written %04X\n",space.device().safe_pc(),data);
+		logerror("CPU #0 PC:%06X - Unknown EEPROM data being written %04X\n",m_maincpu->pc(),data);
 
 	if ( ACCESSING_BITS_0_7 )
 		ioport("EEPROMOUT")->write(data, 0xff);
@@ -2752,11 +2746,11 @@ static INPUT_PORTS_START( sstriker )
 INPUT_PORTS_END
 
 
-static INPUT_PORTS_START( sstrikera )
+static INPUT_PORTS_START( sstrikerk ) // Although the region jumper is functional, it's a Korean board / version
 	PORT_INCLUDE( sstriker )
 
 	PORT_MODIFY("JMPR")
-	PORT_CONFNAME( 0x000e,  0x0004, DEF_STR( Region ) ) //PORT_CONFLOCATION("JP:!3,!2,!1")
+	PORT_CONFNAME( 0x000e,  0x000a, DEF_STR( Region ) ) //PORT_CONFLOCATION("JP:!3,!2,!1")
 	PORT_CONFSETTING(       0x0004, DEF_STR( Europe ) )
 	PORT_CONFSETTING(       0x0002, DEF_STR( USA ) )
 	PORT_CONFSETTING(       0x0000, DEF_STR( Japan ) )
@@ -4069,10 +4063,10 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( batrider )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_32MHz/2)       /* 16MHz , 32MHz Oscillator */
+	MCFG_CPU_ADD("maincpu", M68000, XTAL_32MHz/2) /* 16MHz , 32MHz Oscillator (verified) */
 	MCFG_CPU_PROGRAM_MAP(batrider_68k_mem)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_32MHz/8)     /* 4MHz , 32MHz Oscillator */
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL_32MHz/6) /* 5.333MHz , 32MHz Oscillator (verified) */
 	MCFG_CPU_PROGRAM_MAP(batrider_sound_z80_mem)
 	MCFG_CPU_IO_MAP(batrider_sound_z80_port)
 
@@ -4109,7 +4103,7 @@ static MACHINE_CONFIG_START( batrider )
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch3")
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch4")
 
-	MCFG_YM2151_ADD("ymsnd", XTAL_32MHz/8)
+	MCFG_YM2151_ADD("ymsnd", XTAL_32MHz/8) /* 4MHz , 32MHz Oscillator (verified) */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MCFG_OKIM6295_ADD("oki1", XTAL_32MHz/10, PIN7_HIGH)
@@ -4911,7 +4905,7 @@ ROM_START( sstriker )
 ROM_END
 
 
-ROM_START( sstrikera )
+ROM_START( sstrikerk )
 	ROM_REGION( 0x080000, "maincpu", 0 )            /* Main 68K code */
 	ROM_LOAD16_WORD_SWAP( "ra-ma-01_01.u65", 0x000000, 0x080000, CRC(92259f84) SHA1(127e62e407d95efd360bfe2cac9577f326abf6ef) )
 
@@ -5643,9 +5637,9 @@ GAME( 1995, othldrby,    0,        othldrby,   othldrby,   toaplan2_state, 0,   
 GAME( 1994, snowbro2,    0,        snowbro2,   snowbro2,   toaplan2_state, 0,        ROT0,   "Hanafram", "Snow Bros. 2 - With New Elves / Otenki Paradise",           MACHINE_SUPPORTS_SAVE )
 GAME( 1998, snowbro2b,   snowbro2, snowbro2,   snowbro2,   toaplan2_state, 0,        ROT0,   "bootleg",  "Snow Bros. 2 - With New Elves / Otenki Paradise (bootleg)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1993, sstriker,    0,        mahoudai,   sstriker,   toaplan2_state, 0,        ROT270, "Raizing",                "Sorcer Striker (set 1)" ,  MACHINE_SUPPORTS_SAVE ) // verified on two different PCBs
-GAME( 1993, sstrikera,   sstriker, mahoudai,   sstrikera,  toaplan2_state, 0,        ROT270, "Raizing",                "Sorcer Striker (set 2)" ,  MACHINE_SUPPORTS_SAVE ) // from Korean board
-GAME( 1993, mahoudai,    sstriker, mahoudai,   mahoudai,   toaplan2_state, 0,        ROT270, "Raizing (Able license)", "Mahou Daisakusen (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, sstriker,    0,        mahoudai,   sstriker,   toaplan2_state, 0,        ROT270, "Raizing",                         "Sorcer Striker",           MACHINE_SUPPORTS_SAVE ) // verified on two different PCBs
+GAME( 1993, sstrikerk,   sstriker, mahoudai,   sstrikerk,  toaplan2_state, 0,        ROT270, "Raizing (Unite Trading license)", "Sorcer Striker (Korea)" ,  MACHINE_SUPPORTS_SAVE ) // Although the region jumper is functional, it's a Korean board / version
+GAME( 1993, mahoudai,    sstriker, mahoudai,   mahoudai,   toaplan2_state, 0,        ROT270, "Raizing (Able license)",          "Mahou Daisakusen (Japan)", MACHINE_SUPPORTS_SAVE )
 
 GAME( 1994, kingdmgp,    0,        shippumd,   kingdmgp,   toaplan2_state, 0,        ROT270, "Raizing / Eighting", "Kingdom Grandprix",               MACHINE_SUPPORTS_SAVE ) // from Korean board, missing letters on credits screen but this is correct
 GAME( 1994, shippumd,    kingdmgp, shippumd,   shippumd,   toaplan2_state, 0,        ROT270, "Raizing / Eighting", "Shippu Mahou Daisakusen (Japan)", MACHINE_SUPPORTS_SAVE )

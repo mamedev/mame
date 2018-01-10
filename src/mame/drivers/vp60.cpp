@@ -12,7 +12,7 @@ No significant progress can be made until the 8051 has its internal ROM dumped.
 #include "cpu/mcs51/mcs51.h"
 //#include "machine/er2055.h"
 //#include "video/i8275.h"
-//#include "screen.h"
+#include "screen.h"
 
 class vp60_state : public driver_device
 {
@@ -20,16 +20,23 @@ public:
 	vp60_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
-		//, m_p_chargen(*this, "chargen")
+		, m_p_chargen(*this, "chargen")
 	{ }
+
+	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 private:
 	required_device<cpu_device> m_maincpu;
-	//required_region_ptr<u8> m_p_chargen;
+	required_region_ptr<u8> m_p_chargen;
 };
 
+u32 vp60_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+{
+	return 0;
+}
+
 static ADDRESS_MAP_START( mem_map, AS_PROGRAM, 8, vp60_state )
-	AM_RANGE(0x0000, 0x3fff) AM_ROM AM_REGION("maincpu", 0)
+	AM_RANGE(0x0000, 0x2fff) AM_ROM AM_REGION("maincpu", 0)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( io_map, AS_PROGRAM, 8, vp60_state )
@@ -48,7 +55,11 @@ static MACHINE_CONFIG_START( vp60 )
 	MCFG_CPU_PROGRAM_MAP(mem_map)
 	MCFG_CPU_IO_MAP(io_map)
 
-	MCFG_CPU_ADD("kbdcpu", I8035, 5000000)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_RAW_PARAMS(XTAL_25_92MHz, 1350, 0, 1056, 320, 0, 300) // dimensions guessed
+	MCFG_SCREEN_UPDATE_DRIVER(vp60_state, screen_update)
+
+	MCFG_CPU_ADD("kbdcpu", I8035, XTAL_3_579545MHz) // 48-300-010 XTAL
 	MCFG_CPU_PROGRAM_MAP(kbd_map)
 MACHINE_CONFIG_END
 
@@ -58,14 +69,15 @@ MACHINE_CONFIG_END
 ADDS Viewpoint 60.
 Chips: P8051, P8275, EAROM ER-2055, HM6116P-4
 Crystals: 25.92, 10.920
-Keyboard: INS8035N-6, unknown crystal marked 48-300-010.
+Keyboard: INS8035N-6, crystal marked 48-300-010.
 
 ***************************************************************************************************************/
 
 ROM_START( vp60 )
 	ROM_REGION(0x4000, "maincpu", ROMREGION_ERASE00)
-	ROM_LOAD( "p8051.ub1",  0x0000, 0x2000, NO_DUMP ) // internal ROM not dumped
-	ROM_LOAD( "pgm.uc1",    0x2000, 0x2000, CRC(714ca569) SHA1(405424369fd5458e02c845c104b2cb386bd857d2) )
+	ROM_LOAD( "p8051.ub1",  0x0000, 0x1000, NO_DUMP ) // internal ROM not dumped
+	ROM_LOAD( "pgm.uc1",    0x2000, 0x1000, CRC(714ca569) SHA1(405424369fd5458e02c845c104b2cb386bd857d2) )
+	ROM_CONTINUE(           0x1000, 0x1000 )
 
 	ROM_REGION(0x1000, "chargen", 0)
 	ROM_LOAD( "font.uc4",   0x0000, 0x1000, CRC(3c4d39c0) SHA1(9503c0d5a76e8073c94c86be57bcb312641f6cc4) )

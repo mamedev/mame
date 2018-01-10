@@ -863,65 +863,100 @@ WRITE16_MEMBER(m72_state::soundram_w)
 		m_soundram[offset * 2 + 1] = data >> 8;
 }
 
-
-#define M72_CPU1_MEMORY(NAME,ROMSIZE,WORKRAM)                               \
-static ADDRESS_MAP_START( NAME##_map, AS_PROGRAM, 16 , m72_state )      \
-	AM_RANGE(0x00000, ROMSIZE-1) AM_ROM                                 \
-	AM_RANGE(WORKRAM, WORKRAM+0x3fff) AM_RAM    /* work RAM */          \
-	AM_RANGE(0xc0000, 0xc03ff) AM_RAM AM_SHARE("spriteram") \
-	AM_RANGE(0xc8000, 0xc8bff) AM_READWRITE(palette1_r, palette1_w) AM_SHARE("paletteram")          \
-	AM_RANGE(0xcc000, 0xccbff) AM_READWRITE(palette2_r, palette2_w) AM_SHARE("paletteram2")     \
-	AM_RANGE(0xd0000, 0xd3fff) AM_RAM_WRITE(videoram1_w) AM_SHARE("videoram1")      \
-	AM_RANGE(0xd8000, 0xdbfff) AM_RAM_WRITE(videoram2_w) AM_SHARE("videoram2")      \
-	AM_RANGE(0xe0000, 0xeffff) AM_READWRITE(soundram_r, soundram_w)                         \
-	AM_RANGE(0xffff0, 0xfffff) AM_ROM                                   \
+static ADDRESS_MAP_START( m72_cpu1_common_map, AS_PROGRAM, 16, m72_state )
+	AM_RANGE(0xc0000, 0xc03ff) AM_RAM AM_SHARE("spriteram")
+	AM_RANGE(0xc8000, 0xc8bff) AM_READWRITE(palette1_r, palette1_w) AM_SHARE("paletteram")
+	AM_RANGE(0xcc000, 0xccbff) AM_READWRITE(palette2_r, palette2_w) AM_SHARE("paletteram2")
+	AM_RANGE(0xd0000, 0xd3fff) AM_RAM_WRITE(videoram1_w) AM_SHARE("videoram1")
+	AM_RANGE(0xd8000, 0xdbfff) AM_RAM_WRITE(videoram2_w) AM_SHARE("videoram2")
+	AM_RANGE(0xe0000, 0xeffff) AM_READWRITE(soundram_r, soundram_w)
+	AM_RANGE(0xffff0, 0xfffff) AM_ROM
 ADDRESS_MAP_END
 
-
-/*                            ROMSIZE  WORKRAM */
-M72_CPU1_MEMORY( m72,         0x80000, 0xa0000 )
-M72_CPU1_MEMORY( rtype,       0x40000, 0x40000 )
-M72_CPU1_MEMORY( xmultiplm72, 0x80000, 0x80000 )
-M72_CPU1_MEMORY( dbreedm72,   0x80000, 0x90000 )
-
-
-#define M81_CPU1_MEMORY(NAME,WORKRAM)                               \
-	static ADDRESS_MAP_START( NAME##_map, AS_PROGRAM, 16 , m72_state )      \
-	AM_RANGE(0x00000, 0x7ffff) AM_ROM                                 \
-	AM_RANGE(WORKRAM, WORKRAM+0x3fff) AM_RAM    /* work RAM */          \
-	AM_RANGE(0xb0ffe, 0xb0fff) AM_WRITEONLY /* leftover from protection?? */ \
-	AM_RANGE(0xc0000, 0xc03ff) AM_RAM AM_SHARE("spriteram") \
-	AM_RANGE(0xc8000, 0xc8bff) AM_READWRITE(palette1_r, palette1_w) AM_SHARE("paletteram") \
-	AM_RANGE(0xcc000, 0xccbff) AM_READWRITE(palette2_r, palette2_w) AM_SHARE("paletteram2") \
-	AM_RANGE(0xd0000, 0xd3fff) AM_RAM_WRITE(videoram1_w) AM_SHARE("videoram1") \
-	AM_RANGE(0xd8000, 0xdbfff) AM_RAM_WRITE(videoram2_w) AM_SHARE("videoram2") \
-	AM_RANGE(0xffff0, 0xfffff) AM_ROM \
+static ADDRESS_MAP_START( m72_map, AS_PROGRAM, 16, m72_state)
+	AM_IMPORT_FROM( m72_cpu1_common_map )
+	AM_RANGE(0x00000, 0x7ffff) AM_ROM
+	AM_RANGE(0xa0000, 0xa3fff) AM_RAM    /* work RAM */
 ADDRESS_MAP_END
-/*                         WORKRAM */
-M81_CPU1_MEMORY( xmultipl, 0x9c000 )
-M81_CPU1_MEMORY( dbreed,   0x88000 )
-M81_CPU1_MEMORY( hharry,   0xa0000 )
 
-
-#define M84_CPU1_MEMORY(NAME,VIDEORAM,PALETTERAM1,PALETTERAM2) \
-	static ADDRESS_MAP_START( NAME##_map, AS_PROGRAM, 16 , m72_state ) \
-	AM_RANGE(0x00000, 0x7ffff) AM_ROM \
-	AM_RANGE(0xb0000, 0xb0001) AM_WRITE(irq_line_w) \
-	AM_RANGE(0xb4000, 0xb4001) AM_WRITENOP  /* ??? */ \
-	AM_RANGE(0xbc000, 0xbc001) AM_WRITE(dmaon_w) \
-	AM_RANGE(0xb0ffe, 0xb0fff) AM_WRITEONLY /* leftover from protection?? */ \
-	AM_RANGE(0xc0000, 0xc03ff) AM_RAM AM_SHARE("spriteram") \
-	AM_RANGE(VIDEORAM+0x0000, VIDEORAM+0x3fff) AM_RAM_WRITE(videoram1_w) AM_SHARE("videoram1") \
-	AM_RANGE(VIDEORAM+0x4000, VIDEORAM+0x7fff) AM_RAM_WRITE(videoram2_w) AM_SHARE("videoram2") \
-	AM_RANGE(PALETTERAM1, PALETTERAM1+0xbff) AM_READWRITE(palette1_r, palette1_w) AM_SHARE("paletteram") \
-	AM_RANGE(PALETTERAM2, PALETTERAM2+0xbff) AM_READWRITE(palette2_r, palette2_w) AM_SHARE("paletteram2") \
-	AM_RANGE(0xe0000, 0xe3fff) AM_RAM   /* work RAM */ \
-	AM_RANGE(0xffff0, 0xfffff) AM_ROM \
+static ADDRESS_MAP_START( rtype_map, AS_PROGRAM, 16, m72_state)
+	AM_IMPORT_FROM( m72_cpu1_common_map )
+	AM_RANGE(0x00000, 0x3ffff) AM_ROM
+	AM_RANGE(0x40000, 0x43fff) AM_RAM    /* work RAM */
 ADDRESS_MAP_END
-M84_CPU1_MEMORY( rtype2,  0xd0000, 0xc8000, 0xd8000 )
-M84_CPU1_MEMORY( hharryu, 0xd0000, 0xa0000, 0xa8000 )
-M84_CPU1_MEMORY( kengo,   0x80000, 0xa0000, 0xa8000 )
 
+static ADDRESS_MAP_START( xmultiplm72_map, AS_PROGRAM, 16, m72_state)
+	AM_IMPORT_FROM( m72_cpu1_common_map )
+	AM_RANGE(0x00000, 0x7ffff) AM_ROM
+	AM_RANGE(0x80000, 0x83fff) AM_RAM    /* work RAM */
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( dbreedm72_map, AS_PROGRAM, 16, m72_state)
+	AM_IMPORT_FROM( m72_cpu1_common_map )
+	AM_RANGE(0x00000, 0x7ffff) AM_ROM
+	AM_RANGE(0x90000, 0x93fff) AM_RAM    /* work RAM */
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( m81_cpu1_common_map, AS_PROGRAM, 16, m72_state )
+	AM_RANGE(0x00000, 0x7ffff) AM_ROM
+	AM_RANGE(0xb0ffe, 0xb0fff) AM_WRITEONLY /* leftover from protection?? */
+	AM_RANGE(0xc0000, 0xc03ff) AM_RAM AM_SHARE("spriteram")
+	AM_RANGE(0xc8000, 0xc8bff) AM_READWRITE(palette1_r, palette1_w) AM_SHARE("paletteram")
+	AM_RANGE(0xcc000, 0xccbff) AM_READWRITE(palette2_r, palette2_w) AM_SHARE("paletteram2")
+	AM_RANGE(0xd0000, 0xd3fff) AM_RAM_WRITE(videoram1_w) AM_SHARE("videoram1")
+	AM_RANGE(0xd8000, 0xdbfff) AM_RAM_WRITE(videoram2_w) AM_SHARE("videoram2")
+	AM_RANGE(0xffff0, 0xfffff) AM_ROM
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( xmultipl_map, AS_PROGRAM, 16, m72_state)
+	AM_IMPORT_FROM( m81_cpu1_common_map )
+	AM_RANGE(0x9c000, 0x9ffff) AM_RAM    /* work RAM */
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( dbreed_map, AS_PROGRAM, 16, m72_state)
+	AM_IMPORT_FROM( m81_cpu1_common_map )
+	AM_RANGE(0x88000, 0x8bfff) AM_RAM    /* work RAM */
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( hharry_map, AS_PROGRAM, 16, m72_state)
+	AM_IMPORT_FROM( m81_cpu1_common_map )
+	AM_RANGE(0xa0000, 0xa3fff) AM_RAM    /* work RAM */
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( m84_cpu1_common_map, AS_PROGRAM, 16, m72_state )
+	AM_RANGE(0x00000, 0x7ffff) AM_ROM
+	AM_RANGE(0xb0000, 0xb0001) AM_WRITE(irq_line_w)
+	AM_RANGE(0xb4000, 0xb4001) AM_WRITENOP  /* ??? */
+	AM_RANGE(0xbc000, 0xbc001) AM_WRITE(dmaon_w)
+	AM_RANGE(0xb0ffe, 0xb0fff) AM_WRITEONLY /* leftover from protection?? */
+	AM_RANGE(0xc0000, 0xc03ff) AM_RAM AM_SHARE("spriteram")
+	AM_RANGE(0xe0000, 0xe3fff) AM_RAM   /* work RAM */
+	AM_RANGE(0xffff0, 0xfffff) AM_ROM
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( rtype2_map, AS_PROGRAM, 16, m72_state)
+	AM_IMPORT_FROM( m84_cpu1_common_map )
+	AM_RANGE(0xd0000, 0xd3fff) AM_RAM_WRITE(videoram1_w) AM_SHARE("videoram1")
+	AM_RANGE(0xd4000, 0xd7fff) AM_RAM_WRITE(videoram2_w) AM_SHARE("videoram2")
+	AM_RANGE(0xc8000, 0xc8bff) AM_READWRITE(palette1_r, palette1_w) AM_SHARE("paletteram")
+	AM_RANGE(0xd8000, 0xd8bff) AM_READWRITE(palette2_r, palette2_w) AM_SHARE("paletteram2")
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( hharryu_map, AS_PROGRAM, 16, m72_state)
+	AM_IMPORT_FROM( m84_cpu1_common_map )
+	AM_RANGE(0xd0000, 0xd3fff) AM_RAM_WRITE(videoram1_w) AM_SHARE("videoram1")
+	AM_RANGE(0xd4000, 0xd7fff) AM_RAM_WRITE(videoram2_w) AM_SHARE("videoram2")
+	AM_RANGE(0xa0000, 0xa0bff) AM_READWRITE(palette1_r, palette1_w) AM_SHARE("paletteram")
+	AM_RANGE(0xa8000, 0xa8bff) AM_READWRITE(palette2_r, palette2_w) AM_SHARE("paletteram2")
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( kengo_map, AS_PROGRAM, 16, m72_state)
+	AM_IMPORT_FROM( m84_cpu1_common_map )
+	AM_RANGE(0x80000, 0x83fff) AM_RAM_WRITE(videoram1_w) AM_SHARE("videoram1")
+	AM_RANGE(0x84000, 0x87fff) AM_RAM_WRITE(videoram2_w) AM_SHARE("videoram2")
+	AM_RANGE(0xa0000, 0xa0bff) AM_READWRITE(palette1_r, palette1_w) AM_SHARE("paletteram")
+	AM_RANGE(0xa8000, 0xa8bff) AM_READWRITE(palette2_r, palette2_w) AM_SHARE("paletteram2")
+ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( m82_map, AS_PROGRAM, 16, m72_state )

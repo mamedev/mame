@@ -503,7 +503,7 @@ WRITE8_MEMBER (dbox_state::write_pa){
 /* Lcoal emulation of the 29F800B 8Mbit flashes if the intelflsh bugs, relies on a complete command cycle is done per device, not in parallell */
 /* TODO: Make a flash device of this and support programming per sector and persistance, as settings etc may be stored in a 8Kb sector  */
 WRITE16_MEMBER (dbox_state::sysflash_w){
-	LOGFLASH("%s pc:%08x offset:%08x data:%08x mask:%08x\n", FUNCNAME, space.device().safe_pc(), offset, data, mem_mask);
+	LOGFLASH("%s pc:%08x offset:%08x data:%08x mask:%08x\n", FUNCNAME, m_maincpu->pc(), offset, data, mem_mask);
 
 	/*Data bits DQ15–DQ8 are don’t cares for unlock and command cycles.*/
 	m_sf_state = ((m_sf_state << 8) & 0xffffff00) | (data & 0xff);

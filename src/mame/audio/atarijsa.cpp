@@ -408,8 +408,8 @@ WRITE8_MEMBER( atari_jsa_oki_base_device::wrio_w )
 	m_cpu_bank->set_entry((data >> 6) & 3);
 
 	// coin counters
-	space.machine().bookkeeping().coin_counter_w(1, (data >> 5) & 1);
-	space.machine().bookkeeping().coin_counter_w(0, (data >> 4) & 1);
+	machine().bookkeeping().coin_counter_w(1, (data >> 5) & 1);
+	machine().bookkeeping().coin_counter_w(0, (data >> 4) & 1);
 
 	// update the OKI frequency
 	if (m_oki1 != nullptr)
@@ -959,7 +959,9 @@ MACHINE_CONFIG_MEMBER( atari_jsa_iiis_device::device_add_mconfig )
 
 	atari_jsa_iii_device::device_add_mconfig(config);
 
-	MCFG_DEVICE_MODIFY("ym2151")
+	MCFG_SOUND_MODIFY("ym2151")
+	MCFG_SOUND_ROUTES_RESET()
+	MCFG_MIXER_ROUTE(0, DEVICE_SELF_OWNER, 0.60, 0)
 	MCFG_MIXER_ROUTE(1, DEVICE_SELF_OWNER, 0.60, 1)
 
 	MCFG_OKIM6295_ADD("oki2", JSA_MASTER_CLOCK/3, PIN7_HIGH)

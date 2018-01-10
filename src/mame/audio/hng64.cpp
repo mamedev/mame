@@ -91,7 +91,7 @@ WRITE32_MEMBER(hng64_state::hng64_soundram_w)
 			logerror("dumping sound program in m_soundram\n");
 			FILE *fp;
 			char filename[256];
-			sprintf(filename,"soundram_%s", space.machine().system().name);
+			sprintf(filename,"soundram_%s", machine().system().name);
 			fp=fopen(filename, "w+b");
 			if (fp)
 			{
@@ -210,7 +210,7 @@ WRITE16_MEMBER(hng64_state::hng64_sound_port_0008_w)
 READ16_MEMBER(hng64_state::hng64_sound_port_0008_r)
 {
 	// read in irq5
-	//printf("%08x: hng64_sound_port_0008_r mask (%04x)\n", space.device().safe_pc(), mem_mask);
+	//logerror("%s: hng64_sound_port_0008_r mask (%04x)\n", machine().describe_context(), mem_mask);
 	return 0;
 }
 

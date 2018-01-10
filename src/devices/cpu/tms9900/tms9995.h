@@ -83,8 +83,6 @@ protected:
 
 	// device-level overrides
 	virtual void        device_start() override;
-	virtual void        device_stop() override;
-	virtual void        device_reset() override;
 
 	// device_execute_interface overrides
 	virtual uint32_t      execute_min_cycles() const override;
@@ -186,7 +184,7 @@ private:
 	bool    m_mid_active;
 
 	int     m_decrementer_clkdiv;
-	bool    m_servicing_interrupt;
+	bool    m_log_interrupt;
 
 	// Flag field
 	int     m_int_pending;

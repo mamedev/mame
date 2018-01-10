@@ -497,7 +497,7 @@ WRITE8_MEMBER(kurukuru_state::kurukuru_out_latch_w)
 	m_hopper->motor_w(BIT(data, 6));
 
 	if (data & 0x9e)
-		logerror("kurukuru_out_latch_w %02X @ %04X\n", data, space.device().safe_pc());
+		logerror("kurukuru_out_latch_w %02X @ %04X\n", data, m_maincpu->pc());
 }
 
 WRITE8_MEMBER(kurukuru_state::kurukuru_bankswitch_w)
@@ -604,7 +604,7 @@ WRITE8_MEMBER(kurukuru_state::kurukuru_adpcm_reset_w)
        bit 2 = S2
        bit 3 = S1
 */
-	m_adpcm->playmode_w(BITSWAP8((data>>1), 7,6,5,4,3,0,1,2));
+	m_adpcm->playmode_w(bitswap<8>((data>>1), 7,6,5,4,3,0,1,2));
 	m_adpcm->reset_w(data & 1);
 }
 

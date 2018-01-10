@@ -154,19 +154,19 @@ Pipi & Bibis     | Fix Eight        | V-Five           | Snow Bros. 2     |
 #define GP9001_PRIMASK (0x000f)
 #define GP9001_PRIMASK_TMAPS (0x000e)
 
-WRITE16_MEMBER( gp9001vdp_device::gp9001_bg_tmap_w )
+WRITE16_MEMBER(gp9001vdp_device::bg_tmap_w)
 {
 	COMBINE_DATA(&m_vram_bg[offset]);
 	bg.tmap->mark_tile_dirty(offset/2);
 }
 
-WRITE16_MEMBER( gp9001vdp_device::gp9001_fg_tmap_w )
+WRITE16_MEMBER(gp9001vdp_device::fg_tmap_w)
 {
 	COMBINE_DATA(&m_vram_fg[offset]);
 	fg.tmap->mark_tile_dirty(offset/2);
 }
 
-WRITE16_MEMBER( gp9001vdp_device::gp9001_top_tmap_w )
+WRITE16_MEMBER(gp9001vdp_device::top_tmap_w)
 {
 	COMBINE_DATA(&m_vram_top[offset]);
 	top.tmap->mark_tile_dirty(offset/2);
@@ -174,9 +174,9 @@ WRITE16_MEMBER( gp9001vdp_device::gp9001_top_tmap_w )
 
 
 DEVICE_ADDRESS_MAP_START( map, 16, gp9001vdp_device )
-	AM_RANGE(0x0000, 0x0fff) AM_RAM_WRITE(gp9001_bg_tmap_w) AM_SHARE("vram_bg")
-	AM_RANGE(0x1000, 0x1fff) AM_RAM_WRITE(gp9001_fg_tmap_w) AM_SHARE("vram_fg")
-	AM_RANGE(0x2000, 0x2fff) AM_RAM_WRITE(gp9001_top_tmap_w) AM_SHARE("vram_top")
+	AM_RANGE(0x0000, 0x0fff) AM_RAM_WRITE(bg_tmap_w) AM_SHARE("vram_bg")
+	AM_RANGE(0x1000, 0x1fff) AM_RAM_WRITE(fg_tmap_w) AM_SHARE("vram_fg")
+	AM_RANGE(0x2000, 0x2fff) AM_RAM_WRITE(top_tmap_w) AM_SHARE("vram_top")
 	AM_RANGE(0x3000, 0x37ff) AM_RAM AM_SHARE("spriteram") AM_MIRROR(0x0800)
 //  AM_RANGE(0x3800, 0x3fff) AM_RAM // sprite mirror?
 ADDRESS_MAP_END
@@ -394,7 +394,7 @@ void gp9001vdp_device::gp9001_videoram16_w(uint16_t data, uint16_t mem_mask)
 
 uint16_t gp9001vdp_device::gp9001_vdpstatus_r()
 {
-	return ((m_screen->vpos() + 15) % 262) >= 245;
+	return ((screen().vpos() + 15) % 262) >= 245;
 }
 
 void gp9001vdp_device::gp9001_scroll_reg_select_w(uint16_t data, uint16_t mem_mask)
@@ -536,7 +536,7 @@ void gp9001vdp_device::init_scroll_regs()
 
 
 
-READ16_MEMBER( gp9001vdp_device::gp9001_vdp_r )
+READ16_MEMBER(gp9001vdp_device::gp9001_vdp_r)
 {
 	switch (offset & (0xc/2))
 	{
@@ -553,7 +553,7 @@ READ16_MEMBER( gp9001vdp_device::gp9001_vdp_r )
 	return 0xffff;
 }
 
-WRITE16_MEMBER( gp9001vdp_device::gp9001_vdp_w )
+WRITE16_MEMBER(gp9001vdp_device::gp9001_vdp_w)
 {
 	switch (offset & (0xc/2))
 	{
@@ -576,7 +576,7 @@ WRITE16_MEMBER( gp9001vdp_device::gp9001_vdp_w )
 }
 
 /* batrider and bbakraid invert the register select lines */
-READ16_MEMBER( gp9001vdp_device::gp9001_vdp_alt_r )
+READ16_MEMBER(gp9001vdp_device::gp9001_vdp_alt_r)
 {
 	switch (offset & (0xc/2))
 	{
@@ -593,7 +593,7 @@ READ16_MEMBER( gp9001vdp_device::gp9001_vdp_alt_r )
 	return 0xffff;
 }
 
-WRITE16_MEMBER( gp9001vdp_device::gp9001_vdp_alt_w )
+WRITE16_MEMBER(gp9001vdp_device::gp9001_vdp_alt_w)
 {
 	switch (offset & (0xc/2))
 	{
@@ -620,7 +620,7 @@ WRITE16_MEMBER( gp9001vdp_device::gp9001_vdp_alt_w )
 /***************************************************************************/
 /**************** PIPIBIBI bootleg interface into this video driver ********/
 
-WRITE16_MEMBER( gp9001vdp_device::pipibibi_bootleg_scroll_w )
+WRITE16_MEMBER(gp9001vdp_device::pipibibi_bootleg_scroll_w)
 {
 	if (ACCESSING_BITS_8_15 && ACCESSING_BITS_0_7)
 	{
@@ -642,28 +642,54 @@ WRITE16_MEMBER( gp9001vdp_device::pipibibi_bootleg_scroll_w )
 	}
 }
 
-READ16_MEMBER( gp9001vdp_device::pipibibi_bootleg_videoram16_r )
+READ16_MEMBER(gp9001vdp_device::pipibibi_bootleg_videoram16_r)
 {
 	gp9001_voffs_w(offset, 0xffff);
 	return gp9001_videoram16_r();
 }
 
-WRITE16_MEMBER( gp9001vdp_device::pipibibi_bootleg_videoram16_w )
+WRITE16_MEMBER(gp9001vdp_device::pipibibi_bootleg_videoram16_w)
 {
 	gp9001_voffs_w(offset, 0xffff);
 	gp9001_videoram16_w(data, mem_mask);
 }
 
-READ16_MEMBER( gp9001vdp_device::pipibibi_bootleg_spriteram16_r )
+READ16_MEMBER(gp9001vdp_device::pipibibi_bootleg_spriteram16_r)
 {
 	gp9001_voffs_w((0x1800 + offset), 0);
 	return gp9001_videoram16_r();
 }
 
-WRITE16_MEMBER( gp9001vdp_device::pipibibi_bootleg_spriteram16_w )
+WRITE16_MEMBER(gp9001vdp_device::pipibibi_bootleg_spriteram16_w)
 {
 	gp9001_voffs_w((0x1800 + offset), mem_mask);
 	gp9001_videoram16_w(data, mem_mask);
+}
+
+/***************************************************************************
+    Blanking Signal Polling
+***************************************************************************/
+
+READ_LINE_MEMBER(gp9001vdp_device::hsync_r)
+{
+	int hpos = screen().hpos();
+
+	// active low output
+	return (hpos > 325) && (hpos < 380) ? 0 : 1;
+}
+
+READ_LINE_MEMBER(gp9001vdp_device::vsync_r)
+{
+	int vpos = screen().vpos();
+
+	// active low output
+	return (vpos >= 232) && (vpos <= 245) ? 0 : 1;
+}
+
+READ_LINE_MEMBER(gp9001vdp_device::fblank_r)
+{
+	// ?? Dogyuun is too slow if this is wrong
+	return (hsync_r() == 0 || vsync_r() == 0) ? 0 : 1;
 }
 
 /***************************************************************************
@@ -862,8 +888,8 @@ void gp9001vdp_device::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clip
 
 void gp9001vdp_device::gp9001_draw_custom_tilemap( bitmap_ind16 &bitmap, tilemap_t* tilemap, const uint8_t* priremap, const uint8_t* pri_enable )
 {
-	int width = m_screen->width();
-	int height = m_screen->height();
+	int width = screen().width();
+	int height = screen().height();
 	int y,x;
 	bitmap_ind16 &tmb = tilemap->pixmap();
 	uint16_t* srcptr;

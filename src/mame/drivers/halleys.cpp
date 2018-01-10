@@ -1039,7 +1039,7 @@ WRITE8_MEMBER(halleys_state::bgtile_w)
 
 READ8_MEMBER(halleys_state::blitter_status_r)
 {
-	if (m_game_id==GAME_HALLEYS && space.device().safe_pc()==0x8017) return(0x55); // HACK: trick SRAM test on startup
+	if (m_game_id==GAME_HALLEYS && m_maincpu->pc()==0x8017) return(0x55); // HACK: trick SRAM test on startup
 
 	return(0);
 }
@@ -1079,7 +1079,7 @@ WRITE8_MEMBER(halleys_state::blitter_w)
 		else
 		{
 			m_blitter_busy = 1;
-			m_blitter_reset_timer->adjust(downcast<cpu_device *>(&space.device())->cycles_to_attotime(100)); // free blitter if no updates in 100 cycles
+			m_blitter_reset_timer->adjust(m_maincpu->cycles_to_attotime(100)); // free blitter if no updates in 100 cycles
 		}
 	}
 }
@@ -1109,7 +1109,7 @@ READ8_MEMBER(halleys_state::collision_id_r)
     UPDATE: re-implemented pixel collision to accompany the hack method.
 */
 
-	if (m_game_id==GAME_HALLEYS && space.device().safe_pc()==m_collision_detection) // HACK: collision detection bypass
+	if (m_game_id==GAME_HALLEYS && m_maincpu->pc()==m_collision_detection) // HACK: collision detection bypass
 	{
 		if (m_collision_count) { m_collision_count--; return(m_collision_list[m_collision_count]); }
 
@@ -1921,7 +1921,7 @@ void halleys_state::machine_reset()
 
 
 static MACHINE_CONFIG_START( halleys )
-	MCFG_CPU_ADD("maincpu", M6809, XTAL_19_968MHz/12) /* verified on pcb */
+	MCFG_CPU_ADD("maincpu", MC6809E, XTAL_19_968MHz/12) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(halleys_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", halleys_state, halleys_scanline, "screen", 0, 1)
 
@@ -2154,8 +2154,8 @@ void halleys_state::init_common()
 
 	for (i=0; i<0x10000; i++)
 	{
-		addr = BITSWAP16(i,15,14,13,12,11,10,1,0,4,5,6,3,7,8,9,2);
-		buf[i] = BITSWAP8(rom[addr],0,7,6,5,1,4,2,3);
+		addr = bitswap<16>(i,15,14,13,12,11,10,1,0,4,5,6,3,7,8,9,2);
+		buf[i] = bitswap<8>(rom[addr],0,7,6,5,1,4,2,3);
 	}
 
 	memcpy(rom, buf, 0x10000);

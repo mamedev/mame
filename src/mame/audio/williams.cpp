@@ -175,7 +175,7 @@ ADDRESS_MAP_END
 //-------------------------------------------------
 
 MACHINE_CONFIG_MEMBER( williams_cvsd_sound_device::device_add_mconfig )
-	MCFG_CPU_ADD("cpu", M6809E, CVSD_MASTER_CLOCK)
+	MCFG_CPU_ADD("cpu", MC6809E, CVSD_MASTER_CLOCK / 4)
 	MCFG_CPU_PROGRAM_MAP(williams_cvsd_map)
 
 	MCFG_DEVICE_ADD("pia", PIA6821, 0)
@@ -493,10 +493,10 @@ ADDRESS_MAP_END
 
 
 MACHINE_CONFIG_MEMBER( williams_narc_sound_device::device_add_mconfig )
-	MCFG_CPU_ADD("cpu0", M6809E, NARC_MASTER_CLOCK)
+	MCFG_CPU_ADD("cpu0", MC6809E, NARC_MASTER_CLOCK / 4)
 	MCFG_CPU_PROGRAM_MAP(williams_narc_master_map)
 
-	MCFG_CPU_ADD("cpu1", M6809E, NARC_MASTER_CLOCK)
+	MCFG_CPU_ADD("cpu1", MC6809E, NARC_MASTER_CLOCK / 4)
 	MCFG_CPU_PROGRAM_MAP(williams_narc_slave_map)
 
 	MCFG_YM2151_ADD("ym2151", NARC_FM_CLOCK)
@@ -746,7 +746,7 @@ ADDRESS_MAP_END
 //-------------------------------------------------
 
 MACHINE_CONFIG_MEMBER( williams_adpcm_sound_device::device_add_mconfig )
-	MCFG_CPU_ADD("cpu", M6809E, ADPCM_MASTER_CLOCK)
+	MCFG_CPU_ADD("cpu", MC6809E, ADPCM_MASTER_CLOCK / 4)
 	MCFG_CPU_PROGRAM_MAP(williams_adpcm_map)
 
 	MCFG_YM2151_ADD("ym2151", ADPCM_FM_CLOCK)

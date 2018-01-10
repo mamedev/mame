@@ -419,7 +419,7 @@ DRIVER_INIT_MEMBER(scregg_state,rockduck)
 
 	for (x = 0x2000; x < 0x6000; x++)
 	{
-		src[x] = BITSWAP8(src[x],2,0,3,6,1,4,7,5);
+		src[x] = bitswap<8>(src[x],2,0,3,6,1,4,7,5);
 
 	}
 }

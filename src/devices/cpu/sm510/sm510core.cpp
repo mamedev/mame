@@ -57,15 +57,15 @@ void sm510_device::clock_melody()
 {
 	u8 out = 0;
 
-	if (m_r_direct)
+	if (m_r_mask_option == SM510_R_CONTROL_OUTPUT)
 	{
 		// direct output
 		out = m_r & 3;
 	}
 	else
 	{
-		// buzzer from divider, R2 inverse phase
-		out = m_div >> 2 & 1;
+		// from divider, R2 inverse phase
+		out = m_div >> m_r_mask_option & 1;
 		out |= (out << 1 ^ 2);
 		out &= m_r;
 	}

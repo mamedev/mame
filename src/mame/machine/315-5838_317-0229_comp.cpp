@@ -346,7 +346,7 @@ READ32_MEMBER(sega_315_5838_comp_device::doa_prot_r)
 	else
 	{
 		printf("doa_prot_read %08x %08x %08x\n", offset*4, retval, mem_mask);
-		logerror("Unhandled Protection READ @ %x mask %x (PC=%x)\n", offset, mem_mask, space.device().safe_pc());
+		logerror("Unhandled Protection READ @ %x mask %x %s\n", offset, mem_mask, machine().describe_context());
 	}
 
 	return retval;

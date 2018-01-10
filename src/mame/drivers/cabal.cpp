@@ -92,7 +92,7 @@ WRITE16_MEMBER(cabal_state::sound_irq_trigger_word_w)
 		m_seibu_sound->main_w(space, 4, data & 0x00ff);
 
 	/* spin for a while to let the Z80 read the command, otherwise coins "stick" */
-	space.device().execute().spin_until_time(attotime::from_usec(50));
+	m_maincpu->spin_until_time(attotime::from_usec(50));
 }
 
 WRITE16_MEMBER(cabal_state::cabalbl_sound_irq_trigger_word_w)
@@ -156,12 +156,12 @@ ADDRESS_MAP_END
 
 READ8_MEMBER(cabal_state::cabalbl_snd2_r)
 {
-	return BITSWAP8(m_sound_command2, 7,2,4,5,3,6,1,0);
+	return bitswap<8>(m_sound_command2, 7,2,4,5,3,6,1,0);
 }
 
 READ8_MEMBER(cabal_state::cabalbl_snd1_r)
 {
-	return BITSWAP8(m_sound_command1, 7,2,4,5,3,6,1,0);
+	return bitswap<8>(m_sound_command1, 7,2,4,5,3,6,1,0);
 }
 
 WRITE8_MEMBER(cabal_state::cabalbl_coin_w)

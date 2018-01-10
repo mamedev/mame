@@ -92,7 +92,7 @@ nubus_specpdq_device::nubus_specpdq_device(const machine_config &mconfig, device
 	m_width(0), m_height(0), m_patofsx(0), m_patofsy(0), m_vram_addr(0), m_vram_src(0),
 	m_palette(*this, "palette")
 {
-	m_screen_tag = m_assembled_tag.c_str();
+	static_set_screen(*this, m_assembled_tag.c_str());
 }
 
 //-------------------------------------------------
@@ -109,7 +109,7 @@ void nubus_specpdq_device::device_start()
 
 	slotspace = get_slotspace();
 
-//  printf("[specpdq %p] slotspace = %x\n", this, slotspace);
+//  logerror("[specpdq %p] slotspace = %x\n", this, slotspace);
 
 	m_vram.resize(VRAM_SIZE);
 	m_vram32 = (uint32_t *)&m_vram[0];
@@ -117,7 +117,7 @@ void nubus_specpdq_device::device_start()
 	m_nubus->install_device(slotspace+0x400000, slotspace+0xfbffff, read32_delegate(FUNC(nubus_specpdq_device::specpdq_r), this), write32_delegate(FUNC(nubus_specpdq_device::specpdq_w), this));
 
 	m_timer = timer_alloc(0, nullptr);
-	m_timer->adjust(m_screen->time_until_pos(843, 0), 0);
+	m_timer->adjust(screen().time_until_pos(843, 0), 0);
 }
 
 //-------------------------------------------------
@@ -145,7 +145,7 @@ void nubus_specpdq_device::device_timer(emu_timer &timer, device_timer_id tid, i
 		raise_slot_irq();
 	}
 
-	m_timer->adjust(m_screen->time_until_pos(843, 0), 0);
+	m_timer->adjust(screen().time_until_pos(843, 0), 0);
 }
 
 /***************************************************************************
@@ -245,7 +245,7 @@ WRITE32_MEMBER( nubus_specpdq_device::specpdq_w )
 	switch (offset)
 	{
 		case 0xc0054:   // mode 1
-//          printf("%x to mode1\n", data);
+//          logerror("%x to mode1\n", data);
 			break;
 
 		case 0xc005c:   // interrupt control
@@ -264,7 +264,7 @@ WRITE32_MEMBER( nubus_specpdq_device::specpdq_w )
 			break;
 
 		case 0xc007a:
-//          printf("%x to mode2\n", data);
+//          logerror("%x to mode2\n", data);
 
 			switch (data)
 			{
@@ -281,11 +281,11 @@ WRITE32_MEMBER( nubus_specpdq_device::specpdq_w )
 					break;
 			}
 
-//          printf("m_mode = %d\n", m_mode);
+//          logerror("m_mode = %d\n", m_mode);
 			break;
 
 		case 0x120000:  // DAC address
-//          printf("%08x to DAC control (PC=%x)\n", data, space.device().safe_pc());
+//          logerror("%08x to DAC control %s\n", data,machine().describe_context());
 			m_clutoffs = ((data>>8)&0xff)^0xff;
 			break;
 
@@ -294,7 +294,7 @@ WRITE32_MEMBER( nubus_specpdq_device::specpdq_w )
 
 			if (m_count == 3)
 			{
-//              printf("RAMDAC: color %d = %02x %02x %02x (PC=%x)\n", m_clutoffs, m_colors[0], m_colors[1], m_colors[2], space.device().safe_pc() );
+//              logerror("RAMDAC: color %d = %02x %02x %02x %s\n", m_clutoffs, m_colors[0], m_colors[1], m_colors[2], machine().describe_context());
 				m_palette->set_pen_color(m_clutoffs, rgb_t(m_colors[0], m_colors[1], m_colors[2]));
 				m_palette_val[m_clutoffs] = rgb_t(m_colors[0], m_colors[1], m_colors[2]);
 				m_clutoffs++;
@@ -371,7 +371,7 @@ WRITE32_MEMBER( nubus_specpdq_device::specpdq_w )
 		case 0x18103d:
 		case 0x18103e:
 		case 0x18103f:
-//          printf("Pattern %08x @ %x\n", data ^ 0xffffffff, offset);
+//          logerror("Pattern %08x @ %x\n", data ^ 0xffffffff, offset);
 			m_fillbytes[((offset&0x3f)*4)] = ((data>>24) & 0xff) ^ 0xff;
 			m_fillbytes[((offset&0x3f)*4)+1] = ((data>>16) & 0xff) ^ 0xff;
 			m_fillbytes[((offset&0x3f)*4)+2] = ((data>>8) & 0xff) ^ 0xff;
@@ -380,40 +380,40 @@ WRITE32_MEMBER( nubus_specpdq_device::specpdq_w )
 
 		// blitter control
 		case 0x182006:
-//          printf("%08x (%d) to blitter ctrl 1 (PC=%x)\n", data^0xffffffff, data^0xffffffff, space.device().safe_pc());
+//          logerror("%08x (%d) to blitter ctrl 1 %s\n", data^0xffffffff, data^0xffffffff, machine().describe_context());
 			break;
 
 		case 0x182008:
-//          printf("%08x (%d) to blitter ctrl 2 (PC=%x)\n", data^0xffffffff, data^0xffffffff, space.device().safe_pc());
+//          logerror("%08x (%d) to blitter ctrl 2 %s\n", data^0xffffffff, data^0xffffffff, machine().describe_context());
 			m_patofsx = (data ^ 0xffffffff) & 7;
 			m_patofsy = ((data ^ 0xffffffff)>>3) & 7;
 			break;
 
 		case 0x18200e:
-//          printf("%08x (%d) to blitter ctrl 3 (PC=%x)\n", data^0xffffffff, data^0xffffffff, space.device().safe_pc());
+//          logerror("%08x (%d) to blitter ctrl 3 %s\n", data^0xffffffff, data^0xffffffff, machine().describe_context());
 			m_width = data ^ 0xffffffff;
 			break;
 
 		case 0x18200b:
-//          printf("%08x (%d) to blitter ctrl 4 (PC=%x)\n", data^0xffffffff, data^0xffffffff, space.device().safe_pc());
+//          logerror("%08x (%d) to blitter ctrl 4 %s\n", data^0xffffffff, data^0xffffffff, machine().describe_context());
 			m_height = (data ^ 0xffffffff) & 0xffff;
 			break;
 
 		case 0x18200a:
 			data ^= 0xffffffff;
-//          printf("%08x to blitter ctrl 5 (PC=%x)\n", data, space.device().safe_pc());
+//          logerror("%08x to blitter ctrl 5 %s\n", data, machine().describe_context());
 			m_vram_src = data>>2;
 			break;
 
 		case 0x182009:
 			data ^= 0xffffffff;
-//          printf("%08x to blitter ctrl 6 (PC=%x)\n", data, space.device().safe_pc());
+//          logerror("%08x to blitter ctrl 6 %s\n", data, machine().describe_context());
 			m_vram_addr = data>>2;
 			break;
 
 		case 0x182007:
 			data ^= 0xffffffff;
-//          printf("%08x to blitter ctrl 7 (PC=%x)\n", data, space.device().safe_pc());
+//          logerror("%08x to blitter ctrl 7 %s\n", data, machine().describe_context());
 
 			// fill rectangle
 			if (data == 2)
@@ -421,7 +421,7 @@ WRITE32_MEMBER( nubus_specpdq_device::specpdq_w )
 				int x, y;
 				uint8_t *vram = &m_vram[m_vram_addr + m_patofsx]; // m_vram_addr is missing the low 2 bits, we add them back here
 
-//              printf("Fill rectangle with %02x %02x %02x %02x, width %d height %d\n", m_fillbytes[0], m_fillbytes[1], m_fillbytes[2], m_fillbytes[3], m_width, m_height);
+//              logerror("Fill rectangle with %02x %02x %02x %02x, width %d height %d\n", m_fillbytes[0], m_fillbytes[1], m_fillbytes[2], m_fillbytes[3], m_width, m_height);
 
 				for (y = 0; y < m_height; y++)
 				{
@@ -437,7 +437,7 @@ WRITE32_MEMBER( nubus_specpdq_device::specpdq_w )
 				uint8_t *vram = &m_vram[m_vram_addr];
 				uint8_t *vramsrc = &m_vram[m_vram_src];
 
-//              printf("Copy rectangle, width %d height %d  src %x dst %x\n", m_width, m_height, m_vram_addr, m_vram_src);
+//              logerror("Copy rectangle, width %d height %d  src %x dst %x\n", m_width, m_height, m_vram_addr, m_vram_src);
 
 				for (y = 0; y < m_height; y++)
 				{
@@ -449,19 +449,19 @@ WRITE32_MEMBER( nubus_specpdq_device::specpdq_w )
 			}
 			else
 			{
-				printf("Unknown blitter command %08x\n", data);
+				logerror("Unknown blitter command %08x\n", data);
 			}
 			break;
 
 		default:
-//          printf("specpdq_w: %08x @ %x (mask %08x  PC=%x)\n", data^0xffffffff, offset, mem_mask, space.device().safe_pc());
+//          logerror("specpdq_w: %08x @ %x (mask %08x  %s)\n", data^0xffffffff, offset, mem_mask, machine().describe_context());
 			break;
 	}
 }
 
 READ32_MEMBER( nubus_specpdq_device::specpdq_r )
 {
-//  if (offset != 0xc005c && offset != 0xc005e) printf("specpdq_r: @ %x (mask %08x  PC=%x)\n", offset, mem_mask, space.device().safe_pc());
+//  if (offset != 0xc005c && offset != 0xc005e) logerror("specpdq_r: @ %x (mask %08x  %s)\n", offset, mem_mask, machine().describe_context());
 
 	if (offset >= 0xc0000 && offset < 0x100000)
 	{

@@ -1316,7 +1316,8 @@ void apollo_stdio_device::device_reset()
 void apollo_stdio_device::device_timer(emu_timer &timer, device_timer_id id,
 		int param, void *ptr)
 {
-	device_serial_interface::device_timer(timer, id, param, ptr);
+//  FIXME?
+//  device_serial_interface::device_timer(timer, id, param, ptr);
 }
 
 void apollo_stdio_device::rcv_complete() // Rx completed receiving byte

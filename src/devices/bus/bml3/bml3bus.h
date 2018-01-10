@@ -21,7 +21,7 @@
 //**************************************************************************
 
 #define MCFG_BML3BUS_CPU(_cputag) \
-	bml3bus_device::static_set_cputag(*device, _cputag);
+	bml3bus_device::static_set_cputag(*device, "^" _cputag);
 
 #define MCFG_BML3BUS_OUT_NMI_CB(_devcb) \
 	devcb = &bml3bus_device::set_out_nmi_callback(*device, DEVCB_##_devcb);
@@ -99,6 +99,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( irq_w );
 	DECLARE_WRITE_LINE_MEMBER( firq_w );
 
+	address_space &space() const { return m_maincpu->space(AS_PROGRAM); }
+
 protected:
 	bml3bus_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
@@ -107,7 +109,7 @@ protected:
 	virtual void device_reset() override;
 
 	// internal state
-	cpu_device   *m_maincpu;
+	required_device<cpu_device> m_maincpu;
 
 	devcb_write_line    m_out_nmi_cb;
 	devcb_write_line    m_out_irq_cb;

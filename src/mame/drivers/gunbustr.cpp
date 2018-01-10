@@ -377,8 +377,8 @@ ROM_END
 
 READ32_MEMBER(gunbustr_state::main_cycle_r)
 {
-	if (space.device().safe_pc()==0x55a && (m_ram[0x3acc/4]&0xff000000)==0)
-		space.device().execute().spin_until_interrupt();
+	if (m_maincpu->pc()==0x55a && (m_ram[0x3acc/4]&0xff000000)==0)
+		m_maincpu->spin_until_interrupt();
 
 	return m_ram[0x3acc/4];
 }

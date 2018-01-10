@@ -34,8 +34,8 @@ Year + Game                PCB        Sound         Chips
 96 Virtua Bowling V101XCM  NO-0101-1  ICS2115       IGS011 IGS003e IGS012
 96 Virtua Bowling V101HJS  NO-0101-?  ICS2115       IGS011 IGS003e?IGS012
 96 Long Hu Bang II V185H   NO-0115    M6295 YM2413  IGS011 8255
-96 Wan Li Chang Cheng      ?
-96 Xing Yen Man Guan       ?
+96 Wanli Changcheng        ?
+96 Xingyun Man Guan        ?
 98 Mj Nenrikishu SP V250J  NO-0115-5  M6295 YM2413  IGS011 8255
 ---------------------------------------------------------------------------
 
@@ -281,10 +281,10 @@ WRITE16_MEMBER(igs011_state::igs011_priority_w)
 {
 	COMBINE_DATA(&m_priority);
 
-//  logerror("%06x: priority = %02x\n", space.device().safe_pc(), m_priority);
+//  logerror("%06x: priority = %02x\n", m_maincpu->pc(), m_priority);
 
 	if (data & ~0x7)
-		logerror("%06x: warning, unknown bits written to priority = %02x\n", space.device().safe_pc(), m_priority);
+		logerror("%06x: warning, unknown bits written to priority = %02x\n", m_maincpu->pc(), m_priority);
 }
 
 
@@ -513,7 +513,7 @@ WRITE16_MEMBER(igs011_state::igs011_blit_flags_w)
 	COMBINE_DATA(&blitter.flags);
 
 #if LOG_BLITTER
-	logerror("%06x: blit x %03x, y %03x, w %03x, h %03x, gfx %03x%04x, depth %02x, pen %02x, flags %03x\n", space.device().safe_pc(),
+	logerror("%06x: blit x %03x, y %03x, w %03x, h %03x, gfx %03x%04x, depth %02x, pen %02x, flags %03x\n", m_maincpu->pc(),
 					blitter.x,blitter.y,blitter.w,blitter.h,blitter.gfx_hi,blitter.gfx_lo,blitter.depth,blitter.pen,blitter.flags);
 #endif
 
@@ -827,7 +827,7 @@ void igs011_state::lhb2_decrypt()
 		if ((i & 0x3080) != 0x3080 && (i & 0x3090) != 0x3010)
 			x ^= 0x0020;
 
-		j = BITSWAP24(i, 23,22,21,20,19,18,17,16,15,14,13, 8, 11,10, 9, 2, 7,6,5,4,3, 12, 1,0);
+		j = bitswap<24>(i, 23,22,21,20,19,18,17,16,15,14,13, 8, 11,10, 9, 2, 7,6,5,4,3, 12, 1,0);
 
 		result_data[j] = x;
 	}
@@ -849,7 +849,7 @@ void igs011_state::nkishusp_decrypt()
 		uint16_t x = src[i];
 
 		// lhb2 address scrambling
-		j = BITSWAP24(i, 23,22,21,20,19,18,17,16,15,14,13, 8, 11,10, 9, 2, 7,6,5,4,3, 12, 1,0);
+		j = bitswap<24>(i, 23,22,21,20,19,18,17,16,15,14,13, 8, 11,10, 9, 2, 7,6,5,4,3, 12, 1,0);
 
 		// ryukobou xor:
 
@@ -1047,7 +1047,7 @@ void igs011_state::lhb2_gfx_decrypt()
 	std::vector<uint8_t> result_data(rom_size);
 
 	for (i=0; i<rom_size; i++)
-		result_data[i] = src[BITSWAP24(i, 23,22,21,20, 19, 17,16,15, 13,12, 10,9,8,7,6,5,4, 2,1, 3, 11, 14, 18, 0)];
+		result_data[i] = src[bitswap<24>(i, 23,22,21,20, 19, 17,16,15, 13,12, 10,9,8,7,6,5,4, 2,1, 3, 11, 14, 18, 0)];
 
 	memcpy(src,&result_data[0],rom_size);
 }
@@ -1060,7 +1060,7 @@ void igs011_state::drgnwrld_gfx_decrypt()
 	std::vector<uint8_t> result_data(rom_size);
 
 	for (i=0; i<rom_size; i++)
-		result_data[i] = src[BITSWAP24(i, 23,22,21,20,19,18,17,16,15, 12, 13, 14, 11,10,9,8,7,6,5,4,3,2,1,0)];
+		result_data[i] = src[bitswap<24>(i, 23,22,21,20,19,18,17,16,15, 12, 13, 14, 11,10,9,8,7,6,5,4,3,2,1,0)];
 
 	memcpy(src,&result_data[0],rom_size);
 }
@@ -1531,7 +1531,7 @@ WRITE16_MEMBER(igs011_state::drgnwrld_igs003_w)
 				machine().bookkeeping().coin_counter_w(0,data & 2);
 
 			if (data & ~0x2)
-				logerror("%06x: warning, unknown bits written in coin counter = %02x\n", space.device().safe_pc(), data);
+				logerror("%06x: warning, unknown bits written in coin counter = %02x\n", m_maincpu->pc(), data);
 
 			break;
 
@@ -1544,7 +1544,7 @@ WRITE16_MEMBER(igs011_state::drgnwrld_igs003_w)
 
 		default:
 //          popmessage("igs003 %x <- %04x",m_igs003_reg[0],data);
-			logerror("%06x: warning, writing to igs003_reg %02x = %02x\n", space.device().safe_pc(), m_igs003_reg[0], data);
+			logerror("%06x: warning, writing to igs003_reg %02x = %02x\n", m_maincpu->pc(), m_igs003_reg[0], data);
 	}
 }
 READ16_MEMBER(igs011_state::drgnwrld_igs003_r)
@@ -1578,7 +1578,7 @@ READ16_MEMBER(igs011_state::drgnwrld_igs003_r)
 		case 0x34:  return 0x32;
 
 		default:
-			logerror("%06x: warning, reading with igs003_reg = %02x\n", space.device().safe_pc(), m_igs003_reg[0]);
+			logerror("%06x: warning, reading with igs003_reg = %02x\n", m_maincpu->pc(), m_igs003_reg[0]);
 	}
 
 	return 0;
@@ -1598,7 +1598,7 @@ WRITE16_MEMBER(igs011_state::lhb_inputs_w)
 	}
 
 	if ( m_igs_input_sel & (~0xff) )
-		logerror("%06x: warning, unknown bits written in igs_input_sel = %02x\n", space.device().safe_pc(), m_igs_input_sel);
+		logerror("%06x: warning, unknown bits written in igs_input_sel = %02x\n", m_maincpu->pc(), m_igs_input_sel);
 
 //  popmessage("sel2 %02x",m_igs_input_sel&~0x1f);
 }
@@ -1615,7 +1615,7 @@ READ16_MEMBER(igs011_state::lhb_inputs_r)
 			if (~m_igs_input_sel & 0x08)    return ioport("KEY3")->read();
 			if (~m_igs_input_sel & 0x10)    return ioport("KEY4")->read();
 
-			logerror("%06x: warning, reading with igs_input_sel = %02x\n", space.device().safe_pc(), m_igs_input_sel);
+			logerror("%06x: warning, reading with igs_input_sel = %02x\n", m_maincpu->pc(), m_igs_input_sel);
 			break;
 	}
 	return 0;
@@ -1643,7 +1643,7 @@ WRITE16_MEMBER(igs011_state::lhb2_igs003_w)
 			}
 
 			if ( m_igs_input_sel & ~0x7f )
-				logerror("%06x: warning, unknown bits written in igs_input_sel = %02x\n", space.device().safe_pc(), m_igs_input_sel);
+				logerror("%06x: warning, unknown bits written in igs_input_sel = %02x\n", m_maincpu->pc(), m_igs_input_sel);
 
 //          popmessage("sel2 %02x",m_igs_input_sel&~0x1f);
 			break;
@@ -1657,7 +1657,7 @@ WRITE16_MEMBER(igs011_state::lhb2_igs003_w)
 			}
 
 			if ( m_lhb2_pen_hi & ~0xf )
-				logerror("%06x: warning, unknown bits written in lhb2_pen_hi = %02x\n", space.device().safe_pc(), m_lhb2_pen_hi);
+				logerror("%06x: warning, unknown bits written in lhb2_pen_hi = %02x\n", m_maincpu->pc(), m_lhb2_pen_hi);
 
 //          popmessage("oki %02x",m_lhb2_pen_hi & 0x08);
 			break;
@@ -1723,7 +1723,7 @@ WRITE16_MEMBER(igs011_state::lhb2_igs003_w)
 
 		default:
 //          popmessage("igs003 %x <- %04x",m_igs003_reg[0],data);
-			logerror("%06x: warning, writing to igs003_reg %02x = %02x\n", space.device().safe_pc(), m_igs003_reg[0], data);
+			logerror("%06x: warning, writing to igs003_reg %02x = %02x\n", m_maincpu->pc(), m_igs003_reg[0], data);
 	}
 }
 READ16_MEMBER(igs011_state::lhb2_igs003_r)
@@ -1738,11 +1738,11 @@ READ16_MEMBER(igs011_state::lhb2_igs003_r)
 			if (~m_igs_input_sel & 0x10)    return ioport("KEY4")->read();
 			/* fall through */
 		default:
-			logerror("%06x: warning, reading with igs003_reg = %02x\n", space.device().safe_pc(), m_igs003_reg[0]);
+			logerror("%06x: warning, reading with igs003_reg = %02x\n", m_maincpu->pc(), m_igs003_reg[0]);
 			break;
 
 		case 0x03:
-			return BITSWAP16(m_igs003_prot_hold, 14,11,8,6,4,3,1,0, 5,2,9,7,10,13,12,15) & 0xff;
+			return bitswap<16>(m_igs003_prot_hold, 14,11,8,6,4,3,1,0, 5,2,9,7,10,13,12,15) & 0xff;
 
 		// Protection:
 		// 0544FE: 20 21 22 24 25 26 27 28 2A 2B 2C 2D 2E 30 31 32 33 34
@@ -1796,13 +1796,13 @@ WRITE16_MEMBER(igs011_state::wlcc_igs003_w)
 			}
 
 			if (data & ~0x33)
-				logerror("%06x: warning, unknown bits written in coin counter = %02x\n", space.device().safe_pc(), data);
+				logerror("%06x: warning, unknown bits written in coin counter = %02x\n", m_maincpu->pc(), data);
 
 //          popmessage("coin %02x",data);
 			break;
 
 		default:
-			logerror("%06x: warning, writing to igs003_reg %02x = %02x\n", space.device().safe_pc(), m_igs003_reg[0], data);
+			logerror("%06x: warning, writing to igs003_reg %02x = %02x\n", m_maincpu->pc(), m_igs003_reg[0], data);
 	}
 }
 READ16_MEMBER(igs011_state::wlcc_igs003_r)
@@ -1834,7 +1834,7 @@ READ16_MEMBER(igs011_state::wlcc_igs003_r)
 		case 0x34:  return 0x32;
 
 		default:
-			logerror("%06x: warning, reading with igs003_reg = %02x\n", space.device().safe_pc(), m_igs003_reg[0]);
+			logerror("%06x: warning, reading with igs003_reg = %02x\n", m_maincpu->pc(), m_igs003_reg[0]);
 	}
 
 	return 0;
@@ -1862,13 +1862,13 @@ WRITE16_MEMBER(igs011_state::xymg_igs003_w)
 			}
 
 			if ( m_igs_input_sel & 0x40 )
-				logerror("%06x: warning, unknown bits written in igs_input_sel = %02x\n", space.device().safe_pc(), m_igs_input_sel);
+				logerror("%06x: warning, unknown bits written in igs_input_sel = %02x\n", m_maincpu->pc(), m_igs_input_sel);
 
 //          popmessage("sel2 %02x",m_igs_input_sel&~0x1f);
 			break;
 
 		default:
-			logerror("%06x: warning, writing to igs003_reg %02x = %02x\n", space.device().safe_pc(), m_igs003_reg[0], data);
+			logerror("%06x: warning, writing to igs003_reg %02x = %02x\n", m_maincpu->pc(), m_igs003_reg[0], data);
 	}
 }
 READ16_MEMBER(igs011_state::xymg_igs003_r)
@@ -1908,7 +1908,7 @@ READ16_MEMBER(igs011_state::xymg_igs003_r)
 		case 0x34:  return 0x32;
 
 		default:
-			logerror("%06x: warning, reading with igs003_reg = %02x\n", space.device().safe_pc(), m_igs003_reg[0]);
+			logerror("%06x: warning, reading with igs003_reg = %02x\n", m_maincpu->pc(), m_igs003_reg[0]);
 			break;
 	}
 
@@ -1934,7 +1934,7 @@ WRITE16_MEMBER(igs011_state::vbowl_igs003_w)
 			}
 
 			if (data & ~0x3)
-				logerror("%06x: warning, unknown bits written in coin counter = %02x\n", space.device().safe_pc(), data);
+				logerror("%06x: warning, unknown bits written in coin counter = %02x\n", m_maincpu->pc(), data);
 
 			break;
 
@@ -1999,7 +1999,7 @@ WRITE16_MEMBER(igs011_state::vbowl_igs003_w)
 
 		default:
 //          popmessage("igs003 %x <- %04x",m_igs003_reg[0],data);
-			logerror("%06x: warning, writing to igs003_reg %02x = %02x\n", space.device().safe_pc(), m_igs003_reg[0], data);
+			logerror("%06x: warning, writing to igs003_reg %02x = %02x\n", m_maincpu->pc(), m_igs003_reg[0], data);
 	}
 }
 READ16_MEMBER(igs011_state::vbowl_igs003_r)
@@ -2010,7 +2010,7 @@ READ16_MEMBER(igs011_state::vbowl_igs003_r)
 		case 0x01:  return ioport("IN1")->read();
 
 		case 0x03:
-			return BITSWAP16(m_igs003_prot_hold, 14,11,8,6,4,3,1,0, 5,2,9,7,10,13,12,15) & 0xff;
+			return bitswap<16>(m_igs003_prot_hold, 14,11,8,6,4,3,1,0, 5,2,9,7,10,13,12,15) & 0xff;
 
 		case 0x20:  return 0x49;
 		case 0x21:  return 0x47;
@@ -2035,7 +2035,7 @@ READ16_MEMBER(igs011_state::vbowl_igs003_r)
 		case 0x34:  return 0x32;
 
 		default:
-			logerror("%06x: warning, reading with igs003_reg = %02x\n", space.device().safe_pc(), m_igs003_reg[0]);
+			logerror("%06x: warning, reading with igs003_reg = %02x\n", m_maincpu->pc(), m_igs003_reg[0]);
 	}
 
 	return 0;
@@ -2060,7 +2060,7 @@ WRITE16_MEMBER(igs011_state::vbowlhk_igs003_w)
 			}
 
 			if (data & ~0x3)
-				logerror("%06x: warning, unknown bits written in coin counter = %02x\n", space.device().safe_pc(), data);
+				logerror("%06x: warning, unknown bits written in coin counter = %02x\n", m_maincpu->pc(), data);
 
 			break;
 
@@ -2125,7 +2125,7 @@ WRITE16_MEMBER(igs011_state::vbowlhk_igs003_w)
 
 		default:
 //          popmessage("igs003 %x <- %04x",m_igs003_reg[0],data);
-			logerror("%06x: warning, writing to igs003_reg %02x = %02x\n", space.device().safe_pc(), m_igs003_reg[0], data);
+			logerror("%06x: warning, writing to igs003_reg %02x = %02x\n", m_maincpu->pc(), m_igs003_reg[0], data);
 	}
 }
 
@@ -2874,7 +2874,7 @@ WRITE16_MEMBER(igs011_state::vbowl_pen_hi_w)
 	}
 
 	if (data & ~0x7)
-		logerror("%06x: warning, unknown bits written to pen_hi = %04x\n", space.device().safe_pc(), m_priority);
+		logerror("%06x: warning, unknown bits written to pen_hi = %04x\n", m_maincpu->pc(), m_priority);
 }
 
 WRITE16_MEMBER(igs011_state::vbowl_link_0_w){ }
@@ -4464,7 +4464,8 @@ ROM_END
 
 /***************************************************************************
 
-    Dong Fang Zhi Zhu (Hong Kong version of Zhong Guo Long, V011H)
+  東方之珠/Dōngfāng Zhī Zhū
+  (Hong Kong version of 中國龍/Zhōngguó Lóng, V011H)
 
 ***************************************************************************/
 
@@ -4481,7 +4482,7 @@ ROM_END
 
 /***************************************************************************
 
-Zhong Guo Long (China, V010C)
+中國龍/Zhōngguó Lóng (China, V010C)
 (C) 1995 IGS
 
 Chips:
@@ -4554,7 +4555,7 @@ ROM_END
 
 /***************************************************************************
 
-    Wan Li Chang Cheng (The Great Wall)
+    萬里長城/Wànlǐ Chángchéng (The Great Wall)
 
     Other files in the zip:
 
@@ -4964,7 +4965,7 @@ ROM_END
 
 /***************************************************************************
 
-    Xing Yen Man Guan
+    幸運滿貫 (Xìngyùn Mǎn Guàn)
 
     Other files in the zip:
 
@@ -4999,17 +5000,17 @@ GAME( 1997, drgnwrld,     0,        drgnwrld,        drgnwrld,  igs011_state, dr
 GAME( 1995, drgnwrldv40k, drgnwrld, drgnwrld_igs012, drgnwrldc, igs011_state, drgnwrldv40k, ROT0, "IGS",                     "Dragon World (Korea, V040K)",          MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
 GAME( 1995, drgnwrldv30,  drgnwrld, drgnwrld,        drgnwrld,  igs011_state, drgnwrldv30,  ROT0, "IGS",                     "Dragon World (World, V030O)",          MACHINE_SUPPORTS_SAVE )
 GAME( 1995, drgnwrldv21,  drgnwrld, drgnwrld_igs012, drgnwrld,  igs011_state, drgnwrldv21,  ROT0, "IGS",                     "Dragon World (World, V021O)",          MACHINE_SUPPORTS_SAVE )
-GAME( 1995, drgnwrldv21j, drgnwrld, drgnwrld_igs012, drgnwrldj, igs011_state, drgnwrldv21j, ROT0, "IGS / Alta",              "Zhong Guo Long (Japan, V021J)",        MACHINE_SUPPORTS_SAVE )
-GAME( 1995, drgnwrldv20j, drgnwrld, drgnwrld_igs012, drgnwrldj, igs011_state, drgnwrldv20j, ROT0, "IGS / Alta",              "Zhong Guo Long (Japan, V020J)",        MACHINE_SUPPORTS_SAVE )
-GAME( 1995, drgnwrldv11h, drgnwrld, drgnwrld,        drgnwrldc, igs011_state, drgnwrldv11h, ROT0, "IGS",                     "Dong Fang Zhi Zhu (Hong Kong, V011H)", MACHINE_SUPPORTS_SAVE )
-GAME( 1995, drgnwrldv10c, drgnwrld, drgnwrld,        drgnwrldc, igs011_state, drgnwrldv10c, ROT0, "IGS",                     "Zhong Guo Long (China, V010C)",        MACHINE_SUPPORTS_SAVE )
+GAME( 1995, drgnwrldv21j, drgnwrld, drgnwrld_igs012, drgnwrldj, igs011_state, drgnwrldv21j, ROT0, "IGS / Alta",              "Zhongguo Long (Japan, V021J)",         MACHINE_SUPPORTS_SAVE )
+GAME( 1995, drgnwrldv20j, drgnwrld, drgnwrld_igs012, drgnwrldj, igs011_state, drgnwrldv20j, ROT0, "IGS / Alta",              "Zhongguo Long (Japan, V020J)",         MACHINE_SUPPORTS_SAVE )
+GAME( 1995, drgnwrldv11h, drgnwrld, drgnwrld,        drgnwrldc, igs011_state, drgnwrldv11h, ROT0, "IGS",                     "Dongfang Zhi Zhu (Hong Kong, V011H)",  MACHINE_SUPPORTS_SAVE )
+GAME( 1995, drgnwrldv10c, drgnwrld, drgnwrld,        drgnwrldc, igs011_state, drgnwrldv10c, ROT0, "IGS",                     "Zhongguo Long (China, V010C)",         MACHINE_SUPPORTS_SAVE )
 GAME( 1995, lhb,          0,        lhb,             lhb,       igs011_state, lhb,          ROT0, "IGS",                     "Long Hu Bang (China, V035C)",          MACHINE_SUPPORTS_SAVE )
 GAME( 1995, lhbv33c,      lhb,      lhb,             lhb,       igs011_state, lhbv33c,      ROT0, "IGS",                     "Long Hu Bang (China, V033C)",          MACHINE_SUPPORTS_SAVE )
 GAME( 1995, dbc,          lhb,      lhb,             lhb,       igs011_state, dbc,          ROT0, "IGS",                     "Da Ban Cheng (Hong Kong, V027H)",      MACHINE_SUPPORTS_SAVE )
 GAME( 1995, ryukobou,     lhb,      lhb,             lhb,       igs011_state, ryukobou,     ROT0, "IGS / Alta",              "Mahjong Ryukobou (Japan, V030J)",      MACHINE_SUPPORTS_SAVE )
 GAME( 1996, lhb2,         0,        lhb2,            lhb2,      igs011_state, lhb2,         ROT0, "IGS",                     "Long Hu Bang II (Hong Kong, V185H)",   MACHINE_SUPPORTS_SAVE )
-GAME( 1996, xymg,         0,        xymg,            xymg,      igs011_state, xymg,         ROT0, "IGS",                     "Xing Yun Man Guan (China, V651C)",     MACHINE_SUPPORTS_SAVE )
-GAME( 1996, wlcc,         xymg,     wlcc,            wlcc,      igs011_state, wlcc,         ROT0, "IGS",                     "Wan Li Chang Cheng (China, V638C)",    MACHINE_SUPPORTS_SAVE )
+GAME( 1996, xymg,         0,        xymg,            xymg,      igs011_state, xymg,         ROT0, "IGS",                     "Xingyun Man Guan (China, V651C)",      MACHINE_SUPPORTS_SAVE )
+GAME( 1996, wlcc,         xymg,     wlcc,            wlcc,      igs011_state, wlcc,         ROT0, "IGS",                     "Wanli Changcheng (China, V638C)",      MACHINE_SUPPORTS_SAVE )
 GAME( 1996, vbowl,        0,        vbowl,           vbowl,     igs011_state, vbowl,        ROT0, "IGS",                     "Virtua Bowling (World, V101XCM)",      MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
 GAME( 1996, vbowlj,       vbowl,    vbowl,           vbowlj,    igs011_state, vbowlj,       ROT0, "IGS / Alta",              "Virtua Bowling (Japan, V100JCM)",      MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
 GAME( 1996, vbowlhk,      vbowl,    vbowlhk,         vbowl,     igs011_state, vbowlhk,      ROT0, "IGS / Tai Tin Amusement", "Virtua Bowling (Hong Kong, V101HJS)",  MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )

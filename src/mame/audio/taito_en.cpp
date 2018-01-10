@@ -128,7 +128,7 @@ WRITE16_MEMBER( taito_en_device::es5510_dsp_w )
 	uint8_t *snd_mem = (uint8_t *)memregion(":ensoniq.0")->base();
 
 //  if (offset>4 && offset!=0x80  && offset!=0xa0  && offset!=0xc0  && offset!=0xe0)
-//      logerror("%06x: DSP write offset %04x %04x\n",space.device().safe_pc(),offset,data);
+//      logerror("%06x: DSP write offset %04x %04x\n",m_audiocpu->pc(),offset,data);
 
 	COMBINE_DATA(&m_es5510_dsp_ram[offset]);
 

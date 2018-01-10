@@ -30,7 +30,9 @@
 #include "cpu/m68000/m68000.h"
 #include "cpu/mcs51/mcs51.h"
 #include "cpu/tms34010/tms34010.h"
+#include "machine/mc68681.h"
 #include "machine/nvram.h"
+#include "sound/ay8910.h"
 #include "sound/okim6295.h"
 #include "screen.h"
 #include "speaker.h"
@@ -106,7 +108,7 @@ WRITE16_MEMBER(artmagic_state::control_w)
 		m_oki->set_rom_bank((data >> 4) & 1);
 	}
 
-	logerror("%06X:control_w(%d) = %04X\n", space.device().safe_pc(), offset, data);
+	logerror("%06X:control_w(%d) = %04X\n", m_maincpu->pc(), offset, data);
 }
 
 
@@ -134,7 +136,7 @@ void artmagic_state::device_timer(emu_timer &timer, device_timer_id id, int para
 READ16_MEMBER(artmagic_state::ultennis_hack_r)
 {
 	/* IRQ5 points to: jsr (a5); rte */
-	uint32_t pc = space.device().safe_pc();
+	uint32_t pc = m_maincpu->pc();
 	if (pc == 0x18c2 || pc == 0x18e4)
 	{
 		m_hack_irq = 1;
@@ -442,37 +444,17 @@ static ADDRESS_MAP_START( stonebal_map, AS_PROGRAM, 16, artmagic_state )
 ADDRESS_MAP_END
 
 // TODO: jumps to undefined area at PC=33a0 -> 230000, presumably protection device provides a code snippet
-READ16_MEMBER(artmagic_state::shtstar_unk_r)
-{
-	// bits 7-4 should be 0
-	// bit 2 and 0 are status ready related.
-	return 4 | 1; //machine().rand();
-}
-
-READ16_MEMBER(artmagic_state::shtstar_unk_2_r)
-{
-	return 1;
-}
-
 static ADDRESS_MAP_START( shtstar_map, AS_PROGRAM, 16, artmagic_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x200000, 0x27ffff) AM_RAM
 	AM_RANGE(0x280000, 0x280fff) AM_RAM AM_SHARE("nvram")
 
-	AM_RANGE(0x3c0000, 0x3c0001) AM_READ_PORT("3c0000")
-	AM_RANGE(0x3c0002, 0x3c0003) AM_READ_PORT("3c0002")
-	AM_RANGE(0x3c0004, 0x3c0005) AM_READ_PORT("3c0004")
-	AM_RANGE(0x3c0006, 0x3c0007) AM_READ_PORT("3c0006")
-	AM_RANGE(0x3c0008, 0x3c0009) AM_READ_PORT("3c0008")
-	AM_RANGE(0x3c000a, 0x3c000b) AM_READ_PORT("3c000a")
-
-	AM_RANGE(0x3c0012, 0x3c0013) AM_READ(shtstar_unk_r)
-	AM_RANGE(0x3c0016, 0x3c0017) AM_READ(shtstar_unk_2_r)
-
+	AM_RANGE(0x300000, 0x300001) AM_READNOP //AM_READ_PORT("300000")
 	AM_RANGE(0x300000, 0x300003) AM_WRITE(control_w) AM_SHARE("control")
-	AM_RANGE(0x3c0004, 0x3c0007) AM_WRITE(protection_bit_w)
+	AM_RANGE(0x300004, 0x300007) AM_WRITE(protection_bit_w)
 	AM_RANGE(0x340000, 0x340001) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)
 	AM_RANGE(0x380000, 0x380007) AM_DEVREADWRITE("tms", tms34010_device, host_r, host_w)
+	AM_RANGE(0x3c0000, 0x3c001f) AM_DEVREADWRITE8("mainduart", mc68681_device, read, write, 0x00ff)
 ADDRESS_MAP_END
 
 
@@ -511,6 +493,9 @@ ADDRESS_MAP_END
 /* see adp.c */
 static ADDRESS_MAP_START( shtstar_subcpu_map, AS_PROGRAM, 16, artmagic_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
+	AM_RANGE(0x800140, 0x800141) AM_DEVWRITE8("aysnd", ym2149_device, address_w, 0x00ff)
+	AM_RANGE(0x800142, 0x800143) AM_DEVREADWRITE8("aysnd", ym2149_device, data_r, data_w, 0x00ff)
+	AM_RANGE(0x800180, 0x80019f) AM_DEVREADWRITE8("subduart", mc68681_device, read, write, 0x00ff)
 	AM_RANGE(0xffc000, 0xffffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -520,6 +505,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( shtstar_guncpu_io_map, AS_IO, 8, artmagic_state )
 	AM_RANGE(0xc000, 0xcfff) AM_RAM
+	AM_RANGE(MCS51_PORT_P1, MCS51_PORT_P1) AM_READNOP
 ADDRESS_MAP_END
 
 
@@ -874,9 +860,16 @@ static MACHINE_CONFIG_DERIVED( shtstar, artmagic )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(shtstar_map)
 
+	MCFG_DEVICE_ADD("mainduart", MC68681, 3686400)
+
 	/* sub cpu*/
 	MCFG_CPU_ADD("subcpu", M68000, MASTER_CLOCK_25MHz/2)
 	MCFG_CPU_PROGRAM_MAP(shtstar_subcpu_map)
+
+	MCFG_DEVICE_ADD("subduart", MC68681, 3686400)
+
+	MCFG_SOUND_ADD("aysnd", YM2149, 3686400/2)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 
 	/*gun board cpu*/
 	MCFG_CPU_ADD("guncpu", I80C31, 6000000)

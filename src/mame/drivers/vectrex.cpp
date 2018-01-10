@@ -97,7 +97,7 @@ SLOT_INTERFACE_END
 
 static MACHINE_CONFIG_START( vectrex )
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6809, XTAL_6MHz / 4) // 68A09
+	MCFG_CPU_ADD("maincpu", MC6809, XTAL_6MHz) // 68A09
 	MCFG_CPU_PROGRAM_MAP(vectrex_map)
 
 	/* video hardware */

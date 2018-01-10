@@ -372,7 +372,7 @@ WRITE16_MEMBER(dec0_state::dec0_control_w)
 			break;
 
 		case 0xa: /* Mix Psel(?). */
-			logerror("CPU #0 PC %06x: warning - write %02x to unmapped memory address %06x\n",space.device().safe_pc(),data,0x30c010+(offset<<1));
+			logerror("CPU #0 PC %06x: warning - write %02x to unmapped memory address %06x\n",m_maincpu->pc(),data,0x30c010+(offset<<1));
 			break;
 
 		case 0xc: /* Cblk - coin blockout.  Seems to be unused by the games */
@@ -380,11 +380,11 @@ WRITE16_MEMBER(dec0_state::dec0_control_w)
 
 		case 0xe: /* Reset Intel 8751? - not sure, all the games write here at startup */
 			dec0_i8751_reset();
-			logerror("CPU #0 PC %06x: warning - write %02x to unmapped memory address %06x\n",space.device().safe_pc(),data,0x30c010+(offset<<1));
+			logerror("CPU #0 PC %06x: warning - write %02x to unmapped memory address %06x\n",m_maincpu->pc(),data,0x30c010+(offset<<1));
 			break;
 
 		default:
-			logerror("CPU #0 PC %06x: warning - write %02x to unmapped memory address %06x\n",space.device().safe_pc(),data,0x30c010+(offset<<1));
+			logerror("CPU #0 PC %06x: warning - write %02x to unmapped memory address %06x\n",m_maincpu->pc(),data,0x30c010+(offset<<1));
 			break;
 	}
 }
@@ -407,7 +407,7 @@ WRITE16_MEMBER(dec0_automat_state::automat_control_w)
 			break;
 
 		case 0xa: /* Mix Psel(?). */
-			logerror("CPU #0 PC %06x: warning - write %02x to unmapped memory address %06x\n",space.device().safe_pc(),data,0x30c010+(offset<<1));
+			logerror("CPU #0 PC %06x: warning - write %02x to unmapped memory address %06x\n",m_maincpu->pc(),data,0x30c010+(offset<<1));
 			break;
 
 		case 0xc: /* Cblk - coin blockout.  Seems to be unused by the games */
@@ -415,7 +415,7 @@ WRITE16_MEMBER(dec0_automat_state::automat_control_w)
 #endif
 
 		default:
-			logerror("CPU #0 PC %06x: warning - write %02x to unmapped memory address %06x\n",space.device().safe_pc(),data,0x30c010+(offset<<1));
+			logerror("CPU #0 PC %06x: warning - write %02x to unmapped memory address %06x\n",m_maincpu->pc(),data,0x30c010+(offset<<1));
 			break;
 	}
 }
@@ -516,7 +516,7 @@ READ16_MEMBER(dec0_state::slyspy_protection_r)
 		case 0xc:   return m_ram[0x2028/2] >> 8;
 	}
 
-	logerror("%04x, Unknown protection read at 30c000 %d\n", space.device().safe_pc(), offset);
+	logerror("%04x, Unknown protection read at 30c000 %d\n", m_maincpu->pc(), offset);
 	return 0;
 }
 

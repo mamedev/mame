@@ -5896,14 +5896,14 @@ void sfbonus_state::sfbonus_bitswap(
 
 		switch(i & 7)
 		{
-			case 0: x = BITSWAP8(x^xor0, b00,b01,b02,b03,b04,b05,b06,b07); break;
-			case 1: x = BITSWAP8(x^xor1, b10,b11,b12,b13,b14,b15,b16,b17); break;
-			case 2: x = BITSWAP8(x^xor2, b20,b21,b22,b23,b24,b25,b26,b27); break;
-			case 3: x = BITSWAP8(x^xor3, b30,b31,b32,b33,b34,b35,b36,b37); break;
-			case 4: x = BITSWAP8(x^xor4, b40,b41,b42,b43,b44,b45,b46,b47); break;
-			case 5: x = BITSWAP8(x^xor5, b50,b51,b52,b53,b54,b55,b56,b57); break;
-			case 6: x = BITSWAP8(x^xor6, b60,b61,b62,b63,b64,b65,b66,b67); break;
-			case 7: x = BITSWAP8(x^xor7, b70,b71,b72,b73,b74,b75,b76,b77); break;
+			case 0: x = bitswap<8>(x^xor0, b00,b01,b02,b03,b04,b05,b06,b07); break;
+			case 1: x = bitswap<8>(x^xor1, b10,b11,b12,b13,b14,b15,b16,b17); break;
+			case 2: x = bitswap<8>(x^xor2, b20,b21,b22,b23,b24,b25,b26,b27); break;
+			case 3: x = bitswap<8>(x^xor3, b30,b31,b32,b33,b34,b35,b36,b37); break;
+			case 4: x = bitswap<8>(x^xor4, b40,b41,b42,b43,b44,b45,b46,b47); break;
+			case 5: x = bitswap<8>(x^xor5, b50,b51,b52,b53,b54,b55,b56,b57); break;
+			case 6: x = bitswap<8>(x^xor6, b60,b61,b62,b63,b64,b65,b66,b67); break;
+			case 7: x = bitswap<8>(x^xor7, b70,b71,b72,b73,b74,b75,b76,b77); break;
 		}
 
 		ROM[i] = x;

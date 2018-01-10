@@ -38,7 +38,7 @@ READ8_MEMBER(wpc_pic_device::read)
 		data = swarray[curcmd - 0x16]->read();
 
 	else
-		logerror("%s: cmd=%02x (%04x)\n", tag(), curcmd, space.device().safe_pc());
+		logerror("cmd=%02x %s\n", tag(), curcmd, machine().describe_context());
 
 	return data;
 }
@@ -50,7 +50,7 @@ void wpc_pic_device::check_game_id()
 		uint32_t v = (i >> 8) * 0x3133 + (i & 0xff) * 0x3231;
 		v = v & 0xffffff;
 		if(v == cmp)
-			logerror("%s: Detected game id %03d\n", tag(), i);
+			logerror("Detected game id %03d\n", i);
 	}
 }
 
@@ -60,7 +60,7 @@ WRITE8_MEMBER(wpc_pic_device::write)
 		cmpchk[3-chk_count] = data;
 
 		if(data != cmpchk[3-chk_count]) {
-			logerror("%s: WARNING: validation error, checksum[%d] got %02x, expected %02x\n", tag(), 3-chk_count, data, chk[3-chk_count]);
+			logerror("WARNING: validation error, checksum[%d] got %02x, expected %02x\n", 3-chk_count, data, chk[3-chk_count]);
 			if(chk_count == 1)
 				check_game_id();
 		}
@@ -79,7 +79,7 @@ WRITE8_MEMBER(wpc_pic_device::write)
 	else if(data == 0x20)
 		chk_count = 3;
 	else if((data < 0x16 || data >= 0x1e) && ((data & 0xf0) != 0x70))
-		logerror("%s: write %02x (%04x)\n", tag(), data, space.device().safe_pc());
+		logerror("write %02x (%04x)\n", data, machine().describe_context());
 
 	curcmd = data;
 }

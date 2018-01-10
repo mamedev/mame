@@ -577,7 +577,7 @@ WRITE8_MEMBER(mplay_state::game_w)
 		m_bios_mode = MP_GAME;
 		m_readpos = 1;
 //      popmessage("Game bank selected: 0x%03x", m_game_banksel);
-		logerror("BIOS [0x%04x]: 68K address space bank selected: 0x%03x\n", space.device().safe_pcbase(), m_game_banksel);
+		logerror("BIOS [0x%04x]: 68K address space bank selected: 0x%03x\n", m_bioscpu->pcbase(), m_game_banksel);
 	}
 
 	m_bios_bank_addr = ((m_bios_bank_addr >> 1) | (data << 23)) & 0xff8000;

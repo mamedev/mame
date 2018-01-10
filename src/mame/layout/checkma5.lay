@@ -340,7 +340,7 @@
 			<bounds x="1.09" y="3.28" width="0.31" height="0.24" />
 		</bezel>
 		<bezel name="lamp4" element="BET3" inputtag="P1" inputmask="0x10">
-		    <bounds x="1.51" y="3.28" width="0.31" height="0.24" />
+			<bounds x="1.51" y="3.28" width="0.31" height="0.24" />
 		</bezel>
 		<bezel name="lamp3" element="BET4" inputtag="P1" inputmask="0x08">
 			<bounds x="1.91" y="3.28" width="0.31" height="0.24" />
@@ -405,7 +405,7 @@
 			<bounds x="1.09" y="3.28" width="0.31" height="0.24" />
 		</bezel>
 		<bezel name="lamp4" element="BET3" inputtag="P1" inputmask="0x10">
-		    <bounds x="1.51" y="3.28" width="0.31" height="0.24" />
+			<bounds x="1.51" y="3.28" width="0.31" height="0.24" />
 		</bezel>
 		<bezel name="lamp3" element="BET5" inputtag="P1" inputmask="0x08">
 			<bounds x="1.91" y="3.28" width="0.31" height="0.24" />

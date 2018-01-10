@@ -239,7 +239,7 @@ READ16_MEMBER(pgm_state::z80_ram_r)
 
 WRITE16_MEMBER(pgm_state::z80_ram_w)
 {
-	int pc = space.device().safe_pc();
+	int pc = m_maincpu->pc();
 
 	if (ACCESSING_BITS_8_15)
 		m_z80_mainram[offset * 2] = data >> 8;
@@ -248,13 +248,13 @@ WRITE16_MEMBER(pgm_state::z80_ram_w)
 
 	if (pc != 0xf12 && pc != 0xde2 && pc != 0x100c50 && pc != 0x100b20)
 		if (PGMLOGERROR)
-			logerror("Z80: write %04x, %04x @ %04x (%06x)\n", offset * 2, data, mem_mask, space.device().safe_pc());
+			logerror("Z80: write %04x, %04x @ %04x (%06x)\n", offset * 2, data, mem_mask, m_maincpu->pc());
 }
 
 WRITE16_MEMBER(pgm_state::z80_reset_w)
 {
 	if (PGMLOGERROR)
-		logerror("Z80: reset %04x @ %04x (%06x)\n", data, mem_mask, space.device().safe_pc());
+		logerror("Z80: reset %04x @ %04x (%06x)\n", data, mem_mask, m_maincpu->pc());
 
 	if (data == 0x5050)
 	{
@@ -273,7 +273,7 @@ WRITE16_MEMBER(pgm_state::z80_reset_w)
 WRITE16_MEMBER(pgm_state::z80_ctrl_w)
 {
 	if (PGMLOGERROR)
-		logerror("Z80: ctrl %04x @ %04x (%06x)\n", data, mem_mask, space.device().safe_pc());
+		logerror("Z80: ctrl %04x @ %04x (%06x)\n", data, mem_mask, m_maincpu->pc());
 }
 
 WRITE16_MEMBER(pgm_state::m68k_l1_w)
@@ -281,7 +281,7 @@ WRITE16_MEMBER(pgm_state::m68k_l1_w)
 	if(ACCESSING_BITS_0_7)
 	{
 		if (PGMLOGERROR)
-			logerror("SL 1 m68.w %02x (%06x) IRQ\n", data & 0xff, space.device().safe_pc());
+			logerror("SL 1 m68.w %02x (%06x) IRQ\n", data & 0xff, m_maincpu->pc());
 		m_soundlatch->write(space, 0, data);
 		m_soundcpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE );
 	}
@@ -290,7 +290,7 @@ WRITE16_MEMBER(pgm_state::m68k_l1_w)
 WRITE8_MEMBER(pgm_state::z80_l3_w)
 {
 	if (PGMLOGERROR)
-		logerror("SL 3 z80.w %02x (%04x)\n", data, space.device().safe_pc());
+		logerror("SL 3 z80.w %02x (%04x)\n", data, m_soundcpu->pc());
 	m_soundlatch3->write(space, 0, data);
 }
 

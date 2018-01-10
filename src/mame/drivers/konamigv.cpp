@@ -501,7 +501,7 @@ INPUT_PORTS_END
 
 WRITE16_MEMBER(konamigv_state::btc_trackball_w)
 {
-//  osd_printf_debug( "w %08x %08x %08x %08x\n", space.device().safe_pc(), offset, data, mem_mask );
+//  osd_printf_debug( "w %08x %08x %08x %08x\n", m_maincpu->pc(), offset, data, mem_mask );
 
 	for (int i = 0; i < 2; i++)
 	{

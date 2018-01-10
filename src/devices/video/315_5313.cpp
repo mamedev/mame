@@ -1267,7 +1267,7 @@ uint16_t sega315_5313_device::get_hposition()
 	}
 	else
 	{
-		value4 = m_screen->hpos();
+		value4 = screen().hpos();
 	}
 
 	return value4;
@@ -1278,7 +1278,7 @@ int sega315_5313_device::get_scanline_counter()
 	if (!m_use_alt_timing)
 		return m_scanline_counter;
 	else
-		return m_screen->vpos();
+		return screen().vpos();
 }
 
 
@@ -1337,7 +1337,7 @@ READ16_MEMBER( sega315_5313_device::vdp_r )
 		//  if ((!ACCESSING_BITS_8_15) || (!ACCESSING_BITS_0_7)) osd_printf_debug("8-bit VDP read control port access, offset %04x mem_mask %04x\n",offset,mem_mask);
 			retvalue = ctrl_port_r();
 		//  retvalue = machine().rand();
-		//  osd_printf_debug("%06x: Read Control Port at scanline %d hpos %d (return %04x)\n",space.device().safe_pc(),get_scanline_counter(), get_hposition(),retvalue);
+		//  logerror("%s: Read Control Port at scanline %d hpos %d (return %04x)\n",machine().describe_context(),get_scanline_counter(), get_hposition(),retvalue);
 			break;
 
 		case 0x08:
@@ -1347,7 +1347,7 @@ READ16_MEMBER( sega315_5313_device::vdp_r )
 		//  if ((!ACCESSING_BITS_8_15) || (!ACCESSING_BITS_0_7)) osd_printf_debug("8-bit VDP read HV counter port access, offset %04x mem_mask %04x\n",offset,mem_mask);
 			retvalue = megadriv_read_hv_counters();
 		//  retvalue = machine().rand();
-		//  osd_printf_debug("%06x: Read HV counters at scanline %d hpos %d (return %04x)\n",space.device().safe_pc(),get_scanline_counter(), get_hposition(),retvalue);
+		//  osd_printf_debug("%s: Read HV counters at scanline %d hpos %d (return %04x)\n",machine().describe_context(),get_scanline_counter(), get_hposition(),retvalue);
 			break;
 
 		case 0x10:
@@ -2849,7 +2849,7 @@ void sega315_5313_device::vdp_handle_eof()
 
 	visarea.set(0, scr_width - 1, 0, m_visible_scanlines - 1);
 
-	m_screen->configure(480, m_total_scanlines, visarea, m_screen->frame_period().attoseconds());
+	screen().configure(480, m_total_scanlines, visarea, screen().frame_period().attoseconds());
 }
 
 
@@ -2875,7 +2875,7 @@ TIMER_DEVICE_CALLBACK_MEMBER( sega315_5313_device::megadriv_scanline_timer_callb
 	{
 		if (param==0)
 		{
-			//printf("where are we? %d %d\n", m_screen->vpos(), screen().hpos());
+			//printf("where are we? %d %d\n", screen().vpos(), screen().hpos());
 			vdp_handle_eof();
 			//vdp_clear_bitmap();
 		}

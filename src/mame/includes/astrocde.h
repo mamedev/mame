@@ -189,7 +189,7 @@ public:
 	void astrocade_trigger_lightpen(uint8_t vfeedback, uint8_t hfeedback);
 	inline void increment_source(uint8_t curwidth, uint8_t *u13ff);
 	inline void increment_dest(uint8_t curwidth);
-	void execute_blit(address_space &space);
+	void execute_blit();
 	void init_sparklestar();
 	virtual void machine_start() override;
 

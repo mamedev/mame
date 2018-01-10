@@ -723,7 +723,7 @@ DRIVER_INIT_MEMBER(ltcasino_state,mv4in1)
 	int i;
 	uint8_t *rom = memregion("maincpu")->base();
 	for(i=0;i<0x10000;i++)
-		rom[i]=BITSWAP8(rom[i],7,6,5,4,3,1,2,0);
+		rom[i]=bitswap<8>(rom[i],7,6,5,4,3,1,2,0);
 }
 
 

@@ -203,6 +203,7 @@ public:
 	inline pen_t shift_mode_2();
 	void shifter_tick();
 	inline void shifter_load();
+	inline void draw_pixel(int x, int y, u32 pen);
 	void glue_tick();
 	void set_screen_parameters();
 	void blitter_source();

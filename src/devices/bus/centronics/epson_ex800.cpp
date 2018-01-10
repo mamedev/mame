@@ -372,19 +372,19 @@ void epson_ex800_device::device_reset()
 
 READ8_MEMBER(epson_ex800_device::porta_r)
 {
-	logerror("PA R @%x\n", space.device().safe_pc());
+	logerror("PA R %s\n", machine().describe_context());
 	return machine().rand();
 }
 
 READ8_MEMBER(epson_ex800_device::portb_r)
 {
-	logerror("PB R @%x\n", space.device().safe_pc());
+	logerror("PB R %s\n", machine().describe_context());
 	return machine().rand();
 }
 
 READ8_MEMBER(epson_ex800_device::portc_r)
 {
-	logerror("PC R @%x\n", space.device().safe_pc());
+	logerror("PC R %s\n", machine().describe_context());
 	return machine().rand();
 }
 
@@ -393,31 +393,31 @@ WRITE8_MEMBER(epson_ex800_device::porta_w)
 	if (PA6) logerror("BNK0 selected.\n");
 	if (PA7) logerror("BNK1 selected.\n");
 
-	logerror("PA W %x @%x\n", data, space.device().safe_pc());
+	logerror("PA W %x %s\n", data, machine().describe_context());
 }
 
 WRITE8_MEMBER(epson_ex800_device::portb_w)
 {
 	if (data & 3)
-		logerror("PB0/1 Line feed @%x\n", space.device().safe_pc());
+		logerror("PB0/1 Line feed %s\n", machine().describe_context());
 	if (!(data & 4))
-		logerror("PB2 Line feed @%x\n", space.device().safe_pc());
+		logerror("PB2 Line feed %s\n", machine().describe_context());
 	if (data & 8)
-		logerror("PB3 Online LED on @%x\n", space.device().safe_pc());
+		logerror("PB3 Online LED on %s\n", machine().describe_context());
 	else
-		logerror("PB3 Online LED off @%x\n", space.device().safe_pc());
+		logerror("PB3 Online LED off %s\n", machine().describe_context());
 	if (data & 16)
-		logerror("PB4 Serial @%x\n", space.device().safe_pc());
+		logerror("PB4 Serial %s\n", machine().describe_context());
 	if (data & 32)
-		logerror("PB4 Serial @%x\n", space.device().safe_pc());
+		logerror("PB4 Serial %s\n", machine().describe_context());
 	if (data & 64)
-		logerror("PB4 Serial @%x\n", space.device().safe_pc());
+		logerror("PB4 Serial %s\n", machine().describe_context());
 	if (data & 128)
-		logerror("PB3 Paper empty LED on @%x\n", space.device().safe_pc());
+		logerror("PB3 Paper empty LED on %s\n", machine().describe_context());
 	else
-		logerror("PB3 Paper empty LED off @%x\n", space.device().safe_pc());
+		logerror("PB3 Paper empty LED off %s\n", machine().describe_context());
 
-//  logerror("PB W %x @%x\n", data, space.device().safe_pc());
+//  logerror("PB W %x %s\n", data, machine().describe_context());
 }
 
 WRITE8_MEMBER(epson_ex800_device::portc_w)
@@ -427,7 +427,7 @@ WRITE8_MEMBER(epson_ex800_device::portc_w)
 	else
 		m_beeper->set_state(1);
 
-	logerror("PC W %x @%x\n", data, space.device().safe_pc());
+	logerror("PC W %x %s\n", data, machine().describe_context());
 }
 
 
@@ -435,44 +435,44 @@ WRITE8_MEMBER(epson_ex800_device::portc_w)
 
 READ8_MEMBER(epson_ex800_device::devsel_r)
 {
-	logerror("DEVSEL R @%x with offset %x\n", space.device().safe_pc(), offset);
+	logerror("DEVSEL R %s with offset %x\n", machine().describe_context(), offset);
 	return machine().rand();
 }
 
 WRITE8_MEMBER(epson_ex800_device::devsel_w)
 {
-	logerror("DEVSEL W %x @%x with offset %x\n", data, space.device().safe_pc(), offset);
+	logerror("DEVSEL W %x %s with offset %x\n", data, machine().describe_context(), offset);
 }
 
 READ8_MEMBER(epson_ex800_device::gate5a_r)
 {
-	logerror("GATE5A R @%x with offset %x\n", space.device().safe_pc(), offset);
+	logerror("GATE5A R %s with offset %x\n", machine().describe_context(), offset);
 	return machine().rand();
 }
 
 WRITE8_MEMBER(epson_ex800_device::gate5a_w)
 {
-	logerror("GATE5A W %x @%x with offset %x\n", data, space.device().safe_pc(), offset);
+	logerror("GATE5A W %x %s with offset %x\n", data, machine().describe_context(), offset);
 }
 
 READ8_MEMBER(epson_ex800_device::iosel_r)
 {
-	logerror("IOSEL R @%x with offset %x\n", space.device().safe_pc(), offset);
+	logerror("IOSEL R %s with offset %x\n", machine().describe_context(), offset);
 	return machine().rand();
 }
 
 WRITE8_MEMBER(epson_ex800_device::iosel_w)
 {
-	logerror("IOSEL W %x @%x with offset %x\n", data, space.device().safe_pc(), offset);
+	logerror("IOSEL W %x %s with offset %x\n", data, machine().describe_context(), offset);
 }
 
 READ8_MEMBER(epson_ex800_device::gate7a_r)
 {
-	logerror("GATE7A R @%x with offset %x\n", space.device().safe_pc(), offset);
+	logerror("GATE7A R %s with offset %x\n", machine().describe_context(), offset);
 	return machine().rand();
 }
 
 WRITE8_MEMBER(epson_ex800_device::gate7a_w)
 {
-	logerror("GATE7A W %x @%x with offset %x\n", data, space.device().safe_pc(), offset);
+	logerror("GATE7A W %x %s with offset %x\n", data, machine().describe_context(), offset);
 }

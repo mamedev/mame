@@ -359,7 +359,7 @@ cgb_ppu_device::cgb_ppu_device(const machine_config &mconfig, const char *tag, d
 
 void dmg_ppu_device::common_start()
 {
-	m_screen->register_screen_bitmap(m_bitmap);
+	screen().register_screen_bitmap(m_bitmap);
 	save_item(NAME(m_bitmap));
 	m_oam = make_unique_clear<uint8_t[]>(m_oam_size);
 	m_vram = make_unique_clear<uint8_t[]>(m_vram_size);
@@ -1268,7 +1268,7 @@ void dmg_ppu_device::update_scanline(uint32_t cycles_to_go)
 			{
 				if (m_current_line < 144)
 				{
-					const rectangle &r = m_screen->visible_area();
+					const rectangle &r = screen().visible_area();
 					rectangle r1(r.min_x, r.max_x, m_current_line, m_current_line);
 					m_bitmap.fill(0, r1);
 				}
@@ -1889,7 +1889,7 @@ void cgb_ppu_device::update_scanline(uint32_t cycles_to_go)
 			{
 				if (m_current_line < 144)
 				{
-					const rectangle &r1 = m_screen->visible_area();
+					const rectangle &r1 = screen().visible_area();
 					rectangle r(r1.min_x, r1.max_x, m_current_line, m_current_line);
 					m_bitmap.fill((!m_gbc_mode) ? 0 : 32767 , r);
 				}

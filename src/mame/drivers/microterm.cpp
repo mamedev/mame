@@ -11,8 +11,8 @@ Skeleton driver for Micro-Term terminals.
 #include "machine/eepromser.h"
 #include "machine/mc2661.h"
 #include "machine/mc68681.h"
-//#include "video/scn2674.h"
-//#include "screen.h"
+#include "video/scn2674.h"
+#include "screen.h"
 
 class microterm_state : public driver_device
 {
@@ -20,14 +20,15 @@ public:
 	microterm_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
-		//, m_p_chargen(*this, "chargen")
+		, m_p_chargen(*this, "chargen")
 	{ }
 
 	DECLARE_READ8_MEMBER(c000_r);
+	SCN2674_DRAW_CHARACTER_MEMBER(draw_character);
 
 private:
 	required_device<cpu_device> m_maincpu;
-	//required_region_ptr<u8> m_p_chargen;
+	optional_region_ptr<u8> m_p_chargen;
 };
 
 READ8_MEMBER(microterm_state::c000_r)
@@ -37,7 +38,9 @@ READ8_MEMBER(microterm_state::c000_r)
 
 static ADDRESS_MAP_START( mt420_mem_map, AS_PROGRAM, 8, microterm_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM AM_REGION("maincpu", 0)
+	AM_RANGE(0x9000, 0x9000) AM_WRITENOP
 	AM_RANGE(0xc000, 0xc000) AM_READ(c000_r) AM_WRITENOP
+	AM_RANGE(0xeff8, 0xefff) AM_DEVREADWRITE("avdc", scn2674_device, read, write)
 	AM_RANGE(0xe000, 0xefff) AM_RAM
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM
 ADDRESS_MAP_END
@@ -46,6 +49,14 @@ static ADDRESS_MAP_START( mt420_io_map, AS_IO, 8, microterm_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0xe0, 0xef) AM_DEVREADWRITE("duart", scn2681_device, read, write)
 	AM_RANGE(0xf0, 0xf3) AM_DEVREADWRITE("asci", mc2661_device, read, write)
+ADDRESS_MAP_END
+
+SCN2674_DRAW_CHARACTER_MEMBER(microterm_state::draw_character)
+{
+}
+
+static ADDRESS_MAP_START( mt420_vram_map, 0, 8, microterm_state )
+	AM_RANGE(0x0000, 0x3fff) AM_NOP
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mt5510_mem_map, AS_PROGRAM, 8, microterm_state )
@@ -77,6 +88,20 @@ static MACHINE_CONFIG_START( mt420 )
 
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 	MCFG_EEPROM_SERIAL_DO_CALLBACK(DEVWRITELINE("duart", scn2681_device, ip6_w))
+
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(50)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+	MCFG_SCREEN_SIZE(720, 360)
+	MCFG_SCREEN_VISIBLE_AREA(0, 720-1, 0, 360-1)
+	MCFG_SCREEN_UPDATE_DEVICE("avdc", scn2674_device, screen_update)
+
+	MCFG_DEVICE_ADD("avdc", SCN2674, 4000000)
+	MCFG_SCN2674_TEXT_CHARACTER_WIDTH(8)
+	MCFG_SCN2674_GFX_CHARACTER_WIDTH(8)
+	MCFG_SCN2674_DRAW_CHARACTER_CALLBACK_OWNER(microterm_state, draw_character)
+	MCFG_DEVICE_ADDRESS_MAP(0, mt420_vram_map)
+	MCFG_VIDEO_SET_SCREEN("screen")
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( mt5510 )

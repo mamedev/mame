@@ -211,17 +211,17 @@ READ16_MEMBER(bmcbowl_state::bmc_random_read)
 
 READ16_MEMBER(bmcbowl_state::bmc_protection_r)
 {
-	switch(space.device().safe_pcbase())
+	switch(m_maincpu->pcbase())
 	{
 		case 0xca68:
-			switch(space.device().state().state_int(M68K_D2))
+			switch(m_maincpu->state_int(M68K_D2))
 			{
 				case 0:          return 0x37<<8;
 				case 0x1013: return 0;
 				default:         return 0x46<<8;
 			}
 	}
-	logerror("Protection read @ %X\n",space.device().safe_pcbase());
+	logerror("Protection read @ %X\n",m_maincpu->pcbase());
 	return machine().rand();
 }
 

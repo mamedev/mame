@@ -1602,7 +1602,7 @@ READ16_MEMBER(namcos22_state::namcos22_keycus_r)
 	// where certain enemies will emerge.
 	// It works in combination with keycus_w, but not yet understood how.
 
-//  printf("Hit keycus offs %x mask %x PC=%x\n", offset, mem_mask, space.device().safe_pc());
+//  printf("Hit keycus offs %x mask %x PC=%x\n", offset, mem_mask, m_maincpu->pc());
 
 	// protection (not used for all games)
 	// note: some games will XOR this register against a magic value, but that doesn't mean
@@ -2383,7 +2383,7 @@ WRITE16_MEMBER(namcos22_state::upload_code_to_slave_dsp_w)
 					break;
 
 				default:
-					logerror("%08x: master port#7: 0x%04x\n", space.device().safe_pcbase(), data);
+					logerror("%08x: master port#7: 0x%04x\n", m_master->pcbase(), data);
 					break;
 			}
 			break;
@@ -5444,9 +5444,9 @@ ROM_END
 // for MCU BIOS v1.41
 READ16_MEMBER(namcos22_state::mcu141_speedup_r)
 {
-	if ((space.device().safe_pc() == 0xc12d) && (!(m_su_82 & 0xff00)))
+	if ((m_mcu->pc() == 0xc12d) && (!(m_su_82 & 0xff00)))
 	{
-		space.device().execute().spin_until_interrupt();
+		m_mcu->spin_until_interrupt();
 	}
 
 	return m_su_82;
@@ -5460,9 +5460,9 @@ WRITE16_MEMBER(namcos22_state::mcu_speedup_w)
 // for MCU BIOS v1.20/v1.30
 READ16_MEMBER(namcos22_state::mcu130_speedup_r)
 {
-	if ((space.device().safe_pc() == 0xc12a) && (!(m_su_82 & 0xff00)))
+	if ((m_mcu->pc() == 0xc12a) && (!(m_su_82 & 0xff00)))
 	{
-		space.device().execute().spin_until_interrupt();
+		m_mcu->spin_until_interrupt();
 	}
 
 	return m_su_82;
@@ -5471,9 +5471,9 @@ READ16_MEMBER(namcos22_state::mcu130_speedup_r)
 // for NSTX7702 v1.00 (C74)
 READ16_MEMBER(namcos22_state::mcuc74_speedup_r)
 {
-	if (((space.device().safe_pc() == 0xc0df) || (space.device().safe_pc() == 0xc101)) && (!(m_su_82 & 0xff00)))
+	if (((m_mcu->pc() == 0xc0df) || (m_mcu->pc() == 0xc101)) && (!(m_su_82 & 0xff00)))
 	{
-		space.device().execute().spin_until_interrupt();
+		m_mcu->spin_until_interrupt();
 	}
 
 	return m_su_82;

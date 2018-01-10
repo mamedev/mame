@@ -540,7 +540,7 @@ WRITE8_MEMBER(esripsys_state::tms5220_w)
 /* Not used in later revisions */
 WRITE8_MEMBER(esripsys_state::control_w)
 {
-	logerror("Sound control write: %.2x (PC:0x%.4x)\n", data, space.device().safe_pcbase());
+	logerror("Sound control write: %.2x (PC:0x%.4x)\n", data, m_soundcpu->pcbase());
 }
 
 
@@ -661,12 +661,12 @@ DRIVER_INIT_MEMBER(esripsys_state,esripsys)
 }
 
 static MACHINE_CONFIG_START( esripsys )
-	MCFG_CPU_ADD("game_cpu", M6809E, XTAL_8MHz)
+	MCFG_CPU_ADD("game_cpu", MC6809E, XTAL_8MHz / 4)
 	MCFG_CPU_PROGRAM_MAP(game_cpu_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", esripsys_state,  esripsys_vblank_irq)
 	MCFG_QUANTUM_PERFECT_CPU("game_cpu")
 
-	MCFG_CPU_ADD("frame_cpu", M6809E, XTAL_8MHz)
+	MCFG_CPU_ADD("frame_cpu", MC6809E, XTAL_8MHz / 4)
 	MCFG_CPU_PROGRAM_MAP(frame_cpu_map)
 
 	MCFG_CPU_ADD("video_cpu", ESRIP, XTAL_40MHz / 4)
@@ -677,7 +677,7 @@ static MACHINE_CONFIG_START( esripsys )
 	MCFG_ESRIP_DRAW_CALLBACK_OWNER(esripsys_state, esripsys_draw)
 	MCFG_ESRIP_LBRM_PROM("proms")
 
-	MCFG_CPU_ADD("sound_cpu", M6809E, XTAL_8MHz)
+	MCFG_CPU_ADD("sound_cpu", MC6809E, XTAL_8MHz / 4)
 	MCFG_CPU_PROGRAM_MAP(sound_cpu_map)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")

@@ -64,7 +64,7 @@ DRIVER_INIT_MEMBER(nbmj8891_state,gionbana)
 	   the checksum. */
 	for (i = 0;i < 0x20000;i++)
 	{
-		prot[i] = BITSWAP8(prot[i],2,7,3,5,0,6,4,1);
+		prot[i] = bitswap<8>(prot[i],2,7,3,5,0,6,4,1);
 	}
 }
 
@@ -81,7 +81,7 @@ DRIVER_INIT_MEMBER(nbmj8891_state,omotesnd)
 	   the checksum. */
 	for (i = 0;i < 0x20000;i++)
 	{
-		prot[i] = BITSWAP8(prot[i],2,7,3,5,0,6,4,1);
+		prot[i] = bitswap<8>(prot[i],2,7,3,5,0,6,4,1);
 	}
 #endif
 
@@ -114,7 +114,7 @@ DRIVER_INIT_MEMBER(nbmj8891_state,telmahjn)
 	   the checksum. */
 	for (i = 0;i < 0x20000;i++)
 	{
-		prot[i] = BITSWAP8(prot[i + 0x20000],7,0,4,1,5,2,6,3);
+		prot[i] = bitswap<8>(prot[i + 0x20000],7,0,4,1,5,2,6,3);
 	}
 }
 
@@ -130,7 +130,7 @@ DRIVER_INIT_MEMBER(nbmj8891_state,mgmen89)
 	   the checksum. */
 	for (i = 0;i < 0x20000;i++)
 	{
-		prot[i] = BITSWAP8(prot[i],5,6,1,0,7,3,2,4);
+		prot[i] = bitswap<8>(prot[i],5,6,1,0,7,3,2,4);
 	}
 }
 
@@ -150,7 +150,7 @@ DRIVER_INIT_MEMBER(nbmj8891_state,mjfocus)
 	   the checksum. */
 	for (i = 0;i < 0x20000;i++)
 	{
-		prot[i] = BITSWAP8(prot[i + 0x20000],7,0,4,1,5,2,6,3);
+		prot[i] = bitswap<8>(prot[i + 0x20000],7,0,4,1,5,2,6,3);
 	}
 }
 
@@ -190,7 +190,7 @@ DRIVER_INIT_MEMBER(nbmj8891_state,mjnanpas)
 	   the checksum. */
 	for (i = 0;i < 0x20000;i++)
 	{
-		prot[i] = BITSWAP8(prot[i + 0x20000],0,5,2,3,6,7,1,4);
+		prot[i] = bitswap<8>(prot[i + 0x20000],0,5,2,3,6,7,1,4);
 	}
 #endif
 }
@@ -207,7 +207,7 @@ DRIVER_INIT_MEMBER(nbmj8891_state,pairsnb)
 	   the checksum. */
 	for (i = 0;i < 0x20000;i++)
 	{
-		prot[i] = BITSWAP8(prot[i],5,6,1,0,7,3,2,4);
+		prot[i] = bitswap<8>(prot[i],5,6,1,0,7,3,2,4);
 	}
 }
 
@@ -223,7 +223,7 @@ DRIVER_INIT_MEMBER(nbmj8891_state,pairsten)
 	   the checksum. */
 	for (i = 0;i < 0x20000;i++)
 	{
-		prot[i] = BITSWAP8(prot[i + 0x20000],5,6,0,4,3,7,1,2);
+		prot[i] = bitswap<8>(prot[i + 0x20000],5,6,0,4,3,7,1,2);
 	}
 }
 

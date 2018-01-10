@@ -6232,9 +6232,9 @@ ROM_END
 ROM_START( sfa )
 	ROM_REGION( CODE_SIZE, "maincpu", 0 )      /* 68000 code */
 	ROM_LOAD16_WORD_SWAP( "sfze.03d", 0x000000, 0x80000, CRC(ebf2054d) SHA1(6e7b9e4202b86ab237ea5634c98b71b82d812ef2) )
-	ROM_LOAD16_WORD_SWAP( "sfz.04b",  0x080000, 0x80000, CRC(8b73b0e5) SHA1(5318761f615c21395366b5333e75eaaa73ef2073) )
-	ROM_LOAD16_WORD_SWAP( "sfz.05a",  0x100000, 0x80000, CRC(0810544d) SHA1(5f39bda3e7b16508eb58e5a2e0cc58c09cf428ce) )
-	ROM_LOAD16_WORD_SWAP( "sfz.06",   0x180000, 0x80000, CRC(806e8f38) SHA1(b6d6912aa8f2f590335d7ff9a8214648e7131ebb) )
+	ROM_LOAD16_WORD_SWAP( "sfz.04b",  0x080000, 0x80000, CRC(8b73b0e5) SHA1(5318761f615c21395366b5333e75eaaa73ef2073) ) // also found as sfze.04c, same hash
+	ROM_LOAD16_WORD_SWAP( "sfz.05a",  0x100000, 0x80000, CRC(0810544d) SHA1(5f39bda3e7b16508eb58e5a2e0cc58c09cf428ce) ) // also found as sfze.05b, same hash
+	ROM_LOAD16_WORD_SWAP( "sfz.06",   0x180000, 0x80000, CRC(806e8f38) SHA1(b6d6912aa8f2f590335d7ff9a8214648e7131ebb) ) // also found as sfze.06, same hash
 
 	ROM_REGION( 0x1000000, "gfx", 0 )
 	ROM_FILL(              0x000000, 0x800000, 0x00 )
@@ -9258,6 +9258,40 @@ ROM_START( xmcotaar1 )
 	ROM_LOAD( "xmcotaa.key",  0x000000, 0x000014, CRC(3fdd2d42) SHA1(effcfdf03e71d386356c32c2803c8c841871e24c) )
 ROM_END
 
+ROM_START( xmcotab )
+	ROM_REGION( CODE_SIZE, "maincpu", 0 )      /* 68000 code */
+	ROM_LOAD16_WORD_SWAP( "xmnb.03c", 0x000000, 0x80000, CRC(ab48bcb0) SHA1(856168752cdd4d248eb43b2794e989a3409dc8b0) )
+	ROM_LOAD16_WORD_SWAP( "xmnb.04c", 0x080000, 0x80000, CRC(8d8fcbb1) SHA1(f98712374006d44e6121abc65ba2c78c5ebf6de5) )
+	ROM_LOAD16_WORD_SWAP( "xmne.05b", 0x100000, 0x80000, CRC(87b0ed0f) SHA1(f4d78fdd9fcf864e909d9a2bb351b49a5f8ec7a0) )
+	ROM_LOAD16_WORD_SWAP( "xmn.06a",  0x180000, 0x80000, CRC(1b86a328) SHA1(2469cd705139ee9f1142e6e379e68d0c9675b37e) )
+	ROM_LOAD16_WORD_SWAP( "xmn.07a",  0x200000, 0x80000, CRC(2c142a44) SHA1(7624875f9c39b361fc83e52e87e0fd5e96279713) )
+	ROM_LOAD16_WORD_SWAP( "xmn.08a",  0x280000, 0x80000, CRC(f712d44f) SHA1(0d18d4a4eacad94a66beca6ec509ac7f690c6882) )
+	ROM_LOAD16_WORD_SWAP( "xmn.09a",  0x300000, 0x80000, CRC(9241cae8) SHA1(bb6980abf25aaf3eb14e230ca6942f3e2ab2c660) )
+	ROM_LOAD16_WORD_SWAP( "xmne.10b", 0x380000, 0x80000, CRC(cb36b0a4) SHA1(f21e3f2da405dfe43843ad32d381ea51f5d2fdd7) )
+
+	ROM_REGION( 0x2000000, "gfx", 0 )
+	ROMX_LOAD( "xmn.13m",   0x0000000, 0x400000, CRC(bf4df073) SHA1(4d2740c3a827f0ec2cf75ad99c65e393c6a11c23) , ROM_GROUPWORD | ROM_SKIP(6) )
+	ROMX_LOAD( "xmn.15m",   0x0000002, 0x400000, CRC(4d7e4cef) SHA1(50b8797b8099a8d76ad063ba1201a13dbb88ae3a) , ROM_GROUPWORD | ROM_SKIP(6) )
+	ROMX_LOAD( "xmn.17m",   0x0000004, 0x400000, CRC(513eea17) SHA1(a497477ad9ac13180911d8745ef6ee1955c0b877) , ROM_GROUPWORD | ROM_SKIP(6) )
+	ROMX_LOAD( "xmn.19m",   0x0000006, 0x400000, CRC(d23897fc) SHA1(1e31627999736652252164d32662779a1ac6ca29) , ROM_GROUPWORD | ROM_SKIP(6) )
+	ROMX_LOAD( "xmn.14m",   0x1000000, 0x400000, CRC(778237b7) SHA1(89a759ec383518ec52f5059d10ec342f2247aa20) , ROM_GROUPWORD | ROM_SKIP(6) )
+	ROMX_LOAD( "xmn.16m",   0x1000002, 0x400000, CRC(67b36948) SHA1(692fb6e4096b880aa22996d554b160f664bbd907) , ROM_GROUPWORD | ROM_SKIP(6) )
+	ROMX_LOAD( "xmn.18m",   0x1000004, 0x400000, CRC(015a7c4c) SHA1(cccc95dafd076a1a9fa004710006149c42d058ba) , ROM_GROUPWORD | ROM_SKIP(6) )
+	ROMX_LOAD( "xmn.20m",   0x1000006, 0x400000, CRC(9dde2758) SHA1(17ba259cad03c7b5d56c0a5eda9ab53521665729) , ROM_GROUPWORD | ROM_SKIP(6) )
+
+	ROM_REGION( QSOUND_SIZE, "audiocpu", 0 ) /* 64k for the audio CPU (+banks) */
+	ROM_LOAD( "xmn.01a",  0x00000, 0x08000, CRC(40f479ea) SHA1(f29e15f537675305264ae2138a0a537fb9e2008b) )
+	ROM_CONTINUE(         0x10000, 0x18000 )
+	ROM_LOAD( "xmn.02a",  0x28000, 0x20000, CRC(39d9b5ad) SHA1(af502debfd36100d4fc971ed25fdf9d7121d6f18) )
+
+	ROM_REGION( 0x400000, "qsound", 0 ) /* QSound samples */
+	ROM_LOAD16_WORD_SWAP( "xmn.11m",   0x000000, 0x200000, CRC(c848a6bc) SHA1(ac8ac564d3c43225822f8bc330eba9f35b24b0a4) )
+	ROM_LOAD16_WORD_SWAP( "xmn.12m",   0x200000, 0x200000, CRC(729c188f) SHA1(3279774ad8aebbcf0fc779cdfcbe21044dd192ad) )
+
+	ROM_REGION( 0x20, "key", 0 )
+	ROM_LOAD( "xmcotab.key",  0x000000, 0x000014, CRC(bb70f10f) SHA1(99f9d1eccd81c906b6adb08b5f1547636e649298) )
+ROM_END
+
 ROM_START( xmvsf )
 	ROM_REGION( CODE_SIZE, "maincpu", 0 )      /* 68000 code */
 	ROM_LOAD16_WORD_SWAP( "xvse.03f", 0x000000, 0x80000, CRC(db06413f) SHA1(c6d8aa1e43fc541e5b4e938258f27ab9ee30ca33) )
@@ -9962,6 +9996,7 @@ GAME( 1994, armwarar1,  armwar,   cps2, cps2_3p3b, cps_state, cps2,     ROT0,   
 GAME( 1994, xmcota,     0,        cps2, cps2_2p6b, cps_state, cps2,     ROT0,   "Capcom", "X-Men: Children of the Atom (Euro 950331)", MACHINE_SUPPORTS_SAVE )
 GAME( 1994, xmcotar1,   xmcota,   cps2, cps2_2p6b, cps_state, cps2,     ROT0,   "Capcom", "X-Men: Children of the Atom (Euro 950105)", MACHINE_SUPPORTS_SAVE )
 GAME( 1994, xmcotau,    xmcota,   cps2, cps2_2p6b, cps_state, cps2,     ROT0,   "Capcom", "X-Men: Children of the Atom (USA 950105)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, xmcotab,    xmcota,   cps2, cps2_2p6b, cps_state, cps2,     ROT0,   "Capcom", "X-Men: Children of the Atom (Brazil 950331)", MACHINE_SUPPORTS_SAVE )
 GAME( 1994, xmcotah,    xmcota,   cps2, cps2_2p6b, cps_state, cps2,     ROT0,   "Capcom", "X-Men: Children of the Atom (Hispanic 950331)", MACHINE_SUPPORTS_SAVE )
 GAME( 1994, xmcotahr1,  xmcota,   cps2, cps2_2p6b, cps_state, cps2,     ROT0,   "Capcom", "X-Men: Children of the Atom (Hispanic 950105)", MACHINE_SUPPORTS_SAVE )
 GAME( 1994, xmcotaj,    xmcota,   cps2, cps2_2p6b, cps_state, cps2,     ROT0,   "Capcom", "X-Men: Children of the Atom (Japan 950105)", MACHINE_SUPPORTS_SAVE )

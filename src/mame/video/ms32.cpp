@@ -18,7 +18,7 @@ priority should be given to
 #include "includes/ms32.h"
 
 
-// kirarast, tp2m32, and 47pie2 require the sprites in a different order
+// kirarast, tp2m32, and suchie2 require the sprites in a different order
 
 /********** Tilemaps **********/
 
@@ -91,8 +91,8 @@ void ms32_state::video_start()
 	/* i hate per game patches...how should priority really work? tetrisp2.c ? i can't follow it */
 	if (!strcmp(machine().system().name,"kirarast"))    m_reverse_sprite_order = 0;
 	if (!strcmp(machine().system().name,"tp2m32"))  m_reverse_sprite_order = 0;
-	if (!strcmp(machine().system().name,"47pie2"))  m_reverse_sprite_order = 0;
-	if (!strcmp(machine().system().name,"47pie2o")) m_reverse_sprite_order = 0;
+	if (!strcmp(machine().system().name,"suchie2"))  m_reverse_sprite_order = 0;
+	if (!strcmp(machine().system().name,"suchie2o")) m_reverse_sprite_order = 0;
 	if (!strcmp(machine().system().name,"hayaosi3"))    m_reverse_sprite_order = 0;
 	if (!strcmp(machine().system().name,"bnstars")) m_reverse_sprite_order = 0;
 	if (!strcmp(machine().system().name,"wpksocv2"))    m_reverse_sprite_order = 0;
@@ -411,54 +411,38 @@ uint32_t ms32_state::screen_update_ms32(screen_device &screen, bitmap_rgb32 &bit
 	else
 		scr_pri++;
 
-	if((m_priram[0x3a00 / 2] & 0x00ff) == 0x000c)
+	// Suchiepai 2 title & Gratia gameplay intermissions uses 0x0f
+	// hayaosi3 uses 0x09 during flames screen on attract
+	// this is otherwise 0x17 most of the time except for 0x15 in hayaosi3, tetris plus 2 & world pk soccer 2
+	// kirarast flips between 0x16 in gameplay and 0x17 otherwise
+	if((m_priram[0x3a00 / 2] & 0x0030) == 0x00)
 		scr_pri++;
 	else
 		rot_pri++;
 
-	if (rot_pri == 0)
-		draw_roz(screen, m_temp_bitmap_tilemaps, cliprect, 1 << 1);
-	else if (scr_pri == 0)
-		if (m_tilemaplayoutcontrol&1)
+//	popmessage("%02x %02x %02x",m_priram[0x2b00 / 2],m_priram[0x2e00 / 2],m_priram[0x3a00 / 2]);
+	
+	// tile-tile mixing
+	for(int prin=0;prin<3;prin++)
+	{
+		if(rot_pri == prin)
+			draw_roz(screen, m_temp_bitmap_tilemaps, cliprect, 1 << 1);
+		else if (scr_pri == prin)
 		{
-			m_bg_tilemap_alt->draw(screen, m_temp_bitmap_tilemaps, cliprect, 0, 1 << 0);
+			if (m_tilemaplayoutcontrol&1)
+			{
+				m_bg_tilemap_alt->draw(screen, m_temp_bitmap_tilemaps, cliprect, 0, 1 << 0);
+			}
+			else
+			{
+				m_bg_tilemap->draw(screen, m_temp_bitmap_tilemaps, cliprect, 0, 1 << 0);
+			}
 		}
-		else
-		{
-			m_bg_tilemap->draw(screen, m_temp_bitmap_tilemaps, cliprect, 0, 1 << 0);
-		}
-	else if (asc_pri == 0)
-		m_tx_tilemap->draw(screen, m_temp_bitmap_tilemaps, cliprect, 0, 1 << 2);
+		else if(asc_pri == prin)
+			m_tx_tilemap->draw(screen, m_temp_bitmap_tilemaps, cliprect, 0, 1 << 2);
+	}
 
-	if (rot_pri == 1)
-		draw_roz(screen, m_temp_bitmap_tilemaps, cliprect, 1 << 1);
-	else if (scr_pri == 1)
-		if (m_tilemaplayoutcontrol&1)
-		{
-			m_bg_tilemap_alt->draw(screen, m_temp_bitmap_tilemaps, cliprect, 0, 1 << 0);
-		}
-		else
-		{
-			m_bg_tilemap->draw(screen, m_temp_bitmap_tilemaps, cliprect, 0, 1 << 0);
-		}
-	else if (asc_pri == 1)
-		m_tx_tilemap->draw(screen, m_temp_bitmap_tilemaps, cliprect, 0, 1 << 2);
-
-	if (rot_pri == 2)
-		draw_roz(screen, m_temp_bitmap_tilemaps, cliprect, 1 << 1);
-	else if (scr_pri == 2)
-		if (m_tilemaplayoutcontrol&1)
-		{
-			m_bg_tilemap_alt->draw(screen, m_temp_bitmap_tilemaps, cliprect, 0, 1 << 0);
-		}
-		else
-		{
-			m_bg_tilemap->draw(screen, m_temp_bitmap_tilemaps, cliprect, 0, 1 << 0);
-		}
-	else if (asc_pri == 2)
-		m_tx_tilemap->draw(screen, m_temp_bitmap_tilemaps, cliprect, 0, 1 << 2);
-
-	/* MIX it! */
+	// tile-sprite mixing 
 	/* this mixing isn't 100% accurate, it should be using ALL the data in
 	   the priority ram, probably for per-pixel / pen mixing, or more levels
 	   than are supported here..  I don't know, it will need hw tests I think */
@@ -505,6 +489,7 @@ uint32_t ms32_state::screen_update_ms32(screen_device &screen, bitmap_rgb32 &bit
 				if (m_priram[(spritepri | 0x0a00 | 0x0000) / 2] & 0x38) primask |= 1 << 7;
 
 
+				// TODO: spaghetti code ...
 				if (primask == 0x00)
 				{
 					if (src_tilepri==0x00)

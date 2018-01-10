@@ -25,8 +25,29 @@
 #define S_BIT_CONST(val) ((val & 0x4000) >> 14)
 #define DD(val)          ((val & 0x3000) >> 12)
 
+#define S_BIT                   ((OP & 0x100) >> 8)
+#define D_BIT                   ((OP & 0x200) >> 9)
+#define N_VALUE                 (((OP & 0x100) >> 4) | (OP & 0x0f))
+#define HI_N_VALUE              (0x10 | (OP & 0x0f))
+#define LO_N_VALUE              (OP & 0x0f)
+#define N_OP_MASK               (m_op & 0x10f)
+#define DRC_HI_N_VALUE          (0x10 | (op & 0x0f))
+#define DRC_LO_N_VALUE          (op & 0x0f)
+#define DRC_N_OP_MASK           (op & 0x10f)
+#define DST_CODE                ((OP & 0xf0) >> 4)
+#define SRC_CODE                (OP & 0x0f)
+#define SIGN_BIT(val)           ((val & 0x80000000) >> 31)
+#define SIGN_TO_N(val)          ((val & 0x80000000) >> 29)
+#define SIGN64_TO_N(val)        ((val & 0x8000000000000000ULL) >> 61)
 
 /* Extended DSP instructions */
+#define EHMAC           0x02a
+#define EHMACD          0x02e
+#define EHCMULD         0x046
+#define EHCMACD         0x04e
+#define EHCSUMD         0x086
+#define EHCFFTD         0x096
+#define EMUL_N			0x100
 #define EMUL            0x102
 #define EMULU           0x104
 #define EMULS           0x106
@@ -34,12 +55,6 @@
 #define EMACD           0x10e
 #define EMSUB           0x11a
 #define EMSUBD          0x11e
-#define EHMAC           0x02a
-#define EHMACD          0x02e
-#define EHCMULD         0x046
-#define EHCMACD         0x04e
-#define EHCSUMD         0x086
-#define EHCFFTD         0x096
 #define EHCFFTSD        0x296
 
 /* IRQ numbers */
@@ -115,7 +130,7 @@
 #define IO_WRITE_W(addr, data)  m_io->write_dword(((addr) >> 11) & 0x7ffc, data)
 
 
-#define READ_OP(addr)          m_direct->read_word((addr), m_opcodexor)
+#define READ_OP(addr)          m_direct->read_word((addr), m_core->opcodexor)
 
 // set C in adds/addsi/subs/sums
 #define SETCARRYS 0
@@ -126,21 +141,21 @@
 /* Internal registers */
 
 #define OP              m_op
-#define PC              m_global_regs[0] //Program Counter
-#define SR              m_global_regs[1] //Status Register
-#define FER             m_global_regs[2] //Floating-Point Exception Register
+#define PC              m_core->global_regs[0] //Program Counter
+#define SR              m_core->global_regs[1] //Status Register
+#define FER             m_core->global_regs[2] //Floating-Point Exception Register
 // 03 - 15  General Purpose Registers
 // 16 - 17  Reserved
-#define SP              m_global_regs[18] //Stack Pointer
-#define UB              m_global_regs[19] //Upper Stack Bound
-#define BCR             m_global_regs[20] //Bus Control Register
-#define TPR             m_global_regs[21] //Timer Prescaler Register
-#define TCR             m_global_regs[22] //Timer Compare Register
+#define SP              m_core->global_regs[18] //Stack Pointer
+#define UB              m_core->global_regs[19] //Upper Stack Bound
+#define BCR             m_core->global_regs[20] //Bus Control Register
+#define TPR             m_core->global_regs[21] //Timer Prescaler Register
+#define TCR             m_core->global_regs[22] //Timer Compare Register
 #define TR              compute_tr() //Timer Register
-#define WCR             m_global_regs[24] //Watchdog Compare Register
-#define ISR             m_global_regs[25] //Input Status Register
-#define FCR             m_global_regs[26] //Function Control Register
-#define MCR             m_global_regs[27] //Memory Control Register
+#define WCR             m_core->global_regs[24] //Watchdog Compare Register
+#define ISR             m_core->global_regs[25] //Input Status Register
+#define FCR             m_core->global_regs[26] //Function Control Register
+#define MCR             m_core->global_regs[27] //Memory Control Register
 // 28 - 31  Reserved
 
 #define C_MASK                  0x00000001
@@ -179,7 +194,7 @@
 #define GET_S                   ((SR & S_MASK)>>18)     // bit 18 //SUPERVISOR STATE
 #define GET_ILC                 ((SR & 0x00180000)>>19) // bits 20 - 19 //INSTRUCTION-LENGTH
 /* if FL is zero it is always interpreted as 16 */
-#define GET_FL                  m_fl_lut[((SR >> 21) & 0xf)] // bits 24 - 21 //FRAME LENGTH
+#define GET_FL                  m_core->fl_lut[((SR >> 21) & 0xf)] // bits 24 - 21 //FRAME LENGTH
 #define GET_FP                  ((SR & 0xfe000000)>>25) // bits 31 - 25 //FRAME POINTER
 
 #define SET_C(val)              (SR = (SR & ~C_MASK) | (val))

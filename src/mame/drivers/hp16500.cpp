@@ -12,7 +12,7 @@
     MC68A45 CRTC
     FDC9793 floppy controller (WD1793 type)
     TMS9914A GPIB bus interface
-    SCN2661 DUART/timer
+    SCN2661 EPCI
 
   IRQ1 = VBL, IRQ2 = 20b007, IRQ3 = ?, IRQ4 = 20d000, IRQ5 = 20d007,
   IRQ6 = ?, IRQ7 = ?
@@ -22,7 +22,7 @@
     MC68A45 CRTC
     Z0765A08PSC floppy controller (NEC765 type)
     TMS9914A GPIB bus interface
-    SCN2661 DUART/timer
+    SCN2661 EPCI
 
   16500b:
     MC68EC030 @ 25 MHz
@@ -49,26 +49,20 @@
 
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
-#include "machine/mc68681.h"
+#include "machine/mc2661.h"
 #include "bus/hp_hil/hp_hil.h"
 #include "bus/hp_hil/hil_devices.h"
 #include "video/mc6845.h"
 #include "screen.h"
 #include "speaker.h"
 
-#define MAINCPU_TAG "maincpu"
-#define CRTC_TAG    "crtc"
-#define SCREEN_TAG  "screen"
-#define DUART_TAG   "duart"
-#define MLC_TAG     "mlc"
-
 class hp16500_state : public driver_device
 {
 public:
 	hp16500_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, MAINCPU_TAG),
-		m_mlc(*this, MLC_TAG)
+		m_maincpu(*this, "maincpu"),
+		m_mlc(*this, "mlc")
 		{ }
 
 	virtual void video_start() override;
@@ -229,8 +223,10 @@ static ADDRESS_MAP_START(hp1650_map, AS_PROGRAM, 16, hp16500_state)
 	AM_RANGE(0x206000, 0x206001) AM_WRITE8(pal_g_w, 0x00ff)
 	AM_RANGE(0x207000, 0x207001) AM_WRITE8(pal_b_w, 0x00ff)
 
-	AM_RANGE(0x20c000, 0x20c001) AM_DEVREADWRITE8(CRTC_TAG, mc6845_device, status_r, address_w, 0x00ff)
-	AM_RANGE(0x20c002, 0x20c003) AM_DEVREADWRITE8(CRTC_TAG, mc6845_device, register_r, register_w, 0x00ff)
+	AM_RANGE(0x20a000, 0x20a007) AM_DEVREADWRITE8("epci", mc2661_device, read, write, 0x00ff)
+
+	AM_RANGE(0x20c000, 0x20c001) AM_DEVREADWRITE8("crtc", mc6845_device, status_r, address_w, 0x00ff)
+	AM_RANGE(0x20c002, 0x20c003) AM_DEVREADWRITE8("crtc", mc6845_device, register_r, register_w, 0x00ff)
 
 	AM_RANGE(0x20e000, 0x20e001) AM_READWRITE(vbl_ack16_r, vbl_ack16_w)
 
@@ -255,8 +251,10 @@ static ADDRESS_MAP_START(hp1651_map, AS_PROGRAM, 16, hp16500_state)
 	AM_RANGE(0x206000, 0x206001) AM_WRITE8(pal_g_w, 0x00ff)
 	AM_RANGE(0x207000, 0x207001) AM_WRITE8(pal_b_w, 0x00ff)
 
-	AM_RANGE(0x20c000, 0x20c001) AM_DEVREADWRITE8(CRTC_TAG, mc6845_device, status_r, address_w, 0x00ff)
-	AM_RANGE(0x20c002, 0x20c003) AM_DEVREADWRITE8(CRTC_TAG, mc6845_device, register_r, register_w, 0x00ff)
+	AM_RANGE(0x20a000, 0x20a007) AM_DEVREADWRITE8("epci", mc2661_device, read, write, 0x00ff)
+
+	AM_RANGE(0x20c000, 0x20c001) AM_DEVREADWRITE8("crtc", mc6845_device, status_r, address_w, 0x00ff)
+	AM_RANGE(0x20c002, 0x20c003) AM_DEVREADWRITE8("crtc", mc6845_device, register_r, register_w, 0x00ff)
 
 	AM_RANGE(0x20e000, 0x20e001) AM_READWRITE(vbl_ack16_r, vbl_ack16_w)
 
@@ -280,8 +278,8 @@ static ADDRESS_MAP_START(hp16500a_map, AS_PROGRAM, 16, hp16500_state)
 	AM_RANGE(0x206000, 0x206001) AM_WRITE8(pal_g_w, 0x00ff)
 	AM_RANGE(0x207000, 0x207001) AM_WRITE8(pal_b_w, 0x00ff)
 
-	AM_RANGE(0x20c000, 0x20c001) AM_DEVREADWRITE8(CRTC_TAG, mc6845_device, status_r, address_w, 0x00ff)
-	AM_RANGE(0x20c002, 0x20c003) AM_DEVREADWRITE8(CRTC_TAG, mc6845_device, register_r, register_w, 0x00ff)
+	AM_RANGE(0x20c000, 0x20c001) AM_DEVREADWRITE8("crtc", mc6845_device, status_r, address_w, 0x00ff)
+	AM_RANGE(0x20c002, 0x20c003) AM_DEVREADWRITE8("crtc", mc6845_device, register_r, register_w, 0x00ff)
 
 	AM_RANGE(0x20e000, 0x20e001) AM_READWRITE(vbl_ack16_r, vbl_ack16_w)
 
@@ -306,7 +304,7 @@ static ADDRESS_MAP_START(hp16500_map, AS_PROGRAM, 32, hp16500_state)
 
 	AM_RANGE(0x0020b800, 0x0020b8ff) AM_RAM // system ram test is really strange.
 
-	AM_RANGE(0x0020f800, 0x0020f80f) AM_DEVREADWRITE8(MLC_TAG, hp_hil_mlc_device, read, write, 0xffffffff);
+	AM_RANGE(0x0020f800, 0x0020f80f) AM_DEVREADWRITE8("mlc", hp_hil_mlc_device, read, write, 0xffffffff);
 	AM_RANGE(0x00600000, 0x0061ffff) AM_WRITE16(vram_w, 0xffffffff)
 	AM_RANGE(0x00600000, 0x0067ffff) AM_READ8  (vram_r, 0x00ff00ff)
 	AM_RANGE(0x00700000, 0x00700003) AM_WRITE8 (mask_w, 0xff000000)
@@ -410,71 +408,69 @@ uint32_t hp16500_state::screen_update_hp16500(screen_device &screen, bitmap_rgb3
 
 static MACHINE_CONFIG_START( hp1650 )
 	/* basic machine hardware */
-	MCFG_CPU_ADD(MAINCPU_TAG, M68000, 10000000)
+	MCFG_CPU_ADD("maincpu", M68000, 10000000)
 	MCFG_CPU_PROGRAM_MAP(hp1650_map)
 
-	MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
+	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(25000000, 0x330, 0, 0x250, 0x198, 0, 0x180 )
-	MCFG_SCREEN_UPDATE_DEVICE( CRTC_TAG, mc6845_device, screen_update )
+	MCFG_SCREEN_UPDATE_DEVICE( "crtc", mc6845_device, screen_update )
 
-	MCFG_MC6845_ADD(CRTC_TAG, MC6845, SCREEN_TAG, 25000000/9)
+	MCFG_MC6845_ADD("crtc", MC6845, "screen", 25000000/9)
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(8)
 	MCFG_MC6845_UPDATE_ROW_CB(hp16500_state, crtc_update_row_1650)
 	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(hp16500_state, vsync_changed))
 
-	MCFG_DEVICE_ADD(DUART_TAG, MC68681, 20000000)
+	MCFG_DEVICE_ADD("epci", MC2661, 5000000)
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( hp1651 )
 	/* basic machine hardware */
-	MCFG_CPU_ADD(MAINCPU_TAG, M68000, 10000000)
+	MCFG_CPU_ADD("maincpu", M68000, 10000000)
 	MCFG_CPU_PROGRAM_MAP(hp1651_map)
 
-	MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
+	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(25000000, 0x330, 0, 0x250, 0x198, 0, 0x180 )
-	MCFG_SCREEN_UPDATE_DEVICE( CRTC_TAG, mc6845_device, screen_update )
+	MCFG_SCREEN_UPDATE_DEVICE( "crtc", mc6845_device, screen_update )
 
-	MCFG_MC6845_ADD(CRTC_TAG, MC6845, SCREEN_TAG, 25000000/9)
+	MCFG_MC6845_ADD("crtc", MC6845, "screen", 25000000/9)
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(8)
 	MCFG_MC6845_UPDATE_ROW_CB(hp16500_state, crtc_update_row_1650)
 	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(hp16500_state, vsync_changed))
 
-	MCFG_DEVICE_ADD(DUART_TAG, MC68681, 20000000)
+	MCFG_DEVICE_ADD("epci", MC2661, 5000000)
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( hp16500a )
 	/* basic machine hardware */
-	MCFG_CPU_ADD(MAINCPU_TAG, M68000, 10000000)
+	MCFG_CPU_ADD("maincpu", M68000, 10000000)
 	MCFG_CPU_PROGRAM_MAP(hp16500a_map)
 
-	MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
+	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(25000000, 0x320, 0, 0x240, 0x19c, 0, 0x170 )
-	MCFG_SCREEN_UPDATE_DEVICE( CRTC_TAG, mc6845_device, screen_update )
+	MCFG_SCREEN_UPDATE_DEVICE( "crtc", mc6845_device, screen_update )
 
-	MCFG_MC6845_ADD(CRTC_TAG, MC6845, SCREEN_TAG, 25000000/9)
+	MCFG_MC6845_ADD("crtc", MC6845, "screen", 25000000/9)
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(8)
 	MCFG_MC6845_UPDATE_ROW_CB(hp16500_state, crtc_update_row)
 	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(hp16500_state, vsync_changed))
-
-	MCFG_DEVICE_ADD(DUART_TAG, MC68681, 20000000)
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( hp16500 )
 	/* basic machine hardware */
-	MCFG_CPU_ADD(MAINCPU_TAG, M68EC030, 25000000)
+	MCFG_CPU_ADD("maincpu", M68EC030, 25000000)
 	MCFG_CPU_PROGRAM_MAP(hp16500_map)
-	MCFG_CPU_VBLANK_INT_DRIVER(SCREEN_TAG, hp16500_state, vblank)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", hp16500_state, vblank)
 
-	MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
+	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_UPDATE_DRIVER(hp16500_state, screen_update_hp16500)
 	MCFG_SCREEN_SIZE(576,384)
 	MCFG_SCREEN_VISIBLE_AREA(0, 576-1, 0, 384-1)
@@ -482,17 +478,15 @@ static MACHINE_CONFIG_START( hp16500 )
 
 	// FIXME: Where is the AP line connected to? The MLC documentation recommends
 	// connecting it to VBLANK
-	MCFG_SCREEN_VBLANK_CALLBACK(DEVWRITELINE(MLC_TAG, hp_hil_mlc_device, ap_w))
+	MCFG_SCREEN_VBLANK_CALLBACK(DEVWRITELINE("mlc", hp_hil_mlc_device, ap_w))
 
-	MCFG_DEVICE_ADD(MLC_TAG, HP_HIL_MLC, XTAL_15_92MHz/2)
+	MCFG_DEVICE_ADD("mlc", HP_HIL_MLC, XTAL_15_92MHz/2)
 	MCFG_HP_HIL_INT_CALLBACK(WRITELINE(hp16500_state, irq_2))
 
 	// TODO: for now hook up the ipc hil keyboard - this might be replaced
 	// later with a 16500b specific keyboard implementation
-	MCFG_HP_HIL_SLOT_ADD(MLC_TAG, "hil1", hp_hil_devices, "hp_ipc_kbd")
-	MCFG_HP_HIL_SLOT_ADD(MLC_TAG, "hil2", hp_hil_devices, "hp_ipc_kbd")
-
-	MCFG_DEVICE_ADD(DUART_TAG, MC68681, 20000000)
+	MCFG_HP_HIL_SLOT_ADD("mlc", "hil1", hp_hil_devices, "hp_ipc_kbd")
+	MCFG_HP_HIL_SLOT_ADD("mlc", "hil2", hp_hil_devices, "hp_ipc_kbd")
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 MACHINE_CONFIG_END

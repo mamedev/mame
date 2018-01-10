@@ -2138,8 +2138,8 @@ void mpu4_state::mpu4_install_mod4yam_space(address_space &space)
 
 void mpu4_state::mpu4_install_mod4oki_space(address_space &space)
 {
-	pia6821_device *pia_ic4ss = space.machine().device<pia6821_device>("pia_ic4ss");
-	ptm6840_device *ptm_ic3ss = space.machine().device<ptm6840_device>("ptm_ic3ss");
+	pia6821_device *pia_ic4ss = machine().device<pia6821_device>("pia_ic4ss");
+	ptm6840_device *ptm_ic3ss = machine().device<ptm6840_device>("ptm_ic3ss");
 
 	space.install_readwrite_handler(0x0880, 0x0883, read8_delegate(FUNC(pia6821_device::read), pia_ic4ss), write8_delegate(FUNC(pia6821_device::write), pia_ic4ss));
 	space.install_read_handler(0x08c0, 0x08c7, read8_delegate(FUNC(ptm6840_device::read), ptm_ic3ss));
@@ -2567,13 +2567,13 @@ static void descramble_crystal( uint8_t* region, int start, int end, uint8_t ext
 		switch (i & 0x58)
 		{
 		case 0x00: // same as 0x08
-		case 0x08: x = BITSWAP8( x^0xca , 3,2,1,0,7,4,6,5 ); break;
-		case 0x10: x = BITSWAP8( x^0x30 , 3,0,4,6,1,5,7,2 ); break;
-		case 0x18: x = BITSWAP8( x^0x89 , 4,1,2,5,7,0,6,3 ); break;
-		case 0x40: x = BITSWAP8( x^0x14 , 6,1,4,3,2,5,0,7 ); break;
-		case 0x48: x = BITSWAP8( x^0x40 , 1,0,3,2,5,4,7,6 ); break;
-		case 0x50: x = BITSWAP8( x^0xcb , 3,2,1,0,7,6,5,4 ); break;
-		case 0x58: x = BITSWAP8( x^0xc0 , 2,3,6,0,5,1,7,4 ); break;
+		case 0x08: x = bitswap<8>( x^0xca , 3,2,1,0,7,4,6,5 ); break;
+		case 0x10: x = bitswap<8>( x^0x30 , 3,0,4,6,1,5,7,2 ); break;
+		case 0x18: x = bitswap<8>( x^0x89 , 4,1,2,5,7,0,6,3 ); break;
+		case 0x40: x = bitswap<8>( x^0x14 , 6,1,4,3,2,5,0,7 ); break;
+		case 0x48: x = bitswap<8>( x^0x40 , 1,0,3,2,5,4,7,6 ); break;
+		case 0x50: x = bitswap<8>( x^0xcb , 3,2,1,0,7,6,5,4 ); break;
+		case 0x58: x = bitswap<8>( x^0xc0 , 2,3,6,0,5,1,7,4 ); break;
 		}
 		region[i] = x ^ extra_xor;
 	}
@@ -3087,7 +3087,7 @@ MACHINE_CONFIG_START( mpu4base )
 
 	MCFG_MACHINE_START_OVERRIDE(mpu4_state,mod2    )
 	MCFG_MACHINE_RESET_OVERRIDE(mpu4_state,mpu4)
-	MCFG_CPU_ADD("maincpu", M6809, MPU4_MASTER_CLOCK/4)
+	MCFG_CPU_ADD("maincpu", MC6809, MPU4_MASTER_CLOCK) // MC68B09P
 	MCFG_CPU_PROGRAM_MAP(mpu4_memmap)
 
 	MCFG_FRAGMENT_ADD(mpu4_common)

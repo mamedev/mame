@@ -171,7 +171,7 @@ READ8_MEMBER(mole_state::mole_protection_r)
 	{
 	case 0x08: return 0xb0; /* random mole placement */
 	case 0x26:
-		if (space.device().safe_pc() == 0x53d5)
+		if (m_maincpu->pc() == 0x53d5)
 		{
 			return 0x06; /* bonus round */
 		}

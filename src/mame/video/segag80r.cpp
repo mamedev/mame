@@ -294,7 +294,7 @@ READ8_MEMBER(segag80r_state::segag80r_video_port_r)
 {
 	if (offset == 0)
 	{
-		logerror("%04X:segag80r_video_port_r(%d)\n", space.device().safe_pc(), offset);
+		logerror("%04X:segag80r_video_port_r(%d)\n", m_maincpu->pc(), offset);
 		return 0xff;
 	}
 	else
@@ -314,7 +314,7 @@ WRITE8_MEMBER(segag80r_state::segag80r_video_port_w)
 {
 	if (offset == 0)
 	{
-		logerror("%04X:segag80r_video_port_w(%d) = %02X\n", space.device().safe_pc(), offset, data);
+		logerror("%04X:segag80r_video_port_w(%d) = %02X\n", m_maincpu->pc(), offset, data);
 	}
 	else
 	{

@@ -46,7 +46,7 @@ READ8_MEMBER(mosaic_state::protection_r)
 {
 	int res = (m_prot_val >> 8) & 0xff;
 
-	logerror("%06x: protection_r %02x\n", space.device().safe_pc(), res);
+	logerror("%06x: protection_r %02x\n", m_maincpu->pc(), res);
 
 	m_prot_val <<= 8;
 
@@ -55,7 +55,7 @@ READ8_MEMBER(mosaic_state::protection_r)
 
 WRITE8_MEMBER(mosaic_state::gfire2_protection_w)
 {
-	logerror("%06x: protection_w %02x\n", space.device().safe_pc(), data);
+	logerror("%06x: protection_w %02x\n", m_maincpu->pc(), data);
 
 	switch(data)
 	{

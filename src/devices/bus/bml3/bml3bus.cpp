@@ -97,7 +97,7 @@ DEFINE_DEVICE_TYPE(BML3BUS, bml3bus_device, "bml3bus", "Hitachi MB-6890 Bus")
 void bml3bus_device::static_set_cputag(device_t &device, const char *tag)
 {
 	bml3bus_device &bml3bus = downcast<bml3bus_device &>(device);
-	bml3bus.m_cputag = tag;
+	bml3bus.m_maincpu.set_tag(tag);
 }
 
 //**************************************************************************
@@ -115,7 +115,7 @@ bml3bus_device::bml3bus_device(const machine_config &mconfig, const char *tag, d
 
 bml3bus_device::bml3bus_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, type, tag, owner, clock),
-	m_maincpu(nullptr),
+	m_maincpu(*this, finder_base::DUMMY_TAG),
 	m_out_nmi_cb(*this),
 	m_out_irq_cb(*this),
 	m_out_firq_cb(*this),
@@ -128,8 +128,6 @@ bml3bus_device::bml3bus_device(const machine_config &mconfig, device_type type, 
 
 void bml3bus_device::device_start()
 {
-	m_maincpu = machine().device<cpu_device>(m_cputag);
-
 	// resolve callbacks
 	m_out_nmi_cb.resolve_safe();
 	m_out_irq_cb.resolve_safe();

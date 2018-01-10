@@ -130,7 +130,7 @@ void twins_state::machine_start()
 READ16_MEMBER(twins_state::twins_port4_r)
 {
 // doesn't work??
-//  printf("%08x: twins_port4_r %04x\n", space.device().safe_pc(), mem_mask);
+//  printf("%08x: twins_port4_r %04x\n", m_maincpu->pc(), mem_mask);
 //  return m_i2cmem->read_sda();// | 0xfffe;
 
 	return 0x0001;
@@ -138,7 +138,7 @@ READ16_MEMBER(twins_state::twins_port4_r)
 
 WRITE16_MEMBER(twins_state::twins_port4_w)
 {
-//  printf("%08x: twins_port4_w %04x %04x\n", space.device().safe_pc(), data, mem_mask);
+//  printf("%08x: twins_port4_w %04x %04x\n", m_maincpu->pc(), data, mem_mask);
 	int i2c_clk = BIT(data, 1);
 	int i2c_mem = BIT(data, 0);
 	m_i2cmem->write_scl(i2c_clk);
@@ -154,13 +154,13 @@ WRITE16_MEMBER(twins_state::twins_pal_w)
 		dat = m_paletteram[m_paloff];
 
 		r = dat & 0x1f;
-		r = BITSWAP8(r,7,6,5,0,1,2,3,4);
+		r = bitswap<8>(r,7,6,5,0,1,2,3,4);
 
 		g = (dat>>5) & 0x1f;
-		g = BITSWAP8(g,7,6,5,0,1,2,3,4);
+		g = bitswap<8>(g,7,6,5,0,1,2,3,4);
 
 		b = (dat>>10) & 0x1f;
-		b = BITSWAP8(b,7,6,5,0,1,2,3,4);
+		b = bitswap<8>(b,7,6,5,0,1,2,3,4);
 
 		m_palette->set_pen_color(m_paloff, pal5bit(r),pal5bit(g),pal5bit(b));
 

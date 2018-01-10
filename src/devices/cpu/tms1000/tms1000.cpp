@@ -2,13 +2,11 @@
 // copyright-holders:hap
 /*
 
-  TMS1000 family - TMS1000, TMS1000C, TMS1070, TMS1040, TMS1200, TMS1700, TMS1730,
+  TMS1000 family - TMS1000, TMS1070, TMS1040, TMS1200, TMS1700, TMS1730,
   and second source Motorola MC141000, MC141200.
 
   TODO:
   - add TMS1270 (10 O pins, how does that work?)
-  - add TMS1200C (has L input pins like TMS1600)
-  - add TMS1000C-specific mpla
 
 */
 
@@ -32,16 +30,6 @@ DEFINE_DEVICE_TYPE(TMS1040,  tms1040_cpu_device,  "tms1040",  "TMS1040") // same
 DEFINE_DEVICE_TYPE(TMS1200,  tms1200_cpu_device,  "tms1200",  "TMS1200") // 40-pin DIP, 13 R pins
 DEFINE_DEVICE_TYPE(TMS1700,  tms1700_cpu_device,  "tms1700",  "TMS1700") // 28-pin DIP, RAM/ROM size halved, 9 R pins
 DEFINE_DEVICE_TYPE(TMS1730,  tms1730_cpu_device,  "tms1730",  "TMS1730") // 20-pin DIP, same die as TMS1700, package has less pins: 6 R pins, 5 O pins (output PLA is still 8-bit, O1,O3,O5 unused)
-
-// CMOS versions (3-level stack, HALT pin)
-// - RAM at top-left, ROM at top-right(rotate CCW)
-// - ROM ordering is different:
-//   * row select is linear (0-63)
-//   * bit select is 7-0 instead of 0-7
-//   * page select doesn't flip in the middle
-// - 32-term mpla at bottom-right, different order
-// - 32-term opla at bottom-left, ordered O7-O0(0 or 1), and A8,4,2,1,S
-DEFINE_DEVICE_TYPE(TMS1000C, tms1000c_cpu_device, "tms1000c", "TMS1000C") // 28-pin SDIP, 10 R pins
 
 // 2nd source Motorola chips
 DEFINE_DEVICE_TYPE(MC141000, mc141000_cpu_device, "mc141000", "MC141000") // CMOS, pin-compatible with TMS1000(reverse polarity)
@@ -103,11 +91,6 @@ tms1730_cpu_device::tms1730_cpu_device(const machine_config &mconfig, const char
 {
 }
 
-tms1000c_cpu_device::tms1000c_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: tms1000_cpu_device(mconfig, TMS1000C, tag, owner, clock, 8, 10, 6, 8, 2, 10, ADDRESS_MAP_NAME(program_10bit_8), 6, ADDRESS_MAP_NAME(data_64x4))
-{
-}
-
 mc141000_cpu_device::mc141000_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: tms1000_cpu_device(mconfig, MC141000, tag, owner, clock, 8, 11, 6, 8, 2, 10, ADDRESS_MAP_NAME(program_10bit_8), 6, ADDRESS_MAP_NAME(data_64x4))
 {
@@ -129,16 +112,6 @@ MACHINE_CONFIG_MEMBER(tms1000_cpu_device::device_add_mconfig)
 	MCFG_PLA_FILEFORMAT(BERKELEY)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_MEMBER(tms1000c_cpu_device::device_add_mconfig)
-
-	// microinstructions PLA, output PLA
-	//MCFG_PLA_ADD("mpla", 8, 16, 32)
-	MCFG_PLA_ADD("mpla", 8, 16, 30)
-	MCFG_PLA_FILEFORMAT(BERKELEY)
-	MCFG_PLA_ADD("opla", 5, 8, 32)
-	MCFG_PLA_FILEFORMAT(BERKELEY)
-MACHINE_CONFIG_END
-
 
 // disasm
 util::disasm_interface *tms1000_cpu_device::create_disassembler()
@@ -148,6 +121,21 @@ util::disasm_interface *tms1000_cpu_device::create_disassembler()
 
 
 // device_reset
+u32 tms1000_cpu_device::decode_micro(u8 sel)
+{
+	//                                           _____              _____  ______  _____  ______  _____  _____  _____  _____
+	const u32 md[16] = { M_STSL, M_AUTY, M_AUTA, M_CIN, M_C8, M_NE, M_CKN, M_15TN, M_MTN, M_NATN, M_ATN, M_MTP, M_YTP, M_CKP, M_CKM, M_STO };
+	u16 mask = m_mpla->read(sel);
+	mask ^= 0x3fc8; // invert active-negative
+	u32 decode = 0;
+
+	for (int bit = 0; bit < 16; bit++)
+		if (mask & (1 << bit))
+			decode |= md[bit];
+
+	return decode;
+}
+
 void tms1000_cpu_device::device_reset()
 {
 	// common reset
@@ -159,17 +147,9 @@ void tms1000_cpu_device::device_reset()
 	m_micro_decode.resize(0x100);
 	memset(&m_micro_decode[0], 0, 0x100*sizeof(u32));
 
+	// decode microinstructions
 	for (int op = 0; op < 0x100; op++)
-	{
-		//                                           _____              _____  ______  _____  ______  _____  _____  _____  _____
-		const u32 md[16] = { M_STSL, M_AUTY, M_AUTA, M_CIN, M_C8, M_NE, M_CKN, M_15TN, M_MTN, M_NATN, M_ATN, M_MTP, M_YTP, M_CKP, M_CKM, M_STO };
-		u16 mask = m_mpla->read(op);
-		mask ^= 0x3fc8; // invert active-negative
-
-		for (int bit = 0; bit < 16; bit++)
-			if (mask & (1 << bit))
-				m_micro_decode[op] |= md[bit];
-	}
+		m_micro_decode[op] = decode_micro(op);
 
 	// the fixed instruction set is not programmable
 	m_fixed_decode[0x00] = F_COMX;

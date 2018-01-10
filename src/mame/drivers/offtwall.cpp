@@ -127,11 +127,11 @@ READ16_MEMBER(offtwall_state::bankswitch_r)
 READ16_MEMBER(offtwall_state::bankrom_r)
 {
 	/* this is the banked ROM read */
-	logerror("%06X: %04X\n", space.device().safe_pcbase(), offset);
+	logerror("%06X: %04X\n", m_maincpu->pcbase(), offset);
 
 	/* if the values are $3e000 or $3e002 are being read by code just below the
 	    ROM bank area, we need to return the correct value to give the proper checksum */
-	if ((offset == 0x3000 || offset == 0x3001) && space.device().safe_pcbase() > 0x37000)
+	if ((offset == 0x3000 || offset == 0x3001) && m_maincpu->pcbase() > 0x37000)
 	{
 		uint32_t checksum = (space.read_word(0x3fd210) << 16) | space.read_word(0x3fd212);
 		uint32_t us = 0xaaaa5555 - checksum;
@@ -166,7 +166,7 @@ READ16_MEMBER(offtwall_state::bankrom_r)
 
 READ16_MEMBER(offtwall_state::spritecache_count_r)
 {
-	int prevpc = space.device().safe_pcbase();
+	int prevpc = m_maincpu->pcbase();
 
 	/* if this read is coming from $99f8 or $9992, it's in the sprite copy loop */
 	if (prevpc == 0x99f8 || prevpc == 0x9992)
@@ -220,7 +220,7 @@ READ16_MEMBER(offtwall_state::spritecache_count_r)
 
 READ16_MEMBER(offtwall_state::unknown_verify_r)
 {
-	int prevpc = space.device().safe_pcbase();
+	int prevpc = m_maincpu->pcbase();
 	if (prevpc < 0x5c5e || prevpc > 0xc432)
 		return m_unknown_verify_base[offset];
 	else

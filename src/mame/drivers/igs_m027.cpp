@@ -88,7 +88,7 @@ WRITE32_MEMBER(igs_m027_state::igs_cg_videoram_w)
 {
 	COMBINE_DATA(&m_igs_cg_videoram[offset]);
 	//if(data!=0)
-	logerror("PC(%08X) CG @%x = %x!\n",space.device().safe_pc(),offset ,m_igs_cg_videoram[offset]);
+	logerror("PC(%08X) CG @%x = %x!\n",m_maincpu->pc(),offset ,m_igs_cg_videoram[offset]);
 
 	/*
 	ROM:08020520                 DCW 0x3E                                           ddd1        y
@@ -212,7 +212,7 @@ void igs_m027_state::sdwx_gfx_decrypt()
 	std::vector<uint8_t> result_data(rom_size);
 
 	for (i=0; i<rom_size; i++)
-		result_data[i] = src[BITSWAP24(i, 23,22,21,20,19,18,17,16,15,14,13,12,11,8,7,6,10,9,5,4,3,2,1,0)];
+		result_data[i] = src[bitswap<24>(i, 23,22,21,20,19,18,17,16,15,14,13,12,11,8,7,6,10,9,5,4,3,2,1,0)];
 
 	for (i=0; i<rom_size; i+=0x200)
 	{

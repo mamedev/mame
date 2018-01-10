@@ -128,15 +128,15 @@ void a2bus_corvfdc02_device::device_timer(emu_timer &timer, device_timer_id id, 
     read_c0nx - called for reads from this card's c0nx space
 -------------------------------------------------*/
 
-uint8_t a2bus_corvfdc02_device::read_c0nx(address_space &space, uint8_t offset)
+uint8_t a2bus_corvfdc02_device::read_c0nx(uint8_t offset)
 {
 	switch (offset)
 	{
 		case 0: // 765 FIFO
-			return m_fdc->fifo_r(space, 0);
+			return m_fdc->fifo_r();
 
 		case 1: // 765 MSR
-			return m_fdc->msr_r(space, 0);
+			return m_fdc->msr_r();
 
 		case 2: // buffer address
 			return (m_bufptr>>1) & 0xff;
@@ -164,14 +164,14 @@ uint8_t a2bus_corvfdc02_device::read_c0nx(address_space &space, uint8_t offset)
     write_c0nx - called for writes to this card's c0nx space
 -------------------------------------------------*/
 
-void a2bus_corvfdc02_device::write_c0nx(address_space &space, uint8_t offset, uint8_t data)
+void a2bus_corvfdc02_device::write_c0nx(uint8_t offset, uint8_t data)
 {
 	floppy_image_device *floppy = nullptr;
 
 	switch (offset)
 	{
 		case 0:    // FDC FIFO write
-			m_fdc->fifo_w(space, offset, data);
+			m_fdc->fifo_w(data);
 			break;
 
 		case 1:    // FDC ???
@@ -238,7 +238,7 @@ void a2bus_corvfdc02_device::write_c0nx(address_space &space, uint8_t offset, ui
     read_cnxx - called for reads from this card's cnxx space
 -------------------------------------------------*/
 
-uint8_t a2bus_corvfdc02_device::read_cnxx(address_space &space, uint8_t offset)
+uint8_t a2bus_corvfdc02_device::read_cnxx(uint8_t offset)
 {
 	return m_rom[offset & 0x1f];
 }

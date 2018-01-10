@@ -2,10 +2,12 @@
 // copyright-holders:AJR
 /***************************************************************************
 
-    Skeleton driver for National Sports Games' 6809-based mechanical games:
+    Skeleton driver for 6809-based mechanical games by National Sports
+    Games, Inc. (a division of Skee-Ball Inc.):
 
-    * Pitch Hitter
+    * Pitch Hitter - Baseball Challenge
     * Super Shot (undumped)
+    * UB-QB - Football Challenge (undumped)
 
     Memory map for "Universal Game PCB" in Super Shot schematics:
 
@@ -62,7 +64,7 @@ static INPUT_PORTS_START( pitchhit )
 INPUT_PORTS_END
 
 static MACHINE_CONFIG_START( pitchhit )
-	MCFG_CPU_ADD("maincpu", M6809, XTAL_4MHz / 4)
+	MCFG_CPU_ADD("maincpu", MC6809, XTAL_4MHz) // clock buffered through 74HC4060
 	MCFG_CPU_PROGRAM_MAP(main_map)
 
 	MCFG_DEVICE_ADD("via", VIA6522, XTAL_4MHz / 4)

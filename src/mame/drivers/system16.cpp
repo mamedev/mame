@@ -414,7 +414,7 @@ WRITE8_MEMBER(segas1x_bootleg_state::tturfbl_soundbank_w)
 			break;
 		default:
 			m_soundbank_ptr = nullptr;
-			logerror("Invalid bank setting %02X (%04X)\n", data, space.device().safe_pc());
+			logerror("Invalid bank setting %02X (%04X)\n", data, m_soundcpu->pc());
 			break;
 	}
 }
@@ -524,27 +524,6 @@ void segas1x_bootleg_state::set_bg_page( int data )
 	m_bg_page[2] = (data >> 4) & 0x0f;
 	m_bg_page[3] = data & 0x0f;
 }
-
-#ifdef UNUSED_CODE
-static ADDRESS_MAP_START( bayroute_map, AS_PROGRAM, 16, segas1x_bootleg_state )
-	AM_RANGE(0x000000, 0x0bffff) AM_ROM
-	AM_RANGE(0x100000, 0x100003) AM_WRITENOP // tilebank control?
-	AM_RANGE(0x500000, 0x503fff) AM_RAM // work ram
-	AM_RANGE(0x600000, 0x600fff) AM_RAM AM_SHARE("sprites")
-	AM_RANGE(0x700000, 0x70ffff) AM_RAM_WRITE(sys16_tileram_w) AM_SHARE("tileram")
-	AM_RANGE(0x710000, 0x710fff) AM_RAM_WRITE(sys16_textram_w) AM_SHARE("textram")
-	AM_RANGE(0x800000, 0x800fff) AM_RAM_WRITE(paletteram_w) AM_SHARE("paletteram")
-	AM_RANGE(0x900000, 0x900001) AM_WRITE(sys16_coinctrl_w)
-	AM_RANGE(0x901002, 0x901003) AM_READ_PORT("P1")
-	AM_RANGE(0x901006, 0x901007) AM_READ_PORT("P2")
-	AM_RANGE(0x901000, 0x901001) AM_READ_PORT("SERVICE")
-	AM_RANGE(0x902002, 0x902003) AM_READ_PORT("DSW1")
-	AM_RANGE(0x902000, 0x902001) AM_READ_PORT("DSW2")
-	AM_RANGE(0xff0006, 0xff0007) AM_WRITE(sound_command_irq_w)
-	AM_RANGE(0xff0020, 0xff003f) AM_WRITENOP // config regs
-ADDRESS_MAP_END
-#endif
-
 
 
 /***************************************************************************/
@@ -1226,7 +1205,7 @@ WRITE8_MEMBER(segas1x_bootleg_state::shdancbl_bankctrl_w)
 			break;
 		default:
 			m_soundbank_ptr = nullptr;
-			logerror("Invalid bank setting %02X (%04X)\n", data, space.device().safe_pc());
+			logerror("Invalid bank setting %02X (%04X)\n", data, m_soundcpu->pc());
 			break;
 	}
 }
@@ -1372,7 +1351,7 @@ ADDRESS_MAP_END
 
 WRITE16_MEMBER(segas1x_bootleg_state::ddcrewbl_spritebank_w)
 {
-//  printf("banking write %08x: %04x (%04x %04x)\n", space.device().safe_pc(), offset*2, data&mem_mask, mem_mask);
+//  printf("banking write %08x: %04x (%04x %04x)\n", m_maincpu->pc(), offset*2, data&mem_mask, mem_mask);
 
 	data &= mem_mask;
 //  offset &= 0x7;
@@ -3947,7 +3926,7 @@ DRIVER_INIT_MEMBER(segas1x_bootleg_state,beautyb)
 	{
 		rom[x] = rom[x] ^ 0x2400;
 
-		if (x & 8) rom[x] = BITSWAP16(rom[x],15,14,10,12,  11,13,9,8,
+		if (x & 8) rom[x] = bitswap<16>(rom[x],15,14,10,12,  11,13,9,8,
 									7,6,5,4,   3,2,1,0 );
 	}
 

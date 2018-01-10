@@ -1675,7 +1675,7 @@ ROM_END
 //    YEAR  NAME      PARENT    COMPAT  MACHINE       INPUT     STATE           INIT      COMPANY                  FULLNAME                             FLAGS
 COMP( 1988, socrates, 0,        0,      socrates,     socrates, socrates_state, socrates, "Video Technology",      "Socrates Educational Video System", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // English NTSC, no title copyright
 COMP( 1988, socratfc, socrates, 0,      socrates,     socrates, socrates_state, socrates, "Video Technology",      "Socrates SAITOUT",                  MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // French Canandian NTSC, 1988 title copyright
-COMP( 1988, profweis, socrates, 0,      socrates_pal, socrates, socrates_state, socrates, "Video Technology/Yeno", "Professor Weiss-Alles",             MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // German PAL, 1988 title copyright
+COMP( 1988, profweis, socrates, 0,      socrates_pal, socrates, socrates_state, socrates, "Video Technology / Yeno", "Professor Weiss-Alles",             MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // German PAL, 1988 title copyright
 // Yeno Professeur Saitout goes here (french SECAM)
 // ? goes here (spanish PAL)
 

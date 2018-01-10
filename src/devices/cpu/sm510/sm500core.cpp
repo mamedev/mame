@@ -6,7 +6,6 @@
 
   TODO:
   - EXKSA, EXKFA opcodes
-  - SM500 data book suggests that R1 divider output is selectable, but how?
   - unknown which O group is which W output, guessed for now (segments and H should be ok)
 
 */
@@ -134,9 +133,9 @@ void sm500_device::lcd_update()
 
 void sm500_device::clock_melody()
 {
-	// R1 buzzer from divider, R2-R4 generic outputs
-	u8 out = m_div >> 2 & 1;
-	out = (out & ~m_r) | (~m_r & 0xe);
+	// R1 from divider or direct control, R2-R4 generic outputs
+	u8 mask = (m_r_mask_option == SM510_R_CONTROL_OUTPUT) ? 1 : (m_div >> m_r_mask_option & 1);
+	u8 out = (mask & ~m_r) | (~m_r & 0xe);
 
 	// output to R pins
 	if (out != m_r_out)

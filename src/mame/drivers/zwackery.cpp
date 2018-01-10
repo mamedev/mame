@@ -471,7 +471,7 @@ READ8_MEMBER( zwackery_state::pia2_porta_r )
 // 6840 take 14 additional cycles
 READ8_MEMBER( zwackery_state::ptm_r )
 {
-	space.device().execute().adjust_icount(-14);
+	m_maincpu->adjust_icount(-14);
 	return m_ptm->read(space, offset);
 }
 

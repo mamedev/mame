@@ -75,7 +75,7 @@ nubus_m2video_device::nubus_m2video_device(const machine_config &mconfig, device
 	m_vram32(nullptr), m_mode(0), m_vbl_disable(0), m_toggle(0), m_count(0), m_clutoffs(0), m_timer(nullptr),
 	m_assembled_tag(util::string_format("%s:%s", tag, M2VIDEO_SCREEN_NAME))
 {
-	m_screen_tag = m_assembled_tag.c_str();
+	static_set_screen(*this, m_assembled_tag.c_str());
 }
 
 //-------------------------------------------------
@@ -92,7 +92,7 @@ void nubus_m2video_device::device_start()
 
 	slotspace = get_slotspace();
 
-//  printf("[m2video %p] slotspace = %x\n", this, slotspace);
+//  logerror("[m2video %p] slotspace = %x\n", this, slotspace);
 
 	m_vram.resize(VRAM_SIZE);
 	m_vram32 = (uint32_t *)&m_vram[0];
@@ -102,7 +102,7 @@ void nubus_m2video_device::device_start()
 	m_nubus->install_device(slotspace+0x80000, slotspace+0xeffff, read32_delegate(FUNC(nubus_m2video_device::m2video_r), this), write32_delegate(FUNC(nubus_m2video_device::m2video_w), this));
 
 	m_timer = timer_alloc(0, nullptr);
-	m_timer->adjust(m_screen->time_until_pos(479, 0), 0);
+	m_timer->adjust(screen().time_until_pos(479, 0), 0);
 }
 
 //-------------------------------------------------
@@ -130,7 +130,7 @@ void nubus_m2video_device::device_timer(emu_timer &timer, device_timer_id tid, i
 		raise_slot_irq();
 	}
 
-	m_timer->adjust(m_screen->time_until_pos(479, 0), 0);
+	m_timer->adjust(screen().time_until_pos(479, 0), 0);
 }
 
 /***************************************************************************
@@ -246,7 +246,7 @@ WRITE32_MEMBER( nubus_m2video_device::m2video_w )
 			break;
 
 		case 0x4007:    // DAC control
-//          printf("%08x to DAC control (PC=%x)\n", data, space.device().safe_pc());
+//          logerror("%08x to DAC control %s\n", data, machine().describe_context());
 			m_clutoffs = (data>>24)&0xff;
 			break;
 
@@ -255,7 +255,7 @@ WRITE32_MEMBER( nubus_m2video_device::m2video_w )
 
 			if (m_count == 3)
 			{
-//                printf("RAMDAC: color %02x = %02x %02x %02x (PC=%x)\n", m_clutoffs, m_colors[0], m_colors[1], m_colors[2], space.device().safe_pc() );
+//                logerror("RAMDAC: color %02x = %02x %02x %02x %s\n", m_clutoffs, m_colors[0], m_colors[1], m_colors[2], machine().describe_context() );
 				m_palette[m_clutoffs] = rgb_t(m_colors[0], m_colors[1], m_colors[2]);
 				m_clutoffs++;
 				if (m_clutoffs > 255)
@@ -276,7 +276,7 @@ WRITE32_MEMBER( nubus_m2video_device::m2video_w )
 			break;
 
 		default:
-//          printf("m2video_w: %08x @ %x, mask %08x (PC=%x)\n", data, offset, mem_mask, space.device().safe_pc());
+//          logerror("m2video_w: %08x @ %x, mask %08x %s\n", data, offset, mem_mask, machine().describe_context());
 			break;
 	}
 }
@@ -290,7 +290,7 @@ READ32_MEMBER( nubus_m2video_device::m2video_r )
 	}
 	else
 	{
-//      printf("m2video_r: @ %x, mask %08x (PC=%x)\n", offset, mem_mask, space.device().safe_pc());
+//      logerror("m2video_r: @ %x, mask %08x %s\n", offset, mem_mask, machine().describe_context());
 	}
 
 	return 0;

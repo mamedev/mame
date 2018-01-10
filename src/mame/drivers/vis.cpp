@@ -535,6 +535,7 @@ WRITE8_MEMBER(vis_vga_device::vga_w)
 			break;
 		case 0x05:
 		case 0x25:
+			assert(vga.crtc.index < ARRAY_LENGTH(m_crtc_regs));
 			m_crtc_regs[vga.crtc.index] = data;
 			switch(vga.crtc.index)
 			{

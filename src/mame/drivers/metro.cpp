@@ -115,11 +115,11 @@ READ16_MEMBER(metro_state::metro_irq_cause_r)
 	/* interrupt cause, used by
 
 	int[0] vblank
-	int[1] hblank (bangball for faster intermission skip, 
-	               puzzli for gameplay water effect, 
-				   blzntrnd title screen scroll (enabled all the time then?),
-				   unused/empty in balcube, daitoride, karatour,
-				   unchecked mouja & other i4300 games )
+	int[1] hblank (bangball for faster intermission skip,
+	               puzzli for gameplay water effect,
+	               blzntrnd title screen scroll (enabled all the time then?),
+	               unused/empty in balcube, daitoride, karatour,
+	               unchecked mouja & other i4300 games )
 	int[2] blitter
 	int[3] ?            KARATOUR
 	int[4] ?
@@ -179,7 +179,7 @@ IRQ_CALLBACK_MEMBER(metro_state::metro_irq_callback)
 
 WRITE16_MEMBER(metro_state::metro_irq_cause_w)
 {
-	//if (data & ~0x15) logerror("CPU #0 PC %06X : unknown bits of irqcause written: %04X\n", space.device().safe_pc(), data);
+	//if (data & ~0x15) logerror("CPU #0 PC %06X : unknown bits of irqcause written: %04X\n", m_maincpu->pc(), data);
 
 	if (ACCESSING_BITS_0_7)
 	{
@@ -291,7 +291,7 @@ WRITE16_MEMBER(metro_state::metro_soundlatch_w)
 	{
 		m_soundlatch->write(space, 0, data & 0xff);
 		m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
-		space.device().execute().spin_until_interrupt();
+		m_maincpu->spin_until_interrupt();
 		m_busy_sndcpu = 1;
 	}
 }
@@ -460,7 +460,7 @@ WRITE16_MEMBER(metro_state::metro_coin_lockout_1word_w)
 		machine().bookkeeping().coin_counter_w(0, data & 1);
 		machine().bookkeeping().coin_counter_w(1, data & 2);
 	}
-	if (data & ~3)  logerror("CPU #0 PC %06X : unknown bits of coin lockout written: %04X\n", space.device().safe_pc(), data);
+	if (data & ~3)  logerror("CPU #0 PC %06X : unknown bits of coin lockout written: %04X\n", m_maincpu->pc(), data);
 }
 
 // value written doesn't matter, also each counted coin gets reported after one full second.
@@ -470,7 +470,7 @@ WRITE16_MEMBER(metro_state::metro_coin_lockout_4words_w)
 	machine().bookkeeping().coin_counter_w((offset >> 1) & 1, offset & 1);
 //  machine().bookkeeping().coin_lockout_w((offset >> 1) & 1, offset & 1);
 
-	if (data & ~1)  logerror("CPU #0 PC %06X : unknown bits of coin lockout written: %04X\n", space.device().safe_pc(), data);
+	if (data & ~1)  logerror("CPU #0 PC %06X : unknown bits of coin lockout written: %04X\n", m_maincpu->pc(), data);
 }
 
 WRITE_LINE_MEMBER(metro_state::vdp_blit_end_w)
@@ -539,7 +539,7 @@ READ16_MEMBER(metro_state::balcube_dsw_r)
 		case 0x17FFE:   return BIT(dsw2, 6) ? 0x40 : 0;
 		case 0x0FFFE:   return BIT(dsw2, 7) ? 0x40 : 0;
 	}
-	logerror("CPU #0 PC %06X : unknown dsw address read: %04X\n", space.device().safe_pc(), offset);
+	logerror("CPU #0 PC %06X : unknown dsw address read: %04X\n", m_maincpu->pc(), offset);
 	return 0xffff;
 }
 
@@ -5535,7 +5535,7 @@ DRIVER_INIT_MEMBER(metro_state,balcube)
 
 	for (unsigned i = 0; i < len; i+=2)
 	{
-		ROM[i]  = BITSWAP8(ROM[i],0,1,2,3,4,5,6,7);
+		ROM[i]  = bitswap<8>(ROM[i],0,1,2,3,4,5,6,7);
 	}
 
 	metro_common();
@@ -5552,11 +5552,11 @@ DRIVER_INIT_MEMBER(metro_state,dharmak)
 	{
 		uint8_t dat;
 		dat = src[i + 1];
-		dat = BITSWAP8(dat, 7,3,2,4, 5,6,1,0);
+		dat = bitswap<8>(dat, 7,3,2,4, 5,6,1,0);
 		src[i + 1] = dat;
 
 		dat = src[i + 3];
-		dat = BITSWAP8(dat, 7,2,5,4, 3,6,1,0);
+		dat = bitswap<8>(dat, 7,2,5,4, 3,6,1,0);
 		src[i + 3] = dat;
 	}
 

@@ -172,7 +172,7 @@ WRITE8_MEMBER(vsnes_state::vsnes_coin_counter_w)
 		//"bnglngby" and "cluclu"
 	if( data & 0xfe )
 	{
-		logerror("vsnes_coin_counter_w: pc = 0x%04x - data = 0x%02x\n", space.device().safe_pc(), data);
+		logerror("vsnes_coin_counter_w: pc = 0x%04x - data = 0x%02x\n", m_maincpu->pc(), data);
 	}
 }
 
@@ -188,7 +188,7 @@ WRITE8_MEMBER(vsnes_state::vsnes_coin_counter_1_w)
 	if( data & 0xfe ) //vsbball service mode
 	{
 	//do something?
-		logerror("vsnes_coin_counter_1_w: pc = 0x%04x - data = 0x%02x\n", space.device().safe_pc(), data);
+		logerror("vsnes_coin_counter_1_w: pc = 0x%04x - data = 0x%02x\n", m_subcpu->pc(), data);
 	}
 
 }

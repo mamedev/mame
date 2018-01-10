@@ -90,7 +90,7 @@ WRITE16_MEMBER(esd16_state::esd16_sound_command_w)
 	{
 		m_soundlatch->write(space, 0, data & 0xff);
 		m_audiocpu->set_input_line(0, ASSERT_LINE);      // Generate an IRQ
-		space.device().execute().spin_until_time(attotime::from_usec(50));  // Allow the other CPU to reply
+		m_maincpu->spin_until_time(attotime::from_usec(50));  // Allow the other CPU to reply
 	}
 }
 
@@ -110,7 +110,7 @@ READ16_MEMBER(esd16_state::esd_eeprom_r)
 		return ((m_eeprom->do_read() & 0x01) << 15);
 	}
 
-//  logerror("(0x%06x) unk EEPROM read: %04x\n", space.device().safe_pc(), mem_mask);
+//  logerror("(0x%06x) unk EEPROM read: %04x\n", m_maincpu->pc(), mem_mask);
 	return 0;
 }
 
@@ -119,7 +119,7 @@ WRITE16_MEMBER(esd16_state::esd_eeprom_w)
 	if (ACCESSING_BITS_8_15)
 		ioport("EEPROMOUT")->write(data, 0xffff);
 
-//  logerror("(0x%06x) Unk EEPROM write: %04x %04x\n", space.device().safe_pc(), data, mem_mask);
+//  logerror("(0x%06x) Unk EEPROM write: %04x %04x\n", m_maincpu->pc(), data, mem_mask);
 }
 
 

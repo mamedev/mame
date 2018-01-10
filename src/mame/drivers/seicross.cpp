@@ -87,7 +87,7 @@ READ8_MEMBER(seicross_state::portB_r)
 
 WRITE8_MEMBER(seicross_state::portB_w)
 {
-	//logerror("PC %04x: 8910 port B = %02x\n", space.device().safe_pc(), data);
+	//logerror("PC %04x: 8910 port B = %02x\n", m_maincpu->pc(), data);
 	/* bit 0 is IRQ enable */
 	m_irq_mask = data & 1;
 
@@ -628,7 +628,7 @@ DRIVER_INIT_MEMBER(seicross_state,friskytb)
 	// this code is in ROM 6.3h, maps to MCU at dxxx
 	for (int i = 0; i < 0x7800; i++)
 	{
-		m_decrypted_opcodes[i] = BITSWAP8(ROM[i], 6, 7, 5, 4, 3, 2, 0, 1);
+		m_decrypted_opcodes[i] = bitswap<8>(ROM[i], 6, 7, 5, 4, 3, 2, 0, 1);
 	}
 }
 

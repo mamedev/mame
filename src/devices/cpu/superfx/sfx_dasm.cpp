@@ -18,7 +18,7 @@ offs_t superfx_disassembler::disassemble(std::ostream &stream, offs_t pc, const 
 	uint8_t  param0 = opcodes.r8(pc+1);
 	uint8_t  param1 = opcodes.r8(pc+2);
 	uint16_t alt = m_config->get_alt();
-	
+
 	uint8_t bytes_consumed = 1;
 
 	switch(op)

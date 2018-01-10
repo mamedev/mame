@@ -81,36 +81,18 @@ uint32_t next_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, 
 	return 0;
 }
 
-/* Dummy catcher for any unknown r/w */
-READ8_MEMBER( next_state::io_r )
-{
-	if(!machine().side_effect_disabled())
-		printf("io_r %08x (%08x)\n",offset+0x02000000, space.device().safe_pc());
-
-	if(offset == 0xc0)
-		return 0;
-
-	return 0xff;
-}
-
-WRITE8_MEMBER( next_state::io_w )
-{
-	if(!machine().side_effect_disabled())
-		printf("io_w %08x, %02x (%08x)\n",offset+0x02000000,data, space.device().safe_pc());
-}
-
 /* map ROM at 0x01000000-0x0101ffff? */
 READ32_MEMBER( next_state::rom_map_r )
 {
 	if(0 && !machine().side_effect_disabled())
-		printf("%08x ROM MAP?\n",space.device().safe_pc());
+		printf("%08x ROM MAP?\n",maincpu->pc());
 	return 0x01000000;
 }
 
 READ32_MEMBER( next_state::scr2_r )
 {
 	if(0 && !machine().side_effect_disabled())
-		printf("%08x\n",space.device().safe_pc());
+		printf("%08x\n",maincpu->pc());
 	/*
 	x--- ---- ---- ---- ---- ---- ---- ---- dsp reset
 	-x-- ---- ---- ---- ---- ---- ---- ---- dsp block end
@@ -147,7 +129,7 @@ READ32_MEMBER( next_state::scr2_r )
 WRITE32_MEMBER( next_state::scr2_w )
 {
 	if(0 && !machine().side_effect_disabled())
-		printf("scr2_w %08x (%08x)\n", data, space.device().safe_pc());
+		printf("scr2_w %08x (%08x)\n", data, maincpu->pc());
 	COMBINE_DATA(&scr2);
 
 	rtc->ce_w(BIT(scr2, 8));
@@ -475,7 +457,7 @@ READ32_MEMBER( next_state::dma_regs_r)
 	}
 
 	const char *name = dma_name(slot);
-	logerror("dma_regs_r %s:%d %08x (%08x)\n", name, reg, res, space.device().safe_pc());
+	logerror("dma_regs_r %s:%d %08x (%08x)\n", name, reg, res, maincpu->pc());
 
 	return res;
 }
@@ -487,7 +469,7 @@ WRITE32_MEMBER( next_state::dma_regs_w)
 
 	const char *name = dma_name(slot);
 
-	logerror("dma_regs_w %s:%d %08x (%08x)\n", name, reg, data, space.device().safe_pc());
+	logerror("dma_regs_w %s:%d %08x (%08x)\n", name, reg, data, maincpu->pc());
 	switch(reg) {
 	case 0:
 		dma_slots[slot].start = data;
@@ -512,8 +494,8 @@ READ32_MEMBER( next_state::dma_ctrl_r)
 
 	const char *name = dma_name(slot);
 
-	if(space.device().safe_pc() != 0x409bb4e)
-		logerror("dma_ctrl_r %s:%d %02x (%08x)\n", name, reg, dma_slots[slot].state, space.device().safe_pc());
+	if(maincpu->pc() != 0x409bb4e)
+		logerror("dma_ctrl_r %s:%d %02x (%08x)\n", name, reg, dma_slots[slot].state, maincpu->pc());
 
 	return reg ? 0 : dma_slots[slot].state << 24;
 }
@@ -523,7 +505,7 @@ WRITE32_MEMBER( next_state::dma_ctrl_w)
 	int slot = offset >> 2;
 	int reg = offset & 3;
 	const char *name = dma_name(slot);
-	logerror("dma_ctrl_w %s:%d %08x @ %08x (%08x)\n", name, reg, data, mem_mask, space.device().safe_pc());
+	logerror("dma_ctrl_w %s:%d %08x @ %08x (%08x)\n", name, reg, data, mem_mask, maincpu->pc());
 	if(!reg) {
 		if(ACCESSING_BITS_16_23)
 			dma_do_ctrl_w(slot, data >> 16);
@@ -580,7 +562,7 @@ const int next_state::scsi_clocks[4] = { 10000000, 12000000, 20000000, 16000000 
 READ32_MEMBER( next_state::scsictrl_r )
 {
 	uint32_t res = (scsictrl << 24) | (scsistat << 16);
-	logerror("scsictrl_read %08x @ %08x (%08x)\n", res, mem_mask, space.device().safe_pc());
+	logerror("scsictrl_read %08x @ %08x (%08x)\n", res, mem_mask, maincpu->pc());
 	return res;
 }
 
@@ -600,11 +582,11 @@ WRITE32_MEMBER( next_state::scsictrl_w )
 				scsictrl & 0x04 ? " flush" : "",
 				scsictrl & 0x02 ? " reset" : "",
 				scsictrl & 0x01 ? "wd3392" : "ncr5390",
-				space.device().safe_pc());
+				maincpu->pc());
 	}
 	if(ACCESSING_BITS_16_23) {
 		scsistat = data >> 16;
-		logerror("SCSIstat %02x (%08x)\n", data, space.device().safe_pc());
+		logerror("SCSIstat %02x (%08x)\n", data, maincpu->pc());
 	}
 }
 
@@ -627,7 +609,7 @@ READ32_MEMBER( next_state::dsp_r)
 
 WRITE32_MEMBER( next_state::fdc_control_w )
 {
-	logerror("FDC write %02x (%08x)\n", data >> 24, space.device().safe_pc());
+	logerror("FDC write %02x (%08x)\n", data >> 24, maincpu->pc());
 }
 
 READ32_MEMBER( next_state::fdc_control_r )
@@ -666,14 +648,14 @@ READ32_MEMBER( next_state::fdc_control_r )
 
 READ32_MEMBER( next_state::phy_r )
 {
-	logerror("phy_r %d %08x (%08x)\n", offset, phy[offset], space.device().safe_pc());
+	logerror("phy_r %d %08x (%08x)\n", offset, phy[offset], maincpu->pc());
 	return phy[offset] | (0 << 24);
 }
 
 WRITE32_MEMBER( next_state::phy_w )
 {
 	COMBINE_DATA(phy+offset);
-	logerror("phy_w %d %08x (%08x)\n", offset, phy[offset], space.device().safe_pc());
+	logerror("phy_w %d %08x (%08x)\n", offset, phy[offset], maincpu->pc());
 }
 
 void next_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)

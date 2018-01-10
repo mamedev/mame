@@ -58,7 +58,7 @@ WRITE16_MEMBER(drgnmst_state::drgnmst_snd_command_w)
 	if (ACCESSING_BITS_0_7)
 	{
 		m_snd_command = (data & 0xff);
-		space.device().execute().yield();
+		m_maincpu->yield();
 	}
 }
 

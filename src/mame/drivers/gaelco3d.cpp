@@ -297,7 +297,7 @@ READ16_MEMBER(gaelco3d_state::eeprom_data_r)
 READ16_MEMBER(gaelco3d_state::sound_status_r)
 {
 	if (LOG)
-		logerror("%06X:sound_status_r(%02X) = %02X\n", space.device().safe_pc(), offset, m_sound_status);
+		logerror("%s:sound_status_r(%02X) = %02X\n", machine().describe_context(), offset, m_sound_status);
 	if (ACCESSING_BITS_0_7)
 		return m_sound_status;
 	return 0xffff;
@@ -391,7 +391,7 @@ WRITE_LINE_MEMBER(gaelco3d_state::fp_analog_clock_w)
 
 READ32_MEMBER(gaelco3d_state::tms_m68k_ram_r)
 {
-//  logerror("%06X:tms_m68k_ram_r(%04X) = %08X\n", space.device().safe_pc(), offset, !(offset & 1) ? ((int32_t)m_m68k_ram_base[offset/2] >> 16) : (int)(int16_t)m_m68k_ram_base[offset/2]);
+//  logerror("%s:tms_m68k_ram_r(%04X) = %08X\n", machine().describe_context(), offset, !(offset & 1) ? ((int32_t)m_m68k_ram_base[offset/2] >> 16) : (int)(int16_t)m_m68k_ram_base[offset/2]);
 	return (int32_t)(int16_t)m_m68k_ram_base[offset ^ m_tms_offset_xor];
 }
 
@@ -448,7 +448,7 @@ WRITE16_MEMBER(gaelco3d_state::tms_comm_w)
 {
 	COMBINE_DATA(&m_tms_comm_base[offset ^ m_tms_offset_xor]);
 	if (LOG)
-		logerror("%06X:tms_comm_w(%02X) = %08X & %08X\n", space.device().safe_pc(), offset*2, data, mem_mask);
+		logerror("%s:tms_comm_w(%02X) = %08X & %08X\n", machine().describe_context(), offset*2, data, mem_mask);
 }
 
 

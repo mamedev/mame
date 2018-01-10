@@ -236,7 +236,7 @@ READ16_MEMBER(topspeed_state::motor_r)
 			return 0;
 
 		default:
-			logerror("CPU #0 PC %06x: warning - read from motor cpu %03x\n", space.device().safe_pc(), offset);
+			logerror("CPU #0 PC %06x: warning - read from motor cpu %03x\n", m_subcpu->pc(), offset);
 			return 0;
 	}
 }
@@ -244,7 +244,7 @@ READ16_MEMBER(topspeed_state::motor_r)
 WRITE16_MEMBER(topspeed_state::motor_w)
 {
 	// Writes $900000-25 and $900200-219
-	logerror("CPU #0 PC %06x: warning - write %04x to motor cpu %03x\n", space.device().safe_pc(), data, offset);
+	logerror("CPU #0 PC %06x: warning - write %04x to motor cpu %03x\n", m_subcpu->pc(), data, offset);
 }
 
 WRITE8_MEMBER(topspeed_state::coins_w)
@@ -316,7 +316,7 @@ WRITE8_MEMBER(topspeed_state::msm5205_command_w)
 			break;
 
 		default:
-			logerror("Unhandled MSM5205 control write to %x with %x (PC:%.4x)\n", 0xb000 + offset, data, space.device().safe_pc());
+			logerror("Unhandled MSM5205 control write to %x with %x (PC:%.4x)\n", 0xb000 + offset, data, m_audiocpu->pc());
 			break;
 	}
 }

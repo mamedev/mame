@@ -178,7 +178,7 @@ WRITE8_MEMBER( vcs80_state::pio_pb_w )
 
 	*/
 
-	uint8_t led_data = BITSWAP8(data & 0x7f, 7, 5, 6, 4, 3, 2, 1, 0);
+	uint8_t led_data = bitswap<8>(data & 0x7f, 7, 5, 6, 4, 3, 2, 1, 0);
 	int digit = m_keylatch;
 
 	/* skip middle digit */

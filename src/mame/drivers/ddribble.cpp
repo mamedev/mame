@@ -259,15 +259,15 @@ void ddribble_state::machine_reset()
 static MACHINE_CONFIG_START( ddribble )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6809,  XTAL_18_432MHz/12)  /* verified on pcb */
+	MCFG_CPU_ADD("maincpu", MC6809E, XTAL_18_432MHz/12)  /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(cpu0_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", ddribble_state,  ddribble_interrupt_0)
 
-	MCFG_CPU_ADD("cpu1", M6809, XTAL_18_432MHz/12)  /* verified on pcb */
+	MCFG_CPU_ADD("cpu1", MC6809E, XTAL_18_432MHz/12)  /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(cpu1_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", ddribble_state,  ddribble_interrupt_1)
 
-	MCFG_CPU_ADD("cpu2", M6809, XTAL_18_432MHz/12)  /* verified on pcb */
+	MCFG_CPU_ADD("cpu2", MC6809E, XTAL_18_432MHz/12)  /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(cpu2_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))  /* we need heavy synch */

@@ -786,7 +786,7 @@ project "bx"
 	}
 
 	files {
-	    MAME_DIR .. "3rdparty/bx/src/allocator.cpp",
+		MAME_DIR .. "3rdparty/bx/src/allocator.cpp",
 		MAME_DIR .. "3rdparty/bx/src/bx.cpp",
 		MAME_DIR .. "3rdparty/bx/src/commandline.cpp",
 		MAME_DIR .. "3rdparty/bx/src/crtnone.cpp",

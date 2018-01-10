@@ -488,7 +488,7 @@ WRITE8_MEMBER(cntsteer_state::cntsteer_background_w)
 /* checks area 0x2000-0x2fff with this address config. */
 READ8_MEMBER(cntsteer_state::cntsteer_background_mirror_r)
 {
-	return m_videoram2[BITSWAP16(offset,15,14,13,12,5,4,3,2,1,0,11,10,9,8,7,6)];
+	return m_videoram2[bitswap<16>(offset,15,14,13,12,5,4,3,2,1,0,11,10,9,8,7,6)];
 }
 
 /*************************************
@@ -511,7 +511,7 @@ WRITE8_MEMBER(cntsteer_state::cntsteer_sound_w)
 WRITE8_MEMBER(cntsteer_state::zerotrgt_ctrl_w)
 {
 	/*TODO: check this.*/
-	logerror("CTRL: %04x: %04x: %04x\n", space.device().safe_pc(), offset, data);
+	logerror("CTRL: %04x: %04x: %04x\n", m_maincpu->pc(), offset, data);
 //  if (offset == 0) m_subcpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 
 	// Wrong - bits 0 & 1 used on this

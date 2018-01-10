@@ -129,7 +129,7 @@ void elwro800_state::elwro800jr_mmu_w(uint8_t data)
 	uint8_t cs;
 	uint8_t ls175;
 
-	ls175 = BITSWAP8(data, 7, 6, 5, 4, 4, 5, 7, 6) & 0x0f;
+	ls175 = bitswap<8>(data, 7, 6, 5, 4, 4, 5, 7, 6) & 0x0f;
 
 	cs = prom[((0x0000 >> 10) | (ls175 << 6)) & 0x1ff];
 	if (!BIT(cs,0))

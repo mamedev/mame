@@ -42,7 +42,6 @@
 #include "cpu/tms9900/tms9900.h"
 
 #include "sound/wave.h"
-#include "video/v9938.h"
 #include "machine/tms9901.h"
 #include "imagedev/cassette.h"
 

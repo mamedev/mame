@@ -3,7 +3,7 @@
 /*
  * PlayStation CPU emulator
  *
- * Copyright 2003-2013 smf
+ * Copyright 2003-2017 smf
  *
  * Known chip id's
  *   CXD8530AQ
@@ -1837,6 +1837,10 @@ void psxcpu_device::device_start()
 	save_item( NAME( m_multiplier_operation ) );
 	save_item( NAME( m_multiplier_operand1 ) );
 	save_item( NAME( m_multiplier_operand2 ) );
+	save_item( NAME( m_exp_base ) );
+	save_item( NAME( m_exp_config ) );
+	save_item( NAME( m_ram_config ) );
+	save_item( NAME( m_rom_config ) );
 
 	state_add( STATE_GENPC, "GENPC", m_pc ).noshow();
 	state_add( STATE_GENPCBASE, "CURPC", m_pc ).noshow();
@@ -2023,6 +2027,8 @@ void psxcpu_device::device_post_load()
 	update_memory_handlers();
 	update_address_masks();
 	update_scratchpad();
+	update_ram_config();
+	update_rom_config();
 }
 
 

@@ -148,7 +148,7 @@ void a2bus_corvfdc01_device::device_reset()
     read_c0nx - called for reads from this card's c0nx space
 -------------------------------------------------*/
 
-uint8_t a2bus_corvfdc01_device::read_c0nx(address_space &space, uint8_t offset)
+uint8_t a2bus_corvfdc01_device::read_c0nx(uint8_t offset)
 {
 	switch (offset)
 	{
@@ -161,16 +161,16 @@ uint8_t a2bus_corvfdc01_device::read_c0nx(address_space &space, uint8_t offset)
 			return m_fdc_local_status | LS_8IN_mask;
 
 		case  8:    // WD1793 at 8-11
-			return m_wdfdc->status_r(space, offset);
+			return m_wdfdc->status_r();
 
 		case  9:
-			return m_wdfdc->track_r(space, offset);
+			return m_wdfdc->track_r();
 
 		case 10:
-			return m_wdfdc->sector_r(space, offset);
+			return m_wdfdc->sector_r();
 
 		case 11:
-			return m_wdfdc->data_r(space, offset);
+			return m_wdfdc->data_r();
 	}
 
 	return 0xff;
@@ -181,7 +181,7 @@ uint8_t a2bus_corvfdc01_device::read_c0nx(address_space &space, uint8_t offset)
     write_c0nx - called for writes to this card's c0nx space
 -------------------------------------------------*/
 
-void a2bus_corvfdc01_device::write_c0nx(address_space &space, uint8_t offset, uint8_t data)
+void a2bus_corvfdc01_device::write_c0nx(uint8_t offset, uint8_t data)
 {
 	int current_drive;
 	floppy_image_device *floppy = nullptr;
@@ -228,19 +228,19 @@ void a2bus_corvfdc01_device::write_c0nx(address_space &space, uint8_t offset, ui
 			break;
 
 		case  8:    // FDC COMMAMD REG
-			m_wdfdc->cmd_w(space, offset, data);
+			m_wdfdc->cmd_w(data);
 			break;
 
 		case  9:    // FDC TRACK REG
-			m_wdfdc->track_w(space, offset, data);
+			m_wdfdc->track_w(data);
 			break;
 
 		case 10:    // FDC SECTOR REG
-			m_wdfdc->sector_w(space, offset, data);
+			m_wdfdc->sector_w(data);
 			break;
 
 		case 11:    // FDC DATA REG
-			m_wdfdc->data_w(space, offset, data);
+			m_wdfdc->data_w(data);
 			break;
 	}
 }
@@ -249,7 +249,7 @@ void a2bus_corvfdc01_device::write_c0nx(address_space &space, uint8_t offset, ui
     read_cnxx - called for reads from this card's cnxx space
 -------------------------------------------------*/
 
-uint8_t a2bus_corvfdc01_device::read_cnxx(address_space &space, uint8_t offset)
+uint8_t a2bus_corvfdc01_device::read_cnxx(uint8_t offset)
 {
 	return m_rom[offset & 0x1f];
 }

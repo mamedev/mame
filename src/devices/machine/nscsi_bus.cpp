@@ -3,6 +3,15 @@
 #include "emu.h"
 #include "nscsi_bus.h"
 
+#define LOG_GENERAL (1U << 0)
+#define LOG_STATE   (1U << 1)
+#define LOG_CONTROL (1U << 2)
+
+//#define VERBOSE (LOG_GENERAL | LOG_STATE | LOG_CONTROL)
+#define VERBOSE (LOG_GENERAL)
+
+#include "logmacro.h"
+
 DEFINE_DEVICE_TYPE(NSCSI_BUS,       nscsi_bus_device, "nscsi_bus",       "SCSI Bus (new)")
 DEFINE_DEVICE_TYPE(NSCSI_CONNECTOR, nscsi_connector,  "nscsi_connector", "SCSI Connector Abstraction (new)")
 
@@ -49,9 +58,8 @@ void nscsi_bus_device::regen_ctrl(int refid)
 	for(int i=0; i<devcnt; i++)
 		ctrl |= dev[i].ctrl;
 
-	if(0) {
-		logerror("%s: ctrl %c%c%c%c%c%c%c%c%c %s %04x -",
-					tag(),
+	if(VERBOSE & LOG_CONTROL) {
+		LOGMASKED(LOG_CONTROL, "ctrl %c%c%c%c%c%c%c%c%c %s %04x\n",
 					ctrl & nscsi_device::S_RST ? 'R' : '.',
 					ctrl & nscsi_device::S_ATN ? 'A' : '.',
 					ctrl & nscsi_device::S_ACK ? 'K' : '.',
@@ -65,8 +73,7 @@ void nscsi_bus_device::regen_ctrl(int refid)
 					data);
 		for(int i=0; i<devcnt; i++)
 			if(dev[i].ctrl) {
-				logerror(" %d=", i);
-				logerror("%s%s%s%s%s%s%s%s%s",
+				LOGMASKED(LOG_CONTROL, "%d=%s%s%s%s%s%s%s%s%s\n", i,
 							dev[i].ctrl & nscsi_device::S_RST ? "R" : "",
 							dev[i].ctrl & nscsi_device::S_ATN ? "A" : "",
 							dev[i].ctrl & nscsi_device::S_ACK ? "K" : "",
@@ -77,7 +84,6 @@ void nscsi_bus_device::regen_ctrl(int refid)
 							dev[i].ctrl & nscsi_device::S_SEL ? "S" : "",
 							dev[i].ctrl & nscsi_device::S_BSY ? "B" : "");
 			}
-		logerror("\n");
 	}
 
 	octrl = octrl ^ ctrl;
@@ -265,14 +271,13 @@ void nscsi_full_device::step(bool timeout)
 		scsi_bus->data_w(scsi_refid, 0);
 		scsi_bus->ctrl_w(scsi_refid, 0, S_ALL);
 		scsi_state = IDLE;
-		logerror("%s: scsi bus reset\n", tag());
+		LOG("scsi bus reset\n");
 		return;
 	}
 
-	if(0)
-		logerror("%s: state=%d.%d %s\n",
-					tag(), scsi_state & STATE_MASK, (scsi_state & SUB_MASK) >> SUB_SHIFT,
-					timeout ? "timeout" : "change");
+	LOGMASKED(LOG_STATE, "state=%d.%d %s\n",
+		scsi_state & STATE_MASK, (scsi_state & SUB_MASK) >> SUB_SHIFT,
+		timeout ? "timeout" : "change");
 
 	switch(scsi_state & SUB_MASK ? scsi_state & SUB_MASK : scsi_state & STATE_MASK) {
 	case IDLE:
@@ -417,7 +422,7 @@ void nscsi_full_device::step(bool timeout)
 		if(ctrl & S_SEL)
 			return;
 		if(ctrl & S_ATN) {
-			logerror("%s: Parity error? Say what?\n", tag());
+			LOG("Parity error? Say what?\n");
 			scsi_state = IDLE;
 			break;
 		}
@@ -433,9 +438,8 @@ void nscsi_full_device::step(bool timeout)
 		break;
 
 	default:
-		logerror("%s: step() unexpected state %d.%d\n",
-					tag(),
-					scsi_state & STATE_MASK, (scsi_state & SUB_MASK) >> SUB_SHIFT);
+		LOG("step() unexpected state %d.%d\n",
+			scsi_state & STATE_MASK, (scsi_state & SUB_MASK) >> SUB_SHIFT);
 		exit(0);
 	}
 }
@@ -568,7 +572,7 @@ void nscsi_full_device::sense(bool deferred, uint8_t key)
 
 void nscsi_full_device::scsi_unknown_command()
 {
-	logerror("%s: Unhandled command %s", tag(), command_names[scsi_cmdbuf[0]]);
+	LOG("Unhandled command %s", command_names[scsi_cmdbuf[0]]);
 	for(int i=0; i != scsi_cmdsize; i++)
 		logerror(" %02x", scsi_cmdbuf[i]);
 	logerror("\n");
@@ -581,7 +585,7 @@ void nscsi_full_device::scsi_command()
 {
 	switch(scsi_cmdbuf[0]) {
 	case SC_REQUEST_SENSE:
-		logerror("%s: command REQUEST SENSE\n", tag());
+		LOG("command REQUEST SENSE\n");
 		scsi_data_in(SBUF_SENSE, 8);
 		scsi_status_complete(SS_GOOD);
 		break;
@@ -598,7 +602,7 @@ void nscsi_full_device::scsi_message()
 		return;
 	}
 
-	logerror("%s: Unknown message", tag());
+	LOG("Unknown message");
 	for(int i=0; i != scsi_cmdsize; i++)
 		logerror(" %02x", scsi_cmdbuf[i]);
 	logerror("\n");

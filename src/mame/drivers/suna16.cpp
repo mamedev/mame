@@ -51,7 +51,7 @@ WRITE16_MEMBER(suna16_state::soundlatch_w)
 	{
 		m_soundlatch->write(space, 0, data & 0xff );
 	}
-	if (data & ~0xff)   logerror("CPU#0 PC %06X - Sound latch unknown bits: %04X\n", space.device().safe_pc(), data);
+	if (data & ~0xff)   logerror("CPU#0 PC %06X - Sound latch unknown bits: %04X\n", m_maincpu->pc(), data);
 }
 
 
@@ -65,7 +65,7 @@ WRITE16_MEMBER(suna16_state::bssoccer_leds_w)
 		output().set_led_value(3, data & 0x08);
 		machine().bookkeeping().coin_counter_w(0, data & 0x10);
 	}
-	if (data & ~0x1f)   logerror("CPU#0 PC %06X - Leds unknown bits: %04X\n", space.device().safe_pc(), data);
+	if (data & ~0x1f)   logerror("CPU#0 PC %06X - Leds unknown bits: %04X\n", m_maincpu->pc(), data);
 }
 
 
@@ -77,7 +77,7 @@ WRITE16_MEMBER(suna16_state::uballoon_leds_w)
 		output().set_led_value(0, data & 0x02);
 		output().set_led_value(1, data & 0x04);
 	}
-	if (data & ~0x07)   logerror("CPU#0 PC %06X - Leds unknown bits: %04X\n", space.device().safe_pc(), data);
+	if (data & ~0x07)   logerror("CPU#0 PC %06X - Leds unknown bits: %04X\n", m_maincpu->pc(), data);
 }
 
 
@@ -87,7 +87,7 @@ WRITE16_MEMBER(suna16_state::bestbest_coin_w)
 	{
 		machine().bookkeeping().coin_counter_w(0, data & 0x04);
 	}
-	if (data & ~0x04)   logerror("CPU#0 PC %06X - Leds unknown bits: %04X\n", space.device().safe_pc(), data);
+	if (data & ~0x04)   logerror("CPU#0 PC %06X - Leds unknown bits: %04X\n", m_maincpu->pc(), data);
 }
 
 
@@ -201,7 +201,7 @@ WRITE8_MEMBER(suna16_state::bestbest_prot_w)
 		case 0x00:  m_prot = m_prot ^ 0x0009;   break;
 		case 0x08:  m_prot = m_prot ^ 0x0002;   break;
 		case 0x0c:  m_prot = m_prot ^ 0x0003;   break;
-		//default:    logerror("CPU#0 PC %06X - Unknown protection value: %04X\n", space.device().safe_pc(), data);
+		//default:    logerror("CPU#0 PC %06X - Unknown protection value: %04X\n", m_maincpu->pc(), data);
 	}
 }
 
@@ -310,14 +310,14 @@ MACHINE_START_MEMBER(suna16_state, bssoccer)
 WRITE8_MEMBER(suna16_state::bssoccer_pcm_1_bankswitch_w)
 {
 	const int bank = data & 7;
-	if (bank & ~7)  logerror("CPU#2 PC %06X - ROM bank unknown bits: %02X\n", space.device().safe_pc(), data);
+	if (bank & ~7)  logerror("CPU#2 PC %06X - ROM bank unknown bits: %02X\n", m_pcm1->pc(), data);
 	m_bank1->set_entry(bank);
 }
 
 WRITE8_MEMBER(suna16_state::bssoccer_pcm_2_bankswitch_w)
 {
 	const int bank = data & 7;
-	if (bank & ~7)  logerror("CPU#3 PC %06X - ROM bank unknown bits: %02X\n", space.device().safe_pc(), data);
+	if (bank & ~7)  logerror("CPU#3 PC %06X - ROM bank unknown bits: %02X\n", m_pcm2->pc(), data);
 	m_bank2->set_entry(bank);
 }
 
@@ -363,7 +363,7 @@ ADDRESS_MAP_END
 WRITE8_MEMBER(suna16_state::uballoon_pcm_1_bankswitch_w)
 {
 	const int bank = data & 1;
-	if (bank & ~1)  logerror("CPU#2 PC %06X - ROM bank unknown bits: %02X\n", space.device().safe_pc(), data);
+	if (bank & ~1)  logerror("CPU#2 PC %06X - ROM bank unknown bits: %02X\n", m_pcm1->pc(), data);
 	m_bank1->set_entry(bank);
 }
 

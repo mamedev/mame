@@ -173,7 +173,7 @@ TIMER_CALLBACK_MEMBER( speech_sound_device::delayed_speech_w )
 
 WRITE8_MEMBER( speech_sound_device::data_w )
 {
-	space.machine().scheduler().synchronize(timer_expired_delegate(FUNC(speech_sound_device::delayed_speech_w), this), data);
+	machine().scheduler().synchronize(timer_expired_delegate(FUNC(speech_sound_device::delayed_speech_w), this), data);
 }
 
 
@@ -418,10 +418,10 @@ TIMER_CALLBACK_MEMBER( usb_sound_device::delayed_usb_data_w )
 WRITE8_MEMBER( usb_sound_device::data_w )
 {
 	LOG("%04X:usb_data_w = %02X\n", m_maincpu->safe_pc(), data);
-	space.machine().scheduler().synchronize(timer_expired_delegate(FUNC(usb_sound_device::delayed_usb_data_w), this), data);
+	machine().scheduler().synchronize(timer_expired_delegate(FUNC(usb_sound_device::delayed_usb_data_w), this), data);
 
 	/* boost the interleave so that sequences can be sent */
-	space.machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(250));
+	machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(250));
 }
 
 

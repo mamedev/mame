@@ -171,14 +171,14 @@ READ8_MEMBER(fgoal_state::shifter_r)
 {
 	uint8_t v = m_mb14241->shift_result_r(space, 0);
 
-	return BITSWAP8(v, 7, 6, 5, 4, 3, 2, 1, 0);
+	return bitswap<8>(v, 7, 6, 5, 4, 3, 2, 1, 0);
 }
 
 READ8_MEMBER(fgoal_state::shifter_reverse_r)
 {
 	uint8_t v = m_mb14241->shift_result_r(space, 0);
 
-	return BITSWAP8(v, 0, 1, 2, 3, 4, 5, 6, 7);
+	return bitswap<8>(v, 0, 1, 2, 3, 4, 5, 6, 7);
 }
 
 

@@ -1345,7 +1345,7 @@ void tmsprom_device::device_timer(emu_timer &timer, device_timer_id id, int para
 	if (ctrl & (1 << m_reset_bit))
 		m_address = 0;
 
-	m_ctl_cb((offs_t)0, BITSWAP8(ctrl,0,0,0,0,m_ctl8_bit,
+	m_ctl_cb((offs_t)0, bitswap<8>(ctrl,0,0,0,0,m_ctl8_bit,
 			m_ctl4_bit,m_ctl2_bit,m_ctl1_bit));
 
 	m_pdc_cb((ctrl >> m_pdc_bit) & 0x01);

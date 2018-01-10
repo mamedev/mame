@@ -47,13 +47,13 @@ DECLARE_DEVICE_TYPE(ATA_SLOT, ata_slot_device)
 ***************************************************************************/
 
 #define MCFG_ATA_INTERFACE_IRQ_HANDLER(_devcb) \
-	devcb = &ata_interface_device::set_irq_handler(*device, DEVCB_##_devcb);
+	devcb = &abstract_ata_interface_device::set_irq_handler(*device, DEVCB_##_devcb);
 
 #define MCFG_ATA_INTERFACE_DMARQ_HANDLER(_devcb) \
-	devcb = &ata_interface_device::set_dmarq_handler(*device, DEVCB_##_devcb);
+	devcb = &abstract_ata_interface_device::set_dmarq_handler(*device, DEVCB_##_devcb);
 
 #define MCFG_ATA_INTERFACE_DASP_HANDLER(_devcb) \
-	devcb = &ata_interface_device::set_dasp_handler(*device, DEVCB_##_devcb);
+	devcb = &abstract_ata_interface_device::set_dasp_handler(*device, DEVCB_##_devcb);
 
 SLOT_INTERFACE_EXTERN(ata_devices);
 
@@ -75,27 +75,25 @@ SLOT_INTERFACE_EXTERN(ata_devices);
 
 /* ----- device interface ----- */
 
-class ata_interface_device : public device_t
+class abstract_ata_interface_device : public device_t
 {
 public:
-	ata_interface_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-
 	// static configuration helpers
-	template <class Object> static devcb_base &set_irq_handler(device_t &device, Object &&cb) { return downcast<ata_interface_device &>(device).m_irq_handler.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_dmarq_handler(device_t &device, Object &&cb) { return downcast<ata_interface_device &>(device).m_dmarq_handler.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_dasp_handler(device_t &device, Object &&cb) { return downcast<ata_interface_device &>(device).m_dasp_handler.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_irq_handler(device_t &device, Object &&cb) { return downcast<abstract_ata_interface_device &>(device).m_irq_handler.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_dmarq_handler(device_t &device, Object &&cb) { return downcast<abstract_ata_interface_device &>(device).m_dmarq_handler.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_dasp_handler(device_t &device, Object &&cb) { return downcast<abstract_ata_interface_device &>(device).m_dasp_handler.set_callback(std::forward<Object>(cb)); }
 
 	uint16_t read_dma();
-	virtual DECLARE_READ16_MEMBER(read_cs0);
-	virtual DECLARE_READ16_MEMBER(read_cs1);
-
 	void write_dma(uint16_t data);
-	virtual DECLARE_WRITE16_MEMBER(write_cs0);
-	virtual DECLARE_WRITE16_MEMBER(write_cs1);
 	DECLARE_WRITE_LINE_MEMBER(write_dmack);
 
 protected:
-	ata_interface_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	abstract_ata_interface_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
+	uint16_t internal_read_cs0(offs_t offset, uint16_t mem_mask = 0xffff);
+	uint16_t internal_read_cs1(offs_t offset, uint16_t mem_mask = 0xffff);
+	void internal_write_cs0(offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void internal_write_cs1(offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -125,6 +123,22 @@ private:
 	devcb_write_line m_irq_handler;
 	devcb_write_line m_dmarq_handler;
 	devcb_write_line m_dasp_handler;
+};
+
+class ata_interface_device : public abstract_ata_interface_device
+{
+public:
+	ata_interface_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	uint16_t read_cs0(offs_t offset, uint16_t mem_mask = 0xffff) { return internal_read_cs0(offset, mem_mask); }
+	uint16_t read_cs1(offs_t offset, uint16_t mem_mask = 0xffff) { return internal_read_cs1(offset, mem_mask); }
+	void write_cs0(offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff) { internal_write_cs0(offset, data, mem_mask); }
+	void write_cs1(offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff) { internal_write_cs1(offset, data, mem_mask); }
+
+	DECLARE_READ16_MEMBER(read_cs0) { return read_cs0(offset, mem_mask); }
+	DECLARE_READ16_MEMBER(read_cs1) { return read_cs1(offset, mem_mask); }
+	DECLARE_WRITE16_MEMBER(write_cs0) { write_cs0(offset, data, mem_mask); }
+	DECLARE_WRITE16_MEMBER(write_cs1) { write_cs1(offset, data, mem_mask); }
 };
 
 DECLARE_DEVICE_TYPE(ATA_INTERFACE, ata_interface_device)

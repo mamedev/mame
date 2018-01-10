@@ -433,11 +433,11 @@ READ8_MEMBER(kc_d004_gide_device::gide_r)
 			{
 				if (ide_cs == 0 )
 				{
-					m_ata_data = m_ata->read_cs0(space, io_addr & 0x07, 0xffff);
+					m_ata_data = m_ata->read_cs0(io_addr & 0x07);
 				}
 				else
 				{
-					m_ata_data = m_ata->read_cs1(space, io_addr & 0x07, 0xffff);
+					m_ata_data = m_ata->read_cs1(io_addr & 0x07);
 				}
 			}
 
@@ -482,11 +482,11 @@ WRITE8_MEMBER(kc_d004_gide_device::gide_w)
 			{
 				if (ide_cs == 0)
 				{
-					m_ata->write_cs0(space, io_addr & 0x07, m_ata_data, 0xffff);
+					m_ata->write_cs0(io_addr & 0x07, m_ata_data);
 				}
 				else
 				{
-					m_ata->write_cs1(space, io_addr & 0x07, m_ata_data, 0xffff);
+					m_ata->write_cs1(io_addr & 0x07, m_ata_data);
 				}
 			}
 		}

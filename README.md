@@ -67,7 +67,7 @@ Where can I find out more?
 =============
 
 * [Official MAME Development Team Site](http://mamedev.org/) (includes binary downloads for MAME and MESS, wiki, forums, and more)
-* [Official MESS Wiki](http://www.mess.org/)
+* [Official MESS Wiki](http://mess.redump.net/)
 * [MAME Testers](http://mametesters.org/) (official bug tracker for MAME and MESS)
 
 
@@ -92,7 +92,7 @@ Please note that MAME is a registered trademark of Gregory Ember, and permission
 <img align="right" src="http://opensource.org/trademarks/opensource/OSI-Approved-License-100x137.png">
 </a>
 
-    Copyright (C) 1997-2017  MAMEDev and contributors
+    Copyright (C) 1997-2018  MAMEDev and contributors
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by

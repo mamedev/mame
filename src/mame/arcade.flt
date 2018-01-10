@@ -172,6 +172,7 @@ bzone.cpp
 cabal.cpp
 cabaret.cpp
 calchase.cpp
+calcune.cpp
 calomega.cpp
 calorie.cpp
 canyon.cpp
@@ -265,6 +266,7 @@ cv1k.cpp
 cvs.cpp
 cyberbal.cpp
 cybertnk.cpp
+cybstorm.cpp
 cyclemb.cpp
 d9final.cpp
 dacholer.cpp
@@ -636,6 +638,7 @@ looping.cpp
 lordgun.cpp
 lsasquad.cpp
 ltcasino.cpp
+luckybal.cpp
 ltd.cpp
 luckgrln.cpp
 lucky74.cpp
@@ -827,6 +830,7 @@ nitedrvr.cpp
 niyanpai.cpp
 nmg5.cpp
 nmk16.cpp
+nmkmedal.cpp
 norautp.cpp
 notechan.cpp
 nova2001.cpp
@@ -837,6 +841,7 @@ nss.cpp
 nwk-tr.cpp
 nycaptor.cpp
 nyny.cpp
+odyssey.cpp
 offtwall.cpp
 ohmygod.cpp
 ojankohs.cpp
@@ -933,6 +938,7 @@ quakeat.cpp
 quantum.cpp
 quasar.cpp
 queen.cpp
+quickpick5.cpp
 quizdna.cpp
 quizo.cpp
 quizpani.cpp
@@ -1354,6 +1360,7 @@ xyonix.cpp
 yiear.cpp
 yunsun16.cpp
 yunsung8.cpp
+yuvomz80.cpp
 zac_1.cpp
 zac_2.cpp
 zac_proto.cpp

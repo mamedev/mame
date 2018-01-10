@@ -76,7 +76,7 @@ nubus_xceed30hr_device::nubus_xceed30hr_device(const machine_config &mconfig, de
 	m_vram32(nullptr), m_mode(0), m_vbl_disable(0), m_toggle(0), m_count(0), m_clutoffs(0), m_timer(nullptr),
 	m_assembled_tag(util::string_format("%s:%s", tag, XCEED30HR_SCREEN_NAME))
 {
-	m_screen_tag = m_assembled_tag.c_str();
+	static_set_screen(*this, m_assembled_tag.c_str());
 }
 
 //-------------------------------------------------
@@ -102,7 +102,7 @@ void nubus_xceed30hr_device::device_start()
 	m_nubus->install_device(slotspace+0x800000, slotspace+0xefffff, read32_delegate(FUNC(nubus_xceed30hr_device::xceed30hr_r), this), write32_delegate(FUNC(nubus_xceed30hr_device::xceed30hr_w), this));
 
 	m_timer = timer_alloc(0, nullptr);
-	m_timer->adjust(m_screen->time_until_pos(479, 0), 0);
+	m_timer->adjust(screen().time_until_pos(479, 0), 0);
 }
 
 //-------------------------------------------------
@@ -130,7 +130,7 @@ void nubus_xceed30hr_device::device_timer(emu_timer &timer, device_timer_id tid,
 		raise_slot_irq();
 	}
 
-	m_timer->adjust(m_screen->time_until_pos(479, 0), 0);
+	m_timer->adjust(screen().time_until_pos(479, 0), 0);
 }
 
 /***************************************************************************
@@ -249,18 +249,18 @@ WRITE32_MEMBER( nubus_xceed30hr_device::xceed30hr_w )
 			break;
 
 		case 0x100000:
-//            printf("%08x to DAC control (PC=%x)\n", data, space.device().safe_pc());
+//            logerror("%08x to DAC control %s\n", data, machine().describe_context());
 			m_clutoffs = (data&0xff);
 			m_count = 0;
 			break;
 
 		case 0x100001:
-//            printf("%08x to DAC data (PC=%x)\n", data, space.device().safe_pc());
+//            logerror("%08x to DAC data %s\n", data, machine().describe_context());
 			m_colors[m_count++] = (data & 0xff);
 
 			if (m_count == 3)
 			{
-//                printf("RAMDAC: color %02x = %02x %02x %02x (PC=%x)\n", m_clutoffs, m_colors[0], m_colors[1], m_colors[2], space.device().safe_pc() );
+//                logerror("RAMDAC: color %02x = %02x %02x %02x %s\n", m_clutoffs, m_colors[0], m_colors[1], m_colors[2], machine().describe_context());
 				m_palette[m_clutoffs] = rgb_t(m_colors[0], m_colors[1], m_colors[2]);
 				m_clutoffs++;
 				if (m_clutoffs > 255)
@@ -284,14 +284,14 @@ WRITE32_MEMBER( nubus_xceed30hr_device::xceed30hr_w )
 			break;
 
 		default:
-//            printf("xceed30hr_w: %08x @ %x, mask %08x (PC=%x)\n", data, offset, mem_mask, space.device().safe_pc());
+//            logerror("xceed30hr_w: %08x @ %x, mask %08x %s\n", data, offset, mem_mask, machine().describe_context());
 			break;
 	}
 }
 
 READ32_MEMBER( nubus_xceed30hr_device::xceed30hr_r )
 {
-//    printf("xceed30hr_r: @ %x, mask %08x [PC=%x]\n", offset, mem_mask, machine().device("maincpu")->safe_pc());
+//    logerror("xceed30hr_r: @ %x, mask %08x %s\n", offset, mem_mask, machine().describe_context());
 	if (offset == 0x80008)
 	{
 		m_toggle ^= 0x80;

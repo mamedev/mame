@@ -83,6 +83,7 @@ protected:
 	void attribute_reg_write(uint8_t index, uint8_t data);
 	void gc_reg_write(uint8_t index,uint8_t data);
 	virtual uint16_t offset();
+	virtual uint32_t start_addr();
 	inline uint8_t vga_latch_write(int offs, uint8_t data);
 	inline uint8_t rotate_right(uint8_t val) { return (val >> vga.gc.rotate_count) | (val << (8 - vga.gc.rotate_count)); }
 	inline uint8_t vga_logical_op(uint8_t data, uint8_t plane, uint8_t mask)
@@ -247,6 +248,7 @@ class svga_device :  public vga_device
 public:
 	virtual void zero() override;
 	virtual uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect) override;
+	uint8_t get_video_depth();
 
 protected:
 	// construction/destruction
@@ -279,7 +281,7 @@ public:
 	ibm8514a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	void set_vga(const char* tag) { m_vga_tag.assign(tag); }
-	void set_vga_owner() { m_vga = dynamic_cast<vga_device*>(owner()); }
+	void set_vga_owner() { m_vga = dynamic_cast<svga_device*>(owner()); }
 
 	void enabled();
 
@@ -287,8 +289,8 @@ public:
 	WRITE16_MEMBER(ibm8514_cmd_w);
 	READ16_MEMBER(ibm8514_line_error_r);
 	WRITE16_MEMBER(ibm8514_line_error_w);
-	READ16_MEMBER(ibm8514_status_r);
-	WRITE16_MEMBER(ibm8514_htotal_w);
+	READ8_MEMBER(ibm8514_status_r);
+	WRITE8_MEMBER(ibm8514_htotal_w);
 	READ16_MEMBER(ibm8514_substatus_r);
 	WRITE16_MEMBER(ibm8514_subcontrol_w);
 	READ16_MEMBER(ibm8514_subcontrol_r);
@@ -322,7 +324,7 @@ public:
 	READ16_MEMBER(ibm8514_foremix_r);
 	WRITE16_MEMBER(ibm8514_foremix_w);
 	READ16_MEMBER(ibm8514_pixel_xfer_r);
-	WRITE16_MEMBER(ibm8514_pixel_xfer_w);
+	virtual WRITE16_MEMBER(ibm8514_pixel_xfer_w);
 	READ16_MEMBER(ibm8514_read_mask_r);
 	WRITE16_MEMBER(ibm8514_read_mask_w);
 	READ16_MEMBER(ibm8514_write_mask_r);
@@ -386,16 +388,17 @@ protected:
 
 	virtual void device_start() override;
 	virtual void device_config_complete() override;
-	vga_device* m_vga;  // for pass-through
+	void ibm8514_write(uint32_t offset, uint32_t src);
+	void ibm8514_write_fg(uint32_t offset);
+	void ibm8514_write_bg(uint32_t offset);
+
+	svga_device* m_vga;  // for pass-through
 	std::string m_vga_tag;  // pass-through device tag
 private:
 	void ibm8514_draw_vector(uint8_t len, uint8_t dir, bool draw);
 	void ibm8514_wait_draw_ssv();
 	void ibm8514_draw_ssv(uint8_t data);
 	void ibm8514_wait_draw_vector();
-	void ibm8514_write_fg(uint32_t offset);
-	void ibm8514_write_bg(uint32_t offset);
-	void ibm8514_write(uint32_t offset, uint32_t src);
 
 	//uint8_t* m_vram;  // the original 8514/A has it's own VRAM, but most VGA+8514 combination cards will have
 					// only one set of VRAM, so this will only be needed in standalone 8514/A cards
@@ -444,6 +447,13 @@ public:
 	WRITE16_MEMBER(mach8_ext_leftscissor_w);
 	WRITE16_MEMBER(mach8_ext_topscissor_w);
 	READ16_MEMBER(mach8_clksel_r) { return mach8.clksel; }
+	WRITE16_MEMBER(mach8_ge_offset_l_w);
+	WRITE16_MEMBER(mach8_ge_offset_h_w);
+	WRITE16_MEMBER(mach8_ge_pitch_w);
+	WRITE16_MEMBER(mach8_scan_x_w);
+	WRITE16_MEMBER(mach8_dp_config_w);
+	READ16_MEMBER(mach8_readonly_r) { return 0; }
+	WRITE16_MEMBER(mach8_pixel_xfer_w);
 
 protected:
 	mach8_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
@@ -454,7 +464,15 @@ protected:
 		uint16_t scratch1;
 		uint16_t linedraw;
 		uint16_t clksel;
+		uint16_t dp_config;
+		uint32_t ge_offset;
+		uint16_t ge_pitch;
+		uint16_t scan_x;
 	} mach8;
+
+private:
+	void mach8_wait_scan();
+
 };
 
 // device type definition
@@ -539,15 +557,15 @@ protected:
 
 	virtual void device_start() override;
 	virtual void device_add_mconfig(machine_config &config) override;
-
-private:
-	void ati_define_video_mode();
 	struct
 	{
 		uint8_t ext_reg[64];
 		uint8_t ext_reg_select;
 		uint8_t vga_chip_id;
 	} ati;
+
+private:
+	void ati_define_video_mode();
 	mach8_device* m_8514;
 };
 

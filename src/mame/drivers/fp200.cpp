@@ -554,7 +554,7 @@ void fp200_state::machine_start()
 
 	for(int i=0;i<0x800;i++)
 	{
-		m_chargen[i] = raw_gfx[BITSWAP16(i,15,14,13,12,11,6,5,4,3,10,9,8,7,2,1,0)];
+		m_chargen[i] = raw_gfx[bitswap<16>(i,15,14,13,12,11,6,5,4,3,10,9,8,7,2,1,0)];
 	}
 }
 

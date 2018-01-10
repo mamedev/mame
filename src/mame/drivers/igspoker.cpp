@@ -258,7 +258,7 @@ WRITE8_MEMBER(igspoker_state::igs_nmi_and_coins_w)
 
 	m_nmi_enable = data & 0x80;     // nmi enable?
 #if VERBOSE
-	logerror("PC %06X: NMI change %02x\n",space.device().safe_pc(),m_nmi_enable);
+	logerror("PC %06X: NMI change %02x\n",m_maincpu->pc(),m_nmi_enable);
 #endif
 
 	m_out[0] = data;
@@ -310,7 +310,7 @@ WRITE8_MEMBER(igspoker_state::igs_lamps_w)
 READ8_MEMBER(igspoker_state::custom_io_r)
 {
 #if VERBOSE
-	logerror("PC %06X: Protection read %02x\n",space.device().safe_pc(), m_protection_res);
+	logerror("PC %06X: Protection read %02x\n",m_maincpu->pc(), m_protection_res);
 #endif
 	return m_protection_res;
 }
@@ -318,7 +318,7 @@ READ8_MEMBER(igspoker_state::custom_io_r)
 WRITE8_MEMBER(igspoker_state::custom_io_w)
 {
 #if VERBOSE
-	logerror("PC %06X: Protection write %02x\n",space.device().safe_pc(),data);
+	logerror("PC %06X: Protection write %02x\n",m_maincpu->pc(),data);
 #endif
 
 	switch (data)
@@ -2605,7 +2605,7 @@ DRIVER_INIT_MEMBER(igspoker_state,number10)
 	memcpy(&tmp[0],rom,length);
 	for (A = 0; A < length; A++)
 	{
-		int addr = (A & ~0xffff) | BITSWAP16(A,15,14,13,12,11,10,9,8,7,6,5,4,3,0,1,2);
+		int addr = (A & ~0xffff) | bitswap<16>(A,15,14,13,12,11,10,9,8,7,6,5,4,3,0,1,2);
 		rom[A] = tmp[addr];
 	}
 }

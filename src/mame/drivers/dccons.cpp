@@ -279,18 +279,18 @@
 
 READ64_MEMBER(dc_cons_state::dcus_idle_skip_r )
 {
-	//if (space.device().safe_pc()==0xc0ba52a)
-	//  space.device().execute().spin_until_time(attotime::from_usec(2500));
-	//  device_spinuntil_int(&space.device());
+	//if (m_maincpu->pc()==0xc0ba52a)
+	//  m_maincpu->spin_until_time(attotime::from_usec(2500));
+	//  device_spinuntil_int(m_maincpu);
 
 	return dc_ram[0x2303b0/8];
 }
 
 READ64_MEMBER(dc_cons_state::dcjp_idle_skip_r )
 {
-	//if (space.device().safe_pc()==0xc0bac62)
-	//  space.device().execute().spin_until_time(attotime::from_usec(2500));
-	//  device_spinuntil_int(&space.device());
+	//if (m_maincpu->pc()==0xc0bac62)
+	//  m_maincpu->spin_until_time(attotime::from_usec(2500));
+	//  device_spinuntil_int(m_maincpu);
 
 	return dc_ram[0x2302f8/8];
 }

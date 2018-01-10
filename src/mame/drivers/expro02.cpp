@@ -1797,7 +1797,7 @@ DRIVER_INIT_MEMBER(expro02_state,expro02)
 			offset = x;
 
 			// swap bits around to simplify further processing
-			offset = BITSWAP24(offset, 23, 22, 21, 20, 19, 18, 15, 9, 10, 8, 7, 12, 13, 16, 17, 6, 5, 4, 3, 14, 11, 2, 1, 0);
+			offset = bitswap<24>(offset, 23, 22, 21, 20, 19, 18, 15, 9, 10, 8, 7, 12, 13, 16, 17, 6, 5, 4, 3, 14, 11, 2, 1, 0);
 
 			// invert 8 bits
 			offset ^= 0x0528f;
@@ -1809,7 +1809,7 @@ DRIVER_INIT_MEMBER(expro02_state,expro02)
 			offset = (offset & ~0x1fe00) | ((offset - 0x09600) & 0x1fe00);
 
 			// reverse the initial bitswap
-			offset = BITSWAP24(offset, 23, 22, 21, 20, 19, 18, 9, 10, 17, 4, 11, 12, 3, 15, 16, 14, 13, 8, 7, 6, 5, 2, 1, 0);
+			offset = bitswap<24>(offset, 23, 22, 21, 20, 19, 18, 9, 10, 17, 4, 11, 12, 3, 15, 16, 14, 13, 8, 7, 6, 5, 2, 1, 0);
 
 			// swap nibbles to use the same gfxdecode
 			dst[x] = (src[offset] << 4 & 0xF0F0F0F0) | (src[offset] >> 4 & 0x0F0F0F0F);

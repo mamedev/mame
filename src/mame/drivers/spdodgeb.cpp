@@ -213,7 +213,7 @@ void spdodgeb_state::mcu63705_update_inputs()
 
 READ8_MEMBER(spdodgeb_state::mcu63701_r)
 {
-//  logerror("CPU #0 PC %04x: read from port %02x of 63701 data address 3801\n",space.device().safe_pc(),offset);
+//  logerror("CPU #0 PC %04x: read from port %02x of 63701 data address 3801\n",m_maincpu->pc(),offset);
 
 	if (m_mcu63701_command == 0) return 0x6a;
 	else switch (offset)
@@ -229,7 +229,7 @@ READ8_MEMBER(spdodgeb_state::mcu63701_r)
 
 WRITE8_MEMBER(spdodgeb_state::mcu63701_w)
 {
-//  logerror("CPU #0 PC %04x: write %02x to 63701 control address 3800\n",space.device().safe_pc(),data);
+//  logerror("CPU #0 PC %04x: write %02x to 63701 control address 3800\n",m_maincpu->pc(),data);
 	m_mcu63701_command = data;
 	mcu63705_update_inputs();
 }
@@ -410,7 +410,7 @@ static MACHINE_CONFIG_START( spdodgeb )
 	MCFG_CPU_PROGRAM_MAP(spdodgeb_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", spdodgeb_state, interrupt, "screen", 0, 1) /* 1 IRQ every 8 visible scanlines, plus NMI for vblank */
 
-	MCFG_CPU_ADD("audiocpu", M6809, XTAL_12MHz/6)  /* 2MHz ? */
+	MCFG_CPU_ADD("audiocpu", MC6809, XTAL_12MHz/2) // HD68A09P (1.5MHz internally)
 	MCFG_CPU_PROGRAM_MAP(spdodgeb_sound_map)
 
 	/* video hardware */

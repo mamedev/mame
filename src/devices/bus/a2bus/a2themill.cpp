@@ -98,12 +98,12 @@ void a2bus_themill_device::device_reset()
 	m_6809->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 }
 
-uint8_t a2bus_themill_device::read_c0nx(address_space &space, uint8_t offset)
+uint8_t a2bus_themill_device::read_c0nx(uint8_t offset)
 {
 	return m_status;
 }
 
-void a2bus_themill_device::write_c0nx(address_space &space, uint8_t offset, uint8_t data)
+void a2bus_themill_device::write_c0nx(uint8_t offset, uint8_t data)
 {
 	switch (offset)
 	{

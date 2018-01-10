@@ -45,7 +45,7 @@ void blstroid_state::update_interrupts()
 
 WRITE16_MEMBER(blstroid_state::blstroid_halt_until_hblank_0_w)
 {
-	halt_until_hblank_0(space.device(), *m_screen);
+	halt_until_hblank_0(*m_maincpu, *m_screen);
 }
 
 

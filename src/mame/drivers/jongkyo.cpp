@@ -564,7 +564,7 @@ DRIVER_INIT_MEMBER(jongkyo_state,jongkyo)
 	/* first of all, do a simple bitswap */
 	for (int i = 0x6000; i < 0x8c00; ++i)
 	{
-		rom[i] = BITSWAP8(rom[i], 7,6,5,3,4,2,1,0);
+		rom[i] = bitswap<8>(rom[i], 7,6,5,3,4,2,1,0);
 	}
 
 	uint8_t *opcodes = auto_alloc_array(machine(), uint8_t, 0x6c00+0x400*8);

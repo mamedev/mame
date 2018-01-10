@@ -536,7 +536,7 @@ void itech8_state::update_interrupts(int periodic, int tms34061, int blitter)
 	if (blitter != -1) m_blitter_int = blitter;
 
 	/* handle the 6809 case */
-	if (main_cpu_type == M6809 || main_cpu_type == HD6309)
+	if (main_cpu_type == MC6809 || main_cpu_type == HD6309)
 	{
 		/* just modify lines that have changed */
 		if (periodic != -1) m_maincpu->set_input_line(INPUT_LINE_NMI, periodic ? ASSERT_LINE : CLEAR_LINE);
@@ -625,7 +625,7 @@ void itech8_state::machine_reset()
 	device_type main_cpu_type = m_maincpu->type();
 
 	/* make sure bank 0 is selected */
-	if (main_cpu_type == M6809 || main_cpu_type == HD6309)
+	if (main_cpu_type == MC6809 || main_cpu_type == HD6309)
 	{
 		membank("bank1")->set_entry(0);
 		m_maincpu->reset();
@@ -1668,7 +1668,7 @@ WRITE_LINE_MEMBER(itech8_state::generate_tms34061_interrupt)
 static MACHINE_CONFIG_START( itech8_core_lo )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6809, CLOCK_8MHz/4)
+	MCFG_CPU_ADD("maincpu", MC6809, CLOCK_8MHz)
 	MCFG_CPU_PROGRAM_MAP(tmslo_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", itech8_state,  generate_nmi)
 
@@ -1710,7 +1710,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( itech8_sound_ym2203 )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("soundcpu", M6809, CLOCK_8MHz/4)
+	MCFG_CPU_ADD("soundcpu", MC6809, CLOCK_8MHz)
 	MCFG_CPU_PROGRAM_MAP(sound2203_map)
 
 	/* sound hardware */
@@ -1730,7 +1730,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( itech8_sound_ym2608b )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("soundcpu", M6809, CLOCK_8MHz/4)
+	MCFG_CPU_ADD("soundcpu", MC6809, CLOCK_8MHz)
 	MCFG_CPU_PROGRAM_MAP(sound2608b_map)
 
 	/* sound hardware */
@@ -1744,7 +1744,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( itech8_sound_ym3812 )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("soundcpu", M6809, CLOCK_8MHz/4)
+	MCFG_CPU_ADD("soundcpu", MC6809, CLOCK_8MHz)
 	MCFG_CPU_PROGRAM_MAP(sound3812_map)
 
 	MCFG_DEVICE_ADD("pia", PIA6821, 0)
@@ -1765,7 +1765,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( itech8_sound_ym3812_external )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("soundcpu", M6809, CLOCK_8MHz/4)
+	MCFG_CPU_ADD("soundcpu", MC6809, CLOCK_8MHz)
 	MCFG_CPU_PROGRAM_MAP(sound3812_external_map)
 
 	/* sound hardware */

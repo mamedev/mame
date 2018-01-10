@@ -683,7 +683,7 @@ READ8_MEMBER(dkong_state::epos_decrypt_rom)
 WRITE8_MEMBER(dkong_state::s2650_data_w)
 {
 #if DEBUG_PROTECTION
-	logerror("write : pc = %04x, loopback = %02x\n",space.device().safe_pc(), data);
+	logerror("write : pc = %04x, loopback = %02x\n",m_maincpu->pc(), data);
 #endif
 
 	m_hunchloopback = data;
@@ -704,7 +704,7 @@ WRITE_LINE_MEMBER(dkong_state::s2650_fo_w)
 READ8_MEMBER(dkong_state::s2650_port0_r)
 {
 #if DEBUG_PROTECTION
-	logerror("port 0 : pc = %04x, loopback = %02x fo=%d\n",space.device().safe_pc(), m_hunchloopback, m_main_fo);
+	logerror("port 0 : pc = %04x, loopback = %02x fo=%d\n",m_maincpu->pc(), m_hunchloopback, m_main_fo);
 #endif
 
 	switch (m_protect_type)
@@ -721,14 +721,14 @@ READ8_MEMBER(dkong_state::s2650_port0_r)
 			else
 				return m_hunchloopback--;
 	}
-	fatalerror("Unhandled read from port 0 : pc = %4x\n",space.device().safe_pc());
+	fatalerror("Unhandled read from port 0 : pc = %4x\n",m_maincpu->pc());
 }
 
 
 READ8_MEMBER(dkong_state::s2650_port1_r)
 {
 #if DEBUG_PROTECTION
-	logerror("port 1 : pc = %04x, loopback = %02x fo=%d\n",space.device().safe_pc(), m_hunchloopback, m_main_fo);
+	logerror("port 1 : pc = %04x, loopback = %02x fo=%d\n",m_maincpu->pc(), m_hunchloopback, m_main_fo);
 #endif
 
 	switch (m_protect_type)
@@ -742,7 +742,7 @@ READ8_MEMBER(dkong_state::s2650_port1_r)
 			else
 				return ++m_prot_cnt;
 	}
-	fatalerror("Unhandled read from port 1 : pc = %4x\n",space.device().safe_pc());
+	fatalerror("Unhandled read from port 1 : pc = %4x\n",m_maincpu->pc());
 }
 
 
@@ -1655,8 +1655,8 @@ void dkong_state::braze_decrypt_rom(uint8_t *dest)
 	{
 		oldbyte = ROM[mem];
 
-		newmem = ((BITSWAP8((mem >> 8),7,2,3,1,0,6,4,5))<<8) | (mem & 0xff);
-		newbyte = BITSWAP8(oldbyte, 1,4,5,7,6,0,3,2);
+		newmem = ((bitswap<8>((mem >> 8),7,2,3,1,0,6,4,5))<<8) | (mem & 0xff);
+		newbyte = bitswap<8>(oldbyte, 1,4,5,7,6,0,3,2);
 
 		dest[newmem] = newbyte;
 	}
@@ -3248,7 +3248,7 @@ void dkong_state::drakton_decrypt_rom(uint8_t mod, int offs, int *bs)
 		    PAL10H8 driven by the counter. */
 
 		newbyte = (oldbyte & mod) | (~oldbyte & ~mod);
-		newbyte = BITSWAP8(newbyte, bs[0], bs[1], bs[2], bs[3], bs[4], bs[5], bs[6], bs[7]);
+		newbyte = bitswap<8>(newbyte, bs[0], bs[1], bs[2], bs[3], bs[4], bs[5], bs[6], bs[7]);
 
 		ROM[mem + offs] = newbyte;
 	}

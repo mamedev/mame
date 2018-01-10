@@ -119,6 +119,7 @@ WRITE8_MEMBER(tmp68301_device::icr_w)
 tmp68301_device::tmp68301_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, TMP68301, tag, owner, clock),
 		device_memory_interface(mconfig, *this),
+		m_cpu(*this, finder_base::DUMMY_TAG),
 		m_in_parallel_cb(*this),
 		m_out_parallel_cb(*this),
 		m_imr(0),
@@ -227,7 +228,7 @@ TIMER_CALLBACK_MEMBER( tmp68301_device::timer_callback )
 		m_irq_vector[level]  =   IVNR & 0x00e0;
 		m_irq_vector[level]  +=  4+i;
 
-		machine().firstcpu->set_input_line(level,HOLD_LINE);
+		m_cpu->set_input_line(level,HOLD_LINE);
 	}
 
 	if (TCR & 0x0080)   // N/1
@@ -270,7 +271,7 @@ void tmp68301_device::update_timer( int i )
 		{
 			int scale = (TCR & 0x3c00)>>10;         // P4..1
 			if (scale > 8) scale = 8;
-			duration = attotime::from_hz(machine().firstcpu->unscaled_clock()) * ((1 << scale) * max);
+			duration = attotime::from_hz(m_cpu->unscaled_clock()) * ((1 << scale) * max);
 		}
 		break;
 	}
@@ -310,7 +311,7 @@ void tmp68301_device::update_irq_state(uint16_t cause)
 			m_irq_vector[level]  =   IVNR & 0x00e0;
 			m_irq_vector[level]  +=  i;
 
-			machine().firstcpu->set_input_line(level,HOLD_LINE);
+			m_cpu->set_input_line(level,HOLD_LINE);
 		}
 	}
 }
@@ -349,7 +350,7 @@ void tmp68301_device::update_irq_serial(uint16_t cause, uint8_t type)
 			 */
 			m_irq_vector[level]  +=  type;
 
-			machine().firstcpu->set_input_line(level,HOLD_LINE);
+			m_cpu->set_input_line(level,HOLD_LINE);
 		}
 	}
 }
@@ -368,7 +369,7 @@ WRITE16_MEMBER( tmp68301_device::regs_w )
 
 	if (!ACCESSING_BITS_0_7)    return;
 
-//  logerror("CPU #0 PC %06X: TMP68301 Reg %04X<-%04X & %04X\n",space.device().safe_pc(),offset*2,data,mem_mask^0xffff);
+//  logerror("CPU #0 PC %06X: TMP68301 Reg %04X<-%04X & %04X\n", m_cpu->pc(),offset*2,data,mem_mask^0xffff);
 
 	switch( offset * 2 )
 	{

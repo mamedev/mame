@@ -449,10 +449,10 @@ WRITE8_MEMBER(segac2_state::io_portd_w)
 	 D1 : To CN1 pin J. (Coin meter 2)
 	 D0 : To CN1 pin 8. (Coin meter 1)
 	*/
-	//space.machine().bookkeeping().coin_lockout_w(1, data & 0x08);
-	//space.machine().bookkeeping().coin_lockout_w(0, data & 0x04);
-	space.machine().bookkeeping().coin_counter_w(1, data & 0x02);
-	space.machine().bookkeeping().coin_counter_w(0, data & 0x01);
+	//machine().bookkeeping().coin_lockout_w(1, data & 0x08);
+	//machine().bookkeeping().coin_lockout_w(0, data & 0x04);
+	machine().bookkeeping().coin_counter_w(1, data & 0x02);
+	machine().bookkeeping().coin_counter_w(0, data & 0x01);
 }
 
 WRITE8_MEMBER(segac2_state::io_porth_w)
@@ -497,7 +497,7 @@ WRITE8_MEMBER(segac2_state::control_w)
 	data &= 0x0f;
 
 	/* bit 0 controls display enable */
-	//segac2_enable_display(space.machine(), ~data & 1);
+	//segac2_enable_display(machine(), ~data & 1);
 	m_segac2_enable_display = ~data & 1;
 
 	/* bit 1 resets the protection */
@@ -526,7 +526,7 @@ WRITE8_MEMBER(segac2_state::control_w)
 /* protection chip reads */
 READ8_MEMBER(segac2_state::prot_r)
 {
-	if (LOG_PROTECTION) logerror("%06X:protection r=%02X\n", space.device().safe_pcbase(), m_prot_read_buf);
+	if (LOG_PROTECTION) logerror("%06X:protection r=%02X\n", m_maincpu->pcbase(), m_prot_read_buf);
 	return m_prot_read_buf | 0xf0;
 }
 
@@ -546,7 +546,7 @@ WRITE8_MEMBER(segac2_state::prot_w)
 
 	/* determine the value to return, should a read occur */
 	m_prot_read_buf = m_prot_func(table_index);
-	if (LOG_PROTECTION) logerror("%06X:protection w=%02X, new result=%02X\n", space.device().safe_pcbase(), data & 0x0f, m_prot_read_buf);
+	if (LOG_PROTECTION) logerror("%06X:protection w=%02X, new result=%02X\n", m_maincpu->pcbase(), data & 0x0f, m_prot_read_buf);
 
 	/* if the palette changed, force an update */
 	if (new_sp_palbase != m_sp_palbase || new_bg_palbase != m_bg_palbase)
@@ -587,8 +587,8 @@ WRITE8_MEMBER(segac2_state::counter_timer_w)
 			break;
 
 		case 0x10:  /* coin counter */
-//          space.machine().bookkeeping().coin_counter_w(0,1);
-//          space.machine().bookkeeping().coin_counter_w(0,0);
+//          machine().bookkeeping().coin_counter_w(0,1);
+//          machine().bookkeeping().coin_counter_w(0,0);
 			break;
 
 		case 0x12:  /* set coinage info -- followed by two 4-bit values */

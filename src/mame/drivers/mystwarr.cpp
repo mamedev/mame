@@ -279,7 +279,7 @@ WRITE16_MEMBER(mystwarr_state::k053247_scattered_word_w)
 {
 	if (offset & 0x0078)
 	{
-//      osd_printf_debug("spr write %x to %x (PC=%x)\n", data, offset, space.device().safe_pc());
+//      osd_printf_debug("spr write %x to %x (PC=%x)\n", data, offset, m_maincpu->pc());
 		COMBINE_DATA(m_spriteram+offset);
 	}
 	else

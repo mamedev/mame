@@ -120,7 +120,7 @@ WRITE16_MEMBER(hyprduel_state::subcpu_control_w)
 				m_subcpu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
 				m_subcpu_resetline = 0;
 			}
-			space.device().execute().spin_until_interrupt();
+			m_maincpu->spin_until_interrupt();
 			break;
 
 		case 0x0c:
@@ -150,7 +150,7 @@ WRITE16_MEMBER(hyprduel_state::hyprduel_cpusync_trigger1_w)
 	{
 		if (!m_cpu_trigger && !m_subcpu_resetline)
 		{
-			space.device().execute().spin_until_trigger(1001);
+			m_maincpu->spin_until_trigger(1001);
 			m_cpu_trigger = 1001;
 		}
 	}
@@ -176,7 +176,7 @@ WRITE16_MEMBER(hyprduel_state::hyprduel_cpusync_trigger2_w)
 	{
 		if (!m_cpu_trigger && !m_subcpu_resetline)
 		{
-			space.device().execute().spin_until_trigger(1002);
+			m_maincpu->spin_until_trigger(1002);
 			m_cpu_trigger = 1002;
 		}
 	}
@@ -276,7 +276,7 @@ void hyprduel_state::blt_write( address_space &space, const int tmap, const offs
 		case 2: vram_1_w(space, offs, data, mask); break;
 		case 3: vram_2_w(space, offs, data, mask); break;
 	}
-//  logerror("%s : Blitter %X] %04X <- %04X & %04X\n", space.machine().describe_context(), tmap, offs, data, mask);
+//  logerror("%s : Blitter %X] %04X <- %04X & %04X\n", machine().describe_context(), tmap, offs, data, mask);
 }
 
 
@@ -296,7 +296,7 @@ WRITE16_MEMBER(hyprduel_state::blitter_w)
 		int shift = (dst_offs & 0x80) ? 0 : 8;
 		uint16_t mask = (dst_offs & 0x80) ? 0x00ff : 0xff00;
 
-//      logerror("CPU #0 PC %06X : Blitter regs %08X, %08X, %08X\n", space.device().safe_pc(), tmap, src_offs, dst_offs);
+//      logerror("CPU #0 PC %06X : Blitter regs %08X, %08X, %08X\n", m_maincpu->pc(), tmap, src_offs, dst_offs);
 
 		dst_offs >>= 7 + 1;
 		switch (tmap)
@@ -306,7 +306,7 @@ WRITE16_MEMBER(hyprduel_state::blitter_w)
 			case 3:
 				break;
 			default:
-				logerror("CPU #0 PC %06X : Blitter unknown destination: %08X\n", space.device().safe_pc(), tmap);
+				logerror("CPU #0 PC %06X : Blitter unknown destination: %08X\n", m_maincpu->pc(), tmap);
 				return;
 		}
 
@@ -316,7 +316,7 @@ WRITE16_MEMBER(hyprduel_state::blitter_w)
 
 			src_offs %= src_len;
 			b1 = blt_read(src, src_offs);
-//          logerror("CPU #0 PC %06X : Blitter opcode %02X at %06X\n", space.device().safe_pc(), b1, src_offs);
+//          logerror("CPU #0 PC %06X : Blitter opcode %02X at %06X\n", m_maincpu->pc(), b1, src_offs);
 			src_offs++;
 
 			count = ((~b1) & 0x3f) + 1;
@@ -400,7 +400,7 @@ WRITE16_MEMBER(hyprduel_state::blitter_w)
 
 
 				default:
-					logerror("CPU #0 PC %06X : Blitter unknown opcode %02X at %06X\n", space.device().safe_pc(), b1, src_offs - 1);
+					logerror("CPU #0 PC %06X : Blitter unknown opcode %02X at %06X\n", m_maincpu->pc(), b1, src_offs - 1);
 					return;
 			}
 

@@ -953,7 +953,6 @@ uint32_t gba_eeprom_device::read()
 	switch (m_state)
 	{
 		case EEP_IDLE:
-//          printf("eeprom_r: @ %x, mask %08x (state %d) (PC=%x) = %d\n", offset, ~mem_mask, m_state, activecpu_get_pc(), 1);
 			return 0x00010001;  // "ready"
 
 		case EEP_READFIRST:
@@ -992,17 +991,13 @@ uint32_t gba_eeprom_device::read()
 				m_state = EEP_IDLE;
 			}
 
-//          printf("out = %08x\n", out);
-//          printf("eeprom_r: @ %x, mask %08x (state %d) (PC=%x) = %08x\n", offset, ~mem_mask, m_state, activecpu_get_pc(), out);
 			return out;
 	}
-//  printf("eeprom_r: @ %x, mask %08x (state %d) (PC=%x) = %d\n", offset, ~mem_mask, m_state, space.device().safe_pc(), 0);
 	return 0;
 }
 
 void gba_eeprom_device::write(uint32_t data)
 {
-//  printf("eeprom_w: %x @ %x (state %d) (PC=%x)\n", data, offset, m_state, space.device().safe_pc());
 	switch (m_state)
 	{
 		case EEP_IDLE:

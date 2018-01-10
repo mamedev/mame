@@ -147,7 +147,7 @@ DRIVER_INIT_MEMBER(forte2_state,pesadelo)
 	// data swap
 	for (int i = 0; i < memsize; i++)
 	{
-		mem[i] = BITSWAP8(mem[i],3,5,6,7,0,4,2,1);
+		mem[i] = bitswap<8>(mem[i],3,5,6,7,0,4,2,1);
 	}
 
 	// address line swap
@@ -155,7 +155,7 @@ DRIVER_INIT_MEMBER(forte2_state,pesadelo)
 	memcpy(&buf[0], mem, memsize);
 	for (int i = 0; i < memsize; i++)
 	{
-		mem[BITSWAP16(i,11,9,8,13,14,15,12,7,6,5,4,3,2,1,0,10)] = buf[i];
+		mem[bitswap<16>(i,11,9,8,13,14,15,12,7,6,5,4,3,2,1,0,10)] = buf[i];
 	}
 }
 

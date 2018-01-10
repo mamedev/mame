@@ -302,11 +302,11 @@ void bladestl_state::machine_reset()
 static MACHINE_CONFIG_START( bladestl )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", HD6309, 24000000/2)     /* 24MHz/2 (?) */
+	MCFG_CPU_ADD("maincpu", HD6309E, XTAL_24MHz / 8) // divider not verified (from 007342 custom)
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", bladestl_state, bladestl_scanline, "screen", 0, 1)
 
-	MCFG_CPU_ADD("audiocpu", M6809, 2000000)
+	MCFG_CPU_ADD("audiocpu", MC6809E, XTAL_24MHz / 16)
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
@@ -347,10 +347,10 @@ static MACHINE_CONFIG_START( bladestl )
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("upd", UPD7759, UPD7759_STANDARD_CLOCK)
+	MCFG_SOUND_ADD("upd", UPD7759, XTAL_640kHz)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
 
-	MCFG_SOUND_ADD("ymsnd", YM2203, 3579545)
+	MCFG_SOUND_ADD("ymsnd", YM2203, XTAL_24MHz / 8)
 	MCFG_AY8910_PORT_A_WRITE_CB(DEVWRITE8("upd", upd775x_device, port_w))
 	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(bladestl_state, bladestl_port_B_w))
 	MCFG_SOUND_ROUTE(0, "filter1", 0.45)

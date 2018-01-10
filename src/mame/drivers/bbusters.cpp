@@ -281,9 +281,9 @@ READ16_MEMBER(bbusters_state::control_3_r)
 
 WRITE16_MEMBER(bbusters_state::gun_select_w)
 {
-	logerror("%08x: gun r\n",space.device().safe_pc());
+	logerror("%08x: gun r\n",m_maincpu->pc());
 
-	space.device().execute().set_input_line(2, HOLD_LINE);
+	m_maincpu->set_input_line(2, HOLD_LINE);
 
 	m_gun_select = data & 0xff;
 }

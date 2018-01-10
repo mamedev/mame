@@ -160,7 +160,7 @@ WRITE8_MEMBER( poly880_state::pio1_pa_w )
 
 	*/
 
-	m_segment = BITSWAP8(data, 3, 4, 6, 0, 1, 2, 7, 5);
+	m_segment = bitswap<8>(data, 3, 4, 6, 0, 1, 2, 7, 5);
 
 	update_display();
 }

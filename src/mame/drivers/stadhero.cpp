@@ -45,7 +45,7 @@ WRITE16_MEMBER(stadhero_state::stadhero_control_w)
 			m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 			break;
 		default:
-			logerror("CPU #0 PC %06x: warning - write %02x to unmapped memory address %06x\n",space.device().safe_pc(),data,0x30c010+offset);
+			logerror("CPU #0 PC %06x: warning - write %02x to unmapped memory address %06x\n",m_maincpu->pc(),data,0x30c010+offset);
 			break;
 	}
 }

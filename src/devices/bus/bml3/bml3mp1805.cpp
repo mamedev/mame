@@ -152,7 +152,7 @@ void bml3bus_mp1805_device::device_start()
 	m_rom = memregion(MP1805_ROM_REGION)->base();
 
 	// install into memory
-	address_space &space_prg = machine().firstcpu->space(AS_PROGRAM);
+	address_space &space_prg = m_bml3bus->space();
 	space_prg.install_readwrite_handler(0xff18, 0xff1f, read8_delegate( FUNC(mc6843_device::read), (mc6843_device*)m_mc6843), write8_delegate(FUNC(mc6843_device::write), (mc6843_device*)m_mc6843) );
 	space_prg.install_readwrite_handler(0xff20, 0xff20, read8_delegate( FUNC(bml3bus_mp1805_device::bml3_mp1805_r), this), write8_delegate(FUNC(bml3bus_mp1805_device::bml3_mp1805_w), this) );
 	// overwriting the main ROM (rather than using e.g. install_rom) should mean that bank switches for RAM expansion still work...

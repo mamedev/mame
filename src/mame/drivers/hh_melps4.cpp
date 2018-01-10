@@ -235,8 +235,8 @@ public:
 
 void cfrogger_state::prepare_display()
 {
-	u16 grid = BITSWAP16(m_grid,15,14,13,12,0,1,2,3,4,5,6,7,8,9,10,11);
-	u16 plate = BITSWAP16(m_plate,12,4,13,5,14,6,15,7,3,11,2,10,1,9,0,8);
+	u16 grid = bitswap<16>(m_grid,15,14,13,12,0,1,2,3,4,5,6,7,8,9,10,11);
+	u16 plate = bitswap<16>(m_plate,12,4,13,5,14,6,15,7,3,11,2,10,1,9,0,8);
 	display_matrix(16, 12, plate, grid);
 }
 
@@ -273,7 +273,6 @@ READ16_MEMBER(cfrogger_state::input_r)
 	// K3: fixed input
 	return (m_inp_matrix[2]->read() & 8) | (read_inputs(2) & 3);
 }
-
 
 // config
 
@@ -351,8 +350,8 @@ public:
 
 void gjungler_state::prepare_display()
 {
-	u16 grid = BITSWAP16(m_grid,15,14,13,12,11,10,9,8,7,6,5,4,3,2,0,1);
-	u32 plate = BITSWAP24(m_plate,23,22,21,20,19,18,8,9,10,11,13,16,15,14,13,12,7,0,6,1,5,2,4,3) | 0x2000;
+	u16 grid = bitswap<16>(m_grid,15,14,13,12,11,10,9,8,7,6,5,4,3,2,0,1);
+	u32 plate = bitswap<24>(m_plate,23,22,21,20,19,18,8,9,10,11,13,16,15,14,13,12,7,0,6,1,5,2,4,3) | 0x2000;
 	display_matrix(18, 12, plate, grid);
 }
 
@@ -388,7 +387,6 @@ READ16_MEMBER(gjungler_state::input_r)
 	// K2,K3: fixed inputs
 	return (m_inp_matrix[2]->read() & 0xc) | (read_inputs(2) & 3);
 }
-
 
 // config
 

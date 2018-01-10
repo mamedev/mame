@@ -225,7 +225,7 @@ MACHINE_RESET_MEMBER(tutankhm_state,tutankhm)
 static MACHINE_CONFIG_START( tutankhm )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6809, XTAL_18_432MHz/12)   /* 1.5 MHz ??? */
+	MCFG_CPU_ADD("maincpu", MC6809E, XTAL_18_432MHz/12)   /* 1.5 MHz ??? */
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", tutankhm_state,  tutankhm_interrupt)
 

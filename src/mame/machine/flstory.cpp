@@ -97,7 +97,7 @@ WRITE8_MEMBER(flstory_state::victnine_mcu_w)
 
 READ8_MEMBER(flstory_state::victnine_mcu_r)
 {
-	//logerror("%04x: mcu read (0x%02x)\n", space.device().safe_pcbase(), m_from_mcu);
+	//logerror("%04x: mcu read (0x%02x)\n", m_maincpu->pcbase(), m_from_mcu);
 
 	return m_from_mcu - VICTNINE_MCU_SEED;
 }

@@ -779,7 +779,7 @@ READ32_MEMBER(ip22_state::hpc3_hd0_r)
 			return 0;
 		}
 	default:
-		//verboselog((machine, 0, "Unknown HPC3 HD0 Read: %08x (%08x) [%x] PC=%x\n", 0x1fbc0000 + ( offset << 2 ), mem_mask, offset, space.device().safe_pc() );
+		//verboselog((machine, 0, "Unknown HPC3 HD0 Read: %08x (%08x) [%x] PC=%x\n", 0x1fbc0000 + ( offset << 2 ), mem_mask, offset, m_maincpu->pc() );
 		return 0;
 	}
 }

@@ -34,7 +34,7 @@ Video emulation TODO:
  \-complete windows effects
  \-mosaic effect
  \-ODD bit/H/V Counter not yet emulated properly
- \-Reduction enable bits
+ \-Reduction enable bits (zooming limiters)
  \-Check if there are any remaining video registers that are yet to be macroized & added to the rumble.
 -batmanfr:
  \-If you reset the game after the character selection screen,when you get again to it there's garbage
@@ -44,10 +44,10 @@ Video emulation TODO:
 -hanagumi:
  \-ending screens have corrupt graphics. (*untested*)
 -kiwames:
- \-incorrect color emulation for the alpha blended flames on the title screen,it's caused by a schizoid
+ \-(fixed) incorrect color emulation for the alpha blended flames on the title screen,it's caused by a schizoid
    linescroll emulation quirk.
  \-the VDP1 sprites refresh is too slow,causing the "Draw by request" mode to
-   flicker.Moved back to default ATM.
+   flicker. Moved back to default ATM.
 -pblbeach:
  \-Sprites are offset, because it doesn't clear vdp1 local coordinates set by bios,
    I guess that they are cleared when some vdp1 register is written (kludged for now)
@@ -55,8 +55,16 @@ Video emulation TODO:
  \-Attract mode presentation has corrupted graphics in various places,probably caused by incomplete
    framebuffer data delete.
 -seabass:
- \-Player sprite is corrupt/missing during movements,caused by incomplete framebuffer switching.
-
+ \-(fixed) Player sprite is corrupt/missing during movements,caused by incomplete framebuffer switching.
+-shienryu:
+ \-level 2 background colors on statues, caused by special color calculation usage (per dot);
+(Saturn games)
+- scud the disposable assassin:
+ \- when zooming on melee attack background gets pink, color calculation issue?
+- virtual hydlide:
+ \- transparent pens usage on most vdp1 items should be black instead.
+ \- likewise "press start button" is the other way around, i.e. black pen where it should be transparent instead.
+ 
 Notes of Interest & Unclear features:
 
 -the test mode / bios is drawn with layer NBG3;

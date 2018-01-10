@@ -334,7 +334,6 @@ WRITE8_MEMBER(touchme_state::write_c)
 	update_speaker();
 }
 
-
 // config
 
 static INPUT_PORTS_START( touchme )
@@ -442,7 +441,6 @@ WRITE8_MEMBER(pabball_state::write_c)
 	prepare_display();
 }
 
-
 // config
 
 static INPUT_PORTS_START( pabball )
@@ -537,7 +535,6 @@ WRITE8_MEMBER(melodym_state::write_c)
 	// C7: speaker out
 	m_speaker->level_w(~data >> 7 & 1);
 }
-
 
 // config
 
@@ -671,7 +668,6 @@ WRITE8_MEMBER(maniac_state::write_c)
 	update_speaker();
 }
 
-
 // config
 
 static INPUT_PORTS_START( maniac )
@@ -789,7 +785,6 @@ WRITE8_MEMBER(leboom_state::write_c)
 	// C6: speaker out
 	m_speaker->level_w(data >> 6 & 1);
 }
-
 
 // config
 
@@ -925,7 +920,6 @@ WRITE8_MEMBER(tbaskb_state::write_c)
 	prepare_display();
 }
 
-
 // config
 
 static INPUT_PORTS_START( tbaskb )
@@ -1046,7 +1040,6 @@ WRITE8_MEMBER(rockpin_state::write_d)
 	prepare_display();
 }
 
-
 // config
 
 static INPUT_PORTS_START( rockpin )
@@ -1151,7 +1144,6 @@ WRITE8_MEMBER(hccbaskb_state::write_c)
 	m_c = ~data;
 	prepare_display();
 }
-
 
 // config
 
@@ -1274,7 +1266,6 @@ WRITE8_MEMBER(ttfball_state::write_c)
 	prepare_display();
 }
 
-
 // config
 
 static INPUT_PORTS_START( ttfball )
@@ -1395,7 +1386,7 @@ WRITE8_MEMBER(uspbball_state::write_a)
 WRITE8_MEMBER(uspbball_state::write_b)
 {
 	// B: digit segment data
-	m_b = BITSWAP8(data,0,1,2,3,4,5,6,7);
+	m_b = bitswap<8>(data,0,1,2,3,4,5,6,7);
 	prepare_display();
 }
 
@@ -1412,7 +1403,6 @@ WRITE8_MEMBER(uspbball_state::write_d)
 	m_d = ~data;
 	prepare_display();
 }
-
 
 // config
 
@@ -1532,7 +1522,6 @@ WRITE8_MEMBER(us2pfball_state::write_d)
 	m_d = ~data;
 	prepare_display();
 }
-
 
 // config
 

@@ -96,7 +96,7 @@ public:
 	DECLARE_DRIVER_INIT(thenanpa);
 	DECLARE_DRIVER_INIT(torarech);
 	DECLARE_DRIVER_INIT(tsuwaku);
-	
+
 	virtual void machine_reset() override;
 	TIMER_DEVICE_CALLBACK_MEMBER(csplayh5_irq);
 	DECLARE_WRITE_LINE_MEMBER(csplayh5_vdp0_interrupt);
@@ -362,6 +362,7 @@ static MACHINE_CONFIG_START( csplayh5 )
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", csplayh5_state, csplayh5_irq, "screen", 0, 1)
 
 	MCFG_DEVICE_ADD("tmp68301", TMP68301, 0)
+	MCFG_TMP68301_CPU("maincpu")
 	MCFG_TMP68301_OUT_PARALLEL_CB(WRITE16(csplayh5_state, tmp68301_parallel_port_w))
 
 #if USE_H8
@@ -806,12 +807,11 @@ ROM_START( nuretemi )
 	DVD_BIOS
 
 	ROM_REGION( 0x20000, ":nichisnd:audiorom", 0 ) // z80
-	// identical to vol. 19, probably an attempt to fix a dead board.
-	ROM_LOAD( "11.ic51", 0x000000, 0x020000, BAD_DUMP CRC(d1ba05d6) SHA1(8d29cdbf00946e06e92225eb260a694d17d7b8d4) )
+	ROM_LOAD( "11.ic51", 0x000000, 0x020000, CRC(655ec499) SHA1(5cea38e998edc7833b9a644930daecd99933c277) )
 
 	ROM_REGION( 0x400000, "blit_gfx", ROMREGION_ERASEFF ) // blitter based gfxs
 	ROM_LOAD16_BYTE( "3.ic40", 0x000000, 0x080000, CRC(5c7af7f6) SHA1(78e58e3a81a6585c2c61f0026b7dc73a72c0d862) )
-	ROM_LOAD16_BYTE( "4.ic41",            0x000001, 0x080000, CRC(335b6388) SHA1(c5427b42af011b5a5026d905b1740684b9f6f953) )
+	ROM_LOAD16_BYTE( "4.ic41", 0x000001, 0x080000, CRC(335b6388) SHA1(c5427b42af011b5a5026d905b1740684b9f6f953) )
 
 	DISK_REGION( "ide:0:hdd:image" )
 	DISK_IMAGE_READONLY( "nb8016", 0, SHA1(607d9f390265da3f0c50753d0ea32257b12e8c08) )
@@ -939,7 +939,7 @@ GAME( 1998, nichidvd,   0,   csplayh5,  csplayh5, csplayh5_state,  0,           
 /* 15 */ GAME( 2000, fuudol,    nichidvd,   csplayh5,  csplayh5, csplayh5_state,  fuudol,    ROT0, "Nichibutsu/eic", "Fuudol (Japan)", MACHINE_NOT_WORKING )
 /* 16 */ GAME( 2000, nuretemi,  nichidvd,   csplayh5,  csplayh5, csplayh5_state,  nuretemi,  ROT0, "Nichibutsu/Love Factory", "Nurete Mitaino... - Net Idol Hen (Japan)", MACHINE_NOT_WORKING )
 /* 17 */ GAME( 2000, tsuwaku,   nichidvd,   csplayh5,  csplayh5, csplayh5_state,  tsuwaku,   ROT0, "Nichibutsu/Love Factory/Just&Just", "Tsuugakuro no Yuuwaku (Japan)", MACHINE_NOT_WORKING )
-/* 18 */ GAME( 2000, torarech,  nichidvd,   csplayh5,  csplayh5, csplayh5_state,  torarech, ROT0,  "Nichibutsu/Love Factory/M Friend", "Torarechattano - AV Kantoku Hen (Japan)", MACHINE_NOT_WORKING ) 
+/* 18 */ GAME( 2000, torarech,  nichidvd,   csplayh5,  csplayh5, csplayh5_state,  torarech, ROT0,  "Nichibutsu/Love Factory/M Friend", "Torarechattano - AV Kantoku Hen (Japan)", MACHINE_NOT_WORKING )
 /* sp */ GAME( 2000, nichisel,  nichidvd,   csplayh5,  csplayh5, csplayh5_state,  nichisel,  ROT0, "Nichibutsu", "DVD Select (Japan)", MACHINE_NOT_WORKING )
 
 // 2001

@@ -70,7 +70,7 @@ nubus_lview_device::nubus_lview_device(const machine_config &mconfig, device_typ
 	m_vram32(nullptr), m_vbl_disable(0), m_toggle(0), m_timer(nullptr), m_protstate(0),
 	m_assembled_tag(util::string_format("%s:%s", tag, LVIEW_SCREEN_NAME))
 {
-	m_screen_tag = m_assembled_tag.c_str();
+	static_set_screen(*this, m_assembled_tag.c_str());
 }
 
 //-------------------------------------------------
@@ -97,7 +97,7 @@ void nubus_lview_device::device_start()
 	m_nubus->install_device(slotspace+0xb0000, slotspace+0xbffff, read32_delegate(FUNC(nubus_lview_device::lview_r), this), write32_delegate(FUNC(nubus_lview_device::lview_w), this));
 
 	m_timer = timer_alloc(0, nullptr);
-	m_timer->adjust(m_screen->time_until_pos(599, 0), 0);
+	m_timer->adjust(screen().time_until_pos(599, 0), 0);
 }
 
 //-------------------------------------------------
@@ -123,7 +123,7 @@ void nubus_lview_device::device_timer(emu_timer &timer, device_timer_id tid, int
 		raise_slot_irq();
 	}
 
-	m_timer->adjust(m_screen->time_until_pos(599, 0), 0);
+	m_timer->adjust(screen().time_until_pos(599, 0), 0);
 }
 
 /***************************************************************************
@@ -167,7 +167,7 @@ READ32_MEMBER( nubus_lview_device::lview_r )
 
 //    printf("prot_r: @ %x, mask %08x [PC=%x  state %d]\n", offset, mem_mask, machine().device("maincpu")->safe_pc(), m_protstate);
 
-	if ((m_protstate == 1) || (m_protstate == 10) || (machine().device("maincpu")->safe_pc() == 0x5aac))
+	if ((m_protstate == 1) || (m_protstate == 10) || (machine().device<cpu_device>("maincpu")->pc() == 0x5aac))
 	{
 		rv = 0x02020202;
 	}
@@ -183,7 +183,7 @@ READ32_MEMBER( nubus_lview_device::lview_r )
 
 WRITE32_MEMBER( nubus_lview_device::lview_w )
 {
-//    if (offset != 0x7a && offset != 0x3ffb) printf("prot_w: %08x @ %x, mask %08x (PC=%x)\n", data, offset, mem_mask, space.device().safe_pc());
+//    if (offset != 0x7a && offset != 0x3ffb) logerror("prot_w: %08x @ %x, mask %08x %s\n", data, offset, mem_mask, machine().describe_context());
 
 	if (offset == 0x7a)
 	{

@@ -812,7 +812,7 @@ WRITE16_MEMBER(model1_state::md1_w)
 	//if(0 && offset)
 	//  return;
 	if(true && m_dump)
-		logerror("TGP: md1_w %x, %04x @ %04x (%x)\n", offset, data, mem_mask, space.device().safe_pc());
+		logerror("TGP: md1_w %x, %04x @ %04x (%x)\n", offset, data, mem_mask, m_maincpu->pc());
 }
 
 WRITE16_MEMBER(model1_state::md0_w)
@@ -822,7 +822,7 @@ WRITE16_MEMBER(model1_state::md0_w)
 	//if(0 && offset)
 	//  return;
 	if(true && m_dump)
-		logerror("TGP: md0_w %x, %04x @ %04x (%x)\n", offset, data, mem_mask, space.device().safe_pc());
+		logerror("TGP: md0_w %x, %04x @ %04x (%x)\n", offset, data, mem_mask, m_maincpu->pc());
 }
 
 WRITE16_MEMBER(model1_state::p_w)
@@ -830,14 +830,14 @@ WRITE16_MEMBER(model1_state::p_w)
 	uint16_t old = m_paletteram16[offset];
 	m_palette->write(space, offset, data, mem_mask);
 	if(0 && m_paletteram16[offset] != old)
-		logerror("XVIDEO: p_w %x, %04x @ %04x (%x)\n", offset, data, mem_mask, space.device().safe_pc());
+		logerror("XVIDEO: p_w %x, %04x @ %04x (%x)\n", offset, data, mem_mask, m_maincpu->pc());
 }
 
 WRITE16_MEMBER(model1_state::mr_w)
 {
 	COMBINE_DATA(m_mr+offset);
 	if(0 && offset == 0x1138/2)
-		logerror("MR.w %x, %04x @ %04x (%x)\n", offset*2+0x500000, data, mem_mask, space.device().safe_pc());
+		logerror("MR.w %x, %04x @ %04x (%x)\n", offset*2+0x500000, data, mem_mask, m_maincpu->pc());
 }
 
 WRITE16_MEMBER(model1_state::mr2_w)
@@ -845,23 +845,23 @@ WRITE16_MEMBER(model1_state::mr2_w)
 	COMBINE_DATA(m_mr2+offset);
 #if 0
 	if(0 && offset == 0x6e8/2) {
-		logerror("MR.w %x, %04x @ %04x (%x)\n", offset*2+0x400000, data, mem_mask, space.device().safe_pc());
+		logerror("MR.w %x, %04x @ %04x (%x)\n", offset*2+0x400000, data, mem_mask, m_maincpu->pc());
 	}
 	if(offset/2 == 0x3680/4)
-		logerror("MW f80[r25], %04x%04x (%x)\n", m_mr2[0x3680/2+1], m_mr2[0x3680/2], space.device().safe_pc());
+		logerror("MW f80[r25], %04x%04x (%x)\n", m_mr2[0x3680/2+1], m_mr2[0x3680/2], m_maincpu->pc());
 	if(offset/2 == 0x06ca/4)
-		logerror("MW fca[r19], %04x%04x (%x)\n", m_mr2[0x06ca/2+1], m_mr2[0x06ca/2], space.device().safe_pc());
+		logerror("MW fca[r19], %04x%04x (%x)\n", m_mr2[0x06ca/2+1], m_mr2[0x06ca/2], m_maincpu->pc());
 	if(offset/2 == 0x1eca/4)
-		logerror("MW fca[r22], %04x%04x (%x)\n", m_mr2[0x1eca/2+1], m_mr2[0x1eca/2], space.device().safe_pc());
+		logerror("MW fca[r22], %04x%04x (%x)\n", m_mr2[0x1eca/2+1], m_mr2[0x1eca/2], m_maincpu->pc());
 #endif
 
 	// wingwar scene position, pc=e1ce -> d735
 	if(offset/2 == 0x1f08/4)
-		logerror("MW  8[r10], %f (%x)\n", *(float *)(m_mr2+0x1f08/2), space.device().safe_pc());
+		logerror("MW  8[r10], %f (%x)\n", *(float *)(m_mr2+0x1f08/2), m_maincpu->pc());
 	if(offset/2 == 0x1f0c/4)
-		logerror("MW  c[r10], %f (%x)\n", *(float *)(m_mr2+0x1f0c/2), space.device().safe_pc());
+		logerror("MW  c[r10], %f (%x)\n", *(float *)(m_mr2+0x1f0c/2), m_maincpu->pc());
 	if(offset/2 == 0x1f10/4)
-		logerror("MW 10[r10], %f (%x)\n", *(float *)(m_mr2+0x1f10/2), space.device().safe_pc());
+		logerror("MW 10[r10], %f (%x)\n", *(float *)(m_mr2+0x1f10/2), m_maincpu->pc());
 }
 
 static ADDRESS_MAP_START( model1_mem, AS_PROGRAM, 16, model1_state )

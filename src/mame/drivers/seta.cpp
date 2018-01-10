@@ -1475,7 +1475,7 @@ WRITE16_MEMBER(seta_state::timer_regs_w)
 			uPD71054->max[offset] = (uPD71054->max[offset]&0x00ff)+(data<<8);
 		}
 		if( uPD71054->max[offset] != 0 ) {
-			uPD71054_update_timer( &space.device(), offset );
+			uPD71054_update_timer( m_maincpu.target(), offset );
 		}
 		break;
 		case 0x0003:
@@ -1522,7 +1522,7 @@ WRITE_LINE_MEMBER(seta_state::utoukond_ym3438_interrupt)
 WRITE_LINE_MEMBER(seta_state::pit_out0)
 {
 	if (state)
-		m_maincpu->set_input_line(4, HOLD_LINE);
+		m_maincpu->set_input_line(4, ASSERT_LINE);
 }
 
 
@@ -1685,7 +1685,7 @@ WRITE16_MEMBER(seta_state::ipl2_ack_w)
 
 static ADDRESS_MAP_START( tndrcade_map, AS_PROGRAM, 16, seta_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM                             // ROM
-	AM_RANGE(0x200000, 0x200001) AM_WRITENOP                        // ? 0
+	AM_RANGE(0x200000, 0x200001) AM_WRITE(ipl1_ack_w)
 	AM_RANGE(0x280000, 0x280001) AM_WRITENOP                        // ? 0 / 1 (sub cpu related?)
 	AM_RANGE(0x300000, 0x300001) AM_WRITENOP                        // ? 0 / 1
 	AM_RANGE(0x380000, 0x3803ff) AM_RAM AM_SHARE("paletteram") // Palette
@@ -2547,8 +2547,9 @@ static ADDRESS_MAP_START( kamenrid_map, AS_PROGRAM, 16, seta_state )
 	AM_RANGE(0x500004, 0x500007) AM_READ(seta_dsw_r)                // DSW
 	AM_RANGE(0x500008, 0x500009) AM_READ_PORT("COINS")              // Coins
 	AM_RANGE(0x50000c, 0x50000d) AM_DEVREADWRITE("watchdog", watchdog_timer_device, reset16_r, reset16_w)    // xx Watchdog? (sokonuke)
+	AM_RANGE(0x600004, 0x600005) AM_WRITE(ipl1_ack_w)
 	AM_RANGE(0x600000, 0x600005) AM_RAM_WRITE(seta_vregs_w) AM_SHARE("vregs")   // ? Coin Lockout + Video Registers
-	AM_RANGE(0x600006, 0x600007) AM_WRITENOP                        // ?
+	AM_RANGE(0x600006, 0x600007) AM_WRITE(ipl2_ack_w)
 	AM_RANGE(0x700000, 0x7003ff) AM_RAM                             // Palette RAM (tested)
 	AM_RANGE(0x700400, 0x700fff) AM_RAM AM_SHARE("paletteram")  // Palette
 	AM_RANGE(0x701000, 0x703fff) AM_RAM                             // Palette
@@ -2563,11 +2564,7 @@ static ADDRESS_MAP_START( kamenrid_map, AS_PROGRAM, 16, seta_state )
 	AM_RANGE(0xa80000, 0xa80001) AM_RAM                             // ? $4000
 	AM_RANGE(0xb00000, 0xb03fff) AM_RAM AM_DEVREADWRITE("spritegen", seta001_device, spritecode_r16, spritecode_w16)     // Sprites Code + X + Attr
 	AM_RANGE(0xb04000, 0xb07fff) AM_RAM                             // tested
-#if __uPD71054_TIMER
-	AM_RANGE(0xc00000, 0xc00007) AM_WRITE(timer_regs_w)             // ?
-#else
-	AM_RANGE(0xc00000, 0xc00007) AM_WRITENOP                        // ?
-#endif
+	AM_RANGE(0xc00000, 0xc00007) AM_DEVREADWRITE8("pit", pit8254_device, read, write, 0x00ff)
 	AM_RANGE(0xd00000, 0xd03fff) AM_DEVREADWRITE("x1snd", x1_010_device, word_r, word_w)   // Sound
 ADDRESS_MAP_END
 
@@ -2580,8 +2577,9 @@ static ADDRESS_MAP_START( madshark_map, AS_PROGRAM, 16, seta_state )
 	AM_RANGE(0x500004, 0x500005) AM_READ_PORT("COINS")              // Coins
 	AM_RANGE(0x500008, 0x50000b) AM_READ(seta_dsw_r)                // DSW
 	AM_RANGE(0x50000c, 0x50000d) AM_DEVWRITE("watchdog", watchdog_timer_device, reset16_w)
+	AM_RANGE(0x600004, 0x600005) AM_WRITE(ipl1_ack_w)
 	AM_RANGE(0x600000, 0x600005) AM_RAM_WRITE(seta_vregs_w) AM_SHARE("vregs")   // ? Coin Lockout + Video Registers
-	AM_RANGE(0x600006, 0x600007) AM_WRITENOP                        // ?
+	AM_RANGE(0x600006, 0x600007) AM_WRITE(ipl2_ack_w)
 	AM_RANGE(0x700400, 0x700fff) AM_RAM AM_SHARE("paletteram")  // Palette
 	AM_RANGE(0x800000, 0x803fff) AM_RAM_WRITE(seta_vram_0_w) AM_SHARE("vram_0") // VRAM 0&1
 	AM_RANGE(0x880000, 0x883fff) AM_RAM_WRITE(seta_vram_2_w) AM_SHARE("vram_2") // VRAM 2&3
@@ -2617,8 +2615,8 @@ static ADDRESS_MAP_START( magspeed_map, AS_PROGRAM, 16, seta_state )
 	AM_RANGE(0x500008, 0x50000b) AM_READ(seta_dsw_r)                // DSW
 	AM_RANGE(0x50000c, 0x50000d) AM_DEVWRITE("watchdog", watchdog_timer_device, reset16_w)
 	AM_RANGE(0x500010, 0x500015) AM_RAM_WRITE(msgundam_vregs_w) AM_SHARE("vregs")   // ? Coin Lockout + Video Registers
-	AM_RANGE(0x500018, 0x500019) AM_WRITENOP                        // lev 2 irq ack?
-	AM_RANGE(0x50001c, 0x50001d) AM_WRITENOP                        // lev 4 irq ack?
+	AM_RANGE(0x500018, 0x500019) AM_WRITE(ipl1_ack_w)               // lev 2 irq ack?
+	AM_RANGE(0x50001c, 0x50001d) AM_WRITE(ipl2_ack_w)               // lev 4 irq ack?
 	AM_RANGE(0x600000, 0x600005) AM_WRITE(magspeed_lights_w)        // Lights
 	AM_RANGE(0x600006, 0x600007) AM_WRITENOP                        // ?
 	AM_RANGE(0x700000, 0x7003ff) AM_RAM                             // Palette RAM (tested)
@@ -2635,11 +2633,7 @@ static ADDRESS_MAP_START( magspeed_map, AS_PROGRAM, 16, seta_state )
 	AM_RANGE(0xa80000, 0xa80001) AM_RAM                             // ? $4000
 	AM_RANGE(0xb00000, 0xb03fff) AM_RAM AM_DEVREADWRITE("spritegen", seta001_device, spritecode_r16, spritecode_w16)     // Sprites Code + X + Attr
 	AM_RANGE(0xb04000, 0xb07fff) AM_RAM                             // tested
-#if __uPD71054_TIMER
-	AM_RANGE(0xc00000, 0xc00007) AM_WRITE(timer_regs_w)             // ?
-#else
-	AM_RANGE(0xc00000, 0xc00007) AM_WRITENOP                        // ?
-#endif
+	AM_RANGE(0xc00000, 0xc00007) AM_DEVREADWRITE8("pit", pit8254_device, read, write, 0x00ff)
 	AM_RANGE(0xd00000, 0xd03fff) AM_DEVREADWRITE("x1snd", x1_010_device, word_r, word_w)   // Sound
 ADDRESS_MAP_END
 
@@ -2695,8 +2689,8 @@ static ADDRESS_MAP_START( msgundam_map, AS_PROGRAM, 16, seta_state )
 	AM_RANGE(0x400000, 0x400001) AM_READ_PORT("P1")                 // P1
 	AM_RANGE(0x400002, 0x400003) AM_READ_PORT("P2")                 // P2
 	AM_RANGE(0x400004, 0x400005) AM_READ_PORT("COINS")              // Coins
-	AM_RANGE(0x400000, 0x400001) AM_WRITENOP                        // Lev 2 IRQ Ack
-	AM_RANGE(0x400004, 0x400005) AM_WRITENOP                        // Lev 4 IRQ Ack
+	AM_RANGE(0x400000, 0x400001) AM_WRITE(ipl1_ack_w)               // Lev 2 IRQ Ack
+	AM_RANGE(0x400004, 0x400005) AM_WRITE(ipl2_ack_w)               // Lev 4 IRQ Ack
 	AM_RANGE(0x500000, 0x500005) AM_RAM_WRITE(msgundam_vregs_w) AM_SHARE("vregs")   // Coin Lockout + Video Registers
 	AM_RANGE(0x600000, 0x600003) AM_READ(seta_dsw_r)                // DSW
 	AM_RANGE(0x700400, 0x700fff) AM_RAM AM_SHARE("paletteram")  // Palette
@@ -2709,11 +2703,7 @@ static ADDRESS_MAP_START( msgundam_map, AS_PROGRAM, 16, seta_state )
 	AM_RANGE(0xb00000, 0xb00005) AM_RAM AM_SHARE("vctrl_0")     // VRAM 0&1 Ctrl
 	AM_RANGE(0xb80000, 0xb80005) AM_RAM AM_SHARE("vctrl_2")     // VRAM 2&3 Ctrl
 	AM_RANGE(0xc00000, 0xc03fff) AM_DEVREADWRITE("x1snd", x1_010_device, word_r, word_w)   // Sound
-#if __uPD71054_TIMER
-	AM_RANGE(0xd00000, 0xd00007) AM_WRITE(timer_regs_w) // ?
-#else
-	AM_RANGE(0xd00000, 0xd00007) AM_WRITENOP    // ?
-#endif
+	AM_RANGE(0xd00000, 0xd00007) AM_DEVREADWRITE8("pit", pit8254_device, read, write, 0x00ff)
 ADDRESS_MAP_END
 
 
@@ -2801,7 +2791,7 @@ READ16_MEMBER(seta_state::kiwame_input_r)
 		case 0x08/2:    return 0xffff;
 
 		default:
-			logerror("PC %06X - Read input %02X !\n", space.device().safe_pc(), offset*2);
+			logerror("PC %06X - Read input %02X !\n", m_maincpu->pc(), offset*2);
 			return 0x0000;
 	}
 }
@@ -2827,12 +2817,12 @@ ADDRESS_MAP_END
 
 READ16_MEMBER(seta_state::thunderl_protection_r)
 {
-//  logerror("PC %06X - Protection Read\n", space.device().safe_pc());
+//  logerror("PC %06X - Protection Read\n", m_maincpu->pc());
 	return 0x00dd;
 }
 WRITE16_MEMBER(seta_state::thunderl_protection_w)
 {
-//  logerror("PC %06X - Protection Written: %04X <- %04X\n", space.device().safe_pc(), offset*2, data);
+//  logerror("PC %06X - Protection Written: %04X <- %04X\n", m_maincpu->pc(), offset*2, data);
 }
 
 /* Similar to downtown etc. */
@@ -2841,7 +2831,7 @@ static ADDRESS_MAP_START( thunderl_map, AS_PROGRAM, 16, seta_state )
 	AM_RANGE(0x000000, 0x00ffff) AM_ROM                             // ROM
 	AM_RANGE(0xffc000, 0xffffff) AM_RAM                             // RAM
 	AM_RANGE(0x100000, 0x103fff) AM_DEVREADWRITE("x1snd", x1_010_device, word_r, word_w)   // Sound
-	AM_RANGE(0x200000, 0x200001) AM_WRITENOP                        // ?
+	AM_RANGE(0x200000, 0x200001) AM_READWRITE(ipl1_ack_r, ipl1_ack_w)
 	AM_RANGE(0x300000, 0x300001) AM_WRITENOP                        // ?
 	AM_RANGE(0x400000, 0x40ffff) AM_WRITE(thunderl_protection_w)    // Protection (not in wits)
 	AM_RANGE(0x500000, 0x500001) AM_RAM_WRITE(seta_vregs_w) AM_SHARE("vregs")   // Coin Lockout
@@ -2865,7 +2855,7 @@ static ADDRESS_MAP_START( thunderlbl_map, AS_PROGRAM, 16, seta_state )
 	AM_RANGE(0x000000, 0x00ffff) AM_ROM                             // ROM
 	AM_RANGE(0xffc000, 0xffffff) AM_RAM                             // RAM
 //  AM_RANGE(0x100000, 0x103fff) AM_DEVREADWRITE("x1snd", x1_010_device, word_r, word_w)  // Sound
-	AM_RANGE(0x200000, 0x200001) AM_WRITENOP                        // ?
+	AM_RANGE(0x200000, 0x200001) AM_READWRITE(ipl1_ack_r, ipl1_ack_w)
 	AM_RANGE(0x300000, 0x300001) AM_WRITENOP                        // ?
 //  AM_RANGE(0x400000, 0x40ffff) AM_WRITE(thunderl_protection_w)    // Protection (not in wits)
 	AM_RANGE(0x500000, 0x500001) AM_RAM_WRITE(seta_vregs_w) AM_SHARE("vregs")   // Coin Lockout
@@ -2892,7 +2882,7 @@ static ADDRESS_MAP_START( wiggie_map, AS_PROGRAM, 16, seta_state )
 	AM_RANGE(0x000000, 0x01ffff) AM_ROM                             // ROM
 	AM_RANGE(0xffc000, 0xffffff) AM_RAM                             // RAM
 	AM_RANGE(0x100000, 0x103fff) AM_NOP                             // X1_010 is not used
-	AM_RANGE(0x200000, 0x200001) AM_WRITENOP                        // ?
+	AM_RANGE(0x200000, 0x200001) AM_READWRITE(ipl1_ack_r, ipl1_ack_w)
 	AM_RANGE(0x300000, 0x300001) AM_WRITENOP                        // ?
 	AM_RANGE(0x400000, 0x40ffff) AM_WRITE(thunderl_protection_w)    // Protection (not in wits)
 	AM_RANGE(0x500000, 0x500001) AM_RAM_WRITE(seta_vregs_w) AM_SHARE("vregs")   // Coin Lockout
@@ -2985,14 +2975,14 @@ READ16_MEMBER(seta_state::pairlove_prot_r)
 	int retdata;
 
 	retdata = m_pairslove_protram[offset];
-	//osd_printf_debug("pairs love protection? read %06x %04x %04x\n",space.device().safe_pc(), offset,retdata);
+	//osd_printf_debug("pairs love protection? read %06x %04x %04x\n",m_maincpu->pc(), offset,retdata);
 	m_pairslove_protram[offset] = m_pairslove_protram_old[offset];
 	return retdata;
 }
 
 WRITE16_MEMBER(seta_state::pairlove_prot_w)
 {
-	//osd_printf_debug("pairs love protection? write %06x %04x %04x\n",space.device().safe_pc(), offset,data);
+	//osd_printf_debug("pairs love protection? write %06x %04x %04x\n",m_maincpu->pc(), offset,data);
 	m_pairslove_protram_old[offset] = m_pairslove_protram[offset];
 	m_pairslove_protram[offset] = data;
 }
@@ -3081,7 +3071,7 @@ READ16_MEMBER(jockeyc_state::mux_r)
 		case 0x40:  return (m_key2[3]->read() << 8) | m_key1[3]->read();
 		case 0x80:  return (m_key2[4]->read() << 8) | m_key1[4]->read();
 	}
-	logerror("%06X: unknown key read, mux = %04x\n", space.device().safe_pc(), m_mux);
+	logerror("%06X: unknown key read, mux = %04x\n", m_maincpu->pc(), m_mux);
 	return 0xffff;
 }
 
@@ -3453,7 +3443,7 @@ WRITE8_MEMBER(seta_state::calibr50_sub_bankswitch_w)
 WRITE8_MEMBER(seta_state::calibr50_soundlatch2_w)
 {
 	m_soundlatch2->write(space,0,data);
-	space.device().execute().spin_until_time(attotime::from_usec(50));  // Allow the other cpu to reply
+	m_subcpu->spin_until_time(attotime::from_usec(50));  // Allow the other cpu to reply
 }
 
 static ADDRESS_MAP_START( calibr50_sub_map, AS_PROGRAM, 8, seta_state )
@@ -7765,7 +7755,7 @@ static MACHINE_CONFIG_START( tndrcade )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 16000000/2) /* 8 MHz */
 	MCFG_CPU_PROGRAM_MAP(tndrcade_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", seta_state,  irq2_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", seta_state, irq2_line_assert)
 
 	MCFG_CPU_ADD("sub", M65C02, 16000000/8) /* 2 MHz */
 	MCFG_CPU_PROGRAM_MAP(tndrcade_sub_map)
@@ -8759,12 +8749,12 @@ static MACHINE_CONFIG_START( kamenrid )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 16000000)   /* 16 MHz */
 	MCFG_CPU_PROGRAM_MAP(kamenrid_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", seta_state,  wrofaero_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", seta_state, irq2_line_assert)
 	MCFG_WATCHDOG_ADD("watchdog")
 
-#if __uPD71054_TIMER
-	MCFG_MACHINE_START_OVERRIDE(seta_state, wrofaero )
-#endif  // __uPD71054_TIMER
+	MCFG_DEVICE_ADD("pit", PIT8254, 0) // uPD71054C
+	MCFG_PIT8253_CLK0(16000000/2/8)
+	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(seta_state, pit_out0))
 
 	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
 	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
@@ -8931,7 +8921,7 @@ static MACHINE_CONFIG_START( madshark )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 16000000)   /* 16 MHz */
 	MCFG_CPU_PROGRAM_MAP(madshark_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", seta_state,  wrofaero_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", seta_state, irq2_line_assert)
 
 	MCFG_DEVICE_ADD("pit", PIT8254, 0) // uPD71054C
 	MCFG_PIT8253_CLK0(16000000/2/8)
@@ -8977,13 +8967,13 @@ static MACHINE_CONFIG_START( magspeed )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 16000000)   /* 16 MHz */
 	MCFG_CPU_PROGRAM_MAP(magspeed_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", seta_state,  wrofaero_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", seta_state, irq2_line_assert)
 
 	MCFG_WATCHDOG_ADD("watchdog")
 
-#if __uPD71054_TIMER
-	MCFG_MACHINE_START_OVERRIDE(seta_state, wrofaero )
-#endif  // __uPD71054_TIMER
+	MCFG_DEVICE_ADD("pit", PIT8254, 0) // uPD71054C
+	MCFG_PIT8253_CLK0(16000000/2/8)
+	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(seta_state, pit_out0))
 
 	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
 	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
@@ -9022,15 +9012,11 @@ static MACHINE_CONFIG_START( msgundam )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 16000000)   /* 16 MHz */
 	MCFG_CPU_PROGRAM_MAP(msgundam_map)
-#if __uPD71054_TIMER
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", seta_state,  wrofaero_interrupt)
-#else
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", seta_state, seta_interrupt_2_and_4, "screen", 0, 1)
-#endif  // __uPD71054_TIMER
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", seta_state, irq2_line_assert)
 
-#if __uPD71054_TIMER
-	MCFG_MACHINE_START_OVERRIDE(seta_state, wrofaero )
-#endif  // __uPD71054_TIMER
+	MCFG_DEVICE_ADD("pit", PIT8254, 0) // uPD71054C
+	MCFG_PIT8253_CLK0(16000000/2/8)
+	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(seta_state, pit_out0))
 
 	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
 	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
@@ -9148,6 +9134,7 @@ static MACHINE_CONFIG_START( kiwame )
 	/* lev 1-7 are the same. WARNING: the interrupt table is written to. */
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", seta_state,  irq1_line_hold)
 	MCFG_DEVICE_ADD("tmp68301", TMP68301, 0)
+	MCFG_TMP68301_CPU("maincpu")
 	MCFG_TMP68301_OUT_PARALLEL_CB(WRITE16(seta_state, kiwame_row_select_w))
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
@@ -9232,7 +9219,7 @@ static MACHINE_CONFIG_START( thunderl )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 16000000/2) /* 8 MHz */
 	MCFG_CPU_PROGRAM_MAP(thunderl_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", seta_state,  irq2_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", seta_state, irq2_line_assert)
 
 	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
 	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
@@ -9280,7 +9267,7 @@ static MACHINE_CONFIG_DERIVED( thunderlbl, thunderl )
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(thunderlbl_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", seta_state,  irq2_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", seta_state, irq2_line_assert)
 
 	MCFG_CPU_ADD("audiocpu", Z80, 10000000/2)
 	MCFG_CPU_PROGRAM_MAP(thunderlbl_sound_map)
@@ -9302,7 +9289,7 @@ static MACHINE_CONFIG_START( wiggie )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 16000000/2) /* 8 MHz */
 	MCFG_CPU_PROGRAM_MAP(wiggie_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", seta_state,  irq2_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", seta_state, irq2_line_assert)
 
 	MCFG_CPU_ADD("audiocpu", Z80, 16000000/4)   /* 4 MHz */
 	MCFG_CPU_PROGRAM_MAP(wiggie_sound_map)
@@ -9345,7 +9332,7 @@ static MACHINE_CONFIG_START( wits )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 16000000/2) /* 8 MHz */
 	MCFG_CPU_PROGRAM_MAP(thunderl_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", seta_state,  irq2_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", seta_state, irq2_line_assert)
 
 	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
 	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
@@ -11710,12 +11697,12 @@ READ16_MEMBER(seta_state::twineagl_debug_r)
 READ16_MEMBER(seta_state::twineagl_200100_r)
 {
 	// protection check at boot
-	logerror("%04x: twineagl_200100_r %d\n",space.device().safe_pc(),offset);
+	logerror("%04x: twineagl_200100_r %d\n",m_maincpu->pc(),offset);
 	return m_twineagl_xram[offset];
 }
 WRITE16_MEMBER(seta_state::twineagl_200100_w)
 {
-	logerror("%04x: twineagl_200100_w %d = %02x\n",space.device().safe_pc(),offset,data);
+	logerror("%04x: twineagl_200100_w %d = %02x\n",m_maincpu->pc(),offset,data);
 
 	if (ACCESSING_BITS_0_7)
 	{
@@ -11782,16 +11769,31 @@ DRIVER_INIT_MEMBER(seta_state,arbalest)
 }
 
 
+READ16_MEMBER(seta_state::metafox_protection_r)
+{
+	// very simplified protection simulation
+	// 21c000-21c3ff, 21d000-21d3ff, and 21e000-21e3ff are tested as 8 bit reads/writes
+	// the first address in each range is special and returns data written elsewhere in that range
+	// 21fde0-21fdff appears to be control bytes?
+
+	switch (offset)
+	{
+		case 0x0001/2:
+			return 0x3d;
+
+		case 0x1001/2:
+			return 0x76;
+
+		case 0x2001/2:
+			return 0x10;
+	}
+
+	return offset * 0x1f;
+}
+
 DRIVER_INIT_MEMBER(seta_state,metafox)
 {
-	uint16_t *RAM = (uint16_t *) memregion("maincpu")->base();
-
-	/* This game uses the 21c000-21ffff area for protection? */
-//  m_maincpu->space(AS_PROGRAM).nop_readwrite(0x21c000, 0x21ffff);
-
-	RAM[0x8ab1c/2] = 0x4e71;    // patch protection test: "cp error"
-	RAM[0x8ab1e/2] = 0x4e71;
-	RAM[0x8ab20/2] = 0x4e71;
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x21c000, 0x21ffff,read16_delegate(FUNC(seta_state::metafox_protection_r),this));
 }
 
 

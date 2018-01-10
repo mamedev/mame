@@ -52,7 +52,7 @@
 
 class cococart_slot_device;
 
-class gime_device : public mc6847_friend_device, public sam6883_friend_device
+class gime_device : public mc6847_friend_device, public sam6883_friend_device_interface
 {
 public:
 	template <class Object> static devcb_base &set_irq_wr_callback(device_t &device, Object &&cb) { return downcast<gime_device &>(device).m_write_irq.set_callback(std::forward<Object>(cb)); }

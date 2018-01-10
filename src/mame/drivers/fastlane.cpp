@@ -25,10 +25,9 @@ TIMER_DEVICE_CALLBACK_MEMBER(fastlane_state::fastlane_scanline)
 {
 	int scanline = param;
 
-	address_space &space = generic_space();
-	if(scanline == 240 && m_k007121->ctrlram_r(space, 7) & 0x02) // vblank irq
+	if(scanline == 240 && m_k007121->ctrlram_r(7) & 0x02) // vblank irq
 		m_maincpu->set_input_line(HD6309_IRQ_LINE, HOLD_LINE);
-	else if(((scanline % 32) == 0) && m_k007121->ctrlram_r(space, 7) & 0x01) // timer irq
+	else if(((scanline % 32) == 0) && m_k007121->ctrlram_r(7) & 0x01) // timer irq
 		m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 

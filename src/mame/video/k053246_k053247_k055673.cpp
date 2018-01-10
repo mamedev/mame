@@ -133,9 +133,9 @@ WRITE8_MEMBER( k053247_device::k053247_w )
 // FIXME: rearrange ROM loading so this can be merged with the 4/6/8bpp version
 READ16_MEMBER( k053247_device::k055673_5bpp_rom_word_r ) // 5bpp
 {
-	uint8_t *ROM8 = (uint8_t *)space.machine().root_device().memregion(m_memory_region)->base();
-	uint16_t *ROM = (uint16_t *)space.machine().root_device().memregion(m_memory_region)->base();
-	int size4 = (space.machine().root_device().memregion(m_memory_region)->bytes() / (1024 * 1024)) / 5;
+	uint8_t *ROM8 = (uint8_t *)machine().root_device().memregion(m_memory_region)->base();
+	uint16_t *ROM = (uint16_t *)machine().root_device().memregion(m_memory_region)->base();
+	int size4 = (machine().root_device().memregion(m_memory_region)->bytes() / (1024 * 1024)) / 5;
 	int romofs;
 
 	size4 *= 4 * 1024 * 1024;   // get offset to 5th bit
@@ -174,7 +174,7 @@ READ16_MEMBER( k053247_device::k055673_rom_word_r )
 	if (m_bpp == 5)
 		return k055673_5bpp_rom_word_r(space, offset, mem_mask);
 
-	uint16_t *ROM = (uint16_t *)space.machine().root_device().memregion(m_memory_region)->base();
+	uint16_t *ROM = (uint16_t *)machine().root_device().memregion(m_memory_region)->base();
 	int romofs;
 
 	romofs = m_kx46_regs[6] << 16 | m_kx46_regs[7] << 8 | m_kx46_regs[4];
@@ -188,7 +188,7 @@ READ16_MEMBER( k053247_device::k055673_rom_word_r )
 
 READ16_MEMBER( k053247_device::k055673_ps_rom_word_r )
 {
-	uint8_t *ROM = (uint8_t *)space.machine().root_device().memregion(m_memory_region)->base();
+	uint8_t *ROM = (uint8_t *)machine().root_device().memregion(m_memory_region)->base();
 	int romofs;
 	int magic = (offset & 1);
 
@@ -207,14 +207,11 @@ READ8_MEMBER( k053247_device::k053246_r )
 		int addr;
 
 		addr = (m_kx46_regs[6] << 17) | (m_kx46_regs[7] << 9) | (m_kx46_regs[4] << 1) | ((offset & 1) ^ 1);
-		addr &= space.machine().root_device().memregion(m_memory_region)->bytes() - 1;
-//      if (VERBOSE)
-//          popmessage("%04x: offset %02x addr %06x", space.device().safe_pc(), offset, addr);
-		return space.machine().root_device().memregion(m_memory_region)->base()[addr];
+		addr &= machine().root_device().memregion(m_memory_region)->bytes() - 1;
+		return machine().root_device().memregion(m_memory_region)->base()[addr];
 	}
 	else
 	{
-//      LOG("%04x: read from unknown 053246 address %x\n", space.device().safe_pc(), offset);
 		return 0;
 	}
 }
@@ -1121,7 +1118,7 @@ void k053247_device::device_start()
 
 	if (VERBOSE)
 	{
-		if (m_screen->format() == BITMAP_FORMAT_RGB32)
+		if (screen().format() == BITMAP_FORMAT_RGB32)
 		{
 			if (!palette().shadows_enabled() || !palette().hilights_enabled())
 				popmessage("driver missing SHADOWS or HIGHLIGHTS flag");

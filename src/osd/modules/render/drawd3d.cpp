@@ -762,15 +762,12 @@ void renderer_d3d9::update_presentation_parameters()
 
 void renderer_d3d9::update_gamma_ramp()
 {
-	if (m_gamma_supported)
+	if (!m_gamma_supported)
 	{
 		return;
 	}
 
 	auto win = assert_window();
-
-	// create a standard ramp
-	D3DGAMMARAMP ramp;
 
 	// set the gamma if we need to
 	if (win->fullscreen())
@@ -782,14 +779,16 @@ void renderer_d3d9::update_gamma_ramp()
 		float gamma = options.full_screen_gamma();
 		if (brightness != 1.0f || contrast != 1.0f || gamma != 1.0f)
 		{
+			D3DGAMMARAMP ramp;
+
 			for (int i = 0; i < 256; i++)
 			{
 				ramp.red[i] = ramp.green[i] = ramp.blue[i] = apply_brightness_contrast_gamma(i, brightness, contrast, gamma) << 8;
 			}
+
+			m_device->SetGammaRamp(0, 0, &ramp);
 		}
 	}
-
-	m_device->SetGammaRamp(0, 0, &ramp);
 }
 
 

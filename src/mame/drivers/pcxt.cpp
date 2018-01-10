@@ -236,7 +236,7 @@ const tiny_rom_entry *isa8_cga_tetriskr_device::device_rom_region() const
 
 READ8_MEMBER(pcxt_state::disk_iobank_r)
 {
-	//printf("Read Prototyping card [%02x] @ PC=%05x\n",offset,space.device().safe_pc());
+	//printf("Read Prototyping card [%02x] @ PC=%05x\n",offset,m_maincpu->pc());
 	//if(offset == 0) return ioport("DSW")->read();
 	if(offset == 1) return ioport("IN1")->read();
 

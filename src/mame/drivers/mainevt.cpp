@@ -105,7 +105,7 @@ WRITE8_MEMBER(mainevt_state::mainevt_sh_bankswitch_w)
 {
 	int bank_A, bank_B;
 
-//logerror("CPU #1 PC: %04x bank switch = %02x\n",space.device().safe_pc(),data);
+//logerror("CPU #1 PC: %04x bank switch = %02x\n", m_audiocpu->pc(),data);
 
 	/* bits 0-3 select the 007232 banks */
 	bank_A = (data & 0x3);
@@ -120,7 +120,7 @@ WRITE8_MEMBER(mainevt_state::dv_sh_bankswitch_w)
 {
 	int bank_A, bank_B;
 
-//logerror("CPU #1 PC: %04x bank switch = %02x\n",space.device().safe_pc(),data);
+//logerror("CPU #1 PC: %04x bank switch = %02x\n",m_audiocpu->pc(),data);
 
 	/* bits 0-3 select the 007232 banks */
 	bank_A = (data & 0x3);

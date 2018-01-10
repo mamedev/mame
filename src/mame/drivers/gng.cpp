@@ -60,6 +60,11 @@ WRITE_LINE_MEMBER(gng_state::ym_reset_w)
 	}
 }
 
+READ8_MEMBER(gng_state::diamond_hack_r)
+{
+	return 0;
+}
+
 static ADDRESS_MAP_START( gng_map, AS_PROGRAM, 8, gng_state )
 	AM_RANGE(0x0000, 0x1dff) AM_RAM
 	AM_RANGE(0x1e00, 0x1fff) AM_RAM AM_SHARE("spriteram")
@@ -79,6 +84,32 @@ static ADDRESS_MAP_START( gng_map, AS_PROGRAM, 8, gng_state )
 	AM_RANGE(0x3d00, 0x3d07) AM_DEVWRITE("mainlatch", ls259_device, write_d0)
 	AM_RANGE(0x3e00, 0x3e00) AM_WRITE(gng_bankswitch_w)
 	AM_RANGE(0x4000, 0x5fff) AM_ROMBANK("bank1")
+	AM_RANGE(0x6000, 0xffff) AM_ROM
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( diamond_map, AS_PROGRAM, 8, gng_state )
+	AM_RANGE(0x0000, 0x1dff) AM_RAM
+	AM_RANGE(0x1e00, 0x1fff) AM_RAM AM_SHARE("spriteram")
+	AM_RANGE(0x2000, 0x27ff) AM_RAM_WRITE(gng_fgvideoram_w) AM_SHARE("fgvideoram")
+	AM_RANGE(0x2800, 0x2fff) AM_RAM_WRITE(gng_bgvideoram_w) AM_SHARE("bgvideoram")
+	AM_RANGE(0x3000, 0x3000) AM_READ_PORT("SYSTEM")
+	AM_RANGE(0x3001, 0x3001) AM_READ_PORT("P1")
+	AM_RANGE(0x3002, 0x3002) AM_READ_PORT("P2")
+	AM_RANGE(0x3003, 0x3003) AM_READ_PORT("DSW1")
+	AM_RANGE(0x3004, 0x3004) AM_READ_PORT("DSW2")
+	AM_RANGE(0x3000, 0x33ff) AM_NOP // faulty POST?
+	AM_RANGE(0x3800, 0x38ff) AM_DEVWRITE("palette", palette_device, write_ext) AM_SHARE("palette_ext")
+	AM_RANGE(0x3900, 0x39ff) AM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x3a00, 0x3a00) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
+	AM_RANGE(0x3b08, 0x3b09) AM_WRITE(gng_bgscrollx_w)
+	AM_RANGE(0x3b0a, 0x3b0b) AM_WRITE(gng_bgscrolly_w)
+	AM_RANGE(0x3c00, 0x3c00) AM_NOP /* watchdog? */
+	AM_RANGE(0x3d00, 0x3d00) AM_WRITENOP // ? (writes $01 and $0F)
+	AM_RANGE(0x3d01, 0x3d01) AM_WRITENOP // ?
+	AM_RANGE(0x3e00, 0x3e00) AM_WRITE(gng_bankswitch_w)
+	AM_RANGE(0x4000, 0x5fff) AM_ROMBANK("bank1")
+	AM_RANGE(0x6000, 0x6000) AM_READ(diamond_hack_r)
+	AM_RANGE(0x6048, 0x6048) AM_WRITENOP // ?
 	AM_RANGE(0x6000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -357,7 +388,7 @@ void gng_state::machine_reset()
 static MACHINE_CONFIG_START( gng )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6809, XTAL_12MHz/8)        /* verified on pcb */
+	MCFG_CPU_ADD("maincpu", MC6809, XTAL_12MHz/2)        /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(gng_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", gng_state,  irq0_line_hold)
 
@@ -405,6 +436,13 @@ static MACHINE_CONFIG_START( gng )
 	MCFG_SOUND_ROUTE(1, "mono", 0.40)
 	MCFG_SOUND_ROUTE(2, "mono", 0.40)
 	MCFG_SOUND_ROUTE(3, "mono", 0.20)
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( diamond, gng )
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(diamond_map)
+
+	MCFG_DEVICE_REMOVE("mainlatch")
 MACHINE_CONFIG_END
 
 
@@ -503,8 +541,8 @@ ROM_START( gngbl )
 	ROM_REGION( 0x18000, "gfx2", 0 )
 	ROM_LOAD( "13.84490.3e",     0x00000, 0x4000, CRC(ddd56fa9) SHA1(f9d77eee5e2738b7e83ba02fcc55dd480391479f) ) /* tiles 0-1 Plane 1*/
 	ROM_LOAD( "12.84490.1e",     0x04000, 0x4000, CRC(7302529d) SHA1(8434c994cc55d2586641f3b90b6b15fd65dfb67c) ) /* tiles 2-3 Plane 1*/
-	ROM_LOAD( "11.84490.3c",      0x08000, 0x4000, CRC(20035bda) SHA1(bbb1fba0eb19471f66d29526fa8423ccb047bd63) ) /* tiles 0-1 Plane 2*/
-	ROM_LOAD( "10.84490.1c",      0x0c000, 0x4000, CRC(f12ba271) SHA1(1c42fa02cb27b35d10c3f7f036005e747f9f6b79) ) /* tiles 2-3 Plane 2*/
+	ROM_LOAD( "11.84490.3c",     0x08000, 0x4000, CRC(20035bda) SHA1(bbb1fba0eb19471f66d29526fa8423ccb047bd63) ) /* tiles 0-1 Plane 2*/
+	ROM_LOAD( "10.84490.1c",     0x0c000, 0x4000, CRC(f12ba271) SHA1(1c42fa02cb27b35d10c3f7f036005e747f9f6b79) ) /* tiles 2-3 Plane 2*/
 	ROM_LOAD( "9.84490.3b",      0x10000, 0x4000, CRC(e525207d) SHA1(1947f159189b3a53f1251d8653b6e7c65c91fc3c) ) /* tiles 0-1 Plane 3*/
 	ROM_LOAD( "8.84490.1b",      0x14000, 0x4000, CRC(2d77e9b2) SHA1(944da1ce29a18bf0fc8deff78bceacba0bf23a07) ) /* tiles 2-3 Plane 3*/
 
@@ -529,7 +567,7 @@ ROM_START( gngprot )
 	ROM_LOAD( "gg14h.bin",      0x0000, 0x8000, CRC(55cfb196) SHA1(df9cdbb24c26bca226d7274225725d62ea854c7a) )
 
 	ROM_REGION( 0x04000, "gfx1", 0 )
-	ROM_LOAD( "1.84490.11e",      0x00000, 0x4000, BAD_DUMP CRC(ecfccf07) SHA1(0a1518e19a2e0a4cc3dde4b9568202ea911b5ece) ) /* characters */ // MISSING FROM THIS SET! (was on PCB, why wasn't it dumped?)
+	ROM_LOAD( "gg11e.bin",      0x00000, 0x4000, CRC(ccea9365) SHA1(bb567529fa376afc0a5afd331dcecef4f61cc8a3) ) /* characters */
 
 	ROM_REGION( 0x18000, "gfx2", 0 )
 	ROM_LOAD( "gg3e.bin",      0x00000, 0x4000, CRC(68db22c8) SHA1(ada859bfa60d9563a8a86b1b6526f626b932981c) ) /* tiles 0-1 Plane 1*/
@@ -790,26 +828,14 @@ ROM_END
 
 
 
-READ8_MEMBER(gng_state::diamond_hack_r)
-{
-	return 0;
-}
-
-DRIVER_INIT_MEMBER(gng_state,diamond)
-{
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x6000, 0x6000, read8_delegate(FUNC(gng_state::diamond_hack_r),this));
-}
-
-
-
-GAME( 1985, gng,       0,   gng, gng,      gng_state, 0,       ROT0, "Capcom",   "Ghosts'n Goblins (World? set 1)",            MACHINE_SUPPORTS_SAVE )
-GAME( 1985, gnga,      gng, gng, gng,      gng_state, 0,       ROT0, "Capcom",   "Ghosts'n Goblins (World? set 2)",            MACHINE_SUPPORTS_SAVE )
-GAME( 1985, gngbl,     gng, gng, gng,      gng_state, 0,       ROT0, "bootleg",  "Ghosts'n Goblins (bootleg with Cross)",      MACHINE_SUPPORTS_SAVE )
-GAME( 1985, gngprot,   gng, gng, gng,      gng_state, 0,       ROT0, "Capcom",   "Ghosts'n Goblins (prototype)",               MACHINE_SUPPORTS_SAVE )
-GAME( 1985, gngblita,  gng, gng, gng,      gng_state, 0,       ROT0, "bootleg",  "Ghosts'n Goblins (Italian bootleg, harder)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, gngc,      gng, gng, gng,      gng_state, 0,       ROT0, "Capcom",   "Ghosts'n Goblins (World? set 3)",            MACHINE_SUPPORTS_SAVE ) // rev c?
-GAME( 1985, gngt,      gng, gng, gng,      gng_state, 0,       ROT0, "Capcom (Taito America license)", "Ghosts'n Goblins (US)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, makaimur,  gng, gng, makaimur, gng_state, 0,       ROT0, "Capcom",   "Makai-Mura (Japan)",                         MACHINE_SUPPORTS_SAVE )
-GAME( 1985, makaimurc, gng, gng, makaimur, gng_state, 0,       ROT0, "Capcom",   "Makai-Mura (Japan Revision C)",              MACHINE_SUPPORTS_SAVE )
-GAME( 1985, makaimurg, gng, gng, makaimur, gng_state, 0,       ROT0, "Capcom",   "Makai-Mura (Japan Revision G)",              MACHINE_SUPPORTS_SAVE )
-GAME( 1989, diamond,   0,   gng, diamond,  gng_state, diamond, ROT0, "KH Video", "Diamond Run",                                MACHINE_SUPPORTS_SAVE )
+GAME( 1985, gng,       0,   gng,     gng,      gng_state, 0, ROT0, "Capcom",   "Ghosts'n Goblins (World? set 1)",            MACHINE_SUPPORTS_SAVE )
+GAME( 1985, gnga,      gng, gng,     gng,      gng_state, 0, ROT0, "Capcom",   "Ghosts'n Goblins (World? set 2)",            MACHINE_SUPPORTS_SAVE )
+GAME( 1985, gngbl,     gng, gng,     gng,      gng_state, 0, ROT0, "bootleg",  "Ghosts'n Goblins (bootleg with Cross)",      MACHINE_SUPPORTS_SAVE )
+GAME( 1985, gngprot,   gng, gng,     gng,      gng_state, 0, ROT0, "Capcom",   "Ghosts'n Goblins (prototype)",               MACHINE_SUPPORTS_SAVE )
+GAME( 1985, gngblita,  gng, gng,     gng,      gng_state, 0, ROT0, "bootleg",  "Ghosts'n Goblins (Italian bootleg, harder)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, gngc,      gng, gng,     gng,      gng_state, 0, ROT0, "Capcom",   "Ghosts'n Goblins (World? set 3)",            MACHINE_SUPPORTS_SAVE ) // rev c?
+GAME( 1985, gngt,      gng, gng,     gng,      gng_state, 0, ROT0, "Capcom (Taito America license)", "Ghosts'n Goblins (US)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, makaimur,  gng, gng,     makaimur, gng_state, 0, ROT0, "Capcom",   "Makai-Mura (Japan)",                         MACHINE_SUPPORTS_SAVE )
+GAME( 1985, makaimurc, gng, gng,     makaimur, gng_state, 0, ROT0, "Capcom",   "Makai-Mura (Japan Revision C)",              MACHINE_SUPPORTS_SAVE )
+GAME( 1985, makaimurg, gng, gng,     makaimur, gng_state, 0, ROT0, "Capcom",   "Makai-Mura (Japan Revision G)",              MACHINE_SUPPORTS_SAVE )
+GAME( 1989, diamond,   0,   diamond, diamond,  gng_state, 0, ROT0, "KH Video", "Diamond Run",                                MACHINE_SUPPORTS_SAVE )

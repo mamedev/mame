@@ -210,15 +210,15 @@ uint8_t qubide_device::read(address_space &space, offs_t offset, uint8_t data)
 			switch (offset & 0x0f)
 			{
 			case 0:
-				data = m_ata->read_cs1(space, 0x07, 0xff);
+				data = m_ata->read_cs1(0x07, 0xff);
 				break;
 
 			default:
-				data = m_ata->read_cs0(space, offset & 0x07, 0xff);
+				data = m_ata->read_cs0(offset & 0x07, 0xff);
 				break;
 
 			case 0x08: case 0x0a: case 0x0c:
-				m_ata_data = m_ata->read_cs0(space, 0x00, 0xffff);
+				m_ata_data = m_ata->read_cs0(0);
 
 				data = m_ata_data >> 8;
 				break;
@@ -228,7 +228,7 @@ uint8_t qubide_device::read(address_space &space, offs_t offset, uint8_t data)
 				break;
 
 			case 0x0e: case 0x0f:
-				data = m_ata->read_cs1(space, 0x05, 0xff);
+				data = m_ata->read_cs1(0x05, 0xff);
 				break;
 			}
 		}
@@ -255,7 +255,7 @@ void qubide_device::write(address_space &space, offs_t offset, uint8_t data)
 			switch (offset & 0x0f)
 			{
 			case 0: case 0x0e: case 0x0f:
-				m_ata->write_cs1(space, 0x05, data, 0xff);
+				m_ata->write_cs1(0x05, data, 0xff);
 				break;
 
 			case 0x08: case 0x0a: case 0x0c:
@@ -265,11 +265,11 @@ void qubide_device::write(address_space &space, offs_t offset, uint8_t data)
 			case 0x09: case 0x0b: case 0x0d:
 				m_ata_data = (m_ata_data & 0xff00) | data;
 
-				m_ata->write_cs0(space, 0x00, m_ata_data, 0xffff);
+				m_ata->write_cs0(0, m_ata_data);
 				break;
 
 			default:
-				m_ata->write_cs0(space, offset & 0x07, data, 0xff);
+				m_ata->write_cs0(offset & 0x07, data, 0xff);
 				break;
 			}
 		}

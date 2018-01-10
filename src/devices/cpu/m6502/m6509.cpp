@@ -26,9 +26,9 @@ m6509_device::m6509_device(const machine_config &mconfig, const char *tag, devic
 void m6509_device::device_start()
 {
 	if(direct_disabled)
-		mintf = new mi_6509_nd(this);
+		mintf = std::make_unique<mi_6509_nd>(this);
 	else
-		mintf = new mi_6509_normal(this);
+		mintf = std::make_unique<mi_6509_normal>(this);
 
 	init();
 

@@ -10,6 +10,8 @@ Skeleton driver for Data General Dasher 400 series terminals.
 #include "cpu/m6809/m6809.h"
 #include "machine/mc68681.h"
 #include "machine/x2212.h"
+//#include "video/crt9007.h"
+//#include "screen.h"
 
 class d400_state : public driver_device
 {
@@ -25,6 +27,7 @@ private:
 
 static ADDRESS_MAP_START( mem_map, AS_PROGRAM, 8, d400_state )
 	AM_RANGE(0x0000, 0x3fff) AM_RAM
+	//AM_RANGE(0x4000, 0x403f) AM_DEVREADWRITE("vpac", crt9007_device, read, write)
 	AM_RANGE(0x4800, 0x48ff) AM_RAM
 	AM_RANGE(0x5000, 0x50ff) AM_RAM
 	AM_RANGE(0x6000, 0x6fff) AM_RAM
@@ -38,7 +41,7 @@ static INPUT_PORTS_START( d461 )
 INPUT_PORTS_END
 
 static MACHINE_CONFIG_START( d461 )
-	MCFG_CPU_ADD("maincpu", M6809, 4'000'000)
+	MCFG_CPU_ADD("maincpu", MC6809E, 4'000'000) // HD68B09EP
 	MCFG_CPU_PROGRAM_MAP(mem_map)
 
 	MCFG_DEVICE_ADD("novram", X2210, 0)

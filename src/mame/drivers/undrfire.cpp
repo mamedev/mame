@@ -284,7 +284,7 @@ READ32_MEMBER(undrfire_state::unknown_hardware_r)
 WRITE32_MEMBER(undrfire_state::unknown_int_req_w)
 {
 	/* 10000 cycle delay is arbitrary */
-	timer_set(downcast<cpu_device *>(&space.device())->cycles_to_attotime(10000), TIMER_INTERRUPT5);
+	timer_set(m_maincpu->cycles_to_attotime(10000), TIMER_INTERRUPT5);
 }
 
 
@@ -318,7 +318,7 @@ READ32_MEMBER(undrfire_state::undrfire_lightgun_r)
 		}
 	}
 
-logerror("CPU #0 PC %06x: warning - read unmapped lightgun offset %06x\n",space.device().safe_pc(),offset);
+logerror("CPU #0 PC %06x: warning - read unmapped lightgun offset %06x\n",m_maincpu->pc(),offset);
 
 	return 0x0;
 }
@@ -392,7 +392,7 @@ WRITE8_MEMBER(undrfire_state::cbombers_adc_w)
 	/* TODO: hook it up to offset 0 only otherwise cbomber proto keeps sending irqs.
 	         Could or could not be right. */
 	if(offset == 0)
-		timer_set(downcast<cpu_device *>(&space.device())->cycles_to_attotime(1000), TIMER_INTERRUPT5);
+		timer_set(m_maincpu->cycles_to_attotime(1000), TIMER_INTERRUPT5);
 }
 
 /***********************************************************

@@ -209,7 +209,7 @@
                                                                digit #3
                                                                +-------+ swapped digits 1 & 2
                                                                |       |  +-------+------+
-    tile_offset = BITSWAP16((tile_offset & 0xfff),15,14,13,12, 8,9,10,11, 0,1,2,3, 4,5,6,7)
+    tile_offset = bitswap<16>((tile_offset & 0xfff),15,14,13,12, 8,9,10,11, 0,1,2,3, 4,5,6,7)
                                                                | | |  |   | | | | || | | |
                                                                inverted   inverted|inverted
                                                                bitorder   bitorder|bitorder
@@ -243,7 +243,7 @@
                                       1st nibble
                                   inverted bitorder
                                        | | | |
-    color_index = BITSWAP8(color_index,4,5,6,7,2,3,0,1)
+    color_index = bitswap<8>(color_index,4,5,6,7,2,3,0,1)
                                                <-> <->
                                               2nd nibble
                                             swappeed pairs
@@ -437,7 +437,7 @@
 
   So, the algorithm to properly decrypt the color codes is the following one:
 
-    color_index = BITSWAP8(color_index,7,5,6,4,3,2,1,0)
+    color_index = bitswap<8>(color_index,7,5,6,4,3,2,1,0)
                                          | |
                                        swapped
 

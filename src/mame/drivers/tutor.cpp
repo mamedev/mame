@@ -267,6 +267,7 @@ void tutor_state::machine_reset()
 
 	// Enable auto wait states by lowering READY during reset
 	m_maincpu->ready_line(CLEAR_LINE);
+	m_maincpu->reset_line(ASSERT_LINE);
 }
 
 /*

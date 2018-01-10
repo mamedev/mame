@@ -136,22 +136,22 @@ southbridge_device::southbridge_device(const machine_config &mconfig, device_typ
 /// HACK: the memory system cannot cope with mixing the  8 bit device map from the fdc with a 32 bit handler
 READ8_MEMBER(southbridge_device::ide_read_cs1_r)
 {
-	return m_ide->read_cs1(space, 1, (uint32_t) 0xff0000) >> 16;
+	return m_ide->read_cs1(1, 0xff0000) >> 16;
 }
 
 WRITE8_MEMBER(southbridge_device::ide_write_cs1_w)
 {
-	m_ide->write_cs1(space, 1, (uint32_t) data << 16, (uint32_t) 0xff0000);
+	m_ide->write_cs1(1, data << 16, 0xff0000);
 }
 
 READ8_MEMBER(southbridge_device::ide2_read_cs1_r)
 {
-	return m_ide2->read_cs1(space, 1, (uint32_t) 0xff0000) >> 16;
+	return m_ide2->read_cs1(1, 0xff0000) >> 16;
 }
 
 WRITE8_MEMBER(southbridge_device::ide2_write_cs1_w)
 {
-	m_ide2->write_cs1(space, 1, (uint32_t) data << 16, (uint32_t) 0xff0000);
+	m_ide2->write_cs1(1, data << 16, 0xff0000);
 }
 
 //-------------------------------------------------

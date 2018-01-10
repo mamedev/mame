@@ -154,7 +154,7 @@ WRITE32_MEMBER(midzeus_state::cmos_w)
 	if (disk_asic_jr[2] && !cmos_protected)
 		COMBINE_DATA(&m_nvram[offset]);
 	else
-		logerror("%06X:timekeeper_w with disk_asic_jr[2] = %d, cmos_protected = %d\n", space.device().safe_pc(), disk_asic_jr[2], cmos_protected);
+		logerror("%06X:timekeeper_w with disk_asic_jr[2] = %d, cmos_protected = %d\n", m_maincpu->pc(), disk_asic_jr[2], cmos_protected);
 	cmos_protected = true;
 }
 
@@ -205,7 +205,7 @@ WRITE32_MEMBER(midzeus_state::zpram_w)
 	if (disk_asic_jr[2])
 		COMBINE_DATA(&m_nvram[offset]);
 	else
-		logerror("%06X:zpram_w with disk_asic_jr[2] = %d\n", space.device().safe_pc(), disk_asic_jr[2]);
+		logerror("%06X:zpram_w with disk_asic_jr[2] = %d\n", m_maincpu->pc(), disk_asic_jr[2]);
 }
 
 
@@ -247,7 +247,7 @@ READ32_MEMBER(midzeus_state::disk_asic_r)
 			break;
 		// Unknown
 		default:
-			logerror("%06X:disk_asic_r(%X) Unknown\n", space.device().safe_pc(), offset);
+			logerror("%06X:disk_asic_r(%X) Unknown\n", m_maincpu->pc(), offset);
 			break;
 	}
 	return retVal;
@@ -284,7 +284,7 @@ WRITE32_MEMBER(midzeus_state::disk_asic_w)
 			break;
 		// Unknown
 		default:
-			logerror("%06X:disk_asic_w(%X)=%08X Unknown\n", space.device().safe_pc(), offset, data);
+			logerror("%06X:disk_asic_w(%X)=%08X Unknown\n", m_maincpu->pc(), offset, data);
 			break;
 	}
 }
@@ -328,7 +328,7 @@ READ32_MEMBER(midzeus_state::disk_asic_jr_r)
 
 		/* unknown purpose */
 		default:
-			logerror("%06X:disk_asic_jr_r(%X)\n", space.device().safe_pc(), offset);
+			logerror("%06X:disk_asic_jr_r(%X)\n", m_maincpu->pc(), offset);
 			break;
 	}
 	return retVal;
@@ -345,13 +345,13 @@ WRITE32_MEMBER(midzeus_state::disk_asic_jr_w)
 		/* disk asic jr led; crusnexo toggles this between 0 and 1 every 20 frames; thegrid writes 1 */
 		case 0:
 			if (data != 0 && data != 1)
-				logerror("%06X:disk_asic_jr_w(%X) = %X (unexpected)\n", space.device().safe_pc(), offset, data);
+				logerror("%06X:disk_asic_jr_w(%X) = %X (unexpected)\n", m_maincpu->pc(), offset, data);
 			break;
 
 		/* miscellaneous hardware wait states; mk4/invasn write 1 here at initialization; crusnexo/thegrid write 3 */
 		case 1:
 			if (data != 1 && data != 3)
-				logerror("%06X:disk_asic_jr_w(%X) = %X (unexpected)\n", space.device().safe_pc(), offset, data);
+				logerror("%06X:disk_asic_jr_w(%X) = %X (unexpected)\n", m_maincpu->pc(), offset, data);
 			break;
 
 		/* CMOS/ZPRAM write enable; only low bit is used */
@@ -365,7 +365,7 @@ WRITE32_MEMBER(midzeus_state::disk_asic_jr_w)
 		/* unknown purpose; invasn writes 2 here at startup */
 		case 4:
 			if (data != 2)
-				logerror("%06X:disk_asic_jr_w(%X) = %X (unexpected)\n", space.device().safe_pc(), offset, data);
+				logerror("%06X:disk_asic_jr_w(%X) = %X (unexpected)\n", m_maincpu->pc(), offset, data);
 			break;
 
 		/* ROM bank selection on Zeus 2 */
@@ -380,18 +380,18 @@ WRITE32_MEMBER(midzeus_state::disk_asic_jr_w)
 		/* romsize; crusnexo writes 4 at startup; thegrid writes 6 */
 		case 8:
 			if (data != 4 && data != 6)
-				logerror("%06X:disk_asic_jr_w(%X) = %X (unexpected)\n", space.device().safe_pc(), offset, data);
+				logerror("%06X:disk_asic_jr_w(%X) = %X (unexpected)\n", m_maincpu->pc(), offset, data);
 			break;
 
 		/* trackball reset; thegrid writes 1 at startup */
 		case 9:
 			if (data != 1)
-				logerror("%06X:disk_asic_jr_w(%X) = %X (unexpected)\n", space.device().safe_pc(), offset, data);
+				logerror("%06X:disk_asic_jr_w(%X) = %X (unexpected)\n", m_maincpu->pc(), offset, data);
 			break;
 		/* unknown purpose */
 		default:
 			//if (oldval ^ data)
-				logerror("%06X:disk_asic_jr_w(%X) = %X\n", space.device().safe_pc(), offset, data);
+				logerror("%06X:disk_asic_jr_w(%X) = %X\n", m_maincpu->pc(), offset, data);
 			break;
 
 	}
@@ -484,7 +484,7 @@ READ32_MEMBER(midzeus_state::firewire_r)
 		retVal = 0x0;
 		break;
 	}
-	if LOG_FW logerror("%06X:firewire_r(%02X)=%08X\n", space.device().safe_pc(), offset, retVal);
+	if LOG_FW logerror("%06X:firewire_r(%02X)=%08X\n", m_maincpu->pc(), offset, retVal);
 	return retVal;
 }
 
@@ -517,7 +517,7 @@ WRITE32_MEMBER(midzeus_state::firewire_w)
 
 	if (offset < 0x40)
 		COMBINE_DATA(&m_firewire[offset / 4]);
-	if LOG_FW logerror("%06X:firewire_w(%02X) = %08X\n", space.device().safe_pc(),  offset, data);
+	if LOG_FW logerror("%06X:firewire_w(%02X) = %08X\n", m_maincpu->pc(),  offset, data);
 }
 
 
@@ -541,7 +541,7 @@ READ32_MEMBER(midzeus_state::tms32031_control_r)
 
 	/* log anything else except the memory control register */
 	if (offset != 0x64)
-		logerror("%06X:tms32031_control_r(%02X)\n", space.device().safe_pc(), offset);
+		logerror("%06X:tms32031_control_r(%02X)\n", m_maincpu->pc(), offset);
 
 	return m_tms32031_control[offset];
 }
@@ -563,7 +563,7 @@ WRITE32_MEMBER(midzeus_state::tms32031_control_w)
 			timer[which]->adjust(attotime::never);
 	}
 	else
-		logerror("%06X:tms32031_control_w(%02X) = %08X\n", space.device().safe_pc(), offset, data);
+		logerror("%06X:tms32031_control_w(%02X) = %08X\n", m_maincpu->pc(), offset, data);
 }
 
 
@@ -628,7 +628,7 @@ READ32_MEMBER(midzeus_state::analog_r)
 {
 	static const char * const tags[] = { "ANALOG0", "ANALOG1", "ANALOG2", "ANALOG3" };
 	if (offset < 8 || offset > 11)
-		logerror("%06X:analog_r(%X)\n", space.device().safe_pc(), offset);
+		logerror("%06X:analog_r(%X)\n", m_maincpu->pc(), offset);
 	return ioport(tags[offset & 3])->read();
 }
 

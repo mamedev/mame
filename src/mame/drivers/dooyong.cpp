@@ -429,7 +429,7 @@ WRITE8_MEMBER(dooyong_z80_state::primella_ctrl_w)
 
 	/* bit 5 used but unknown */
 
-//  logerror("%04x: bankswitch = %02x\n",space.device().safe_pc(),data&0xe0);
+//  logerror("%04x: bankswitch = %02x\n",m_maincpu->pc(),data&0xe0);
 }
 
 

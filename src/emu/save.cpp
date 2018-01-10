@@ -79,7 +79,12 @@ void save_manager::allow_registration(bool allowed)
 	// allow/deny registration
 	m_reg_allowed = allowed;
 	if (!allowed)
+	{
 		dump_registry();
+
+		// everything is registered by now, evaluate the savestate size
+		m_rewind->clamp_capacity();
+	}
 }
 
 
@@ -567,34 +572,208 @@ rewinder::rewinder(save_manager &save)
 	: m_save(save)
 	, m_enabled(save.machine().options().rewind())
 	, m_capacity(save.machine().options().rewind_capacity())
+	, m_current_index(REWIND_INDEX_NONE)
+	, m_first_invalid_index(REWIND_INDEX_NONE)
+	, m_first_time_warning(true)
+	, m_first_time_note(true)
 {
 }
 
 
 //-------------------------------------------------
-//  check_size - shrink the state list if it is
-//  about to hit the capacity
+//  clamp_capacity - safety checks for commandline
+//  override
 //-------------------------------------------------
 
-void rewinder::check_size()
+void rewinder::clamp_capacity()
 {
-	// safety check that shouldn't be allowed to trigger
-	if (m_state_list.size() > m_capacity)
+	if (!m_enabled)
+		return;
+
+	const size_t total = m_capacity * 1024 * 1024;
+	const size_t single = ram_state::get_size(m_save);
+
+	// can't set below zero, but allow commandline to override options' upper limit
+	if (total < 0)
+		m_capacity = 0;
+
+	// if capacity is below savestate size, can't save anything
+	if (total < single)
 	{
-		// drop all states beyond capacity
-		uint32_t count = m_state_list.size() - m_capacity;
+		m_enabled = false;
+		m_save.machine().logerror("Rewind has been disabled, because rewind capacity is smaller than savestate size.\n");
+		m_save.machine().logerror("Rewind buffer size: %d bytes. Savestate size: %d bytes.\n", total, single);
+		m_save.machine().popmessage("Rewind has been disabled. See error.log for details");
+	}
+}
+
+
+//-------------------------------------------------
+//  invalidate - mark all the future states as
+//  invalid to prevent loading them, as the
+//  current input might have changed
+//-------------------------------------------------
+
+void rewinder::invalidate()
+{
+	if (!m_enabled)
+		return;
+
+	// is there anything to invalidate?
+	if (!current_index_is_last())
+	{
+		// all states starting from the current one will be invalid
+		m_first_invalid_index = m_current_index;
+
+		// actually invalidate
+		for (auto it = m_state_list.begin() + m_first_invalid_index; it < m_state_list.end(); ++it)
+			it->get()->m_valid = false;
+	}
+}
+
+
+//-------------------------------------------------
+//  capture - record a single state, returns true
+//  on success
+//-------------------------------------------------
+
+bool rewinder::capture()
+{
+	if (!m_enabled)
+	{
+		report_error(STATERR_DISABLED, rewind_operation::SAVE);
+		return false;
+	}
+
+	if (current_index_is_last())
+	{
+		// we need to create a new state
+		std::unique_ptr<ram_state> state = std::make_unique<ram_state>(m_save);
+		const save_error error = state->save();
+
+		// validate the state
+		if (error == STATERR_NONE)
+			// it's safe to append
+			m_state_list.push_back(std::move(state));
+		else
+		{
+			// internal error, complain and evacuate
+			report_error(error, rewind_operation::SAVE);
+			return false;
+		}
+	}
+	else
+	{
+		// invalidate the future states
+		invalidate();
+
+		// update the existing state
+		ram_state *state = m_state_list.at(m_current_index).get();
+		const save_error error = state->save();
+
+		// validate the state
+		if (error != STATERR_NONE)
+		{
+			// internal error, complain and evacuate
+			report_error(error, rewind_operation::SAVE);
+			return false;
+		}
+	}
+
+	// make sure we will fit in
+	if (!check_size())
+		// the list keeps growing
+		m_current_index++;
+
+	// update first invalid index
+	if (current_index_is_last())
+		m_first_invalid_index = REWIND_INDEX_NONE;
+	else
+		m_first_invalid_index = m_current_index + 1;
+
+	// success
+	report_error(STATERR_NONE, rewind_operation::SAVE);
+	return true;
+}
+
+
+//-------------------------------------------------
+//  step - single step back in time, returns true
+//  on success
+//-------------------------------------------------
+
+bool rewinder::step()
+{
+	if (!m_enabled)
+	{
+		report_error(STATERR_DISABLED, rewind_operation::LOAD);
+		return false;
+	}
+
+	// do we have states to load?
+	if (m_current_index <= REWIND_INDEX_FIRST || m_first_invalid_index == REWIND_INDEX_FIRST)
+	{
+		// no valid states, complain and evacuate
+		report_error(STATERR_NOT_FOUND, rewind_operation::LOAD);
+		return false;
+	}
+
+	// prepare to load the last valid index if we're too far ahead
+	if (m_first_invalid_index > REWIND_INDEX_NONE && m_current_index > m_first_invalid_index)
+		m_current_index = m_first_invalid_index;
+
+	// step back and obtain the state pointer
+	ram_state *state = m_state_list.at(--m_current_index).get();
+
+	// try to load and report the result
+	const save_error error = state->load();
+	report_error(error, rewind_operation::LOAD);
+
+	if (error == save_error::STATERR_NONE)
+		return true;
+
+	return false;
+}
+
+
+//-------------------------------------------------
+//  check_size - shrink the state list if it is
+//  about to hit the capacity. returns true if
+//  the list got shrank
+//-------------------------------------------------
+
+bool rewinder::check_size()
+{
+	if (!m_enabled)
+		return false;
+
+	// state sizes in bytes
+	const size_t singlesize = ram_state::get_size(m_save);
+	size_t totalsize = m_state_list.size() * singlesize;
+
+	// convert our limit from megabytes
+	const size_t capsize = m_capacity * 1024 * 1024;
+
+	// safety check that shouldn't be allowed to trigger
+	if (totalsize > capsize)
+	{
+		// states to remove
+		const u32 count = (totalsize - capsize) / singlesize;
+
+		// drop everything that's beyond capacity
 		m_state_list.erase(m_state_list.begin(), m_state_list.begin() + count);
 	}
 
-	// check if we're about to hit capacity
-	if (m_state_list.size() == m_capacity)
-	{
-		// check the last state
-		ram_state *last = m_state_list.back().get();
+	// update before new check
+	totalsize = m_state_list.size() * singlesize;
 
-		// if we're not on top of the list, no need to move states around
-		if (!last->m_valid)
-			return;
+	// check if capacity will be hit by the newly captured state
+	if (totalsize + singlesize >= capsize)
+	{
+		// check if we have spare states ahead
+		if (!current_index_is_last())
+			// no need to move states around
+			return false;
 
 		// we can now get the first state and invalidate it
 		std::unique_ptr<ram_state> first(std::move(m_state_list.front()));
@@ -603,243 +782,94 @@ void rewinder::check_size()
 		// move it to the end for future use
 		m_state_list.push_back(std::move(first));
 		m_state_list.erase(m_state_list.begin());
+
+		if (m_first_time_note)
+		{
+			m_save.machine().logerror("Rewind note: Capacity has been reached. Old savestates will be erased.\n");
+			m_save.machine().logerror("Capacity: %d bytes. Savestate size: %d bytes. Savestate count: %d.\n",
+				totalsize, singlesize, m_state_list.size());
+			m_first_time_note = false;
+		}
+
+		return true;
 	}
+
+	return false;
 }
 
 
 //-------------------------------------------------
-//  report_error - report rewind success or
-//  error type
+//  report_error - report rewind results
 //-------------------------------------------------
 
-void rewinder::report_error(save_error error, rewind_operation operation, int index)
+void rewinder::report_error(save_error error, rewind_operation operation)
 {
 	const char *const opname = (operation == rewind_operation::LOAD) ? "load" : "save";
-
 	switch (error)
 	{
 	// internal saveload failures
 	case STATERR_ILLEGAL_REGISTRATIONS:
-		m_save.machine().popmessage("Error: Unable to %s state due to illegal registrations. See error.log for details.", opname);
+		m_save.machine().logerror("Rewind error: Unable to %s state due to illegal registrations.", opname);
+		m_save.machine().popmessage("Rewind error occured. See error.log for details.");
 		break;
 
 	case STATERR_INVALID_HEADER:
-		m_save.machine().popmessage("Error: Unable to %s state due to an invalid header. Make sure the save state is correct for this machine.", opname);
+		m_save.machine().logerror("Rewind error: Unable to %s state due to an invalid header. "
+			"Make sure the save state is correct for this machine.\n", opname);
+		m_save.machine().popmessage("Rewind error occured. See error.log for details.");
 		break;
 
 	case STATERR_READ_ERROR:
-		m_save.machine().popmessage("Error: Unable to %s state due to a read error.", opname);
+		m_save.machine().logerror("Rewind error: Unable to %s state due to a read error.\n", opname);
+		m_save.machine().popmessage("Rewind error occured. See error.log for details.");
 		break;
 
 	case STATERR_WRITE_ERROR:
-		m_save.machine().popmessage("Error: Unable to %s state due to a write error.", opname);
+		m_save.machine().logerror("Rewind error: Unable to %s state due to a write error.\n", opname);
+		m_save.machine().popmessage("Rewind error occured. See error.log for details.");
 		break;
 
 	// external saveload failures
 	case STATERR_NOT_FOUND:
 		if (operation == rewind_operation::LOAD)
-			m_save.machine().popmessage("No rewind state to load.");
+		{
+			m_save.machine().logerror("Rewind error: No rewind state to load.\n");
+			m_save.machine().popmessage("Rewind error occured. See error.log for details.");
+		}
+		break;
+
+	case STATERR_DISABLED:
+		if (operation == rewind_operation::LOAD)
+		{
+			m_save.machine().logerror("Rewind error: Rewind is disabled.\n");
+			m_save.machine().popmessage("Rewind error occured. See error.log for details.");
+		}
 		break;
 
 	// success
 	case STATERR_NONE:
 		{
-			const char *const warning = (m_save.machine().system().flags & MACHINE_SUPPORTS_SAVE) ? ""
-				: "\nWarning: Save states are not officially supported for this machine.";
+			const u64 supported = m_save.machine().system().flags & MACHINE_SUPPORTS_SAVE;
+			const char *const warning = supported || !m_first_time_warning ? "" :
+				"Rewind warning: Save states are not officially supported for this machine.\n";
+			const char *const opnamed = (operation == rewind_operation::LOAD) ? "loaded" : "captured";
 
-			// figure out the qantity of valid states
-			int invalid = get_first_invalid_index();
-
-			// all states are valid
-			if (invalid == REWIND_INDEX_NONE)
-				invalid = m_state_list.size();
-
-			if (operation == rewind_operation::SAVE)
-				m_save.machine().popmessage("Rewind state %i captured.\nRewind state count: %i.%s", invalid - 1, invalid, warning);
-			else
-				m_save.machine().popmessage("Rewind state %i loaded.\nRewind state count: %i.%s", index, invalid, warning);
+			// for rewinding outside of debugger, give some indication that rewind has worked, as screen doesn't update
+			m_save.machine().popmessage("Rewind state %i %s.\n%s", m_current_index + 1, opnamed, warning);
+			if (m_first_time_warning && operation == rewind_operation::LOAD && !supported)
+			{
+				m_save.machine().logerror(warning);
+				m_first_time_warning = false;
+			}
 		}
 		break;
 
 	// something that shouldn't be allowed to happen
 	default:
-		m_save.machine().popmessage("Error: Unknown error during state %s.", opname);
+		m_save.machine().logerror("Error: Unknown error during state %s.\n", opname);
+		m_save.machine().popmessage("Rewind error occured. See error.log for details.");
 		break;
 	}
-}
-
-
-//-------------------------------------------------
-//  get_current_index - get the index of the
-//  state to assume as current
-//-------------------------------------------------
-
-int rewinder::get_current_index()
-{
-	// nowhere to search
-	if (m_state_list.empty())
-		return REWIND_INDEX_NONE;
-
-	// fetch the current machine time
-	attotime curtime = m_save.machine().time();
-
-	// find the state at the current time, or at least the first one after
-	for (auto it = m_state_list.begin(); it < m_state_list.end(); ++it)
-		if (it->get()->m_time >= curtime)
-			return it - m_state_list.begin();
-
-	// all states are older
-	return REWIND_INDEX_NONE;
-}
-
-
-//-------------------------------------------------
-//  get_first_invalid_index - get the index of the
-//  first invalid state
-//-------------------------------------------------
-
-int rewinder::get_first_invalid_index()
-{
-	for (auto it = m_state_list.begin(); it < m_state_list.end(); ++it)
-		if (!it->get()->m_valid)
-			return it - m_state_list.begin();
-
-	// all states are valid
-	return REWIND_INDEX_NONE;
-}
-
-
-//-------------------------------------------------
-//  invalidate - mark all the future states as
-//  invalid
-//-------------------------------------------------
-
-int rewinder::invalidate()
-{
-	// fetch the current state index
-	int index = get_current_index();
-
-	// more invalid states may be farther back, account for them too
-	int invalid = get_first_invalid_index();
-
-	// roll back if we can
-	if (invalid != REWIND_INDEX_NONE && (index == REWIND_INDEX_NONE || invalid < index))
-		index = invalid;
-
-	if (index != REWIND_INDEX_NONE)
-	{
-		// if it's the last state in the list, skip further invalidation
-		if (++index >= m_state_list.size())
-			return index;
-
-		// invalidate all the future states, as the current input might have changed
-		for (auto it = m_state_list.begin() + index; it < m_state_list.end(); ++it)
-			it->get()->m_valid = false;
-	}
-
-	// index of the first invalid state
-	return index;
-}
-
-
-//-------------------------------------------------
-//  capture - record a single state
-//-------------------------------------------------
-
-void rewinder::capture()
-{
-	// fetch the current state index and invalidate the future states
-	int index = invalidate();
-
-	if (index == REWIND_INDEX_NONE)
-	{
-		// no current state, create one
-		std::unique_ptr<ram_state> state = std::make_unique<ram_state>(m_save);
-		save_error error = state->save();
-
-		// validate the state
-		if (error == STATERR_NONE)
-		{
-			// it's safe to append
-			m_state_list.push_back(std::move(state));
-		}
-		else
-		{
-			// internal error, complain and evacuate
-			report_error(error, rewind_operation::SAVE);
-			return;
-		}
-	}
-	else
-	{
-		// update the existing state
-		ram_state *state = m_state_list.at(--index).get();
-		save_error error = state->save();
-		
-		// validate the state
-		if (error != STATERR_NONE)
-		{
-			// internal error, complain and evacuate
-			report_error(error, rewind_operation::SAVE);
-			return;
-		}
-	}
-
-	// make sure we still fit in
-	check_size();
-
-	// success
-	report_error(STATERR_NONE, rewind_operation::SAVE);
-}
-
-
-//-------------------------------------------------
-//  step - single step back in time
-//-------------------------------------------------
-
-void rewinder::step()
-{
-	// check presence of states
-	if (m_state_list.empty())
-	{
-		// no states, complain and evacuate
-		report_error(STATERR_NOT_FOUND, rewind_operation::LOAD);
-		return;
-	}
-
-	// fetch the current state index
-	int index = get_current_index();
-
-	// if there is room, retreat
-	if (index != REWIND_INDEX_FIRST)
-	{
-		// we may be on top of the list, when all states are older
-		if (index == REWIND_INDEX_NONE)
-		{
-			// use the last consecutively valid state, to ensure rewinder integrity
-			index = get_first_invalid_index();
-
-			if (index == REWIND_INDEX_NONE)
-				// all states are valid
-				index = m_state_list.size();
-			else if (index == REWIND_INDEX_FIRST)
-			{
-				// no valid states, complain and evacuate
-				report_error(STATERR_NOT_FOUND, rewind_operation::LOAD);
-				return;
-			}
-		}
-
-		// obtain the state pointer
-		ram_state *state = m_state_list.at(--index).get();
-
-		// try to load and report the result
-		report_error(state->load(), rewind_operation::LOAD, index);
-		return;
-	}
-
-	// no valid states, complain
-	report_error(STATERR_NOT_FOUND, rewind_operation::LOAD);
 }
 
 

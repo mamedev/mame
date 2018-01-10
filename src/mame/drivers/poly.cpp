@@ -152,7 +152,7 @@ WRITE8_MEMBER(poly_state::baud_rate_w)
 
 static MACHINE_CONFIG_START( poly )
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6809E, XTAL_12_0576MHz / 3)
+	MCFG_CPU_ADD("maincpu", MC6809, XTAL_12_0576MHz / 3) // nominally 4 MHz
 	MCFG_CPU_PROGRAM_MAP(poly_mem)
 
 	/* video hardware */

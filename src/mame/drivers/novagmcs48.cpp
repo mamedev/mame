@@ -145,7 +145,7 @@ INPUT_CHANGED_MEMBER(novagmcs48_state::octo_cpu_freq)
 static MACHINE_CONFIG_START( presto )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I8049, 6000000) // LC circuit, measured
+	MCFG_CPU_ADD("maincpu", I8049, 6000000) // LC circuit, measured 6MHz
 	MCFG_MCS48_PORT_P1_IN_CB(READ8(novagmcs48_state, presto_input_r))
 	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(novagmcs48_state, presto_control_w))
 	MCFG_MCS48_PORT_BUS_OUT_CB(WRITE8(novagmcs48_state, presto_mux_w))

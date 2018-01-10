@@ -701,7 +701,7 @@ MACHINE_CONFIG_END
 
 READ32_MEMBER(calchase_state::calchase_idle_skip_r)
 {
-	if(space.device().safe_pc()==0x1406f48)
+	if(m_maincpu->pc()==0x1406f48)
 		m_maincpu->spin_until_interrupt();
 
 	return m_idle_skip_ram;

@@ -9518,14 +9518,14 @@ DRIVER_INIT_MEMBER(atomiswave_state,atomiswave)
 READ64_MEMBER(atomiswave_state::xtrmhnt2_hack_r)
 {
 	// disable ALL.Net board check
-	if (space.device().safe_pc() == 0xc03cb30)
+	if (m_maincpu->pc() == 0xc03cb30)
 	{
 		dc_ram[0x357fe/8] |= (uint64_t)0x200 << 48;
 		dc_ram[0x358e2/8] |= (uint64_t)0x200 << 16;
 		dc_ram[0x38bb2/8] |= (uint64_t)0x200 << 16;
 		dc_ram[0x38bee/8] |= (uint64_t)0x200 << 48;
 	}
-	if (space.device().safe_pc() == 0xc108240)
+	if (m_maincpu->pc() == 0xc108240)
 		dc_ram[0x9acc8/8] = (dc_ram[0x9acc8/8] & 0xffffffffffff0000U) | (uint64_t)0x0009;
 	return 0;
 }
@@ -10256,6 +10256,7 @@ ROM_END
 /* 0166    */ GAME( 2006, zunou,     naomi,    naomim4, naomi,   naomi_state, naomi,   ROT0, "Sega", "Touch De Zunou (Japan, Rev A)", GAME_FLAGS )
 /* 0170-01 */ GAME( 2007, manicpnc,  naomi,    naomim4, naomi,   naomi_state, naomi,   ROT0, "Sega", "Manic Panic Ghosts! (USA, Export)", GAME_FLAGS )
 /* 0170    */ GAME( 2007, pokasuka,  manicpnc, naomim4, naomi,   naomi_state, naomi,   ROT0, "Sega", "Pokasuka Ghost! (Japan)", GAME_FLAGS )
+// 0171 Mushiking 2K6 2ND (Japan)
 /* 0175    */ GAME( 2007, asndynmt,  naomi,    naomim4, naomi,   naomi_state, naomi,   ROT0, "Sega", "Asian Dynamite / Dynamite Deka EX", GAME_FLAGS )
 /* 0177    */ GAME( 2007, rhytngk,   naomi,    naomim4, naomi,   naomi_state, naomi,   ROT0, "Sega / Nintendo - J.P ROOM", "Rhythm Tengoku (Japan)", GAME_FLAGS )
 /* 0180    */ GAME( 2007, mushik4e,  naomi,    naomim4, naomi,   naomi_state, naomi,   ROT0, "Sega", "Mushiking The King Of Beetles - Mushiking IV / V / VI (World)", GAME_FLAGS ) // not for Japan or Korea, version can be changed in secret menu, ~equivalent of Japanese 2K6 versions.

@@ -6,13 +6,20 @@
 
     2015-10-02 Skeleton [Robbbert]
 
-    Nothing is known about this system, except that it uses a 6809 CPU.
-    No manuals, schematic or circuit description have been found.
+    Little is known about this system except for a few PCB pictures. No
+    manuals, schematic or circuit description have been found.
+
+    The RD100 was apparently sold in France under the "Superkit" brand. There
+    appear to have been several versions. Earlier models had 7-segment LEDs
+    and rudimentary keyboards. The model dumped here is apparently the K32K,
+    which had a 16x2 character LCD display, a QWERTY keyboard and non-numeric
+    keypad, Centronics and RS-232 ports, and an extension board for prototyping.
 
 *********************************************************************************/
 
 #include "emu.h"
 #include "cpu/m6809/m6809.h"
+#include "machine/6821pia.h"
 #include "screen.h"
 
 
@@ -37,7 +44,9 @@ private:
 static ADDRESS_MAP_START( mem_map, AS_PROGRAM, 8, rd100_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x7fff) AM_RAM
-	//AM_RANGE(0x8640, 0x8643)  // device
+	//AM_RANGE(0x8608, 0x860f) AM_DEVREADWRITE("timer", ptm6840_device, read, write)
+	AM_RANGE(0x8640, 0x8643) AM_DEVREADWRITE("pia1", pia6821_device, read, write)
+	AM_RANGE(0x8680, 0x8683) AM_DEVREADWRITE("pia2", pia6821_device, read, write)
 	//AM_RANGE(0x8700, 0x8700)  // device
 	AM_RANGE(0x8800, 0xffff) AM_ROM AM_REGION("roms", 0x800)
 ADDRESS_MAP_END
@@ -87,10 +96,14 @@ MACHINE_RESET_MEMBER( rd100_state, rd100 )
 
 static MACHINE_CONFIG_START( rd100 )
 	// basic machine hardware
-	MCFG_CPU_ADD("maincpu",M6809E, XTAL_4MHz)  // freq unknown
+	MCFG_CPU_ADD("maincpu", MC6809, XTAL_4MHz) // MC6809P???
 	MCFG_CPU_PROGRAM_MAP(mem_map)
 
 	MCFG_MACHINE_RESET_OVERRIDE(rd100_state, rd100)
+
+	MCFG_DEVICE_ADD("pia1", PIA6821, 0)
+
+	MCFG_DEVICE_ADD("pia2", PIA6821, 0)
 
 	// video hardware
 	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green())
@@ -110,5 +123,5 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT   CLASS          INIT    COMPANY  FULLNAME  FLAGS
-COMP( 1989, rd100,  0,      0,       rd100,     rd100,  rd100_state,   rd100,  "Data",  "RD100",  MACHINE_IS_SKELETON )
+//    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT   CLASS          INIT    COMPANY      FULLNAME  FLAGS
+COMP( 1989, rd100,  0,      0,       rd100,     rd100,  rd100_state,   rd100,  "Data R.D.", "RD100",  MACHINE_IS_SKELETON )

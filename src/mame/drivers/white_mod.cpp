@@ -45,7 +45,7 @@ DRIVER_INIT_MEMBER(whitestar_mod_state,whitestar_mod)
 
 static MACHINE_CONFIG_START( whitestar_mod )
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6809, 2000000)
+	MCFG_CPU_ADD("maincpu", MC6809E, 2000000)
 	MCFG_CPU_PROGRAM_MAP(whitestar_mod_map)
 MACHINE_CONFIG_END
 

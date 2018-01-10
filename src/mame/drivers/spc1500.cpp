@@ -683,38 +683,6 @@ static ADDRESS_MAP_START( spc1500_double_io , AS_IO, 8, spc1500_state )
 	AM_RANGE(0x0000, 0x17ff) AM_RAM AM_SHARE("pcgram")
 ADDRESS_MAP_END
 
-#if 0
-static ADDRESS_MAP_START( spc1500_io , AS_IO, 8, spc1500_state )
-	ADDRESS_MAP_UNMAP_HIGH
-//  AM_RANGE(0x0000, 0x03ff) AM_DEVREADWRITE("userio", user_device, userio_r, userio_w)
-//  AM_RANGE(0x0400, 0x05ff) AM_DEVREADWRITE("lanio", lan_device, lanio_r, lanio_w)
-//  AM_RANGE(0x0600, 0x07ff) AM_DEVREADWRITE("rs232c", rs232c_device, rs232c_r, rs232c_w)
-//  AM_RANGE(0x0800, 0x09ff) AM_DEVREADWRITE("fdcx", fdcx_device, fdcx_r, fdcx_w)
-//  AM_RANGE(0x0a00, 0x0bff) AM_DEVREADWRITE("userio", user_device, userio_r, userio_w)
-//  AM_RANGE(0x0c00, 0x0dff) AM_DEVREADWRITE("fdc", fdc_device, fdc_r, fdc_w)
-//  AM_RANGE(0x0e00, 0x0fff) AM_DEVREADWRITE("extram", extram_device, extram_r, extram_w)
-	AM_RANGE(0x1000, 0x10ff) AM_WRITE(paletb_w)
-	AM_RANGE(0x1100, 0x11ff) AM_WRITE(paletr_w)
-	AM_RANGE(0x1200, 0x12ff) AM_WRITE(paletg_w)
-	AM_RANGE(0x1300, 0x13ff) AM_WRITE(priority_w)
-	AM_RANGE(0x1400, 0x14ff) AM_READ(pcgg_r)
-	AM_RANGE(0x1500, 0x15ff) AM_READWRITE(pcgb_r, pcgb_w)
-	AM_RANGE(0x1600, 0x16ff) AM_READWRITE(pcgr_r, pcgr_w)
-	AM_RANGE(0x1700, 0x17ff) AM_WRITE(pcgg_w)
-	AM_RANGE(0x1800, 0x18ff) AM_READWRITE(crtc_r, crtc_w)
-//  AM_RANGE(0x1800, 0x1800) AM_DEVWRITE("mc6845", mc6845_device, address_w)
-//  AM_RANGE(0x1801, 0x1801) AM_DEVREADWRITE("mc6845", mc6845_device, register_r, register_w)
-//  AM_RANGE(0x1800, 0x1801) AM_READWRITE(crtc_r, crtc_w)
-	AM_RANGE(0x1900, 0x1909) AM_READ(keyboard_r)
-	AM_RANGE(0x1a00, 0x1a03) AM_DEVREADWRITE("ppi8255", i8255_device, read, write)
-	AM_RANGE(0x1b00, 0x1bff) AM_DEVREADWRITE("ay8910", ay8910_device, data_r, data_w)
-	AM_RANGE(0x1c00, 0x1cff) AM_DEVWRITE("ay8910", ay8910_device, address_w)
-	AM_RANGE(0x1d00, 0x1d00) AM_WRITE(romsel)
-	AM_RANGE(0x1e00, 0x1e00) AM_WRITE(ramsel)
-	AM_RANGE(0x2000, 0xffff) AM_RAM AM_SHARE("videoram")
-ADDRESS_MAP_END
-#endif
-
 /* Input ports */
 static INPUT_PORTS_START( spc1500 )
 
