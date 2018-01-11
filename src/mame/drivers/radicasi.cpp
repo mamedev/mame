@@ -6,7 +6,7 @@
 #include "screen.h"
 #include "speaker.h"
 #include "machine/bankdev.h"
-#include "cpu/m6502/r65c02.h"
+//#include "cpu/m6502/r65c02.h"
 
 class radicasi_state : public driver_device
 {
@@ -239,7 +239,7 @@ GFXDECODE_END
 static MACHINE_CONFIG_START( radicasi )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",R65C02,8000000) // unknown frequency
+	MCFG_CPU_ADD("maincpu",M6502,8000000) // unknown frequency
 	MCFG_CPU_PROGRAM_MAP(radicasi_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", radicasi_state,  irq0_line_hold)
 
