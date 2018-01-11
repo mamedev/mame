@@ -44,8 +44,14 @@ ROM_START( plus1 )
 	ROM_SYSTEM_BIOS(2, "presap2", "PRES AP2 Support 1.23")
 	ROMX_LOAD("presap2_123.rom", 0x0000, 0x2000, CRC(f796689c) SHA1(bc40a79e6d2b4cb5e549d5d21f673c66a661850d), ROM_BIOS(3))
 
-	ROM_SYSTEM_BIOS(3, "slogger", "Slogger Expansion 2.02")
-	ROMX_LOAD("slogger202.rom", 0x0000, 0x2000, CRC(32b440be) SHA1(dbc73e8d919c5615d0241d99db60e06324e16c86), ROM_BIOS(4))
+	ROM_SYSTEM_BIOS(3, "sl200", "Slogger Expansion 2.00")
+	ROMX_LOAD("elkexp200.rom", 0x0000, 0x2000, CRC(dee02843) SHA1(5c9b940b4ddb46e9a223160310683a32266300c8), ROM_BIOS(4))
+
+	ROM_SYSTEM_BIOS(4, "sl201", "Slogger Expansion 2.01")
+	ROMX_LOAD("elkexp201.rom", 0x0000, 0x2000, CRC(0e896892) SHA1(4e0794f1083fe529b01bd4fa100996a533ed8b10), ROM_BIOS(5))
+
+	ROM_SYSTEM_BIOS(5, "sl202", "Slogger Expansion 2.02")
+	ROMX_LOAD("elkexp202.rom", 0x0000, 0x2000, CRC(32b440be) SHA1(dbc73e8d919c5615d0241d99db60e06324e16c86), ROM_BIOS(6))
 ROM_END
 
 //-------------------------------------------------
@@ -99,9 +105,9 @@ MACHINE_CONFIG_MEMBER( electron_plus1_device::device_add_mconfig )
 	MCFG_ADC0844_CH4_CB(IOPORT("JOY4"))
 
 	/* cartridges */
-	MCFG_GENERIC_SOCKET_ADD("cart_sk1", generic_plain_slot, "electron_cart")
+	MCFG_GENERIC_CARTSLOT_ADD("cart_sk1", generic_plain_slot, "electron_cart")
 	MCFG_GENERIC_LOAD(electron_plus1_device, electron_cart_sk1)
-	MCFG_GENERIC_SOCKET_ADD("cart_sk2", generic_plain_slot, "electron_cart")
+	MCFG_GENERIC_CARTSLOT_ADD("cart_sk2", generic_plain_slot, "electron_cart")
 	MCFG_GENERIC_LOAD(electron_plus1_device, electron_cart_sk2)
 MACHINE_CONFIG_END
 
