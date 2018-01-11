@@ -228,10 +228,26 @@ static const gfx_layout helper2_layout =
 	16 * 64
 };
 
+static const uint32_t texlayout_xoffset[256] = { STEP256(0,8) };
+static const uint32_t texlayout_yoffset[256] = { STEP256(0,256*8) };
+static const gfx_layout helper3_layout =
+{
+	256, 256,
+	RGN_FRAC(1,1),
+	8,
+	{ 0,1,2,3,4,5,6,7 },
+	EXTENDED_XOFFS,
+	EXTENDED_YOFFS,
+	256*256*8,
+	texlayout_xoffset,
+	texlayout_yoffset
+};
+
 
 static GFXDECODE_START( radicasi_fake )
-	GFXDECODE_ENTRY( "maincpu", 0, helper_layout,  0x0, 16  )
-	GFXDECODE_ENTRY( "maincpu", 0, helper2_layout,  0x0, 16  )
+	GFXDECODE_ENTRY( "maincpu", 0, helper_layout,  0x0, 1  )
+	GFXDECODE_ENTRY( "maincpu", 0, helper2_layout,  0x0, 1  )
+	GFXDECODE_ENTRY( "maincpu", 0, helper3_layout,  0x0, 1  )
 GFXDECODE_END
 
 
