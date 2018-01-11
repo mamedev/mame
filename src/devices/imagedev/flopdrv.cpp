@@ -508,7 +508,7 @@ legacy_floppy_image_device *floppy_get_device_by_type(running_machine &machine,i
 	return nullptr;
 }
 
-int floppy_get_drive(device_t *image)
+static int floppy_get_drive(device_t *image)
 {
 	int drive = -1;
 	if (strcmp(image->tag(), ":" FLOPPY_0) == 0) drive = 0;
