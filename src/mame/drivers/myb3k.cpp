@@ -11,8 +11,7 @@
 
     TODO:
     - Fix proper cursor support
-    - Fix 36 character modes
-    - Fix japanese character support, eg remove the extra underscore
+    - Fix Hi-Res 640x400 mode when MC6845 supports interlaced mode
     - Expansion Unit with 6 more ISA8 slots
     - Proper waitstate support when 8088 CPU core admits it and remove the workaround in machine_start
 
@@ -60,7 +59,7 @@
 #define LOG_SCRL    (1U << 11)
 #define LOG_CENT    (1U << 12)
 
-//#define VERBOSE (LOG_PIC|LOG_CENT)
+//#define VERBOSE (LOG_VMOD)
 //#define LOG_OUTPUT_STREAM std::cout
 
 #include "logmacro.h"
@@ -293,14 +292,24 @@ MC6845_UPDATE_ROW( myb3k_state::crtc_update_row )
 			uint16_t pdat16;
 			switch (m_vmode)
 			{
-			case 1: // 320x200, 40 char, 8 color TODO: 8 green tones in monochrome
+			case 1: 
 				rowstart = (((x_pos + ma) * 32 + ra) & 0x7fff) + page;
-				pdat  = ((m_vram[rowstart +  0]  & 0xff) << 16); // Green 8 bits
-				pdat |= ((m_vram[rowstart +  8]  & 0xf0) << 8);  // Red upper 4 bits
-				pdat |= ((m_vram[rowstart +  8]  & 0x0f) <<  4); // Blue upper 4 bits
-				pdat |= ((m_vram[rowstart +  24] & 0xf0) <<  4); // Red lower 4 bits
-				pdat |= ((m_vram[rowstart +  24] & 0x0f) <<  0); // Blue lower 4 bits
 
+				// Crude fix of 36CH mode
+				if ((ioport("DSW1")->read() & 0x0c) == 0 && ra > 7)
+				{ // text mode only, 36x25 char, 8 color, discarding raster rows with what appears to be garbish
+				  // needs to be implemented LLE to verify the function of that data, possibly related to Kanji support
+					pdat = 0x00; // This gets wrong when background color is not black
+				}
+				else
+				{ // 320x200, 40x25 char, 8 color
+					pdat  = ((m_vram[rowstart +  0]  & 0xff) << 16); // Green 8 bits
+					pdat |= ((m_vram[rowstart +  8]  & 0xf0) << 8);  // Red upper 4 bits
+					pdat |= ((m_vram[rowstart +  8]  & 0x0f) <<  4); // Blue upper 4 bits
+					pdat |= ((m_vram[rowstart +  24] & 0xf0) <<  4); // Red lower 4 bits
+					pdat |= ((m_vram[rowstart +  24] & 0x0f) <<  0); // Blue lower 4 bits
+				}
+				
 				if (pdat != 0)
 				{
 					LOGPIX(" - PDAT:%06x from offset %04x RA=%d\n", pdat, rowstart + 0, ra);
@@ -329,8 +338,8 @@ MC6845_UPDATE_ROW( myb3k_state::crtc_update_row )
 			case 2: /* 640x200, 80 char, white on black */
 				rowstart = (((x_pos + ma * 2) * 16 + ra) & 0x7fff) + page;
 				pdat16 = m_vram[rowstart];
-				if (pdat16 != 0)
-					LOGM2(" - PDAT:%06x from offset %04x RA=%d X:%d Y:%d\n", pdat16, (x_pos * 2 + ma * 2) * 16 + ra + page + 0, ra, x_pos, y);
+				//if (pdat16 != 0)
+				LOGM2(" - PDAT:%06x from offset %04x RA=%d X:%d Y:%d DE:%d HBP:%d VBP:%d\n", pdat16, (x_pos * 2 + ma * 2) * 16 + ra + page + 0, ra, x_pos, y, de, hbp, vbp);
 
 				/* Check if we are in a cursor and create cursor if so */
 				//pdat ^= ((cursor_x != -1 && x_pos/2 == cursor_x && ra == 7) ? 0xff : 0);
@@ -360,8 +369,8 @@ MC6845_UPDATE_ROW( myb3k_state::crtc_update_row )
  *
  *  chars 36  40  80  80  36  40  80  36  40
  *  rows  25  25  25  25  20  20  20  25  25
- *  mode   1   1   2   3   0   0   0   0   0
- *----------------------------------------------------------------------
+ *  mode   1   1   2   3   0   0   0   0   0 - as per basica "screen x,y,mode"
+ *----------------------------------------------------------------------------
  *  R0    55  55  55  55  55  55  55  55  55 - Horizontal Total
  *  R1    40  40  40  40  40  40  40  40  40 - Horizontal Displayed
  *  R2    44  44  44  44  44  44  44  44  44 - Horizontal Sync Position
@@ -376,11 +385,11 @@ MC6845_UPDATE_ROW( myb3k_state::crtc_update_row )
  *  R11    7   7   7  15   9   9   9  15  15 - Cursor End Address
  *  R12    0   0   0   0   0   0   0   0   0 - Start Address (H)
  *  R13    0   0   0   0   0   0   0   0   0 - Start Address (L)
- * -------------------------------------------------------------------
- *  vmode  1   1   2   6   1   1   2   5   5 - 3 bits latch at I/O 0x04
+ * ---------------------------------------------------------------------------
+ *  vmode  1   1   2   6   1   1   2   5   5 - as per 3 bits latch at I/O 0x04
  *  xres 320 320 640 640 320 320 640 320 320
  *  yres 200 200 200 400 200 200 200 400 400
- *  char  40  40  80  80  40  40  80  40  40<
+ *  char  40  40  80  80  40  40  80  40  40
  */
 
 WRITE8_MEMBER( myb3k_state::myb3k_video_mode_w )
