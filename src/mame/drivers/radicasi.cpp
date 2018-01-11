@@ -6,6 +6,7 @@
 #include "screen.h"
 #include "speaker.h"
 #include "machine/bankdev.h"
+#include "cpu/m6502/r65c02.h"
 
 class radicasi_state : public driver_device
 {
@@ -14,6 +15,7 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_ram(*this, "ram"),
+		m_pixram(*this, "pixram"),
 		m_bank(*this, "bank"),
 		m_gfxdecode(*this, "gfxdecode")
 	{ }
@@ -37,6 +39,7 @@ protected:
 private:
 	required_device<cpu_device> m_maincpu;
 	required_shared_ptr<uint8_t> m_ram;
+	required_shared_ptr<uint8_t> m_pixram;
 	required_device<address_map_bank_device> m_bank;
 	required_device<gfxdecode_device> m_gfxdecode;
 
@@ -50,12 +53,15 @@ void radicasi_state::video_start()
 	m_hackmode = 0;
 }
 
-uint32_t radicasi_state::screen_update( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect )
+uint32_t radicasi_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(0, cliprect);
 
-	if(machine().input().code_pressed_once(KEYCODE_Q))
-		m_hackmode^=1;
+	if (machine().input().code_pressed_once(KEYCODE_Q))
+	{
+		m_hackmode++;
+		m_hackmode &= 3;
+	}
 
 	// it is unclear if the tilemap is an internal structure or something actually used by the video rendering
 	int offs = 0x600;
@@ -69,8 +75,8 @@ uint32_t radicasi_state::screen_update( screen_device &screen, bitmap_ind16 &bit
 			for (int x = 0; x < 16; x++)
 			{
 				int tile = m_ram[offs];
-				gfx->transpen(bitmap,cliprect,tile,0,0,0,x*16,y*16,0);			
-				offs+=4;
+				gfx->transpen(bitmap, cliprect, tile, 0, 0, 0, x * 16, y * 16, 0);
+				offs += 4;
 			}
 		}
 	}
@@ -83,8 +89,24 @@ uint32_t radicasi_state::screen_update( screen_device &screen, bitmap_ind16 &bit
 			for (int x = 0; x < 32; x++)
 			{
 				int tile = m_ram[offs];
-				gfx->transpen(bitmap,cliprect,tile,0,0,0,x*8,y*8,0);			
-				offs+=4;
+				gfx->transpen(bitmap, cliprect, tile, 0, 0, 0, x * 8, y * 8, 0);
+				offs += 4;
+			}
+		}
+	}
+	else if (m_hackmode == 2) // qix
+	{
+		for (int y = 0; y < 224; y++)
+		{
+			uint16_t* row = &bitmap.pix16(y);
+
+			for (int x = 0; x < 256; x++)
+			{
+				int pixel = m_pixram[offs];
+
+				if (pixel) row[x] = pixel;
+
+				offs++;
 			}
 		}
 	}
@@ -96,6 +118,8 @@ WRITE8_MEMBER(radicasi_state::radicasi_500c_w)
 {
 	// written with the banking?
 	logerror("%s: radicasi_500c_w %02x\n", machine().describe_context().c_str(), data);
+
+	m_bank->set_bank(m_500d_data);
 }
 
 READ8_MEMBER(radicasi_state::radicasi_500d_r)
@@ -107,7 +131,6 @@ WRITE8_MEMBER(radicasi_state::radicasi_500d_w)
 {
 	logerror("%s: radicasi_500d_w %02x\n", machine().describe_context().c_str(), data);
 	m_500d_data = data;
-	m_bank->set_bank(m_500d_data);
 }
 
 READ8_MEMBER(radicasi_state::radicasi_50a8_r)
@@ -134,8 +157,10 @@ ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( radicasi_bank_map, AS_PROGRAM, 8, radicasi_state )
+	AM_RANGE(0x000000, 0x00ffff) AM_RAM AM_SHARE("pixram") // qix accesses here when 500c is 01 (which could be an additional bank bit)
+
 	AM_RANGE(0x300000, 0x3fffff) AM_ROM AM_REGION("maincpu", 0)
-	AM_RANGE(0x400000, 0x40ffff) AM_RAM // could be framebuffer access (256x256 at 4bpp)
+	AM_RANGE(0x400000, 0x40ffff) AM_RAM // could be tileram? or spriteram? only cleared tho, so would be populated with DMA?
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( radicasi )
@@ -214,7 +239,7 @@ GFXDECODE_END
 static MACHINE_CONFIG_START( radicasi )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",M6502,8000000) // unknown frequency
+	MCFG_CPU_ADD("maincpu",R65C02,8000000) // unknown frequency
 	MCFG_CPU_PROGRAM_MAP(radicasi_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", radicasi_state,  irq0_line_hold)
 
