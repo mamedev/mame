@@ -1785,6 +1785,47 @@
 		</part>
 	</software>
 	
+	<!-- DOS -->
+	<!-- TODO: "Disk write failed" on install -->
+	<software name="darker" supported="no">
+		<description>Darker</description>
+		<year>1995</year>
+		<publisher>Psygnosis / S.I.E.E</publisher>
+		
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="darker (1995)(psygnosis)" sha1="8aa77f5c75589480055174e22ce66f767e7ce52e" />
+			</diskarea>
+		</part>
+	</software>
+	
+	<!-- DOS -->
+	<!-- TODO: selecting SB16 hangs on the sound test -->
+	<software name="detritus" supported="partial">
+		<description>Detritus - The Daemon's Quest</description>
+		<year>1996</year>
+		<publisher>Manyk / Myndgaemz</publisher>
+		
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="detritus - the daemon's quest (1996)(manyk)" sha1="b9dc8d31ddedf4e6c189f4481ecc40b2784d29de" />
+			</diskarea>
+		</part>
+	</software>
+	
+	<!-- DOS -->
+	<software name="discdeep">
+		<description>Discoveries of the Deep</description>
+		<year>1996</year>
+		<publisher>SoftKey</publisher>
+		
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="discoveries of the deep (1996)(softkey)" sha1="b55f1cc746f5efce727e83c06a31c6ac743da628" />
+			</diskarea>
+		</part>
+	</software>
+	
 	<!-- Pentium class 166 MHz / Direct X 7.0 -->
 	<!-- Windows 95/98/ME -->
 	<!-- TODO: some transparency issues -->
@@ -1814,6 +1855,33 @@
 		</part>
 	</software>
 
+	<!-- DOS -->
+	<software name="dungkrem">
+		<description>Dungeons of Kremlin (English, Russia)</description>
+		<year>1995</year>
+		<publisher>NewCom</publisher>
+		
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="dungeons of kremlin (1995)(newcom)(en-ru)" sha1="39f7a573cd92b3992e5d298c37c307f8060cd2a1" />
+			</diskarea>
+		</part>
+	</software>
+	
+	<!-- distributed for free by the Art Department Werbeagentur GmbH -->
+	<!-- TODO: SB16 fails detecting for DS2 -->
+	<software name="dunksc12" supported="partial">
+		<description>Dunkle Schatten 1 &amp; 2 (Germany)</description>
+		<year>1996</year>
+		<publisher>BMI</publisher>
+		
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="dunkle schatten 1 &amp; 2 (1996)(bmi)(de)[compilation]" sha1="fa3a2584edc1ca152e3d352a5a7ed8ab740a2c67" />
+			</diskarea>
+		</part>
+	</software>
+	
 	<software name="elecpop">
 		<description>Electronic Popple (Japan)</description>
 		<year>1997</year>
