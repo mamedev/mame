@@ -83,6 +83,7 @@
 ***************************************************************************/
 
 #define LOG_FDC                 0
+#define WD2791_TAG              "wd2791"
 #define WD2797_TAG              "wd2797"
 
 
@@ -112,6 +113,27 @@ namespace
 		// methods
 		void dskreg_w(uint8_t data);
 	};
+
+	class premier_fdc_device_base : public coco_family_fdc_device_base
+	{
+	protected:
+		// construction/destruction
+		premier_fdc_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
+		// device-level overrides
+		virtual DECLARE_READ8_MEMBER(scs_read) override;
+		virtual DECLARE_WRITE8_MEMBER(scs_write) override;
+		virtual void device_add_mconfig(machine_config &config) override;
+		virtual void update_lines() override;
+
+	private:
+		// device references
+		required_device<wd2791_device>              m_wd2791;
+		required_device_array<floppy_connector, 4>  m_floppies;
+
+		// methods
+		void dskreg_w(uint8_t data);
+	};
 }
 
 /***************************************************************************
@@ -124,9 +146,10 @@ SLOT_INTERFACE_END
 
 
 MACHINE_CONFIG_MEMBER(dragon_fdc_device_base::device_add_mconfig)
-	MCFG_WD2797_ADD(WD2797_TAG, XTAL_1MHz)
+	MCFG_WD2797_ADD(WD2797_TAG, XTAL_4MHz / 4)
 	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(dragon_fdc_device_base, fdc_intrq_w))
 	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(dragon_fdc_device_base, fdc_drq_w))
+	MCFG_WD_FDC_FORCE_READY
 
 	MCFG_FLOPPY_DRIVE_ADD(WD2797_TAG ":0", dragon_fdc_device_base, "qd", dragon_fdc_device_base::floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
@@ -135,6 +158,21 @@ MACHINE_CONFIG_MEMBER(dragon_fdc_device_base::device_add_mconfig)
 	MCFG_FLOPPY_DRIVE_ADD(WD2797_TAG ":2", dragon_fdc_device_base, "", dragon_fdc_device_base::floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 	MCFG_FLOPPY_DRIVE_ADD(WD2797_TAG ":3", dragon_fdc_device_base, "", dragon_fdc_device_base::floppy_formats)
+	MCFG_FLOPPY_DRIVE_SOUND(true)
+MACHINE_CONFIG_END
+
+
+MACHINE_CONFIG_MEMBER(premier_fdc_device_base::device_add_mconfig)
+	MCFG_WD2791_ADD(WD2791_TAG, XTAL_2MHz / 2)
+	MCFG_WD_FDC_FORCE_READY
+
+	MCFG_FLOPPY_DRIVE_ADD(WD2791_TAG ":0", dragon_fdc_device_base, "qd", dragon_fdc_device_base::floppy_formats)
+	MCFG_FLOPPY_DRIVE_SOUND(true)
+	MCFG_FLOPPY_DRIVE_ADD(WD2791_TAG ":1", dragon_fdc_device_base, "qd", dragon_fdc_device_base::floppy_formats)
+	MCFG_FLOPPY_DRIVE_SOUND(true)
+	MCFG_FLOPPY_DRIVE_ADD(WD2791_TAG ":2", dragon_fdc_device_base, "", dragon_fdc_device_base::floppy_formats)
+	MCFG_FLOPPY_DRIVE_SOUND(true)
+	MCFG_FLOPPY_DRIVE_ADD(WD2791_TAG ":3", dragon_fdc_device_base, "", dragon_fdc_device_base::floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 MACHINE_CONFIG_END
 
@@ -154,6 +192,14 @@ dragon_fdc_device_base::dragon_fdc_device_base(const machine_config &mconfig, de
 }
 
 
+premier_fdc_device_base::premier_fdc_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: coco_family_fdc_device_base(mconfig, type, tag, owner, clock)
+	, m_wd2791(*this, WD2791_TAG)
+	, m_floppies(*this, WD2791_TAG ":%u", 0)
+{
+}
+
+
 //-------------------------------------------------
 //  update_lines - Dragon specific disk
 //  controller lines
@@ -169,6 +215,11 @@ void dragon_fdc_device_base::update_lines()
 }
 
 
+void premier_fdc_device_base::update_lines()
+{
+}
+
+
 //-------------------------------------------------
 //  dskreg_w - function to write to
 //  Dragon dskreg
@@ -179,14 +230,14 @@ void dragon_fdc_device_base::dskreg_w(uint8_t data)
 	if (LOG_FDC)
 	{
 		logerror("fdc_dragon_dskreg_w(): %c%c%c%c%c%c%c%c ($%02x)\n",
-			data & 0x80 ? 'X' : 'x',
-			data & 0x40 ? 'X' : 'x',
-			data & 0x20 ? 'N' : 'n',
-			data & 0x10 ? 'P' : 'p',
-			data & 0x08 ? 'S' : 'D',
-			data & 0x04 ? 'M' : 'm',
-			data & 0x02 ? '1' : '0',
-			data & 0x01 ? '1' : '0',
+			BIT(data, 7) ? 'X' : 'x',
+			BIT(data, 6) ? 'X' : 'x',
+			BIT(data, 5) ? 'N' : 'n',
+			BIT(data, 4) ? 'P' : 'p',
+			BIT(data, 3) ? 'S' : 'D',
+			BIT(data, 2) ? 'M' : 'm',
+			BIT(data, 1) ? '1' : '0',
+			BIT(data, 0) ? '1' : '0',
 			data);
 	}
 
@@ -195,12 +246,50 @@ void dragon_fdc_device_base::dskreg_w(uint8_t data)
 	{
 		floppy_image_device *floppy = m_floppies[i]->get_device();
 		if (floppy)
-			floppy->mon_w((data & 0x04) && (i == (data & 0x03)) ? CLEAR_LINE : ASSERT_LINE);
+			floppy->mon_w(BIT(data,2) && (i == (data & 0x03)) ? CLEAR_LINE : ASSERT_LINE);
 	}
 
 	// manipulate the WD2797
 	m_wd2797->set_floppy(m_floppies[data & 0x03]->get_device());
 	m_wd2797->dden_w(BIT(data, 3));
+
+	set_dskreg(data);
+}
+
+
+void premier_fdc_device_base::dskreg_w(uint8_t data)
+{
+	if (LOG_FDC)
+	{
+		logerror("fdc_premier_dskreg_w(): %c%c%c%c%c%c%c%c ($%02x)\n",
+			BIT(data, 7) ? 'X' : 'x',
+			BIT(data, 6) ? 'X' : 'x',
+			BIT(data, 5) ? 'X' : 'x',
+			BIT(data, 4) ? 'D' : 'S',
+			BIT(data, 3) ? '8' : '5',
+			BIT(data, 2) ? '1' : '0',
+			BIT(data, 1) ? '1' : '0',
+			BIT(data, 0) ? '1' : '0',
+			data);
+	}
+	floppy_image_device *floppy = nullptr;
+
+	// update the motor on each floppy
+	for (int i = 0; i < 4; i++)
+	{
+		floppy = m_floppies[i]->get_device();
+		if (floppy)
+			floppy->mon_w((i == (data & 0x03)) ? CLEAR_LINE : ASSERT_LINE );
+	}
+	floppy = m_floppies[data & 0x03]->get_device();
+
+	// manipulate the WD2791
+	m_wd2791->set_floppy(floppy);
+
+	if (floppy)
+		floppy->ss_w(BIT(data, 2));
+
+	m_wd2791->dden_w(!BIT(data, 4));
 
 	set_dskreg(data);
 }
@@ -213,24 +302,33 @@ void dragon_fdc_device_base::dskreg_w(uint8_t data)
 READ8_MEMBER(dragon_fdc_device_base::scs_read)
 {
 	uint8_t result = 0;
-	switch (offset & 0xEF)
+	switch (offset & 0xef)
 	{
 	case 0:
-		result = m_wd2797->status_r(space, 0);
-		break;
 	case 1:
-		result = m_wd2797->track_r(space, 0);
-		break;
 	case 2:
-		result = m_wd2797->sector_r(space, 0);
-		break;
 	case 3:
-		result = m_wd2797->data_r(space, 0);
+		result = m_wd2797->read(space, offset & 0xef);
 		break;
 	}
 	return result;
 }
 
+
+READ8_MEMBER(premier_fdc_device_base::scs_read)
+{
+	uint8_t result = 0;
+	switch (offset)
+	{
+	case 0:
+	case 1:
+	case 2:
+	case 3:
+		result = m_wd2791->read(space, offset);
+		break;
+	}
+	return result;
+}
 
 
 //-------------------------------------------------
@@ -239,19 +337,13 @@ READ8_MEMBER(dragon_fdc_device_base::scs_read)
 
 WRITE8_MEMBER(dragon_fdc_device_base::scs_write)
 {
-	switch (offset & 0xEF)
+	switch (offset & 0xef)
 	{
 	case 0:
-		m_wd2797->cmd_w(space, 0, data);
-		break;
 	case 1:
-		m_wd2797->track_w(space, 0, data);
-		break;
 	case 2:
-		m_wd2797->sector_w(space, 0, data);
-		break;
 	case 3:
-		m_wd2797->data_w(space, 0, data);
+		m_wd2797->write(space, offset & 0xef, data);
 		break;
 	case 8: case 9: case 10: case 11:
 	case 12: case 13: case 14: case 15:
@@ -261,6 +353,21 @@ WRITE8_MEMBER(dragon_fdc_device_base::scs_write)
 }
 
 
+WRITE8_MEMBER(premier_fdc_device_base::scs_write)
+{
+	switch (offset)
+	{
+	case 0:
+	case 1:
+	case 2:
+	case 3:
+		m_wd2791->write(space, offset, data);
+		break;
+	case 4:
+		dskreg_w(data);
+		break;
+	};
+}
 
 
 //**************************************************************************
@@ -293,6 +400,38 @@ namespace
 }
 
 DEFINE_DEVICE_TYPE(DRAGON_FDC, dragon_fdc_device, "dragon_fdc", "Dragon FDC")
+
+
+//**************************************************************************
+//              PREMIER FDC
+//**************************************************************************
+
+ROM_START(premier_fdc)
+	ROM_REGION(0x4000, "eprom", ROMREGION_ERASE00)
+	ROM_LOAD_OPTIONAL("deltados.rom", 0x0000, 0x2000, CRC(149eb4dd) SHA1(eb686ce6afe63e4d4011b333a882ca812c69307f))
+ROM_END
+
+namespace
+{
+	class premier_fdc_device : public premier_fdc_device_base
+	{
+	public:
+		// construction/destruction
+		premier_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+			: premier_fdc_device_base(mconfig, PREMIER_FDC, tag, owner, clock)
+		{
+		}
+
+	protected:
+		// optional information overrides
+		virtual const tiny_rom_entry *device_rom_region() const override
+		{
+			return ROM_NAME(premier_fdc);
+		}
+	};
+};
+
+DEFINE_DEVICE_TYPE(PREMIER_FDC, premier_fdc_device, "premier_fdc", "Premier FDC")
 
 
 //**************************************************************************
