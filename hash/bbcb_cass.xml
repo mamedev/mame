@@ -2893,7 +2893,7 @@
 
 	<software name="confront">
 		<description>Confrontation</description>
-		<year>198?</year>
+		<year>1984</year>
 		<publisher>Lothlorien</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="10284">
@@ -2904,7 +2904,7 @@
 
 	<software name="confscn1">
 		<description>Confrontation Scenarios Vol.1</description>
-		<year>198?</year>
+		<year>1984</year>
 		<publisher>Lothlorien</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="2426">
@@ -3014,7 +3014,7 @@
 
 	<software name="corpuscl">
 		<description>Corpuscle</description>
-		<year>198?</year>
+		<year>1985</year>
 		<publisher>Micrograf</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="11094">
@@ -3602,7 +3602,7 @@
 
 	<software name="delta14">
 		<description>Delta 14</description>
-		<year>198?</year>
+		<year>1983</year>
 		<publisher>Voltmace</publisher>
 		<info name="usage" value="Load with *RUN" />
 		<part name="cass1" interface="bbc_cass">
@@ -3632,7 +3632,7 @@
 
 	<software name="demolato">
 		<description>Demolator</description>
-		<year>198?</year>
+		<year>1984</year>
 		<publisher>Visions</publisher>
 		<info name="usage" value="Load with *RUN" />
 		<part name="cass1" interface="bbc_cass">
@@ -4143,7 +4143,7 @@
 
 	<software name="ebonytow">
 		<description>Ebony Tower</description>
-		<year>198?</year>
+		<year>1984</year>
 		<publisher>Alligata</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="14604">
@@ -4418,7 +4418,7 @@
 
 	<software name="exmon">
 		<description>Exmon</description>
-		<year>198?</year>
+		<year>1983</year>
 		<publisher>Beebug</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="4834">
@@ -4725,7 +4725,7 @@
 
 	<software name="fivesphe">
 		<description>Five Spheres of Goliath</description>
-		<year>198?</year>
+		<year>1984</year>
 		<publisher>Kansas</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="17639">
@@ -4776,7 +4776,7 @@
 
 	<software name="flintsgo">
 		<description>Flints Gold</description>
-		<year>198?</year>
+		<year>1984</year>
 		<publisher>Micrograf</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="13565">
@@ -5282,7 +5282,7 @@
 
 	<software name="galraide">
 		<description>Galaxy Raiders</description>
-		<year>198?</year>
+		<year>1984</year>
 		<publisher>Visions</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="12507">
@@ -5829,7 +5829,7 @@
 
 	<software name="guyinhat">
 		<description>Guy in the Hat</description>
-		<year>198?</year>
+		<year>1983</year>
 		<publisher>MRM Software</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="5514">
@@ -7524,7 +7524,7 @@
 
 	<software name="loonloco">
 		<description>Loony Loco</description>
-		<year>198?</year>
+		<year>1986</year>
 		<publisher>Kansas</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="10608">
@@ -7653,7 +7653,7 @@
 	</software>
 
 	<software name="magiceel">
-		<description>Magic Eel</description>
+		<description>Games 4: Magic Eel</description>
 		<year>1982</year>
 		<publisher>Beebug</publisher>
 		<part name="cass" interface="bbc_cass">
@@ -8432,7 +8432,7 @@
 
 	<software name="muproc">
 		<description>MuProc</description>
-		<year>198?</year>
+		<year>1983</year>
 		<publisher>Quicksilva</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="22880">
@@ -8669,7 +8669,7 @@
 
 	<software name="niftylif">
 		<description>Nifty Lifty</description>
-		<year>198?</year>
+		<year>1984</year>
 		<publisher>Visions</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="5716">
@@ -8802,7 +8802,7 @@
 
 	<software name="omegapro">
 		<description>Omega Probe</description>
-		<year>198?</year>
+		<year>1984</year>
 		<publisher>Optima</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="9046">
@@ -9682,7 +9682,7 @@
 
 	<software name="protecto">
 		<description>Protector</description>
-		<year>198?</year>
+		<year>1983</year>
 		<publisher>Quicksilva</publisher>
 		<info name="usage" value="Load with *RUN" />
 		<part name="cass" interface="bbc_cass">
@@ -9773,7 +9773,7 @@
 
 	<software name="qman">
 		<description>Q Man</description>
-		<year>198?</year>
+		<year>1983</year>
 		<publisher>MRM Software</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="5533">
@@ -11256,7 +11256,7 @@
 
 	<software name="snookerv">
 		<description>Snooker (Visions)</description>
-		<year>198?</year>
+		<year>1984</year>
 		<publisher>Visions</publisher>
 		<info name="usage" value="Load with *RUN" />
 		<part name="cass" interface="bbc_cass">
@@ -11268,7 +11268,7 @@
 
 	<software name="snorter">
 		<description>Snorter</description>
-		<year>198?</year>
+		<year>1984</year>
 		<publisher>Beebug</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="5578">
@@ -11551,7 +11551,7 @@
 
 	<software name="spstatal">
 		<description>Space Station Alpha</description>
-		<year>198?</year>
+		<year>1984</year>
 		<publisher>Icon</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="6281">
@@ -11882,7 +11882,7 @@
 	</software>
 
 	<software name="starfire">
-		<description>Starfire</description>
+		<description>Games 1: Starfire</description>
 		<year>1982</year>
 		<publisher>Beebug</publisher>
 		<part name="cass" interface="bbc_cass">
@@ -12592,7 +12592,7 @@
 
 	<software name="swordsor">
 		<description>Swords and Sorcery</description>
-		<year>198?</year>
+		<year>1984</year>
 		<publisher>Kansas</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="14081">
@@ -12973,7 +12973,7 @@
 
 	<software name="generato">
 		<description>The Generators</description>
-		<year>198?</year>
+		<year>1983</year>
 		<publisher>Quicksilva</publisher>
 		<part name="cass1" interface="bbc_cass">
 			<feature name="part_id" value="Character Generator"/>
@@ -13279,7 +13279,7 @@
 
 	<software name="timelord">
 		<description>Time Lords</description>
-		<year>198?</year>
+		<year>1984</year>
 		<publisher>Red Shift</publisher>
 		<info name="usage" value="Load with *RUN" />
 		<part name="cass" interface="bbc_cass">
@@ -13671,7 +13671,7 @@
 
 	<software name="turbo">
 		<description>Turbo</description>
-		<year>198?</year>
+		<year>1984</year>
 		<publisher>Kansas</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="6111">
@@ -13861,7 +13861,7 @@
 
 	<software name="vampcast">
 		<description>Vampire Castle</description>
-		<year>198?</year>
+		<year>1984</year>
 		<publisher>Micrograf</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="16000">
@@ -14677,7 +14677,7 @@
 
 	<software name="zorakk">
 		<description>Zorakk the Conqueror</description>
-		<year>198?</year>
+		<year>1984</year>
 		<publisher>Icon</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="6263">
@@ -14689,7 +14689,7 @@
 	<!-- Business -->
 
 	<software name="ap1beebu">
-		<description>Applications1: Super Plot</description>
+		<description>Applications 1: SuperPlot</description>
 		<year>1982</year>
 		<publisher>Beebug</publisher>
 		<part name="cass" interface="bbc_cass">
@@ -14700,7 +14700,7 @@
 	</software>
 
 	<software name="ap2maste">
-		<description>Applications2: Masterfile</description>
+		<description>Applications 2: Masterfile</description>
 		<year>1982</year>
 		<publisher>Beebug</publisher>
 		<part name="cass" interface="bbc_cass">
@@ -14818,12 +14818,11 @@
 
 	<software name="stockcon">
 		<description>Stock Control</description>
-		<year>1984</year>
-		<publisher>Acornsoft</publisher>
-		<info name="release" value="SNB11" />
+		<year>1982</year>
+		<publisher>Gemini</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="4706">
-				<rom name="stockcontrol(1984)(acornsoft)(b11).uef" size="4706" crc="b53b4c25" sha1="e91185367082cced699e8899e62e9d854d79cc6a" offset="0" />
+				<rom name="stockcontrol(1982)(gemini).uef" size="4706" crc="b53b4c25" sha1="e91185367082cced699e8899e62e9d854d79cc6a" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -16022,7 +16021,7 @@
 
 	<software name="artist">
 		<description>Artist</description>
-		<year>198?</year>
+		<year>1984</year>
 		<publisher>MRM Software</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="10589">
