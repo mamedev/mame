@@ -56,6 +56,8 @@ ROM_START( plus3 )
 	// DFS
 	ROM_SYSTEM_BIOS(3, "dfs200", "Advanced 1770 DFS 2.00")
 	ROMX_LOAD("acp_dfs1770_200.rom", 0x0000, 0x4000, CRC(5a3a13c7) SHA1(d5dad7ab5a0237c44d0426cd85a8ec86545747e0), ROM_BIOS(4))
+	ROM_SYSTEM_BIOS(4, "dfs210", "Advanced 1770 DFS 2.10")
+	ROMX_LOAD("acp_dfs1770_210.rom", 0x0000, 0x4000, CRC(b0661992) SHA1(c62f1290f689788dad6a2df30ace083eb827cffe), ROM_BIOS(5))
 ROM_END
 
 //-------------------------------------------------
