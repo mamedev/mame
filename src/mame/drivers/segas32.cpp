@@ -1081,13 +1081,13 @@ WRITE8_MEMBER(segas32_state::sound_bank_hi_w)
 
 WRITE8_MEMBER(segas32_state::multipcm_bank_w)
 {
-	m_multipcm->set_bank(0x80000 * ((data >> 3) & 7), 0x80000 * (data & 7));
+	m_multipcm->set_sega_bank_512k(data & 7, (data >> 3) & 7);
 }
 
 
 WRITE8_MEMBER(segas32_state::scross_bank_w)
 {
-	m_multipcm->set_bank(0x80000 * (data & 7), 0x80000 * (data & 7));
+	m_multipcm->set_sega_bank_512k(data & 7, data & 7);
 }
 
 

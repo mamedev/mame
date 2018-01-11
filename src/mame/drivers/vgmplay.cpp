@@ -1243,7 +1243,10 @@ WRITE8_MEMBER(vgmplay_state::multipcm_bank_lo_a_w)
 	if (offset & 2)
 		m_multipcma_bank_r = (m_multipcma_bank_r & 0xff00) | data;
 
-	m_multipcma->set_bank(m_multipcma_bank_l << 16, m_multipcma_bank_r << 16);
+	if (m_multipcma_bank_l == m_multipcma_bank_r)
+		m_multipcma->set_sega_bank_1m(m_multipcma_bank_r >> 4);
+	else
+		m_multipcma->set_sega_bank_512k(m_multipcma_bank_r >> 3, m_multipcma_bank_l >> 3);
 }
 
 WRITE8_MEMBER(vgmplay_state::multipcm_bank_hi_b_w)
@@ -1261,7 +1264,10 @@ WRITE8_MEMBER(vgmplay_state::multipcm_bank_lo_b_w)
 	if (offset & 2)
 		m_multipcmb_bank_r = (m_multipcmb_bank_r & 0xff00) | data;
 
-	m_multipcmb->set_bank(m_multipcmb_bank_l << 16, m_multipcmb_bank_r << 16);
+	if (m_multipcmb_bank_l == m_multipcmb_bank_r)
+		m_multipcmb->set_sega_bank_1m(m_multipcmb_bank_r >> 4);
+	else
+		m_multipcmb->set_sega_bank_512k(m_multipcmb_bank_r >> 3, m_multipcmb_bank_l >> 3);
 }
 
 static INPUT_PORTS_START( vgmplay )
