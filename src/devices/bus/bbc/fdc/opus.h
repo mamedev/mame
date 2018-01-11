@@ -25,8 +25,6 @@ class bbc_opus8272_device :
 
 {
 public:
-	static constexpr feature_type imperfect_features() { return feature::DISK; }
-
 	// construction/destruction
 	bbc_opus8272_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
@@ -43,7 +41,6 @@ private:
 	DECLARE_READ8_MEMBER(fdc_r);
 	DECLARE_WRITE8_MEMBER(fdc_w);
 	DECLARE_WRITE_LINE_MEMBER(fdc_intrq_w);
-	DECLARE_WRITE_LINE_MEMBER(motor_w);
 
 	required_memory_region m_dfs_rom;
 	required_device<i8272a_device> m_fdc;
