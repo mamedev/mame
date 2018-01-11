@@ -40,23 +40,35 @@ public:
 		m_k053245(*this, "k053245"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_vram(*this, "vram"),
-		m_oki(*this, "oki")
+		m_oki(*this, "oki"),
+		m_ttlrom_offset(0)
 	{ }
 
 	uint32_t screen_update_quickpick5(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	K05324X_CB_MEMBER(sprite_callback);
 	TILE_GET_INFO_MEMBER(ttl_get_tile_info);
+	INTERRUPT_GEN_MEMBER(vbl_interrupt);
 
 	READ8_MEMBER(control_r) { return m_control; }
 
 	READ8_MEMBER(inp_magic_r) { return 0xff; }
 
+	READ8_MEMBER(irq_flag_r) { return 0xff; }
+
+	WRITE8_MEMBER(vbl_ack_w) { m_maincpu->set_input_line(0, CLEAR_LINE); }
+	WRITE8_MEMBER(nmi_ack_w) { m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE); }
+
+	// A0 is inverted to match the Z80's endianness.  Typical Konami.
+	READ8_MEMBER(k244_r) { return m_k053245->k053244_r(space, offset^1);  }
+	WRITE8_MEMBER(k244_w) { m_k053245->k053244_w(space, offset^1, data); }
+	READ8_MEMBER(k245_r) { return m_k053245->k053245_r(space, offset^1);  }
+	WRITE8_MEMBER(k245_w) { m_k053245->k053245_w(space, offset^1, data); }
+
 	WRITE8_MEMBER(control_w)
 	{
-		printf("%02x to control\n", data);
+		//printf("%02x to control\n", data);
 		membank("bank1")->set_entry(data&0x1);
-		//m_k053245->set_rmrd_line((data & 0x40) ? ASSERT_LINE : CLEAR_LINE);
 		if (((m_control & 0x60) != 0x60) && ((data & 0x60) == 0x60))
 		{
 			m_ttlrom_offset = 0;
@@ -94,6 +106,12 @@ READ8_MEMBER(quickpick5_state::vram_r)
 	}
 
 	return m_vram[offset];
+}
+
+INTERRUPT_GEN_MEMBER(quickpick5_state::vbl_interrupt)
+{
+	m_maincpu->set_input_line(0, ASSERT_LINE);
+	//m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 }
 
 void quickpick5_state::video_start()
@@ -135,7 +153,8 @@ TILE_GET_INFO_MEMBER(quickpick5_state::ttl_get_tile_info)
 
 	attr = lvram[BYTE_XOR_LE((tile_index<<1)+1)];
 	code = lvram[BYTE_XOR_LE((tile_index<<1))] | ((attr & 0xf) << 8);
-	attr >>= 4;
+	attr >>= 3;
+	attr &= ~1;
 
 	SET_TILE_INFO_MEMBER(m_ttl_gfx_index, code, attr, 0);
 }
@@ -145,10 +164,10 @@ uint32_t quickpick5_state::screen_update_quickpick5(screen_device &screen, bitma
 	bitmap.fill(0, cliprect);
 	screen.priority().fill(0, cliprect);
 
-	m_k053245->sprites_draw(bitmap, cliprect, screen.priority());
-
 	m_ttl_tilemap->mark_all_dirty();
 	m_ttl_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+
+	m_k053245->sprites_draw(bitmap, cliprect, screen.priority());
 
 	return 0;
 }
@@ -156,17 +175,23 @@ uint32_t quickpick5_state::screen_update_quickpick5(screen_device &screen, bitma
 K05324X_CB_MEMBER(quickpick5_state::sprite_callback)
 {
 	*priority = 0;
+//  *priority = 0xf0 | 0xcc | 0xaa;
+	*code = (*code & 0x7ff);
+	*color = (*color & 0x001f);
 }
 
 static ADDRESS_MAP_START( quickpick5_main, AS_PROGRAM, 8, quickpick5_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM AM_REGION("maincpu", 0)
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xc000) AM_READWRITE(control_r, control_w)
+	AM_RANGE(0xd006, 0xd006) AM_READWRITE(irq_flag_r, nmi_ack_w)
+	AM_RANGE(0xd007, 0xd007) AM_READWRITE(irq_flag_r, vbl_ack_w)
 	AM_RANGE(0xd800, 0xdbff) AM_RAM // stack
-	AM_RANGE(0xdc40, 0xdc4f) AM_DEVREADWRITE("k053245", k05324x_device, k053244_r, k053244_w)
-	AM_RANGE(0xdcc1, 0xdcc1) AM_READ(inp_magic_r)
+	AM_RANGE(0xdc40, 0xdc4f) AM_READWRITE(k244_r, k244_w)
+	AM_RANGE(0xdcc0, 0xdccf) AM_READ(inp_magic_r)
 	AM_RANGE(0xe000, 0xefff) AM_RAM AM_SHARE("vram") AM_READ(vram_r)
-	AM_RANGE(0xf000, 0xf7ff) AM_RAM AM_DEVREADWRITE("k053245", k05324x_device, k053245_r, k053245_w)
+	AM_RANGE(0xf000, 0xf7ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0xf800, 0xffff) AM_READWRITE(k245_r, k245_w)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( quickpick5 )
@@ -186,6 +211,7 @@ static MACHINE_CONFIG_START( quickpick5 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_32MHz/4) // z84c0008pec 8mhz part, 32Mhz xtal verified on PCB, divisor unknown
 	MCFG_CPU_PROGRAM_MAP(quickpick5_main)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", quickpick5_state, vbl_interrupt)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -196,13 +222,13 @@ static MACHINE_CONFIG_START( quickpick5 )
 	MCFG_SCREEN_UPDATE_DRIVER(quickpick5_state, screen_update_quickpick5)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD("palette", 8192)
+	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_ENABLE_SHADOWS()
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
 	MCFG_DEVICE_ADD("k053245", K053245, 0)
 	MCFG_GFX_PALETTE("palette")
-	MCFG_K05324X_OFFSETS(0, 0)
+	MCFG_K05324X_OFFSETS(80, 0)
 	MCFG_K05324X_CB(quickpick5_state, sprite_callback)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", empty)
@@ -222,10 +248,10 @@ ROM_START( quickp5 )
 	ROM_LOAD( "117.10e.bin",  0x000000, 0x010000, CRC(3645e1a5) SHA1(7d0d98772f3732510e7a58f50a622fcec74087c3) )
 
 	ROM_REGION( 0x40000, "k053245", 0 )   /* sprites */
-	ROM_LOAD16_BYTE( "117-a02-7k.bin", 0x000003, 0x010000, CRC(745a1dc9) SHA1(33d876fb70cb802d62f87ad3721740e0961c7bec) )
-	ROM_LOAD16_BYTE( "117-a03-7l.bin", 0x000002, 0x010000, CRC(07ec6db7) SHA1(7a94efc5f313fee6b9b63b7d2b6ba1cbf4158900) )
-	ROM_LOAD16_BYTE( "117-a04-3l.bin", 0x000001, 0x010000, CRC(08dba5df) SHA1(2174be21c5a7db31ccc20ca0b88e4a94145776a5) )
-	ROM_LOAD16_BYTE( "117-a05-3k.bin", 0x000000, 0x010000, CRC(9b2d0501) SHA1(3f1c69ef101153da5ac3335585541006c42e954d) )
+	ROM_LOAD32_BYTE( "117-a02-7k.bin", 0x000003, 0x010000, CRC(745a1dc9) SHA1(33d876fb70cb802d62f87ad3721740e0961c7bec) )
+	ROM_LOAD32_BYTE( "117-a03-7l.bin", 0x000002, 0x010000, CRC(07ec6db7) SHA1(7a94efc5f313fee6b9b63b7d2b6ba1cbf4158900) )
+	ROM_LOAD32_BYTE( "117-a04-3l.bin", 0x000001, 0x010000, CRC(08dba5df) SHA1(2174be21c5a7db31ccc20ca0b88e4a94145776a5) )
+	ROM_LOAD32_BYTE( "117-a05-3k.bin", 0x000000, 0x010000, CRC(9b2d0501) SHA1(3f1c69ef101153da5ac3335585541006c42e954d) )
 
 	ROM_REGION( 0x80000, "ttl", 0 ) /* TTL text tilemap characters? */
 	ROM_LOAD( "117-18e.bin",  0x000000, 0x020000, CRC(10e0d1e2) SHA1(f4ba190814d5e3f3e910c9da24845b6ddb259bff) )
