@@ -498,7 +498,7 @@ legacy_floppy_image_device *floppy_get_device_by_type(running_machine &machine,i
 	int cnt = 0;
 	for (i=0;i<4;i++) {
 		legacy_floppy_image_device *disk = floppy_get_device(machine,i);
-		if (disk->floppy_get_drive_type()==ftype) {
+		if (disk && disk->floppy_get_drive_type()==ftype) {
 			if (cnt==drive) {
 				return disk;
 			}
@@ -523,7 +523,7 @@ int floppy_get_drive_by_type(legacy_floppy_image_device *image,int ftype)
 	int i,drive =0;
 	for (i=0;i<4;i++) {
 		legacy_floppy_image_device *disk = floppy_get_device(image->machine(),i);
-		if (disk->floppy_get_drive_type()==ftype) {
+		if (disk && disk->floppy_get_drive_type()==ftype) {
 			if (image==disk) {
 				return drive;
 			}
