@@ -35,6 +35,19 @@
 		</part>
 	</software>
 	
+	<!-- "CDROM not ISO9660 or High Sierra" when trying to DIR it -->
+	<software name="3dpwrv1" supported="no">
+		<description>3D Power Games Volume 1</description>
+		<year>1997</year>
+		<publisher>Electronic Entertainment Publishing</publisher>
+		
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="3d power games volume 1 (1997)(electronic entertainment publishing)(nl)[compilation]" sha1="d632a5baaeafc893d0ff95704b2815ca7e8e124e" />
+			</diskarea>
+		</part>
+	</software>
+	
 	<!-- Windows 3.1 / 95 -->
 	<software name="3dupin">
 		<description>3-D Ultra Pinball (Budget Sierra Originals Version)</description>
@@ -47,7 +60,7 @@
 			</diskarea>
 		</part>
 	</software>
-
+	
 	<!-- DOS (with Adobe Acrobat 2.1 for Windows) -->
 	<!-- disc label: pack34 -->
 	<!-- Super Tetris has manual copy protection -->
@@ -108,6 +121,7 @@
 		</part>
 	</software>	
 	
+	<!-- Windows 95 -->
 	<software name="aceventd">
 		<description>Ace Ventura (Germany)</description>
 		<year>1996</year>
@@ -502,6 +516,19 @@
 		</part>
 	</software>
 	
+	<!-- "CDROM not ISO9660 or High Sierra" when trying to DIR it -->
+	<software name="arktime" supported="no">
+		<description>Ark of Time</description>
+		<year>1997</year>
+		<publisher>Dice</publisher>
+		
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="ark of time (1997)(dice)(nl)(m4)" sha1="0aaae225fb08402455a3ab8ea03cd412ad26b5f5" />
+			</diskarea>
+		</part>
+	</software>
+	
 	<!-- DOS -->
 	<software name="armofist">
 		<description>Armored Fist</description>
@@ -741,7 +768,20 @@
 			</diskarea>
 		</part>
 	</software>	
-
+	
+	<!-- "CDROM not ISO9660 or High Sierra" when trying to DIR it -->
+	<software name="batlcr3k" supported="no">
+		<description>Battlecruiser 3000AD</description>
+		<year>1995</year>
+		<publisher>Take 2</publisher>
+		
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="battlecruiser 3000ad (1995)(take 2)" sha1="dd59c07faf6f127053800b27c8c1248393ac4b86" />
+			</diskarea>
+		</part>
+	</software>
+	
 	<!-- Windows 3.1 -->
 	<!-- TODO: setup AVI test stalls to a DOS text mode-->
 	<software name="batlisl3" supported="partial">
@@ -885,6 +925,19 @@
 		</part>
 	</software>
 
+	<!-- "CDROM not ISO9660 or High Sierra" when trying to DIR it -->
+	<software name="blowaway" supported="no">
+		<description>Blown Away (Germany)</description>
+		<year>1997</year>
+		<publisher>Magellan</publisher>
+		
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="blown away (1997)(magellan)(de)" sha1="d2de15e7baa6344802644a5b2b1d7f8837fa563f" />
+			</diskarea>
+		</part>
+	</software>
+	
 	<!-- DOS -->
 	<!-- Needs 590k of conventional memory -->
 	<software name="blueforc">
@@ -970,6 +1023,60 @@
 		<part name="cdrom2" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="baphomets fluch (1997)(megamedia)(de)(disc 2 of 2)[compilation megapak 8]" sha1="3e53de504a2a1c806400206fc1d5c85e605cdbb4" />
+			</diskarea>
+		</part>
+	</software>
+	
+	<!-- "CDROM not ISO9660 or High Sierra" when trying to DIR it -->
+	<software name="brokswd2d" supported="no">
+		<description>Baphomets Fluch II - Die Spiegel der Finsternis (Germany A707197)</description>
+		<year>1997</year>
+		<publisher>Virgin / Revolution</publisher>
+		
+		<part name="cdrom1" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="baphomets fluch ii - die spiegel der finsternis (1997)(virgin)(de)(disc 1 of 2)[a707197-01]" sha1="c42eb9bf21d3e4145a702c8d694fa4932c22018b" />
+			</diskarea>
+		</part>
+		<part name="cdrom2" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="baphomets fluch ii - die spiegel der finsternis (1997)(virgin)(de)(disc 2 of 2)[a707197-02]" sha1="c4a5ff0e844f8cb91205bc4829b15c4f74dc2daa" />
+			</diskarea>
+		</part>
+	</software>
+	
+	<!-- "CDROM not ISO9660 or High Sierra" when trying to DIR it -->
+	<software name="brokswd2da" cloneof="brokswd2d" supported="no">
+		<description>Baphomets Fluch II - Die Spiegel der Finsternis (Germany CVIR102400)</description>
+		<year>1997</year>
+		<publisher>Virgin / Revolution</publisher>
+		
+		<part name="cdrom1" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="baphomets fluch ii - die spiegel der finsternis (1997)(virgin)(de)(disc 1 of 2)[cvir102400 cd1.2]" sha1="b01957c5c2c27f9956124275ed293ff1e02357f8" />
+			</diskarea>
+		</part>
+		<part name="cdrom2" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="baphomets fluch ii - die spiegel der finsternis (1997)(virgin)(de)(disc 2 of 2)[cvir102400 cd2.2]" sha1="9c087381903bbc8a2a87e8f7ea502d216830185b" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- "CDROM not ISO9660 or High Sierra" when trying to DIR it -->
+	<software name="brokswd2e" cloneof="brokswd2d" supported="no">
+		<description>Broken Sword II - Las Fuerzas del Mal (Spain)</description>
+		<year>1997</year>
+		<publisher>Friendware / Revolution</publisher>
+		
+		<part name="cdrom1" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="broken sword ii - las fuerzas del mal (1997)(friendware)(es)(disc 1 of 2)" sha1="bd53affaea0bffd54b11a39b751978249bdf7cf4" />
+			</diskarea>
+		</part>
+		<part name="cdrom2" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="broken sword ii - las fuerzas del mal (1997)(friendware)(es)(disc 2 of 2)" sha1="3819e8b6d6ab743b9cbd19f1a28c0475649e23b2" />
 			</diskarea>
 		</part>
 	</software>
@@ -1336,6 +1443,19 @@
 		</part>
 	</software>
 
+	<!-- "CDROM not ISO9660 or High Sierra" when trying to DIR it -->
+	<software name="clifdang" supported="no">
+		<description>Clif Danger (Budget Smile Edition)</description>
+		<year>1997</year>
+		<publisher>CDV</publisher>
+		
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="clif danger (1997)(cdv)[budget smile edition]" sha1="eb534da5ec21d701d1d96f881322902d9da9d52e" />
+			</diskarea>
+		</part>
+	</software>
+	
 	<!-- DOS -->
 	<software name="clubdead">
 		<description>Club Dead</description>
@@ -1533,6 +1653,19 @@
 		</part>
 	</software>
 
+	<!-- "CDROM not ISO9660 or High Sierra" when trying to DIR it -->
+	<software name="creatursd" supported="no">
+		<description>Creatures (Germany)</description>
+		<year>1996</year>
+		<publisher>Time Warner Interactive</publisher>
+		
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="creatures (1996)(time warner interactive)(de)" sha1="7fda7332902883068b2c32fad034d46cab94c460" />
+			</diskarea>
+		</part>
+	</software>
+	
 	<!-- DOS -->
 	<software name="crimec">
 		<description>Crime City</description>
@@ -1901,6 +2034,24 @@
 		</part>
 	</software>
 	
+	<!-- "CDROM not ISO9660 or High Sierra" when trying to DIR it -->
+	<software name="monkisl3" supported="no">
+		<description>The Curse of Monkey Island</description>
+		<year>1997</year>
+		<publisher>LucasArts</publisher>
+		
+		<part name="cdrom1" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="curse of monkey island, the (1997)(lucasarts)(disc 1 of 2)[lucasarts classic]" sha1="66fed1c67175c01eeb570c71d8c65e4c424a0266" />
+			</diskarea>
+		</part>
+		<part name="cdrom2" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="curse of monkey island, the (1997)(lucasarts)(disc 2 of 2)[lucasarts classic]" sha1="424d5197c9ed6f6fcf5803612d670aea9bbe05a0" />
+			</diskarea>
+		</part>
+	</software>
+	
 	<software name="moon" supported="no">
 		<description>Moon (Japan)</description>
 		<year>1998</year>
@@ -1970,6 +2121,7 @@
 		</part>
 	</software>
 
+	<!-- Windows 95 -->
 	<software name="orpheocr">
 		<description>Are You Afraid of the Dark - The Tale of Orpheo's Curse</description>
 		<year>1994</year>
@@ -2193,7 +2345,6 @@
 		</part>
 	</software>
 
-	
 	<software name="sideline">
 		<description>Sideline</description>
 		<year>1996</year>
@@ -2382,8 +2533,6 @@
 			</diskarea>
 		</part>
 	</software>	
-	
-
 
 	
 	<!--                                         -->
