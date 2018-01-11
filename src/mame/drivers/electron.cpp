@@ -233,6 +233,7 @@ static MACHINE_CONFIG_START( electron )
 	MCFG_SOFTWARE_LIST_ADD("cass_list", "electron_cass")
 	MCFG_SOFTWARE_LIST_ADD("cart_list", "electron_cart")
 	MCFG_SOFTWARE_LIST_ADD("flop_list", "electron_flop")
+	MCFG_SOFTWARE_LIST_ADD("rom_list",  "electron_rom")
 MACHINE_CONFIG_END
 
 
