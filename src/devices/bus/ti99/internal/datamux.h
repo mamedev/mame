@@ -121,6 +121,10 @@ private:
 	// Counter for the wait states.
 	int   m_waitcount;
 
+	// Keep the state of the ROMG* and MEMEN* lines so that debugger does not mess up things
+	line_state m_romgq_state;
+	line_state m_memen_state;
+
 	// Use the memory expansion?
 	bool m_use32k;
 
