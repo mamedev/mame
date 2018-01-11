@@ -832,7 +832,7 @@ static MACHINE_CONFIG_START( squale )
 	MCFG_WD1770_ADD("wd1770", XTAL_8MHz )
 	MCFG_FLOPPY_DRIVE_ADD("wd1770:0", squale_floppies, "525qd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("wd1770:1", squale_floppies, "525qd", floppy_image_device::default_floppy_formats)
-	MCFG_SOFTWARE_LIST_ADD("flop525_list", "squale")
+	//MCFG_SOFTWARE_LIST_ADD("flop525_list", "squale")
 
 	/* Cartridge slot */
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_linear_slot, "squale_cart")
