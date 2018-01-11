@@ -32402,6 +32402,9 @@ r9751                           // ROLM 9751 phone system
 @source:rabbit.cpp
 rabbit                          // (c) 1997 Electronic Arts
 
+@source:radicasi.cpp
+radicasi
+
 @source:radio86.cpp
 impuls03                        //
 kr03                            //

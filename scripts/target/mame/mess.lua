@@ -3611,6 +3611,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/qtsbc.cpp",
 	MAME_DIR .. "src/mame/drivers/qvt6800.cpp",
 	MAME_DIR .. "src/mame/drivers/rd100.cpp",
+	MAME_DIR .. "src/mame/drivers/radicasi.cpp",
 	MAME_DIR .. "src/mame/drivers/rvoice.cpp",
 	MAME_DIR .. "src/mame/drivers/sacstate.cpp",
 	MAME_DIR .. "src/mame/drivers/sbrain.cpp",
