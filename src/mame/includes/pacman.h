@@ -77,6 +77,7 @@ public:
 	DECLARE_READ8_MEMBER(alibaba_mystery_1_r);
 	DECLARE_READ8_MEMBER(alibaba_mystery_2_r);
 	DECLARE_WRITE8_MEMBER(maketrax_protection_w);
+	DECLARE_READ8_MEMBER(mbrush_prot_r);
 	DECLARE_READ8_MEMBER(maketrax_special_port2_r);
 	DECLARE_READ8_MEMBER(maketrax_special_port3_r);
 	DECLARE_READ8_MEMBER(korosuke_special_port2_r);
@@ -142,6 +143,7 @@ public:
 	DECLARE_DRIVER_INIT(porky);
 	DECLARE_DRIVER_INIT(mspacman);
 	DECLARE_DRIVER_INIT(mschamp);
+	DECLARE_DRIVER_INIT(mbrush);
 	TILEMAP_MAPPER_MEMBER(pacman_scan_rows);
 	TILE_GET_INFO_MEMBER(pacman_get_tile_info);
 	TILE_GET_INFO_MEMBER(s2650_get_tile_info);

@@ -655,6 +655,38 @@ READ8_MEMBER(pacman_state::maketrax_special_port3_r)
 	}
 }
 
+READ8_MEMBER(pacman_state::mbrush_prot_r)
+{
+	uint8_t data = ioport("DSW1")->read() & 0x3f;
+
+	switch (offset)
+	{
+		case 0x00:
+		case 0x04:
+		case 0x07:
+		case 0x0e:
+		case 0x0f:
+			return 0xc0 | data;
+		case 0x40:
+		case 0x41:
+		case 0x47:
+		case 0x49:
+		case 0x4d:
+		case 0x5d:
+			return 0x00;
+		case 0x42:
+		case 0x43:
+		case 0x46:
+		case 0x4c:
+		case 0x50:
+			return 0x02;
+		case 0x7f:
+			return 0x10;
+	}
+
+	return data;
+}
+
 READ8_MEMBER(pacman_state::korosuke_special_port2_r)
 {
 	int data = ioport("DSW1")->read();
@@ -6867,6 +6899,12 @@ DRIVER_INIT_MEMBER(pacman_state,maketrax)
 	save_item(NAME(m_maketrax_counter));
 }
 
+DRIVER_INIT_MEMBER(pacman_state,mbrush)
+{
+	/* set up protection handlers */
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x5080, 0x50ff, read8_delegate(FUNC(pacman_state::mbrush_prot_r),this));
+}
+
 void pacman_state::korosuke_rom_decode()
 {
 	uint8_t *rom = memregion("maincpu")->base();
@@ -7351,10 +7389,10 @@ GAME( 1981, maketrxb, crush,    maketrax, maketrax, pacman_state,  maketrax, ROT
 GAME( 1981, korosuke, crush,    korosuke, korosuke, pacman_state,  korosuke, ROT90,  "Alpha Denshi Co. / Kural Electric, Ltd.", "Korosuke Roller (Japan)", MACHINE_SUPPORTS_SAVE ) // ADK considers it a sequel?
 GAME( 1981, crushrlf, crush,    pacman,   maketrax, pacman_state,  0,        ROT90,  "bootleg", "Crush Roller (Famare SA PCB)", MACHINE_SUPPORTS_SAVE )
 GAME( 1981, crushbl,  crush,    pacman,   maketrax, pacman_state,  0,        ROT90,  "bootleg", "Crush Roller (bootleg set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, crushbl2, crush,    maketrax, mbrush,   pacman_state,  maketrax, ROT90,  "bootleg", "Crush Roller (bootleg set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, crushbl2, crush,    maketrax, mbrush,   pacman_state,  mbrush,   ROT90,  "bootleg", "Crush Roller (bootleg set 2)", MACHINE_SUPPORTS_SAVE )
 GAME( 1981, crushbl3, crush,    maketrax, mbrush,   pacman_state,  maketrax, ROT90,  "bootleg", "Crush Roller (bootleg set 3)", MACHINE_SUPPORTS_SAVE )
 GAME( 1981, crushs,   crush,    crushs,   crushs,   pacman_state,  0,        ROT90,  "bootleg (Sidam)", "Crush Roller (bootleg set 4)", MACHINE_SUPPORTS_SAVE ) // Sidam PCB, no Sidam text
-GAME( 1981, mbrush,   crush,    maketrax, mbrush,   pacman_state,  maketrax, ROT90,  "bootleg (Olympia)", "Magic Brush (bootleg of Crush Roller)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, mbrush,   crush,    maketrax, mbrush,   pacman_state,  mbrush,   ROT90,  "bootleg (Olympia)", "Magic Brush (bootleg of Crush Roller)", MACHINE_SUPPORTS_SAVE )
 GAME( 1981, paintrlr, crush,    pacman,   paintrlr, pacman_state,  0,        ROT90,  "bootleg", "Paint Roller (bootleg of Crush Roller)", MACHINE_SUPPORTS_SAVE )
 
 GAME( 1982, eyes,     0,        pacman,   eyes,     pacman_state,  eyes,     ROT90,  "Techstar (Rock-Ola license)", "Eyes (US set 1)", MACHINE_SUPPORTS_SAVE )
