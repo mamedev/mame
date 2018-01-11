@@ -1747,6 +1747,7 @@ READ8_MEMBER(towns_state::towns_cdrom_r)
 		case 0x01:  // command status
 			if(m_towns_cd.cmd_status_ptr >= 3)
 			{
+				m_towns_cd.status &= ~2;
 				// check for more status bytes
 				if(m_towns_cd.extra_status != 0)
 				{
