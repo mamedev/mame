@@ -194,7 +194,7 @@ private:
 	{
 		TIMER_ID_KEY_INTERRUPT
 	};
-		void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 	/* Status bits */
 	enum
