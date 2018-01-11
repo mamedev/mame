@@ -112,7 +112,7 @@ COMP( 1983, qvt102, 0, 0, qvt102, qvt6800, qvt6800_state, 0, "Qume", "QVT-102", 
 
 Qume QVT-190.
 Chips: MC68B00P, 2x MC68B50P, MC68B45P, V61C16P55L, M5M5165P-70L, ABHGA101006, button battery, 7-DIL-jumper
-Crystal: unreadable
+Crystal: unreadable (but likely to be 16.6698)
 
 ***************************************************************************************************************/
 
