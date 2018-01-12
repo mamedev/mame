@@ -1734,7 +1734,7 @@
 	</software>
 	
 	<!-- partial version, contains about half of the game and bundled with sound cards etc. --> 
-	<software name="cyberian" cloneof="cyberia">
+	<software name="cyberian" cloneof="cyberia" supported="no">
 		<description>Cyberia - Mission Norway (OEM v1.87)</description>
 		<year>1994</year>
 		<publisher>Interplay</publisher>
@@ -1742,7 +1742,7 @@
 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
-				<disk name="cyberia - mission norway v1.87 (1994)(interplay)(m3)[oem]" sha1="1" />
+				<disk name="cyberia - mission norway v1.87 (1994)(interplay)(m3)[oem]" sha1="3bc4126a28807bd9199a4070de1ae02b6c4e00f3" />
 			</diskarea>
 		</part>
 	</software>
