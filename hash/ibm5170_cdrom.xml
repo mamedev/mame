@@ -1960,6 +1960,77 @@
 			</diskarea>
 		</part>
 	</software>
+
+	<!-- DOS -->
+	<!-- requires 600k of free memory -->
+	<!-- has manual copy protection -->
+	<software name="f1gp">
+		<description>Formula One Grand Prix</description>
+		<year>1996</year>
+		<publisher>Microprose</publisher>
+		
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="formula one grand prix (1996)(microprose)" sha1="1ef7e2d077ce28578efcbbe9fd6e2b4c197cd6eb" />
+			</diskarea>
+		</part>
+	</software>
+	
+	<!-- DOS -->
+	<!-- TODO: several elements are black colored (EGA mode) -->
+	<software name="f29ret" supported="no">
+		<description>F-29 Retaliator</description>
+		<year>1995</year>
+		<publisher>Hit Squad</publisher>
+		
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="f-29 retaliator (1995)(hit squad)" sha1="d3b66cdf19b871decf81a9d5718d290f4c3648b4" />
+			</diskarea>
+		</part>
+	</software>
+	
+	<!-- DOS -->
+	<software name="fpbbal94">
+		<description>Front Page Sports - Baseball '94</description>
+		<year>1994</year>
+		<publisher>Sierra</publisher>
+		
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="front page sports - baseball '94 (1994)(sierra)" sha1="685dffa916c07d70e45a6f31a762a567bbfe1269" />
+			</diskarea>
+		</part>
+	</software>
+	
+	<!-- DOS -->
+	<!-- wants 595k of free memory, bootmake.bat doesn't seem to work properly -->
+	<software name="franklod" supported="no">
+		<description>Frankenstein - Life or Death</description>
+		<year>1995</year>
+		<publisher>Merit Studios</publisher>
+		
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="frankenstein - life or death (1995)(merit studios)" sha1="22869181022fb89a00f563e41599b833678f2975" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- DOS -->
+	<!-- TODO: runtime check failure -->
+	<software name="fwmigolf" supported="no">
+		<description>Fuzzy's World of Miniature Space Golf</description>
+		<year>2000</year>
+		<publisher>Manaccom</publisher>
+		<info name="version" value="1.01r" />
+		
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="fuzzy's world of miniature space golf (2000)(manaccom)" sha1="24759143001f23279037226779a90476de3df4c3" />
+			</diskarea>
+		</part>
+	</software>
 	
 	<!-- Windows 95/98 -->
 	<!-- TODO: create character screen is unusable (sets up True Color Mode) -->
