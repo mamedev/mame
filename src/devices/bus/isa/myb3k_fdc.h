@@ -14,7 +14,7 @@
 #include "machine/wd_fdc.h"
 #include "formats/imd_dsk.h"
 
-class isa8_myb3k_fdc471x_device
+class isa8_myb3k_fdc471x_base
 {
 protected:
 	enum {
@@ -30,7 +30,7 @@ protected:
 class isa8_myb3k_fdc4710_device :
 	public device_t,
 	public device_isa8_card_interface,
-	public isa8_myb3k_fdc471x_device
+	public isa8_myb3k_fdc471x_base
 {
 public:
 	// construction/destruction
@@ -68,7 +68,7 @@ private:
 class isa8_myb3k_fdc4711_device :
 	public device_t,
 	public device_isa8_card_interface,
-	public isa8_myb3k_fdc471x_device
+	public isa8_myb3k_fdc471x_base
 {
 public:
 	// construction/destruction
