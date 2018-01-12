@@ -212,6 +212,41 @@
   |         PC7 |------> I/O 4512 #2 (SO, DIP switches)
   '-------------'
 
+      4099 #1
+   .-----v-----.
+   |        Q0 |-------> JUG. 1
+   |        Q1 |-------> JUG. 2
+   |        Q2 |-------> JUG. 3
+   |        Q3 |-------> JUG. 4
+   |        Q4 |-------> JUG. 5
+   |        Q5 |-------> JUG. 6
+   |        Q6 |-------> JUG. 7
+   |        Q7 |-------> JUG. 8
+   '-----------'
+
+      4099 #2
+   .-----v-----.
+   |        Q0 |-------> AUX OUT1
+   |        Q1 |-------> AUX OUT2 (through ULN2004)
+   |        Q2 |-------> AUX OUT3 (through ULN2004)
+   |        Q3 |-------> AUX OUT4 (through ULN2004)
+   |        Q4 |-------> CONT.AUX1 (through ULN2004)
+   |        Q5 |-------> CONT.ENT (through ULN2004)
+   |        Q6 |-------> CONT.AUX2 (through ULN2004)
+   |        Q7 |-------> CONT.SAL (through ULN2004)
+   '-----------'
+
+      4099 #3
+   .-----v-----.
+   |        Q0 |-------> n.c.?
+   |        Q1 |-------> n.c.?
+   |        Q2 |-------> n.c.?
+   |        Q3 |-------> n.c.?
+   |        Q4 |-------> TOUCH (through 1N60)
+   |        Q5 |-------> n.c.?
+   |        Q6 |-------> n.c.?
+   |        Q7 |-------> n.c.?
+   '-----------'
 
 *********************************************************************
 
@@ -225,7 +260,8 @@
   outputs back).
 
   Currently the machine gets stuck polling the control register for
-  the Z180's unemulated clocked serial I/O.
+  the Z180's unemulated clocked serial I/O (which connects with the
+  ST6265's SIN/SOUT/SCK).
 
 *********************************************************************/
 
@@ -239,6 +275,7 @@
 
 #include "emu.h"
 #include "cpu/z180/z180.h"
+#include "machine/74259.h"
 #include "machine/i8255.h"
 #include "video/v9938.h"
 #include "sound/dac.h"
@@ -256,6 +293,7 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_ppi(*this, "ppi")
 		, m_dac(*this, "dac")
+		, m_latch(*this, "latch%u", 1)
 	{ }
 
 	DECLARE_WRITE8_MEMBER(port90_bitswap_w);
@@ -272,6 +310,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<i8255_device> m_ppi;
 	required_device<dac_byte_interface> m_dac;
+	required_device_array<cd4099_device, 3> m_latch;
 };
 
 
@@ -368,7 +407,11 @@ WRITE8_MEMBER(luckybal_state::output_port_a_w)
 
 WRITE8_MEMBER(luckybal_state::output_port_b_w)
 {
-	if ((data & 0xf8) != 0xf8)
+	for (int n = 0; n < 3; n++)
+		if (!BIT(data, n + 3))
+			m_latch[n]->write_bit(data & 7, BIT(data, 6));
+
+	if ((data & 0x80) != 0x80)
 		logerror("%s: Write to PPI port B: %02X\n", machine().describe_context(), data);
 }
 
@@ -485,6 +528,12 @@ static MACHINE_CONFIG_START( luckybal )
 	MCFG_I8255_OUT_PORTB_CB(WRITE8(luckybal_state, output_port_b_w))
 	MCFG_I8255_IN_PORTC_CB(READ8(luckybal_state, input_port_c_r))
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(luckybal_state, output_port_c_w))
+
+	MCFG_DEVICE_ADD("latch1", CD4099, 0)
+
+	MCFG_DEVICE_ADD("latch2", CD4099, 0)
+
+	MCFG_DEVICE_ADD("latch3", CD4099, 0)
 
 	/* video hardware */
 	MCFG_V9938_ADD("v9938", "screen", VDP_MEM, VID_CLOCK)
