@@ -30,6 +30,37 @@ if (BUSES["A7800"]~=null) then
 	}
 end
 
+---------------------------------------------------
+--
+--@src/devices/bus/a7800_ctrl/ctrl.h,BUSES["A7800_CTRL"] = true
+---------------------------------------------------
+
+if (BUSES["A7800_CTRL"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/bus/a7800_ctrl/ctrl.cpp",
+		MAME_DIR .. "src/devices/bus/a7800_ctrl/ctrl.h",
+		MAME_DIR .. "src/devices/bus/a7800_ctrl/joystick.cpp",
+		MAME_DIR .. "src/devices/bus/a7800_ctrl/joystick.h",
+		MAME_DIR .. "src/devices/bus/a7800_ctrl/joyproline.cpp",
+		MAME_DIR .. "src/devices/bus/a7800_ctrl/joyproline.h",
+		MAME_DIR .. "src/devices/bus/a7800_ctrl/keypad.cpp",
+		MAME_DIR .. "src/devices/bus/a7800_ctrl/keypad.h",
+		MAME_DIR .. "src/devices/bus/a7800_ctrl/lightgun.cpp",
+		MAME_DIR .. "src/devices/bus/a7800_ctrl/lightgun.h",
+		MAME_DIR .. "src/devices/bus/a7800_ctrl/paddles.cpp",
+		MAME_DIR .. "src/devices/bus/a7800_ctrl/paddles.h",
+		MAME_DIR .. "src/devices/bus/a7800_ctrl/wheel.cpp",
+		MAME_DIR .. "src/devices/bus/a7800_ctrl/wheel.h",
+		MAME_DIR .. "src/devices/bus/a7800_ctrl/trackball.cpp",
+		MAME_DIR .. "src/devices/bus/a7800_ctrl/trackball.h",
+		MAME_DIR .. "src/devices/bus/a7800_ctrl/stmouse.cpp",
+		MAME_DIR .. "src/devices/bus/a7800_ctrl/stmouse.h",
+		MAME_DIR .. "src/devices/bus/a7800_ctrl/amigamouse.cpp",
+		MAME_DIR .. "src/devices/bus/a7800_ctrl/amigamouse.h",
+	}
+end
+
+
 
 ---------------------------------------------------
 --
@@ -920,14 +951,8 @@ end
 
 if (BUSES["INTELLEC4"]~=null) then
 	files {
-		MAME_DIR .. "src/devices/bus/intellec4/insdatastor.cpp",
-		MAME_DIR .. "src/devices/bus/intellec4/insdatastor.h",
 		MAME_DIR .. "src/devices/bus/intellec4/intellec4.cpp",
 		MAME_DIR .. "src/devices/bus/intellec4/intellec4.h",
-		MAME_DIR .. "src/devices/bus/intellec4/prommemory.cpp",
-		MAME_DIR .. "src/devices/bus/intellec4/prommemory.h",
-		MAME_DIR .. "src/devices/bus/intellec4/tapereader.cpp",
-		MAME_DIR .. "src/devices/bus/intellec4/tapereader.h",
 	}
 end
 

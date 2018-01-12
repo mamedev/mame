@@ -6,8 +6,10 @@
 
 
   - some history:
+
     2014-12-01 Mike Saarna, Robert Tuccitto Implemented "colorburst kill" bit
                 of the MARIA CTRL register.
+
     2014-10-05 Mike Saarna, Robert Tuccitto Last Line DMA value corrected
                 to 6. GCC and Atari docs both show a difference between
                 Other Line and Last Line as +6 at the lowest part of the
@@ -53,7 +55,8 @@
 
 #define TRIGGER_HSYNC   64717
 
-#define READ_MEM(x) space.read_byte(x)
+//#define READ_MEM(x) space.read_byte(x)
+#define READ_MEM(x) (((x)<0x20) ? 0:space.read_byte(x)) //TODO: track down spurious writes to TIA
 
 DEFINE_DEVICE_TYPE(ATARI_MARIA, atari_maria_device, "atari_maria", "Atari MARIA")
 
@@ -270,8 +273,10 @@ void atari_maria_device::draw_scanline()
 		if (m_offset == 0)
 		{
 			maria_cycles += 6; // extra shutdown time
+
 			if (READ_MEM(m_dll + 3) & 0x80)
 				maria_cycles += 17; // interrupt overhead
+
 		}
 
 		// If MARIA used up all of the DMA time then the CPU can't run until next line...

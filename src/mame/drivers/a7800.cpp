@@ -94,6 +94,11 @@
     2014/08/25 Fabio Priuli Converted carts to be slot devices and cleaned
                up the driver (removed the pokey, cleaned up rom regions, etc.)
 
+    2017/07/14 Mike Saarna/Robert Tuccito   Converted to slotted controls and
+               added support for proline joysticks, vcs joysticks, paddles,
+               lightguns, keypads, driving wheels, cx22 trakballs, amiga mice, 
+               st mice/cx80. 
+
 ***************************************************************************/
 
 #include "emu.h"
@@ -103,10 +108,12 @@
 #include "sound/tiasound.h"
 #include "machine/mos6530n.h"
 #include "video/maria.h"
+#include "bus/a7800_ctrl/ctrl.h"
 #include "bus/a7800/a78_carts.h"
 #include "screen.h"
 #include "softlist.h"
 #include "speaker.h"
+
 
 #define A7800_NTSC_Y1   XTAL_14_31818MHz
 #define CLK_PAL 1773447
@@ -120,12 +127,13 @@ public:
 	m_maincpu(*this, "maincpu"),
 	m_tia(*this, "tia"),
 	m_maria(*this, "maria"),
-	m_io_joysticks(*this, "joysticks"),
-	m_io_buttons(*this, "buttons"),
+	m_joy1(*this, "joy1"),
+	m_joy2(*this, "joy2"),
 	m_io_console_buttons(*this, "console_buttons"),
 	m_cart(*this, "cartslot"),
 	m_screen(*this, "screen"),
 	m_bios(*this, "maincpu") { }
+
 
 	int m_lines;
 	int m_ispal;
@@ -136,6 +144,7 @@ public:
 	int m_p1_one_button;
 	int m_p2_one_button;
 	int m_bios_enabled;
+
 
 	DECLARE_READ8_MEMBER(bios_or_cart_r);
 	DECLARE_READ8_MEMBER(tia_r);
@@ -149,19 +158,23 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(interrupt);
 	TIMER_CALLBACK_MEMBER(maria_startdma);
 	DECLARE_READ8_MEMBER(riot_joystick_r);
+	DECLARE_WRITE8_MEMBER(riot_joystick_w);
 	DECLARE_READ8_MEMBER(riot_console_button_r);
 	DECLARE_WRITE8_MEMBER(riot_button_pullup_w);
+
 
 protected:
 	required_device<cpu_device> m_maincpu;
 	required_device<tia_device> m_tia;
 	required_device<atari_maria_device> m_maria;
-	required_ioport m_io_joysticks;
-	required_ioport m_io_buttons;
+	required_device<a7800_control_port_device> m_joy1;
+	required_device<a7800_control_port_device> m_joy2;
 	required_ioport m_io_console_buttons;
 	required_device<a78_cart_slot_device> m_cart;
 	required_device<screen_device> m_screen;
 	required_region_ptr<uint8_t> m_bios;
+	uint64_t paddle_start;
+	uint8_t  tia_delay;
 };
 
 
@@ -172,7 +185,27 @@ protected:
 // RIOT
 READ8_MEMBER(a7800_state::riot_joystick_r)
 {
-	return m_io_joysticks->read();
+	uint8_t val = 0;
+
+
+	/* Left controller port PINs 1-4 ( 4321 ) */
+	val |= ( m_joy1->joy_r() & 0x0F ) << 4;
+
+	/* Right controller port PINs 1-4 ( 4321 ) */
+	val |= m_joy2->joy_r() & 0x0F;
+
+	return val;
+}
+
+WRITE8_MEMBER(a7800_state::riot_joystick_w)
+{
+
+	/* Left controller port */
+	m_joy1->joy_w( data >> 4 );
+
+	/* Right controller port */
+	m_joy2->joy_w( data & 0x0f );
+
 }
 
 READ8_MEMBER(a7800_state::riot_console_button_r)
@@ -190,6 +223,26 @@ WRITE8_MEMBER(a7800_state::riot_button_pullup_w)
 
 READ8_MEMBER(a7800_state::tia_r)
 {
+
+	uint64_t elapsed; 
+	int16_t cpu_x, cpu_y;
+	int16_t gun_x, gun_y;
+
+	/* For now we only apply the 0.5 cycle penalty to lightgun games, where it's required.
+	   Other games (mostly paddle) may jitter from frame to frame, because we can't actually 
+	   wait 0.5 cycles, and instead wait for 1 cycle every 2x TIA accesses. Without this fix
+	   our 6502 on-screen position is severely skewed. */
+	if ((m_joy1->is_lightgun())||(m_joy2->is_lightgun()))
+	{
+		tia_delay++;
+		if(tia_delay==2)
+		{
+			tia_delay=0;
+			//+3 gives us +1 cpu cycle, because we're partway through an instruction.
+			m_maincpu->spin_until_time(m_maincpu->cycles_to_attotime(3));
+		}
+	}
+
 	switch (offset & 0x0f)
 	{
 		case 0x00:
@@ -201,26 +254,141 @@ READ8_MEMBER(a7800_state::tia_r)
 		case 0x06:
 		case 0x07:
 			/* Even though the 7800 doesn't use the TIA graphics the collision registers should
-			 still return a reasonable value */
+			   still return a reasonable value */
 			return 0x00;
-		case 0x08:
-			return ((m_io_buttons->read() & 0x02) << 6);
-		case 0x09:
-			return ((m_io_buttons->read() & 0x08) << 4);
-		case 0x0a:
-			return ((m_io_buttons->read() & 0x01) << 7);
-		case 0x0b:
-			return ((m_io_buttons->read() & 0x04) << 5);
-		case 0x0c:
-			if (((m_io_buttons->read() & 0x08) ||(m_io_buttons->read() & 0x02)) && m_p1_one_button)
+		case 0x08: //INPT0
+			if ( m_joy1->has_pro_buttons() && m_p1_one_button) // don't report A or B in 1 button mode
 				return 0x00;
-			else
-				return 0x80;
-		case 0x0d:
-			if (((m_io_buttons->read() & 0x01) ||(m_io_buttons->read() & 0x04)) && m_p2_one_button)
+			if ( m_joy1->is_paddle() )
+			{
+				/* Scale the elapsed cycles to approximately fit the digital paddle-scale. This
+				   is always a bit different from game to game, so we'll invariably wind up with
+				   some wasted digital paddle-range and an in-game non-centered center point. */
+				elapsed = (machine().device<cpu_device>("maincpu")->total_cycles() - paddle_start)/97;
+				if ( elapsed > m_joy1->pot_x_r() )
+					return 0x80;
+				else
+					return 0x00;
+			}
+			if(m_joy1->has_pot_x())
+				return m_joy1->pot_x_r();
+			return ((m_joy1->joy_r() & 0x10)<<3);
+		case 0x09: //INPT1
+			if ( m_joy1->has_pro_buttons() && m_p1_one_button) // don't report A or B in 1 button mode
 				return 0x00;
+			if ( m_joy1->is_paddle() )
+			{
+				/* Scale the elapsed cycles to approximately fit the digital paddle-scale. This
+				   is always a bit different from game to game, so we'll invariably wind up with
+				   some wasted digital paddle-range and an in-game non-centered center point. */
+				elapsed = (machine().device<cpu_device>("maincpu")->total_cycles() - paddle_start)/97;
+				if ( elapsed > m_joy1->pot_y_r() )
+					return 0x80;
+				else
+					return 0x00;
+			}
+			if(m_joy1->has_pot_y())
+				return m_joy1->pot_y_r();
+			return ((m_joy1->joy_r() & 0x40)<<1);
+		case 0x0a: //INPT2
+			if ( m_joy2->has_pro_buttons() && m_p2_one_button) // don't report A or B in 1 button mode
+				return 0x00;
+			if ( m_joy2->is_paddle() )
+			{
+				/* Scale the elapsed cycles to approximately fit the digital paddle-scale. This
+				   is always a bit different from game to game, so we'll invariably wind up with
+				   some wasted digital paddle-range and an in-game non-centered center point. */
+				elapsed = (machine().device<cpu_device>("maincpu")->total_cycles() - paddle_start)/97;
+				if ( elapsed > (m_joy2->pot_x_r()^0xff) )
+					return 0x80;
+				else
+					return 0x00;
+			}
+			if(m_joy2->has_pot_x())
+				return m_joy2->pot_x_r();
+			return ((m_joy2->joy_r() & 0x10)<<3);
+		case 0x0b: //INPT3
+			if ( m_joy2->has_pro_buttons() && m_p2_one_button) // don't report A or B in 1 button mode
+				return 0x00;
+			if ( m_joy2->is_paddle() )
+			{
+				/* Scale the elapsed cycles to approximately fit the digital paddle-scale. This
+				   is always a bit different from game to game, so we'll invariably wind up with
+				   some wasted digital paddle-range and an in-game non-centered center point. */
+				elapsed = (machine().device<cpu_device>("maincpu")->total_cycles() - paddle_start)/97;
+				if ( elapsed > m_joy2->pot_y_r() )
+					return 0x80;
+				else
+					return 0x00;
+			}
+			if(m_joy2->has_pot_y())
+				return m_joy2->pot_y_r();
+			return ((m_joy2->joy_r() & 0x40)<<1);
+		case 0x0c: //INPT4
+			if ( m_joy1->has_pro_buttons() && m_p1_one_button && (m_joy1->joy_r() & 0x50) )
+				return 0x00; // A and B buttons activate the vcs button line in 1 button mode
+			if (m_joy1->is_lightgun())
+			{
+				/* To support 7800 lightguns, the 6502 races the beam 2600 style, checking
+				   the INPT4 light sensor. If it's being checked, we need to find out
+				   the current cpu position, and compare it to the GUI gunsight. If the
+				   gunsight is nearby, we need to return a "lit-up" sensor value. */
+
+				cpu_x=m_screen->hpos()/2;
+				cpu_y=(m_screen->vpos() % m_lines); 
+
+				// Scale the gun X coordinates to the screen. Offset and wrap the X.
+				gun_x=((((m_joy1->light_x_r())*160)/255)+95)%227;
+
+				// Scale the gun Y coordinates to the visible screen length. Offset the Y.
+				if(m_ispal)
+					gun_y=(((m_joy1->light_y_r())*260)/255)+24;
+				else //ntsc
+					gun_y=(((m_joy1->light_y_r())*228)/255)+16;
+
+				/* Calculate the distance between the gunsight and beam. If it's within 8 pixels,
+				   light up the sensor. We use 8 squared instead of 8 for the comparison, so that
+				   we can skip the square root on the distance calculation. */
+				if( (((gun_x-cpu_x)*(gun_x-cpu_x))+((gun_y-cpu_y)*(gun_y-cpu_y))) < 64 )
+					return 0x00;
+				else
+					return 0x80;
+			}
 			else
-				return 0x80;
+				return((m_joy1->joy_r()&0x20)<<2);
+
+		case 0x0d: //INPT5
+			if ( m_joy2->has_pro_buttons() && m_p2_one_button && (m_joy2->joy_r() & 0x50) )
+				return 0x00; // A and B buttons activate the vcs button line in 1 button mode
+			if (m_joy2->is_lightgun())
+			{
+				/* To support 7800 lightguns, the 6502 races the beam 2600 style, checking
+				   the INPT5 light sensor. If it's being checked, we need to find out
+				   the current cpu position, and compare it to the GUI gunsight. If the
+				   gunsight is nearby, we need to return a "lit-up" sensor value. */
+
+				cpu_x=m_screen->hpos()/2;
+				cpu_y=(m_screen->vpos() % m_lines); 
+
+				// Scale the gun X coordinates to the screen. Offset and wrap the X.
+				gun_x=((((m_joy2->light_x_r())*160)/255)+95)%227;
+
+				// Scale the gun Y coordinates to the visible screen length. Offset the Y.
+				if(m_ispal)
+					gun_y=(((m_joy2->light_y_r())*260)/255)+24;
+				else //ntsc
+					gun_y=(((m_joy2->light_y_r())*228)/255)+16;
+
+				/* Calculate the distance between the gunsight and beam. If it's within 8 pixels,
+				   light up the sensor. We use 8 squared instead of 8 for the comparison, so we 
+				   can skip the square root on the distance calculation. */
+				if( (((gun_x-cpu_x)*(gun_x-cpu_x))+((gun_y-cpu_y)*(gun_y-cpu_y))) < 64 )
+					return 0x00;
+				else
+					return 0x80;
+			}
+			else
+				return((m_joy2->joy_r()&0x20)<<2);
 		default:
 			logerror("undefined TIA read %x\n",offset);
 
@@ -231,6 +399,23 @@ READ8_MEMBER(a7800_state::tia_r)
 // TIA
 WRITE8_MEMBER(a7800_state::tia_w)
 {
+	static uint8_t paddle_is_grounded = 0;
+
+	/* For now we only apply the 0.5 cycle penalty to lightgun games, where it's required.
+	   Other games (mostly paddle) may jitter from frame to frame, because we can't actually 
+	   wait 0.5 cycles, and instead wait for 1 cycle every 2x TIA accesses. Without this fix
+	   our 6502 on-screen position is severely skewed. */
+	if ((m_joy1->is_lightgun())||(m_joy2->is_lightgun()))
+	{
+		tia_delay++;
+		if(tia_delay==2)
+		{
+			tia_delay=0;
+			//+3 gives us +1 cpu cycle, because we're partway through an instruction.
+			m_maincpu->spin_until_time(m_maincpu->cycles_to_attotime(3));
+		}
+	}
+
 	if (offset < 0x20)
 	{ //INPTCTRL covers TIA registers 0x00-0x1F until locked
 		if (data & 0x01)
@@ -246,7 +431,20 @@ WRITE8_MEMBER(a7800_state::tia_w)
 			m_ctrl_reg = data;
 		}
 	}
-	m_tia->tia_sound_w(space, offset, data);
+	if(offset==1) // VBLANK
+	{
+		// paddle_start is when the paddles have been grounded and released from ground.
+		if(data & 0x80) 
+			paddle_is_grounded=1;
+		else if (paddle_is_grounded)
+		{
+			paddle_is_grounded=0;
+			paddle_start = machine().device<cpu_device>("maincpu")->total_cycles();
+		}
+	}
+	else
+		m_tia->tia_sound_w(space, offset, data);
+
 }
 
 
@@ -305,22 +503,6 @@ ADDRESS_MAP_END
 ***************************************************************************/
 
 static INPUT_PORTS_START( a7800 )
-	PORT_START("joysticks")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP)    PORT_PLAYER(2) PORT_8WAY
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN)  PORT_PLAYER(2) PORT_8WAY
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT)  PORT_PLAYER(2) PORT_8WAY
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT) PORT_PLAYER(2) PORT_8WAY
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_UP)    PORT_PLAYER(1) PORT_8WAY
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN)  PORT_PLAYER(1) PORT_8WAY
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT)  PORT_PLAYER(1) PORT_8WAY
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT) PORT_PLAYER(1) PORT_8WAY
-
-	PORT_START("buttons")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_BUTTON2)       PORT_PLAYER(2)
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_BUTTON2)       PORT_PLAYER(1)
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_BUTTON1)       PORT_PLAYER(2)
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_BUTTON1)       PORT_PLAYER(1)
-	PORT_BIT(0xF0, IP_ACTIVE_LOW, IPT_UNUSED)
 
 	PORT_START("console_buttons")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_OTHER)  PORT_NAME("Reset")         PORT_CODE(KEYCODE_R)
@@ -1350,11 +1532,12 @@ void a7800_state::machine_reset()
 	m_ctrl_reg = 0;
 	m_maria_flag = 0;
 	m_bios_enabled = 0;
+	tia_delay = 0;
 }
 
 static MACHINE_CONFIG_START( a7800_ntsc )
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6502, A7800_NTSC_Y1/8) /* 1.79 MHz (switches to 1.19 MHz on TIA or RIOT access) */
+	MCFG_CPU_ADD("maincpu", M6502, A7800_NTSC_Y1/8) /* 1.79 MHz (switches to 1.19 MHz on TIA or RIOT RAM access) */
 	MCFG_CPU_PROGRAM_MAP(a7800_mem)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", a7800_state, interrupt, "screen", 0, 1)
 
@@ -1378,8 +1561,13 @@ static MACHINE_CONFIG_START( a7800_ntsc )
 	/* devices */
 	MCFG_DEVICE_ADD("riot", MOS6532_NEW, A7800_NTSC_Y1/8)
 	MCFG_MOS6530n_IN_PA_CB(READ8(a7800_state, riot_joystick_r))
+	MCFG_MOS6530n_OUT_PA_CB(WRITE8(a7800_state, riot_joystick_w))
 	MCFG_MOS6530n_IN_PB_CB(READ8(a7800_state, riot_console_button_r))
 	MCFG_MOS6530n_OUT_PB_CB(WRITE8(a7800_state, riot_button_pullup_w))
+
+
+	MCFG_A7800_CONTROL_PORT_ADD("joy1", a7800_control_port_devices, "proline_joystick")
+	MCFG_A7800_CONTROL_PORT_ADD("joy2", a7800_control_port_devices, "proline_joystick")
 
 	MCFG_A78_CARTRIDGE_ADD("cartslot", a7800_cart, nullptr)
 
@@ -1405,6 +1593,7 @@ static MACHINE_CONFIG_DERIVED( a7800_pal, a7800_ntsc )
 	MCFG_DEVICE_REMOVE("riot")
 	MCFG_DEVICE_ADD("riot", MOS6532_NEW, CLK_PAL)
 	MCFG_MOS6530n_IN_PA_CB(READ8(a7800_state, riot_joystick_r))
+	MCFG_MOS6530n_OUT_PA_CB(WRITE8(a7800_state, riot_joystick_w))
 	MCFG_MOS6530n_IN_PB_CB(READ8(a7800_state, riot_console_button_r))
 	MCFG_MOS6530n_OUT_PB_CB(WRITE8(a7800_state, riot_button_pullup_w))
 
