@@ -332,7 +332,7 @@ MACHINE_CONFIG_END
 
 /***************************************************************************
 
-  Coleco Head to Head Basketball/Hockey/Soccer (model 2150/2160/2170)
+  Coleco Head to Head: Electronic Basketball/Hockey/Soccer (model 2150/2160/2170)
   * COP420 MCU label COP420L-NEZ/N
   * 2-digit 7seg display, 41 other leds, 1-bit sound
 
@@ -1723,12 +1723,12 @@ ROM_START( h2hbaskb )
 	ROM_LOAD( "cop420l-nmy", 0x0000, 0x0400, CRC(87152509) SHA1(acdb869b65d49b3b9855a557ed671cbbb0f61e2c) )
 ROM_END
 
-ROM_START( h2hhockey )
+ROM_START( h2hhockey ) // dumped from Basketball
 	ROM_REGION( 0x0400, "maincpu", 0 )
 	ROM_LOAD( "cop420l-nmy", 0x0000, 0x0400, CRC(87152509) SHA1(acdb869b65d49b3b9855a557ed671cbbb0f61e2c) )
 ROM_END
 
-ROM_START( h2hsoccer )
+ROM_START( h2hsoccer ) // dumped from Basketball
 	ROM_REGION( 0x0400, "maincpu", 0 )
 	ROM_LOAD( "cop420l-nmy", 0x0000, 0x0400, CRC(87152509) SHA1(acdb869b65d49b3b9855a557ed671cbbb0f61e2c) )
 ROM_END
@@ -1801,9 +1801,9 @@ ROM_END
 //    YEAR  NAME       PARENT   CMP MACHINE    INPUT      STATE          INIT COMPANY, FULLNAME, FLAGS
 CONS( 1979, ctstein,   0,        0, ctstein,   ctstein,   ctstein_state,   0, "Castle Toy", "Einstein (Castle Toy)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
-CONS( 1980, h2hbaskb,  0,        0, h2hbaskb,  h2hbaskb,  h2hbaskb_state,  0, "Coleco", "Head to Head Basketball (COP420L version)", MACHINE_SUPPORTS_SAVE )
-CONS( 1980, h2hhockey, h2hbaskb, 0, h2hhockey, h2hhockey, h2hbaskb_state,  0, "Coleco", "Head to Head Hockey (COP420L version)", MACHINE_SUPPORTS_SAVE )
-CONS( 1980, h2hsoccer, h2hbaskb, 0, h2hsoccer, h2hsoccer, h2hbaskb_state,  0, "Coleco", "Head to Head Soccer (COP420L version)", MACHINE_SUPPORTS_SAVE )
+CONS( 1980, h2hbaskb,  0,        0, h2hbaskb,  h2hbaskb,  h2hbaskb_state,  0, "Coleco", "Head to Head: Electronic Basketball (COP420L version)", MACHINE_SUPPORTS_SAVE )
+CONS( 1980, h2hhockey, h2hbaskb, 0, h2hhockey, h2hhockey, h2hbaskb_state,  0, "Coleco", "Head to Head: Electronic Hockey (COP420L version)", MACHINE_SUPPORTS_SAVE )
+CONS( 1980, h2hsoccer, h2hbaskb, 0, h2hsoccer, h2hsoccer, h2hbaskb_state,  0, "Coleco", "Head to Head: Electronic Soccer (COP420L version)", MACHINE_SUPPORTS_SAVE )
 
 CONS( 1981, einvaderc, einvader, 0, einvaderc, einvaderc, einvaderc_state, 0, "Entex", "Space Invader (Entex, COP444L version)", MACHINE_SUPPORTS_SAVE )
 
