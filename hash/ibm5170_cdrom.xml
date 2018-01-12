@@ -926,7 +926,7 @@
 	</software>
 
 	<!-- "CDROM not ISO9660 or High Sierra" when trying to DIR it -->
-	<software name="blowaway" supported="no">
+	<software name="blowawayd" supported="no">
 		<description>Blown Away (Germany)</description>
 		<year>1997</year>
 		<publisher>Magellan</publisher>
@@ -1784,7 +1784,20 @@
 			</diskarea>
 		</part>
 	</software>
-	
+
+	<!-- DOS -->
+	<software name="cycleman">
+		<description>Cyclemania</description>
+		<year>1994</year>
+		<publisher>Accolade</publisher>
+		
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="cyclemania (1994)(accolade)" sha1="947d0ff25be8668d43fbabb31b23092b6c6510e7" />
+			</diskarea>
+		</part>
+	</software>
+
 	<!-- DOS -->
 	<!-- TODO: "Disk write failed" on install -->
 	<software name="darker" supported="no">
@@ -1882,6 +1895,18 @@
 		</part>
 	</software>
 	
+	<software name="ecoquest">
+		<description>EcoQuest 1 - The Search for Cetus</description>
+		<year>1992</year>
+		<publisher>Sierra</publisher>
+		
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="ecoquest 1 - the search for cetus (1992)(sierra)" sha1="8e1452f6caf66f51eb5c57230cce19aef254916b" />
+			</diskarea>
+		</part>
+	</software>
+	
 	<software name="elecpop">
 		<description>Electronic Popple (Japan)</description>
 		<year>1997</year>
@@ -1894,6 +1919,48 @@
 		</part>
 	</software>
 
+	<!-- DOS 5.0 -->
+	<!-- 486 class CPU -->
+	<software name="enemystr">
+		<description>Enemy Star</description>
+		<year>1999</year>
+		<publisher>Midas</publisher>
+		
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="enemy star (1999)(midas)" sha1="c34f71fd3b51976fd372619e1f6f298b53f6f48f" />
+			</diskarea>
+		</part>
+	</software>
+	
+	<!-- DOS -->
+	<software name="ericurdy">
+		<description>Eric the Unready</description>
+		<year>1997</year>
+		<publisher>Legend Entertainment</publisher>
+		<info name="version" value="1.0" />
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="eric the unready (1997)(legend)" sha1="212771b1cd6622403c24d6bbbee0af7e5069f649" />
+			</diskarea>
+		</part>
+	</software>
+	
+	<!-- DOS -->
+	<!-- TODO: sound requires EMM manager -->
+	<software name="escdlrum" supported="partial">
+		<description>Escape from Delirium</description>
+		<year>1997</year>
+		<publisher>Magicom Multimedia / Virtual X-Perience</publisher>
+		
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="escape from delirium (1997)(magicom multimedia)" sha1="d851ad199db4e9a8aa97ff3a90c7f7e5067aac06" />
+			</diskarea>
+		</part>
+	</software>
+	
 	<!-- Windows 95/98 -->
 	<!-- TODO: create character screen is unusable (sets up True Color Mode) -->
 	<software name="geo" supported="no">
@@ -2214,6 +2281,20 @@
 		</part>
 	</software>
 
+	<!-- Windows 3.x -->
+	<!-- TODO: 256 colors shifting issue, sound is too slow? -->
+	<software name="plumber" supported="partial">
+		<description>Plumber don't Wear Ties</description>
+		<year>1993</year>
+		<publisher>Kirin Entertainment</publisher>
+		
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="plumber" sha1="275872f0cf2f5ebcf05ff91865b341e73dbf1972" />
+			</diskarea>
+		</part>
+	</software>
+	
 	<!-- Windows 95 -->
 	<software name="poipon">
 		<description>PoiPon (Japan)</description>
