@@ -410,8 +410,6 @@ void popeye_state::draw_background(bitmap_ind16 &bitmap, const rectangle &clipre
 
 	if (flip_screen())
 	{
-		if (m_bitmap_type == TYPE_TPP1)
-			scrollx = -scrollx;
 		scrolly = -scrolly;
 	}
 
