@@ -23,6 +23,7 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_p_chargen(*this, "chargen")
+		, m_videoram(*this, "videoram")
 	{ }
 
 	MC6845_UPDATE_ROW(update_row);
@@ -30,6 +31,7 @@ public:
 private:
 	required_device<cpu_device> m_maincpu;
 	required_region_ptr<u8> m_p_chargen;
+	required_shared_ptr<u8> m_videoram;
 };
 
 MC6845_UPDATE_ROW(qvt6800_state::update_row)
@@ -39,7 +41,7 @@ MC6845_UPDATE_ROW(qvt6800_state::update_row)
 static ADDRESS_MAP_START( qvt102_mem_map, AS_PROGRAM, 8, qvt6800_state )
 	AM_RANGE(0x0000, 0x03ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x2800, 0x2803) AM_DEVWRITE("ctc", z80ctc_device, write)
-	AM_RANGE(0x4000, 0x47ff) AM_RAM
+	AM_RANGE(0x4000, 0x47ff) AM_RAM AM_SHARE("videoram")
 	AM_RANGE(0x8000, 0x8000) AM_DEVREADWRITE("crtc", mc6845_device, status_r, address_w)
 	AM_RANGE(0x8001, 0x8001) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
 	AM_RANGE(0x9800, 0x9801) AM_DEVREADWRITE("acia", acia6850_device, read, write)
@@ -47,12 +49,12 @@ static ADDRESS_MAP_START( qvt102_mem_map, AS_PROGRAM, 8, qvt6800_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( qvt190_mem_map, AS_PROGRAM, 8, qvt6800_state )
-	AM_RANGE(0x0000, 0x07ff) AM_RAM
+	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x2500, 0x2501) AM_DEVREADWRITE("acia1", acia6850_device, read, write)
 	AM_RANGE(0x2600, 0x2601) AM_DEVREADWRITE("acia2", acia6850_device, read, write)
 	AM_RANGE(0x2800, 0x2800) AM_DEVREADWRITE("crtc", mc6845_device, status_r, address_w)
 	AM_RANGE(0x2801, 0x2801) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
-	AM_RANGE(0x4000, 0x47ff) AM_RAM
+	AM_RANGE(0x4000, 0x47ff) AM_RAM AM_SHARE("videoram")
 	AM_RANGE(0x8000, 0xffff) AM_ROM AM_REGION("maincpu", 0)
 ADDRESS_MAP_END
 
@@ -92,6 +94,8 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( qvt190 )
 	MCFG_CPU_ADD("maincpu", M6800, XTAL_16_6698MHz / 9)
 	MCFG_CPU_PROGRAM_MAP(qvt190_mem_map)
+
+	MCFG_NVRAM_ADD_0FILL("nvram") // V61C16P55L + battery
 
 	MCFG_DEVICE_ADD("acia1", ACIA6850, 0)
 
