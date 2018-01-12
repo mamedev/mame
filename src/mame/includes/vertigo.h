@@ -7,7 +7,6 @@
 *************************************************************************/
 
 #include "audio/exidy440.h"
-#include "machine/pit8253.h"
 #include "machine/74148.h"
 #include "video/vector.h"
 
@@ -89,7 +88,6 @@ public:
 		: driver_device(mconfig, type, tag),
 			m_maincpu(*this, "maincpu"),
 			m_audiocpu(*this, "audiocpu"),
-			m_pit(*this, "pit8254"),
 			m_custom(*this, "custom"),
 			m_ttl74148(*this, "74148"),
 			m_vector(*this, "vector"),
@@ -98,7 +96,6 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
-	required_device<pit8254_device> m_pit;
 	required_device<exidy440_sound_device> m_custom;
 	required_device<ttl74148_device> m_ttl74148;
 	required_device<vector_device> m_vector;

@@ -71,7 +71,7 @@ WRITE_LINE_MEMBER(vertigo_state::v_irq3_w)
 
 /*************************************
  *
- *  ADC and coin handlers
+ *  ADC (ADC0808) and coin handlers
  *
  *************************************/
 
