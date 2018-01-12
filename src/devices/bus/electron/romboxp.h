@@ -42,22 +42,18 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(busy_w);
 
 	image_init_result load_rom(device_image_interface &image, generic_slot_device *slot);
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(rom1_load) { return load_rom(image, m_rom1); }
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(rom2_load) { return load_rom(image, m_rom2); }
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(rom3_load) { return load_rom(image, m_rom3); }
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(rom4_load) { return load_rom(image, m_rom4); }
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(rom1_load) { return load_rom(image, m_rom[0]); }
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(rom2_load) { return load_rom(image, m_rom[1]); }
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(rom3_load) { return load_rom(image, m_rom[2]); }
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(rom4_load) { return load_rom(image, m_rom[3]); }
 
 	image_init_result load_cart(device_image_interface &image, generic_slot_device *slot);
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(electron_cart_sk1) { return load_cart(image, m_cart_sk1); }
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(electron_cart_sk2) { return load_cart(image, m_cart_sk2); }
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart1_load) { return load_cart(image, m_cart[0]); }
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart2_load) { return load_cart(image, m_cart[1]); }
 
 	required_memory_region m_exp_rom;
-	required_device<generic_slot_device> m_rom1;
-	required_device<generic_slot_device> m_rom2;
-	required_device<generic_slot_device> m_rom3;
-	required_device<generic_slot_device> m_rom4;
-	required_device<generic_slot_device> m_cart_sk1;
-	required_device<generic_slot_device> m_cart_sk2;
+	required_device_array<generic_slot_device, 4> m_rom;
+	required_device_array<generic_slot_device, 2> m_cart;
 	required_device<centronics_device> m_centronics;
 	required_device<output_latch_device> m_cent_data_out;
 	required_ioport m_option;

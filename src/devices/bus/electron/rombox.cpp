@@ -89,14 +89,7 @@ MACHINE_CONFIG_END
 electron_rombox_device::electron_rombox_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, ELECTRON_ROMBOX, tag, owner, clock),
 		device_electron_expansion_interface(mconfig, *this),
-	m_rom1(*this, "rom1"),
-	m_rom2(*this, "rom2"),
-	m_rom3(*this, "rom3"),
-	m_rom4(*this, "rom4"),
-	m_rom5(*this, "rom5"),
-	m_rom6(*this, "rom6"),
-	m_rom7(*this, "rom7"),
-	m_rom8(*this, "rom8"),
+	m_rom(*this, "rom%u", 1),
 	m_option(*this, "OPTION")
 {
 }
@@ -118,42 +111,19 @@ void electron_rombox_device::device_reset()
 {
 	std::string region_tag;
 	memory_region *tmp_reg;
-	int rom_base;
 
-	rom_base = 4;
-	if (m_rom1 && (tmp_reg = memregion(region_tag.assign(m_rom1->tag()).append(GENERIC_ROM_REGION_TAG).c_str())))
+	int rom_base = (m_option->read() & 0x04) ? 0 : 12;
+	for (int i = 0; i < 4; i++)
 	{
-		machine().root_device().membank("bank2")->configure_entry(rom_base + 0, tmp_reg->base());
-	}
-	if (m_rom2 && (tmp_reg = memregion(region_tag.assign(m_rom2->tag()).append(GENERIC_ROM_REGION_TAG).c_str())))
-	{
-		machine().root_device().membank("bank2")->configure_entry(rom_base + 1, tmp_reg->base());
-	}
-	if (m_rom3 && (tmp_reg = memregion(region_tag.assign(m_rom3->tag()).append(GENERIC_ROM_REGION_TAG).c_str())))
-	{
-		machine().root_device().membank("bank2")->configure_entry(rom_base + 2, tmp_reg->base());
-	}
-	if (m_rom4 && (tmp_reg = memregion(region_tag.assign(m_rom4->tag()).append(GENERIC_ROM_REGION_TAG).c_str())))
-	{
-		machine().root_device().membank("bank2")->configure_entry(rom_base + 3, tmp_reg->base());
-	}
+		if (m_rom[i] && (tmp_reg = memregion(region_tag.assign(m_rom[i]->tag()).append(GENERIC_ROM_REGION_TAG).c_str())))
+		{
+			machine().root_device().membank("bank2")->configure_entry(4 + i, tmp_reg->base());
+		}
 
-	rom_base = (m_option->read() & 0x04) ? 0 : 12;
-	if (m_rom5 && (tmp_reg = memregion(region_tag.assign(m_rom5->tag()).append(GENERIC_ROM_REGION_TAG).c_str())))
-	{
-		machine().root_device().membank("bank2")->configure_entry(rom_base + 0, tmp_reg->base());
-	}
-	if (m_rom6 && (tmp_reg = memregion(region_tag.assign(m_rom6->tag()).append(GENERIC_ROM_REGION_TAG).c_str())))
-	{
-		machine().root_device().membank("bank2")->configure_entry(rom_base + 1, tmp_reg->base());
-	}
-	if (m_rom7 && (tmp_reg = memregion(region_tag.assign(m_rom7->tag()).append(GENERIC_ROM_REGION_TAG).c_str())))
-	{
-		machine().root_device().membank("bank2")->configure_entry(rom_base + 2, tmp_reg->base());
-	}
-	if (m_rom8 && (tmp_reg = memregion(region_tag.assign(m_rom8->tag()).append(GENERIC_ROM_REGION_TAG).c_str())))
-	{
-		machine().root_device().membank("bank2")->configure_entry(rom_base + 3, tmp_reg->base());
+		if (m_rom[i + 4] && (tmp_reg = memregion(region_tag.assign(m_rom[i + 4]->tag()).append(GENERIC_ROM_REGION_TAG).c_str())))
+		{
+			machine().root_device().membank("bank2")->configure_entry(rom_base + i, tmp_reg->base());
+		}
 	}
 }
 
