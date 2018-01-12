@@ -109,10 +109,23 @@ static void _atari_load_proc(device_image_interface &image, bool is_created)
 	atarifdc->atari_load_proc(image, is_created);
 }
 
+static int atari_fdc_get_drive(device_t *image)
+{
+	int drive = -1;
+	if (strcmp(image->tag(), ":fdc:" FLOPPY_0) == 0) drive = 0;
+	if (strcmp(image->tag(), ":fdc:" FLOPPY_1) == 0) drive = 1;
+	if (strcmp(image->tag(), ":fdc:" FLOPPY_2) == 0) drive = 2;
+	if (strcmp(image->tag(), ":fdc:" FLOPPY_3) == 0) drive = 3;
+	return drive;
+}
+
 void atari_fdc_device::atari_load_proc(device_image_interface &image, bool is_created)
 {
-	int id = floppy_get_drive(&image.device());
+	int id = atari_fdc_get_drive(&image.device());
 	int size, i;
+	
+	if (id == -1)
+		return;
 
 	m_drv[id].image = std::make_unique<uint8_t[]>(MAXSIZE);
 	if (!m_drv[id].image)
