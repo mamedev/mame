@@ -57,6 +57,9 @@ public:
 	DECLARE_WRITE8_MEMBER(radicasi_500c_w);
 	DECLARE_WRITE8_MEMBER(radicasi_500d_w);
 
+	DECLARE_WRITE8_MEMBER(radicasi_5029_w);
+	DECLARE_WRITE8_MEMBER(radicasi_502a_w);
+
 	DECLARE_READ8_MEMBER(radicasi_500b_r);
 	DECLARE_READ8_MEMBER(radicasi_500d_r);
 	DECLARE_READ8_MEMBER(radicasi_50a8_r);
@@ -76,6 +79,8 @@ private:
 	required_device<gfxdecode_device> m_gfxdecode;
 
 	uint8_t m_500d_data;
+	uint8_t m_5029_data;
+	uint8_t m_502a_data;
 
 	int m_hackmode;
 };
@@ -92,7 +97,7 @@ uint32_t radica_6502_state::screen_update(screen_device &screen, bitmap_ind16 &b
 	if (machine().input().code_pressed_once(KEYCODE_Q))
 	{
 		m_hackmode++;
-		if (m_hackmode == 6) m_hackmode = 0;
+		if (m_hackmode == 3) m_hackmode = 0;
 	}
 
 	// it is unclear if the tilemap is an internal structure or something actually used by the video rendering
@@ -119,15 +124,17 @@ uint32_t radica_6502_state::screen_update(screen_device &screen, bitmap_ind16 &b
 					/* this logic allows us to see the Taito logo and menu screen */
 					gfx = m_gfxdecode->gfx(0); // 4bpp
 					tile = (tile & 0xf) + ((tile & ~0xf) * 16);
-					tile += 0x5020; // where does this come from, should this have been copied to RAM already?
+					tile += ((m_5029_data | m_502a_data << 8) << 5);
 					tile <<= 1; // due to 16 pixel wide
 				}
 				else
 				{
 					gfx = m_gfxdecode->gfx(2); // 8bpp
 					tile = (tile & 0xf) + ((tile & ~0xf) * 16);
-					tile += 0x1af0; // where does this come from, should this have been copied to RAM already?
 					tile <<= 1; // due to 16 pixel wide
+
+					// why after the shift in this case?
+					tile += ((m_5029_data | m_502a_data << 8) << 5);
 				}
 
 				for (int i = 0; i < 16; i++)
@@ -140,7 +147,7 @@ uint32_t radica_6502_state::screen_update(screen_device &screen, bitmap_ind16 &b
 			}
 		}
 	}
-	else if (m_hackmode < 5) // 8x8 tiles (games)
+	else if (m_hackmode == 1) // 8x8 tiles (games)
 	{
 		gfx_element *gfx = m_gfxdecode->gfx(2);
 
@@ -151,23 +158,18 @@ uint32_t radica_6502_state::screen_update(screen_device &screen, bitmap_ind16 &b
 				int tile = m_ram[offs] + (m_ram[offs + 1] << 8);
 
 				tile = (tile & 0x1f) + ((tile & ~0x1f) * 8);
-				
-				// where does this come from, should this have been copied to RAM already?
-				if (m_hackmode==1) tile += 0x7360; // space invaders
-				else if (m_hackmode==2) tile += 0x11520; // lunar rescue
-				else if (m_hackmode==3) tile += 0x40; // colony7
-				else if (m_hackmode==4) tile += 0x8d40; // phoenix
+				tile += ((m_5029_data | m_502a_data << 8) << 5);
 
 				for (int i = 0; i < 8; i++)
 				{
-					gfx->transpen(bitmap, cliprect, tile + i * 32, 0, 0, 0, x * 8, (y * 8)+i, 0);
+					gfx->transpen(bitmap, cliprect, tile + i * 32, 0, 0, 0, x * 8, (y * 8) + i, 0);
 
 				}
 				offs += 4;
 			}
 		}
 	}
-	else if (m_hackmode == 5) // qix
+	else if (m_hackmode == 2) // qix
 	{
 		for (int y = 0; y < 224; y++)
 		{
@@ -215,6 +217,19 @@ WRITE8_MEMBER(radica_6502_state::radicasi_500d_w)
 	m_500d_data = data;
 }
 
+WRITE8_MEMBER(radica_6502_state::radicasi_5029_w)
+{
+	logerror("%s: radicasi_5029_w (select GFX base lower) %02x\n", machine().describe_context().c_str(), data);
+	m_5029_data = data;
+}
+
+WRITE8_MEMBER(radica_6502_state::radicasi_502a_w)
+{
+	logerror("%s: radicasi_502a_w (select GFX base upper) %02x\n", machine().describe_context().c_str(), data);
+	m_502a_data = data;
+}
+
+
 READ8_MEMBER(radica_6502_state::radicasi_50a8_r)
 {
 	logerror("%s: radicasi_50a8_r\n", machine().describe_context().c_str());
@@ -228,6 +243,10 @@ static ADDRESS_MAP_START( radicasi_map, AS_PROGRAM, 8, radica_6502_state )
 	AM_RANGE(0x500b, 0x500b) AM_READ(radicasi_500b_r) // PAL / NTSC flag at least
 	AM_RANGE(0x500c, 0x500c) AM_WRITE(radicasi_500c_w)
 	AM_RANGE(0x500d, 0x500d) AM_READWRITE(radicasi_500d_r, radicasi_500d_w)
+
+	AM_RANGE(0x5029, 0x5029) AM_WRITE(radicasi_5029_w)
+	AM_RANGE(0x502a, 0x502a) AM_WRITE(radicasi_502a_w)
+	// 502B / 502C are probably sprite base
 
 	AM_RANGE(0x5041, 0x5041) AM_READ_PORT("IN0") // AM_READ(radicasi_5041_r)
 
@@ -288,7 +307,6 @@ void radica_6502_state::machine_reset()
 {
 }
 
-// these are fake, should be decoded from RAM, or not tile based (although game does seem to have 'tilemap' structures in RAM
 static const gfx_layout helper_4bpp_8_layout =
 {
 	8,1,
@@ -311,6 +329,8 @@ static const gfx_layout helper_8bpp_8_layout =
 	8 * 8
 };
 
+
+// these are fake just to make looking at the texture pages easier
 static const uint32_t texlayout_xoffset_8bpp[256] = { STEP256(0,8) };
 static const uint32_t texlayout_yoffset_8bpp[256] = { STEP256(0,256*8) };
 static const gfx_layout texture_helper_8bpp_layout =
