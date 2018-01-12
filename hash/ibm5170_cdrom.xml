@@ -1733,8 +1733,8 @@
 		</part>
 	</software>
 	
-	<!-- partial version, contains about half of the game and bundled with sound cards etc. --> 
-	<software name="cyberian" cloneof="cyberia" supported="no">
+	<!-- kind of a demo version, contains about half of the game, supposed to be bundled with sound cards etc. --> 
+	<software name="cyberian" cloneof="cyberia">
 		<description>Cyberia - Mission Norway (OEM v1.87)</description>
 		<year>1994</year>
 		<publisher>Interplay</publisher>
