@@ -115,8 +115,6 @@ public:
 	DECLARE_WRITE16_MEMBER(vertigo_audio_w);
 	DECLARE_READ16_MEMBER(vertigo_sio_r);
 	DECLARE_WRITE16_MEMBER(vertigo_motor_w);
-	DECLARE_READ16_MEMBER(vertigo_pit8254_lsb_r);
-	DECLARE_WRITE16_MEMBER(vertigo_pit8254_lsb_w);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	INTERRUPT_GEN_MEMBER(vertigo_interrupt);
