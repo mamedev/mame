@@ -56,9 +56,26 @@ public:
 
 	DECLARE_WRITE8_MEMBER(radicasi_500c_w);
 	DECLARE_WRITE8_MEMBER(radicasi_500d_w);
+	
+	// palette bases
+	DECLARE_WRITE8_MEMBER(radicasi_palbase_lo_w);
+	DECLARE_WRITE8_MEMBER(radicasi_palbase_hi_w);
+	DECLARE_READ8_MEMBER(radicasi_palbase_lo_r);
+	DECLARE_READ8_MEMBER(radicasi_palbase_hi_r);
 
-	DECLARE_WRITE8_MEMBER(radicasi_5029_w);
-	DECLARE_WRITE8_MEMBER(radicasi_502a_w);
+
+	// tile bases
+	DECLARE_WRITE8_MEMBER(radicasi_tile_gfxbase_lo_w);
+	DECLARE_WRITE8_MEMBER(radicasi_tile_gfxbase_hi_w);
+	DECLARE_READ8_MEMBER(radicasi_tile_gfxbase_lo_r);
+	DECLARE_READ8_MEMBER(radicasi_tile_gfxbase_hi_r);
+
+	// sprite tile bases
+	DECLARE_WRITE8_MEMBER(radicasi_sprite_gfxbase_lo_w);
+	DECLARE_WRITE8_MEMBER(radicasi_sprite_gfxbase_hi_w);
+	DECLARE_READ8_MEMBER(radicasi_sprite_gfxbase_lo_r);
+	DECLARE_READ8_MEMBER(radicasi_sprite_gfxbase_hi_r);
+
 
 	DECLARE_READ8_MEMBER(radicasi_500b_r);
 	DECLARE_READ8_MEMBER(radicasi_500d_r);
@@ -79,8 +96,15 @@ private:
 	required_device<gfxdecode_device> m_gfxdecode;
 
 	uint8_t m_500d_data;
-	uint8_t m_5029_data;
-	uint8_t m_502a_data;
+
+	uint8_t m_palbase_lo_data;
+	uint8_t m_palbase_hi_data;
+
+	uint8_t m_tile_gfxbase_lo_data;
+	uint8_t m_tile_gfxbase_hi_data;
+
+	uint8_t m_sprite_gfxbase_lo_data;
+	uint8_t m_sprite_gfxbase_hi_data;
 
 	int m_hackmode;
 };
@@ -89,6 +113,12 @@ void radica_6502_state::video_start()
 {
 	m_hackmode = 0;
 }
+
+/* (m_tile_gfxbase_lo_data | (m_tile_gfxbase_hi_data << 8)) * 0x100
+   gives you the actual rom address, everything references the 3MByte - 4MByte region, like the banking so
+   the system can probalby have up to a 4MByte rom, all games we have so far just use the upper 1MByte of
+   that space
+*/
 
 uint32_t radica_6502_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
@@ -124,7 +154,7 @@ uint32_t radica_6502_state::screen_update(screen_device &screen, bitmap_ind16 &b
 					/* this logic allows us to see the Taito logo and menu screen */
 					gfx = m_gfxdecode->gfx(0); // 4bpp
 					tile = (tile & 0xf) + ((tile & ~0xf) * 16);
-					tile += ((m_5029_data | m_502a_data << 8) << 5);
+					tile += ((m_tile_gfxbase_lo_data | m_tile_gfxbase_hi_data << 8) << 5);
 					tile <<= 1; // due to 16 pixel wide
 				}
 				else
@@ -134,7 +164,7 @@ uint32_t radica_6502_state::screen_update(screen_device &screen, bitmap_ind16 &b
 					tile <<= 1; // due to 16 pixel wide
 
 					// why after the shift in this case?
-					tile += ((m_5029_data | m_502a_data << 8) << 5);
+					tile += ((m_tile_gfxbase_lo_data | m_tile_gfxbase_hi_data << 8) << 5);
 				}
 
 				for (int i = 0; i < 16; i++)
@@ -158,7 +188,7 @@ uint32_t radica_6502_state::screen_update(screen_device &screen, bitmap_ind16 &b
 				int tile = m_ram[offs] + (m_ram[offs + 1] << 8);
 
 				tile = (tile & 0x1f) + ((tile & ~0x1f) * 8);
-				tile += ((m_5029_data | m_502a_data << 8) << 5);
+				tile += ((m_tile_gfxbase_lo_data | m_tile_gfxbase_hi_data << 8) << 5);
 
 				for (int i = 0; i < 8; i++)
 				{
@@ -217,16 +247,82 @@ WRITE8_MEMBER(radica_6502_state::radicasi_500d_w)
 	m_500d_data = data;
 }
 
-WRITE8_MEMBER(radica_6502_state::radicasi_5029_w)
+// Tile bases
+
+WRITE8_MEMBER(radica_6502_state::radicasi_tile_gfxbase_lo_w)
 {
-	logerror("%s: radicasi_5029_w (select GFX base lower) %02x\n", machine().describe_context().c_str(), data);
-	m_5029_data = data;
+	logerror("%s: radicasi_tile_gfxbase_lo_w (select GFX base lower) %02x\n", machine().describe_context().c_str(), data);
+	m_tile_gfxbase_lo_data = data;
 }
 
-WRITE8_MEMBER(radica_6502_state::radicasi_502a_w)
+WRITE8_MEMBER(radica_6502_state::radicasi_tile_gfxbase_hi_w)
 {
-	logerror("%s: radicasi_502a_w (select GFX base upper) %02x\n", machine().describe_context().c_str(), data);
-	m_502a_data = data;
+	logerror("%s: radicasi_tile_gfxbase_hi_w (select GFX base upper) %02x\n", machine().describe_context().c_str(), data);
+	m_tile_gfxbase_hi_data = data;
+}
+
+READ8_MEMBER(radica_6502_state::radicasi_tile_gfxbase_lo_r)
+{
+	logerror("%s: radicasi_tile_gfxbase_lo_r (GFX base lower) %02x\n", machine().describe_context().c_str());
+	return m_tile_gfxbase_lo_data;
+}
+
+READ8_MEMBER(radica_6502_state::radicasi_tile_gfxbase_hi_r)
+{
+	logerror("%s: radicasi_tile_gfxbase_hi_r (GFX base upper) %02x\n", machine().describe_context().c_str());
+	return m_tile_gfxbase_hi_data;
+}
+
+// Sprite Tile bases
+
+WRITE8_MEMBER(radica_6502_state::radicasi_sprite_gfxbase_lo_w)
+{
+	logerror("%s: radicasi_sprite_gfxbase_lo_w (select Sprite GFX base lower) %02x\n", machine().describe_context().c_str(), data);
+	m_sprite_gfxbase_lo_data = data;
+}
+
+WRITE8_MEMBER(radica_6502_state::radicasi_sprite_gfxbase_hi_w)
+{
+	logerror("%s: radicasi_sprite_gfxbase_hi_w (select Sprite GFX base upper) %02x\n", machine().describe_context().c_str(), data);
+	m_sprite_gfxbase_hi_data = data;
+}
+
+READ8_MEMBER(radica_6502_state::radicasi_sprite_gfxbase_lo_r)
+{
+	logerror("%s: radicasi_sprite_gfxbase_lo_r (Sprite GFX base lower) %02x\n", machine().describe_context().c_str());
+	return m_sprite_gfxbase_lo_data;
+}
+
+READ8_MEMBER(radica_6502_state::radicasi_sprite_gfxbase_hi_r)
+{
+	logerror("%s: radicasi_sprite_gfxbase_hi_r (Sprite GFX base upper) %02x\n", machine().describe_context().c_str());
+	return m_sprite_gfxbase_hi_data;
+}
+
+// Palette bases
+
+WRITE8_MEMBER(radica_6502_state::radicasi_palbase_lo_w)
+{
+	logerror("%s: radicasi_palbase_lo_w (select Palette base lower) %02x\n", machine().describe_context().c_str(), data);
+	m_palbase_lo_data = data;
+}
+
+WRITE8_MEMBER(radica_6502_state::radicasi_palbase_hi_w)
+{
+	logerror("%s: radicasi_palbase_hi_w (select Palette base upper) %02x\n", machine().describe_context().c_str(), data);
+	m_palbase_hi_data = data;
+}
+
+READ8_MEMBER(radica_6502_state::radicasi_palbase_lo_r)
+{
+	logerror("%s: radicasi_palbase_lo_r (Palette base lower) %02x\n", machine().describe_context().c_str());
+	return m_palbase_lo_data;
+}
+
+READ8_MEMBER(radica_6502_state::radicasi_palbase_hi_r)
+{
+	logerror("%s: radicasi_palbase_hi_r (Palette base upper) %02x\n", machine().describe_context().c_str());
+	return m_palbase_hi_data;
 }
 
 
@@ -244,13 +340,34 @@ static ADDRESS_MAP_START( radicasi_map, AS_PROGRAM, 8, radica_6502_state )
 	AM_RANGE(0x500c, 0x500c) AM_WRITE(radicasi_500c_w)
 	AM_RANGE(0x500d, 0x500d) AM_READWRITE(radicasi_500d_r, radicasi_500d_w)
 
-	AM_RANGE(0x5029, 0x5029) AM_WRITE(radicasi_5029_w)
-	AM_RANGE(0x502a, 0x502a) AM_WRITE(radicasi_502a_w)
-	// 502B / 502C are probably sprite base
+	AM_RANGE(0x5010, 0x5010) AM_READWRITE(radicasi_palbase_lo_r, radicasi_palbase_lo_w) // palettebase
+	AM_RANGE(0x5011, 0x5011) AM_READWRITE(radicasi_palbase_hi_r, radicasi_palbase_hi_w) // palettebase
+
+	AM_RANGE(0x5029, 0x5029) AM_READWRITE(radicasi_tile_gfxbase_lo_r, radicasi_tile_gfxbase_lo_w) // tilebase
+	AM_RANGE(0x502a, 0x502a) AM_READWRITE(radicasi_tile_gfxbase_hi_r, radicasi_tile_gfxbase_hi_w) // tilebase
+
+	AM_RANGE(0x502b, 0x502b) AM_READWRITE(radicasi_sprite_gfxbase_lo_r, radicasi_sprite_gfxbase_lo_w) // tilebase (spr?)
+	AM_RANGE(0x502c, 0x502c) AM_READWRITE(radicasi_sprite_gfxbase_hi_r, radicasi_sprite_gfxbase_hi_w) // tilebase (spr?)
 
 	AM_RANGE(0x5041, 0x5041) AM_READ_PORT("IN0") // AM_READ(radicasi_5041_r)
 
+	// These might be sound / DMA channels?
+
+	//AM_RANGE(0x5082, 0x5082) // set to 0x33, so probably another 'high' address bits reg
+
+	//AM_RANGE(0x5085, 0x5085) // set to 0x33, so probably another 'high' address bits reg
+
+	//AM_RANGE(0x5088, 0x5088) // set to 0x33, so probably another 'high' address bits reg
+
+	//AM_RANGE(0x5088, 0x508b) // set to 0x33, so probably another 'high' address bits reg
+
+	//AM_RANGE(0x508e, 0x508e) // set to 0x33, so probably another 'high' address bits reg
+
+	//AM_RANGE(0x5091, 0x5091) // set to 0x33, so probably another 'high' address bits reg
+
 	AM_RANGE(0x50a8, 0x50a8) AM_READ(radicasi_50a8_r)
+
+	//AM_RANGE(0x5000, 0x50ff) AM_RAM
 
 	AM_RANGE(0x6000, 0xdfff) AM_DEVICE("bank", address_map_bank_device, amap8)
 
