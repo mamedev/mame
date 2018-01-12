@@ -1331,7 +1331,7 @@ static MACHINE_CONFIG_START( snes )
 	MCFG_CPU_ADD("maincpu", _5A22, MCLK_NTSC)   /* 2.68 MHz, also 3.58 MHz */
 	MCFG_CPU_PROGRAM_MAP(snes_map)
 
-	MCFG_CPU_ADD("soundcpu", SPC700, 1024000)   /* 1.024 MHz */
+	MCFG_CPU_ADD("soundcpu", SPC700, XTAL_24_576MHz / 24)   /* 1.024 MHz */
 	MCFG_CPU_PROGRAM_MAP(spc_map)
 
 	//MCFG_QUANTUM_TIME(attotime::from_hz(48000))
