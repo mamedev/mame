@@ -457,7 +457,7 @@ static ADDRESS_MAP_START( radicasi_map, AS_PROGRAM, 8, radica_6502_state )
 
 	AM_RANGE(0x5088, 0x5088) AM_READWRITE(radicasi_unkreg3_hi_r, radicasi_unkreg3_hi_w) // set to 0x33, so probably another 'high' address bits reg
 
-	AM_RANGE(0x5088, 0x508b) AM_READWRITE(radicasi_unkreg4_hi_r, radicasi_unkreg4_hi_w) // set to 0x33, so probably another 'high' address bits reg
+	AM_RANGE(0x508b, 0x508b) AM_READWRITE(radicasi_unkreg4_hi_r, radicasi_unkreg4_hi_w) // set to 0x33, so probably another 'high' address bits reg
 
 	AM_RANGE(0x508e, 0x508e) AM_READWRITE(radicasi_unkreg5_hi_r, radicasi_unkreg5_hi_w) // set to 0x33, so probably another 'high' address bits reg
 
