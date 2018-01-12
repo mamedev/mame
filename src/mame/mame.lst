@@ -32380,6 +32380,9 @@ quizpun2                        // (c) 1989 Space Computer System of Korea
 @source:quizshow.cpp
 quizshow                        // 005464           1976/04 [2650]
 
+@source:qvt103.cpp
+qvt103                          // (c) 1983 Qume Corp.
+
 @source:qvt6800.cpp
 qvt102                          //
 qvt190                          //
@@ -36494,7 +36497,6 @@ t4490                           // Terco 4490 Mill CNC Control (c) 1986
 @source:terminals.cpp
 aaa
 qvt70
-qvt103
 qvt201
 tv955
 tv965
