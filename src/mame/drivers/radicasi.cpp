@@ -76,6 +76,19 @@ public:
 	DECLARE_READ8_MEMBER(radicasi_sprite_gfxbase_lo_r);
 	DECLARE_READ8_MEMBER(radicasi_sprite_gfxbase_hi_r);
 
+	// unknown rom bases
+	DECLARE_WRITE8_MEMBER(radicasi_unkreg1_hi_w);
+	DECLARE_READ8_MEMBER(radicasi_unkreg1_hi_r);
+	DECLARE_WRITE8_MEMBER(radicasi_unkreg2_hi_w);
+	DECLARE_READ8_MEMBER(radicasi_unkreg2_hi_r);
+	DECLARE_WRITE8_MEMBER(radicasi_unkreg3_hi_w);
+	DECLARE_READ8_MEMBER(radicasi_unkreg3_hi_r);
+	DECLARE_WRITE8_MEMBER(radicasi_unkreg4_hi_w);
+	DECLARE_READ8_MEMBER(radicasi_unkreg4_hi_r);
+	DECLARE_WRITE8_MEMBER(radicasi_unkreg5_hi_w);
+	DECLARE_READ8_MEMBER(radicasi_unkreg5_hi_r);
+	DECLARE_WRITE8_MEMBER(radicasi_unkreg6_hi_w);
+	DECLARE_READ8_MEMBER(radicasi_unkreg6_hi_r);
 
 	DECLARE_READ8_MEMBER(radicasi_500b_r);
 	DECLARE_READ8_MEMBER(radicasi_500d_r);
@@ -105,6 +118,14 @@ private:
 
 	uint8_t m_sprite_gfxbase_lo_data;
 	uint8_t m_sprite_gfxbase_hi_data;
+
+	uint8_t m_unkreg1_hi_data;
+	uint8_t m_unkreg2_hi_data;
+	uint8_t m_unkreg3_hi_data;
+	uint8_t m_unkreg4_hi_data;
+	uint8_t m_unkreg5_hi_data;
+	uint8_t m_unkreg6_hi_data;
+
 
 	int m_hackmode;
 };
@@ -263,13 +284,13 @@ WRITE8_MEMBER(radica_6502_state::radicasi_tile_gfxbase_hi_w)
 
 READ8_MEMBER(radica_6502_state::radicasi_tile_gfxbase_lo_r)
 {
-	logerror("%s: radicasi_tile_gfxbase_lo_r (GFX base lower) %02x\n", machine().describe_context().c_str());
+	logerror("%s: radicasi_tile_gfxbase_lo_r (GFX base lower)\n", machine().describe_context().c_str());
 	return m_tile_gfxbase_lo_data;
 }
 
 READ8_MEMBER(radica_6502_state::radicasi_tile_gfxbase_hi_r)
 {
-	logerror("%s: radicasi_tile_gfxbase_hi_r (GFX base upper) %02x\n", machine().describe_context().c_str());
+	logerror("%s: radicasi_tile_gfxbase_hi_r (GFX base upper)\n", machine().describe_context().c_str());
 	return m_tile_gfxbase_hi_data;
 }
 
@@ -289,13 +310,13 @@ WRITE8_MEMBER(radica_6502_state::radicasi_sprite_gfxbase_hi_w)
 
 READ8_MEMBER(radica_6502_state::radicasi_sprite_gfxbase_lo_r)
 {
-	logerror("%s: radicasi_sprite_gfxbase_lo_r (Sprite GFX base lower) %02x\n", machine().describe_context().c_str());
+	logerror("%s: radicasi_sprite_gfxbase_lo_r (Sprite GFX base lower)\n", machine().describe_context().c_str());
 	return m_sprite_gfxbase_lo_data;
 }
 
 READ8_MEMBER(radica_6502_state::radicasi_sprite_gfxbase_hi_r)
 {
-	logerror("%s: radicasi_sprite_gfxbase_hi_r (Sprite GFX base upper) %02x\n", machine().describe_context().c_str());
+	logerror("%s: radicasi_sprite_gfxbase_hi_r (Sprite GFX base upper)\n", machine().describe_context().c_str());
 	return m_sprite_gfxbase_hi_data;
 }
 
@@ -315,15 +336,92 @@ WRITE8_MEMBER(radica_6502_state::radicasi_palbase_hi_w)
 
 READ8_MEMBER(radica_6502_state::radicasi_palbase_lo_r)
 {
-	logerror("%s: radicasi_palbase_lo_r (Palette base lower) %02x\n", machine().describe_context().c_str());
+	logerror("%s: radicasi_palbase_lo_r (Palette base lower)\n", machine().describe_context().c_str());
 	return m_palbase_lo_data;
 }
 
 READ8_MEMBER(radica_6502_state::radicasi_palbase_hi_r)
 {
-	logerror("%s: radicasi_palbase_hi_r (Palette base upper) %02x\n", machine().describe_context().c_str());
+	logerror("%s: radicasi_palbase_hi_r (Palette base upper)\n", machine().describe_context().c_str());
 	return m_palbase_hi_data;
 }
+
+// unknown regs that seem to also be pointers
+
+
+WRITE8_MEMBER(radica_6502_state::radicasi_unkreg1_hi_w)
+{
+	logerror("%s: radicasi_unkreg1_hi_w (unknown register 1 base upper) %02x\n", machine().describe_context().c_str(), data);
+	m_unkreg1_hi_data = data;
+}
+
+READ8_MEMBER(radica_6502_state::radicasi_unkreg1_hi_r)
+{
+	logerror("%s: radicasi_unkreg1_hi_r (unknown register 1 base upper)\n", machine().describe_context().c_str());
+	return m_unkreg1_hi_data;
+}
+
+WRITE8_MEMBER(radica_6502_state::radicasi_unkreg2_hi_w)
+{
+	logerror("%s: radicasi_unkreg2_hi_w (unknown register 2 base upper) %02x\n", machine().describe_context().c_str(), data);
+	m_unkreg2_hi_data = data;
+}
+
+READ8_MEMBER(radica_6502_state::radicasi_unkreg2_hi_r)
+{
+	logerror("%s: radicasi_unkreg2_hi_r (unknown register 2 base upper)\n", machine().describe_context().c_str());
+	return m_unkreg2_hi_data;
+}
+
+WRITE8_MEMBER(radica_6502_state::radicasi_unkreg3_hi_w)
+{
+	logerror("%s: radicasi_unkreg3_hi_w (unknown register 3 base upper) %02x\n", machine().describe_context().c_str(), data);
+	m_unkreg3_hi_data = data;
+}
+
+READ8_MEMBER(radica_6502_state::radicasi_unkreg3_hi_r)
+{
+	logerror("%s: radicasi_unkreg3_hi_r (unknown register 3 base upper)\n", machine().describe_context().c_str());
+	return m_unkreg3_hi_data;
+}
+
+WRITE8_MEMBER(radica_6502_state::radicasi_unkreg4_hi_w)
+{
+	logerror("%s: radicasi_unkreg4_hi_w (unknown register 4 base upper) %02x\n", machine().describe_context().c_str(), data);
+	m_unkreg4_hi_data = data;
+}
+
+READ8_MEMBER(radica_6502_state::radicasi_unkreg4_hi_r)
+{
+	logerror("%s: radicasi_unkreg4_hi_r (unknown register 4 base upper)\n", machine().describe_context().c_str());
+	return m_unkreg4_hi_data;
+}
+
+WRITE8_MEMBER(radica_6502_state::radicasi_unkreg5_hi_w)
+{
+	logerror("%s: radicasi_unkreg5_hi_w (unknown register 5 base upper) %02x\n", machine().describe_context().c_str(), data);
+	m_unkreg5_hi_data = data;
+}
+
+READ8_MEMBER(radica_6502_state::radicasi_unkreg5_hi_r)
+{
+	logerror("%s: radicasi_unkreg5_hi_r (unknown register 5 base upper)\n", machine().describe_context().c_str());
+	return m_unkreg5_hi_data;
+}
+
+WRITE8_MEMBER(radica_6502_state::radicasi_unkreg6_hi_w)
+{
+	logerror("%s: radicasi_unkreg6_hi_w (unknown register 6 base upper) %02x\n", machine().describe_context().c_str(), data);
+	m_unkreg6_hi_data = data;
+}
+
+READ8_MEMBER(radica_6502_state::radicasi_unkreg6_hi_r)
+{
+	logerror("%s: radicasi_unkreg6_hi_r (unknown register 6 base upper)\n", machine().describe_context().c_str());
+	return m_unkreg6_hi_data;
+}
+
+
 
 
 READ8_MEMBER(radica_6502_state::radicasi_50a8_r)
@@ -353,17 +451,17 @@ static ADDRESS_MAP_START( radicasi_map, AS_PROGRAM, 8, radica_6502_state )
 
 	// These might be sound / DMA channels?
 
-	//AM_RANGE(0x5082, 0x5082) // set to 0x33, so probably another 'high' address bits reg
+	AM_RANGE(0x5082, 0x5082) AM_READWRITE(radicasi_unkreg1_hi_r, radicasi_unkreg1_hi_w) // set to 0x33, so probably another 'high' address bits reg
 
-	//AM_RANGE(0x5085, 0x5085) // set to 0x33, so probably another 'high' address bits reg
+	AM_RANGE(0x5085, 0x5085) AM_READWRITE(radicasi_unkreg2_hi_r, radicasi_unkreg2_hi_w) // set to 0x33, so probably another 'high' address bits reg
 
-	//AM_RANGE(0x5088, 0x5088) // set to 0x33, so probably another 'high' address bits reg
+	AM_RANGE(0x5088, 0x5088) AM_READWRITE(radicasi_unkreg3_hi_r, radicasi_unkreg3_hi_w) // set to 0x33, so probably another 'high' address bits reg
 
-	//AM_RANGE(0x5088, 0x508b) // set to 0x33, so probably another 'high' address bits reg
+	AM_RANGE(0x5088, 0x508b) AM_READWRITE(radicasi_unkreg4_hi_r, radicasi_unkreg4_hi_w) // set to 0x33, so probably another 'high' address bits reg
 
-	//AM_RANGE(0x508e, 0x508e) // set to 0x33, so probably another 'high' address bits reg
+	AM_RANGE(0x508e, 0x508e) AM_READWRITE(radicasi_unkreg5_hi_r, radicasi_unkreg5_hi_w) // set to 0x33, so probably another 'high' address bits reg
 
-	//AM_RANGE(0x5091, 0x5091) // set to 0x33, so probably another 'high' address bits reg
+	AM_RANGE(0x5091, 0x5091) AM_READWRITE(radicasi_unkreg6_hi_r, radicasi_unkreg6_hi_w) // set to 0x33, so probably another 'high' address bits reg
 
 	AM_RANGE(0x50a8, 0x50a8) AM_READ(radicasi_50a8_r)
 
