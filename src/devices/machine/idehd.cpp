@@ -111,7 +111,7 @@ void ata_mass_storage_device::ide_build_identify_device()
 			"1.0", 4);
 	swap_strncpy(&m_identify_buffer[27],               /* 27-46: model number */
 			"MAME Compressed Hard Disk", 20);
-	m_identify_buffer[47] = 0x8001;                    /* 47: read/write multiple support */
+	m_identify_buffer[47] = 0x8010;                    /* 47: read/write multiple support, value from Seagate Quantum Fireball */
 	m_identify_buffer[48] = 0;                         /* 48: reserved */
 	m_identify_buffer[49] = 0x0f03;                    /* 49: capabilities */
 	m_identify_buffer[50] = 0;                         /* 50: reserved */
@@ -406,6 +406,18 @@ void ata_mass_storage_device::fill_buffer()
 	case IDE_COMMAND_IDENTIFY_DEVICE:
 		break;
 
+	case IDE_COMMAND_READ_MULTIPLE:
+		/* if there is more data to read, keep going */
+		if (m_sector_count > 0)
+			m_sector_count--;
+
+		if (m_sector_count > 0)
+		{
+			// Read the next sector with no delay
+			finished_read();
+		}
+		break;
+
 	default:
 		/* if there is more data to read, keep going */
 		if (m_sector_count > 0)
@@ -423,23 +435,23 @@ void ata_mass_storage_device::fill_buffer()
 
 void ata_mass_storage_device::finished_read()
 {
-	int lba = lba_address(), count;
+	int lba = lba_address(), read_status;
 
 	set_dasp(CLEAR_LINE);
 
 	/* now do the read */
-	count = read_sector(lba, &m_buffer[0]);
+	read_status = read_sector(lba, &m_buffer[0]);
 
 	/* if we succeeded, advance to the next sector and set the nice bits */
-	if (count == 1)
+	if (read_status)
 	{
 		/* advance the pointers, unless this is the last sector */
 		/* Gauntlet: Dark Legacy checks to make sure we stop on the last sector */
 		if (m_sector_count != 1)
 			next_sector();
 
-		/* signal an interrupt */
-		if (--m_sectors_until_int == 0 || m_sector_count == 1)
+		/* signal an interrupt, IDE_COMMAND_READ_MULTIPLE sets the interrupt at the start the block */
+		if (--m_sectors_until_int == 0 || (m_sector_count == 1 && m_command != IDE_COMMAND_READ_MULTIPLE))
 		{
 			m_sectors_until_int = ((m_command == IDE_COMMAND_READ_MULTIPLE) ? m_block_count : 1);
 			set_irq(ASSERT_LINE);
@@ -746,7 +758,7 @@ void ata_mass_storage_device::process_command()
 		break;
 
 	case IDE_COMMAND_SET_BLOCK_COUNT:
-		LOGPRINT(("IDE Set block count (%02X)\n", m_sector_count));
+		LOGPRINT(("IDE Set block count (%d)\n", m_sector_count));
 
 		m_block_count = m_sector_count;
 
