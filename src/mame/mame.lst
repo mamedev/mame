@@ -13660,6 +13660,7 @@ vindctr2r2                      // 136059           (c) 1988
 
 @source:gb.cpp
 gameboy                         // Nintendo Game Boy Handheld
+gamefgtr                        // bootleg
 gbcolor                         // Nintendo Game Boy Color Handheld
 gbpocket                        // Nintendo Game Boy Pocket Handheld
 megaduck                        // Megaduck
