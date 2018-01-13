@@ -38,8 +38,8 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_palette(*this, "palette"),
 		m_k053245(*this, "k053245"),
+		m_k051649(*this, "k051649"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_vram(*this, "vram"),
 		m_oki(*this, "oki"),
 		m_ttlrom_offset(0)
 	{ }
@@ -67,7 +67,6 @@ public:
 
 	WRITE8_MEMBER(control_w)
 	{
-		//printf("%02x to control\n", data);
 		membank("bank1")->set_entry(data&0x1);
 		if (((m_control & 0x60) != 0x60) && ((data & 0x60) == 0x60))
 		{
@@ -77,6 +76,7 @@ public:
 	}
 
 	DECLARE_READ8_MEMBER(vram_r);
+	DECLARE_WRITE8_MEMBER(vram_w);
 
 protected:
 	virtual void machine_start() override;
@@ -87,18 +87,32 @@ private:
 	required_device<cpu_device> m_maincpu;
 	required_device<palette_device> m_palette;
 	required_device<k05324x_device> m_k053245;
+	required_device<k051649_device> m_k051649;
 	required_device<gfxdecode_device> m_gfxdecode;
-	required_shared_ptr<uint8_t> m_vram;
 	required_device<okim6295_device> m_oki;
 
 	int         m_ttl_gfx_index;
 	tilemap_t   *m_ttl_tilemap;
 	uint8_t     m_control;
 	int         m_ttlrom_offset;
+	uint8_t     m_vram[0x1000];
 };
 
 READ8_MEMBER(quickpick5_state::vram_r)
 {
+	if ((m_control & 0x10) == 0x10)
+	{
+		offset |= 0x800;
+		if ((offset >= 0x800) && (offset <= 0x880))
+		{
+			return m_k051649->k051649_waveform_r(space, offset & 0x7f);
+		}
+		else if ((offset >= 0x8e0) && (offset <= 0x8ff))
+		{
+			return m_k051649->k051649_test_r(space, offset-0x8e0);
+		}
+	}
+
 	if ((m_control & 0x60) == 0x60)
 	{
 		uint8_t *ROM = memregion("ttl")->base();
@@ -108,10 +122,43 @@ READ8_MEMBER(quickpick5_state::vram_r)
 	return m_vram[offset];
 }
 
+WRITE8_MEMBER(quickpick5_state::vram_w)
+{
+	if ((m_control & 0x10) == 0x10)
+	{
+		offset |= 0x800;
+		if ((offset >= 0x800) && (offset < 0x880))
+		{
+			m_k051649->k051649_waveform_w(space, offset-0x800, data);
+			return;
+		}
+		else if (offset < 0x88a)
+		{
+			m_k051649->k051649_frequency_w(space, offset-0x880, data);
+			return;
+		}
+		else if (offset < 0x88f)
+		{
+			m_k051649->k051649_volume_w(space, offset-0x88a, data);
+			return;
+		}
+		else if (offset < 0x890)
+		{
+			m_k051649->k051649_keyonoff_w(space, 0, data);
+			return;
+		}
+
+		m_k051649->k051649_test_w(space, offset-0x8e0, data);
+		return;
+	}
+
+	m_vram[offset] = data;
+}
+
 INTERRUPT_GEN_MEMBER(quickpick5_state::vbl_interrupt)
 {
+	m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 	m_maincpu->set_input_line(0, ASSERT_LINE);
-	//m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 }
 
 void quickpick5_state::video_start()
@@ -165,8 +212,7 @@ uint32_t quickpick5_state::screen_update_quickpick5(screen_device &screen, bitma
 	screen.priority().fill(0, cliprect);
 
 	m_ttl_tilemap->mark_all_dirty();
-	m_ttl_tilemap->draw(screen, bitmap, cliprect, 0, 0);
-
+	m_ttl_tilemap->draw(screen, bitmap, cliprect, 0, 0xff);
 	m_k053245->sprites_draw(bitmap, cliprect, screen.priority());
 
 	return 0;
@@ -174,27 +220,132 @@ uint32_t quickpick5_state::screen_update_quickpick5(screen_device &screen, bitma
 
 K05324X_CB_MEMBER(quickpick5_state::sprite_callback)
 {
-	*priority = 0;
-//  *priority = 0xf0 | 0xcc | 0xaa;
 	*code = (*code & 0x7ff);
-	*color = (*color & 0x001f);
+	*color = (*color & 0x003f);
 }
 
 static ADDRESS_MAP_START( quickpick5_main, AS_PROGRAM, 8, quickpick5_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM AM_REGION("maincpu", 0)
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
-	AM_RANGE(0xc000, 0xc000) AM_READWRITE(control_r, control_w)
-	AM_RANGE(0xd006, 0xd006) AM_READWRITE(irq_flag_r, nmi_ack_w)
-	AM_RANGE(0xd007, 0xd007) AM_READWRITE(irq_flag_r, vbl_ack_w)
-	AM_RANGE(0xd800, 0xdbff) AM_RAM // stack
+	AM_RANGE(0xc000, 0xdbff) AM_RAM
 	AM_RANGE(0xdc40, 0xdc4f) AM_READWRITE(k244_r, k244_w)
-	AM_RANGE(0xdcc0, 0xdccf) AM_READ(inp_magic_r)
-	AM_RANGE(0xe000, 0xefff) AM_RAM AM_SHARE("vram") AM_READ(vram_r)
+	AM_RANGE(0xdc80, 0xdc80) AM_READ_PORT("DSW3")
+	AM_RANGE(0xdc81, 0xdc81) AM_READ_PORT("DSW4")
+	AM_RANGE(0xdcc0, 0xdcc0) AM_READ_PORT("DSW1")
+	AM_RANGE(0xdcc1, 0xdcc1) AM_READ_PORT("DSW2")
+	AM_RANGE(0xdc0e, 0xdc0e) AM_READWRITE(irq_flag_r, nmi_ack_w)
+	AM_RANGE(0xdc0f, 0xdc0f) AM_READWRITE(irq_flag_r, vbl_ack_w)
+	AM_RANGE(0xdd00, 0xdd00) AM_WRITENOP
+	AM_RANGE(0xdd40, 0xdd40) AM_NOP
+	AM_RANGE(0xdd80, 0xdd80) AM_READWRITE(control_r, control_w)
+	AM_RANGE(0xddc0, 0xddc0) AM_WRITENOP
+	AM_RANGE(0xde00, 0xde00) AM_WRITENOP
+	AM_RANGE(0xde40, 0xde40) AM_DEVWRITE("oki", okim6295_device, write)
+	AM_RANGE(0xe000, 0xefff) AM_READWRITE(vram_r, vram_w)
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0xf800, 0xffff) AM_READWRITE(k245_r, k245_w)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( quickpick5 )
+	PORT_START("DSW1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Unknown ) )   PORT_DIPLOCATION("SW1:3")
+	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Unknown ) )   PORT_DIPLOCATION("SW1:4")
+	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Unknown ) )   PORT_DIPLOCATION("SW1:5")
+	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Unknown ) )   PORT_DIPLOCATION("SW1:6")
+	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Unknown ) )   PORT_DIPLOCATION("SW1:7")
+	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Unknown ) )   PORT_DIPLOCATION("SW1:8")
+	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+
+	PORT_START("DSW2")
+	PORT_DIPNAME( 0x01, 0x00, "Reset Switch" )   PORT_DIPLOCATION("SW2:1")
+	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPNAME( 0x02, 0x00, "Global Stats" )   PORT_DIPLOCATION("SW2:2")
+	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPNAME( 0x04, 0x00, "Last Game Stats" )   PORT_DIPLOCATION("SW2:3")
+	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Unknown ) )   PORT_DIPLOCATION("SW2:4")
+	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Unknown ) )   PORT_DIPLOCATION("SW2:5")
+	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Unknown ) )   PORT_DIPLOCATION("SW2:6")
+	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Unknown ) )   PORT_DIPLOCATION("SW2:7")
+	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Unknown ) )   PORT_DIPLOCATION("SW2:8")
+	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+
+	PORT_START("DSW3")
+	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Unknown ) )   PORT_DIPLOCATION("SW3:1")
+	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Unknown ) )   PORT_DIPLOCATION("SW3:2")
+	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Unknown ) )   PORT_DIPLOCATION("SW3:3")
+	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Unknown ) )   PORT_DIPLOCATION("SW3:4")
+	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Unknown ) )   PORT_DIPLOCATION("SW3:5")
+	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Unknown ) )   PORT_DIPLOCATION("SW3:6")
+	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Unknown ) )   PORT_DIPLOCATION("SW3:7")
+	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Unknown ) )   PORT_DIPLOCATION("SW3:8")
+	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+
+	PORT_START("DSW4")
+	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Unknown ) )   PORT_DIPLOCATION("SW4:1")
+	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Unknown ) )   PORT_DIPLOCATION("SW4:2")
+	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Unknown ) )   PORT_DIPLOCATION("SW4:3")
+	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Unknown ) )   PORT_DIPLOCATION("SW4:4")
+	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Unknown ) )   PORT_DIPLOCATION("SW4:5")
+	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Unknown ) )   PORT_DIPLOCATION("SW4:6")
+	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Unknown ) )   PORT_DIPLOCATION("SW4:7")
+	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Unknown ) )   PORT_DIPLOCATION("SW4:8")
+	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 INPUT_PORTS_END
 
 void quickpick5_state::machine_start()
@@ -218,7 +369,7 @@ static MACHINE_CONFIG_START( quickpick5 )
 	MCFG_SCREEN_REFRESH_RATE(59.62)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(64*8, 33*8)
-	MCFG_SCREEN_VISIBLE_AREA(80, 464-1, 24, 264-1)
+	MCFG_SCREEN_VISIBLE_AREA(88, 456-1, 24, 264-1)
 	MCFG_SCREEN_UPDATE_DRIVER(quickpick5_state, screen_update_quickpick5)
 	MCFG_SCREEN_PALETTE("palette")
 
@@ -228,7 +379,7 @@ static MACHINE_CONFIG_START( quickpick5 )
 
 	MCFG_DEVICE_ADD("k053245", K053245, 0)
 	MCFG_GFX_PALETTE("palette")
-	MCFG_K05324X_OFFSETS(80, 0)
+	MCFG_K05324X_OFFSETS(-44, -8)
 	MCFG_K05324X_CB(quickpick5_state, sprite_callback)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", empty)
@@ -256,7 +407,7 @@ ROM_START( quickp5 )
 	ROM_REGION( 0x80000, "ttl", 0 ) /* TTL text tilemap characters? */
 	ROM_LOAD( "117-18e.bin",  0x000000, 0x020000, CRC(10e0d1e2) SHA1(f4ba190814d5e3f3e910c9da24845b6ddb259bff) )
 
-	ROM_REGION( 0x20000, "okim6295", 0 )    /* OKIM6295 samples */
+	ROM_REGION( 0x20000, "oki", 0 )    /* OKIM6295 samples */
 	ROM_LOAD( "117-a01-2e.bin", 0x000000, 0x020000, CRC(3d8fbd01) SHA1(f350da2a4e7bfff9975188a39acf73415bd85b3d) )
 
 	ROM_REGION( 0x80000, "pals", 0 )
