@@ -106,6 +106,8 @@ public:
 	DECLARE_READ8_MEMBER(radicasi_unkregs_trigger_r);
 	DECLARE_WRITE8_MEMBER(radicasi_unkregs_trigger_w);
 
+	DECLARE_WRITE8_MEMBER(radicasi_5027_w);
+
 	DECLARE_READ8_MEMBER(radicasi_500b_r);
 	DECLARE_READ8_MEMBER(radicasi_500d_r);
 	DECLARE_READ8_MEMBER(radicasi_50a8_r);
@@ -125,6 +127,7 @@ private:
 	required_device<gfxdecode_device> m_gfxdecode;
 
 	uint8_t m_500d_data;
+	uint8_t m_5027_data;
 
 	uint8_t m_palbase_lo_data;
 	uint8_t m_palbase_hi_data;
@@ -172,7 +175,7 @@ uint32_t radica_6502_state::screen_update(screen_device &screen, bitmap_ind16 &b
 	if (machine().input().code_pressed_once(KEYCODE_Q))
 	{
 		m_hackmode++;
-		if (m_hackmode == 3) m_hackmode = 0;
+		if (m_hackmode == 2) m_hackmode = 0;
 	}
 
 	// it is unclear if the tilemap is an internal structure or something actually used by the video rendering
@@ -181,70 +184,72 @@ uint32_t radica_6502_state::screen_update(screen_device &screen, bitmap_ind16 &b
 	// we draw the tiles as 8x1 strips as that's how they're stored in ROM
 	// it might be they're format shifted at some point tho as I doubt it draws direct from ROM
 
-	// is the data at 0x000 in ROM the palette? can't work out the format if so.
 
-	if (m_hackmode == 0) // 16x16 tiles 4bpp (menu)
+	if (m_hackmode == 0)
 	{
-		for (int y = 0; y < 16; y++)
+		if (m_5027_data & 0x40) // 16x16 tiles
 		{
-			for (int x = 0; x < 16; x++)
+			for (int y = 0; y < 16; y++)
 			{
-				gfx_element *gfx = m_gfxdecode->gfx(0);
-
-				int tile = m_ram[offs] + (m_ram[offs + 1] << 8);
-				int attr = (m_ram[offs + 3]); // set to 0x07 on the radica logo, 0x00 on the game select screen
-
-				if (attr == 0)
+				for (int x = 0; x < 16; x++)
 				{
-					/* this logic allows us to see the Taito logo and menu screen */
-					gfx = m_gfxdecode->gfx(0); // 4bpp
-					tile = (tile & 0xf) + ((tile & ~0xf) * 16);
+					gfx_element *gfx = m_gfxdecode->gfx(0);
+
+					int tile = m_ram[offs] + (m_ram[offs + 1] << 8);
+					//int attr = (m_ram[offs + 3]); // set to 0x07 on the radica logo, 0x00 on the game select screen
+
+					if (m_5027_data & 0x20) // 4bpp mode
+					{
+						/* this logic allows us to see the Taito logo and menu screen */
+						gfx = m_gfxdecode->gfx(0); // 4bpp
+						tile = (tile & 0xf) + ((tile & ~0xf) * 16);
+						tile += ((m_tile_gfxbase_lo_data | m_tile_gfxbase_hi_data << 8) << 5);
+						tile <<= 1; // due to 16 pixel wide
+					}
+					else
+					{
+						gfx = m_gfxdecode->gfx(2); // 8bpp
+						tile = (tile & 0xf) + ((tile & ~0xf) * 16);
+						tile <<= 1; // due to 16 pixel wide
+
+						// why after the shift in this case?
+						tile += ((m_tile_gfxbase_lo_data | m_tile_gfxbase_hi_data << 8) << 5);
+					}
+
+					for (int i = 0; i < 16; i++)
+					{
+						gfx->transpen(bitmap, cliprect, tile + i * 32, 0, 0, 0, x * 16, (y * 16) + i, 0);
+						gfx->transpen(bitmap, cliprect, (tile + i * 32) + 1, 0, 0, 0, (x * 16) + 8, (y * 16) + i, 0);
+					}
+
+					offs += 4;
+				}
+			}
+		}
+		else // 8x8 tiles
+		{
+			gfx_element *gfx = m_gfxdecode->gfx(2);
+
+			for (int y = 0; y < 32; y++)
+			{
+				for (int x = 0; x < 32; x++)
+				{
+					int tile = m_ram[offs] + (m_ram[offs + 1] << 8);
+
+					tile = (tile & 0x1f) + ((tile & ~0x1f) * 8);
 					tile += ((m_tile_gfxbase_lo_data | m_tile_gfxbase_hi_data << 8) << 5);
-					tile <<= 1; // due to 16 pixel wide
-				}
-				else
-				{
-					gfx = m_gfxdecode->gfx(2); // 8bpp
-					tile = (tile & 0xf) + ((tile & ~0xf) * 16);
-					tile <<= 1; // due to 16 pixel wide
 
-					// why after the shift in this case?
-					tile += ((m_tile_gfxbase_lo_data | m_tile_gfxbase_hi_data << 8) << 5);
-				}
+					for (int i = 0; i < 8; i++)
+					{
+						gfx->transpen(bitmap, cliprect, tile + i * 32, 0, 0, 0, x * 8, (y * 8) + i, 0);
 
-				for (int i = 0; i < 16; i++)
-				{
-					gfx->transpen(bitmap, cliprect, tile + i * 32, 0, 0, 0, x * 16, (y * 16) + i, 0);
-					gfx->transpen(bitmap, cliprect, (tile + i * 32) + 1, 0, 0, 0, (x * 16) + 8, (y * 16) + i, 0);
+					}
+					offs += 4;
 				}
-
-				offs += 4;
 			}
 		}
 	}
-	else if (m_hackmode == 1) // 8x8 tiles (games)
-	{
-		gfx_element *gfx = m_gfxdecode->gfx(2);
-
-		for (int y = 0; y < 32; y++)
-		{
-			for (int x = 0; x < 32; x++)
-			{
-				int tile = m_ram[offs] + (m_ram[offs + 1] << 8);
-
-				tile = (tile & 0x1f) + ((tile & ~0x1f) * 8);
-				tile += ((m_tile_gfxbase_lo_data | m_tile_gfxbase_hi_data << 8) << 5);
-
-				for (int i = 0; i < 8; i++)
-				{
-					gfx->transpen(bitmap, cliprect, tile + i * 32, 0, 0, 0, x * 8, (y * 8) + i, 0);
-
-				}
-				offs += 4;
-			}
-		}
-	}
-	else if (m_hackmode == 2) // qix
+	else if (m_hackmode == 1) // qix
 	{
 		for (int y = 0; y < 224; y++)
 		{
@@ -612,6 +617,18 @@ READ8_MEMBER(radica_6502_state::radicasi_50a8_r)
 	return 0x3f;
 }
 
+WRITE8_MEMBER(radica_6502_state::radicasi_5027_w)
+{
+	logerror("%s: radicasi_5027_w %02x (video control?)\n", machine().describe_context().c_str(), data);
+	/*
+		c3  8bpp 16x16         1100 0011
+		e3  4bpp 16x16         1110 0011
+		83  8bpp 8x8           1000 0011
+		02  8bpp 8x8 (phoenix) 0000 0010
+	*/
+	m_5027_data = data;
+}
+
 static ADDRESS_MAP_START( radicasi_map, AS_PROGRAM, 8, radica_6502_state )
 	AM_RANGE(0x0000, 0x3fff) AM_RAM AM_SHARE("ram") // ends up copying code to ram, but could be due to banking issues
 	AM_RANGE(0x4800, 0x49ff) AM_RAM
@@ -623,13 +640,15 @@ static ADDRESS_MAP_START( radicasi_map, AS_PROGRAM, 8, radica_6502_state )
 	AM_RANGE(0x5010, 0x5010) AM_READWRITE(radicasi_palbase_lo_r, radicasi_palbase_lo_w) // palettebase
 	AM_RANGE(0x5011, 0x5011) AM_READWRITE(radicasi_palbase_hi_r, radicasi_palbase_hi_w) // palettebase
 
+	AM_RANGE(0x5027, 0x5027) AM_WRITE(radicasi_5027_w)
+
 	AM_RANGE(0x5029, 0x5029) AM_READWRITE(radicasi_tile_gfxbase_lo_r, radicasi_tile_gfxbase_lo_w) // tilebase
 	AM_RANGE(0x502a, 0x502a) AM_READWRITE(radicasi_tile_gfxbase_hi_r, radicasi_tile_gfxbase_hi_w) // tilebase
 
 	AM_RANGE(0x502b, 0x502b) AM_READWRITE(radicasi_sprite_gfxbase_lo_r, radicasi_sprite_gfxbase_lo_w) // tilebase (spr?)
 	AM_RANGE(0x502c, 0x502c) AM_READWRITE(radicasi_sprite_gfxbase_hi_r, radicasi_sprite_gfxbase_hi_w) // tilebase (spr?)
 
-	AM_RANGE(0x5041, 0x5041) AM_READ_PORT("IN0") // AM_READ(radicasi_5041_r)
+	AM_RANGE(0x5041, 0x5041) AM_READ_PORT("IN0")
 
 	// These might be sound / DMA channels?
 
