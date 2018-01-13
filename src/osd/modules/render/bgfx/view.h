@@ -4,6 +4,7 @@
 #pragma once
 
 #include "window.h"
+#include <climits>
 
 class renderer_bgfx;
 class bgfx_target;
