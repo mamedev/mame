@@ -48,7 +48,8 @@ public:
 		m_ram(*this, "ram"),
 		m_pixram(*this, "pixram"),
 		m_bank(*this, "bank"),
-		m_gfxdecode(*this, "gfxdecode")
+		m_gfxdecode(*this, "gfxdecode"),
+		m_palette(*this, "palette")
 	{ }
 
 	// screen updates
@@ -125,6 +126,7 @@ private:
 	required_shared_ptr<uint8_t> m_pixram;
 	required_device<address_map_bank_device> m_bank;
 	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
 
 	uint8_t m_500c_data;
 	uint8_t m_500d_data;
@@ -177,6 +179,17 @@ uint32_t radica_6502_state::screen_update(screen_device &screen, bitmap_ind16 &b
 	// it might be they're format shifted at some point tho as I doubt it draws direct from ROM
 
 	address_space& fullbankspace = m_bank->space(AS_PROGRAM);
+
+	int offset = (m_palbase_lo_data | (m_palbase_hi_data <<8)) * 0x100;
+
+	for (int i = 0; i < 1024; i++)
+	{
+		uint16_t dat = fullbankspace.read_byte(offset++);
+		dat |= fullbankspace.read_byte(offset++) << 8;
+		
+		// wrong format, does seem to be 13-bit tho.
+		m_palette->set_pen_color(i, pal4bit(dat >> 0), pal4bit(dat >> 4), pal5bit(dat >> 8));
+	}
 
 
 	if (m_5027_data & 0x40) // 16x16 tiles
@@ -811,7 +824,7 @@ static MACHINE_CONFIG_START( radicasi )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 28*8-1)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD("palette", 256)
+	MCFG_PALETTE_ADD("palette", 1024)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", radicasi_fake)
 
