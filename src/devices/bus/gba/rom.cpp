@@ -745,7 +745,10 @@ WRITE32_MEMBER(gba_rom_3dmatrix_device::write_mapper)
 		case 2:
 			//printf("m_dst: %08x\n", data); fflush(stdout);
 			if (data >= 0xa000000)
-				printf("Unknown transfer destination 0x%X\n", data); fflush(stdout);
+			{
+				printf("Unknown transfer destination 0x%X\n", data);
+				fflush(stdout);
+			}
 			m_dst = (data & 0x1ffffff);
 			break;
 		case 3:
