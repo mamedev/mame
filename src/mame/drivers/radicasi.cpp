@@ -1,6 +1,37 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood, R.Belmont
 
+/*
+	Radica Games 6502 based 'TV Game' hardware
+
+	These use a 6502 derived CPU under a glob
+	The CPU die is marked 'ELAN EU3A05'
+
+	There is a second glob surrounded by TSOP48 pads
+	this contains the ROM
+
+	Space Invaders uses a 3rd glob marked
+	AMIC (C) (M) 1998-1 AM3122A
+	this is presumably for the bitmap layer on Qix
+
+	--
+	Known games on this hardare
+
+	Tetris
+	Space Invaders
+
+	---
+	Other games that might be on this hardware
+
+	Golden Tee Home Edition
+	Skateboarding
+	+ some of the earlier PlayTV games (not Soccer, that's XaviX, see xavix.cpp)
+
+	---
+	The XaviX ones seem to have a XaviX logo on the external packaging while the
+	ones for this driver don't seem to have any specific marking.
+*/
+
 #include "emu.h"
 #include "cpu/m6502/m6502.h"
 #include "screen.h"
@@ -8,10 +39,10 @@
 #include "machine/bankdev.h"
 //#include "cpu/m6502/r65c02.h"
 
-class radicasi_state : public driver_device
+class radica_6502_state : public driver_device
 {
 public:
-	radicasi_state(const machine_config &mconfig, device_type type, const char *tag)
+	radica_6502_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_ram(*this, "ram"),
@@ -25,7 +56,41 @@ public:
 
 	DECLARE_WRITE8_MEMBER(radicasi_500c_w);
 	DECLARE_WRITE8_MEMBER(radicasi_500d_w);
+	
+	// palette bases
+	DECLARE_WRITE8_MEMBER(radicasi_palbase_lo_w);
+	DECLARE_WRITE8_MEMBER(radicasi_palbase_hi_w);
+	DECLARE_READ8_MEMBER(radicasi_palbase_lo_r);
+	DECLARE_READ8_MEMBER(radicasi_palbase_hi_r);
 
+
+	// tile bases
+	DECLARE_WRITE8_MEMBER(radicasi_tile_gfxbase_lo_w);
+	DECLARE_WRITE8_MEMBER(radicasi_tile_gfxbase_hi_w);
+	DECLARE_READ8_MEMBER(radicasi_tile_gfxbase_lo_r);
+	DECLARE_READ8_MEMBER(radicasi_tile_gfxbase_hi_r);
+
+	// sprite tile bases
+	DECLARE_WRITE8_MEMBER(radicasi_sprite_gfxbase_lo_w);
+	DECLARE_WRITE8_MEMBER(radicasi_sprite_gfxbase_hi_w);
+	DECLARE_READ8_MEMBER(radicasi_sprite_gfxbase_lo_r);
+	DECLARE_READ8_MEMBER(radicasi_sprite_gfxbase_hi_r);
+
+	// unknown rom bases
+	DECLARE_WRITE8_MEMBER(radicasi_unkreg1_hi_w);
+	DECLARE_READ8_MEMBER(radicasi_unkreg1_hi_r);
+	DECLARE_WRITE8_MEMBER(radicasi_unkreg2_hi_w);
+	DECLARE_READ8_MEMBER(radicasi_unkreg2_hi_r);
+	DECLARE_WRITE8_MEMBER(radicasi_unkreg3_hi_w);
+	DECLARE_READ8_MEMBER(radicasi_unkreg3_hi_r);
+	DECLARE_WRITE8_MEMBER(radicasi_unkreg4_hi_w);
+	DECLARE_READ8_MEMBER(radicasi_unkreg4_hi_r);
+	DECLARE_WRITE8_MEMBER(radicasi_unkreg5_hi_w);
+	DECLARE_READ8_MEMBER(radicasi_unkreg5_hi_r);
+	DECLARE_WRITE8_MEMBER(radicasi_unkreg6_hi_w);
+	DECLARE_READ8_MEMBER(radicasi_unkreg6_hi_r);
+
+	DECLARE_READ8_MEMBER(radicasi_500b_r);
 	DECLARE_READ8_MEMBER(radicasi_500d_r);
 	DECLARE_READ8_MEMBER(radicasi_50a8_r);
 
@@ -45,51 +110,112 @@ private:
 
 	uint8_t m_500d_data;
 
+	uint8_t m_palbase_lo_data;
+	uint8_t m_palbase_hi_data;
+
+	uint8_t m_tile_gfxbase_lo_data;
+	uint8_t m_tile_gfxbase_hi_data;
+
+	uint8_t m_sprite_gfxbase_lo_data;
+	uint8_t m_sprite_gfxbase_hi_data;
+
+	uint8_t m_unkreg1_hi_data;
+	uint8_t m_unkreg2_hi_data;
+	uint8_t m_unkreg3_hi_data;
+	uint8_t m_unkreg4_hi_data;
+	uint8_t m_unkreg5_hi_data;
+	uint8_t m_unkreg6_hi_data;
+
+
 	int m_hackmode;
 };
 
-void radicasi_state::video_start()
+void radica_6502_state::video_start()
 {
 	m_hackmode = 0;
 }
 
-uint32_t radicasi_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+/* (m_tile_gfxbase_lo_data | (m_tile_gfxbase_hi_data << 8)) * 0x100
+   gives you the actual rom address, everything references the 3MByte - 4MByte region, like the banking so
+   the system can probalby have up to a 4MByte rom, all games we have so far just use the upper 1MByte of
+   that space
+*/
+
+uint32_t radica_6502_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(0, cliprect);
 
 	if (machine().input().code_pressed_once(KEYCODE_Q))
 	{
 		m_hackmode++;
-		m_hackmode &= 3;
+		if (m_hackmode == 3) m_hackmode = 0;
 	}
 
 	// it is unclear if the tilemap is an internal structure or something actually used by the video rendering
 	int offs = 0x600;
 
-	if (m_hackmode == 0) // 16x16 tiles (menu)
-	{
-		gfx_element *gfx = m_gfxdecode->gfx(1);
+	// we draw the tiles as 8x1 strips as that's how they're stored in ROM
+	// it might be they're format shifted at some point tho as I doubt it draws direct from ROM
 
+	// is the data at 0x000 in ROM the palette? can't work out the format if so.
+
+	if (m_hackmode == 0) // 16x16 tiles 4bpp (menu)
+	{
 		for (int y = 0; y < 16; y++)
 		{
 			for (int x = 0; x < 16; x++)
 			{
-				int tile = m_ram[offs];
-				gfx->transpen(bitmap, cliprect, tile, 0, 0, 0, x * 16, y * 16, 0);
+				gfx_element *gfx = m_gfxdecode->gfx(0);
+
+				int tile = m_ram[offs] + (m_ram[offs + 1] << 8);
+				int attr = (m_ram[offs + 3]); // set to 0x07 on the radica logo, 0x00 on the game select screen
+
+				if (attr == 0)
+				{
+					/* this logic allows us to see the Taito logo and menu screen */
+					gfx = m_gfxdecode->gfx(0); // 4bpp
+					tile = (tile & 0xf) + ((tile & ~0xf) * 16);
+					tile += ((m_tile_gfxbase_lo_data | m_tile_gfxbase_hi_data << 8) << 5);
+					tile <<= 1; // due to 16 pixel wide
+				}
+				else
+				{
+					gfx = m_gfxdecode->gfx(2); // 8bpp
+					tile = (tile & 0xf) + ((tile & ~0xf) * 16);
+					tile <<= 1; // due to 16 pixel wide
+
+					// why after the shift in this case?
+					tile += ((m_tile_gfxbase_lo_data | m_tile_gfxbase_hi_data << 8) << 5);
+				}
+
+				for (int i = 0; i < 16; i++)
+				{
+					gfx->transpen(bitmap, cliprect, tile + i * 32, 0, 0, 0, x * 16, (y * 16) + i, 0);
+					gfx->transpen(bitmap, cliprect, (tile + i * 32) + 1, 0, 0, 0, (x * 16) + 8, (y * 16) + i, 0);
+				}
+
 				offs += 4;
 			}
 		}
 	}
-	else if (m_hackmode == 1) // 8x8 tiles (games?)
+	else if (m_hackmode == 1) // 8x8 tiles (games)
 	{
-		gfx_element *gfx = m_gfxdecode->gfx(0);
+		gfx_element *gfx = m_gfxdecode->gfx(2);
 
 		for (int y = 0; y < 32; y++)
 		{
 			for (int x = 0; x < 32; x++)
 			{
-				int tile = m_ram[offs];
-				gfx->transpen(bitmap, cliprect, tile, 0, 0, 0, x * 8, y * 8, 0);
+				int tile = m_ram[offs] + (m_ram[offs + 1] << 8);
+
+				tile = (tile & 0x1f) + ((tile & ~0x1f) * 8);
+				tile += ((m_tile_gfxbase_lo_data | m_tile_gfxbase_hi_data << 8) << 5);
+
+				for (int i = 0; i < 8; i++)
+				{
+					gfx->transpen(bitmap, cliprect, tile + i * 32, 0, 0, 0, x * 8, (y * 8) + i, 0);
+
+				}
 				offs += 4;
 			}
 		}
@@ -114,41 +240,232 @@ uint32_t radicasi_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	return 0;
 }
 
-WRITE8_MEMBER(radicasi_state::radicasi_500c_w)
+WRITE8_MEMBER(radica_6502_state::radicasi_500c_w)
 {
 	// written with the banking?
-	logerror("%s: radicasi_500c_w %02x\n", machine().describe_context().c_str(), data);
+	logerror("%s: radicasi_500c_w (set ROM bank) %02x\n", machine().describe_context().c_str(), data);
 
 	m_bank->set_bank(m_500d_data);
 }
 
-READ8_MEMBER(radicasi_state::radicasi_500d_r)
+READ8_MEMBER(radica_6502_state::radicasi_500d_r)
 {
 	return m_500d_data;
 }
 
-WRITE8_MEMBER(radicasi_state::radicasi_500d_w)
+READ8_MEMBER(radica_6502_state::radicasi_500b_r)
 {
-	logerror("%s: radicasi_500d_w %02x\n", machine().describe_context().c_str(), data);
+	// how best to handle this, we probably need to run the PAL machine at 50hz
+	// the text under the radica logo differs between regions
+	logerror("%s: radicasi_500b_r (region + more?)\n", machine().describe_context().c_str());
+	return 0xff; // NTSC
+	//return 0x00; // PAL
+}
+
+WRITE8_MEMBER(radica_6502_state::radicasi_500d_w)
+{
+	logerror("%s: radicasi_500d_w (select ROM bank) %02x\n", machine().describe_context().c_str(), data);
 	m_500d_data = data;
 }
 
-READ8_MEMBER(radicasi_state::radicasi_50a8_r)
+// Tile bases
+
+WRITE8_MEMBER(radica_6502_state::radicasi_tile_gfxbase_lo_w)
+{
+	logerror("%s: radicasi_tile_gfxbase_lo_w (select GFX base lower) %02x\n", machine().describe_context().c_str(), data);
+	m_tile_gfxbase_lo_data = data;
+}
+
+WRITE8_MEMBER(radica_6502_state::radicasi_tile_gfxbase_hi_w)
+{
+	logerror("%s: radicasi_tile_gfxbase_hi_w (select GFX base upper) %02x\n", machine().describe_context().c_str(), data);
+	m_tile_gfxbase_hi_data = data;
+}
+
+READ8_MEMBER(radica_6502_state::radicasi_tile_gfxbase_lo_r)
+{
+	logerror("%s: radicasi_tile_gfxbase_lo_r (GFX base lower)\n", machine().describe_context().c_str());
+	return m_tile_gfxbase_lo_data;
+}
+
+READ8_MEMBER(radica_6502_state::radicasi_tile_gfxbase_hi_r)
+{
+	logerror("%s: radicasi_tile_gfxbase_hi_r (GFX base upper)\n", machine().describe_context().c_str());
+	return m_tile_gfxbase_hi_data;
+}
+
+// Sprite Tile bases
+
+WRITE8_MEMBER(radica_6502_state::radicasi_sprite_gfxbase_lo_w)
+{
+	logerror("%s: radicasi_sprite_gfxbase_lo_w (select Sprite GFX base lower) %02x\n", machine().describe_context().c_str(), data);
+	m_sprite_gfxbase_lo_data = data;
+}
+
+WRITE8_MEMBER(radica_6502_state::radicasi_sprite_gfxbase_hi_w)
+{
+	logerror("%s: radicasi_sprite_gfxbase_hi_w (select Sprite GFX base upper) %02x\n", machine().describe_context().c_str(), data);
+	m_sprite_gfxbase_hi_data = data;
+}
+
+READ8_MEMBER(radica_6502_state::radicasi_sprite_gfxbase_lo_r)
+{
+	logerror("%s: radicasi_sprite_gfxbase_lo_r (Sprite GFX base lower)\n", machine().describe_context().c_str());
+	return m_sprite_gfxbase_lo_data;
+}
+
+READ8_MEMBER(radica_6502_state::radicasi_sprite_gfxbase_hi_r)
+{
+	logerror("%s: radicasi_sprite_gfxbase_hi_r (Sprite GFX base upper)\n", machine().describe_context().c_str());
+	return m_sprite_gfxbase_hi_data;
+}
+
+// Palette bases
+
+WRITE8_MEMBER(radica_6502_state::radicasi_palbase_lo_w)
+{
+	logerror("%s: radicasi_palbase_lo_w (select Palette base lower) %02x\n", machine().describe_context().c_str(), data);
+	m_palbase_lo_data = data;
+}
+
+WRITE8_MEMBER(radica_6502_state::radicasi_palbase_hi_w)
+{
+	logerror("%s: radicasi_palbase_hi_w (select Palette base upper) %02x\n", machine().describe_context().c_str(), data);
+	m_palbase_hi_data = data;
+}
+
+READ8_MEMBER(radica_6502_state::radicasi_palbase_lo_r)
+{
+	logerror("%s: radicasi_palbase_lo_r (Palette base lower)\n", machine().describe_context().c_str());
+	return m_palbase_lo_data;
+}
+
+READ8_MEMBER(radica_6502_state::radicasi_palbase_hi_r)
+{
+	logerror("%s: radicasi_palbase_hi_r (Palette base upper)\n", machine().describe_context().c_str());
+	return m_palbase_hi_data;
+}
+
+// unknown regs that seem to also be pointers
+
+
+WRITE8_MEMBER(radica_6502_state::radicasi_unkreg1_hi_w)
+{
+	logerror("%s: radicasi_unkreg1_hi_w (unknown register 1 base upper) %02x\n", machine().describe_context().c_str(), data);
+	m_unkreg1_hi_data = data;
+}
+
+READ8_MEMBER(radica_6502_state::radicasi_unkreg1_hi_r)
+{
+	logerror("%s: radicasi_unkreg1_hi_r (unknown register 1 base upper)\n", machine().describe_context().c_str());
+	return m_unkreg1_hi_data;
+}
+
+WRITE8_MEMBER(radica_6502_state::radicasi_unkreg2_hi_w)
+{
+	logerror("%s: radicasi_unkreg2_hi_w (unknown register 2 base upper) %02x\n", machine().describe_context().c_str(), data);
+	m_unkreg2_hi_data = data;
+}
+
+READ8_MEMBER(radica_6502_state::radicasi_unkreg2_hi_r)
+{
+	logerror("%s: radicasi_unkreg2_hi_r (unknown register 2 base upper)\n", machine().describe_context().c_str());
+	return m_unkreg2_hi_data;
+}
+
+WRITE8_MEMBER(radica_6502_state::radicasi_unkreg3_hi_w)
+{
+	logerror("%s: radicasi_unkreg3_hi_w (unknown register 3 base upper) %02x\n", machine().describe_context().c_str(), data);
+	m_unkreg3_hi_data = data;
+}
+
+READ8_MEMBER(radica_6502_state::radicasi_unkreg3_hi_r)
+{
+	logerror("%s: radicasi_unkreg3_hi_r (unknown register 3 base upper)\n", machine().describe_context().c_str());
+	return m_unkreg3_hi_data;
+}
+
+WRITE8_MEMBER(radica_6502_state::radicasi_unkreg4_hi_w)
+{
+	logerror("%s: radicasi_unkreg4_hi_w (unknown register 4 base upper) %02x\n", machine().describe_context().c_str(), data);
+	m_unkreg4_hi_data = data;
+}
+
+READ8_MEMBER(radica_6502_state::radicasi_unkreg4_hi_r)
+{
+	logerror("%s: radicasi_unkreg4_hi_r (unknown register 4 base upper)\n", machine().describe_context().c_str());
+	return m_unkreg4_hi_data;
+}
+
+WRITE8_MEMBER(radica_6502_state::radicasi_unkreg5_hi_w)
+{
+	logerror("%s: radicasi_unkreg5_hi_w (unknown register 5 base upper) %02x\n", machine().describe_context().c_str(), data);
+	m_unkreg5_hi_data = data;
+}
+
+READ8_MEMBER(radica_6502_state::radicasi_unkreg5_hi_r)
+{
+	logerror("%s: radicasi_unkreg5_hi_r (unknown register 5 base upper)\n", machine().describe_context().c_str());
+	return m_unkreg5_hi_data;
+}
+
+WRITE8_MEMBER(radica_6502_state::radicasi_unkreg6_hi_w)
+{
+	logerror("%s: radicasi_unkreg6_hi_w (unknown register 6 base upper) %02x\n", machine().describe_context().c_str(), data);
+	m_unkreg6_hi_data = data;
+}
+
+READ8_MEMBER(radica_6502_state::radicasi_unkreg6_hi_r)
+{
+	logerror("%s: radicasi_unkreg6_hi_r (unknown register 6 base upper)\n", machine().describe_context().c_str());
+	return m_unkreg6_hi_data;
+}
+
+
+
+
+READ8_MEMBER(radica_6502_state::radicasi_50a8_r)
 {
 	logerror("%s: radicasi_50a8_r\n", machine().describe_context().c_str());
 	return 0x3f;
 }
 
-static ADDRESS_MAP_START( radicasi_map, AS_PROGRAM, 8, radicasi_state )
+static ADDRESS_MAP_START( radicasi_map, AS_PROGRAM, 8, radica_6502_state )
 	AM_RANGE(0x0000, 0x3fff) AM_RAM AM_SHARE("ram") // ends up copying code to ram, but could be due to banking issues
 	AM_RANGE(0x4800, 0x49ff) AM_RAM
 
+	AM_RANGE(0x500b, 0x500b) AM_READ(radicasi_500b_r) // PAL / NTSC flag at least
 	AM_RANGE(0x500c, 0x500c) AM_WRITE(radicasi_500c_w)
 	AM_RANGE(0x500d, 0x500d) AM_READWRITE(radicasi_500d_r, radicasi_500d_w)
 
+	AM_RANGE(0x5010, 0x5010) AM_READWRITE(radicasi_palbase_lo_r, radicasi_palbase_lo_w) // palettebase
+	AM_RANGE(0x5011, 0x5011) AM_READWRITE(radicasi_palbase_hi_r, radicasi_palbase_hi_w) // palettebase
+
+	AM_RANGE(0x5029, 0x5029) AM_READWRITE(radicasi_tile_gfxbase_lo_r, radicasi_tile_gfxbase_lo_w) // tilebase
+	AM_RANGE(0x502a, 0x502a) AM_READWRITE(radicasi_tile_gfxbase_hi_r, radicasi_tile_gfxbase_hi_w) // tilebase
+
+	AM_RANGE(0x502b, 0x502b) AM_READWRITE(radicasi_sprite_gfxbase_lo_r, radicasi_sprite_gfxbase_lo_w) // tilebase (spr?)
+	AM_RANGE(0x502c, 0x502c) AM_READWRITE(radicasi_sprite_gfxbase_hi_r, radicasi_sprite_gfxbase_hi_w) // tilebase (spr?)
+
 	AM_RANGE(0x5041, 0x5041) AM_READ_PORT("IN0") // AM_READ(radicasi_5041_r)
 
+	// These might be sound / DMA channels?
+
+	AM_RANGE(0x5082, 0x5082) AM_READWRITE(radicasi_unkreg1_hi_r, radicasi_unkreg1_hi_w) // set to 0x33, so probably another 'high' address bits reg
+
+	AM_RANGE(0x5085, 0x5085) AM_READWRITE(radicasi_unkreg2_hi_r, radicasi_unkreg2_hi_w) // set to 0x33, so probably another 'high' address bits reg
+
+	AM_RANGE(0x5088, 0x5088) AM_READWRITE(radicasi_unkreg3_hi_r, radicasi_unkreg3_hi_w) // set to 0x33, so probably another 'high' address bits reg
+
+	AM_RANGE(0x508b, 0x508b) AM_READWRITE(radicasi_unkreg4_hi_r, radicasi_unkreg4_hi_w) // set to 0x33, so probably another 'high' address bits reg
+
+	AM_RANGE(0x508e, 0x508e) AM_READWRITE(radicasi_unkreg5_hi_r, radicasi_unkreg5_hi_w) // set to 0x33, so probably another 'high' address bits reg
+
+	AM_RANGE(0x5091, 0x5091) AM_READWRITE(radicasi_unkreg6_hi_r, radicasi_unkreg6_hi_w) // set to 0x33, so probably another 'high' address bits reg
+
 	AM_RANGE(0x50a8, 0x50a8) AM_READ(radicasi_50a8_r)
+
+	//AM_RANGE(0x5000, 0x50ff) AM_RAM
 
 	AM_RANGE(0x6000, 0xdfff) AM_DEVICE("bank", address_map_bank_device, amap8)
 
@@ -156,7 +473,7 @@ static ADDRESS_MAP_START( radicasi_map, AS_PROGRAM, 8, radicasi_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( radicasi_bank_map, AS_PROGRAM, 8, radicasi_state )
+static ADDRESS_MAP_START( radicasi_bank_map, AS_PROGRAM, 8, radica_6502_state )
 	AM_RANGE(0x000000, 0x00ffff) AM_RAM AM_SHARE("pixram") // qix accesses here when 500c is 01 (which could be an additional bank bit)
 
 	AM_RANGE(0x300000, 0x3fffff) AM_ROM AM_REGION("maincpu", 0)
@@ -175,7 +492,7 @@ static INPUT_PORTS_START( radicasi )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON4 )
 INPUT_PORTS_END
 
-void radicasi_state::machine_start()
+void radica_6502_state::machine_start()
 {
 	uint8_t *rom = memregion("maincpu")->base();
 	/* both NMI and IRQ vectors just point to RTI
@@ -201,36 +518,37 @@ void radicasi_state::machine_start()
 	m_bank->set_bank(0x7f);
 }
 
-void radicasi_state::machine_reset()
+void radica_6502_state::machine_reset()
 {
 }
 
-// these are fake, should be decoded from RAM, or not tile based (although game does seem to have 'tilemap' structures in RAM
-static const gfx_layout helper_layout =
+static const gfx_layout helper_4bpp_8_layout =
 {
-	8,8,
+	8,1,
 	RGN_FRAC(1,1),
 	4,
 	{ 0,1,2,3 },
 	{ STEP8(0,4) },
-	{ STEP8(0,32) },
-	8 * 32
+	{ 0 },
+	8 * 4
 };
 
-static const gfx_layout helper2_layout =
+static const gfx_layout helper_8bpp_8_layout =
 {
-	16,16,
+	8,1,
 	RGN_FRAC(1,1),
-	4,
-	{ 0,1,2,3 },
-	{ STEP16(0,4) },
-	{ STEP16(0,64) },
-	16 * 64
+	8,
+	{ 0,1,2,3,4,5,6,7 },
+	{ STEP8(0,8) },
+	{ 0 },
+	8 * 8
 };
 
-static const uint32_t texlayout_xoffset[256] = { STEP256(0,8) };
-static const uint32_t texlayout_yoffset[256] = { STEP256(0,256*8) };
-static const gfx_layout helper3_layout =
+
+// these are fake just to make looking at the texture pages easier
+static const uint32_t texlayout_xoffset_8bpp[256] = { STEP256(0,8) };
+static const uint32_t texlayout_yoffset_8bpp[256] = { STEP256(0,256*8) };
+static const gfx_layout texture_helper_8bpp_layout =
 {
 	256, 256,
 	RGN_FRAC(1,1),
@@ -239,25 +557,43 @@ static const gfx_layout helper3_layout =
 	EXTENDED_XOFFS,
 	EXTENDED_YOFFS,
 	256*256*8,
-	texlayout_xoffset,
-	texlayout_yoffset
+	texlayout_xoffset_8bpp,
+	texlayout_yoffset_8bpp
+};
+
+static const uint32_t texlayout_xoffset_4bpp[256] = { STEP256(0,4) };
+static const uint32_t texlayout_yoffset_4bpp[256] = { STEP256(0,256*4) };
+static const gfx_layout texture_helper_4bpp_layout =
+{
+	256, 256,
+	RGN_FRAC(1,1),
+	4,
+	{ 0,1,2,3 },
+	EXTENDED_XOFFS,
+	EXTENDED_YOFFS,
+	256*256*4,
+	texlayout_xoffset_4bpp,
+	texlayout_yoffset_4bpp
 };
 
 
+
 static GFXDECODE_START( radicasi_fake )
-	GFXDECODE_ENTRY( "maincpu", 0, helper_layout,  0x0, 1  )
-	GFXDECODE_ENTRY( "maincpu", 0, helper2_layout,  0x0, 1  )
-	GFXDECODE_ENTRY( "maincpu", 0, helper3_layout,  0x0, 1  )
+	GFXDECODE_ENTRY( "maincpu", 0, helper_4bpp_8_layout,  0x0, 1  )
+	GFXDECODE_ENTRY( "maincpu", 0, texture_helper_4bpp_layout,  0x0, 1  )
+	GFXDECODE_ENTRY( "maincpu", 0, helper_8bpp_8_layout,  0x0, 1  )
+	GFXDECODE_ENTRY( "maincpu", 0, texture_helper_8bpp_layout,  0x0, 1  )
 GFXDECODE_END
 
 
+// Tetris has a XTAL_21_28137MHz, not confirmed on Space Invaders, actual CPU clock unknown.
 
 static MACHINE_CONFIG_START( radicasi )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",M6502,8000000) // unknown frequency
+	MCFG_CPU_ADD("maincpu",M6502,XTAL_21_28137MHz/2)
 	MCFG_CPU_PROGRAM_MAP(radicasi_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", radicasi_state,  irq0_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", radica_6502_state,  irq0_line_hold)
 
 	MCFG_DEVICE_ADD("bank", ADDRESS_MAP_BANK, 0)
 	MCFG_DEVICE_PROGRAM_MAP(radicasi_bank_map)
@@ -266,12 +602,11 @@ static MACHINE_CONFIG_START( radicasi )
 	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(32)
 	MCFG_ADDRESS_MAP_BANK_STRIDE(0x8000)
 
-
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
-	MCFG_SCREEN_UPDATE_DRIVER(radicasi_state, screen_update)
+	MCFG_SCREEN_UPDATE_DRIVER(radica_6502_state, screen_update)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 28*8-1)
 	MCFG_SCREEN_PALETTE("palette")
@@ -285,10 +620,15 @@ static MACHINE_CONFIG_START( radicasi )
 MACHINE_CONFIG_END
 
 
+ROM_START( rad_tetr )
+	ROM_REGION( 0x100000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD( "tetrisrom.bin", 0x000000, 0x100000, CRC(40538e08) SHA1(1aef9a2c678e39243eab8d910bb7f9f47bae0aee) )
+ROM_END
 
-ROM_START( radicasi )
+ROM_START( rad_sinv )
 	ROM_REGION( 0x100000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD( "spaceinvadersrom.bin", 0x000000, 0x100000, CRC(5ffb2c8f) SHA1(9bde42ec5c65d9584a802de7d7c8b842ebf8cbd8) )
 ROM_END
 
-CONS( 200?, radicasi,  0,   0,  radicasi,  radicasi, radicasi_state, 0, "Radica (licensed from Taito)", "Space Invaders (Radica, Arcade Legends TV Game)", MACHINE_IS_SKELETON )
+CONS( 2004, rad_tetr,  0,   0,  radicasi,  radicasi, radica_6502_state, 0, "Radica (licensed from Taito)", "Space Invaders (Radica, Arcade Legends TV Game)", MACHINE_NOT_WORKING )
+CONS( 2004, rad_sinv,  0,   0,  radicasi,  radicasi, radica_6502_state, 0, "Radica",                       "Tetris (Radica, Arcade Legends TV Game)", MACHINE_NOT_WORKING ) // "5 Tetris games in 1"

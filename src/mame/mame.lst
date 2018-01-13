@@ -32409,7 +32409,8 @@ r9751                           // ROLM 9751 phone system
 rabbit                          // (c) 1997 Electronic Arts
 
 @source:radicasi.cpp
-radicasi
+rad_sinv
+rad_tetr
 
 @source:radio86.cpp
 impuls03                        //
