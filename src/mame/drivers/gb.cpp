@@ -845,6 +845,11 @@ ROM_START(megaduck)
 	ROM_REGION(0x10000, "maincpu", ROMREGION_ERASEFF)
 ROM_END
 
+ROM_START(gamefgtr)
+	ROM_REGION(0x0100, "maincpu", 0)
+	ROM_LOAD("gamefgtr.bin", 0x0000, 0x0100, CRC(908ba8de) SHA1(a4a36f71bf1b3b587df620d48ae940af93a982a5))
+ROM_END
+
 /*   YEAR  NAME       PARENT   COMPAT   MACHINE   INPUT    STATE           INIT  COMPANY     FULLNAME */
 CONS(1990, gameboy,   0,       0,       gameboy,  gameboy, gb_state,       0,    "Nintendo", "Game Boy", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE)
 CONS(1994, supergb,   gameboy, 0,       supergb,  gameboy, gb_state,       0,    "Nintendo", "Super Game Boy", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE)
@@ -853,4 +858,7 @@ CONS(1996, gbpocket,  gameboy, 0,       gbpocket, gameboy, gb_state,       0,   
 CONS(1998, gbcolor,   0,       0,       gbcolor,  gameboy, gb_state,       0,    "Nintendo", "Game Boy Color", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE)
 
 // Sound is not 100% yet, it generates some sounds which could be ok. Since we're lacking a real system there's no way to verify.
-CONS( 1993, megaduck, 0,       0,       megaduck, gameboy, megaduck_state, 0,    "Welback Holdings (Timlex International) / Creatronic / Videojet / Cougar USA", "Mega Duck / Cougar Boy", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+CONS(1993, megaduck,  0,       0,       megaduck, gameboy, megaduck_state, 0,    "Welback Holdings (Timlex International) / Creatronic / Videojet / Cougar USA", "Mega Duck / Cougar Boy", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+
+// http://blog.gg8.se/wordpress/2012/11/11/gameboy-clone-game-fighter-teardown/
+CONS(1993, gamefgtr,  gameboy, 0,       gameboy,  gameboy, gb_state,       0,    "unknown", "Game Fighter (bootleg)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE)
