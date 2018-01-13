@@ -48,7 +48,8 @@ public:
 		m_ram(*this, "ram"),
 		m_pixram(*this, "pixram"),
 		m_bank(*this, "bank"),
-		m_gfxdecode(*this, "gfxdecode")
+		m_gfxdecode(*this, "gfxdecode"),
+		m_palette(*this, "palette")
 	{ }
 
 	// screen updates
@@ -125,7 +126,9 @@ private:
 	required_shared_ptr<uint8_t> m_pixram;
 	required_device<address_map_bank_device> m_bank;
 	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
 
+	uint8_t m_500c_data;
 	uint8_t m_500d_data;
 	uint8_t m_5027_data;
 
@@ -153,13 +156,10 @@ private:
 	uint8_t handle_unkregs_0_r(int which, int offset);
 	void handle_unkregs_1_w(int which, int offset, uint8_t data);
 	uint8_t handle_unkregs_1_r(int which, int offset);
-
-	int m_hackmode;
 };
 
 void radica_6502_state::video_start()
 {
-	m_hackmode = 0;
 }
 
 /* (m_tile_gfxbase_lo_data | (m_tile_gfxbase_hi_data << 8)) * 0x100
@@ -172,99 +172,105 @@ uint32_t radica_6502_state::screen_update(screen_device &screen, bitmap_ind16 &b
 {
 	bitmap.fill(0, cliprect);
 
-	if (machine().input().code_pressed_once(KEYCODE_Q))
-	{
-		m_hackmode++;
-		if (m_hackmode == 2) m_hackmode = 0;
-	}
-
 	// it is unclear if the tilemap is an internal structure or something actually used by the video rendering
 	int offs = 0x600;
 
 	// we draw the tiles as 8x1 strips as that's how they're stored in ROM
 	// it might be they're format shifted at some point tho as I doubt it draws direct from ROM
 
+	address_space& fullbankspace = m_bank->space(AS_PROGRAM);
 
-	if (m_hackmode == 0)
+	int offset = (m_palbase_lo_data | (m_palbase_hi_data <<8)) * 0x100;
+
+	for (int i = 0; i < 1024; i++)
 	{
-		if (m_5027_data & 0x40) // 16x16 tiles
+		uint16_t dat = fullbankspace.read_byte(offset++);
+		dat |= fullbankspace.read_byte(offset++) << 8;
+		
+		// wrong format, does seem to be 13-bit tho.
+		m_palette->set_pen_color(i, pal4bit(dat >> 0), pal4bit(dat >> 4), pal5bit(dat >> 8));
+	}
+
+
+	if (m_5027_data & 0x40) // 16x16 tiles
+	{
+		for (int y = 0; y < 16; y++)
 		{
-			for (int y = 0; y < 16; y++)
+			for (int x = 0; x < 16; x++)
 			{
-				for (int x = 0; x < 16; x++)
+				int tile = m_ram[offs] + (m_ram[offs + 1] << 8);
+				//int attr = (m_ram[offs + 3]); // set to 0x07 on the radica logo, 0x00 on the game select screen
+
+
+				if (m_5027_data & 0x20) // 4bpp mode
 				{
-					gfx_element *gfx = m_gfxdecode->gfx(0);
-
-					int tile = m_ram[offs] + (m_ram[offs + 1] << 8);
-					//int attr = (m_ram[offs + 3]); // set to 0x07 on the radica logo, 0x00 on the game select screen
-
-					if (m_5027_data & 0x20) // 4bpp mode
-					{
-						/* this logic allows us to see the Taito logo and menu screen */
-						gfx = m_gfxdecode->gfx(0); // 4bpp
-						tile = (tile & 0xf) + ((tile & ~0xf) * 16);
-						tile += ((m_tile_gfxbase_lo_data | m_tile_gfxbase_hi_data << 8) << 5);
-						tile <<= 1; // due to 16 pixel wide
-					}
-					else
-					{
-						gfx = m_gfxdecode->gfx(2); // 8bpp
-						tile = (tile & 0xf) + ((tile & ~0xf) * 16);
-						tile <<= 1; // due to 16 pixel wide
-
-						// why after the shift in this case?
-						tile += ((m_tile_gfxbase_lo_data | m_tile_gfxbase_hi_data << 8) << 5);
-					}
-
-					for (int i = 0; i < 16; i++)
-					{
-						gfx->transpen(bitmap, cliprect, tile + i * 32, 0, 0, 0, x * 16, (y * 16) + i, 0);
-						gfx->transpen(bitmap, cliprect, (tile + i * 32) + 1, 0, 0, 0, (x * 16) + 8, (y * 16) + i, 0);
-					}
-
-					offs += 4;
-				}
-			}
-		}
-		else // 8x8 tiles
-		{
-			gfx_element *gfx = m_gfxdecode->gfx(2);
-
-			for (int y = 0; y < 32; y++)
-			{
-				for (int x = 0; x < 32; x++)
-				{
-					int tile = m_ram[offs] + (m_ram[offs + 1] << 8);
-
-					tile = (tile & 0x1f) + ((tile & ~0x1f) * 8);
+					tile = (tile & 0xf) + ((tile & ~0xf) * 16);
 					tile += ((m_tile_gfxbase_lo_data | m_tile_gfxbase_hi_data << 8) << 5);
-
-					for (int i = 0; i < 8; i++)
-					{
-						gfx->transpen(bitmap, cliprect, tile + i * 32, 0, 0, 0, x * 8, (y * 8) + i, 0);
-
-					}
-					offs += 4;
 				}
+				else
+				{
+					tile = (tile & 0xf) + ((tile & ~0xf) * 16);
+					tile <<= 1;
+
+					tile += ((m_tile_gfxbase_lo_data | m_tile_gfxbase_hi_data << 8) << 5);
+				}
+
+				for (int i = 0; i < 16; i++)
+				{
+					uint16_t* row = &bitmap.pix16((y * 16) + i);
+
+					if (m_5027_data & 0x20) // 4bpp
+					{
+						for (int xx = 0; xx < 16; xx += 2)
+						{
+							int realaddr = ((tile + i * 16) << 3) + (xx >> 1);
+							uint8_t pix = fullbankspace.read_byte(realaddr);
+							row[x * 16 + xx + 0] = (pix & 0xf0) >> 4;
+							row[x * 16 + xx + 1] = (pix & 0x0f) >> 0;
+						}
+					}
+					else // 8bpp
+					{
+						for (int xx = 0; xx < 16; xx++)
+						{
+							int realaddr = ((tile + i * 32) << 3) + xx;
+							uint8_t pix = fullbankspace.read_byte(realaddr);
+							row[x * 16 + xx] = pix;
+						}
+					}
+				}
+
+				offs += 4;
 			}
 		}
 	}
-	else if (m_hackmode == 1) // qix
+	else // 8x8 tiles
 	{
-		for (int y = 0; y < 224; y++)
+		for (int y = 0; y < 32; y++)
 		{
-			uint16_t* row = &bitmap.pix16(y);
-
-			for (int x = 0; x < 256; x++)
+			for (int x = 0; x < 32; x++)
 			{
-				int pixel = m_pixram[offs];
+				int tile = (m_ram[offs] + (m_ram[offs + 1] << 8));
 
-				if (pixel) row[x] = pixel;
+				tile = (tile & 0x1f) + ((tile & ~0x1f) * 8);
+				tile += ((m_tile_gfxbase_lo_data | m_tile_gfxbase_hi_data << 8) << 5);
 
-				offs++;
+				for (int i = 0; i < 8; i++)
+				{
+					uint16_t* row = &bitmap.pix16((y * 8) + i);
+
+					for (int xx = 0; xx < 8; xx++)
+					{
+						int realaddr = ((tile + i * 32) << 3) + xx;
+						uint8_t pix = fullbankspace.read_byte(realaddr);
+						row[x * 8 + xx] = pix;
+					}
+				}
+				offs += 4;
 			}
 		}
 	}
+
 
 	return 0;
 }
@@ -273,8 +279,9 @@ WRITE8_MEMBER(radica_6502_state::radicasi_500c_w)
 {
 	// written with the banking?
 	logerror("%s: radicasi_500c_w (set ROM bank) %02x\n", machine().describe_context().c_str(), data);
+	m_500c_data = data;
 
-	m_bank->set_bank(m_500d_data);
+	m_bank->set_bank(m_500d_data | (m_500c_data << 8));
 }
 
 READ8_MEMBER(radica_6502_state::radicasi_500d_r)
@@ -674,15 +681,16 @@ static ADDRESS_MAP_START( radicasi_map, AS_PROGRAM, 8, radica_6502_state )
 
 	AM_RANGE(0x6000, 0xdfff) AM_DEVICE("bank", address_map_bank_device, amap8)
 
-	AM_RANGE(0xe000, 0xffff) AM_ROM AM_REGION("maincpu", 0xf8000)
+	AM_RANGE(0xe000, 0xffff) AM_ROM AM_REGION("maincpu", 0x3f8000)
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( radicasi_bank_map, AS_PROGRAM, 8, radica_6502_state )
-	AM_RANGE(0x000000, 0x00ffff) AM_RAM AM_SHARE("pixram") // qix accesses here when 500c is 01 (which could be an additional bank bit)
+static ADDRESS_MAP_START( radicasi_bank_map, AS_PROGRAM, 8, radica_6502_state )          
+	AM_RANGE(0x000000, 0x3fffff) AM_ROM AM_REGION("maincpu", 0)
+	AM_RANGE(0x400000, 0x40ffff) AM_RAM // ?? only ever cleared maybe a mirror of below?
+	AM_RANGE(0x800000, 0x80ffff) AM_RAM AM_SHARE("pixram") // Qix writes here and sets the tile base here instead of ROM so it can have a pixel layer
 
-	AM_RANGE(0x300000, 0x3fffff) AM_ROM AM_REGION("maincpu", 0)
-	AM_RANGE(0x400000, 0x40ffff) AM_RAM // could be tileram? or spriteram? only cleared tho, so would be populated with DMA?
+	AM_RANGE(0x000000, 0xffffff) AM_NOP // shut up any logging when video params are invalid
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( radicasi )
@@ -706,8 +714,8 @@ void radica_6502_state::machine_start()
 	   patch the main IRQ to be the one that decreases an address the code is waiting for
 	   the others look like they might be timer service routines
 	*/
-	rom[0xf9ffe] = 0xd4;
-	rom[0xf9fff] = 0xff;
+	rom[0x3f9ffe] = 0xd4;
+	rom[0x3f9fff] = 0xff;
 
 	/*
 		d8000-dffff maps to 6000-dfff
@@ -804,7 +812,7 @@ static MACHINE_CONFIG_START( radicasi )
 	MCFG_DEVICE_PROGRAM_MAP(radicasi_bank_map)
 	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
 	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
-	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(32)
+	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(24)
 	MCFG_ADDRESS_MAP_BANK_STRIDE(0x8000)
 
 	/* video hardware */
@@ -816,7 +824,7 @@ static MACHINE_CONFIG_START( radicasi )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 28*8-1)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD("palette", 256)
+	MCFG_PALETTE_ADD("palette", 1024)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", radicasi_fake)
 
@@ -826,13 +834,19 @@ MACHINE_CONFIG_END
 
 
 ROM_START( rad_tetr )
-	ROM_REGION( 0x100000, "maincpu", ROMREGION_ERASE00 )
+	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD( "tetrisrom.bin", 0x000000, 0x100000, CRC(40538e08) SHA1(1aef9a2c678e39243eab8d910bb7f9f47bae0aee) )
+	ROM_RELOAD(0x100000, 0x100000)
+	ROM_RELOAD(0x200000, 0x100000)
+	ROM_RELOAD(0x300000, 0x100000)
 ROM_END
 
 ROM_START( rad_sinv )
-	ROM_REGION( 0x100000, "maincpu", ROMREGION_ERASE00 )
+	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD( "spaceinvadersrom.bin", 0x000000, 0x100000, CRC(5ffb2c8f) SHA1(9bde42ec5c65d9584a802de7d7c8b842ebf8cbd8) )
+	ROM_RELOAD(0x100000, 0x100000)
+	ROM_RELOAD(0x200000, 0x100000)
+	ROM_RELOAD(0x300000, 0x100000)
 ROM_END
 
 CONS( 2004, rad_tetr,  0,   0,  radicasi,  radicasi, radica_6502_state, 0, "Radica (licensed from Taito)", "Space Invaders (Radica, Arcade Legends TV Game)", MACHINE_NOT_WORKING )
