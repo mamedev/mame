@@ -1873,6 +1873,7 @@ MACHINE_CONFIG_MEMBER( steeltal_board_device_state::device_add_mconfig )
 	MCFG_DEVICE_REMOVE("ds3xdsp")
 	MCFG_DEVICE_REMOVE("ldac")
 	MCFG_DEVICE_REMOVE("rdac")
+	MCFG_DEVICE_REMOVE("vref")
 	MCFG_DEVICE_REMOVE("lspeaker")
 	MCFG_DEVICE_REMOVE("rspeaker")
 

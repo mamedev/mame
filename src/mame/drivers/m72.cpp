@@ -1906,6 +1906,7 @@ static MACHINE_CONFIG_DERIVED( rtype, m72_base )
 	MCFG_CPU_IO_MAP(rtype_sound_portmap)
 
 	MCFG_DEVICE_REMOVE("dac")
+	MCFG_DEVICE_REMOVE("vref")
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( m72_xmultipl, m72_8751 )
