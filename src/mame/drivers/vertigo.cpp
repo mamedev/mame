@@ -14,7 +14,7 @@
 #include "emu.h"
 #include "includes/vertigo.h"
 
-#include "cpu/m6805/m6805.h"
+#include "cpu/m6805/m68705.h"
 #include "cpu/m68000/m68000.h"
 #include "machine/pit8253.h"
 #include "machine/nvram.h"
@@ -28,17 +28,6 @@
  *
  *************************************/
 
-READ16_MEMBER(vertigo_state::vertigo_pit8254_lsb_r)
-{
-	return m_pit->read(space, offset);
-}
-
-WRITE16_MEMBER(vertigo_state::vertigo_pit8254_lsb_w)
-{
-	if (ACCESSING_BITS_0_7)
-		m_pit->write(space, offset, data);
-}
-
 static ADDRESS_MAP_START( vertigo_map, AS_PROGRAM, 16, vertigo_state )
 	AM_RANGE(0x000000, 0x000007) AM_ROM
 	AM_RANGE(0x000008, 0x001fff) AM_RAM AM_MIRROR(0x010000)
@@ -51,7 +40,7 @@ static ADDRESS_MAP_START( vertigo_map, AS_PROGRAM, 16, vertigo_state )
 	AM_RANGE(0x004050, 0x00405f) AM_WRITE(vertigo_audio_w) AM_MIRROR(0x001000)
 	AM_RANGE(0x004060, 0x00406f) AM_WRITE(vertigo_motor_w) AM_MIRROR(0x001000)
 	AM_RANGE(0x004070, 0x00407f) AM_WRITE(vertigo_wsot_w) AM_MIRROR(0x001000)
-	AM_RANGE(0x006000, 0x006007) AM_READWRITE(vertigo_pit8254_lsb_r, vertigo_pit8254_lsb_w)
+	AM_RANGE(0x006000, 0x006007) AM_DEVREADWRITE8("pit", pit8254_device, read, write, 0x00ff)
 	AM_RANGE(0x007000, 0x0073ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x800000, 0x81ffff) AM_ROM
 ADDRESS_MAP_END
@@ -116,27 +105,25 @@ INPUT_PORTS_END
 static MACHINE_CONFIG_START( vertigo )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 8000000)
+	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz / 3)
 	MCFG_CPU_PROGRAM_MAP(vertigo_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(vertigo_state, vertigo_interrupt, 60)
 
 	MCFG_FRAGMENT_ADD(exidy440_audio)
 
-	MCFG_DEVICE_ADD("pit8254", PIT8254, 0)
-	MCFG_PIT8253_CLK0(240000)
+	MCFG_DEVICE_ADD("pit", PIT8254, 0)
+	MCFG_PIT8253_CLK0(XTAL_24MHz / 100)
 	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(vertigo_state, v_irq4_w))
-	MCFG_PIT8253_CLK1(240000)
+	MCFG_PIT8253_CLK1(XTAL_24MHz / 100)
 	MCFG_PIT8253_OUT1_HANDLER(WRITELINE(vertigo_state, v_irq3_w))
-	MCFG_PIT8253_CLK2(240000)
+	MCFG_PIT8253_CLK2(XTAL_24MHz / 100)
 
 	MCFG_DEVICE_ADD("74148", TTL74148, 0)
 	MCFG_74148_OUTPUT_CB(vertigo_state, update_irq)
 
 	/* motor controller */
-	/*
-	MCFG_CPU_ADD("motor", M6805, 1000000)
-	MCFG_CPU_PROGRAM_MAP(vertigo_motor)
-	*/
+	MCFG_CPU_ADD("motorcpu", M68705P3, XTAL_24MHz / 6)
+
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	/* video hardware */
@@ -211,7 +198,7 @@ ROM_START( topgunnr )
 	ROM_LOAD( "vga1_7.l7",  0x10000, 0x2000, CRC(183ba71d) SHA1(03b4dc21094d5911b6f964e060cbe4450ecb71e6) )
 	ROM_LOAD( "vga1_7.m7",  0x12000, 0x2000, CRC(4866b4b7) SHA1(fa28d602b1e0a47528b710602bb32d5cc52c8db8) )
 
-	ROM_REGION( 0x800, "cpu2", 0 )
+	ROM_REGION( 0x800, "motorcpu", 0 )
 	ROM_LOAD( "vga3_4.bd1",  0x080, 0x780, CRC(a50dde56) SHA1(ef13f4cf01c9d483f2dc829a2e23965a6053f37a) )
 ROM_END
 

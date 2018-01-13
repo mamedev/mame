@@ -13,6 +13,7 @@
 #include "machine/s3c44b0.h"
 #include "machine/smartmed.h"
 #include "sound/dac.h"
+#include "sound/volt_reg.h"
 #include "rendlay.h"
 #include "screen.h"
 #include "softlist.h"
@@ -317,7 +318,8 @@ static MACHINE_CONFIG_START( juicebox )
 
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
 	MCFG_SOUND_ADD("dac", DAC_16BIT_R2R_TWOS_COMPLEMENT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0) // unknown DAC
-	MCFG_SOUND_REFERENCE_INPUT(DAC_VREF_POS_INPUT, 1.0) MCFG_SOUND_REFERENCE_INPUT(DAC_VREF_NEG_INPUT, -1.0)
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 
 	MCFG_DEVICE_ADD("s3c44b0", S3C44B0, 10000000)
 	MCFG_S3C44B0_GPIO_PORT_R_CB(READ32(juicebox_state, s3c44b0_gpio_port_r))

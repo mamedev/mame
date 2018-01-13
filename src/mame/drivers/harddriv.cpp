@@ -330,6 +330,7 @@ Notes:
 #include "includes/slapstic.h"
 #include "machine/timer.h"
 #include "machine/watchdog.h"
+#include "sound/volt_reg.h"
 #include "speaker.h"
 
 #include "racedrivpan.lh"
@@ -1581,9 +1582,10 @@ static MACHINE_CONFIG_START( ds3 )
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MCFG_SOUND_ADD("ldac", DAC_16BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0) // unknown DAC
-	MCFG_SOUND_REFERENCE_INPUT(DAC_VREF_POS_INPUT, 1.0) MCFG_SOUND_REFERENCE_INPUT(DAC_VREF_NEG_INPUT, -1.0)
 	MCFG_SOUND_ADD("rdac", DAC_16BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0) // unknown DAC
-	MCFG_SOUND_REFERENCE_INPUT(DAC_VREF_POS_INPUT, 1.0) MCFG_SOUND_REFERENCE_INPUT(DAC_VREF_NEG_INPUT, -1.0)
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "ldac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "ldac", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE_EX(0, "rdac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "rdac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 
@@ -1871,6 +1873,7 @@ MACHINE_CONFIG_MEMBER( steeltal_board_device_state::device_add_mconfig )
 	MCFG_DEVICE_REMOVE("ds3xdsp")
 	MCFG_DEVICE_REMOVE("ldac")
 	MCFG_DEVICE_REMOVE("rdac")
+	MCFG_DEVICE_REMOVE("vref")
 	MCFG_DEVICE_REMOVE("lspeaker")
 	MCFG_DEVICE_REMOVE("rspeaker")
 

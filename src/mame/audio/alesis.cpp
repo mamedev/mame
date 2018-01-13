@@ -13,6 +13,7 @@
 
 #include "emu.h"
 #include "includes/alesis.h"
+#include "sound/volt_reg.h"
 #include "speaker.h"
 
 #define LOG 1
@@ -44,7 +45,8 @@ MACHINE_CONFIG_MEMBER( alesis_dm3ag_device::device_add_mconfig )
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker1", "rspeaker1")
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker2", "rspeaker2")
 	MCFG_SOUND_ADD("dac", PCM54HP, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker1", 1.0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker1", 1.0) // PCM54HP DAC + R63/R73-75 + Sample and hold
-	MCFG_SOUND_REFERENCE_INPUT(DAC_VREF_POS_INPUT, 1.0) MCFG_SOUND_REFERENCE_INPUT(DAC_VREF_NEG_INPUT, -1.0)
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 //-------------------------------------------------

@@ -193,7 +193,7 @@ static MACHINE_CONFIG_START( citycon )
 	MCFG_CPU_PROGRAM_MAP(citycon_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", citycon_state,  irq0_line_assert)
 
-	MCFG_CPU_ADD("audiocpu", MC6809E, XTAL_20MHz / 16) // schematics allow for either a 6809 or 6809E; HD68A09EP found on one actual PCB
+	MCFG_CPU_ADD("audiocpu", MC6809E, XTAL_20MHz / 32) // schematics allow for either a 6809 or 6809E; HD68A09EP found on one actual PCB
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", citycon_state,  irq0_line_hold) //actually unused, probably it was during development
 

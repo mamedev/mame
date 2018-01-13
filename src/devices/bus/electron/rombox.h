@@ -37,23 +37,16 @@ protected:
 
 private:
 	image_init_result load_rom(device_image_interface &image, generic_slot_device *slot);
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(rom1_load) { return load_rom(image, m_rom1); }
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(rom2_load) { return load_rom(image, m_rom2); }
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(rom3_load) { return load_rom(image, m_rom3); }
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(rom4_load) { return load_rom(image, m_rom4); }
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(rom5_load) { return load_rom(image, m_rom5); }
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(rom6_load) { return load_rom(image, m_rom6); }
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(rom7_load) { return load_rom(image, m_rom7); }
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(rom8_load) { return load_rom(image, m_rom8); }
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(rom1_load) { return load_rom(image, m_rom[0]); }
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(rom2_load) { return load_rom(image, m_rom[1]); }
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(rom3_load) { return load_rom(image, m_rom[2]); }
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(rom4_load) { return load_rom(image, m_rom[3]); }
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(rom5_load) { return load_rom(image, m_rom[4]); }
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(rom6_load) { return load_rom(image, m_rom[5]); }
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(rom7_load) { return load_rom(image, m_rom[6]); }
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(rom8_load) { return load_rom(image, m_rom[7]); }
 
-	required_device<generic_slot_device> m_rom1;
-	required_device<generic_slot_device> m_rom2;
-	required_device<generic_slot_device> m_rom3;
-	required_device<generic_slot_device> m_rom4;
-	required_device<generic_slot_device> m_rom5;
-	required_device<generic_slot_device> m_rom6;
-	required_device<generic_slot_device> m_rom7;
-	required_device<generic_slot_device> m_rom8;
+	required_device_array<generic_slot_device, 8> m_rom;
 	required_ioport m_option;
 };
 

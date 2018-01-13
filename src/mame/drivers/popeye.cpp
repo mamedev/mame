@@ -12,8 +12,6 @@ Notes:
   (which is the same revision of the program code) has the protection disabled
   in a very clean way, so I don't know if it's an original (without the
   protection device to save costs), or a very well done bootleg.
-- The bootleg derives from a different revision of the program code which we
-  don't have.
 
 ***************************************************************************/
 
@@ -159,7 +157,7 @@ WRITE8_MEMBER(popeye_state::protection_w)
 
 
 
-static ADDRESS_MAP_START( skyskipr_map, AS_PROGRAM, 8, popeye_state )
+static ADDRESS_MAP_START( tnx1_map, AS_PROGRAM, 8, popeye_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0x8800, 0x8bff) AM_WRITENOP // Attempts to initialize this area with 00 on boot
@@ -169,11 +167,11 @@ static ADDRESS_MAP_START( skyskipr_map, AS_PROGRAM, 8, popeye_state )
 	AM_RANGE(0x8e80, 0x8fff) AM_RAM
 	AM_RANGE(0xa000, 0xa3ff) AM_WRITE(popeye_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0xa400, 0xa7ff) AM_WRITE(popeye_colorram_w) AM_SHARE("colorram")
-	AM_RANGE(0xc000, 0xcfff) AM_WRITE(skyskipr_bitmap_w)
+	AM_RANGE(0xc000, 0xcfff) AM_WRITE(tnx1_bitmap_w)
 	AM_RANGE(0xe000, 0xe001) AM_READWRITE(protection_r,protection_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( popeye_map, AS_PROGRAM, 8, popeye_state )
+static ADDRESS_MAP_START( tpp2_map, AS_PROGRAM, 8, popeye_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM // unpopulated 7f
 	AM_RANGE(0x8800, 0x8bff) AM_RAM
@@ -183,7 +181,7 @@ static ADDRESS_MAP_START( popeye_map, AS_PROGRAM, 8, popeye_state )
 	AM_RANGE(0x8e80, 0x8fff) AM_RAM
 	AM_RANGE(0xa000, 0xa3ff) AM_WRITE(popeye_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0xa400, 0xa7ff) AM_WRITE(popeye_colorram_w) AM_SHARE("colorram")
-	AM_RANGE(0xc000, 0xdfff) AM_WRITE(popeye_bitmap_w)
+	AM_RANGE(0xc000, 0xdfff) AM_WRITE(tpp2_bitmap_w)
 	AM_RANGE(0xe000, 0xe001) AM_READWRITE(protection_r,protection_w)
 ADDRESS_MAP_END
 
@@ -196,7 +194,7 @@ static ADDRESS_MAP_START( popeyebl_map, AS_PROGRAM, 8, popeye_state )
 	AM_RANGE(0x8e80, 0x8fff) AM_RAM
 	AM_RANGE(0xa000, 0xa3ff) AM_WRITE(popeye_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0xa400, 0xa7ff) AM_WRITE(popeye_colorram_w) AM_SHARE("colorram")
-	AM_RANGE(0xc000, 0xcfff) AM_WRITE(skyskipr_bitmap_w)
+	AM_RANGE(0xc000, 0xcfff) AM_WRITE(tnx1_bitmap_w)
 	AM_RANGE(0xe000, 0xe01f) AM_ROM AM_REGION("blprot", 0x00)
 ADDRESS_MAP_END
 
@@ -447,10 +445,10 @@ WRITE8_MEMBER(popeye_state::popeye_portB_w)
 	m_dswbit = (data & 0x0e) >> 1;
 }
 
-static MACHINE_CONFIG_START( skyskipr )
+static MACHINE_CONFIG_START( tnx1 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_8MHz/2)   /* 4 MHz */
-	MCFG_CPU_PROGRAM_MAP(skyskipr_map)
+	MCFG_CPU_PROGRAM_MAP(tnx1_map)
 	MCFG_CPU_IO_MAP(popeye_io_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", popeye_state,  popeye_interrupt)
 
@@ -465,7 +463,7 @@ static MACHINE_CONFIG_START( skyskipr )
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", popeye)
 	MCFG_PALETTE_ADD("palette", 16+16*2+64*4)
-	MCFG_PALETTE_INIT_OWNER(popeye_state, skyskipr)
+	MCFG_PALETTE_INIT_OWNER(popeye_state, tnx1)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -476,14 +474,16 @@ static MACHINE_CONFIG_START( skyskipr )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( popeyej, skyskipr )
+static MACHINE_CONFIG_DERIVED( tpp1, tnx1 )
 	MCFG_PALETTE_MODIFY("palette")
-	MCFG_PALETTE_INIT_OWNER(popeye_state,popeye)
+	MCFG_PALETTE_INIT_OWNER(popeye_state,tpp1)
+
+	MCFG_VIDEO_START_OVERRIDE(popeye_state,tpp1)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( popeye, popeyej )
+static MACHINE_CONFIG_DERIVED( tpp2, tpp1 )
 	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(popeye_map)
+	MCFG_CPU_PROGRAM_MAP(tpp2_map)
 
 	MCFG_SOUND_MODIFY("aysnd")
 	MCFG_SOUND_ROUTES_RESET()
@@ -507,12 +507,10 @@ static MACHINE_CONFIG_DERIVED( popeye, popeyej )
 
 	MCFG_NETLIST_STREAM_OUTPUT("snd_nl", 0, "ROUT.1")
 	MCFG_NETLIST_ANALOG_MULT_OFFSET(30000.0, -65000.0)
-
-	MCFG_VIDEO_START_OVERRIDE(popeye_state,popeye)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( popeyebl, popeye )
+static MACHINE_CONFIG_DERIVED( popeyebl, tpp1 )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(popeyebl_map)
 
@@ -815,7 +813,7 @@ ROM_START( popeyejo )
 ROM_END
 
 
-DRIVER_INIT_MEMBER(popeye_state,skyskipr)
+DRIVER_INIT_MEMBER(popeye_state,tnx1)
 {
 	uint8_t *rom = memregion("maincpu")->base();
 	int len = memregion("maincpu")->bytes();
@@ -834,7 +832,7 @@ DRIVER_INIT_MEMBER(popeye_state,skyskipr)
 	save_item(NAME(m_prot_shift));
 }
 
-DRIVER_INIT_MEMBER(popeye_state,popeye)
+DRIVER_INIT_MEMBER(popeye_state,tpp2)
 {
 	uint8_t *rom = memregion("maincpu")->base();
 	int len = memregion("maincpu")->bytes();
@@ -854,12 +852,12 @@ DRIVER_INIT_MEMBER(popeye_state,popeye)
 }
 
 
-GAME( 1981, skyskipr, 0,      skyskipr, skyskipr, popeye_state, skyskipr, ROT0, "Nintendo", "Sky Skipper",                          MACHINE_SUPPORTS_SAVE )
-GAME( 1982, popeye,   0,      popeye,   popeye,   popeye_state, popeye,   ROT0, "Nintendo", "Popeye (revision D)",                  MACHINE_SUPPORTS_SAVE )
-GAME( 1982, popeyeu,  popeye, popeye,   popeye,   popeye_state, popeye,   ROT0, "Nintendo", "Popeye (revision D not protected)",    MACHINE_SUPPORTS_SAVE )
-GAME( 1982, popeyef,  popeye, popeye,   popeyef,  popeye_state, popeye,   ROT0, "Nintendo", "Popeye (revision F)",                  MACHINE_SUPPORTS_SAVE )
-GAME( 1982, popeyebl, popeye, popeyebl, popeye,   popeye_state, 0,        ROT0, "bootleg",  "Popeye (bootleg set 1)",               MACHINE_SUPPORTS_SAVE )
-GAME( 1982, popeyeb2, popeye, popeyebl, popeye,   popeye_state, 0,        ROT0, "bootleg",  "Popeye (bootleg set 2)",               MACHINE_SUPPORTS_SAVE )
-GAME( 1982, popeyeb3, popeye, popeye,   popeye,   popeye_state, popeye,   ROT0, "bootleg",  "Popeye (bootleg set 3)",               MACHINE_SUPPORTS_SAVE )
-GAME( 1982, popeyej,  popeye, popeyej,  popeye,   popeye_state, skyskipr, ROT0, "Nintendo", "Popeye (Japan, Sky Skipper hardware)", MACHINE_SUPPORTS_SAVE ) // this is the original Japanese release on the same hardware as Sky Skipper
-GAME( 1982, popeyejo, popeye, popeyej,  popeye,   popeye_state, skyskipr, ROT0, "Nintendo", "Popeye (Japan, Sky Skipper hardware, Older)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, skyskipr, 0,      tnx1,     skyskipr, popeye_state, tnx1, ROT0, "Nintendo", "Sky Skipper",                          MACHINE_SUPPORTS_SAVE )
+GAME( 1982, popeye,   0,      tpp2,     popeye,   popeye_state, tpp2, ROT0, "Nintendo", "Popeye (revision D)",                  MACHINE_SUPPORTS_SAVE )
+GAME( 1982, popeyeu,  popeye, tpp2,     popeye,   popeye_state, tpp2, ROT0, "Nintendo", "Popeye (revision D not protected)",    MACHINE_SUPPORTS_SAVE )
+GAME( 1982, popeyef,  popeye, tpp2,     popeyef,  popeye_state, tpp2, ROT0, "Nintendo", "Popeye (revision F)",                  MACHINE_SUPPORTS_SAVE )
+GAME( 1982, popeyebl, popeye, popeyebl, popeye,   popeye_state, 0,    ROT0, "bootleg",  "Popeye (bootleg set 1)",               MACHINE_SUPPORTS_SAVE )
+GAME( 1982, popeyeb2, popeye, popeyebl, popeye,   popeye_state, 0,    ROT0, "bootleg",  "Popeye (bootleg set 2)",               MACHINE_SUPPORTS_SAVE )
+GAME( 1982, popeyeb3, popeye, tpp2,     popeye,   popeye_state, tpp2, ROT0, "bootleg",  "Popeye (bootleg set 3)",               MACHINE_SUPPORTS_SAVE )
+GAME( 1982, popeyej,  popeye, tpp1,     popeye,   popeye_state, tnx1, ROT0, "Nintendo", "Popeye (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, popeyejo, popeye, tpp1,     popeye,   popeye_state, tnx1, ROT0, "Nintendo", "Popeye (Japan, Older)", MACHINE_SUPPORTS_SAVE )

@@ -198,6 +198,7 @@ Stephh's additional notes (based on the game Z80 code and some tests) :
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
 #include "sound/dac.h"
+#include "sound/volt_reg.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -795,7 +796,8 @@ static MACHINE_CONFIG_START( nycaptor )
 	// Does the DAC also exist on this board? nycaptor writes 0x80 to 0xd600
 	// Update: of course it exists, sound board seems common Taito design.
 	MCFG_SOUND_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25) // unknown DAC
-	MCFG_SOUND_REFERENCE_INPUT(DAC_VREF_POS_INPUT, 1.0) MCFG_SOUND_REFERENCE_INPUT(DAC_VREF_NEG_INPUT, -1.0)
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( cyclshtg )
@@ -866,7 +868,8 @@ static MACHINE_CONFIG_START( cyclshtg )
 	// pin 22 Noise Output  not mapped
 
 	MCFG_SOUND_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25) // unknown DAC
-	MCFG_SOUND_REFERENCE_INPUT(DAC_VREF_POS_INPUT, 1.0) MCFG_SOUND_REFERENCE_INPUT(DAC_VREF_NEG_INPUT, -1.0)
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 
@@ -934,7 +937,8 @@ static MACHINE_CONFIG_START( bronx )
 	// pin 22 Noise Output  not mapped
 
 	MCFG_SOUND_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25) // unknown DAC
-	MCFG_SOUND_REFERENCE_INPUT(DAC_VREF_POS_INPUT, 1.0) MCFG_SOUND_REFERENCE_INPUT(DAC_VREF_NEG_INPUT, -1.0)
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 

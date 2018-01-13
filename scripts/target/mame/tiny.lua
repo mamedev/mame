@@ -21,6 +21,7 @@ CPUS["M6502"] = true
 CPUS["MCS48"] = true
 CPUS["MCS51"] = true
 CPUS["M6800"] = true
+CPUS["M6805"] = true
 CPUS["M6809"] = true
 CPUS["M680X0"] = true
 CPUS["TMS9900"] = true
@@ -43,6 +44,7 @@ SOUNDS["HC55516"] = true
 SOUNDS["YM3812"] = true
 SOUNDS["CEM3394"] = true
 SOUNDS["VOTRAX"] = true
+SOUNDS["VOLT_REG"] = true
 
 --------------------------------------------------
 -- specify available video cores

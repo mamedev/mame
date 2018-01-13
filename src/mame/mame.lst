@@ -13660,6 +13660,7 @@ vindctr2r2                      // 136059           (c) 1988
 
 @source:gb.cpp
 gameboy                         // Nintendo Game Boy Handheld
+gamefgtr                        // bootleg
 gbcolor                         // Nintendo Game Boy Color Handheld
 gbpocket                        // Nintendo Game Boy Pocket Handheld
 megaduck                        // Megaduck
@@ -14744,6 +14745,7 @@ gnw_mario                       // Nintendo
 gnw_mariocm                     // Nintendo
 gnw_mmouse                      // Nintendo
 gnw_mickdon                     // Nintendo
+gnw_smb                         // Nintendo
 kbilly                          // Konami
 kblades                         // Konami
 kbucky                          // Konami
@@ -14993,6 +14995,7 @@ homelab4                        //
 dynashot                        // (c) 1988 Jaleco
 ganjaja                         // (c) 1990 Jaleco
 homerun                         // (c) 1988 Jaleco
+nhomerun                        // (c) 1988 Jaleco
 
 @source:homez80.cpp
 homez80                         //

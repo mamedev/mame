@@ -54,7 +54,7 @@
  *MP1296   TMS1100?  1982, Entex Black Knight
  @MP1312   TMS1100   1983, Gakken FX-Micom R-165/Tandy Radio Shack Science Fair Microcomputer Trainer
  *MP1359   TMS1100?  1985, Capsela CRC2000
- @MP1525   TMS1170   1980, Coleco Head to Head Baseball
+ @MP1525   TMS1170   1980, Coleco Head to Head: Electronic Baseball
  @MP1604   TMS1370   1982, Gakken Invader 2000/Tandy Cosmic Fire Away 3000
  @MP1801   TMS1700   1981, Tiger Ditto/Tandy Pocket Repeat (model 60-2152)
  @MP2105   TMS1370   1979, Gakken/Entex Poker (6005)
@@ -68,7 +68,8 @@
  *MP3232   TMS1000   1979, Fonas 2-Player Baseball (no "MP" on chip label)
  @MP3300   TMS1000   1979, Milton Bradley Simon (Rev F)
  @MP3301A  TMS1000   1979, Milton Bradley Big Trak
- *MP3320A  TMS1000   1979, Coleco Head to Head Basketball
+ *MP3320A  TMS1000   1980, Coleco Head to Head: Electronic Basketball
+ *MP3321A  TMS1000   1980, Coleco Head to Head: Electronic Hockey
  @M32001   TMS1000   1981, Coleco Quiz Wiz Challenger (note: MP3398, MP3399, M3200x?)
  *M32018   TMS1000   1990, unknown device (have decap/dump)
   M32045B  TMS1000   1983, Chrysler Electronic Voice Alert (11-function) -> eva.cpp
@@ -82,7 +83,7 @@
   MP3454   TMS1100   1979, MicroVision cartridge: Star Trek Phaser Strike
   MP3455   TMS1100   1980, MicroVision cartridge: Pinball
   MP3457   TMS1100   1979, MicroVision cartridge: Mindbuster
- @MP3460   TMS1100   1980, Coleco Head to Head Football
+ @MP3460   TMS1100   1980, Coleco Head to Head: Electronic Football
   MP3474   TMS1100   1979, MicroVision cartridge: Vegas Slots
   MP3475   TMS1100   1979, MicroVision cartridge: Bowling
  @MP3476   TMS1100   1979, Milton Bradley Super Simon
@@ -97,7 +98,7 @@
  @M34012   TMS1100   1980, Mattel Dungeons & Dragons - Computer Labyrinth Game
  *M34014   TMS1100   1981, Coleco Bowlatronic
   M34017   TMS1100   1981, MicroVision cartridge: Cosmic Hunter
- @M34018   TMS1100   1981, Coleco Head to Head Boxing
+ @M34018   TMS1100   1981, Coleco Head to Head: Electronic Boxing
  @M34038   TMS1100   1982, Parker Brothers Lost Treasure
   M34047   TMS1100   1982, MicroVision cartridge: Super Blockbuster
  @M34078A  TMS1100   1983, Milton Bradley Electronic Arcade Mania
@@ -1348,7 +1349,7 @@ MACHINE_CONFIG_END
 
 /***************************************************************************
 
-  Coleco Head to Head Football
+  Coleco Head to Head: Electronic Football
   * TMS1100NLLE (rev. E!) MP3460 (die label same)
   * 2*SN75492N LED display drivers, 9-digit LED grid, 1-bit sound
 
@@ -1356,7 +1357,7 @@ MACHINE_CONFIG_END
   offense blips (should) appear brighter. The hardware is similar to cqback.
 
   known releases:
-  - USA(1): Head to Head Football
+  - USA(1): Head to Head: Electronic Football
   - USA(2): Team Play Football, published by Sears
 
 ***************************************************************************/
@@ -1465,13 +1466,13 @@ MACHINE_CONFIG_END
 
 /***************************************************************************
 
-  Coleco Head to Head Baseball
+  Coleco Head to Head: Electronic Baseball
   * PCB labels Coleco rev C 73891/2
   * TMS1170NLN MP1525-N2 (die label MP1525)
   * 9-digit cyan VFD display, and other LEDs behind bezel, 1-bit sound
 
   known releases:
-  - USA: Head to Head Baseball
+  - USA: Head to Head: Electronic Baseball
   - Japan: Computer Baseball, published by Tsukuda
 
 ***************************************************************************/
@@ -1603,7 +1604,7 @@ MACHINE_CONFIG_END
 
 /***************************************************************************
 
-  Coleco Head to Head Boxing
+  Coleco Head to Head: Electronic Boxing
   * TMS1100NLL M34018-N2 (die label M34018)
   * 2-digit 7seg LED display, LED grid display, 1-bit sound
 
@@ -10091,9 +10092,9 @@ CONS( 1979, bcheetah,   0,         0, bcheetah,  bcheetah,  bcheetah_state,  0, 
 CONS( 1978, amaztron,   0,         0, amaztron,  amaztron,  amaztron_state,  0, "Coleco", "Amaze-A-Tron", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS ) // ***
 COMP( 1979, zodiac,     0,         0, zodiac,    zodiac,    zodiac_state,    0, "Coleco", "Zodiac - The Astrology Computer", MACHINE_SUPPORTS_SAVE )
 CONS( 1978, cqback,     0,         0, cqback,    cqback,    cqback_state,    0, "Coleco", "Electronic Quarterback", MACHINE_SUPPORTS_SAVE )
-CONS( 1980, h2hfootb,   0,         0, h2hfootb,  h2hfootb,  h2hfootb_state,  0, "Coleco", "Head to Head Football", MACHINE_SUPPORTS_SAVE )
-CONS( 1980, h2hbaseb,   0,         0, h2hbaseb,  h2hbaseb,  h2hbaseb_state,  0, "Coleco", "Head to Head Baseball", MACHINE_SUPPORTS_SAVE )
-CONS( 1981, h2hboxing,  0,         0, h2hboxing, h2hboxing, h2hboxing_state, 0, "Coleco", "Head to Head Boxing", MACHINE_SUPPORTS_SAVE )
+CONS( 1980, h2hfootb,   0,         0, h2hfootb,  h2hfootb,  h2hfootb_state,  0, "Coleco", "Head to Head: Electronic Football", MACHINE_SUPPORTS_SAVE )
+CONS( 1980, h2hbaseb,   0,         0, h2hbaseb,  h2hbaseb,  h2hbaseb_state,  0, "Coleco", "Head to Head: Electronic Baseball", MACHINE_SUPPORTS_SAVE )
+CONS( 1981, h2hboxing,  0,         0, h2hboxing, h2hboxing, h2hboxing_state, 0, "Coleco", "Head to Head: Electronic Boxing", MACHINE_SUPPORTS_SAVE )
 CONS( 1981, quizwizc,   0,         0, quizwizc,  quizwizc,  quizwizc_state,  0, "Coleco", "Quiz Wiz Challenger", MACHINE_SUPPORTS_SAVE ) // ***
 CONS( 1981, tc4,        0,         0, tc4,       tc4,       tc4_state,       0, "Coleco", "Total Control 4", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 

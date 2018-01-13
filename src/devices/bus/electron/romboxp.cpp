@@ -96,10 +96,10 @@ MACHINE_CONFIG_MEMBER( electron_romboxp_device::device_add_mconfig )
 	MCFG_GENERIC_LOAD(electron_romboxp_device, rom4_load)
 
 	/* cartridges */
-	MCFG_GENERIC_CARTSLOT_ADD("cart_sk1", generic_plain_slot, "electron_cart") // ROM SLOT 2/3
-	MCFG_GENERIC_LOAD(electron_romboxp_device, electron_cart_sk1)
-	MCFG_GENERIC_CARTSLOT_ADD("cart_sk2", generic_plain_slot, "electron_cart") // ROM SLOT 0/1
-	MCFG_GENERIC_LOAD(electron_romboxp_device, electron_cart_sk2)
+	MCFG_GENERIC_CARTSLOT_ADD("cart1", generic_plain_slot, "electron_cart") // ROM SLOT 0/1
+	MCFG_GENERIC_LOAD(electron_romboxp_device, cart1_load)
+	MCFG_GENERIC_CARTSLOT_ADD("cart2", generic_plain_slot, "electron_cart") // ROM SLOT 2/3
+	MCFG_GENERIC_LOAD(electron_romboxp_device, cart2_load)
 MACHINE_CONFIG_END
 
 const tiny_rom_entry *electron_romboxp_device::device_rom_region() const
@@ -119,12 +119,8 @@ electron_romboxp_device::electron_romboxp_device(const machine_config &mconfig, 
 	: device_t(mconfig, ELECTRON_ROMBOXP, tag, owner, clock),
 		device_electron_expansion_interface(mconfig, *this),
 	m_exp_rom(*this, "exp_rom"),
-	m_rom1(*this, "rom1"),
-	m_rom2(*this, "rom2"),
-	m_rom3(*this, "rom3"),
-	m_rom4(*this, "rom4"),
-	m_cart_sk1(*this, "cart_sk1"),
-	m_cart_sk2(*this, "cart_sk2"),
+	m_rom(*this, "rom%u", 1),
+	m_cart(*this, "cart%u", 1),
 	m_centronics(*this, "centronics"),
 	m_cent_data_out(*this, "cent_data_out"),
 	m_option(*this, "OPTION")
@@ -154,30 +150,20 @@ void electron_romboxp_device::device_reset()
 	memory_region *tmp_reg;
 
 	int rom_base = (m_option->read() & 0x02) ? 4 : 12;
-	if (m_rom1 && (tmp_reg = memregion(region_tag.assign(m_rom1->tag()).append(GENERIC_ROM_REGION_TAG).c_str())))
+	for (int i = 0; i < 4; i++)
 	{
-		machine().root_device().membank("bank2")->configure_entry(rom_base + 0, tmp_reg->base());
-	}
-	if (m_rom2 && (tmp_reg = memregion(region_tag.assign(m_rom2->tag()).append(GENERIC_ROM_REGION_TAG).c_str())))
-	{
-		machine().root_device().membank("bank2")->configure_entry(rom_base + 1, tmp_reg->base());
-	}
-	if (m_rom3 && (tmp_reg = memregion(region_tag.assign(m_rom3->tag()).append(GENERIC_ROM_REGION_TAG).c_str())))
-	{
-		machine().root_device().membank("bank2")->configure_entry(rom_base + 2, tmp_reg->base());
-	}
-	if (m_rom4 && (tmp_reg = memregion(region_tag.assign(m_rom4->tag()).append(GENERIC_ROM_REGION_TAG).c_str())))
-	{
-		machine().root_device().membank("bank2")->configure_entry(rom_base + 3, tmp_reg->base());
+		if (m_rom[i] && (tmp_reg = memregion(region_tag.assign(m_rom[i]->tag()).append(GENERIC_ROM_REGION_TAG).c_str())))
+		{
+			machine().root_device().membank("bank2")->configure_entry(rom_base + i, tmp_reg->base());
+		}
 	}
 
-	if (m_cart_sk2 && (tmp_reg = memregion(region_tag.assign(m_cart_sk2->tag()).append(GENERIC_ROM_REGION_TAG).c_str())))
+	for (int i = 0; i < 2; i++)
 	{
-		machine().root_device().membank("bank2")->configure_entries(0, 2, tmp_reg->base(), 0x4000);
-	}
-	if (m_cart_sk1 && (tmp_reg = memregion(region_tag.assign(m_cart_sk1->tag()).append(GENERIC_ROM_REGION_TAG).c_str())))
-	{
-		machine().root_device().membank("bank2")->configure_entries(2, 2, tmp_reg->base(), 0x4000);
+		if (m_cart[i] && (tmp_reg = memregion(region_tag.assign(m_cart[i]->tag()).append(GENERIC_ROM_REGION_TAG).c_str())))
+		{
+			machine().root_device().membank("bank2")->configure_entries(i * 2, 2, tmp_reg->base(), 0x4000);
+		}
 	}
 
 	machine().root_device().membank("bank2")->configure_entry(12, memregion("exp_rom")->base());
