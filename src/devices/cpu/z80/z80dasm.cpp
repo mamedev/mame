@@ -416,6 +416,8 @@ offs_t z80_disassembler::disassemble(std::ostream &stream, offs_t pc, const data
 		break;
 	case 0xed:
 		d = &mnemonic_ed[opcodes.r8(pos++)];
+		if (d->mnemonic == zDB)
+			pos--;
 		break;
 	case 0xdd:
 	{
@@ -428,7 +430,11 @@ offs_t z80_disassembler::disassemble(std::ostream &stream, offs_t pc, const data
 			d = &mnemonic_xx_cb[op1];
 		}
 		else
+		{
 			d = &mnemonic_xx[op1];
+			if (d->mnemonic == zDB)
+				pos--;
+		}
 		break;
 	}
 	case 0xfd:
@@ -442,7 +448,11 @@ offs_t z80_disassembler::disassemble(std::ostream &stream, offs_t pc, const data
 			d = &mnemonic_xx_cb[op1];
 		}
 		else
+		{
 			d = &mnemonic_xx[op1];
+			if (d->mnemonic == zDB)
+				pos--;
+		}
 		break;
 	}
 	default:
