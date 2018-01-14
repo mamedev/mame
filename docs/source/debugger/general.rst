@@ -29,7 +29,7 @@ You can also type **help <command>** for further details on each command in the 
 
  .. _debugger-command-do:
 
-Do
+do
 --
 
 |  **do <expression>**
@@ -46,7 +46,7 @@ Do
 
  .. _debugger-command-symlist:
 
-Symlist
+symlist
 -------
 
 |  **symlist [<cpu>]**
@@ -68,7 +68,7 @@ Symlist
 
  .. _debugger-command-softreset:
  
-Softreset
+softreset
 ---------
 
 |  **softreset**
@@ -86,7 +86,7 @@ Softreset
 
  .. _debugger-command-hardreset:
  
-Hardreset
+hardreset
 ---------
 
 |  **hardreset**
@@ -104,7 +104,7 @@ Hardreset
 
  .. _debugger-command-print:
 
-Print
+print
 -----
 
 |  **print <item>[,...]**
@@ -126,7 +126,7 @@ Print
 
  .. _debugger-command-printf:
  
-Printf
+printf
 ------
 
 |  **printf <format>[,<item>[,...]]**
@@ -153,7 +153,7 @@ Printf
 
  .. _debugger-command-logerror:
  
-Logerror
+logerror
 --------
 
 |  **logerror <format>[,<item>[,...]]**
@@ -180,7 +180,7 @@ Logerror
 
  .. _debugger-command-tracelog:
 
-Tracelog
+tracelog
 --------
 
 |  **tracelog <format>[,<item>[,...]]**
@@ -202,7 +202,7 @@ Tracelog
 
  .. _debugger-command-tracesym:
 
-Tracesym
+tracesym
 --------
 
 |  **tracesym <item>[,...]**
@@ -224,7 +224,7 @@ Tracesym
 
  .. _debugger-command-trackpc:
 
-Trackpc
+trackpc
 -------
 
 |  **trackpc [<bool>,<cpu>,<bool>]**
@@ -246,7 +246,7 @@ Trackpc
 
  .. _debugger-command-trackmem:
 
-Trackmem
+trackmem
 --------
 
 |  **trackmem [<bool>,<cpu>,<bool>]**
@@ -268,7 +268,7 @@ Trackmem
 
  .. _debugger-command-pcatmem:
 
-Pcatmem
+pcatmem
 -------
 
 |  **pcatmem(p/d/i) <address>[,<cpu>]**
@@ -290,7 +290,7 @@ Pcatmem
 
  .. _debugger-command-rewind:
  
-Rewind
+rewind
 ------
 
 |  **rewind[rw]**
@@ -302,7 +302,7 @@ Rewind
 
  .. _debugger-command-statesave:
 
-Statesave
+statesave
 ---------
 
 |  **statesave[ss] <filename>**
@@ -320,7 +320,7 @@ Statesave
 
  .. _debugger-command-stateload:
 
-Stateload
+stateload
 ---------
 
 |  **stateload[sl] <filename>**
@@ -338,7 +338,7 @@ Stateload
 
  .. _debugger-command-snap:
 
-Snap
+snap
 ----
 
 |  **snap [[<filename>], <scrnum>]**
@@ -360,7 +360,7 @@ Snap
 
  .. _debugger-command-source:
 
-Source
+source
 ------
 
 |  **source <filename>**
@@ -378,7 +378,7 @@ Source
 
  .. _debugger-command-quit:
 
-Quit
+quit
 ----
 
 |  **quit**

@@ -15,7 +15,7 @@ You can also type **help <command>** for further details on each command in the 
 
  .. _debugger-command-comadd:
 
-Comadd
+comadd
 ------
 
 |  **comadd[//] <address>,<comment>**
@@ -35,7 +35,7 @@ Comadd
 
  .. _debugger-command-comdelete:
 
-Comdelete
+comdelete
 ---------
 
 |  **comdelete**
@@ -51,7 +51,7 @@ Comdelete
 
  .. _debugger-command-comsave:
 
-Comsave
+comsave
 -------
 
 |  **comsave**
@@ -67,7 +67,7 @@ Comsave
 
  .. _debugger-command-comlist:
 
-Comlist
+comlist
 -------
 
 |  **comlist**
@@ -83,7 +83,7 @@ Comlist
 
  .. _debugger-command-commit:
 
-Commit
+commit
 ------
 
 |  **commit[/*] <address>,<comment>**

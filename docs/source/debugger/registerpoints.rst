@@ -16,7 +16,7 @@ You can also type **help <command>** for further details on each command in the 
 
  .. _debugger-command-rpset:
 
-Rpset
+rpset
 -----
 
 |  **rp[set] {<condition>}[,<action>]]**
@@ -44,7 +44,7 @@ Rpset
 
  .. _debugger-command-rpclear:
 
-Rpclear
+rpclear
 -------
 
 |  **rpclear [<rpnum>]**
@@ -66,7 +66,7 @@ Rpclear
 
  .. _debugger-command-rpdisable:
 
-Rpdisable
+rpdisable
 ---------
 
 |  **rpdisable [<rpnum>]**
@@ -88,7 +88,7 @@ Rpdisable
 
  .. _debugger-command-rpenable:
 
-Rpenable
+rpenable
 --------
 
 |  **rpenable [<rpnum>]**
@@ -110,7 +110,7 @@ Rpenable
 
  .. _debugger-command-rplist:
 
-Rplist
+rplist
 ------
 
 |  **rplist**
