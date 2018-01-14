@@ -1,6 +1,6 @@
 -- get marp high score file from http://replay.marpirc.net/txt/scores3.htm
 local dat = {}
-local db, sql = require("data/database")()
+local db = require("data/database")
 local ver, info
 
 local function init()
@@ -17,9 +17,9 @@ local function init()
 		end
 	end
 
-	local stmt = db:prepare("SELECT version FROM version WHERE datfile = ?")
+	local stmt = db.prepare("SELECT version FROM version WHERE datfile = ?")
 	stmt:bind_values(file)
-	if stmt:step() == sql.ROW then
+	if stmt:step() == db.ROW then
 		dbver = stmt:get_value(0)
 	end
 	stmt:finalize()
@@ -31,10 +31,10 @@ local function init()
 	elseif not fh then
 		return
 	elseif not dbver then
-		db:exec("CREATE TABLE \"" .. file .. [[" (
+		db.exec("CREATE TABLE \"" .. file .. [[" (
 		romset VARCHAR NOT NULL,
 		data CLOB NOT NULL)]])
-		db:exec("CREATE INDEX \"romset_" .. file .. "\" ON \"" .. file .. "_idx\"(romset)")
+		db.exec("CREATE INDEX \"romset_" .. file .. "\" ON \"" .. file .. "_idx\"(romset)")
 	end
 
 	for line in fh:lines() do
@@ -56,11 +56,11 @@ local function init()
 	end
 
 	if dbver then
-		db:exec("DELETE FROM \"" .. file .. "\"")
-		db:exec("DELETE FROM \"" .. file .. "_idx\"")
-		stmt = db:prepare("UPDATE version SET version = ? WHERE datfile = ?")
+		db.exec("DELETE FROM \"" .. file .. "\"")
+		db.exec("DELETE FROM \"" .. file .. "_idx\"")
+		stmt = db.prepare("UPDATE version SET version = ? WHERE datfile = ?")
 	else
-		stmt = db:prepare("INSERT INTO version VALUES (?, ?)")
+		stmt = db.prepare("INSERT INTO version VALUES (?, ?)")
 	end
 	stmt:bind_values(ver, file)
 	stmt:step()
@@ -68,7 +68,7 @@ local function init()
 
 	fh:seek("set")
 	local buffer = fh:read("a")
-	db:exec("BEGIN TRANSACTION")
+	db.exec("BEGIN TRANSACTION")
 
 	local function gmatchpos()
 		local pos = 1
@@ -102,25 +102,23 @@ local function init()
 	end
 
 	for set, data in gmatchpos() do
-		stmt = db:prepare("INSERT INTO \"" .. file .. "\" VALUES (?, ?)")
+		stmt = db.prepare("INSERT INTO \"" .. file .. "\" VALUES (?, ?)")
 		stmt:bind_values(set, data)
 		stmt:step()
 		stmt:finalize()
 	end
 	fh:close()
-	db:exec("END TRANSACTION")
+	db.exec("END TRANSACTION")
 end
 
-if db then
-	init()
-end
+init()
 
 function dat.check(set, softlist)
-	if softlist or not ver or not db then
+	if softlist or not ver then
 		return nil
 	end
 	info = nil
-	local stmt = db:prepare("SELECT data FROM \"scores3.htm\" AS f WHERE romset = ?")
+	local stmt = db.prepare("SELECT data FROM \"scores3.htm\" AS f WHERE romset = ?")
 	stmt:bind_values(set)
 	if stmt:step() == sql.ROW then
 		info = "#j2\n" .. stmt:get_value(0)

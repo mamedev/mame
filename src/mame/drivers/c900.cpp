@@ -30,6 +30,7 @@ into the weeds (jumps to 00000).
 //#include "machine/z80scc.h"
 //#include "bus/rs232/rs232.h"
 #include "machine/terminal.h"
+#include "machine/z8536.h"
 
 
 class c900_state : public driver_device
@@ -41,7 +42,6 @@ public:
 		, m_terminal(*this, "terminal")
 	{ }
 
-	DECLARE_READ16_MEMBER(port1e_r);
 	DECLARE_READ16_MEMBER(key_r);
 	DECLARE_READ16_MEMBER(stat_r);
 	void kbd_put(u8 data);
@@ -62,21 +62,14 @@ static ADDRESS_MAP_START(data_map, AS_DATA, 16, c900_state)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(io_map, AS_IO, 16, c900_state)
+	AM_RANGE(0x0000, 0x007f) AM_DEVREADWRITE8("cio", z8036_device, read, write, 0x00ff)
 	//AM_RANGE(0x0100, 0x011f) AM_DEVREADWRITE8("scc", scc8030_device, zbus_r, zbus_w, 0x00ff)  // range for one channel
-	AM_RANGE(0x0010, 0x0011) AM_READ(stat_r)
-	AM_RANGE(0x001A, 0x001B) AM_READ(key_r)
-	AM_RANGE(0x001E, 0x001F) AM_READ(port1e_r)
 	AM_RANGE(0x0100, 0x0101) AM_READ(stat_r)
 	AM_RANGE(0x0110, 0x0111) AM_READ(key_r) AM_DEVWRITE8("terminal", generic_terminal_device, write, 0x00ff)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( c900 )
 INPUT_PORTS_END
-
-READ16_MEMBER( c900_state::port1e_r )
-{
-	return 0;
-}
 
 READ16_MEMBER( c900_state::key_r )
 {
@@ -124,6 +117,8 @@ static MACHINE_CONFIG_START( c900 )
 	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(PUT(c900_state, kbd_put))
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", c900)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
+
+	MCFG_DEVICE_ADD("cio", Z8036, 6'000'000)
 
 	//MCFG_SCC8030_ADD("scc", 6'000'000, 326400, 0, 326400, 0)
 	/* Port A */

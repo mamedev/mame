@@ -33255,6 +33255,9 @@ sapizps3                        //
 sapizps3a                       //
 sapizps3b                       //
 
+@source:sartorius.cpp
+sart3733                        //
+
 @source:saturn.cpp
 hisaturn                        // Hitachi HiSaturn
 saturn                          // 1995 Sega Saturn (USA)
