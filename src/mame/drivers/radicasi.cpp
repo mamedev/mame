@@ -30,6 +30,103 @@
 	---
 	The XaviX ones seem to have a XaviX logo on the external packaging while the
 	ones for this driver don't seem to have any specific marking.
+
+
+	Notes:
+
+	To access internal test on Tetris hold P1 Down + P1 Anticlockwise (Button 2) on boot
+	There appears to be a similar mode for Invaders but I don't know if it's accessible
+
+
+	RAM 0xa0 and 0xa1 contain the ACD0 and AD1 values and player 2 controls if between
+	certain values? probably read via serial??
+
+	Custom Interrupt purposes
+
+	TETRIS
+
+	ffb0
+	nothing of note?
+
+	ffb4
+	stuff with 500e, 500c and 500d
+
+	ffb8
+	stuff with 50a4 / 50a5 / 50a6  and memory address e2
+
+	ffbc
+	stuff with 50a4 / 50a5 / 50a6  and memory address e2 (similar to above, different bits)
+
+	ffc0 - doesn't exist
+	ffc4 - doesn't exist
+	ffc8 - doesn't exist
+	ffd0 - doesn't exist
+
+	ffd4
+	main irq?
+
+	ffd8
+	jumps straight to an rti
+
+	ffdc
+	accesses 501d / 501b
+
+	SPACE INVADERS
+
+	ffb0
+	rti
+
+	ffb4
+	rti
+
+	ffb8
+	rti
+
+	ffbc
+	decreases 301  bit 02
+	stuff wit 50a5
+
+	ffc0
+	decreases 302
+	stuff with 50a5 bit 04
+
+	ffc4
+	decreases 303
+	stuff with 50a5  bit 08
+
+	ffc8
+	decreases 304  
+	stuff with 50a5  bit 10
+
+	ffcc
+	uses 307
+	stuff with 50a5  bit 20
+
+	ffd0
+	dead loop
+
+	ffd4
+	main interrupt
+
+	ffd8
+	dead loop
+
+	ffdc
+	dead loop
+
+	ffe0
+	dead loop
+
+	ffe4
+	rti
+
+	ffe8
+	dead loop
+
+	ffec
+	dead loop
+
+
 */
 
 #include "emu.h"
@@ -221,10 +318,13 @@ void radica_6502_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap
 		bb = sometimes set in invaders
 
 		AA = attributes
-		e--- --sS
+		e--- fFsS
 		e = enable
 		S = SizeX
 		s = SizeY
+		F = FlipX
+		f = FlipY (assumed, not seen)
+
 	*/
 
 	for (int i = 0; i < 512; i += 8)
@@ -257,7 +357,16 @@ void radica_6502_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap
 
 		for (int yy = 0; yy < sizey; yy++)
 		{
-			uint16_t* row = &bitmap.pix16((y + yy) & 0xff);
+			uint16_t* row;
+				
+			if (attrs & 0x08) // guess flipy
+			{
+				row = &bitmap.pix16((y + (sizey - 1 - yy)) & 0xff);
+			}
+			else
+			{
+				row = &bitmap.pix16((y + yy) & 0xff);
+			}
 
 			for (int xx = 0; xx < sizex; xx++)
 			{
@@ -267,7 +376,16 @@ void radica_6502_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap
 				uint8_t pix = fullbankspace.read_byte(realaddr);
 
 				if (pix)
-					row[(x + xx) & 0xff] = pix;// + attr;
+				{
+					if (attrs & 0x04) // flipx
+					{
+						row[(x + (sizex - 1 - xx)) & 0xff] = pix;// + attr;
+					}
+					else
+					{
+						row[(x + xx) & 0xff] = pix;// + attr;
+					}
+				}
 			}
 		}
 	}
