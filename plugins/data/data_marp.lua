@@ -18,6 +18,7 @@ local function init()
 	end
 
 	local stmt = db.prepare("SELECT version FROM version WHERE datfile = ?")
+	db.check("reading marp version")
 	stmt:bind_values(file)
 	if stmt:step() == db.ROW then
 		dbver = stmt:get_value(0)
@@ -34,7 +35,9 @@ local function init()
 		db.exec("CREATE TABLE \"" .. file .. [[" (
 		romset VARCHAR NOT NULL,
 		data CLOB NOT NULL)]])
+		db.check("creating marp table")
 		db.exec("CREATE INDEX \"romset_" .. file .. "\" ON \"" .. file .. "_idx\"(romset)")
+		db.check("creating marp index")
 	end
 
 	for line in fh:lines() do
@@ -57,10 +60,14 @@ local function init()
 
 	if dbver then
 		db.exec("DELETE FROM \"" .. file .. "\"")
+		db.check("deleting marp")
 		db.exec("DELETE FROM \"" .. file .. "_idx\"")
+		db.check("deleting marp index")
 		stmt = db.prepare("UPDATE version SET version = ? WHERE datfile = ?")
+		db.check("updating marp version")
 	else
 		stmt = db.prepare("INSERT INTO version VALUES (?, ?)")
+		db.check("inserting marp version")
 	end
 	stmt:bind_values(ver, file)
 	stmt:step()
@@ -69,6 +76,7 @@ local function init()
 	fh:seek("set")
 	local buffer = fh:read("a")
 	db.exec("BEGIN TRANSACTION")
+	db.check("beginning marp transation")
 
 	local function gmatchpos()
 		local pos = 1
@@ -103,12 +111,14 @@ local function init()
 
 	for set, data in gmatchpos() do
 		stmt = db.prepare("INSERT INTO \"" .. file .. "\" VALUES (?, ?)")
+		db.check("inserting marp values")
 		stmt:bind_values(set, data)
 		stmt:step()
 		stmt:finalize()
 	end
 	fh:close()
 	db.exec("END TRANSACTION")
+	db.check("ending marp transation")
 end
 
 if db then
@@ -121,6 +131,7 @@ function dat.check(set, softlist)
 	end
 	info = nil
 	local stmt = db.prepare("SELECT data FROM \"scores3.htm\" AS f WHERE romset = ?")
+	db.check("reading marp data")
 	stmt:bind_values(set)
 	if stmt:step() == sql.ROW then
 		info = "#j2\n" .. stmt:get_value(0)
