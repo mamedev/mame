@@ -56,7 +56,7 @@ opcode spaces.  It's accessed via a 4008/4009 pair, or a 4289.  With a
 support requires a 4040 with a 4289.  Accesses are 4 bits wide.  The
 address consists of the 8-bit value latched with the SRC instruction and
 a first/last bit that toggles on each program memory operation.  There's
-no way for the CPU to get the sate of the first/last bit (even using
+no way for the CPU to get the state of the first/last bit (even using
 additional I/O to read it is difficult because it's only output during
 program memory reads and writes), so the developer has to be very
 careful to always do program memory operations in pairs or track the
