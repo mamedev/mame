@@ -41,7 +41,6 @@ READ8_MEMBER(ppu_vt03_device::palette_read)
 void ppu_vt03_device::set_new_pen(int i)
 {
 	uint16_t palval = (m_newpal[i&0x7f] & 0x3f) | ((m_newpal[(i&0x7f)+0x80] & 0x3f)<<6);
-
 	// &0x3f so we don't attempt to use any of the extended colours right now because
 	// I haven't managed to work out the format
 	m_palette->set_pen_indirect(i&0x7f,palval&0x3f);
@@ -312,15 +311,14 @@ WRITE8_MEMBER(ppu_vt03_device::write)
 	}
 	else
 	{
+		logerror("%s: write to reg 0x20%02x %02x\n", machine().describe_context(), offset, data);
 		switch (offset)
 		{
 		case 0x10:
-			logerror("%s: write to reg 0x2010 %02x\n", machine().describe_context(), data);
 			set_2010_reg(data);
 			break;
 
 		case 0x11:
-			logerror("%s: write to reg 0x2011 %02x\n", machine().describe_context(), data);
 			break;
 
 		case 0x12:

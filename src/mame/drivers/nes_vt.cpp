@@ -97,6 +97,7 @@ public:
 
 	/* Misc PPU */
 	DECLARE_WRITE8_MEMBER(nes_vh_sprite_dma_w);
+	DECLARE_WRITE8_MEMBER(vt_hh_sprite_dma_w);
 	void ppu_nmi(int *ppu_regs);
 	uint32_t screen_update_vt(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_PALETTE_INIT(nesvt);
@@ -104,6 +105,7 @@ public:
 	/* VT03 extension handling */
 	DECLARE_WRITE8_MEMBER(vt03_410x_w);
 	DECLARE_WRITE8_MEMBER(vt03_8000_w);
+	DECLARE_WRITE8_MEMBER(vt03_4034_w);
 
 	/* OneBus read callbacks for getting sprite and tile data during rendering*/
 	DECLARE_READ8_MEMBER(spr_r);
@@ -118,7 +120,9 @@ private:
 
 	void scanline_irq(int scanline, int vblank, int blanked);
 	uint8_t m_410x[0xc];
-
+	
+	uint8_t vdma_ctrl;
+	
 	int m_timer_irq_enabled;
 	int m_timer_running;
 	int m_timer_val;
@@ -743,6 +747,41 @@ WRITE8_MEMBER(nes_vt_state::nes_vh_sprite_dma_w)
 	m_ppu->spriteram_dma(space, data);
 }
 
+WRITE8_MEMBER(nes_vt_state::vt_hh_sprite_dma_w)
+{
+	uint8_t dma_mode = vdma_ctrl & 0x01;
+	uint8_t dma_len  = (vdma_ctrl >> 1) & 0x07;
+	uint8_t src_nib_74 =  (vdma_ctrl >> 4) & 0x0F;
+	int length = 256;
+	switch(dma_len) {
+		case 0x0: length = 256; break;
+		case 0x4: length = 16; break;
+		case 0x5: length = 32; break;
+		case 0x6: length = 64; break;
+		case 0x7: length = 128; break;
+	}
+	uint16_t src_addr = (data << 8) | (src_nib_74 << 4);
+	logerror("vthh dma start ctrl=%02x addr=%04x\n", vdma_ctrl, src_addr);
+	for (int i = 0; i < length; i++)
+	{
+		uint8_t spriteData = space.read_byte(src_addr + i);
+		if(dma_mode) {
+			space.write_byte(0x2007, spriteData);
+		} else {
+			space.write_byte(0x2004, spriteData);
+		}
+	}
+
+	// should last (length * 4 - 1) CPU cycles.
+	space.device().execute().adjust_icount(-(length * 4 - 1));
+}
+
+
+WRITE8_MEMBER(nes_vt_state::vt03_4034_w)
+{
+	vdma_ctrl = data;
+}
+
 static ADDRESS_MAP_START( nes_vt_map, AS_PROGRAM, 8, nes_vt_state )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM
 	AM_RANGE(0x2000, 0x3fff) AM_DEVREADWRITE("ppu", ppu2c0x_device, read, write)        /* PPU registers */
@@ -763,6 +802,25 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( nes_vt_xx_map, AS_PROGRAM, 8, nes_vt_state )
 	AM_IMPORT_FROM(nes_vt_map)
 	AM_RANGE(0x0800, 0x0fff) AM_RAM
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( nes_vt_hh_map, AS_PROGRAM, 8, nes_vt_state )
+	AM_RANGE(0x0000, 0x0fff) AM_RAM
+	AM_RANGE(0x2000, 0x3fff) AM_DEVREADWRITE("ppu", ppu2c0x_device, read, write)        /* PPU registers */
+
+	AM_RANGE(0x4000, 0x4013) AM_DEVREADWRITE("apu", nesapu_device, read, write)
+	AM_RANGE(0x4015, 0x4015) AM_READWRITE(psg1_4015_r, psg1_4015_w) /* PSG status / first control register */
+	AM_RANGE(0x4016, 0x4016) AM_READWRITE(nes_in0_r, nes_in0_w)
+	AM_RANGE(0x4017, 0x4017) AM_READ(nes_in1_r) AM_WRITE(psg1_4017_w)
+
+	AM_RANGE(0x4100, 0x410b) AM_WRITE(vt03_410x_w)
+
+	AM_RANGE(0x8000, 0xffff) AM_WRITE(vt03_8000_w)
+	AM_RANGE(0x8000, 0xffff) AM_DEVICE("prg", address_map_bank_device, amap8)
+
+	AM_RANGE(0x4034, 0x4034) AM_WRITE(vt03_4034_w)
+	AM_RANGE(0x4014, 0x4014) AM_READ(psg1_4014_r) AM_WRITE(vt_hh_sprite_dma_w)
+	AM_RANGE(0x6000, 0x6fff) AM_RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( prg_map, AS_PROGRAM, 8, nes_vt_state )
@@ -875,6 +933,8 @@ MACHINE_CONFIG_END
 
 // New mystery handheld architecture, VTxx derived
 static MACHINE_CONFIG_DERIVED( nes_vt_hh, nes_vt_xx )
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(nes_vt_hh_map)
 MACHINE_CONFIG_END
 
 static INPUT_PORTS_START( nes_vt )
