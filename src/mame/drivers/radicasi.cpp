@@ -47,6 +47,7 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_ram(*this, "ram"),
 		m_vram(*this, "vram"),
+		m_spriteram(*this, "spriteram"),
 		m_palram(*this, "palram"),
 		m_pixram(*this, "pixram"),
 		m_bank(*this, "bank"),
@@ -145,6 +146,7 @@ private:
 	required_device<cpu_device> m_maincpu;
 	required_shared_ptr<uint8_t> m_ram;
 	required_shared_ptr<uint8_t> m_vram;
+	required_shared_ptr<uint8_t> m_spriteram;
 	required_shared_ptr<uint8_t> m_palram;
 	required_shared_ptr<uint8_t> m_pixram;
 	required_device<address_map_bank_device> m_bank;
@@ -189,6 +191,8 @@ private:
 	uint8_t handle_unkregs_0_r(int which, int offset);
 	void handle_unkregs_1_w(int which, int offset, uint8_t data);
 	uint8_t handle_unkregs_1_r(int which, int offset);
+
+	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 void radica_6502_state::video_start()
@@ -197,22 +201,85 @@ void radica_6502_state::video_start()
 
 /* (m_tile_gfxbase_lo_data | (m_tile_gfxbase_hi_data << 8)) * 0x100
    gives you the actual rom address, everything references the 3MByte - 4MByte region, like the banking so
-   the system can probalby have up to a 4MByte rom, all games we have so far just use the upper 1MByte of
-   that space
+   the system can probably have up to a 4MByte rom, all games we have so far just use the upper 1MByte of
+   that space (Tetris seems to rely on mirroring? as it sets all addresses up for the lower 1MB instead)
 */
+
+void radica_6502_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	address_space& fullbankspace = m_bank->space(AS_PROGRAM);
+
+	/*
+		Sprites
+		AA yy xx ?? XX YY aa bb
+
+		yy = y position
+		xx = x position
+		XX = texture x start
+		YY = texture y start
+		aa = same as final param on tiles?
+		bb = sometimes set in invaders
+
+		AA = attributes
+		e--- --sS
+		e = enable
+		S = SizeX
+		s = SizeY
+	*/
+
+	for (int i = 0; i < 512; i += 8)
+	{
+		uint8_t x = m_spriteram[i + 2];
+		uint8_t y = m_spriteram[i + 1];
+
+		uint8_t tex_x = (m_spriteram[i + 4]);
+		uint8_t tex_y = (m_spriteram[i + 5]);
+
+		uint8_t attrs = m_spriteram[i + 0];
+
+		if (!(attrs & 0x80))
+			continue;
+
+		int sizex = 8;
+		int sizey = 8;
+
+		if (attrs & 0x01)
+		{
+			sizex = 16;
+		}
+
+		if (attrs & 0x02)
+		{
+			sizey = 16;
+		}
+
+		int base = (m_sprite_gfxbase_lo_data | (m_sprite_gfxbase_hi_data << 8)) * 0x100;
+
+		for (int yy = 0; yy < sizey; yy++)
+		{
+			uint16_t* row = &bitmap.pix16((y + yy) & 0xff);
+
+			for (int xx = 0; xx < sizex; xx++)
+			{
+				int realaddr = base + ((tex_x+xx)&0xff);
+				realaddr += ((tex_y+yy)&0xff) * 256;
+
+				uint8_t pix = fullbankspace.read_byte(realaddr);
+
+				if (pix)
+					row[(x + xx) & 0xff] = pix;// + attr;
+			}
+		}
+	}
+}
 
 uint32_t radica_6502_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(0, cliprect);
 
-
-	// we draw the tiles as 8x1 strips as that's how they're stored in ROM
-	// it might be they're format shifted at some point tho as I doubt it draws direct from ROM
-
 	address_space& fullbankspace = m_bank->space(AS_PROGRAM);
-
 	int offs;
-	
+
 	// Palette
 
 	offs = 0;
@@ -220,7 +287,7 @@ uint32_t radica_6502_state::screen_update(screen_device &screen, bitmap_ind16 &b
 	{
 		uint16_t dat = m_palram[offs++];
 		dat |= m_palram[offs++] << 8;
-		
+
 		// wrong format, does seem to be 13-bit tho.
 		// the palette for the Taito logo is at 27f00 in ROM, 4bpp, 16 colours.
 		m_palette->set_pen_color(i, pal4bit(dat >> 0), pal4bit(dat >> 4), pal4bit(dat >> 8));
@@ -237,7 +304,7 @@ uint32_t radica_6502_state::screen_update(screen_device &screen, bitmap_ind16 &b
 			{
 				int tile = m_vram[offs] + (m_vram[offs + 1] << 8);
 				//int attr = (m_vram[offs + 3]); // set to 0x07 on the radica logo, 0x00 on the game select screen
-				int attr = m_vram[offs+2];
+				int attr = m_vram[offs + 2];
 
 
 				if (m_5027_data & 0x20) // 4bpp mode
@@ -263,8 +330,8 @@ uint32_t radica_6502_state::screen_update(screen_device &screen, bitmap_ind16 &b
 						{
 							int realaddr = ((tile + i * 16) << 3) + (xx >> 1);
 							uint8_t pix = fullbankspace.read_byte(realaddr);
-							row[x * 16 + xx + 0] = ((pix & 0xf0) >> 4)+attr;
-							row[x * 16 + xx + 1] = ((pix & 0x0f) >> 0)+attr;
+							row[x * 16 + xx + 0] = ((pix & 0xf0) >> 4) + attr;
+							row[x * 16 + xx + 1] = ((pix & 0x0f) >> 0) + attr;
 						}
 					}
 					else // 8bpp
@@ -288,7 +355,7 @@ uint32_t radica_6502_state::screen_update(screen_device &screen, bitmap_ind16 &b
 		{
 			for (int x = 0; x < 32; x++)
 			{
-				int tile = (m_vram[offs] + (m_vram[offs + 1] << 8));	
+				int tile = (m_vram[offs] + (m_vram[offs + 1] << 8));
 				//int attr = m_vram[offs+2];
 
 				tile = (tile & 0x1f) + ((tile & ~0x1f) * 8);
@@ -310,6 +377,7 @@ uint32_t radica_6502_state::screen_update(screen_device &screen, bitmap_ind16 &b
 		}
 	}
 
+	draw_sprites(screen,bitmap,cliprect);
 
 	return 0;
 }
@@ -776,14 +844,18 @@ WRITE8_MEMBER(radica_6502_state::radicasi_5027_w)
 }
 
 static ADDRESS_MAP_START( radicasi_map, AS_PROGRAM, 8, radica_6502_state )
+	// can the addresses move around?
 	AM_RANGE(0x0000, 0x05ff) AM_RAM AM_SHARE("ram")
-	AM_RANGE(0x0600, 0x3fff) AM_RAM AM_SHARE("vram")
+	AM_RANGE(0x0600, 0x3dff) AM_RAM AM_SHARE("vram")
+	AM_RANGE(0x3e00, 0x3fff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x4800, 0x49ff) AM_RAM AM_SHARE("palram")
 
+	// 500x system regs?
 	AM_RANGE(0x500b, 0x500b) AM_READ(radicasi_500b_r) // PAL / NTSC flag at least
 	AM_RANGE(0x500c, 0x500c) AM_WRITE(radicasi_500c_w)
 	AM_RANGE(0x500d, 0x500d) AM_READWRITE(radicasi_500d_r, radicasi_500d_w)
 
+	// 501x DMA controller
 	AM_RANGE(0x5010, 0x5010) AM_READWRITE(radicasi_dmasrc_lo_r, radicasi_dmasrc_lo_w)
 	AM_RANGE(0x5011, 0x5011) AM_READWRITE(radicasi_dmasrc_hi_r, radicasi_dmasrc_hi_w)
 
@@ -795,10 +867,9 @@ static ADDRESS_MAP_START( radicasi_map, AS_PROGRAM, 8, radica_6502_state )
 
 	AM_RANGE(0x5016, 0x5016) AM_READWRITE(radicasi_dmatrg_r, radicasi_dmatrg_w)
 
+	// 502x - 503x video regs area?
+	AM_RANGE(0x5020, 0x5026) AM_RAM // unknown, space invaders sets these to fixed values, tetris has them as 00
 	AM_RANGE(0x5027, 0x5027) AM_WRITE(radicasi_5027_w)
-
-	// 5031 y scroll lo (phoenix)
-	// 5032 y scroll hi (phoenix)
 
 	AM_RANGE(0x5029, 0x5029) AM_READWRITE(radicasi_tile_gfxbase_lo_r, radicasi_tile_gfxbase_lo_w) // tilebase
 	AM_RANGE(0x502a, 0x502a) AM_READWRITE(radicasi_tile_gfxbase_hi_r, radicasi_tile_gfxbase_hi_w) // tilebase
@@ -806,21 +877,26 @@ static ADDRESS_MAP_START( radicasi_map, AS_PROGRAM, 8, radica_6502_state )
 	AM_RANGE(0x502b, 0x502b) AM_READWRITE(radicasi_sprite_gfxbase_lo_r, radicasi_sprite_gfxbase_lo_w) // tilebase (spr?)
 	AM_RANGE(0x502c, 0x502c) AM_READWRITE(radicasi_sprite_gfxbase_hi_r, radicasi_sprite_gfxbase_hi_w) // tilebase (spr?)
 
-	// 5040 written at same time as 5048 (port direction?)
-	AM_RANGE(0x5041, 0x5041) AM_READ_PORT("IN0") // written with 0x80 after setting 5040 to 0x7f
-	// 5042 written at same time as 5049 (port direction?)
-	// 5043 written with 0x00 after setting 0x5042 to 0xfe
-	// 5044 written at same time as 504a (port direction?)
-	// 5045 written with 0x00 after setting 0x5044 to 0xff
-	
-	// 5048 see above (some kind of port config?)
-	// 5049 see above
-	// 504a see above
+	// 5031 bg y scroll lo (phoenix)
+	// 5032 bg y scroll hi (phoenix)
 
+
+	// 504x GPIO area?
+	AM_RANGE(0x5040, 0x5040) AM_WRITENOP // written at same time as 5048 (port direction?)
+	AM_RANGE(0x5041, 0x5041) AM_WRITENOP AM_READ_PORT("IN0") // written with 0x80 after setting 5040 to 0x7f
+	AM_RANGE(0x5042, 0x5042) AM_WRITENOP // written at same time as 5049 (port direction?)
+	AM_RANGE(0x5043, 0x5043) AM_WRITENOP // written with 0x00 after setting 0x5042 to 0xfe
+	AM_RANGE(0x5044, 0x5044) AM_WRITENOP // written at same time as 504a (port direction?)
+	AM_RANGE(0x5046, 0x5046) AM_WRITENOP //  written with 0x00 after setting 0x5044 to 0xff
+	
+	AM_RANGE(0x5048, 0x5048) AM_WRITENOP  // 5048 see above (some kind of port config?)
+	AM_RANGE(0x5049, 0x5049) AM_WRITENOP  // 5049 see above
+	AM_RANGE(0x504a, 0x504a) AM_WRITENOP  // 504a see above
+
+	// 506x unknown
 	AM_RANGE(0x5060, 0x506d) AM_RAM // read/written by tetris
 
-	// These might be sound / DMA channels?
-
+	// 508x - 60ax These might be sound / DMA channels?
 	AM_RANGE(0x5080, 0x5082) AM_READWRITE(radicasi_unkregs_0_0_r, radicasi_unkregs_0_0_w) // 5082 set to 0x33, so probably another 'high' address bits reg
 	AM_RANGE(0x5083, 0x5085) AM_READWRITE(radicasi_unkregs_0_1_r, radicasi_unkregs_0_1_w) // 5085 set to 0x33, so probably another 'high' address bits reg
 	AM_RANGE(0x5086, 0x5088) AM_READWRITE(radicasi_unkregs_0_2_r, radicasi_unkregs_0_2_w) // 5088 set to 0x33, so probably another 'high' address bits reg
@@ -837,9 +913,8 @@ static ADDRESS_MAP_START( radicasi_map, AS_PROGRAM, 8, radica_6502_state )
 
 	AM_RANGE(0x50a5, 0x50a5) AM_READWRITE(radicasi_unkregs_trigger_r, radicasi_unkregs_trigger_w)
 
+	AM_RANGE(0x50a8, 0x50a8) AM_READ(radicasi_50a8_r) // possible 'stopped' status of above channels, waits for it to be 0x3f in places
 	AM_RANGE(0x50a9, 0x50a9) AM_READWRITE(radicasi_50a9_r, radicasi_50a9_w)
-
-	AM_RANGE(0x50a8, 0x50a8) AM_READ(radicasi_50a8_r)
 
 	//AM_RANGE(0x5000, 0x50ff) AM_RAM
 
