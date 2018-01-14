@@ -2,9 +2,9 @@ local sql = require("lsqlite3")
 local datfile = {}
 local db
 
-function check_db(msg)
-	if db:errcode() > sqlite3.OK then
-		io.stderr:write("Error: " .. msg .. " (" .. db:errcode() .. " - " .. db:errmsg() .. ")\n")
+local function check_db(msg)
+	if db:errcode() > sql.OK then
+		emu.print_error("Error: " .. msg .. " (" .. db:errcode() .. " - " .. db:errmsg() .. ")\n")
 	end
 end
 
@@ -31,4 +31,7 @@ if db then
 	end
 end
 
-return function() return db, sql end
+local dbtable = { prepare = function(...) return db:prepare(...) end,
+		  exec = function(...) return db:exec(...) end, ROW = sql.ROW, check = check_db }
+
+return db and dbtable or nil
