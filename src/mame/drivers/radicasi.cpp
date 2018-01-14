@@ -46,6 +46,7 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_ram(*this, "ram"),
+		m_vram(*this, "vram"),
 		m_palram(*this, "palram"),
 		m_pixram(*this, "pixram"),
 		m_bank(*this, "bank"),
@@ -125,6 +126,14 @@ public:
 	DECLARE_READ8_MEMBER(radicasi_500d_r);
 	DECLARE_READ8_MEMBER(radicasi_50a8_r);
 
+	DECLARE_READ8_MEMBER(radicasi_50a9_r);
+	DECLARE_WRITE8_MEMBER(radicasi_50a9_w);
+
+	INTERRUPT_GEN_MEMBER(interrupt);
+
+	DECLARE_READ8_MEMBER(radicasi_nmi_vector_r);
+	DECLARE_READ8_MEMBER(radicasi_irq_vector_r);
+
 protected:
 	// driver_device overrides
 	virtual void machine_start() override;
@@ -135,6 +144,7 @@ protected:
 private:
 	required_device<cpu_device> m_maincpu;
 	required_shared_ptr<uint8_t> m_ram;
+	required_shared_ptr<uint8_t> m_vram;
 	required_shared_ptr<uint8_t> m_palram;
 	required_shared_ptr<uint8_t> m_pixram;
 	required_device<address_map_bank_device> m_bank;
@@ -144,6 +154,7 @@ private:
 	uint8_t m_500c_data;
 	uint8_t m_500d_data;
 	uint8_t m_5027_data;
+	uint8_t m_50a9_data;
 
 	uint8_t m_dmasrc_lo_data;
 	uint8_t m_dmasrc_hi_data;
@@ -151,7 +162,6 @@ private:
 	uint8_t m_dmadst_hi_data;
 	uint8_t m_dmasize_lo_data;
 	uint8_t m_dmasize_hi_data;
-
 
 	uint8_t m_tile_gfxbase_lo_data;
 	uint8_t m_tile_gfxbase_hi_data;
@@ -167,6 +177,11 @@ private:
 	uint8_t m_unkregs_1_unk2[6];
 
 	uint8_t m_unkregs_trigger;
+
+	int m_custom_irq;
+	int m_custom_nmi;
+	uint16_t m_custom_irq_vector;
+	uint16_t m_custom_nmi_vector;
 
 	void handle_trigger(int which);
 
@@ -190,35 +205,39 @@ uint32_t radica_6502_state::screen_update(screen_device &screen, bitmap_ind16 &b
 {
 	bitmap.fill(0, cliprect);
 
-	// it is unclear if the tilemap is an internal structure or something actually used by the video rendering
-	int offs = 0x600;
 
 	// we draw the tiles as 8x1 strips as that's how they're stored in ROM
 	// it might be they're format shifted at some point tho as I doubt it draws direct from ROM
 
 	address_space& fullbankspace = m_bank->space(AS_PROGRAM);
 
-	int offset = 0;
+	int offs;
+	
+	// Palette
+
+	offs = 0;
 	for (int i = 0; i < 256; i++)
 	{
-		uint16_t dat = m_palram[offset++];
-		dat |= m_palram[offset++] << 8;
+		uint16_t dat = m_palram[offs++];
+		dat |= m_palram[offs++] << 8;
 		
 		// wrong format, does seem to be 13-bit tho.
 		// the palette for the Taito logo is at 27f00 in ROM, 4bpp, 16 colours.
 		m_palette->set_pen_color(i, pal4bit(dat >> 0), pal4bit(dat >> 4), pal4bit(dat >> 8));
 	}
 
+	// Tilemaps
 
+	offs = 0;
 	if (m_5027_data & 0x40) // 16x16 tiles
 	{
 		for (int y = 0; y < 16; y++)
 		{
 			for (int x = 0; x < 16; x++)
 			{
-				int tile = m_ram[offs] + (m_ram[offs + 1] << 8);
-				//int attr = (m_ram[offs + 3]); // set to 0x07 on the radica logo, 0x00 on the game select screen
-				int attr = m_ram[offs+2];
+				int tile = m_vram[offs] + (m_vram[offs + 1] << 8);
+				//int attr = (m_vram[offs + 3]); // set to 0x07 on the radica logo, 0x00 on the game select screen
+				int attr = m_vram[offs+2];
 
 
 				if (m_5027_data & 0x20) // 4bpp mode
@@ -269,8 +288,8 @@ uint32_t radica_6502_state::screen_update(screen_device &screen, bitmap_ind16 &b
 		{
 			for (int x = 0; x < 32; x++)
 			{
-				int tile = (m_ram[offs] + (m_ram[offs + 1] << 8));	
-				//int attr = m_ram[offs+2];
+				int tile = (m_vram[offs] + (m_vram[offs + 1] << 8));	
+				//int attr = m_vram[offs+2];
 
 				tile = (tile & 0x1f) + ((tile & ~0x1f) * 8);
 				tile += ((m_tile_gfxbase_lo_data | m_tile_gfxbase_hi_data << 8) << 5);
@@ -468,16 +487,19 @@ WRITE8_MEMBER(radica_6502_state::radicasi_dmatrg_w)
 	address_space& fullbankspace = m_bank->space(AS_PROGRAM);
 	address_space& destspace = m_maincpu->space(AS_PROGRAM);
 
-	int src = (m_dmasrc_lo_data | (m_dmasrc_hi_data <<8)) * 0x100;
-	uint16_t dest = (m_dmadst_lo_data | (m_dmadst_hi_data <<8));
-	uint16_t size = (m_dmasize_lo_data | (m_dmasize_hi_data <<8));
-
-	logerror(" Doing DMA %06x to %04x size %04x\n", src, dest, size);
-
-	for (int i = 0; i < size; i++)
+	if (data)
 	{
-		uint8_t dat = fullbankspace.read_byte(src+i);
-		destspace.write_byte(dest+i, dat);
+		int src = (m_dmasrc_lo_data | (m_dmasrc_hi_data << 8)) * 0x100;
+		uint16_t dest = (m_dmadst_lo_data | (m_dmadst_hi_data << 8));
+		uint16_t size = (m_dmasize_lo_data | (m_dmasize_hi_data << 8));
+
+		logerror(" Doing DMA %06x to %04x size %04x\n", src, dest, size);
+
+		for (int i = 0; i < size; i++)
+		{
+			uint8_t dat = fullbankspace.read_byte(src + i);
+			destspace.write_byte(dest + i, dat);
+		}
 	}
 }
 
@@ -485,7 +507,7 @@ WRITE8_MEMBER(radica_6502_state::radicasi_dmatrg_w)
 
 
 // unknown regs that seem to also be pointers
-// seem to get set to sound data?
+// seem to get set to sound data? probably 6 channels of 'DMA DAC' sound with status flags
 
 void radica_6502_state::handle_unkregs_0_w(int which, int offset, uint8_t data)
 {
@@ -726,6 +748,21 @@ READ8_MEMBER(radica_6502_state::radicasi_50a8_r)
 	return 0x3f;
 }
 
+// this is used a bit like the triggers?
+READ8_MEMBER(radica_6502_state::radicasi_50a9_r)
+{
+	logerror("%s: radicasi_50a9_r\n", machine().describe_context().c_str());
+	return m_50a9_data;
+}
+
+WRITE8_MEMBER(radica_6502_state::radicasi_50a9_w)
+{
+	logerror("%s: radicasi_50a9_w %02x\n", machine().describe_context().c_str(), data);
+	m_50a9_data = data;
+}
+
+
+
 WRITE8_MEMBER(radica_6502_state::radicasi_5027_w)
 {
 	logerror("%s: radicasi_5027_w %02x (video control?)\n", machine().describe_context().c_str(), data);
@@ -739,7 +776,8 @@ WRITE8_MEMBER(radica_6502_state::radicasi_5027_w)
 }
 
 static ADDRESS_MAP_START( radicasi_map, AS_PROGRAM, 8, radica_6502_state )
-	AM_RANGE(0x0000, 0x3fff) AM_RAM AM_SHARE("ram") // ends up copying code to ram, but could be due to banking issues
+	AM_RANGE(0x0000, 0x05ff) AM_RAM AM_SHARE("ram")
+	AM_RANGE(0x0600, 0x3fff) AM_RAM AM_SHARE("vram")
 	AM_RANGE(0x4800, 0x49ff) AM_RAM AM_SHARE("palram")
 
 	AM_RANGE(0x500b, 0x500b) AM_READ(radicasi_500b_r) // PAL / NTSC flag at least
@@ -767,6 +805,8 @@ static ADDRESS_MAP_START( radicasi_map, AS_PROGRAM, 8, radica_6502_state )
 
 	AM_RANGE(0x5041, 0x5041) AM_READ_PORT("IN0")
 
+	AM_RANGE(0x5060, 0x506d) AM_RAM // read/written by tetris
+
 	// These might be sound / DMA channels?
 
 	AM_RANGE(0x5080, 0x5082) AM_READWRITE(radicasi_unkregs_0_0_r, radicasi_unkregs_0_0_w) // 5082 set to 0x33, so probably another 'high' address bits reg
@@ -785,11 +825,17 @@ static ADDRESS_MAP_START( radicasi_map, AS_PROGRAM, 8, radica_6502_state )
 
 	AM_RANGE(0x50a5, 0x50a5) AM_READWRITE(radicasi_unkregs_trigger_r, radicasi_unkregs_trigger_w)
 
+	AM_RANGE(0x50a9, 0x50a9) AM_READWRITE(radicasi_50a9_r, radicasi_50a9_w)
+
 	AM_RANGE(0x50a8, 0x50a8) AM_READ(radicasi_50a8_r)
 
 	//AM_RANGE(0x5000, 0x50ff) AM_RAM
 
 	AM_RANGE(0x6000, 0xdfff) AM_DEVICE("bank", address_map_bank_device, amap8)
+
+	// not sure how these work,, might be a modified 6502 core instead.
+	AM_RANGE(0xfffa, 0xfffb) AM_READ(radicasi_nmi_vector_r)
+	AM_RANGE(0xfffe, 0xffff) AM_READ(radicasi_irq_vector_r)
 
 	AM_RANGE(0xe000, 0xffff) AM_ROM AM_REGION("maincpu", 0x3f8000)
 ADDRESS_MAP_END
@@ -815,28 +861,46 @@ static INPUT_PORTS_START( radicasi )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON4 )
 INPUT_PORTS_END
 
+/* both NMI and IRQ vectors just point to RTI
+	there is a table of jumps just before that, those appear to be the real interrupt functions?
+
+	patch the main IRQ to be the one that decreases an address the code is waiting for
+	the others look like they might be timer service routines
+*/
+
+READ8_MEMBER(radica_6502_state::radicasi_nmi_vector_r)
+{
+	if (m_custom_nmi)
+	{
+		return m_custom_nmi_vector >> (offset*8);
+	}
+	else
+	{
+		uint8_t *rom = memregion("maincpu")->base();
+		return rom[0x3f9ffa + offset];
+	}
+}
+
+READ8_MEMBER(radica_6502_state::radicasi_irq_vector_r)
+{
+	if (m_custom_irq)
+	{
+		return m_custom_irq_vector >> (offset*8);
+	}
+	else
+	{
+		uint8_t *rom = memregion("maincpu")->base();
+		return rom[0x3f9ffe + offset];
+	}
+}
+
 void radica_6502_state::machine_start()
 {
-	uint8_t *rom = memregion("maincpu")->base();
-	/* both NMI and IRQ vectors just point to RTI
-	   there is a table of jumps just before that, those appear to be the real interrupt functions?
+	m_custom_irq = 0;
+	m_custom_irq_vector = 0x0000;
 
-	   patch the main IRQ to be the one that decreases an address the code is waiting for
-	   the others look like they might be timer service routines
-	*/
-	rom[0x3f9ffe] = 0xd4;
-	rom[0x3f9fff] = 0xff;
-
-	/*
-		d8000-dffff maps to 6000-dfff
-		e0000-e7fff maps to 6000-dfff
-		e8000-effff maps to 6000-dfff
-		f0000-f7fff maps to 6000-dfff
-		f8000-fffff maps to 6000-dfff (but f8000-f9fff mapping to 6000-7fff isn't used, because it's the fixed area below - make sure nothing else gets mapped there instead)
-
-		-- fixed
-		f8000-f9fff maps to e000-ffff
-	*/
+	m_custom_nmi = 0;
+	m_custom_nmi_vector = 0x0000;
 
 	m_bank->set_bank(0x7f);
 }
@@ -899,8 +963,6 @@ static const gfx_layout texture_helper_4bpp_layout =
 	texlayout_yoffset_4bpp
 };
 
-
-
 static GFXDECODE_START( radicasi_fake )
 	GFXDECODE_ENTRY( "maincpu", 0, helper_4bpp_8_layout,  0x0, 1  )
 	GFXDECODE_ENTRY( "maincpu", 0, texture_helper_4bpp_layout,  0x0, 1  )
@@ -908,15 +970,26 @@ static GFXDECODE_START( radicasi_fake )
 	GFXDECODE_ENTRY( "maincpu", 0, texture_helper_8bpp_layout,  0x0, 1  )
 GFXDECODE_END
 
+INTERRUPT_GEN_MEMBER(radica_6502_state::interrupt)
+{
+	m_custom_irq = 1;
+	m_custom_irq_vector = 0xffd4;
 
-// Tetris has a XTAL_21_28137MHz, not confirmed on Space Invaders, actual CPU clock unknown.
+	m_maincpu->set_input_line(INPUT_LINE_IRQ0,HOLD_LINE);
+	/*
+	m_custom_nmi = 1;
+	m_custom_nmi_vector = 0xffd4;
+
+	m_maincpu->set_input_line(INPUT_LINE_NMI,PULSE_LINE);
+	*/
+}
 
 static MACHINE_CONFIG_START( radicasi )
 
-	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",M6502,XTAL_21_28137MHz/2)
+	/* basic machine hardware */	
+	MCFG_CPU_ADD("maincpu",M6502,XTAL_21_28137MHz/2) // Tetris has a XTAL_21_28137MHz, not confirmed on Space Invaders, actual CPU clock unknown.
 	MCFG_CPU_PROGRAM_MAP(radicasi_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", radica_6502_state,  irq0_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", radica_6502_state,  interrupt)
 
 	MCFG_DEVICE_ADD("bank", ADDRESS_MAP_BANK, 0)
 	MCFG_DEVICE_PROGRAM_MAP(radicasi_bank_map)
