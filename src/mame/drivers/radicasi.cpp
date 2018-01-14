@@ -182,13 +182,16 @@ uint32_t radica_6502_state::screen_update(screen_device &screen, bitmap_ind16 &b
 
 	int offset = (m_palbase_lo_data | (m_palbase_hi_data <<8)) * 0x100;
 
+	//printf("palette base is %06x\n", offset);
+
 	for (int i = 0; i < 1024; i++)
 	{
 		uint16_t dat = fullbankspace.read_byte(offset++);
 		dat |= fullbankspace.read_byte(offset++) << 8;
 		
 		// wrong format, does seem to be 13-bit tho.
-		m_palette->set_pen_color(i, pal4bit(dat >> 0), pal4bit(dat >> 4), pal5bit(dat >> 8));
+		// the palette for the Taito logo is at 27f00 in ROM, 4bpp, 16 colours.
+		m_palette->set_pen_color(i, pal4bit(dat >> 0), pal4bit(dat >> 4), pal4bit(dat >> 8));
 	}
 
 
@@ -200,6 +203,7 @@ uint32_t radica_6502_state::screen_update(screen_device &screen, bitmap_ind16 &b
 			{
 				int tile = m_ram[offs] + (m_ram[offs + 1] << 8);
 				//int attr = (m_ram[offs + 3]); // set to 0x07 on the radica logo, 0x00 on the game select screen
+				int attr = m_ram[offs+2];
 
 
 				if (m_5027_data & 0x20) // 4bpp mode
@@ -225,8 +229,8 @@ uint32_t radica_6502_state::screen_update(screen_device &screen, bitmap_ind16 &b
 						{
 							int realaddr = ((tile + i * 16) << 3) + (xx >> 1);
 							uint8_t pix = fullbankspace.read_byte(realaddr);
-							row[x * 16 + xx + 0] = (pix & 0xf0) >> 4;
-							row[x * 16 + xx + 1] = (pix & 0x0f) >> 0;
+							row[x * 16 + xx + 0] = ((pix & 0xf0) >> 4)+attr;
+							row[x * 16 + xx + 1] = ((pix & 0x0f) >> 0)+attr;
 						}
 					}
 					else // 8bpp
@@ -235,7 +239,7 @@ uint32_t radica_6502_state::screen_update(screen_device &screen, bitmap_ind16 &b
 						{
 							int realaddr = ((tile + i * 32) << 3) + xx;
 							uint8_t pix = fullbankspace.read_byte(realaddr);
-							row[x * 16 + xx] = pix;
+							row[x * 16 + xx] = pix;// + attr;
 						}
 					}
 				}
@@ -250,7 +254,8 @@ uint32_t radica_6502_state::screen_update(screen_device &screen, bitmap_ind16 &b
 		{
 			for (int x = 0; x < 32; x++)
 			{
-				int tile = (m_ram[offs] + (m_ram[offs + 1] << 8));
+				int tile = (m_ram[offs] + (m_ram[offs + 1] << 8));	
+				//int attr = m_ram[offs+2];
 
 				tile = (tile & 0x1f) + ((tile & ~0x1f) * 8);
 				tile += ((m_tile_gfxbase_lo_data | m_tile_gfxbase_hi_data << 8) << 5);
@@ -263,7 +268,7 @@ uint32_t radica_6502_state::screen_update(screen_device &screen, bitmap_ind16 &b
 					{
 						int realaddr = ((tile + i * 32) << 3) + xx;
 						uint8_t pix = fullbankspace.read_byte(realaddr);
-						row[x * 8 + xx] = pix;
+						row[x * 8 + xx] = pix;// + attr;
 					}
 				}
 				offs += 4;
