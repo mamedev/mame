@@ -20,7 +20,13 @@
 
   VT16 - ?
   VT18 - ?
-
+	
+	Mystery handheld SoC, may or may not be VRT:
+		Uses SQI rather than parallel flash
+		Vaguely OneBus compatible but some registers different ($411C in particular)
+		Uses RGB format for palettes
+		Credit to NewRisingSun2 for much of the reverse engineering
+	
   (more)
 
   VT1682 - NOT compatible with NES, different video system, sound CPU (4x
@@ -867,6 +873,9 @@ static MACHINE_CONFIG_DERIVED( nes_vt_xx, nes_vt )
 	MCFG_CPU_PROGRAM_MAP(nes_vt_xx_map)
 MACHINE_CONFIG_END
 
+// New mystery handheld architecture, VTxx derived
+static MACHINE_CONFIG_DERIVED( nes_vt_hh, nes_vt_xx )
+MACHINE_CONFIG_END
 
 static INPUT_PORTS_START( nes_vt )
 INPUT_PORTS_END
@@ -1043,6 +1052,11 @@ ROM_START( vgpmini )
 	// there was a dump of a 'secure' area with this, but it was just the bottom 0x10000 bytes of the existing rom.
 ROM_END
 
+ROM_START( sy889 )
+	ROM_REGION( 0x800000, "mainrom", 0 )
+	ROM_LOAD( "sy889_w25q64.bin", 0x00000, 0x800000, CRC(fcdaa6fc) SHA1(0493747facf2172b8af22010851668bb18cbb3e4) )
+ROM_END
+
 // earlier version of vdogdemo
 CONS( 200?, vdogdeme,  0,  0,  nes_vt,    nes_vt, nes_vt_state,  0, "VRT", "V-Dog (prototype, earlier)", MACHINE_NOT_WORKING )
 
@@ -1067,7 +1081,8 @@ CONS( 200?, dgun2500,  0,  0,  nes_vt,    nes_vt, nes_vt_state,  0, "dreamGEAR",
 CONS( 2012, dgun2561,  0,  0,  nes_vt,    nes_vt, nes_vt_state,  0, "dreamGEAR", "dreamGEAR My Arcade Portable Gaming System (DGUN-2561)", MACHINE_NOT_WORKING )
 CONS( 200?, lexcyber,  0,  0,  nes_vt_xx, nes_vt, nes_vt_state,  0, "Lexibook", "Lexibook Compact Cyber Arcade", MACHINE_NOT_WORKING )
 
-// these seem to have custom CPU opcodes? looks similar to the above, has many of the same games, but isn't 100% valid 6502
+// these are VT1682 based and have scrambled CPU opcodes. Will need VT1682 CPU and PPU
+// to be emulated
 // (no visible tiles in ROM using standard decodes tho, might need moving out of here)
 CONS( 200?, ii8in1,    0,  0,  nes_vt,    nes_vt, nes_vt_state,  0, "Intec", "InterAct 8-in-1", MACHINE_NOT_WORKING )
 CONS( 200?, ii32in1,   0,  0,  nes_vt,    nes_vt, nes_vt_state,  0, "Intec", "InterAct 32-in-1", MACHINE_NOT_WORKING )
@@ -1105,4 +1120,4 @@ CONS( 200?, mc_8x6ss,   0,        0,  nes_vt,    nes_vt, nes_vt_state,  0, "<unk
 CONS( 2004, mc_dcat8,   0,        0,  nes_vt,    nes_vt, nes_vt_state,  0, "<unknown>", "100 in 1 (D-CAT8 8bit Console, set 1) (v5.01.11-frd, BL 20041217)", MACHINE_NOT_WORKING )
 CONS( 2004, mc_dcat8a,  mc_dcat8, 0,  nes_vt,    nes_vt, nes_vt_state,  0, "<unknown>", "100 in 1 (D-CAT8 8bit Console, set 2)", MACHINE_NOT_WORKING )
 
-
+CONS( 2017, sy889,  		0, 				0,  nes_vt_hh, nes_vt, nes_vt_state,  0, "SY Corp", 	"SY-889 300 in 1 Handheld", MACHINE_NOT_WORKING )
