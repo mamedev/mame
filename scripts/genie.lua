@@ -974,16 +974,13 @@ if _OPTIONS["SANITIZE"] then
 	if string.find(_OPTIONS["SANITIZE"], "undefined") then
 		-- 'function' produces errors without delegates by design
 		-- 'alignment' produces a lot of errors which we are not interested in
-		-- 'nullability' errors are not actually undefined behavior but unintentional
 		buildoptions {
 			"-fno-sanitize=function",
-			"-fno-sanitize=alignment",
-			"-fsanitize=nullability"
+			"-fno-sanitize=alignment"
 		}
 		linkoptions {
 			"-fno-sanitize=function",
-			"-fno-sanitize=alignment",
-			"-fsanitize=nullability"
+			"-fno-sanitize=alignment"
 		}
 	end
 end
