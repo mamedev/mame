@@ -15,7 +15,7 @@ You can also type **help <command>** for further details on each command in the 
 
  .. _debugger-command-bpset:
 
-Bpset
+bpset
 -----
 
 |  **bp[set] <address>[,<condition>[,<action>]]**
@@ -51,7 +51,7 @@ Bpset
 
  .. _debugger-command-bpclear:
 
-Bpclear
+bpclear
 -------
 
 |  **bpclear [<bpnum>]**
@@ -73,7 +73,7 @@ Bpclear
 
  .. _debugger-command-bpdisable:
 
-Bpdisable
+bpdisable
 ---------
 
 |  **bpdisable [<bpnum>]**
@@ -95,7 +95,7 @@ Bpdisable
 
  .. _debugger-command-bpenable:
 
-Bpenable
+bpenable
 --------
 
 |  **bpenable [<bpnum>]**
@@ -117,7 +117,7 @@ Bpenable
 
  .. _debugger-command-bplist:
 
-Bplist
+bplist
 ------
 
 |  **bplist**

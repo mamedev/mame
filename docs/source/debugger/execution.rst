@@ -24,7 +24,7 @@ You can also type **help <command>** for further details on each command in the 
 
  .. _debugger-command-step:
 
-Step
+step
 ----
 
 |  **s[tep] [<count>=1]**
@@ -46,7 +46,7 @@ Step
 
  .. _debugger-command-over:
 
-Over
+over
 ----
 
 |  **o[ver] [<count>=1]**
@@ -70,7 +70,7 @@ Over
 
  .. _debugger-command-out:
 
-Out
+out
 ---
 
 |  **out**
@@ -90,7 +90,7 @@ Out
 
  .. _debugger-command-go:
 
-Go
+go
 --
 
 |  **g[o] [<address>]**
@@ -112,7 +112,7 @@ Go
 
  .. _debugger-command-gvblank:
 
-Gvblank
+gvblank
 -------
 
 |  **gv[blank]**
@@ -130,7 +130,7 @@ Gvblank
 
  .. _debugger-command-gint:
 
-Gint
+gint
 ----
 
 |  **gi[nt] [<irqline>]**
@@ -152,7 +152,7 @@ Gint
 
  .. _debugger-command-gtime:
 
-Gtime
+gtime
 -----
 
 |  **gt[ime] <milliseconds>**
@@ -170,7 +170,7 @@ Gtime
 
  .. _debugger-command-next:
 
-Next
+next
 ----
 
 |  **n[ext]**
@@ -182,7 +182,7 @@ Next
 
  .. _debugger-command-focus:
 
-Focus
+focus
 -----
 
 |  **focus <cpu>**
@@ -200,7 +200,7 @@ Focus
 
  .. _debugger-command-ignore:
 
-Ignore
+ignore
 ------
 
 |  **ignore [<cpu>[,<cpu>[,...]]]**
@@ -226,7 +226,7 @@ Ignore
 
  .. _debugger-command-observe:
 
-Observe
+observe
 -------
 
 |  **observe [<cpu>[,<cpu>[,...]]]**
@@ -252,7 +252,7 @@ Observe
 
  .. _debugger-command-trace:
 
-Trace
+trace
 -----
 
 |  **trace {<filename>|OFF}[,<cpu>[,[noloop|logerror][,<action>]]]**
@@ -307,7 +307,7 @@ Trace
 
  .. _debugger-command-traceover:
 
-Traceover
+traceover
 ---------
 
 |  **traceover {<filename>|OFF}[,<cpu>[,<detectloops>[,<action>]]]**
@@ -350,7 +350,7 @@ Traceover
 
  .. _debugger-command-traceflush:
 
-Traceflush
+traceflush
 ----------
 
 |  **traceflush**

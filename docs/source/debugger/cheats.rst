@@ -15,7 +15,7 @@ You can also type **help <command>** for further details on each command in the 
 
  .. _debugger-command-cheatinit:
 
-Cheatinit
+cheatinit
 ---------
 
 |  **cheatinit [<sign><width><swap>,[<address>,<length>[,<cpu>]]]**
@@ -47,7 +47,7 @@ Cheatinit
 
  .. _debugger-command-cheatrange:
 
-Cheatrange
+cheatrange
 ----------
 
 |  **cheatrange <address>,<length>**
@@ -67,7 +67,7 @@ Cheatrange
 
  .. _debugger-command-cheatnext:
 
-Cheatnext
+cheatnext
 ---------
 
 |  **cheatnext <condition>[,<comparisonvalue>]**
@@ -145,7 +145,7 @@ Cheatnext
 
  .. _debugger-command-cheatnextf:
 
-Cheatnextf
+cheatnextf
 ----------
 
 |  **cheatnextf <condition>[,<comparisonvalue>]**
@@ -224,7 +224,7 @@ Cheatnextf
 
  .. _debugger-command-cheatlist:
 
-Cheatlist
+cheatlist
 ---------
 
 |  **cheatlist [<filename>]**
@@ -247,7 +247,7 @@ Cheatlist
 
  .. _debugger-command-cheatundo:
 
-Cheatundo
+cheatundo
 ---------
 
 |  **cheatundo**

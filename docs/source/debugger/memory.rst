@@ -18,7 +18,7 @@ You can also type **help <command>** for further details on each command in the 
 
  .. _debugger-command-dasm:
 
-Dasm
+dasm
 ----
 
 |  **dasm <filename>,<address>,<length>[,<opcodes>[,<cpu>]]**
@@ -40,7 +40,7 @@ Dasm
 
  .. _debugger-command-find:
 
-Find
+find
 ----
 
 |  **f[ind][{d|i}] <address>,<length>[,<data>[,...]]**
@@ -66,7 +66,7 @@ Find
 
  .. _debugger-command-dump:
 
-Dump
+dump
 ----
 
 |  **dump[{d|i}] <filename>,<address>,<length>[,<size>[,<ascii>[,<cpu>]]]**
@@ -94,7 +94,7 @@ Dump
 
  .. _debugger-command-save:
 
-Save
+save
 ----
 
 |  **save[{d|i}] <filename>,<address>,<length>[,<cpu>]**
@@ -120,7 +120,7 @@ Save
 
  .. _debugger-command-load:
 
-Load
+load
 ----
 
 |  **load[{d|i}] <filename>,<address>[,<length>,<cpu>]**
@@ -149,7 +149,7 @@ Load
 
  .. _debugger-command-map:
 
-Map
+map
 ---
 
 |  **map[{d|i}] <address>**
@@ -164,5 +164,4 @@ Map
 | Gives physical address and bank for logical address 152d0 in program memory
 |
 | Back to :ref:`debugger-memory-list`
-
 

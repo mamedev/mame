@@ -13,7 +13,7 @@ You can also type **help <command>** for further details on each command in the 
 
  .. _debugger-command-images:
 
-Images
+images
 ------
 
 |  **images**
@@ -29,7 +29,7 @@ Images
 
  .. _debugger-command-mount:
 
-Mount
+mount
 -----
 
 |  **mount <device>,<filename>**
@@ -47,7 +47,7 @@ Mount
 
  .. _debugger-command-unmount:
 
-Unmount
+unmount
 -------
 
 |  **unmount <device>**

@@ -14,7 +14,7 @@ You can also type **help <command>** for further details on each command in the 
 
  .. _debugger-command-wpset:
 
-Wpset
+wpset
 -----
 
 |  **wp[{d|i}][set] <address>,<length>,<type>[,<condition>[,<action>]]**
@@ -51,7 +51,7 @@ Wpset
 
  .. _debugger-command-wpclear:
 
-Wpclear
+wpclear
 -------
 
 |  **wpclear [<wpnum>]**
@@ -73,7 +73,7 @@ Wpclear
 
  .. _debugger-command-wpdisable:
 
-Wpdisable
+wpdisable
 ---------
 
 |  **wpdisable [<wpnum>]**
@@ -95,7 +95,7 @@ Wpdisable
 
  .. _debugger-command-wpenable:
 
-Wpenable
+wpenable
 --------
 
 |  **wpenable [<wpnum>]**
@@ -117,7 +117,7 @@ Wpenable
 
  .. _debugger-command-wplist:
 
-Wplist
+wplist
 ------
 
 |  **wplist**
