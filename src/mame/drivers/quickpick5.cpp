@@ -14,7 +14,7 @@
 
  Konami Custom chips:
   051649 (SCC1 sound)
-  053252 (timing/interrupt controller?)
+  053252 (timing/interrupt controller)
   053244 (sprites)
   053245 (sprites)
 
@@ -27,6 +27,9 @@
 #include "sound/okim6295.h"
 #include "video/k053244_k053245.h"
 #include "video/konami_helper.h"
+#include "machine/k053252.h"
+#include "machine/nvram.h"
+#include "machine/timer.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -39,6 +42,7 @@ public:
 		m_palette(*this, "palette"),
 		m_k053245(*this, "k053245"),
 		m_k051649(*this, "k051649"),
+		m_k053252(*this, "k053252"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_oki(*this, "oki"),
 		m_ttlrom_offset(0)
@@ -48,16 +52,13 @@ public:
 
 	K05324X_CB_MEMBER(sprite_callback);
 	TILE_GET_INFO_MEMBER(ttl_get_tile_info);
-	INTERRUPT_GEN_MEMBER(vbl_interrupt);
+	DECLARE_WRITE8_MEMBER(ccu_int_time_w);
+	TIMER_DEVICE_CALLBACK_MEMBER(scanline);
 
 	READ8_MEMBER(control_r) { return m_control; }
 
-	READ8_MEMBER(inp_magic_r) { return 0xff; }
-
-	READ8_MEMBER(irq_flag_r) { return 0xff; }
-
-	WRITE8_MEMBER(vbl_ack_w) { m_maincpu->set_input_line(0, CLEAR_LINE); }
-	WRITE8_MEMBER(nmi_ack_w) { m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE); }
+	WRITE_LINE_MEMBER(vbl_ack_w) { m_maincpu->set_input_line(0, CLEAR_LINE); }
+	WRITE_LINE_MEMBER(nmi_ack_w) { m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE); }
 
 	// A0 is inverted to match the Z80's endianness.  Typical Konami.
 	READ8_MEMBER(k244_r) { return m_k053245->k053244_r(space, offset^1);  }
@@ -88,6 +89,7 @@ private:
 	required_device<palette_device> m_palette;
 	required_device<k05324x_device> m_k053245;
 	required_device<k051649_device> m_k051649;
+	required_device<k053252_device> m_k053252;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<okim6295_device> m_oki;
 
@@ -96,7 +98,15 @@ private:
 	uint8_t     m_control;
 	int         m_ttlrom_offset;
 	uint8_t     m_vram[0x1000];
+	bool        m_title_hack;
+	int         m_ccu_int_time, m_ccu_int_time_count;
 };
+
+WRITE8_MEMBER(quickpick5_state::ccu_int_time_w)
+{
+	logerror("ccu_int_time rewritten with value of %02x\n", data);
+	m_ccu_int_time = data;
+}
 
 READ8_MEMBER(quickpick5_state::vram_r)
 {
@@ -153,12 +163,7 @@ WRITE8_MEMBER(quickpick5_state::vram_w)
 	}
 
 	m_vram[offset] = data;
-}
-
-INTERRUPT_GEN_MEMBER(quickpick5_state::vbl_interrupt)
-{
-	m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
-	m_maincpu->set_input_line(0, ASSERT_LINE);
+	m_ttl_tilemap->mark_tile_dirty(offset>>1);
 }
 
 void quickpick5_state::video_start()
@@ -189,8 +194,12 @@ void quickpick5_state::video_start()
 
 	m_ttl_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(quickpick5_state::ttl_get_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 	m_ttl_tilemap->set_transparent_pen(0);
+	m_ttl_tilemap->set_scrollx(80);
+	m_ttl_tilemap->set_scrolly(28);
 
 	m_ttlrom_offset = 0;
+	m_ccu_int_time_count = 0;
+	m_ccu_int_time = 20;
 }
 
 TILE_GET_INFO_MEMBER(quickpick5_state::ttl_get_tile_info)
@@ -210,10 +219,13 @@ uint32_t quickpick5_state::screen_update_quickpick5(screen_device &screen, bitma
 {
 	bitmap.fill(0, cliprect);
 	screen.priority().fill(0, cliprect);
-
-	m_ttl_tilemap->mark_all_dirty();
-	m_ttl_tilemap->draw(screen, bitmap, cliprect, 0, 0xff);
+	m_title_hack = false;
 	m_k053245->sprites_draw(bitmap, cliprect, screen.priority());
+
+	if (!m_title_hack)
+	{
+		m_ttl_tilemap->draw(screen, bitmap, cliprect, 0, 0xff);
+	}
 
 	return 0;
 }
@@ -222,19 +234,44 @@ K05324X_CB_MEMBER(quickpick5_state::sprite_callback)
 {
 	*code = (*code & 0x7ff);
 	*color = (*color & 0x003f);
+
+	if (*code == 0x520)
+	{
+		m_title_hack = true;
+	}
+}
+
+TIMER_DEVICE_CALLBACK_MEMBER(quickpick5_state::scanline)
+{
+	int scanline = param;
+
+	// z80 /IRQ is connected to the IRQ1(vblank) pin of k053252 CCU
+	if(scanline == 255)
+	{
+		m_maincpu->set_input_line(0, ASSERT_LINE);
+	}
+
+	// z80 /NMI is connected to the IRQ2 pin of k053252 CCU
+	// the following code is emulating INT_TIME of the k053252, this code will go away
+	// when the new konami branch is merged.
+	m_ccu_int_time_count--;
+	if (m_ccu_int_time_count <= 0)
+	{
+		m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
+		m_ccu_int_time_count = m_ccu_int_time;
+	}
 }
 
 static ADDRESS_MAP_START( quickpick5_main, AS_PROGRAM, 8, quickpick5_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM AM_REGION("maincpu", 0)
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
-	AM_RANGE(0xc000, 0xdbff) AM_RAM
+	AM_RANGE(0xc000, 0xdbff) AM_RAM AM_SHARE("nvram")
+	AM_RANGE(0xdc00, 0xdc0f) AM_DEVREADWRITE("k053252", k053252_device, read, write)
 	AM_RANGE(0xdc40, 0xdc4f) AM_READWRITE(k244_r, k244_w)
 	AM_RANGE(0xdc80, 0xdc80) AM_READ_PORT("DSW3")
 	AM_RANGE(0xdc81, 0xdc81) AM_READ_PORT("DSW4")
 	AM_RANGE(0xdcc0, 0xdcc0) AM_READ_PORT("DSW1")
 	AM_RANGE(0xdcc1, 0xdcc1) AM_READ_PORT("DSW2")
-	AM_RANGE(0xdc0e, 0xdc0e) AM_READWRITE(irq_flag_r, nmi_ack_w)
-	AM_RANGE(0xdc0f, 0xdc0f) AM_READWRITE(irq_flag_r, vbl_ack_w)
 	AM_RANGE(0xdd00, 0xdd00) AM_WRITENOP
 	AM_RANGE(0xdd40, 0xdd40) AM_NOP
 	AM_RANGE(0xdd80, 0xdd80) AM_READWRITE(control_r, control_w)
@@ -362,14 +399,19 @@ static MACHINE_CONFIG_START( quickpick5 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_32MHz/4) // z84c0008pec 8mhz part, 32Mhz xtal verified on PCB, divisor unknown
 	MCFG_CPU_PROGRAM_MAP(quickpick5_main)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", quickpick5_state, vbl_interrupt)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", quickpick5_state, scanline, "screen", 0, 1)
+
+	MCFG_DEVICE_ADD("k053252", K053252, XTAL_32MHz/4) /* K053252, xtal verified, divider not verified */
+	MCFG_K053252_INT1_ACK_CB(WRITELINE(quickpick5_state, vbl_ack_w))
+	MCFG_K053252_INT2_ACK_CB(WRITELINE(quickpick5_state, nmi_ack_w))
+	MCFG_K053252_INT_TIME_CB(WRITE8(quickpick5_state, ccu_int_time_w))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(59.62)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(20))
 	MCFG_SCREEN_SIZE(64*8, 33*8)
-	MCFG_SCREEN_VISIBLE_AREA(88, 456-1, 24, 264-1)
+	MCFG_SCREEN_VISIBLE_AREA(88, 456-1, 28, 256-1)
 	MCFG_SCREEN_UPDATE_DRIVER(quickpick5_state, screen_update_quickpick5)
 	MCFG_SCREEN_PALETTE("palette")
 
@@ -379,17 +421,19 @@ static MACHINE_CONFIG_START( quickpick5 )
 
 	MCFG_DEVICE_ADD("k053245", K053245, 0)
 	MCFG_GFX_PALETTE("palette")
-	MCFG_K05324X_OFFSETS(-44, -8)
+	MCFG_K05324X_OFFSETS(-(44+80), 20)
 	MCFG_K05324X_CB(quickpick5_state, sprite_callback)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", empty)
 
+	MCFG_NVRAM_ADD_0FILL("nvram")
+
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_K051649_ADD("k051649", XTAL_32MHz/16)
+	MCFG_K051649_ADD("k051649", XTAL_32MHz/18)  // xtal is verified, divider is not
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.45)
 
-	MCFG_OKIM6295_ADD("oki", XTAL_32MHz/16, PIN7_HIGH)
+	MCFG_OKIM6295_ADD("oki", XTAL_32MHz/18, PIN7_HIGH)
 	MCFG_SOUND_ROUTE(0, "mono", 1.0)
 	MCFG_SOUND_ROUTE(1, "mono", 1.0)
 MACHINE_CONFIG_END

@@ -728,25 +728,32 @@ void gba_rom_boktai_device::gpio_dev_write(uint16_t data, int gpio_dirs)
 
 WRITE32_MEMBER(gba_rom_3dmatrix_device::write_mapper)
 {
-	//printf("mapper write 0x%.8X - 0x%X\n", offset, data);
+	//printf("mapper write 0x%.8X - 0x%X\n", offset, data); fflush(stdout);
 	switch (offset & 3)
 	{
 		case 0:
-			if (data == 0x1)    // transfer data
+			//printf("command: %08x\n", data); fflush(stdout);
+			if (data & 0x01)    // transfer data
 				memcpy((uint8_t *)m_romhlp + m_dst, (uint8_t *)m_rom + m_src, m_nblock * 0x200);
 			else
 				printf("Unknown mapper command 0x%X\n", data);
 			break;
 		case 1:
-			m_src = data;
+			//printf("m_src: %08x\n", data); fflush(stdout);
+			m_src = data & 0x3ffffff;
 			break;
 		case 2:
+			//printf("m_dst: %08x\n", data); fflush(stdout);
 			if (data >= 0xa000000)
+			{
 				printf("Unknown transfer destination 0x%X\n", data);
+				fflush(stdout);
+			}
 			m_dst = (data & 0x1ffffff);
 			break;
 		case 3:
 		default:
+			//printf("m_nblock: %08x\n", data); fflush(stdout);
 			m_nblock = data;
 			break;
 	}
