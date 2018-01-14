@@ -1607,11 +1607,7 @@ ROM_START( trivrus )
 	ROM_REGION( 0x1000000, "user2", ROMREGION_ERASEFF ) // Unmapped flash
 ROM_END
 
-/*
-  uses ADC 'Amazon-LF' SoC, EISC CPU core - similar to crystal system?
-*/
-
-ROM_START( crospuzl )
+ROM_START( crospuzl ) /* This PCB uses ADC 'Amazon-LF' SoC, EISC CPU core - However PCBs have been see with a standard VRenderZERO+ MagicEyes EISC chip */
 	ROM_REGION( 0x80010, "maincpu", 0 )
 	ROM_LOAD("en29lv040a.u5",  0x000000, 0x80010, CRC(d50e8500) SHA1(d681cd18cd0e48854c24291d417d2d6d28fe35c1) )
 
