@@ -46,6 +46,7 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_ram(*this, "ram"),
+		m_palram(*this, "palram"),
 		m_pixram(*this, "pixram"),
 		m_bank(*this, "bank"),
 		m_gfxdecode(*this, "gfxdecode"),
@@ -58,11 +59,22 @@ public:
 	DECLARE_WRITE8_MEMBER(radicasi_500c_w);
 	DECLARE_WRITE8_MEMBER(radicasi_500d_w);
 	
-	// palette bases
-	DECLARE_WRITE8_MEMBER(radicasi_palbase_lo_w);
-	DECLARE_WRITE8_MEMBER(radicasi_palbase_hi_w);
-	DECLARE_READ8_MEMBER(radicasi_palbase_lo_r);
-	DECLARE_READ8_MEMBER(radicasi_palbase_hi_r);
+	// DMA
+	DECLARE_WRITE8_MEMBER(radicasi_dmasrc_lo_w);
+	DECLARE_WRITE8_MEMBER(radicasi_dmasrc_hi_w);
+	DECLARE_READ8_MEMBER(radicasi_dmasrc_lo_r);
+	DECLARE_READ8_MEMBER(radicasi_dmasrc_hi_r);
+	DECLARE_WRITE8_MEMBER(radicasi_dmadst_lo_w);
+	DECLARE_WRITE8_MEMBER(radicasi_dmadst_hi_w);
+	DECLARE_READ8_MEMBER(radicasi_dmadst_lo_r);
+	DECLARE_READ8_MEMBER(radicasi_dmadst_hi_r);
+	DECLARE_WRITE8_MEMBER(radicasi_dmasize_lo_w);
+	DECLARE_WRITE8_MEMBER(radicasi_dmasize_hi_w);
+	DECLARE_READ8_MEMBER(radicasi_dmasize_lo_r);
+	DECLARE_READ8_MEMBER(radicasi_dmasize_hi_r);
+	DECLARE_READ8_MEMBER(radicasi_dmatrg_r);
+	DECLARE_WRITE8_MEMBER(radicasi_dmatrg_w);
+
 
 
 	// tile bases
@@ -123,6 +135,7 @@ protected:
 private:
 	required_device<cpu_device> m_maincpu;
 	required_shared_ptr<uint8_t> m_ram;
+	required_shared_ptr<uint8_t> m_palram;
 	required_shared_ptr<uint8_t> m_pixram;
 	required_device<address_map_bank_device> m_bank;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -132,8 +145,13 @@ private:
 	uint8_t m_500d_data;
 	uint8_t m_5027_data;
 
-	uint8_t m_palbase_lo_data;
-	uint8_t m_palbase_hi_data;
+	uint8_t m_dmasrc_lo_data;
+	uint8_t m_dmasrc_hi_data;
+	uint8_t m_dmadst_lo_data;
+	uint8_t m_dmadst_hi_data;
+	uint8_t m_dmasize_lo_data;
+	uint8_t m_dmasize_hi_data;
+
 
 	uint8_t m_tile_gfxbase_lo_data;
 	uint8_t m_tile_gfxbase_hi_data;
@@ -180,14 +198,11 @@ uint32_t radica_6502_state::screen_update(screen_device &screen, bitmap_ind16 &b
 
 	address_space& fullbankspace = m_bank->space(AS_PROGRAM);
 
-	int offset = (m_palbase_lo_data | (m_palbase_hi_data <<8)) * 0x100;
-
-	//printf("palette base is %06x\n", offset);
-
-	for (int i = 0; i < 1024; i++)
+	int offset = 0;
+	for (int i = 0; i < 256; i++)
 	{
-		uint16_t dat = fullbankspace.read_byte(offset++);
-		dat |= fullbankspace.read_byte(offset++) << 8;
+		uint16_t dat = m_palram[offset++];
+		dat |= m_palram[offset++] << 8;
 		
 		// wrong format, does seem to be 13-bit tho.
 		// the palette for the Taito logo is at 27f00 in ROM, 4bpp, 16 colours.
@@ -363,29 +378,111 @@ READ8_MEMBER(radica_6502_state::radicasi_sprite_gfxbase_hi_r)
 
 // Palette bases
 
-WRITE8_MEMBER(radica_6502_state::radicasi_palbase_lo_w)
+WRITE8_MEMBER(radica_6502_state::radicasi_dmasrc_lo_w)
 {
-	logerror("%s: radicasi_palbase_lo_w (select Palette base lower) %02x\n", machine().describe_context().c_str(), data);
-	m_palbase_lo_data = data;
+	logerror("%s: radicasi_dmasrc_lo_w (select DMA source lower) %02x\n", machine().describe_context().c_str(), data);
+	m_dmasrc_lo_data = data;
 }
 
-WRITE8_MEMBER(radica_6502_state::radicasi_palbase_hi_w)
+WRITE8_MEMBER(radica_6502_state::radicasi_dmasrc_hi_w)
 {
-	logerror("%s: radicasi_palbase_hi_w (select Palette base upper) %02x\n", machine().describe_context().c_str(), data);
-	m_palbase_hi_data = data;
+	logerror("%s: radicasi_dmasrc_hi_w (select DMA source upper) %02x\n", machine().describe_context().c_str(), data);
+	m_dmasrc_hi_data = data;
 }
 
-READ8_MEMBER(radica_6502_state::radicasi_palbase_lo_r)
+READ8_MEMBER(radica_6502_state::radicasi_dmasrc_lo_r)
 {
-	logerror("%s: radicasi_palbase_lo_r (Palette base lower)\n", machine().describe_context().c_str());
-	return m_palbase_lo_data;
+	logerror("%s: radicasi_dmasrc_lo_r (DMA source lower)\n", machine().describe_context().c_str());
+	return m_dmasrc_lo_data;
 }
 
-READ8_MEMBER(radica_6502_state::radicasi_palbase_hi_r)
+READ8_MEMBER(radica_6502_state::radicasi_dmasrc_hi_r)
 {
-	logerror("%s: radicasi_palbase_hi_r (Palette base upper)\n", machine().describe_context().c_str());
-	return m_palbase_hi_data;
+	logerror("%s: radicasi_dmasrc_hi_r (DMA source upper)\n", machine().describe_context().c_str());
+	return m_dmasrc_hi_data;
 }
+
+
+
+WRITE8_MEMBER(radica_6502_state::radicasi_dmadst_lo_w)
+{
+	logerror("%s: radicasi_dmadst_lo_w (select DMA Dest lower) %02x\n", machine().describe_context().c_str(), data);
+	m_dmadst_lo_data = data;
+}
+
+WRITE8_MEMBER(radica_6502_state::radicasi_dmadst_hi_w)
+{
+	logerror("%s: radicasi_dmadst_hi_w (select DMA Dest upper) %02x\n", machine().describe_context().c_str(), data);
+	m_dmadst_hi_data = data;
+}
+
+READ8_MEMBER(radica_6502_state::radicasi_dmadst_lo_r)
+{
+	logerror("%s: radicasi_dmadst_lo_r (DMA Dest lower)\n", machine().describe_context().c_str());
+	return m_dmadst_lo_data;
+}
+
+READ8_MEMBER(radica_6502_state::radicasi_dmadst_hi_r)
+{
+	logerror("%s: radicasi_dmadst_hi_r (DMA Dest upper)\n", machine().describe_context().c_str());
+	return m_dmadst_hi_data;
+}
+
+
+WRITE8_MEMBER(radica_6502_state::radicasi_dmasize_lo_w)
+{
+	logerror("%s: radicasi_dmasize_lo_w (select DMA Size lower) %02x\n", machine().describe_context().c_str(), data);
+	m_dmasize_lo_data = data;
+}
+
+WRITE8_MEMBER(radica_6502_state::radicasi_dmasize_hi_w)
+{
+	logerror("%s: radicasi_dmasize_hi_w (select DMA Size upper) %02x\n", machine().describe_context().c_str(), data);
+	m_dmasize_hi_data = data;
+}
+
+READ8_MEMBER(radica_6502_state::radicasi_dmasize_lo_r)
+{
+	logerror("%s: radicasi_dmasize_lo_r (DMA Size lower)\n", machine().describe_context().c_str());
+	return m_dmasize_lo_data;
+}
+
+READ8_MEMBER(radica_6502_state::radicasi_dmasize_hi_r)
+{
+	logerror("%s: radicasi_dmasize_hi_r (DMA Size upper)\n", machine().describe_context().c_str());
+	return m_dmasize_hi_data;
+}
+
+READ8_MEMBER(radica_6502_state::radicasi_dmatrg_r)
+{
+	logerror("%s: radicasi_dmasize_hi_r (DMA operation state?)\n", machine().describe_context().c_str());
+	return 0x00;//m_dmatrg_data;
+}
+
+
+WRITE8_MEMBER(radica_6502_state::radicasi_dmatrg_w)
+{
+	logerror("%s: radicasi_dmasize_lo_w (trigger DMA operation) %02x\n", machine().describe_context().c_str(), data);
+	//m_dmatrg_data = data;
+
+	address_space& fullbankspace = m_bank->space(AS_PROGRAM);
+	address_space& destspace = m_maincpu->space(AS_PROGRAM);
+
+	int src = (m_dmasrc_lo_data | (m_dmasrc_hi_data <<8)) * 0x100;
+	uint16_t dest = (m_dmadst_lo_data | (m_dmadst_hi_data <<8));
+	uint16_t size = (m_dmasize_lo_data | (m_dmasize_hi_data <<8));
+
+	logerror(" Doing DMA %06x to %04x size %04x\n", src, dest, size);
+
+	for (int i = 0; i < size; i++)
+	{
+		uint8_t dat = fullbankspace.read_byte(src+i);
+		destspace.write_byte(dest+i, dat);
+	}
+}
+
+
+
 
 // unknown regs that seem to also be pointers
 // seem to get set to sound data?
@@ -643,14 +740,22 @@ WRITE8_MEMBER(radica_6502_state::radicasi_5027_w)
 
 static ADDRESS_MAP_START( radicasi_map, AS_PROGRAM, 8, radica_6502_state )
 	AM_RANGE(0x0000, 0x3fff) AM_RAM AM_SHARE("ram") // ends up copying code to ram, but could be due to banking issues
-	AM_RANGE(0x4800, 0x49ff) AM_RAM
+	AM_RANGE(0x4800, 0x49ff) AM_RAM AM_SHARE("palram")
 
 	AM_RANGE(0x500b, 0x500b) AM_READ(radicasi_500b_r) // PAL / NTSC flag at least
 	AM_RANGE(0x500c, 0x500c) AM_WRITE(radicasi_500c_w)
 	AM_RANGE(0x500d, 0x500d) AM_READWRITE(radicasi_500d_r, radicasi_500d_w)
 
-	AM_RANGE(0x5010, 0x5010) AM_READWRITE(radicasi_palbase_lo_r, radicasi_palbase_lo_w) // palettebase
-	AM_RANGE(0x5011, 0x5011) AM_READWRITE(radicasi_palbase_hi_r, radicasi_palbase_hi_w) // palettebase
+	AM_RANGE(0x5010, 0x5010) AM_READWRITE(radicasi_dmasrc_lo_r, radicasi_dmasrc_lo_w)
+	AM_RANGE(0x5011, 0x5011) AM_READWRITE(radicasi_dmasrc_hi_r, radicasi_dmasrc_hi_w)
+
+	AM_RANGE(0x5012, 0x5012) AM_READWRITE(radicasi_dmadst_lo_r, radicasi_dmadst_lo_w)
+	AM_RANGE(0x5013, 0x5013) AM_READWRITE(radicasi_dmadst_hi_r, radicasi_dmadst_hi_w)
+
+	AM_RANGE(0x5014, 0x5014) AM_READWRITE(radicasi_dmasize_lo_r, radicasi_dmasize_lo_w)
+	AM_RANGE(0x5015, 0x5015) AM_READWRITE(radicasi_dmasize_hi_r, radicasi_dmasize_hi_w)
+
+	AM_RANGE(0x5016, 0x5016) AM_READWRITE(radicasi_dmatrg_r, radicasi_dmatrg_w)
 
 	AM_RANGE(0x5027, 0x5027) AM_WRITE(radicasi_5027_w)
 
