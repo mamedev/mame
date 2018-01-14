@@ -118,6 +118,8 @@ private:
 	/* IO ports */
 	uint8_t                   m_port_in[4];         /* SPC input ports */
 	uint8_t                   m_port_out[4];        /* SPC output ports */
+	
+	uint16_t				  m_TnDIV[3]; /**< Timer N Divider */
 };
 
 DECLARE_DEVICE_TYPE(SNES, snes_sound_device)

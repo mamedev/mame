@@ -170,6 +170,7 @@ snes_sound_device::snes_sound_device(const machine_config &mconfig, const char *
 
 void snes_sound_device::device_start()
 {
+	const int timerHz[3] = { 8000, 8000, 64000 };
 	m_channel = machine().sound().stream_alloc(*this, 0, 2, 32000);
 
 	m_ram = make_unique_clear<uint8_t[]>(SNES_SPCRAM_SIZE);
@@ -178,16 +179,14 @@ void snes_sound_device::device_start()
 	memcpy(m_ipl_region, machine().root_device().memregion("sound_ipl")->base(), 64);
 
 	/* Initialize the timers */
-	m_timer[0] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(snes_sound_device::spc_timer),this));
-	m_timer[0]->adjust(attotime::from_hz(8000),  0, attotime::from_hz(8000));
-	m_timer[0]->enable(false);
-	m_timer[1] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(snes_sound_device::spc_timer),this));
-	m_timer[1]->adjust(attotime::from_hz(8000),  1, attotime::from_hz(8000));
-	m_timer[1]->enable(false);
-	m_timer[2] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(snes_sound_device::spc_timer),this));
-	m_timer[2]->adjust(attotime::from_hz(64000), 2, attotime::from_hz(64000));
-	m_timer[2]->enable(false);
-
+	for(int timerNumber=0;timerNumber<3;timerNumber++)
+	{
+		m_timer[timerNumber] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(snes_sound_device::spc_timer),this));
+		m_timer[timerNumber]->adjust(attotime::from_hz(timerHz[timerNumber]),  0, attotime::from_hz(timerHz[timerNumber]));
+		m_timer[timerNumber]->enable(false);
+		m_TnDIV[timerNumber] = 256;
+	}
+	
 	state_register();
 	save_pointer(NAME(m_ram.get()), SNES_SPCRAM_SIZE);
 }
@@ -991,9 +990,9 @@ int snes_sound_device::advance_envelope( int v )
 TIMER_CALLBACK_MEMBER( snes_sound_device::spc_timer )
 {
 	int which = param;
-
+	
 	m_counter[which]++;
-	if (m_counter[which] >= m_ram[0xfa + which] ) // minus =
+	if (m_counter[which] >= m_TnDIV[which] ) // minus =
 	{
 		m_counter[which] = 0;
 		m_ram[0xfd + which]++;
@@ -1139,8 +1138,11 @@ WRITE8_MEMBER( snes_sound_device::spc_io_w )
 		case 0xa:       /* Timer 0 */
 		case 0xb:       /* Timer 1 */
 		case 0xc:       /* Timer 2 */
-			if (data == 0)
-				data = 255;
+			// if 0 then TnDiv is divided by 256, otherwise it's divided by 1 to 255
+			if(data == 0)
+				m_TnDIV[offset - 0xa] = 256;
+			else
+				m_TnDIV[offset - 0xa] = data;
 			break;
 		case 0xd:       /* Counter 0 */
 		case 0xe:       /* Counter 1 */
