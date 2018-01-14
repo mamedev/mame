@@ -9,6 +9,7 @@ function datfile.open(file, vertag, fixupcb)
 		local data
 		local stmt = db:prepare("SELECT f.data FROM \"" .. file .. "_idx\" AS fi, \"" .. file .. [["
 		 AS f WHERE fi.type = ? AND fi.val = ? AND fi.romset = ? AND f.rowid = fi.data]])
+		check_db("reading " .. tag1 .. " - " .. tag2 .. " - " .. set)
 		stmt:bind_values(tag1, tag2, set)
 		if stmt:step() == sql.ROW then
 			data = stmt:get_value(0)
@@ -32,6 +33,7 @@ function datfile.open(file, vertag, fixupcb)
 	file = file:gsub("[^%w%._]", "")
 
 	local stmt = db:prepare("SELECT version FROM version WHERE datfile = ?")
+	check_db("reading version")
 	stmt:bind_values(file)
 	if stmt:step() == sql.ROW then
 		dbver = stmt:get_value(0)
@@ -49,8 +51,11 @@ function datfile.open(file, vertag, fixupcb)
 				val VARCHAR NOT NULL,
 				romset VARCHAR NOT NULL,
 				data INTEGER NOT NULL)]])
+		check_db("creating index")
 		db:exec("CREATE TABLE \"" .. file .. "\" (data CLOB NOT NULL)")
+		check_db("creating table")
 		db:exec("CREATE INDEX \"typeval_" .. file .. "\" ON \"" .. file .. "_idx\"(type, val)")
+		check_db("creating typeval index")
 	end
 
 	if vertag then
@@ -72,10 +77,14 @@ function datfile.open(file, vertag, fixupcb)
 
 	if dbver then
 		db:exec("DELETE FROM \"" .. file .. "\"")
+		check_db("deleting")
 		db:exec("DELETE FROM \"" .. file .. "_idx\"")
+		check_db("deleting index")
 		stmt = db:prepare("UPDATE version SET version = ? WHERE datfile = ?")
+		check_db("updating version")
 	else
 		stmt = db:prepare("INSERT INTO version VALUES (?, ?)")
+		check_db("inserting version")
 	end
 	stmt:bind_values(ver, file)
 	stmt:step()
@@ -86,6 +95,7 @@ function datfile.open(file, vertag, fixupcb)
 		fh:seek("set")
 		local buffer = fh:read("a")
 		db:exec("BEGIN TRANSACTION")
+		check_db("beginning transaction")
 		local function gmatchpos()
 			local pos = 1
 			local function iter()
@@ -127,6 +137,7 @@ function datfile.open(file, vertag, fixupcb)
 						data = fixupcb(data)
 					end
 					stmt = db:prepare("INSERT INTO \"" .. file .. "\" VALUES (?)")
+					check_db("inserting values")
 					stmt:bind_values(data)
 					stmt:step()
 					local row = stmt:last_insert_rowid()
@@ -137,6 +148,7 @@ function datfile.open(file, vertag, fixupcb)
 								fixupcb(data)
 							end
 							stmt = db:prepare("INSERT INTO \"" .. file .. "_idx\" VALUES (?, ?, ?, ?)")
+							check_db("inserting into index")
 							stmt:bind_values(tag1, tag2, set, row)
 							stmt:step()
 							stmt:finalize()
@@ -146,6 +158,7 @@ function datfile.open(file, vertag, fixupcb)
 			end
 		end
 		db:exec("END TRANSACTION")
+		check_db("ending transaction")
 	end
 	fh:close()
 
