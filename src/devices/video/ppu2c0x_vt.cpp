@@ -40,10 +40,21 @@ READ8_MEMBER(ppu_vt03_device::palette_read)
 
 void ppu_vt03_device::set_new_pen(int i)
 {
-	uint16_t palval = (m_newpal[i&0x7f] & 0x3f) | ((m_newpal[(i&0x7f)+0x80] & 0x3f)<<6);
-	// &0x3f so we don't attempt to use any of the extended colours right now because
-	// I haven't managed to work out the format
-	m_palette->set_pen_indirect(i&0x7f,palval&0x3f);
+	if(m_pal_mode == PAL_MODE_NEW_RGB) {
+		
+		uint16_t rgbval = (m_newpal[i&0x7f] & 0xff) | ((m_newpal[(i&0x7f)+0x80] & 0xff)<<8);
+		logerror ("pal %d rgb %04x\n",i,rgbval);
+		uint8_t blue = (rgbval & 0x001f) << 3;
+		uint8_t green = (rgbval & 0x3e0) >> 2;
+		uint8_t red  = (rgbval & 0x7C00) >> 7;
+		m_palette->set_pen_color(i & 0x7f, rgb_t(red, green, blue));
+	} else {
+		uint16_t palval = (m_newpal[i&0x7f] & 0x3f) | ((m_newpal[(i&0x7f)+0x80] & 0x3f)<<6);
+		// &0x3f so we don't attempt to use any of the extended colours right now because
+		// I haven't managed to work out the format
+		m_palette->set_pen_indirect(i&0x7f,palval&0x3f);
+	}
+
 }
 
 WRITE8_MEMBER(ppu_vt03_device::palette_write)

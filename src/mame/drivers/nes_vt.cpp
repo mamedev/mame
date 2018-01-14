@@ -121,7 +121,7 @@ private:
 	void scanline_irq(int scanline, int vblank, int blanked);
 	uint8_t m_410x[0xc];
 	
-	uint8_t vdma_ctrl;
+	uint8_t m_vdma_ctrl;
 	
 	int m_timer_irq_enabled;
 	int m_timer_running;
@@ -749,9 +749,9 @@ WRITE8_MEMBER(nes_vt_state::nes_vh_sprite_dma_w)
 
 WRITE8_MEMBER(nes_vt_state::vt_hh_sprite_dma_w)
 {
-	uint8_t dma_mode = vdma_ctrl & 0x01;
-	uint8_t dma_len  = (vdma_ctrl >> 1) & 0x07;
-	uint8_t src_nib_74 =  (vdma_ctrl >> 4) & 0x0F;
+	uint8_t dma_mode = m_vdma_ctrl & 0x01;
+	uint8_t dma_len  = (m_vdma_ctrl >> 1) & 0x07;
+	uint8_t src_nib_74 =  (m_vdma_ctrl >> 4) & 0x0F;
 	int length = 256;
 	switch(dma_len) {
 		case 0x0: length = 256; break;
@@ -761,7 +761,7 @@ WRITE8_MEMBER(nes_vt_state::vt_hh_sprite_dma_w)
 		case 0x7: length = 128; break;
 	}
 	uint16_t src_addr = (data << 8) | (src_nib_74 << 4);
-	logerror("vthh dma start ctrl=%02x addr=%04x\n", vdma_ctrl, src_addr);
+	logerror("vthh dma start ctrl=%02x addr=%04x\n", m_vdma_ctrl, src_addr);
 	for (int i = 0; i < length; i++)
 	{
 		uint8_t spriteData = space.read_byte(src_addr + i);
@@ -779,7 +779,7 @@ WRITE8_MEMBER(nes_vt_state::vt_hh_sprite_dma_w)
 
 WRITE8_MEMBER(nes_vt_state::vt03_4034_w)
 {
-	vdma_ctrl = data;
+	m_vdma_ctrl = data;
 }
 
 static ADDRESS_MAP_START( nes_vt_map, AS_PROGRAM, 8, nes_vt_state )
@@ -935,6 +935,8 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( nes_vt_hh, nes_vt_xx )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(nes_vt_hh_map)
+	MCFG_PPU_VT03_MODIFY("ppu")
+	MCFG_PPU_VT03_SET_PAL_MODE(PAL_MODE_NEW_RGB);
 MACHINE_CONFIG_END
 
 static INPUT_PORTS_START( nes_vt )
