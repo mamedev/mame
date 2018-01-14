@@ -797,13 +797,25 @@ static ADDRESS_MAP_START( radicasi_map, AS_PROGRAM, 8, radica_6502_state )
 
 	AM_RANGE(0x5027, 0x5027) AM_WRITE(radicasi_5027_w)
 
+	// 5031 y scroll lo (phoenix)
+	// 5032 y scroll hi (phoenix)
+
 	AM_RANGE(0x5029, 0x5029) AM_READWRITE(radicasi_tile_gfxbase_lo_r, radicasi_tile_gfxbase_lo_w) // tilebase
 	AM_RANGE(0x502a, 0x502a) AM_READWRITE(radicasi_tile_gfxbase_hi_r, radicasi_tile_gfxbase_hi_w) // tilebase
 
 	AM_RANGE(0x502b, 0x502b) AM_READWRITE(radicasi_sprite_gfxbase_lo_r, radicasi_sprite_gfxbase_lo_w) // tilebase (spr?)
 	AM_RANGE(0x502c, 0x502c) AM_READWRITE(radicasi_sprite_gfxbase_hi_r, radicasi_sprite_gfxbase_hi_w) // tilebase (spr?)
 
-	AM_RANGE(0x5041, 0x5041) AM_READ_PORT("IN0")
+	// 5040 written at same time as 5048 (port direction?)
+	AM_RANGE(0x5041, 0x5041) AM_READ_PORT("IN0") // written with 0x80 after setting 5040 to 0x7f
+	// 5042 written at same time as 5049 (port direction?)
+	// 5043 written with 0x00 after setting 0x5042 to 0xfe
+	// 5044 written at same time as 504a (port direction?)
+	// 5045 written with 0x00 after setting 0x5044 to 0xff
+	
+	// 5048 see above (some kind of port config?)
+	// 5049 see above
+	// 504a see above
 
 	AM_RANGE(0x5060, 0x506d) AM_RAM // read/written by tetris
 
