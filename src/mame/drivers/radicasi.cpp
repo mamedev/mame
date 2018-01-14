@@ -232,8 +232,8 @@ void radica_6502_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap
 		uint8_t x = m_spriteram[i + 2];
 		uint8_t y = m_spriteram[i + 1];
 
-		uint8_t tex_x = (m_spriteram[i + 4]);
-		uint8_t tex_y = (m_spriteram[i + 5]);
+		uint8_t tex_x = m_spriteram[i + 4];
+		uint8_t tex_y = m_spriteram[i + 5];
 
 		uint8_t attrs = m_spriteram[i + 0];
 
