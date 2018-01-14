@@ -40,10 +40,8 @@ READ8_MEMBER(ppu_vt03_device::palette_read)
 
 void ppu_vt03_device::set_new_pen(int i)
 {
-	if(m_pal_mode == PAL_MODE_NEW_RGB) {
-		
+	if(m_pal_mode == PAL_MODE_NEW_RGB) {		
 		uint16_t rgbval = (m_newpal[i&0x7f] & 0xff) | ((m_newpal[(i&0x7f)+0x80] & 0xff)<<8);
-		logerror ("pal %d rgb %04x\n",i,rgbval);
 		uint8_t blue = (rgbval & 0x001f) << 3;
 		uint8_t green = (rgbval & 0x3e0) >> 2;
 		uint8_t red  = (rgbval & 0x7C00) >> 7;
@@ -110,12 +108,16 @@ void ppu_vt03_device::device_reset()
 
 	m_read_bg.resolve_safe(0);
 	m_read_sp.resolve_safe(0);
-
+	for (int i = 0;i < 0xff;i++)
+		m_newpal[i] = 0x0;
+	set_2010_reg(0x00);
+	set_2010_reg(0x80);
 	set_2010_reg(0x00);
 
 	// todo: what are the actual defaults for these?
 	for (int i = 0;i < 0x20;i++)
 		set_201x_reg(i, 0x00);
+	
 
 	m_read_bg4_bg3 = 0;
 	m_va34 = 0;

@@ -326,10 +326,11 @@ void nes_vt_state::scanline_irq(int scanline, int vblank, int blanked)
 	{
 		m_timer_val--;
 
-		if (m_timer_val < 0)
+		if (m_timer_val < 1)
 		{
 			if (m_timer_irq_enabled)
 			{
+				logerror("scanline_irq %d\n", scanline);
 				irqstate = 1;
 			}
 		}
@@ -399,7 +400,8 @@ void nes_vt_state::machine_reset()
 	m_timer_irq_enabled = 0;
 	m_timer_running = 0;
 	m_timer_val = 0;
-
+	m_vdma_ctrl = 0;
+	
 	update_banks();
 }
 
@@ -764,12 +766,14 @@ WRITE8_MEMBER(nes_vt_state::vt_hh_sprite_dma_w)
 	logerror("vthh dma start ctrl=%02x addr=%04x\n", m_vdma_ctrl, src_addr);
 	for (int i = 0; i < length; i++)
 	{
+		
 		uint8_t spriteData = space.read_byte(src_addr + i);
 		if(dma_mode) {
 			space.write_byte(0x2007, spriteData);
 		} else {
 			space.write_byte(0x2004, spriteData);
 		}
+		if(((src_addr + i) & 0xFF) == length) break;
 	}
 
 	// should last (length * 4 - 1) CPU cycles.
