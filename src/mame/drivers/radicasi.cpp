@@ -142,6 +142,7 @@
 
 	Enemies in Phoenix are rendered above the score panel
 
+	The 200pt right facing bird on the Phoenix score table is corrupt
 
 	Uncertain (to check)
 
