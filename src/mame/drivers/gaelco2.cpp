@@ -25,6 +25,8 @@
     sounds cut out sometimes, others are often missing (sound status reads as busy,
     so no attempt made to play new sound) probably bug in devices\sound\gaelco.cpp ??
 
+Known to exist but not dumped is a Maniac Square v1.0 with checksum 66B1
+
 ***************************************************************************/
 
 #include "emu.h"
