@@ -36,6 +36,7 @@ public:
 		, m_earom(*this, "earom")
 		, m_picu(*this, "picu")
 		, m_p_chargen(*this, "chargen")
+		, m_videoram(*this, "videoram")
 	{ }
 
 	template<int n> DECLARE_WRITE8_MEMBER(brg_w);
@@ -56,10 +57,52 @@ private:
 	required_device<er1400_device> m_earom;
 	required_device<i8214_device> m_picu;
 	required_region_ptr<u8> m_p_chargen;
+	required_shared_ptr<u8> m_videoram;
 };
 
 u32 v100_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
+	if (m_vtac->screen_reset())
+	{
+		bitmap.fill(rgb_t::black(), cliprect);
+		return 0;
+	}
+
+	unsigned row = cliprect.top() / 10;
+	unsigned scan = cliprect.top() % 10;
+	unsigned x0 = cliprect.left();
+	unsigned stride = (screen.visible_area().width() / CHAR_WIDTH) + 2;
+	unsigned ch0 = (x0 / CHAR_WIDTH) + (row * stride) + 2;
+	unsigned px0 = x0 % CHAR_WIDTH;
+
+	for (unsigned y = cliprect.top(); y <= cliprect.bottom(); y++)
+	{
+		unsigned x = x0, ch = ch0, px = px0;
+		u8 vchar = m_videoram[ch & m_videoram.mask()];
+		u8 gfxdata = m_p_chargen[((vchar & 0x7f) << 4) | scan];
+		while (x <= cliprect.right())
+		{
+			bitmap.pix(y, x) = BIT(gfxdata, 7) ? rgb_t::white() : rgb_t::black();
+			x++;
+			px++;
+			if ((px & 1) == 0)
+				gfxdata <<= 1;
+			if (px >= CHAR_WIDTH)
+			{
+				vchar = m_videoram[++ch & m_videoram.mask()];
+				gfxdata = m_p_chargen[((vchar & 0x7f) << 4) | scan];
+				px = 0;
+			}
+		}
+		scan++;
+		if (scan >= 10)
+		{
+			row++;
+			ch0 += stride;
+			scan = 0;
+		}
+	}
+
 	return 0;
 }
 
@@ -103,7 +146,8 @@ WRITE8_MEMBER(v100_state::ppi_porta_w)
 
 static ADDRESS_MAP_START( mem_map, AS_PROGRAM, 8, v100_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM AM_REGION("maincpu", 0)
-	AM_RANGE(0x4000, 0x5fff) AM_RAM
+	AM_RANGE(0x4000, 0x4fff) AM_RAM AM_SHARE("videoram")
+	AM_RANGE(0x5000, 0x5fff) AM_RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( io_map, AS_IO, 8, v100_state )
