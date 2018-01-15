@@ -1017,6 +1017,8 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( nes_vt_dg, nes_vt_xx )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(nes_vt_dg_map)
+	MCFG_PPU_VT03_MODIFY("ppu")
+	MCFG_PPU_VT03_SET_PAL_MODE(PAL_MODE_NEW_VG);
 MACHINE_CONFIG_END
 
 // New mystery handheld architecture, VTxx derived
@@ -1228,9 +1230,9 @@ CONS( 200?, vgtablet,   0,        0,  nes_vt,    nes_vt, nes_vt_state,  0, "<unk
 
 // this is VT09 based, and needs 8bpp modes at least
 // it boots, but gfx look wrong due to unsupported mode
-CONS( 2009, cybar120,  0,  0,  nes_vt_xx, nes_vt, nes_vt_state,  0, "Defender", "Defender M2500P 120-in-1", MACHINE_NOT_WORKING )
-CONS( 200?, vgpocket,  0,  0,  nes_vt_xx, nes_vt, nes_vt_state,  0, "<unknown>", "VG Pocket (VG-2000)", MACHINE_NOT_WORKING )
-CONS( 200?, vgpmini,   0,  0,  nes_vt_xx, nes_vt, nes_vt_state,  0, "<unknown>", "VG Pocket Mini (VG-1500)", MACHINE_NOT_WORKING )
+CONS( 2009, cybar120,  0,  0,  nes_vt_dg, nes_vt, nes_vt_state,  0, "Defender", "Defender M2500P 120-in-1", MACHINE_NOT_WORKING )
+CONS( 200?, vgpocket,  0,  0,  nes_vt_dg, nes_vt, nes_vt_state,  0, "<unknown>", "VG Pocket (VG-2000)", MACHINE_NOT_WORKING )
+CONS( 200?, vgpmini,   0,  0,  nes_vt_dg, nes_vt, nes_vt_state,  0, "<unknown>", "VG Pocket Mini (VG-1500)", MACHINE_NOT_WORKING )
 
 // these are NOT VT03, but something newer but based around the same basic designs
 // (no visible tiles in ROM using standard decodes tho, might need moving out of here)

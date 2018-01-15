@@ -55,7 +55,7 @@ void ppu_vt03_device::set_new_pen(int i)
 		uint8_t rsat = (palval >> 8) & 0x0F;
 		//See http://wiki.nesdev.com/w/index.php/VT03%2B_Enhanced_Palette#Inverted_extended_color_numbers
 		bool inverted = (rlum < ((rsat + 1) >> 1) || rlum > (15 - (rsat >>1)));
-		if(inverted) {
+		if(inverted && (m_pal_mode != PAL_MODE_NEW_VG)) {
 			rsat = 16 - rsat;
 			rlum = (rlum - 8) & 0x0F;
 			uint8_t hue_lut[16] = {0xD, 0x7, 0x8, 0x9, 0xA, 0xB, 0xC, 0x1, 0x2, 0x3, 0x4, 0x5, 0x6, 0x0, 0xE, 0xF};
@@ -129,7 +129,8 @@ void ppu_vt03_device::set_new_pen(int i)
 
 WRITE8_MEMBER(ppu_vt03_device::palette_write)
 {
-	if (m_201x_regs[0] & 0x80)
+	logerror("pal write %d %02x\n", offset, data);
+	if (m_201x_regs[0] & 0x80 || m_pal_mode == PAL_MODE_NEW_VG)
 	{
 		m_newpal[offset] = data;
 		set_new_pen(offset);
