@@ -1156,7 +1156,8 @@ WRITE8_MEMBER( snes_sound_device::spc_io_w )
 		case 0x7:       /* Port 3 */
 			// osd_printf_debug("SPC: %02x to APU @ %d %s\n", data, offset & 3, machine().describe_context());
 			m_port_out[offset - 4] = data;
-			machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(20));
+			// Unneeded, we already run at perfect_interleave
+			// machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(20));
 			break;
 		case 0xa:       /* Timer 0 */
 		case 0xb:       /* Timer 1 */
