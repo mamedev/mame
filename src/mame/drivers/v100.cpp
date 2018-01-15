@@ -31,6 +31,7 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_screen(*this, "screen")
+		, m_vtac(*this, "vtac")
 		, m_brg(*this, "brg%u", 1)
 		, m_earom(*this, "earom")
 		, m_picu(*this, "picu")
@@ -50,6 +51,7 @@ private:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;
+	required_device<crt5037_device> m_vtac;
 	required_device_array<com8116_device, 2> m_brg;
 	required_device<er1400_device> m_earom;
 	required_device<i8214_device> m_picu;
@@ -93,6 +95,9 @@ IRQ_CALLBACK_MEMBER(v100_state::irq_ack)
 
 WRITE8_MEMBER(v100_state::ppi_porta_w)
 {
+	m_vtac->set_clock_scale(BIT(data, 5) ? 0.5 : 1.0);
+	m_screen->set_clock_scale(BIT(data, 5) ? 0.5 : 1.0);
+
 	logerror("Writing %02X to PPI port A\n", data);
 }
 
@@ -142,12 +147,12 @@ static MACHINE_CONFIG_START( v100 )
 	MCFG_COM8116_FT_HANDLER(DEVWRITELINE("usart2", i8251_device, write_txc))
 
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL_47_736MHz / 2, 102 * CHAR_WIDTH, 0, 80 * CHAR_WIDTH, 260, 0, 240)
-	//MCFG_SCREEN_RAW_PARAMS(XTAL_47_736MHz, 170 * CHAR_WIDTH, 0, 132 * CHAR_WIDTH, 312, 0, 240)
+	//MCFG_SCREEN_RAW_PARAMS(XTAL_47_736MHz / 2, 102 * CHAR_WIDTH, 0, 80 * CHAR_WIDTH, 260, 0, 240)
+	MCFG_SCREEN_RAW_PARAMS(XTAL_47_736MHz, 170 * CHAR_WIDTH, 0, 132 * CHAR_WIDTH, 312, 0, 240)
 	MCFG_SCREEN_UPDATE_DRIVER(v100_state, screen_update)
 
-	// FIXME: dot clock should be divided by char width, and not divided by 2 for 132-column mode
-	MCFG_DEVICE_ADD("vtac", CRT5037, XTAL_47_736MHz / 2)
+	// FIXME: dot clock should be divided by char width
+	MCFG_DEVICE_ADD("vtac", CRT5037, XTAL_47_736MHz)
 	MCFG_TMS9927_CHAR_WIDTH(CHAR_WIDTH)
 	MCFG_VIDEO_SET_SCREEN("screen")
 
