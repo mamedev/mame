@@ -47,10 +47,82 @@ void ppu_vt03_device::set_new_pen(int i)
 		uint8_t red  = (rgbval & 0x7C00) >> 7;
 		m_palette->set_pen_color(i & 0x7f, rgb_t(red, green, blue));
 	} else {
+		// TODO: should this be tidied up?
 		uint16_t palval = (m_newpal[i&0x7f] & 0x3f) | ((m_newpal[(i&0x7f)+0x80] & 0x3f)<<6);
-		// &0x3f so we don't attempt to use any of the extended colours right now because
-		// I haven't managed to work out the format
-		m_palette->set_pen_indirect(i&0x7f,palval&0x3f);
+		
+		uint8_t rhue = palval & 0x0F;
+		uint8_t rlum = (palval >> 4) & 0x0F;
+		uint8_t rsat = (palval >> 8) & 0x0F;
+		//See http://wiki.nesdev.com/w/index.php/VT03%2B_Enhanced_Palette#Inverted_extended_color_numbers
+		bool inverted = (rlum < ((rsat + 1) >> 1) || rlum > (15 - (rsat >>1)));
+		if(inverted) {
+			rsat = 16 - rsat;
+			rlum = (rlum - 8) & 0x0F;
+			uint8_t hue_lut[16] = {0xD, 0x7, 0x8, 0x9, 0xA, 0xB, 0xC, 0x1, 0x2, 0x3, 0x4, 0x5, 0x6, 0x0, 0xE, 0xF};
+			rhue = hue_lut[rhue];
+		}
+		
+		// Get base color
+		double hue = 287.0;
+
+		double Kr = 0.2989;
+		double Kb = 0.1145;
+		double Ku = 2.029;
+		double Kv = 1.140;
+		
+		double sat;
+		double y, u, v;
+		double rad;
+		int R, G, B;
+		switch (rhue)
+		{
+		case 0:
+			sat = 0; rad = 0;
+			y = 1.0;
+			break;
+
+		case 13:
+			sat = 0; rad = 0;
+			y = 0.77;
+			break;
+
+		case 14:
+		case 15:
+			sat = 0; rad = 0; y = 0.9;
+			break;
+
+		default:
+			sat = 1;
+			rad = M_PI * ((rhue * 30 + hue) / 180.0);
+			y = 0.9;
+			break;
+		}
+		
+		sat *= (rsat / 15.0);
+		y *= (rlum / 15.0);
+		u = sat * cos(rad);
+		v = sat * sin(rad);
+
+		/* Transform to RGB */
+		R = (y + Kv * v) * 255.0;
+		G = (y - (Kb * Ku * u + Kr * Kv * v) / (1 - Kb - Kr)) * 255.0;
+		B = (y + Ku * u) * 255.0;
+
+		/* Clipping, in case of saturation */
+		if (R < 0)
+			R = 0;
+		if (R > 255)
+			R = 255;
+		if (G < 0)
+			G = 0;
+		if (G > 255)
+			G = 255;
+		if (B < 0)
+			B = 0;
+		if (B > 255)
+			B = 255;
+		
+		m_palette->set_pen_color(i & 0x7f, rgb_t(R, G ,B));
 	}
 
 }

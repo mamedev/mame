@@ -109,6 +109,7 @@ public:
 	
 	DECLARE_WRITE8_MEMBER(vt03_41bx_w);
 	DECLARE_READ8_MEMBER(vt03_41bx_r);
+	DECLARE_WRITE8_MEMBER(vt03_411c_w);
 
 	DECLARE_WRITE8_MEMBER(vt03_48ax_w);
 	DECLARE_READ8_MEMBER(vt03_48ax_r);
@@ -126,7 +127,7 @@ private:
 
 	void scanline_irq(int scanline, int vblank, int blanked);
 	uint8_t m_410x[0xc];
-	
+	uint8_t m_411c;
 	uint8_t m_vdma_ctrl;
 	
 	int m_timer_irq_enabled;
@@ -302,6 +303,14 @@ WRITE8_MEMBER(nes_vt_state::vt03_41bx_w)
 	logerror("vt03_41bx_w %02x %02x\n", offset, data);
 }
 
+WRITE8_MEMBER(nes_vt_state::vt03_411c_w)
+{
+	logerror("vt03_411c_w  %02x\n", data);
+	m_411c = data;
+	update_banks();
+}
+
+
 READ8_MEMBER(nes_vt_state::vt03_41bx_r)
 {
 	switch(offset) {
@@ -434,7 +443,7 @@ void nes_vt_state::machine_reset()
 	m_410x[0x9] = 0x02;
 	m_410x[0xa] = 0x00;
 	m_410x[0xb] = 0x00;
-
+	m_411c = 0x00;
 	m_timer_irq_enabled = 0;
 	m_timer_running = 0;
 	m_timer_val = 0;
@@ -871,6 +880,27 @@ static ADDRESS_MAP_START( nes_vt_hh_map, AS_PROGRAM, 8, nes_vt_state )
 	AM_RANGE(0x6000, 0x6fff) AM_RAM
 ADDRESS_MAP_END
 
+static ADDRESS_MAP_START( nes_vt_dg_map, AS_PROGRAM, 8, nes_vt_state )
+	AM_RANGE(0x0000, 0x0fff) AM_RAM
+	AM_RANGE(0x2000, 0x3fff) AM_DEVREADWRITE("ppu", ppu2c0x_device, read, write)        /* PPU registers */
+
+	AM_RANGE(0x4000, 0x4013) AM_DEVREADWRITE("apu", nesapu_device, read, write)
+	AM_RANGE(0x4015, 0x4015) AM_READWRITE(psg1_4015_r, psg1_4015_w) /* PSG status / first control register */
+	AM_RANGE(0x4016, 0x4016) AM_READWRITE(nes_in0_r, nes_in0_w)
+	AM_RANGE(0x4017, 0x4017) AM_READ(nes_in1_r) AM_WRITE(psg1_4017_w)
+
+	AM_RANGE(0x4100, 0x410b) AM_WRITE(vt03_410x_w)
+
+	AM_RANGE(0x411c, 0x411c) AM_WRITE(vt03_411c_w)
+
+	AM_RANGE(0x8000, 0xffff) AM_WRITE(vt03_8000_w)
+	AM_RANGE(0x8000, 0xffff) AM_DEVICE("prg", address_map_bank_device, amap8)
+
+	AM_RANGE(0x4034, 0x4034) AM_WRITE(vt03_4034_w)
+	AM_RANGE(0x4014, 0x4014) AM_READ(psg1_4014_r) AM_WRITE(vt_hh_sprite_dma_w)
+	AM_RANGE(0x6000, 0x6fff) AM_RAM
+ADDRESS_MAP_END
+
 static ADDRESS_MAP_START( prg_map, AS_PROGRAM, 8, nes_vt_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROMBANK("prg_bank0")
 	AM_RANGE(0x2000, 0x3fff) AM_ROMBANK("prg_bank1")
@@ -982,6 +1012,11 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( nes_vt_cy, nes_vt_xx )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(nes_vt_cy_map)
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( nes_vt_dg, nes_vt_xx )
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(nes_vt_dg_map)
 MACHINE_CONFIG_END
 
 // New mystery handheld architecture, VTxx derived
@@ -1199,8 +1234,8 @@ CONS( 200?, vgpmini,   0,  0,  nes_vt_xx, nes_vt, nes_vt_state,  0, "<unknown>",
 
 // these are NOT VT03, but something newer but based around the same basic designs
 // (no visible tiles in ROM using standard decodes tho, might need moving out of here)
-CONS( 200?, dgun2500,  0,  0,  nes_vt,    nes_vt, nes_vt_state,  0, "dreamGEAR", "dreamGEAR Wireless Motion Control with 130 games (DGUN-2500)", MACHINE_NOT_WORKING )
-CONS( 2012, dgun2561,  0,  0,  nes_vt,    nes_vt, nes_vt_state,  0, "dreamGEAR", "dreamGEAR My Arcade Portable Gaming System (DGUN-2561)", MACHINE_NOT_WORKING )
+CONS( 200?, dgun2500,  0,  0,  nes_vt_dg,    nes_vt, nes_vt_state,  0, "dreamGEAR", "dreamGEAR Wireless Motion Control with 130 games (DGUN-2500)", MACHINE_NOT_WORKING )
+CONS( 2012, dgun2561,  0,  0,  nes_vt_dg,    nes_vt, nes_vt_state,  0, "dreamGEAR", "dreamGEAR My Arcade Portable Gaming System (DGUN-2561)", MACHINE_NOT_WORKING )
 CONS( 200?, lexcyber,  0,  0,  nes_vt_cy, nes_vt, nes_vt_state,  0, "Lexibook", "Lexibook Compact Cyber Arcade", MACHINE_NOT_WORKING )
 
 // these are VT1682 based and have scrambled CPU opcodes. Will need VT1682 CPU and PPU
