@@ -127,6 +127,16 @@
 	dead loop
 
 
+	Flaws (NOT emulation bugs, happen on hardware):
+
+	In QIX the sprites lag behind the line drawing, so you see the line infront of your player until you stop moving
+	
+	In Space Invaders the UFO can sometimes glitch for a frame when appearing, and wraps around at the edges
+	  (even if the hardware supports having higher priority tiles to prevent this, as used by Lunar Rescue, it isn't
+	   used here)
+
+	Colony 7 has a typo in the instructions
+
 */
 
 #include "emu.h"
@@ -402,9 +412,9 @@ double hue2rgb(double p, double q, double t)
 {
 	if (t < 0) t += 1;
 	if (t > 1) t -= 1;
-	if (t < 1 / 6.0) return p + (q - p) * 6 * t;
-	if (t < 1 / 2.0) return q;
-	if (t < 2 / 3.0) return p + (q - p) * (2 / 3.0 - t) * 6;
+	if (t < 1 / 6.0f) return p + (q - p) * 6 * t;
+	if (t < 1 / 2.0f) return q;
+	if (t < 2 / 3.0f) return p + (q - p) * (2 / 3.0f - t) * 6;
 	return p;
 }
 
@@ -426,7 +436,7 @@ uint32_t radica_6502_state::screen_update(screen_device &screen, bitmap_ind16 &b
 
 		double l = (double)l_raw / 31.0f;
 		double s = (double)sl_raw / 7.0f;
-		double h = (double)h_raw / 23.0f;
+		double h = (double)h_raw / 24.0f;
 
 	    double r, g, b;
 
