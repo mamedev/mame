@@ -225,6 +225,8 @@ public:
 	DECLARE_READ8_MEMBER(radicasi_sprite_bg_scroll_r);
 	DECLARE_WRITE8_MEMBER(radicasi_sprite_bg_scroll_w);
 
+	DECLARE_READ8_MEMBER(radicasi_5003_r);
+
 	DECLARE_READ8_MEMBER(radicasi_500b_r);
 	DECLARE_READ8_MEMBER(radicasi_500d_r);
 	DECLARE_READ8_MEMBER(radicasi_50a8_r);
@@ -551,6 +553,24 @@ READ8_MEMBER(radica_6502_state::radicasi_500b_r)
 	return 0xff; // NTSC
 	//return 0x00; // PAL
 }
+
+READ8_MEMBER(radica_6502_state::radicasi_5003_r)
+{
+	/* masked with 0x0f, 0x01 or 0x03 depending on situation..
+	
+	  I think it might just be an RNG because if you return 0x00
+	  your shots can never hit the stage 3 enemies in Phoenix and
+	  if you return 0xff they always hit.  On the real hardware it
+	  seems to be random.  Could also just be a crude frame counter
+	  used for the same purpose.
+	
+	*/
+
+	logerror("%s: radicasi_5003_r (RNG?)\n", machine().describe_context().c_str());
+
+	return machine().rand();
+}
+
 
 WRITE8_MEMBER(radica_6502_state::radicasi_500d_w)
 {
@@ -1020,6 +1040,7 @@ static ADDRESS_MAP_START( radicasi_map, AS_PROGRAM, 8, radica_6502_state )
 	AM_RANGE(0x4800, 0x49ff) AM_RAM AM_SHARE("palram")
 
 	// 500x system regs?
+	AM_RANGE(0x5003, 0x5003) AM_READ(radicasi_5003_r) 
 	AM_RANGE(0x500b, 0x500b) AM_READ(radicasi_500b_r) // PAL / NTSC flag at least
 	AM_RANGE(0x500c, 0x500c) AM_WRITE(radicasi_500c_w)
 	AM_RANGE(0x500d, 0x500d) AM_READWRITE(radicasi_500d_r, radicasi_500d_w)
