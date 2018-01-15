@@ -160,8 +160,10 @@ public:
 	
 	// DMA
 	DECLARE_WRITE8_MEMBER(radicasi_dmasrc_lo_w);
+	DECLARE_WRITE8_MEMBER(radicasi_dmasrc_md_w);
 	DECLARE_WRITE8_MEMBER(radicasi_dmasrc_hi_w);
 	DECLARE_READ8_MEMBER(radicasi_dmasrc_lo_r);
+	DECLARE_READ8_MEMBER(radicasi_dmasrc_md_r);
 	DECLARE_READ8_MEMBER(radicasi_dmasrc_hi_r);
 	DECLARE_WRITE8_MEMBER(radicasi_dmadst_lo_w);
 	DECLARE_WRITE8_MEMBER(radicasi_dmadst_hi_w);
@@ -259,6 +261,7 @@ private:
 	uint8_t m_50a9_data;
 
 	uint8_t m_dmasrc_lo_data;
+	uint8_t m_dmasrc_md_data;
 	uint8_t m_dmasrc_hi_data;
 	uint8_t m_dmadst_lo_data;
 	uint8_t m_dmadst_hi_data;
@@ -607,12 +610,18 @@ READ8_MEMBER(radica_6502_state::radicasi_sprite_gfxbase_hi_r)
 	return m_sprite_gfxbase_hi_data;
 }
 
-// Palette bases
+// DMA bases
 
 WRITE8_MEMBER(radica_6502_state::radicasi_dmasrc_lo_w)
 {
-	logerror("%s: radicasi_dmasrc_lo_w (select DMA source lower) %02x\n", machine().describe_context().c_str(), data);
+	logerror("%s: radicasi_dmasrc_lo_w (select DMA source low) %02x\n", machine().describe_context().c_str(), data);
 	m_dmasrc_lo_data = data;
+}
+
+WRITE8_MEMBER(radica_6502_state::radicasi_dmasrc_md_w)
+{
+	logerror("%s: radicasi_dmasrc_md_w (select DMA source middle) %02x\n", machine().describe_context().c_str(), data);
+	m_dmasrc_md_data = data;
 }
 
 WRITE8_MEMBER(radica_6502_state::radicasi_dmasrc_hi_w)
@@ -623,8 +632,14 @@ WRITE8_MEMBER(radica_6502_state::radicasi_dmasrc_hi_w)
 
 READ8_MEMBER(radica_6502_state::radicasi_dmasrc_lo_r)
 {
-	logerror("%s: radicasi_dmasrc_lo_r (DMA source lower)\n", machine().describe_context().c_str());
+	logerror("%s: radicasi_dmasrc_lo_r (DMA source low)\n", machine().describe_context().c_str());
 	return m_dmasrc_lo_data;
+}
+
+READ8_MEMBER(radica_6502_state::radicasi_dmasrc_md_r)
+{
+	logerror("%s: radicasi_dmasrc_md_r (DMA source middle)\n", machine().describe_context().c_str());
+	return m_dmasrc_md_data;
 }
 
 READ8_MEMBER(radica_6502_state::radicasi_dmasrc_hi_r)
@@ -686,14 +701,14 @@ READ8_MEMBER(radica_6502_state::radicasi_dmasize_hi_r)
 
 READ8_MEMBER(radica_6502_state::radicasi_dmatrg_r)
 {
-	logerror("%s: radicasi_dmasize_hi_r (DMA operation state?)\n", machine().describe_context().c_str());
+	logerror("%s: radicasi_dmatrg_r (DMA operation state?)\n", machine().describe_context().c_str());
 	return 0x00;//m_dmatrg_data;
 }
 
 
 WRITE8_MEMBER(radica_6502_state::radicasi_dmatrg_w)
 {
-	logerror("%s: radicasi_dmasize_lo_w (trigger DMA operation) %02x\n", machine().describe_context().c_str(), data);
+	logerror("%s: radicasi_dmatrg_w (trigger DMA operation) %02x\n", machine().describe_context().c_str(), data);
 	//m_dmatrg_data = data;
 
 	address_space& fullbankspace = m_bank->space(AS_PROGRAM);
@@ -701,7 +716,7 @@ WRITE8_MEMBER(radica_6502_state::radicasi_dmatrg_w)
 
 	if (data)
 	{
-		int src = (m_dmasrc_lo_data | (m_dmasrc_hi_data << 8)) * 0x100;
+		int src = (m_dmasrc_lo_data << 0) | (m_dmasrc_md_data << 8) | (m_dmasrc_hi_data << 16);
 		uint16_t dest = (m_dmadst_lo_data | (m_dmadst_hi_data << 8));
 		uint16_t size = (m_dmasize_lo_data | (m_dmasize_hi_data << 8));
 
@@ -1010,7 +1025,8 @@ static ADDRESS_MAP_START( radicasi_map, AS_PROGRAM, 8, radica_6502_state )
 	AM_RANGE(0x500d, 0x500d) AM_READWRITE(radicasi_500d_r, radicasi_500d_w)
 
 	// 501x DMA controller
-	AM_RANGE(0x5010, 0x5010) AM_READWRITE(radicasi_dmasrc_lo_r, radicasi_dmasrc_lo_w)
+	AM_RANGE(0x500F, 0x500F) AM_READWRITE(radicasi_dmasrc_lo_r, radicasi_dmasrc_lo_w)
+	AM_RANGE(0x5010, 0x5010) AM_READWRITE(radicasi_dmasrc_md_r, radicasi_dmasrc_md_w)
 	AM_RANGE(0x5011, 0x5011) AM_READWRITE(radicasi_dmasrc_hi_r, radicasi_dmasrc_hi_w)
 
 	AM_RANGE(0x5012, 0x5012) AM_READWRITE(radicasi_dmadst_lo_r, radicasi_dmadst_lo_w)
