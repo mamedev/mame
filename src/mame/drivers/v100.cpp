@@ -68,39 +68,74 @@ u32 v100_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const
 		return 0;
 	}
 
-	unsigned row = cliprect.top() / 10;
-	unsigned scan = cliprect.top() % 10;
+	unsigned row0 = cliprect.top() / 10;
 	unsigned x0 = cliprect.left();
-	unsigned stride = (screen.visible_area().width() / CHAR_WIDTH) + 2;
-	unsigned ch0 = (x0 / CHAR_WIDTH) + (row * stride) + 2;
 	unsigned px0 = x0 % CHAR_WIDTH;
 
-	for (unsigned y = cliprect.top(); y <= cliprect.bottom(); y++)
+	u16 start = 0;
+	unsigned y = 0;
+	for (unsigned row = 0; y <= cliprect.bottom(); row++)
 	{
-		unsigned x = x0, ch = ch0, px = px0;
-		u8 vchar = m_videoram[ch & m_videoram.mask()];
-		u8 gfxdata = m_p_chargen[((vchar & 0x7f) << 4) | scan];
-		while (x <= cliprect.right())
+		start = m_videoram[start] | (m_videoram[(start + 1) & 0xfff] << 8);
+		u16 end = start + 0x50;
+		switch (start & 0xf000)
 		{
-			bitmap.pix(y, x) = BIT(gfxdata, 7) ? rgb_t::white() : rgb_t::black();
-			x++;
-			px++;
-			if ((px & 1) == 0)
-				gfxdata <<= 1;
-			if (px >= CHAR_WIDTH)
+		case 0x1000:
+			end = start + 0x29;
+			break;
+		case 0x3000:
+			end = start + 0x6e;
+			break;
+		case 0xc000:
+			end = start + 0x50;
+			break;
+		default:
+			break;
+		}
+		start &= 0xfff;
+		end &= 0xfff;
+
+		if (row < row0)
+			y += 10;
+		else
+		{
+			unsigned scan = 0;
+			if (row == row0)
 			{
-				vchar = m_videoram[++ch & m_videoram.mask()];
-				gfxdata = m_p_chargen[((vchar & 0x7f) << 4) | scan];
-				px = 0;
+				scan += cliprect.top() - y;
+				y = cliprect.top();
+			}
+			while (scan < 10 && y <= cliprect.bottom())
+			{
+				unsigned x = x0, px = px0, addr = start;
+				u8 gfxdata = m_p_chargen[((m_videoram[addr] & 0x7f) << 4) | scan] << (px0 / 2);
+				while (x <= cliprect.right())
+				{
+					bitmap.pix(y, x) = BIT(gfxdata, 7) ? rgb_t::white() : rgb_t::black();
+					x++;
+					px++;
+					if ((px & 1) == 0)
+						gfxdata <<= 1;
+					if (px >= CHAR_WIDTH)
+					{
+						addr = (addr + 1) & 0xfff;
+						gfxdata = m_p_chargen[((m_videoram[addr] & 0x7f) << 4) | scan];
+						px = 0;
+
+						if (addr == end)
+						{
+							while (x <= cliprect.right())
+								bitmap.pix(y, x++) = rgb_t::black();
+							break;
+						}
+					}
+				}
+				scan++;
+				y++;
 			}
 		}
-		scan++;
-		if (scan >= 10)
-		{
-			row++;
-			ch0 += stride;
-			scan = 0;
-		}
+
+		start = end;
 	}
 
 	return 0;
@@ -145,14 +180,14 @@ WRITE8_MEMBER(v100_state::ppi_porta_w)
 }
 
 static ADDRESS_MAP_START( mem_map, AS_PROGRAM, 8, v100_state )
-	AM_RANGE(0x0000, 0x3fff) AM_ROM AM_REGION("maincpu", 0)
+	AM_RANGE(0x0000, 0x1fff) AM_ROM AM_REGION("maincpu", 0)
 	AM_RANGE(0x4000, 0x4fff) AM_RAM AM_SHARE("videoram")
 	AM_RANGE(0x5000, 0x5fff) AM_RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( io_map, AS_IO, 8, v100_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x0f) AM_DEVREADWRITE("vtac", crt5037_device, read, write)
+	AM_RANGE(0x00, 0x0f) AM_DEVWRITE("vtac", crt5037_device, write)
 	AM_RANGE(0x10, 0x10) AM_WRITE(brg_w<0>)
 	AM_RANGE(0x12, 0x12) AM_DEVREADWRITE("usart1", i8251_device, data_r, data_w)
 	AM_RANGE(0x13, 0x13) AM_DEVREADWRITE("usart1", i8251_device, status_r, control_w)
@@ -225,7 +260,7 @@ Crystal: 47.736
 ***************************************************************************************************************/
 
 ROM_START( v100 )
-	ROM_REGION(0x4000, "maincpu", 0)
+	ROM_REGION(0x2000, "maincpu", 0)
 	ROM_LOAD( "262-047.u108",  0x0000, 0x1000, CRC(e82f708c) SHA1(20ed83a41fd0703d72a20e170af971181cfbd575) )
 	ROM_LOAD( "262-048.u110",  0x1000, 0x1000, CRC(830923d3) SHA1(108590234ff84b5856cc2784d738a2a625305953) )
 
