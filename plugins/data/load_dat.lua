@@ -66,7 +66,8 @@ function datfile.open(file, vertag, fixupcb)
 				break
 			end
 		end
-	else
+	end
+	if not ver then
 		-- use file ctime for version
 		ver = tostring(lfs.attributes(filepath, "change"))
 	end

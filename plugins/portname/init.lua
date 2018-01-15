@@ -140,7 +140,7 @@ function portname.startplugin()
 				file:write("msgid \"" .. def .."\"\nmsgstr \"" .. custom .. "\"\n\n")
 			end
 			file:close()
-			manager:machine():popmessage(_("Input port name file saved to ") .. ctrlrpath .. "/portname/" .. filename)
+			manager:machine():popmessage(string.format(_("Input port name file saved to %s")), ctrlrpath .. "/portname/" .. filename)
 		end
 		return false
 	end
