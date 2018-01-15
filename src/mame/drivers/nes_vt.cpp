@@ -106,6 +106,12 @@ public:
 	DECLARE_WRITE8_MEMBER(vt03_410x_w);
 	DECLARE_WRITE8_MEMBER(vt03_8000_w);
 	DECLARE_WRITE8_MEMBER(vt03_4034_w);
+	
+	DECLARE_WRITE8_MEMBER(vt03_41bx_w);
+	DECLARE_READ8_MEMBER(vt03_41bx_r);
+
+	DECLARE_WRITE8_MEMBER(vt03_48ax_w);
+	DECLARE_READ8_MEMBER(vt03_48ax_r);
 
 	/* OneBus read callbacks for getting sprite and tile data during rendering*/
 	DECLARE_READ8_MEMBER(spr_r);
@@ -291,6 +297,38 @@ WRITE8_MEMBER(nes_vt_state::vt03_410x_w)
 	}
 }
 
+WRITE8_MEMBER(nes_vt_state::vt03_41bx_w)
+{
+	logerror("vt03_41bx_w %02x %02x\n", offset, data);
+}
+
+READ8_MEMBER(nes_vt_state::vt03_41bx_r)
+{
+	switch(offset) {
+		case 0x07:
+			return 0x04;
+		default:
+			return 0x00;
+	}
+}
+
+WRITE8_MEMBER(nes_vt_state::vt03_48ax_w)
+{
+	logerror("vt03_48ax_w %02x %02x\n", offset, data);
+}
+
+READ8_MEMBER(nes_vt_state::vt03_48ax_r)
+{
+	switch(offset) {
+		case 0x04:
+			return 0x01;
+		case 0x05:
+			return 0x01;
+		default:
+			return 0x00;
+	}
+}
+
 
 uint32_t nes_vt_state::screen_update_vt(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
@@ -326,7 +364,7 @@ void nes_vt_state::scanline_irq(int scanline, int vblank, int blanked)
 	{
 		m_timer_val--;
 
-		if (m_timer_val < 1)
+		if (m_timer_val < 0)
 		{
 			if (m_timer_irq_enabled)
 			{
@@ -766,7 +804,6 @@ WRITE8_MEMBER(nes_vt_state::vt_hh_sprite_dma_w)
 	logerror("vthh dma start ctrl=%02x addr=%04x\n", m_vdma_ctrl, src_addr);
 	for (int i = 0; i < length; i++)
 	{
-		
 		uint8_t spriteData = space.read_byte(src_addr + i);
 		if(dma_mode) {
 			space.write_byte(0x2007, spriteData);
@@ -807,6 +844,13 @@ static ADDRESS_MAP_START( nes_vt_xx_map, AS_PROGRAM, 8, nes_vt_state )
 	AM_IMPORT_FROM(nes_vt_map)
 	AM_RANGE(0x0800, 0x0fff) AM_RAM
 ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( nes_vt_cy_map, AS_PROGRAM, 8, nes_vt_state )
+	AM_IMPORT_FROM(nes_vt_xx_map)
+	AM_RANGE(0x41b0, 0x41bf) AM_READ(vt03_41bx_r) AM_WRITE(vt03_41bx_w)
+	AM_RANGE(0x48a0, 0x48af) AM_READ(vt03_48ax_r) AM_WRITE(vt03_48ax_w)
+ADDRESS_MAP_END
+
 
 static ADDRESS_MAP_START( nes_vt_hh_map, AS_PROGRAM, 8, nes_vt_state )
 	AM_RANGE(0x0000, 0x0fff) AM_RAM
@@ -933,6 +977,11 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( nes_vt_xx, nes_vt )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(nes_vt_xx_map)
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( nes_vt_cy, nes_vt_xx )
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(nes_vt_cy_map)
 MACHINE_CONFIG_END
 
 // New mystery handheld architecture, VTxx derived
@@ -1152,7 +1201,7 @@ CONS( 200?, vgpmini,   0,  0,  nes_vt_xx, nes_vt, nes_vt_state,  0, "<unknown>",
 // (no visible tiles in ROM using standard decodes tho, might need moving out of here)
 CONS( 200?, dgun2500,  0,  0,  nes_vt,    nes_vt, nes_vt_state,  0, "dreamGEAR", "dreamGEAR Wireless Motion Control with 130 games (DGUN-2500)", MACHINE_NOT_WORKING )
 CONS( 2012, dgun2561,  0,  0,  nes_vt,    nes_vt, nes_vt_state,  0, "dreamGEAR", "dreamGEAR My Arcade Portable Gaming System (DGUN-2561)", MACHINE_NOT_WORKING )
-CONS( 200?, lexcyber,  0,  0,  nes_vt_xx, nes_vt, nes_vt_state,  0, "Lexibook", "Lexibook Compact Cyber Arcade", MACHINE_NOT_WORKING )
+CONS( 200?, lexcyber,  0,  0,  nes_vt_cy, nes_vt, nes_vt_state,  0, "Lexibook", "Lexibook Compact Cyber Arcade", MACHINE_NOT_WORKING )
 
 // these are VT1682 based and have scrambled CPU opcodes. Will need VT1682 CPU and PPU
 // to be emulated
