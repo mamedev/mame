@@ -72,7 +72,7 @@ public:
 	int m_sk;                       // MCU SK line state
 	u16 m_inp_mux;                  // multiplexed inputs mask
 
-	u16 read_inputs(int columns);
+	u16 read_inputs(int columns, u16 colmask = ~0);
 
 	// display common
 	int m_display_wait;             // led/lamp off-delay in milliseconds (default 33ms)
@@ -221,10 +221,10 @@ void hh_cop400_state::display_matrix(int maxx, int maxy, u32 setx, u32 sety, boo
 
 // generic input handlers
 
-u16 hh_cop400_state::read_inputs(int columns)
+u16 hh_cop400_state::read_inputs(int columns, u16 colmask)
 {
 	// active low
-	u16 ret = ~0;
+	u16 ret = ~0 & colmask;
 
 	// read selected input rows
 	for (int i = 0; i < columns; i++)
@@ -282,7 +282,7 @@ WRITE8_MEMBER(ctstein_state::write_l)
 READ8_MEMBER(ctstein_state::read_l)
 {
 	// L4-L7: multiplexed inputs
-	return read_inputs(3) << 4 | 0xf;
+	return read_inputs(3, 0xf) << 4 | 0xf;
 }
 
 // config
@@ -393,7 +393,7 @@ WRITE8_MEMBER(h2hbaskb_state::write_l)
 READ8_MEMBER(h2hbaskb_state::read_in)
 {
 	// IN: multiplexed inputs
-	return (read_inputs(4) & 7) | (m_inp_matrix[4]->read() & 8);
+	return read_inputs(4, 7) | (m_inp_matrix[4]->read() & 8);
 }
 
 // config
@@ -795,7 +795,7 @@ WRITE8_MEMBER(lchicken_state::write_g)
 READ8_MEMBER(lchicken_state::read_g)
 {
 	// G0-G3: multiplexed inputs
-	return read_inputs(4) & m_g;
+	return read_inputs(4, m_g);
 }
 
 WRITE_LINE_MEMBER(lchicken_state::write_so)
@@ -928,7 +928,7 @@ WRITE8_MEMBER(funjacks_state::write_g)
 READ8_MEMBER(funjacks_state::read_l)
 {
 	// L4,L5: multiplexed inputs
-	return (read_inputs(3) & 0x30) | m_l;
+	return read_inputs(3, 0x30) | m_l;
 }
 
 READ8_MEMBER(funjacks_state::read_g)
@@ -1138,7 +1138,7 @@ WRITE8_MEMBER(mdallas_state::write_g)
 READ8_MEMBER(mdallas_state::read_in)
 {
 	// IN: multiplexed inputs
-	return read_inputs(6) & 0xf;
+	return read_inputs(6, 0xf);
 }
 
 // config
@@ -1364,7 +1364,7 @@ READ8_MEMBER(lightfgt_state::read_g)
 {
 	// G: multiplexed inputs
 	m_inp_mux = m_d << 1 | m_so;
-	return read_inputs(5);
+	return read_inputs(5, 0xf);
 }
 
 // config
@@ -1458,13 +1458,13 @@ WRITE8_MEMBER(bship82_state::write_d)
 READ8_MEMBER(bship82_state::read_l)
 {
 	// L: multiplexed inputs
-	return read_inputs(4) & 0xff;
+	return read_inputs(4, 0xff);
 }
 
 READ8_MEMBER(bship82_state::read_in)
 {
 	// IN: multiplexed inputs
-	return read_inputs(4) >> 8 & 0xf;
+	return read_inputs(4, 0xf00) >> 8;
 }
 
 WRITE_LINE_MEMBER(bship82_state::write_so)
@@ -1641,7 +1641,7 @@ WRITE8_MEMBER(qkracer_state::write_l)
 READ8_MEMBER(qkracer_state::read_in)
 {
 	// IN: multiplexed inputs
-	return read_inputs(5) & 0xf;
+	return read_inputs(5, 0xf);
 }
 
 WRITE_LINE_MEMBER(qkracer_state::write_sk)

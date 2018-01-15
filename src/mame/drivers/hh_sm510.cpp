@@ -4795,7 +4795,7 @@ CONS( 1983, gnw_mario,   0,          0, gnw_mario,   gnw_mario,   gnw_mario_stat
 
 CONS( 1982, gnw_dkjr,    0,          0, gnw_dkjr,    gnw_dkjr,    gnw_dkjr_state,    0, "Nintendo", "Game & Watch: Donkey Kong Jr. (new wide screen)", MACHINE_SUPPORTS_SAVE )
 CONS( 1983, gnw_mariocm, 0,          0, gnw_mariocm, gnw_mariocm, gnw_mariocm_state, 0, "Nintendo", "Game & Watch: Mario's Cement Factory (new wide screen)", MACHINE_SUPPORTS_SAVE )
-CONS( 1986, gnw_smb,     0,          0, gnw_smb,     gnw_smb,     gnw_smb_state,     0, "Nintendo", "Game & Watch: Super Mario Bros.", MACHINE_SUPPORTS_SAVE )
+CONS( 1986, gnw_smb,     0,          0, gnw_smb,     gnw_smb,     gnw_smb_state,     0, "Nintendo", "Game & Watch: Super Mario Bros.", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
 
 CONS( 1984, gnw_boxing,  0,          0, gnw_boxing,  gnw_boxing,  gnw_boxing_state,  0, "Nintendo", "Game & Watch: Boxing", MACHINE_SUPPORTS_SAVE )
 
