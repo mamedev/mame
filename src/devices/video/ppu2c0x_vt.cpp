@@ -88,11 +88,11 @@ void ppu_vt03_device::set_new_pen(int i)
 
 		case 14:
 		case 15:
-			sat = 0; rad = 0; y = 0.9;
+			sat = 0; rad = 0; y = 0;
 			break;
 
 		default:
-			sat = 1;
+			sat = 0.7;
 			rad = M_PI * ((rhue * 30 + hue) / 180.0);
 			y = 0.9;
 			break;
