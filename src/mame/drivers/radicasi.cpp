@@ -398,21 +398,54 @@ void radica_6502_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap
 	}
 }
 
+double hue2rgb(double p, double q, double t)
+{
+	if (t < 0) t += 1;
+	if (t > 1) t -= 1;
+	if (t < 1 / 6.0) return p + (q - p) * 6 * t;
+	if (t < 1 / 2.0) return q;
+	if (t < 2 / 3.0) return p + (q - p) * (2 / 3.0 - t) * 6;
+	return p;
+}
+
 uint32_t radica_6502_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(0, cliprect);
 
 	// Palette
 	int offs = 0;
-	for (int i = 0; i < 256; i++)
+	for (int index = 0;index < 256; index++)
 	{
-		uint16_t dat = m_palram[offs++];
-		dat |= m_palram[offs++] << 8;
+		uint16_t dat = m_palram[offs++] << 8;
+		dat |= m_palram[offs++];
 
-		// wrong format, does seem to be 13-bit tho.
-		// the palette for the Taito logo is at 27f00 in ROM, 4bpp, 16 colours.
-		m_palette->set_pen_color(i, pal4bit(dat >> 0), pal4bit(dat >> 4), pal4bit(dat >> 8));
-	}
+		// llll lsss ---h hhhh
+		int l_raw = (dat & 0xf800) >> 11;
+		int sl_raw = (dat & 0x0700) >> 8;
+		int h_raw = (dat & 0x001f) >> 0;
+
+		double l = (double)l_raw / 31.0f;
+		double s = (double)sl_raw / 7.0f;
+		double h = (double)h_raw / 23.0f;
+
+	    double r, g, b;
+
+		if (s == 0) {
+			r = g = b = l; // greyscale
+		} else {
+			double q = l < 0.5f ? l * (1 + s) : l + s - l * s;
+			double p = 2 * l - q;
+			r = hue2rgb(p, q, h + 1/3.0f);
+			g = hue2rgb(p, q, h);
+			b = hue2rgb(p, q, h - 1/3.0f);
+		}
+
+		int r_real = r * 255.0f;
+		int g_real = g * 255.0f;
+		int b_real = b * 255.0f;
+
+		m_palette->set_pen_color(index, r_real, g_real, b_real);
+	}	
 
 	// Tilemaps
 
