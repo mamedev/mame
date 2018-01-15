@@ -131,10 +131,10 @@
 
 #include "emu.h"
 #include "cpu/m6502/m6502.h"
+//#include "cpu/m6502/m65c02.h"
 #include "screen.h"
 #include "speaker.h"
 #include "machine/bankdev.h"
-//#include "cpu/m6502/r65c02.h"
 
 class radica_6502_state : public driver_device
 {
@@ -220,6 +220,9 @@ public:
 
 	DECLARE_WRITE8_MEMBER(radicasi_5027_w);
 
+	DECLARE_READ8_MEMBER(radicasi_sprite_bg_scroll_r);
+	DECLARE_WRITE8_MEMBER(radicasi_sprite_bg_scroll_w);
+
 	DECLARE_READ8_MEMBER(radicasi_500b_r);
 	DECLARE_READ8_MEMBER(radicasi_500d_r);
 	DECLARE_READ8_MEMBER(radicasi_50a8_r);
@@ -276,6 +279,8 @@ private:
 	uint8_t m_unkregs_1_unk2[6];
 
 	uint8_t m_unkregs_trigger;
+
+	uint8_t m_bg_scroll[2];
 
 	int m_custom_irq;
 	int m_custom_nmi;
@@ -395,12 +400,8 @@ uint32_t radica_6502_state::screen_update(screen_device &screen, bitmap_ind16 &b
 {
 	bitmap.fill(0, cliprect);
 
-	address_space& fullbankspace = m_bank->space(AS_PROGRAM);
-	int offs;
-
 	// Palette
-
-	offs = 0;
+	int offs = 0;
 	for (int i = 0; i < 256; i++)
 	{
 		uint16_t dat = m_palram[offs++];
@@ -413,17 +414,25 @@ uint32_t radica_6502_state::screen_update(screen_device &screen, bitmap_ind16 &b
 
 	// Tilemaps
 
-	offs = 0;
+	int scroll = (m_bg_scroll[1] << 8) | m_bg_scroll[0];
+	address_space& fullbankspace = m_bank->space(AS_PROGRAM);
+
 	if (m_5027_data & 0x40) // 16x16 tiles
 	{
+		int startrow = (scroll >> 4) & 0x1f;
+
 		for (int y = 0; y < 16; y++)
 		{
 			for (int x = 0; x < 16; x++)
 			{
-				int tile = m_vram[offs] + (m_vram[offs + 1] << 8);
-				//int attr = (m_vram[offs + 3]); // set to 0x07 on the radica logo, 0x00 on the game select screen
-				int attr = m_vram[offs + 2];
+				int realstartrow = (startrow + y);
 
+				if (realstartrow >= 28)
+					realstartrow -= 28;
+
+				int base = (((realstartrow + y)&0x1f)*8)+x;
+				int tile = m_vram[base * 4] + (m_vram[(base * 4)+1] << 8);
+				int attr = m_vram[(base * 4)+ 2];
 
 				if (m_5027_data & 0x20) // 4bpp mode
 				{
@@ -440,57 +449,77 @@ uint32_t radica_6502_state::screen_update(screen_device &screen, bitmap_ind16 &b
 
 				for (int i = 0; i < 16; i++)
 				{
-					uint16_t* row = &bitmap.pix16((y * 16) + i);
+					int drawline = (y * 16) + i;
+					drawline -= scroll & 0xf;
 
-					if (m_5027_data & 0x20) // 4bpp
+					if ((drawline >= 0) && (drawline < 256))
 					{
-						for (int xx = 0; xx < 16; xx += 2)
+						uint16_t* row = &bitmap.pix16(drawline);
+
+						if (m_5027_data & 0x20) // 4bpp
 						{
-							int realaddr = ((tile + i * 16) << 3) + (xx >> 1);
-							uint8_t pix = fullbankspace.read_byte(realaddr);
-							row[x * 16 + xx + 0] = ((pix & 0xf0) >> 4) + attr;
-							row[x * 16 + xx + 1] = ((pix & 0x0f) >> 0) + attr;
+							for (int xx = 0; xx < 16; xx += 2)
+							{
+								int realaddr = ((tile + i * 16) << 3) + (xx >> 1);
+								uint8_t pix = fullbankspace.read_byte(realaddr);
+								row[x * 16 + xx + 0] = ((pix & 0xf0) >> 4) + attr;
+								row[x * 16 + xx + 1] = ((pix & 0x0f) >> 0) + attr;
+							}
 						}
-					}
-					else // 8bpp
-					{
-						for (int xx = 0; xx < 16; xx++)
+						else // 8bpp
 						{
-							int realaddr = ((tile + i * 32) << 3) + xx;
-							uint8_t pix = fullbankspace.read_byte(realaddr);
-							row[x * 16 + xx] = pix;// + attr;
+							for (int xx = 0; xx < 16; xx++)
+							{
+								int realaddr = ((tile + i * 32) << 3) + xx;
+								uint8_t pix = fullbankspace.read_byte(realaddr);
+								row[x * 16 + xx] = pix;// + attr;
+							}
 						}
+
 					}
 				}
-
-				offs += 4;
 			}
 		}
 	}
 	else // 8x8 tiles
 	{
+		// Phoenix scrolling actually skips a pixel, jumping from 0x001 to 0x1bf, scroll 0x000 isn't used, maybe it has other meanings?
+
+		int startrow = (scroll >> 3) & 0x3f;
+
 		for (int y = 0; y < 32; y++)
 		{
 			for (int x = 0; x < 32; x++)
 			{
-				int tile = (m_vram[offs] + (m_vram[offs + 1] << 8));
-				//int attr = m_vram[offs+2];
+				int realstartrow = (startrow + y);
+
+				if (realstartrow >= 56)
+					realstartrow -= 56;
+
+				int base = (((realstartrow)&0x3f)*32)+x;
+				int tile = m_vram[base * 4] + (m_vram[(base * 4)+1] << 8);
+				//int attr = m_vram[(base * 4)+ 2];
 
 				tile = (tile & 0x1f) + ((tile & ~0x1f) * 8);
 				tile += ((m_tile_gfxbase_lo_data | m_tile_gfxbase_hi_data << 8) << 5);
 
 				for (int i = 0; i < 8; i++)
 				{
-					uint16_t* row = &bitmap.pix16((y * 8) + i);
-
-					for (int xx = 0; xx < 8; xx++)
+					int drawline = (y * 8) + i;
+					drawline -= scroll & 0x7;
+					
+					if ((drawline >= 0) && (drawline < 256))
 					{
-						int realaddr = ((tile + i * 32) << 3) + xx;
-						uint8_t pix = fullbankspace.read_byte(realaddr);
-						row[x * 8 + xx] = pix;// + attr;
+						uint16_t* row = &bitmap.pix16(drawline);
+
+						for (int xx = 0; xx < 8; xx++)
+						{
+							int realaddr = ((tile + i * 32) << 3) + xx;
+							uint8_t pix = fullbankspace.read_byte(realaddr);
+							row[x * 8 + xx] = pix;// + attr;
+						}
 					}
 				}
-				offs += 4;
 			}
 		}
 	}
@@ -947,6 +976,16 @@ WRITE8_MEMBER(radica_6502_state::radicasi_50a9_w)
 	m_50a9_data = data;
 }
 
+READ8_MEMBER(radica_6502_state::radicasi_sprite_bg_scroll_r)
+{
+	return m_bg_scroll[offset];
+
+}
+
+WRITE8_MEMBER(radica_6502_state::radicasi_sprite_bg_scroll_w)
+{
+	m_bg_scroll[offset] = data;
+}
 
 
 WRITE8_MEMBER(radica_6502_state::radicasi_5027_w)
@@ -995,8 +1034,7 @@ static ADDRESS_MAP_START( radicasi_map, AS_PROGRAM, 8, radica_6502_state )
 	AM_RANGE(0x502b, 0x502b) AM_READWRITE(radicasi_sprite_gfxbase_lo_r, radicasi_sprite_gfxbase_lo_w) // tilebase (spr?)
 	AM_RANGE(0x502c, 0x502c) AM_READWRITE(radicasi_sprite_gfxbase_hi_r, radicasi_sprite_gfxbase_hi_w) // tilebase (spr?)
 
-	// 5031 bg y scroll lo (phoenix)
-	// 5032 bg y scroll hi (phoenix)
+	AM_RANGE(0x5031, 0x5032) AM_READWRITE(radicasi_sprite_bg_scroll_r, radicasi_sprite_bg_scroll_w)
 
 
 	// 504x GPIO area?
