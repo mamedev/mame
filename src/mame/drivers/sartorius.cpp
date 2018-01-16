@@ -72,4 +72,4 @@ ROM_END
 
 } // anonymous namespace
 
-SYST( 1978?, sart3733, 0, 0, sart3733, sart3733, sart3733_state, 0, "Sartorius-Werke GmbH", "3733 Digital Scale", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+SYST( 1978?, sart3733, 0, 0, sart3733, sart3733, sart3733_state, 0, "Sartorius-Werke GmbH", "3733 (digital scale)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
