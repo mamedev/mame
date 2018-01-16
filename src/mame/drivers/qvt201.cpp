@@ -76,12 +76,14 @@ MACHINE_CONFIG_END
 Qume QVT-201.
 Chips: Z80A, SCN2681A, SCN2672B, 4x HM6116P-2, D446C-2, button battery
 Crystals: (from schematics, unreadable on photo) 48.654 MHz (Y1), 3.6864 MHz (Y2)
-Board is marked QVT-202.
+Board is marked QVT-202 LB10 REV2 74 6 26.
+Printed label on PCB: 301488-02 REV.2
+                      MFG:607   QC:PASS
 
 ***************************************************************************************************************/
 
 ROM_START( qvt201 )
-	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_REGION(0x8000, "maincpu", 0) // "Program Contents ©1986 Qume Corp."
 	ROM_LOAD( "390410-002.u11", 0x0000, 0x4000, CRC(69337561) SHA1(022e49bf5e8d76a3c2cc5af65630d3f77cc32bc1) )
 	ROM_LOAD( "390410-001.u10", 0x4000, 0x4000, CRC(977cc138) SHA1(a019980ea6da2dce53617bced420014ab4e03ec8) )
 
@@ -89,4 +91,4 @@ ROM_START( qvt201 )
 	ROM_LOAD( "301847-01.u42",  0x0000, 0x1000, CRC(546ed236) SHA1(312d57a7012f50327310bd11bda000149f13342e) )
 ROM_END
 
-COMP( 1985, qvt201, 0, 0, qvt201, qvt201, qvt201_state, 0, "Qume", "QVT-201", MACHINE_IS_SKELETON )
+COMP( 1986, qvt201, 0, 0, qvt201, qvt201, qvt201_state, 0, "Qume", "QVT-201 (Rev. T201VE)", MACHINE_IS_SKELETON )
