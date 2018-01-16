@@ -130,13 +130,17 @@ void ppu_vt03_device::set_new_pen(int i)
 WRITE8_MEMBER(ppu_vt03_device::palette_write)
 {
 	logerror("pal write %d %02x\n", offset, data);
-	if (m_201x_regs[0] & 0x80 || m_pal_mode == PAL_MODE_NEW_VG)
+	uint8_t pal_mask = (m_pal_mode == PAL_MODE_NEW_VG) ? 0x04 : 0x80;
+
+	if (m_201x_regs[0] & pal_mask)
 	{
 		m_newpal[offset] = data;
 		set_new_pen(offset);
 	}
 	else
 	{
+		if(m_pal_mode == PAL_MODE_NEW_VG)
+			m_newpal[offset] = data;
 		ppu2c0x_device::palette_write(space, offset, data);
 	}
 }
@@ -367,10 +371,10 @@ void ppu_vt03_device::set_2010_reg(uint8_t data)
 	    2   : SP16EN
 	    1   : BK16EN
 	    0   : PIX16EN */
-
-	if ((m_201x_regs[0x0] & 0x80) != (data & 0x80))
+	uint8_t pal_mask = (m_pal_mode == PAL_MODE_NEW_VG) ? 0x04 : 0x80;
+	if ((m_201x_regs[0x0] & pal_mask) != (data & pal_mask))
 	{
-		if (data & 0x80)
+		if (data & pal_mask)
 		{
 			for (int i = 0;i < 256;i++)
 			{
