@@ -155,6 +155,8 @@ private:
 	required_memory_bank m_prgbank2;
 	required_memory_bank m_prgbank3;
 	required_region_ptr<uint8_t> m_prgrom;
+	
+	uint16_t decode_nt_addr(uint16_t addr);
 };
 
 uint32_t nes_vt_state::get_banks(uint8_t bnk)
@@ -212,6 +214,14 @@ void nes_vt_state::update_banks()
 	// e000 - ffff
 	bank = 0xff;
 	m_prgbank3->set_entry(get_banks(bank) & (m_numbanks-1));
+}
+
+uint16_t nes_vt_state::decode_nt_addr(uint16_t addr) {
+	bool vert_mirror = !(m_410x[0x6] & 0x01);
+	int a11 = (addr >> 11) & 0x01;
+	int a10 = (addr >> 10) & 0x01;
+	uint16_t base = (addr & 0x3FF);
+	return ((vert_mirror ? a10 : a11) << 10) | base;
 }
 
 WRITE8_MEMBER(nes_vt_state::vt03_410x_w)
@@ -392,12 +402,12 @@ void nes_vt_state::scanline_irq(int scanline, int vblank, int blanked)
 /* todo, handle custom VT nametable stuff here */
 READ8_MEMBER(nes_vt_state::nt_r)
 {
-	return m_ntram[offset];
+	return m_ntram[decode_nt_addr(offset)];
 }
 
 WRITE8_MEMBER(nes_vt_state::nt_w)
 {
-	m_ntram[offset] = data;
+	m_ntram[decode_nt_addr(offset)] = data;
 }
 
 void nes_vt_state::machine_start()
