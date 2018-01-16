@@ -58,8 +58,9 @@
 #define LOG_M3      (1U << 10)
 #define LOG_SCRL    (1U << 11)
 #define LOG_CENT    (1U << 12)
+#define LOG_RAM     (1U << 13)
 
-//#define VERBOSE (LOG_VMOD)
+//#define VERBOSE (LOG_VMOD|LOG_RAM)
 //#define LOG_OUTPUT_STREAM std::cout
 
 #include "logmacro.h"
@@ -76,6 +77,7 @@
 #define LOGM3(...)   LOGMASKED(LOG_M3,   __VA_ARGS__)
 #define LOGSCRL(...) LOGMASKED(LOG_SCRL, __VA_ARGS__)
 #define LOGCENT(...) LOGMASKED(LOG_CENT, __VA_ARGS__)
+#define LOGRAM(...)  LOGMASKED(LOG_RAM, __VA_ARGS__)
 
 #ifdef _MSC_VER
 #define FUNCNAME __func__
@@ -357,7 +359,7 @@ MC6845_UPDATE_ROW( myb3k_state::crtc_update_row )
 				}
 				break;
 			default:
-				logerror("unimplemented video mode: %02x", m_vmode);
+				logerror("unimplemented video mode: %02x\n", m_vmode);
 			}
 		}
 	}
@@ -647,8 +649,19 @@ void myb3k_state::machine_start()
 	   close enough performance of the DOS 1.25 "basica demo" compared to the real hardware */
 	m_maincpu->set_clock_scale(0.5f);
 
-	/* Setup ram */
-	m_maincpu->space(AS_PROGRAM).install_ram(0, m_ram->size() - 1, m_ram->pointer());
+	/* Setup ram - NOTE; video RAM is really a mirror of last 64KB of main memory and not the opposite as indicated below. */
+	if (m_ram->size() <= (1024 * 128))
+	{
+		LOGRAM("128KB System\n");
+		m_maincpu->space(AS_PROGRAM).install_ram(0, 0xffff, m_ram->pointer()); // Install first 64KB of main memory 
+		m_maincpu->space(AS_PROGRAM).install_ram(0x10000, 0x1ffff, m_vram);    // Install mirror of video RAM as the last 64Kb of main memory
+	}
+	else
+	{
+		LOGRAM("256KB System\n");
+		m_maincpu->space(AS_PROGRAM).install_ram(0, 0x2ffff, m_ram->pointer()); // Install 192KB (128KB Storage Module + first 64KB of main memory)
+		m_maincpu->space(AS_PROGRAM).install_ram(0x30000, 0x3ffff, m_vram);     // Install mirror of video RAM as the last 64KB of main memory
+	}
 
 	/* No key presses allowed yet */
 	m_kbd_data = 0;
