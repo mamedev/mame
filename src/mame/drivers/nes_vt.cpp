@@ -1216,6 +1216,27 @@ ROM_START( sy889 )
 	ROM_LOAD( "sy889_w25q64.bin", 0x00000, 0x800000, CRC(fcdaa6fc) SHA1(0493747facf2172b8af22010851668bb18cbb3e4) )
 ROM_END
 
+ROM_START( mc_15kin1 )
+	ROM_REGION( 0x200000, "mainrom", 0 )
+	ROM_LOAD( "15000in1.bin", 0x00000, 0x200000, CRC(29a8cb96) SHA1(c4b31964fbfc5ee97d4a4c7e4d418ea5d84a568d) )
+ROM_END
+
+ROM_START( mc_18kin1 )
+	ROM_REGION( 0x400000, "mainrom", 0 )
+	ROM_LOAD( "18000in1.bin", 0x00000, 0x400000, CRC(23c0c325) SHA1(4ad53b5e5a8e65571fd39760278cdf7a6371da47) )
+ROM_END
+
+ROM_START( gx121in1 )
+	ROM_REGION( 0x400000, "mainrom", 0 )
+	ROM_LOAD( "gx121in1.bin", 0x00000, 0x400000, CRC(0282d975) SHA1(9ead7505b99a60834724a5818ee120e03c8bf975) )
+ROM_END
+
+ROM_START( dgun2573 )
+	ROM_REGION( 0x2000000, "mainrom", 0 )
+	ROM_LOAD( "dgun2573.bin", 0x00000, 0x2000000, CRC(cde71a53) SHA1(d0d4c1965876291861781ecde46b1142b062f1f3) )
+ROM_END
+
+
 // earlier version of vdogdemo
 CONS( 200?, vdogdeme,  0,  0,  nes_vt,    nes_vt, nes_vt_state,  0, "VRT", "V-Dog (prototype, earlier)", MACHINE_NOT_WORKING )
 
@@ -1238,6 +1259,7 @@ CONS( 200?, vgpmini,   0,  0,  nes_vt_dg, nes_vt, nes_vt_state,  0, "<unknown>",
 // (no visible tiles in ROM using standard decodes tho, might need moving out of here)
 CONS( 200?, dgun2500,  0,  0,  nes_vt_dg,    nes_vt, nes_vt_state,  0, "dreamGEAR", "dreamGEAR Wireless Motion Control with 130 games (DGUN-2500)", MACHINE_NOT_WORKING )
 CONS( 2012, dgun2561,  0,  0,  nes_vt_dg,    nes_vt, nes_vt_state,  0, "dreamGEAR", "dreamGEAR My Arcade Portable Gaming System (DGUN-2561)", MACHINE_NOT_WORKING )
+CONS( 2015, dgun2573,  0,  0,  nes_vt_dg,    nes_vt, nes_vt_state,  0, "dreamGEAR", "dreamGEAR My Arcade Gamer V Portable Gaming System (DGUN-2573)", MACHINE_NOT_WORKING )
 CONS( 200?, lexcyber,  0,  0,  nes_vt_cy, nes_vt, nes_vt_state,  0, "Lexibook", "Lexibook Compact Cyber Arcade", MACHINE_NOT_WORKING )
 
 // these are VT1682 based and have scrambled CPU opcodes. Will need VT1682 CPU and PPU
@@ -1278,5 +1300,11 @@ CONS( 200?, mc_7x6ss,   0,        0,  nes_vt,    nes_vt, nes_vt_state,  0, "<unk
 CONS( 200?, mc_8x6ss,   0,        0,  nes_vt,    nes_vt, nes_vt_state,  0, "<unknown>", "888888 in 1 (8 bit Slim Station, NEWPXP-DVT22-A PCB)", MACHINE_NOT_WORKING )
 CONS( 2004, mc_dcat8,   0,        0,  nes_vt,    nes_vt, nes_vt_state,  0, "<unknown>", "100 in 1 (D-CAT8 8bit Console, set 1) (v5.01.11-frd, BL 20041217)", MACHINE_NOT_WORKING )
 CONS( 2004, mc_dcat8a,  mc_dcat8, 0,  nes_vt,    nes_vt, nes_vt_state,  0, "<unknown>", "100 in 1 (D-CAT8 8bit Console, set 2)", MACHINE_NOT_WORKING )
+
+// misc OneBus
+// all have broken gfx, abd games don't load
+CONS( 200?, mc_15kin1,  0, 				0,  nes_vt,    nes_vt, nes_vt_state,  0, "<unknown>", "15000 in 1", MACHINE_NOT_WORKING )
+CONS( 200?, mc_18kin1,  0, 				0,  nes_vt,    nes_vt, nes_vt_state,  0, "<unknown>", "18000 in 1", MACHINE_NOT_WORKING )
+CONS( 200?, gx121in1,  	0, 				0,  nes_vt,    nes_vt, nes_vt_state,  0, "<unknown>", "Games Xplosion 121 in 1", MACHINE_NOT_WORKING )
 
 CONS( 2017, sy889,  		0, 				0,  nes_vt_hh, nes_vt, nes_vt_state,  0, "SY Corp", 	"SY-889 300 in 1 Handheld", MACHINE_NOT_WORKING )
