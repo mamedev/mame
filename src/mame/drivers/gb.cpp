@@ -861,4 +861,4 @@ CONS(1998, gbcolor,   0,       0,       gbcolor,  gameboy, gb_state,       0,   
 CONS(1993, megaduck,  0,       0,       megaduck, gameboy, megaduck_state, 0,    "Welback Holdings (Timlex International) / Creatronic / Videojet / Cougar USA", "Mega Duck / Cougar Boy", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 
 // http://blog.gg8.se/wordpress/2012/11/11/gameboy-clone-game-fighter-teardown/
-CONS(1993, gamefgtr,  gameboy, 0,       gameboy,  gameboy, gb_state,       0,    "unknown", "Game Fighter (bootleg)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE)
+CONS(1993, gamefgtr,  gameboy, 0,       gameboy,  gameboy, gb_state,       0,    "bootleg", "Game Fighter (bootleg)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE)
