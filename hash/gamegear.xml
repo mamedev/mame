@@ -6897,7 +6897,8 @@ a certain item) -->
 			<dataarea name="rom" size="524288">
 				<rom name="shining force ii - the sword of hajya (usa, europe).bin" size="524288" crc="a6ca6fa9" sha1="789734c4a837dffd2ad3e2c8de22cbd83836580d" offset="000000" />
 			</dataarea>
-			<dataarea name="ram" size="24576">
+			<!-- KM62256BLG-10L - 32Kx8 bit Low Power CMOS Static RAM -->
+			<dataarea name="ram" size="32768">
 			</dataarea>
 		</part>
 	</software>
@@ -6922,7 +6923,8 @@ a certain item) -->
 			<dataarea name="rom" size="524288">
 				<rom name="mpr-15570 j07.u1" size="524288" crc="30374681" sha1="2dd374db661315e51e9eedebf346a5a4ded0c3be" offset="000000" />
 			</dataarea>
-			<dataarea name="ram" size="24576">
+			<!-- KM62256BLG-10L - 32Kx8 bit Low Power CMOS Static RAM -->
+			<dataarea name="ram" size="32768">
 			</dataarea>
 		</part>
 	</software>
@@ -6936,7 +6938,8 @@ a certain item) -->
 			<dataarea name="rom" size="524288">
 				<rom name="shining force ii (prototype - apr 27,  1994).bin" size="524288" crc="65e5345c" sha1="71ed14c75915d606e00481cc2fbbaa28b6d2ba4f" offset="000000" />
 			</dataarea>
-			<dataarea name="ram" size="24576">
+			<!-- KM62256BLG-10L - 32Kx8 bit Low Power CMOS Static RAM -->
+			<dataarea name="ram" size="32768">
 			</dataarea>
 		</part>
 	</software>
@@ -6950,7 +6953,8 @@ a certain item) -->
 			<dataarea name="rom" size="524288">
 				<rom name="shining force ii (prototype - jul 08,  1994).bin" size="524288" crc="80dca91d" sha1="a9dd1254577bff20ee33f7bce56e2c4361f911c4" offset="000000" />
 			</dataarea>
-			<dataarea name="ram" size="24576">
+			<!-- KM62256BLG-10L - 32Kx8 bit Low Power CMOS Static RAM -->
+			<dataarea name="ram" size="32768">
 			</dataarea>
 		</part>
 	</software>
@@ -6964,7 +6968,8 @@ a certain item) -->
 			<dataarea name="rom" size="524288">
 				<rom name="shining force ii (prototype - jun 27,  1994).bin" size="524288" crc="8bfc56c3" sha1="900f8640af14dd6c413f20058a98da11a0fd07b1" offset="000000" />
 			</dataarea>
-			<dataarea name="ram" size="24576">
+			<!-- KM62256BLG-10L - 32Kx8 bit Low Power CMOS Static RAM -->
+			<dataarea name="ram" size="32768">
 			</dataarea>
 		</part>
 	</software>
@@ -6978,7 +6983,8 @@ a certain item) -->
 			<dataarea name="rom" size="524288">
 				<rom name="shining force ii (prototype - may 30,  1994).bin" size="524288" crc="e97ec011" sha1="bb7be9acb986a923c6c8ae41053c1b2f508885d1" offset="000000" />
 			</dataarea>
-			<dataarea name="ram" size="24576">
+			<!-- KM62256BLG-10L - 32Kx8 bit Low Power CMOS Static RAM -->
+			<dataarea name="ram" size="32768">
 			</dataarea>
 		</part>
 	</software>
