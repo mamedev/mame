@@ -1563,7 +1563,7 @@
 
 	<software name="discexec">
 		<description>Disc Executor</description>
-		<year>198?</year>
+		<year>1983</year>
 		<publisher>Vision Software</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="104943">
@@ -3362,7 +3362,7 @@
 	<software name="mailsys">
 		<description>Mailing System</description>
 		<year>1984</year>
-		<publisher>Acornsoft</publisher>
+		<publisher>Acornsoft/MI</publisher>
 		<info name="release" value="SNB09" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="104944">
@@ -3410,7 +3410,7 @@
 	<software name="purchsng">
 		<description>Purchasing</description>
 		<year>1984</year>
-		<publisher>Acornsoft</publisher>
+		<publisher>Acornsoft/MI</publisher>
 		<info name="release" value="SNB14" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="104940">
@@ -3422,7 +3422,7 @@
 	<software name="invoicng">
 		<description>Invoicing</description>
 		<year>1984</year>
-		<publisher>Acornsoft</publisher>
+		<publisher>Acornsoft/MI</publisher>
 		<info name="release" value="SNB08" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="104939">
@@ -3489,7 +3489,7 @@
 
 	<software name="flowercr">
 		<description>Flowers of Crystal</description>
-		<year>198?</year>
+		<year>1984</year>
 		<publisher>4mation</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="102590">
@@ -3533,7 +3533,7 @@
 
 	<software name="wrldword">
 		<description>World Without Words</description>
-		<year>198?</year>
+		<year>1988</year>
 		<publisher>4mation</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="104949">
