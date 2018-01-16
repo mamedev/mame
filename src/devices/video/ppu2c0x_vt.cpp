@@ -92,9 +92,9 @@ void ppu_vt03_device::set_new_pen(int i)
 			break;
 
 		default:
-			sat = 0.7;
+			sat = (m_pal_mode == PAL_MODE_NEW_VG) ? 0.5 : 0.7;
 			rad = M_PI * ((rhue * 30 + hue) / 180.0);
-			y = 0.9;
+			y = (m_pal_mode == PAL_MODE_NEW_VG) ? 0.4 : 0.9;
 			break;
 		}
 		
