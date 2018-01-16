@@ -37,6 +37,9 @@ protected:
 	virtual const tiny_rom_entry *device_rom_region() const override;
 	virtual ioport_constructor device_input_ports() const override;
 
+	virtual uint8_t expbus_r(address_space &space, offs_t offset, uint8_t data) override;
+	virtual void expbus_w(address_space &space, offs_t offset, uint8_t data) override;
+
 private:
 	DECLARE_READ8_MEMBER(status_r);
 	DECLARE_WRITE_LINE_MEMBER(busy_w);
@@ -58,6 +61,8 @@ private:
 	required_device<output_latch_device> m_cent_data_out;
 	required_ioport m_option;
 
+	uint8_t m_romsel;
+	uint8_t m_rom_base;
 	int m_centronics_busy;
 };
 

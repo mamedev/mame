@@ -87,9 +87,35 @@ void electron_expansion_slot_device::device_start()
 
 void electron_expansion_slot_device::device_reset()
 {
-	if (get_card_device())
+	if (m_card != nullptr)
 	{
-		get_card_device()->reset();
+		m_card->device().reset();
+	}
+}
+
+//-------------------------------------------------
+//  expbus_r - expansion data read
+//-------------------------------------------------
+
+uint8_t electron_expansion_slot_device::expbus_r(address_space &space, offs_t offset, uint8_t data)
+{
+	if (m_card != nullptr)
+	{
+		data = m_card->expbus_r(space, offset, data);
+	}
+
+	return data;
+}
+
+//-------------------------------------------------
+//  expbus_w - expansion data write
+//-------------------------------------------------
+
+void electron_expansion_slot_device::expbus_w(address_space &space, offs_t offset, uint8_t data)
+{
+	if (m_card != nullptr)
+	{
+		m_card->expbus_w(space, offset, data);
 	}
 }
 
