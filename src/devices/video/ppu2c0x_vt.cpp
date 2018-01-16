@@ -371,7 +371,7 @@ void ppu_vt03_device::set_2010_reg(uint8_t data)
 	    2   : SP16EN
 	    1   : BK16EN
 	    0   : PIX16EN */
-	uint8_t pal_mask = (m_pal_mode == PAL_MODE_NEW_VG) ? 0x04 : 0x80;
+	uint8_t pal_mask = (m_pal_mode == PAL_MODE_NEW_VG) ? 0x08 : 0x80;
 	if ((m_201x_regs[0x0] & pal_mask) != (data & pal_mask))
 	{
 		if (data & pal_mask)
