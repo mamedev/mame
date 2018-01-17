@@ -119,6 +119,7 @@ enum
 	XTAL_9_828MHz       = 9828000,      /* Universal PCBs */
 	XTAL_9_832MHz       = 9832000,      /* Robotron A7150 */
 	XTAL_9_8304MHz      = 9830400,      /* Epson PX-8 */
+	XTAL_9_87768MHz     = 9877680,      /* Microterm 420 */
 	XTAL_9_987MHz       = 9987000,      /* Crazy Balloon */
 	XTAL_10MHz          = 10000000,
 	XTAL_10_245MHz      = 10245000,     /* PES Speech box */
@@ -198,7 +199,7 @@ enum
 	XTAL_17_9712MHz     = 17971200,
 	XTAL_18MHz          = 18000000,     /* S.A.R, Ikari Warriors 3 */
 	XTAL_18_432MHz      = 18432000,     /* Extremely common, used on 100's of PCBs (48000 * 384) */
-	XTAL_18_575MHz      = 18575000,     /* Visual 102 */
+	XTAL_18_575MHz      = 18575000,     /* Visual 102, Visual 220 */
 	XTAL_18_720MHz      = 18720000,     /* Nokia MikroMikko 1 */
 	XTAL_18_8696MHz     = 18869600,     /* Memorex 2178 */
 	XTAL_19_3396MHz     = 19339600,     /* TeleVideo TVI-955 80-column display clock */
@@ -248,6 +249,7 @@ enum
 	XTAL_27MHz          = 27000000,     /* Some Banpresto games macrossp, Irem M92 and 90's Toaplan games */
 	XTAL_27_164MHz      = 27164000,     /* Typically used on 90's Taito PCBs to drive the custom chips */
 	XTAL_27_2109MHz     = 27210900,     /* LA Girl */
+	XTAL_27_562MHz      = 27562000,     /* Visual 220 */
 	XTAL_28MHz          = 28000000,
 	XTAL_28_322MHz      = 28322000,     /* Saitek RISC 2500, Mephisto Montreux */
 	XTAL_28_37516MHz    = 28375160,     /* Amiga PAL systems */
