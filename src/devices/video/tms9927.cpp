@@ -242,9 +242,17 @@ WRITE8_MEMBER( tms9927_device::write )
 		case 0x03:  /* SKEW BITS / DATA ROWS PER FRAME */
 		case 0x04:  /* SCAN LINES / FRAME */
 		case 0x05:  /* VERTICAL DATA START */
-		case 0x06:  /* LAST DISPLAYED DATA ROW */
 			m_reg[offset] = data;
 			recompute_parameters(false);
+			break;
+
+		case 0x06:  /* LAST DISPLAYED DATA ROW */
+			// TVI-912 writes to this register frequently
+			if (m_reg[offset] != data)
+			{
+				m_reg[offset] = data;
+				recompute_parameters(false);
+			}
 			break;
 
 		case 0x0c:  /* LOAD CURSOR CHARACTER ADDRESS */
