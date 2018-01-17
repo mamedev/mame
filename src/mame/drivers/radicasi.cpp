@@ -1289,15 +1289,16 @@ static INPUT_PORTS_START( rad_tetr )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 ) // Anticlockwise
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON2 ) // Clockwise
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) // Twist Left
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) // Twist Right
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) // and Select
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	// Player 2 inputs must be read via serial or similar
-	// the game doesn't read them directly, or even let
-	// you select player 2 mode by default
+	/* Player 2 inputs must be read via serial or similar
+	   the game doesn't read them directly, or even let
+	   you select player 2 mode by default
+	*/
 INPUT_PORTS_END
 
 /* both NMI and IRQ vectors just point to RTI
@@ -1355,6 +1356,10 @@ void radica_6502_state::machine_reset()
 
 	   It seems likely this 6502 sets it to 0x1ff by default
 	   at least.
+
+	   According to
+	   http://mametesters.org/view.php?id=6486
+	   this isn't right for known 6502 types either
 	*/
 	m_maincpu->set_state_int(M6502_S, 0x1ff);
 }
