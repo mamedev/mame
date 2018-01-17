@@ -310,7 +310,9 @@ public:
 	DECLARE_READ8_MEMBER(radicasi_sound_size_r);
 	DECLARE_READ8_MEMBER(radicasi_sound_trigger_r);
 	DECLARE_WRITE8_MEMBER(radicasi_sound_trigger_w);
-	
+	DECLARE_READ8_MEMBER(radicasi_sound_unk_r);
+	DECLARE_WRITE8_MEMBER(radicasi_sound_unk_w);
+
 	DECLARE_READ8_MEMBER(radicasi_50a8_r);
 protected:
 	// device-level overrides
@@ -329,6 +331,7 @@ private:
 	uint32_t m_sound_current_nib_pos[6];
 
 	uint8_t m_sound_trigger;
+	uint8_t m_sound_unk;
 
 	uint8_t m_isstopped;
 
@@ -774,7 +777,7 @@ uint32_t radica_6502_state::screen_update(screen_device &screen, bitmap_ind16 &b
 WRITE8_MEMBER(radica_6502_state::radicasi_rombank_hi_w)
 {
 	// written with the banking?
-	logerror("%s: radicasi_rombank_hi_w (set ROM bank) %02x\n", machine().describe_context().c_str(), data);
+	//logerror("%s: radicasi_rombank_hi_w (set ROM bank) %02x\n", machine().describe_context().c_str(), data);
 	m_rombank_hi = data;
 
 	m_bank->set_bank(m_rombank_lo | (m_rombank_hi << 8));
@@ -782,7 +785,7 @@ WRITE8_MEMBER(radica_6502_state::radicasi_rombank_hi_w)
 
 WRITE8_MEMBER(radica_6502_state::radicasi_rombank_lo_w)
 {
-	logerror("%s: radicasi_rombank_lo_w (select ROM bank) %02x\n", machine().describe_context().c_str(), data);
+	//logerror("%s: radicasi_rombank_lo_w (select ROM bank) %02x\n", machine().describe_context().c_str(), data);
 	m_rombank_lo = data;
 }
 
@@ -824,25 +827,25 @@ READ8_MEMBER(radica_6502_state::radicasi_5003_r)
 
 WRITE8_MEMBER(radica_6502_state::radicasi_tile_gfxbase_lo_w)
 {
-	logerror("%s: radicasi_tile_gfxbase_lo_w (select GFX base lower) %02x\n", machine().describe_context().c_str(), data);
+	//logerror("%s: radicasi_tile_gfxbase_lo_w (select GFX base lower) %02x\n", machine().describe_context().c_str(), data);
 	m_tile_gfxbase_lo_data = data;
 }
 
 WRITE8_MEMBER(radica_6502_state::radicasi_tile_gfxbase_hi_w)
 {
-	logerror("%s: radicasi_tile_gfxbase_hi_w (select GFX base upper) %02x\n", machine().describe_context().c_str(), data);
+	//logerror("%s: radicasi_tile_gfxbase_hi_w (select GFX base upper) %02x\n", machine().describe_context().c_str(), data);
 	m_tile_gfxbase_hi_data = data;
 }
 
 READ8_MEMBER(radica_6502_state::radicasi_tile_gfxbase_lo_r)
 {
-	logerror("%s: radicasi_tile_gfxbase_lo_r (GFX base lower)\n", machine().describe_context().c_str());
+	//logerror("%s: radicasi_tile_gfxbase_lo_r (GFX base lower)\n", machine().describe_context().c_str());
 	return m_tile_gfxbase_lo_data;
 }
 
 READ8_MEMBER(radica_6502_state::radicasi_tile_gfxbase_hi_r)
 {
-	logerror("%s: radicasi_tile_gfxbase_hi_r (GFX base upper)\n", machine().describe_context().c_str());
+	//logerror("%s: radicasi_tile_gfxbase_hi_r (GFX base upper)\n", machine().describe_context().c_str());
 	return m_tile_gfxbase_hi_data;
 }
 
@@ -850,25 +853,25 @@ READ8_MEMBER(radica_6502_state::radicasi_tile_gfxbase_hi_r)
 
 WRITE8_MEMBER(radica_6502_state::radicasi_sprite_gfxbase_lo_w)
 {
-	logerror("%s: radicasi_sprite_gfxbase_lo_w (select Sprite GFX base lower) %02x\n", machine().describe_context().c_str(), data);
+	//logerror("%s: radicasi_sprite_gfxbase_lo_w (select Sprite GFX base lower) %02x\n", machine().describe_context().c_str(), data);
 	m_sprite_gfxbase_lo_data = data;
 }
 
 WRITE8_MEMBER(radica_6502_state::radicasi_sprite_gfxbase_hi_w)
 {
-	logerror("%s: radicasi_sprite_gfxbase_hi_w (select Sprite GFX base upper) %02x\n", machine().describe_context().c_str(), data);
+	//logerror("%s: radicasi_sprite_gfxbase_hi_w (select Sprite GFX base upper) %02x\n", machine().describe_context().c_str(), data);
 	m_sprite_gfxbase_hi_data = data;
 }
 
 READ8_MEMBER(radica_6502_state::radicasi_sprite_gfxbase_lo_r)
 {
-	logerror("%s: radicasi_sprite_gfxbase_lo_r (Sprite GFX base lower)\n", machine().describe_context().c_str());
+	//logerror("%s: radicasi_sprite_gfxbase_lo_r (Sprite GFX base lower)\n", machine().describe_context().c_str());
 	return m_sprite_gfxbase_lo_data;
 }
 
 READ8_MEMBER(radica_6502_state::radicasi_sprite_gfxbase_hi_r)
 {
-	logerror("%s: radicasi_sprite_gfxbase_hi_r (Sprite GFX base upper)\n", machine().describe_context().c_str());
+	//logerror("%s: radicasi_sprite_gfxbase_hi_r (Sprite GFX base upper)\n", machine().describe_context().c_str());
 	return m_sprite_gfxbase_hi_data;
 }
 
@@ -1152,6 +1155,32 @@ WRITE8_MEMBER(radica6502_sound_device::radicasi_sound_trigger_w)
 		logerror("  UNEXPECTED BITS SET");
 }
 
+/* this is read/written with the same individual bits for each channel as the trigger
+   maybe related to interrupts? */
+READ8_MEMBER(radica6502_sound_device::radicasi_sound_unk_r)
+{
+	logerror("%s: radicasi_sound_unk_r\n", machine().describe_context().c_str());
+	return m_sound_unk;
+}
+
+WRITE8_MEMBER(radica6502_sound_device::radicasi_sound_unk_w)
+{
+	logerror("%s: radicasi_sound_unk_w %02x\n", machine().describe_context().c_str(), data);
+
+	for (int i = 0; i < 6; i++)
+	{
+		int bit = (data >> i) & 1;
+
+		if (bit)
+			logerror("(unknown operation on channel %d)\n", i);
+	}
+
+	m_sound_unk = data;
+
+	if (data & 0xc0)
+		logerror("  UNEXPECTED BITS SET");
+}
+
 void radica6502_sound_device::handle_sound_trigger(int which)
 {
 	logerror("Triggering operation on channel (%d) with params %08x %08x\n", which, m_sound_byte_address[which], m_sound_byte_len[which]);
@@ -1245,7 +1274,7 @@ static ADDRESS_MAP_START( radicasi_map, AS_PROGRAM, 8, radica_6502_state )
 
 	AM_RANGE(0x5080, 0x5091) AM_DEVREADWRITE("6ch_sound", radica6502_sound_device, radicasi_sound_addr_r, radicasi_sound_addr_w)
 	AM_RANGE(0x5092, 0x50a3) AM_DEVREADWRITE("6ch_sound", radica6502_sound_device, radicasi_sound_size_r, radicasi_sound_size_w)
-
+	AM_RANGE(0x50a4, 0x50a4) AM_DEVREADWRITE("6ch_sound", radica6502_sound_device, radicasi_sound_unk_r, radicasi_sound_unk_w)
 	AM_RANGE(0x50a5, 0x50a5) AM_DEVREADWRITE("6ch_sound", radica6502_sound_device, radicasi_sound_trigger_r, radicasi_sound_trigger_w)
 
 	AM_RANGE(0x50a8, 0x50a8) AM_DEVREAD("6ch_sound", radica6502_sound_device, radicasi_50a8_r) // possible 'stopped' status of above channels, waits for it to be 0x3f in places
