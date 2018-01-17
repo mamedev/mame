@@ -730,7 +730,7 @@ void myb3k_state::machine_start()
 	if (m_ram->size() <= (1024 * 128))
 	{
 		LOGRAM("128KB System\n");
-		m_maincpu->space(AS_PROGRAM).install_ram(0, 0xffff, m_ram->pointer()); // Install first 64KB of main memory 
+		m_maincpu->space(AS_PROGRAM).install_ram(0, 0xffff, m_ram->pointer()); // Install first 64KB of main memory
 		m_maincpu->space(AS_PROGRAM).install_ram(0x10000, 0x1ffff, m_vram);    // Install mirror of video RAM as the last 64Kb of main memory
 	}
 	else
@@ -1045,9 +1045,17 @@ static MACHINE_CONFIG_START( myb3k )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( jb3000, myb3k )
+	/* Keyboard */
+	MCFG_DEVICE_REPLACE("myb3k_keyboard", JB3000_KEYBOARD, 0)
+	MCFG_MYB3K_KEYBOARD_CB(PUT(myb3k_state, kbd_set_data_and_interrupt))
+
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( stepone, myb3k )
+	/* Keyboard */
+	MCFG_DEVICE_REPLACE("myb3k_keyboard", STEPONE_KEYBOARD, 0)
+	MCFG_MYB3K_KEYBOARD_CB(PUT(myb3k_state, kbd_set_data_and_interrupt))
+
 	/* software lists */
 	MCFG_SOFTWARE_LIST_ADD("stepone_flop_list", "stepone_flop")
 MACHINE_CONFIG_END
