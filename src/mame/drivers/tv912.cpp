@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:
+// copyright-holders:AJR
 /*******************************************************************************
 
     TeleVideo TVI-912/TVI-920 terminals
@@ -15,7 +15,7 @@
 #include "emu.h"
 #include "cpu/mcs48/mcs48.h"
 //#include "bus/rs232/rs232.h"
-//#include "machine/ay31015.h"
+#include "machine/ay31015.h"
 #include "machine/bankdev.h"
 #include "sound/beep.h"
 #include "video/tms9927.h"
@@ -31,18 +31,25 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_crtc(*this, "crtc")
+		, m_uart(*this, "uart")
 		, m_bankdev(*this, "bankdev")
 		, m_beep(*this, "beep")
 		, m_dispram_bank(*this, "dispram")
 		, m_p_chargen(*this, "chargen")
 		, m_keys(*this, "KEY%u", 0)
 		, m_modifiers(*this, "MODIFIERS")
+		, m_jumpers(*this, "JUMPERS")
+		, m_option(*this, "OPTION")
 	{ }
 
 	DECLARE_WRITE8_MEMBER(p1_w);
 	DECLARE_WRITE8_MEMBER(p2_w);
 	DECLARE_READ8_MEMBER(crtc_r);
 	DECLARE_WRITE8_MEMBER(crtc_w);
+	DECLARE_READ8_MEMBER(uart_status_r);
+	DECLARE_READ8_MEMBER(uart_data_r);
+	DECLARE_WRITE8_MEMBER(uart_data_w);
+	DECLARE_WRITE_LINE_MEMBER(uart_reset_w);
 	DECLARE_READ8_MEMBER(keyboard_r);
 	DECLARE_WRITE8_MEMBER(output_40c);
 
@@ -54,12 +61,15 @@ private:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<tms9927_device> m_crtc;
+	required_device<ay51013_device> m_uart;
 	required_device<address_map_bank_device> m_bankdev;
 	required_device<beep_device> m_beep;
 	required_memory_bank m_dispram_bank;
 	required_region_ptr<u8> m_p_chargen;
 	required_ioport_array<32> m_keys;
 	required_ioport m_modifiers;
+	required_ioport m_jumpers;
+	required_ioport m_option;
 
 	u8 m_keyboard_scan;
 	std::unique_ptr<u8[]> m_dispram;
@@ -102,6 +112,36 @@ READ8_MEMBER(tv912_state::keyboard_r)
 	return result;
 }
 
+READ8_MEMBER(tv912_state::uart_status_r)
+{
+	m_uart->set_input_pin(AY31015_SWE, 0);
+	u8 status = m_uart->get_output_pin(AY31015_DAV) << 0;
+	status |= m_uart->get_output_pin(AY31015_TBMT) << 1;
+	status |= m_uart->get_output_pin(AY31015_PE) << 2;
+	status |= m_uart->get_output_pin(AY31015_FE) << 3;
+	status |= BIT(m_jumpers->read(), offset) << 4;
+	status |= m_option->read();
+	m_uart->set_input_pin(AY31015_SWE, 1);
+	return status;
+}
+
+READ8_MEMBER(tv912_state::uart_data_r)
+{
+	m_uart->set_input_pin(AY31015_RDAV, 0);
+	u8 data = m_uart->get_received_data();
+	m_uart->set_input_pin(AY31015_RDAV, 1);
+	return data;
+}
+
+WRITE8_MEMBER(tv912_state::uart_data_w)
+{
+	m_uart->set_transmit_data(data);
+}
+
+WRITE_LINE_MEMBER(tv912_state::uart_reset_w)
+{
+}
+
 WRITE8_MEMBER(tv912_state::output_40c)
 {
 	// Bit 5: +FORCE BLANK
@@ -141,8 +181,10 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( bank_map, 0, 8, tv912_state )
 	AM_RANGE(0x000, 0x0ff) AM_MIRROR(0x300) AM_RAM
 	AM_RANGE(0x400, 0x403) AM_MIRROR(0x3c0) AM_SELECT(0x030) AM_READWRITE(crtc_r, crtc_w)
+	AM_RANGE(0x407, 0x407) AM_MIRROR(0x3f0) AM_READ(uart_status_r)
+	AM_RANGE(0x408, 0x408) AM_MIRROR(0x3f3) AM_READWRITE(uart_data_r, uart_data_w)
 	AM_RANGE(0x40c, 0x40f) AM_MIRROR(0x3f0) AM_READ(keyboard_r)
-	AM_RANGE(0x40c, 0x40c) AM_MIRROR(0x3f0) AM_WRITE(output_40c)
+	AM_RANGE(0x40c, 0x40c) AM_MIRROR(0x3f3) AM_WRITE(output_40c)
 	AM_RANGE(0x800, 0xfff) AM_RAMBANK("dispram")
 ADDRESS_MAP_END
 
@@ -156,6 +198,25 @@ static INPUT_PORTS_START( switches )
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Ctrl") PORT_CODE(KEYCODE_LCONTROL)
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Funct") PORT_CODE(KEYCODE_LALT)
 	PORT_BIT(0x23, IP_ACTIVE_LOW, IPT_UNUSED)
+
+	PORT_START("JUMPERS")
+	PORT_DIPNAME(0x08, 0x08, "Automatic CRLF") PORT_DIPLOCATION("S4:1") // or jumper W31
+	PORT_DIPSETTING(0x08, DEF_STR(Off))
+	PORT_DIPSETTING(0x00, DEF_STR(On))
+	PORT_DIPNAME(0x04, 0x04, "End of Send Character") PORT_DIPLOCATION("S4:2") // or jumper W32
+	PORT_DIPSETTING(0x04, "CR")
+	PORT_DIPSETTING(0x00, "EOT")
+	PORT_DIPNAME(0x02, 0x02, "Column 80 CRLF") PORT_DIPLOCATION("S4:3") // or jumper W33
+	PORT_DIPSETTING(0x00, DEF_STR(Off))
+	PORT_DIPSETTING(0x02, DEF_STR(On))
+	PORT_DIPNAME(0x01, 0x01, "Terminal Mode") PORT_DIPLOCATION("S4:4") // or jumper W34
+	PORT_DIPSETTING(0x01, "Extension")
+	PORT_DIPSETTING(0x00, "Page Print")
+
+	PORT_START("OPTION")
+	PORT_DIPUNKNOWN_DIPLOC(0x20, 0x20, "S4:5")
+	PORT_DIPUNKNOWN_DIPLOC(0x40, 0x40, "S4:6")
+	PORT_DIPUNKNOWN_DIPLOC(0x80, 0x80, "S4:7")
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( tv912b )
@@ -557,6 +618,7 @@ MACHINE_CONFIG_START(tv912_state::tv912)
 	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(tv912_state, p1_w))
 	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(tv912_state, p2_w))
 	MCFG_MCS48_PORT_T1_IN_CB(DEVREADLINE("crtc", tms9927_device, bl_r)) MCFG_DEVCB_INVERT
+	MCFG_MCS48_PORT_PROG_OUT_CB(WRITELINE(tv912_state, uart_reset_w))
 
 	MCFG_DEVICE_ADD("bankdev", ADDRESS_MAP_BANK, 0)
 	MCFG_DEVICE_PROGRAM_MAP(bank_map)
@@ -571,6 +633,8 @@ MACHINE_CONFIG_START(tv912_state::tv912)
 	MCFG_DEVICE_ADD("crtc", TMS9927, XTAL_23_814MHz)
 	MCFG_TMS9927_CHAR_WIDTH(CHAR_WIDTH)
 	MCFG_TMS9927_VSYN_CALLBACK(INPUTLINE("maincpu", MCS48_INPUT_IRQ))
+
+	MCFG_DEVICE_ADD("uart", AY51013, 0)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("beep", BEEP, XTAL_23_814MHz / 7 / 11 / 256) // nominally 1200 Hz (same clock as for 75 baud setting)
