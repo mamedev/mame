@@ -276,7 +276,8 @@ MC6845_UPDATE_ROW( myb3k_state::crtc_update_row )
 {
 	/* The 6845 is not programmed to get 80 character modes or 400 pixels width but this is managed by external circuitry that selects
 	   the apropriate pixelclock based on the video mode latch at i/o address 0x04. This callback always get x_count set to 40  */
-	for (int x_pos = 0; x_pos < (m_vmode & 0x02 ? x_count * 2 : x_count); x_pos++)
+	uint8_t row_length = (m_vmode & 0x02) || (m_vmode == 0 && (m_pal == &m_mpal)) ? x_count * 2 : x_count;
+	for (int x_pos = 0; x_pos < row_length; x_pos++)
 	{
 		uint16_t page = (m_portc & PC1_SETPAGE) ? 0x8000 : 0;
 
@@ -289,72 +290,116 @@ MC6845_UPDATE_ROW( myb3k_state::crtc_update_row )
 		}
 		else
 		{
-			uint32_t rowstart;
-			uint32_t pdat;
-			uint16_t pdat16;
+		  //uint32_t pdat;
 			switch (m_vmode)
 			{
-			case 1:
-				rowstart = (((x_pos + ma) * 32 + ra) & 0x7fff) + page;
-
-				// Crude fix of 36CH mode
-				if ((ioport("DSW1")->read() & 0x0c) == 0 && ra > 7)
-				{ // text mode only, 36x25 char, 8 color, discarding raster rows with what appears to be garbish
-				  // needs to be implemented LLE to verify the function of that data, possibly related to Kanji support
-					pdat = 0x00; // This gets wrong when background color is not black
-				}
-				else
-				{ // 320x200, 40x25 char, 8 color
-					pdat  = ((m_vram[rowstart +  0]  & 0xff) << 16); // Green 8 bits
+			case 0:
+				// Color connector doing 320x200, 40x25 characters, 8 grey tones
+				if ((ioport("MONITOR")->read() & 1) == 0)
+				{
+					uint32_t rowstart = (((x_pos + ma) * 32 + ra) & 0x7fff) + page;
+					uint32_t pdat  = ((m_vram[rowstart +  0]  & 0xff) << 16); // Green 8 bits
 					pdat |= ((m_vram[rowstart +  8]  & 0xf0) << 8);  // Red upper 4 bits
 					pdat |= ((m_vram[rowstart +  8]  & 0x0f) <<  4); // Blue upper 4 bits
 					pdat |= ((m_vram[rowstart +  24] & 0xf0) <<  4); // Red lower 4 bits
 					pdat |= ((m_vram[rowstart +  24] & 0x0f) <<  0); // Blue lower 4 bits
+					for (int pxl = 0; pxl < 8; pxl++)
+					{
+						uint16_t pind = 0;
+						/* Pixeldata for 8 pixels are stored in pdat as GGRRBB  */
+						pind = (((pdat & (0x800000 >> pxl)) ? 0x04 : 0x00) |
+							((pdat & (0x008000 >> pxl)) ? 0x02 : 0x00) |
+							((pdat & (0x000080 >> pxl)) ? 0x01 : 0x00) );
+
+						/* Check if we are in a cursor and create cursor if so */
+						pind ^= ((cursor_x != -1 && x_pos == cursor_x && ra == 7) ? 7 : 0);
+
+						/* Create the grey scale */
+						bitmap.pix32(y, ( x_pos * 8) + pxl) = rgb_t(m_mpal[pind & 0x07].g(),m_mpal[pind & 0x07].g(),m_mpal[pind & 0x07].g());
+					}
 				}
-
-				if (pdat != 0)
+				else // Monochrome connector doing 640x200, 80x25, b&w
 				{
-					LOGPIX(" - PDAT:%06x from offset %04x RA=%d\n", pdat, rowstart + 0, ra);
+					uint32_t rowstart = (((x_pos + ma * 2) * 16 + ra) & 0x7fff) + page;
+					uint16_t pdat = m_vram[rowstart];
+					for (int pxl = 0; pxl < 8; pxl++)
+					{
+						if ((pdat & (0x80 >> pxl)) != 0)
+						{
+							//bitmap.pix32(y, ( x_pos * 8) + pxl) = (*m_pal)[0x07];
+							bitmap.pix32(y, ( x_pos * 8) + pxl) = m_mpal[0x07];
+						}
+						else
+						{
+							bitmap.pix32(y, ( x_pos * 8) + pxl) = rgb_t::black();
+						}
+					}
 				}
-
-				for (int pxl = 0; pxl < 8; pxl++)
+				break;
+			case 1:
 				{
-					uint16_t pind = 0;
-					/* Pixeldata for 8 pixels are stored in pdat as GGRRBB  */
-					pind = (((pdat & (0x800000 >> pxl)) ? 0x04 : 0x00) |
-						((pdat & (0x008000 >> pxl)) ? 0x02 : 0x00) |
-						((pdat & (0x000080 >> pxl)) ? 0x01 : 0x00) );
+					uint32_t pdat;
+					// Crude fix of 36CH mode
+					if ((ioport("DSW1")->read() & 0x0c) == 0 && ra > 7)
+					{
+						// text mode only, 36x25 char, 8 color, discarding raster rows with what appears to be garbish
+						// needs to be implemented LLE to verify the function of that data, possibly related to Kanji support
+						pdat = 0x00; // This gets wrong when background color is not black
+					}
+					else
+					{	// 320x200, 40x25 char, 8 color
+						uint32_t rowstart = (((x_pos + ma) * 32 + ra) & 0x7fff) + page;
+						pdat  = ((m_vram[rowstart +  0]  & 0xff) << 16); // Green 8 bits
+						pdat |= ((m_vram[rowstart +  8]  & 0xf0) << 8);  // Red upper 4 bits
+						pdat |= ((m_vram[rowstart +  8]  & 0x0f) <<  4); // Blue upper 4 bits
+						pdat |= ((m_vram[rowstart +  24] & 0xf0) <<  4); // Red lower 4 bits
+						pdat |= ((m_vram[rowstart +  24] & 0x0f) <<  0); // Blue lower 4 bits
+						if (pdat != 0)
+						{
+							LOGPIX(" - PDAT:%06x from offset %04x RA=%d\n", pdat, rowstart + 0, ra);
+						}
+					}
 
-					/* Check if we are in a cursor and create cursor if so */
-					pind ^= ((cursor_x != -1 && x_pos == cursor_x && ra == 7) ? 7 : 0);
+					for (int pxl = 0; pxl < 8; pxl++)
+					{
+						uint16_t pind = 0;
+						/* Pixeldata for 8 pixels are stored in pdat as GGRRBB  */
+						pind = (((pdat & (0x800000 >> pxl)) ? 0x04 : 0x00) |
+							((pdat & (0x008000 >> pxl)) ? 0x02 : 0x00) |
+							((pdat & (0x000080 >> pxl)) ? 0x01 : 0x00) );
 
-					/* Pick up the color */
-					bitmap.pix32(y, ( x_pos * 8) + pxl) = (*m_pal)[pind & 0x07];
+						/* Check if we are in a cursor and create cursor if so */
+						pind ^= ((cursor_x != -1 && x_pos == cursor_x && ra == 7) ? 7 : 0);
+
+						/* Pick up the color */
+						bitmap.pix32(y, ( x_pos * 8) + pxl) = (*m_pal)[pind & 0x07];
+					}
 				}
 				break;
 
 			case 6: /* 640x400, 80 char, white on black -  fall through to case 2 if monochrome monitor
 			       Mode 6 is an interlaced mode so should induce flicker on the color monitor but be
 			       ok on the monochrome green monitor */
-
 			case 2: /* 640x200, 80 char, white on black */
-				rowstart = (((x_pos + ma * 2) * 16 + ra) & 0x7fff) + page;
-				pdat16 = m_vram[rowstart];
-				//if (pdat16 != 0)
-				LOGM2(" - PDAT:%06x from offset %04x RA=%d X:%d Y:%d DE:%d HBP:%d VBP:%d\n", pdat16, (x_pos * 2 + ma * 2) * 16 + ra + page + 0, ra, x_pos, y, de, hbp, vbp);
-
-				/* Check if we are in a cursor and create cursor if so */
-				//pdat ^= ((cursor_x != -1 && x_pos/2 == cursor_x && ra == 7) ? 0xff : 0);
-
-				for (int pxl = 0; pxl < 8; pxl++)
 				{
-					if ((pdat16 & (0x80 >> pxl)) != 0)
+					uint32_t rowstart = (((x_pos + ma * 2) * 16 + ra) & 0x7fff) + page;
+					uint16_t pdat = m_vram[rowstart];
+					//if (pdat16 != 0)
+					LOGM2(" - PDAT:%06x from offset %04x RA=%d X:%d Y:%d DE:%d HBP:%d VBP:%d\n", pdat, (x_pos * 2 + ma * 2) * 16 + ra + page + 0, ra, x_pos, y, de, hbp, vbp);
+
+					/* Check if we are in a cursor and create cursor if so */
+					//pdat ^= ((cursor_x != -1 && x_pos/2 == cursor_x && ra == 7) ? 0xff : 0);
+
+					for (int pxl = 0; pxl < 8; pxl++)
 					{
-						bitmap.pix32(y, ( x_pos * 8) + pxl) = (*m_pal)[0x07];
-					}
-					else
-					{
-						bitmap.pix32(y, ( x_pos * 8) + pxl) = rgb_t::black();
+						if ((pdat & (0x80 >> pxl)) != 0)
+						{
+							bitmap.pix32(y, ( x_pos * 8) + pxl) = (*m_pal)[0x07];
+						}
+						else
+						{
+							bitmap.pix32(y, ( x_pos * 8) + pxl) = rgb_t::black();
+						}
 					}
 				}
 				break;
@@ -405,9 +450,21 @@ WRITE8_MEMBER( myb3k_state::myb3k_video_mode_w )
 	m_vmode = data;
 	switch (data & 7)
 	{
-	case 0: /* Green connector 640x200 80x25 chars 1 tone or GRB 320x200 40x20 8 tones */
-		LOGVMOD(" - 640x200 on Green or 320x200 on GRB output...\n");
-		break;
+	case 0:
+		if ((ioport("MONITOR")->read() & 1) == 0)
+		{
+			LOGVMOD(" - Color display 320x200 on 40x25 8 grey tones\n");
+			rectangle rect(0, 320 - 1, 0, 200 - 1);
+			machine().first_screen()->configure(320, 200, rect, HZ_TO_ATTOSECONDS(50));
+			break;
+		}
+		else // Monochrome connector selected?
+		{
+			LOGVMOD(" - Monochrome 640x200 on 80x25  \n");
+			rectangle rect(0, 640 - 1, 0, 200 - 1);
+			machine().first_screen()->configure(640, 200, rect, HZ_TO_ATTOSECONDS(50));
+			break;
+		}
 
 	case 1: /* 320x200 */
 		{
@@ -611,7 +668,27 @@ INPUT_PORTS_END
 
 INPUT_CHANGED_MEMBER(myb3k_state::monitor_changed)
 {
-	m_pal = (ioport("MONITOR")->read() & 1) ? &m_mpal : &m_cpal;
+	if ((ioport("MONITOR")->read() & 1) == 1)
+	{
+		m_pal = &m_mpal;
+		if ((m_vmode & 7) == 0)
+		{
+			LOGVMOD(" - Monochrome 640x200 on 80x25  \n");
+			rectangle rect(0, 640 - 1, 0, 200 - 1);
+			machine().first_screen()->configure(640, 200, rect, HZ_TO_ATTOSECONDS(50));
+		}
+	}
+	else
+	{
+		m_pal = &m_cpal;
+		if ((m_vmode & 7) == 0)
+		{
+			m_pal = &m_mpal;
+			LOGVMOD(" - Color display 320x200 on 40x25 8 grey tones\n");
+			rectangle rect(0, 320 - 1, 0, 200 - 1);
+			machine().first_screen()->configure(320, 200, rect, HZ_TO_ATTOSECONDS(50));
+		}
+	}
 }
 
 void myb3k_state::machine_start()
@@ -686,7 +763,7 @@ void myb3k_state::machine_reset()
 	m_vmode = 0;
 	m_portc = 0;
 	memset(m_dma_page, 0, sizeof(m_dma_page));
-	m_pal = (ioport("MONITOR")->read() & 1) ? &m_mpal : &m_cpal;
+	m_pal = &m_mpal;
 }
 
 void myb3k_state::select_dma_channel(int channel, bool state)
