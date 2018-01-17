@@ -1140,7 +1140,8 @@ CONS( 200?, vdogdemo,  0,  0,  nes_vt,    nes_vt, nes_vt_state,  0, "VRT", "V-Do
 // for testing 'Shark', 'Octopus', 'Harbor', and 'Earth Fighter' use the extended colour modes, other games just seem to use standard NES modes
 CONS( 200?, mc_dgear,  0,  0,  nes_vt,    nes_vt, nes_vt_state,  0, "dreamGEAR", "dreamGEAR 75-in-1", MACHINE_NOT_WORKING )
 // all software in this runs in the VT03 enhanced mode, it also includes an actual licensed VT03 port of Frogger.  If running on EmuVT set to PAL or the colours are broken
-CONS( 200?, vgtablet,   0,        0,  nes_vt,    nes_vt, nes_vt_state,  0, "<unknown> / Konami", "VG Pocket Tablet", MACHINE_NOT_WORKING )
+CONS( 2006, vgtablet,   0,        0,  nes_vt,    nes_vt, nes_vt_state,  0, "<unknown> / Konami", "VG Pocket Tablet", MACHINE_NOT_WORKING )
+// There is a 2004 Majesco Frogger "TV game" that appears to contain the same version of Frogger as above but with no other games, so probably fits here.
 
 // this is VT09 based, and needs 8bpp modes at least
 // it boots, but gfx look wrong due to unsupported mode
