@@ -35,6 +35,10 @@ protected:
 
 	// internal state
 	const char *m_device_name;
+
+public:
+	// getter (for validation purposes)
+	const char *device_name() const { return m_device_name; }
 };
 
 
@@ -98,9 +102,6 @@ public:
 
 	// perform the binding
 	void bind_relative_to(device_t &search_root) { if (!basetype::isnull()) basetype::late_bind(bound_object(search_root)); }
-
-	// getter (for validation purposes)
-	const char *device_name() const { return m_device_name; }
 };
 
 
