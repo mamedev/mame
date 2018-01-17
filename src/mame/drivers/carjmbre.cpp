@@ -6,8 +6,11 @@
     Omori Electric CAD (OEC) 1983
 
     TODO:
-    - colors are wrong
-    - sprite priorities?
+    - colors are probably wrong
+    - sprite priorities? (eg. player car jumping on the ramp, 1 part disappears)
+    - first 2 letters on titlescreen look misaligned with the tilemap
+    - The spriteram holds 2 sprite lists (00-7f and 80-ff), they are identical.
+      Is it an unused feature? Or a RAM access speed workaround?
 
 ----------------------------------------------------------------------------
 
@@ -179,7 +182,7 @@ uint32_t carjmbre_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 
 void carjmbre_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	for (int offs = m_spriteram.bytes() - 4; offs >= 0; offs -= 4)
+	for (int offs = 0x80 - 4; offs >= 0; offs -= 4)
 	{
 		int sy = m_spriteram[offs];
 		int code = m_spriteram[offs + 1];
