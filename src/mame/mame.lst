@@ -36643,8 +36643,9 @@ ti82                            // 1993 TI-82 (Z80 6 MHz)
 ti83                            // 1996 TI-83 (Z80 6 MHz)
 ti83p                           // 1999 TI-83 Plus (Z80 6 MHz)
 ti83pse                         // 2001 TI-83 Plus Silver Edition
-ti84p                           // 2004 TI-84 Plus
-ti84pse                         // 2004 TI-84 Plus Silver Edition
+ti84p                           // 2004 TI-84 Plus (Boot Code 1.0)
+ti84pv2                         // 20?? TI-84 Plus (Boot Code 1.2)
+ti84pse                         // 2004 TI-84 Plus Silver Edition (Boot Code 1.00)
 ti85                            // 1992 TI-85 (Z80 6 MHz)
 ti86                            // 1997 TI-86 (Z80 6 MHz)
 
@@ -36664,8 +36665,8 @@ ti99_4p                         // 1996 SNUG SGCPU (aka TI-99/4P)
 
 @source:ti99_4x.cpp
 ti99_4                          // 1979 TI-99/4
-ti99_4a                         // 1981 TI-99/4A
 ti99_4ae                        // 1981 TI-99/4A with 50Hz video
+ti99_4a                         // 1981 TI-99/4A
 ti99_4e                         // 1980 TI-99/4 with 50Hz video
 ti99_4ev                        // 1994 TI-99/4A with EVPC video card
 ti99_4qi                        // 1983 TI-99/4QI (US only)
