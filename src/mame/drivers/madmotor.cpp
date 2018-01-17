@@ -232,7 +232,7 @@ void madmotor_state::machine_reset()
 	m_flipscreen = 0;
 }
 
-static MACHINE_CONFIG_START( madmotor )
+MACHINE_CONFIG_START(madmotor_state::madmotor)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 12000000) /* Custom chip 59, 24 MHz crystal */

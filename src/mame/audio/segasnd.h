@@ -31,6 +31,8 @@ public:
 
 	DECLARE_WRITE_LINE_MEMBER(drq_w);
 
+	void sega_speech_board(machine_config &config);
+
 protected:
 	// device-level overrides
 	virtual void device_start() override;
@@ -50,8 +52,6 @@ private:
 };
 
 DECLARE_DEVICE_TYPE(SEGASPEECH, speech_sound_device)
-
-MACHINE_CONFIG_EXTERN( sega_speech_board );
 
 
 class usb_sound_device : public device_t, public device_sound_interface

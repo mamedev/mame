@@ -44,6 +44,7 @@ ToDo:
 #include "machine/6821pia.h"
 #include "machine/timer.h"
 #include "sound/dac.h"
+#include "sound/volt_reg.h"
 #include "speaker.h"
 
 #include "s3.lh"
@@ -88,6 +89,8 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(audio_nmi);
 	DECLARE_MACHINE_RESET(s3);
 	DECLARE_MACHINE_RESET(s3a);
+	void s3a(machine_config &config);
+	void s3(machine_config &config);
 private:
 	uint8_t m_t_c;
 	uint8_t m_sound_data;
@@ -423,7 +426,7 @@ TIMER_DEVICE_CALLBACK_MEMBER( s3_state::irq )
 		m_t_c++;
 }
 
-static MACHINE_CONFIG_START( s3 )
+MACHINE_CONFIG_START(s3_state::s3)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6800, 3580000)
 	MCFG_CPU_PROGRAM_MAP(s3_main_map)
@@ -475,7 +478,7 @@ static MACHINE_CONFIG_START( s3 )
 	MCFG_NVRAM_ADD_0FILL("nvram")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( s3a, s3 )
+MACHINE_CONFIG_DERIVED(s3_state::s3a, s3)
 	/* Add the soundcard */
 	MCFG_CPU_ADD("audiocpu", M6802, 3580000)
 	MCFG_CPU_PROGRAM_MAP(s3_audio_map)
@@ -483,7 +486,8 @@ static MACHINE_CONFIG_DERIVED( s3a, s3 )
 
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
 	MCFG_SOUND_ADD("dac", MC1408, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
-	MCFG_SOUND_REFERENCE_INPUT(DAC_VREF_POS_INPUT, 1.0) MCFG_SOUND_REFERENCE_INPUT(DAC_VREF_NEG_INPUT, -1.0)
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 
 	MCFG_DEVICE_ADD("pias", PIA6821, 0)
 	MCFG_PIA_READPB_HANDLER(READ8(s3_state,sound_r))

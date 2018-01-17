@@ -18,6 +18,7 @@
 #include "machine/nvram.h"
 #include "sound/ay8910.h"
 #include "sound/dac.h"
+#include "sound/volt_reg.h"
 #include "sound/3812intf.h"
 #include "speaker.h"
 
@@ -40,6 +41,7 @@ public:
 	DECLARE_READ8_MEMBER(ay8910_inputs_r);
 	DECLARE_WRITE8_MEMBER(sound_rombank_w);
 
+	void mephisto(machine_config &config);
 private:
 	u8 m_ay8910_data;
 	bool m_ay8910_bdir;
@@ -153,7 +155,7 @@ void mephisto_pinball_state::machine_reset()
 {
 }
 
-static MACHINE_CONFIG_START( mephisto )
+MACHINE_CONFIG_START(mephisto_pinball_state::mephisto)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8088, XTAL_18MHz/3)
 	MCFG_CPU_PROGRAM_MAP(mephisto_map)
@@ -184,7 +186,8 @@ static MACHINE_CONFIG_START( mephisto )
 
 	MCFG_SOUND_ADD("dac", DAC08, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
-	MCFG_SOUND_REFERENCE_INPUT(DAC_VREF_POS_INPUT, 1.0) MCFG_SOUND_REFERENCE_INPUT(DAC_VREF_NEG_INPUT, -1.0)
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 #ifdef UNUSED_DEFINITION

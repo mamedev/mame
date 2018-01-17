@@ -199,7 +199,7 @@ GFXDECODE_END
 
 /* Machine Driver */
 
-static MACHINE_CONFIG_START( bigstrkb )
+MACHINE_CONFIG_START(bigstrkb_state::bigstrkb)
 
 	MCFG_CPU_ADD("maincpu", M68000, 12000000)
 	MCFG_CPU_PROGRAM_MAP(bigstrkb_map)

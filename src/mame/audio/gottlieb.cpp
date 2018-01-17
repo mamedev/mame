@@ -13,6 +13,7 @@
 #include "emu.h"
 #include "audio/gottlieb.h"
 #include "sound/dac.h"
+#include "sound/volt_reg.h"
 
 
 #define SOUND1_CLOCK        XTAL_3_579545MHz
@@ -107,7 +108,7 @@ INPUT_CHANGED_MEMBER( gottlieb_sound_r0_device::audio_nmi )
 // device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( gottlieb_sound_r0_device::device_add_mconfig )
+MACHINE_CONFIG_START(gottlieb_sound_r0_device::device_add_mconfig)
 	// audio CPU
 	MCFG_CPU_ADD("audiocpu", M6502, SOUND1_CLOCK/4) // M6503 - clock is a gate, a resistor and a capacitor. Freq unknown.
 	MCFG_CPU_PROGRAM_MAP(gottlieb_sound_r0_map)
@@ -119,7 +120,8 @@ MACHINE_CONFIG_MEMBER( gottlieb_sound_r0_device::device_add_mconfig )
 
 	// sound devices
 	MCFG_SOUND_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, DEVICE_SELF_OWNER, 0.25) // unknown DAC
-	MCFG_SOUND_REFERENCE_INPUT(DAC_VREF_POS_INPUT, 1.0) MCFG_SOUND_REFERENCE_INPUT(DAC_VREF_NEG_INPUT, -1.0)
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 
@@ -304,7 +306,7 @@ INPUT_PORTS_END
 // device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( gottlieb_sound_r1_device::device_add_mconfig )
+MACHINE_CONFIG_START(gottlieb_sound_r1_device::device_add_mconfig)
 	// audio CPU
 	MCFG_CPU_ADD("audiocpu", M6502, SOUND1_CLOCK/4) // the board can be set to /2 as well
 	MCFG_CPU_PROGRAM_MAP(gottlieb_sound_r1_map)
@@ -317,7 +319,8 @@ MACHINE_CONFIG_MEMBER( gottlieb_sound_r1_device::device_add_mconfig )
 
 	// sound devices
 	MCFG_SOUND_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, DEVICE_SELF_OWNER, 0.25) // unknown DAC
-	MCFG_SOUND_REFERENCE_INPUT(DAC_VREF_POS_INPUT, 1.0) MCFG_SOUND_REFERENCE_INPUT(DAC_VREF_NEG_INPUT, -1.0)
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 
@@ -361,7 +364,7 @@ gottlieb_sound_r1_with_votrax_device::gottlieb_sound_r1_with_votrax_device(const
 // device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( gottlieb_sound_r1_with_votrax_device::device_add_mconfig )
+MACHINE_CONFIG_START(gottlieb_sound_r1_with_votrax_device::device_add_mconfig)
 	gottlieb_sound_r1_device::device_add_mconfig(config);
 
 	// add the VOTRAX
@@ -661,7 +664,7 @@ INPUT_PORTS_END
 // device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( gottlieb_sound_r2_device::device_add_mconfig )
+MACHINE_CONFIG_START(gottlieb_sound_r2_device::device_add_mconfig)
 	// audio CPUs
 	MCFG_CPU_ADD("audiocpu", M6502, SOUND2_CLOCK/4)
 	MCFG_CPU_PROGRAM_MAP(gottlieb_sound_r2_map)
@@ -673,7 +676,8 @@ MACHINE_CONFIG_MEMBER( gottlieb_sound_r2_device::device_add_mconfig )
 	MCFG_SOUND_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, DEVICE_SELF_OWNER, 0.075) // unknown DAC
 	MCFG_SOUND_ADD("dacvol", DAC_8BIT_R2R, 0) // unknown DAC
 	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
-	MCFG_SOUND_REFERENCE_INPUT(DAC_VREF_POS_INPUT, 1.0)
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dacvol", 1.0, DAC_VREF_POS_INPUT)
 
 	MCFG_SOUND_ADD("ay1", AY8913, SOUND2_CLOCK/2)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, DEVICE_SELF_OWNER, 0.15)

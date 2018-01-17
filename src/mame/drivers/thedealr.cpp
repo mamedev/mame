@@ -76,6 +76,7 @@ public:
 	DECLARE_PALETTE_INIT(thedealr);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank);
+	void thedealr(machine_config &config);
 };
 
 /***************************************************************************
@@ -524,7 +525,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(thedealr_state::thedealr_interrupt)
 		m_maincpu->set_input_line(INPUT_LINE_IRQ0, ASSERT_LINE);
 }
 
-static MACHINE_CONFIG_START( thedealr )
+MACHINE_CONFIG_START(thedealr_state::thedealr)
 
 	// basic machine hardware
 	MCFG_CPU_ADD("maincpu", R65C02, XTAL_16MHz/8)   // 2 MHz?

@@ -66,6 +66,7 @@ public:
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
+	void dotrikun(machine_config &config);
 };
 
 TIMER_DEVICE_CALLBACK_MEMBER(dotrikun_state::interrupt)
@@ -188,7 +189,7 @@ void dotrikun_state::machine_reset()
 	m_color = 0;
 }
 
-static MACHINE_CONFIG_START( dotrikun )
+MACHINE_CONFIG_START(dotrikun_state::dotrikun)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK)

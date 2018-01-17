@@ -27,6 +27,7 @@
 #include "emu.h"
 #include "cpu/avr8/avr8.h"
 #include "sound/dac.h"
+#include "sound/volt_reg.h"
 #include "video/hd44780.h"
 #include "rendlay.h"
 #include "screen.h"
@@ -185,6 +186,7 @@ public:
 	DECLARE_DRIVER_INIT(replicator);
 	virtual void machine_reset() override;
 	DECLARE_PALETTE_INIT(replicator);
+	void replicator(machine_config &config);
 };
 
 void replicator_state::machine_start()
@@ -598,7 +600,7 @@ static GFXDECODE_START( replicator )
 	GFXDECODE_ENTRY( "hd44780:cgrom", 0x0000, hd44780_charlayout, 0, 1 )
 GFXDECODE_END
 
-static MACHINE_CONFIG_START( replicator )
+MACHINE_CONFIG_START(replicator_state::replicator)
 
 	MCFG_CPU_ADD("maincpu", ATMEGA1280, MASTER_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(replicator_prg_map)
@@ -634,7 +636,8 @@ static MACHINE_CONFIG_START( replicator )
 	/* A piezo is connected to the PORT G bit 5 (OC0B pin driven by Timer/Counter #4) */
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
 	MCFG_SOUND_ADD("dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(0, "speaker", 0.5)
-	MCFG_SOUND_REFERENCE_INPUT(DAC_VREF_POS_INPUT, 1.0)
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT)
 MACHINE_CONFIG_END
 
 ROM_START( replica1 )

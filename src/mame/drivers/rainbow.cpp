@@ -622,6 +622,7 @@ public:
 	DECLARE_WRITE16_MEMBER(vram_w);
 	DECLARE_WRITE_LINE_MEMBER(GDC_vblank_irq);
 
+	void rainbow(machine_config &config);
 protected:
 	virtual void machine_start() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
@@ -3182,7 +3183,7 @@ static ADDRESS_MAP_START( upd7220_map, 0, 16, rainbow_state)
 	AM_RANGE(0x00000, 0x3ffff) AM_READWRITE(vram_r, vram_w) AM_SHARE("vram")
 ADDRESS_MAP_END
 
-static MACHINE_CONFIG_START(rainbow)
+MACHINE_CONFIG_START(rainbow_state::rainbow)
 MCFG_DEFAULT_LAYOUT(layout_rainbow)
 
 /* basic machine hardware */

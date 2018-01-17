@@ -469,7 +469,7 @@ void slapshot_state::machine_start()
 }
 
 
-static MACHINE_CONFIG_START( slapshot )
+MACHINE_CONFIG_START(slapshot_state::slapshot)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 14346000)   /* 28.6860 MHz / 2 ??? */
@@ -530,7 +530,7 @@ static MACHINE_CONFIG_START( slapshot )
 	MCFG_TC0140SYT_SLAVE_CPU("audiocpu")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( opwolf3 )
+MACHINE_CONFIG_START(slapshot_state::opwolf3)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 14346000)   /* 28.6860 MHz / 2 ??? */

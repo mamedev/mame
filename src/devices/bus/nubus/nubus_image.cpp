@@ -130,7 +130,7 @@ DEFINE_DEVICE_TYPE(NUBUS_IMAGE, nubus_image_device, "nb_image", "NuBus Disk Imag
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( nubus_image_device::device_add_mconfig )
+MACHINE_CONFIG_START(nubus_image_device::device_add_mconfig)
 	MCFG_DEVICE_ADD(IMAGE_DISK0_TAG, MESSIMG_DISK, 0)
 MACHINE_CONFIG_END
 

@@ -83,6 +83,7 @@ I/O read/write
 #include "cpu/z80/z80.h"
 #include "machine/segacrpt_device.h"
 #include "sound/sn76496.h"
+#include "sound/volt_reg.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -549,7 +550,7 @@ static GFXDECODE_START( senjyo )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( senjyo )
+MACHINE_CONFIG_START(senjyo_state::senjyo)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 4000000)   /* 4 MHz? */
@@ -599,12 +600,13 @@ static MACHINE_CONFIG_START( senjyo )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
 
 	MCFG_SOUND_ADD("dac", DAC_4BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.05) // unknown DAC
-	MCFG_SOUND_REFERENCE_INPUT(DAC_VREF_POS_INPUT, 1.0) MCFG_SOUND_REFERENCE_INPUT(DAC_VREF_NEG_INPUT, -1.0)
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 
 
-static MACHINE_CONFIG_DERIVED( senjyox_e, senjyo )
+MACHINE_CONFIG_DERIVED(senjyo_state::senjyox_e, senjyo)
 	MCFG_CPU_REPLACE("maincpu", SEGA_315_5015, 4000000)   /* 4 MHz? */
 	MCFG_CPU_PROGRAM_MAP(senjyo_map)
 	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map)
@@ -612,7 +614,7 @@ static MACHINE_CONFIG_DERIVED( senjyox_e, senjyo )
 	MCFG_SEGACRPT_SET_DECRYPTED_TAG(":decrypted_opcodes")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( senjyox_a, senjyo )
+MACHINE_CONFIG_DERIVED(senjyo_state::senjyox_a, senjyo)
 	MCFG_CPU_REPLACE("maincpu", SEGA_315_5018, 4000000)   /* 4 MHz? */
 	MCFG_CPU_PROGRAM_MAP(senjyo_map)
 	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map)
@@ -621,7 +623,7 @@ static MACHINE_CONFIG_DERIVED( senjyox_a, senjyo )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( starforb, senjyox_e )
+MACHINE_CONFIG_DERIVED(senjyo_state::starforb, senjyox_e)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")

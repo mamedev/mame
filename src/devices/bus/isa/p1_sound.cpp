@@ -14,6 +14,7 @@
 #include "emu.h"
 #include "p1_sound.h"
 
+#include "sound/volt_reg.h"
 #include "speaker.h"
 
 
@@ -28,7 +29,7 @@ DEFINE_DEVICE_TYPE(P1_SOUND, p1_sound_device, "p1_sound", "Poisk-1 sound card (B
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( p1_sound_device::device_add_mconfig )
+MACHINE_CONFIG_START(p1_sound_device::device_add_mconfig)
 	MCFG_DEVICE_ADD("midi", I8251, 0)
 	MCFG_I8251_TXD_HANDLER(DEVWRITELINE("mdout", midi_port_device, write_txd))
 	MCFG_I8251_RXRDY_HANDLER(DEVWRITELINE(":isa", isa8_device, irq3_w))
@@ -67,7 +68,8 @@ MACHINE_CONFIG_MEMBER( p1_sound_device::device_add_mconfig )
 	MCFG_FILTER_RC_ADD("filter", 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 	MCFG_SOUND_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "filter", 0.5) // unknown DAC
-	MCFG_SOUND_REFERENCE_INPUT(DAC_VREF_POS_INPUT, 1.0) MCFG_SOUND_REFERENCE_INPUT(DAC_VREF_NEG_INPUT, -1.0)
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 

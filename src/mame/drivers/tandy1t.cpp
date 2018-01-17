@@ -129,6 +129,17 @@ public:
 	uint8_t m_tandy_bios_bank;    /* I/O port FFEAh */
 	uint8_t m_tandy_ppi_portb, m_tandy_ppi_portc;
 	uint8_t m_vram_bank;
+	static void cfg_fdc_35(device_t *device);
+	static void cfg_fdc_525(device_t *device);
+	void tandy1000_common(machine_config &config);
+	void tandy1000_90key(machine_config &config);
+	void tandy1000_101key(machine_config &config);
+	void t1000tl(machine_config &config);
+	void t1000sx(machine_config &config);
+	void t1000rl(machine_config &config);
+	void t1000sl2(machine_config &config);
+	void t1000hx(machine_config &config);
+	void t1000tx(machine_config &config);
 };
 
 /* tandy 1000 eeprom
@@ -601,26 +612,25 @@ static const gfx_layout t1000_charlayout =
 	8
 };
 
-static MACHINE_CONFIG_START( cfg_fdc_35 )
-	MCFG_DEVICE_MODIFY("fdc:0")
-	MCFG_SLOT_DEFAULT_OPTION("35dd")
-	MCFG_SLOT_FIXED(true)
 
-	MCFG_DEVICE_REMOVE("fdc:1")
-MACHINE_CONFIG_END
+void tandy1000_state::cfg_fdc_35(device_t *device)
+{
+	device_slot_interface::static_set_default_option(*device->subdevice("fdc:0"), "35dd");
+	device_slot_interface::static_set_fixed(*device->subdevice("fdc:0"), true);
+	device_slot_interface::static_set_default_option(*device->subdevice("fdc:1"), "");
+}
 
-static MACHINE_CONFIG_START( cfg_fdc_525 )
-	MCFG_DEVICE_MODIFY("fdc:0")
-	MCFG_SLOT_FIXED(true)
-
-	MCFG_DEVICE_REMOVE("fdc:1")
-MACHINE_CONFIG_END
+void tandy1000_state::cfg_fdc_525(device_t *device)
+{
+	device_slot_interface::static_set_fixed(*device->subdevice("fdc:0"), true);
+	device_slot_interface::static_set_default_option(*device->subdevice("fdc:1"), "");
+}
 
 static GFXDECODE_START( t1000 )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, t1000_charlayout, 3, 1 )
 GFXDECODE_END
 
-static MACHINE_CONFIG_START(tandy1000_common)
+MACHINE_CONFIG_START(tandy1000_state::tandy1000_common)
 	MCFG_DEVICE_ADD("mb", T1000_MOTHERBOARD, 0)
 	t1000_mb_device::static_set_cputag(*device, "^maincpu");
 
@@ -651,15 +661,15 @@ static MACHINE_CONFIG_START(tandy1000_common)
 	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("pc_list","ibm5150")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START(tandy1000_90key)
+MACHINE_CONFIG_START(tandy1000_state::tandy1000_90key)
 	MCFG_PC_KEYB_ADD("pc_keyboard", DEVWRITELINE("mb:pic8259", pic8259_device, ir1_w))
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START(tandy1000_101key)
+MACHINE_CONFIG_START(tandy1000_state::tandy1000_101key)
 	MCFG_AT_KEYB_ADD("pc_keyboard", 1, DEVWRITELINE("mb:pic8259", pic8259_device, ir1_w))
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( t1000hx )
+MACHINE_CONFIG_START(tandy1000_state::t1000hx)
 	MCFG_CPU_ADD("maincpu", I8088, 8000000)
 	MCFG_CPU_PROGRAM_MAP(tandy1000_map)
 	MCFG_CPU_IO_MAP(tandy1000_io)
@@ -675,7 +685,7 @@ static MACHINE_CONFIG_START( t1000hx )
 	MCFG_RAM_EXTRA_OPTIONS("256K, 384K")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( t1000sx, t1000hx )
+MACHINE_CONFIG_DERIVED(tandy1000_state::t1000sx, t1000hx)
 	MCFG_DEVICE_MODIFY("isa_fdc")
 	MCFG_SLOT_OPTION_MACHINE_CONFIG("fdc_xt", cfg_fdc_525)
 
@@ -689,7 +699,7 @@ static MACHINE_CONFIG_DERIVED( t1000sx, t1000hx )
 	MCFG_RAM_EXTRA_OPTIONS("384K")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( t1000rl )
+MACHINE_CONFIG_START(tandy1000_state::t1000rl)
 	MCFG_CPU_ADD("maincpu", I8086, XTAL_28_63636MHz / 3)
 	MCFG_CPU_PROGRAM_MAP(tandy1000_bank_map)
 	MCFG_CPU_IO_MAP(tandy1000_bank_io)
@@ -711,7 +721,7 @@ static MACHINE_CONFIG_START( t1000rl )
 	MCFG_RAM_EXTRA_OPTIONS("384K")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( t1000sl2, t1000rl )
+MACHINE_CONFIG_DERIVED(tandy1000_state::t1000sl2, t1000rl)
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_CLOCK( XTAL_24MHz / 3 )
 
@@ -721,7 +731,7 @@ static MACHINE_CONFIG_DERIVED( t1000sl2, t1000rl )
 	MCFG_ISA8_SLOT_ADD("mb:isa", "isa4", pc_isa8_cards, nullptr, false)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( t1000tl )
+MACHINE_CONFIG_START(tandy1000_state::t1000tl)
 	MCFG_CPU_ADD("maincpu", I80286, XTAL_28_63636MHz / 2)
 	MCFG_CPU_PROGRAM_MAP(tandy1000_286_map)
 	MCFG_CPU_IO_MAP(tandy1000_16_io)
@@ -738,7 +748,7 @@ static MACHINE_CONFIG_START( t1000tl )
 	MCFG_ISA8_SLOT_ADD("mb:isa", "isa5", pc_isa8_cards, nullptr, false)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( t1000tx, t1000tl )
+MACHINE_CONFIG_DERIVED(tandy1000_state::t1000tx, t1000tl)
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_IO_MAP(tandy1000tx_io)
 

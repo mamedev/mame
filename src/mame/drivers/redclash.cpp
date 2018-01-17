@@ -626,7 +626,7 @@ MACHINE_RESET_MEMBER(redclash_state,redclash)
 	m_stars_count = 0;
 }
 
-static MACHINE_CONFIG_START( zerohour )
+MACHINE_CONFIG_START(redclash_state::zerohour)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 4000000)  /* 4 MHz */
@@ -655,7 +655,7 @@ static MACHINE_CONFIG_START( zerohour )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( redclash )
+MACHINE_CONFIG_START(redclash_state::redclash)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 4000000)  /* 4 MHz */
@@ -683,7 +683,7 @@ static MACHINE_CONFIG_START( redclash )
 	/* sound hardware */
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( sraider )
+MACHINE_CONFIG_START(redclash_state::sraider)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 4000000)   /* 4 MHz */

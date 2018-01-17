@@ -1738,7 +1738,7 @@ MACHINE_RESET_MEMBER(snowbros_state,finalttr)
 		m_hyperpac_ram[0x2000/2 + i] = PROTDATA[i];
 }
 
-static MACHINE_CONFIG_START( snowbros )
+MACHINE_CONFIG_START(snowbros_state::snowbros)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz/2) /* 8 Mhz - confirmed */
@@ -1781,7 +1781,7 @@ static MACHINE_CONFIG_START( snowbros )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( wintbob, snowbros )
+MACHINE_CONFIG_DERIVED(snowbros_state::wintbob, snowbros)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1798,7 +1798,7 @@ static MACHINE_CONFIG_DERIVED( wintbob, snowbros )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( semicom, snowbros )
+MACHINE_CONFIG_DERIVED(snowbros_state::semicom, snowbros)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1828,7 +1828,7 @@ static MACHINE_CONFIG_DERIVED( semicom, snowbros )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( semicom_mcu, semicom )
+MACHINE_CONFIG_DERIVED(snowbros_state::semicom_mcu, semicom)
 
 	/* basic machine hardware */
 
@@ -1838,12 +1838,12 @@ static MACHINE_CONFIG_DERIVED( semicom_mcu, semicom )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( semiprot, semicom )
+MACHINE_CONFIG_DERIVED(snowbros_state::semiprot, semicom)
 	MCFG_MACHINE_RESET_OVERRIDE (snowbros_state, semiprot )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( honeydol )
+MACHINE_CONFIG_START(snowbros_state::honeydol)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_12MHz) /* MC68000P12 @ 12MHz */
@@ -1882,7 +1882,7 @@ static MACHINE_CONFIG_START( honeydol )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( twinadv )
+MACHINE_CONFIG_START(snowbros_state::twinadv)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_12MHz) /* 12MHz like Honey Dolls ? */
@@ -1940,7 +1940,7 @@ Intel P8752 (mcu)
 
 */
 
-static MACHINE_CONFIG_DERIVED( finalttr, semicom )
+MACHINE_CONFIG_DERIVED(snowbros_state::finalttr, semicom)
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_CLOCK(XTAL_12MHz)
@@ -1961,13 +1961,13 @@ static MACHINE_CONFIG_DERIVED( finalttr, semicom )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( _4in1, semicom )
+MACHINE_CONFIG_DERIVED(snowbros_state::_4in1, semicom)
 
 	/* basic machine hardware */
 	MCFG_GFXDECODE_MODIFY("gfxdecode", snowbros)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( snowbro3 ) /* PCB has 16MHz & 12MHz OSCs */
+MACHINE_CONFIG_START(snowbros_state::snowbro3) /* PCB has 16MHz & 12MHz OSCs */
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_12MHz) /* MC68000P10 CPU @ 12mhz or 8MHz (16MHz/2) ? */
@@ -1997,7 +1997,7 @@ MACHINE_CONFIG_END
 
 
 
-static MACHINE_CONFIG_START( yutnori )
+MACHINE_CONFIG_START(snowbros_state::yutnori)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz/2)
@@ -2587,6 +2587,33 @@ ROM_START( cookbib2 )
 	ROM_LOAD( "cookbib2.03", 0x100000, 0x40000, CRC(e1604821) SHA1(bede6bdd8331128b9f2b229d718133470bf407c9) )
 ROM_END
 
+ROM_START( cookbib2a )
+	ROM_REGION( 0x100000, "maincpu", 0 ) /* 68000 Code */
+	ROM_LOAD16_BYTE( "uh12.020",  0x00001, 0x40000, CRC(a44ec1f8) SHA1(0c741bf38f5cf667586cd1925417b6e17dbb8916) )
+	ROM_LOAD16_BYTE( "ui12.020",  0x00000, 0x40000, CRC(bdbcd0d1) SHA1(9a6a85a492c21f6dd5daef964071a8a1c62f73c8) )
+
+	ROM_REGION( 0x10000, "soundcpu", 0 ) /* Z80 Code */
+	ROM_LOAD( "u1.512", 0x00000, 0x10000 , CRC(f59f1c9a) SHA1(2830261fd55249e015514fcb4cf8392e83b7fd0d) )
+
+	ROM_REGION( 0x10000, "cpu2", 0 ) /* Intel 87C52 MCU Code */
+	ROM_LOAD( "87c52.mcu", 0x00000, 0x10000 , NO_DUMP ) /* can't be dumped */
+
+	ROM_REGION( 0x200, "user1", 0 ) /* Data from Shared RAM */
+	/* this is not a real rom but instead the data extracted from
+	   shared ram, the MCU puts it there
+	   
+	   this one is hacked from the cookbib2 one, absolute code jump needed to be changed at least */
+	ROM_LOAD16_WORD_SWAP( "protdata_alt.bin", 0x00000, 0x200, BAD_DUMP CRC(bc136ead) SHA1(96459c2ccf7f95880421ba082c2414fa1040f3ed) )
+
+	ROM_REGION( 0x040000, "oki", 0 ) /* Samples */
+	ROM_LOAD( "uj15.010", 0x00000, 0x20000, CRC(5e6f76b8) SHA1(725800143dfeaa6093ed5fcc5b9f15678ae9e547) )
+
+	ROM_REGION( 0x180000, "gfx1", 0 ) /* Sprites */
+	ROM_LOAD( "ua4.040", 0x000000, 0x80000, CRC(f458d52e) SHA1(f6a145aaa57c64557479e63bb95732a98a7b8b85) )
+	ROM_LOAD( "ua6.040", 0x080000, 0x80000, CRC(249e89b4) SHA1(2100eea2c3cee84a046ba7ff6cec1027966b895c) )
+	ROM_LOAD( "ua8.040", 0x100000, 0x80000, CRC(caa25138) SHA1(784111255777f5774abf4d34c0a95b5e23a14c9f) )
+ROM_END
+
 ROM_START( cookbib3 )
 	ROM_REGION( 0x100000, "maincpu", 0 ) /* 68000 Code */
 	ROM_LOAD16_BYTE( "u52.bin",  0x00001, 0x40000, CRC(65134893) SHA1(b1f26794d1a85893aedf55adb2195ad244f90132) )
@@ -2913,7 +2940,8 @@ GAME( 1996, toto,       0,        snowbros,    snowbros, snowbros_state, toto, R
 GAME( 1993, finalttr,   0,        finalttr,    finalttr, snowbros_state, 0,        ROT0, "Jeil Computer System", "Final Tetris", MACHINE_SUPPORTS_SAVE )
 GAME( 1995, hyperpac,   0,        semicom_mcu, hyperpac, snowbros_state, hyperpac, ROT0, "SemiCom",              "Hyper Pacman", MACHINE_SUPPORTS_SAVE )
 GAME( 1995, hyperpacb,  hyperpac, semicom,     hyperpac, snowbros_state, 0,        ROT0, "bootleg",              "Hyper Pacman (bootleg)", MACHINE_SUPPORTS_SAVE )
-GAME( 1996, cookbib2,   0,        semiprot,    cookbib2, snowbros_state, cookbib2, ROT0, "SemiCom",              "Cookie & Bibi 2", MACHINE_SUPPORTS_SAVE )
+GAME( 1996, cookbib2,   0,        semiprot,    cookbib2, snowbros_state, cookbib2, ROT0, "SemiCom",              "Cookie & Bibi 2 (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1996, cookbib2a,  cookbib2, semiprot,    cookbib2, snowbros_state, cookbib2, ROT0, "SemiCom",              "Cookie & Bibi 2 (set 2)", MACHINE_SUPPORTS_SAVE ) // older? test mode looks even worse on this, but neither shows the correct dip info anyway
 GAME( 1996, toppyrap,   0,        semiprot,    toppyrap, snowbros_state, 0,        ROT0, "SemiCom",              "Toppy & Rappy", MACHINE_SUPPORTS_SAVE )
 GAME( 1997, cookbib3,   0,        semiprot,    cookbib3, snowbros_state, cookbib3, ROT0, "SemiCom",              "Cookie & Bibi 3", MACHINE_SUPPORTS_SAVE )
 GAME( 1997, pzlbreak,   0,        semiprot,    pzlbreak, snowbros_state, pzlbreak, ROT0, "SemiCom / Tirano",     "Puzzle Break", MACHINE_SUPPORTS_SAVE )

@@ -210,7 +210,7 @@ ADDRESS_MAP_END
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( lk201_device::device_add_mconfig )
+MACHINE_CONFIG_START(lk201_device::device_add_mconfig)
 	MCFG_CPU_ADD(LK201_CPU_TAG, M68HC05EG, XTAL_4MHz) // actually 68HC05C4, clock verified by Lord_Nightmare
 	MCFG_CPU_PROGRAM_MAP(lk201_map)
 

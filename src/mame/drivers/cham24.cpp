@@ -95,6 +95,7 @@ public:
 	uint32_t screen_update_cham24(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void cham24_set_mirroring( int mirroring );
 	void ppu_irq(int *ppu_regs);
+	void cham24(machine_config &config);
 };
 
 
@@ -309,7 +310,7 @@ static GFXDECODE_START( cham24 )
 	/* none, the ppu generates one */
 GFXDECODE_END
 
-static MACHINE_CONFIG_START( cham24 )
+MACHINE_CONFIG_START(cham24_state::cham24)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", N2A03, NTSC_APU_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(cham24_map)

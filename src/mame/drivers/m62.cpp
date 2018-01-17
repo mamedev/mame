@@ -946,7 +946,7 @@ void m62_state::machine_reset()
 	m_bankcontrol[1] = 0;
 }
 
-static MACHINE_CONFIG_START( ldrun )
+MACHINE_CONFIG_START(m62_state::ldrun)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 24000000/6)
@@ -979,7 +979,7 @@ static MACHINE_CONFIG_START( ldrun )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( kungfum, ldrun )
+MACHINE_CONFIG_DERIVED(m62_state::kungfum, ldrun)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -996,7 +996,7 @@ static MACHINE_CONFIG_DERIVED( kungfum, ldrun )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( battroad, ldrun )
+MACHINE_CONFIG_DERIVED(m62_state::battroad, ldrun)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1020,7 +1020,7 @@ static MACHINE_CONFIG_DERIVED( battroad, ldrun )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( ldrun2, ldrun )
+MACHINE_CONFIG_DERIVED(m62_state::ldrun2, ldrun)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1033,7 +1033,7 @@ static MACHINE_CONFIG_DERIVED( ldrun2, ldrun )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( ldrun3, ldrun )
+MACHINE_CONFIG_DERIVED(m62_state::ldrun3, ldrun)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1047,7 +1047,7 @@ static MACHINE_CONFIG_DERIVED( ldrun3, ldrun )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( ldrun4, ldrun )
+MACHINE_CONFIG_DERIVED(m62_state::ldrun4, ldrun)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1061,7 +1061,7 @@ static MACHINE_CONFIG_DERIVED( ldrun4, ldrun )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( lotlot, ldrun )
+MACHINE_CONFIG_DERIVED(m62_state::lotlot, ldrun)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1082,7 +1082,7 @@ static MACHINE_CONFIG_DERIVED( lotlot, ldrun )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( kidniki, ldrun )
+MACHINE_CONFIG_DERIVED(m62_state::kidniki, ldrun)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1098,7 +1098,7 @@ static MACHINE_CONFIG_DERIVED( kidniki, ldrun )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( spelunkr, ldrun )
+MACHINE_CONFIG_DERIVED(m62_state::spelunkr, ldrun)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1113,7 +1113,7 @@ static MACHINE_CONFIG_DERIVED( spelunkr, ldrun )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( spelunk2, ldrun )
+MACHINE_CONFIG_DERIVED(m62_state::spelunk2, ldrun)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1134,7 +1134,7 @@ static MACHINE_CONFIG_DERIVED( spelunk2, ldrun )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( youjyudn, ldrun )
+MACHINE_CONFIG_DERIVED(m62_state::youjyudn, ldrun)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1154,7 +1154,7 @@ static MACHINE_CONFIG_DERIVED( youjyudn, ldrun )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( horizon, ldrun )
+MACHINE_CONFIG_DERIVED(m62_state::horizon, ldrun)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")

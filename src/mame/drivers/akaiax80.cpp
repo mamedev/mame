@@ -59,6 +59,7 @@ public:
 		, m_maincpu(*this, "maincpu")
 	{ }
 
+	void ax80(machine_config &config);
 private:
 	virtual void machine_reset() override;
 	required_device<upd7810_device> m_maincpu;
@@ -87,7 +88,7 @@ static ADDRESS_MAP_START( ax80_map, AS_PROGRAM, 8, ax80_state )
 	AM_RANGE(0xc000, 0xc7ff) AM_MIRROR(0x3800) AM_RAM
 ADDRESS_MAP_END
 
-static MACHINE_CONFIG_START( ax80 )
+MACHINE_CONFIG_START(ax80_state::ax80)
 	MCFG_CPU_ADD("maincpu", UPD7810, XTAL_12MHz)
 	MCFG_CPU_PROGRAM_MAP(ax80_map)
 	//MCFG_CPU_IO_MAP(ax80_io)

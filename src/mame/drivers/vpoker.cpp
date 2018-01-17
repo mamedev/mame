@@ -124,6 +124,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	void vpoker(machine_config &config);
 };
 
 
@@ -627,7 +628,7 @@ WRITE_LINE_MEMBER(vpoker_state::ptm_irq)
 	m_maincpu->set_input_line(M6809_IRQ_LINE, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
-static MACHINE_CONFIG_START( vpoker )
+MACHINE_CONFIG_START(vpoker_state::vpoker)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",M6809,XTAL_4MHz)

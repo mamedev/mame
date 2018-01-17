@@ -43,6 +43,7 @@ public:
 
 	DECLARE_QUICKLOAD_LOAD_MEMBER(altair);
 
+	void altair(machine_config &config);
 private:
 	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
@@ -90,7 +91,7 @@ void altair_state::machine_reset()
 	m_maincpu->set_state_int(i8080_cpu_device::I8085_PC, 0xFD00);
 }
 
-static MACHINE_CONFIG_START( altair )
+MACHINE_CONFIG_START(altair_state::altair)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8080, XTAL_2MHz)
 	MCFG_CPU_PROGRAM_MAP(mem_map)

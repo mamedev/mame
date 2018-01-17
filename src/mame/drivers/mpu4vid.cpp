@@ -297,6 +297,11 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(mpu_video_reset);
 	DECLARE_WRITE8_MEMBER( vram_w );
 	DECLARE_READ8_MEMBER( vram_r );
+	void mpu4_vid(machine_config &config);
+	void bwbvid(machine_config &config);
+	void crmaze(machine_config &config);
+	void bwbvid5(machine_config &config);
+	void mating(machine_config &config);
 };
 
 /*************************************
@@ -1258,7 +1263,7 @@ ADDRESS_MAP_END
 
 
 
-static MACHINE_CONFIG_START( mpu4_vid )
+MACHINE_CONFIG_START(mpu4vid_state::mpu4_vid)
 	MCFG_CPU_ADD("maincpu", M6809, MPU4_MASTER_CLOCK/4 )
 	MCFG_CPU_PROGRAM_MAP(mpu4_6809_map)
 
@@ -1321,14 +1326,14 @@ static MACHINE_CONFIG_START( mpu4_vid )
 	MCFG_ACIA6850_IRQ_HANDLER(WRITELINE(mpu4vid_state, m68k_acia_irq))
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( crmaze, mpu4_vid )
+MACHINE_CONFIG_DERIVED(mpu4vid_state::crmaze, mpu4_vid)
 	MCFG_DEVICE_MODIFY("pia_ic5")
 	MCFG_PIA_READPA_HANDLER(READ8(mpu4vid_state, pia_ic5_porta_track_r))
 	MCFG_PIA_WRITEPA_HANDLER(NOOP)
 	MCFG_PIA_WRITEPB_HANDLER(NOOP)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( mating, crmaze )
+MACHINE_CONFIG_DERIVED(mpu4vid_state::mating, crmaze)
 	MCFG_CPU_MODIFY("video")
 	MCFG_CPU_PROGRAM_MAP(mpu4oki_68k_map)
 
@@ -1339,12 +1344,12 @@ static MACHINE_CONFIG_DERIVED( mating, crmaze )
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.5)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( bwbvid, mpu4_vid )
+MACHINE_CONFIG_DERIVED(mpu4vid_state::bwbvid, mpu4_vid)
 	MCFG_CPU_MODIFY("video")
 	MCFG_CPU_PROGRAM_MAP(bwbvid_68k_map)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( bwbvid5, bwbvid )
+MACHINE_CONFIG_DERIVED(mpu4vid_state::bwbvid5, bwbvid)
 	MCFG_CPU_MODIFY("video")
 	MCFG_CPU_PROGRAM_MAP(bwbvid5_68k_map)
 

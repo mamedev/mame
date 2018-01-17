@@ -81,6 +81,7 @@ public:
 	required_ioport m_in1;
 	required_ioport m_dsw;
 
+	void monzagp(machine_config &config);
 private:
 	uint8_t m_p1;
 	uint8_t m_p2;
@@ -484,7 +485,7 @@ static GFXDECODE_START( monzagp )
 	GFXDECODE_ENTRY( "gfx3", 0x0000, tile_layout,   0, 8 )
 GFXDECODE_END
 
-static MACHINE_CONFIG_START( monzagp )
+MACHINE_CONFIG_START(monzagp_state::monzagp)
 	MCFG_CPU_ADD("maincpu", I8035, 12000000/4) /* 400KHz ??? - Main board Crystal is 12MHz */
 	MCFG_CPU_PROGRAM_MAP(monzagp_map)
 	MCFG_CPU_IO_MAP(monzagp_io)

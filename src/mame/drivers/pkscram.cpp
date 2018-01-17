@@ -58,6 +58,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
+	void pkscramble(machine_config &config);
 };
 
 
@@ -300,7 +301,7 @@ void pkscram_state::machine_reset()
 	scanline_timer->adjust(m_screen->time_until_pos(interrupt_scanline), interrupt_scanline);
 }
 
-static MACHINE_CONFIG_START( pkscramble )
+MACHINE_CONFIG_START(pkscram_state::pkscramble)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 8000000 )
 	MCFG_CPU_PROGRAM_MAP(pkscramble_map)

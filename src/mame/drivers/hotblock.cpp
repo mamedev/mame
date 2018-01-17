@@ -77,6 +77,7 @@ public:
 	virtual void video_start() override;
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void hotblock(machine_config &config);
 };
 
 
@@ -201,7 +202,7 @@ static INPUT_PORTS_START( hotblock )
 INPUT_PORTS_END
 
 
-static MACHINE_CONFIG_START( hotblock )
+MACHINE_CONFIG_START(hotblock_state::hotblock)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8088, 10000000)

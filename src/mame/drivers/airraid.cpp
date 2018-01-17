@@ -188,6 +188,8 @@ public:
 	DECLARE_DRIVER_INIT(cshooter);
 	DECLARE_MACHINE_RESET(cshooter);
 	TIMER_DEVICE_CALLBACK_MEMBER(cshooter_scanline);
+	void airraid(machine_config &config);
+	void airraid_crypt(machine_config &config);
 };
 
 
@@ -375,7 +377,7 @@ INPUT_PORTS_END
 
 
 
-static MACHINE_CONFIG_START( airraid )
+MACHINE_CONFIG_START(airraid_state::airraid)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80,XTAL_12MHz/2)        /* verified on pcb */
@@ -411,7 +413,7 @@ static MACHINE_CONFIG_START( airraid )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( airraid_crypt, airraid )
+MACHINE_CONFIG_DERIVED(airraid_state::airraid_crypt, airraid)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map)
 MACHINE_CONFIG_END

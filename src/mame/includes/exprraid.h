@@ -73,4 +73,6 @@ public:
 	uint32_t screen_update_exprraid(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void exprraid_gfx_expand();
+	void exprraid(machine_config &config);
+	void exprboot(machine_config &config);
 };

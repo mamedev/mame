@@ -131,6 +131,7 @@ public:
 	uint32_t screen_update_sanremo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
+	void sanremo(machine_config &config);
 };
 
 
@@ -342,7 +343,7 @@ GFXDECODE_END
 *              Machine Drivers               *
 *********************************************/
 
-static MACHINE_CONFIG_START( sanremo )
+MACHINE_CONFIG_START(sanremo_state::sanremo)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, CPU_CLOCK)

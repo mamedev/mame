@@ -1599,7 +1599,7 @@ GFXDECODE_END
 
 
 
-static MACHINE_CONFIG_START( dec0_base )
+MACHINE_CONFIG_START(dec0_state::dec0_base)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1632,7 +1632,7 @@ static MACHINE_CONFIG_START( dec0_base )
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( dec0, dec0_base )
+MACHINE_CONFIG_DERIVED(dec0_state::dec0, dec0_base)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_20MHz / 2)
@@ -1666,7 +1666,7 @@ static MACHINE_CONFIG_DERIVED( dec0, dec0_base )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( dec1, dec0_base )
+MACHINE_CONFIG_DERIVED(dec0_state::dec1, dec0_base)
 	/* basic machine hardware */
 	/* maincpu and audiocpu clocks and address maps differ per game */
 
@@ -1722,7 +1722,7 @@ WRITE_LINE_MEMBER(dec0_automat_state::msm2_vclk_cb)
 }
 
 
-static MACHINE_CONFIG_START( automat )
+MACHINE_CONFIG_START(dec0_automat_state::automat)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 10000000)
@@ -1797,7 +1797,7 @@ static MACHINE_CONFIG_START( automat )
 MACHINE_CONFIG_END
 
 // this seems very similar to the automat bootleg
-static MACHINE_CONFIG_START( secretab )
+MACHINE_CONFIG_START(dec0_automat_state::secretab)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_20MHz/2) /* verified on pcb (20MHZ OSC) 68000P12 running at 10Mhz */
@@ -1869,7 +1869,7 @@ static MACHINE_CONFIG_START( secretab )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( hbarrel, dec0 )
+MACHINE_CONFIG_DERIVED(dec0_state::hbarrel, dec0)
 
 	MCFG_CPU_ADD("mcu", I8751, XTAL_8MHz)
 	MCFG_CPU_IO_MAP(mcu_io_map)
@@ -1879,7 +1879,7 @@ static MACHINE_CONFIG_DERIVED( hbarrel, dec0 )
 	MCFG_SCREEN_UPDATE_DRIVER(dec0_state, screen_update_hbarrel)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( baddudes, dec0 )
+MACHINE_CONFIG_DERIVED(dec0_state::baddudes, dec0)
 
 	MCFG_CPU_ADD("mcu", I8751, XTAL_8MHz)
 	MCFG_CPU_IO_MAP(mcu_io_map)
@@ -1889,21 +1889,21 @@ static MACHINE_CONFIG_DERIVED( baddudes, dec0 )
 	MCFG_SCREEN_UPDATE_DRIVER(dec0_state, screen_update_baddudes)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( drgninjab, dec0 )
+MACHINE_CONFIG_DERIVED(dec0_state::drgninjab, dec0)
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(dec0_state, screen_update_baddudes)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( birdtry, dec0 )
+MACHINE_CONFIG_DERIVED(dec0_state::birdtry, dec0)
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(dec0_state, screen_update_birdtry)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( robocop, dec0 )
+MACHINE_CONFIG_DERIVED(dec0_state::robocop, dec0)
 
 	MCFG_CPU_ADD("sub", H6280, XTAL_21_4772MHz / 16)
 	MCFG_CPU_PROGRAM_MAP(robocop_sub_map)
@@ -1915,14 +1915,14 @@ static MACHINE_CONFIG_DERIVED( robocop, dec0 )
 	MCFG_SCREEN_UPDATE_DRIVER(dec0_state, screen_update_robocop)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( robocopb, dec0 )
+MACHINE_CONFIG_DERIVED(dec0_state::robocopb, dec0)
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(dec0_state, screen_update_robocop)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( hippodrm, dec0 )
+MACHINE_CONFIG_DERIVED(dec0_state::hippodrm, dec0)
 
 	MCFG_CPU_ADD("sub", H6280, XTAL_21_4772MHz / 16)
 	MCFG_CPU_PROGRAM_MAP(hippodrm_sub_map)
@@ -1934,7 +1934,7 @@ static MACHINE_CONFIG_DERIVED( hippodrm, dec0 )
 	MCFG_SCREEN_UPDATE_DRIVER(dec0_state, screen_update_hippodrm)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( ffantasybl, dec0 )
+MACHINE_CONFIG_DERIVED(dec0_state::ffantasybl, dec0)
 
 //  MCFG_CPU_ADD("sub", H6280, XTAL_21_4772MHz / 16)
 //  MCFG_CPU_PROGRAM_MAP(hippodrm_sub_map)
@@ -1955,7 +1955,7 @@ MACHINE_RESET_MEMBER(dec0_state,slyspy)
 	m_sndprotect->set_bank(m_slyspy_sound_state);
 }
 
-static MACHINE_CONFIG_DERIVED( slyspy, dec1 )
+MACHINE_CONFIG_DERIVED(dec0_state::slyspy, dec1)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_20MHz/2) /* verified on pcb (20MHZ OSC) 68000P12 running at 10Mhz */
@@ -1988,7 +1988,7 @@ static MACHINE_CONFIG_DERIVED( slyspy, dec1 )
 	MCFG_MACHINE_RESET_OVERRIDE(dec0_state,slyspy)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( midres, dec1 )
+MACHINE_CONFIG_DERIVED(dec0_state::midres, dec1)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_20MHz/2) /* verified on pcb (20MHZ OSC) 68000P12 running at 10Mhz */
@@ -2005,7 +2005,7 @@ static MACHINE_CONFIG_DERIVED( midres, dec1 )
 	MCFG_GFXDECODE_MODIFY("gfxdecode", midres)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( midresb, midres )
+MACHINE_CONFIG_DERIVED(dec0_state::midresb, midres)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(midresb_map)
 
@@ -2031,7 +2031,7 @@ static MACHINE_CONFIG_DERIVED( midresb, midres )
 
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( midresbj, midresb )
+MACHINE_CONFIG_DERIVED(dec0_state::midresbj, midresb)
 	MCFG_DEVICE_REMOVE("mcu")
 MACHINE_CONFIG_END
 

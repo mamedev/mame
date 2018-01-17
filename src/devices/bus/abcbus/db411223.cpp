@@ -66,7 +66,7 @@ ADDRESS_MAP_END
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( databoard_4112_23_t::device_add_mconfig )
+MACHINE_CONFIG_START(databoard_4112_23_t::device_add_mconfig)
 	MCFG_CPU_ADD(Z80_TAG, Z80, 4000000)
 	MCFG_CPU_PROGRAM_MAP(databoard_4112_23_mem)
 	MCFG_CPU_IO_MAP(databoard_4112_23_io)

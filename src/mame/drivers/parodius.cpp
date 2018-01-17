@@ -224,7 +224,7 @@ WRITE8_MEMBER( parodius_state::banking_callback )
 	membank("bank1")->set_entry((data & 0x0f) ^ 0x0f);
 }
 
-static MACHINE_CONFIG_START( parodius )
+MACHINE_CONFIG_START(parodius_state::parodius)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", KONAMI, 3000000)        /* 053248 */

@@ -28,6 +28,7 @@
 #include "machine/nvram.h"
 #include "machine/timer.h"
 #include "sound/dac.h"
+#include "sound/volt_reg.h"
 #include "video/resnet.h"
 #include "screen.h"
 #include "speaker.h"
@@ -70,6 +71,7 @@ public:
 	uint32_t screen_update_meyc8088(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank_meyc8088);
 	TIMER_DEVICE_CALLBACK_MEMBER(heartbeat_callback);
+	void meyc8088(machine_config &config);
 };
 
 
@@ -343,7 +345,7 @@ INPUT_PORTS_END
 
 ***************************************************************************/
 
-static MACHINE_CONFIG_START( meyc8088 )
+MACHINE_CONFIG_START(meyc8088_state::meyc8088)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8088, (XTAL_15MHz / 3) * 0.95) // NOTE: underclocked to prevent errors on diagnostics, MAME i8088 cycle timing is probably inaccurate
@@ -381,7 +383,8 @@ static MACHINE_CONFIG_START( meyc8088 )
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
 
 	MCFG_SOUND_ADD("dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
-	MCFG_SOUND_REFERENCE_INPUT(DAC_VREF_POS_INPUT, 1.0)
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT)
 MACHINE_CONFIG_END
 
 

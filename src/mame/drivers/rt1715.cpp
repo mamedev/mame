@@ -44,6 +44,8 @@ public:
 	DECLARE_PALETTE_INIT(rt1715);
 	I8275_DRAW_CHARACTER_MEMBER( crtc_display_pixels );
 
+	void rt1715(machine_config &config);
+	void rt1715w(machine_config &config);
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -272,7 +274,7 @@ static const z80_daisy_config rt1715_daisy_chain[] =
 	{ nullptr }
 };
 
-static MACHINE_CONFIG_START( rt1715 )
+MACHINE_CONFIG_START(rt1715_state::rt1715)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_2_4576MHz)
 	MCFG_CPU_PROGRAM_MAP(rt1715_mem)
@@ -315,7 +317,7 @@ static MACHINE_CONFIG_START( rt1715 )
 	MCFG_RAM_DEFAULT_VALUE(0x00)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( rt1715w, rt1715 )
+MACHINE_CONFIG_DERIVED(rt1715_state::rt1715w, rt1715)
 MACHINE_CONFIG_END
 
 

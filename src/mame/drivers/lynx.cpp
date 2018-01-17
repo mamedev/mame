@@ -75,7 +75,7 @@ void lynx_state::sound_cb()
 	lynx_timer_count_down(1);
 }
 
-static MACHINE_CONFIG_START( lynx )
+MACHINE_CONFIG_START(lynx_state::lynx)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M65SC02, 4000000)        /* vti core, integrated in vlsi, stz, but not bbr bbs */
 	MCFG_CPU_PROGRAM_MAP(lynx_mem)

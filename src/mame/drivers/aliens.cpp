@@ -191,7 +191,7 @@ WRITE8_MEMBER( aliens_state::banking_callback )
 	m_rombank->set_entry(data & 0x1f);
 }
 
-static MACHINE_CONFIG_START( aliens )
+MACHINE_CONFIG_START(aliens_state::aliens)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", KONAMI, XTAL_24MHz/2/4)       /* 052001 (verified on pcb) */

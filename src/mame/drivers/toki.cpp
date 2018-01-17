@@ -485,7 +485,7 @@ GFXDECODE_END
 
 /*****************************************************************************/
 
-static MACHINE_CONFIG_START( toki ) /* KOYO 20.000MHz near the cpu */
+MACHINE_CONFIG_START(toki_state::toki) /* KOYO 20.000MHz near the cpu */
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000,XTAL_20MHz /2)   /* verified on pcb */
@@ -531,7 +531,7 @@ static MACHINE_CONFIG_START( toki ) /* KOYO 20.000MHz near the cpu */
 	MCFG_SEIBU_SOUND_YM_WRITE_CB(DEVWRITE8("ymsnd", ym3812_device, write))
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( jujuba, toki )
+MACHINE_CONFIG_DERIVED(toki_state::jujuba, toki)
 	MCFG_DEVICE_REMOVE("sei80bu")
 
 	MCFG_DEVICE_MODIFY("audiocpu")
@@ -539,7 +539,7 @@ static MACHINE_CONFIG_DERIVED( jujuba, toki )
 	MCFG_CPU_DECRYPTED_OPCODES_MAP(jujuba_audio_opcodes_map)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( tokib )
+MACHINE_CONFIG_START(toki_state::tokib)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 10000000)   /* 10MHz causes bad slowdowns with monkey machine rd1, but is correct, 20Mhz XTAL */

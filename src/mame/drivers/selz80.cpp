@@ -55,6 +55,8 @@ public:
 	DECLARE_MACHINE_RESET(dagz80);
 	DECLARE_MACHINE_RESET(selz80);
 
+	void selz80(machine_config &config);
+	void dagz80(machine_config &config);
 private:
 	uint8_t m_digit;
 	void setup_baud();
@@ -198,7 +200,7 @@ READ8_MEMBER( selz80_state::kbd_r )
 	return data;
 }
 
-static MACHINE_CONFIG_START( selz80 )
+MACHINE_CONFIG_START(selz80_state::selz80)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80, XTAL_4MHz) // it's actually a 5MHz XTAL with a NEC uPD780C-1 cpu
 	MCFG_CPU_PROGRAM_MAP(selz80_mem)
@@ -231,7 +233,7 @@ static MACHINE_CONFIG_START( selz80 )
 	MCFG_I8279_IN_CTRL_CB(VCC)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( dagz80, selz80 )
+MACHINE_CONFIG_DERIVED(selz80_state::dagz80, selz80)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(dagz80_mem)
 	MCFG_MACHINE_RESET_OVERRIDE(selz80_state, dagz80 )

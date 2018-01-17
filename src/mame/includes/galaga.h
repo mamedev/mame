@@ -94,6 +94,9 @@ public:
 	};
 
 	static struct star m_star_seed_tab[];
+	void galaga(machine_config &config);
+	void gatsbee(machine_config &config);
+	void galagab(machine_config &config);
 };
 
 DISCRETE_SOUND_EXTERN( galaga );

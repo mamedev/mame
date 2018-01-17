@@ -104,6 +104,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_ioport_array<10> m_row;
 
+	void thayers(machine_config &config);
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
@@ -786,7 +787,7 @@ void thayers_state::machine_reset()
 
 /* Machine Driver */
 
-static MACHINE_CONFIG_START( thayers )
+MACHINE_CONFIG_START(thayers_state::thayers)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_4MHz)

@@ -536,7 +536,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( spiders )
+MACHINE_CONFIG_START(spiders_state::spiders)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", MC6809, 2800000)

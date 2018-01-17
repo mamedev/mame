@@ -85,6 +85,7 @@ public:
 	virtual void video_start() override;
 	uint32_t screen_update_cmmb(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(vblank_irq);
+	void cmmb(machine_config &config);
 };
 
 
@@ -381,7 +382,7 @@ void cmmb_state::machine_reset()
 }
 
 
-static MACHINE_CONFIG_START( cmmb )
+MACHINE_CONFIG_START(cmmb_state::cmmb)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M65SC02, MAIN_CLOCK/5) // Unknown clock, but chip rated for 14MHz

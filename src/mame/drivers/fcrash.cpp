@@ -1559,7 +1559,7 @@ MACHINE_RESET_MEMBER(cps_state,fcrash)
 	m_sample_select2 = 0;
 }
 
-static MACHINE_CONFIG_START( fcrash )
+MACHINE_CONFIG_START(cps_state::fcrash)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 10000000)
@@ -1616,7 +1616,7 @@ static MACHINE_CONFIG_START( fcrash )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( cawingbl, fcrash )
+MACHINE_CONFIG_DERIVED(cps_state::cawingbl, fcrash)
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", cps_state,  irq6_line_hold) /* needed to write to scroll values */
@@ -1624,7 +1624,7 @@ static MACHINE_CONFIG_DERIVED( cawingbl, fcrash )
 	MCFG_MACHINE_START_OVERRIDE(cps_state, cawingbl)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( kodb )
+MACHINE_CONFIG_START(cps_state::kodb)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 10000000)
@@ -1667,7 +1667,7 @@ static MACHINE_CONFIG_START( kodb )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( sf2mdt )
+MACHINE_CONFIG_START(cps_state::sf2mdt)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 12000000)
@@ -1716,12 +1716,12 @@ static MACHINE_CONFIG_START( sf2mdt )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( sf2b, sf2mdt)
+MACHINE_CONFIG_DERIVED(cps_state::sf2b, sf2mdt)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(sf2b_map)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( knightsb )
+MACHINE_CONFIG_START(cps_state::knightsb)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 24000000 / 2)
@@ -2104,7 +2104,7 @@ MACHINE_START_MEMBER(cps_state, dinopic)
 	m_sprite_x_offset = 0;
 }
 
-static MACHINE_CONFIG_START( dinopic )
+MACHINE_CONFIG_START(cps_state::dinopic)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 12000000)
@@ -2265,7 +2265,7 @@ DRIVER_INIT_MEMBER(cps_state, dinopic)
 // sound cpu is (239 V 249521 VC5006 KABUKI DL-030P-110V) - recycled Kabuki Z80 from genuine Capcom HW?
 // 3x8 dsws
 
-static MACHINE_CONFIG_START( sgyxz )
+MACHINE_CONFIG_START(cps_state::sgyxz)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 12000000)
 	MCFG_CPU_PROGRAM_MAP(sgyxz_map)
@@ -2359,7 +2359,7 @@ MACHINE_START_MEMBER(cps_state, punipic)
 	m_sprite_x_offset = 0;
 }
 
-static MACHINE_CONFIG_START( punipic )
+MACHINE_CONFIG_START(cps_state::punipic)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 12000000)
@@ -2555,7 +2555,7 @@ DRIVER_INIT_MEMBER(cps_state, punipic3)
 
 // ************************************************************************* SF2M1
 
-static MACHINE_CONFIG_START( sf2m1 )
+MACHINE_CONFIG_START(cps_state::sf2m1)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_12MHz )
@@ -2889,7 +2889,7 @@ MACHINE_START_MEMBER(cps_state, slampic)
 	m_sprite_x_offset = 0;
 }
 
-static MACHINE_CONFIG_START( slampic )
+MACHINE_CONFIG_START(cps_state::slampic)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 12000000)
@@ -2991,7 +2991,7 @@ static ADDRESS_MAP_START( varthb_map, AS_PROGRAM, 16, cps_state )
 	AM_RANGE(0xff0000, 0xffffff) AM_RAM AM_SHARE("mainram")
 ADDRESS_MAP_END
 
-static MACHINE_CONFIG_START( varthb )
+MACHINE_CONFIG_START(cps_state::varthb)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 12000000)

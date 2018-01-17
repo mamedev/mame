@@ -29,6 +29,7 @@ public:
 		, m_maincpu(*this, "maincpu")
 	{ }
 
+	void ice_tbd(machine_config &config);
 private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -59,7 +60,7 @@ void ice_tbd_state::machine_reset()
 {
 }
 
-static MACHINE_CONFIG_START( ice_tbd )
+MACHINE_CONFIG_START(ice_tbd_state::ice_tbd)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80,8000000)         /* ? MHz */

@@ -73,6 +73,7 @@ public:
 	required_device<m6502_device> m_fdccpu;
 	required_shared_ptr<uint16_t> m_mainram;
 	required_shared_ptr<uint16_t> m_vram;
+	void tek4404(machine_config &config);
 };
 
 /*************************************
@@ -185,7 +186,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( tek4404 )
+MACHINE_CONFIG_START(tek440x_state::tek4404)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68010, XTAL_40MHz / 4) // MC68010L10

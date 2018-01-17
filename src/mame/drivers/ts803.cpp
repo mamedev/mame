@@ -84,6 +84,7 @@ public:
 	DECLARE_DRIVER_INIT(ts803);
 	uint32_t screen_update_ts803(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
+	void ts803(machine_config &config);
 private:
 	std::unique_ptr<uint8_t[]> m_videoram;
 	std::unique_ptr<uint8_t[]> m_56kram;
@@ -411,7 +412,7 @@ static const z80_daisy_config daisy_chain[] =
 	{ nullptr }
 };
 
-static MACHINE_CONFIG_START( ts803 )
+MACHINE_CONFIG_START(ts803_state::ts803)
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_16MHz/4)
 	MCFG_CPU_PROGRAM_MAP(ts803_mem)
 	MCFG_CPU_IO_MAP(ts803_io)

@@ -1081,7 +1081,7 @@ GFXDECODE_END
  *************************************/
 
 /* Core MCR monoboard system with no sound */
-static MACHINE_CONFIG_START( mcrmono )
+MACHINE_CONFIG_START(mcr3_state::mcrmono)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK/4)
@@ -1121,7 +1121,7 @@ MACHINE_CONFIG_END
 
 
 /* Sarge/Demolition Derby Mono/Max RPM = MCR monoboard with Turbo Cheap Squeak */
-static MACHINE_CONFIG_DERIVED( mono_tcs, mcrmono )
+MACHINE_CONFIG_DERIVED(mcr3_state::mono_tcs, mcrmono)
 
 	/* basic machine hardware */
 	MCFG_SOUND_ADD("tcs", MIDWAY_TURBO_CHEAP_SQUEAK, 0)
@@ -1129,7 +1129,7 @@ static MACHINE_CONFIG_DERIVED( mono_tcs, mcrmono )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( maxrpm, mono_tcs )
+MACHINE_CONFIG_DERIVED(mcr3_state::maxrpm, mono_tcs)
 	MCFG_ADC0844_ADD("adc")
 	MCFG_ADC0844_CH1_CB(IOPORT("MONO.IP1"))
 	MCFG_ADC0844_CH2_CB(IOPORT("MONO.IP1.ALT1"))
@@ -1139,7 +1139,7 @@ MACHINE_CONFIG_END
 
 
 /* Rampage/Power Drive/Star Guards = MCR monoboard with Sounds Good */
-static MACHINE_CONFIG_DERIVED( mono_sg, mcrmono )
+MACHINE_CONFIG_DERIVED(mcr3_state::mono_sg, mcrmono)
 
 	/* basic machine hardware */
 	MCFG_SOUND_ADD("sg", MIDWAY_SOUNDS_GOOD, 0)
@@ -1152,7 +1152,7 @@ MACHINE_CONFIG_END
 
 
 /* Core scrolling system with SSIO sound */
-static MACHINE_CONFIG_DERIVED( mcrscroll, mcrmono )
+MACHINE_CONFIG_DERIVED(mcr3_state::mcrscroll, mcrmono)
 
 	/* basic machine hardware */
 	MCFG_SOUND_ADD("ssio", MIDWAY_SSIO, 0)
@@ -1178,7 +1178,7 @@ MACHINE_CONFIG_END
 
 
 /* Spy Hunter = scrolling system with an SSIO and a cheap squeak deluxe */
-static MACHINE_CONFIG_DERIVED( mcrsc_csd, mcrscroll )
+MACHINE_CONFIG_DERIVED(mcr3_state::mcrsc_csd, mcrscroll)
 
 	/* basic machine hardware */
 	MCFG_SOUND_ADD("csd", MIDWAY_CHEAP_SQUEAK_DELUXE, 0)

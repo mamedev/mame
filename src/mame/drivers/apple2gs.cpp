@@ -307,7 +307,7 @@ static SLOT_INTERFACE_START(apple2_cards)
 	SLOT_INTERFACE("hsscsi", A2BUS_HSSCSI)  /* Apple II High-Speed SCSI Card */
 SLOT_INTERFACE_END
 
-static MACHINE_CONFIG_START( apple2gs )
+MACHINE_CONFIG_START(apple2gs_state::apple2gs)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", G65816, APPLE2GS_14M/5)
 	MCFG_CPU_PROGRAM_MAP(apple2gs_map)
@@ -415,7 +415,7 @@ static MACHINE_CONFIG_START( apple2gs )
 	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("flop525_list", "apple2")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( apple2gsr1, apple2gs )
+MACHINE_CONFIG_DERIVED(apple2gs_state::apple2gsr1, apple2gs)
 	MCFG_MACHINE_START_OVERRIDE(apple2gs_state, apple2gsr1 )
 
 	#if RUN_ADB_MICRO

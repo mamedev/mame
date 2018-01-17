@@ -277,6 +277,17 @@ public:
 	INTERRUPT_GEN_MEMBER(sigmab98_vblank_interrupt);
 	TIMER_DEVICE_CALLBACK_MEMBER(sammymdl_irq);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int pri_mask);
+	void sigmab98(machine_config &config);
+	void pyenaget(machine_config &config);
+	void dodghero(machine_config &config);
+	void dashhero(machine_config &config);
+	void gegege(machine_config &config);
+	void haekaka(machine_config &config);
+	void gocowboy(machine_config &config);
+	void tdoboon(machine_config &config);
+	void animalc(machine_config &config);
+	void sammymdl(machine_config &config);
+	void itazuram(machine_config &config);
 };
 
 
@@ -2498,7 +2509,7 @@ INTERRUPT_GEN_MEMBER(sigmab98_state::sigmab98_vblank_interrupt)
 	device.execute().set_input_line_and_vector(0, HOLD_LINE, 0x5a);
 }
 
-static MACHINE_CONFIG_START( sigmab98 )
+MACHINE_CONFIG_START(sigmab98_state::sigmab98)
 	MCFG_CPU_ADD("maincpu", Z80, 10000000)  // !! TAXAN KY-80, clock @X1? !!
 	MCFG_CPU_PROGRAM_MAP(gegege_mem_map)
 	MCFG_CPU_IO_MAP(gegege_io_map)
@@ -2535,19 +2546,19 @@ static MACHINE_CONFIG_START( sigmab98 )
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( dodghero, sigmab98 )
+MACHINE_CONFIG_DERIVED(sigmab98_state::dodghero, sigmab98)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP( dodghero_mem_map )
 	MCFG_CPU_IO_MAP( dodghero_io_map )
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( gegege, sigmab98 )
+MACHINE_CONFIG_DERIVED(sigmab98_state::gegege, sigmab98)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP( gegege_mem_map )
 	MCFG_CPU_IO_MAP( gegege_io_map )
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( dashhero, sigmab98 )
+MACHINE_CONFIG_DERIVED(sigmab98_state::dashhero, sigmab98)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP( gegege_mem_map )
 	MCFG_CPU_IO_MAP( dashhero_io_map )
@@ -2579,7 +2590,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(sigmab98_state::sammymdl_irq)
 		m_maincpu->set_input_line_and_vector(0,HOLD_LINE, m_timer1_vector);
 }
 
-static MACHINE_CONFIG_START( sammymdl )
+MACHINE_CONFIG_START(sigmab98_state::sammymdl)
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_20MHz / 2)    // !! KL5C80A120FP @ 10MHz? (actually 4 times faster than Z80) !!
 	MCFG_CPU_PROGRAM_MAP( animalc_map )
 	MCFG_CPU_IO_MAP( animalc_io )
@@ -2619,13 +2630,13 @@ static MACHINE_CONFIG_START( sammymdl )
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.80)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( animalc, sammymdl )
+MACHINE_CONFIG_DERIVED(sigmab98_state::animalc, sammymdl)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP( animalc_map )
 	MCFG_CPU_IO_MAP( animalc_io )
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( gocowboy, sammymdl )
+MACHINE_CONFIG_DERIVED(sigmab98_state::gocowboy, sammymdl)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP( gocowboy_map )
 	MCFG_CPU_IO_MAP( gocowboy_io )
@@ -2635,25 +2646,25 @@ static MACHINE_CONFIG_DERIVED( gocowboy, sammymdl )
 	MCFG_TICKET_DISPENSER_ADD("hopper_large", attotime::from_msec(1000), TICKET_MOTOR_ACTIVE_LOW, TICKET_STATUS_ACTIVE_LOW )
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( haekaka, sammymdl )
+MACHINE_CONFIG_DERIVED(sigmab98_state::haekaka, sammymdl)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP( haekaka_map )
 	MCFG_CPU_IO_MAP( haekaka_io )
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( itazuram, sammymdl )
+MACHINE_CONFIG_DERIVED(sigmab98_state::itazuram, sammymdl)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP( itazuram_map )
 	MCFG_CPU_IO_MAP( itazuram_io )
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( pyenaget, sammymdl )
+MACHINE_CONFIG_DERIVED(sigmab98_state::pyenaget, sammymdl)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP( haekaka_map )
 	MCFG_CPU_IO_MAP( pyenaget_io )
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( tdoboon, sammymdl )
+MACHINE_CONFIG_DERIVED(sigmab98_state::tdoboon, sammymdl)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP( tdoboon_map )
 	MCFG_CPU_IO_MAP( tdoboon_io )

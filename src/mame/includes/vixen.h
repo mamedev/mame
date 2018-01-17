@@ -76,6 +76,7 @@ public:
 	DECLARE_READ8_MEMBER(oprom_r);
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
+	void vixen(machine_config &config);
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<fd1797_device> m_fdc;

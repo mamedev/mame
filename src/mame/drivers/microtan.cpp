@@ -209,7 +209,7 @@ static GFXDECODE_START( microtan )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( microtan )
+MACHINE_CONFIG_START(microtan_state::microtan)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, XTAL_6MHz / 8)  // 750 kHz
 	MCFG_CPU_PROGRAM_MAP(microtan_map)

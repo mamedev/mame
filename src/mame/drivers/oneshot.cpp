@@ -360,7 +360,7 @@ void oneshot_state::machine_reset()
 	m_p2_wobble = 0;
 }
 
-static MACHINE_CONFIG_START( oneshot )
+MACHINE_CONFIG_START(oneshot_state::oneshot)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 12000000)
@@ -396,7 +396,7 @@ static MACHINE_CONFIG_START( oneshot )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( maddonna, oneshot )
+MACHINE_CONFIG_DERIVED(oneshot_state::maddonna, oneshot)
 
 	/* basic machine hardware */
 

@@ -563,7 +563,7 @@ void zodiack_state::machine_reset()
 }
 
 
-static MACHINE_CONFIG_START( zodiack )
+MACHINE_CONFIG_START(zodiack_state::zodiack)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_18_432MHz/6)

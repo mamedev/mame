@@ -208,6 +208,8 @@ public:
 
 	uint32_t bw2_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
+	void sun3_80(machine_config &config);
+	void sun3_460(machine_config &config);
 private:
 	uint32_t m_enable, m_buserr, m_diag, m_printer, m_irqctrl, m_memreg, m_memerraddr;
 	uint32_t m_iommu[0x800];
@@ -575,7 +577,7 @@ static SLOT_INTERFACE_START( sun_floppies )
 	SLOT_INTERFACE( "35hd", FLOPPY_35_HD )
 SLOT_INTERFACE_END
 
-static MACHINE_CONFIG_START( sun3_80 )
+MACHINE_CONFIG_START(sun3x_state::sun3_80)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68030, 20000000)
 	MCFG_CPU_PROGRAM_MAP(sun3_80_mem)
@@ -622,7 +624,7 @@ static MACHINE_CONFIG_START( sun3_80 )
 	MCFG_SCREEN_REFRESH_RATE(72)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( sun3_460 )
+MACHINE_CONFIG_START(sun3x_state::sun3_460)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68030, 33000000)
 	MCFG_CPU_PROGRAM_MAP(sun3_460_mem)

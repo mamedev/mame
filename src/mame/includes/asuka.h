@@ -102,6 +102,12 @@ public:
 	DECLARE_WRITE16_MEMBER( bonzeadv_cchip_ram_w );
 	DECLARE_WRITE_LINE_MEMBER(asuka_msm5205_vck);
 
+	void mofflott(machine_config &config);
+	void asuka(machine_config &config);
+	void cadash(machine_config &config);
+	void eto(machine_config &config);
+	void galmedes(machine_config &config);
+	void bonzeadv(machine_config &config);
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };

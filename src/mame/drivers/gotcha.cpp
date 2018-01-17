@@ -262,7 +262,7 @@ void gotcha_state::machine_reset()
 	m_banksel = 0;
 }
 
-static MACHINE_CONFIG_START( gotcha )
+MACHINE_CONFIG_START(gotcha_state::gotcha)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000,14318180)    /* 14.31818 MHz */

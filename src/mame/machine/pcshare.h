@@ -47,7 +47,13 @@ public:
 	uint8_t m_dma_offset[2][4];
 	uint8_t m_at_pages[0x10];
 	int m_pit_out2;
+	void pcat_common(machine_config &config);
+	void pcvideo_vga(machine_config &config);
+	void pcvideo_trident_vga(machine_config &config);
+	void pcvideo_s3_vga(machine_config &config);
+	void pcvideo_cirrus_gd5428(machine_config &config);
+	void pcvideo_cirrus_gd5430(machine_config &config);
+
 };
 
 ADDRESS_MAP_EXTERN(pcat32_io_common, 32);
-MACHINE_CONFIG_EXTERN(pcat_common);

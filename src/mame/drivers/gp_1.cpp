@@ -57,6 +57,8 @@ public:
 	DECLARE_WRITE8_MEMBER(portc_w);
 	DECLARE_READ8_MEMBER(portb_r);
 	TIMER_DEVICE_CALLBACK_MEMBER(zero_timer);
+	void gp_1(machine_config &config);
+	void gp_1s(machine_config &config);
 private:
 	uint8_t m_u14;
 	uint8_t m_digit;
@@ -421,7 +423,7 @@ static const z80_daisy_config daisy_chain[] =
 	{ nullptr }
 };
 
-static MACHINE_CONFIG_START( gp_1 )
+MACHINE_CONFIG_START(gp_1_state::gp_1)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 2457600)
 	MCFG_CPU_PROGRAM_MAP(gp_1_map)
@@ -447,7 +449,7 @@ static MACHINE_CONFIG_START( gp_1 )
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("gp1", gp_1_state, zero_timer, attotime::from_hz(120)) // mains freq*2
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( gp_1s, gp_1 )
+MACHINE_CONFIG_DERIVED(gp_1_state::gp_1s, gp_1)
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("snsnd", SN76477, 0)
 	MCFG_SN76477_NOISE_PARAMS(0, 0, 0)                // noise + filter: N/C

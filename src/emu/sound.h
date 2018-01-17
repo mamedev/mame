@@ -82,7 +82,6 @@ class sound_stream
 		attoseconds_t       m_latency_attoseconds;  // latency between this stream and the input stream
 		s16               m_gain;                 // gain to apply to this input
 		s16               m_user_gain;            // user-controlled gain to apply to this input
-		stream_sample_t   m_default_level;        // default level (when no active source)
 	};
 
 	// constants
@@ -111,7 +110,7 @@ public:
 	float output_gain(int outputnum) const;
 
 	// operations
-	void set_input(int inputnum, sound_stream *input_stream, int outputnum = 0, float gain = 1.0f, stream_sample_t level = 0);
+	void set_input(int inputnum, sound_stream *input_stream, int outputnum = 0, float gain = 1.0f);
 	void update();
 	const stream_sample_t *output_since_last_update(int outputnum, int &numsamples);
 

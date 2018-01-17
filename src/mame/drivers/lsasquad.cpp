@@ -550,7 +550,7 @@ MACHINE_RESET_MEMBER(lsasquad_state,lsasquad)
 }
 
 /* Note: lsasquad clock values are not verified */
-static MACHINE_CONFIG_START( lsasquad )
+MACHINE_CONFIG_START(lsasquad_state::lsasquad)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK / 4)
@@ -606,7 +606,7 @@ static MACHINE_CONFIG_START( lsasquad )
 	MCFG_SOUND_ROUTE(3, "mono", 0.63)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( storming, lsasquad )
+MACHINE_CONFIG_DERIVED(lsasquad_state::storming, lsasquad)
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(storming_map)
@@ -617,7 +617,7 @@ static MACHINE_CONFIG_DERIVED( storming, lsasquad )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.12)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( daikaiju )
+MACHINE_CONFIG_START(lsasquad_state::daikaiju)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK / 4)

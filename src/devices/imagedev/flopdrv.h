@@ -233,7 +233,6 @@ DECLARE_DEVICE_TYPE(LEGACY_FLOPPY, legacy_floppy_image_device)
 
 legacy_floppy_image_device *floppy_get_device(running_machine &machine,int drive);
 legacy_floppy_image_device *floppy_get_device_by_type(running_machine &machine,int ftype,int drive);
-int floppy_get_drive(device_t *image);
 int floppy_get_drive_by_type(legacy_floppy_image_device *image,int ftype);
 int floppy_get_count(running_machine &machine);
 

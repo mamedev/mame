@@ -298,6 +298,7 @@ public:
 	required_device<upd7759_device> m_upd7759;
 	required_device<palette_device> m_palette;
 	required_device<meters_device> m_meters;
+	void bfcobra(machine_config &config);
 };
 
 
@@ -1627,7 +1628,7 @@ INTERRUPT_GEN_MEMBER(bfcobra_state::vblank_gen)
 	update_irqs();
 }
 
-static MACHINE_CONFIG_START( bfcobra )
+MACHINE_CONFIG_START(bfcobra_state::bfcobra)
 	MCFG_CPU_ADD("maincpu", Z80, Z80_XTAL)
 	MCFG_CPU_PROGRAM_MAP(z80_prog_map)
 	MCFG_CPU_IO_MAP(z80_io_map)

@@ -145,6 +145,7 @@ public:
 	DECLARE_WRITE16_MEMBER(b38_keyboard_w);
 	DECLARE_READ16_MEMBER(b38_crtc_r);
 	DECLARE_WRITE16_MEMBER(b38_crtc_w);
+	void ngen(machine_config &config);
 protected:
 	virtual void machine_reset() override;
 	virtual void machine_start() override;
@@ -191,6 +192,8 @@ public:
 	ngen386_state(const machine_config &mconfig, device_type type, const char *tag)
 		: ngen_state(mconfig, type, tag)
 		{}
+		void ngen386(machine_config &config);
+		void _386i(machine_config &config);
 private:
 };
 
@@ -911,7 +914,7 @@ static SLOT_INTERFACE_START( ngen_floppies )
 	SLOT_INTERFACE( "525qd", FLOPPY_525_QD )
 SLOT_INTERFACE_END
 
-static MACHINE_CONFIG_START( ngen )
+MACHINE_CONFIG_START(ngen_state::ngen)
 	// basic machine hardware
 	MCFG_CPU_ADD("maincpu", I80186, XTAL_16MHz / 2)
 	MCFG_CPU_PROGRAM_MAP(ngen_mem)
@@ -1025,7 +1028,7 @@ static MACHINE_CONFIG_START( ngen )
 
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( ngen386 )
+MACHINE_CONFIG_START(ngen386_state::ngen386)
 	MCFG_CPU_ADD("i386cpu", I386, XTAL_50MHz / 2)
 	MCFG_CPU_PROGRAM_MAP(ngen386_mem)
 	MCFG_CPU_IO_MAP(ngen386_io)
@@ -1135,7 +1138,7 @@ static MACHINE_CONFIG_START( ngen386 )
 	MCFG_HARDDISK_ADD("hard0")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( 386i, ngen386 )
+MACHINE_CONFIG_DERIVED(ngen386_state::_386i, ngen386)
 	MCFG_CPU_MODIFY("i386cpu")
 	MCFG_CPU_PROGRAM_MAP(ngen386i_mem)
 MACHINE_CONFIG_END
@@ -1180,4 +1183,4 @@ ROM_END
 
 COMP( 1983, ngen,    0,      0,      ngen,           ngen, ngen_state,    0,      "Convergent Technologies",  "NGEN CP-001", MACHINE_IS_SKELETON )
 COMP( 1991, ngenb38, ngen,   0,      ngen386,        ngen, ngen386_state, 0,      "Financial Products Corp.", "B28/38",      MACHINE_IS_SKELETON )
-COMP( 1990, 386i,    ngen,   0,      386i,           ngen, ngen386_state, 0,      "Convergent Technologies",  "386i",        MACHINE_IS_SKELETON )
+COMP( 1990, 386i,    ngen,   0,      _386i,          ngen, ngen386_state, 0,      "Convergent Technologies",  "386i",        MACHINE_IS_SKELETON )

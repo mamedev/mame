@@ -26,7 +26,6 @@ public:
 		, m_rocktrv2_prot_data(*this, "rocktrv2_prot")
 		, m_gfxdecode(*this, "gfxdecode")
 		, m_palette(*this, "palette")
-		, m_patched_opcodes(*this, "patched_opcodes")
 	{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -43,7 +42,6 @@ private:
 	optional_shared_ptr<uint8_t> m_rocktrv2_prot_data;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
-	optional_shared_ptr<uint8_t> m_patched_opcodes;
 
 	uint8_t m_cannonb_bit_to_read;
 	int m_mystery;
@@ -80,8 +78,6 @@ public:
 	DECLARE_READ8_MEMBER(mbrush_prot_r);
 	DECLARE_READ8_MEMBER(maketrax_special_port2_r);
 	DECLARE_READ8_MEMBER(maketrax_special_port3_r);
-	DECLARE_READ8_MEMBER(korosuke_special_port2_r);
-	DECLARE_READ8_MEMBER(korosuke_special_port3_r);
 	DECLARE_READ8_MEMBER(mschamp_kludge_r);
 	DECLARE_WRITE8_MEMBER(bigbucks_bank_w);
 	DECLARE_READ8_MEMBER(bigbucks_question_r);
@@ -134,7 +130,6 @@ public:
 	DECLARE_DRIVER_INIT(woodpek);
 	DECLARE_DRIVER_INIT(cannonbp);
 	DECLARE_DRIVER_INIT(jumpshot);
-	DECLARE_DRIVER_INIT(korosuke);
 	DECLARE_DRIVER_INIT(mspacii);
 	DECLARE_DRIVER_INIT(pacplus);
 	DECLARE_DRIVER_INIT(rocktrv2);
@@ -167,7 +162,6 @@ public:
 private:
 	void init_save_state();
 	void jrpacman_mark_tile_dirty( int offset );
-	void korosuke_rom_decode();
 	void eyes_decode(uint8_t *data);
 	void mspacman_install_patches(uint8_t *ROM);
 
@@ -180,6 +174,33 @@ public:
 	DECLARE_MACHINE_RESET(eeekk);
 	DECLARE_MACHINE_START(acitya);
 	DECLARE_MACHINE_RESET(acitya);
+
+	void birdiy(machine_config &config);
+	void rocktrv2(machine_config &config);
+	void mspacman(machine_config &config);
+	void dremshpr(machine_config &config);
+	void mschamp(machine_config &config);
+	void acitya(machine_config &config);
+	void theglobp(machine_config &config);
+	void nmouse(machine_config &config);
+	void vanvan(machine_config &config);
+	void s2650games(machine_config &config);
+	void woodpek(machine_config &config);
+	void crushs(machine_config &config);
+	void eeekk(machine_config &config);
+	void superabc(machine_config &config);
+	void numcrash(machine_config &config);
+	void crush4(machine_config &config);
+	void bigbucks(machine_config &config);
+	void porky(machine_config &config);
+	void pacman(machine_config &config);
+	void _8bpm(machine_config &config);
+	void maketrax(machine_config &config);
+	void korosuke(machine_config &config);
+	void alibaba(machine_config &config);
+	void drivfrcp(machine_config &config);
+	void pengojpm(machine_config &config);
+	void piranha(machine_config &config);
 
 private:
 	// pacplus.c

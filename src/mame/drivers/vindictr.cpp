@@ -182,7 +182,7 @@ GFXDECODE_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( vindictr )
+MACHINE_CONFIG_START(vindictr_state::vindictr)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68010, ATARI_CLOCK_14MHz/2)

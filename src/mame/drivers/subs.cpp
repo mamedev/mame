@@ -172,7 +172,7 @@ GFXDECODE_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( subs )
+MACHINE_CONFIG_START(subs_state::subs)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502,12096000/16)      /* clock input is the "4H" signal */

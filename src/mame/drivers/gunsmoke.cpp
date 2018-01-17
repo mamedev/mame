@@ -299,7 +299,7 @@ void gunsmoke_state::machine_reset()
 	m_sprite3bank = 0;
 }
 
-static MACHINE_CONFIG_START( gunsmoke )
+MACHINE_CONFIG_START(gunsmoke_state::gunsmoke)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 4000000)   // 4 MHz

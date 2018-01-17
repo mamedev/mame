@@ -85,7 +85,7 @@ WRITE_LINE_MEMBER(sns_rom_superfx_device::snes_extern_irq_w)
 }
 
 
-MACHINE_CONFIG_MEMBER( sns_rom_superfx_device::device_add_mconfig )
+MACHINE_CONFIG_START(sns_rom_superfx_device::device_add_mconfig)
 	MCFG_CPU_ADD("superfx", SUPERFX, 21480000)  /* 21.48MHz */
 	MCFG_CPU_PROGRAM_MAP(sfx_map)
 	MCFG_SUPERFX_OUT_IRQ(WRITELINE(sns_rom_superfx_device, snes_extern_irq_w))  /* IRQ line from cart */

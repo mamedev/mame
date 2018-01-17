@@ -621,7 +621,7 @@ INTERRUPT_GEN_MEMBER(undrfire_state::undrfire_interrupt)
 	device.execute().set_input_line(4, HOLD_LINE);
 }
 
-static MACHINE_CONFIG_START( undrfire )
+MACHINE_CONFIG_START(undrfire_state::undrfire)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68EC020, XTAL_40MHz/2) /* 20 MHz - NOT verified */
@@ -674,7 +674,7 @@ static MACHINE_CONFIG_START( undrfire )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( cbombers )
+MACHINE_CONFIG_START(undrfire_state::cbombers)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68EC020, XTAL_40MHz/2) /* 20 MHz - NOT verified */

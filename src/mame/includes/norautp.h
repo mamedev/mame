@@ -41,6 +41,20 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
+	void noraut_base(machine_config &config);
+	void kimble(machine_config &config);
+	void kimbldhl(machine_config &config);
+	void norautp(machine_config &config);
+	void norautx4(machine_config &config);
+	void norautpl(machine_config &config);
+	void newhilop(machine_config &config);
+	void dphltest(machine_config &config);
+	void nortest1(machine_config &config);
+	void ssjkrpkr(machine_config &config);
+	void dphl(machine_config &config);
+	void dphla(machine_config &config);
+	void drhl(machine_config &config);
+	void norautxp(machine_config &config);
 };
 
 /*----------- defined in audio/norautp.c -----------*/

@@ -93,6 +93,7 @@ public:
 
 	DECLARE_PALETTE_INIT(molecula);
 
+	void molecula(machine_config &config);
 protected:
 	// driver_device overrides
 	virtual void machine_start() override;
@@ -284,7 +285,7 @@ PALETTE_INIT_MEMBER(molecula_state, molecula)
 {
 }
 
-static MACHINE_CONFIG_START( molecula )
+MACHINE_CONFIG_START(molecula_state::molecula)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("filecpu",Z80,Z80_CLOCK/2)

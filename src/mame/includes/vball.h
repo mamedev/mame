@@ -61,4 +61,5 @@ public:
 	void spprombank_w(int bank);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	inline int scanline_to_vcount(int scanline);
+	void vball(machine_config &config);
 };

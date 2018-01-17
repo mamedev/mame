@@ -546,7 +546,7 @@ void fuuki32_state::machine_reset()
 }
 
 
-static MACHINE_CONFIG_START(fuuki32)
+MACHINE_CONFIG_START(fuuki32_state::fuuki32)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68EC020, CPU_CLOCK) /* 20MHz verified */

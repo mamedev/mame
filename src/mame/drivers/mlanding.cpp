@@ -164,6 +164,7 @@ public:
 	uint32_t exec_dma();
 	void msm5205_update(int chip);
 
+	void mlanding(machine_config &config);
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
@@ -908,7 +909,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( mlanding )
+MACHINE_CONFIG_START(mlanding_state::mlanding)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 8000000) // Appears to be 68000P8 in PCB photo

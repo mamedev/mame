@@ -1863,7 +1863,7 @@ MACHINE_RESET_MEMBER(seibuspi_state,spi)
 	m_z80_prg_transfer_pos = 0;
 }
 
-static MACHINE_CONFIG_START( spi )
+MACHINE_CONFIG_START(seibuspi_state::spi)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I386, XTAL_50MHz/2) // AMD or Intel 386DX, 25MHz
@@ -1913,13 +1913,13 @@ static MACHINE_CONFIG_START( spi )
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( ejanhs, spi )
+MACHINE_CONFIG_DERIVED(seibuspi_state::ejanhs, spi)
 
 	/* video hardware */
 	MCFG_VIDEO_START_OVERRIDE(seibuspi_state, ejanhs)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( rdft2, spi )
+MACHINE_CONFIG_DERIVED(seibuspi_state::rdft2, spi)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(rdft2_map)
 MACHINE_CONFIG_END
@@ -1934,7 +1934,7 @@ MACHINE_RESET_MEMBER(seibuspi_state,sxx2e)
 	m_sb_coin_latch = 0;
 }
 
-static MACHINE_CONFIG_DERIVED( sxx2e, spi )
+MACHINE_CONFIG_DERIVED(seibuspi_state::sxx2e, spi)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1958,7 +1958,7 @@ static MACHINE_CONFIG_DERIVED( sxx2e, spi )
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( sxx2f, sxx2e )
+MACHINE_CONFIG_DERIVED(seibuspi_state::sxx2f, sxx2e)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1972,7 +1972,7 @@ static MACHINE_CONFIG_DERIVED( sxx2f, sxx2e )
 	// clock is unknown, possibly slower than 7.159MHz
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( sxx2g, sxx2f ) // clocks differ, but otherwise same hw as sxx2f
+MACHINE_CONFIG_DERIVED(seibuspi_state::sxx2g, sxx2f) // clocks differ, but otherwise same hw as sxx2f
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu") // AMD AM386DX/DX-40, 28.63636MHz
@@ -1992,7 +1992,7 @@ MACHINE_CONFIG_END
 
 /* SYS386I */
 
-static MACHINE_CONFIG_START( sys386i )
+MACHINE_CONFIG_START(seibuspi_state::sys386i)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I386, XTAL_40MHz) // AMD 386DX, 40MHz
@@ -2049,7 +2049,7 @@ DRIVER_INIT_MEMBER(seibuspi_state,sys386f)
 	}
 }
 
-static MACHINE_CONFIG_START( sys386f )
+MACHINE_CONFIG_START(seibuspi_state::sys386f)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I386, XTAL_50MHz/2) // Intel i386DX, 25MHz

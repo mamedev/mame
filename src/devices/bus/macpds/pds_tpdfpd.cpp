@@ -58,7 +58,7 @@ DEFINE_DEVICE_TYPE(PDS_SEDISPLAY, macpds_sedisplay_device, "pds_sefp", "Radius S
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( macpds_sedisplay_device::device_add_mconfig )
+MACHINE_CONFIG_START(macpds_sedisplay_device::device_add_mconfig)
 	MCFG_SCREEN_ADD( SEDISPLAY_SCREEN_NAME, RASTER)
 	MCFG_SCREEN_UPDATE_DEVICE(DEVICE_SELF, macpds_sedisplay_device, screen_update)
 	MCFG_SCREEN_SIZE(1280, 960)

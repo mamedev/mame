@@ -43,6 +43,7 @@ public:
 		bitmap.fill(rgb_t::black(), cliprect);
 		return 0;
 	}
+	void magreel(machine_config &config);
 protected:
 	// driver_device overrides
 	virtual void machine_start() override;
@@ -117,7 +118,7 @@ void magreel_state::machine_reset()
 }
 
 
-static MACHINE_CONFIG_START( magreel )
+MACHINE_CONFIG_START(magreel_state::magreel)
 
 	/* basic machine hardware - all information unknown */
 //  MCFG_CPU_ADD("maincpu",m68000,MAIN_CLOCK/12)

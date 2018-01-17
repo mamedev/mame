@@ -497,6 +497,7 @@ expect that the software reads these once on startup only.
 #include "machine/i8243.h"
 #include "machine/z80pio.h"
 #include "sound/beep.h"
+#include "sound/volt_reg.h"
 #include "speaker.h"
 
 // internal artwork
@@ -580,6 +581,13 @@ public:
 	DECLARE_WRITE8_MEMBER(dsc_control_w);
 	DECLARE_WRITE8_MEMBER(dsc_select_w);
 	DECLARE_READ8_MEMBER(dsc_input_r);
+	void bcc(machine_config &config);
+	void scc(machine_config &config);
+	void dsc(machine_config &config);
+	void vcc(machine_config &config);
+	void cc10(machine_config &config);
+	void vsc(machine_config &config);
+	void vbrc(machine_config &config);
 };
 
 
@@ -1630,7 +1638,7 @@ INPUT_PORTS_END
     Machine Drivers
 ******************************************************************************/
 
-static MACHINE_CONFIG_START( bcc )
+MACHINE_CONFIG_START(fidelz80_state::bcc)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_3_579545MHz)
@@ -1643,10 +1651,11 @@ static MACHINE_CONFIG_START( bcc )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
 	MCFG_SOUND_ADD("dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
-	MCFG_SOUND_REFERENCE_INPUT(DAC_VREF_POS_INPUT, 1.0)
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( scc )
+MACHINE_CONFIG_START(fidelz80_state::scc)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_3_9MHz)
@@ -1659,10 +1668,11 @@ static MACHINE_CONFIG_START( scc )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
 	MCFG_SOUND_ADD("dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
-	MCFG_SOUND_REFERENCE_INPUT(DAC_VREF_POS_INPUT, 1.0)
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( cc10 )
+MACHINE_CONFIG_START(fidelz80_state::cc10)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_4MHz)
@@ -1688,7 +1698,7 @@ static MACHINE_CONFIG_START( cc10 )
 	MCFG_TIMER_DRIVER_ADD("beeper_off", fidelz80_state, beeper_off_callback)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( vcc )
+MACHINE_CONFIG_START(fidelz80_state::vcc)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_4MHz)
@@ -1716,7 +1726,7 @@ static MACHINE_CONFIG_START( vcc )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.75)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( vsc )
+MACHINE_CONFIG_START(fidelz80_state::vsc)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_3_9MHz) // 3.9MHz resonator
@@ -1744,7 +1754,7 @@ static MACHINE_CONFIG_START( vsc )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.75)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( vbrc )
+MACHINE_CONFIG_START(fidelz80_state::vbrc)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_5MHz/2)
@@ -1772,7 +1782,7 @@ static MACHINE_CONFIG_START( vbrc )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.75)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( dsc )
+MACHINE_CONFIG_START(fidelz80_state::dsc)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_3_9MHz) // 3.9MHz resonator
@@ -1787,7 +1797,8 @@ static MACHINE_CONFIG_START( dsc )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
 	MCFG_SOUND_ADD("dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
-	MCFG_SOUND_REFERENCE_INPUT(DAC_VREF_POS_INPUT, 1.0)
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT)
 MACHINE_CONFIG_END
 
 

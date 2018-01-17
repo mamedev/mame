@@ -106,6 +106,8 @@ public:
 
 	MC6845_BEGIN_UPDATE(crtc_begin_update);
 	MC6845_UPDATE_ROW(crtc_update_row);
+	void tapatune(machine_config &config);
+	void tapatune_base(machine_config &config);
 };
 
 
@@ -509,7 +511,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( tapatune_base )
+MACHINE_CONFIG_START(tapatune_state::tapatune_base)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_24MHz / 4)
 	MCFG_CPU_PROGRAM_MAP(maincpu_map)
@@ -528,7 +530,7 @@ static MACHINE_CONFIG_START( tapatune_base )
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( tapatune, tapatune_base )
+MACHINE_CONFIG_DERIVED(tapatune_state::tapatune, tapatune_base)
 	MCFG_CPU_ADD("videocpu", M68000, XTAL_24MHz / 2)
 	MCFG_CPU_PROGRAM_MAP(video_map)
 

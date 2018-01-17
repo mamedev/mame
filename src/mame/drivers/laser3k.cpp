@@ -111,6 +111,7 @@ public:
 	DECLARE_READ_LINE_MEMBER(ay3600_control_r);
 	DECLARE_WRITE_LINE_MEMBER(ay3600_data_ready_w);
 
+	void laser3k(machine_config &config);
 private:
 	uint8_t m_bank0val, m_bank1val, m_bank2val, m_bank3val;
 	int m_flash;
@@ -960,7 +961,7 @@ PALETTE_INIT_MEMBER(laser3k_state, laser3k)
 	palette.set_pen_colors(0, laser3k_palette, ARRAY_LENGTH(laser3k_palette));
 }
 
-static MACHINE_CONFIG_START( laser3k )
+MACHINE_CONFIG_START(laser3k_state::laser3k)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, 1021800)
 	MCFG_CPU_PROGRAM_MAP(laser3k_map)

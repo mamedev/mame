@@ -837,7 +837,7 @@ GFXDECODE_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( turbo )
+MACHINE_CONFIG_START(turbo_state::turbo)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK/4)
@@ -892,7 +892,7 @@ static MACHINE_CONFIG_START( turbo )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( subroc3d )
+MACHINE_CONFIG_START(turbo_state::subroc3d)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK/4)
@@ -932,7 +932,7 @@ static MACHINE_CONFIG_START( subroc3d )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( buckrog )
+MACHINE_CONFIG_START(turbo_state::buckrog)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK/4)
@@ -979,13 +979,13 @@ static MACHINE_CONFIG_START( buckrog )
 	MCFG_FRAGMENT_ADD(buckrog_samples)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( buckrogu, buckrog )
+MACHINE_CONFIG_DERIVED(turbo_state::buckrogu, buckrog)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_DEVICE_REMOVE_ADDRESS_MAP(AS_OPCODES)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( buckroge, buckrog )
+MACHINE_CONFIG_DERIVED(turbo_state::buckroge, buckrog)
 
 	/* basic machine hardware */
 	MCFG_CPU_REPLACE("maincpu", SEGA_315_5014, MASTER_CLOCK/4)

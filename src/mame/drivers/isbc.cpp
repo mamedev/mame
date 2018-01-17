@@ -83,6 +83,12 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(led_ds1_w);
 	DECLARE_WRITE_LINE_MEMBER(led_ds3_w);
 	DECLARE_WRITE_LINE_MEMBER(megabyte_select_w);
+	void isbc2861(machine_config &config);
+	void isbc86(machine_config &config);
+	void rpc86(machine_config &config);
+	void isbc8605(machine_config &config);
+	void isbc286(machine_config &config);
+	void isbc8630(machine_config &config);
 protected:
 	void machine_reset() override;
 private:
@@ -326,7 +332,7 @@ WRITE_LINE_MEMBER(isbc_state::megabyte_select_w)
 	m_megabyte_enable = !state;
 }
 
-static MACHINE_CONFIG_START( isbc86 )
+MACHINE_CONFIG_START(isbc_state::isbc86)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8086, XTAL_5MHz)
 	MCFG_CPU_PROGRAM_MAP(isbc86_mem)
@@ -359,7 +365,7 @@ static MACHINE_CONFIG_START( isbc86 )
 	MCFG_DEVICE_CARD_DEVICE_INPUT_DEFAULTS("terminal", isbc86_terminal)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( rpc86 )
+MACHINE_CONFIG_START(isbc_state::rpc86)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8086, XTAL_5MHz)
 	MCFG_CPU_PROGRAM_MAP(rpc86_mem)
@@ -400,7 +406,7 @@ static MACHINE_CONFIG_START( rpc86 )
 	//MCFG_ISBX_SLOT_MINTR1_CALLBACK(DEVWRITELINE("pic_0", pic8259_device, ir6_w))
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( isbc8605, rpc86 )
+MACHINE_CONFIG_DERIVED(isbc_state::isbc8605, rpc86)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(isbc8605_io)
 
@@ -409,7 +415,7 @@ static MACHINE_CONFIG_DERIVED( isbc8605, rpc86 )
 	MCFG_ISBC_208_IRQ(DEVWRITELINE("pic_0", pic8259_device, ir5_w))
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( isbc8630, rpc86 )
+MACHINE_CONFIG_DERIVED(isbc_state::isbc8630, rpc86)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(isbc8630_io)
 
@@ -428,7 +434,7 @@ static MACHINE_CONFIG_DERIVED( isbc8630, rpc86 )
 	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(isbc_state, megabyte_select_w))
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( isbc286 )
+MACHINE_CONFIG_START(isbc_state::isbc286)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I80286, XTAL_16MHz/2)
 	MCFG_CPU_PROGRAM_MAP(isbc286_mem)
@@ -522,7 +528,7 @@ static MACHINE_CONFIG_START( isbc286 )
 	MCFG_ISBC_215_IRQ(DEVWRITELINE("pic_0", pic8259_device, ir5_w))
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( isbc2861, isbc286 )
+MACHINE_CONFIG_DERIVED(isbc_state::isbc2861, isbc286)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(isbc2861_mem)
 MACHINE_CONFIG_END

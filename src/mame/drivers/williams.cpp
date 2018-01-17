@@ -506,6 +506,7 @@ Reference video: https://www.youtube.com/watch?v=R5OeC6Wc_yI
 #include "machine/74157.h"
 #include "machine/nvram.h"
 #include "sound/dac.h"
+#include "sound/volt_reg.h"
 #include "speaker.h"
 
 
@@ -1447,7 +1448,7 @@ GFXDECODE_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( williams )
+MACHINE_CONFIG_START(williams_state::williams)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", MC6809E, MASTER_CLOCK/3/4)
@@ -1476,7 +1477,8 @@ static MACHINE_CONFIG_START( williams )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
 	MCFG_SOUND_ADD("dac", MC1408, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25) // mc1408.ic6
-	MCFG_SOUND_REFERENCE_INPUT(DAC_VREF_POS_INPUT, 1.0) MCFG_SOUND_REFERENCE_INPUT(DAC_VREF_NEG_INPUT, -1.0)
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 
 	/* pia */
 	MCFG_DEVICE_ADD("pia_0", PIA6821, 0)
@@ -1496,7 +1498,7 @@ static MACHINE_CONFIG_START( williams )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( defender, williams )
+MACHINE_CONFIG_DERIVED(williams_state::defender, williams)
 
 	/* basic machine hardware */
 
@@ -1521,14 +1523,14 @@ static MACHINE_CONFIG_DERIVED( defender, williams )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( jin, defender ) // needs a different screen size or the credit text is clipped
+MACHINE_CONFIG_DERIVED(williams_state::jin, defender) // needs a different screen size or the credit text is clipped
 	/* basic machine hardware */
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VISIBLE_AREA(0, 315, 7, 247-1)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( williams_muxed, williams )
+MACHINE_CONFIG_DERIVED(williams_state::williams_muxed, williams)
 
 	/* basic machine hardware */
 
@@ -1552,7 +1554,7 @@ static MACHINE_CONFIG_DERIVED( williams_muxed, williams )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( spdball, williams )
+MACHINE_CONFIG_DERIVED(williams_state::spdball, williams)
 
 	/* basic machine hardware */
 
@@ -1563,7 +1565,7 @@ static MACHINE_CONFIG_DERIVED( spdball, williams )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( lottofun, williams )
+MACHINE_CONFIG_DERIVED(williams_state::lottofun, williams)
 
 	/* basic machine hardware */
 
@@ -1576,7 +1578,7 @@ static MACHINE_CONFIG_DERIVED( lottofun, williams )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( sinistar, williams )
+MACHINE_CONFIG_DERIVED(williams_state::sinistar, williams)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1596,7 +1598,7 @@ static MACHINE_CONFIG_DERIVED( sinistar, williams )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( playball, williams )
+MACHINE_CONFIG_DERIVED(williams_state::playball, williams)
 
 	/* basic machine hardware */
 
@@ -1618,7 +1620,7 @@ static MACHINE_CONFIG_DERIVED( playball, williams )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( blastkit, williams )
+MACHINE_CONFIG_DERIVED(blaster_state::blastkit, williams)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1645,7 +1647,7 @@ static MACHINE_CONFIG_DERIVED( blastkit, williams )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( blaster, blastkit )
+MACHINE_CONFIG_DERIVED(blaster_state::blaster, blastkit)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("soundcpu_b", M6808, SOUND_CLOCK) // internal clock divider of 4, effective frequency is 894.886kHz
@@ -1680,16 +1682,18 @@ static MACHINE_CONFIG_DERIVED( blaster, blastkit )
 	/* sound hardware */
 	MCFG_DEVICE_REMOVE("speaker")
 	MCFG_DEVICE_REMOVE("dac")
+	MCFG_DEVICE_REMOVE("vref")
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 	MCFG_SOUND_ADD("ldac", MC1408, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.25) // unknown DAC
-	MCFG_SOUND_REFERENCE_INPUT(DAC_VREF_POS_INPUT, 1.0) MCFG_SOUND_REFERENCE_INPUT(DAC_VREF_NEG_INPUT, -1.0)
 	MCFG_SOUND_ADD("rdac", MC1408, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.25) // unknown DAC
-	MCFG_SOUND_REFERENCE_INPUT(DAC_VREF_POS_INPUT, 1.0) MCFG_SOUND_REFERENCE_INPUT(DAC_VREF_NEG_INPUT, -1.0)
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "ldac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "ldac", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE_EX(0, "rdac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "rdac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( williams2 )
+MACHINE_CONFIG_START(williams2_state::williams2)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", MC6809E, MASTER_CLOCK/3/4)
@@ -1728,7 +1732,8 @@ static MACHINE_CONFIG_START( williams2 )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
 	MCFG_SOUND_ADD("dac", MC1408, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5) // unknown DAC
-	MCFG_SOUND_REFERENCE_INPUT(DAC_VREF_POS_INPUT, 1.0) MCFG_SOUND_REFERENCE_INPUT(DAC_VREF_NEG_INPUT, -1.0)
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 
 	/* pia */
 	MCFG_DEVICE_ADD("pia_0", PIA6821, 0)
@@ -1751,7 +1756,7 @@ static MACHINE_CONFIG_START( williams2 )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( inferno, williams2 )
+MACHINE_CONFIG_DERIVED(williams2_state::inferno, williams2)
 	MCFG_DEVICE_MODIFY("pia_0")
 	MCFG_PIA_READPA_HANDLER(DEVREAD8("mux", ls157_x2_device, output_r))
 	MCFG_PIA_CA2_HANDLER(DEVWRITELINE("mux", ls157_x2_device, select_w))
@@ -1762,7 +1767,7 @@ static MACHINE_CONFIG_DERIVED( inferno, williams2 )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( mysticm, williams2 )
+MACHINE_CONFIG_DERIVED(williams2_state::mysticm, williams2)
 
 	/* basic machine hardware */
 
@@ -1777,7 +1782,7 @@ static MACHINE_CONFIG_DERIVED( mysticm, williams2 )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( tshoot, williams2 )
+MACHINE_CONFIG_DERIVED(tshoot_state::tshoot, williams2)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1804,7 +1809,7 @@ static MACHINE_CONFIG_DERIVED( tshoot, williams2 )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( joust2, williams2 )
+MACHINE_CONFIG_DERIVED(joust2_state::joust2, williams2)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")

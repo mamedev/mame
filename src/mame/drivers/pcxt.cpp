@@ -93,6 +93,8 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<pc_noppi_mb_device> m_mb;
 	optional_device<address_map_bank_device> m_bank;
+	void tetriskr(machine_config &config);
+	void filetto(machine_config &config);
 };
 
 
@@ -480,7 +482,7 @@ static SLOT_INTERFACE_START( filetto_isa8_cards )
 SLOT_INTERFACE_END
 
 
-static MACHINE_CONFIG_START( filetto )
+MACHINE_CONFIG_START(pcxt_state::filetto)
 	MCFG_CPU_ADD("maincpu", I8088, XTAL_14_31818MHz/3)
 	MCFG_CPU_PROGRAM_MAP(filetto_map)
 	MCFG_CPU_IO_MAP(filetto_io)
@@ -501,7 +503,7 @@ static MACHINE_CONFIG_START( filetto )
 	MCFG_ADDRESS_MAP_BANK_STRIDE(0x10000)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( tetriskr )
+MACHINE_CONFIG_START(pcxt_state::tetriskr)
 	MCFG_CPU_ADD("maincpu", I8088, XTAL_14_31818MHz/3)
 	MCFG_CPU_PROGRAM_MAP(tetriskr_map)
 	MCFG_CPU_IO_MAP(tetriskr_io)

@@ -73,6 +73,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	void carrera(machine_config &config);
 };
 
 
@@ -308,7 +309,7 @@ PALETTE_INIT_MEMBER(carrera_state, carrera)
 }
 
 
-static MACHINE_CONFIG_START( carrera )
+MACHINE_CONFIG_START(carrera_state::carrera)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK / 6)
 	MCFG_CPU_PROGRAM_MAP(carrera_map)

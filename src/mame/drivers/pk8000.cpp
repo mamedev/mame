@@ -65,6 +65,7 @@ public:
 	INTERRUPT_GEN_MEMBER(interrupt);
 	IRQ_CALLBACK_MEMBER(irq_callback);
 
+	void pk8000(machine_config &config);
 protected:
 	required_device<cpu_device> m_maincpu;
 	required_device<cassette_image_device> m_cassette;
@@ -355,7 +356,7 @@ uint32_t pk8000_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 	return video_update(screen, bitmap, cliprect, m_ram->pointer());
 }
 
-static MACHINE_CONFIG_START( pk8000 )
+MACHINE_CONFIG_START(pk8000_state::pk8000)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",I8080, 1780000)
 	MCFG_CPU_PROGRAM_MAP(pk8000_mem)

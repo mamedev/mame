@@ -106,6 +106,7 @@ public:
 	uint32_t screen_update_jokrwild(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
+	void jokrwild(machine_config &config);
 };
 
 
@@ -402,7 +403,7 @@ WRITE8_MEMBER(jokrwild_state::testb_w)
 *    Machine Drivers     *
 *************************/
 
-static MACHINE_CONFIG_START( jokrwild )
+MACHINE_CONFIG_START(jokrwild_state::jokrwild)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6809, MASTER_CLOCK/2)  /* guess */

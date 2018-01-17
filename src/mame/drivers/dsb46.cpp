@@ -49,6 +49,7 @@ public:
 	DECLARE_DRIVER_INIT(dsb46);
 	DECLARE_MACHINE_RESET(dsb46);
 
+	void dsb46(machine_config &config);
 private:
 	required_device<cpu_device> m_maincpu;
 };
@@ -102,7 +103,7 @@ static const z80_daisy_config daisy_chain[] =
 };
 
 
-static MACHINE_CONFIG_START( dsb46 )
+MACHINE_CONFIG_START(dsb46_state::dsb46)
 	// basic machine hardware
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_24MHz / 6)
 	MCFG_CPU_PROGRAM_MAP(dsb46_mem)

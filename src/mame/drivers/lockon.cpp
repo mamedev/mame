@@ -480,7 +480,7 @@ void lockon_state::machine_reset()
 	m_main_inten = 0;
 }
 
-static MACHINE_CONFIG_START( lockon )
+MACHINE_CONFIG_START(lockon_state::lockon)
 
 	MCFG_CPU_ADD("maincpu", V30, XTAL_16MHz / 2)
 	MCFG_CPU_PROGRAM_MAP(main_v30)

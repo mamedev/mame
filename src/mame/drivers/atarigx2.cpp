@@ -1494,7 +1494,7 @@ static const atari_rle_objects_config modesc_0x400 =
  *
  *************************************/
 
-static MACHINE_CONFIG_START( atarigx2 )
+MACHINE_CONFIG_START(atarigx2_state::atarigx2)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68EC020, ATARI_CLOCK_14MHz)
@@ -1534,12 +1534,12 @@ static MACHINE_CONFIG_START( atarigx2 )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( atarigx2_0x200, atarigx2 )
+MACHINE_CONFIG_DERIVED(atarigx2_state::atarigx2_0x200, atarigx2)
 	MCFG_DEVICE_ADD("xga", ATARI_136094_0072, 0)
 	MCFG_ATARIRLE_ADD("rle", modesc_0x200)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( atarigx2_0x400, atarigx2 )
+MACHINE_CONFIG_DERIVED(atarigx2_state::atarigx2_0x400, atarigx2)
 	MCFG_DEVICE_ADD("xga", ATARI_136095_0072, 0)
 	MCFG_ATARIRLE_ADD("rle", modesc_0x400)
 MACHINE_CONFIG_END

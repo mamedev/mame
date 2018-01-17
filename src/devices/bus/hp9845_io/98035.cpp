@@ -754,7 +754,7 @@ const tiny_rom_entry *hp98035_io_card_device::device_rom_region() const
 	return ROM_NAME(hp98035);
 }
 
-MACHINE_CONFIG_MEMBER(hp98035_io_card_device::device_add_mconfig)
+MACHINE_CONFIG_START(hp98035_io_card_device::device_add_mconfig)
 	MCFG_CPU_ADD("np" , HP_NANOPROCESSOR , XTAL_1MHz)
 	MCFG_CPU_PROGRAM_MAP(np_program_map)
 	MCFG_CPU_IO_MAP(np_io_map)

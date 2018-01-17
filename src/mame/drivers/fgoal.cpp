@@ -364,7 +364,7 @@ void fgoal_state::machine_reset()
 	m_prev_coin = 0;
 }
 
-static MACHINE_CONFIG_START( fgoal )
+MACHINE_CONFIG_START(fgoal_state::fgoal)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6800, 10065000 / 10) /* ? */

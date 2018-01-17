@@ -50,4 +50,5 @@ public:
 	void draw_box(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_shell(bitmap_ind16 &bitmap, const rectangle &cliprect, int picture_code,
 		int hposition,int vstart,int vstop,int vstretch,int hstretch);
+		void tunhunt(machine_config &config);
 };

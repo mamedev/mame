@@ -128,7 +128,7 @@ void news_state::machine_reset()
 	m_bgpic = 0;
 }
 
-static MACHINE_CONFIG_START( news )
+MACHINE_CONFIG_START(news_state::news)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80,8000000)         /* ? MHz */

@@ -1950,9 +1950,9 @@ void validity_checker::validate_devices()
 				const char *const def_bios = option.second->default_bios();
 				if (def_bios)
 					device_t::static_set_default_bios_tag(*card, def_bios);
-				machine_config_constructor const additions = option.second->machine_config();
+				auto additions = option.second->machine_config();
 				if (additions)
-					(*additions)(*m_current_config, card, card);
+					additions(card);
 
 				for (device_slot_interface &subslot : slot_interface_iterator(*card))
 				{
@@ -1965,9 +1965,9 @@ void validity_checker::validate_devices()
 							const char *const sub_bios = suboption->default_bios();
 							if (sub_bios)
 								device_t::static_set_default_bios_tag(*sub_card, sub_bios);
-							machine_config_constructor const sub_additions = suboption->machine_config();
+							auto sub_additions = suboption->machine_config();
 							if (sub_additions)
-								(*sub_additions)(*m_current_config, sub_card, sub_card);
+								sub_additions(sub_card);
 						}
 					}
 				}

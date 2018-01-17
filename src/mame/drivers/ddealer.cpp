@@ -173,6 +173,7 @@ public:
 	INTERRUPT_GEN_MEMBER(interrupt);
 	TIMER_DEVICE_CALLBACK_MEMBER(mcu_sim);
 	void draw_video_layer(uint16_t* vreg_base, uint16_t* top, uint16_t* bottom, bitmap_ind16 &bitmap, const rectangle &cliprect, int flipy);
+	void ddealer(machine_config &config);
 };
 
 
@@ -616,7 +617,7 @@ INTERRUPT_GEN_MEMBER(ddealer_state::interrupt)
 	device.execute().set_input_line(4, HOLD_LINE);
 }
 
-static MACHINE_CONFIG_START( ddealer )
+MACHINE_CONFIG_START(ddealer_state::ddealer)
 
 	MCFG_CPU_ADD("maincpu" , M68000, XTAL_16MHz/2) /* 8MHz */
 	MCFG_CPU_PROGRAM_MAP(ddealer)

@@ -216,7 +216,7 @@ void pc4_state::machine_start()
 	m_blink = 0;
 }
 
-static MACHINE_CONFIG_START( pc4 )
+MACHINE_CONFIG_START(pc4_state::pc4)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_4MHz)
 	MCFG_CPU_PROGRAM_MAP(pc4_mem)

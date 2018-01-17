@@ -268,7 +268,7 @@ INTERRUPT_GEN_MEMBER(groundfx_state::interrupt)
 	device.execute().set_input_line(4, HOLD_LINE);
 }
 
-static MACHINE_CONFIG_START( groundfx )
+MACHINE_CONFIG_START(groundfx_state::groundfx)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68EC020, XTAL_40MHz/2) /* 20MHz - verified */

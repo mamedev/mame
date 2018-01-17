@@ -224,6 +224,7 @@ public:
 		BEEP_TIMER = 100
 	};
 
+	void octopus(machine_config &config);
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
@@ -865,7 +866,7 @@ SLOT_INTERFACE_START(octopus_centronics_devices)
 	SLOT_INTERFACE("printer", CENTRONICS_PRINTER)
 SLOT_INTERFACE_END
 
-static MACHINE_CONFIG_START( octopus )
+MACHINE_CONFIG_START(octopus_state::octopus)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",I8088, XTAL_24MHz / 3)  // 8MHz
 	MCFG_CPU_PROGRAM_MAP(octopus_mem)

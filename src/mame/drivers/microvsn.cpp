@@ -21,6 +21,7 @@ of the games were clocked at around 500KHz, 550KHz, or 300KHz.
 #include "cpu/mcs48/mcs48.h"
 #include "cpu/tms1000/tms1100.h"
 #include "sound/dac.h"
+#include "sound/volt_reg.h"
 #include "rendlay.h"
 #include "softlist.h"
 #include "screen.h"
@@ -89,6 +90,7 @@ public:
 	pcb_type    m_pcb_type;
 	rc_type     m_rc_type;
 
+	void microvision(machine_config &config);
 protected:
 	required_device<dac_byte_interface> m_dac;
 	required_device<cpu_device> m_i8021;
@@ -636,7 +638,7 @@ static ADDRESS_MAP_START( microvision_8021_io, AS_IO, 8, microvision_state )
 ADDRESS_MAP_END
 
 
-static MACHINE_CONFIG_START( microvision )
+MACHINE_CONFIG_START(microvision_state::microvision)
 	MCFG_CPU_ADD("maincpu1", I8021, 2000000)    // approximately
 	MCFG_CPU_IO_MAP(microvision_8021_io)
 	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(microvision_state, i8021_p1_write))
@@ -672,7 +674,8 @@ static MACHINE_CONFIG_START( microvision )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
 	MCFG_SOUND_ADD("dac", DAC_2BIT_BINARY_WEIGHTED_ONES_COMPLEMENT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25) // unknown DAC
-	MCFG_SOUND_REFERENCE_INPUT(DAC_VREF_POS_INPUT, 1.0) MCFG_SOUND_REFERENCE_INPUT(DAC_VREF_NEG_INPUT, -1.0)
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "microvision_cart")
 	MCFG_GENERIC_MANDATORY

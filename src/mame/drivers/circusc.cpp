@@ -61,6 +61,7 @@ This bug is due to 380_r02.6h, it differs from 380_q02.6h by 2 bytes, at
 #include "machine/konami1.h"
 #include "machine/watchdog.h"
 #include "sound/discrete.h"
+#include "sound/volt_reg.h"
 
 #include "screen.h"
 #include "speaker.h"
@@ -340,7 +341,7 @@ INTERRUPT_GEN_MEMBER(circusc_state::vblank_irq)
 		device.execute().set_input_line(M6809_IRQ_LINE, ASSERT_LINE);
 }
 
-static MACHINE_CONFIG_START( circusc )
+MACHINE_CONFIG_START(circusc_state::circusc)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", KONAMI1, 2048000)        /* 2 MHz? */
@@ -388,7 +389,8 @@ static MACHINE_CONFIG_START( circusc )
 	MCFG_SOUND_ROUTE_EX(0, "fltdisc", 1.0, 1)
 
 	MCFG_SOUND_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE_EX(0, "fltdisc", 1.0, 2) // ls374.7g + r44+r45+r47+r48+r50+r56+r57+r58+r59 (20k) + r46+r49+r51+r52+r53+r54+r55 (10k) + upc324.3h
-	MCFG_SOUND_REFERENCE_INPUT(DAC_VREF_POS_INPUT, 1.0)
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT)
 
 	MCFG_SOUND_ADD("fltdisc", DISCRETE, 0)
 

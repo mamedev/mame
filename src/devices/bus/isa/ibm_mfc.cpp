@@ -372,7 +372,7 @@ ROM_END
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( isa8_ibm_mfc_device::device_add_mconfig )
+MACHINE_CONFIG_START(isa8_ibm_mfc_device::device_add_mconfig)
 	MCFG_CPU_ADD("ibm_mfc", Z80, XTAL_11_8MHz / 2)
 	MCFG_CPU_PROGRAM_MAP(prg_map)
 	MCFG_CPU_IO_MAP(io_map)

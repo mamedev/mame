@@ -34,6 +34,7 @@ public:
 	uint32_t screen_update_x1pce(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	DECLARE_INPUT_CHANGED_MEMBER(ipl_reset);
 	DECLARE_INPUT_CHANGED_MEMBER(nmi_reset);
+	void x1twin(machine_config &config);
 };
 
 
@@ -401,7 +402,7 @@ static SLOT_INTERFACE_START( x1_floppies )
 	SLOT_INTERFACE("dd", FLOPPY_525_DD)
 SLOT_INTERFACE_END
 
-static MACHINE_CONFIG_START( x1twin )
+MACHINE_CONFIG_START(x1twin_state::x1twin)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("x1_cpu", Z80, X1_MAIN_CLOCK/4)
 	MCFG_CPU_PROGRAM_MAP(x1_mem)

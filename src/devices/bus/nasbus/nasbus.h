@@ -111,7 +111,7 @@
 #define MCFG_NASBUS_SLOT_ADD(_tag, _slot_intf, _def_slot) \
 	MCFG_DEVICE_ADD(_tag, NASBUS_SLOT, 0) \
 	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false) \
-	nasbus_slot_device::set_nasbus_slot(*device, owner, NASBUS_TAG);
+	nasbus_slot_device::set_nasbus_slot(*device, this, NASBUS_TAG);
 
 #define MCFG_NASBUS_RAM_DISABLE_HANDLER(_devcb) \
 	devcb = &nasbus_device::set_ram_disable_handler(*device, DEVCB_##_devcb);

@@ -693,7 +693,7 @@ ROM_START( bwg_fdc )
 	ROM_LOAD("bwg_dsr.u15", 0x0000, 0x8000, CRC(06f1ec89) SHA1(6ad77033ed268f986d9a5439e65f7d391c4b7651)) /* BwG disk DSR ROM */
 ROM_END
 
-MACHINE_CONFIG_MEMBER( snug_bwg_device::device_add_mconfig )
+MACHINE_CONFIG_START(snug_bwg_device::device_add_mconfig)
 	MCFG_WD1773_ADD(FDC_TAG, XTAL_8MHz)
 	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(snug_bwg_device, fdc_irq_w))
 	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(snug_bwg_device, fdc_drq_w))

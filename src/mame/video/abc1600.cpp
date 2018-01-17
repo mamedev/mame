@@ -193,7 +193,7 @@ MC6845_ON_UPDATE_ADDR_CHANGED( abc1600_mover_device::crtc_update )
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( abc1600_mover_device::device_add_mconfig )
+MACHINE_CONFIG_START(abc1600_mover_device::device_add_mconfig)
 	MCFG_DEFAULT_LAYOUT(layout_abc1600)
 
 	MCFG_SCREEN_ADD_MONOCHROME(SCREEN_TAG, RASTER, rgb_t::green())

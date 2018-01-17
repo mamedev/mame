@@ -102,6 +102,11 @@ public:
 	DECLARE_PALETTE_INIT(nightgal);
 	uint32_t screen_update_nightgal(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
+	void ngalsumr(machine_config &config);
+	void sexygal(machine_config &config);
+	void sweetgal(machine_config &config);
+	void sgaltrop(machine_config &config);
+	void royalqn(machine_config &config);
 protected:
 	required_ioport m_io_cr_clear;
 	required_ioport m_io_coins;
@@ -735,7 +740,7 @@ void nightgal_state::machine_reset()
 	memset(m_blit_raw_data, 0, ARRAY_LENGTH(m_blit_raw_data));
 }
 
-static MACHINE_CONFIG_START( royalqn )
+MACHINE_CONFIG_START(nightgal_state::royalqn)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80,MASTER_CLOCK / 8)        /* ? MHz */
@@ -768,7 +773,7 @@ static MACHINE_CONFIG_START( royalqn )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( sexygal, royalqn )
+MACHINE_CONFIG_DERIVED(nightgal_state::sexygal, royalqn)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -791,7 +796,7 @@ static MACHINE_CONFIG_DERIVED( sexygal, royalqn )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( sweetgal, sexygal )
+MACHINE_CONFIG_DERIVED(nightgal_state::sweetgal, sexygal)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(sweetgal_map)
 
@@ -799,14 +804,14 @@ static MACHINE_CONFIG_DERIVED( sweetgal, sexygal )
 	MCFG_DEVICE_REMOVE("audiocpu")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( ngalsumr, royalqn )
+MACHINE_CONFIG_DERIVED(nightgal_state::ngalsumr, royalqn)
 	MCFG_CPU_MODIFY("maincpu")
 	// TODO: happens from protection device
 	MCFG_CPU_PERIODIC_INT_DRIVER(nightgal_state, nmi_line_pulse, 60)
 
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( sgaltrop, sexygal )
+MACHINE_CONFIG_DERIVED(nightgal_state::sgaltrop, sexygal)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(sgaltrop_io)
 

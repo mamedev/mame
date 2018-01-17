@@ -228,7 +228,7 @@ GFXDECODE_END
 
 /******************************************************************************/
 
-static MACHINE_CONFIG_START( darkseal )
+MACHINE_CONFIG_START(darkseal_state::darkseal)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz/2) /* Custom chip 59 */

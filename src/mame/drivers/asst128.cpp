@@ -52,6 +52,7 @@ public:
 	DECLARE_WRITE8_MEMBER(asst128_fdc_dor_w);
 
 	void machine_start() override;
+	void asst128(machine_config &config);
 };
 
 void asst128_state::machine_start()
@@ -92,7 +93,7 @@ static DEVICE_INPUT_DEFAULTS_START( asst128 )
 	DEVICE_INPUT_DEFAULTS("DSW0", 0x30, 0x20)
 DEVICE_INPUT_DEFAULTS_END
 
-static MACHINE_CONFIG_START( asst128 )
+MACHINE_CONFIG_START(asst128_state::asst128)
 	MCFG_CPU_ADD("maincpu", I8086, 4772720)
 	MCFG_CPU_PROGRAM_MAP(asst128_map)
 	MCFG_CPU_IO_MAP(asst128_io)

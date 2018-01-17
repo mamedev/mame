@@ -568,7 +568,7 @@ void topspeed_state::machine_reset()
 }
 
 
-static MACHINE_CONFIG_START( topspeed )
+MACHINE_CONFIG_START(topspeed_state::topspeed)
 
 	// basic machine hardware
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz / 2)

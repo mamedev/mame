@@ -410,11 +410,33 @@ public:
 	DECLARE_READ16_MEMBER(joy_or_paddle_ecofghtr_r);
 	DECLARE_WRITE_LINE_MEMBER(m5205_int1);
 	DECLARE_WRITE_LINE_MEMBER(m5205_int2);
+	void cps2(machine_config &config);
+	void gigaman2(machine_config &config);
+	void dead_cps2(machine_config &config);
+	void cawingbl(machine_config &config);
+	void sf2mdt(machine_config &config);
+	void sf2m1(machine_config &config);
+	void kodb(machine_config &config);
+	void varthb(machine_config &config);
+	void sgyxz(machine_config &config);
+	void punipic(machine_config &config);
+	void dinopic(machine_config &config);
+	void slampic(machine_config &config);
+	void sf2b(machine_config &config);
+	void knightsb(machine_config &config);
+	void fcrash(machine_config &config);
+	void sf2m10(machine_config &config);
+	void sf2m3(machine_config &config);
+	void forgottn(machine_config &config);
+	void ganbare(machine_config &config);
+	void qsound(machine_config &config);
+	void cps1_12MHz(machine_config &config);
+	void wofhfh(machine_config &config);
+	void cps1_10MHz(machine_config &config);
+	void pang3(machine_config &config);
 };
 
 /*----------- defined in drivers/cps1.c -----------*/
-
-MACHINE_CONFIG_EXTERN(cps1_12MHz);
 
 ADDRESS_MAP_EXTERN( qsound_sub_map, 8 );
 

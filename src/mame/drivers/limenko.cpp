@@ -114,6 +114,8 @@ public:
 	void draw_single_sprite(bitmap_ind16 &dest_bmp,const rectangle &clip,gfx_element *gfx,uint32_t code,uint32_t color,int flipx,int flipy,int sx,int sy,int priority);
 	void draw_sprites(uint32_t *sprites, const rectangle &cliprect, int count);
 	void copy_sprites(bitmap_ind16 &bitmap, bitmap_ind16 &sprites_bitmap, bitmap_ind8 &priority_bitmap, const rectangle &cliprect);
+	void limenko(machine_config &config);
+	void spotty(machine_config &config);
 };
 
 /*****************************************************************************************************
@@ -730,7 +732,7 @@ GFXDECODE_END
 *****************************************************************************************************/
 
 
-static MACHINE_CONFIG_START( limenko )
+MACHINE_CONFIG_START(limenko_state::limenko)
 	MCFG_CPU_ADD("maincpu", E132XN, 20000000*4) /* 4x internal multiplier */
 	MCFG_CPU_PROGRAM_MAP(limenko_map)
 	MCFG_CPU_IO_MAP(limenko_io_map)
@@ -766,7 +768,7 @@ static MACHINE_CONFIG_START( limenko )
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( spotty )
+MACHINE_CONFIG_START(limenko_state::spotty)
 	MCFG_CPU_ADD("maincpu", GMS30C2232, 20000000)   /* 20 MHz, no internal multiplier */
 	MCFG_CPU_PROGRAM_MAP(spotty_map)
 	MCFG_CPU_IO_MAP(spotty_io_map)

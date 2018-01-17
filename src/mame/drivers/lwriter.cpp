@@ -127,6 +127,7 @@ public:
 	//DECLARE_WRITE_LINE_MEMBER(scc_int);
 	virtual void machine_start () override;
 	virtual void machine_reset () override;
+	void lwriter(machine_config &config);
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<scc8530_device> m_scc;
@@ -349,7 +350,7 @@ WRITE_LINE_MEMBER(lwriter_state::scc_int)
 #define CPU_CLK (XTAL_22_3210MHz / 2) // Based on pictures form here: http://picclick.co.uk/Apple-Postscript-LaserWriter-IINT-Printer-640-4105-M6009-Mainboard-282160713108.html#&gid=1&pid=7
 #define RXC_CLK ((CPU_CLK - (87 * 16 * 70)) / 3) // Tuned to get 9600 baud according to manual, needs rework based on real hardware
 
-static MACHINE_CONFIG_START( lwriter )
+MACHINE_CONFIG_START(lwriter_state::lwriter)
 	MCFG_CPU_ADD("maincpu", M68000, CPU_CLK)
 	MCFG_CPU_PROGRAM_MAP(maincpu_map)
 	MCFG_SCC8530_ADD("scc", CPU_CLK, RXC_CLK, 0, RXC_CLK, 0)

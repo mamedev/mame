@@ -102,7 +102,7 @@ WRITE_LINE_MEMBER( sandy_superqboard_device::busy_w )
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( sandy_superqboard_device::device_add_mconfig )
+MACHINE_CONFIG_START(sandy_superqboard_device::device_add_mconfig)
 	MCFG_DEVICE_ADD(WD1772_TAG, WD1772, XTAL_16MHz/2)
 	MCFG_FLOPPY_DRIVE_ADD(WD1772_TAG":0", sandy_superqboard_floppies, "35hd", sandy_superqboard_device::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(WD1772_TAG":1", sandy_superqboard_floppies, nullptr, sandy_superqboard_device::floppy_formats)

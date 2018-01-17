@@ -232,7 +232,7 @@ GFXDECODE_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( round2 )
+MACHINE_CONFIG_START(cybstorm_state::round2)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68EC020, ATARI_CLOCK_14MHz)
@@ -275,7 +275,7 @@ static MACHINE_CONFIG_START( round2 )
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED( cybstorm, round2 )
+MACHINE_CONFIG_DERIVED(cybstorm_state::cybstorm, round2)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 

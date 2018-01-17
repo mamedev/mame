@@ -85,4 +85,6 @@ public:
 	required_device<okim6295_device> m_oki;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	void kickgoal(machine_config &config);
+	void actionhw(machine_config &config);
 };

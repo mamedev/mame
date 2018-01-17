@@ -245,6 +245,7 @@ dgc (dg(no!spam)cx@mac.com)
 #include "machine/mc68681.h"
 #include "machine/x2212.h"
 #include "sound/dac.h"
+#include "sound/volt_reg.h"
 #include "speaker.h"
 
 
@@ -320,6 +321,7 @@ public:
 	uint16_t dsp_outfifo_r();
 	DECLARE_WRITE_LINE_MEMBER(dectalk_reset);
 
+	void dectalk(machine_config &config);
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
@@ -867,7 +869,7 @@ TIMER_CALLBACK_MEMBER(dectalk_state::outfifo_read_cb)
 	    duart_rx_break(duart, 1, 0);*/
 }
 
-static MACHINE_CONFIG_START( dectalk )
+MACHINE_CONFIG_START(dectalk_state::dectalk)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_20MHz/2) /* E74 20MHz OSC (/2) */
 	MCFG_CPU_PROGRAM_MAP(m68k_mem)
@@ -895,7 +897,8 @@ static MACHINE_CONFIG_START( dectalk )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
 	MCFG_SOUND_ADD("dac", AD7541, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.9) // ad7541.e107 (E88 10KHz OSC, handled by timer)
-	MCFG_SOUND_REFERENCE_INPUT(DAC_VREF_POS_INPUT, 1.0) MCFG_SOUND_REFERENCE_INPUT(DAC_VREF_NEG_INPUT, -1.0)
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 
 	/* Y2 is a 3.579545 MHz xtal for the dtmf decoder chip */
 

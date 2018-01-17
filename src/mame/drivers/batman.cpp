@@ -197,7 +197,7 @@ GFXDECODE_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( batman )
+MACHINE_CONFIG_START(batman_state::batman)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, ATARI_CLOCK_14MHz)

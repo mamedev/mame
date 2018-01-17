@@ -73,6 +73,7 @@ public:
 	void update_plunger();
 	double calc_plunger_pos();
 
+	void videopin(machine_config &config);
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };

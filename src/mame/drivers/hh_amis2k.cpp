@@ -72,6 +72,7 @@ public:
 	void sound_update();
 
 	virtual void machine_start() override;
+	void wildfire(machine_config &config);
 };
 
 
@@ -306,7 +307,7 @@ static const u8 wildfire_7seg_table[0x10] =
 };
 
 
-static MACHINE_CONFIG_START( wildfire )
+MACHINE_CONFIG_START(wildfire_state::wildfire)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", AMI_S2152, MASTER_CLOCK)

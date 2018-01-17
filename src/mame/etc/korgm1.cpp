@@ -33,6 +33,8 @@ public:
 	// screen updates
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
+	void korgm1(machine_config &config);
+
 protected:
 	// driver_device overrides
 	virtual void machine_start();
@@ -160,7 +162,7 @@ PALETTE_INIT_MEMBER(korgm1_state, korgm1)
 {
 }
 
-static MACHINE_CONFIG_START( korgm1, korgm1_state )
+MACHINE_CONFIG_START(korgm1_state::korgm1)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",V30,MAIN_CLOCK) // V50 actually

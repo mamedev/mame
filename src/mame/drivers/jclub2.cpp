@@ -169,6 +169,7 @@ public:
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
+	void jclub2(machine_config &config);
 private:
 	required_device<st0020_device> m_st0020;
 };
@@ -198,6 +199,7 @@ public:
 	DECLARE_WRITE32_MEMBER(cmd2_word_w);
 	DECLARE_READ32_MEMBER(cmd_stat_word_r);
 
+	void jclub2o(machine_config &config);
 private:
 	uint8_t m_cmd1;
 	uint8_t m_cmd2;
@@ -235,6 +237,7 @@ public:
 	DECLARE_DRIVER_INIT(darkhors);
 	DECLARE_VIDEO_START(darkhors);
 
+	void darkhors(machine_config &config);
 private:
 	required_shared_ptr<uint32_t> m_tmapram;
 	required_shared_ptr<uint32_t> m_tmapscroll;
@@ -1110,7 +1113,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(common_state::scanline_irq)
 }
 
 // Older hardware (ST-0020 + ST-0016)
-static MACHINE_CONFIG_START( jclub2o )
+MACHINE_CONFIG_START(jclub2o_state::jclub2o)
 	MCFG_CPU_ADD("gamecpu", M68EC020, 12000000)
 	MCFG_CPU_PROGRAM_MAP(jclub2o_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", common_state, scanline_irq, "screen", 0, 1)
@@ -1149,7 +1152,7 @@ MACHINE_CONFIG_END
 
 
 // Newer hardware (ST-0032)
-static MACHINE_CONFIG_START( jclub2 )
+MACHINE_CONFIG_START(jclub2_state::jclub2)
 	MCFG_CPU_ADD("gamecpu", M68EC020, 12000000)
 	MCFG_CPU_PROGRAM_MAP(jclub2_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", common_state, scanline_irq, "screen", 0, 1)
@@ -1184,7 +1187,7 @@ static MACHINE_CONFIG_START( jclub2 )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( darkhors )
+MACHINE_CONFIG_START(darkhors_state::darkhors)
 	MCFG_CPU_ADD("gamecpu", M68EC020, 12000000) // 36MHz/3 ??
 	MCFG_CPU_PROGRAM_MAP(darkhors_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", common_state, scanline_irq, "screen", 0, 1)

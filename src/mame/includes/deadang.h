@@ -62,4 +62,5 @@ public:
 
 	TIMER_DEVICE_CALLBACK_MEMBER(main_scanline);
 	TIMER_DEVICE_CALLBACK_MEMBER(sub_scanline);
+	void deadang(machine_config &config);
 };

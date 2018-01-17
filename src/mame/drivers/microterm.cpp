@@ -23,13 +23,22 @@ public:
 		, m_p_chargen(*this, "chargen")
 	{ }
 
+	u32 mt5510_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+
 	DECLARE_READ8_MEMBER(c000_r);
 	SCN2674_DRAW_CHARACTER_MEMBER(draw_character);
 
+	void mt420(machine_config &config);
+	void mt5510(machine_config &config);
 private:
 	required_device<cpu_device> m_maincpu;
 	optional_region_ptr<u8> m_p_chargen;
 };
+
+u32 microterm_state::mt5510_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+{
+	return 0;
+}
 
 READ8_MEMBER(microterm_state::c000_r)
 {
@@ -48,7 +57,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( mt420_io_map, AS_IO, 8, microterm_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0xe0, 0xef) AM_DEVREADWRITE("duart", scn2681_device, read, write)
-	AM_RANGE(0xf0, 0xf3) AM_DEVREADWRITE("asci", mc2661_device, read, write)
+	AM_RANGE(0xf0, 0xf3) AM_DEVREADWRITE("aci", mc2661_device, read, write)
 ADDRESS_MAP_END
 
 SCN2674_DRAW_CHARACTER_MEMBER(microterm_state::draw_character)
@@ -73,7 +82,7 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START( microterm )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( mt420 )
+MACHINE_CONFIG_START(microterm_state::mt420)
 	MCFG_CPU_ADD("maincpu", Z80, 4'000'000)
 	MCFG_CPU_PROGRAM_MAP(mt420_mem_map)
 	MCFG_CPU_IO_MAP(mt420_io_map)
@@ -84,27 +93,26 @@ static MACHINE_CONFIG_START( mt420 )
 	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("eeprom", eeprom_serial_93cxx_device, cs_write)) MCFG_DEVCB_BIT(4)
 	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("eeprom", eeprom_serial_93cxx_device, clk_write)) MCFG_DEVCB_BIT(3)
 
-	MCFG_DEVICE_ADD("asci", MC2661, XTAL_3_6864MHz) // SCN2641
+	MCFG_DEVICE_ADD("aci", MC2661, XTAL_3_6864MHz) // SCN2641
 
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 	MCFG_EEPROM_SERIAL_DO_CALLBACK(DEVWRITELINE("duart", scn2681_device, ip6_w))
 
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_SIZE(720, 360)
-	MCFG_SCREEN_VISIBLE_AREA(0, 720-1, 0, 360-1)
+	MCFG_SCREEN_RAW_PARAMS(XTAL_9_87768MHz, 612, 0, 480, 269, 0, 250)
+	//MCFG_SCREEN_RAW_PARAMS(XTAL_15_30072MHz, 948, 0, 792, 269, 0, 250)
 	MCFG_SCREEN_UPDATE_DEVICE("avdc", scn2674_device, screen_update)
 
-	MCFG_DEVICE_ADD("avdc", SCN2674, 4000000)
-	MCFG_SCN2674_TEXT_CHARACTER_WIDTH(8)
-	MCFG_SCN2674_GFX_CHARACTER_WIDTH(8)
+	MCFG_DEVICE_ADD("avdc", SCN2674, XTAL_9_87768MHz / 6)
+	//MCFG_DEVICE_CLOCK(XTAL_15_30072MHz / 6)
+	MCFG_SCN2674_TEXT_CHARACTER_WIDTH(6)
+	MCFG_SCN2674_GFX_CHARACTER_WIDTH(6)
 	MCFG_SCN2674_DRAW_CHARACTER_CALLBACK_OWNER(microterm_state, draw_character)
 	MCFG_DEVICE_ADDRESS_MAP(0, mt420_vram_map)
 	MCFG_VIDEO_SET_SCREEN("screen")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( mt5510 )
+MACHINE_CONFIG_START(microterm_state::mt5510)
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_6MHz)
 	MCFG_CPU_PROGRAM_MAP(mt5510_mem_map)
 	MCFG_CPU_IO_MAP(mt5510_io_map)
@@ -123,6 +131,10 @@ static MACHINE_CONFIG_START( mt5510 )
 
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom2")
 	MCFG_EEPROM_SERIAL_DO_CALLBACK(DEVWRITELINE("duart", scn2681_device, ip5_w))
+
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_RAW_PARAMS(XTAL_45_8304MHz / 2, 1120, 0, 960, 341, 0, 300) // wild guess at resolution
+	MCFG_SCREEN_UPDATE_DRIVER(microterm_state, mt5510_update)
 MACHINE_CONFIG_END
 
 

@@ -173,7 +173,8 @@ const tiny_rom_entry *driver_device::device_rom_region() const
 void driver_device::device_add_mconfig(machine_config &config)
 {
 	assert(m_system);
-	m_system->machine_config(config, this, nullptr);
+	machine_config_delegate creator(m_system->machine_creator, *this);
+	creator(config);
 }
 
 

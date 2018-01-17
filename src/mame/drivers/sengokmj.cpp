@@ -122,6 +122,7 @@ public:
 
 	void draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect,int pri);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void sengokmj(machine_config &config);
 };
 
 
@@ -566,7 +567,7 @@ WRITE16_MEMBER( sengokmj_state::layer_scroll_w )
 }
 
 
-static MACHINE_CONFIG_START( sengokmj )
+MACHINE_CONFIG_START(sengokmj_state::sengokmj)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", V30, 16000000/2) /* V30-8 */

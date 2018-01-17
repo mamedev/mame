@@ -64,6 +64,7 @@ public:
 	DECLARE_WRITE8_MEMBER(i8155_b_w);
 	DECLARE_WRITE8_MEMBER(i8155_c_w);
 	DECLARE_WRITE_LINE_MEMBER(i8155_timer_out);
+	void paranoia(machine_config &config);
 };
 
 
@@ -155,7 +156,7 @@ WRITE_LINE_MEMBER(paranoia_state::i8155_timer_out)
 	//logerror("Timer out %d\n", state);
 }
 
-static MACHINE_CONFIG_START( paranoia )
+MACHINE_CONFIG_START(paranoia_state::paranoia)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", H6280, PCE_MAIN_CLOCK/3)
 	MCFG_CPU_PROGRAM_MAP(pce_mem)

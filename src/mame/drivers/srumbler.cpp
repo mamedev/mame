@@ -243,7 +243,7 @@ GFXDECODE_END
 
 
 
-static MACHINE_CONFIG_START( srumbler )
+MACHINE_CONFIG_START(srumbler_state::srumbler)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", MC6809, 6000000)        /* HD68B09P at 6 MHz (?) */

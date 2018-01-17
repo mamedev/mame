@@ -93,4 +93,5 @@ public:
 	// video/topspeed.c
 	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_topspeed(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void topspeed(machine_config &config);
 };

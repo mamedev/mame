@@ -265,7 +265,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(deadang_state::sub_scanline)
 
 /* Machine Drivers */
 
-static MACHINE_CONFIG_START( deadang )
+MACHINE_CONFIG_START(deadang_state::deadang)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", V30,XTAL_16MHz/2) /* Sony 8623h9 CXQ70116D-8 (V30 compatible) */

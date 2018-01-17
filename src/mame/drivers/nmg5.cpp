@@ -294,6 +294,11 @@ public:
 	virtual void video_start() override;
 	uint32_t screen_update_nmg5(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_bitmap( bitmap_ind16 &bitmap );
+	void nmg5(machine_config &config);
+	void pclubys(machine_config &config);
+	void garogun(machine_config &config);
+	void searchp2(machine_config &config);
+	void _7ordi(machine_config &config);
 };
 
 
@@ -974,7 +979,7 @@ void nmg5_state::machine_reset()
 	m_input_data = 0;
 }
 
-static MACHINE_CONFIG_START( nmg5 )
+MACHINE_CONFIG_START(nmg5_state::nmg5)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 16000000)   /* 16 MHz */
@@ -1020,7 +1025,7 @@ static MACHINE_CONFIG_START( nmg5 )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( garogun, nmg5 )
+MACHINE_CONFIG_DERIVED(nmg5_state::garogun, nmg5)
 
 	/* basic machine hardware */
 
@@ -1032,7 +1037,7 @@ static MACHINE_CONFIG_DERIVED( garogun, nmg5 )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( pclubys, nmg5 )
+MACHINE_CONFIG_DERIVED(nmg5_state::pclubys, nmg5)
 
 	/* basic machine hardware */
 
@@ -1045,7 +1050,7 @@ static MACHINE_CONFIG_DERIVED( pclubys, nmg5 )
 	MCFG_GFXDECODE_MODIFY("gfxdecode", pclubys)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( searchp2, nmg5 )
+MACHINE_CONFIG_DERIVED(nmg5_state::searchp2, nmg5)
 
 	/* basic machine hardware */
 
@@ -1055,7 +1060,7 @@ static MACHINE_CONFIG_DERIVED( searchp2, nmg5 )
 	MCFG_GFXDECODE_MODIFY("gfxdecode", pclubys)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( 7ordi, nmg5 )
+MACHINE_CONFIG_DERIVED(nmg5_state::_7ordi, nmg5)
 
 	/* basic machine hardware */
 
@@ -1590,6 +1595,6 @@ GAME( 1999, searchp2,  0,        searchp2, searchp2,  nmg5_state, prot_val_10, R
 GAME( 2000, pclubys,   0,        pclubys,  pclubys,   nmg5_state, prot_val_10, ROT0, "Yun Sung", "Puzzle Club (Yun Sung, set 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 2000, pclubysa,  pclubys,  pclubys,  pclubys,   nmg5_state, prot_val_10, ROT0, "Yun Sung", "Puzzle Club (Yun Sung, set 2)", MACHINE_SUPPORTS_SAVE )
 GAME( 2000, garogun,   0,        garogun,  garogun,   nmg5_state, prot_val_40, ROT0, "Yun Sung", "Garogun Seroyang (Korea)", MACHINE_SUPPORTS_SAVE )
-GAME( 2002, 7ordi,     0,        7ordi,    7ordi,     nmg5_state, prot_val_20, ROT0, "Yun Sung", "7 Ordi (Korea)", MACHINE_SUPPORTS_SAVE )
+GAME( 2002, 7ordi,     0,        _7ordi,   7ordi,     nmg5_state, prot_val_20, ROT0, "Yun Sung", "7 Ordi (Korea)", MACHINE_SUPPORTS_SAVE )
 GAME( ????, wondstck,  0,        nmg5,     wondstck,  nmg5_state, prot_val_00, ROT0, "Yun Sung", "Wonder Stick (set 1)", MACHINE_SUPPORTS_SAVE )
 GAME( ????, wondstcka, wondstck, nmg5,     wondstck,  nmg5_state, prot_val_00, ROT0, "Yun Sung", "Wonder Stick (set 2, censored)", MACHINE_SUPPORTS_SAVE )

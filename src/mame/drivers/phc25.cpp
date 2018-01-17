@@ -306,7 +306,7 @@ void phc25_state::video_start()
 
 /* Machine Driver */
 
-static MACHINE_CONFIG_START( phc25 )
+MACHINE_CONFIG_START(phc25_state::phc25)
 	/* basic machine hardware */
 	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL_4MHz)
 	MCFG_CPU_PROGRAM_MAP(phc25_mem)
@@ -340,7 +340,7 @@ static MACHINE_CONFIG_START( phc25 )
 	MCFG_SOFTWARE_LIST_ADD("cass_list", "phc25_cass")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( pal, phc25 )
+MACHINE_CONFIG_DERIVED(phc25_state::pal, phc25)
 	/* video hardware */
 	MCFG_SCREEN_MC6847_PAL_ADD(SCREEN_TAG, MC6847_TAG)
 
@@ -352,7 +352,7 @@ static MACHINE_CONFIG_DERIVED( pal, phc25 )
 	// other lines not connected
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( ntsc, phc25 )
+MACHINE_CONFIG_DERIVED(phc25_state::ntsc, phc25)
 	/* video hardware */
 	MCFG_SCREEN_MC6847_NTSC_ADD(SCREEN_TAG, MC6847_TAG)
 

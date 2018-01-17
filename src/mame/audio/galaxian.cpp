@@ -25,6 +25,7 @@ TODO:
 #include "emu.h"
 #include "audio/galaxian.h"
 #include "includes/galaxian.h"
+#include "includes/galaxold.h"
 
 /*************************************
  *
@@ -495,7 +496,7 @@ void galaxian_sound_device::sound_stream_update(sound_stream &stream, stream_sam
  *
  *************************************/
 
-MACHINE_CONFIG_START( galaxian_audio )
+MACHINE_CONFIG_START(galaxold_state::galaxian_audio)
 
 	MCFG_SOUND_ADD("cust", GALAXIAN, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.4)
@@ -505,7 +506,28 @@ MACHINE_CONFIG_START( galaxian_audio )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START( mooncrst_audio )
+MACHINE_CONFIG_START(galaxold_state::mooncrst_audio)
+
+	MCFG_SOUND_ADD("cust", GALAXIAN, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.4)
+
+	MCFG_SOUND_ADD(GAL_AUDIO, DISCRETE, 0)
+	MCFG_DISCRETE_INTF(mooncrst)
+
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
+MACHINE_CONFIG_END
+
+MACHINE_CONFIG_START(galaxian_state::galaxian_audio)
+
+	MCFG_SOUND_ADD("cust", GALAXIAN, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.4)
+
+	MCFG_SOUND_ADD(GAL_AUDIO, DISCRETE, 0)
+	MCFG_DISCRETE_INTF(galaxian)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
+MACHINE_CONFIG_END
+
+MACHINE_CONFIG_START(galaxian_state::mooncrst_audio)
 
 	MCFG_SOUND_ADD("cust", GALAXIAN, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.4)

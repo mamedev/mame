@@ -81,7 +81,7 @@ void a26_rom_harmony_device::device_start()
 static ADDRESS_MAP_START( harmony_arm7_map, AS_PROGRAM, 32, a26_rom_harmony_device )
 ADDRESS_MAP_END
 
-MACHINE_CONFIG_MEMBER( a26_rom_harmony_device::device_add_mconfig )
+MACHINE_CONFIG_START(a26_rom_harmony_device::device_add_mconfig)
 	MCFG_CPU_ADD("arm", LPC2103, 70000000)
 	MCFG_CPU_PROGRAM_MAP(harmony_arm7_map)
 MACHINE_CONFIG_END

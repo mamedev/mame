@@ -28,6 +28,7 @@ Paste facility was tested but doesn't work, so all code remnants removed.
 #include "formats/rk_cas.h"
 #include "softlist.h"
 #include "ut88mini.lh"
+#include "sound/volt_reg.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -182,7 +183,7 @@ static INPUT_PORTS_START( ut88mini )
 INPUT_PORTS_END
 
 /* Machine driver */
-static MACHINE_CONFIG_START( ut88 )
+MACHINE_CONFIG_START(ut88_state::ut88)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8080, 2000000)
 	MCFG_CPU_PROGRAM_MAP(ut88_mem)
@@ -205,7 +206,8 @@ static MACHINE_CONFIG_START( ut88 )
 	/* audio hardware */
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
 	MCFG_SOUND_ADD("dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
-	MCFG_SOUND_REFERENCE_INPUT(DAC_VREF_POS_INPUT, 1.0)
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT)
 
 	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
@@ -224,7 +226,7 @@ static MACHINE_CONFIG_START( ut88 )
 	MCFG_SOFTWARE_LIST_ADD("cass_list","ut88")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( ut88mini )
+MACHINE_CONFIG_START(ut88_state::ut88mini)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8080, 2000000)
 	MCFG_CPU_PROGRAM_MAP(ut88mini_mem)

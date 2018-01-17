@@ -45,6 +45,8 @@ public:
 
 	DECLARE_WRITE16_MEMBER( write_protect_w );
 
+	void a1000(machine_config &config);
+	void a1000n(machine_config &config);
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -75,6 +77,8 @@ public:
 	DECLARE_READ16_MEMBER( clock_r );
 	DECLARE_WRITE16_MEMBER( clock_w );
 
+	void a2000(machine_config &config);
+	void a2000n(machine_config &config);
 protected:
 	virtual void machine_reset() override;
 
@@ -108,6 +112,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( side_int2_w );
 	DECLARE_WRITE_LINE_MEMBER( side_int6_w );
 
+	void a500n(machine_config &config);
+	void a500(machine_config &config);
 protected:
 	virtual void machine_reset() override;
 
@@ -152,6 +158,8 @@ public:
 	DECLARE_WRITE8_MEMBER( tpi_port_b_write );
 	DECLARE_WRITE_LINE_MEMBER( tpi_int_w );
 
+	void cdtv(machine_config &config);
+	void cdtvn(machine_config &config);
 protected:
 	// driver_device overrides
 	virtual void machine_start() override;
@@ -187,6 +195,8 @@ public:
 	DECLARE_DRIVER_INIT( pal );
 	DECLARE_DRIVER_INIT( ntsc );
 
+	void a3000(machine_config &config);
+	void a3000n(machine_config &config);
 protected:
 
 private:
@@ -209,6 +219,8 @@ public:
 	DECLARE_DRIVER_INIT( pal );
 	DECLARE_DRIVER_INIT( ntsc );
 
+	void a500pn(machine_config &config);
+	void a500p(machine_config &config);
 protected:
 	virtual void machine_reset() override;
 
@@ -241,6 +253,8 @@ public:
 
 	static const uint8_t GAYLE_ID = 0xd0;
 
+	void a600n(machine_config &config);
+	void a600(machine_config &config);
 protected:
 	virtual bool int2_pending() override;
 
@@ -263,6 +277,8 @@ public:
 
 	static const uint8_t GAYLE_ID = 0xd1;
 
+	void a1200(machine_config &config);
+	void a1200n(machine_config &config);
 protected:
 	virtual bool int2_pending() override;
 
@@ -294,6 +310,12 @@ public:
 	DECLARE_DRIVER_INIT( pal );
 	DECLARE_DRIVER_INIT( ntsc );
 
+	void a400030n(machine_config &config);
+	void a4000tn(machine_config &config);
+	void a4000t(machine_config &config);
+	void a4000n(machine_config &config);
+	void a4000(machine_config &config);
+	void a400030(machine_config &config);
 protected:
 
 private:
@@ -333,6 +355,8 @@ public:
 	int m_cd32_shifter[2];
 	uint16_t m_potgo_value;
 
+	void cd32n(machine_config &config);
+	void cd32(machine_config &config);
 protected:
 	// amiga_state overrides
 	virtual void potgo_w(uint16_t data) override;
@@ -1310,7 +1334,7 @@ static SLOT_INTERFACE_START( amiga_floppies )
 SLOT_INTERFACE_END
 
 // basic elements common to all amigas
-static MACHINE_CONFIG_START( amiga_base )
+MACHINE_CONFIG_START(amiga_state::amiga_base)
 	// video
 	MCFG_FRAGMENT_ADD(pal_video)
 
@@ -1389,7 +1413,7 @@ static MACHINE_CONFIG_START( amiga_base )
 	MCFG_SOFTWARE_LIST_ADD("ocs_list", "amigaocs_flop")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( a1000, amiga_base )
+MACHINE_CONFIG_DERIVED(a1000_state::a1000, amiga_base)
 	// main cpu
 	MCFG_CPU_ADD("maincpu", M68000, amiga_state::CLK_7M_PAL)
 	MCFG_CPU_PROGRAM_MAP(a1000_mem)
@@ -1411,7 +1435,7 @@ static MACHINE_CONFIG_DERIVED( a1000, amiga_base )
 	MCFG_SOFTWARE_LIST_ADD("a1000_list", "amiga_a1000")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( a1000n, a1000 )
+MACHINE_CONFIG_DERIVED(a1000_state::a1000n, a1000)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_CLOCK(amiga_state::CLK_7M_NTSC)
 	MCFG_DEVICE_REMOVE("screen")
@@ -1426,7 +1450,7 @@ static MACHINE_CONFIG_DERIVED( a1000n, a1000 )
 	MCFG_DEVICE_CLOCK(amiga_state::CLK_7M_NTSC)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( a2000, amiga_base )
+MACHINE_CONFIG_DERIVED(a2000_state::a2000, amiga_base)
 	// main cpu
 	MCFG_CPU_ADD("maincpu", M68000, amiga_state::CLK_7M_PAL)
 	MCFG_CPU_PROGRAM_MAP(a2000_mem)
@@ -1455,7 +1479,7 @@ static MACHINE_CONFIG_DERIVED( a2000, amiga_base )
 	MCFG_ZORRO2_SLOT_ADD("zorro5", zorro2_cards, nullptr)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( a2000n, a2000 )
+MACHINE_CONFIG_DERIVED(a2000_state::a2000n, a2000)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_CLOCK(amiga_state::CLK_7M_NTSC)
 	MCFG_DEVICE_REMOVE("screen")
@@ -1470,7 +1494,7 @@ static MACHINE_CONFIG_DERIVED( a2000n, a2000 )
 	MCFG_DEVICE_CLOCK(amiga_state::CLK_7M_NTSC)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( a500, amiga_base )
+MACHINE_CONFIG_DERIVED(a500_state::a500, amiga_base)
 	// main cpu
 	MCFG_CPU_ADD("maincpu", M68000, amiga_state::CLK_7M_PAL)
 	MCFG_CPU_PROGRAM_MAP(a500_mem)
@@ -1489,7 +1513,7 @@ static MACHINE_CONFIG_DERIVED( a500, amiga_base )
 	MCFG_EXPANSION_SLOT_INT6_HANDLER(WRITELINE(a500_state, side_int6_w))
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( a500n, a500 )
+MACHINE_CONFIG_DERIVED(a500_state::a500n, a500)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_CLOCK(amiga_state::CLK_7M_NTSC)
 	MCFG_DEVICE_REMOVE("screen")
@@ -1504,7 +1528,7 @@ static MACHINE_CONFIG_DERIVED( a500n, a500 )
 	MCFG_DEVICE_CLOCK(amiga_state::CLK_7M_NTSC)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( cdtv, amiga_base )
+MACHINE_CONFIG_DERIVED(cdtv_state::cdtv, amiga_base)
 	// main cpu
 	MCFG_CPU_ADD("maincpu", M68000, amiga_state::CLK_7M_PAL)
 	MCFG_CPU_PROGRAM_MAP(cdtv_mem)
@@ -1561,7 +1585,7 @@ static MACHINE_CONFIG_DERIVED( cdtv, amiga_base )
 	MCFG_SOFTWARE_LIST_ADD("cd_list", "cdtv")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( cdtvn, cdtv )
+MACHINE_CONFIG_DERIVED(cdtv_state::cdtvn, cdtv)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_CLOCK(amiga_state::CLK_7M_NTSC)
 	MCFG_DEVICE_REMOVE("screen")
@@ -1578,7 +1602,7 @@ static MACHINE_CONFIG_DERIVED( cdtvn, cdtv )
 	MCFG_DEVICE_CLOCK(amiga_state::CLK_7M_NTSC)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( a3000, amiga_base )
+MACHINE_CONFIG_DERIVED(a3000_state::a3000, amiga_base)
 	// main cpu
 	MCFG_CPU_ADD("maincpu", M68030, XTAL_32MHz / 2)
 	MCFG_CPU_PROGRAM_MAP(a3000_mem)
@@ -1600,7 +1624,7 @@ static MACHINE_CONFIG_DERIVED( a3000, amiga_base )
 	MCFG_SOFTWARE_LIST_ADD("ecs_list", "amigaecs_flop")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( a3000n, a3000 )
+MACHINE_CONFIG_DERIVED(a3000_state::a3000n, a3000)
 	MCFG_DEVICE_REMOVE("screen")
 	MCFG_FRAGMENT_ADD(ntsc_video)
 	MCFG_DEVICE_MODIFY("cia_0")
@@ -1611,7 +1635,7 @@ static MACHINE_CONFIG_DERIVED( a3000n, a3000 )
 	MCFG_DEVICE_CLOCK(amiga_state::CLK_7M_NTSC)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( a500p, amiga_base )
+MACHINE_CONFIG_DERIVED(a500p_state::a500p, amiga_base)
 	// main cpu
 	MCFG_CPU_ADD("maincpu", M68000, amiga_state::CLK_7M_PAL)
 	MCFG_CPU_PROGRAM_MAP(a500p_mem)
@@ -1633,7 +1657,7 @@ static MACHINE_CONFIG_DERIVED( a500p, amiga_base )
 	MCFG_SOFTWARE_LIST_ADD("ecs_list", "amigaecs_flop")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( a500pn, a500p )
+MACHINE_CONFIG_DERIVED(a500p_state::a500pn, a500p)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_CLOCK(amiga_state::CLK_7M_NTSC)
 	MCFG_DEVICE_REMOVE("screen")
@@ -1648,7 +1672,7 @@ static MACHINE_CONFIG_DERIVED( a500pn, a500p )
 	MCFG_DEVICE_CLOCK(amiga_state::CLK_7M_NTSC)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( a600, amiga_base )
+MACHINE_CONFIG_DERIVED(a600_state::a600, amiga_base)
 	// main cpu
 	MCFG_CPU_ADD("maincpu", M68000, amiga_state::CLK_7M_PAL)
 	MCFG_CPU_PROGRAM_MAP(a600_mem)
@@ -1676,7 +1700,7 @@ static MACHINE_CONFIG_DERIVED( a600, amiga_base )
 	MCFG_SOFTWARE_LIST_ADD("ecs_list", "amigaecs_flop")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( a600n, a600 )
+MACHINE_CONFIG_DERIVED(a600_state::a600n, a600)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_CLOCK(amiga_state::CLK_7M_NTSC)
 	MCFG_DEVICE_MODIFY("gayle")
@@ -1693,7 +1717,7 @@ static MACHINE_CONFIG_DERIVED( a600n, a600 )
 	MCFG_DEVICE_CLOCK(amiga_state::CLK_7M_NTSC)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( a1200, amiga_base )
+MACHINE_CONFIG_DERIVED(a1200_state::a1200, amiga_base)
 	// main cpu
 	MCFG_CPU_ADD("maincpu", M68EC020, amiga_state::CLK_28M_PAL / 2)
 	MCFG_CPU_PROGRAM_MAP(a1200_mem)
@@ -1736,7 +1760,7 @@ static MACHINE_CONFIG_DERIVED( a1200, amiga_base )
 	MCFG_SOFTWARE_LIST_ADD("ecs_list", "amigaecs_flop")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( a1200n, a1200 )
+MACHINE_CONFIG_DERIVED(a1200_state::a1200n, a1200)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_CLOCK(amiga_state::CLK_28M_NTSC / 2)
 	MCFG_DEVICE_MODIFY("gayle")
@@ -1756,7 +1780,7 @@ static MACHINE_CONFIG_DERIVED( a1200n, a1200 )
 	MCFG_DEVICE_CLOCK(amiga_state::CLK_7M_NTSC)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( a4000, amiga_base )
+MACHINE_CONFIG_DERIVED(a4000_state::a4000, amiga_base)
 	// main cpu
 	MCFG_CPU_ADD("maincpu", M68040, XTAL_50MHz / 2)
 	MCFG_CPU_PROGRAM_MAP(a4000_mem)
@@ -1790,7 +1814,7 @@ static MACHINE_CONFIG_DERIVED( a4000, amiga_base )
 	MCFG_SOFTWARE_LIST_ADD("ecs_list", "amigaecs_flop")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( a4000n, a4000 )
+MACHINE_CONFIG_DERIVED(a4000_state::a4000n, a4000)
 	MCFG_DEVICE_REMOVE("screen")
 	MCFG_FRAGMENT_ADD(ntsc_video)
 	MCFG_DEVICE_MODIFY("screen")
@@ -1806,7 +1830,7 @@ static MACHINE_CONFIG_DERIVED( a4000n, a4000 )
 	MCFG_DEVICE_CLOCK(amiga_state::CLK_7M_NTSC)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( a400030, a4000 )
+MACHINE_CONFIG_DERIVED(a4000_state::a400030, a4000)
 	// main cpu
 	MCFG_DEVICE_REMOVE("maincpu")
 	MCFG_CPU_ADD("maincpu", M68EC030, XTAL_50MHz / 2)
@@ -1815,7 +1839,7 @@ static MACHINE_CONFIG_DERIVED( a400030, a4000 )
 	// todo: ide
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( a400030n, a400030 )
+MACHINE_CONFIG_DERIVED(a4000_state::a400030n, a400030)
 	MCFG_DEVICE_REMOVE("screen")
 	MCFG_FRAGMENT_ADD(ntsc_video)
 	MCFG_DEVICE_MODIFY("screen")
@@ -1831,7 +1855,7 @@ static MACHINE_CONFIG_DERIVED( a400030n, a400030 )
 	MCFG_DEVICE_CLOCK(amiga_state::CLK_7M_NTSC)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( cd32, amiga_base )
+MACHINE_CONFIG_DERIVED(cd32_state::cd32, amiga_base)
 	// main cpu
 	MCFG_CPU_ADD("maincpu", M68EC020, amiga_state::CLK_28M_PAL / 2)
 	MCFG_CPU_PROGRAM_MAP(cd32_mem)
@@ -1877,7 +1901,7 @@ static MACHINE_CONFIG_DERIVED( cd32, amiga_base )
 	MCFG_DEVICE_REMOVE("kbd")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( cd32n, cd32 )
+MACHINE_CONFIG_DERIVED(cd32_state::cd32n, cd32)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_CLOCK(amiga_state::CLK_28M_NTSC / 2)
 	MCFG_DEVICE_REMOVE("screen")
@@ -1895,7 +1919,7 @@ static MACHINE_CONFIG_DERIVED( cd32n, cd32 )
 	MCFG_DEVICE_CLOCK(amiga_state::CLK_7M_NTSC)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( a4000t, a4000 )
+MACHINE_CONFIG_DERIVED(a4000_state::a4000t, a4000)
 	// main cpu
 	MCFG_DEVICE_REMOVE("maincpu")
 	MCFG_CPU_ADD("maincpu", M68040, XTAL_50MHz / 2)
@@ -1904,7 +1928,7 @@ static MACHINE_CONFIG_DERIVED( a4000t, a4000 )
 	// todo: ide, zorro3, scsi, super dmac
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( a4000tn, a4000 )
+MACHINE_CONFIG_DERIVED(a4000_state::a4000tn, a4000)
 	MCFG_DEVICE_REMOVE("screen")
 	MCFG_FRAGMENT_ADD(ntsc_video)
 	MCFG_DEVICE_MODIFY("screen")

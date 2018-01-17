@@ -104,7 +104,7 @@ ROM_END
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( a2bus_videx160_device::device_add_mconfig )
+MACHINE_CONFIG_START(a2bus_videx160_device::device_add_mconfig)
 	MCFG_SCREEN_ADD( ULTRATERM_SCREEN_NAME, RASTER)
 	MCFG_SCREEN_RAW_PARAMS(CLOCK_LOW, 882, 0, 720, 370, 0, 350 )
 	MCFG_SCREEN_UPDATE_DEVICE( ULTRATERM_MC6845_NAME, mc6845_device, screen_update )

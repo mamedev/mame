@@ -902,7 +902,7 @@ void wgp_state::machine_start()
 	machine().save().register_postload(save_prepost_delegate(FUNC(wgp_state::postload), this));
 }
 
-static MACHINE_CONFIG_START( wgp )
+MACHINE_CONFIG_START(wgp_state::wgp)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 12000000)   /* 12 MHz ??? */
@@ -962,7 +962,7 @@ static MACHINE_CONFIG_START( wgp )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( wgp2, wgp )
+MACHINE_CONFIG_DERIVED(wgp_state::wgp2, wgp)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(12000))
 	/* video hardware */

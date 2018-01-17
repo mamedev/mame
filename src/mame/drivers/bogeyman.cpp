@@ -228,7 +228,7 @@ WRITE8_MEMBER(bogeyman_state::colbank_w)
 	}
 }
 
-static MACHINE_CONFIG_START( bogeyman )
+MACHINE_CONFIG_START(bogeyman_state::bogeyman)
 
 	// basic machine hardware
 	MCFG_CPU_ADD("maincpu", M6502, 1500000) /* Verified */

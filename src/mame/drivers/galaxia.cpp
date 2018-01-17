@@ -284,7 +284,7 @@ static GFXDECODE_START( astrowar )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( galaxia )
+MACHINE_CONFIG_START(galaxia_state::galaxia)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", S2650, XTAL_14_31818MHz/8)
@@ -328,7 +328,7 @@ static MACHINE_CONFIG_START( galaxia )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( astrowar )
+MACHINE_CONFIG_START(galaxia_state::astrowar)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", S2650, XTAL_14_31818MHz/8)

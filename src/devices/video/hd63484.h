@@ -26,7 +26,7 @@
 	MCFG_DEVICE_ADDRESS_MAP(0, _map)
 
 #define MCFG_HD63484_DISPLAY_CALLBACK_OWNER(_class, _method) \
-	hd63484_device::static_set_display_callback(*device, hd63484_device::display_delegate(&_class::_method, #_class "::" #_method, downcast<_class *>(owner)));
+	hd63484_device::static_set_display_callback(*device, hd63484_device::display_delegate(&_class::_method, #_class "::" #_method, this));
 
 #define MCFG_HD63484_AUTO_CONFIGURE_SCREEN(_val) \
 	hd63484_device::static_set_auto_configure_screen(*device, _val);

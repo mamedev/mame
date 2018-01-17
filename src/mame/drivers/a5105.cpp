@@ -71,6 +71,7 @@ public:
 	UPD7220_DISPLAY_PIXELS_MEMBER( hgdc_display_pixels );
 	UPD7220_DRAW_TEXT_LINE_MEMBER( hgdc_draw_text );
 
+	void a5105(machine_config &config);
 private:
 	uint8_t *m_ram_base;
 	uint8_t *m_rom_base;
@@ -556,7 +557,7 @@ static const z80_daisy_config a5105_daisy_chain[] =
 	{ nullptr }
 };
 
-static MACHINE_CONFIG_START( a5105 )
+MACHINE_CONFIG_START(a5105_state::a5105)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80, XTAL_15MHz / 4)
 	MCFG_CPU_PROGRAM_MAP(a5105_mem)

@@ -38,6 +38,7 @@ Notes:
 #include "sound/3812intf.h"
 #include "sound/ay8910.h"
 #include "sound/dac.h"
+#include "sound/volt_reg.h"
 #include "speaker.h"
 
 
@@ -1313,7 +1314,7 @@ static INPUT_PORTS_START( av2mj2rg )
 INPUT_PORTS_END
 
 
-static MACHINE_CONFIG_START( nbmjdrv1 ) // galkoku
+MACHINE_CONFIG_START(nbmj8991_state::nbmjdrv1) // galkoku
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 25000000/5)        /* 5.00 MHz ? */
@@ -1340,11 +1341,12 @@ static MACHINE_CONFIG_START( nbmjdrv1 ) // galkoku
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.7)
 
 	MCFG_SOUND_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25) // unknown DAC
-	MCFG_SOUND_REFERENCE_INPUT(DAC_VREF_POS_INPUT, 1.0) MCFG_SOUND_REFERENCE_INPUT(DAC_VREF_NEG_INPUT, -1.0)
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( nbmjdrv2 ) // pstadium
+MACHINE_CONFIG_START(nbmj8991_state::nbmjdrv2) // pstadium
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 6000000/2) /* 3.00 MHz */
@@ -1379,13 +1381,14 @@ static MACHINE_CONFIG_START( nbmjdrv2 ) // pstadium
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.7)
 
 	MCFG_SOUND_ADD("dac1", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25) // unknown DAC
-	MCFG_SOUND_REFERENCE_INPUT(DAC_VREF_POS_INPUT, 1.0) MCFG_SOUND_REFERENCE_INPUT(DAC_VREF_NEG_INPUT, -1.0)
 	MCFG_SOUND_ADD("dac2", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25) // unknown DAC
-	MCFG_SOUND_REFERENCE_INPUT(DAC_VREF_POS_INPUT, 1.0) MCFG_SOUND_REFERENCE_INPUT(DAC_VREF_NEG_INPUT, -1.0)
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac1", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac1", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE_EX(0, "dac2", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac2", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( nbmjdrv3, nbmjdrv1 )
+MACHINE_CONFIG_DERIVED(nbmj8991_state::nbmjdrv3, nbmjdrv1)
 
 	/* basic machine hardware */
 
@@ -1399,7 +1402,7 @@ MACHINE_CONFIG_END
 
 // ---------------------------------------------------------------------
 
-static MACHINE_CONFIG_DERIVED( galkoku, nbmjdrv1 )
+MACHINE_CONFIG_DERIVED(nbmj8991_state::galkoku, nbmjdrv1)
 
 	/* basic machine hardware */
 	MCFG_DEVICE_MODIFY("nb1413m3")
@@ -1407,7 +1410,7 @@ static MACHINE_CONFIG_DERIVED( galkoku, nbmjdrv1 )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( galkaika, nbmjdrv1 )
+MACHINE_CONFIG_DERIVED(nbmj8991_state::galkaika, nbmjdrv1)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1418,7 +1421,7 @@ static MACHINE_CONFIG_DERIVED( galkaika, nbmjdrv1 )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( tokyogal, nbmjdrv1 )
+MACHINE_CONFIG_DERIVED(nbmj8991_state::tokyogal, nbmjdrv1)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1429,7 +1432,7 @@ static MACHINE_CONFIG_DERIVED( tokyogal, nbmjdrv1 )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( tokimbsj, nbmjdrv1 )
+MACHINE_CONFIG_DERIVED(nbmj8991_state::tokimbsj, nbmjdrv1)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1442,7 +1445,7 @@ static MACHINE_CONFIG_DERIVED( tokimbsj, nbmjdrv1 )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( mcontest, nbmjdrv1 )
+MACHINE_CONFIG_DERIVED(nbmj8991_state::mcontest, nbmjdrv1)
 
 	/* basic machine hardware */
 	MCFG_DEVICE_MODIFY("nb1413m3")
@@ -1450,7 +1453,7 @@ static MACHINE_CONFIG_DERIVED( mcontest, nbmjdrv1 )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( uchuuai, nbmjdrv1 )
+MACHINE_CONFIG_DERIVED(nbmj8991_state::uchuuai, nbmjdrv1)
 
 	/* basic machine hardware */
 	MCFG_DEVICE_MODIFY("nb1413m3")
@@ -1458,7 +1461,7 @@ static MACHINE_CONFIG_DERIVED( uchuuai, nbmjdrv1 )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( hyouban, nbmjdrv3 )
+MACHINE_CONFIG_DERIVED(nbmj8991_state::hyouban, nbmjdrv3)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1471,7 +1474,7 @@ static MACHINE_CONFIG_DERIVED( hyouban, nbmjdrv3 )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( pstadium, nbmjdrv2 )
+MACHINE_CONFIG_DERIVED(nbmj8991_state::pstadium, nbmjdrv2)
 
 	/* basic machine hardware */
 	MCFG_DEVICE_MODIFY("nb1413m3")
@@ -1479,7 +1482,7 @@ static MACHINE_CONFIG_DERIVED( pstadium, nbmjdrv2 )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( triplew1, nbmjdrv2 )
+MACHINE_CONFIG_DERIVED(nbmj8991_state::triplew1, nbmjdrv2)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1490,7 +1493,7 @@ static MACHINE_CONFIG_DERIVED( triplew1, nbmjdrv2 )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( triplew2, nbmjdrv2 )
+MACHINE_CONFIG_DERIVED(nbmj8991_state::triplew2, nbmjdrv2)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1501,7 +1504,7 @@ static MACHINE_CONFIG_DERIVED( triplew2, nbmjdrv2 )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( ntopstar, nbmjdrv2 )
+MACHINE_CONFIG_DERIVED(nbmj8991_state::ntopstar, nbmjdrv2)
 
 	/* basic machine hardware */
 	MCFG_DEVICE_MODIFY("nb1413m3")
@@ -1509,7 +1512,7 @@ static MACHINE_CONFIG_DERIVED( ntopstar, nbmjdrv2 )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( mjlstory, nbmjdrv2 )
+MACHINE_CONFIG_DERIVED(nbmj8991_state::mjlstory, nbmjdrv2)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1520,7 +1523,7 @@ static MACHINE_CONFIG_DERIVED( mjlstory, nbmjdrv2 )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( vanilla, nbmjdrv2 )
+MACHINE_CONFIG_DERIVED(nbmj8991_state::vanilla, nbmjdrv2)
 
 	/* basic machine hardware */
 	MCFG_DEVICE_MODIFY("nb1413m3")
@@ -1528,7 +1531,7 @@ static MACHINE_CONFIG_DERIVED( vanilla, nbmjdrv2 )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( finalbny, nbmjdrv2 )
+MACHINE_CONFIG_DERIVED(nbmj8991_state::finalbny, nbmjdrv2)
 
 	/* basic machine hardware */
 	MCFG_DEVICE_MODIFY("nb1413m3")
@@ -1538,7 +1541,7 @@ static MACHINE_CONFIG_DERIVED( finalbny, nbmjdrv2 )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( qmhayaku, nbmjdrv2 )
+MACHINE_CONFIG_DERIVED(nbmj8991_state::qmhayaku, nbmjdrv2)
 
 	/* basic machine hardware */
 	MCFG_DEVICE_MODIFY("nb1413m3")
@@ -1546,7 +1549,7 @@ static MACHINE_CONFIG_DERIVED( qmhayaku, nbmjdrv2 )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( mjgottub, nbmjdrv2 )
+MACHINE_CONFIG_DERIVED(nbmj8991_state::mjgottub, nbmjdrv2)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1559,7 +1562,7 @@ static MACHINE_CONFIG_DERIVED( mjgottub, nbmjdrv2 )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( av2mj1bb, nbmjdrv2 )
+MACHINE_CONFIG_DERIVED(nbmj8991_state::av2mj1bb, nbmjdrv2)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1571,7 +1574,7 @@ static MACHINE_CONFIG_DERIVED( av2mj1bb, nbmjdrv2 )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( av2mj2rg, nbmjdrv2 )
+MACHINE_CONFIG_DERIVED(nbmj8991_state::av2mj2rg, nbmjdrv2)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")

@@ -85,6 +85,7 @@ public:
 	DECLARE_READ8_MEMBER(watchdog_clear_r);
 	DECLARE_READ8_MEMBER(inputs_r);
 
+	void popper(machine_config &config);
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -526,7 +527,7 @@ void popper_state::machine_reset()
 //  MACHINE DEFINTIONS
 //**************************************************************************
 
-static MACHINE_CONFIG_START( popper )
+MACHINE_CONFIG_START(popper_state::popper)
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_18_432MHz/3/2)
 	MCFG_CPU_PROGRAM_MAP(main_map)
 

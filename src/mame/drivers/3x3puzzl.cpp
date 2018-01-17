@@ -96,6 +96,7 @@ public:
 	DECLARE_WRITE16_MEMBER(tilemap1_scrollx_w);
 	DECLARE_WRITE16_MEMBER(tilemap1_scrolly_w);
 
+	void _3x3puzzle(machine_config &config);
 protected:
 	virtual void video_start() override;
 	virtual void machine_start() override;
@@ -382,7 +383,7 @@ void _3x3puzzle_state::machine_reset()
 }
 
 
-static MACHINE_CONFIG_START( _3x3puzzle )
+MACHINE_CONFIG_START(_3x3puzzle_state::_3x3puzzle)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",M68000,MAIN_CLOCK)

@@ -16,6 +16,10 @@
 #include "emu.h"
 #include "machine/pcshare.h"
 #include "cpu/i86/i286.h"
+#include "bus/isa/trident.h"
+#include "video/pc_vga.h"
+#include "video/clgd542x.h"
+#include "screen.h"
 
 /******************
 DMA8237 Controller
@@ -135,7 +139,54 @@ ADDRESS_MAP_START( pcat32_io_common, AS_IO, 32, pcat_base_state )
 	AM_RANGE(0x00c0, 0x00df) AM_DEVREADWRITE8("dma8237_2", am9517a_device, read, write, 0x00ff00ff)
 ADDRESS_MAP_END
 
-MACHINE_CONFIG_START(pcat_common)
+
+MACHINE_CONFIG_START(pcat_base_state::pcvideo_vga)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_RAW_PARAMS(XTAL_25_1748MHz,900,0,640,526,0,480)
+	MCFG_SCREEN_UPDATE_DEVICE("vga", vga_device, screen_update)
+
+	MCFG_PALETTE_ADD("palette", 0x100)
+	MCFG_DEVICE_ADD("vga", VGA, 0)
+MACHINE_CONFIG_END
+
+MACHINE_CONFIG_START(pcat_base_state::pcvideo_trident_vga)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_RAW_PARAMS(XTAL_25_1748MHz,900,0,640,526,0,480)
+	MCFG_SCREEN_UPDATE_DEVICE("vga", trident_vga_device, screen_update)
+
+	MCFG_PALETTE_ADD("palette", 0x100)
+	MCFG_DEVICE_ADD("vga", TRIDENT_VGA, 0)
+MACHINE_CONFIG_END
+
+MACHINE_CONFIG_START(pcat_base_state::pcvideo_s3_vga)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_RAW_PARAMS(XTAL_25_1748MHz,900,0,640,526,0,480)
+	MCFG_SCREEN_UPDATE_DEVICE("vga", s3_vga_device, screen_update)
+
+	MCFG_PALETTE_ADD("palette", 0x100)
+	MCFG_DEVICE_ADD("vga", S3_VGA, 0)
+MACHINE_CONFIG_END
+
+
+MACHINE_CONFIG_START(pcat_base_state::pcvideo_cirrus_gd5428)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_RAW_PARAMS(XTAL_25_1748MHz,900,0,640,526,0,480)
+	MCFG_SCREEN_UPDATE_DEVICE("vga", cirrus_gd5428_device, screen_update)
+
+	MCFG_PALETTE_ADD("palette", 0x100)
+	MCFG_DEVICE_ADD("vga", CIRRUS_GD5428, 0)
+MACHINE_CONFIG_END
+
+MACHINE_CONFIG_START(pcat_base_state::pcvideo_cirrus_gd5430)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_RAW_PARAMS(XTAL_25_1748MHz,900,0,640,526,0,480)
+	MCFG_SCREEN_UPDATE_DEVICE("vga", cirrus_gd5430_device, screen_update)
+
+	MCFG_PALETTE_ADD("palette", 0x100)
+	MCFG_DEVICE_ADD("vga", CIRRUS_GD5430, 0)
+MACHINE_CONFIG_END
+
+MACHINE_CONFIG_START(pcat_base_state::pcat_common)
 	MCFG_DEVICE_ADD("pic8259_1", PIC8259, 0)
 	MCFG_PIC8259_OUT_INT_CB(INPUTLINE("maincpu", 0))
 	MCFG_PIC8259_IN_SP_CB(VCC)

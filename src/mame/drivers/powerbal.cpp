@@ -51,6 +51,8 @@ public:
 	DECLARE_WRITE16_MEMBER(magicstk_bgvideoram_w);
 	DECLARE_WRITE16_MEMBER(tile_banking_w);
 	DECLARE_WRITE16_MEMBER(oki_banking);
+	void magicstk(machine_config &config);
+	void powerbal(machine_config &config);
 };
 
 
@@ -491,7 +493,7 @@ MACHINE_RESET_MEMBER(powerbal_state,powerbal)
 	configure_oki_banks();
 }
 
-static MACHINE_CONFIG_START( powerbal )
+MACHINE_CONFIG_START(powerbal_state::powerbal)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 12000000)   /* 12 MHz */
@@ -524,7 +526,7 @@ static MACHINE_CONFIG_START( powerbal )
 	MCFG_DEVICE_ADDRESS_MAP(0, oki_map)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( magicstk )
+MACHINE_CONFIG_START(powerbal_state::magicstk)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 12000000)   /* 12 MHz */

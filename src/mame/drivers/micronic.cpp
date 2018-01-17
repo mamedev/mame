@@ -348,7 +348,7 @@ WRITE_LINE_MEMBER( micronic_state::mc146818_irq )
 }
 
 
-static MACHINE_CONFIG_START( micronic )
+MACHINE_CONFIG_START(micronic_state::micronic)
 	/* basic machine hardware */
 	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL_3_579545MHz)
 	MCFG_CPU_PROGRAM_MAP(micronic_mem)

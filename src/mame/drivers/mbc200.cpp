@@ -82,6 +82,7 @@ public:
 	MC6845_UPDATE_ROW(update_row);
 	required_device<palette_device> m_palette;
 
+	void mbc200(machine_config &config);
 private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -290,7 +291,7 @@ static GFXDECODE_START( mbc200 )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( mbc200 )
+MACHINE_CONFIG_START(mbc200_state::mbc200)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80, XTAL_8MHz/2) // NEC D780C-1
 	MCFG_CPU_PROGRAM_MAP(mbc200_mem)

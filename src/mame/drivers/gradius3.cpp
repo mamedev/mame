@@ -274,7 +274,7 @@ void gradius3_state::machine_reset()
 
 }
 
-static MACHINE_CONFIG_START( gradius3 )
+MACHINE_CONFIG_START(gradius3_state::gradius3)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_10MHz)

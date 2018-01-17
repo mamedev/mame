@@ -110,4 +110,14 @@ public:
 	void init_common();
 	void milliped_set_color(offs_t offset, uint8_t data);
 	inline int read_trackball(int idx, int switch_port);
+	void centiped_base(machine_config &config);
+	void milliped(machine_config &config);
+	void bullsdrt(machine_config &config);
+	void centipdb(machine_config &config);
+	void magworm(machine_config &config);
+	void caterplr(machine_config &config);
+	void centiped(machine_config &config);
+	void mazeinv(machine_config &config);
+	void warlords(machine_config &config);
+	void multiped(machine_config &config);
 };

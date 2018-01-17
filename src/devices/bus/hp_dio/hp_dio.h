@@ -26,13 +26,13 @@
 #define MCFG_DIO16_SLOT_ADD(_diotag, _tag, _slot_intf, _def_slot, _fixed) \
 	MCFG_DEVICE_ADD(_tag, DIO16_SLOT, 0) \
 	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, _fixed) \
-	dio16_slot_device::static_set_dio16_slot(*device, owner, _diotag);
+	dio16_slot_device::static_set_dio16_slot(*device, this, _diotag);
 #define MCFG_DIO32_CPU(_cputag) \
 	dio32_device::static_set_cputag(*device, _cputag);
 #define MCFG_DIO32_SLOT_ADD(_diotag, _tag, _slot_intf, _def_slot, _fixed) \
 	MCFG_DEVICE_ADD(_tag, DIO32_SLOT, 0) \
 	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, _fixed) \
-	dio32_slot_device::static_set_dio32_slot(*device, owner, _diotag);
+	dio32_slot_device::static_set_dio32_slot(*device, this, _diotag);
 
 #define MCFG_ISA_OUT_IRQ3_CB(_devcb) \
 	devcb = &dio16_device::set_out_irq3_callback(*device, DEVCB_##_devcb);

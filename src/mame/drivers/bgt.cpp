@@ -21,6 +21,7 @@ public:
 			m_maincpu(*this, "maincpu")
 	{ }
 
+	void bgt(machine_config &config);
 protected:
 
 	// devices
@@ -44,7 +45,7 @@ static INPUT_PORTS_START( bgt )
 INPUT_PORTS_END
 
 
-static MACHINE_CONFIG_START( bgt )
+MACHINE_CONFIG_START(bgt_state::bgt)
 	MCFG_CPU_ADD("maincpu", V30, 12000000 ) // ? unknown CPU.. definitely x86 based tho
 	MCFG_CPU_PROGRAM_MAP(bgt_map)
 	MCFG_CPU_IO_MAP(bgt_io)

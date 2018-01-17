@@ -18,6 +18,7 @@ public:
 //      , m_maincpu(*this, "maincpu")
 	{ }
 
+void lilith(machine_config &config);
 private:
 //  required_device<cpu_device> m_maincpu;
 };
@@ -31,7 +32,7 @@ private:
 static INPUT_PORTS_START( lilith )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( lilith )
+MACHINE_CONFIG_START(lilith_state::lilith)
 MACHINE_CONFIG_END
 
 ROM_START( lilith )

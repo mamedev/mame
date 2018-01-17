@@ -208,7 +208,7 @@ void flkatck_state::machine_reset()
 	m_flipscreen = 0;
 }
 
-static MACHINE_CONFIG_START( flkatck )
+MACHINE_CONFIG_START(flkatck_state::flkatck)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", HD6309,3000000*4) /* HD63C09EP, 24/8 MHz */

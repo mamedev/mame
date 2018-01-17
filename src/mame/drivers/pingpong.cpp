@@ -446,7 +446,7 @@ static GFXDECODE_START( pingpong )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( pingpong )
+MACHINE_CONFIG_START(pingpong_state::pingpong)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80,18432000/6)      /* 3.072 MHz (probably) */
@@ -476,7 +476,7 @@ static MACHINE_CONFIG_START( pingpong )
 MACHINE_CONFIG_END
 
 /* too fast! */
-static MACHINE_CONFIG_DERIVED( merlinmm, pingpong )
+MACHINE_CONFIG_DERIVED(pingpong_state::merlinmm, pingpong)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(merlinmm_map)
 	MCFG_TIMER_MODIFY("scantimer")

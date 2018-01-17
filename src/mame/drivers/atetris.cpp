@@ -326,7 +326,7 @@ GFXDECODE_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( atetris )
+MACHINE_CONFIG_START(atetris_state::atetris)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502,MASTER_CLOCK/8)
@@ -365,7 +365,7 @@ static MACHINE_CONFIG_START( atetris )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( atetrisb2 )
+MACHINE_CONFIG_START(atetris_state::atetrisb2)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502,BOOTLEG_CLOCK/8)
@@ -405,7 +405,7 @@ static MACHINE_CONFIG_START( atetrisb2 )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( atetrisb3, atetrisb2 )
+MACHINE_CONFIG_DERIVED(atetris_state::atetrisb3, atetrisb2)
 
 	MCFG_CPU_REPLACE("maincpu", M6502, MASTER_CLOCK/8)
 	MCFG_CPU_PROGRAM_MAP(atetrisb3_map)

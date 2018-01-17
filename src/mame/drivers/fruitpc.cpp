@@ -43,6 +43,8 @@ public:
 
 	DECLARE_READ8_MEMBER(fruit_inp_r);
 	DECLARE_WRITE8_MEMBER(dma8237_1_dack_w);
+	static void fruitpc_sb_conf(device_t *device);
+	void fruitpc(machine_config &config);
 };
 
 READ8_MEMBER(fruitpc_state::fruit_inp_r)
@@ -117,12 +119,13 @@ static DEVICE_INPUT_DEFAULTS_START( fruitpc_sb_def )
 	DEVICE_INPUT_DEFAULTS("CONFIG", 0x03, 0x01)
 DEVICE_INPUT_DEFAULTS_END
 
-static MACHINE_CONFIG_START( fruitpc_sb_conf )
-	MCFG_DEVICE_MODIFY("pc_joy")
+void fruitpc_state::fruitpc_sb_conf(device_t *device)
+{
+	device = device->subdevice("pc_joy");
 	MCFG_DEVICE_SLOT_INTERFACE(pc_joysticks, nullptr, true) // remove joystick
-MACHINE_CONFIG_END
+}
 
-static MACHINE_CONFIG_START( fruitpc )
+MACHINE_CONFIG_START(fruitpc_state::fruitpc)
 	MCFG_CPU_ADD("maincpu", I486, 66000000) // ST STPCD0166BTC3 66 MHz 486 CPU
 	MCFG_CPU_PROGRAM_MAP(fruitpc_map)
 	MCFG_CPU_IO_MAP(fruitpc_io)

@@ -8,6 +8,7 @@
 #include "machine/at.h"
 #include "sound/262intf.h"
 #include "sound/dac.h"
+#include "sound/volt_reg.h"
 #include "video/pc_vga.h"
 #include "speaker.h"
 
@@ -129,7 +130,7 @@ void vis_audio_device::device_timer(emu_timer &timer, device_timer_id id, int pa
 	}
 }
 
-MACHINE_CONFIG_MEMBER( vis_audio_device::device_add_mconfig )
+MACHINE_CONFIG_START(vis_audio_device::device_add_mconfig)
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 	MCFG_SOUND_ADD("ymf262", YMF262, XTAL_14_31818MHz)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.00)
@@ -137,9 +138,10 @@ MACHINE_CONFIG_MEMBER( vis_audio_device::device_add_mconfig )
 	MCFG_SOUND_ROUTE(2, "lspeaker", 1.00)
 	MCFG_SOUND_ROUTE(3, "rspeaker", 1.00)
 	MCFG_SOUND_ADD("ldac", DAC_16BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0) // unknown DAC
-	MCFG_SOUND_REFERENCE_INPUT(DAC_VREF_POS_INPUT, 1.0) MCFG_SOUND_REFERENCE_INPUT(DAC_VREF_NEG_INPUT, -1.0)
 	MCFG_SOUND_ADD("rdac", DAC_16BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0) // unknown DAC
-	MCFG_SOUND_REFERENCE_INPUT(DAC_VREF_POS_INPUT, 1.0) MCFG_SOUND_REFERENCE_INPUT(DAC_VREF_NEG_INPUT, -1.0)
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "ldac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "ldac", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE_EX(0, "rdac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "rdac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 READ8_MEMBER(vis_audio_device::pcm_r)
@@ -255,7 +257,7 @@ vis_vga_device::vis_vga_device(const machine_config &mconfig, const char *tag, d
 	m_screen.set_tag("screen");
 }
 
-MACHINE_CONFIG_MEMBER( vis_vga_device::device_add_mconfig )
+MACHINE_CONFIG_START(vis_vga_device::device_add_mconfig)
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(XTAL_25_1748MHz,900,0,640,526,0,480)
 	MCFG_SCREEN_UPDATE_DEVICE(DEVICE_SELF, vis_vga_device, screen_update)
@@ -714,6 +716,7 @@ public:
 	DECLARE_READ8_MEMBER(unk1_r);
 	DECLARE_WRITE8_MEMBER(unk1_w);
 	DECLARE_INPUT_CHANGED_MEMBER(update);
+	void vis(machine_config &config);
 protected:
 	void machine_reset() override;
 private:
@@ -879,7 +882,7 @@ static INPUT_PORTS_START(vis)
 	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_UNKNOWN ) PORT_CHANGED_MEMBER(DEVICE_SELF, vis_state, update, 0)
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( vis )
+MACHINE_CONFIG_START(vis_state::vis)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I80286, XTAL_12MHz )
 	MCFG_CPU_PROGRAM_MAP(at16_map)

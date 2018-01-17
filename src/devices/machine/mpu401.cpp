@@ -85,7 +85,7 @@ DEFINE_DEVICE_TYPE(MPU401, mpu401_device, "mpu401", "Roland MPU-401 I/O box")
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( mpu401_device::device_add_mconfig )
+MACHINE_CONFIG_START(mpu401_device::device_add_mconfig)
 	MCFG_CPU_ADD(M6801_TAG, M6801, 4000000) /* 4 MHz as per schematics */
 	MCFG_CPU_PROGRAM_MAP(mpu401_map)
 	MCFG_CPU_IO_MAP(mpu401_io_map)

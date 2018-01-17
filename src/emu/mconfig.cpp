@@ -70,9 +70,9 @@ machine_config::machine_config(const game_driver &gamedrv, emu_options &options)
 				if (default_bios != nullptr)
 					device_t::static_set_default_bios_tag(*new_dev, default_bios);
 
-				machine_config_constructor additions = option->machine_config();
-				if (additions != nullptr)
-					(*additions)(*this, new_dev, new_dev);
+				auto additions = option->machine_config();
+				if (additions)
+					additions(new_dev);
 
 				input_device_default const *const input_device_defaults = option->input_device_defaults();
 				if (input_device_defaults)

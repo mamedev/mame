@@ -37,6 +37,7 @@ public:
 	I8275_DRAW_CHARACTER_MEMBER( crtc_display_pixels );
 	uint8_t m_term_data;
 	virtual void machine_reset() override;
+	void ipds(machine_config &config);
 };
 
 READ8_MEMBER( ipds_state::ipds_b0_r )
@@ -126,7 +127,7 @@ void ipds_state::kbd_put(u8 data)
 	m_term_data = data;
 }
 
-static MACHINE_CONFIG_START( ipds )
+MACHINE_CONFIG_START(ipds_state::ipds)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",I8085A, XTAL_19_6608MHz / 4)
 	MCFG_CPU_PROGRAM_MAP(ipds_mem)

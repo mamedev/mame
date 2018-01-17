@@ -69,6 +69,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(cts_w);
 	DECLARE_WRITE_LINE_MEMBER(rxd_w);
 
+	void hunter2(machine_config &config);
 private:
 	uint8_t m_keydata;
 	uint8_t m_irq_mask;
@@ -365,7 +366,7 @@ WRITE_LINE_MEMBER(hunter2_state::rxd_w)
 		m_maincpu->set_input_line(NSC800_RSTB, ASSERT_LINE);
 }
 
-static MACHINE_CONFIG_START( hunter2 )
+MACHINE_CONFIG_START(hunter2_state::hunter2)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", NSC800, XTAL_4MHz)
 	MCFG_CPU_PROGRAM_MAP(hunter2_mem)

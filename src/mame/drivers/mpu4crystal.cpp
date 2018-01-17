@@ -7,8 +7,6 @@
 #include "emu.h"
 #include "includes/mpu4.h"
 
-MACHINE_CONFIG_EXTERN( mod4oki );
-MACHINE_CONFIG_EXTERN( mpu4crys );
 INPUT_PORTS_EXTERN( mpu4 );
 
 #define M4FRKSTN_SOUND \

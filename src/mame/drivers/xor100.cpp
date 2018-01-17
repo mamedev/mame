@@ -503,7 +503,7 @@ void xor100_state::post_load()
 
 /* Machine Driver */
 
-static MACHINE_CONFIG_START( xor100 )
+MACHINE_CONFIG_START(xor100_state::xor100)
 	/* basic machine hardware */
 	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL_8MHz/2)
 	MCFG_CPU_PROGRAM_MAP(xor100_mem)

@@ -237,7 +237,7 @@ void dogfgt_state::machine_reset()
 }
 
 
-static MACHINE_CONFIG_START( dogfgt )
+MACHINE_CONFIG_START(dogfgt_state::dogfgt)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, 1500000) /* 1.5 MHz ???? */

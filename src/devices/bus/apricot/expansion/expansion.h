@@ -54,10 +54,10 @@
 
 #define MCFG_EXPANSION_ADD(_tag, _cpu_tag) \
 	MCFG_DEVICE_ADD(_tag, APRICOT_EXPANSION_BUS, 0) \
-	apricot_expansion_bus_device::set_cpu_tag(*device, owner, _cpu_tag);
+	apricot_expansion_bus_device::set_cpu_tag(*device, this, _cpu_tag);
 
 #define MCFG_EXPANSION_IOP_ADD(_tag) \
-	apricot_expansion_bus_device::set_iop_tag(*device, owner, _tag);
+	apricot_expansion_bus_device::set_iop_tag(*device, this, _tag);
 
 #define MCFG_EXPANSION_SLOT_ADD(_tag, _slot_intf, _def_slot) \
 	MCFG_DEVICE_ADD(_tag, APRICOT_EXPANSION_SLOT, 0) \

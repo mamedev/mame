@@ -342,7 +342,7 @@ INTERRUPT_GEN_MEMBER(bombjack_state::vblank_irq)
 		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
-static MACHINE_CONFIG_START( bombjack )
+MACHINE_CONFIG_START(bombjack_state::bombjack)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_4MHz)     /* Confirmed from PCB */

@@ -64,6 +64,7 @@
 
 #include "cpu/z80/z80.h"
 #include "machine/nvram.h"
+#include "sound/volt_reg.h"
 #include "speaker.h"
 
 
@@ -939,7 +940,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( leland )
+MACHINE_CONFIG_START(leland_state::leland)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("master", Z80, MASTER_CLOCK/2)
@@ -978,13 +979,14 @@ static MACHINE_CONFIG_START( leland )
 //  MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
 
 	MCFG_SOUND_ADD("dac0", DAC_8BIT_BINARY_WEIGHTED, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.0625) // ls374.u79 + r17-r23 (24k,12k,6.2k,3k,1.5k,750,390,180)
-	MCFG_SOUND_REFERENCE_INPUT(DAC_VREF_POS_INPUT, 1.0) MCFG_SOUND_REFERENCE_INPUT(DAC_VREF_NEG_INPUT, -1.0)
 	MCFG_SOUND_ADD("dac1", DAC_8BIT_BINARY_WEIGHTED, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.0625) // ls374.u88 + r27-r34 (24k,12k,6.2k,3k,1.5k,750,390,180)
-	MCFG_SOUND_REFERENCE_INPUT(DAC_VREF_POS_INPUT, 1.0) MCFG_SOUND_REFERENCE_INPUT(DAC_VREF_NEG_INPUT, -1.0)
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac0", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac0", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE_EX(0, "dac1", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac1", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( redline, leland )
+MACHINE_CONFIG_DERIVED(leland_state::redline, leland)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("master")
@@ -1000,7 +1002,7 @@ static MACHINE_CONFIG_DERIVED( redline, leland )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( quarterb, redline )
+MACHINE_CONFIG_DERIVED(leland_state::quarterb, redline)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("audiocpu")
@@ -1012,7 +1014,7 @@ static MACHINE_CONFIG_DERIVED( quarterb, redline )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( lelandi, quarterb )
+MACHINE_CONFIG_DERIVED(leland_state::lelandi, quarterb)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("slave")
@@ -1020,7 +1022,7 @@ static MACHINE_CONFIG_DERIVED( lelandi, quarterb )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( ataxx )
+MACHINE_CONFIG_START(leland_state::ataxx)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("master", Z80, 6000000)
@@ -1053,7 +1055,7 @@ static MACHINE_CONFIG_START( ataxx )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( wsf, ataxx )
+MACHINE_CONFIG_DERIVED(leland_state::wsf, ataxx)
 	MCFG_CPU_MODIFY("audiocpu")
 	MCFG_80186_TMROUT1_HANDLER(DEVWRITELINE("custom", leland_80186_sound_device, i80186_tmr1_w))
 

@@ -71,7 +71,7 @@
 #define ES_PCI_READ 0
 #define ES_PCI_WRITE 1
 
-MACHINE_CONFIG_MEMBER( es1373_device::device_add_mconfig )
+MACHINE_CONFIG_START(es1373_device::device_add_mconfig)
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 MACHINE_CONFIG_END
 

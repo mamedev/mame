@@ -22,6 +22,8 @@ public:
 	void exidy440_sound_command(uint8_t param);
 	uint8_t exidy440_sound_command_ack();
 
+	void exidy440_audio(machine_config &config);
+
 protected:
 	// device-level overrides
 	virtual void device_start() override;
@@ -111,6 +113,5 @@ private:
 
 DECLARE_DEVICE_TYPE(EXIDY440, exidy440_sound_device)
 
-MACHINE_CONFIG_EXTERN( exidy440_audio );
 
 #endif // MAME_AUDIO_EXIDY440_H

@@ -58,7 +58,7 @@ ROM_END
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( bbc_cumana1_device::device_add_mconfig )
+MACHINE_CONFIG_START(bbc_cumana1_device::device_add_mconfig)
 	MCFG_MB8877_ADD("mb8877a", XTAL_16MHz / 16)
 	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(bbc_cumanafdc_device, fdc_intrq_w))
 	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(bbc_cumanafdc_device, fdc_drq_w))
@@ -69,7 +69,7 @@ MACHINE_CONFIG_MEMBER( bbc_cumana1_device::device_add_mconfig )
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_MEMBER( bbc_cumana2_device::device_add_mconfig )
+MACHINE_CONFIG_START(bbc_cumana2_device::device_add_mconfig)
 	MCFG_MB8877_ADD("mb8877a", XTAL_16MHz / 16)
 	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(bbc_cumanafdc_device, fdc_intrq_w))
 	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(bbc_cumanafdc_device, fdc_drq_w))

@@ -111,6 +111,7 @@ public:
 
 	uint8_t m_analog_select;
 	uint8_t m_analog_count;
+	void spyhuntertec(machine_config &config);
 };
 
 WRITE8_MEMBER(spyhuntertec_state::ay1_porta_w)
@@ -657,7 +658,7 @@ void spyhuntertec_state::machine_reset()
 
 
 
-static MACHINE_CONFIG_START( spyhuntertec )
+MACHINE_CONFIG_START(spyhuntertec_state::spyhuntertec)
 
 // note: no ctc, no nvram
 // 2*z80, 3*ay8912

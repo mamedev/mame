@@ -304,7 +304,7 @@ INTERRUPT_GEN_MEMBER(dynduke_state::interrupt)
 
 /* Machine Driver */
 
-static MACHINE_CONFIG_START( dynduke )
+MACHINE_CONFIG_START(dynduke_state::dynduke)
 	// basic machine hardware
 	MCFG_CPU_ADD("maincpu", V30, 16000000/2) // NEC V30-8 CPU
 	MCFG_CPU_PROGRAM_MAP(master_map)
@@ -357,7 +357,7 @@ static MACHINE_CONFIG_START( dynduke )
 	MCFG_SEIBU_SOUND_YM_WRITE_CB(DEVWRITE8("ymsnd", ym3812_device, write))
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( dbldyn, dynduke )
+MACHINE_CONFIG_DERIVED(dynduke_state::dbldyn, dynduke)
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(masterj_map)

@@ -65,6 +65,7 @@ public:
 	#endif
 	uint32_t screen_update_taitowlf(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void intel82439tx_init();
+	void taitowlf(machine_config &config);
 };
 
 #if !ENABLE_VGA
@@ -365,7 +366,7 @@ PALETTE_INIT_MEMBER(taitowlf_state, taitowlf)
 }
 #endif
 
-static MACHINE_CONFIG_START( taitowlf )
+MACHINE_CONFIG_START(taitowlf_state::taitowlf)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", PENTIUM, 200000000)

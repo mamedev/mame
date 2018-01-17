@@ -80,7 +80,7 @@ ROM_END
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( bbc_opus3_device::device_add_mconfig )
+MACHINE_CONFIG_START(bbc_opus3_device::device_add_mconfig)
 	/* fdc */
 	MCFG_WD1770_ADD("wd1770", XTAL_16MHz / 2)
 	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(bbc_opus3_device, fdc_drq_w))

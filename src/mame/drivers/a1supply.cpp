@@ -49,6 +49,7 @@ public:
 	required_device<netlist_mame_device> m_maincpu;
 	required_device<fixedfreq_device> m_video;
 
+	void a1supply(machine_config &config);
 protected:
 
 	// driver_device overrides
@@ -89,7 +90,7 @@ void a1supply_state::video_start()
 {
 }
 
-static MACHINE_CONFIG_START( a1supply )
+MACHINE_CONFIG_START(a1supply_state::a1supply)
 
 	/* basic machine hardware */
 	MCFG_DEVICE_ADD("maincpu", NETLIST_CPU, NETLIST_CLOCK)

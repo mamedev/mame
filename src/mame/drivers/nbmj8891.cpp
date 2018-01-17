@@ -48,6 +48,7 @@ TODO:
 #include "sound/3812intf.h"
 #include "sound/ay8910.h"
 #include "sound/dac.h"
+#include "sound/volt_reg.h"
 #include "speaker.h"
 
 
@@ -2175,7 +2176,7 @@ static INPUT_PORTS_START( taiwanmb )
 INPUT_PORTS_END
 
 
-static MACHINE_CONFIG_START( gionbana )
+MACHINE_CONFIG_START(nbmj8891_state::gionbana)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 20000000/4)    /* 5.00 MHz ? */
@@ -2205,10 +2206,11 @@ static MACHINE_CONFIG_START( gionbana )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
 
 	MCFG_SOUND_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.37) // unknown DAC
-	MCFG_SOUND_REFERENCE_INPUT(DAC_VREF_POS_INPUT, 1.0) MCFG_SOUND_REFERENCE_INPUT(DAC_VREF_NEG_INPUT, -1.0)
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( mgion, gionbana )
+MACHINE_CONFIG_DERIVED(nbmj8891_state::mgion, gionbana)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2221,7 +2223,7 @@ static MACHINE_CONFIG_DERIVED( mgion, gionbana )
 	MCFG_NVRAM_ADD_0FILL("nvram")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( omotesnd, gionbana )
+MACHINE_CONFIG_DERIVED(nbmj8891_state::omotesnd, gionbana)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2240,14 +2242,14 @@ static MACHINE_CONFIG_DERIVED( omotesnd, gionbana )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.35)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( abunai, gionbana )
+MACHINE_CONFIG_DERIVED(nbmj8891_state::abunai, gionbana)
 
 	MCFG_DEVICE_MODIFY("nb1413m3")
 	MCFG_NB1413M3_TYPE( NB1413M3_ABUNAI )
 MACHINE_CONFIG_END
 
 /* NBMJDRV2 */
-static MACHINE_CONFIG_DERIVED( mjcamerb, gionbana )
+MACHINE_CONFIG_DERIVED(nbmj8891_state::mjcamerb, gionbana)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2264,7 +2266,7 @@ static MACHINE_CONFIG_DERIVED( mjcamerb, gionbana )
 	MCFG_VIDEO_START_OVERRIDE(nbmj8891_state,_1layer)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( mmcamera, gionbana )
+MACHINE_CONFIG_DERIVED(nbmj8891_state::mmcamera, gionbana)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2281,7 +2283,7 @@ static MACHINE_CONFIG_DERIVED( mmcamera, gionbana )
 	MCFG_VIDEO_START_OVERRIDE(nbmj8891_state,_1layer)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( hanamomo, gionbana )
+MACHINE_CONFIG_DERIVED(nbmj8891_state::hanamomo, gionbana)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2297,7 +2299,7 @@ static MACHINE_CONFIG_DERIVED( hanamomo, gionbana )
 	MCFG_VIDEO_START_OVERRIDE(nbmj8891_state,_1layer)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( msjiken, hanamomo )
+MACHINE_CONFIG_DERIVED(nbmj8891_state::msjiken, hanamomo)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2309,7 +2311,7 @@ static MACHINE_CONFIG_DERIVED( msjiken, hanamomo )
 MACHINE_CONFIG_END
 
 /* NBMJDRV3 */
-static MACHINE_CONFIG_DERIVED( telmahjn, gionbana )
+MACHINE_CONFIG_DERIVED(nbmj8891_state::telmahjn, gionbana)
 
 	MCFG_DEVICE_MODIFY("nb1413m3")
 	MCFG_NB1413M3_TYPE( NB1413M3_TELMAHJN )
@@ -2318,7 +2320,7 @@ static MACHINE_CONFIG_DERIVED( telmahjn, gionbana )
 	MCFG_VIDEO_START_OVERRIDE(nbmj8891_state,_1layer)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( mgmen89, telmahjn )
+MACHINE_CONFIG_DERIVED(nbmj8891_state::mgmen89, telmahjn)
 
 	MCFG_DEVICE_MODIFY("nb1413m3")
 	MCFG_NB1413M3_TYPE( NB1413M3_MGMEN89 )
@@ -2326,7 +2328,7 @@ static MACHINE_CONFIG_DERIVED( mgmen89, telmahjn )
 MACHINE_CONFIG_END
 
 /* NBMJDRV4 */
-static MACHINE_CONFIG_DERIVED( mjfocus, gionbana )
+MACHINE_CONFIG_DERIVED(nbmj8891_state::mjfocus, gionbana)
 
 	/* basic machine hardware */
 
@@ -2337,20 +2339,20 @@ static MACHINE_CONFIG_DERIVED( mjfocus, gionbana )
 	MCFG_VIDEO_START_OVERRIDE(nbmj8891_state,_1layer)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( pairsnb, gionbana )
+MACHINE_CONFIG_DERIVED(nbmj8891_state::pairsnb, gionbana)
 
 	MCFG_DEVICE_MODIFY("nb1413m3")
 	MCFG_NB1413M3_TYPE( NB1413M3_PAIRSNB )
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( pairsten, gionbana )
+MACHINE_CONFIG_DERIVED(nbmj8891_state::pairsten, gionbana)
 
 	MCFG_DEVICE_MODIFY("nb1413m3")
 	MCFG_NB1413M3_TYPE( NB1413M3_PAIRSTEN )
 MACHINE_CONFIG_END
 
 /* NBMJDRV5 */
-static MACHINE_CONFIG_DERIVED( mjnanpas, gionbana )
+MACHINE_CONFIG_DERIVED(nbmj8891_state::mjnanpas, gionbana)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2360,7 +2362,7 @@ static MACHINE_CONFIG_DERIVED( mjnanpas, gionbana )
 	MCFG_NB1413M3_TYPE( NB1413M3_MJNANPAS )
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( maiko, mjnanpas )
+MACHINE_CONFIG_DERIVED(nbmj8891_state::maiko, mjnanpas)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2371,7 +2373,7 @@ static MACHINE_CONFIG_DERIVED( maiko, mjnanpas )
 	MCFG_NB1413M3_TYPE( NB1413M3_MAIKO )
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( mmaiko, maiko )
+MACHINE_CONFIG_DERIVED(nbmj8891_state::mmaiko, maiko)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2383,7 +2385,7 @@ static MACHINE_CONFIG_DERIVED( mmaiko, maiko )
 	MCFG_NVRAM_ADD_0FILL("nvram")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( lovehous, mjnanpas )
+MACHINE_CONFIG_DERIVED(nbmj8891_state::lovehous, mjnanpas)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2396,7 +2398,7 @@ static MACHINE_CONFIG_DERIVED( lovehous, mjnanpas )
 	MCFG_NVRAM_ADD_0FILL("nvram")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( hanaoji, maiko )
+MACHINE_CONFIG_DERIVED(nbmj8891_state::hanaoji, maiko)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2408,7 +2410,7 @@ static MACHINE_CONFIG_DERIVED( hanaoji, maiko )
 	MCFG_NVRAM_ADD_0FILL("nvram")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( hnxmasev, maiko )
+MACHINE_CONFIG_DERIVED(nbmj8891_state::hnxmasev, maiko)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2416,7 +2418,7 @@ static MACHINE_CONFIG_DERIVED( hnxmasev, maiko )
 	MCFG_CPU_IO_MAP(maiko_io_map)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( hnageman, maiko )
+MACHINE_CONFIG_DERIVED(nbmj8891_state::hnageman, maiko)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2424,7 +2426,7 @@ static MACHINE_CONFIG_DERIVED( hnageman, maiko )
 	MCFG_CPU_IO_MAP(maiko_io_map)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( scandal, hanamomo )
+MACHINE_CONFIG_DERIVED(nbmj8891_state::scandal, hanamomo)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2435,7 +2437,7 @@ static MACHINE_CONFIG_DERIVED( scandal, hanamomo )
 	MCFG_NB1413M3_TYPE( NB1413M3_SCANDAL )
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( bananadr, mjnanpas )
+MACHINE_CONFIG_DERIVED(nbmj8891_state::bananadr, mjnanpas)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2448,26 +2450,26 @@ static MACHINE_CONFIG_DERIVED( bananadr, mjnanpas )
 	MCFG_NVRAM_ADD_0FILL("nvram")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( club90s, mjnanpas )
+MACHINE_CONFIG_DERIVED(nbmj8891_state::club90s, mjnanpas)
 
 	MCFG_DEVICE_MODIFY("nb1413m3")
 	MCFG_NB1413M3_TYPE( NB1413M3_CLUB90S )
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( mladyhtr, mjnanpas )
+MACHINE_CONFIG_DERIVED(nbmj8891_state::mladyhtr, mjnanpas)
 
 	MCFG_DEVICE_MODIFY("nb1413m3")
 	MCFG_NB1413M3_TYPE( NB1413M3_MLADYHTR )
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( chinmoku, mjnanpas )
+MACHINE_CONFIG_DERIVED(nbmj8891_state::chinmoku, mjnanpas)
 
 	MCFG_DEVICE_MODIFY("nb1413m3")
 	MCFG_NB1413M3_TYPE( NB1413M3_CHINMOKU )
 MACHINE_CONFIG_END
 
 /* NBMJDRV6 */
-static MACHINE_CONFIG_DERIVED( mjfocusm, gionbana )
+MACHINE_CONFIG_DERIVED(nbmj8891_state::mjfocusm, gionbana)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2491,13 +2493,13 @@ static MACHINE_CONFIG_DERIVED( mjfocusm, gionbana )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.7)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( scandalm, mjfocusm )
+MACHINE_CONFIG_DERIVED(nbmj8891_state::scandalm, mjfocusm)
 
 	MCFG_DEVICE_MODIFY("nb1413m3")
 	MCFG_NB1413M3_TYPE( NB1413M3_SCANDALM )
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( taiwanmb, gionbana )
+MACHINE_CONFIG_DERIVED(nbmj8891_state::taiwanmb, gionbana)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")

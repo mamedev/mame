@@ -101,6 +101,7 @@ public:
 	DECLARE_READ8_MEMBER(test_r);
 		uint32_t screen_update_wms(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
+		void wms(machine_config &config);
 protected:
 
 	// devices
@@ -168,7 +169,7 @@ static GFXDECODE_START( wms )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( wms )
+MACHINE_CONFIG_START(wms_state::wms)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I80188, MAIN_CLOCK )    // AMD N80C188-20, ( 40 MHz. internally divided by 2)
 	MCFG_CPU_PROGRAM_MAP(wms_map)

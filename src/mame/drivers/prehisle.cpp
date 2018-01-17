@@ -196,7 +196,7 @@ GFXDECODE_END
 
 /******************************************************************************/
 
-static MACHINE_CONFIG_START( prehisle )
+MACHINE_CONFIG_START(prehisle_state::prehisle)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_18MHz/2)   /* verified on pcb */

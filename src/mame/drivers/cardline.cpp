@@ -75,6 +75,7 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	required_device<screen_device> m_screen;
+	void cardline(machine_config &config);
 };
 
 void cardline_state::machine_start()
@@ -313,7 +314,7 @@ PALETTE_INIT_MEMBER(cardline_state, cardline)
 	}
 }
 
-static MACHINE_CONFIG_START( cardline )
+MACHINE_CONFIG_START(cardline_state::cardline)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I80C32, MASTER_CLOCK)

@@ -79,6 +79,7 @@ public:
 	DECLARE_WRITE16_MEMBER(comms_w);
 	DECLARE_WRITE16_MEMBER(data_bank_w);
 	DECLARE_WRITE16_MEMBER(upd_w);
+	void gambl186(machine_config &config);
 };
 
 void gambl186_state::machine_start()
@@ -465,14 +466,19 @@ INPUT_PORTS_END
 
 
 
-static MACHINE_CONFIG_START( gambl186 )
+MACHINE_CONFIG_START(gambl186_state::gambl186)
 	MCFG_CPU_ADD("maincpu", I80186, XTAL_40MHz)
 	MCFG_CPU_PROGRAM_MAP(gambl186_map)
 	MCFG_CPU_IO_MAP(gambl186_io)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
-	MCFG_FRAGMENT_ADD( pcvideo_cirrus_gd5428 )
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_RAW_PARAMS(XTAL_25_1748MHz,900,0,640,526,0,480)
+	MCFG_SCREEN_UPDATE_DEVICE("vga", cirrus_gd5428_device, screen_update)
+
+	MCFG_PALETTE_ADD("palette", 0x100)
+	MCFG_DEVICE_ADD("vga", CIRRUS_GD5428, 0)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

@@ -93,6 +93,7 @@ public:
 	virtual void machine_reset() override;
 	uint32_t screen_update_toratora(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(toratora_timer);
+	void toratora(machine_config &config);
 };
 
 
@@ -390,7 +391,7 @@ void toratora_state::machine_reset()
 	m_clear_tv = 0;
 }
 
-static MACHINE_CONFIG_START( toratora )
+MACHINE_CONFIG_START(toratora_state::toratora)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6800, 5185000 / 8) /* 5.185 MHz XTAL divided by 8 (@ U94.12) */

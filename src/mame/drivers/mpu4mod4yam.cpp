@@ -5,7 +5,6 @@
 #include "emu.h"
 #include "includes/mpu4.h"
 
-MACHINE_CONFIG_EXTERN( mod4yam );
 INPUT_PORTS_EXTERN( mpu4 );
 
 

@@ -81,6 +81,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	void umipoker(machine_config &config);
 };
 
 TILE_GET_INFO_MEMBER(umipoker_state::get_tile_info_0)
@@ -657,7 +658,7 @@ void umipoker_state::machine_reset()
 }
 
 // TODO: clocks
-static MACHINE_CONFIG_START( umipoker )
+MACHINE_CONFIG_START(umipoker_state::umipoker)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",M68000,16000000) // TMP68HC000-16

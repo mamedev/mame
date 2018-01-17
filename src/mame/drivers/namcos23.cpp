@@ -1597,6 +1597,13 @@ public:
 	void render_project(poly_vertex &pv);
 	void render_one_model(const namcos23_render_entry *re);
 	void render_run(bitmap_rgb32 &bitmap);
+	void timecrs2v4a(machine_config &config);
+	void ss23e2(machine_config &config);
+	void gorgon(machine_config &config);
+	void ss23(machine_config &config);
+	void s23(machine_config &config);
+	void gmen(machine_config &config);
+	void timecrs2(machine_config &config);
 };
 
 
@@ -3536,7 +3543,7 @@ static GFXDECODE_START( namcos23 )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( gorgon )
+MACHINE_CONFIG_START(namcos23_state::gorgon)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", R4650BE, BUSCLOCK*4)
@@ -3602,7 +3609,7 @@ static MACHINE_CONFIG_START( gorgon )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( s23 )
+MACHINE_CONFIG_START(namcos23_state::s23)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", R4650BE, BUSCLOCK*4)
@@ -3667,14 +3674,14 @@ static MACHINE_CONFIG_START( s23 )
 	MCFG_SOUND_ROUTE(3, "lspeaker", 1.00)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( timecrs2, s23 )
+MACHINE_CONFIG_DERIVED(namcos23_state::timecrs2, s23)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("iocpu")
 	MCFG_CPU_PROGRAM_MAP( timecrs2iobrdmap )
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( gmen, s23 )
+MACHINE_CONFIG_DERIVED(namcos23_state::gmen, s23)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -3688,7 +3695,7 @@ static MACHINE_CONFIG_DERIVED( gmen, s23 )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( ss23 )
+MACHINE_CONFIG_START(namcos23_state::ss23)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", R4650BE, BUSCLOCK*5)
@@ -3744,7 +3751,7 @@ static MACHINE_CONFIG_START( ss23 )
 	MCFG_SOUND_ROUTE(3, "lspeaker", 1.00)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( timecrs2v4a, ss23 )
+MACHINE_CONFIG_DERIVED(namcos23_state::timecrs2v4a, ss23)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("iocpu", H83334, JVSCLOCK )
 	MCFG_CPU_PROGRAM_MAP( timecrs2iobrdmap )
@@ -3756,7 +3763,7 @@ static MACHINE_CONFIG_DERIVED( timecrs2v4a, ss23 )
 	MCFG_H8_SCI_TX_CALLBACK(DEVWRITELINE(":iocpu:sci0", h8_sci_device, rx_w))
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( ss23e2, ss23 )
+MACHINE_CONFIG_DERIVED(namcos23_state::ss23e2, ss23)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")

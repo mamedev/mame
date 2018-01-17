@@ -154,6 +154,7 @@ Tetris         -         -         -         -         EPR12169  EPR12170  -    
 #include "machine/nvram.h"
 #include "machine/segacrp2_device.h"
 #include "sound/dac.h"
+#include "sound/volt_reg.h"
 #include "speaker.h"
 
 
@@ -1964,7 +1965,7 @@ GFXDECODE_END
 //  GENERIC MACHINE DRIVERS
 //**************************************************************************
 
-static MACHINE_CONFIG_START( system16a )
+MACHINE_CONFIG_START(segas16a_state::system16a)
 
 	// basic machine hardware
 	MCFG_CPU_ADD("maincpu", M68000, 10000000)
@@ -2019,35 +2020,36 @@ static MACHINE_CONFIG_START( system16a )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.43)
 
 	MCFG_SOUND_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.4) // unknown DAC
-	MCFG_SOUND_REFERENCE_INPUT(DAC_VREF_POS_INPUT, 1.0) MCFG_SOUND_REFERENCE_INPUT(DAC_VREF_NEG_INPUT, -1.0)
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( system16a_fd1089a, system16a )
+MACHINE_CONFIG_DERIVED(segas16a_state::system16a_fd1089a, system16a)
 	MCFG_CPU_REPLACE("maincpu", FD1089A, 10000000)
 	MCFG_CPU_PROGRAM_MAP(system16a_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", segas16a_state, irq4_line_hold)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( system16a_fd1089b, system16a )
+MACHINE_CONFIG_DERIVED(segas16a_state::system16a_fd1089b, system16a)
 	MCFG_CPU_REPLACE("maincpu", FD1089B, 10000000)
 	MCFG_CPU_PROGRAM_MAP(system16a_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", segas16a_state, irq4_line_hold)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( system16a_fd1094, system16a )
+MACHINE_CONFIG_DERIVED(segas16a_state::system16a_fd1094, system16a)
 	MCFG_CPU_REPLACE("maincpu", FD1094, 10000000)
 	MCFG_CPU_PROGRAM_MAP(system16a_map)
 	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", segas16a_state, irq4_line_hold)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( aceattaca_fd1094, system16a_fd1094 )
+MACHINE_CONFIG_DERIVED(segas16a_state::aceattaca_fd1094, system16a_fd1094)
 	MCFG_DEVICE_ADD("cxdio", CXD1095, 0)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( system16a_i8751, system16a )
+MACHINE_CONFIG_DERIVED(segas16a_state::system16a_i8751, system16a)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", segas16a_state, i8751_main_cpu_vblank)
 
@@ -2057,18 +2059,19 @@ static MACHINE_CONFIG_DERIVED( system16a_i8751, system16a )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( system16a_no7751, system16a )
+MACHINE_CONFIG_DERIVED(segas16a_state::system16a_no7751, system16a)
 	MCFG_CPU_MODIFY("soundcpu")
 	MCFG_CPU_IO_MAP(sound_no7751_portmap)
 
 	MCFG_DEVICE_REMOVE("n7751")
 	MCFG_DEVICE_REMOVE("dac")
+	MCFG_DEVICE_REMOVE("vref")
 
 	MCFG_SOUND_REPLACE("ymsnd", YM2151, 4000000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( system16a_no7751p, system16a_no7751 )
+MACHINE_CONFIG_DERIVED(segas16a_state::system16a_no7751p, system16a_no7751)
 	MCFG_CPU_REPLACE("soundcpu", SEGA_315_5177, 4000000)
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 	MCFG_CPU_IO_MAP(sound_no7751_portmap)
@@ -2080,40 +2083,44 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( system16a_i8751_no7751, system16a_i8751 )
     MCFG_DEVICE_REMOVE("n7751")
     MCFG_DEVICE_REMOVE("dac")
+	MCFG_DEVICE_REMOVE("vref")
 
     MCFG_SOUND_REPLACE("ymsnd", YM2151, 4000000)
     MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 MACHINE_CONFIG_END
 */
 
-static MACHINE_CONFIG_DERIVED( system16a_fd1089a_no7751, system16a_fd1089a )
+MACHINE_CONFIG_DERIVED(segas16a_state::system16a_fd1089a_no7751, system16a_fd1089a)
 	MCFG_CPU_MODIFY("soundcpu")
 	MCFG_CPU_IO_MAP(sound_no7751_portmap)
 
 	MCFG_DEVICE_REMOVE("n7751")
 	MCFG_DEVICE_REMOVE("dac")
+	MCFG_DEVICE_REMOVE("vref")
 
 	MCFG_SOUND_REPLACE("ymsnd", YM2151, 4000000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( system16a_fd1089b_no7751, system16a_fd1089b )
+MACHINE_CONFIG_DERIVED(segas16a_state::system16a_fd1089b_no7751, system16a_fd1089b)
 	MCFG_CPU_MODIFY("soundcpu")
 	MCFG_CPU_IO_MAP(sound_no7751_portmap)
 
 	MCFG_DEVICE_REMOVE("n7751")
 	MCFG_DEVICE_REMOVE("dac")
+	MCFG_DEVICE_REMOVE("vref")
 
 	MCFG_SOUND_REPLACE("ymsnd", YM2151, 4000000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( system16a_fd1094_no7751, system16a_fd1094 )
+MACHINE_CONFIG_DERIVED(segas16a_state::system16a_fd1094_no7751, system16a_fd1094)
 	MCFG_CPU_MODIFY("soundcpu")
 	MCFG_CPU_IO_MAP(sound_no7751_portmap)
 
 	MCFG_DEVICE_REMOVE("n7751")
 	MCFG_DEVICE_REMOVE("dac")
+	MCFG_DEVICE_REMOVE("vref")
 
 	MCFG_SOUND_REPLACE("ymsnd", YM2151, 4000000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)

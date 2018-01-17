@@ -41,6 +41,7 @@ public:
 		, m_maincpu(*this, "maincpu")
 	{ }
 
+	void picno(machine_config &config);
 private:
 	required_device<cpu_device> m_maincpu;
 };
@@ -59,7 +60,7 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START( picno )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( picno )
+MACHINE_CONFIG_START(picno_state::picno)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",  H83002, XTAL_20MHz) /* TODO: correct CPU type (H8/532), crystal is a guess, divided by 2 in the cpu */
 	MCFG_CPU_PROGRAM_MAP(mem_map)

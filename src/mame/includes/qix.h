@@ -146,16 +146,16 @@ public:
 	int kram3_decrypt(int address, int value);
 	DECLARE_WRITE_LINE_MEMBER(kram3_lic_maincpu_changed);
 	DECLARE_WRITE_LINE_MEMBER(kram3_lic_videocpu_changed);
+	void mcu(machine_config &config);
+	void qix_base(machine_config &config);
+	void qix(machine_config &config);
+	void qix_video(machine_config &config);
+	void qix_audio(machine_config &config);
+	void zookeep(machine_config &config);
+	void zookeep_video(machine_config &config);
+	void kram3(machine_config &config);
+	void kram3_video(machine_config &config);
+	void slither(machine_config &config);
+	void slither_video(machine_config &config);
+	void slither_audio(machine_config &config);
 };
-
-/*----------- defined in video/qix.c -----------*/
-
-MACHINE_CONFIG_EXTERN( qix_video );
-MACHINE_CONFIG_EXTERN( kram3_video );
-MACHINE_CONFIG_EXTERN( zookeep_video );
-MACHINE_CONFIG_EXTERN( slither_video );
-
-/*----------- defined in audio/qix.c -----------*/
-
-MACHINE_CONFIG_EXTERN( qix_audio );
-MACHINE_CONFIG_EXTERN( slither_audio );

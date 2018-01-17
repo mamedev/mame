@@ -483,7 +483,7 @@ void lastduel_state::machine_reset()
 		m_scroll[i] = 0;
 }
 
-static MACHINE_CONFIG_START( lastduel )
+MACHINE_CONFIG_START(lastduel_state::lastduel)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 10000000) // Unconfirmed - could be 8MHz
@@ -528,7 +528,7 @@ static MACHINE_CONFIG_START( lastduel )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( madgear )
+MACHINE_CONFIG_START(lastduel_state::madgear)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_10MHz)

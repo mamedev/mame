@@ -466,7 +466,7 @@ void _4enraya_state::machine_reset()
 *         Machine Drivers          *
 ***********************************/
 
-static MACHINE_CONFIG_START( 4enraya )
+MACHINE_CONFIG_START(_4enraya_state::_4enraya )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, MAIN_CLOCK/2)
@@ -494,7 +494,7 @@ static MACHINE_CONFIG_START( 4enraya )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( unkpacg, 4enraya )
+MACHINE_CONFIG_DERIVED(_4enraya_state::unkpacg, _4enraya)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -645,8 +645,8 @@ DRIVER_INIT_MEMBER(_4enraya_state, unkpacg)
 ***********************************/
 
 /*    YEAR  NAME      PARENT   MACHINE   INPUT    STATE           INIT     ROT    COMPANY      FULLNAME                                         FLAGS  */
-GAME( 1990, 4enraya,  0,       4enraya,  4enraya, _4enraya_state, 0,       ROT0, "IDSA",      "4 En Raya (set 1)",                              MACHINE_SUPPORTS_SAVE )
-GAME( 1990, 4enrayaa, 4enraya, 4enraya,  4enraya, _4enraya_state, 0,       ROT0, "IDSA",      "4 En Raya (set 2)",                              MACHINE_SUPPORTS_SAVE )
+GAME( 1990, 4enraya,  0,       _4enraya, 4enraya, _4enraya_state, 0,       ROT0, "IDSA",      "4 En Raya (set 1)",                              MACHINE_SUPPORTS_SAVE )
+GAME( 1990, 4enrayaa, 4enraya, _4enraya, 4enraya, _4enraya_state, 0,       ROT0, "IDSA",      "4 En Raya (set 2)",                              MACHINE_SUPPORTS_SAVE )
 GAME( 199?, unkpacg,  0,       unkpacg,  unkpacg, _4enraya_state, unkpacg, ROT0, "<unknown>", "unknown 'Pac-Man' gambling game",                MACHINE_SUPPORTS_SAVE )
 GAME( 199?, unksig,   0,       unkpacg,  unkfr,   _4enraya_state, unkpacg, ROT0, "<unknown>", "unknown 'Space Invaders' gambling game (set 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 199?, unksiga,  unksig,  unkpacg,  unkfr,   _4enraya_state, unkpacg, ROT0, "<unknown>", "unknown 'Space Invaders' gambling game (set 2)", MACHINE_SUPPORTS_SAVE )

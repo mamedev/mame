@@ -741,7 +741,7 @@ static GFXDECODE_START( drgnbowl )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( shadoww )
+MACHINE_CONFIG_START(gaiden_state::shadoww)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 18432000/2) /* 9.216 MHz */
@@ -805,7 +805,7 @@ static MACHINE_CONFIG_START( shadoww )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( raiga, shadoww )
+MACHINE_CONFIG_DERIVED(gaiden_state::raiga, shadoww)
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(gaiden_state, screen_update_raiga)
@@ -814,7 +814,7 @@ static MACHINE_CONFIG_DERIVED( raiga, shadoww )
 	MCFG_GFXDECODE_MODIFY("gfxdecode", raiga)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( drgnbowl )
+MACHINE_CONFIG_START(gaiden_state::drgnbowl)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 20000000/2) /* 10 MHz */
@@ -970,7 +970,7 @@ static ADDRESS_MAP_START( mastninj_map, AS_PROGRAM, 16, gaiden_state )
 	AM_RANGE(0x07e000, 0x07e001) AM_WRITE8(drgnbowl_irq_ack_w, 0xff00)
 ADDRESS_MAP_END
 
-static MACHINE_CONFIG_START( mastninj )
+MACHINE_CONFIG_START(gaiden_state::mastninj)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 10000000)   /* 10 MHz? */

@@ -916,7 +916,7 @@ void lwings_state::machine_reset()
 	m_adpcm = 0;
 }
 
-static MACHINE_CONFIG_START( lwings )
+MACHINE_CONFIG_START(lwings_state::lwings)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_12MHz/2)  /* verified on PCB */
@@ -972,7 +972,7 @@ MACHINE_CONFIG_END
 
 
 
-static MACHINE_CONFIG_START( fball )
+MACHINE_CONFIG_START(lwings_state::fball)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_12MHz/2)
@@ -1014,7 +1014,7 @@ static MACHINE_CONFIG_START( fball )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( trojan, lwings )
+MACHINE_CONFIG_DERIVED(lwings_state::trojan, lwings)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1045,7 +1045,7 @@ static MACHINE_CONFIG_DERIVED( trojan, lwings )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( avengers, trojan )
+MACHINE_CONFIG_DERIVED(lwings_state::avengers, trojan)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1059,7 +1059,7 @@ static MACHINE_CONFIG_DERIVED( avengers, trojan )
 	MCFG_VIDEO_START_OVERRIDE(lwings_state,avengers)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( avengersb, avengers )
+MACHINE_CONFIG_DERIVED(lwings_state::avengersb, avengers)
 	/* video hardware */
 	MCFG_VIDEO_START_OVERRIDE(lwings_state,avengersb)
 MACHINE_CONFIG_END

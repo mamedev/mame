@@ -72,6 +72,7 @@ public:
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
+	void rcorsair(machine_config &config);
 protected:
 
 	// devices
@@ -147,7 +148,7 @@ uint32_t rcorsair_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	return 0;
 }
 
-static MACHINE_CONFIG_START( rcorsair )
+MACHINE_CONFIG_START(rcorsair_state::rcorsair)
 
 	/* Main CPU is probably inside Custom Block with
 	   program code, unknown type */

@@ -132,6 +132,7 @@ public:
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(irq);
+	void jackie(machine_config &config);
 };
 
 
@@ -596,7 +597,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(jackie_state::irq)
 		m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
-static MACHINE_CONFIG_START( jackie )
+MACHINE_CONFIG_START(jackie_state::jackie)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_12MHz / 2)

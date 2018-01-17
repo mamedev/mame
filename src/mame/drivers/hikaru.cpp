@@ -397,6 +397,7 @@ public:
 	virtual void video_start() override;
 	uint32_t screen_update_hikaru(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
+	void hikaru(machine_config &config);
 };
 
 void hikaru_state::video_start()
@@ -481,7 +482,7 @@ static ADDRESS_MAP_START( hikaru_map_slave, AS_PROGRAM, 64, hikaru_state )
 ADDRESS_MAP_END
 
 
-static MACHINE_CONFIG_START( hikaru )
+MACHINE_CONFIG_START(hikaru_state::hikaru)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", SH4LE, CPU_CLOCK)
 //  MCFG_SH4_MD0(1)

@@ -53,6 +53,7 @@ Year + Game             Main CPU    Sound CPU    Sound            Video
 #include "cpu/z80/z80.h"
 #include "sound/3526intf.h"
 #include "sound/dac.h"
+#include "sound/volt_reg.h"
 #include "sound/ym2151.h"
 #include "speaker.h"
 
@@ -838,7 +839,7 @@ INTERRUPT_GEN_MEMBER(fantland_state::fantland_sound_irq)
 	device.execute().set_input_line_and_vector(0, HOLD_LINE, 0x80 / 4);
 }
 
-static MACHINE_CONFIG_START( fantland )
+MACHINE_CONFIG_START(fantland_state::fantland)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8086, 8000000)        // ?
@@ -879,7 +880,8 @@ static MACHINE_CONFIG_START( fantland )
 	MCFG_SOUND_ROUTE(1, "speaker", 0.35)
 
 	MCFG_SOUND_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25) // unknown DAC
-	MCFG_SOUND_REFERENCE_INPUT(DAC_VREF_POS_INPUT, 1.0) MCFG_SOUND_REFERENCE_INPUT(DAC_VREF_NEG_INPUT, -1.0)
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 
@@ -888,7 +890,7 @@ WRITE_LINE_MEMBER(fantland_state::galaxygn_sound_irq)
 	m_audiocpu->set_input_line_and_vector(0, state ? ASSERT_LINE : CLEAR_LINE, 0x80/4);
 }
 
-static MACHINE_CONFIG_START( galaxygn )
+MACHINE_CONFIG_START(fantland_state::galaxygn)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8088, 8000000)        // ?
@@ -970,7 +972,7 @@ MACHINE_RESET_MEMBER(fantland_state,borntofi)
 	borntofi_adpcm_stop(m_msm4, 3);
 }
 
-static MACHINE_CONFIG_START( borntofi )
+MACHINE_CONFIG_START(fantland_state::borntofi)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", V20, 16000000/2)        // D701080C-8 - NEC D70108C-8 V20 CPU, running at 8.000MHz [16/2]
@@ -1024,7 +1026,7 @@ static MACHINE_CONFIG_START( borntofi )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( wheelrun )
+MACHINE_CONFIG_START(fantland_state::wheelrun)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", V20, XTAL_18MHz/2)      // D701080C-8 (V20)

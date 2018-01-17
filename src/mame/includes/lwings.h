@@ -86,4 +86,9 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	required_device<generic_latch_8_device> m_soundlatch;
+	void lwings(machine_config &config);
+	void trojan(machine_config &config);
+	void fball(machine_config &config);
+	void avengers(machine_config &config);
+	void avengersb(machine_config &config);
 };

@@ -48,6 +48,7 @@ public:
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
+	void patapata(machine_config &config);
 protected:
 	virtual void video_start() override;
 
@@ -280,7 +281,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(patapata_state::scanline)
 	if (param==128) m_maincpu->set_input_line(1, HOLD_LINE);
 }
 
-static MACHINE_CONFIG_START( patapata )
+MACHINE_CONFIG_START(patapata_state::patapata)
 
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz) // 16 MHz XTAL, 16 MHz CPU
 	MCFG_CPU_PROGRAM_MAP(main_map)

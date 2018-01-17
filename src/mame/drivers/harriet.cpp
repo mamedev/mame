@@ -40,6 +40,7 @@ public:
 	DECLARE_READ8_MEMBER(keyboard_status_r);
 	void kbd_put(u8 data);
 
+	void harriet(machine_config &config);
 protected:
 	// driver_device overrides
 	virtual void machine_start() override;
@@ -193,7 +194,7 @@ void harriet_state::machine_reset()
 }
 
 
-static MACHINE_CONFIG_START( harriet )
+MACHINE_CONFIG_START(harriet_state::harriet)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",M68010,XTAL_8MHz) // TODO: clock

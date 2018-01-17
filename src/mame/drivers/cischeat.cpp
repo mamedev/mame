@@ -1909,7 +1909,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(cischeat_state::bigrun_scanline)
 
 
 
-static MACHINE_CONFIG_START( bigrun )
+MACHINE_CONFIG_START(cischeat_state::bigrun)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("cpu1", M68000, 10000000)
@@ -1969,7 +1969,7 @@ static MACHINE_CONFIG_START( bigrun )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( cischeat, bigrun )
+MACHINE_CONFIG_DERIVED(cischeat_state::cischeat, bigrun)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("cpu1")
@@ -2006,7 +2006,7 @@ static MACHINE_CONFIG_DERIVED( cischeat, bigrun )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( f1gpstar, bigrun )
+MACHINE_CONFIG_DERIVED(cischeat_state::f1gpstar, bigrun)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("cpu1")
@@ -2042,7 +2042,7 @@ static MACHINE_CONFIG_DERIVED( f1gpstar, bigrun )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( f1gpstr2, f1gpstar )
+MACHINE_CONFIG_DERIVED(cischeat_state::f1gpstr2, f1gpstar)
 
 	/* basic machine hardware */
 
@@ -2059,7 +2059,7 @@ static MACHINE_CONFIG_DERIVED( f1gpstr2, f1gpstar )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( wildplt, f1gpstr2 )
+MACHINE_CONFIG_DERIVED(cischeat_state::wildplt, f1gpstr2)
 	MCFG_CPU_MODIFY("cpu1")
 	MCFG_CPU_PROGRAM_MAP(wildplt_map)
 MACHINE_CONFIG_END
@@ -2087,7 +2087,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(cischeat_state::scudhamm_scanline)
 		m_maincpu->set_input_line(2, HOLD_LINE);
 }
 
-static MACHINE_CONFIG_START( scudhamm )
+MACHINE_CONFIG_START(cischeat_state::scudhamm)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",M68000, 12000000)
@@ -2142,7 +2142,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(cischeat_state::armchamp2_scanline)
 		m_maincpu->set_input_line(4, HOLD_LINE);
 }
 
-static MACHINE_CONFIG_DERIVED( armchmp2, scudhamm )
+MACHINE_CONFIG_DERIVED(cischeat_state::armchmp2, scudhamm)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2174,7 +2174,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(cischeat_state::captflag_scanline)
 		m_maincpu->set_input_line(3, HOLD_LINE);
 }
 
-static MACHINE_CONFIG_START( captflag )
+MACHINE_CONFIG_START(cischeat_state::captflag)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",M68000, XTAL_24MHz / 2)  // TMP68000P-12

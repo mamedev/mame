@@ -258,7 +258,7 @@ void cbasebal_state::machine_reset()
 	m_scroll_y[1] = 0;
 }
 
-static MACHINE_CONFIG_START( cbasebal )
+MACHINE_CONFIG_START(cbasebal_state::cbasebal)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 6000000)   /* ??? */

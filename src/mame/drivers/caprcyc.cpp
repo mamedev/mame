@@ -28,6 +28,7 @@ public:
 	{ }
 
 	required_device<cpu_device> m_maincpu;
+	void caprcyc(machine_config &config);
 };
 
 
@@ -60,7 +61,7 @@ INPUT_PORTS_END
 
 ***************************************************************************/
 
-static MACHINE_CONFIG_START( caprcyc )
+MACHINE_CONFIG_START(caprcyc_state::caprcyc)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", VR4300BE, 100000000) // cpu configuration is unknown

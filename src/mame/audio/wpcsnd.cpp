@@ -10,6 +10,7 @@
 #include "emu.h"
 #include "wpcsnd.h"
 #include "sound/dac.h"
+#include "sound/volt_reg.h"
 
 #define LOG_WPCSND (0)
 
@@ -65,7 +66,7 @@ uint8_t wpcsnd_device::data_r()
 	return m_reply;
 }
 
-MACHINE_CONFIG_MEMBER( wpcsnd_device::device_add_mconfig )
+MACHINE_CONFIG_START(wpcsnd_device::device_add_mconfig)
 	MCFG_CPU_ADD("bgcpu", MC6809E, XTAL_8MHz / 4) // MC68B09E
 	MCFG_CPU_PROGRAM_MAP(wpcsnd_map)
 	MCFG_QUANTUM_TIME(attotime::from_hz(50))
@@ -75,7 +76,8 @@ MACHINE_CONFIG_MEMBER( wpcsnd_device::device_add_mconfig )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, DEVICE_SELF_OWNER, 0.25)
 
 	MCFG_SOUND_ADD("dac", AD7524, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, DEVICE_SELF_OWNER, 0.25)
-	MCFG_SOUND_REFERENCE_INPUT(DAC_VREF_POS_INPUT, 1.0) MCFG_SOUND_REFERENCE_INPUT(DAC_VREF_NEG_INPUT, -1.0)
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 
 	MCFG_SOUND_ADD("hc55516", HC55516, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, DEVICE_SELF_OWNER, 0.5)

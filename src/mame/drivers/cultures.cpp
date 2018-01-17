@@ -78,6 +78,7 @@ public:
 	virtual void video_start() override;
 	uint32_t screen_update_cultures(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(cultures_interrupt);
+	void cultures(machine_config &config);
 };
 
 
@@ -394,7 +395,7 @@ void cultures_state::machine_reset()
 
 
 
-static MACHINE_CONFIG_START( cultures )
+MACHINE_CONFIG_START(cultures_state::cultures)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, MCLK/2) /* 8.000 MHz */

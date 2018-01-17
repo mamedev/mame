@@ -343,7 +343,7 @@ FLOPPY_FORMATS_END
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( c1551_device::device_add_mconfig )
+MACHINE_CONFIG_START(c1551_device::device_add_mconfig)
 	MCFG_CPU_ADD(M6510T_TAG, M6510T, XTAL_16MHz/8)
 	MCFG_CPU_PROGRAM_MAP(c1551_mem)
 	MCFG_M6510T_PORT_CALLBACKS(READ8(c1551_device, port_r), WRITE8(c1551_device, port_w))

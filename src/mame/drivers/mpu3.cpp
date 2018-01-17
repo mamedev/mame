@@ -267,6 +267,7 @@ public:
 	required_device<stepper_device> m_reel3;
 	required_device<meters_device> m_meters;
 	optional_device<roc10937_device> m_vfd;
+	void mpu3base(machine_config &config);
 };
 
 #define DISPLAY_PORT 0
@@ -848,7 +849,7 @@ ADDRESS_MAP_END
 	MCFG_STEPPER_INDEX_PATTERN(0x00)\
 	MCFG_STEPPER_INIT_PHASE(2)
 
-static MACHINE_CONFIG_START( mpu3base )
+MACHINE_CONFIG_START(mpu3_state::mpu3base)
 	MCFG_CPU_ADD("maincpu", M6808, MPU3_MASTER_CLOCK)///4)
 	MCFG_CPU_PROGRAM_MAP(mpu3_basemap)
 

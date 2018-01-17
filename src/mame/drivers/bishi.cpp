@@ -444,7 +444,7 @@ void bishi_state::machine_reset()
 	m_cur_control2 = 0;
 }
 
-static MACHINE_CONFIG_START( bishi )
+MACHINE_CONFIG_START(bishi_state::bishi)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, CPU_CLOCK) /* 12MHz (24MHz OSC / 2 ) */
@@ -484,7 +484,7 @@ static MACHINE_CONFIG_START( bishi )
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( dobouchn, bishi )
+MACHINE_CONFIG_DERIVED(bishi_state::dobouchn, bishi)
 //  TODO: change accordingly (ASCII charset definitely not 8bpp, 5bpp perhaps?)
 	MCFG_DEVICE_MODIFY("k056832")
 //  MCFG_K056832_CB(bishi_state, dobouchn_tile_callback)

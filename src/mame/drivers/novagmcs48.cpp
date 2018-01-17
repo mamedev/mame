@@ -31,6 +31,7 @@ Otherwise, it's identical to Presto. The MCU internal ROM is same too.
 #include "includes/novagbase.h"
 
 #include "cpu/mcs48/mcs48.h"
+#include "sound/volt_reg.h"
 #include "speaker.h"
 
 // internal artwork
@@ -51,6 +52,8 @@ public:
 	DECLARE_MACHINE_RESET(octo);
 	DECLARE_INPUT_CHANGED_MEMBER(octo_cpu_freq);
 	void octo_set_cpu_freq();
+	void presto(machine_config &config);
+	void octo(machine_config &config);
 };
 
 
@@ -141,7 +144,7 @@ INPUT_CHANGED_MEMBER(novagmcs48_state::octo_cpu_freq)
     Machine Drivers
 ******************************************************************************/
 
-static MACHINE_CONFIG_START( presto )
+MACHINE_CONFIG_START(novagmcs48_state::presto)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8049, 6000000) // LC circuit, measured 6MHz
@@ -155,10 +158,11 @@ static MACHINE_CONFIG_START( presto )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
 	MCFG_SOUND_ADD("dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
-	MCFG_SOUND_REFERENCE_INPUT(DAC_VREF_POS_INPUT, 1.0) MCFG_SOUND_REFERENCE_INPUT(DAC_VREF_NEG_INPUT, -1.0)
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( octo, presto )
+MACHINE_CONFIG_DERIVED(novagmcs48_state::octo, presto)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")

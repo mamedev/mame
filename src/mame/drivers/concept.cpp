@@ -208,7 +208,7 @@ SLOT_INTERFACE_END
 
 
 
-static MACHINE_CONFIG_START( concept )
+MACHINE_CONFIG_START(concept_state::concept)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 8182000)        /* 16.364 MHz / 2 */
 	MCFG_CPU_PROGRAM_MAP(concept_memmap)

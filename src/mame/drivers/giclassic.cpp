@@ -80,6 +80,7 @@ public:
 	DECLARE_WRITE16_MEMBER(control_w);
 	DECLARE_READ16_MEMBER(vrom_r);
 
+	void giclassic(machine_config &config);
 private:
 	uint8_t m_control;
 };
@@ -196,6 +197,7 @@ public:
 	DECLARE_WRITE16_MEMBER(control_w);
 	DECLARE_READ16_MEMBER(control_r);
 
+	void giclassvr(machine_config &config);
 private:
 	uint16 m_control;
 };
@@ -288,7 +290,7 @@ void giclassicsvr_state::machine_reset()
 {
 }
 
-static MACHINE_CONFIG_START( giclassic )
+MACHINE_CONFIG_START(giclassic_state::giclassic)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_20MHz / 2) // PCB is marked "68000 12 MHz", but only visible osc is 20 MHz
@@ -314,7 +316,7 @@ static MACHINE_CONFIG_START( giclassic )
 	MCFG_K056832_PALETTE("palette")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( giclassvr )
+MACHINE_CONFIG_START(giclassicsvr_state::giclassvr)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz) // unknown speed

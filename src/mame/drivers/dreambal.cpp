@@ -73,6 +73,7 @@ public:
 			m_eeprom->cs_write(data&0x4 ? ASSERT_LINE : CLEAR_LINE);
 		}
 	}
+	void dreambal(machine_config &config);
 };
 
 
@@ -304,7 +305,7 @@ void dreambal_state::machine_reset()
 }
 
 // xtals = 28.000, 9.8304
-static MACHINE_CONFIG_START( dreambal )
+MACHINE_CONFIG_START(dreambal_state::dreambal)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 28000000/2)

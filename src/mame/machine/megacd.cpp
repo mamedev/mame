@@ -285,7 +285,7 @@ static GFXDECODE_START( segacd )
 GFXDECODE_END
 
 
-MACHINE_CONFIG_MEMBER( sega_segacd_device::device_add_mconfig )
+MACHINE_CONFIG_START(sega_segacd_device::device_add_mconfig)
 
 	MCFG_CPU_ADD("segacd_68k", M68000, SEGACD_CLOCK ) /* 12.5 MHz */
 	MCFG_CPU_PROGRAM_MAP(segacd_map)

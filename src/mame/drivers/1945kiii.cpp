@@ -91,6 +91,8 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	void flagrall(machine_config &config);
+	void k3(machine_config &config);
 };
 
 
@@ -367,7 +369,7 @@ void k3_state::machine_start()
 {
 }
 
-static MACHINE_CONFIG_START( flagrall )
+MACHINE_CONFIG_START(k3_state::flagrall)
 
 	MCFG_CPU_ADD("maincpu", M68000, MASTER_CLOCK ) // ?
 	MCFG_CPU_PROGRAM_MAP(flagrall_map)
@@ -393,7 +395,7 @@ static MACHINE_CONFIG_START( flagrall )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( k3, flagrall )
+MACHINE_CONFIG_DERIVED(k3_state::k3, flagrall)
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(k3_map)

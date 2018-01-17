@@ -300,7 +300,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( btoads )
+MACHINE_CONFIG_START(btoads_state::btoads)
 
 	MCFG_CPU_ADD("maincpu", TMS34020, CPU_CLOCK/2)
 	MCFG_CPU_PROGRAM_MAP(main_map)

@@ -44,7 +44,7 @@
 	deco_rmc3_device::static_set_init(*device, deco_rmc3_palette_init_delegate(FUNC(deco_rmc3_device::palette_init_proms), downcast<deco_rmc3_device *>(device)));
 
 //#define MCFG_DECO_RMC3_INIT_OWNER(_class, _method)
-//  deco_rmc3_device::static_set_init(*device, deco_rmc3_palette_init_delegate(&_class::PALETTE_INIT_NAME(_method), #_class "::palette_init_" #_method, downcast<_class *>(owner)));
+//  deco_rmc3_device::static_set_init(*device, deco_rmc3_palette_init_delegate(&_class::PALETTE_INIT_NAME(_method), #_class "::palette_init_" #_method, this));
 
 //**************************************************************************
 //  TYPE DEFINITIONS

@@ -107,6 +107,7 @@ public:
 	DECLARE_READ8_MEMBER ( ts9347_io_r );
 	DECLARE_WRITE8_MEMBER ( ts9347_io_w );
 
+	void minitel2(machine_config &config);
 protected:
 	required_ioport_array<16> m_io_kbd;
 	virtual void machine_start() override;
@@ -412,7 +413,7 @@ static INPUT_PORTS_START( minitel2 )
 
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( minitel2 )
+MACHINE_CONFIG_START(minitel_state::minitel2)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I80C32, XTAL_14_31818MHz) //verified on pcb
 	MCFG_CPU_PROGRAM_MAP(mem_prg)

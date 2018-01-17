@@ -213,6 +213,8 @@ public:
 	int prot_func_pclubjv2(int in);
 	int prot_func_pclubjv4(int in);
 	int prot_func_pclubjv5(int in);
+	void segac2(machine_config &config);
+	void segac(machine_config &config);
 };
 
 
@@ -1533,7 +1535,7 @@ WRITE_LINE_MEMBER(segac2_state::vdp_lv4irqline_callback_c2)
 }
 
 
-static MACHINE_CONFIG_START( segac )
+MACHINE_CONFIG_START(segac2_state::segac)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XL2_CLOCK/6)
@@ -1589,7 +1591,7 @@ static MACHINE_CONFIG_START( segac )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( segac2, segac )
+MACHINE_CONFIG_DERIVED(segac2_state::segac2, segac)
 
 	/* basic machine hardware */
 	MCFG_DEVICE_MODIFY("io")

@@ -55,6 +55,7 @@
 #include "machine/ram.h"
 #include "machine/timer.h"
 #include "sound/dac.h"
+#include "sound/volt_reg.h"
 #include "sound/wave.h"
 #include "video/ef9345.h"
 
@@ -101,6 +102,7 @@ public:
 	TIMER_CALLBACK_MEMBER(z80_irq_clear);
 	TIMER_DEVICE_CALLBACK_MEMBER(z80_irq);
 	TIMER_DEVICE_CALLBACK_MEMBER(vg5k_scanline);
+	void vg5k(machine_config &config);
 };
 
 
@@ -357,7 +359,7 @@ DRIVER_INIT_MEMBER(vg5k_state,vg5k)
 }
 
 
-static MACHINE_CONFIG_START( vg5k )
+MACHINE_CONFIG_START(vg5k_state::vg5k)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80, XTAL_4MHz)
@@ -385,7 +387,8 @@ static MACHINE_CONFIG_START( vg5k )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
 	MCFG_SOUND_ADD("dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.125)
-	MCFG_SOUND_REFERENCE_INPUT(DAC_VREF_POS_INPUT, 1.0) MCFG_SOUND_REFERENCE_INPUT(DAC_VREF_NEG_INPUT, -1.0)
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT)
 
 	/* cassette */
 	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")

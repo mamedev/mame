@@ -273,7 +273,7 @@ void metlclsh_state::machine_reset()
 	m_gfxbank = 0;
 }
 
-static MACHINE_CONFIG_START( metlclsh )
+MACHINE_CONFIG_START(metlclsh_state::metlclsh)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6809, 1500000)        // ?

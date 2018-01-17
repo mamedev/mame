@@ -78,6 +78,7 @@
 #include "cpu/tms7000/tms7000.h"
 #include "machine/nvram.h"
 #include "sound/dac.h"
+#include "sound/volt_reg.h"
 #include "video/hd44780.h"
 
 #include "screen.h"
@@ -146,6 +147,7 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(sysram_size_changed);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cc40_cartridge);
 	HD44780_PIXEL_UPDATE(cc40_pixel_update);
+	void cc40(machine_config &config);
 };
 
 
@@ -573,7 +575,7 @@ void cc40_state::machine_start()
 	machine().save().register_postload(save_prepost_delegate(FUNC(cc40_state::postload), this));
 }
 
-static MACHINE_CONFIG_START( cc40 )
+MACHINE_CONFIG_START(cc40_state::cc40)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", TMS70C20, XTAL_5MHz / 2)
@@ -605,7 +607,8 @@ static MACHINE_CONFIG_START( cc40 )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
 	MCFG_SOUND_ADD("dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
-	MCFG_SOUND_REFERENCE_INPUT(DAC_VREF_POS_INPUT, 1.0)
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT)
 
 	/* cartridge */
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "cc40_cart")

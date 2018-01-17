@@ -162,18 +162,18 @@ void dmv_k234_device::device_reset()
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( dmv_k230_device::device_add_mconfig )
+MACHINE_CONFIG_START(dmv_k230_device::device_add_mconfig)
 	MCFG_CPU_ADD("maincpu", I8088, XTAL_15MHz / 3)
 	MCFG_CPU_PROGRAM_MAP(k230_mem)
 	MCFG_CPU_IO_MAP(k230_io)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_MEMBER( dmv_k234_device::device_add_mconfig )
+MACHINE_CONFIG_START(dmv_k234_device::device_add_mconfig)
 	MCFG_CPU_ADD("maincpu", M68008, XTAL_16MHz / 2)
 	MCFG_CPU_PROGRAM_MAP(k234_mem)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_MEMBER( dmv_k235_device::device_add_mconfig )
+MACHINE_CONFIG_START(dmv_k235_device::device_add_mconfig)
 	MCFG_CPU_ADD("maincpu", V20, XTAL_15MHz / 3)
 	MCFG_CPU_PROGRAM_MAP(k230_mem)
 	MCFG_CPU_IO_MAP(k235_io)

@@ -124,6 +124,7 @@ public:
 	required_device<okim6295_device> m_oki1;
 	required_device<okim6295_device> m_oki2;
 	required_device<palette_device> m_palette;
+	void pasha2(machine_config &config);
 };
 
 
@@ -412,7 +413,7 @@ void pasha2_state::machine_reset()
 	m_vbuffer = 0;
 }
 
-static MACHINE_CONFIG_START( pasha2 )
+MACHINE_CONFIG_START(pasha2_state::pasha2)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", E116XT, 20000000*4)     /* 4x internal multiplier */

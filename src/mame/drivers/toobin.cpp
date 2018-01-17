@@ -196,7 +196,7 @@ GFXDECODE_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( toobin )
+MACHINE_CONFIG_START(toobin_state::toobin)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68010, MASTER_CLOCK/4)

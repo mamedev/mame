@@ -432,7 +432,7 @@ void warriorb_state::machine_reset()
 	machine().sound().system_enable(true);  /* mixer enabled */
 }
 
-static MACHINE_CONFIG_START( darius2d )
+MACHINE_CONFIG_START(warriorb_state::darius2d)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 12000000)   /* 12 MHz ??? (Might well be 16!) */
@@ -521,7 +521,7 @@ static MACHINE_CONFIG_START( darius2d )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( warriorb )
+MACHINE_CONFIG_START(warriorb_state::warriorb)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 16000000)   /* 16 MHz ? */

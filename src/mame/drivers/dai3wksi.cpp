@@ -97,6 +97,7 @@ public:
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
+	void dai3wksi(machine_config &config);
 };
 
 
@@ -400,7 +401,7 @@ void dai3wksi_state::machine_reset()
 }
 
 
-static MACHINE_CONFIG_START( dai3wksi )
+MACHINE_CONFIG_START(dai3wksi_state::dai3wksi)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_10MHz/4)

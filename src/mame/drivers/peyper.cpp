@@ -66,6 +66,7 @@ public:
 	DECLARE_DRIVER_INIT(peyper);
 	DECLARE_DRIVER_INIT(odin);
 	DECLARE_DRIVER_INIT(wolfman);
+	void peyper(machine_config &config);
 private:
 	uint8_t m_digit;
 	uint8_t m_disp_layout[36];
@@ -578,7 +579,7 @@ void peyper_state::machine_reset()
 {
 }
 
-static MACHINE_CONFIG_START( peyper )
+MACHINE_CONFIG_START(peyper_state::peyper)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 2500000)
 	MCFG_CPU_PROGRAM_MAP(peyper_map)

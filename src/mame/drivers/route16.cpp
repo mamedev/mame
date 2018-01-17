@@ -75,6 +75,7 @@
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
 #include "sound/dac.h"
+#include "sound/volt_reg.h"
 
 #include "screen.h"
 #include "speaker.h"
@@ -602,7 +603,7 @@ DRIVER_INIT_MEMBER(route16_state, route16)
 	save_item(NAME(m_protection_data));
 }
 
-static MACHINE_CONFIG_START( route16 )
+MACHINE_CONFIG_START(route16_state::route16)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("cpu1", Z80, 2500000)  /* 10MHz / 4 = 2.5MHz */
@@ -630,7 +631,7 @@ static MACHINE_CONFIG_START( route16 )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( routex, route16 )
+MACHINE_CONFIG_DERIVED(route16_state::routex, route16)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("cpu1")
@@ -638,7 +639,7 @@ static MACHINE_CONFIG_DERIVED( routex, route16 )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( stratvox, route16 )
+MACHINE_CONFIG_DERIVED(route16_state::stratvox, route16)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("cpu1")
@@ -673,11 +674,12 @@ static MACHINE_CONFIG_DERIVED( stratvox, route16 )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
 
 	MCFG_SOUND_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25) // unknown DAC
-	MCFG_SOUND_REFERENCE_INPUT(DAC_VREF_POS_INPUT, 1.0) MCFG_SOUND_REFERENCE_INPUT(DAC_VREF_NEG_INPUT, -1.0)
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( speakres, stratvox )
+MACHINE_CONFIG_DERIVED(route16_state::speakres, stratvox)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("cpu1")
@@ -687,7 +689,7 @@ static MACHINE_CONFIG_DERIVED( speakres, stratvox )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( spacecho, speakres )
+MACHINE_CONFIG_DERIVED(route16_state::spacecho, speakres)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("cpu2")
@@ -695,7 +697,7 @@ static MACHINE_CONFIG_DERIVED( spacecho, speakres )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( ttmahjng, route16 )
+MACHINE_CONFIG_DERIVED(route16_state::ttmahjng, route16)
 	MCFG_CPU_MODIFY("cpu1")
 	MCFG_CPU_PROGRAM_MAP(ttmahjng_cpu1_map)
 	MCFG_CPU_IO_MAP(0)

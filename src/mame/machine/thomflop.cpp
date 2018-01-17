@@ -992,7 +992,7 @@ int thomson_state::thmfc_floppy_find_sector( chrn_id* dst )
 	}
 
 	thmfc1->stat0 = THMFC1_STAT0_CRC_ERROR | THMFC1_STAT0_FINISHED;
-	LOG (( "thmfc_floppy_find_sector: sector not found drive=%i track=%i sector=%i\n", floppy_get_drive(img), thmfc1->track, thmfc1->sector ));
+	LOG (( "thmfc_floppy_find_sector: sector not found drive=%s track=%i sector=%i\n", img->tag(), thmfc1->track, thmfc1->sector ));
 	return 0;
 }
 

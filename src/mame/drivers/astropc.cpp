@@ -23,6 +23,7 @@ public:
 			m_maincpu(*this, "maincpu")
 	{ }
 
+	void astropc(machine_config &config);
 protected:
 
 	// devices
@@ -45,7 +46,7 @@ INPUT_PORTS_END
 
 
 
-static MACHINE_CONFIG_START( astropc )
+MACHINE_CONFIG_START(astropc_state::astropc)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I486, 40000000 ) // ??
 	MCFG_CPU_PROGRAM_MAP(astropc_map)

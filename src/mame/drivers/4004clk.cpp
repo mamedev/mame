@@ -12,6 +12,7 @@
 #include "cpu/mcs40/mcs40.h"
 #include "machine/clock.h"
 #include "sound/dac.h"
+#include "sound/volt_reg.h"
 #include "speaker.h"
 
 #include "4004clk.lh"
@@ -25,6 +26,7 @@ public:
 	DECLARE_WRITE8_MEMBER( nixie_w );
 	DECLARE_WRITE8_MEMBER( neon_w );
 
+	void _4004clk(machine_config &config);
 protected:
 	virtual void machine_start() override;
 
@@ -122,7 +124,7 @@ void nixieclock_state::machine_start()
 	save_pointer(NAME(m_nixie), 6);
 }
 
-static MACHINE_CONFIG_START( 4004clk )
+MACHINE_CONFIG_START(nixieclock_state::_4004clk)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I4004, XTAL_5MHz / 8)
@@ -138,7 +140,8 @@ static MACHINE_CONFIG_START( 4004clk )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
 	MCFG_SOUND_ADD("dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
-	MCFG_SOUND_REFERENCE_INPUT(DAC_VREF_POS_INPUT, 1.0)
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT)
 
 	MCFG_CLOCK_ADD("clk", 60)
 	MCFG_CLOCK_SIGNAL_HANDLER(INPUTLINE("maincpu", I4004_TEST_LINE))
@@ -168,4 +171,4 @@ ROM_END
 /* Driver */
 
 //    YEAR  NAME      PARENT  COMPAT   MACHINE    INPUT    STATE             INIT  COMPANY             FULLNAME            FLAGS
-SYST( 2008, 4004clk,  0,      0,       4004clk,   4004clk, nixieclock_state, 0,    "John L. Weinrich", "4004 Nixie Clock", MACHINE_SUPPORTS_SAVE )
+SYST( 2008, 4004clk,  0,      0,       _4004clk,  4004clk, nixieclock_state, 0,    "John L. Weinrich", "4004 Nixie Clock", MACHINE_SUPPORTS_SAVE )

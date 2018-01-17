@@ -203,6 +203,7 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	INTERRUPT_GEN_MEMBER(joystand_interrupt);
+	void joystand(machine_config &config);
 };
 
 const rgb_t joystand_state::BG15_TRANSPARENT = 0x99999999;
@@ -579,7 +580,7 @@ INTERRUPT_GEN_MEMBER(joystand_state::joystand_interrupt)
 	m_tmp68301->external_interrupt_1();
 }
 
-static MACHINE_CONFIG_START( joystand )
+MACHINE_CONFIG_START(joystand_state::joystand)
 
 	// basic machine hardware
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz) // !! TMP68301 !!

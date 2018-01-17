@@ -441,7 +441,7 @@ MACHINE_RESET_MEMBER( aussiebyte_state, aussiebyte )
 	m_maincpu->reset();
 }
 
-static MACHINE_CONFIG_START( aussiebyte )
+MACHINE_CONFIG_START(aussiebyte_state::aussiebyte)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_16MHz / 4)
 	MCFG_CPU_PROGRAM_MAP(aussiebyte_map)

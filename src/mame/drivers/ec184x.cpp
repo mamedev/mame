@@ -54,6 +54,9 @@ public:
 
 	DECLARE_READ8_MEMBER(memboard_r);
 	DECLARE_WRITE8_MEMBER(memboard_w);
+	void ec1841(machine_config &config);
+	void ec1847(machine_config &config);
+	void ec1840(machine_config &config);
 };
 
 /*
@@ -208,7 +211,7 @@ ADDRESS_MAP_END
 
 
 // XXX verify everything
-static MACHINE_CONFIG_START( ec1840 )
+MACHINE_CONFIG_START(ec184x_state::ec1840)
 	MCFG_CPU_ADD("maincpu", I8088, 4096000)
 	MCFG_CPU_PROGRAM_MAP(ec1840_map)
 	MCFG_CPU_IO_MAP(ec1840_io)
@@ -231,7 +234,7 @@ static MACHINE_CONFIG_START( ec1840 )
 	MCFG_RAM_DEFAULT_SIZE("512K")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( ec1841 )
+MACHINE_CONFIG_START(ec184x_state::ec1841)
 	MCFG_CPU_ADD("maincpu", I8086, 4096000)
 	MCFG_CPU_PROGRAM_MAP(ec1841_map)
 	MCFG_CPU_IO_MAP(ec1841_io)
@@ -258,7 +261,7 @@ static MACHINE_CONFIG_START( ec1841 )
 MACHINE_CONFIG_END
 
 // XXX verify everything
-static MACHINE_CONFIG_START( ec1847 )
+MACHINE_CONFIG_START(ec184x_state::ec1847)
 	MCFG_CPU_ADD("maincpu", I8088, 4772720)
 	MCFG_CPU_PROGRAM_MAP(ec1847_map)
 	MCFG_CPU_IO_MAP(ec1847_io)

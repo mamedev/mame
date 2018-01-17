@@ -43,6 +43,7 @@ public:
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(subhuntr);
 	uint32_t screen_update_subhuntr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void subhuntr(machine_config &config);
 };
 
 
@@ -130,7 +131,7 @@ static GFXDECODE_START( subhuntr )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( subhuntr )
+MACHINE_CONFIG_START(subhuntr_state::subhuntr)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", S2650, 14318180/4/2)

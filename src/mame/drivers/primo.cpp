@@ -240,7 +240,7 @@ static const struct CassetteOptions primo_cassette_options = {
 	22050   /* sample frequency */
 };
 
-static MACHINE_CONFIG_START( primoa32 )
+MACHINE_CONFIG_START(primo_state::primoa32)
 	/* basic machine hardware */
 	MCFG_CPU_ADD( "maincpu", Z80, 2500000 )
 	MCFG_CPU_PROGRAM_MAP( primo32_mem)
@@ -284,38 +284,38 @@ static MACHINE_CONFIG_START( primoa32 )
 	MCFG_GENERIC_EXTENSIONS("bin,rom")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( primoa48, primoa32 )
+MACHINE_CONFIG_DERIVED(primo_state::primoa48, primoa32)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(primo48_mem)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( primoa64, primoa32 )
+MACHINE_CONFIG_DERIVED(primo_state::primoa64, primoa32)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(primo64_mem)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( primob32, primoa32 )
+MACHINE_CONFIG_DERIVED(primo_state::primob32, primoa32)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(primob_port)
 
 	MCFG_MACHINE_RESET_OVERRIDE(primo_state, primob)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( primob48, primoa48 )
+MACHINE_CONFIG_DERIVED(primo_state::primob48, primoa48)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(primob_port)
 
 	MCFG_MACHINE_RESET_OVERRIDE(primo_state, primob)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( primob64, primoa64 )
+MACHINE_CONFIG_DERIVED(primo_state::primob64, primoa64)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(primob_port)
 
 	MCFG_MACHINE_RESET_OVERRIDE(primo_state, primob)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( primoc64, primoa64 )
+MACHINE_CONFIG_DERIVED(primo_state::primoc64, primoa64)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(primob_port)
 

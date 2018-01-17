@@ -245,7 +245,7 @@ void rockrage_state::machine_reset()
 	m_vreg = 0;
 }
 
-static MACHINE_CONFIG_START( rockrage )
+MACHINE_CONFIG_START(rockrage_state::rockrage)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", HD6309E, XTAL_24MHz / 8)

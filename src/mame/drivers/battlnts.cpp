@@ -229,7 +229,7 @@ void battlnts_state::machine_reset()
 	m_spritebank = 0;
 }
 
-static MACHINE_CONFIG_START( battlnts )
+MACHINE_CONFIG_START(battlnts_state::battlnts)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", HD6309, XTAL_24MHz / 2 /* 3000000*4? */)

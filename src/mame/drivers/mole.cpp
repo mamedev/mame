@@ -85,6 +85,7 @@ public:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	uint32_t screen_update_mole(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void mole(machine_config &config);
 };
 
 
@@ -317,7 +318,7 @@ void mole_state::machine_reset()
 	m_tile_bank = 0;
 }
 
-static MACHINE_CONFIG_START( mole )
+MACHINE_CONFIG_START(mole_state::mole)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, 4000000) // ???

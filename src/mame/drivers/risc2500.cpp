@@ -16,6 +16,7 @@
 #include "machine/ram.h"
 #include "machine/nvram.h"
 #include "sound/dac.h"
+#include "sound/volt_reg.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -46,6 +47,7 @@ public:
 	void install_boot_rom();
 	void remove_boot_rom();
 
+	void risc2500(machine_config &config);
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<ram_device> m_ram;
@@ -293,7 +295,7 @@ static ADDRESS_MAP_START(risc2500_mem, AS_PROGRAM, 32, risc2500_state )
 ADDRESS_MAP_END
 
 
-static MACHINE_CONFIG_START( risc2500 )
+MACHINE_CONFIG_START(risc2500_state::risc2500)
 	MCFG_CPU_ADD("maincpu", ARM, XTAL_28_322MHz / 2)      // VY86C010
 	MCFG_CPU_PROGRAM_MAP(risc2500_mem)
 	MCFG_ARM_COPRO(VL86C020)
@@ -320,7 +322,8 @@ static MACHINE_CONFIG_START( risc2500 )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
 	MCFG_SOUND_ADD("dac", DAC_2BIT_BINARY_WEIGHTED_ONES_COMPLEMENT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25) // unknown DAC
-	MCFG_SOUND_REFERENCE_INPUT(DAC_VREF_POS_INPUT, 1.0) MCFG_SOUND_REFERENCE_INPUT(DAC_VREF_NEG_INPUT, -1.0)
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 

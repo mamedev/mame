@@ -121,6 +121,8 @@ public:
 	DECLARE_READ8_MEMBER(serial_r);
 	DECLARE_WRITE8_MEMBER(serial_w);
 
+	void apfm1000(machine_config &config);
+	void apfimag(machine_config &config);
 private:
 	uint8_t m_latch;
 	uint8_t m_keyboard_data;
@@ -508,7 +510,7 @@ static SLOT_INTERFACE_START(apf_cart)
 SLOT_INTERFACE_END
 
 
-static MACHINE_CONFIG_START( apfm1000 )
+MACHINE_CONFIG_START(apf_state::apfm1000)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6800, XTAL_3_579545MHz / 4 )  // divided by 4 in external clock circuit
@@ -544,7 +546,7 @@ static MACHINE_CONFIG_START( apfm1000 )
 	MCFG_SOFTWARE_LIST_ADD("cart_list", "apfm1000")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( apfimag, apfm1000 )
+MACHINE_CONFIG_DERIVED(apf_state::apfimag, apfm1000)
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_PROGRAM_MAP( apfimag_map)
 

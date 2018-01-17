@@ -84,6 +84,11 @@ public:
 	MC6845_UPDATE_ROW(crtc_update_row);
 	uint32_t screen_update_sapi1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_sapi3(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void sapi3(machine_config &config);
+	void sapi1(machine_config &config);
+	void sapi2(machine_config &config);
+	void sapi3a(machine_config &config);
+	void sapi3b(machine_config &config);
 private:
 	uint8_t m_term_data;
 	uint8_t m_keyboard_mask;
@@ -609,7 +614,7 @@ DRIVER_INIT_MEMBER( sapi1_state, sapizps3b )
 
 
 /* Machine driver */
-static MACHINE_CONFIG_START( sapi1 )
+MACHINE_CONFIG_START(sapi1_state::sapi1)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8080A, XTAL_18MHz / 9) // Tesla MHB8080A + MHB8224 + MHB8228
 	MCFG_CPU_PROGRAM_MAP(sapi1_mem)
@@ -631,7 +636,7 @@ static MACHINE_CONFIG_START( sapi1 )
 	MCFG_RAM_DEFAULT_SIZE("64K")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( sapi2, sapi1 )
+MACHINE_CONFIG_DERIVED(sapi1_state::sapi2, sapi1)
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(sapi2_mem)
@@ -639,7 +644,7 @@ static MACHINE_CONFIG_DERIVED( sapi2, sapi1 )
 	MCFG_GENERIC_KEYBOARD_CB(PUT(sapi1_state, kbd_put))
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( sapi3, sapi2 )
+MACHINE_CONFIG_DERIVED(sapi1_state::sapi3, sapi2)
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(sapi3_mem)
@@ -651,7 +656,7 @@ static MACHINE_CONFIG_DERIVED( sapi3, sapi2 )
 	MCFG_SCREEN_UPDATE_DRIVER(sapi1_state, screen_update_sapi3)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( sapi3b, sapi3 )
+MACHINE_CONFIG_DERIVED(sapi1_state::sapi3b, sapi3)
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(sapi3b_mem)
@@ -676,7 +681,7 @@ static DEVICE_INPUT_DEFAULTS_START( terminal )
 	DEVICE_INPUT_DEFAULTS( "RS232_STOPBITS", 0xff, RS232_STOPBITS_1 )
 DEVICE_INPUT_DEFAULTS_END
 
-static MACHINE_CONFIG_START( sapi3a )
+MACHINE_CONFIG_START(sapi1_state::sapi3a)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8080A, XTAL_18MHz / 9) // Tesla MHB8080A + MHB8224 + MHB8228
 	MCFG_CPU_PROGRAM_MAP(sapi3a_mem)

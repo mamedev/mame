@@ -44,6 +44,8 @@ public:
 	DECLARE_MACHINE_RESET(missb2);
 	uint32_t screen_update_missb2(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
+	void missb2(machine_config &config);
+	void bublpong(machine_config &config);
 protected:
 	void configure_banks();
 
@@ -453,7 +455,7 @@ MACHINE_RESET_MEMBER(missb2_state,missb2)
 	bublbobl_bankswitch_w(m_maincpu->device_t::memory().space(AS_PROGRAM), 0, 0x00, 0xFF); // force a bankswitch write of all zeroes, as /RESET clears the latch
 }
 
-static MACHINE_CONFIG_START( missb2 )
+MACHINE_CONFIG_START(missb2_state::missb2)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, MAIN_XTAL/4)   // 6 MHz
@@ -512,7 +514,7 @@ static MACHINE_CONFIG_START( missb2 )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.4)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( bublpong, missb2 )
+MACHINE_CONFIG_DERIVED(missb2_state::bublpong, missb2)
 	MCFG_GFXDECODE_MODIFY("gfxdecode", bublpong)
 MACHINE_CONFIG_END
 

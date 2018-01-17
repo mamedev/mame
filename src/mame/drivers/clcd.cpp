@@ -551,6 +551,7 @@ public:
 
 	void nvram_init(nvram_device &nvram, void *data, size_t size);
 
+	void clcd(machine_config &config);
 private:
 	required_device<m65c02_device> m_maincpu;
 	required_device<mos6551_device> m_acia;
@@ -734,7 +735,7 @@ static INPUT_PORTS_START( clcd )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // clears screen and goes into infinite loop
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START(clcd)
+MACHINE_CONFIG_START(clcd_state::clcd)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M65C02, 2000000)
 	MCFG_CPU_PROGRAM_MAP(clcd_mem)

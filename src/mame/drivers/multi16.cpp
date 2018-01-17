@@ -37,6 +37,7 @@ public:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	uint32_t screen_update_multi16(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void multi16(machine_config &config);
 };
 
 
@@ -130,7 +131,7 @@ void multi16_state::machine_reset()
 }
 
 
-static MACHINE_CONFIG_START( multi16 )
+MACHINE_CONFIG_START(multi16_state::multi16)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8086, 8000000)
 	MCFG_CPU_PROGRAM_MAP(multi16_map)

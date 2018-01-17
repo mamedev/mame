@@ -1665,7 +1665,7 @@ WRITE_LINE_MEMBER(itech8_state::generate_tms34061_interrupt)
 
 /************* core pieces ******************/
 
-static MACHINE_CONFIG_START( itech8_core_lo )
+MACHINE_CONFIG_START(itech8_state::itech8_core_lo)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", MC6809, CLOCK_8MHz)
@@ -1699,7 +1699,7 @@ static MACHINE_CONFIG_START( itech8_core_lo )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( itech8_core_hi, itech8_core_lo )
+MACHINE_CONFIG_DERIVED(itech8_state::itech8_core_hi, itech8_core_lo)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1707,7 +1707,7 @@ static MACHINE_CONFIG_DERIVED( itech8_core_hi, itech8_core_lo )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( itech8_sound_ym2203 )
+MACHINE_CONFIG_START(itech8_state::itech8_sound_ym2203)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("soundcpu", MC6809, CLOCK_8MHz)
@@ -1727,7 +1727,7 @@ static MACHINE_CONFIG_START( itech8_sound_ym2203 )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( itech8_sound_ym2608b )
+MACHINE_CONFIG_START(itech8_state::itech8_sound_ym2608b)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("soundcpu", MC6809, CLOCK_8MHz)
@@ -1741,7 +1741,7 @@ static MACHINE_CONFIG_START( itech8_sound_ym2608b )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( itech8_sound_ym3812 )
+MACHINE_CONFIG_START(itech8_state::itech8_sound_ym3812)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("soundcpu", MC6809, CLOCK_8MHz)
@@ -1762,7 +1762,7 @@ static MACHINE_CONFIG_START( itech8_sound_ym3812 )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( itech8_sound_ym3812_external )
+MACHINE_CONFIG_START(itech8_state::itech8_sound_ym3812_external)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("soundcpu", MC6809, CLOCK_8MHz)
@@ -1780,7 +1780,7 @@ MACHINE_CONFIG_END
 
 /************* full drivers ******************/
 
-static MACHINE_CONFIG_DERIVED( wfortune, itech8_core_hi )
+MACHINE_CONFIG_DERIVED(itech8_state::wfortune, itech8_core_hi)
 
 	/* basic machine hardware */
 	MCFG_FRAGMENT_ADD(itech8_sound_ym2203)
@@ -1794,7 +1794,7 @@ static MACHINE_CONFIG_DERIVED( wfortune, itech8_core_hi )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( grmatch, itech8_core_hi )
+MACHINE_CONFIG_DERIVED(itech8_state::grmatch, itech8_core_hi)
 
 	/* basic machine hardware */
 	MCFG_FRAGMENT_ADD(itech8_sound_ym2608b)
@@ -1810,7 +1810,7 @@ static MACHINE_CONFIG_DERIVED( grmatch, itech8_core_hi )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( stratab_hi, itech8_core_hi )
+MACHINE_CONFIG_DERIVED(itech8_state::stratab_hi, itech8_core_hi)
 
 	/* basic machine hardware */
 	MCFG_FRAGMENT_ADD(itech8_sound_ym2203)
@@ -1823,7 +1823,7 @@ static MACHINE_CONFIG_DERIVED( stratab_hi, itech8_core_hi )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( stratab_lo, itech8_core_lo )
+MACHINE_CONFIG_DERIVED(itech8_state::stratab_lo, itech8_core_lo)
 
 	/* basic machine hardware */
 	MCFG_FRAGMENT_ADD(itech8_sound_ym2203)
@@ -1835,7 +1835,7 @@ static MACHINE_CONFIG_DERIVED( stratab_lo, itech8_core_lo )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( slikshot_hi, itech8_core_hi )
+MACHINE_CONFIG_DERIVED(itech8_state::slikshot_hi, itech8_core_hi)
 
 	/* basic machine hardware */
 	MCFG_FRAGMENT_ADD(itech8_sound_ym2203)
@@ -1852,7 +1852,7 @@ static MACHINE_CONFIG_DERIVED( slikshot_hi, itech8_core_hi )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( slikshot_lo, itech8_core_lo )
+MACHINE_CONFIG_DERIVED(itech8_state::slikshot_lo, itech8_core_lo)
 
 	/* basic machine hardware */
 	MCFG_FRAGMENT_ADD(itech8_sound_ym2203)
@@ -1869,7 +1869,7 @@ static MACHINE_CONFIG_DERIVED( slikshot_lo, itech8_core_lo )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( slikshot_lo_noz80, itech8_core_lo )
+MACHINE_CONFIG_DERIVED(itech8_state::slikshot_lo_noz80, itech8_core_lo)
 
 	/* basic machine hardware */
 	MCFG_FRAGMENT_ADD(itech8_sound_ym2203)
@@ -1881,7 +1881,7 @@ static MACHINE_CONFIG_DERIVED( slikshot_lo_noz80, itech8_core_lo )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( sstrike, slikshot_lo )
+MACHINE_CONFIG_DERIVED(itech8_state::sstrike, slikshot_lo)
 
 	/* basic machine hardware */
 	MCFG_MACHINE_START_OVERRIDE(itech8_state,sstrike)
@@ -1889,7 +1889,7 @@ static MACHINE_CONFIG_DERIVED( sstrike, slikshot_lo )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( hstennis_hi, itech8_core_hi )
+MACHINE_CONFIG_DERIVED(itech8_state::hstennis_hi, itech8_core_hi)
 
 	/* basic machine hardware */
 	MCFG_FRAGMENT_ADD(itech8_sound_ym3812)
@@ -1901,7 +1901,7 @@ static MACHINE_CONFIG_DERIVED( hstennis_hi, itech8_core_hi )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( hstennis_lo, itech8_core_lo )
+MACHINE_CONFIG_DERIVED(itech8_state::hstennis_lo, itech8_core_lo)
 
 	/* basic machine hardware */
 	MCFG_FRAGMENT_ADD(itech8_sound_ym3812)
@@ -1913,7 +1913,7 @@ static MACHINE_CONFIG_DERIVED( hstennis_lo, itech8_core_lo )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( rimrockn, itech8_core_hi )
+MACHINE_CONFIG_DERIVED(itech8_state::rimrockn, itech8_core_hi)
 
 	/* basic machine hardware */
 	MCFG_FRAGMENT_ADD(itech8_sound_ym3812_external)
@@ -1929,7 +1929,7 @@ static MACHINE_CONFIG_DERIVED( rimrockn, itech8_core_hi )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( ninclown, itech8_core_hi )
+MACHINE_CONFIG_DERIVED(itech8_state::ninclown, itech8_core_hi)
 
 	/* basic machine hardware */
 	MCFG_FRAGMENT_ADD(itech8_sound_ym3812_external)
@@ -1946,7 +1946,7 @@ static MACHINE_CONFIG_DERIVED( ninclown, itech8_core_hi )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( gtg2, itech8_core_lo )
+MACHINE_CONFIG_DERIVED(itech8_state::gtg2, itech8_core_lo)
 
 	/* basic machine hardware */
 	MCFG_FRAGMENT_ADD(itech8_sound_ym3812_external)

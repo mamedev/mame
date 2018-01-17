@@ -82,6 +82,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<ticket_dispenser_device> m_hopper;
 	required_ioport_array<6> m_in;
+	void big10(machine_config &config);
 };
 
 
@@ -217,7 +218,7 @@ INPUT_PORTS_END
 *           Machine Driver            *
 **************************************/
 
-static MACHINE_CONFIG_START( big10 )
+MACHINE_CONFIG_START(big10_state::big10)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK/6)    /* guess */

@@ -298,7 +298,7 @@ static GFXDECODE_START( ultratnk )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( ultratnk )
+MACHINE_CONFIG_START(ultratnk_state::ultratnk)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, PIXEL_CLOCK / 8)

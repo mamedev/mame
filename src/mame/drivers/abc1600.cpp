@@ -873,7 +873,7 @@ void abc1600_state::machine_reset()
 //  MACHINE_CONFIG( abc1600 )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( abc1600 )
+MACHINE_CONFIG_START(abc1600_state::abc1600)
 	// basic machine hardware
 	MCFG_CPU_ADD(MC68008P8_TAG, M68008, XTAL_64MHz/8)
 	MCFG_CPU_PROGRAM_MAP(abc1600_mem)

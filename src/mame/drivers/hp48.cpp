@@ -13,6 +13,7 @@
 
 #include "cpu/saturn/saturn.h"
 #include "machine/nvram.h"
+#include "sound/volt_reg.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -1256,7 +1257,7 @@ ADDRESS_MAP_END
 /*************************** driver ********************************/
 
 
-static MACHINE_CONFIG_START( hp48_common )
+MACHINE_CONFIG_START(hp48_state::hp48_common)
 
 	/* cpu */
 	MCFG_CPU_ADD ( "maincpu", SATURN, 3937007 ) /* almost 4 MHz */
@@ -1284,10 +1285,11 @@ static MACHINE_CONFIG_START( hp48_common )
 	/* sound */
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
 	MCFG_SOUND_ADD("dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
-	MCFG_SOUND_REFERENCE_INPUT(DAC_VREF_POS_INPUT, 1.0)
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( hp48gx, hp48_common )
+MACHINE_CONFIG_DERIVED(hp48_state::hp48gx, hp48_common)
 	MCFG_MACHINE_START_OVERRIDE  (hp48_state, hp48gx )
 
 	/* expansion ports */
@@ -1299,7 +1301,7 @@ static MACHINE_CONFIG_DERIVED( hp48gx, hp48_common )
 	//MCFG_KERMIT_ADD( "rs232_k", hp48_kermit_rs232_conf )
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( hp48g, hp48_common )
+MACHINE_CONFIG_DERIVED(hp48_state::hp48g, hp48_common)
 	MCFG_MACHINE_START_OVERRIDE  (hp48_state, hp48g )
 
 	/* serial I/O */
@@ -1308,7 +1310,7 @@ static MACHINE_CONFIG_DERIVED( hp48g, hp48_common )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( hp48gp, hp48_common )
+MACHINE_CONFIG_DERIVED(hp48_state::hp48gp, hp48_common)
 	MCFG_MACHINE_START_OVERRIDE  (hp48_state, hp48gp )
 
 	/* serial I/O */
@@ -1317,7 +1319,7 @@ static MACHINE_CONFIG_DERIVED( hp48gp, hp48_common )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( hp48sx, hp48_common )
+MACHINE_CONFIG_DERIVED(hp48_state::hp48sx, hp48_common)
 	MCFG_CPU_MODIFY     ( "maincpu" )
 	MCFG_CPU_CLOCK      ( 2000000 )
 	MCFG_MACHINE_START_OVERRIDE  (hp48_state, hp48sx )
@@ -1330,7 +1332,7 @@ static MACHINE_CONFIG_DERIVED( hp48sx, hp48_common )
 	//MCFG_KERMIT_ADD( "rs232_k", hp48_kermit_rs232_conf )
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( hp48s, hp48_common )
+MACHINE_CONFIG_DERIVED(hp48_state::hp48s, hp48_common)
 	MCFG_CPU_MODIFY     ( "maincpu" )
 	MCFG_CPU_CLOCK      ( 2000000 )
 	MCFG_MACHINE_START_OVERRIDE  (hp48_state, hp48s )
@@ -1339,7 +1341,7 @@ static MACHINE_CONFIG_DERIVED( hp48s, hp48_common )
 	//MCFG_KERMIT_ADD( "rs232_k", hp48_kermit_rs232_conf )
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( hp49g, hp48_common )
+MACHINE_CONFIG_DERIVED(hp48_state::hp49g, hp48_common)
 	MCFG_CPU_MODIFY     ( "maincpu" )
 	MCFG_MACHINE_START_OVERRIDE  (hp48_state, hp49g )
 

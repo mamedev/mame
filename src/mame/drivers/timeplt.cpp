@@ -421,7 +421,7 @@ void timeplt_state::machine_reset()
 {
 }
 
-static MACHINE_CONFIG_START( timeplt )
+MACHINE_CONFIG_START(timeplt_state::timeplt)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK/3/2)  /* not confirmed, but common for Konami games of the era */
@@ -457,11 +457,12 @@ static MACHINE_CONFIG_START( timeplt )
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_FRAGMENT_ADD(timeplt_sound)
+	MCFG_SOUND_ADD("timeplt_audio", TIMEPLT_AUDIO, 0)
+	downcast<timeplt_audio_device *>(device)->timeplt_sound(config);
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( psurge, timeplt )
+MACHINE_CONFIG_DERIVED(timeplt_state::psurge, timeplt)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -477,7 +478,7 @@ static MACHINE_CONFIG_DERIVED( psurge, timeplt )
 	MCFG_VIDEO_START_OVERRIDE(timeplt_state,psurge)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( bikkuric, timeplt )
+MACHINE_CONFIG_DERIVED(timeplt_state::bikkuric, timeplt)
 
 	MCFG_GFXDECODE_MODIFY("gfxdecode", chkun)
 
@@ -488,16 +489,16 @@ static MACHINE_CONFIG_DERIVED( bikkuric, timeplt )
 	MCFG_VIDEO_START_OVERRIDE(timeplt_state,chkun)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( chkun, bikkuric )
+MACHINE_CONFIG_DERIVED(timeplt_state::chkun, bikkuric)
 
 	MCFG_GFXDECODE_MODIFY("gfxdecode", chkun)
 
 	/* sound hardware */
-	MCFG_SOUND_MODIFY("ay2")
+	MCFG_SOUND_MODIFY("timeplt_audio:ay2")
 	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(timeplt_state, chkun_sound_w))
 
 	MCFG_TC8830F_ADD("tc8830f", XTAL_512kHz)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "timeplt_audio:mono", 0.10)
 MACHINE_CONFIG_END
 
 
@@ -514,7 +515,7 @@ ROM_START( timeplt )
 	ROM_LOAD( "tm2",          0x2000, 0x2000, CRC(58636cb5) SHA1(ab517efa93ae7be780af55faea82a6e83edd828c) )
 	ROM_LOAD( "tm3",          0x4000, 0x2000, CRC(ff4e0d83) SHA1(ef98a1abb45b22d7498a0aca520f43bbee248b22) )
 
-	ROM_REGION( 0x10000, "tpsound", 0 )
+	ROM_REGION( 0x10000, "timeplt_audio:tpsound", 0 )
 	ROM_LOAD( "tm7",          0x0000, 0x1000, CRC(d66da813) SHA1(408fca4515e8af84211df3e204c8776b2f8adb23) )
 
 	ROM_REGION( 0x2000, "gfx1", 0 )
@@ -537,7 +538,7 @@ ROM_START( timeplta )
 	ROM_LOAD( "cd_e2.bin",         0x2000, 0x2000, CRC(38b0c72a) SHA1(8f0950deb2f9e2b65714318b9e837a1c837f52a9) )
 	ROM_LOAD( "cd_e3.bin",         0x4000, 0x2000, CRC(83846870) SHA1(b1741e7e5674f9e63e113ead0cb7f5ef874eac5f) )
 
-	ROM_REGION( 0x10000, "tpsound", 0 )
+	ROM_REGION( 0x10000, "timeplt_audio:tpsound", 0 )
 	ROM_LOAD( "tm7",          0x0000, 0x1000, CRC(d66da813) SHA1(408fca4515e8af84211df3e204c8776b2f8adb23) )
 
 	ROM_REGION( 0x2000, "gfx1", 0 )
@@ -560,7 +561,7 @@ ROM_START( timepltc )
 	ROM_LOAD( "cd2y",         0x2000, 0x2000, CRC(0dcf5287) SHA1(c36628367e81ac07f5ace72b45ebb7140b6aa116) )
 	ROM_LOAD( "cd3y",         0x4000, 0x2000, CRC(c789b912) SHA1(dead7b20a40769e48738fccc3a17e2266aac445d) )
 
-	ROM_REGION( 0x10000, "tpsound", 0 )
+	ROM_REGION( 0x10000, "timeplt_audio:tpsound", 0 )
 	ROM_LOAD( "tm7",          0x0000, 0x1000, CRC(d66da813) SHA1(408fca4515e8af84211df3e204c8776b2f8adb23) )
 
 	ROM_REGION( 0x2000, "gfx1", 0 )
@@ -583,7 +584,7 @@ ROM_START( spaceplt )
 	ROM_LOAD( "sp2",          0x2000, 0x2000, CRC(1f0308ef) SHA1(dd88378fc4cefe473f310d4730268c98354a4a44) )
 	ROM_LOAD( "sp3",          0x4000, 0x2000, CRC(90aeca50) SHA1(9c6fddfeafa84f5284ec8f7c9d46216b110badc1) )
 
-	ROM_REGION( 0x10000, "tpsound", 0 )
+	ROM_REGION( 0x10000, "timeplt_audio:tpsound", 0 )
 	ROM_LOAD( "tm7",          0x0000, 0x1000, CRC(d66da813) SHA1(408fca4515e8af84211df3e204c8776b2f8adb23) )
 
 	ROM_REGION( 0x2000, "gfx1", 0 )
@@ -607,7 +608,7 @@ ROM_START( psurge )
 	ROM_LOAD( "p2",           0x2000, 0x2000, CRC(3ff41576) SHA1(9bdbad31c65dff76942967b5a334407b0326f752) )
 	ROM_LOAD( "p3",           0x4000, 0x2000, CRC(e8fe120a) SHA1(b6320c9cb1a67097692aa0de7d88b0dfb63dedd7) )
 
-	ROM_REGION( 0x10000, "tpsound", 0 )
+	ROM_REGION( 0x10000, "timeplt_audio:tpsound", 0 )
 	ROM_LOAD( "p6",           0x0000, 0x1000, CRC(b52d01fa) SHA1(9b6cf9ea51d3a87c174f34d42a4b1b5f38b48723) )
 	ROM_LOAD( "p7",           0x1000, 0x1000, CRC(9db5c0ce) SHA1(b5bc1d89a7f7d7a0baae64390c37ee11f69a0e76) )
 
@@ -630,7 +631,7 @@ ROM_START( chkun )
 	ROM_LOAD( "n1.16a",   0x0000, 0x4000, CRC(c5879f9b) SHA1(68e3a87dfe6b3d1e0cdadd1ed8ad115a9d3055f9) )
 	ROM_LOAD( "12.14a",   0x4000, 0x2000, CRC(80cc55da) SHA1(68727721479624cd0d38d895b98dcef4edac13e9) )
 
-	ROM_REGION( 0x12000, "tpsound", 0 )
+	ROM_REGION( 0x12000, "timeplt_audio:tpsound", 0 )
 	ROM_LOAD( "15.3l",    0x0000, 0x2000, CRC(1f1463ca) SHA1(870abbca35236fcce6a2f640a238e20b9e57f10f))
 
 	ROM_REGION( 0x4000, "gfx1", 0 )
@@ -659,7 +660,7 @@ ROM_START( bikkuric )
 	ROM_LOAD( "1.a16", 0x00000, 0x04000, CRC(e8d595ab) SHA1(01f6a5321274befcd03a0ec18ed9770aca4527b6) )
 	ROM_LOAD( "2.a14", 0x04000, 0x02000, CRC(63fd7d53) SHA1(b1ef666453c5c9e344bee544a0673068d60158fa) )
 
-	ROM_REGION( 0x10000, "tpsound", 0 )
+	ROM_REGION( 0x10000, "timeplt_audio:tpsound", 0 )
 	ROM_LOAD( "5.l3",  0x00000, 0x02000, CRC(bc438531) SHA1(e19badc417b0538010cf535d3f733acc54b0cd96) )
 
 	ROM_REGION( 0x8000, "gfx1", 0 )

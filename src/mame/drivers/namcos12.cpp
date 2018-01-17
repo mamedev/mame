@@ -1168,6 +1168,7 @@ public:
 	void namcos12_rom_read( uint32_t *p_n_psxram, uint32_t n_address, int32_t n_size );
 	void namcos12_sub_irq( screen_device &screen, bool vblank_state );
 
+	void coh700(machine_config &config);
 protected:
 	virtual void machine_reset() override;
 };
@@ -1178,6 +1179,12 @@ class namcos12_boothack_state : public namcos12_state
 public:
 	using namcos12_state::namcos12_state;
 
+	void technodr(machine_config &config);
+	void golgo13(machine_config &config);
+	void aplarail(machine_config &config);
+	void truckk(machine_config &config);
+	void tektagt(machine_config &config);
+	void ptblank2(machine_config &config);
 protected:
 	virtual void machine_reset() override;
 };
@@ -1664,7 +1671,7 @@ DRIVER_INIT_MEMBER(namcos12_state,technodr)
 	*( (uint32_t *)( memregion( "sub" )->base() + 0x14b6 ) ) = 0;
 }
 
-static MACHINE_CONFIG_START( coh700 )
+MACHINE_CONFIG_START(namcos12_state::coh700)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", CXD8661R, XTAL_100MHz)
@@ -1673,7 +1680,7 @@ static MACHINE_CONFIG_START( coh700 )
 	MCFG_RAM_MODIFY("maincpu:ram")
 	MCFG_RAM_DEFAULT_SIZE("4M")
 
-	MCFG_PSX_DMA_CHANNEL_READ( "maincpu", 5, psxdma_device::read_delegate(&namcos12_state::namcos12_rom_read, (namcos12_state *) owner ))
+	MCFG_PSX_DMA_CHANNEL_READ( "maincpu", 5, psxdma_device::read_delegate(&namcos12_state::namcos12_rom_read, this ))
 
 	MCFG_CPU_ADD("sub", H83002, 16934400) // frequency based on research (superctr)
 	MCFG_CPU_PROGRAM_MAP(s12h8rwmap)
@@ -1693,7 +1700,7 @@ static MACHINE_CONFIG_START( coh700 )
 
 	/* video hardware */
 	MCFG_PSXGPU_ADD( "maincpu", "gpu", CXD8654Q, 0x200000, XTAL_53_693175MHz )
-	MCFG_PSXGPU_VBLANK_CALLBACK(vblank_state_delegate(&namcos12_state::namcos12_sub_irq, (namcos12_state *) owner ) )
+	MCFG_PSXGPU_VBLANK_CALLBACK(vblank_state_delegate(&namcos12_state::namcos12_sub_irq, this ) )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -1705,21 +1712,21 @@ static MACHINE_CONFIG_START( coh700 )
 	//MCFG_SOUND_ROUTE(3, "rspeaker", 1.00)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( ptblank2, coh700 )
+MACHINE_CONFIG_DERIVED(namcos12_boothack_state::ptblank2, coh700)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP( ptblank2_map )
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( tektagt, coh700 )
+MACHINE_CONFIG_DERIVED(namcos12_boothack_state::tektagt, coh700)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP( tektagt_map )
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( golgo13, coh700 )
+MACHINE_CONFIG_DERIVED(namcos12_boothack_state::golgo13, coh700)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("sub")
@@ -1736,7 +1743,7 @@ static ADDRESS_MAP_START( jvsiomap, AS_IO, 16, namcos12_state )
 ADDRESS_MAP_END
 
 
-static MACHINE_CONFIG_DERIVED( truckk, coh700 )
+MACHINE_CONFIG_DERIVED(namcos12_boothack_state::truckk, coh700)
 	// Timer at 115200*16 for the jvs serial clock
 	MCFG_DEVICE_MODIFY(":sub:sci0")
 	MCFG_H8_SCI_SET_EXTERNAL_CLOCK_PERIOD(attotime::from_hz(JVSCLOCK/8))
@@ -1805,7 +1812,7 @@ static ADDRESS_MAP_START( plarailjvsiomap, AS_IO, 16, namcos12_state )
 	AM_RANGE(h8_device::ADC_2, h8_device::ADC_2) AM_NOP
 ADDRESS_MAP_END
 
-static MACHINE_CONFIG_DERIVED( technodr, coh700 )
+MACHINE_CONFIG_DERIVED(namcos12_boothack_state::technodr, coh700)
 	// Timer at 115200*16 for the jvs serial clock
 	MCFG_DEVICE_MODIFY(":sub:sci0")
 	MCFG_H8_SCI_SET_EXTERNAL_CLOCK_PERIOD(attotime::from_hz(JVSCLOCK/8))
@@ -1827,7 +1834,7 @@ static MACHINE_CONFIG_DERIVED( technodr, coh700 )
 	MCFG_QUANTUM_TIME(attotime::from_hz(2*115200))
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( aplarail, coh700 )
+MACHINE_CONFIG_DERIVED(namcos12_boothack_state::aplarail, coh700)
 	// Timer at 115200*16 for the jvs serial clock
 	MCFG_DEVICE_MODIFY(":sub:sci0")
 	MCFG_H8_SCI_SET_EXTERNAL_CLOCK_PERIOD(attotime::from_hz(JVSCLOCK/8))

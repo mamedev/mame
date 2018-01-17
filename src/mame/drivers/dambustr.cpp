@@ -71,6 +71,7 @@ public:
 	int m_noise_data;
 	DECLARE_WRITE8_MEMBER(dambustr_noise_enable_w);
 	DECLARE_DRIVER_INIT(dambustr);
+	void dambustr(machine_config &config);
 };
 
 
@@ -251,7 +252,7 @@ DRIVER_INIT_MEMBER(dambustr_state,dambustr)
 
 
 
-static MACHINE_CONFIG_START( dambustr )
+MACHINE_CONFIG_START(dambustr_state::dambustr)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 18432000/6)    /* 3.072 MHz */
 	MCFG_CPU_PROGRAM_MAP(dambustr_map)

@@ -51,6 +51,7 @@ ToDO:
 #include "sound/ay8910.h"
 #include "sound/dac.h"
 #include "sound/votrax.h"
+#include "sound/volt_reg.h"
 #include "speaker.h"
 
 #include "taito.lh"
@@ -76,6 +77,13 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(pia_cb2_w);
 	DECLARE_WRITE_LINE_MEMBER(votrax_request);
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_a);
+	void taito2(machine_config &config);
+	void taito6(machine_config &config);
+	void taito(machine_config &config);
+	void shock(machine_config &config);
+	void taito4(machine_config &config);
+	void taito5(machine_config &config);
+	void taito_ay_audio(machine_config &config);
 private:
 	uint8_t m_out_offs;
 	uint8_t m_sndcmd;
@@ -324,7 +332,7 @@ TIMER_DEVICE_CALLBACK_MEMBER( taito_state::timer_a )
 	output().set_digit_value(++digit, patterns[m_p_ram[m_out_offs++]&15]);
 }
 
-static MACHINE_CONFIG_START( taito )
+MACHINE_CONFIG_START(taito_state::taito)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8080, 19000000/9)
 	MCFG_CPU_PROGRAM_MAP(taito_map)
@@ -340,7 +348,8 @@ static MACHINE_CONFIG_START( taito )
 
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
 	MCFG_SOUND_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.475) // unknown DAC
-	MCFG_SOUND_REFERENCE_INPUT(DAC_VREF_POS_INPUT, 1.0) MCFG_SOUND_REFERENCE_INPUT(DAC_VREF_NEG_INPUT, -1.0)
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 
 	MCFG_DEVICE_ADD("pia", PIA6821, 0)
 	//MCFG_PIA_READPA_HANDLER(READ8(taito_state, pia_pa_r))
@@ -355,20 +364,20 @@ static MACHINE_CONFIG_START( taito )
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer_a", taito_state, timer_a, attotime::from_hz(200))
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( shock, taito )
+MACHINE_CONFIG_DERIVED(taito_state::shock, taito)
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_PROGRAM_MAP(shock_map)
 	MCFG_CPU_MODIFY( "audiocpu" )
 	MCFG_CPU_PROGRAM_MAP(shock_sub_map)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( taito2, taito )
+MACHINE_CONFIG_DERIVED(taito_state::taito2, taito)
 	MCFG_CPU_MODIFY( "audiocpu" )
 	MCFG_CPU_PROGRAM_MAP(taito_sub_map2)
 MACHINE_CONFIG_END
 
 // add vox
-static MACHINE_CONFIG_DERIVED( taito4, taito )
+MACHINE_CONFIG_DERIVED(taito_state::taito4, taito)
 	MCFG_SPEAKER_STANDARD_MONO("voxsnd")
 	MCFG_DEVICE_ADD("votrax", VOTRAX_SC01, 720000) // guess
 	MCFG_VOTRAX_SC01_REQUEST_CB(WRITELINE(taito_state, votrax_request))
@@ -378,7 +387,7 @@ static MACHINE_CONFIG_DERIVED( taito4, taito )
 	MCFG_PIA_CB2_HANDLER(WRITELINE(taito_state, pia_cb2_w))
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( taito_ay_audio )
+MACHINE_CONFIG_START(taito_state::taito_ay_audio)
 	MCFG_CPU_MODIFY( "audiocpu" )
 	MCFG_CPU_PROGRAM_MAP(taito_sub_map5)
 
@@ -390,12 +399,12 @@ static MACHINE_CONFIG_START( taito_ay_audio )
 MACHINE_CONFIG_END
 
 // add ay
-static MACHINE_CONFIG_DERIVED( taito5, taito )
+MACHINE_CONFIG_DERIVED(taito_state::taito5, taito)
 	MCFG_FRAGMENT_ADD( taito_ay_audio )
 MACHINE_CONFIG_END
 
 // add vox and ay
-static MACHINE_CONFIG_DERIVED( taito6, taito4 )
+MACHINE_CONFIG_DERIVED(taito_state::taito6, taito4)
 	MCFG_FRAGMENT_ADD( taito_ay_audio )
 MACHINE_CONFIG_END
 

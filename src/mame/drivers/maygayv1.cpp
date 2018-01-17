@@ -256,6 +256,7 @@ public:
 	DECLARE_READ8_MEMBER(data_to_i8031);
 	DECLARE_WRITE_LINE_MEMBER(duart_irq_handler);
 	DECLARE_WRITE_LINE_MEMBER(duart_txa);
+	void maygayv1(machine_config &config);
 };
 
 
@@ -864,7 +865,7 @@ INTERRUPT_GEN_MEMBER(maygayv1_state::vsync_interrupt)
 }
 
 
-static MACHINE_CONFIG_START( maygayv1 )
+MACHINE_CONFIG_START(maygayv1_state::maygayv1)
 	MCFG_CPU_ADD("maincpu", M68000, MASTER_CLOCK / 2)
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", maygayv1_state,  vsync_interrupt)

@@ -53,6 +53,7 @@ public:
 			m_eeprom(*this, "eeprom")
 	{ }
 
+	void konendev(machine_config &config);
 protected:
 	// devices
 	required_device<cpu_device> m_maincpu;
@@ -299,7 +300,7 @@ INTERRUPT_GEN_MEMBER(konendev_state::vbl_interrupt)
 	device.execute().set_input_line(INPUT_LINE_IRQ3, ASSERT_LINE);
 }
 
-static MACHINE_CONFIG_START( konendev )
+MACHINE_CONFIG_START(konendev_state::konendev)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", PPC403GCX, 32000000) // Clock unknown
 	MCFG_CPU_PROGRAM_MAP(konendev_map)

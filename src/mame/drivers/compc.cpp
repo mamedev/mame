@@ -32,6 +32,8 @@ public:
 	DECLARE_WRITE8_MEMBER(pio_w);
 	DECLARE_READ8_MEMBER(pio_r);
 
+	void compc(machine_config &config);
+	void pc10iii(machine_config &config);
 private:
 	u8 m_portb, m_dips;
 };
@@ -184,7 +186,7 @@ static ADDRESS_MAP_START(compciii_io, AS_IO, 8, compc_state)
 	AM_RANGE(0x0000, 0x00ff) AM_DEVICE("mb", pc_noppi_mb_device, map)
 ADDRESS_MAP_END
 
-static MACHINE_CONFIG_START(compc)
+MACHINE_CONFIG_START(compc_state::compc)
 	MCFG_CPU_ADD("maincpu", I8088, 4772720*2)
 	MCFG_CPU_PROGRAM_MAP(compc_map)
 	MCFG_CPU_IO_MAP(compc_io)
@@ -216,7 +218,7 @@ static MACHINE_CONFIG_START(compc)
 	MCFG_SOFTWARE_LIST_ADD("disk_list", "ibm5150")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED(pc10iii, compc)
+MACHINE_CONFIG_DERIVED(compc_state::pc10iii, compc)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(compciii_io)
 MACHINE_CONFIG_END

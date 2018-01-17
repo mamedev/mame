@@ -35,6 +35,10 @@ protected:
 
 	// internal state
 	const char *m_device_name;
+
+public:
+	// getter (for validation purposes)
+	const char *device_name() const { return m_device_name; }
 };
 
 
@@ -66,7 +70,7 @@ private:
 // device_delegate is a delegate that wraps with a device tag and can be easily
 // late bound without replicating logic everywhere
 template<typename _Signature>
-class device_delegate : public named_delegate<_Signature>, device_delegate_helper
+class device_delegate : public named_delegate<_Signature>, public device_delegate_helper
 {
 	typedef device_delegate<_Signature> thistype;
 	typedef named_delegate<_Signature> basetype;
@@ -98,9 +102,6 @@ public:
 
 	// perform the binding
 	void bind_relative_to(device_t &search_root) { if (!basetype::isnull()) basetype::late_bind(bound_object(search_root)); }
-
-	// getter (for validation purposes)
-	const char *device_name() const { return m_device_name; }
 };
 
 

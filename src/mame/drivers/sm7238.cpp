@@ -89,6 +89,7 @@ public:
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
+	void sm7238(machine_config &config);
 private:
 	void recompute_parameters();
 
@@ -353,7 +354,7 @@ PALETTE_INIT_MEMBER(sm7238_state, sm7238)
 	palette.set_pen_color(2, 0x00, 0xff, 0x00); // highlight
 }
 
-static MACHINE_CONFIG_START( sm7238 )
+MACHINE_CONFIG_START(sm7238_state::sm7238)
 	MCFG_CPU_ADD("maincpu", I8080, XTAL_16_5888MHz/9)
 	MCFG_CPU_PROGRAM_MAP(sm7238_mem)
 	MCFG_CPU_IO_MAP(sm7238_io)

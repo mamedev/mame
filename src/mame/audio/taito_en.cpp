@@ -270,7 +270,7 @@ WRITE_LINE_MEMBER(taito_en_device::duart_irq_handler)
 // device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( taito_en_device::device_add_mconfig )
+MACHINE_CONFIG_START(taito_en_device::device_add_mconfig)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("audiocpu", M68000, XTAL_30_4761MHz / 2)

@@ -328,7 +328,7 @@ INTERRUPT_GEN_MEMBER(tp84_state::sub_vblank_irq)
 }
 
 
-static MACHINE_CONFIG_START( tp84 )
+MACHINE_CONFIG_START(tp84_state::tp84)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("cpu1", MC6809E, XTAL_18_432MHz/12) /* verified on pcb */
@@ -390,7 +390,7 @@ static MACHINE_CONFIG_START( tp84 )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( tp84b, tp84 )
+MACHINE_CONFIG_DERIVED(tp84_state::tp84b, tp84)
 	MCFG_CPU_MODIFY("cpu1")
 	MCFG_CPU_PROGRAM_MAP(tp84b_cpu1_map)
 MACHINE_CONFIG_END

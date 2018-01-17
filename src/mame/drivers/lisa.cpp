@@ -95,7 +95,7 @@ static const floppy_interface lisa_floppy_interface =
 ***************************************************************************/
 
 /* Lisa1 and Lisa 2 machine */
-static MACHINE_CONFIG_START( lisa )
+MACHINE_CONFIG_START(lisa_state::lisa)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 5093760)        /* 20.37504 MHz / 4 */
 	MCFG_CPU_PROGRAM_MAP(lisa_map)
@@ -163,7 +163,7 @@ static MACHINE_CONFIG_START( lisa )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( lisa210, lisa )
+MACHINE_CONFIG_DERIVED(lisa_state::lisa210, lisa)
 	MCFG_CPU_MODIFY( "fdccpu" )
 	MCFG_CPU_PROGRAM_MAP(lisa210_fdc_map)
 
@@ -178,7 +178,7 @@ static MACHINE_CONFIG_DERIVED( lisa210, lisa )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( macxl, lisa210 )
+MACHINE_CONFIG_DERIVED(lisa_state::macxl, lisa210)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_SIZE(   768/* ???? */, 447/* ???? */)
 	MCFG_SCREEN_VISIBLE_AREA(0, 608-1, 0, 431-1)

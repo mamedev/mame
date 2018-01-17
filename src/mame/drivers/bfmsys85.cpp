@@ -134,6 +134,7 @@ public:
 	required_device<stepper_device> m_reel3;
 	required_device<acia6850_device> m_acia6850_0;
 	required_device<meters_device> m_meters;
+	void bfmsys85(machine_config &config);
 };
 
 #define MASTER_CLOCK    (XTAL_4MHz)
@@ -385,7 +386,7 @@ ADDRESS_MAP_END
 
 // machine driver for system85 board //////////////////////////////////////
 
-static MACHINE_CONFIG_START( bfmsys85 )
+MACHINE_CONFIG_START(bfmsys85_state::bfmsys85)
 	MCFG_CPU_ADD("maincpu", M6809, MASTER_CLOCK/4)          // 6809 CPU at 1 Mhz
 	MCFG_CPU_PROGRAM_MAP(memmap)                        // setup read and write memorymap
 	MCFG_CPU_PERIODIC_INT_DRIVER(bfmsys85_state, timer_irq,  1000)              // generate 1000 IRQ's per second

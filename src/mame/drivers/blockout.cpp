@@ -286,7 +286,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(blockout_state::blockout_scanline)
 		m_maincpu->set_input_line(5, ASSERT_LINE);
 }
 
-static MACHINE_CONFIG_START( blockout )
+MACHINE_CONFIG_START(blockout_state::blockout)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, MAIN_CLOCK)       /* MRH - 8.76 makes gfx/adpcm samples sync better -- but 10 is correct speed*/
@@ -325,7 +325,7 @@ static MACHINE_CONFIG_START( blockout )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( agress, blockout )
+MACHINE_CONFIG_DERIVED(blockout_state::agress, blockout)
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_PROGRAM_MAP(agress_map)
 MACHINE_CONFIG_END

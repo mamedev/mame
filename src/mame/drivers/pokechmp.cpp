@@ -216,7 +216,7 @@ OKI M6295 (an AD65 on this board, note pin 7 is low): 1.5mhz
 
 */
 
-static MACHINE_CONFIG_START( pokechmp )
+MACHINE_CONFIG_START(pokechmp_state::pokechmp)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, XTAL_4MHz/4)

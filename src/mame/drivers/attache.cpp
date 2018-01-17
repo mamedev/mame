@@ -180,6 +180,7 @@ public:
 	void keyboard_clock_w(bool state);
 	uint8_t keyboard_data_r();
 	uint16_t get_key();
+	void attache(machine_config &config);
 private:
 	required_device<cpu_device> m_maincpu;
 	required_memory_region m_rom;
@@ -257,6 +258,7 @@ public:
 
 	virtual void machine_reset() override;
 
+	void attache816(machine_config &config);
 private:
 	required_device<cpu_device> m_extcpu;
 	required_device<i8255_device> m_ppi;
@@ -1094,7 +1096,7 @@ void attache816_state::machine_reset()
 	attache_state::machine_reset();
 }
 
-static MACHINE_CONFIG_START( attache )
+MACHINE_CONFIG_START(attache_state::attache)
 	MCFG_CPU_ADD("maincpu",Z80,XTAL_8MHz / 2)
 	MCFG_CPU_PROGRAM_MAP(attache_map)
 	MCFG_CPU_IO_MAP(attache_io)
@@ -1172,7 +1174,7 @@ static MACHINE_CONFIG_START( attache )
 	MCFG_SOFTWARE_LIST_ADD("disk_list","attache")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( attache816 )
+MACHINE_CONFIG_START(attache816_state::attache816)
 	MCFG_CPU_ADD("maincpu",Z80,XTAL_8MHz / 2)
 	MCFG_CPU_PROGRAM_MAP(attache_map)
 	MCFG_CPU_IO_MAP(attache816_io)

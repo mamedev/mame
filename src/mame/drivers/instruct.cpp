@@ -77,6 +77,7 @@ public:
 	DECLARE_WRITE8_MEMBER(portfa_w);
 	DECLARE_QUICKLOAD_LOAD_MEMBER(instruct);
 	INTERRUPT_GEN_MEMBER(t2l_int);
+	void instruct(machine_config &config);
 private:
 	virtual void machine_reset() override;
 	uint16_t m_lar;
@@ -408,7 +409,7 @@ QUICKLOAD_LOAD_MEMBER( instruct_state, instruct )
 	return result;
 }
 
-static MACHINE_CONFIG_START( instruct )
+MACHINE_CONFIG_START(instruct_state::instruct)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",S2650, XTAL_3_579545MHz / 4)
 	MCFG_CPU_PROGRAM_MAP(mem_map)

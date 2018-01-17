@@ -13,7 +13,6 @@
 */
 
 
-MACHINE_CONFIG_EXTERN( bfm_sc5 );
 INPUT_PORTS_EXTERN( bfm_sc5 );
 
 ROM_START( sc5plays )

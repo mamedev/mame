@@ -60,7 +60,7 @@ ADDRESS_MAP_END
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( c64_supercpu_device::device_add_mconfig )
+MACHINE_CONFIG_START(c64_supercpu_device::device_add_mconfig)
 	MCFG_CPU_ADD(G65816_TAG, G65816, 1000000)
 	MCFG_CPU_PROGRAM_MAP(c64_supercpu_map)
 

@@ -359,7 +359,7 @@ GFXDECODE_END
 #define MASTER_CLOCK XTAL_24MHz
 #define OKI_CLOCK XTAL_8MHz
 
-static MACHINE_CONFIG_START( fstarfrc )
+MACHINE_CONFIG_START(tecmo16_state::fstarfrc)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000,MASTER_CLOCK/2)          /* 12MHz */
@@ -410,7 +410,7 @@ static MACHINE_CONFIG_START( fstarfrc )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.40)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( ginkun, fstarfrc )
+MACHINE_CONFIG_DERIVED(tecmo16_state::ginkun, fstarfrc)
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(ginkun_map)
@@ -418,7 +418,7 @@ static MACHINE_CONFIG_DERIVED( ginkun, fstarfrc )
 	MCFG_VIDEO_START_OVERRIDE(tecmo16_state,ginkun)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( riot, ginkun )
+MACHINE_CONFIG_DERIVED(tecmo16_state::riot, ginkun)
 
 	/* basic machine hardware */
 	MCFG_VIDEO_START_OVERRIDE(tecmo16_state,riot)

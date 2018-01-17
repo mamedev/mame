@@ -9139,17 +9139,17 @@ has been replaced with an all-zero block. -->
 	</software>
 
 	<software name="spdball2">
-		<description>Speedball II - Brutal Deluxe</description>
+		<description>Speedball 2 - Brutal Deluxe</description>
 		<year>1990</year>
 		<publisher>Imageworks</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size = "368640">
-				<rom name="Speedball II - Brutal Deluxe (1990)(Imageworks)(Disk 1 of 2).dsk" size="368640" crc="7076b522" sha1="80e4d60ebe4c948f13897fb74c403b22a2acfceb" offset="0"/>
+				<rom name="Speedball 2 - Brutal Deluxe (1990)(Imageworks)(Disk 1 of 2).dsk" size="368640" crc="7076b522" sha1="80e4d60ebe4c948f13897fb74c403b22a2acfceb" offset="0"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size = "368640">
-				<rom name="Speedball II - Brutal Deluxe (1990)(Imageworks)(Disk 2 of 2).dsk" size="368640" crc="09fc221a" sha1="a71468919cb0d32706de00dae2cc14ca0b471a62" offset="0"/>
+				<rom name="Speedball 2 - Brutal Deluxe (1990)(Imageworks)(Disk 2 of 2).dsk" size="368640" crc="09fc221a" sha1="a71468919cb0d32706de00dae2cc14ca0b471a62" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -9204,6 +9204,23 @@ has been replaced with an all-zero block. -->
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size = "368640">
 				<rom name="Starflight 2 Disk 2.bin" size="368640" crc="be83f4cb" sha1="04f4450fd1aad9558e882d925b96ebb1397b9d46" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="stellar7">
+		<description>Stellar 7</description>
+		<year>1990</year>
+		<publisher>Dynamix</publisher>
+		<info name="developer" value="Dynamix" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Stellar 7 [Dynamix] [1990] [3.5DD] [Disk 1 of 2].img" size="737280" crc="9b0db70d" sha1="0a7264e6fb359e171166c21a761aa37764a298b1" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Stellar 7 [Dynamix] [1990] [3.5DD] [Disk 2 of 2].img" size="737280" crc="c828a588" sha1="f27f78e79d5a9cc0a26d3b0fa26ebb671db40765" offset="0"/>
 			</dataarea>
 		</part>
 	</software>

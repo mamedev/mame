@@ -339,7 +339,7 @@ GFXDECODE_END
 
 
 
-static MACHINE_CONFIG_START( iqblock )
+MACHINE_CONFIG_START(iqblock_state::iqblock)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80,12000000/2) /* 6 MHz */

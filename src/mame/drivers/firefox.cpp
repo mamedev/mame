@@ -127,6 +127,7 @@ public:
 	required_device<palette_device> m_palette;
 	required_device<generic_latch_8_device> m_soundlatch;
 	required_device<generic_latch_8_device> m_soundlatch2;
+	void firefox(machine_config &config);
 };
 
 
@@ -721,7 +722,7 @@ GFXDECODE_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( firefox )
+MACHINE_CONFIG_START(firefox_state::firefox)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", MC6809E, MASTER_XTAL/8) // 68B09E

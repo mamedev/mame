@@ -23,6 +23,18 @@
 		</part>
 	</software>
 
+	<software name="advbasic">
+		<description>Advanced BASIC</description>
+		<year>1987</year>
+		<publisher>Tubelink</publisher>
+		<info name="usage" value="Requires 6502 2nd Processor" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="87040">
+				<rom name="Advanced BASIC 1.02.ssd" size="87040" crc="f54bd1dd" sha1="3ffb605dfa7e07f37d70364e06487b95a5ec427c" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="bitstik1">
 		<description>Bitstik Graphics System</description>
 		<year>1984</year>

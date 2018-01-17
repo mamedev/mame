@@ -57,6 +57,8 @@ public:
 	IRQ_CALLBACK_MEMBER(sound_int_cb);
 	DECLARE_DRIVER_INIT(jp);
 
+	void jp(machine_config &config);
+	void jps(machine_config &config);
 private:
 	void update_display();
 	virtual void machine_start() override;
@@ -320,7 +322,7 @@ DRIVER_INIT_MEMBER( jp_state, jp )
 {
 }
 
-static MACHINE_CONFIG_START( jp )
+MACHINE_CONFIG_START(jp_state::jp)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_8MHz / 2)
 	MCFG_CPU_PROGRAM_MAP(jp_map)
@@ -395,7 +397,7 @@ IRQ_CALLBACK_MEMBER(jp_state::sound_int_cb)
 	return 0xff;
 }
 
-static MACHINE_CONFIG_DERIVED( jps, jp )
+MACHINE_CONFIG_DERIVED(jp_state::jps, jp)
 	MCFG_CPU_ADD("soundcpu", Z80, XTAL_8MHz / 2)
 	MCFG_CPU_PROGRAM_MAP(jp_sound_map)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(jp_state, sound_int_cb)

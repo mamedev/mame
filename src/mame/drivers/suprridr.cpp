@@ -317,7 +317,7 @@ GFXDECODE_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( suprridr )
+MACHINE_CONFIG_START(suprridr_state::suprridr)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_49_152MHz/16)     /* 3 MHz */

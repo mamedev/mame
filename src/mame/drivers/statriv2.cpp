@@ -122,6 +122,9 @@ public:
 	DECLARE_VIDEO_START(vertical);
 	uint32_t screen_update_statriv2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(statriv2_interrupt);
+	void statriv2(machine_config &config);
+	void funcsino(machine_config &config);
+	void statriv2v(machine_config &config);
 };
 
 
@@ -590,7 +593,7 @@ GFXDECODE_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( statriv2 )
+MACHINE_CONFIG_START(statriv2_state::statriv2)
 	/* basic machine hardware */
 	/* FIXME: The 8085A had a max clock of 6MHz, internally divided by 2! */
 	MCFG_CPU_ADD("maincpu", I8085A, MASTER_CLOCK)
@@ -629,7 +632,7 @@ static MACHINE_CONFIG_START( statriv2 )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( statriv2v, statriv2 )
+MACHINE_CONFIG_DERIVED(statriv2_state::statriv2v, statriv2)
 
 	/* basic machine hardware */
 
@@ -640,7 +643,7 @@ static MACHINE_CONFIG_DERIVED( statriv2v, statriv2 )
 	MCFG_GFXDECODE_MODIFY("gfxdecode", vertical)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( funcsino, statriv2 )
+MACHINE_CONFIG_DERIVED(statriv2_state::funcsino, statriv2)
 
 	/* basic machine hardware */
 

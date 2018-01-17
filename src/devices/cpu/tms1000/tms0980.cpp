@@ -59,7 +59,7 @@ tms1980_cpu_device::tms1980_cpu_device(const machine_config &mconfig, const char
 
 
 // machine configs
-MACHINE_CONFIG_MEMBER(tms0980_cpu_device::device_add_mconfig)
+MACHINE_CONFIG_START(tms0980_cpu_device::device_add_mconfig)
 
 	// main opcodes PLA, microinstructions PLA, output PLA, segment PLA
 	MCFG_PLA_ADD("ipla", 9, 22, 24)
@@ -72,7 +72,7 @@ MACHINE_CONFIG_MEMBER(tms0980_cpu_device::device_add_mconfig)
 	MCFG_PLA_FILEFORMAT(BERKELEY)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_MEMBER(tms1980_cpu_device::device_add_mconfig)
+MACHINE_CONFIG_START(tms1980_cpu_device::device_add_mconfig)
 
 	// main opcodes PLA, microinstructions PLA, output PLA
 	MCFG_PLA_ADD("ipla", 9, 22, 24)

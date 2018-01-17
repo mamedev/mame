@@ -199,7 +199,7 @@ GFXDECODE_END
 
 /******************************************************************************/
 
-static MACHINE_CONFIG_START( stadhero )
+MACHINE_CONFIG_START(stadhero_state::stadhero)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_20MHz/2)

@@ -153,6 +153,15 @@ public:
 	DECLARE_PALETTE_INIT(glcolor);
 	TIMER_DEVICE_CALLBACK_MEMBER(irq_timer);
 	IRQ_CALLBACK_MEMBER(prestige_int_ack);
+	void prestige_base(machine_config &config);
+	void princ(machine_config &config);
+	void gl6000sl(machine_config &config);
+	void gjmovie(machine_config &config);
+	void snotec(machine_config &config);
+	void glmcolor(machine_config &config);
+	void glcolor(machine_config &config);
+	void prestige(machine_config &config);
+	void gl7007sl(machine_config &config);
 };
 
 
@@ -723,7 +732,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(prestige_state::irq_timer)
 	m_maincpu->set_input_line(0, ASSERT_LINE);
 }
 
-static MACHINE_CONFIG_START( prestige_base )
+MACHINE_CONFIG_START(prestige_state::prestige_base)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80, XTAL_8MHz)  // Z84C008
 	MCFG_CPU_PROGRAM_MAP(prestige_mem)
@@ -755,7 +764,7 @@ static MACHINE_CONFIG_START( prestige_base )
 	MCFG_RAM_EXTRA_OPTIONS("64K")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( glcolor, prestige_base )
+MACHINE_CONFIG_DERIVED(prestige_state::glcolor, prestige_base)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(glcolor_io)
 
@@ -773,41 +782,41 @@ static MACHINE_CONFIG_DERIVED( glcolor, prestige_base )
 	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("snotec_cart", "snotec")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( glmcolor, glcolor )
+MACHINE_CONFIG_DERIVED(prestige_state::glmcolor, glcolor)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(prestige_io)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( snotec, glcolor )
+MACHINE_CONFIG_DERIVED(prestige_state::snotec, glcolor)
 	MCFG_SOFTWARE_LIST_REMOVE("cart_list")
 	MCFG_SOFTWARE_LIST_REMOVE("snotec_cart")
 	MCFG_SOFTWARE_LIST_ADD("cart_list", "snotec")
 	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("glcolor_cart", "glcolor")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( prestige, prestige_base )
+MACHINE_CONFIG_DERIVED(prestige_state::prestige, prestige_base)
 	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("gl6000sl_cart", "gl6000sl")
 	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("misterx_cart", "misterx")
 	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("gl2000_cart", "gl2000")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( gl6000sl, prestige_base )
+MACHINE_CONFIG_DERIVED(prestige_state::gl6000sl, prestige_base)
 	MCFG_SOFTWARE_LIST_ADD("cart_list", "gl6000sl")
 	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("misterx_cart", "misterx")
 	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("gl2000_cart", "gl2000")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( gl7007sl, prestige_base )
+MACHINE_CONFIG_DERIVED(prestige_state::gl7007sl, prestige_base)
 	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("gl6000sl_cart", "gl6000sl")
 	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("gl2000_cart", "gl2000")
 	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("misterx_cart", "misterx")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( gjmovie, prestige_base )
+MACHINE_CONFIG_DERIVED(prestige_state::gjmovie, prestige_base)
 	MCFG_SOFTWARE_LIST_ADD("cart_list", "gjmovie")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( princ, prestige_base )
+MACHINE_CONFIG_DERIVED(prestige_state::princ, prestige_base)
 	MCFG_DEVICE_REMOVE("cartslot")
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "princ_cart")
 	MCFG_SOFTWARE_LIST_ADD("cart_list", "princ")

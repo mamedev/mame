@@ -478,7 +478,7 @@ ioport_constructor snug_enhanced_video_device::device_input_ports() const
 	return INPUT_PORTS_NAME(ti99_evpc);
 }
 
-MACHINE_CONFIG_MEMBER( snug_enhanced_video_device::device_add_mconfig )
+MACHINE_CONFIG_START(snug_enhanced_video_device::device_add_mconfig)
 	// video hardware
 	MCFG_V9938_ADD(TI_VDP_TAG, TI_SCREEN_TAG, 0x20000, XTAL_21_4772MHz)  /* typical 9938 clock, not verified */
 	MCFG_V99X8_INTERRUPT_CALLBACK(WRITELINE(snug_enhanced_video_device, video_interrupt_in))

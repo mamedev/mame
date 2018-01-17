@@ -243,14 +243,14 @@ WRITE_LINE_MEMBER(ginganin_state::ptm_irq)
 }
 
 
-static MACHINE_CONFIG_START( ginganin )
+MACHINE_CONFIG_START(ginganin_state::ginganin)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, MAIN_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(ginganin_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", ginganin_state,  irq1_line_hold) /* ? (vectors 1-7 cointain the same address) */
 
-	MCFG_CPU_ADD("audiocpu", M6809, SOUND_CLOCK)
+	MCFG_CPU_ADD("audiocpu", MC6809, SOUND_CLOCK) // MBL68B09?
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 
 

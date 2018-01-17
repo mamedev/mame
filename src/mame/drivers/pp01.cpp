@@ -198,7 +198,7 @@ static INPUT_PORTS_START( pp01 )
 INPUT_PORTS_END
 
 /* Machine driver */
-static MACHINE_CONFIG_START( pp01 )
+MACHINE_CONFIG_START(pp01_state::pp01)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8080, 2000000)
 	MCFG_CPU_PROGRAM_MAP(pp01_mem)

@@ -71,6 +71,7 @@ public:
 
 	DECLARE_READ8_MEMBER(ptm_r);
 
+	void zwackery(machine_config &config);
 protected:
 	virtual void machine_start() override;
 
@@ -489,7 +490,7 @@ void zwackery_state::machine_start()
 //  MACHINE DEFINTIONS
 //**************************************************************************
 
-static MACHINE_CONFIG_START( zwackery )
+MACHINE_CONFIG_START(zwackery_state::zwackery)
 	// basic machine hardware
 	MCFG_CPU_ADD("maincpu", M68000, 7652400)    // based on counter usage, should be XTAL_16MHz/2
 	MCFG_CPU_PROGRAM_MAP(zwackery_map)

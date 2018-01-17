@@ -285,6 +285,7 @@ public:
 
 	int m_ready_line;
 	int m_ready_line1;
+	void geneve_60hz(machine_config &config);
 };
 
 /*
@@ -331,6 +332,11 @@ static INPUT_PORTS_START(geneve)
 		PORT_CONFSETTING( 0x00, "32 KiB" )
 		PORT_CONFSETTING( 0x01, "64 KiB" )
 		PORT_CONFSETTING( 0x02, "384 KiB" )
+
+	PORT_START( "VRAM" )
+	PORT_CONFNAME( 0x01, 0x00, "Video RAM" )
+		PORT_CONFSETTING( 0x00, "128 KiB" )
+		PORT_CONFSETTING( 0x01, "192 KiB" )
 
 	PORT_START( "GENMODDIPS" )
 	PORT_DIPNAME( GENEVE_GM_TURBO, 0x00, "Genmod Turbo mode") PORT_CONDITION( "MODE", 0x01, EQUALS, GENMOD ) PORT_CHANGED_MEMBER(GENEVE_MAPPER_TAG, bus::ti99::internal::geneve_mapper_device, settings_changed, 1)
@@ -683,7 +689,7 @@ void geneve_state::machine_reset()
 	m_joyport->write_port(0x01);    // select Joystick 1
 }
 
-static MACHINE_CONFIG_START( geneve_60hz )
+MACHINE_CONFIG_START(geneve_state::geneve_60hz)
 	// basic machine hardware
 	// TMS9995 CPU @ 12.0 MHz
 	MCFG_TMS99xx_ADD("maincpu", TMS9995, 12000000, memmap, crumap)

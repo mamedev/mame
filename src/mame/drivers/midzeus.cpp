@@ -76,6 +76,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(zeus_irq);
 	DECLARE_READ32_MEMBER(zeus2_timekeeper_r);
 	DECLARE_WRITE32_MEMBER(zeus2_timekeeper_w);
+	void thegrid(machine_config &config);
+	void crusnexo(machine_config &config);
 private:
 };
 
@@ -1255,7 +1257,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( midzeus )
+MACHINE_CONFIG_START(midzeus_state::midzeus)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", TMS32032, CPU_CLOCK)
@@ -1284,20 +1286,20 @@ static MACHINE_CONFIG_START( midzeus )
 	MCFG_MIDWAY_SERIAL_PIC2_YEAR_OFFS(94)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( mk4, midzeus )
+MACHINE_CONFIG_DERIVED(midzeus_state::mk4, midzeus)
 	MCFG_DEVICE_MODIFY("ioasic")
 	MCFG_MIDWAY_IOASIC_UPPER(461/* or 474 */)
 	MCFG_MIDWAY_IOASIC_SHUFFLE_DEFAULT(1)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( invasn, midzeus )
+MACHINE_CONFIG_DERIVED(midzeus_state::invasn, midzeus)
 	MCFG_CPU_ADD("pic", PIC16C57, 8000000)  /* ? */
 
 	MCFG_DEVICE_MODIFY("ioasic")
 	MCFG_MIDWAY_IOASIC_UPPER(468/* or 488 */)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( midzeus2 )
+MACHINE_CONFIG_START(midzeus_state::midzeus2)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", TMS32032, CPU_CLOCK)
@@ -1327,12 +1329,12 @@ static MACHINE_CONFIG_START( midzeus2 )
 	MCFG_MIDWAY_IOASIC_UPPER(474)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( crusnexo, midzeus2 )
+MACHINE_CONFIG_DERIVED(midzeus2_state::crusnexo, midzeus2)
 	MCFG_DEVICE_MODIFY("ioasic")
 	MCFG_MIDWAY_IOASIC_UPPER(472/* or 476,477,478,110 */)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( thegrid, midzeus2 )
+MACHINE_CONFIG_DERIVED(midzeus2_state::thegrid, midzeus2)
 	MCFG_DEVICE_MODIFY("ioasic")
 	MCFG_MIDWAY_IOASIC_UPPER(474/* or 491 */)
 MACHINE_CONFIG_END

@@ -195,6 +195,7 @@ public:
 	virtual void video_start() override;
 
 	uint32_t screen_update_dgpix(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void dgpix(machine_config &config);
 };
 
 
@@ -422,7 +423,7 @@ void dgpix_state::machine_reset()
 }
 
 
-static MACHINE_CONFIG_START( dgpix )
+MACHINE_CONFIG_START(dgpix_state::dgpix)
 	MCFG_CPU_ADD("maincpu", E132XT, 20000000*4) /* 4x internal multiplier */
 	MCFG_CPU_PROGRAM_MAP(cpu_map)
 	MCFG_CPU_IO_MAP(io_map)

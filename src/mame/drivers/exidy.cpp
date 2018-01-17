@@ -148,7 +148,6 @@ Fax                  1982  6502   FXL, FLA
 #include "machine/6821pia.h"
 #include "audio/exidy.h"
 #include "includes/exidy.h"
-#include "audio/targ.h"
 
 
 /*************************************
@@ -814,7 +813,7 @@ MACHINE_START_MEMBER(exidy_state,teetert)
  *
  *************************************/
 
-static MACHINE_CONFIG_START( base )
+MACHINE_CONFIG_START(exidy_state::base)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, EXIDY_CPU_CLOCK)
@@ -833,7 +832,7 @@ static MACHINE_CONFIG_START( base )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( sidetrac, base )
+MACHINE_CONFIG_DERIVED(exidy_state::sidetrac, base)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -844,7 +843,7 @@ static MACHINE_CONFIG_DERIVED( sidetrac, base )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( targ, base )
+MACHINE_CONFIG_DERIVED(exidy_state::targ, base)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -855,7 +854,7 @@ static MACHINE_CONFIG_DERIVED( targ, base )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( spectar, base )
+MACHINE_CONFIG_DERIVED(exidy_state::spectar, base)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -866,7 +865,7 @@ static MACHINE_CONFIG_DERIVED( spectar, base )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( rallys, spectar )
+MACHINE_CONFIG_DERIVED(exidy_state::rallys, spectar)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -874,7 +873,7 @@ static MACHINE_CONFIG_DERIVED( rallys, spectar )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( venture, base )
+MACHINE_CONFIG_DERIVED(exidy_state::venture, base)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -887,7 +886,7 @@ static MACHINE_CONFIG_DERIVED( venture, base )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( teetert, venture )
+MACHINE_CONFIG_DERIVED(exidy_state::teetert, venture)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -898,7 +897,7 @@ static MACHINE_CONFIG_DERIVED( teetert, venture )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( mtrap, venture )
+MACHINE_CONFIG_DERIVED(exidy_state::mtrap, venture)
 
 	/* basic machine hardware */
 
@@ -909,7 +908,7 @@ static MACHINE_CONFIG_DERIVED( mtrap, venture )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( pepper2, venture )
+MACHINE_CONFIG_DERIVED(exidy_state::pepper2, venture)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -917,7 +916,7 @@ static MACHINE_CONFIG_DERIVED( pepper2, venture )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( fax, pepper2 )
+MACHINE_CONFIG_DERIVED(exidy_state::fax, pepper2)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")

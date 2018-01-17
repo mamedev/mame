@@ -362,7 +362,7 @@ void rastan_state::machine_reset()
 }
 
 
-static MACHINE_CONFIG_START( rastan )
+MACHINE_CONFIG_START(rastan_state::rastan)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz/2)   /* verified on pcb */

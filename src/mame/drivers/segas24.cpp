@@ -346,6 +346,7 @@ Notes:
 #include "machine/nvram.h"
 #include "machine/upd4701.h"
 #include "machine/315_5296.h"
+#include "sound/volt_reg.h"
 #include "sound/ym2151.h"
 #include "video/segaic24.h"
 #include "speaker.h"
@@ -1859,7 +1860,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( system24 )
+MACHINE_CONFIG_START(segas24_state::system24)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, MASTER_CLOCK/2)
@@ -1909,21 +1910,22 @@ static MACHINE_CONFIG_START( system24 )
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.50)
 
 	MCFG_SOUND_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.5) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.5) // unknown DAC
-	MCFG_SOUND_REFERENCE_INPUT(DAC_VREF_POS_INPUT, 1.0) MCFG_SOUND_REFERENCE_INPUT(DAC_VREF_NEG_INPUT, -1.0)
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( mahmajn, system24 )
+MACHINE_CONFIG_DERIVED(segas24_state::mahmajn, system24)
 	MCFG_DEVICE_MODIFY("io")
 	MCFG_315_5296_IN_PORTA_CB(READ8(segas24_state, mahmajn_input_line_r))
 	MCFG_315_5296_IN_PORTC_CB(READ8(segas24_state, mahmajn_inputs_r))
 	MCFG_315_5296_OUT_PORTD_CB(WRITE8(segas24_state, mahmajn_mux_w))
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( system24_floppy, system24 )
+MACHINE_CONFIG_DERIVED(segas24_state::system24_floppy, system24)
 	MCFG_NVRAM_ADD_NO_FILL("floppy_nvram")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( system24_floppy_hotrod, system24_floppy )
+MACHINE_CONFIG_DERIVED(segas24_state::system24_floppy_hotrod, system24_floppy)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(hotrod_cpu1_map)
 	MCFG_CPU_MODIFY("subcpu")
@@ -1946,13 +1948,13 @@ static MACHINE_CONFIG_DERIVED( system24_floppy_hotrod, system24_floppy )
 	MCFG_DEVICE_ADD("adc2", MSM6253, 0) // IC2 - 33k/33p R/C clock
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( system24_floppy_fd1094, system24_floppy )
+MACHINE_CONFIG_DERIVED(segas24_state::system24_floppy_fd1094, system24_floppy)
 	MCFG_CPU_REPLACE("subcpu", FD1094, MASTER_CLOCK/2)
 	MCFG_CPU_PROGRAM_MAP(system24_cpu2_map)
 	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( system24_floppy_fd_upd, system24_floppy_fd1094 )
+MACHINE_CONFIG_DERIVED(segas24_state::system24_floppy_fd_upd, system24_floppy_fd1094)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(roughrac_cpu1_map)
 	MCFG_CPU_MODIFY("subcpu")
@@ -1963,13 +1965,13 @@ static MACHINE_CONFIG_DERIVED( system24_floppy_fd_upd, system24_floppy_fd1094 )
 	MCFG_UPD4701_PORTY("DIAL2")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( dcclub, system24 )
+MACHINE_CONFIG_DERIVED(segas24_state::dcclub, system24)
 	MCFG_DEVICE_MODIFY("io")
 	MCFG_315_5296_IN_PORTA_CB(READ8(segas24_state, dcclub_p1_r))
 	MCFG_315_5296_IN_PORTC_CB(READ8(segas24_state, dcclub_p3_r))
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( system24_floppy_dcclub, system24_floppy_fd1094 )
+MACHINE_CONFIG_DERIVED(segas24_state::system24_floppy_dcclub, system24_floppy_fd1094)
 	MCFG_DEVICE_MODIFY("io")
 	MCFG_315_5296_IN_PORTA_CB(READ8(segas24_state, dcclub_p1_r))
 	MCFG_315_5296_IN_PORTC_CB(READ8(segas24_state, dcclub_p3_r))

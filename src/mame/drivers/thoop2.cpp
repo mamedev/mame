@@ -259,7 +259,7 @@ static GFXDECODE_START( thoop2 )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( thoop2 )
+MACHINE_CONFIG_START(thoop2_state::thoop2)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000,XTAL_24MHz / 2) // 12MHz verified

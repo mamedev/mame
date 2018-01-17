@@ -463,7 +463,7 @@ void renegade_state::machine_reset()
 }
 
 
-static MACHINE_CONFIG_START( renegade )
+MACHINE_CONFIG_START(renegade_state::renegade)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, 12000000/8)  /* 1.5 MHz (measured) */
@@ -505,7 +505,7 @@ static MACHINE_CONFIG_START( renegade )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( kuniokunb, renegade )
+MACHINE_CONFIG_DERIVED(renegade_state::kuniokunb, renegade)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(renegade_nomcu_map)
 

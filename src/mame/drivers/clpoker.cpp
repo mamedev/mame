@@ -57,6 +57,7 @@ public:
 
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
+	void clpoker(machine_config &config);
 protected:
 	virtual void video_start() override;
 
@@ -246,7 +247,7 @@ static GFXDECODE_START( clpoker )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( clpoker )
+MACHINE_CONFIG_START(clpoker_state::clpoker)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_12MHz / 3) // Z0840004PSC, divider not verified
 	MCFG_CPU_PROGRAM_MAP(prg_map)

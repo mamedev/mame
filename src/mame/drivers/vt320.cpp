@@ -29,6 +29,7 @@ public:
 	uint32_t screen_update_vt320(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<ram_device> m_ram;
+	void vt320(machine_config &config);
 };
 
 /*
@@ -84,7 +85,7 @@ uint32_t vt320_state::screen_update_vt320(screen_device &screen, bitmap_ind16 &b
 }
 
 
-static MACHINE_CONFIG_START( vt320 )
+MACHINE_CONFIG_START(vt320_state::vt320)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8051, XTAL_16MHz)
 	MCFG_CPU_PROGRAM_MAP(vt320_mem)

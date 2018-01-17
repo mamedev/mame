@@ -119,6 +119,8 @@ public:
 
 	void kbd_put(u8 data);
 
+	void cgc7900(machine_config &config);
+	void cgc7900_video(machine_config &config);
 private:
 	u16 kbd_mods;
 	u8 kbd_data;
@@ -126,9 +128,5 @@ private:
 
 	void irq_encoder(int pin, int state);
 };
-
-/*----------- defined in video/cgc7900.c -----------*/
-
-MACHINE_CONFIG_EXTERN( cgc7900_video );
 
 #endif

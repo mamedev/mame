@@ -54,7 +54,7 @@ ROM_END
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( electron_m2105_device::device_add_mconfig )
+MACHINE_CONFIG_START(electron_m2105_device::device_add_mconfig)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
@@ -121,6 +121,7 @@ electron_m2105_device::electron_m2105_device(const machine_config &mconfig, cons
 	, m_tms(*this, "tms5220")
 	, m_centronics(*this, "centronics")
 	, m_irqs(*this, "irqs")
+	, m_romsel(0)
 {
 }
 
@@ -130,12 +131,7 @@ electron_m2105_device::electron_m2105_device(const machine_config &mconfig, cons
 
 void electron_m2105_device::device_start()
 {
-	address_space& space = machine().device("maincpu")->memory().space(AS_PROGRAM);
 	m_slot = dynamic_cast<electron_expansion_slot_device *>(owner());
-
-	space.install_readwrite_handler(0xfc40, 0xfc5f, READ8_DEVICE_DELEGATE(m_via6522_1, via6522_device, read), WRITE8_DEVICE_DELEGATE(m_via6522_1, via6522_device, write));
-	space.install_readwrite_handler(0xfc60, 0xfc6f, READ8_DEVICE_DELEGATE(m_duart, scn2681_device, read), WRITE8_DEVICE_DELEGATE(m_duart, scn2681_device, write));
-	space.install_readwrite_handler(0xfc70, 0xfc8f, READ8_DEVICE_DELEGATE(m_via6522_0, via6522_device, read), WRITE8_DEVICE_DELEGATE(m_via6522_0, via6522_device, write));
 }
 
 //-------------------------------------------------
@@ -144,10 +140,74 @@ void electron_m2105_device::device_start()
 
 void electron_m2105_device::device_reset()
 {
-	machine().root_device().membank("bank2")->configure_entry(12, memregion("exp_rom")->base() + 0x0000);
-	machine().root_device().membank("bank2")->configure_entry(13, memregion("exp_rom")->base() + 0x4000);
-	machine().root_device().membank("bank2")->configure_entry( 0, memregion("exp_rom")->base() + 0x8000);
-	machine().root_device().membank("bank2")->configure_entry( 2, memregion("exp_rom")->base() + 0xc000);
+}
+
+//-------------------------------------------------
+//  expbus_r - expansion data read
+//-------------------------------------------------
+
+uint8_t electron_m2105_device::expbus_r(address_space &space, offs_t offset, uint8_t data)
+{
+	if (offset >= 0x8000 && offset < 0xc000)
+	{
+		switch (m_romsel)
+		{
+		case 0:
+			data = memregion("exp_rom")->base()[0x8000 + (offset & 0x3fff)];
+			break;
+		case 2:
+			data = memregion("exp_rom")->base()[0xc000 + (offset & 0x3fff)];
+			break;
+		case 12:
+			data = memregion("exp_rom")->base()[0x0000 + (offset & 0x3fff)];
+			break;
+		case 13:
+			data = memregion("exp_rom")->base()[0x4000 + (offset & 0x3fff)];
+			break;
+		}
+	}
+	else if (offset >= 0xfc40 && offset < 0xfc60)
+	{
+		data = m_via6522_1->read(space, offset);
+	}
+	else if (offset >= 0xfc60 && offset < 0xfc70)
+	{
+		data = m_duart->read(space, offset & 0x0f);
+	}
+	else if (offset >= 0xfc70 && offset < 0xfc90)
+	{
+		data = m_via6522_0->read(space, offset);
+	}
+
+	return data;
+}
+
+//-------------------------------------------------
+//  expbus_w - expansion data write
+//-------------------------------------------------
+
+void electron_m2105_device::expbus_w(address_space &space, offs_t offset, uint8_t data)
+{
+	if (offset >= 0x8000 && offset < 0xc000)
+	{
+		logerror("write ram bank %d\n", m_romsel);
+	}
+	else if (offset >= 0xfc40 && offset < 0xfc60)
+	{
+		m_via6522_1->write(space, offset, data);
+	}
+	else if (offset >= 0xfc60 && offset < 0xfc70)
+	{
+		m_duart->write(space, offset & 0x0f, data);
+	}
+	else if (offset >= 0xfc70 && offset < 0xfc90)
+	{
+		m_via6522_0->write(space, offset, data);
+	}
+	else if (offset == 0xfe05)
+	{
+		m_romsel = data & 0x0f;
+	}
 }
 
 

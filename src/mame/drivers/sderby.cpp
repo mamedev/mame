@@ -593,7 +593,7 @@ GFXDECODE_END
 *      Machine Drivers      *
 ****************************/
 
-static MACHINE_CONFIG_START( sderby )
+MACHINE_CONFIG_START(sderby_state::sderby)
 
 	MCFG_CPU_ADD("maincpu", M68000, 12000000)
 	MCFG_CPU_PROGRAM_MAP(sderby_map)
@@ -618,7 +618,7 @@ static MACHINE_CONFIG_START( sderby )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( sderbya )
+MACHINE_CONFIG_START(sderby_state::sderbya)
 
 	MCFG_CPU_ADD("maincpu", M68000, 12000000)
 	MCFG_CPU_PROGRAM_MAP(sderbya_map)
@@ -643,7 +643,7 @@ static MACHINE_CONFIG_START( sderbya )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( luckboom )
+MACHINE_CONFIG_START(sderby_state::luckboom)
 
 	MCFG_CPU_ADD("maincpu", M68000, 12000000)
 	MCFG_CPU_PROGRAM_MAP(luckboom_map)
@@ -668,7 +668,7 @@ static MACHINE_CONFIG_START( luckboom )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( spacewin )
+MACHINE_CONFIG_START(sderby_state::spacewin)
 
 	MCFG_CPU_ADD("maincpu", M68000, 12000000)
 	MCFG_CPU_PROGRAM_MAP(spacewin_map)
@@ -693,7 +693,7 @@ static MACHINE_CONFIG_START( spacewin )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( shinygld)
+MACHINE_CONFIG_START(sderby_state::shinygld)
 
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz / 2) // verified
 	MCFG_CPU_PROGRAM_MAP(shinygld_map)
@@ -718,7 +718,7 @@ static MACHINE_CONFIG_START( shinygld)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( pmroulet )
+MACHINE_CONFIG_START(sderby_state::pmroulet)
 
 	MCFG_CPU_ADD("maincpu", M68000, 12000000)
 	MCFG_CPU_PROGRAM_MAP(roulette_map)

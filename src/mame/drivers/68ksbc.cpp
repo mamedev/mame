@@ -41,6 +41,7 @@ public:
 		, m_maincpu(*this, "maincpu")
 	{ }
 
+	void c68ksbc(machine_config &config);
 private:
 	required_device<cpu_device> m_maincpu;
 };
@@ -58,7 +59,7 @@ static INPUT_PORTS_START( c68ksbc )
 INPUT_PORTS_END
 
 
-static MACHINE_CONFIG_START( c68ksbc )
+MACHINE_CONFIG_START(c68ksbc_state::c68ksbc)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 8000000) // text says 8MHz, schematic says 10MHz
 	MCFG_CPU_PROGRAM_MAP(c68ksbc_mem)

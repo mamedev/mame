@@ -42,7 +42,7 @@
 	devcb = &mc6847_friend_device::set_fsync_wr_callback(*device, DEVCB_##_write);
 
 #define MCFG_MC6847_CHARROM_CALLBACK(_class, _method) \
-	mc6847_friend_device::set_get_char_rom(*device, mc6847_friend_device::get_char_rom_delegate(&_class::_method, #_class "::" #_method, downcast<_class *>(owner)));
+	mc6847_friend_device::set_get_char_rom(*device, mc6847_friend_device::get_char_rom_delegate(&_class::_method, #_class "::" #_method, this));
 
 #define MCFG_MC6847_INPUT_CALLBACK(_read) \
 	devcb = &mc6847_base_device::set_input_callback(*device, DEVCB_##_read);

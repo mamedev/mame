@@ -163,6 +163,7 @@ public:
 	uint32_t screen_update_rblaster(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(sound_interrupt);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, uint8_t *spriteram, uint16_t tile_bank );
+	void rblaster(machine_config &config);
 };
 
 void deco_ld_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, uint8_t *spriteram, uint16_t tile_bank )
@@ -455,7 +456,7 @@ void deco_ld_state::machine_start()
 {
 }
 
-static MACHINE_CONFIG_START( rblaster )
+MACHINE_CONFIG_START(deco_ld_state::rblaster)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",M6502,8000000/2)

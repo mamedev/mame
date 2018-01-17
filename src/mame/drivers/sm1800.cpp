@@ -50,6 +50,7 @@ public:
 	INTERRUPT_GEN_MEMBER(sm1800_vblank_interrupt);
 	IRQ_CALLBACK_MEMBER(sm1800_irq_callback);
 	I8275_DRAW_CHARACTER_MEMBER( crtc_display_pixels );
+	void sm1800(machine_config &config);
 };
 
 static ADDRESS_MAP_START(sm1800_mem, AS_PROGRAM, 8, sm1800_state)
@@ -153,7 +154,7 @@ static GFXDECODE_START( sm1800 )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( sm1800 )
+MACHINE_CONFIG_START(sm1800_state::sm1800)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",I8080, XTAL_2MHz)
 	MCFG_CPU_PROGRAM_MAP(sm1800_mem)

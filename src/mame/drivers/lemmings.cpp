@@ -218,7 +218,7 @@ void lemmings_state::machine_start()
 {
 }
 
-static MACHINE_CONFIG_START( lemmings )
+MACHINE_CONFIG_START(lemmings_state::lemmings)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 14000000)

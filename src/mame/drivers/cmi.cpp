@@ -310,7 +310,7 @@ cmi01a_device::cmi01a_device(const machine_config &mconfig, const char *tag, dev
 {
 }
 
-MACHINE_CONFIG_MEMBER( cmi01a_device::device_add_mconfig )
+MACHINE_CONFIG_START(cmi01a_device::device_add_mconfig)
 	MCFG_DEVICE_ADD("cmi01a_pia_0", PIA6821, 0) // pia_cmi01a_1_config
 	MCFG_PIA_READCB1_HANDLER(READLINE(cmi01a_device, tri_r))
 	MCFG_PIA_WRITEPA_HANDLER(WRITE8(cmi01a_device, ws_dir_w))
@@ -557,6 +557,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( cmi07_irq );
 	DECLARE_WRITE_LINE_MEMBER( mkbd_acia_clock );
 
+	void cmi2x(machine_config &config);
 protected:
 
 	required_device<mc6809e_device> m_maincpu1;
@@ -2742,7 +2743,7 @@ static SLOT_INTERFACE_START( cmi2x_floppies )
 	SLOT_INTERFACE( "8dssd", FLOPPY_8_DSSD )
 SLOT_INTERFACE_END
 
-static MACHINE_CONFIG_START( cmi2x )
+MACHINE_CONFIG_START(cmi_state::cmi2x)
 	MCFG_CPU_ADD("maincpu1", MC6809E, Q209_CPU_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(maincpu1_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", cmi_state, cmi_iix_vblank)

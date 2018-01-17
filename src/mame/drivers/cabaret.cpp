@@ -70,6 +70,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	void cabaret(machine_config &config);
 };
 
 
@@ -352,7 +353,7 @@ INTERRUPT_GEN_MEMBER(cabaret_state::cabaret_interrupt)
 		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
-static MACHINE_CONFIG_START( cabaret )
+MACHINE_CONFIG_START(cabaret_state::cabaret)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z180, XTAL_12MHz / 2)
 	MCFG_CPU_PROGRAM_MAP(cabaret_map)

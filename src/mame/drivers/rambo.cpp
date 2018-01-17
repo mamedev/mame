@@ -56,6 +56,7 @@ public:
 	DECLARE_DRIVER_INIT(rambo);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
+	void rambo(machine_config &config);
 };
 
 void rambo_state::machine_start()
@@ -138,7 +139,7 @@ void rambo_state::machine_reset()
 	m_port_l = 0;
 }
 
-static MACHINE_CONFIG_START( rambo )
+MACHINE_CONFIG_START(rambo_state::rambo)
 
 	MCFG_CPU_ADD("maincpu", ATMEGA2560, MASTER_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(rambo_prg_map)

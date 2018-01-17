@@ -6,7 +6,7 @@
 
 DEFINE_DEVICE_TYPE(NE2000, ne2000_device, "ne2000", "NE2000 Network Adapter")
 
-MACHINE_CONFIG_MEMBER(ne2000_device::device_add_mconfig)
+MACHINE_CONFIG_START(ne2000_device::device_add_mconfig)
 	MCFG_DEVICE_ADD("dp8390d", DP8390D, 0)
 	MCFG_DP8390D_IRQ_CB(WRITELINE(ne2000_device, ne2000_irq_w))
 	MCFG_DP8390D_MEM_READ_CB(READ8(ne2000_device, ne2000_mem_read))

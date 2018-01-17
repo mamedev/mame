@@ -297,7 +297,7 @@ CUSTOM_INPUT_MEMBER( crimfght_state::system_r )
 	return data >> 4;
 }
 
-static MACHINE_CONFIG_START( crimfght )
+MACHINE_CONFIG_START(crimfght_state::crimfght)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", KONAMI, XTAL_24MHz/8)       /* 052001 (verified on pcb) */

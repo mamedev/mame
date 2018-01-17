@@ -44,7 +44,7 @@
 //**************************************************************************
 
 #define MCFG_F3853_EXT_INPUT_CB(_class, _method) \
-	f3853_device::set_interrupt_req_callback(*device, f3853_device::interrupt_req_delegate(&_class::_method, #_class "::" #_method, downcast<_class *>(owner)));
+	f3853_device::set_interrupt_req_callback(*device, f3853_device::interrupt_req_delegate(&_class::_method, #_class "::" #_method, this));
 
 /***************************************************************************
     TYPE DEFINITIONS

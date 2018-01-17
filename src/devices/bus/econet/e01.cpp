@@ -241,7 +241,7 @@ ADDRESS_MAP_END
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( econet_e01_device::device_add_mconfig )
+MACHINE_CONFIG_START(econet_e01_device::device_add_mconfig)
 	// basic machine hardware
 	MCFG_CPU_ADD(R65C102_TAG, M65C02, XTAL_8MHz/4) // Rockwell R65C102P3
 	MCFG_CPU_PROGRAM_MAP(e01_mem)

@@ -1904,7 +1904,7 @@ void taitob_state::machine_reset()
 }
 
 
-static MACHINE_CONFIG_START( rastsag2 )
+MACHINE_CONFIG_START(taitob_state::rastsag2)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz/2)   /* 12 MHz */
@@ -1961,7 +1961,7 @@ static MACHINE_CONFIG_START( rastsag2 )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( masterw )
+MACHINE_CONFIG_START(taitob_state::masterw)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz/2)   /* 12 MHz */
@@ -2020,7 +2020,7 @@ static MACHINE_CONFIG_START( masterw )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( tetrist, rastsag2 ) /* Nastar conversion kit with slightly different memory map */
+MACHINE_CONFIG_DERIVED(taitob_state::tetrist, rastsag2) /* Nastar conversion kit with slightly different memory map */
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(tetrist_map)
@@ -2030,14 +2030,14 @@ static MACHINE_CONFIG_DERIVED( tetrist, rastsag2 ) /* Nastar conversion kit with
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( tetrista, masterw ) /* Master of Weapon conversion kit with slightly different memory map */
+MACHINE_CONFIG_DERIVED(taitob_state::tetrista, masterw) /* Master of Weapon conversion kit with slightly different memory map */
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(tetrista_map)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( ashura )
+MACHINE_CONFIG_START(taitob_state::ashura)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz/2)   /* 12 MHz */
@@ -2094,7 +2094,7 @@ static MACHINE_CONFIG_START( ashura )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( crimec )
+MACHINE_CONFIG_START(taitob_state::crimec)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz/2)   /* 12 MHz */
@@ -2152,7 +2152,7 @@ static MACHINE_CONFIG_START( crimec )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( hitice )
+MACHINE_CONFIG_START(taitob_state::hitice)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz/2)   /* 12 MHz */
@@ -2215,7 +2215,7 @@ static MACHINE_CONFIG_START( hitice )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( rambo3p )
+MACHINE_CONFIG_START(taitob_state::rambo3p)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz/2)   /* verified on pcb */
@@ -2273,7 +2273,7 @@ static MACHINE_CONFIG_START( rambo3p )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( rambo3 )
+MACHINE_CONFIG_START(taitob_state::rambo3)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz/2)   /* 12MHz verified on pcb */
@@ -2330,7 +2330,7 @@ static MACHINE_CONFIG_START( rambo3 )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( pbobble )
+MACHINE_CONFIG_START(taitob_state::pbobble)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz/2)   /* 12 MHz */
@@ -2393,7 +2393,7 @@ static MACHINE_CONFIG_START( pbobble )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( spacedx )
+MACHINE_CONFIG_START(taitob_state::spacedx)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz/2)   /* 12 MHz */
@@ -2456,7 +2456,7 @@ static MACHINE_CONFIG_START( spacedx )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( spacedxo )
+MACHINE_CONFIG_START(taitob_state::spacedxo)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz/2)   /* 12 MHz */
@@ -2513,7 +2513,7 @@ static MACHINE_CONFIG_START( spacedxo )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( qzshowby )
+MACHINE_CONFIG_START(taitob_state::qzshowby)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 16000000)   /* 16 MHz according to the readme*/
@@ -2576,7 +2576,7 @@ static MACHINE_CONFIG_START( qzshowby )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( viofight )
+MACHINE_CONFIG_START(taitob_state::viofight)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz/2)   /* 12 MHz */
@@ -2638,7 +2638,7 @@ static MACHINE_CONFIG_START( viofight )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( silentd )
+MACHINE_CONFIG_START(taitob_state::silentd)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz/2)   /* 12 MHz */
@@ -2695,7 +2695,7 @@ static MACHINE_CONFIG_START( silentd )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( selfeena )
+MACHINE_CONFIG_START(taitob_state::selfeena)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz/2)   /* 12 MHz */
@@ -2761,7 +2761,7 @@ void taitob_state::ryujin_patch(void)
 }
 #endif
 
-static MACHINE_CONFIG_START( ryujin )
+MACHINE_CONFIG_START(taitob_state::ryujin)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz/2)   /* 12 MHz */
@@ -2825,7 +2825,7 @@ void taitob_state::sbm_patch(void)
 }
 #endif
 
-static MACHINE_CONFIG_START( sbm )
+MACHINE_CONFIG_START(taitob_state::sbm)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 12000000)   /* 12 MHz */
@@ -2881,7 +2881,7 @@ static MACHINE_CONFIG_START( sbm )
 	MCFG_TC0140SYT_SLAVE_CPU("audiocpu")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( realpunc )
+MACHINE_CONFIG_START(taitob_c_state::realpunc)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 12000000)

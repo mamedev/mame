@@ -233,6 +233,7 @@ public:
 	void supracan_suprnova_draw_roz(bitmap_ind16 &bitmap, const rectangle &cliprect, tilemap_t *tmap, uint32_t startx, uint32_t starty, int incxx, int incxy, int incyx, int incyy, int wraparound/*, int columnscroll, uint32_t* scrollram*/, int transmask);
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	void supracan(machine_config &config);
 };
 
 
@@ -1884,7 +1885,7 @@ INTERRUPT_GEN_MEMBER(supracan_state::supracan_sound_irq)
 	}
 }
 
-static MACHINE_CONFIG_START( supracan )
+MACHINE_CONFIG_START(supracan_state::supracan)
 
 	MCFG_CPU_ADD( "maincpu", M68000, XTAL_10_738635MHz )        /* Correct frequency unknown */
 	MCFG_CPU_PROGRAM_MAP( supracan_mem )

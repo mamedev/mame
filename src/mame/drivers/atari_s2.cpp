@@ -28,6 +28,7 @@ ToDo:
 #include "machine/timer.h"
 #include "machine/watchdog.h"
 #include "sound/dac.h"
+#include "sound/volt_reg.h"
 #include "speaker.h"
 
 #include "atari_s2.lh"
@@ -52,6 +53,8 @@ public:
 	DECLARE_WRITE8_MEMBER(display_w);
 	TIMER_DEVICE_CALLBACK_MEMBER(irq);
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_s);
+	void atari_s2(machine_config &config);
+	void atari_s3(machine_config &config);
 private:
 	bool m_timer_sb;
 	uint8_t m_timer_s[5];
@@ -464,7 +467,7 @@ void atari_s2_state::machine_reset()
 }
 
 
-static MACHINE_CONFIG_START( atari_s2 )
+MACHINE_CONFIG_START(atari_s2_state::atari_s2)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6800, XTAL_4MHz / 4)
 	MCFG_CPU_PROGRAM_MAP(atari_s2_map)
@@ -476,9 +479,10 @@ static MACHINE_CONFIG_START( atari_s2 )
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
 
 	MCFG_SOUND_ADD("dac", DAC_4BIT_BINARY_WEIGHTED, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.15) // r23-r26 (68k,33k,18k,8.2k)
-	MCFG_SOUND_REFERENCE_INPUT(DAC_VREF_POS_INPUT, 1.0) MCFG_SOUND_REFERENCE_INPUT(DAC_VREF_NEG_INPUT, -1.0)
 	MCFG_SOUND_ADD("dac1", DAC_3BIT_BINARY_WEIGHTED, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.15) // r18-r20 (100k,47k,100k)
-	MCFG_SOUND_REFERENCE_INPUT(DAC_VREF_POS_INPUT, 1.0) MCFG_SOUND_REFERENCE_INPUT(DAC_VREF_NEG_INPUT, -1.0)
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE_EX(0, "dac1", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac1", -1.0, DAC_VREF_NEG_INPUT)
 
 	/* Video */
 	MCFG_DEFAULT_LAYOUT(layout_atari_s2)
@@ -487,7 +491,7 @@ static MACHINE_CONFIG_START( atari_s2 )
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer_s", atari_s2_state, timer_s, attotime::from_hz(150000))
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( atari_s3, atari_s2 )
+MACHINE_CONFIG_DERIVED(atari_s2_state::atari_s3, atari_s2)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(atari_s3_map)
 MACHINE_CONFIG_END

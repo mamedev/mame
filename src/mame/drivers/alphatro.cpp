@@ -105,6 +105,7 @@ public:
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load) { return load_cart(image, m_cart); }
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
 
+	void alphatro(machine_config &config);
 private:
 	uint8_t *m_ram_ptr;
 	required_device<ram_device> m_ram;
@@ -686,7 +687,7 @@ static SLOT_INTERFACE_START( alphatro_floppies )
 	SLOT_INTERFACE( "525dd", FLOPPY_525_DD )
 SLOT_INTERFACE_END
 
-static MACHINE_CONFIG_START( alphatro )
+MACHINE_CONFIG_START(alphatro_state::alphatro)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80,MAIN_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(alphatro_map)

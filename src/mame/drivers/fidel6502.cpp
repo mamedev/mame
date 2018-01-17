@@ -441,6 +441,7 @@ I/O is via TTL, very similar to Designer Display
 #include "machine/6821pia.h"
 #include "machine/i8255.h"
 #include "machine/nvram.h"
+#include "sound/volt_reg.h"
 #include "speaker.h"
 
 // internal artwork
@@ -540,6 +541,31 @@ public:
 	DECLARE_WRITE8_MEMBER(chesster_control_w);
 	DECLARE_WRITE8_MEMBER(kishon_control_w);
 	DECLARE_DRIVER_INIT(chesster);
+	void chesster(machine_config &config);
+	void su9(machine_config &config);
+	void sc12b(machine_config &config);
+	void sc9b(machine_config &config);
+	void csc(machine_config &config);
+	void fexcelv(machine_config &config);
+	void fexcelb(machine_config &config);
+	void kishon(machine_config &config);
+	void fphantom(machine_config &config);
+	void fexcel4(machine_config &config);
+	void eag(machine_config &config);
+	void playmatic(machine_config &config);
+	void fdes2000d(machine_config &config);
+	void rsc(machine_config &config);
+	void fdes2100d(machine_config &config);
+	void fdes2100(machine_config &config);
+	void fdes2000(machine_config &config);
+	void eas(machine_config &config);
+	void fexcelp(machine_config &config);
+	void sc9d(machine_config &config);
+	void sc12(machine_config &config);
+	void granits(machine_config &config);
+	void sc9c(machine_config &config);
+	void fexcel(machine_config &config);
+	void fexceld(machine_config &config);
 };
 
 
@@ -1549,7 +1575,7 @@ INPUT_PORTS_END
     Machine Drivers
 ******************************************************************************/
 
-static MACHINE_CONFIG_START( rsc )
+MACHINE_CONFIG_START(fidel6502_state::rsc)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, 1800000) // measured approx 1.81MHz
@@ -1573,10 +1599,11 @@ static MACHINE_CONFIG_START( rsc )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
 	MCFG_SOUND_ADD("dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
-	MCFG_SOUND_REFERENCE_INPUT(DAC_VREF_POS_INPUT, 1.0)
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( csc )
+MACHINE_CONFIG_START(fidel6502_state::csc)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, XTAL_3_9MHz/2) // from 3.9MHz resonator
@@ -1608,10 +1635,11 @@ static MACHINE_CONFIG_START( csc )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.75)
 
 	MCFG_SOUND_ADD("dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
-	MCFG_SOUND_REFERENCE_INPUT(DAC_VREF_POS_INPUT, 1.0)
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( su9, csc )
+MACHINE_CONFIG_DERIVED(fidel6502_state::su9, csc)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1620,7 +1648,7 @@ static MACHINE_CONFIG_DERIVED( su9, csc )
 	MCFG_DEFAULT_LAYOUT(layout_fidel_su9)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( eas )
+MACHINE_CONFIG_START(fidel6502_state::eas)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", R65C02, XTAL_3MHz)
@@ -1645,7 +1673,8 @@ static MACHINE_CONFIG_START( eas )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.75)
 
 	MCFG_SOUND_ADD("dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
-	MCFG_SOUND_REFERENCE_INPUT(DAC_VREF_POS_INPUT, 1.0)
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT)
 
 	/* cartridge */
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "fidel_scc")
@@ -1654,7 +1683,7 @@ static MACHINE_CONFIG_START( eas )
 	MCFG_SOFTWARE_LIST_ADD("cart_list", "fidel_scc")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( eag, eas )
+MACHINE_CONFIG_DERIVED(fidel6502_state::eag, eas)
 
 	/* basic machine hardware */
 	MCFG_CPU_REPLACE("maincpu", R65C02, XTAL_5MHz) // R65C02P4
@@ -1664,7 +1693,7 @@ static MACHINE_CONFIG_DERIVED( eag, eas )
 	MCFG_DEFAULT_LAYOUT(layout_fidel_eag)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( sc9d )
+MACHINE_CONFIG_START(fidel6502_state::sc9d)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, XTAL_3_9MHz/2) // R6502AP, 3.9MHz resonator
@@ -1679,7 +1708,8 @@ static MACHINE_CONFIG_START( sc9d )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
 	MCFG_SOUND_ADD("dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
-	MCFG_SOUND_REFERENCE_INPUT(DAC_VREF_POS_INPUT, 1.0)
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT)
 
 	/* cartridge */
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "fidel_scc")
@@ -1688,20 +1718,20 @@ static MACHINE_CONFIG_START( sc9d )
 	MCFG_SOFTWARE_LIST_ADD("cart_list", "fidel_scc")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( sc9b, sc9d )
+MACHINE_CONFIG_DERIVED(fidel6502_state::sc9b, sc9d)
 
 	/* basic machine hardware */
 	MCFG_CPU_REPLACE("maincpu", M6502, 1500000) // from ceramic resonator "681 JSA", measured
 	MCFG_CPU_PROGRAM_MAP(sc9_map)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( sc9c, sc9b )
+MACHINE_CONFIG_DERIVED(fidel6502_state::sc9c, sc9b)
 
 	/* basic machine hardware */
 	MCFG_MACHINE_RESET_OVERRIDE(fidel6502_state, sc9c)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( playmatic, sc9b )
+MACHINE_CONFIG_DERIVED(fidel6502_state::playmatic, sc9b)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1710,7 +1740,7 @@ static MACHINE_CONFIG_DERIVED( playmatic, sc9b )
 	MCFG_DEFAULT_LAYOUT(layout_fidel_playmatic)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( sc12 )
+MACHINE_CONFIG_START(fidel6502_state::sc12)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", R65C02, XTAL_3MHz) // R65C02P3
@@ -1733,7 +1763,8 @@ static MACHINE_CONFIG_START( sc12 )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
 	MCFG_SOUND_ADD("dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
-	MCFG_SOUND_REFERENCE_INPUT(DAC_VREF_POS_INPUT, 1.0)
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT)
 
 	/* cartridge */
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "fidel_scc")
@@ -1742,7 +1773,7 @@ static MACHINE_CONFIG_START( sc12 )
 	MCFG_SOFTWARE_LIST_ADD("cart_list", "fidel_scc")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( sc12b, sc12 )
+MACHINE_CONFIG_DERIVED(fidel6502_state::sc12b, sc12)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1759,7 +1790,7 @@ static MACHINE_CONFIG_DERIVED( sc12b, sc12 )
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("dummy_timer", fidel6502_state, dummy, attotime::from_hz(XTAL_4MHz)) // MCFG_QUANTUM_PERFECT_CPU("maincpu") didn't work
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( fexcel )
+MACHINE_CONFIG_START(fidel6502_state::fexcel)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M65SC02, XTAL_12MHz/4) // G65SC102P-3, 12.0M ceramic resonator
@@ -1774,38 +1805,39 @@ static MACHINE_CONFIG_START( fexcel )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
 	MCFG_SOUND_ADD("dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
-	MCFG_SOUND_REFERENCE_INPUT(DAC_VREF_POS_INPUT, 1.0)
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( fexcel4, fexcel )
+MACHINE_CONFIG_DERIVED(fidel6502_state::fexcel4, fexcel)
 
 	/* basic machine hardware */
 	MCFG_CPU_REPLACE("maincpu", R65C02, XTAL_4MHz) // R65C02P4
 	MCFG_CPU_PROGRAM_MAP(fexcel_map)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( fexcelb, fexcel )
+MACHINE_CONFIG_DERIVED(fidel6502_state::fexcelb, fexcel)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(fexcelb_map)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( fexcelp, fexcel )
+MACHINE_CONFIG_DERIVED(fidel6502_state::fexcelp, fexcel)
 
 	/* basic machine hardware */
 	MCFG_CPU_REPLACE("maincpu", R65C02, XTAL_5MHz) // R65C02P4
 	MCFG_CPU_PROGRAM_MAP(fexcelp_map)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( granits, fexcelp )
+MACHINE_CONFIG_DERIVED(fidel6502_state::granits, fexcelp)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_DEVICE_CLOCK(XTAL_8MHz) // overclocked
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( fdes2100, fexcel )
+MACHINE_CONFIG_DERIVED(fidel6502_state::fdes2100, fexcel)
 
 	/* basic machine hardware */
 	MCFG_CPU_REPLACE("maincpu", M65C02, XTAL_5MHz) // WDC 65C02
@@ -1821,14 +1853,14 @@ static MACHINE_CONFIG_DERIVED( fdes2100, fexcel )
 	MCFG_DEFAULT_LAYOUT(layout_fidel_des)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( fdes2000, fdes2100 )
+MACHINE_CONFIG_DERIVED(fidel6502_state::fdes2000, fdes2100)
 
 	/* basic machine hardware */
 	MCFG_CPU_REPLACE("maincpu", R65C02, XTAL_3MHz) // RP65C02G
 	MCFG_CPU_PROGRAM_MAP(fexcelp_map)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( fexcelv, fexcelb )
+MACHINE_CONFIG_DERIVED(fidel6502_state::fexcelv, fexcelb)
 
 	/* sound hardware */
 	MCFG_SOUND_ADD("speech", S14001A, 25000) // R/C circuit, around 25khz
@@ -1836,13 +1868,13 @@ static MACHINE_CONFIG_DERIVED( fexcelv, fexcelb )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.75)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( fexceld, fexcelb )
+MACHINE_CONFIG_DERIVED(fidel6502_state::fexceld, fexcelb)
 
 	/* basic machine hardware */
 	MCFG_DEFAULT_LAYOUT(layout_fidel_exd)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( fdes2100d )
+MACHINE_CONFIG_START(fidel6502_state::fdes2100d)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M65C02, XTAL_6MHz) // W65C02P-6
@@ -1857,17 +1889,18 @@ static MACHINE_CONFIG_START( fdes2100d )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
 	MCFG_SOUND_ADD("dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
-	MCFG_SOUND_REFERENCE_INPUT(DAC_VREF_POS_INPUT, 1.0)
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( fdes2000d, fdes2100d )
+MACHINE_CONFIG_DERIVED(fidel6502_state::fdes2000d, fdes2100d)
 
 	/* basic machine hardware */
 	MCFG_CPU_REPLACE("maincpu", R65C02, XTAL_3MHz) // R65C02P3
 	MCFG_CPU_PROGRAM_MAP(fdesdis_map)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( fphantom )
+MACHINE_CONFIG_START(fidel6502_state::fphantom)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", R65C02, XTAL_4_9152MHz) // R65C02P4
@@ -1882,10 +1915,11 @@ static MACHINE_CONFIG_START( fphantom )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
 	MCFG_SOUND_ADD("dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
-	MCFG_SOUND_REFERENCE_INPUT(DAC_VREF_POS_INPUT, 1.0)
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( chesster )
+MACHINE_CONFIG_START(fidel6502_state::chesster)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", R65C02, XTAL_5MHz) // RP65C02G
@@ -1901,10 +1935,11 @@ static MACHINE_CONFIG_START( chesster )
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
 	MCFG_SOUND_ADD("dac8", DAC_8BIT_R2R, 0) // m74hc374b1.ic1 + 8l513_02.z2
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
-	MCFG_SOUND_REFERENCE_INPUT(DAC_VREF_POS_INPUT, 1.0) MCFG_SOUND_REFERENCE_INPUT(DAC_VREF_NEG_INPUT, -1.0)
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac8", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac8", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( kishon, chesster )
+MACHINE_CONFIG_DERIVED(fidel6502_state::kishon, chesster)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")

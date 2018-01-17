@@ -51,6 +51,7 @@ public:
 	DECLARE_READ16_MEMBER( port9c_r );
 	void kbd_put(u8 data);
 
+	void dms86(machine_config &config);
 private:
 	u8 m_term_data;
 	virtual void machine_reset() override;
@@ -109,7 +110,7 @@ void dms86_state::kbd_put(u8 data)
 	m_term_data = data;
 }
 
-static MACHINE_CONFIG_START( dms86 )
+MACHINE_CONFIG_START(dms86_state::dms86)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8086, XTAL_14_7456MHz / 3) // according to the manual... hmm
 	MCFG_CPU_PROGRAM_MAP(mem_map)

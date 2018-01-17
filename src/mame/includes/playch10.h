@@ -140,4 +140,7 @@ public:
 	void gboard_scanline_cb( int scanline, int vblank, int blanked );
 	void ppu_irq(int *ppu_regs);
 	void mapper9_latch(offs_t offset);
+	void playch10(machine_config &config);
+	void playchnv(machine_config &config);
+	void playch10_hboard(machine_config &config);
 };

@@ -79,6 +79,8 @@ public:
 	// driver_device overrides
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
+	void faceoffh(machine_config &config);
+	void chexx83(machine_config &config);
 };
 
 
@@ -313,7 +315,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(chexx_state::update)
 #endif
 }
 
-static MACHINE_CONFIG_START( chexx83 )
+MACHINE_CONFIG_START(chexx_state::chexx83)
 
 	// basic machine hardware
 	MCFG_CPU_ADD("maincpu", M6502, MAIN_CLOCK/2)
@@ -343,7 +345,7 @@ static MACHINE_CONFIG_START( chexx83 )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.16)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( faceoffh, chexx83 )
+MACHINE_CONFIG_DERIVED(chexx_state::faceoffh, chexx83)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(faceoffh_map)
 

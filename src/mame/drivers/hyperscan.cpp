@@ -88,6 +88,7 @@ public:
 	void spg290_blit_bitmap(bitmap_rgb32 &bitmap, const rectangle &cliprect, uint32_t control, uint32_t attribute, int posy, int posx, uint32_t nptr, uint32_t buf_start, uint32_t transrgb);
 	void spg290_blit_character(bitmap_rgb32 &bitmap, const rectangle &cliprect, uint32_t control, uint32_t attribute, int posy, int posx, uint32_t nptr, uint32_t buf_start, uint32_t transrgb);
 
+	void hyperscan(machine_config &config);
 private:
 	static const device_timer_id TIMER_SPG290 = 0;
 	static const device_timer_id TIMER_I2C = 1;
@@ -616,7 +617,7 @@ void hyperscan_state::machine_reset()
 }
 
 
-static MACHINE_CONFIG_START( hyperscan )
+MACHINE_CONFIG_START(hyperscan_state::hyperscan)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", SCORE7, XTAL_27MHz * 4)   // 108MHz S+core 7
 	MCFG_CPU_PROGRAM_MAP(spg290_mem)

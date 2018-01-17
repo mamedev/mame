@@ -287,7 +287,7 @@ static GFXDECODE_START( starshp1 )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( starshp1 )
+MACHINE_CONFIG_START(starshp1_state::starshp1)
 
 	/* basic machine hardware */
 

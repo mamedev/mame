@@ -8,6 +8,7 @@
 #include "machine/clock.h"
 #include "machine/rescap.h"
 #include "sound/dac.h"
+#include "sound/volt_reg.h"
 
 
 //**************************************************************************
@@ -217,7 +218,7 @@ READ8_MEMBER(zac1b111xx_melody_base::melodypsg1_portb_r)
 	return m_melody_command;
 }
 
-MACHINE_CONFIG_MEMBER(zac1b111xx_melody_base::device_add_mconfig)
+MACHINE_CONFIG_START(zac1b111xx_melody_base::device_add_mconfig)
 	MCFG_CPU_ADD("melodycpu", M6802, XTAL_3_579545MHz) // verified on pcb
 	MCFG_CPU_PROGRAM_MAP(zac1b111xx_melody_base_map)
 
@@ -296,7 +297,7 @@ WRITE8_MEMBER(zac1b11107_audio_device::melodypsg2_porta_w)
 	// TODO: assume LEVELT is controlled here as is the case for 1B11142?
 }
 
-MACHINE_CONFIG_MEMBER(zac1b11107_audio_device::device_add_mconfig)
+MACHINE_CONFIG_START(zac1b11107_audio_device::device_add_mconfig)
 	zac1b111xx_melody_base::device_add_mconfig(config);
 
 	MCFG_CPU_MODIFY("melodycpu")
@@ -399,7 +400,7 @@ WRITE8_MEMBER(zac1b11142_audio_device::pia_1i_portb_w)
 	// TODO: a LED output().set_led_value(0, BIT(data, 4));
 }
 
-MACHINE_CONFIG_MEMBER(zac1b11142_audio_device::device_add_mconfig)
+MACHINE_CONFIG_START(zac1b11142_audio_device::device_add_mconfig)
 	zac1b111xx_melody_base::device_add_mconfig(config);
 
 	MCFG_CPU_MODIFY("melodycpu")
@@ -427,7 +428,8 @@ MACHINE_CONFIG_MEMBER(zac1b11142_audio_device::device_add_mconfig)
 	MCFG_PIA_WRITEPB_HANDLER(WRITE8(zac1b11142_audio_device, pia_1i_portb_w))
 
 	MCFG_SOUND_ADD("dac", MC1408, 0) MCFG_MIXER_ROUTE(ALL_OUTPUTS, DEVICE_SELF_OWNER, 0.40, 0) // mc1408.1f
-	MCFG_SOUND_REFERENCE_INPUT(DAC_VREF_POS_INPUT, 1.0) MCFG_SOUND_REFERENCE_INPUT(DAC_VREF_NEG_INPUT, -1.0)
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 
 	// There is no xtal, the clock is obtained from a RC oscillator as shown in the TMS5220 datasheet (R=100kOhm C=22pF)
 	// 162kHz measured on pin 3 20 minutes after power on, clock would then be 162.3*4=649.2kHz

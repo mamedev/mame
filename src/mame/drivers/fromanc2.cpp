@@ -506,7 +506,7 @@ void fromanc2_state::machine_reset()
 	m_datalatch_2l = 0;
 }
 
-static MACHINE_CONFIG_START( fromanc2 )
+MACHINE_CONFIG_START(fromanc2_state::fromanc2)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000,32000000/2)      /* 16.00 MHz */
@@ -566,7 +566,7 @@ static MACHINE_CONFIG_START( fromanc2 )
 	MCFG_SOUND_ROUTE(2, "mono", 0.75)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( fromancr )
+MACHINE_CONFIG_START(fromanc2_state::fromancr)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000,32000000/2)      /* 16.00 MHz */
@@ -626,7 +626,7 @@ static MACHINE_CONFIG_START( fromancr )
 	MCFG_SOUND_ROUTE(2, "mono", 0.75)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( fromanc4 )
+MACHINE_CONFIG_START(fromanc2_state::fromanc4)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_32MHz/2)      /* 16.00 MHz */

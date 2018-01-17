@@ -251,7 +251,7 @@ void mrflea_state::machine_reset()
 	m_gfx_bank = 0;
 }
 
-static MACHINE_CONFIG_START( mrflea )
+MACHINE_CONFIG_START(mrflea_state::mrflea)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 4000000) /* 4 MHz? */

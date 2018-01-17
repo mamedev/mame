@@ -51,7 +51,7 @@ ROM_END
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( bml3bus_mp1802_device::device_add_mconfig )
+MACHINE_CONFIG_START(bml3bus_mp1802_device::device_add_mconfig)
 	MCFG_MB8866_ADD("fdc", XTAL_1MHz)
 	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(bml3bus_mp1802_device, bml3_wd17xx_intrq_w))
 

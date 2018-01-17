@@ -54,6 +54,7 @@ public:
 	required_device<netlist_mame_device> m_maincpu;
 	required_device<fixedfreq_device> m_video;
 
+	void electra(machine_config &config);
 protected:
 
 	// driver_device overrides
@@ -94,7 +95,7 @@ void electra_state::video_start()
 {
 }
 
-static MACHINE_CONFIG_START( electra )
+MACHINE_CONFIG_START(electra_state::electra)
 
 	/* basic machine hardware */
 	MCFG_DEVICE_ADD("maincpu", NETLIST_CPU, NETLIST_CLOCK)

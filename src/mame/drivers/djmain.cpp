@@ -1376,7 +1376,7 @@ void djmain_state::machine_reset()
  *
  *************************************/
 
-static MACHINE_CONFIG_START( djmainj )
+MACHINE_CONFIG_START(djmain_state::djmainj)
 
 	/* basic machine hardware */
 	// popn3 works 9.6 MHz or slower in some songs */
@@ -1421,12 +1421,12 @@ static MACHINE_CONFIG_START( djmainj )
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED(djmainu, djmainj)
+MACHINE_CONFIG_DERIVED(djmain_state::djmainu, djmainj)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(maincpu_djmainu)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED(djmaina, djmainj)
+MACHINE_CONFIG_DERIVED(djmain_state::djmaina, djmainj)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(maincpu_djmaina)
 MACHINE_CONFIG_END

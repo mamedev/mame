@@ -127,6 +127,7 @@ public:
 		return 0;
 	}
 
+	void bfm_swp(machine_config &config);
 protected:
 
 	// devices
@@ -198,7 +199,7 @@ void bfm_swp_state::machine_start()
 }
 
 
-static MACHINE_CONFIG_START( bfm_swp )
+MACHINE_CONFIG_START(bfm_swp_state::bfm_swp)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68340, 16000000)

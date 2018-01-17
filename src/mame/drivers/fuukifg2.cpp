@@ -438,7 +438,7 @@ void fuuki16_state::machine_reset()
 }
 
 
-static MACHINE_CONFIG_START( fuuki16 )
+MACHINE_CONFIG_START(fuuki16_state::fuuki16)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_32MHz / 2) /* 16 MHz */

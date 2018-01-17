@@ -65,4 +65,6 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	required_device<generic_latch_8_device> m_soundlatch;
+	void _1942p(machine_config &config);
+	void _1942(machine_config &config);
 };

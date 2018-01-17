@@ -39,6 +39,7 @@ ToDo:
 #include "machine/timer.h"
 #include "sound/dac.h"
 #include "sound/tms5220.h"
+#include "sound/volt_reg.h"
 #include "video/resnet.h"
 #include "screen.h"
 #include "speaker.h"
@@ -84,6 +85,7 @@ public:
 	required_shared_ptr<uint8_t> m_p_videoram;
 	required_shared_ptr<uint8_t> m_p_objectram;
 	required_device<gfxdecode_device> m_gfxdecode;
+	void mrgame(machine_config &config);
 private:
 	bool m_ack1;
 	bool m_ack2;
@@ -459,7 +461,7 @@ uint32_t mrgame_state::screen_update_mrgame(screen_device &screen, bitmap_ind16 
 	return 0;
 }
 
-static MACHINE_CONFIG_START( mrgame )
+MACHINE_CONFIG_START(mrgame_state::mrgame)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_6MHz)
 	MCFG_CPU_PROGRAM_MAP(main_map)
@@ -495,7 +497,8 @@ static MACHINE_CONFIG_START( mrgame )
 	MCFG_SOUND_ADD("dacvol", DAC_8BIT_R2R, 0) // unknown DAC
 	MCFG_SOUND_ROUTE_EX(0, "ldac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "ldac", -1.0, DAC_VREF_NEG_INPUT)
 	MCFG_SOUND_ROUTE_EX(0, "rdac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "rdac", -1.0, DAC_VREF_NEG_INPUT)
-	MCFG_SOUND_REFERENCE_INPUT(DAC_VREF_POS_INPUT, 1.0) MCFG_SOUND_REFERENCE_INPUT(DAC_VREF_NEG_INPUT, -1.0)
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dacvol", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dacvol", -1.0, DAC_VREF_NEG_INPUT)
 
 	MCFG_SOUND_ADD("tms", TMS5220, 672000) // uses a RC combination. 672k copied from jedi.h
 	MCFG_TMS52XX_READYQ_HANDLER(INPUTLINE("audiocpu2", Z80_INPUT_LINE_BOGUSWAIT))

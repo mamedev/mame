@@ -933,7 +933,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(namcona1_state::interrupt)
 }
 
 /* cropped at sides */
-static MACHINE_CONFIG_START( namcona1 )
+MACHINE_CONFIG_START(namcona1_state::namcona1)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, MASTER_CLOCK/4)
@@ -972,7 +972,7 @@ MACHINE_CONFIG_END
 
 
 /* full-width */
-static MACHINE_CONFIG_DERIVED( namcona1w, namcona1 )
+MACHINE_CONFIG_DERIVED(namcona1_state::namcona1w, namcona1)
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
@@ -980,7 +980,7 @@ static MACHINE_CONFIG_DERIVED( namcona1w, namcona1 )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( namcona2, namcona1 )
+MACHINE_CONFIG_DERIVED(namcona1_state::namcona2, namcona1)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -991,7 +991,7 @@ static MACHINE_CONFIG_DERIVED( namcona2, namcona1 )
 	MCFG_CPU_IO_MAP( namcona1_mcu_io_map)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( namcona2w, namcona2 )
+MACHINE_CONFIG_DERIVED(namcona1_state::namcona2w, namcona2)
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")

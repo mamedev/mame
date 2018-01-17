@@ -113,6 +113,7 @@ public:
 	virtual void machine_reset() override;
 	INTERRUPT_GEN_MEMBER(pachifev_vblank_irq);
 	required_device<cpu_device> m_maincpu;
+	void pachifev(machine_config &config);
 };
 
 WRITE8_MEMBER(pachifev_state::controls_w)
@@ -341,7 +342,7 @@ void pachifev_state::machine_start()
 	save_item(NAME(m_cnt));
 }
 
-static MACHINE_CONFIG_START( pachifev )
+MACHINE_CONFIG_START(pachifev_state::pachifev)
 
 	// CPU TMS9995, standard variant; no line connections
 	MCFG_TMS99xx_ADD("maincpu", TMS9995, XTAL_12MHz, pachifev_map, pachifev_cru)

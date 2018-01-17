@@ -59,6 +59,10 @@ public:
 	uint8_t coleco_paddle_read(int port, int joy_mode, uint8_t joy_status);
 	uint8_t coleco_scan_paddles(uint8_t *joy_status0, uint8_t *joy_status1);
 
+	void colecop(machine_config &config);
+	void coleco(machine_config &config);
+	void czz50(machine_config &config);
+	void dina(machine_config &config);
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<colecovision_cartridge_slot_device> m_cart;

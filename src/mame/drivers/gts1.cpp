@@ -106,6 +106,7 @@ public:
 	DECLARE_WRITE8_MEMBER(gts1_io_w);
 	DECLARE_READ8_MEMBER (gts1_pa_r);
 	DECLARE_WRITE8_MEMBER(gts1_do_w);
+	void gts1(machine_config &config);
 private:
 	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
@@ -675,7 +676,7 @@ WRITE8_MEMBER(gts1_state::gts1_do_w)
 }
 
 
-static MACHINE_CONFIG_START( gts1 )
+MACHINE_CONFIG_START(gts1_state::gts1)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", PPS4_2, XTAL_3_579545MHz)  // divided by 18 in the CPU
 	MCFG_CPU_PROGRAM_MAP(gts1_map)

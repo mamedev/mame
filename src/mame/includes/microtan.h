@@ -96,6 +96,7 @@ public:
 	DECLARE_SNAPSHOT_LOAD_MEMBER( microtan );
 	DECLARE_QUICKLOAD_LOAD_MEMBER( microtan );
 
+	void microtan(machine_config &config);
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };

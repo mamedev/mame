@@ -123,6 +123,14 @@ public:
 	required_device<pia6821_device> m_pia_0;
 	required_device<pia6821_device> m_pia_1;
 	required_device<pia6821_device> m_pia_2;
+	void playball(machine_config &config);
+	void defender(machine_config &config);
+	void sinistar(machine_config &config);
+	void lottofun(machine_config &config);
+	void spdball(machine_config &config);
+	void williams(machine_config &config);
+	void williams_muxed(machine_config &config);
+	void jin(machine_config &config);
 };
 
 
@@ -161,6 +169,8 @@ public:
 	uint32_t screen_update_blaster(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	inline void update_blaster_banking();
+	void blastkit(machine_config &config);
+	void blaster(machine_config &config);
 };
 
 
@@ -208,6 +218,9 @@ public:
 	DECLARE_MACHINE_RESET(williams2);
 	DECLARE_VIDEO_START(williams2);
 	uint32_t screen_update_williams2(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	void williams2(machine_config &config);
+	void mysticm(machine_config &config);
+	void inferno(machine_config &config);
 };
 
 
@@ -222,6 +235,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(maxvol_w);
 	DECLARE_WRITE8_MEMBER(lamp_w);
 
+	void tshoot(machine_config &config);
 private:
 	required_ioport_array<2> m_gun;
 };
@@ -242,6 +256,7 @@ public:
 	TIMER_CALLBACK_MEMBER(joust2_deferred_snd_cmd_w);
 	DECLARE_WRITE8_MEMBER(joust2_snd_cmd_w);
 	DECLARE_WRITE_LINE_MEMBER(joust2_pia_3_cb1_w);
+	void joust2(machine_config &config);
 };
 
 /*----------- defined in video/williams.cpp -----------*/

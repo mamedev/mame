@@ -88,6 +88,7 @@ public:
 	DECLARE_READ8_MEMBER(c100_r);
 	DECLARE_WRITE8_MEMBER(c100_w);
 
+	void tk2000(machine_config &config);
 private:
 	int m_speaker_state;
 	int m_cassette_state;
@@ -562,7 +563,7 @@ static INPUT_PORTS_START( tk2000 )
 	PORT_CONFSETTING(0x03, "Amber")
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( tk2000 )
+MACHINE_CONFIG_START(tk2000_state::tk2000)
 	/* basic machine hardware */
 	MCFG_CPU_ADD(A2_CPU_TAG, M6502, 1021800)     /* close to actual CPU frequency of 1.020484 MHz */
 	MCFG_CPU_PROGRAM_MAP(apple2_map)

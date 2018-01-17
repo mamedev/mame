@@ -1309,7 +1309,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-MACHINE_CONFIG_START( dkong2b_audio )
+MACHINE_CONFIG_START(dkong_state::dkong2b_audio)
 
 	/* sound latches */
 	MCFG_LATCH8_ADD("ls175.3d") /* sound cmd latch */
@@ -1351,14 +1351,14 @@ MACHINE_CONFIG_START( dkong2b_audio )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED( radarscp_audio, dkong2b_audio )
+MACHINE_CONFIG_DERIVED(dkong_state::radarscp_audio, dkong2b_audio)
 
 	MCFG_DISCRETE_REPLACE("discrete", 0, radarscp)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.7)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED( radarscp1_audio, radarscp_audio )
+MACHINE_CONFIG_DERIVED(dkong_state::radarscp1_audio, radarscp_audio)
 
 	MCFG_CPU_MODIFY("soundcpu")
 	MCFG_CPU_IO_MAP(radarscp1_sound_io_map)
@@ -1384,7 +1384,7 @@ MACHINE_CONFIG_DERIVED( radarscp1_audio, radarscp_audio )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START( dkongjr_audio )
+MACHINE_CONFIG_START(dkong_state::dkongjr_audio)
 
 	/* sound latches */
 	MCFG_LATCH8_ADD("ls174.3d")
@@ -1423,7 +1423,7 @@ MACHINE_CONFIG_START( dkongjr_audio )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START( dkong3_audio )
+MACHINE_CONFIG_START(dkong_state::dkong3_audio)
 
 	MCFG_CPU_ADD("n2a03a", N2A03, NTSC_APU_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(dkong3_sound1_map)

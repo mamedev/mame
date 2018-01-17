@@ -72,6 +72,9 @@ public:
 	INTERRUPT_GEN_MEMBER(interrupt);
 	INTERRUPT_GEN_MEMBER(vsgongf_sound_interrupt);
 
+	void tsamurai(machine_config &config);
+	void m660(machine_config &config);
+	void vsgongf(machine_config &config);
 protected:
 	virtual void machine_start() override;
 	virtual void video_start() override;

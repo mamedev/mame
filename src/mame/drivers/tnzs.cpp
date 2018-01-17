@@ -626,6 +626,7 @@ Driver by Takahiro Nogi (nogi@kt.rim.or.jp) 1999/11/06
 
 #include "cpu/z80/z80.h"
 #include "sound/2203intf.h"
+#include "sound/volt_reg.h"
 #include "sound/ym2151.h"
 #include "screen.h"
 #include "speaker.h"
@@ -870,7 +871,7 @@ static ADDRESS_MAP_START( mainbank_map, AS_PROGRAM, 8, tnzs_base_state )
 	AM_RANGE(0x08000, 0x1ffff) AM_ROM AM_REGION(":maincpu", 0x8000)
 ADDRESS_MAP_END
 
-MACHINE_CONFIG_START( tnzs_mainbank )
+MACHINE_CONFIG_START(tnzs_base_state::tnzs_mainbank)
 	MCFG_DEVICE_ADD("mainbank", ADDRESS_MAP_BANK, 0)
 	MCFG_DEVICE_PROGRAM_MAP(mainbank_map)
 	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
@@ -1516,7 +1517,7 @@ static GFXDECODE_START( insectx )
 	GFXDECODE_ENTRY( "gfx1", 0, insectx_charlayout, 0, 32 )
 GFXDECODE_END
 
-static MACHINE_CONFIG_START( tnzs_base )
+MACHINE_CONFIG_START(tnzs_base_state::tnzs_base)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80,XTAL_12MHz/2)       /* 6.0 MHz ??? - Main board Crystal is 12MHz, verified on insectx, kageki, tnzsb */
 	MCFG_CPU_PROGRAM_MAP(main_map)
@@ -1551,7 +1552,7 @@ static MACHINE_CONFIG_START( tnzs_base )
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( tnzs, tnzs_base )
+MACHINE_CONFIG_DERIVED(tnzs_base_state::tnzs, tnzs_base)
 	MCFG_CPU_ADD("mcu", I8742, 12000000/2)  /* 400KHz ??? - Main board Crystal is 12MHz */
 	MCFG_MCS48_PORT_P1_IN_CB(READ8(tnzs_mcu_state, mcu_port1_r))
 	MCFG_MCS48_PORT_P2_IN_CB(READ8(tnzs_mcu_state, mcu_port2_r))
@@ -1574,7 +1575,7 @@ static MACHINE_CONFIG_DERIVED( tnzs, tnzs_base )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.3)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( extrmatn, tnzs )
+MACHINE_CONFIG_DERIVED(extrmatn_state::extrmatn, tnzs)
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(prompal_main_map)
@@ -1588,13 +1589,13 @@ static MACHINE_CONFIG_DERIVED( extrmatn, tnzs )
 	MCFG_PALETTE_INIT_OWNER(tnzs_base_state, prompalette)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( plumppop, extrmatn )
+MACHINE_CONFIG_DERIVED(extrmatn_state::plumppop, extrmatn)
 	MCFG_DEVICE_ADD("upd4701", UPD4701A, 0)
 	MCFG_UPD4701_PORTX("AN1")
 	MCFG_UPD4701_PORTY("AN2")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( arknoid2, plumppop )
+MACHINE_CONFIG_DERIVED(arknoid2_state::arknoid2, plumppop)
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", arknoid2_state, mcu_interrupt)
@@ -1606,7 +1607,7 @@ static MACHINE_CONFIG_DERIVED( arknoid2, plumppop )
 	MCFG_DEVICE_DISABLE()
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( insectx, tnzs_base )
+MACHINE_CONFIG_DERIVED(insectx_state::insectx, tnzs_base)
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("sub")
 	MCFG_CPU_PROGRAM_MAP(insectx_sub_map)
@@ -1622,7 +1623,7 @@ static MACHINE_CONFIG_DERIVED( insectx, tnzs_base )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( kageki, tnzs_base )
+MACHINE_CONFIG_DERIVED(kageki_state::kageki, tnzs_base)
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("sub")
 	MCFG_CPU_PROGRAM_MAP(kageki_sub_map)
@@ -1642,7 +1643,7 @@ static MACHINE_CONFIG_DERIVED( kageki, tnzs_base )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( tnzsb, tnzs_base )
+MACHINE_CONFIG_DERIVED(tnzsb_state::tnzsb, tnzs_base)
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(tnzsb_main_map)
@@ -1670,7 +1671,7 @@ static MACHINE_CONFIG_DERIVED( tnzsb, tnzs_base )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( kabukiz, tnzsb )
+MACHINE_CONFIG_DERIVED(kabukiz_state::kabukiz, tnzsb)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("sub")
@@ -1685,11 +1686,12 @@ static MACHINE_CONFIG_DERIVED( kabukiz, tnzsb )
 	MCFG_AY8910_PORT_B_WRITE_CB(DEVWRITE8("dac", dac_byte_interface, write))
 
 	MCFG_SOUND_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5) // unknown DAC
-	MCFG_SOUND_REFERENCE_INPUT(DAC_VREF_POS_INPUT, 1.0) MCFG_SOUND_REFERENCE_INPUT(DAC_VREF_NEG_INPUT, -1.0)
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( jpopnics, tnzs_base )
+MACHINE_CONFIG_DERIVED(jpopnics_state::jpopnics, tnzs_base)
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(jpopnics_main_map)

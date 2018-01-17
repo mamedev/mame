@@ -295,7 +295,7 @@ MACHINE_START_MEMBER(powerins_state, powerinsa)
 	membank("okibank")->configure_entries(0, 5, memregion("oki1")->base() + 0x30000, 0x10000);
 }
 
-static MACHINE_CONFIG_START( powerins )
+MACHINE_CONFIG_START(powerins_state::powerins)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 12000000)   /* 12MHz */
@@ -341,7 +341,7 @@ static MACHINE_CONFIG_START( powerins )
 	MCFG_NMK112_ROM1("oki2")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( powerinsa, powerins )
+MACHINE_CONFIG_DERIVED(powerins_state::powerinsa, powerins)
 
 	/* basic machine hardware */
 
@@ -364,7 +364,7 @@ static MACHINE_CONFIG_DERIVED( powerinsa, powerins )
 	MCFG_DEVICE_REMOVE("nmk112")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( powerinsb, powerins )
+MACHINE_CONFIG_DERIVED(powerins_state::powerinsb, powerins)
 
 	/* basic machine hardware */
 

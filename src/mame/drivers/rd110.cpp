@@ -73,6 +73,7 @@ public:
 	DECLARE_PALETTE_INIT(d110);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
+	void d110(machine_config &config);
 private:
 
 	uint8_t  m_lcd_data_buffer[256];
@@ -230,7 +231,7 @@ static ADDRESS_MAP_START( d110_io, AS_IO, 16, d110_state )
 	AM_RANGE(i8x9x_device::P0,     i8x9x_device::P0)     AM_READ(port0_r)
 ADDRESS_MAP_END
 
-static MACHINE_CONFIG_START( d110 )
+MACHINE_CONFIG_START(d110_state::d110)
 	MCFG_CPU_ADD( "maincpu", P8098, XTAL_12MHz )
 	MCFG_CPU_PROGRAM_MAP( d110_map )
 	MCFG_CPU_IO_MAP( d110_io )

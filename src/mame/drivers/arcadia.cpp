@@ -469,7 +469,7 @@ static SLOT_INTERFACE_START(arcadia_cart)
 SLOT_INTERFACE_END
 
 
-static MACHINE_CONFIG_START( arcadia )
+MACHINE_CONFIG_START(arcadia_state::arcadia)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", S2650, 3580000/4)        /* 0.895 MHz */
 	MCFG_CPU_PROGRAM_MAP(arcadia_mem)

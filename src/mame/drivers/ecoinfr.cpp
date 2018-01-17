@@ -123,6 +123,7 @@ public:
 	required_device<stepper_device> m_reel1;
 	required_device<stepper_device> m_reel2;
 	required_device<stepper_device> m_reel3;
+	void ecoinfr(machine_config &config);
 };
 
 
@@ -770,7 +771,7 @@ void ecoinfr_state::machine_reset()
 }
 
 
-static MACHINE_CONFIG_START( ecoinfr )
+MACHINE_CONFIG_START(ecoinfr_state::ecoinfr)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80,4000000)
 	MCFG_CPU_PROGRAM_MAP(memmap)

@@ -112,6 +112,7 @@ public:
 	required_device<palette_device> m_palette;
 	required_device<megasys1_tilemap_device> m_bgtmap;
 	required_device<megasys1_tilemap_device> m_txtmap;
+	void acommand(machine_config &config);
 };
 
 
@@ -459,7 +460,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(acommand_state::acommand_scanline)
 		m_maincpu->set_input_line(3, HOLD_LINE);
 }
 
-static MACHINE_CONFIG_START( acommand )
+MACHINE_CONFIG_START(acommand_state::acommand)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",M68000,12000000)

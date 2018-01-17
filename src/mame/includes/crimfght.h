@@ -52,6 +52,7 @@ public:
 	DECLARE_WRITE8_MEMBER(banking_callback);
 	DECLARE_CUSTOM_INPUT_MEMBER(system_r);
 
+	void crimfght(machine_config &config);
 private:
 	int m_woco;
 	int m_rmrd;

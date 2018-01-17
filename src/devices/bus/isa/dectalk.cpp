@@ -3,6 +3,7 @@
 #include "emu.h"
 #include "dectalk.h"
 
+#include "sound/volt_reg.h"
 #include "speaker.h"
 
 
@@ -152,7 +153,7 @@ const tiny_rom_entry* dectalk_isa_device::device_rom_region() const
 	return ROM_NAME( dectalk_isa );
 }
 
-MACHINE_CONFIG_MEMBER( dectalk_isa_device::device_add_mconfig )
+MACHINE_CONFIG_START(dectalk_isa_device::device_add_mconfig)
 	MCFG_CPU_ADD("dectalk_cpu", I80186, XTAL_20MHz)
 	MCFG_CPU_IO_MAP(dectalk_cpu_io)
 	MCFG_CPU_PROGRAM_MAP(dectalk_cpu_map)
@@ -165,7 +166,8 @@ MACHINE_CONFIG_MEMBER( dectalk_isa_device::device_add_mconfig )
 
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
 	MCFG_SOUND_ADD("dac", DAC_12BIT_R2R, 0) MCFG_SOUND_ROUTE(0, "speaker", 1.0) // unknown DAC
-	MCFG_SOUND_REFERENCE_INPUT(DAC_VREF_POS_INPUT, 1.0) MCFG_SOUND_REFERENCE_INPUT(DAC_VREF_NEG_INPUT, -1.0)
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 WRITE8_MEMBER(dectalk_isa_device::write)

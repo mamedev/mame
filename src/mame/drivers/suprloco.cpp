@@ -173,7 +173,7 @@ static GFXDECODE_START( suprloco )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( suprloco )
+MACHINE_CONFIG_START(suprloco_state::suprloco)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", SEGA_315_5015, 4000000)   /* 4 MHz (?) */

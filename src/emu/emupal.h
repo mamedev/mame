@@ -184,7 +184,7 @@
 
 
 #define MCFG_PALETTE_INIT_OWNER(_class, _method) \
-	palette_device::static_set_init(*device, palette_init_delegate(&_class::PALETTE_INIT_NAME(_method), #_class "::palette_init_" #_method, downcast<_class *>(owner)));
+	palette_device::static_set_init(*device, palette_init_delegate(&_class::PALETTE_INIT_NAME(_method), #_class "::palette_init_" #_method, this));
 #define MCFG_PALETTE_INIT_DEVICE(_tag, _class, _method) \
 	palette_device::static_set_init(*device, palette_init_delegate(&_class::PALETTE_INIT_NAME(_method), #_class "::palette_init_" #_method, _tag));
 

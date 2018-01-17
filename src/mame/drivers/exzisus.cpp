@@ -225,7 +225,7 @@ GFXDECODE_END
 
 
 /* All clocks are unconfirmed */
-static MACHINE_CONFIG_START( exzisus )
+MACHINE_CONFIG_START(exzisus_state::exzisus)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("cpua", Z80, 6000000)

@@ -67,6 +67,7 @@ public:
 	DECLARE_WRITE8_MEMBER(portc_w);
 	DECLARE_WRITE8_MEMBER(disp_w);
 	DECLARE_WRITE8_MEMBER(lamp_w);
+	void g627(machine_config &config);
 private:
 	uint8_t m_seg[6];
 	uint8_t m_portc;
@@ -286,7 +287,7 @@ WRITE8_MEMBER( g627_state::lamp_w )
 	}
 }
 
-static MACHINE_CONFIG_START( g627 )
+MACHINE_CONFIG_START(g627_state::g627)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 14138000/8)
 	MCFG_CPU_PROGRAM_MAP(mem_map)

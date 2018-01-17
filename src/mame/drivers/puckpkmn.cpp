@@ -275,7 +275,7 @@ static ADDRESS_MAP_START( puckpkmna_map, AS_PROGRAM, 16, md_boot_state )
 	AM_RANGE(0x70001c, 0x70001d) AM_READ(puckpkmna_70001c_r)
 ADDRESS_MAP_END
 
-static MACHINE_CONFIG_START( puckpkmn )
+MACHINE_CONFIG_START(md_boot_state::puckpkmn)
 	MCFG_FRAGMENT_ADD(md_ntsc)
 
 	MCFG_CPU_MODIFY("maincpu")
@@ -290,14 +290,14 @@ static MACHINE_CONFIG_START( puckpkmn )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker",0.25)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( puckpkmna, puckpkmn )
+MACHINE_CONFIG_DERIVED(md_boot_state::puckpkmna, puckpkmn)
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(puckpkmna_map)
 
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( jzth, puckpkmn )
+MACHINE_CONFIG_DERIVED(md_boot_state::jzth, puckpkmn)
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(jzth_map)

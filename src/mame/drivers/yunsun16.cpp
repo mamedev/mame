@@ -586,7 +586,7 @@ MACHINE_RESET_MEMBER(yunsun16_state, shocking)
                                 Magic Bubble
 ***************************************************************************/
 
-static MACHINE_CONFIG_START( magicbub )
+MACHINE_CONFIG_START(yunsun16_state::magicbub)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz)
@@ -629,7 +629,7 @@ MACHINE_CONFIG_END
                                 Shocking
 ***************************************************************************/
 
-static MACHINE_CONFIG_START( shocking )
+MACHINE_CONFIG_START(yunsun16_state::shocking)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz)

@@ -92,4 +92,6 @@ public:
 	int command7();
 	void update_background();
 	void update_foreground();
+	void victory(machine_config &config);
+	void victory_audio(machine_config &config);
 };

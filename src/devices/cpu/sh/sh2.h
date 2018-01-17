@@ -49,13 +49,13 @@
 	sh2_device::set_is_slave(*device, _slave);
 
 #define MCFG_SH2_DMA_KLUDGE_CB(_class, _method) \
-	sh2_device::set_dma_kludge_callback(*device, sh2_device::dma_kludge_delegate(&_class::_method, #_class "::" #_method, downcast<_class *>(owner)));
+	sh2_device::set_dma_kludge_callback(*device, sh2_device::dma_kludge_delegate(&_class::_method, #_class "::" #_method, this));
 
 #define MCFG_SH2_FIFO_DATA_AVAIL_CB(_class, _method) \
-	sh2_device::set_dma_fifo_data_available_callback(*device, sh2_device::dma_fifo_data_available_delegate(&_class::_method, #_class "::" #_method, downcast<_class *>(owner)));
+	sh2_device::set_dma_fifo_data_available_callback(*device, sh2_device::dma_fifo_data_available_delegate(&_class::_method, #_class "::" #_method, this));
 
 #define MCFG_SH2_FTCSR_READ_CB(_class, _method) \
-	sh2_device::set_ftcsr_read_callback(*device, sh2_device::ftcsr_read_delegate(&_class::_method, #_class "::" #_method, downcast<_class *>(owner)));
+	sh2_device::set_ftcsr_read_callback(*device, sh2_device::ftcsr_read_delegate(&_class::_method, #_class "::" #_method, this));
 
 
 class sh2_frontend;

@@ -178,6 +178,7 @@ public:
 		return m_p_videoram[0x1000 + (ch & 0x7f) * 16 + line];
 	}
 
+	void spc1000(machine_config &config);
 private:
 	uint8_t m_IPLK;
 	uint8_t m_GMODE;
@@ -458,7 +459,7 @@ extern SLOT_INTERFACE_START(spc1000_exp)
 	SLOT_INTERFACE("vdp", SPC1000_VDP_EXP)
 SLOT_INTERFACE_END
 
-static MACHINE_CONFIG_START( spc1000 )
+MACHINE_CONFIG_START(spc1000_state::spc1000)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80, XTAL_4MHz)
 	MCFG_CPU_PROGRAM_MAP(spc1000_mem)

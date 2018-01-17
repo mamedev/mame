@@ -743,7 +743,7 @@ void px8_state::machine_reset()
     MACHINE DRIVERS
 ***************************************************************************/
 
-static MACHINE_CONFIG_START( px8 )
+MACHINE_CONFIG_START(px8_state::px8)
 	/* main cpu (uPD70008) */
 	MCFG_CPU_ADD(UPD70008_TAG, Z80, XTAL_CR1 / 4) /* 2.45 MHz */
 	MCFG_CPU_PROGRAM_MAP(px8_mem)

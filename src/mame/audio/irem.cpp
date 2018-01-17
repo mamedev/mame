@@ -400,7 +400,7 @@ ADDRESS_MAP_END
 // device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( m62_audio_device::device_add_mconfig )
+MACHINE_CONFIG_START(m62_audio_device::device_add_mconfig)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("iremsound", M6803, XTAL_3_579545MHz) /* verified on pcb */
@@ -470,7 +470,7 @@ MACHINE_CONFIG_MEMBER( m62_audio_device::device_add_mconfig )
 
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_MEMBER( m52_soundc_audio_device::device_add_mconfig )
+MACHINE_CONFIG_START(m52_soundc_audio_device::device_add_mconfig)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("iremsound", M6803, XTAL_3_579545MHz) /* verified on pcb */
@@ -504,7 +504,7 @@ MACHINE_CONFIG_MEMBER( m52_soundc_audio_device::device_add_mconfig )
 
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_MEMBER( m52_large_audio_device::device_add_mconfig )  /* 10 yard fight */
+MACHINE_CONFIG_START(m52_large_audio_device::device_add_mconfig)  /* 10 yard fight */
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("iremsound", M6803, XTAL_3_579545MHz) /* verified on pcb */

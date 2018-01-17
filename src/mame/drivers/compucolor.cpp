@@ -78,6 +78,7 @@ public:
 	IRQ_CALLBACK_MEMBER( int_ack );
 
 	uint8_t m_xo;
+	void compucolor2(machine_config &config);
 };
 
 static ADDRESS_MAP_START( compucolor2_mem, AS_PROGRAM, 8, compucolor2_state )
@@ -389,7 +390,7 @@ void compucolor2_state::machine_reset()
 	m_rs232->write_dtr(1);
 }
 
-static MACHINE_CONFIG_START( compucolor2 )
+MACHINE_CONFIG_START(compucolor2_state::compucolor2)
 	// basic machine hardware
 	MCFG_CPU_ADD(I8080_TAG, I8080, XTAL_17_9712MHz/9)
 	MCFG_CPU_PROGRAM_MAP(compucolor2_mem)

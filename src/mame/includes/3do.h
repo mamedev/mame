@@ -178,6 +178,8 @@ public:
 
 	TIMER_DEVICE_CALLBACK_MEMBER( timer_x16_cb );
 
+	void _3do(machine_config &config);
+	void _3do_pal(machine_config &config);
 protected:
 	required_memory_bank m_bank1;
 	required_memory_bank m_bank2;

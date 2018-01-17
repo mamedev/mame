@@ -105,6 +105,7 @@ public:
 	DECLARE_WRITE8_MEMBER(cv_w);
 	DECLARE_WRITE8_MEMBER(gate_w);
 
+	void prophet600(machine_config &config);
 private:
 	uint16_t m_dac;
 	uint8_t m_scanrow;
@@ -260,7 +261,7 @@ DRIVER_INIT_MEMBER(prophet600_state, prophet600)
 }
 
 // master crystal is 8 MHz, all clocks derived from there
-static MACHINE_CONFIG_START( prophet600 )
+MACHINE_CONFIG_START(prophet600_state::prophet600)
 	MCFG_CPU_ADD(MAINCPU_TAG, Z80, XTAL_8MHz/2)
 	MCFG_CPU_PROGRAM_MAP(cpu_map)
 	MCFG_CPU_IO_MAP(io_map)

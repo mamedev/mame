@@ -100,9 +100,9 @@ DECLARE_DEVICE_TYPE(UPD7002, upd7002_device)
 ***************************************************************************/
 
 #define MCFG_UPD7002_GET_ANALOGUE_CB(_class, _method) \
-		upd7002_device::set_get_analogue_callback(*device, upd7002_device::get_analogue_delegate(&_class::_method, #_class "::" #_method, downcast<_class *>(owner)));
+		upd7002_device::set_get_analogue_callback(*device, upd7002_device::get_analogue_delegate(&_class::_method, #_class "::" #_method, this));
 
 #define MCFG_UPD7002_EOC_CB(_class, _method) \
-		upd7002_device::set_eoc_callback(*device, upd7002_device::eoc_delegate(&_class::_method, #_class "::" #_method, downcast<_class *>(owner)));
+		upd7002_device::set_eoc_callback(*device, upd7002_device::eoc_delegate(&_class::_method, #_class "::" #_method, this));
 
 #endif // MAME_MACHINE_UPD7002_H

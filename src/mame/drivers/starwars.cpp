@@ -299,7 +299,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( starwars )
+MACHINE_CONFIG_START(starwars_state::starwars)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", MC6809E, MASTER_CLOCK / 8)
@@ -370,7 +370,7 @@ static MACHINE_CONFIG_START( starwars )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( esb, starwars )
+MACHINE_CONFIG_DERIVED(starwars_state::esb, starwars)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(esb_main_map)
 

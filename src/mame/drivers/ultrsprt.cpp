@@ -52,6 +52,7 @@ public:
 
 	uint32_t screen_update_ultrsprt(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
+	void ultrsprt(machine_config &config);
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -229,7 +230,7 @@ void ultrsprt_state::machine_reset()
 
 /*****************************************************************************/
 
-static MACHINE_CONFIG_START( ultrsprt )
+MACHINE_CONFIG_START(ultrsprt_state::ultrsprt)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", PPC403GA, 25000000)
 	MCFG_CPU_PROGRAM_MAP(ultrsprt_map)

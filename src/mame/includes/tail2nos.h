@@ -61,4 +61,5 @@ public:
 	void tail2nos_postload();
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	K051316_CB_MEMBER(zoom_callback);
+	void tail2nos(machine_config &config);
 };

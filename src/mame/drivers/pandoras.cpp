@@ -35,6 +35,7 @@ Boards:
 #include "machine/watchdog.h"
 #include "sound/ay8910.h"
 #include "sound/dac.h"
+#include "sound/volt_reg.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -304,7 +305,7 @@ READ8_MEMBER(pandoras_state::pandoras_portB_r)
 	return (m_audiocpu->total_cycles() / 512) & 0x0f;
 }
 
-static MACHINE_CONFIG_START( pandoras )
+MACHINE_CONFIG_START(pandoras_state::pandoras)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", MC6809E, MASTER_CLOCK/6)  /* CPU A */
@@ -363,7 +364,8 @@ static MACHINE_CONFIG_START( pandoras )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.4)
 
 	MCFG_SOUND_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.12) // unknown DAC
-	MCFG_SOUND_REFERENCE_INPUT(DAC_VREF_POS_INPUT, 1.0) MCFG_SOUND_REFERENCE_INPUT(DAC_VREF_NEG_INPUT, -1.0)
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 

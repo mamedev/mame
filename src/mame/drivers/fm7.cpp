@@ -2055,7 +2055,7 @@ MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8) \
 MCFG_ADDRESS_MAP_BANK_STRIDE(0x1000)
 
 
-static MACHINE_CONFIG_START( fm7 )
+MACHINE_CONFIG_START(fm7_state::fm7)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", MC6809, XTAL_16_128MHz / 2)
 	MCFG_CPU_PROGRAM_MAP(fm7_mem)
@@ -2110,7 +2110,7 @@ static MACHINE_CONFIG_START( fm7 )
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( fm8 )
+MACHINE_CONFIG_START(fm7_state::fm8)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", MC6809, XTAL_4_9152MHz)  // 1.2MHz 68A09
 	MCFG_CPU_PROGRAM_MAP(fm8_mem)
@@ -2158,7 +2158,7 @@ static MACHINE_CONFIG_START( fm8 )
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( fm77av )
+MACHINE_CONFIG_START(fm7_state::fm77av)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", MC6809E, XTAL_16_128MHz / 8)
 	MCFG_CPU_PROGRAM_MAP(fm77av_mem)
@@ -2234,7 +2234,7 @@ static MACHINE_CONFIG_START( fm77av )
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( fm11 )
+MACHINE_CONFIG_START(fm7_state::fm11)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", MC6809E, 2000000)  // 2MHz 68B09E
 	MCFG_CPU_PROGRAM_MAP(fm11_mem)
@@ -2303,7 +2303,7 @@ static MACHINE_CONFIG_START( fm11 )
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( fm16beta )
+MACHINE_CONFIG_START(fm7_state::fm16beta)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8086, 8000000)  // 8MHz i8086
 	MCFG_CPU_PROGRAM_MAP(fm16_mem)

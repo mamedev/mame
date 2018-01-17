@@ -213,6 +213,10 @@ private:
 		IOSTAT_FAULT = 0x08
 	};
 
+	void stepone(machine_config &config);
+	void jb3000(machine_config &config);
+	void myb3k(machine_config &config);
+protected:
 	required_device<cpu_device> m_maincpu;
 	required_device<ram_device> m_ram;
 	required_device<pic8259_device> m_pic8259;
@@ -961,7 +965,7 @@ static SLOT_INTERFACE_START(stepone_isa_cards)
 	SLOT_INTERFACE("myb3k_fdc4711", ISA8_MYB3K_FDC4711)
 SLOT_INTERFACE_END
 
-static MACHINE_CONFIG_START( myb3k )
+MACHINE_CONFIG_START(myb3k_state::myb3k)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8088, XTAL_14_31818MHz / 3) /* 14.3182 main crystal divided by three through a 8284A */
 	MCFG_CPU_PROGRAM_MAP(myb3k_map)
@@ -1057,15 +1061,15 @@ static MACHINE_CONFIG_START( myb3k )
 	MCFG_SCREEN_UPDATE_DEVICE("crtc", h46505_device, screen_update)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( jb3000, myb3k )
+MACHINE_CONFIG_DERIVED(myb3k_state::jb3000, myb3k)
 	/* Keyboard */
 	MCFG_DEVICE_REPLACE("myb3k_keyboard", JB3000_KEYBOARD, 0)
 	MCFG_MYB3K_KEYBOARD_CB(PUT(myb3k_state, kbd_set_data_and_interrupt))
 
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( stepone, myb3k )
-	/* Keyboard */
+MACHINE_CONFIG_DERIVED(myb3k_state::stepone, myb3k)
+  /* Keyboard */
 	MCFG_DEVICE_REPLACE("myb3k_keyboard", STEPONE_KEYBOARD, 0)
 	MCFG_MYB3K_KEYBOARD_CB(PUT(myb3k_state, kbd_set_data_and_interrupt))
 

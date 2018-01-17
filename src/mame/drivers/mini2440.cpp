@@ -11,6 +11,7 @@
 #include "machine/s3c2440.h"
 #include "machine/smartmed.h"
 #include "sound/dac.h"
+#include "sound/volt_reg.h"
 #include "rendlay.h"
 #include "screen.h"
 #include "speaker.h"
@@ -55,6 +56,7 @@ public:
 	DECLARE_WRITE16_MEMBER(s3c2440_i2s_data_w );
 	DECLARE_READ32_MEMBER(s3c2440_adc_data_r );
 
+	void mini2440(machine_config &config);
 };
 
 inline void mini2440_state::verboselog(int n_level, const char *s_fmt, ...)
@@ -218,7 +220,7 @@ DRIVER_INIT_MEMBER(mini2440_state,mini2440)
 	// do nothing
 }
 
-static MACHINE_CONFIG_START( mini2440 )
+MACHINE_CONFIG_START(mini2440_state::mini2440)
 	MCFG_CPU_ADD("maincpu", ARM920T, 400000000)
 	MCFG_CPU_PROGRAM_MAP(mini2440_map)
 
@@ -235,9 +237,10 @@ static MACHINE_CONFIG_START( mini2440 )
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 	MCFG_SOUND_ADD("ldac", UDA1341TS, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0) // uda1341ts.u12
-	MCFG_SOUND_REFERENCE_INPUT(DAC_VREF_POS_INPUT, 1.0) MCFG_SOUND_REFERENCE_INPUT(DAC_VREF_NEG_INPUT, -1.0)
 	MCFG_SOUND_ADD("rdac", UDA1341TS, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0) // uda1341ts.u12
-	MCFG_SOUND_REFERENCE_INPUT(DAC_VREF_POS_INPUT, 1.0) MCFG_SOUND_REFERENCE_INPUT(DAC_VREF_NEG_INPUT, -1.0)
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "ldac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "ldac", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE_EX(0, "rdac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "rdac", -1.0, DAC_VREF_NEG_INPUT)
 
 	MCFG_DEVICE_ADD("s3c2440", S3C2440, 12000000)
 	MCFG_S3C2440_PALETTE("palette")

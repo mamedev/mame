@@ -20,6 +20,7 @@ public:
 		//, m_p_chargen(*this, "chargen")
 	{ }
 
+		void terminals(machine_config &config);
 private:
 	required_device<cpu_device> m_maincpu;
 	//required_region_ptr<u8> m_p_chargen;
@@ -31,7 +32,7 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START( terminals )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( terminals )
+MACHINE_CONFIG_START(terminals_state::terminals)
 	MCFG_CPU_ADD("maincpu", Z80, 2'000'000)
 	MCFG_CPU_PROGRAM_MAP(mem_map)
 MACHINE_CONFIG_END
@@ -73,53 +74,6 @@ ROM_START( qvt70 )
 ROM_END
 
 COMP( 1992, qvt70, 0, 0, terminals, terminals, terminals_state, 0, "Qume", "QVT-70", MACHINE_IS_SKELETON )
-
-
-
-/**************************************************************************************************************
-
-Qume QVT-103.
-Chips: Z80A, Z80A DART, Z80A CTC, 2x CRT9212, 5x HM6116P-2, TC5516APL, D8741AD, CRT9007, 1x 10-sw dip, Button battery.
-Crystals: (all hard to read) 29.876, 6.000
-Keyboard CPU, Crystal, ROM are on the main board.
-
-***************************************************************************************************************/
-
-ROM_START( qvt103 )
-	ROM_REGION(0x10000, "maincpu", 0)
-	ROM_LOAD( "t103e1.u28", 0x0000, 0x2000, CRC(eace3cbe) SHA1(1e7f395c5233d8656df5305163d050275f0a8033) )
-	ROM_LOAD( "t103e2.u27", 0x2000, 0x4000, CRC(100cf542) SHA1(4b2569d509790a0f94b4447fb9d3d42582fcaf66) )
-
-	ROM_REGION(0x1000, "chargen", 0)
-	ROM_LOAD( "c103b.u40",  0x0000, 0x1000, CRC(3419760d) SHA1(3455c70ed48c7f7769d73a84f152beddf508094f) )
-
-	ROM_REGION(0x10000, "keyboard", 0)
-	ROM_LOAD( "k304a.u24",  0x0000, 0x0400, CRC(e4b1f0da) SHA1(e9f8c48c34105464b3db206b34f67e7603484fea) )
-ROM_END
-
-COMP( 1983, qvt103, 0, 0, terminals, terminals, terminals_state, 0, "Qume", "QVT-103", MACHINE_IS_SKELETON )
-
-
-
-/**************************************************************************************************************
-
-Qume QVT-201.
-Chips: Z80A, SCN2681A, SCN2672B, 4x HM6116P-2, D446C-2, button battery
-Crystals: (from schematics, unreadable on photo) 48.654 MHz (Y1), 3.6864 MHz (Y2)
-Board is marked QVT-202.
-
-***************************************************************************************************************/
-
-ROM_START( qvt201 )
-	ROM_REGION(0x10000, "maincpu", 0)
-	ROM_LOAD( "390410-002.u11", 0x0000, 0x4000, CRC(69337561) SHA1(022e49bf5e8d76a3c2cc5af65630d3f77cc32bc1) )
-	ROM_LOAD( "390410-001.u10", 0x4000, 0x4000, CRC(977cc138) SHA1(a019980ea6da2dce53617bced420014ab4e03ec8) )
-
-	ROM_REGION(0x1000, "chargen", 0)
-	ROM_LOAD( "301847-01.u42",  0x0000, 0x1000, CRC(546ed236) SHA1(312d57a7012f50327310bd11bda000149f13342e) )
-ROM_END
-
-COMP( 1986, qvt201, 0, 0, terminals, terminals, terminals_state, 0, "Qume", "QVT-201", MACHINE_IS_SKELETON )
 
 
 

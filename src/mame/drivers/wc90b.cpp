@@ -350,7 +350,7 @@ void wc90b_state::machine_start()
 }
 
 
-static MACHINE_CONFIG_START( wc90b )
+MACHINE_CONFIG_START(wc90b_state::wc90b)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK)

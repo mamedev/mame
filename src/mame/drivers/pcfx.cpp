@@ -49,6 +49,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( irq15_w );
 	TIMER_CALLBACK_MEMBER(pad_func);
 
+	void pcfx(machine_config &config);
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
@@ -410,7 +411,7 @@ uint32_t pcfx_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, 
 }
 
 
-static MACHINE_CONFIG_START( pcfx )
+MACHINE_CONFIG_START(pcfx_state::pcfx)
 	MCFG_CPU_ADD( "maincpu", V810, XTAL_21_4772MHz )
 	MCFG_CPU_PROGRAM_MAP( pcfx_mem)
 	MCFG_CPU_IO_MAP( pcfx_io)

@@ -302,6 +302,7 @@ public:
 	void pdp1_lightpen();
 	int read_spacewar() { return m_spacewar->read(); }
 
+	void pdp1(machine_config &config);
 private:
 	pdp1_reset_param_t m_reset_param;
 	int m_old_typewriter_keys[4];

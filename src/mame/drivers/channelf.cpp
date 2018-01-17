@@ -199,7 +199,7 @@ static SLOT_INTERFACE_START(cf_cart)
 SLOT_INTERFACE_END
 
 
-static MACHINE_CONFIG_START( channelf_cart )
+MACHINE_CONFIG_START(channelf_state::channelf_cart)
 	/* cartridge */
 	MCFG_CHANNELF_CARTRIDGE_ADD("cartslot", cf_cart, nullptr)
 
@@ -207,7 +207,7 @@ static MACHINE_CONFIG_START( channelf_cart )
 	MCFG_SOFTWARE_LIST_ADD("cart_list","channelf")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( channelf )
+MACHINE_CONFIG_START(channelf_state::channelf)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", F8, 3579545/2)        /* Colorburst/2 */
 	MCFG_CPU_PROGRAM_MAP(channelf_map)
@@ -234,7 +234,7 @@ static MACHINE_CONFIG_START( channelf )
 	MCFG_FRAGMENT_ADD( channelf_cart )
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( sabavdpl )
+MACHINE_CONFIG_START(channelf_state::sabavdpl)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", F8, MASTER_CLOCK_PAL)        /* PAL speed */
 	MCFG_CPU_PROGRAM_MAP(channelf_map)
@@ -262,7 +262,7 @@ static MACHINE_CONFIG_START( sabavdpl )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( channlf2 )
+MACHINE_CONFIG_START(channelf_state::channlf2)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", F8, 3579545/2)        /* Colorburst / 2 */
 	MCFG_CPU_PROGRAM_MAP(channelf_map)
@@ -290,7 +290,7 @@ static MACHINE_CONFIG_START( channlf2 )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( sabavpl2 )
+MACHINE_CONFIG_START(channelf_state::sabavpl2)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", F8, MASTER_CLOCK_PAL)        /* PAL speed */
 	MCFG_CPU_PROGRAM_MAP(channelf_map)

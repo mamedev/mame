@@ -122,6 +122,7 @@
 #include "imagedev/cassette.h"
 #include "machine/wd_fdc.h"
 #include "sound/dac.h"
+#include "sound/volt_reg.h"
 #include "sound/wave.h"
 #include "video/mc6845.h"
 
@@ -166,6 +167,11 @@ public:
 	MC6845_UPDATE_ROW(lynx48k_update_row);
 	MC6845_UPDATE_ROW(lynx128k_update_row);
 	required_device<palette_device> m_palette;
+	void lynx_common(machine_config &config);
+	void lynx_disk(machine_config &config);
+	void lynx128k(machine_config &config);
+	void lynx48k(machine_config &config);
+	void lynx96k(machine_config &config);
 private:
 	uint8_t m_port58;
 	uint8_t m_port80;
@@ -788,18 +794,19 @@ static SLOT_INTERFACE_START( camplynx_floppies )
 	SLOT_INTERFACE( "525qd", FLOPPY_525_QD )
 SLOT_INTERFACE_END
 
-static MACHINE_CONFIG_START( lynx_common )
+MACHINE_CONFIG_START(camplynx_state::lynx_common)
 	MCFG_PALETTE_ADD_3BIT_RGB("palette")
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
 	MCFG_SOUND_ADD("dac", DAC_6BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.375) // unknown DAC
-	MCFG_SOUND_REFERENCE_INPUT(DAC_VREF_POS_INPUT, 1.0) MCFG_SOUND_REFERENCE_INPUT(DAC_VREF_NEG_INPUT, -1.0)
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.02)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( lynx_disk )
+MACHINE_CONFIG_START(camplynx_state::lynx_disk)
 	MCFG_FD1793_ADD("fdc", XTAL_24MHz / 24)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", camplynx_floppies, "525qd", camplynx_state::camplynx_floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
@@ -807,7 +814,7 @@ static MACHINE_CONFIG_START( lynx_disk )
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( lynx48k )
+MACHINE_CONFIG_START(camplynx_state::lynx48k)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_24MHz / 6)
@@ -839,7 +846,7 @@ static MACHINE_CONFIG_START( lynx48k )
 	MCFG_MC6845_OUT_VSYNC_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( lynx96k, lynx48k )
+MACHINE_CONFIG_DERIVED(camplynx_state::lynx96k, lynx48k)
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(lynx96k_io)
@@ -847,7 +854,7 @@ static MACHINE_CONFIG_DERIVED( lynx96k, lynx48k )
 	MCFG_FRAGMENT_ADD(lynx_disk)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( lynx128k )
+MACHINE_CONFIG_START(camplynx_state::lynx128k)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_24MHz / 4)

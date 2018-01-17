@@ -603,7 +603,7 @@ WRITE_LINE_MEMBER(polygonet_state::k054539_nmi_gen)
 	m_sound_intck = state;
 }
 
-static MACHINE_CONFIG_START( plygonet )
+MACHINE_CONFIG_START(polygonet_state::plygonet)
 
 	MCFG_CPU_ADD("maincpu", M68EC020, XTAL_32MHz/2)
 	MCFG_CPU_PROGRAM_MAP(main_map)

@@ -591,7 +591,7 @@ static SLOT_INTERFACE_START( trs80_floppies )
 SLOT_INTERFACE_END
 
 
-static MACHINE_CONFIG_START( trs80 )       // the original model I, level I, with no extras
+MACHINE_CONFIG_START(trs80_state::trs80)       // the original model I, level I, with no extras
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 1796000)        /* 1.796 MHz */
 	MCFG_CPU_PROGRAM_MAP(trs80_map)
@@ -621,7 +621,7 @@ static MACHINE_CONFIG_START( trs80 )       // the original model I, level I, wit
 	MCFG_CASSETTE_ADD( "cassette" )
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( model1, trs80 )      // model I, level II
+MACHINE_CONFIG_DERIVED(trs80_state::model1, trs80)      // model I, level II
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_PROGRAM_MAP( model1_map)
 	MCFG_CPU_IO_MAP( model1_io)
@@ -659,7 +659,7 @@ static MACHINE_CONFIG_DERIVED( model1, trs80 )      // model I, level II
 	MCFG_AY31015_TX_CLOCK(0.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( model3, model1 )
+MACHINE_CONFIG_DERIVED(trs80_state::model3, model1)
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_PROGRAM_MAP( model3_map)
 	MCFG_CPU_IO_MAP( model3_io)
@@ -675,28 +675,28 @@ static MACHINE_CONFIG_DERIVED( model3, model1 )
 	MCFG_SCREEN_VISIBLE_AREA(0,80*8-1,0,239)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( model4, model3 )
+MACHINE_CONFIG_DERIVED(trs80_state::model4, model3)
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_IO_MAP( model4_io)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( model4p, model3 )
+MACHINE_CONFIG_DERIVED(trs80_state::model4p, model3)
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_IO_MAP( model4p_io)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( sys80, model1 )
+MACHINE_CONFIG_DERIVED(trs80_state::sys80, model1)
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_IO_MAP( sys80_io)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( ht1080z, sys80 )
+MACHINE_CONFIG_DERIVED(trs80_state::ht1080z, sys80)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(trs80_state, screen_update_ht1080z)
 	MCFG_GFXDECODE_MODIFY("gfxdecode", ht1080z)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( lnw80, model1 )
+MACHINE_CONFIG_DERIVED(trs80_state::lnw80, model1)
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_PROGRAM_MAP( lnw80_map)
 	MCFG_CPU_IO_MAP( lnw80_io)
@@ -713,7 +713,7 @@ static MACHINE_CONFIG_DERIVED( lnw80, model1 )
 	MCFG_SCREEN_UPDATE_DRIVER(trs80_state, screen_update_lnw80)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( radionic, model1 )
+MACHINE_CONFIG_DERIVED(trs80_state::radionic, model1)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_SIZE(64*8, 16*16)
 	MCFG_SCREEN_VISIBLE_AREA(0,64*8-1,0,16*16-1)
@@ -721,7 +721,7 @@ static MACHINE_CONFIG_DERIVED( radionic, model1 )
 	MCFG_GFXDECODE_MODIFY("gfxdecode", radionic)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( meritum, sys80 )
+MACHINE_CONFIG_DERIVED(trs80_state::meritum, sys80)
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_PROGRAM_MAP( meritum_map)
 	MCFG_CPU_IO_MAP( meritum_io)
@@ -730,7 +730,7 @@ static MACHINE_CONFIG_DERIVED( meritum, sys80 )
 	MCFG_GFXDECODE_MODIFY("gfxdecode", meritum)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( cp500, model3 )
+MACHINE_CONFIG_DERIVED(trs80_state::cp500, model3)
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_IO_MAP( cp500_io)
 

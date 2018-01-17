@@ -84,6 +84,7 @@ public:
 	{
 		return m_p_chargen[(ch * 16 + line) & 0xfff];
 	}
+	void fc100(machine_config &config);
 private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -506,7 +507,7 @@ DRIVER_INIT_MEMBER( fc100_state, fc100 )
 	membank("bankr")->configure_entry(1, &ram[0]);
 }
 
-static MACHINE_CONFIG_START( fc100 )
+MACHINE_CONFIG_START(fc100_state::fc100)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80, XTAL_7_15909MHz/2)
 	MCFG_CPU_PROGRAM_MAP(fc100_mem)

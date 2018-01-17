@@ -106,7 +106,7 @@ void a78_xm_device::device_reset()
 }
 
 
-MACHINE_CONFIG_MEMBER( a78_xboard_device::device_add_mconfig )
+MACHINE_CONFIG_START(a78_xboard_device::device_add_mconfig)
 	MCFG_A78_CARTRIDGE_ADD("xb_slot", a7800_cart, nullptr)
 
 	MCFG_SPEAKER_STANDARD_MONO("xb_speaker")
@@ -115,7 +115,7 @@ MACHINE_CONFIG_MEMBER( a78_xboard_device::device_add_mconfig )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "xb_speaker", 1.00)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_MEMBER( a78_xm_device::device_add_mconfig )
+MACHINE_CONFIG_START(a78_xm_device::device_add_mconfig)
 	MCFG_A78_CARTRIDGE_ADD("xb_slot", a7800_cart, nullptr)
 
 	MCFG_SPEAKER_STANDARD_MONO("xb_speaker")

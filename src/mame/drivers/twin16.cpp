@@ -661,7 +661,7 @@ void twin16_state::machine_start()
 	save_item(NAME(m_CPUB_register));
 }
 
-static MACHINE_CONFIG_START( twin16 )
+MACHINE_CONFIG_START(twin16_state::twin16)
 	// basic machine hardware
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_18_432MHz/2)
 	MCFG_CPU_PROGRAM_MAP(main_map)
@@ -715,11 +715,11 @@ static MACHINE_CONFIG_START( twin16 )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.20)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( devilw, twin16 )
+MACHINE_CONFIG_DERIVED(twin16_state::devilw, twin16)
 	MCFG_QUANTUM_TIME(attotime::from_hz(60000)) // watchdog reset otherwise
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( fround )
+MACHINE_CONFIG_START(fround_state::fround)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_18_432MHz/2)
 	MCFG_CPU_PROGRAM_MAP(fround_map)
@@ -769,12 +769,12 @@ static MACHINE_CONFIG_START( fround )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.20)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( miaj, twin16 )
+MACHINE_CONFIG_DERIVED(twin16_state::miaj, twin16)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_RAW_PARAMS(XTAL_18_432MHz/2, 576, 1*8, 39*8, 264, 2*8, 30*8)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( cuebrickj, twin16 )
+MACHINE_CONFIG_DERIVED(cuebrickj_state::cuebrickj, twin16)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_RAW_PARAMS(XTAL_18_432MHz/2, 576, 1*8, 39*8, 264, 2*8, 30*8)
 	MCFG_NVRAM_ADD_0FILL("nvram")

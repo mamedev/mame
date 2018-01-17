@@ -26,10 +26,11 @@ public:
 	{ }
 
 	required_device<ie15_device> m_ie15;
+	void ie15(machine_config &config);
 };
 
 
-static MACHINE_CONFIG_START( ie15 )
+MACHINE_CONFIG_START(ie15_state::ie15)
 	MCFG_DEVICE_ADD("ie15", IE15, 0)
 MACHINE_CONFIG_END
 

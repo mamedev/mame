@@ -120,6 +120,9 @@ public:
 	void bebox_set_irq_bit(unsigned int interrupt_bit, int val);
 	void bebox_update_interrupts();
 
+	static void mpc105_config(device_t *device);
+	void bebox(machine_config &config);
+	void bebox2(machine_config &config);
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };

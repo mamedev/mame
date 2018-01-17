@@ -60,6 +60,7 @@ public:
 	DECLARE_READ16_MEMBER( coin_chip_r );
 	DECLARE_WRITE16_MEMBER( coin_chip_w );
 
+	void mquake(machine_config &config);
 private:
 	required_device<es5503_device> m_es5503;
 	required_region_ptr<uint8_t> m_es5503_rom;
@@ -302,7 +303,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( mquake )
+MACHINE_CONFIG_START(mquake_state::mquake)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, amiga_state::CLK_7M_NTSC)

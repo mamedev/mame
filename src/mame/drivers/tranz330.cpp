@@ -150,7 +150,7 @@ static const z80_daisy_config tranz330_daisy_chain[] =
 
 // * - check clocks
 // ? - check purported RS232 hookup, inconsistent information found at the relevant webpage vs. user-submitted errata
-static MACHINE_CONFIG_START( tranz330 )
+MACHINE_CONFIG_START(tranz330_state::tranz330)
 	MCFG_CPU_ADD(CPU_TAG, Z80, XTAL_7_15909MHz/2) //*
 	MCFG_CPU_PROGRAM_MAP(tranz330_mem)
 	MCFG_CPU_IO_MAP(tranz330_io)

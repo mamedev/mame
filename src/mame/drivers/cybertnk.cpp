@@ -238,6 +238,7 @@ public:
 	uint32_t update_screen(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int screen_shift);
 	uint32_t screen_update_cybertnk_left(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_cybertnk_right(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void cybertnk(machine_config &config);
 };
 
 /* tile format
@@ -831,7 +832,7 @@ GFXDECODE_END
 */
 
 
-static MACHINE_CONFIG_START( cybertnk )
+MACHINE_CONFIG_START(cybertnk_state::cybertnk)
 	MCFG_CPU_ADD("maincpu", M68000,XTAL_20MHz/2)
 	MCFG_CPU_PROGRAM_MAP(master_mem)
 	MCFG_CPU_VBLANK_INT_DRIVER("lscreen", cybertnk_state,  irq1_line_assert)

@@ -252,7 +252,7 @@ void kncljoe_state::machine_reset()
 	m_flipscreen = 0;
 }
 
-static MACHINE_CONFIG_START( kncljoe )
+MACHINE_CONFIG_START(kncljoe_state::kncljoe)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_6MHz)  /* verified on pcb */

@@ -335,7 +335,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( jedi )
+MACHINE_CONFIG_START(jedi_state::jedi)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, JEDI_MAIN_CPU_CLOCK)

@@ -541,6 +541,9 @@ public:
 	DECLARE_WRITE16_MEMBER(vip2000_outputs_w);
 	u8 m_toslave;
 	u8 m_fromslave;
+	void bingor(machine_config &config);
+	void bingor2(machine_config &config);
+	void vip2000(machine_config &config);
 };
 
 
@@ -677,7 +680,7 @@ static GFXDECODE_START( bingor )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( bingor )
+MACHINE_CONFIG_START(bingor_state::bingor)
 	MCFG_CPU_ADD("maincpu", I80186, XTAL_16MHz)
 	MCFG_CPU_PROGRAM_MAP(bingor_map)
 	MCFG_CPU_IO_MAP(bingor_io)
@@ -704,7 +707,7 @@ static MACHINE_CONFIG_START( bingor )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( bingor2, bingor )
+MACHINE_CONFIG_DERIVED(bingor_state::bingor2, bingor)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(bingor2_map)
 MACHINE_CONFIG_END
@@ -761,7 +764,7 @@ static ADDRESS_MAP_START( slave_io, AS_IO, 8, bingor_state)
 	AM_RANGE(0xc000, 0xcfff) AM_RAM
 ADDRESS_MAP_END
 
-static MACHINE_CONFIG_START( vip2000 )
+MACHINE_CONFIG_START(bingor_state::vip2000)
 	MCFG_CPU_ADD("maincpu", I80186, XTAL_10MHz)
 	MCFG_CPU_PROGRAM_MAP(vip2000_map)
 	MCFG_CPU_IO_MAP(vip2000_io)

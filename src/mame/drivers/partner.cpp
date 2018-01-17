@@ -167,7 +167,7 @@ static GFXDECODE_START( partner )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( partner )
+MACHINE_CONFIG_START(partner_state::partner)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8080, XTAL_16MHz / 9)
 	MCFG_CPU_PROGRAM_MAP(partner_mem)

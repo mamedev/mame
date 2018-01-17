@@ -290,6 +290,20 @@ public:
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t a20_286(bool state);
 
+	void pc9801_keyboard(machine_config &config);
+	void pc9801_mouse(machine_config &config);
+	void pc9801_cbus(machine_config &config);
+	void pc9801_sasi(machine_config &config);
+	void pc9801_ide(machine_config &config);
+	void pc9801_common(machine_config &config);
+	void pc9821v20(machine_config &config);
+	void pc9801ux(machine_config &config);
+	void pc9801vm(machine_config &config);
+	void pc9801(machine_config &config);
+	void pc9801bx2(machine_config &config);
+	void pc9821ap2(machine_config &config);
+	void pc9821(machine_config &config);
+	void pc9801rs(machine_config &config);
 protected:
 	virtual void video_start() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;

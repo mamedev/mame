@@ -166,6 +166,7 @@ public:
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
+	void pyson(machine_config &config);
 protected:
 
 	// devices
@@ -193,7 +194,7 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START( pyson )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( pyson )
+MACHINE_CONFIG_START(pyson_state::pyson)
 	MCFG_CPU_ADD("maincpu", R5000LE, 294000000) // imported from namcops2.c driver
 	MCFG_MIPS3_ICACHE_SIZE(16384)
 	MCFG_MIPS3_DCACHE_SIZE(16384)

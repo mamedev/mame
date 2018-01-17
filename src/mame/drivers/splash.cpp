@@ -471,7 +471,7 @@ MACHINE_RESET_MEMBER(splash_state,splash)
 	m_ret = 0x100;
 }
 
-static MACHINE_CONFIG_START( splash )
+MACHINE_CONFIG_START(splash_state::splash)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz/2)       /* 12MHz (24/2) */
@@ -533,7 +533,7 @@ INTERRUPT_GEN_MEMBER(splash_state::roldfrog_interrupt)
 	roldfrog_update_irq();
 }
 
-static MACHINE_CONFIG_START( roldfrog )
+MACHINE_CONFIG_START(splash_state::roldfrog)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz/2)       /* 12 MHz - verified */
@@ -627,7 +627,7 @@ void funystrp_state::machine_start()
 	save_item(NAME(m_snd_interrupt_enable2));
 }
 
-static MACHINE_CONFIG_START( funystrp )
+MACHINE_CONFIG_START(funystrp_state::funystrp)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz/2)       /* 12 MHz (24/2) */

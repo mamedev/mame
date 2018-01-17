@@ -139,7 +139,7 @@ GFXDECODE_END
 
 /* Machine Driver */
 
-static MACHINE_CONFIG_START( nitedrvr )
+MACHINE_CONFIG_START(nitedrvr_state::nitedrvr)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, XTAL_12_096MHz/12) // 1 MHz

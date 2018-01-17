@@ -461,6 +461,8 @@ public:
 	virtual void video_start() override;
 	uint32_t screen_update_triforce(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	required_device<ppc_device> m_maincpu;
+	void triforcegd(machine_config &config);
+	void triforce_base(machine_config &config);
 };
 
 READ64_MEMBER(triforce_state::gc_pi_r)
@@ -564,7 +566,7 @@ void triforce_state::machine_start()
 	descrambler(&rom[0x100], 0x1afe00);
 }
 
-static MACHINE_CONFIG_START( triforce_base )
+MACHINE_CONFIG_START(triforce_state::triforce_base)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", PPC603, 64000000) /* Correct CPU is a PowerPC 750 (what Apple called "G3") with paired-single vector instructions added */
@@ -584,7 +586,7 @@ static MACHINE_CONFIG_START( triforce_base )
 
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( triforcegd, triforce_base )
+MACHINE_CONFIG_DERIVED(triforce_state::triforcegd, triforce_base)
 	MCFG_NAOMI_GDROM_BOARD_ADD("rom_board", ":gdrom", ":pic", nullptr, NOOP)
 MACHINE_CONFIG_END
 

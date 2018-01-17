@@ -195,6 +195,7 @@ public:
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
+	void comebaby(machine_config &config);
 protected:
 
 	// devices
@@ -222,7 +223,7 @@ static INPUT_PORTS_START( comebaby )
 INPUT_PORTS_END
 
 
-static MACHINE_CONFIG_START( comebaby )
+MACHINE_CONFIG_START(comebaby_state::comebaby)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", PENTIUM, 2000000000) /* Probably a Pentium .. ?? Mhz*/
 	MCFG_CPU_PROGRAM_MAP(comebaby_map)

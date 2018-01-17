@@ -39,6 +39,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<speaker_sound_device> m_speaker;
 	char port0, port1, port2, port3;
+	void daruma(machine_config &config);
 };
 
 WRITE8_MEMBER(daruma_state::port_w)
@@ -140,7 +141,7 @@ static INPUT_PORTS_START( daruma )
 
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( daruma )
+MACHINE_CONFIG_START(daruma_state::daruma)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I80C32,11059200) //verified on pcb
 	MCFG_CPU_PROGRAM_MAP(mem_prg)

@@ -302,7 +302,7 @@ QUICKLOAD_LOAD_MEMBER( eti660_state, eti660 )
 
 /* Machine Drivers */
 
-static MACHINE_CONFIG_START( eti660 )
+MACHINE_CONFIG_START(eti660_state::eti660)
 	/* basic machine hardware */
 	MCFG_CPU_ADD(CDP1802_TAG, CDP1802, XTAL_8_867238MHz/5)
 	MCFG_CPU_PROGRAM_MAP(mem_map)

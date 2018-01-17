@@ -17,13 +17,13 @@ typedef device_delegate<void (int *code, int *color, int *priority_mask)> k05324
 #define K055673_CB_MEMBER(_name)   void _name(int *code, int *color, int *priority_mask)
 
 #define MCFG_K053246_CB(_class, _method) \
-	k053247_device::set_k053247_callback(*device, k053247_cb_delegate(&_class::_method, #_class "::" #_method, downcast<_class *>(owner)));
+	k053247_device::set_k053247_callback(*device, k053247_cb_delegate(&_class::_method, #_class "::" #_method, this));
 
 #define MCFG_K053246_CONFIG(_gfx_reg, _order, _dx, _dy) \
 	k053247_device::set_config(*device, _gfx_reg, _order, _dx, _dy);
 
 #define MCFG_K055673_CB(_class, _method) \
-	k053247_device::set_k053247_callback(*device, k053247_cb_delegate(&_class::_method, #_class "::" #_method, downcast<_class *>(owner)));
+	k053247_device::set_k053247_callback(*device, k053247_cb_delegate(&_class::_method, #_class "::" #_method, this));
 
 #define MCFG_K055673_CONFIG(_gfx_reg, _order, _dx, _dy) \
 	k053247_device::set_config(*device, _gfx_reg, _order, _dx, _dy);

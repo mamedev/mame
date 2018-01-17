@@ -51,6 +51,7 @@ public:
 	DECLARE_READ8_MEMBER(port90_r);
 	DECLARE_READ8_MEMBER(port91_r);
 	void kbd_put(u8 data);
+	void chaos(machine_config &config);
 private:
 	uint8_t m_term_data;
 	virtual void machine_reset() override;
@@ -141,7 +142,7 @@ void chaos_state::machine_reset()
 	memcpy(m_p_ram+0x7000, ROM+0x3000, 0x1000);
 }
 
-static MACHINE_CONFIG_START( chaos )
+MACHINE_CONFIG_START(chaos_state::chaos)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", S2650, XTAL_1MHz)
 	MCFG_CPU_PROGRAM_MAP(mem_map)

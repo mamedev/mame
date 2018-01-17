@@ -172,7 +172,7 @@ INPUT_PORTS_END
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( mackbd_device::device_add_mconfig )
+MACHINE_CONFIG_START(mackbd_device::device_add_mconfig)
 	MCFG_CPU_ADD(MACKBD_CPU_TAG, I8021, 3000000)    // "the approximate clock rate of the MPU is 3 MHz"
 	MCFG_CPU_PROGRAM_MAP(mackbd_map)
 	MCFG_CPU_IO_MAP(mackbd_io_map)

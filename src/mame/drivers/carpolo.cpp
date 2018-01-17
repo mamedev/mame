@@ -231,7 +231,7 @@ GFXDECODE_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( carpolo )
+MACHINE_CONFIG_START(carpolo_state::carpolo)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, XTAL_11_289MHz/12)       /* 940.75 kHz */

@@ -27,6 +27,7 @@ Sensory Chess Challenger 6 (model SC6):
 #include "includes/fidelbase.h"
 
 #include "cpu/mcs48/mcs48.h"
+#include "sound/volt_reg.h"
 #include "speaker.h"
 
 // internal artwork
@@ -47,6 +48,7 @@ public:
 	DECLARE_READ8_MEMBER(sc6_input_r);
 	DECLARE_READ_LINE_MEMBER(sc6_input6_r);
 	DECLARE_READ_LINE_MEMBER(sc6_input7_r);
+	void sc6(machine_config &config);
 };
 
 
@@ -143,7 +145,7 @@ INPUT_PORTS_END
     Machine Drivers
 ******************************************************************************/
 
-static MACHINE_CONFIG_START( sc6 )
+MACHINE_CONFIG_START(fidelmcs48_state::sc6)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8040, XTAL_11MHz)
@@ -160,7 +162,8 @@ static MACHINE_CONFIG_START( sc6 )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
 	MCFG_SOUND_ADD("dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
-	MCFG_SOUND_REFERENCE_INPUT(DAC_VREF_POS_INPUT, 1.0) MCFG_SOUND_REFERENCE_INPUT(DAC_VREF_NEG_INPUT, -1.0)
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT)
 MACHINE_CONFIG_END
 
 

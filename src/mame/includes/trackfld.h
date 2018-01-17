@@ -85,4 +85,11 @@ public:
 	INTERRUPT_GEN_MEMBER(vblank_nmi);
 	INTERRUPT_GEN_MEMBER(yieartf_timer_irq);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
+	void reaktor(machine_config &config);
+	void atlantol(machine_config &config);
+	void yieartf(machine_config &config);
+	void wizzquiz(machine_config &config);
+	void trackfld(machine_config &config);
+	void hyprolyb(machine_config &config);
+	void mastkin(machine_config &config);
 };

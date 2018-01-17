@@ -229,7 +229,7 @@ static GFXDECODE_START( galpanic )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( galpanic )
+MACHINE_CONFIG_START(galpanic_state::galpanic)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_12MHz) /* verified on pcb */
@@ -266,7 +266,7 @@ static MACHINE_CONFIG_START( galpanic )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( galpanica, galpanic )
+MACHINE_CONFIG_DERIVED(galpanic_state::galpanica, galpanic)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(galpanica_map)
 

@@ -138,6 +138,13 @@ public:
 	uint32_t screen_update_igs_video(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_cpokerpk(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(igs_interrupt);
+	void csk234it(machine_config &config);
+	void igs_ncs(machine_config &config);
+	void csk227it(machine_config &config);
+	void igspoker(machine_config &config);
+	void pktetris(machine_config &config);
+	void cpokerpk(machine_config &config);
+	void number10(machine_config &config);
 };
 
 
@@ -1892,7 +1899,7 @@ static GFXDECODE_START( cpokerpk )
 	GFXDECODE_ENTRY( "gfx2", 0x00000, charlayout2,  0, 1 )
 GFXDECODE_END
 
-static MACHINE_CONFIG_START( igspoker )
+MACHINE_CONFIG_START(igspoker_state::igspoker)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80, 3579545)
@@ -1925,19 +1932,19 @@ static MACHINE_CONFIG_START( igspoker )
 
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( csk227it, igspoker )
+MACHINE_CONFIG_DERIVED(igspoker_state::csk227it, igspoker)
 
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( csk234it, igspoker )
+MACHINE_CONFIG_DERIVED(igspoker_state::csk234it, igspoker)
 
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( igs_ncs, igspoker )
+MACHINE_CONFIG_DERIVED(igspoker_state::igs_ncs, igspoker)
 
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( number10, igspoker )
+MACHINE_CONFIG_DERIVED(igspoker_state::number10, igspoker)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(number10_io_map)
 
@@ -1951,14 +1958,14 @@ static MACHINE_CONFIG_DERIVED( number10, igspoker )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( cpokerpk, number10 )
+MACHINE_CONFIG_DERIVED(igspoker_state::cpokerpk, number10)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(cpokerpk_io_map)
 	MCFG_GFXDECODE_MODIFY("gfxdecode", cpokerpk)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( pktetris, igspoker )
+MACHINE_CONFIG_DERIVED(igspoker_state::pktetris, igspoker)
 
 MACHINE_CONFIG_END
 

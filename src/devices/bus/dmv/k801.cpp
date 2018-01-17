@@ -142,7 +142,7 @@ void dmv_k801_device::device_reset()
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( dmv_k801_device::device_add_mconfig )
+MACHINE_CONFIG_START(dmv_k801_device::device_add_mconfig)
 	MCFG_DEVICE_ADD("epci", MC2661, XTAL_5_0688MHz)
 	MCFG_MC2661_TXD_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_txd))
 	MCFG_MC2661_RTS_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_rts))
@@ -157,21 +157,21 @@ MACHINE_CONFIG_MEMBER( dmv_k801_device::device_add_mconfig )
 	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("epci", mc2661_device, cts_w))
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_MEMBER( dmv_k211_device::device_add_mconfig )
+MACHINE_CONFIG_START(dmv_k211_device::device_add_mconfig)
 	dmv_k801_device::device_add_mconfig(config);
 
 	MCFG_DEVICE_MODIFY("rs232")
 	MCFG_SLOT_DEFAULT_OPTION("null_modem")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_MEMBER( dmv_k212_device::device_add_mconfig )
+MACHINE_CONFIG_START(dmv_k212_device::device_add_mconfig)
 	dmv_k801_device::device_add_mconfig(config);
 
 	MCFG_DEVICE_MODIFY("rs232")
 	MCFG_SLOT_DEFAULT_OPTION("printer")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_MEMBER( dmv_k213_device::device_add_mconfig )
+MACHINE_CONFIG_START(dmv_k213_device::device_add_mconfig)
 	dmv_k801_device::device_add_mconfig(config);
 
 	MCFG_DEVICE_MODIFY("rs232")

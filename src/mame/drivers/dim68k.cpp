@@ -72,6 +72,7 @@ public:
 	void kbd_put(u8 data);
 	MC6845_UPDATE_ROW(crtc_update_row);
 
+	void dim68k(machine_config &config);
 private:
 	bool m_speaker_bit;
 	u8 m_video_control;
@@ -303,7 +304,7 @@ void dim68k_state::kbd_put(u8 data)
 	m_term_data = data;
 }
 
-static MACHINE_CONFIG_START( dim68k )
+MACHINE_CONFIG_START(dim68k_state::dim68k)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_10MHz)
 	MCFG_CPU_PROGRAM_MAP(dim68k_mem)

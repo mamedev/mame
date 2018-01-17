@@ -88,6 +88,7 @@ public:
 	DECLARE_READ8_MEMBER(kbd_get);
 	void kbd_put(u8 data);
 
+	void ms6102(machine_config &config);
 private:
 	bool m_kbd_ready;
 	uint8_t m_kbd_data;
@@ -247,7 +248,7 @@ DRIVER_INIT_MEMBER( ms6102_state, ms6102 )
 }
 
 
-static MACHINE_CONFIG_START( ms6102 )
+MACHINE_CONFIG_START(ms6102_state::ms6102)
 	MCFG_CPU_ADD("maincpu", I8080, XTAL_18_432MHz / 9)
 	MCFG_CPU_PROGRAM_MAP(ms6102_mem)
 	MCFG_CPU_IO_MAP(ms6102_io)

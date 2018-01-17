@@ -72,6 +72,8 @@ public:
 	uint32_t screen_update_bestleag(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_bestleaw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void bestleag(machine_config &config);
+	void bestleaw(machine_config &config);
 };
 
 
@@ -375,7 +377,7 @@ static GFXDECODE_START( bestleag )
 	GFXDECODE_ENTRY( "gfx2", 0, bestleag_char16layout,   0x300, 16 )
 GFXDECODE_END
 
-static MACHINE_CONFIG_START( bestleag )
+MACHINE_CONFIG_START(bestleag_state::bestleag)
 	MCFG_CPU_ADD("maincpu", M68000, 12000000)
 	MCFG_CPU_PROGRAM_MAP(bestleag_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", bestleag_state,  irq6_line_hold)
@@ -399,7 +401,7 @@ static MACHINE_CONFIG_START( bestleag )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.00)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( bestleaw, bestleag )
+MACHINE_CONFIG_DERIVED(bestleag_state::bestleaw, bestleag)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(bestleag_state, screen_update_bestleaw)
 MACHINE_CONFIG_END

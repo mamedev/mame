@@ -72,4 +72,8 @@ public:
 
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int pri_mask);
 	void common_decrypt();
+	void raidene(machine_config &config);
+	void raidenb(machine_config &config);
+	void raiden(machine_config &config);
+	void raidenu(machine_config &config);
 };

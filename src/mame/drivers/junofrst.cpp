@@ -93,6 +93,7 @@ Blitter source graphics
 #include "sound/ay8910.h"
 #include "sound/dac.h"
 #include "sound/flt_rc.h"
+#include "sound/volt_reg.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -131,6 +132,7 @@ public:
 	DECLARE_MACHINE_RESET(junofrst);
 
 	INTERRUPT_GEN_MEMBER(_30hz_irq);
+	void junofrst(machine_config &config);
 };
 
 
@@ -383,7 +385,7 @@ INTERRUPT_GEN_MEMBER(junofrst_state::_30hz_irq)
 		device.execute().set_input_line(0, ASSERT_LINE);
 }
 
-static MACHINE_CONFIG_START( junofrst )
+MACHINE_CONFIG_START(junofrst_state::junofrst)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", KONAMI1, 1500000)         /* 1.5 MHz ??? */
@@ -437,7 +439,8 @@ static MACHINE_CONFIG_START( junofrst )
 	MCFG_SOUND_ROUTE(2, "filter.0.2", 0.30)
 
 	MCFG_SOUND_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25) // 100K (R56-63)/200K (R64-71) ladder network
-	MCFG_SOUND_REFERENCE_INPUT(DAC_VREF_POS_INPUT, 1.0) MCFG_SOUND_REFERENCE_INPUT(DAC_VREF_NEG_INPUT, -1.0)
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 
 	MCFG_FILTER_RC_ADD("filter.0.0", 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)

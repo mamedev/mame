@@ -38,6 +38,7 @@ MB7051 - fuse programmed prom.
 #include "imagedev/snapquik.h"
 #include "sound/dac.h"
 #include "sound/mea8000.h"
+#include "sound/volt_reg.h"
 #include "sound/wave.h"
 #include "screen.h"
 #include "speaker.h"
@@ -75,6 +76,9 @@ public:
 	uint32_t screen_update_homelab2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_homelab3(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
+	void homelab3(machine_config &config);
+	void brailab4(machine_config &config);
+	void homelab(machine_config &config);
 private:
 	const uint8_t *m_p_videoram;
 	bool m_nmi;
@@ -731,7 +735,7 @@ QUICKLOAD_LOAD_MEMBER( homelab_state,homelab)
 }
 
 /* Machine driver */
-static MACHINE_CONFIG_START( homelab )
+MACHINE_CONFIG_START(homelab_state::homelab)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_8MHz / 2)
 	MCFG_CPU_PROGRAM_MAP(homelab2_mem)
@@ -753,7 +757,8 @@ static MACHINE_CONFIG_START( homelab )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
 	MCFG_SOUND_ADD("dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
-	MCFG_SOUND_REFERENCE_INPUT(DAC_VREF_POS_INPUT, 1.0)
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT)
 
 	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
@@ -762,7 +767,7 @@ static MACHINE_CONFIG_START( homelab )
 	MCFG_QUICKLOAD_ADD("quickload", homelab_state, homelab, "htp", 2)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( homelab3 )
+MACHINE_CONFIG_START(homelab_state::homelab3)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_12MHz / 4)
 	MCFG_CPU_PROGRAM_MAP(homelab3_mem)
@@ -785,7 +790,8 @@ static MACHINE_CONFIG_START( homelab3 )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
 	MCFG_SOUND_ADD("dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
-	MCFG_SOUND_REFERENCE_INPUT(DAC_VREF_POS_INPUT, 1.0)
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT)
 
 	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
@@ -794,7 +800,7 @@ static MACHINE_CONFIG_START( homelab3 )
 	MCFG_QUICKLOAD_ADD("quickload", homelab_state, homelab, "htp", 2)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( brailab4 )
+MACHINE_CONFIG_START(homelab_state::brailab4)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_12MHz / 4)
 	MCFG_CPU_PROGRAM_MAP(brailab4_mem)
@@ -817,7 +823,8 @@ static MACHINE_CONFIG_START( brailab4 )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
 	MCFG_SOUND_ADD("dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
-	MCFG_SOUND_REFERENCE_INPUT(DAC_VREF_POS_INPUT, 1.0)
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT)
 
 	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)

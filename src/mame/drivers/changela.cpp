@@ -415,7 +415,7 @@ void changela_state::machine_reset()
 	m_dir_31 = 0;
 }
 
-static MACHINE_CONFIG_START( changela )
+MACHINE_CONFIG_START(changela_state::changela)
 
 	MCFG_CPU_ADD("maincpu", Z80,5000000)
 	MCFG_CPU_PROGRAM_MAP(changela_map)

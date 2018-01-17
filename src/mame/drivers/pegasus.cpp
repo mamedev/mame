@@ -90,6 +90,8 @@ public:
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(exp0c_load) { return load_cart(image, m_exp_0c, "c000"); }
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(exp0d_load) { return load_cart(image, m_exp_0d, "d000"); }
 
+	void pegasusm(machine_config &config);
+	void pegasus(machine_config &config);
 private:
 	uint8_t m_kbd_row;
 	bool m_kbd_irq;
@@ -478,7 +480,7 @@ DRIVER_INIT_MEMBER(pegasus_state, pegasus)
 	pegasus_decrypt_rom(base);
 }
 
-static MACHINE_CONFIG_START( pegasus )
+MACHINE_CONFIG_START(pegasus_state::pegasus)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", MC6809, XTAL_4MHz)  // actually a 6809C - 4MHZ clock coming in, 1MHZ internally
 	MCFG_CPU_PROGRAM_MAP(pegasus_mem)
@@ -539,7 +541,7 @@ static MACHINE_CONFIG_START( pegasus )
 	MCFG_SOFTWARE_LIST_ADD("cart_list", "pegasus_cart")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( pegasusm, pegasus )
+MACHINE_CONFIG_DERIVED(pegasus_state::pegasusm, pegasus)
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_PROGRAM_MAP(pegasusm_mem)
 MACHINE_CONFIG_END

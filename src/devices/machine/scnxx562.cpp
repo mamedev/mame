@@ -126,7 +126,7 @@ DEFINE_DEVICE_TYPE(DUSCC68C562,   duscc68c562_device, "duscc68c562",   "Philips 
 //-------------------------------------------------
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
-MACHINE_CONFIG_MEMBER( duscc_device::device_add_mconfig )
+MACHINE_CONFIG_START(duscc_device::device_add_mconfig)
 	MCFG_DEVICE_ADD(CHANA_TAG, DUSCC_CHANNEL, 0)
 	MCFG_DEVICE_ADD(CHANB_TAG, DUSCC_CHANNEL, 0)
 MACHINE_CONFIG_END

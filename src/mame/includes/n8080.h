@@ -121,10 +121,11 @@ public:
 	TIMER_CALLBACK_MEMBER( delayed_sound_1_callback );
 	void delayed_sound_2( int data );
 	TIMER_CALLBACK_MEMBER( delayed_sound_2_callback );
+	void sheriff(machine_config &config);
+	void sheriff_sound(machine_config &config);
+	void westgun2(machine_config &config);
+	void helifire(machine_config &config);
+	void helifire_sound(machine_config &config);
+	void spacefev(machine_config &config);
+	void spacefev_sound(machine_config &config);
 };
-
-/*----------- defined in audio/n8080.c -----------*/
-
-MACHINE_CONFIG_EXTERN( spacefev_sound );
-MACHINE_CONFIG_EXTERN( sheriff_sound );
-MACHINE_CONFIG_EXTERN( helifire_sound );

@@ -41,4 +41,5 @@ public:
 	INTERRUPT_GEN_MEMBER(battlnts_interrupt);
 	K007342_CALLBACK_MEMBER(battlnts_tile_callback);
 	K007420_CALLBACK_MEMBER(battlnts_sprite_callback);
+	void battlnts(machine_config &config);
 };

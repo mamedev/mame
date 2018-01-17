@@ -136,6 +136,7 @@ public:
 	DECLARE_WRITE8_MEMBER(p1_ppi2_portb_w);
 	DECLARE_READ8_MEMBER(p1_ppi2_portc_r);
 	const char *m_cputag;
+	void poisk1(machine_config &config);
 };
 
 /*
@@ -631,7 +632,7 @@ static INPUT_PORTS_START( poisk1 )
 	PORT_INCLUDE( poisk1_keyboard_v91 )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( poisk1 )
+MACHINE_CONFIG_START(p1_state::poisk1)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8088, 5000000)
 	MCFG_CPU_PROGRAM_MAP(poisk1_map)

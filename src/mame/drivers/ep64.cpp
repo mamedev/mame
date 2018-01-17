@@ -217,6 +217,8 @@ public:
 
 	DECLARE_WRITE_LINE_MEMBER(write_centronics_busy);
 	int m_centronics_busy;
+	void ep128(machine_config &config);
+	void ep64(machine_config &config);
 };
 
 
@@ -556,7 +558,7 @@ void ep64_state::machine_reset()
 //  MACHINE_CONFIG( ep64 )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( ep64 )
+MACHINE_CONFIG_START(ep64_state::ep64)
 	// basic machine hardware
 	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL_8MHz/2)
 	MCFG_CPU_PROGRAM_MAP(ep64_mem)
@@ -611,7 +613,7 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( ep128 )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_DERIVED( ep128, ep64 )
+MACHINE_CONFIG_DERIVED(ep64_state::ep128, ep64)
 	MCFG_DEVICE_MODIFY(DAVE_TAG)
 	MCFG_DEVICE_ADDRESS_MAP(AS_PROGRAM, dave_128k_mem)
 

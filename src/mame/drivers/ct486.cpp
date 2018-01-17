@@ -51,6 +51,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( cs4031_hold );
 	DECLARE_WRITE8_MEMBER( cs4031_tc ) { m_isabus->eop_w(offset, data); }
 	DECLARE_WRITE_LINE_MEMBER( cs4031_spkr ) { m_speaker->level_w(state); }
+	void ct486(machine_config &config);
 };
 
 
@@ -104,7 +105,7 @@ ADDRESS_MAP_END
 //  MACHINE DRIVERS
 //**************************************************************************
 
-static MACHINE_CONFIG_START( ct486 )
+MACHINE_CONFIG_START(ct486_state::ct486)
 	MCFG_CPU_ADD("maincpu", I486, XTAL_25MHz)
 	MCFG_CPU_PROGRAM_MAP(ct486_map)
 	MCFG_CPU_IO_MAP(ct486_io)

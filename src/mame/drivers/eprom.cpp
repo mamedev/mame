@@ -386,7 +386,7 @@ GFXDECODE_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( eprom )
+MACHINE_CONFIG_START(eprom_state::eprom)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, ATARI_CLOCK_14MHz/2)
@@ -435,7 +435,7 @@ static MACHINE_CONFIG_START( eprom )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( klaxp )
+MACHINE_CONFIG_START(eprom_state::klaxp)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, ATARI_CLOCK_14MHz/2)
@@ -480,7 +480,7 @@ static MACHINE_CONFIG_START( klaxp )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( guts )
+MACHINE_CONFIG_START(eprom_state::guts)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, ATARI_CLOCK_14MHz/2)

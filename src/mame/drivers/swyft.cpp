@@ -379,6 +379,7 @@ public:
 	uint8_t m_keyboard_line;
 	uint8_t m_floppy_control;
 
+	void swyft(machine_config &config);
 //protected:
 	//virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 };
@@ -768,7 +769,7 @@ WRITE_LINE_MEMBER( swyft_state::write_acia_clock )
 	m_acia6850->write_rxc(state);
 }
 
-static MACHINE_CONFIG_START( swyft )
+MACHINE_CONFIG_START(swyft_state::swyft)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",M68008, XTAL_15_8976MHz/2) //MC68008P8, Y1=15.8976Mhz, clock GUESSED at Y1 / 2

@@ -196,6 +196,19 @@ public:
 	DECLARE_READ8_MEMBER( votrax_speech_r );
 	CUSTOM_INPUT_MEMBER( votrax_speech_status_r );
 
+	void astrocade_base(machine_config &config);
+	void astrocade_16color_base(machine_config &config);
+	void astrocade_mono_sound(machine_config &config);
+	void astrocade_stereo_sound(machine_config &config);
+	void spacezap(machine_config &config);
+	void gorf(machine_config &config);
+	void seawolf2(machine_config &config);
+	void profpac(machine_config &config);
+	void robby(machine_config &config);
+	void ebases(machine_config &config);
+	void wow(machine_config &config);
+	void tenpindx(machine_config &config);
+	void demndrgn(machine_config &config);
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };

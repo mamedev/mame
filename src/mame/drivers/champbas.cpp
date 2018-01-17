@@ -87,6 +87,7 @@ TODO:
 #include "machine/watchdog.h"
 #include "sound/ay8910.h"
 #include "sound/dac.h"
+#include "sound/volt_reg.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -508,7 +509,7 @@ INTERRUPT_GEN_MEMBER(champbas_state::vblank_irq)
 }
 
 
-static MACHINE_CONFIG_START( talbot )
+MACHINE_CONFIG_START(champbas_state::talbot)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_18_432MHz/6)
@@ -555,7 +556,7 @@ static MACHINE_CONFIG_START( talbot )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( champbas )
+MACHINE_CONFIG_START(champbas_state::champbas)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_18_432MHz/6)
@@ -601,10 +602,11 @@ static MACHINE_CONFIG_START( champbas )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.3)
 
 	MCFG_SOUND_ADD("dac", DAC_6BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.7) // unknown DAC
-	MCFG_SOUND_REFERENCE_INPUT(DAC_VREF_POS_INPUT, 1.0) MCFG_SOUND_REFERENCE_INPUT(DAC_VREF_NEG_INPUT, -1.0)
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( champbasj, champbas )
+MACHINE_CONFIG_DERIVED(champbas_state::champbasj, champbas)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -619,21 +621,21 @@ static MACHINE_CONFIG_DERIVED( champbasj, champbas )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( champbasja, champbas )
+MACHINE_CONFIG_DERIVED(champbas_state::champbasja, champbas)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(champbasja_map)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( champbasjb, champbas )
+MACHINE_CONFIG_DERIVED(champbas_state::champbasjb, champbas)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(champbasjb_map)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( champbb2, champbasj )
+MACHINE_CONFIG_DERIVED(champbas_state::champbb2, champbasj)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -641,7 +643,7 @@ static MACHINE_CONFIG_DERIVED( champbb2, champbasj )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( tbasebal, champbas )
+MACHINE_CONFIG_DERIVED(champbas_state::tbasebal, champbas)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -652,7 +654,7 @@ MACHINE_CONFIG_END
 
 
 
-static MACHINE_CONFIG_START( exctsccr )
+MACHINE_CONFIG_START(champbas_state::exctsccr)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_18_432MHz/6 )
@@ -716,13 +718,14 @@ static MACHINE_CONFIG_START( exctsccr )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.08)
 
 	MCFG_SOUND_ADD("dac1", DAC_6BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.3) // unknown DAC
-	MCFG_SOUND_REFERENCE_INPUT(DAC_VREF_POS_INPUT, 1.0) MCFG_SOUND_REFERENCE_INPUT(DAC_VREF_NEG_INPUT, -1.0)
 	MCFG_SOUND_ADD("dac2", DAC_6BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.3) // unknown DAC
-	MCFG_SOUND_REFERENCE_INPUT(DAC_VREF_POS_INPUT, 1.0) MCFG_SOUND_REFERENCE_INPUT(DAC_VREF_NEG_INPUT, -1.0)
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac1", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac1", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE_EX(0, "dac2", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac2", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 /* Bootleg running on a modified Champion Baseball board */
-static MACHINE_CONFIG_START( exctsccrb )
+MACHINE_CONFIG_START(champbas_state::exctsccrb)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_18_432MHz/6)
@@ -771,7 +774,8 @@ static MACHINE_CONFIG_START( exctsccrb )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.3)
 
 	MCFG_SOUND_ADD("dac", DAC_6BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.7) // unknown DAC
-	MCFG_SOUND_REFERENCE_INPUT(DAC_VREF_POS_INPUT, 1.0) MCFG_SOUND_REFERENCE_INPUT(DAC_VREF_NEG_INPUT, -1.0)
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 

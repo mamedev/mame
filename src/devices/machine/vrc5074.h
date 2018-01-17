@@ -20,7 +20,7 @@
 	downcast<vrc5074_device *>(device)->set_sdram_size(_index, _size);
 
 #define MCFG_VRC5074_SET_CS(_cs_num, _map) \
-	downcast<vrc5074_device *>(device)->set_map(_cs_num, address_map_delegate(ADDRESS_MAP_NAME(_map), #_map), owner);
+	downcast<vrc5074_device *>(device)->set_map(_cs_num, address_map_delegate(ADDRESS_MAP_NAME(_map), #_map), this);
 
 class vrc5074_device : public pci_host_device {
 public:

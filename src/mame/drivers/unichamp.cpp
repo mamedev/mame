@@ -81,6 +81,7 @@ public:
 
 	uint32_t screen_update_unichamp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
+	void unichamp(machine_config &config);
 protected:
 	required_ioport m_ctrls;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
@@ -231,7 +232,7 @@ WRITE16_MEMBER( unichamp_state::unichamp_trapl_w )
 	logerror("trapl_w(%x) = %x\n",offset,data);
 }
 
-static MACHINE_CONFIG_START( unichamp )
+MACHINE_CONFIG_START(unichamp_state::unichamp)
 	/* basic machine hardware */
 
 	//The CPU is really clocked this way:

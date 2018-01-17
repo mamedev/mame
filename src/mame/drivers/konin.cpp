@@ -63,6 +63,7 @@ public:
 	DECLARE_WRITE8_MEMBER(picu_b_w);
 	DECLARE_WRITE_LINE_MEMBER(picu_r3_w);
 
+	void konin(machine_config &config);
 private:
 	virtual void machine_start() override;
 	required_device<cpu_device> m_maincpu;
@@ -109,7 +110,7 @@ void konin_state::machine_start()
 {
 }
 
-static MACHINE_CONFIG_START( konin )
+MACHINE_CONFIG_START(konin_state::konin)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8080, XTAL_4MHz)
 	MCFG_CPU_PROGRAM_MAP(konin_mem)

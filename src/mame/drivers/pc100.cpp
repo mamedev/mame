@@ -145,6 +145,7 @@ public:
 	WRITE_LINE_MEMBER(rtc_portc_2_w) { m_rtc_portc = (m_rtc_portc & ~(1 << 2)) | ((state & 1) << 2); }
 	WRITE_LINE_MEMBER(rtc_portc_3_w) { m_rtc_portc = (m_rtc_portc & ~(1 << 3)) | ((state & 1) << 3); }
 	uint8_t m_rtc_portc;
+	void pc100(machine_config &config);
 };
 
 void pc100_state::video_start()
@@ -491,7 +492,7 @@ SLOT_INTERFACE_END
 
 #define MASTER_CLOCK 6988800
 
-static MACHINE_CONFIG_START( pc100 )
+MACHINE_CONFIG_START(pc100_state::pc100)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8086, MASTER_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(pc100_map)

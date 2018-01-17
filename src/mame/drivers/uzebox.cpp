@@ -63,6 +63,7 @@ public:
 	uint32_t screen_update_uzebox(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(uzebox_cart);
 
+	void uzebox(machine_config &config);
 private:
 	int             m_vpos;
 	uint64_t          m_line_start_cycles;
@@ -273,7 +274,7 @@ DEVICE_IMAGE_LOAD_MEMBER(uzebox_state, uzebox_cart)
 * Machine definition                                 *
 \****************************************************/
 
-static MACHINE_CONFIG_START( uzebox )
+MACHINE_CONFIG_START(uzebox_state::uzebox)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", ATMEGA644, MASTER_CLOCK)

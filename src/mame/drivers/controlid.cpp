@@ -44,6 +44,7 @@ public:
 		DECLARE_PALETTE_INIT( controlidx628 );
 
 	required_device<nt7534_device> m_lcdc;
+	void controlidx628(machine_config &config);
 private:
 	uint8_t p0_data;
 	uint8_t p1_data;
@@ -102,7 +103,7 @@ PALETTE_INIT_MEMBER(controlidx628_state, controlidx628)
 *     Machine Driver     *
 *************************/
 
-static MACHINE_CONFIG_START( controlidx628 )
+MACHINE_CONFIG_START(controlidx628_state::controlidx628)
 	// basic machine hardware
 	MCFG_CPU_ADD("maincpu", I80C32, XTAL_11_0592MHz) /* Actually the board has an Atmel AT89S52 mcu. */
 	MCFG_CPU_PROGRAM_MAP(prog_map)

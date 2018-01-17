@@ -27,6 +27,7 @@ Bottom board - M75-B-A (all versions regardless of mask ROM/EPROM)
 
 #include "cpu/z80/z80.h"
 #include "sound/2203intf.h"
+#include "sound/volt_reg.h"
 #include "sound/ym2151.h"
 #include "screen.h"
 #include "speaker.h"
@@ -470,7 +471,7 @@ static GFXDECODE_START( kikcubic )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( vigilant )
+MACHINE_CONFIG_START(vigilant_state::vigilant)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 3579645)          /* 3.579645 MHz */
@@ -509,10 +510,11 @@ static MACHINE_CONFIG_START( vigilant )
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.55)
 
 	MCFG_SOUND_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0) // unknown DAC
-	MCFG_SOUND_REFERENCE_INPUT(DAC_VREF_POS_INPUT, 1.0) MCFG_SOUND_REFERENCE_INPUT(DAC_VREF_NEG_INPUT, -1.0)
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( buccanrs )
+MACHINE_CONFIG_START(vigilant_state::buccanrs)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 5688800)          /* 5.688800 MHz */
@@ -567,10 +569,11 @@ static MACHINE_CONFIG_START( buccanrs )
 	MCFG_SOUND_ROUTE(3, "rspeaker", 0.50)
 
 	MCFG_SOUND_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.35) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.35) // unknown DAC
-	MCFG_SOUND_REFERENCE_INPUT(DAC_VREF_POS_INPUT, 1.0) MCFG_SOUND_REFERENCE_INPUT(DAC_VREF_NEG_INPUT, -1.0)
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( kikcubic )
+MACHINE_CONFIG_START(vigilant_state::kikcubic)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 3579645)          /* 3.579645 MHz */
@@ -609,7 +612,8 @@ static MACHINE_CONFIG_START( kikcubic )
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.55)
 
 	MCFG_SOUND_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0) // unknown DAC
-	MCFG_SOUND_REFERENCE_INPUT(DAC_VREF_POS_INPUT, 1.0) MCFG_SOUND_REFERENCE_INPUT(DAC_VREF_NEG_INPUT, -1.0)
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 

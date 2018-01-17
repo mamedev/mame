@@ -49,4 +49,5 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(mrflea_slave_interrupt);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void draw_background( bitmap_ind16 &bitmap, const rectangle &cliprect );
+	void mrflea(machine_config &config);
 };

@@ -589,6 +589,10 @@ public:
 	uint8_t *dimm_board_memory;
 	uint32_t dimm_board_memory_size;
 
+	static void an2131qc_configuration(device_t *device);
+	static void an2131sc_configuration(device_t *device);
+	void chihirogd(machine_config &config);
+	void chihiro_base(machine_config &config);
 private:
 	void jamtable_disasm(address_space &space, uint32_t address, uint32_t size);
 	void jamtable_disasm_command(int ref, const std::vector<std::string> &params);
@@ -1829,15 +1833,17 @@ SLOT_INTERFACE_START(usb_baseboard)
 	SLOT_INTERFACE("xbox_controller", OHCI_GAME_CONTROLLER)
 SLOT_INTERFACE_END
 
-static MACHINE_CONFIG_START(an2131qc_configuration)
+void chihiro_state::an2131qc_configuration(device_t *device)
+{
 	MCFG_OHCI_HLEAN2131QC_REGION(":others", 0)
-MACHINE_CONFIG_END
+}
 
-static MACHINE_CONFIG_START(an2131sc_configuration)
+void chihiro_state::an2131sc_configuration(device_t *device)
+{
 	MCFG_OHCI_HLEAN2131SC_REGION(":others", 0x2080)
-MACHINE_CONFIG_END
+}
 
-static MACHINE_CONFIG_DERIVED(chihiro_base, xbox_base)
+MACHINE_CONFIG_DERIVED(chihiro_state::chihiro_base, xbox_base)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(chihiro_map)
 	MCFG_CPU_IO_MAP(chihiro_map_io)
@@ -1859,7 +1865,7 @@ static MACHINE_CONFIG_DERIVED(chihiro_base, xbox_base)
 	MCFG_SEGA_837_13551_DEVICE_ADD("837_13551", "jvs_master", ":TILT", ":P1", ":P2", ":A0", ":A1", ":A2", ":A3", ":A4", ":A5", ":A6", ":A7", ":OUTPUT")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED(chihirogd, chihiro_base)
+MACHINE_CONFIG_DERIVED(chihiro_state::chihirogd, chihiro_base)
 	MCFG_NAOMI_GDROM_BOARD_ADD("rom_board", ":gdrom", "^pic", nullptr, NOOP)
 	MCFG_DEVICE_ADD("network", SEGA_NETWORK_BOARD, 0)
 MACHINE_CONFIG_END

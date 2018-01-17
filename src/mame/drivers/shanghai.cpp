@@ -43,6 +43,9 @@ public:
 	DECLARE_PALETTE_INIT(shanghai);
 	INTERRUPT_GEN_MEMBER(half_vblank_irq);
 
+	void shanghai(machine_config &config);
+	void shangha2(machine_config &config);
+	void kothello(machine_config &config);
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;
@@ -378,7 +381,7 @@ static ADDRESS_MAP_START( hd63484_map, 0, 16, shanghai_state )
 	AM_RANGE(0x00000, 0x3ffff) AM_RAM
 ADDRESS_MAP_END
 
-static MACHINE_CONFIG_START( shanghai )
+MACHINE_CONFIG_START(shanghai_state::shanghai)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", V30, XTAL_16MHz/2) /* NEC D70116C-8 */
@@ -414,7 +417,7 @@ static MACHINE_CONFIG_START( shanghai )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( shangha2 )
+MACHINE_CONFIG_START(shanghai_state::shangha2)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", V30, XTAL_16MHz/2) /* ? */
@@ -449,7 +452,7 @@ static MACHINE_CONFIG_START( shangha2 )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( kothello )
+MACHINE_CONFIG_START(shanghai_state::kothello)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", V30, XTAL_16MHz)

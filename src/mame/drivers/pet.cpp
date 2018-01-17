@@ -326,6 +326,25 @@ public:
 	int m_pia2b_irq;
 	int m_exp_irq;
 	int m_user_diag;
+	void _4k(machine_config &config);
+	void _8k(machine_config &config);
+	void _16k(machine_config &config);
+	void _32k(machine_config &config);
+	void pet(machine_config &config);
+	void pet2001n(machine_config &config);
+	void pet2001n8(machine_config &config);
+	void cbm3032(machine_config &config);
+	void pet20018(machine_config &config);
+	void pet2001n16(machine_config &config);
+	void cbm3016(machine_config &config);
+	void cbm3000(machine_config &config);
+	void cbm4000(machine_config &config);
+	void cbm4032f(machine_config &config);
+	void cbm4032(machine_config &config);
+	void cbm4016(machine_config &config);
+	void cbm3008(machine_config &config);
+	void pet2001(machine_config &config);
+	void pet2001n32(machine_config &config);
 };
 
 
@@ -337,6 +356,20 @@ public:
 	{ }
 
 	DECLARE_READ8_MEMBER( pia1_pb_r );
+	void pet2001b(machine_config &config);
+	void pet2001b32(machine_config &config);
+	void pet4000(machine_config &config);
+	void pet4000b(machine_config &config);
+	void pet4001b(machine_config &config);
+	void pet4032f(machine_config &config);
+	void pet4032b(machine_config &config);
+	void pet4032(machine_config &config);
+	void pet2001b16(machine_config &config);
+	void cbm3032b(machine_config &config);
+	void cbm4000b(machine_config &config);
+	void cbm4032b(machine_config &config);
+	void pet2001b8(machine_config &config);
+	void pet4016(machine_config &config);
 };
 
 
@@ -352,6 +385,8 @@ public:
 
 	MC6845_UPDATE_ROW( pet80_update_row );
 	MC6845_UPDATE_ROW( cbm8296_update_row );
+	void pet80(machine_config &config);
+	void pet8032(machine_config &config);
 };
 
 
@@ -361,6 +396,7 @@ public:
 	superpet_state(const machine_config &mconfig, device_type type, const char *tag)
 		: pet80_state(mconfig, type, tag)
 	{ }
+	void superpet(machine_config &config);
 };
 
 
@@ -370,6 +406,7 @@ public:
 	cbm8096_state(const machine_config &mconfig, device_type type, const char *tag) :
 		pet80_state(mconfig, type, tag)
 	{ }
+	void cbm8096(machine_config &config);
 };
 
 
@@ -408,6 +445,8 @@ public:
 	DECLARE_WRITE8_MEMBER( write );
 
 	uint8_t m_cr;
+	void cbm8296d(machine_config &config);
+	void cbm8296(machine_config &config);
 };
 
 
@@ -1690,7 +1729,7 @@ MACHINE_RESET_MEMBER( cbm8296_state, cbm8296 )
 //  MACHINE_CONFIG( 4k )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( 4k )
+MACHINE_CONFIG_START(pet_state::_4k)
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("4K")
 	MCFG_RAM_EXTRA_OPTIONS("8K,16K,32K")
@@ -1701,7 +1740,7 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( 8k )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( 8k )
+MACHINE_CONFIG_START(pet_state::_8k)
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("8K")
 	MCFG_RAM_EXTRA_OPTIONS("16K,32K")
@@ -1709,10 +1748,10 @@ MACHINE_CONFIG_END
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG( 8k )
+//  MACHINE_CONFIG( 16k )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( 16k )
+MACHINE_CONFIG_START(pet_state::_16k)
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("16K")
 	MCFG_RAM_EXTRA_OPTIONS("32K")
@@ -1720,10 +1759,10 @@ MACHINE_CONFIG_END
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG( 8k )
+//  MACHINE_CONFIG( 32k )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( 32k )
+MACHINE_CONFIG_START(pet_state::_32k)
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("32K")
 MACHINE_CONFIG_END
@@ -1733,7 +1772,7 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( pet )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( pet )
+MACHINE_CONFIG_START(pet_state::pet)
 	MCFG_MACHINE_START_OVERRIDE(pet_state, pet2001)
 	MCFG_MACHINE_RESET_OVERRIDE(pet_state, pet)
 
@@ -1816,8 +1855,8 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( pet2001 )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_DERIVED( pet2001, pet )
-	MCFG_FRAGMENT_ADD(4k)
+MACHINE_CONFIG_DERIVED(pet_state::pet2001, pet)
+	MCFG_FRAGMENT_ADD(_4k)
 MACHINE_CONFIG_END
 
 
@@ -1825,8 +1864,8 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( pet20018 )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_DERIVED( pet20018, pet )
-	MCFG_FRAGMENT_ADD(8k)
+MACHINE_CONFIG_DERIVED(pet_state::pet20018, pet)
+	MCFG_FRAGMENT_ADD(_8k)
 MACHINE_CONFIG_END
 
 
@@ -1834,7 +1873,7 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( pet2001n )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_DERIVED( pet2001n, pet )
+MACHINE_CONFIG_DERIVED(pet_state::pet2001n, pet)
 	MCFG_GENERIC_CARTSLOT_ADD("cart_9000", generic_linear_slot, "pet_9000_rom")
 	MCFG_GENERIC_EXTENSIONS("bin,rom")
 
@@ -1852,8 +1891,8 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( pet2001n8 )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_DERIVED( pet2001n8, pet2001n )
-	MCFG_FRAGMENT_ADD(8k)
+MACHINE_CONFIG_DERIVED(pet_state::pet2001n8, pet2001n)
+	MCFG_FRAGMENT_ADD(_8k)
 MACHINE_CONFIG_END
 
 
@@ -1861,8 +1900,8 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( pet2001n16 )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_DERIVED( pet2001n16, pet2001n )
-	MCFG_FRAGMENT_ADD(16k)
+MACHINE_CONFIG_DERIVED(pet_state::pet2001n16, pet2001n)
+	MCFG_FRAGMENT_ADD(_16k)
 MACHINE_CONFIG_END
 
 
@@ -1870,8 +1909,8 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( pet2001n32 )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_DERIVED( pet2001n32, pet2001n )
-	MCFG_FRAGMENT_ADD(32k)
+MACHINE_CONFIG_DERIVED(pet_state::pet2001n32, pet2001n)
+	MCFG_FRAGMENT_ADD(_32k)
 MACHINE_CONFIG_END
 
 
@@ -1879,7 +1918,7 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( cbm3000 )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_DERIVED( cbm3000, pet2001n )
+MACHINE_CONFIG_DERIVED(pet_state::cbm3000, pet2001n)
 	// video hardware
 	MCFG_SCREEN_MODIFY(SCREEN_TAG)
 	MCFG_SCREEN_REFRESH_RATE(50)
@@ -1896,8 +1935,8 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( cbm3008 )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_DERIVED( cbm3008, cbm3000 )
-	MCFG_FRAGMENT_ADD(8k)
+MACHINE_CONFIG_DERIVED(pet_state::cbm3008, cbm3000)
+	MCFG_FRAGMENT_ADD(_8k)
 MACHINE_CONFIG_END
 
 
@@ -1905,8 +1944,8 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( cbm3016 )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_DERIVED( cbm3016, cbm3000 )
-	MCFG_FRAGMENT_ADD(16k)
+MACHINE_CONFIG_DERIVED(pet_state::cbm3016, cbm3000)
+	MCFG_FRAGMENT_ADD(_16k)
 MACHINE_CONFIG_END
 
 
@@ -1914,8 +1953,8 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( cbm3032 )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_DERIVED( cbm3032, cbm3000 )
-	MCFG_FRAGMENT_ADD(32k)
+MACHINE_CONFIG_DERIVED(pet_state::cbm3032, cbm3000)
+	MCFG_FRAGMENT_ADD(_32k)
 MACHINE_CONFIG_END
 
 
@@ -1923,7 +1962,7 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( pet2001b )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_DERIVED( pet2001b, pet2001n )
+MACHINE_CONFIG_DERIVED(pet2001b_state::pet2001b, pet2001n)
 	MCFG_DEVICE_MODIFY(M6520_1_TAG)
 	MCFG_PIA_READPB_HANDLER(READ8(pet2001b_state, pia1_pb_r))
 MACHINE_CONFIG_END
@@ -1933,8 +1972,8 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( pet2001b8 )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_DERIVED( pet2001b8, pet2001b )
-	MCFG_FRAGMENT_ADD(8k)
+MACHINE_CONFIG_DERIVED(pet2001b_state::pet2001b8, pet2001b)
+	MCFG_FRAGMENT_ADD(_8k)
 MACHINE_CONFIG_END
 
 
@@ -1942,8 +1981,8 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( pet2001b16 )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_DERIVED( pet2001b16, pet2001b )
-	MCFG_FRAGMENT_ADD(16k)
+MACHINE_CONFIG_DERIVED(pet2001b_state::pet2001b16, pet2001b)
+	MCFG_FRAGMENT_ADD(_16k)
 MACHINE_CONFIG_END
 
 
@@ -1951,8 +1990,8 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( pet2001b32 )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_DERIVED( pet2001b32, pet2001b )
-	MCFG_FRAGMENT_ADD(32k)
+MACHINE_CONFIG_DERIVED(pet2001b_state::pet2001b32, pet2001b)
+	MCFG_FRAGMENT_ADD(_32k)
 MACHINE_CONFIG_END
 
 
@@ -1960,7 +1999,7 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( cbm3032b )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_DERIVED( cbm3032b, pet2001b )
+MACHINE_CONFIG_DERIVED(pet2001b_state::cbm3032b, pet2001b)
 	// video hardware
 	MCFG_SCREEN_MODIFY(SCREEN_TAG)
 	MCFG_SCREEN_REFRESH_RATE(50)
@@ -1971,7 +2010,7 @@ static MACHINE_CONFIG_DERIVED( cbm3032b, pet2001b )
 	MCFG_DEVICE_REMOVE("sync_timer")
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("sync_timer", pet_state, sync_tick, attotime::from_hz(100))
 
-	MCFG_FRAGMENT_ADD(32k)
+	MCFG_FRAGMENT_ADD(_32k)
 MACHINE_CONFIG_END
 
 
@@ -1979,7 +2018,7 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( pet4000 )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_DERIVED( pet4000, pet2001n )
+MACHINE_CONFIG_DERIVED(pet2001b_state::pet4000, pet2001n )
 	MCFG_DEVICE_REMOVE("cart_b000")
 MACHINE_CONFIG_END
 
@@ -1988,7 +2027,7 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( pet4016 )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_DERIVED( pet4016, pet4000 )
+MACHINE_CONFIG_DERIVED(pet2001b_state::pet4016, pet4000)
 	// RAM not upgradeable
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("16K")
@@ -1999,8 +2038,8 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( pet4032 )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_DERIVED( pet4032, pet4000 )
-	MCFG_FRAGMENT_ADD(32k)
+MACHINE_CONFIG_DERIVED(pet2001b_state::pet4032, pet4000)
+	MCFG_FRAGMENT_ADD(_32k)
 MACHINE_CONFIG_END
 
 
@@ -2008,7 +2047,7 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( pet4032f )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_DERIVED( pet4032f, pet4000 )
+MACHINE_CONFIG_DERIVED(pet2001b_state::pet4032f, pet4000)
 	MCFG_MACHINE_START_OVERRIDE(pet_state, pet40)
 	MCFG_MACHINE_RESET_OVERRIDE(pet_state, pet40)
 
@@ -2033,7 +2072,7 @@ static MACHINE_CONFIG_DERIVED( pet4032f, pet4000 )
 	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MCFG_FRAGMENT_ADD(32k)
+	MCFG_FRAGMENT_ADD(_32k)
 MACHINE_CONFIG_END
 
 
@@ -2041,7 +2080,7 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( cbm4000 )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_DERIVED( cbm4000, pet2001n )
+MACHINE_CONFIG_DERIVED(pet_state::cbm4000, pet2001n)
 	// video hardware
 	MCFG_SCREEN_MODIFY(SCREEN_TAG)
 	MCFG_SCREEN_REFRESH_RATE(50)
@@ -2060,7 +2099,7 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( cbm4016 )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_DERIVED( cbm4016, cbm4000 )
+MACHINE_CONFIG_DERIVED(pet_state::cbm4016, cbm4000)
 	// RAM not upgradeable
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("16K")
@@ -2071,8 +2110,8 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( cbm4032 )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_DERIVED( cbm4032, cbm4000 )
-	MCFG_FRAGMENT_ADD(32k)
+MACHINE_CONFIG_DERIVED(pet_state::cbm4032, cbm4000)
+	MCFG_FRAGMENT_ADD(_32k)
 MACHINE_CONFIG_END
 
 
@@ -2080,7 +2119,7 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( cbm4032f )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_DERIVED( cbm4032f, cbm4000 )
+MACHINE_CONFIG_DERIVED(pet_state::cbm4032f, cbm4000)
 	MCFG_MACHINE_START_OVERRIDE(pet_state, pet40)
 	MCFG_MACHINE_RESET_OVERRIDE(pet_state, pet40)
 
@@ -2105,7 +2144,7 @@ static MACHINE_CONFIG_DERIVED( cbm4032f, cbm4000 )
 	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MCFG_FRAGMENT_ADD(32k)
+	MCFG_FRAGMENT_ADD(_32k)
 MACHINE_CONFIG_END
 
 
@@ -2113,7 +2152,7 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( pet4000b )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_DERIVED( pet4000b, pet2001b )
+MACHINE_CONFIG_DERIVED(pet2001b_state::pet4000b, pet2001b)
 	MCFG_DEVICE_REMOVE("cart_b000")
 MACHINE_CONFIG_END
 
@@ -2122,8 +2161,8 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( pet4032b )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_DERIVED( pet4032b, pet4000b )
-	MCFG_FRAGMENT_ADD(32k)
+MACHINE_CONFIG_DERIVED(pet2001b_state::pet4032b, pet4000b)
+	MCFG_FRAGMENT_ADD(_32k)
 MACHINE_CONFIG_END
 
 
@@ -2131,7 +2170,7 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( cbm4000b )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_DERIVED( cbm4000b, pet2001b )
+MACHINE_CONFIG_DERIVED(pet2001b_state::cbm4000b, pet2001b)
 	// video hardware
 	MCFG_SCREEN_MODIFY(SCREEN_TAG)
 	MCFG_SCREEN_REFRESH_RATE(50)
@@ -2150,8 +2189,8 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( cbm4032b )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_DERIVED( cbm4032b, cbm4000b )
-	MCFG_FRAGMENT_ADD(32k)
+MACHINE_CONFIG_DERIVED(pet2001b_state::cbm4032b, cbm4000b)
+	MCFG_FRAGMENT_ADD(_32k)
 MACHINE_CONFIG_END
 
 
@@ -2159,7 +2198,7 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( pet80 )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( pet80 )
+MACHINE_CONFIG_START(pet80_state::pet80)
 	MCFG_MACHINE_START_OVERRIDE(pet80_state, pet80)
 	MCFG_MACHINE_RESET_OVERRIDE(pet80_state, pet80)
 
@@ -2259,8 +2298,8 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( pet8032 )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_DERIVED( pet8032, pet80 )
-	MCFG_FRAGMENT_ADD(32k)
+MACHINE_CONFIG_DERIVED(pet80_state::pet8032, pet80)
+	MCFG_FRAGMENT_ADD(_32k)
 MACHINE_CONFIG_END
 
 
@@ -2268,7 +2307,7 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( superpet )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_DERIVED( superpet, pet8032 )
+MACHINE_CONFIG_DERIVED(superpet_state::superpet, pet8032)
 	MCFG_DEVICE_REMOVE(PET_EXPANSION_SLOT_TAG)
 	MCFG_PET_EXPANSION_SLOT_ADD(PET_EXPANSION_SLOT_TAG, XTAL_16MHz/16, pet_expansion_cards, "superpet")
 	MCFG_PET_EXPANSION_SLOT_DMA_CALLBACKS(READ8(pet_state, read), WRITE8(pet_state, write))
@@ -2281,7 +2320,7 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( cbm8096 )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_DERIVED( cbm8096, pet80 )
+MACHINE_CONFIG_DERIVED(cbm8096_state::cbm8096, pet80)
 	MCFG_DEVICE_REMOVE(PET_EXPANSION_SLOT_TAG)
 	MCFG_PET_EXPANSION_SLOT_ADD(PET_EXPANSION_SLOT_TAG, XTAL_16MHz/16, pet_expansion_cards, "64k")
 	MCFG_PET_EXPANSION_SLOT_DMA_CALLBACKS(READ8(pet_state, read), WRITE8(pet_state, write))
@@ -2297,7 +2336,7 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( cbm8296 )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_DERIVED( cbm8296, pet80 )
+MACHINE_CONFIG_DERIVED(cbm8296_state::cbm8296, pet80)
 	MCFG_MACHINE_START_OVERRIDE(cbm8296_state, cbm8296)
 	MCFG_MACHINE_RESET_OVERRIDE(cbm8296_state, cbm8296)
 
@@ -2328,7 +2367,7 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( cbm8296d )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_DERIVED( cbm8296d, cbm8296 )
+MACHINE_CONFIG_DERIVED(cbm8296_state::cbm8296d, cbm8296)
 	MCFG_DEVICE_MODIFY("ieee8")
 	MCFG_DEVICE_SLOT_INTERFACE(cbm8296d_ieee488_devices, "c8250lp", false)
 MACHINE_CONFIG_END

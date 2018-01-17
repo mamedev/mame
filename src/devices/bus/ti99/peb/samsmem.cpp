@@ -120,7 +120,7 @@ WRITE_LINE_MEMBER(sams_memory_expansion_device::map_mode_w)
 	m_map_mode = state;
 }
 
-MACHINE_CONFIG_MEMBER( sams_memory_expansion_device::device_add_mconfig )
+MACHINE_CONFIG_START(sams_memory_expansion_device::device_add_mconfig)
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("1M")
 	MCFG_RAM_DEFAULT_VALUE(0)

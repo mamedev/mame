@@ -142,22 +142,6 @@ TIMER_CALLBACK_MEMBER(electron_state::electron_tape_timer_handler)
 	}
 }
 
-READ8_MEMBER(electron_state::electron_read_keyboard)
-{
-	uint8_t data = 0;
-
-	//logerror( "PC=%04x: keyboard read from paged rom area, address: %04x", activecpu_get_pc(), offset );
-	for (int i = 0; i < 14; i++)
-	{
-		if (!(offset & 1))
-			data |= m_keybd[i]->read() & 0x0f;
-
-		offset = offset >> 1;
-	}
-	//logerror( ", data: %02x\n", data );
-	return data;
-}
-
 READ8_MEMBER(electron_state::electron_mem_r)
 {
 	//waitforramsync();
@@ -170,26 +154,84 @@ WRITE8_MEMBER(electron_state::electron_mem_w)
 	m_ram->write(offset, data);
 }
 
+READ8_MEMBER(electron_state::electron_paged_r)
+{
+	/*  0 Second external socket on the expansion module (SK2) */
+	/*  1 Second external socket on the expansion module (SK2) */
+	/*  2 First external socket on the expansion module (SK1)  */
+	/*  3 First external socket on the expansion module (SK1)  */
+	/*  4 Disc                                                 */
+	/*  5 USER applications                                    */
+	/*  6 USER applications                                    */
+	/*  7 Modem interface ROM                                  */
+	/*  8 Keyboard                                             */
+	/*  9 Keyboard mirror                                      */
+	/* 10 BASIC rom                                            */
+	/* 11 BASIC rom mirror                                     */
+	/* 12 Expansion module operating system                    */
+	/* 13 High priority slot in expansion module               */
+	/* 14 ECONET                                               */
+	/* 15 Reserved                                             */
+
+	uint8_t data = 0;
+
+	switch (m_ula.rompage)
+	{
+	case 8:
+	case 9:
+		/* Keyboard */
+		for (int i = 0; i < 14; i++)
+		{
+			if (!(offset & 1))
+				data |= m_keybd[i]->read() & 0x0f;
+
+			offset = offset >> 1;
+		}
+		break;
+
+	case 10:
+	case 11:
+		/* BASIC */
+		data = memregion("basic")->base()[offset & 0x3fff];
+		break;
+
+	default:
+		/* ROM in extension devices */
+		data = m_exp->expbus_r(space, 0x8000 + offset, 0xff);
+		break;
+	}
+	return data;
+}
+
+WRITE8_MEMBER(electron_state::electron_paged_w)
+{
+	m_exp->expbus_w(space, 0x8000 + offset, data);
+}
+
 READ8_MEMBER(electron_state::electron_fred_r)
 {
 	/* The Issue 4 ULA returns data from OS ROM, whereas Issue 6 ULA will return 0xfc */
-	logerror("FRED: read fc%02x\n", offset);
-	return 0xfc;
+	//logerror("FRED: read fc%02x\n", offset);
+	return m_exp->expbus_r(space, 0xfc00 + offset, 0xfc);
 }
 
 WRITE8_MEMBER(electron_state::electron_fred_w)
 {
+	//logerror("FRED: write fc%02x\n", offset);
+	m_exp->expbus_w(space, 0xfc00 + offset, data);
 }
 
 READ8_MEMBER(electron_state::electron_jim_r)
 {
 	/* The Issue 4 ULA returns data from OS ROM, whereas Issue 6 ULA will return 0xfd */
-	logerror("JIM: read fd%02x\n", offset);
-	return 0xfd;
+	//logerror("JIM: read fd%02x\n", offset);
+	return m_exp->expbus_r(space, 0xfd00 + offset, 0xfd);
 }
 
 WRITE8_MEMBER(electron_state::electron_jim_w)
 {
+	//logerror("JIM: write fd%02x\n", offset);
+	m_exp->expbus_w(space, 0xfd00 + offset, data);
 }
 
 READ8_MEMBER(electron_state::electron_sheila_r)
@@ -210,7 +252,7 @@ READ8_MEMBER(electron_state::electron_sheila_r)
 		data = m_ula.tape_byte;
 		break;
 	}
-	logerror( "ULA: read offset %02x: %02x\n", offset, data );
+	//logerror( "ULA: read fe%02x: %02x\n", offset, data );
 	return data;
 }
 
@@ -219,8 +261,10 @@ static const uint16_t electron_screen_base[8] = { 0x3000, 0x3000, 0x3000, 0x4000
 
 WRITE8_MEMBER(electron_state::electron_sheila_w)
 {
+	m_exp->expbus_w(space, 0xfe00 + offset, data);
+
 	int i = electron_palette_offset[(( offset >> 1 ) & 0x03)];
-	logerror( "ULA: write offset %02x <- %02x\n", offset & 0x0f, data );
+	//logerror( "ULA: write fe%02x <- %02x\n", offset & 0x0f, data );
 	switch( offset & 0x0f )
 	{
 	case 0x00:  /* Interrupt control */
@@ -251,13 +295,7 @@ WRITE8_MEMBER(electron_state::electron_sheila_w)
 			if ( m_ula.rompage == 8 || m_ula.rompage == 9 )
 			{
 				m_ula.rompage = 8;
-				space.install_read_handler( 0x8000, 0xbfff, read8_delegate(FUNC(electron_state::electron_read_keyboard),this));
 			}
-			else
-			{
-				space.install_read_bank( 0x8000, 0xbfff, "bank2");
-			}
-			membank("bank2")->set_entry(m_ula.rompage);
 		}
 		if ( data & 0x10 )
 		{
@@ -368,8 +406,6 @@ TIMER_CALLBACK_MEMBER(electron_state::setup_beep)
 
 void electron_state::machine_reset()
 {
-	membank("bank2")->set_entry(0);
-
 	m_ula.communication_mode = 0x04;
 	m_ula.screen_mode = 0;
 	m_ula.cassette_motor_mode = 0;
@@ -384,9 +420,6 @@ void electron_state::machine_reset()
 
 void electron_state::machine_start()
 {
-	for (int page = 0; page < 16; page++)
-		membank("bank2")->configure_entries(page, 1, memregion("user1")->base() + page * 0x4000, 0x4000);
-
 	m_ula.interrupt_status = 0x82;
 	m_ula.interrupt_control = 0x00;
 	timer_set(attotime::zero, TIMER_SETUP_BEEP);

@@ -554,6 +554,7 @@ uint32_t ms32_state::screen_update_ms32(screen_device &screen, bitmap_rgb32 &bit
 				else if (primask == 0xc0)
 				{
 					dstptr_bitmap[xx] = paldata[machine().rand()&0xfff];
+					popmessage("unhandled priority type %02x, contact MAMEdev",primask);
 				}
 				else if (primask == 0xf0)
 				{
@@ -684,11 +685,17 @@ uint32_t ms32_state::screen_update_ms32(screen_device &screen, bitmap_rgb32 &bit
 						dstptr_bitmap[xx] = paldata[src_tile]; // assumed
 					}
 				}
-
+				else if(primask == 0xf8) // gratia ending
+				{
+					if (spridat & 0xff && src_tilepri == 0x02)
+						dstptr_bitmap[xx] = paldata[spridat];
+					else
+						dstptr_bitmap[xx] = paldata[src_tile];
+				}
 				else
 				{
 					dstptr_bitmap[xx] = 0;
-					logerror("unhandled priority type %02x\n",primask);
+					popmessage("unhandled priority type %02x, contact MAMEdev",primask);
 				}
 
 

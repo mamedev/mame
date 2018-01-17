@@ -63,4 +63,7 @@ public:
 	void nvram_init(nvram_device &nvram, void *data, size_t size);
 
 	DECLARE_WRITE8_MEMBER(dac_w);
+	void no_nvram(machine_config &config);
+	void friskytb(machine_config &config);
+	void nvram(machine_config &config);
 };

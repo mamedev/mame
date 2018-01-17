@@ -49,7 +49,7 @@ DEFINE_DEVICE_TYPE(A2BUS_MCMS2, a2bus_mcms2_device, "a2mcms2", "Mountain Compute
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( a2bus_mcms1_device::device_add_mconfig )
+MACHINE_CONFIG_START(a2bus_mcms1_device::device_add_mconfig)
 	MCFG_SPEAKER_STANDARD_STEREO("mcms_l", "mcms_r")
 
 	MCFG_DEVICE_ADD(ENGINE_TAG, MCMS, 1000000)

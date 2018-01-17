@@ -237,6 +237,8 @@ public:
 	uint32_t m_idleramoffs;
 	uint32_t m_idlepc;
 	void install_speedups(uint32_t idleramoff, uint32_t idlepc, bool is_typed);
+	void cv1k_d(machine_config &config);
+	void cv1k(machine_config &config);
 };
 
 
@@ -449,7 +451,7 @@ void cv1k_state::machine_reset()
 	m_blitter->reset();
 }
 
-static MACHINE_CONFIG_START( cv1k )
+MACHINE_CONFIG_START(cv1k_state::cv1k)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", SH3BE, XTAL_12_8MHz*8) // 102.4MHz
@@ -488,7 +490,7 @@ static MACHINE_CONFIG_START( cv1k )
 	MCFG_EPIC12_SET_MAINRAMSIZE(0x800000)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( cv1k_d, cv1k )
+MACHINE_CONFIG_DERIVED(cv1k_state::cv1k_d, cv1k)
 
 	/* basic machine hardware */
 	MCFG_DEVICE_REMOVE("maincpu")

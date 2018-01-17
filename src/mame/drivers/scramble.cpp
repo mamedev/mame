@@ -1284,7 +1284,7 @@ GFXDECODE_END
 
 /**************************************************************************/
 
-static MACHINE_CONFIG_START( scramble )
+MACHINE_CONFIG_START(scramble_state::scramble)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 18432000/6)    /* 3.072 MHz */
@@ -1348,7 +1348,7 @@ static MACHINE_CONFIG_START( scramble )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.16)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( mars, scramble )
+MACHINE_CONFIG_DERIVED(scramble_state::mars, scramble)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1366,7 +1366,7 @@ static MACHINE_CONFIG_DERIVED( mars, scramble )
 	MCFG_PALETTE_INIT_OWNER(scramble_state,galaxold)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( devilfsh, scramble )
+MACHINE_CONFIG_DERIVED(scramble_state::devilfsh, scramble)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1379,7 +1379,7 @@ static MACHINE_CONFIG_DERIVED( devilfsh, scramble )
 	MCFG_PALETTE_INIT_OWNER(scramble_state,galaxold)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( newsin7, scramble )
+MACHINE_CONFIG_DERIVED(scramble_state::newsin7, scramble)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1394,7 +1394,7 @@ static MACHINE_CONFIG_DERIVED( newsin7, scramble )
 	MCFG_VIDEO_START_OVERRIDE(scramble_state,newsin7)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( mrkougb, scramble )
+MACHINE_CONFIG_DERIVED(scramble_state::mrkougb, scramble)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1411,13 +1411,13 @@ static MACHINE_CONFIG_DERIVED( mrkougb, scramble )
 	MCFG_PALETTE_INIT_OWNER(scramble_state,galaxold)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( mrkougar, mrkougb )
+MACHINE_CONFIG_DERIVED(scramble_state::mrkougar, mrkougb)
 
 	/* video hardware */
 	MCFG_GFXDECODE_MODIFY("gfxdecode", mrkougar)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( ckongs, scramble )
+MACHINE_CONFIG_DERIVED(scramble_state::ckongs, scramble)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1430,7 +1430,7 @@ static MACHINE_CONFIG_DERIVED( ckongs, scramble )
 	MCFG_VIDEO_START_OVERRIDE(scramble_state,ckongs)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( hotshock, scramble )
+MACHINE_CONFIG_DERIVED(scramble_state::hotshock, scramble)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1461,7 +1461,7 @@ static MACHINE_CONFIG_DERIVED( hotshock, scramble )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.33)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( cavelon, scramble )
+MACHINE_CONFIG_DERIVED(scramble_state::cavelon, scramble)
 
 	/* basic machine hardware */
 
@@ -1472,7 +1472,7 @@ static MACHINE_CONFIG_DERIVED( cavelon, scramble )
 	MCFG_VIDEO_START_OVERRIDE(scramble_state,ckongs)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( mimonscr, scramble )
+MACHINE_CONFIG_DERIVED(scramble_state::mimonscr, scramble)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1483,7 +1483,7 @@ static MACHINE_CONFIG_DERIVED( mimonscr, scramble )
 MACHINE_CONFIG_END
 
 /* Triple Punch and Mariner are different - only one CPU, one 8910 */
-static MACHINE_CONFIG_DERIVED( triplep, scramble )
+MACHINE_CONFIG_DERIVED(scramble_state::triplep, scramble)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1510,7 +1510,7 @@ static MACHINE_CONFIG_DERIVED( triplep, scramble )
 	MCFG_DEVICE_REMOVE("8910.2")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( mariner, triplep )
+MACHINE_CONFIG_DERIVED(scramble_state::mariner, triplep)
 
 	/* basic machine hardware */
 
@@ -1523,7 +1523,7 @@ static MACHINE_CONFIG_DERIVED( mariner, triplep )
 MACHINE_CONFIG_END
 
 /* Hunchback replaces the Z80 with a S2650 CPU */
-static MACHINE_CONFIG_DERIVED( hunchbks, scramble )
+MACHINE_CONFIG_DERIVED(scramble_state::hunchbks, scramble)
 
 	/* basic machine hardware */
 	MCFG_CPU_REPLACE("maincpu", S2650, 18432000/6)
@@ -1542,7 +1542,7 @@ static MACHINE_CONFIG_DERIVED( hunchbks, scramble )
 	MCFG_PALETTE_INIT_OWNER(scramble_state,galaxold)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( hncholms, hunchbks )
+MACHINE_CONFIG_DERIVED(scramble_state::hncholms, hunchbks)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1551,7 +1551,7 @@ static MACHINE_CONFIG_DERIVED( hncholms, hunchbks )
 	MCFG_VIDEO_START_OVERRIDE(scramble_state,scorpion)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( ad2083 )
+MACHINE_CONFIG_START(scramble_state::ad2083)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 18432000/6)    /* 3.072 MHz */
 	MCFG_CPU_PROGRAM_MAP(ad2083_map)
@@ -1593,7 +1593,7 @@ static MACHINE_CONFIG_START( ad2083 )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( harem, scramble )
+MACHINE_CONFIG_DERIVED(scramble_state::harem, scramble)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")

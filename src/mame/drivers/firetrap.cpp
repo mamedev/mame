@@ -611,7 +611,7 @@ void firetrap_state::machine_reset()
 	m_coin_command_pending = 0;
 }
 
-static MACHINE_CONFIG_START( firetrap )
+MACHINE_CONFIG_START(firetrap_state::firetrap)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, FIRETRAP_XTAL/2)       // 6 MHz
@@ -659,7 +659,7 @@ static MACHINE_CONFIG_START( firetrap )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( firetrapbl )
+MACHINE_CONFIG_START(firetrap_state::firetrapbl)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, FIRETRAP_XTAL/2)       // 6 MHz

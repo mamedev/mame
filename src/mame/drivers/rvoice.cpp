@@ -88,6 +88,7 @@ public:
 	virtual void machine_reset() override;
 	void null_kbd_put(u8 data);
 	required_device<cpu_device> m_maincpu;
+	void rvoicepc(machine_config &config);
 };
 
 
@@ -358,7 +359,7 @@ void rvoice_state::null_kbd_put(u8 data)
 {
 }
 
-static MACHINE_CONFIG_START( rvoicepc )
+MACHINE_CONFIG_START(rvoice_state::rvoicepc)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", HD63701, XTAL_7_3728MHz)
 	MCFG_CPU_PROGRAM_MAP(hd63701_main_mem)

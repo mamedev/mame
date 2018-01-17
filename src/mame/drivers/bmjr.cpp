@@ -47,6 +47,7 @@ public:
 	DECLARE_DRIVER_INIT(bmjr);
 	u32 screen_update_bmjr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
+	void bmjr(machine_config &config);
 private:
 	bool m_tape_switch;
 	u8 m_xor_display;
@@ -333,7 +334,7 @@ void bmjr_state::machine_reset()
 	m_cass->change_state(CASSETTE_MOTOR_DISABLED,CASSETTE_MASK_MOTOR);
 }
 
-static MACHINE_CONFIG_START( bmjr )
+MACHINE_CONFIG_START(bmjr_state::bmjr)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",M6800, XTAL_4MHz/4) //unknown clock / divider
 	MCFG_CPU_PROGRAM_MAP(bmjr_mem)

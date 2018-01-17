@@ -27,6 +27,7 @@
 
 #include "emu.h"
 #include "epson_lx810l.h"
+#include "sound/volt_reg.h"
 #include "speaker.h"
 
 //extern const char layout_lx800[]; /* use layout from lx800 */
@@ -107,7 +108,7 @@ ADDRESS_MAP_END
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( epson_lx810l_device::device_add_mconfig )
+MACHINE_CONFIG_START(epson_lx810l_device::device_add_mconfig)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", UPD7810, XTAL_14_7456MHz)
 	MCFG_CPU_PROGRAM_MAP(lx810l_mem)
@@ -141,7 +142,8 @@ MACHINE_CONFIG_MEMBER( epson_lx810l_device::device_add_mconfig )
 	/* audio hardware */
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
 	MCFG_SOUND_ADD("dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
-	MCFG_SOUND_REFERENCE_INPUT(DAC_VREF_POS_INPUT, 1.0)
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT)
 
 	/* gate array */
 	MCFG_DEVICE_ADD("e05a30", E05A30, 0)

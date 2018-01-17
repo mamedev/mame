@@ -265,6 +265,26 @@ public:
 	void esprade_unpack_sprites(const char *region);
 	void sailormn_unpack_tiles(const char *region);
 
+	void uopoko(machine_config &config);
+	void sailormn(machine_config &config);
+	void paceight(machine_config &config);
+	void pacslot(machine_config &config);
+	void hotdogst(machine_config &config);
+	void crusherm(machine_config &config);
+	void donpachi(machine_config &config);
+	void tekkencw(machine_config &config);
+	void korokoro(machine_config &config);
+	void esprade(machine_config &config);
+	void mazinger(machine_config &config);
+	void tjumpman(machine_config &config);
+	void tekkenbs(machine_config &config);
+	void gaia(machine_config &config);
+	void metmqstr(machine_config &config);
+	void ppsatan(machine_config &config);
+	void guwange(machine_config &config);
+	void dfeveron(machine_config &config);
+	void ddonpach(machine_config &config);
+	void pwrinst2(machine_config &config);
 private:
 	inline void get_tile_info( tile_data &tileinfo, int tile_index, int GFX );
 	inline void tilemap_draw( int chip, screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, uint32_t flags, uint32_t priority, uint32_t priority2, int GFX );

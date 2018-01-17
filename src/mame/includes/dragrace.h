@@ -74,6 +74,7 @@ public:
 	uint32_t screen_update_dragrace(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(dragrace_frame_callback);
 	void dragrace_update_misc_flags( address_space &space );
+	void dragrace(machine_config &config);
 };
 
 /*----------- defined in audio/dragrace.c -----------*/

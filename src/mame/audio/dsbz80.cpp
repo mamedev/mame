@@ -43,7 +43,7 @@ DEFINE_DEVICE_TYPE(DSBZ80, dsbz80_device, "dsbz80_device", "Sega Z80-based Digit
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( dsbz80_device::device_add_mconfig )
+MACHINE_CONFIG_START(dsbz80_device::device_add_mconfig)
 	MCFG_CPU_ADD(Z80_TAG, Z80, 4000000)     /* unknown clock, but probably pretty slow considering the z80 does like nothing */
 	MCFG_CPU_PROGRAM_MAP(dsbz80_map)
 	MCFG_CPU_IO_MAP(dsbz80io_map)

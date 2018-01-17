@@ -190,7 +190,7 @@ static GFXDECODE_START( sspeedr )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( sspeedr )
+MACHINE_CONFIG_START(sspeedr_state::sspeedr)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_19_968MHz/8)

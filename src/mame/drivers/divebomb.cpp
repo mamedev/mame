@@ -445,7 +445,7 @@ GFXDECODE_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( divebomb )
+MACHINE_CONFIG_START(divebomb_state::divebomb)
 
 	MCFG_CPU_ADD("fgcpu", Z80,XTAL1/4) // ?
 	MCFG_CPU_PROGRAM_MAP(divebomb_fgcpu_map)

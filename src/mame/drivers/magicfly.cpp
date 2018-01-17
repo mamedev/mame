@@ -444,6 +444,7 @@
 #include "cpu/m6502/m6502.h"
 #include "machine/nvram.h"
 #include "sound/dac.h"
+#include "sound/volt_reg.h"
 #include "video/mc6845.h"
 #include "screen.h"
 #include "speaker.h"
@@ -481,6 +482,9 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<dac_bit_interface> m_dac;
 	required_device<gfxdecode_device> m_gfxdecode;
+	void bchance(machine_config &config);
+	void magicfly(machine_config &config);
+	void _7mezzo(machine_config &config);
 };
 
 
@@ -931,7 +935,7 @@ GFXDECODE_END
 *              Machine Drivers               *
 *********************************************/
 
-static MACHINE_CONFIG_START( magicfly )
+MACHINE_CONFIG_START(magicfly_state::magicfly)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, MASTER_CLOCK / 16) /* guess */
@@ -960,11 +964,12 @@ static MACHINE_CONFIG_START( magicfly )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
 	MCFG_SOUND_ADD("dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
-	MCFG_SOUND_REFERENCE_INPUT(DAC_VREF_POS_INPUT, 1.0)
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( 7mezzo, magicfly )
+MACHINE_CONFIG_DERIVED(magicfly_state::_7mezzo, magicfly)
 
 	/* video hardware */
 	MCFG_VIDEO_START_OVERRIDE(magicfly_state, 7mezzo)
@@ -972,7 +977,7 @@ static MACHINE_CONFIG_DERIVED( 7mezzo, magicfly )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( bchance, magicfly )
+MACHINE_CONFIG_DERIVED(magicfly_state::bchance, magicfly)
 
 	/* video hardware */
 	MCFG_PALETTE_MODIFY("palette")
@@ -1056,5 +1061,5 @@ ROM_END
 
 //    YEAR  NAME      PARENT  MACHINE   INPUT     STATE           INIT   ROT   COMPANY      FULLNAME                          FLAGS
 GAME( 198?, magicfly, 0,      magicfly, magicfly, magicfly_state, 0,     ROT0, "P&A Games", "Magic Fly",                      0 )
-GAME( 198?, 7mezzo,   0,      7mezzo,   7mezzo,   magicfly_state, 0,     ROT0, "<unknown>", "7 e Mezzo",                      0 )
+GAME( 198?, 7mezzo,   0,      _7mezzo,  7mezzo,   magicfly_state, 0,     ROT0, "<unknown>", "7 e Mezzo",                      0 )
 GAME( 198?, bchance,  0,      bchance,  bchance,  magicfly_state, 0,     ROT0, "<unknown>", "Bonne Chance! (French/English)", MACHINE_IMPERFECT_GRAPHICS )

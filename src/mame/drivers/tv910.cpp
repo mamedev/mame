@@ -77,6 +77,7 @@ public:
 	required_memory_region m_kbdrom;
 	required_ioport m_kbspecial;
 
+	void tv910(machine_config &config);
 private:
 	uint8_t *m_vramptr, *m_chrrom;
 
@@ -490,7 +491,7 @@ MC6845_UPDATE_ROW( tv910_state::crtc_update_row )
 	}
 }
 
-static MACHINE_CONFIG_START( tv910 )
+MACHINE_CONFIG_START(tv910_state::tv910)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, MASTER_CLOCK/8)
 	MCFG_CPU_PROGRAM_MAP(tv910_mem)

@@ -1871,7 +1871,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(namcos21_state::screen_scanline)
 	}
 }
 
-static MACHINE_CONFIG_START( configure_c148_standard )
+MACHINE_CONFIG_START(namcos21_state::configure_c148_standard)
 	MCFG_NAMCO_C148_ADD("master_intc","maincpu",true)
 	namco_c148_device::link_c148_device(*device,"slave_intc");
 	MCFG_NAMCO_C148_EXT1_CB(WRITE8(namcos21_state, sound_reset_w))
@@ -1882,7 +1882,7 @@ static MACHINE_CONFIG_START( configure_c148_standard )
 
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( namcos21 )
+MACHINE_CONFIG_START(namcos21_state::namcos21)
 	MCFG_CPU_ADD("maincpu", M68000,12288000) /* Master */
 	MCFG_CPU_PROGRAM_MAP(master_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", namcos21_state, screen_scanline, "screen", 0, 1)
@@ -1949,7 +1949,7 @@ static MACHINE_CONFIG_START( namcos21 )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( driveyes )
+MACHINE_CONFIG_START(namcos21_state::driveyes)
 	MCFG_CPU_ADD("maincpu", M68000,12288000) /* Master */
 	MCFG_CPU_PROGRAM_MAP(driveyes_master_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", namcos21_state, screen_scanline, "screen", 0, 1)
@@ -2009,7 +2009,7 @@ static MACHINE_CONFIG_START( driveyes )
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.30)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( winrun )
+MACHINE_CONFIG_START(namcos21_state::winrun)
 	MCFG_CPU_ADD("maincpu", M68000,12288000) /* Master */
 	MCFG_CPU_PROGRAM_MAP(winrun_master_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", namcos21_state, screen_scanline, "screen", 0, 1)
