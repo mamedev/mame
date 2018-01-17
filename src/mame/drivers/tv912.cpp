@@ -16,6 +16,7 @@
 #include "cpu/mcs48/mcs48.h"
 //#include "bus/rs232/rs232.h"
 //#include "machine/ay31015.h"
+#include "machine/bankdev.h"
 //#include "video/tms9927.h"
 #include "screen.h"
 
@@ -27,19 +28,48 @@ public:
 	tv912_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
+		, m_bankdev(*this, "bankdev")
+		, m_dispram_bank(*this, "dispram")
 		, m_p_chargen(*this, "chargen")
 	{ }
+
+	DECLARE_WRITE8_MEMBER(p2_w);
 
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 private:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
 	required_device<cpu_device> m_maincpu;
+	required_device<address_map_bank_device> m_bankdev;
+	required_memory_bank m_dispram_bank;
 	required_region_ptr<u8> m_p_chargen;
+
+	std::unique_ptr<u8[]> m_dispram;
 };
+
+WRITE8_MEMBER(tv912_state::p2_w)
+{
+	m_bankdev->set_bank(data & 0x0f);
+}
 
 u32 tv912_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	return 0;
+}
+
+void tv912_state::machine_start()
+{
+	m_dispram = make_unique_clear<u8[]>(0x1000);
+	m_dispram_bank->configure_entries(0, 2, m_dispram.get(), 0x800);
+
+	save_pointer(NAME(m_dispram.get()), 0x1000);
+}
+
+void tv912_state::machine_reset()
+{
+	m_dispram_bank->set_entry(0);
 }
 
 static ADDRESS_MAP_START( prog_map, AS_PROGRAM, 8, tv912_state )
@@ -47,6 +77,13 @@ static ADDRESS_MAP_START( prog_map, AS_PROGRAM, 8, tv912_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( io_map, AS_IO, 8, tv912_state )
+	AM_RANGE(0x00, 0xff) AM_DEVICE("bankdev", address_map_bank_device, amap8)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( bank_map, 0, 8, tv912_state )
+	AM_RANGE(0x000, 0x0ff) AM_MIRROR(0x300) AM_RAM
+	//AM_RANGE(0x400, 0x403) AM_MIRROR(0x3c0) AM_SELECT(0x030) AM_READWRITE(crtc_r, crtc_w)
+	AM_RANGE(0x800, 0xfff) AM_RAMBANK("dispram")
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( tv912b )
@@ -59,6 +96,13 @@ static MACHINE_CONFIG_START( tv912 )
 	MCFG_CPU_ADD("maincpu", I8035, XTAL_23_814MHz / 4)
 	MCFG_CPU_PROGRAM_MAP(prog_map)
 	MCFG_CPU_IO_MAP(io_map)
+	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(tv912_state, p2_w))
+
+	MCFG_DEVICE_ADD("bankdev", ADDRESS_MAP_BANK, 0)
+	MCFG_DEVICE_PROGRAM_MAP(bank_map)
+	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
+	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(12)
+	MCFG_ADDRESS_MAP_BANK_STRIDE(0x100)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(XTAL_23_814MHz, 105 * CHAR_WIDTH, 0, 80 * CHAR_WIDTH, 270, 0, 240)
