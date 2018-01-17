@@ -1160,7 +1160,8 @@ WRITE8_MEMBER(radica6502_sound_device::radicasi_sound_trigger_w)
 READ8_MEMBER(radica6502_sound_device::radicasi_sound_unk_r)
 {
 	logerror("%s: radicasi_sound_unk_r\n", machine().describe_context().c_str());
-	return m_sound_unk;
+	// don't think this reads back what was written probably a status of something instead?
+	return 0x00; //m_sound_unk;
 }
 
 WRITE8_MEMBER(radica6502_sound_device::radicasi_sound_unk_w)
