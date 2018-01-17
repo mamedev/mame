@@ -33,10 +33,6 @@ DECLARE_DEVICE_TYPE(MYB3K_KEYBOARD, myb3k_keyboard_device)
 DECLARE_DEVICE_TYPE(JB3000_KEYBOARD, jb3000_keyboard_device)
 DECLARE_DEVICE_TYPE(STEPONE_KEYBOARD, stepone_keyboard_device)
 
-INPUT_PORTS_EXTERN( myb3k_keyboard );
-INPUT_PORTS_EXTERN( jb3000_keyboard );
-INPUT_PORTS_EXTERN( stepone_keyboard );
-
 class myb3k_keyboard_device : public device_t
 {
 public:
@@ -59,8 +55,6 @@ public:
 		downcast<myb3k_keyboard_device &>(device).m_keyboard_cb = std::forward<Object>(cb);
 	}
 
-	virtual ioport_constructor device_input_ports() const override;
-
 protected:
 	myb3k_keyboard_device(
 			const machine_config &mconfig,
@@ -68,6 +62,7 @@ protected:
 			char const *tag,
 			device_t *owner,
 			u32 clock);
+	virtual ioport_constructor device_input_ports() const override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual void send_byte(u8 code);
@@ -94,7 +89,7 @@ public:
 		 char const *tag,
 		 device_t *owner,
 		 u32 clock);
-
+private:
 	virtual ioport_constructor device_input_ports() const override;
 };
 
@@ -106,7 +101,7 @@ public:
 		 char const *tag,
 		 device_t *owner,
 		 u32 clock);
-
+private:
 	virtual ioport_constructor device_input_ports() const override;
 };
 

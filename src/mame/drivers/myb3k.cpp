@@ -102,6 +102,11 @@ public:
 		, m_vram(*this, "vram")
 		, m_isabus(*this, "isa")
 		, m_centronics(*this, "centronics")
+		, m_io_dsw1(*this, "DSW1")
+		, m_io_monitor(*this, "MONITOR")
+		, m_io_j4(*this, "J4")
+		, m_io_j5(*this, "J5")
+		, m_screen(*this, "screen")
 	{ }
 public:
 	/* Interrupt controller */
@@ -177,7 +182,8 @@ private:
 	};
 
 	/* Paralell port */
-	enum {
+	enum
+	{
 		PC0_STROBE  = 0x01, // Printer interface
 		PC1_SETPAGE = 0x02, // Graphics circuit
 		PC2_DISPST  = 0x04, // Graphics circuit
@@ -219,6 +225,13 @@ private:
 	required_shared_ptr<uint8_t> m_vram;
 	required_device<isa8_device> m_isabus;
 	optional_device<centronics_device> m_centronics;
+
+	required_ioport m_io_dsw1;
+	required_ioport m_io_monitor;
+	required_ioport m_io_j4;
+	required_ioport m_io_j5;
+	required_device<screen_device> m_screen;
+
 	int m_dma_channel;
 	bool m_cur_tc;
 	uint8_t m_kbd_data; // Data inside the 74LS164 serial to parallel converter.
@@ -295,7 +308,7 @@ MC6845_UPDATE_ROW( myb3k_state::crtc_update_row )
 			{
 			case 0:
 				// Color connector doing 320x200, 40x25 characters, 8 grey tones
-				if ((ioport("MONITOR")->read() & 1) == 0)
+				if ((m_io_monitor->read() & 1) == 0)
 				{
 					uint32_t rowstart = (((x_pos + ma) * 32 + ra) & 0x7fff) + page;
 					uint32_t pdat  = ((m_vram[rowstart +  0]  & 0xff) << 16); // Green 8 bits
@@ -340,7 +353,7 @@ MC6845_UPDATE_ROW( myb3k_state::crtc_update_row )
 				{
 					uint32_t pdat;
 					// Crude fix of 36CH mode
-					if ((ioport("DSW1")->read() & 0x0c) == 0 && ra > 7)
+					if ((m_io_dsw1->read() & 0x0c) == 0 && ra > 7)
 					{
 						// text mode only, 36x25 char, 8 color, discarding raster rows with what appears to be garbish
 						// needs to be implemented LLE to verify the function of that data, possibly related to Kanji support
@@ -451,18 +464,18 @@ WRITE8_MEMBER( myb3k_state::myb3k_video_mode_w )
 	switch (data & 7)
 	{
 	case 0:
-		if ((ioport("MONITOR")->read() & 1) == 0)
+		if ((m_io_monitor->read() & 1) == 0)
 		{
 			LOGVMOD(" - Color display 320x200 on 40x25 8 grey tones\n");
 			rectangle rect(0, 320 - 1, 0, 200 - 1);
-			machine().first_screen()->configure(320, 200, rect, HZ_TO_ATTOSECONDS(50));
+			m_screen->configure(320, 200, rect, HZ_TO_ATTOSECONDS(50));
 			break;
 		}
 		else // Monochrome connector selected?
 		{
 			LOGVMOD(" - Monochrome 640x200 on 80x25  \n");
 			rectangle rect(0, 640 - 1, 0, 200 - 1);
-			machine().first_screen()->configure(640, 200, rect, HZ_TO_ATTOSECONDS(50));
+			m_screen->configure(640, 200, rect, HZ_TO_ATTOSECONDS(50));
 			break;
 		}
 
@@ -470,7 +483,7 @@ WRITE8_MEMBER( myb3k_state::myb3k_video_mode_w )
 		{
 			LOGVMOD(" - 320x200, 40 char, 8 color or 8 tones of green...\n");
 			rectangle rect(0, 320 - 1, 0, 200 - 1);
-			machine().first_screen()->configure(320, 200, rect, HZ_TO_ATTOSECONDS(50));
+			m_screen->configure(320, 200, rect, HZ_TO_ATTOSECONDS(50));
 		}
 		break;
 
@@ -478,7 +491,7 @@ WRITE8_MEMBER( myb3k_state::myb3k_video_mode_w )
 		{
 			LOGVMOD(" - 640x200, 80 char, white on black...\n");
 			rectangle rect(0, 640 - 1, 0, 200 - 1);
-			machine().first_screen()->configure(640, 200, rect, HZ_TO_ATTOSECONDS(50));
+			m_screen->configure(640, 200, rect, HZ_TO_ATTOSECONDS(50));
 		}
 		break;
 
@@ -494,7 +507,7 @@ WRITE8_MEMBER( myb3k_state::myb3k_video_mode_w )
 		{
 			LOGVMOD("320x400, 40 char, white on black\n");
 			rectangle rect(0, 320 - 1, 0, 400 - 1);
-			machine().first_screen()->configure(320, 400, rect, HZ_TO_ATTOSECONDS(50));
+			m_screen->configure(320, 400, rect, HZ_TO_ATTOSECONDS(50));
 		}
 		break;
 
@@ -502,7 +515,7 @@ WRITE8_MEMBER( myb3k_state::myb3k_video_mode_w )
 		{
 			LOGVMOD("640x400, 80 char, white on black\n");
 			rectangle rect(0, 640 - 1, 0, 400 - 1);
-			machine().first_screen()->configure(640, 400, rect, HZ_TO_ATTOSECONDS(50));
+			m_screen->configure(640, 400, rect, HZ_TO_ATTOSECONDS(50));
 		}
 		break;
 
@@ -668,14 +681,14 @@ INPUT_PORTS_END
 
 INPUT_CHANGED_MEMBER(myb3k_state::monitor_changed)
 {
-	if ((ioport("MONITOR")->read() & 1) == 1)
+	if ((m_io_monitor->read() & 1) == 1)
 	{
 		m_pal = &m_mpal;
 		if ((m_vmode & 7) == 0)
 		{
 			LOGVMOD(" - Monochrome 640x200 on 80x25  \n");
 			rectangle rect(0, 640 - 1, 0, 200 - 1);
-			machine().first_screen()->configure(640, 200, rect, HZ_TO_ATTOSECONDS(50));
+			m_screen->configure(640, 200, rect, HZ_TO_ATTOSECONDS(50));
 		}
 	}
 	else
@@ -686,7 +699,7 @@ INPUT_CHANGED_MEMBER(myb3k_state::monitor_changed)
 			m_pal = &m_mpal;
 			LOGVMOD(" - Color display 320x200 on 40x25 8 grey tones\n");
 			rectangle rect(0, 320 - 1, 0, 200 - 1);
-			machine().first_screen()->configure(320, 200, rect, HZ_TO_ATTOSECONDS(50));
+			m_screen->configure(320, 200, rect, HZ_TO_ATTOSECONDS(50));
 		}
 	}
 }
@@ -799,7 +812,7 @@ WRITE_LINE_MEMBER(myb3k_state::pic_int_w)
 void myb3k_state::pic_ir5_w(int source, int state)
 {
 	LOGPIC("%s: %d\n", FUNCNAME, state);
-	if (!machine().paused() && (source & ioport("J4")->read()))
+	if (!machine().paused() && (source & m_io_j4->read()))
 		m_pic8259->ir5_w(state);
 }
 
@@ -807,7 +820,7 @@ void myb3k_state::pic_ir5_w(int source, int state)
 void myb3k_state::pic_ir7_w(int source, int state)
 {
 	LOGPIC("%s: %d\n", FUNCNAME, state);
-	if (!machine().paused() && (source & ioport("J5")->read()))
+	if (!machine().paused() && (source & m_io_j5->read()))
 		m_pic8259->ir7_w(state);
 }
 
@@ -859,7 +872,7 @@ READ8_MEMBER( myb3k_state::ppi_portb_r )
 {
 	LOGPPI("%s\n", FUNCNAME);
 
-	return ioport("DSW1")->read();
+	return m_io_dsw1->read();
 }
 
 WRITE8_MEMBER( myb3k_state::ppi_portc_w )
