@@ -49,6 +49,9 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( io_map, AS_IO, 8, tv912_state )
 ADDRESS_MAP_END
 
+static INPUT_PORTS_START( tv912b )
+INPUT_PORTS_END
+
 static INPUT_PORTS_START( tv912c )
 INPUT_PORTS_END
 
@@ -73,10 +76,19 @@ Other: 1x 8-sw DIP, 1x 10-sw DIP (internal), 2x 10-sw DIP (available to user at 
 
 ROM_START( tv912c )
 	ROM_REGION(0x1000, "maincpu", 0)
-	ROM_LOAD( "a49c1.bin",    0x0000, 0x1000, CRC(d21851bf) SHA1(28fe77a218a5eee11de376f5d16e9380b616b3ca) BAD_DUMP ) // last half is all FF
+	ROM_LOAD( "a49c1.bin",    0x0000, 0x1000, CRC(40068371) SHA1(44c32f8c3980acebe28fa48f98479910af2eb4ae) ) // MM52132
 
 	ROM_REGION(0x0800, "chargen", 0)
-	ROM_LOAD( "a3-2.bin",     0x0000, 0x0800, CRC(bb9a7fbd) SHA1(5f1c4d41b25bd3ca4dbc336873362935daf283da) )
+	ROM_LOAD( "a3-2.bin",     0x0000, 0x0800, CRC(bb9a7fbd) SHA1(5f1c4d41b25bd3ca4dbc336873362935daf283da) ) // EA8316
 ROM_END
 
-COMP( 1978, tv912c, 0, 0, tv912, tv912c, tv912_state, 0, "TeleVideo Systems", "TVI-912C", MACHINE_IS_SKELETON )
+ROM_START( tv912b )
+	ROM_REGION(0x1000, "maincpu", 0)
+	ROM_LOAD( "televideo912b_rom_a49.bin", 0x0000, 0x1000, CRC(2c95e995) SHA1(77cda383d68b0bbbb783026d8fde679f10f9eded) ) // MM52132
+
+	ROM_REGION(0x0800, "chargen", 0)
+	ROM_LOAD( "televideo912b_rom_a3.bin", 0x0000, 0x0800, CRC(bb9a7fbd) SHA1(5f1c4d41b25bd3ca4dbc336873362935daf283da) ) // 2316E
+ROM_END
+
+COMP( 1978, tv912c, 0,      0, tv912, tv912c, tv912_state, 0, "TeleVideo Systems", "TVI-912C", MACHINE_IS_SKELETON )
+COMP( 1978, tv912b, tv912c, 0, tv912, tv912b, tv912_state, 0, "TeleVideo Systems", "TVI-912B", MACHINE_IS_SKELETON )
