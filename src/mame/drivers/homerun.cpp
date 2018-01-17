@@ -244,6 +244,7 @@ static INPUT_PORTS_START( ganjaja )
 	PORT_BIT( 0xcf, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
 	PORT_START("DSW")
+	// starts game with coin in if 1c_1c?
 	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Coin_B ) )       PORT_DIPLOCATION("DIPSW:1")
 	PORT_DIPSETTING(    0x00, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( 1C_1C ) )
@@ -362,9 +363,10 @@ static MACHINE_CONFIG_START( dynashot )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_SIZE(256, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 30*8-1)
+//	MCFG_SCREEN_REFRESH_RATE(60)
+//	MCFG_SCREEN_SIZE(256, 256)
+//	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 30*8-1)
+	MCFG_SCREEN_RAW_PARAMS(XTAL_20MHz/4,328,0,256,253,0,240)
 	MCFG_SCREEN_UPDATE_DRIVER(homerun_state, screen_update_homerun)
 	MCFG_SCREEN_PALETTE("palette")
 
@@ -422,6 +424,20 @@ ROM_START( homerun )
 	ROM_LOAD( "d7756c.ic98",    0x00000, 0x08000, NO_DUMP ) /* D7756C built-in rom - very likely the same rom as [Moero!! Pro Yakyuu (Black/Red)] on Famicom, and [Moero!! Nettou Yakyuu '88] on MSX2 */
 ROM_END
 
+ROM_START( nhomerun )
+	ROM_REGION( 0x30000, "maincpu", 0 )
+	ROM_LOAD( "1.ic43",   0x00000, 0x04000, CRC(aed96d6d) SHA1(5cb3932f4cfa3f6c0134ac20a1747c562db31a65) )
+	ROM_CONTINUE(         0x10000, 0x1c000)
+
+	ROM_REGION( 0x10000, "gfx1", 0 )
+	ROM_LOAD( "3.ic60",   0x00000, 0x10000, CRC(69a720d1) SHA1(0f0a4877578f358e9e829ece8c31e23f01adcf83) )
+
+	ROM_REGION( 0x20000, "gfx2", 0 )
+	ROM_LOAD( "2.ic120",  0x00000, 0x20000, CRC(57e9b757) SHA1(8190d690721005407a5b06d13d64e70301d1e925) )
+
+	ROM_REGION( 0x08000, "d7756", ROMREGION_ERASE00 )
+	ROM_LOAD( "d7756c.ic98",    0x00000, 0x08000, NO_DUMP )
+ROM_END
 
 ROM_START( dynashot )
 	ROM_REGION( 0x30000, "maincpu", 0 )
@@ -452,6 +468,7 @@ ROM_START( ganjaja )
 ROM_END
 
 
-GAME( 1988, homerun,  0, homerun,  homerun,  homerun_state, 0, ROT0, "Jaleco", "Moero!! Pro Yakyuu Homerun Kyousou", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1988, nhomerun, 0, homerun, homerun,  homerun_state, 0,  ROT0, "Jaleco", "NEW Moero!! Pro Yakyuu Homerun Kyousou", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // same as below but harder?
+GAME( 1988, homerun,  nhomerun, homerun,  homerun,  homerun_state, 0, ROT0, "Jaleco", "Moero!! Pro Yakyuu Homerun Kyousou", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1988, dynashot, 0, dynashot, dynashot, homerun_state, 0, ROT0, "Jaleco", "Dynamic Shoot Kyousou", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 GAME( 1990, ganjaja,  0, ganjaja,  ganjaja,  homerun_state, 0, ROT0, "Jaleco", "Ganbare Jajamaru Saisho wa Goo / Ganbare Jajamaru Hop Step & Jump", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )

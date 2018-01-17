@@ -28,6 +28,9 @@ paradise: I'm not sure it's working correctly:
 
 - The high scores table can't be entered !?
 
+
+Known to exist but not dumped is Target Ball '96
+
 penky: we need to delay the irqs at startup or it won't boot. Either one of
        ports 0x2003.r or 0x2005.w starts up the irq timer (confirmed via trojan)
 

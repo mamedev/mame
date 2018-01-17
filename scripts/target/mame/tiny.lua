@@ -21,6 +21,7 @@ CPUS["M6502"] = true
 CPUS["MCS48"] = true
 CPUS["MCS51"] = true
 CPUS["M6800"] = true
+CPUS["M6805"] = true
 CPUS["M6809"] = true
 CPUS["M680X0"] = true
 CPUS["TMS9900"] = true

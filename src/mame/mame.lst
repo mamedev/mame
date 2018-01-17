@@ -1219,6 +1219,7 @@ cpc6128                         // Amstrad (Schneider in Germany) 1985
 cpc6128f                        // Amstrad (Schneider in Germany) 1985 (AZERTY)
 cpc6128p                        // Amstrad CPC6128 Plus - 1990
 cpc6128s                        // Amstrad (Schneider in Germany) 1985
+cpc6128sp                       // Amstrad (Schneider in Germany) 1985
 cpc664                          // Amstrad (Schneider in Germany) 1985
 gx4000                          // Amstrad GX4000 - 1990
 kccomp                          // VEB KC compact
@@ -12990,6 +12991,7 @@ biomtoy                         // (c) 1995 - Ref 922804/2 - (unprotected)
 biomtoya                        // (c) 1995 - Ref 922804/2 - (unprotected)
 biomtoyb                        // (c) 1995 - Ref 922804/2 - (unprotected)
 maniacsp                        // (c) 1996 - Ref 922804/2 - (prototype)
+lastkm                          // (c) 1995 - Ref 922804/2
 squash                          // (c) 1992 - Ref 922804/2
 thoop                           // (c) 1992 - Ref 922804/1
 
@@ -13659,6 +13661,7 @@ vindctr2r2                      // 136059           (c) 1988
 
 @source:gb.cpp
 gameboy                         // Nintendo Game Boy Handheld
+gamefgtr                        // bootleg
 gbcolor                         // Nintendo Game Boy Color Handheld
 gbpocket                        // Nintendo Game Boy Pocket Handheld
 megaduck                        // Megaduck
@@ -14724,6 +14727,7 @@ hccbaskb                        // Tiger Electronics
 leboom                          // Lakeside
 maniac                          // Ideal
 melodym                         // GAF
+matchme                         // Kingsford
 pabball                         // Caprice
 rockpin                         // Tiger Electronics
 tbaskb                          // Tandy Radio Shack
@@ -14743,6 +14747,7 @@ gnw_mario                       // Nintendo
 gnw_mariocm                     // Nintendo
 gnw_mmouse                      // Nintendo
 gnw_mickdon                     // Nintendo
+gnw_smb                         // Nintendo
 kbilly                          // Konami
 kblades                         // Konami
 kbucky                          // Konami
@@ -14779,6 +14784,7 @@ tsfight2                        // Tiger
 tshadow                         // Tiger
 tsharr2                         // Tiger
 tsjam                           // Tiger
+tskelwarr                       // Tiger
 tsonic                          // Tiger
 tswampt                         // Tiger
 tvindictr                       // Tiger
@@ -14991,6 +14997,7 @@ homelab4                        //
 dynashot                        // (c) 1988 Jaleco
 ganjaja                         // (c) 1990 Jaleco
 homerun                         // (c) 1988 Jaleco
+nhomerun                        // (c) 1988 Jaleco
 
 @source:homez80.cpp
 homez80                         //
@@ -29768,6 +29775,7 @@ gprnrs1
 gprnrs16
 vgpocket
 vgpmini
+sy889
 
 @source:newbrain.cpp
 newbrain                        //
@@ -32378,6 +32386,12 @@ quizpun2                        // (c) 1989 Space Computer System of Korea
 @source:quizshow.cpp
 quizshow                        // 005464           1976/04 [2650]
 
+@source:qvt103.cpp
+qvt103                          // (c) 1983 Qume Corp.
+
+@source:qvt201.cpp
+qvt201                          // (c) 1986 Qume Corp.
+
 @source:qvt6800.cpp
 qvt102                          //
 qvt190                          //
@@ -32400,6 +32414,10 @@ r9751                           // ROLM 9751 phone system
 
 @source:rabbit.cpp
 rabbit                          // (c) 1997 Electronic Arts
+
+@source:radicasi.cpp
+rad_sinv
+rad_tetr
 
 @source:radio86.cpp
 impuls03                        //
@@ -33242,6 +33260,9 @@ sapizps2                        //
 sapizps3                        //
 sapizps3a                       //
 sapizps3b                       //
+
+@source:sartorius.cpp
+sart3733                        //
 
 @source:saturn.cpp
 hisaturn                        // Hitachi HiSaturn
@@ -34855,6 +34876,7 @@ crystalca                       // 1998 JCD srl
 4in1boot                        // (c) 2002 KISoft (includes hacks of Semicom games + Snowbros)
 ballboy                         // bootleg
 cookbib2                        // (c) 1996 SemiCom
+cookbib2a
 cookbib3                        // (c) 1997 SemiCom
 finalttr                        // (c) 1993 Jeil Computer System
 honeydol                        // (c) 1995 Barko Corp
@@ -35339,6 +35361,9 @@ twinbratb                       // (c) 1995
 
 @source:stratos.cpp
 stratos                         // Kasparov Stratos Chess Computer
+
+@source:strkzn.cpp
+strkzn                          // (c) 1994 Purple Star
 
 @source:strnskil.cpp
 banbam                          // TVG16 (c) 1984 Sun Electronics
@@ -36486,8 +36511,6 @@ t4490                           // Terco 4490 Mill CNC Control (c) 1986
 @source:terminals.cpp
 aaa
 qvt70
-qvt103
-qvt201
 tv955
 tv965
 
@@ -39218,4 +39241,3 @@ vgmplay
 @source:ldplayer.cpp
 simldv1000                      // Pioneer LD-V1000
 simpr8210                       // Pioneer PR-8210
-

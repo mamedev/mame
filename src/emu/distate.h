@@ -131,7 +131,7 @@ class device_state_register : public device_state_entry
 public:
 	// construction/destruction
 	device_state_register(int index, const char *symbol, ItemType &data, device_state_interface *dev)
-		: device_state_entry(index, symbol, sizeof(ItemType), std::numeric_limits<ItemType>::max(), 0, dev),
+		: device_state_entry(index, symbol, sizeof(ItemType), std::numeric_limits<typename std::make_unsigned<ItemType>::type>::max(), 0, dev),
 			m_data(data)
 	{
 		static_assert(std::is_integral<ItemType>().value, "Registration of non-integer types is not currently supported");
@@ -145,6 +145,28 @@ protected:
 
 private:
 	ItemType &              m_data;                 // reference to where the data lives
+};
+
+// class template representing a boolean state register
+template<>
+class device_state_register<bool> : public device_state_entry
+{
+public:
+	// construction/destruction
+	device_state_register(int index, const char *symbol, bool &data, device_state_interface *dev)
+		: device_state_entry(index, symbol, sizeof(bool), 1, 0, dev),
+			m_data(data)
+	{
+	}
+
+protected:
+	// device_state_entry overrides
+	virtual void *entry_baseptr() const override { return &m_data; }
+	virtual u64 entry_value() const override { return m_data; }
+	virtual void entry_set_value(u64 value) const override { m_data = bool(value); }
+
+private:
+	bool &                  m_data;                 // reference to where the data lives
 };
 
 // class template representing a floating-point state register

@@ -6,6 +6,12 @@
 
 #pragma once
 
+#define MCFG_APEXC_TAPE_READ_CB(_devcb) \
+	devcb = &apexc_cpu_device::set_tape_read_cb(*device, DEVCB_##_devcb);
+
+#define MCFG_APEXC_TAPE_PUNCH_CB(_devcb) \
+	devcb = &apexc_cpu_device::set_tape_punch_cb(*device, DEVCB_##_devcb);
+
 enum
 {
 	APEXC_CR =1,    /* control register */
@@ -21,6 +27,18 @@ class apexc_cpu_device : public cpu_device
 public:
 	// construction/destruction
 	apexc_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	// static configuration
+	template<class Object>
+	static devcb_base &set_tape_read_cb(device_t &device, Object &&object)
+	{
+		return downcast<apexc_cpu_device &>(device).m_tape_read_cb.set_callback(std::forward<Object>(object));
+	}
+	template<class Object>
+	static devcb_base &set_tape_punch_cb(device_t &device, Object &&object)
+	{
+		return downcast<apexc_cpu_device &>(device).m_tape_punch_cb.set_callback(std::forward<Object>(object));
+	}
 
 protected:
 	// device-level overrides
@@ -56,7 +74,9 @@ protected:
 	void execute();
 
 	address_space_config m_program_config;
-	address_space_config m_io_config;
+
+	devcb_read8 m_tape_read_cb;
+	devcb_write8 m_tape_punch_cb;
 
 	uint32_t m_a;   /* accumulator */
 	uint32_t m_r;   /* register */
@@ -70,7 +90,6 @@ protected:
 	uint32_t m_pc;  /* address of next instruction for the disassembler */
 
 	address_space *m_program;
-	address_space *m_io;
 	int m_icount;
 
 	// For state

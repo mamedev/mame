@@ -40,7 +40,7 @@
 
 # DEBUG = 1
 # PROFILER = 1
-# SANITIZE = 1
+# SANITIZE = 
 
 # PTR64 = 1
 # BIGENDIAN = 1
@@ -780,6 +780,10 @@ endif
 
 ifdef WEBASSEMBLY
 PARAMS += --WEBASSEMBLY='$(WEBASSEMBLY)'
+endif
+
+ifdef SANITIZE
+PARAMS += --SANITIZE='$(SANITIZE)'
 endif
 #-------------------------------------------------
 # All scripts

@@ -852,11 +852,6 @@ static ADDRESS_MAP_START(apexc_mem_map, AS_PROGRAM, 32, apexc_state )
 #endif
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(apexc_io_map, AS_IO, 8, apexc_state )
-	AM_RANGE(0x00, 0x00) AM_READ(tape_read)
-	AM_RANGE(0x00, 0x00) AM_WRITE(tape_write)
-ADDRESS_MAP_END
-
 
 static MACHINE_CONFIG_START( apexc )
 
@@ -864,7 +859,8 @@ static MACHINE_CONFIG_START( apexc )
 	/* APEXC CPU @ 2.0 kHz (memory word clock frequency) */
 	MCFG_CPU_ADD("maincpu", APEXC, 2000)
 	MCFG_CPU_PROGRAM_MAP(apexc_mem_map)
-	MCFG_CPU_IO_MAP(apexc_io_map)
+	MCFG_APEXC_TAPE_READ_CB(READ8(apexc_state, tape_read))
+	MCFG_APEXC_TAPE_PUNCH_CB(WRITE8(apexc_state, tape_write))
 	/* dummy interrupt: handles the control panel */
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", apexc_state,  apexc_interrupt)
 

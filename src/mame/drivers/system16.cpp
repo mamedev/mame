@@ -930,6 +930,8 @@ static ADDRESS_MAP_START( beautyb_map, AS_PROGRAM, 16, segas1x_bootleg_state )
 	AM_RANGE(0x0280D6, 0x0280D7) AM_READ(beautyb_unkx_r)
 	AM_RANGE(0x0280D8, 0x0280D9) AM_READ(beautyb_unkx_r)
 
+	AM_RANGE(0x3f0000, 0x3fffff) AM_WRITE(sys16_tilebank_w)
+
 	AM_RANGE(0x400000, 0x40ffff) AM_RAM_WRITE(sys16_tileram_w) AM_SHARE("tileram")
 	AM_RANGE(0x410000, 0x413fff) AM_RAM_WRITE(sys16_textram_w) AM_SHARE("textram")
 
@@ -940,7 +942,6 @@ static ADDRESS_MAP_START( beautyb_map, AS_PROGRAM, 16, segas1x_bootleg_state )
 	AM_RANGE(0x418020, 0x418021) AM_WRITE(s16bl_bgpage_w)
 	AM_RANGE(0x418028, 0x418029) AM_WRITE(s16bl_fgpage_w)
 
-	AM_RANGE(0x440000, 0x440fff) AM_RAM AM_SHARE("sprites")
 	AM_RANGE(0x840000, 0x840fff) AM_RAM_WRITE(paletteram_w) AM_SHARE("paletteram")
 
 	AM_RANGE(0xc41000, 0xc41001) AM_READ_PORT("SERVICE")
@@ -949,7 +950,7 @@ static ADDRESS_MAP_START( beautyb_map, AS_PROGRAM, 16, segas1x_bootleg_state )
 	AM_RANGE(0xc42006, 0xc42007) AM_WRITE(sound_command_irq_w)
 
 	AM_RANGE(0xc40000, 0xc40001) AM_WRITENOP
-	AM_RANGE(0xc80000, 0xc80001) AM_WRITENOP // vblank irq ack
+	AM_RANGE(0xc80000, 0xc80001) AM_NOP // vblank irq ack
 
 	AM_RANGE(0xffc000, 0xffffff) AM_RAM // work ram
 ADDRESS_MAP_END
@@ -2388,8 +2389,7 @@ static MACHINE_CONFIG_DERIVED( beautyb, system16_base )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(beautyb_map)
 
-	MCFG_BOOTLEG_SYS16B_SPRITES_ADD("sprites")
-	MCFG_BOOTLEG_SYS16B_SPRITES_XORIGIN(189-112)
+	// no sprites
 
 	MCFG_FRAGMENT_ADD(z80_ym2151)
 MACHINE_CONFIG_END
@@ -3312,11 +3312,11 @@ ROM_START( beautyb )
 	ROM_LOAD( "b53.bin", 0x10000, 0x10000, CRC(aca8e330) SHA1(912e636e3c1e238682ea29620e8e2c6089c77209) )
 	ROM_LOAD( "b63.bin", 0x00000, 0x10000, CRC(f2af2fd5) SHA1(0a95ebb5eae7cdc6535533d73d06419c23d01ac3) )
 
-	ROM_REGION16_BE( 0x020000, "sprites", ROMREGION_ERASEFF ) /* sprites */
 	/* no sprites on this */
 
 	ROM_REGION( 0x40000, "soundcpu", 0 ) /* sound CPU */
 	ROM_LOAD( "1.bin", 0x0000, 0x8000, CRC(bd9ba01b) SHA1(fafa7dc36cc057a50ae4cdf7a35f3594292336f4) )
+	// ROM above 0x8000 would have 5205 ADPCM data, but this is unpopulated
 
 	ROM_REGION( 0x0020, "proms", 0 )
 	ROM_LOAD( "82s123.2",  0x0000, 0x0020, CRC(58bcf8bd) SHA1(e4d3d179b08c0f3424a6bec0f15058fb1b56f8d8) )
@@ -3339,7 +3339,6 @@ ROM_START( iqpipe )
 	ROM_LOAD( "iqpipe.5", 0x10000, 0x10000, CRC(dfaedd39) SHA1(498f1c34fecd8de497fdce41bb683d00047a868a) )
 	ROM_LOAD( "iqpipe.6", 0x00000, 0x10000, CRC(8e554f8d) SHA1(4b3b0e47c36f37947422f1c31063f11975108cd0) )
 
-	ROM_REGION16_BE( 0x020000, "sprites", ROMREGION_ERASEFF ) /* sprites */
 	/* no sprites on this */
 
 	ROM_REGION( 0x40000, "soundcpu", 0 ) /* sound CPU */

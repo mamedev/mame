@@ -160,7 +160,7 @@ offs_t lc8670_disassembler::disassemble(std::ostream &stream, offs_t pc, const d
 	offs_t pos = pc;
 	char arg1[16], arg2[16];
 
-	uint8_t op = opcodes.r8(pos);
+	uint8_t op = opcodes.r8(pos++);
 
 	int idx;
 	switch (op & 0x0f)

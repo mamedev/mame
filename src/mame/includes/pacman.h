@@ -26,7 +26,6 @@ public:
 		, m_rocktrv2_prot_data(*this, "rocktrv2_prot")
 		, m_gfxdecode(*this, "gfxdecode")
 		, m_palette(*this, "palette")
-		, m_patched_opcodes(*this, "patched_opcodes")
 	{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -43,7 +42,6 @@ private:
 	optional_shared_ptr<uint8_t> m_rocktrv2_prot_data;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
-	optional_shared_ptr<uint8_t> m_patched_opcodes;
 
 	uint8_t m_cannonb_bit_to_read;
 	int m_mystery;
@@ -77,10 +75,9 @@ public:
 	DECLARE_READ8_MEMBER(alibaba_mystery_1_r);
 	DECLARE_READ8_MEMBER(alibaba_mystery_2_r);
 	DECLARE_WRITE8_MEMBER(maketrax_protection_w);
+	DECLARE_READ8_MEMBER(mbrush_prot_r);
 	DECLARE_READ8_MEMBER(maketrax_special_port2_r);
 	DECLARE_READ8_MEMBER(maketrax_special_port3_r);
-	DECLARE_READ8_MEMBER(korosuke_special_port2_r);
-	DECLARE_READ8_MEMBER(korosuke_special_port3_r);
 	DECLARE_READ8_MEMBER(mschamp_kludge_r);
 	DECLARE_WRITE8_MEMBER(bigbucks_bank_w);
 	DECLARE_READ8_MEMBER(bigbucks_question_r);
@@ -133,7 +130,6 @@ public:
 	DECLARE_DRIVER_INIT(woodpek);
 	DECLARE_DRIVER_INIT(cannonbp);
 	DECLARE_DRIVER_INIT(jumpshot);
-	DECLARE_DRIVER_INIT(korosuke);
 	DECLARE_DRIVER_INIT(mspacii);
 	DECLARE_DRIVER_INIT(pacplus);
 	DECLARE_DRIVER_INIT(rocktrv2);
@@ -142,6 +138,7 @@ public:
 	DECLARE_DRIVER_INIT(porky);
 	DECLARE_DRIVER_INIT(mspacman);
 	DECLARE_DRIVER_INIT(mschamp);
+	DECLARE_DRIVER_INIT(mbrush);
 	TILEMAP_MAPPER_MEMBER(pacman_scan_rows);
 	TILE_GET_INFO_MEMBER(pacman_get_tile_info);
 	TILE_GET_INFO_MEMBER(s2650_get_tile_info);
@@ -165,7 +162,6 @@ public:
 private:
 	void init_save_state();
 	void jrpacman_mark_tile_dirty( int offset );
-	void korosuke_rom_decode();
 	void eyes_decode(uint8_t *data);
 	void mspacman_install_patches(uint8_t *ROM);
 

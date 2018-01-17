@@ -451,14 +451,14 @@ void xain_state::machine_start()
 static MACHINE_CONFIG_START( xsleena )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6809, CPU_CLOCK)
+	MCFG_CPU_ADD("maincpu", MC6809E, CPU_CLOCK) // 68B09E
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", xain_state, scanline, "screen", 0, 1)
 
-	MCFG_CPU_ADD("sub", M6809, CPU_CLOCK)
+	MCFG_CPU_ADD("sub", MC6809E, CPU_CLOCK) // 68B09E
 	MCFG_CPU_PROGRAM_MAP(cpu_map_B)
 
-	MCFG_CPU_ADD("audiocpu", M6809, CPU_CLOCK)
+	MCFG_CPU_ADD("audiocpu", MC6809, PIXEL_CLOCK) // 68A09
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 
 	MCFG_DEVICE_ADD("mcu", TAITO68705_MCU, MCU_CLOCK)

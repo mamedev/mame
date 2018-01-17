@@ -22,6 +22,9 @@
 #include "emu.h"
 #include "machine/er1400.h"
 
+#define VERBOSE 0
+#include "logmacro.h"
+
 // device type definition
 DEFINE_DEVICE_TYPE(ER1400, er1400_device, "er1400", "ER1400 Serial EAROM (100x14)")
 
@@ -123,7 +126,7 @@ void er1400_device::read_data()
 				if (BIT(m_address_register, units))
 				{
 					offs_t offset = 10 * (tens - 10) + units;
-					logerror("Reading data at %d (%04X) into register\n", offset, m_data_array[offset]);
+					LOG("Reading data at %d (%04X) into register\n", offset, m_data_array[offset]);
 					m_data_register |= m_data_array[offset];
 					selected++;
 				}
@@ -155,7 +158,7 @@ void er1400_device::write_data()
 					offs_t offset = 10 * (tens - 10) + units;
 					if ((m_data_array[offset] & ~m_data_register) != 0)
 					{
-						logerror("Writing data %04X at %d\n", m_data_register, offset);
+						LOG("Writing data %04X at %d\n", m_data_register, offset);
 						m_data_array[offset] &= m_data_register;
 					}
 					selected++;
@@ -188,7 +191,7 @@ void er1400_device::erase_data()
 					offs_t offset = 10 * (tens - 10) + units;
 					if (m_data_array[offset] != 0x3fff)
 					{
-						logerror("Erasing data at %d\n", offset);
+						LOG("Erasing data at %d\n", offset);
 						m_data_array[offset] = 0x3fff;
 					}
 					selected++;
@@ -278,7 +281,7 @@ WRITE_LINE_MEMBER(er1400_device::clock_w)
 		case 2: // erase
 			if (m_erase_time == attotime::never)
 			{
-				logerror("Entering erase command\n");
+				LOG("Entering erase command\n");
 				m_erase_time = machine().time() + attotime::from_msec(15);
 			}
 			break;
@@ -300,7 +303,7 @@ WRITE_LINE_MEMBER(er1400_device::clock_w)
 		case 6: // write
 			if (m_write_time == attotime::never)
 			{
-				logerror("Entering write command\n");
+				LOG("Entering write command\n");
 				m_write_time = machine().time() + attotime::from_msec(15);
 			}
 			break;

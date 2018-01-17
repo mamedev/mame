@@ -59,6 +59,7 @@ protected:
 	virtual void device_start() override;
 	virtual void device_stop() override;
 	virtual void device_reset() override;
+	virtual void device_clock_changed() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 private:
@@ -85,7 +86,6 @@ private:
 	optional_region_ptr<uint8_t> m_selfload;
 
 	/* live state */
-	uint32_t  m_clock;
 	uint8_t   m_reg[9];
 	uint8_t   m_start_datarow;
 	bool      m_reset;

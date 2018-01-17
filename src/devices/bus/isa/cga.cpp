@@ -1813,7 +1813,10 @@ READ8_MEMBER( isa8_cga_m24_device::io_read )
 MC6845_UPDATE_ROW(isa8_cga_m24_device::crtc_update_row)
 {
 	if(m_mode2 & 1)
+	{
 		m24_gfx_1bpp_m24_update_row(bitmap, cliprect, ma, ra, y, x_count, cursor_x, de, hbp, vbp);
+		return;
+	}
 
 	if (m_update_row_type == -1)
 		return;

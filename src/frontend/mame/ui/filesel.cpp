@@ -296,15 +296,15 @@ void menu_file_selector::populate(float &customtop, float &custombottom)
 	m_entrylist.clear();
 
 	// open the directory
-	util::zippath_directory *directory = nullptr;
-	osd_file::error const err = util::zippath_opendir(m_current_directory, &directory);
+	util::zippath_directory::ptr directory;
+	osd_file::error const err = util::zippath_directory::open(m_current_directory, directory);
 
 	// add the "[empty slot]" entry if available
 	if (m_has_empty)
 		append_entry(SELECTOR_ENTRY_TYPE_EMPTY, "", "");
 
 	// add the "[create]" entry
-	if (m_has_create && !util::zippath_is_zip(directory))
+	if (m_has_create && !directory->is_archive())
 		append_entry(SELECTOR_ENTRY_TYPE_CREATE, "", "");
 
 	// add and select the "[software list]" entry if available
@@ -326,7 +326,7 @@ void menu_file_selector::populate(float &customtop, float &custombottom)
 	}
 	else
 	{
-		for (osd::directory::entry const *dirent = util::zippath_readdir(directory); dirent; dirent = util::zippath_readdir(directory))
+		for (osd::directory::entry const *dirent = directory->readdir(); dirent; dirent = directory->readdir())
 		{
 			// append a dirent entry
 			file_selector_entry const *entry = append_dirent_entry(dirent);
@@ -342,8 +342,7 @@ void menu_file_selector::populate(float &customtop, float &custombottom)
 			}
 		}
 	}
-	if (directory)
-		util::zippath_closedir(directory);
+	directory.reset();
 
 	// sort the menu entries
 	const std::collate<wchar_t> &coll = std::use_facet<std::collate<wchar_t>>(std::locale());
@@ -410,7 +409,10 @@ void menu_file_selector::handle()
 			case SELECTOR_ENTRY_TYPE_DRIVE:
 			case SELECTOR_ENTRY_TYPE_DIRECTORY:
 				// drive/directory - first check the path
-				err = util::zippath_opendir(entry->fullpath, nullptr);
+				{
+					util::zippath_directory::ptr dir;
+					err = util::zippath_directory::open(entry->fullpath, dir);
+				}
 				if (err != osd_file::error::NONE)
 				{
 					// this path is problematic; present the user with an error and bail

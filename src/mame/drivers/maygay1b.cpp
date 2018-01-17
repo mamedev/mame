@@ -73,6 +73,7 @@
 ******************************************************************************************/
 #include "emu.h"
 #include "includes/maygay1b.h"
+#include "machine/74259.h"
 #include "speaker.h"
 
 #include "maygay1b.lh"
@@ -395,42 +396,45 @@ WRITE8_MEMBER(maygay1b_state::m1_meter_w)
 	}
 }
 
-WRITE8_MEMBER(maygay1b_state::m1_latch_w)
+WRITE_LINE_MEMBER(maygay1b_state::ramen_w)
 {
-	switch ( offset )
+	m_RAMEN = state;
+}
+
+WRITE_LINE_MEMBER(maygay1b_state::alarmen_w)
+{
+	m_ALARMEN = state;
+}
+
+WRITE_LINE_MEMBER(maygay1b_state::nmien_w)
+{
+	if (m_NMIENABLE == 0 && state)
 	{
-		case 0: // m_RAMEN
-		m_RAMEN = (data & 1);
-		break;
-		case 1: // AlarmEn
-		m_ALARMEN = (data & 1);
-		break;
-		case 2: // Enable
-		{
-			if ( m_NMIENABLE == 0 && ( data & 1 ))
-			{
-				m_NMIENABLE = (data & 1);
-				cpu0_nmi();
-			}
-			m_NMIENABLE = (data & 1);
-		}
-		break;
-		case 3: // RTS
-		{
-		}
-		break;
-		case 4: // PSURelay
-		m_PSUrelay = (data & 1);
-		break;
-		case 5: // WDog
-		m_WDOG = (data & 1);
-		break;
-		case 6: // Srsel
-		// this is the ROM banking?
-		printf("rom bank %02x\n",data);
-		m_bank1->set_entry(data & 1);
-		break;
+		m_NMIENABLE = state;
+		cpu0_nmi();
 	}
+	m_NMIENABLE = state;
+}
+
+WRITE_LINE_MEMBER(maygay1b_state::rts_w)
+{
+}
+
+WRITE_LINE_MEMBER(maygay1b_state::psurelay_w)
+{
+	m_PSUrelay = state;
+}
+
+WRITE_LINE_MEMBER(maygay1b_state::wdog_w)
+{
+	m_WDOG = state;
+}
+
+WRITE_LINE_MEMBER(maygay1b_state::srsel_w)
+{
+	// this is the ROM banking?
+	logerror("rom bank %02x\n", state);
+	m_bank1->set_entry(state);
 }
 
 WRITE8_MEMBER(maygay1b_state::latch_ch2_w)
@@ -500,7 +504,7 @@ static ADDRESS_MAP_START( m1_memmap, AS_PROGRAM, 8, maygay1b_state )
 	AM_RANGE(0x20A0, 0x20A3) AM_DEVWRITE("pia", pia6821_device, write)
 	AM_RANGE(0x20A0, 0x20A3) AM_DEVREAD("pia", pia6821_device, read)
 
-	AM_RANGE(0x20C0, 0x20C7) AM_WRITE(m1_latch_w)
+	AM_RANGE(0x20C0, 0x20C7) AM_DEVWRITE("mainlatch", hc259_device, write_d0)
 
 	AM_RANGE(0x2400, 0x2401) AM_DEVWRITE("ymsnd", ym2413_device, write)
 	AM_RANGE(0x2404, 0x2405) AM_READ(latch_st_lo)
@@ -585,7 +589,7 @@ static ADDRESS_MAP_START( m1_nec_memmap, AS_PROGRAM, 8, maygay1b_state )
 	AM_RANGE(0x20A0, 0x20A3) AM_DEVWRITE("pia", pia6821_device, write)
 	AM_RANGE(0x20A0, 0x20A3) AM_DEVREAD("pia", pia6821_device, read)
 
-	AM_RANGE(0x20C0, 0x20C7) AM_WRITE(m1_latch_w)
+	AM_RANGE(0x20C0, 0x20C7) AM_DEVWRITE("mainlatch", hc259_device, write_d0)
 
 	AM_RANGE(0x2400, 0x2401) AM_DEVWRITE("ymsnd", ym2413_device, write)
 	AM_RANGE(0x2404, 0x2405) AM_WRITE(nec_bank0_w)
@@ -783,6 +787,15 @@ MACHINE_CONFIG_START( maygay_m1 )
 	MCFG_DEVICE_ADD("pia", PIA6821, 0)
 	MCFG_PIA_WRITEPA_HANDLER(WRITE8(maygay1b_state, m1_pia_porta_w))
 	MCFG_PIA_WRITEPB_HANDLER(WRITE8(maygay1b_state, m1_pia_portb_w))
+
+	MCFG_DEVICE_ADD("mainlatch", HC259, 0) // U29
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(maygay1b_state, ramen_w))  // m_RAMEN
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(maygay1b_state, alarmen_w)) // AlarmEn
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(maygay1b_state, nmien_w)) // Enable
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(maygay1b_state, rts_w)) // RTS
+	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(maygay1b_state, psurelay_w)) // PSURelay
+	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(maygay1b_state, wdog_w)) // WDog
+	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(maygay1b_state, srsel_w)) // Srsel
 
 	MCFG_S16LF01_ADD("vfd",0)
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

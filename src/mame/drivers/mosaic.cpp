@@ -7,6 +7,32 @@
     Notes:
     - the ROM OK / RAM OK message in service mode is fake: ROM and RAM are not tested.
 
+
++--------------------------------------+
+|            1  2  3  4     5  6  7  8 |
+|       PAL                            |
+|   2018      6116            6116     |
+|J  2018      6116   PAL PAL  6116     |
+|A                                     |
+|M                                 PAL |
+|M                           12.288MHz |
+|A  14.31818MHz       PAL  6264  Z     |
+|       DSW                      1     |
+| VR                             8   10|
+|        YM2203C              9  0     |
++--------------------------------------+
+
+  CPU: Z180 (surface scratched)
+Sound: YM2203C
+  OSC: 14.31818MHz, 12.288MHz
+  DSW: 8 position DSW
+   VR: Volume adjust pot
+  RAM: SiS 6116-10 (x4)
+       MCM2018ANS45 (x2)
+       HY6264P-15
+
+Unknown 28 pin protection chip (possibly a PIC) at 5A (UC02 as silkscreened on PCB)
+
 ***************************************************************************/
 
 #include "emu.h"
@@ -249,7 +275,7 @@ void mosaic_state::machine_reset()
 static MACHINE_CONFIG_START( mosaic )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z180, 7000000)  /* ??? */
+	MCFG_CPU_ADD("maincpu", Z180, XTAL_12_288MHz/2)  /* 6.144MHz */
 	MCFG_CPU_PROGRAM_MAP(mosaic_map)
 	MCFG_CPU_IO_MAP(mosaic_io_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", mosaic_state,  irq0_line_hold)
@@ -272,7 +298,7 @@ static MACHINE_CONFIG_START( mosaic )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ymsnd", YM2203, 3000000)
+	MCFG_SOUND_ADD("ymsnd", YM2203, XTAL_12_288MHz/4) /* 3.072MHz or 3.579545MHz (14.31818MHz/4)? */
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
@@ -293,36 +319,36 @@ MACHINE_CONFIG_END
 
 ROM_START( mosaic )
 	ROM_REGION( 0x100000, "maincpu", 0 )    /* 1024k for Z180 address space */
-	ROM_LOAD( "mosaic.9", 0x00000, 0x10000, CRC(5794dd39) SHA1(28784371f4ca561e3c0fb74d1f0a204f58ccdd3a) )
+	ROM_LOAD( "9.ua02", 0x00000, 0x10000, CRC(5794dd39) SHA1(28784371f4ca561e3c0fb74d1f0a204f58ccdd3a) ) /* at PCB location 7F */
 
 	ROM_REGION( 0x40000, "gfx1", 0 )
-	ROM_LOAD( "mosaic.1", 0x00000, 0x10000, CRC(05f4cc70) SHA1(367cfa716b5d24663efcd98a4a80bf02ef28f2f8) )
-	ROM_LOAD( "mosaic.2", 0x10000, 0x10000, CRC(78907875) SHA1(073b90e0303f7812e7e8f66bb798a7734cb36bb9) )
-	ROM_LOAD( "mosaic.3", 0x20000, 0x10000, CRC(f81294cd) SHA1(9bce627bbe3940769776121fb4296f92ac4c7d1a) )
-	ROM_LOAD( "mosaic.4", 0x30000, 0x10000, CRC(fff72536) SHA1(4fc5d0a79128dd49275bc4c4cc2dd7c587096fd8) )
+	ROM_LOAD( "1.u505", 0x00000, 0x10000, CRC(05f4cc70) SHA1(367cfa716b5d24663efcd98a4a80bf02ef28f2f8) ) /* at PCB location 1L */
+	ROM_LOAD( "2.u506", 0x10000, 0x10000, CRC(78907875) SHA1(073b90e0303f7812e7e8f66bb798a7734cb36bb9) ) /* at PCB location 1K */
+	ROM_LOAD( "3.u507", 0x20000, 0x10000, CRC(f81294cd) SHA1(9bce627bbe3940769776121fb4296f92ac4c7d1a) ) /* at PCB location 1I */
+	ROM_LOAD( "4.u508", 0x30000, 0x10000, CRC(fff72536) SHA1(4fc5d0a79128dd49275bc4c4cc2dd7c587096fd8) ) /* at PCB location 1G */
 
 	ROM_REGION( 0x40000, "gfx2", 0 )
-	ROM_LOAD( "mosaic.5", 0x00000, 0x10000, CRC(28513fbf) SHA1(e69051206cc3df470e7b2358c51cbbed294795f5) )
-	ROM_LOAD( "mosaic.6", 0x10000, 0x10000, CRC(1b8854c4) SHA1(d49df2565d9ccda403fafb9e219d3603776e3d34) )
-	ROM_LOAD( "mosaic.7", 0x20000, 0x10000, CRC(35674ac2) SHA1(6422a81034b6d34aefc8ca5d2926d3d3c3d7ff77) )
-	ROM_LOAD( "mosaic.8", 0x30000, 0x10000, CRC(6299c376) SHA1(eb64b20268c06c97c4201c8004a759b6de42fab6) )
+	ROM_LOAD( "5.u305", 0x00000, 0x10000, CRC(28513fbf) SHA1(e69051206cc3df470e7b2358c51cbbed294795f5) ) /* at PCB location 1F */
+	ROM_LOAD( "6.u306", 0x10000, 0x10000, CRC(1b8854c4) SHA1(d49df2565d9ccda403fafb9e219d3603776e3d34) ) /* at PCB location 1D */
+	ROM_LOAD( "7.u307", 0x20000, 0x10000, CRC(35674ac2) SHA1(6422a81034b6d34aefc8ca5d2926d3d3c3d7ff77) ) /* at PCB location 1C */
+	ROM_LOAD( "8.u308", 0x30000, 0x10000, CRC(6299c376) SHA1(eb64b20268c06c97c4201c8004a759b6de42fab6) ) /* at PCB location 1A */
 ROM_END
 
 ROM_START( mosaica )
 	ROM_REGION( 0x100000, "maincpu", 0 )    /* 1024k for Z180 address space */
-	ROM_LOAD( "mosaic_9.a02", 0x00000, 0x10000, CRC(ecb4f8aa) SHA1(e45c074bac92d1d079cf1bcc0a6a081beb3dbb8e) )
+	ROM_LOAD( "mosaic_9.a02", 0x00000, 0x10000, CRC(ecb4f8aa) SHA1(e45c074bac92d1d079cf1bcc0a6a081beb3dbb8e) ) /* at PCB location 7F */
 
 	ROM_REGION( 0x40000, "gfx1", 0 )
-	ROM_LOAD( "mosaic.1", 0x00000, 0x10000, CRC(05f4cc70) SHA1(367cfa716b5d24663efcd98a4a80bf02ef28f2f8) )
-	ROM_LOAD( "mosaic.2", 0x10000, 0x10000, CRC(78907875) SHA1(073b90e0303f7812e7e8f66bb798a7734cb36bb9) )
-	ROM_LOAD( "mosaic.3", 0x20000, 0x10000, CRC(f81294cd) SHA1(9bce627bbe3940769776121fb4296f92ac4c7d1a) )
-	ROM_LOAD( "mosaic.4", 0x30000, 0x10000, CRC(fff72536) SHA1(4fc5d0a79128dd49275bc4c4cc2dd7c587096fd8) )
+	ROM_LOAD( "1.u505", 0x00000, 0x10000, CRC(05f4cc70) SHA1(367cfa716b5d24663efcd98a4a80bf02ef28f2f8) ) /* at PCB location 1L */
+	ROM_LOAD( "2.u506", 0x10000, 0x10000, CRC(78907875) SHA1(073b90e0303f7812e7e8f66bb798a7734cb36bb9) ) /* at PCB location 1K */
+	ROM_LOAD( "3.u507", 0x20000, 0x10000, CRC(f81294cd) SHA1(9bce627bbe3940769776121fb4296f92ac4c7d1a) ) /* at PCB location 1I */
+	ROM_LOAD( "4.u508", 0x30000, 0x10000, CRC(fff72536) SHA1(4fc5d0a79128dd49275bc4c4cc2dd7c587096fd8) ) /* at PCB location 1G */
 
 	ROM_REGION( 0x40000, "gfx2", 0 )
-	ROM_LOAD( "mosaic.5", 0x00000, 0x10000, CRC(28513fbf) SHA1(e69051206cc3df470e7b2358c51cbbed294795f5) )
-	ROM_LOAD( "mosaic.6", 0x10000, 0x10000, CRC(1b8854c4) SHA1(d49df2565d9ccda403fafb9e219d3603776e3d34) )
-	ROM_LOAD( "mosaic.7", 0x20000, 0x10000, CRC(35674ac2) SHA1(6422a81034b6d34aefc8ca5d2926d3d3c3d7ff77) )
-	ROM_LOAD( "mosaic.8", 0x30000, 0x10000, CRC(6299c376) SHA1(eb64b20268c06c97c4201c8004a759b6de42fab6) )
+	ROM_LOAD( "5.u305", 0x00000, 0x10000, CRC(28513fbf) SHA1(e69051206cc3df470e7b2358c51cbbed294795f5) ) /* at PCB location 1F */
+	ROM_LOAD( "6.u306", 0x10000, 0x10000, CRC(1b8854c4) SHA1(d49df2565d9ccda403fafb9e219d3603776e3d34) ) /* at PCB location 1D */
+	ROM_LOAD( "7.u307", 0x20000, 0x10000, CRC(35674ac2) SHA1(6422a81034b6d34aefc8ca5d2926d3d3c3d7ff77) ) /* at PCB location 1C */
+	ROM_LOAD( "8.u308", 0x30000, 0x10000, CRC(6299c376) SHA1(eb64b20268c06c97c4201c8004a759b6de42fab6) ) /* at PCB location 1A */
 ROM_END
 
 ROM_START( gfire2 )

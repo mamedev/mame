@@ -38,6 +38,7 @@ protected:
 
 	// sound stream update overrides
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 private:
 	enum class env_state_t32 : u8
@@ -82,7 +83,7 @@ private:
 
 	DECLARE_READ8_MEMBER(dsp_io_r);
 	DECLARE_WRITE8_MEMBER(dsp_io_w);
-	TIMER_CALLBACK_MEMBER(spc_timer);
+//	TIMER_CALLBACK_MEMBER(spc_timer);
 	void dsp_reset();
 	void dsp_update(short *sound_ptr);
 	int advance_envelope(int v);
@@ -110,14 +111,22 @@ private:
 	int                     m_echo_ptr;
 #endif
 
+	enum
+	{
+		TIMER_TICK_ID = 1
+	};
 	/* timers */
-	emu_timer               *m_timer[3];
-	uint8_t                   m_enabled[3];
+	emu_timer 				  *m_tick_timer;
+	bool                      m_timer_enabled[3];
 	uint16_t                  m_counter[3];
+	uint8_t					  m_subcounter[3];
+	inline void update_timer_tick(uint8_t which);
 
 	/* IO ports */
 	uint8_t                   m_port_in[4];         /* SPC input ports */
 	uint8_t                   m_port_out[4];        /* SPC output ports */
+	
+	uint16_t				  m_TnDIV[3]; /**< Timer N Divider */
 };
 
 DECLARE_DEVICE_TYPE(SNES, snes_sound_device)

@@ -2,7 +2,7 @@
 // copyright-holders:Kevin Thacker, Barry Rodewald
 /******************************************************************************
 
-    amstrad.c
+    amstrad.cpp
     system driver
 
         Amstrad Hardware:
@@ -507,6 +507,19 @@ static INPUT_PORTS_START( cpc6128s )
 
 	PORT_MODIFY("kbrow.4")
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_COMMA)      PORT_CHAR(',') PORT_CHAR(';')
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( cpc6128sp )
+	PORT_INCLUDE(cpc6128)
+
+	PORT_MODIFY("kbrow.2")
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("[")                     PORT_CODE(KEYCODE_CLOSEBRACE) PORT_CHAR('[') PORT_CHAR('*')
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("]")                     PORT_CODE(KEYCODE_BACKSLASH)  PORT_CHAR(']') PORT_CHAR('+')
+
+	PORT_MODIFY("kbrow.3")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_EQUALS)     PORT_CHAR('^') PORT_CHAR(0x20A7)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_QUOTE)      PORT_CHAR(';') PORT_CHAR(':')
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_COLON)      PORT_CHAR(0x00F1) PORT_CHAR(0x00D1)
 INPUT_PORTS_END
 
 /*
@@ -1218,6 +1231,17 @@ ROM_START( cpc6128s )
 	ROM_LOAD("cpcados.rom",  0x18000, 0x4000, CRC(1fe22ecd) SHA1(39102c8e9cb55fcc0b9b62098780ed4a3cb6a4bb))
 ROM_END
 
+ROM_START( cpc6128sp )
+	/* this defines the total memory size (128kb))- 64k ram, 16k OS, 16k BASIC, 16k DOS +16k*/
+	ROM_REGION(0x020000, "maincpu", 0)
+
+	/* load the os to offset 0x01000 from memory base */
+	ROM_LOAD("amstrad_40038.ic103", 0x10000, 0x8000, CRC(2fa2e7d6) SHA1(1acd01c2c03424a78b32c9440f4d890fb1104815))
+	ROM_LOAD("amstrad_40015.ic204",  0x18000, 0x4000, CRC(1fe22ecd) SHA1(39102c8e9cb55fcc0b9b62098780ed4a3cb6a4bb))
+
+	ROM_REGION(0x200, "pals", 0)
+	ROM_LOAD("mmi_hal16l8.ic118", 0x000, 0x104, NO_DUMP)
+ROM_END
 
 ROM_START( cpc464 )
 	/* this defines the total memory size - 64k ram, 16k OS, 16k BASIC, 16k DOS */
@@ -1287,13 +1311,14 @@ ROM_END
  *************************************/
 
 /*    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT     STATE          INIT  COMPANY                FULLNAME                                     FLAGS */
-COMP( 1984, cpc464,   0,        0,      cpc464,   cpc464,   amstrad_state, 0,    "Amstrad plc",         "Amstrad CPC464",                            0 )
-COMP( 1985, cpc664,   cpc464,   0,      cpc664,   cpc664,   amstrad_state, 0,    "Amstrad plc",         "Amstrad CPC664",                            0 )
-COMP( 1985, cpc6128,  cpc464,   0,      cpc6128,  cpc6128,  amstrad_state, 0,    "Amstrad plc",         "Amstrad CPC6128",                           0 )
-COMP( 1985, cpc6128f, cpc464,   0,      cpc6128,  cpc6128f, amstrad_state, 0,    "Amstrad plc",         "Amstrad CPC6128 (France, AZERTY Keyboard)", 0 )
-COMP( 1985, cpc6128s, cpc464,   0,      cpc6128,  cpc6128s, amstrad_state, 0,    "Amstrad plc",         "Amstrad CPC6128 (Sweden/Finland)",          0 )
-COMP( 1990, cpc464p,  0,        0,      cpcplus,  plus,     amstrad_state, 0,    "Amstrad plc",         "Amstrad CPC464+",                           0 )
-COMP( 1990, cpc6128p, 0,        0,      cpcplus,  plus,     amstrad_state, 0,    "Amstrad plc",         "Amstrad CPC6128+",                          0 )
-CONS( 1990, gx4000,   0,        0,      gx4000,   gx4000,   amstrad_state, 0,    "Amstrad plc",         "Amstrad GX4000",                            0 )
-COMP( 1989, kccomp,   cpc464,   0,      kccomp,   kccomp,   amstrad_state, 0,    "VEB Mikroelektronik", "KC Compact",                                0 )
-COMP( 1993, al520ex,  cpc464,   0,      aleste,   aleste,   amstrad_state, 0,    "Patisonic",           "Aleste 520EX",                              MACHINE_IMPERFECT_SOUND )
+COMP( 1984, cpc464,    0,        0,      cpc464,   cpc464,    amstrad_state, 0,    "Amstrad plc",         "Amstrad CPC464",                            0 )
+COMP( 1985, cpc664,    cpc464,   0,      cpc664,   cpc664,    amstrad_state, 0,    "Amstrad plc",         "Amstrad CPC664",                            0 )
+COMP( 1985, cpc6128,   cpc464,   0,      cpc6128,  cpc6128,   amstrad_state, 0,    "Amstrad plc",         "Amstrad CPC6128",                           0 )
+COMP( 1985, cpc6128f,  cpc464,   0,      cpc6128,  cpc6128f,  amstrad_state, 0,    "Amstrad plc",         "Amstrad CPC6128 (France, AZERTY Keyboard)", 0 )
+COMP( 1985, cpc6128s,  cpc464,   0,      cpc6128,  cpc6128s,  amstrad_state, 0,    "Amstrad plc",         "Amstrad CPC6128 (Sweden/Finland)",          0 )
+COMP( 1985, cpc6128sp, cpc464,   0,      cpc6128,  cpc6128sp, amstrad_state, 0,    "Amstrad plc",         "Amstrad CPC6128 (Spain)",                   0 )
+COMP( 1990, cpc464p,   0,        0,      cpcplus,  plus,      amstrad_state, 0,    "Amstrad plc",         "Amstrad CPC464+",                           0 )
+COMP( 1990, cpc6128p,  0,        0,      cpcplus,  plus,      amstrad_state, 0,    "Amstrad plc",         "Amstrad CPC6128+",                          0 )
+CONS( 1990, gx4000,    0,        0,      gx4000,   gx4000,    amstrad_state, 0,    "Amstrad plc",         "Amstrad GX4000",                            0 )
+COMP( 1989, kccomp,    cpc464,   0,      kccomp,   kccomp,    amstrad_state, 0,    "VEB Mikroelektronik", "KC Compact",                                0 )
+COMP( 1993, al520ex,   cpc464,   0,      aleste,   aleste,    amstrad_state, 0,    "Patisonic",           "Aleste 520EX",                              MACHINE_IMPERFECT_SOUND )

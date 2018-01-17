@@ -20,7 +20,13 @@
 
   VT16 - ?
   VT18 - ?
-
+	
+	Mystery handheld SoC, may or may not be VRT:
+		Uses SQI rather than parallel flash
+		Vaguely OneBus compatible but some registers different ($411C in particular)
+		Uses RGB format for palettes
+		Credit to NewRisingSun2 for much of the reverse engineering
+	
   (more)
 
   VT1682 - NOT compatible with NES, different video system, sound CPU (4x
@@ -91,6 +97,7 @@ public:
 
 	/* Misc PPU */
 	DECLARE_WRITE8_MEMBER(nes_vh_sprite_dma_w);
+	DECLARE_WRITE8_MEMBER(vt_hh_sprite_dma_w);
 	void ppu_nmi(int *ppu_regs);
 	uint32_t screen_update_vt(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_PALETTE_INIT(nesvt);
@@ -98,6 +105,7 @@ public:
 	/* VT03 extension handling */
 	DECLARE_WRITE8_MEMBER(vt03_410x_w);
 	DECLARE_WRITE8_MEMBER(vt03_8000_w);
+	DECLARE_WRITE8_MEMBER(vt03_4034_w);
 
 	/* OneBus read callbacks for getting sprite and tile data during rendering*/
 	DECLARE_READ8_MEMBER(spr_r);
@@ -112,7 +120,9 @@ private:
 
 	void scanline_irq(int scanline, int vblank, int blanked);
 	uint8_t m_410x[0xc];
-
+	
+	uint8_t m_vdma_ctrl;
+	
 	int m_timer_irq_enabled;
 	int m_timer_running;
 	int m_timer_val;
@@ -316,10 +326,11 @@ void nes_vt_state::scanline_irq(int scanline, int vblank, int blanked)
 	{
 		m_timer_val--;
 
-		if (m_timer_val < 0)
+		if (m_timer_val < 1)
 		{
 			if (m_timer_irq_enabled)
 			{
+				logerror("scanline_irq %d\n", scanline);
 				irqstate = 1;
 			}
 		}
@@ -389,7 +400,8 @@ void nes_vt_state::machine_reset()
 	m_timer_irq_enabled = 0;
 	m_timer_running = 0;
 	m_timer_val = 0;
-
+	m_vdma_ctrl = 0;
+	
 	update_banks();
 }
 
@@ -737,6 +749,43 @@ WRITE8_MEMBER(nes_vt_state::nes_vh_sprite_dma_w)
 	m_ppu->spriteram_dma(space, data);
 }
 
+WRITE8_MEMBER(nes_vt_state::vt_hh_sprite_dma_w)
+{
+	uint8_t dma_mode = m_vdma_ctrl & 0x01;
+	uint8_t dma_len  = (m_vdma_ctrl >> 1) & 0x07;
+	uint8_t src_nib_74 =  (m_vdma_ctrl >> 4) & 0x0F;
+	int length = 256;
+	switch(dma_len) {
+		case 0x0: length = 256; break;
+		case 0x4: length = 16; break;
+		case 0x5: length = 32; break;
+		case 0x6: length = 64; break;
+		case 0x7: length = 128; break;
+	}
+	uint16_t src_addr = (data << 8) | (src_nib_74 << 4);
+	logerror("vthh dma start ctrl=%02x addr=%04x\n", m_vdma_ctrl, src_addr);
+	for (int i = 0; i < length; i++)
+	{
+		
+		uint8_t spriteData = space.read_byte(src_addr + i);
+		if(dma_mode) {
+			space.write_byte(0x2007, spriteData);
+		} else {
+			space.write_byte(0x2004, spriteData);
+		}
+		if(((src_addr + i) & 0xFF) == length) break;
+	}
+
+	// should last (length * 4 - 1) CPU cycles.
+	space.device().execute().adjust_icount(-(length * 4 - 1));
+}
+
+
+WRITE8_MEMBER(nes_vt_state::vt03_4034_w)
+{
+	m_vdma_ctrl = data;
+}
+
 static ADDRESS_MAP_START( nes_vt_map, AS_PROGRAM, 8, nes_vt_state )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM
 	AM_RANGE(0x2000, 0x3fff) AM_DEVREADWRITE("ppu", ppu2c0x_device, read, write)        /* PPU registers */
@@ -757,6 +806,25 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( nes_vt_xx_map, AS_PROGRAM, 8, nes_vt_state )
 	AM_IMPORT_FROM(nes_vt_map)
 	AM_RANGE(0x0800, 0x0fff) AM_RAM
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( nes_vt_hh_map, AS_PROGRAM, 8, nes_vt_state )
+	AM_RANGE(0x0000, 0x0fff) AM_RAM
+	AM_RANGE(0x2000, 0x3fff) AM_DEVREADWRITE("ppu", ppu2c0x_device, read, write)        /* PPU registers */
+
+	AM_RANGE(0x4000, 0x4013) AM_DEVREADWRITE("apu", nesapu_device, read, write)
+	AM_RANGE(0x4015, 0x4015) AM_READWRITE(psg1_4015_r, psg1_4015_w) /* PSG status / first control register */
+	AM_RANGE(0x4016, 0x4016) AM_READWRITE(nes_in0_r, nes_in0_w)
+	AM_RANGE(0x4017, 0x4017) AM_READ(nes_in1_r) AM_WRITE(psg1_4017_w)
+
+	AM_RANGE(0x4100, 0x410b) AM_WRITE(vt03_410x_w)
+
+	AM_RANGE(0x8000, 0xffff) AM_WRITE(vt03_8000_w)
+	AM_RANGE(0x8000, 0xffff) AM_DEVICE("prg", address_map_bank_device, amap8)
+
+	AM_RANGE(0x4034, 0x4034) AM_WRITE(vt03_4034_w)
+	AM_RANGE(0x4014, 0x4014) AM_READ(psg1_4014_r) AM_WRITE(vt_hh_sprite_dma_w)
+	AM_RANGE(0x6000, 0x6fff) AM_RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( prg_map, AS_PROGRAM, 8, nes_vt_state )
@@ -867,6 +935,20 @@ static MACHINE_CONFIG_DERIVED( nes_vt_xx, nes_vt )
 	MCFG_CPU_PROGRAM_MAP(nes_vt_xx_map)
 MACHINE_CONFIG_END
 
+// New mystery handheld architecture, VTxx derived
+static MACHINE_CONFIG_DERIVED( nes_vt_hh, nes_vt_xx )
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(nes_vt_hh_map)
+	MCFG_PPU_VT03_MODIFY("ppu")
+	MCFG_PPU_VT03_SET_PAL_MODE(PAL_MODE_NEW_RGB);
+
+	/* video hardware */
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_REFRESH_RATE(50.0070)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC((106.53/(PAL_APU_CLOCK/1000000)) * (ppu2c0x_device::VBLANK_LAST_SCANLINE_PAL-ppu2c0x_device::VBLANK_FIRST_SCANLINE+1+2)))
+	MCFG_SCREEN_SIZE(32*8, 312)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 30*8-1)
+MACHINE_CONFIG_END
 
 static INPUT_PORTS_START( nes_vt )
 INPUT_PORTS_END
@@ -1043,6 +1125,11 @@ ROM_START( vgpmini )
 	// there was a dump of a 'secure' area with this, but it was just the bottom 0x10000 bytes of the existing rom.
 ROM_END
 
+ROM_START( sy889 )
+	ROM_REGION( 0x800000, "mainrom", 0 )
+	ROM_LOAD( "sy889_w25q64.bin", 0x00000, 0x800000, CRC(fcdaa6fc) SHA1(0493747facf2172b8af22010851668bb18cbb3e4) )
+ROM_END
+
 // earlier version of vdogdemo
 CONS( 200?, vdogdeme,  0,  0,  nes_vt,    nes_vt, nes_vt_state,  0, "VRT", "V-Dog (prototype, earlier)", MACHINE_NOT_WORKING )
 
@@ -1067,7 +1154,8 @@ CONS( 200?, dgun2500,  0,  0,  nes_vt,    nes_vt, nes_vt_state,  0, "dreamGEAR",
 CONS( 2012, dgun2561,  0,  0,  nes_vt,    nes_vt, nes_vt_state,  0, "dreamGEAR", "dreamGEAR My Arcade Portable Gaming System (DGUN-2561)", MACHINE_NOT_WORKING )
 CONS( 200?, lexcyber,  0,  0,  nes_vt_xx, nes_vt, nes_vt_state,  0, "Lexibook", "Lexibook Compact Cyber Arcade", MACHINE_NOT_WORKING )
 
-// these seem to have custom CPU opcodes? looks similar to the above, has many of the same games, but isn't 100% valid 6502
+// these are VT1682 based and have scrambled CPU opcodes. Will need VT1682 CPU and PPU
+// to be emulated
 // (no visible tiles in ROM using standard decodes tho, might need moving out of here)
 CONS( 200?, ii8in1,    0,  0,  nes_vt,    nes_vt, nes_vt_state,  0, "Intec", "InterAct 8-in-1", MACHINE_NOT_WORKING )
 CONS( 200?, ii32in1,   0,  0,  nes_vt,    nes_vt, nes_vt_state,  0, "Intec", "InterAct 32-in-1", MACHINE_NOT_WORKING )
@@ -1105,4 +1193,4 @@ CONS( 200?, mc_8x6ss,   0,        0,  nes_vt,    nes_vt, nes_vt_state,  0, "<unk
 CONS( 2004, mc_dcat8,   0,        0,  nes_vt,    nes_vt, nes_vt_state,  0, "<unknown>", "100 in 1 (D-CAT8 8bit Console, set 1) (v5.01.11-frd, BL 20041217)", MACHINE_NOT_WORKING )
 CONS( 2004, mc_dcat8a,  mc_dcat8, 0,  nes_vt,    nes_vt, nes_vt_state,  0, "<unknown>", "100 in 1 (D-CAT8 8bit Console, set 2)", MACHINE_NOT_WORKING )
 
-
+CONS( 2017, sy889,  		0, 				0,  nes_vt_hh, nes_vt, nes_vt_state,  0, "SY Corp", 	"SY-889 300 in 1 Handheld", MACHINE_NOT_WORKING )

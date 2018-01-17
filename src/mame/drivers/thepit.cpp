@@ -478,6 +478,16 @@ static INPUT_PORTS_START( intrepid )
 INPUT_PORTS_END
 
 
+static INPUT_PORTS_START( intrepidb )
+	PORT_INCLUDE(intrepid)
+
+	PORT_MODIFY("DSW")
+	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Lives ) )        PORT_DIPLOCATION("SW1:!6")
+	PORT_DIPSETTING(    0x20, "2" )
+	PORT_DIPSETTING(    0x00, "3" )
+INPUT_PORTS_END
+
+
 static INPUT_PORTS_START( dockman )
 	PORT_INCLUDE(in0_real)
 
@@ -1318,9 +1328,9 @@ GAME( 1982, desertdn,   0,        desertdn, desertdn, thepit_state, 0,     ROT0,
 
 GAME( 1983, intrepid,   0,        intrepid, intrepid, thepit_state, 0,     ROT90, "Nova Games Ltd.",                             "Intrepid (set 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1983, intrepid2,  intrepid, intrepid, intrepid, thepit_state, 0,     ROT90, "Nova Games Ltd.",                             "Intrepid (set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, intrepidb,  intrepid, intrepid, intrepid, thepit_state, 0,     ROT90, "bootleg (Elsys)",                             "Intrepid (Elsys bootleg, set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, intrepidb3, intrepid, intrepid, intrepid, thepit_state, 0,     ROT90, "bootleg (Elsys)",                             "Intrepid (Elsys bootleg, set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, intrepidb2, intrepid, intrepid, intrepid, thepit_state, 0,     ROT90, "bootleg (Loris)",                             "Intrepid (Loris bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, intrepidb,  intrepid, intrepid, intrepidb,thepit_state, 0,     ROT90, "bootleg (Elsys)",                             "Intrepid (Elsys bootleg, set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, intrepidb3, intrepid, intrepid, intrepidb,thepit_state, 0,     ROT90, "bootleg (Elsys)",                             "Intrepid (Elsys bootleg, set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, intrepidb2, intrepid, intrepid, intrepidb,thepit_state, 0,     ROT90, "bootleg (Loris)",                             "Intrepid (Loris bootleg)", MACHINE_SUPPORTS_SAVE )
 
 GAME( 1984, zaryavos,   0,        intrepid, intrepid, thepit_state, 0,     ROT90, "Nova Games of Canada",                        "Zarya Vostoka", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 

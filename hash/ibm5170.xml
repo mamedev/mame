@@ -7142,6 +7142,42 @@
 		</part>
 	</software>
 
+	<software name="bstone">
+		<description>Blake Stone: Aliens of Gold (v3.0)</description>
+		<year>1994</year>
+		<publisher>Apogee Software</publisher>
+		<info name="developer" value="JAM Productions" />
+		<info name="version" value="3.0" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Blake Stone - Aliens of Gold (3.0) [Apogee Software] [1994] [3.5HD] [Disk 1 of 2].img" size="1474560" crc="1f60fad0" sha1="74af4ff89c839a4dca219160bdb1fdc76a654ce7" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Blake Stone - Aliens of Gold (3.0) [Apogee Software] [1994] [3.5HD] [Disk 2 of 2].img" size="1474560" crc="f0789329" sha1="c7851394eba175afd084ac5ee5910044bb2e7f6c" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bstonea" cloneof="bstone">
+		<description>Blake Stone: Aliens of Gold (v2.1)</description>
+		<year>1994</year>
+		<publisher>Apogee Software</publisher>
+		<info name="developer" value="JAM Productions" />
+		<info name="version" value="2.1" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Blake Stone - Aliens of Gold (2.1) [Apogee Software] [1994] [3.5HD] [Disk 1 of 2].img" size="1474560" crc="f3207ca6" sha1="d7a19072c14aed709ab84c94589acac9d811d6c1" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Blake Stone - Aliens of Gold (2.1) [Apogee Software] [1994] [3.5HD] [Disk 2 of 2].img" size="1474560" crc="c241071f" sha1="6579c53898a6ced800caa18a3059b2468e259073" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="bodyblow">
 		<description>Body Blows</description>
 		<year>1993</year>
@@ -9469,6 +9505,28 @@
 		<part name="flop2" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="simlifed2.img" size="737280" crc="6e704c65" sha1="fc2e641147584f3a5675083edbd0cee355db3ba6" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="simonsrc">
+		<description>Simon the Sorcerer</description>
+		<year>1993</year>
+		<publisher>Infocom</publisher>
+		<info name="developer" value="Adventuresoft" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Simon The Sorcerer [Infocom] [1993] [3.5HD] [Disk 1 of 3].img" size="1474560" crc="1539a70a" sha1="c877dfb10479eb39ff0676a9d0d6a66976f631b5" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Simon The Sorcerer [Infocom] [1993] [3.5HD] [Disk 2 of 3].img" size="1474560" crc="f8021446" sha1="031580bd049edb0c94efae69809c37f7bc64f7ee" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Simon The Sorcerer [Infocom] [1993] [3.5HD] [Disk 3 of 3].img" size="1474560" crc="a6dccd4c" sha1="6cf2d9689176fda1a69b29b3bb9e82bc8073f256" offset="0"/>
 			</dataarea>
 		</part>
 	</software>

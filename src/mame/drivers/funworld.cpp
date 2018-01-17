@@ -3666,6 +3666,32 @@ ROM_END
 
    Q is remote (x100)
    W is payout.
+
+-------------------------------------
+
+   Complete specs:
+
+   1x Empty CPU place (surely Rockwell 65C02 bitwise family)
+
+   1x GI AY-3-8910 Sound Processor.
+
+   2x Motorola MC68B21P for I/O.
+   1x GoldStar GM68B45S CRTC.
+   1x Altera EP910PC-40.
+
+   1x KM6264AL-10
+   1x Dallas DS1220Y nonvolatile SRAM.
+
+   2x M27C512 (ROMs 6 & 7)
+   1x MBM27256 (ROM 5)
+
+   1x N82S147N Bipolar PROM (undumped)
+
+   1x Xtal 16 MHz.
+   1x 8 DIP Switches bank.
+   1x Jamma edge connector.
+   1x Unknown POT between two caps, maybe for sound amp stage.
+
 */
 ROM_START( jolycdid )   /* Altera EP910PC CPLD */
 	ROM_REGION( 0x10000, "maincpu", 0 )

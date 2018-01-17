@@ -39,7 +39,7 @@ public:
 
 	optional_memory_bank m_soundbank;
 
-	required_device<sega_16bit_sprite_device> m_sprites;
+	optional_device<sega_16bit_sprite_device> m_sprites;
 
 	uint16_t m_coinctrl;
 

@@ -15,7 +15,7 @@
 
 static const size_t popeye_bitmapram_size = 0x2000; // 8k nybbles packed into 4k ram chip
 
-enum { TYPE_SKYSKIPR, TYPE_POPEYE };
+enum { TYPE_TNX1, TYPE_TPP1 };
 
 #define USE_NEW_COLOR (1)
 
@@ -199,7 +199,7 @@ void popeye_state::convert_color_prom(const uint8_t *color_prom)
 #endif
 }
 
-PALETTE_INIT_MEMBER(popeye_state, popeye)
+PALETTE_INIT_MEMBER(popeye_state, tpp1)
 {
 	m_invertmask = (USE_NEW_COLOR) ? 0x00 : 0xff;
 
@@ -213,7 +213,7 @@ PALETTE_INIT_MEMBER(popeye_state,popeyebl)
 	convert_color_prom(m_color_prom);
 }
 
-PALETTE_INIT_MEMBER(popeye_state, skyskipr)
+PALETTE_INIT_MEMBER(popeye_state, tnx1)
 {
 	/* Two of the PROM address pins are tied together and one is not connected... */
 	for (int i = 0;i < 0x100;i++)
@@ -265,7 +265,7 @@ void popeye_state::set_background_palette(int bank)
 		bit0 = 0;
 		bit1 = ((color_prom[0] ^ m_invertmask) >> 6) & 0x01;
 		bit2 = ((color_prom[0] ^ m_invertmask) >> 7) & 0x01;
-		if (m_bitmap_type == TYPE_SKYSKIPR)
+		if (m_bitmap_type == TYPE_TNX1)
 		{
 			/* Sky Skipper has different weights */
 			bit0 = bit1;
@@ -292,13 +292,13 @@ WRITE8_MEMBER(popeye_state::popeye_colorram_w)
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(popeye_state::popeye_bitmap_w)
+WRITE8_MEMBER(popeye_state::tpp2_bitmap_w)
 {
 	int sx,sy,x,y,colour;
 
 	m_bitmapram[offset] = data & 0xf;
 
-	if (m_bitmap_type == TYPE_SKYSKIPR)
+	if (m_bitmap_type == TYPE_TNX1)
 	{
 		sx = 8 * (offset % 128);
 		sy = 8 * (offset / 128);
@@ -334,13 +334,13 @@ WRITE8_MEMBER(popeye_state::popeye_bitmap_w)
 	}
 }
 
-WRITE8_MEMBER(popeye_state::skyskipr_bitmap_w)
+WRITE8_MEMBER(popeye_state::tnx1_bitmap_w)
 {
 	offset = ((offset & 0xfc0) << 1) | (offset & 0x03f);
 	if (data & 0x80)
 		offset |= 0x40;
 
-	popeye_bitmap_w(space,offset,data);
+	tpp2_bitmap_w(space,offset,data);
 }
 
 TILE_GET_INFO_MEMBER(popeye_state::get_fg_tile_info)
@@ -356,7 +356,7 @@ void popeye_state::video_start()
 	m_bitmapram = std::make_unique<uint8_t[]>(popeye_bitmapram_size);
 	m_tmpbitmap2 = std::make_unique<bitmap_ind16>(1024,1024);    /* actually 1024x512 but not rolling over vertically? */
 
-	m_bitmap_type = TYPE_SKYSKIPR;
+	m_bitmap_type = TYPE_TNX1;
 
 	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(popeye_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
 	m_fg_tilemap->set_transparent_pen(0);
@@ -370,12 +370,12 @@ void popeye_state::video_start()
 	save_pointer(NAME(m_bitmapram.get()), popeye_bitmapram_size);
 }
 
-VIDEO_START_MEMBER(popeye_state,popeye)
+VIDEO_START_MEMBER(popeye_state,tpp1)
 {
 	m_bitmapram = std::make_unique<uint8_t[]>(popeye_bitmapram_size);
-	m_tmpbitmap2 = std::make_unique<bitmap_ind16>(512,512);
+	m_tmpbitmap2 = std::make_unique<bitmap_ind16>(512,1024);    /* actually 512x512 but not rolling over vertically? */
 
-	m_bitmap_type = TYPE_POPEYE;
+	m_bitmap_type = TYPE_TPP1;
 
 	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(popeye_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
 	m_fg_tilemap->set_transparent_pen(0);
@@ -397,33 +397,23 @@ void popeye_state::draw_background(bitmap_ind16 &bitmap, const rectangle &clipre
 	if (m_lastflip != flip_screen())
 	{
 		for (offs = 0;offs < popeye_bitmapram_size;offs++)
-			popeye_bitmap_w(space,offs,m_bitmapram[offs]);
+			tpp2_bitmap_w(space,offs,m_bitmapram[offs]);
 
 		m_lastflip = flip_screen();
 	}
 
 	set_background_palette((*m_palettebank & 0x08) >> 3);
 
-	if (m_background_pos[1] == 0)    /* no background */
-		bitmap.fill(0, cliprect);
-	else
+	/* copy the background graphics */
+	int scrollx = 2 * (456 - (m_background_pos[0] | (m_background_pos[2] << 8)));
+	int scrolly = 2 * (256 - m_background_pos[1]);
+
+	if (flip_screen())
 	{
-		/* copy the background graphics */
-		int scrollx = 200 - m_background_pos[0] - 256*(m_background_pos[2]&1); /* ??? */
-		int scrolly = 2 * (256 - m_background_pos[1]);
-
-		if (m_bitmap_type == TYPE_SKYSKIPR)
-			scrollx = 2*scrollx - 512;
-
-		if (flip_screen())
-		{
-			if (m_bitmap_type == TYPE_POPEYE)
-				scrollx = -scrollx;
-			scrolly = -scrolly;
-		}
-
-		copyscrollbitmap(bitmap,*m_tmpbitmap2,1,&scrollx,1,&scrolly,cliprect);
+		scrolly = -scrolly;
 	}
+
+	copyscrollbitmap(bitmap,*m_tmpbitmap2,1,&scrollx,1,&scrolly,cliprect);
 }
 
 void popeye_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)

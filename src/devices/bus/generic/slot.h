@@ -101,7 +101,7 @@ class generic_slot_device : public device_t,
 {
 public:
 	// construction/destruction
-	generic_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	generic_slot_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 	virtual ~generic_slot_device();
 
 	static void static_set_device_load(device_t &device, device_image_load_delegate callback) { downcast<generic_slot_device &>(device).m_device_image_load = callback; }
@@ -126,11 +126,11 @@ public:
 	void common_load_rom(uint8_t *ROM, uint32_t len, const char *region);
 
 	virtual iodevice_t image_type() const override { return IO_CARTSLOT; }
-	virtual bool is_readable()  const override { return 1; }
-	virtual bool is_writeable() const override { return 0; }
-	virtual bool is_creatable() const override { return 0; }
+	virtual bool is_readable()  const override { return true; }
+	virtual bool is_writeable() const override { return false; }
+	virtual bool is_creatable() const override { return false; }
 	virtual bool must_be_loaded() const override { return m_must_be_loaded; }
-	virtual bool is_reset_on_load() const override { return 1; }
+	virtual bool is_reset_on_load() const override { return true; }
 	virtual const char *image_interface() const override { return m_interface; }
 	virtual const char *file_extensions() const override { return m_extensions; }
 
@@ -186,9 +186,26 @@ protected:
 	device_image_func_delegate      m_device_image_unload;
 };
 
+class generic_socket_device : public generic_slot_device
+{
+public:
+	generic_socket_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	virtual iodevice_t image_type() const override { return IO_ROM; }
+};
+
+class generic_cartslot_device : public generic_slot_device
+{
+public:
+	generic_cartslot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	virtual iodevice_t image_type() const override { return IO_CARTSLOT; }
+};
+
 
 // device type definition
-DECLARE_DEVICE_TYPE(GENERIC_SOCKET, generic_slot_device)
+DECLARE_DEVICE_TYPE(GENERIC_SOCKET, generic_socket_device)
+DECLARE_DEVICE_TYPE(GENERIC_CARTSLOT, generic_cartslot_device)
 
 
 /***************************************************************************
@@ -196,7 +213,7 @@ DECLARE_DEVICE_TYPE(GENERIC_SOCKET, generic_slot_device)
  ***************************************************************************/
 
 #define MCFG_GENERIC_CARTSLOT_ADD(_tag, _slot_intf, _dev_intf) \
-	MCFG_DEVICE_ADD(_tag, GENERIC_SOCKET, 0) \
+	MCFG_DEVICE_ADD(_tag, GENERIC_CARTSLOT, 0) \
 	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, nullptr, false) \
 	MCFG_GENERIC_INTERFACE(_dev_intf)
 #define MCFG_GENERIC_SOCKET_ADD(_tag, _slot_intf, _dev_intf) \
@@ -205,6 +222,10 @@ DECLARE_DEVICE_TYPE(GENERIC_SOCKET, generic_slot_device)
 	MCFG_GENERIC_INTERFACE(_dev_intf)
 
 #define MCFG_GENERIC_CARTSLOT_ADD_WITH_DEFAULT(_tag, _slot_intf, _dev_intf, _default) \
+	MCFG_DEVICE_ADD(_tag, GENERIC_CARTSLOT, 0) \
+	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _default, false) \
+	MCFG_GENERIC_INTERFACE(_dev_intf)
+#define MCFG_GENERIC_SOCKET_ADD_WITH_DEFAULT(_tag, _slot_intf, _dev_intf, _default) \
 	MCFG_DEVICE_ADD(_tag, GENERIC_SOCKET, 0) \
 	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _default, false) \
 	MCFG_GENERIC_INTERFACE(_dev_intf)

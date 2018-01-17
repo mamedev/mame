@@ -56,18 +56,22 @@ ROM_END
 
 ROM_START( opus2791 )
 	ROM_REGION(0x4000, "dfs_rom", 0)
-	ROM_DEFAULT_BIOS("ddos315")
+	ROM_DEFAULT_BIOS("ddos316")
 	ROM_SYSTEM_BIOS(0, "ddos315", "Opus DDOS 3.15")
 	ROMX_LOAD("opus-ddos315.rom", 0x0000, 0x4000, CRC(5f06701c) SHA1(9e250dc7ddcde35b19e8f29f2cfe95a79f46d473), ROM_BIOS(1))
-	ROM_SYSTEM_BIOS(1, "edos04", "Opus EDOS 0.4")
-	ROMX_LOAD("opus-edos04.rom", 0x0000, 0x4000, CRC(1d8a3860) SHA1(05f461464707b4ca24636c9e726af561f227ccdb), ROM_BIOS(2))
+	ROM_SYSTEM_BIOS(1, "ddos316", "Opus DDOS 3.16")
+	ROMX_LOAD("opus-ddos316.rom", 0x0000, 0x4000, CRC(268ebc0d) SHA1(e608f6e40a5579147cc631f351aae275fdabec5b), ROM_BIOS(2))
+	ROM_SYSTEM_BIOS(2, "edos04", "Opus EDOS 0.4")
+	ROMX_LOAD("opus-edos04.rom", 0x0000, 0x4000, CRC(1d8a3860) SHA1(05f461464707b4ca24636c9e726af561f227ccdb), ROM_BIOS(3))
 ROM_END
 
 ROM_START( opus2793 )
 	ROM_REGION(0x4000, "dfs_rom", 0)
-	ROM_DEFAULT_BIOS("ddos335")
+	ROM_DEFAULT_BIOS("ddos336")
 	ROM_SYSTEM_BIOS(0, "ddos335", "Opus DDOS 3.35")
 	ROMX_LOAD("opus-ddos335.rom", 0x0000, 0x4000, CRC(e33167fb) SHA1(42fbc9932db2087708da41cb1ffa94358683cf7a), ROM_BIOS(1))
+	ROM_SYSTEM_BIOS(1, "ddos336", "Opus DDOS 3.36")
+	ROMX_LOAD("opus-ddos336.rom", 0x0000, 0x4000, CRC(2f400f69) SHA1(a6a57bb907d6b9bd351029fb0471a3a9c343da24), ROM_BIOS(2))
 ROM_END
 
 ROM_START( opus1770 )
@@ -87,7 +91,6 @@ ROM_END
 MACHINE_CONFIG_MEMBER( bbc_opus8272_device::device_add_mconfig )
 	MCFG_I8272A_ADD("i8272", true)
 	MCFG_UPD765_INTRQ_CALLBACK(WRITELINE(bbc_opus8272_device, fdc_intrq_w))
-	MCFG_UPD765_HDL_CALLBACK(WRITELINE(bbc_opus8272_device, motor_w))
 	MCFG_FLOPPY_DRIVE_ADD("i8272:0", bbc_floppies_525, "525qd", bbc_opusfdc_device::floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 	MCFG_FLOPPY_DRIVE_ADD("i8272:1", bbc_floppies_525, "525qd", bbc_opusfdc_device::floppy_formats)
@@ -240,24 +243,29 @@ READ8_MEMBER(bbc_opus8272_device::fdc_r)
 	switch (offset)
 	{
 	case 0x02:
-		data = 0x01;
+		m_fdc->tc_w(true);
+		m_fdc->tc_w(false);
 		break;
-	case 0x04:
+
 	case 0x06:
+		if (m_floppy0->get_device()) m_floppy0->get_device()->mon_w(1);
+		if (m_floppy1->get_device()) m_floppy1->get_device()->mon_w(1);
+	case 0x04:
 		data = m_fdc->msr_r(space, 0);
 		break;
+
 	case 0x05:
+		if (m_floppy0->get_device()) m_floppy0->get_device()->mon_w(0);
+		if (m_floppy1->get_device()) m_floppy1->get_device()->mon_w(0);
 	case 0x07:
 		data = m_fdc->fifo_r(space, 0);
 		break;
 	}
-	logerror("Read %04x -> %02x\n", offset | 0xfe80, data);
 	return data;
 }
 
 WRITE8_MEMBER(bbc_opus8272_device::fdc_w)
 {
-	logerror("Write %04x <- %02x\n", offset | 0xfe80, data);
 	floppy_image_device *floppy = nullptr;
 
 	switch (offset)
@@ -269,21 +277,15 @@ WRITE8_MEMBER(bbc_opus8272_device::fdc_w)
 		case 1: floppy = m_floppy0->get_device(); break;
 		}
 		m_fdc->set_floppy(floppy);
+		break;
 
+	case 0x05:
 		if (m_floppy0->get_device()) m_floppy0->get_device()->mon_w(0);
 		if (m_floppy1->get_device()) m_floppy1->get_device()->mon_w(0);
-		break;
-	case 0x05:
 	case 0x07:
 		m_fdc->fifo_w(space, 0, data);
 		break;
 	}
-}
-
-WRITE_LINE_MEMBER(bbc_opus8272_device::motor_w)
-{
-	if (m_floppy0->get_device()) m_floppy0->get_device()->mon_w(!state);
-	if (m_floppy1->get_device()) m_floppy1->get_device()->mon_w(!state);
 }
 
 WRITE_LINE_MEMBER(bbc_opus8272_device::fdc_intrq_w)
