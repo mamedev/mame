@@ -222,7 +222,6 @@ public:
 	DECLARE_WRITE8_MEMBER(eag_7seg_w);
 	DECLARE_WRITE8_MEMBER(eag_mux_w);
 	DECLARE_READ8_MEMBER(eag_input2_r);
-	void fccpu1_eprom_sockets(machine_config &config);
 	void eag(machine_config &config);
 	void fex68km2(machine_config &config);
 	void eagv10(machine_config &config);
