@@ -1217,7 +1217,7 @@ void lua_engine::initialize()
 			"name", sol::property([] (game_driver const &driver) { return &driver.name[0]; }),
 			"description", sol::property([] (game_driver const &driver) { return &driver.type.fullname()[0]; }),
 			"year", sol::readonly(&game_driver::year),
-			"manufacturer", sol::readonly(&game_driver::manufacturer),
+			"manufacturer", sol::property([] (game_driver const &driver) { return &driver.type.manufacturer()[0]; }),
 			"compatible_with", sol::readonly(&game_driver::compatible_with),
 			"default_layout", sol::readonly(&game_driver::default_layout));
 

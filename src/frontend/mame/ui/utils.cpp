@@ -750,7 +750,7 @@ public:
 		else if (!selection_valid())
 			return false;
 
-		std::string const name(c_mnfct::getname(system.driver->manufacturer));
+		std::string const name(c_mnfct::getname(system.driver->type.manufacturer()));
 		return !name.empty() && (selection_text() == name);
 	}
 };

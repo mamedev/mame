@@ -312,7 +312,7 @@ void video_manager::save_snapshot(screen_device *screen, emu_file &file)
 
 	// add two text entries describing the image
 	std::string text1 = std::string(emulator_info::get_appname()).append(" ").append(emulator_info::get_build_version());
-	std::string text2 = std::string(machine().system().manufacturer).append(" ").append(machine().system().type.fullname());
+	std::string text2 = std::string(machine().system().type.manufacturer()).append(" ").append(machine().system().type.fullname());
 	png_info pnginfo;
 	pnginfo.add_text("Software", text1.c_str());
 	pnginfo.add_text("System", text2.c_str());
@@ -1298,7 +1298,7 @@ void video_manager::record_frame()
 			if (m_mng_frame == 0)
 			{
 				std::string text1 = std::string(emulator_info::get_appname()).append(" ").append(emulator_info::get_build_version());
-				std::string text2 = std::string(machine().system().manufacturer).append(" ").append(machine().system().type.fullname());
+				std::string text2 = std::string(machine().system().type.manufacturer()).append(" ").append(machine().system().type.fullname());
 				pnginfo.add_text("Software", text1.c_str());
 				pnginfo.add_text("System", text2.c_str());
 			}

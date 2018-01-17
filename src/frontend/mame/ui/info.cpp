@@ -293,7 +293,7 @@ std::string machine_info::game_info_string() const
 	util::stream_format(buf, _("%1$s\n%2$s %3$s\nDriver: %4$s\n\nCPU:\n"),
 			m_machine.system().type.fullname(),
 			m_machine.system().year,
-			m_machine.system().manufacturer,
+			m_machine.system().type.manufacturer(),
 			core_filename_extract_base(m_machine.system().type.source()));
 
 	// loop over all CPUs

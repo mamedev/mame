@@ -1413,6 +1413,10 @@ void validity_checker::validate_driver()
 		osd_printf_error("Driver description is a duplicate of %s(%s)\n", core_filename_extract_base(match->type.source()).c_str(), match->name);
 	}
 
+	// check for missing manufacturer
+	if (!m_current_driver->type.has_manufacturer())
+		osd_printf_error("Driver has no manufacturer\n");
+
 	// determine if we are a clone
 	bool is_clone = (strcmp(m_current_driver->parent, "0") != 0);
 	int clone_of = m_drivlist.clone(*m_current_driver);
@@ -2012,7 +2016,7 @@ void validity_checker::validate_device_types()
 		device_t *const dev = config.device_add(&config.root_device(), "_tmp", type, 0);
 
 		char const *name((dev->shortname() && *dev->shortname()) ? dev->shortname() : type.type().name());
-		std::string const description((dev->source() && *dev->source()) ? util::string_format("%s(%s)", core_filename_extract_base(dev->source()).c_str(), name) : name);
+		std::string const description((dev->type().source() && *dev->type().source()) ? util::string_format("%s(%s)", core_filename_extract_base(dev->type().source()), name) : name);
 
 		// ensure shortname exists
 		if (!dev->shortname() || !*dev->shortname())
@@ -2047,7 +2051,7 @@ void validity_checker::validate_device_types()
 			else if (!devname.second)
 			{
 				device_t *const dup = config.device_add(&config.root_device(), "_dup", *devname.first->second, 0);
-				osd_printf_error("Device %s short name is a duplicate of %s(%s)\n", description.c_str(), core_filename_extract_base(dup->source()).c_str(), dup->shortname());
+				osd_printf_error("Device %s short name is a duplicate of %s(%s)\n", description.c_str(), core_filename_extract_base(dup->type().source()).c_str(), dup->shortname());
 				config.device_remove(&config.root_device(), "_dup");
 			}
 		}
@@ -2071,13 +2075,13 @@ void validity_checker::validate_device_types()
 			else if (!devdesc.second)
 			{
 				device_t *const dup = config.device_add(&config.root_device(), "_dup", *devdesc.first->second, 0);
-				osd_printf_error("Device %s name '%s' is a duplicate of %s(%s)\n", description.c_str(), dev->name(), core_filename_extract_base(dup->source()).c_str(), dup->shortname());
+				osd_printf_error("Device %s name '%s' is a duplicate of %s(%s)\n", description.c_str(), dev->name(), core_filename_extract_base(dup->type().source()).c_str(), dup->shortname());
 				config.device_remove(&config.root_device(), "_dup");
 			}
 		}
 
 		// ensure source exists
-		if (!dev->source() || !*dev->source())
+		if (!dev->type().source() || !*dev->type().source())
 			osd_printf_error("Device %s does not have source defined\n", description.c_str());
 
 		// check that reported type matches supplied type
