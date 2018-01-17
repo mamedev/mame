@@ -70,7 +70,7 @@ private:
 // device_delegate is a delegate that wraps with a device tag and can be easily
 // late bound without replicating logic everywhere
 template<typename _Signature>
-class device_delegate : public named_delegate<_Signature>, device_delegate_helper
+class device_delegate : public named_delegate<_Signature>, public device_delegate_helper
 {
 	typedef device_delegate<_Signature> thistype;
 	typedef named_delegate<_Signature> basetype;
