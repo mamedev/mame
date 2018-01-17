@@ -140,6 +140,7 @@ WRITE8_MEMBER(tv912_state::uart_data_w)
 
 WRITE_LINE_MEMBER(tv912_state::uart_reset_w)
 {
+	m_uart->set_input_pin(AY31015_XR, state);
 }
 
 WRITE8_MEMBER(tv912_state::output_40c)
@@ -181,8 +182,9 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( bank_map, 0, 8, tv912_state )
 	AM_RANGE(0x000, 0x0ff) AM_MIRROR(0x300) AM_RAM
 	AM_RANGE(0x400, 0x403) AM_MIRROR(0x3c0) AM_SELECT(0x030) AM_READWRITE(crtc_r, crtc_w)
-	AM_RANGE(0x407, 0x407) AM_MIRROR(0x3f0) AM_READ(uart_status_r)
-	AM_RANGE(0x408, 0x408) AM_MIRROR(0x3f3) AM_READWRITE(uart_data_r, uart_data_w)
+	AM_RANGE(0x404, 0x404) AM_MIRROR(0x3f3) AM_READ(uart_data_r)
+	AM_RANGE(0x408, 0x40b) AM_MIRROR(0x3f0) AM_READ(uart_status_r)
+	AM_RANGE(0x408, 0x408) AM_MIRROR(0x3f3) AM_WRITE(uart_data_w)
 	AM_RANGE(0x40c, 0x40f) AM_MIRROR(0x3f0) AM_READ(keyboard_r)
 	AM_RANGE(0x40c, 0x40c) AM_MIRROR(0x3f3) AM_WRITE(output_40c)
 	AM_RANGE(0x800, 0xfff) AM_RAMBANK("dispram")
@@ -618,7 +620,7 @@ MACHINE_CONFIG_START(tv912_state::tv912)
 	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(tv912_state, p1_w))
 	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(tv912_state, p2_w))
 	MCFG_MCS48_PORT_T1_IN_CB(DEVREADLINE("crtc", tms9927_device, bl_r)) MCFG_DEVCB_INVERT
-	MCFG_MCS48_PORT_PROG_OUT_CB(WRITELINE(tv912_state, uart_reset_w))
+	MCFG_MCS48_PORT_PROG_OUT_CB(WRITELINE(tv912_state, uart_reset_w)) MCFG_DEVCB_INVERT
 
 	MCFG_DEVICE_ADD("bankdev", ADDRESS_MAP_BANK, 0)
 	MCFG_DEVICE_PROGRAM_MAP(bank_map)
