@@ -1272,7 +1272,7 @@ static ADDRESS_MAP_START( radicasi_bank_map, AS_PROGRAM, 8, radica_6502_state )
 	AM_RANGE(0x000000, 0xffffff) AM_NOP // shut up any logging when video params are invalid
 ADDRESS_MAP_END
 
-static INPUT_PORTS_START( radicasi )
+static INPUT_PORTS_START( rad_sinv )
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )
@@ -1280,8 +1280,24 @@ static INPUT_PORTS_START( radicasi )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON3 )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON4 )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON3 ) // MENU
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( rad_tetr )
+	PORT_START("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 ) // Anticlockwise
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON2 ) // Clockwise
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) // Twist Left
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) // Twist Right
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	// Player 2 inputs must be read via serial or similar
+	// the game doesn't read them directly, or even let
+	// you select player 2 mode by default
 INPUT_PORTS_END
 
 /* both NMI and IRQ vectors just point to RTI
@@ -1330,6 +1346,17 @@ void radica_6502_state::machine_start()
 
 void radica_6502_state::machine_reset()
 {
+	/* the 6502 core sets the default stack value to 0x01bd
+	   and Tetris does not initialize it to anything else
+
+	   Tetris stores the playfield data at 0x100 - 0x1c7 and
+	   has a clear routine that will erase that range and
+	   trash the stack
+
+	   It seems likely this 6502 sets it to 0x1ff by default
+	   at least.
+	*/
+	m_maincpu->set_state_int(M6502_S, 0x1ff);
 }
 
 static const gfx_layout helper_4bpp_8_layout =
@@ -1458,5 +1485,5 @@ ROM_START( rad_sinv )
 	ROM_RELOAD(0x300000, 0x100000)
 ROM_END
 
-CONS( 2004, rad_tetr,  0,   0,  radicasi,  radicasi, radica_6502_state, 0, "Radica (licensed from Taito)", "Space Invaders (Radica, Arcade Legends TV Game)", MACHINE_NOT_WORKING )
-CONS( 2004, rad_sinv,  0,   0,  radicasi,  radicasi, radica_6502_state, 0, "Radica",                       "Tetris (Radica, Arcade Legends TV Game)", MACHINE_NOT_WORKING ) // "5 Tetris games in 1"
+CONS( 2004, rad_sinv,  0,   0,  radicasi,  rad_sinv, radica_6502_state, 0, "Radica (licensed from Taito)",                      "Space Invaders [Lunar Rescue, Colony 5, Qix, Phoenix] (Radica, Arcade Legends TV Game)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // "5 Taito games in 1"
+CONS( 2004, rad_tetr,  0,   0,  radicasi,  rad_tetr, radica_6502_state, 0, "Radica (licensed from Elorg / The Tetris Company)", "Tetris (Radica, Arcade Legends TV Game)", MACHINE_NOT_WORKING ) // "5 Tetris games in 1"
