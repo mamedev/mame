@@ -234,6 +234,8 @@ public:
 
 	DECLARE_READ8_MEMBER(read_sound);
 
+	void radicasi(machine_config &config);
+
 protected:
 	// driver_device overrides
 	virtual void machine_start() override;
@@ -1379,7 +1381,7 @@ INTERRUPT_GEN_MEMBER(radica_6502_state::interrupt)
 	*/
 }
 
-static MACHINE_CONFIG_START( radicasi )
+MACHINE_CONFIG_START(radica_6502_state::radicasi)
 
 	/* basic machine hardware */	
 	MCFG_CPU_ADD("maincpu",M6502,XTAL_21_28137MHz/2) // Tetris has a XTAL_21_28137MHz, not confirmed on Space Invaders, actual CPU clock unknown.
