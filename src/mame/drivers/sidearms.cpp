@@ -157,12 +157,12 @@ static ADDRESS_MAP_START( whizz_map, AS_PROGRAM, 8, sidearms_state )
 	AM_RANGE(0xc807, 0xc807) AM_READ_PORT("IN4")
 	AM_RANGE(0xc808, 0xc809) AM_WRITEONLY AM_SHARE("bg_scrollx")
 	AM_RANGE(0xc80a, 0xc80b) AM_WRITEONLY AM_SHARE("bg_scrolly")
-	AM_RANGE(0xe805, 0xe805) AM_WRITE(star_scrollx_w)
-	AM_RANGE(0xe806, 0xe806) AM_WRITE(star_scrolly_w)
 	AM_RANGE(0xc80c, 0xc80c) AM_WRITE(gfxctrl_w)
 	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0xd800, 0xdfff) AM_RAM_WRITE(colorram_w) AM_SHARE("colorram")
 	AM_RANGE(0xe000, 0xefff) AM_RAM
+	AM_RANGE(0xe805, 0xe805) AM_WRITE(star_scrollx_w)
+	AM_RANGE(0xe806, 0xe806) AM_WRITE(star_scrolly_w)
 	AM_RANGE(0xf000, 0xffff) AM_RAM AM_SHARE("spriteram")
 ADDRESS_MAP_END
 

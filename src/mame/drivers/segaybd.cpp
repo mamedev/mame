@@ -715,11 +715,10 @@ WRITE16_MEMBER(segaybd_state::link2_w)
 }
 
 static ADDRESS_MAP_START( main_map_link, AS_PROGRAM, 16, segaybd_state )
+	AM_IMPORT_FROM(main_map)
 	AM_RANGE(0x190000, 0x190fff) AM_DEVREADWRITE8("mb8421", mb8421_device, left_r, left_w, 0x00ff)
 	AM_RANGE(0x191000, 0x191001) AM_READ(link_r)
 	AM_RANGE(0x192000, 0x192001) AM_READWRITE(link2_r, link2_w)
-
-	AM_IMPORT_FROM(main_map)
 ADDRESS_MAP_END
 
 

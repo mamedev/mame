@@ -683,8 +683,8 @@ ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( gladiatr_cpu1_io, AS_IO, 8, gladiatr_state )
-	AM_RANGE(0xc004, 0xc004) AM_WRITE(gladiatr_irq_patch_w) /* !!! patch to 2nd CPU IRQ !!! */
 	AM_RANGE(0xc000, 0xc007) AM_DEVWRITE("mainlatch", ls259_device, write_d0)
+	AM_RANGE(0xc004, 0xc004) AM_WRITE(gladiatr_irq_patch_w) /* !!! patch to 2nd CPU IRQ !!! */
 	AM_RANGE(0xc09e, 0xc09f) AM_DEVREADWRITE("ucpu", upi41_cpu_device, upi41_master_r, upi41_master_w)
 	AM_RANGE(0xc0bf, 0xc0bf) AM_NOP // watchdog_reset_w doesn't work
 ADDRESS_MAP_END

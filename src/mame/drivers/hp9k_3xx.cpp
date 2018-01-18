@@ -206,57 +206,57 @@ ADDRESS_MAP_END
 
 // 9000/320
 static ADDRESS_MAP_START(hp9k320_map, AS_PROGRAM, 32, hp9k3xx_state)
+	AM_IMPORT_FROM(hp9k3xx_common)
+
 	AM_RANGE(0xffe00000, 0xffefffff) AM_READWRITE(buserror_r, buserror_w)
 	AM_RANGE(0xfff00000, 0xffffffff) AM_RAM
-
-	AM_IMPORT_FROM(hp9k3xx_common)
 ADDRESS_MAP_END
 
 // 9000/330 and 9000/340
 static ADDRESS_MAP_START(hp9k330_map, AS_PROGRAM, 32, hp9k3xx_state)
+	AM_IMPORT_FROM(hp9k3xx_common)
+
 	AM_RANGE(0xffb00000, 0xffbfffff) AM_READWRITE(buserror_r, buserror_w)
 	AM_RANGE(0xffc00000, 0xffffffff) AM_RAM
-
-	AM_IMPORT_FROM(hp9k3xx_common)
 ADDRESS_MAP_END
 
 // 9000/332, with built-in medium-res video
 static ADDRESS_MAP_START(hp9k332_map, AS_PROGRAM, 32, hp9k3xx_state)
+	AM_IMPORT_FROM(hp9k3xx_common)
+
 	AM_RANGE(0x00200000, 0x002fffff) AM_RAM AM_SHARE("vram")    // 98544 mono framebuffer
 	AM_RANGE(0x00560000, 0x00563fff) AM_ROM AM_REGION("graphics", 0x0000)   // 98544 mono ROM
 
 	AM_RANGE(0xffb00000, 0xffbfffff) AM_READWRITE(buserror_r, buserror_w)
 	AM_RANGE(0xffc00000, 0xffffffff) AM_RAM
-
-	AM_IMPORT_FROM(hp9k3xx_common)
 ADDRESS_MAP_END
 
 // 9000/370 - 8 MB RAM standard
 static ADDRESS_MAP_START(hp9k370_map, AS_PROGRAM, 32, hp9k3xx_state)
+	AM_IMPORT_FROM(hp9k3xx_common)
+
 	AM_RANGE(0xff700000, 0xff7fffff) AM_READWRITE(buserror_r, buserror_w)
 	AM_RANGE(0xff800000, 0xffffffff) AM_RAM
-
-	AM_IMPORT_FROM(hp9k3xx_common)
 ADDRESS_MAP_END
 
 // 9000/380 - '040
 static ADDRESS_MAP_START(hp9k380_map, AS_PROGRAM, 32, hp9k3xx_state)
+	AM_IMPORT_FROM(hp9k3xx_common)
+
 	AM_RANGE(0x0051a000, 0x0051afff) AM_READWRITE(buserror_r, buserror_w)   // no "Alpha display"
 
 	AM_RANGE(0xc0000000, 0xff7fffff) AM_READWRITE(buserror_r, buserror_w)
 	AM_RANGE(0xff800000, 0xffffffff) AM_RAM
-
-	AM_IMPORT_FROM(hp9k3xx_common)
 ADDRESS_MAP_END
 
 // 9000/382 - onboard VGA compatible video (where?)
 static ADDRESS_MAP_START(hp9k382_map, AS_PROGRAM, 32, hp9k3xx_state)
+	AM_IMPORT_FROM(hp9k3xx_common)
+
 	AM_RANGE(0xffb00000, 0xffbfffff) AM_READWRITE(buserror_r, buserror_w)
 	AM_RANGE(0xffc00000, 0xffffffff) AM_RAM
 
 	AM_RANGE(0x0051a000, 0x0051afff) AM_READWRITE(buserror_r, buserror_w)   // no "Alpha display"
-
-	AM_IMPORT_FROM(hp9k3xx_common)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(iocpu_map, AS_PROGRAM, 8, hp9k3xx_state)

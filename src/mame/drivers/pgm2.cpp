@@ -577,23 +577,23 @@ ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( pgm2_rom_map, AS_PROGRAM, 32, pgm2_state )
-	AM_RANGE(0x10000000, 0x10ffffff) AM_ROM AM_REGION("user1", 0) // external ROM
 	AM_IMPORT_FROM(pgm2_map)
+	AM_RANGE(0x10000000, 0x10ffffff) AM_ROM AM_REGION("user1", 0) // external ROM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( pgm2_ram_rom_map, AS_PROGRAM, 32, pgm2_state )
+	AM_IMPORT_FROM(pgm2_map)
 	AM_RANGE(0x10000000, 0x101fffff) AM_RAM AM_SHARE("romboard_ram") // we should also probably decrypt writes once the encryption is enabled, but the game never writes with it turned on anyway
 	AM_RANGE(0x10200000, 0x103fffff) AM_ROM AM_REGION("user1", 0) // external ROM
-	AM_IMPORT_FROM(pgm2_map)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( pgm2_module_rom_map, AS_PROGRAM, 32, pgm2_state )
+	AM_IMPORT_FROM(pgm2_rom_map)
 	AM_RANGE(0x10000000, 0x107fffff) AM_WRITE16(module_rom_w, 0xffffffff)
 	AM_RANGE(0x10000000, 0x1000000f) AM_READ16(module_rom_r, 0xffffffff)
 	AM_RANGE(0xfffff430, 0xfffff433) AM_WRITE(pio_sodr_w)
 	AM_RANGE(0xfffff434, 0xfffff437) AM_WRITE(pio_codr_w)
 	AM_RANGE(0xfffff43c, 0xfffff43f) AM_READ(pio_pdsr_r)
-	AM_IMPORT_FROM(pgm2_rom_map)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( pgm2 )

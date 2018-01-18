@@ -1433,8 +1433,8 @@ ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( main_map_slot, AS_PROGRAM, 16, neogeo_state )
-	AM_RANGE(0x000000, 0x00007f) AM_READ(banked_vectors_r)
 	AM_IMPORT_FROM( neogeo_main_map )
+	AM_RANGE(0x000000, 0x00007f) AM_READ(banked_vectors_r)
 ADDRESS_MAP_END
 
 

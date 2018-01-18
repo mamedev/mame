@@ -130,6 +130,7 @@ static ADDRESS_MAP_START( senjyo_map, AS_PROGRAM, 8, senjyo_state )
 	AM_RANGE(0x9400, 0x97ff) AM_RAM_WRITE(fgcolorram_w) AM_SHARE("fgcolorram")
 	AM_RANGE(0x9800, 0x987f) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x9c00, 0x9dff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
+	AM_RANGE(0x9e00, 0x9e3f) AM_RAM
 	AM_RANGE(0x9e00, 0x9e1f) AM_RAM AM_SHARE("fgscroll")
 	AM_RANGE(0x9e20, 0x9e21) AM_RAM AM_SHARE("scrolly3")
 /*  AM_RANGE(0x9e22, 0x9e23) height of the layer (Senjyo only, fixed at 0x380) */
@@ -143,7 +144,6 @@ static ADDRESS_MAP_START( senjyo_map, AS_PROGRAM, 8, senjyo_state )
 	AM_RANGE(0x9e35, 0x9e35) AM_RAM AM_SHARE("scrollx1")
 /*  AM_RANGE(0x9e38, 0x9e38) probably radar y position (Senjyo only, fixed at 0x61) */
 /*  AM_RANGE(0x9e3d, 0x9e3d) probably radar x position (Senjyo only, 0x00/0xc0 depending on screen flip) */
-	AM_RANGE(0x9e00, 0x9e3f) AM_RAM
 	AM_RANGE(0xa000, 0xa7ff) AM_RAM_WRITE(bg3videoram_w) AM_SHARE("bg3videoram")
 	AM_RANGE(0xa800, 0xafff) AM_RAM_WRITE(bg2videoram_w) AM_SHARE("bg2videoram")
 	AM_RANGE(0xb000, 0xb7ff) AM_RAM_WRITE(bg1videoram_w) AM_SHARE("bg1videoram")
@@ -167,10 +167,6 @@ static ADDRESS_MAP_START( senjyo_sound_map, AS_PROGRAM, 8, senjyo_state )
 	AM_RANGE(0x9000, 0x9000) AM_DEVWRITE("sn2", sn76496_device, write)
 	AM_RANGE(0xa000, 0xa000) AM_DEVWRITE("sn3", sn76496_device, write)
 	AM_RANGE(0xd000, 0xd000) AM_WRITE(volume_w)
-#if 0
-	AM_RANGE(0xe000, 0xe000) AM_WRITE(unknown)
-	AM_RANGE(0xf000, 0xf000) AM_WRITE(unknown)
-#endif
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( senjyo_sound_io_map, AS_IO, 8, senjyo_state )
@@ -202,11 +198,11 @@ static ADDRESS_MAP_START( starforb_map, AS_PROGRAM, 8, senjyo_state )
 	AM_RANGE(0x9800, 0x987f) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x9c00, 0x9dff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
 	/* The format / use of the ram here is different on the bootleg */
+	AM_RANGE(0x9e00, 0x9e3f) AM_RAM
 	AM_RANGE(0x9e20, 0x9e21) AM_RAM AM_SHARE("scrolly3")
 	AM_RANGE(0x9e25, 0x9e25) AM_RAM AM_SHARE("scrollx3")
 	AM_RANGE(0x9e30, 0x9e31) AM_RAM_WRITE(starforb_scrolly2) AM_SHARE("scrolly2") // ok
 	AM_RANGE(0x9e35, 0x9e35) AM_RAM_WRITE(starforb_scrollx2) AM_SHARE("scrollx2") // ok
-	AM_RANGE(0x9e00, 0x9e3f) AM_RAM
 
 	AM_RANGE(0xa000, 0xa7ff) AM_RAM_WRITE(bg3videoram_w) AM_SHARE("bg3videoram")
 	AM_RANGE(0xa800, 0xafff) AM_RAM_WRITE(bg2videoram_w) AM_SHARE("bg2videoram")
@@ -233,10 +229,6 @@ static ADDRESS_MAP_START( starforb_sound_map, AS_PROGRAM, 8, senjyo_state )
 	AM_RANGE(0x9000, 0x9000) AM_DEVWRITE("sn2", sn76496_device, write)
 	AM_RANGE(0xa000, 0xa000) AM_DEVWRITE("sn3", sn76496_device, write)
 	AM_RANGE(0xd000, 0xd000) AM_WRITE(volume_w)
-#if 0
-	AM_RANGE(0xe000, 0xe000) AM_WRITE(unknown)
-	AM_RANGE(0xf000, 0xf000) AM_WRITE(unknown)
-#endif
 	AM_RANGE(0xf000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 

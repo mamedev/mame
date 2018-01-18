@@ -548,10 +548,10 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(tandy1000_io, AS_IO, 8, tandy1000_state )
 	ADDRESS_MAP_UNMAP_HIGH
+	AM_RANGE(0x0000, 0x00ff) AM_DEVICE("mb", t1000_mb_device, map)
 	AM_RANGE(0x0060, 0x0063) AM_READWRITE(tandy1000_pio_r, tandy1000_pio_w)
 	AM_RANGE(0x00a0, 0x00a0) AM_WRITE(nmi_vram_bank_w)
 	AM_RANGE(0x00c0, 0x00c0) AM_DEVWRITE("sn76496", ncr7496_device, write)
-	AM_RANGE(0x0000, 0x00ff) AM_DEVICE("mb", t1000_mb_device, map)
 	AM_RANGE(0x0200, 0x0207) AM_DEVREADWRITE("pc_joy", pc_joy_device, joy_port_r, joy_port_w)
 	AM_RANGE(0x0378, 0x037f) AM_READWRITE(pc_t1t_p37x_r, pc_t1t_p37x_w)
 	AM_RANGE(0x03d0, 0x03df) AM_DEVREAD("pcvideo_t1000", pcvideo_t1000_device, read) AM_DEVWRITE("pcvideo_t1000", pcvideo_t1000_device, write)
@@ -571,11 +571,11 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(tandy1000_16_io, AS_IO, 16, tandy1000_state )
 	ADDRESS_MAP_UNMAP_HIGH
+	AM_RANGE(0x0000, 0x00ff) AM_DEVICE8("mb", t1000_mb_device, map, 0xffff)
 	AM_RANGE(0x0060, 0x0063) AM_READWRITE8(tandy1000_pio_r, tandy1000_pio_w, 0xffff)
 	AM_RANGE(0x0064, 0x0065) AM_WRITE8(devctrl_w, 0xff00)
 	AM_RANGE(0x00a0, 0x00a1) AM_READ8(unk_r, 0x00ff)
 	AM_RANGE(0x00c0, 0x00c1) AM_DEVWRITE8("sn76496", ncr7496_device, write, 0xffff)
-	AM_RANGE(0x0000, 0x00ff) AM_DEVICE8("mb", t1000_mb_device, map, 0xffff)
 	AM_RANGE(0x0200, 0x0207) AM_DEVREADWRITE8("pc_joy", pc_joy_device, joy_port_r, joy_port_w, 0xffff)
 	AM_RANGE(0x0378, 0x037f) AM_READWRITE8(pc_t1t_p37x_r, pc_t1t_p37x_w, 0xffff)
 	AM_RANGE(0x03d0, 0x03df) AM_DEVREAD8("pcvideo_t1000", pcvideo_t1000_device, read, 0xffff) AM_DEVWRITE8("pcvideo_t1000", pcvideo_t1000_device, write, 0xffff)
@@ -590,8 +590,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(tandy1000tx_io, AS_IO, 16, tandy1000_state )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x00a0, 0x00a1) AM_WRITE8(nmi_vram_bank_w, 0x00ff)
 	AM_IMPORT_FROM(tandy1000_16_io)
+	AM_RANGE(0x00a0, 0x00a1) AM_WRITE8(nmi_vram_bank_w, 0x00ff)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(tandy1000_286_map, AS_PROGRAM, 16, tandy1000_state )

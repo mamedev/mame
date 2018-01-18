@@ -1099,8 +1099,8 @@ static ADDRESS_MAP_START( tjumpman_map, AS_PROGRAM, 16, cave_state )
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM AM_SHARE("nvram")                                               // RAM (battery)
 	AM_RANGE(0x200000, 0x207fff) AM_RAM AM_SHARE("spriteram.0")       // Sprites
 	AM_RANGE(0x208000, 0x20ffff) AM_RAM AM_SHARE("spriteram_2.0")                         // Sprite bank 2
-	AM_RANGE(0x304000, 0x307fff) AM_WRITE(cave_vram_0_w)                                                // Layer 0 - 16x16 tiles mapped here
 	AM_RANGE(0x300000, 0x307fff) AM_RAM_WRITE(cave_vram_0_w) AM_SHARE("vram.0")         // Layer 0
+	AM_RANGE(0x304000, 0x307fff) AM_WRITE(cave_vram_0_w)                                                // Layer 0 - 16x16 tiles mapped here
 	AM_RANGE(0x400000, 0x400005) AM_WRITEONLY AM_SHARE("vctrl.0")                       // Layer 0 Control
 	AM_RANGE(0x500000, 0x50ffff) AM_RAM AM_SHARE("paletteram.0")  // Palette
 	AM_RANGE(0x600000, 0x600001) AM_READ_PORT("IN0")                                                    // Inputs + EEPROM + Hopper

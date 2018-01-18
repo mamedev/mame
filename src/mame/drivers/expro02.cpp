@@ -740,6 +740,8 @@ ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( galhustl_map, AS_PROGRAM, 16, expro02_state )
+	AM_IMPORT_FROM(expro02_video_base_map_noview2)
+
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x200000, 0x2fffff) AM_ROM AM_REGION("maincpudata", 0)
 
@@ -752,12 +754,11 @@ static ADDRESS_MAP_START( galhustl_map, AS_PROGRAM, 16, expro02_state )
 	AM_RANGE(0xe80000, 0xe8ffff) AM_RAM
 
 	AM_RANGE(0x780000, 0x78001f) AM_NOP // prevent sprites being flipped
-
-	AM_IMPORT_FROM(expro02_video_base_map_noview2)
-
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( zipzap_map, AS_PROGRAM, 16, expro02_state )
+	AM_IMPORT_FROM(expro02_video_base_map_noview2)
+
 	AM_RANGE(0x000000, 0x4fffff) AM_ROM
 	AM_RANGE(0x701000, 0x71ffff) AM_RAM
 	AM_RANGE(0x800000, 0x800001) AM_READ_PORT("DSW1")
@@ -768,8 +769,6 @@ static ADDRESS_MAP_START( zipzap_map, AS_PROGRAM, 16, expro02_state )
 	AM_RANGE(0xc80000, 0xc8ffff) AM_RAM     // main ram
 
 	AM_RANGE(0x780000, 0x78001f) AM_NOP // prevent sprites being flipped
-
-	AM_IMPORT_FROM(expro02_video_base_map_noview2)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( supmodel_map, AS_PROGRAM, 16, expro02_state )

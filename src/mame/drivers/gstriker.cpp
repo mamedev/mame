@@ -265,8 +265,8 @@ static ADDRESS_MAP_START( twcup94_map, AS_PROGRAM, 16, gstriker_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( gstriker_map, AS_PROGRAM, 16, gstriker_state )
-	AM_RANGE(0x200060, 0x200063) AM_DEVREADWRITE8("acia", acia6850_device, read, write, 0x00ff)
 	AM_IMPORT_FROM(twcup94_map)
+	AM_RANGE(0x200060, 0x200063) AM_DEVREADWRITE8("acia", acia6850_device, read, write, 0x00ff)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, gstriker_state )

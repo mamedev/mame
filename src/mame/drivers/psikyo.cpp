@@ -309,9 +309,9 @@ READ32_MEMBER(psikyo_state::sngkace_input_r)
 }
 
 static ADDRESS_MAP_START( sngkace_map, AS_PROGRAM, 32, psikyo_state )
+	AM_IMPORT_FROM(psikyo_map)
 	AM_RANGE(0xc00000, 0xc0000b) AM_READ(sngkace_input_r)
 	AM_RANGE(0xc00010, 0xc00013) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x000000ff)
-	AM_IMPORT_FROM(psikyo_map)
 ADDRESS_MAP_END
 
 WRITE8_MEMBER(psikyo_state::sngkace_sound_bankswitch_w)
@@ -350,15 +350,15 @@ READ32_MEMBER(psikyo_state::gunbird_input_r)
 }
 
 static ADDRESS_MAP_START( gunbird_map, AS_PROGRAM, 32, psikyo_state )
+	AM_IMPORT_FROM(psikyo_map)
 	AM_RANGE(0xc00000, 0xc0000b) AM_READ(gunbird_input_r)
 	AM_RANGE(0xc00010, 0xc00013) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x000000ff)
-	AM_IMPORT_FROM(psikyo_map)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( s1945jn_map, AS_PROGRAM, 32, psikyo_state )
+	AM_IMPORT_FROM(psikyo_map)
 	AM_RANGE(0xc00000, 0xc0000b) AM_READ(gunbird_input_r)
 	AM_RANGE(0xc00010, 0xc00013) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x00ff0000)
-	AM_IMPORT_FROM(psikyo_map)
 ADDRESS_MAP_END
 
 WRITE8_MEMBER(psikyo_state::gunbird_sound_bankswitch_w)
@@ -397,10 +397,10 @@ READ32_MEMBER(psikyo_state::s1945_input_r)
 }
 
 static ADDRESS_MAP_START( s1945_map, AS_PROGRAM, 32, psikyo_state )
+	AM_IMPORT_FROM(psikyo_map)
 	AM_RANGE(0xc00000, 0xc0000b) AM_READ(s1945_input_r) // input ports
 	AM_RANGE(0xc00004, 0xc0000b) AM_WRITE(s1945_mcu_w) // protection and tile bank switching
 	AM_RANGE(0xc00010, 0xc00013) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x00ff0000)
-	AM_IMPORT_FROM(psikyo_map)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( s1945_sound_io_map, AS_IO, 8, psikyo_state )

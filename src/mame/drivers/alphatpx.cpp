@@ -216,11 +216,11 @@ static ADDRESS_MAP_START( alphatp2_mem, AS_PROGRAM, 8, alphatp_12_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( alphatp2_map, AS_PROGRAM, 8, alphatp_12_state )
+	AM_RANGE(0x00000, 0x0ffff) AM_RAMBANK("ram_0000")
 	AM_RANGE(0x00000, 0x017ff) AM_ROM AM_REGION("boot", 0)  // P2  0x0000 , 0x17ff -hw 6kB, P3 only 4 kB
 	AM_RANGE(0x01800, 0x01c00) AM_RAM // boot rom variables
 	AM_RANGE(0x03000, 0x03bff) AM_WRITEONLY AM_SHARE("vram") // test  2017 hw, MOS directly writes to display RAM
 	AM_RANGE(0x03FF0, 0x03fff) AM_DEVWRITE("crtc", crt5027_device, write) //test hw, mem-mapped registers, cursor position can be determined through this range
-	AM_RANGE(0x00000, 0x0ffff) AM_RAMBANK("ram_0000")
 
 	AM_RANGE(0x10000, 0x1ffff) AM_RAM AM_SHARE("ram")
 ADDRESS_MAP_END
@@ -252,11 +252,11 @@ static ADDRESS_MAP_START( alphatp3_mem, AS_PROGRAM, 8, alphatp_34_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( alphatp3_map, AS_PROGRAM, 8, alphatp_34_state )
+	AM_RANGE(0x00000, 0x0ffff) AM_RAMBANK("ram_0000")
 	AM_RANGE(0x00000, 0x017ff) AM_ROM AM_REGION("boot", 0)  // P2  0x0000 , 0x17ff -hw 6kB, P3 only 4 kB
 	AM_RANGE(0x01800, 0x01c00) AM_RAM // boot rom variables
 	AM_RANGE(0x03000, 0x03bff) AM_WRITEONLY AM_SHARE("vram") // test  2017 hw, MOS directly writes to display RAM
 	AM_RANGE(0x03FF0, 0x03fff) AM_DEVWRITE("crtc", crt5037_device, write) //test hw, mem-mapped registers, cursor position can be determined through this range
-	AM_RANGE(0x00000, 0x0ffff) AM_RAMBANK("ram_0000")
 
 	AM_RANGE(0x10000, 0x1ffff) AM_RAM AM_SHARE("ram")
 ADDRESS_MAP_END

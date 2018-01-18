@@ -47,8 +47,8 @@ static ADDRESS_MAP_START( st0016_mem, AS_PROGRAM, 8, st0016_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( renju_mem, AS_PROGRAM, 8, st0016_state )
-	AM_RANGE(0x0000, 0x7fff) AM_ROM AM_REGION("maincpu", 0x200000 )
 	AM_IMPORT_FROM( st0016_mem )
+	AM_RANGE(0x0000, 0x7fff) AM_ROM AM_REGION("maincpu", 0x200000 )
 ADDRESS_MAP_END
 
 

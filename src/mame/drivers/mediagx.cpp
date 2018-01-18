@@ -758,8 +758,8 @@ static ADDRESS_MAP_START( mediagx_map, AS_PROGRAM, 32, mediagx_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(mediagx_io, AS_IO, 32, mediagx_state )
-	AM_RANGE(0x0020, 0x0023) AM_READWRITE8(io20_r, io20_w, 0xffff0000)
 	AM_IMPORT_FROM(pcat32_io_common)
+	AM_RANGE(0x0020, 0x0023) AM_READWRITE8(io20_r, io20_w, 0xffff0000)
 	AM_RANGE(0x00e8, 0x00eb) AM_NOP     // I/O delay port
 	AM_RANGE(0x01f0, 0x01f7) AM_DEVREADWRITE("ide", ide_controller_32_device, read_cs0, write_cs0)
 	AM_RANGE(0x0378, 0x037b) AM_READWRITE(parallel_port_r, parallel_port_w)

@@ -542,7 +542,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sub_map, AS_PROGRAM, 8, ddragon_state )
 	AM_RANGE(0x0000, 0x001f) AM_READWRITE(ddragon_hd63701_internal_registers_r, ddragon_hd63701_internal_registers_w)
-	AM_RANGE(0x001f, 0x0fff) AM_RAM
+	AM_RANGE(0x0020, 0x0fff) AM_RAM
 	AM_RANGE(0x8000, 0x81ff) AM_RAM AM_SHARE("comram")
 	AM_RANGE(0xc000, 0xffff) AM_ROM
 ADDRESS_MAP_END

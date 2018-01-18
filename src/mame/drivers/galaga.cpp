@@ -869,8 +869,8 @@ static ADDRESS_MAP_START( galaga_map, AS_PROGRAM, 8, galaga_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( gatsbee_main_map, AS_PROGRAM, 8, galaga_state )
-	AM_RANGE(0x0000, 0x0007) AM_MIRROR(0x3ff8) AM_DEVWRITE("extralatch", ls259_device, write_d0)
 	AM_IMPORT_FROM(galaga_map)
+	AM_RANGE(0x0000, 0x0007) AM_MIRROR(0x3ff8) AM_DEVWRITE("extralatch", ls259_device, write_d0)
 ADDRESS_MAP_END
 
 

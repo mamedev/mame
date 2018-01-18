@@ -230,8 +230,8 @@ static ADDRESS_MAP_START( overdriv_slave_map, AS_PROGRAM, 16, overdriv_state )
 	AM_RANGE(0x118000, 0x118fff) AM_DEVREADWRITE("k053246", k053247_device, k053247_word_r, k053247_word_w) // data gets copied to sprite chip with DMA..
 	AM_RANGE(0x120000, 0x120001) AM_DEVREAD("k053246", k053247_device, k053246_word_r)
 	AM_RANGE(0x128000, 0x128001) AM_READWRITE(cpuB_ctrl_r, cpuB_ctrl_w) /* enable K053247 ROM reading, plus something else */
-	AM_RANGE(0x130004, 0x130005) AM_WRITE(objdma_w)
 	AM_RANGE(0x130000, 0x130007) AM_DEVREADWRITE8("k053246", k053247_device, k053246_r,k053246_w,0xffff)
+	AM_RANGE(0x130004, 0x130005) AM_WRITE(objdma_w)
 	//AM_RANGE(0x140000, 0x140001) used in later stages, set after writes at 0x208000-0x20bfff range
 	AM_RANGE(0x200000, 0x203fff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0x208000, 0x20bfff) AM_RAM // sprite indirect table?

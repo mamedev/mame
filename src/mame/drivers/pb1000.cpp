@@ -89,10 +89,10 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(pb2000c_mem, AS_PROGRAM, 16, pb1000_state)
 	ADDRESS_MAP_UNMAP_LOW
+	AM_RANGE( 0x00000, 0x0ffff ) AM_ROMBANK("bank1")
 	AM_RANGE( 0x00000, 0x00bff ) AM_ROM
 	//AM_RANGE( 0x00c00, 0x00c0f ) AM_NOP   //I/O
 	AM_RANGE( 0x00c10, 0x00c11 ) AM_WRITE(gatearray_w)
-	AM_RANGE( 0x00000, 0x0ffff ) AM_ROMBANK("bank1")
 	AM_RANGE( 0x10000, 0x1ffff ) AM_RAM                 AM_SHARE("nvram1")
 	AM_RANGE( 0x20000, 0x27fff ) AM_DEVREAD("cardslot1", generic_slot_device, read16_rom)
 	AM_RANGE( 0x28000, 0x2ffff ) AM_RAM                 AM_SHARE("nvram2")

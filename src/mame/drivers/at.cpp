@@ -220,15 +220,15 @@ READ8_MEMBER( at_state::ps1_portb_r )
 
 static ADDRESS_MAP_START(ps1_16_io, AS_IO, 16, at_state )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0060, 0x0061) AM_READ8(ps1_portb_r, 0xff00)
 	AM_RANGE(0x0000, 0x00ff) AM_DEVICE("mb", at_mb_device, map)
+	AM_RANGE(0x0060, 0x0061) AM_READ8(ps1_portb_r, 0xff00)
 	AM_RANGE(0x0102, 0x0105) AM_READWRITE(ps1_unk_r, ps1_unk_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( neat_io, AS_IO, 16, at_state )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0022, 0x0023) AM_DEVICE("cs8221", cs8221_device, map)
 	AM_RANGE(0x0000, 0x00ff) AM_DEVICE("mb", at_mb_device, map)
+	AM_RANGE(0x0022, 0x0023) AM_DEVICE("cs8221", cs8221_device, map)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( at32_io, AS_IO, 32, at_state )
@@ -238,8 +238,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( ficpio_io, AS_IO, 32, at_state )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x00a8, 0x00af) AM_DEVREADWRITE8("chipset", vt82c496_device, read, write, 0xffffffff)
 	AM_RANGE(0x0000, 0x00ff) AM_DEVICE16("mb", at_mb_device, map, 0xffffffff)
+	AM_RANGE(0x00a8, 0x00af) AM_DEVREADWRITE8("chipset", vt82c496_device, read, write, 0xffffffff)
 	AM_RANGE(0x0170, 0x0177) AM_DEVREADWRITE("ide2", ide_controller_32_device, read_cs0, write_cs0)
 	AM_RANGE(0x01f0, 0x01f7) AM_DEVREADWRITE("ide", ide_controller_32_device, read_cs0, write_cs0)
 	AM_RANGE(0x0370, 0x0377) AM_DEVREADWRITE("ide2", ide_controller_32_device, read_cs1, write_cs1)

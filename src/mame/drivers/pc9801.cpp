@@ -708,13 +708,13 @@ static ADDRESS_MAP_START( pc9801_common_io, AS_IO, 16, pc9801_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( pc9801_io, AS_IO, 16, pc9801_state )
+	AM_IMPORT_FROM(pc9801_common_io)
 	AM_RANGE(0x0020, 0x002f) AM_WRITE8(dmapg4_w,0xff00)
 	AM_RANGE(0x0068, 0x0069) AM_WRITE8(pc9801_video_ff_w,0x00ff) //mode FF / <undefined>
 	AM_RANGE(0x00a0, 0x00af) AM_READWRITE8(pc9801_a0_r,pc9801_a0_w,0xffff) //upd7220 bitmap ports / display registers
 	AM_RANGE(0x00c8, 0x00cb) AM_DEVICE8("upd765_2dd", upd765a_device, map, 0x00ff)
 	AM_RANGE(0x00cc, 0x00cd) AM_READWRITE8(fdc_2dd_ctrl_r, fdc_2dd_ctrl_w, 0x00ff) //upd765a 2dd / <undefined>
 	AM_RANGE(0x00f0, 0x00ff) AM_READ8(f0_r,0x00ff)
-	AM_IMPORT_FROM(pc9801_common_io)
 ADDRESS_MAP_END
 
 /*************************************
@@ -1096,6 +1096,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( pc9801ux_io, AS_IO, 16, pc9801_state )
 	ADDRESS_MAP_UNMAP_HIGH
+	AM_IMPORT_FROM(pc9801_common_io)
 	AM_RANGE(0x0020, 0x002f) AM_WRITE8(dmapg8_w,0xff00)
 	AM_RANGE(0x0050, 0x0057) AM_NOP // 2dd ppi?
 	AM_RANGE(0x005c, 0x005f) AM_READ(timestamp_r) AM_WRITENOP // artic
@@ -1110,26 +1111,25 @@ static ADDRESS_MAP_START( pc9801ux_io, AS_IO, 16, pc9801_state )
 	AM_RANGE(0x043c, 0x043f) AM_WRITE8(pc9801rs_bank_w, 0xffff) //ROM/RAM bank
 	AM_RANGE(0x04a0, 0x04af) AM_WRITE(egc_w)
 	AM_RANGE(0x3fd8, 0x3fdf) AM_DEVREADWRITE8("pit8253", pit8253_device, read, write, 0xff00)
-	AM_IMPORT_FROM(pc9801_common_io)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( pc9801rs_map, AS_PROGRAM, 16, pc9801_state )
+	AM_IMPORT_FROM(pc9801ux_map)
 //  AM_RANGE(0x0d8000, 0x0d9fff) AM_ROM AM_REGION("ide",0)
 	AM_RANGE(0x0da000, 0x0dbfff) AM_RAM // ide ram
 	AM_RANGE(0xee8000, 0xefffff) AM_DEVICE("ipl_bank", address_map_bank_device, amap16)
 	AM_RANGE(0xfe8000, 0xffffff) AM_DEVICE("ipl_bank", address_map_bank_device, amap16)
-	AM_IMPORT_FROM(pc9801ux_map)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( pc9801rs_io, AS_IO, 16, pc9801_state )
 	ADDRESS_MAP_UNMAP_HIGH
+	AM_IMPORT_FROM(pc9801ux_io)
 	AM_RANGE(0x0430, 0x0433) AM_READWRITE8(ide_ctrl_r, ide_ctrl_w, 0x00ff)
 	AM_RANGE(0x0640, 0x064f) AM_READWRITE(ide_cs0_r, ide_cs0_w)
 	AM_RANGE(0x0740, 0x074f) AM_READWRITE(ide_cs1_r, ide_cs1_w)
 	AM_RANGE(0x1e8c, 0x1e8f) AM_NOP // temp
 	AM_RANGE(0xbfd8, 0xbfdf) AM_WRITE8(pc9801rs_mouse_freq_w, 0xffff)
 	AM_RANGE(0xe0d0, 0xe0d3) AM_READ8(midi_r, 0xffff)
-	AM_IMPORT_FROM(pc9801ux_io)
 ADDRESS_MAP_END
 
 /*************************************
