@@ -61,7 +61,7 @@ WRITE_LINE_MEMBER(tee_connector_device::ring_b_w)
 }
 
 
-MACHINE_CONFIG_MEMBER(tee_connector_device::device_add_mconfig)
+MACHINE_CONFIG_START(tee_connector_device::device_add_mconfig)
 	MCFG_TI8X_LINK_PORT_ADD("a", default_ti8x_link_devices, nullptr)
 	MCFG_TI8X_LINK_TIP_HANDLER(WRITELINE(tee_connector_device, tip_a_w))
 	MCFG_TI8X_LINK_RING_HANDLER(WRITELINE(tee_connector_device, ring_a_w))

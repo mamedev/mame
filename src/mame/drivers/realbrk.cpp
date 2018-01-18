@@ -754,7 +754,7 @@ INTERRUPT_GEN_MEMBER(realbrk_state::interrupt)
 	m_tmp68301->external_interrupt_1();
 }
 
-static MACHINE_CONFIG_START( realbrk )
+MACHINE_CONFIG_START(realbrk_state::realbrk)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",M68000, XTAL_32MHz / 2)          /* !! TMP68301 !! */
@@ -791,7 +791,7 @@ static MACHINE_CONFIG_START( realbrk )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( pkgnsh, realbrk )
+MACHINE_CONFIG_DERIVED(realbrk_state::pkgnsh, realbrk)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(pkgnsh_mem)
 
@@ -799,12 +799,12 @@ static MACHINE_CONFIG_DERIVED( pkgnsh, realbrk )
 	MCFG_TMP68301_OUT_PARALLEL_CB(NOOP)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( pkgnshdx, pkgnsh )
+MACHINE_CONFIG_DERIVED(realbrk_state::pkgnshdx, pkgnsh)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(pkgnshdx_mem)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( dai2kaku, realbrk )
+MACHINE_CONFIG_DERIVED(realbrk_state::dai2kaku, realbrk)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(dai2kaku_mem)
 

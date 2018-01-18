@@ -104,6 +104,7 @@ public:
 	DECLARE_PALETTE_INIT(chanbara);
 	uint32_t screen_update_chanbara(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
+	void chanbara(machine_config &config);
 };
 
 
@@ -385,7 +386,7 @@ void chanbara_state::machine_reset()
 	m_scrollhi = 0;
 }
 
-static MACHINE_CONFIG_START( chanbara )
+MACHINE_CONFIG_START(chanbara_state::chanbara)
 
 	MCFG_CPU_ADD("maincpu", M6809, XTAL_12MHz/8)
 	MCFG_CPU_PROGRAM_MAP(chanbara_map)

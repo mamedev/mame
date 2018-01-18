@@ -107,6 +107,8 @@ public:
 	inline uint8_t hex_to_ascii(uint8_t in);
 	void load_ldafile(address_space &space, const uint8_t *file);
 	void load_hexfile(address_space &space, const uint8_t *file);
+	void airrace(machine_config &config);
+	void atarisy4(machine_config &config);
 };
 
 
@@ -757,7 +759,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( atarisy4 )
+MACHINE_CONFIG_START(atarisy4_state::atarisy4)
 	MCFG_CPU_ADD("maincpu", M68000, 8000000)
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", atarisy4_state,  vblank_int)
@@ -776,7 +778,7 @@ static MACHINE_CONFIG_START( atarisy4 )
 
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( airrace, atarisy4 )
+MACHINE_CONFIG_DERIVED(atarisy4_state::airrace, atarisy4)
 
 	MCFG_CPU_ADD("dsp1", TMS32010, 16000000)
 	MCFG_CPU_PROGRAM_MAP(dsp1_map)

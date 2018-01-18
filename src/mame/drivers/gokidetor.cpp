@@ -33,6 +33,7 @@ public:
 	DECLARE_WRITE8_MEMBER(out9_w);
 	DECLARE_WRITE8_MEMBER(ym_porta_w);
 
+	void gokidetor(machine_config &config);
 protected:
 	virtual void machine_start() override;
 
@@ -115,7 +116,7 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, gokidetor_state )
 ADDRESS_MAP_END
 
 
-MACHINE_CONFIG_START( gokidetor )
+MACHINE_CONFIG_START(gokidetor_state::gokidetor)
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_16MHz / 4) // divider not verified
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	// IRQ from ???

@@ -32,7 +32,7 @@ DEFINE_DEVICE_TYPE(A2BUS_MIDI, a2bus_midi_device, "a2midi", "6850 MIDI card")
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( a2bus_midi_device::device_add_mconfig )
+MACHINE_CONFIG_START(a2bus_midi_device::device_add_mconfig)
 	MCFG_DEVICE_ADD(MIDI_PTM_TAG, PTM6840, 1021800)
 	MCFG_PTM6840_EXTERNAL_CLOCKS(1021800.0f, 1021800.0f, 1021800.0f)
 	MCFG_PTM6840_IRQ_CB(WRITELINE(a2bus_midi_device, ptm_irq_w))

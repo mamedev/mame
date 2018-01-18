@@ -52,6 +52,7 @@ public:
 	uint16_t m_hack[2];
 #endif
 
+void bowltry(machine_config &config);
 protected:
 	required_device<cpu_device> m_maincpu;
 public:
@@ -94,7 +95,7 @@ uint32_t bowltry_state::screen_update_bowltry(screen_device &screen, bitmap_rgb3
 
 
 
-static MACHINE_CONFIG_START( bowltry )
+MACHINE_CONFIG_START(bowltry_state::bowltry)
 	MCFG_CPU_ADD("maincpu", H83008, 16000000 )
 	MCFG_CPU_PROGRAM_MAP( bowltry_map )
 //  MCFG_CPU_VBLANK_INT_DRIVER("screen", bowltry_state,  irq0_line_hold) // uses vector $64, IMIAB according to the manual (timer/compare B, internal to the CPU)

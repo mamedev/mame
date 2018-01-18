@@ -257,7 +257,7 @@ void asterix_state::machine_reset()
 	}
 }
 
-static MACHINE_CONFIG_START( asterix )
+MACHINE_CONFIG_START(asterix_state::asterix)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz/2) // 12MHz

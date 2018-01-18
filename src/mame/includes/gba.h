@@ -78,6 +78,7 @@ public:
 	TIMER_CALLBACK_MEMBER(timer_expire);
 	TIMER_CALLBACK_MEMBER(handle_irq);
 
+	void gbadv(machine_config &config);
 protected:
 	required_region_ptr<uint32_t> m_region_maincpu;
 	required_ioport m_io_inputs;

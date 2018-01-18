@@ -47,6 +47,8 @@ public:
 	void galaxy_setup_snapshot (const uint8_t * data, uint32_t size);
 	required_device<cpu_device> m_maincpu;
 	DECLARE_SNAPSHOT_LOAD_MEMBER( galaxy );
+	void galaxy(machine_config &config);
+	void galaxyp(machine_config &config);
 protected:
 	required_device<cassette_image_device> m_cassette;
 	required_device<ram_device> m_ram;

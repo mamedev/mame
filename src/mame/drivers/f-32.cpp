@@ -52,6 +52,8 @@ public:
 
 	DECLARE_READ32_MEMBER(f32_input_port_1_r);
 	uint32_t screen_update_mosaicf2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void mosaicf2(machine_config &config);
+	void royalpk2(machine_config &config);
 };
 
 
@@ -156,7 +158,7 @@ INPUT_PORTS_END
 
 
 
-static MACHINE_CONFIG_START( mosaicf2 )
+MACHINE_CONFIG_START(mosaicf2_state::mosaicf2)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", E132XN, XTAL_20MHz*4) /* 4x internal multiplier */
@@ -232,7 +234,7 @@ static ADDRESS_MAP_START( royalpk2_io, AS_IO, 32, mosaicf2_state )
 	AM_RANGE(0x6a00, 0x6a03) AM_WRITE_PORT("EEPROMOUT")
 ADDRESS_MAP_END
 
-static MACHINE_CONFIG_START( royalpk2 )
+MACHINE_CONFIG_START(mosaicf2_state::royalpk2)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", GMS30C2132, XTAL_50MHz)

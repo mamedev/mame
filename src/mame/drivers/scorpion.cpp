@@ -33,6 +33,9 @@ public:
 	DECLARE_MACHINE_START(scorpion);
 	DECLARE_MACHINE_RESET(scorpion);
 	TIMER_DEVICE_CALLBACK_MEMBER(nmi_check_callback);
+	void scorpion(machine_config &config);
+	void profi(machine_config &config);
+	void quorum(machine_config &config);
 protected:
 	required_memory_bank m_bank1;
 	required_memory_bank m_bank2;
@@ -280,7 +283,7 @@ static GFXDECODE_START( quorum )
 	GFXDECODE_ENTRY( "maincpu", 0x1fb00, quorum_charlayout, 0, 8 )
 GFXDECODE_END
 
-static MACHINE_CONFIG_DERIVED( scorpion, spectrum_128 )
+MACHINE_CONFIG_DERIVED(scorpion_state::scorpion, spectrum_128)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(scorpion_mem)
 	MCFG_CPU_IO_MAP(scorpion_io)
@@ -301,11 +304,11 @@ static MACHINE_CONFIG_DERIVED( scorpion, spectrum_128 )
 	MCFG_DEVICE_REMOVE("exp")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( profi, scorpion )
+MACHINE_CONFIG_DERIVED(scorpion_state::profi, scorpion)
 	MCFG_GFXDECODE_MODIFY("gfxdecode", profi)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( quorum, scorpion )
+MACHINE_CONFIG_DERIVED(scorpion_state::quorum, scorpion)
 	MCFG_GFXDECODE_MODIFY("gfxdecode", quorum)
 MACHINE_CONFIG_END
 

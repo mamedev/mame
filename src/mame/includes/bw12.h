@@ -120,6 +120,10 @@ public:
 	int m_centronics_busy;
 	int m_centronics_fault;
 	int m_centronics_perror;
+
+	void common(machine_config &config);
+	void bw14(machine_config &config);
+	void bw12(machine_config &config);
 };
 
 #endif

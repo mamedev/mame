@@ -91,6 +91,10 @@ public:
 
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cartridge);
 
+	void svi328n(machine_config &config);
+	void svi318(machine_config &config);
+	void svi318n(machine_config &config);
+	void svi328(machine_config &config);
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -518,7 +522,7 @@ DEVICE_IMAGE_LOAD_MEMBER( svi3x8_state, cartridge )
 //  MACHINE DEFINTIONS
 //**************************************************************************
 
-static MACHINE_CONFIG_START( svi318 )
+MACHINE_CONFIG_START(svi3x8_state::svi318)
 	// basic machine hardware
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_10_738635MHz / 3)
 	MCFG_CPU_PROGRAM_MAP(svi3x8_mem)
@@ -579,7 +583,7 @@ static MACHINE_CONFIG_START( svi318 )
 	MCFG_SVI_EXPANDER_EXCSW_HANDLER(WRITE8(svi3x8_state, excs_w))
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( svi318n, svi318 )
+MACHINE_CONFIG_DERIVED(svi3x8_state::svi318n, svi318)
 	MCFG_DEVICE_REMOVE("vdp")
 	MCFG_DEVICE_REMOVE("screen")
 	MCFG_DEVICE_ADD("vdp", TMS9928A, XTAL_10_738635MHz / 2)
@@ -589,13 +593,13 @@ static MACHINE_CONFIG_DERIVED( svi318n, svi318 )
 	MCFG_SCREEN_UPDATE_DEVICE("vdp", tms9928a_device, screen_update)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( svi328, svi318 )
+MACHINE_CONFIG_DERIVED(svi3x8_state::svi328, svi318)
 	MCFG_DEVICE_REMOVE(RAM_TAG)
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("64K")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( svi328n, svi318n )
+MACHINE_CONFIG_DERIVED(svi3x8_state::svi328n, svi318n)
 	MCFG_DEVICE_REMOVE(RAM_TAG)
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("64K")

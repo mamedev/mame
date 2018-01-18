@@ -183,6 +183,14 @@ public:
 	required_device<palette_device> m_palette;
 	optional_device<ticket_dispenser_device> m_hopper;
 
+	void bishjan(machine_config &config);
+	void saklove(machine_config &config);
+	void mtrain(machine_config &config);
+	void humlan(machine_config &config);
+	void new2001(machine_config &config);
+	void expcard(machine_config &config);
+	void xplan(machine_config &config);
+	void xtrain(machine_config &config);
 private:
 	inline void ss9601_get_tile_info(layer_t *l, tile_data &tileinfo, tilemap_memory_index tile_index);
 };
@@ -2332,7 +2340,7 @@ INPUT_PORTS_END
                                 Bishou Jan
 ***************************************************************************/
 
-static MACHINE_CONFIG_START( bishjan )
+MACHINE_CONFIG_START(subsino2_state::bishjan)
 	MCFG_CPU_ADD("maincpu", H83044, XTAL_44_1MHz / 3)
 	MCFG_CPU_PROGRAM_MAP( bishjan_map )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", subsino2_state, irq0_line_hold)
@@ -2359,7 +2367,7 @@ static MACHINE_CONFIG_START( bishjan )
 	// SS9904
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( new2001, bishjan )
+MACHINE_CONFIG_DERIVED(subsino2_state::new2001, bishjan)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP( new2001_map )
 
@@ -2368,7 +2376,7 @@ static MACHINE_CONFIG_DERIVED( new2001, bishjan )
 	MCFG_SCREEN_VISIBLE_AREA( 0, 640-1, 0, 256-16-1 )
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( humlan, bishjan )
+MACHINE_CONFIG_DERIVED(subsino2_state::humlan, bishjan)
 	MCFG_CPU_REPLACE("maincpu", H83044, XTAL_48MHz / 3)
 	MCFG_CPU_PROGRAM_MAP( humlan_map )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", subsino2_state, irq0_line_hold)
@@ -2381,7 +2389,7 @@ MACHINE_CONFIG_END
                                 Magic Train
 ***************************************************************************/
 
-static MACHINE_CONFIG_START( mtrain )
+MACHINE_CONFIG_START(subsino2_state::mtrain)
 	MCFG_CPU_ADD("maincpu", Z180, XTAL_12MHz / 8)   /* Unknown clock */
 	MCFG_CPU_PROGRAM_MAP( mtrain_map )
 	MCFG_CPU_IO_MAP( mtrain_io )
@@ -2415,7 +2423,7 @@ MACHINE_CONFIG_END
                           Sakura Love - Ying Hua Lian
 ***************************************************************************/
 
-static MACHINE_CONFIG_START( saklove )
+MACHINE_CONFIG_START(subsino2_state::saklove)
 	MCFG_CPU_ADD("maincpu", I80188, XTAL_20MHz*2 )    // !! AMD AM188-EM !!
 	MCFG_CPU_PROGRAM_MAP( saklove_map )
 	MCFG_CPU_IO_MAP( saklove_io )
@@ -2452,7 +2460,7 @@ MACHINE_CONFIG_END
                                 X-Plan
 ***************************************************************************/
 
-static MACHINE_CONFIG_START( xplan )
+MACHINE_CONFIG_START(subsino2_state::xplan)
 	MCFG_CPU_ADD("maincpu", I80188, XTAL_20MHz*2 )    // !! AMD AM188-EM !!
 	MCFG_CPU_PROGRAM_MAP( xplan_map )
 	MCFG_CPU_IO_MAP( xplan_io )
@@ -2483,12 +2491,12 @@ static MACHINE_CONFIG_START( xplan )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( xtrain, xplan )
+MACHINE_CONFIG_DERIVED(subsino2_state::xtrain, xplan)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(xtrain_io)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( expcard, xplan )
+MACHINE_CONFIG_DERIVED(subsino2_state::expcard, xplan)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(expcard_io)
 MACHINE_CONFIG_END

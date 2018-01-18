@@ -225,6 +225,7 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_main_tick);
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_pad_tick);
 	TIMER_DEVICE_CALLBACK_MEMBER(vboy_scanlineL);
+	void vboy(machine_config &config);
 };
 
 
@@ -1346,7 +1347,7 @@ static SLOT_INTERFACE_START(vboy_cart)
 	SLOT_INTERFACE_INTERNAL("vb_eeprom", VBOY_ROM_EEPROM)
 SLOT_INTERFACE_END
 
-static MACHINE_CONFIG_START( vboy )
+MACHINE_CONFIG_START(vboy_state::vboy)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD( "maincpu", V810, XTAL_20MHz )

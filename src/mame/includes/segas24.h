@@ -154,4 +154,12 @@ public:
 	optional_ioport m_paddle;
 	optional_ioport_array<4> m_dials;
 	optional_ioport_array<8> m_mj_inputs;
+	void mahmajn(machine_config &config);
+	void system24_floppy_fd_upd(machine_config &config);
+	void system24_floppy(machine_config &config);
+	void system24_floppy_fd1094(machine_config &config);
+	void dcclub(machine_config &config);
+	void system24_floppy_dcclub(machine_config &config);
+	void system24_floppy_hotrod(machine_config &config);
+	void system24(machine_config &config);
 };

@@ -64,6 +64,8 @@ public:
 	IRQ_CALLBACK_MEMBER(poly88_irq_callback);
 	DECLARE_SNAPSHOT_LOAD_MEMBER( poly88 );
 
+	void poly88(machine_config &config);
+	void poly8813(machine_config &config);
 protected:
 	required_device<cpu_device> m_maincpu;
 	required_device<i8251_device> m_uart;

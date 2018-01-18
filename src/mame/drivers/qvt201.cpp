@@ -27,6 +27,7 @@ public:
 
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
+	void qvt201(machine_config &config);
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;
@@ -53,7 +54,7 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START( qvt201 )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( qvt201 )
+MACHINE_CONFIG_START(qvt201_state::qvt201)
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_3_6864MHz)
 	MCFG_CPU_PROGRAM_MAP(mem_map) // IORQ is not used at all
 

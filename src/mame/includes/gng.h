@@ -54,4 +54,6 @@ public:
 	required_device_array<ym2203_device, 2> m_ym;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	void gng(machine_config &config);
+	void diamond(machine_config &config);
 };

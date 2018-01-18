@@ -393,11 +393,11 @@ READ8_MEMBER(nes_lz93d50_24c01_device::read_m)
 //  SERIAL I2C DEVICE
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( nes_lz93d50_24c01_device::device_add_mconfig )
+MACHINE_CONFIG_START(nes_lz93d50_24c01_device::device_add_mconfig)
 	MCFG_24C01_ADD("i2cmem")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_MEMBER( nes_lz93d50_24c02_device::device_add_mconfig )
+MACHINE_CONFIG_START(nes_lz93d50_24c02_device::device_add_mconfig)
 	MCFG_24C02_ADD("i2cmem")
 MACHINE_CONFIG_END
 

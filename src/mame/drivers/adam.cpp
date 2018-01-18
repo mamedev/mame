@@ -1047,7 +1047,7 @@ DEVICE_INPUT_DEFAULTS_END
 //  MACHINE_CONFIG( adam )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( adam )
+MACHINE_CONFIG_START(adam_state::adam)
 	// basic machine hardware
 	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL_7_15909MHz/2)
 	MCFG_CPU_PROGRAM_MAP(adam_mem)

@@ -97,6 +97,7 @@ public:
 	TIMER_CALLBACK_MEMBER(joystick_callback);
 	TIMER_CALLBACK_MEMBER(quarter_callback);
 
+	void flyball(machine_config &config);
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
@@ -449,7 +450,7 @@ void flyball_state::machine_reset()
 }
 
 
-static MACHINE_CONFIG_START( flyball )
+MACHINE_CONFIG_START(flyball_state::flyball)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, MASTER_CLOCK/16)

@@ -146,6 +146,9 @@ public:
 		IO2 = 6,
 		IO3 = 7
 	};
+	void ntsc(machine_config &config);
+	void pal(machine_config &config);
+	void vic20(machine_config &config);
 };
 
 
@@ -787,7 +790,7 @@ WRITE_LINE_MEMBER(vic20_state::write_user_cassette_switch)
 //  MACHINE_CONFIG( vic20_common )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( vic20 )
+MACHINE_CONFIG_START(vic20_state::vic20)
 	// devices
 	MCFG_PET_DATASSETTE_PORT_ADD(PET_DATASSETTE_PORT_TAG, cbm_datassette_devices, "c1530", DEVWRITELINE(M6522_2_TAG, via6522_device, write_ca1))
 	MCFG_CBM_IEC_ADD("c1541")
@@ -831,7 +834,7 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( ntsc )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_DERIVED( ntsc, vic20 )
+MACHINE_CONFIG_DERIVED(vic20_state::ntsc, vic20)
 	// basic machine hardware
 	MCFG_CPU_ADD(M6502_TAG, M6502, MOS6560_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(vic20_mem)
@@ -878,7 +881,7 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( pal )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_DERIVED( pal, vic20 )
+MACHINE_CONFIG_DERIVED(vic20_state::pal, vic20)
 	// basic machine hardware
 	MCFG_CPU_ADD(M6502_TAG, M6502, MOS6561_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(vic20_mem)

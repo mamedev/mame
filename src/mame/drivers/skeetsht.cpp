@@ -60,6 +60,7 @@ public:
 	required_device<cpu_device> m_68hc11;
 	required_device<ay8910_device> m_ay;
 	required_device<tms34010_device> m_tms;
+	void skeetsht(machine_config &config);
 };
 
 
@@ -227,7 +228,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( skeetsht )
+MACHINE_CONFIG_START(skeetsht_state::skeetsht)
 
 	MCFG_CPU_ADD("68hc11", MC68HC11, 4000000) // ?
 	MCFG_CPU_PROGRAM_MAP(hc11_pgm_map)

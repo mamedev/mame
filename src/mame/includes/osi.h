@@ -56,6 +56,9 @@ public:
 
 	DECLARE_PALETTE_INIT(osi630);
 
+	void osi600(machine_config &config);
+	void osi600_video(machine_config &config);
+	void osi630_video(machine_config &config);
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 	virtual void machine_start() override;
@@ -105,6 +108,7 @@ public:
 	DECLARE_WRITE8_MEMBER( osi630_ctrl_w );
 	DECLARE_WRITE8_MEMBER( osi630_sound_w );
 	DECLARE_DRIVER_INIT(c1p);
+	void c1p(machine_config &config);
 };
 
 class c1pmf_state : public c1p_state
@@ -121,6 +125,7 @@ public:
 	DECLARE_WRITE8_MEMBER( osi470_pia_pb_w );
 	DECLARE_WRITE_LINE_MEMBER( osi470_pia_cb2_w );
 
+	void c1pmf(machine_config &config);
 protected:
 	virtual void machine_start() override;
 
@@ -139,12 +144,8 @@ public:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	DECLARE_WRITE8_MEMBER( keyboard_w );
+	void uk101(machine_config &config);
+	void uk101_video(machine_config &config);
 };
-
-/* ---------- defined in video/osi.c ---------- */
-
-MACHINE_CONFIG_EXTERN( osi600_video );
-MACHINE_CONFIG_EXTERN( uk101_video );
-MACHINE_CONFIG_EXTERN( osi630_video );
 
 #endif

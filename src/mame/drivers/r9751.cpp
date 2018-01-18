@@ -101,6 +101,7 @@ public:
 
 	DECLARE_DRIVER_INIT(r9751);
 
+	void r9751(machine_config &config);
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<pdc_device> m_pdc;
@@ -567,7 +568,7 @@ INPUT_PORTS_END
  Machine Drivers
 ******************************************************************************/
 
-static MACHINE_CONFIG_START( r9751 )
+MACHINE_CONFIG_START(r9751_state::r9751)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68030, 20000000)
 	MCFG_CPU_PROGRAM_MAP(r9751_mem)

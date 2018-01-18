@@ -272,7 +272,7 @@ void mosaic_state::machine_reset()
 	m_prot_val = 0;
 }
 
-static MACHINE_CONFIG_START( mosaic )
+MACHINE_CONFIG_START(mosaic_state::mosaic)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z180, XTAL_12_288MHz/2)  /* 6.144MHz */
@@ -303,7 +303,7 @@ static MACHINE_CONFIG_START( mosaic )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( gfire2, mosaic )
+MACHINE_CONFIG_DERIVED(mosaic_state::gfire2, mosaic)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(gfire2_map)
 	MCFG_CPU_IO_MAP(gfire2_io_map)

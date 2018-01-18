@@ -1399,7 +1399,7 @@ void ms32_state::machine_reset()
 
 /********** MACHINE DRIVER **********/
 
-static MACHINE_CONFIG_START( ms32 )
+MACHINE_CONFIG_START(ms32_state::ms32)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", V70, 20000000) // 20MHz
@@ -1436,7 +1436,7 @@ static MACHINE_CONFIG_START( ms32 )
 
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( f1superb, ms32 )
+MACHINE_CONFIG_DERIVED(ms32_state::f1superb, ms32)
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(f1superb_map)

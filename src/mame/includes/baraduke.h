@@ -55,4 +55,5 @@ public:
 	void scroll_w(address_space &space, int layer, int offset, int data);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int sprite_priority);
 	void set_scroll(int layer);
+	void baraduke(machine_config &config);
 };

@@ -179,6 +179,7 @@ public:
 	DECLARE_WRITE8_MEMBER(pio_5_m_out_pb_w)         { logerror("pio_5_m_out_pb_w %02x (LAMPS1)\n", data); }
 	DECLARE_WRITE_LINE_MEMBER(pio_5_m_out_brdy_w)   { logerror("pio_5_m_out_brdy_w %02x\n", state); }
 
+	void proconn(machine_config &config);
 protected:
 
 	// devices
@@ -318,7 +319,7 @@ void proconn_state::machine_reset()
 	m_vfd->reset(); // reset display1
 }
 
-static MACHINE_CONFIG_START( proconn )
+MACHINE_CONFIG_START(proconn_state::proconn)
 	MCFG_CPU_ADD("maincpu", Z80, 4000000) /* ?? Mhz */
 	MCFG_Z80_DAISY_CHAIN(z80_daisy_chain)
 	MCFG_CPU_PROGRAM_MAP(proconn_map)

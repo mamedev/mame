@@ -21,7 +21,7 @@
 
 DEFINE_DEVICE_TYPE(WD7600, wd7600_device, "wd7600", "Western Digital WD7600 chipset")
 
-MACHINE_CONFIG_MEMBER( wd7600_device::device_add_mconfig )
+MACHINE_CONFIG_START(wd7600_device::device_add_mconfig)
 	MCFG_DEVICE_ADD("dma1", AM9517A, 0)
 	MCFG_I8237_OUT_HREQ_CB(DEVWRITELINE("dma2", am9517a_device, dreq0_w))
 	MCFG_I8237_OUT_EOP_CB(WRITELINE(wd7600_device, dma1_eop_w))

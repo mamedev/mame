@@ -65,6 +65,11 @@ public:
 	DECLARE_WRITE16_MEMBER(dsp_ram_w);
 	DECLARE_INPUT_CHANGED_MEMBER(key_irq);
 
+	void noki3330(machine_config &config);
+	void noki3410(machine_config &config);
+	void noki7110(machine_config &config);
+	void noki6210(machine_config &config);
+	void noki3310(machine_config &config);
 private:
 	void assert_fiq(int num);
 	void assert_irq(int num);
@@ -688,7 +693,7 @@ static INPUT_PORTS_START( noki3310 )
 INPUT_PORTS_END
 
 
-static MACHINE_CONFIG_START( noki3310 )
+MACHINE_CONFIG_START(noki3310_state::noki3310)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", ARM7_BE, 26000000 / 2)  // MAD2WD1 13 MHz, clock internally supplied to ARM core can be divided by 2, in sleep mode a 32768 Hz clock is used
@@ -712,28 +717,28 @@ static MACHINE_CONFIG_START( noki3310 )
 
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( noki3330, noki3310 )
+MACHINE_CONFIG_DERIVED(noki3310_state::noki3330, noki3310)
 
 	MCFG_DEVICE_REMOVE("flash")
 	MCFG_INTEL_TE28F320_ADD("flash")
 
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( noki3410, noki3330 )
+MACHINE_CONFIG_DERIVED(noki3310_state::noki3410, noki3330)
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_SIZE(96, 65)    // Philips OM6206
 
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( noki7110, noki3330 )
+MACHINE_CONFIG_DERIVED(noki3310_state::noki7110, noki3330)
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_SIZE(96, 65)    // Epson SED1565
 
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( noki6210, noki3330 )
+MACHINE_CONFIG_DERIVED(noki3310_state::noki6210, noki3330)
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_SIZE(96, 60)

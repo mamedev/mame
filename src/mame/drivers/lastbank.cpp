@@ -86,6 +86,7 @@ public:
 	uint8_t ram_bank_r(uint16_t offset, uint8_t bank_num);
 	void ram_bank_w(uint16_t offset, uint8_t data, uint8_t bank_num);
 	TIMER_DEVICE_CALLBACK_MEMBER(lastbank_irq_scanline);
+	void lastbank(machine_config &config);
 };
 
 void lastbank_state::video_start()
@@ -528,7 +529,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(lastbank_state::lastbank_irq_scanline)
 	}
 }
 
-static MACHINE_CONFIG_START( lastbank )
+MACHINE_CONFIG_START(lastbank_state::lastbank)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80,MASTER_CLOCK/4) //!!! TC0091LVC !!!

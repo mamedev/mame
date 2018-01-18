@@ -26,6 +26,7 @@ public:
 
 	uint32_t screen_update_pass(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
+	void pass(machine_config &config);
 protected:
 	virtual void video_start() override;
 

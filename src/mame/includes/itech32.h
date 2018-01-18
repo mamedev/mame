@@ -202,4 +202,9 @@ public:
 	void handle_video_command();
 	inline int determine_irq_state(int vint, int xint, int qint);
 	void itech32_update_interrupts(int vint, int xint, int qint);
+	void tourny(machine_config &config);
+	void sftm(machine_config &config);
+	void drivedge(machine_config &config);
+	void bloodstm(machine_config &config);
+	void timekill(machine_config &config);
 };

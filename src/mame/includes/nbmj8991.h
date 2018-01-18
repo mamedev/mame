@@ -76,6 +76,27 @@ public:
 
 	void postload();
 
+	void nbmjdrv1(machine_config &config);
+	void nbmjdrv2(machine_config &config);
+	void nbmjdrv3(machine_config &config);
+	void tokyogal(machine_config &config);
+	void finalbny(machine_config &config);
+	void mjlstory(machine_config &config);
+	void galkaika(machine_config &config);
+	void pstadium(machine_config &config);
+	void galkoku(machine_config &config);
+	void av2mj2rg(machine_config &config);
+	void av2mj1bb(machine_config &config);
+	void vanilla(machine_config &config);
+	void mcontest(machine_config &config);
+	void triplew1(machine_config &config);
+	void ntopstar(machine_config &config);
+	void tokimbsj(machine_config &config);
+	void triplew2(machine_config &config);
+	void uchuuai(machine_config &config);
+	void hyouban(machine_config &config);
+	void qmhayaku(machine_config &config);
+	void mjgottub(machine_config &config);
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };

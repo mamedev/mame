@@ -138,11 +138,11 @@ public:
 	DECLARE_WRITE8_MEMBER(memory_write_byte);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void set_ea(int ea);
+	void mario_base(machine_config &config);
+	void masao(machine_config &config);
+	void masao_audio(machine_config &config);
+	void mario(machine_config &config);
+	void mario_audio(machine_config &config);
 };
-
-/*----------- defined in audio/mario.c -----------*/
-
-MACHINE_CONFIG_EXTERN( mario_audio );
-MACHINE_CONFIG_EXTERN( masao_audio );
 
 #endif /*MARIO_H_*/

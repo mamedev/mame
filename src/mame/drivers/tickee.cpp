@@ -91,6 +91,10 @@ public:
 	TMS340X0_SCANLINE_RGB32_CB_MEMBER(scanline_update);
 	TMS340X0_SCANLINE_RGB32_CB_MEMBER(rapidfir_scanline_update);
 
+	void rapidfir(machine_config &config);
+	void ghoshunt(machine_config &config);
+	void tickee(machine_config &config);
+	void mouseatk(machine_config &config);
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
@@ -744,7 +748,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( tickee )
+MACHINE_CONFIG_START(tickee_state::tickee)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", TMS34010, XTAL_40MHz)
@@ -784,7 +788,7 @@ static MACHINE_CONFIG_START( tickee )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( ghoshunt, tickee )
+MACHINE_CONFIG_DERIVED(tickee_state::ghoshunt, tickee)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -792,7 +796,7 @@ static MACHINE_CONFIG_DERIVED( ghoshunt, tickee )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( rapidfir )
+MACHINE_CONFIG_START(tickee_state::rapidfir)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", TMS34010, XTAL_50MHz)
@@ -826,7 +830,7 @@ static MACHINE_CONFIG_START( rapidfir )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( mouseatk )
+MACHINE_CONFIG_START(tickee_state::mouseatk)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", TMS34010, XTAL_40MHz)

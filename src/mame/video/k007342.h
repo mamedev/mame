@@ -67,7 +67,7 @@ DECLARE_DEVICE_TYPE(K007342, k007342_device)
 	k007342_device::static_set_gfxnum(*device, _gfxnum);
 
 #define MCFG_K007342_CALLBACK_OWNER(_class, _method) \
-	k007342_device::static_set_callback(*device, k007342_delegate(&_class::_method, #_class "::" #_method, downcast<_class *>(owner)));
+	k007342_device::static_set_callback(*device, k007342_delegate(&_class::_method, #_class "::" #_method, this));
 
 #define MCFG_K007342_CALLBACK_DEVICE(_tag, _class, _method) \
 	k007342_device::static_set_callback(*device, k007342_delegate(&_class::_method, #_class "::" #_method, _tag));

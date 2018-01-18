@@ -232,6 +232,7 @@ public:
 	DECLARE_PALETTE_INIT(cocoloco);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void cocoloco(machine_config &config);
 };
 
 /***********************************
@@ -519,7 +520,7 @@ INPUT_PORTS_END
 *         Machine Drivers          *
 ***********************************/
 
-static MACHINE_CONFIG_START( cocoloco )
+MACHINE_CONFIG_START(cocoloco_state::cocoloco)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, CPU_CLOCK)   /* confirmed */

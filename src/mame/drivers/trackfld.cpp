@@ -892,7 +892,7 @@ INTERRUPT_GEN_MEMBER(trackfld_state::vblank_nmi)
 		device.execute().set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 }
 
-static MACHINE_CONFIG_START( trackfld )
+MACHINE_CONFIG_START(trackfld_state::trackfld)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", KONAMI1, MASTER_CLOCK/6/2)    /* a guess for now */
@@ -960,7 +960,7 @@ INTERRUPT_GEN_MEMBER(trackfld_state::yieartf_timer_irq)
 		device.execute().set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 }
 
-static MACHINE_CONFIG_START( yieartf )
+MACHINE_CONFIG_START(trackfld_state::yieartf)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", MC6809E, MASTER_CLOCK/6/2)    /* a guess for now */
@@ -1023,9 +1023,31 @@ static MACHINE_CONFIG_START( yieartf )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 MACHINE_CONFIG_END
 
+static ADDRESS_MAP_START( hyprolyb_adpcm_map, AS_PROGRAM, 8, hyprolyb_adpcm_device )
+	AM_RANGE(0x0000, 0x007f) AM_RAM
+	AM_RANGE(0x1000, 0x1000) AM_DEVREAD("hyprolyb_adpcm", hyprolyb_adpcm_device, data_r)
+	AM_RANGE(0x1001, 0x1001) AM_DEVREAD("hyprolyb_adpcm", hyprolyb_adpcm_device, ready_r)
+	AM_RANGE(0x1002, 0x1002) AM_DEVWRITE("hyprolyb_adpcm", hyprolyb_adpcm_device, msm_data_w)
+	AM_RANGE(0x1003, 0x1003) AM_DEVREAD("hyprolyb_adpcm", hyprolyb_adpcm_device, msm_vck_r)
+		// on init:
+		//    $1003 = $00
+		//    $1002 = $FF
+		//    $1003 = $34
+		//    $1001 = $36
+		//    $1002 = $80
+		// loops while ($1003) & 0x80 == 0
+		// 1002 = ADPCM data written (low 4 bits)
+		//
+		// $1003 & $80 (in) = 5205 DRQ
+		// $1002 & $0f (out) = 5205 data
+		// $1001 & $80 (in) = sound latch request
+		// $1000 (in) = sound latch data
+	AM_RANGE(0x8000, 0xffff) AM_ROM
+ADDRESS_MAP_END
+
 /* same as the original, but uses ADPCM instead of VLM5030 */
 /* also different memory handlers do handle that */
-static MACHINE_CONFIG_DERIVED( hyprolyb, trackfld )
+MACHINE_CONFIG_DERIVED(trackfld_state::hyprolyb, trackfld)
 
 	MCFG_CPU_MODIFY("audiocpu")
 	MCFG_CPU_PROGRAM_MAP(hyprolyb_sound_map)
@@ -1035,16 +1057,26 @@ static MACHINE_CONFIG_DERIVED( hyprolyb, trackfld )
 
 	/* sound hardware */
 	MCFG_DEVICE_REMOVE("vlm")
-	MCFG_FRAGMENT_ADD(hyprolyb_adpcm)
+	MCFG_CPU_ADD("adpcm", M6802, XTAL_14_31818MHz/8)    /* unknown clock */
+	MCFG_CPU_PROGRAM_MAP(hyprolyb_adpcm_map)
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
+
+	MCFG_SOUND_ADD("hyprolyb_adpcm", HYPROLYB_ADPCM, 0)
+
+	MCFG_SOUND_ADD("msm", MSM5205, 384000)
+	MCFG_MSM5205_VCLK_CB(DEVWRITELINE("hyprolyb_adpcm", hyprolyb_adpcm_device, vck_callback)) /* VCK function */
+	MCFG_MSM5205_PRESCALER_SELECTOR(S96_4B)      /* 4 kHz */
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( atlantol, hyprolyb )
+MACHINE_CONFIG_DERIVED(trackfld_state::atlantol, hyprolyb)
 
 	MCFG_VIDEO_START_OVERRIDE(trackfld_state,atlantol)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( mastkin, trackfld )
+MACHINE_CONFIG_DERIVED(trackfld_state::mastkin, trackfld)
 
 	/* basic machine hardware */
 	MCFG_CPU_REPLACE("maincpu", MC6809E, MASTER_CLOCK/6/2)    /* a guess for now */
@@ -1056,7 +1088,7 @@ static MACHINE_CONFIG_DERIVED( mastkin, trackfld )
 	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(NOOP) // actually not used
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( wizzquiz, trackfld )
+MACHINE_CONFIG_DERIVED(trackfld_state::wizzquiz, trackfld)
 
 	/* basic machine hardware */
 	// right cpu?
@@ -1068,7 +1100,7 @@ static MACHINE_CONFIG_DERIVED( wizzquiz, trackfld )
 	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(trackfld_state, nmi_mask_w))
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( reaktor, trackfld )
+MACHINE_CONFIG_DERIVED(trackfld_state::reaktor, trackfld)
 
 	/* basic machine hardware */
 	MCFG_CPU_REPLACE("maincpu",Z80,MASTER_CLOCK/6)

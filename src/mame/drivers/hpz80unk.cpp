@@ -70,6 +70,7 @@ public:
 	DECLARE_WRITE8_MEMBER(port0e_w);
 	DECLARE_READ8_MEMBER(portfc_r);
 
+	void hpz80unk(machine_config &config);
 private:
 	uint8_t m_port02_data;
 	virtual void machine_reset() override;
@@ -213,7 +214,7 @@ void hpz80unk_state::machine_reset()
 }
 
 
-static MACHINE_CONFIG_START( hpz80unk )
+MACHINE_CONFIG_START(hpz80unk_state::hpz80unk)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80, XTAL_4MHz)
 	MCFG_CPU_PROGRAM_MAP(hpz80unk_mem)

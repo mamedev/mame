@@ -1887,7 +1887,7 @@ GFXDECODE_END
 #define VBSTART             (240)
 
 
-static MACHINE_CONFIG_START( rallybik )
+MACHINE_CONFIG_START(toaplan1_rallybik_state::rallybik)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_10MHz)
@@ -1933,7 +1933,7 @@ static MACHINE_CONFIG_START( rallybik )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( truxton )
+MACHINE_CONFIG_START(toaplan1_state::truxton)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_10MHz)
@@ -1971,7 +1971,7 @@ static MACHINE_CONFIG_START( truxton )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( hellfire )
+MACHINE_CONFIG_START(toaplan1_state::hellfire)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_10MHz)
@@ -2009,7 +2009,7 @@ static MACHINE_CONFIG_START( hellfire )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( zerowing )
+MACHINE_CONFIG_START(toaplan1_state::zerowing)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_10MHz)
@@ -2047,7 +2047,7 @@ static MACHINE_CONFIG_START( zerowing )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( demonwld )
+MACHINE_CONFIG_START(toaplan1_state::demonwld)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_10MHz)
@@ -2090,7 +2090,7 @@ static MACHINE_CONFIG_START( demonwld )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( samesame )
+MACHINE_CONFIG_START(toaplan1_state::samesame)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_10MHz)
@@ -2128,7 +2128,7 @@ static MACHINE_CONFIG_START( samesame )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( outzone )
+MACHINE_CONFIG_START(toaplan1_state::outzone)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_10MHz)
@@ -2166,7 +2166,7 @@ static MACHINE_CONFIG_START( outzone )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( outzonecv )
+MACHINE_CONFIG_START(toaplan1_state::outzonecv)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_10MHz)
@@ -2204,7 +2204,7 @@ static MACHINE_CONFIG_START( outzonecv )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( vimana )
+MACHINE_CONFIG_START(toaplan1_state::vimana)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_10MHz) /* verified on pcb */

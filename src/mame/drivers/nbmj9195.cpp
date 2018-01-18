@@ -2503,7 +2503,7 @@ static const z80_daisy_config daisy_chain_sound[] =
 	MCFG_TMPZ84C011_PORTD_WRITE_CB(WRITE8(nbmj9195_state, clutsel_w)) \
 	MCFG_TMPZ84C011_PORTE_WRITE_CB(WRITE8(nbmj9195_state, outcoin_flag_w))
 
-static MACHINE_CONFIG_START( NBMJDRV1_base )
+MACHINE_CONFIG_START(nbmj9195_state::NBMJDRV1_base)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", TMPZ84C011, 12000000/2) /* TMPZ84C011, 6.00 MHz */
@@ -2549,7 +2549,7 @@ static MACHINE_CONFIG_START( NBMJDRV1_base )
 	MCFG_SOUND_ROUTE_EX(0, "dac2", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac2", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( NBMJDRV1, NBMJDRV1_base )
+MACHINE_CONFIG_DERIVED(nbmj9195_state::NBMJDRV1, NBMJDRV1_base)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2557,7 +2557,7 @@ static MACHINE_CONFIG_DERIVED( NBMJDRV1, NBMJDRV1_base )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( NBMJDRV2, NBMJDRV1_base )
+MACHINE_CONFIG_DERIVED(nbmj9195_state::NBMJDRV2, NBMJDRV1_base)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2568,7 +2568,7 @@ static MACHINE_CONFIG_DERIVED( NBMJDRV2, NBMJDRV1_base )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( NBMJDRV3, NBMJDRV1_base )
+MACHINE_CONFIG_DERIVED(nbmj9195_state::NBMJDRV3, NBMJDRV1_base)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2584,7 +2584,7 @@ MACHINE_CONFIG_END
 
 //-------------------------------------------------------------------------
 
-static MACHINE_CONFIG_DERIVED( mjuraden, NBMJDRV1 )
+MACHINE_CONFIG_DERIVED(nbmj9195_state::mjuraden, NBMJDRV1)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2593,7 +2593,7 @@ static MACHINE_CONFIG_DERIVED( mjuraden, NBMJDRV1 )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( koinomp, NBMJDRV1 )
+MACHINE_CONFIG_DERIVED(nbmj9195_state::koinomp, NBMJDRV1)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2602,7 +2602,7 @@ static MACHINE_CONFIG_DERIVED( koinomp, NBMJDRV1 )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( patimono, NBMJDRV1 )
+MACHINE_CONFIG_DERIVED(nbmj9195_state::patimono, NBMJDRV1)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2610,7 +2610,7 @@ static MACHINE_CONFIG_DERIVED( patimono, NBMJDRV1 )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( janbari, NBMJDRV1 )
+MACHINE_CONFIG_DERIVED(nbmj9195_state::janbari, NBMJDRV1)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2620,7 +2620,7 @@ static MACHINE_CONFIG_DERIVED( janbari, NBMJDRV1 )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( mmehyou, NBMJDRV1 )
+MACHINE_CONFIG_DERIVED(nbmj9195_state::mmehyou, NBMJDRV1)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2631,7 +2631,7 @@ static MACHINE_CONFIG_DERIVED( mmehyou, NBMJDRV1 )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( ultramhm, NBMJDRV1 )
+MACHINE_CONFIG_DERIVED(nbmj9195_state::ultramhm, NBMJDRV1)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2642,7 +2642,7 @@ static MACHINE_CONFIG_DERIVED( ultramhm, NBMJDRV1 )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( gal10ren, NBMJDRV1 )
+MACHINE_CONFIG_DERIVED(nbmj9195_state::gal10ren, NBMJDRV1)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2650,7 +2650,7 @@ static MACHINE_CONFIG_DERIVED( gal10ren, NBMJDRV1 )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( renaiclb, NBMJDRV1 )
+MACHINE_CONFIG_DERIVED(nbmj9195_state::renaiclb, NBMJDRV1)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2658,7 +2658,7 @@ static MACHINE_CONFIG_DERIVED( renaiclb, NBMJDRV1 )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( mjlaman, NBMJDRV1 )
+MACHINE_CONFIG_DERIVED(nbmj9195_state::mjlaman, NBMJDRV1)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2666,7 +2666,7 @@ static MACHINE_CONFIG_DERIVED( mjlaman, NBMJDRV1 )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( mkeibaou, NBMJDRV1 )
+MACHINE_CONFIG_DERIVED(nbmj9195_state::mkeibaou, NBMJDRV1)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2674,7 +2674,7 @@ static MACHINE_CONFIG_DERIVED( mkeibaou, NBMJDRV1 )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( pachiten, NBMJDRV1 )
+MACHINE_CONFIG_DERIVED(nbmj9195_state::pachiten, NBMJDRV1)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2684,13 +2684,13 @@ static MACHINE_CONFIG_DERIVED( pachiten, NBMJDRV1 )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( sailorws, NBMJDRV1 )
+MACHINE_CONFIG_DERIVED(nbmj9195_state::sailorws, NBMJDRV1)
 
 	/* basic machine hardware */
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( sailorwr, NBMJDRV1 )
+MACHINE_CONFIG_DERIVED(nbmj9195_state::sailorwr, NBMJDRV1)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2700,7 +2700,7 @@ static MACHINE_CONFIG_DERIVED( sailorwr, NBMJDRV1 )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( psailor1, NBMJDRV1 )
+MACHINE_CONFIG_DERIVED(nbmj9195_state::psailor1, NBMJDRV1)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2708,7 +2708,7 @@ static MACHINE_CONFIG_DERIVED( psailor1, NBMJDRV1 )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( psailor2, NBMJDRV1 )
+MACHINE_CONFIG_DERIVED(nbmj9195_state::psailor2, NBMJDRV1)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2716,7 +2716,7 @@ static MACHINE_CONFIG_DERIVED( psailor2, NBMJDRV1 )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( otatidai, NBMJDRV1 )
+MACHINE_CONFIG_DERIVED(nbmj9195_state::otatidai, NBMJDRV1)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2724,7 +2724,7 @@ static MACHINE_CONFIG_DERIVED( otatidai, NBMJDRV1 )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( yosimoto, NBMJDRV1 )
+MACHINE_CONFIG_DERIVED(nbmj9195_state::yosimoto, NBMJDRV1)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2732,7 +2732,7 @@ static MACHINE_CONFIG_DERIVED( yosimoto, NBMJDRV1 )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( yosimotm, NBMJDRV1 )
+MACHINE_CONFIG_DERIVED(nbmj9195_state::yosimotm, NBMJDRV1)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2742,7 +2742,7 @@ static MACHINE_CONFIG_DERIVED( yosimotm, NBMJDRV1 )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( jituroku, NBMJDRV1 )
+MACHINE_CONFIG_DERIVED(nbmj9195_state::jituroku, NBMJDRV1)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2750,7 +2750,7 @@ static MACHINE_CONFIG_DERIVED( jituroku, NBMJDRV1 )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( ngpgal, NBMJDRV2 )
+MACHINE_CONFIG_DERIVED(nbmj9195_state::ngpgal, NBMJDRV2)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2759,7 +2759,7 @@ static MACHINE_CONFIG_DERIVED( ngpgal, NBMJDRV2 )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( mjgottsu, NBMJDRV2 )
+MACHINE_CONFIG_DERIVED(nbmj9195_state::mjgottsu, NBMJDRV2)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2768,7 +2768,7 @@ static MACHINE_CONFIG_DERIVED( mjgottsu, NBMJDRV2 )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( bakuhatu, NBMJDRV2 )
+MACHINE_CONFIG_DERIVED(nbmj9195_state::bakuhatu, NBMJDRV2)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2777,7 +2777,7 @@ static MACHINE_CONFIG_DERIVED( bakuhatu, NBMJDRV2 )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( cmehyou, NBMJDRV2 )
+MACHINE_CONFIG_DERIVED(nbmj9195_state::cmehyou, NBMJDRV2)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2786,7 +2786,7 @@ static MACHINE_CONFIG_DERIVED( cmehyou, NBMJDRV2 )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( mjkoiura, NBMJDRV2 )
+MACHINE_CONFIG_DERIVED(nbmj9195_state::mjkoiura, NBMJDRV2)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2795,7 +2795,7 @@ static MACHINE_CONFIG_DERIVED( mjkoiura, NBMJDRV2 )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( mkoiuraa, NBMJDRV2 )
+MACHINE_CONFIG_DERIVED(nbmj9195_state::mkoiuraa, NBMJDRV2)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2804,7 +2804,7 @@ static MACHINE_CONFIG_DERIVED( mkoiuraa, NBMJDRV2 )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( mscoutm, NBMJDRV3 )
+MACHINE_CONFIG_DERIVED(nbmj9195_state::mscoutm, NBMJDRV3)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2813,7 +2813,7 @@ static MACHINE_CONFIG_DERIVED( mscoutm, NBMJDRV3 )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( imekura, NBMJDRV3 )
+MACHINE_CONFIG_DERIVED(nbmj9195_state::imekura, NBMJDRV3)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2822,7 +2822,7 @@ static MACHINE_CONFIG_DERIVED( imekura, NBMJDRV3 )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( mjegolf, NBMJDRV3 )
+MACHINE_CONFIG_DERIVED(nbmj9195_state::mjegolf, NBMJDRV3)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2831,7 +2831,7 @@ static MACHINE_CONFIG_DERIVED( mjegolf, NBMJDRV3 )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( shabdama, NBMJDRV1 )
+MACHINE_CONFIG_DERIVED(nbmj9195_state::shabdama, NBMJDRV1)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")

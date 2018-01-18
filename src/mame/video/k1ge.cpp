@@ -882,7 +882,7 @@ k1ge_device::k1ge_device(const machine_config &mconfig, device_type type, const 
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( k1ge_device::device_add_mconfig )
+MACHINE_CONFIG_START(k1ge_device::device_add_mconfig)
 	MCFG_PALETTE_ADD("palette", 8 )
 	MCFG_PALETTE_INIT_OWNER(k1ge_device, k1ge)
 MACHINE_CONFIG_END
@@ -899,7 +899,7 @@ k2ge_device::k2ge_device(const machine_config &mconfig, const char *tag, device_
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( k2ge_device::device_add_mconfig )
+MACHINE_CONFIG_START(k2ge_device::device_add_mconfig)
 	MCFG_PALETTE_ADD("palette", 4096 )
 	MCFG_PALETTE_INIT_OWNER(k2ge_device, k2ge)
 MACHINE_CONFIG_END

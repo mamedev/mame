@@ -32,4 +32,10 @@ public:
 
 	DECLARE_MACHINE_START(md_bootleg) { MACHINE_START_CALL_MEMBER(megadriv); m_vdp->stop_timers(); }
 	DECLARE_MACHINE_START(md_6button);
+	void megadrvb(machine_config &config);
+	void megadrvb_6b(machine_config &config);
+	void md_bootleg(machine_config &config);
+	void puckpkmn(machine_config &config);
+	void jzth(machine_config &config);
+	void puckpkmna(machine_config &config);
 };

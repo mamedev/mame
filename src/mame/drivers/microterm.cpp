@@ -28,6 +28,8 @@ public:
 	DECLARE_READ8_MEMBER(c000_r);
 	SCN2674_DRAW_CHARACTER_MEMBER(draw_character);
 
+	void mt420(machine_config &config);
+	void mt5510(machine_config &config);
 private:
 	required_device<cpu_device> m_maincpu;
 	optional_region_ptr<u8> m_p_chargen;
@@ -80,7 +82,7 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START( microterm )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( mt420 )
+MACHINE_CONFIG_START(microterm_state::mt420)
 	MCFG_CPU_ADD("maincpu", Z80, 4'000'000)
 	MCFG_CPU_PROGRAM_MAP(mt420_mem_map)
 	MCFG_CPU_IO_MAP(mt420_io_map)
@@ -110,7 +112,7 @@ static MACHINE_CONFIG_START( mt420 )
 	MCFG_VIDEO_SET_SCREEN("screen")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( mt5510 )
+MACHINE_CONFIG_START(microterm_state::mt5510)
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_6MHz)
 	MCFG_CPU_PROGRAM_MAP(mt5510_mem_map)
 	MCFG_CPU_IO_MAP(mt5510_io_map)

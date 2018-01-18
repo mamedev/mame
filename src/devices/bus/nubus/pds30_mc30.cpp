@@ -35,7 +35,7 @@ DEFINE_DEVICE_TYPE(PDS030_XCEEDMC30, nubus_xceedmc30_device, "pd3_mclr", "Micron
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( nubus_xceedmc30_device::device_add_mconfig )
+MACHINE_CONFIG_START(nubus_xceedmc30_device::device_add_mconfig)
 	MCFG_SCREEN_ADD( XCEEDMC30_SCREEN_NAME, RASTER)
 	MCFG_SCREEN_UPDATE_DEVICE(DEVICE_SELF, nubus_xceedmc30_device, screen_update)
 	MCFG_SCREEN_RAW_PARAMS(25175000, 800, 0, 640, 525, 0, 480)

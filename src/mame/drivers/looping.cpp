@@ -167,6 +167,7 @@ public:
 	required_device<palette_device> m_palette;
 	required_device<generic_latch_8_device> m_soundlatch;
 	required_device<watchdog_timer_device> m_watchdog;
+	void looping(machine_config &config);
 };
 
 
@@ -610,7 +611,7 @@ GFXDECODE_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( looping )
+MACHINE_CONFIG_START(looping_state::looping)
 
 	// CPU TMS9995, standard variant; no line connections
 	MCFG_TMS99xx_ADD("maincpu", TMS9995, MAIN_CPU_CLOCK, looping_map, looping_io_map)

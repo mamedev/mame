@@ -66,4 +66,6 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	optional_shared_ptr<uint8_t> m_decrypted_opcodes;
+	void angelkds(machine_config &config);
+	void spcpostn(machine_config &config);
 };

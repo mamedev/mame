@@ -68,4 +68,5 @@ public:
 	DECLARE_WRITE16_MEMBER(cbuster_palette_w);
 	DECLARE_WRITE16_MEMBER(cbuster_palette_ext_w);
 	void update_palette(int offset);
+	void twocrude(machine_config &config);
 };

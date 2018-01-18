@@ -38,6 +38,7 @@ public:
 	DECLARE_WRITE8_MEMBER(port_b_w);
 	uint32_t screen_update_mc8020(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
+	void mc8020(machine_config &config);
 private:
 	u8 m_row;
 	required_shared_ptr<u8> m_p_videoram;
@@ -289,7 +290,7 @@ static const z80_daisy_config daisy_chain[] =
 	{ nullptr }
 };
 
-static MACHINE_CONFIG_START( mc8020 )
+MACHINE_CONFIG_START(mc8020_state::mc8020)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80, XTAL_2_4576MHz)
 	MCFG_CPU_PROGRAM_MAP(mem_map)

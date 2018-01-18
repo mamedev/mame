@@ -72,6 +72,7 @@ public:
 	DECLARE_READ8_MEMBER(keyboard_r);
 	DECLARE_DRIVER_INIT(init);
 
+	void cortex(machine_config &config);
 private:
 	bool m_kbd_ack;
 	bool m_vdp_int;
@@ -174,7 +175,7 @@ DRIVER_INIT_MEMBER( cortex_state, init )
 	membank("bankw0")->configure_entry(0, &main[0x00000]);
 }
 
-static MACHINE_CONFIG_START( cortex )
+MACHINE_CONFIG_START(cortex_state::cortex)
 	/* basic machine hardware */
 	/* TMS9995 CPU @ 12.0 MHz */
 	// Standard variant, no overflow int

@@ -54,6 +54,7 @@ public:
 	DECLARE_WRITE8_MEMBER(portf8_w);
 	DECLARE_DRIVER_INIT(microdec);
 
+	void microdec(machine_config &config);
 private:
 	uint8_t m_portf8;
 	bool m_fdc_rdy;
@@ -181,7 +182,7 @@ DRIVER_INIT_MEMBER( microdec_state, microdec )
 	membank("bankw0")->configure_entry(0, &main[0x1000]);
 }
 
-static MACHINE_CONFIG_START( microdec )
+MACHINE_CONFIG_START(microdec_state::microdec)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_16MHz / 4)
 	MCFG_CPU_PROGRAM_MAP(microdec_mem)

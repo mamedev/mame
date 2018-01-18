@@ -96,6 +96,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	void dominob(machine_config &config);
 };
 
 void dominob_state::video_start()
@@ -289,7 +290,7 @@ static GFXDECODE_START( dominob )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( dominob )
+MACHINE_CONFIG_START(dominob_state::dominob)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80,XTAL_12MHz/2)

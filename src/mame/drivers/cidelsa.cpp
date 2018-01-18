@@ -389,7 +389,7 @@ void cidelsa_state::machine_reset()
 
 /* Machine Drivers */
 
-static MACHINE_CONFIG_START( destryer )
+MACHINE_CONFIG_START(cidelsa_state::destryer)
 	/* basic system hardware */
 	MCFG_CPU_ADD(CDP1802_TAG, CDP1802, DESTRYER_CHR1)
 	MCFG_CPU_PROGRAM_MAP(destryer_map)
@@ -404,7 +404,7 @@ static MACHINE_CONFIG_START( destryer )
 	MCFG_FRAGMENT_ADD(destryer_video)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( destryera )
+MACHINE_CONFIG_START(cidelsa_state::destryera)
 	/* basic system hardware */
 	MCFG_CPU_ADD(CDP1802_TAG, CDP1802, DESTRYER_CHR1)
 	MCFG_CPU_PROGRAM_MAP(destryera_map)
@@ -419,7 +419,7 @@ static MACHINE_CONFIG_START( destryera )
 	MCFG_FRAGMENT_ADD(destryer_video)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( altair )
+MACHINE_CONFIG_START(cidelsa_state::altair)
 	/* basic system hardware */
 	MCFG_CPU_ADD(CDP1802_TAG, CDP1802, ALTAIR_CHR1)
 	MCFG_CPU_PROGRAM_MAP(altair_map)
@@ -448,7 +448,7 @@ static MACHINE_CONFIG_START( altair )
 	MCFG_FRAGMENT_ADD(altair_video)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( draco )
+MACHINE_CONFIG_START(draco_state::draco)
 	/* basic system hardware */
 	MCFG_CPU_ADD(CDP1802_TAG, CDP1802, DRACO_CHR1)
 	MCFG_CPU_PROGRAM_MAP(draco_map)

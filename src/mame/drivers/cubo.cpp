@@ -357,6 +357,7 @@ public:
 	int m_cd32_shifter[2];
 	uint16_t m_potgo_value;
 
+	void cubo(machine_config &config);
 protected:
 	virtual void rs232_tx(int state) override;
 	virtual void potgo_w(uint16_t data) override;
@@ -1024,7 +1025,7 @@ static INPUT_PORTS_START( mgprem11 )
 INPUT_PORTS_END
 
 
-static MACHINE_CONFIG_START( cubo )
+MACHINE_CONFIG_START(cubo_state::cubo)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68EC020, amiga_state::CLK_28M_PAL / 2)

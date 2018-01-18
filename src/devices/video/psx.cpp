@@ -3804,14 +3804,14 @@ PALETTE_INIT_MEMBER( psxgpu_device, psx )
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( psxgpu_device::device_add_mconfig )
+MACHINE_CONFIG_START(psxgpu_device::device_add_mconfig)
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE( 60 )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MCFG_SCREEN_SIZE( 1024, 1024 )
 	MCFG_SCREEN_VISIBLE_AREA( 0, 639, 0, 479 )
 	MCFG_SCREEN_UPDATE_DEVICE( DEVICE_SELF, psxgpu_device, update_screen )
-	((screen_device *)device)->register_vblank_callback(vblank_state_delegate(&psxgpu_device::vblank, (psxgpu_device *) owner));
+	((screen_device *)device)->register_vblank_callback(vblank_state_delegate(&psxgpu_device::vblank, this));
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD( "palette", 65536 )

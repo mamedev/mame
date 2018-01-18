@@ -47,7 +47,7 @@ protected:
 	virtual uint32_t execute_input_lines() const override { return 1; }
 	virtual uint8_t fetch_op() override;
 	virtual uint8_t fetch() override;
-	uint32_t pc() { return m_pc = (m_sregs[CS] << 4) + m_ip; }
+	uint32_t update_pc() { return m_pc = (m_sregs[CS] << 4) + m_ip; }
 
 	virtual uint8_t read_port_byte(uint16_t port) override;
 	virtual uint16_t read_port_word(uint16_t port) override;

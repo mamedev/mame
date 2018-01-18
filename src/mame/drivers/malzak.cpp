@@ -295,7 +295,7 @@ void malzak_state::machine_reset()
 	m_malzak_y = 0;
 }
 
-static MACHINE_CONFIG_START( malzak )
+MACHINE_CONFIG_START(malzak_state::malzak)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", S2650, 3800000/4)
@@ -365,7 +365,7 @@ static MACHINE_CONFIG_START( malzak )
 
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( malzak2, malzak )
+MACHINE_CONFIG_DERIVED(malzak_state::malzak2, malzak)
 
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_PROGRAM_MAP(malzak2_map)

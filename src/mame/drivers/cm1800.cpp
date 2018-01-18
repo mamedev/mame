@@ -52,6 +52,7 @@ public:
 	DECLARE_READ8_MEMBER(port01_r);
 	DECLARE_WRITE8_MEMBER(port00_w);
 
+	void cm1800(machine_config &config);
 private:
 	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
@@ -107,7 +108,7 @@ void cm1800_state::machine_reset()
 	m_uart->set_input_pin(AY31015_CS, 0);
 }
 
-static MACHINE_CONFIG_START( cm1800 )
+MACHINE_CONFIG_START(cm1800_state::cm1800)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8080, XTAL_2MHz)
 	MCFG_CPU_PROGRAM_MAP(mem_map)

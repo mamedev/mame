@@ -145,7 +145,7 @@ static SLOT_INTERFACE_START(dragon_fdc_device_base)
 SLOT_INTERFACE_END
 
 
-MACHINE_CONFIG_MEMBER(dragon_fdc_device_base::device_add_mconfig)
+MACHINE_CONFIG_START(dragon_fdc_device_base::device_add_mconfig)
 	MCFG_WD2797_ADD(WD2797_TAG, XTAL_4MHz / 4)
 	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(dragon_fdc_device_base, fdc_intrq_w))
 	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(dragon_fdc_device_base, fdc_drq_w))
@@ -162,7 +162,7 @@ MACHINE_CONFIG_MEMBER(dragon_fdc_device_base::device_add_mconfig)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_MEMBER(premier_fdc_device_base::device_add_mconfig)
+MACHINE_CONFIG_START(premier_fdc_device_base::device_add_mconfig)
 	MCFG_WD2791_ADD(WD2791_TAG, XTAL_2MHz / 2)
 	MCFG_WD_FDC_FORCE_READY
 

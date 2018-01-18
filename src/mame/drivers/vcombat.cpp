@@ -138,6 +138,8 @@ public:
 	required_device<i860_cpu_device> m_vid_0;
 	optional_device<i860_cpu_device> m_vid_1;
 	required_device<dac_word_interface> m_dac;
+	void shadfgtr(machine_config &config);
+	void vcombat(machine_config &config);
 };
 
 uint32_t vcombat_state::update_screen(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int index)
@@ -543,7 +545,7 @@ WRITE_LINE_MEMBER(vcombat_state::sound_update)
 	m_soundcpu->set_input_line(M68K_IRQ_1, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
-static MACHINE_CONFIG_START( vcombat )
+MACHINE_CONFIG_START(vcombat_state::vcombat)
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_12MHz)
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", vcombat_state,  irq1_line_assert)
@@ -591,7 +593,7 @@ static MACHINE_CONFIG_START( vcombat )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( shadfgtr )
+MACHINE_CONFIG_START(vcombat_state::shadfgtr)
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_12MHz)
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", vcombat_state,  irq1_line_assert)

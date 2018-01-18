@@ -50,4 +50,5 @@ public:
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	static const atari_motion_objects_config s_mob_config;
+	void toobin(machine_config &config);
 };

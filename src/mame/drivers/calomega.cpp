@@ -2567,7 +2567,7 @@ WRITE_LINE_MEMBER(calomega_state::write_acia_clock)
 *                Machine Drivers                 *
 *************************************************/
 
-static MACHINE_CONFIG_START( sys903 )
+MACHINE_CONFIG_START(calomega_state::sys903)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, CPU_CLOCK)   /* confirmed */
 	MCFG_CPU_PROGRAM_MAP(sys903_map)
@@ -2616,7 +2616,7 @@ static MACHINE_CONFIG_START( sys903 )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( s903mod, sys903 )
+MACHINE_CONFIG_DERIVED(calomega_state::s903mod, sys903)
 
 	/* basic machine hardware */
 
@@ -2633,7 +2633,7 @@ static MACHINE_CONFIG_DERIVED( s903mod, sys903 )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( sys905, sys903 )
+MACHINE_CONFIG_DERIVED(calomega_state::sys905, sys903)
 
 	/* basic machine hardware */
 
@@ -2657,7 +2657,7 @@ static MACHINE_CONFIG_DERIVED( sys905, sys903 )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( sys906, sys903 )
+MACHINE_CONFIG_DERIVED(calomega_state::sys906, sys903)
 
 	/* basic machine hardware */
 

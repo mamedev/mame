@@ -63,6 +63,12 @@ public:
 	DECLARE_WRITE8_MEMBER(mondial2_input_mux_w);
 	TIMER_DEVICE_CALLBACK_MEMBER(refresh_leds);
 
+	void smondial(machine_config &config);
+	void mondial2(machine_config &config);
+	void smondial2(machine_config &config);
+	void montec(machine_config &config);
+	void monteciv(machine_config &config);
+	void megaiv(machine_config &config);
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -434,7 +440,7 @@ static INPUT_PORTS_START( smondial2 )
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYPAD)        PORT_NAME("Clear")    PORT_CODE(KEYCODE_BACKSPACE)
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( montec )
+MACHINE_CONFIG_START(mephisto_montec_state::montec)
 	MCFG_CPU_ADD("maincpu", M65C02, XTAL_4MHz)
 	MCFG_CPU_PROGRAM_MAP( montec_mem )
 	MCFG_CPU_PERIODIC_INT_DRIVER(mephisto_montec_state, nmi_line_assert, (double)XTAL_4MHz / (1 << 13))
@@ -450,12 +456,12 @@ static MACHINE_CONFIG_START( montec )
 	MCFG_DEFAULT_LAYOUT(layout_mephisto_montec)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( monteciv, montec )
+MACHINE_CONFIG_DERIVED(mephisto_montec_state::monteciv, montec)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_CLOCK( XTAL_8MHz )
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( megaiv, montec )
+MACHINE_CONFIG_DERIVED(mephisto_montec_state::megaiv, montec)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_CLOCK( XTAL_4_9152MHz )
 	MCFG_CPU_PROGRAM_MAP(megaiv_mem)
@@ -467,7 +473,7 @@ static MACHINE_CONFIG_DERIVED( megaiv, montec )
 	MCFG_DEFAULT_LAYOUT(layout_mephisto_megaiv)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( mondial2, megaiv )
+MACHINE_CONFIG_DERIVED(mephisto_montec_state::mondial2, megaiv)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_CLOCK( XTAL_2MHz )
 	MCFG_CPU_PROGRAM_MAP(mondial2_mem)
@@ -477,14 +483,14 @@ static MACHINE_CONFIG_DERIVED( mondial2, megaiv )
 	MCFG_DEFAULT_LAYOUT(layout_mephisto_mondial2)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( smondial, megaiv )
+MACHINE_CONFIG_DERIVED(mephisto_montec_state::smondial, megaiv)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_CLOCK( XTAL_4MHz )
 	MCFG_CPU_PROGRAM_MAP(smondial_mem)
 	MCFG_CPU_PERIODIC_INT_DRIVER(mephisto_montec_state, nmi_line_pulse, (double)XTAL_4MHz / (1 << 13))
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( smondial2, smondial )
+MACHINE_CONFIG_DERIVED(mephisto_montec_state::smondial2, smondial)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(smondial2_mem)
 

@@ -485,7 +485,7 @@ WRITE_LINE_MEMBER(v53_base_device::internal_irq_w)
 }
 
 
-MACHINE_CONFIG_MEMBER( v53_base_device::device_add_mconfig )
+MACHINE_CONFIG_START(v53_base_device::device_add_mconfig)
 
 	MCFG_DEVICE_ADD("pit", PIT8254, 0) // functionality identical to uPD71054
 	MCFG_PIT8253_CLK0(16000000) // manual implicitly claims that these runs at same speed as the CPU

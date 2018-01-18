@@ -84,6 +84,7 @@ public:
 	virtual void video_start() override;
 	uint32_t screen_update_laserbat(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
+	void laserbat_base(machine_config &config);
 protected:
 	enum { TIMER_SCANLINE };
 
@@ -165,6 +166,7 @@ public:
 	// sound control ports
 	virtual DECLARE_WRITE8_MEMBER(csound2_w) override;
 
+	void laserbat(machine_config &config);
 protected:
 
 	// initialisation/startup
@@ -196,6 +198,7 @@ public:
 	virtual DECLARE_WRITE8_MEMBER(csound1_w) override;
 	virtual DECLARE_WRITE8_MEMBER(csound2_w) override;
 
+	void catnmous(machine_config &config);
 protected:
 	required_device<zac1b11107_audio_device>    m_audiopcb;
 };

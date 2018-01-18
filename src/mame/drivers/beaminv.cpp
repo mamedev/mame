@@ -90,6 +90,7 @@ public:
 	TIMER_CALLBACK_MEMBER(interrupt_callback);
 	void create_interrupt_timer();
 	void start_interrupt_timer();
+	void beaminv(machine_config &config);
 };
 
 
@@ -335,7 +336,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( beaminv )
+MACHINE_CONFIG_START(beaminv_state::beaminv)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 2000000)   /* 2 MHz ? */

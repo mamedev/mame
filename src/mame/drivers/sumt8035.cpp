@@ -24,6 +24,7 @@ public:
 			m_maincpu(*this, "maincpu")
 	{ }
 
+	void summit(machine_config &config);
 protected:
 
 	// devices
@@ -233,7 +234,7 @@ static INPUT_PORTS_START( summit )
 INPUT_PORTS_END
 
 
-static MACHINE_CONFIG_START( summit )
+MACHINE_CONFIG_START(sumt8035_state::summit)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",I8035,5000000)
 	MCFG_CPU_PROGRAM_MAP(sumt_map)

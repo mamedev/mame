@@ -25,6 +25,7 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
+	void awetoss(machine_config &config);
 //  required_device<mcs51_cpu_device> m_maincpu;
 };
 
@@ -42,7 +43,7 @@ void awetoss_state::machine_reset()
 }
 
 
-static MACHINE_CONFIG_START( awetoss )
+MACHINE_CONFIG_START(awetoss_state::awetoss)
 
 	/* basic machine hardware */
 //  MCFG_CPU_ADD("maincpu", ??, 8000000) // unknown

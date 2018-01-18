@@ -3878,7 +3878,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(nmk16_state::nmk16_scanline)
 
 
 
-static MACHINE_CONFIG_START( tharrier )
+MACHINE_CONFIG_START(nmk16_state::tharrier)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 10000000) /* 10 MHz */
@@ -3921,7 +3921,7 @@ static MACHINE_CONFIG_START( tharrier )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( mustang )
+MACHINE_CONFIG_START(nmk16_state::mustang)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 10000000) /* 10 MHz ? */
@@ -3961,7 +3961,7 @@ static MACHINE_CONFIG_START( mustang )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( mustangb )
+MACHINE_CONFIG_START(nmk16_state::mustangb)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 10000000) /* 10 MHz ? */
@@ -4002,7 +4002,7 @@ MACHINE_CONFIG_END
 #define BIOSHIP_CRYSTAL1 10000000
 #define BIOSHIP_CRYSTAL2 12000000
 
-static MACHINE_CONFIG_START( bioship )
+MACHINE_CONFIG_START(nmk16_state::bioship)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, BIOSHIP_CRYSTAL1 ) /* 10.0 MHz (verified) */
@@ -4042,7 +4042,7 @@ static MACHINE_CONFIG_START( bioship )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( vandyke )
+MACHINE_CONFIG_START(nmk16_state::vandyke)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_10MHz) /* 68000p12 running at 10Mhz, verified on pcb */
@@ -4082,7 +4082,7 @@ static MACHINE_CONFIG_START( vandyke )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( vandykeb )
+MACHINE_CONFIG_START(nmk16_state::vandykeb)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 10000000) /* 10 MHz ? */
@@ -4110,7 +4110,7 @@ static MACHINE_CONFIG_START( vandykeb )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( acrobatm )
+MACHINE_CONFIG_START(nmk16_state::acrobatm)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 10000000) /* 10 MHz (verified on pcb) */
@@ -4151,7 +4151,7 @@ static MACHINE_CONFIG_START( acrobatm )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( tdragonb )    /* bootleg using Raiden sound hardware */
+MACHINE_CONFIG_START(nmk16_state::tdragonb)    /* bootleg using Raiden sound hardware */
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 10000000)
@@ -4189,7 +4189,7 @@ static MACHINE_CONFIG_START( tdragonb )    /* bootleg using Raiden sound hardwar
 	MCFG_SEIBU_SOUND_YM_WRITE_CB(DEVWRITE8("ymsnd", ym3812_device, write))
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( tdragon )
+MACHINE_CONFIG_START(nmk16_state::tdragon)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_8MHz) /* verified on pcb */
@@ -4228,11 +4228,11 @@ static MACHINE_CONFIG_START( tdragon )
 	MCFG_DEVICE_ADDRESS_MAP(0, oki2_map)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 MACHINE_CONFIG_END
-static MACHINE_CONFIG_DERIVED( tdragon_prot, tdragon )
+MACHINE_CONFIG_DERIVED(nmk16_state::tdragon_prot, tdragon)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("coinsim", nmk16_state, tdragon_mcu_sim, attotime::from_hz(10000))
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( ssmissin )
+MACHINE_CONFIG_START(nmk16_state::ssmissin)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 8000000) /* 8 Mhz */
@@ -4264,7 +4264,7 @@ static MACHINE_CONFIG_START( ssmissin )
 
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( strahl )
+MACHINE_CONFIG_START(nmk16_state::strahl)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 12000000) /* 12 MHz ? */
@@ -4303,7 +4303,7 @@ static MACHINE_CONFIG_START( strahl )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( hachamf )
+MACHINE_CONFIG_START(nmk16_state::hachamf)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 10000000) /* 10 MHz ? */
@@ -4342,12 +4342,12 @@ static MACHINE_CONFIG_START( hachamf )
 	MCFG_DEVICE_ADDRESS_MAP(0, oki2_map)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 MACHINE_CONFIG_END
-static MACHINE_CONFIG_DERIVED( hachamf_prot, hachamf )
+MACHINE_CONFIG_DERIVED(nmk16_state::hachamf_prot, hachamf)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("coinsim", nmk16_state, hachamf_mcu_sim, attotime::from_hz(10000))
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( macross )
+MACHINE_CONFIG_START(nmk16_state::macross)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 10000000) /* 10 MHz ? */
@@ -4387,7 +4387,7 @@ static MACHINE_CONFIG_START( macross )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( blkheart )
+MACHINE_CONFIG_START(nmk16_state::blkheart)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_8MHz) /* verified on pcb */
@@ -4427,7 +4427,7 @@ static MACHINE_CONFIG_START( blkheart )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( gunnail )
+MACHINE_CONFIG_START(nmk16_state::gunnail)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_10MHz) /* verified on pcb */
@@ -4466,7 +4466,7 @@ static MACHINE_CONFIG_START( gunnail )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( macross2 )
+MACHINE_CONFIG_START(nmk16_state::macross2)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 10000000) /* 10 MHz ? */
@@ -4512,7 +4512,7 @@ static MACHINE_CONFIG_START( macross2 )
 	MCFG_NMK112_ROM1("oki2")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( tdragon2 )
+MACHINE_CONFIG_START(nmk16_state::tdragon2)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 10000000) /* 10 MHz  */
@@ -4558,13 +4558,13 @@ static MACHINE_CONFIG_START( tdragon2 )
 	MCFG_NMK112_ROM1("oki2")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( tdragon3h, tdragon2 )
+MACHINE_CONFIG_DERIVED(nmk16_state::tdragon3h, tdragon2)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(tdragon3h_map)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( raphero )
+MACHINE_CONFIG_START(nmk16_state::raphero)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 14000000) /* 14 MHz measured */
@@ -4609,7 +4609,7 @@ static MACHINE_CONFIG_START( raphero )
 	MCFG_NMK112_ROM1("oki2")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( bjtwin )
+MACHINE_CONFIG_START(nmk16_state::bjtwin)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 10000000) /* verified on pcb */
@@ -4643,7 +4643,7 @@ MACHINE_CONFIG_END
 
 
 
-static MACHINE_CONFIG_START( atombjt )
+MACHINE_CONFIG_START(nmk16_state::atombjt)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 10000000) /* there is a 28mhz crystal and a 10mhz crystal near the 12 rated CPU */
@@ -4690,7 +4690,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(nmk16_state::manybloc_scanline)
 }
 
 // non-nmk board, different to the others, very timing sensitive
-static MACHINE_CONFIG_START( manybloc )
+MACHINE_CONFIG_START(nmk16_state::manybloc)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 10000000) /* 10? MHz - check */
@@ -5208,7 +5208,7 @@ GFXDECODE_END
 
 ***************************************************************************/
 
-static MACHINE_CONFIG_START( stagger1 )
+MACHINE_CONFIG_START(nmk16_state::stagger1)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000,XTAL_12MHz) /* 68000p10 running at 12mhz, verified on pcb */
@@ -5244,7 +5244,7 @@ static MACHINE_CONFIG_START( stagger1 )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.70)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( redhawki, stagger1 )
+MACHINE_CONFIG_DERIVED(nmk16_state::redhawki, stagger1)
 
 	/* basic machine hardware */
 	/* video hardware */
@@ -5252,7 +5252,7 @@ static MACHINE_CONFIG_DERIVED( redhawki, stagger1 )
 	MCFG_SCREEN_UPDATE_DRIVER(nmk16_state, screen_update_redhawki)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( redhawkb, stagger1 )
+MACHINE_CONFIG_DERIVED(nmk16_state::redhawkb, stagger1)
 
 	/* basic machine hardware */
 	/* video hardware */
@@ -5261,7 +5261,7 @@ static MACHINE_CONFIG_DERIVED( redhawkb, stagger1 )
 	MCFG_SCREEN_UPDATE_DRIVER(nmk16_state, screen_update_redhawkb)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( grdnstrm, stagger1 )
+MACHINE_CONFIG_DERIVED(nmk16_state::grdnstrm, stagger1)
 
 	/* basic machine hardware */
 
@@ -5272,7 +5272,7 @@ static MACHINE_CONFIG_DERIVED( grdnstrm, stagger1 )
 	MCFG_SCREEN_UPDATE_DRIVER(nmk16_state, screen_update_firehawk)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( grdnstrmk, stagger1 ) /* Side by side with PCB, the music seems too fast as well */
+MACHINE_CONFIG_DERIVED(nmk16_state::grdnstrmk, stagger1) /* Side by side with PCB, the music seems too fast as well */
 
 	/* basic machine hardware */
 
@@ -5283,7 +5283,7 @@ static MACHINE_CONFIG_DERIVED( grdnstrmk, stagger1 ) /* Side by side with PCB, t
 	MCFG_VIDEO_START_OVERRIDE(nmk16_state,grdnstrm)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( popspops, grdnstrm )
+MACHINE_CONFIG_DERIVED(nmk16_state::popspops, grdnstrm)
 
 	/* basic machine hardware */
 
@@ -5292,7 +5292,7 @@ static MACHINE_CONFIG_DERIVED( popspops, grdnstrm )
 	MCFG_SCREEN_UPDATE_DRIVER(nmk16_state, screen_update_bubl2000)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( firehawk )
+MACHINE_CONFIG_START(nmk16_state::firehawk)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000,12000000)
@@ -5325,13 +5325,13 @@ static MACHINE_CONFIG_START( firehawk )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( spec2k, firehawk )
+MACHINE_CONFIG_DERIVED(nmk16_state::spec2k, firehawk)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(afega)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( twinactn )
+MACHINE_CONFIG_START(nmk16_state::twinactn)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000,12000000)

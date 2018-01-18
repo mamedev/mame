@@ -66,6 +66,7 @@ public:
 	DECLARE_PALETTE_INIT(jongkyo);
 	uint32_t screen_update_jongkyo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
+	void jongkyo(machine_config &config);
 };
 
 
@@ -490,7 +491,7 @@ void jongkyo_state::machine_reset()
 }
 
 
-static MACHINE_CONFIG_START( jongkyo )
+MACHINE_CONFIG_START(jongkyo_state::jongkyo)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", SEGA_315_5084,JONGKYO_CLOCK/4)

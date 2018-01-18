@@ -49,6 +49,7 @@ public:
 	DECLARE_READ8_MEMBER(keyboard_r);
 	DECLARE_WRITE8_MEMBER(keyboard_w);
 	DECLARE_WRITE8_MEMBER(leds_w);
+	void pmi80(machine_config &config);
 private:
 	uint8_t m_keyrow;
 	bool m_ledready;
@@ -152,7 +153,7 @@ void pmi80_state::machine_reset()
 }
 
 
-static MACHINE_CONFIG_START( pmi80 )
+MACHINE_CONFIG_START(pmi80_state::pmi80)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",I8080, XTAL_1MHz)
 	MCFG_CPU_PROGRAM_MAP(pmi80_mem)

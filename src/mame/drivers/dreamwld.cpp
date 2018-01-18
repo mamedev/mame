@@ -156,6 +156,8 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	void baryon(machine_config &config);
+	void dreamwld(machine_config &config);
 };
 
 
@@ -792,7 +794,7 @@ void dreamwld_state::machine_reset()
 }
 
 
-static MACHINE_CONFIG_START( baryon )
+MACHINE_CONFIG_START(dreamwld_state::baryon)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68EC020, XTAL_32MHz/2) /* 16MHz verified */
@@ -823,7 +825,7 @@ static MACHINE_CONFIG_START( baryon )
 
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( dreamwld, baryon )
+MACHINE_CONFIG_DERIVED(dreamwld_state::dreamwld, baryon)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")

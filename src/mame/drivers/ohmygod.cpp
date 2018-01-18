@@ -318,7 +318,7 @@ void ohmygod_state::machine_reset()
 	m_scrolly = 0;
 }
 
-static MACHINE_CONFIG_START( ohmygod )
+MACHINE_CONFIG_START(ohmygod_state::ohmygod)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 12000000)

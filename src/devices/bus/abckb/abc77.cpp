@@ -127,7 +127,7 @@ DISCRETE_SOUND_END
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( abc77_device::device_add_mconfig )
+MACHINE_CONFIG_START(abc77_device::device_add_mconfig)
 	// keyboard cpu
 	MCFG_CPU_ADD(I8035_TAG, I8035, XTAL_4_608MHz)
 	MCFG_CPU_PROGRAM_MAP(abc77_map)

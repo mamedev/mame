@@ -112,6 +112,7 @@ public:
 	virtual void machine_reset() override;
 	DECLARE_PALETTE_INIT(othello);
 	MC6845_UPDATE_ROW(crtc_update_row);
+	void othello(machine_config &config);
 };
 
 
@@ -389,7 +390,7 @@ void othello_state::machine_reset()
 	m_n7751_busy = 0;
 }
 
-static MACHINE_CONFIG_START( othello )
+MACHINE_CONFIG_START(othello_state::othello)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80,XTAL_8MHz/2)

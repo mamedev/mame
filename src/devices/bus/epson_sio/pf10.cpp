@@ -63,7 +63,7 @@ static SLOT_INTERFACE_START( pf10_floppies )
 	SLOT_INTERFACE( "smd165", EPSON_SMD_165 )
 SLOT_INTERFACE_END
 
-MACHINE_CONFIG_MEMBER( epson_pf10_device::device_add_mconfig )
+MACHINE_CONFIG_START(epson_pf10_device::device_add_mconfig)
 	MCFG_CPU_ADD("maincpu", HD6303Y, XTAL_4_9152MHz) // HD63A03XF
 	MCFG_CPU_PROGRAM_MAP(cpu_mem)
 	MCFG_CPU_IO_MAP(cpu_io)

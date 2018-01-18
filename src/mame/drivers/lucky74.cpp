@@ -1461,7 +1461,7 @@ WRITE_LINE_MEMBER(lucky74_state::lucky74_adpcm_int)
 *    Machine Drivers     *
 *************************/
 
-static MACHINE_CONFIG_START( lucky74 )
+MACHINE_CONFIG_START(lucky74_state::lucky74)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, C_06B49P_CLKOUT_03)    /* 3 MHz. */

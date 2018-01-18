@@ -164,4 +164,12 @@ public:
 
 	void rfjet_text_decrypt(uint8_t *rom);
 	void rfjet_bg_decrypt(uint8_t *rom, int size);
+	void sys386f(machine_config &config);
+	void sxx2f(machine_config &config);
+	void rdft2(machine_config &config);
+	void ejanhs(machine_config &config);
+	void sys386i(machine_config &config);
+	void sxx2g(machine_config &config);
+	void spi(machine_config &config);
+	void sxx2e(machine_config &config);
 };

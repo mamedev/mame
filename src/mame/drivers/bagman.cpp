@@ -447,7 +447,7 @@ INTERRUPT_GEN_MEMBER(bagman_state::vblank_irq)
 }
 
 
-static MACHINE_CONFIG_START( bagman )
+MACHINE_CONFIG_START(bagman_state::bagman)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, BAGMAN_H0)
@@ -511,12 +511,12 @@ static MACHINE_CONFIG_START( bagman )
 	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(bagman_state, tmsprom_csq1_w))
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( sbagman, bagman )
+MACHINE_CONFIG_DERIVED(bagman_state::sbagman, bagman)
 	MCFG_DEVICE_MODIFY("mainlatch")
 	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(bagman_state, video_enable_w))
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( sbagmani, sbagman )
+MACHINE_CONFIG_DERIVED(bagman_state::sbagmani, sbagman)
 
 	// only 1 AY8910
 	MCFG_DEVICE_REMOVE("tmsprom")
@@ -524,7 +524,7 @@ static MACHINE_CONFIG_DERIVED( sbagmani, sbagman )
 	MCFG_DEVICE_REMOVE("tmslatch")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( pickin )
+MACHINE_CONFIG_START(bagman_state::pickin)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, BAGMAN_H0)
@@ -584,7 +584,7 @@ z80
 */
 
 
-static MACHINE_CONFIG_START( botanic )
+MACHINE_CONFIG_START(bagman_state::botanic)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, BAGMAN_H0)
@@ -625,7 +625,7 @@ static MACHINE_CONFIG_START( botanic )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( squaitsa, botanic )
+MACHINE_CONFIG_DERIVED(bagman_state::squaitsa, botanic)
 	MCFG_MACHINE_START_OVERRIDE(bagman_state, squaitsa)
 
 	MCFG_SOUND_MODIFY("aysnd")

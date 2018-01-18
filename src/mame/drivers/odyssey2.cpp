@@ -61,6 +61,9 @@ public:
 
 	DECLARE_WRITE16_MEMBER(scanline_postprocess);
 
+	void odyssey2_cartslot(machine_config &config);
+	void videopac(machine_config &config);
+	void odyssey2(machine_config &config);
 protected:
 	/* constants */
 	static const uint8_t P1_BANK_LO_BIT          = 0x01;
@@ -97,6 +100,8 @@ public:
 	DECLARE_WRITE8_MEMBER(i8243_port_w);
 	DECLARE_WRITE16_MEMBER(scanline_postprocess);
 
+	void g7400(machine_config &config);
+	void odyssey3(machine_config &config);
 protected:
 	uint8_t m_ic674_decode[8];
 	uint8_t m_ic678_decode[8];
@@ -650,14 +655,14 @@ GFXDECODE_END
 
 
 
-static MACHINE_CONFIG_START( odyssey2_cartslot )
+MACHINE_CONFIG_START(odyssey2_state::odyssey2_cartslot)
 	MCFG_O2_CARTRIDGE_ADD("cartslot", o2_cart, nullptr)
 
 	MCFG_SOFTWARE_LIST_ADD("cart_list","odyssey2")
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( odyssey2 )
+MACHINE_CONFIG_START(odyssey2_state::odyssey2)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8048, ( ( XTAL_7_15909MHz * 3 ) / 4 ) )
 	MCFG_CPU_PROGRAM_MAP(odyssey2_mem)
@@ -691,7 +696,7 @@ static MACHINE_CONFIG_START( odyssey2 )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( videopac )
+MACHINE_CONFIG_START(odyssey2_state::videopac)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8048, ( XTAL_17_73447MHz / 3 ) )
 	MCFG_CPU_PROGRAM_MAP(odyssey2_mem)
@@ -717,7 +722,7 @@ static MACHINE_CONFIG_START( videopac )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( g7400 )
+MACHINE_CONFIG_START(g7400_state::g7400)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8048, XTAL_5_911MHz )
 	MCFG_CPU_PROGRAM_MAP(odyssey2_mem)
@@ -758,7 +763,7 @@ static MACHINE_CONFIG_START( g7400 )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( odyssey3 )
+MACHINE_CONFIG_START(g7400_state::odyssey3)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8048, XTAL_5_911MHz )
 	MCFG_CPU_PROGRAM_MAP(odyssey2_mem)

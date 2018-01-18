@@ -35,6 +35,12 @@ public:
 	uint32_t screen_update_route16(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_ttmahjng(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
+	void routex(machine_config &config);
+	void ttmahjng(machine_config &config);
+	void spacecho(machine_config &config);
+	void speakres(machine_config &config);
+	void stratvox(machine_config &config);
+	void route16(machine_config &config);
 private:
 	required_device<cpu_device> m_cpu1;
 	required_device<cpu_device> m_cpu2;

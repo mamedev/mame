@@ -722,7 +722,7 @@ void fitfight_state::machine_reset()
 	m_fof_700000_data = 0;
 }
 
-static MACHINE_CONFIG_START( fitfight )
+MACHINE_CONFIG_START(fitfight_state::fitfight)
 
 	MCFG_CPU_ADD("maincpu",M68000, 12000000)
 	MCFG_CPU_PROGRAM_MAP(fitfight_main_map)
@@ -758,7 +758,7 @@ static MACHINE_CONFIG_START( fitfight )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( bbprot )
+MACHINE_CONFIG_START(fitfight_state::bbprot)
 
 	MCFG_CPU_ADD("maincpu",M68000, 12000000)
 	MCFG_CPU_PROGRAM_MAP(bbprot_main_map)

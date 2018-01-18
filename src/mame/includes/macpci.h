@@ -139,6 +139,7 @@ public:
 	DECLARE_READ64_MEMBER ( unk2_r );
 
 	DECLARE_DRIVER_INIT(pippin);
+	void pippin(machine_config &config);
 private:
 	// wait states for accessing the VIA
 	int m_via_cycles;

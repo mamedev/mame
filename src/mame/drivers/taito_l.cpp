@@ -1520,7 +1520,7 @@ WRITE8_MEMBER(fhawk_state::portA_w)
 }
 
 
-static MACHINE_CONFIG_START( l_system_video )
+MACHINE_CONFIG_START(taitol_state::l_system_video)
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
@@ -1539,7 +1539,7 @@ static MACHINE_CONFIG_START( l_system_video )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( fhawk )
+MACHINE_CONFIG_START(fhawk_state::fhawk)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_13_33056MHz/2)    /* verified freq on pin122 of TC0090LVC cpu */
@@ -1586,7 +1586,7 @@ static MACHINE_CONFIG_START( fhawk )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( champwr, fhawk )
+MACHINE_CONFIG_DERIVED(champwr_state::champwr, fhawk)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1612,7 +1612,7 @@ MACHINE_CONFIG_END
 
 
 
-static MACHINE_CONFIG_START( raimais )
+MACHINE_CONFIG_START(taitol_2cpu_state::raimais)
 
 	MCFG_CPU_ADD("maincpu", Z80, 13330560/2)    // needs verification from pin122 of TC0090LVC
 	MCFG_CPU_PROGRAM_MAP(raimais_map)
@@ -1658,7 +1658,7 @@ static MACHINE_CONFIG_START( raimais )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( kurikint )
+MACHINE_CONFIG_START(taitol_2cpu_state::kurikint)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_13_33056MHz/2)    /* verified freq on pin122 of TC0090LVC cpu */
@@ -1698,7 +1698,7 @@ static MACHINE_CONFIG_START( kurikint )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( plotting )
+MACHINE_CONFIG_START(taitol_1cpu_state::plotting)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_13_33056MHz/2)    /* verified freq on pin122 of TC0090LVC cpu */
@@ -1732,7 +1732,7 @@ static MACHINE_CONFIG_START( plotting )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( puzznic, plotting )
+MACHINE_CONFIG_DERIVED(taitol_1cpu_state::puzznic, plotting)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1741,7 +1741,7 @@ static MACHINE_CONFIG_DERIVED( puzznic, plotting )
 	MCFG_DEVICE_ADD("mcu", ARKANOID_68705P3, XTAL_3MHz)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( puzznici, plotting )
+MACHINE_CONFIG_DERIVED(taitol_1cpu_state::puzznici, plotting)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1749,7 +1749,7 @@ static MACHINE_CONFIG_DERIVED( puzznici, plotting )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( horshoes, plotting )
+MACHINE_CONFIG_DERIVED(horshoes_state::horshoes, plotting)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1761,7 +1761,7 @@ static MACHINE_CONFIG_DERIVED( horshoes, plotting )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( palamed, plotting )
+MACHINE_CONFIG_DERIVED(taitol_1cpu_state::palamed, plotting)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1781,7 +1781,7 @@ static MACHINE_CONFIG_DERIVED( palamed, plotting )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( cachat, plotting )
+MACHINE_CONFIG_DERIVED(taitol_1cpu_state::cachat, plotting)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1800,7 +1800,7 @@ static MACHINE_CONFIG_DERIVED( cachat, plotting )
 	MCFG_DEVICE_REMOVE("inmux")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( evilston )
+MACHINE_CONFIG_START(taitol_2cpu_state::evilston)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_13_33056MHz/2)    /* not verified */

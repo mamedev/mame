@@ -90,6 +90,7 @@ public:
 	pcb_type    m_pcb_type;
 	rc_type     m_rc_type;
 
+	void microvision(machine_config &config);
 protected:
 	required_device<dac_byte_interface> m_dac;
 	required_device<cpu_device> m_i8021;
@@ -637,7 +638,7 @@ static ADDRESS_MAP_START( microvision_8021_io, AS_IO, 8, microvision_state )
 ADDRESS_MAP_END
 
 
-static MACHINE_CONFIG_START( microvision )
+MACHINE_CONFIG_START(microvision_state::microvision)
 	MCFG_CPU_ADD("maincpu1", I8021, 2000000)    // approximately
 	MCFG_CPU_IO_MAP(microvision_8021_io)
 	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(microvision_state, i8021_p1_write))

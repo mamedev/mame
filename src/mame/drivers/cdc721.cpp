@@ -30,6 +30,7 @@ public:
 	DECLARE_PALETTE_INIT(cdc721);
 //  DECLARE_WRITE8_MEMBER(port70_w) { membank("bankr0")->set_entry(BIT(data, 3)); }
 
+void cdc721(machine_config &config);
 private:
 	u8 m_flashcnt;
 	virtual void machine_reset() override;
@@ -140,7 +141,7 @@ uint32_t cdc721_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 	return 0;
 }
 
-static MACHINE_CONFIG_START( cdc721 )
+MACHINE_CONFIG_START(cdc721_state::cdc721)
 	// basic machine hardware
 	MCFG_CPU_ADD("maincpu", Z80, 4000000)
 	MCFG_CPU_PROGRAM_MAP(mem_map)

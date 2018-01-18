@@ -191,7 +191,7 @@ GFXDECODE_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( yard )
+MACHINE_CONFIG_START(m58_state::yard)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK/3/2)

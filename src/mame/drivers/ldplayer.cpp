@@ -38,6 +38,8 @@ public:
 	// callback hook
 	static chd_file *get_disc_static(device_t *dummy, laserdisc_device &device) { return device.machine().driver_data<ldplayer_state>()->get_disc(); }
 
+	void ldplayer_ntsc(machine_config &config);
+
 protected:
 	// device overrides
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
@@ -105,6 +107,7 @@ public:
 			m_command_buffer_in(0),
 			m_command_buffer_out(0) { }
 
+			void pr8210(machine_config &config);
 protected:
 	// device overrides
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
@@ -142,6 +145,7 @@ public:
 		: ldplayer_state(mconfig, type, tag),
 			m_laserdisc(*this, "laserdisc") { }
 
+			void ldv1000(machine_config &config);
 protected:
 	required_device<pioneer_ldv1000_device> m_laserdisc;
 
@@ -620,11 +624,11 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( ldplayer_ntsc )
+MACHINE_CONFIG_START(ldplayer_state::ldplayer_ntsc)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( ldv1000, ldplayer_ntsc )
+MACHINE_CONFIG_DERIVED(ldv1000_state::ldv1000, ldplayer_ntsc)
 	MCFG_LASERDISC_LDV1000_ADD("laserdisc")
 	MCFG_LASERDISC_GET_DISC(laserdisc_device::get_disc_delegate(&ldplayer_state::get_disc_static, device))
 	MCFG_LASERDISC_SCREEN_ADD_NTSC("screen", "laserdisc")
@@ -636,7 +640,7 @@ static MACHINE_CONFIG_DERIVED( ldv1000, ldplayer_ntsc )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( pr8210, ldplayer_ntsc )
+MACHINE_CONFIG_DERIVED(pr8210_state::pr8210, ldplayer_ntsc)
 	MCFG_LASERDISC_PR8210_ADD("laserdisc")
 	MCFG_LASERDISC_GET_DISC(laserdisc_device::get_disc_delegate(&ldplayer_state::get_disc_static, device))
 	MCFG_LASERDISC_SCREEN_ADD_NTSC("screen", "laserdisc")

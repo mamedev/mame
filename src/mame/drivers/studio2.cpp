@@ -246,6 +246,8 @@ public:
 
 	/* keyboard state */
 	uint8_t m_keylatch;
+	void studio2_cartslot(machine_config &config);
+	void studio2(machine_config &config);
 };
 
 class visicom_state : public studio2_state
@@ -263,6 +265,7 @@ public:
 	required_shared_ptr<uint8_t> m_color1_ram;
 
 	DECLARE_WRITE8_MEMBER( dma_w );
+	void visicom(machine_config &config);
 };
 
 class mpt02_state : public studio2_state
@@ -288,6 +291,7 @@ public:
 	/* video state */
 	required_shared_ptr<uint8_t> m_color_ram;
 	uint8_t m_color;
+	void mpt02(machine_config &config);
 };
 
 
@@ -613,7 +617,7 @@ DEVICE_IMAGE_LOAD_MEMBER( studio2_state, studio2_cart_load )
 
 /* Machine Drivers */
 
-static MACHINE_CONFIG_START( studio2_cartslot )
+MACHINE_CONFIG_START(studio2_state::studio2_cartslot)
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "studio2_cart")
 	MCFG_GENERIC_EXTENSIONS("st2,bin,rom")
 	MCFG_GENERIC_LOAD(studio2_state, studio2_cart_load)
@@ -622,7 +626,7 @@ static MACHINE_CONFIG_START( studio2_cartslot )
 	MCFG_SOFTWARE_LIST_ADD("cart_list", "studio2")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( studio2 )
+MACHINE_CONFIG_START(studio2_state::studio2)
 	/* basic machine hardware */
 	MCFG_CPU_ADD(CDP1802_TAG, CDP1802, 1760000) /* the real clock is derived from an oscillator circuit */
 	MCFG_CPU_PROGRAM_MAP(studio2_map)
@@ -649,7 +653,7 @@ static MACHINE_CONFIG_START( studio2 )
 	MCFG_FRAGMENT_ADD( studio2_cartslot )
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( visicom )
+MACHINE_CONFIG_START(visicom_state::visicom)
 	/* basic machine hardware */
 	MCFG_CPU_ADD(CDP1802_TAG, CDP1802, XTAL_3_579545MHz/2)
 	MCFG_CPU_PROGRAM_MAP(visicom_map)
@@ -681,7 +685,7 @@ static MACHINE_CONFIG_START( visicom )
 	MCFG_SOFTWARE_LIST_ADD("cart_list", "visicom")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( mpt02 )
+MACHINE_CONFIG_START(mpt02_state::mpt02)
 	/* basic machine hardware */
 	MCFG_CPU_ADD(CDP1802_TAG, CDP1802, CDP1864_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(mpt02_map)

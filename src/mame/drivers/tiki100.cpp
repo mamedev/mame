@@ -58,7 +58,7 @@ READ8_MEMBER( tiki100_state::mrq_r )
 		data = m_video_ram[addr];
 	}
 
-	if (prom & RAM)
+	if (prom & RAM0)
 	{
 		data = m_ram->pointer()[offset];
 	}
@@ -79,7 +79,7 @@ WRITE8_MEMBER( tiki100_state::mrq_w )
 		m_video_ram[addr] = data;
 	}
 
-	if (prom & RAM)
+	if (prom & RAM0)
 	{
 		m_ram->pointer()[offset] = data;
 	}
@@ -695,7 +695,7 @@ void tiki100_state::machine_reset()
 
 /* Machine Driver */
 
-static MACHINE_CONFIG_START( tiki100 )
+MACHINE_CONFIG_START(tiki100_state::tiki100)
 	/* basic machine hardware */
 	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL_8MHz/2)
 	MCFG_CPU_PROGRAM_MAP(tiki100_mem)

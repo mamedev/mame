@@ -43,6 +43,8 @@ public:
 	DECLARE_PALETTE_INIT(scv);
 	uint32_t screen_update_scv(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
+	void scv(machine_config &config);
+	void scv_pal(machine_config &config);
 protected:
 	enum
 	{
@@ -651,7 +653,7 @@ static SLOT_INTERFACE_START(scv_cart)
 	SLOT_INTERFACE_INTERNAL("rom128k_ram", SCV_ROM128K_RAM4K)
 SLOT_INTERFACE_END
 
-static MACHINE_CONFIG_START( scv )
+MACHINE_CONFIG_START(scv_state::scv)
 
 	MCFG_CPU_ADD( "maincpu", UPD7801, XTAL_4MHz )
 	MCFG_CPU_PROGRAM_MAP( scv_mem )
@@ -683,7 +685,7 @@ static MACHINE_CONFIG_START( scv )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( scv_pal, scv )
+MACHINE_CONFIG_DERIVED(scv_state::scv_pal, scv)
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_CLOCK( 3780000 )
 

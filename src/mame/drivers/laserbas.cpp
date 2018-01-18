@@ -125,6 +125,7 @@ public:
 	required_device<dac_byte_interface> m_dac4;
 	required_device<dac_byte_interface> m_dac5;
 	required_device<dac_byte_interface> m_dac6;
+	void laserbas(machine_config &config);
 };
 
 TIMER_DEVICE_CALLBACK_MEMBER(  laserbas_state::laserbas_scanline )
@@ -405,7 +406,7 @@ INPUT_PORTS_END
 #define CLOCK 16680000
 #define PIT_CLOCK (CLOCK/16) // 12 divider ?
 
-static MACHINE_CONFIG_START( laserbas )
+MACHINE_CONFIG_START(laserbas_state::laserbas)
 
 	MCFG_CPU_ADD("maincpu", Z80, CLOCK / 4)
 	MCFG_CPU_PROGRAM_MAP(laserbas_memory)

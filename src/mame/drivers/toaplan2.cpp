@@ -3175,7 +3175,7 @@ static GFXDECODE_START( fixeightbl )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( tekipaki )
+MACHINE_CONFIG_START(toaplan2_state::tekipaki)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_10MHz)         /* 10MHz Oscillator */
@@ -3219,7 +3219,7 @@ static MACHINE_CONFIG_START( tekipaki )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( ghox )
+MACHINE_CONFIG_START(toaplan2_state::ghox)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_10MHz)         /* verified on pcb */
@@ -3309,7 +3309,7 @@ a4849 cd
 
 */
 
-static MACHINE_CONFIG_START( dogyuun )
+MACHINE_CONFIG_START(toaplan2_state::dogyuun)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_25MHz/2)           /* verified on pcb */
@@ -3354,7 +3354,7 @@ static MACHINE_CONFIG_START( dogyuun )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( kbash )
+MACHINE_CONFIG_START(toaplan2_state::kbash)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz)         /* 16MHz Oscillator */
@@ -3400,7 +3400,7 @@ static MACHINE_CONFIG_START( kbash )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( kbash2 )
+MACHINE_CONFIG_START(toaplan2_state::kbash2)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz)         /* 16MHz Oscillator */
@@ -3437,7 +3437,7 @@ static MACHINE_CONFIG_START( kbash2 )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( truxton2 )
+MACHINE_CONFIG_START(toaplan2_state::truxton2)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz)         /* verified on pcb */
@@ -3484,7 +3484,7 @@ static MACHINE_CONFIG_START( truxton2 )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( pipibibs )
+MACHINE_CONFIG_START(toaplan2_state::pipibibs)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_10MHz)         /* verified on pcb */
@@ -3526,7 +3526,7 @@ static MACHINE_CONFIG_START( pipibibs )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( pipibibsbl )
+MACHINE_CONFIG_START(toaplan2_state::pipibibsbl)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_10MHz)         /* 10MHz Oscillator */
@@ -3607,7 +3607,7 @@ static const uint8_t ts001turbo_decryption_table[256] = {
 };
 
 
-static MACHINE_CONFIG_START( fixeight )
+MACHINE_CONFIG_START(toaplan2_state::fixeight)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz)         /* verified on pcb */
@@ -3650,7 +3650,7 @@ static MACHINE_CONFIG_START( fixeight )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( fixeightbl )
+MACHINE_CONFIG_START(toaplan2_state::fixeightbl)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_10MHz)         /* 10MHz Oscillator */
@@ -3687,7 +3687,7 @@ static MACHINE_CONFIG_START( fixeightbl )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( vfive )
+MACHINE_CONFIG_START(toaplan2_state::vfive)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_20MHz/2)   /* verified on pcb */
@@ -3726,7 +3726,7 @@ static MACHINE_CONFIG_START( vfive )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( batsugun )
+MACHINE_CONFIG_START(toaplan2_state::batsugun)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_32MHz/2)           /* 16MHz , 32MHz Oscillator */
@@ -3772,7 +3772,7 @@ static MACHINE_CONFIG_START( batsugun )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( pwrkick )
+MACHINE_CONFIG_START(toaplan2_state::pwrkick)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz)
@@ -3808,7 +3808,7 @@ static MACHINE_CONFIG_START( pwrkick )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( othldrby )
+MACHINE_CONFIG_START(toaplan2_state::othldrby)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz)
 	MCFG_CPU_PROGRAM_MAP(othldrby_68k_mem)
@@ -3842,7 +3842,7 @@ static MACHINE_CONFIG_START( othldrby )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( enmadaio )
+MACHINE_CONFIG_START(toaplan2_state::enmadaio)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_20MHz/2)
 	MCFG_CPU_PROGRAM_MAP(enmadaio_68k_mem)
@@ -3875,7 +3875,7 @@ static MACHINE_CONFIG_START( enmadaio )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( snowbro2 )
+MACHINE_CONFIG_START(toaplan2_state::snowbro2)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz)
@@ -3912,7 +3912,7 @@ static MACHINE_CONFIG_START( snowbro2 )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( mahoudai )
+MACHINE_CONFIG_START(toaplan2_state::mahoudai)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_32MHz/2)       /* 16MHz , 32MHz Oscillator */
@@ -3957,7 +3957,7 @@ static MACHINE_CONFIG_START( mahoudai )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( shippumd )
+MACHINE_CONFIG_START(toaplan2_state::shippumd)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_32MHz/2)       /* 16MHz , 32MHz Oscillator */
@@ -4001,7 +4001,7 @@ static MACHINE_CONFIG_START( shippumd )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( bgaregga )
+MACHINE_CONFIG_START(toaplan2_state::bgaregga)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_32MHz/2)       /* 16MHz , 32MHz Oscillator */
@@ -4053,14 +4053,14 @@ static MACHINE_CONFIG_START( bgaregga )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( bgareggabl, bgaregga )
+MACHINE_CONFIG_DERIVED(toaplan2_state::bgareggabl, bgaregga)
 	MCFG_VIDEO_START_OVERRIDE(toaplan2_state,bgareggabl)
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(toaplan2_state, screen_update_bootleg)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( batrider )
+MACHINE_CONFIG_START(toaplan2_state::batrider)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_32MHz/2) /* 16MHz , 32MHz Oscillator (verified) */
@@ -4118,7 +4118,7 @@ static MACHINE_CONFIG_START( batrider )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( bbakraid )
+MACHINE_CONFIG_START(toaplan2_state::bbakraid)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_32MHz/2)       /* 16MHz , 32MHz Oscillator */

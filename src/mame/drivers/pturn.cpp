@@ -143,6 +143,7 @@ public:
 
 	INTERRUPT_GEN_MEMBER(sub_intgen);
 	INTERRUPT_GEN_MEMBER(main_intgen);
+	void pturn(machine_config &config);
 };
 
 
@@ -507,7 +508,7 @@ void pturn_state::machine_reset()
 	m_nmi_sub = false;
 }
 
-static MACHINE_CONFIG_START( pturn )
+MACHINE_CONFIG_START(pturn_state::pturn)
 	MCFG_CPU_ADD("maincpu", Z80, 12000000/3)
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", pturn_state,  main_intgen)

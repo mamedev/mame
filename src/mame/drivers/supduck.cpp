@@ -81,6 +81,7 @@ public:
 
 	DECLARE_WRITE8_MEMBER(okibank_w);
 
+	void supduck(machine_config &config);
 protected:
 
 	// driver_device overrides
@@ -433,7 +434,7 @@ void supduck_state::machine_reset()
 }
 
 
-static MACHINE_CONFIG_START( supduck )
+MACHINE_CONFIG_START(supduck_state::supduck)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_8MHz) /* Verified on PCB */

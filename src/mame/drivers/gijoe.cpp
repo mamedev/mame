@@ -289,7 +289,7 @@ void gijoe_state::machine_reset()
 	m_cur_control2 = 0;
 }
 
-static MACHINE_CONFIG_START( gijoe )
+MACHINE_CONFIG_START(gijoe_state::gijoe)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_32MHz/2)   /* 16MHz Confirmed */

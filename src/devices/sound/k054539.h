@@ -14,7 +14,7 @@
 #define K054539_CB_MEMBER(_name)   void _name(double left, double right)
 
 #define MCFG_K054539_APAN_CB(_class, _method) \
-		k054539_device::set_analog_callback(*device, k054539_device::cb_delegate(&_class::_method, #_class "::" #_method, downcast<_class *>(owner)));
+		k054539_device::set_analog_callback(*device, k054539_device::cb_delegate(&_class::_method, #_class "::" #_method, this));
 
 #define MCFG_K054539_REGION_OVERRRIDE(_region) \
 		k054539_device::set_override(*device, "^" _region);

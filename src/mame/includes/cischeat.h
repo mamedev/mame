@@ -157,4 +157,12 @@ public:
 
 	DECLARE_DRIVER_INIT(captflag);
 	TIMER_DEVICE_CALLBACK_MEMBER(captflag_scanline);
+	void scudhamm(machine_config &config);
+	void armchmp2(machine_config &config);
+	void cischeat(machine_config &config);
+	void f1gpstr2(machine_config &config);
+	void f1gpstar(machine_config &config);
+	void captflag(machine_config &config);
+	void bigrun(machine_config &config);
+	void wildplt(machine_config &config);
 };

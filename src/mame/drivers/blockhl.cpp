@@ -58,6 +58,7 @@ public:
 
 	DECLARE_WRITE8_MEMBER(banking_callback);
 
+	void blockhl(machine_config &config);
 protected:
 	virtual void machine_start() override;
 
@@ -270,7 +271,7 @@ INPUT_PORTS_END
 //  MACHINE DEFINTIONS
 //**************************************************************************
 
-static MACHINE_CONFIG_START( blockhl )
+MACHINE_CONFIG_START(blockhl_state::blockhl)
 	// basic machine hardware
 	MCFG_CPU_ADD("maincpu", KONAMI, XTAL_24MHz/8)     // Konami 052526
 	MCFG_CPU_PROGRAM_MAP(main_map)

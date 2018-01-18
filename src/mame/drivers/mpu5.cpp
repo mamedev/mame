@@ -232,6 +232,7 @@ public:
 	DECLARE_READ32_MEMBER(pic_r);
 	DECLARE_WRITE32_MEMBER(pic_w);
 
+	void mpu5(machine_config &config);
 protected:
 
 	// devices
@@ -541,7 +542,7 @@ void mpu5_state::machine_start()
 }
 
 
-MACHINE_CONFIG_START( mpu5 )
+MACHINE_CONFIG_START(mpu5_state::mpu5)
 	MCFG_CPU_ADD("maincpu", M68340, 16000000)    // ?
 	MCFG_CPU_PROGRAM_MAP(mpu5_map)
 

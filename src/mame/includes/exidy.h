@@ -126,6 +126,20 @@ public:
 	SAMPLES_START_CB_MEMBER(spectar_audio_start);
 	SAMPLES_START_CB_MEMBER(targ_audio_start);
 
+	void base(machine_config &config);
+	void mtrap(machine_config &config);
+	void mtrap_cvsd_audio(machine_config &config);
+	void venture(machine_config &config);
+	void venture_audio(machine_config &config);
+	void fax(machine_config &config);
+	void teetert(machine_config &config);
+	void sidetrac(machine_config &config);
+	void spectar(machine_config &config);
+	void spectar_audio(machine_config &config);
+	void rallys(machine_config &config);
+	void pepper2(machine_config &config);
+	void targ(machine_config &config);
+	void targ_audio(machine_config &config);
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };

@@ -647,7 +647,7 @@ GFXDECODE_END
 
 /******************************************************************************/
 
-static MACHINE_CONFIG_START( bbusters )
+MACHINE_CONFIG_START(bbusters_state::bbusters)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 12000000)
@@ -692,7 +692,7 @@ static MACHINE_CONFIG_START( bbusters )
 	MCFG_SOUND_ROUTE(2, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( mechatt )
+MACHINE_CONFIG_START(bbusters_state::mechatt)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 12000000)

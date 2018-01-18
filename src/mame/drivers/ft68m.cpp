@@ -31,6 +31,7 @@ public:
 
 	DECLARE_READ16_MEMBER(switches_r);
 
+	void ft68m(machine_config &config);
 private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -78,7 +79,7 @@ void ft68m_state::machine_reset()
 	m_maincpu->reset();
 }
 
-static MACHINE_CONFIG_START( ft68m )
+MACHINE_CONFIG_START(ft68m_state::ft68m)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_19_6608MHz / 2)

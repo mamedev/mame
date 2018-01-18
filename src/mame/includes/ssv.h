@@ -152,6 +152,29 @@ public:
 	void init_eaglshot_banking();
 	void init_st010();
 
+	void ssv(machine_config &config);
+	void gdfs(machine_config &config);
+	void dynagear(machine_config &config);
+	void hypreac2(machine_config &config);
+	void meosism(machine_config &config);
+	void drifto94(machine_config &config);
+	void stmblade(machine_config &config);
+	void srmp4(machine_config &config);
+	void srmp7(machine_config &config);
+	void twineag2(machine_config &config);
+	void ryorioh(machine_config &config);
+	void janjans1(machine_config &config);
+	void eaglshot(machine_config &config);
+	void survarts(machine_config &config);
+	void sxyreac2(machine_config &config);
+	void ultrax(machine_config &config);
+	void vasara(machine_config &config);
+	void sxyreact(machine_config &config);
+	void mslider(machine_config &config);
+	void jsk(machine_config &config);
+	void hypreact(machine_config &config);
+	void keithlcy(machine_config &config);
+	void cairblad(machine_config &config);
 protected:
 	optional_ioport_array<4> m_io_gun;
 	optional_ioport m_io_key0;

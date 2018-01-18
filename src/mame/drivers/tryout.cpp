@@ -189,7 +189,7 @@ static GFXDECODE_START( tryout )
 	GFXDECODE_ENTRY( nullptr,   0, vramlayout,   0, 4 )
 GFXDECODE_END
 
-static MACHINE_CONFIG_START( tryout )
+MACHINE_CONFIG_START(tryout_state::tryout)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, 2000000)     /* ? */
 	MCFG_CPU_PROGRAM_MAP(main_cpu)

@@ -80,6 +80,7 @@ public:
 
 	// video state
 	required_shared_ptr<uint8_t> m_video_ram;
+	void tdv2324(machine_config &config);
 };
 
 

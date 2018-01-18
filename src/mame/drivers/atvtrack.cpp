@@ -144,6 +144,7 @@ public:
 	u16 gpu_irq_mask;
 	void gpu_irq_test();
 	void gpu_irq_set(int);
+	void atvtrack(machine_config &config);
 protected:
 	bool m_slaverun;
 };
@@ -157,6 +158,7 @@ public:
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
+	void smashdrv(machine_config &config);
 };
 
 void atvtrack_state::logbinary(uint32_t data,int high=31,int low=0)
@@ -550,7 +552,7 @@ INPUT_PORTS_END
 
 #define ATV_CPU_CLOCK XTAL_33MHz*6
 
-static MACHINE_CONFIG_START( atvtrack )
+MACHINE_CONFIG_START(atvtrack_state::atvtrack)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", SH4LE, ATV_CPU_CLOCK)
 	MCFG_SH4_MD0(1)
@@ -593,7 +595,7 @@ static MACHINE_CONFIG_START( atvtrack )
 	MCFG_PALETTE_ADD("palette", 0x1000)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( smashdrv, atvtrack )
+MACHINE_CONFIG_DERIVED(smashdrv_state::smashdrv, atvtrack)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(smashdrv_main_map)
 	MCFG_CPU_IO_MAP(smashdrv_main_port)

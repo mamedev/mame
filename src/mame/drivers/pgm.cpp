@@ -504,7 +504,7 @@ MACHINE_RESET_MEMBER(pgm_state,pgm)
 	m_soundcpu->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
 }
 
-MACHINE_CONFIG_START( pgmbase )
+MACHINE_CONFIG_START(pgm_state::pgmbase)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 20000000) /* 20 mhz! verified on real board */
 	MCFG_CPU_PROGRAM_MAP(pgm_basic_mem)
@@ -549,7 +549,7 @@ MACHINE_CONFIG_START( pgmbase )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 5.0)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START( pgm )
+MACHINE_CONFIG_START(pgm_state::pgm)
 	MCFG_FRAGMENT_ADD(pgmbase)
 MACHINE_CONFIG_END
 

@@ -64,6 +64,7 @@ public:
 
 	DECLARE_DRIVER_INIT(sys2900);
 	uint32_t screen_update_sys2900(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void sys2900(machine_config &config);
 private:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
@@ -133,7 +134,7 @@ uint32_t sys2900_state::screen_update_sys2900(screen_device &screen, bitmap_ind1
 	return 0;
 }
 
-static MACHINE_CONFIG_START( sys2900 )
+MACHINE_CONFIG_START(sys2900_state::sys2900)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_8MHz / 2)
 	MCFG_CPU_PROGRAM_MAP(mem_map)

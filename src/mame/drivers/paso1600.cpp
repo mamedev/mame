@@ -49,6 +49,7 @@ public:
 	DECLARE_WRITE8_MEMBER(pc_dma_write_byte);
 	uint32_t screen_update_paso1600(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
+	void paso1600(machine_config &config);
 private:
 	uint8_t m_crtc_vreg[0x100],m_crtc_index;
 	struct{
@@ -296,7 +297,7 @@ WRITE8_MEMBER(paso1600_state::pc_dma_write_byte)
 	space.write_byte(offset, data);
 }
 
-static MACHINE_CONFIG_START( paso1600 )
+MACHINE_CONFIG_START(paso1600_state::paso1600)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8086, 16000000/2)
 	MCFG_CPU_PROGRAM_MAP(paso1600_map)

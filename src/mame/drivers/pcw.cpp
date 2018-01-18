@@ -1242,7 +1242,7 @@ static SLOT_INTERFACE_START( pcw_floppies )
 SLOT_INTERFACE_END
 
 /* PCW8256, PCW8512, PCW9256 */
-static MACHINE_CONFIG_START( pcw )
+MACHINE_CONFIG_START(pcw_state::pcw)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 4000000)       /* clock supplied to chip, but in reality it is 3.4 MHz */
 	MCFG_CPU_PROGRAM_MAP(pcw_map)
@@ -1301,7 +1301,7 @@ static MACHINE_CONFIG_START( pcw )
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("pcw_timer", pcw_state, pcw_timer_interrupt, attotime::from_hz(300))
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( pcw8256, pcw )
+MACHINE_CONFIG_DERIVED(pcw_state::pcw8256, pcw)
 	MCFG_SCREEN_ADD("printer",RASTER)
 	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_SIZE( PCW_PRINTER_WIDTH, PCW_PRINTER_HEIGHT )
@@ -1313,7 +1313,7 @@ static MACHINE_CONFIG_DERIVED( pcw8256, pcw )
 
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( pcw8512, pcw )
+MACHINE_CONFIG_DERIVED(pcw_state::pcw8512, pcw)
 	MCFG_SCREEN_ADD("printer",RASTER)
 	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_SIZE( PCW_PRINTER_WIDTH, PCW_PRINTER_HEIGHT )
@@ -1329,7 +1329,7 @@ static MACHINE_CONFIG_DERIVED( pcw8512, pcw )
 MACHINE_CONFIG_END
 
 /* PCW9512, PCW9512+, PCW10 */
-static MACHINE_CONFIG_DERIVED( pcw9512, pcw )
+MACHINE_CONFIG_DERIVED(pcw_state::pcw9512, pcw)
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_IO_MAP(pcw9512_io)
 

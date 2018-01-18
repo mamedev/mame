@@ -101,7 +101,7 @@ WRITE_LINE_MEMBER( s100_dj2db_device::fdc_drq_w )
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( s100_dj2db_device::device_add_mconfig )
+MACHINE_CONFIG_START(s100_dj2db_device::device_add_mconfig)
 	MCFG_DEVICE_ADD(BR1941_TAG, COM8116, XTAL_5_0688MHz)
 	MCFG_COM8116_FR_HANDLER(WRITELINE(s100_dj2db_device, fr_w))
 

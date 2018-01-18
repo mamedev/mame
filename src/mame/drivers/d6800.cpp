@@ -81,6 +81,7 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(d6800_p);
 	DECLARE_QUICKLOAD_LOAD_MEMBER( d6800 );
 
+	void d6800(machine_config &config);
 private:
 	uint8_t m_rtc;
 	bool m_cb2;
@@ -381,7 +382,7 @@ QUICKLOAD_LOAD_MEMBER( d6800_state, d6800 )
 	return result;
 }
 
-static MACHINE_CONFIG_START( d6800 )
+MACHINE_CONFIG_START(d6800_state::d6800)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",M6800, XTAL_4MHz/4)
 	MCFG_CPU_PROGRAM_MAP(d6800_map)

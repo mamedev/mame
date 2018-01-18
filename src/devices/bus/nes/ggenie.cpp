@@ -258,7 +258,7 @@ READ8_MEMBER(nes_ggenie_device::nt_r)
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( nes_ggenie_device::device_add_mconfig )
+MACHINE_CONFIG_START(nes_ggenie_device::device_add_mconfig)
 	MCFG_NES_CARTRIDGE_ADD("gg_slot", nes_cart, nullptr)
 	MCFG_NES_CARTRIDGE_NOT_MANDATORY
 MACHINE_CONFIG_END

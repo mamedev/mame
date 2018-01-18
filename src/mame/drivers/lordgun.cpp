@@ -632,7 +632,7 @@ void lordgun_state::machine_start()
 	save_item(NAME(m_whitescreen));
 }
 
-static MACHINE_CONFIG_START( lordgun )
+MACHINE_CONFIG_START(lordgun_state::lordgun)
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_20MHz / 2)
 	MCFG_CPU_PROGRAM_MAP(lordgun_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", lordgun_state,  irq4_line_hold)
@@ -684,7 +684,7 @@ static MACHINE_CONFIG_START( lordgun )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( aliencha )
+MACHINE_CONFIG_START(lordgun_state::aliencha)
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_20MHz / 2)
 	MCFG_CPU_PROGRAM_MAP(aliencha_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", lordgun_state,  irq4_line_hold)

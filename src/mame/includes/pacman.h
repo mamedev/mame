@@ -175,6 +175,33 @@ public:
 	DECLARE_MACHINE_START(acitya);
 	DECLARE_MACHINE_RESET(acitya);
 
+	void birdiy(machine_config &config);
+	void rocktrv2(machine_config &config);
+	void mspacman(machine_config &config);
+	void dremshpr(machine_config &config);
+	void mschamp(machine_config &config);
+	void acitya(machine_config &config);
+	void theglobp(machine_config &config);
+	void nmouse(machine_config &config);
+	void vanvan(machine_config &config);
+	void s2650games(machine_config &config);
+	void woodpek(machine_config &config);
+	void crushs(machine_config &config);
+	void eeekk(machine_config &config);
+	void superabc(machine_config &config);
+	void numcrash(machine_config &config);
+	void crush4(machine_config &config);
+	void bigbucks(machine_config &config);
+	void porky(machine_config &config);
+	void pacman(machine_config &config);
+	void _8bpm(machine_config &config);
+	void maketrax(machine_config &config);
+	void korosuke(machine_config &config);
+	void alibaba(machine_config &config);
+	void drivfrcp(machine_config &config);
+	void pengojpm(machine_config &config);
+	void piranha(machine_config &config);
+
 private:
 	// pacplus.c
 	uint8_t pacplus_decrypt(int addr, uint8_t e);

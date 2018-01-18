@@ -640,7 +640,7 @@ INTERRUPT_GEN_MEMBER(playch10_state::playch10_interrupt){
 		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
-static MACHINE_CONFIG_START( playch10 )
+MACHINE_CONFIG_START(playch10_state::playch10)
 	// basic machine hardware
 	MCFG_CPU_ADD("maincpu", Z80, 8000000/2) // 4 MHz
 	MCFG_CPU_PROGRAM_MAP(bios_map)
@@ -696,11 +696,11 @@ static MACHINE_CONFIG_START( playch10 )
 	MCFG_RP5H01_ADD("rp5h01")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( playchnv, playch10 )
+MACHINE_CONFIG_DERIVED(playch10_state::playchnv, playch10)
 	MCFG_NVRAM_ADD_0FILL("nvram")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( playch10_hboard, playch10 )
+MACHINE_CONFIG_DERIVED(playch10_state::playch10_hboard, playch10)
 	MCFG_VIDEO_START_OVERRIDE(playch10_state,playch10_hboard)
 	MCFG_MACHINE_START_OVERRIDE(playch10_state,playch10_hboard)
 MACHINE_CONFIG_END

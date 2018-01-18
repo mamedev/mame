@@ -426,6 +426,8 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	DECLARE_WRITE_LINE_MEMBER(kurukuru_msm5205_vck);
+	void ppj(machine_config &config);
+	void kurukuru(machine_config &config);
 };
 
 #define MAIN_CLOCK      XTAL_21_4772MHz
@@ -848,7 +850,7 @@ void kurukuru_state::machine_reset()
 *                 Machine Driver                 *
 *************************************************/
 
-static MACHINE_CONFIG_START( kurukuru )
+MACHINE_CONFIG_START(kurukuru_state::kurukuru)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80, CPU_CLOCK)
@@ -886,7 +888,7 @@ static MACHINE_CONFIG_START( kurukuru )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( ppj )
+MACHINE_CONFIG_START(kurukuru_state::ppj)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80, CPU_CLOCK)

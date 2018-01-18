@@ -702,7 +702,7 @@ GFXDECODE_END
 
 /*******************************************************************************/
 
-static MACHINE_CONFIG_START( tsamurai )
+MACHINE_CONFIG_START(tsamurai_state::tsamurai)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_24MHz/8)
@@ -752,7 +752,7 @@ static MACHINE_CONFIG_START( tsamurai )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( vsgongf )
+MACHINE_CONFIG_START(tsamurai_state::vsgongf)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_24MHz/8)
@@ -800,7 +800,7 @@ static MACHINE_CONFIG_START( vsgongf )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( m660 )
+MACHINE_CONFIG_START(tsamurai_state::m660)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_24MHz/8)

@@ -1135,7 +1135,7 @@ static GFXDECODE_START( srmp3 )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( srmp2 )
+MACHINE_CONFIG_START(srmp2_state::srmp2)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000,16000000/2)              /* 8.00 MHz */
@@ -1179,7 +1179,7 @@ static MACHINE_CONFIG_START( srmp2 )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( srmp3 )
+MACHINE_CONFIG_START(srmp2_state::srmp3)
 
 	/* basic machine hardware */
 
@@ -1225,7 +1225,7 @@ static MACHINE_CONFIG_START( srmp3 )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.45)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( rmgoldyh, srmp3 )
+MACHINE_CONFIG_DERIVED(srmp2_state::rmgoldyh, srmp3)
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(rmgoldyh_map)
@@ -1234,7 +1234,7 @@ static MACHINE_CONFIG_DERIVED( rmgoldyh, srmp3 )
 	MCFG_MACHINE_START_OVERRIDE(srmp2_state,rmgoldyh)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( mjyuugi )
+MACHINE_CONFIG_START(srmp2_state::mjyuugi)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000,16000000/2)              /* 8.00 MHz */

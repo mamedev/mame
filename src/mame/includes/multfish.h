@@ -91,9 +91,9 @@ public:
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 	required_device<ticket_dispenser_device> m_hopper;
+	void rollfr(machine_config &config);
+	void igrosoft_gamble(machine_config &config);
 };
 
 
-MACHINE_CONFIG_EXTERN( igrosoft_gamble );
-MACHINE_CONFIG_EXTERN( rollfr );
 INPUT_PORTS_EXTERN( igrosoft_gamble );

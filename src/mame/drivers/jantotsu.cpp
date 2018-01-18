@@ -143,6 +143,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<msm5205_device> m_adpcm;
 	required_device<palette_device> m_palette;
+	void jantotsu(machine_config &config);
 };
 
 
@@ -494,7 +495,7 @@ void jantotsu_state::machine_reset()
 	m_adpcm_trigger = 0;
 }
 
-static MACHINE_CONFIG_START( jantotsu )
+MACHINE_CONFIG_START(jantotsu_state::jantotsu)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80,MAIN_CLOCK/4)

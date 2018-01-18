@@ -89,6 +89,9 @@ public:
 	DECLARE_WRITE8_MEMBER(midearth_w);
 	TIMER_DEVICE_CALLBACK_MEMBER(nmi);
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_s);
+	void midearth(machine_config &config);
+	void atari_s1(machine_config &config);
+	void atarians(machine_config &config);
 private:
 	bool m_audiores;
 	uint8_t m_timer_s[3];
@@ -436,7 +439,7 @@ void atari_s1_state::machine_reset()
 	m_audiores = 0;
 }
 
-static MACHINE_CONFIG_START( atari_s1 )
+MACHINE_CONFIG_START(atari_s1_state::atari_s1)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6800, MASTER_CLK)
 	MCFG_CPU_PROGRAM_MAP(atari_s1_map)
@@ -458,12 +461,12 @@ static MACHINE_CONFIG_START( atari_s1 )
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer_s", atari_s1_state, timer_s, attotime::from_hz(AUDIO_CLK))
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( atarians, atari_s1 )
+MACHINE_CONFIG_DERIVED(atari_s1_state::atarians, atari_s1)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(atarians_map)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( midearth, atari_s1 )
+MACHINE_CONFIG_DERIVED(atari_s1_state::midearth, atari_s1)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(midearth_map)
 MACHINE_CONFIG_END

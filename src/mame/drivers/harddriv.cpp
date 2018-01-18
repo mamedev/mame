@@ -522,6 +522,20 @@ public:
 	optional_device<harddriv_state> m_leftpcb;
 	optional_device<harddriv_state> m_rightpcb;
 
+	void steeltal1_machine(machine_config &config);
+	void harddriv_machine(machine_config &config);
+	void hdrivairp_machine(machine_config &config);
+	void harddrivc_machine(machine_config &config);
+	void racedrivb1_machine(machine_config &config);
+	void racedrivc1_machine(machine_config &config);
+	void steeltal_machine(machine_config &config);
+	void racedriv_panorama_machine(machine_config &config);
+	void hdrivair_machine(machine_config &config);
+	void racedriv_machine(machine_config &config);
+	void strtdriv_machine(machine_config &config);
+	void steeltalp_machine(machine_config &config);
+	void racedrivc_machine(machine_config &config);
+	void stunrun_machine(machine_config &config);
 };
 
 
@@ -1417,7 +1431,7 @@ INTERRUPT_GEN_MEMBER(harddriv_state::video_int_gen)
 
 
 /* Driver board without MSP (used by Race Drivin' cockpit) */
-static MACHINE_CONFIG_START( driver_nomsp )
+MACHINE_CONFIG_START(harddriv_state::driver_nomsp)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68010, HARDDRIV_MASTER_CLOCK/4)
@@ -1465,7 +1479,7 @@ MACHINE_CONFIG_END
 
 
 /* Driver board with MSP (used by Hard Drivin' cockpit) */
-static MACHINE_CONFIG_START( driver_msp )
+MACHINE_CONFIG_START(harddriv_state::driver_msp)
 
 	MCFG_FRAGMENT_ADD( driver_nomsp )
 
@@ -1483,7 +1497,7 @@ MACHINE_CONFIG_END
 
 
 /* Multisync board without MSP (used by STUN Runner, Steel Talons, Race Drivin' compact) */
-static MACHINE_CONFIG_START( multisync_nomsp )
+MACHINE_CONFIG_START(harddriv_state::multisync_nomsp)
 
 	MCFG_FRAGMENT_ADD( driver_nomsp )
 
@@ -1504,7 +1518,7 @@ MACHINE_CONFIG_END
 
 
 /* Multisync board with MSP (used by Hard Drivin' compact) */
-static MACHINE_CONFIG_START( multisync_msp )
+MACHINE_CONFIG_START(harddriv_state::multisync_msp)
 
 	MCFG_FRAGMENT_ADD( multisync_nomsp )
 
@@ -1522,7 +1536,7 @@ MACHINE_CONFIG_END
 
 
 /* Multisync II board (used by Hard Drivin's Airborne) */
-static MACHINE_CONFIG_START( multisync2 )
+MACHINE_CONFIG_START(harddriv_state::multisync2)
 
 	MCFG_FRAGMENT_ADD( multisync_nomsp )
 
@@ -1545,7 +1559,7 @@ MACHINE_CONFIG_END
  *************************************/
 
 /* ADSP/ADSP II boards (used by Hard/Race Drivin', STUN Runner) */
-static MACHINE_CONFIG_START( adsp )
+MACHINE_CONFIG_START(harddriv_state::adsp)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("adsp", ADSP2100, XTAL_32MHz/4)
@@ -1555,7 +1569,7 @@ MACHINE_CONFIG_END
 
 
 /* DS III/IV board (used by Steel Talons, Street Drivin' and Hard Drivin's Airborne) */
-static MACHINE_CONFIG_START( ds3 )
+MACHINE_CONFIG_START(harddriv_state::ds3)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("adsp", ADSP2101, XTAL_12MHz)
@@ -1597,7 +1611,7 @@ MACHINE_CONFIG_END
  *************************************/
 
 /* DSK board (used by Race Drivin') */
-static MACHINE_CONFIG_START( dsk )
+MACHINE_CONFIG_START(harddriv_state::dsk)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("dsp32", DSP32C, XTAL_40MHz)
@@ -1613,7 +1627,7 @@ MACHINE_CONFIG_END
 
 
 /* DSK II board (used by Hard Drivin's Airborne) */
-static MACHINE_CONFIG_START( dsk2 )
+MACHINE_CONFIG_START(harddriv_state::dsk2)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("dsp32", DSP32C, XTAL_40MHz)
@@ -1639,7 +1653,7 @@ harddriv_board_device_state::harddriv_board_device_state(const machine_config &m
 {
 }
 
-MACHINE_CONFIG_MEMBER( harddriv_board_device_state::device_add_mconfig )
+MACHINE_CONFIG_START(harddriv_board_device_state::device_add_mconfig)
 	MCFG_FRAGMENT_ADD( driver_msp )
 	/* basic machine hardware */        /* original driver board with MSP */
 	MCFG_FRAGMENT_ADD( adsp )           /* ADSP board */
@@ -1667,7 +1681,7 @@ harddrivc_board_device_state::harddrivc_board_device_state(const machine_config 
 {
 }
 
-MACHINE_CONFIG_MEMBER( harddrivc_board_device_state::device_add_mconfig )
+MACHINE_CONFIG_START(harddrivc_board_device_state::device_add_mconfig)
 	MCFG_FRAGMENT_ADD( multisync_msp )
 
 	/* basic machine hardware */        /* multisync board with MSP */
@@ -1708,7 +1722,7 @@ racedrivb1_board_device_state::racedrivb1_board_device_state(const machine_confi
 {
 }
 
-MACHINE_CONFIG_MEMBER( racedriv_board_device_state::device_add_mconfig )
+MACHINE_CONFIG_START(racedriv_board_device_state::device_add_mconfig)
 	MCFG_FRAGMENT_ADD( driver_nomsp )
 
 	/* basic machine hardware */        /* original driver board without MSP */
@@ -1763,7 +1777,7 @@ racedrivc_panorama_side_board_device_state::racedrivc_panorama_side_board_device
 {
 }
 
-MACHINE_CONFIG_MEMBER( racedrivc_board_device_state::device_add_mconfig )
+MACHINE_CONFIG_START(racedrivc_board_device_state::device_add_mconfig)
 
 	MCFG_FRAGMENT_ADD( multisync_nomsp )
 
@@ -1773,7 +1787,7 @@ MACHINE_CONFIG_MEMBER( racedrivc_board_device_state::device_add_mconfig )
 	MCFG_DEVICE_ADD("harddriv_sound", HARDDRIV_SOUND_BOARD, 0)      /* driver sound board */
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_MEMBER( racedrivc_panorama_side_board_device_state::device_add_mconfig )
+MACHINE_CONFIG_START(racedrivc_panorama_side_board_device_state::device_add_mconfig)
 
 	MCFG_FRAGMENT_ADD( multisync_nomsp )
 
@@ -1798,7 +1812,7 @@ stunrun_board_device_state::stunrun_board_device_state(const machine_config &mco
 {
 }
 
-MACHINE_CONFIG_MEMBER( stunrun_board_device_state::device_add_mconfig )
+MACHINE_CONFIG_START(stunrun_board_device_state::device_add_mconfig)
 
 	MCFG_FRAGMENT_ADD( multisync_nomsp )
 
@@ -1864,7 +1878,7 @@ steeltalp_board_device_state::steeltalp_board_device_state(const machine_config 
 {
 }
 
-MACHINE_CONFIG_MEMBER( steeltal_board_device_state::device_add_mconfig )
+MACHINE_CONFIG_START(steeltal_board_device_state::device_add_mconfig)
 	MCFG_FRAGMENT_ADD( multisync_msp )
 
 	/* basic machine hardware */        /* multisync board with MSP */
@@ -1902,7 +1916,7 @@ strtdriv_board_device_state::strtdriv_board_device_state(const machine_config &m
 {
 }
 
-MACHINE_CONFIG_MEMBER( strtdriv_board_device_state::device_add_mconfig )
+MACHINE_CONFIG_START(strtdriv_board_device_state::device_add_mconfig)
 
 	MCFG_FRAGMENT_ADD( multisync_nomsp )
 
@@ -1946,7 +1960,7 @@ hdrivairp_board_device_state::hdrivairp_board_device_state(const machine_config 
 {
 }
 
-MACHINE_CONFIG_MEMBER( hdrivair_board_device_state::device_add_mconfig )
+MACHINE_CONFIG_START(hdrivair_board_device_state::device_add_mconfig)
 
 	MCFG_FRAGMENT_ADD( multisync2 )
 
@@ -1956,55 +1970,55 @@ MACHINE_CONFIG_MEMBER( hdrivair_board_device_state::device_add_mconfig )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( harddriv_machine )
+MACHINE_CONFIG_START(harddriv_new_state::harddriv_machine)
 	MCFG_DEVICE_ADD("mainpcb", HARDDRIV_BOARD, 0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( harddrivc_machine )
+MACHINE_CONFIG_START(harddriv_new_state::harddrivc_machine)
 	MCFG_DEVICE_ADD("mainpcb", HARDDRIVC_BOARD, 0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( racedriv_machine )
+MACHINE_CONFIG_START(harddriv_new_state::racedriv_machine)
 	MCFG_DEVICE_ADD("mainpcb", RACEDRIV_BOARD, 0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( racedrivb1_machine )
+MACHINE_CONFIG_START(harddriv_new_state::racedrivb1_machine)
 	MCFG_DEVICE_ADD("mainpcb", RACEDRIVB1_BOARD, 0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( racedrivc_machine )
+MACHINE_CONFIG_START(harddriv_new_state::racedrivc_machine)
 	MCFG_DEVICE_ADD("mainpcb", RACEDRIVC_BOARD, 0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( racedrivc1_machine )
+MACHINE_CONFIG_START(harddriv_new_state::racedrivc1_machine)
 	MCFG_DEVICE_ADD("mainpcb", RACEDRIVC1_BOARD, 0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( stunrun_machine )
+MACHINE_CONFIG_START(harddriv_new_state::stunrun_machine)
 	MCFG_DEVICE_ADD("mainpcb", STUNRUN_BOARD, 0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( strtdriv_machine )
+MACHINE_CONFIG_START(harddriv_new_state::strtdriv_machine)
 	MCFG_DEVICE_ADD("mainpcb", STRTDRIV_BOARD, 0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( hdrivair_machine )
+MACHINE_CONFIG_START(harddriv_new_state::hdrivair_machine)
 	MCFG_DEVICE_ADD("mainpcb", HDRIVAIR_BOARD, 0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( hdrivairp_machine )
+MACHINE_CONFIG_START(harddriv_new_state::hdrivairp_machine)
 	MCFG_DEVICE_ADD("mainpcb", HDRIVAIRP_BOARD, 0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( steeltal_machine )
+MACHINE_CONFIG_START(harddriv_new_state::steeltal_machine)
 	MCFG_DEVICE_ADD("mainpcb", STEELTAL_BOARD, 0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( steeltal1_machine )
+MACHINE_CONFIG_START(harddriv_new_state::steeltal1_machine)
 	MCFG_DEVICE_ADD("mainpcb", STEELTAL1_BOARD, 0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( steeltalp_machine )
+MACHINE_CONFIG_START(harddriv_new_state::steeltalp_machine)
 	MCFG_DEVICE_ADD("mainpcb", STEELTALP_BOARD, 0)
 MACHINE_CONFIG_END
 
@@ -2015,7 +2029,7 @@ WRITE_LINE_MEMBER(harddriv_new_state::tx_a)
 	m_rightpcb->get_duart()->rx_a_w(state);
 }
 
-static MACHINE_CONFIG_START( racedriv_panorama_machine )
+MACHINE_CONFIG_START(harddriv_new_state::racedriv_panorama_machine)
 	MCFG_DEVICE_ADD("mainpcb", RACEDRIV_BOARD, 0)
 	MCFG_DEVICE_ADD("leftpcb", RACEDRIVC_PANORAMA_SIDE_BOARD, 0)
 	MCFG_DEVICE_ADD("rightpcb", RACEDRIVC_PANORAMA_SIDE_BOARD, 0)

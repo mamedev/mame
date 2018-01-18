@@ -37,6 +37,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<palette_device> m_palette;
 	UPD7220_DISPLAY_PIXELS_MEMBER( hgdc_display_pixels );
+	void mz6500(machine_config &config);
 };
 
 UPD7220_DISPLAY_PIXELS_MEMBER( mz6500_state::hgdc_display_pixels )
@@ -137,7 +138,7 @@ static ADDRESS_MAP_START( upd7220_map, 0, 16, mz6500_state )
 ADDRESS_MAP_END
 
 
-static MACHINE_CONFIG_START( mz6500 )
+MACHINE_CONFIG_START(mz6500_state::mz6500)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8086, 8000000) //unk clock
 	MCFG_CPU_PROGRAM_MAP(mz6500_map)

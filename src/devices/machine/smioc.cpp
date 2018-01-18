@@ -109,7 +109,7 @@ static ADDRESS_MAP_START( smioc_mem, AS_PROGRAM, 8, smioc_device )
 	AM_RANGE(0xF8000, 0xFFFFF) AM_ROM AM_REGION("rom", 0)
 ADDRESS_MAP_END
 
-MACHINE_CONFIG_MEMBER( smioc_device::device_add_mconfig )
+MACHINE_CONFIG_START(smioc_device::device_add_mconfig)
 	/* CPU - Intel 80C188 */
 	MCFG_CPU_ADD(I188_TAG, I80188, XTAL_20MHz / 2) // Clock division unknown
 	MCFG_CPU_PROGRAM_MAP(smioc_mem)

@@ -65,7 +65,7 @@ void iq151_grafik_device::device_reset()
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( iq151_grafik_device::device_add_mconfig )
+MACHINE_CONFIG_START(iq151_grafik_device::device_add_mconfig)
 	MCFG_DEVICE_ADD("ppi8255", I8255, 0)
 	MCFG_I8255_OUT_PORTA_CB(WRITE8(iq151_grafik_device, x_write))
 	MCFG_I8255_OUT_PORTB_CB(WRITE8(iq151_grafik_device, y_write))

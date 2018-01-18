@@ -54,6 +54,7 @@ public:
 	DECLARE_WRITE8_MEMBER(la120_NVR_w);
 	DECLARE_READ8_MEMBER(la120_DC305_r);
 	DECLARE_WRITE8_MEMBER(la120_DC305_w);
+	void la120(machine_config &config);
 private:
 	virtual void machine_start() override;
 	//virtual void machine_reset();
@@ -398,7 +399,7 @@ void decwriter_state::machine_reset()
 //  MACHINE DRIVERS
 //**************************************************************************
 
-static MACHINE_CONFIG_START( la120 )
+MACHINE_CONFIG_START(decwriter_state::la120)
 
 	MCFG_CPU_ADD("maincpu",I8080, XTAL_18MHz / 9) // 18Mhz xtal on schematics, using an i8224 clock divider/reset sanitizer IC
 	MCFG_CPU_PROGRAM_MAP(la120_mem)

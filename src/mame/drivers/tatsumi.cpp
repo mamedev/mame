@@ -842,7 +842,7 @@ MACHINE_RESET_MEMBER(apache3_state,apache3)
 }
 
 
-static MACHINE_CONFIG_START( apache3 )
+MACHINE_CONFIG_START(apache3_state::apache3)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", V30, CLOCK_1 / 2)
@@ -898,7 +898,7 @@ static MACHINE_CONFIG_START( apache3 )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.75)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( roundup5 )
+MACHINE_CONFIG_START(roundup5_state::roundup5)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", V30, CLOCK_1 / 2)
@@ -946,7 +946,7 @@ static MACHINE_CONFIG_START( roundup5 )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.75)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( cyclwarr )
+MACHINE_CONFIG_START(cyclwarr_state::cyclwarr)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, CLOCK_2 / 4)
@@ -1004,7 +1004,7 @@ static MACHINE_CONFIG_START( cyclwarr )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.75)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( bigfight )
+MACHINE_CONFIG_START(cyclwarr_state::bigfight)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, CLOCK_2 / 4)

@@ -43,6 +43,7 @@ public:
 	DECLARE_WRITE8_MEMBER( bosco_scrollx_w );
 	DECLARE_WRITE8_MEMBER( bosco_scrolly_w );
 	DECLARE_WRITE8_MEMBER( bosco_starclr_w );
+	void bosco(machine_config &config);
 };
 
 #endif // MAME_INCLUDES_BOSCO_H

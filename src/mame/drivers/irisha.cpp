@@ -49,6 +49,7 @@ public:
 	uint32_t screen_update_irisha(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_shared_ptr<uint8_t> m_p_videoram;
 
+	void irisha(machine_config &config);
 private:
 	bool m_sg1_line;
 	bool m_keypressed;
@@ -357,7 +358,7 @@ void irisha_state::machine_reset()
 }
 
 /* Machine driver */
-static MACHINE_CONFIG_START( irisha )
+MACHINE_CONFIG_START(irisha_state::irisha)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8080, XTAL_16MHz / 9)
 	MCFG_CPU_PROGRAM_MAP(irisha_mem)

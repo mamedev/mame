@@ -448,7 +448,7 @@ void xain_state::machine_start()
 	save_item(NAME(m_vblank));
 }
 
-static MACHINE_CONFIG_START( xsleena )
+MACHINE_CONFIG_START(xain_state::xsleena)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", MC6809E, CPU_CLOCK) // 68B09E
@@ -496,7 +496,7 @@ static MACHINE_CONFIG_START( xsleena )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( xsleenab, xsleena )
+MACHINE_CONFIG_DERIVED(xain_state::xsleenab, xsleena)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(bootleg_map)
 

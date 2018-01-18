@@ -590,7 +590,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( tunit_core )
+MACHINE_CONFIG_START(midtunit_state::tunit_core)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", TMS34010, CPU_CLOCK)
@@ -621,7 +621,7 @@ static MACHINE_CONFIG_START( tunit_core )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( tunit_adpcm, tunit_core )
+MACHINE_CONFIG_DERIVED(midtunit_state::tunit_adpcm, tunit_core)
 
 	/* basic machine hardware */
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
@@ -630,7 +630,7 @@ static MACHINE_CONFIG_DERIVED( tunit_adpcm, tunit_core )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( tunit_dcs, tunit_core )
+MACHINE_CONFIG_DERIVED(midtunit_state::tunit_dcs, tunit_core)
 
 	/* basic machine hardware */
 	MCFG_DEVICE_ADD("dcs", DCS_AUDIO_2K, 0)

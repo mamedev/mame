@@ -73,6 +73,7 @@ public:
 	TIMER_CALLBACK_MEMBER(periodic_callback);
 	void draw(bitmap_ind16 &bitmap, const rectangle &cliprect);
 
+	void boxer(machine_config &config);
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
@@ -480,7 +481,7 @@ void boxer_state::machine_reset()
 }
 
 
-static MACHINE_CONFIG_START( boxer )
+MACHINE_CONFIG_START(boxer_state::boxer)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, MASTER_CLOCK / 16)

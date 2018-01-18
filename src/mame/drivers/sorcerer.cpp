@@ -413,7 +413,7 @@ static DEVICE_INPUT_DEFAULTS_START( terminal )
 	DEVICE_INPUT_DEFAULTS( "RS232_STOPBITS", 0xff, RS232_STOPBITS_2 )
 DEVICE_INPUT_DEFAULTS_END
 
-static MACHINE_CONFIG_START( sorcerer )
+MACHINE_CONFIG_START(sorcerer_state::sorcerer)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, ES_CPU_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(sorcerer_mem)
@@ -481,7 +481,7 @@ static MACHINE_CONFIG_START( sorcerer )
 	MCFG_RAM_EXTRA_OPTIONS("8K,16K,32K")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( sorcererd, sorcerer )
+MACHINE_CONFIG_DERIVED(sorcerer_state::sorcererd, sorcerer)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(sorcererd_mem)
 

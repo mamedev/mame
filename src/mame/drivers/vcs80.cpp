@@ -209,7 +209,7 @@ void vcs80_state::machine_start()
 
 /* Machine Driver */
 
-static MACHINE_CONFIG_START( vcs80 )
+MACHINE_CONFIG_START(vcs80_state::vcs80)
 	/* basic machine hardware */
 	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL_5MHz/2) /* U880D */
 	MCFG_CPU_PROGRAM_MAP(vcs80_mem)

@@ -80,4 +80,8 @@ public:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_bestbest(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, uint16_t *sprites, int gfx);
+	void uballoon(machine_config &config);
+	void sunaq(machine_config &config);
+	void bssoccer(machine_config &config);
+	void bestbest(machine_config &config);
 };

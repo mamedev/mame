@@ -295,7 +295,7 @@ void blktiger_state::machine_reset()
 	m_i8751_latch = 0;
 }
 
-static MACHINE_CONFIG_START( blktiger )
+MACHINE_CONFIG_START(blktiger_state::blktiger)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_24MHz/4)  /* verified on pcb */
@@ -343,7 +343,7 @@ static MACHINE_CONFIG_START( blktiger )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( blktigerbl, blktiger )
+MACHINE_CONFIG_DERIVED(blktiger_state::blktigerbl, blktiger)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(blktigerbl_io_map)
 

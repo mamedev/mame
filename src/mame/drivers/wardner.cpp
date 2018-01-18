@@ -152,6 +152,7 @@ public:
 	DECLARE_WRITE8_MEMBER(wardner_bank_w);
 	DECLARE_DRIVER_INIT(wardner);
 
+	void wardner(machine_config &config);
 protected:
 	virtual void driver_start() override;
 	virtual void machine_reset() override;
@@ -360,7 +361,7 @@ void wardner_state::machine_reset()
 	m_membank->set_bank(0);
 }
 
-static MACHINE_CONFIG_START( wardner )
+MACHINE_CONFIG_START(wardner_state::wardner)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_24MHz/4)      /* 6MHz */

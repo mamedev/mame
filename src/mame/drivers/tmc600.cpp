@@ -251,7 +251,7 @@ WRITE8_MEMBER( tmc600_state::sc_w )
 
 /* Machine Drivers */
 
-static MACHINE_CONFIG_START( tmc600 )
+MACHINE_CONFIG_START(tmc600_state::tmc600)
 	// CPU
 	MCFG_CPU_ADD(CDP1802_TAG, CDP1802, XTAL_3_57MHz)
 	MCFG_CPU_PROGRAM_MAP(tmc600_map)

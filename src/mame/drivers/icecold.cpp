@@ -63,6 +63,7 @@ public:
 	int     m_lmotor;           // left motor position (0-100)
 	TIMER_DEVICE_CALLBACK_MEMBER(icecold_sint_timer);
 	TIMER_DEVICE_CALLBACK_MEMBER(icecold_motors_timer);
+	void icecold(machine_config &config);
 };
 
 static ADDRESS_MAP_START( icecold_map, AS_PROGRAM, 8, icecold_state )
@@ -330,7 +331,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(icecold_state::icecold_motors_timer)
 	}
 }
 
-static MACHINE_CONFIG_START( icecold )
+MACHINE_CONFIG_START(icecold_state::icecold)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", MC6809E, XTAL_6MHz/4) // 68A09E

@@ -120,6 +120,8 @@ public:
 	DECLARE_WRITE8_MEMBER(re_mux_port_B_w);
 
 	DECLARE_DRIVER_INIT(re900);
+	void re900(machine_config &config);
+	void bs94(machine_config &config);
 };
 
 
@@ -377,7 +379,7 @@ INPUT_PORTS_END
 *      Machine Driver      *
 ***************************/
 
-static MACHINE_CONFIG_START( re900 )
+MACHINE_CONFIG_START(re900_state::re900)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8051, MAIN_CLOCK)
@@ -403,7 +405,7 @@ static MACHINE_CONFIG_START( re900 )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( bs94, re900 )
+MACHINE_CONFIG_DERIVED(re900_state::bs94, re900)
 
 	/* sound hardware   */
 	MCFG_SOUND_MODIFY("ay_re900")

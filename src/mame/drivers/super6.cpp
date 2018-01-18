@@ -475,7 +475,7 @@ void super6_state::machine_reset()
 //  MACHINE_CONFIG( super6 )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( super6 )
+MACHINE_CONFIG_START(super6_state::super6)
 	// basic machine hardware
 	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL_24MHz/4)
 	MCFG_CPU_PROGRAM_MAP(super6_mem)

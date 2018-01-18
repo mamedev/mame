@@ -571,7 +571,7 @@ void docastle_state::machine_start()
 	save_item(NAME(m_buffer1));
 }
 
-static MACHINE_CONFIG_START( docastle )
+MACHINE_CONFIG_START(docastle_state::docastle)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_4MHz)
@@ -640,7 +640,7 @@ static MACHINE_CONFIG_START( docastle )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( dorunrun, docastle )
+MACHINE_CONFIG_DERIVED(docastle_state::dorunrun, docastle)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -653,7 +653,7 @@ static MACHINE_CONFIG_DERIVED( dorunrun, docastle )
 	MCFG_VIDEO_START_OVERRIDE(docastle_state,dorunrun)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( idsoccer, docastle )
+MACHINE_CONFIG_DERIVED(docastle_state::idsoccer, docastle)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")

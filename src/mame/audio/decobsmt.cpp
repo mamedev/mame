@@ -46,7 +46,7 @@ DEFINE_DEVICE_TYPE(DECOBSMT, decobsmt_device, "decobsmt", "Data East/Sega/Stern 
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( decobsmt_device::device_add_mconfig )
+MACHINE_CONFIG_START(decobsmt_device::device_add_mconfig)
 	MCFG_CPU_ADD(M6809_TAG, MC6809E, XTAL_24MHz / 12) // 68B09E U6 (E & Q = 2 MHz according to manual)
 	MCFG_CPU_PROGRAM_MAP(decobsmt_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(decobsmt_device, decobsmt_firq_interrupt, 489) /* Fixed FIRQ of 489Hz as measured on real (pinball) machine */

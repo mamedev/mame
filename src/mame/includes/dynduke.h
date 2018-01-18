@@ -58,4 +58,6 @@ public:
 	void draw_background(bitmap_ind16 &bitmap, const rectangle &cliprect, int pri );
 
 	INTERRUPT_GEN_MEMBER(interrupt);
+	void dynduke(machine_config &config);
+	void dbldyn(machine_config &config);
 };

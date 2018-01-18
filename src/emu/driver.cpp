@@ -173,7 +173,7 @@ const tiny_rom_entry *driver_device::device_rom_region() const
 void driver_device::device_add_mconfig(machine_config &config)
 {
 	assert(m_system);
-	m_system->machine_config(config, this, nullptr);
+	m_system->machine_creator(config, *this);
 }
 
 
@@ -201,7 +201,7 @@ void driver_device::device_start()
 			throw device_missing_dependencies();
 
 	// call the game-specific init
-	m_system->driver_init(machine());
+	m_system->driver_init(*this);
 
 	// finish image devices init process
 	machine().image().postdevice_init();

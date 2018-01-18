@@ -1151,7 +1151,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(mitchell_state::mitchell_irq)
 	}
 }
 
-static MACHINE_CONFIG_START( mgakuen )
+MACHINE_CONFIG_START(mitchell_state::mgakuen)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_16MHz/2) /* probably same clock as the other mitchell hardware games */
@@ -1191,7 +1191,7 @@ static MACHINE_CONFIG_START( mgakuen )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( pang )
+MACHINE_CONFIG_START(mitchell_state::pang)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80, XTAL_16MHz/2) /* verified on pcb */
@@ -1231,7 +1231,7 @@ static MACHINE_CONFIG_START( pang )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( pangnv, pang )
+MACHINE_CONFIG_DERIVED(mitchell_state::pangnv, pang)
 	MCFG_NVRAM_ADD_0FILL("nvram")
 MACHINE_CONFIG_END
 
@@ -1266,7 +1266,7 @@ WRITE_LINE_MEMBER(mitchell_state::spangbl_adpcm_int)
 }
 
 
-static MACHINE_CONFIG_DERIVED( spangbl, pangnv )
+MACHINE_CONFIG_DERIVED(mitchell_state::spangbl, pangnv)
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(spangbl_map)
@@ -1294,7 +1294,7 @@ static MACHINE_CONFIG_DERIVED( spangbl, pangnv )
 	MCFG_74157_OUT_CB(DEVWRITE8("msm", msm5205_device, data_w))
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( pangba, spangbl )
+MACHINE_CONFIG_DERIVED(mitchell_state::pangba, spangbl)
 	MCFG_CPU_MODIFY("audiocpu")
 	MCFG_CPU_PROGRAM_MAP(pangba_sound_map)
 
@@ -1302,7 +1302,7 @@ static MACHINE_CONFIG_DERIVED( pangba, spangbl )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( mstworld )
+MACHINE_CONFIG_START(mitchell_state::mstworld)
 
 	/* basic machine hardware */
 	/* it doesn't glitch with the clock speed set to 4x normal, however this is incorrect..
@@ -1346,7 +1346,7 @@ static MACHINE_CONFIG_START( mstworld )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( marukin )
+MACHINE_CONFIG_START(mitchell_state::marukin)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_16MHz/2) /* verified on pcb */
@@ -1401,7 +1401,7 @@ Vsync is 59.09hz
 
 */
 
-static MACHINE_CONFIG_START( pkladiesbl )
+MACHINE_CONFIG_START(mitchell_state::pkladiesbl)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_12MHz/2) /* verified on pcb */

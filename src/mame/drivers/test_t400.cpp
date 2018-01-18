@@ -20,6 +20,8 @@ public:
 
 	DECLARE_WRITE8_MEMBER( port_l_w );
 	required_device<cpu_device> m_maincpu;
+	void test_t410(machine_config &config);
+	void test_t420(machine_config &config);
 };
 
 WRITE8_MEMBER( t400_test_suite_state::port_l_w )
@@ -27,13 +29,13 @@ WRITE8_MEMBER( t400_test_suite_state::port_l_w )
 //  printf("L: %u\n", data);
 }
 
-static MACHINE_CONFIG_START( test_t410 )
+MACHINE_CONFIG_START(t400_test_suite_state::test_t410)
 	MCFG_CPU_ADD("maincpu", COP410, 1000000)
 	MCFG_COP400_CONFIG( COP400_CKI_DIVISOR_16, COP400_CKO_OSCILLATOR_OUTPUT, false )
 	MCFG_COP400_WRITE_L_CB(WRITE8(t400_test_suite_state, port_l_w))
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( test_t420 )
+MACHINE_CONFIG_START(t400_test_suite_state::test_t420)
 	MCFG_CPU_ADD("maincpu", COP420, 1000000)
 	MCFG_COP400_CONFIG( COP400_CKI_DIVISOR_16, COP400_CKO_OSCILLATOR_OUTPUT, true )
 	MCFG_COP400_WRITE_L_CB(WRITE8(t400_test_suite_state, port_l_w))

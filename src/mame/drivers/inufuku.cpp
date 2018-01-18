@@ -330,7 +330,7 @@ void inufuku_state::machine_reset()
 	m_tx_palettebank = 0;
 }
 
-static MACHINE_CONFIG_START( inufuku )
+MACHINE_CONFIG_START(inufuku_state::inufuku)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 32000000/2) /* 16.00 MHz */
@@ -381,7 +381,7 @@ static MACHINE_CONFIG_START( inufuku )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( _3on3dunk, inufuku )
+MACHINE_CONFIG_DERIVED(inufuku_state::_3on3dunk, inufuku)
 	MCFG_GFXDECODE_MODIFY("gfxdecode", _3on3dunk)
 MACHINE_CONFIG_END
 

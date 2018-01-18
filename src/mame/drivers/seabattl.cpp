@@ -105,6 +105,7 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
+	void seabattl(machine_config &config);
 };
 
 
@@ -473,7 +474,7 @@ static GFXDECODE_START( seabattl )
 	GFXDECODE_ENTRY( "gfx3", 0, tiles8x8_layout, 24, 1 )
 GFXDECODE_END
 
-static MACHINE_CONFIG_START( seabattl )
+MACHINE_CONFIG_START(seabattl_state::seabattl)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", S2650, 14318180/4/2)

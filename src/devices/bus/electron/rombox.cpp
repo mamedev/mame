@@ -47,7 +47,7 @@ ioport_constructor electron_rombox_device::device_input_ports() const
 	return INPUT_PORTS_NAME( rombox );
 }
 
-MACHINE_CONFIG_MEMBER( electron_rombox_device::device_add_mconfig )
+MACHINE_CONFIG_START(electron_rombox_device::device_add_mconfig)
 	/* rom sockets */
 	MCFG_GENERIC_SOCKET_ADD("rom1", generic_plain_slot, "electron_rom")
 	MCFG_GENERIC_EXTENSIONS("bin,rom")

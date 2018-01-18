@@ -185,7 +185,7 @@ void gotya_state::machine_reset()
 	m_theme_playing = 0;
 }
 
-static MACHINE_CONFIG_START( gotya )
+MACHINE_CONFIG_START(gotya_state::gotya)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80,18432000/6) /* 3.072 MHz ??? */

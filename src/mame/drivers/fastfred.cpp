@@ -626,7 +626,7 @@ INTERRUPT_GEN_MEMBER(fastfred_state::sound_timer_irq)
 		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
-static MACHINE_CONFIG_START( fastfred )
+MACHINE_CONFIG_START(fastfred_state::fastfred)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_12_432MHz/4)   /* 3.108 MHz; xtal from pcb pics, divider not verified */
@@ -676,7 +676,7 @@ static MACHINE_CONFIG_START( fastfred )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( jumpcoas, fastfred )
+MACHINE_CONFIG_DERIVED(fastfred_state::jumpcoas, fastfred)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -692,7 +692,7 @@ static MACHINE_CONFIG_DERIVED( jumpcoas, fastfred )
 	MCFG_DEVICE_REMOVE("ay8910.2")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( imago, fastfred )
+MACHINE_CONFIG_DERIVED(fastfred_state::imago, fastfred)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")

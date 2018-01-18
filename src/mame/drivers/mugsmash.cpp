@@ -396,7 +396,7 @@ void mugsmash_state::machine_start()
 {
 }
 
-static MACHINE_CONFIG_START( mugsmash )
+MACHINE_CONFIG_START(mugsmash_state::mugsmash)
 
 	MCFG_CPU_ADD("maincpu", M68000, 12000000)
 	MCFG_CPU_PROGRAM_MAP(mugsmash_map)

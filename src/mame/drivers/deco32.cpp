@@ -1850,7 +1850,7 @@ GFXDECODE_END
 //  MACHINE DEFINITIONS
 //**************************************************************************
 
-static MACHINE_CONFIG_START( captaven )
+MACHINE_CONFIG_START(captaven_state::captaven)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", ARM, XTAL_28MHz/4) /* verified on pcb (Data East 101 custom)*/
@@ -1935,7 +1935,7 @@ static MACHINE_CONFIG_START( captaven )
 MACHINE_CONFIG_END
 
 // DE-0380-2
-static MACHINE_CONFIG_START( fghthist )
+MACHINE_CONFIG_START(fghthist_state::fghthist)
 	MCFG_CPU_ADD("maincpu", ARM, XTAL_28MHz / 4)
 	MCFG_CPU_PROGRAM_MAP(fghthist_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", deco32_state, irq0_line_assert)
@@ -2017,7 +2017,7 @@ static MACHINE_CONFIG_START( fghthist )
 MACHINE_CONFIG_END
 
 // DE-0395-1
-static MACHINE_CONFIG_DERIVED( fghthsta, fghthist )
+MACHINE_CONFIG_DERIVED(fghthist_state::fghthsta, fghthist)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(fghthsta_memmap)
 
@@ -2031,7 +2031,7 @@ static MACHINE_CONFIG_DERIVED( fghthsta, fghthist )
 MACHINE_CONFIG_END
 
 // DE-0396-0
-static MACHINE_CONFIG_DERIVED( fghthistu, fghthsta )
+MACHINE_CONFIG_DERIVED(fghthist_state::fghthistu, fghthsta)
 	MCFG_DEVICE_REMOVE("audiocpu")
 
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL_32_22MHz / 9)
@@ -2051,7 +2051,7 @@ static MACHINE_CONFIG_DERIVED( fghthistu, fghthsta )
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.40)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( dragngun )
+MACHINE_CONFIG_START(dragngun_state::dragngun)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", ARM, XTAL_28MHz / 4)
@@ -2153,7 +2153,7 @@ static MACHINE_CONFIG_START( dragngun )
 	MCFG_LC7535_VOLUME_CB(dragngun_state, volume_gun_changed)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( lockloadu, dragngun )
+MACHINE_CONFIG_DERIVED(dragngun_state::lockloadu, dragngun)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(lockloadu_map)
 
@@ -2164,7 +2164,7 @@ static MACHINE_CONFIG_DERIVED( lockloadu, dragngun )
 	MCFG_DECO16IC_WIDTH12(0)    // lockload definitely wants pf34 half width..
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( lockload )
+MACHINE_CONFIG_START(dragngun_state::lockload)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", ARM, XTAL_28MHz / 4)
@@ -2271,7 +2271,7 @@ static MACHINE_CONFIG_START( lockload )
 	MCFG_LC7535_VOLUME_CB(dragngun_state, volume_gun_changed)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( tattass )
+MACHINE_CONFIG_START(nslasher_state::tattass)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", ARM, 28000000/4) // unconfirmed
@@ -2338,7 +2338,7 @@ static MACHINE_CONFIG_START( tattass )
 	MCFG_DECOBSMT_ADD(DECOBSMT_TAG)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( nslasher )
+MACHINE_CONFIG_START(nslasher_state::nslasher)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", ARM, XTAL_28_322MHz / 4)
@@ -2429,7 +2429,7 @@ static MACHINE_CONFIG_START( nslasher )
 MACHINE_CONFIG_END
 
 // the US release uses a H6280 instead of a Z80, much like Lock 'n' Loaded
-static MACHINE_CONFIG_DERIVED( nslasheru, nslasher )
+MACHINE_CONFIG_DERIVED(nslasher_state::nslasheru, nslasher)
 	MCFG_CPU_REPLACE("audiocpu", H6280, 32220000/8)
 	MCFG_CPU_PROGRAM_MAP(h6280_sound_map)
 

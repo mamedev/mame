@@ -17,7 +17,7 @@
 
 DEFINE_DEVICE_TYPE(X68K_MIDI, x68k_midi_device, "x68k_midi", "X68000 MIDI Interface")
 
-MACHINE_CONFIG_MEMBER( x68k_midi_device::device_add_mconfig )
+MACHINE_CONFIG_START(x68k_midi_device::device_add_mconfig)
 	MCFG_DEVICE_ADD("midi", YM3802, XTAL_1MHz)  // clock is unknown
 	MCFG_YM3802_TXD_HANDLER(DEVWRITELINE("mdout",midi_port_device,write_txd))
 	MCFG_YM3802_IRQ_HANDLER(WRITELINE(x68k_midi_device,irq_w))

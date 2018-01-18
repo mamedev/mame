@@ -1558,7 +1558,7 @@ INTERRUPT_GEN_MEMBER(galaga_state::sub_vblank_irq)
 		device.execute().set_input_line(0, ASSERT_LINE);
 }
 
-static MACHINE_CONFIG_START( bosco )
+MACHINE_CONFIG_START(bosco_state::bosco)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK/6)    /* 3.072 MHz */
@@ -1656,7 +1656,7 @@ static MACHINE_CONFIG_START( bosco )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.90)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( galaga )
+MACHINE_CONFIG_START(galaga_state::galaga)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK/6)    /* 3.072 MHz */
@@ -1732,7 +1732,7 @@ static MACHINE_CONFIG_START( galaga )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.90)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( galagab, galaga )
+MACHINE_CONFIG_DERIVED(galaga_state::galagab, galaga)
 
 	/* basic machine hardware */
 
@@ -1752,7 +1752,7 @@ static MACHINE_CONFIG_DERIVED( galagab, galaga )
 	MCFG_DEVICE_REMOVE("discrete")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( gatsbee, galaga )
+MACHINE_CONFIG_DERIVED(galaga_state::gatsbee, galaga)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(gatsbee_main_map)
 
@@ -1760,7 +1760,7 @@ static MACHINE_CONFIG_DERIVED( gatsbee, galaga )
 	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(galaga_state, gatsbee_bank_w))
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( xevious )
+MACHINE_CONFIG_START(xevious_state::xevious)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK/6)    /* 3.072 MHz */
@@ -1836,7 +1836,7 @@ static MACHINE_CONFIG_START( xevious )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.90)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( battles, xevious )
+MACHINE_CONFIG_DERIVED(xevious_state::battles, xevious)
 
 	/* basic machine hardware */
 
@@ -1867,7 +1867,7 @@ static MACHINE_CONFIG_DERIVED( battles, xevious )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( digdug )
+MACHINE_CONFIG_START(digdug_state::digdug)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK/6)    /* 3.072 MHz */
@@ -1949,7 +1949,7 @@ static MACHINE_CONFIG_START( digdug )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.90 * 10.0 / 16.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( dzigzag, digdug )
+MACHINE_CONFIG_DERIVED(digdug_state::dzigzag, digdug)
 
 	/* basic machine hardware */
 

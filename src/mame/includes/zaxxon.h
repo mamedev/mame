@@ -103,9 +103,15 @@ public:
 	inline int find_minimum_y(uint8_t value, int flip);
 	inline int find_minimum_x(uint8_t value, int flip);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, uint16_t flipxmask, uint16_t flipymask);
+	void root(machine_config &config);
+	void ixion(machine_config &config);
+	void futspye(machine_config &config);
+	void congo(machine_config &config);
+	void szaxxon(machine_config &config);
+	void razmataze(machine_config &config);
+	void szaxxone(machine_config &config);
+	void zaxxon(machine_config &config);
+	void zaxxon_samples(machine_config &config);
+	void congo_samples(machine_config &config);
 };
 
-
-/*----------- defined in audio/zaxxon.c -----------*/
-MACHINE_CONFIG_EXTERN( zaxxon_samples );
-MACHINE_CONFIG_EXTERN( congo_samples );

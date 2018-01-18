@@ -625,12 +625,13 @@ void kickgoal_state::machine_reset()
 	m_m6295_key_delay = 0;
 }
 
+
 static ADDRESS_MAP_START( oki_map, 0, 8, kickgoal_state )
 	AM_RANGE(0x00000, 0x1ffff) AM_ROM
 	AM_RANGE(0x20000, 0x3ffff) AM_ROMBANK("okibank")
 ADDRESS_MAP_END
 
-static MACHINE_CONFIG_START( kickgoal )
+MACHINE_CONFIG_START(kickgoal_state::kickgoal)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 12000000)   /* 12 MHz */
@@ -670,7 +671,7 @@ static MACHINE_CONFIG_START( kickgoal )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( actionhw )
+MACHINE_CONFIG_START(kickgoal_state::actionhw)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_12MHz) /* verified on pcb */

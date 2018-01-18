@@ -199,6 +199,7 @@ public:
 	float lightlevel(const uint8_t *src, const uint8_t *render);
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	virtual void machine_start() override;
+	void mu100(machine_config &config);
 };
 
 class mu100r_state : public mu100_state {
@@ -431,7 +432,7 @@ static ADDRESS_MAP_START( mu100_iomap, AS_IO, 16, mu100_state )
 	AM_RANGE(h8_device::ADC_7,   h8_device::ADC_7)   AM_READ(adc7_r)
 ADDRESS_MAP_END
 
-static MACHINE_CONFIG_START( mu100 )
+MACHINE_CONFIG_START(mu100_state::mu100)
 	MCFG_CPU_ADD( "maincpu", H8S2655, XTAL_16MHz )
 	MCFG_CPU_PROGRAM_MAP( mu100_map )
 	MCFG_CPU_IO_MAP( mu100_iomap )

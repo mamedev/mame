@@ -1358,7 +1358,7 @@ INTERRUPT_GEN_MEMBER(superqix_state::sqix_timer_irq)
 
 
 
-static MACHINE_CONFIG_START( pbillian )
+MACHINE_CONFIG_START(hotsmash_state::pbillian)
 	MCFG_CPU_ADD("maincpu", Z80,XTAL_12MHz/2)      /* 6 MHz, ROHM Z80B */
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_IO_MAP(pbillian_port_map)
@@ -1400,7 +1400,7 @@ static MACHINE_CONFIG_START( pbillian )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( sqix )
+MACHINE_CONFIG_START(superqix_state::sqix)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_12MHz/2) /* Z80B, 12 MHz / 2 (6 MHz), verified from pcb tracing */
@@ -1446,13 +1446,13 @@ static MACHINE_CONFIG_START( sqix )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( sqix_8031, sqix )
+MACHINE_CONFIG_DERIVED(superqix_state::sqix_8031, sqix)
 	MCFG_CPU_MODIFY("mcu") /* p8031ah, clock not verified */
 	MCFG_CPU_IO_MAP(sqix_8031_mcu_io_map)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( sqix_nomcu )
+MACHINE_CONFIG_START(superqix_state::sqix_nomcu)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 12000000/2)    /* 6 MHz */

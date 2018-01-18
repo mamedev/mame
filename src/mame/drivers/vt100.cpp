@@ -74,6 +74,9 @@ public:
 	uint32_t screen_update_vt100(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(vt100_vertical_interrupt);
 	IRQ_CALLBACK_MEMBER(vt100_irq_callback);
+	void vt102(machine_config &config);
+	void vt100(machine_config &config);
+	void vt180(machine_config &config);
 };
 
 
@@ -259,7 +262,7 @@ static GFXDECODE_START( vt100 )
 	GFXDECODE_ENTRY( "chargen", 0x0000, vt100_charlayout, 0, 1 )
 GFXDECODE_END
 
-static MACHINE_CONFIG_START( vt100 )
+MACHINE_CONFIG_START(vt100_state::vt100)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",I8080, XTAL_24_8832MHz / 9)
 	MCFG_CPU_PROGRAM_MAP(vt100_mem)
@@ -305,13 +308,13 @@ static MACHINE_CONFIG_START( vt100 )
 	MCFG_VT100_KEYBOARD_INT_CALLBACK(WRITELINE(vt100_state, keyboard_int_w))
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( vt180, vt100 )
+MACHINE_CONFIG_DERIVED(vt100_state::vt180, vt100)
 	MCFG_CPU_ADD("z80cpu", Z80, XTAL_24_8832MHz / 9)
 	MCFG_CPU_PROGRAM_MAP(vt180_mem)
 	MCFG_CPU_IO_MAP(vt180_io)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( vt102, vt100 )
+MACHINE_CONFIG_DERIVED(vt100_state::vt102, vt100)
 	MCFG_CPU_REPLACE("maincpu",I8085A, XTAL_24_8832MHz / 9)
 	MCFG_CPU_PROGRAM_MAP(vt100_mem)
 	MCFG_CPU_IO_MAP(vt100_io)

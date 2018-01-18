@@ -372,7 +372,7 @@ GFXDECODE_END
 
 
 
-static MACHINE_CONFIG_START( mainsnk )
+MACHINE_CONFIG_START(mainsnk_state::mainsnk)
 
 	MCFG_CPU_ADD("maincpu", Z80, 3360000)
 	MCFG_CPU_PROGRAM_MAP(main_map)

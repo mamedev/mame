@@ -171,7 +171,7 @@ WRITE8_MEMBER( vicdual_state::pulsar_audio_2_w )
 }
 
 
-MACHINE_CONFIG_START( pulsar_audio )
+MACHINE_CONFIG_START(vicdual_state::pulsar_audio)
 
 	/* samples */
 	MCFG_SOUND_ADD("samples", SAMPLES, 0)

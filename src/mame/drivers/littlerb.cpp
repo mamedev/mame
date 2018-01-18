@@ -105,6 +105,7 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(littlerb_sound_cb);
 
 	DECLARE_DRIVER_INIT(littlerb);
+	void littlerb(machine_config &config);
 };
 
 
@@ -250,7 +251,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(littlerb_state::littlerb_sound_step_cb)
 	m_soundframe++;
 }
 
-static MACHINE_CONFIG_START( littlerb )
+MACHINE_CONFIG_START(littlerb_state::littlerb)
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz/2) // 10MHz rated part, near 16Mhz XTAL
 	MCFG_CPU_PROGRAM_MAP(littlerb_main)
 

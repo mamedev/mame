@@ -238,6 +238,13 @@ public:
 
 	int m_user_pa2;
 	int m_user_pb;
+	void pal(machine_config &config);
+	void ntsc(machine_config &config);
+	void c128pal(machine_config &config);
+	void c128(machine_config &config);
+	void c128dcr(machine_config &config);
+	void c128dcrp(machine_config &config);
+	void c128d81(machine_config &config);
 };
 
 
@@ -1672,7 +1679,7 @@ void c128_state::machine_reset()
 //  MACHINE_CONFIG( ntsc )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( ntsc )
+MACHINE_CONFIG_START(c128_state::ntsc)
 	// basic hardware
 	MCFG_CPU_ADD(Z80A_TAG, Z80, XTAL_14_31818MHz*2/3.5/2)
 	MCFG_CPU_PROGRAM_MAP(z80_mem)
@@ -1807,7 +1814,7 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( c128 )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_DERIVED( c128, ntsc )
+MACHINE_CONFIG_DERIVED(c128_state::c128, ntsc)
 	MCFG_CBM_IEC_ADD("c1571")
 	MCFG_CBM_IEC_BUS_SRQ_CALLBACK(WRITELINE(c128_state, iec_srq_w))
 	MCFG_CBM_IEC_BUS_DATA_CALLBACK(WRITELINE(c128_state, iec_data_w))
@@ -1818,7 +1825,7 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( c128dcr )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_DERIVED( c128dcr, ntsc )
+MACHINE_CONFIG_DERIVED(c128_state::c128dcr, ntsc)
 	MCFG_CBM_IEC_ADD("c1571") // TODO c1571cr
 	MCFG_CBM_IEC_BUS_SRQ_CALLBACK(WRITELINE(c128_state, iec_srq_w))
 	MCFG_CBM_IEC_BUS_DATA_CALLBACK(WRITELINE(c128_state, iec_data_w))
@@ -1829,7 +1836,7 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( c128d81 )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_DERIVED( c128d81, ntsc )
+MACHINE_CONFIG_DERIVED(c128_state::c128d81, ntsc)
 	MCFG_CBM_IEC_ADD(nullptr)
 	MCFG_CBM_IEC_BUS_SRQ_CALLBACK(WRITELINE(c128_state, iec_srq_w))
 	MCFG_CBM_IEC_BUS_DATA_CALLBACK(WRITELINE(c128_state, iec_data_w))
@@ -1843,7 +1850,7 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( pal )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( pal )
+MACHINE_CONFIG_START(c128_state::pal)
 	// basic hardware
 	MCFG_CPU_ADD(Z80A_TAG, Z80, XTAL_17_734472MHz*2/4.5/2)
 	MCFG_CPU_PROGRAM_MAP(z80_mem)
@@ -1978,7 +1985,7 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( c128pal )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_DERIVED( c128pal, pal )
+MACHINE_CONFIG_DERIVED(c128_state::c128pal, pal)
 	MCFG_CBM_IEC_ADD("c1571")
 	MCFG_CBM_IEC_BUS_SRQ_CALLBACK(WRITELINE(c128_state, iec_srq_w))
 	MCFG_CBM_IEC_BUS_DATA_CALLBACK(WRITELINE(c128_state, iec_data_w))
@@ -1989,7 +1996,7 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( c128dcrp )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_DERIVED( c128dcrp, pal )
+MACHINE_CONFIG_DERIVED(c128_state::c128dcrp, pal)
 	MCFG_CBM_IEC_ADD("c1571") // TODO c1571cr
 	MCFG_CBM_IEC_BUS_SRQ_CALLBACK(WRITELINE(c128_state, iec_srq_w))
 	MCFG_CBM_IEC_BUS_DATA_CALLBACK(WRITELINE(c128_state, iec_data_w))

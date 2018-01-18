@@ -132,6 +132,7 @@ public:
 	DECLARE_DRIVER_INIT(kt);
 	DECLARE_WRITE_LINE_MEMBER(esq5506_otto_irq);
 	DECLARE_READ16_MEMBER(esq5506_read_adc);
+	void kt(machine_config &config);
 };
 
 void esqkt_state::machine_reset()
@@ -201,7 +202,7 @@ WRITE_LINE_MEMBER(esqkt_state::duart_tx_b)
 	m_sq1panel->rx_w(state);
 }
 
-static MACHINE_CONFIG_START( kt )
+MACHINE_CONFIG_START(esqkt_state::kt)
 	MCFG_CPU_ADD("maincpu", M68EC020, XTAL_16MHz)
 	MCFG_CPU_PROGRAM_MAP(kt_map)
 

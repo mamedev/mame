@@ -1181,7 +1181,7 @@ void pc1640_state::machine_reset()
 //  MACHINE_CONFIG( pc1512 )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( pc1512 )
+MACHINE_CONFIG_START(pc1512_state::pc1512)
 	MCFG_CPU_ADD(I8086_TAG, I8086, XTAL_24MHz/3)
 	MCFG_CPU_PROGRAM_MAP(pc1512_mem)
 	MCFG_CPU_IO_MAP(pc1512_io)
@@ -1295,7 +1295,7 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( pc1512dd )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_DERIVED( pc1512dd, pc1512 )
+MACHINE_CONFIG_DERIVED(pc1512_state::pc1512dd, pc1512)
 	MCFG_DEVICE_MODIFY(PC_FDC_XT_TAG ":1")
 	MCFG_SLOT_DEFAULT_OPTION("525dd")
 MACHINE_CONFIG_END
@@ -1305,7 +1305,7 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( pc1512hd )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_DERIVED( pc1512hd, pc1512 )
+MACHINE_CONFIG_DERIVED(pc1512_state::pc1512hd, pc1512)
 	MCFG_DEVICE_MODIFY("isa1")
 	//MCFG_SLOT_DEFAULT_OPTION("wdxt_gen")
 	MCFG_SLOT_DEFAULT_OPTION("hdc")
@@ -1316,7 +1316,7 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( pc1640 )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( pc1640 )
+MACHINE_CONFIG_START(pc1640_state::pc1640)
 	MCFG_CPU_ADD(I8086_TAG, I8086, XTAL_24MHz/3)
 	MCFG_CPU_PROGRAM_MAP(pc1640_mem)
 	MCFG_CPU_IO_MAP(pc1640_io)
@@ -1428,7 +1428,7 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( pc1640dd )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_DERIVED( pc1640dd, pc1640 )
+MACHINE_CONFIG_DERIVED(pc1640_state::pc1640dd, pc1640)
 	MCFG_DEVICE_MODIFY(PC_FDC_XT_TAG ":1")
 	MCFG_SLOT_DEFAULT_OPTION("525dd")
 MACHINE_CONFIG_END
@@ -1438,7 +1438,7 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( pc1640hd )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_DERIVED( pc1640hd, pc1640 )
+MACHINE_CONFIG_DERIVED(pc1640_state::pc1640hd, pc1640)
 	MCFG_DEVICE_MODIFY("isa1")
 	//MCFG_SLOT_DEFAULT_OPTION("wdxt_gen")
 	MCFG_SLOT_DEFAULT_OPTION("hdc")

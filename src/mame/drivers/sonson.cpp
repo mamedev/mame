@@ -223,7 +223,7 @@ GFXDECODE_END
 
 
 
-static MACHINE_CONFIG_START( sonson )
+MACHINE_CONFIG_START(sonson_state::sonson)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", MC6809, XTAL_12MHz/2) // HD68B09P (/4 internally)

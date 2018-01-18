@@ -126,7 +126,7 @@ static INPUT_PORTS_START( ac1 )
 INPUT_PORTS_END
 
 /* Machine driver */
-static MACHINE_CONFIG_START( ac1 )
+MACHINE_CONFIG_START(ac1_state::ac1)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_8MHz / 4)
 	MCFG_CPU_PROGRAM_MAP(ac1_mem)
@@ -158,7 +158,7 @@ static MACHINE_CONFIG_START( ac1 )
 	MCFG_CASSETTE_ADD( "cassette" )
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( ac1_32, ac1 )
+MACHINE_CONFIG_DERIVED(ac1_state::ac1_32, ac1)
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(ac1_32_mem)

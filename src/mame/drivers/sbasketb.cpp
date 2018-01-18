@@ -192,7 +192,7 @@ INTERRUPT_GEN_MEMBER(sbasketb_state::vblank_irq)
 		device.execute().set_input_line(0, HOLD_LINE);
 }
 
-static MACHINE_CONFIG_START( sbasketb )
+MACHINE_CONFIG_START(sbasketb_state::sbasketb)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", KONAMI1, 1400000)        /* 1.400 MHz ??? */
@@ -245,7 +245,7 @@ static MACHINE_CONFIG_START( sbasketb )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(sbasketbu, sbasketb)
+MACHINE_CONFIG_DERIVED(sbasketb_state::sbasketbu, sbasketb)
 	MCFG_DEVICE_REMOVE("maincpu")
 	MCFG_CPU_ADD("maincpu", MC6809E, 1400000)        /* 6809E at 1.400 MHz ??? */
 	MCFG_CPU_PROGRAM_MAP(sbasketb_map)

@@ -43,7 +43,7 @@ void o2_voice_device::device_start()
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( o2_voice_device::device_add_mconfig )
+MACHINE_CONFIG_START(o2_voice_device::device_add_mconfig)
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("sp0256_speech", SP0256, 3120000)

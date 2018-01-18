@@ -82,6 +82,7 @@ public:
 	uint8_t m_status_flag;
 	DECLARE_PALETTE_INIT(micronic);
 
+	void micronic(machine_config &config);
 protected:
 	required_memory_bank m_bank1;
 	required_ioport m_bit0;

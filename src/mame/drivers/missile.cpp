@@ -423,6 +423,9 @@ public:
 
 	TIMER_CALLBACK_MEMBER(clock_irq);
 	TIMER_CALLBACK_MEMBER(adjust_cpu_speed);
+	void missileb(machine_config &config);
+	void missile(machine_config &config);
+	void missilea(machine_config &config);
 };
 
 
@@ -1134,7 +1137,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( missile )
+MACHINE_CONFIG_START(missile_state::missile)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, MASTER_CLOCK/8)
@@ -1161,12 +1164,12 @@ static MACHINE_CONFIG_START( missile )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( missilea, missile )
+MACHINE_CONFIG_DERIVED(missile_state::missilea, missile)
 
 	MCFG_DEVICE_REMOVE("pokey")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( missileb, missilea )
+MACHINE_CONFIG_DERIVED(missile_state::missileb, missilea)
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(bootleg_main_map)

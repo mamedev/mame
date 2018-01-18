@@ -194,7 +194,7 @@ void contra_state::machine_start()
 	membank("bank1")->configure_entries(0, 16, &ROM[0x10000], 0x2000);
 }
 
-static MACHINE_CONFIG_START( contra )
+MACHINE_CONFIG_START(contra_state::contra)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", HD6309E, XTAL_24MHz / 8) /* 3000000? (HD63C09EP) */

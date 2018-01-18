@@ -511,7 +511,7 @@ void angelkds_state::machine_reset()
 	m_bgtopbank = 0;
 }
 
-static MACHINE_CONFIG_START( angelkds )
+MACHINE_CONFIG_START(angelkds_state::angelkds)
 
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_6MHz)
 	MCFG_CPU_PROGRAM_MAP(main_map)
@@ -565,7 +565,7 @@ static MACHINE_CONFIG_START( angelkds )
 	MCFG_SOUND_ROUTE(3, "mono", 0.45)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( spcpostn, angelkds )
+MACHINE_CONFIG_DERIVED(angelkds_state::spcpostn, angelkds)
 	/* encryption */
 	MCFG_CPU_REPLACE("maincpu", SEGA_317_0005, XTAL_6MHz)
 	MCFG_CPU_PROGRAM_MAP(main_map)

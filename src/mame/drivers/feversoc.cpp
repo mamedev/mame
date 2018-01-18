@@ -114,6 +114,7 @@ public:
 	required_device<ticket_dispenser_device> m_hopper;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	void feversoc(machine_config &config);
 };
 
 
@@ -273,7 +274,7 @@ WRITE16_MEMBER(feversoc_state::feversoc_irq_ack)
 	m_maincpu->set_input_line(8, CLEAR_LINE);
 }
 
-static MACHINE_CONFIG_START( feversoc )
+MACHINE_CONFIG_START(feversoc_state::feversoc)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",SH2,MASTER_CLOCK)

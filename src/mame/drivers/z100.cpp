@@ -219,6 +219,7 @@ public:
 	virtual void video_start() override;
 	uint32_t screen_update_z100(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_INPUT_CHANGED_MEMBER(key_stroke);
+	void z100(machine_config &config);
 };
 
 #define mc6845_h_char_total     (m_crtc_vreg[0])
@@ -665,7 +666,7 @@ static SLOT_INTERFACE_START( z100_floppies )
 	SLOT_INTERFACE("dd", FLOPPY_525_DD)
 SLOT_INTERFACE_END
 
-static MACHINE_CONFIG_START( z100 )
+MACHINE_CONFIG_START(z100_state::z100)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",I8088, XTAL_14_31818MHz/3)
 	MCFG_CPU_PROGRAM_MAP(z100_mem)

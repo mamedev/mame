@@ -101,6 +101,9 @@ public:
 	DECLARE_MACHINE_START(superqix);
 	DECLARE_MACHINE_RESET(superqix);
 
+	void sqix(machine_config &config);
+	void sqix_8031(machine_config &config);
+	void sqix_nomcu(machine_config &config);
 protected:
 	virtual void machine_init_common() override;
 
@@ -153,6 +156,7 @@ public:
 
 	u32 screen_update_pbillian(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
+	void pbillian(machine_config &config);
 protected:
 	virtual void machine_init_common() override;
 

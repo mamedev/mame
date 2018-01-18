@@ -224,7 +224,7 @@ GFXDECODE_END
 
 /* MACHINE driver *************************************************************/
 
-static MACHINE_CONFIG_START( xyonix )
+MACHINE_CONFIG_START(xyonix_state::xyonix)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80,16000000 / 4)        /* 4 MHz ? */

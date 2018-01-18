@@ -48,6 +48,7 @@ public:
 	void pes_kbd_input(u8 data);
 	DECLARE_READ8_MEMBER(data_to_i8031);
 	DECLARE_WRITE8_MEMBER(data_from_i8031);
+	void pes(machine_config &config);
 };
 
 

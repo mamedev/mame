@@ -281,7 +281,7 @@ INTERRUPT_GEN_MEMBER(pbaction_state::vblank_irq)
 		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
-static MACHINE_CONFIG_START( pbaction )
+MACHINE_CONFIG_START(pbaction_state::pbaction)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 4000000)   /* 4 MHz? */
@@ -323,7 +323,7 @@ static MACHINE_CONFIG_START( pbaction )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( pbactionx, pbaction )
+MACHINE_CONFIG_DERIVED(pbaction_state::pbactionx, pbaction)
 	MCFG_CPU_REPLACE("maincpu", SEGA_CPU_PBACTIO4, 4000000)   /* 4 MHz? */
 	MCFG_CPU_PROGRAM_MAP(pbaction_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", pbaction_state,  vblank_irq)

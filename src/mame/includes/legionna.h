@@ -97,4 +97,11 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	optional_device<raiden2cop_device> m_raiden2cop;
+	void cupsocs(machine_config &config);
+	void heatbrl(machine_config &config);
+	void cupsoc(machine_config &config);
+	void grainbow(machine_config &config);
+	void legionna(machine_config &config);
+	void godzilla(machine_config &config);
+	void denjinmk(machine_config &config);
 };

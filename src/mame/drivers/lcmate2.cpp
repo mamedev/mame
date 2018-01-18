@@ -62,6 +62,7 @@ public:
 	DECLARE_WRITE8_MEMBER( speaker_w );
 	DECLARE_WRITE8_MEMBER( bankswitch_w );
 	DECLARE_PALETTE_INIT(lcmate2);
+	void lcmate2(machine_config &config);
 };
 
 WRITE8_MEMBER( lcmate2_state::speaker_w )
@@ -223,7 +224,7 @@ static GFXDECODE_START( lcmate2 )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( lcmate2 )
+MACHINE_CONFIG_START(lcmate2_state::lcmate2)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_3_579545MHz) // confirmed
 	MCFG_CPU_PROGRAM_MAP(lcmate2_mem)

@@ -606,7 +606,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( tx1 )
+MACHINE_CONFIG_START(tx1_state::tx1)
 	MCFG_CPU_ADD("main_cpu", I8086, CPU_MASTER_CLOCK / 3)
 	MCFG_CPU_PROGRAM_MAP(tx1_main)
 
@@ -669,7 +669,7 @@ static MACHINE_CONFIG_START( tx1 )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( buggyboy )
+MACHINE_CONFIG_START(tx1_state::buggyboy)
 	MCFG_CPU_ADD("main_cpu", I8086, CPU_MASTER_CLOCK / 3)
 	MCFG_CPU_PROGRAM_MAP(buggyboy_main)
 
@@ -733,7 +733,7 @@ static MACHINE_CONFIG_START( buggyboy )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( buggybjr )
+MACHINE_CONFIG_START(tx1_state::buggybjr)
 	MCFG_CPU_ADD("main_cpu", I8086, CPU_MASTER_CLOCK / 3)
 	MCFG_CPU_PROGRAM_MAP(buggybjr_main)
 

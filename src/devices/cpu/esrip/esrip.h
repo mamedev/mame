@@ -29,7 +29,7 @@
 	devcb = &esrip_device::static_set_status_in_callback(*device, DEVCB_##_read);
 
 #define MCFG_ESRIP_DRAW_CALLBACK_OWNER(_class, _method) \
-	esrip_device::static_set_draw_callback(*device, esrip_device::draw_delegate(&_class::_method, #_class "::" #_method, downcast<_class *>(owner)));
+	esrip_device::static_set_draw_callback(*device, esrip_device::draw_delegate(&_class::_method, #_class "::" #_method, this));
 
 #define MCFG_ESRIP_LBRM_PROM(_tag) \
 	esrip_device::static_lbrm_prom(*device, _tag);

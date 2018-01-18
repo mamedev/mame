@@ -999,7 +999,7 @@ void psikyo_state::machine_reset()
 ***************************************************************************/
 
 
-static MACHINE_CONFIG_START( sngkace )
+MACHINE_CONFIG_START(psikyo_state::sngkace)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68EC020, XTAL_32MHz/2) /* verified on pcb */
@@ -1046,7 +1046,7 @@ MACHINE_CONFIG_END
 ***************************************************************************/
 
 
-static MACHINE_CONFIG_START( gunbird )
+MACHINE_CONFIG_START(psikyo_state::gunbird)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68EC020, 16000000)
@@ -1086,12 +1086,12 @@ static MACHINE_CONFIG_START( gunbird )
 	MCFG_GENERIC_LATCH_SEPARATE_ACKNOWLEDGE(true)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( s1945jn, gunbird )
+MACHINE_CONFIG_DERIVED(psikyo_state::s1945jn, gunbird)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(s1945jn_map)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( s1945bl ) /* Bootleg hardware based on the unprotected Japanese Strikers 1945 set */
+MACHINE_CONFIG_START(psikyo_state::s1945bl) /* Bootleg hardware based on the unprotected Japanese Strikers 1945 set */
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68EC020, 16000000)
@@ -1130,7 +1130,7 @@ MACHINE_CONFIG_END
 ***************************************************************************/
 
 
-static MACHINE_CONFIG_START( s1945 )
+MACHINE_CONFIG_START(psikyo_state::s1945)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68EC020, 16000000)

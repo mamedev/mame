@@ -273,7 +273,7 @@ WRITE16_MEMBER( dcon_state::layer_scroll_w )
 
 /******************************************************************************/
 
-static MACHINE_CONFIG_START( dcon )
+MACHINE_CONFIG_START(dcon_state::dcon)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 10000000)
@@ -317,7 +317,7 @@ static MACHINE_CONFIG_START( dcon )
 	MCFG_SEIBU_SOUND_YM_WRITE_CB(DEVWRITE8("ymsnd", ym3812_device, write))
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( sdgndmps ) /* PCB number is PB91008 */
+MACHINE_CONFIG_START(dcon_state::sdgndmps) /* PCB number is PB91008 */
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_20MHz/2)

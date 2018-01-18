@@ -192,7 +192,7 @@ uint32_t abc80_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap,
 //  MACHINE_CONFIG_START( abc80_video )
 //-------------------------------------------------
 
-MACHINE_CONFIG_START( abc80_video )
+MACHINE_CONFIG_START(abc80_state::abc80_video)
 	MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
 	MCFG_SCREEN_UPDATE_DRIVER(abc80_state, screen_update)
 

@@ -91,6 +91,8 @@ public:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(mcu_irq);
 
+	void rbmk(machine_config &config);
+	void rbspm(machine_config &config);
 protected:
 	virtual void video_start() override;
 
@@ -556,7 +558,7 @@ INTERRUPT_GEN_MEMBER(rbmk_state::mcu_irq)
 	m_mcu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
-static MACHINE_CONFIG_START( rbmk )
+MACHINE_CONFIG_START(rbmk_state::rbmk)
 	MCFG_CPU_ADD("maincpu", M68000, 22000000 /2)
 	MCFG_CPU_PROGRAM_MAP(rbmk_mem)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", rbmk_state,  irq1_line_hold)
@@ -593,7 +595,7 @@ static MACHINE_CONFIG_START( rbmk )
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.60)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( rbspm, rbmk )
+MACHINE_CONFIG_DERIVED(rbmk_state::rbspm, rbmk)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(rbspm_mem)
 

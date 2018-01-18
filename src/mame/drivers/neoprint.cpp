@@ -69,6 +69,8 @@ public:
 	uint32_t screen_update_neoprint(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_nprsp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
+	void neoprint(machine_config &config);
+	void nprsp(machine_config &config);
 protected:
 	virtual void machine_start() override;
 	virtual void video_start() override;
@@ -484,7 +486,7 @@ void neoprint_state::machine_start()
 	m_upd4990a->c2_w(1);
 }
 
-static MACHINE_CONFIG_START( neoprint )
+MACHINE_CONFIG_START(neoprint_state::neoprint)
 	MCFG_CPU_ADD("maincpu", M68000, 12000000)
 	MCFG_CPU_PROGRAM_MAP(neoprint_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(neoprint_state, irq3_line_hold, 45) /* camera / printer irq, unknown timing */
@@ -527,7 +529,7 @@ MACHINE_RESET_MEMBER(neoprint_state,nprsp)
 	m_bank_val = 0;
 }
 
-static MACHINE_CONFIG_START( nprsp )
+MACHINE_CONFIG_START(neoprint_state::nprsp)
 	MCFG_CPU_ADD("maincpu", M68000, 12000000)
 	MCFG_CPU_PROGRAM_MAP(nprsp_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(neoprint_state, irq3_line_hold, 45) /* camera / printer irq, unknown timing */

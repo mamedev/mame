@@ -76,10 +76,6 @@ SLOT_INTERFACE_EXTERN( coco_cart );
 #define DIECOM_LIGHTGUN_LY_TAG      "dclg_ly"
 #define DIECOM_LIGHTGUN_BUTTONS_TAG "dclg_triggers"
 
-MACHINE_CONFIG_EXTERN( coco_sound );
-MACHINE_CONFIG_EXTERN( coco_floating );
-
-
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -134,6 +130,9 @@ public:
 	// disassembly override
 	static offs_t os9_dasm_override(std::ostream &stream, offs_t pc, const util::disasm_interface::data_buffer &opcodes, const util::disasm_interface::data_buffer &params);
 	offs_t dasm_override(std::ostream &stream, offs_t pc, const util::disasm_interface::data_buffer &opcodes, const util::disasm_interface::data_buffer &params);
+
+	void coco_sound(machine_config &config);
+	void coco_floating(machine_config &config);
 
 protected:
 	// device-level overrides

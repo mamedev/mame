@@ -107,6 +107,7 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	required_device<generic_latch_8_device> m_soundlatch;
+	void wyvernf0(machine_config &config);
 };
 
 
@@ -636,7 +637,7 @@ MACHINE_RESET_MEMBER(wyvernf0_state,wyvernf0)
 	m_mcu_ready = 0;
 }
 
-static MACHINE_CONFIG_START( wyvernf0 )
+MACHINE_CONFIG_START(wyvernf0_state::wyvernf0)
 
 	// basic machine hardware
 	MCFG_CPU_ADD("maincpu", Z80, 6000000) // ?

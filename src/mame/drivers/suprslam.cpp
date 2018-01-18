@@ -265,7 +265,7 @@ void suprslam_state::machine_reset()
 	m_bg_bank = 0;
 }
 
-static MACHINE_CONFIG_START( suprslam )
+MACHINE_CONFIG_START(suprslam_state::suprslam)
 
 	MCFG_CPU_ADD("maincpu", M68000, 16000000)
 	MCFG_CPU_PROGRAM_MAP(suprslam_map)

@@ -149,7 +149,7 @@ namespace
     IMPLEMENTATION
 ***************************************************************************/
 
-MACHINE_CONFIG_MEMBER(coco_t4426_device::device_add_mconfig)
+MACHINE_CONFIG_START(coco_t4426_device::device_add_mconfig)
 	MCFG_DEVICE_ADD(PIA_TAG, PIA6821, 0)
 	MCFG_PIA_WRITEPA_HANDLER(WRITE8(coco_t4426_device, pia_A_w))
 

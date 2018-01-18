@@ -63,6 +63,7 @@ public:
 		bitmap.fill(rgb_t::black(), cliprect);
 		return 0;
 	}
+	void learnwin(machine_config &config);
 protected:
 	// driver_device overrides
 	virtual void machine_start() override;
@@ -137,7 +138,7 @@ void learnwin_state::machine_reset()
 }
 
 
-static MACHINE_CONFIG_START( learnwin )
+MACHINE_CONFIG_START(learnwin_state::learnwin)
 
 	/* video hardware */
 //  MCFG_SCREEN_ADD("screen", LCD)

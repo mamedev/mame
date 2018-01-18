@@ -140,7 +140,7 @@ WRITE8_MEMBER( vicdual_state::tranqgun_audio_w )
 }
 
 
-MACHINE_CONFIG_START( tranqgun_audio )
+MACHINE_CONFIG_START(vicdual_state::tranqgun_audio)
 
 	/* samples */
 	MCFG_SOUND_ADD("samples", SAMPLES, 0)

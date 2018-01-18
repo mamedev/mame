@@ -221,6 +221,16 @@ public:
 
 	// timers
 	emu_timer *m_todclk_timer;
+	void _128k(machine_config &config);
+	void _256k(machine_config &config);
+	void cbm2lp_ntsc(machine_config &config);
+	void cbm2lp_pal(machine_config &config);
+	void cbm2hp_ntsc(machine_config &config);
+	void cbm2hp_pal(machine_config &config);
+	void cbm620(machine_config &config);
+	void b128(machine_config &config);
+	void b256(machine_config &config);
+	void cbm610(machine_config &config);
 };
 
 
@@ -235,6 +245,12 @@ public:
 		int *casseg1, int *casseg2, int *casseg3, int *casseg4, int *rasseg1, int *rasseg2, int *rasseg3, int *rasseg4) override;
 
 	DECLARE_READ8_MEMBER( tpi2_pc_r );
+	void b256hp(machine_config &config);
+	void b128hp(machine_config &config);
+	void cbm710(machine_config &config);
+	void cbm730(machine_config &config);
+	void cbm720(machine_config &config);
+	void bx256hp(machine_config &config);
 };
 
 
@@ -300,6 +316,8 @@ public:
 
 	// interrupt state
 	int m_vic_irq;
+	void p500_pal(machine_config &config);
+	void p500_ntsc(machine_config &config);
 };
 
 
@@ -2258,7 +2276,7 @@ MACHINE_RESET_MEMBER( p500_state, p500 )
 //  MACHINE_CONFIG( 128k )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( 128k )
+MACHINE_CONFIG_START(cbm2_state::_128k)
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("128K")
 	MCFG_RAM_EXTRA_OPTIONS("256K")
@@ -2269,7 +2287,7 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( 256k )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( 256k )
+MACHINE_CONFIG_START(cbm2_state::_256k)
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("256K")
 MACHINE_CONFIG_END
@@ -2279,7 +2297,7 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( p500_ntsc )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( p500_ntsc )
+MACHINE_CONFIG_START(p500_state::p500_ntsc)
 	MCFG_MACHINE_START_OVERRIDE(p500_state, p500_ntsc)
 	MCFG_MACHINE_RESET_OVERRIDE(p500_state, p500)
 
@@ -2381,7 +2399,7 @@ static MACHINE_CONFIG_START( p500_ntsc )
 	MCFG_QUICKLOAD_ADD("quickload", p500_state, p500, "p00,prg", CBM_QUICKLOAD_DELAY_SECONDS)
 
 	// internal ram
-	MCFG_FRAGMENT_ADD(128k)
+	MCFG_FRAGMENT_ADD(_128k)
 
 	// software list
 	MCFG_SOFTWARE_LIST_ADD("cart_list", "cbm2_cart")
@@ -2395,7 +2413,7 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( p500_pal )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( p500_pal )
+MACHINE_CONFIG_START(p500_state::p500_pal)
 	MCFG_MACHINE_START_OVERRIDE(p500_state, p500_pal)
 	MCFG_MACHINE_RESET_OVERRIDE(p500_state, p500)
 
@@ -2494,7 +2512,7 @@ static MACHINE_CONFIG_START( p500_pal )
 	MCFG_QUICKLOAD_ADD("quickload", p500_state, p500, "p00,prg", CBM_QUICKLOAD_DELAY_SECONDS)
 
 	// internal ram
-	MCFG_FRAGMENT_ADD(128k)
+	MCFG_FRAGMENT_ADD(_128k)
 
 	// software list
 	MCFG_SOFTWARE_LIST_ADD("cart_list", "cbm2_cart")
@@ -2508,7 +2526,7 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( cbm2lp_ntsc )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( cbm2lp_ntsc )
+MACHINE_CONFIG_START(cbm2_state::cbm2lp_ntsc)
 	MCFG_MACHINE_START_OVERRIDE(cbm2_state, cbm2_ntsc)
 	MCFG_MACHINE_RESET_OVERRIDE(cbm2_state, cbm2)
 
@@ -2617,8 +2635,8 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( b128 )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_DERIVED( b128, cbm2lp_ntsc )
-	MCFG_FRAGMENT_ADD(128k)
+MACHINE_CONFIG_DERIVED(cbm2_state::b128, cbm2lp_ntsc)
+	MCFG_FRAGMENT_ADD(_128k)
 MACHINE_CONFIG_END
 
 
@@ -2626,8 +2644,8 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( b256 )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_DERIVED( b256, cbm2lp_ntsc )
-	MCFG_FRAGMENT_ADD(256k)
+MACHINE_CONFIG_DERIVED(cbm2_state::b256, cbm2lp_ntsc)
+	MCFG_FRAGMENT_ADD(_256k)
 MACHINE_CONFIG_END
 
 
@@ -2635,7 +2653,7 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( cbm2lp_pal )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_DERIVED( cbm2lp_pal, cbm2lp_ntsc )
+MACHINE_CONFIG_DERIVED(cbm2_state::cbm2lp_pal, cbm2lp_ntsc)
 	MCFG_MACHINE_START_OVERRIDE(cbm2_state, cbm2_pal)
 
 	MCFG_DEVICE_MODIFY(MOS6526_TAG)
@@ -2647,8 +2665,8 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( cbm610 )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_DERIVED( cbm610, cbm2lp_pal )
-	MCFG_FRAGMENT_ADD(128k)
+MACHINE_CONFIG_DERIVED(cbm2_state::cbm610, cbm2lp_pal)
+	MCFG_FRAGMENT_ADD(_128k)
 MACHINE_CONFIG_END
 
 
@@ -2656,8 +2674,8 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( cbm620 )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_DERIVED( cbm620, cbm2lp_pal )
-	MCFG_FRAGMENT_ADD(256k)
+MACHINE_CONFIG_DERIVED(cbm2_state::cbm620, cbm2lp_pal)
+	MCFG_FRAGMENT_ADD(_256k)
 MACHINE_CONFIG_END
 
 
@@ -2665,7 +2683,7 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( cbm2hp_ntsc )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_DERIVED( cbm2hp_ntsc, cbm2lp_ntsc )
+MACHINE_CONFIG_DERIVED(cbm2_state::cbm2hp_ntsc, cbm2lp_ntsc)
 	MCFG_DEVICE_MODIFY(MOS6525_2_TAG)
 	MCFG_TPI6525_IN_PC_CB(READ8(cbm2hp_state, tpi2_pc_r))
 MACHINE_CONFIG_END
@@ -2675,8 +2693,8 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( b128hp )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_DERIVED( b128hp, cbm2hp_ntsc )
-	MCFG_FRAGMENT_ADD(128k)
+MACHINE_CONFIG_DERIVED(cbm2hp_state::b128hp, cbm2hp_ntsc)
+	MCFG_FRAGMENT_ADD(_128k)
 MACHINE_CONFIG_END
 
 
@@ -2684,8 +2702,8 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( b256hp )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_DERIVED( b256hp, cbm2hp_ntsc )
-	MCFG_FRAGMENT_ADD(256k)
+MACHINE_CONFIG_DERIVED(cbm2hp_state::b256hp, cbm2hp_ntsc)
+	MCFG_FRAGMENT_ADD(_256k)
 MACHINE_CONFIG_END
 
 
@@ -2693,7 +2711,7 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( bx256hp )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_DERIVED( bx256hp, b256hp )
+MACHINE_CONFIG_DERIVED(cbm2hp_state::bx256hp, b256hp)
 	MCFG_MACHINE_START_OVERRIDE(cbm2_state, cbm2x_ntsc)
 
 	MCFG_CPU_ADD(EXT_I8088_TAG, I8088, XTAL_12MHz)
@@ -2725,7 +2743,7 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( cbm2hp_pal )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_DERIVED( cbm2hp_pal, cbm2hp_ntsc )
+MACHINE_CONFIG_DERIVED(cbm2_state::cbm2hp_pal, cbm2hp_ntsc)
 	MCFG_MACHINE_START_OVERRIDE(cbm2_state, cbm2_pal)
 
 	// devices
@@ -2741,8 +2759,8 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( cbm710 )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_DERIVED( cbm710, cbm2hp_pal )
-	MCFG_FRAGMENT_ADD(128k)
+MACHINE_CONFIG_DERIVED(cbm2hp_state::cbm710, cbm2hp_pal)
+	MCFG_FRAGMENT_ADD(_128k)
 MACHINE_CONFIG_END
 
 
@@ -2750,8 +2768,8 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( cbm720 )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_DERIVED( cbm720, cbm2hp_pal )
-	MCFG_FRAGMENT_ADD(256k)
+MACHINE_CONFIG_DERIVED(cbm2hp_state::cbm720, cbm2hp_pal)
+	MCFG_FRAGMENT_ADD(_256k)
 MACHINE_CONFIG_END
 
 
@@ -2759,7 +2777,7 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( cbm730 )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_DERIVED( cbm730, cbm720 )
+MACHINE_CONFIG_DERIVED(cbm2hp_state::cbm730, cbm720)
 	MCFG_MACHINE_START_OVERRIDE(cbm2_state, cbm2x_pal)
 
 	MCFG_CPU_ADD(EXT_I8088_TAG, I8088, XTAL_12MHz)

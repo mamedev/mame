@@ -66,6 +66,8 @@ public:
 	DECLARE_WRITE8_MEMBER(ctrl_w);
 	DECLARE_DRIVER_INIT(chinsan);
 
+	void chinsan(machine_config &config);
+	void mayumi(machine_config &config);
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -495,7 +497,7 @@ DRIVER_INIT_MEMBER( chinsan_state, chinsan )
 //**************************************************************************
 
 // C1-00114-B
-static MACHINE_CONFIG_START( chinsan )
+MACHINE_CONFIG_START(chinsan_state::chinsan)
 	MCFG_CPU_ADD("maincpu", MC8123, XTAL_10MHz/2) // 317-5012
 	MCFG_CPU_PROGRAM_MAP(chinsan_map)
 	MCFG_CPU_IO_MAP(chinsan_io_map)
@@ -538,7 +540,7 @@ static MACHINE_CONFIG_START( chinsan )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( mayumi, chinsan )
+MACHINE_CONFIG_DERIVED(chinsan_state::mayumi, chinsan)
 	// standard Z80 instead of MC-8123
 	MCFG_DEVICE_REMOVE("maincpu")
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_10MHz/2)

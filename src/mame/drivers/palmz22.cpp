@@ -103,6 +103,7 @@ public:
 	DECLARE_READ32_MEMBER(s3c2410_core_pin_r);
 	DECLARE_READ32_MEMBER(s3c2410_adc_data_r );
 
+	void palmz22(machine_config &config);
 };
 
 
@@ -278,7 +279,7 @@ DRIVER_INIT_MEMBER(palmz22_state,palmz22)
 {
 }
 
-static MACHINE_CONFIG_START( palmz22 )
+MACHINE_CONFIG_START(palmz22_state::palmz22)
 	MCFG_CPU_ADD("maincpu", ARM920T, 266000000)
 	MCFG_CPU_PROGRAM_MAP(palmz22_map)
 

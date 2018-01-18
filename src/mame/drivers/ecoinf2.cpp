@@ -226,6 +226,7 @@ public:
 
 	DECLARE_MACHINE_START(ecoinf2);
 
+	void ecoinf2_oxo(machine_config &config);
 };
 
 
@@ -500,7 +501,7 @@ static INPUT_PORTS_START( ecoinf2 )
 INPUT_PORTS_END
 
 
-static MACHINE_CONFIG_START( ecoinf2_oxo )
+MACHINE_CONFIG_START(ecoinf2_state::ecoinf2_oxo)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z180,4000000) // some of these hit invalid opcodes with a plain z80, some don't?
 	MCFG_CPU_PROGRAM_MAP(oxo_memmap)

@@ -52,6 +52,7 @@ public:
 
 	DECLARE_READ8_MEMBER( qtsbc_43_r );
 
+	void qtsbc(machine_config &config);
 private:
 	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
@@ -98,7 +99,7 @@ static DEVICE_INPUT_DEFAULTS_START( terminal )
 	DEVICE_INPUT_DEFAULTS( "RS232_STOPBITS", 0xff, RS232_STOPBITS_1 )
 DEVICE_INPUT_DEFAULTS_END
 
-static MACHINE_CONFIG_START( qtsbc )
+MACHINE_CONFIG_START(qtsbc_state::qtsbc)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80, XTAL_4MHz) // Mostek MK3880
 	MCFG_CPU_PROGRAM_MAP(mem_map)

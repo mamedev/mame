@@ -183,7 +183,7 @@ WRITE16_MEMBER(sega_scu_device::scudsp_dma_w)
 	m_hostspace->write_word(addr, data,mem_mask);
 }
 
-MACHINE_CONFIG_MEMBER(sega_scu_device::device_add_mconfig)
+MACHINE_CONFIG_START(sega_scu_device::device_add_mconfig)
 	MCFG_CPU_ADD("scudsp", SCUDSP, XTAL_57_2727MHz/4) // 14 MHz
 	MCFG_SCUDSP_OUT_IRQ_CB(DEVWRITELINE(DEVICE_SELF, sega_scu_device, scudsp_end_w))
 	MCFG_SCUDSP_IN_DMA_CB(READ16(sega_scu_device, scudsp_dma_r))

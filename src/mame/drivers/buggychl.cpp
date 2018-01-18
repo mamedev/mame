@@ -446,7 +446,7 @@ void buggychl_state::machine_reset()
 	m_bg_scrollx = 0;
 }
 
-static MACHINE_CONFIG_START( buggychl )
+MACHINE_CONFIG_START(buggychl_state::buggychl)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_48MHz/8) /* 6 MHz according to schematics, though it can be jumpered for 4MHz as well */

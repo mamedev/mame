@@ -638,7 +638,7 @@ WRITE8_MEMBER(nes_konami_vrc6_device::write_h)
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( nes_konami_vrc6_device::device_add_mconfig )
+MACHINE_CONFIG_START(nes_konami_vrc6_device::device_add_mconfig)
 
 	// additional sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("addon")
@@ -762,7 +762,7 @@ WRITE8_MEMBER(nes_konami_vrc7_device::write_h)
 
 // FIXME: we currently emulate this as a base YM2413!
 
-MACHINE_CONFIG_MEMBER( nes_konami_vrc7_device::device_add_mconfig )
+MACHINE_CONFIG_START(nes_konami_vrc7_device::device_add_mconfig)
 
 	// additional sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("addon")

@@ -455,7 +455,7 @@ GFXDECODE_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( rpunch )
+MACHINE_CONFIG_START(rpunch_state::rpunch)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, MASTER_CLOCK/2)
@@ -499,13 +499,13 @@ static MACHINE_CONFIG_START( rpunch )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( svolley, rpunch )
+MACHINE_CONFIG_DERIVED(rpunch_state::svolley, rpunch)
 	MCFG_VIDEO_START_OVERRIDE(rpunch_state,svolley)
 MACHINE_CONFIG_END
 
 
 // c+p of above for now, bootleg hw, things need verifying
-static MACHINE_CONFIG_START( svolleybl )
+MACHINE_CONFIG_START(rpunch_state::svolleybl)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, MASTER_CLOCK/2)

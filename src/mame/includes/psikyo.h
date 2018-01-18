@@ -107,4 +107,9 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
+	void sngkace(machine_config &config);
+	void s1945jn(machine_config &config);
+	void gunbird(machine_config &config);
+	void s1945(machine_config &config);
+	void s1945bl(machine_config &config);
 };

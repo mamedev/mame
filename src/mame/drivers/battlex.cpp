@@ -288,7 +288,7 @@ void battlex_state::machine_reset()
 	m_in0_b4 = 0;
 }
 
-static MACHINE_CONFIG_START( battlex )
+MACHINE_CONFIG_START(battlex_state::battlex)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80,XTAL_10MHz/4 )      // ?
@@ -315,7 +315,7 @@ static MACHINE_CONFIG_START( battlex )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( dodgeman, battlex )
+MACHINE_CONFIG_DERIVED(battlex_state::dodgeman, battlex)
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(dodgeman_io_map)

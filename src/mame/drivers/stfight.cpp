@@ -448,7 +448,7 @@ INPUT_PORTS_END
 
 
 
-static MACHINE_CONFIG_START( stfight_base )
+MACHINE_CONFIG_START(stfight_state::stfight_base)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_12MHz / 4)
@@ -492,7 +492,7 @@ static MACHINE_CONFIG_START( stfight_base )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( stfight, stfight_base )
+MACHINE_CONFIG_DERIVED(stfight_state::stfight, stfight_base)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(stfight_cpu1_map)
 	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map)
@@ -502,7 +502,7 @@ static MACHINE_CONFIG_DERIVED( stfight, stfight_base )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( cshooter, stfight_base )
+MACHINE_CONFIG_DERIVED(stfight_state::cshooter, stfight_base)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(cshooter_cpu1_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("airraid_vid:screen", stfight_state,  stfight_vb_interrupt)

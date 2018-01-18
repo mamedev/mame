@@ -44,7 +44,6 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<palette_device> m_palette;
 	required_device<cpu_device> m_audiocpu;
+	void spiders(machine_config &config);
+	void spiders_audio(machine_config &config);
 };
-
-/*----------- defined in audio/spiders.c -----------*/
-MACHINE_CONFIG_EXTERN( spiders_audio );

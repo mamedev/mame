@@ -936,7 +936,7 @@ GFXDECODE_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( ddragon )
+MACHINE_CONFIG_START(ddragon_state::ddragon)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", HD6309, MAIN_CLOCK)     /* 12 MHz / 4 internally */
@@ -989,7 +989,7 @@ static MACHINE_CONFIG_START( ddragon )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( ddragonb, ddragon )
+MACHINE_CONFIG_DERIVED(ddragon_state::ddragonb, ddragon)
 
 	/* basic machine hardware */
 	MCFG_CPU_REPLACE("sub", M6809, MAIN_CLOCK / 8)  /* 1.5MHz */
@@ -997,7 +997,7 @@ static MACHINE_CONFIG_DERIVED( ddragonb, ddragon )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( ddragonba, ddragon )
+MACHINE_CONFIG_DERIVED(ddragon_state::ddragonba, ddragon)
 
 	/* basic machine hardware */
 	MCFG_CPU_REPLACE("sub", M6803, MAIN_CLOCK / 2)  /* 6MHz / 4 internally */
@@ -1006,7 +1006,7 @@ static MACHINE_CONFIG_DERIVED( ddragonba, ddragon )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( ddragon6809 )
+MACHINE_CONFIG_START(ddragon_state::ddragon6809)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", MC6809E, MAIN_CLOCK / 8)  /* 1.5 MHz */
@@ -1059,7 +1059,7 @@ static MACHINE_CONFIG_START( ddragon6809 )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( ddragon2 )
+MACHINE_CONFIG_START(ddragon_state::ddragon2)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", HD6309, MAIN_CLOCK)     /* 12 MHz / 4 internally */
@@ -1105,7 +1105,7 @@ static MACHINE_CONFIG_START( ddragon2 )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( darktowr, ddragon )
+MACHINE_CONFIG_DERIVED(darktowr_state::darktowr, ddragon)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("mcu", M68705P3, XTAL_4MHz)
@@ -1115,7 +1115,7 @@ static MACHINE_CONFIG_DERIVED( darktowr, ddragon )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( toffy, ddragon )
+MACHINE_CONFIG_DERIVED(toffy_state::toffy, ddragon)
 
 	/* basic machine hardware */
 	MCFG_DEVICE_REMOVE("sub")

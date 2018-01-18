@@ -244,7 +244,7 @@ void amspdwy_state::machine_reset()
 	m_wheel_return[1] = 0;
 }
 
-static MACHINE_CONFIG_START( amspdwy )
+MACHINE_CONFIG_START(amspdwy_state::amspdwy)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 3000000)

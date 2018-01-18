@@ -372,7 +372,7 @@ const tiny_rom_entry *pioneer_pr8210_device::device_rom_region() const
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( pioneer_pr8210_device::device_add_mconfig )
+MACHINE_CONFIG_START(pioneer_pr8210_device::device_add_mconfig)
 	MCFG_CPU_ADD("pr8210", I8049, XTAL_4_41MHz)
 	MCFG_CPU_IO_MAP(pr8210_portmap)
 	MCFG_MCS48_PORT_BUS_IN_CB(READ8(pioneer_pr8210_device, i8049_bus_r))
@@ -999,7 +999,7 @@ const tiny_rom_entry *simutrek_special_device::device_rom_region() const
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( simutrek_special_device::device_add_mconfig )
+MACHINE_CONFIG_START(simutrek_special_device::device_add_mconfig)
 	MCFG_CPU_ADD("simutrek", I8748, XTAL_6MHz)
 	MCFG_CPU_IO_MAP(simutrek_portmap)
 	MCFG_MCS48_PORT_P2_IN_CB(READ8(simutrek_special_device, i8748_port2_r))

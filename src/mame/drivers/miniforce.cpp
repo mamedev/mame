@@ -135,6 +135,7 @@ miniforce_state(const machine_config &mconfig, device_type type, const char *tag
 	}
 	virtual void machine_start () override;
 	virtual void machine_reset () override;
+	void miniforce(machine_config &config);
 };
 
 #if 0
@@ -175,7 +176,7 @@ SLOT_INTERFACE_END
 /*
  * Machine configuration
  */
-MACHINE_CONFIG_START (miniforce)
+MACHINE_CONFIG_START(miniforce_state::miniforce)
 //  MCFG_CPU_PROGRAM_MAP (miniforce_mem)
 	MCFG_VME_DEVICE_ADD("vme")
 	MCFG_VME_SLOT_ADD ("vme", 1, miniforce_vme_cards, "fccpu21")

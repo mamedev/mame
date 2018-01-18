@@ -80,4 +80,13 @@ public:
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
+	void champbas(machine_config &config);
+	void champbb2(machine_config &config);
+	void exctsccr(machine_config &config);
+	void talbot(machine_config &config);
+	void tbasebal(machine_config &config);
+	void champbasjb(machine_config &config);
+	void champbasj(machine_config &config);
+	void exctsccrb(machine_config &config);
+	void champbasja(machine_config &config);
 };

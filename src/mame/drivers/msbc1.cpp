@@ -65,6 +65,7 @@ public:
 		, m_maincpu(*this, MC68000R12_TAG)
 	{ }
 
+	void msbc1(machine_config &config);
 private:
 	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
@@ -90,7 +91,7 @@ void msbc1_state::machine_reset()
 	m_maincpu->reset();
 }
 
-static MACHINE_CONFIG_START( msbc1 )
+MACHINE_CONFIG_START(msbc1_state::msbc1)
 	/* basic machine hardware */
 	MCFG_CPU_ADD(MC68000R12_TAG, M68000, XTAL_12_5MHz)
 	MCFG_CPU_PROGRAM_MAP(msbc1_mem)

@@ -276,7 +276,7 @@ void tmc2000e_state::machine_reset()
 
 /* Machine Drivers */
 
-static MACHINE_CONFIG_START( tmc2000e )
+MACHINE_CONFIG_START(tmc2000e_state::tmc2000e)
 	// basic system hardware
 	MCFG_CPU_ADD(CDP1802_TAG, CDP1802, XTAL_1_75MHz)
 	MCFG_CPU_PROGRAM_MAP(tmc2000e_map)

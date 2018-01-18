@@ -133,6 +133,7 @@ public:
 	virtual void machine_start() override;
 	DECLARE_PALETTE_INIT(flipjack);
 	uint32_t screen_update_flipjack(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	void flipjack(machine_config &config);
 };
 
 
@@ -435,7 +436,7 @@ void flipjack_state::machine_start()
 }
 
 
-static MACHINE_CONFIG_START( flipjack )
+MACHINE_CONFIG_START(flipjack_state::flipjack)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK/4)

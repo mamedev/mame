@@ -67,6 +67,8 @@ public:
 	DECLARE_DRIVER_INIT(asr);
 	DECLARE_WRITE_LINE_MEMBER(esq5506_otto_irq);
 	DECLARE_READ16_MEMBER(esq5506_read_adc);
+	void asrx(machine_config &config);
+	void asr(machine_config &config);
 };
 
 void esqasr_state::machine_reset()
@@ -93,7 +95,7 @@ READ16_MEMBER(esqasr_state::esq5506_read_adc)
 	return 0;
 }
 
-static MACHINE_CONFIG_START( asr )
+MACHINE_CONFIG_START(esqasr_state::asr)
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz) // actually MC68302
 	MCFG_CPU_PROGRAM_MAP(asr_map)
 
@@ -115,7 +117,7 @@ static MACHINE_CONFIG_START( asr )
 	MCFG_SOUND_ROUTE(1, "rspeaker", 2.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( asrx )
+MACHINE_CONFIG_START(esqasr_state::asrx)
 	MCFG_CPU_ADD("maincpu", M68020, XTAL_16MHz) // unknown, possibly 68340?
 	MCFG_CPU_PROGRAM_MAP(asrx_map)
 

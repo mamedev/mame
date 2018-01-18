@@ -219,7 +219,7 @@ void volfied_state::machine_reset()
 	cchip_reset();
 }
 
-static MACHINE_CONFIG_START( volfied )
+MACHINE_CONFIG_START(volfied_state::volfied)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, CPU_CLOCK)   /* 8MHz */

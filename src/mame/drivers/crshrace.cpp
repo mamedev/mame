@@ -399,7 +399,7 @@ void crshrace_state::machine_reset()
 	m_flipscreen = 0;
 }
 
-static MACHINE_CONFIG_START( crshrace )
+MACHINE_CONFIG_START(crshrace_state::crshrace)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000,16000000)    /* 16 MHz ??? */

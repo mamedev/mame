@@ -69,6 +69,8 @@ public:
 	DECLARE_WRITE8_MEMBER( beep_w );
 	DECLARE_PALETTE_INIT(pc2000);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(pc2000_cart);
+	void pc2000(machine_config &config);
+	void gl2000(machine_config &config);
 };
 
 class gl3000s_state : public pc2000_state
@@ -84,6 +86,7 @@ public:
 	required_device<sed1520_device> m_lcdc_l;
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void gl3000s(machine_config &config);
 };
 
 class gl4004_state : public pc2000_state
@@ -95,6 +98,7 @@ public:
 
 	virtual void machine_start() override;
 	HD44780_PIXEL_UPDATE(gl4000_pixel_update);
+	void gl4000(machine_config &config);
 };
 
 class pc1000_state : public pc2000_state
@@ -114,6 +118,8 @@ public:
 	DECLARE_READ8_MEMBER( lcdc_control_r );
 	DECLARE_WRITE8_MEMBER( lcdc_control_w );
 	HD44780_PIXEL_UPDATE(pc1000_pixel_update);
+	void misterx(machine_config &config);
+	void pc1000(machine_config &config);
 };
 
 
@@ -829,7 +835,7 @@ DEVICE_IMAGE_LOAD_MEMBER( pc2000_state, pc2000_cart )
 	return image_init_result::PASS;
 }
 
-static MACHINE_CONFIG_START( pc2000 )
+MACHINE_CONFIG_START(pc2000_state::pc2000)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80, XTAL_4MHz) /* probably not accurate */
 	MCFG_CPU_PROGRAM_MAP(pc2000_mem)
@@ -864,7 +870,7 @@ static MACHINE_CONFIG_START( pc2000 )
 	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("pc1000_cart", "pc1000")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( gl2000, pc2000 )
+MACHINE_CONFIG_DERIVED(pc2000_state::gl2000, pc2000)
 	MCFG_SOFTWARE_LIST_ADD("cart_list", "gl2000")
 	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("misterx_cart", "misterx")
 MACHINE_CONFIG_END
@@ -886,7 +892,7 @@ HD44780_PIXEL_UPDATE(gl4004_state::gl4000_pixel_update)
 	}
 }
 
-static MACHINE_CONFIG_DERIVED( gl3000s, pc2000 )
+MACHINE_CONFIG_DERIVED(gl3000s_state::gl3000s, pc2000)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(gl3000s_io)
 
@@ -907,7 +913,7 @@ static MACHINE_CONFIG_DERIVED( gl3000s, pc2000 )
 	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("misterx_cart", "misterx")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( gl4000, pc2000 )
+MACHINE_CONFIG_DERIVED(gl4004_state::gl4000, pc2000)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_SIZE(120, 36) // 4x20 chars
 	MCFG_SCREEN_VISIBLE_AREA(0, 120-1, 0, 36-1)
@@ -920,7 +926,7 @@ static MACHINE_CONFIG_DERIVED( gl4000, pc2000 )
 	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("misterx_cart", "misterx")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( misterx, pc2000 )
+MACHINE_CONFIG_DERIVED(pc1000_state::misterx, pc2000)
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(pc1000_mem)
@@ -940,7 +946,7 @@ static MACHINE_CONFIG_DERIVED( misterx, pc2000 )
 	MCFG_SOFTWARE_LIST_ADD("cart_list", "misterx")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( pc1000, misterx )
+MACHINE_CONFIG_DERIVED(pc1000_state::pc1000, misterx)
 	MCFG_SOFTWARE_LIST_REMOVE("cart_list")
 	MCFG_SOFTWARE_LIST_REMOVE("pc1000_cart")
 	MCFG_SOFTWARE_LIST_ADD("cart_list", "pc1000")

@@ -153,7 +153,7 @@ const tiny_rom_entry* dectalk_isa_device::device_rom_region() const
 	return ROM_NAME( dectalk_isa );
 }
 
-MACHINE_CONFIG_MEMBER( dectalk_isa_device::device_add_mconfig )
+MACHINE_CONFIG_START(dectalk_isa_device::device_add_mconfig)
 	MCFG_CPU_ADD("dectalk_cpu", I80186, XTAL_20MHz)
 	MCFG_CPU_IO_MAP(dectalk_cpu_io)
 	MCFG_CPU_PROGRAM_MAP(dectalk_cpu_map)

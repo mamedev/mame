@@ -152,6 +152,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(async_txd_w);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_beep_exp);
+
+	void hp2645(machine_config &config);
 protected:
 	required_device<i8080a_cpu_device> m_cpu;
 	required_device<timer_device> m_timer_10ms;
@@ -974,7 +976,7 @@ static ADDRESS_MAP_START(cpu_io_map , AS_IO , 8 , hp2645_state)
 	AM_RANGE(0x00 , 0xff) AM_WRITE(mode_byte_w)
 ADDRESS_MAP_END
 
-static MACHINE_CONFIG_START(hp2645)
+MACHINE_CONFIG_START(hp2645_state::hp2645)
 	MCFG_CPU_ADD("cpu" , I8080A , SYS_CLOCK / 2)
 	MCFG_CPU_PROGRAM_MAP(cpu_mem_map)
 	MCFG_CPU_IO_MAP(cpu_io_map)

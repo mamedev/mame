@@ -655,7 +655,7 @@ static GFXDECODE_START( twincobr )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( twincobr )
+MACHINE_CONFIG_START(twincobr_state::twincobr)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_28MHz/4)       /* 7MHz - Main board Crystal is 28MHz */
@@ -721,7 +721,7 @@ static MACHINE_CONFIG_START( twincobr )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( fshark, twincobr )
+MACHINE_CONFIG_DERIVED(twincobr_state::fshark, twincobr)
 	MCFG_DEVICE_MODIFY("mainlatch")
 	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(NOOP)
 
@@ -733,7 +733,7 @@ static MACHINE_CONFIG_DERIVED( fshark, twincobr )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( fsharkbt, fshark )
+MACHINE_CONFIG_DERIVED(twincobr_state::fsharkbt, fshark)
 
 	MCFG_CPU_ADD("mcu", I8741, XTAL_28MHz/16)
 	/* Program Map is internal to the CPU */

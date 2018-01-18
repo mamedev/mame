@@ -50,6 +50,7 @@ public:
 	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
 	required_device<ticket_dispenser_device> m_hopper;
+	void tonton(machine_config &config);
 };
 
 #define MAIN_CLOCK      XTAL_21_4772MHz
@@ -215,7 +216,7 @@ WRITE8_MEMBER(tonton_state::ay_bout_w)
 *                 Machine Driver                 *
 *************************************************/
 
-static MACHINE_CONFIG_START( tonton )
+MACHINE_CONFIG_START(tonton_state::tonton)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80, CPU_CLOCK)  /* Guess. According to other MSX2 based gambling games */

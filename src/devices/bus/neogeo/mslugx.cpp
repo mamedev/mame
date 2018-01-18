@@ -43,6 +43,6 @@ void neogeo_mslugx_cart_device::device_reset()
  mapper specific handlers
  -------------------------------------------------*/
 
-MACHINE_CONFIG_MEMBER( neogeo_mslugx_cart_device::device_add_mconfig )
+MACHINE_CONFIG_START(neogeo_mslugx_cart_device::device_add_mconfig)
 	MCFG_MSLUGX_PROT_ADD("mslugx_prot")
 MACHINE_CONFIG_END

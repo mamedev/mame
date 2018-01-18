@@ -57,6 +57,7 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(kim1_cassette_input);
 	TIMER_DEVICE_CALLBACK_MEMBER(kim1_update_leds);
 
+	void kim1(machine_config &config);
 protected:
 	required_ioport m_row0;
 	required_ioport m_row1;

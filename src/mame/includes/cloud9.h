@@ -76,4 +76,5 @@ public:
 	inline void cloud9_write_vram( uint16_t addr, uint8_t data, uint8_t bitmd, uint8_t pixba );
 	inline void bitmode_autoinc(  );
 	inline void schedule_next_irq(int curscanline);
+	void cloud9(machine_config &config);
 };

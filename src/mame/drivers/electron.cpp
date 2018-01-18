@@ -197,7 +197,7 @@ static INPUT_PORTS_START( electron )
 	PORT_BIT(0x01,  IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("BREAK") PORT_CODE(KEYCODE_F12) PORT_CHAR(UCHAR_MAMEKEY(F12)) PORT_CHANGED_MEMBER(DEVICE_SELF, electron_state, trigger_reset, 0)
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( electron )
+MACHINE_CONFIG_START(electron_state::electron)
 	MCFG_CPU_ADD( "maincpu", M6502, XTAL_16MHz/8 )
 	MCFG_CPU_PROGRAM_MAP( electron_mem )
 
@@ -237,7 +237,7 @@ static MACHINE_CONFIG_START( electron )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( btm2105, electron )
+MACHINE_CONFIG_DERIVED(electron_state::btm2105, electron)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_COLOR(rgb_t::amber())
 

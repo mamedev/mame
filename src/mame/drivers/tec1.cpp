@@ -123,6 +123,8 @@ public:
 	virtual void machine_reset() override;
 	virtual void machine_start() override;
 	TIMER_CALLBACK_MEMBER(tec1_kbd_callback);
+	void tec1(machine_config &config);
+	void tecjmon(machine_config &config);
 };
 
 
@@ -402,7 +404,7 @@ INPUT_PORTS_END
 
 ***************************************************************************/
 
-static MACHINE_CONFIG_START( tec1 )
+MACHINE_CONFIG_START(tec1_state::tec1)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 1000000)   /* speed can be varied between 250kHz and 2MHz */
 	MCFG_CPU_PROGRAM_MAP(tec1_map)
@@ -417,7 +419,7 @@ static MACHINE_CONFIG_START( tec1 )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( tecjmon )
+MACHINE_CONFIG_START(tec1_state::tecjmon)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_3_579545MHz / 2)
 	MCFG_CPU_PROGRAM_MAP(tecjmon_map)

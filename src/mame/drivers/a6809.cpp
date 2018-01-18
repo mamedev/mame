@@ -85,6 +85,7 @@ public:
 	required_shared_ptr<uint8_t> m_p_videoram;
 	uint16_t m_start_address;
 	uint16_t m_cursor_address;
+	void a6809(machine_config &config);
 private:
 	uint8_t m_cass_data[4];
 	bool m_cass_state;
@@ -220,7 +221,7 @@ void a6809_state::kbd_put(u8 data)
 	m_via->write_cb1(0);
 }
 
-static MACHINE_CONFIG_START( a6809 )
+MACHINE_CONFIG_START(a6809_state::a6809)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", MC6809, XTAL_4MHz)
 	MCFG_CPU_PROGRAM_MAP(a6809_mem)

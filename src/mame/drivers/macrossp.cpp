@@ -539,7 +539,7 @@ void macrossp_state::machine_reset()
 	m_snd_toggle = 0;
 }
 
-static MACHINE_CONFIG_START( macrossp )
+MACHINE_CONFIG_START(macrossp_state::macrossp)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68EC020, 50000000/2)   /* 25 MHz */
@@ -580,7 +580,7 @@ static MACHINE_CONFIG_START( macrossp )
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.1)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( quizmoon, macrossp )
+MACHINE_CONFIG_DERIVED(macrossp_state::quizmoon, macrossp)
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VISIBLE_AREA(0, 24*16-1, 0*8, 14*16-1)

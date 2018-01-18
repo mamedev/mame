@@ -253,7 +253,7 @@ void momoko_state::machine_reset()
 	m_flipscreen = 0;
 }
 
-static MACHINE_CONFIG_START( momoko )
+MACHINE_CONFIG_START(momoko_state::momoko)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_10MHz/2)   /* 5.0MHz */

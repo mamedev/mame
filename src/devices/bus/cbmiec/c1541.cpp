@@ -811,7 +811,7 @@ WRITE8_MEMBER( c1541_prologic_dos_classic_device::pia_pb_w )
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( c1541_device_base::device_add_mconfig )
+MACHINE_CONFIG_START(c1541_device_base::device_add_mconfig)
 	MCFG_CPU_ADD(M6502_TAG, M6502, XTAL_16MHz/16)
 	MCFG_CPU_PROGRAM_MAP(c1541_mem)
 	MCFG_QUANTUM_PERFECT_CPU(M6502_TAG)
@@ -840,12 +840,12 @@ MACHINE_CONFIG_MEMBER( c1541_device_base::device_add_mconfig )
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_MEMBER( c1541c_device::device_add_mconfig )
+MACHINE_CONFIG_START(c1541c_device::device_add_mconfig)
 	c1541_device_base::device_add_mconfig(config);
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_MEMBER( c1541_dolphin_dos_device::device_add_mconfig )
+MACHINE_CONFIG_START(c1541_dolphin_dos_device::device_add_mconfig)
 	c1541_device_base::device_add_mconfig(config);
 
 	MCFG_CPU_MODIFY(M6502_TAG)
@@ -853,7 +853,7 @@ MACHINE_CONFIG_MEMBER( c1541_dolphin_dos_device::device_add_mconfig )
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_MEMBER( c1541_professional_dos_v1_device::device_add_mconfig )
+MACHINE_CONFIG_START(c1541_professional_dos_v1_device::device_add_mconfig)
 	c1541_device_base::device_add_mconfig(config);
 
 	MCFG_CPU_MODIFY(M6502_TAG)
@@ -861,7 +861,7 @@ MACHINE_CONFIG_MEMBER( c1541_professional_dos_v1_device::device_add_mconfig )
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_MEMBER( c1541_prologic_dos_classic_device::device_add_mconfig )
+MACHINE_CONFIG_START(c1541_prologic_dos_classic_device::device_add_mconfig)
 	c1541_device_base::device_add_mconfig(config);
 
 	MCFG_CPU_MODIFY(M6502_TAG)

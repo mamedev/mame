@@ -21,6 +21,7 @@ public:
 
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
+	void att630(machine_config &config);
 private:
 	required_device<cpu_device> m_maincpu;
 };
@@ -43,7 +44,7 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START( att630 )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( att630 )
+MACHINE_CONFIG_START(att630_state::att630)
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_40MHz / 4) // clock not confirmed
 	MCFG_CPU_PROGRAM_MAP(mem_map)
 

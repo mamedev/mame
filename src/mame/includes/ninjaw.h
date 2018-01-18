@@ -77,4 +77,6 @@ public:
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, int primask, int x_offs, int y_offs );
 	void parse_control(  );
 	uint32_t update_screen(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int xoffs, tc0100scn_device *tc0100scn);
+	void darius2(machine_config &config);
+	void ninjaw(machine_config &config);
 };

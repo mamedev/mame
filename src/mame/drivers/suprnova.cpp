@@ -786,7 +786,7 @@ GFXDECODE_END
 
 /***** MACHINE DRIVER *****/
 
-static MACHINE_CONFIG_START( skns )
+MACHINE_CONFIG_START(skns_state::skns)
 	MCFG_CPU_ADD("maincpu", SH2,28638000)
 	MCFG_CPU_PROGRAM_MAP(skns_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", skns_state, irq, "screen", 0, 1)
@@ -855,23 +855,23 @@ MACHINE_RESET_MEMBER(skns_state,sknsk)
 }
 
 
-static MACHINE_CONFIG_DERIVED( sknsa, skns )
+MACHINE_CONFIG_DERIVED(skns_state::sknsa, skns)
 	MCFG_MACHINE_RESET_OVERRIDE(skns_state,sknsa)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( sknsj, skns )
+MACHINE_CONFIG_DERIVED(skns_state::sknsj, skns)
 	MCFG_MACHINE_RESET_OVERRIDE(skns_state,sknsj)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( sknsu, skns )
+MACHINE_CONFIG_DERIVED(skns_state::sknsu, skns)
 	MCFG_MACHINE_RESET_OVERRIDE(skns_state,sknsu)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( sknse, skns )
+MACHINE_CONFIG_DERIVED(skns_state::sknse, skns)
 	MCFG_MACHINE_RESET_OVERRIDE(skns_state,sknse)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( sknsk, skns )
+MACHINE_CONFIG_DERIVED(skns_state::sknsk, skns)
 	MCFG_MACHINE_RESET_OVERRIDE(skns_state,sknsk)
 MACHINE_CONFIG_END
 

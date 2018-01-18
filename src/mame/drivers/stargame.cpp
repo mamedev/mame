@@ -32,6 +32,7 @@ public:
 	DECLARE_WRITE8_MEMBER(rint_w);
 	DECLARE_MACHINE_RESET(stargame);
 
+	void stargame(machine_config &config);
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
@@ -92,7 +93,7 @@ static const z80_daisy_config daisy_chain[] =
 };
 
 
-static MACHINE_CONFIG_START( stargame )
+MACHINE_CONFIG_START(stargame_state::stargame)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 15000000 / 4) // clock line marked as CK4 and derived from 15MHz crystal
 	MCFG_CPU_PROGRAM_MAP(maincpu_map)

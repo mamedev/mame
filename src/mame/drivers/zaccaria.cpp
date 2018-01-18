@@ -330,7 +330,7 @@ INTERRUPT_GEN_MEMBER(zaccaria_state::vblank_irq)
 }
 
 
-static MACHINE_CONFIG_START( zaccaria )
+MACHINE_CONFIG_START(zaccaria_state::zaccaria)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80,XTAL_18_432MHz/6)   /* verified on pcb */

@@ -136,6 +136,8 @@ public:
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TILE_GET_INFO_MEMBER(get_tile_info);
+	void vcarn(machine_config &config);
+	void spool99(machine_config &config);
 };
 
 TILE_GET_INFO_MEMBER(spool99_state::get_tile_info)
@@ -355,7 +357,7 @@ INPUT_PORTS_END
 
 
 
-static MACHINE_CONFIG_START( spool99 )
+MACHINE_CONFIG_START(spool99_state::spool99)
 
 	MCFG_CPU_ADD("maincpu", Z80, 24000000/8)
 	MCFG_CPU_PROGRAM_MAP(spool99_map)
@@ -384,7 +386,7 @@ static MACHINE_CONFIG_START( spool99 )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.47)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( vcarn, spool99 )
+MACHINE_CONFIG_DERIVED(spool99_state::vcarn, spool99)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(vcarn_map)
 

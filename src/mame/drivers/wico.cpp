@@ -70,6 +70,7 @@ public:
 	DECLARE_READ8_MEMBER(gentmrcl_r);
 	TIMER_DEVICE_CALLBACK_MEMBER(irq_housekeeping);
 	TIMER_DEVICE_CALLBACK_MEMBER(firq_housekeeping);
+	void wico(machine_config &config);
 private:
 	bool m_zcen;
 	bool m_gten;
@@ -428,7 +429,7 @@ void wico_state::machine_reset()
 }
 
 
-static MACHINE_CONFIG_START( wico )
+MACHINE_CONFIG_START(wico_state::wico)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("ccpu", MC6809E, XTAL_10MHz / 8) // MC68A09EP @ U51
 	MCFG_CPU_PROGRAM_MAP(ccpu_map)

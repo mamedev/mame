@@ -124,6 +124,7 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
+	void starshp1(machine_config &config);
 };
 
 /*----------- defined in audio/starshp1.c -----------*/

@@ -73,6 +73,7 @@ public:
 	int intensity(int bits);
 	unsigned video_ram_address( );
 
+	void fgoal(machine_config &config);
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };

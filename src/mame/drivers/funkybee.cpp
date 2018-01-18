@@ -283,7 +283,7 @@ void funkybee_state::machine_start()
 	m_gfx_bank = 0;
 }
 
-static MACHINE_CONFIG_START( funkybee )
+MACHINE_CONFIG_START(funkybee_state::funkybee)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 3072000)   /* 3.072 MHz */

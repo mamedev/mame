@@ -121,7 +121,7 @@ void taito_sj_security_mcu_device::device_reset()
 		m_mcu->set_input_line(M68705_IRQ_LINE, CLEAR_LINE);
 }
 
-MACHINE_CONFIG_MEMBER(taito_sj_security_mcu_device::device_add_mconfig)
+MACHINE_CONFIG_START(taito_sj_security_mcu_device::device_add_mconfig)
 	MCFG_CPU_ADD("mcu", M68705P5, DERIVED_CLOCK(1, 1))
 	MCFG_M68705_PORTA_R_CB(READ8(taito_sj_security_mcu_device, mcu_pa_r))
 	MCFG_M68705_PORTC_R_CB(READ8(taito_sj_security_mcu_device, mcu_pc_r))

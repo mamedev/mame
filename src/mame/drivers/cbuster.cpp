@@ -305,7 +305,7 @@ void cbuster_state::machine_reset()
 	m_pri = 0;
 }
 
-static MACHINE_CONFIG_START( twocrude )
+MACHINE_CONFIG_START(cbuster_state::twocrude)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz/2) /* Custom chip 59 @ 12MHz Verified */

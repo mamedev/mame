@@ -80,6 +80,7 @@ public:
 	DECLARE_QUICKLOAD_LOAD_MEMBER(cd2650);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
+	void cd2650(machine_config &config);
 private:
 	uint8_t m_term_data;
 	virtual void machine_reset() override;
@@ -278,7 +279,7 @@ QUICKLOAD_LOAD_MEMBER( cd2650_state, cd2650 )
 	return result;
 }
 
-static MACHINE_CONFIG_START( cd2650 )
+MACHINE_CONFIG_START(cd2650_state::cd2650)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", S2650, XTAL_14_192640MHz / 12) // 1.182720MHz according to RE schematic
 	MCFG_CPU_PROGRAM_MAP(cd2650_mem)

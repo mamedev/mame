@@ -574,7 +574,7 @@ void qdrmfgp_state::machine_reset()
  *  Machine driver
  *
  *************************************/
-static MACHINE_CONFIG_START( qdrmfgp )
+MACHINE_CONFIG_START(qdrmfgp_state::qdrmfgp)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_32MHz/2) /*  16.000 MHz */
@@ -618,7 +618,7 @@ static MACHINE_CONFIG_START( qdrmfgp )
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( qdrmfgp2 )
+MACHINE_CONFIG_START(qdrmfgp_state::qdrmfgp2)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_32MHz/2) /*  16.000 MHz */

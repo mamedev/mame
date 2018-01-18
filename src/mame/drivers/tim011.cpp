@@ -43,6 +43,7 @@ public:
 	required_device<floppy_image_device> m_floppy1;
 	required_device<floppy_image_device> m_floppy2;
 	required_device<floppy_image_device> m_floppy3;
+	void tim011(machine_config &config);
 };
 
 
@@ -121,7 +122,7 @@ static const floppy_format_type tim011_floppy_formats[] = {
 	nullptr
 };
 
-static MACHINE_CONFIG_START( tim011 )
+MACHINE_CONFIG_START(tim011_state::tim011)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z180, XTAL_12_288MHz / 2) // location U17 HD64180
 	MCFG_CPU_PROGRAM_MAP(tim011_mem)

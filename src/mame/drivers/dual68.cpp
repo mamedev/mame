@@ -29,6 +29,7 @@ public:
 	void kbd_put(u8 data);
 	DECLARE_WRITE16_MEMBER(terminal_w);
 
+	void dual68(machine_config &config);
 private:
 	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
@@ -89,7 +90,7 @@ void dual68_state::kbd_put(u8 data)
 	//m_term_data = data;
 }
 
-static MACHINE_CONFIG_START( dual68 )
+MACHINE_CONFIG_START(dual68_state::dual68)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz / 2)
 	MCFG_CPU_PROGRAM_MAP(dual68_mem)

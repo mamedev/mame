@@ -120,7 +120,7 @@ void namco_c117_device::device_reset()
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( namco_c117_device::device_add_mconfig )
+MACHINE_CONFIG_START(namco_c117_device::device_add_mconfig)
 	MCFG_WATCHDOG_ADD("watchdog")
 MACHINE_CONFIG_END
 

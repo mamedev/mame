@@ -53,6 +53,7 @@ public:
 	DECLARE_DRIVER_INIT(pasopia);
 	TIMER_CALLBACK_MEMBER(pio_timer);
 
+	void pasopia(machine_config &config);
 private:
 	uint8_t m_hblank;
 	uint16_t m_vram_addr;
@@ -277,7 +278,7 @@ We preset all banks here, so that bankswitching will incur no speed penalty.
 	m_pio_timer->adjust(attotime::from_hz(50), 0, attotime::from_hz(50));
 }
 
-static MACHINE_CONFIG_START( pasopia )
+MACHINE_CONFIG_START(pasopia_state::pasopia)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 4000000)
 	MCFG_CPU_PROGRAM_MAP(pasopia_map)

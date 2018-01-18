@@ -50,6 +50,7 @@ public:
 	DECLARE_WRITE8_MEMBER(output_w);
 
 	required_device<cpu_device> m_maincpu;
+	void cspin2(machine_config &config);
 };
 
 WRITE8_MEMBER(capr1_state::output_w)
@@ -195,7 +196,7 @@ INPUT_PORTS_END
 
 ***************************************************************************/
 
-static MACHINE_CONFIG_START( cspin2 )
+MACHINE_CONFIG_START(capr1_state::cspin2)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 4000000) // clock frequency unknown

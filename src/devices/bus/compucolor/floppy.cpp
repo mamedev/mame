@@ -50,7 +50,7 @@ SLOT_INTERFACE_END
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( compucolor_floppy_device::device_add_mconfig )
+MACHINE_CONFIG_START(compucolor_floppy_device::device_add_mconfig)
 	MCFG_FLOPPY_DRIVE_ADD_FIXED("floppy", compucolor_floppies, "525sssd", compucolor_floppy_device::floppy_formats)
 MACHINE_CONFIG_END
 

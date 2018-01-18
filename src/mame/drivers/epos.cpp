@@ -453,7 +453,7 @@ MACHINE_START_MEMBER(epos_state,dealer)
 	MACHINE_START_CALL_MEMBER(epos);
 }
 
-static MACHINE_CONFIG_START( epos ) /* EPOS TRISTAR 8000 PCB */
+MACHINE_CONFIG_START(epos_state::epos) /* EPOS TRISTAR 8000 PCB */
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_11MHz/4)    /* 2.75 MHz schematics confirm 11MHz XTAL (see notes) */
@@ -481,7 +481,7 @@ static MACHINE_CONFIG_START( epos ) /* EPOS TRISTAR 8000 PCB */
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( dealer ) /* EPOS TRISTAR 9000 PCB */
+MACHINE_CONFIG_START(epos_state::dealer) /* EPOS TRISTAR 9000 PCB */
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_22_1184MHz/8)    /* 2.7648 MHz (measured) */

@@ -246,7 +246,7 @@ void deniam_state::machine_reset()
 	m_oki->set_rom_bank(0);
 }
 
-static MACHINE_CONFIG_START( deniam16b )
+MACHINE_CONFIG_START(deniam_state::deniam16b)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000,XTAL_25MHz/2)    /* 12.5Mhz verified */
@@ -286,7 +286,7 @@ static MACHINE_CONFIG_START( deniam16b )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( deniam16c )
+MACHINE_CONFIG_START(deniam_state::deniam16c)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000,XTAL_25MHz/2)    /* 12.5Mhz verified */

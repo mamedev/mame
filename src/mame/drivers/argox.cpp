@@ -53,6 +53,7 @@ public:
 
 		DECLARE_DRIVER_INIT(os214);
 	required_device<cpu_device> m_maincpu;
+	void os214(machine_config &config);
 };
 
 static ADDRESS_MAP_START( os214_prg_map, AS_PROGRAM, 16, os214_state )
@@ -63,7 +64,7 @@ static ADDRESS_MAP_START( os214_io_map, AS_IO, 8, os214_state )
 //  ADDRESS_MAP_GLOBAL_MASK(0xff)
 ADDRESS_MAP_END
 
-static MACHINE_CONFIG_START( os214 )
+MACHINE_CONFIG_START(os214_state::os214)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", H83002, XTAL_16MHz) /* X1 xtal value is correct,
 	                                                   but there can be some clock divider perhaps ? */

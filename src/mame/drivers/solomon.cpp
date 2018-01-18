@@ -206,7 +206,7 @@ INTERRUPT_GEN_MEMBER(solomon_state::vblank_irq)
 
 
 
-static MACHINE_CONFIG_START( solomon )
+MACHINE_CONFIG_START(solomon_state::solomon)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 4000000)   /* 4.0 MHz (?????) */

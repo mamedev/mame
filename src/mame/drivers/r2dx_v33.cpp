@@ -123,6 +123,9 @@ public:
 	DECLARE_MACHINE_RESET(r2dx_v33);
 	DECLARE_MACHINE_RESET(nzeroteam);
 
+	void nzerotea(machine_config &config);
+	void rdx_v33(machine_config &config);
+	void zerotm2k(machine_config &config);
 protected:
 	virtual void machine_start() override;
 
@@ -765,7 +768,7 @@ static ADDRESS_MAP_START( r2dx_oki_map, 0, 8, r2dx_v33_state )
 	AM_RANGE(0x00000, 0x3ffff) AM_ROMBANK("okibank")
 ADDRESS_MAP_END
 
-static MACHINE_CONFIG_START( rdx_v33 )
+MACHINE_CONFIG_START(r2dx_v33_state::rdx_v33)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", V33, 32000000/2 ) // ?
@@ -802,7 +805,7 @@ static MACHINE_CONFIG_START( rdx_v33 )
 	MCFG_DEVICE_ADDRESS_MAP(0, r2dx_oki_map)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( nzerotea )
+MACHINE_CONFIG_START(r2dx_v33_state::nzerotea)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", V33,XTAL_32MHz/2) /* verified on pcb */
@@ -849,7 +852,7 @@ static MACHINE_CONFIG_START( nzerotea )
 	MCFG_SEIBU_SOUND_YM_WRITE_CB(DEVWRITE8("ymsnd", ym3812_device, write))
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( zerotm2k, nzerotea )
+MACHINE_CONFIG_DERIVED(r2dx_v33_state::zerotm2k, nzerotea)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(zerotm2k_map)
 

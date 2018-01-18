@@ -370,7 +370,7 @@ GFXDECODE_END
 
 
 
-static MACHINE_CONFIG_START( baraduke )
+MACHINE_CONFIG_START(baraduke_state::baraduke)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", MC6809E, XTAL_49_152MHz/32) // 68A09E

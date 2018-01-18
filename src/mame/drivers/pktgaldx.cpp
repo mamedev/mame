@@ -333,7 +333,7 @@ void pktgaldx_state::machine_start()
 {
 }
 
-static MACHINE_CONFIG_START( pktgaldx )
+MACHINE_CONFIG_START(pktgaldx_state::pktgaldx)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 14000000)
@@ -396,7 +396,7 @@ static MACHINE_CONFIG_START( pktgaldx )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( pktgaldb )
+MACHINE_CONFIG_START(pktgaldx_state::pktgaldb)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 16000000)

@@ -94,6 +94,9 @@ public:
 	DECLARE_DRIVER_INIT(game2);
 	DECLARE_PALETTE_INIT(spinb);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void jolypark(machine_config &config);
+	void vrnwrld(machine_config &config);
+	void spinb(machine_config &config);
 private:
 	bool m_pc0a;
 	bool m_pc0m;
@@ -621,7 +624,7 @@ uint32_t spinb_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 	return 0;
 }
 
-static MACHINE_CONFIG_START( spinb )
+MACHINE_CONFIG_START(spinb_state::spinb)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_5MHz / 2)
 	MCFG_CPU_PROGRAM_MAP(spinb_map)
@@ -718,7 +721,7 @@ static MACHINE_CONFIG_START( spinb )
 	MCFG_74157_OUT_CB(DEVWRITE8("msm_m", msm5205_device, data_w))
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( jolypark, spinb )
+MACHINE_CONFIG_DERIVED(spinb_state::jolypark, spinb)
 	MCFG_SOUND_REPLACE("msm_a", MSM6585, XTAL_640kHz)
 	MCFG_MSM6585_VCK_CALLBACK(DEVWRITELINE("ic5a", ttl7474_device, clock_w))
 	MCFG_MSM6585_PRESCALER_SELECTOR(S40)
@@ -729,7 +732,7 @@ static MACHINE_CONFIG_DERIVED( jolypark, spinb )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "msmmvol", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( vrnwrld, jolypark )
+MACHINE_CONFIG_DERIVED(spinb_state::vrnwrld, jolypark)
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(vrnwrld_map)

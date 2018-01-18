@@ -927,7 +927,7 @@ MACHINE_RESET_MEMBER(ninjakd2_state,omegaf)
 
 /*****************************************************************************/
 
-static MACHINE_CONFIG_START( ninjakd2_core )
+MACHINE_CONFIG_START(ninjakd2_state::ninjakd2_core)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, MAIN_CLOCK_12/2)       /* verified */
@@ -976,20 +976,20 @@ static MACHINE_CONFIG_START( ninjakd2_core )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( ninjakd2, ninjakd2_core )
+MACHINE_CONFIG_DERIVED(ninjakd2_state::ninjakd2, ninjakd2_core)
 	MCFG_CPU_REPLACE("soundcpu", MC8123, MAIN_CLOCK_5)     /* verified */
 	MCFG_CPU_PROGRAM_MAP(ninjakd2_sound_cpu)
 	MCFG_CPU_IO_MAP(ninjakd2_sound_io)
 	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( ninjakd2b, ninjakd2_core )
+MACHINE_CONFIG_DERIVED(ninjakd2_state::ninjakd2b, ninjakd2_core)
 	MCFG_CPU_MODIFY("soundcpu")
 	MCFG_CPU_PROGRAM_MAP(ninjakd2_sound_cpu)
 	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( mnight, ninjakd2_core )
+MACHINE_CONFIG_DERIVED(ninjakd2_state::mnight, ninjakd2_core)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1005,7 +1005,7 @@ static MACHINE_CONFIG_DERIVED( mnight, ninjakd2_core )
 	MCFG_DEVICE_REMOVE("pcm")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( arkarea, ninjakd2_core )
+MACHINE_CONFIG_DERIVED(ninjakd2_state::arkarea, ninjakd2_core)
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(mnight_main_cpu)
@@ -1020,7 +1020,7 @@ static MACHINE_CONFIG_DERIVED( arkarea, ninjakd2_core )
 	MCFG_DEVICE_REMOVE("pcm")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( robokid, mnight )
+MACHINE_CONFIG_DERIVED(ninjakd2_state::robokid, mnight)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1041,7 +1041,7 @@ static MACHINE_CONFIG_DERIVED( robokid, mnight )
 	MCFG_SCREEN_UPDATE_DRIVER(ninjakd2_state, screen_update_robokid)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( omegaf, robokid )
+MACHINE_CONFIG_DERIVED(ninjakd2_state::omegaf, robokid)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")

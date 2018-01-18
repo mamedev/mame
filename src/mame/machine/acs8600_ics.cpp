@@ -92,7 +92,7 @@ static const z80_daisy_config ics_daisy_chain[] =
 	nullptr
 };
 
-MACHINE_CONFIG_MEMBER( acs8600_ics_device::device_add_mconfig )
+MACHINE_CONFIG_START(acs8600_ics_device::device_add_mconfig)
 	MCFG_CPU_ADD("icscpu", Z80, XTAL_4MHz)
 	MCFG_CPU_PROGRAM_MAP(ics_mem)
 	MCFG_CPU_IO_MAP(ics_io)

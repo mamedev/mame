@@ -14,7 +14,7 @@ typedef device_delegate<void (int *code, int *color, int *priority)> k05324x_cb_
 	k05324x_device::set_bpp(*device, _bpp);
 
 #define MCFG_K05324X_CB(_class, _method) \
-	k05324x_device::set_k05324x_callback(*device, k05324x_cb_delegate(&_class::_method, #_class "::" #_method, downcast<_class *>(owner)));
+	k05324x_device::set_k05324x_callback(*device, k05324x_cb_delegate(&_class::_method, #_class "::" #_method, this));
 
 #define MCFG_K05324X_OFFSETS(_xoffs, _yoffs) \
 	k05324x_device::set_offsets(*device, _xoffs, _yoffs);

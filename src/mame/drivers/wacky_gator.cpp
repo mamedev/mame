@@ -83,6 +83,7 @@ public:
 
 	TIMER_DEVICE_CALLBACK_MEMBER(nmi_timer)     { m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE); }
 
+	void wackygtr(machine_config &config);
 private:
 	int     m_adpcm_sel;
 	uint16_t  m_adpcm_pos;
@@ -271,7 +272,7 @@ static ADDRESS_MAP_START( program_map, AS_PROGRAM, 8, wackygtr_state )
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static MACHINE_CONFIG_START( wackygtr )
+MACHINE_CONFIG_START(wackygtr_state::wackygtr)
 
 	MCFG_CPU_ADD("maincpu", MC6809, XTAL_3_579545MHz)   // HD68B09P
 	MCFG_CPU_PROGRAM_MAP(program_map)

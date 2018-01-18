@@ -94,6 +94,9 @@ public:
 	DECLARE_DRIVER_INIT(okean240);
 	uint32_t screen_update_okean240(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
+	void okean240a(machine_config &config);
+	void okean240t(machine_config &config);
+	void okean240(machine_config &config);
 private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -492,7 +495,7 @@ static GFXDECODE_START( okean240a )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( okean240t )
+MACHINE_CONFIG_START(okean240_state::okean240t)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",I8080, XTAL_12MHz / 6)
 	MCFG_CPU_PROGRAM_MAP(okean240_mem)
@@ -537,7 +540,7 @@ static MACHINE_CONFIG_START( okean240t )
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( okean240a, okean240t )
+MACHINE_CONFIG_DERIVED(okean240_state::okean240a, okean240t)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(okean240a_io)
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", okean240a)
@@ -556,7 +559,7 @@ static MACHINE_CONFIG_DERIVED( okean240a, okean240t )
 	MCFG_PIT8253_CLK1(1536000) // artificial rate
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( okean240, okean240t )
+MACHINE_CONFIG_DERIVED(okean240_state::okean240, okean240t)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(okean240_io)
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", okean240)

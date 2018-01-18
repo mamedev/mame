@@ -424,7 +424,7 @@ static const atari_rle_objects_config modesc_pitfight =
  *
  *************************************/
 
-static MACHINE_CONFIG_START( atarig1 )
+MACHINE_CONFIG_START(atarig1_state::atarig1)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, ATARI_CLOCK_14MHz)
@@ -466,42 +466,42 @@ static MACHINE_CONFIG_START( atarig1 )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( hydra, atarig1 )
+MACHINE_CONFIG_DERIVED(atarig1_state::hydra, atarig1)
 	MCFG_ATARIRLE_ADD("rle", modesc_hydra)
 	MCFG_SLAPSTIC_ADD("slapstic", 116)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( hydrap, hydra )
+MACHINE_CONFIG_DERIVED(atarig1_state::hydrap, hydra)
 	MCFG_DEVICE_REMOVE("slapstic")
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( pitfight9, atarig1 )
+MACHINE_CONFIG_DERIVED(atarig1_state::pitfight9, atarig1)
 	MCFG_ATARIRLE_ADD("rle", modesc_pitfight)
 	MCFG_SLAPSTIC_ADD("slapstic", 114)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( pitfight7, atarig1 )
+MACHINE_CONFIG_DERIVED(atarig1_state::pitfight7, atarig1)
 	MCFG_ATARIRLE_ADD("rle", modesc_pitfight)
 	MCFG_SLAPSTIC_ADD("slapstic", 112)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( pitfight, atarig1 )
+MACHINE_CONFIG_DERIVED(atarig1_state::pitfight, atarig1)
 	MCFG_ATARIRLE_ADD("rle", modesc_pitfight)
 	MCFG_SLAPSTIC_ADD("slapstic", 111)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( pitfightj, atarig1 )
+MACHINE_CONFIG_DERIVED(atarig1_state::pitfightj, atarig1)
 	MCFG_ATARIRLE_ADD("rle", modesc_pitfight)
 	MCFG_SLAPSTIC_ADD("slapstic", 113)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( pitfightb, atarig1 )
+MACHINE_CONFIG_DERIVED(atarig1_state::pitfightb, atarig1)
 	MCFG_ATARIRLE_ADD("rle", modesc_pitfight)
 MACHINE_CONFIG_END
 

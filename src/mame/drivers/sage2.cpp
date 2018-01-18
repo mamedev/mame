@@ -407,7 +407,7 @@ READ16_MEMBER(sage2_state::rom_r)
 //  MACHINE_CONFIG( sage2 )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( sage2 )
+MACHINE_CONFIG_START(sage2_state::sage2)
 	// basic machine hardware
 	MCFG_CPU_ADD(M68000_TAG, M68000, XTAL_16MHz/2)
 	MCFG_CPU_PROGRAM_MAP(sage2_mem)

@@ -318,7 +318,7 @@ INTERRUPT_GEN_MEMBER(raiden_state::raiden_interrupt)
 	device.execute().set_input_line_and_vector(0, HOLD_LINE, 0xc8/4); /* VBL */
 }
 
-static MACHINE_CONFIG_START( raiden )
+MACHINE_CONFIG_START(raiden_state::raiden)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", V30,XTAL_20MHz/2) /* NEC V30 CPU, 20MHz verified on pcb */
@@ -367,7 +367,7 @@ static MACHINE_CONFIG_START( raiden )
 	MCFG_SEIBU_SOUND_YM_WRITE_CB(DEVWRITE8("ymsnd", ym3812_device, write))
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( raidene, raiden )
+MACHINE_CONFIG_DERIVED(raiden_state::raidene, raiden)
 	MCFG_DEVICE_MODIFY("audiocpu")
 	MCFG_CPU_PROGRAM_MAP(raiden_sound_map)
 	MCFG_CPU_DECRYPTED_OPCODES_MAP(raiden_sound_decrypted_opcodes_map)
@@ -376,7 +376,7 @@ static MACHINE_CONFIG_DERIVED( raidene, raiden )
 	MCFG_DEVICE_PROGRAM_MAP(sei80bu_encrypted_full_map)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( raidenu, raidene )
+MACHINE_CONFIG_DERIVED(raiden_state::raidenu, raidene)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -391,7 +391,7 @@ WRITE16_MEMBER( raiden_state::raidenb_layer_scroll_w )
 	COMBINE_DATA(&m_raidenb_scroll_ram[offset]);
 }
 
-static MACHINE_CONFIG_DERIVED( raidenb, raiden )
+MACHINE_CONFIG_DERIVED(raiden_state::raidenb, raiden)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")

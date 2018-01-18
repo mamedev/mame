@@ -27,6 +27,7 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
+	void age_candy(machine_config &config);
 //  required_device<mcs51_cpu_device> m_maincpu;
 };
 
@@ -50,7 +51,7 @@ static ADDRESS_MAP_START(age_candy_map, AS_PROGRAM, 8, age_candy_state)
 ADDRESS_MAP_END
 #endif
 
-static MACHINE_CONFIG_START( age_candy )
+MACHINE_CONFIG_START(age_candy_state::age_candy)
 
 	/* basic machine hardware */
 //  MCFG_CPU_ADD("maincpu", HPC46104, 8000000) // unknown clock; HPC emulation needed

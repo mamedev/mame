@@ -518,6 +518,10 @@ public:
 	CUSTOM_INPUT_MEMBER(coin_usa_r);
 	CUSTOM_INPUT_MEMBER(hopper_r);
 
+	void aristmk5(machine_config &config);
+	void aristmk5_touch(machine_config &config);
+	void aristmk5_usa_touch(machine_config &config);
+	void aristmk5_usa(machine_config &config);
 private:
 	required_device_array<eeprom_serial_93cxx_device, 2> m_eeprom;
 	required_device<ds1302_device> m_rtc;
@@ -2011,7 +2015,7 @@ void aristmk5_state::machine_reset()
 }
 
 
-static MACHINE_CONFIG_START( aristmk5 )
+MACHINE_CONFIG_START(aristmk5_state::aristmk5)
 	MCFG_CPU_ADD("maincpu", ARM, MASTER_CLOCK/6)    // 12000000
 	MCFG_CPU_PROGRAM_MAP(aristmk5_drame_map)
 
@@ -2087,19 +2091,19 @@ static MACHINE_CONFIG_START( aristmk5 )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( aristmk5_touch, aristmk5 )
+MACHINE_CONFIG_DERIVED(aristmk5_state::aristmk5_touch, aristmk5)
 	MCFG_DEVICE_MODIFY("uart_0a")
 	MCFG_INS8250_OUT_TX_CB(DEVWRITELINE("microtouch", microtouch_device, rx))
 
 	MCFG_MICROTOUCH_ADD("microtouch", 2400, DEVWRITELINE("uart_0a", ins8250_uart_device, rx_w))
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( aristmk5_usa, aristmk5 )
+MACHINE_CONFIG_DERIVED(aristmk5_state::aristmk5_usa, aristmk5)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(aristmk5_usa_map)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( aristmk5_usa_touch, aristmk5_usa )
+MACHINE_CONFIG_DERIVED(aristmk5_state::aristmk5_usa_touch, aristmk5_usa)
 	MCFG_DEVICE_MODIFY("uart_0a")
 	MCFG_INS8250_OUT_TX_CB(DEVWRITELINE("microtouch", microtouch_device, rx))
 

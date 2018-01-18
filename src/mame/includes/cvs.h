@@ -139,4 +139,5 @@ public:
 	void cvs_init_stars(  );
 	void cvs_update_stars(bitmap_ind16 &bitmap, const rectangle &cliprect, const pen_t star_pen, bool update_always);
 	void start_393hz_timer();
+	void cvs(machine_config &config);
 };

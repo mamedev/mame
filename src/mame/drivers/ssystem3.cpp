@@ -286,7 +286,7 @@ INPUT_PORTS_END
 
 
 
-static MACHINE_CONFIG_START( ssystem3 )
+MACHINE_CONFIG_START(ssystem3_state::ssystem3)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, 1000000)
 	MCFG_CPU_PROGRAM_MAP(ssystem3_map)

@@ -270,7 +270,7 @@ const tiny_rom_entry *pioneer_ldv1000_device::device_rom_region() const
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( pioneer_ldv1000_device::device_add_mconfig )
+MACHINE_CONFIG_START(pioneer_ldv1000_device::device_add_mconfig)
 	MCFG_CPU_ADD("ldv1000", Z80, XTAL_5MHz/2)
 	MCFG_Z80_DAISY_CHAIN(daisy_chain)
 	MCFG_CPU_PROGRAM_MAP(ldv1000_map)

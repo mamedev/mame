@@ -87,7 +87,7 @@ WRITE_LINE_MEMBER( s100_wunderbus_device::rtc_tp_w )
 //-------------------------------------------------
 
 
-MACHINE_CONFIG_MEMBER( s100_wunderbus_device::device_add_mconfig )
+MACHINE_CONFIG_START(s100_wunderbus_device::device_add_mconfig)
 	MCFG_DEVICE_ADD(I8259A_TAG, PIC8259, 0)
 	MCFG_PIC8259_OUT_INT_CB(WRITELINE(s100_wunderbus_device, pic_int_w))
 	MCFG_PIC8259_IN_SP_CB(VCC)

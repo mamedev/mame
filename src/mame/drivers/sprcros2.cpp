@@ -104,6 +104,7 @@ public:
 	bool m_slave_nmi_enable;
 	bool m_screen_enable;
 	uint8_t m_bg_scrollx, m_bg_scrolly;
+	void sprcros2(machine_config &config);
 protected:
 	// driver_device overrides
 	virtual void machine_start() override;
@@ -442,7 +443,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(sprcros2_state::master_scanline)
 		m_master_cpu->set_input_line(0, HOLD_LINE);
 }
 
-static MACHINE_CONFIG_START( sprcros2 )
+MACHINE_CONFIG_START(sprcros2_state::sprcros2)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("master_cpu",Z80,MAIN_CLOCK/4)

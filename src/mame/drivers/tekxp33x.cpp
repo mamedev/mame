@@ -53,6 +53,7 @@ public:
 
 	virtual void video_start() override;
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	void tekxp330(machine_config &config);
 };
 
 /* Memory Maps */
@@ -89,7 +90,7 @@ void tekxp330_state::machine_start()
 
 /* Machine Driver */
 
-static MACHINE_CONFIG_START( tekxp330 )
+MACHINE_CONFIG_START(tekxp330_state::tekxp330)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", R3052, XTAL_20MHz) /* IDT 79R3052E, clock unknown */
 	MCFG_R3000_ENDIANNESS(ENDIANNESS_BIG)

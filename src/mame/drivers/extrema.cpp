@@ -24,6 +24,7 @@ public:
 		m_maincpu(*this, "maincpu") { }
 
 	required_device<cpu_device> m_maincpu;
+	void extrema(machine_config &config);
 };
 
 
@@ -43,7 +44,7 @@ static INPUT_PORTS_START( extrema )
 INPUT_PORTS_END
 
 
-static MACHINE_CONFIG_START( extrema )
+MACHINE_CONFIG_START(extrema_state::extrema)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 6000000)
 	MCFG_CPU_PROGRAM_MAP(extrema_map)

@@ -295,7 +295,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( micro3d )
+MACHINE_CONFIG_START(micro3d_state::micro3d)
 
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_32MHz / 2)
 	MCFG_CPU_PROGRAM_MAP(hostmem)
@@ -388,7 +388,7 @@ static MACHINE_CONFIG_START( micro3d )
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED( botss11, micro3d )
+MACHINE_CONFIG_DERIVED(micro3d_state::botss11, micro3d)
 	MCFG_DEVICE_MODIFY("adc")
 	MCFG_ADC0844_CH1_CB(NOOP)
 MACHINE_CONFIG_END

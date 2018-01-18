@@ -36,6 +36,7 @@ public:
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
+	void m74(machine_config &config);
 protected:
 
 	// devices
@@ -75,7 +76,7 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START( m74 )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( m74 )
+MACHINE_CONFIG_START(m74_state::m74)
 	MCFG_CPU_ADD("maincpu", M37450, XTAL_8MHz) /* C68 @ 8.0MHz - main CPU */
 	MCFG_CPU_PROGRAM_MAP(c68_map)
 

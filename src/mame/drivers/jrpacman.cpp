@@ -118,6 +118,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(irq_mask_w);
 	DECLARE_DRIVER_INIT(jrpacman);
 	INTERRUPT_GEN_MEMBER(vblank_irq);
+	void jrpacman(machine_config &config);
 };
 
 
@@ -270,7 +271,7 @@ INTERRUPT_GEN_MEMBER(jrpacman_state::vblank_irq)
 		device.execute().set_input_line(0, HOLD_LINE);
 }
 
-static MACHINE_CONFIG_START( jrpacman )
+MACHINE_CONFIG_START(jrpacman_state::jrpacman)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 18432000/6)    /* 3.072 MHz */

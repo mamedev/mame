@@ -443,7 +443,7 @@ static GFXDECODE_START( shangha3 )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( shangha3 )
+MACHINE_CONFIG_START(shangha3_state::shangha3)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_48MHz/3) // TMP68HC000N-16
@@ -480,7 +480,7 @@ static MACHINE_CONFIG_START( shangha3 )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( heberpop )
+MACHINE_CONFIG_START(shangha3_state::heberpop)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_48MHz/3) // TMP68HC000N-16 like the others??
@@ -524,7 +524,7 @@ static MACHINE_CONFIG_START( heberpop )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( blocken )
+MACHINE_CONFIG_START(shangha3_state::blocken)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_48MHz/3) // TMP68HC000N-16

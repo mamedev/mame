@@ -229,6 +229,7 @@ public:
 	virtual void machine_reset() override;
 	TIMER_CALLBACK_MEMBER(m_aces1_irq_timer_callback);
 	TIMER_CALLBACK_MEMBER(m_aces1_nmi_timer_callback);
+	void aces1(machine_config &config);
 };
 
 
@@ -428,7 +429,7 @@ static INPUT_PORTS_START( aces1 )
 INPUT_PORTS_END
 
 
-static MACHINE_CONFIG_START( aces1 )
+MACHINE_CONFIG_START(aces1_state::aces1)
 
 	MCFG_CPU_ADD("maincpu", Z80, 4000000) /* ?? Mhz */
 	MCFG_CPU_PROGRAM_MAP(aces1_map)

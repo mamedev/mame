@@ -63,6 +63,7 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline);
 	uint8_t m_fg_tilebank;
 	bool m_rowscroll_enable;
+	void metlfrzr(machine_config &config);
 };
 
 
@@ -357,7 +358,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(metlfrzr_state::scanline)
 		m_maincpu->set_input_line_and_vector(0, HOLD_LINE,0x08); /* RST 08h */
 }
 
-static MACHINE_CONFIG_START(metlfrzr)
+MACHINE_CONFIG_START(metlfrzr_state::metlfrzr)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_12MHz / 2)

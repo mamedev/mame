@@ -167,6 +167,8 @@ public:
 
 	required_device<pico_cart_slot_device> m_picocart;
 	DECLARE_MACHINE_START(pico);
+	void pico(machine_config &config);
+	void picopal(machine_config &config);
 };
 
 
@@ -385,7 +387,7 @@ MACHINE_START_MEMBER(pico_state,pico)
 	m_vdp->stop_timers();
 }
 
-static MACHINE_CONFIG_START( pico )
+MACHINE_CONFIG_START(pico_state::pico)
 	MCFG_FRAGMENT_ADD( md_ntsc )
 
 	MCFG_CPU_MODIFY("maincpu")
@@ -406,7 +408,7 @@ static MACHINE_CONFIG_START( pico )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.16)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( picopal )
+MACHINE_CONFIG_START(pico_state::picopal)
 	MCFG_FRAGMENT_ADD( md_pal )
 
 	MCFG_CPU_MODIFY("maincpu")
@@ -561,6 +563,7 @@ public:
 
 	required_device<copera_cart_slot_device> m_picocart;
 	DECLARE_MACHINE_START(copera);
+	void copera(machine_config &config);
 };
 
 
@@ -597,7 +600,7 @@ MACHINE_START_MEMBER(copera_state,copera)
 
 }
 
-static MACHINE_CONFIG_START( copera )
+MACHINE_CONFIG_START(copera_state::copera)
 	MCFG_FRAGMENT_ADD( md_ntsc )
 
 	MCFG_CPU_MODIFY("maincpu")

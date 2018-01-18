@@ -771,7 +771,7 @@ ADDRESS_MAP_END
 
 // machine driver for maygay m1 board /////////////////////////////////
 
-MACHINE_CONFIG_START( maygay_m1 )
+MACHINE_CONFIG_START(maygay1b_state::maygay_m1)
 
 	MCFG_CPU_ADD("maincpu", MC6809, M1_MASTER_CLOCK/2) // claimed to be 4 MHz
 	MCFG_CPU_PROGRAM_MAP(m1_memmap)
@@ -848,11 +848,11 @@ MACHINE_CONFIG_START( maygay_m1 )
 	MCFG_DEFAULT_LAYOUT(layout_maygay1b)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED( maygay_m1_no_oki, maygay_m1 )
+MACHINE_CONFIG_DERIVED(maygay1b_state::maygay_m1_no_oki, maygay_m1)
 	MCFG_DEVICE_REMOVE("msm6376")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED( maygay_m1_nec, maygay_m1 )
+MACHINE_CONFIG_DERIVED(maygay1b_state::maygay_m1_nec, maygay_m1)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(m1_nec_memmap)
 

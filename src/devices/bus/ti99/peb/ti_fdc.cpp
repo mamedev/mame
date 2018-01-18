@@ -449,7 +449,7 @@ ROM_START( ti_fdc )
 	ROM_LOAD("fdc_dsr.u27", 0x1000, 0x1000, CRC(2c921087) SHA1(3646c3bcd2dce16b918ee01ea65312f36ae811d2)) /* TI disk DSR ROM second 4K */
 ROM_END
 
-MACHINE_CONFIG_MEMBER( ti_fdc_device::device_add_mconfig )
+MACHINE_CONFIG_START(ti_fdc_device::device_add_mconfig)
 	MCFG_FD1771_ADD(FDC_TAG, XTAL_1MHz)
 	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(ti_fdc_device, fdc_irq_w))
 	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(ti_fdc_device, fdc_drq_w))

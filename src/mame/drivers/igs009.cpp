@@ -118,6 +118,8 @@ public:
 	DECLARE_VIDEO_START(gp98);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void gp98(machine_config &config);
+	void jingbell(machine_config &config);
 };
 
 
@@ -808,7 +810,7 @@ INTERRUPT_GEN_MEMBER(igs009_state::interrupt)
 		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
-static MACHINE_CONFIG_START( jingbell )
+MACHINE_CONFIG_START(igs009_state::jingbell)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z180, XTAL_12MHz / 2)   /* HD64180RP8, 8 MHz? */
 	MCFG_CPU_PROGRAM_MAP(jingbell_map)
@@ -850,7 +852,7 @@ static MACHINE_CONFIG_START( jingbell )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( gp98, jingbell )
+MACHINE_CONFIG_DERIVED(igs009_state::gp98, jingbell)
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(gp98_portmap)

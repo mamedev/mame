@@ -532,7 +532,7 @@ GFXDECODE_END
 
 /* Machine Driver Bits */
 
-static MACHINE_CONFIG_START( shadfrce )
+MACHINE_CONFIG_START(shadfrce_state::shadfrce)
 
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_28MHz / 2)          /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(shadfrce_map)

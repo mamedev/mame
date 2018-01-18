@@ -139,6 +139,23 @@ public:
 	// bootleg stuff
 	void tilemap_16b_fpointbl_fill_latch(int i, uint16_t* latched_pageselect, uint16_t* latched_yscroll, uint16_t* latched_xscroll, uint16_t* textram);
 
+	void rom_5797_fragment(machine_config &config);
+	void system16b_fd1094_5797(machine_config &config);
+	void fpointbla(machine_config &config);
+	void atomicp(machine_config &config);
+	void aceattacb_fd1094(machine_config &config);
+	void system16b_i8751(machine_config &config);
+	void system16c(machine_config &config);
+	void system16b_mc8123(machine_config &config);
+	void system16b_i8751_5797(machine_config &config);
+	void system16b_fd1089a(machine_config &config);
+	void system16b_5797(machine_config &config);
+	void system16b_split(machine_config &config);
+	void system16b_fd1089b(machine_config &config);
+	void system16b(machine_config &config);
+	void system16b_fd1094(machine_config &config);
+	void fpointbl(machine_config &config);
+	void lockonph(machine_config &config);
 protected:
 	// internal types
 	typedef delegate<void ()> i8751_sim_delegate;
@@ -330,4 +347,5 @@ public:
 	uint8_t           m_rle_control_byte;
 	bool            m_rle_latched;
 	uint8_t           m_rle_byte;
+	void isgsm(machine_config &config);
 };

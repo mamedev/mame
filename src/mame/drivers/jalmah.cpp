@@ -232,6 +232,8 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	void urashima(machine_config &config);
+	void jalmah(machine_config &config);
 };
 
 
@@ -1418,7 +1420,7 @@ void jalmah_state::machine_reset()
 	}
 }
 
-static MACHINE_CONFIG_START( jalmah )
+MACHINE_CONFIG_START(jalmah_state::jalmah)
 	MCFG_CPU_ADD("maincpu" , M68000, 12000000) /* 68000-8 */
 	MCFG_CPU_PROGRAM_MAP(jalmah)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", jalmah_state,  irq2_line_hold)
@@ -1445,7 +1447,7 @@ static MACHINE_CONFIG_START( jalmah )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( urashima, jalmah )
+MACHINE_CONFIG_DERIVED(jalmah_state::urashima, jalmah)
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(urashima)

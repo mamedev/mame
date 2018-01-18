@@ -85,4 +85,6 @@ public:
 	{
 		return 0xffff;
 	}
+	void spbactn(machine_config &config);
+	void spbactnp(machine_config &config);
 };

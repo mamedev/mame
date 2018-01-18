@@ -702,7 +702,7 @@ void trs80m2_state::machine_reset()
 //  MACHINE_CONFIG( trs80m2 )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( trs80m2 )
+MACHINE_CONFIG_START(trs80m2_state::trs80m2)
 	// basic machine hardware
 	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL_8MHz/2)
 	MCFG_Z80_DAISY_CHAIN(trs80m2_daisy_chain)
@@ -787,7 +787,7 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( trs80m16 )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( trs80m16 )
+MACHINE_CONFIG_START(trs80m16_state::trs80m16)
 	// basic machine hardware
 	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL_8MHz/2)
 	MCFG_Z80_DAISY_CHAIN(trs80m2_daisy_chain)

@@ -153,7 +153,7 @@ DEFINE_DEVICE_TYPE(C64_TDOS, c64_tdos_cartridge_device, "c64_tdos", "C64 TDOS ca
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( c64_tdos_cartridge_device::device_add_mconfig )
+MACHINE_CONFIG_START(c64_tdos_cartridge_device::device_add_mconfig)
 	MCFG_DEVICE_ADD(MC68A52P_TAG, MC6852, XTAL_6_5MHz)
 
 	MCFG_C64_PASSTHRU_EXPANSION_SLOT_ADD()

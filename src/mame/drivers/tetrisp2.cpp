@@ -1329,7 +1329,7 @@ DRIVER_INIT_MEMBER(stepstag_state,stepstag)
 }
 
 
-static MACHINE_CONFIG_START( tetrisp2 )
+MACHINE_CONFIG_START(tetrisp2_state::tetrisp2)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 12000000)
@@ -1364,7 +1364,7 @@ static MACHINE_CONFIG_START( tetrisp2 )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( nndmseal )
+MACHINE_CONFIG_START(tetrisp2_state::nndmseal)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_12MHz)
@@ -1397,7 +1397,7 @@ static MACHINE_CONFIG_START( nndmseal )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( rockn )
+MACHINE_CONFIG_START(tetrisp2_state::rockn)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 12000000)
@@ -1431,7 +1431,7 @@ static MACHINE_CONFIG_START( rockn )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( rockn2 )
+MACHINE_CONFIG_START(tetrisp2_state::rockn2)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 12000000)
@@ -1465,7 +1465,7 @@ static MACHINE_CONFIG_START( rockn2 )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( rocknms )
+MACHINE_CONFIG_START(tetrisp2_state::rocknms)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 12000000)
@@ -1515,7 +1515,7 @@ static MACHINE_CONFIG_START( rocknms )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( stepstag )
+MACHINE_CONFIG_START(stepstag_state::stepstag)
 	MCFG_CPU_ADD("maincpu", M68000, 16000000 ) //??
 	MCFG_CPU_PROGRAM_MAP(stepstag_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", tetrisp2_state,  irq2_line_hold) // lev 4 triggered by system timer

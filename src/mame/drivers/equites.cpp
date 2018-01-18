@@ -1028,7 +1028,7 @@ static const char *const alphamc07_sample_names[] =
 #define MSM5232_BASE_VOLUME 1.0
 
 // the sound board is the same in all games
-static MACHINE_CONFIG_START( common_sound )
+MACHINE_CONFIG_START(equites_state::common_sound)
 
 	MCFG_CPU_ADD("audiocpu", I8085A, XTAL_6_144MHz) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
@@ -1127,7 +1127,7 @@ void equites_state::machine_reset()
 }
 
 
-static MACHINE_CONFIG_START( equites )
+MACHINE_CONFIG_START(equites_state::equites)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_12MHz/4) /* 68000P8 running at 3mhz! verified on pcb */
@@ -1162,7 +1162,7 @@ static MACHINE_CONFIG_START( equites )
 	MCFG_VIDEO_START_OVERRIDE(equites_state,equites)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( gekisou, equites )
+MACHINE_CONFIG_DERIVED(equites_state::gekisou, equites)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1177,7 +1177,7 @@ static MACHINE_CONFIG_DERIVED( gekisou, equites )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( splndrbt )
+MACHINE_CONFIG_START(equites_state::splndrbt)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz/4) /* 68000P8 running at 6mhz, verified on pcb */
@@ -1211,7 +1211,7 @@ static MACHINE_CONFIG_START( splndrbt )
 	MCFG_VIDEO_START_OVERRIDE(equites_state,splndrbt)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( hvoltage, splndrbt )
+MACHINE_CONFIG_DERIVED(equites_state::hvoltage, splndrbt)
 
 	// mcu not dumped, so add simulated mcu
 	MCFG_CPU_ADD("mcu", ALPHA8301L, 4000000/8)

@@ -112,6 +112,8 @@ protected:
 	optional_device<dooyong_rom_tilemap_device> m_bg2;
 	optional_device<dooyong_rom_tilemap_device> m_fg;
 	optional_device<dooyong_rom_tilemap_device> m_fg2;
+
+	void sound_2151_4mhz(machine_config &config);
 };
 
 class dooyong_z80_state : public dooyong_state
@@ -215,6 +217,10 @@ public:
 		save_item(NAME(m_tx_pri));
 	}
 
+	void sound_2151(machine_config &config);
+	void bluehawk(machine_config &config);
+	void flytiger(machine_config &config);
+	void primella(machine_config &config);
 protected:
 	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, unsigned extensions = 0);
 
@@ -283,6 +289,10 @@ public:
 		save_item(NAME(m_interrupt_line_2));
 	}
 
+	void sound_2203(machine_config &config);
+	void pollux(machine_config &config);
+	void lastday(machine_config &config);
+	void gulfstrm(machine_config &config);
 protected:
 	int m_interrupt_line_1 = 0;
 	int m_interrupt_line_2 = 0;
@@ -337,6 +347,9 @@ public:
 		/* Register for save/restore */
 		save_item(NAME(m_bg2_priority));
 	}
+	void dooyong_68k(machine_config &config);
+	void superx(machine_config &config);
+	void rshark(machine_config &config);
 };
 
 
@@ -362,6 +375,7 @@ public:
 		save_item(NAME(m_bg2_priority)); // Not used atm
 	}
 
+		void popbingo(machine_config &config);
 protected:
 	bitmap_ind16 m_bg_bitmap;
 	bitmap_ind16 m_bg2_bitmap;
@@ -1414,7 +1428,7 @@ WRITE_LINE_MEMBER(dooyong_z80_ym2203_state::irqhandler_2203_2)
 ***************************************************************************/
 
 
-MACHINE_CONFIG_START( sound_2203 )
+MACHINE_CONFIG_START(dooyong_z80_ym2203_state::sound_2203)
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
@@ -1430,7 +1444,7 @@ MACHINE_CONFIG_START( sound_2203 )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START( sound_2151 )
+MACHINE_CONFIG_START(dooyong_z80_state::sound_2151)
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
@@ -1444,7 +1458,7 @@ MACHINE_CONFIG_START( sound_2151 )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START( sound_2151_4mhz )
+MACHINE_CONFIG_START(dooyong_state::sound_2151_4mhz )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
@@ -1458,7 +1472,7 @@ MACHINE_CONFIG_START( sound_2151_4mhz )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START( lastday )
+MACHINE_CONFIG_START(dooyong_z80_ym2203_state::lastday)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_16MHz/2)   /* 8MHz verified for Last Day / D-day */
@@ -1511,7 +1525,7 @@ MACHINE_CONFIG_START( lastday )
 
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START( gulfstrm )
+MACHINE_CONFIG_START(dooyong_z80_ym2203_state::gulfstrm)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 8000000)   /* ??? */
@@ -1550,7 +1564,7 @@ MACHINE_CONFIG_START( gulfstrm )
 	MCFG_FRAGMENT_ADD( sound_2203 ) /* 3.579545MHz */
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START( pollux )
+MACHINE_CONFIG_START(dooyong_z80_ym2203_state::pollux)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_16MHz/2)   /* 8Mhz */
@@ -1589,7 +1603,7 @@ MACHINE_CONFIG_START( pollux )
 	MCFG_FRAGMENT_ADD( sound_2203 ) /* 3.579545MHz or 4Mhz ??? */
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START( bluehawk )
+MACHINE_CONFIG_START(dooyong_z80_state::bluehawk)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 8000000)   /* ??? */
@@ -1629,7 +1643,7 @@ MACHINE_CONFIG_START( bluehawk )
 	MCFG_FRAGMENT_ADD( sound_2151 ) /* 3.579545MHz or 4Mhz ??? */
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START( flytiger )
+MACHINE_CONFIG_START(dooyong_z80_state::flytiger)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_16MHz/2)   /* 8MHz */
@@ -1668,7 +1682,7 @@ MACHINE_CONFIG_START( flytiger )
 	MCFG_FRAGMENT_ADD( sound_2151 )
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START( primella )
+MACHINE_CONFIG_START(dooyong_z80_state::primella)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_16MHz/2)   /* 8MHz */
@@ -1718,7 +1732,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(dooyong_68k_state::scanline)
 }
 
 
-MACHINE_CONFIG_START( dooyong_68k )
+MACHINE_CONFIG_START(rshark_state::dooyong_68k)
 
 	// basic machine hardware
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_8MHz)  // 8MHz measured on Super-X
@@ -1757,17 +1771,17 @@ MACHINE_CONFIG_START( dooyong_68k )
 	MCFG_FRAGMENT_ADD(sound_2151_4mhz)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED( rshark, dooyong_68k )
+MACHINE_CONFIG_DERIVED(rshark_state::rshark, dooyong_68k)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(rshark_map)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED( superx, dooyong_68k )
+MACHINE_CONFIG_DERIVED(rshark_state::superx, dooyong_68k)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(superx_map)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START( popbingo )
+MACHINE_CONFIG_START(popbingo_state::popbingo)
 
 	// basic machine hardware
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_20MHz/2)   // 10MHz measured

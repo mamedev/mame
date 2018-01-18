@@ -76,4 +76,11 @@ public:
 	void sega_generate_vector_list();
 	offs_t decrypt_offset(address_space &space, offs_t offset);
 	inline uint8_t demangle(uint8_t d7d6, uint8_t d5d4, uint8_t d3d2, uint8_t d1d0);
+	void g80v_base(machine_config &config);
+	void tacscan(machine_config &config);
+	void elim2(machine_config &config);
+	void startrek(machine_config &config);
+	void zektor(machine_config &config);
+	void spacfury(machine_config &config);
+	void sega_speech_board(machine_config &config);
 };

@@ -398,7 +398,7 @@ static GFXDECODE_START( sprint4 )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( sprint4 )
+MACHINE_CONFIG_START(sprint4_state::sprint4)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, PIXEL_CLOCK / 8)

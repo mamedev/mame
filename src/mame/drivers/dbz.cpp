@@ -325,7 +325,7 @@ void dbz_state::machine_reset()
 	m_control = 0;
 }
 
-static MACHINE_CONFIG_START( dbz )
+MACHINE_CONFIG_START(dbz_state::dbz)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 16000000)

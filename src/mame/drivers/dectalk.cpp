@@ -321,6 +321,7 @@ public:
 	uint16_t dsp_outfifo_r();
 	DECLARE_WRITE_LINE_MEMBER(dectalk_reset);
 
+	void dectalk(machine_config &config);
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
@@ -868,7 +869,7 @@ TIMER_CALLBACK_MEMBER(dectalk_state::outfifo_read_cb)
 	    duart_rx_break(duart, 1, 0);*/
 }
 
-static MACHINE_CONFIG_START( dectalk )
+MACHINE_CONFIG_START(dectalk_state::dectalk)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_20MHz/2) /* E74 20MHz OSC (/2) */
 	MCFG_CPU_PROGRAM_MAP(m68k_mem)

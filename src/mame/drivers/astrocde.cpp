@@ -1245,7 +1245,7 @@ static const z80_daisy_config tenpin_daisy_chain[] =
  *
  *************************************/
 
-static MACHINE_CONFIG_START( astrocade_base )
+MACHINE_CONFIG_START(astrocde_state::astrocade_base)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, ASTROCADE_CLOCK/4)
@@ -1264,7 +1264,7 @@ static MACHINE_CONFIG_START( astrocade_base )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( astrocade_16color_base, astrocade_base )
+MACHINE_CONFIG_DERIVED(astrocde_state::astrocade_16color_base, astrocade_base)
 
 	/* basic machine hardware */
 	MCFG_DEVICE_ADD("bank4000", ADDRESS_MAP_BANK, 0)
@@ -1288,7 +1288,7 @@ static MACHINE_CONFIG_DERIVED( astrocade_16color_base, astrocade_base )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( astrocade_mono_sound )
+MACHINE_CONFIG_START(astrocde_state::astrocade_mono_sound)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -1298,7 +1298,7 @@ static MACHINE_CONFIG_START( astrocade_mono_sound )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( astrocade_stereo_sound )
+MACHINE_CONFIG_START(astrocde_state::astrocade_stereo_sound)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -1318,7 +1318,7 @@ MACHINE_CONFIG_END
  *
  *************************************/
 
-static MACHINE_CONFIG_DERIVED( seawolf2, astrocade_base )
+MACHINE_CONFIG_DERIVED(astrocde_state::seawolf2, astrocade_base)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1344,7 +1344,7 @@ static MACHINE_CONFIG_DERIVED( seawolf2, astrocade_base )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( ebases, astrocade_base )
+MACHINE_CONFIG_DERIVED(astrocde_state::ebases, astrocade_base)
 	MCFG_FRAGMENT_ADD(astrocade_mono_sound)
 
 	/* basic machine hardware */
@@ -1354,7 +1354,7 @@ static MACHINE_CONFIG_DERIVED( ebases, astrocade_base )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( spacezap, astrocade_base )
+MACHINE_CONFIG_DERIVED(astrocde_state::spacezap, astrocade_base)
 	MCFG_FRAGMENT_ADD(astrocade_mono_sound)
 
 	/* basic machine hardware */
@@ -1363,7 +1363,7 @@ static MACHINE_CONFIG_DERIVED( spacezap, astrocade_base )
 	MCFG_CPU_IO_MAP(port_map_mono_pattern)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( wow, astrocade_base )
+MACHINE_CONFIG_DERIVED(astrocde_state::wow, astrocade_base)
 	MCFG_FRAGMENT_ADD(astrocade_stereo_sound)
 
 	/* basic machine hardware */
@@ -1384,7 +1384,7 @@ static MACHINE_CONFIG_DERIVED( wow, astrocade_base )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( gorf, astrocade_base )
+MACHINE_CONFIG_DERIVED(astrocde_state::gorf, astrocade_base)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1410,7 +1410,7 @@ static MACHINE_CONFIG_DERIVED( gorf, astrocade_base )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( robby, astrocade_base )
+MACHINE_CONFIG_DERIVED(astrocde_state::robby, astrocade_base)
 	MCFG_FRAGMENT_ADD(astrocade_stereo_sound)
 
 	/* basic machine hardware */
@@ -1422,7 +1422,7 @@ static MACHINE_CONFIG_DERIVED( robby, astrocade_base )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( profpac, astrocade_16color_base )
+MACHINE_CONFIG_DERIVED(astrocde_state::profpac, astrocade_16color_base)
 	MCFG_FRAGMENT_ADD(astrocade_stereo_sound)
 
 	/* basic machine hardware */
@@ -1436,7 +1436,7 @@ static MACHINE_CONFIG_DERIVED( profpac, astrocade_16color_base )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( demndrgn, astrocade_16color_base )
+MACHINE_CONFIG_DERIVED(astrocde_state::demndrgn, astrocade_16color_base)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1445,7 +1445,7 @@ static MACHINE_CONFIG_DERIVED( demndrgn, astrocade_16color_base )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( tenpindx, astrocade_16color_base )
+MACHINE_CONFIG_DERIVED(astrocde_state::tenpindx, astrocade_16color_base)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")

@@ -411,7 +411,7 @@ GFXDECODE_END
  Machine Driver(s)
 *******************************************************************************/
 
-static MACHINE_CONFIG_START( wwfsstar )
+MACHINE_CONFIG_START(wwfsstar_state::wwfsstar)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, CPU_CLOCK)

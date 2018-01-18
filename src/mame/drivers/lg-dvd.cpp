@@ -17,6 +17,7 @@ public:
 		, m_maincpu(*this, "maincpu")
 	{ }
 
+	void lg(machine_config &config);
 protected:
 	required_device<i80c52_device> m_maincpu;
 };
@@ -28,7 +29,7 @@ static ADDRESS_MAP_START( lg_dvd_map, AS_PROGRAM, 8, lg_dvd_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM AM_REGION("maincpu", 0)
 ADDRESS_MAP_END
 
-static MACHINE_CONFIG_START( lg )
+MACHINE_CONFIG_START(lg_dvd_state::lg)
 	MCFG_CPU_ADD( "maincpu", I80C52, XTAL_16MHz )
 	MCFG_CPU_PROGRAM_MAP( lg_dvd_map )
 MACHINE_CONFIG_END

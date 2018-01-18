@@ -77,6 +77,7 @@ public:
 	DECLARE_WRITE8_MEMBER(key_w);
 	DECLARE_READ8_MEMBER(key_r);
 
+	void sbc6510(machine_config &config);
 private:
 	uint8_t m_key_row;
 	uint8_t m_2;
@@ -264,7 +265,7 @@ static GFXDECODE_START( sbc6510 )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( sbc6510 )
+MACHINE_CONFIG_START(sbc6510_state::sbc6510)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",M6510, XTAL_1MHz)
 	MCFG_CPU_PROGRAM_MAP(sbc6510_mem)

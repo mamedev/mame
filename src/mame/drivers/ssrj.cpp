@@ -139,7 +139,7 @@ static GFXDECODE_START( ssrj )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,     0, 0x10 )
 GFXDECODE_END
 
-static MACHINE_CONFIG_START( ssrj )
+MACHINE_CONFIG_START(ssrj_state::ssrj)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80,8000000/2)

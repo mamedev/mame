@@ -110,6 +110,9 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
+	void galaxi(machine_config &config);
+	void lastfour(machine_config &config);
+	void magjoker(machine_config &config);
 };
 
 
@@ -445,7 +448,7 @@ void galaxi_state::machine_reset()
                               Machine Drivers
 ***************************************************************************/
 
-static MACHINE_CONFIG_START( galaxi )
+MACHINE_CONFIG_START(galaxi_state::galaxi)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, CPU_CLOCK)
@@ -475,7 +478,7 @@ static MACHINE_CONFIG_START( galaxi )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( magjoker, galaxi )
+MACHINE_CONFIG_DERIVED(galaxi_state::magjoker, galaxi)
 
 	/* sound hardware */
 	MCFG_SOUND_MODIFY("oki")
@@ -486,7 +489,7 @@ static MACHINE_CONFIG_DERIVED( magjoker, galaxi )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( lastfour, galaxi )
+MACHINE_CONFIG_DERIVED(galaxi_state::lastfour, galaxi)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")

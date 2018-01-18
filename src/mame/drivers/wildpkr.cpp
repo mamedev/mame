@@ -217,6 +217,8 @@ public:
 	DECLARE_WRITE16_MEMBER(clock_rate_w);
 	DECLARE_WRITE16_MEMBER(unknown_trigger_w);
 	IRQ_CALLBACK_MEMBER(tabpkr_irq_ack);
+	void wildpkr(machine_config &config);
+	void tabpkr(machine_config &config);
 };
 
 
@@ -449,7 +451,7 @@ IRQ_CALLBACK_MEMBER(wildpkr_state::tabpkr_irq_ack)
 *    Machine Drivers     *
 *************************/
 
-static MACHINE_CONFIG_START( wildpkr )
+MACHINE_CONFIG_START(wildpkr_state::wildpkr)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, MAIN_CLOCK)
@@ -480,7 +482,7 @@ static MACHINE_CONFIG_START( wildpkr )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( tabpkr )
+MACHINE_CONFIG_START(wildpkr_state::tabpkr)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz / 2)

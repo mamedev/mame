@@ -39,6 +39,7 @@ public:
 	DECLARE_WRITE8_MEMBER(switch_w);
 	virtual void machine_start() override;
 	INTERRUPT_GEN_MEMBER(whitestar_firq_interrupt);
+	void whitestar(machine_config &config);
 };
 
 static INPUT_PORTS_START( whitestar )
@@ -113,7 +114,7 @@ INTERRUPT_GEN_MEMBER(whitestar_state::whitestar_firq_interrupt)
 	device.execute().set_input_line(M6809_FIRQ_LINE, HOLD_LINE);
 }
 
-static MACHINE_CONFIG_START( whitestar )
+MACHINE_CONFIG_START(whitestar_state::whitestar)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", MC6809E, 2000000)
 	MCFG_CPU_PROGRAM_MAP(whitestar_map)

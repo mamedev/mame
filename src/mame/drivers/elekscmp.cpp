@@ -44,6 +44,7 @@ public:
 	DECLARE_WRITE8_MEMBER(hex_display_w);
 	uint8_t convert_key(uint8_t data);
 
+	void elekscmp(machine_config &config);
 private:
 	required_device<cpu_device> m_maincpu;
 	required_ioport m_x0;
@@ -140,7 +141,7 @@ static INPUT_PORTS_START( elekscmp )
 	PORT_BIT(0xfe, IP_ACTIVE_HIGH, IPT_UNUSED)
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( elekscmp )
+MACHINE_CONFIG_START(elekscmp_state::elekscmp)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",INS8060, XTAL_4MHz)
 	MCFG_CPU_PROGRAM_MAP(mem_map)

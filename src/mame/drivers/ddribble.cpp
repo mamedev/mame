@@ -256,7 +256,7 @@ void ddribble_state::machine_reset()
 	m_charbank[1] = 0;
 }
 
-static MACHINE_CONFIG_START( ddribble )
+MACHINE_CONFIG_START(ddribble_state::ddribble)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", MC6809E, XTAL_18_432MHz/12)  /* verified on pcb */

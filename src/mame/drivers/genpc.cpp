@@ -23,6 +23,11 @@ public:
 		m_maincpu(*this, "maincpu") { }
 
 	required_device<cpu_device> m_maincpu;
+	void pcega(machine_config &config);
+	void pcvga(machine_config &config);
+	void pccga(machine_config &config);
+	void pcherc(machine_config &config);
+	void pcmda(machine_config &config);
 };
 
 static ADDRESS_MAP_START( pc8_map, AS_PROGRAM, 8, genpc_state )
@@ -43,7 +48,7 @@ static DEVICE_INPUT_DEFAULTS_START(vga)
 	DEVICE_INPUT_DEFAULTS("DSW0",0x30, 0x00)
 DEVICE_INPUT_DEFAULTS_END
 
-static MACHINE_CONFIG_START( pcmda )
+MACHINE_CONFIG_START(genpc_state::pcmda)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8088, 4772720)
 	MCFG_CPU_PROGRAM_MAP(pc8_map)
@@ -72,13 +77,13 @@ static MACHINE_CONFIG_START( pcmda )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( pcherc, pcmda )
+MACHINE_CONFIG_DERIVED(genpc_state::pcherc, pcmda)
 	MCFG_DEVICE_MODIFY("isa1")
 	MCFG_DEVICE_SLOT_INTERFACE(pc_isa8_cards, "hercules", false)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( pccga, pcmda )
+MACHINE_CONFIG_DERIVED(genpc_state::pccga, pcmda)
 	MCFG_DEVICE_MODIFY("mb")
 	MCFG_DEVICE_INPUT_DEFAULTS(cga)
 	MCFG_DEVICE_MODIFY("isa1")
@@ -86,7 +91,7 @@ static MACHINE_CONFIG_DERIVED( pccga, pcmda )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( pcega, pccga )
+MACHINE_CONFIG_DERIVED(genpc_state::pcega, pccga)
 	MCFG_DEVICE_MODIFY("isa1")
 	MCFG_DEVICE_SLOT_INTERFACE(pc_isa8_cards, "ega", false)
 	MCFG_DEVICE_MODIFY("mb")
@@ -94,7 +99,7 @@ static MACHINE_CONFIG_DERIVED( pcega, pccga )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( pcvga, pcega )
+MACHINE_CONFIG_DERIVED(genpc_state::pcvga, pcega)
 	MCFG_DEVICE_MODIFY("isa1")
 	MCFG_DEVICE_SLOT_INTERFACE(pc_isa8_cards, "vga", false)
 MACHINE_CONFIG_END

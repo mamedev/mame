@@ -298,7 +298,7 @@ GFXDECODE_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( irobot )
+MACHINE_CONFIG_START(irobot_state::irobot)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", MC6809E, MAIN_CLOCK/8)

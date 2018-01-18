@@ -159,6 +159,7 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(counter_tick);
 	DECLARE_READ8_MEMBER(hd61830_rd_r);
 	IRQ_CALLBACK_MEMBER(portfolio_int_ack);
+	void portfolio(machine_config &config);
 };
 
 
@@ -1005,7 +1006,7 @@ void portfolio_state::machine_reset()
 //  MACHINE_CONFIG( portfolio )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( portfolio )
+MACHINE_CONFIG_START(portfolio_state::portfolio)
 	// basic machine hardware
 	MCFG_CPU_ADD(M80C88A_TAG, I8088, XTAL_4_9152MHz)
 	MCFG_CPU_PROGRAM_MAP(portfolio_mem)

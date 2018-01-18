@@ -90,7 +90,7 @@ ADDRESS_MAP_END
 //  MACHINE_CONFIG_START( wangpc_wdc )
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( wangpc_wdc_device::device_add_mconfig )
+MACHINE_CONFIG_START(wangpc_wdc_device::device_add_mconfig)
 	MCFG_CPU_ADD(Z80_TAG, Z80, 2000000) // XTAL_10MHz / ?
 	//MCFG_Z80_DAISY_CHAIN(wangpc_wdc_daisy_chain)
 	MCFG_CPU_PROGRAM_MAP(wangpc_wdc_mem)

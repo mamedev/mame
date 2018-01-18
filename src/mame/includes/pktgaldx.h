@@ -64,4 +64,6 @@ public:
 	DECLARE_WRITE16_MEMBER( vblank_ack_w );
 
 	DECO16IC_BANK_CB_MEMBER(bank_callback);
+	void pktgaldx(machine_config &config);
+	void pktgaldb(machine_config &config);
 };

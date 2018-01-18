@@ -33,6 +33,7 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
+	void westdrm(machine_config &config);
 };
 
 
@@ -104,7 +105,7 @@ INPUT_PORTS_END
 
 ***************************************************************************/
 
-static MACHINE_CONFIG_START( westdrm )
+MACHINE_CONFIG_START(segacoin_state::westdrm)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 8000000) // clock frequency unknown

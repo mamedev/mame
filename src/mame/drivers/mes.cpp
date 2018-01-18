@@ -32,6 +32,7 @@ public:
 	DECLARE_READ8_MEMBER(port00_r);
 	DECLARE_READ8_MEMBER(port08_r);
 
+	void mes(machine_config &config);
 private:
 	u8 m_term_data;
 	u8 m_port08;
@@ -123,7 +124,7 @@ void mes_state::kbd_put(u8 data)
 	m_term_data = data;
 }
 
-static MACHINE_CONFIG_START( mes )
+MACHINE_CONFIG_START(mes_state::mes)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_16MHz / 4)
 	MCFG_CPU_PROGRAM_MAP(mem_map)

@@ -706,7 +706,7 @@ void ojankohs_state::machine_reset()
 	m_screen_refresh = 0;
 }
 
-static MACHINE_CONFIG_START( ojankohs )
+MACHINE_CONFIG_START(ojankohs_state::ojankohs)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80,12000000/2)     /* 6.00 MHz ? */
@@ -747,7 +747,7 @@ static MACHINE_CONFIG_START( ojankohs )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( ojankoy )
+MACHINE_CONFIG_START(ojankohs_state::ojankoy)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80,12000000/2)     /* 6.00 MHz ? */
@@ -787,7 +787,7 @@ static MACHINE_CONFIG_START( ojankoy )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( ccasino )
+MACHINE_CONFIG_START(ojankohs_state::ccasino)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80,12000000/2)     /* 6.00 MHz ? */
@@ -828,7 +828,7 @@ static MACHINE_CONFIG_START( ccasino )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( ojankoc )
+MACHINE_CONFIG_START(ojankohs_state::ojankoc)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80,8000000/2)          /* 4.00 MHz */

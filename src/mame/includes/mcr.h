@@ -77,6 +77,13 @@ public:
 	uint32_t screen_update_mcr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(mcr_interrupt);
 
+	void mcr_91490_tcs(machine_config &config);
+	void mcr_91490_snt(machine_config &config);
+	void mcr_91490(machine_config &config);
+	void mcr_90009(machine_config &config);
+	void mcr_90010_tt(machine_config &config);
+	void mcr_91475(machine_config &config);
+	void mcr_90010(machine_config &config);
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -141,6 +148,7 @@ public:
 
 	DECLARE_DRIVER_INIT(dpoker);
 
+	void mcr_90009_dp(machine_config &config);
 private:
 	uint8_t m_coin_status;
 	uint8_t m_output;
@@ -173,6 +181,7 @@ public:
 
 	DECLARE_DRIVER_INIT(nflfoot);
 
+	void mcr_91490_ipu(machine_config &config);
 protected:
 	virtual void machine_start() override;
 

@@ -242,7 +242,7 @@ static ADDRESS_MAP_START (cpu20_mem, AS_PROGRAM, 32, vme_fccpu20_device)
 ADDRESS_MAP_END
 
 
-MACHINE_CONFIG_MEMBER(vme_fccpu20_device::device_add_mconfig)
+MACHINE_CONFIG_START(vme_fccpu20_device::device_add_mconfig)
 	/* basic machine hardware */
 	MCFG_CPU_ADD ("maincpu", M68020, CLOCK50 / 3) /* Crytstal verified from picture HCI */
 	MCFG_CPU_PROGRAM_MAP (cpu20_mem)
@@ -305,12 +305,12 @@ MACHINE_CONFIG_MEMBER(vme_fccpu20_device::device_add_mconfig)
 	MCFG_RS232_CTS_HANDLER (DEVWRITELINE ("mpcc3", mpcc68561_device, cts_w))
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_MEMBER( vme_fccpu20_card_device::device_add_mconfig )
+MACHINE_CONFIG_START(vme_fccpu20_card_device::device_add_mconfig)
 	vme_fccpu20_device::device_add_mconfig(config);
 MACHINE_CONFIG_END
 
 // SYS68K/CPU-21S Part No.1 01 041 - 68020 CPU board + FPU 68881 at 12.5 MHz, 512 KB RAM
-MACHINE_CONFIG_MEMBER( vme_fccpu21s_card_device::device_add_mconfig )
+MACHINE_CONFIG_START(vme_fccpu21s_card_device::device_add_mconfig)
 	vme_fccpu20_device::device_add_mconfig(config);
 
 	MCFG_DEVICE_MODIFY("maincpu")
@@ -318,7 +318,7 @@ MACHINE_CONFIG_MEMBER( vme_fccpu21s_card_device::device_add_mconfig )
 MACHINE_CONFIG_END
 
 // SYS68K/CPU-21 Part No.1 01 001 - 68020 CPU board (CPU-20) + FPU 68881 at 16.7 MHz, 512 KB RAM
-MACHINE_CONFIG_MEMBER( vme_fccpu21_card_device::device_add_mconfig )
+MACHINE_CONFIG_START(vme_fccpu21_card_device::device_add_mconfig)
 	vme_fccpu20_device::device_add_mconfig(config);
 
 	MCFG_DEVICE_MODIFY("maincpu")
@@ -326,7 +326,7 @@ MACHINE_CONFIG_MEMBER( vme_fccpu21_card_device::device_add_mconfig )
 MACHINE_CONFIG_END
 
 // SYS68K/CPU-21A Part No.1 01 011 - 68020 CPU board + FPU 68881 at 20 MHz, 512 KB RAM
-MACHINE_CONFIG_MEMBER( vme_fccpu21a_card_device::device_add_mconfig )
+MACHINE_CONFIG_START(vme_fccpu21a_card_device::device_add_mconfig)
 	vme_fccpu20_device::device_add_mconfig(config);
 
 	MCFG_DEVICE_MODIFY("maincpu")
@@ -334,7 +334,7 @@ MACHINE_CONFIG_MEMBER( vme_fccpu21a_card_device::device_add_mconfig )
 MACHINE_CONFIG_END
 
 // SYS68K/CPU-21YA Part No.1 01 061 - 68020 CPU board + FPU 68881 at 20 MHz, 2048 KB RAM
-MACHINE_CONFIG_MEMBER( vme_fccpu21ya_card_device::device_add_mconfig )
+MACHINE_CONFIG_START(vme_fccpu21ya_card_device::device_add_mconfig)
 	vme_fccpu20_device::device_add_mconfig(config);
 
 	MCFG_DEVICE_MODIFY("maincpu")
@@ -342,7 +342,7 @@ MACHINE_CONFIG_MEMBER( vme_fccpu21ya_card_device::device_add_mconfig )
 MACHINE_CONFIG_END
 
 // SYS68K/CPU-21B Part No.1 01 021 - 68020 CPU board + FPU 68881 at 25 MHz, 512 KB RAM
-MACHINE_CONFIG_MEMBER( vme_fccpu21b_card_device::device_add_mconfig )
+MACHINE_CONFIG_START(vme_fccpu21b_card_device::device_add_mconfig)
 	vme_fccpu20_device::device_add_mconfig(config);
 
 	MCFG_DEVICE_MODIFY("maincpu")
@@ -350,7 +350,7 @@ MACHINE_CONFIG_MEMBER( vme_fccpu21b_card_device::device_add_mconfig )
 MACHINE_CONFIG_END
 
 // SYS68K/CPU-21YB Part No.1 01 071 - 68020 CPU board + FPU 68881 at 25 MHz, 2048 KB RAM
-MACHINE_CONFIG_MEMBER( vme_fccpu21yb_card_device::device_add_mconfig )
+MACHINE_CONFIG_START(vme_fccpu21yb_card_device::device_add_mconfig)
 	vme_fccpu20_device::device_add_mconfig(config);
 
 	MCFG_DEVICE_MODIFY("maincpu")

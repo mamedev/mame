@@ -251,7 +251,7 @@ FLOPPY_FORMATS_END
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( pdc_device::device_add_mconfig )
+MACHINE_CONFIG_START(pdc_device::device_add_mconfig)
 	/* CPU - Zilog Z0840006PSC */
 	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL_10MHz / 2)
 	MCFG_CPU_PROGRAM_MAP(pdc_mem)

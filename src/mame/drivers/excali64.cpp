@@ -95,6 +95,7 @@ public:
 	DECLARE_MACHINE_RESET(excali64);
 	required_device<palette_device> m_palette;
 
+	void excali64(machine_config &config);
 private:
 	uint8_t *m_p_videoram;
 	uint8_t *m_p_hiresram;
@@ -543,7 +544,7 @@ MC6845_UPDATE_ROW( excali64_state::update_row )
 	}
 }
 
-static MACHINE_CONFIG_START( excali64 )
+MACHINE_CONFIG_START(excali64_state::excali64)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_16MHz / 4)
 	MCFG_CPU_PROGRAM_MAP(mem_map)

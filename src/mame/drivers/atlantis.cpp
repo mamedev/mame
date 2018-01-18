@@ -182,6 +182,7 @@ public:
 
 	DECLARE_READ8_MEMBER(parallel_r);
 	DECLARE_WRITE8_MEMBER(parallel_w);
+	void mwskins(machine_config &config);
 };
 
 // Parallel Port
@@ -792,7 +793,7 @@ DEVICE_INPUT_DEFAULTS_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( mwskins )
+MACHINE_CONFIG_START(atlantis_state::mwskins)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", VR4310LE, 166666666)    // clock is TRUSTED

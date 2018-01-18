@@ -250,6 +250,7 @@ public:
 	DECLARE_WRITE8_MEMBER(omegrace_soundlatch_w);
 	DECLARE_DRIVER_INIT(omegrace);
 	virtual void machine_reset() override;
+	void omegrace(machine_config &config);
 };
 
 
@@ -496,7 +497,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( omegrace )
+MACHINE_CONFIG_START(omegrace_state::omegrace)
 
 	/* basic machine hardware */
 

@@ -68,6 +68,8 @@ public:
 	void descramble_sound( const char *tag );
 	DECO16IC_BANK_CB_MEMBER(bank_callback);
 	DECOSPR_PRIORITY_CB_MEMBER(pri_callback);
+	void hvysmsh(machine_config &config);
+	void wcvol95(machine_config &config);
 };
 
 
@@ -317,7 +319,7 @@ DECOSPR_PRIORITY_CB_MEMBER(deco156_state::pri_callback)
 	return 0;
 }
 
-static MACHINE_CONFIG_START( hvysmsh )
+MACHINE_CONFIG_START(deco156_state::hvysmsh)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", ARM, 28000000) /* Unconfirmed */
@@ -369,7 +371,7 @@ static MACHINE_CONFIG_START( hvysmsh )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.35)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( wcvol95 )
+MACHINE_CONFIG_START(deco156_state::wcvol95)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", ARM, 28000000) /* Unconfirmed */

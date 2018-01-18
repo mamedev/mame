@@ -53,6 +53,7 @@ public:
 	DECLARE_WRITE8_MEMBER(ram_w);
 	DECLARE_READ8_MEMBER(ram_r);
 
+	void microkit(machine_config &config);
 private:
 	virtual void machine_reset() override;
 	uint8_t m_resetcnt;
@@ -113,7 +114,7 @@ static DEVICE_INPUT_DEFAULTS_START( serial_keyb )
 DEVICE_INPUT_DEFAULTS_END
 
 
-static MACHINE_CONFIG_START( microkit )
+MACHINE_CONFIG_START(microkit_state::microkit)
 	// basic machine hardware
 	MCFG_CPU_ADD("maincpu", CDP1802, 1750000)
 	MCFG_CPU_PROGRAM_MAP(microkit_mem)

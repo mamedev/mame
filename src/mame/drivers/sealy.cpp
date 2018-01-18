@@ -52,6 +52,7 @@ public:
 	// screen updates
 	DECLARE_PALETTE_INIT(sealy);
 	uint32_t screen_update_sealy(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	void sealy(machine_config &config);
 };
 
 
@@ -95,7 +96,7 @@ static GFXDECODE_START( sealy )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( sealy )
+MACHINE_CONFIG_START(sealy_state::sealy)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", H83044, MAIN_CLOCK) /* wrong CPU, but we have not a M16C core ATM */

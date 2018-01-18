@@ -128,6 +128,7 @@ public:
 	DECLARE_WRITE8_MEMBER(ald_w);
 	DECLARE_SNAPSHOT_LOAD_MEMBER( ace );
 
+	void ace(machine_config &config);
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<i8255_device> m_ppi;
@@ -746,7 +747,7 @@ void ace_state::machine_start()
 //  MACHINE_CONFIG( ace )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( ace )
+MACHINE_CONFIG_START(ace_state::ace)
 	// basic machine hardware
 	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL_6_5MHz/2)
 	MCFG_CPU_PROGRAM_MAP(ace_mem)

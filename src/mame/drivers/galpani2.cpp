@@ -619,7 +619,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(galpani2_state::galpani2_interrupt2)
 		m_subcpu->set_input_line(3, HOLD_LINE);
 }
 
-static MACHINE_CONFIG_START( galpani2 )
+MACHINE_CONFIG_START(galpani2_state::galpani2)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_27MHz/2)       /* Confirmed on galpani2i PCB */

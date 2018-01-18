@@ -259,6 +259,15 @@ public:
 	// comad
 	READ16_MEMBER(comad_timer_r);
 	READ8_MEMBER(comad_okim6295_r);
+	void supmodel(machine_config &config);
+	void zipzap(machine_config &config);
+	void fantasia(machine_config &config);
+	void fantsia2(machine_config &config);
+	void comad(machine_config &config);
+	void comad_noview2(machine_config &config);
+	void smissw(machine_config &config);
+	void galhustl(machine_config &config);
+	void expro02(machine_config &config);
 };
 
 
@@ -877,7 +886,7 @@ GFXDECODE_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( expro02 )
+MACHINE_CONFIG_START(expro02_state::expro02)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 12000000)
@@ -929,7 +938,7 @@ static MACHINE_CONFIG_START( expro02 )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( comad, expro02 )
+MACHINE_CONFIG_DERIVED(expro02_state::comad, expro02)
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(fantasia_map)
@@ -945,20 +954,20 @@ static MACHINE_CONFIG_DERIVED( comad, expro02 )
 	MCFG_WATCHDOG_TIME_INIT(attotime::from_seconds(0))  /* a guess, and certainly wrong */
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( comad_noview2, comad )
+MACHINE_CONFIG_DERIVED(expro02_state::comad_noview2, comad)
 	MCFG_DEVICE_REMOVE("view2_0")
 
 	MCFG_GFXDECODE_MODIFY("gfxdecode", expro02_noview2)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( fantasia, comad_noview2 )
+MACHINE_CONFIG_DERIVED(expro02_state::fantasia, comad_noview2)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_CLOCK(10000000)
 	MCFG_CPU_PROGRAM_MAP(comad_map)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( supmodel, comad_noview2 )
+MACHINE_CONFIG_DERIVED(expro02_state::supmodel, comad_noview2)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(supmodel_map)
 	MCFG_OKIM6295_REPLACE("oki", 1584000, PIN7_HIGH) // clock frequency & pin 7 not verified
@@ -966,17 +975,17 @@ static MACHINE_CONFIG_DERIVED( supmodel, comad_noview2 )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( smissw, comad_noview2 ) // 951127 PCB, 12 & 16 clocks
+MACHINE_CONFIG_DERIVED(expro02_state::smissw, comad_noview2) // 951127 PCB, 12 & 16 clocks
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(smissw_map)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( fantsia2, comad_noview2 )
+MACHINE_CONFIG_DERIVED(expro02_state::fantsia2, comad_noview2)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(fantsia2_map)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( galhustl, comad_noview2 )
+MACHINE_CONFIG_DERIVED(expro02_state::galhustl, comad_noview2)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(galhustl_map)
 	MCFG_OKIM6295_REPLACE("oki", 1056000, PIN7_HIGH) // clock frequency & pin 7 not verified
@@ -987,7 +996,7 @@ static MACHINE_CONFIG_DERIVED( galhustl, comad_noview2 )
 	MCFG_SCREEN_UPDATE_DRIVER(expro02_state, screen_update_zipzap)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( zipzap, comad_noview2 )
+MACHINE_CONFIG_DERIVED(expro02_state::zipzap, comad_noview2)
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(zipzap_map)

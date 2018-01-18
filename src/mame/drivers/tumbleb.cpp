@@ -2041,7 +2041,7 @@ MACHINE_RESET_MEMBER(tumbleb_state,tumbleb)
 	memset(m_control_0, 0, sizeof(m_control_0));
 }
 
-static MACHINE_CONFIG_START( tumblepb )
+MACHINE_CONFIG_START(tumbleb_state::tumblepb)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 14000000)
@@ -2079,7 +2079,7 @@ static MACHINE_CONFIG_START( tumblepb )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( tumbleb2 )
+MACHINE_CONFIG_START(tumbleb_state::tumbleb2)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 14000000)
@@ -2116,7 +2116,7 @@ static MACHINE_CONFIG_START( tumbleb2 )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.70)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( jumpkids )
+MACHINE_CONFIG_START(tumbleb_state::jumpkids)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 12000000)
@@ -2159,7 +2159,7 @@ static MACHINE_CONFIG_START( jumpkids )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.70)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( fncywld )
+MACHINE_CONFIG_START(tumbleb_state::fncywld)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 12000000)
@@ -2217,7 +2217,7 @@ MACHINE_RESET_MEMBER(tumbleb_state,htchctch)
 	MACHINE_RESET_CALL_MEMBER(tumbleb);
 }
 
-static MACHINE_CONFIG_START( htchctch )
+MACHINE_CONFIG_START(tumbleb_state::htchctch)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 15000000) /* verified */
@@ -2265,12 +2265,12 @@ static MACHINE_CONFIG_START( htchctch )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( cookbib, htchctch )
+MACHINE_CONFIG_DERIVED(tumbleb_state::cookbib, htchctch)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(tumbleb_state, screen_update_semicom_altoffsets)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( chokchok, htchctch )
+MACHINE_CONFIG_DERIVED(tumbleb_state::chokchok, htchctch)
 	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 	// some PCBs have left factory with a 3.57mhz while some have a 4.096 which matches other games, assuming the former are factory errors
@@ -2280,7 +2280,7 @@ static MACHINE_CONFIG_DERIVED( chokchok, htchctch )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( cookbib_mcu, htchctch )
+MACHINE_CONFIG_DERIVED(tumbleb_state::cookbib_mcu, htchctch)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("protection", I8052, 16000000)  // AT89C52
@@ -2292,7 +2292,7 @@ static MACHINE_CONFIG_DERIVED( cookbib_mcu, htchctch )
 	MCFG_SCREEN_UPDATE_DRIVER(tumbleb_state, screen_update_semicom_altoffsets)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( bcstory, htchctch )
+MACHINE_CONFIG_DERIVED(tumbleb_state::bcstory, htchctch)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(tumbleb_state, screen_update_bcstory)
 
@@ -2301,19 +2301,19 @@ static MACHINE_CONFIG_DERIVED( bcstory, htchctch )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( semibase, bcstory )
+MACHINE_CONFIG_DERIVED(tumbleb_state::semibase, bcstory)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(tumbleb_state, screen_update_semibase)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( sdfight, bcstory )
+MACHINE_CONFIG_DERIVED(tumbleb_state::sdfight, bcstory)
 	MCFG_VIDEO_START_OVERRIDE(tumbleb_state,sdfight)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(tumbleb_state, screen_update_sdfight)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( metlsavr, cookbib )
+MACHINE_CONFIG_DERIVED(tumbleb_state::metlsavr, cookbib)
 	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 
@@ -2325,7 +2325,7 @@ MACHINE_CONFIG_END
 
 
 
-static MACHINE_CONFIG_START( suprtrio )
+MACHINE_CONFIG_START(tumbleb_state::suprtrio)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 14000000) /* 14mhz should be correct, but lots of sprite flicker later in game */
@@ -2367,7 +2367,7 @@ static MACHINE_CONFIG_START( suprtrio )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( pangpang )
+MACHINE_CONFIG_START(tumbleb_state::pangpang)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 14000000)

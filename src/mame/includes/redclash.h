@@ -62,4 +62,7 @@ public:
 	void redclash_draw_stars(bitmap_ind16 &bitmap, const rectangle &cliprect, uint8_t palette_offset, uint8_t sraider, uint8_t firstx, uint8_t lastx);
 	void redclash_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void redclash_draw_bullets( bitmap_ind16 &bitmap, const rectangle &cliprect );
+	void zerohour(machine_config &config);
+	void sraider(machine_config &config);
+	void redclash(machine_config &config);
 };

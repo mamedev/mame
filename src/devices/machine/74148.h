@@ -95,7 +95,7 @@ DECLARE_DEVICE_TYPE(TTL74148, ttl74148_device)
 
 
 #define MCFG_74148_OUTPUT_CB(_class, _method) \
-	ttl74148_device::set_output_callback(*device, ttl74148_output_delegate(&_class::_method, #_class "::" #_method, downcast<_class *>(owner)));
+	ttl74148_device::set_output_callback(*device, ttl74148_output_delegate(&_class::_method, #_class "::" #_method, this));
 
 
 #endif // MAME_DEVICES_MACHINE_74148_H

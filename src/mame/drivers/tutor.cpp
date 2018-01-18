@@ -227,6 +227,8 @@ public:
 
 	int m_centronics_busy;
 	DECLARE_WRITE_LINE_MEMBER(write_centronics_busy);
+	void pyuutajr(machine_config &config);
+	void tutor(machine_config &config);
 };
 
 
@@ -733,7 +735,7 @@ static INPUT_PORTS_START(pyuutajr)
 		PORT_BIT(0xff, IP_ACTIVE_HIGH, IPT_UNUSED)
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( tutor )
+MACHINE_CONFIG_START(tutor_state::tutor)
 	// basic machine hardware
 	// TMS9995 CPU @ 10.7 MHz
 	// No lines connected yet
@@ -768,7 +770,7 @@ static MACHINE_CONFIG_START( tutor )
 	MCFG_SOFTWARE_LIST_ADD("cart_list","tutor")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( pyuutajr, tutor )
+MACHINE_CONFIG_DERIVED(tutor_state::pyuutajr, tutor)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(pyuutajr_mem)
 	//MCFG_DEVICE_REMOVE("centronics")

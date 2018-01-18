@@ -2046,6 +2046,6 @@ uint32_t vic3_device::video_update( bitmap_ind16 &bitmap, const rectangle &clipr
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( vic3_device::device_add_mconfig )
+MACHINE_CONFIG_START(vic3_device::device_add_mconfig)
 	MCFG_PALETTE_ADD_INIT_BLACK("palette", 0x100)
 MACHINE_CONFIG_END

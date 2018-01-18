@@ -63,6 +63,7 @@ public:
 
 	virtual void video_start() override;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void ichibanjyan(machine_config &config);
 };
 
 void ichibanjyan_state::video_start()
@@ -115,7 +116,7 @@ void ichibanjyan_state::machine_reset()
 }
 
 
-static MACHINE_CONFIG_START( ichibanjyan )
+MACHINE_CONFIG_START(ichibanjyan_state::ichibanjyan)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80,MAIN_CLOCK/3)

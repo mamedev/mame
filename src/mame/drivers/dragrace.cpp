@@ -282,7 +282,7 @@ void dragrace_state::machine_reset()
 	m_gear[1] = 0;
 }
 
-static MACHINE_CONFIG_START( dragrace )
+MACHINE_CONFIG_START(dragrace_state::dragrace)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6800, XTAL_12_096MHz / 12)

@@ -98,6 +98,7 @@ public:
 	DECLARE_DRIVER_INIT(c65pal);
 
 	INTERRUPT_GEN_MEMBER(vic3_vblank_irq);
+	void c65(machine_config &config);
 protected:
 	// driver_device overrides
 	virtual void machine_start() override;
@@ -680,7 +681,7 @@ WRITE_LINE_MEMBER(c65_state::cia0_irq)
 //  c65_irq(state || m_vicirq);
 }
 
-static MACHINE_CONFIG_START( c65 )
+MACHINE_CONFIG_START(c65_state::c65)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M4510, MAIN_CLOCK)

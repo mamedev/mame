@@ -660,7 +660,7 @@ DRIVER_INIT_MEMBER(esripsys_state,esripsys)
 	save_item(NAME(m_fbsel));
 }
 
-static MACHINE_CONFIG_START( esripsys )
+MACHINE_CONFIG_START(esripsys_state::esripsys)
 	MCFG_CPU_ADD("game_cpu", MC6809E, XTAL_8MHz / 4)
 	MCFG_CPU_PROGRAM_MAP(game_cpu_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", esripsys_state,  esripsys_vblank_irq)

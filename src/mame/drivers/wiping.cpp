@@ -283,7 +283,7 @@ INTERRUPT_GEN_MEMBER(wiping_state::sound_timer_irq)
 
 
 
-static MACHINE_CONFIG_START( wiping )
+MACHINE_CONFIG_START(wiping_state::wiping)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80,18432000/6) /* 3.072 MHz */

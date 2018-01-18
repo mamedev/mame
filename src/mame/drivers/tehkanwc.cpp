@@ -659,7 +659,7 @@ static GFXDECODE_START( tehkanwc )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( tehkanwc )
+MACHINE_CONFIG_START(tehkanwc_state::tehkanwc)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 18432000/4)    /* 18.432000 / 4 */
@@ -715,7 +715,7 @@ static MACHINE_CONFIG_START( tehkanwc )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.45)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED(tehkanwcb, tehkanwc)
+MACHINE_CONFIG_DERIVED(tehkanwc_state::tehkanwcb, tehkanwc)
 	MCFG_SOUND_REPLACE("ay1", AY8910, 18432000/12)
 	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(tehkanwc_state, portA_w))
 	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(tehkanwc_state, portB_w))

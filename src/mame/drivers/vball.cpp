@@ -394,7 +394,7 @@ static GFXDECODE_START( vb )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( vball )
+MACHINE_CONFIG_START(vball_state::vball)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, CPU_CLOCK)   /* 2 MHz - measured by guru but it makes the game far far too slow ?! */

@@ -26,6 +26,7 @@ public:
 	DECLARE_READ8_MEMBER(fff400_r);
 	SCN2674_DRAW_CHARACTER_MEMBER(draw_character);
 
+	void tr175(machine_config &config);
 private:
 	required_device<cpu_device> m_maincpu;
 };
@@ -77,7 +78,7 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START( tr175 )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( tr175 )
+MACHINE_CONFIG_START(tr175_state::tr175)
 	MCFG_CPU_ADD("maincpu", M68000, 12'000'000)
 	MCFG_CPU_PROGRAM_MAP(mem_map)
 

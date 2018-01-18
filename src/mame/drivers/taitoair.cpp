@@ -697,7 +697,7 @@ void taitoair_state::machine_reset()
 	}
 }
 
-static MACHINE_CONFIG_START( airsys )
+MACHINE_CONFIG_START(taitoair_state::airsys)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_12MHz) // MC68000P12

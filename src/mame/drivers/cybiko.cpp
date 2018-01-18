@@ -384,7 +384,7 @@ static DEVICE_INPUT_DEFAULTS_START( debug_serial ) // set up debug port to defau
 	DEVICE_INPUT_DEFAULTS( "RS232_STOPBITS", 0xff, RS232_STOPBITS_1 )
 DEVICE_INPUT_DEFAULTS_END
 
-static MACHINE_CONFIG_START( cybikov1 )
+MACHINE_CONFIG_START(cybiko_state::cybikov1)
 	// cpu
 	MCFG_CPU_ADD( "maincpu", H8S2241, XTAL_11_0592MHz )
 	MCFG_CPU_PROGRAM_MAP( cybikov1_mem )
@@ -436,7 +436,7 @@ static MACHINE_CONFIG_START( cybikov1 )
 	MCFG_QUICKLOAD_ADD("quickload", cybiko_state, cybiko, "bin,nv", 0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( cybikov2, cybikov1)
+MACHINE_CONFIG_DERIVED(cybiko_state::cybikov2, cybikov1)
 	// cpu
 	MCFG_CPU_REPLACE("maincpu", H8S2246, XTAL_11_0592MHz)
 	MCFG_CPU_PROGRAM_MAP(cybikov2_mem)
@@ -461,7 +461,7 @@ static MACHINE_CONFIG_DERIVED( cybikov2, cybikov1)
 	MCFG_H8_SCI_TX_CALLBACK(DEVWRITELINE(":debug_serial", rs232_port_device, write_txd))
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( cybikoxt, cybikov1)
+MACHINE_CONFIG_DERIVED(cybiko_state::cybikoxt, cybikov1)
 	// cpu
 	MCFG_CPU_REPLACE("maincpu", H8S2323, XTAL_18_432MHz)
 	MCFG_CPU_PROGRAM_MAP(cybikoxt_mem )

@@ -65,6 +65,7 @@ public:
 	virtual void video_start() override;
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void d9final(machine_config &config);
 };
 
 
@@ -293,7 +294,7 @@ void d9final_state::machine_start()
 	membank("bank1")->set_entry(0);
 }
 
-static MACHINE_CONFIG_START( d9final )
+MACHINE_CONFIG_START(d9final_state::d9final)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 24000000/4)/* ? MHz */
 	MCFG_CPU_PROGRAM_MAP(d9final_map)

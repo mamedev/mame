@@ -237,6 +237,7 @@ public:
 	uint8_t pal_256_param(int index, int param);
 	void mz2500_reset(mz2500_state *state, uint8_t type);
 	required_device<palette_device> m_palette;
+	void mz2500(machine_config &config);
 };
 
 
@@ -2076,7 +2077,7 @@ static SLOT_INTERFACE_START( mz2500_floppies )
 SLOT_INTERFACE_END
 
 
-static MACHINE_CONFIG_START( mz2500 )
+MACHINE_CONFIG_START(mz2500_state::mz2500)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 6000000)
 	MCFG_CPU_PROGRAM_MAP(mz2500_map)

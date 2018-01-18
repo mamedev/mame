@@ -123,6 +123,7 @@ public:
 
 	void scsi_dma_read( uint32_t *p_n_psxram, uint32_t n_address, int32_t n_size );
 	void scsi_dma_write( uint32_t *p_n_psxram, uint32_t n_address, int32_t n_size );
+	void konamigq(machine_config &config);
 };
 
 /* EEPROM */
@@ -311,7 +312,7 @@ MACHINE_RESET_MEMBER(konamigq_state,konamigq)
 {
 }
 
-static MACHINE_CONFIG_START( konamigq )
+MACHINE_CONFIG_START(konamigq_state::konamigq)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", CXD8530BQ, XTAL_67_7376MHz)
 	MCFG_CPU_PROGRAM_MAP(konamigq_map)
@@ -319,8 +320,8 @@ static MACHINE_CONFIG_START( konamigq )
 	MCFG_RAM_MODIFY("maincpu:ram")
 	MCFG_RAM_DEFAULT_SIZE("4M")
 
-	MCFG_PSX_DMA_CHANNEL_READ( "maincpu", 5, psxdma_device::read_delegate(&konamigq_state::scsi_dma_read, (konamigq_state *) owner ) )
-	MCFG_PSX_DMA_CHANNEL_WRITE( "maincpu", 5, psxdma_device::write_delegate(&konamigq_state::scsi_dma_write, (konamigq_state *) owner ) )
+	MCFG_PSX_DMA_CHANNEL_READ( "maincpu", 5, psxdma_device::read_delegate(&konamigq_state::scsi_dma_read, this ) )
+	MCFG_PSX_DMA_CHANNEL_WRITE( "maincpu", 5, psxdma_device::write_delegate(&konamigq_state::scsi_dma_write, this ) )
 
 	MCFG_CPU_ADD("soundcpu", M68000, XTAL_32MHz/4) /* 8MHz - measured */
 	MCFG_CPU_PROGRAM_MAP(konamigq_sound_map)

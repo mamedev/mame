@@ -695,7 +695,7 @@ WRITE_LINE_MEMBER(copsnrob_state::one_start_w)
 }
 
 
-MACHINE_CONFIG_START( copsnrob_audio )
+MACHINE_CONFIG_START(copsnrob_state::copsnrob_audio)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 

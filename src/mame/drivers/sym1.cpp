@@ -77,6 +77,7 @@ public:
 	DECLARE_WRITE8_MEMBER(riot_b_w);
 	DECLARE_WRITE8_MEMBER(via3_a_w);
 
+	void sym1(machine_config &config);
 protected:
 	required_device<cpu_device> m_maincpu;
 	required_device<ram_device> m_ram;
@@ -317,7 +318,7 @@ ADDRESS_MAP_END
 //  MACHINE DRIVERS
 //**************************************************************************
 
-static MACHINE_CONFIG_START( sym1 )
+MACHINE_CONFIG_START(sym1_state::sym1)
 	// basic machine hardware
 	MCFG_CPU_ADD("maincpu", M6502, SYM1_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(sym1_map)

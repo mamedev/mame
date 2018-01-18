@@ -193,7 +193,7 @@ static GFXDECODE_START( quizpani )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( quizpani )
+MACHINE_CONFIG_START(quizpani_state::quizpani)
 	MCFG_CPU_ADD("maincpu", M68000, 10000000)
 	MCFG_CPU_PROGRAM_MAP(quizpani_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", quizpani_state,  irq4_line_hold)

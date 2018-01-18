@@ -82,6 +82,7 @@ public:
 	uint32_t screen_update_koikoi(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
+	void koikoi(machine_config &config);
 };
 
 
@@ -347,7 +348,7 @@ void koikoi_state::machine_reset()
 		m_ioram[i] = 0;
 }
 
-static MACHINE_CONFIG_START( koikoi )
+MACHINE_CONFIG_START(koikoi_state::koikoi)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80,KOIKOI_CRYSTAL/4)   /* ?? */

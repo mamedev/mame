@@ -486,7 +486,7 @@ void lethal_state::machine_reset()
 	m_bank4000->set_bank(0);
 }
 
-static MACHINE_CONFIG_START( lethalen )
+MACHINE_CONFIG_START(lethal_state::lethalen)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", HD6309, MAIN_CLOCK/2)    /* verified on pcb */
@@ -542,7 +542,7 @@ static MACHINE_CONFIG_START( lethalen )
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( lethalej, lethalen )
+MACHINE_CONFIG_DERIVED(lethal_state::lethalej, lethalen)
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VISIBLE_AREA(224, 512-1, 16, 240-1)

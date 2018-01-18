@@ -81,4 +81,6 @@ public:
 	void kchampvs_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void decrypt_code();
 	DECLARE_WRITE_LINE_MEMBER(msmint);
+	void kchamp(machine_config &config);
+	void kchampvs(machine_config &config);
 };

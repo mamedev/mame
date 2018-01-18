@@ -249,7 +249,7 @@ WRITE8_MEMBER(midway_serial_pic_emu_device::write_c)
 //  printf("%s: write_c %02x\n", machine().describe_context(), data);
 }
 
-MACHINE_CONFIG_MEMBER( midway_serial_pic_emu_device::device_add_mconfig )
+MACHINE_CONFIG_START(midway_serial_pic_emu_device::device_add_mconfig)
 	MCFG_CPU_ADD("pic", PIC16C57, 12000000)    /* ? Mhz */
 	MCFG_PIC16C5x_WRITE_A_CB(WRITE8(midway_serial_pic_emu_device, write_a))
 	MCFG_PIC16C5x_READ_B_CB(READ8(midway_serial_pic_emu_device, read_b))

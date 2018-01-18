@@ -314,6 +314,7 @@ public:
 	DECLARE_WRITE8_MEMBER(out_f9_w);
 	DECLARE_WRITE8_MEMBER(out_fa_w);
 	DECLARE_WRITE8_MEMBER(out_ff_w);
+	void notechan(machine_config &config);
 };
 
 
@@ -493,7 +494,7 @@ INPUT_PORTS_END
 *               Machine Config               *
 *********************************************/
 
-static MACHINE_CONFIG_START( notechan )
+MACHINE_CONFIG_START(notechan_state::notechan)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, CPU_CLOCK)  // unknown...
 	MCFG_CPU_PROGRAM_MAP(notechan_map)

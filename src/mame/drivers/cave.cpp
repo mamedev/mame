@@ -2096,7 +2096,7 @@ MACHINE_RESET_MEMBER(cave_state,cave)
                                 Dangun Feveron
 ***************************************************************************/
 
-static MACHINE_CONFIG_START( dfeveron )
+MACHINE_CONFIG_START(cave_state::dfeveron)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz)
@@ -2137,7 +2137,7 @@ MACHINE_CONFIG_END
 ***************************************************************************/
 
 
-static MACHINE_CONFIG_START( ddonpach )
+MACHINE_CONFIG_START(cave_state::ddonpach)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz)
@@ -2177,7 +2177,7 @@ MACHINE_CONFIG_END
                                     Donpachi
 ***************************************************************************/
 
-static MACHINE_CONFIG_START( donpachi )
+MACHINE_CONFIG_START(cave_state::donpachi)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz)
@@ -2224,7 +2224,7 @@ MACHINE_CONFIG_END
                                 Esprade
 ***************************************************************************/
 
-static MACHINE_CONFIG_START( esprade )
+MACHINE_CONFIG_START(cave_state::esprade)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz)
@@ -2264,7 +2264,7 @@ MACHINE_CONFIG_END
                                     Gaia Crusaders
 ***************************************************************************/
 
-static MACHINE_CONFIG_START( gaia )
+MACHINE_CONFIG_START(cave_state::gaia)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz)
@@ -2305,7 +2305,7 @@ MACHINE_CONFIG_END
                                     Guwange
 ***************************************************************************/
 
-static MACHINE_CONFIG_START( guwange )
+MACHINE_CONFIG_START(cave_state::guwange)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz)
@@ -2344,7 +2344,7 @@ MACHINE_CONFIG_END
                                 Hotdog Storm
 ***************************************************************************/
 
-static MACHINE_CONFIG_START( hotdogst )
+MACHINE_CONFIG_START(cave_state::hotdogst)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_32MHz/2)
@@ -2397,7 +2397,7 @@ MACHINE_CONFIG_END
                                Koro Koro Quest
 ***************************************************************************/
 
-static MACHINE_CONFIG_START( korokoro )
+MACHINE_CONFIG_START(cave_state::korokoro)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz)
@@ -2432,7 +2432,7 @@ static MACHINE_CONFIG_START( korokoro )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( crusherm, korokoro )
+MACHINE_CONFIG_DERIVED(cave_state::crusherm, korokoro)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(crusherm_map)
 MACHINE_CONFIG_END
@@ -2442,7 +2442,7 @@ MACHINE_CONFIG_END
                                 Mazinger Z
 ***************************************************************************/
 
-static MACHINE_CONFIG_START( mazinger )
+MACHINE_CONFIG_START(cave_state::mazinger)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz)
@@ -2498,7 +2498,7 @@ MACHINE_CONFIG_END
                                 Metamoqester
 ***************************************************************************/
 
-static MACHINE_CONFIG_START( metmqstr )
+MACHINE_CONFIG_START(cave_state::metmqstr)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_32MHz / 2)
@@ -2555,7 +2555,7 @@ MACHINE_CONFIG_END
                                    Pac-Slot
 ***************************************************************************/
 
-static MACHINE_CONFIG_START( pacslot )
+MACHINE_CONFIG_START(cave_state::pacslot)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -2602,7 +2602,7 @@ static MACHINE_CONFIG_START( pacslot )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( paceight, pacslot )
+MACHINE_CONFIG_DERIVED(cave_state::paceight, pacslot)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(paceight_map)
 MACHINE_CONFIG_END
@@ -2615,7 +2615,7 @@ TIMER_DEVICE_CALLBACK_MEMBER( cave_state::timer_lev2_cb )
 	m_maincpu->set_input_line(M68K_IRQ_2, HOLD_LINE);   // ppsatan: read touch screens
 }
 
-static MACHINE_CONFIG_START( ppsatan )
+MACHINE_CONFIG_START(cave_state::ppsatan)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz)
@@ -2678,7 +2678,7 @@ MACHINE_CONFIG_END
 
 /*  X1 = 12 MHz, X2 = 28 MHz, X3 = 16 MHz. OKI: / 165 mode A ; / 132 mode B */
 
-static MACHINE_CONFIG_START( pwrinst2 )
+MACHINE_CONFIG_START(cave_state::pwrinst2)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz) /* 16 MHz */
@@ -2749,7 +2749,7 @@ MACHINE_RESET_MEMBER(cave_state,sailormn)
 	MACHINE_RESET_CALL_MEMBER(cave);
 }
 
-static MACHINE_CONFIG_START( sailormn )
+MACHINE_CONFIG_START(cave_state::sailormn)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz)
@@ -2810,7 +2810,7 @@ MACHINE_CONFIG_END
                             Tekken Card World
 ***************************************************************************/
 
-static MACHINE_CONFIG_START( tekkencw )
+MACHINE_CONFIG_START(cave_state::tekkencw)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -2854,7 +2854,7 @@ static MACHINE_CONFIG_START( tekkencw )
 	// oki2 chip spot and rom socket are both unpopulated
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( tekkenbs, tekkencw )
+MACHINE_CONFIG_DERIVED(cave_state::tekkenbs, tekkencw)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(tekkenbs_map)
 MACHINE_CONFIG_END
@@ -2864,7 +2864,7 @@ MACHINE_CONFIG_END
                             Tobikose! Jumpman
 ***************************************************************************/
 
-static MACHINE_CONFIG_START( tjumpman )
+MACHINE_CONFIG_START(cave_state::tjumpman)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -2913,7 +2913,7 @@ MACHINE_CONFIG_END
                                 Uo Poko
 ***************************************************************************/
 
-static MACHINE_CONFIG_START( uopoko )
+MACHINE_CONFIG_START(cave_state::uopoko)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz)

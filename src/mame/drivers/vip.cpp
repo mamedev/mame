@@ -710,7 +710,7 @@ QUICKLOAD_LOAD_MEMBER( vip_state, vip )
 //  MACHINE_CONFIG( vip )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( vip )
+MACHINE_CONFIG_START(vip_state::vip)
 	// basic machine hardware
 	MCFG_CPU_ADD(CDP1802_TAG, CDP1802, XTAL_3_52128MHz/2)
 	MCFG_CPU_PROGRAM_MAP(vip_mem)
@@ -767,7 +767,7 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( vp111 )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_DERIVED( vp111, vip )
+MACHINE_CONFIG_DERIVED(vip_state::vp111, vip)
 	// internal ram
 	MCFG_RAM_MODIFY(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("1K")

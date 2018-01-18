@@ -298,7 +298,7 @@ void bottom9_state::machine_reset()
 	m_nmienable = 0;
 }
 
-static MACHINE_CONFIG_START( bottom9 )
+MACHINE_CONFIG_START(bottom9_state::bottom9)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", HD6309E, XTAL_24MHz / 8) // 63C09E

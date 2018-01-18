@@ -191,6 +191,43 @@ public:
 	void taito_f2_tc360_spritemixdraw(screen_device &screen, bitmap_ind16 &dest_bmp, const rectangle &clip, gfx_element *gfx,
 	uint32_t code, uint32_t color, int flipx, int flipy, int sx, int sy, int scalex, int scaley );
 
+	void taito_f2_tc0220ioc(machine_config &config);
+	void taito_f2_tc0510nio(machine_config &config);
+	void taito_f2_te7750(machine_config &config);
+	void taito_f2(machine_config &config);
+	void thundfox(machine_config &config);
+	void dinorex(machine_config &config);
+	void mjnquest(machine_config &config);
+	void cameltrya(machine_config &config);
+	void koshien(machine_config &config);
+	void qzchikyu(machine_config &config);
+	void metalb(machine_config &config);
+	void yesnoj(machine_config &config);
+	void quizhq(machine_config &config);
+	void dondokod(machine_config &config);
+	void qcrayon2(machine_config &config);
+	void qtorimon(machine_config &config);
+	void driftout(machine_config &config);
+	void solfigtr(machine_config &config);
+	void qzquest(machine_config &config);
+	void liquidk(machine_config &config);
+	void deadconx(machine_config &config);
+	void ssi(machine_config &config);
+	void pulirula(machine_config &config);
+	void growl(machine_config &config);
+	void ninjak(machine_config &config);
+	void footchmp(machine_config &config);
+	void cameltry(machine_config &config);
+	void finalb(machine_config &config);
+	void hthero(machine_config &config);
+	void driveout(machine_config &config);
+	void gunfront(machine_config &config);
+	void qcrayon(machine_config &config);
+	void megab(machine_config &config);
+	void qjinsei(machine_config &config);
+	void deadconxj(machine_config &config);
+	void footchmpbl(machine_config &config);
+	void yuyugogo(machine_config &config);
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };

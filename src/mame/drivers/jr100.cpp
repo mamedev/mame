@@ -72,6 +72,7 @@ public:
 	DECLARE_QUICKLOAD_LOAD_MEMBER(jr100);
 
 
+	void jr100(machine_config &config);
 protected:
 	required_device<via6522_device> m_via;
 	required_device<cassette_image_device> m_cassette;
@@ -365,7 +366,7 @@ QUICKLOAD_LOAD_MEMBER( jr100_state,jr100)
 	return image_init_result::PASS;
 }
 
-static MACHINE_CONFIG_START( jr100 )
+MACHINE_CONFIG_START(jr100_state::jr100)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",M6802, XTAL_14_31818MHz / 4) // clock devided internaly by 4

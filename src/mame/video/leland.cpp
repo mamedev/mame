@@ -530,7 +530,7 @@ uint32_t leland_state::screen_update_ataxx(screen_device &screen, bitmap_ind16 &
  *
  *************************************/
 
-MACHINE_CONFIG_START( leland_video )
+MACHINE_CONFIG_START(leland_state::leland_video)
 
 	MCFG_VIDEO_START_OVERRIDE(leland_state,leland)
 
@@ -546,7 +546,7 @@ MACHINE_CONFIG_START( leland_video )
 	MCFG_SCREEN_PALETTE("palette")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED( ataxx_video, leland_video )
+MACHINE_CONFIG_DERIVED(leland_state::ataxx_video, leland_video)
 	MCFG_VIDEO_START_OVERRIDE(leland_state,ataxx)
 
 	MCFG_SCREEN_MODIFY("screen")

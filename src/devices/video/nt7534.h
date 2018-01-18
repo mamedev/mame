@@ -16,7 +16,7 @@
 	MCFG_DEVICE_ADD( _tag, NT7534, 0 )
 
 #define MCFG_NT7534_PIXEL_UPDATE_CB(_class, _method) \
-	nt7534_device::static_set_pixel_update_cb(*device, nt7534_device::pixel_update_delegate(&_class::_method, #_class "::" #_method, downcast<_class *>(owner)));
+	nt7534_device::static_set_pixel_update_cb(*device, nt7534_device::pixel_update_delegate(&_class::_method, #_class "::" #_method, this));
 
 //**************************************************************************
 //  TYPE DEFINITIONS

@@ -118,7 +118,7 @@ INTERRUPT_GEN_MEMBER(ondra_state::ondra_interrupt)
 }
 
 /* Machine driver */
-static MACHINE_CONFIG_START( ondra )
+MACHINE_CONFIG_START(ondra_state::ondra)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 2000000)
 	MCFG_CPU_PROGRAM_MAP(ondra_mem)

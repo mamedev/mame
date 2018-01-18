@@ -500,7 +500,7 @@ GFXDECODE_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( badlands )
+MACHINE_CONFIG_START(badlands_state::badlands)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, ATARI_CLOCK_14MHz/2)
@@ -756,7 +756,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(badlands_state::bootleg_sound_scanline)
 		m_audiocpu->set_input_line(0, HOLD_LINE);
 }
 
-static MACHINE_CONFIG_START( badlandsb )
+MACHINE_CONFIG_START(badlands_state::badlandsb)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_28MHz/4)   /* Divisor estimated */

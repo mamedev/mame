@@ -51,6 +51,7 @@ public:
 	DECLARE_READ8_MEMBER(io_r);
 	DECLARE_WRITE8_MEMBER(io_w);
 
+	void ampro(machine_config &config);
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<z80dart_device> m_dart;
@@ -143,7 +144,7 @@ DRIVER_INIT_MEMBER( ampro_state, ampro )
 	membank("bankw0")->configure_entry(0, &main[0x0000]);
 }
 
-static MACHINE_CONFIG_START( ampro )
+MACHINE_CONFIG_START(ampro_state::ampro)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80, XTAL_16MHz / 4)
 	MCFG_CPU_PROGRAM_MAP(ampro_mem)

@@ -70,7 +70,7 @@ tms1670_cpu_device::tms1670_cpu_device(const machine_config &mconfig, const char
 
 
 // machine configs
-MACHINE_CONFIG_MEMBER(tms1400_cpu_device::device_add_mconfig)
+MACHINE_CONFIG_START(tms1400_cpu_device::device_add_mconfig)
 
 	// microinstructions PLA, output PLA
 	MCFG_PLA_ADD("mpla", 8, 16, 30)

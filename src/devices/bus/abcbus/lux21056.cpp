@@ -245,7 +245,7 @@ WRITE_LINE_MEMBER( luxor_55_21056_device::write_sasi_msg )
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( luxor_55_21056_device::device_add_mconfig )
+MACHINE_CONFIG_START(luxor_55_21056_device::device_add_mconfig)
 	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL_8MHz/2)
 	MCFG_CPU_PROGRAM_MAP(luxor_55_21056_mem)
 	MCFG_CPU_IO_MAP(luxor_55_21056_io)

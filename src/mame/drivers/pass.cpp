@@ -237,7 +237,7 @@ static GFXDECODE_START( pass )
 GFXDECODE_END
 
 /* todo : is this correct? */
-static MACHINE_CONFIG_START( pass )
+MACHINE_CONFIG_START(pass_state::pass)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 14318180/2 )

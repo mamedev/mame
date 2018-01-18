@@ -60,6 +60,7 @@ public:
 	DECLARE_WRITE8_MEMBER(port_d_w);
 	void update_lcdc(address_space &space, bool lcdc0, bool lcdc1);
 
+	void alphasmart(machine_config &config);
 protected:
 	uint8_t           m_matrix[2];
 	uint8_t           m_port_a;
@@ -82,6 +83,7 @@ public:
 	DECLARE_WRITE8_MEMBER(io_w);
 	virtual DECLARE_WRITE8_MEMBER(port_a_w) override;
 
+	void asma2k(machine_config &config);
 private:
 	uint8_t m_lcd_ctrl;
 };
@@ -418,7 +420,7 @@ void alphasmart_state::machine_reset()
 	m_port_d = 0;
 }
 
-static MACHINE_CONFIG_START( alphasmart )
+MACHINE_CONFIG_START(alphasmart_state::alphasmart)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", MC68HC11, XTAL_8MHz/2)  // MC68HC11D0, XTAL is 8 Mhz, unknown divider
 	MCFG_CPU_PROGRAM_MAP(alphasmart_mem)
@@ -449,7 +451,7 @@ static MACHINE_CONFIG_START( alphasmart )
 	MCFG_NVRAM_ADD_0FILL("nvram")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( asma2k, alphasmart )
+MACHINE_CONFIG_DERIVED(asma2k_state::asma2k, alphasmart)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(asma2k_mem)
 MACHINE_CONFIG_END

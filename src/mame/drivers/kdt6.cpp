@@ -105,6 +105,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(rs232b_rx_w);
 	DECLARE_WRITE_LINE_MEMBER(siob_tx_w);
 
+	void psi98(machine_config &config);
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -608,7 +609,7 @@ static const z80_daisy_config daisy_chain_intf[] =
 	{ nullptr }
 };
 
-static MACHINE_CONFIG_START( psi98 )
+MACHINE_CONFIG_START(kdt6_state::psi98)
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_16MHz / 4)
 	MCFG_CPU_PROGRAM_MAP(psi98_mem)
 	MCFG_CPU_IO_MAP(psi98_io)

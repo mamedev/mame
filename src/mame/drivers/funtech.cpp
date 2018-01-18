@@ -94,6 +94,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<ticket_dispenser_device> m_hopper;
 	required_device<gfxdecode_device> m_gfxdecode;
+	void funtech(machine_config &config);
 };
 
 
@@ -484,7 +485,7 @@ void fun_tech_corp_state::machine_reset()
 {
 }
 
-static MACHINE_CONFIG_START( funtech )
+MACHINE_CONFIG_START(fun_tech_corp_state::funtech)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80,4000000)         /* ? MHz */

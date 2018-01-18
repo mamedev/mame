@@ -116,13 +116,13 @@
 		cdp1869_device::static_set_color_clock(*device, _clk);
 
 #define MCFG_CDP1869_CHAR_RAM_READ_OWNER(_class, _method) \
-		cdp1869_device::static_set_char_ram_read(*device, cdp1869_device::char_ram_read_delegate(&_class::_method, #_class "::" #_method, downcast<_class *>(owner)));
+		cdp1869_device::static_set_char_ram_read(*device, cdp1869_device::char_ram_read_delegate(&_class::_method, #_class "::" #_method, this));
 
 #define MCFG_CDP1869_CHAR_RAM_WRITE_OWNER(_class, _method) \
-		cdp1869_device::static_set_char_ram_write(*device, cdp1869_device::char_ram_write_delegate(&_class::_method, #_class "::" #_method, downcast<_class *>(owner)));
+		cdp1869_device::static_set_char_ram_write(*device, cdp1869_device::char_ram_write_delegate(&_class::_method, #_class "::" #_method, this));
 
 #define MCFG_CDP1869_CHAR_PCB_READ_OWNER(_class, _method) \
-		cdp1869_device::static_set_pcb_read(*device, cdp1869_device::pcb_read_delegate(&_class::_method, #_class "::" #_method, downcast<_class *>(owner)));
+		cdp1869_device::static_set_pcb_read(*device, cdp1869_device::pcb_read_delegate(&_class::_method, #_class "::" #_method, this));
 
 
 //**************************************************************************

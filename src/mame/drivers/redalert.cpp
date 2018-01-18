@@ -387,7 +387,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( redalert )
+MACHINE_CONFIG_START(redalert_state::redalert)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, MAIN_CPU_CLOCK)
@@ -401,7 +401,7 @@ static MACHINE_CONFIG_START( redalert )
 	MCFG_FRAGMENT_ADD(redalert_audio)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( ww3 )
+MACHINE_CONFIG_START(redalert_state::ww3)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, MAIN_CPU_CLOCK)
@@ -415,7 +415,7 @@ static MACHINE_CONFIG_START( ww3 )
 	MCFG_FRAGMENT_ADD(ww3_audio)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( panther )
+MACHINE_CONFIG_START(redalert_state::panther)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, MAIN_CPU_CLOCK)
@@ -429,7 +429,7 @@ static MACHINE_CONFIG_START( panther )
 	MCFG_FRAGMENT_ADD(ww3_audio)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( demoneye )
+MACHINE_CONFIG_START(redalert_state::demoneye)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, MAIN_CPU_CLOCK)

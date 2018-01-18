@@ -126,6 +126,8 @@ public:
 	required_device<palette_device> m_palette;
 	required_device<generic_latch_8_device> m_soundlatch;
 	optional_shared_ptr<uint8_t> m_decrypted_opcodes;
+	void caloriee(machine_config &config);
+	void calorie(machine_config &config);
 };
 
 
@@ -452,7 +454,7 @@ void calorie_state::machine_reset()
 }
 
 
-static MACHINE_CONFIG_START( calorie )
+MACHINE_CONFIG_START(calorie_state::calorie)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80,4000000)         /* 4 MHz */
@@ -494,7 +496,7 @@ static MACHINE_CONFIG_START( calorie )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.8)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( caloriee, calorie )
+MACHINE_CONFIG_DERIVED(calorie_state::caloriee, calorie)
 	MCFG_CPU_REPLACE("maincpu", SEGA_317_0004,4000000)         /* 4 MHz */
 	MCFG_CPU_PROGRAM_MAP(calorie_map)
 	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map)

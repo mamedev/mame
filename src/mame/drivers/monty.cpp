@@ -59,6 +59,8 @@ public:
 	// screen updates
 	uint32_t lcd_update(screen_device& screen, bitmap_rgb32& bitmap, const rectangle& cliprect);
 
+	void monty(machine_config &config);
+	void mmonty(machine_config &config);
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<speaker_sound_device> m_speaker;
@@ -252,7 +254,7 @@ SED1520_UPDATE_CB(monty_screen_update)
 
 
 // TODO: Additional machine definition - Master Monty has a different memory layout
-static MACHINE_CONFIG_START( monty )
+MACHINE_CONFIG_START(monty_state::monty)
 	// Basic machine hardware
 	MCFG_CPU_ADD("maincpu", Z80, 3580000)       // Ceramic resonator labeled 3.58MT
 	MCFG_CPU_PROGRAM_MAP(monty_mem)
@@ -276,7 +278,7 @@ static MACHINE_CONFIG_START( monty )
 	MCFG_SED1520_ADD("sed1520_0", monty_screen_update)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( mmonty, monty )
+MACHINE_CONFIG_DERIVED(monty_state::mmonty, monty)
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_PROGRAM_MAP(mmonty_mem)
 MACHINE_CONFIG_END

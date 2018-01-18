@@ -63,7 +63,7 @@ DECLARE_DEVICE_TYPE(ADC1038, adc1038_device)
 
 
 #define MCFG_ADC1038_INPUT_CB(_class, _method) \
-	adc1038_device::set_input_callback(*device, adc1038_device::input_delegate(&_class::_method, #_class "::" #_method, downcast<_class *>(owner)));
+	adc1038_device::set_input_callback(*device, adc1038_device::input_delegate(&_class::_method, #_class "::" #_method, this));
 
 #define MCFG_ADC1038_GTIHACK(_hack) \
 	adc1038_device::set_gti_club_hack(*device, _hack);

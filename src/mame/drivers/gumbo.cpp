@@ -233,7 +233,7 @@ static GFXDECODE_START( gumbo )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( gumbo )
+MACHINE_CONFIG_START(gumbo_state::gumbo)
 
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_14_31818MHz/2)
 	MCFG_CPU_PROGRAM_MAP(gumbo_map)
@@ -259,13 +259,13 @@ static MACHINE_CONFIG_START( gumbo )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.47)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( mspuzzle, gumbo )
+MACHINE_CONFIG_DERIVED(gumbo_state::mspuzzle, gumbo)
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(mspuzzle_map)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( dblpoint, gumbo )
+MACHINE_CONFIG_DERIVED(gumbo_state::dblpoint, gumbo)
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(dblpoint_map)

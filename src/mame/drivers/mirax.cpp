@@ -159,6 +159,7 @@ public:
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	INTERRUPT_GEN_MEMBER(vblank_irq);
+	void mirax(machine_config &config);
 };
 
 
@@ -473,7 +474,7 @@ INTERRUPT_GEN_MEMBER(mirax_state::vblank_irq)
 		device.execute().set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 }
 
-static MACHINE_CONFIG_START( mirax )
+MACHINE_CONFIG_START(mirax_state::mirax)
 	MCFG_CPU_ADD("maincpu", Z80, 12000000/4) // ceramic potted module, encrypted z80
 	MCFG_CPU_PROGRAM_MAP(mirax_main_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", mirax_state, vblank_irq)

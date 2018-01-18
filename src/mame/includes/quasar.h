@@ -32,4 +32,5 @@ public:
 	DECLARE_PALETTE_INIT(quasar);
 	uint32_t screen_update_quasar(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(quasar_interrupt);
+	void quasar(machine_config &config);
 };

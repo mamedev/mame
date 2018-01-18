@@ -32,6 +32,8 @@ public:
 		bitmap.fill(rgb_t::black(), cliprect);
 		return 0;
 	}
+
+	void ___empty(machine_config &config);
 };
 
 
@@ -40,7 +42,7 @@ public:
 //  MACHINE DRIVERS
 //**************************************************************************
 
-static MACHINE_CONFIG_START( ___empty )
+MACHINE_CONFIG_START( empty_state::___empty )
 
 	// video hardware
 	MCFG_SCREEN_ADD("screen", RASTER)

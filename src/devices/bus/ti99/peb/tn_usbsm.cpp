@@ -360,7 +360,7 @@ INPUT_PORTS_START( tn_usbsm )
 		PORT_DIPSETTING( 0x01, "Geneve mode")
 INPUT_PORTS_END
 
-MACHINE_CONFIG_MEMBER( nouspikel_usb_smartmedia_device::device_add_mconfig )
+MACHINE_CONFIG_START(nouspikel_usb_smartmedia_device::device_add_mconfig)
 	MCFG_DEVICE_ADD("smartmedia", SMARTMEDIA, 0)
 	MCFG_STRATAFLASH_ADD(STRATA_TAG)
 	MCFG_RAM_ADD(RAM1_TAG)

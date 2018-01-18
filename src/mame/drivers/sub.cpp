@@ -159,6 +159,7 @@ public:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(main_irq);
 	INTERRUPT_GEN_MEMBER(sound_irq);
+	void sub(machine_config &config);
 };
 
 void sub_state::machine_start()
@@ -452,7 +453,7 @@ INTERRUPT_GEN_MEMBER(sub_state::sound_irq)
 		m_soundcpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 }
 
-static MACHINE_CONFIG_START( sub )
+MACHINE_CONFIG_START(sub_state::sub)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80,MASTER_CLOCK/6)      /* ? MHz */

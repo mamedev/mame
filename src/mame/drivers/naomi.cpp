@@ -2685,7 +2685,7 @@ MACHINE_RESET_MEMBER(naomi_state,naomi)
  */
 
  // TODO: merge with Dreamcast base machine
- MACHINE_CONFIG_START( naomi_aw_base )
+MACHINE_CONFIG_START(dc_state::naomi_aw_base)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", SH4LE, CPU_CLOCK) // SH4!!!
 	MCFG_SH4_MD0(1)
@@ -2728,7 +2728,7 @@ MACHINE_RESET_MEMBER(naomi_state,naomi)
 	MCFG_AICARTC_ADD("aicartc", XTAL_32_768kHz )
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( naomi_base )
+MACHINE_CONFIG_START(naomi_state::naomi_base)
 	MCFG_FRAGMENT_ADD( naomi_aw_base )
 
 	MCFG_EEPROM_SERIAL_93C46_ADD("main_eeprom")
@@ -2753,7 +2753,7 @@ MACHINE_CONFIG_END
  * Naomi 1, unprotected ROM sub-board
  */
 
-static MACHINE_CONFIG_DERIVED( naomi, naomi_base )
+MACHINE_CONFIG_DERIVED(naomi_state::naomi, naomi_base)
 	MCFG_NAOMI_ROM_BOARD_ADD("rom_board", "naomibd_eeprom", WRITE8(dc_state, g1_irq))
 MACHINE_CONFIG_END
 
@@ -2761,7 +2761,7 @@ MACHINE_CONFIG_END
  * Naomi 1 GD-Rom
  */
 
-static MACHINE_CONFIG_DERIVED( naomigd, naomi_base )
+MACHINE_CONFIG_DERIVED(naomi_state::naomigd, naomi_base)
 	MCFG_NAOMI_GDROM_BOARD_ADD("rom_board", ":gdrom", ":pic", "naomibd_eeprom", WRITE8(dc_state, g1_irq))
 MACHINE_CONFIG_END
 
@@ -2769,7 +2769,7 @@ MACHINE_CONFIG_END
  * Naomi 1, M1 sub-board
  */
 
-static MACHINE_CONFIG_DERIVED( naomim1, naomi_base )
+MACHINE_CONFIG_DERIVED(naomi_state::naomim1, naomi_base)
 	MCFG_NAOMI_M1_BOARD_ADD("rom_board", "naomibd_eeprom", WRITE8(dc_state, g1_irq))
 MACHINE_CONFIG_END
 
@@ -2777,7 +2777,7 @@ MACHINE_CONFIG_END
  * Naomi 1, M2/3 sub-board
  */
 
-static MACHINE_CONFIG_DERIVED( naomim2, naomi_base )
+MACHINE_CONFIG_DERIVED(naomi_state::naomim2, naomi_base)
 	MCFG_NAOMI_M2_BOARD_ADD("rom_board", "naomibd_eeprom", WRITE8(dc_state, g1_irq))
 MACHINE_CONFIG_END
 
@@ -2785,7 +2785,7 @@ MACHINE_CONFIG_END
  * Naomi 1, M4 sub-board
  */
 
-static MACHINE_CONFIG_DERIVED( naomim4, naomi_base )
+MACHINE_CONFIG_DERIVED(naomi_state::naomim4, naomi_base)
 	MCFG_NAOMI_M4_BOARD_ADD("rom_board", "pic_readout", "naomibd_eeprom", WRITE8(dc_state, g1_irq))
 MACHINE_CONFIG_END
 
@@ -2793,7 +2793,7 @@ MACHINE_CONFIG_END
  * Naomi 2
  */
 /*
-static MACHINE_CONFIG_DERIVED( naomi2, naomi )
+MACHINE_CONFIG_DERIVED((naomi2_state::naomi2, naomi)
     MCFG_CPU_MODIFY("maincpu")
     MCFG_CPU_PROGRAM_MAP(naomi2_map)
 MACHINE_CONFIG_END
@@ -2802,13 +2802,13 @@ MACHINE_CONFIG_END
  * Naomi 2 GD-Rom
  */
 
-static MACHINE_CONFIG_START( naomi2_base )
+MACHINE_CONFIG_START(naomi2_state::naomi2_base)
 	MCFG_POWERVR2_ADD("powervr2_slave", WRITE8(dc_state, pvr_irq))
 
 	// TODO: ELAN device
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( naomi2gd )
+MACHINE_CONFIG_START(naomi2_state::naomi2gd)
 	MCFG_FRAGMENT_ADD( naomigd )
 	MCFG_FRAGMENT_ADD( naomi2_base )
 
@@ -2820,7 +2820,7 @@ MACHINE_CONFIG_END
  * Naomi 2, M1 sub-board
  */
 
-static MACHINE_CONFIG_START( naomi2m1 )
+MACHINE_CONFIG_START(naomi2_state::naomi2m1)
 	MCFG_FRAGMENT_ADD( naomim1 )
 	MCFG_FRAGMENT_ADD( naomi2_base )
 
@@ -2832,7 +2832,7 @@ MACHINE_CONFIG_END
  * Naomi 2, M2/3 sub-board
  */
 
-static MACHINE_CONFIG_START( naomi2m2 )
+MACHINE_CONFIG_START(naomi2_state::naomi2m2)
 	MCFG_FRAGMENT_ADD( naomim2 )
 	MCFG_FRAGMENT_ADD( naomi2_base )
 
@@ -2844,7 +2844,7 @@ MACHINE_CONFIG_END
  * Atomiswave
  */
 
-static MACHINE_CONFIG_START( aw_base )
+MACHINE_CONFIG_START(atomiswave_state::aw_base)
 	MCFG_FRAGMENT_ADD( naomi_aw_base )
 
 	MCFG_CPU_MODIFY("maincpu")
@@ -2859,13 +2859,13 @@ static MACHINE_CONFIG_START( aw_base )
 	MCFG_MACHINE_RESET_OVERRIDE(dc_state,dc_console)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( aw1c, aw_base )
+MACHINE_CONFIG_DERIVED(atomiswave_state::aw1c, aw_base)
 	MCFG_DC_CONTROLLER_ADD("dcctrl0", "maple_dc", 0, ":P1.0", ":P1.1", ":P1.A0", ":P1.A1", ":P1.A2", ":P1.A3", ":P1.A4", ":P1.A5")
 	// TODO: isn't it supposed to be just one controller?
 	MCFG_DC_CONTROLLER_ADD("dcctrl1", "maple_dc", 1, ":P2.0", ":P2.1", ":P2.A0", ":P2.A1", ":P2.A2", ":P2.A3", ":P2.A4", ":P2.A5")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( aw2c, aw_base )
+MACHINE_CONFIG_DERIVED(atomiswave_state::aw2c, aw_base)
 	MCFG_DC_CONTROLLER_ADD("dcctrl0", "maple_dc", 0, ":P1.0", ":P1.1", ":P1.A0", ":P1.A1", ":P1.A2", ":P1.A3", ":P1.A4", ":P1.A5")
 	MCFG_DC_CONTROLLER_ADD("dcctrl1", "maple_dc", 1, ":P2.0", ":P2.1", ":P2.A0", ":P2.A1", ":P2.A2", ":P2.A3", ":P2.A4", ":P2.A5")
 MACHINE_CONFIG_END

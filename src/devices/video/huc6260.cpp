@@ -303,7 +303,7 @@ void huc6260_device::device_reset()
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( huc6260_device::device_add_mconfig )
+MACHINE_CONFIG_START(huc6260_device::device_add_mconfig)
 	MCFG_PALETTE_ADD("palette",  huc6260_device::PALETTE_SIZE)
 	MCFG_PALETTE_INIT_OWNER(huc6260_device, huc6260)
 MACHINE_CONFIG_END

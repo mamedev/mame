@@ -313,7 +313,7 @@ void munchmo_state::machine_start()
 	save_item(NAME(m_nmi_enable));
 }
 
-static MACHINE_CONFIG_START( mnchmobl )
+MACHINE_CONFIG_START(munchmo_state::mnchmobl)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_15MHz/4) // from pin 13 of XTAL-driven 163

@@ -131,7 +131,7 @@ const tiny_rom_entry *k573dio_device::device_rom_region() const
 	return ROM_NAME(k573dio);
 }
 
-MACHINE_CONFIG_MEMBER( k573dio_device::device_add_mconfig )
+MACHINE_CONFIG_START(k573dio_device::device_add_mconfig)
 	MCFG_MAS3507D_ADD( "mpeg" )
 	MCFG_DS2401_ADD( "digital_id" )
 MACHINE_CONFIG_END

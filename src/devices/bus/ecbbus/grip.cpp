@@ -457,7 +457,7 @@ void ecb_grip21_device::kb_w(uint8_t data)
 //-------------------------------------------------
 
 
-MACHINE_CONFIG_MEMBER( ecb_grip21_device::device_add_mconfig )
+MACHINE_CONFIG_START(ecb_grip21_device::device_add_mconfig)
 	// basic machine hardware
 	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL_16MHz/4)
 	MCFG_Z80_DAISY_CHAIN(grip_daisy_chain)

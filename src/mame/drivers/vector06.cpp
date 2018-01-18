@@ -157,7 +157,7 @@ SLOT_INTERFACE_END
 
 
 /* Machine driver */
-static MACHINE_CONFIG_START( vector06 )
+MACHINE_CONFIG_START(vector06_state::vector06)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8080, 3000000)     // actual speed is wrong due to unemulated latency
 	MCFG_CPU_PROGRAM_MAP(vector06_mem)

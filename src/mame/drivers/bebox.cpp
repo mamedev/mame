@@ -118,11 +118,11 @@ static SLOT_INTERFACE_START( bebox_floppies )
 	SLOT_INTERFACE( "35hd", FLOPPY_35_HD )
 SLOT_INTERFACE_END
 
-static MACHINE_CONFIG_START( mpc105_config )
+void bebox_state::mpc105_config(device_t *device)
+{
 	MCFG_MPC105_CPU( "ppc1" )
 	MCFG_MPC105_BANK_BASE_DEFAULT( 0 )
-MACHINE_CONFIG_END
-
+}
 
 /*************************************
  *
@@ -141,7 +141,7 @@ static SLOT_INTERFACE_START( pci_devices )
 	SLOT_INTERFACE("cirrus", PCI_CIRRUS_SVGA)
 SLOT_INTERFACE_END
 
-static MACHINE_CONFIG_START( bebox )
+MACHINE_CONFIG_START(bebox_state::bebox)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("ppc1", PPC603, 66000000)  /* 66 MHz */
 	MCFG_CPU_PROGRAM_MAP(bebox_mem)
@@ -187,8 +187,12 @@ static MACHINE_CONFIG_START( bebox )
 	MCFG_DEVICE_ADD( "ns16550_3", NS16550, 0 )   /* TODO: Verify model */
 
 	/* video hardware */
-	MCFG_FRAGMENT_ADD( pcvideo_cirrus_gd5428 )
-
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_RAW_PARAMS(XTAL_25_1748MHz,900,0,640,526,0,480)
+	MCFG_SCREEN_UPDATE_DEVICE("vga", cirrus_gd5428_device, screen_update)
+	
+	MCFG_PALETTE_ADD("palette", 0x100)
+	MCFG_DEVICE_ADD("vga", CIRRUS_GD5428, 0)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("ym3812", YM3812, 3579545)
@@ -236,7 +240,7 @@ static MACHINE_CONFIG_START( bebox )
 	MCFG_RAM_EXTRA_OPTIONS("8M,16M")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( bebox2, bebox )
+MACHINE_CONFIG_DERIVED(bebox_state::bebox2, bebox)
 	MCFG_CPU_REPLACE("ppc1", PPC603E, 133000000)    /* 133 MHz */
 	MCFG_CPU_PROGRAM_MAP(bebox_mem)
 

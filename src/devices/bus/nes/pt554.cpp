@@ -88,7 +88,7 @@ static const char *const pt554_sample_names[] =
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( nes_bandai_pt554_device::device_add_mconfig )
+MACHINE_CONFIG_START(nes_bandai_pt554_device::device_add_mconfig)
 
 	// additional sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("addon")

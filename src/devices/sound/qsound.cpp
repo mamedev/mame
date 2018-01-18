@@ -97,7 +97,7 @@ const tiny_rom_entry *qsound_device::device_rom_region() const
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( qsound_device::device_add_mconfig )
+MACHINE_CONFIG_START(qsound_device::device_add_mconfig)
 	MCFG_CPU_ADD("qsound", DSP16, QSOUND_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(dsp16_program_map)
 	MCFG_CPU_DATA_MAP(dsp16_data_map)

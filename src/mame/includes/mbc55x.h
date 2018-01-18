@@ -159,6 +159,7 @@ public:
 
 	uint32_t      m_debug_machine;
 
+	void mbc55x(machine_config &config);
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;

@@ -45,6 +45,7 @@ public:
 	INTERRUPT_GEN_MEMBER(vblank_irq);
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
+	void alinvade(machine_config &config);
 private:
 	uint8_t m_irqmask;
 	uint8_t m_irqff;
@@ -202,7 +203,7 @@ INTERRUPT_GEN_MEMBER(alinvade_state::vblank_irq)
 		m_maincpu->set_input_line(0,HOLD_LINE);
 }
 
-static MACHINE_CONFIG_START( alinvade )
+MACHINE_CONFIG_START(alinvade_state::alinvade)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502,2000000)         /* ? MHz */

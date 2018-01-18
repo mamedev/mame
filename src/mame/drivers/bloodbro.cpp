@@ -517,7 +517,7 @@ WRITE16_MEMBER( bloodbro_state::weststry_layer_scroll_w )
 
 /* Machine Drivers */
 
-static MACHINE_CONFIG_START( bloodbro )
+MACHINE_CONFIG_START(bloodbro_state::bloodbro)
 	// basic machine hardware
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_20MHz/2) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(bloodbro_map)
@@ -562,7 +562,7 @@ static MACHINE_CONFIG_START( bloodbro )
 	MCFG_SEIBU_SOUND_YM_WRITE_CB(DEVWRITE8("ymsnd", ym3812_device, write))
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( weststry, bloodbro )
+MACHINE_CONFIG_DERIVED(bloodbro_state::weststry, bloodbro)
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(weststry_map)
@@ -596,7 +596,7 @@ static MACHINE_CONFIG_DERIVED( weststry, bloodbro )
 	MCFG_SEIBU_SOUND_YM_WRITE_CB(WRITE8(bloodbro_state, weststry_opl_w))
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( skysmash, bloodbro )
+MACHINE_CONFIG_DERIVED(bloodbro_state::skysmash, bloodbro)
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(skysmash_map)

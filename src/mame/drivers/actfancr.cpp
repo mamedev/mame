@@ -284,7 +284,7 @@ MACHINE_RESET_MEMBER(actfancr_state,triothep)
 
 /******************************************************************************/
 
-static MACHINE_CONFIG_START( actfancr )
+MACHINE_CONFIG_START(actfancr_state::actfancr)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", H6280, 21477200/3) /* Should be accurate */
@@ -339,7 +339,7 @@ static MACHINE_CONFIG_START( actfancr )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.85)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( triothep )
+MACHINE_CONFIG_START(actfancr_state::triothep)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",H6280,XTAL_21_4772MHz/3) /* XIN=21.4772Mhz, verified on pcb */

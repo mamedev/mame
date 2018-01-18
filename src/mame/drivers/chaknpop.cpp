@@ -361,7 +361,7 @@ void chaknpop_state::machine_reset()
 	m_flip_y = 0;
 }
 
-static MACHINE_CONFIG_START( chaknpop )
+MACHINE_CONFIG_START(chaknpop_state::chaknpop)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_18MHz / 6)    // Verified on PCB

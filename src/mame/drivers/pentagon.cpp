@@ -41,6 +41,8 @@ public:
 	INTERRUPT_GEN_MEMBER(pentagon_interrupt);
 	TIMER_CALLBACK_MEMBER(irq_on);
 	TIMER_CALLBACK_MEMBER(irq_off);
+	void pent1024(machine_config &config);
+	void pentagon(machine_config &config);
 protected:
 	required_memory_bank m_bank1;
 	required_memory_bank m_bank2;
@@ -248,7 +250,7 @@ GFXDECODE_END
 
 
 
-static MACHINE_CONFIG_DERIVED( pentagon, spectrum_128 )
+MACHINE_CONFIG_DERIVED(pentagon_state::pentagon, spectrum_128)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_CLOCK(XTAL_14MHz / 4)
 	MCFG_CPU_PROGRAM_MAP(pentagon_mem)
@@ -277,7 +279,7 @@ static MACHINE_CONFIG_DERIVED( pentagon, spectrum_128 )
 	MCFG_SOFTWARE_LIST_ADD("cass_list_pen","pentagon_cass")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( pent1024, pentagon)
+MACHINE_CONFIG_DERIVED(pentagon_state::pent1024, pentagon)
 	/* internal ram */
 	MCFG_RAM_MODIFY(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("1024K")

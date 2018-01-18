@@ -31,7 +31,7 @@ DEFINE_DEVICE_TYPE(C64_SPEAKEASY, c64_speakeasy_cartridge_device, "c64_speakeasy
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( c64_speakeasy_cartridge_device::device_add_mconfig )
+MACHINE_CONFIG_START(c64_speakeasy_cartridge_device::device_add_mconfig)
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD(SC01A_TAG, VOTRAX_SC01, 720000)

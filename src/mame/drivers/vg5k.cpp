@@ -102,6 +102,7 @@ public:
 	TIMER_CALLBACK_MEMBER(z80_irq_clear);
 	TIMER_DEVICE_CALLBACK_MEMBER(z80_irq);
 	TIMER_DEVICE_CALLBACK_MEMBER(vg5k_scanline);
+	void vg5k(machine_config &config);
 };
 
 
@@ -358,7 +359,7 @@ DRIVER_INIT_MEMBER(vg5k_state,vg5k)
 }
 
 
-static MACHINE_CONFIG_START( vg5k )
+MACHINE_CONFIG_START(vg5k_state::vg5k)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80, XTAL_4MHz)

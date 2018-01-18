@@ -231,7 +231,7 @@ GFXDECODE_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( shuuz )
+MACHINE_CONFIG_START(shuuz_state::shuuz)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, ATARI_CLOCK_14MHz/2)

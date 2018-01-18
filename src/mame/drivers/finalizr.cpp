@@ -260,7 +260,7 @@ void finalizr_state::machine_reset()
 	m_irq_enable = 0;
 }
 
-static MACHINE_CONFIG_START( finalizr )
+MACHINE_CONFIG_START(finalizr_state::finalizr)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", KONAMI1, XTAL_18_432MHz/6) /* ??? */

@@ -100,6 +100,7 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(sw_prgm_pwr);
 	DECLARE_INPUT_CHANGED_MEMBER(sw_do_enable);
 
+	void intellec4(machine_config &config);
 protected:
 	intellec4_state(machine_config const &mconfig, device_type type, char const *tag)
 		: driver_device(mconfig, type, tag)
@@ -307,7 +308,7 @@ DEVICE_INPUT_DEFAULTS_START(tty)
 	DEVICE_INPUT_DEFAULTS("FLOW_CONTROL",    0x0001, 0x0000)
 DEVICE_INPUT_DEFAULTS_END
 
-MACHINE_CONFIG_START(intellec4)
+MACHINE_CONFIG_START(intellec4_state::intellec4)
 	MCFG_DEVICE_ADD("prgbank", ADDRESS_MAP_BANK, 0)
 	MCFG_DEVICE_PROGRAM_MAP(intellec4_program_banks)
 	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
@@ -1007,6 +1008,7 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(sw_hold);
 	DECLARE_INPUT_CHANGED_MEMBER(sw_one_shot);
 
+	void mod4(machine_config &config);
 protected:
 	virtual void driver_start() override;
 	virtual void driver_reset() override;
@@ -1037,7 +1039,7 @@ private:
   MOD 4-specific configuration
 ----------------------------------*/
 
-MACHINE_CONFIG_DERIVED(mod4, intellec4)
+MACHINE_CONFIG_DERIVED(mod4_state::mod4, intellec4)
 	MCFG_CPU_ADD("maincpu", I4004, 5185000. / 7)
 	MCFG_I4004_ROM_MAP(intellec4_rom)
 	MCFG_I4004_RAM_MEMORY_MAP(intellec4_ram_memory)
@@ -1195,6 +1197,7 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(sw_stop);
 	DECLARE_INPUT_CHANGED_MEMBER(sw_single_step);
 
+	void mod40(machine_config &config);
 protected:
 	virtual void driver_start() override;
 	virtual void driver_reset() override;
@@ -1227,7 +1230,7 @@ private:
   MOD 40-specific configuration
 ----------------------------------*/
 
-MACHINE_CONFIG_DERIVED(mod40, intellec4)
+MACHINE_CONFIG_DERIVED(mod40_state::mod40, intellec4)
 	MCFG_CPU_ADD("maincpu", I4040, 5185000. / 7)
 	MCFG_I4040_ROM_MAP(intellec4_rom)
 	MCFG_I4040_RAM_MEMORY_MAP(intellec4_ram_memory)

@@ -350,7 +350,7 @@ void yunsung8_state::machine_reset()
 }
 
 
-static MACHINE_CONFIG_START( yunsung8 )
+MACHINE_CONFIG_START(yunsung8_state::yunsung8)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_16MHz/2)           /* Z80B @ 8MHz? */

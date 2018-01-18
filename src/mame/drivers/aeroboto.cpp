@@ -237,7 +237,7 @@ void aeroboto_state::machine_reset()
 	m_sy = 0;
 }
 
-static MACHINE_CONFIG_START( formatz )
+MACHINE_CONFIG_START(aeroboto_state::formatz)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", MC6809, XTAL_10MHz/2) /* verified on pcb */

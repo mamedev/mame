@@ -219,7 +219,7 @@ void busicom_state::machine_reset()
 
 //static const char layout_busicom [] = "busicom";
 
-static MACHINE_CONFIG_START( busicom )
+MACHINE_CONFIG_START(busicom_state::busicom)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I4004, 750000)
 	MCFG_I4004_ROM_MAP(busicom_rom)

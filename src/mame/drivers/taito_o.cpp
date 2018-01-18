@@ -232,7 +232,7 @@ void taitoo_state::machine_start()
 {
 }
 
-static MACHINE_CONFIG_START( parentj )
+MACHINE_CONFIG_START(taitoo_state::parentj)
 
 	MCFG_CPU_ADD("maincpu", M68000,12000000 )       /*?? MHz */
 	MCFG_CPU_PROGRAM_MAP(parentj_map)

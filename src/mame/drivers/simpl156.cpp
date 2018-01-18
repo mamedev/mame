@@ -396,7 +396,7 @@ DECOSPR_PRIORITY_CB_MEMBER(simpl156_state::pri_callback)
 }
 
 
-static MACHINE_CONFIG_START( chainrec )
+MACHINE_CONFIG_START(simpl156_state::chainrec)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", ARM, 28000000 /* /4 */) /*DE156*/ /* 7.000 MHz */ /* measured at 7.. seems to need 28? */
@@ -451,28 +451,28 @@ static MACHINE_CONFIG_START( chainrec )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.2)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( magdrop, chainrec )
+MACHINE_CONFIG_DERIVED(simpl156_state::magdrop, chainrec)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(magdrop_map)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( magdropp, chainrec )
+MACHINE_CONFIG_DERIVED(simpl156_state::magdropp, chainrec)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(magdropp_map)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( joemacr, chainrec )
+MACHINE_CONFIG_DERIVED(simpl156_state::joemacr, chainrec)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(joemacr_map)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( mitchell156, chainrec )
+MACHINE_CONFIG_DERIVED(simpl156_state::mitchell156, chainrec)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")

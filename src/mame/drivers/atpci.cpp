@@ -21,6 +21,12 @@ public:
 	required_device<cpu_device> m_maincpu;
 
 	DECLARE_WRITE8_MEMBER(boot_state_w);
+	void at586x3(machine_config &config);
+	void at586(machine_config &config);
+	void at_softlists(machine_config &config);
+
+	static void tx_config(device_t *device);
+	static void sb_config(device_t *device);
 };
 
 WRITE8_MEMBER(at586_state::boot_state_w)
@@ -28,14 +34,18 @@ WRITE8_MEMBER(at586_state::boot_state_w)
 	logerror("Boot state %02x\n", data);
 }
 
-static MACHINE_CONFIG_START( tx_config )
+void at586_state::tx_config(device_t *device)
+{
 	MCFG_I82439TX_CPU( "maincpu" )
 	MCFG_I82439TX_REGION( "isa" )
-MACHINE_CONFIG_END
+}
 
-static MACHINE_CONFIG_START(sb_config)
+void at586_state::sb_config(device_t *device)
+{
+	devcb_base *devcb = nullptr;
+	(void)devcb;
 	MCFG_I82371SB_BOOT_STATE_HOOK(DEVWRITE8(":", at586_state, boot_state_w))
-MACHINE_CONFIG_END
+}
 
 static SLOT_INTERFACE_START( pci_devices )
 	SLOT_INTERFACE_INTERNAL("i82439tx", I82439TX)
@@ -55,7 +65,14 @@ static ADDRESS_MAP_START( at586_io, AS_IO, 32, at586_state )
 	AM_RANGE(0x0cf8, 0x0cff) AM_DEVREADWRITE("pcibus", pci_bus_device, read, write)
 ADDRESS_MAP_END
 
-static MACHINE_CONFIG_START( at586 )
+MACHINE_CONFIG_START(at586_state::at_softlists)
+	/* software lists */
+	MCFG_SOFTWARE_LIST_ADD("pc_disk_list","ibm5150")
+	MCFG_SOFTWARE_LIST_ADD("at_disk_list","ibm5170")
+	MCFG_SOFTWARE_LIST_ADD("at_cdrom_list","ibm5170_cdrom")
+MACHINE_CONFIG_END
+
+MACHINE_CONFIG_START(at586_state::at586)
 	MCFG_CPU_ADD("maincpu", PENTIUM, 60000000)
 	MCFG_CPU_PROGRAM_MAP(at586_map)
 	MCFG_CPU_IO_MAP(at586_io)
@@ -80,7 +97,7 @@ static MACHINE_CONFIG_START( at586 )
 	MCFG_FRAGMENT_ADD( at_softlists )
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( at586x3 )
+MACHINE_CONFIG_START(at586_state::at586x3)
 	MCFG_CPU_ADD("maincpu", PENTIUM, 60000000)
 	MCFG_CPU_PROGRAM_MAP(at586_map)
 	MCFG_CPU_IO_MAP(at586_io)

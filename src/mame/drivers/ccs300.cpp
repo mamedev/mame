@@ -40,6 +40,7 @@ public:
 	DECLARE_MACHINE_RESET(ccs300);
 	DECLARE_WRITE8_MEMBER(port40_w);
 
+	void ccs300(machine_config &config);
 private:
 	required_device<cpu_device> m_maincpu;
 };
@@ -110,7 +111,7 @@ static DEVICE_INPUT_DEFAULTS_START( terminal )
 	DEVICE_INPUT_DEFAULTS( "RS232_STOPBITS", 0xff, RS232_STOPBITS_2 )
 DEVICE_INPUT_DEFAULTS_END
 
-static MACHINE_CONFIG_START( ccs300 )
+MACHINE_CONFIG_START(ccs300_state::ccs300)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80, XTAL_4MHz)
 	MCFG_CPU_PROGRAM_MAP(ccs300_mem)

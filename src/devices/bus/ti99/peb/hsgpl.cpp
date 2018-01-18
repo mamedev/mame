@@ -696,7 +696,7 @@ INPUT_PORTS_START( ti99_hsgpl)
 		PORT_DIPSETTING(    0x01, "Normal" )
 INPUT_PORTS_END
 
-MACHINE_CONFIG_MEMBER( snug_high_speed_gpl_device::device_add_mconfig )
+MACHINE_CONFIG_START(snug_high_speed_gpl_device::device_add_mconfig)
 	MCFG_AT29C040A_ADD( DSR_EEPROM )
 	MCFG_AT29C040A_ADD( GROM_B_EEPROM )
 	MCFG_AT29C040A_ADD( GROM_A_EEPROM )

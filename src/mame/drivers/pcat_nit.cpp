@@ -107,6 +107,8 @@ public:
 	DECLARE_READ8_MEMBER(pcat_nit_io_r);
 	DECLARE_DRIVER_INIT(pcat_nit);
 	virtual void machine_start() override;
+	void bonanza(machine_config &config);
+	void pcat_nit(machine_config &config);
 };
 
 /*************************************
@@ -218,7 +220,7 @@ void pcat_nit_state::machine_start()
 	membank("rombank")->set_entry(0);
 }
 
-static MACHINE_CONFIG_START( pcat_nit )
+MACHINE_CONFIG_START(pcat_nit_state::pcat_nit)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I386, 14318180*2)   /* I386 ?? Mhz */
 	MCFG_CPU_PROGRAM_MAP(pcat_map)
@@ -237,7 +239,7 @@ static MACHINE_CONFIG_START( pcat_nit )
 	MCFG_NVRAM_ADD_0FILL("nvram")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( bonanza )
+MACHINE_CONFIG_START(pcat_nit_state::bonanza)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I386, 14318180*2)   /* I386 ?? Mhz */
 	MCFG_CPU_PROGRAM_MAP(bonanza_map)

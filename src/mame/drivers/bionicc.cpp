@@ -369,7 +369,7 @@ void bionicc_state::machine_reset()
 	m_soundcommand = 0;
 }
 
-static MACHINE_CONFIG_START( bionicc )
+MACHINE_CONFIG_START(bionicc_state::bionicc)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz / 2) /* 12 MHz - verified in schematics */

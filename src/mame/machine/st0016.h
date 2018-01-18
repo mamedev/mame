@@ -15,7 +15,7 @@ typedef device_delegate<uint8_t (void)> st0016_dma_offs_delegate;
 #define ST0016_DMA_OFFS_CB(name)  uint8_t name(void)
 
 #define MCFG_ST0016_DMA_OFFS_CB(_class, _method) \
-	st0016_cpu_device::set_dma_offs_callback(*device, st0016_dma_offs_delegate(&_class::_method, #_class "::" #_method, downcast<_class *>(owner)));
+	st0016_cpu_device::set_dma_offs_callback(*device, st0016_dma_offs_delegate(&_class::_method, #_class "::" #_method, this));
 
 
 class st0016_cpu_device : public z80_device, public device_gfx_interface

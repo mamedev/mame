@@ -167,7 +167,7 @@ WRITE8_MEMBER(ajax_state::volume_callback1)
 }
 
 
-static MACHINE_CONFIG_START( ajax )
+MACHINE_CONFIG_START(ajax_state::ajax)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", KONAMI, XTAL_24MHz/2/4)    /* 052001 12/4 MHz*/

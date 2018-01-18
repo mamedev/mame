@@ -243,15 +243,15 @@ SLOT_INTERFACE_END
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( sns_rom_bsx_device::device_add_mconfig )
+MACHINE_CONFIG_START(sns_rom_bsx_device::device_add_mconfig)
 	MCFG_SNS_BSX_CARTRIDGE_ADD("bs_slot", bsx_cart, nullptr)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_MEMBER( sns_rom_bsxlo_device::device_add_mconfig )
+MACHINE_CONFIG_START(sns_rom_bsxlo_device::device_add_mconfig)
 	MCFG_SNS_BSX_CARTRIDGE_ADD("bs_slot", bsx_cart, nullptr)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_MEMBER( sns_rom_bsxhi_device::device_add_mconfig )
+MACHINE_CONFIG_START(sns_rom_bsxhi_device::device_add_mconfig)
 	MCFG_SNS_BSX_CARTRIDGE_ADD("bs_slot", bsx_cart, nullptr)
 MACHINE_CONFIG_END
 

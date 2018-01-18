@@ -47,6 +47,7 @@ public:
 	void lcd_spi_line_w( int line, int data);
 	int lcd_spi_line_r( int line);
 	required_device<cpu_device> m_maincpu;
+	void hp49gp(machine_config &config);
 };
 
 /***************************************************************************
@@ -276,7 +277,7 @@ DRIVER_INIT_MEMBER(hp49gp_state,hp49gp)
 	lcd_spi_init();
 }
 
-static MACHINE_CONFIG_START( hp49gp )
+MACHINE_CONFIG_START(hp49gp_state::hp49gp)
 	MCFG_CPU_ADD("maincpu", ARM9, 400000000)
 	MCFG_CPU_PROGRAM_MAP(hp49gp_map)
 

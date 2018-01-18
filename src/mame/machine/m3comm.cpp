@@ -116,7 +116,7 @@ DEFINE_DEVICE_TYPE(M3COMM, m3comm_device, "m3comm", "Model 3 Communication Board
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( m3comm_device::device_add_mconfig )
+MACHINE_CONFIG_START(m3comm_device::device_add_mconfig)
 	MCFG_CPU_ADD(M68K_TAG, M68000, 10000000) // random
 	MCFG_CPU_PROGRAM_MAP(m3comm_mem)
 

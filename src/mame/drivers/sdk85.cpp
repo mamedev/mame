@@ -58,6 +58,7 @@ public:
 	DECLARE_WRITE8_MEMBER(digit_w);
 	DECLARE_READ8_MEMBER(kbd_r);
 
+	void sdk85(machine_config &config);
 protected:
 	virtual void machine_reset() override;
 
@@ -141,7 +142,7 @@ READ8_MEMBER( sdk85_state::kbd_r )
 	return data;
 }
 
-static MACHINE_CONFIG_START( sdk85 )
+MACHINE_CONFIG_START(sdk85_state::sdk85)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8085A, XTAL_6_144MHz)
 	MCFG_CPU_PROGRAM_MAP(sdk85_mem)

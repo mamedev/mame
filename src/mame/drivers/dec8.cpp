@@ -1954,7 +1954,7 @@ void dec8_state::machine_reset()
 		MCFG_SCREEN_RAW_PARAMS(XTAL_12MHz/2,384,0,256,272,8,248)
 
 
-static MACHINE_CONFIG_START( lastmisn )
+MACHINE_CONFIG_START(dec8_state::lastmisn)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", MC6809E, 2000000)
@@ -2007,7 +2007,7 @@ static MACHINE_CONFIG_START( lastmisn )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.70)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( shackled )
+MACHINE_CONFIG_START(dec8_state::shackled)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", MC6809E, 2000000)
@@ -2061,7 +2061,7 @@ static MACHINE_CONFIG_START( shackled )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.70)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( gondo )
+MACHINE_CONFIG_START(dec8_state::gondo)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", HD6309,3000000*4) /* HD63C09EP */
@@ -2115,7 +2115,7 @@ static MACHINE_CONFIG_START( gondo )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.70)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( garyoret )
+MACHINE_CONFIG_START(dec8_state::garyoret)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", HD6309,3000000*4) /* HD63C09EP */
@@ -2169,7 +2169,7 @@ static MACHINE_CONFIG_START( garyoret )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.70)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( ghostb )
+MACHINE_CONFIG_START(dec8_state::ghostb)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", HD6309, 3000000*4)
@@ -2225,12 +2225,12 @@ static MACHINE_CONFIG_START( ghostb )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.70)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( meikyuh, ghostb )
+MACHINE_CONFIG_DERIVED(dec8_state::meikyuh, ghostb)
 	MCFG_CPU_REPLACE("audiocpu", M6502, 1500000)
 	MCFG_CPU_PROGRAM_MAP(dec8_s_map)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( csilver )
+MACHINE_CONFIG_START(dec8_state::csilver)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", MC6809E, XTAL_12MHz/8) /* verified on pcb */
@@ -2289,7 +2289,7 @@ static MACHINE_CONFIG_START( csilver )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.88)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( oscar )
+MACHINE_CONFIG_START(dec8_state::oscar)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", HD6309, XTAL_12MHz/2) /* verified on pcb */
@@ -2347,7 +2347,7 @@ static MACHINE_CONFIG_START( oscar )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.70)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( srdarwin )
+MACHINE_CONFIG_START(dec8_state::srdarwin)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", MC6809E, 2000000)  /* MC68A09EP */
@@ -2397,7 +2397,7 @@ static MACHINE_CONFIG_START( srdarwin )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.70)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( cobracom )
+MACHINE_CONFIG_START(dec8_state::cobracom)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", MC6809E, 2000000)

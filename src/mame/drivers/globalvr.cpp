@@ -67,6 +67,7 @@ public:
 			m_maincpu(*this, "maincpu")
 	{ }
 
+	void globalvr(machine_config &config);
 protected:
 
 	// devices
@@ -84,7 +85,7 @@ static INPUT_PORTS_START( globalvr )
 INPUT_PORTS_END
 
 
-static MACHINE_CONFIG_START( globalvr )
+MACHINE_CONFIG_START(globalvr_state::globalvr)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", PENTIUM, 100000000)      /* ? MHz */
 	MCFG_CPU_PROGRAM_MAP(globalvr_map)

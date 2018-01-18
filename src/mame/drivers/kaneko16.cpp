@@ -1867,7 +1867,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(kaneko16_state::kaneko16_interrupt)
     6-7]    rte
 */
 
-static MACHINE_CONFIG_START( berlwall )
+MACHINE_CONFIG_START(kaneko16_berlwall_state::berlwall)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 12000000)   /* MC68000P12 */
@@ -1926,7 +1926,7 @@ MACHINE_CONFIG_END
                             Bakuretsu Breaker
 ***************************************************************************/
 
-static MACHINE_CONFIG_START( bakubrkr )
+MACHINE_CONFIG_START(kaneko16_state::bakubrkr)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_12MHz) /* verified on pcb */
@@ -2001,7 +2001,7 @@ MACHINE_CONFIG_END
         6-7]    busy loop
 */
 
-static MACHINE_CONFIG_START( blazeon )
+MACHINE_CONFIG_START(kaneko16_state::blazeon)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000,12000000)    /* TMP68HC000-12 */
@@ -2055,7 +2055,7 @@ MACHINE_CONFIG_END
                                  Wing Force
 ***************************************************************************/
 
-static MACHINE_CONFIG_START( wingforc )
+MACHINE_CONFIG_START(kaneko16_state::wingforc)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz)    /* TMP68HC000N-16 */
@@ -2121,7 +2121,7 @@ MACHINE_CONFIG_END
     VIDEO_UPDATE_AFTER_VBLANK fixes the mangled/wrong colored sprites
 */
 
-static MACHINE_CONFIG_START( gtmr )
+MACHINE_CONFIG_START(kaneko16_gtmr_state::gtmr)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz) /* verified on pcb */
@@ -2179,7 +2179,7 @@ static MACHINE_CONFIG_START( gtmr )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( gtmre, gtmr )
+MACHINE_CONFIG_DERIVED(kaneko16_gtmr_state::gtmre, gtmr)
 	MCFG_DEVICE_MODIFY("toybox")
 	MCFG_TOYBOX_TABLE_TYPE(ALT)
 MACHINE_CONFIG_END
@@ -2188,7 +2188,7 @@ MACHINE_CONFIG_END
                             Great 1000 Miles Rally 2
 ***************************************************************************/
 
-static MACHINE_CONFIG_DERIVED( gtmr2, gtmre )
+MACHINE_CONFIG_DERIVED(kaneko16_gtmr_state::gtmr2, gtmre)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2199,7 +2199,7 @@ MACHINE_CONFIG_END
                                 Blood Warrior
 ***************************************************************************/
 
-static MACHINE_CONFIG_DERIVED( bloodwar, gtmr )
+MACHINE_CONFIG_DERIVED(kaneko16_gtmr_state::bloodwar, gtmr)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2220,7 +2220,7 @@ MACHINE_CONFIG_END
                             Bonk's Adventure
 ***************************************************************************/
 
-static MACHINE_CONFIG_DERIVED( bonkadv, gtmr )
+MACHINE_CONFIG_DERIVED(kaneko16_gtmr_state::bonkadv, gtmr)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2244,7 +2244,7 @@ MACHINE_CONFIG_END
                                 Magical Crystal
 ***************************************************************************/
 
-static MACHINE_CONFIG_START( mgcrystl )
+MACHINE_CONFIG_START(kaneko16_state::mgcrystl)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_12MHz) /* verified on pcb, TMP68HC000N-12 @U31 and X2 is 12MHz */
@@ -2373,7 +2373,7 @@ static ADDRESS_MAP_START( shogwarr_oki2_map, 0, 8, kaneko16_shogwarr_state )
 	AM_RANGE(0x00000, 0x3ffff) AM_ROMBANK("bank11")
 ADDRESS_MAP_END
 
-static MACHINE_CONFIG_START( shogwarr )
+MACHINE_CONFIG_START(kaneko16_shogwarr_state::shogwarr)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_12MHz)
@@ -2449,7 +2449,7 @@ static ADDRESS_MAP_START( brapboys_oki2_map, 0, 8, kaneko16_shogwarr_state )
 	AM_RANGE(0x20000, 0x3ffff) AM_ROMBANK("bank11")
 ADDRESS_MAP_END
 
-static MACHINE_CONFIG_DERIVED( brapboys, shogwarr )
+MACHINE_CONFIG_DERIVED(kaneko16_shogwarr_state::brapboys, shogwarr)
 	MCFG_SOUND_MODIFY("oki2")
 	MCFG_DEVICE_ADDRESS_MAP(0, brapboys_oki2_map)
 

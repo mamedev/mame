@@ -424,7 +424,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(gundealr_state::gundealr_scanline)
 		m_maincpu->set_input_line_and_vector(0, HOLD_LINE,0xcf); /* RST 10h */
 }
 
-static MACHINE_CONFIG_START( gundealr )
+MACHINE_CONFIG_START(gundealr_state::gundealr)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_12MHz/2)   /* 6 MHz verified for Yam! Yam!? */
@@ -517,14 +517,14 @@ TIMER_DEVICE_CALLBACK_MEMBER(gundealr_state::yamyam_mcu_sim)
 	m_rambase[0x006] = ioport("IN0")->read();
 }
 
-static MACHINE_CONFIG_DERIVED( yamyam, gundealr )
+MACHINE_CONFIG_DERIVED(gundealr_state::yamyam, gundealr)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(yamyam_main_map)
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("mcusim", gundealr_state, yamyam_mcu_sim, attotime::from_hz(6000000/60)) /* 6mhz confirmed */
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( gundealrbl, yamyam )
+MACHINE_CONFIG_DERIVED(gundealr_state::gundealrbl, yamyam)
 	MCFG_DEVICE_REMOVE("mcusim")
 MACHINE_CONFIG_END
 

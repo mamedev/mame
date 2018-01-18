@@ -487,7 +487,7 @@ void exprraid_state::machine_reset()
 }
 
 
-static MACHINE_CONFIG_START( exprraid )
+MACHINE_CONFIG_START(exprraid_state::exprraid)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", DECO16, XTAL_12MHz / 8)
@@ -527,7 +527,7 @@ static MACHINE_CONFIG_START( exprraid )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( exprboot, exprraid )
+MACHINE_CONFIG_DERIVED(exprraid_state::exprboot, exprraid)
 
 	MCFG_CPU_REPLACE("maincpu", M6502, 1500000)        /* 1.5 MHz ??? */
 	MCFG_CPU_PROGRAM_MAP(master_map)

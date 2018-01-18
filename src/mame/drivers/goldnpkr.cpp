@@ -1353,6 +1353,18 @@ public:
 	DECLARE_MACHINE_RESET(mondial);
 	uint32_t screen_update_goldnpkr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
+	void goldnpkr_base(machine_config &config);
+	void wildcard(machine_config &config);
+	void wildcrdb(machine_config &config);
+	void witchcrd(machine_config &config);
+	void mondial(machine_config &config);
+	void bchancep(machine_config &config);
+	void wcfalcon(machine_config &config);
+	void geniea(machine_config &config);
+	void genie(machine_config &config);
+	void pottnpkr(machine_config &config);
+	void goldnpkr(machine_config &config);
+	void wcrdxtnd(machine_config &config);
 protected:
 	required_shared_ptr<uint8_t> m_videoram;
 	required_shared_ptr<uint8_t> m_colorram;
@@ -1391,6 +1403,7 @@ public:
 	DECLARE_WRITE8_MEMBER(mcu_command_w);
 	DECLARE_WRITE8_MEMBER(mcu_portb_w);
 	DECLARE_WRITE8_MEMBER(mcu_portc_w);
+	void megadpkr(machine_config &config);
 };
 
 
@@ -4253,7 +4266,7 @@ MACHINE_RESET_MEMBER(goldnpkr_state, mondial)
 *              Machine Drivers               *
 *********************************************/
 
-static MACHINE_CONFIG_START( goldnpkr_base )
+MACHINE_CONFIG_START(goldnpkr_state::goldnpkr_base)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, CPU_CLOCK)
@@ -4290,7 +4303,7 @@ static MACHINE_CONFIG_START( goldnpkr_base )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( goldnpkr, goldnpkr_base )
+MACHINE_CONFIG_DERIVED(goldnpkr_state::goldnpkr, goldnpkr_base)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -4300,7 +4313,7 @@ static MACHINE_CONFIG_DERIVED( goldnpkr, goldnpkr_base )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( pottnpkr, goldnpkr_base )
+MACHINE_CONFIG_DERIVED(goldnpkr_state::pottnpkr, goldnpkr_base)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -4318,7 +4331,7 @@ static MACHINE_CONFIG_DERIVED( pottnpkr, goldnpkr_base )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( witchcrd, goldnpkr_base )
+MACHINE_CONFIG_DERIVED(goldnpkr_state::witchcrd, goldnpkr_base)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -4340,7 +4353,7 @@ static MACHINE_CONFIG_DERIVED( witchcrd, goldnpkr_base )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( wcfalcon, goldnpkr_base )
+MACHINE_CONFIG_DERIVED(goldnpkr_state::wcfalcon, goldnpkr_base)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -4363,7 +4376,7 @@ static MACHINE_CONFIG_DERIVED( wcfalcon, goldnpkr_base )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( wildcard, goldnpkr_base )
+MACHINE_CONFIG_DERIVED(goldnpkr_state::wildcard, goldnpkr_base)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -4387,7 +4400,7 @@ static MACHINE_CONFIG_DERIVED( wildcard, goldnpkr_base )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( wcrdxtnd, goldnpkr_base )
+MACHINE_CONFIG_DERIVED(goldnpkr_state::wcrdxtnd, goldnpkr_base)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -4411,7 +4424,7 @@ static MACHINE_CONFIG_DERIVED( wcrdxtnd, goldnpkr_base )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( wildcrdb, goldnpkr_base )
+MACHINE_CONFIG_DERIVED(goldnpkr_state::wildcrdb, goldnpkr_base)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -4440,7 +4453,7 @@ static MACHINE_CONFIG_DERIVED( wildcrdb, goldnpkr_base )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( genie, goldnpkr_base )
+MACHINE_CONFIG_DERIVED(goldnpkr_state::genie, goldnpkr_base)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -4462,7 +4475,7 @@ static MACHINE_CONFIG_DERIVED( genie, goldnpkr_base )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( geniea, goldnpkr_base )
+MACHINE_CONFIG_DERIVED(goldnpkr_state::geniea, goldnpkr_base)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -4484,7 +4497,7 @@ static MACHINE_CONFIG_DERIVED( geniea, goldnpkr_base )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( mondial, goldnpkr_base )
+MACHINE_CONFIG_DERIVED(goldnpkr_state::mondial, goldnpkr_base)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -4500,7 +4513,7 @@ static MACHINE_CONFIG_DERIVED( mondial, goldnpkr_base )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( bchancep, goldnpkr_base )
+MACHINE_CONFIG_DERIVED(goldnpkr_state::bchancep, goldnpkr_base)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -4647,7 +4660,7 @@ static INPUT_PORTS_START( megadpkr )
 INPUT_PORTS_END
 
 
-static MACHINE_CONFIG_START( megadpkr )
+MACHINE_CONFIG_START(blitz_state::megadpkr)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, CPU_CLOCK)

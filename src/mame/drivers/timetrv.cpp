@@ -51,6 +51,7 @@ public:
 	INTERRUPT_GEN_MEMBER(vblank_irq);
 	INTERRUPT_GEN_MEMBER(ld_irq);
 	required_device<cpu_device> m_maincpu;
+	void timetrv(machine_config &config);
 };
 
 
@@ -149,7 +150,7 @@ INTERRUPT_GEN_MEMBER(timetrv_state::ld_irq)
 	device.execute().set_input_line_and_vector(0,HOLD_LINE,0x48/4); //ld irq
 }
 
-static MACHINE_CONFIG_START( timetrv )
+MACHINE_CONFIG_START(timetrv_state::timetrv)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",I80188,20000000) //???
