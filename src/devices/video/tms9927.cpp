@@ -279,7 +279,8 @@ READ8_MEMBER( tms9927_device::read )
 			return m_reg[offset - 0x08 + 7];
 
 		default:
-			generic_access(space, offset);
+			if (!machine().side_effect_disabled())
+				generic_access(space, offset);
 			break;
 	}
 	return 0xff;
