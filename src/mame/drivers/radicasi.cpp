@@ -372,11 +372,9 @@ void radica6502_sound_device::device_reset()
 	m_isstopped = 0x3f;
 }
 
-
 //-------------------------------------------------
 //  sound_stream_update - handle a stream update
 //-------------------------------------------------
-
 
 void radica6502_sound_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
 {
@@ -424,6 +422,129 @@ void radica6502_sound_device::sound_stream_update(sound_stream &stream, stream_s
 		}
 		outpos++;
 	}
+}
+
+
+#define MCFG_RADICA6502_GPIO_READ_PORT0_CB(_devcb) \
+	devcb = &radica6502_gpio_device::set_gpio_read_0_callback(*device, DEVCB_##_devcb);
+
+#define MCFG_RADICA6502_GPIO_READ_PORT1_CB(_devcb) \
+	devcb = &radica6502_gpio_device::set_gpio_read_1_callback(*device, DEVCB_##_devcb);
+
+#define MCFG_RADICA6502_GPIO_READ_PORT2_CB(_devcb) \
+	devcb = &radica6502_gpio_device::set_gpio_read_2_callback(*device, DEVCB_##_devcb);
+
+
+class radica6502_gpio_device : public device_t
+{
+public:
+	radica6502_gpio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	template <class Object> static devcb_base &set_gpio_read_0_callback(device_t &device, Object &&cb) { return downcast<radica6502_gpio_device &>(device).m_space_read0_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_gpio_read_1_callback(device_t &device, Object &&cb) { return downcast<radica6502_gpio_device &>(device).m_space_read1_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_gpio_read_2_callback(device_t &device, Object &&cb) { return downcast<radica6502_gpio_device &>(device).m_space_read2_cb.set_callback(std::forward<Object>(cb)); }
+
+	DECLARE_READ8_MEMBER(gpio_r);
+	DECLARE_WRITE8_MEMBER(gpio_w);
+
+	DECLARE_WRITE8_MEMBER(gpio_unk_w);
+
+
+protected:
+	// device-level overrides
+	virtual void device_start() override;
+	virtual void device_reset() override;
+
+private:
+	devcb_read8 m_space_read0_cb;
+	devcb_read8 m_space_read1_cb;
+	devcb_read8 m_space_read2_cb;
+
+	uint8_t read_port_data(int which);
+	uint8_t read_direction(int which);
+	void write_port_data(int which, uint8_t data);
+	void write_direction(int which, uint8_t data);
+
+	uint8_t m_ddr[3];
+	uint8_t m_unk[3];
+};
+
+//DECLARE_DEVICE_TYPE(RADICA6502_SOUND, radica6502_gpio_device)
+DEFINE_DEVICE_TYPE(RADICA6502_GPIO, radica6502_gpio_device, "radica6502gpio", "Radica 6502 GPIO")
+
+radica6502_gpio_device::radica6502_gpio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, RADICA6502_GPIO, tag, owner, clock)
+	, m_space_read0_cb(*this)
+	, m_space_read1_cb(*this)
+	, m_space_read2_cb(*this)
+{
+}
+
+void radica6502_gpio_device::device_start()
+{
+	m_space_read0_cb.resolve_safe(0xff);
+	m_space_read1_cb.resolve_safe(0xff);
+	m_space_read2_cb.resolve_safe(0xff);
+}
+
+void radica6502_gpio_device::device_reset()
+{
+	for (int i = 0; i < 3; i++)
+	{
+		m_ddr[3] = 0;
+		m_unk[3] = 0;
+	}
+}
+
+uint8_t radica6502_gpio_device::read_port_data(int which)
+{
+	//todo, actually use the direction registers
+	switch (which)
+	{
+		case 0: return m_space_read0_cb();
+		case 1: return m_space_read1_cb();
+		case 2: return m_space_read2_cb();
+	}
+
+	return 0xff;
+}
+
+uint8_t radica6502_gpio_device::read_direction(int which)
+{
+	return m_ddr[which];
+}
+
+READ8_MEMBER(radica6502_gpio_device::gpio_r)
+{
+
+	int port = offset/2;
+	if (!(offset&1)) return read_direction(port);
+	else return read_port_data(port);
+}
+
+void radica6502_gpio_device::write_port_data(int which, uint8_t data)
+{
+	//todo, actually use the direction registers
+	logerror("%s: write_port_data (port %d) %02x (direction register %02x)\n", which, data, m_ddr[which]);
+}
+
+void radica6502_gpio_device::write_direction(int which, uint8_t data)
+{
+	logerror("%s: write_direction (port %d) %02x\n", which, data);
+	m_ddr[which] = data;
+}
+
+WRITE8_MEMBER(radica6502_gpio_device::gpio_w)
+{
+
+	int port = offset/2;
+	if (!(offset&1)) return write_direction(port, data);
+	else return write_port_data(port, data);
+}
+
+WRITE8_MEMBER(radica6502_gpio_device::gpio_unk_w)
+{
+	logerror("%s: gpio_unk_w (port %d) %02x (direction register %02x)\n", offset, data, m_ddr[offset]);
 }
 
 void radica_6502_state::video_start()
@@ -1259,20 +1380,13 @@ static ADDRESS_MAP_START( radicasi_map, AS_PROGRAM, 8, radica_6502_state )
 
 
 	// 504x GPIO area?
-	AM_RANGE(0x5040, 0x5040) AM_WRITENOP // written at same time as 5048 (port direction?)
-	AM_RANGE(0x5041, 0x5041) AM_WRITENOP AM_READ_PORT("IN0") // written with 0x80 after setting 5040 to 0x7f
-	AM_RANGE(0x5042, 0x5042) AM_WRITENOP // written at same time as 5049 (port direction?)
-	AM_RANGE(0x5043, 0x5043) AM_WRITENOP // written with 0x00 after setting 0x5042 to 0xfe
-	AM_RANGE(0x5044, 0x5044) AM_WRITENOP // written at same time as 504a (port direction?)
-	AM_RANGE(0x5046, 0x5046) AM_WRITENOP //  written with 0x00 after setting 0x5044 to 0xff
-	
-	AM_RANGE(0x5048, 0x5048) AM_WRITENOP  // 5048 see above (some kind of port config?)
-	AM_RANGE(0x5049, 0x5049) AM_WRITENOP  // 5049 see above
-	AM_RANGE(0x504a, 0x504a) AM_WRITENOP  // 504a see above
+	AM_RANGE(0x5040, 0x5046) AM_DEVREADWRITE("gpio", radica6502_gpio_device, gpio_r, gpio_w)
+	AM_RANGE(0x5048, 0x504a) AM_DEVWRITE("gpio", radica6502_gpio_device, gpio_unk_w)
 
 	// 506x unknown
 	AM_RANGE(0x5060, 0x506d) AM_RAM // read/written by tetris
 
+	// 508x sound
 	AM_RANGE(0x5080, 0x5091) AM_DEVREADWRITE("6ch_sound", radica6502_sound_device, radicasi_sound_addr_r, radicasi_sound_addr_w)
 	AM_RANGE(0x5092, 0x50a3) AM_DEVREADWRITE("6ch_sound", radica6502_sound_device, radicasi_sound_size_r, radicasi_sound_size_w)
 	AM_RANGE(0x50a4, 0x50a4) AM_DEVREADWRITE("6ch_sound", radica6502_sound_device, radicasi_sound_unk_r, radicasi_sound_unk_w)
@@ -1495,6 +1609,9 @@ MACHINE_CONFIG_START(radica_6502_state::radicasi)
 	MCFG_PALETTE_ADD("palette", 256)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", radicasi_fake)
+
+	MCFG_DEVICE_ADD("gpio", RADICA6502_GPIO, 0)
+	MCFG_RADICA6502_GPIO_READ_PORT0_CB(IOPORT("IN0"))
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
