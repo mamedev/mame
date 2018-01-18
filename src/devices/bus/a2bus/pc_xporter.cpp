@@ -319,7 +319,7 @@ uint8_t a2bus_pcxporter_device::read_c800(uint16_t offset)
 				break;
 		}
 
-		return m_regs[offset];
+		return m_regs[offset & 0x3ff];
 	}
 }
 
@@ -436,7 +436,7 @@ void a2bus_pcxporter_device::write_c800(uint16_t offset, uint8_t data)
 
 			default:
 //              logerror("%02x to C800 at %x\n", data, offset + 0xc800);
-				m_regs[offset] = data;
+				m_regs[offset & 0x3ff] = data;
 				break;
 		}
 	}
