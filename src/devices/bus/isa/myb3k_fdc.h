@@ -14,9 +14,23 @@
 #include "machine/wd_fdc.h"
 #include "formats/imd_dsk.h"
 
+class isa8_myb3k_fdc471x_base
+{
+protected:
+	enum {
+		FDC_MSM_MODE = 0x40,
+		FDC_DDEN = 0x20,
+		//FDC_MOTOR_ON = 0x10, // According to service manual but not schematics and BIOS
+		FDC_SIDE_SEL = 0x08,
+		FDC_MOTOR_ON = 0x04, // According to schematics but "Motor Cont" according to service manual
+		FDC_DRIVE_SEL = 0x03,
+	};
+};
+
 class isa8_myb3k_fdc4710_device :
 	public device_t,
-	public device_isa8_card_interface
+	public device_isa8_card_interface,
+	public isa8_myb3k_fdc471x_base
 {
 public:
 	// construction/destruction
@@ -53,7 +67,8 @@ private:
 
 class isa8_myb3k_fdc4711_device :
 	public device_t,
-	public device_isa8_card_interface
+	public device_isa8_card_interface,
+	public isa8_myb3k_fdc471x_base
 {
 public:
 	// construction/destruction

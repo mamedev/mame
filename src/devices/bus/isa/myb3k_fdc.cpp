@@ -289,12 +289,6 @@ WRITE8_MEMBER( isa8_myb3k_fdc4711_device::myb3k_inv_fdc_data_w )
 //-------------------------------------------------
 //  myb3k_fdc_command - descrete fdc card features
 //-------------------------------------------------
-#define FDC_MSM_MODE   0x40
-#define FDC_DDEN       0x20
-//#define FDC_MOTOR_ON   0x10 // According to service manual but not schematics and BIOS
-#define FDC_SIDE_SEL   0x08
-#define FDC_MOTOR_ON   0x04 // According to schematics but "Motor Cont" according to service manual
-#define FDC_DRIVE_SEL  0x03
 WRITE8_MEMBER( isa8_myb3k_fdc4710_device::myb3k_fdc_command )
 {
 	data = ~data;
