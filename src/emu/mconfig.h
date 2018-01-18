@@ -83,8 +83,6 @@ private:
 	std::unique_ptr<device_t>  m_root_device;
 };
 
-typedef device_delegate<void (machine_config &)> machine_config_delegate;
-
 
 //*************************************************************************/
 /** @name Machine config start/end macros */
