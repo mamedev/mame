@@ -283,8 +283,6 @@ private:
 	bool get_tile_data(int base, int drawpri, int& tile, int &attr, int &unk2);
 	void draw_tilemaps(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int drawpri);
 	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-
-	sound_stream *m_stream;
 };
 
 
@@ -491,8 +489,8 @@ void radica6502_gpio_device::device_reset()
 {
 	for (int i = 0; i < 3; i++)
 	{
-		m_ddr[3] = 0;
-		m_unk[3] = 0;
+		m_ddr[i] = 0;
+		m_unk[i] = 0;
 	}
 }
 
