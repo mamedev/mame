@@ -93,20 +93,20 @@ void sm511_device::clock_melody()
 		return;
 
 	// tone cycle table (SM511/SM512 datasheet fig.5)
-	// cmd 0 = cmd, 1 = stop, > 13 = illegal(unknown)
+	// cmd 0 = rest, 1 = stop, > 13 = illegal(inactive?)
 	static const u8 lut_tone_cycles[4*16] =
 	{
-		0, 0, 7, 8, 8, 9, 9, 10,11,11,12,13,14,14, 7*2, 8*2,
-		0, 0, 8, 8, 9, 9, 10,11,11,12,13,13,14,15, 8*2, 8*2,
-		0, 0, 8, 8, 9, 9, 10,10,11,12,12,13,14,15, 8*2, 8*2,
-		0, 0, 8, 9, 9, 10,10,11,11,12,13,14,14,15, 8*2, 9*2
+		0, 0, 7, 8, 8, 9, 9, 10,11,11,12,13,14,14, 0, 0,
+		0, 0, 8, 8, 9, 9, 10,11,11,12,13,13,14,15, 0, 0,
+		0, 0, 8, 8, 9, 9, 10,10,11,12,12,13,14,15, 0, 0,
+		0, 0, 8, 9, 9, 10,10,11,11,12,13,14,14,15, 0, 0,
 	};
 
 	u8 cmd = m_melody_rom[m_melody_address] & 0x3f;
 	u8 out = 0;
 
 	// clock duty cycle if tone is active
-	if ((cmd & 0xf) > 1)
+	if ((cmd & 0xf) >= 2 && (cmd & 0xf) <= 13)
 	{
 		out = m_melody_duty_index & m_melody_rd & 1;
 		m_melody_duty_count++;
@@ -121,7 +121,7 @@ void sm511_device::clock_melody()
 	}
 	else if ((cmd & 0xf) == 1)
 	{
-		// rest tell signal
+		// set melody stop flag
 		m_melody_rd |= 2;
 	}
 
