@@ -139,7 +139,7 @@ device_memory_interface::space_config_vector i8086_cpu_device::memory_space_conf
 uint8_t i8086_cpu_device::fetch_op()
 {
 	uint8_t data;
-	data = m_direct_opcodes->read_byte(pc(), m_fetch_xor);
+	data = m_direct_opcodes->read_byte(update_pc(), m_fetch_xor);
 	m_ip++;
 	return data;
 }
@@ -147,7 +147,7 @@ uint8_t i8086_cpu_device::fetch_op()
 uint8_t i8086_cpu_device::fetch()
 {
 	uint8_t data;
-	data = m_direct_opcodes->read_byte(pc(), m_fetch_xor);
+	data = m_direct_opcodes->read_byte(update_pc(), m_fetch_xor);
 	m_ip++;
 	return data;
 }
@@ -210,7 +210,7 @@ void i8086_cpu_device::execute_run()
 
 		if (!m_seg_prefix)
 		{
-			debugger_instruction_hook( this, pc() );
+			debugger_instruction_hook( this, update_pc() );
 		}
 
 		uint8_t op = fetch_op();
@@ -284,7 +284,7 @@ void i8086_cpu_device::execute_run()
 			case 0xdd:
 			case 0xde:
 			case 0xdf:
-				m_esc_opcode_handler(pc() - 1);
+				m_esc_opcode_handler(m_pc - 1);
 				m_modrm = fetch();
 				if(m_modrm < 0xc0)
 					m_esc_data_handler(get_ea(1, I8086_READ));
@@ -297,7 +297,7 @@ void i8086_cpu_device::execute_run()
 				if(!common_op(op))
 				{
 					m_icount -= 10;
-					logerror("%06x: Invalid Opcode %02x\n", pc(), op);
+					logerror("%06x: Invalid Opcode %02x\n", m_pc, op);
 					break;
 				}
 				break;
@@ -2100,7 +2100,7 @@ bool i8086_common_cpu_device::common_op(uint8_t op)
 
 		case 0xf0: // i_lock
 		case 0xf1: // 0xf1 is 0xf0; verified on real CPU
-			logerror("%06x: Warning - BUSLOCK\n", pc());
+			logerror("%06x: Warning - BUSLOCK\n", m_pc);
 			m_lock = true;
 			m_no_interrupt = 1;
 			CLK(NOP);
@@ -2125,7 +2125,7 @@ bool i8086_common_cpu_device::common_op(uint8_t op)
 				case 0xae:  CLK(OVERRIDE); if (c) do { i_scasb(); c--; } while (c>0 && !ZF && m_icount>0);   m_regs.w[CX]=c; m_seg_prefix = false; m_seg_prefix_next = false; break;
 				case 0xaf:  CLK(OVERRIDE); if (c) do { i_scasw(); c--; } while (c>0 && !ZF && m_icount>0);   m_regs.w[CX]=c; m_seg_prefix = false; m_seg_prefix_next = false; break;
 				default:
-					logerror("%06x: REPNE invalid\n", pc());
+					logerror("%06x: REPNE invalid\n", m_pc);
 					// Decrement IP so the normal instruction will be executed next
 					m_ip--;
 					invalid = true;
@@ -2158,7 +2158,7 @@ bool i8086_common_cpu_device::common_op(uint8_t op)
 				case 0xae:  CLK(OVERRIDE); if (c) do { i_scasb(); c--; } while (c>0 && ZF && m_icount>0);    m_regs.w[CX]=c; m_seg_prefix = false; m_seg_prefix_next = false; break;
 				case 0xaf:  CLK(OVERRIDE); if (c) do { i_scasw(); c--; } while (c>0 && ZF && m_icount>0);    m_regs.w[CX]=c; m_seg_prefix = false; m_seg_prefix_next = false; break;
 				default:
-					logerror("%06x: REPE invalid\n", pc());
+					logerror("%06x: REPE invalid\n", m_pc);
 					// Decrement IP so the normal instruction will be executed next
 					m_ip--;
 					invalid = true;
@@ -2173,7 +2173,7 @@ bool i8086_common_cpu_device::common_op(uint8_t op)
 			break;
 
 		case 0xf4: // i_hlt
-			//logerror("%s: %06x: HALT\n", tag(), pc());
+			//logerror("%s: %06x: HALT\n", tag(), m_pc);
 			m_icount = 0;
 			m_halt = true;
 			break;
@@ -2418,7 +2418,7 @@ bool i8086_common_cpu_device::common_op(uint8_t op)
 					CLKM(INCDEC_R8,INCDEC_M8);
 					break;
 				default:
-					logerror("%06x: FE Pre with unimplemented mod\n", pc());
+					logerror("%06x: FE Pre with unimplemented mod\n", m_pc);
 					break;
 				}
 			}
@@ -2474,7 +2474,7 @@ bool i8086_common_cpu_device::common_op(uint8_t op)
 					CLKM(PUSH_R16,PUSH_M16);
 					break;
 				default:
-					logerror("%06x: FF Pre with unimplemented mod\n", pc());
+					logerror("%06x: FF Pre with unimplemented mod\n", m_pc);
 					break;
 				}
 			}

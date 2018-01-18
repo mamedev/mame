@@ -112,7 +112,7 @@ private:
 	void switch_task(uint16_t ntask, int type);
 	void trap(uint32_t error);
 	int verify(uint16_t selector, int operation, uint8_t rights, bool valid);
-	uint32_t pc() { return m_pc = m_base[CS] + m_ip; }
+	uint32_t update_pc() { return m_pc = m_base[CS] + m_ip; }
 
 	int m_trap_level;
 	uint16_t m_msw;

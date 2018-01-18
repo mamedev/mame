@@ -248,7 +248,7 @@ WRITE8_MEMBER(mw8080bw_state::gunfight_audio_w)
 		break;
 
 	default:
-		logerror("%04x:  Unknown sh port write %02x\n", space.device().safe_pc(), data);
+		logerror("%04x:  Unknown sh port write %02x\n", m_maincpu->pc(), data);
 		break;
 	}
 }
