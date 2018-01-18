@@ -48,6 +48,8 @@ public:
 	
 	uint32_t screen_update_kickgoal(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
+	void kickgoal(machine_config &config);
+	void actionhw(machine_config &config);
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -93,6 +95,4 @@ private:
 	required_memory_bank m_okibank;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
-	void kickgoal(machine_config &config);
-	void actionhw(machine_config &config);
 };
