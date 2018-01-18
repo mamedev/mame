@@ -288,22 +288,6 @@ void blockout_state::machine_start()
 void blockout_state::machine_reset()
 {
 	m_color = 0;
-	
-	/*
-	 * agress checks at F3A that this is mirrored, blockout glitches if you mirror to it
-	 * But actually mirroring this VRAM makes display to be offset 
-	 * (clearly visible with text being on top bank instead of bottom during gameplay)
-	 * There are many possible solutions to this:
-	 * A) reads are actually ORed between upper and lower banks
-	 * B) VRAM is initialized with same pattern checked
-	 * C) Agress isn't truly identical to Block Out HW wise, it really mirrors VRAM data and offsets display
-	 * For now 
-	 */
-	for(int i=0;i<0x4000/2;i++)
-	{
-		m_frontvideoram[i] = i;
-		m_frontvideoram[i+0x4000/2] = i;
-	}
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER(blockout_state::blockout_scanline)
@@ -448,8 +432,28 @@ ROM_END
  *
  *************************************/
 
+DRIVER_INIT_MEMBER(blockout_state,agress)
+{
+	/*
+	 * agress checks at F3A that this is mirrored, blockout glitches if you mirror to it
+	 * But actually mirroring this VRAM makes display to be offset 
+	 * (clearly visible with text being on top bank instead of bottom during gameplay)
+	 * There are many possible solutions to this:
+	 * A) reads are actually ORed between upper and lower banks
+	 * B) VRAM is initialized with same pattern checked, or extreme open bus occurs for the second uninitalized bank. 
+	 * C) Agress isn't truly identical to Block Out HW wise, it really mirrors VRAM data and offsets display
+	 * D) it's not supposed to enter into trace mode at all, cause of the bogus mirror check (trace exception 
+	 *    occurs at very beginning of the program execution)
+	 * For now let's use D and just patch the TRACE exception that causes the bogus mirror check
+	 */
+	 
+ 	uint16_t *rom = (uint16_t *)memregion("maincpu")->base();
+
+	rom[0x82/2] = 0x2700;
+}
+ 
 GAME( 1989, blockout, 0,        blockout, blockout,  blockout_state, 0, ROT0, "Technos Japan / California Dreams", "Block Out (set 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1989, blockout2,blockout, blockout, blockout,  blockout_state, 0, ROT0, "Technos Japan / California Dreams", "Block Out (set 2)", MACHINE_SUPPORTS_SAVE )
 GAME( 1989, blockoutj,blockout, blockout, blockoutj, blockout_state, 0, ROT0, "Technos Japan / California Dreams", "Block Out (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, agress,   0,        agress,   agress,    blockout_state, 0, ROT0, "Palco",   "Agress - Missile Daisenryaku (Japan)",           MACHINE_SUPPORTS_SAVE )
-GAME( 2003, agressb,  agress,   agress,   agress,    blockout_state, 0, ROT0, "bootleg", "Agress - Missile Daisenryaku (English bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, agress,   0,        agress,   agress,    blockout_state, agress, ROT0, "Palco",   "Agress - Missile Daisenryaku (Japan)",           MACHINE_SUPPORTS_SAVE )
+GAME( 2003, agressb,  agress,   agress,   agress,    blockout_state, agress, ROT0, "bootleg", "Agress - Missile Daisenryaku (English bootleg)", MACHINE_SUPPORTS_SAVE )
