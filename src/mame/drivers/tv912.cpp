@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:
+// copyright-holders:AJR
 /*******************************************************************************
 
     TeleVideo TVI-912/TVI-920 terminals
@@ -10,15 +10,20 @@
     suffix indicated a typewriter-style keyboard. The TVI-920 added a row of
     function keys but was otherwise mostly identical to the TVI-912.
 
+    The baud rate switches are mounted vertically at the rear of the unit.
+    Only one switch may be down (closed) at a time.
+
 *******************************************************************************/
 
 #include "emu.h"
 #include "cpu/mcs48/mcs48.h"
-//#include "bus/rs232/rs232.h"
-//#include "machine/ay31015.h"
+#include "bus/rs232/rs232.h"
+#include "machine/ay31015.h"
 #include "machine/bankdev.h"
-//#include "video/tms9927.h"
+#include "sound/beep.h"
+#include "video/tms9927.h"
 #include "screen.h"
+#include "speaker.h"
 
 #define CHAR_WIDTH 14
 
@@ -28,31 +33,178 @@ public:
 	tv912_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
+		, m_crtc(*this, "crtc")
+		, m_uart(*this, "uart")
 		, m_bankdev(*this, "bankdev")
+		, m_beep(*this, "beep")
 		, m_dispram_bank(*this, "dispram")
 		, m_p_chargen(*this, "chargen")
+		, m_keys(*this, "KEY%u", 0)
+		, m_modem_baud(*this, "MODEMBAUD")
+		, m_printer_baud(*this, "PRINTBAUD")
+		, m_uart_control(*this, "UARTCTRL")
+		, m_modifiers(*this, "MODIFIERS")
+		, m_jumpers(*this, "JUMPERS")
+		, m_option(*this, "OPTION")
+		, m_baudgen_timer(nullptr)
 	{ }
 
+	DECLARE_WRITE8_MEMBER(p1_w);
 	DECLARE_WRITE8_MEMBER(p2_w);
+	DECLARE_READ8_MEMBER(crtc_r);
+	DECLARE_WRITE8_MEMBER(crtc_w);
+	DECLARE_READ8_MEMBER(uart_status_r);
+	DECLARE_READ8_MEMBER(uart_data_r);
+	DECLARE_WRITE8_MEMBER(uart_data_w);
+	DECLARE_WRITE_LINE_MEMBER(uart_reset_w);
+	DECLARE_READ8_MEMBER(keyboard_r);
+	DECLARE_WRITE8_MEMBER(output_40c);
 
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
+	DECLARE_INPUT_CHANGED_MEMBER(uart_settings_changed);
+
 	void tv912(machine_config &config);
 private:
+	enum
+	{
+		TIMER_BAUDGEN
+	};
+
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 	required_device<cpu_device> m_maincpu;
+	required_device<tms9927_device> m_crtc;
+	required_device<ay51013_device> m_uart;
 	required_device<address_map_bank_device> m_bankdev;
+	required_device<beep_device> m_beep;
 	required_memory_bank m_dispram_bank;
 	required_region_ptr<u8> m_p_chargen;
+	required_ioport_array<32> m_keys;
+	required_ioport m_modem_baud;
+	required_ioport m_printer_baud;
+	required_ioport m_uart_control;
+	required_ioport m_modifiers;
+	required_ioport m_jumpers;
+	required_ioport m_option;
 
+	emu_timer *m_baudgen_timer;
+
+	bool m_force_blank;
+	bool m_lpt_select;
+	u8 m_keyboard_scan;
 	std::unique_ptr<u8[]> m_dispram;
 };
 
+WRITE8_MEMBER(tv912_state::p1_w)
+{
+	m_keyboard_scan = data;
+}
+
 WRITE8_MEMBER(tv912_state::p2_w)
 {
+	// P20-P23: Address Signals (4MSBS)
 	m_bankdev->set_bank(data & 0x0f);
+
+	// P24: +4Hz Flasher
+	// P25: -DCR
+	// P26: -PTR RDY
+	// P27: -HALF DUPLEX
+}
+
+READ8_MEMBER(tv912_state::crtc_r)
+{
+	return m_crtc->read(space, bitswap<4>(offset, 5, 4, 1, 0));
+}
+
+WRITE8_MEMBER(tv912_state::crtc_w)
+{
+	m_crtc->write(space, bitswap<4>(offset, 5, 4, 1, 0), data);
+}
+
+READ8_MEMBER(tv912_state::keyboard_r)
+{
+	u8 result = m_modifiers->read();
+
+	for (int b = 0; b < 8; b++)
+		if (!BIT(m_keyboard_scan, b))
+			result &= m_keys[b + offset * 8]->read();
+
+	return result;
+}
+
+READ8_MEMBER(tv912_state::uart_status_r)
+{
+	m_uart->set_input_pin(AY31015_SWE, 0);
+	u8 status = m_uart->get_output_pin(AY31015_DAV) << 0;
+	status |= m_uart->get_output_pin(AY31015_TBMT) << 1;
+	status |= m_uart->get_output_pin(AY31015_PE) << 2;
+	status |= m_uart->get_output_pin(AY31015_FE) << 3;
+	status |= BIT(m_jumpers->read(), offset) << 4;
+	status |= m_option->read();
+	m_uart->set_input_pin(AY31015_SWE, 1);
+	return status;
+}
+
+READ8_MEMBER(tv912_state::uart_data_r)
+{
+	m_uart->set_input_pin(AY31015_RDAV, 0);
+	u8 data = m_uart->get_received_data();
+	m_uart->set_input_pin(AY31015_RDAV, 1);
+	return data;
+}
+
+WRITE8_MEMBER(tv912_state::uart_data_w)
+{
+	m_uart->set_transmit_data(data);
+}
+
+WRITE_LINE_MEMBER(tv912_state::uart_reset_w)
+{
+	m_uart->set_input_pin(AY31015_XR, state);
+}
+
+WRITE8_MEMBER(tv912_state::output_40c)
+{
+	// Bit 5: +FORCE BLANK
+	m_force_blank = BIT(data, 5);
+
+	// Bit 4: +SEL LPT
+	m_lpt_select = BIT(data, 4);
+
+	// Bit 3: -BREAK
+	// Bit 2: -RQS
+
+	// Bit 1: +BEEP
+	m_beep->set_state(BIT(data, 1));
+
+	// Bit 0: +PG SEL
+	m_dispram_bank->set_entry(BIT(data, 0));
+}
+
+void tv912_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+{
+	switch (id)
+	{
+	case TIMER_BAUDGEN:
+		m_uart->set_input_pin(AY31015_RCP, param);
+		m_uart->set_input_pin(AY31015_TCP, param);
+
+		ioport_value sel = (m_lpt_select ? m_printer_baud : m_modem_baud)->read();
+		for (int b = 0; b < 10; b++)
+		{
+			if (!BIT(sel, b))
+			{
+				unsigned divisor = 11 * (b < 9 ? 1 << b : 176);
+				m_baudgen_timer->adjust(attotime::from_hz(XTAL_23_814MHz / 3.5 / divisor), !param);
+				break;
+			}
+		}
+
+		break;
+	}
 }
 
 u32 tv912_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
@@ -65,12 +217,24 @@ void tv912_state::machine_start()
 	m_dispram = make_unique_clear<u8[]>(0x1000);
 	m_dispram_bank->configure_entries(0, 2, m_dispram.get(), 0x800);
 
+	m_baudgen_timer = timer_alloc(TIMER_BAUDGEN);
+	m_baudgen_timer->adjust(attotime::zero, 0);
+
+	save_item(NAME(m_force_blank));
+	save_item(NAME(m_lpt_select));
+	save_item(NAME(m_keyboard_scan));
 	save_pointer(NAME(m_dispram.get()), 0x1000);
 }
 
 void tv912_state::machine_reset()
 {
-	m_dispram_bank->set_entry(0);
+	ioport_value uart_ctrl = m_uart_control->read();
+	m_uart->set_input_pin(AY31015_NP, BIT(uart_ctrl, 4));
+	m_uart->set_input_pin(AY31015_TSB, BIT(uart_ctrl, 3));
+	m_uart->set_input_pin(AY31015_NB1, BIT(uart_ctrl, 2));
+	m_uart->set_input_pin(AY31015_NB2, 1);
+	m_uart->set_input_pin(AY31015_EPS, BIT(uart_ctrl, 0));
+	m_uart->set_input_pin(AY31015_CS, 1);
 }
 
 static ADDRESS_MAP_START( prog_map, AS_PROGRAM, 8, tv912_state )
@@ -83,21 +247,496 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( bank_map, 0, 8, tv912_state )
 	AM_RANGE(0x000, 0x0ff) AM_MIRROR(0x300) AM_RAM
-	//AM_RANGE(0x400, 0x403) AM_MIRROR(0x3c0) AM_SELECT(0x030) AM_READWRITE(crtc_r, crtc_w)
+	AM_RANGE(0x400, 0x403) AM_MIRROR(0x3c0) AM_SELECT(0x030) AM_READWRITE(crtc_r, crtc_w)
+	AM_RANGE(0x404, 0x404) AM_MIRROR(0x3f3) AM_READ(uart_data_r)
+	AM_RANGE(0x408, 0x40b) AM_MIRROR(0x3f0) AM_READ(uart_status_r)
+	AM_RANGE(0x408, 0x408) AM_MIRROR(0x3f3) AM_WRITE(uart_data_w)
+	AM_RANGE(0x40c, 0x40f) AM_MIRROR(0x3f0) AM_READ(keyboard_r)
+	AM_RANGE(0x40c, 0x40c) AM_MIRROR(0x3f3) AM_WRITE(output_40c)
 	AM_RANGE(0x800, 0xfff) AM_RAMBANK("dispram")
 ADDRESS_MAP_END
 
+INPUT_CHANGED_MEMBER(tv912_state::uart_settings_changed)
+{
+	ioport_value uart_ctrl = m_uart_control->read();
+	m_uart->set_input_pin(AY31015_NP, BIT(uart_ctrl, 4));
+	m_uart->set_input_pin(AY31015_TSB, BIT(uart_ctrl, 3));
+	m_uart->set_input_pin(AY31015_NB1, BIT(uart_ctrl, 2));
+	// S2:8 was probably connected to NB2 on earlier hardware revisions
+	m_uart->set_input_pin(AY31015_EPS, BIT(uart_ctrl, 0));
+}
+
+static INPUT_PORTS_START( switches )
+	PORT_START("MODEMBAUD")
+	PORT_DIPNAME(0x3ff, 0x3fd, "Modem Port Baud Rate") PORT_DIPLOCATION("S1:1,2,3,4,5,6,7,8,9,10")
+	PORT_DIPSETTING(0x2ff, "75") // actual rate: 1,208 ÷ 16 ≈ 75.5
+	PORT_DIPSETTING(0x1ff, "110") // actual rate: 1,757 ÷ 16 ≈ 109.8
+	PORT_DIPSETTING(0x37f, "150") // actual rate: 2,416 ÷ 16 ≈ 151
+	PORT_DIPSETTING(0x3bf, "300") // actual rate: 4,832 ÷ 16 ≈ 302
+	PORT_DIPSETTING(0x3df, "600") // actual rate: 9,665 ÷ 16 ≈ 604
+	PORT_DIPSETTING(0x3ef, "1200") // actual rate: 19,330 ÷ 16 ≈ 1,208
+	PORT_DIPSETTING(0x3f7, "2400") // actual rate: 38,659 ÷ 16 ≈ 2,416
+	PORT_DIPSETTING(0x3fb, "4800") // actual rate: 77,318 ÷ 16 ≈ 4,832
+	PORT_DIPSETTING(0x3fd, "9600") // actual rate: 154,636 ÷ 16 ≈ 9,665
+	PORT_DIPSETTING(0x3fe, "19200") // actual rate: 309,273 ÷ 16 ≈ 19,330
+
+	PORT_START("PRINTBAUD")
+	PORT_DIPNAME(0x3ff, 0x3fd, "Printer Port Baud Rate") PORT_DIPLOCATION("S3:1,2,3,4,5,6,7,8,9,10")
+	PORT_DIPSETTING(0x2ff, "75")
+	PORT_DIPSETTING(0x1ff, "110")
+	PORT_DIPSETTING(0x37f, "150")
+	PORT_DIPSETTING(0x3bf, "300")
+	PORT_DIPSETTING(0x3df, "600")
+	PORT_DIPSETTING(0x3ef, "1200")
+	PORT_DIPSETTING(0x3f7, "2400")
+	PORT_DIPSETTING(0x3fb, "4800")
+	PORT_DIPSETTING(0x3fd, "9600")
+	PORT_DIPSETTING(0x3fe, "19200")
+
+	PORT_START("UARTCTRL")
+	PORT_DIPNAME(0x11, 0x11, "Parity Select") PORT_DIPLOCATION("S2:9,5") PORT_CHANGED_MEMBER(DEVICE_SELF, tv912_state, uart_settings_changed, nullptr)
+	PORT_DIPSETTING(0x11, "None")
+	PORT_DIPSETTING(0x01, "Even")
+	PORT_DIPSETTING(0x00, "Odd")
+	PORT_DIPNAME(0x08, 0x00, "Stop Bits") PORT_DIPLOCATION("S2:6") PORT_CHANGED_MEMBER(DEVICE_SELF, tv912_state, uart_settings_changed, nullptr)
+	PORT_DIPSETTING(0x00, "1")
+	PORT_DIPSETTING(0x08, "2")
+	PORT_DIPNAME(0x04, 0x04, "Data Bits") PORT_DIPLOCATION("S2:7") PORT_CHANGED_MEMBER(DEVICE_SELF, tv912_state, uart_settings_changed, nullptr)
+	PORT_DIPSETTING(0x00, "7")
+	PORT_DIPSETTING(0x04, "8")
+	PORT_DIPUNUSED_DIPLOC(0x02, 0x02, "S2:8")
+
+	PORT_START("MODIFIERS")
+	PORT_DIPNAME(0x80, 0x80, "Refresh Rate") PORT_DIPLOCATION("S2:4")
+	PORT_DIPSETTING(0x00, "50 Hz")
+	PORT_DIPSETTING(0x80, "60 Hz")
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Alpha Lock") PORT_CODE(KEYCODE_CAPSLOCK)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Shift") PORT_CODE(KEYCODE_LSHIFT)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Ctrl") PORT_CODE(KEYCODE_LCONTROL)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Funct") PORT_CODE(KEYCODE_LALT)
+	PORT_BIT(0x23, IP_ACTIVE_LOW, IPT_UNUSED)
+
+	PORT_START("JUMPERS")
+	PORT_DIPNAME(0x08, 0x08, "Automatic CRLF") PORT_DIPLOCATION("S4:1") // or jumper W31
+	PORT_DIPSETTING(0x08, DEF_STR(Off))
+	PORT_DIPSETTING(0x00, DEF_STR(On))
+	PORT_DIPNAME(0x04, 0x04, "End of Send Character") PORT_DIPLOCATION("S4:2") // or jumper W32
+	PORT_DIPSETTING(0x04, "CR")
+	PORT_DIPSETTING(0x00, "EOT")
+	PORT_DIPNAME(0x02, 0x02, "Column 80 CRLF") PORT_DIPLOCATION("S4:3") // or jumper W33
+	PORT_DIPSETTING(0x00, DEF_STR(Off))
+	PORT_DIPSETTING(0x02, DEF_STR(On))
+	PORT_DIPNAME(0x01, 0x01, "Terminal Mode") PORT_DIPLOCATION("S4:4") // or jumper W34
+	PORT_DIPSETTING(0x01, "Extension")
+	PORT_DIPSETTING(0x00, "Page Print")
+
+	PORT_START("OPTION")
+	PORT_DIPUNKNOWN_DIPLOC(0x20, 0x20, "S4:5")
+	PORT_DIPUNKNOWN_DIPLOC(0x40, 0x40, "S4:6")
+	PORT_DIPUNKNOWN_DIPLOC(0x80, 0x80, "S4:7")
+ADDRESS_MAP_END
+
 static INPUT_PORTS_START( tv912b )
+	PORT_INCLUDE(switches)
+
+	PORT_START("KEY0")
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0xdc, IP_ACTIVE_LOW, IPT_UNUSED)
+
+	PORT_START("KEY1")
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0xdc, IP_ACTIVE_LOW, IPT_UNUSED)
+
+	PORT_START("KEY2")
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0xdc, IP_ACTIVE_LOW, IPT_UNUSED)
+
+	PORT_START("KEY3")
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0xdc, IP_ACTIVE_LOW, IPT_UNUSED)
+
+	PORT_START("KEY4")
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0xdc, IP_ACTIVE_LOW, IPT_UNUSED)
+
+	PORT_START("KEY5")
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0xdc, IP_ACTIVE_LOW, IPT_UNUSED)
+
+	PORT_START("KEY6")
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0xdc, IP_ACTIVE_LOW, IPT_UNUSED)
+
+	PORT_START("KEY7")
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0xdc, IP_ACTIVE_LOW, IPT_UNUSED)
+
+	PORT_START("KEY8")
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0xdc, IP_ACTIVE_LOW, IPT_UNUSED)
+
+	PORT_START("KEY9")
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0xdc, IP_ACTIVE_LOW, IPT_UNUSED)
+
+	PORT_START("KEY10")
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0xdc, IP_ACTIVE_LOW, IPT_UNUSED)
+
+	PORT_START("KEY11")
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0xdc, IP_ACTIVE_LOW, IPT_UNUSED)
+
+	PORT_START("KEY12")
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0xdc, IP_ACTIVE_LOW, IPT_UNUSED)
+
+	PORT_START("KEY13")
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0xdc, IP_ACTIVE_LOW, IPT_UNUSED)
+
+	PORT_START("KEY14")
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0xdc, IP_ACTIVE_LOW, IPT_UNUSED)
+
+	PORT_START("KEY15")
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0xdc, IP_ACTIVE_LOW, IPT_UNUSED)
+
+	PORT_START("KEY16")
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0xdc, IP_ACTIVE_LOW, IPT_UNUSED)
+
+	PORT_START("KEY17")
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0xdc, IP_ACTIVE_LOW, IPT_UNUSED)
+
+	PORT_START("KEY18")
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0xdc, IP_ACTIVE_LOW, IPT_UNUSED)
+
+	PORT_START("KEY19")
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0xdc, IP_ACTIVE_LOW, IPT_UNUSED)
+
+	PORT_START("KEY20")
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0xdc, IP_ACTIVE_LOW, IPT_UNUSED)
+
+	PORT_START("KEY21")
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0xdc, IP_ACTIVE_LOW, IPT_UNUSED)
+
+	PORT_START("KEY22")
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0xdc, IP_ACTIVE_LOW, IPT_UNUSED)
+
+	PORT_START("KEY23")
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0xdc, IP_ACTIVE_LOW, IPT_UNUSED)
+
+	PORT_START("KEY24")
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0xdc, IP_ACTIVE_LOW, IPT_UNUSED)
+
+	PORT_START("KEY25")
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0xdc, IP_ACTIVE_LOW, IPT_UNUSED)
+
+	PORT_START("KEY26")
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0xdc, IP_ACTIVE_LOW, IPT_UNUSED)
+
+	PORT_START("KEY27")
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0xdc, IP_ACTIVE_LOW, IPT_UNUSED)
+
+	PORT_START("KEY28")
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0xdc, IP_ACTIVE_LOW, IPT_UNUSED)
+
+	PORT_START("KEY29")
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0xdc, IP_ACTIVE_LOW, IPT_UNUSED)
+
+	PORT_START("KEY30")
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0xdc, IP_ACTIVE_LOW, IPT_UNUSED)
+
+	PORT_START("KEY31")
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0xdc, IP_ACTIVE_LOW, IPT_UNUSED)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( tv912c )
+	PORT_INCLUDE(switches)
+
+	PORT_START("KEY0")
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0xdc, IP_ACTIVE_LOW, IPT_UNUSED)
+
+	PORT_START("KEY1")
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0xdc, IP_ACTIVE_LOW, IPT_UNUSED)
+
+	PORT_START("KEY2")
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0xdc, IP_ACTIVE_LOW, IPT_UNUSED)
+
+	PORT_START("KEY3")
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0xdc, IP_ACTIVE_LOW, IPT_UNUSED)
+
+	PORT_START("KEY4")
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0xdc, IP_ACTIVE_LOW, IPT_UNUSED)
+
+	PORT_START("KEY5")
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0xdc, IP_ACTIVE_LOW, IPT_UNUSED)
+
+	PORT_START("KEY6")
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0xdc, IP_ACTIVE_LOW, IPT_UNUSED)
+
+	PORT_START("KEY7")
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0xdc, IP_ACTIVE_LOW, IPT_UNUSED)
+
+	PORT_START("KEY8")
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0xdc, IP_ACTIVE_LOW, IPT_UNUSED)
+
+	PORT_START("KEY9")
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0xdc, IP_ACTIVE_LOW, IPT_UNUSED)
+
+	PORT_START("KEY10")
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0xdc, IP_ACTIVE_LOW, IPT_UNUSED)
+
+	PORT_START("KEY11")
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0xdc, IP_ACTIVE_LOW, IPT_UNUSED)
+
+	PORT_START("KEY12")
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0xdc, IP_ACTIVE_LOW, IPT_UNUSED)
+
+	PORT_START("KEY13")
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0xdc, IP_ACTIVE_LOW, IPT_UNUSED)
+
+	PORT_START("KEY14")
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0xdc, IP_ACTIVE_LOW, IPT_UNUSED)
+
+	PORT_START("KEY15")
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0xdc, IP_ACTIVE_LOW, IPT_UNUSED)
+
+	PORT_START("KEY16")
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0xdc, IP_ACTIVE_LOW, IPT_UNUSED)
+
+	PORT_START("KEY17")
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0xdc, IP_ACTIVE_LOW, IPT_UNUSED)
+
+	PORT_START("KEY18")
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0xdc, IP_ACTIVE_LOW, IPT_UNUSED)
+
+	PORT_START("KEY19")
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0xdc, IP_ACTIVE_LOW, IPT_UNUSED)
+
+	PORT_START("KEY20")
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0xdc, IP_ACTIVE_LOW, IPT_UNUSED)
+
+	PORT_START("KEY21")
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0xdc, IP_ACTIVE_LOW, IPT_UNUSED)
+
+	PORT_START("KEY22")
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0xdc, IP_ACTIVE_LOW, IPT_UNUSED)
+
+	PORT_START("KEY23")
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0xdc, IP_ACTIVE_LOW, IPT_UNUSED)
+
+	PORT_START("KEY24")
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0xdc, IP_ACTIVE_LOW, IPT_UNUSED)
+
+	PORT_START("KEY25")
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0xdc, IP_ACTIVE_LOW, IPT_UNUSED)
+
+	PORT_START("KEY26")
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0xdc, IP_ACTIVE_LOW, IPT_UNUSED)
+
+	PORT_START("KEY27")
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0xdc, IP_ACTIVE_LOW, IPT_UNUSED)
+
+	PORT_START("KEY28")
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0xdc, IP_ACTIVE_LOW, IPT_UNUSED)
+
+	PORT_START("KEY29")
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0xdc, IP_ACTIVE_LOW, IPT_UNUSED)
+
+	PORT_START("KEY30")
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0xdc, IP_ACTIVE_LOW, IPT_UNUSED)
+
+	PORT_START("KEY31")
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0xdc, IP_ACTIVE_LOW, IPT_UNUSED)
 INPUT_PORTS_END
 
 MACHINE_CONFIG_START(tv912_state::tv912)
 	MCFG_CPU_ADD("maincpu", I8035, XTAL_23_814MHz / 4)
 	MCFG_CPU_PROGRAM_MAP(prog_map)
 	MCFG_CPU_IO_MAP(io_map)
+	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(tv912_state, p1_w))
 	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(tv912_state, p2_w))
+	MCFG_MCS48_PORT_T0_IN_CB(DEVREADLINE("rs232", rs232_port_device, cts_r))
+	MCFG_MCS48_PORT_T1_IN_CB(DEVREADLINE("crtc", tms9927_device, bl_r)) MCFG_DEVCB_INVERT
+	MCFG_MCS48_PORT_PROG_OUT_CB(WRITELINE(tv912_state, uart_reset_w)) MCFG_DEVCB_INVERT
 
 	MCFG_DEVICE_ADD("bankdev", ADDRESS_MAP_BANK, 0)
 	MCFG_DEVICE_PROGRAM_MAP(bank_map)
@@ -108,6 +747,21 @@ MACHINE_CONFIG_START(tv912_state::tv912)
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(XTAL_23_814MHz, 105 * CHAR_WIDTH, 0, 80 * CHAR_WIDTH, 270, 0, 240)
 	MCFG_SCREEN_UPDATE_DRIVER(tv912_state, screen_update)
+
+	MCFG_DEVICE_ADD("crtc", TMS9927, XTAL_23_814MHz)
+	MCFG_TMS9927_CHAR_WIDTH(CHAR_WIDTH)
+	MCFG_TMS9927_VSYN_CALLBACK(INPUTLINE("maincpu", MCS48_INPUT_IRQ))
+	MCFG_VIDEO_SET_SCREEN("screen")
+
+	MCFG_DEVICE_ADD("uart", AY51013, 0)
+	MCFG_AY51013_READ_SI_CB(DEVREADLINE("rs232", rs232_port_device, rxd_r))
+	MCFG_AY51013_WRITE_SO_CB(DEVWRITELINE("rs232", rs232_port_device, write_txd))
+
+	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, nullptr)
+
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("beep", BEEP, XTAL_23_814MHz / 7 / 11 / 256) // nominally 1200 Hz (same clock as for 75 baud setting)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
 /**************************************************************************************************************
@@ -135,5 +789,5 @@ ROM_START( tv912b )
 	ROM_LOAD( "televideo912b_rom_a3.bin", 0x0000, 0x0800, CRC(bb9a7fbd) SHA1(5f1c4d41b25bd3ca4dbc336873362935daf283da) ) // 2316E
 ROM_END
 
-COMP( 1978, tv912c, 0,      0, tv912, tv912c, tv912_state, 0, "TeleVideo Systems", "TVI-912C", MACHINE_IS_SKELETON )
-COMP( 1978, tv912b, tv912c, 0, tv912, tv912b, tv912_state, 0, "TeleVideo Systems", "TVI-912B", MACHINE_IS_SKELETON )
+COMP( 1978, tv912c, 0,      0, tv912, tv912c, tv912_state, 0, "TeleVideo Systems", "TVI-912C", MACHINE_NOT_WORKING )
+COMP( 1978, tv912b, tv912c, 0, tv912, tv912b, tv912_state, 0, "TeleVideo Systems", "TVI-912B", MACHINE_NOT_WORKING )

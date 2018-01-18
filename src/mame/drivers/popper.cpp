@@ -326,13 +326,13 @@ uint32_t popper_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 	// draw the sprites
 	for (int offs = 0; offs < 0x800; offs += 4)
 	{
-		// 0  76653210  Y coordinate
+		// 0  76543210  Y coordinate
 		// 1  76543210  Code
 		// 2  7-------  Flip Y
 		// 2  -6------  Flip X
 		// 2  --54----  Not used
 		// 2  ----3210  Color
-		// 3  76653210  X coordinate
+		// 3  76543210  X coordinate
 
 		int sx = m_sprite_ram[offs + 3];
 		int sy = m_sprite_ram[offs + 0];

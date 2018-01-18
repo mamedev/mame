@@ -306,7 +306,7 @@ static ADDRESS_MAP_START( ddragon3_map, AS_PROGRAM, 16, ddragon3_state )
 	AM_RANGE(0x100006, 0x100007) AM_WRITE(irq5_ack_w)
 	AM_RANGE(0x140000, 0x1405ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette") /* Palette RAM */
 	AM_RANGE(0x180000, 0x180fff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x1c0000, 0x1c3fff) AM_RAM /* working RAM */
+	AM_RANGE(0x1c0000, 0x1c3fff) AM_RAM /* work RAM */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( dd3b_map, AS_PROGRAM, 16, ddragon3_state )
@@ -325,7 +325,7 @@ static ADDRESS_MAP_START( dd3b_map, AS_PROGRAM, 16, ddragon3_state )
 	AM_RANGE(0x180002, 0x180003) AM_READ_PORT("IN1")
 	AM_RANGE(0x180004, 0x180005) AM_READ_PORT("IN2")
 	AM_RANGE(0x180006, 0x180007) AM_READ_PORT("IN3")
-	AM_RANGE(0x1c0000, 0x1c3fff) AM_RAM /* working RAM */
+	AM_RANGE(0x1c0000, 0x1c3fff) AM_RAM /* work RAM */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( ctribe_map, AS_PROGRAM, 16, ddragon3_state )
@@ -345,7 +345,7 @@ static ADDRESS_MAP_START( ctribe_map, AS_PROGRAM, 16, ddragon3_state )
 	AM_RANGE(0x180002, 0x180003) AM_READ_PORT("IN1")
 	AM_RANGE(0x180004, 0x180005) AM_READ_PORT("IN2")
 	AM_RANGE(0x180006, 0x180007) AM_READ_PORT("IN3")
-	AM_RANGE(0x1c0000, 0x1c3fff) AM_RAM /* working RAM */
+	AM_RANGE(0x1c0000, 0x1c3fff) AM_RAM /* work RAM */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, wwfwfest_state )

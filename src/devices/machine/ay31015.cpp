@@ -628,6 +628,16 @@ void ay31015_device::set_input_pin( ay31015_input_pin_t pin, int data )
 
 	switch (pin)
 	{
+	case AY31015_RCP:
+		if (!m_pins[pin] && data)
+			rx_process();
+		m_pins[pin] = data;
+		break;
+	case AY31015_TCP:
+		if (m_pins[pin] && !data)
+			tx_process();
+		m_pins[pin] = data;
+		break;
 	case AY31015_SWE:
 		m_pins[pin] = data;
 		update_status_pins();
