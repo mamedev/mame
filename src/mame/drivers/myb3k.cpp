@@ -108,7 +108,7 @@ public:
 		, m_io_j5(*this, "J5")
 		, m_screen(*this, "screen")
 	{ }
-public:
+
 	/* Interrupt controller */
 	DECLARE_WRITE_LINE_MEMBER( pic_int_w );
 
@@ -164,10 +164,15 @@ public:
 	/* Status bits */
 	DECLARE_READ8_MEMBER(myb3k_io_status_r);
 
-private:
+	void stepone(machine_config &config);
+	void jb3000(machine_config &config);
+	void myb3k(machine_config &config);
+
+protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
+private:
 	/* Interrupt Controller */
 	void pic_ir5_w(int source, int state);
 	void pic_ir7_w(int source, int state);
@@ -213,10 +218,6 @@ private:
 		IOSTAT_FAULT = 0x08
 	};
 
-	void stepone(machine_config &config);
-	void jb3000(machine_config &config);
-	void myb3k(machine_config &config);
-protected:
 	required_device<cpu_device> m_maincpu;
 	required_device<ram_device> m_ram;
 	required_device<pic8259_device> m_pic8259;
