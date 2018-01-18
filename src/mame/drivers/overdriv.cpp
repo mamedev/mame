@@ -159,7 +159,7 @@ WRITE16_MEMBER(overdriv_state::slave_irq5_assert_w)
 static ADDRESS_MAP_START( overdriv_master_map, AS_PROGRAM, 16, overdriv_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x040000, 0x043fff) AM_RAM                 /* work RAM */
-	AM_RANGE(0x080000, 0x080fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x080000, 0x080fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x0c0000, 0x0c0001) AM_READ_PORT("INPUTS")
 	AM_RANGE(0x0c0002, 0x0c0003) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x0e0000, 0x0e0001) AM_WRITENOP            /* unknown (always 0x30) */

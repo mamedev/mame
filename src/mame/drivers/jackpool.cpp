@@ -144,7 +144,7 @@ static ADDRESS_MAP_START( jackpool_mem, AS_PROGRAM, 16, jackpool_state )
 	AM_RANGE(0x340000, 0x347fff) AM_RAM AM_SHARE("vram")
 	AM_RANGE(0x348000, 0x34ffff) AM_RAM //<- vram banks 2 & 3?
 
-	AM_RANGE(0x360000, 0x3603ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x360000, 0x3603ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x380000, 0x38002f) AM_READ8(jackpool_io_r, 0x00ff)
 	AM_RANGE(0x380030, 0x38003f) AM_DEVWRITE8("latch1", ls259_device, write_d0, 0x00ff)
 	AM_RANGE(0x380040, 0x38004f) AM_DEVWRITE8("latch2", ls259_device, write_d0, 0x00ff)

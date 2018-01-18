@@ -517,7 +517,7 @@ WRITE16_MEMBER(srmp6_state::paletteram_w)
 	int8_t r, g, b;
 	int brg = m_brightness - 0x60;
 
-	m_palette->write(space, offset, data, mem_mask);
+	m_palette->write16(space, offset, data, mem_mask);
 
 	if(brg)
 	{

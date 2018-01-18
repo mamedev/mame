@@ -236,7 +236,7 @@ static ADDRESS_MAP_START( pzletime_map, AS_PROGRAM, 16, pzletime_state )
 	AM_RANGE(0x000000, 0x3fffff) AM_ROM
 	AM_RANGE(0x700000, 0x700005) AM_RAM_WRITE(video_regs_w) AM_SHARE("video_regs")
 	AM_RANGE(0x800000, 0x800001) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)
-	AM_RANGE(0x900000, 0x9005ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x900000, 0x9005ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0xa00000, 0xa00007) AM_RAM AM_SHARE("tilemap_regs")
 	AM_RANGE(0xb00000, 0xb3ffff) AM_RAM AM_SHARE("bg_videoram")
 	AM_RANGE(0xc00000, 0xc00fff) AM_RAM_WRITE(mid_videoram_w) AM_SHARE("mid_videoram")

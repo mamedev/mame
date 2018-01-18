@@ -165,7 +165,7 @@ static ADDRESS_MAP_START( sfan_map, AS_PROGRAM, 16, sf_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000000, 0x04ffff) AM_ROM
 	AM_RANGE(0x800000, 0x800fff) AM_RAM_WRITE(videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0xb00000, 0xb007ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0xb00000, 0xb007ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0xc00000, 0xc00001) AM_READ_PORT("IN0")
 	AM_RANGE(0xc00002, 0xc00003) AM_READ_PORT("IN1")
 	AM_RANGE(0xc00004, 0xc00005) AM_READ_PORT("PUNCH")
@@ -188,7 +188,7 @@ static ADDRESS_MAP_START( sfus_map, AS_PROGRAM, 16, sf_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000000, 0x04ffff) AM_ROM
 	AM_RANGE(0x800000, 0x800fff) AM_RAM_WRITE(videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0xb00000, 0xb007ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0xb00000, 0xb007ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0xc00000, 0xc00001) AM_READ_PORT("IN0")
 	AM_RANGE(0xc00002, 0xc00003) AM_READ_PORT("IN1")
 	AM_RANGE(0xc00004, 0xc00005) AM_READNOP
@@ -211,7 +211,7 @@ static ADDRESS_MAP_START( sfjp_map, AS_PROGRAM, 16, sf_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000000, 0x04ffff) AM_ROM
 	AM_RANGE(0x800000, 0x800fff) AM_RAM_WRITE(videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0xb00000, 0xb007ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0xb00000, 0xb007ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0xc00000, 0xc00001) AM_READ_PORT("IN0")
 	AM_RANGE(0xc00002, 0xc00003) AM_READ_PORT("IN1")
 	AM_RANGE(0xc00004, 0xc00005) AM_READ_PORT("IN2")

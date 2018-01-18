@@ -191,8 +191,8 @@ static ADDRESS_MAP_START( fresh_map, AS_PROGRAM, 16, fresh_state )
 
 
 	// written together
-	AM_RANGE(0xc40000, 0xc417ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
-	AM_RANGE(0xc50000, 0xc517ff) AM_RAM_DEVWRITE("palette", palette_device, write_ext) AM_SHARE("palette_ext")
+	AM_RANGE(0xc40000, 0xc417ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
+	AM_RANGE(0xc50000, 0xc517ff) AM_RAM_DEVWRITE("palette", palette_device, write16_ext) AM_SHARE("palette_ext")
 
 	AM_RANGE(0xd00000, 0xd00001) AM_DEVWRITE8("ymsnd", ym2413_device, register_port_w, 0x00ff)
 	AM_RANGE(0xd10000, 0xd10001) AM_DEVWRITE8("ymsnd", ym2413_device, data_port_w, 0x00ff)

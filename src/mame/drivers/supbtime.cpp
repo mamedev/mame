@@ -118,7 +118,7 @@ static ADDRESS_MAP_START( supbtime_map, AS_PROGRAM, 16, supbtime_state )
 	AM_RANGE(0x104000, 0x11ffff) AM_WRITENOP // Nothing there
 	AM_RANGE(0x120000, 0x1207ff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x120800, 0x13ffff) AM_WRITENOP // Nothing there
-	AM_RANGE(0x140000, 0x1407ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x140000, 0x1407ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x180000, 0x180001) AM_READ_PORT("INPUTS")
 	AM_RANGE(0x180002, 0x180003) AM_READ_PORT("DSW")
 	AM_RANGE(0x180008, 0x180009) AM_READ_PORT("SYSTEM")
@@ -136,7 +136,7 @@ static ADDRESS_MAP_START( chinatwn_map, AS_PROGRAM, 16, supbtime_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x100000, 0x100001) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x00ff)
 	AM_RANGE(0x120000, 0x1207ff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x140000, 0x1407ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x140000, 0x1407ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x180000, 0x180001) AM_READ_PORT("INPUTS")
 	AM_RANGE(0x180002, 0x180003) AM_READ_PORT("DSW")
 	AM_RANGE(0x180008, 0x180009) AM_READ_PORT("SYSTEM")
@@ -157,7 +157,7 @@ static ADDRESS_MAP_START( tumblep_map, AS_PROGRAM, 16, supbtime_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x100000, 0x100001) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x00ff)
 	AM_RANGE(0x120000, 0x123fff) AM_RAM
-	AM_RANGE(0x140000, 0x1407ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x140000, 0x1407ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x180000, 0x180001) AM_READ_PORT("INPUTS")
 	AM_RANGE(0x180002, 0x180003) AM_READ_PORT("DSW")
 	AM_RANGE(0x180008, 0x180009) AM_READ_PORT("SYSTEM")

@@ -971,7 +971,7 @@ static ADDRESS_MAP_START( hng_map, AS_PROGRAM, 32, hng64_state )
 	AM_RANGE(0x20010000, 0x20010013) AM_RAM AM_SHARE("spriteregs")
 	AM_RANGE(0x20100000, 0x2017ffff) AM_RAM_WRITE(hng64_videoram_w) AM_SHARE("videoram")    // Tilemap
 	AM_RANGE(0x20190000, 0x20190037) AM_RAM_WRITE(hng64_vregs_w) AM_SHARE("videoregs")
-	AM_RANGE(0x20200000, 0x20203fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x20200000, 0x20203fff) AM_RAM_DEVWRITE("palette", palette_device, write32) AM_SHARE("palette")
 	AM_RANGE(0x20208000, 0x2020805f) AM_READWRITE(tcram_r, tcram_w) AM_SHARE("tcram")   // Transition Control
 	AM_RANGE(0x20300000, 0x203001ff) AM_WRITE16(dl_w,0xffffffff) // 3d Display List
 	AM_RANGE(0x20300200, 0x20300203) AM_WRITE(dl_upload_w)  // 3d Display List Upload

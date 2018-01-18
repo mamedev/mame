@@ -310,7 +310,7 @@ static ADDRESS_MAP_START( berlwall, AS_PROGRAM, 16, kaneko16_berlwall_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM     // ROM
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM     // Work RAM
 	AM_RANGE(0x30e000, 0x30ffff) AM_READWRITE(berlwall_spriteram_r, berlwall_spriteram_w) AM_SHARE("spriteram")       // Sprites (scrambled RAM)
-	AM_RANGE(0x400000, 0x400fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")                // Palette
+	AM_RANGE(0x400000, 0x400fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")                // Palette
 	AM_RANGE(0x480000, 0x480001) AM_RAM AM_SHARE("bg15_scroll")                                                       // High Color Background
 	AM_RANGE(0x500000, 0x500001) AM_READWRITE(kaneko16_bg15_bright_r, kaneko16_bg15_bright_w) AM_SHARE("bg15_bright") // ""
 	AM_RANGE(0x580000, 0x580001) AM_READWRITE(kaneko16_bg15_select_r, kaneko16_bg15_select_w) AM_SHARE("bg15_select") // ""
@@ -357,7 +357,7 @@ static ADDRESS_MAP_START( bakubrkr, AS_PROGRAM, 16, kaneko16_state )
 	AM_RANGE(0x500000, 0x503fff) AM_DEVREADWRITE("view2_0", kaneko_view2_tilemap_device,  kaneko_tmap_vram_r, kaneko_tmap_vram_w )
 	AM_RANGE(0x580000, 0x583fff) AM_DEVREADWRITE("view2_1", kaneko_view2_tilemap_device,  kaneko_tmap_vram_r, kaneko_tmap_vram_w )
 	AM_RANGE(0x600000, 0x601fff) AM_RAM AM_SHARE("spriteram")                   // Sprites
-	AM_RANGE(0x700000, 0x700fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")    // Palette
+	AM_RANGE(0x700000, 0x700fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")    // Palette
 	AM_RANGE(0x800000, 0x80001f) AM_DEVREADWRITE("view2_0", kaneko_view2_tilemap_device,  kaneko_tmap_regs_r, kaneko_tmap_regs_w)
 	AM_RANGE(0x900000, 0x90001f) AM_DEVREADWRITE("kan_spr", kaneko16_sprite_device, kaneko16_sprites_regs_r, kaneko16_sprites_regs_w)
 	AM_RANGE(0xa80000, 0xa80001) AM_DEVREAD("watchdog", watchdog_timer_device, reset16_r)
@@ -377,7 +377,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( blazeon, AS_PROGRAM, 16, kaneko16_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM     // ROM
 	AM_RANGE(0x300000, 0x30ffff) AM_RAM     // Work RAM
-	AM_RANGE(0x500000, 0x500fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")    // Palette
+	AM_RANGE(0x500000, 0x500fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")    // Palette
 	AM_RANGE(0x600000, 0x603fff) AM_DEVREADWRITE("view2_0", kaneko_view2_tilemap_device,  kaneko_tmap_vram_r, kaneko_tmap_vram_w )
 	AM_RANGE(0x700000, 0x700fff) AM_RAM AM_SHARE("spriteram")                   // Sprites
 	AM_RANGE(0x800000, 0x80001f) AM_DEVREADWRITE("view2_0", kaneko_view2_tilemap_device,  kaneko_tmap_regs_r, kaneko_tmap_regs_w)
@@ -436,7 +436,7 @@ static ADDRESS_MAP_START( bloodwar, AS_PROGRAM, 16, kaneko16_gtmr_state )
 	AM_RANGE(0x2b0000, 0x2b0001) AM_DEVWRITE( "toybox", kaneko_toybox_device, mcu_com1_w)
 	AM_RANGE(0x2c0000, 0x2c0001) AM_DEVWRITE( "toybox", kaneko_toybox_device, mcu_com2_w)
 	AM_RANGE(0x2d0000, 0x2d0001) AM_DEVWRITE( "toybox", kaneko_toybox_device, mcu_com3_w)
-	AM_RANGE(0x300000, 0x30ffff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")    // Palette
+	AM_RANGE(0x300000, 0x30ffff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")    // Palette
 	AM_RANGE(0x400000, 0x401fff) AM_RAM AM_SHARE("spriteram")                   // Sprites
 	AM_RANGE(0x500000, 0x503fff) AM_DEVREADWRITE("view2_0", kaneko_view2_tilemap_device,  kaneko_tmap_vram_r, kaneko_tmap_vram_w )
 	AM_RANGE(0x580000, 0x583fff) AM_DEVREADWRITE("view2_1", kaneko_view2_tilemap_device,  kaneko_tmap_vram_r, kaneko_tmap_vram_w )
@@ -490,7 +490,7 @@ static ADDRESS_MAP_START( bonkadv, AS_PROGRAM, 16, kaneko16_gtmr_state )
 	AM_RANGE(0x2b0000, 0x2b0001) AM_DEVWRITE( "toybox", kaneko_toybox_device, mcu_com1_w)
 	AM_RANGE(0x2c0000, 0x2c0001) AM_DEVWRITE( "toybox", kaneko_toybox_device, mcu_com2_w)
 	AM_RANGE(0x2d0000, 0x2d0001) AM_DEVWRITE( "toybox", kaneko_toybox_device, mcu_com3_w)
-	AM_RANGE(0x300000, 0x30ffff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")    // Palette
+	AM_RANGE(0x300000, 0x30ffff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")    // Palette
 	AM_RANGE(0x400000, 0x401fff) AM_RAM AM_SHARE("spriteram")                   // Sprites
 	AM_RANGE(0x500000, 0x503fff) AM_DEVREADWRITE("view2_0", kaneko_view2_tilemap_device,  kaneko_tmap_vram_r, kaneko_tmap_vram_w )
 	AM_RANGE(0x580000, 0x583fff) AM_DEVREADWRITE("view2_1", kaneko_view2_tilemap_device,  kaneko_tmap_vram_r, kaneko_tmap_vram_w )
@@ -562,7 +562,7 @@ static ADDRESS_MAP_START( gtmr_map, AS_PROGRAM, 16, kaneko16_gtmr_state )
 	AM_RANGE(0x2c0000, 0x2c0001) AM_DEVWRITE( "toybox", kaneko_toybox_device, mcu_com2_w)
 	AM_RANGE(0x2d0000, 0x2d0001) AM_DEVWRITE( "toybox", kaneko_toybox_device, mcu_com3_w)
 
-	AM_RANGE(0x300000, 0x30ffff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")    // Palette
+	AM_RANGE(0x300000, 0x30ffff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")    // Palette
 	AM_RANGE(0x310000, 0x327fff) AM_RAM                                                                     //
 	AM_RANGE(0x400000, 0x401fff) AM_RAM AM_SHARE("spriteram")                       // Sprites
 
@@ -631,7 +631,7 @@ static ADDRESS_MAP_START( gtmr2_map, AS_PROGRAM, 16, kaneko16_gtmr_state )
 	AM_RANGE(0x2c0000, 0x2c0001) AM_DEVWRITE( "toybox", kaneko_toybox_device, mcu_com2_w)
 	AM_RANGE(0x2d0000, 0x2d0001) AM_DEVWRITE( "toybox", kaneko_toybox_device, mcu_com3_w)
 
-	AM_RANGE(0x300000, 0x30ffff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")    // Palette
+	AM_RANGE(0x300000, 0x30ffff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")    // Palette
 	AM_RANGE(0x310000, 0x327fff) AM_RAM //
 	AM_RANGE(0x400000, 0x401fff) AM_RAM AM_SHARE("spriteram") // Sprites
 
@@ -671,7 +671,7 @@ static ADDRESS_MAP_START( mgcrystl, AS_PROGRAM, 16, kaneko16_state )
 	AM_RANGE(0x400000, 0x40001f) AM_READWRITE(kaneko16_ay1_YM2149_r, kaneko16_ay1_YM2149_w) // Sound
 	AM_RANGE(0x400200, 0x40021f) AM_READWRITE(kaneko16_ay2_YM2149_r, kaneko16_ay2_YM2149_w)
 	AM_RANGE(0x400400, 0x400401) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)
-	AM_RANGE(0x500000, 0x500fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")    // Palette
+	AM_RANGE(0x500000, 0x500fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")    // Palette
 	AM_RANGE(0x600000, 0x603fff) AM_DEVREADWRITE("view2_0", kaneko_view2_tilemap_device,  kaneko_tmap_vram_r, kaneko_tmap_vram_w )
 	AM_RANGE(0x680000, 0x683fff) AM_DEVREADWRITE("view2_1", kaneko_view2_tilemap_device,  kaneko_tmap_vram_r, kaneko_tmap_vram_w )
 	AM_RANGE(0x700000, 0x701fff) AM_RAM AM_SHARE("spriteram")                   // Sprites
@@ -733,7 +733,7 @@ static ADDRESS_MAP_START( shogwarr, AS_PROGRAM, 16, kaneko16_shogwarr_state )
 	AM_RANGE(0x2b0000, 0x2b0001) AM_DEVWRITE("calc3_prot", kaneko_calc3_device, mcu_com2_w)
 	//AM_RANGE(0x2c0000, 0x2c0001) // run calc 3? or irq ack?
 	AM_RANGE(0x2d0000, 0x2d0001) AM_DEVWRITE("calc3_prot", kaneko_calc3_device, mcu_com3_w)
-	AM_RANGE(0x380000, 0x380fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")    // Palette
+	AM_RANGE(0x380000, 0x380fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")    // Palette
 	AM_RANGE(0x400000, 0x400001) AM_DEVREADWRITE8("oki1", okim6295_device, read, write, 0x00ff) // Samples
 	AM_RANGE(0x480000, 0x480001) AM_DEVREADWRITE8("oki2", okim6295_device, read, write, 0x00ff)
 	AM_RANGE(0x580000, 0x581fff) AM_RAM AM_SHARE("spriteram")                   // Sprites

@@ -115,7 +115,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, cabal_state )
 	AM_RANGE(0xa0010, 0xa0011) AM_READ_PORT("INPUTS")
 	AM_RANGE(0xc0040, 0xc0041) AM_WRITENOP /* ??? */
 	AM_RANGE(0xc0080, 0xc0081) AM_WRITE(flipscreen_w)
-	AM_RANGE(0xe0000, 0xe07ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0xe0000, 0xe07ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0xe8008, 0xe8009) AM_WRITE(sound_irq_trigger_word_w) // fix coin insertion
 	AM_RANGE(0xe8000, 0xe800d) AM_DEVREADWRITE8("seibu_sound", seibu_sound_device, main_r, main_w, 0x00ff)
 ADDRESS_MAP_END
@@ -145,7 +145,7 @@ static ADDRESS_MAP_START( cabalbl_main_map, AS_PROGRAM, 16, cabal_state )
 	AM_RANGE(0xa0010, 0xa0011) AM_READ_PORT("INPUTS")
 	AM_RANGE(0xc0040, 0xc0041) AM_WRITENOP /* ??? */
 	AM_RANGE(0xc0080, 0xc0081) AM_WRITE(flipscreen_w)
-	AM_RANGE(0xe0000, 0xe07ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0xe0000, 0xe07ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0xe8000, 0xe8003) AM_WRITE(cabalbl_sndcmd_w)
 	AM_RANGE(0xe8004, 0xe8005) AM_DEVREAD8("soundlatch", generic_latch_8_device, read, 0x00ff)
 	AM_RANGE(0xe8008, 0xe8009) AM_WRITE(cabalbl_sound_irq_trigger_word_w)

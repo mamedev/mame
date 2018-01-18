@@ -612,7 +612,7 @@ static ADDRESS_MAP_START( master_mem, AS_PROGRAM, 16, cybertnk_state )
 	AM_RANGE(0x0c4000, 0x0c5fff) AM_RAM_WRITE(tilemap1_vram_w) AM_SHARE("tilemap1_vram")
 	AM_RANGE(0x0c8000, 0x0c9fff) AM_RAM_WRITE(tilemap2_vram_w) AM_SHARE("tilemap2_vram")
 	AM_RANGE(0x0e0000, 0x0e0fff) AM_RAM AM_SHARE("sharedram")
-	AM_RANGE(0x100000, 0x107fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette") /* 2x palettes, one for each screen */
+	AM_RANGE(0x100000, 0x107fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette") /* 2x palettes, one for each screen */
 
 	AM_RANGE(0x110000, 0x110001) AM_WRITE8(cybertnk_sound_cmd_w,0xffff)
 	AM_RANGE(0x110002, 0x110003) AM_READ_PORT("DSW1")  AM_WRITENOP// watchdog?

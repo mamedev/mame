@@ -380,7 +380,7 @@ WRITE_LINE_MEMBER( djmain_state::ide_interrupt )
 static ADDRESS_MAP_START( maincpu_djmain, AS_PROGRAM, 32, djmain_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM                         // PRG ROM
 	AM_RANGE(0x400000, 0x40ffff) AM_RAM                         // WORK RAM
-	AM_RANGE(0x480000, 0x48443f) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")       // COLOR RAM
+	AM_RANGE(0x480000, 0x48443f) AM_RAM_DEVWRITE("palette", palette_device, write32) AM_SHARE("palette")       // COLOR RAM
 	AM_RANGE(0x500000, 0x57ffff) AM_READWRITE(sndram_r, sndram_w)               // SOUND RAM
 	AM_RANGE(0x580000, 0x58003f) AM_DEVREADWRITE("k056832", k056832_device, long_r, long_w)      // VIDEO REG (tilemap)
 	AM_RANGE(0x590000, 0x590007) AM_WRITE(unknown590000_w)                  // ??

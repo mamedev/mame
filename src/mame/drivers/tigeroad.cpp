@@ -82,7 +82,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, tigeroad_state )
 	AM_RANGE(0xfe800e, 0xfe800f) AM_WRITEONLY    /* fe800e = watchdog or IRQ acknowledge */
 	AM_RANGE(0xfec000, 0xfec7ff) AM_RAM_WRITE(tigeroad_videoram_w) AM_SHARE("videoram")
 
-	AM_RANGE(0xff8000, 0xff87ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0xff8000, 0xff87ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0xffc000, 0xffffff) AM_RAM AM_SHARE("ram16")
 ADDRESS_MAP_END
 
@@ -107,7 +107,7 @@ static ADDRESS_MAP_START( bballs_map, AS_PROGRAM, 16, pushman_state )
 	AM_RANGE(0xe800e, 0xe800f) AM_WRITENOP /* ? */
 	AM_RANGE(0xec000, 0xec7ff) AM_RAM_WRITE(tigeroad_videoram_w) AM_SHARE("videoram")
 
-	AM_RANGE(0xf8000, 0xf87ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0xf8000, 0xf87ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0xfc000, 0xfffff) AM_RAM AM_SHARE("ram16")
 ADDRESS_MAP_END
 

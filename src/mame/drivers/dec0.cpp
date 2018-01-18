@@ -455,8 +455,8 @@ static ADDRESS_MAP_START( dec0_map, AS_PROGRAM, 16, dec0_state )
 	AM_RANGE(0x30c010, 0x30c01f) AM_WRITE(dec0_control_w)                                   /* Priority, sound, etc. */
 	AM_RANGE(0x30c012, 0x30c013) AM_READNOP // clr.w for sprite DMA
 	AM_RANGE(0x30c018, 0x30c019) AM_READNOP // clr.w for irq ack
-	AM_RANGE(0x310000, 0x3107ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
-	AM_RANGE(0x314000, 0x3147ff) AM_RAM_DEVWRITE("palette", palette_device, write_ext) AM_SHARE("palette_ext")
+	AM_RANGE(0x310000, 0x3107ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
+	AM_RANGE(0x314000, 0x3147ff) AM_RAM_DEVWRITE("palette", palette_device, write16_ext) AM_SHARE("palette_ext")
 	AM_RANGE(0xff8000, 0xffbfff) AM_RAM AM_SHARE("ram")                                 /* Main ram */
 	AM_RANGE(0xffc000, 0xffc7ff) AM_RAM AM_SHARE("spriteram")                               /* Sprites */
 ADDRESS_MAP_END
@@ -610,7 +610,7 @@ static ADDRESS_MAP_START( slyspy_map, AS_PROGRAM, 16, dec0_state )
 
 	AM_RANGE(0x304000, 0x307fff) AM_RAM AM_SHARE("ram") /* Sly spy main ram */
 	AM_RANGE(0x308000, 0x3087ff) AM_RAM AM_SHARE("spriteram")   /* Sprites */
-	AM_RANGE(0x310000, 0x3107ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x310000, 0x3107ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x314000, 0x314001) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x00ff)
 	AM_RANGE(0x314002, 0x314003) AM_WRITE(dec0_priority_w)
 	AM_RANGE(0x314008, 0x31400f) AM_READ(slyspy_controls_r)
@@ -622,7 +622,7 @@ static ADDRESS_MAP_START( midres_map, AS_PROGRAM, 16, dec0_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x100000, 0x103fff) AM_RAM AM_SHARE("ram")
 	AM_RANGE(0x120000, 0x1207ff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x140000, 0x1407ff) AM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x140000, 0x1407ff) AM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x160000, 0x160001) AM_WRITE(dec0_priority_w)
 	AM_RANGE(0x180000, 0x18000f) AM_READ(midres_controls_r)
 	AM_RANGE(0x180008, 0x18000f) AM_WRITENOP /* ?? watchdog ?? */
@@ -763,7 +763,7 @@ READ16_MEMBER( dec0_automat_state::automat_palette_r )
 WRITE16_MEMBER( dec0_automat_state::automat_palette_w )
 {
 	offset ^=0xf;
-	m_palette->write(space, offset, data, mem_mask);
+	m_palette->write16(space, offset, data, mem_mask);
 }
 
 

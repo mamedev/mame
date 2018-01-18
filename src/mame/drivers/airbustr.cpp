@@ -328,7 +328,7 @@ static ADDRESS_MAP_START( slave_map, AS_PROGRAM, 8, airbustr_state )
 	AM_RANGE(0xc400, 0xc7ff) AM_RAM_WRITE(colorram2_w) AM_SHARE("colorram2")
 	AM_RANGE(0xc800, 0xcbff) AM_RAM_WRITE(videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0xcc00, 0xcfff) AM_RAM_WRITE(colorram_w) AM_SHARE("colorram")
-	AM_RANGE(0xd000, 0xd5ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0xd000, 0xd5ff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
 	AM_RANGE(0xd600, 0xdfff) AM_RAM
 	AM_RANGE(0xe000, 0xefff) AM_RAM
 	AM_RANGE(0xf000, 0xffff) AM_RAM AM_SHARE("share1")

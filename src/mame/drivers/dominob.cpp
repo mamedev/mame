@@ -193,7 +193,7 @@ static ADDRESS_MAP_START( memmap, AS_PROGRAM, 8, dominob_state )
 	AM_RANGE(0xe840, 0xefff) AM_RAM
 	AM_RANGE(0xf000, 0xf07f) AM_RAM AM_SHARE("bgram")
 	AM_RANGE(0xf080, 0xf7ff) AM_RAM
-	AM_RANGE(0xf800, 0xfbff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0xf800, 0xfbff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
 	AM_RANGE(0xfc00, 0xffff) AM_RAM
 ADDRESS_MAP_END
 

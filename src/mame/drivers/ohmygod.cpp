@@ -48,7 +48,7 @@ static ADDRESS_MAP_START( ohmygod_map, AS_PROGRAM, 16, ohmygod_state )
 	AM_RANGE(0x308000, 0x30ffff) AM_RAM
 	AM_RANGE(0x400000, 0x400001) AM_WRITE(ohmygod_scrollx_w)
 	AM_RANGE(0x400002, 0x400003) AM_WRITE(ohmygod_scrolly_w)
-	AM_RANGE(0x600000, 0x6007ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x600000, 0x6007ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x700000, 0x703fff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x704000, 0x707fff) AM_RAM
 	AM_RANGE(0x708000, 0x70ffff) AM_RAM     /* Work RAM */

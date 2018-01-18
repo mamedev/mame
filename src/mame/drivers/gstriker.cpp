@@ -252,7 +252,7 @@ static ADDRESS_MAP_START( twcup94_map, AS_PROGRAM, 16, gstriker_state )
 	AM_RANGE(0x140000, 0x141fff) AM_RAM AM_SHARE("cg10103_m_vram")
 	AM_RANGE(0x180000, 0x180fff) AM_DEVREADWRITE("texttilemap", vs920a_text_tilemap_device,  vram_r, vram_w )
 	AM_RANGE(0x181000, 0x181fff) AM_DEVREADWRITE("zoomtilemap", mb60553_zooming_tilemap_device,  line_r, line_w )
-	AM_RANGE(0x1c0000, 0x1c0fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette") AM_MIRROR(0x00f000)
+	AM_RANGE(0x1c0000, 0x1c0fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette") AM_MIRROR(0x00f000)
 
 	AM_RANGE(0x200000, 0x20000f) AM_DEVREADWRITE("zoomtilemap", mb60553_zooming_tilemap_device,  regs_r, regs_w )
 	AM_RANGE(0x200010, 0x200011) AM_WRITENOP

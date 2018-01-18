@@ -680,7 +680,7 @@ static ADDRESS_MAP_START( alpha68k_II_map, AS_PROGRAM, 16, alpha68k_state )
 	AM_RANGE(0x100000, 0x100fff) AM_RAM_WRITE(alpha68k_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0x200000, 0x207fff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x300000, 0x3001ff) AM_READWRITE(alpha_II_trigger_r, alpha_microcontroller_w)
-	AM_RANGE(0x400000, 0x400fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x400000, 0x400fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x800000, 0x83ffff) AM_ROMBANK("bank8")
 ADDRESS_MAP_END
 
@@ -698,7 +698,7 @@ static ADDRESS_MAP_START( alpha68k_V_map, AS_PROGRAM, 16, alpha68k_state )
 	AM_RANGE(0x300000, 0x303fff) AM_READ(alpha_V_trigger_r)
 	AM_RANGE(0x300000, 0x3001ff) AM_WRITE(alpha_microcontroller_w)
 	AM_RANGE(0x303e00, 0x303fff) AM_WRITE(alpha_microcontroller_w) /* Gang Wars mirror */
-	AM_RANGE(0x400000, 0x401fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x400000, 0x401fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x800000, 0x83ffff) AM_ROMBANK("bank8")
 ADDRESS_MAP_END
 

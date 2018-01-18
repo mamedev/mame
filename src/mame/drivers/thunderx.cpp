@@ -435,12 +435,12 @@ ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( scontra_bank5800_map, AS_PROGRAM, 8, thunderx_state )
-	AM_RANGE(0x0000, 0x07ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x0000, 0x07ff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
 	AM_RANGE(0x0800, 0x0fff) AM_RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( thunderx_bank5800_map, AS_PROGRAM, 8, thunderx_state )
-	AM_RANGE(0x0000, 0x07ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x0000, 0x07ff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
 	AM_RANGE(0x0800, 0x0fff) AM_RAM
 	AM_RANGE(0x1000, 0x17ff) AM_READWRITE(pmc_r, pmc_w) AM_SHARE("pmcram")
 ADDRESS_MAP_END

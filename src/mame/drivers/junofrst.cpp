@@ -277,7 +277,7 @@ WRITE8_MEMBER(junofrst_state::i8039_irqen_and_status_w)
 
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, junofrst_state )
 	AM_RANGE(0x0000, 0x7fff) AM_RAM AM_SHARE("videoram")
-	AM_RANGE(0x8000, 0x800f) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x8000, 0x800f) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
 	AM_RANGE(0x8010, 0x8010) AM_READ_PORT("DSW2")
 	AM_RANGE(0x801c, 0x801c) AM_DEVREAD("watchdog", watchdog_timer_device, reset_r)
 	AM_RANGE(0x8020, 0x8020) AM_READ_PORT("SYSTEM")

@@ -744,7 +744,7 @@ static ADDRESS_MAP_START( rabbit_map, AS_PROGRAM, 32, rabbit_state )
 	AM_RANGE(0x488000, 0x48bfff) AM_READWRITE(tilemap2_r,tilemap2_w)
 	AM_RANGE(0x48c000, 0x48ffff) AM_READWRITE(tilemap3_r,tilemap3_w)
 	AM_RANGE(0x494000, 0x497fff) AM_RAM AM_SHARE("spriteram") // sprites?
-	AM_RANGE(0x4a0000, 0x4affff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x4a0000, 0x4affff) AM_RAM_DEVWRITE("palette", palette_device, write32) AM_SHARE("palette")
 	AM_RANGE(0xff0000, 0xffffff) AM_RAM
 ADDRESS_MAP_END
 

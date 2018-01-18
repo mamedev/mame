@@ -140,7 +140,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( bank0000_map, AS_PROGRAM, 8, simpsons_state )
 	AM_RANGE(0x0000, 0x0fff) AM_DEVREADWRITE("k052109", k052109_device, read, write)
-	AM_RANGE(0x1000, 0x1fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x1000, 0x1fff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( bank2000_map, AS_PROGRAM, 8, simpsons_state )

@@ -326,7 +326,7 @@ static ADDRESS_MAP_START(pc100_io, AS_IO, 16, pc100_state)
 	AM_RANGE(0x38, 0x39) AM_WRITE8(pc100_crtc_addr_w,0x00ff) //crtc address reg
 	AM_RANGE(0x3a, 0x3b) AM_WRITE8(pc100_crtc_data_w,0x00ff) //crtc data reg
 	AM_RANGE(0x3c, 0x3f) AM_READWRITE8(pc100_vs_vreg_r,pc100_vs_vreg_w,0x00ff) //crtc vertical start position
-	AM_RANGE(0x40, 0x5f) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x40, 0x5f) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 //  AM_RANGE(0x60, 0x61) crtc command (16-bit wide)
 	AM_RANGE(0x80, 0x81) AM_READWRITE(pc100_kanji_r,pc100_kanji_w)
 	AM_RANGE(0x82, 0x83) AM_WRITENOP //kanji-related?

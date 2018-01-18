@@ -326,7 +326,7 @@ static ADDRESS_MAP_START( acommand_map, AS_PROGRAM, 16, acommand_state )
 	AM_RANGE(0x082208, 0x082209) AM_WRITE(ac_unk2_w)
 	AM_RANGE(0x0a0000, 0x0a3fff) AM_RAM_DEVWRITE("bgtmap", megasys1_tilemap_device, write) AM_SHARE("bgtmap")
 	AM_RANGE(0x0b0000, 0x0b3fff) AM_RAM_DEVWRITE("txtmap", megasys1_tilemap_device, write) AM_SHARE("txtmap")
-	AM_RANGE(0x0b8000, 0x0bffff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x0b8000, 0x0bffff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x0f0000, 0x0f7fff) AM_RAM
 	AM_RANGE(0x0f8000, 0x0f8fff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x0f9000, 0x0fffff) AM_RAM

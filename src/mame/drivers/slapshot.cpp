@@ -269,7 +269,7 @@ static ADDRESS_MAP_START( slapshot_map, AS_PROGRAM, 16, slapshot_state )
 	AM_RANGE(0x700000, 0x701fff) AM_RAM AM_SHARE("spriteext")   /* debugging */
 	AM_RANGE(0x800000, 0x80ffff) AM_DEVREADWRITE("tc0480scp", tc0480scp_device, word_r, word_w)    /* tilemaps */
 	AM_RANGE(0x830000, 0x83002f) AM_DEVREADWRITE("tc0480scp", tc0480scp_device, ctrl_word_r, ctrl_word_w)
-	AM_RANGE(0x900000, 0x907fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x900000, 0x907fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0xa00000, 0xa03fff) AM_DEVREADWRITE8("mk48t08", timekeeper_device, read, write, 0xff00) /* nvram (only low bytes used) */
 	AM_RANGE(0xb00000, 0xb0001f) AM_DEVWRITE8("tc0360pri", tc0360pri_device, write, 0xff00)  /* priority chip */
 	AM_RANGE(0xc00000, 0xc0000f) AM_DEVREADWRITE("tc0640fio", tc0640fio_device, halfword_byteswap_r, halfword_byteswap_w)
@@ -284,7 +284,7 @@ static ADDRESS_MAP_START( opwolf3_map, AS_PROGRAM, 16, slapshot_state )
 	AM_RANGE(0x700000, 0x701fff) AM_RAM AM_SHARE("spriteext")   /* debugging */
 	AM_RANGE(0x800000, 0x80ffff) AM_DEVREADWRITE("tc0480scp", tc0480scp_device, word_r, word_w)    /* tilemaps */
 	AM_RANGE(0x830000, 0x83002f) AM_DEVREADWRITE("tc0480scp", tc0480scp_device, ctrl_word_r, ctrl_word_w)
-	AM_RANGE(0x900000, 0x907fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x900000, 0x907fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0xa00000, 0xa03fff) AM_DEVREADWRITE8("mk48t08", timekeeper_device, read, write, 0xff00) /* nvram (only low bytes used) */
 	AM_RANGE(0xb00000, 0xb0001f) AM_DEVWRITE8("tc0360pri", tc0360pri_device, write, 0xff00)  /* priority chip */
 	AM_RANGE(0xc00000, 0xc0000f) AM_DEVREADWRITE("tc0640fio", tc0640fio_device, halfword_byteswap_r, halfword_byteswap_w)

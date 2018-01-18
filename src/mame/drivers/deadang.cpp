@@ -75,7 +75,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, deadang_state )
 	AM_RANGE(0x08800, 0x0bfff) AM_WRITEONLY
 	AM_RANGE(0x0a000, 0x0a001) AM_READ_PORT("P1_P2")
 	AM_RANGE(0x0a002, 0x0a003) AM_READ_PORT("DSW")
-	AM_RANGE(0x0c000, 0x0cfff) AM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x0c000, 0x0cfff) AM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x0d000, 0x0dfff) AM_WRITEONLY
 	AM_RANGE(0x0e000, 0x0e0ff) AM_WRITEONLY AM_SHARE("scroll_ram")
 	AM_RANGE(0x0e100, 0x0ffff) AM_WRITEONLY

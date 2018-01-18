@@ -559,7 +559,7 @@ static ADDRESS_MAP_START(ibmpcjr_io, AS_IO, 8, pcjr_state)
 	AM_RANGE(0x0200, 0x0207) AM_DEVREADWRITE("pc_joy", pc_joy_device, joy_port_r, joy_port_w)
 	AM_RANGE(0x02f8, 0x02ff) AM_DEVREADWRITE("ins8250", ins8250_device, ins8250_r, ins8250_w)
 	AM_RANGE(0x0378, 0x037b) AM_DEVREADWRITE("lpt_0", pc_lpt_device, read, write)
-	AM_RANGE(0x03d0, 0x03df) AM_DEVREADWRITE("pcvideo_pcjr", pcvideo_pcjr_device, read, write)
+	AM_RANGE(0x03d0, 0x03df) AM_DEVREAD("pcvideo_pcjr", pcvideo_pcjr_device, read) AM_DEVWRITE("pcvideo_pcjr", pcvideo_pcjr_device, write)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(ibmpcjx_map, AS_PROGRAM, 8, pcjr_state )

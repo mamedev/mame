@@ -182,7 +182,7 @@ static ADDRESS_MAP_START( maincpu_map, AS_PROGRAM, 8, missb2_state )
 	AM_RANGE(0xc000, 0xdcff) AM_RAM AM_SHARE("videoram")
 	AM_RANGE(0xdd00, 0xdfff) AM_RAM AM_SHARE("objectram")
 	AM_RANGE(0xe000, 0xf7ff) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0xf800, 0xf9ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0xf800, 0xf9ff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
 	AM_RANGE(0xfa00, 0xfa00) AM_MIRROR(0x007c) AM_DEVREAD("sound_to_main", generic_latch_8_device, read) AM_DEVWRITE("main_to_sound", generic_latch_8_device, write)
 	AM_RANGE(0xfa01, 0xfa01) AM_MIRROR(0x007c) AM_READ(common_sound_semaphores_r)
 	AM_RANGE(0xfa03, 0xfa03) AM_MIRROR(0x007c) AM_WRITE(bublbobl_soundcpu_reset_w)
@@ -205,7 +205,7 @@ static ADDRESS_MAP_START( subcpu_map, AS_PROGRAM, 8, missb2_state )
 	AM_RANGE(0x9000, 0x9fff) AM_ROMBANK("bank2")    // ROM data for the background palette ram
 	AM_RANGE(0xa000, 0xafff) AM_ROMBANK("bank3")    // ROM data for the background palette ram
 	AM_RANGE(0xb000, 0xb1ff) AM_ROM         // banked ???
-	AM_RANGE(0xc000, 0xc1ff) AM_RAM_DEVWRITE("bgpalette", palette_device, write) AM_SHARE("bgpalette")
+	AM_RANGE(0xc000, 0xc1ff) AM_RAM_DEVWRITE("bgpalette", palette_device, write8) AM_SHARE("bgpalette")
 	AM_RANGE(0xc800, 0xcfff) AM_RAM         // main ???
 	AM_RANGE(0xd000, 0xd000) AM_WRITE(missb2_bg_bank_w)
 	AM_RANGE(0xd002, 0xd002) AM_WRITENOP

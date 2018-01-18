@@ -602,9 +602,9 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 32, atarigt_state )
 	AM_RANGE(0xd00014, 0xd00017) AM_READ(analog_port0_r)
 	AM_RANGE(0xd0001c, 0xd0001f) AM_READ(analog_port1_r)
 	AM_RANGE(0xd20000, 0xd20fff) AM_DEVREADWRITE8("eeprom", eeprom_parallel_28xx_device, read, write, 0xff00ff00)
-	AM_RANGE(0xd40000, 0xd4ffff) AM_DEVWRITE("eeprom", eeprom_parallel_28xx_device, unlock_write)
-	AM_RANGE(0xd72000, 0xd75fff) AM_DEVWRITE("playfield", tilemap_device, write) AM_SHARE("playfield")
-	AM_RANGE(0xd76000, 0xd76fff) AM_DEVWRITE("alpha", tilemap_device, write) AM_SHARE("alpha")
+	AM_RANGE(0xd40000, 0xd4ffff) AM_DEVWRITE("eeprom", eeprom_parallel_28xx_device, unlock_write32)
+	AM_RANGE(0xd72000, 0xd75fff) AM_DEVWRITE("playfield", tilemap_device, write32) AM_SHARE("playfield")
+	AM_RANGE(0xd76000, 0xd76fff) AM_DEVWRITE("alpha", tilemap_device, write32) AM_SHARE("alpha")
 	AM_RANGE(0xd78000, 0xd78fff) AM_RAM AM_SHARE("rle")
 	AM_RANGE(0xd7a200, 0xd7a203) AM_WRITE(mo_command_w) AM_SHARE("mo_command")
 	AM_RANGE(0xd70000, 0xd7ffff) AM_RAM
@@ -1301,7 +1301,7 @@ WRITE32_MEMBER(atarigt_state::tmek_pf_w)
 	if (pc == 0x25834 || pc == 0x25860)
 		logerror("%06X:PFW@%06X = %08X & %08X (src=%06X)\n", m_maincpu->pc(), 0xd72000 + offset*4, data, mem_mask, (uint32_t)m_maincpu->state_int(M68K_A3) - 2);
 
-	m_playfield_tilemap->write(space, offset, data, mem_mask);
+	m_playfield_tilemap->write32(space, offset, data, mem_mask);
 }
 
 DRIVER_INIT_MEMBER(atarigt_state,tmek)

@@ -201,7 +201,7 @@ static ADDRESS_MAP_START( snowbros_map, AS_PROGRAM, 16, snowbros_state )
 	AM_RANGE(0x500000, 0x500001) AM_READ_PORT("DSW1")
 	AM_RANGE(0x500002, 0x500003) AM_READ_PORT("DSW2")
 	AM_RANGE(0x500004, 0x500005) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x600000, 0x6001ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x600000, 0x6001ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x700000, 0x701fff) AM_DEVREADWRITE("pandora", kaneko_pandora_device, spriteram_LSB_r, spriteram_LSB_w)
 	AM_RANGE(0x800000, 0x800001) AM_WRITE(snowbros_irq4_ack_w)  /* IRQ 4 acknowledge */
 	AM_RANGE(0x900000, 0x900001) AM_WRITE(snowbros_irq3_ack_w)  /* IRQ 3 acknowledge */
@@ -285,7 +285,7 @@ static ADDRESS_MAP_START( wintbob_map, AS_PROGRAM, 16, snowbros_state )
 	AM_RANGE(0x500000, 0x500001) AM_READ_PORT("DSW1")
 	AM_RANGE(0x500002, 0x500003) AM_READ_PORT("DSW2")
 	AM_RANGE(0x500004, 0x500005) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x600000, 0x6001ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x600000, 0x6001ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x700000, 0x701fff) AM_RAM AM_SHARE("spriteram16b")
 	AM_RANGE(0x800000, 0x800001) AM_WRITE(snowbros_irq4_ack_w)  /* IRQ 4 acknowledge */
 	AM_RANGE(0x900000, 0x900001) AM_WRITE(snowbros_irq3_ack_w)  /* IRQ 3 acknowledge */
@@ -306,7 +306,7 @@ static ADDRESS_MAP_START( honeydol_map, AS_PROGRAM, 16, snowbros_state )
 	AM_RANGE(0x900000, 0x900001) AM_READ_PORT("DSW1")
 	AM_RANGE(0x900002, 0x900003) AM_READ_PORT("DSW2")
 	AM_RANGE(0x900004, 0x900005) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0xa00000, 0xa007ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0xa00000, 0xa007ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0xb00000, 0xb01fff) AM_RAM AM_SHARE("spriteram16b")
 ADDRESS_MAP_END
 
@@ -336,7 +336,7 @@ static ADDRESS_MAP_START( twinadv_map, AS_PROGRAM, 16, snowbros_state )
 	AM_RANGE(0x500000, 0x500001) AM_READ_PORT("DSW1")
 	AM_RANGE(0x500002, 0x500003) AM_READ_PORT("DSW2")
 	AM_RANGE(0x500004, 0x500005) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x600000, 0x6001ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x600000, 0x6001ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x700000, 0x701fff) AM_RAM AM_SHARE("spriteram16b")
 	AM_RANGE(0x800000, 0x800001) AM_WRITE(snowbros_irq4_ack_w)  /* IRQ 4 acknowledge */
 	AM_RANGE(0x900000, 0x900001) AM_WRITE(snowbros_irq3_ack_w)  /* IRQ 3 acknowledge */
@@ -377,7 +377,7 @@ static ADDRESS_MAP_START( hyperpac_map, AS_PROGRAM, 16, snowbros_state )
 	AM_RANGE(0x500002, 0x500003) AM_READ_PORT("DSW2")
 	AM_RANGE(0x500004, 0x500005) AM_READ_PORT("SYSTEM")
 
-	AM_RANGE(0x600000, 0x6001ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x600000, 0x6001ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x700000, 0x701fff) AM_DEVREADWRITE("pandora", kaneko_pandora_device, spriteram_LSB_r, spriteram_LSB_w)
 	AM_RANGE(0x800000, 0x800001) AM_WRITE(snowbros_irq4_ack_w)  /* IRQ 4 acknowledge */
 	AM_RANGE(0x900000, 0x900001) AM_WRITE(snowbros_irq3_ack_w)  /* IRQ 3 acknowledge */
@@ -509,7 +509,7 @@ static ADDRESS_MAP_START( snowbros3_map, AS_PROGRAM, 16, snowbros_state )
 	AM_RANGE( 0x500000, 0x500001) AM_READ_PORT("DSW1")
 	AM_RANGE( 0x500002, 0x500003) AM_READ_PORT("DSW2")
 	AM_RANGE( 0x500004, 0x500005) AM_READ_PORT("SYSTEM")
-	AM_RANGE( 0x600000, 0x6003ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE( 0x600000, 0x6003ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE( 0x700000, 0x7021ff) AM_RAM AM_SHARE("spriteram16b")
 	AM_RANGE(0x800000, 0x800001) AM_WRITE(snowbros_irq4_ack_w)  /* IRQ 4 acknowledge */
 	AM_RANGE(0x900000, 0x900001) AM_WRITE(snowbros_irq3_ack_w)  /* IRQ 3 acknowledge */
@@ -528,7 +528,7 @@ static ADDRESS_MAP_START( finalttr_map, AS_PROGRAM, 16, snowbros_state )
 	AM_RANGE(0x500002, 0x500003) AM_READ_PORT("DSW2")
 	AM_RANGE(0x500004, 0x500005) AM_READ_PORT("SYSTEM")
 
-	AM_RANGE(0x600000, 0x6001ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x600000, 0x6001ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x700000, 0x701fff) AM_DEVREADWRITE("pandora", kaneko_pandora_device, spriteram_LSB_r, spriteram_LSB_w)
 	AM_RANGE(0x800000, 0x800001) AM_WRITE(snowbros_irq4_ack_w)  /* IRQ 4 acknowledge */
 	AM_RANGE(0x900000, 0x900001) AM_WRITE(snowbros_irq3_ack_w)  /* IRQ 3 acknowledge */
@@ -554,7 +554,7 @@ static ADDRESS_MAP_START( yutnori_map, AS_PROGRAM, 16, snowbros_state )
 //  AM_RANGE(0x400000, 0x400001) AM_DEVWRITE("watchdog", watchdog_timer_device, reset16_w) // maybe?
 	AM_RANGE(0x400000, 0x400001) AM_NOP
 
-	AM_RANGE(0x500000, 0x5001ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x500000, 0x5001ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 
 	AM_RANGE(0x600000, 0x601fff) AM_DEVREADWRITE("pandora", kaneko_pandora_device, spriteram_LSB_r, spriteram_LSB_w)
 

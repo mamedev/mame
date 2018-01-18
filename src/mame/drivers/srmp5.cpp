@@ -374,7 +374,7 @@ static ADDRESS_MAP_START( srmp5_mem, AS_PROGRAM, 32, srmp5_state )
 	AM_RANGE(0x01c00000, 0x01c00003) AM_READNOP // debug? 'Toru'
 
 	AM_RANGE(0x0a000000, 0x0a0fffff) AM_READWRITE(spr_r, spr_w)
-	AM_RANGE(0x0a100000, 0x0a17ffff) AM_DEVREADWRITE16("palette", palette_device, read, write, 0x0000ffff) AM_SHARE("palette")
+	AM_RANGE(0x0a100000, 0x0a17ffff) AM_DEVREADWRITE16("palette", palette_device, read16, write16, 0x0000ffff) AM_SHARE("palette")
 	//0?N???A?????????i??????????
 	AM_RANGE(0x0a180000, 0x0a180003) AM_READNOP // write 0x00000400
 	AM_RANGE(0x0a180000, 0x0a18011f) AM_READWRITE(srmp5_vidregs_r, srmp5_vidregs_w)

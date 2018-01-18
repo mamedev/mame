@@ -267,8 +267,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( spoker_portmap, AS_IO, 8, spoker_state )
 	AM_RANGE(0x0000, 0x003f) AM_RAM // Z180 internal regs
-	AM_RANGE(0x2000, 0x23ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
-	AM_RANGE(0x2400, 0x27ff) AM_RAM_DEVWRITE("palette", palette_device, write_ext) AM_SHARE("palette_ext")
+	AM_RANGE(0x2000, 0x23ff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
+	AM_RANGE(0x2400, 0x27ff) AM_RAM_DEVWRITE("palette", palette_device, write8_ext) AM_SHARE("palette_ext")
 	AM_RANGE(0x3000, 0x33ff) AM_RAM_WRITE(bg_tile_w ) AM_SHARE("bg_tile_ram")
 	AM_RANGE(0x5000, 0x5fff) AM_RAM_WRITE(fg_tile_w )  AM_SHARE("fg_tile_ram")
 	AM_RANGE(0x6480, 0x6483) AM_DEVREADWRITE("ppi8255_0", i8255_device, read, write)    /* NMI and coins (w), service (r), coins (r) */
@@ -282,8 +282,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( 3super8_portmap, AS_IO, 8, spoker_state )
 //  AM_RANGE(0x1000, 0x1fff) AM_WRITENOP
-	AM_RANGE(0x2000, 0x27ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
-	AM_RANGE(0x2800, 0x2fff) AM_RAM_DEVWRITE("palette", palette_device, write_ext) AM_SHARE("palette_ext")
+	AM_RANGE(0x2000, 0x27ff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
+	AM_RANGE(0x2800, 0x2fff) AM_RAM_DEVWRITE("palette", palette_device, write8_ext) AM_SHARE("palette_ext")
 	AM_RANGE(0x3000, 0x33ff) AM_RAM_WRITE(bg_tile_w ) AM_SHARE("bg_tile_ram")
 	AM_RANGE(0x4000, 0x4000) AM_READ_PORT( "DSW1" )
 	AM_RANGE(0x4001, 0x4001) AM_READ_PORT( "DSW2" )

@@ -91,7 +91,7 @@ WRITE16_MEMBER(powerbal_state::oki_banking)
 
 static ADDRESS_MAP_START( magicstk_main_map, AS_PROGRAM, 16, powerbal_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
-	AM_RANGE(0x088000, 0x0883ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x088000, 0x0883ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x094000, 0x094001) AM_WRITENOP
 	AM_RANGE(0x094002, 0x094003) AM_WRITENOP
 	AM_RANGE(0x094004, 0x094005) AM_WRITE(tile_banking_w)
@@ -110,7 +110,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( powerbal_main_map, AS_PROGRAM, 16, powerbal_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
-	AM_RANGE(0x088000, 0x0883ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x088000, 0x0883ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x094000, 0x094001) AM_WRITENOP
 	AM_RANGE(0x094002, 0x094003) AM_WRITENOP
 	AM_RANGE(0x094004, 0x094005) AM_WRITE(tile_banking_w)

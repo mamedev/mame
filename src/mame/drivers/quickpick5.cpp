@@ -280,7 +280,7 @@ static ADDRESS_MAP_START( quickpick5_main, AS_PROGRAM, 8, quickpick5_state )
 	AM_RANGE(0xde00, 0xde00) AM_WRITENOP
 	AM_RANGE(0xde40, 0xde40) AM_DEVWRITE("oki", okim6295_device, write)
 	AM_RANGE(0xe000, 0xefff) AM_READWRITE(vram_r, vram_w)
-	AM_RANGE(0xf000, 0xf7ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0xf000, 0xf7ff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
 	AM_RANGE(0xf800, 0xffff) AM_READWRITE(k245_r, k245_w)
 ADDRESS_MAP_END
 

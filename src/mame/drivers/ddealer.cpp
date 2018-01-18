@@ -478,7 +478,7 @@ static ADDRESS_MAP_START( ddealer, AS_PROGRAM, 16, ddealer_state )
 	AM_RANGE(0x080006, 0x080007) AM_READ_PORT("UNK")
 	AM_RANGE(0x080008, 0x080009) AM_READ_PORT("DSW1")
 	AM_RANGE(0x084000, 0x084003) AM_DEVWRITE8("ymsnd", ym2203_device, write, 0x00ff) // ym ?
-	AM_RANGE(0x088000, 0x0887ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x088000, 0x0887ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x08c000, 0x08cfff) AM_RAM AM_SHARE("vregs") // palette ram
 
 	/* this might actually be 1 tilemap with some funky rowscroll / columnscroll enabled, I'm not sure */

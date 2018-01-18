@@ -200,7 +200,7 @@ WRITE8_MEMBER(chance32_state::muxout_w)
 static ADDRESS_MAP_START( chance32_map, AS_PROGRAM, 8, chance32_state )
 	AM_RANGE(0x0000, 0xcfff) AM_ROM
 	AM_RANGE(0xd800, 0xdfff) AM_RAM
-	AM_RANGE(0xe000, 0xefff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0xe000, 0xefff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM_WRITE(chance32_fgram_w) AM_SHARE("fgram")
 	AM_RANGE(0xf800, 0xffff) AM_RAM_WRITE(chance32_bgram_w) AM_SHARE("bgram")
 ADDRESS_MAP_END

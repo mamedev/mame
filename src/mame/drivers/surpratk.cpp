@@ -79,7 +79,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( bank0000_map, AS_PROGRAM, 8, surpratk_state )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM
 	AM_RANGE(0x0800, 0x0fff) AM_DEVREADWRITE("k053244", k05324x_device, k053245_r, k053245_w)
-	AM_RANGE(0x1000, 0x1fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x1000, 0x1fff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
 ADDRESS_MAP_END
 
 

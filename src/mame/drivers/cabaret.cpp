@@ -206,8 +206,8 @@ static ADDRESS_MAP_START( cabaret_portmap, AS_IO, 8, cabaret_state )
 	AM_RANGE( 0x2000, 0x27ff ) AM_RAM_WRITE(fg_tile_w )  AM_SHARE("fg_tile_ram")
 	AM_RANGE( 0x2800, 0x2fff ) AM_RAM_WRITE(fg_color_w ) AM_SHARE("fg_color_ram")
 
-	AM_RANGE( 0x3000, 0x37ff ) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
-	AM_RANGE( 0x3800, 0x3fff ) AM_RAM_DEVWRITE("palette", palette_device, write_ext) AM_SHARE("palette_ext")
+	AM_RANGE( 0x3000, 0x37ff ) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
+	AM_RANGE( 0x3800, 0x3fff ) AM_RAM_DEVWRITE("palette", palette_device, write8_ext) AM_SHARE("palette_ext")
 
 	AM_RANGE( 0x1000, 0x103f ) AM_RAM_WRITE(bg_scroll_w ) AM_SHARE("bg_scroll")
 

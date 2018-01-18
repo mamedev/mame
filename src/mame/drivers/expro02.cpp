@@ -654,7 +654,7 @@ static ADDRESS_MAP_START( expro02_video_base_map, AS_PROGRAM, 16, expro02_state 
 	AM_RANGE(0x500000, 0x51ffff) AM_RAM AM_SHARE("fg_ind8ram")
 	AM_RANGE(0x520000, 0x53ffff) AM_RAM AM_SHARE("bg_rgb555ram")
 	AM_RANGE(0x580000, 0x583fff) AM_DEVREADWRITE("view2_0", kaneko_view2_tilemap_device,  kaneko_tmap_vram_r, kaneko_tmap_vram_w )
-	AM_RANGE(0x600000, 0x600fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette") // palette?
+	AM_RANGE(0x600000, 0x600fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette") // palette?
 	AM_RANGE(0x680000, 0x68001f) AM_DEVREADWRITE("view2_0", kaneko_view2_tilemap_device,  kaneko_tmap_regs_r, kaneko_tmap_regs_w)
 	AM_RANGE(0x700000, 0x700fff) AM_RAM AM_SHARE("spriteram")    // sprites? 0x72f words tested
 	AM_RANGE(0x780000, 0x78001f) AM_DEVREADWRITE("kan_spr", kaneko16_sprite_device, kaneko16_sprites_regs_r, kaneko16_sprites_regs_w)
@@ -666,7 +666,7 @@ static ADDRESS_MAP_START( expro02_video_base_map_noview2, AS_PROGRAM, 16, expro0
 	AM_RANGE(0x500000, 0x51ffff) AM_RAM AM_SHARE("fg_ind8ram")
 	AM_RANGE(0x520000, 0x53ffff) AM_RAM AM_SHARE("bg_rgb555ram")
 	AM_RANGE(0x580000, 0x583fff) AM_NOP // games still makes leftover accesses
-	AM_RANGE(0x600000, 0x600fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette") // palette?
+	AM_RANGE(0x600000, 0x600fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette") // palette?
 	AM_RANGE(0x680000, 0x68001f) AM_NOP // games still makes leftover accesses
 	AM_RANGE(0x700000, 0x700fff) AM_RAM AM_SHARE("spriteram")    // sprites? 0x72f words tested
 	AM_RANGE(0x780000, 0x78001f) AM_DEVREADWRITE("kan_spr", kaneko16_sprite_device, kaneko16_sprites_regs_r, kaneko16_sprites_regs_w)

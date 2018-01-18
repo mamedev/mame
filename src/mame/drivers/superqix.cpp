@@ -990,7 +990,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, superqix_state_base )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( pbillian_port_map, AS_IO, 8, hotsmash_state ) // used by both pbillian and hotsmash
-	AM_RANGE(0x0000, 0x01ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette") // 6116 sram near the jamma connector, "COLOR RAM" during POST
+	AM_RANGE(0x0000, 0x01ff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette") // 6116 sram near the jamma connector, "COLOR RAM" during POST
 	//AM_RANGE(0x0200, 0x03ff) AM_RAM // looks like leftover crap from a dev board which had double the color ram? zeroes written here, never read.
 	AM_RANGE(0x0401, 0x0401) AM_DEVREAD("ay1", ay8910_device, data_r) // ay i/o ports connect to "SYSTEM" and "BUTTONS" inputs which includes mcu semaphore flags
 	AM_RANGE(0x0402, 0x0403) AM_DEVWRITE("ay1", ay8910_device, data_address_w)
@@ -1003,7 +1003,7 @@ static ADDRESS_MAP_START( pbillian_port_map, AS_IO, 8, hotsmash_state ) // used 
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sqix_port_map, AS_IO, 8, superqix_state )
-	AM_RANGE(0x0000, 0x00ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x0000, 0x00ff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
 	AM_RANGE(0x0401, 0x0401) AM_DEVREAD("ay1", ay8910_device, data_r)
 	AM_RANGE(0x0402, 0x0402) AM_DEVWRITE("ay1", ay8910_device, data_w)
 	AM_RANGE(0x0403, 0x0403) AM_WRITE(z80_ay1_sync_address_w) // sync on address write, so semaphores are accurately read

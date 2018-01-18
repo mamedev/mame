@@ -783,7 +783,7 @@ ADDRESS_MAP_START( lastday_map, AS_PROGRAM, 8, dooyong_z80_ym2203_state )
 	AM_RANGE(0xc012, 0xc012) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
 	AM_RANGE(0xc013, 0xc013) AM_READ_PORT("DSWA")
 	AM_RANGE(0xc014, 0xc014) AM_READ_PORT("DSWB")
-	AM_RANGE(0xc800, 0xcfff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0xc800, 0xcfff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
 	AM_RANGE(0xd000, 0xdfff) AM_READWRITE(lastday_tx_r, lastday_tx_w)
 	AM_RANGE(0xe000, 0xefff) AM_RAM
 	AM_RANGE(0xf000, 0xffff) AM_RAM AM_SHARE("spriteram")
@@ -823,7 +823,7 @@ ADDRESS_MAP_START( gulfstrm_map, AS_PROGRAM, 8, dooyong_z80_ym2203_state )
 	AM_RANGE(0xf010, 0xf010) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
 	AM_RANGE(0xf018, 0xf01f) AM_DEVWRITE("bg", dooyong_rom_tilemap_device, ctrl_w)
 	AM_RANGE(0xf020, 0xf027) AM_DEVWRITE("fg", dooyong_rom_tilemap_device, ctrl_w)
-	AM_RANGE(0xf800, 0xffff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0xf800, 0xffff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
 ADDRESS_MAP_END
 
 ADDRESS_MAP_START( bluehawk_map, AS_PROGRAM, 8, dooyong_z80_state )
@@ -840,7 +840,7 @@ ADDRESS_MAP_START( bluehawk_map, AS_PROGRAM, 8, dooyong_z80_state )
 	AM_RANGE(0xc018, 0xc01f) AM_DEVWRITE("fg2", dooyong_rom_tilemap_device, ctrl_w)
 	AM_RANGE(0xc040, 0xc047) AM_DEVWRITE("bg", dooyong_rom_tilemap_device, ctrl_w)
 	AM_RANGE(0xc048, 0xc04f) AM_DEVWRITE("fg", dooyong_rom_tilemap_device, ctrl_w)
-	AM_RANGE(0xc800, 0xcfff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0xc800, 0xcfff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
 	AM_RANGE(0xd000, 0xdfff) AM_READWRITE(bluehawk_tx_r, bluehawk_tx_w)
 	AM_RANGE(0xe000, 0xefff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0xf000, 0xffff) AM_RAM
@@ -871,7 +871,7 @@ ADDRESS_MAP_START( primella_map, AS_PROGRAM, 8, dooyong_z80_state )
 	AM_RANGE(0xc000, 0xcfff) AM_RAM
 	AM_RANGE(0xd000, 0xd3ff) AM_RAM /* what is this? looks like a palette? scratchpad RAM maybe? */
 	AM_RANGE(0xe000, 0xefff) AM_READWRITE(bluehawk_tx_r, bluehawk_tx_w)
-	AM_RANGE(0xf000, 0xf7ff) AM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0xf000, 0xf7ff) AM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
 	AM_RANGE(0xf800, 0xf800) AM_READ_PORT("DSWA")
 	AM_RANGE(0xf800, 0xf800) AM_WRITE(primella_ctrl_w)  /* bank switch, flip screen etc */
 	AM_RANGE(0xf810, 0xf810) AM_READ_PORT("DSWB")
@@ -894,7 +894,7 @@ ADDRESS_MAP_START( rshark_map, AS_PROGRAM, 16, dooyong_68k_state )
 	AM_RANGE(0x0c0006, 0x0c0007) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x0c4000, 0x0c400f) AM_DEVWRITE8("bg", dooyong_rom_tilemap_device, ctrl_w, 0x00ff)
 	AM_RANGE(0x0c4010, 0x0c401f) AM_DEVWRITE8("bg2", dooyong_rom_tilemap_device, ctrl_w, 0x00ff)
-	AM_RANGE(0x0c8000, 0x0c8fff) AM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x0c8000, 0x0c8fff) AM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x0c0012, 0x0c0013) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x00ff)
 	AM_RANGE(0x0c0014, 0x0c0015) AM_WRITE(ctrl_w)    /* flip screen + unknown stuff */
 	AM_RANGE(0x0cc000, 0x0cc00f) AM_DEVWRITE8("fg", dooyong_rom_tilemap_device, ctrl_w, 0x00ff)
@@ -912,7 +912,7 @@ ADDRESS_MAP_START( superx_map, AS_PROGRAM, 16, dooyong_68k_state )
 	AM_RANGE(0x080006, 0x080007) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x084000, 0x08400f) AM_DEVWRITE8("bg", dooyong_rom_tilemap_device, ctrl_w, 0x00ff)
 	AM_RANGE(0x084010, 0x08401f) AM_DEVWRITE8("bg2", dooyong_rom_tilemap_device, ctrl_w, 0x00ff)
-	AM_RANGE(0x088000, 0x088fff) AM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x088000, 0x088fff) AM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x080012, 0x080013) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x00ff)
 	AM_RANGE(0x080014, 0x080015) AM_WRITE(ctrl_w)    /* flip screen + unknown stuff */
 	AM_RANGE(0x08c000, 0x08c00f) AM_DEVWRITE8("fg", dooyong_rom_tilemap_device, ctrl_w, 0x00ff)
@@ -933,7 +933,7 @@ ADDRESS_MAP_START( popbingo_map, AS_PROGRAM, 16, dooyong_68k_state )
 	AM_RANGE(0x0c0018, 0x0c001b) AM_WRITENOP // ?
 	AM_RANGE(0x0c4000, 0x0c400f) AM_DEVWRITE8("bg", dooyong_rom_tilemap_device, ctrl_w, 0x00ff)
 	AM_RANGE(0x0c4010, 0x0c401f) AM_DEVWRITE8("bg2", dooyong_rom_tilemap_device, ctrl_w, 0x00ff)
-	AM_RANGE(0x0c8000, 0x0c8fff) AM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x0c8000, 0x0c8fff) AM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	//AM_RANGE(0x08c000, 0x08c00f) AM_DEVWRITE8("fg", dooyong_rom_tilemap_device, ctrl_w, 0x00ff) apparently not present
 	//AM_RANGE(0x08c010, 0x08c01f) AM_DEVWRITE8("fg2", dooyong_rom_tilemap_device, ctrl_w, 0x00ff) apparently not present
 	AM_RANGE(0x0dc000, 0x0dc01f) AM_RAM // registers of some kind?

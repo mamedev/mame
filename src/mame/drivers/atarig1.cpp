@@ -196,7 +196,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, atarig1_state )
 	AM_RANGE(0x040000, 0x077fff) AM_ROM
 	AM_RANGE(0x078000, 0x07ffff) AM_ROM /* hydra slapstic goes here */
 	AM_RANGE(0xf80000, 0xf80001) AM_DEVWRITE("watchdog", watchdog_timer_device, reset16_w)
-	AM_RANGE(0xf88000, 0xf8ffff) AM_DEVWRITE("eeprom", eeprom_parallel_28xx_device, unlock_write)
+	AM_RANGE(0xf88000, 0xf8ffff) AM_DEVWRITE("eeprom", eeprom_parallel_28xx_device, unlock_write16)
 	AM_RANGE(0xf90000, 0xf90001) AM_DEVWRITE8("jsa", atari_jsa_ii_device, main_command_w, 0xff00)
 	AM_RANGE(0xf98000, 0xf98001) AM_DEVWRITE("jsa", atari_jsa_ii_device, sound_reset_w)
 	AM_RANGE(0xfa0000, 0xfa0001) AM_DEVWRITE8("rle", atari_rle_objects_device, control_write, 0x00ff)
@@ -206,11 +206,11 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, atarig1_state )
 	AM_RANGE(0xfd0000, 0xfd0001) AM_DEVREAD8("jsa", atari_jsa_ii_device, main_response_r, 0xff00)
 	AM_RANGE(0xfd8000, 0xfdffff) AM_DEVREADWRITE8("eeprom", eeprom_parallel_28xx_device, read, write, 0x00ff)
 /*  AM_RANGE(0xfe0000, 0xfe7fff) AM_READ(from_r)*/
-	AM_RANGE(0xfe8000, 0xfe89ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0xfe8000, 0xfe89ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0xff0000, 0xff0fff) AM_RAM AM_SHARE("rle")
 	AM_RANGE(0xff2000, 0xff2001) AM_WRITE(mo_command_w) AM_SHARE("mo_command")
-	AM_RANGE(0xff4000, 0xff5fff) AM_DEVWRITE("playfield", tilemap_device, write) AM_SHARE("playfield")
-	AM_RANGE(0xff6000, 0xff6fff) AM_DEVWRITE("alpha", tilemap_device, write) AM_SHARE("alpha")
+	AM_RANGE(0xff4000, 0xff5fff) AM_DEVWRITE("playfield", tilemap_device, write16) AM_SHARE("playfield")
+	AM_RANGE(0xff6000, 0xff6fff) AM_DEVWRITE("alpha", tilemap_device, write16) AM_SHARE("alpha")
 	AM_RANGE(0xff0000, 0xffffff) AM_RAM
 ADDRESS_MAP_END
 

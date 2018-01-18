@@ -243,7 +243,7 @@ static ADDRESS_MAP_START( syvalion_map, AS_PROGRAM, 16, taitoh_state )
 	AM_RANGE(0x300000, 0x300001) AM_READNOP AM_DEVWRITE8("tc0140syt", tc0140syt_device, master_port_w, 0x00ff)
 	AM_RANGE(0x300002, 0x300003) AM_DEVREADWRITE8("tc0140syt", tc0140syt_device, master_comm_r, master_comm_w, 0x00ff)
 	AM_RANGE(0x400000, 0x420fff) AM_DEVREADWRITE("tc0080vco", tc0080vco_device, word_r, word_w)
-	AM_RANGE(0x500800, 0x500fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x500800, 0x500fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( recordbr_map, AS_PROGRAM, 16, taitoh_state )
@@ -253,7 +253,7 @@ static ADDRESS_MAP_START( recordbr_map, AS_PROGRAM, 16, taitoh_state )
 	AM_RANGE(0x300000, 0x300001) AM_READNOP AM_DEVWRITE8("tc0140syt", tc0140syt_device, master_port_w, 0x00ff)
 	AM_RANGE(0x300002, 0x300003) AM_DEVREADWRITE8("tc0140syt", tc0140syt_device, master_comm_r, master_comm_w, 0x00ff)
 	AM_RANGE(0x400000, 0x420fff) AM_DEVREADWRITE("tc0080vco", tc0080vco_device, word_r, word_w)
-	AM_RANGE(0x500800, 0x500fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x500800, 0x500fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( tetristh_map, AS_PROGRAM, 16, taitoh_state )
@@ -263,7 +263,7 @@ static ADDRESS_MAP_START( tetristh_map, AS_PROGRAM, 16, taitoh_state )
 	AM_RANGE(0x200002, 0x200003) AM_DEVREADWRITE8("tc0140syt", tc0140syt_device, master_comm_r, master_comm_w, 0x00ff)
 	AM_RANGE(0x300000, 0x300003) AM_DEVREADWRITE8("tc0040ioc", tc0040ioc_device, read, write, 0x00ff)
 	AM_RANGE(0x400000, 0x420fff) AM_DEVREADWRITE("tc0080vco", tc0080vco_device, word_r, word_w)
-	AM_RANGE(0x500800, 0x500fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x500800, 0x500fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( dleague_map, AS_PROGRAM, 16, taitoh_state )
@@ -273,7 +273,7 @@ static ADDRESS_MAP_START( dleague_map, AS_PROGRAM, 16, taitoh_state )
 	AM_RANGE(0x300000, 0x300001) AM_READNOP AM_DEVWRITE8("tc0140syt", tc0140syt_device, master_port_w, 0x00ff)
 	AM_RANGE(0x300002, 0x300003) AM_DEVREADWRITE8("tc0140syt", tc0140syt_device, master_comm_r, master_comm_w, 0x00ff)
 	AM_RANGE(0x400000, 0x420fff) AM_DEVREADWRITE("tc0080vco", tc0080vco_device, word_r, word_w)
-	AM_RANGE(0x500800, 0x500fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x500800, 0x500fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x600000, 0x600001) AM_WRITENOP    /* ?? writes zero once per frame */
 ADDRESS_MAP_END
 

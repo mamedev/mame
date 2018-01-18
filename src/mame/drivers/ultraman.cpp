@@ -31,7 +31,7 @@ WRITE8_MEMBER(ultraman_state::sound_nmi_enable_w)
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, ultraman_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x080000, 0x08ffff) AM_RAM
-	AM_RANGE(0x180000, 0x183fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")/* Palette */
+	AM_RANGE(0x180000, 0x183fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")/* Palette */
 	AM_RANGE(0x1c0000, 0x1c0001) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x1c0002, 0x1c0003) AM_READ_PORT("P1")
 	AM_RANGE(0x1c0004, 0x1c0005) AM_READ_PORT("P2")

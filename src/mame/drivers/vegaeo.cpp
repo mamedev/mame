@@ -139,7 +139,7 @@ static ADDRESS_MAP_START( vega_map, AS_PROGRAM, 32, vegaeo_state )
 	AM_RANGE(0x00000000, 0x001fffff) AM_RAM
 	AM_RANGE(0x80000000, 0x80013fff) AM_READWRITE(vega_vram_r, vega_vram_w)
 	AM_RANGE(0xfc000000, 0xfc0000ff) AM_DEVREADWRITE8("at28c16", at28c16_device, read, write, 0x000000ff)
-	AM_RANGE(0xfc200000, 0xfc2003ff) AM_DEVREADWRITE16("palette", palette_device, read, write, 0x0000ffff) AM_SHARE("palette")
+	AM_RANGE(0xfc200000, 0xfc2003ff) AM_DEVREADWRITE16("palette", palette_device, read16, write16, 0x0000ffff) AM_SHARE("palette")
 	AM_RANGE(0xfc400000, 0xfc40005b) AM_WRITENOP // crt registers ?
 	AM_RANGE(0xfc600000, 0xfc600003) AM_WRITE(soundlatch_w)
 	AM_RANGE(0xfca00000, 0xfca00003) AM_WRITE(vega_misc_w)

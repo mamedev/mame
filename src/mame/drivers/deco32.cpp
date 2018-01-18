@@ -388,7 +388,7 @@ static ADDRESS_MAP_START( captaven_map, AS_PROGRAM, 32, captaven_state )
 	AM_RANGE(0x110000, 0x111fff) AM_READWRITE(spriteram_r, spriteram_w)
 	AM_RANGE(0x120000, 0x127fff) AM_RAM AM_SHARE("ram") /* Main RAM */
 	AM_RANGE(0x128000, 0x12ffff) AM_READWRITE16(ioprot_r, ioprot_w, 0x0000ffff)
-	AM_RANGE(0x130000, 0x131fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x130000, 0x131fff) AM_RAM_DEVWRITE("palette", palette_device, write32) AM_SHARE("palette")
 	AM_RANGE(0x148000, 0x14800f) AM_DEVICE8("irq", deco_irq_device, map, 0x000000ff)
 	AM_RANGE(0x160000, 0x167fff) AM_RAM /* Extra work RAM */
 	AM_RANGE(0x168000, 0x168003) AM_READ8(captaven_dsw1_r, 0x000000ff)

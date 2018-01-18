@@ -236,7 +236,7 @@ static ADDRESS_MAP_START( spool99_map, AS_PROGRAM, 8, spool99_state )
 	AM_RANGE(0xafef, 0xafef) AM_WRITE(eeprom_dataline_w )
 	AM_RANGE(0xaff8, 0xaff8) AM_DEVWRITE("oki", okim6295_device, write)
 
-	AM_RANGE(0xb000, 0xb3ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0xb000, 0xb3ff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
 
 	AM_RANGE(0xb800, 0xdfff) AM_RAM
 	AM_RANGE(0xe000, 0xefff) AM_RAM_WRITE(vram_w) AM_SHARE("vram")
@@ -282,7 +282,7 @@ static ADDRESS_MAP_START( vcarn_map, AS_PROGRAM, 8, spool99_state )
 	AM_RANGE(0xa747, 0xa747) AM_WRITE(eeprom_dataline_w )
 	AM_RANGE(0xa780, 0xa780) AM_DEVWRITE("oki", okim6295_device, write)
 
-	AM_RANGE(0xa800, 0xabff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0xa800, 0xabff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
 
 	AM_RANGE(0xb000, 0xdfff) AM_RAM
 //  AM_RANGE(0xdf00, 0xdfff) AM_READWRITE(vcarn_io_r,vcarn_io_w) AM_SHARE("vcarn_io")

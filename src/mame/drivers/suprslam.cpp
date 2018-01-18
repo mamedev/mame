@@ -113,7 +113,7 @@ static ADDRESS_MAP_START( suprslam_map, AS_PROGRAM, 16, suprslam_state )
 	AM_RANGE(0xff3000, 0xff3001) AM_WRITENOP // sprite buffer trigger?
 	AM_RANGE(0xff8000, 0xff8fff) AM_DEVREADWRITE("k053936", k053936_device, linectrl_r, linectrl_w)
 	AM_RANGE(0xff9000, 0xff9001) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x00ff)
-	AM_RANGE(0xffa000, 0xffafff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0xffa000, 0xffafff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0xffd000, 0xffd01f) AM_DEVWRITE("k053936", k053936_device, ctrl_w)
 	AM_RANGE(0xffe000, 0xffe001) AM_WRITE(suprslam_bank_w)
 	AM_RANGE(0xfff000, 0xfff01f) AM_DEVREADWRITE8("io", vs9209_device, read, write, 0x00ff)

@@ -772,8 +772,8 @@ static ADDRESS_MAP_START( bnstars_map, AS_PROGRAM, 32, bnstars_state )
 	/* wrote together */
 	AM_RANGE(0xfd040000, 0xfd047fff) AM_RAM // priority ram
 	AM_RANGE(0xfd080000, 0xfd087fff) AM_RAM
-	AM_RANGE(0xfd200000, 0xfd237fff) AM_DEVREADWRITE16("palette2", palette_device, read, write, 0x0000ffff) AM_SHARE("palette2")
-	AM_RANGE(0xfd400000, 0xfd437fff) AM_DEVREADWRITE16("palette", palette_device, read, write, 0x0000ffff) AM_SHARE("palette")
+	AM_RANGE(0xfd200000, 0xfd237fff) AM_DEVREADWRITE16("palette2", palette_device, read16, write16, 0x0000ffff) AM_SHARE("palette2")
+	AM_RANGE(0xfd400000, 0xfd437fff) AM_DEVREADWRITE16("palette", palette_device, read16, write16, 0x0000ffff) AM_SHARE("palette")
 	AM_RANGE(0xfe000000, 0xfe01ffff) AM_RAM_WRITE(ms32_roz1_ram_w) AM_SHARE("roz1_ram")
 	AM_RANGE(0xfe400000, 0xfe41ffff) AM_RAM_WRITE(ms32_roz0_ram_w) AM_SHARE("roz0_ram")
 	AM_RANGE(0xfe800000, 0xfe83ffff) AM_RAM AM_SHARE("spram")

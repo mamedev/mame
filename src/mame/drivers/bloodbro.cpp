@@ -159,7 +159,7 @@ static ADDRESS_MAP_START( common_map, AS_PROGRAM, 16, bloodbro_state )
 	AM_RANGE(0x08d400, 0x08d7ff) AM_RAM
 	AM_RANGE(0x08d800, 0x08dfff) AM_RAM_WRITE(txvideoram_w) AM_SHARE("txvideoram")
 	AM_RANGE(0x08e000, 0x08e7ff) AM_RAM
-	AM_RANGE(0x08e800, 0x08f7ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x08e800, 0x08f7ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x08f800, 0x08ffff) AM_RAM
 	AM_RANGE(0x0a0000, 0x0a000d) AM_DEVREADWRITE8("seibu_sound", seibu_sound_device, main_r, main_w, 0x00ff)
 //  AM_RANGE(0x0c0000, 0x0c007f) AM_RAM AM_SHARE("scroll")
@@ -205,7 +205,7 @@ static ADDRESS_MAP_START( weststry_map, AS_PROGRAM, 16, bloodbro_state )
 	AM_RANGE(0x123800, 0x123fff) AM_RAM_WRITE(txvideoram_w) AM_SHARE("txvideoram")
 	AM_RANGE(0x124000, 0x124005) AM_RAM
 	AM_RANGE(0x124006, 0x1247fd) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x128000, 0x1287ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x128000, 0x1287ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 ADDRESS_MAP_END
 
 WRITE_LINE_MEMBER(bloodbro_state::weststry_opl_irq_w)

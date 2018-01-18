@@ -735,7 +735,7 @@ static ADDRESS_MAP_START( dodghero_mem_map, AS_PROGRAM, 8, sigmab98_state )
 
 	AM_RANGE( 0xa800, 0xb7ff ) AM_RAM AM_SHARE("spriteram")
 
-	AM_RANGE( 0xc800, 0xc9ff ) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE( 0xc800, 0xc9ff ) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
 
 	AM_RANGE( 0xd001, 0xd07f ) AM_RAM AM_SHARE("vtable")
 
@@ -930,7 +930,7 @@ static ADDRESS_MAP_START( gegege_mem_map, AS_PROGRAM, 8, sigmab98_state )
 
 	AM_RANGE( 0xa000, 0xafff ) AM_RAM AM_SHARE("spriteram")
 
-	AM_RANGE( 0xc000, 0xc1ff ) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE( 0xc000, 0xc1ff ) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
 
 	AM_RANGE( 0xc800, 0xc87f ) AM_RAM AM_SHARE("vtable")
 
@@ -1258,7 +1258,7 @@ static ADDRESS_MAP_START( animalc_map, AS_PROGRAM, 8, sigmab98_state )
 	AM_RANGE( 0xa000, 0xafff ) AM_RAM
 	AM_RANGE( 0xb000, 0xbfff ) AM_RAMBANK("sprbank")
 
-	AM_RANGE( 0xd000, 0xd1ff ) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE( 0xd000, 0xd1ff ) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
 	AM_RANGE( 0xd800, 0xd87f ) AM_RAM AM_SHARE("vtable")
 
 	AM_RANGE( 0xe011, 0xe011 ) AM_WRITENOP  // IRQ Enable? Screen disable?
@@ -1440,7 +1440,7 @@ WRITE8_MEMBER(sigmab98_state::gocowboy_4400_w)
 			}
 			else if ((offset >= 0x2000) && (offset < 0x2200))
 			{
-				m_palette->write(space, offset-0x2000, data);
+				m_palette->write8(space, offset-0x2000, data);
 				return;
 			}
 			else if ((offset >= 0x2800) && (offset < 0x2880))
@@ -1531,7 +1531,7 @@ WRITE8_MEMBER(sigmab98_state::gocowboy_dc00_w)
 			return;
 
 		case 0x64: // (72000) PALETTERAM
-			m_palette->write(space, offset, data);
+			m_palette->write8(space, offset, data);
 			return;
 	}
 
@@ -1756,7 +1756,7 @@ WRITE8_MEMBER(sigmab98_state::haekaka_b000_w)
 		case 0x67:  // PALETTERAM + VTABLE + VREGS
 			if (offset < 0x200)
 			{
-				m_palette->write(space, offset, data);
+				m_palette->write8(space, offset, data);
 				return;
 			}
 			else if ((offset >= 0x800) && (offset < 0x880))
@@ -2010,7 +2010,7 @@ WRITE8_MEMBER(sigmab98_state::itazuram_nvram_palette_w)
 {
 	if (m_rambank == 0x64)
 	{
-		m_palette->write(space, offset, data);
+		m_palette->write8(space, offset, data);
 	}
 	else if (m_rambank == 0x52)
 	{
@@ -2027,7 +2027,7 @@ WRITE8_MEMBER(sigmab98_state::itazuram_palette_w)
 	if (m_rombank == 0x6c)
 	{
 		if (offset < 0x200)
-			m_palette->write(space, offset, data);
+			m_palette->write8(space, offset, data);
 	}
 	else
 	{
@@ -2256,7 +2256,7 @@ WRITE8_MEMBER(sigmab98_state::tdoboon_c000_w)
 		case 0x66:  // PALETTERAM + VTABLE
 			if (offset < 0x200)
 			{
-				m_palette->write(space, offset, data);
+				m_palette->write8(space, offset, data);
 				return;
 			}
 			else if ((offset >= 0x800) && (offset < 0x880))

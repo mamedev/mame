@@ -358,7 +358,7 @@ static ADDRESS_MAP_START( macrossp_map, AS_PROGRAM, 32, macrossp_state )
 	AM_RANGE(0x91c200, 0x91c3ff) AM_RAM AM_SHARE("text_linezoom") /* W/O? */
 	AM_RANGE(0x91d000, 0x91d00b) AM_RAM AM_SHARE("text_videoregs") /* W/O? */
 
-	AM_RANGE(0xa00000, 0xa03fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0xa00000, 0xa03fff) AM_RAM_DEVWRITE("palette", palette_device, write32) AM_SHARE("palette")
 
 	AM_RANGE(0xb00000, 0xb00003) AM_READ_PORT("INPUTS")
 	AM_RANGE(0xb00004, 0xb00007) AM_READ(macrossp_soundstatus_r) AM_WRITENOP // irq related?

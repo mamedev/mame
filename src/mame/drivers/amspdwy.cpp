@@ -73,7 +73,7 @@ READ8_MEMBER(amspdwy_state::amspdwy_sound_r)
 
 static ADDRESS_MAP_START( amspdwy_map, AS_PROGRAM, 8, amspdwy_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x801f) AM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x8000, 0x801f) AM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
 	AM_RANGE(0x9000, 0x93ff) AM_MIRROR(0x0400) AM_RAM_WRITE(amspdwy_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0x9800, 0x9bff) AM_RAM_WRITE(amspdwy_colorram_w) AM_SHARE("colorram")
 	AM_RANGE(0x9c00, 0x9fff) AM_RAM // unused?

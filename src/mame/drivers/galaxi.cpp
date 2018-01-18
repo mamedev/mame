@@ -311,7 +311,7 @@ static ADDRESS_MAP_START( galaxi_map, AS_PROGRAM, 16, galaxi_state )
 	AM_RANGE(0x101000, 0x101fff) AM_RAM_WRITE(galaxi_fg_w ) AM_SHARE("fg_ram")
 	AM_RANGE(0x102000, 0x107fff) AM_READNOP // unknown
 
-	AM_RANGE(0x300000, 0x3007ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x300000, 0x3007ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 
 	AM_RANGE(0x500000, 0x500001) AM_READ_PORT("INPUTS")
 	AM_RANGE(0x500000, 0x500001) AM_WRITE(galaxi_500000_w)
@@ -336,7 +336,7 @@ static ADDRESS_MAP_START( lastfour_map, AS_PROGRAM, 16, galaxi_state )
 	AM_RANGE(0x101000, 0x101fff) AM_RAM_WRITE(galaxi_fg_w ) AM_SHARE("fg_ram")
 	AM_RANGE(0x102000, 0x107fff) AM_READNOP // unknown
 
-	AM_RANGE(0x300000, 0x3007ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x300000, 0x3007ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 
 	AM_RANGE(0x500000, 0x500001) AM_READ_PORT("INPUTS")
 	AM_RANGE(0x500000, 0x500001) AM_WRITE(galaxi_500000_w)

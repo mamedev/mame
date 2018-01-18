@@ -139,7 +139,7 @@ static ADDRESS_MAP_START( hvysmsh_map, AS_PROGRAM, 32, deco156_state )
 	AM_RANGE(0x194000, 0x195fff) AM_DEVREADWRITE("tilegen1", deco16ic_device, pf2_data_dword_r, pf2_data_dword_w)
 	AM_RANGE(0x1a0000, 0x1a0fff) AM_READWRITE(wcvol95_pf1_rowscroll_r, wcvol95_pf1_rowscroll_w)
 	AM_RANGE(0x1a4000, 0x1a4fff) AM_READWRITE(wcvol95_pf2_rowscroll_r, wcvol95_pf2_rowscroll_w)
-	AM_RANGE(0x1c0000, 0x1c0fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x1c0000, 0x1c0fff) AM_RAM_DEVWRITE("palette", palette_device, write32) AM_SHARE("palette")
 	AM_RANGE(0x1d0010, 0x1d002f) AM_READNOP // Check for DMA complete?
 	AM_RANGE(0x1e0000, 0x1e1fff) AM_READWRITE(wcvol95_spriteram_r, wcvol95_spriteram_w)
 ADDRESS_MAP_END
@@ -156,7 +156,7 @@ static ADDRESS_MAP_START( wcvol95_map, AS_PROGRAM, 32, deco156_state )
 	AM_RANGE(0x150000, 0x150003) AM_WRITE_PORT("EEPROMOUT")
 	AM_RANGE(0x160000, 0x161fff) AM_READWRITE(wcvol95_spriteram_r, wcvol95_spriteram_w)
 	AM_RANGE(0x170000, 0x170003) AM_NOP // Irq ack?
-	AM_RANGE(0x180000, 0x180fff) AM_READONLY AM_DEVWRITE16("palette", palette_device, write, 0x0000ffff) AM_SHARE("palette")
+	AM_RANGE(0x180000, 0x180fff) AM_READONLY AM_DEVWRITE16("palette", palette_device, write16, 0x0000ffff) AM_SHARE("palette")
 	AM_RANGE(0x1a0000, 0x1a0007) AM_DEVREADWRITE8("ymz", ymz280b_device, read, write, 0x000000ff)
 ADDRESS_MAP_END
 

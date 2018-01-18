@@ -400,7 +400,7 @@ READ16_MEMBER(ssv_state::fake_r){   return ssv_scroll[offset];  }
 #define SSV_MAP( _ROM  )                                                                                            \
 	AM_RANGE(0x000000, 0x00ffff) AM_RAM AM_SHARE("mainram")                                     /*  RAM     */  \
 	AM_RANGE(0x100000, 0x13ffff) AM_RAM AM_SHARE("spriteram")                                       /*  Sprites */  \
-	AM_RANGE(0x140000, 0x15ffff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette") /* Palette */\
+	AM_RANGE(0x140000, 0x15ffff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette") /* Palette */\
 	AM_RANGE(0x160000, 0x17ffff) AM_RAM                                                             /*          */  \
 	AM_RANGE(0x1c0000, 0x1c0001) AM_READ(vblank_r           )                                   /*  Vblank? */  \
 /**/AM_RANGE(0x1c0002, 0x1c007f) AM_READONLY                                    /*  Scroll  */  \

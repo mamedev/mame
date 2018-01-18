@@ -166,7 +166,7 @@ static ADDRESS_MAP_START( rbmk_mem, AS_PROGRAM, 16, rbmk_state )
 	AM_RANGE(0x500000, 0x50ffff) AM_RAM
 	AM_RANGE(0x940000, 0x940fff) AM_RAM AM_SHARE("vidram2")
 	AM_RANGE(0x980300, 0x983fff) AM_RAM // 0x2048  words ???, byte access
-	AM_RANGE(0x900000, 0x900fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x900000, 0x900fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x9c0000, 0x9c0fff) AM_RAM AM_SHARE("vidram")
 	AM_RANGE(0xb00000, 0xb00001) AM_WRITE(eeprom_w)
 	AM_RANGE(0xc00000, 0xc00001) AM_READWRITE(dip_mux_r, dip_mux_w)
@@ -187,7 +187,7 @@ static ADDRESS_MAP_START( rbspm_mem, AS_PROGRAM, 16, rbmk_state )
 	AM_RANGE(0x320000, 0x320001) AM_READ_PORT("IN3")
 	AM_RANGE(0x328000, 0x328001) AM_WRITE(unk_w)
 	AM_RANGE(0x500000, 0x50ffff) AM_RAM
-	AM_RANGE(0x900000, 0x900fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette") // if removed fails gfx test?
+	AM_RANGE(0x900000, 0x900fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette") // if removed fails gfx test?
 	AM_RANGE(0x940000, 0x940fff) AM_RAM AM_SHARE("vidram2") // if removed fails palette test?
 	AM_RANGE(0x980300, 0x983fff) AM_RAM // 0x2048  words ???, byte access, u25 and u26 according to test mode
 	AM_RANGE(0x9c0000, 0x9c0fff) AM_RAM AM_SHARE("vidram")

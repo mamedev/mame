@@ -181,7 +181,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, twin16_state )
 	AM_RANGE(0x040000, 0x043fff) AM_RAM AM_SHARE("comram")
 //  AM_RANGE(0x044000, 0x04ffff) AM_NOP             // miaj
 	AM_RANGE(0x060000, 0x063fff) AM_RAM
-	AM_RANGE(0x080000, 0x080fff) AM_DEVREADWRITE8("palette", palette_device, read, write, 0x00ff) AM_SHARE("palette")
+	AM_RANGE(0x080000, 0x080fff) AM_DEVREADWRITE8("palette", palette_device, read8, write8, 0x00ff) AM_SHARE("palette")
 	AM_RANGE(0x081000, 0x081fff) AM_WRITENOP
 	AM_RANGE(0x0a0000, 0x0a0001) AM_READ_PORT("SYSTEM") AM_WRITE(CPUA_register_w)
 	AM_RANGE(0x0a0002, 0x0a0003) AM_READ_PORT("P1")
@@ -220,7 +220,7 @@ static ADDRESS_MAP_START( fround_map, AS_PROGRAM, 16, fround_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x040000, 0x043fff) AM_RAM AM_SHARE("comram")
 	AM_RANGE(0x060000, 0x063fff) AM_RAM
-	AM_RANGE(0x080000, 0x080fff) AM_DEVREADWRITE8("palette", palette_device, read, write, 0x00ff) AM_SHARE("palette")
+	AM_RANGE(0x080000, 0x080fff) AM_DEVREADWRITE8("palette", palette_device, read8, write8, 0x00ff) AM_SHARE("palette")
 	AM_RANGE(0x0a0000, 0x0a0001) AM_READ_PORT("SYSTEM") AM_WRITE(fround_CPU_register_w)
 	AM_RANGE(0x0a0002, 0x0a0003) AM_READ_PORT("P1")
 	AM_RANGE(0x0a0004, 0x0a0005) AM_READ_PORT("P2")

@@ -243,8 +243,8 @@ INTERRUPT_GEN_MEMBER(fun_tech_corp_state::funtech_vblank_interrupt)
 static ADDRESS_MAP_START( funtech_map, AS_PROGRAM, 8, fun_tech_corp_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 
-	AM_RANGE(0xc000, 0xc1ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
-	AM_RANGE(0xc800, 0xc9ff) AM_RAM_DEVWRITE("palette", palette_device, write_ext) AM_SHARE("palette_ext")
+	AM_RANGE(0xc000, 0xc1ff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
+	AM_RANGE(0xc800, 0xc9ff) AM_RAM_DEVWRITE("palette", palette_device, write8_ext) AM_SHARE("palette_ext")
 
 	AM_RANGE(0xd000, 0xd7ff) AM_ROM // maybe
 

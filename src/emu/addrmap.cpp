@@ -85,10 +85,10 @@ address_map_entry &address_map_entry::set_submap(const char *tag, address_map_de
 
 //-------------------------------------------------
 //  set_handler - handler setters for
-//  8-bit read/write handlers
+//  8-bit read/write delegates
 //-------------------------------------------------
 
-address_map_entry &address_map_entry::set_handler(read8_delegate func, u64 unitmask)
+address_map_entry &address_map_entry::r(read8_delegate func, u64 unitmask)
 {
 	assert(!func.isnull());
 	assert(unitmask_is_appropriate(8, unitmask, func.name()));
@@ -101,7 +101,7 @@ address_map_entry &address_map_entry::set_handler(read8_delegate func, u64 unitm
 }
 
 
-address_map_entry &address_map_entry::set_handler(write8_delegate func, u64 unitmask)
+address_map_entry &address_map_entry::w(write8_delegate func, u64 unitmask)
 {
 	assert(!func.isnull());
 	assert(unitmask_is_appropriate(8, unitmask, func.name()));
@@ -114,20 +114,20 @@ address_map_entry &address_map_entry::set_handler(write8_delegate func, u64 unit
 }
 
 
-address_map_entry &address_map_entry::set_handler(read8_delegate rfunc, write8_delegate wfunc, u64 unitmask)
+address_map_entry &address_map_entry::rw(read8_delegate rfunc, write8_delegate wfunc, u64 unitmask)
 {
-	set_handler(rfunc, unitmask);
-	set_handler(wfunc, unitmask);
+	r(rfunc, unitmask);
+	w(wfunc, unitmask);
 	return *this;
 }
 
 
 //-------------------------------------------------
 //  set_handler - handler setters for
-//  16-bit read/write handlers
+//  16-bit read/write delegates
 //-------------------------------------------------
 
-address_map_entry &address_map_entry::set_handler(read16_delegate func, u64 unitmask)
+address_map_entry &address_map_entry::r(read16_delegate func, u64 unitmask)
 {
 	assert(!func.isnull());
 	assert(unitmask_is_appropriate(16, unitmask, func.name()));
@@ -140,7 +140,7 @@ address_map_entry &address_map_entry::set_handler(read16_delegate func, u64 unit
 }
 
 
-address_map_entry &address_map_entry::set_handler(write16_delegate func, u64 unitmask)
+address_map_entry &address_map_entry::w(write16_delegate func, u64 unitmask)
 {
 	assert(!func.isnull());
 	assert(unitmask_is_appropriate(16, unitmask, func.name()));
@@ -153,20 +153,20 @@ address_map_entry &address_map_entry::set_handler(write16_delegate func, u64 uni
 }
 
 
-address_map_entry &address_map_entry::set_handler(read16_delegate rfunc, write16_delegate wfunc, u64 unitmask)
+address_map_entry &address_map_entry::rw(read16_delegate rfunc, write16_delegate wfunc, u64 unitmask)
 {
-	set_handler(rfunc, unitmask);
-	set_handler(wfunc, unitmask);
+	r(rfunc, unitmask);
+	w(wfunc, unitmask);
 	return *this;
 }
 
 
 //-------------------------------------------------
 //  set_handler - handler setters for
-//  32-bit read/write handlers
+//  32-bit read/write delegates
 //-------------------------------------------------
 
-address_map_entry &address_map_entry::set_handler(read32_delegate func, u64 unitmask)
+address_map_entry &address_map_entry::r(read32_delegate func, u64 unitmask)
 {
 	assert(!func.isnull());
 	assert(unitmask_is_appropriate(32, unitmask, func.name()));
@@ -179,7 +179,7 @@ address_map_entry &address_map_entry::set_handler(read32_delegate func, u64 unit
 }
 
 
-address_map_entry &address_map_entry::set_handler(write32_delegate func, u64 unitmask)
+address_map_entry &address_map_entry::w(write32_delegate func, u64 unitmask)
 {
 	assert(!func.isnull());
 	assert(unitmask_is_appropriate(32, unitmask, func.name()));
@@ -192,20 +192,20 @@ address_map_entry &address_map_entry::set_handler(write32_delegate func, u64 uni
 }
 
 
-address_map_entry &address_map_entry::set_handler(read32_delegate rfunc, write32_delegate wfunc, u64 unitmask)
+address_map_entry &address_map_entry::rw(read32_delegate rfunc, write32_delegate wfunc, u64 unitmask)
 {
-	set_handler(rfunc, unitmask);
-	set_handler(wfunc, unitmask);
+	r(rfunc, unitmask);
+	w(wfunc, unitmask);
 	return *this;
 }
 
 
 //-------------------------------------------------
 //  set_handler - handler setters for
-//  64-bit read/write handlers
+//  64-bit read/write delegates
 //-------------------------------------------------
 
-address_map_entry &address_map_entry::set_handler(read64_delegate func, u64 unitmask)
+address_map_entry &address_map_entry::r(read64_delegate func, u64 unitmask)
 {
 	assert(!func.isnull());
 	assert(unitmask_is_appropriate(64, unitmask, func.name()));
@@ -218,7 +218,7 @@ address_map_entry &address_map_entry::set_handler(read64_delegate func, u64 unit
 }
 
 
-address_map_entry &address_map_entry::set_handler(write64_delegate func, u64 unitmask)
+address_map_entry &address_map_entry::w(write64_delegate func, u64 unitmask)
 {
 	assert(!func.isnull());
 	assert(unitmask_is_appropriate(64, unitmask, func.name()));
@@ -231,10 +231,10 @@ address_map_entry &address_map_entry::set_handler(write64_delegate func, u64 uni
 }
 
 
-address_map_entry &address_map_entry::set_handler(read64_delegate rfunc, write64_delegate wfunc, u64 unitmask)
+address_map_entry &address_map_entry::rw(read64_delegate rfunc, write64_delegate wfunc, u64 unitmask)
 {
-	set_handler(rfunc, unitmask);
-	set_handler(wfunc, unitmask);
+	r(rfunc, unitmask);
+	w(wfunc, unitmask);
 	return *this;
 }
 
@@ -402,7 +402,7 @@ address_map::address_map(const address_space &space, offs_t start, offs_t end, i
 		m_unmapval(space.unmap()),
 		m_globalmask(space.addrmask())
 {
-	range(start, end).set_submap(DEVICE_SELF, submap_delegate, bits, unitmask);
+	(*this)(start, end).set_submap(DEVICE_SELF, submap_delegate, bits, unitmask);
 }
 
 
@@ -448,7 +448,7 @@ void address_map::global_mask(offs_t mask)
 //  add - add a new entry
 //-------------------------------------------------
 
-address_map_entry &address_map::range(offs_t start, offs_t end)
+address_map_entry &address_map::operator()(offs_t start, offs_t end)
 {
 	address_map_entry *ptr = global_alloc(address_map_entry(*m_device, *this, start, end));
 	m_entrylist.append(*ptr);

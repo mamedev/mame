@@ -102,7 +102,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, m107_state )
 	AM_RANGE(0xd0000, 0xdffff) AM_RAM_WRITE(vram_w) AM_SHARE("vram_data")
 	AM_RANGE(0xe0000, 0xeffff) AM_RAM /* System ram */
 	AM_RANGE(0xf8000, 0xf8fff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0xf9000, 0xf9fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0xf9000, 0xf9fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0xffff0, 0xfffff) AM_ROM AM_REGION("maincpu", 0x7fff0)
 ADDRESS_MAP_END
 

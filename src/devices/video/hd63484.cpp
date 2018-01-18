@@ -1910,13 +1910,13 @@ void hd63484_device::video_registers_w(int offset)
 	}
 }
 
-READ16_MEMBER( hd63484_device::status_r )
+READ16_MEMBER( hd63484_device::status16_r )
 {
 	// kothello is coded so that upper byte of this should be 0xff (tests with jc opcode). Maybe it's just unconnected?
 	return m_sr | 0xff00;
 }
 
-READ16_MEMBER( hd63484_device::data_r )
+READ16_MEMBER( hd63484_device::data16_r )
 {
 	uint16_t res;
 
@@ -1937,13 +1937,13 @@ READ16_MEMBER( hd63484_device::data_r )
 	return res;
 }
 
-WRITE16_MEMBER( hd63484_device::address_w )
+WRITE16_MEMBER( hd63484_device::address16_w )
 {
 	if(ACCESSING_BITS_0_7)
 		m_ar = data & 0xfe;
 }
 
-WRITE16_MEMBER( hd63484_device::data_w )
+WRITE16_MEMBER( hd63484_device::data16_w )
 {
 	if(ACCESSING_BITS_8_15)
 		m_vreg[m_ar] = (data & 0xff00) >> 8;
@@ -1956,17 +1956,17 @@ WRITE16_MEMBER( hd63484_device::data_w )
 	inc_ar(2);
 }
 
-READ8_MEMBER( hd63484_device::status_r )
+READ8_MEMBER( hd63484_device::status8_r )
 {
 	return m_sr;
 }
 
-WRITE8_MEMBER( hd63484_device::address_w )
+WRITE8_MEMBER( hd63484_device::address8_w )
 {
 	m_ar = data;
 }
 
-READ8_MEMBER( hd63484_device::data_r )
+READ8_MEMBER( hd63484_device::data8_r )
 {
 	uint8_t res = 0xff;
 
@@ -1980,7 +1980,7 @@ READ8_MEMBER( hd63484_device::data_r )
 	return res;
 }
 
-WRITE8_MEMBER( hd63484_device::data_w )
+WRITE8_MEMBER( hd63484_device::data8_w )
 {
 	m_vreg[m_ar] = data;
 

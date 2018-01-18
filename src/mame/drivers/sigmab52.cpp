@@ -317,8 +317,8 @@ static ADDRESS_MAP_START( jwildb52_map, AS_PROGRAM, 8, sigmab52_state )
 
 	AM_RANGE(0xf720, 0xf727) AM_DEVREADWRITE("6840ptm_1", ptm6840_device, read, write)
 
-	AM_RANGE(0xf730, 0xf730) AM_DEVREADWRITE("hd63484", hd63484_device, status_r, address_w)
-	AM_RANGE(0xf731, 0xf731) AM_DEVREADWRITE("hd63484", hd63484_device, data_r, data_w)
+	AM_RANGE(0xf730, 0xf730) AM_DEVREADWRITE("hd63484", hd63484_device, status8_r, address8_w)
+	AM_RANGE(0xf731, 0xf731) AM_DEVREADWRITE("hd63484", hd63484_device, data8_r, data8_w)
 
 	AM_RANGE(0xf740, 0xf740) AM_READ(in0_r)
 	AM_RANGE(0xf741, 0xf741) AM_READ_PORT("IN1")

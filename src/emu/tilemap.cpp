@@ -1710,14 +1710,14 @@ void tilemap_device::static_set_transparent_pen(device_t &device, pen_t pen)
 //  write: Main memory writes
 //-------------------------------------------------
 
-WRITE8_MEMBER(tilemap_device::write)
+WRITE8_MEMBER(tilemap_device::write8)
 {
 	m_basemem.write8(offset, data);
 	offset /= m_bytes_per_entry;
 	mark_tile_dirty(offset);
 }
 
-WRITE16_MEMBER(tilemap_device::write)
+WRITE16_MEMBER(tilemap_device::write16)
 {
 	m_basemem.write16(offset, data, mem_mask);
 	offset = offset * 2 / m_bytes_per_entry;
@@ -1726,7 +1726,7 @@ WRITE16_MEMBER(tilemap_device::write)
 		mark_tile_dirty(offset + 1);
 }
 
-WRITE32_MEMBER(tilemap_device::write)
+WRITE32_MEMBER(tilemap_device::write32)
 {
 	m_basemem.write32(offset, data, mem_mask);
 	offset = offset * 4 / m_bytes_per_entry;
@@ -1747,14 +1747,14 @@ WRITE32_MEMBER(tilemap_device::write)
 //  write_entry_ext: Extension memory writes
 //-------------------------------------------------
 
-WRITE8_MEMBER(tilemap_device::write_ext)
+WRITE8_MEMBER(tilemap_device::write8_ext)
 {
 	m_extmem.write8(offset, data);
 	offset /= m_bytes_per_entry;
 	mark_tile_dirty(offset);
 }
 
-WRITE16_MEMBER(tilemap_device::write_ext)
+WRITE16_MEMBER(tilemap_device::write16_ext)
 {
 	m_extmem.write16(offset, data, mem_mask);
 	offset = offset * 2 / m_bytes_per_entry;
@@ -1763,7 +1763,7 @@ WRITE16_MEMBER(tilemap_device::write_ext)
 		mark_tile_dirty(offset + 1);
 }
 
-WRITE32_MEMBER(tilemap_device::write_ext)
+WRITE32_MEMBER(tilemap_device::write32_ext)
 {
 	m_extmem.write32(offset, data, mem_mask);
 	offset = offset * 4 / m_bytes_per_entry;

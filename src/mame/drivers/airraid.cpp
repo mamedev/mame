@@ -253,8 +253,8 @@ static ADDRESS_MAP_START( airraid_map, AS_PROGRAM, 8, airraid_state )
 	AM_RANGE(0xc700, 0xc700) AM_WRITE(cshooter_c700_w)
 //  AM_RANGE(0xc801, 0xc801) AM_WRITE(cshooter_c801_w)            // see notes
 	AM_RANGE(0xd000, 0xd7ff) AM_RAM_DEVWRITE("airraid_vid", airraid_video_device, txram_w) AM_SHARE("txram")
-	AM_RANGE(0xd800, 0xd8ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
-	AM_RANGE(0xda00, 0xdaff) AM_RAM_DEVWRITE("palette", palette_device, write_ext) AM_SHARE("palette_ext")
+	AM_RANGE(0xd800, 0xd8ff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
+	AM_RANGE(0xda00, 0xdaff) AM_RAM_DEVWRITE("palette", palette_device, write8_ext) AM_SHARE("palette_ext")
 	AM_RANGE(0xdc00, 0xdc0f) AM_RAM_DEVWRITE("airraid_vid", airraid_video_device,  vregs_w) AM_SHARE("vregs")
 //  AM_RANGE(0xdc10, 0xdc10) AM_RAM
 	AM_RANGE(0xdc11, 0xdc11) AM_WRITE(bank_w)

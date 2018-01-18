@@ -255,7 +255,7 @@ READ16_MEMBER(wwfwfest_state::wwfwfest_paletteram_r)
 WRITE16_MEMBER(wwfwfest_state::wwfwfest_paletteram_w)
 {
 	offset = (offset & 0x000f) | (offset & 0x7fc0) >> 2;
-	m_palette->write(space, offset, data, mem_mask);
+	m_palette->write16(space, offset, data, mem_mask);
 }
 
 /*- Priority Control -*/
@@ -304,7 +304,7 @@ static ADDRESS_MAP_START( ddragon3_map, AS_PROGRAM, 16, ddragon3_state )
 	AM_RANGE(0x100002, 0x100003) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x00ff)
 	AM_RANGE(0x100004, 0x100005) AM_WRITE(irq6_ack_w)
 	AM_RANGE(0x100006, 0x100007) AM_WRITE(irq5_ack_w)
-	AM_RANGE(0x140000, 0x1405ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette") /* Palette RAM */
+	AM_RANGE(0x140000, 0x1405ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette") /* Palette RAM */
 	AM_RANGE(0x180000, 0x180fff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x1c0000, 0x1c3fff) AM_RAM /* work RAM */
 ADDRESS_MAP_END
@@ -315,7 +315,7 @@ static ADDRESS_MAP_START( dd3b_map, AS_PROGRAM, 16, ddragon3_state )
 	AM_RANGE(0x081000, 0x081fff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x082000, 0x0827ff) AM_RAM_WRITE(ddragon3_bg_videoram_w) AM_SHARE("bg_videoram") /* Background (32x32 Tiles - 2 by per tile) */
 	AM_RANGE(0x0c0000, 0x0c000f) AM_WRITE(ddragon3_scroll_w)
-	AM_RANGE(0x100000, 0x1005ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette") /* Palette RAM */
+	AM_RANGE(0x100000, 0x1005ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette") /* Palette RAM */
 	AM_RANGE(0x140000, 0x140001) AM_WRITE(ddragon3_vreg_w)
 	AM_RANGE(0x140002, 0x140003) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x00ff)
 	AM_RANGE(0x140004, 0x140005) AM_WRITE(irq6_ack_w)
@@ -335,7 +335,7 @@ static ADDRESS_MAP_START( ctribe_map, AS_PROGRAM, 16, ddragon3_state )
 	AM_RANGE(0x082000, 0x0827ff) AM_RAM_WRITE(ddragon3_bg_videoram_w) AM_SHARE("bg_videoram") /* Background (32x32 Tiles - 2 by per tile) */
 	AM_RANGE(0x082800, 0x082fff) AM_RAM
 	AM_RANGE(0x0c0000, 0x0c000f) AM_READWRITE(ddragon3_scroll_r, ddragon3_scroll_w)
-	AM_RANGE(0x100000, 0x1005ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette") /* Palette RAM */
+	AM_RANGE(0x100000, 0x1005ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette") /* Palette RAM */
 	AM_RANGE(0x140000, 0x140001) AM_WRITE(ddragon3_vreg_w)
 	AM_RANGE(0x140002, 0x140003) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x00ff)
 	AM_RANGE(0x140004, 0x140005) AM_WRITE(irq6_ack_w)

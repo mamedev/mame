@@ -469,7 +469,7 @@ static ADDRESS_MAP_START( galpani3_map, AS_PROGRAM, 16, galpani3_state )
 	AM_RANGE(0x000000, 0x17ffff) AM_ROM
 
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM // area [B] - Work RAM
-	AM_RANGE(0x280000, 0x287fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette") // area [A] - palette for sprites
+	AM_RANGE(0x280000, 0x287fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette") // area [A] - palette for sprites
 
 	AM_RANGE(0x300000, 0x303fff) AM_RAM_WRITE(galpani3_suprnova_sprite32_w) AM_SHARE("spriteram")
 	AM_RANGE(0x380000, 0x38003f) AM_RAM_WRITE(galpani3_suprnova_sprite32regs_w) AM_SHARE("sprregs")

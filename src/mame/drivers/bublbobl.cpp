@@ -298,7 +298,7 @@ static ADDRESS_MAP_START( common_maincpu_map, AS_PROGRAM, 8, bublbobl_state )
 	AM_RANGE(0xc000, 0xdcff) AM_RAM AM_SHARE("videoram")
 	AM_RANGE(0xdd00, 0xdfff) AM_RAM AM_SHARE("objectram")
 	AM_RANGE(0xe000, 0xf7ff) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0xf800, 0xf9ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0xf800, 0xf9ff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( bublbobl_maincpu_map, AS_PROGRAM, 8, bublbobl_state )

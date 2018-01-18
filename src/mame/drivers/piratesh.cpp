@@ -395,7 +395,7 @@ static ADDRESS_MAP_START( piratesh_map, AS_PROGRAM, 16, piratesh_state )
 	AM_RANGE(0x2a1000, 0x2a3fff) AM_WRITENOP
 	AM_RANGE(0x2b0000, 0x2b000f) AM_DEVREADWRITE("k053250", k053250ps_device, reg_r, reg_w) // LVC
 	AM_RANGE(0x300000, 0x3000ff) AM_DEVWRITE("k055555", k055555_device, K055555_word_w)
-	AM_RANGE(0x380000, 0x381fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x380000, 0x381fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x400000, 0x400001) AM_READ_PORT("IN0")
 	AM_RANGE(0x400002, 0x400003) AM_READ_PORT("IN1")
 	AM_RANGE(0x400004, 0x400005) AM_READ_PORT("DSW1")

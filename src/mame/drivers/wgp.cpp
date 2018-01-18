@@ -625,7 +625,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, wgp_state )
 	AM_RANGE(0x502000, 0x517fff) AM_RAM_WRITE(pivram_word_w) AM_SHARE("pivram") /* piv tilemaps */
 	AM_RANGE(0x520000, 0x52001f) AM_RAM_WRITE(piv_ctrl_word_w) AM_SHARE("piv_ctrlram")
 	AM_RANGE(0x600000, 0x600003) AM_WRITE(rotate_port_w)    /* rotation control ? */
-	AM_RANGE(0x700000, 0x701fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x700000, 0x701fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( cpu2_map, AS_PROGRAM, 16  /* LAN areas not mapped... */, wgp_state )

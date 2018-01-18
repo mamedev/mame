@@ -111,7 +111,7 @@ static ADDRESS_MAP_START( zwackery_map, AS_PROGRAM, 16, zwackery_state )
 	AM_RANGE(0x108000, 0x108007) AM_DEVREADWRITE8("pia1", pia6821_device, read, write, 0x00ff)
 	AM_RANGE(0x10c000, 0x10c007) AM_DEVREADWRITE8("pia2", pia6821_device, read, write, 0x00ff)
 	AM_RANGE(0x800000, 0x800fff) AM_RAM_WRITE(videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x802000, 0x803fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x802000, 0x803fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0xc00000, 0xc00fff) AM_READWRITE8(spriteram_r, spriteram_w, 0x00ff)
 ADDRESS_MAP_END
 

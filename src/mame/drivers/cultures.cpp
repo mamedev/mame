@@ -191,7 +191,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( vrambank_map, AS_PROGRAM, 8, cultures_state )
 	AM_RANGE(0x0000, 0x3fff) AM_RAM_WRITE(bg0_videoram_w) AM_SHARE("bg0_videoram")
-	AM_RANGE(0x4000, 0x6fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x4000, 0x6fff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( cultures_map, AS_PROGRAM, 8, cultures_state )

@@ -385,8 +385,8 @@ static ADDRESS_MAP_START( igspoker_prg_map, AS_PROGRAM, 8, igspoker_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( igspoker_io_map, AS_IO, 8, igspoker_state )
-	AM_RANGE(0x2000, 0x27ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
-	AM_RANGE(0x2800, 0x2fff) AM_RAM_DEVWRITE("palette", palette_device, write_ext) AM_SHARE("palette_ext")
+	AM_RANGE(0x2000, 0x27ff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
+	AM_RANGE(0x2800, 0x2fff) AM_RAM_DEVWRITE("palette", palette_device, write8_ext) AM_SHARE("palette_ext")
 	AM_RANGE(0x4000, 0x4000) AM_READ_PORT("DSW1")           /* DSW1 */
 	AM_RANGE(0x4001, 0x4001) AM_READ_PORT("DSW2")           /* DSW2 */
 	AM_RANGE(0x4002, 0x4002) AM_READ_PORT("DSW3")           /* DSW3 */
@@ -1137,8 +1137,8 @@ INPUT_PORTS_END
 
 
 static ADDRESS_MAP_START( number10_io_map, AS_IO, 8, igspoker_state )
-	AM_RANGE(0x2000, 0x27ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
-	AM_RANGE(0x2800, 0x2fff) AM_RAM_DEVWRITE("palette", palette_device, write_ext) AM_SHARE("palette_ext")
+	AM_RANGE(0x2000, 0x27ff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
+	AM_RANGE(0x2800, 0x2fff) AM_RAM_DEVWRITE("palette", palette_device, write8_ext) AM_SHARE("palette_ext")
 	AM_RANGE(0x4000, 0x4000) AM_READ_PORT("DSW1")           /* DSW1 */
 	AM_RANGE(0x4001, 0x4001) AM_READ_PORT("DSW2")           /* DSW2 */
 	AM_RANGE(0x4002, 0x4002) AM_READ_PORT("DSW3")           /* DSW3 */
@@ -1160,8 +1160,8 @@ static ADDRESS_MAP_START( number10_io_map, AS_IO, 8, igspoker_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( cpokerpk_io_map, AS_IO, 8, igspoker_state )
-	AM_RANGE(0x2000, 0x27ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
-	AM_RANGE(0x2800, 0x2fff) AM_RAM_DEVWRITE("palette", palette_device, write_ext) AM_SHARE("palette_ext")
+	AM_RANGE(0x2000, 0x27ff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
+	AM_RANGE(0x2800, 0x2fff) AM_RAM_DEVWRITE("palette", palette_device, write8_ext) AM_SHARE("palette_ext")
 	AM_RANGE(0x4000, 0x4000) AM_READ_PORT("DSW1")           /* DSW1 */
 	AM_RANGE(0x4001, 0x4001) AM_READ_PORT("DSW2")           /* DSW2 */
 	AM_RANGE(0x4002, 0x4002) AM_READ_PORT("DSW3")           /* DSW3 */

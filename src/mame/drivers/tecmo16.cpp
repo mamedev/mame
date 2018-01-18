@@ -48,7 +48,7 @@ static ADDRESS_MAP_START( fstarfrc_map, AS_PROGRAM, 16, tecmo16_state )
 	AM_RANGE(0x121800, 0x121fff) AM_RAM_WRITE(colorram2_w) AM_SHARE("colorram2")
 	AM_RANGE(0x122000, 0x127fff) AM_RAM /* work area */
 	AM_RANGE(0x130000, 0x130fff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x140000, 0x141fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x140000, 0x141fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x150000, 0x150001) AM_WRITE(flipscreen_w)
 	AM_RANGE(0x150010, 0x150011) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x00ff)
 	AM_RANGE(0x150030, 0x150031) AM_READ_PORT("DSW2") AM_WRITENOP   /* ??? */
@@ -71,7 +71,7 @@ static ADDRESS_MAP_START( ginkun_map, AS_PROGRAM, 16, tecmo16_state )
 	AM_RANGE(0x123000, 0x123fff) AM_RAM_WRITE(colorram2_w) AM_SHARE("colorram2")
 	AM_RANGE(0x124000, 0x124fff) AM_RAM /* extra RAM for Riot */
 	AM_RANGE(0x130000, 0x130fff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x140000, 0x141fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x140000, 0x141fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x150000, 0x150001) AM_WRITE(flipscreen_w)
 	AM_RANGE(0x150010, 0x150011) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x00ff)
 	AM_RANGE(0x150020, 0x150021) AM_READ_PORT("EXTRA") AM_WRITENOP  /* ??? */

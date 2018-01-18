@@ -635,7 +635,7 @@ static ADDRESS_MAP_START( tumblepopb_main_map, AS_PROGRAM, 16, tumbleb_state )
 #endif
 	AM_RANGE(0x100000, 0x100001) AM_READWRITE(tumblepb_prot_r, tumblepb_oki_w)
 	AM_RANGE(0x120000, 0x123fff) AM_RAM AM_SHARE("mainram")
-	AM_RANGE(0x140000, 0x1407ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x140000, 0x1407ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x160000, 0x1607ff) AM_RAM AM_SHARE("spriteram") /* Bootleg sprite buffer */
 	AM_RANGE(0x160800, 0x160807) AM_WRITEONLY /* writes past the end of spriteram */
 	AM_RANGE(0x180000, 0x18000f) AM_READ(tumblepopb_controls_r)
@@ -657,7 +657,7 @@ static ADDRESS_MAP_START( fncywld_main_map, AS_PROGRAM, 16, tumbleb_state )
 #endif
 	AM_RANGE(0x100000, 0x100003) AM_DEVREADWRITE8("ymsnd", ym2151_device, read, write, 0x00ff)
 	AM_RANGE(0x100004, 0x100005) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)
-	AM_RANGE(0x140000, 0x140fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x140000, 0x140fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x160000, 0x1607ff) AM_RAM AM_SHARE("spriteram") /* sprites */
 	AM_RANGE(0x160800, 0x16080f) AM_WRITEONLY /* goes slightly past the end of spriteram? */
 	AM_RANGE(0x180000, 0x18000f) AM_READ(tumblepopb_controls_r)
@@ -685,7 +685,7 @@ static ADDRESS_MAP_START( htchctch_main_map, AS_PROGRAM, 16, tumbleb_state )
 	AM_RANGE(0x100000, 0x100001) AM_WRITE(semicom_soundcmd_w)
 	AM_RANGE(0x100002, 0x100003) AM_WRITE(bcstory_tilebank_w)
 	AM_RANGE(0x120000, 0x123fff) AM_RAM AM_SHARE("mainram")
-	AM_RANGE(0x140000, 0x1407ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x140000, 0x1407ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x160000, 0x160fff) AM_RAM AM_SHARE("spriteram") /* Bootleg sprite buffer */
 	AM_RANGE(0x180000, 0x18000f) AM_READ(tumblepopb_controls_r)
 	AM_RANGE(0x18000c, 0x18000d) AM_WRITENOP
@@ -711,7 +711,7 @@ static ADDRESS_MAP_START( suprtrio_main_map, AS_PROGRAM, 16, tumbleb_state )
 	AM_RANGE(0xa00000, 0xa0000f) AM_RAM AM_SHARE("control")
 	AM_RANGE(0xa20000, 0xa20fff) AM_RAM_WRITE(tumblepb_pf1_data_w) AM_SHARE("pf1_data")
 	AM_RANGE(0xa22000, 0xa22fff) AM_RAM_WRITE(tumblepb_pf2_data_w) AM_SHARE("pf2_data")
-	AM_RANGE(0xcf0000, 0xcf05ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0xcf0000, 0xcf05ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0xe00000, 0xe00001) AM_READ_PORT("PLAYERS") AM_WRITE(suprtrio_tilebank_w)
 	AM_RANGE(0xe40000, 0xe40001) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0xe80002, 0xe80003) AM_READ_PORT("DSW")
@@ -722,7 +722,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( pangpang_main_map, AS_PROGRAM, 16, tumbleb_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x120000, 0x123fff) AM_RAM AM_SHARE("mainram")
-	AM_RANGE(0x140000, 0x1407ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x140000, 0x1407ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x160000, 0x1607ff) AM_RAM AM_SHARE("spriteram") /* Bootleg sprite buffer */
 	AM_RANGE(0x160800, 0x160807) AM_WRITEONLY // writes past the end of spriteram
 	AM_RANGE(0x180000, 0x18000f) AM_READ(tumblepopb_controls_r)
@@ -778,7 +778,7 @@ static ADDRESS_MAP_START( jumpkids_main_map, AS_PROGRAM, 16, tumbleb_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x100000, 0x100001) AM_WRITE(jumpkids_sound_w)
 	AM_RANGE(0x120000, 0x123fff) AM_RAM AM_SHARE("mainram")
-	AM_RANGE(0x140000, 0x1407ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x140000, 0x1407ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x160000, 0x1607ff) AM_RAM AM_SHARE("spriteram") /* Bootleg sprite buffer */
 	AM_RANGE(0x160800, 0x160807) AM_WRITEONLY /* writes past the end of spriteram */
 	AM_RANGE(0x180000, 0x18000f) AM_READ(tumblepopb_controls_r)
@@ -3573,7 +3573,7 @@ DRIVER_INIT_MEMBER(tumbleb_state,chokchok)
 	DRIVER_INIT_CALL(htchctch);
 
 	/* different palette format, closer to tumblep -- is this controlled by a register? the palette was right with the hatch catch trojan */
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x140000, 0x140fff, write16_delegate(FUNC(palette_device::write), m_palette.target()));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x140000, 0x140fff, write16_delegate(FUNC(palette_device::write16), m_palette.target()));
 
 	/* slightly different banking */
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x100002, 0x100003, write16_delegate(FUNC(tumbleb_state::chokchok_tilebank_w),this));

@@ -138,7 +138,7 @@ static ADDRESS_MAP_START( galpanic_map, AS_PROGRAM, 16, galpanic_state )
 	AM_RANGE(0x400000, 0x400001) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)
 	AM_RANGE(0x500000, 0x51ffff) AM_RAM AM_SHARE("fgvideoram")
 	AM_RANGE(0x520000, 0x53ffff) AM_RAM_WRITE(bgvideoram_w) AM_SHARE("bgvideoram")  /* + work RAM */
-	AM_RANGE(0x600000, 0x6007ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")  /* 1024 colors, but only 512 seem to be used */
+	AM_RANGE(0x600000, 0x6007ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")  /* 1024 colors, but only 512 seem to be used */
 	AM_RANGE(0x700000, 0x701fff) AM_DEVREADWRITE("pandora", kaneko_pandora_device, spriteram_LSB_r, spriteram_LSB_w)
 	AM_RANGE(0x702000, 0x704fff) AM_RAM
 	AM_RANGE(0x800000, 0x800001) AM_READ_PORT("DSW1")

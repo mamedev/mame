@@ -158,7 +158,7 @@ WRITE16_MEMBER(realbrk_state::backup_ram_w)
 static ADDRESS_MAP_START( base_mem, AS_PROGRAM, 16, realbrk_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM                                         // ROM
 	AM_RANGE(0x200000, 0x203fff) AM_RAM                   AM_SHARE("spriteram") // Sprites
-	AM_RANGE(0x400000, 0x40ffff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")   // Palette
+	AM_RANGE(0x400000, 0x40ffff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")   // Palette
 	AM_RANGE(0x600000, 0x601fff) AM_RAM_WRITE(vram_0_w) AM_SHARE("vram_0")  // Background   (0)
 	AM_RANGE(0x602000, 0x603fff) AM_RAM_WRITE(vram_1_w) AM_SHARE("vram_1")  // Background   (1)
 	AM_RANGE(0x604000, 0x604fff) AM_RAM_WRITE(vram_2_w) AM_SHARE("vram_2")  // Text         (2)

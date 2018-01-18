@@ -237,7 +237,7 @@ WRITE8_MEMBER(egghunt_state::egghunt_okibanking_w)
 
 static ADDRESS_MAP_START( egghunt_map, AS_PROGRAM, 8, egghunt_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0xc000, 0xc7ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0xc000, 0xc7ff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
 	AM_RANGE(0xc800, 0xcfff) AM_RAM_WRITE(egghunt_atram_w) AM_SHARE("atram")
 	AM_RANGE(0xd000, 0xdfff) AM_READWRITE(egghunt_bgram_r, egghunt_bgram_w)
 	AM_RANGE(0xe000, 0xffff) AM_RAM

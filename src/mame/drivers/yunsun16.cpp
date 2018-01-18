@@ -127,7 +127,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, yunsun16_state )
 	AM_RANGE(0x800180, 0x800181) AM_WRITE8(sound_bank_w, 0x00ff)    // Sound
 	AM_RANGE(0x800188, 0x800189) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)  // Sound
 	AM_RANGE(0x8001fe, 0x8001ff) AM_WRITENOP    // ? 0 (during int)
-	AM_RANGE(0x900000, 0x903fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")    // Palette
+	AM_RANGE(0x900000, 0x903fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")    // Palette
 	AM_RANGE(0x908000, 0x90bfff) AM_RAM_WRITE(vram_1_w) AM_SHARE("vram_1") // Layer 1
 	AM_RANGE(0x90c000, 0x90ffff) AM_RAM_WRITE(vram_0_w) AM_SHARE("vram_0") // Layer 0
 	AM_RANGE(0x910000, 0x910fff) AM_RAM AM_SHARE("spriteram")   // Sprites

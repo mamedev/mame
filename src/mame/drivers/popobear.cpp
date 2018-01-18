@@ -491,7 +491,7 @@ static ADDRESS_MAP_START( popobear_mem, AS_PROGRAM, 16, popobear_state )
 	AM_RANGE(0x480034, 0x480035) AM_RAM // coin counter or coin lockout
 	AM_RANGE(0x48003a, 0x48003b) AM_RAM //AM_READ(48003a_r) AM_WRITE(48003a_w)
 
-	AM_RANGE(0x480400, 0x4807ff) AM_RAM AM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x480400, 0x4807ff) AM_RAM AM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 
 	AM_RANGE(0x500000, 0x500001) AM_READ_PORT("IN0")
 	AM_RANGE(0x520000, 0x520001) AM_READ_PORT("IN1")

@@ -717,7 +717,7 @@ static ADDRESS_MAP_START( tmmjprd_map, AS_PROGRAM, 32, tmmjprd_state )
 	AM_RANGE(0x28c000, 0x28ffff) AM_READWRITE(tilemap3_r,tilemap3_w)
 	/* ?? is palette ram shared with sprites in this case or just a different map */
 	AM_RANGE(0x290000, 0x29bfff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x29c000, 0x29ffff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x29c000, 0x29ffff) AM_RAM_DEVWRITE("palette", palette_device, write32) AM_SHARE("palette")
 
 	AM_RANGE(0x400000, 0x400003) AM_READ(mux_r) AM_WRITE(eeprom_write)
 	AM_RANGE(0xf00000, 0xffffff) AM_RAM

@@ -596,7 +596,7 @@ uint32_t bingor_state::screen_update_bingor(screen_device &screen, bitmap_rgb32 
 static ADDRESS_MAP_START( bingor_map, AS_PROGRAM, 16, bingor_state )
 	AM_RANGE(0x00000, 0x0ffff) AM_RAM
 	AM_RANGE(0x90000, 0x9ffff) AM_ROM AM_REGION("gfx", 0)
-	AM_RANGE(0xa0300, 0xa031f) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette") //wrong
+	AM_RANGE(0xa0300, 0xa031f) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette") //wrong
 	AM_RANGE(0xa0000, 0xaffff) AM_RAM AM_SHARE("blit_ram")
 	AM_RANGE(0xf0000, 0xfffff) AM_ROM AM_REGION("boot_prg", 0)
 ADDRESS_MAP_END
@@ -715,7 +715,7 @@ MACHINE_CONFIG_END
 
 static ADDRESS_MAP_START( vip2000_map, AS_PROGRAM, 16, bingor_state )
 	AM_RANGE(0x00000, 0x0ffff) AM_RAM
-	AM_RANGE(0x40300, 0x4031f) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette") //wrong
+	AM_RANGE(0x40300, 0x4031f) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette") //wrong
 	AM_RANGE(0x40000, 0x4ffff) AM_RAM AM_SHARE("blit_ram")
 	//AM_RANGE(0x50000, 0x5ffff) AM_ROM AM_REGION("gfx", 0)
 	AM_RANGE(0x60000, 0x60003) AM_DEVWRITE8("ymz", ymz284_device, address_data_w, 0x00ff)

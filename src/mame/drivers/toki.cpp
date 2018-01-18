@@ -146,7 +146,7 @@ static ADDRESS_MAP_START( toki_map, AS_PROGRAM, 16, toki_state )
 	AM_RANGE(0x000000, 0x05ffff) AM_ROM
 	AM_RANGE(0x060000, 0x06d7ff) AM_RAM
 	AM_RANGE(0x06d800, 0x06dfff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x06e000, 0x06e7ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x06e000, 0x06e7ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x06e800, 0x06efff) AM_RAM_WRITE(background1_videoram_w) AM_SHARE("bg1_vram")
 	AM_RANGE(0x06f000, 0x06f7ff) AM_RAM_WRITE(background2_videoram_w) AM_SHARE("bg2_vram")
 	AM_RANGE(0x06f800, 0x06ffff) AM_RAM_WRITE(foreground_videoram_w) AM_SHARE("videoram")
@@ -161,7 +161,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( tokib_map, AS_PROGRAM, 16, toki_state )
 	AM_RANGE(0x000000, 0x05ffff) AM_ROM
 	AM_RANGE(0x060000, 0x06dfff) AM_RAM
-	AM_RANGE(0x06e000, 0x06e7ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x06e000, 0x06e7ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x06e800, 0x06efff) AM_RAM_WRITE(background1_videoram_w) AM_SHARE("bg1_vram")
 	AM_RANGE(0x06f000, 0x06f7ff) AM_RAM_WRITE(background2_videoram_w) AM_SHARE("bg2_vram")
 	AM_RANGE(0x06f800, 0x06ffff) AM_RAM_WRITE(foreground_videoram_w) AM_SHARE("videoram")

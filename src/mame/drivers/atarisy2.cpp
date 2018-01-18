@@ -755,7 +755,7 @@ WRITE8_MEMBER(atarisy2_state::coincount_w)
 /* full memory map derived from schematics */
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, atarisy2_state )
 	AM_RANGE(0x0000, 0x0fff) AM_RAM
-	AM_RANGE(0x1000, 0x11ff) AM_MIRROR(0x0200) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x1000, 0x11ff) AM_MIRROR(0x0200) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x1400, 0x1403) AM_MIRROR(0x007c) AM_READWRITE(adc_r, bankselect_w)
 	AM_RANGE(0x1480, 0x1487) AM_MIRROR(0x0078) AM_WRITE(adc_strobe_w)
 	AM_RANGE(0x1580, 0x1581) AM_MIRROR(0x001e) AM_WRITE(int0_ack_w)

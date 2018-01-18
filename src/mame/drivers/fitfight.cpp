@@ -175,7 +175,7 @@ static ADDRESS_MAP_START( fitfight_main_map, AS_PROGRAM, 16, fitfight_state )
 	AM_RANGE(0xb14000, 0xb17fff) AM_RAM //used by histryma @0x0000b25a,b270
 	AM_RANGE(0xb18000, 0xb1bfff) AM_RAM //used by histryma @0x0000b25a,b270,b286
 
-	AM_RANGE(0xc00000, 0xc00fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0xc00000, 0xc00fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 
 	AM_RANGE(0xd00000, 0xd007ff) AM_RAM AM_SHARE("spriteram")
 
@@ -207,7 +207,7 @@ static ADDRESS_MAP_START( bbprot_main_map, AS_PROGRAM, 16, fitfight_state )
 	AM_RANGE(0xb0c000, 0xb0ffff) AM_RAM_WRITE(fof_txt_tileram_w) AM_SHARE("fof_txt_tileram")
 
 	AM_RANGE(0xc00000, 0xc00fff) AM_READONLY
-	AM_RANGE(0xc00000, 0xc03fff) AM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0xc00000, 0xc03fff) AM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 
 	AM_RANGE(0xd00000, 0xd007ff) AM_RAM AM_SHARE("spriteram")
 

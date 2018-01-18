@@ -417,7 +417,7 @@ static ADDRESS_MAP_START( wyvernf0_map, AS_PROGRAM, 8, wyvernf0_state )
 	AM_RANGE(0xd610, 0xd610) AM_DEVREAD("soundlatch", generic_latch_8_device, read) AM_WRITE(sound_command_w)
 	// d613 write (FF -> 00 at boot)
 
-	AM_RANGE(0xd800, 0xdbff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0xd800, 0xdbff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
 
 	AM_RANGE(0xdc00, 0xdc00) AM_WRITENOP    // irq ack?
 ADDRESS_MAP_END

@@ -402,8 +402,8 @@ static ADDRESS_MAP_START( slave_memory, AS_PROGRAM, 8, hvyunit_state )
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("slave_bank")
 	AM_RANGE(0xc000, 0xc3ff) AM_RAM_WRITE(hu_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0xc400, 0xc7ff) AM_RAM_WRITE(hu_colorram_w) AM_SHARE("colorram")
-	AM_RANGE(0xd000, 0xd1ff) AM_RAM_DEVWRITE("palette", palette_device, write_ext) AM_SHARE("palette_ext")
-	AM_RANGE(0xd800, 0xd9ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0xd000, 0xd1ff) AM_RAM_DEVWRITE("palette", palette_device, write8_ext) AM_SHARE("palette_ext")
+	AM_RANGE(0xd800, 0xd9ff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
 	AM_RANGE(0xd000, 0xdfff) AM_RAM
 	AM_RANGE(0xe000, 0xffff) AM_RAM AM_SHARE("share1")
 ADDRESS_MAP_END

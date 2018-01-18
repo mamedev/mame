@@ -730,7 +730,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, tnzs_base_state )
 	AM_RANGE(0xf300, 0xf303) AM_MIRROR(0xfc) AM_DEVWRITE("spritegen", seta001_device, spritectrl_w8)  /* control registers (0x80 mirror used by Arkanoid 2) */
 	AM_RANGE(0xf400, 0xf400) AM_DEVWRITE("spritegen", seta001_device, spritebgflag_w8)   /* enable / disable background transparency */
 	AM_RANGE(0xf600, 0xf600) AM_READNOP AM_WRITE(ramrom_bankswitch_w)
-	AM_RANGE(0xf800, 0xfbff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0xf800, 0xfbff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( prompal_main_map, AS_PROGRAM, 8, extrmatn_state )
@@ -809,12 +809,12 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( tnzsb_sub_map, AS_PROGRAM, 8, tnzsb_state )
 	AM_RANGE(0xf000, 0xf003) AM_READONLY
-	AM_RANGE(0xf000, 0xf3ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0xf000, 0xf3ff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
 	AM_IMPORT_FROM(tnzsb_base_sub_map)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( kabukiz_sub_map, AS_PROGRAM, 8, kabukiz_state )
-	AM_RANGE(0xf800, 0xfbff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0xf800, 0xfbff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
 	AM_IMPORT_FROM(tnzsb_base_sub_map)
 ADDRESS_MAP_END
 
@@ -845,7 +845,7 @@ static ADDRESS_MAP_START( jpopnics_main_map, AS_PROGRAM, 8, jpopnics_state )
 	AM_RANGE(0xf300, 0xf303) AM_MIRROR(0xfc) AM_DEVWRITE("spritegen", seta001_device, spritectrl_w8) /* control registers (0x80 mirror used by Arkanoid 2) */
 	AM_RANGE(0xf400, 0xf400) AM_DEVWRITE("spritegen", seta001_device, spritebgflag_w8)   /* enable / disable background transparency */
 	AM_RANGE(0xf600, 0xf600) AM_READNOP AM_WRITE(ramrom_bankswitch_w)
-	AM_RANGE(0xf800, 0xffff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0xf800, 0xffff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( jpopnics_sub_map, AS_PROGRAM, 8, jpopnics_state )

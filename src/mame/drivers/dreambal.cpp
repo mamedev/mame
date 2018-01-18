@@ -120,7 +120,7 @@ static ADDRESS_MAP_START( dreambal_map, AS_PROGRAM, 16, dreambal_state )
 	AM_RANGE(0x103000, 0x103fff) AM_RAM
 
 	AM_RANGE(0x120000, 0x123fff) AM_RAM
-	AM_RANGE(0x140000, 0x1403ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x140000, 0x1403ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x161000, 0x16100f) AM_DEVWRITE("tilegen1", deco16ic_device, pf_control_w)
 
 	AM_RANGE(0x160000, 0x163fff) AM_READWRITE(dreambal_protection_region_0_104_r,dreambal_protection_region_0_104_w)AM_SHARE("prot16ram") /* Protection device */

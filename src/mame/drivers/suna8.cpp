@@ -562,7 +562,7 @@ static ADDRESS_MAP_START( hardhead_map, AS_PROGRAM, 8, suna8_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM                             // ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")                        // Banked ROM
 	AM_RANGE(0xc000, 0xd7ff) AM_RAM                             // RAM
-	AM_RANGE(0xd800, 0xd9ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette") // Palette
+	AM_RANGE(0xd800, 0xd9ff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette") // Palette
 	AM_RANGE(0xda00, 0xda00) AM_RAM_READ(hardhead_ip_r) AM_SHARE("hardhead_ip") // Input Port Select
 	AM_RANGE(0xda80, 0xda80) AM_DEVREAD("soundlatch2", generic_latch_8_device, read) AM_WRITE(hardhead_bankswitch_w )   // ROM Banking
 	AM_RANGE(0xdb00, 0xdb00) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)   // To Sound CPU
@@ -637,7 +637,7 @@ static ADDRESS_MAP_START( rranger_map, AS_PROGRAM, 8, suna8_state )
 	AM_RANGE(0xc280, 0xc280) AM_WRITENOP    // ? NMI Ack
 	AM_RANGE(0xc280, 0xc280) AM_READ_PORT("DSW1")               // DSW 1
 	AM_RANGE(0xc2c0, 0xc2c0) AM_READ_PORT("DSW2")               // DSW 2
-	AM_RANGE(0xc600, 0xc7ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette") // Palette
+	AM_RANGE(0xc600, 0xc7ff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette") // Palette
 	AM_RANGE(0xc800, 0xdfff) AM_RAM                                                                     // Work RAM
 	AM_RANGE(0xe000, 0xffff) AM_RAM_WRITE(suna8_spriteram_w) AM_SHARE("spriteram")                      // Sprites
 ADDRESS_MAP_END
@@ -1009,7 +1009,7 @@ static ADDRESS_MAP_START( hardhea2_map, AS_PROGRAM, 8, suna8_state )
 	AM_RANGE(0xc533, 0xc533) AM_WRITE(hardhea2_rambank_0_w )
 	// Protection ***
 
-	AM_RANGE(0xc600, 0xc7ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette") // Palette
+	AM_RANGE(0xc600, 0xc7ff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette") // Palette
 	AM_RANGE(0xc800, 0xdfff) AM_RAMBANK("bank2")                                                        // Work RAM (Banked)
 	AM_RANGE(0xe000, 0xffff) AM_READWRITE(suna8_banked_spriteram_r, suna8_banked_spriteram_w)           // Sprites (Banked)
 ADDRESS_MAP_END
@@ -1113,7 +1113,7 @@ static ADDRESS_MAP_START( starfigh_map, AS_PROGRAM, 8, suna8_state )
 	AM_RANGE(0xc500, 0xc500) AM_WRITE(starfigh_sound_latch_w        )   // To Sound CPU (can be disabled)
 //  (c522 + R & 0x1f) write?
 
-	AM_RANGE(0xc600, 0xc7ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette") // Palette
+	AM_RANGE(0xc600, 0xc7ff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette") // Palette
 	AM_RANGE(0xc800, 0xdfff) AM_RAM                                                                     // Work RAM
 	AM_RANGE(0xe000, 0xffff) AM_READWRITE(suna8_banked_spriteram_r, suna8_banked_spriteram_w)           // Sprites (Banked)
 ADDRESS_MAP_END
@@ -1241,7 +1241,7 @@ static ADDRESS_MAP_START( sparkman_map, AS_PROGRAM, 8, suna8_state )
 	AM_RANGE(0xc480, 0xc480) AM_WRITE(sparkman_coin_counter_w       )   // Coin Counter
 	AM_RANGE(0xc500, 0xc57f) AM_WRITE(starfigh_sound_latch_w        )   // To Sound CPU (can be disabled)
 
-	AM_RANGE(0xc600, 0xc7ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette") // Palette
+	AM_RANGE(0xc600, 0xc7ff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette") // Palette
 	AM_RANGE(0xc800, 0xdfff) AM_RAM_WRITE(suna8_wram_w) AM_SHARE("wram")                        // RAM
 	AM_RANGE(0xe000, 0xffff) AM_READWRITE(suna8_banked_spriteram_r, suna8_banked_spriteram_w)   // Sprites (Banked)
 ADDRESS_MAP_END

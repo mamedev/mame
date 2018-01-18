@@ -95,7 +95,7 @@ WRITE32_MEMBER(cybstorm_state::latch_w)
 
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 32, cybstorm_state )
 	AM_RANGE(0x000000, 0x1fffff) AM_ROM
-	AM_RANGE(0x200000, 0x20ffff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x200000, 0x20ffff) AM_RAM_DEVWRITE("palette", palette_device, write32) AM_SHARE("palette")
 	AM_RANGE(0x3effc0, 0x3effff) AM_DEVREADWRITE16("vad", atari_vad_device, control_read, control_write, 0xffffffff)
 	AM_RANGE(0x3f0000, 0x3fffff) AM_DEVICE16("vadbank", address_map_bank_device, amap16, 0xffffffff)
 	AM_RANGE(0x9f0000, 0x9f0003) AM_READ_PORT("9F0000")
@@ -104,7 +104,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 32, cybstorm_state )
 	AM_RANGE(0x9f0040, 0x9f0043) AM_DEVWRITE8("jsa", atari_jsa_iii_device, main_command_w, 0x00ff0000)
 	AM_RANGE(0x9f0050, 0x9f0053) AM_WRITE(latch_w)
 	AM_RANGE(0xfb0000, 0xfb0003) AM_DEVWRITE("watchdog", watchdog_timer_device, reset32_w)
-	AM_RANGE(0xfc0000, 0xfc0003) AM_DEVWRITE("eeprom", eeprom_parallel_28xx_device, unlock_write)
+	AM_RANGE(0xfc0000, 0xfc0003) AM_DEVWRITE("eeprom", eeprom_parallel_28xx_device, unlock_write32)
 	AM_RANGE(0xfd0000, 0xfd0fff) AM_DEVREADWRITE8("eeprom", eeprom_parallel_28xx_device, read, write, 0xff00ff00)
 	AM_RANGE(0xfe0000, 0xffffff) AM_RAM
 ADDRESS_MAP_END

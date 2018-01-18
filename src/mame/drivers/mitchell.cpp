@@ -318,7 +318,7 @@ WRITE8_MEMBER(mitchell_state::input_w)
 static ADDRESS_MAP_START( mgakuen_map, AS_PROGRAM, 8, mitchell_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
-	AM_RANGE(0xc000, 0xc7ff) AM_RAM_DEVWRITE("palette", palette_device, write)   /* palette RAM */
+	AM_RANGE(0xc000, 0xc7ff) AM_RAM_DEVWRITE("palette", palette_device, write8)   /* palette RAM */
 	AM_RANGE(0xc800, 0xcfff) AM_READWRITE(pang_colorram_r, pang_colorram_w) AM_SHARE("colorram") /* Attribute RAM */
 	AM_RANGE(0xd000, 0xdfff) AM_READWRITE(mgakuen_videoram_r, mgakuen_videoram_w) AM_SHARE("videoram") /* char RAM */
 	AM_RANGE(0xe000, 0xefff) AM_RAM /* Work RAM */

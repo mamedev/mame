@@ -193,7 +193,7 @@ static ADDRESS_MAP_START( silvmil_map, AS_PROGRAM, 16, silvmil_state )
 
 	AM_RANGE(0x120000, 0x120fff) AM_RAM_WRITE(silvmil_fg_videoram_w) AM_SHARE("fg_videoram")
 	AM_RANGE(0x122000, 0x122fff) AM_RAM_WRITE(silvmil_bg_videoram_w) AM_SHARE("bg_videoram")
-	AM_RANGE(0x200000, 0x2005ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x200000, 0x2005ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x210000, 0x2107ff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x270000, 0x270001) AM_WRITE(silvmil_soundcmd_w)
 	AM_RANGE(0x280000, 0x280001) AM_READ_PORT("P1_P2")

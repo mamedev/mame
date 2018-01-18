@@ -348,7 +348,7 @@ static ADDRESS_MAP_START( laserbas_io, AS_IO, 8, laserbas_state )
 	AM_RANGE(0x20, 0x23) AM_WRITE(out_w)
 	AM_RANGE(0x40, 0x43) AM_DEVREADWRITE("pit0", pit8253_device, read, write)
 	AM_RANGE(0x44, 0x47) AM_DEVREADWRITE("pit1", pit8253_device, read, write)
-	AM_RANGE(0x80, 0x9f) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x80, 0x9f) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( laserbas )

@@ -291,7 +291,7 @@ static ADDRESS_MAP_START( gstream_32bit_map, AS_PROGRAM, 32, gstream_state )
 	AM_RANGE(0x4E000000, 0x4E1FFFFF) AM_ROM AM_REGION("user2",0) // main game rom
 	AM_RANGE(0x4F000000, 0x4F000003) AM_WRITE(gstream_tilemap3_scrollx_w)
 	AM_RANGE(0x4F200000, 0x4F200003) AM_WRITE(gstream_tilemap3_scrolly_w)
-	AM_RANGE(0x4F400000, 0x4F406FFF) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x4F400000, 0x4F406FFF) AM_RAM_DEVWRITE("palette", palette_device, write32) AM_SHARE("palette")
 	AM_RANGE(0x4F800000, 0x4F800003) AM_WRITE(gstream_tilemap1_scrollx_w)
 	AM_RANGE(0x4FA00000, 0x4FA00003) AM_WRITE(gstream_tilemap1_scrolly_w)
 	AM_RANGE(0x4FC00000, 0x4FC00003) AM_WRITE(gstream_tilemap2_scrollx_w)

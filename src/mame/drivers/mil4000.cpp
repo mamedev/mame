@@ -437,7 +437,7 @@ static ADDRESS_MAP_START( mil4000_map, AS_PROGRAM, 16, mil4000_state )
 	AM_RANGE(0x708010, 0x708011) AM_NOP //touch screen
 	AM_RANGE(0x70801e, 0x70801f) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)
 
-	AM_RANGE(0x780000, 0x780fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x780000, 0x780fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0xff0000, 0xffffff) AM_RAM AM_SHARE("nvram") // 2x CY62256L-70 (U7 & U8).
 
 ADDRESS_MAP_END
@@ -460,7 +460,7 @@ static ADDRESS_MAP_START( chewheel_map, AS_PROGRAM, 16, mil4000_state )
 	AM_RANGE(0x708010, 0x708011) AM_READWRITE(chewheel_mcu_r, chewheel_mcu_w)
 	AM_RANGE(0x70801e, 0x70801f) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)
 
-	AM_RANGE(0x780000, 0x780fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x780000, 0x780fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0xff0000, 0xff3fff) AM_RAM AM_SHARE("nvram")   // V62C51864L-70P (U77).
 	AM_RANGE(0xffc000, 0xffffff) AM_RAM                     // V62C51864L-70P (U78).
 

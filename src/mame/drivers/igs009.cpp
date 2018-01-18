@@ -482,8 +482,8 @@ static ADDRESS_MAP_START( jingbell_portmap, AS_IO, 8, igs009_state )
 
 	AM_RANGE( 0x1000, 0x11ff ) AM_RAM_WRITE(bg_scroll_w ) AM_SHARE("bg_scroll")
 
-	AM_RANGE( 0x2000, 0x23ff ) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
-	AM_RANGE( 0x2400, 0x27ff ) AM_RAM_DEVWRITE("palette", palette_device, write_ext) AM_SHARE("palette_ext")
+	AM_RANGE( 0x2000, 0x23ff ) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
+	AM_RANGE( 0x2400, 0x27ff ) AM_RAM_DEVWRITE("palette", palette_device, write8_ext) AM_SHARE("palette_ext")
 
 	AM_RANGE( 0x3000, 0x33ff ) AM_RAM_WRITE(reel1_ram_w )  AM_SHARE("reel1_ram")
 	AM_RANGE( 0x3400, 0x37ff ) AM_RAM_WRITE(reel2_ram_w )  AM_SHARE("reel2_ram")
@@ -516,8 +516,8 @@ static ADDRESS_MAP_START( gp98_portmap, AS_IO, 8, igs009_state )
 
 	AM_RANGE( 0x1000, 0x11ff ) AM_RAM_WRITE(bg_scroll_w ) AM_SHARE("bg_scroll")
 
-	AM_RANGE( 0x2000, 0x23ff ) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
-	AM_RANGE( 0x2400, 0x27ff ) AM_RAM_DEVWRITE("palette", palette_device, write_ext) AM_SHARE("palette_ext")
+	AM_RANGE( 0x2000, 0x23ff ) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
+	AM_RANGE( 0x2400, 0x27ff ) AM_RAM_DEVWRITE("palette", palette_device, write8_ext) AM_SHARE("palette_ext")
 
 	AM_RANGE( 0x3000, 0x33ff ) AM_RAM_WRITE(reel1_ram_w )  AM_SHARE("reel1_ram")
 	AM_RANGE( 0x3400, 0x37ff ) AM_RAM_WRITE(reel2_ram_w )  AM_SHARE("reel2_ram")

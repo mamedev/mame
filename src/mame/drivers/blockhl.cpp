@@ -93,7 +93,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, blockhl_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( bank5800_map, AS_PROGRAM, 8, blockhl_state )
-	AM_RANGE(0x0000, 0x07ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x0000, 0x07ff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
 	AM_RANGE(0x0800, 0x0fff) AM_RAM
 ADDRESS_MAP_END
 

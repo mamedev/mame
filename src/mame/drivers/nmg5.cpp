@@ -365,7 +365,7 @@ WRITE8_MEMBER(nmg5_state::oki_banking_w)
 static ADDRESS_MAP_START( nmg5_map, AS_PROGRAM, 16, nmg5_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x120000, 0x12ffff) AM_RAM
-	AM_RANGE(0x140000, 0x1407ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x140000, 0x1407ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x160000, 0x1607ff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x180000, 0x180001) AM_WRITE(nmg5_soundlatch_w)
 	AM_RANGE(0x180002, 0x180003) AM_WRITENOP
@@ -385,7 +385,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( pclubys_map, AS_PROGRAM, 16, nmg5_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM
-	AM_RANGE(0x440000, 0x4407ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x440000, 0x4407ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x460000, 0x4607ff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x480000, 0x480001) AM_WRITE(nmg5_soundlatch_w)
 	AM_RANGE(0x480002, 0x480003) AM_WRITENOP

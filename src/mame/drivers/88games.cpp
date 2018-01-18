@@ -124,7 +124,7 @@ WRITE8_MEMBER(_88games_state::k052109_051960_w)
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, _88games_state )
 	AM_RANGE(0x0000, 0x0fff) AM_READ_BANK("bank0000") /* banked ROM */
 	AM_RANGE(0x1000, 0x1fff) AM_READ_BANK("bank1000") /* banked ROM + palette RAM */
-	AM_RANGE(0x1000, 0x1fff) AM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x1000, 0x1fff) AM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
 	AM_RANGE(0x2000, 0x2fff) AM_RAM
 	AM_RANGE(0x3000, 0x37ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x3800, 0x3fff) AM_READWRITE(bankedram_r, bankedram_w) AM_SHARE("ram")

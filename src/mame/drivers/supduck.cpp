@@ -257,7 +257,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, supduck_state )
 	AM_RANGE(0xfec000, 0xfecfff) AM_RAM_WRITE(text_videoram_w) AM_SHARE("textvideoram")
 	AM_RANGE(0xff0000, 0xff3fff) AM_RAM_WRITE(back_videoram_w) AM_SHARE("backvideoram")
 	AM_RANGE(0xff4000, 0xff7fff) AM_RAM_WRITE(fore_videoram_w) AM_SHARE("forevideoram")
-	AM_RANGE(0xff8000, 0xff87ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0xff8000, 0xff87ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0xffc000, 0xffffff) AM_RAM /* working RAM */
 ADDRESS_MAP_END
 

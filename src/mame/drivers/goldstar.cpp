@@ -353,7 +353,7 @@ static ADDRESS_MAP_START( goldstar_map, AS_PROGRAM, 8, goldstar_state )
 	AM_RANGE(0xf900, 0xf900) AM_WRITE(p1_lamps_w)
 	AM_RANGE(0xfa00, 0xfa00) AM_WRITE(goldstar_fa00_w)
 	AM_RANGE(0xfb00, 0xfb00) AM_DEVREADWRITE("oki", okim6295_device, read, write)
-	AM_RANGE(0xfd00, 0xfdff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0xfd00, 0xfdff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
 	AM_RANGE(0xfe00, 0xfe00) AM_READWRITE(protection_r,protection_w)
 ADDRESS_MAP_END
 
@@ -1107,8 +1107,8 @@ ADDRESS_MAP_END
 /* newer / more capable hw */
 static ADDRESS_MAP_START( unkch_map, AS_PROGRAM, 8, unkch_state )
 	AM_RANGE(0x0000, 0x9fff) AM_ROM
-	AM_RANGE(0xc000, 0xc1ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
-	AM_RANGE(0xc800, 0xc9ff) AM_RAM_DEVWRITE("palette", palette_device, write_ext) AM_SHARE("palette_ext")
+	AM_RANGE(0xc000, 0xc1ff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
+	AM_RANGE(0xc800, 0xc9ff) AM_RAM_DEVWRITE("palette", palette_device, write8_ext) AM_SHARE("palette_ext")
 
 	AM_RANGE(0xd000, 0xd7ff) AM_RAM AM_SHARE("nvram")
 

@@ -229,7 +229,7 @@ static ADDRESS_MAP_START( kongambl_map, AS_PROGRAM, 32, kongambl_state )
 
 	AM_RANGE(0x440000, 0x443fff) AM_RAM // OBJ RAM
 
-	AM_RANGE(0x460000, 0x47ffff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x460000, 0x47ffff) AM_RAM_DEVWRITE("palette", palette_device, write32) AM_SHARE("palette")
 
 	AM_RANGE(0x4b0000, 0x4b001f) AM_DEVREADWRITE8("k053252", k053252_device, read, write, 0xff00ff00)
 

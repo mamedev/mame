@@ -436,7 +436,7 @@ static ADDRESS_MAP_START( tv_tcf_map, AS_PROGRAM, 16, highvdeo_state )
 	AM_RANGE(0x00000, 0x003ff) AM_RAM /*irq vector area*/
 	AM_RANGE(0x00400, 0x03fff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x40000, 0x5d4bf) AM_RAM AM_SHARE("blit_ram") /*blitter ram*/
-	AM_RANGE(0x7fe00, 0x7ffff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x7fe00, 0x7ffff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x80000, 0xbffff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc0000, 0xfffff) AM_ROM AM_REGION("boot_prg",0)
 ADDRESS_MAP_END

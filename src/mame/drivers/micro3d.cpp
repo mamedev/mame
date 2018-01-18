@@ -233,7 +233,7 @@ static ADDRESS_MAP_START( vgbmem, AS_PROGRAM, 16, micro3d_state )
 	AM_RANGE(0x00800000, 0x00bfffff) AM_RAM
 	AM_RANGE(0x00c00000, 0x00c0000f) AM_READ_PORT("VGB_SW")
 	AM_RANGE(0x00e00000, 0x00e0000f) AM_WRITE(micro3d_xfer3dk_w)
-	AM_RANGE(0x02000000, 0x0200ffff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette") // clut
+	AM_RANGE(0x02000000, 0x0200ffff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette") // clut
 	AM_RANGE(0x02600000, 0x0260000f) AM_WRITE(micro3d_creg_w)
 	AM_RANGE(0x02c00000, 0x02c0003f) AM_READ8(vgb_uart_r, 0x00ff)
 	AM_RANGE(0x02e00000, 0x02e0003f) AM_WRITE8(vgb_uart_w, 0x00ff)

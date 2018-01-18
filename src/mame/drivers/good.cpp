@@ -123,7 +123,7 @@ static ADDRESS_MAP_START( good_map, AS_PROGRAM, 16, good_state )
 	AM_RANGE(0x280002, 0x280003) AM_READ_PORT("IN1")
 	AM_RANGE(0x280004, 0x280005) AM_READ_PORT("IN2")
 
-	AM_RANGE(0x800000, 0x8007ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x800000, 0x8007ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 
 	AM_RANGE(0x820000, 0x820fff) AM_RAM_WRITE(fg_tilemapram_w) AM_SHARE("fg_tilemapram")
 	AM_RANGE(0x822000, 0x822fff) AM_RAM_WRITE(bg_tilemapram_w) AM_SHARE("bg_tilemapram")

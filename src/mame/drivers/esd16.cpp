@@ -149,7 +149,7 @@ WRITE16_MEMBER(esd16_state::esd_eeprom_w)
 	AM_RANGE(_BASE + 0xc, _BASE + 0xd) AM_WRITENOP \
 	AM_RANGE(_BASE + 0xe, _BASE + 0xf) AM_WRITEONLY AM_SHARE("head_layersize")
 #define ESD16_PALETTE_AREA( _BASE ) \
-	AM_RANGE(_BASE + 0x000, _BASE + 0xfff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(_BASE + 0x000, _BASE + 0xfff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 #define ESD16_SPRITE_AREA( _BASE ) \
 	AM_RANGE(_BASE + 0x000, _BASE + 0x7ff) AM_WRITEONLY AM_SHARE("spriteram") AM_MIRROR(0x000800)
 #define ESD16_VRAM_AREA( _BASE ) \

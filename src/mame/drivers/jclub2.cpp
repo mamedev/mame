@@ -606,7 +606,7 @@ static ADDRESS_MAP_START( jclub2o_map, AS_PROGRAM, 32, jclub2o_state )
 
 	// ST-0020
 	AM_RANGE(0x600000, 0x67ffff) AM_DEVREADWRITE16( "st0020", st0020_device, sprram_r, sprram_w, 0xffffffff );
-	AM_RANGE(0x680000, 0x69ffff) AM_RAM AM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x680000, 0x69ffff) AM_RAM AM_DEVWRITE("palette", palette_device, write32) AM_SHARE("palette")
 	AM_RANGE(0x6a0000, 0x6bffff) AM_RAM
 	AM_RANGE(0x6c0000, 0x6c00ff) AM_DEVREADWRITE16( "st0020", st0020_device, regs_r,   regs_w,   0xffffffff );
 	AM_RANGE(0x700000, 0x7fffff) AM_DEVREADWRITE16( "st0020", st0020_device, gfxram_r, gfxram_w, 0xffffffff );
@@ -721,7 +721,7 @@ static ADDRESS_MAP_START( jclub2_map, AS_PROGRAM, 32, jclub2_state )
 
 	// ST-0032
 	AM_RANGE(0x800000, 0x87ffff) AM_DEVREADWRITE16( "st0020", st0020_device, sprram_r, sprram_w, 0xffffffff );
-	AM_RANGE(0x880000, 0x89ffff) AM_RAM AM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x880000, 0x89ffff) AM_RAM AM_DEVWRITE("palette", palette_device, write32) AM_SHARE("palette")
 	AM_RANGE(0x8a0000, 0x8bffff) AM_RAM   // this should still be palette ram!
 	AM_RANGE(0x8c0000, 0x8c00ff) AM_DEVREADWRITE16( "st0020", st0020_device, regs_r,   regs_w,   0xffffffff );
 	AM_RANGE(0x8e0000, 0x8e01ff) AM_RAM // sound?
@@ -805,7 +805,7 @@ static ADDRESS_MAP_START( darkhors_map, AS_PROGRAM, 32, darkhors_state )
 	AM_RANGE(0x870000, 0x873fff) AM_RAM_WRITE(tmapram2_w) AM_SHARE("tmapram2")
 	AM_RANGE(0x874000, 0x87dfff) AM_RAM
 	AM_RANGE(0x87e000, 0x87ffff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x880000, 0x89ffff) AM_RAM AM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x880000, 0x89ffff) AM_RAM AM_DEVWRITE("palette", palette_device, write32) AM_SHARE("palette")
 	AM_RANGE(0x8a0000, 0x8bffff) AM_RAM   // this should still be palette ram!
 	AM_RANGE(0x8c0120, 0x8c012f) AM_WRITEONLY AM_SHARE("tmapscroll")
 	AM_RANGE(0x8c0130, 0x8c013f) AM_WRITEONLY AM_SHARE("tmapscroll2")

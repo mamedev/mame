@@ -249,7 +249,7 @@ static ADDRESS_MAP_START( neoprint_map, AS_PROGRAM, 16, neoprint_state )
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM
 	AM_RANGE(0x300000, 0x30ffff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x400000, 0x43ffff) AM_RAM AM_SHARE("npvidram")
-	AM_RANGE(0x500000, 0x51ffff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x500000, 0x51ffff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x600000, 0x600001) AM_READWRITE8(neoprint_audio_result_r, audio_command_w, 0xff00)
 	AM_RANGE(0x600002, 0x600003) AM_READWRITE8(neoprint_calendar_r, neoprint_calendar_w, 0xff00)
 	AM_RANGE(0x600004, 0x600005) AM_READ_PORT("SYSTEM") AM_WRITENOP

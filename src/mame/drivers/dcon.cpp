@@ -46,7 +46,7 @@ static ADDRESS_MAP_START( dcon_map, AS_PROGRAM, 16, dcon_state )
 	AM_RANGE(0x8c800, 0x8cfff) AM_RAM_WRITE(foreground_w) AM_SHARE("fore_data")
 	AM_RANGE(0x8d000, 0x8d7ff) AM_RAM_WRITE(midground_w) AM_SHARE("mid_data")
 	AM_RANGE(0x8d800, 0x8e7ff) AM_RAM_WRITE(text_w) AM_SHARE("textram")
-	AM_RANGE(0x8e800, 0x8f7ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x8e800, 0x8f7ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x8f800, 0x8ffff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x9d000, 0x9d7ff) AM_WRITE(gfxbank_w)
 

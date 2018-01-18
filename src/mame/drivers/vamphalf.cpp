@@ -443,21 +443,21 @@ WRITE8_MEMBER( vamphalf_state::qs1000_p3_w )
 static ADDRESS_MAP_START( common_map, AS_PROGRAM, 16, vamphalf_state )
 	AM_RANGE(0x00000000, 0x001fffff) AM_RAM AM_SHARE("wram")
 	AM_RANGE(0x40000000, 0x4003ffff) AM_RAM AM_SHARE("tiles")
-	AM_RANGE(0x80000000, 0x8000ffff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x80000000, 0x8000ffff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0xfff00000, 0xffffffff) AM_ROM AM_REGION("user1",0)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( common_32bit_map, AS_PROGRAM, 32, vamphalf_state )
 	AM_RANGE(0x00000000, 0x001fffff) AM_RAM AM_SHARE("wram32")
 	AM_RANGE(0x40000000, 0x4003ffff) AM_RAM AM_SHARE("tiles32")
-	AM_RANGE(0x80000000, 0x8000ffff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x80000000, 0x8000ffff) AM_RAM_DEVWRITE("palette", palette_device, write32) AM_SHARE("palette")
 	AM_RANGE(0xfff00000, 0xffffffff) AM_ROM AM_REGION("user1",0)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( yorijori_32bit_map, AS_PROGRAM, 32, vamphalf_state )
 	AM_RANGE(0x00000000, 0x001fffff) AM_RAM AM_SHARE("wram32")
 	AM_RANGE(0x40000000, 0x4003ffff) AM_RAM AM_SHARE("tiles32")
-	AM_RANGE(0x80000000, 0x8000ffff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x80000000, 0x8000ffff) AM_RAM_DEVWRITE("palette", palette_device, write32) AM_SHARE("palette")
 	AM_RANGE(0xffe00000, 0xffffffff) AM_ROM AM_REGION("user1",0)
 ADDRESS_MAP_END
 
@@ -576,7 +576,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( aoh_map, AS_PROGRAM, 32, vamphalf_state )
 	AM_RANGE(0x00000000, 0x003fffff) AM_RAM AM_SHARE("wram32")
 	AM_RANGE(0x40000000, 0x4003ffff) AM_RAM AM_SHARE("tiles32")
-	AM_RANGE(0x80000000, 0x8000ffff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x80000000, 0x8000ffff) AM_RAM_DEVWRITE("palette", palette_device, write32) AM_SHARE("palette")
 	AM_RANGE(0x80210000, 0x80210003) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x80220000, 0x80220003) AM_READ_PORT("P1_P2")
 	AM_RANGE(0xffc00000, 0xffffffff) AM_ROM AM_REGION("user1",0)

@@ -241,7 +241,7 @@ WRITE8_MEMBER(liberate_state::prosport_charram_w)
  *************************************/
 
 static ADDRESS_MAP_START( prosport_map, AS_PROGRAM, 8, liberate_state )
-	AM_RANGE(0x0200, 0x021f) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x0200, 0x021f) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
 	AM_RANGE(0x0000, 0x03ff) AM_MIRROR(0x2000) AM_RAM
 	AM_RANGE(0x0400, 0x07ff) AM_RAM_WRITE(prosport_bg_vram_w) AM_SHARE("bg_vram")
 	AM_RANGE(0x0800, 0x1fff) AM_READWRITE(prosport_charram_r,prosport_charram_w) //0x1e00-0x1fff isn't charram!

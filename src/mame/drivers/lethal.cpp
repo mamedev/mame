@@ -377,7 +377,7 @@ static ADDRESS_MAP_START( bank4000_map, AS_PROGRAM, 8, lethal_state )
 	AM_RANGE(0xa000, 0xbfff) AM_MIRROR(0x4000) AM_UNMAP // AM_DEVREAD("k056832", k056832_device, rom_byte_r)
 
 	// CBNK = 1; partially overlaid when VRD = 1
-	AM_RANGE(0x4000, 0x7fff) AM_MIRROR(0x8000) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x4000, 0x7fff) AM_MIRROR(0x8000) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( le_sound, AS_PROGRAM, 8, lethal_state )

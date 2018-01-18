@@ -1014,7 +1014,7 @@ static ADDRESS_MAP_START( gx_base_memmap, AS_PROGRAM, 32, konamigx_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( gx_type1_map, AS_PROGRAM, 32, konamigx_state )
-	AM_RANGE(0xd90000, 0xd97fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0xd90000, 0xd97fff) AM_RAM_DEVWRITE("palette", palette_device, write32) AM_SHARE("palette")
 	AM_RANGE(0xdc0000, 0xdc1fff) AM_RAM         // LAN RAM? (Racin' Force has, Open Golf doesn't)
 	AM_RANGE(0xdd0000, 0xdd00ff) AM_READNOP AM_WRITENOP // LAN board
 	AM_RANGE(0xdda000, 0xddafff) AM_WRITE_PORT("ADC-WRPORT")
@@ -1034,7 +1034,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( gx_type2_map, AS_PROGRAM, 32, konamigx_state )
 	AM_RANGE(0xcc0000, 0xcc0003) AM_WRITE(esc_w)
-	AM_RANGE(0xd90000, 0xd97fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0xd90000, 0xd97fff) AM_RAM_DEVWRITE("palette", palette_device, write32) AM_SHARE("palette")
 	AM_IMPORT_FROM(gx_base_memmap)
 ADDRESS_MAP_END
 
