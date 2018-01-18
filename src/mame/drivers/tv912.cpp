@@ -10,11 +10,14 @@
     suffix indicated a typewriter-style keyboard. The TVI-920 added a row of
     function keys but was otherwise mostly identical to the TVI-912.
 
+    The baud rate switches are mounted vertically at the rear of the unit.
+    Only one switch may be down (closed) at a time.
+
 *******************************************************************************/
 
 #include "emu.h"
 #include "cpu/mcs48/mcs48.h"
-//#include "bus/rs232/rs232.h"
+#include "bus/rs232/rs232.h"
 #include "machine/ay31015.h"
 #include "machine/bankdev.h"
 #include "sound/beep.h"
@@ -37,9 +40,13 @@ public:
 		, m_dispram_bank(*this, "dispram")
 		, m_p_chargen(*this, "chargen")
 		, m_keys(*this, "KEY%u", 0)
+		, m_modem_baud(*this, "MODEMBAUD")
+		, m_printer_baud(*this, "PRINTBAUD")
+		, m_uart_control(*this, "UARTCTRL")
 		, m_modifiers(*this, "MODIFIERS")
 		, m_jumpers(*this, "JUMPERS")
 		, m_option(*this, "OPTION")
+		, m_baudgen_timer(nullptr)
 	{ }
 
 	DECLARE_WRITE8_MEMBER(p1_w);
@@ -55,9 +62,18 @@ public:
 
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
+	DECLARE_INPUT_CHANGED_MEMBER(uart_settings_changed);
+
 	void tv912(machine_config &config);
 private:
+	enum
+	{
+		TIMER_BAUDGEN
+	};
+
 	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<tms9927_device> m_crtc;
@@ -67,10 +83,17 @@ private:
 	required_memory_bank m_dispram_bank;
 	required_region_ptr<u8> m_p_chargen;
 	required_ioport_array<32> m_keys;
+	required_ioport m_modem_baud;
+	required_ioport m_printer_baud;
+	required_ioport m_uart_control;
 	required_ioport m_modifiers;
 	required_ioport m_jumpers;
 	required_ioport m_option;
 
+	emu_timer *m_baudgen_timer;
+
+	bool m_force_blank;
+	bool m_lpt_select;
 	u8 m_keyboard_scan;
 	std::unique_ptr<u8[]> m_dispram;
 };
@@ -146,7 +169,11 @@ WRITE_LINE_MEMBER(tv912_state::uart_reset_w)
 WRITE8_MEMBER(tv912_state::output_40c)
 {
 	// Bit 5: +FORCE BLANK
+	m_force_blank = BIT(data, 5);
+
 	// Bit 4: +SEL LPT
+	m_lpt_select = BIT(data, 4);
+
 	// Bit 3: -BREAK
 	// Bit 2: -RQS
 
@@ -155,6 +182,29 @@ WRITE8_MEMBER(tv912_state::output_40c)
 
 	// Bit 0: +PG SEL
 	m_dispram_bank->set_entry(BIT(data, 0));
+}
+
+void tv912_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+{
+	switch (id)
+	{
+	case TIMER_BAUDGEN:
+		m_uart->set_input_pin(AY31015_RCP, param);
+		m_uart->set_input_pin(AY31015_TCP, param);
+
+		ioport_value sel = (m_lpt_select ? m_printer_baud : m_modem_baud)->read();
+		for (int b = 0; b < 10; b++)
+		{
+			if (!BIT(sel, b))
+			{
+				unsigned divisor = 11 * (b < 9 ? 1 << b : 176);
+				m_baudgen_timer->adjust(attotime::from_hz(XTAL_23_814MHz / 3.5 / divisor), !param);
+				break;
+			}
+		}
+
+		break;
+	}
 }
 
 u32 tv912_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
@@ -167,8 +217,24 @@ void tv912_state::machine_start()
 	m_dispram = make_unique_clear<u8[]>(0x1000);
 	m_dispram_bank->configure_entries(0, 2, m_dispram.get(), 0x800);
 
+	m_baudgen_timer = timer_alloc(TIMER_BAUDGEN);
+	m_baudgen_timer->adjust(attotime::zero, 0);
+
+	save_item(NAME(m_force_blank));
+	save_item(NAME(m_lpt_select));
 	save_item(NAME(m_keyboard_scan));
 	save_pointer(NAME(m_dispram.get()), 0x1000);
+}
+
+void tv912_state::machine_reset()
+{
+	ioport_value uart_ctrl = m_uart_control->read();
+	m_uart->set_input_pin(AY31015_NP, BIT(uart_ctrl, 4));
+	m_uart->set_input_pin(AY31015_TSB, BIT(uart_ctrl, 3));
+	m_uart->set_input_pin(AY31015_NB1, BIT(uart_ctrl, 2));
+	m_uart->set_input_pin(AY31015_NB2, 1);
+	m_uart->set_input_pin(AY31015_EPS, BIT(uart_ctrl, 0));
+	m_uart->set_input_pin(AY31015_CS, 1);
 }
 
 static ADDRESS_MAP_START( prog_map, AS_PROGRAM, 8, tv912_state )
@@ -190,7 +256,56 @@ static ADDRESS_MAP_START( bank_map, 0, 8, tv912_state )
 	AM_RANGE(0x800, 0xfff) AM_RAMBANK("dispram")
 ADDRESS_MAP_END
 
+INPUT_CHANGED_MEMBER(tv912_state::uart_settings_changed)
+{
+	ioport_value uart_ctrl = m_uart_control->read();
+	m_uart->set_input_pin(AY31015_NP, BIT(uart_ctrl, 4));
+	m_uart->set_input_pin(AY31015_TSB, BIT(uart_ctrl, 3));
+	m_uart->set_input_pin(AY31015_NB1, BIT(uart_ctrl, 2));
+	// S2:8 was probably connected to NB2 on earlier hardware revisions
+	m_uart->set_input_pin(AY31015_EPS, BIT(uart_ctrl, 0));
+}
+
 static INPUT_PORTS_START( switches )
+	PORT_START("MODEMBAUD")
+	PORT_DIPNAME(0x3ff, 0x3fd, "Modem Port Baud Rate") PORT_DIPLOCATION("S1:1,2,3,4,5,6,7,8,9,10")
+	PORT_DIPSETTING(0x2ff, "75") // actual rate: 1,208 ÷ 16 ≈ 75.5
+	PORT_DIPSETTING(0x1ff, "110") // actual rate: 1,757 ÷ 16 ≈ 109.8
+	PORT_DIPSETTING(0x37f, "150") // actual rate: 2,416 ÷ 16 ≈ 151
+	PORT_DIPSETTING(0x3bf, "300") // actual rate: 4,832 ÷ 16 ≈ 302
+	PORT_DIPSETTING(0x3df, "600") // actual rate: 9,665 ÷ 16 ≈ 604
+	PORT_DIPSETTING(0x3ef, "1200") // actual rate: 19,330 ÷ 16 ≈ 1,208
+	PORT_DIPSETTING(0x3f7, "2400") // actual rate: 38,659 ÷ 16 ≈ 2,416
+	PORT_DIPSETTING(0x3fb, "4800") // actual rate: 77,318 ÷ 16 ≈ 4,832
+	PORT_DIPSETTING(0x3fd, "9600") // actual rate: 154,636 ÷ 16 ≈ 9,665
+	PORT_DIPSETTING(0x3fe, "19200") // actual rate: 309,273 ÷ 16 ≈ 19,330
+
+	PORT_START("PRINTBAUD")
+	PORT_DIPNAME(0x3ff, 0x3fd, "Printer Port Baud Rate") PORT_DIPLOCATION("S3:1,2,3,4,5,6,7,8,9,10")
+	PORT_DIPSETTING(0x2ff, "75")
+	PORT_DIPSETTING(0x1ff, "110")
+	PORT_DIPSETTING(0x37f, "150")
+	PORT_DIPSETTING(0x3bf, "300")
+	PORT_DIPSETTING(0x3df, "600")
+	PORT_DIPSETTING(0x3ef, "1200")
+	PORT_DIPSETTING(0x3f7, "2400")
+	PORT_DIPSETTING(0x3fb, "4800")
+	PORT_DIPSETTING(0x3fd, "9600")
+	PORT_DIPSETTING(0x3fe, "19200")
+
+	PORT_START("UARTCTRL")
+	PORT_DIPNAME(0x11, 0x11, "Parity Select") PORT_DIPLOCATION("S2:9,5") PORT_CHANGED_MEMBER(DEVICE_SELF, tv912_state, uart_settings_changed, nullptr)
+	PORT_DIPSETTING(0x11, "None")
+	PORT_DIPSETTING(0x01, "Even")
+	PORT_DIPSETTING(0x00, "Odd")
+	PORT_DIPNAME(0x08, 0x00, "Stop Bits") PORT_DIPLOCATION("S2:6") PORT_CHANGED_MEMBER(DEVICE_SELF, tv912_state, uart_settings_changed, nullptr)
+	PORT_DIPSETTING(0x00, "1")
+	PORT_DIPSETTING(0x08, "2")
+	PORT_DIPNAME(0x04, 0x04, "Data Bits") PORT_DIPLOCATION("S2:7") PORT_CHANGED_MEMBER(DEVICE_SELF, tv912_state, uart_settings_changed, nullptr)
+	PORT_DIPSETTING(0x00, "7")
+	PORT_DIPSETTING(0x04, "8")
+	PORT_DIPUNUSED_DIPLOC(0x02, 0x02, "S2:8")
+
 	PORT_START("MODIFIERS")
 	PORT_DIPNAME(0x80, 0x80, "Refresh Rate") PORT_DIPLOCATION("S2:4")
 	PORT_DIPSETTING(0x00, "50 Hz")
@@ -637,6 +752,10 @@ MACHINE_CONFIG_START(tv912_state::tv912)
 	MCFG_TMS9927_VSYN_CALLBACK(INPUTLINE("maincpu", MCS48_INPUT_IRQ))
 
 	MCFG_DEVICE_ADD("uart", AY51013, 0)
+	MCFG_AY51013_READ_SI_CB(DEVREADLINE("rs232", rs232_port_device, rxd_r))
+	MCFG_AY51013_WRITE_SO_CB(DEVWRITELINE("rs232", rs232_port_device, write_txd))
+
+	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, nullptr)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("beep", BEEP, XTAL_23_814MHz / 7 / 11 / 256) // nominally 1200 Hz (same clock as for 75 baud setting)
