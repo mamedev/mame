@@ -17,8 +17,8 @@
 	</software>
 
 	<!-- Apps -->
-	<software name="combi">
-		<description></description>
+	<software name="combi" supported="no">
+		<description>Custom integrated office suite</description>
 		<year>1983</year>
 		<publisher>OMS - Office Management Systems AB</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -97,4 +97,24 @@
 		</part>
 	</software>
 
+	<software name="spel">
+		<description>Collections of small games</description>
+		<year>1987</year>
+		<publisher>Various authors</publisher>
+		<part name="spel1" interface="floppy_5_25">
+			<dataarea name="flop" size="666392">
+				<rom name="SPEL1.IMD" size="666392" crc="62eae5c0" sha1="e33e9e901a649114312c75780fefbd9bb27a18c7" offset="0" />
+			</dataarea>
+		</part>
+		<part name="spel2" interface="floppy_5_25">
+			<dataarea name="flop" size="509004">
+				<rom name="SPEL2.IMD" size="509004" crc="07abdac4" sha1="a665d8862f80234ca85a9dc14ae89ff202c70860" offset="0" />
+			</dataarea>
+		</part>
+		<part name="spel3" interface="floppy_5_25">
+			<dataarea name="flop" size="461481">
+				<rom name="SPEL3.IMD" size="461481" crc="771eafc3" sha1="1bc8879355dee5877ea8bb1c16256fa28eb10547" offset="0" />
+			</dataarea>
+		</part>
+	</software>
 </softwarelist>
