@@ -52,6 +52,7 @@ public:
 		, m_kbdrom(*this, "keyboard")
 		, m_kbspecial(*this, "keyb_special")
 		, m_beep(*this, "bell")
+		, m_dsw1(*this, "DSW1")
 	{ }
 
 	virtual void machine_start() override;
@@ -86,6 +87,7 @@ private:
 	required_memory_region m_kbdrom;
 	required_ioport m_kbspecial;
 	required_device<beep_device> m_beep;
+	required_ioport m_dsw1;
 
 	uint16_t m_lastchar, m_strobe;
 	uint8_t m_transchar;
@@ -385,11 +387,12 @@ static INPUT_PORTS_START( tv910 )
 	PORT_DIPNAME( 0x80, 0x00, "Duplex" )
 	PORT_DIPSETTING( 0x00, "Half Duplex" )
 	PORT_DIPSETTING( 0x80, "Full Duplex" )
-#if 0
-	PORT_DIPNAME( 0x100, 0x000, "Colors" )
-	PORT_DIPSETTING( 0x00, "Black characters on white screen" )
-	PORT_DIPSETTING( 0x100, "White characters on black screen" )
 
+	PORT_DIPNAME( 0x100, 0x100, "Colors" )
+	PORT_DIPSETTING( 0x00, "Black characters on green screen" )
+	PORT_DIPSETTING( 0x100, "Green characters on black screen" )
+
+#if 0
 	PORT_DIPNAME( 0x200, 0x200, "Data Set Ready" )
 	PORT_DIPSETTING( 0x00, "DSR connected" )
 	PORT_DIPSETTING( 0x200, "DSR disconnected" )
@@ -424,47 +427,46 @@ WRITE8_MEMBER(tv910_state::vbl_ack_w)
 MC6845_UPDATE_ROW( tv910_state::crtc_update_row )
 {
 	uint32_t  *p = &bitmap.pix32(y);
-	uint16_t  chr_base = (ra + 1) & 7;
+	uint16_t  chr_base = ra & 7;
+	uint8_t   chr = m_vram[0x7ff];
+	uint8_t   att = (chr & 0xf0) == 0x90 ? chr & 0x0f : 0;
+	bool      bow = BIT(m_dsw1->read(), 8);
 
 	for (int i = 0; i < x_count; i++)
 	{
 		uint16_t offset = ( ma + i ) & 0x7ff;
 		uint8_t chr = m_vram[ offset ];
-		uint8_t data = m_chrrom[ chr_base + chr * 8 ];
+		bool att_blk = (chr & 0xf0) == 0x90;
+		bool half_int = BIT(chr, 7) && !att_blk;
+		if (att_blk)
+			att = chr & 0x0f;
+
+		uint8_t data = m_chrrom[chr_base | (chr & 0x7f) << 3];
 		rgb_t fg = rgb_t::green();
 		rgb_t bg = rgb_t::black();
+		if (half_int)
+			fg = rgb_t(fg.r() / 2, fg.g() / 2, fg.b() / 2);
 
-		if ( i == cursor_x )
-		{
-			if (m_control & 2)
-			{
-				data = 0xFF;
-			}
-		}
+		if (ra == 9)
+			data = BIT(att, 3) ? 0xff : 0;
+		else if (ra == 0 || att_blk || BIT(att, 0) || (BIT(att, 1) && BIT(m_control, 1)))
+			data = 0;
 
-		if ((y % 10) >= 8)
-		{
-			*p++ = rgb_t::black();
-			*p++ = rgb_t::black();
-			*p++ = rgb_t::black();
-			*p++ = rgb_t::black();
-			*p++ = rgb_t::black();
-			*p++ = rgb_t::black();
-			*p++ = rgb_t::black();
-			*p++ = rgb_t::black();
-			*p++ = rgb_t::black();
-		}
-		else
-		{
-			*p = BIT(data, 7) ? fg : bg; p++;
-			*p = BIT(data, 6) ? fg : bg; p++;
-			*p = BIT(data, 5) ? fg : bg; p++;
-			*p = BIT(data, 4) ? fg : bg; p++;
-			*p = BIT(data, 3) ? fg : bg; p++;
-			*p = BIT(data, 2) ? fg : bg; p++;
-			*p = BIT(data, 1) ? fg : bg; p++;
-			*p = BIT(data, 0) ? fg : bg; p++;
-		}
+		if (i == cursor_x && BIT(m_control, 1))
+			data ^= 0xff;
+		if (BIT(att, 2))
+			data ^= 0xff;
+		if (bow)
+			data ^= 0xff;
+
+		*p = BIT(data, 7) ? bg : fg; p++;
+		*p = BIT(data, 6) ? bg : fg; p++;
+		*p = BIT(data, 5) ? bg : fg; p++;
+		*p = BIT(data, 4) ? bg : fg; p++;
+		*p = BIT(data, 3) ? bg : fg; p++;
+		*p = BIT(data, 2) ? bg : fg; p++;
+		*p = BIT(data, 1) ? bg : fg; p++;
+		*p = BIT(data, 0) ? bg : fg; p++;
 	}
 }
 
@@ -477,7 +479,7 @@ MACHINE_CONFIG_START(tv910_state::tv910)
 	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("maincpu", M6502_IRQ_LINE))
 
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK, 882, 0, 720, 370, 0, 350 ) // not real values
+	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK, 720, 0, 640, 315, 0, 250)
 	MCFG_SCREEN_UPDATE_DEVICE( CRTC_TAG, r6545_1_device, screen_update )
 
 	MCFG_MC6845_ADD(CRTC_TAG, R6545_1, "screen", MASTER_CLOCK/8)
