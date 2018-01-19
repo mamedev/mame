@@ -36,7 +36,7 @@
 #define RS232_TAG   "rs232"
 #define KBDC_TAG    "ay3600"
 
-#define MASTER_CLOCK (13608000)
+#define MASTER_CLOCK XTAL_13_608MHz
 
 class tv910_state : public driver_device
 {

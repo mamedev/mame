@@ -93,7 +93,7 @@ enum
 	XTAL_5_5296MHz      = 5529600,      /* Kontron PSI98 keyboard */
 	XTAL_5_626MHz       = 5626000,      /* RCA CDP1869 PAL dot clock */
 	XTAL_5_67MHz        = 5670000,      /* RCA CDP1869 NTSC dot clock */
-	XTAL_5_7143MHz      = 5714300,      /* Cidelsa Destroyer */
+	XTAL_5_7143MHz      = 5714300,      /* Cidelsa Destroyer, TeleVideo serial keyboards */
 	XTAL_5_911MHz       = 5911000,      /* Philips Videopac Plus G7400 */
 	XTAL_5_9904MHz      = 5990400,      /* Luxor ABC 800 keyboard (Keytronic custom part #48-300-008 is equivalent) */
 	XTAL_6MHz           = 6000000,      /* American Poker II, Taito SJ System */
@@ -158,8 +158,10 @@ enum
 	XTAL_13_33056MHz    = 13330560,     /* Taito L */
 	XTAL_13_333MHz      = 13333000,     /* Ojanko High School */
 	XTAL_13_4MHz        = 13400000,     /* TNK3, Ikari Warriors h/w */
+	XTAL_13_4784MHz     = 13478400,     /* TeleVideo 970 80-column display clock */
 	XTAL_13_4952MHz     = 13495200,     /* Used on Shadow Force pcb and maybe other Technos pcbs? */
 	XTAL_13_5168MHz     = 13516800,     /* Kontron KDT6 */
+	XTAL_13_608MHz      = 13608000,     /* TeleVideo 910 & 925 */
 	XTAL_14MHz          = 14000000,
 	XTAL_14_112MHz      = 14112000,     /* Timex/Sinclair TS2068 */
 	XTAL_14_192640MHz   = 14192640,     /* Central Data 2650 */
@@ -221,10 +223,11 @@ enum
 	XTAL_22MHz          = 22000000,
 	XTAL_22_096MHz      = 22096000,     /* ADDS Viewpoint 122 */
 	XTAL_22_1184MHz     = 22118400,     /* Amusco Poker */
+	XTAL_22_2544MHz     = 22254400,     /* TeleVideo 970 132-column display clock */
 	XTAL_22_3210MHz     = 22321000,     /* Apple LaserWriter II NT */
 	XTAL_22_656MHz      = 22656000,     /* Super Pinball Action (~1440x NTSC line rate) */
 	XTAL_22_896MHz      = 22896000,     /* DEC VT220 132-column display clock */
-	XTAL_23_814MHz      = 23814000,     /* TeleVideo TVI-912C & 950 */
+	XTAL_23_814MHz      = 23814000,     /* TeleVideo TVI-912, 920 & 950 */
 	XTAL_23_9616MHz     = 23961600,     /* Osborne 4 (Vixen) */
 	XTAL_24MHz          = 24000000,     /* Mario, 80's Data East games, 80's Konami games */
 	XTAL_24_0734MHz     = 24073400,     /* DEC Rainbow 100 */
