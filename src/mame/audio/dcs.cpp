@@ -1987,8 +1987,7 @@ TIMER_DEVICE_CALLBACK_MEMBER( dcs_audio_device::sport0_irq )
 	/* note that there is non-interrupt code that reads/modifies/writes the output_control */
 	/* register; if we don't interlock it, we will eventually lose sound (see CarnEvil) */
 	/* so we skip the SPORT interrupt if we read with output_control within the last 5 cycles */
-	// Can't seem to trigger this problem anymore.  Skipping this check for now. TG
-	if (1 || (m_cpu->total_cycles() - m_output_control_cycles) > 5)
+	if ((m_cpu->total_cycles() - m_output_control_cycles) > 5)
 	{
 		m_cpu->set_input_line(ADSP2115_SPORT0_RX, ASSERT_LINE);
 		m_cpu->set_input_line(ADSP2115_SPORT0_RX, CLEAR_LINE);
