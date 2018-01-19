@@ -23,6 +23,7 @@
 #include "emu.h"
 #include "bus/rs232/rs232.h"
 #include "cpu/m6502/m6502.h"
+#include "machine/input_merger.h"
 #include "machine/kb3600.h"
 #include "machine/mos6551.h"
 #include "sound/beep.h"
@@ -43,8 +44,10 @@ public:
 	tv910_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
+		, m_mainirq(*this, "mainirq")
 		, m_crtc(*this, CRTC_TAG)
 		, m_vram(*this, "vram")
+		, m_chrrom(*this, "graphics")
 		, m_ay3600(*this, KBDC_TAG)
 		, m_kbdrom(*this, "keyboard")
 		, m_kbspecial(*this, "keyb_special")
@@ -66,24 +69,23 @@ public:
 	DECLARE_WRITE8_MEMBER(control_w);
 
 	DECLARE_WRITE_LINE_MEMBER(vbl_w);
-	DECLARE_WRITE_LINE_MEMBER(acia_irq_w);
 
 	DECLARE_READ_LINE_MEMBER(ay3600_shift_r);
 	DECLARE_READ_LINE_MEMBER(ay3600_control_r);
 	DECLARE_WRITE_LINE_MEMBER(ay3600_data_ready_w);
 	DECLARE_WRITE_LINE_MEMBER(ay3600_ako_w);
 
+	void tv910(machine_config &config);
+private:
 	required_device<m6502_device> m_maincpu;
+	required_device<input_merger_device> m_mainirq;
 	required_device<r6545_1_device> m_crtc;
 	required_shared_ptr<uint8_t> m_vram;
+	required_region_ptr<uint8_t> m_chrrom;
 	required_device<ay3600_device> m_ay3600;
 	required_memory_region m_kbdrom;
 	required_ioport m_kbspecial;
 	required_device<beep_device> m_beep;
-
-	void tv910(machine_config &config);
-private:
-	uint8_t *m_vramptr, *m_chrrom;
 
 	uint16_t m_lastchar, m_strobe;
 	uint8_t m_transchar;
@@ -91,8 +93,6 @@ private:
 	int m_repeatdelay;
 
 	uint8_t m_control;
-
-	bool m_vbl_irq, m_aica_irq;
 };
 
 static ADDRESS_MAP_START(tv910_mem, AS_PROGRAM, 8, tv910_state)
@@ -398,8 +398,6 @@ INPUT_PORTS_END
 
 void tv910_state::machine_start()
 {
-	m_vramptr = m_vram.target();
-	m_chrrom = memregion("graphics")->base();
 }
 
 void tv910_state::machine_reset()
@@ -415,54 +413,26 @@ WRITE_LINE_MEMBER(tv910_state::vbl_w)
 {
 	// this is ACKed by vbl_ack_w, state going 0 here doesn't ack the IRQ
 	if (state)
-	{
-		m_vbl_irq = true;
-		m_maincpu->set_input_line(M6502_IRQ_LINE, ASSERT_LINE);
-	}
-}
-
-WRITE_LINE_MEMBER(tv910_state::acia_irq_w)
-{
-	m_aica_irq = (state == ASSERT_LINE) ? true : false;
-
-	if (m_aica_irq || m_vbl_irq)
-	{
-		m_maincpu->set_input_line(M6502_IRQ_LINE, ASSERT_LINE);
-	}
-	else
-	{
-		m_maincpu->set_input_line(M6502_IRQ_LINE, CLEAR_LINE);
-	}
+		m_mainirq->in_w<0>(1);
 }
 
 WRITE8_MEMBER(tv910_state::vbl_ack_w)
 {
-	m_vbl_irq = false;
-
-	if (m_aica_irq || m_vbl_irq)
-	{
-		m_maincpu->set_input_line(M6502_IRQ_LINE, ASSERT_LINE);
-	}
-	else
-	{
-		m_maincpu->set_input_line(M6502_IRQ_LINE, CLEAR_LINE);
-	}
+	m_mainirq->in_w<0>(0);
 }
 
 MC6845_UPDATE_ROW( tv910_state::crtc_update_row )
 {
-	static const uint32_t palette[2] = { 0, 0x00ff00 };
 	uint32_t  *p = &bitmap.pix32(y);
 	uint16_t  chr_base = (ra + 1) & 7;
-	int i;
 
-	for ( i = 0; i < x_count; i++ )
+	for (int i = 0; i < x_count; i++)
 	{
 		uint16_t offset = ( ma + i ) & 0x7ff;
-		uint8_t chr = m_vramptr[ offset ];
+		uint8_t chr = m_vram[ offset ];
 		uint8_t data = m_chrrom[ chr_base + chr * 8 ];
-		uint8_t fg = 1;
-		uint8_t bg = 0;
+		rgb_t fg = rgb_t::green();
+		rgb_t bg = rgb_t::black();
 
 		if ( i == cursor_x )
 		{
@@ -474,26 +444,26 @@ MC6845_UPDATE_ROW( tv910_state::crtc_update_row )
 
 		if ((y % 10) >= 8)
 		{
-			*p++ = palette[0];
-			*p++ = palette[0];
-			*p++ = palette[0];
-			*p++ = palette[0];
-			*p++ = palette[0];
-			*p++ = palette[0];
-			*p++ = palette[0];
-			*p++ = palette[0];
-			*p++ = palette[0];
+			*p++ = rgb_t::black();
+			*p++ = rgb_t::black();
+			*p++ = rgb_t::black();
+			*p++ = rgb_t::black();
+			*p++ = rgb_t::black();
+			*p++ = rgb_t::black();
+			*p++ = rgb_t::black();
+			*p++ = rgb_t::black();
+			*p++ = rgb_t::black();
 		}
 		else
 		{
-			*p = palette[( data & 0x80 ) ? fg : bg]; p++;
-			*p = palette[( data & 0x40 ) ? fg : bg]; p++;
-			*p = palette[( data & 0x20 ) ? fg : bg]; p++;
-			*p = palette[( data & 0x10 ) ? fg : bg]; p++;
-			*p = palette[( data & 0x08 ) ? fg : bg]; p++;
-			*p = palette[( data & 0x04 ) ? fg : bg]; p++;
-			*p = palette[( data & 0x02 ) ? fg : bg]; p++;
-			*p = palette[( data & 0x01 ) ? fg : bg]; p++;
+			*p = BIT(data, 7) ? fg : bg; p++;
+			*p = BIT(data, 6) ? fg : bg; p++;
+			*p = BIT(data, 5) ? fg : bg; p++;
+			*p = BIT(data, 4) ? fg : bg; p++;
+			*p = BIT(data, 3) ? fg : bg; p++;
+			*p = BIT(data, 2) ? fg : bg; p++;
+			*p = BIT(data, 1) ? fg : bg; p++;
+			*p = BIT(data, 0) ? fg : bg; p++;
 		}
 	}
 }
@@ -502,6 +472,9 @@ MACHINE_CONFIG_START(tv910_state::tv910)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, MASTER_CLOCK/8)
 	MCFG_CPU_PROGRAM_MAP(tv910_mem)
+
+	MCFG_INPUT_MERGER_ANY_HIGH("mainirq")
+	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("maincpu", M6502_IRQ_LINE))
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK, 882, 0, 720, 370, 0, 350 ) // not real values
@@ -531,7 +504,7 @@ MACHINE_CONFIG_START(tv910_state::tv910)
 
 	MCFG_DEVICE_ADD(ACIA_TAG, MOS6551, 0)
 	MCFG_MOS6551_XTAL(XTAL_1_8432MHz)
-	MCFG_MOS6551_IRQ_HANDLER(WRITELINE(tv910_state, acia_irq_w))
+	MCFG_MOS6551_IRQ_HANDLER(DEVWRITELINE("mainirq", input_merger_device, in_w<1>))
 	MCFG_MOS6551_TXD_HANDLER(DEVWRITELINE(RS232_TAG, rs232_port_device, write_txd))
 	MCFG_MOS6551_RTS_HANDLER(DEVWRITELINE(RS232_TAG, rs232_port_device, write_rts))
 	MCFG_MOS6551_DTR_HANDLER(DEVWRITELINE(RS232_TAG, rs232_port_device, write_dtr))
