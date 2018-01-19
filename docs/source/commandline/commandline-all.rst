@@ -9,9 +9,13 @@ This section contains configuration options that are applicable to *all* MAME su
 Core commands
 -------------
 
+.. _mame-commandline-help:
+
 **-help** / **-h** / **-?**
 
 	Displays current MAME version and copyright notice.
+
+.. _mame-commandline-validate:
 
 **-validate** / **-valid**
 
@@ -24,11 +28,15 @@ Core commands
 Configuration commands
 ----------------------
 
+.. _mame-commandline-createconfig:
+
 **-createconfig** / **-cc**
 
 	Creates the default mame.ini file. All the configuration options
 	(not commands) described below can be permanently changed by editing
 	this configuration file.
+
+.. _mame-commandline-showconfig:
 
 **-showconfig** / **-sc**
 
@@ -38,6 +46,8 @@ Configuration commands
 		**mame -showconfig >mame.ini**
 
 	is equivalent to **-createconfig**.
+
+.. _mame-commandline-showusage:
 
 **-showusage** / **-su**
 
@@ -52,51 +62,72 @@ Frontend commands
 
 Note: By default, all the '**-list**' commands below write info to the screen. If you wish to write the info to a textfile instead, add this to the end of your command:
 
-  > filename
+  **> filename**
 
 ...where 'filename' is the textfile's path and name (e.g., c:\\mame\\list.txt).
 
+
+.. _mame-commandline-listxml:
 
 **-listxml** / **-lx** [*<gamename|wildcard>*]
 
 	List comprehensive details for all of the supported games. The output is quite long, so it is usually better to redirect this into a file. The output is in XML format. By default all games are listed; however, you can limit this list by specifying a driver name or wildcard after the -listxml command.
 
+.. _mame-commandline-listfull:
+
 **-listfull** / **-ll** [*<gamename|wildcard>*]
 
 	Displays a list of game driver names and descriptions. By default all games are listed; however, you can limit this list by specifying a driver name or wildcard after the **-listfull** command.
+
+.. _mame-commandline-listsource:
 
 **-listsource** / **-ls** [<*gamename|wildcard>*]
 
 	Displays a list of drivers and the names of the source files their game drivers live in. Useful for finding which driver a game runs on in order to fix bugs. By default all games are listed; however, you	can limit this list by specifying a driver name or wildcard after the **-listsource** command.
 
+.. _mame-commandline-listclones:
+
 **-listclones** / **-lc** [<*gamename|wildcard*>]
 
 	Displays a list of clones. By default all clones are listed; however, you can limit this list by specifying a driver name or wildcard after the **-listsource** command.
+
+.. _mame-commandline-listbrothers:
 
 **-listbrothers** / **-lb** [<*gamename|wildcard*>]
 
 	Displays a list of '*brothers*', or rather, other sets which are located in the same sourcefile as the gamename searched for.
 
+.. _mame-commandline-listcrc:
+
 **-listcrc** [<*gamename|wildcard*>]
 
 	Displays a full list of CRCs of all ROM images referenced by all drivers within MAME.
+
+.. _mame-commandline-listroms:
 
 **-listroms** [<*gamename|wildcard*>]
 
 	Displays a list of ROM images referenced by the specified game.
 
+.. _mame-commandline-listsamples:
 
 **-listsamples** [<*gamename|wildcard*>]
 
 	Displays a list of samples referenced by the specified game.
 
+.. _mame-commandline-verifyroms:
+
 **-verifyroms** [<*gamename|wildcard*>]
 
 	Checks for invalid or missing ROM images. By default all drivers that have valid ZIP files or directories in the rompath are verified; however, you can limit this list by specifying a driver name or wildcard after the **-verifyroms** command.
 
+.. _mame-commandline-verifysamples:
+
 **-verifysamples** [<*gamename|wildcard*>]
 
 	Checks for invalid or missing samples. By default all drivers that have valid ZIP files or directories in the samplepath are verified;	however, you can limit this list by specifying a driver name or wildcard after the **-verifyroms** command.
+
+.. _mame-commandline-romident:
 
 **-romident** [*path\\to\\romstocheck.zip*]
 
@@ -107,9 +138,13 @@ Note: By default, all the '**-list**' commands below write info to the screen. I
 		* 8: means some files were identified
 		* 9: means no files were identified
 
+.. _mame-commandline-listdevices:
+
 **-listdevices** / **-ld** [<*gamename|wildcard*>]
 
         Displays a list of all devices known to be hooked up to a game.  The ":" is considered the game itself with the devices list being attached to give the user a better understanding of what the emulation is using.
+
+.. _mame-commandline-listslots:
 
 **-listslots** [<*gamename|wildcard*>]
 
@@ -117,21 +152,31 @@ Note: By default, all the '**-list**' commands below write info to the screen. I
 		
         The slot name (e.g. **ctrl1**) can be used from the command line (**-ctrl1** in this case) 
 
+.. _mame-commandline-listmedia:
+
 **-listmedia** / **-lm** [<*gamename|wildcard*>]
 
         List available media that the chosen game or system allows to be used.  This includes media types (cartridge, cassette, diskette and more) as well as common file extentions which are supported.
+
+.. _mame-commandline-listsoftware:
 
 **-listsoftware** [<*gamename|wildcard*>]
 
         Posts to screen all software lists which can be used by the entered gamename or system.  Note that this is simply a copy/paste of the .XML file which reside in the HASH folder which are allowed to be used.
 
+.. _mame-commandline-verifysoftware:
+
 **-verifysoftware** [<*gamename|wildcard*>]
 
 	Checks for invalid or missing ROM images in your software lists. By default all drivers that have valid ZIP files or directories in the rompath are verified; however, you can limit this list by specifying a specific driver name or wildcard after the -verifysoftware command.
 
+.. _mame-commandline-getsoftlist:
+
 **-getsoftlist** [<*gamename|wildcard*>]
 
         Posts to screen a specific software list which matches with the gamename provided.
+
+.. _mame-commandline-verifysoftlist:
 
 **-verifysoftlist** [softwarelistname]
 
@@ -143,17 +188,25 @@ Note: By default, all the '**-list**' commands below write info to the screen. I
 OSD related options
 -------------------
 
+.. _mame-commandline-uimodekey:
+
 **-uimodekey** [*keystring*]
 
 	Key used to toggle emulated keyboard on and off.  Default setting is *SCRLOCK*.
+
+.. _mame-commandline-uifontprovider:
 
 **\-uifontprovider**
 
 	Chooses provider for UI font:  win, none or auto.  Default setting is *AUTO*.
 
+.. _mame-commandline-menu:
+
 **\-menu**
 
 	Enables menu bar at the top of the MAME window, if available by UI implementation.  Default is *OFF*
+
+.. _mame-commandline-keyboardprovider:
 
 **\-keyboardprovider**
 
@@ -164,6 +217,8 @@ OSD related options
 	
 	The default is *auto*. On Windows, auto will try rawinput with fallback to dinput. On SDL, auto will default to sdl.
 	
+.. _mame-commandline-mouseprovider:
+
 **\-mouseprovider**
 
 	Chooses how MAME will get mouse input.
@@ -173,6 +228,8 @@ OSD related options
 	
 	The default is *auto*. On Windows, auto will try rawinput with fallback to dinput. On SDL, auto will default to sdl.
 
+.. _mame-commandline-lightgunprovider:
+
 **\-lightgunprovider**
 
 	Chooses how MAME will get light gun input.
@@ -181,6 +238,8 @@ OSD related options
 	On SDL, you can choose from: auto, x11 or none
 
 	The default is *auto*. On Windows, auto will try rawinput with fallback to win32, or none if it doesn't find any. On SDL/Linux, auto will default to x11, or none if it doesn't find any. On other SDL, auto will default to none.
+
+.. _mame-commandline-joystickprovider:
 
 **\-joystickprovider**
 
