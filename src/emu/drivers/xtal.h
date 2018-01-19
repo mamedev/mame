@@ -217,13 +217,13 @@ enum
 	XTAL_21MHz          = 21000000,     /* Lock-On pixel clock */
 	XTAL_21_0526MHz     = 21052600,     /* NEC PC-98xx pixel clock */
 	XTAL_21_06MHz       = 21060000,     /* HP 264x display clock (60 Hz configuration) */
+	XTAL_21_2544MHz     = 21254400,     /* TeleVideo 970 132-column display clock */
 	XTAL_21_28137MHz    = 21281370,     /* Radica Tetris */
 	XTAL_21_3MHz        = 21300000,
 	XTAL_21_4772MHz     = 21477272,     /* BMC bowling, some Data East 90's games, Vtech Socrates; (6x NTSC subcarrier) */
 	XTAL_22MHz          = 22000000,
 	XTAL_22_096MHz      = 22096000,     /* ADDS Viewpoint 122 */
 	XTAL_22_1184MHz     = 22118400,     /* Amusco Poker */
-	XTAL_22_2544MHz     = 22254400,     /* TeleVideo 970 132-column display clock */
 	XTAL_22_3210MHz     = 22321000,     /* Apple LaserWriter II NT */
 	XTAL_22_656MHz      = 22656000,     /* Super Pinball Action (~1440x NTSC line rate) */
 	XTAL_22_896MHz      = 22896000,     /* DEC VT220 132-column display clock */
@@ -243,6 +243,7 @@ enum
 	XTAL_25_7715MHz     = 25771500,     /* HP-2622A */
 	XTAL_25_92MHz       = 25920000,     /* ADDS Viewpoint 60 */
 	XTAL_26MHz          = 26000000,     /* Gaelco PCBs */
+	XTAL_26_366MHz      = 26366000,     /* DEC VT320 */
 	XTAL_26_580MHz      = 26580000,     /* Wyse WY-60 80-column display clock */
 	XTAL_26_601712MHz   = 26601712,     /* Astro Corp.'s Show Hand, PAL Vtech/Yeno Socrates (6x PAL subcarrier) */
 	XTAL_26_666MHz      = 26666000,     /* Imagetek I4100/I4220/I4300 */
@@ -271,6 +272,7 @@ enum
 	XTAL_31_9488MHz     = 31948800,     /* NEC PC-88xx, PC-98xx */
 	XTAL_32MHz          = 32000000,
 	XTAL_32_22MHz       = 32220000,     /* Typically used on 90's Data East PCBs (close to 9x NTSC subcarrier which is 32.215905Mhz*/
+	XTAL_32_3174MHz     = 32317400,     /* DEC VT330, VT340 */
 	XTAL_32_5304MHz     = 32530400,     /* Seta 2 */
 	XTAL_33MHz          = 33000000,     /* Sega Model 3 video board */
 	XTAL_33_264MHz      = 33264000,     /* Hazeltine 1500 terminal */
