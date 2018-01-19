@@ -567,8 +567,11 @@ READ32_MEMBER( vegas_state::timekeeper_r )
 		result = (result & ~0x00ff0000) | (m_timekeeper->read(space, offset * 4 + 2, 0xff) << 16);
 	if (ACCESSING_BITS_24_31)
 		result = (result & ~0xff000000) | (m_timekeeper->read(space, offset * 4 + 3, 0xff) << 24);
-	if (offset*4 >= 0x7ff0)
-		if (LOG_TIMEKEEPER) logerror("timekeeper_r(%04X & %08X) = %08X\n", offset*4, mem_mask, result);
+	if (offset * 4 >= 0x7ff0) {
+		// Initial RTC check expects reads to the RTC to take some time
+		machine().device<cpu_device>("maincpu")->eat_cycles(30);
+		if (LOG_TIMEKEEPER) logerror("%s: timekeeper_r(%04X & %08X) = %08X\n", machine().describe_context(), offset * 4, mem_mask, result);
+	}
 	return result;
 }
 
@@ -618,7 +621,7 @@ WRITE_LINE_MEMBER(vegas_state::vblank_assert)
 	if (LOG_SIO)
 		logerror("vblank_assert: m_sio_reset_ctrl: %04x state: %d\n", m_sio_reset_ctrl, state);
 	// latch on the correct polarity transition
-	if ((state && !(m_sio_reset_ctrl & 0x10)) || (!state && (m_sio_reset_ctrl & 0x10)))
+	if ((m_sio_irq_enable & 0x20) && ((state && !(m_sio_reset_ctrl & 0x10)) || (!state && (m_sio_reset_ctrl & 0x10))))
 	{
 		m_sio_irq_state |= 0x20;
 		update_sio_irqs();
@@ -679,6 +682,7 @@ READ8_MEMBER(vegas_state::sio_r)
 			std::string sioBitSel = sioIRQString(result);
 			logerror("%08X: sio_r: INTR CAUSE 0x%02x %s\n", machine().device("maincpu")->safe_pc(), result, sioBitSel);
 		}
+		//m_sio_irq_state &= ~0x02;
 		break;
 	case 3:
 		// Interrupt Status
@@ -889,8 +893,8 @@ READ32_MEMBER( vegas_state::analog_port_r )
 {
 	//logerror("%08X: analog_port_r = %08X & %08X\n", machine().device("maincpu")->safe_pc(), m_pending_analog_read, mem_mask);
 	// Clear interrupt
+	m_sio_irq_state &= ~0x02;
 	if (m_sio_irq_enable & 0x02) {
-		m_sio_irq_state &= ~0x02;
 		update_sio_irqs();
 	}
 	// TODO: Need to look at the proper shift value for sf2049
@@ -1050,6 +1054,7 @@ CUSTOM_INPUT_MEMBER(vegas_state::i40_r)
 		data = ~index & 0xf;
 		break;
 	default:
+		//logerror("%08X: i40_r: select: %x index: %d data: %x\n", machine().device("maincpu")->safe_pc(), m_i40_data, index, data);
 		break;
 	}
 	//if (m_i40_data & 0x1000)
@@ -1883,7 +1888,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_DERIVED(vegas_state::roadburn, vegas32m)
 	MCFG_DEVICE_ADD("dcs", DCS2_AUDIO_DSIO, 0)
 	MCFG_DCS2_AUDIO_DRAM_IN_MB(4)
-	MCFG_DCS2_AUDIO_POLLING_OFFSET(0x200a)
+	MCFG_DCS2_AUDIO_POLLING_OFFSET(0x0ddd)
 
 	MCFG_DEVICE_ADD("ioasic", MIDWAY_IOASIC, 0)
 	MCFG_MIDWAY_IOASIC_SHUFFLE(MIDWAY_IOASIC_STANDARD)
@@ -1937,7 +1942,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_DERIVED(vegas_state::sf2049, denver)
 	MCFG_DEVICE_ADD("dcs", DCS2_AUDIO_DENVER, 0)
 	MCFG_DCS2_AUDIO_DRAM_IN_MB(8)
-	MCFG_DCS2_AUDIO_POLLING_OFFSET(0x200d)
+	MCFG_DCS2_AUDIO_POLLING_OFFSET(0x872)
 
 	MCFG_DEVICE_ADD("ioasic", MIDWAY_IOASIC, 0)
 	MCFG_MIDWAY_IOASIC_SHUFFLE(MIDWAY_IOASIC_STANDARD)
@@ -1951,6 +1956,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_DERIVED(vegas_state::sf2049se, denver)
 	MCFG_DEVICE_ADD("dcs", DCS2_AUDIO_DENVER, 0)
 	MCFG_DCS2_AUDIO_DRAM_IN_MB(8)
+	MCFG_DCS2_AUDIO_POLLING_OFFSET(0x872)
 
 	MCFG_DEVICE_ADD("ioasic", MIDWAY_IOASIC, 0)
 	MCFG_MIDWAY_IOASIC_SHUFFLE(MIDWAY_IOASIC_SFRUSHRK)
@@ -1964,6 +1970,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_DERIVED(vegas_state::sf2049te, denver)
 	MCFG_DEVICE_ADD("dcs", DCS2_AUDIO_DENVER, 0)
 	MCFG_DCS2_AUDIO_DRAM_IN_MB(8)
+	MCFG_DCS2_AUDIO_POLLING_OFFSET(0x872)
 
 	MCFG_DEVICE_ADD("ioasic", MIDWAY_IOASIC, 0)
 	MCFG_MIDWAY_IOASIC_SHUFFLE(MIDWAY_IOASIC_SFRUSHRK)
@@ -1977,6 +1984,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_DERIVED(vegas_state::cartfury, vegasv3)
 	MCFG_DEVICE_ADD("dcs", DCS2_AUDIO_2104, 0)
 	MCFG_DCS2_AUDIO_DRAM_IN_MB(4)
+	MCFG_DCS2_AUDIO_POLLING_OFFSET(0x0b5d)
 
 	MCFG_DEVICE_ADD("ioasic", MIDWAY_IOASIC, 0)
 	MCFG_MIDWAY_IOASIC_SHUFFLE(MIDWAY_IOASIC_CARNEVIL)
