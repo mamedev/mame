@@ -25,8 +25,10 @@
 #include "cpu/m6502/m6502.h"
 #include "machine/kb3600.h"
 #include "machine/mos6551.h"
+#include "sound/beep.h"
 #include "video/mc6845.h"
 #include "screen.h"
+#include "speaker.h"
 
 #define ACIA_TAG    "acia1"
 #define CRTC_TAG    "crtc"
@@ -46,6 +48,7 @@ public:
 		, m_ay3600(*this, KBDC_TAG)
 		, m_kbdrom(*this, "keyboard")
 		, m_kbspecial(*this, "keyb_special")
+		, m_beep(*this, "bell")
 	{ }
 
 	virtual void machine_start() override;
@@ -76,6 +79,7 @@ public:
 	required_device<ay3600_device> m_ay3600;
 	required_memory_region m_kbdrom;
 	required_ioport m_kbspecial;
+	required_device<beep_device> m_beep;
 
 	void tv910(machine_config &config);
 private:
@@ -121,6 +125,8 @@ WRITE8_MEMBER(tv910_state::control_w)
 		(data & 0x2) ? 'C' : 'c',
 		(data & 1) ? 'B' : ' ');
 	#endif
+
+	m_beep->set_state(BIT(data, 0));
 }
 
 READ8_MEMBER(tv910_state::charset_r)
@@ -398,6 +404,7 @@ void tv910_state::machine_start()
 
 void tv910_state::machine_reset()
 {
+	control_w(machine().dummy_space(), 0, 0);
 }
 
 MC6845_ON_UPDATE_ADDR_CHANGED( tv910_state::crtc_update_addr )
@@ -535,6 +542,9 @@ MACHINE_CONFIG_START(tv910_state::tv910)
 	MCFG_RS232_DSR_HANDLER(DEVWRITELINE(ACIA_TAG, mos6551_device, write_dsr))
 	MCFG_RS232_CTS_HANDLER(DEVWRITELINE(ACIA_TAG, mos6551_device, write_cts))
 
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("bell", BEEP, MASTER_CLOCK / 8400) // 1620 Hz (Row 10 signal)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
 /* ROM definition */
@@ -551,4 +561,4 @@ ROM_END
 
 /* Driver */
 //    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT  STATE         INIT  COMPANY      FULLNAME  FLAGS
-COMP( 1981, tv910,  0,      0,       tv910,     tv910, tv910_state,  0,    "TeleVideo", "TV910",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1981, tv910,  0,      0,       tv910,     tv910, tv910_state,  0,    "TeleVideo", "TV910",  MACHINE_NOT_WORKING )
