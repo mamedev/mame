@@ -61,7 +61,7 @@
 /* only ROM from FF00-FFFF and DAT memory at FFF0-FFFF (write only) is guaranteed always*/
 
 static ADDRESS_MAP_START(mp09_mem, AS_PROGRAM, 8, swtpc09_state)
-	AM_RANGE(0x0000, 0xffef) AM_READWRITE(main_r, main_w)
+	AM_RANGE(0x0000, 0xfeff) AM_READWRITE(main_r, main_w)
 	AM_RANGE(0xff00, 0xffff) AM_ROM AM_REGION("maincpu", 0xff00)
 	AM_RANGE(0xff00, 0xff0f) AM_MIRROR(0xf0) AM_WRITEONLY AM_SHARE("dat")
 ADDRESS_MAP_END
