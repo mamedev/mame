@@ -10,11 +10,11 @@
     6545 CRTC
     6551 ACIA
 
-    IRQ = ACIA wire-OR CRTC VBlank
+    IRQ = ACIA gated with flip-flop driven by CRTC VBlank (not wire-OR)
     NMI = AY-5-3600 keyboard char present
 
     TODO:
-        - Character attributes: how is that even possible?  (Esc-V brings up test screen)
+        - Attributes might not all be correct (Esc-V brings up test screen)
         - DIP switches don't all appear to have the expected effects
         - Keyboard hookup isn't quite right
 
