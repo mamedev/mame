@@ -114,7 +114,7 @@ static ADDRESS_MAP_START( vadbank_map, AS_PROGRAM, 16, cybstorm_state )
 	AM_RANGE(0x002000, 0x003fff) AM_RAM_DEVWRITE("vad", atari_vad_device, playfield_latched_lsb_w) AM_SHARE("vad:playfield")
 	AM_RANGE(0x004000, 0x005fff) AM_RAM_DEVWRITE("vad", atari_vad_device, playfield_upper_w) AM_SHARE("vad:playfield_ext")
 	AM_RANGE(0x006000, 0x007fff) AM_RAM AM_SHARE("vad:mob")
-	AM_RANGE(0x008000, 0x008fef) AM_DEVWRITE("vad", atari_vad_device, alpha_w) AM_SHARE("vad:alpha")
+	AM_RANGE(0x008000, 0x008eff) AM_DEVWRITE("vad", atari_vad_device, alpha_w) AM_SHARE("vad:alpha")
 	AM_RANGE(0x008f00, 0x008f7f) AM_RAM AM_SHARE("vad:eof")
 	AM_RANGE(0x008f80, 0x008fff) AM_RAM AM_SHARE("vad:mob:slip")
 	AM_RANGE(0x009000, 0x00ffff) AM_RAM
