@@ -446,7 +446,7 @@ MC6845_UPDATE_ROW( tv910_state::crtc_update_row )
 {
 	static const uint32_t palette[2] = { 0, 0x00ff00 };
 	uint32_t  *p = &bitmap.pix32(y);
-	uint16_t  chr_base = ra;
+	uint16_t  chr_base = (ra + 1) & 7;
 	int i;
 
 	for ( i = 0; i < x_count; i++ )
