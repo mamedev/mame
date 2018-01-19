@@ -61,7 +61,7 @@
  *    - and probably lots more I've forgotten, too.
  *    - improve Z80-8086 comms on the 8:16, saving a file to the RAM disk under CP/M often ends in deadlock.
  *    - add Z8530 SCC and TMS9914A GPIB to the 8:16.  These are optional devices, so aren't strictly required at this stage.
- *
+ *    - connect dma and sio (channel 3)
  */
 
 #include "emu.h"
@@ -910,7 +910,7 @@ static ADDRESS_MAP_START( attache_io, AS_IO, 8, attache_state)
 	AM_RANGE(0xe0, 0xed) AM_DEVREADWRITE("dma",am9517a_device,read,write) AM_MIRROR(0xff00)
 	AM_RANGE(0xee, 0xee) AM_WRITE(display_command_w) AM_MIRROR(0xff00)
 	AM_RANGE(0xef, 0xef) AM_READWRITE(dma_mask_r, dma_mask_w) AM_MIRROR(0xff00)
-	AM_RANGE(0xe6, 0xe7) AM_DEVREADWRITE("sio",z80sio_device,ba_cd_r, ba_cd_w) AM_MIRROR(0xff00)
+	AM_RANGE(0xf0, 0xf1) AM_DEVREADWRITE("sio",z80sio_device,ba_cd_r, ba_cd_w) AM_MIRROR(0xff00)
 	AM_RANGE(0xf4, 0xf7) AM_DEVREADWRITE("ctc",z80ctc_device,read,write) AM_MIRROR(0xff00)
 	AM_RANGE(0xf8, 0xfb) AM_DEVREADWRITE("pio",z80pio_device,read_alt,write_alt) AM_MIRROR(0xff00)
 	AM_RANGE(0xfc, 0xfd) AM_DEVICE("fdc",upd765a_device,map) AM_MIRROR(0xff00)
@@ -924,7 +924,7 @@ static ADDRESS_MAP_START( attache816_io, AS_IO, 8, attache816_state)
 	AM_RANGE(0xe0, 0xed) AM_DEVREADWRITE("dma",am9517a_device,read,write) AM_MIRROR(0xff00)
 	AM_RANGE(0xee, 0xee) AM_WRITE(display_command_w) AM_MIRROR(0xff00)
 	AM_RANGE(0xef, 0xef) AM_READWRITE(dma_mask_r, dma_mask_w) AM_MIRROR(0xff00)
-	AM_RANGE(0xe6, 0xe7) AM_DEVREADWRITE("sio",z80sio_device,ba_cd_r, ba_cd_w) AM_MIRROR(0xff00)
+	AM_RANGE(0xf0, 0xf1) AM_DEVREADWRITE("sio",z80sio_device,ba_cd_r, ba_cd_w) AM_MIRROR(0xff00)
 	AM_RANGE(0xf4, 0xf7) AM_DEVREADWRITE("ctc",z80ctc_device,read,write) AM_MIRROR(0xff00)
 	AM_RANGE(0xf8, 0xfb) AM_DEVREADWRITE("pio",z80pio_device,read_alt,write_alt) AM_MIRROR(0xff00)
 	AM_RANGE(0xfc, 0xfd) AM_DEVICE("fdc",upd765a_device,map) AM_MIRROR(0xff00)
