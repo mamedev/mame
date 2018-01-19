@@ -578,6 +578,7 @@ TIMER_CALLBACK_MEMBER( dcs_audio_device::dcs_reset )
 
 	/* reset the HLE transfer states */
 	m_transfer.dcs_state = m_transfer.state = 0;
+
 }
 
 
@@ -696,7 +697,7 @@ dcs_audio_device::dcs_audio_device(const machine_config &mconfig, device_type ty
 	m_last_input_empty(0),
 	m_progflags(0),
 	m_timer_enable(0),
-	m_timer_ignore(0),
+	m_timer_ignore(false),
 	m_timer_start_cycles(0),
 	m_timer_start_count(0),
 	m_timer_scale(0),
@@ -865,7 +866,7 @@ void dcs2_audio_device::device_start()
 	install_speedup();
 
 	/* allocate a watchdog timer for HLE transfers */
-	m_transfer.hle_enabled = (ENABLE_HLE_TRANSFERS && m_dram_in_mb != 0);
+	m_transfer.hle_enabled = (ENABLE_HLE_TRANSFERS && m_dram_in_mb != 0 && m_rev < REV_DSIO);
 	if (m_transfer.hle_enabled)
 		m_transfer.watchdog = subdevice<timer_device>("dcs_hle_timer");
 
@@ -886,6 +887,8 @@ void dcs_audio_device::install_speedup(void)
 		else {
 			// ADSP 2181 (DSIO and DENVER) use program memory
 			m_cpu->space(AS_PROGRAM).install_readwrite_handler(m_polling_offset, m_polling_offset, read32_delegate(FUNC(dcs_audio_device::dcs_polling32_r), this), write32_delegate(FUNC(dcs_audio_device::dcs_polling32_w), this));
+			// DSIO and DENVER poll in two spots.  This offset covers all three machines (mwskins, sf2049, roadburn).
+			m_cpu->space(AS_PROGRAM).install_readwrite_handler(m_polling_offset + 9, m_polling_offset + 9, read32_delegate(FUNC(dcs_audio_device::dcs_polling32_r), this), write32_delegate(FUNC(dcs_audio_device::dcs_polling32_w), this));
 		}
 	}
 }
@@ -1345,13 +1348,13 @@ WRITE32_MEMBER( dcs_audio_device::dsio_idma_data_w )
 	m_ram_map->set_bank(0);
 	if (ACCESSING_BITS_0_15)
 	{
-		if (LOG_DCS_TRANSFERS && !(downcast<adsp2181_device *>(m_cpu)->idma_addr_r() & 0x0ffc))
+		if (LOG_DCS_TRANSFERS && !(downcast<adsp2181_device *>(m_cpu)->idma_addr_r() & 0x00ff))
 			logerror("%s IDMA_data_w(%04X) = %04X\n", machine().describe_context(), downcast<adsp2181_device *>(m_cpu)->idma_addr_r(), data & 0xffff);
 		downcast<adsp2181_device *>(m_cpu)->idma_data_w(data & 0xffff);
 	}
 	if (ACCESSING_BITS_16_31)
 	{
-		if (LOG_DCS_TRANSFERS && !(downcast<adsp2181_device *>(m_cpu)->idma_addr_r() & 0x0ffc))
+		if (LOG_DCS_TRANSFERS && !(downcast<adsp2181_device *>(m_cpu)->idma_addr_r() & 0x00ff))
 			logerror("%s IDMA_data_w(%04X) = %04X\n", machine().describe_context(), downcast<adsp2181_device *>(m_cpu)->idma_addr_r(), data >> 16);
 		downcast<adsp2181_device *>(m_cpu)->idma_data_w(data >> 16);
 	}
@@ -1532,6 +1535,8 @@ WRITE16_MEMBER( dcs_audio_device::input_latch_ack_w )
 		m_input_empty_cb(m_last_input_empty = 1);
 	SET_INPUT_EMPTY();
 	m_cpu->set_input_line(ADSP2105_IRQ2, CLEAR_LINE);
+	if (LOG_DCS_IO)
+		logerror("%s input_latch_ack_w\n", machine().describe_context());
 }
 
 
@@ -1607,6 +1612,10 @@ void dcs_audio_device::ack_w()
 
 uint16_t dcs_audio_device::data_r()
 {
+	// If the cpu is reading empty data it is probably polling so eat some cyles
+	if IS_OUTPUT_EMPTY()
+		machine().device<cpu_device>("maincpu")->eat_cycles(4444);
+
 	/* data is actually only 8 bit (read from d8-d15, which is d0-d7 from the data access instructions POV) on early dcs, but goes 16 on later (seattle) */
 	if (m_last_output_full && !m_output_full_cb.isnull())
 		m_output_full_cb(m_last_output_full = 0);
@@ -1654,13 +1663,8 @@ int dcs_audio_device::data2_r()
 {
 	if (LOG_DCS_IO)
 		logerror("%08X dcs:data2_r = %04X\n", machine().device<cpu_device>("maincpu")->pc(), m_output_control);
-	if (m_rev >= REV_DSIO) {
-		// Not sure about this but allows sf2049 and roadburn to pass audio initialization tests at boot
-		return m_output_control << 8;
-	}
-	else {
-		return m_output_control;
-	}
+
+	return m_output_control;
 }
 
 
@@ -1686,16 +1690,19 @@ void dcs_audio_device::update_timer_count()
 	elapsed_clocks = elapsed_cycles / m_timer_scale;
 
 	/* if we haven't counted past the initial count yet, just do that */
-	if (elapsed_clocks < m_timer_start_count + 1)
-		m_control_regs[TIMER_COUNT_REG] = m_timer_start_count - elapsed_clocks;
+	if (elapsed_clocks < m_timer_start_count + 1) {
+		m_timer_start_count -= elapsed_clocks;
+		m_control_regs[TIMER_COUNT_REG] = m_timer_start_count;
 
 	/* otherwise, count how many periods */
+	}
 	else
 	{
 		elapsed_clocks -= m_timer_start_count + 1;
 		periods_since_start = elapsed_clocks / (m_timer_period + 1);
 		elapsed_clocks -= periods_since_start * (m_timer_period + 1);
-		m_control_regs[TIMER_COUNT_REG] = m_timer_period - elapsed_clocks;
+		m_timer_start_count = m_timer_period - elapsed_clocks;
+		m_control_regs[TIMER_COUNT_REG] = m_timer_start_count;
 	}
 }
 
@@ -1762,16 +1769,19 @@ void dcs_audio_device::reset_timer()
 
 WRITE_LINE_MEMBER(dcs_audio_device::timer_enable_callback)
 {
-	m_timer_enable = state;
-	m_timer_ignore = 0;
 	if (state)
 	{
-		//osd_printf_debug("Timer enabled @ %d cycles/int, or %f Hz\n", m_timer_scale * (m_timer_period + 1), 1.0 / m_cpu->cycles_to_attotime(m_timer_scale * (m_timer_period + 1)));
+		//logerror("Timer enabled @ %d cycles/int, or %f Hz\n", m_timer_scale * (m_timer_period + 1), 1.0 / m_cpu->cycles_to_attotime(m_timer_scale * (m_timer_period + 1)).as_double());
+		m_timer_enable = state;
+		m_timer_ignore = false;
 		reset_timer();
 	}
 	else
 	{
-		//osd_printf_debug("Timer disabled\n");
+		//logerror("Timer disabled\n");
+		// Update the timer so the start count is correct the next time the timer is enabled
+		update_timer_count();
+		m_timer_enable = state;
 		m_internal_timer->reset();
 	}
 }
@@ -1809,7 +1819,7 @@ READ16_MEMBER( dcs_audio_device::adsp_control_r )
 	{
 		case PROG_FLAG_DATA_REG:
 			// Probably some sort of frame start for DAC with external clock
-			// Denver Atlantis mwskinswants 0x2 to toggle
+			// Denver Atlantis mwskins wants 0x2 to toggle
 			// Denver Durnago sf2049te wants 0x6 to toogle
 			result = (m_control_regs[PROG_FLAG_CONTROL_REG] & m_control_regs[PROG_FLAG_DATA_REG]) | (m_progflags & ~m_control_regs[PROG_FLAG_CONTROL_REG]);
 			m_progflags ^= 0x6;
@@ -1977,7 +1987,8 @@ TIMER_DEVICE_CALLBACK_MEMBER( dcs_audio_device::sport0_irq )
 	/* note that there is non-interrupt code that reads/modifies/writes the output_control */
 	/* register; if we don't interlock it, we will eventually lose sound (see CarnEvil) */
 	/* so we skip the SPORT interrupt if we read with output_control within the last 5 cycles */
-	if ((m_cpu->total_cycles() - m_output_control_cycles) > 5)
+	// Can't seem to trigger this problem anymore.  Skipping this check for now. TG
+	if (1 || (m_cpu->total_cycles() - m_output_control_cycles) > 5)
 	{
 		m_cpu->set_input_line(ADSP2115_SPORT0_RX, ASSERT_LINE);
 		m_cpu->set_input_line(ADSP2115_SPORT0_RX, CLEAR_LINE);
