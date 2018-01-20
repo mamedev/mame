@@ -1417,6 +1417,7 @@ WRITE8_MEMBER( tia_video_device::NUSIZ0_w )
 				if ( p0gfx.start_pixel[j] == 8 )
 					break;
 			}
+			assert(j < PLAYER_GFX_SLOTS);
 			p0gfx.size[j] = nusiz[data & 7][1];
 			p0gfx.start_drawing[j] = ( horzP0 + (p0gfx.size[j] > 1 ? 1 : 0)
 									+ i * 8 * ( nusiz[data & 7][2] + p0gfx.size[j] ) ) % 160;
@@ -1495,6 +1496,7 @@ WRITE8_MEMBER( tia_video_device::NUSIZ1_w )
 				if ( p1gfx.start_pixel[j] == 8 )
 					break;
 			}
+			assert(j < PLAYER_GFX_SLOTS);
 			p1gfx.size[j] = nusiz[data & 7][1];
 			p1gfx.start_drawing[j] = ( horzP1 + (p1gfx.size[j] > 1 ? 1 : 0)
 									+ i * 8 * ( nusiz[data & 7][2] + p1gfx.size[j] ) ) % 160;
@@ -1602,6 +1604,7 @@ WRITE8_MEMBER( tia_video_device::RESP0_w )
 				if ( p0gfx.start_pixel[j] == 8 )
 					break;
 			}
+			assert(j < PLAYER_GFX_SLOTS);
 			p0gfx.size[j] = nusiz[NUSIZ0 & 7][1];
 			p0gfx.start_drawing[j] = ( horzP0 + (p0gfx.size[j] > 1 ? 1 : 0)
 									+ i * 8 * ( nusiz[NUSIZ0 & 7][2] + p0gfx.size[j] ) ) % 160;
@@ -1662,6 +1665,7 @@ WRITE8_MEMBER( tia_video_device::RESP1_w )
 				if ( p1gfx.start_pixel[j] == 8 )
 					break;
 			}
+			assert(j < PLAYER_GFX_SLOTS);
 			p1gfx.size[j] = nusiz[NUSIZ1 & 7][1];
 			p1gfx.start_drawing[j] = ( horzP1 + (p1gfx.size[j] > 1 ? 1 : 0)
 									+ i * 8 * ( nusiz[NUSIZ1 & 7][2] + p1gfx.size[j] ) ) % 160;
