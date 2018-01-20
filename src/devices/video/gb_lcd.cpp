@@ -1116,7 +1116,7 @@ void dmg_ppu_device::update_sprites()
 			for (int bit = 0; bit < 8 && xindex < 160; bit++, xindex++)
 			{
 				int colour = ((data & 0x8000) ? 2 : 0) | ((data & 0x0080) ? 1 : 0);
-				if (colour && !m_bg_zbuf[xindex] && xindex >= 0 && xindex < 160)
+				if (colour && xindex >= 0 && xindex < 160 && !m_bg_zbuf[xindex])
 					plot_pixel(xindex, yindex, spal[colour]);
 				data <<= 1;
 			}
@@ -1660,7 +1660,7 @@ void cgb_ppu_device::update_sprites()
 			for (int bit = 0; bit < 8; bit++, xindex++)
 			{
 				int colour = ((data & 0x0100) ? 2 : 0) | ((data & 0x0001) ? 1 : 0);
-				if (colour && !m_bg_zbuf[xindex] && xindex >= 0 && xindex < 160)
+				if (colour && xindex >= 0 && xindex < 160 && !m_bg_zbuf[xindex])
 				{
 					if (!m_gbc_mode)
 						colour = pal ? m_gb_spal1[colour] : m_gb_spal0[colour];
