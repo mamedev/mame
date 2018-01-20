@@ -50,7 +50,7 @@ void ad1848_device::device_start()
 
 void ad1848_device::device_reset()
 {
-	memset(&m_regs.idx[0], '\0', sizeof(m_regs));
+	memset(m_regs.idx, '\0', sizeof(m_regs.idx));
 	m_addr = 0;
 	m_stat = 0;
 	m_sam_cnt = 0;
