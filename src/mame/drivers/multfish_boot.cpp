@@ -72,6 +72,9 @@ ROM_START( mfish_3a ) // 021124 bank F9
 	ROM_LOAD( "multi_fish.006", 0x180000, 0x80000, CRC(023c1193) SHA1(98cf2732f9542b0bb3bee324611f6d3143ef1dc4) )
 	ROM_LOAD( "multi_fish.007", 0x280000, 0x80000, CRC(9afdc2d3) SHA1(b112fd2005354c9f97d77030bdb6f99d7b5c8050) )
 	ROM_LOAD( "multi_fish.008", 0x380000, 0x80000, CRC(29f1a326) SHA1(5e268411cab888c0727aaf8ae7d0b435d2efd189) )
+
+	ROM_REGION( 0x8000, "m48t35", 0 ) // factory initialized defaults
+	ROM_LOAD( "m48t35", 0x0000, 0x8000, CRC(1fd7ad5c) SHA1(85268e5396f88328abb42b9479f1127bf2208ac8) )
 ROM_END
 
 ROM_START( mfish_12a ) // 040308 bank F9
@@ -87,6 +90,9 @@ ROM_START( mfish_12a ) // 040308 bank F9
 	ROM_LOAD( "multi_fish.006", 0x180000, 0x80000, CRC(023c1193) SHA1(98cf2732f9542b0bb3bee324611f6d3143ef1dc4) )
 	ROM_LOAD( "multi_fish.007", 0x280000, 0x80000, CRC(9afdc2d3) SHA1(b112fd2005354c9f97d77030bdb6f99d7b5c8050) )
 	ROM_LOAD( "multi_fish.008", 0x380000, 0x80000, CRC(29f1a326) SHA1(5e268411cab888c0727aaf8ae7d0b435d2efd189) )
+
+	ROM_REGION( 0x8000, "m48t35", 0 ) // factory initialized defaults
+	ROM_LOAD( "m48t35", 0x0000, 0x8000, CRC(73955da7) SHA1(73debc4af32c277e8d5390cb6f11237477eb6d61) )
 ROM_END
 
 
@@ -104,6 +110,9 @@ ROM_START( czmon_7a ) // 031110 backdoor 1,1 1,3 1,5 1,7  3,3  3,4
 	ROM_LOAD( "crazymonkey_m.006", 0x180000, 0x80000, CRC(a15f0fee) SHA1(3f06d5a1a41e1335bcc7586a5ea95b9b734155c0) )
 	ROM_LOAD( "crazymonkey_m.007", 0x280000, 0x80000, CRC(715a2528) SHA1(6c4c72592568ecbaa9518fb7271d2714dd22dbbb) )
 	ROM_LOAD( "crazymonkey_m.008", 0x380000, 0x80000, CRC(6fdb6fd5) SHA1(f40916112365de258956ec033aff79aae1f58690) )
+
+	ROM_REGION( 0x8000, "m48t35", 0 ) // factory initialized defaults
+	ROM_LOAD( "m48t35", 0x0000, 0x8000, CRC(3a0e19fd) SHA1(27a56bd43264ccdd1d7db118dc218321338990ef) )
 ROM_END
 
 ROM_START( czmon_7b ) // 031110 backdoor 1,5 5,5 1,7 3,2  3,3  3,4
@@ -119,6 +128,9 @@ ROM_START( czmon_7b ) // 031110 backdoor 1,5 5,5 1,7 3,2  3,3  3,4
 	ROM_LOAD( "crazymonkey_m.006", 0x180000, 0x80000, CRC(a15f0fee) SHA1(3f06d5a1a41e1335bcc7586a5ea95b9b734155c0) )
 	ROM_LOAD( "crazymonkey_m.007", 0x280000, 0x80000, CRC(715a2528) SHA1(6c4c72592568ecbaa9518fb7271d2714dd22dbbb) )
 	ROM_LOAD( "crazymonkey_m.008", 0x380000, 0x80000, CRC(6fdb6fd5) SHA1(f40916112365de258956ec033aff79aae1f58690) )
+
+	ROM_REGION( 0x8000, "m48t35", 0 ) // factory initialized defaults
+	ROM_LOAD( "m48t35", 0x0000, 0x8000, CRC(3a0e19fd) SHA1(27a56bd43264ccdd1d7db118dc218321338990ef) )
 ROM_END
 
 ROM_START( czmon_8a ) // 050120 backdoor 1,1 1,3 1,5 1,7  3,3  3,4
@@ -134,6 +146,9 @@ ROM_START( czmon_8a ) // 050120 backdoor 1,1 1,3 1,5 1,7  3,3  3,4
 	ROM_LOAD( "crazymonkey_m.006", 0x180000, 0x80000, CRC(a15f0fee) SHA1(3f06d5a1a41e1335bcc7586a5ea95b9b734155c0) )
 	ROM_LOAD( "crazymonkey_m.007", 0x280000, 0x80000, CRC(715a2528) SHA1(6c4c72592568ecbaa9518fb7271d2714dd22dbbb) )
 	ROM_LOAD( "crazymonkey_m.008", 0x380000, 0x80000, CRC(6fdb6fd5) SHA1(f40916112365de258956ec033aff79aae1f58690) )
+
+	ROM_REGION( 0x8000, "m48t35", 0 ) // factory initialized defaults
+	ROM_LOAD( "m48t35", 0x0000, 0x8000, CRC(3a0e19fd) SHA1(27a56bd43264ccdd1d7db118dc218321338990ef) )
 ROM_END
 
 ROM_START( czmon_8b ) // 050120 changed version text to 070315
@@ -149,6 +164,9 @@ ROM_START( czmon_8b ) // 050120 changed version text to 070315
 	ROM_LOAD( "crazymonkey_m.006", 0x180000, 0x80000, CRC(a15f0fee) SHA1(3f06d5a1a41e1335bcc7586a5ea95b9b734155c0) )
 	ROM_LOAD( "crazymonkey_m.007", 0x280000, 0x80000, CRC(715a2528) SHA1(6c4c72592568ecbaa9518fb7271d2714dd22dbbb) )
 	ROM_LOAD( "crazymonkey_m.008", 0x380000, 0x80000, CRC(6fdb6fd5) SHA1(f40916112365de258956ec033aff79aae1f58690) )
+
+	ROM_REGION( 0x8000, "m48t35", 0 ) // factory initialized defaults
+	ROM_LOAD( "m48t35", 0x0000, 0x8000, CRC(3a0e19fd) SHA1(27a56bd43264ccdd1d7db118dc218321338990ef) )
 ROM_END
 
 ROM_START( czmon_8c ) // 050120 custom alteras, modified graphics, changed version text to "VIDEO GAME-1 CM01"
@@ -164,6 +182,9 @@ ROM_START( czmon_8c ) // 050120 custom alteras, modified graphics, changed versi
 	ROM_LOAD( "bootleg_6b", 0x180000, 0x80000, CRC(4f8a61aa) SHA1(cb266f31ad573f627c8b8d54af88fa9e5a3676ea) )
 	ROM_LOAD( "bootleg_7b", 0x280000, 0x80000, CRC(a055fea1) SHA1(69498f7410acd3d66b391f9c8a1d541d3400674c) )
 	ROM_LOAD( "bootleg_8b", 0x380000, 0x80000, CRC(aa4b0eb3) SHA1(39a98e89a8137c9c986932398b748e48d7f21d9d) )
+
+	ROM_REGION( 0x8000, "m48t35", 0 ) // factory initialized defaults
+	ROM_LOAD( "m48t35", 0x0000, 0x8000, CRC(3a0e19fd) SHA1(27a56bd43264ccdd1d7db118dc218321338990ef) )
 ROM_END
 
 ROM_START( czmon_8d ) // 050120 modified graphics, changed version text to "MDS_is_the_best_ LOTTOGAME (I)"
@@ -179,6 +200,9 @@ ROM_START( czmon_8d ) // 050120 modified graphics, changed version text to "MDS_
 	ROM_LOAD( "crazymonkey_m.006", 0x180000, 0x80000, CRC(a15f0fee) SHA1(3f06d5a1a41e1335bcc7586a5ea95b9b734155c0) )
 	ROM_LOAD( "crazymonkey_m.007", 0x280000, 0x80000, CRC(715a2528) SHA1(6c4c72592568ecbaa9518fb7271d2714dd22dbbb) )
 	ROM_LOAD( "crazymonkey_m.008", 0x380000, 0x80000, CRC(6fdb6fd5) SHA1(f40916112365de258956ec033aff79aae1f58690) )
+
+	ROM_REGION( 0x8000, "m48t35", 0 ) // factory initialized defaults
+	ROM_LOAD( "m48t35", 0x0000, 0x8000, CRC(93b335a6) SHA1(85de925d55fe0e6453e84c441ff2ea0becf6ca90) )
 ROM_END
 
 ROM_START( czmon_8e ) // 050120 modified graphics, many texts changed, changed version text to "LOTO PROGRAM V-CM2"
@@ -194,6 +218,9 @@ ROM_START( czmon_8e ) // 050120 modified graphics, many texts changed, changed v
 	ROM_LOAD( "crazymonkey_m.006", 0x180000, 0x80000, CRC(a15f0fee) SHA1(3f06d5a1a41e1335bcc7586a5ea95b9b734155c0) )
 	ROM_LOAD( "crazymonkey_m.007", 0x280000, 0x80000, CRC(715a2528) SHA1(6c4c72592568ecbaa9518fb7271d2714dd22dbbb) )
 	ROM_LOAD( "crazymonkey_m.008", 0x380000, 0x80000, CRC(6fdb6fd5) SHA1(f40916112365de258956ec033aff79aae1f58690) )
+
+	ROM_REGION( 0x8000, "m48t35", 0 ) // factory initialized defaults
+	ROM_LOAD( "m48t35", 0x0000, 0x8000, CRC(3a0e19fd) SHA1(27a56bd43264ccdd1d7db118dc218321338990ef) )
 ROM_END
 
 ROM_START( czmon_8f ) // 050120 custom_alteras, modified graphics, many texts changed, changed version text to "LOTOS CM01"
@@ -209,6 +236,9 @@ ROM_START( czmon_8f ) // 050120 custom_alteras, modified graphics, many texts ch
 	ROM_LOAD( "bootleg_6b", 0x180000, 0x80000, CRC(4f8a61aa) SHA1(cb266f31ad573f627c8b8d54af88fa9e5a3676ea) )
 	ROM_LOAD( "bootleg_7b", 0x280000, 0x80000, CRC(a055fea1) SHA1(69498f7410acd3d66b391f9c8a1d541d3400674c) )
 	ROM_LOAD( "bootleg_8b", 0x380000, 0x80000, CRC(aa4b0eb3) SHA1(39a98e89a8137c9c986932398b748e48d7f21d9d) )
+
+	ROM_REGION( 0x8000, "m48t35", 0 ) // factory initialized defaults
+	ROM_LOAD( "m48t35", 0x0000, 0x8000, CRC(3a0e19fd) SHA1(27a56bd43264ccdd1d7db118dc218321338990ef) )
 ROM_END
 
 
@@ -225,6 +255,9 @@ ROM_START( czmon_9a ) // 070315 custom alteras, modified graphics, changed versi
 	ROM_LOAD( "bootleg_6b", 0x180000, 0x80000, CRC(4f8a61aa) SHA1(cb266f31ad573f627c8b8d54af88fa9e5a3676ea) )
 	ROM_LOAD( "bootleg_7b", 0x280000, 0x80000, CRC(a055fea1) SHA1(69498f7410acd3d66b391f9c8a1d541d3400674c) )
 	ROM_LOAD( "bootleg_8b", 0x380000, 0x80000, CRC(aa4b0eb3) SHA1(39a98e89a8137c9c986932398b748e48d7f21d9d) )
+
+	ROM_REGION( 0x8000, "m48t35", 0 ) // factory initialized defaults
+	ROM_LOAD( "m48t35", 0x0000, 0x8000, CRC(8d494ff5) SHA1(9c5067bb86fca1f7fb023e7a7f9e1dc63f56c3f8) )
 ROM_END
 
 ROM_START( czmon_9b ) // 070315 modified graphics, changed version text to "VIDEO GAME-1 O01" (czmon_9a, decoded gfx)
@@ -240,6 +273,9 @@ ROM_START( czmon_9b ) // 070315 modified graphics, changed version text to "VIDE
 	ROM_LOAD( "crazymonkey_m.006", 0x180000, 0x80000, CRC(a15f0fee) SHA1(3f06d5a1a41e1335bcc7586a5ea95b9b734155c0) )
 	ROM_LOAD( "crazymonkey_m.007", 0x280000, 0x80000, CRC(715a2528) SHA1(6c4c72592568ecbaa9518fb7271d2714dd22dbbb) )
 	ROM_LOAD( "crazymonkey_m.008", 0x380000, 0x80000, CRC(6fdb6fd5) SHA1(f40916112365de258956ec033aff79aae1f58690) )
+
+	ROM_REGION( 0x8000, "m48t35", 0 ) // factory initialized defaults
+	ROM_LOAD( "m48t35", 0x0000, 0x8000, CRC(8d494ff5) SHA1(9c5067bb86fca1f7fb023e7a7f9e1dc63f56c3f8) )
 ROM_END
 
 ROM_START( czmon_9c ) // 070315 payout percentage 70%
@@ -255,6 +291,9 @@ ROM_START( czmon_9c ) // 070315 payout percentage 70%
 	ROM_LOAD( "crazymonkey_m.006", 0x180000, 0x80000, CRC(a15f0fee) SHA1(3f06d5a1a41e1335bcc7586a5ea95b9b734155c0) )
 	ROM_LOAD( "crazymonkey_m.007", 0x280000, 0x80000, CRC(715a2528) SHA1(6c4c72592568ecbaa9518fb7271d2714dd22dbbb) )
 	ROM_LOAD( "crazymonkey_m.008", 0x380000, 0x80000, CRC(6fdb6fd5) SHA1(f40916112365de258956ec033aff79aae1f58690) )
+
+	ROM_REGION( 0x8000, "m48t35", 0 ) // factory initialized defaults
+	ROM_LOAD( "m48t35", 0x0000, 0x8000, CRC(8d494ff5) SHA1(9c5067bb86fca1f7fb023e7a7f9e1dc63f56c3f8) )
 ROM_END
 
 
@@ -272,6 +311,9 @@ ROM_START( fcockt_6a ) // 040216 bank F8
 	ROM_LOAD( "fruitcocktail_m.006", 0x180000, 0x80000, CRC(ef24f255) SHA1(6ff924627c179868a25f180f79cd57182b72d9d4) )
 	ROM_LOAD( "fruitcocktail_m.007", 0x280000, 0x80000, CRC(20f87a15) SHA1(cb60866a3543668f3592c270b445dee881d78128) )
 	ROM_LOAD( "fruitcocktail_m.008", 0x380000, 0x80000, CRC(d282e42e) SHA1(eac9c3eaef39b1805f863ade5da47d6274d20a55) )
+
+	ROM_REGION( 0x8000, "m48t35", 0 ) // factory initialized defaults
+	ROM_LOAD( "m48t35", 0x0000, 0x8000, CRC(65ad8b49) SHA1(1f15a17c3a7f1dffc36b92b6d5e8e600c3a59eaf) )
 ROM_END
 
 ROM_START( fcockt_6b ) // 040216 backdoor 1,1 1,3 1,5 1,7  3,3  3,4
@@ -287,6 +329,9 @@ ROM_START( fcockt_6b ) // 040216 backdoor 1,1 1,3 1,5 1,7  3,3  3,4
 	ROM_LOAD( "fruitcocktail_m.006", 0x180000, 0x80000, CRC(ef24f255) SHA1(6ff924627c179868a25f180f79cd57182b72d9d4) )
 	ROM_LOAD( "fruitcocktail_m.007", 0x280000, 0x80000, CRC(20f87a15) SHA1(cb60866a3543668f3592c270b445dee881d78128) )
 	ROM_LOAD( "fruitcocktail_m.008", 0x380000, 0x80000, CRC(d282e42e) SHA1(eac9c3eaef39b1805f863ade5da47d6274d20a55) )
+
+	ROM_REGION( 0x8000, "m48t35", 0 ) // factory initialized defaults
+	ROM_LOAD( "m48t35", 0x0000, 0x8000, CRC(65ad8b49) SHA1(1f15a17c3a7f1dffc36b92b6d5e8e600c3a59eaf) )
 ROM_END
 
 ROM_START( fcockt_6c ) // 040216 modified graphics, some code changes, description says "for Lat-02 terminals", older set
@@ -302,6 +347,9 @@ ROM_START( fcockt_6c ) // 040216 modified graphics, some code changes, descripti
 	ROM_LOAD( "fruitcocktail_m.006", 0x180000, 0x80000, CRC(ef24f255) SHA1(6ff924627c179868a25f180f79cd57182b72d9d4) )
 	ROM_LOAD( "fruitcocktail_m.007", 0x280000, 0x80000, CRC(20f87a15) SHA1(cb60866a3543668f3592c270b445dee881d78128) )
 	ROM_LOAD( "fruitcocktail_m.008", 0x380000, 0x80000, CRC(d282e42e) SHA1(eac9c3eaef39b1805f863ade5da47d6274d20a55) )
+
+	ROM_REGION( 0x8000, "m48t35", 0 ) // factory initialized defaults
+	ROM_LOAD( "m48t35", 0x0000, 0x8000, CRC(65ad8b49) SHA1(1f15a17c3a7f1dffc36b92b6d5e8e600c3a59eaf) )
 ROM_END
 
 ROM_START( fcockt_6d ) // 040216 modified graphics, some code changes, changed version text to "VIDEO GAME-1 FR01", description says "for Lat-02 terminals", newer set
@@ -317,6 +365,9 @@ ROM_START( fcockt_6d ) // 040216 modified graphics, some code changes, changed v
 	ROM_LOAD( "fruitcocktail_m.006", 0x180000, 0x80000, CRC(ef24f255) SHA1(6ff924627c179868a25f180f79cd57182b72d9d4) )
 	ROM_LOAD( "fruitcocktail_m.007", 0x280000, 0x80000, CRC(20f87a15) SHA1(cb60866a3543668f3592c270b445dee881d78128) )
 	ROM_LOAD( "fruitcocktail_m.008", 0x380000, 0x80000, CRC(d282e42e) SHA1(eac9c3eaef39b1805f863ade5da47d6274d20a55) )
+
+	ROM_REGION( 0x8000, "m48t35", 0 ) // factory initialized defaults
+	ROM_LOAD( "m48t35", 0x0000, 0x8000, CRC(65ad8b49) SHA1(1f15a17c3a7f1dffc36b92b6d5e8e600c3a59eaf) )
 ROM_END
 
 ROM_START( fcockt_7a ) // 050118 backdoor 1,1 1,3 1,5 1,7  3,3  3,4
@@ -332,6 +383,9 @@ ROM_START( fcockt_7a ) // 050118 backdoor 1,1 1,3 1,5 1,7  3,3  3,4
 	ROM_LOAD( "fruitcocktail_m.006", 0x180000, 0x80000, CRC(ef24f255) SHA1(6ff924627c179868a25f180f79cd57182b72d9d4) )
 	ROM_LOAD( "fruitcocktail_m.007", 0x280000, 0x80000, CRC(20f87a15) SHA1(cb60866a3543668f3592c270b445dee881d78128) )
 	ROM_LOAD( "fruitcocktail_m.008", 0x380000, 0x80000, CRC(d282e42e) SHA1(eac9c3eaef39b1805f863ade5da47d6274d20a55) )
+
+	ROM_REGION( 0x8000, "m48t35", 0 ) // factory initialized defaults
+	ROM_LOAD( "m48t35", 0x0000, 0x8000, CRC(65ad8b49) SHA1(1f15a17c3a7f1dffc36b92b6d5e8e600c3a59eaf) )
 ROM_END
 
 ROM_START( fcockt_7b ) // 050118 custom alteras, modified graphics, many texts changed, changed version text to "VIDEO GAME-1 FR01"
@@ -347,6 +401,9 @@ ROM_START( fcockt_7b ) // 050118 custom alteras, modified graphics, many texts c
 	ROM_LOAD( "bootleg_6e", 0x180000, 0x80000, CRC(32ede872) SHA1(b2f2c8c9ad00ee98d19fcd16efff8e4b28ce44d0) )
 	ROM_LOAD( "bootleg_7e", 0x280000, 0x80000, CRC(391b0471) SHA1(5d20ff6a00425b66f6e53766e41afbed34a6aa42) )
 	ROM_LOAD( "bootleg_8e", 0x380000, 0x80000, CRC(a634af6b) SHA1(91eeaa7932368b1240a3c0180841b010f5c52362) )
+
+	ROM_REGION( 0x8000, "m48t35", 0 ) // factory initialized defaults
+	ROM_LOAD( "m48t35", 0x0000, 0x8000, CRC(65ad8b49) SHA1(1f15a17c3a7f1dffc36b92b6d5e8e600c3a59eaf) )
 ROM_END
 
 ROM_START( fcockt_7c ) // 050118 payout percentage 40%
@@ -362,6 +419,9 @@ ROM_START( fcockt_7c ) // 050118 payout percentage 40%
 	ROM_LOAD( "fruitcocktail_m.006", 0x180000, 0x80000, CRC(ef24f255) SHA1(6ff924627c179868a25f180f79cd57182b72d9d4) )
 	ROM_LOAD( "fruitcocktail_m.007", 0x280000, 0x80000, CRC(20f87a15) SHA1(cb60866a3543668f3592c270b445dee881d78128) )
 	ROM_LOAD( "fruitcocktail_m.008", 0x380000, 0x80000, CRC(d282e42e) SHA1(eac9c3eaef39b1805f863ade5da47d6274d20a55) )
+
+	ROM_REGION( 0x8000, "m48t35", 0 ) // factory initialized defaults
+	ROM_LOAD( "m48t35", 0x0000, 0x8000, CRC(65ad8b49) SHA1(1f15a17c3a7f1dffc36b92b6d5e8e600c3a59eaf) )
 ROM_END
 
 ROM_START( fcockt_7d ) // 050118 payout percentage 60%
@@ -377,6 +437,9 @@ ROM_START( fcockt_7d ) // 050118 payout percentage 60%
 	ROM_LOAD( "fruitcocktail_m.006", 0x180000, 0x80000, CRC(ef24f255) SHA1(6ff924627c179868a25f180f79cd57182b72d9d4) )
 	ROM_LOAD( "fruitcocktail_m.007", 0x280000, 0x80000, CRC(20f87a15) SHA1(cb60866a3543668f3592c270b445dee881d78128) )
 	ROM_LOAD( "fruitcocktail_m.008", 0x380000, 0x80000, CRC(d282e42e) SHA1(eac9c3eaef39b1805f863ade5da47d6274d20a55) )
+
+	ROM_REGION( 0x8000, "m48t35", 0 ) // factory initialized defaults
+	ROM_LOAD( "m48t35", 0x0000, 0x8000, CRC(65ad8b49) SHA1(1f15a17c3a7f1dffc36b92b6d5e8e600c3a59eaf) )
 ROM_END
 
 ROM_START( fcockt_7e ) // 050118 payout percentage 70%
@@ -392,6 +455,9 @@ ROM_START( fcockt_7e ) // 050118 payout percentage 70%
 	ROM_LOAD( "fruitcocktail_m.006", 0x180000, 0x80000, CRC(ef24f255) SHA1(6ff924627c179868a25f180f79cd57182b72d9d4) )
 	ROM_LOAD( "fruitcocktail_m.007", 0x280000, 0x80000, CRC(20f87a15) SHA1(cb60866a3543668f3592c270b445dee881d78128) )
 	ROM_LOAD( "fruitcocktail_m.008", 0x380000, 0x80000, CRC(d282e42e) SHA1(eac9c3eaef39b1805f863ade5da47d6274d20a55) )
+
+	ROM_REGION( 0x8000, "m48t35", 0 ) // factory initialized defaults
+	ROM_LOAD( "m48t35", 0x0000, 0x8000, CRC(65ad8b49) SHA1(1f15a17c3a7f1dffc36b92b6d5e8e600c3a59eaf) )
 ROM_END
 
 ROM_START( fcockt_7f ) // 050118 changed version text to 070305
@@ -407,6 +473,9 @@ ROM_START( fcockt_7f ) // 050118 changed version text to 070305
 	ROM_LOAD( "fruitcocktail_m.006", 0x180000, 0x80000, CRC(ef24f255) SHA1(6ff924627c179868a25f180f79cd57182b72d9d4) )
 	ROM_LOAD( "fruitcocktail_m.007", 0x280000, 0x80000, CRC(20f87a15) SHA1(cb60866a3543668f3592c270b445dee881d78128) )
 	ROM_LOAD( "fruitcocktail_m.008", 0x380000, 0x80000, CRC(d282e42e) SHA1(eac9c3eaef39b1805f863ade5da47d6274d20a55) )
+
+	ROM_REGION( 0x8000, "m48t35", 0 ) // factory initialized defaults
+	ROM_LOAD( "m48t35", 0x0000, 0x8000, CRC(a92e0974) SHA1(bd068e70a8e3c5253bb1a5d9a8f88dd9621a8219) )
 ROM_END
 
 ROM_START( fcockt_7g ) // 050118 modified graphics, many texts changed, changed version text to "LOTO PROGRAM V-FC2"
@@ -422,6 +491,9 @@ ROM_START( fcockt_7g ) // 050118 modified graphics, many texts changed, changed 
 	ROM_LOAD( "fruitcocktail_m.006", 0x180000, 0x80000, CRC(ef24f255) SHA1(6ff924627c179868a25f180f79cd57182b72d9d4) )
 	ROM_LOAD( "fruitcocktail_m.007", 0x280000, 0x80000, CRC(20f87a15) SHA1(cb60866a3543668f3592c270b445dee881d78128) )
 	ROM_LOAD( "fruitcocktail_m.008", 0x380000, 0x80000, CRC(d282e42e) SHA1(eac9c3eaef39b1805f863ade5da47d6274d20a55) )
+
+	ROM_REGION( 0x8000, "m48t35", 0 ) // factory initialized defaults
+	ROM_LOAD( "m48t35", 0x0000, 0x8000, CRC(65ad8b49) SHA1(1f15a17c3a7f1dffc36b92b6d5e8e600c3a59eaf) )
 ROM_END
 
 ROM_START( fcockt_7h ) // 050118 modified graphics, many texts changed, changed version text to "LOTOS FR01"
@@ -437,6 +509,9 @@ ROM_START( fcockt_7h ) // 050118 modified graphics, many texts changed, changed 
 	ROM_LOAD( "fruitcocktail_m.006", 0x180000, 0x80000, CRC(ef24f255) SHA1(6ff924627c179868a25f180f79cd57182b72d9d4) )
 	ROM_LOAD( "fruitcocktail_m.007", 0x280000, 0x80000, CRC(20f87a15) SHA1(cb60866a3543668f3592c270b445dee881d78128) )
 	ROM_LOAD( "fruitcocktail_m.008", 0x380000, 0x80000, CRC(d282e42e) SHA1(eac9c3eaef39b1805f863ade5da47d6274d20a55) )
+
+	ROM_REGION( 0x8000, "m48t35", 0 ) // factory initialized defaults
+	ROM_LOAD( "m48t35", 0x0000, 0x8000, CRC(65ad8b49) SHA1(1f15a17c3a7f1dffc36b92b6d5e8e600c3a59eaf) )
 ROM_END
 
 ROM_START( fcockt_8a ) // 060111 modified graphics, many texts changed, changed version text to "LOTO COCKTAIL V01-0001"
@@ -452,6 +527,9 @@ ROM_START( fcockt_8a ) // 060111 modified graphics, many texts changed, changed 
 	ROM_LOAD( "bootleg_6",  0x180000, 0x80000, CRC(965d6363) SHA1(5c229238a09ec54147d492e9843595962ce79952) )
 	ROM_LOAD( "fruitcocktail_m.007", 0x280000, 0x80000, CRC(20f87a15) SHA1(cb60866a3543668f3592c270b445dee881d78128) )
 	ROM_LOAD( "bootleg_8",  0x380000, 0x80000, CRC(8384e4d4) SHA1(83d0bbbd7cca7328a66a69cf802632fd8d22d5b8) )
+
+	ROM_REGION( 0x8000, "m48t35", 0 ) // factory initialized defaults
+	ROM_LOAD( "m48t35", 0x0000, 0x8000, CRC(1d1d98f5) SHA1(67dd05b5de28c30f7b35bb79794d303123e52154) )
 ROM_END
 
 ROM_START( fcockt_8b ) // 060111 modified graphics, changed version text to "MDS_is_the_best_ LOTTOGAME (I)"
@@ -467,6 +545,9 @@ ROM_START( fcockt_8b ) // 060111 modified graphics, changed version text to "MDS
 	ROM_LOAD( "fruitcocktail_m.006", 0x180000, 0x80000, CRC(ef24f255) SHA1(6ff924627c179868a25f180f79cd57182b72d9d4) )
 	ROM_LOAD( "fruitcocktail_m.007", 0x280000, 0x80000, CRC(20f87a15) SHA1(cb60866a3543668f3592c270b445dee881d78128) )
 	ROM_LOAD( "fruitcocktail_m.008", 0x380000, 0x80000, CRC(d282e42e) SHA1(eac9c3eaef39b1805f863ade5da47d6274d20a55) )
+
+	ROM_REGION( 0x8000, "m48t35", 0 ) // factory initialized defaults
+	ROM_LOAD( "m48t35", 0x0000, 0x8000, CRC(5286d5a5) SHA1(9e9a5c86504a4fcb28fb1d577d8914e533364c10) )
 ROM_END
 
 
@@ -484,6 +565,9 @@ ROM_START( lhaunt_4a ) // 031111 backdoor 1,1 1,3 1,5 1,7  3,3  3,4
 	ROM_LOAD( "luckyhaunter_m.006", 0x180000, 0x80000, CRC(4eaaab64) SHA1(9fed16f8e0308200fd16c4b1e511e1bf6c22ae66) )
 	ROM_LOAD( "luckyhaunter_m.007", 0x280000, 0x80000, CRC(64d16ba9) SHA1(3b897183d6e0f1256be7657441f234fc72077682) )
 	ROM_LOAD( "luckyhaunter_m.008", 0x380000, 0x80000, CRC(1bdf6252) SHA1(7b5ae82a95a744b236e109024d47b526dccf9c14) )
+
+	ROM_REGION( 0x8000, "m48t35", 0 ) // factory initialized defaults
+	ROM_LOAD( "m48t35", 0x0000, 0x8000, CRC(70d4f018) SHA1(089c8cee33157d43c1946a23ff7e75af65b94ebd) )
 ROM_END
 
 ROM_START( lhaunt_5a ) // 040216 backdoor 1,1 1,3 1,5 1,7  3,3  3,4
@@ -499,6 +583,9 @@ ROM_START( lhaunt_5a ) // 040216 backdoor 1,1 1,3 1,5 1,7  3,3  3,4
 	ROM_LOAD( "luckyhaunter_m.006", 0x180000, 0x80000, CRC(4eaaab64) SHA1(9fed16f8e0308200fd16c4b1e511e1bf6c22ae66) )
 	ROM_LOAD( "luckyhaunter_m.007", 0x280000, 0x80000, CRC(64d16ba9) SHA1(3b897183d6e0f1256be7657441f234fc72077682) )
 	ROM_LOAD( "luckyhaunter_m.008", 0x380000, 0x80000, CRC(1bdf6252) SHA1(7b5ae82a95a744b236e109024d47b526dccf9c14) )
+
+	ROM_REGION( 0x8000, "m48t35", 0 ) // factory initialized defaults
+	ROM_LOAD( "m48t35", 0x0000, 0x8000, CRC(70d4f018) SHA1(089c8cee33157d43c1946a23ff7e75af65b94ebd) )
 ROM_END
 
 ROM_START( lhaunt_6a ) // 040825 backdoor 1,5 9,1 5,1 1,5  3,3  3,4
@@ -514,6 +601,9 @@ ROM_START( lhaunt_6a ) // 040825 backdoor 1,5 9,1 5,1 1,5  3,3  3,4
 	ROM_LOAD( "luckyhaunter_m.006", 0x180000, 0x80000, CRC(4eaaab64) SHA1(9fed16f8e0308200fd16c4b1e511e1bf6c22ae66) )
 	ROM_LOAD( "luckyhaunter_m.007", 0x280000, 0x80000, CRC(64d16ba9) SHA1(3b897183d6e0f1256be7657441f234fc72077682) )
 	ROM_LOAD( "luckyhaunter_m.008", 0x380000, 0x80000, CRC(1bdf6252) SHA1(7b5ae82a95a744b236e109024d47b526dccf9c14) )
+
+	ROM_REGION( 0x8000, "m48t35", 0 ) // factory initialized defaults
+	ROM_LOAD( "m48t35", 0x0000, 0x8000, CRC(70d4f018) SHA1(089c8cee33157d43c1946a23ff7e75af65b94ebd) )
 ROM_END
 
 ROM_START( lhaunt_6b ) // 040825 custom alteras, modified graphics, many texts changed, changed version text to "VIDEO GAME-1 PB01"
@@ -529,6 +619,9 @@ ROM_START( lhaunt_6b ) // 040825 custom alteras, modified graphics, many texts c
 	ROM_LOAD( "bootleg_6b", 0x180000, 0x80000, CRC(208fb837) SHA1(857a615fa674cd55771cc4c12afd61fe8a891d3c) )
 	ROM_LOAD( "bootleg_7b", 0x280000, 0x80000, CRC(a4d609cd) SHA1(bcf193745012a59ec706f54c157dd413b49f0a35) )
 	ROM_LOAD( "bootleg_8b", 0x380000, 0x80000, CRC(6703695b) SHA1(7730aa1297cc1584cfe1236c16f1a90829727baa) )
+
+	ROM_REGION( 0x8000, "m48t35", 0 ) // factory initialized defaults
+	ROM_LOAD( "m48t35", 0x0000, 0x8000, CRC(70d4f018) SHA1(089c8cee33157d43c1946a23ff7e75af65b94ebd) )
 ROM_END
 
 ROM_START( lhaunt_6c ) // 040825 changed version text to 070604
@@ -544,6 +637,9 @@ ROM_START( lhaunt_6c ) // 040825 changed version text to 070604
 	ROM_LOAD( "luckyhaunter_m.006", 0x180000, 0x80000, CRC(4eaaab64) SHA1(9fed16f8e0308200fd16c4b1e511e1bf6c22ae66) )
 	ROM_LOAD( "luckyhaunter_m.007", 0x280000, 0x80000, CRC(64d16ba9) SHA1(3b897183d6e0f1256be7657441f234fc72077682) )
 	ROM_LOAD( "luckyhaunter_m.008", 0x380000, 0x80000, CRC(1bdf6252) SHA1(7b5ae82a95a744b236e109024d47b526dccf9c14) )
+
+	ROM_REGION( 0x8000, "m48t35", 0 ) // factory initialized defaults
+	ROM_LOAD( "m48t35", 0x0000, 0x8000, CRC(2d03d894) SHA1(42904fbef85d80cd95f1a7dd32a5e30547fc4b98) )
 ROM_END
 
 ROM_START( lhaunt_6d ) // 040825 modified graphics, changed version text to "MDS_is_the_best_ LOTTOGAME (I)"
@@ -559,6 +655,9 @@ ROM_START( lhaunt_6d ) // 040825 modified graphics, changed version text to "MDS
 	ROM_LOAD( "luckyhaunter_m.006", 0x180000, 0x80000, CRC(4eaaab64) SHA1(9fed16f8e0308200fd16c4b1e511e1bf6c22ae66) )
 	ROM_LOAD( "luckyhaunter_m.007", 0x280000, 0x80000, CRC(64d16ba9) SHA1(3b897183d6e0f1256be7657441f234fc72077682) )
 	ROM_LOAD( "luckyhaunter_m.008", 0x380000, 0x80000, CRC(1bdf6252) SHA1(7b5ae82a95a744b236e109024d47b526dccf9c14) )
+
+	ROM_REGION( 0x8000, "m48t35", 0 ) // factory initialized defaults
+	ROM_LOAD( "m48t35", 0x0000, 0x8000, CRC(683354e7) SHA1(87be869f633333e496e8ca7f92a38373fe2884dd) )
 ROM_END
 
 ROM_START( lhaunt_6e ) // 040825 modified graphics, many texts changed, changed version text to "LOTO PROGRAM V-LH2"
@@ -574,6 +673,9 @@ ROM_START( lhaunt_6e ) // 040825 modified graphics, many texts changed, changed 
 	ROM_LOAD( "bootleg_6d", 0x180000, 0x80000, CRC(304475f2) SHA1(de532496c4534ff09c88d87d0ccadad542ff5637) )
 	ROM_LOAD( "bootleg_7d", 0x280000, 0x80000, CRC(278aab12) SHA1(cb35e95babddcb126c10dfd6abf2986133a6fbf1) )
 	ROM_LOAD( "bootleg_8d", 0x380000, 0x80000, CRC(79c110bc) SHA1(4198b6003af7e52720f84776f51fe4e1c1cc8713) )
+
+	ROM_REGION( 0x8000, "m48t35", 0 ) // factory initialized defaults
+	ROM_LOAD( "m48t35", 0x0000, 0x8000, CRC(70d4f018) SHA1(089c8cee33157d43c1946a23ff7e75af65b94ebd) )
 ROM_END
 
 ROM_START( lhaunt_6f ) // 040825 custom alteras, modified graphics, many texts changed, changed version text to "LOTOS PB01"
@@ -589,6 +691,9 @@ ROM_START( lhaunt_6f ) // 040825 custom alteras, modified graphics, many texts c
 	ROM_LOAD( "bootleg_6b", 0x180000, 0x80000, CRC(208fb837) SHA1(857a615fa674cd55771cc4c12afd61fe8a891d3c) )
 	ROM_LOAD( "bootleg_7b", 0x280000, 0x80000, CRC(a4d609cd) SHA1(bcf193745012a59ec706f54c157dd413b49f0a35) )
 	ROM_LOAD( "bootleg_8b", 0x380000, 0x80000, CRC(6703695b) SHA1(7730aa1297cc1584cfe1236c16f1a90829727baa) )
+
+	ROM_REGION( 0x8000, "m48t35", 0 ) // factory initialized defaults
+	ROM_LOAD( "m48t35", 0x0000, 0x8000, CRC(70d4f018) SHA1(089c8cee33157d43c1946a23ff7e75af65b94ebd) )
 ROM_END
 
 
@@ -606,6 +711,9 @@ ROM_START( garage_4a ) // 040219 backdoor 1,1 1,3 1,5 1,7  3,3  3,4
 	ROM_LOAD( "garage_m.006", 0x180000, 0x80000, CRC(e5082b26) SHA1(6547409d39dd51498ce8e3f82ff813a8ac3c6522) )
 	ROM_LOAD( "garage_m.007", 0x280000, 0x80000, CRC(dfa2ceb1) SHA1(ec7de8a8f6e7785a563df973841cc1f1603f79fc) )
 	ROM_LOAD( "garage_m.008", 0x380000, 0x80000, CRC(90c5416b) SHA1(583bfb517bc2e30d7b7903aa19fc3b4b5188d7d2) )
+
+	ROM_REGION( 0x8000, "m48t35", 0 ) // factory initialized defaults
+	ROM_LOAD( "m48t35", 0x0000, 0x8000, CRC(2fc9133e) SHA1(b1e0df97316e8614aaa770f8766e3a10aa55d686) )
 ROM_END
 
 ROM_START( garage_4b ) // 040219 changed version text to 070329
@@ -621,6 +729,9 @@ ROM_START( garage_4b ) // 040219 changed version text to 070329
 	ROM_LOAD( "garage_m.006", 0x180000, 0x80000, CRC(e5082b26) SHA1(6547409d39dd51498ce8e3f82ff813a8ac3c6522) )
 	ROM_LOAD( "garage_m.007", 0x280000, 0x80000, CRC(dfa2ceb1) SHA1(ec7de8a8f6e7785a563df973841cc1f1603f79fc) )
 	ROM_LOAD( "garage_m.008", 0x380000, 0x80000, CRC(90c5416b) SHA1(583bfb517bc2e30d7b7903aa19fc3b4b5188d7d2) )
+
+	ROM_REGION( 0x8000, "m48t35", 0 ) // factory initialized defaults
+	ROM_LOAD( "m48t35", 0x0000, 0x8000, CRC(2fc9133e) SHA1(b1e0df97316e8614aaa770f8766e3a10aa55d686) )
 ROM_END
 
 ROM_START( garage_4c ) // 040219 modified graphics, many texts changed, changed version text to "LOTO PROGRAM V-GG2"
@@ -636,6 +747,9 @@ ROM_START( garage_4c ) // 040219 modified graphics, many texts changed, changed 
 	ROM_LOAD( "bootleg_6d", 0x180000, 0x80000, CRC(df4ff9ff) SHA1(89cc80923544e44367ba27e42f4f49744de9782c) )
 	ROM_LOAD( "bootleg_7d", 0x280000, 0x80000, CRC(e65de46e) SHA1(ffcc48449e764329864800befcb31b884bd7ff20) )
 	ROM_LOAD( "bootleg_8d", 0x380000, 0x80000, CRC(15fcac6d) SHA1(3c1f44225686b42eba5229fb0ad03d2592c09203) )
+
+	ROM_REGION( 0x8000, "m48t35", 0 ) // factory initialized defaults
+	ROM_LOAD( "m48t35", 0x0000, 0x8000, CRC(2fc9133e) SHA1(b1e0df97316e8614aaa770f8766e3a10aa55d686) )
 ROM_END
 
 ROM_START( garage_5a ) // 050311 backdoor 1,1 1,3 1,5 1,7  3,3  3,4
@@ -651,6 +765,9 @@ ROM_START( garage_5a ) // 050311 backdoor 1,1 1,3 1,5 1,7  3,3  3,4
 	ROM_LOAD( "garage_m.006", 0x180000, 0x80000, CRC(e5082b26) SHA1(6547409d39dd51498ce8e3f82ff813a8ac3c6522) )
 	ROM_LOAD( "garage_m.007", 0x280000, 0x80000, CRC(dfa2ceb1) SHA1(ec7de8a8f6e7785a563df973841cc1f1603f79fc) )
 	ROM_LOAD( "garage_m.008", 0x380000, 0x80000, CRC(90c5416b) SHA1(583bfb517bc2e30d7b7903aa19fc3b4b5188d7d2) )
+
+	ROM_REGION( 0x8000, "m48t35", 0 ) // factory initialized defaults
+	ROM_LOAD( "m48t35", 0x0000, 0x8000, CRC(d379dd5f) SHA1(c9302cfebed8c9120faf04b9f45671720cfebac0) )
 ROM_END
 
 ROM_START( garage_5b ) // 050311 custom alteras, modified graphics, changed version text to "VIDEO GAME-1 GA01"
@@ -666,6 +783,9 @@ ROM_START( garage_5b ) // 050311 custom alteras, modified graphics, changed vers
 	ROM_LOAD( "bootleg_6b", 0x180000, 0x80000, CRC(45b039a0) SHA1(1166815fa1271e44d08bad1f5a3a786c93cb5030) )
 	ROM_LOAD( "bootleg_7b", 0x280000, 0x80000, CRC(b4e1ecdb) SHA1(7cd5ffbe21ff48434f3be995388e6bc398fe2aa4) )
 	ROM_LOAD( "bootleg_8b", 0x380000, 0x80000, CRC(06c5149f) SHA1(012573a144532bb6d697c0390b97136e47aaca99) )
+
+	ROM_REGION( 0x8000, "m48t35", 0 ) // factory initialized defaults
+	ROM_LOAD( "m48t35", 0x0000, 0x8000, CRC(d379dd5f) SHA1(c9302cfebed8c9120faf04b9f45671720cfebac0) )
 ROM_END
 
 ROM_START( garage_5c ) // 050311 payout percentage 70%
@@ -681,6 +801,9 @@ ROM_START( garage_5c ) // 050311 payout percentage 70%
 	ROM_LOAD( "garage_m.006", 0x180000, 0x80000, CRC(e5082b26) SHA1(6547409d39dd51498ce8e3f82ff813a8ac3c6522) )
 	ROM_LOAD( "garage_m.007", 0x280000, 0x80000, CRC(dfa2ceb1) SHA1(ec7de8a8f6e7785a563df973841cc1f1603f79fc) )
 	ROM_LOAD( "garage_m.008", 0x380000, 0x80000, CRC(90c5416b) SHA1(583bfb517bc2e30d7b7903aa19fc3b4b5188d7d2) )
+
+	ROM_REGION( 0x8000, "m48t35", 0 ) // factory initialized defaults
+	ROM_LOAD( "m48t35", 0x0000, 0x8000, CRC(d379dd5f) SHA1(c9302cfebed8c9120faf04b9f45671720cfebac0) )
 ROM_END
 
 ROM_START( garage_5d ) // 050311 modified graphics, changed version text to "MDS_is_the_best_ LOTTOGAME (I)"
@@ -696,6 +819,9 @@ ROM_START( garage_5d ) // 050311 modified graphics, changed version text to "MDS
 	ROM_LOAD( "bootleg_6c", 0x180000, 0x80000, CRC(b8a6a574) SHA1(157d68736960f351b148be0b81bcdba472437508) )
 	ROM_LOAD( "bootleg_7c", 0x280000, 0x80000, CRC(94f2b464) SHA1(879c435a80eb8770fe47d4120078c6a447025f08) )
 	ROM_LOAD( "bootleg_8c", 0x380000, 0x80000, CRC(0cf53598) SHA1(c456add6b56169a5116643a27aace1ee19a68340) )
+
+	ROM_REGION( 0x8000, "m48t35", 0 ) // factory initialized defaults
+	ROM_LOAD( "m48t35", 0x0000, 0x8000,CRC(578e7c96) SHA1(1b2574f06dd6592c24f587580373cb9b60e2d0ab) )
 ROM_END
 
 ROM_START( garage_5e ) // 050311 custom alteras, modified graphics, many texts changed, changed version text to "LOTOS GA01"
@@ -711,6 +837,9 @@ ROM_START( garage_5e ) // 050311 custom alteras, modified graphics, many texts c
 	ROM_LOAD( "bootleg_6e", 0x180000, 0x80000, CRC(ddbd373e) SHA1(cebb6b666cc1ee6e1f0a27c6b989f3818d67419b) )
 	ROM_LOAD( "bootleg_7e", 0x280000, 0x80000, CRC(13880471) SHA1(037b5e331da282aba310bc72346d66a0b4a08e6d) )
 	ROM_LOAD( "bootleg_8e", 0x380000, 0x80000, CRC(10cc710b) SHA1(2bcf01b9d4730d8377edfd563c1c508ea128fd46) )
+
+	ROM_REGION( 0x8000, "m48t35", 0 ) // factory initialized defaults
+	ROM_LOAD( "m48t35", 0x0000, 0x8000, CRC(d379dd5f) SHA1(c9302cfebed8c9120faf04b9f45671720cfebac0) )
 ROM_END
 
 
@@ -728,6 +857,9 @@ ROM_START( rclimb_3a ) // 040827 backdoor 1,5 9,1 5,1 1,5  3,3  3,4
 	ROM_LOAD( "rockclimber_m.006", 0x180000, 0x80000, CRC(277fa273) SHA1(6320e6c5b5e48dc451cc48189054c42d85e8ccc1) )
 	ROM_LOAD( "rockclimber_m.007", 0x280000, 0x80000, CRC(3ca7f69a) SHA1(878cca181d915dc3548d5285a4bbb51aef31a64e) )
 	ROM_LOAD( "rockclimber_m.008", 0x380000, 0x80000, CRC(8cf6b4c2) SHA1(4c36c217b83c82acfdd615f5547bf597af7b8833) )
+
+	ROM_REGION( 0x8000, "m48t35", 0 ) // factory initialized defaults
+	ROM_LOAD( "m48t35", 0x0000, 0x8000, CRC(4c709bc6) SHA1(3d9a2a85818533ac014bac47821dbfab306eef31) )
 ROM_END
 
 ROM_START( rclimb_3b ) // 040827 - new service menu
@@ -743,6 +875,9 @@ ROM_START( rclimb_3b ) // 040827 - new service menu
 	ROM_LOAD( "bootleg_rc6_.bin", 0x180000, 0x80000, CRC(36a8148f) SHA1(57d84e44c77f2bb1e97ec8a1acd3ef71246e3274) )
 	ROM_LOAD( "bootleg_rc7_.bin", 0x280000, 0x80000, CRC(26c620e3) SHA1(b14f2cfc0e5b740360e6ecca97f6bf941136141f) )
 	ROM_LOAD( "bootleg_rc8_.bin", 0x380000, 0x80000, CRC(8cf6b4c2) SHA1(4c36c217b83c82acfdd615f5547bf597af7b8833) )
+
+	ROM_REGION( 0x8000, "m48t35", 0 ) // factory initialized defaults
+	ROM_LOAD( "m48t35", 0x0000, 0x8000, CRC(4c709bc6) SHA1(3d9a2a85818533ac014bac47821dbfab306eef31) )
 ROM_END
 
 ROM_START( rclimb_3c ) // 040827 custom alteras, modified graphics, many texts changed, changed version text to "VIDEO GAME-1 SK01"
@@ -758,6 +893,9 @@ ROM_START( rclimb_3c ) // 040827 custom alteras, modified graphics, many texts c
 	ROM_LOAD( "bootleg_6b", 0x180000, 0x80000, CRC(6f8f3678) SHA1(b9c0e5093f93a3e9ebc715a24588a68105ca15c7) )
 	ROM_LOAD( "bootleg_7b", 0x280000, 0x80000, CRC(72d3cba8) SHA1(2f14bc23574276cb1ceef4306653e79f7bf19ac9) )
 	ROM_LOAD( "bootleg_8b", 0x380000, 0x80000, CRC(4210c5e2) SHA1(053cee86e3fa27e43ef74615cd4bb1f28c900ec4) )
+
+	ROM_REGION( 0x8000, "m48t35", 0 ) // factory initialized defaults
+	ROM_LOAD( "m48t35", 0x0000, 0x8000, CRC(4c709bc6) SHA1(3d9a2a85818533ac014bac47821dbfab306eef31) )
 ROM_END
 
 ROM_START( rclimb_3d ) // 040827 modified graphics, changed version text to "MDS_is_the_best_ LOTTOGAME (I)"
@@ -773,6 +911,9 @@ ROM_START( rclimb_3d ) // 040827 modified graphics, changed version text to "MDS
 	ROM_LOAD( "rockclimber_m.006", 0x180000, 0x80000, CRC(277fa273) SHA1(6320e6c5b5e48dc451cc48189054c42d85e8ccc1) )
 	ROM_LOAD( "rockclimber_m.007", 0x280000, 0x80000, CRC(3ca7f69a) SHA1(878cca181d915dc3548d5285a4bbb51aef31a64e) )
 	ROM_LOAD( "rockclimber_m.008", 0x380000, 0x80000, CRC(8cf6b4c2) SHA1(4c36c217b83c82acfdd615f5547bf597af7b8833) )
+
+	ROM_REGION( 0x8000, "m48t35", 0 ) // factory initialized defaults
+	ROM_LOAD( "m48t35", 0x0000, 0x8000, CRC(7e6676c7) SHA1(d01e0d5073d18108a143f8b08463e582345fb92b) )
 ROM_END
 
 ROM_START( rclimb_3e ) // 040827 custom alteras, modified graphics, many texts changed, changed version text to "LOTOS SK01"
@@ -788,6 +929,9 @@ ROM_START( rclimb_3e ) // 040827 custom alteras, modified graphics, many texts c
 	ROM_LOAD( "bootleg_6b", 0x180000, 0x80000, CRC(6f8f3678) SHA1(b9c0e5093f93a3e9ebc715a24588a68105ca15c7) )
 	ROM_LOAD( "bootleg_7b", 0x280000, 0x80000, CRC(72d3cba8) SHA1(2f14bc23574276cb1ceef4306653e79f7bf19ac9) )
 	ROM_LOAD( "bootleg_8b", 0x380000, 0x80000, CRC(4210c5e2) SHA1(053cee86e3fa27e43ef74615cd4bb1f28c900ec4) )
+
+	ROM_REGION( 0x8000, "m48t35", 0 ) // factory initialized defaults
+	ROM_LOAD( "m48t35", 0x0000, 0x8000, CRC(4c709bc6) SHA1(3d9a2a85818533ac014bac47821dbfab306eef31) )
 ROM_END
 
 
@@ -805,6 +949,9 @@ ROM_START( sweetla ) // 041220 backdoor 1,5 9,1 5,3 1,5  3,3  3,4
 	ROM_LOAD( "sweetlife.006", 0x180000, 0x80000, CRC(d34e0905) SHA1(cc4afe64fb9052a31f759be41ff07a727e0a9093) )
 	ROM_LOAD( "sweetlife.007", 0x280000, 0x80000, CRC(978b67bb) SHA1(87357d5832588f00272bd76df736c06c599f3853) )
 	ROM_LOAD( "sweetlife.008", 0x380000, 0x80000, CRC(75954355) SHA1(e6ef2b70d859b61e8e3d1751de8558b8778e502d) )
+
+	ROM_REGION( 0x8000, "m48t35", 0 ) // factory initialized defaults
+	ROM_LOAD( "m48t35", 0x0000, 0x8000, CRC(1547f59e) SHA1(7f19c8a4ea8d09270d04b1185d5e0957fc3a102d) )
 ROM_END
 
 ROM_START( sweetlb ) // 041220 bank F9, changed version text to 070412
@@ -820,6 +967,9 @@ ROM_START( sweetlb ) // 041220 bank F9, changed version text to 070412
 	ROM_LOAD( "sweetlife.006", 0x180000, 0x80000, CRC(d34e0905) SHA1(cc4afe64fb9052a31f759be41ff07a727e0a9093) )
 	ROM_LOAD( "sweetlife.007", 0x280000, 0x80000, CRC(978b67bb) SHA1(87357d5832588f00272bd76df736c06c599f3853) )
 	ROM_LOAD( "sweetlife.008", 0x380000, 0x80000, CRC(75954355) SHA1(e6ef2b70d859b61e8e3d1751de8558b8778e502d) )
+
+	ROM_REGION( 0x8000, "m48t35", 0 ) // factory initialized defaults
+	ROM_LOAD( "m48t35", 0x0000, 0x8000, CRC(d40e70f4) SHA1(09dfcdb73d86de949d98a5404a262e67d61ac78a) )
 ROM_END
 
 
@@ -836,6 +986,9 @@ ROM_START( sweetl2_2a ) // 080320 bank F9
 	ROM_LOAD( "sweetlife2.006", 0x180000, 0x80000, CRC(868fe1cb) SHA1(692679f8242950e009c30cc084c4ddc5d1963502) )
 	ROM_LOAD( "sweetlife2.007", 0x280000, 0x80000, CRC(6ce87282) SHA1(586e08994db4ca2b967d47b16ba5b458e240d30f) )
 	ROM_LOAD( "sweetlife2.008", 0x380000, 0x80000, CRC(c2ad2b74) SHA1(c78e3ca5d15acb17ee671d2205405f287ad9c464) )
+
+	ROM_REGION( 0x8000, "m48t35", 0 ) // factory initialized defaults
+	ROM_LOAD( "m48t35", 0x0000, 0x8000, CRC(81ec556f) SHA1(f772e37d9df36e11f97ec2d5fa02f67ec42f277c) )
 ROM_END
 
 ROM_START( sweetl2_2b ) // 080320 bank F9, some fixes
@@ -851,6 +1004,9 @@ ROM_START( sweetl2_2b ) // 080320 bank F9, some fixes
 	ROM_LOAD( "sweetlife2.006", 0x180000, 0x80000, CRC(868fe1cb) SHA1(692679f8242950e009c30cc084c4ddc5d1963502) )
 	ROM_LOAD( "sweetlife2.007", 0x280000, 0x80000, CRC(6ce87282) SHA1(586e08994db4ca2b967d47b16ba5b458e240d30f) )
 	ROM_LOAD( "sweetlife2.008", 0x380000, 0x80000, CRC(c2ad2b74) SHA1(c78e3ca5d15acb17ee671d2205405f287ad9c464) )
+
+	ROM_REGION( 0x8000, "m48t35", 0 ) // factory initialized defaults
+	ROM_LOAD( "m48t35", 0x0000, 0x8000, CRC(81ec556f) SHA1(f772e37d9df36e11f97ec2d5fa02f67ec42f277c) )
 ROM_END
 
 ROM_START( sweetl2_2c ) // 080320 modified graphics, bank F9, changed version text to "VIDEO GAME-1 MD01"
@@ -866,6 +1022,9 @@ ROM_START( sweetl2_2c ) // 080320 modified graphics, bank F9, changed version te
 	ROM_LOAD( "bootleg_6a", 0x180000, 0x80000, CRC(c334b279) SHA1(55bace43fe2aee54ab9cc787a955f382f05cb666) )
 	ROM_LOAD( "bootleg_7a", 0x280000, 0x80000, CRC(9e8cfe95) SHA1(2594c66d65ec4b23fe7760ed7f05761b95ec1bde) )
 	ROM_LOAD( "bootleg_8a", 0x380000, 0x80000, CRC(f4b48eee) SHA1(02af6ea807d003504a37c4dc7f9111b716cf78a5) )
+
+	ROM_REGION( 0x8000, "m48t35", 0 ) // factory initialized defaults
+	ROM_LOAD( "m48t35", 0x0000, 0x8000, CRC(81ec556f) SHA1(f772e37d9df36e11f97ec2d5fa02f67ec42f277c) )
 ROM_END
 
 ROM_START( sweetl2_2d ) // 080320 bank F9, modified graphics, changed version text to "MDS_is_the_best_ LOTTOGAME (I)"
@@ -881,6 +1040,9 @@ ROM_START( sweetl2_2d ) // 080320 bank F9, modified graphics, changed version te
 	ROM_LOAD( "bootleg_6b", 0x180000, 0x80000, CRC(f85255d9) SHA1(eb9e8de3775c9a1ddc1134c7b96e556ec2e87b1d) )
 	ROM_LOAD( "sweetlife2.007",  0x280000, 0x80000, CRC(6ce87282) SHA1(586e08994db4ca2b967d47b16ba5b458e240d30f) )
 	ROM_LOAD( "sweetlife2.008",  0x380000, 0x80000, CRC(c2ad2b74) SHA1(c78e3ca5d15acb17ee671d2205405f287ad9c464) )
+
+	ROM_REGION( 0x8000, "m48t35", 0 ) // factory initialized defaults
+	ROM_LOAD( "m48t35", 0x0000, 0x8000, CRC(137641d0) SHA1(2b99d15a129c0de1ef827a75feb9c7fb06cec111) )
 ROM_END
 
 
@@ -898,6 +1060,9 @@ ROM_START( resdnt_2a ) // 040513 backdoor 1,5 9,1 5,1 1,5  3,3  3,4
 	ROM_LOAD( "resident_m.006", 0x180000, 0x80000, CRC(7437904f) SHA1(630c79cd6a990ce7658a1ffabba5a27efba985a1) )
 	ROM_LOAD( "resident_m.007", 0x280000, 0x80000, CRC(6e94728a) SHA1(ab414879cb957d9bc8d653b5e3bb2bbf91139ec0) )
 	ROM_LOAD( "resident_m.008", 0x380000, 0x80000, CRC(a9f55043) SHA1(4771df3d45bdc0a21b1c479f45e09ac5bab6c94f) )
+
+	ROM_REGION( 0x8000, "m48t35", 0 ) // factory initialized defaults
+	ROM_LOAD( "m48t35", 0x0000, 0x8000, CRC(7a76dd58) SHA1(70c240dcbfb30b9119ca8de1fb769891a4c5d0f2) )
 ROM_END
 
 ROM_START( resdnt_2b ) // 040513 custom alteras, modified graphics, changed version text to "VIDEO GAME-1 SE01"
@@ -913,6 +1078,9 @@ ROM_START( resdnt_2b ) // 040513 custom alteras, modified graphics, changed vers
 	ROM_LOAD( "bootleg_6b", 0x180000, 0x80000, CRC(2a4364c6) SHA1(f2760d7416585123a46ffb47ab9da008532f64bb) )
 	ROM_LOAD( "bootleg_7b", 0x280000, 0x80000, CRC(a34d91d0) SHA1(9616952b1e8b6c06c8bca3c776bdfa3526ef60cf) )
 	ROM_LOAD( "bootleg_8b", 0x380000, 0x80000, CRC(a0be7be4) SHA1(d6f4a1ba22be638fa801923960da8f5f72fc16c0) )
+
+	ROM_REGION( 0x8000, "m48t35", 0 ) // factory initialized defaults
+	ROM_LOAD( "m48t35", 0x0000, 0x8000, CRC(7a76dd58) SHA1(70c240dcbfb30b9119ca8de1fb769891a4c5d0f2) )
 ROM_END
 
 ROM_START( resdnt_2c ) // 040513 custom alteras, modified graphics, changed version text to "VIDEO GAME-1 SE01"
@@ -928,6 +1096,9 @@ ROM_START( resdnt_2c ) // 040513 custom alteras, modified graphics, changed vers
 	ROM_LOAD( "bootleg_6b", 0x180000, 0x80000, CRC(2a4364c6) SHA1(f2760d7416585123a46ffb47ab9da008532f64bb) )
 	ROM_LOAD( "bootleg_7b", 0x280000, 0x80000, CRC(a34d91d0) SHA1(9616952b1e8b6c06c8bca3c776bdfa3526ef60cf) )
 	ROM_LOAD( "bootleg_8b", 0x380000, 0x80000, CRC(a0be7be4) SHA1(d6f4a1ba22be638fa801923960da8f5f72fc16c0) )
+
+	ROM_REGION( 0x8000, "m48t35", 0 ) // factory initialized defaults
+	ROM_LOAD( "m48t35", 0x0000, 0x8000, CRC(7a76dd58) SHA1(70c240dcbfb30b9119ca8de1fb769891a4c5d0f2) )
 ROM_END
 
 ROM_START( resdnt_2d ) // 040513 custom alteras, modified graphics, many texts changed, changed version text to "VIDEO GAME-1 SE01"
@@ -943,6 +1114,9 @@ ROM_START( resdnt_2d ) // 040513 custom alteras, modified graphics, many texts c
 	ROM_LOAD( "bootleg_6d", 0x180000, 0x80000, CRC(1e06508e) SHA1(df64f3849945f0303e55de7061d3fc3370a27299) )
 	ROM_LOAD( "bootleg_7d", 0x280000, 0x80000, CRC(e896b62f) SHA1(fb97ff11b49345fda04d5b1f03ec96fdf4a71419) )
 	ROM_LOAD( "bootleg_8d", 0x380000, 0x80000, CRC(a8de4e0a) SHA1(92264e99a7c90967bf71ca440b5cd4df4baeb553) )
+
+	ROM_REGION( 0x8000, "m48t35", 0 ) // factory initialized defaults
+	ROM_LOAD( "m48t35", 0x0000, 0x8000, CRC(7a76dd58) SHA1(70c240dcbfb30b9119ca8de1fb769891a4c5d0f2) )
 ROM_END
 
 ROM_START( resdnt_2e ) // 040513 modified graphics, changed version text to "MDS_is_the_best_ LOTTOGAME (I)"
@@ -958,6 +1132,9 @@ ROM_START( resdnt_2e ) // 040513 modified graphics, changed version text to "MDS
 	ROM_LOAD( "resident_m.006", 0x180000, 0x80000, CRC(7437904f) SHA1(630c79cd6a990ce7658a1ffabba5a27efba985a1) )
 	ROM_LOAD( "resident_m.007", 0x280000, 0x80000, CRC(6e94728a) SHA1(ab414879cb957d9bc8d653b5e3bb2bbf91139ec0) )
 	ROM_LOAD( "resident_m.008", 0x380000, 0x80000, CRC(a9f55043) SHA1(4771df3d45bdc0a21b1c479f45e09ac5bab6c94f) )
+
+	ROM_REGION( 0x8000, "m48t35", 0 ) // factory initialized defaults
+	ROM_LOAD( "m48t35", 0x0000, 0x8000, CRC(dcef5aaa) SHA1(8f42f7f4da4524b6262246906cd7cf00a626a0ec) )
 ROM_END
 
 ROM_START( resdnt_2f ) // 040513 modified graphics, many texts changed, changed version text to "LOTO PROGRAM V-RS2"
@@ -973,6 +1150,9 @@ ROM_START( resdnt_2f ) // 040513 modified graphics, many texts changed, changed 
 	ROM_LOAD( "resident_m.006", 0x180000, 0x80000, CRC(7437904f) SHA1(630c79cd6a990ce7658a1ffabba5a27efba985a1) )
 	ROM_LOAD( "resident_m.007", 0x280000, 0x80000, CRC(6e94728a) SHA1(ab414879cb957d9bc8d653b5e3bb2bbf91139ec0) )
 	ROM_LOAD( "resident_m.008", 0x380000, 0x80000, CRC(a9f55043) SHA1(4771df3d45bdc0a21b1c479f45e09ac5bab6c94f) )
+
+	ROM_REGION( 0x8000, "m48t35", 0 ) // factory initialized defaults
+	ROM_LOAD( "m48t35", 0x0000, 0x8000, CRC(7a76dd58) SHA1(70c240dcbfb30b9119ca8de1fb769891a4c5d0f2) )
 ROM_END
 
 ROM_START( resdnt_2g ) // 040513 custom alteras, modified graphics, many texts changed, changed version text to "LOTOS SE01"
@@ -988,6 +1168,9 @@ ROM_START( resdnt_2g ) // 040513 custom alteras, modified graphics, many texts c
 	ROM_LOAD( "bootleg_6d", 0x180000, 0x80000, CRC(1e06508e) SHA1(df64f3849945f0303e55de7061d3fc3370a27299) )
 	ROM_LOAD( "bootleg_7d", 0x280000, 0x80000, CRC(e896b62f) SHA1(fb97ff11b49345fda04d5b1f03ec96fdf4a71419) )
 	ROM_LOAD( "bootleg_8d", 0x380000, 0x80000, CRC(a8de4e0a) SHA1(92264e99a7c90967bf71ca440b5cd4df4baeb553) )
+
+	ROM_REGION( 0x8000, "m48t35", 0 ) // factory initialized defaults
+	ROM_LOAD( "m48t35", 0x0000, 0x8000, CRC(7a76dd58) SHA1(70c240dcbfb30b9119ca8de1fb769891a4c5d0f2) )
 ROM_END
 
 
@@ -1005,6 +1188,9 @@ ROM_START( islanda ) // 050713 backdoor 1,1 1,3 1,5 1,7  3,3  3,4
 	ROM_LOAD( "island.006", 0x180000, 0x80000, CRC(0faaa968) SHA1(0f05546e6e0559e24c6afdde65b3feeb66b6adff) )
 	ROM_LOAD( "island.007", 0x280000, 0x80000, CRC(d7277a6c) SHA1(d96a0befc965ad22087381982305d68208978a7e) )
 	ROM_LOAD( "island.008", 0x380000, 0x80000, CRC(ac6fba48) SHA1(64dd03d624f16da52bc7fa0702246e91ae39a806) )
+
+	ROM_REGION( 0x8000, "m48t35", 0 ) // factory initialized defaults
+	ROM_LOAD( "m48t35", 0x0000, 0x8000, CRC(30c24324) SHA1(cd531f23ddae833a3a652d8c97d619ba123e8cb7) )
 ROM_END
 
 ROM_START( islandb ) // 050713 custom alteras, modified graphics, many texts changed, changed version text to "VIDEO GAME-1 OS01"
@@ -1020,6 +1206,9 @@ ROM_START( islandb ) // 050713 custom alteras, modified graphics, many texts cha
 	ROM_LOAD( "bootleg_6a", 0x180000, 0x80000, CRC(f59eaafa) SHA1(c324ff461b997c79572644b2974db33a156a00e8) )
 	ROM_LOAD( "bootleg_7a", 0x280000, 0x80000, CRC(5248d6b8) SHA1(1ef6fbc56c81b641003b16eceffb8d0b3d385546) )
 	ROM_LOAD( "bootleg_8a", 0x380000, 0x80000, CRC(47d37fe9) SHA1(1c12cadfe265bd18539af8c94deef674e179eea4) )
+
+	ROM_REGION( 0x8000, "m48t35", 0 ) // factory initialized defaults
+	ROM_LOAD( "m48t35", 0x0000, 0x8000, CRC(30c24324) SHA1(cd531f23ddae833a3a652d8c97d619ba123e8cb7) )
 ROM_END
 
 ROM_START( islandc ) // 050713 custom alteras, modified graphics, many texts changed, changed version text to "LOTOS OS01"
@@ -1035,6 +1224,9 @@ ROM_START( islandc ) // 050713 custom alteras, modified graphics, many texts cha
 	ROM_LOAD( "bootleg_6a", 0x180000, 0x80000, CRC(f59eaafa) SHA1(c324ff461b997c79572644b2974db33a156a00e8) )
 	ROM_LOAD( "bootleg_7a", 0x280000, 0x80000, CRC(5248d6b8) SHA1(1ef6fbc56c81b641003b16eceffb8d0b3d385546) )
 	ROM_LOAD( "bootleg_8a", 0x380000, 0x80000, CRC(47d37fe9) SHA1(1c12cadfe265bd18539af8c94deef674e179eea4) )
+
+	ROM_REGION( 0x8000, "m48t35", 0 ) // factory initialized defaults
+	ROM_LOAD( "m48t35", 0x0000, 0x8000, CRC(30c24324) SHA1(cd531f23ddae833a3a652d8c97d619ba123e8cb7) )
 ROM_END
 
 
@@ -1053,8 +1245,8 @@ ROM_START( island2a ) // 060529 bank F9
 	ROM_LOAD( "island2.007", 0x280000, 0x80000, CRC(edd72be6) SHA1(fb1e63f59e8565c23ae43630fa572fbc022c878f) )
 	ROM_LOAD( "island2.008", 0x380000, 0x80000, CRC(c336d608) SHA1(55391183c6d95ecea81354efa70641350860d1f5) )
 
-	ROM_REGION( 0x8000, "m48t35", 0 )
-	ROM_LOAD( "m48t35",      0x000000, 0x08000, CRC(c8ec9973) SHA1(7973189d9b380ca2591d3ef3b80446410f7a8ed8) )
+	ROM_REGION( 0x8000, "m48t35", 0 ) // factory initialized defaults
+	ROM_LOAD( "m48t35", 0x0000, 0x8000, CRC(7c150083) SHA1(3973d317047ffd115ad4f0d63c56d135bcf7d32b) )
 ROM_END
 
 ROM_START( island2b ) // 060529 bank F9, changed version text to 070205, skip some start tests
@@ -1070,6 +1262,9 @@ ROM_START( island2b ) // 060529 bank F9, changed version text to 070205, skip so
 	ROM_LOAD( "island2.006", 0x180000, 0x80000, CRC(55e285d9) SHA1(ba58963441c65220700cd8057e6afe3f5f8faa4f) )
 	ROM_LOAD( "island2.007", 0x280000, 0x80000, CRC(edd72be6) SHA1(fb1e63f59e8565c23ae43630fa572fbc022c878f) )
 	ROM_LOAD( "island2.008", 0x380000, 0x80000, CRC(c336d608) SHA1(55391183c6d95ecea81354efa70641350860d1f5) )
+
+	ROM_REGION( 0x8000, "m48t35", 0 ) // factory initialized defaults
+	ROM_LOAD( "m48t35", 0x0000, 0x8000, CRC(a0a1225d) SHA1(9496de02c45d7d91ca2595f0873d3b97e9ba4068) )
 ROM_END
 
 ROM_START( island2c ) // 060529 bank F9, modified graphics, changed version text to "MDS_is_the_best_ LOTTOGAME (I)"
@@ -1085,6 +1280,9 @@ ROM_START( island2c ) // 060529 bank F9, modified graphics, changed version text
 	ROM_LOAD( "bootleg_6b", 0x180000, 0x80000, CRC(b4b7dc6e) SHA1(8b1b195e55d402e298a45b9b5d1b8bff39f6aecd) )
 	ROM_LOAD( "bootleg_7",  0x280000, 0x80000, CRC(edd72be6) SHA1(fb1e63f59e8565c23ae43630fa572fbc022c878f) )
 	ROM_LOAD( "bootleg_8",  0x380000, 0x80000, CRC(c336d608) SHA1(55391183c6d95ecea81354efa70641350860d1f5) )
+
+	ROM_REGION( 0x8000, "m48t35", 0 ) // factory initialized defaults
+	ROM_LOAD( "m48t35", 0x0000, 0x8000, CRC(081ce185) SHA1(7c564ad956ea78421d190e0fb5ad6b9f21397b2c) )
 ROM_END
 
 ROM_START( island2_3a ) // 061218 bank F9, modified graphics, changed version text to "VIDEO GAME-1 OS2-01"
@@ -1100,6 +1298,9 @@ ROM_START( island2_3a ) // 061218 bank F9, modified graphics, changed version te
 	ROM_LOAD( "bootleg_6a", 0x180000, 0x80000, CRC(0072562b) SHA1(df6f24149a194d8654fd10bce4969bd9fc9d2165) )
 	ROM_LOAD( "bootleg_7a", 0x280000, 0x80000, CRC(a325a291) SHA1(de3d4f1ab803faa08a50e4f5dc5a78cd67f5ec1f) )
 	ROM_LOAD( "bootleg_8a", 0x380000, 0x80000, CRC(d6b228ca) SHA1(70c62c38291e7b2bae8f30e1b1488b1d8bc1435c) )
+
+	ROM_REGION( 0x8000, "m48t35", 0 ) // factory initialized defaults
+	ROM_LOAD( "m48t35", 0x0000, 0x8000, CRC(35779a11) SHA1(71dbb98eff18c82432b2a606fc3e0bab43e523bf) )
 ROM_END
 
 ROM_START( island2_4a ) // 070205 bank F9
@@ -1115,6 +1316,9 @@ ROM_START( island2_4a ) // 070205 bank F9
 	ROM_LOAD( "island2.006", 0x180000, 0x80000, CRC(55e285d9) SHA1(ba58963441c65220700cd8057e6afe3f5f8faa4f) )
 	ROM_LOAD( "island2.007", 0x280000, 0x80000, CRC(edd72be6) SHA1(fb1e63f59e8565c23ae43630fa572fbc022c878f) )
 	ROM_LOAD( "island2.008", 0x380000, 0x80000, CRC(c336d608) SHA1(55391183c6d95ecea81354efa70641350860d1f5) )
+
+	ROM_REGION( 0x8000, "m48t35", 0 ) // factory initialized defaults
+	ROM_LOAD( "m48t35", 0x0000, 0x8000, CRC(6408870a) SHA1(a97a5374f8848c46264d76f62de9695c96559a5d) )
 ROM_END
 
 
@@ -1132,6 +1336,9 @@ ROM_START( pirate2a ) // 061005 bank F9
 	ROM_LOAD( "pirate2.006", 0x180000, 0x80000, CRC(366e1465) SHA1(440230d5306c4b424f27839b7fb9c8a5bb922dcc) )
 	ROM_LOAD( "pirate2.007", 0x280000, 0x80000, CRC(21fb963e) SHA1(e3f7fb13f326699e34aebcc3ee07016f7cfe6e46) )
 	ROM_LOAD( "pirate2.008", 0x380000, 0x80000, CRC(40c59448) SHA1(774af0f376864ec5948904df338bc7493eaed392) )
+
+	ROM_REGION( 0x8000, "m48t35", 0 ) // factory initialized defaults
+	ROM_LOAD( "m48t35", 0x0000, 0x8000, CRC(1a0a98a5) SHA1(2d7d2d6bb02317de1f5225189a156d2ec5ade23a) )
 ROM_END
 
 ROM_START( pirate2b ) // 061005 bank F9, skip raster beam position check
@@ -1147,6 +1354,9 @@ ROM_START( pirate2b ) // 061005 bank F9, skip raster beam position check
 	ROM_LOAD( "pirate2.006", 0x180000, 0x80000, CRC(366e1465) SHA1(440230d5306c4b424f27839b7fb9c8a5bb922dcc) )
 	ROM_LOAD( "pirate2.007", 0x280000, 0x80000, CRC(21fb963e) SHA1(e3f7fb13f326699e34aebcc3ee07016f7cfe6e46) )
 	ROM_LOAD( "pirate2.008", 0x380000, 0x80000, CRC(40c59448) SHA1(774af0f376864ec5948904df338bc7493eaed392) )
+
+	ROM_REGION( 0x8000, "m48t35", 0 ) // factory initialized defaults
+	ROM_LOAD( "m48t35", 0x0000, 0x8000, CRC(3ba715aa) SHA1(eaa6cf46f888029ff441a6a3e8bbc89b7ed358a9) )
 ROM_END
 
 ROM_START( pirate2c ) // 061005 bank F9, changed version text to 070126
@@ -1162,6 +1372,9 @@ ROM_START( pirate2c ) // 061005 bank F9, changed version text to 070126
 	ROM_LOAD( "pirate2.006", 0x180000, 0x80000, CRC(366e1465) SHA1(440230d5306c4b424f27839b7fb9c8a5bb922dcc) )
 	ROM_LOAD( "pirate2.007", 0x280000, 0x80000, CRC(21fb963e) SHA1(e3f7fb13f326699e34aebcc3ee07016f7cfe6e46) )
 	ROM_LOAD( "pirate2.008", 0x380000, 0x80000, CRC(40c59448) SHA1(774af0f376864ec5948904df338bc7493eaed392) )
+
+	ROM_REGION( 0x8000, "m48t35", 0 ) // factory initialized defaults
+	ROM_LOAD( "m48t35", 0x0000, 0x8000, CRC(e8d47066) SHA1(2a3cac3a6fbbe313236c83b8635678b79f17304f) )
 ROM_END
 
 ROM_START( pirate2d ) // 061005 bank F9, changed version text to 070126
@@ -1177,6 +1390,9 @@ ROM_START( pirate2d ) // 061005 bank F9, changed version text to 070126
 	ROM_LOAD( "pirate2.006", 0x180000, 0x80000, CRC(366e1465) SHA1(440230d5306c4b424f27839b7fb9c8a5bb922dcc) )
 	ROM_LOAD( "pirate2.007", 0x280000, 0x80000, CRC(21fb963e) SHA1(e3f7fb13f326699e34aebcc3ee07016f7cfe6e46) )
 	ROM_LOAD( "pirate2.008", 0x380000, 0x80000, CRC(40c59448) SHA1(774af0f376864ec5948904df338bc7493eaed392) )
+
+	ROM_REGION( 0x8000, "m48t35", 0 ) // factory initialized defaults
+	ROM_LOAD( "m48t35", 0x0000, 0x8000, CRC(1a0a98a5) SHA1(2d7d2d6bb02317de1f5225189a156d2ec5ade23a) )
 ROM_END
 
 ROM_START( pirate2e ) // 061005 bank F9, changed version text to 070126, skip some start tests
@@ -1192,6 +1408,9 @@ ROM_START( pirate2e ) // 061005 bank F9, changed version text to 070126, skip so
 	ROM_LOAD( "pirate2.006", 0x180000, 0x80000, CRC(366e1465) SHA1(440230d5306c4b424f27839b7fb9c8a5bb922dcc) )
 	ROM_LOAD( "pirate2.007", 0x280000, 0x80000, CRC(21fb963e) SHA1(e3f7fb13f326699e34aebcc3ee07016f7cfe6e46) )
 	ROM_LOAD( "pirate2.008", 0x380000, 0x80000, CRC(40c59448) SHA1(774af0f376864ec5948904df338bc7493eaed392) )
+
+	ROM_REGION( 0x8000, "m48t35", 0 ) // factory initialized defaults
+	ROM_LOAD( "m48t35", 0x0000, 0x8000, CRC(6a6e77b9) SHA1(c5a40617b57f0b299a16e84a0d0cf8d63455c0fe) )
 ROM_END
 
 ROM_START( pirate2f ) // 061005 custom alteras, modified graphics, many texts changed, changed version text to "VIDEO GAME-1 PR01"
@@ -1207,6 +1426,9 @@ ROM_START( pirate2f ) // 061005 custom alteras, modified graphics, many texts ch
 	ROM_LOAD( "bootleg_6a", 0x180000, 0x80000, CRC(913d55e1) SHA1(030eb39a4e34e7c5791059ac2affcded914096ae) )
 	ROM_LOAD( "bootleg_7a", 0x280000, 0x80000, CRC(02fb1604) SHA1(7fd9c6f256f22e437cdd7938b353a4ba9ceb006a) )
 	ROM_LOAD( "bootleg_8a", 0x380000, 0x80000, CRC(48643b99) SHA1(1b0399df326835a6b442137d233cc741cf7863de) )
+
+	ROM_REGION( 0x8000, "m48t35", 0 ) // factory initialized defaults
+	ROM_LOAD( "m48t35", 0x0000, 0x8000, CRC(1a0a98a5) SHA1(2d7d2d6bb02317de1f5225189a156d2ec5ade23a) )
 ROM_END
 
 ROM_START( pirate2g ) // 061005 bank F9, modified graphics, changed version text to "MDS_is_the_best_ LOTTOGAME (I)"
@@ -1222,6 +1444,9 @@ ROM_START( pirate2g ) // 061005 bank F9, modified graphics, changed version text
 	ROM_LOAD( "bootleg_6b", 0x180000, 0x80000, CRC(19155fa8) SHA1(81458b32432caa3effba778971840e330be33585) )
 	ROM_LOAD( "bootleg_7b", 0x280000, 0x80000, CRC(7fb69540) SHA1(595ede785962c8af84eee7ff47c4b3bc91c5537a) )
 	ROM_LOAD( "bootleg_8b", 0x380000, 0x80000, CRC(f8a97474) SHA1(b8c5be0f7bc3f4a08823a1bf8e2026afe11d052c) )
+
+	ROM_REGION( 0x8000, "m48t35", 0 ) // factory initialized defaults
+	ROM_LOAD( "m48t35", 0x0000, 0x8000, CRC(6b5e8618) SHA1(e65cb22456c74923dd1cd5f91d4ed9c3bcf5b15d) )
 ROM_END
 
 ROM_START( pirate2h ) // 061005 custom alteras, modified graphics, many texts changed, changed version text to "LOTOS PR01"
@@ -1237,6 +1462,9 @@ ROM_START( pirate2h ) // 061005 custom alteras, modified graphics, many texts ch
 	ROM_LOAD( "bootleg_6a", 0x180000, 0x80000, CRC(913d55e1) SHA1(030eb39a4e34e7c5791059ac2affcded914096ae) )
 	ROM_LOAD( "bootleg_7a", 0x280000, 0x80000, CRC(02fb1604) SHA1(7fd9c6f256f22e437cdd7938b353a4ba9ceb006a) )
 	ROM_LOAD( "bootleg_8a", 0x380000, 0x80000, CRC(48643b99) SHA1(1b0399df326835a6b442137d233cc741cf7863de) )
+
+	ROM_REGION( 0x8000, "m48t35", 0 ) // factory initialized defaults
+	ROM_LOAD( "m48t35", 0x0000, 0x8000, CRC(1a0a98a5) SHA1(2d7d2d6bb02317de1f5225189a156d2ec5ade23a) )
 ROM_END
 
 ROM_START( pirate2_2a ) // 070126 bank F9
@@ -1252,6 +1480,9 @@ ROM_START( pirate2_2a ) // 070126 bank F9
 	ROM_LOAD( "pirate2.006", 0x180000, 0x80000, CRC(366e1465) SHA1(440230d5306c4b424f27839b7fb9c8a5bb922dcc) )
 	ROM_LOAD( "pirate2.007", 0x280000, 0x80000, CRC(21fb963e) SHA1(e3f7fb13f326699e34aebcc3ee07016f7cfe6e46) )
 	ROM_LOAD( "pirate2.008", 0x380000, 0x80000, CRC(40c59448) SHA1(774af0f376864ec5948904df338bc7493eaed392) )
+
+	ROM_REGION( 0x8000, "m48t35", 0 ) // factory initialized defaults
+	ROM_LOAD( "m48t35", 0x0000, 0x8000, CRC(ee15ee8a) SHA1(aa7d4e302e14abc8a7bd1b4dc2cfb7b21c5a2061) )
 ROM_END
 
 
@@ -1269,6 +1500,9 @@ ROM_START( keksa ) // 060328 bank F9
 	ROM_LOAD( "keks_m.006", 0x180000, 0x80000, CRC(583da5fd) SHA1(645228db20cdaacb53bfc68731fd1a66a6a8cf56) )
 	ROM_LOAD( "keks_m.007", 0x280000, 0x80000, CRC(311c166a) SHA1(5f0ad8d755a6141964d818b98b3f156cbda8fb0d) )
 	ROM_LOAD( "keks_m.008", 0x380000, 0x80000, CRC(f69b0831) SHA1(75392349ef02a39cf883206938e2c615445065fc) )
+
+	ROM_REGION( 0x8000, "m48t35", 0 ) // factory initialized defaults
+	ROM_LOAD( "m48t35", 0x0000, 0x8000, CRC(99307739) SHA1(cfcf9cd9426a1a977c29f8825288064a561df28d) )
 ROM_END
 
 ROM_START( keksb ) // 060328 backdoor 1,1 1,3 1,5 1,7  3,3  3,4
@@ -1284,6 +1518,9 @@ ROM_START( keksb ) // 060328 backdoor 1,1 1,3 1,5 1,7  3,3  3,4
 	ROM_LOAD( "keks_m.006", 0x180000, 0x80000, CRC(583da5fd) SHA1(645228db20cdaacb53bfc68731fd1a66a6a8cf56) )
 	ROM_LOAD( "keks_m.007", 0x280000, 0x80000, CRC(311c166a) SHA1(5f0ad8d755a6141964d818b98b3f156cbda8fb0d) )
 	ROM_LOAD( "keks_m.008", 0x380000, 0x80000, CRC(f69b0831) SHA1(75392349ef02a39cf883206938e2c615445065fc) )
+
+	ROM_REGION( 0x8000, "m48t35", 0 ) // factory initialized defaults
+	ROM_LOAD( "m48t35", 0x0000, 0x8000, CRC(99307739) SHA1(cfcf9cd9426a1a977c29f8825288064a561df28d) )
 ROM_END
 
 ROM_START( keksc ) // 060328 bank F9, changed version text to 070119
@@ -1299,6 +1536,9 @@ ROM_START( keksc ) // 060328 bank F9, changed version text to 070119
 	ROM_LOAD( "keks_m.006", 0x180000, 0x80000, CRC(583da5fd) SHA1(645228db20cdaacb53bfc68731fd1a66a6a8cf56) )
 	ROM_LOAD( "keks_m.007", 0x280000, 0x80000, CRC(311c166a) SHA1(5f0ad8d755a6141964d818b98b3f156cbda8fb0d) )
 	ROM_LOAD( "keks_m.008", 0x380000, 0x80000, CRC(f69b0831) SHA1(75392349ef02a39cf883206938e2c615445065fc) )
+
+	ROM_REGION( 0x8000, "m48t35", 0 ) // factory initialized defaults
+	ROM_LOAD( "m48t35", 0x0000, 0x8000, CRC(99307739) SHA1(cfcf9cd9426a1a977c29f8825288064a561df28d) )
 ROM_END
 
 ROM_START( keks_2a ) // 060403 bank F9
@@ -1314,6 +1554,9 @@ ROM_START( keks_2a ) // 060403 bank F9
 	ROM_LOAD( "keks_m.006", 0x180000, 0x80000, CRC(583da5fd) SHA1(645228db20cdaacb53bfc68731fd1a66a6a8cf56) )
 	ROM_LOAD( "keks_m.007", 0x280000, 0x80000, CRC(311c166a) SHA1(5f0ad8d755a6141964d818b98b3f156cbda8fb0d) )
 	ROM_LOAD( "keks_m.008", 0x380000, 0x80000, CRC(f69b0831) SHA1(75392349ef02a39cf883206938e2c615445065fc) )
+
+	ROM_REGION( 0x8000, "m48t35", 0 ) // factory initialized defaults
+	ROM_LOAD( "m48t35", 0x0000, 0x8000, CRC(99307739) SHA1(cfcf9cd9426a1a977c29f8825288064a561df28d) )
 ROM_END
 
 ROM_START( keks_2b ) // 060403 bank F9, changed version text to 070119
@@ -1329,6 +1572,9 @@ ROM_START( keks_2b ) // 060403 bank F9, changed version text to 070119
 	ROM_LOAD( "keks_m.006", 0x180000, 0x80000, CRC(583da5fd) SHA1(645228db20cdaacb53bfc68731fd1a66a6a8cf56) )
 	ROM_LOAD( "keks_m.007", 0x280000, 0x80000, CRC(311c166a) SHA1(5f0ad8d755a6141964d818b98b3f156cbda8fb0d) )
 	ROM_LOAD( "keks_m.008", 0x380000, 0x80000, CRC(f69b0831) SHA1(75392349ef02a39cf883206938e2c615445065fc) )
+
+	ROM_REGION( 0x8000, "m48t35", 0 ) // factory initialized defaults
+	ROM_LOAD( "m48t35", 0x0000, 0x8000, CRC(c8d4c103) SHA1(f5b30651070c8bf3c64bdfe102722cff84bf61fb) )
 ROM_END
 
 ROM_START( keks_2c ) // 060403 custom alteras, modified graphics, bank F9, changed version text to "VIDEO GAME-1 KS01"
@@ -1344,6 +1590,9 @@ ROM_START( keks_2c ) // 060403 custom alteras, modified graphics, bank F9, chang
 	ROM_LOAD( "bootleg_6b", 0x180000, 0x80000, CRC(5ffbfa73) SHA1(0036bdba0ed6f907b8925b55adc33e96913297a3) )
 	ROM_LOAD( "bootleg_7b", 0x280000, 0x80000, CRC(ce3f6152) SHA1(6e142e0d448d7a2328b6f6bf014b8e6de6f18407) )
 	ROM_LOAD( "bootleg_8b", 0x380000, 0x80000, CRC(6e2e6a3d) SHA1(d4efad82b580c7cd53fca705a24aef51edede8ed) )
+
+	ROM_REGION( 0x8000, "m48t35", 0 ) // factory initialized defaults
+	ROM_LOAD( "m48t35", 0x0000, 0x8000, CRC(99307739) SHA1(cfcf9cd9426a1a977c29f8825288064a561df28d))
 ROM_END
 
 ROM_START( keks_2d ) // 060403 modified graphics, bank F9, changed version text to "VIDEO GAME-1 KS01" (keks_2c, decoded gfx)
@@ -1359,6 +1608,9 @@ ROM_START( keks_2d ) // 060403 modified graphics, bank F9, changed version text 
 	ROM_LOAD( "keks_m.006", 0x180000, 0x80000, CRC(583da5fd) SHA1(645228db20cdaacb53bfc68731fd1a66a6a8cf56) )
 	ROM_LOAD( "keks_m.007", 0x280000, 0x80000, CRC(311c166a) SHA1(5f0ad8d755a6141964d818b98b3f156cbda8fb0d) )
 	ROM_LOAD( "keks_m.008", 0x380000, 0x80000, CRC(f69b0831) SHA1(75392349ef02a39cf883206938e2c615445065fc) )
+
+	ROM_REGION( 0x8000, "m48t35", 0 ) // factory initialized defaults
+	ROM_LOAD( "m48t35", 0x0000, 0x8000, CRC(99307739) SHA1(cfcf9cd9426a1a977c29f8825288064a561df28d) )
 ROM_END
 
 ROM_START( keks_2e ) // 060403 bank F9, payout percentage 60%
@@ -1374,6 +1626,9 @@ ROM_START( keks_2e ) // 060403 bank F9, payout percentage 60%
 	ROM_LOAD( "keks_m.006", 0x180000, 0x80000, CRC(583da5fd) SHA1(645228db20cdaacb53bfc68731fd1a66a6a8cf56) )
 	ROM_LOAD( "keks_m.007", 0x280000, 0x80000, CRC(311c166a) SHA1(5f0ad8d755a6141964d818b98b3f156cbda8fb0d) )
 	ROM_LOAD( "keks_m.008", 0x380000, 0x80000, CRC(f69b0831) SHA1(75392349ef02a39cf883206938e2c615445065fc) )
+
+	ROM_REGION( 0x8000, "m48t35", 0 ) // factory initialized defaults
+	ROM_LOAD( "m48t35", 0x0000, 0x8000, CRC(99307739) SHA1(cfcf9cd9426a1a977c29f8825288064a561df28d) )
 ROM_END
 
 ROM_START( keks_2f ) // 060403 bank F9, modified graphics, changed version text to "MDS_is_the_best_ LOTTOGAME (I)"
@@ -1389,6 +1644,9 @@ ROM_START( keks_2f ) // 060403 bank F9, modified graphics, changed version text 
 	ROM_LOAD( "bootleg_6d", 0x180000, 0x80000, CRC(baa7cce5) SHA1(1aacc85498f026358085caa854c2caaad3de5abf) )
 	ROM_LOAD( "keks_m.007", 0x280000, 0x80000, CRC(311c166a) SHA1(5f0ad8d755a6141964d818b98b3f156cbda8fb0d) )
 	ROM_LOAD( "keks_m.008", 0x380000, 0x80000, CRC(f69b0831) SHA1(75392349ef02a39cf883206938e2c615445065fc) )
+
+	ROM_REGION( 0x8000, "m48t35", 0 ) // factory initialized defaults
+	ROM_LOAD( "m48t35", 0x0000, 0x8000, CRC(a6f5fc73) SHA1(59573edb9e52427c255a9b0f7055d10a421b55b3) )
 ROM_END
 
 ROM_START( keks_2g ) // 060403 custom alteras, modified graphics, bank F9, many texts changed, changed version text to "LOTOS KS01"
@@ -1404,6 +1662,9 @@ ROM_START( keks_2g ) // 060403 custom alteras, modified graphics, bank F9, many 
 	ROM_LOAD( "bootleg_6f", 0x180000, 0x80000, CRC(7ecd7ed4) SHA1(e6320741f0def3915c91307cb4e3c277b347dee6) )
 	ROM_LOAD( "bootleg_7f", 0x280000, 0x80000, CRC(e952996a) SHA1(3382158ced985c46fad56fb74766a4ed0e35b6c6) )
 	ROM_LOAD( "bootleg_8f", 0x380000, 0x80000, CRC(4fefa4eb) SHA1(6a2b633e278a9b2a05dde2c6c37f15fc6b3fa7dc) )
+
+	ROM_REGION( 0x8000, "m48t35", 0 ) // factory initialized defaults
+	ROM_LOAD( "m48t35", 0x0000, 0x8000, CRC(99307739) SHA1(cfcf9cd9426a1a977c29f8825288064a561df28d) )
 ROM_END
 
 ROM_START( keks_3a ) // 070119 bank F9
@@ -1419,6 +1680,9 @@ ROM_START( keks_3a ) // 070119 bank F9
 	ROM_LOAD( "keks_m.006", 0x180000, 0x80000, CRC(583da5fd) SHA1(645228db20cdaacb53bfc68731fd1a66a6a8cf56) )
 	ROM_LOAD( "keks_m.007", 0x280000, 0x80000, CRC(311c166a) SHA1(5f0ad8d755a6141964d818b98b3f156cbda8fb0d) )
 	ROM_LOAD( "keks_m.008", 0x380000, 0x80000, CRC(f69b0831) SHA1(75392349ef02a39cf883206938e2c615445065fc) )
+
+	ROM_REGION( 0x8000, "m48t35", 0 ) // factory initialized defaults
+	ROM_LOAD( "m48t35", 0x0000, 0x8000, CRC(1464bf6c) SHA1(5c1a984825dbd129e8295c3c6de6f82bfe5dc99e) )
 ROM_END
 
 ROM_START( keks_3b ) // 070119 bank F9
@@ -1434,6 +1698,9 @@ ROM_START( keks_3b ) // 070119 bank F9
 	ROM_LOAD( "keks_m.006", 0x180000, 0x80000, CRC(583da5fd) SHA1(645228db20cdaacb53bfc68731fd1a66a6a8cf56) )
 	ROM_LOAD( "keks_m.007", 0x280000, 0x80000, CRC(311c166a) SHA1(5f0ad8d755a6141964d818b98b3f156cbda8fb0d) )
 	ROM_LOAD( "keks_m.008", 0x380000, 0x80000, CRC(f69b0831) SHA1(75392349ef02a39cf883206938e2c615445065fc) )
+
+	ROM_REGION( 0x8000, "m48t35", 0 ) // factory initialized defaults
+	ROM_LOAD( "m48t35", 0x0000, 0x8000, CRC(1464bf6c) SHA1(5c1a984825dbd129e8295c3c6de6f82bfe5dc99e) )
 ROM_END
 
 
@@ -1451,6 +1718,9 @@ ROM_START( gnomea ) // 070906 bank F9
 	ROM_LOAD( "gnome.006", 0x180000, 0x80000, CRC(7ef2b88a) SHA1(7e7de60fc6791731d7cfd6a50e2bc5af1bf5e4b2) )
 	ROM_LOAD( "gnome.007", 0x280000, 0x80000, CRC(71976bdf) SHA1(c44dbfa75a0f12893b3177907fc93b3d5e8ad390) )
 	ROM_LOAD( "gnome.008", 0x380000, 0x80000, CRC(c86a1586) SHA1(e622bca8dc618ca8edc1a7daa9c8286383caebef) )
+
+	ROM_REGION( 0x8000, "m48t35", 0 ) // factory initialized defaults
+	ROM_LOAD( "m48t35", 0x0000, 0x8000, CRC(0cf7c6c9) SHA1(0d0900528f3007f6fb84cb90db97927a879bb2e2) )
 ROM_END
 
 ROM_START( gnomeb ) // 070906 bank F9
@@ -1466,6 +1736,9 @@ ROM_START( gnomeb ) // 070906 bank F9
 	ROM_LOAD( "gnome.006", 0x180000, 0x80000, CRC(7ef2b88a) SHA1(7e7de60fc6791731d7cfd6a50e2bc5af1bf5e4b2) )
 	ROM_LOAD( "gnome.007", 0x280000, 0x80000, CRC(71976bdf) SHA1(c44dbfa75a0f12893b3177907fc93b3d5e8ad390) )
 	ROM_LOAD( "gnome.008", 0x380000, 0x80000, CRC(c86a1586) SHA1(e622bca8dc618ca8edc1a7daa9c8286383caebef) )
+
+	ROM_REGION( 0x8000, "m48t35", 0 ) // factory initialized defaults
+	ROM_LOAD( "m48t35", 0x0000, 0x8000, CRC(52b7a804) SHA1(d620185adb2160f455f94edc08fd2b9f4a3ea9c2) )
 ROM_END
 
 ROM_START( gnomec ) // 070906 bank F9
@@ -1481,6 +1754,9 @@ ROM_START( gnomec ) // 070906 bank F9
 	ROM_LOAD( "gnome.006", 0x180000, 0x80000, CRC(7ef2b88a) SHA1(7e7de60fc6791731d7cfd6a50e2bc5af1bf5e4b2) )
 	ROM_LOAD( "gnome.007", 0x280000, 0x80000, CRC(71976bdf) SHA1(c44dbfa75a0f12893b3177907fc93b3d5e8ad390) )
 	ROM_LOAD( "gnome.008", 0x380000, 0x80000, CRC(c86a1586) SHA1(e622bca8dc618ca8edc1a7daa9c8286383caebef) )
+
+	ROM_REGION( 0x8000, "m48t35", 0 ) // factory initialized defaults
+	ROM_LOAD( "m48t35", 0x0000, 0x8000, CRC(0cf7c6c9) SHA1(0d0900528f3007f6fb84cb90db97927a879bb2e2) )
 ROM_END
 
 ROM_START( gnomed ) // 070906 custom alteras, modified graphics, many texts changed, changed version text to "VIDEO GAME-1 GN01"
@@ -1496,6 +1772,9 @@ ROM_START( gnomed ) // 070906 custom alteras, modified graphics, many texts chan
 	ROM_LOAD( "bootleg_6a", 0x180000, 0x80000, CRC(95c2d96f) SHA1(8ac7283b65940fc620e126ad7e8563d96378dfd4) )
 	ROM_LOAD( "bootleg_7a", 0x280000, 0x80000, CRC(476d6b00) SHA1(106c4afdb4d4d5afe9ec8395ef26050c814f053a) )
 	ROM_LOAD( "bootleg_8a", 0x380000, 0x80000, CRC(658becb6) SHA1(7280ce53796326a48da8e461de8f78ea78a2f8c2) )
+
+	ROM_REGION( 0x8000, "m48t35", 0 ) // factory initialized defaults
+	ROM_LOAD( "m48t35", 0x0000, 0x8000, CRC(0cf7c6c9) SHA1(0d0900528f3007f6fb84cb90db97927a879bb2e2) )
 ROM_END
 
 ROM_START( gnomee ) // 070906 custom alteras, modified graphics, bank F9, many texts changed, changed version text to "LOTOS GN01"
@@ -1511,6 +1790,9 @@ ROM_START( gnomee ) // 070906 custom alteras, modified graphics, bank F9, many t
 	ROM_LOAD( "bootleg_6a", 0x180000, 0x80000, CRC(95c2d96f) SHA1(8ac7283b65940fc620e126ad7e8563d96378dfd4) )
 	ROM_LOAD( "bootleg_7a", 0x280000, 0x80000, CRC(476d6b00) SHA1(106c4afdb4d4d5afe9ec8395ef26050c814f053a) )
 	ROM_LOAD( "bootleg_8a", 0x380000, 0x80000, CRC(658becb6) SHA1(7280ce53796326a48da8e461de8f78ea78a2f8c2) )
+
+	ROM_REGION( 0x8000, "m48t35", 0 ) // factory initialized defaults
+	ROM_LOAD( "m48t35", 0x0000, 0x8000, CRC(261f5dc8) SHA1(b694866333828703214329147f4736b04ba1aa49) )
 ROM_END
 
 ROM_START( gnome_2a ) // 071115 bank F9
@@ -1526,6 +1808,9 @@ ROM_START( gnome_2a ) // 071115 bank F9
 	ROM_LOAD( "gnome.006", 0x180000, 0x80000, CRC(7ef2b88a) SHA1(7e7de60fc6791731d7cfd6a50e2bc5af1bf5e4b2) )
 	ROM_LOAD( "gnome.007", 0x280000, 0x80000, CRC(71976bdf) SHA1(c44dbfa75a0f12893b3177907fc93b3d5e8ad390) )
 	ROM_LOAD( "gnome.008", 0x380000, 0x80000, CRC(c86a1586) SHA1(e622bca8dc618ca8edc1a7daa9c8286383caebef) )
+
+	ROM_REGION( 0x8000, "m48t35", 0 ) // factory initialized defaults
+	ROM_LOAD( "m48t35", 0x0000, 0x8000, CRC(bbcaa3d0) SHA1(e7a0f7602c77fad46bfc24079b0d0e445e8a651e) )
 ROM_END
 
 
@@ -1542,6 +1827,9 @@ ROM_START( gnome_3a ) // 080303 bank F9
 	ROM_LOAD( "gnome.006", 0x180000, 0x80000, CRC(7ef2b88a) SHA1(7e7de60fc6791731d7cfd6a50e2bc5af1bf5e4b2) )
 	ROM_LOAD( "gnome.007", 0x280000, 0x80000, CRC(71976bdf) SHA1(c44dbfa75a0f12893b3177907fc93b3d5e8ad390) )
 	ROM_LOAD( "gnome.008", 0x380000, 0x80000, CRC(c86a1586) SHA1(e622bca8dc618ca8edc1a7daa9c8286383caebef) )
+
+	ROM_REGION( 0x8000, "m48t35", 0 ) // factory initialized defaults
+	ROM_LOAD( "m48t35", 0x0000, 0x8000, CRC(b67b18e6) SHA1(d6772e6d1bd4c942f92da170c7073636dea2ad48) )
 ROM_END
 
 ROM_START( gnome_3b ) // 080303 bank F9, payout percentage 45%
@@ -1557,6 +1845,9 @@ ROM_START( gnome_3b ) // 080303 bank F9, payout percentage 45%
 	ROM_LOAD( "gnome.006", 0x180000, 0x80000, CRC(7ef2b88a) SHA1(7e7de60fc6791731d7cfd6a50e2bc5af1bf5e4b2) )
 	ROM_LOAD( "gnome.007", 0x280000, 0x80000, CRC(71976bdf) SHA1(c44dbfa75a0f12893b3177907fc93b3d5e8ad390) )
 	ROM_LOAD( "gnome.008", 0x380000, 0x80000, CRC(c86a1586) SHA1(e622bca8dc618ca8edc1a7daa9c8286383caebef) )
+
+	ROM_REGION( 0x8000, "m48t35", 0 ) // factory initialized defaults
+	ROM_LOAD( "m48t35", 0x0000, 0x8000, CRC(b67b18e6) SHA1(d6772e6d1bd4c942f92da170c7073636dea2ad48) )
 ROM_END
 
 ROM_START( gnome_3c ) // 080303 bank F9, payout percentage 60%
@@ -1572,6 +1863,9 @@ ROM_START( gnome_3c ) // 080303 bank F9, payout percentage 60%
 	ROM_LOAD( "gnome.006", 0x180000, 0x80000, CRC(7ef2b88a) SHA1(7e7de60fc6791731d7cfd6a50e2bc5af1bf5e4b2) )
 	ROM_LOAD( "gnome.007", 0x280000, 0x80000, CRC(71976bdf) SHA1(c44dbfa75a0f12893b3177907fc93b3d5e8ad390) )
 	ROM_LOAD( "gnome.008", 0x380000, 0x80000, CRC(c86a1586) SHA1(e622bca8dc618ca8edc1a7daa9c8286383caebef) )
+
+	ROM_REGION( 0x8000, "m48t35", 0 ) // factory initialized defaults
+	ROM_LOAD( "m48t35", 0x0000, 0x8000, CRC(b67b18e6) SHA1(d6772e6d1bd4c942f92da170c7073636dea2ad48) )
 ROM_END
 
 ROM_START( gnome_5a ) // 090406 bank F9, payout percentage 70%
@@ -1587,6 +1881,9 @@ ROM_START( gnome_5a ) // 090406 bank F9, payout percentage 70%
 	ROM_LOAD( "gnome.006", 0x180000, 0x80000, CRC(7ef2b88a) SHA1(7e7de60fc6791731d7cfd6a50e2bc5af1bf5e4b2) )
 	ROM_LOAD( "gnome.007", 0x280000, 0x80000, CRC(71976bdf) SHA1(c44dbfa75a0f12893b3177907fc93b3d5e8ad390) )
 	ROM_LOAD( "gnome.008", 0x380000, 0x80000, CRC(c86a1586) SHA1(e622bca8dc618ca8edc1a7daa9c8286383caebef) )
+
+	ROM_REGION( 0x8000, "m48t35", 0 ) // factory initialized defaults
+	ROM_LOAD( "m48t35", 0x0000, 0x8000, CRC(cce43879) SHA1(4128d59d55e0be9c7bad7c4cdb7ebbc3e3273a51) )
 ROM_END
 
 ROM_START( gnome_5b ) // 090406 bank F9, modified graphics, changed version text to "MDS_is_the_best_ LOTTOGAME (I)"
@@ -1602,6 +1899,9 @@ ROM_START( gnome_5b ) // 090406 bank F9, modified graphics, changed version text
 	ROM_LOAD( "bootleg_6c", 0x180000, 0x80000, CRC(0efe6ea1) SHA1(0bd96da3a2e7ed47f266c391835cbfb0fe5731e6) )
 	ROM_LOAD( "bootleg_7",  0x280000, 0x80000, CRC(71976bdf) SHA1(c44dbfa75a0f12893b3177907fc93b3d5e8ad390) )
 	ROM_LOAD( "gnome.008",  0x380000, 0x80000, CRC(c86a1586) SHA1(e622bca8dc618ca8edc1a7daa9c8286383caebef) )
+
+	ROM_REGION( 0x8000, "m48t35", 0 ) // factory initialized defaults
+	ROM_LOAD( "m48t35", 0x0000, 0x8000, CRC(3ef48004) SHA1(ced4cd5fc05b44ea004bbe74522fb07ad514a7ae) )
 ROM_END
 
 
@@ -1618,6 +1918,9 @@ ROM_START( fcockt2a ) // 080707 bank F9
 	ROM_LOAD( "fruitcocktail2_old.006", 0x180000, 0x80000, CRC(2c9f712e) SHA1(c3118154eafca74b66b3325a2e07c85f86f3544d) )
 	ROM_LOAD( "fruitcocktail2_old.007", 0x280000, 0x80000, CRC(85ba9a86) SHA1(aa9b6170135e9e420509e8f7c1702c9896bc5d8e) )
 	ROM_LOAD( "fruitcocktail2_old.008", 0x380000, 0x80000, CRC(a27c49a2) SHA1(7c9ee0e01f76ca3ab6716579f5dde7036050970b) )
+
+	ROM_REGION( 0x8000, "m48t35", 0 ) // factory initialized defaults
+	ROM_LOAD( "m48t35", 0x0000, 0x8000, CRC(7c601cc1) SHA1(ac43de86e2cbac33185de92ba4ca8aa8a7f366be) )
 ROM_END
 
 ROM_START( fcockt2_4a ) // 081105 bank F9
@@ -1633,6 +1936,9 @@ ROM_START( fcockt2_4a ) // 081105 bank F9
 	ROM_LOAD( "fruitcocktail2.006", 0x180000, 0x80000, CRC(8fc75fd7) SHA1(3b7cd8a3e04ca9d4494b37c801e21d1293f094e8) )
 	ROM_LOAD( "fruitcocktail2.007", 0x280000, 0x80000, CRC(d37fcc0f) SHA1(57c2ea5dc747f16e2233305f2c73cb4b632aae2c) )
 	ROM_LOAD( "fruitcocktail2.008", 0x380000, 0x80000, CRC(e3a9442c) SHA1(cbaba182e858b0f158756118e5da873e3ddfc0b9) )
+
+	ROM_REGION( 0x8000, "m48t35", 0 ) // factory initialized defaults
+	ROM_LOAD( "m48t35", 0x0000, 0x8000, CRC(d8e3ce83) SHA1(0912b67b9fe63a88b22de5a00a812288635dd2ca) )
 ROM_END
 
 ROM_START( fcockt2_4b ) // 081105 bank F9, no credit limit, "MaxVin" signature
@@ -1648,6 +1954,9 @@ ROM_START( fcockt2_4b ) // 081105 bank F9, no credit limit, "MaxVin" signature
 	ROM_LOAD( "fruitcocktail2.006", 0x180000, 0x80000, CRC(8fc75fd7) SHA1(3b7cd8a3e04ca9d4494b37c801e21d1293f094e8) )
 	ROM_LOAD( "fruitcocktail2.007", 0x280000, 0x80000, CRC(d37fcc0f) SHA1(57c2ea5dc747f16e2233305f2c73cb4b632aae2c) )
 	ROM_LOAD( "fruitcocktail2.008", 0x380000, 0x80000, CRC(e3a9442c) SHA1(cbaba182e858b0f158756118e5da873e3ddfc0b9) )
+
+	ROM_REGION( 0x8000, "m48t35", 0 ) // factory initialized defaults
+	ROM_LOAD( "m48t35", 0x0000, 0x8000, CRC(c13d3d9c) SHA1(911dd037410e75c7211a0961cce784cb605945ae) )
 ROM_END
 
 ROM_START( fcockt2_4c ) // 081105 custom alteras, modified graphics, bank F9, many texts changed, changed version text to "VIDEO GAME-1 FR02"
@@ -1663,6 +1972,9 @@ ROM_START( fcockt2_4c ) // 081105 custom alteras, modified graphics, bank F9, ma
 	ROM_LOAD( "bootleg_6b", 0x180000, 0x80000, CRC(aa982f4e) SHA1(edf75d4ddd60532ac0ca2e17e3fd9004aa768973) )
 	ROM_LOAD( "bootleg_7b", 0x280000, 0x80000, CRC(b9b1ead7) SHA1(111e505fce8fe75043ff7cc5dc68e81ce4f98d06) )
 	ROM_LOAD( "bootleg_8b", 0x380000, 0x80000, CRC(8e49d1c1) SHA1(4735503335cf499895d1b2d9a405be50f21a2d68) )
+
+	ROM_REGION( 0x8000, "m48t35", 0 ) // factory initialized defaults
+	ROM_LOAD( "m48t35", 0x0000, 0x8000, CRC(5156e49d) SHA1(be601f18d29a430ba41dda0ef2e0d337f686578e) )
 ROM_END
 
 ROM_START( fcockt2_4d ) // 081105 bank F9, no credit limit, "MaxVin" signature, payout percentage 70%
@@ -1678,6 +1990,9 @@ ROM_START( fcockt2_4d ) // 081105 bank F9, no credit limit, "MaxVin" signature, 
 	ROM_LOAD( "fruitcocktail2.006", 0x180000, 0x80000, CRC(8fc75fd7) SHA1(3b7cd8a3e04ca9d4494b37c801e21d1293f094e8) )
 	ROM_LOAD( "fruitcocktail2.007", 0x280000, 0x80000, CRC(d37fcc0f) SHA1(57c2ea5dc747f16e2233305f2c73cb4b632aae2c) )
 	ROM_LOAD( "fruitcocktail2.008", 0x380000, 0x80000, CRC(e3a9442c) SHA1(cbaba182e858b0f158756118e5da873e3ddfc0b9) )
+
+	ROM_REGION( 0x8000, "m48t35", 0 ) // factory initialized defaults
+	ROM_LOAD( "m48t35", 0x0000, 0x8000, CRC(c13d3d9c) SHA1(911dd037410e75c7211a0961cce784cb605945ae) )
 ROM_END
 
 ROM_START( fcockt2_4e ) // 081105 bank F9, modified graphics, changed version text to "MDS_is_the_best_ LOTTOGAME (I)"
@@ -1693,6 +2008,9 @@ ROM_START( fcockt2_4e ) // 081105 bank F9, modified graphics, changed version te
 	ROM_LOAD( "bootleg_6c", 0x180000, 0x80000, CRC(21a91970) SHA1(6f4832c743469171cd0efe4554f243c4bed21e88) )
 	ROM_LOAD( "bootleg_7c", 0x280000, 0x80000, CRC(3a8a7340) SHA1(9408791686926dd13216352ffcb04ad9f8954b3e) )
 	ROM_LOAD( "bootleg_8c", 0x380000, 0x80000, CRC(fbf48ebd) SHA1(04917e613d9a3f0caeab71c78b9f77c4b5b84988) )
+
+	ROM_REGION( 0x8000, "m48t35", 0 ) // factory initialized defaults
+	ROM_LOAD( "m48t35", 0x0000, 0x8000, CRC(1ad900b4) SHA1(989413bbb0764735f704089a582cdcc4fba6a63c) )
 ROM_END
 
 ROM_START( fcockt2_4f ) // 081105 custom alteras, modified graphics, bank F9, many texts changed, changed version text to "LOTOS FR02"
@@ -1708,6 +2026,9 @@ ROM_START( fcockt2_4f ) // 081105 custom alteras, modified graphics, bank F9, ma
 	ROM_LOAD( "bootleg_6b", 0x180000, 0x80000, CRC(aa982f4e) SHA1(edf75d4ddd60532ac0ca2e17e3fd9004aa768973) )
 	ROM_LOAD( "bootleg_7b", 0x280000, 0x80000, CRC(b9b1ead7) SHA1(111e505fce8fe75043ff7cc5dc68e81ce4f98d06) )
 	ROM_LOAD( "bootleg_8b", 0x380000, 0x80000, CRC(8e49d1c1) SHA1(4735503335cf499895d1b2d9a405be50f21a2d68) )
+
+	ROM_REGION( 0x8000, "m48t35", 0 ) // factory initialized defaults
+	ROM_LOAD( "m48t35", 0x0000, 0x8000, CRC(08bd9c8c) SHA1(c63805246c6590d7ad0d28bffb776295b5e86792) )
 ROM_END
 
 
@@ -1780,7 +2101,7 @@ GAME( 2005, islanda,    island,    igrosoft_gamble, igrosoft_gamble, igrosoft_ga
 GAME( 2005, islandb,    island,    igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, customl, ROT0,  "bootleg", "Island (bootleg, 050713, VIDEO GAME-1 OS01)", MACHINE_SUPPORTS_SAVE ) // custom alteras, modified graphics, many texts changed, changed version text to "VIDEO GAME-1 OS01"
 GAME( 2005, islandc,    island,    igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, customl, ROT0,  "bootleg", "Island (bootleg, 050713, LOTOS OS01)",        MACHINE_SUPPORTS_SAVE ) // custom alteras, modified graphics, many texts changed, changed version text to "LOTOS OS01"
 
-GAME( 2006, island2a,   island2,   igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, 0,       ROT0,  "bootleg", "Island 2 (bootleg, 060529, banking address hack)",                       MACHINE_SUPPORTS_SAVE ) // bank F9 (not standart, game not work)
+GAME( 2006, island2a,   island2,   igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, 0,       ROT0,  "bootleg", "Island 2 (bootleg, 060529, banking address hack)",                       MACHINE_SUPPORTS_SAVE ) // bank F9 (not standard, requires default value in timekeeper to boot)
 GAME( 2006, island2b,   island2,   igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, 0,       ROT0,  "bootleg", "Island 2 (bootleg, 060529, banking address hack, changed version text)", MACHINE_SUPPORTS_SAVE ) // bank F9, changed version text to 070205, skip some start tests
 GAME( 2006, island2c,   island2,   igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, 0,       ROT0,  "bootleg", "Island 2 (bootleg, 060529, LOTTOGAME (I))",                              MACHINE_SUPPORTS_SAVE ) // bank F9, modified graphics, changed version text to "MDS_is_the_best_ LOTTOGAME (I)"
 GAME( 2006, island2_3a, island2,   igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, 0,       ROT0,  "bootleg", "Island 2 (bootleg, 061218, VIDEO GAME-1 OS2-01)",                        MACHINE_SUPPORTS_SAVE ) // bank F9, modified graphics, changed version text to "VIDEO GAME-1 OS2-01"
