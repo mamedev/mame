@@ -344,7 +344,7 @@ static imgtoolerr_t concept_image_nextenum(imgtool::directory &enumeration, imgt
 	ent.corrupt = 0;
 	ent.eof = 0;
 
-	if ((iter->image->dev_dir.file_dir[iter->index].filename[0] == 0) || (iter->index > 77))
+	if ((iter->image->dev_dir.file_dir[iter->index].filename[0] == 0) || (iter->index >= 77))
 	{
 		ent.eof = 1;
 	}
@@ -416,7 +416,7 @@ static imgtoolerr_t concept_image_freespace(imgtool::partition &partition, uint6
 					- get_UINT16xE(image->dev_dir.vol_hdr.disk_flipped, image->dev_dir.vol_hdr.next_block);
 
 	/* next substract length of each file */
-	for (i=0; (image->dev_dir.file_dir[i].filename[0] != 0) && (i <= 77); i++)
+	for (i=0; (image->dev_dir.file_dir[i].filename[0] != 0) && (i < 77); i++)
 	{
 		free_blocks -= get_UINT16xE(image->dev_dir.vol_hdr.disk_flipped, image->dev_dir.file_dir[i].next_block)
 						- get_UINT16xE(image->dev_dir.vol_hdr.disk_flipped, image->dev_dir.file_dir[i].first_block);
