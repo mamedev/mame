@@ -2726,8 +2726,8 @@ void S3C24_CLASS_NAME::nand_update_mecc(uint8_t *ecc, int pos, uint8_t data)
 	if (pos & 0x040) ecc[1] ^= (temp << 5); else ecc[1] ^= (temp << 4);
 	if (pos & 0x080) ecc[1] ^= (temp << 7); else ecc[1] ^= (temp << 6);
 	if (pos & 0x100) ecc[2] ^= (temp << 1); else ecc[2] ^= (temp << 0);
-	if (pos & 0x200) ecc[3] ^= (temp << 5); else ecc[3] ^= (temp << 4);
-	if (pos & 0x400) ecc[3] ^= (temp << 7); else ecc[3] ^= (temp << 6);
+	if (pos & 0x200) ecc[2] ^= (temp << 5); else ecc[3] ^= (temp << 4);
+	if (pos & 0x400) ecc[2] ^= (temp << 7); else ecc[3] ^= (temp << 6);
 }
 
 #if defined(DEVICE_S3C2440)
