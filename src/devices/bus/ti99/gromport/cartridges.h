@@ -171,21 +171,21 @@ private:
 	{
 	public:
 		rpk_socket(const char *id, int length, uint8_t *contents);
-		rpk_socket(const char *id, int length, uint8_t *contents, const char *pathname);
+		rpk_socket(const char *id, int length, uint8_t *contents, std::string &&pathname);
 		~rpk_socket() {}
 
 		const char*     id() { return m_id; }
 		int             get_content_length() { return m_length; }
 		uint8_t*          get_contents() { return m_contents; }
-		bool            persistent_ram() { return m_pathname != nullptr; }
-		const char*     get_pathname() { return m_pathname; }
+		bool            persistent_ram() { return !m_pathname.empty(); }
+		const char*     get_pathname() { return m_pathname.c_str(); }
 		void            cleanup() { if (m_contents != nullptr) global_free_array(m_contents); }
 
 	private:
 		const char*     m_id;
 		uint32_t          m_length;
 		uint8_t*          m_contents;
-		const char*     m_pathname;
+		const std::string m_pathname;
 	};
 
 	bool    m_readrom;
