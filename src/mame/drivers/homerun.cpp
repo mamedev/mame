@@ -468,7 +468,8 @@ ROM_START( ganjaja )
 ROM_END
 
 
-GAME( 1988, nhomerun, 0, homerun, homerun,  homerun_state, 0,  ROT0, "Jaleco", "NEW Moero!! Pro Yakyuu Homerun Kyousou", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // same as below but harder?
-GAME( 1988, homerun,  nhomerun, homerun,  homerun,  homerun_state, 0, ROT0, "Jaleco", "Moero!! Pro Yakyuu Homerun Kyousou", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1988, dynashot, 0, dynashot, dynashot, homerun_state, 0, ROT0, "Jaleco", "Dynamic Shoot Kyousou", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1990, ganjaja,  0, ganjaja,  ganjaja,  homerun_state, 0, ROT0, "Jaleco", "Ganbare Jajamaru Saisho wa Goo / Ganbare Jajamaru Hop Step & Jump", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME      PARENT    MACHINE   INPUT     STATE          INIT   ROT    COMPANY   FULLNAME                                                            FLAGS
+GAME( 1988, nhomerun, 0,        homerun,  homerun,  homerun_state, 0,     ROT0, "Jaleco", "NEW Moero!! Pro Yakyuu Homerun Kyousou",                            MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // same as below but harder?
+GAME( 1988, homerun,  nhomerun, homerun,  homerun,  homerun_state, 0,     ROT0, "Jaleco", "Moero!! Pro Yakyuu Homerun Kyousou",                                MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1988, dynashot, 0,        dynashot, dynashot, homerun_state, 0,     ROT0, "Jaleco", "Dynamic Shoot Kyousou",                                             MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1990, ganjaja,  0,        ganjaja,  ganjaja,  homerun_state, 0,     ROT0, "Jaleco", "Ganbare Jajamaru Saisho wa Goo / Ganbare Jajamaru Hop Step & Jump", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
