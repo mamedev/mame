@@ -546,7 +546,7 @@ void prodigy_state::update_bcd()
 		case 0x02: digit_nbr = 1; break;
 		case 0x04: digit_nbr = 2; break;
 		case 0x08: digit_nbr = 3; break;
-		default: logerror("Wrong BCD digit, shouldn't happen, call the maintainer!\n");
+		default: fatalerror("Wrong BCD digit, shouldn't happen, call the maintainer!\n");
 		}
 
 		LOGBCD(" - digit number: %d\n", digit_nbr);
