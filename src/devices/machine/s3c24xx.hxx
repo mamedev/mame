@@ -1330,7 +1330,7 @@ void S3C24_CLASS_NAME::s3c24xx_pwm_start(int timer)
 	{
 		hz = freq / cnt;
 	}
-	verboselog(*this, 5, "PWM %d - pclk=%d prescaler=%d div=%d freq=%f cnt=%d cmp=%d auto_reload=%d hz=%f\n", timer, pclk, prescaler, mux_table[mux], freq, cnt, cmp, auto_reload, hz);
+	verboselog(*this, 5, "PWM %d - pclk=%d prescaler=%d div=%d freq=%f cnt=%d cmp=%d auto_reload=%d hz=%f\n", timer, pclk, prescaler, (mux < 4) ? mux_table[mux] : 1, freq, cnt, cmp, auto_reload, hz);
 	m_pwm.cnt[timer] = cnt;
 	m_pwm.cmp[timer] = cmp;
 	m_pwm.freq[timer] = freq;
