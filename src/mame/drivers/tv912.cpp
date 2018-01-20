@@ -19,6 +19,8 @@
     framing of data bits. Position 8 (NB2) is deliberately disconnected on
     later revisions to restrict communications to 7 or 8 data bits, likely
     because of known incompatibilities between UART models in 5-bit data mode.
+    (For reasons that are less clear, the 19,200 baud option is also commonly
+    omitted from documentation.)
 
     The baud rate switches (S1/S3) are mounted vertically at the rear of the
     unit. As these are connected directly to the frequency outputs of the baud
@@ -362,7 +364,7 @@ static INPUT_PORTS_START( switches )
 	PORT_BIT(0x23, IP_ACTIVE_LOW, IPT_UNUSED)
 
 	PORT_START("HALFDUP")
-	PORT_DIPNAME(0x01, 0x01, "Communication Mode") PORT_DIPLOCATION("S2:3")
+	PORT_DIPNAME(0x01, 0x01, "Conversation Mode") PORT_DIPLOCATION("S2:3")
 	PORT_DIPSETTING(0x00, "Half Duplex")
 	PORT_DIPSETTING(0x01, "Full Duplex")
 
