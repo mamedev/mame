@@ -26,6 +26,8 @@
     so no attempt made to play new sound) probably bug in devices\sound\gaelco.cpp ??
 
 Known to exist but not dumped is a Maniac Square v1.0 with checksum 66B1
+  This version of Maniac Square runs on a REF. 960419/1 PCB, the same PCB
+  as the current sets of Snow Board runs on.
 
 ***************************************************************************/
 
