@@ -2781,7 +2781,8 @@ READ16_MEMBER(seta_state::kiwame_input_r)
 
 	for(i = 0; i < 5; i++)
 		if (row_select & (1<<i))    break;
-
+	assert(i < 5);
+	
 	switch( offset )
 	{
 		case 0x00/2:    return ioport(keynames[i])->read();
