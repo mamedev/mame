@@ -1297,6 +1297,7 @@ chd_error chdcd_parse_toc(const char *tocfname, cdrom_toc &outtoc, chdcd_track_i
 				cdrom_convert_type_string_to_track_info(token, &outtoc.tracks[trknum]);
 				if (outtoc.tracks[trknum].datasize == 0)
 				{
+					fclose(infile);
 					printf("ERROR: Unknown track type [%s].  Contact MAMEDEV.\n", token);
 					return CHDERR_UNSUPPORTED_FORMAT;
 				}
