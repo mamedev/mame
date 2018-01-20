@@ -188,7 +188,7 @@ void lordgun_state::lorddgun_calc_gun_scr(int i)
 
 	int x = ioport(gunnames[i])->read() - 0x3c;
 
-	if ( (x < 0) || (x > ARRAY_LENGTH(lordgun_gun_x_table)) )
+	if ( (x < 0) || (x >= ARRAY_LENGTH(lordgun_gun_x_table)) )
 		x = 0;
 
 	m_gun[i].scr_x = lordgun_gun_x_table[x];
