@@ -37941,6 +37941,7 @@ vt180                           // 1981 Digital Equipment Corporation
 
 @source:vt220.cpp
 vt220                           // 1983 Digital Equipment Corporation
+vt220a                          // 1983 Digital Equipment Corporation
 
 @source:vt240.cpp
 mc7105                          // Elektronika MC7105
