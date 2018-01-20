@@ -1275,46 +1275,29 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( vcc )
 	PORT_INCLUDE( vcc_base )
 
-	PORT_START("IN.4") // PCB jumpers, not consumer accessible
-	PORT_CONFNAME( 0x01, 0x00, "Language: German" )
-	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
-	PORT_CONFSETTING(    0x01, DEF_STR( On ) )
-	PORT_CONFNAME( 0x02, 0x00, "Language: French" )
-	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
-	PORT_CONFSETTING(    0x02, DEF_STR( On ) )
-	PORT_CONFNAME( 0x04, 0x00, "Language: Spanish" )
-	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
-	PORT_CONFSETTING(    0x04, DEF_STR( On ) )
-	PORT_CONFNAME( 0x08, 0x00, "Language: Special" )
-	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
-	PORT_CONFSETTING(    0x08, DEF_STR( On ) )
-INPUT_PORTS_END
-
-static INPUT_PORTS_START( vccfr )
-	PORT_INCLUDE( vcc )
-
-	PORT_MODIFY("IN.4")
-	PORT_CONFNAME( 0x02, 0x02, "Language: French" )
-	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
-	PORT_CONFSETTING(    0x02, DEF_STR( On ) )
+	PORT_START("IN.4") // language setting, hardwired with 4 jumpers (0: English, 1: German, 2: French, 4: Spanish, 8:Special(unused))
+	PORT_BIT(0x0f, 0x00, IPT_SPECIAL)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( vccsp )
 	PORT_INCLUDE( vcc )
 
-	PORT_MODIFY("IN.4")
-	PORT_CONFNAME( 0x04, 0x04, "Language: Spanish" )
-	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
-	PORT_CONFSETTING(    0x04, DEF_STR( On ) )
+	PORT_MODIFY("IN.4") // set to Spanish
+	PORT_BIT(0x0f, 0x04, IPT_SPECIAL)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( vccg )
 	PORT_INCLUDE( vcc )
 
-	PORT_MODIFY("IN.4")
-	PORT_CONFNAME( 0x01, 0x01, "Language: German" )
-	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
-	PORT_CONFSETTING(    0x01, DEF_STR( On ) )
+	PORT_MODIFY("IN.4") // set to German
+	PORT_BIT(0x0f, 0x01, IPT_SPECIAL)
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( vccfr )
+	PORT_INCLUDE( vcc )
+
+	PORT_MODIFY("IN.4") // set to French
+	PORT_BIT(0x0f, 0x02, IPT_SPECIAL)
 INPUT_PORTS_END
 
 
@@ -1593,22 +1576,29 @@ static INPUT_PORTS_START( vsc )
 	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_S) PORT_NAME("ST")
 	PORT_BIT(0xc0, IP_ACTIVE_HIGH, IPT_UNUSED)
 
-	PORT_START("IN.10") // hardwired (2 diodes)
-	PORT_CONFNAME( 0x01, 0x00, DEF_STR( Language ) )
-	PORT_CONFSETTING(    0x00, DEF_STR( English ) )
-	PORT_CONFSETTING(    0x01, "Other" )
-	PORT_CONFNAME( 0x02, 0x00, DEF_STR( Unknown ) )
-	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
-	PORT_CONFSETTING(    0x02, DEF_STR( On ) )
+	PORT_START("IN.10") // language setting, hardwired with 2 diodes (0: English, 1: German, 2: French, 3: Spanish)
+	PORT_BIT(0x03, 0x00, IPT_SPECIAL)
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( vscsp )
+	PORT_INCLUDE( vsc )
+
+	PORT_MODIFY("IN.10") // set to Spanish
+	PORT_BIT(0x03, 0x03, IPT_SPECIAL)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( vscg )
 	PORT_INCLUDE( vsc )
 
-	PORT_MODIFY("IN.10")
-	PORT_CONFNAME( 0x01, 0x01, DEF_STR( Language ) )
-	PORT_CONFSETTING(    0x00, DEF_STR( English ) )
-	PORT_CONFSETTING(    0x01, "Other" )
+	PORT_MODIFY("IN.10") // set to German
+	PORT_BIT(0x03, 0x01, IPT_SPECIAL)
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( vscfr )
+	PORT_INCLUDE( vsc )
+
+	PORT_MODIFY("IN.10") // set to French
+	PORT_BIT(0x03, 0x02, IPT_SPECIAL)
 INPUT_PORTS_END
 
 
@@ -2004,9 +1994,9 @@ CONS( 1980, uvcg,     vcc,    0, vcc,    vccg,  fidelz80_state, 0, "Fidelity Ele
 CONS( 1980, uvcfr,    vcc,    0, vcc,    vccfr, fidelz80_state, 0, "Fidelity Electronics", "Advanced Voice Chess Challenger (French)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
 CONS( 1980, vsc,      0,      0, vsc,    vsc,   fidelz80_state, 0, "Fidelity Electronics", "Voice Sensory Chess Challenger (English)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
-CONS( 1980, vscsp,    vsc,    0, vsc,    vscg,  fidelz80_state, 0, "Fidelity Electronics", "Voice Sensory Chess Challenger (Spanish)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
+CONS( 1980, vscsp,    vsc,    0, vsc,    vscsp, fidelz80_state, 0, "Fidelity Electronics", "Voice Sensory Chess Challenger (Spanish)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
 CONS( 1980, vscg,     vsc,    0, vsc,    vscg,  fidelz80_state, 0, "Fidelity Electronics", "Voice Sensory Chess Challenger (German)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
-CONS( 1980, vscfr,    vsc,    0, vsc,    vscg,  fidelz80_state, 0, "Fidelity Electronics", "Voice Sensory Chess Challenger (French)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
+CONS( 1980, vscfr,    vsc,    0, vsc,    vscfr, fidelz80_state, 0, "Fidelity Electronics", "Voice Sensory Chess Challenger (French)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
 
 CONS( 1979, vbrc,     0,      0, vbrc,   vbrc,  fidelz80_state, 0, "Fidelity Electronics", "Voice Bridge Challenger", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
 CONS( 1980, bridgec3, vbrc,   0, vbrc,   vbrc,  fidelz80_state, 0, "Fidelity Electronics", "Bridge Challenger III",  MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )

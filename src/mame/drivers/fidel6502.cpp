@@ -633,7 +633,7 @@ READ8_MEMBER(fidel6502_state::csc_pia0_pb_r)
 
 	// d5: button row 8 (active low)
 	// d6,d7: language switches
-	data |= (~read_inputs(9) >> 3 & 0x20) | (~m_inp_matrix[9]->read() << 6 & 0xc0);
+	data |= (~read_inputs(9) >> 3 & 0x20) | (m_inp_matrix[9]->read() << 6 & 0xc0);
 
 	return data;
 }
@@ -771,7 +771,7 @@ READ8_MEMBER(fidel6502_state::eas_ppi_portb_r)
 	data |= (m_speech->busy_r()) ? 2 : 0;
 
 	// d2,d3: language switches
-	data |= ~m_inp_matrix[9]->read() << 2 & 0x0c;
+	data |= m_inp_matrix[9]->read() << 2 & 0x0c;
 
 	// d5: multiplexed inputs highest bit
 	data |= (read_inputs(9) & 0x100) ? 0 : 0x20;
@@ -1314,22 +1314,29 @@ static INPUT_PORTS_START( csc )
 	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_DEL) PORT_NAME("CL")
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_R) PORT_NAME("RE")
 
-	PORT_START("IN.9") // hardwired, default to English
-	PORT_CONFNAME( 0x01, 0x00, DEF_STR( Language ) )
-	PORT_CONFSETTING(    0x00, DEF_STR( English ) )
-	PORT_CONFSETTING(    0x01, "Other" )
-	PORT_CONFNAME( 0x02, 0x00, DEF_STR( Unknown ) )
-	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
-	PORT_CONFSETTING(    0x02, DEF_STR( On ) )
+	PORT_START("IN.9") // language setting, hardwired with 2 resistors/jumpers (0: Spanish, 1: French, 2: German, 3: English)
+	PORT_BIT(0x03, 0x03, IPT_SPECIAL)
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( cscsp )
+	PORT_INCLUDE( csc )
+
+	PORT_MODIFY("IN.9") // set to Spanish
+	PORT_BIT(0x03, 0x00, IPT_SPECIAL)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( cscg )
 	PORT_INCLUDE( csc )
 
-	PORT_MODIFY("IN.9") // hardwired, modify default to Other
-	PORT_CONFNAME( 0x01, 0x01, DEF_STR( Language ) )
-	PORT_CONFSETTING(    0x00, DEF_STR( English ) )
-	PORT_CONFSETTING(    0x01, "Other" )
+	PORT_MODIFY("IN.9") // set to German
+	PORT_BIT(0x03, 0x02, IPT_SPECIAL)
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( cscfr )
+	PORT_INCLUDE( csc )
+
+	PORT_MODIFY("IN.9") // set to French
+	PORT_BIT(0x03, 0x01, IPT_SPECIAL)
 INPUT_PORTS_END
 
 
@@ -1345,13 +1352,25 @@ static INPUT_PORTS_START( su9 )
 	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_6) PORT_CODE(KEYCODE_6_PAD) PORT_NAME("PB / King")
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( su9sp )
+	PORT_INCLUDE( su9 )
+
+	PORT_MODIFY("IN.9") // set to Spanish
+	PORT_BIT(0x03, 0x00, IPT_SPECIAL)
+INPUT_PORTS_END
+
 static INPUT_PORTS_START( su9g )
 	PORT_INCLUDE( su9 )
 
-	PORT_MODIFY("IN.9") // hardwired, modify default to Other
-	PORT_CONFNAME( 0x01, 0x01, DEF_STR( Language ) )
-	PORT_CONFSETTING(    0x00, DEF_STR( English ) )
-	PORT_CONFSETTING(    0x01, "Other" )
+	PORT_MODIFY("IN.9") // set to German
+	PORT_BIT(0x03, 0x02, IPT_SPECIAL)
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( su9fr )
+	PORT_INCLUDE( su9 )
+
+	PORT_MODIFY("IN.9") // set to French
+	PORT_BIT(0x03, 0x01, IPT_SPECIAL)
 INPUT_PORTS_END
 
 
@@ -1377,22 +1396,29 @@ static INPUT_PORTS_START( eas )
 	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_5) PORT_CODE(KEYCODE_5_PAD) PORT_NAME("TB / Knight")
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_6) PORT_CODE(KEYCODE_6_PAD) PORT_NAME("LV / Pawn")
 
-	PORT_START("IN.9") // hardwired, default to English
-	PORT_CONFNAME( 0x01, 0x00, DEF_STR( Language ) )
-	PORT_CONFSETTING(    0x00, DEF_STR( English ) )
-	PORT_CONFSETTING(    0x01, "Other" )
-	PORT_CONFNAME( 0x02, 0x00, DEF_STR( Unknown ) )
-	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
-	PORT_CONFSETTING(    0x02, DEF_STR( On ) )
+	PORT_START("IN.9") // language setting, hardwired (0: Spanish, 1: French, 2: German, 3: English)
+	PORT_BIT(0x03, 0x03, IPT_SPECIAL)
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( eassp )
+	PORT_INCLUDE( eas )
+
+	PORT_MODIFY("IN.9") // set to Spanish
+	PORT_BIT(0x03, 0x00, IPT_SPECIAL)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( easg )
 	PORT_INCLUDE( eas )
 
-	PORT_MODIFY("IN.9") // hardwired, modify default to Other
-	PORT_CONFNAME( 0x01, 0x01, DEF_STR( Language ) )
-	PORT_CONFSETTING(    0x00, DEF_STR( English ) )
-	PORT_CONFSETTING(    0x01, "Other" )
+	PORT_MODIFY("IN.9") // set to German
+	PORT_BIT(0x03, 0x02, IPT_SPECIAL)
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( easfr )
+	PORT_INCLUDE( eas )
+
+	PORT_MODIFY("IN.9") // set to French
+	PORT_BIT(0x03, 0x01, IPT_SPECIAL)
 INPUT_PORTS_END
 
 
@@ -1418,22 +1444,29 @@ static INPUT_PORTS_START( eag )
 	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_5) PORT_CODE(KEYCODE_5_PAD) PORT_NAME("PV / Queen")
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_6) PORT_CODE(KEYCODE_6_PAD) PORT_NAME("PB / King")
 
-	PORT_START("IN.9") // hardwired, default to English
-	PORT_CONFNAME( 0x01, 0x00, DEF_STR( Language ) )
-	PORT_CONFSETTING(    0x00, DEF_STR( English ) )
-	PORT_CONFSETTING(    0x01, "Other" )
-	PORT_CONFNAME( 0x02, 0x00, DEF_STR( Unknown ) )
-	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
-	PORT_CONFSETTING(    0x02, DEF_STR( On ) )
+	PORT_START("IN.9") // language setting, hardwired (0: Spanish, 1: French, 2: German, 3: English)
+	PORT_BIT(0x03, 0x03, IPT_SPECIAL)
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( eagsp )
+	PORT_INCLUDE( eag )
+
+	PORT_MODIFY("IN.9") // set to Spanish
+	PORT_BIT(0x03, 0x00, IPT_SPECIAL)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( eagg )
 	PORT_INCLUDE( eag )
 
-	PORT_MODIFY("IN.9") // hardwired, modify default to Other
-	PORT_CONFNAME( 0x01, 0x01, DEF_STR( Language ) )
-	PORT_CONFSETTING(    0x00, DEF_STR( English ) )
-	PORT_CONFSETTING(    0x01, "Other" )
+	PORT_MODIFY("IN.9") // set to German
+	PORT_BIT(0x03, 0x02, IPT_SPECIAL)
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( eagfr )
+	PORT_INCLUDE( eag )
+
+	PORT_MODIFY("IN.9") // set to French
+	PORT_BIT(0x03, 0x01, IPT_SPECIAL)
 INPUT_PORTS_END
 
 
@@ -2011,7 +2044,7 @@ ROM_END
 
 ROM_START( super9cc )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD("cb9.bin",     0x2000, 0x2000, CRC(421147e8) SHA1(ccf62f6f218e8992baf30973fe41b35e14a1cc1a) )
+	ROM_LOAD("101-1050a01", 0x2000, 0x2000, CRC(421147e8) SHA1(ccf62f6f218e8992baf30973fe41b35e14a1cc1a) )
 	ROM_LOAD("101-1024b03", 0xa000, 0x0800, CRC(e8c97455) SHA1(ed2958fc5474253ee8c2eaf27fc64226e12f80ea) )
 	ROM_LOAD("101-1024b02", 0xc000, 0x2000, CRC(95004699) SHA1(ea79f43da73267344545df8ad61730f613876c2e) )
 	ROM_LOAD("101-1024c01", 0xe000, 0x2000, CRC(03904e86) SHA1(bfa0dd9d8541e3ec359a247a3eba543501f727bc) )
@@ -2023,7 +2056,7 @@ ROM_END
 
 ROM_START( super9ccsp )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD("cb9.bin",     0x2000, 0x2000, CRC(421147e8) SHA1(ccf62f6f218e8992baf30973fe41b35e14a1cc1a) )
+	ROM_LOAD("101-1050a01", 0x2000, 0x2000, CRC(421147e8) SHA1(ccf62f6f218e8992baf30973fe41b35e14a1cc1a) )
 	ROM_LOAD("101-1024b03", 0xa000, 0x0800, CRC(e8c97455) SHA1(ed2958fc5474253ee8c2eaf27fc64226e12f80ea) )
 	ROM_LOAD("101-1024b02", 0xc000, 0x2000, CRC(95004699) SHA1(ea79f43da73267344545df8ad61730f613876c2e) )
 	ROM_LOAD("101-1024c01", 0xe000, 0x2000, CRC(03904e86) SHA1(bfa0dd9d8541e3ec359a247a3eba543501f727bc) )
@@ -2034,7 +2067,7 @@ ROM_END
 
 ROM_START( super9ccg )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD("cb9.bin",     0x2000, 0x2000, CRC(421147e8) SHA1(ccf62f6f218e8992baf30973fe41b35e14a1cc1a) )
+	ROM_LOAD("101-1050a01", 0x2000, 0x2000, CRC(421147e8) SHA1(ccf62f6f218e8992baf30973fe41b35e14a1cc1a) )
 	ROM_LOAD("101-1024b03", 0xa000, 0x0800, CRC(e8c97455) SHA1(ed2958fc5474253ee8c2eaf27fc64226e12f80ea) )
 	ROM_LOAD("101-1024b02", 0xc000, 0x2000, CRC(95004699) SHA1(ea79f43da73267344545df8ad61730f613876c2e) )
 	ROM_LOAD("101-1024c01", 0xe000, 0x2000, CRC(03904e86) SHA1(bfa0dd9d8541e3ec359a247a3eba543501f727bc) )
@@ -2045,7 +2078,7 @@ ROM_END
 
 ROM_START( super9ccfr )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD("cb9.bin",     0x2000, 0x2000, CRC(421147e8) SHA1(ccf62f6f218e8992baf30973fe41b35e14a1cc1a) )
+	ROM_LOAD("101-1050a01", 0x2000, 0x2000, CRC(421147e8) SHA1(ccf62f6f218e8992baf30973fe41b35e14a1cc1a) )
 	ROM_LOAD("101-1024b03", 0xa000, 0x0800, CRC(e8c97455) SHA1(ed2958fc5474253ee8c2eaf27fc64226e12f80ea) )
 	ROM_LOAD("101-1024b02", 0xc000, 0x2000, CRC(95004699) SHA1(ea79f43da73267344545df8ad61730f613876c2e) )
 	ROM_LOAD("101-1024c01", 0xe000, 0x2000, CRC(03904e86) SHA1(bfa0dd9d8541e3ec359a247a3eba543501f727bc) )
@@ -2387,28 +2420,28 @@ ROM_END
 CONS( 1981, reversic,   0,        0, rsc,       rsc,       fidel6502_state, 0,        "Fidelity Electronics", "Reversi Sensory Challenger (green version)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
 
 CONS( 1981, csc,        0,        0, csc,       csc,       fidel6502_state, 0,        "Fidelity Electronics", "Champion Sensory Chess Challenger (English)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
-CONS( 1981, cscsp,      csc,      0, csc,       cscg,      fidel6502_state, 0,        "Fidelity Electronics", "Champion Sensory Chess Challenger (Spanish)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
+CONS( 1981, cscsp,      csc,      0, csc,       cscsp,     fidel6502_state, 0,        "Fidelity Electronics", "Champion Sensory Chess Challenger (Spanish)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
 CONS( 1981, cscg,       csc,      0, csc,       cscg,      fidel6502_state, 0,        "Fidelity Electronics", "Champion Sensory Chess Challenger (German)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
-CONS( 1981, cscfr,      csc,      0, csc,       cscg,      fidel6502_state, 0,        "Fidelity Electronics", "Champion Sensory Chess Challenger (French)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
+CONS( 1981, cscfr,      csc,      0, csc,       cscfr,     fidel6502_state, 0,        "Fidelity Electronics", "Champion Sensory Chess Challenger (French)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
 
 CONS( 1983, super9cc,   0,        0, su9,       su9,       fidel6502_state, 0,        "Fidelity Electronics", "Super 9 Sensory Chess Challenger (English)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
-CONS( 1983, super9ccsp, super9cc, 0, su9,       su9g,      fidel6502_state, 0,        "Fidelity Electronics", "Super 9 Sensory Chess Challenger (Spanish)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
+CONS( 1983, super9ccsp, super9cc, 0, su9,       su9sp,     fidel6502_state, 0,        "Fidelity Electronics", "Super 9 Sensory Chess Challenger (Spanish)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
 CONS( 1983, super9ccg,  super9cc, 0, su9,       su9g,      fidel6502_state, 0,        "Fidelity Electronics", "Super 9 Sensory Chess Challenger (German)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
-CONS( 1983, super9ccfr, super9cc, 0, su9,       su9g,      fidel6502_state, 0,        "Fidelity Electronics", "Super 9 Sensory Chess Challenger (French)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
+CONS( 1983, super9ccfr, super9cc, 0, su9,       su9fr,     fidel6502_state, 0,        "Fidelity Electronics", "Super 9 Sensory Chess Challenger (French)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
 
 CONS( 1983, feasbu,     0,        0, eas,       eas,       fidel6502_state, 0,        "Fidelity Electronics", "Elite A/S Challenger (Budapest program, English)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
-CONS( 1983, feasbusp,   feasbu,   0, eas,       easg,      fidel6502_state, 0,        "Fidelity Electronics", "Elite A/S Challenger (Budapest program, Spanish)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
+CONS( 1983, feasbusp,   feasbu,   0, eas,       eassp,     fidel6502_state, 0,        "Fidelity Electronics", "Elite A/S Challenger (Budapest program, Spanish)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
 CONS( 1983, feasbug,    feasbu,   0, eas,       easg,      fidel6502_state, 0,        "Fidelity Electronics", "Elite A/S Challenger (Budapest program, German)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
-CONS( 1983, feasbufr,   feasbu,   0, eas,       easg,      fidel6502_state, 0,        "Fidelity Electronics", "Elite A/S Challenger (Budapest program, French)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
+CONS( 1983, feasbufr,   feasbu,   0, eas,       easfr,     fidel6502_state, 0,        "Fidelity Electronics", "Elite A/S Challenger (Budapest program, French)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
 CONS( 1984, feasgla,    feasbu,   0, eas,       eas,       fidel6502_state, 0,        "Fidelity Electronics", "Elite A/S Challenger (Glasgow program, English)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
-CONS( 1984, feasglasp,  feasbu,   0, eas,       easg,      fidel6502_state, 0,        "Fidelity Electronics", "Elite A/S Challenger (Glasgow program, Spanish)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
+CONS( 1984, feasglasp,  feasbu,   0, eas,       eassp,     fidel6502_state, 0,        "Fidelity Electronics", "Elite A/S Challenger (Glasgow program, Spanish)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
 CONS( 1984, feasglag,   feasbu,   0, eas,       easg,      fidel6502_state, 0,        "Fidelity Electronics", "Elite A/S Challenger (Glasgow program, German)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
-CONS( 1984, feasglafr,  feasbu,   0, eas,       easg,      fidel6502_state, 0,        "Fidelity Electronics", "Elite A/S Challenger (Glasgow program, French)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
+CONS( 1984, feasglafr,  feasbu,   0, eas,       easfr,     fidel6502_state, 0,        "Fidelity Electronics", "Elite A/S Challenger (Glasgow program, French)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
 
 CONS( 1986, feag2100,   0,        0, eag,       eag,       fidel6502_state, 0,        "Fidelity Electronics", "Elite Avant Garde 2100 (English)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
-CONS( 1986, feag2100sp, feag2100, 0, eag,       eagg,      fidel6502_state, 0,        "Fidelity Electronics", "Elite Avant Garde 2100 (Spanish)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
+CONS( 1986, feag2100sp, feag2100, 0, eag,       eagsp,     fidel6502_state, 0,        "Fidelity Electronics", "Elite Avant Garde 2100 (Spanish)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
 CONS( 1986, feag2100g,  feag2100, 0, eag,       eagg,      fidel6502_state, 0,        "Fidelity Electronics", "Elite Avant Garde 2100 (German)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
-CONS( 1986, feag2100fr, feag2100, 0, eag,       eagg,      fidel6502_state, 0,        "Fidelity Electronics", "Elite Avant Garde 2100 (French)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
+CONS( 1986, feag2100fr, feag2100, 0, eag,       eagfr,     fidel6502_state, 0,        "Fidelity Electronics", "Elite Avant Garde 2100 (French)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
 
 CONS( 1982, fscc9,      0,        0, sc9d,      sc9,       fidel6502_state, 0,        "Fidelity Electronics", "Sensory Chess Challenger 9 (rev. D)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS ) // aka version "B"
 CONS( 1982, fscc9b,     fscc9,    0, sc9b,      sc9,       fidel6502_state, 0,        "Fidelity Electronics", "Sensory Chess Challenger 9 (rev. B)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )

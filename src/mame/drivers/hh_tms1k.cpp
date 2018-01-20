@@ -39,6 +39,7 @@
  @MP0923   TMS1000   1979, Entex Baseball 2 (6002)
  *MP1022   TMS1100   1979, Texas Instruments unknown thermostat
  @MP1030   TMS1100   1980, APF Mathemagician
+ *MP1072   TMS1100   198?, unknown device, Germany (have decap)
  @MP1133   TMS1470   1979, Kosmos Astro
  @MP1180   TMS1100   1980, Tomy Power House Pinball
  @MP1181   TMS1100   1979, Conic Football 2
