@@ -740,6 +740,7 @@ IRQ_CALLBACK_MEMBER(i80186_cpu_device::int_callback)
 		for(i = 0; i < 4; i++)
 			if((m_intr.ack_mask >> (i + 4)) & 1)
 				break;
+		assert(i < 4);
 		if(!(m_intr.ext[i] & EXTINT_CTRL_LTM))
 			m_intr.request &= ~m_intr.ack_mask;
 	}
