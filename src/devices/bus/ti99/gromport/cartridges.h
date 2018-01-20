@@ -119,12 +119,12 @@ private:
 		rpk_exception(rpk_open_error value): m_err(value), m_detail(nullptr) { }
 		rpk_exception(rpk_open_error value, const char* detail) : m_err(value), m_detail(detail) { }
 
-		const char* to_string()
+		std::string to_string()
 		{
-			// FIXME: this leaks memory - in some cases it returns a new buffer, in other cases it returns a pointer to a static string, so the caller can't know whether it needs to be cleaned up
-			if (m_detail==nullptr) return error_text[(int)m_err];
-			std::string errormsg = std::string(error_text[(int)m_err]).append(": ").append(m_detail);
-			return core_strdup(errormsg.c_str());
+			std::string errmsg(error_text[(int)m_err]);
+			if (m_detail==nullptr)
+				return errmsg;
+			return errmsg.append(": ").append(m_detail);
 		}
 
 	private:
