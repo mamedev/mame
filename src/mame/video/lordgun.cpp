@@ -176,7 +176,7 @@ float lordgun_crosshair_mapper(ioport_field *field, float linear_value)
 {
 	int x = linear_value - 0x3c;
 
-	if ( (x < 0) || (x > ARRAY_LENGTH(lordgun_gun_x_table)) )
+	if ( (x < 0) || (x >= ARRAY_LENGTH(lordgun_gun_x_table)) )
 		x = 0;
 
 	return lordgun_gun_x_table[x] * 1.0f / 0x1BF;
