@@ -231,7 +231,7 @@ image_init_result ti99_cartridge_device::call_load()
 	}
 	else
 	{
-		auto reader = new rpk_reader(pcbdefs);
+		auto reader = std::make_unique<rpk_reader>(pcbdefs);
 		try
 		{
 			m_rpk = reader->open(machine().options(), filename(), machine().system().name);
