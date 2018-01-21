@@ -182,7 +182,7 @@ void nes_vt_state::update_banks()
 	uint8_t bank;
 
 	// 8000-9fff
-	if ((m_410x[0xb] & 0x40) == (m_410x[0x5] & 0x40))
+	if ((m_410x[0xb] & 0x40) != 0 || (m_410x[0x5] & 0x40) == 0)
 	{
 		if ((m_410x[0x5] & 0x40) == 0)
 			bank = m_410x[0x7];
@@ -199,7 +199,7 @@ void nes_vt_state::update_banks()
 	m_prgbank1->set_entry(get_banks(bank) & (m_numbanks-1));
 
 	// c000-dfff
-	if ((m_410x[0xb] & 0x40) != (m_410x[0x5] & 0x40))
+	if ((m_410x[0xb] & 0x40) != 0 || (m_410x[0x5] & 0x40) != 0)
 	{
 		if ((m_410x[0x5] & 0x40) == 0)
 			bank = m_410x[0x9];
@@ -285,6 +285,7 @@ WRITE8_MEMBER(nes_vt_state::vt03_410x_w)
 		break;
 
 	case 0xa:
+		logerror("vt03_410aw %02x\n", data);
 		m_410x[0xa] = data;
 		update_banks();
 		break;
@@ -689,8 +690,8 @@ WRITE8_MEMBER(nes_vt_state::vt03_8000_w)
 		// Bank select
 		m_8000_addr_latch = data & 0x07;
 		// Bank config
-		m_410x[0x0B] &= 0xBF;
-		m_410x[0x0B] |= (data & 0x40);
+		m_410x[0x05] &= 0x3F;
+		m_410x[0x05] |= (data & 0xC0);
 		update_banks();
 	} else if((addr < 0xA000) && (addr & 0x01)) {
 		switch(m_8000_addr_latch) {
@@ -719,6 +720,7 @@ WRITE8_MEMBER(nes_vt_state::vt03_8000_w)
 				break;
 			case 0x06:
 				m_410x[0x7] = data;
+				//m_410x[0x9] = data;
 				update_banks();
 				break;
 
@@ -815,8 +817,8 @@ WRITE8_MEMBER(nes_vt_state::vt03_4034_w)
 }
 
 static ADDRESS_MAP_START( nes_vt_map, AS_PROGRAM, 8, nes_vt_state )
-	AM_RANGE(0x0000, 0x07ff) AM_RAM
-	AM_RANGE(0x2000, 0x3fff) AM_DEVREADWRITE("ppu", ppu2c0x_device, read, write)        /* PPU registers */
+	AM_RANGE(0x0000, 0x1fff) AM_MASK(0x07FF) AM_RAM
+	AM_RANGE(0x2000, 0x3fff) AM_MASK(0x001F) AM_DEVREADWRITE("ppu", ppu2c0x_device, read, write)        /* PPU registers */
 
 	AM_RANGE(0x4000, 0x4013) AM_DEVREADWRITE("apu", nesapu_device, read, write)
 	AM_RANGE(0x4014, 0x4014) AM_READ(psg1_4014_r) AM_WRITE(nes_vh_sprite_dma_w)
@@ -828,6 +830,7 @@ static ADDRESS_MAP_START( nes_vt_map, AS_PROGRAM, 8, nes_vt_state )
 
 	AM_RANGE(0x8000, 0xffff) AM_WRITE(vt03_8000_w)
 	AM_RANGE(0x8000, 0xffff) AM_DEVICE("prg", address_map_bank_device, amap8)
+	AM_RANGE(0x6000, 0x7fff) AM_RAM
 ADDRESS_MAP_END
 
 /* Some later VT models have more RAM */
@@ -844,7 +847,7 @@ ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( nes_vt_hh_map, AS_PROGRAM, 8, nes_vt_state )
-	AM_RANGE(0x0000, 0x0fff) AM_RAM
+	AM_RANGE(0x0000, 0x1fff) AM_MASK(0x0fff) AM_RAM
 	AM_RANGE(0x2000, 0x3fff) AM_DEVREADWRITE("ppu", ppu2c0x_device, read, write)        /* PPU registers */
 
 	AM_RANGE(0x4000, 0x4013) AM_DEVREADWRITE("apu", nesapu_device, read, write)
@@ -859,7 +862,7 @@ static ADDRESS_MAP_START( nes_vt_hh_map, AS_PROGRAM, 8, nes_vt_state )
 
 	AM_RANGE(0x4034, 0x4034) AM_WRITE(vt03_4034_w)
 	AM_RANGE(0x4014, 0x4014) AM_READ(psg1_4014_r) AM_WRITE(vt_hh_sprite_dma_w)
-	AM_RANGE(0x6000, 0x6fff) AM_RAM
+	AM_RANGE(0x6000, 0x7fff) AM_RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( nes_vt_dg_map, AS_PROGRAM, 8, nes_vt_state )
@@ -880,7 +883,7 @@ static ADDRESS_MAP_START( nes_vt_dg_map, AS_PROGRAM, 8, nes_vt_state )
 
 	AM_RANGE(0x4034, 0x4034) AM_WRITE(vt03_4034_w)
 	AM_RANGE(0x4014, 0x4014) AM_READ(psg1_4014_r) AM_WRITE(vt_hh_sprite_dma_w)
-	AM_RANGE(0x6000, 0x6fff) AM_RAM
+	AM_RANGE(0x6000, 0x7fff) AM_RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( prg_map, AS_PROGRAM, 8, nes_vt_state )
@@ -1297,4 +1300,4 @@ CONS( 2004, mc_dcat8a,  mc_dcat8, 0,  nes_vt,    nes_vt, nes_vt_state,  0, "<unk
 
 CONS( 2017, sy889,  		0, 				0,  nes_vt_hh, nes_vt, nes_vt_state,  0, "SY Corp", 	"SY-889 300 in 1 Handheld", MACHINE_NOT_WORKING )
 
-CONS( 2017, bittboy,  	0, 				0,  nes_vt,    nes_vt, nes_vt_state,  0, "BittBoy", 	"BittBoy Mini FC 300 in 1", MACHINE_NOT_WORKING )
+CONS( 2017, bittboy,  	0, 				0,  nes_vt_dg,    nes_vt, nes_vt_state,  0, "BittBoy", 	"BittBoy Mini FC 300 in 1", MACHINE_NOT_WORKING )
