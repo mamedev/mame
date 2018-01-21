@@ -21,7 +21,7 @@
   VT16 - ?
   VT18 - ?
 	
-	Mystery handheld SoC, may or may not be VRT:
+	VT3x - used in SY889
 		Uses SQI rather than parallel flash
 		Vaguely OneBus compatible but some registers different ($411C in particular)
 		Uses RGB format for palettes
@@ -34,12 +34,10 @@
            driver)
 
   todo (VT03):
-
-  add support for basic NES PPU page mirroring (selectable with register)
-  work out format of the 12-bit palette, it's meant to be
-  4-bits saturation, 4-bits luminance, 4-bits phase
-  as opposed to the basic NES format of 2-luminance, 4-phase
-  but getting it correct is tricky:
+	
+	Super Mario Bros 3 crashes after title screen, some kind of memory map issue
+	possibly with MMC3 emulation mode
+	
   APU refactoring to allow for mostly doubled up functionality + PCM channel
   *more*
 
@@ -715,7 +713,7 @@ int nes_vt_state::calculate_real_video_address(int addr, int extended, int readt
 // MMC3 compatibility mode
 WRITE8_MEMBER(nes_vt_state::vt03_8000_w)
 {
-	logerror("%s: vt03_8000_w (%04x) %02x\n", machine().describe_context(), offset+0x8000, data );
+	//logerror("%s: vt03_8000_w (%04x) %02x\n", machine().describe_context(), offset+0x8000, data );
 	uint16_t addr = offset + 0x8000;
 	if((addr < 0xA000) && !(addr & 0x01)) {
 		// Bank select
@@ -1313,9 +1311,14 @@ CONS( 2009, cybar120,  0,  0,  nes_vt_vg, nes_vt, nes_vt_state,  0, "Defender", 
 CONS( 200?, vgpocket,  0,  0,  nes_vt_vg, nes_vt, nes_vt_state,  0, "<unknown>", "VG Pocket (VG-2000)", MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_GRAPHICS )
 CONS( 200?, vgpmini,   0,  0,  nes_vt_vg, nes_vt, nes_vt_state,  0, "<unknown>", "VG Pocket Mini (VG-1500)", MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_GRAPHICS )
 
+// Runs fine, non-sport 121 in 1 games perfect, but minor graphical issues in
+// sport games, also no sound in menu or sport games due to missing PCM
+// emulation
+CONS( 200?, dgun2500,  0,  0,  nes_vt_dg,    nes_vt, nes_vt_state,  0, "dreamGEAR", "dreamGEAR Wireless Motion Control with 130 games (DGUN-2500)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND)
+
 // these are NOT VT03, but something newer but based around the same basic designs
 // (no visible tiles in ROM using standard decodes tho, might need moving out of here)
-CONS( 200?, dgun2500,  0,  0,  nes_vt_dg,    nes_vt, nes_vt_state,  0, "dreamGEAR", "dreamGEAR Wireless Motion Control with 130 games (DGUN-2500)", MACHINE_IMPERFECT_GRAPHICS )
+// dgun2561 at least boots, but no visible gfx due to missing PPU features
 CONS( 2012, dgun2561,  0,  0,  nes_vt_dg,    nes_vt, nes_vt_state,  0, "dreamGEAR", "dreamGEAR My Arcade Portable Gaming System (DGUN-2561)", MACHINE_NOT_WORKING )
 CONS( 2015, dgun2573,  0,  0,  nes_vt_hh,    nes_vt, nes_vt_state,  0, "dreamGEAR", "dreamGEAR My Arcade Gamer V Portable Gaming System (DGUN-2573)", MACHINE_NOT_WORKING )
 CONS( 200?, lexcyber,  0,  0,  nes_vt_cy, nes_vt, nes_vt_state,  0, "Lexibook", "Lexibook Compact Cyber Arcade", MACHINE_NOT_WORKING )
@@ -1358,7 +1361,7 @@ CONS( 200?, mc_7x6ss,   0,        0,  nes_vt,    nes_vt, nes_vt_state,  0, "<unk
 CONS( 200?, mc_8x6ss,   0,        0,  nes_vt,    nes_vt, nes_vt_state,  0, "<unknown>", "888888 in 1 (8 bit Slim Station, NEWPXP-DVT22-A PCB)", MACHINE_IMPERFECT_GRAPHICS )
 CONS( 2004, mc_dcat8,   0,        0,  nes_vt,    nes_vt, nes_vt_state,  0, "<unknown>", "100 in 1 (D-CAT8 8bit Console, set 1) (v5.01.11-frd, BL 20041217)", MACHINE_IMPERFECT_GRAPHICS )
 CONS( 2004, mc_dcat8a,  mc_dcat8, 0,  nes_vt,    nes_vt, nes_vt_state,  0, "<unknown>", "100 in 1 (D-CAT8 8bit Console, set 2)", MACHINE_IMPERFECT_GRAPHICS )
-
+// Runs well, minor GFX issues in intro
 CONS( 2017, sy889,  		0, 				0,  nes_vt_hh, nes_vt, nes_vt_state,  0, "SY Corp", 	"SY-889 300 in 1 Handheld", MACHINE_NOT_WORKING )
-
+// Runs well, only issues in SMB3 which crashes
 CONS( 2017, bittboy,  	0, 				0,  nes_vt_bt,    nes_vt, nes_vt_state,  0, "BittBoy", 	"BittBoy Mini FC 300 in 1", MACHINE_NOT_WORKING )
