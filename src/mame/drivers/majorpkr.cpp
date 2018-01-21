@@ -511,6 +511,7 @@ public:
 	TILE_GET_INFO_MEMBER(fg_get_tile_info);
 	virtual void video_start() override;
 	uint32_t screen_update_majorpkr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void majorpkr(machine_config &config);
 };
 
 
@@ -746,7 +747,7 @@ static ADDRESS_MAP_START( map, AS_PROGRAM, 8, majorpkr_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( palettebanks, AS_PROGRAM, 8, majorpkr_state )
-	AM_RANGE(0x0000, 0x1fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x0000, 0x1fff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( vrambanks, AS_PROGRAM, 8, majorpkr_state )
@@ -985,7 +986,7 @@ GFXDECODE_END
 *    Machine Drivers     *
 *************************/
 
-static MACHINE_CONFIG_START( majorpkr )
+MACHINE_CONFIG_START(majorpkr_state::majorpkr)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, CPU_CLOCK)  // 6 MHz.
 	MCFG_CPU_PROGRAM_MAP(map)

@@ -72,6 +72,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(ctc_z0_w);
 	DECLARE_WRITE_LINE_MEMBER(ctc_z1_w);
 	DECLARE_WRITE_LINE_MEMBER(ctc_z2_w);
+	void czk80(machine_config &config);
 private:
 	uint8_t m_term_data;
 	required_device<cpu_device> m_maincpu;
@@ -187,7 +188,7 @@ void czk80_state::kbd_put(u8 data)
 	m_term_data = data;
 }
 
-static MACHINE_CONFIG_START( czk80 )
+MACHINE_CONFIG_START(czk80_state::czk80)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_16MHz / 4)
 	MCFG_CPU_PROGRAM_MAP(czk80_mem)

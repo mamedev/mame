@@ -731,7 +731,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( bwidow )
+MACHINE_CONFIG_START(bwidow_state::bwidow)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, MASTER_CLOCK / 8)
@@ -756,14 +756,14 @@ static MACHINE_CONFIG_START( bwidow )
 
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( bwidowp, bwidow )
+MACHINE_CONFIG_DERIVED(bwidow_state::bwidowp, bwidow)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(bwidowp_map)
 
 	MCFG_WATCHDOG_ADD("watchdog")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( gravitar, bwidow )
+MACHINE_CONFIG_DERIVED(bwidow_state::gravitar, bwidow)
 
 	/* basic machine hardware */
 
@@ -776,7 +776,7 @@ static MACHINE_CONFIG_DERIVED( gravitar, bwidow )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( lunarbat, gravitar )
+MACHINE_CONFIG_DERIVED(bwidow_state::lunarbat, gravitar)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -788,7 +788,7 @@ static MACHINE_CONFIG_DERIVED( lunarbat, gravitar )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( spacduel, gravitar )
+MACHINE_CONFIG_DERIVED(bwidow_state::spacduel, gravitar)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")

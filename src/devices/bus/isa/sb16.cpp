@@ -410,7 +410,7 @@ const tiny_rom_entry *sb16_lle_device::device_rom_region() const
 	return ROM_NAME( sb16 );
 }
 
-MACHINE_CONFIG_MEMBER( sb16_lle_device::device_add_mconfig )
+MACHINE_CONFIG_START(sb16_lle_device::device_add_mconfig)
 	MCFG_CPU_ADD("sb16_cpu", I80C52, XTAL_24MHz)
 	MCFG_CPU_IO_MAP(sb16_io)
 

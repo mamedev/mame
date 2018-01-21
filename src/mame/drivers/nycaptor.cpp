@@ -724,7 +724,7 @@ void nycaptor_state::machine_reset()
 	m_gfxctrl = 0;
 }
 
-static MACHINE_CONFIG_START( nycaptor )
+MACHINE_CONFIG_START(nycaptor_state::nycaptor)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80,8000000/2)      /* ??? */
@@ -800,7 +800,7 @@ static MACHINE_CONFIG_START( nycaptor )
 	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( cyclshtg )
+MACHINE_CONFIG_START(nycaptor_state::cyclshtg)
 
 	MCFG_CPU_ADD("maincpu", Z80,8000000/2)
 	MCFG_CPU_PROGRAM_MAP(cyclshtg_master_map)
@@ -873,7 +873,7 @@ static MACHINE_CONFIG_START( cyclshtg )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( bronx )
+MACHINE_CONFIG_START(nycaptor_state::bronx)
 
 	MCFG_CPU_ADD("maincpu", Z80,8000000/2)
 	MCFG_CPU_PROGRAM_MAP(bronx_master_map)

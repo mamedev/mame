@@ -80,6 +80,7 @@ public:
 	DECLARE_WRITE16_MEMBER(control_w);
 	DECLARE_READ16_MEMBER(vrom_r);
 
+	void giclassic(machine_config &config);
 private:
 	uint8_t m_control;
 };
@@ -144,7 +145,7 @@ READ16_MEMBER(giclassic_state::vrom_r)
 static ADDRESS_MAP_START( satellite_main, AS_PROGRAM, 16, giclassic_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM AM_REGION("maincpu", 0)
 	AM_RANGE(0x100000, 0x103fff) AM_RAM
-	AM_RANGE(0x200000, 0x200fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x200000, 0x200fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x800000, 0x801fff) AM_RAM AM_DEVREADWRITE("k056832", k056832_device, ram_word_r, ram_word_w)
 	AM_RANGE(0x900000, 0x90003f) AM_DEVREADWRITE("k056832", k056832_device, word_r, word_w)
 	AM_RANGE(0xb00000, 0xb01fff) AM_READ(vrom_r)
@@ -196,6 +197,7 @@ public:
 	DECLARE_WRITE16_MEMBER(control_w);
 	DECLARE_READ16_MEMBER(control_r);
 
+	void giclassvr(machine_config &config);
 private:
 	uint16 m_control;
 };
@@ -264,7 +266,7 @@ static ADDRESS_MAP_START( server_main, AS_PROGRAM, 16, giclassicsvr_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM AM_REGION("maincpu", 0)
 	AM_RANGE(0x080000, 0x08ffff) AM_RAM
 	AM_RANGE(0x090000, 0x093fff) AM_RAM
-	AM_RANGE(0x100000, 0x107fff) AM_RAM AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x100000, 0x107fff) AM_RAM AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x180000, 0x183fff) AM_RAM
 	AM_RANGE(0x280000, 0x281fff) AM_RAM AM_DEVREADWRITE("k056832", k056832_device, ram_word_r, ram_word_w)
 	AM_RANGE(0x300000, 0x300007) AM_DEVWRITE("k055673", k055673_device, k053246_word_w) // SPRITES
@@ -288,7 +290,7 @@ void giclassicsvr_state::machine_reset()
 {
 }
 
-static MACHINE_CONFIG_START( giclassic )
+MACHINE_CONFIG_START(giclassic_state::giclassic)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_20MHz / 2) // PCB is marked "68000 12 MHz", but only visible osc is 20 MHz
@@ -314,7 +316,7 @@ static MACHINE_CONFIG_START( giclassic )
 	MCFG_K056832_PALETTE("palette")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( giclassvr )
+MACHINE_CONFIG_START(giclassicsvr_state::giclassvr)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz) // unknown speed

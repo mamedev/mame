@@ -64,6 +64,12 @@ public:
 	uint32_t screen_update_mcr3(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_spyhunt(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
+	void mcrmono(machine_config &config);
+	void maxrpm(machine_config &config);
+	void mcrsc_csd(machine_config &config);
+	void mono_tcs(machine_config &config);
+	void mcrscroll(machine_config &config);
+	void mono_sg(machine_config &config);
 protected:
 	virtual void video_start() override;
 

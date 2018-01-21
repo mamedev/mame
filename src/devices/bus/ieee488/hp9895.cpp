@@ -882,7 +882,7 @@ const tiny_rom_entry *hp9895_device::device_rom_region() const
 	return ROM_NAME(hp9895);
 }
 
-MACHINE_CONFIG_MEMBER(hp9895_device::device_add_mconfig)
+MACHINE_CONFIG_START(hp9895_device::device_add_mconfig)
 	MCFG_CPU_ADD("cpu" , Z80 , 4000000)
 	MCFG_CPU_PROGRAM_MAP(z80_program_map)
 	MCFG_CPU_IO_MAP(z80_io_map)

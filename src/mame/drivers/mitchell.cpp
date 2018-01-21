@@ -318,7 +318,7 @@ WRITE8_MEMBER(mitchell_state::input_w)
 static ADDRESS_MAP_START( mgakuen_map, AS_PROGRAM, 8, mitchell_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
-	AM_RANGE(0xc000, 0xc7ff) AM_RAM_DEVWRITE("palette", palette_device, write)   /* palette RAM */
+	AM_RANGE(0xc000, 0xc7ff) AM_RAM_DEVWRITE("palette", palette_device, write8)   /* palette RAM */
 	AM_RANGE(0xc800, 0xcfff) AM_READWRITE(pang_colorram_r, pang_colorram_w) AM_SHARE("colorram") /* Attribute RAM */
 	AM_RANGE(0xd000, 0xdfff) AM_READWRITE(mgakuen_videoram_r, mgakuen_videoram_w) AM_SHARE("videoram") /* char RAM */
 	AM_RANGE(0xe000, 0xefff) AM_RAM /* Work RAM */
@@ -1151,7 +1151,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(mitchell_state::mitchell_irq)
 	}
 }
 
-static MACHINE_CONFIG_START( mgakuen )
+MACHINE_CONFIG_START(mitchell_state::mgakuen)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_16MHz/2) /* probably same clock as the other mitchell hardware games */
@@ -1191,7 +1191,7 @@ static MACHINE_CONFIG_START( mgakuen )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( pang )
+MACHINE_CONFIG_START(mitchell_state::pang)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80, XTAL_16MHz/2) /* verified on pcb */
@@ -1231,7 +1231,7 @@ static MACHINE_CONFIG_START( pang )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( pangnv, pang )
+MACHINE_CONFIG_DERIVED(mitchell_state::pangnv, pang)
 	MCFG_NVRAM_ADD_0FILL("nvram")
 MACHINE_CONFIG_END
 
@@ -1266,7 +1266,7 @@ WRITE_LINE_MEMBER(mitchell_state::spangbl_adpcm_int)
 }
 
 
-static MACHINE_CONFIG_DERIVED( spangbl, pangnv )
+MACHINE_CONFIG_DERIVED(mitchell_state::spangbl, pangnv)
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(spangbl_map)
@@ -1294,7 +1294,7 @@ static MACHINE_CONFIG_DERIVED( spangbl, pangnv )
 	MCFG_74157_OUT_CB(DEVWRITE8("msm", msm5205_device, data_w))
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( pangba, spangbl )
+MACHINE_CONFIG_DERIVED(mitchell_state::pangba, spangbl)
 	MCFG_CPU_MODIFY("audiocpu")
 	MCFG_CPU_PROGRAM_MAP(pangba_sound_map)
 
@@ -1302,7 +1302,7 @@ static MACHINE_CONFIG_DERIVED( pangba, spangbl )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( mstworld )
+MACHINE_CONFIG_START(mitchell_state::mstworld)
 
 	/* basic machine hardware */
 	/* it doesn't glitch with the clock speed set to 4x normal, however this is incorrect..
@@ -1346,7 +1346,7 @@ static MACHINE_CONFIG_START( mstworld )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( marukin )
+MACHINE_CONFIG_START(mitchell_state::marukin)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_16MHz/2) /* verified on pcb */
@@ -1401,7 +1401,7 @@ Vsync is 59.09hz
 
 */
 
-static MACHINE_CONFIG_START( pkladiesbl )
+MACHINE_CONFIG_START(mitchell_state::pkladiesbl)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_12MHz/2) /* verified on pcb */

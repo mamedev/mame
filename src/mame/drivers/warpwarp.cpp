@@ -705,7 +705,7 @@ GFXDECODE_END
 
 
 
-static MACHINE_CONFIG_START( geebee )
+MACHINE_CONFIG_START(warpwarp_state::geebee)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8080, MASTER_CLOCK/9) /* verified on pcb */
@@ -742,12 +742,12 @@ static MACHINE_CONFIG_START( geebee )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( geebeeb, geebee )
+MACHINE_CONFIG_DERIVED(warpwarp_state::geebeeb, geebee)
 	MCFG_DEVICE_MODIFY("latch")
 	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(NOOP) // remove coin lockout
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( navarone, geebee )
+MACHINE_CONFIG_DERIVED(warpwarp_state::navarone, geebee)
 
 	/* basic machine hardware */
 	MCFG_GFXDECODE_MODIFY("gfxdecode", 2k)
@@ -758,7 +758,7 @@ static MACHINE_CONFIG_DERIVED( navarone, geebee )
 	MCFG_VIDEO_START_OVERRIDE(warpwarp_state,navarone)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( bombbee )
+MACHINE_CONFIG_START(warpwarp_state::bombbee)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8080, MASTER_CLOCK/9)
@@ -796,7 +796,7 @@ static MACHINE_CONFIG_START( bombbee )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( warpwarp, bombbee )
+MACHINE_CONFIG_DERIVED(warpwarp_state::warpwarp, bombbee)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")

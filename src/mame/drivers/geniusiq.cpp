@@ -292,6 +292,8 @@ public:
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( iq128_cart );
 	DECLARE_DEVICE_IMAGE_UNLOAD_MEMBER( iq128_cart );
 
+	void iqtv512(machine_config &config);
+	void iq128(machine_config &config);
 private:
 	uint16_t      m_gfx_y;
 	uint16_t      m_gfx_x;
@@ -321,6 +323,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 
 	virtual uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	void gl8008cx(machine_config &config);
 };
 
 PALETTE_INIT_MEMBER(geniusiq_state, geniusiq)
@@ -792,7 +795,7 @@ DEVICE_IMAGE_UNLOAD_MEMBER(geniusiq_state,iq128_cart)
 }
 
 
-static MACHINE_CONFIG_START( iq128 )
+MACHINE_CONFIG_START(geniusiq_state::iq128)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_32MHz/2) // The main crystal is at 32MHz, not sure whats the CPU freq
 	MCFG_CPU_PROGRAM_MAP(geniusiq_mem)
@@ -822,13 +825,13 @@ static MACHINE_CONFIG_START( iq128 )
 	MCFG_SOFTWARE_LIST_ADD("cart_list", "iq128")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( iqtv512, iq128 )
+MACHINE_CONFIG_DERIVED(geniusiq_state::iqtv512, iq128)
 	/* internal flash */
 	MCFG_DEVICE_REMOVE("flash")
 	MCFG_AMD_29F040_ADD("flash")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( gl8008cx )
+MACHINE_CONFIG_START(gl8008cx_state::gl8008cx)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_32MHz/2) // TODO wrong CPU and frequency
 	MCFG_CPU_PROGRAM_MAP(gl8008cx_mem)

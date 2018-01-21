@@ -299,7 +299,7 @@ void bladestl_state::machine_reset()
 		m_last_track[i] = 0;
 }
 
-static MACHINE_CONFIG_START( bladestl )
+MACHINE_CONFIG_START(bladestl_state::bladestl)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", HD6309E, XTAL_24MHz / 8) // divider not verified (from 007342 custom)

@@ -37,6 +37,7 @@ public:
 	I8275_DRAW_CHARACTER_MEMBER(display_pixels);
 	DECLARE_MACHINE_RESET(mikrosha);
 
+	void mikrosha(machine_config &config);
 protected:
 	required_device<generic_slot_device> m_cart;
 };
@@ -203,7 +204,7 @@ static GFXDECODE_START( mikrosha )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, mikrosha_charlayout, 0, 1 )
 GFXDECODE_END
 
-static MACHINE_CONFIG_START( mikrosha )
+MACHINE_CONFIG_START(mikrosha_state::mikrosha)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8080, XTAL_16MHz / 9)
 	MCFG_CPU_PROGRAM_MAP(mikrosha_mem)

@@ -90,6 +90,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(gcp_adpcm_int);
 	required_device<excellent_spr_device> m_sprgen;
 
+	void gcpinbal(machine_config &config);
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };

@@ -42,8 +42,8 @@ public:
 	DECLARE_MACHINE_START(redbaron);
 	INTERRUPT_GEN_MEMBER(bzone_interrupt);
 	DECLARE_WRITE8_MEMBER(bzone_sounds_w);
+	void bzone_base(machine_config &config);
+	void redbaron(machine_config &config);
+	void bzone(machine_config &config);
+	void bzone_audio(machine_config &config);
 };
-
-
-/*----------- defined in audio/bzone.c -----------*/
-MACHINE_CONFIG_EXTERN( bzone_audio );

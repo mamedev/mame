@@ -87,6 +87,7 @@ public:
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void postload();
+	void sbowling(machine_config &config);
 };
 
 TILE_GET_INFO_MEMBER(sbowling_state::get_tile_info)
@@ -402,7 +403,7 @@ PALETTE_INIT_MEMBER(sbowling_state, sbowling)
 	}
 }
 
-static MACHINE_CONFIG_START( sbowling )
+MACHINE_CONFIG_START(sbowling_state::sbowling)
 	MCFG_CPU_ADD("maincpu", I8080, XTAL_19_968MHz/10)   /* ? */
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_IO_MAP(port_map)

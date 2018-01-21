@@ -81,7 +81,7 @@
 #define MCFG_ISA8_SLOT_ADD(_isatag, _tag, _slot_intf, _def_slot, _fixed) \
 	MCFG_DEVICE_ADD(_tag, ISA8_SLOT, 0) \
 	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, _fixed) \
-	isa8_slot_device::static_set_isa8_slot(*device, owner, _isatag);
+	isa8_slot_device::static_set_isa8_slot(*device, this, _isatag);
 #define MCFG_ISA16_CPU(_cputag) \
 	isa8_device::static_set_cputag(*device, _cputag);
 #define MCFG_ISA16_BUS_CUSTOM_SPACES() \
@@ -89,7 +89,7 @@
 #define MCFG_ISA16_SLOT_ADD(_isatag, _tag, _slot_intf, _def_slot, _fixed) \
 	MCFG_DEVICE_ADD(_tag, ISA16_SLOT, 0) \
 	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, _fixed) \
-	isa16_slot_device::static_set_isa16_slot(*device, owner, _isatag);
+	isa16_slot_device::static_set_isa16_slot(*device, this, _isatag);
 
 #define MCFG_ISA_BUS_IOCHCK(_iochck) \
 	devcb = &downcast<isa8_device *>(device)->set_iochck_callback(DEVCB_##_iochck);

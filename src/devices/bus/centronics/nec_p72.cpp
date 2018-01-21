@@ -48,7 +48,7 @@ ADDRESS_MAP_END
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( nec_p72_device::device_add_mconfig )
+MACHINE_CONFIG_START(nec_p72_device::device_add_mconfig)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", V33, XTAL_16MHz/2) /* TODO it's actually a V40 */
 	MCFG_CPU_PROGRAM_MAP(p72_mem)

@@ -98,6 +98,10 @@ public:
 	void get_tile_info_common( tile_data &tileinfo, tilemap_memory_index tile_index, uint8_t *alpha_videoram );
 	void draw_playfield_and_alpha( bitmap_ind16 &bitmap, const rectangle &cliprect, int playfield_x_offset, int playfield_y_offset );
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, int gfx, int is_soccer );
+	void atarifb4(machine_config &config);
+	void atarifb(machine_config &config);
+	void soccer(machine_config &config);
+	void abaseb(machine_config &config);
 };
 
 /*----------- defined in audio/atarifb.c -----------*/

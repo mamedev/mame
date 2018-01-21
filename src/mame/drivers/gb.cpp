@@ -604,7 +604,7 @@ PALETTE_INIT_MEMBER(megaduck_state, megaduck)
 }
 
 
-static MACHINE_CONFIG_START( gameboy )
+MACHINE_CONFIG_START(gb_state::gameboy)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", LR35902, XTAL_4_194304Mhz)
@@ -644,7 +644,7 @@ static MACHINE_CONFIG_START( gameboy )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( supergb )
+MACHINE_CONFIG_START(gb_state::supergb)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", LR35902, 4295454) /* 4.295454 MHz, derived from SNES xtal */
 	MCFG_CPU_PROGRAM_MAP(sgb_map)
@@ -685,7 +685,7 @@ static MACHINE_CONFIG_START( supergb )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( supergb2, gameboy )
+MACHINE_CONFIG_DERIVED(gb_state::supergb2, gameboy)
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(sgb_map)
@@ -709,7 +709,7 @@ static MACHINE_CONFIG_DERIVED( supergb2, gameboy )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( gbpocket, gameboy )
+MACHINE_CONFIG_DERIVED(gb_state::gbpocket, gameboy)
 
 	/* video hardware */
 	MCFG_PALETTE_MODIFY("palette")
@@ -719,7 +719,7 @@ static MACHINE_CONFIG_DERIVED( gbpocket, gameboy )
 	MCFG_MGB_PPU_ADD("ppu", "maincpu")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( gbcolor )
+MACHINE_CONFIG_START(gb_state::gbcolor)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", LR35902, XTAL_4_194304Mhz) // todo XTAL_8_388MHz
@@ -765,7 +765,7 @@ static MACHINE_CONFIG_START( gbcolor )
 	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("gb_list","gameboy")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( megaduck )
+MACHINE_CONFIG_START(megaduck_state::megaduck)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", LR35902, XTAL_4_194304Mhz) /* 4.194304 MHz */
@@ -861,4 +861,4 @@ CONS(1998, gbcolor,   0,       0,       gbcolor,  gameboy, gb_state,       0,   
 CONS(1993, megaduck,  0,       0,       megaduck, gameboy, megaduck_state, 0,    "Welback Holdings (Timlex International) / Creatronic / Videojet / Cougar USA", "Mega Duck / Cougar Boy", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 
 // http://blog.gg8.se/wordpress/2012/11/11/gameboy-clone-game-fighter-teardown/
-CONS(1993, gamefgtr,  gameboy, 0,       gameboy,  gameboy, gb_state,       0,    "unknown", "Game Fighter (bootleg)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE)
+CONS(1993, gamefgtr,  gameboy, 0,       gameboy,  gameboy, gb_state,       0,    "bootleg", "Game Fighter (bootleg)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE)

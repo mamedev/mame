@@ -165,6 +165,8 @@ public:
 	uint32_t screen_update_mil4000(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
+	void chewheel(machine_config &config);
+	void mil4000(machine_config &config);
 };
 
 
@@ -435,7 +437,7 @@ static ADDRESS_MAP_START( mil4000_map, AS_PROGRAM, 16, mil4000_state )
 	AM_RANGE(0x708010, 0x708011) AM_NOP //touch screen
 	AM_RANGE(0x70801e, 0x70801f) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)
 
-	AM_RANGE(0x780000, 0x780fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x780000, 0x780fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0xff0000, 0xffffff) AM_RAM AM_SHARE("nvram") // 2x CY62256L-70 (U7 & U8).
 
 ADDRESS_MAP_END
@@ -458,7 +460,7 @@ static ADDRESS_MAP_START( chewheel_map, AS_PROGRAM, 16, mil4000_state )
 	AM_RANGE(0x708010, 0x708011) AM_READWRITE(chewheel_mcu_r, chewheel_mcu_w)
 	AM_RANGE(0x70801e, 0x70801f) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)
 
-	AM_RANGE(0x780000, 0x780fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x780000, 0x780fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0xff0000, 0xff3fff) AM_RAM AM_SHARE("nvram")   // V62C51864L-70P (U77).
 	AM_RANGE(0xffc000, 0xffffff) AM_RAM                     // V62C51864L-70P (U78).
 
@@ -537,7 +539,7 @@ static GFXDECODE_START( mil4000 )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( mil4000 )
+MACHINE_CONFIG_START(mil4000_state::mil4000)
 	MCFG_CPU_ADD("maincpu", M68000, CPU_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(mil4000_map)
 	// irq 2/4/5 point to the same place, others invalid
@@ -564,7 +566,7 @@ static MACHINE_CONFIG_START( mil4000 )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( chewheel, mil4000 )
+MACHINE_CONFIG_DERIVED(mil4000_state::chewheel, mil4000)
 	MCFG_CPU_REPLACE("maincpu", M68000, CPU_CLOCK) /* 2MHz */
 	MCFG_CPU_PROGRAM_MAP(chewheel_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", mil4000_state,  irq5_line_hold)

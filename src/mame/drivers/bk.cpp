@@ -162,7 +162,7 @@ static INPUT_PORTS_START( bk0010 )
 INPUT_PORTS_END
 
 
-static MACHINE_CONFIG_START( bk0010 )
+MACHINE_CONFIG_START(bk_state::bk0010)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", T11, 3000000)
 	MCFG_T11_INITIAL_MODE(0x36ff)          /* initial mode word has DAL15,14,11,8 pulled low */
@@ -192,7 +192,7 @@ static MACHINE_CONFIG_START( bk0010 )
 	MCFG_SOFTWARE_LIST_ADD("cass_list","bk0010")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( bk0010fd, bk0010 )
+MACHINE_CONFIG_DERIVED(bk_state::bk0010fd, bk0010)
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(bk0010fd_mem)

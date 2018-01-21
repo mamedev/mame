@@ -45,4 +45,5 @@ public:
 	uint32_t screen_update_offtwall(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	static const atari_motion_objects_config s_mob_config;
+	void offtwall(machine_config &config);
 };

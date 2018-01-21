@@ -940,7 +940,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( leland )
+MACHINE_CONFIG_START(leland_state::leland)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("master", Z80, MASTER_CLOCK/2)
@@ -986,7 +986,7 @@ static MACHINE_CONFIG_START( leland )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( redline, leland )
+MACHINE_CONFIG_DERIVED(leland_state::redline, leland)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("master")
@@ -1002,7 +1002,7 @@ static MACHINE_CONFIG_DERIVED( redline, leland )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( quarterb, redline )
+MACHINE_CONFIG_DERIVED(leland_state::quarterb, redline)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("audiocpu")
@@ -1014,7 +1014,7 @@ static MACHINE_CONFIG_DERIVED( quarterb, redline )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( lelandi, quarterb )
+MACHINE_CONFIG_DERIVED(leland_state::lelandi, quarterb)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("slave")
@@ -1022,7 +1022,7 @@ static MACHINE_CONFIG_DERIVED( lelandi, quarterb )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( ataxx )
+MACHINE_CONFIG_START(leland_state::ataxx)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("master", Z80, 6000000)
@@ -1055,7 +1055,7 @@ static MACHINE_CONFIG_START( ataxx )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( wsf, ataxx )
+MACHINE_CONFIG_DERIVED(leland_state::wsf, ataxx)
 	MCFG_CPU_MODIFY("audiocpu")
 	MCFG_80186_TMROUT1_HANDLER(DEVWRITELINE("custom", leland_80186_sound_device, i80186_tmr1_w))
 

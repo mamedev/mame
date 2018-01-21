@@ -238,7 +238,7 @@ void vaportra_state::machine_reset()
 	m_priority[1] = 0;
 }
 
-static MACHINE_CONFIG_START( vaportra )
+MACHINE_CONFIG_START(vaportra_state::vaportra)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000,XTAL_24MHz/2) /* Custom chip 59 */

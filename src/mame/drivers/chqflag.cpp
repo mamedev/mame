@@ -166,7 +166,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( bank1000_map, AS_PROGRAM, 8, chqflag_state )
 	AM_RANGE(0x0000, 0x0fff) AM_RAM
 	AM_RANGE(0x1000, 0x17ff) AM_READ(k051316_1_ramrom_r) AM_DEVWRITE("k051316_1", k051316_device, write)
-	AM_RANGE(0x1800, 0x1fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x1800, 0x1fff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
 ADDRESS_MAP_END
 
 
@@ -325,7 +325,7 @@ WRITE_LINE_MEMBER(chqflag_state::background_brt_w)
 	}
 }
 
-static MACHINE_CONFIG_START( chqflag )
+MACHINE_CONFIG_START(chqflag_state::chqflag)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", KONAMI, XTAL_24MHz/2/4)    /* 052001 (verified on pcb) */

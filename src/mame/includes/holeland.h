@@ -56,4 +56,6 @@ public:
 	uint32_t screen_update_crzrally(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void holeland_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void crzrally_draw_sprites( bitmap_ind16 &bitmap,const rectangle &cliprect );
+	void crzrally(machine_config &config);
+	void holeland(machine_config &config);
 };

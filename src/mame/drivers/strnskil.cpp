@@ -336,7 +336,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(strnskil_state::strnskil_irq)
 }
 
 
-static MACHINE_CONFIG_START( strnskil )
+MACHINE_CONFIG_START(strnskil_state::strnskil)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80,8000000/2) /* 4.000MHz */
@@ -375,7 +375,7 @@ static MACHINE_CONFIG_START( strnskil )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( banbam, strnskil )
+MACHINE_CONFIG_DERIVED(strnskil_state::banbam, strnskil)
 	MCFG_CPU_ADD("mcu", MB8841, 8000000/2)
 //  MCFG_MB88XX_READ_K_CB(READ8(strnskil_state, mcu_portk_r))
 //  MCFG_MB88XX_READ_R0_CB(READ8(strnskil_state, mcu_portr0_r))

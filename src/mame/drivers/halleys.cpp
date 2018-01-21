@@ -292,6 +292,8 @@ public:
 	required_device<cpu_device> m_audiocpu;
 	required_device<palette_device> m_palette;
 	required_device<generic_latch_8_device> m_soundlatch;
+	void benberob(machine_config &config);
+	void halleys(machine_config &config);
 };
 
 
@@ -1920,7 +1922,7 @@ void halleys_state::machine_reset()
 }
 
 
-static MACHINE_CONFIG_START( halleys )
+MACHINE_CONFIG_START(halleys_state::halleys)
 	MCFG_CPU_ADD("maincpu", MC6809E, XTAL_19_968MHz/12) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(halleys_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", halleys_state, halleys_scanline, "screen", 0, 1)
@@ -1963,7 +1965,7 @@ static MACHINE_CONFIG_START( halleys )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( benberob, halleys )
+MACHINE_CONFIG_DERIVED(halleys_state::benberob, halleys)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_CLOCK(XTAL_19_968MHz/12) /* not verified but pcb identical to halley's comet */
 	MCFG_TIMER_MODIFY("scantimer")

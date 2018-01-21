@@ -133,6 +133,17 @@ public:
 	MC6845_UPDATE_ROW(crtc_update_row);
 	required_device<cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;
+	void misdraw(machine_config &config);
+	void couple(machine_config &config);
+	void phrcraze(machine_config &config);
+	void dtrvwz5(machine_config &config);
+	void casino5(machine_config &config);
+	void dodge(machine_config &config);
+	void tictac(machine_config &config);
+	void trvwhiz(machine_config &config);
+	void trvwhziv(machine_config &config);
+	void bigappg(machine_config &config);
+	void pitboss(machine_config &config);
 };
 
 
@@ -1357,7 +1368,7 @@ MACHINE_START_MEMBER(merit_state,casino5)
 	membank("bank2")->set_entry(0);
 }
 
-static MACHINE_CONFIG_START( pitboss )
+MACHINE_CONFIG_START(merit_state::pitboss)
 	MCFG_CPU_ADD("maincpu",Z80, CPU_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(pitboss_map)
 	MCFG_CPU_IO_MAP(trvwhiz_io_map)
@@ -1393,7 +1404,7 @@ static MACHINE_CONFIG_START( pitboss )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.33)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( casino5, pitboss )
+MACHINE_CONFIG_DERIVED(merit_state::casino5, pitboss)
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(casino5_map)
@@ -1403,7 +1414,7 @@ static MACHINE_CONFIG_DERIVED( casino5, pitboss )
 	MCFG_MACHINE_START_OVERRIDE(merit_state,casino5)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( bigappg, pitboss )
+MACHINE_CONFIG_DERIVED(merit_state::bigappg, pitboss)
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(bigappg_map)
@@ -1412,7 +1423,7 @@ static MACHINE_CONFIG_DERIVED( bigappg, pitboss )
 	MCFG_NVRAM_ADD_0FILL("nvram")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( misdraw, bigappg )
+MACHINE_CONFIG_DERIVED(merit_state::misdraw, bigappg)
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(misdraw_map)
@@ -1420,7 +1431,7 @@ static MACHINE_CONFIG_DERIVED( misdraw, bigappg )
 	MCFG_NVRAM_ADD_0FILL("cpunvram")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( dodge, pitboss )
+MACHINE_CONFIG_DERIVED(merit_state::dodge, pitboss)
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(dodge_map)
@@ -1429,42 +1440,42 @@ static MACHINE_CONFIG_DERIVED( dodge, pitboss )
 	MCFG_NVRAM_ADD_CUSTOM_DRIVER("nvram", merit_state, dodge_nvram_init)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( tictac, pitboss )
+MACHINE_CONFIG_DERIVED(merit_state::tictac, pitboss)
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(tictac_map)
 	MCFG_CPU_IO_MAP(tictac_io_map)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( trvwhiz, pitboss )
+MACHINE_CONFIG_DERIVED(merit_state::trvwhiz, pitboss)
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(trvwhiz_map)
 	MCFG_CPU_IO_MAP(trvwhiz_io_map)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( dtrvwz5, pitboss )
+MACHINE_CONFIG_DERIVED(merit_state::dtrvwz5, pitboss)
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(dtrvwz5_map)
 	MCFG_CPU_IO_MAP(tictac_io_map)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( phrcraze, pitboss )
+MACHINE_CONFIG_DERIVED(merit_state::phrcraze, pitboss)
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(phrcraze_map)
 	MCFG_CPU_IO_MAP(phrcraze_io_map)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( trvwhziv, pitboss )
+MACHINE_CONFIG_DERIVED(merit_state::trvwhziv, pitboss)
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(trvwhziv_map)
 	MCFG_CPU_IO_MAP(tictac_io_map)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( couple, pitboss )
+MACHINE_CONFIG_DERIVED(merit_state::couple, pitboss)
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(couple_map)

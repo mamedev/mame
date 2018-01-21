@@ -65,6 +65,7 @@ public:
 	DECLARE_WRITE8_MEMBER(duart_output);
 	required_shared_ptr<uint16_t> m_p_ram;
 	virtual void machine_reset() override;
+	void ht68k(machine_config &config);
 };
 
 
@@ -123,7 +124,7 @@ static SLOT_INTERFACE_START( ht68k_floppies )
 SLOT_INTERFACE_END
 
 
-static MACHINE_CONFIG_START( ht68k )
+MACHINE_CONFIG_START(ht68k_state::ht68k)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",M68000, XTAL_8MHz)
 	MCFG_CPU_PROGRAM_MAP(ht68k_mem)

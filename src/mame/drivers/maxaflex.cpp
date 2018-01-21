@@ -61,6 +61,7 @@ public:
 	WRITE_LINE_MEMBER(pia_cb2_w) { }  // This is used by Floppy drive on Atari 8bits Home Computers
 	TIMER_DEVICE_CALLBACK_MEMBER(mf_interrupt);
 
+	void maxaflex(machine_config &config);
 protected:
 	virtual void machine_reset() override;
 
@@ -306,7 +307,7 @@ TIMER_DEVICE_CALLBACK_MEMBER( maxaflex_state::mf_interrupt )
 	m_antic->generic_interrupt(2);
 }
 
-static MACHINE_CONFIG_START( maxaflex )
+MACHINE_CONFIG_START(maxaflex_state::maxaflex)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, pokey_device::FREQ_17_EXACT)
 	MCFG_CPU_PROGRAM_MAP(a600xl_mem)

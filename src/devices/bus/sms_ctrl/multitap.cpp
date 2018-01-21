@@ -129,7 +129,7 @@ READ32_MEMBER( sms_multitap_device::pixel_r )
 }
 
 
-MACHINE_CONFIG_MEMBER( sms_multitap_device::device_add_mconfig )
+MACHINE_CONFIG_START(sms_multitap_device::device_add_mconfig)
 	// Controller subports setup, without the TH callback declaration,
 	// because the circuit scheme shows TH of subports without connection.
 	MCFG_SMS_CONTROL_PORT_ADD("ctrl1", sms_control_port_devices, "joypad")

@@ -917,7 +917,7 @@ ADDRESS_MAP_END
 /*                                                           */
 /*************************************************************/
 
-static INPUT_PORTS_START( default )
+static INPUT_PORTS_START( base )
 	NAMCOS2_MCU_PORT_B_DEFAULT
 	NAMCOS2_MCU_PORT_C_DEFAULT
 	NAMCOS2_MCU_ANALOG_PORT_DEFAULT
@@ -927,7 +927,7 @@ static INPUT_PORTS_START( default )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( kyukaidk )
-	PORT_INCLUDE( default )
+	PORT_INCLUDE( base )
 
 	PORT_MODIFY("DSW")
 	/* Must be 'L' for correct C140 output */
@@ -1681,7 +1681,7 @@ via software as INT1
 /*                                                           */
 /*************************************************************/
 
-static MACHINE_CONFIG_START( configure_c148_standard )
+MACHINE_CONFIG_START(namcos2_state::configure_c148_standard)
 	MCFG_NAMCO_C148_ADD("master_intc","maincpu",true)
 	namco_c148_device::link_c148_device(*device,"slave_intc");
 	MCFG_NAMCO_C148_EXT1_CB(WRITE8(namcos2_state, sound_reset_w))
@@ -1713,7 +1713,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(namcos2_state::screen_scanline)
 	}
 }
 
-static MACHINE_CONFIG_START( default )
+MACHINE_CONFIG_START(namcos2_state::base)
 	MCFG_CPU_ADD("maincpu", M68000, M68K_CPU_CLOCK) /* 12.288MHz (49.152MHz OSC/4) */
 	MCFG_CPU_PROGRAM_MAP(master_default_am)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", namcos2_state, screen_scanline, "screen", 0, 1)
@@ -1764,7 +1764,7 @@ static MACHINE_CONFIG_START( default )
 MACHINE_CONFIG_END
 
 /* adjusted machine driver start */
-static MACHINE_CONFIG_DERIVED( default2, default )
+MACHINE_CONFIG_DERIVED(namcos2_state::base2, base)
 
 	MCFG_C140_REPLACE("c140", C140_SOUND_CLOCK) /* 21.333kHz */
 	MCFG_C140_BANK_TYPE(SYSTEM2)
@@ -1773,12 +1773,12 @@ static MACHINE_CONFIG_DERIVED( default2, default )
 MACHINE_CONFIG_END
 /* end */
 
-static MACHINE_CONFIG_DERIVED( assaultp, default2 )
+MACHINE_CONFIG_DERIVED(namcos2_state::assaultp, base2)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(12000*8)) /* CPU slices per frame - boosted (along with MCU speed) so that the Mode Select works */
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( default3, default )
+MACHINE_CONFIG_DERIVED(namcos2_state::base3, base)
 
 	MCFG_C140_REPLACE("c140", C140_SOUND_CLOCK) /* 21.333kHz */
 	MCFG_C140_BANK_TYPE(SYSTEM2)
@@ -1790,7 +1790,7 @@ static MACHINE_CONFIG_DERIVED( default3, default )
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( gollygho )
+MACHINE_CONFIG_START(namcos2_state::gollygho)
 	MCFG_CPU_ADD("maincpu", M68000, M68K_CPU_CLOCK) /* 12.288MHz (49.152MHz OSC/4) */
 	MCFG_CPU_PROGRAM_MAP(master_default_am)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", namcos2_state, screen_scanline, "screen", 0, 1)
@@ -1840,7 +1840,7 @@ static MACHINE_CONFIG_START( gollygho )
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.80)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( finallap )
+MACHINE_CONFIG_START(namcos2_state::finallap)
 	MCFG_CPU_ADD("maincpu", M68000, M68K_CPU_CLOCK) /* 12.288MHz (49.152MHz OSC/4) */
 	MCFG_CPU_PROGRAM_MAP(master_finallap_am)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", namcos2_state, screen_scanline, "screen", 0, 1)
@@ -1895,7 +1895,7 @@ static MACHINE_CONFIG_START( finallap )
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.80)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( sgunner )
+MACHINE_CONFIG_START(namcos2_state::sgunner)
 	MCFG_CPU_ADD("maincpu", M68000, M68K_CPU_CLOCK) /* 12.288MHz (49.152MHz OSC/4) */
 	MCFG_CPU_PROGRAM_MAP(master_sgunner_am)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", namcos2_state, screen_scanline, "screen", 0, 1)
@@ -1947,7 +1947,7 @@ static MACHINE_CONFIG_START( sgunner )
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.80)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( sgunner2 )
+MACHINE_CONFIG_START(namcos2_state::sgunner2)
 	MCFG_CPU_ADD("maincpu", M68000, M68K_CPU_CLOCK) /* 12.288MHz (49.152MHz OSC/4) */
 	MCFG_CPU_PROGRAM_MAP(master_sgunner_am)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", namcos2_state, screen_scanline, "screen", 0, 1)
@@ -2004,7 +2004,7 @@ static MACHINE_CONFIG_START( sgunner2 )
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.80)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( luckywld )
+MACHINE_CONFIG_START(namcos2_state::luckywld)
 	MCFG_CPU_ADD("maincpu", M68000, M68K_CPU_CLOCK) /* 12.288MHz (49.152MHz OSC/4) */
 	MCFG_CPU_PROGRAM_MAP(master_luckywld_am)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", namcos2_state, screen_scanline, "screen", 0, 1)
@@ -2059,7 +2059,7 @@ static MACHINE_CONFIG_START( luckywld )
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.80)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( metlhawk )
+MACHINE_CONFIG_START(namcos2_state::metlhawk)
 	MCFG_CPU_ADD("maincpu", M68000, M68K_CPU_CLOCK) /* 12.288MHz (49.152MHz OSC/4) */
 	MCFG_CPU_PROGRAM_MAP(master_metlhawk_am)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", namcos2_state, screen_scanline, "screen", 0, 1)
@@ -5871,51 +5871,51 @@ GAMEL(1987, finallapc,  finallap, finallap, finallap, namcos2_state, finallap, R
 GAMEL(1987, finallapjc, finallap, finallap, finallap, namcos2_state, finallap, ROT0,   "Namco", "Final Lap (Japan, Rev C)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NODEVICE_LAN, layout_finallap )
 GAMEL(1987, finallapjb, finallap, finallap, finallap, namcos2_state, finallap, ROT0,   "Namco", "Final Lap (Japan, Rev B)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NODEVICE_LAN, layout_finallap )
 
-GAME( 1988, assault,    0,        default2, assault,  namcos2_state, assault,       ROT90, "Namco", "Assault (Rev B)", 0 )
-GAME( 1988, assaultj,   assault,  default2, assault,  namcos2_state, assaultj,      ROT90, "Namco", "Assault (Japan)", 0 )
+GAME( 1988, assault,    0,        base2,    assault,  namcos2_state, assault,       ROT90, "Namco", "Assault (Rev B)", 0 )
+GAME( 1988, assaultj,   assault,  base2,    assault,  namcos2_state, assaultj,      ROT90, "Namco", "Assault (Japan)", 0 )
 GAME( 1988, assaultp,   assault,  assaultp, assault,  namcos2_state, assaultp_hack, ROT90, "Namco", "Assault Plus (Japan)", 0)
 
 GAME( 1988, metlhawk,   0,        metlhawk, metlhawk, namcos2_state, metlhawk, ROT90,  "Namco", "Metal Hawk (Rev C)", 0)
 GAME( 1988, metlhawkj,  metlhawk, metlhawk, metlhawk, namcos2_state, metlhawk, ROT90,  "Namco", "Metal Hawk (Japan, Rev F)", 0)
 
-GAME( 1988, ordyne,     0,        default,  default,  namcos2_state, ordyne,   ROT180, "Namco", "Ordyne (World)", 0 )
-GAME( 1988, ordyneje,   ordyne,   default,  default,  namcos2_state, ordyne,   ROT180, "Namco", "Ordyne (Japan, English Version)", 0 )
-GAME( 1988, ordynej,    ordyne,   default,  default,  namcos2_state, ordyne,   ROT180, "Namco", "Ordyne (Japan)", 0 )
+GAME( 1988, ordyne,     0,        base,     base,     namcos2_state, ordyne,   ROT180, "Namco", "Ordyne (World)", 0 )
+GAME( 1988, ordyneje,   ordyne,   base,     base,     namcos2_state, ordyne,   ROT180, "Namco", "Ordyne (Japan, English Version)", 0 )
+GAME( 1988, ordynej,    ordyne,   base,     base,     namcos2_state, ordyne,   ROT180, "Namco", "Ordyne (Japan)", 0 )
 
-GAME( 1988, mirninja,   0,        default,  default,  namcos2_state, mirninja, ROT0,   "Namco", "Mirai Ninja (Japan)", 0 )
+GAME( 1988, mirninja,   0,        base,     base,     namcos2_state, mirninja, ROT0,   "Namco", "Mirai Ninja (Japan)", 0 )
 
-GAME( 1988, phelios,    0,        default2, default,  namcos2_state, phelios,  ROT90,  "Namco", "Phelios", 0)
-GAME( 1988, pheliosj,   phelios,  default2, default,  namcos2_state, phelios,  ROT90,  "Namco", "Phelios (Japan)", 0)
+GAME( 1988, phelios,    0,        base2,    base,     namcos2_state, phelios,  ROT90,  "Namco", "Phelios", 0)
+GAME( 1988, pheliosj,   phelios,  base2,    base,     namcos2_state, phelios,  ROT90,  "Namco", "Phelios (Japan)", 0)
 
-GAME( 1989, dirtfoxj,   0,        default2, dirtfox,  namcos2_state, dirtfoxj, ROT90,  "Namco", "Dirt Fox (Japan)", MACHINE_NODEVICE_LAN )
+GAME( 1989, dirtfoxj,   0,        base2,    dirtfox,  namcos2_state, dirtfoxj, ROT90,  "Namco", "Dirt Fox (Japan)", MACHINE_NODEVICE_LAN )
 
 GAMEL(1989, fourtrax,   0,        finallap, fourtrax, namcos2_state, fourtrax, ROT0,   "Namco", "Four Trax (World)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NODEVICE_LAN, layout_finallap )
 GAMEL(1989, fourtraxa,  fourtrax, finallap, fourtrax, namcos2_state, fourtrax, ROT0,   "Namco", "Four Trax (Asia)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NODEVICE_LAN, layout_finallap ) // believed to be Asia due to the 4 appended to the changed ROMs. All other games with 2 are marked World and with 1 are marked Japan.
 
-GAME( 1989, valkyrie,   0,        default3, default,  namcos2_state, valkyrie, ROT90,  "Namco", "Valkyrie No Densetsu (Japan)", 0 )
+GAME( 1989, valkyrie,   0,        base3,    base,     namcos2_state, valkyrie, ROT90,  "Namco", "Valkyrie No Densetsu (Japan)", 0 )
 
-GAME( 1989, finehour,   0,        default2, default,  namcos2_state, finehour, ROT0,   "Namco", "Finest Hour (Japan)", 0)
+GAME( 1989, finehour,   0,        base2,    base,     namcos2_state, finehour, ROT0,   "Namco", "Finest Hour (Japan)", 0)
 
-GAME( 1989, burnforc,   0,        default3, default,  namcos2_state, burnforc, ROT0,   "Namco", "Burning Force (Japan, new version (Rev C))", 0 )
-GAME( 1989, burnforco,  burnforc, default3, default,  namcos2_state, burnforc, ROT0,   "Namco", "Burning Force (Japan, old version)", 0 )
+GAME( 1989, burnforc,   0,        base3,    base,     namcos2_state, burnforc, ROT0,   "Namco", "Burning Force (Japan, new version (Rev C))", 0 )
+GAME( 1989, burnforco,  burnforc, base3,    base,     namcos2_state, burnforc, ROT0,   "Namco", "Burning Force (Japan, old version)", 0 )
 
-GAME( 1989, marvland,   0,        default,  default,  namcos2_state, marvland, ROT0,   "Namco", "Marvel Land (US)", MACHINE_IMPERFECT_SOUND )
-GAME( 1989, marvlandj,  marvland, default,  default,  namcos2_state, marvlanj, ROT0,   "Namco", "Marvel Land (Japan)", 0 )
+GAME( 1989, marvland,   0,        base,     base,     namcos2_state, marvland, ROT0,   "Namco", "Marvel Land (US)", MACHINE_IMPERFECT_SOUND )
+GAME( 1989, marvlandj,  marvland, base,     base,     namcos2_state, marvlanj, ROT0,   "Namco", "Marvel Land (Japan)", 0 )
 
-GAME( 1990, kyukaidk,   0,        default,  kyukaidk, namcos2_state, kyukaidk, ROT0,   "Namco", "Kyuukai Douchuuki (Japan, new version (Rev B))", 0 )
-GAME( 1990, kyukaidko,  kyukaidk, default,  kyukaidk, namcos2_state, kyukaidk, ROT0,   "Namco", "Kyuukai Douchuuki (Japan, old version)", 0 )
+GAME( 1990, kyukaidk,   0,        base,     kyukaidk, namcos2_state, kyukaidk, ROT0,   "Namco", "Kyuukai Douchuuki (Japan, new version (Rev B))", 0 )
+GAME( 1990, kyukaidko,  kyukaidk, base,     kyukaidk, namcos2_state, kyukaidk, ROT0,   "Namco", "Kyuukai Douchuuki (Japan, old version)", 0 )
 
-GAME( 1990, dsaber,     0,        default3, default,  namcos2_state, dsaber,   ROT90,  "Namco", "Dragon Saber (World, DO2)", 0 )
-GAME( 1990, dsabera,    dsaber,   default3, default,  namcos2_state, dsaber,   ROT90,  "Namco", "Dragon Saber (World, older?)", 0 )
-GAME( 1990, dsaberj,    dsaber,   default3, default,  namcos2_state, dsaberj,  ROT90,  "Namco", "Dragon Saber (Japan, Rev B)", 0 )
+GAME( 1990, dsaber,     0,        base3,    base,     namcos2_state, dsaber,   ROT90,  "Namco", "Dragon Saber (World, DO2)", 0 )
+GAME( 1990, dsabera,    dsaber,   base3,    base,     namcos2_state, dsaber,   ROT90,  "Namco", "Dragon Saber (World, older?)", 0 )
+GAME( 1990, dsaberj,    dsaber,   base3,    base,     namcos2_state, dsaberj,  ROT90,  "Namco", "Dragon Saber (Japan, Rev B)", 0 )
 
 GAMEL(1990, finalap2,   0,        finallap, finallap, namcos2_state, finalap2, ROT0,   "Namco", "Final Lap 2", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NODEVICE_LAN, layout_finallap )
 GAMEL(1990, finalap2j,  finalap2, finallap, finallap, namcos2_state, finalap2, ROT0,   "Namco", "Final Lap 2 (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NODEVICE_LAN, layout_finallap )
 
 GAME( 1990, gollygho,   0,        gollygho, gollygho, namcos2_state, gollygho, ROT180, "Namco", "Golly! Ghost!", MACHINE_REQUIRES_ARTWORK )
 
-GAME( 1990, rthun2,     0,        default3, default,  namcos2_state, rthun2,   ROT0,   "Namco", "Rolling Thunder 2", 0 )
-GAME( 1990, rthun2j,    rthun2,   default3, default,  namcos2_state, rthun2j,  ROT0,   "Namco", "Rolling Thunder 2 (Japan)", 0 )
+GAME( 1990, rthun2,     0,        base3,    base,     namcos2_state, rthun2,   ROT0,   "Namco", "Rolling Thunder 2", 0 )
+GAME( 1990, rthun2j,    rthun2,   base3,    base,     namcos2_state, rthun2j,  ROT0,   "Namco", "Rolling Thunder 2 (Japan)", 0 )
 
 GAME( 1990, sgunner,    0,        sgunner,  sgunner,  namcos2_state, sgunner2, ROT0,   "Namco", "Steel Gunner (Rev B)", 0 )
 GAME( 1990, sgunnerj,   sgunner,  sgunner,  sgunner,  namcos2_state, sgunner2, ROT0,   "Namco", "Steel Gunner (Japan)", 0 )
@@ -5923,8 +5923,8 @@ GAME( 1990, sgunnerj,   sgunner,  sgunner,  sgunner,  namcos2_state, sgunner2, R
 GAME( 1991, sgunner2,   0,        sgunner2, sgunner2, namcos2_state, sgunner2, ROT0,   "Namco", "Steel Gunner 2 (US)", 0 )
 GAME( 1991, sgunner2j,  sgunner2, sgunner2, sgunner2, namcos2_state, sgunner2, ROT0,   "Namco", "Steel Gunner 2 (Japan, Rev A)", 0 )
 
-GAME( 1991, cosmogng,   0,        default,  default,  namcos2_state, cosmogng, ROT90,  "Namco", "Cosmo Gang the Video (US)", 0 )
-GAME( 1991, cosmogngj,  cosmogng, default,  default,  namcos2_state, cosmogng, ROT90,  "Namco", "Cosmo Gang the Video (Japan)", 0 )
+GAME( 1991, cosmogng,   0,        base,     base,     namcos2_state, cosmogng, ROT90,  "Namco", "Cosmo Gang the Video (US)", 0 )
+GAME( 1991, cosmogngj,  cosmogng, base,     base,     namcos2_state, cosmogng, ROT90,  "Namco", "Cosmo Gang the Video (Japan)", 0 )
 
 GAME( 1992, bubbletr,   0,        gollygho, bubbletr, namcos2_state, bubbletr, ROT180, "Namco", "Bubble Trouble (World, Rev B)", MACHINE_REQUIRES_ARTWORK )
 GAME( 1992, bubbletrj,  bubbletr, gollygho, bubbletr, namcos2_state, bubbletr, ROT180, "Namco", "Bubble Trouble (Japan, Rev C)", MACHINE_REQUIRES_ARTWORK )
@@ -5941,12 +5941,12 @@ GAME( 1992, luckywldj,  luckywld, luckywld, luckywld, namcos2_state, luckywld, R
 GAME( 1992, suzuka8h,   0,        luckywld, suzuka,   namcos2_state, suzuka8h, ROT0,   "Namco", "Suzuka 8 Hours (World, Rev C)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NODEVICE_LAN )
 GAME( 1992, suzuka8hj,  suzuka8h, luckywld, suzuka,   namcos2_state, suzuka8h, ROT0,   "Namco", "Suzuka 8 Hours (Japan, Rev B)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NODEVICE_LAN )
 
-GAME( 1992, sws,        0,        default,  default,  namcos2_state, sws,      ROT0,   "Namco", "Super World Stadium (Japan)", 0 )
+GAME( 1992, sws,        0,        base,     base,     namcos2_state, sws,      ROT0,   "Namco", "Super World Stadium (Japan)", 0 )
 
-GAME( 1992, sws92,      0,        default,  default,  namcos2_state, sws92,    ROT0,   "Namco", "Super World Stadium '92 (Japan)", 0 )
-GAME( 1992, sws92g,     sws92,    default,  default,  namcos2_state, sws92g,   ROT0,   "Namco", "Super World Stadium '92 Gekitouban (Japan)", 0 )
+GAME( 1992, sws92,      0,        base,     base,     namcos2_state, sws92,    ROT0,   "Namco", "Super World Stadium '92 (Japan)", 0 )
+GAME( 1992, sws92g,     sws92,    base,     base,     namcos2_state, sws92g,   ROT0,   "Namco", "Super World Stadium '92 Gekitouban (Japan)", 0 )
 
 GAME( 1993, suzuk8h2,   0,        luckywld, suzuka,   namcos2_state, suzuk8h2, ROT0,   "Namco", "Suzuka 8 Hours 2 (World, Rev B)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NODEVICE_LAN )
 GAME( 1993, suzuk8h2j,  suzuk8h2, luckywld, suzuka,   namcos2_state, suzuk8h2, ROT0,   "Namco", "Suzuka 8 Hours 2 (Japan, Rev B)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NODEVICE_LAN )
 
-GAME( 1993, sws93,      0,        default,  default,  namcos2_state, sws93,    ROT0,   "Namco", "Super World Stadium '93 (Japan)", 0 )
+GAME( 1993, sws93,      0,        base,     base,     namcos2_state, sws93,    ROT0,   "Namco", "Super World Stadium '93 (Japan)", 0 )

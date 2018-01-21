@@ -379,7 +379,7 @@ DRIVER_INIT_MEMBER( s11_state, s11 )
 	m_irq_active = false;
 }
 
-static MACHINE_CONFIG_START( s11 )
+MACHINE_CONFIG_START(s11_state::s11)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6802, XTAL_4MHz)
 	MCFG_CPU_PROGRAM_MAP(s11_main_map)

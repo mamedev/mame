@@ -21,6 +21,7 @@ public:
 	DECLARE_MACHINE_RESET(s11c);
 	DECLARE_DRIVER_INIT(s11c);
 
+	void s11c(machine_config &config);
 protected:
 
 private:

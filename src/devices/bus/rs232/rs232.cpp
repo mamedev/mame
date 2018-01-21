@@ -32,6 +32,9 @@
     DTE →   21          RL  Remote Loopback
     ← DCE   25          TM  Test Mode
 
+    Mark (logic 1) = typically -12V (-3V maximum, -15V minimum)
+    Space (logic 0) = typically +12V (+3V minimum, +15V maximum)
+
 ***************************************************************************/
 
 #include "emu.h"

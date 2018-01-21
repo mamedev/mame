@@ -829,7 +829,7 @@ GFXDECODE_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( g80r_base )
+MACHINE_CONFIG_START(segag80r_state::g80r_base)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, VIDEO_CLOCK/4)
@@ -853,7 +853,7 @@ static MACHINE_CONFIG_START( g80r_base )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( astrob, g80r_base )
+MACHINE_CONFIG_DERIVED(segag80r_state::astrob, g80r_base)
 
 	/* basic machine hardware */
 
@@ -863,7 +863,7 @@ static MACHINE_CONFIG_DERIVED( astrob, g80r_base )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( 005, g80r_base )
+MACHINE_CONFIG_DERIVED(segag80r_state::sega005, g80r_base)
 
 	/* basic machine hardware */
 
@@ -871,11 +871,11 @@ static MACHINE_CONFIG_DERIVED( 005, g80r_base )
 	MCFG_CPU_IO_MAP(main_ppi8255_portmap)
 
 	/* sound boards */
-	MCFG_FRAGMENT_ADD(005_sound_board)
+	MCFG_FRAGMENT_ADD(sega005_sound_board)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( spaceod, g80r_base )
+MACHINE_CONFIG_DERIVED(segag80r_state::spaceod, g80r_base)
 
 	/* basic machine hardware */
 
@@ -891,7 +891,7 @@ static MACHINE_CONFIG_DERIVED( spaceod, g80r_base )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( monsterb, g80r_base )
+MACHINE_CONFIG_DERIVED(segag80r_state::monsterb, g80r_base)
 
 	/* basic machine hardware */
 
@@ -907,7 +907,7 @@ static MACHINE_CONFIG_DERIVED( monsterb, g80r_base )
 	MCFG_FRAGMENT_ADD(monsterb_sound_board)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( monster2, monsterb )
+MACHINE_CONFIG_DERIVED(segag80r_state::monster2, monsterb)
 	MCFG_CPU_REPLACE("maincpu", SEGA_315_SPAT, VIDEO_CLOCK/4)
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_IO_MAP(main_ppi8255_portmap)
@@ -917,7 +917,7 @@ static MACHINE_CONFIG_DERIVED( monster2, monsterb )
 	MCFG_SEGACRPT_SET_DECRYPTED_TAG(":decrypted_opcodes")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( pignewt, g80r_base )
+MACHINE_CONFIG_DERIVED(segag80r_state::pignewt, g80r_base)
 
 	/* basic machine hardware */
 
@@ -931,7 +931,7 @@ static MACHINE_CONFIG_DERIVED( pignewt, g80r_base )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( sindbadm, g80r_base )
+MACHINE_CONFIG_DERIVED(segag80r_state::sindbadm, g80r_base)
 
 	/* basic machine hardware */
 	MCFG_CPU_REPLACE("maincpu", SEGA_315_5028, VIDEO_CLOCK/4)
@@ -1618,7 +1618,7 @@ GAME( 1981, astrob2,   astrob,   astrob,   astrob2,  segag80r_state, astrob,   R
 GAME( 1981, astrob2a,  astrob,   astrob,   astrob2,  segag80r_state, astrob,   ROT270, "Sega", "Astro Blaster (version 2a)", MACHINE_IMPERFECT_SOUND )
 GAME( 1981, astrob1,   astrob,   astrob,   astrob,   segag80r_state, astrob,   ROT270, "Sega", "Astro Blaster (version 1)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) // instant death if you start game with 1 credit, protection?, bad dump?
 GAME( 1981, astrobg,   astrob,   astrob,   astrob,   segag80r_state, astrob,   ROT270, "Sega", "Astro Blaster (German)", MACHINE_IMPERFECT_SOUND )
-GAME( 1981, 005,       0,        005,      005,      segag80r_state, 005,      ROT270, "Sega", "005", MACHINE_IMPERFECT_SOUND )
+GAME( 1981, 005,       0,        sega005,  005,      segag80r_state, 005,      ROT270, "Sega", "005", MACHINE_IMPERFECT_SOUND )
 
 
 /* basic G-80 system with individual background boards */

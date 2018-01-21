@@ -69,7 +69,7 @@ WRITE8_MEMBER(cedar_magnet_plane_device::plane_portcf_w)
 	m_cf_data = data;
 }
 
-MACHINE_CONFIG_MEMBER( cedar_magnet_plane_device::device_add_mconfig )
+MACHINE_CONFIG_START(cedar_magnet_plane_device::device_add_mconfig)
 	MCFG_CPU_ADD("planecpu", Z80,4000000)
 	MCFG_CPU_PROGRAM_MAP(cedar_magnet_plane_map)
 	MCFG_CPU_IO_MAP(cedar_magnet_plane_io)

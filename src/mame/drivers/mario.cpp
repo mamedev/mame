@@ -332,7 +332,7 @@ INTERRUPT_GEN_MEMBER(mario_state::vblank_irq)
 		device.execute().set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 }
 
-static MACHINE_CONFIG_START( mario_base )
+MACHINE_CONFIG_START(mario_state::mario_base)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, Z80_CLOCK) /* verified on pcb */
@@ -367,11 +367,11 @@ static MACHINE_CONFIG_START( mario_base )
 
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( mario, mario_base )
+MACHINE_CONFIG_DERIVED(mario_state::mario, mario_base)
 	MCFG_FRAGMENT_ADD(mario_audio)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( masao, mario_base )
+MACHINE_CONFIG_DERIVED(mario_state::masao, mario_base)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_CLOCK(4000000)        /* 4.000 MHz (?) */
 	MCFG_CPU_PROGRAM_MAP(masao_map)

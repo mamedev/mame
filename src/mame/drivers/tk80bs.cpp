@@ -48,6 +48,7 @@ public:
 	DECLARE_READ8_MEMBER(port_b_r);
 	uint32_t screen_update_tk80bs(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_shared_ptr<uint8_t> m_p_videoram;
+	void tk80bs(machine_config &config);
 private:
 	uint8_t m_term_data;
 	required_device<cpu_device> m_maincpu;
@@ -166,7 +167,7 @@ static GFXDECODE_START( tk80bs )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( tk80bs )
+MACHINE_CONFIG_START(tk80bs_state::tk80bs)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",I8080, XTAL_1MHz) //unknown clock
 	MCFG_CPU_PROGRAM_MAP(tk80bs_mem)

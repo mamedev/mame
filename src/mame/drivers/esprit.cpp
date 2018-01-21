@@ -32,6 +32,8 @@ public:
 	MC6845_UPDATE_ROW(crtc_update_row);
 	DECLARE_DRIVER_INIT(init);
 
+	void esprit(machine_config &config);
+	void esprit3(machine_config &config);
 private:
 	required_device<cpu_device> m_maincpu;
 	required_region_ptr<u8> m_p_chargen;
@@ -112,7 +114,7 @@ DRIVER_INIT_MEMBER( esprit_state, init )
 }
 
 
-static MACHINE_CONFIG_START( esprit )
+MACHINE_CONFIG_START(esprit_state::esprit)
 	MCFG_CPU_ADD("maincpu", M6502, 1000000) // no idea of clock
 	MCFG_CPU_PROGRAM_MAP(mem_map)
 
@@ -133,7 +135,7 @@ static MACHINE_CONFIG_START( esprit )
 	MCFG_MC6845_UPDATE_ROW_CB(esprit_state, crtc_update_row)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( esprit3, esprit )
+MACHINE_CONFIG_DERIVED(esprit_state::esprit3, esprit)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(mem3_map)
 MACHINE_CONFIG_END

@@ -625,7 +625,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, wgp_state )
 	AM_RANGE(0x502000, 0x517fff) AM_RAM_WRITE(pivram_word_w) AM_SHARE("pivram") /* piv tilemaps */
 	AM_RANGE(0x520000, 0x52001f) AM_RAM_WRITE(piv_ctrl_word_w) AM_SHARE("piv_ctrlram")
 	AM_RANGE(0x600000, 0x600003) AM_WRITE(rotate_port_w)    /* rotation control ? */
-	AM_RANGE(0x700000, 0x701fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x700000, 0x701fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( cpu2_map, AS_PROGRAM, 16  /* LAN areas not mapped... */, wgp_state )
@@ -902,7 +902,7 @@ void wgp_state::machine_start()
 	machine().save().register_postload(save_prepost_delegate(FUNC(wgp_state::postload), this));
 }
 
-static MACHINE_CONFIG_START( wgp )
+MACHINE_CONFIG_START(wgp_state::wgp)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 12000000)   /* 12 MHz ??? */
@@ -962,7 +962,7 @@ static MACHINE_CONFIG_START( wgp )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( wgp2, wgp )
+MACHINE_CONFIG_DERIVED(wgp_state::wgp2, wgp)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(12000))
 	/* video hardware */

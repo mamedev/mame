@@ -17,7 +17,7 @@
 DEFINE_DEVICE_TYPE(CPC_PDS, cpc_pds_device, "cpc_pds", "Programmers Development System (CPC Target)")
 
 
-MACHINE_CONFIG_MEMBER( cpc_pds_device::device_add_mconfig )
+MACHINE_CONFIG_START(cpc_pds_device::device_add_mconfig)
 	MCFG_DEVICE_ADD("pio", Z80PIO, XTAL_4MHz)   // no clock on the PCB, so will presume that it uses the CPC's clock
 
 	// no pass-through seen on remake PCBs, unknown if actual hardware had a pass-through port or not

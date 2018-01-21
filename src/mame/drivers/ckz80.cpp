@@ -93,6 +93,7 @@ public:
 	DECLARE_DRIVER_INIT(master);
 	DECLARE_READ8_MEMBER(master_trampoline_r);
 	DECLARE_WRITE8_MEMBER(master_trampoline_w);
+	void master(machine_config &config);
 
 protected:
 	virtual void machine_start() override;
@@ -426,7 +427,7 @@ INPUT_PORTS_END
     Machine Drivers
 ******************************************************************************/
 
-static MACHINE_CONFIG_START( master )
+MACHINE_CONFIG_START(ckz80_state::master)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_8MHz/2)

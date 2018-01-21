@@ -102,6 +102,7 @@ public:
 	DECLARE_READ8_MEMBER(dsw_r);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
+	void dunhuang(machine_config &config);
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -796,7 +797,7 @@ void dunhuang_state::machine_reset()
 }
 
 
-static MACHINE_CONFIG_START( dunhuang )
+MACHINE_CONFIG_START(dunhuang_state::dunhuang)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80,12000000/2)

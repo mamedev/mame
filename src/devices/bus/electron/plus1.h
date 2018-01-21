@@ -30,13 +30,16 @@ public:
 	electron_plus1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
+	// device-level overrides
 	virtual void device_start() override;
-	virtual void device_reset() override;
 
 	// optional information overrides
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual const tiny_rom_entry *device_rom_region() const override;
 	virtual ioport_constructor device_input_ports() const override;
+
+	virtual uint8_t expbus_r(address_space &space, offs_t offset, uint8_t data) override;
+	virtual void expbus_w(address_space &space, offs_t offset, uint8_t data) override;
 
 private:
 	DECLARE_READ8_MEMBER(status_r);
@@ -56,6 +59,7 @@ private:
 	required_ioport_array<4> m_joy;
 	required_ioport m_buttons;
 
+	uint8_t m_romsel;
 	int m_centronics_busy;
 	int m_adc_ready;
 };

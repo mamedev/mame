@@ -89,4 +89,5 @@ public:
 	void draw_sprites( bitmap_ind16 &bmp, const rectangle &clip, uint8_t *ram, int pri );
 
 	INTERRUPT_GEN_MEMBER(bwp3_interrupt);
+	void bwing(machine_config &config);
 };

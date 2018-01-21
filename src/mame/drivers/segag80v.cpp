@@ -870,7 +870,7 @@ static const char *const zektor_sample_names[] =
  *
  *************************************/
 
-static MACHINE_CONFIG_START( g80v_base )
+MACHINE_CONFIG_START(segag80v_state::g80v_base)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, VIDEO_CLOCK/4)
@@ -894,7 +894,7 @@ static MACHINE_CONFIG_START( g80v_base )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( elim2, g80v_base )
+MACHINE_CONFIG_DERIVED(segag80v_state::elim2, g80v_base)
 
 	/* custom sound board */
 	MCFG_SOUND_ADD("samples", SAMPLES, 0)
@@ -904,7 +904,7 @@ static MACHINE_CONFIG_DERIVED( elim2, g80v_base )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( spacfury, g80v_base )
+MACHINE_CONFIG_DERIVED(segag80v_state::spacfury, g80v_base)
 
 	/* custom sound board */
 	MCFG_SOUND_ADD("samples", SAMPLES, 0)
@@ -917,7 +917,7 @@ static MACHINE_CONFIG_DERIVED( spacfury, g80v_base )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( zektor, g80v_base )
+MACHINE_CONFIG_DERIVED(segag80v_state::zektor, g80v_base)
 
 	/* custom sound board */
 	MCFG_SOUND_ADD("samples", SAMPLES, 0)
@@ -933,14 +933,14 @@ static MACHINE_CONFIG_DERIVED( zektor, g80v_base )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( tacscan, g80v_base )
+MACHINE_CONFIG_DERIVED(segag80v_state::tacscan, g80v_base)
 
 	/* universal sound board */
 	MCFG_SEGAUSB_ADD("usbsnd")
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( startrek, g80v_base )
+MACHINE_CONFIG_DERIVED(segag80v_state::startrek, g80v_base)
 
 	/* speech board */
 	MCFG_FRAGMENT_ADD(sega_speech_board)

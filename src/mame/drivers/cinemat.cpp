@@ -962,11 +962,11 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( cinemat_nojmi_4k )
+MACHINE_CONFIG_START(cinemat_state::cinemat_nojmi_4k)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", CCPU, MASTER_CLOCK/4)
-	MCFG_CCPU_VECTOR_FUNC(ccpu_cpu_device::vector_delegate(FUNC(cinemat_state::cinemat_vector_callback),(cinemat_state*)owner))
+	MCFG_CCPU_VECTOR_FUNC(ccpu_cpu_device::vector_delegate(FUNC(cinemat_state::cinemat_vector_callback), this))
 	MCFG_CCPU_EXTERNAL_FUNC(READ8(cinemat_state,joystick_read))
 	MCFG_CPU_PROGRAM_MAP(program_map_4k)
 	MCFG_CPU_DATA_MAP(data_map)
@@ -987,32 +987,32 @@ static MACHINE_CONFIG_START( cinemat_nojmi_4k )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( cinemat_jmi_4k, cinemat_nojmi_4k )
+MACHINE_CONFIG_DERIVED(cinemat_state::cinemat_jmi_4k, cinemat_nojmi_4k)
 	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CCPU_VECTOR_FUNC(ccpu_cpu_device::vector_delegate(FUNC(cinemat_state::cinemat_vector_callback),(cinemat_state*)owner))
+	MCFG_CCPU_VECTOR_FUNC(ccpu_cpu_device::vector_delegate(FUNC(cinemat_state::cinemat_vector_callback), this))
 	MCFG_CCPU_EXTERNAL_FUNC(DEVREAD8("maincpu",ccpu_cpu_device,read_jmi))
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( cinemat_nojmi_8k, cinemat_nojmi_4k )
+MACHINE_CONFIG_DERIVED(cinemat_state::cinemat_nojmi_8k, cinemat_nojmi_4k)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(program_map_8k)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( cinemat_jmi_8k, cinemat_jmi_4k )
+MACHINE_CONFIG_DERIVED(cinemat_state::cinemat_jmi_8k, cinemat_jmi_4k)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(program_map_8k)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( cinemat_jmi_16k, cinemat_jmi_4k )
+MACHINE_CONFIG_DERIVED(cinemat_state::cinemat_jmi_16k, cinemat_jmi_4k)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(program_map_16k)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( cinemat_jmi_32k, cinemat_jmi_4k )
+MACHINE_CONFIG_DERIVED(cinemat_state::cinemat_jmi_32k, cinemat_jmi_4k)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(program_map_32k)
 MACHINE_CONFIG_END
@@ -1026,35 +1026,35 @@ MACHINE_CONFIG_END
  *
  *************************************/
 
-static MACHINE_CONFIG_DERIVED( spacewar, cinemat_nojmi_4k )
+MACHINE_CONFIG_DERIVED(cinemat_state::spacewar, cinemat_nojmi_4k)
 	MCFG_FRAGMENT_ADD(spacewar_sound)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(cinemat_state, screen_update_spacewar)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( barrier, cinemat_jmi_4k )
+MACHINE_CONFIG_DERIVED(cinemat_state::barrier, cinemat_jmi_4k)
 	MCFG_FRAGMENT_ADD(barrier_sound)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( speedfrk, cinemat_nojmi_8k )
+MACHINE_CONFIG_DERIVED(cinemat_state::speedfrk, cinemat_nojmi_8k)
 	MCFG_FRAGMENT_ADD(speedfrk_sound)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( starhawk, cinemat_jmi_4k )
+MACHINE_CONFIG_DERIVED(cinemat_state::starhawk, cinemat_jmi_4k)
 	MCFG_FRAGMENT_ADD(starhawk_sound)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( sundance, cinemat_jmi_8k )
+MACHINE_CONFIG_DERIVED(cinemat_state::sundance, cinemat_jmi_8k)
 	MCFG_FRAGMENT_ADD(sundance_sound)
 	MCFG_VIDEO_START_OVERRIDE(cinemat_state,cinemat_16level)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( tailg, cinemat_nojmi_8k )
+MACHINE_CONFIG_DERIVED(cinemat_state::tailg, cinemat_nojmi_8k)
 	MCFG_FRAGMENT_ADD(tailg_sound)
 
 	MCFG_DEVICE_MODIFY("outlatch")
@@ -1062,33 +1062,33 @@ static MACHINE_CONFIG_DERIVED( tailg, cinemat_nojmi_8k )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( warrior, cinemat_jmi_8k )
+MACHINE_CONFIG_DERIVED(cinemat_state::warrior, cinemat_jmi_8k)
 	MCFG_FRAGMENT_ADD(warrior_sound)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( armora, cinemat_jmi_16k )
+MACHINE_CONFIG_DERIVED(cinemat_state::armora, cinemat_jmi_16k)
 	MCFG_FRAGMENT_ADD(armora_sound)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( ripoff, cinemat_jmi_8k )
+MACHINE_CONFIG_DERIVED(cinemat_state::ripoff, cinemat_jmi_8k)
 	MCFG_FRAGMENT_ADD(ripoff_sound)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( starcas, cinemat_jmi_8k )
+MACHINE_CONFIG_DERIVED(cinemat_state::starcas, cinemat_jmi_8k)
 	MCFG_FRAGMENT_ADD(starcas_sound)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( solarq, cinemat_jmi_16k )
+MACHINE_CONFIG_DERIVED(cinemat_state::solarq, cinemat_jmi_16k)
 	MCFG_FRAGMENT_ADD(solarq_sound)
 	MCFG_VIDEO_START_OVERRIDE(cinemat_state,cinemat_64level)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( boxingb, cinemat_jmi_32k )
+MACHINE_CONFIG_DERIVED(cinemat_state::boxingb, cinemat_jmi_32k)
 	MCFG_FRAGMENT_ADD(boxingb_sound)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VISIBLE_AREA(0, 1024, 0, 788)
@@ -1099,27 +1099,27 @@ static MACHINE_CONFIG_DERIVED( boxingb, cinemat_jmi_32k )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( wotw, cinemat_jmi_16k )
+MACHINE_CONFIG_DERIVED(cinemat_state::wotw, cinemat_jmi_16k)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VISIBLE_AREA(0, 1120, 0, 767)
 	MCFG_FRAGMENT_ADD(wotw_sound)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( wotwc, cinemat_jmi_16k )
+MACHINE_CONFIG_DERIVED(cinemat_state::wotwc, cinemat_jmi_16k)
 	MCFG_FRAGMENT_ADD(wotw_sound)
 	MCFG_VIDEO_START_OVERRIDE(cinemat_state,cinemat_color)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( demon, cinemat_jmi_16k )
+MACHINE_CONFIG_DERIVED(cinemat_state::demon, cinemat_jmi_16k)
 	MCFG_FRAGMENT_ADD(demon_sound)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VISIBLE_AREA(0, 1024, 0, 805)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( qb3, cinemat_jmi_32k )
+MACHINE_CONFIG_DERIVED(cinemat_state::qb3, cinemat_jmi_32k)
 	MCFG_FRAGMENT_ADD(qb3_sound)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_DATA_MAP(data_map_qb3)

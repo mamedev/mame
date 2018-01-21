@@ -55,6 +55,7 @@ public:
 	required_device<palette_device> m_palette;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
+	void chsuper(machine_config &config);
 protected:
 	// driver_device overrides
 	//virtual void machine_start();
@@ -351,7 +352,7 @@ ADDRESS_MAP_END
 *     Machine Drivers      *
 ***************************/
 
-static MACHINE_CONFIG_START( chsuper )
+MACHINE_CONFIG_START(chsuper_state::chsuper)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z180, XTAL_12MHz / 4)   /* HD64180RP8, 8 MHz? */

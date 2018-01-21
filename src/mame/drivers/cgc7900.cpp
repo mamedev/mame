@@ -476,7 +476,7 @@ void cgc7900_state::machine_reset()
     MACHINE_DRIVER( cgc7900 )
 -------------------------------------------------*/
 
-static MACHINE_CONFIG_START( cgc7900 )
+MACHINE_CONFIG_START(cgc7900_state::cgc7900)
 	/* basic machine hardware */
 	MCFG_CPU_ADD(M68000_TAG, M68000, XTAL_28_48MHz/4)
 	MCFG_CPU_PROGRAM_MAP(cgc7900_mem)

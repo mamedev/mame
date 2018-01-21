@@ -691,7 +691,7 @@ WRITE8_MEMBER( atari_jsa_i_device::pokey_w )
 //-------------------------------------------------
 
 // Fully populated JSA-I, not used by anyone
-MACHINE_CONFIG_MEMBER( atari_jsa_i_device::device_add_mconfig )
+MACHINE_CONFIG_START(atari_jsa_i_device::device_add_mconfig)
 
 	// basic machine hardware
 	MCFG_CPU_ADD("cpu", M6502, JSA_MASTER_CLOCK/2)
@@ -821,7 +821,7 @@ READ8_MEMBER( atari_jsa_ii_device::rdio_r )
 //-------------------------------------------------
 
 // Fully populated JSA-II
-MACHINE_CONFIG_MEMBER( atari_jsa_ii_device::device_add_mconfig )
+MACHINE_CONFIG_START(atari_jsa_ii_device::device_add_mconfig)
 
 	// basic machine hardware
 	MCFG_CPU_ADD("cpu", M6502, JSA_MASTER_CLOCK/2)
@@ -903,7 +903,7 @@ READ8_MEMBER( atari_jsa_iii_device::rdio_r )
 //-------------------------------------------------
 
 	// Fully populated JSA-III
-MACHINE_CONFIG_MEMBER( atari_jsa_iii_device::device_add_mconfig )
+MACHINE_CONFIG_START(atari_jsa_iii_device::device_add_mconfig)
 
 	// basic machine hardware
 	MCFG_CPU_ADD("cpu", M6502, JSA_MASTER_CLOCK/2)
@@ -955,7 +955,7 @@ atari_jsa_iiis_device::atari_jsa_iiis_device(const machine_config &mconfig, cons
 //-------------------------------------------------
 
 // Fully populated JSA_IIIs
-MACHINE_CONFIG_MEMBER( atari_jsa_iiis_device::device_add_mconfig )
+MACHINE_CONFIG_START(atari_jsa_iiis_device::device_add_mconfig)
 
 	atari_jsa_iii_device::device_add_mconfig(config);
 

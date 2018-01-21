@@ -61,6 +61,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(watchdog_w);
 	DECLARE_WRITE_LINE_MEMBER(io_enable_w);
 
+	void jpms80(machine_config &config);
 protected:
 
 	// devices
@@ -126,7 +127,7 @@ void jpms80_state::machine_reset()
 	cpu->reset_line(ASSERT_LINE);
 }
 
-static MACHINE_CONFIG_START( jpms80 )
+MACHINE_CONFIG_START(jpms80_state::jpms80)
 	// CPU TMS9995, standard variant; no line connections
 	MCFG_TMS99xx_ADD("maincpu", TMS9995, MAIN_CLOCK, jpms80_map, jpms80_io_map)
 	MCFG_SPEAKER_STANDARD_MONO("mono")

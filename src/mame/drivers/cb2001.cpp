@@ -84,6 +84,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	void cb2001(machine_config &config);
 };
 
 
@@ -814,7 +815,7 @@ PALETTE_INIT_MEMBER(cb2001_state, cb2001)
 	}
 }
 
-static MACHINE_CONFIG_START( cb2001 )
+MACHINE_CONFIG_START(cb2001_state::cb2001)
 	MCFG_CPU_ADD("maincpu", V35, 20000000) // CPU91A-011-0016JK004; encrypted cpu like nec v25/35 used in some irem game
 	MCFG_V25_CONFIG(cb2001_decryption_table)
 	MCFG_CPU_PROGRAM_MAP(cb2001_map)

@@ -32,7 +32,7 @@ DEFINE_DEVICE_TYPE(PDS030_LVIEW, nubus_lview_device, "pd3_lviw", "Sigma Designs 
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( nubus_lview_device::device_add_mconfig )
+MACHINE_CONFIG_START(nubus_lview_device::device_add_mconfig)
 	MCFG_SCREEN_ADD( LVIEW_SCREEN_NAME, RASTER)
 	MCFG_SCREEN_UPDATE_DEVICE(DEVICE_SELF, nubus_lview_device, screen_update)
 	MCFG_SCREEN_SIZE(832,600)

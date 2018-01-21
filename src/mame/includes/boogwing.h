@@ -70,4 +70,5 @@ public:
 
 	DECO16IC_BANK_CB_MEMBER(bank_callback);
 	DECO16IC_BANK_CB_MEMBER(bank_callback2);
+	void boogwing(machine_config &config);
 };

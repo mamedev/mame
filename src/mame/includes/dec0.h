@@ -117,6 +117,21 @@ public:
 	void dec0_i8751_write(int data);
 	void dec0_i8751_reset();
 	void h6280_decrypt(const char *cputag);
+	void dec0_base(machine_config &config);
+	void dec0(machine_config &config);
+	void dec1(machine_config &config);
+	void midres(machine_config &config);
+	void birdtry(machine_config &config);
+	void baddudes(machine_config &config);
+	void midresbj(machine_config &config);
+	void slyspy(machine_config &config);
+	void hbarrel(machine_config &config);
+	void midresb(machine_config &config);
+	void ffantasybl(machine_config &config);
+	void drgninjab(machine_config &config);
+	void robocop(machine_config &config);
+	void robocopb(machine_config &config);
+	void hippodrm(machine_config &config);
 };
 
 
@@ -158,4 +173,6 @@ public:
 
 	uint32_t screen_update_automat(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_secretab(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void secretab(machine_config &config);
+	void automat(machine_config &config);
 };

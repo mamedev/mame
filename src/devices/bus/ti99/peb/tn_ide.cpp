@@ -366,7 +366,7 @@ INPUT_PORTS_START( tn_ide )
 		PORT_DIPSETTING( 0x1f00, "1F00" )
 INPUT_PORTS_END
 
-MACHINE_CONFIG_MEMBER( nouspikel_ide_interface_device::device_add_mconfig )
+MACHINE_CONFIG_START(nouspikel_ide_interface_device::device_add_mconfig)
 	MCFG_DEVICE_ADD( "ide_rtc", RTC65271, 0 )
 	MCFG_RTC65271_INTERRUPT_CB(WRITELINE(nouspikel_ide_interface_device, clock_interrupt_callback))
 	MCFG_ATA_INTERFACE_ADD( "ata", ata_devices, "hdd", nullptr, false)

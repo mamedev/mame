@@ -99,6 +99,7 @@ public:
 	required_device<netlist_mame_device> m_maincpu;
 	required_device<fixedfreq_device> m_video;
 
+	void taitottl(machine_config &config);
 protected:
 
 	// driver_device overrides
@@ -139,7 +140,7 @@ void taitottl_state::video_start()
 {
 }
 
-static MACHINE_CONFIG_START( taitottl )
+MACHINE_CONFIG_START(taitottl_state::taitottl)
 
 	/* basic machine hardware */
 	MCFG_DEVICE_ADD("maincpu", NETLIST_CPU, NETLIST_CLOCK)

@@ -47,7 +47,7 @@
 	upd3301_device::static_set_character_width(*device, _value);
 
 #define MCFG_UPD3301_DRAW_CHARACTER_CALLBACK_OWNER(_class, _method) \
-	upd3301_device::static_set_display_callback(*device, upd3301_device::draw_character_delegate(&_class::_method, #_class "::" #_method, downcast<_class *>(owner)));
+	upd3301_device::static_set_display_callback(*device, upd3301_device::draw_character_delegate(&_class::_method, #_class "::" #_method, this));
 
 #define MCFG_UPD3301_DRQ_CALLBACK(_write) \
 	devcb = &upd3301_device::set_drq_wr_callback(*device, DEVCB_##_write);

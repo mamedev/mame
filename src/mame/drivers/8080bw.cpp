@@ -408,7 +408,7 @@ INPUT_PORTS_END
 
 
 /* same as regular invaders, but with a color board added */
-static MACHINE_CONFIG_DERIVED( invadpt2, mw8080bw_root )
+MACHINE_CONFIG_DERIVED(_8080bw_state::invadpt2, mw8080bw_root)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -451,7 +451,7 @@ static ADDRESS_MAP_START( spacerng_io_map, AS_IO, 8, _8080bw_state )
 	AM_RANGE(0x06, 0x06) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
 ADDRESS_MAP_END
 
-static MACHINE_CONFIG_DERIVED( spacerng, invadpt2 )
+MACHINE_CONFIG_DERIVED(_8080bw_state::spacerng, invadpt2)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -492,7 +492,7 @@ static INPUT_PORTS_START( spcewars )
 	PORT_DIPSETTING(    0x08, "2000" )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_DERIVED( spcewars, mw8080bw_root )
+MACHINE_CONFIG_DERIVED(_8080bw_state::spcewars, mw8080bw_root)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -534,7 +534,7 @@ static ADDRESS_MAP_START( spcewarla_io_map, AS_IO, 8, _8080bw_state )
 	AM_RANGE(0x0c, 0x0c) AM_DEVWRITE("mb14241", mb14241_device, shift_data_w)
 ADDRESS_MAP_END
 
-static MACHINE_CONFIG_DERIVED(spcewarla, spcewars)
+MACHINE_CONFIG_DERIVED(_8080bw_state::spcewarla, spcewars)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(spcewarla_io_map)
 
@@ -600,7 +600,7 @@ static INPUT_PORTS_START( astropal )
 	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_DERIVED( astropal, invaders )
+MACHINE_CONFIG_DERIVED(_8080bw_state::astropal, invaders)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -651,7 +651,7 @@ static INPUT_PORTS_START( cosmo )
 	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x80, "SW1:8" ) /* must be HIGH normally or the joystick won't work */
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_DERIVED( cosmo, mw8080bw_root )
+MACHINE_CONFIG_DERIVED(_8080bw_state::cosmo, mw8080bw_root)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -808,7 +808,7 @@ static ADDRESS_MAP_START( spacecom_io_map, AS_IO, 8, _8080bw_state )
 	AM_RANGE(0x44, 0x44) AM_READ_PORT("IN2") AM_WRITE(invaders_audio_2_w)
 ADDRESS_MAP_END
 
-MACHINE_CONFIG_START( spacecom )
+MACHINE_CONFIG_START(_8080bw_state::spacecom)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8080A, XTAL_18MHz / 10) // divider guessed
@@ -920,7 +920,7 @@ static INPUT_PORTS_START( invrvnge )
 INPUT_PORTS_END
 
 
-static MACHINE_CONFIG_DERIVED( invrvnge, mw8080bw_root )
+MACHINE_CONFIG_DERIVED(_8080bw_state::invrvnge, mw8080bw_root)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1058,7 +1058,7 @@ static ADDRESS_MAP_START( starw1_io_map, AS_IO, 8, _8080bw_state )
 	AM_RANGE(0x07, 0x07) AM_WRITENOP    /* writes 89 at boot */
 ADDRESS_MAP_END
 
-static MACHINE_CONFIG_DERIVED( starw1, invadpt2 )
+MACHINE_CONFIG_DERIVED(_8080bw_state::starw1, invadpt2)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(starw1_io_map)
 MACHINE_CONFIG_END
@@ -1097,7 +1097,7 @@ static INPUT_PORTS_START( lrescue )
 	PORT_DIPUNUSED_DIPLOC( 0x80, 0x00, "SW1:8" )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_DERIVED( lrescue, mw8080bw_root )
+MACHINE_CONFIG_DERIVED(_8080bw_state::lrescue, mw8080bw_root)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1126,7 +1126,7 @@ static MACHINE_CONFIG_DERIVED( lrescue, mw8080bw_root )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START( escmars )
+MACHINE_CONFIG_START(_8080bw_state::escmars)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8080, XTAL_18MHz / 10) // divider guessed
@@ -1224,7 +1224,7 @@ static ADDRESS_MAP_START( cosmicmo_io_map, AS_IO, 8, _8080bw_state )
 	AM_RANGE(0x06, 0x06) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
 ADDRESS_MAP_END
 
-static MACHINE_CONFIG_DERIVED( cosmicmo, mw8080bw_root )
+MACHINE_CONFIG_DERIVED(_8080bw_state::cosmicmo, mw8080bw_root)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1374,7 +1374,7 @@ MACHINE_START_MEMBER(_8080bw_state,rollingc)
 	MACHINE_START_CALL_MEMBER(mw8080bw);
 }
 
-static MACHINE_CONFIG_DERIVED( rollingc, mw8080bw_root )
+MACHINE_CONFIG_DERIVED(_8080bw_state::rollingc, mw8080bw_root)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1514,7 +1514,7 @@ MACHINE_RESET_MEMBER(_8080bw_state,schaser)
 	MACHINE_RESET_CALL_MEMBER(mw8080bw);
 }
 
-static MACHINE_CONFIG_DERIVED( schaser, mw8080bw_root )
+MACHINE_CONFIG_DERIVED(_8080bw_state::schaser, mw8080bw_root)
 
 	/* basic machine hardware */
 	MCFG_CPU_REPLACE("maincpu",I8080,1996800)       /* 19.968MHz / 10 */
@@ -1637,7 +1637,7 @@ MACHINE_START_MEMBER(_8080bw_state,schasercv)
 	MACHINE_START_CALL_MEMBER(mw8080bw);
 }
 
-static MACHINE_CONFIG_DERIVED( schasercv, mw8080bw_root )
+MACHINE_CONFIG_DERIVED(_8080bw_state::schasercv, mw8080bw_root)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1728,7 +1728,7 @@ MACHINE_START_MEMBER(_8080bw_state,sflush)
 	MACHINE_START_CALL_MEMBER(mw8080bw);
 }
 
-static MACHINE_CONFIG_DERIVED( sflush, mw8080bw_root )
+MACHINE_CONFIG_DERIVED(_8080bw_state::sflush, mw8080bw_root)
 
 	/* basic machine hardware */
 	MCFG_CPU_REPLACE("maincpu",M6800,1500000) // ?
@@ -1831,7 +1831,7 @@ static INPUT_PORTS_START( lupin3a )
 	PORT_DIPSETTING(    0x10, DEF_STR( Japanese ) )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_DERIVED( lupin3, mw8080bw_root )
+MACHINE_CONFIG_DERIVED(_8080bw_state::lupin3, mw8080bw_root)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1877,7 +1877,7 @@ static MACHINE_CONFIG_DERIVED( lupin3, mw8080bw_root )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( lupin3a, lupin3 )
+MACHINE_CONFIG_DERIVED(_8080bw_state::lupin3a, lupin3)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(schaser_map)
 	MCFG_MACHINE_START_OVERRIDE(_8080bw_state,sflush)
@@ -1995,7 +1995,7 @@ static INPUT_PORTS_START( polaris )
 	PORT_ADJUSTER( 90, "Sub Volume VR3" )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_DERIVED( polaris, mw8080bw_root )
+MACHINE_CONFIG_DERIVED(_8080bw_state::polaris, mw8080bw_root)
 
 	/* basic machine hardware */
 	MCFG_CPU_REPLACE("maincpu",I8080,1996800)       /* 19.968MHz / 10 */
@@ -2127,7 +2127,7 @@ static INPUT_PORTS_START( ballbomb )
 	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x00, "SW1:8" )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_DERIVED( ballbomb, mw8080bw_root )
+MACHINE_CONFIG_DERIVED(_8080bw_state::ballbomb, mw8080bw_root)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2207,7 +2207,7 @@ static INPUT_PORTS_START( yosakdon )
 INPUT_PORTS_END
 
 
-static MACHINE_CONFIG_DERIVED( yosakdon, mw8080bw_root )
+MACHINE_CONFIG_DERIVED(_8080bw_state::yosakdon, mw8080bw_root)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2370,7 +2370,7 @@ static ADDRESS_MAP_START( indianbtbr_io_map, AS_IO, 8, _8080bw_state )
 ADDRESS_MAP_END
 
 
-static MACHINE_CONFIG_DERIVED( indianbt, mw8080bw_root )
+MACHINE_CONFIG_DERIVED(_8080bw_state::indianbt, mw8080bw_root)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2395,7 +2395,7 @@ static MACHINE_CONFIG_DERIVED( indianbt, mw8080bw_root )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( indianbtbr, mw8080bw_root )
+MACHINE_CONFIG_DERIVED(_8080bw_state::indianbtbr, mw8080bw_root)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2470,7 +2470,7 @@ static INPUT_PORTS_START( steelwkr )
 INPUT_PORTS_END
 
 
-static MACHINE_CONFIG_DERIVED( steelwkr, mw8080bw_root )
+MACHINE_CONFIG_DERIVED(_8080bw_state::steelwkr, mw8080bw_root)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2642,7 +2642,7 @@ static ADDRESS_MAP_START( shuttlei_io_map, AS_IO, 8, _8080bw_state )
 ADDRESS_MAP_END
 
 
-MACHINE_CONFIG_START( shuttlei )
+MACHINE_CONFIG_START(_8080bw_state::shuttlei)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8080, XTAL_18MHz / 10) // divider guessed
@@ -2766,7 +2766,7 @@ static INPUT_PORTS_START( darthvdr )
 	INVADERS_CAB_TYPE_PORT
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_DERIVED( darthvdr, mw8080bw_root )
+MACHINE_CONFIG_DERIVED(_8080bw_state::darthvdr, mw8080bw_root)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2839,7 +2839,7 @@ static INPUT_PORTS_START( vortex )
 	PORT_DIPSETTING(    0x80, DEF_STR( 1C_1C ) )
 INPUT_PORTS_END
 
-MACHINE_CONFIG_DERIVED( vortex, mw8080bw_root )
+MACHINE_CONFIG_DERIVED(_8080bw_state::vortex, mw8080bw_root)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -3147,7 +3147,7 @@ MACHINE_START_MEMBER(_8080bw_state, claybust)
 	MACHINE_START_CALL_MEMBER(mw8080bw);
 }
 
-MACHINE_CONFIG_DERIVED( claybust, invaders )
+MACHINE_CONFIG_DERIVED(_8080bw_state::claybust, invaders)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -3262,7 +3262,7 @@ static INPUT_PORTS_START( attackfc )
 INPUT_PORTS_END
 
 
-static MACHINE_CONFIG_DERIVED( attackfc, mw8080bw_root )
+MACHINE_CONFIG_DERIVED(_8080bw_state::attackfc, mw8080bw_root)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -3400,7 +3400,7 @@ WRITE8_MEMBER(_8080bw_state::invmulti_bank_w)
 	membank("bank2")->set_entry(bank);
 }
 
-MACHINE_CONFIG_DERIVED( invmulti, invaders )
+MACHINE_CONFIG_DERIVED(_8080bw_state::invmulti, invaders)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")

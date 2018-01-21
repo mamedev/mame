@@ -136,6 +136,8 @@ public:
 	void draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect,int pri);
 	virtual void video_start() override;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void totmejan(machine_config &config);
+	void goodejan(machine_config &config);
 };
 
 /*******************************
@@ -433,7 +435,7 @@ static ADDRESS_MAP_START( goodejan_map, AS_PROGRAM, 16, goodejan_state )
 	AM_RANGE(0x00000, 0x0afff) AM_RAM
 	AM_RANGE(0x0c000, 0x0c7ff) AM_RAM_WRITE(seibucrtc_sc0vram_w) AM_SHARE("sc0_vram")
 	AM_RANGE(0x0c800, 0x0cfff) AM_RAM_WRITE(seibucrtc_sc3vram_w) AM_SHARE("sc3_vram")
-	AM_RANGE(0x0d000, 0x0dfff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x0d000, 0x0dfff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	/*Guess: these two aren't used/initialized at all.*/
 	AM_RANGE(0x0e000, 0x0e7ff) AM_RAM_WRITE(seibucrtc_sc1vram_w) AM_SHARE("sc1_vram")
 	AM_RANGE(0x0e800, 0x0efff) AM_RAM_WRITE(seibucrtc_sc2vram_w) AM_SHARE("sc2_vram")
@@ -630,7 +632,7 @@ WRITE16_MEMBER( goodejan_state::layer_scroll_w )
 
 
 
-static MACHINE_CONFIG_START( goodejan )
+MACHINE_CONFIG_START(goodejan_state::goodejan)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", V30, GOODEJAN_MHZ2/2)
@@ -675,7 +677,7 @@ static MACHINE_CONFIG_START( goodejan )
 	MCFG_SEIBU_SOUND_YM_WRITE_CB(DEVWRITE8("ymsnd", ym3812_device, write))
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( totmejan, goodejan )
+MACHINE_CONFIG_DERIVED(goodejan_state::totmejan, goodejan)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(totmejan_io_map)
 MACHINE_CONFIG_END

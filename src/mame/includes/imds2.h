@@ -72,6 +72,7 @@ class imds2_state : public driver_device
 	virtual void video_start() override;
 	virtual void machine_reset() override;
 
+	void imds2(machine_config &config);
 	private:
 	required_device<i8085a_cpu_device> m_ipccpu;
 	required_device<pic8259_device> m_ipcsyspic;

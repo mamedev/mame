@@ -152,7 +152,7 @@ static ADDRESS_MAP_START( spbactn_map, AS_PROGRAM, 16, spbactn_state )
 	AM_RANGE(0x50000, 0x50fff) AM_RAM AM_SHARE("spvideoram")
 	AM_RANGE(0x60000, 0x67fff) AM_RAM_WRITE(fg_videoram_w) AM_SHARE("fgvideoram")
 	AM_RANGE(0x70000, 0x77fff) AM_RAM_WRITE(bg_videoram_w) AM_SHARE("bgvideoram")
-	AM_RANGE(0x80000, 0x827ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x80000, 0x827ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x90000, 0x90001) AM_READ_PORT("IN0")
 	AM_RANGE(0x90010, 0x90011) AM_READ_PORT("IN1")
 	AM_RANGE(0x90020, 0x90021) AM_READ_PORT("SYSTEM")
@@ -201,7 +201,7 @@ static ADDRESS_MAP_START( spbactnp_map, AS_PROGRAM, 16, spbactn_state )
 	AM_RANGE(0x50000, 0x50fff) AM_RAM AM_SHARE("spvideoram")
 	AM_RANGE(0x60000, 0x67fff) AM_RAM_WRITE(fg_videoram_w) AM_SHARE("fgvideoram")
 	AM_RANGE(0x70000, 0x77fff) AM_RAM_WRITE(bg_videoram_w) AM_SHARE("bgvideoram")
-	AM_RANGE(0x80000, 0x827ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")   // yes R and G are swapped vs. the released version
+	AM_RANGE(0x80000, 0x827ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")   // yes R and G are swapped vs. the released version
 
 	AM_RANGE(0x90002, 0x90003) AM_WRITE(main_irq_ack_w)
 	AM_RANGE(0x90006, 0x90007) AM_WRITE(spbatnp_90006_w)
@@ -402,7 +402,7 @@ static GFXDECODE_START( spbactnp )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( spbactn )
+MACHINE_CONFIG_START(spbactn_state::spbactn)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_12MHz)
@@ -455,7 +455,7 @@ static MACHINE_CONFIG_START( spbactn )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( spbactnp )
+MACHINE_CONFIG_START(spbactn_state::spbactnp)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_12MHz)

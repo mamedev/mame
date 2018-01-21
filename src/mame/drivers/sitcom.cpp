@@ -74,6 +74,7 @@ public:
 
 	DECLARE_INPUT_CHANGED_MEMBER(update_buttons);
 
+	void sitcom(machine_config &config);
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -113,6 +114,7 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(update_shutter);
 	DECLARE_INPUT_CHANGED_MEMBER(update_speed);
 
+	void sitcomtmr(machine_config &config);
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
@@ -329,7 +331,7 @@ void sitcom_timer_state::update_dac(uint8_t value)
 }
 
 
-MACHINE_CONFIG_START( sitcom )
+MACHINE_CONFIG_START(sitcom_state::sitcom)
 	// basic machine hardware
 	MCFG_CPU_ADD("maincpu", I8085A, XTAL_6_144MHz) // 3.072MHz can be used for an old slow 8085
 	MCFG_CPU_PROGRAM_MAP(sitcom_mem)
@@ -367,7 +369,7 @@ MACHINE_CONFIG_START( sitcom )
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED( sitcomtmr, sitcom )
+MACHINE_CONFIG_DERIVED(sitcom_timer_state::sitcomtmr, sitcom)
 	MCFG_DEVICE_ADD("ds2", DL1414T, 0) // remote display
 	MCFG_DL1414_UPDATE_HANDLER(WRITE16(sitcom_state, update_ds<2>))
 

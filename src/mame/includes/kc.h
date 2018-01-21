@@ -153,6 +153,7 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(kc_scanline);
 
 	DECLARE_QUICKLOAD_LOAD_MEMBER( kc );
+	void kc85_3(machine_config &config);
 };
 
 
@@ -184,6 +185,8 @@ public:
 	uint8_t               m_port_84_data;
 	uint8_t               m_port_86_data;
 	uint8_t *             m_display_video_ram;
+	void kc85_4(machine_config &config);
+	void kc85_5(machine_config &config);
 };
 
 #endif // MAME_INCLUDES_KC_H

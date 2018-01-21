@@ -51,6 +51,7 @@ public:
 	int m_digit;
 	int m_pio1_a5;
 	int m_pio1_brdy;
+	void c80(machine_config &config);
 };
 
 #endif

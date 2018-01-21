@@ -88,4 +88,5 @@ public:
 	DECLARE_READ8_MEMBER(rozcpu_comm_r);
 	DECLARE_WRITE8_MEMBER(rozcpu_comm_w);
 	DECLARE_WRITE8_MEMBER(rozcpu_pal_w);
+	void divebomb(machine_config &config);
 };

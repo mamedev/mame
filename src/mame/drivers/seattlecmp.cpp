@@ -49,6 +49,7 @@ public:
 
 	DECLARE_READ8_MEMBER(pic_slave_ack);
 
+	void seattle(machine_config &config);
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device_array<pic8259_device, 2> m_pic;
@@ -97,7 +98,7 @@ static DEVICE_INPUT_DEFAULTS_START( terminal )
 	DEVICE_INPUT_DEFAULTS( "RS232_STOPBITS", 0xff, RS232_STOPBITS_2 )
 DEVICE_INPUT_DEFAULTS_END
 
-static MACHINE_CONFIG_START( seattle )
+MACHINE_CONFIG_START(seattle_comp_state::seattle)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8086, XTAL_24MHz / 3) // 8 MHz or 4 MHz selectable
 	MCFG_CPU_PROGRAM_MAP(mem_map)

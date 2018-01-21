@@ -796,6 +796,6 @@ void atari_fdc_device::device_start()
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( atari_fdc_device::device_add_mconfig )
+MACHINE_CONFIG_START(atari_fdc_device::device_add_mconfig)
 	MCFG_LEGACY_FLOPPY_4_DRIVES_ADD(atari_floppy_interface)
 MACHINE_CONFIG_END

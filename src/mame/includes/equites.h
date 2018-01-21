@@ -134,4 +134,9 @@ public:
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
+	void common_sound(machine_config &config);
+	void equites(machine_config &config);
+	void splndrbt(machine_config &config);
+	void gekisou(machine_config &config);
+	void hvoltage(machine_config &config);
 };

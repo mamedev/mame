@@ -159,7 +159,7 @@ ROM_START( ti99_speech )
 	ROM_LOAD("cd2326a.u2b", 0x4000, 0x4000, CRC(65d00401) SHA1(a367242c2c96cebf0e2bf21862f3f6734b2b3020)) // at location u2, top of stack
 ROM_END
 
-MACHINE_CONFIG_MEMBER( ti_speech_synthesizer_device::device_add_mconfig )
+MACHINE_CONFIG_START(ti_speech_synthesizer_device::device_add_mconfig)
 	MCFG_DEVICE_ADD("vsm", SPEECHROM, 0)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")

@@ -132,6 +132,7 @@ public:
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(imolagp);
 	uint32_t screen_update_imolagp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void imolagp(machine_config &config);
 };
 
 
@@ -485,7 +486,7 @@ void imolagp_state::machine_reset()
 }
 
 
-static MACHINE_CONFIG_START( imolagp )
+MACHINE_CONFIG_START(imolagp_state::imolagp)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 3000000) // ? (assume slower than slave)

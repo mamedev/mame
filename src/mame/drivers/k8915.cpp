@@ -32,6 +32,7 @@ public:
 	DECLARE_DRIVER_INIT(k8915);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
+	void k8915(machine_config &config);
 private:
 	uint8_t m_framecnt;
 	virtual void machine_reset() override;
@@ -126,7 +127,7 @@ uint32_t k8915_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 }
 
 
-static MACHINE_CONFIG_START( k8915 )
+MACHINE_CONFIG_START(k8915_state::k8915)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_4_9152MHz / 2)
 	MCFG_CPU_PROGRAM_MAP(mem_map)

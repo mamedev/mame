@@ -25,11 +25,11 @@
 
 #include "vd.lh"
 
-class vd_state : public driver_device
+class vd_state : public genpin_class
 {
 public:
 	vd_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag)
+		: genpin_class(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 	{ }
 
@@ -39,6 +39,7 @@ public:
 	DECLARE_WRITE8_MEMBER(lamp_w) { };
 	DECLARE_WRITE8_MEMBER(sol_w) { };
 	TIMER_DEVICE_CALLBACK_MEMBER(irq);
+	void vd(machine_config &config);
 protected:
 
 	// devices
@@ -181,7 +182,7 @@ void vd_state::machine_reset()
 	m_t_c = 0;
 }
 
-static MACHINE_CONFIG_START( vd )
+MACHINE_CONFIG_START(vd_state::vd)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 4000000)
 	MCFG_CPU_PROGRAM_MAP(vd_map)

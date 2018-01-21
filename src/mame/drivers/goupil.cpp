@@ -86,6 +86,7 @@ public:
 	uint8_t valkeyb;
 	TIMER_DEVICE_CALLBACK_MEMBER(goupil_scanline);
 
+	void goupil_g1(machine_config &config);
 private:
 	required_device<acia6850_device> m_acia;
 	optional_device<ef9364_device> m_ef9364;
@@ -117,6 +118,7 @@ public:
 	DECLARE_READ8_MEMBER(visu24x80_ram_r);
 	DECLARE_WRITE8_MEMBER(visu24x80_ram_w);
 
+	void goupil_g2(machine_config &config);
 protected:
 
 	required_device<palette_device> m_palette;
@@ -527,7 +529,7 @@ READ8_MEMBER( goupil_g2_state::visu24x80_ram_r )
 	return data;
 }
 
-static MACHINE_CONFIG_START( goupil_g1 )
+MACHINE_CONFIG_START(goupil_g1_state::goupil_g1)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",M6808, CPU_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(goupil_mem)
@@ -583,7 +585,7 @@ static MACHINE_CONFIG_START( goupil_g1 )
 
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( goupil_g2 )
+MACHINE_CONFIG_START(goupil_g2_state::goupil_g2)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",M6808, CPU_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(goupil_g2_mem)

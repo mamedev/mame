@@ -42,6 +42,7 @@ public:
 	required_device<ticket_dispenser_device> m_ticket;
 	uint8_t   m_ctrl;
 	uint8_t   m_digit_idx;
+	void piggypas(machine_config &config);
 };
 
 
@@ -124,7 +125,7 @@ HD44780_PIXEL_UPDATE(piggypas_state::piggypas_pixel_update)
 		bitmap.pix16(y, (line * 8 + pos) * 6 + x) = state;
 }
 
-static MACHINE_CONFIG_START( piggypas )
+MACHINE_CONFIG_START(piggypas_state::piggypas)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I80C31, XTAL_8_448MHz) // OKI M80C31F or M80C154S

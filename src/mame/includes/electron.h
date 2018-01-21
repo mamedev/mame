@@ -18,8 +18,6 @@
 #include "sound/beep.h"
 
 #include "bus/electron/exp.h"
-#include "bus/generic/slot.h"
-#include "bus/generic/carts.h"
 
 /* Interrupts */
 #define INT_HIGH_TONE       0x40
@@ -84,9 +82,10 @@ public:
 	int m_map4[256];
 	int m_map16[256];
 	emu_timer *m_scanline_timer;
-	DECLARE_READ8_MEMBER(electron_read_keyboard);
 	DECLARE_READ8_MEMBER(electron_mem_r);
 	DECLARE_WRITE8_MEMBER(electron_mem_w);
+	DECLARE_READ8_MEMBER(electron_paged_r);
+	DECLARE_WRITE8_MEMBER(electron_paged_w);
 	DECLARE_READ8_MEMBER(electron_fred_r);
 	DECLARE_WRITE8_MEMBER(electron_fred_w);
 	DECLARE_READ8_MEMBER(electron_jim_r);
@@ -115,6 +114,8 @@ public:
 	void electron_interrupt_handler(int mode, int interrupt);
 	DECLARE_INPUT_CHANGED_MEMBER( trigger_reset );
 
+	void electron(machine_config &config);
+	void btm2105(machine_config &config);
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };

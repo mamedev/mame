@@ -260,6 +260,15 @@ public:
 
 	DECLARE_WRITE_LINE_MEMBER(write_centronics_busy);
 
+	void cpcplus_cartslot(machine_config &config);
+	void amstrad_base(machine_config &config);
+	void cpc664(machine_config &config);
+	void cpcplus(machine_config &config);
+	void gx4000(machine_config &config);
+	void cpc6128(machine_config &config);
+	void aleste(machine_config &config);
+	void kccomp(machine_config &config);
+	void cpc464(machine_config &config);
 protected:
 	required_memory_region m_region_maincpu;
 	optional_memory_region m_region_user1;

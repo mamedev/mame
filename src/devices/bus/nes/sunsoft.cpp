@@ -610,7 +610,7 @@ WRITE8_MEMBER(nes_sunsoft_5_device::write_h)
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( nes_sunsoft_5_device::device_add_mconfig )
+MACHINE_CONFIG_START(nes_sunsoft_5_device::device_add_mconfig)
 
 	// additional sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("addon")

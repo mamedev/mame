@@ -234,6 +234,8 @@ public:
 	{
 		m_inp_lines = 3;
 	}
+
+	void kdribble(machine_config &config);
 };
 
 // config
@@ -259,7 +261,7 @@ static INPUT_PORTS_START( kdribble )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, acl_button, nullptr) PORT_NAME("All Clear")
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( kdribble )
+MACHINE_CONFIG_START(kdribble_state::kdribble)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", SM510, XTAL_32_768kHz)
@@ -305,6 +307,8 @@ public:
 	{
 		m_inp_lines = 3;
 	}
+
+	void ktopgun(machine_config &config);
 };
 
 // config
@@ -330,7 +334,7 @@ static INPUT_PORTS_START( ktopgun )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, acl_button, nullptr) PORT_NAME("All Clear")
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( ktopgun )
+MACHINE_CONFIG_START(ktopgun_state::ktopgun)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", SM510, XTAL_32_768kHz)
@@ -378,6 +382,8 @@ public:
 	{
 		m_inp_lines = 3;
 	}
+
+	void kcontra(machine_config &config);
 };
 
 // config
@@ -403,7 +409,7 @@ static INPUT_PORTS_START( kcontra )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, acl_button, nullptr) PORT_NAME("All Clear")
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( kcontra )
+MACHINE_CONFIG_START(kcontra_state::kcontra)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", SM511, XTAL_32_768kHz)
@@ -448,6 +454,8 @@ public:
 	{
 		m_inp_lines = 3;
 	}
+
+	void ktmnt(machine_config &config);
 };
 
 // config
@@ -474,7 +482,7 @@ static INPUT_PORTS_START( ktmnt )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, acl_button, nullptr) PORT_NAME("All Clear")
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( ktmnt )
+MACHINE_CONFIG_START(ktmnt_state::ktmnt)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", SM511, XTAL_32_768kHz)
@@ -521,6 +529,8 @@ public:
 	{
 		m_inp_lines = 2;
 	}
+
+	void kgradius(machine_config &config);
 };
 
 // config
@@ -542,7 +552,7 @@ static INPUT_PORTS_START( kgradius )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, acl_button, nullptr) PORT_NAME("All Clear")
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( kgradius )
+MACHINE_CONFIG_START(kgradius_state::kgradius)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", SM511, XTAL_32_768kHz)
@@ -587,6 +597,8 @@ public:
 	{
 		m_inp_lines = 2;
 	}
+
+	void kloneran(machine_config &config);
 };
 
 // config
@@ -608,7 +620,7 @@ static INPUT_PORTS_START( kloneran )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, acl_button, nullptr) PORT_NAME("All Clear")
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( kloneran )
+MACHINE_CONFIG_START(kloneran_state::kloneran)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", SM511, XTAL_32_768kHz)
@@ -653,6 +665,8 @@ public:
 	{
 		m_inp_lines = 3;
 	}
+
+	void kblades(machine_config &config);
 };
 
 // config
@@ -678,7 +692,7 @@ static INPUT_PORTS_START( kblades )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, acl_button, nullptr) PORT_NAME("All Clear")
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( kblades )
+MACHINE_CONFIG_START(kblades_state::kblades)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", SM511, XTAL_32_768kHz)
@@ -724,6 +738,8 @@ public:
 	{
 		m_inp_lines = 3;
 	}
+
+	void knfl(machine_config &config);
 };
 
 // config
@@ -749,7 +765,7 @@ static INPUT_PORTS_START( knfl )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, acl_button, nullptr) PORT_NAME("All Clear")
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( knfl )
+MACHINE_CONFIG_START(knfl_state::knfl)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", SM511, XTAL_32_768kHz)
@@ -792,6 +808,8 @@ public:
 	{
 		m_inp_lines = 3;
 	}
+
+	void kbilly(machine_config &config);
 };
 
 // config
@@ -819,7 +837,7 @@ static INPUT_PORTS_START( kbilly )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, acl_button, nullptr) PORT_NAME("All Clear")
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( kbilly )
+MACHINE_CONFIG_START(kbilly_state::kbilly)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", SM511, XTAL_32_768kHz)
@@ -862,6 +880,8 @@ public:
 	{
 		m_inp_lines = 2;
 	}
+
+	void kbucky(machine_config &config);
 };
 
 // config
@@ -883,7 +903,7 @@ static INPUT_PORTS_START( kbucky )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, acl_button, nullptr) PORT_NAME("All Clear")
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( kbucky )
+MACHINE_CONFIG_START(kbucky_state::kbucky)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", SM511, XTAL_32_768kHz)
@@ -926,6 +946,8 @@ public:
 	{
 		m_inp_lines = 3;
 	}
+
+	void kgarfld(machine_config &config);
 };
 
 // config
@@ -951,7 +973,7 @@ static INPUT_PORTS_START( kgarfld )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, acl_button, nullptr) PORT_NAME("All Clear")
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( kgarfld )
+MACHINE_CONFIG_START(kgarfld_state::kgarfld)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", SM511, XTAL_32_768kHz)
@@ -1003,6 +1025,11 @@ public:
 	{
 		m_inp_lines = 3;
 	}
+
+	void exospace(machine_config &config);
+	void nupogodi(machine_config &config);
+	void gnw_egg(machine_config &config);
+	void gnw_mmouse(machine_config &config);
 };
 
 // config
@@ -1039,7 +1066,7 @@ static INPUT_PORTS_START( exospace )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( gnw_mmouse )
+MACHINE_CONFIG_START(gnw_mmouse_state::gnw_mmouse)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", SM5A, XTAL_32_768kHz)
@@ -1064,7 +1091,7 @@ static MACHINE_CONFIG_START( gnw_mmouse )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( gnw_egg, gnw_mmouse )
+MACHINE_CONFIG_DERIVED(gnw_mmouse_state::gnw_egg, gnw_mmouse)
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
@@ -1072,7 +1099,7 @@ static MACHINE_CONFIG_DERIVED( gnw_egg, gnw_mmouse )
 	MCFG_SCREEN_VISIBLE_AREA(0, 1694-1, 0, 1080-1)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( nupogodi, gnw_mmouse )
+MACHINE_CONFIG_DERIVED(gnw_mmouse_state::nupogodi, gnw_mmouse)
 
 	/* basic machine hardware */
 	MCFG_CPU_REPLACE("maincpu", KB1013VK12, XTAL_32_768kHz)
@@ -1088,7 +1115,7 @@ static MACHINE_CONFIG_DERIVED( nupogodi, gnw_mmouse )
 	MCFG_SCREEN_VISIBLE_AREA(0, 1715-1, 0, 1080-1)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( exospace, nupogodi )
+MACHINE_CONFIG_DERIVED(gnw_mmouse_state::exospace, nupogodi)
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
@@ -1117,6 +1144,8 @@ public:
 	{
 		m_inp_lines = 2;
 	}
+
+	void gnw_mickdon(machine_config &config);
 };
 
 // config
@@ -1143,7 +1172,7 @@ static INPUT_PORTS_START( gnw_mickdon )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( gnw_mickdon )
+MACHINE_CONFIG_START(gnw_mickdon_state::gnw_mickdon)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", SM510, XTAL_32_768kHz)
@@ -1195,6 +1224,8 @@ public:
 	{
 		m_inp_lines = 3;
 	}
+
+	void gnw_dkong2(machine_config &config);
 };
 
 // config
@@ -1225,7 +1256,7 @@ static INPUT_PORTS_START( gnw_dkong2 )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( gnw_dkong2 )
+MACHINE_CONFIG_START(gnw_dkong2_state::gnw_dkong2)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", SM510, XTAL_32_768kHz)
@@ -1277,6 +1308,8 @@ public:
 	{
 		m_inp_lines = 2;
 	}
+
+	void gnw_mario(machine_config &config);
 };
 
 // config
@@ -1308,7 +1341,7 @@ static INPUT_PORTS_START( gnw_mario )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( gnw_mario )
+MACHINE_CONFIG_START(gnw_mario_state::gnw_mario)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", SM510, XTAL_32_768kHz)
@@ -1363,6 +1396,8 @@ public:
 	{
 		m_inp_lines = 3;
 	}
+
+	void gnw_dkjr(machine_config &config);
 };
 
 // config
@@ -1398,7 +1433,7 @@ static INPUT_PORTS_START( gnw_dkjr )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( gnw_dkjr )
+MACHINE_CONFIG_START(gnw_dkjr_state::gnw_dkjr)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", SM510, XTAL_32_768kHz)
@@ -1447,6 +1482,8 @@ public:
 	{
 		m_inp_lines = 2;
 	}
+
+	void gnw_mariocm(machine_config &config);
 };
 
 // config
@@ -1478,7 +1515,7 @@ static INPUT_PORTS_START( gnw_mariocm )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( gnw_mariocm )
+MACHINE_CONFIG_START(gnw_mariocm_state::gnw_mariocm)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", SM510, XTAL_32_768kHz)
@@ -1529,6 +1566,8 @@ public:
 	{
 		m_inp_lines = 3;
 	}
+
+	void gnw_smb(machine_config &config);
 };
 
 // config
@@ -1559,7 +1598,7 @@ static INPUT_PORTS_START( gnw_smb )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( gnw_smb )
+MACHINE_CONFIG_START(gnw_smb_state::gnw_smb)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", SM511, XTAL_32_768kHz)
@@ -1606,6 +1645,8 @@ public:
 	{
 		m_inp_lines = 7;
 	}
+
+	void gnw_boxing(machine_config &config);
 };
 
 // config
@@ -1659,7 +1700,7 @@ static INPUT_PORTS_START( gnw_boxing )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( gnw_boxing )
+MACHINE_CONFIG_START(gnw_boxing_state::gnw_boxing)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", SM511, XTAL_32_768kHz)
@@ -1713,6 +1754,9 @@ public:
 		m_inp_lines = 6;
 		m_inp_fixed = 6;
 	}
+
+	void trobhood(machine_config &config);
+	void tgaunt(machine_config &config);
 };
 
 // config
@@ -1766,7 +1810,7 @@ static INPUT_PORTS_START( trobhood )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr) PORT_NAME("Money")
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( tgaunt )
+MACHINE_CONFIG_START(tgaunt_state::tgaunt)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", SM510, XTAL_32_768kHz)
@@ -1793,7 +1837,7 @@ static MACHINE_CONFIG_START( tgaunt )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( trobhood, tgaunt )
+MACHINE_CONFIG_DERIVED(tgaunt_state::trobhood, tgaunt)
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
@@ -1825,6 +1869,8 @@ public:
 		m_inp_lines = 5;
 		m_inp_fixed = 5;
 	}
+
+	void tddragon(machine_config &config);
 };
 
 // config
@@ -1866,7 +1912,7 @@ static INPUT_PORTS_START( tddragon )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, acl_button, nullptr) PORT_NAME("ACL")
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( tddragon )
+MACHINE_CONFIG_START(tddragon_state::tddragon)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", SM510, XTAL_32_768kHz)
@@ -1914,6 +1960,8 @@ public:
 		m_inp_lines = 6;
 		m_inp_fixed = 6;
 	}
+
+	void tkarnov(machine_config &config);
 };
 
 // config
@@ -1959,7 +2007,7 @@ static INPUT_PORTS_START( tkarnov )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, acl_button, nullptr) PORT_NAME("ACL")
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( tkarnov )
+MACHINE_CONFIG_START(tkarnov_state::tkarnov)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", SM510, XTAL_32_768kHz)
@@ -2007,6 +2055,8 @@ public:
 		m_inp_lines = 6;
 		m_inp_fixed = 6;
 	}
+
+	void tvindictr(machine_config &config);
 };
 
 // config
@@ -2051,7 +2101,7 @@ static INPUT_PORTS_START( tvindictr )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, acl_button, nullptr) PORT_NAME("ACL")
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( tvindictr )
+MACHINE_CONFIG_START(tvindictr_state::tvindictr)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", SM510, XTAL_32_768kHz)
@@ -2101,6 +2151,7 @@ public:
 	}
 
 	DECLARE_WRITE8_MEMBER(write_r);
+	void tgaiden(machine_config &config);
 };
 
 // handlers
@@ -2153,7 +2204,7 @@ static INPUT_PORTS_START( tgaiden )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, acl_button, nullptr) PORT_NAME("ACL")
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( tgaiden )
+MACHINE_CONFIG_START(tgaiden_state::tgaiden)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", SM510, XTAL_32_768kHz)
@@ -2201,6 +2252,8 @@ public:
 		m_inp_lines = 5;
 		m_inp_fixed = 5;
 	}
+
+	void tbatman(machine_config &config);
 };
 
 // config
@@ -2241,7 +2294,7 @@ static INPUT_PORTS_START( tbatman )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, acl_button, nullptr) PORT_NAME("ACL")
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( tbatman )
+MACHINE_CONFIG_START(tbatman_state::tbatman)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", SM510, XTAL_32_768kHz)
@@ -2293,6 +2346,8 @@ public:
 		m_inp_lines = 5;
 		m_inp_fixed = 5;
 	}
+
+	void tsharr2(machine_config &config);
 };
 
 // config
@@ -2333,7 +2388,7 @@ static INPUT_PORTS_START( tsharr2 )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, acl_button, nullptr) PORT_NAME("ACL")
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( tsharr2 )
+MACHINE_CONFIG_START(tsharr2_state::tsharr2)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", SM510, XTAL_32_768kHz)
@@ -2381,6 +2436,8 @@ public:
 		m_inp_lines = 6;
 		m_inp_fixed = 6;
 	}
+
+	void tgoldnaxe(machine_config &config);
 };
 
 // config
@@ -2426,7 +2483,7 @@ static INPUT_PORTS_START( tgoldnaxe )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, acl_button, nullptr) PORT_NAME("ACL")
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( tgoldnaxe )
+MACHINE_CONFIG_START(tgoldnaxe_state::tgoldnaxe)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", SM510, XTAL_32_768kHz)
@@ -2474,6 +2531,8 @@ public:
 		m_inp_lines = 6;
 		m_inp_fixed = 6;
 	}
+
+	void trobocop2(machine_config &config);
 };
 
 // config
@@ -2519,7 +2578,7 @@ static INPUT_PORTS_START( trobocop2 )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, acl_button, nullptr) PORT_NAME("ACL")
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( trobocop2 )
+MACHINE_CONFIG_START(trobocop2_state::trobocop2)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", SM510, XTAL_32_768kHz)
@@ -2571,6 +2630,8 @@ public:
 		m_inp_lines = 6;
 		m_inp_fixed = 6;
 	}
+
+	void taltbeast(machine_config &config);
 };
 
 // config
@@ -2616,7 +2677,7 @@ static INPUT_PORTS_START( taltbeast )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, acl_button, nullptr) PORT_NAME("ACL")
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( taltbeast )
+MACHINE_CONFIG_START(taltbeast_state::taltbeast)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", SM510, XTAL_32_768kHz)
@@ -2664,6 +2725,8 @@ public:
 		m_inp_lines = 5;
 		m_inp_fixed = 5;
 	}
+
+	void tswampt(machine_config &config);
 };
 
 // config
@@ -2705,7 +2768,7 @@ static INPUT_PORTS_START( tswampt )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, acl_button, nullptr) PORT_NAME("ACL")
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( tswampt )
+MACHINE_CONFIG_START(tswampt_state::tswampt)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", SM510, XTAL_32_768kHz)
@@ -2753,6 +2816,8 @@ public:
 		m_inp_lines = 6;
 		m_inp_fixed = 6;
 	}
+
+	void tmchammer(machine_config &config);
 };
 
 // config
@@ -2799,7 +2864,7 @@ static INPUT_PORTS_START( tmchammer )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, acl_button, nullptr) PORT_NAME("ACL")
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( tmchammer )
+MACHINE_CONFIG_START(tmchammer_state::tmchammer)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", SM511, XTAL_32_768kHz)
@@ -2846,6 +2911,8 @@ public:
 		m_inp_lines = 6;
 		m_inp_fixed = 6;
 	}
+
+	void tbtoads(machine_config &config);
 };
 
 // config
@@ -2891,7 +2958,7 @@ static INPUT_PORTS_START( tbtoads )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, acl_button, nullptr) PORT_NAME("ACL")
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( tbtoads )
+MACHINE_CONFIG_START(tbtoads_state::tbtoads)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", SM510, XTAL_32_768kHz)
@@ -2943,6 +3010,7 @@ public:
 	void update_speaker();
 	DECLARE_WRITE8_MEMBER(write_r);
 	DECLARE_WRITE8_MEMBER(write_s);
+	void tsonic(machine_config &config);
 };
 
 // handlers
@@ -3009,7 +3077,7 @@ INPUT_PORTS_END
 
 static const s16 tsonic_speaker_levels[] = { 0, 0x7fff/3*1, 0x7fff/3*2, 0x7fff };
 
-static MACHINE_CONFIG_START( tsonic )
+MACHINE_CONFIG_START(tsonic_state::tsonic)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", SM511, XTAL_32_768kHz)
@@ -3056,6 +3124,8 @@ public:
 		m_inp_lines = 5;
 		m_inp_fixed = 5;
 	}
+
+	void tdummies(machine_config &config);
 };
 
 // config
@@ -3097,7 +3167,7 @@ static INPUT_PORTS_START( tdummies )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, acl_button, nullptr) PORT_NAME("ACL")
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( tdummies )
+MACHINE_CONFIG_START(tdummies_state::tdummies)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", SM510, XTAL_32_768kHz)
@@ -3145,6 +3215,8 @@ public:
 		m_inp_lines = 6;
 		m_inp_fixed = 6;
 	}
+
+	void tsfight2(machine_config &config);
 };
 
 // config
@@ -3190,7 +3262,7 @@ static INPUT_PORTS_START( tsfight2 )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, acl_button, nullptr) PORT_NAME("ACL")
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( tsfight2 )
+MACHINE_CONFIG_START(tsfight2_state::tsfight2)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", SM510, XTAL_32_768kHz)
@@ -3242,6 +3314,8 @@ public:
 		m_inp_lines = 6;
 		m_inp_fixed = 6;
 	}
+
+	void tsddragon(machine_config &config);
 };
 
 // config
@@ -3288,7 +3362,7 @@ static INPUT_PORTS_START( tsddragon )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, acl_button, nullptr) PORT_NAME("ACL")
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( tsddragon )
+MACHINE_CONFIG_START(tsddragon_state::tsddragon)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", SM510, XTAL_32_768kHz)
@@ -3338,6 +3412,7 @@ public:
 	}
 
 	virtual DECLARE_WRITE8_MEMBER(input_w) override;
+	void tnmarebc(machine_config &config);
 };
 
 // handlers
@@ -3386,7 +3461,7 @@ static INPUT_PORTS_START( tnmarebc )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, acl_button, nullptr) PORT_NAME("ACL")
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( tnmarebc )
+MACHINE_CONFIG_START(tnmarebc_state::tnmarebc)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", SM510, XTAL_32_768kHz)
@@ -3434,6 +3509,8 @@ public:
 		m_inp_lines = 6;
 		m_inp_fixed = 6;
 	}
+
+	void tmkombat(machine_config &config);
 };
 
 // config
@@ -3480,7 +3557,7 @@ static INPUT_PORTS_START( tmkombat )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, acl_button, nullptr) PORT_NAME("ACL")
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( tmkombat )
+MACHINE_CONFIG_START(tmkombat_state::tmkombat)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", SM510, XTAL_32_768kHz)
@@ -3528,6 +3605,8 @@ public:
 		m_inp_lines = 6;
 		m_inp_fixed = 6;
 	}
+
+	void tshadow(machine_config &config);
 };
 
 // config
@@ -3573,7 +3652,7 @@ static INPUT_PORTS_START( tshadow )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, acl_button, nullptr) PORT_NAME("ACL")
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( tshadow )
+MACHINE_CONFIG_START(tshadow_state::tshadow)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", SM510, XTAL_32_768kHz)
@@ -3621,6 +3700,8 @@ public:
 		m_inp_lines = 6;
 		m_inp_fixed = 6;
 	}
+
+	void tskelwarr(machine_config &);
 };
 
 // config
@@ -3666,7 +3747,7 @@ static INPUT_PORTS_START( tskelwarr )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, acl_button, nullptr) PORT_NAME("ACL")
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( tskelwarr )
+MACHINE_CONFIG_START(tskelwarr_state::tskelwarr)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", SM510, XTAL_32_768kHz)
@@ -3714,6 +3795,8 @@ public:
 		m_inp_lines = 6;
 		m_inp_fixed = 6;
 	}
+
+	void tbatfor(machine_config &config);
 };
 
 // config
@@ -3760,7 +3843,7 @@ static INPUT_PORTS_START( tbatfor )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, acl_button, nullptr) PORT_NAME("ACL")
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( tbatfor )
+MACHINE_CONFIG_START(tbatfor_state::tbatfor)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", SM510, XTAL_32_768kHz)
@@ -3808,6 +3891,8 @@ public:
 		m_inp_lines = 6;
 		m_inp_fixed = 6;
 	}
+
+	void tjdredd(machine_config &config);
 };
 
 // config
@@ -3854,7 +3939,7 @@ static INPUT_PORTS_START( tjdredd )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, acl_button, nullptr) PORT_NAME("ACL")
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( tjdredd )
+MACHINE_CONFIG_START(tjdredd_state::tjdredd)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", SM510, XTAL_32_768kHz)
@@ -3902,6 +3987,8 @@ public:
 		m_inp_lines = 6;
 		m_inp_fixed = 6;
 	}
+
+	void tapollo13(machine_config &config);
 };
 
 // config
@@ -3948,7 +4035,7 @@ static INPUT_PORTS_START( tapollo13 )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, acl_button, nullptr) PORT_NAME("ACL")
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( tapollo13 )
+MACHINE_CONFIG_START(tapollo13_state::tapollo13)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", SM510, XTAL_32_768kHz)
@@ -3996,6 +4083,8 @@ public:
 		m_inp_lines = 5;
 		m_inp_fixed = 5;
 	}
+
+	void tsjam(machine_config &config);
 };
 
 // config
@@ -4037,7 +4126,7 @@ static INPUT_PORTS_START( tsjam )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, acl_button, nullptr) PORT_NAME("ACL")
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( tsjam )
+MACHINE_CONFIG_START(tsjam_state::tsjam)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", SM510, XTAL_32_768kHz) // no external XTAL
@@ -4084,6 +4173,8 @@ public:
 	{
 		m_inp_lines = 8;
 	}
+
+	void tigarden(machine_config &config);
 };
 
 // config
@@ -4140,7 +4231,7 @@ static INPUT_PORTS_START( tigarden )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_VOLUME_DOWN ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr) PORT_NAME("Sound")
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( tigarden )
+MACHINE_CONFIG_START(tigarden_state::tigarden)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", SM510, XTAL_32_768kHz)
@@ -4185,6 +4276,8 @@ public:
 	{
 		m_inp_lines = 8;
 	}
+
+	void nummunch(machine_config &config);
 };
 
 // config
@@ -4239,7 +4332,7 @@ static INPUT_PORTS_START( nummunch )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_POWER_ON ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, acl_button, nullptr)
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( nummunch )
+MACHINE_CONFIG_START(nummunch_state::nummunch)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", SM511, XTAL_32_768kHz)
@@ -4795,7 +4888,7 @@ CONS( 1983, gnw_mario,   0,          0, gnw_mario,   gnw_mario,   gnw_mario_stat
 
 CONS( 1982, gnw_dkjr,    0,          0, gnw_dkjr,    gnw_dkjr,    gnw_dkjr_state,    0, "Nintendo", "Game & Watch: Donkey Kong Jr. (new wide screen)", MACHINE_SUPPORTS_SAVE )
 CONS( 1983, gnw_mariocm, 0,          0, gnw_mariocm, gnw_mariocm, gnw_mariocm_state, 0, "Nintendo", "Game & Watch: Mario's Cement Factory (new wide screen)", MACHINE_SUPPORTS_SAVE )
-CONS( 1986, gnw_smb,     0,          0, gnw_smb,     gnw_smb,     gnw_smb_state,     0, "Nintendo", "Game & Watch: Super Mario Bros.", MACHINE_SUPPORTS_SAVE )
+CONS( 1986, gnw_smb,     0,          0, gnw_smb,     gnw_smb,     gnw_smb_state,     0, "Nintendo", "Game & Watch: Super Mario Bros.", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
 
 CONS( 1984, gnw_boxing,  0,          0, gnw_boxing,  gnw_boxing,  gnw_boxing_state,  0, "Nintendo", "Game & Watch: Boxing", MACHINE_SUPPORTS_SAVE )
 

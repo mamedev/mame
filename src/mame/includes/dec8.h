@@ -172,6 +172,16 @@ public:
 	void srdarwin_draw_sprites(  bitmap_ind16 &bitmap, const rectangle &cliprect, int pri );
 	DECLARE_WRITE_LINE_MEMBER(csilver_adpcm_int);
 
+	void shackled(machine_config &config);
+	void meikyuh(machine_config &config);
+	void lastmisn(machine_config &config);
+	void csilver(machine_config &config);
+	void cobracom(machine_config &config);
+	void garyoret(machine_config &config);
+	void srdarwin(machine_config &config);
+	void ghostb(machine_config &config);
+	void oscar(machine_config &config);
+	void gondo(machine_config &config);
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 

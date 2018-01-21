@@ -799,7 +799,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( artmagic )
+MACHINE_CONFIG_START(artmagic_state::artmagic)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, MASTER_CLOCK_25MHz/2)
@@ -834,7 +834,7 @@ static MACHINE_CONFIG_START( artmagic )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( cheesech, artmagic )
+MACHINE_CONFIG_DERIVED(artmagic_state::cheesech, artmagic)
 
 	MCFG_SOUND_MODIFY("oki")
 	MCFG_SOUND_ROUTES_RESET()
@@ -842,7 +842,7 @@ static MACHINE_CONFIG_DERIVED( cheesech, artmagic )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( stonebal, artmagic )
+MACHINE_CONFIG_DERIVED(artmagic_state::stonebal, artmagic)
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(stonebal_map)
@@ -855,7 +855,7 @@ static MACHINE_CONFIG_DERIVED( stonebal, artmagic )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.45)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( shtstar, artmagic )
+MACHINE_CONFIG_DERIVED(artmagic_state::shtstar, artmagic)
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(shtstar_map)

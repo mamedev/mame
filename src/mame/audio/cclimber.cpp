@@ -57,7 +57,7 @@ void cclimber_audio_device::device_start()
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( cclimber_audio_device::device_add_mconfig )
+MACHINE_CONFIG_START(cclimber_audio_device::device_add_mconfig)
 	MCFG_SOUND_ADD("aysnd", AY8910, SND_CLOCK/2)
 	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(cclimber_audio_device, sample_select_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, ":speaker", 0.5)

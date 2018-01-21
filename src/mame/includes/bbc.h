@@ -214,6 +214,30 @@ public:
 
 	MC6845_UPDATE_ROW(crtc_update_row);
 
+	void bbc_eprom_sockets(machine_config &config);
+	void discmate(machine_config &config);
+	void reutapm(machine_config &config);
+	void bbcbp(machine_config &config);
+	void abc310(machine_config &config);
+	void bbcmc(machine_config &config);
+	void bbcmt(machine_config &config);
+	void bbcm(machine_config &config);
+	void ltmpm(machine_config &config);
+	void bbcmet(machine_config &config);
+	void cfa3000(machine_config &config);
+	void bbcbp128(machine_config &config);
+	void pro128s(machine_config &config);
+	void bbcm512(machine_config &config);
+	void bbcmarm(machine_config &config);
+	void abc110(machine_config &config);
+	void ltmpbp(machine_config &config);
+	void bbcb_de(machine_config &config);
+	void bbcb(machine_config &config);
+	void bbcmaiv(machine_config &config);
+	void bbca(machine_config &config);
+	void bbcb_us(machine_config &config);
+	void econx25(machine_config &config);
+	void acw443(machine_config &config);
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<ram_device> m_ram;
@@ -452,6 +476,9 @@ class torch240_state : public bbc_state
 public:
 	using bbc_state::bbc_state;
 	static constexpr feature_type imperfect_features() { return feature::KEYBOARD; }
+	void torchf(machine_config &config);
+	void torchh21(machine_config &config);
+	void torchh10(machine_config &config);
 };
 
 #endif // MAME_INCLUDES_BBC_H

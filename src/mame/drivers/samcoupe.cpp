@@ -517,7 +517,7 @@ static SLOT_INTERFACE_START( samcoupe_floppies )
 SLOT_INTERFACE_END
 
 
-static MACHINE_CONFIG_START( samcoupe )
+MACHINE_CONFIG_START(samcoupe_state::samcoupe)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, SAMCOUPE_XTAL_X1 / 4) /* 6 MHz */
 	MCFG_CPU_PROGRAM_MAP(samcoupe_mem)

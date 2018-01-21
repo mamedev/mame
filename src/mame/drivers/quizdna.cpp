@@ -435,7 +435,7 @@ void quizdna_state::machine_start()
 }
 
 
-static MACHINE_CONFIG_START( quizdna )
+MACHINE_CONFIG_START(quizdna_state::quizdna)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, MCLK/2) /* 8.000 MHz */
@@ -471,7 +471,7 @@ static MACHINE_CONFIG_START( quizdna )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( gakupara, quizdna )
+MACHINE_CONFIG_DERIVED(quizdna_state::gakupara, quizdna)
 
 	/* basic machine hardware */
 
@@ -480,7 +480,7 @@ static MACHINE_CONFIG_DERIVED( gakupara, quizdna )
 
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( gekiretu, quizdna )
+MACHINE_CONFIG_DERIVED(quizdna_state::gekiretu, quizdna)
 
 	/* basic machine hardware */
 

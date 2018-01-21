@@ -127,6 +127,13 @@ public:
 	INTERRUPT_GEN_MEMBER(vc4000_video_line);
 	DECLARE_QUICKLOAD_LOAD_MEMBER(vc4000);
 
+	void cx3000tc(machine_config &config);
+	void mpu1000(machine_config &config);
+	void vc4000(machine_config &config);
+	void database(machine_config &config);
+	void h21(machine_config &config);
+	void rwtrntcs(machine_config &config);
+	void elektor(machine_config &config);
 protected:
 	required_device<cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;

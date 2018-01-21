@@ -241,7 +241,7 @@ WRITE8_MEMBER(liberate_state::prosport_charram_w)
  *************************************/
 
 static ADDRESS_MAP_START( prosport_map, AS_PROGRAM, 8, liberate_state )
-	AM_RANGE(0x0200, 0x021f) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x0200, 0x021f) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
 	AM_RANGE(0x0000, 0x03ff) AM_MIRROR(0x2000) AM_RAM
 	AM_RANGE(0x0400, 0x07ff) AM_RAM_WRITE(prosport_bg_vram_w) AM_SHARE("bg_vram")
 	AM_RANGE(0x0800, 0x1fff) AM_READWRITE(prosport_charram_r,prosport_charram_w) //0x1e00-0x1fff isn't charram!
@@ -728,7 +728,7 @@ MACHINE_RESET_MEMBER(liberate_state,liberate)
 	m_bank = 0;
 }
 
-static MACHINE_CONFIG_START( liberate_base )
+MACHINE_CONFIG_START(liberate_state::liberate_base)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",DECO16, 2000000)
@@ -772,12 +772,12 @@ static MACHINE_CONFIG_START( liberate_base )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( liberate, liberate_base )
+MACHINE_CONFIG_DERIVED(liberate_state::liberate, liberate_base)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( liberatb, liberate_base )
+MACHINE_CONFIG_DERIVED(liberate_state::liberatb, liberate_base)
 
 	/* basic machine hardware */
 	MCFG_CPU_REPLACE("maincpu", M6502, 2000000)
@@ -785,14 +785,14 @@ static MACHINE_CONFIG_DERIVED( liberatb, liberate_base )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", liberate_state,  deco16_interrupt)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( boomrang, liberate_base )
+MACHINE_CONFIG_DERIVED(liberate_state::boomrang, liberate_base)
 
 	MCFG_VIDEO_START_OVERRIDE(liberate_state,boomrang)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(liberate_state, screen_update_boomrang)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( prosoccr, liberate_base )
+MACHINE_CONFIG_DERIVED(liberate_state::prosoccr, liberate_base)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -815,7 +815,7 @@ static MACHINE_CONFIG_DERIVED( prosoccr, liberate_base )
 	MCFG_VIDEO_START_OVERRIDE(liberate_state,prosoccr)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( prosport )
+MACHINE_CONFIG_START(liberate_state::prosport)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", DECO16, 2000000)

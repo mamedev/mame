@@ -69,6 +69,11 @@ public:
 	DECLARE_READ_LINE_MEMBER( tdi_r );
 	DECLARE_WRITE_LINE_MEMBER( k1_w );
 
+	void newbrain(machine_config &config);
+	void newbrain_a(machine_config &config);
+	void newbrain_ad(machine_config &config);
+	void newbrain_md(machine_config &config);
+	void newbrain_video(machine_config &config);
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 	virtual void machine_start() override;
@@ -134,10 +139,5 @@ protected:
 
 	emu_timer *m_clkint_timer;
 };
-
-
-// ---------- defined in video/newbrain.c ----------
-
-MACHINE_CONFIG_EXTERN( newbrain_video );
 
 #endif

@@ -45,6 +45,7 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
+	void aftrshok(machine_config &config);
 //  required_device<mcs51_cpu_device> m_maincpu;
 };
 
@@ -62,7 +63,7 @@ void aftrshok_state::machine_reset()
 }
 
 
-static MACHINE_CONFIG_START( aftrshok )
+MACHINE_CONFIG_START(aftrshok_state::aftrshok)
 
 	/* basic machine hardware */
 //  MCFG_CPU_ADD("maincpu", ??, 8000000) // unknown

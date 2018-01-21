@@ -100,6 +100,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(fdc_intrq_w);
 	DECLARE_WRITE_LINE_MEMBER(fdc_drq_w);
 
+	void smc777(machine_config &config);
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -964,7 +965,7 @@ static SLOT_INTERFACE_START( smc777_floppies )
 SLOT_INTERFACE_END
 
 
-static MACHINE_CONFIG_START( smc777 )
+MACHINE_CONFIG_START(smc777_state::smc777)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80, MASTER_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(smc777_mem)

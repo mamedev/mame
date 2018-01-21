@@ -62,4 +62,5 @@ public:
 	DECLARE_PALETTE_INIT(megazone);
 	uint32_t screen_update_megazone(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(vblank_irq);
+	void megazone(machine_config &config);
 };

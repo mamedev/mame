@@ -70,4 +70,12 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	optional_memory_bank m_bank1, m_bank1d;
+	void base(machine_config &config);
+	void oigas(machine_config &config);
+	void pbillrd(machine_config &config);
+	void gigas(machine_config &config);
+	void gigasm(machine_config &config);
+	void pbillrdm(machine_config &config);
+	void omega(machine_config &config);
+	void freekick(machine_config &config);
 };

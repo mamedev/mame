@@ -1677,7 +1677,7 @@ void gp32_state::machine_reset()
 	s3c240x_machine_reset();
 }
 
-static MACHINE_CONFIG_START( gp32 )
+MACHINE_CONFIG_START(gp32_state::gp32)
 	MCFG_CPU_ADD("maincpu", ARM9, 40000000)
 	MCFG_CPU_PROGRAM_MAP(gp32_map)
 

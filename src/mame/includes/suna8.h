@@ -177,4 +177,12 @@ public:
 	void draw_sprites     (screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int start, int end, int which);
 	void draw_text_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int start, int end, int ypos, bool write_mask);
 	uint8_t *brickzn_decrypt();
+	void brickzn(machine_config &config);
+	void starfigh(machine_config &config);
+	void sparkman(machine_config &config);
+	void hardhea2b(machine_config &config);
+	void brickzn11(machine_config &config);
+	void hardhead(machine_config &config);
+	void hardhea2(machine_config &config);
+	void rranger(machine_config &config);
 };

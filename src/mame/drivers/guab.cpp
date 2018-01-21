@@ -94,6 +94,7 @@ public:
 
 	DECLARE_FLOPPY_FORMATS(floppy_formats);
 
+	void guab(machine_config &config);
 protected:
 	virtual void machine_start() override;
 
@@ -447,7 +448,7 @@ SLOT_INTERFACE_END
 //  MACHINE DEFINTIONS
 //**************************************************************************
 
-static MACHINE_CONFIG_START( guab )
+MACHINE_CONFIG_START(guab_state::guab)
 	/* TODO: Verify clock */
 	MCFG_CPU_ADD("maincpu", M68000, 8000000)
 	MCFG_CPU_PROGRAM_MAP(guab_map)

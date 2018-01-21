@@ -55,7 +55,7 @@ static ADDRESS_MAP_START( bogeyman_map, AS_PROGRAM, 8, bogeyman_state )
 	AM_RANGE(0x2000, 0x20ff) AM_RAM_WRITE(videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0x2100, 0x21ff) AM_RAM_WRITE(colorram_w) AM_SHARE("colorram")
 	AM_RANGE(0x2800, 0x2bff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x3000, 0x300f) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x3000, 0x300f) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
 	AM_RANGE(0x3800, 0x3800) AM_READ_PORT("P1") AM_WRITE(ay8910_control_w)
 	AM_RANGE(0x3801, 0x3801) AM_READ_PORT("P2") AM_WRITE(ay8910_latch_w)
 	AM_RANGE(0x3802, 0x3802) AM_READ_PORT("DSW1")
@@ -228,7 +228,7 @@ WRITE8_MEMBER(bogeyman_state::colbank_w)
 	}
 }
 
-static MACHINE_CONFIG_START( bogeyman )
+MACHINE_CONFIG_START(bogeyman_state::bogeyman)
 
 	// basic machine hardware
 	MCFG_CPU_ADD("maincpu", M6502, 1500000) /* Verified */

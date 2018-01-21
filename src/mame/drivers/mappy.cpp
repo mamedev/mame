@@ -1312,7 +1312,7 @@ void mappy_state::machine_start()
 }
 
 
-static MACHINE_CONFIG_START( superpac_common )
+MACHINE_CONFIG_START(mappy_state::superpac_common)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", MC6809E, PIXEL_CLOCK/4)   /* 1.536 MHz */
@@ -1362,7 +1362,7 @@ static MACHINE_CONFIG_START( superpac_common )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( superpac )
+MACHINE_CONFIG_START(mappy_state::superpac)
 
 	MCFG_FRAGMENT_ADD(superpac_common)
 
@@ -1380,7 +1380,7 @@ static MACHINE_CONFIG_START( superpac )
 	MCFG_NAMCO56XX_OUT_0_CB(DEVWRITELINE("dipmux", ls157_device, select_w)) MCFG_DEVCB_BIT(0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( pacnpal )
+MACHINE_CONFIG_START(mappy_state::pacnpal)
 
 	MCFG_FRAGMENT_ADD(superpac_common)
 
@@ -1400,7 +1400,7 @@ static MACHINE_CONFIG_START( pacnpal )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( grobda )
+MACHINE_CONFIG_START(mappy_state::grobda)
 
 	MCFG_FRAGMENT_ADD(superpac_common)
 
@@ -1424,7 +1424,7 @@ static MACHINE_CONFIG_START( grobda )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( phozon )
+MACHINE_CONFIG_START(mappy_state::phozon)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", MC6809E, PIXEL_CLOCK/4)  /* MAIN CPU */
@@ -1492,7 +1492,7 @@ static MACHINE_CONFIG_START( phozon )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( mappy_common )
+MACHINE_CONFIG_START(mappy_state::mappy_common)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", MC6809E, PIXEL_CLOCK/4)   /* 1.536 MHz */
@@ -1542,7 +1542,7 @@ static MACHINE_CONFIG_START( mappy_common )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( mappy )
+MACHINE_CONFIG_START(mappy_state::mappy)
 
 	MCFG_FRAGMENT_ADD(mappy_common)
 
@@ -1560,7 +1560,7 @@ static MACHINE_CONFIG_START( mappy )
 	MCFG_NAMCO58XX_OUT_0_CB(DEVWRITELINE("dipmux", ls157_device, select_w)) MCFG_DEVCB_BIT(0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( digdug2 )
+MACHINE_CONFIG_START(mappy_state::digdug2)
 
 	MCFG_FRAGMENT_ADD(mappy_common)
 
@@ -1581,7 +1581,7 @@ static MACHINE_CONFIG_START( digdug2 )
 	MCFG_NAMCO56XX_OUT_0_CB(DEVWRITELINE("dipmux", ls157_device, select_w)) MCFG_DEVCB_BIT(0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( todruaga, digdug2 )
+MACHINE_CONFIG_DERIVED(mappy_state::todruaga, digdug2)
 
 	/* video hardware */
 	MCFG_GFXDECODE_MODIFY("gfxdecode", todruaga)
@@ -1589,7 +1589,7 @@ static MACHINE_CONFIG_DERIVED( todruaga, digdug2 )
 	MCFG_PALETTE_ENTRIES(64*4+64*16)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( motos )
+MACHINE_CONFIG_START(mappy_state::motos)
 
 	MCFG_FRAGMENT_ADD(mappy_common)
 

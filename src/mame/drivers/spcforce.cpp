@@ -279,7 +279,7 @@ INTERRUPT_GEN_MEMBER(spcforce_state::vblank_irq)
 		device.execute().set_input_line(3, HOLD_LINE);
 }
 
-static MACHINE_CONFIG_START( spcforce )
+MACHINE_CONFIG_START(spcforce_state::spcforce)
 
 	/* basic machine hardware */
 	/* FIXME: The 8085A had a max clock of 6MHz, internally divided by 2! */
@@ -331,7 +331,7 @@ static MACHINE_CONFIG_START( spcforce )
 	MCFG_SN76496_READY_HANDLER(WRITELINE(spcforce_state, write_sn3_ready))
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( meteors, spcforce )
+MACHINE_CONFIG_DERIVED(spcforce_state::meteors, spcforce)
 	MCFG_DEVICE_MODIFY("mainlatch")
 	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(NOOP)
 	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(spcforce_state, irq_mask_w)) // ??

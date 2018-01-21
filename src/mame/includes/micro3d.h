@@ -183,6 +183,8 @@ public:
 	void draw_triangles(uint32_t attr);
 
 
+	void micro3d(machine_config &config);
+	void botss11(machine_config &config);
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 

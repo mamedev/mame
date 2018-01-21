@@ -109,6 +109,7 @@ public:
 
 	DECLARE_DRIVER_INIT(megaphx);
 
+	void megaphx(machine_config &config);
 private:
 	required_device<cpu_device> m_maincpu;
 	required_shared_ptr<uint16_t> m_mainram;
@@ -301,7 +302,7 @@ WRITE_LINE_MEMBER( megaphx_state::dsw_w )
 	m_dsw_data = state;
 }
 
-static MACHINE_CONFIG_START( megaphx )
+MACHINE_CONFIG_START(megaphx_state::megaphx)
 	MCFG_CPU_ADD("maincpu", M68000, 8000000) // ??  can't read xtal due to reflections, CPU is an 8Mhz part
 	MCFG_CPU_PROGRAM_MAP(megaphx_68k_map)
 

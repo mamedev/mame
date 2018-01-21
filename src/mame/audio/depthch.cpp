@@ -83,7 +83,7 @@ WRITE8_MEMBER( vicdual_state::depthch_audio_w )
 }
 
 
-MACHINE_CONFIG_START( depthch_audio )
+MACHINE_CONFIG_START(vicdual_state::depthch_audio)
 
 	/* samples */
 	MCFG_SOUND_ADD("samples", SAMPLES, 0)

@@ -1141,9 +1141,9 @@ static INPUT_PORTS_START( grudge )
 	PORT_DIPSETTING(    0x01, "1" )
 	PORT_DIPSETTING(    0x02, "2" )
 	PORT_DIPSETTING(    0x03, "3" )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Free_Play ) )    PORT_DIPLOCATION("H1:8")
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Free_Play ) )    PORT_DIPLOCATION("H1:8")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x80, "On (buggy)" )
 
 	PORT_MODIFY("SWG")
 	PORT_DIPUNUSED_DIPLOC( 0x01, 0x01, "G1:1" )
@@ -1179,6 +1179,15 @@ static INPUT_PORTS_START( grudge )
 
 	PORT_MODIFY("AN3")
 	UNUSED_ANALOG
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( grudgep )
+	PORT_INCLUDE( sentetst )
+
+	PORT_MODIFY("SWH")
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Free_Play ) ) PORT_DIPLOCATION("H1:8") // default to "ON" because Coin mode is buggy on this revision of the prototype
+	PORT_DIPSETTING(    0x00, "Off (buggy)" )
+	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 INPUT_PORTS_END
 
 
@@ -1277,7 +1286,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( balsente )
+MACHINE_CONFIG_START(balsente_state::balsente)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", MC6809E, XTAL_20MHz/16) /* xtal verified but not speed */
@@ -1362,7 +1371,7 @@ static MACHINE_CONFIG_START( balsente )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( shrike, balsente )
+MACHINE_CONFIG_DERIVED(balsente_state::shrike, balsente)
 
 	/* basic machine hardware */
 
@@ -1808,7 +1817,7 @@ ROM_START( grudge )
 	ROM_LOAD( "gm-2a.bin", 0x28000, 0x8000, CRC(1de8dd2e) SHA1(6b538dcf35105bca1ae1bb5387a08b4d1d4f410c) )
 	ROM_LOAD( "gm-6b.bin", 0x2e000, 0x2000, CRC(513d8cdd) SHA1(563e5a2b7e71b4e1447bd41339174129a5884517) ) // mostly the same as 2a/5a except for a small table, corrupt text if we don't use this here..
 
-	ROM_LOAD( "gm-5a.bin", 0x38000, 0x8000, CRC(1de8dd2e) SHA1(6b538dcf35105bca1ae1bb5387a08b4d1d4f410c) ) // same as 2a, not being used..
+	ROM_LOAD( "gm-5a.bin", 0x38000, 0x8000, CRC(1de8dd2e) SHA1(6b538dcf35105bca1ae1bb5387a08b4d1d4f410c) ) // same as 2a, not being used, confirmed as identical on PCB
 
 	SOUNDBOARD_ROMS
 
@@ -2409,7 +2418,7 @@ GAME( 1985, minigolf, 0,        balsente, minigolf, balsente_state, minigolf, RO
 GAME( 1985, minigolf2,minigolf, balsente, minigolf2,balsente_state, minigolf2,ROT0, "Bally/Sente",  "Mini Golf (10/8/85)", MACHINE_SUPPORTS_SAVE )
 GAME( 1984, triviabb, 0,        balsente, triviag1, balsente_state, triviag2, ROT0, "Bally/Sente",  "Trivial Pursuit (Baby Boomer Edition) (3/20/85)", MACHINE_SUPPORTS_SAVE )
 GAME( 198?, grudge,   0,        balsente, grudge,   balsente_state, grudge,   ROT0, "Bally Midway", "Grudge Match (v00.90, Italy, location test?)", MACHINE_SUPPORTS_SAVE ) // newer than set below, had a complete cabinet + art
-GAME( 198?, grudgep,  grudge,   balsente, grudge,   balsente_state, grudge,   ROT0, "Bally Midway", "Grudge Match (v00.80, prototype)", MACHINE_SUPPORTS_SAVE )
+GAME( 198?, grudgep,  grudge,   balsente, grudgep,  balsente_state, grudge,   ROT0, "Bally Midway", "Grudge Match (v00.80, prototype)", MACHINE_SUPPORTS_SAVE )
 
 /* Board: Unknown  */
 GAME( 1984, triviag1, 0,        balsente, triviag1, balsente_state, triviag1, ROT0, "Bally/Sente",  "Trivial Pursuit (Think Tank - Genus Edition) (set 1)", MACHINE_SUPPORTS_SAVE )

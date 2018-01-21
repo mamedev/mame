@@ -274,6 +274,7 @@ public:
 
 	DECLARE_DRIVER_INIT(ecoinf3);
 	DECLARE_DRIVER_INIT(ecoinf3_swap);
+	void ecoinf3_pyramid(machine_config &config);
 };
 
 
@@ -660,7 +661,7 @@ static INPUT_PORTS_START( ecoinf3 )
 INPUT_PORTS_END
 
 
-static MACHINE_CONFIG_START( ecoinf3_pyramid )
+MACHINE_CONFIG_START(ecoinf3_state::ecoinf3_pyramid)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z180,8000000) // certainly not a plain z80 at least, invalid opcodes for that
 

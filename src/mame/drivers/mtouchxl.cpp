@@ -75,6 +75,8 @@ public:
 	DECLARE_READ8_MEMBER(key_r);
 	DECLARE_WRITE8_MEMBER(key_w);
 	DECLARE_READ8_MEMBER(coin_r);
+	void at486(machine_config &config);
+	static void cdrom(device_t *device);
 };
 
 WRITE8_MEMBER(mtxl_state::bank_w)
@@ -185,16 +187,21 @@ static SLOT_INTERFACE_START(mt6k_ata_devices)
 	SLOT_INTERFACE("cdrom", ATAPI_FIXED_CDROM)
 SLOT_INTERFACE_END
 
-static MACHINE_CONFIG_START(cdrom)
-	MCFG_DEVICE_MODIFY("ide:0")
-	MCFG_DEVICE_SLOT_INTERFACE(mt6k_ata_devices, "cdrom", true)
-	MCFG_DEVICE_MODIFY("ide:1")
-	MCFG_SLOT_DEFAULT_OPTION("")
-	MCFG_SLOT_FIXED(true)
+void mtxl_state::cdrom(device_t *device)
+{
+	auto ide0 = device->subdevice("ide:0");
+	device_slot_interface::static_option_reset(*ide0);
+	SLOT_INTERFACE_NAME(mt6k_ata_devices)(ide0);
+	device_slot_interface::static_set_default_option(*ide0, "cdrom");
+	device_slot_interface::static_set_fixed(*ide0, true);	
+
+	auto ide1 = device->subdevice("ide:1");
+	device_slot_interface::static_set_default_option(*ide1, "");
+	device_slot_interface::static_set_fixed(*ide1, true);
 MACHINE_CONFIG_END
 #endif
 
-static MACHINE_CONFIG_START( at486 )
+MACHINE_CONFIG_START(mtxl_state::at486)
 	MCFG_CPU_ADD("maincpu", I486DX4, 33000000)
 	MCFG_CPU_PROGRAM_MAP(at32_map)
 	MCFG_CPU_IO_MAP(at32_io)

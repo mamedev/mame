@@ -160,6 +160,7 @@ public:
 	uint32_t m_video_address;
 
 	uint32_t m_dsp_rom_address;
+	void taitopjc(machine_config &config);
 };
 
 void taitopjc_state::video_exit()
@@ -752,7 +753,7 @@ INTERRUPT_GEN_MEMBER(taitopjc_state::taitopjc_vbi)
 }
 
 
-static MACHINE_CONFIG_START( taitopjc )
+MACHINE_CONFIG_START(taitopjc_state::taitopjc)
 	MCFG_CPU_ADD("maincpu", PPC603E, 100000000)
 	MCFG_PPC_BUS_FREQUENCY(XTAL_66_6667MHz)    /* Multiplier 1.5, Bus = 66MHz, Core = 100MHz */
 	MCFG_CPU_PROGRAM_MAP(ppc603e_mem)

@@ -65,6 +65,7 @@ public:
 	DECLARE_READ32_MEMBER(s3c44b0_gpio_port_r);
 	DECLARE_WRITE32_MEMBER(s3c44b0_gpio_port_w);
 	DECLARE_WRITE16_MEMBER(s3c44b0_i2s_data_w);
+	void juicebox(machine_config &config);
 };
 
 inline void juicebox_state::verboselog(int n_level, const char *s_fmt, ...)
@@ -301,7 +302,7 @@ DRIVER_INIT_MEMBER(juicebox_state,juicebox)
 	// do nothing
 }
 
-static MACHINE_CONFIG_START( juicebox )
+MACHINE_CONFIG_START(juicebox_state::juicebox)
 	MCFG_CPU_ADD("maincpu", ARM7, 66000000)
 	MCFG_CPU_PROGRAM_MAP(juicebox_map)
 

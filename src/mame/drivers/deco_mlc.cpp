@@ -494,7 +494,7 @@ MACHINE_RESET_MEMBER(deco_mlc_state,mlc)
 	m_raster_irq_timer = machine().device<timer_device>("int_timer");
 }
 
-static MACHINE_CONFIG_START( avengrgs )
+MACHINE_CONFIG_START(deco_mlc_state::avengrgs)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", SH2,42000000/2) /* 21 MHz clock confirmed on real board */
@@ -527,7 +527,7 @@ static MACHINE_CONFIG_START( avengrgs )
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( mlc )
+MACHINE_CONFIG_START(deco_mlc_state::mlc)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", ARM,42000000/6) /* 42 MHz -> 7MHz clock confirmed on real board */
@@ -563,11 +563,11 @@ static MACHINE_CONFIG_START( mlc )
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( mlc_6bpp, mlc )
+MACHINE_CONFIG_DERIVED(deco_mlc_state::mlc_6bpp, mlc)
 	MCFG_GFXDECODE_MODIFY("gfxdecode", 6bpp)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( mlc_5bpp, mlc )
+MACHINE_CONFIG_DERIVED(deco_mlc_state::mlc_5bpp, mlc)
 	MCFG_GFXDECODE_MODIFY("gfxdecode", 5bpp)
 
 	// TODO: mono? ch.0 doesn't output any sound in-game

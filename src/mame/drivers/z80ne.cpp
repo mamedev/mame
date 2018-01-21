@@ -410,7 +410,7 @@ static SLOT_INTERFACE_START( z80ne_floppies )
 	SLOT_INTERFACE("sssd", FLOPPY_525_SSSD)
 SLOT_INTERFACE_END
 
-static MACHINE_CONFIG_START( z80ne )
+MACHINE_CONFIG_START(z80ne_state::z80ne)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("z80ne", Z80, Z80NE_CPU_SPEED_HZ)
 	MCFG_CPU_PROGRAM_MAP(z80ne_mem)
@@ -441,7 +441,7 @@ static MACHINE_CONFIG_START( z80ne )
 	//MCFG_SOFTWARE_LIST_ADD("cass_list","z80ne_cass")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( z80net, z80ne )
+MACHINE_CONFIG_DERIVED(z80ne_state::z80net, z80ne)
 
 	MCFG_CPU_MODIFY("z80ne")
 	MCFG_CPU_PROGRAM_MAP(z80net_mem)
@@ -470,7 +470,7 @@ static MACHINE_CONFIG_DERIVED( z80net, z80ne )
 	MCFG_SOFTWARE_LIST_ADD("cass_list","z80ne_cass")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( z80netb )
+MACHINE_CONFIG_START(z80ne_state::z80netb)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("z80ne", Z80, Z80NE_CPU_SPEED_HZ)
 	MCFG_CPU_PROGRAM_MAP(z80netb_mem)
@@ -511,7 +511,7 @@ static MACHINE_CONFIG_START( z80netb )
 	MCFG_SOFTWARE_LIST_ADD("cass_list","z80ne_cass")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( z80netf )
+MACHINE_CONFIG_START(z80ne_state::z80netf)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("z80ne", Z80, Z80NE_CPU_SPEED_HZ)
 	MCFG_CPU_PROGRAM_MAP(z80netf_mem)

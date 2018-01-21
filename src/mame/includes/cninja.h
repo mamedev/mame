@@ -110,4 +110,11 @@ public:
 	DECLARE_WRITE16_MEMBER( cninja_protection_region_0_104_w );
 
 	DECLARE_READ16_MEMBER(cninjabl2_sprite_dma_r);
+	void cninjabl(machine_config &config);
+	void edrandy(machine_config &config);
+	void cninja(machine_config &config);
+	void robocop2(machine_config &config);
+	void stoneage(machine_config &config);
+	void cninjabl2(machine_config &config);
+	void mutantf(machine_config &config);
 };

@@ -120,6 +120,15 @@ public:
 
 	uint32_t screen_update_cdimono1(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_cdimono1_lcd(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	void cdimono1(machine_config &config);
+	void cdimono2(machine_config &config);
+	void quizard4(machine_config &config);
+	void cdimono1_base(machine_config &config);
+	void cdi910(machine_config &config);
+	void quizard2(machine_config &config);
+	void quizard3(machine_config &config);
+	void quizard1(machine_config &config);
+	void quizard(machine_config &config);
 };
 
 /*----------- debug defines -----------*/

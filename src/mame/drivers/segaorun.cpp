@@ -1183,7 +1183,7 @@ GFXDECODE_END
 //  GENERIC MACHINE DRIVERS
 //**************************************************************************
 
-static MACHINE_CONFIG_START( outrun_base )
+MACHINE_CONFIG_START(segaorun_state::outrun_base)
 
 	// basic machine hardware
 	MCFG_CPU_ADD("maincpu", M68000, MASTER_CLOCK/4)
@@ -1244,7 +1244,7 @@ MACHINE_CONFIG_END
 //  GAME-SPECIFIC MACHINE DRIVERS
 //**************************************************************************
 
-static MACHINE_CONFIG_DERIVED( outrundx, outrun_base )
+MACHINE_CONFIG_DERIVED(segaorun_state::outrundx, outrun_base)
 
 	// basic machine hardware
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("bankmotor", segaorun_state, bankmotor_update, attotime::from_msec(10))
@@ -1253,13 +1253,13 @@ static MACHINE_CONFIG_DERIVED( outrundx, outrun_base )
 	MCFG_SEGA_OUTRUN_SPRITES_ADD("sprites")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( outrun, outrundx )
+MACHINE_CONFIG_DERIVED(segaorun_state::outrun, outrundx)
 
 	// basic machine hardware
 	MCFG_NVRAM_ADD_0FILL("nvram")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( outrun_fd1094, outrun )
+MACHINE_CONFIG_DERIVED(segaorun_state::outrun_fd1094, outrun)
 
 	// basic machine hardware
 	MCFG_CPU_REPLACE("maincpu", FD1094, MASTER_CLOCK/4)
@@ -1267,7 +1267,7 @@ static MACHINE_CONFIG_DERIVED( outrun_fd1094, outrun )
 	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( outrun_fd1089a, outrun )
+MACHINE_CONFIG_DERIVED(segaorun_state::outrun_fd1089a, outrun)
 
 	// basic machine hardware
 	MCFG_CPU_REPLACE("maincpu", FD1089A, MASTER_CLOCK/4)
@@ -1275,7 +1275,7 @@ static MACHINE_CONFIG_DERIVED( outrun_fd1089a, outrun )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( shangon, outrun_base )
+MACHINE_CONFIG_DERIVED(segaorun_state::shangon, outrun_base)
 
 	// basic machine hardware
 	MCFG_DEVICE_REMOVE("i8255")
@@ -1297,7 +1297,7 @@ static MACHINE_CONFIG_DERIVED( shangon, outrun_base )
 	MCFG_SEGA_SYS16B_SPRITES_ADD("sprites")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( shangon_fd1089b, shangon )
+MACHINE_CONFIG_DERIVED(segaorun_state::shangon_fd1089b, shangon)
 
 	// basic machine hardware
 	MCFG_CPU_REPLACE("maincpu", FD1089B, MASTER_CLOCK/4)

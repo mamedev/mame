@@ -227,6 +227,7 @@ public:
 	DECLARE_DRIVER_INIT(mag_time);
 	DECLARE_DRIVER_INIT(mag_xain);
 	DECLARE_DRIVER_INIT(mag_exzi);
+	void cedar_magnet(machine_config &config);
 };
 
 /***********************
@@ -754,7 +755,7 @@ INTERRUPT_GEN_MEMBER(cedar_magnet_state::irq)
 	m_cedsprite->irq_hold();
 }
 
-static MACHINE_CONFIG_START( cedar_magnet )
+MACHINE_CONFIG_START(cedar_magnet_state::cedar_magnet)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80,4000000)         /* ? MHz */

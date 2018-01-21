@@ -43,7 +43,7 @@ FLOPPY_FORMATS_END
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( a2bus_diskiing_device::device_add_mconfig )
+MACHINE_CONFIG_START(a2bus_diskiing_device::device_add_mconfig)
 	MCFG_DEVICE_ADD(WOZFDC_TAG, DISKII_FDC, 1021800*2)
 	MCFG_FLOPPY_DRIVE_ADD("0", a2_floppies, "525", a2bus_diskiing_device::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("1", a2_floppies, "525", a2bus_diskiing_device::floppy_formats)

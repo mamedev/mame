@@ -1002,7 +1002,7 @@ void ti990_hdc_device::device_start()
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( ti990_hdc_device::device_add_mconfig )
+MACHINE_CONFIG_START(ti990_hdc_device::device_add_mconfig)
 	MCFG_HARDDISK_ADD( "harddisk1" )
 	MCFG_HARDDISK_LOAD(ti990_hdc_device, ti990_hd)
 	MCFG_HARDDISK_UNLOAD(ti990_hdc_device, ti990_hd)

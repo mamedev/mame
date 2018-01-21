@@ -61,6 +61,8 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	void kot(machine_config &config);
+	void tiamc1(machine_config &config);
 private:
 	optional_device<speaker_sound_device> m_speaker;
 	void update_bg_palette();

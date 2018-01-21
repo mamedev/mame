@@ -71,7 +71,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, galspnbl_state )
 	AM_RANGE(0x905000, 0x907fff) AM_WRITENOP    /* ??? */
 	AM_RANGE(0x980000, 0x9bffff) AM_RAM AM_SHARE("bgvideoram")
 	AM_RANGE(0xa00000, 0xa00fff) AM_WRITENOP    /* more palette ? */
-	AM_RANGE(0xa01000, 0xa017ff) AM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0xa01000, 0xa017ff) AM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0xa01800, 0xa027ff) AM_WRITENOP    /* more palette ? */
 	AM_RANGE(0xa80000, 0xa80001) AM_READ_PORT("IN0")
 	AM_RANGE(0xa80010, 0xa80011) AM_READ_PORT("IN1") AM_WRITE(soundcommand_w)
@@ -212,7 +212,7 @@ void galspnbl_state::machine_start()
 {
 }
 
-static MACHINE_CONFIG_START( galspnbl )
+MACHINE_CONFIG_START(galspnbl_state::galspnbl)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_12MHz) /* 12 MHz ??? - Use value from Tecmo's Super Pinball Action - NEEDS VERIFICATION!! */

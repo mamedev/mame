@@ -115,7 +115,7 @@ static ADDRESS_MAP_START( glass_map, AS_PROGRAM, 16, glass_state )
 	AM_RANGE(0x102000, 0x102fff) AM_RAM                                                                   // Extra Video RAM
 	AM_RANGE(0x108000, 0x108007) AM_WRITEONLY AM_SHARE("vregs")                                           // Video Registers
 	AM_RANGE(0x108008, 0x108009) AM_WRITE(clr_int_w)                                                      // CLR INT Video
-	AM_RANGE(0x200000, 0x2007ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")    // Palette
+	AM_RANGE(0x200000, 0x2007ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")    // Palette
 	AM_RANGE(0x440000, 0x440fff) AM_RAM AM_SHARE("spriteram")                                             // Sprite RAM
 	AM_RANGE(0x700000, 0x700001) AM_READ_PORT("DSW2")
 	AM_RANGE(0x700002, 0x700003) AM_READ_PORT("DSW1")
@@ -228,7 +228,7 @@ void glass_state::machine_reset()
 		m_blitter_serial_buffer[i] = 0;
 }
 
-static MACHINE_CONFIG_START( glass )
+MACHINE_CONFIG_START(glass_state::glass)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz/2)      /* 12 MHz verified on PCB */
@@ -263,7 +263,7 @@ static MACHINE_CONFIG_START( glass )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( glass_ds5002fp, glass )
+MACHINE_CONFIG_DERIVED(glass_state::glass_ds5002fp, glass)
 	MCFG_DEVICE_ADD("gaelco_ds5002fp", GAELCO_DS5002FP, XTAL_24MHz / 2) /* verified on pcb */
 	MCFG_DEVICE_ADDRESS_MAP(0, mcu_hostmem_map)
 MACHINE_CONFIG_END

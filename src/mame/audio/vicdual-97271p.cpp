@@ -86,7 +86,7 @@ s97271p_device::s97271p_device(const machine_config &mconfig, const char *tag, d
 // device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( s97271p_device::device_add_mconfig )
+MACHINE_CONFIG_START(s97271p_device::device_add_mconfig)
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	/* samples */

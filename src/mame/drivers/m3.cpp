@@ -29,6 +29,7 @@ public:
 
 	MC6845_UPDATE_ROW(crtc_update_row);
 
+	void m3(machine_config &config);
 private:
 	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
@@ -107,7 +108,7 @@ void m3_state::machine_reset()
 	m_maincpu->set_pc(0xf000);
 }
 
-static MACHINE_CONFIG_START( m3 )
+MACHINE_CONFIG_START(m3_state::m3)
 	MCFG_CPU_ADD("maincpu", Z80, 2'000'000) // no idea of clock.
 	MCFG_CPU_PROGRAM_MAP(mem_map)
 	MCFG_CPU_IO_MAP(io_map)

@@ -64,6 +64,13 @@ public:
 	MC6845_UPDATE_ROW(kaypro484_update_row);
 	DECLARE_QUICKLOAD_LOAD_MEMBER(kaypro);
 
+	void omni2(machine_config &config);
+	void kayproiv(machine_config &config);
+	void kayproii(machine_config &config);
+	void kaypronew2(machine_config &config);
+	void kaypro484(machine_config &config);
+	void kaypro10(machine_config &config);
+	void kaypro284(machine_config &config);
 private:
 	uint8_t m_mc6845_cursor[16];
 	uint8_t m_mc6845_reg[32];

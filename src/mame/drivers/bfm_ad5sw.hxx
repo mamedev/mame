@@ -14,7 +14,6 @@
 */
 
 
-MACHINE_CONFIG_EXTERN( bfm_ad5 );
 INPUT_PORTS_EXTERN( bfm_ad5 );
 
 #define ad5crcpt_others \

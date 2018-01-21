@@ -115,6 +115,7 @@ public:
 
 	DECLARE_FLOPPY_FORMATS(floppy_formats);
 
+	void gimix(machine_config &config);
 private:
 	uint8_t m_term_data;
 	uint8_t m_dma_status;
@@ -543,7 +544,7 @@ MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE) \
 MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8) \
 MCFG_ADDRESS_MAP_BANK_STRIDE(0x1000)
 
-static MACHINE_CONFIG_START( gimix )
+MACHINE_CONFIG_START(gimix_state::gimix)
 	// basic machine hardware
 	MCFG_CPU_ADD("maincpu", MC6809, XTAL_8MHz)
 	MCFG_CPU_PROGRAM_MAP(gimix_mem)

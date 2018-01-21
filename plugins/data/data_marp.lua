@@ -133,7 +133,7 @@ function dat.check(set, softlist)
 	local stmt = db.prepare("SELECT data FROM \"scores3.htm\" AS f WHERE romset = ?")
 	db.check("reading marp data")
 	stmt:bind_values(set)
-	if stmt:step() == sql.ROW then
+	if stmt:step() == db.ROW then
 		info = "#j2\n" .. stmt:get_value(0)
 	end
 	stmt:finalize()

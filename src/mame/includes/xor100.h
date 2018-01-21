@@ -68,6 +68,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(write_centronics_busy);
 	DECLARE_WRITE_LINE_MEMBER(write_centronics_select);
 
+	void xor100(machine_config &config);
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;

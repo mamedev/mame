@@ -186,7 +186,7 @@ DRIVER_INIT_MEMBER(wpc_flip2_state,wpc_flip2)
 	wpc_flip1_state::init_wpc_flip1();
 }
 
-static MACHINE_CONFIG_START( wpc_flip2 )
+MACHINE_CONFIG_START(wpc_flip2_state::wpc_flip2)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6809, 2000000)
 	MCFG_CPU_PROGRAM_MAP(wpc_flip2_map)

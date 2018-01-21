@@ -253,6 +253,7 @@ public:
 	required_device<palette_device> m_palette;
 	required_device<palette_device> m_palette2;
 
+	void coinmvga(machine_config &config);
 };
 
 
@@ -626,7 +627,7 @@ static ADDRESS_MAP_START( ramdac2_map, 0, 8, coinmvga_state )
 ADDRESS_MAP_END
 
 
-static MACHINE_CONFIG_START( coinmvga )
+MACHINE_CONFIG_START(coinmvga_state::coinmvga)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", H83007, CPU_CLOCK)  /* xtal */

@@ -90,6 +90,7 @@ public:
 	virtual void video_start() override;
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void suprgolf(machine_config &config);
 };
 
 TILE_GET_INFO_MEMBER(suprgolf_state::get_tile_info)
@@ -486,7 +487,7 @@ void suprgolf_state::machine_reset()
 
 #define MASTER_CLOCK XTAL_12MHz
 
-static MACHINE_CONFIG_START( suprgolf )
+MACHINE_CONFIG_START(suprgolf_state::suprgolf)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80,MASTER_CLOCK/2) /* guess */

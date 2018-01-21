@@ -468,7 +468,7 @@ public:
 	virtual DECLARE_ADDRESS_MAP(map, 32) override;
 
 	DECLARE_WRITE16_MEMBER(eth_w);
-	DECLARE_READ16_MEMBER(eth_r) const;
+	DECLARE_READ16_MEMBER(eth_r);
 
 protected:
 	virtual TIMER_CALLBACK_MEMBER(eth_reset) override;
@@ -510,7 +510,7 @@ public:
 	virtual DECLARE_ADDRESS_MAP(map, 32) override;
 
 	DECLARE_WRITE32_MEMBER(eth_w);
-	DECLARE_READ32_MEMBER(eth_r) const;
+	DECLARE_READ32_MEMBER(eth_r);
 
 protected:
 	virtual TIMER_CALLBACK_MEMBER(eth_reset) override;

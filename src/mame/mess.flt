@@ -562,6 +562,7 @@ pyl601.cpp
 ql.cpp
 qtsbc.cpp
 qvt103.cpp
+qvt201.cpp
 qvt6800.cpp
 qx10.cpp
 r9751.cpp
@@ -591,6 +592,7 @@ sage2.cpp
 samcoupe.cpp
 sansa_fuze.cpp
 sapi1.cpp
+sartorius.cpp
 saturn.cpp
 savia84.cpp
 sbc6510.cpp

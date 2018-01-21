@@ -353,7 +353,7 @@ static ADDRESS_MAP_START( goldstar_map, AS_PROGRAM, 8, goldstar_state )
 	AM_RANGE(0xf900, 0xf900) AM_WRITE(p1_lamps_w)
 	AM_RANGE(0xfa00, 0xfa00) AM_WRITE(goldstar_fa00_w)
 	AM_RANGE(0xfb00, 0xfb00) AM_DEVREADWRITE("oki", okim6295_device, read, write)
-	AM_RANGE(0xfd00, 0xfdff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0xfd00, 0xfdff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
 	AM_RANGE(0xfe00, 0xfe00) AM_READWRITE(protection_r,protection_w)
 ADDRESS_MAP_END
 
@@ -1107,8 +1107,8 @@ ADDRESS_MAP_END
 /* newer / more capable hw */
 static ADDRESS_MAP_START( unkch_map, AS_PROGRAM, 8, unkch_state )
 	AM_RANGE(0x0000, 0x9fff) AM_ROM
-	AM_RANGE(0xc000, 0xc1ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
-	AM_RANGE(0xc800, 0xc9ff) AM_RAM_DEVWRITE("palette", palette_device, write_ext) AM_SHARE("palette_ext")
+	AM_RANGE(0xc000, 0xc1ff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
+	AM_RANGE(0xc800, 0xc9ff) AM_RAM_DEVWRITE("palette", palette_device, write8_ext) AM_SHARE("palette_ext")
 
 	AM_RANGE(0xd000, 0xd7ff) AM_RAM AM_SHARE("nvram")
 
@@ -8059,7 +8059,7 @@ WRITE8_MEMBER(goldstar_state::ay8910_outputb_w)
 }
 
 
-static MACHINE_CONFIG_START( goldstar )
+MACHINE_CONFIG_START(goldstar_state::goldstar)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, CPU_CLOCK)
@@ -8096,7 +8096,7 @@ static MACHINE_CONFIG_START( goldstar )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( goldstbl )
+MACHINE_CONFIG_START(goldstar_state::goldstbl)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, CPU_CLOCK)
@@ -8131,16 +8131,16 @@ static MACHINE_CONFIG_START( goldstbl )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( moonlght, goldstbl )
+MACHINE_CONFIG_DERIVED(goldstar_state::moonlght, goldstbl)
 	MCFG_GFXDECODE_MODIFY("gfxdecode", ml)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( goldfrui, goldstbl )
+MACHINE_CONFIG_DERIVED(goldstar_state::goldfrui, goldstbl)
 	MCFG_GFXDECODE_MODIFY("gfxdecode", goldfrui)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( star100 )
+MACHINE_CONFIG_START(sanghopm_state::star100)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, CPU_CLOCK)
@@ -8179,7 +8179,7 @@ static MACHINE_CONFIG_START( star100 )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( super9 )
+MACHINE_CONFIG_START(goldstar_state::super9)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, CPU_CLOCK)
@@ -8277,7 +8277,7 @@ PALETTE_INIT_MEMBER(goldstar_state, lucky8)
 }
 
 
-static MACHINE_CONFIG_START( ncb3 )
+MACHINE_CONFIG_START(cb3_state::ncb3)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, CPU_CLOCK)
@@ -8326,28 +8326,28 @@ static MACHINE_CONFIG_START( ncb3 )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( cb3c, ncb3 )
+MACHINE_CONFIG_DERIVED(cb3_state::cb3c, ncb3)
 	MCFG_GFXDECODE_MODIFY("gfxdecode", cb3c)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( cb3e, ncb3 )
+MACHINE_CONFIG_DERIVED(cb3_state::cb3e, ncb3)
 	MCFG_GFXDECODE_MODIFY("gfxdecode", cb3e)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( chrygld, ncb3 )
+MACHINE_CONFIG_DERIVED(cb3_state::chrygld, ncb3)
 	MCFG_GFXDECODE_MODIFY("gfxdecode", chry10)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( cherrys, ncb3 )
+MACHINE_CONFIG_DERIVED(cb3_state::cherrys, ncb3)
 	MCFG_GFXDECODE_MODIFY("gfxdecode", cherrys)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( cm97, ncb3 )
+MACHINE_CONFIG_DERIVED(cb3_state::cm97, ncb3)
 	MCFG_GFXDECODE_MODIFY("gfxdecode", cm97)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( wcherry )
+MACHINE_CONFIG_START(goldstar_state::wcherry)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, CPU_CLOCK)
@@ -8396,7 +8396,7 @@ static MACHINE_CONFIG_START( wcherry )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( cm )
+MACHINE_CONFIG_START(cmaster_state::cm)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, CPU_CLOCK)
@@ -8438,12 +8438,12 @@ static MACHINE_CONFIG_START( cm )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( cmasterc, cm )
+MACHINE_CONFIG_DERIVED(cmaster_state::cmasterc, cm)
 	MCFG_GFXDECODE_MODIFY("gfxdecode", cmasterc)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( cmast91 )
+MACHINE_CONFIG_START(goldstar_state::cmast91)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, CPU_CLOCK)
@@ -8493,7 +8493,7 @@ INTERRUPT_GEN_MEMBER(wingco_state::masked_irq)
 		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
-static MACHINE_CONFIG_START( lucky8 )
+MACHINE_CONFIG_START(wingco_state::lucky8)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, CPU_CLOCK)
@@ -8548,7 +8548,7 @@ static MACHINE_CONFIG_START( lucky8 )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( bingowng )
+MACHINE_CONFIG_START(wingco_state::bingowng)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, CPU_CLOCK)
@@ -8602,12 +8602,12 @@ static MACHINE_CONFIG_START( bingowng )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( bingownga, bingowng )
+MACHINE_CONFIG_DERIVED(wingco_state::bingownga, bingowng)
 	MCFG_GFXDECODE_MODIFY("gfxdecode", bingownga)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( flam7_w4, lucky8 )
+MACHINE_CONFIG_DERIVED(wingco_state::flam7_w4, lucky8)
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(flaming7_map)
@@ -8618,7 +8618,7 @@ static MACHINE_CONFIG_DERIVED( flam7_w4, lucky8 )
 	MCFG_DS2401_ADD("fl7w4_id")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( flaming7, lucky8 )
+MACHINE_CONFIG_DERIVED(wingco_state::flaming7, lucky8)
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(flaming7_map)
@@ -8632,7 +8632,7 @@ static MACHINE_CONFIG_DERIVED( flaming7, lucky8 )
 	MCFG_DS2401_ADD("fl7w4_id")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( flam7_tw, lucky8 )
+MACHINE_CONFIG_DERIVED(wingco_state::flam7_tw, lucky8)
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(flaming7_map)
@@ -8646,7 +8646,7 @@ static MACHINE_CONFIG_DERIVED( flam7_tw, lucky8 )
 	MCFG_DS2401_ADD("fl7w4_id")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( mbstar, lucky8 )
+MACHINE_CONFIG_DERIVED(wingco_state::mbstar, lucky8)
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(mbstar_map)
@@ -8670,7 +8670,7 @@ PALETTE_INIT_MEMBER(wingco_state, magodds)
 	}
 }
 
-static MACHINE_CONFIG_START( magodds )
+MACHINE_CONFIG_START(wingco_state::magodds)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, CPU_CLOCK)
@@ -8725,7 +8725,7 @@ static MACHINE_CONFIG_START( magodds )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( kkotnoli )
+MACHINE_CONFIG_START(goldstar_state::kkotnoli)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, CPU_CLOCK)
@@ -8769,7 +8769,7 @@ static MACHINE_CONFIG_START( kkotnoli )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( ladylinr )
+MACHINE_CONFIG_START(goldstar_state::ladylinr)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, CPU_CLOCK)
@@ -8812,7 +8812,7 @@ static MACHINE_CONFIG_START( ladylinr )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( wcat3 )
+MACHINE_CONFIG_START(wingco_state::wcat3)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, CPU_CLOCK)
@@ -8869,7 +8869,7 @@ MACHINE_CONFIG_END
 
 
 /* diff with cm machine driver: gfxdecode, OKI & portmap */
-static MACHINE_CONFIG_START( amcoe1 )
+MACHINE_CONFIG_START(cmaster_state::amcoe1)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, CPU_CLOCK)
@@ -8916,7 +8916,7 @@ MACHINE_CONFIG_END
 
 
 /* diff with cm machine driver: gfxdecode, OKI, portmap & tilemaps rect size/position */
-static MACHINE_CONFIG_DERIVED( amcoe1a, amcoe1 )
+MACHINE_CONFIG_DERIVED(cmaster_state::amcoe1a, amcoe1)
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
@@ -8925,7 +8925,7 @@ MACHINE_CONFIG_END
 
 
 /* diff with cm machine driver: gfxdecode, AY8910 volume & portmap */
-static MACHINE_CONFIG_START( amcoe2 )
+MACHINE_CONFIG_START(cmaster_state::amcoe2)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, CPU_CLOCK)
@@ -8967,7 +8967,7 @@ static MACHINE_CONFIG_START( amcoe2 )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 2.00) /* analyzed for clips */
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( nfm, amcoe2 )
+MACHINE_CONFIG_DERIVED(cmaster_state::nfm, amcoe2)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -8983,7 +8983,7 @@ INTERRUPT_GEN_MEMBER(unkch_state::vblank_irq)
 		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
-static MACHINE_CONFIG_START( unkch )
+MACHINE_CONFIG_START(unkch_state::unkch)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, CPU_CLOCK)
@@ -9022,7 +9022,7 @@ MACHINE_CONFIG_END
 
 
 // hw unknown - should be somewhat similar to cm
-static MACHINE_CONFIG_START( pkrmast )
+MACHINE_CONFIG_START(goldstar_state::pkrmast)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, CPU_CLOCK)
@@ -9055,7 +9055,7 @@ static MACHINE_CONFIG_START( pkrmast )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( megaline )
+MACHINE_CONFIG_START(unkch_state::megaline)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, CPU_CLOCK)
@@ -9105,7 +9105,7 @@ static MACHINE_CONFIG_START( megaline )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( bonusch )
+MACHINE_CONFIG_START(unkch_state::bonusch)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_12MHz / 2)

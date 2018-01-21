@@ -181,6 +181,9 @@ public:
 
 	DECLARE_INPUT_CHANGED_MEMBER(input_changed);
 
+	void pongd(machine_config &config);
+	void pong(machine_config &config);
+	void pongf(machine_config &config);
 protected:
 
 	// driver_device overrides
@@ -245,6 +248,7 @@ public:
 		m_sw1_4->write((newval>>3) & 1);
 	}
 
+	void breakout(machine_config &config);
 protected:
 
 	// driver_device overrides
@@ -371,7 +375,7 @@ static INPUT_PORTS_START( breakout )
 
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( pong )
+MACHINE_CONFIG_START(pong_state::pong)
 
 	/* basic machine hardware */
 	MCFG_DEVICE_ADD("maincpu", NETLIST_CPU, NETLIST_CLOCK)
@@ -406,7 +410,7 @@ static MACHINE_CONFIG_START( pong )
 	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( breakout )
+MACHINE_CONFIG_START(breakout_state::breakout)
 
 	/* basic machine hardware */
 	MCFG_DEVICE_ADD("maincpu", NETLIST_CPU, NETLIST_CLOCK)
@@ -459,7 +463,7 @@ static MACHINE_CONFIG_START( breakout )
 	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( pongf, pong )
+MACHINE_CONFIG_DERIVED(pong_state::pongf, pong)
 
 	/* basic machine hardware */
 	MCFG_DEVICE_MODIFY("maincpu")
@@ -467,7 +471,7 @@ static MACHINE_CONFIG_DERIVED( pongf, pong )
 
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( pongd )
+MACHINE_CONFIG_START(pong_state::pongd)
 
 	/* basic machine hardware */
 	MCFG_DEVICE_ADD("maincpu", NETLIST_CPU, NETLIST_CLOCK)

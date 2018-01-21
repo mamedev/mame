@@ -1093,7 +1093,7 @@ INTERRUPT_GEN_MEMBER(cclimber_state::bagmanf_vblank_irq)
 		device.execute().set_input_line(0, HOLD_LINE);
 }
 
-static MACHINE_CONFIG_START( root )
+MACHINE_CONFIG_START(cclimber_state::root)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK/3/2)  /* 3.072 MHz */
@@ -1123,7 +1123,7 @@ static MACHINE_CONFIG_START( root )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( cclimber, root )
+MACHINE_CONFIG_DERIVED(cclimber_state::cclimber, root)
 	MCFG_DEVICE_MODIFY("mainlatch") // 7J on CCG-1
 	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(DEVWRITELINE("cclimber_audio", cclimber_audio_device, sample_trigger_w))
 
@@ -1133,18 +1133,18 @@ static MACHINE_CONFIG_DERIVED( cclimber, root )
 	MCFG_CCLIMBER_AUDIO_ADD("cclimber_audio")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( cclimberx, cclimber )
+MACHINE_CONFIG_DERIVED(cclimber_state::cclimberx, cclimber)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( ckongb, cclimber )
+MACHINE_CONFIG_DERIVED(cclimber_state::ckongb, cclimber)
 	MCFG_DEVICE_MODIFY("mainlatch")
 	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(cclimber_state, nmi_mask_w)) //used by Crazy Kong Bootleg with alt levels and speed up
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( cannonb, cclimber )
+MACHINE_CONFIG_DERIVED(cclimber_state::cannonb, cclimber)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1159,7 +1159,7 @@ static MACHINE_CONFIG_DERIVED( cannonb, cclimber )
 	MCFG_GFXDECODE_MODIFY("gfxdecode", cannonb)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( bagmanf, cclimber )
+MACHINE_CONFIG_DERIVED(cclimber_state::bagmanf, cclimber)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1168,7 +1168,7 @@ static MACHINE_CONFIG_DERIVED( bagmanf, cclimber )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( yamato, root )
+MACHINE_CONFIG_DERIVED(cclimber_state::yamato, root)
 
 	/* basic machine hardware */
 	MCFG_CPU_REPLACE("maincpu", SEGA_315_5018, MASTER_CLOCK/3/2)  /* 3.072 MHz */
@@ -1200,7 +1200,7 @@ static MACHINE_CONFIG_DERIVED( yamato, root )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( toprollr, cclimber )
+MACHINE_CONFIG_DERIVED(cclimber_state::toprollr, cclimber)
 
 	MCFG_CPU_REPLACE("maincpu", SEGA_315_5018, MASTER_CLOCK/3/2)  /* 3.072 MHz */
 	MCFG_CPU_PROGRAM_MAP(toprollr_map)
@@ -1227,7 +1227,7 @@ static MACHINE_CONFIG_DERIVED( toprollr, cclimber )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( swimmer )
+MACHINE_CONFIG_START(cclimber_state::swimmer)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_18_432MHz/6)    /* verified on pcb */
@@ -1273,7 +1273,7 @@ static MACHINE_CONFIG_START( swimmer )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( guzzler, swimmer )
+MACHINE_CONFIG_DERIVED(cclimber_state::guzzler, swimmer)
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(guzzler_map)

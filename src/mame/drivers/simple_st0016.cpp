@@ -462,7 +462,7 @@ uint32_t st0016_state::screen_update_st0016(screen_device &screen, bitmap_ind16 
 }
 
 
-static MACHINE_CONFIG_START( st0016 )
+MACHINE_CONFIG_START(st0016_state::st0016)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",ST0016_CPU,8000000) /* 8 MHz ? */
 	MCFG_CPU_PROGRAM_MAP(st0016_mem)
@@ -483,7 +483,7 @@ static MACHINE_CONFIG_START( st0016 )
 
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( mayjinsn, st0016 )
+MACHINE_CONFIG_DERIVED(st0016_state::mayjinsn, st0016)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(st0016_m2_io)
 	MCFG_CPU_ADD("sub", V810, 10000000)//25 Mhz ?
@@ -491,7 +491,7 @@ static MACHINE_CONFIG_DERIVED( mayjinsn, st0016 )
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( renju, st0016 )
+MACHINE_CONFIG_DERIVED(st0016_state::renju, st0016)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(renju_mem)
 MACHINE_CONFIG_END

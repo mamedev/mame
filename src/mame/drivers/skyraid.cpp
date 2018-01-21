@@ -218,7 +218,7 @@ static GFXDECODE_START( skyraid )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( skyraid )
+MACHINE_CONFIG_START(skyraid_state::skyraid)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, 12096000 / 12)

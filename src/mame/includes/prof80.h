@@ -101,6 +101,7 @@ public:
 	// timers
 	emu_timer   *m_floppy_motor_off_timer;
 
+	void prof80(machine_config &config);
 };
 
 #endif

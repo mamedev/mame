@@ -1693,7 +1693,7 @@ GFXDECODE_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( centiped_base )
+MACHINE_CONFIG_START(centiped_state::centiped_base)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, 12096000/8)  /* 1.512 MHz (slows down to 0.75MHz while accessing playfield RAM) */
@@ -1730,7 +1730,7 @@ static MACHINE_CONFIG_START( centiped_base )
 
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( centiped, centiped_base )
+MACHINE_CONFIG_DERIVED(centiped_state::centiped, centiped_base)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(centiped_map)
 
@@ -1747,7 +1747,7 @@ static MACHINE_CONFIG_DERIVED( centiped, centiped_base )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( caterplr, centiped_base )
+MACHINE_CONFIG_DERIVED(centiped_state::caterplr, centiped_base)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1765,7 +1765,7 @@ static MACHINE_CONFIG_DERIVED( caterplr, centiped_base )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( centipdb, centiped_base )
+MACHINE_CONFIG_DERIVED(centiped_state::centipdb, centiped_base)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1783,7 +1783,7 @@ static MACHINE_CONFIG_DERIVED( centipdb, centiped_base )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( magworm, centiped_base )
+MACHINE_CONFIG_DERIVED(centiped_state::magworm, centiped_base)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1802,7 +1802,7 @@ static MACHINE_CONFIG_DERIVED( magworm, centiped_base )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( milliped, centiped_base )
+MACHINE_CONFIG_DERIVED(centiped_state::milliped, centiped_base)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1835,7 +1835,7 @@ static MACHINE_CONFIG_DERIVED( milliped, centiped_base )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( multiped, milliped )
+MACHINE_CONFIG_DERIVED(centiped_state::multiped, milliped)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1846,7 +1846,7 @@ static MACHINE_CONFIG_DERIVED( multiped, milliped )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( warlords, centiped_base )
+MACHINE_CONFIG_DERIVED(centiped_state::warlords, centiped_base)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1879,7 +1879,7 @@ static MACHINE_CONFIG_DERIVED( warlords, centiped_base )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( mazeinv, milliped )
+MACHINE_CONFIG_DERIVED(centiped_state::mazeinv, milliped)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1893,7 +1893,7 @@ static MACHINE_CONFIG_DERIVED( mazeinv, milliped )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( bullsdrt )
+MACHINE_CONFIG_START(centiped_state::bullsdrt)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", S2650, 12096000/8)

@@ -106,6 +106,8 @@ public:
 	required_device<snes_control_port_device> m_ctrl1;
 	required_device<snes_control_port_device> m_ctrl2;
 	optional_device<sns_cart_slot_device> m_cartslot;
+	void snespal(machine_config &config);
+	void snes(machine_config &config);
 };
 
 
@@ -1325,7 +1327,7 @@ void snes_console_state::machine_reset()
 }
 
 
-static MACHINE_CONFIG_START( snes )
+MACHINE_CONFIG_START(snes_console_state::snes)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", _5A22, MCLK_NTSC)   /* 2.68 MHz, also 3.58 MHz */
@@ -1365,7 +1367,7 @@ static MACHINE_CONFIG_START( snes )
 	MCFG_SOFTWARE_LIST_ADD("st_list","snes_strom")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( snespal, snes )
+MACHINE_CONFIG_DERIVED(snes_console_state::snespal, snes)
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_CLOCK( MCLK_PAL )
 

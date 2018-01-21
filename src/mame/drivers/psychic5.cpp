@@ -712,7 +712,7 @@ static GFXDECODE_START( bombsa )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( psychic5 )
+MACHINE_CONFIG_START(psychic5_state::psychic5)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_12MHz/2)
@@ -766,7 +766,7 @@ static MACHINE_CONFIG_START( psychic5 )
 	MCFG_SOUND_ROUTE(3, "mono", 0.50)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( bombsa )
+MACHINE_CONFIG_START(psychic5_state::bombsa)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_12MHz/2 ) /* 6 MHz */

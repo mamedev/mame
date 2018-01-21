@@ -131,6 +131,7 @@ public:
 	INTERRUPT_GEN_MEMBER(irq_vs);
 	MC6845_UPDATE_ROW(crtc_update_row);
 
+	void amust(machine_config &config);
 private:
 	u8 m_port04;
 	u8 m_port06;
@@ -370,7 +371,7 @@ DRIVER_INIT_MEMBER( amust_state, amust )
 	membank("bankw0")->configure_entry(0, &main[0xf800]);
 }
 
-static MACHINE_CONFIG_START( amust )
+MACHINE_CONFIG_START(amust_state::amust)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80, XTAL_16MHz / 4)
 	MCFG_CPU_PROGRAM_MAP(mem_map)

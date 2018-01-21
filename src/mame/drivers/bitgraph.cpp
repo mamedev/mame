@@ -139,6 +139,9 @@ public:
 	DECLARE_WRITE8_MEMBER(ppu_write);
 	DECLARE_WRITE8_MEMBER(ppu_i8243_w);
 
+	void bg_motherboard(machine_config &config);
+	void bitgrpha(machine_config &config);
+	void bitgrphb(machine_config &config);
 private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -482,7 +485,7 @@ void bitgraph_state::machine_reset()
 }
 
 
-static MACHINE_CONFIG_START( bg_motherboard )
+MACHINE_CONFIG_START(bitgraph_state::bg_motherboard)
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(40)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
@@ -550,7 +553,7 @@ static MACHINE_CONFIG_START( bg_motherboard )
 MACHINE_CONFIG_END
 
 #ifdef UNUSED_FUNCTION
-static MACHINE_CONFIG_START( bg_ppu )
+MACHINE_CONFIG_START(bitgraph_state::bg_ppu)
 	MCFG_CPU_ADD(PPU_TAG, I8035, XTAL_6_9MHz)
 	MCFG_CPU_IO_MAP(ppu_io)
 //  MCFG_MCS48_PORT_T0_IN_CB(READLINE(bitgraph_state, ppu_t0_r))
@@ -570,7 +573,7 @@ static MACHINE_CONFIG_START( bg_ppu )
 MACHINE_CONFIG_END
 #endif
 
-static MACHINE_CONFIG_START( bitgrpha )
+MACHINE_CONFIG_START(bitgraph_state::bitgrpha)
 	MCFG_CPU_ADD(M68K_TAG, M68000, XTAL_6_9MHz)
 	MCFG_CPU_PROGRAM_MAP(bitgrapha_mem)
 
@@ -593,7 +596,7 @@ static MACHINE_CONFIG_START( bitgrpha )
 	MCFG_RAM_DEFAULT_SIZE("128K")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( bitgrphb )
+MACHINE_CONFIG_START(bitgraph_state::bitgrphb)
 	MCFG_CPU_ADD(M68K_TAG, M68000, XTAL_6_9MHz)
 	MCFG_CPU_PROGRAM_MAP(bitgraphb_mem)
 

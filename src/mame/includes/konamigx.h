@@ -262,6 +262,22 @@ public:
 
 	DECLARE_DRIVER_INIT(posthack);
 	int m_use_68020_post_clock_hack;
+	void konamigx_6bpp(machine_config &config);
+	void gxtype4(machine_config &config);
+	void gxtype4_vsn(machine_config &config);
+	void racinfrc(machine_config &config);
+	void gxtype4sd2(machine_config &config);
+	void konamigx_bios(machine_config &config);
+	void gxtype3(machine_config &config);
+	void opengolf(machine_config &config);
+	void winspike(machine_config &config);
+	void le2(machine_config &config);
+	void konamigx(machine_config &config);
+	void dragoonj(machine_config &config);
+	void salmndr2(machine_config &config);
+	void tbyahhoo(machine_config &config);
+	void gokuparo(machine_config &config);
+	void sexyparo(machine_config &config);
 };
 
 // Sprite Callbacks

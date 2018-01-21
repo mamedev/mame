@@ -101,6 +101,9 @@ public:
 	DECLARE_WRITE16_MEMBER(rev2_write_o);
 	DECLARE_WRITE16_MEMBER(rev2_write_r);
 
+	void rev1(machine_config &config);
+	void rev2(machine_config &config);
+
 protected:
 	virtual void machine_start() override;
 };
@@ -341,7 +344,7 @@ INPUT_PORTS_END
 
 ***************************************************************************/
 
-static MACHINE_CONFIG_START( rev1 )
+MACHINE_CONFIG_START(tispellb_state::rev1)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", TMS0270, 350000) // approximation
@@ -365,7 +368,7 @@ static MACHINE_CONFIG_START( rev1 )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( rev2 )
+MACHINE_CONFIG_START(tispellb_state::rev2)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", TMS0270, 350000) // approximation

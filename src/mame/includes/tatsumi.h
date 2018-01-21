@@ -86,6 +86,7 @@ public:
 	uint32_t screen_update_apache3(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(apache3_68000_reset);
 
+	void apache3(machine_config &config);
 private:
 	void draw_sky(bitmap_rgb32 &bitmap, const rectangle &cliprect, int palette_base, int start_offset);
 	void draw_ground(bitmap_rgb32 &dst, const rectangle &cliprect);
@@ -131,6 +132,7 @@ public:
 	DECLARE_VIDEO_START(roundup5);
 	uint32_t screen_update_roundup5(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
+	void roundup5(machine_config &config);
 private:
 	void draw_road(bitmap_rgb32 &bitmap, const rectangle &cliprect, bitmap_ind8 &shadow_bitmap);
 
@@ -184,6 +186,8 @@ public:
 	uint32_t screen_update_cyclwarr(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_bigfight(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
+	void cyclwarr(machine_config &config);
+	void bigfight(machine_config &config);
 private:
 	required_device_array<cxd1095_device, 2> m_io;
 	required_device<generic_latch_8_device> m_soundlatch;

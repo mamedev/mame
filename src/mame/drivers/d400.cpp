@@ -11,7 +11,7 @@ Skeleton driver for Data General Dasher 400 series terminals.
 #include "machine/mc68681.h"
 #include "machine/x2212.h"
 //#include "video/crt9007.h"
-//#include "screen.h"
+#include "screen.h"
 
 class d400_state : public driver_device
 {
@@ -21,9 +21,17 @@ public:
 		, m_maincpu(*this, "maincpu")
 	{ }
 
+	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+
+	void d461(machine_config &config);
 private:
 	required_device<cpu_device> m_maincpu;
 };
+
+u32 d400_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+{
+	return 0;
+}
 
 static ADDRESS_MAP_START( mem_map, AS_PROGRAM, 8, d400_state )
 	AM_RANGE(0x0000, 0x3fff) AM_RAM
@@ -40,9 +48,14 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START( d461 )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( d461 )
+MACHINE_CONFIG_START(d400_state::d461)
 	MCFG_CPU_ADD("maincpu", MC6809E, 4'000'000) // HD68B09EP
 	MCFG_CPU_PROGRAM_MAP(mem_map)
+
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_RAW_PARAMS(XTAL_59_2920MHz / 3, 1080, 0, 810, 305, 0, 300) // yes, 81 columns
+	//MCFG_SCREEN_RAW_PARAMS(XTAL_59_2920MHz / 2, 1620, 0, 1215, 305, 0, 300) // for 135-column mode
+	MCFG_SCREEN_UPDATE_DRIVER(d400_state, screen_update)
 
 	MCFG_DEVICE_ADD("novram", X2210, 0)
 

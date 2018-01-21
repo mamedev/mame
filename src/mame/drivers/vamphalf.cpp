@@ -204,6 +204,22 @@ public:
 	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap);
 	void draw_sprites_aoh(screen_device &screen, bitmap_ind16 &bitmap);
 	void handle_flipped_visible_area(screen_device &screen);
+	void common(machine_config &config);
+	void sound_ym_oki(machine_config &config);
+	void sound_suplup(machine_config &config);
+	void sound_qs1000(machine_config &config);
+	void mrkickera(machine_config &config);
+	void mrdig(machine_config &config);
+	void misncrft(machine_config &config);
+	void suplup(machine_config &config);
+	void vamphalf(machine_config &config);
+	void yorijori(machine_config &config);
+	void finalgdr(machine_config &config);
+	void wyvernwg(machine_config &config);
+	void boonggab(machine_config &config);
+	void jmpbreak(machine_config &config);
+	void aoh(machine_config &config);
+	void coolmini(machine_config &config);
 };
 
 READ16_MEMBER(vamphalf_state::eeprom_r)
@@ -427,21 +443,21 @@ WRITE8_MEMBER( vamphalf_state::qs1000_p3_w )
 static ADDRESS_MAP_START( common_map, AS_PROGRAM, 16, vamphalf_state )
 	AM_RANGE(0x00000000, 0x001fffff) AM_RAM AM_SHARE("wram")
 	AM_RANGE(0x40000000, 0x4003ffff) AM_RAM AM_SHARE("tiles")
-	AM_RANGE(0x80000000, 0x8000ffff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x80000000, 0x8000ffff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0xfff00000, 0xffffffff) AM_ROM AM_REGION("user1",0)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( common_32bit_map, AS_PROGRAM, 32, vamphalf_state )
 	AM_RANGE(0x00000000, 0x001fffff) AM_RAM AM_SHARE("wram32")
 	AM_RANGE(0x40000000, 0x4003ffff) AM_RAM AM_SHARE("tiles32")
-	AM_RANGE(0x80000000, 0x8000ffff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x80000000, 0x8000ffff) AM_RAM_DEVWRITE("palette", palette_device, write32) AM_SHARE("palette")
 	AM_RANGE(0xfff00000, 0xffffffff) AM_ROM AM_REGION("user1",0)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( yorijori_32bit_map, AS_PROGRAM, 32, vamphalf_state )
 	AM_RANGE(0x00000000, 0x001fffff) AM_RAM AM_SHARE("wram32")
 	AM_RANGE(0x40000000, 0x4003ffff) AM_RAM AM_SHARE("tiles32")
-	AM_RANGE(0x80000000, 0x8000ffff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x80000000, 0x8000ffff) AM_RAM_DEVWRITE("palette", palette_device, write32) AM_SHARE("palette")
 	AM_RANGE(0xffe00000, 0xffffffff) AM_ROM AM_REGION("user1",0)
 ADDRESS_MAP_END
 
@@ -560,7 +576,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( aoh_map, AS_PROGRAM, 32, vamphalf_state )
 	AM_RANGE(0x00000000, 0x003fffff) AM_RAM AM_SHARE("wram32")
 	AM_RANGE(0x40000000, 0x4003ffff) AM_RAM AM_SHARE("tiles32")
-	AM_RANGE(0x80000000, 0x8000ffff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x80000000, 0x8000ffff) AM_RAM_DEVWRITE("palette", palette_device, write32) AM_SHARE("palette")
 	AM_RANGE(0x80210000, 0x80210003) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x80220000, 0x80220003) AM_READ_PORT("P1_P2")
 	AM_RANGE(0xffc00000, 0xffffffff) AM_ROM AM_REGION("user1",0)
@@ -989,7 +1005,7 @@ static GFXDECODE_START( vamphalf )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( common )
+MACHINE_CONFIG_START(vamphalf_state::common)
 	MCFG_CPU_ADD("maincpu", E116T, 50000000)    /* 50 MHz */
 	MCFG_CPU_PROGRAM_MAP(common_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", vamphalf_state,  irq1_line_hold)
@@ -1013,7 +1029,7 @@ static MACHINE_CONFIG_START( common )
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", vamphalf)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( sound_ym_oki )
+MACHINE_CONFIG_START(vamphalf_state::sound_ym_oki)
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MCFG_YM2151_ADD("ymsnd", XTAL_28MHz/8) /* 3.5MHz */
@@ -1025,7 +1041,7 @@ static MACHINE_CONFIG_START( sound_ym_oki )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( sound_suplup )
+MACHINE_CONFIG_START(vamphalf_state::sound_suplup)
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MCFG_YM2151_ADD("ymsnd", XTAL_14_31818MHz/4) /* 3.579545 MHz */
@@ -1037,7 +1053,7 @@ static MACHINE_CONFIG_START( sound_suplup )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( sound_qs1000 )
+MACHINE_CONFIG_START(vamphalf_state::sound_qs1000)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
@@ -1049,14 +1065,14 @@ static MACHINE_CONFIG_START( sound_qs1000 )
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( vamphalf, common )
+MACHINE_CONFIG_DERIVED(vamphalf_state::vamphalf, common)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(vamphalf_io)
 
 	MCFG_FRAGMENT_ADD(sound_ym_oki)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( misncrft, common )
+MACHINE_CONFIG_DERIVED(vamphalf_state::misncrft, common)
 	MCFG_CPU_REPLACE("maincpu", GMS30C2116, XTAL_50MHz)   /* 50 MHz */
 	MCFG_CPU_PROGRAM_MAP(common_map)
 	MCFG_CPU_IO_MAP(misncrft_io)
@@ -1065,28 +1081,28 @@ static MACHINE_CONFIG_DERIVED( misncrft, common )
 	MCFG_FRAGMENT_ADD(sound_qs1000)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( coolmini, common )
+MACHINE_CONFIG_DERIVED(vamphalf_state::coolmini, common)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(coolmini_io)
 
 	MCFG_FRAGMENT_ADD(sound_ym_oki)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( suplup, common )
+MACHINE_CONFIG_DERIVED(vamphalf_state::suplup, common)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(suplup_io)
 
 	MCFG_FRAGMENT_ADD(sound_suplup)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( jmpbreak, common )
+MACHINE_CONFIG_DERIVED(vamphalf_state::jmpbreak, common)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(jmpbreak_io)
 
 	MCFG_FRAGMENT_ADD(sound_ym_oki)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( mrdig, common )
+MACHINE_CONFIG_DERIVED(vamphalf_state::mrdig, common)
 	MCFG_CPU_REPLACE("maincpu", GMS30C2116, XTAL_50MHz)   /* 50 MHz */
 	MCFG_CPU_PROGRAM_MAP(common_map)
 	MCFG_CPU_MODIFY("maincpu")
@@ -1096,7 +1112,7 @@ static MACHINE_CONFIG_DERIVED( mrdig, common )
 	MCFG_FRAGMENT_ADD(sound_ym_oki)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( wyvernwg, common )
+MACHINE_CONFIG_DERIVED(vamphalf_state::wyvernwg, common)
 	MCFG_CPU_REPLACE("maincpu", E132T, XTAL_50MHz)    /* 50 MHz */
 	MCFG_CPU_PROGRAM_MAP(common_32bit_map)
 	MCFG_CPU_IO_MAP(wyvernwg_io)
@@ -1105,7 +1121,7 @@ static MACHINE_CONFIG_DERIVED( wyvernwg, common )
 	MCFG_FRAGMENT_ADD(sound_qs1000)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( finalgdr, common )
+MACHINE_CONFIG_DERIVED(vamphalf_state::finalgdr, common)
 	MCFG_CPU_REPLACE("maincpu", E132T, XTAL_50MHz)    /* 50 MHz */
 	MCFG_CPU_PROGRAM_MAP(common_32bit_map)
 	MCFG_CPU_IO_MAP(finalgdr_io)
@@ -1116,7 +1132,7 @@ static MACHINE_CONFIG_DERIVED( finalgdr, common )
 	MCFG_FRAGMENT_ADD(sound_ym_oki)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( mrkickera, common )
+MACHINE_CONFIG_DERIVED(vamphalf_state::mrkickera, common)
 	MCFG_CPU_REPLACE("maincpu", E132T, XTAL_50MHz)    /* 50 MHz */
 	MCFG_CPU_PROGRAM_MAP(common_32bit_map)
 	MCFG_CPU_IO_MAP(mrkickera_io)
@@ -1129,7 +1145,7 @@ MACHINE_CONFIG_END
 
 
 
-static MACHINE_CONFIG_START( aoh )
+MACHINE_CONFIG_START(vamphalf_state::aoh)
 	MCFG_CPU_ADD("maincpu", E132XN, XTAL_20MHz*4) /* 4x internal multiplier */
 	MCFG_CPU_PROGRAM_MAP(aoh_map)
 	MCFG_CPU_IO_MAP(aoh_io)
@@ -1166,14 +1182,14 @@ static MACHINE_CONFIG_START( aoh )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( boonggab, common )
+MACHINE_CONFIG_DERIVED(vamphalf_state::boonggab, common)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(boonggab_io)
 
 	MCFG_FRAGMENT_ADD(sound_ym_oki)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( yorijori, common )
+MACHINE_CONFIG_DERIVED(vamphalf_state::yorijori, common)
 	MCFG_CPU_REPLACE("maincpu", E132T, XTAL_50MHz)    /* 50 MHz */
 	MCFG_CPU_PROGRAM_MAP(yorijori_32bit_map)
 	MCFG_CPU_IO_MAP(yorijori_io)

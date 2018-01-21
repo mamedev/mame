@@ -226,6 +226,7 @@ public:
 	DECLARE_DRIVER_INIT(mr);
 	DECLARE_WRITE_LINE_MEMBER(esq5506_otto_irq);
 	DECLARE_READ16_MEMBER(esq5506_read_adc);
+	void mr(machine_config &config);
 };
 
 void esqmr_state::machine_reset()
@@ -248,7 +249,7 @@ READ16_MEMBER(esqmr_state::esq5506_read_adc)
 	return 0;
 }
 
-static MACHINE_CONFIG_START( mr )
+MACHINE_CONFIG_START(esqmr_state::mr)
 	MCFG_CPU_ADD("maincpu", M68340, XTAL_16MHz)
 	MCFG_CPU_PROGRAM_MAP(mr_map)
 

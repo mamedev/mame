@@ -48,6 +48,7 @@ public:
 	uint8_t m_count_key;
 	virtual void machine_reset() override;
 
+	void bob85(machine_config &config);
 protected:
 	required_ioport m_line0;
 	required_ioport m_line1;
@@ -198,7 +199,7 @@ READ_LINE_MEMBER( bob85_state::sid_r )
 	return m_cass->input() > 0.0;
 }
 
-static MACHINE_CONFIG_START( bob85 )
+MACHINE_CONFIG_START(bob85_state::bob85)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8085A, XTAL_5MHz)
 	MCFG_CPU_PROGRAM_MAP(bob85_mem)

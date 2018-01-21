@@ -37,7 +37,7 @@ DEFINE_DEVICE_TYPE(NUBUS_RADIUSTPD, nubus_radiustpd_device, "nb_rtpd", "Radius T
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( nubus_radiustpd_device::device_add_mconfig )
+MACHINE_CONFIG_START(nubus_radiustpd_device::device_add_mconfig)
 	MCFG_SCREEN_ADD( RADIUSTPD_SCREEN_NAME, RASTER)
 	MCFG_SCREEN_UPDATE_DEVICE(DEVICE_SELF, nubus_radiustpd_device, screen_update)
 	MCFG_SCREEN_SIZE(1280, 960)

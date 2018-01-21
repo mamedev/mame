@@ -295,7 +295,7 @@ adsp21xx_device::~adsp21xx_device()
 				maxindex = i;
 		if (m_pcbucket[maxindex] == 0)
 			break;
-		fprintf(log, "PC=%04X  (%10d hits)\n", maxindex, pcbucket[maxindex]);
+		fprintf(log, "PC=%04X  (%10d hits)\n", maxindex, m_pcbucket[maxindex]);
 		m_pcbucket[maxindex] = 0;
 	}
 	fclose(log);

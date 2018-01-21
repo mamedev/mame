@@ -144,6 +144,8 @@ public:
 	void skydest_draw_tilemap(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void skydest_draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void skydest_i8741_reset();
+	void cyclemb(machine_config &config);
+	void skydest(machine_config &config);
 };
 
 
@@ -952,7 +954,7 @@ static GFXDECODE_START( cyclemb )
 	GFXDECODE_ENTRY( "sprite_data", 0, spritelayout_32x32,    0x00, 0x40 )
 GFXDECODE_END
 
-static MACHINE_CONFIG_START( cyclemb )
+MACHINE_CONFIG_START(cyclemb_state::cyclemb)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_18MHz/3) // Z8400BPS
 	MCFG_CPU_PROGRAM_MAP(cyclemb_map)
@@ -990,7 +992,7 @@ static MACHINE_CONFIG_START( cyclemb )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( skydest, cyclemb )
+MACHINE_CONFIG_DERIVED(cyclemb_state::skydest, cyclemb)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(skydest_io)
 

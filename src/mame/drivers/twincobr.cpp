@@ -397,7 +397,7 @@ static ADDRESS_MAP_START( main_program_map, AS_PROGRAM, 16, twincobr_state )
 	AM_RANGE(0x000000, 0x02ffff) AM_ROM
 	AM_RANGE(0x030000, 0x033fff) AM_RAM     /* 68K and DSP shared RAM */
 	AM_RANGE(0x040000, 0x040fff) AM_RAM AM_SHARE("spriteram16")
-	AM_RANGE(0x050000, 0x050dff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x050000, 0x050dff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x060000, 0x060001) AM_DEVWRITE8("crtc", mc6845_device, address_w, 0x00ff)
 	AM_RANGE(0x060002, 0x060003) AM_DEVWRITE8("crtc", mc6845_device, register_w, 0x00ff)
 	AM_RANGE(0x070000, 0x070003) AM_WRITE(twincobr_txscroll_w)  /* text layer scroll */
@@ -655,7 +655,7 @@ static GFXDECODE_START( twincobr )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( twincobr )
+MACHINE_CONFIG_START(twincobr_state::twincobr)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_28MHz/4)       /* 7MHz - Main board Crystal is 28MHz */
@@ -721,7 +721,7 @@ static MACHINE_CONFIG_START( twincobr )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( fshark, twincobr )
+MACHINE_CONFIG_DERIVED(twincobr_state::fshark, twincobr)
 	MCFG_DEVICE_MODIFY("mainlatch")
 	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(NOOP)
 
@@ -733,7 +733,7 @@ static MACHINE_CONFIG_DERIVED( fshark, twincobr )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( fsharkbt, fshark )
+MACHINE_CONFIG_DERIVED(twincobr_state::fsharkbt, fshark)
 
 	MCFG_CPU_ADD("mcu", I8741, XTAL_28MHz/16)
 	/* Program Map is internal to the CPU */

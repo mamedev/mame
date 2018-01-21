@@ -89,6 +89,8 @@ public:
 	MC6845_UPDATE_ROW(crtc_update_row);
 	uint32_t screen_update_apricot(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
+	void apricot(machine_config &config);
+	void apricotxi(machine_config &config);
 protected:
 	virtual void machine_start() override;
 
@@ -348,7 +350,7 @@ ADDRESS_MAP_END
 //  MACHINE DRIVERS
 //**************************************************************************
 
-static MACHINE_CONFIG_START( apricot )
+MACHINE_CONFIG_START(apricot_state::apricot)
 	// main cpu
 	MCFG_CPU_ADD("ic91", I8086, XTAL_15MHz / 3)
 	MCFG_CPU_PROGRAM_MAP(apricot_mem)
@@ -467,7 +469,7 @@ static MACHINE_CONFIG_START( apricot )
 	MCFG_EXPANSION_SLOT_ADD("exp:2", apricot_expansion_cards, nullptr)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( apricotxi, apricot )
+MACHINE_CONFIG_DERIVED(apricot_state::apricotxi, apricot)
 MACHINE_CONFIG_END
 
 

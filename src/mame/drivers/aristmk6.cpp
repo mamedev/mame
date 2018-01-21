@@ -68,6 +68,7 @@ public:
 	required_device<eeprom_serial_93cxx_device> m_eeprom0;
 	required_device<palette_device> m_palette;
 	required_shared_ptr<uint64_t> m_vram;
+	void aristmk6(machine_config &config);
 };
 
 
@@ -318,7 +319,7 @@ INPUT_PORTS_END
 #define ARISTMK6_CPU_CLOCK XTAL_200MHz
 // ?
 
-static MACHINE_CONFIG_START( aristmk6 )
+MACHINE_CONFIG_START(aristmk6_state::aristmk6)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", SH4LE, ARISTMK6_CPU_CLOCK)
 	MCFG_SH4_MD0(1)

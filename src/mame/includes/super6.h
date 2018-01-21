@@ -61,6 +61,7 @@ public:
 	DECLARE_READ8_MEMBER(io_read_byte);
 	DECLARE_WRITE8_MEMBER(io_write_byte);
 
+	void super6(machine_config &config);
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;

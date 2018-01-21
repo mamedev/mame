@@ -75,6 +75,7 @@ public:
 	{
 	}
 
+	void sun1(machine_config &config);
 protected:
 	virtual void machine_reset() override;
 
@@ -110,7 +111,7 @@ void sun1_state::machine_reset()
 }
 
 
-static MACHINE_CONFIG_START( sun1 )
+MACHINE_CONFIG_START(sun1_state::sun1)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz / 2)
 	MCFG_CPU_PROGRAM_MAP(sun1_mem)

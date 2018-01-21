@@ -9,6 +9,7 @@
 #include "emu.h"
 #include "vga.h"
 #include "video/pc_vga.h"
+#include "screen.h"
 
 ROM_START( ibm_vga )
 	ROM_REGION(0x8000,"ibm_vga", 0)
@@ -26,8 +27,13 @@ DEFINE_DEVICE_TYPE(ISA8_VGA, isa8_vga_device, "ibm_vga", "IBM VGA Graphics Card"
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( isa8_vga_device::device_add_mconfig)
-	MCFG_FRAGMENT_ADD( pcvideo_vga );
+MACHINE_CONFIG_START(isa8_vga_device::device_add_mconfig)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_RAW_PARAMS(XTAL_25_1748MHz,900,0,640,526,0,480)
+	MCFG_SCREEN_UPDATE_DEVICE("vga", vga_device, screen_update)
+
+	MCFG_PALETTE_ADD("palette", 0x100)
+	MCFG_DEVICE_ADD("vga", VGA, 0)
 MACHINE_CONFIG_END
 
 //-------------------------------------------------

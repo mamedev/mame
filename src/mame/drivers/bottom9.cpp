@@ -90,7 +90,7 @@ WRITE8_MEMBER(bottom9_state::bottom9_bankedram2_w)
 	if (m_k052109_selected)
 		k052109_051960_w(space, offset + 0x2000, data);
 	else
-		m_palette->write(space, offset, data);
+		m_palette->write8(space, offset, data);
 }
 
 WRITE8_MEMBER(bottom9_state::bankswitch_w)
@@ -298,7 +298,7 @@ void bottom9_state::machine_reset()
 	m_nmienable = 0;
 }
 
-static MACHINE_CONFIG_START( bottom9 )
+MACHINE_CONFIG_START(bottom9_state::bottom9)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", HD6309E, XTAL_24MHz / 8) // 63C09E

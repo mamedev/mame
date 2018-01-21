@@ -1068,7 +1068,7 @@ void taitojc_state::machine_start()
 }
 
 
-static MACHINE_CONFIG_START( taitojc )
+MACHINE_CONFIG_START(taitojc_state::taitojc)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68040, XTAL_10MHz*2) // 20MHz, clock source = CY7C991
@@ -1112,7 +1112,7 @@ static MACHINE_CONFIG_START( taitojc )
 	MCFG_DEVICE_ADD("taito_en", TAITO_EN, 0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( dendego, taitojc )
+MACHINE_CONFIG_DERIVED(taitojc_state::dendego, taitojc)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")

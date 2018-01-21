@@ -623,7 +623,7 @@ ADDRESS_MAP_END
 //  machine_add_config - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( atari_cage_device::device_add_mconfig )
+MACHINE_CONFIG_START(atari_cage_device::device_add_mconfig)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("cage", TMS32031, 33868800)
@@ -679,7 +679,7 @@ atari_cage_seattle_device::atari_cage_seattle_device(const machine_config &mconf
 //-------------------------------------------------
 
 
-MACHINE_CONFIG_MEMBER( atari_cage_seattle_device::device_add_mconfig )
+MACHINE_CONFIG_START(atari_cage_seattle_device::device_add_mconfig)
 
 	atari_cage_device::device_add_mconfig(config);
 

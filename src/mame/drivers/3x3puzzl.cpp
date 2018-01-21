@@ -96,6 +96,7 @@ public:
 	DECLARE_WRITE16_MEMBER(tilemap1_scrollx_w);
 	DECLARE_WRITE16_MEMBER(tilemap1_scrolly_w);
 
+	void _3x3puzzle(machine_config &config);
 protected:
 	virtual void video_start() override;
 	virtual void machine_start() override;
@@ -214,7 +215,7 @@ static ADDRESS_MAP_START( _3x3puzzle_map, AS_PROGRAM, 16, _3x3puzzle_state )
 	AM_RANGE(0x201000, 0x201fff) AM_RAM AM_SHARE("videoram2")
 	AM_RANGE(0x202000, 0x202fff) AM_RAM AM_SHARE("videoram3")
 	AM_RANGE(0x280000, 0x280001) AM_READ_PORT("VBLANK")
-	AM_RANGE(0x300000, 0x3005ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x300000, 0x3005ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x400000, 0x400001) AM_WRITE(tilemap1_scrollx_w)
 	AM_RANGE(0x480000, 0x480001) AM_WRITE(tilemap1_scrolly_w)
 	AM_RANGE(0x500000, 0x500001) AM_READ_PORT("P1")
@@ -382,7 +383,7 @@ void _3x3puzzle_state::machine_reset()
 }
 
 
-static MACHINE_CONFIG_START( _3x3puzzle )
+MACHINE_CONFIG_START(_3x3puzzle_state::_3x3puzzle)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",M68000,MAIN_CLOCK)

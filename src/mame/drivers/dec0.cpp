@@ -455,8 +455,8 @@ static ADDRESS_MAP_START( dec0_map, AS_PROGRAM, 16, dec0_state )
 	AM_RANGE(0x30c010, 0x30c01f) AM_WRITE(dec0_control_w)                                   /* Priority, sound, etc. */
 	AM_RANGE(0x30c012, 0x30c013) AM_READNOP // clr.w for sprite DMA
 	AM_RANGE(0x30c018, 0x30c019) AM_READNOP // clr.w for irq ack
-	AM_RANGE(0x310000, 0x3107ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
-	AM_RANGE(0x314000, 0x3147ff) AM_RAM_DEVWRITE("palette", palette_device, write_ext) AM_SHARE("palette_ext")
+	AM_RANGE(0x310000, 0x3107ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
+	AM_RANGE(0x314000, 0x3147ff) AM_RAM_DEVWRITE("palette", palette_device, write16_ext) AM_SHARE("palette_ext")
 	AM_RANGE(0xff8000, 0xffbfff) AM_RAM AM_SHARE("ram")                                 /* Main ram */
 	AM_RANGE(0xffc000, 0xffc7ff) AM_RAM AM_SHARE("spriteram")                               /* Sprites */
 ADDRESS_MAP_END
@@ -610,7 +610,7 @@ static ADDRESS_MAP_START( slyspy_map, AS_PROGRAM, 16, dec0_state )
 
 	AM_RANGE(0x304000, 0x307fff) AM_RAM AM_SHARE("ram") /* Sly spy main ram */
 	AM_RANGE(0x308000, 0x3087ff) AM_RAM AM_SHARE("spriteram")   /* Sprites */
-	AM_RANGE(0x310000, 0x3107ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x310000, 0x3107ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x314000, 0x314001) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x00ff)
 	AM_RANGE(0x314002, 0x314003) AM_WRITE(dec0_priority_w)
 	AM_RANGE(0x314008, 0x31400f) AM_READ(slyspy_controls_r)
@@ -622,7 +622,7 @@ static ADDRESS_MAP_START( midres_map, AS_PROGRAM, 16, dec0_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x100000, 0x103fff) AM_RAM AM_SHARE("ram")
 	AM_RANGE(0x120000, 0x1207ff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x140000, 0x1407ff) AM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x140000, 0x1407ff) AM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x160000, 0x160001) AM_WRITE(dec0_priority_w)
 	AM_RANGE(0x180000, 0x18000f) AM_READ(midres_controls_r)
 	AM_RANGE(0x180008, 0x18000f) AM_WRITENOP /* ?? watchdog ?? */
@@ -763,7 +763,7 @@ READ16_MEMBER( dec0_automat_state::automat_palette_r )
 WRITE16_MEMBER( dec0_automat_state::automat_palette_w )
 {
 	offset ^=0xf;
-	m_palette->write(space, offset, data, mem_mask);
+	m_palette->write16(space, offset, data, mem_mask);
 }
 
 
@@ -1599,7 +1599,7 @@ GFXDECODE_END
 
 
 
-static MACHINE_CONFIG_START( dec0_base )
+MACHINE_CONFIG_START(dec0_state::dec0_base)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1632,7 +1632,7 @@ static MACHINE_CONFIG_START( dec0_base )
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( dec0, dec0_base )
+MACHINE_CONFIG_DERIVED(dec0_state::dec0, dec0_base)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_20MHz / 2)
@@ -1666,7 +1666,7 @@ static MACHINE_CONFIG_DERIVED( dec0, dec0_base )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( dec1, dec0_base )
+MACHINE_CONFIG_DERIVED(dec0_state::dec1, dec0_base)
 	/* basic machine hardware */
 	/* maincpu and audiocpu clocks and address maps differ per game */
 
@@ -1722,7 +1722,7 @@ WRITE_LINE_MEMBER(dec0_automat_state::msm2_vclk_cb)
 }
 
 
-static MACHINE_CONFIG_START( automat )
+MACHINE_CONFIG_START(dec0_automat_state::automat)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 10000000)
@@ -1797,7 +1797,7 @@ static MACHINE_CONFIG_START( automat )
 MACHINE_CONFIG_END
 
 // this seems very similar to the automat bootleg
-static MACHINE_CONFIG_START( secretab )
+MACHINE_CONFIG_START(dec0_automat_state::secretab)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_20MHz/2) /* verified on pcb (20MHZ OSC) 68000P12 running at 10Mhz */
@@ -1869,7 +1869,7 @@ static MACHINE_CONFIG_START( secretab )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( hbarrel, dec0 )
+MACHINE_CONFIG_DERIVED(dec0_state::hbarrel, dec0)
 
 	MCFG_CPU_ADD("mcu", I8751, XTAL_8MHz)
 	MCFG_CPU_IO_MAP(mcu_io_map)
@@ -1879,7 +1879,7 @@ static MACHINE_CONFIG_DERIVED( hbarrel, dec0 )
 	MCFG_SCREEN_UPDATE_DRIVER(dec0_state, screen_update_hbarrel)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( baddudes, dec0 )
+MACHINE_CONFIG_DERIVED(dec0_state::baddudes, dec0)
 
 	MCFG_CPU_ADD("mcu", I8751, XTAL_8MHz)
 	MCFG_CPU_IO_MAP(mcu_io_map)
@@ -1889,21 +1889,21 @@ static MACHINE_CONFIG_DERIVED( baddudes, dec0 )
 	MCFG_SCREEN_UPDATE_DRIVER(dec0_state, screen_update_baddudes)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( drgninjab, dec0 )
+MACHINE_CONFIG_DERIVED(dec0_state::drgninjab, dec0)
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(dec0_state, screen_update_baddudes)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( birdtry, dec0 )
+MACHINE_CONFIG_DERIVED(dec0_state::birdtry, dec0)
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(dec0_state, screen_update_birdtry)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( robocop, dec0 )
+MACHINE_CONFIG_DERIVED(dec0_state::robocop, dec0)
 
 	MCFG_CPU_ADD("sub", H6280, XTAL_21_4772MHz / 16)
 	MCFG_CPU_PROGRAM_MAP(robocop_sub_map)
@@ -1915,14 +1915,14 @@ static MACHINE_CONFIG_DERIVED( robocop, dec0 )
 	MCFG_SCREEN_UPDATE_DRIVER(dec0_state, screen_update_robocop)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( robocopb, dec0 )
+MACHINE_CONFIG_DERIVED(dec0_state::robocopb, dec0)
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(dec0_state, screen_update_robocop)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( hippodrm, dec0 )
+MACHINE_CONFIG_DERIVED(dec0_state::hippodrm, dec0)
 
 	MCFG_CPU_ADD("sub", H6280, XTAL_21_4772MHz / 16)
 	MCFG_CPU_PROGRAM_MAP(hippodrm_sub_map)
@@ -1934,7 +1934,7 @@ static MACHINE_CONFIG_DERIVED( hippodrm, dec0 )
 	MCFG_SCREEN_UPDATE_DRIVER(dec0_state, screen_update_hippodrm)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( ffantasybl, dec0 )
+MACHINE_CONFIG_DERIVED(dec0_state::ffantasybl, dec0)
 
 //  MCFG_CPU_ADD("sub", H6280, XTAL_21_4772MHz / 16)
 //  MCFG_CPU_PROGRAM_MAP(hippodrm_sub_map)
@@ -1955,7 +1955,7 @@ MACHINE_RESET_MEMBER(dec0_state,slyspy)
 	m_sndprotect->set_bank(m_slyspy_sound_state);
 }
 
-static MACHINE_CONFIG_DERIVED( slyspy, dec1 )
+MACHINE_CONFIG_DERIVED(dec0_state::slyspy, dec1)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_20MHz/2) /* verified on pcb (20MHZ OSC) 68000P12 running at 10Mhz */
@@ -1988,7 +1988,7 @@ static MACHINE_CONFIG_DERIVED( slyspy, dec1 )
 	MCFG_MACHINE_RESET_OVERRIDE(dec0_state,slyspy)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( midres, dec1 )
+MACHINE_CONFIG_DERIVED(dec0_state::midres, dec1)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_20MHz/2) /* verified on pcb (20MHZ OSC) 68000P12 running at 10Mhz */
@@ -2005,7 +2005,7 @@ static MACHINE_CONFIG_DERIVED( midres, dec1 )
 	MCFG_GFXDECODE_MODIFY("gfxdecode", midres)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( midresb, midres )
+MACHINE_CONFIG_DERIVED(dec0_state::midresb, midres)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(midresb_map)
 
@@ -2031,7 +2031,7 @@ static MACHINE_CONFIG_DERIVED( midresb, midres )
 
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( midresbj, midresb )
+MACHINE_CONFIG_DERIVED(dec0_state::midresbj, midresb)
 	MCFG_DEVICE_REMOVE("mcu")
 MACHINE_CONFIG_END
 

@@ -55,6 +55,7 @@ public:
 		, m_maincpu(*this, "maincpu")
 	{ }
 
+	void bingowav(machine_config &config);
 protected:
 	virtual void machine_start() override;
 
@@ -103,7 +104,7 @@ static INPUT_PORTS_START( bingowav )
 INPUT_PORTS_END
 
 
-static MACHINE_CONFIG_START( bingowav )
+MACHINE_CONFIG_START(bingowav_state::bingowav)
 	MCFG_CPU_ADD("maincpu", M68000, 12000000) // actually TMP63803F-16
 	MCFG_CPU_PROGRAM_MAP(bingowav_main_map)
 

@@ -91,6 +91,7 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(audio_nmi);
 	DECLARE_MACHINE_RESET(s8);
 	DECLARE_DRIVER_INIT(s8);
+	void s8(machine_config &config);
 private:
 	uint8_t m_sound_data;
 	uint8_t m_strobe;
@@ -304,7 +305,7 @@ DRIVER_INIT_MEMBER( s8_state, s8 )
 	m_irq_timer->adjust(attotime::from_ticks(980,1e6),1);
 }
 
-static MACHINE_CONFIG_START( s8 )
+MACHINE_CONFIG_START(s8_state::s8)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6802, XTAL_4MHz)
 	MCFG_CPU_PROGRAM_MAP(s8_main_map)

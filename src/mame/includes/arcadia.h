@@ -103,6 +103,7 @@ public:
 	uint32_t screen_update_arcadia(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(video_line);
 
+	void arcadia(machine_config &config);
 protected:
 	required_device<arcadia_sound_device> m_custom;
 	required_ioport m_panel;

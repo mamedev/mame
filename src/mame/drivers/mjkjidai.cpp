@@ -294,7 +294,7 @@ void mjkjidai_state::machine_reset()
 	m_adpcm_pos = m_adpcm_end = 0;
 }
 
-static MACHINE_CONFIG_START( mjkjidai )
+MACHINE_CONFIG_START(mjkjidai_state::mjkjidai)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80,10000000/2) /* 5 MHz ??? */

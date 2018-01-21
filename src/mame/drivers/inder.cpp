@@ -82,6 +82,10 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(qc9b_w);
 	DECLARE_DRIVER_INIT(inder);
 	DECLARE_DRIVER_INIT(inder1);
+	void inder(machine_config &config);
+	void brvteam(machine_config &config);
+	void canasta(machine_config &config);
+	void lapbylap(machine_config &config);
 private:
 	void update_mus();
 	bool m_pc0;
@@ -1335,7 +1339,7 @@ DRIVER_INIT_MEMBER( inder_state, inder1 )
 	m_game = 1;
 }
 
-static MACHINE_CONFIG_START( brvteam )
+MACHINE_CONFIG_START(inder_state::brvteam)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_5MHz / 2)
 	MCFG_CPU_PROGRAM_MAP(brvteam_map)
@@ -1353,7 +1357,7 @@ static MACHINE_CONFIG_START( brvteam )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "snvol", 2.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( canasta )
+MACHINE_CONFIG_START(inder_state::canasta)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_5MHz / 2)
 	MCFG_CPU_PROGRAM_MAP(canasta_map)
@@ -1371,7 +1375,7 @@ static MACHINE_CONFIG_START( canasta )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "ayvol", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( lapbylap )
+MACHINE_CONFIG_START(inder_state::lapbylap)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_5MHz / 2)
 	MCFG_CPU_PROGRAM_MAP(lapbylap_map)
@@ -1395,7 +1399,7 @@ static MACHINE_CONFIG_START( lapbylap )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "ayvol", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( inder )
+MACHINE_CONFIG_START(inder_state::inder)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_5MHz / 2)
 	MCFG_CPU_PROGRAM_MAP(inder_map)

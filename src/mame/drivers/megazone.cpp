@@ -289,7 +289,7 @@ INTERRUPT_GEN_MEMBER(megazone_state::vblank_irq)
 }
 
 
-static MACHINE_CONFIG_START( megazone )
+MACHINE_CONFIG_START(megazone_state::megazone)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", KONAMI1, XTAL_18_432MHz/9)        /* 2.048 MHz */

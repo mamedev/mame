@@ -26,6 +26,7 @@ public:
 		, m_maincpu(*this, "maincpu")
 	{ }
 
+	void codata(machine_config &config);
 private:
 	virtual void machine_reset() override;
 	required_shared_ptr<uint16_t> m_p_base;
@@ -59,7 +60,7 @@ void codata_state::machine_reset()
 	m_maincpu->reset();
 }
 
-static MACHINE_CONFIG_START( codata )
+MACHINE_CONFIG_START(codata_state::codata)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",M68000, XTAL_16MHz / 2)
 	MCFG_CPU_PROGRAM_MAP(mem_map)

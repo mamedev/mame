@@ -183,6 +183,18 @@ public:
 	K052109_CB_MEMBER(blswhstl_tile_callback);
 	SAMPLES_START_CB_MEMBER(tmnt_decode_sample);
 
+	void cuebrick(machine_config &config);
+	void blswhstl(machine_config &config);
+	void ssriders(machine_config &config);
+	void tmnt2(machine_config &config);
+	void lgtnfght(machine_config &config);
+	void thndrx2(machine_config &config);
+	void prmrsocr(machine_config &config);
+	void sunsetbl(machine_config &config);
+	void glfgreat(machine_config &config);
+	void tmnt(machine_config &config);
+	void mia(machine_config &config);
+	void punkshot(machine_config &config);
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };

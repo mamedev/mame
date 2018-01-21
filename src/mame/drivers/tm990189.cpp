@@ -160,6 +160,8 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(display_callback);
 	TIMER_CALLBACK_MEMBER(clear_load);
 	void hold_load();
+	void tm990_189_v(machine_config &config);
+	void tm990_189(machine_config &config);
 private:
 	void draw_digit(void);
 	void led_set(int number, bool state);
@@ -804,7 +806,7 @@ static ADDRESS_MAP_START( tm990_189_cru_map, AS_IO, 8, tm990189_state )
 	AM_RANGE(0x0400, 0x05ff) AM_DEVWRITE("tms9902", tms9902_device, cruwrite)   /* optional tms9902 */
 ADDRESS_MAP_END
 
-static MACHINE_CONFIG_START( tm990_189 )
+MACHINE_CONFIG_START(tm990189_state::tm990_189)
 	/* basic machine hardware */
 	MCFG_TMS99xx_ADD("maincpu", TMS9980A, 2000000, tm990_189_memmap, tm990_189_cru_map)
 	MCFG_TMS99xx_EXTOP_HANDLER( WRITE8(tm990189_state, external_operation) )
@@ -861,7 +863,7 @@ static MACHINE_CONFIG_START( tm990_189 )
 	MCFG_TIMER_START_DELAY(attotime::from_msec(150))
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( tm990_189_v )
+MACHINE_CONFIG_START(tm990189_state::tm990_189_v)
 	/* basic machine hardware */
 	MCFG_TMS99xx_ADD("maincpu", TMS9980A, 2000000, tm990_189_v_memmap, tm990_189_cru_map)
 	MCFG_TMS99xx_EXTOP_HANDLER( WRITE8(tm990189_state, external_operation) )

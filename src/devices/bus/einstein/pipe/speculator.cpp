@@ -25,7 +25,7 @@ DEFINE_DEVICE_TYPE(EINSTEIN_SPECULATOR, einstein_speculator_device, "einstein_sp
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( einstein_speculator_device::device_add_mconfig )
+MACHINE_CONFIG_START(einstein_speculator_device::device_add_mconfig)
 	MCFG_DEVICE_ADD("ic5a", TTL74123, 0)
 	MCFG_TTL74123_CONNECTION_TYPE(TTL74123_NOT_GROUNDED_NO_DIODE)
 	MCFG_TTL74123_RESISTOR_VALUE(RES_K(47))

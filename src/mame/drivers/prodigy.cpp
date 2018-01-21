@@ -164,6 +164,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(via_cb2_w);
 	DECLARE_WRITE_LINE_MEMBER(irq_handler);
 
+	void prodigy(machine_config &config);
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<ttl74145_device> m_74145;
@@ -629,7 +630,7 @@ static INPUT_PORTS_START( prodigy )
 	PORT_BIT(0xc00, 0x00, IPT_UNUSED )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( prodigy )
+MACHINE_CONFIG_START(prodigy_state::prodigy)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, XTAL_2MHz)
 	MCFG_CPU_PROGRAM_MAP(maincpu_map)

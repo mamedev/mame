@@ -117,6 +117,9 @@ public:
 	DECLARE_READ8_MEMBER(spr_r);
 	DECLARE_READ8_MEMBER(chr_r);
 
+	void nes_vt(machine_config &config);
+	void nes_vt_xx(machine_config &config);
+	void nes_vt_hh(machine_config &config);
 private:
 
 	/* expansion nametable - todo, see if we can refactor NES code to be reusable without having to add full NES bus etc. */
@@ -985,7 +988,7 @@ static GFXDECODE_START( vt03_helper )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( nes_vt  )
+MACHINE_CONFIG_START(nes_vt_state::nes_vt)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, NTSC_APU_CLOCK) // selectable speed?
 	MCFG_CPU_PROGRAM_MAP(nes_vt_map)
@@ -1035,7 +1038,7 @@ static MACHINE_CONFIG_START( nes_vt  )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( nes_vt_xx, nes_vt )
+MACHINE_CONFIG_DERIVED(nes_vt_state::nes_vt_xx, nes_vt)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(nes_vt_xx_map)
 MACHINE_CONFIG_END
@@ -1072,7 +1075,7 @@ static MACHINE_CONFIG_DERIVED( nes_vt_vg, nes_vt_dg )
 MACHINE_CONFIG_END
 
 // New mystery handheld architecture, VTxx derived
-static MACHINE_CONFIG_DERIVED( nes_vt_hh, nes_vt_xx )
+MACHINE_CONFIG_DERIVED(nes_vt_state::nes_vt_hh, nes_vt_xx)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(nes_vt_hh_map)
 	MCFG_PPU_VT03_MODIFY("ppu")
@@ -1302,7 +1305,8 @@ CONS( 200?, vdogdemo,  0,  0,  nes_vt,    nes_vt, nes_vt_state,  0, "VRT", "V-Do
 CONS( 200?, mc_dgear,  0,  0,  nes_vt,    nes_vt, nes_vt_state,  0, "dreamGEAR", "dreamGEAR 75-in-1", MACHINE_IMPERFECT_GRAPHICS )
 // all software in this runs in the VT03 enhanced mode, it also includes an actual licensed VT03 port of Frogger.
 // all games work OK except Frogger which has serious graphical issues
-CONS( 200?, vgtablet,   0, 0,  nes_vt_vg,    nes_vt, nes_vt_state,  0, "<unknown> / Konami", "VG Pocket Tablet", MACHINE_NOT_WORKING )
+CONS( 2006, vgtablet,   0, 0,  nes_vt_vg,    nes_vt, nes_vt_state,  0, "<unknown> / Konami", "VG Pocket Tablet", MACHINE_NOT_WORKING )
+// There is a 2004 Majesco Frogger "TV game" that appears to contain the same version of Frogger as above but with no other games, so probably fits here.
 
 // this is VT09 based
 // it boots, most games correct, but palette issues in some games still (usually they appear greyscale)

@@ -33,7 +33,7 @@ DEFINE_DEVICE_TYPE(A2BUS_ECHOII, a2bus_echoii_device, "a2echoii", "Street Electr
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( a2bus_echoii_device::device_add_mconfig )
+MACHINE_CONFIG_START(a2bus_echoii_device::device_add_mconfig)
 	MCFG_SPEAKER_STANDARD_MONO("echoii")
 	MCFG_SOUND_ADD(TMS_TAG, TMS5220, 640000) // Note the Echo II card has a "FREQ" potentiometer which can be used to adjust the tms5220's clock frequency; 640khz is the '8khz' value according to the tms5220 datasheet
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "echoii", 1.0)

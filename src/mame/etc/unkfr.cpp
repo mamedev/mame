@@ -25,6 +25,8 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu") { }
 	required_device<cpu_device> m_maincpu;
+
+	void unkfr(machine_config &config);
 };
 
 
@@ -58,7 +60,7 @@ static INPUT_PORTS_START( unkfr )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( unkfr, unkfr_state )
+MACHINE_CONFIG_START( unkfr_state::unkfr )
 MACHINE_CONFIG_END
 
 ROM_START( unkfr )

@@ -40,6 +40,7 @@ public:
 		m_maincpu(*this, "maincpu")
 	{ }
 
+	void trocana(machine_config &config);
 private:
 	required_device<cpu_device> m_maincpu;
 };
@@ -52,7 +53,7 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START( trocana )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( trocana )
+MACHINE_CONFIG_START(nmkmedal_state::trocana)
 	MCFG_CPU_ADD("maincpu", TMP90841, 16500000 / 2) // actually TMP90C041AN
 	MCFG_CPU_PROGRAM_MAP(mem_map)
 

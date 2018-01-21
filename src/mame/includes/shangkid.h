@@ -70,4 +70,7 @@ public:
 	void shangkid_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void dynamski_draw_background(bitmap_ind16 &bitmap, const rectangle &cliprect, int pri );
 	void dynamski_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect );
+	void dynamski(machine_config &config);
+	void chinhero(machine_config &config);
+	void shangkid(machine_config &config);
 };

@@ -21,6 +21,7 @@ public:
 //      , m_maincpu(*this, "maincpu")
 	{ }
 
+void alto1(machine_config &config);
 private:
 //  required_device<cpu_device> m_maincpu;
 };
@@ -29,7 +30,7 @@ private:
 static INPUT_PORTS_START( alto1 )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( alto1 )
+MACHINE_CONFIG_START(alto1_state::alto1)
 MACHINE_CONFIG_END
 
 ROM_START( alto1 )

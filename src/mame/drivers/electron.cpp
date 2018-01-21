@@ -90,12 +90,12 @@ PALETTE_INIT_MEMBER(electron_state, electron)
 
 static ADDRESS_MAP_START(electron_mem, AS_PROGRAM, 8, electron_state )
 	AM_RANGE(0x0000, 0x7fff) AM_READWRITE(electron_mem_r, electron_mem_w)           /* 32KB of RAM */
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank2")                                    /* Banked ROM pages */
-	AM_RANGE(0xc000, 0xfbff) AM_ROM AM_REGION("user1", 0x40000)                     /* OS ROM */
+	AM_RANGE(0x8000, 0xbfff) AM_READWRITE(electron_paged_r, electron_paged_w)       /* Banked ROM pages */
+	AM_RANGE(0xc000, 0xfbff) AM_ROM AM_REGION("mos", 0x0000)                        /* OS ROM */
 	AM_RANGE(0xfc00, 0xfcff) AM_READWRITE(electron_fred_r, electron_fred_w )        /* FRED */
 	AM_RANGE(0xfd00, 0xfdff) AM_READWRITE(electron_jim_r, electron_jim_w )          /* JIM */
 	AM_RANGE(0xfe00, 0xfeff) AM_READWRITE(electron_sheila_r, electron_sheila_w )    /* SHEILA */
-	AM_RANGE(0xff00, 0xffff) AM_ROM AM_REGION("user1", 0x43f00)                     /* OS ROM continued */
+	AM_RANGE(0xff00, 0xffff) AM_ROM AM_REGION("mos", 0x3f00)                        /* OS ROM continued */
 ADDRESS_MAP_END
 
 INPUT_CHANGED_MEMBER(electron_state::trigger_reset)
@@ -197,7 +197,7 @@ static INPUT_PORTS_START( electron )
 	PORT_BIT(0x01,  IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("BREAK") PORT_CODE(KEYCODE_F12) PORT_CHAR(UCHAR_MAMEKEY(F12)) PORT_CHANGED_MEMBER(DEVICE_SELF, electron_state, trigger_reset, 0)
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( electron )
+MACHINE_CONFIG_START(electron_state::electron)
 	MCFG_CPU_ADD( "maincpu", M6502, XTAL_16MHz/8 )
 	MCFG_CPU_PROGRAM_MAP( electron_mem )
 
@@ -237,7 +237,7 @@ static MACHINE_CONFIG_START( electron )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( btm2105, electron )
+MACHINE_CONFIG_DERIVED(electron_state::btm2105, electron)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_COLOR(rgb_t::amber())
 
@@ -252,26 +252,10 @@ MACHINE_CONFIG_END
 
 /* Electron Rom Load */
 ROM_START(electron)
-	ROM_REGION( 0x44000, "user1", 0 ) /* OS Rom */
-	ROM_LOAD( "b02_acornos-1.rom", 0x40000, 0x4000, CRC(a0c2cf43) SHA1(a27ce645472cc5497690e4bfab43710efbb0792d) ) /* OS rom */
-	/* 00000  0 Second external socket on the expansion module (SK2) */
-	/* 04000  1 Second external socket on the expansion module (SK2) */
-	/* 08000  2 First external socket on the expansion module (SK1)  */
-	/* 0c000  3 First external socket on the expansion module (SK1)  */
-	/* 10000  4 Disc                                                 */
-	/* 14000  5 USER applications                                    */
-	/* 18000  6 USER applications                                    */
-	/* 1c000  7 Modem interface ROM                                  */
-	/* 20000  8 Keyboard                                             */
-	/* 24000  9 Keyboard mirror                                      */
-	/* 28000 10 BASIC rom                                            */
-	/* 2c000 11 BASIC rom mirror                                     */
-	/* 30000 12 Expansion module operating system                    */
-	/* 34000 13 High priority slot in expansion module               */
-	/* 38000 14 ECONET                                               */
-	/* 3c000 15 Reserved                                             */
-		ROM_LOAD("basic.rom", 0x28000, 0x4000, CRC(79434781) SHA1(4a7393f3a45ea309f744441c16723e2ef447a281))
-		ROM_COPY("user1", 0x28000, 0x2c000, 0x4000)
+	ROM_REGION( 0x4000, "mos", 0 )
+	ROM_LOAD( "b02_acornos-1.rom", 0x0000, 0x4000, CRC(a0c2cf43) SHA1(a27ce645472cc5497690e4bfab43710efbb0792d) )
+	ROM_REGION( 0x4000, "basic", 0 )
+	ROM_LOAD( "basic.rom", 0x0000, 0x4000, CRC(79434781) SHA1(4a7393f3a45ea309f744441c16723e2ef447a281) )
 ROM_END
 
 

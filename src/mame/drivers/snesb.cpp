@@ -185,6 +185,9 @@ public:
 	DECLARE_DRIVER_INIT(mk3snes);
 	DECLARE_DRIVER_INIT(legendsb);
 	DECLARE_MACHINE_RESET(ffight2b);
+	void mk3snes(machine_config &config);
+	void ffight2b(machine_config &config);
+	void kinstb(machine_config &config);
 };
 
 
@@ -686,7 +689,7 @@ static INPUT_PORTS_START( endless )
 INPUT_PORTS_END
 
 
-static MACHINE_CONFIG_START( kinstb )
+MACHINE_CONFIG_START(snesb_state::kinstb)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", _5A22, 3580000*6)   /* 2.68Mhz, also 3.58Mhz */
@@ -719,7 +722,7 @@ static ADDRESS_MAP_START( mcu_io_map, AS_IO, 8, snesb_state )
 ADDRESS_MAP_END
 
 
-static MACHINE_CONFIG_DERIVED( mk3snes, kinstb )
+MACHINE_CONFIG_DERIVED(snesb_state::mk3snes, kinstb)
 
 	MCFG_CPU_ADD("mcu", I8751, XTAL_8MHz)
 	MCFG_CPU_IO_MAP(mcu_io_map)
@@ -735,7 +738,7 @@ MACHINE_RESET_MEMBER( snesb_state, ffight2b )
 	cpu0space.write_byte(0x7eadce, 0x00);
 }
 
-static MACHINE_CONFIG_DERIVED( ffight2b, kinstb )
+MACHINE_CONFIG_DERIVED(snesb_state::ffight2b, kinstb)
 	MCFG_MACHINE_RESET_OVERRIDE( snesb_state, ffight2b )
 MACHINE_CONFIG_END
 

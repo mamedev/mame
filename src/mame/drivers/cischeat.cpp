@@ -230,7 +230,7 @@ static ADDRESS_MAP_START( bigrun_map, AS_PROGRAM, 16, cischeat_state )
 	AM_RANGE(0x094000, 0x097fff) AM_RAM_DEVWRITE("scroll1", megasys1_tilemap_device, write) AM_SHARE("scroll1")     // Scroll ram 1
 	AM_RANGE(0x098000, 0x09bfff) AM_RAM_DEVWRITE("scroll2", megasys1_tilemap_device, write) AM_SHARE("scroll2")     // Scroll ram 2
 
-	AM_RANGE(0x09c000, 0x09ffff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")            // Palettes
+	AM_RANGE(0x09c000, 0x09ffff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")            // Palettes
 	AM_RANGE(0x0f0000, 0x0fffff) AM_RAM AM_SHARE("ram")                                         // RAM
 	AM_RANGE(0x100000, 0x13ffff) AM_ROM AM_REGION("user1",0)                                                        // ROM
 ADDRESS_MAP_END
@@ -286,7 +286,7 @@ static ADDRESS_MAP_START( cischeat_map, AS_PROGRAM, 16, cischeat_state )
 	AM_RANGE(0x0a0000, 0x0a7fff) AM_RAM_DEVWRITE("scroll0", megasys1_tilemap_device, write) AM_SHARE("scroll0")     // Scroll ram 0
 	AM_RANGE(0x0a8000, 0x0affff) AM_RAM_DEVWRITE("scroll1", megasys1_tilemap_device, write) AM_SHARE("scroll1")     // Scroll ram 1
 	AM_RANGE(0x0b0000, 0x0b7fff) AM_RAM_DEVWRITE("scroll2", megasys1_tilemap_device, write) AM_SHARE("scroll2")     // Scroll ram 2
-	AM_RANGE(0x0b8000, 0x0bffff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")              // Palettes
+	AM_RANGE(0x0b8000, 0x0bffff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")              // Palettes
 
 	AM_RANGE(0x0f0000, 0x0fffff) AM_RAM AM_SHARE("ram")                                             // RAM
 	AM_RANGE(0x100000, 0x17ffff) AM_ROM AM_REGION("user1",0)                                                            // ROM
@@ -342,7 +342,7 @@ static ADDRESS_MAP_START( f1gpstar_map, AS_PROGRAM, 16, cischeat_state )
 	AM_RANGE(0x0a0000, 0x0a7fff) AM_RAM_DEVWRITE("scroll0", megasys1_tilemap_device, write) AM_SHARE("scroll0")     // Scroll ram 0
 	AM_RANGE(0x0a8000, 0x0affff) AM_RAM_DEVWRITE("scroll1", megasys1_tilemap_device, write) AM_SHARE("scroll1")     // Scroll ram 1
 	AM_RANGE(0x0b0000, 0x0b7fff) AM_RAM_DEVWRITE("scroll2", megasys1_tilemap_device, write) AM_SHARE("scroll2")     // Scroll ram 2
-	AM_RANGE(0x0b8000, 0x0bffff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")              // Palettes
+	AM_RANGE(0x0b8000, 0x0bffff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")              // Palettes
 
 	AM_RANGE(0x0f0000, 0x0fffff) AM_RAM AM_SHARE("ram")                                             // RAM
 	AM_RANGE(0x100000, 0x17ffff) AM_ROM AM_REGION("user1",0)                                                            // ROM
@@ -417,7 +417,7 @@ static ADDRESS_MAP_START( wildplt_map, AS_PROGRAM, 16, cischeat_state )
 	AM_RANGE(0x0a0000, 0x0a7fff) AM_RAM_DEVWRITE("scroll0", megasys1_tilemap_device, write) AM_SHARE("scroll0")     // Scroll ram 0
 	AM_RANGE(0x0a8000, 0x0affff) AM_RAM_DEVWRITE("scroll1", megasys1_tilemap_device, write) AM_SHARE("scroll1")     // Scroll ram 1
 	AM_RANGE(0x0b0000, 0x0b7fff) AM_RAM_DEVWRITE("scroll2", megasys1_tilemap_device, write) AM_SHARE("scroll2")     // Scroll ram 2
-	AM_RANGE(0x0b8000, 0x0bffff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")               // Palettes
+	AM_RANGE(0x0b8000, 0x0bffff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")               // Palettes
 
 	AM_RANGE(0x0f0000, 0x0fffff) AM_RAM AM_SHARE("ram")                                             // RAM
 	AM_RANGE(0x100000, 0x17ffff) AM_ROM AM_REGION("user1",0)                                                            // ROM
@@ -462,7 +462,7 @@ static ADDRESS_MAP_START( f1gpstr2_map, AS_PROGRAM, 16, cischeat_state )
 	AM_RANGE(0x0a0000, 0x0a7fff) AM_RAM_DEVWRITE("scroll0", megasys1_tilemap_device, write) AM_SHARE("scroll0")     // Scroll ram 0
 	AM_RANGE(0x0a8000, 0x0affff) AM_RAM_DEVWRITE("scroll1", megasys1_tilemap_device, write) AM_SHARE("scroll1")     // Scroll ram 1
 	AM_RANGE(0x0b0000, 0x0b7fff) AM_RAM_DEVWRITE("scroll2", megasys1_tilemap_device, write) AM_SHARE("scroll2")     // Scroll ram 2
-	AM_RANGE(0x0b8000, 0x0bffff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")               // Palettes
+	AM_RANGE(0x0b8000, 0x0bffff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")               // Palettes
 
 	AM_RANGE(0x0f0000, 0x0fffff) AM_RAM AM_SHARE("ram")                                             // RAM
 	AM_RANGE(0x100000, 0x17ffff) AM_ROM AM_REGION("user1",0)                                                            // ROM
@@ -578,7 +578,7 @@ static ADDRESS_MAP_START( scudhamm_map, AS_PROGRAM, 16, cischeat_state )
 	AM_RANGE(0x082208, 0x082209) AM_DEVREADWRITE("watchdog", watchdog_timer_device, reset16_r, reset16_w)
 	AM_RANGE(0x0a0000, 0x0a3fff) AM_RAM_DEVWRITE("scroll0", megasys1_tilemap_device, write) AM_SHARE("scroll0")   // Scroll RAM 0
 	AM_RANGE(0x0b0000, 0x0b3fff) AM_RAM_DEVWRITE("scroll2", megasys1_tilemap_device, write) AM_SHARE("scroll2")   // Scroll RAM 2
-	AM_RANGE(0x0b8000, 0x0bffff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")          // Palette
+	AM_RANGE(0x0b8000, 0x0bffff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")          // Palette
 	AM_RANGE(0x0f0000, 0x0fffff) AM_RAM AM_SHARE("ram")                                         // Work RAM + Spriteram
 	AM_RANGE(0x100000, 0x100001) AM_WRITE(scudhamm_oki_bank_w)                                          // Sound
 	AM_RANGE(0x100008, 0x100009) AM_READ_PORT("IN0") AM_WRITE(scudhamm_leds_w)                          // Buttons
@@ -662,7 +662,7 @@ static ADDRESS_MAP_START( armchmp2_map, AS_PROGRAM, 16, cischeat_state )
 	AM_RANGE(0x082208, 0x082209) AM_DEVREADWRITE("watchdog", watchdog_timer_device, reset16_r, reset16_w)
 	AM_RANGE(0x0a0000, 0x0a7fff) AM_RAM_DEVWRITE("scroll0", megasys1_tilemap_device, write) AM_SHARE("scroll0")     // Scroll ram 0
 	AM_RANGE(0x0b0000, 0x0b7fff) AM_RAM_DEVWRITE("scroll2", megasys1_tilemap_device, write) AM_SHARE("scroll2")     // Scroll ram 2
-	AM_RANGE(0x0b8000, 0x0bffff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")              // Palette
+	AM_RANGE(0x0b8000, 0x0bffff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")              // Palette
 	AM_RANGE(0x0f0000, 0x0fffff) AM_RAM AM_SHARE("ram")                                         // Work RAM + Spriteram
 	AM_RANGE(0x100000, 0x100001) AM_READ_PORT("IN2") AM_WRITE(scudhamm_oki_bank_w)                      // DSW + Sound
 	AM_RANGE(0x100004, 0x100005) AM_READ_PORT("IN3")                                                    // DSW
@@ -807,7 +807,7 @@ static ADDRESS_MAP_START( captflag_map, AS_PROGRAM, 16, cischeat_state )
 	AM_RANGE(0x090008, 0x090009) AM_WRITENOP                                                            // 0?
 	AM_RANGE(0x0a0000, 0x0a7fff) AM_RAM_DEVWRITE("scroll0", megasys1_tilemap_device, write) AM_SHARE("scroll0") // Scroll RAM 0
 	AM_RANGE(0x0b0000, 0x0b7fff) AM_RAM_DEVWRITE("scroll2", megasys1_tilemap_device, write) AM_SHARE("scroll2") // Scroll RAM 2
-	AM_RANGE(0x0b8000, 0x0bffff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")  // Palette
+	AM_RANGE(0x0b8000, 0x0bffff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")  // Palette
 	AM_RANGE(0x0f0000, 0x0fffff) AM_RAM AM_SHARE("ram")                                                 // Work RAM + Spriteram
 	AM_RANGE(0x100000, 0x100001) AM_READ_PORT("SW1_2") AM_WRITE(captflag_oki_bank_w)                    // 2 x DSW + Sound
 	AM_RANGE(0x100008, 0x100009) AM_READ_PORT("Buttons") AM_WRITE(captflag_leds_w)                      // Buttons + Leds
@@ -1909,7 +1909,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(cischeat_state::bigrun_scanline)
 
 
 
-static MACHINE_CONFIG_START( bigrun )
+MACHINE_CONFIG_START(cischeat_state::bigrun)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("cpu1", M68000, 10000000)
@@ -1969,7 +1969,7 @@ static MACHINE_CONFIG_START( bigrun )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( cischeat, bigrun )
+MACHINE_CONFIG_DERIVED(cischeat_state::cischeat, bigrun)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("cpu1")
@@ -2006,7 +2006,7 @@ static MACHINE_CONFIG_DERIVED( cischeat, bigrun )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( f1gpstar, bigrun )
+MACHINE_CONFIG_DERIVED(cischeat_state::f1gpstar, bigrun)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("cpu1")
@@ -2042,7 +2042,7 @@ static MACHINE_CONFIG_DERIVED( f1gpstar, bigrun )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( f1gpstr2, f1gpstar )
+MACHINE_CONFIG_DERIVED(cischeat_state::f1gpstr2, f1gpstar)
 
 	/* basic machine hardware */
 
@@ -2059,7 +2059,7 @@ static MACHINE_CONFIG_DERIVED( f1gpstr2, f1gpstar )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( wildplt, f1gpstr2 )
+MACHINE_CONFIG_DERIVED(cischeat_state::wildplt, f1gpstr2)
 	MCFG_CPU_MODIFY("cpu1")
 	MCFG_CPU_PROGRAM_MAP(wildplt_map)
 MACHINE_CONFIG_END
@@ -2087,7 +2087,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(cischeat_state::scudhamm_scanline)
 		m_maincpu->set_input_line(2, HOLD_LINE);
 }
 
-static MACHINE_CONFIG_START( scudhamm )
+MACHINE_CONFIG_START(cischeat_state::scudhamm)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",M68000, 12000000)
@@ -2142,7 +2142,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(cischeat_state::armchamp2_scanline)
 		m_maincpu->set_input_line(4, HOLD_LINE);
 }
 
-static MACHINE_CONFIG_DERIVED( armchmp2, scudhamm )
+MACHINE_CONFIG_DERIVED(cischeat_state::armchmp2, scudhamm)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2174,7 +2174,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(cischeat_state::captflag_scanline)
 		m_maincpu->set_input_line(3, HOLD_LINE);
 }
 
-static MACHINE_CONFIG_START( captflag )
+MACHINE_CONFIG_START(cischeat_state::captflag)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",M68000, XTAL_24MHz / 2)  // TMP68000P-12

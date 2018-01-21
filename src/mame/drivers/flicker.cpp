@@ -69,6 +69,7 @@ public:
 
 	DECLARE_INPUT_CHANGED_MEMBER(test_changed);
 
+	void flicker(machine_config &config);
 protected:
 	virtual void driver_start() override;
 
@@ -379,7 +380,7 @@ void flicker_state::driver_start()
 }
 
 
-static MACHINE_CONFIG_START(flicker)
+MACHINE_CONFIG_START(flicker_state::flicker)
 	// basic machine hardware
 	MCFG_CPU_ADD("maincpu", I4004, XTAL_5MHz / 8)
 	MCFG_I4004_ROM_MAP(flicker_rom)

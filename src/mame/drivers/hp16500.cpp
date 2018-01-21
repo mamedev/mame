@@ -99,6 +99,10 @@ public:
 
 	INTERRUPT_GEN_MEMBER(vblank);
 
+	void hp16500(machine_config &config);
+	void hp16500a(machine_config &config);
+	void hp1651(machine_config &config);
+	void hp1650(machine_config &config);
 private:
 	uint32_t m_palette[256], m_colors[3], m_count, m_clutoffs;
 };
@@ -406,7 +410,7 @@ uint32_t hp16500_state::screen_update_hp16500(screen_device &screen, bitmap_rgb3
 	return 0;
 }
 
-static MACHINE_CONFIG_START( hp1650 )
+MACHINE_CONFIG_START(hp16500_state::hp1650)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 10000000)
 	MCFG_CPU_PROGRAM_MAP(hp1650_map)
@@ -426,7 +430,7 @@ static MACHINE_CONFIG_START( hp1650 )
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( hp1651 )
+MACHINE_CONFIG_START(hp16500_state::hp1651)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 10000000)
 	MCFG_CPU_PROGRAM_MAP(hp1651_map)
@@ -446,7 +450,7 @@ static MACHINE_CONFIG_START( hp1651 )
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( hp16500a )
+MACHINE_CONFIG_START(hp16500_state::hp16500a)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 10000000)
 	MCFG_CPU_PROGRAM_MAP(hp16500a_map)
@@ -464,7 +468,7 @@ static MACHINE_CONFIG_START( hp16500a )
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( hp16500 )
+MACHINE_CONFIG_START(hp16500_state::hp16500)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68EC030, 25000000)
 	MCFG_CPU_PROGRAM_MAP(hp16500_map)

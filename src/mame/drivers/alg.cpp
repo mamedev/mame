@@ -58,6 +58,9 @@ public:
 
 	DECLARE_VIDEO_START(alg);
 
+	void alg_r2(machine_config &config);
+	void picmatic(machine_config &config);
+	void alg_r1(machine_config &config);
 protected:
 	// amiga_state overrides
 	virtual void potgo_w(uint16_t data) override;
@@ -289,7 +292,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( alg_r1 )
+MACHINE_CONFIG_START(alg_state::alg_r1)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, amiga_state::CLK_7M_NTSC)
@@ -351,13 +354,13 @@ static MACHINE_CONFIG_START( alg_r1 )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( alg_r2, alg_r1 )
+MACHINE_CONFIG_DERIVED(alg_state::alg_r2, alg_r1)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(main_map_r2)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( picmatic, alg_r1 )
+MACHINE_CONFIG_DERIVED(alg_state::picmatic, alg_r1)
 	/* adjust for PAL specs */
 	MCFG_CPU_REPLACE("maincpu", M68000, amiga_state::CLK_7M_PAL)
 	MCFG_CPU_PROGRAM_MAP(main_map_picmatic)

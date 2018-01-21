@@ -956,7 +956,7 @@ MACHINE_RESET_MEMBER(gameplan_state,gameplan)
 	m_video_data = 0;
 }
 
-static MACHINE_CONFIG_START( gameplan )
+MACHINE_CONFIG_START(gameplan_state::gameplan)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, GAMEPLAN_MAIN_CPU_CLOCK)
@@ -1005,7 +1005,7 @@ static MACHINE_CONFIG_START( gameplan )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( leprechn, gameplan )
+MACHINE_CONFIG_DERIVED(gameplan_state::leprechn, gameplan)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_CLOCK(LEPRECHAUN_MAIN_CPU_CLOCK)
 

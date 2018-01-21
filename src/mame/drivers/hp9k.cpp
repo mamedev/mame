@@ -166,6 +166,7 @@ public:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	required_device<gfxdecode_device> m_gfxdecode;
+	void hp9k(machine_config &config);
 };
 
 //
@@ -392,7 +393,7 @@ WRITE8_MEMBER( hp9k_state::kbd_put )
 }
 
 
-static MACHINE_CONFIG_START( hp9k )
+MACHINE_CONFIG_START(hp9k_state::hp9k)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",M68000, XTAL_8MHz)
 	MCFG_CPU_PROGRAM_MAP(hp9k_mem)

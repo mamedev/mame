@@ -60,6 +60,7 @@ electron_pwrjoy_device::electron_pwrjoy_device(const machine_config &mconfig, co
 	, device_electron_expansion_interface(mconfig, *this)
 	, m_exp_rom(*this, "exp_rom")
 	, m_joy(*this, "JOY")
+	, m_romsel(0)
 {
 }
 
@@ -70,28 +71,39 @@ electron_pwrjoy_device::electron_pwrjoy_device(const machine_config &mconfig, co
 
 void electron_pwrjoy_device::device_start()
 {
-	address_space& space = machine().device("maincpu")->memory().space(AS_PROGRAM);
-	m_slot = dynamic_cast<electron_expansion_slot_device *>(owner());
-
-	space.install_read_handler(0xfcc0, 0xfcc0, READ8_DELEGATE(electron_pwrjoy_device, joystick_r));
 }
 
 
 //-------------------------------------------------
-//  device_reset - device-specific reset
+//  expbus_r - expansion data read
 //-------------------------------------------------
 
-void electron_pwrjoy_device::device_reset()
+uint8_t electron_pwrjoy_device::expbus_r(address_space &space, offs_t offset, uint8_t data)
 {
-	machine().root_device().membank("bank2")->configure_entry(15, memregion("exp_rom")->base());
+	if (offset >= 0x8000 && offset < 0xc000)
+	{
+		if (m_romsel == 15)
+		{
+			data = memregion("exp_rom")->base()[offset & 0x1fff];
+		}
+	}
+	else if (offset == 0xfcc0)
+	{
+		data = m_joy->read() | 0xe0;
+	}
+
+	return data;
 }
 
 
-//**************************************************************************
-//  IMPLEMENTATION
-//**************************************************************************
+//-------------------------------------------------
+//  expbus_w - expansion data write
+//-------------------------------------------------
 
-READ8_MEMBER(electron_pwrjoy_device::joystick_r)
+void electron_pwrjoy_device::expbus_w(address_space &space, offs_t offset, uint8_t data)
 {
-	return m_joy->read() | 0xe0;
+	if (offset == 0xfe05)
+	{
+		m_romsel = data & 0x0f;
+	}
 }

@@ -259,7 +259,7 @@ void jailbrek_state::machine_reset()
 	m_nmi_enable = 0;
 }
 
-static MACHINE_CONFIG_START( jailbrek )
+MACHINE_CONFIG_START(jailbrek_state::jailbrek)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", KONAMI1, MASTER_CLOCK/12)

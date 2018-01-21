@@ -136,6 +136,7 @@ public:
 	DECO16IC_BANK_CB_MEMBER(captaven_bank_callback);
 	DECOSPR_PRIORITY_CB_MEMBER(captaven_pri_callback);
 
+	void captaven(machine_config &config);
 private:
 };
 
@@ -158,6 +159,9 @@ public:
 
 	DECO16IC_BANK_CB_MEMBER(fghthist_bank_callback);
 
+	void fghthist(machine_config &config);
+	void fghthistu(machine_config &config);
+	void fghthsta(machine_config &config);
 private:
 };
 
@@ -188,6 +192,9 @@ public:
 	DECLARE_READ16_MEMBER(port_b_tattass);
 	DECO16IC_BANK_CB_MEMBER(tattass_bank_callback);
 
+	void nslasheru(machine_config &config);
+	void tattass(machine_config &config);
+	void nslasher(machine_config &config);
 private:
 	void updateAceRam();
 	void mixDualAlphaSprites(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, gfx_element *gfx0, gfx_element *gfx1, int mixAlphaTilemap);
@@ -264,6 +271,9 @@ public:
 	DECO16IC_BANK_CB_MEMBER(bank_1_callback);
 	DECO16IC_BANK_CB_MEMBER(bank_2_callback);
 
+	void dragngun(machine_config &config);
+	void lockload(machine_config &config);
+	void lockloadu(machine_config &config);
 private:
 	bool m_gun_speaker_disabled;
 };

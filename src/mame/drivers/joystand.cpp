@@ -203,6 +203,7 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	INTERRUPT_GEN_MEMBER(joystand_interrupt);
+	void joystand(machine_config &config);
 };
 
 const rgb_t joystand_state::BG15_TRANSPARENT = 0x99999999;
@@ -461,7 +462,7 @@ static ADDRESS_MAP_START( joystand_map, AS_PROGRAM, 16, joystand_state )
 	AM_RANGE(0x600000, 0x603fff) AM_RAM_WRITE(bg2_w) AM_SHARE("bg2_ram")
 	AM_RANGE(0x604000, 0x605fff) AM_RAM_WRITE(bg1_w) AM_SHARE("bg1_ram")
 	AM_RANGE(0x606000, 0x607fff) AM_RAM_WRITE(bg15_1_w) AM_SHARE("bg15_1_ram") // r5g5b5 200x200 tile-based
-	AM_RANGE(0x608000, 0x609fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x608000, 0x609fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x60c000, 0x60c003) AM_RAM AM_SHARE("scroll") // write
 	AM_RANGE(0x60c00c, 0x60c00d) AM_RAM AM_SHARE("enable") // write
 
@@ -579,7 +580,7 @@ INTERRUPT_GEN_MEMBER(joystand_state::joystand_interrupt)
 	m_tmp68301->external_interrupt_1();
 }
 
-static MACHINE_CONFIG_START( joystand )
+MACHINE_CONFIG_START(joystand_state::joystand)
 
 	// basic machine hardware
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz) // !! TMP68301 !!

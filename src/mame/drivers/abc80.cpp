@@ -483,7 +483,7 @@ QUICKLOAD_LOAD_MEMBER( abc80_state, bac )
 //  MACHINE_CONFIG( abc80 )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( abc80 )
+MACHINE_CONFIG_START(abc80_state::abc80)
 	// basic machine hardware
 	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL_11_9808MHz/2/2) // 2.9952 MHz
 	MCFG_CPU_PROGRAM_MAP(abc80_mem)

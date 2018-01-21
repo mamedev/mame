@@ -101,7 +101,7 @@ DEVICE_INPUT_DEFAULTS_END
 //  machine configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER(ss50_mpc_device::device_add_mconfig)
+MACHINE_CONFIG_START(ss50_mpc_device::device_add_mconfig)
 	MCFG_DEVICE_ADD("pia", PIA6821, 0) // actually MC6820
 	MCFG_PIA_WRITEPA_HANDLER(DEVWRITELINE("outgate", input_merger_device, in_w<0>)) MCFG_DEVCB_BIT(0)
 	MCFG_PIA_CB2_HANDLER(WRITELINE(ss50_mpc_device, reader_control_w))

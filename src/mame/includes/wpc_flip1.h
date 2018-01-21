@@ -18,6 +18,7 @@ public:
 	{ }
 public:
 	DECLARE_DRIVER_INIT(wpc_flip1);
+	void wpc_flip1(machine_config &config);
 };
 
 #endif /* WPC_FLIP1_H_ */

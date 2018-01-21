@@ -233,7 +233,7 @@ void goindol_state::machine_reset()
 	m_prot_toggle = 0;
 }
 
-static MACHINE_CONFIG_START( goindol )
+MACHINE_CONFIG_START(goindol_state::goindol)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_12MHz/2)  /* XTAL confirmed, divisor is not */

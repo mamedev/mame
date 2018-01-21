@@ -81,6 +81,9 @@ public:
 	INTERRUPT_GEN_MEMBER(CPUB_interrupt);
 	TIMER_CALLBACK_MEMBER(sprite_tick);
 	DECLARE_WRITE8_MEMBER(volume_callback);
+	void devilw(machine_config &config);
+	void miaj(machine_config &config);
+	void twin16(machine_config &config);
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -106,6 +109,7 @@ public:
 	DECLARE_WRITE16_MEMBER(gfx_bank_w);
 	DECLARE_DRIVER_INIT(fround);
 
+	void fround(machine_config &config);
 protected:
 	virtual void video_start() override;
 	virtual void tile_get_info(tile_data &tileinfo, uint16_t data, int color_base) override;
@@ -124,6 +128,7 @@ public:
 	DECLARE_WRITE8_MEMBER(nvram_bank_w);
 	DECLARE_DRIVER_INIT(cuebrickj);
 
+	void cuebrickj(machine_config &config);
 private:
 	uint16_t m_nvram[0x400 * 0x20 / 2];
 };

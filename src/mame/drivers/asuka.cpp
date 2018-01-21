@@ -825,7 +825,7 @@ WRITE_LINE_MEMBER(asuka_state::screen_vblank_asuka)
 	}
 }
 
-static MACHINE_CONFIG_START( bonzeadv )
+MACHINE_CONFIG_START(asuka_state::bonzeadv)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 8000000)    /* checked on PCB */
@@ -882,7 +882,7 @@ static MACHINE_CONFIG_START( bonzeadv )
 	MCFG_TC0140SYT_SLAVE_CPU("audiocpu")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( asuka )
+MACHINE_CONFIG_START(asuka_state::asuka)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz/2)   /* verified on pcb */
@@ -953,7 +953,7 @@ static MACHINE_CONFIG_START( asuka )
 	MCFG_PC060HA_SLAVE_CPU("audiocpu")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( cadash )
+MACHINE_CONFIG_START(asuka_state::cadash)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_32MHz/2)   /* 68000p12 running at 16Mhz, verified on pcb  */
@@ -1021,7 +1021,7 @@ static MACHINE_CONFIG_START( cadash )
 	MCFG_PC060HA_SLAVE_CPU("audiocpu")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( mofflott )
+MACHINE_CONFIG_START(asuka_state::mofflott)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 8000000)    /* 8 MHz ??? */
@@ -1092,7 +1092,7 @@ static MACHINE_CONFIG_START( mofflott )
 	MCFG_PC060HA_SLAVE_CPU("audiocpu")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( galmedes )
+MACHINE_CONFIG_START(asuka_state::galmedes)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 8000000)    /* 8 MHz ??? */
@@ -1155,7 +1155,7 @@ static MACHINE_CONFIG_START( galmedes )
 	MCFG_PC060HA_SLAVE_CPU("audiocpu")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( eto )
+MACHINE_CONFIG_START(asuka_state::eto)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 8000000)    /* 8 MHz ??? */

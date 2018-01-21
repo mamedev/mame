@@ -427,7 +427,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( liberatr )
+MACHINE_CONFIG_START(liberatr_state::liberatr)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, MASTER_CLOCK/16) /* 1.25Mhz divided from 20Mhz master clock */
@@ -471,7 +471,7 @@ static MACHINE_CONFIG_START( liberatr )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( liberat2, liberatr )
+MACHINE_CONFIG_DERIVED(liberatr_state::liberat2, liberatr)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")

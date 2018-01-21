@@ -75,6 +75,7 @@ public:
 	DECLARE_PALETTE_INIT(accomm);
 	INTERRUPT_GEN_MEMBER(vbl_int);
 
+	void accomm(machine_config &config);
 protected:
 	// devices
 	required_device<g65816_device> m_maincpu;
@@ -827,7 +828,7 @@ static INPUT_PORTS_START( accomm )
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_UNUSED)
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( accomm )
+MACHINE_CONFIG_START(accomm_state::accomm)
 	MCFG_CPU_ADD("maincpu", G65816, XTAL_16MHz / 8)
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", accomm_state, vbl_int)

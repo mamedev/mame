@@ -20,9 +20,9 @@ public:
 	void asic3_compute_hold(int,int);
 	DECLARE_READ16_MEMBER( pgm_asic3_r );
 	DECLARE_WRITE16_MEMBER( pgm_asic3_w );
+	void pgm_asic3(machine_config &config);
 };
 
 INPUT_PORTS_EXTERN( orlegend );
 INPUT_PORTS_EXTERN( orlegendt );
 INPUT_PORTS_EXTERN( orlegendk );
-MACHINE_CONFIG_EXTERN( pgm_asic3 );

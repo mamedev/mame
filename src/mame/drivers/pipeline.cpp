@@ -112,6 +112,7 @@ public:
 
 	TIMER_CALLBACK_MEMBER(protection_deferred_w);
 
+	void pipeline(machine_config &config);
 protected:
 	required_device<cpu_device>         m_maincpu;
 	required_device<m68705r_device>     m_mcu;
@@ -349,7 +350,7 @@ PALETTE_INIT_MEMBER(pipeline_state, pipeline)
 	}
 }
 
-static MACHINE_CONFIG_START( pipeline )
+MACHINE_CONFIG_START(pipeline_state::pipeline)
 	/* basic machine hardware */
 
 	MCFG_CPU_ADD("maincpu", Z80, 7372800/2)

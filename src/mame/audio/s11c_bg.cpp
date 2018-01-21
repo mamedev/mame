@@ -56,7 +56,7 @@ void s11c_bg_device::data_w(uint8_t data)
 	m_pia40->portb_w(data);
 }
 
-MACHINE_CONFIG_MEMBER( s11c_bg_device::device_add_mconfig )
+MACHINE_CONFIG_START(s11c_bg_device::device_add_mconfig)
 	MCFG_CPU_ADD("bgcpu", MC6809E, XTAL_8MHz / 4) // MC68B09E
 	MCFG_CPU_PROGRAM_MAP(s11c_bg_map)
 	MCFG_QUANTUM_TIME(attotime::from_hz(50))

@@ -71,4 +71,6 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(k054539_irq1_gen);
 	K056832_CB_MEMBER(qdrmfgp_tile_callback);
 	K056832_CB_MEMBER(qdrmfgp2_tile_callback);
+	void qdrmfgp(machine_config &config);
+	void qdrmfgp2(machine_config &config);
 };

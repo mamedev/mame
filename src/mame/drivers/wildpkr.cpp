@@ -217,6 +217,8 @@ public:
 	DECLARE_WRITE16_MEMBER(clock_rate_w);
 	DECLARE_WRITE16_MEMBER(unknown_trigger_w);
 	IRQ_CALLBACK_MEMBER(tabpkr_irq_ack);
+	void wildpkr(machine_config &config);
+	void tabpkr(machine_config &config);
 };
 
 
@@ -303,8 +305,8 @@ WRITE16_MEMBER(wildpkr_state::unknown_trigger_w)
 static ADDRESS_MAP_START( wildpkr_map, AS_PROGRAM, 16, wildpkr_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x100000, 0x113fff) AM_RAM
-	AM_RANGE(0x800000, 0x800001) AM_DEVREADWRITE("acrtc", hd63484_device, status_r, address_w)
-	AM_RANGE(0x800002, 0x800003) AM_DEVREADWRITE("acrtc", hd63484_device, data_r, data_w)
+	AM_RANGE(0x800000, 0x800001) AM_DEVREADWRITE("acrtc", hd63484_device, status16_r, address16_w)
+	AM_RANGE(0x800002, 0x800003) AM_DEVREADWRITE("acrtc", hd63484_device, data16_r, data16_w)
 	AM_RANGE(0x800080, 0x80009f) AM_DEVREADWRITE8("duart", mc68681_device, read, write, 0x00ff)
 	AM_RANGE(0x800180, 0x800181) AM_READ8(unknown_read8, 0xff00)
 	AM_RANGE(0x800180, 0x800181) AM_WRITE8(unknown_write8, 0x00ff)
@@ -321,8 +323,8 @@ static ADDRESS_MAP_START( tabpkr_map, AS_PROGRAM, 16, wildpkr_state )
 	AM_RANGE(0x000000, 0x2fffff) AM_ROM
 	AM_RANGE(0x300000, 0x303fff) AM_RAM
 	AM_RANGE(0x400000, 0x400fff) AM_RAM_WRITE(nvram_w) AM_SHARE("nvram")
-	AM_RANGE(0x500000, 0x500001) AM_DEVREADWRITE("acrtc", hd63484_device, status_r, address_w)
-	AM_RANGE(0x500002, 0x500003) AM_DEVREADWRITE("acrtc", hd63484_device, data_r, data_w)
+	AM_RANGE(0x500000, 0x500001) AM_DEVREADWRITE("acrtc", hd63484_device, status16_r, address16_w)
+	AM_RANGE(0x500002, 0x500003) AM_DEVREADWRITE("acrtc", hd63484_device, data16_r, data16_w)
 	AM_RANGE(0x500020, 0x500021) AM_DEVREADWRITE8("ramdac", ramdac_device, index_r, index_w, 0x00ff)
 	AM_RANGE(0x500022, 0x500023) AM_DEVREADWRITE8("ramdac", ramdac_device, pal_r, pal_w, 0x00ff)
 	AM_RANGE(0x500024, 0x500025) AM_DEVREADWRITE8("ramdac", ramdac_device, mask_r, mask_w, 0x00ff)
@@ -449,7 +451,7 @@ IRQ_CALLBACK_MEMBER(wildpkr_state::tabpkr_irq_ack)
 *    Machine Drivers     *
 *************************/
 
-static MACHINE_CONFIG_START( wildpkr )
+MACHINE_CONFIG_START(wildpkr_state::wildpkr)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, MAIN_CLOCK)
@@ -480,7 +482,7 @@ static MACHINE_CONFIG_START( wildpkr )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( tabpkr )
+MACHINE_CONFIG_START(wildpkr_state::tabpkr)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz / 2)

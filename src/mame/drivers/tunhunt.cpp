@@ -268,7 +268,7 @@ GFXDECODE_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( tunhunt )
+MACHINE_CONFIG_START(tunhunt_state::tunhunt)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, XTAL_12_096MHz/6)        /* ??? */

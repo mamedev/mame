@@ -32,10 +32,10 @@ static INPUT_PORTS_START( rombox )
 	PORT_CONFSETTING(0x01, "RAM")
 	PORT_CONFNAME(0x02, 0x00, "A2") // not implemented
 	PORT_CONFSETTING(0x00, "8K or 16K")
-	PORT_CONFSETTING(0x01, "4K")
+	PORT_CONFSETTING(0x02, "4K")
 	PORT_CONFNAME(0x04, 0x00, "B")
 	PORT_CONFSETTING(0x00, "ROM 0,1,2,3")
-	PORT_CONFSETTING(0x02, "ROM 12,13,14,15")
+	PORT_CONFSETTING(0x04, "ROM 12,13,14,15")
 INPUT_PORTS_END
 
 //-------------------------------------------------
@@ -47,7 +47,7 @@ ioport_constructor electron_rombox_device::device_input_ports() const
 	return INPUT_PORTS_NAME( rombox );
 }
 
-MACHINE_CONFIG_MEMBER( electron_rombox_device::device_add_mconfig )
+MACHINE_CONFIG_START(electron_rombox_device::device_add_mconfig)
 	/* rom sockets */
 	MCFG_GENERIC_SOCKET_ADD("rom1", generic_plain_slot, "electron_rom")
 	MCFG_GENERIC_EXTENSIONS("bin,rom")
@@ -89,8 +89,11 @@ MACHINE_CONFIG_END
 electron_rombox_device::electron_rombox_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, ELECTRON_ROMBOX, tag, owner, clock),
 		device_electron_expansion_interface(mconfig, *this),
+	m_exp(*this, "exp"),
 	m_rom(*this, "rom%u", 1),
-	m_option(*this, "OPTION")
+	m_option(*this, "OPTION"),
+	m_romsel(0),
+	m_rom_base(0)
 {
 }
 
@@ -100,7 +103,6 @@ electron_rombox_device::electron_rombox_device(const machine_config &mconfig, co
 
 void electron_rombox_device::device_start()
 {
-	m_slot = dynamic_cast<electron_expansion_slot_device *>(owner());
 }
 
 //-------------------------------------------------
@@ -109,21 +111,65 @@ void electron_rombox_device::device_start()
 
 void electron_rombox_device::device_reset()
 {
-	std::string region_tag;
-	memory_region *tmp_reg;
+	m_rom_base = (m_option->read() & 0x04) ? 12 : 0;
+}
 
-	int rom_base = (m_option->read() & 0x04) ? 0 : 12;
-	for (int i = 0; i < 4; i++)
+//-------------------------------------------------
+//  expbus_r - expansion data read
+//-------------------------------------------------
+
+uint8_t electron_rombox_device::expbus_r(address_space &space, offs_t offset, uint8_t data)
+{
+	if (offset >= 0x8000 && offset < 0xc000)
 	{
-		if (m_rom[i] && (tmp_reg = memregion(region_tag.assign(m_rom[i]->tag()).append(GENERIC_ROM_REGION_TAG).c_str())))
+		switch (m_romsel)
 		{
-			machine().root_device().membank("bank2")->configure_entry(4 + i, tmp_reg->base());
+		case 0:
+		case 1:
+		case 2:
+		case 3:
+			if (m_rom_base == 0 && m_rom[m_romsel + 4]->exists())
+			{
+				data = m_rom[m_romsel + 4]->read_rom(space, offset & 0x3fff);
+			}
+			break;
+		case 4:
+		case 5:
+		case 6:
+		case 7:
+			if (m_rom[m_romsel - 4]->exists())
+			{
+				data = m_rom[m_romsel - 4]->read_rom(space, offset & 0x3fff);
+			}
+			break;
+		case 12:
+		case 13:
+		case 14:
+		case 15:
+			if (m_rom_base == 12 && m_rom[m_romsel - 8]->exists())
+			{
+				data = m_rom[m_romsel - 8]->read_rom(space, offset & 0x3fff);
+			}
+			break;
 		}
+	}
 
-		if (m_rom[i + 4] && (tmp_reg = memregion(region_tag.assign(m_rom[i + 4]->tag()).append(GENERIC_ROM_REGION_TAG).c_str())))
-		{
-			machine().root_device().membank("bank2")->configure_entry(rom_base + i, tmp_reg->base());
-		}
+	data &= m_exp->expbus_r(space, offset, data);
+
+	return data;
+}
+
+//-------------------------------------------------
+//  expbus_w - expansion data write
+//-------------------------------------------------
+
+void electron_rombox_device::expbus_w(address_space &space, offs_t offset, uint8_t data)
+{
+	m_exp->expbus_w(space, offset, data);
+
+	if (offset == 0xfe05)
+	{
+		m_romsel = data & 0x0f;
 	}
 }
 
@@ -142,8 +188,12 @@ image_init_result electron_rombox_device::load_rom(device_image_interface &image
 		return image_init_result::FAIL;
 	}
 
-	slot->rom_alloc(size, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);
+	slot->rom_alloc(0x4000, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);
 	slot->common_load_rom(slot->get_rom_base(), size, "rom");
+
+	// mirror 8K ROMs
+	uint8_t *crt = slot->get_rom_base();
+	if (size <= 0x2000) memcpy(crt + 0x2000, crt, 0x2000);
 
 	return image_init_result::PASS;
 }

@@ -68,6 +68,8 @@ public:
 	// screen updates
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
+	void revlatns(machine_config &config);
+	void cops(machine_config &config);
 protected:
 	// driver_device overrides
 	virtual void machine_start() override;
@@ -912,7 +914,7 @@ DRIVER_INIT_MEMBER(cops_state,cops)
 	membank("sysbank1")->set_entry(2);
 }
 
-static MACHINE_CONFIG_START( cops )
+MACHINE_CONFIG_START(cops_state::cops)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, MAIN_CLOCK/2)
@@ -948,7 +950,7 @@ static MACHINE_CONFIG_START( cops )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( revlatns )
+MACHINE_CONFIG_START(cops_state::revlatns)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, MAIN_CLOCK/2)

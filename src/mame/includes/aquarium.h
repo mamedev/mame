@@ -65,4 +65,5 @@ public:
 	uint8_t aquarium_snd_bitswap( uint8_t scrambled_data );
 	void mix_sprite_bitmap(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int priority_mask, int priority_value);
 	bitmap_ind16 m_temp_sprite_bitmap;
+	void aquarium(machine_config &config);
 };

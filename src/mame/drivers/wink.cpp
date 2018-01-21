@@ -62,6 +62,7 @@ public:
 	uint32_t screen_update_wink(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	INTERRUPT_GEN_MEMBER(wink_sound);
+	void wink(machine_config &config);
 };
 
 
@@ -167,7 +168,7 @@ WRITE8_MEMBER(wink_state::prot_w)
 
 static ADDRESS_MAP_START( wink_io, AS_IO, 8, wink_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x1f) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette") //0x10-0x1f is likely to be something else
+	AM_RANGE(0x00, 0x1f) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette") //0x10-0x1f is likely to be something else
 //  AM_RANGE(0x20, 0x20) AM_WRITENOP                //??? seems unused..
 	AM_RANGE(0x21, 0x21) AM_WRITE(player_mux_w)     //??? no mux on the pcb.
 	AM_RANGE(0x22, 0x22) AM_WRITE(tile_banking_w)
@@ -354,7 +355,7 @@ void wink_state::machine_reset()
 	m_sound_flag = 0;
 }
 
-static MACHINE_CONFIG_START( wink )
+MACHINE_CONFIG_START(wink_state::wink)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 12000000 / 4)
 	MCFG_CPU_PROGRAM_MAP(wink_map)

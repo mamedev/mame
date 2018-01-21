@@ -61,6 +61,7 @@ public:
 
 	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
 
+	void destiny(machine_config &config);
 protected:
 	// driver_device overrides
 	virtual void machine_start() override;
@@ -261,7 +262,7 @@ void destiny_state::machine_reset()
 	bank_select_w(m_maincpu->space(AS_PROGRAM), 0, 0);
 }
 
-static MACHINE_CONFIG_START( destiny )
+MACHINE_CONFIG_START(destiny_state::destiny)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6809, XTAL_4MHz/2)

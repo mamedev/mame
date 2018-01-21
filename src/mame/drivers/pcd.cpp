@@ -80,6 +80,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(write_scsi_msg);
 	DECLARE_WRITE_LINE_MEMBER(write_scsi_req);
 
+	void pcx(machine_config &config);
+	void pcd(machine_config &config);
 protected:
 	// driver_device overrides
 	virtual void machine_start() override;
@@ -487,7 +489,7 @@ static INPUT_PORTS_START(pcx)
 	PORT_CONFSETTING(0x02, "SINIX 1.2")
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( pcd )
+MACHINE_CONFIG_START(pcd_state::pcd)
 	MCFG_CPU_ADD("maincpu", I80186, XTAL_16MHz)
 	MCFG_CPU_PROGRAM_MAP(pcd_map)
 	MCFG_CPU_IO_MAP(pcd_io)
@@ -568,7 +570,7 @@ static MACHINE_CONFIG_START( pcd )
 	MCFG_SCSIDEV_ADD("scsi:1", "harddisk", OMTI5100, SCSI_ID_0)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(pcx, pcd)
+MACHINE_CONFIG_DERIVED(pcd_state::pcx, pcd)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(pcx_io)
 

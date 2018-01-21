@@ -95,6 +95,9 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(coin_counter_2_w);
 	DECLARE_WRITE8_MEMBER(output_latches_w);
 
+	void mariobl(machine_config &config);
+	void ambush(machine_config &config);
+	void dkong3abl(machine_config &config);
 private:
 	void register_save_states();
 
@@ -678,7 +681,7 @@ WRITE8_MEMBER(ambush_state::output_latches_w)
 //  MACHINE DEFINTIONS
 //**************************************************************************
 
-static MACHINE_CONFIG_START( ambush )
+MACHINE_CONFIG_START(ambush_state::ambush)
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_18_432MHz/6)
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_IO_MAP(main_portmap)
@@ -719,7 +722,7 @@ static MACHINE_CONFIG_START( ambush )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.33)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( mariobl, ambush )
+MACHINE_CONFIG_DERIVED(ambush_state::mariobl, ambush)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(bootleg_map)
 
@@ -749,7 +752,7 @@ static MACHINE_CONFIG_DERIVED( mariobl, ambush )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.33)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( dkong3abl, mariobl )
+MACHINE_CONFIG_DERIVED(ambush_state::dkong3abl, mariobl)
 	MCFG_MACHINE_START_OVERRIDE(ambush_state, dkong3abl)
 
 	MCFG_GFXDECODE_MODIFY("gfxdecode", dkong3abl)

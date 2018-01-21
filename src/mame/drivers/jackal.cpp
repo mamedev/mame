@@ -355,7 +355,7 @@ void jackal_state::machine_reset()
 	m_irq_enable = 0;
 }
 
-static MACHINE_CONFIG_START( jackal )
+MACHINE_CONFIG_START(jackal_state::jackal)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("master", MC6809E, MASTER_CLOCK/12) // verified on pcb

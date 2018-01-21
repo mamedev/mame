@@ -145,6 +145,7 @@ public:
 	required_device<netlist_mame_device> m_maincpu;
 	required_device<fixedfreq_device> m_video;
 
+	void monacogp(machine_config &config);
 protected:
 
 	// driver_device overrides
@@ -185,7 +186,7 @@ void monacogp_state::video_start()
 {
 }
 
-static MACHINE_CONFIG_START( monacogp )
+MACHINE_CONFIG_START(monacogp_state::monacogp)
 
 	/* basic machine hardware */
 	MCFG_DEVICE_ADD("maincpu", NETLIST_CPU, NETLIST_CLOCK)

@@ -466,6 +466,9 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	void amaticmg2(machine_config &config);
+	void amaticmg(machine_config &config);
+	void amaticmg4(machine_config &config);
 };
 
 
@@ -821,7 +824,7 @@ void amaticmg_state::machine_reset()
 *          Machine Drivers          *
 ************************************/
 
-static MACHINE_CONFIG_START( amaticmg )
+MACHINE_CONFIG_START(amaticmg_state::amaticmg)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, CPU_CLOCK)     /* WRONG! */
 	MCFG_CPU_PROGRAM_MAP(amaticmg_map)
@@ -874,7 +877,7 @@ INTERRUPT_GEN_MEMBER(amaticmg_state::amaticmg2_irq)
 }
 
 
-static MACHINE_CONFIG_DERIVED( amaticmg2, amaticmg )
+MACHINE_CONFIG_DERIVED(amaticmg_state::amaticmg2, amaticmg)
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(amaticmg2_portmap)
@@ -892,7 +895,7 @@ static MACHINE_CONFIG_DERIVED( amaticmg2, amaticmg )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( amaticmg4, amaticmg )
+MACHINE_CONFIG_DERIVED(amaticmg_state::amaticmg4, amaticmg)
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(amaticmg4_portmap)

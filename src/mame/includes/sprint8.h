@@ -67,8 +67,9 @@ public:
 	void set_pens();
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void set_collision(int n);
+	void sprint8(machine_config &config);
+	void sprint8_audio(machine_config &config);
 };
 
 /*----------- defined in audio/sprint8.c -----------*/
-MACHINE_CONFIG_EXTERN( sprint8_audio );
 DISCRETE_SOUND_EXTERN( sprint8 );

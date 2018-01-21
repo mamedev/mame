@@ -77,4 +77,5 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(dbz_scanline);
 	K056832_CB_MEMBER(tile_callback);
 	K053246_CB_MEMBER(sprite_callback);
+	void dbz(machine_config &config);
 };

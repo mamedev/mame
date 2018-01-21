@@ -184,6 +184,7 @@ public:
 	DECLARE_WRITE16_MEMBER(unknown_8401a_w);
 	DECLARE_WRITE16_MEMBER(eeprom_8401c_w);
 	virtual void machine_start() override;
+	void bpmmicro(machine_config &config);
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<eeprom_serial_93cxx_device> m_eeprom_u38;
@@ -357,7 +358,7 @@ INPUT_PORTS_END
  Machine Drivers
 ******************************************************************************/
 
-static MACHINE_CONFIG_START( bpmmicro )
+MACHINE_CONFIG_START(bpmmicro_state::bpmmicro)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I80286, XTAL_32MHz/4) /* divider is guessed, cpu is an AMD N80L286-16/S part */
 	MCFG_CPU_PROGRAM_MAP(i286_mem)

@@ -174,6 +174,8 @@ public:
 
 	uint32_t bw2_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
+	void sun2mbus(machine_config &config);
+	void sun2vme(machine_config &config);
 private:
 	uint16_t *m_rom_ptr, *m_ram_ptr;
 	uint8_t *m_idprom_ptr;
@@ -587,7 +589,7 @@ void sun2_state::machine_reset()
 	m_maincpu->reset();
 }
 
-static MACHINE_CONFIG_START( sun2vme )
+MACHINE_CONFIG_START(sun2_state::sun2vme)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68010, XTAL_19_6608MHz / 2) // or XTAL_24MHz / 2 by jumper setting
 	MCFG_CPU_PROGRAM_MAP(sun2_mem)
@@ -659,7 +661,7 @@ static MACHINE_CONFIG_START( sun2vme )
 	MCFG_RS232_CTS_HANDLER(DEVWRITELINE(SCC2_TAG, z80scc_device, ctsb_w))
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( sun2mbus )
+MACHINE_CONFIG_START(sun2_state::sun2mbus)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68010, XTAL_39_3216MHz / 4)
 	MCFG_CPU_PROGRAM_MAP(sun2_mem)

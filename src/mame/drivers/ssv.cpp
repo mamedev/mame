@@ -400,7 +400,7 @@ READ16_MEMBER(ssv_state::fake_r){   return ssv_scroll[offset];  }
 #define SSV_MAP( _ROM  )                                                                                            \
 	AM_RANGE(0x000000, 0x00ffff) AM_RAM AM_SHARE("mainram")                                     /*  RAM     */  \
 	AM_RANGE(0x100000, 0x13ffff) AM_RAM AM_SHARE("spriteram")                                       /*  Sprites */  \
-	AM_RANGE(0x140000, 0x15ffff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette") /* Palette */\
+	AM_RANGE(0x140000, 0x15ffff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette") /* Palette */\
 	AM_RANGE(0x160000, 0x17ffff) AM_RAM                                                             /*          */  \
 	AM_RANGE(0x1c0000, 0x1c0001) AM_READ(vblank_r           )                                   /*  Vblank? */  \
 /**/AM_RANGE(0x1c0002, 0x1c007f) AM_READONLY                                    /*  Scroll  */  \
@@ -2553,7 +2553,7 @@ DRIVER_INIT_MEMBER(ssv_state,jsk)          {    init(0); save_item(NAME(m_latche
 #define SSV_VBEND 0
 #define SSV_VBSTART 0xf0
 
-static MACHINE_CONFIG_START( ssv )
+MACHINE_CONFIG_START(ssv_state::ssv)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", V60, SSV_MASTER_CLOCK) /* Based on STA-0001 & STA-0001B System boards */
@@ -2585,7 +2585,7 @@ static MACHINE_CONFIG_START( ssv )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( drifto94, ssv )
+MACHINE_CONFIG_DERIVED(ssv_state::drifto94, ssv)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2605,7 +2605,7 @@ static MACHINE_CONFIG_DERIVED( drifto94, ssv )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( gdfs, ssv )
+MACHINE_CONFIG_DERIVED(ssv_state::gdfs, ssv)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2628,7 +2628,7 @@ static MACHINE_CONFIG_DERIVED( gdfs, ssv )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( hypreact, ssv )
+MACHINE_CONFIG_DERIVED(ssv_state::hypreact, ssv)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2642,7 +2642,7 @@ static MACHINE_CONFIG_DERIVED( hypreact, ssv )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( hypreac2, ssv )
+MACHINE_CONFIG_DERIVED(ssv_state::hypreac2, ssv)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2656,7 +2656,7 @@ static MACHINE_CONFIG_DERIVED( hypreac2, ssv )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( janjans1, ssv )
+MACHINE_CONFIG_DERIVED(ssv_state::janjans1, ssv)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2668,7 +2668,7 @@ static MACHINE_CONFIG_DERIVED( janjans1, ssv )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( keithlcy, ssv )
+MACHINE_CONFIG_DERIVED(ssv_state::keithlcy, ssv)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2680,7 +2680,7 @@ static MACHINE_CONFIG_DERIVED( keithlcy, ssv )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( meosism, ssv )
+MACHINE_CONFIG_DERIVED(ssv_state::meosism, ssv)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2696,7 +2696,7 @@ static MACHINE_CONFIG_DERIVED( meosism, ssv )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( mslider, ssv )
+MACHINE_CONFIG_DERIVED(ssv_state::mslider, ssv)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2708,7 +2708,7 @@ static MACHINE_CONFIG_DERIVED( mslider, ssv )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( ryorioh, ssv )
+MACHINE_CONFIG_DERIVED(ssv_state::ryorioh, ssv)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2721,7 +2721,7 @@ static MACHINE_CONFIG_DERIVED( ryorioh, ssv )
 	MCFG_SCREEN_VISIBLE_AREA(0, (0xcb-0x23)*2-1, 0, (0xfe - 0x0e)-1)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( vasara, ssv )
+MACHINE_CONFIG_DERIVED(ssv_state::vasara, ssv)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2734,7 +2734,7 @@ static MACHINE_CONFIG_DERIVED( vasara, ssv )
 	MCFG_SCREEN_VISIBLE_AREA(0, (0xcc-0x24)*2-1, 0,(0xfe - 0x0e)-1)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( srmp4, ssv )
+MACHINE_CONFIG_DERIVED(ssv_state::srmp4, ssv)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2748,7 +2748,7 @@ static MACHINE_CONFIG_DERIVED( srmp4, ssv )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( srmp7, ssv )
+MACHINE_CONFIG_DERIVED(ssv_state::srmp7, ssv)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2762,7 +2762,7 @@ static MACHINE_CONFIG_DERIVED( srmp7, ssv )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( stmblade, ssv )
+MACHINE_CONFIG_DERIVED(ssv_state::stmblade, ssv)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2782,7 +2782,7 @@ static MACHINE_CONFIG_DERIVED( stmblade, ssv )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( survarts, ssv )
+MACHINE_CONFIG_DERIVED(ssv_state::survarts, ssv)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2796,7 +2796,7 @@ static MACHINE_CONFIG_DERIVED( survarts, ssv )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( dynagear, survarts )
+MACHINE_CONFIG_DERIVED(ssv_state::dynagear, survarts)
 
 	/* basic machine hardware */
 	/* video hardware */
@@ -2805,7 +2805,7 @@ static MACHINE_CONFIG_DERIVED( dynagear, survarts )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( eaglshot, ssv )
+MACHINE_CONFIG_DERIVED(ssv_state::eaglshot, ssv)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2829,7 +2829,7 @@ static MACHINE_CONFIG_DERIVED( eaglshot, ssv )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( sxyreact, ssv )
+MACHINE_CONFIG_DERIVED(ssv_state::sxyreact, ssv)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2844,7 +2844,7 @@ static MACHINE_CONFIG_DERIVED( sxyreact, ssv )
 	MCFG_SCREEN_VISIBLE_AREA(0, (0xcb - 0x22)*2-1, 0, (0xfe - 0x0e)-1)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( sxyreac2, ssv )
+MACHINE_CONFIG_DERIVED(ssv_state::sxyreac2, ssv)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2859,7 +2859,7 @@ static MACHINE_CONFIG_DERIVED( sxyreac2, ssv )
 	MCFG_SCREEN_VISIBLE_AREA(0, (0xcb - 0x23)*2-1, 0, (0xfe - 0x0e)-1)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( cairblad, ssv )
+MACHINE_CONFIG_DERIVED(ssv_state::cairblad, ssv)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2874,7 +2874,7 @@ static MACHINE_CONFIG_DERIVED( cairblad, ssv )
 	MCFG_SCREEN_VISIBLE_AREA(0, (0xcb - 0x22)*2-1, 0, (0xfe - 0x0e)-1)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( twineag2, ssv )
+MACHINE_CONFIG_DERIVED(ssv_state::twineag2, ssv)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2894,7 +2894,7 @@ static MACHINE_CONFIG_DERIVED( twineag2, ssv )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( ultrax, ssv )
+MACHINE_CONFIG_DERIVED(ssv_state::ultrax, ssv)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2907,7 +2907,7 @@ static MACHINE_CONFIG_DERIVED( ultrax, ssv )
 	MCFG_SCREEN_VISIBLE_AREA(0, (0xd4 - 0x2c)*2-1, 0, (0x102 - 0x12)-1)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( jsk, ssv )
+MACHINE_CONFIG_DERIVED(ssv_state::jsk, ssv)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")

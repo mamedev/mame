@@ -19,7 +19,7 @@
 #define SVISION_SND_IRQ_MEMBER(_name)   void _name(void)
 
 #define SVISION_SND_IRQ_CB(_class, _method) \
-	svision_sound_device::set_irq_callback(*device, svision_sound_device::irq_delegate(&_class::_method, #_class "::" #_method, downcast<_class *>(owner)));
+	svision_sound_device::set_irq_callback(*device, svision_sound_device::irq_delegate(&_class::_method, #_class "::" #_method, this));
 
 // ======================> svision_sound_device
 

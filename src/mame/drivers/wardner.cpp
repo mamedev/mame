@@ -152,6 +152,7 @@ public:
 	DECLARE_WRITE8_MEMBER(wardner_bank_w);
 	DECLARE_DRIVER_INIT(wardner);
 
+	void wardner(machine_config &config);
 protected:
 	virtual void driver_start() override;
 	virtual void machine_reset() override;
@@ -169,7 +170,7 @@ static ADDRESS_MAP_START( main_program_map, AS_PROGRAM, 8, wardner_state )
 	AM_RANGE(0x0000, 0x6fff) AM_ROM
 	AM_RANGE(0x7000, 0x7fff) AM_RAM
 	AM_RANGE(0x8000, 0x8fff) AM_WRITE(wardner_sprite_w)                     // AM_SHARE("spriteram8")
-	AM_RANGE(0xa000, 0xafff) AM_DEVWRITE("palette", palette_device, write)  // AM_SHARE("palette")
+	AM_RANGE(0xa000, 0xafff) AM_DEVWRITE("palette", palette_device, write8)  // AM_SHARE("palette")
 	AM_RANGE(0xc000, 0xc7ff) AM_WRITEONLY AM_SHARE("sharedram")
 	AM_RANGE(0x8000, 0xffff) AM_DEVREAD("membank", address_map_bank_device, read8)
 ADDRESS_MAP_END
@@ -360,7 +361,7 @@ void wardner_state::machine_reset()
 	m_membank->set_bank(0);
 }
 
-static MACHINE_CONFIG_START( wardner )
+MACHINE_CONFIG_START(wardner_state::wardner)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_24MHz/4)      /* 6MHz */

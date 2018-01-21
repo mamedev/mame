@@ -150,7 +150,7 @@ DEFINE_DEVICE_TYPE(ISA8_PGC, isa8_pgc_device, "isa_ibm_pgc", "IBM Professional G
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( isa8_pgc_device::device_add_mconfig )
+MACHINE_CONFIG_START(isa8_pgc_device::device_add_mconfig)
 	MCFG_CPU_ADD("maincpu", I8088, XTAL_24MHz/3)
 	MCFG_CPU_PROGRAM_MAP(pgc_map)
 	MCFG_CPU_IO_MAP(pgc_io)

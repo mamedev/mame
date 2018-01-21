@@ -290,6 +290,9 @@ public:
 	DECLARE_DRIVER_INIT(sg1000a);
 	required_device<cpu_device> m_maincpu;
 	optional_shared_ptr<uint8_t> m_decrypted_opcodes;
+	void sderby2s(machine_config &config);
+	void sg1000ax(machine_config &config);
+	void sg1000a(machine_config &config);
 };
 
 
@@ -454,7 +457,7 @@ WRITE8_MEMBER(sg1000a_state::sg1000a_coin_counter_w)
  *
  *************************************/
 
-static MACHINE_CONFIG_START( sg1000a )
+MACHINE_CONFIG_START(sg1000a_state::sg1000a)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_3_579545MHz)
 	MCFG_CPU_PROGRAM_MAP(program_map)
@@ -481,7 +484,7 @@ static MACHINE_CONFIG_START( sg1000a )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( sg1000ax, sg1000a )
+MACHINE_CONFIG_DERIVED(sg1000a_state::sg1000ax, sg1000a)
 	MCFG_CPU_REPLACE("maincpu", SEGA_315_5033, XTAL_3_579545MHz)
 	MCFG_CPU_PROGRAM_MAP(program_map)
 	MCFG_CPU_IO_MAP(io_map)
@@ -489,7 +492,7 @@ static MACHINE_CONFIG_DERIVED( sg1000ax, sg1000a )
 	MCFG_SEGACRPT_SET_DECRYPTED_TAG(":decrypted_opcodes")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( sderby2s, sg1000a )
+MACHINE_CONFIG_DERIVED(sg1000a_state::sderby2s, sg1000a)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_CLOCK(XTAL_10_738635MHz / 3)
 	MCFG_CPU_IO_MAP(sderby2_io_map)

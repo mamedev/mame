@@ -63,6 +63,7 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_callback);
 	uint32_t screen_update_z9001(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
+	void z9001(machine_config &config);
 private:
 	uint8_t m_framecnt;
 	bool m_cassbit;
@@ -198,7 +199,7 @@ static GFXDECODE_START( z9001 )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( z9001 )
+MACHINE_CONFIG_START(z9001_state::z9001)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80, XTAL_9_8304MHz / 4)
 	MCFG_CPU_PROGRAM_MAP(z9001_mem)

@@ -75,7 +75,7 @@ ioport_constructor electron_romboxp_device::device_input_ports() const
 	return INPUT_PORTS_NAME( romboxp );
 }
 
-MACHINE_CONFIG_MEMBER( electron_romboxp_device::device_add_mconfig )
+MACHINE_CONFIG_START(electron_romboxp_device::device_add_mconfig)
 	/* printer */
 	MCFG_CENTRONICS_ADD("centronics", centronics_devices, "printer")
 	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(electron_romboxp_device, busy_w))
@@ -123,7 +123,10 @@ electron_romboxp_device::electron_romboxp_device(const machine_config &mconfig, 
 	m_cart(*this, "cart%u", 1),
 	m_centronics(*this, "centronics"),
 	m_cent_data_out(*this, "cent_data_out"),
-	m_option(*this, "OPTION")
+	m_option(*this, "OPTION"),
+	m_romsel(0),
+	m_rom_base(0),
+	m_centronics_busy(0)
 {
 }
 
@@ -133,11 +136,6 @@ electron_romboxp_device::electron_romboxp_device(const machine_config &mconfig, 
 
 void electron_romboxp_device::device_start()
 {
-	address_space& space = machine().device("maincpu")->memory().space(AS_PROGRAM);
-	m_slot = dynamic_cast<electron_expansion_slot_device *>(owner());
-
-	space.install_write_handler(0xfc71, 0xfc71, WRITE8_DEVICE_DELEGATE("cent_data_out", output_latch_device, write));
-	space.install_read_handler(0xfc72, 0xfc72, READ8_DELEGATE(electron_romboxp_device, status_r));
 }
 
 //-------------------------------------------------
@@ -146,27 +144,77 @@ void electron_romboxp_device::device_start()
 
 void electron_romboxp_device::device_reset()
 {
-	std::string region_tag;
-	memory_region *tmp_reg;
+	m_rom_base = (m_option->read() & 0x02) ? 4 : 12;
+}
 
-	int rom_base = (m_option->read() & 0x02) ? 4 : 12;
-	for (int i = 0; i < 4; i++)
+//-------------------------------------------------
+//  expbus_r - expansion data read
+//-------------------------------------------------
+
+uint8_t electron_romboxp_device::expbus_r(address_space &space, offs_t offset, uint8_t data)
+{
+	if (offset >= 0x8000 && offset < 0xc000)
 	{
-		if (m_rom[i] && (tmp_reg = memregion(region_tag.assign(m_rom[i]->tag()).append(GENERIC_ROM_REGION_TAG).c_str())))
+		switch (m_romsel)
 		{
-			machine().root_device().membank("bank2")->configure_entry(rom_base + i, tmp_reg->base());
+		case 0:
+		case 1:
+			if (m_cart[1]->exists())
+			{
+				data = m_cart[1]->read_rom(space, (offset & 0x3fff) + (m_romsel & 0x01) * 0x4000);
+			}
+			break;
+		case 2:
+		case 3:
+			if (m_cart[0]->exists())
+			{
+				data = m_cart[0]->read_rom(space, (offset & 0x3fff) + (m_romsel & 0x01) * 0x4000);
+			}
+			break;
+		case 4:
+		case 5:
+		case 6:
+		case 7:
+			if (m_rom_base == 4 && m_rom[m_romsel - 4]->exists())
+			{
+				data = m_rom[m_romsel - 4]->read_rom(space, offset & 0x3fff);
+			}
+			break;
+		case 12:
+			data = memregion("exp_rom")->base()[offset & 0x1fff];
+			break;
+		case 13:
+		case 14:
+		case 15:
+			if (m_rom_base == 12 && m_rom[m_romsel - 12]->exists())
+			{
+				data = m_rom[m_romsel - 12]->read_rom(space, offset & 0x3fff);
+			}
+			break;
 		}
 	}
-
-	for (int i = 0; i < 2; i++)
+	else if (offset == 0xfc72)
 	{
-		if (m_cart[i] && (tmp_reg = memregion(region_tag.assign(m_cart[i]->tag()).append(GENERIC_ROM_REGION_TAG).c_str())))
-		{
-			machine().root_device().membank("bank2")->configure_entries(i * 2, 2, tmp_reg->base(), 0x4000);
-		}
+		data = status_r(space, offset);
 	}
 
-	machine().root_device().membank("bank2")->configure_entry(12, memregion("exp_rom")->base());
+	return data;
+}
+
+//-------------------------------------------------
+//  expbus_w - expansion data write
+//-------------------------------------------------
+
+void electron_romboxp_device::expbus_w(address_space &space, offs_t offset, uint8_t data)
+{
+	if (offset == 0xfc71)
+	{
+		m_cent_data_out->write(data);
+	}
+	else if (offset == 0xfe05)
+	{
+		m_romsel = data & 0x0f;
+	}
 }
 
 //**************************************************************************
@@ -176,13 +224,13 @@ void electron_romboxp_device::device_reset()
 READ8_MEMBER(electron_romboxp_device::status_r)
 {
 	// Status: b7: printer Busy
-	return m_centronics_busy << 7;
+	return (m_centronics_busy << 7) | 0x7f;
 }
 
 
 WRITE_LINE_MEMBER(electron_romboxp_device::busy_w)
 {
-	m_centronics_busy = state;
+	m_centronics_busy = !state;
 }
 
 
@@ -197,8 +245,12 @@ image_init_result electron_romboxp_device::load_rom(device_image_interface &imag
 		return image_init_result::FAIL;
 	}
 
-	slot->rom_alloc(size, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);
+	slot->rom_alloc(0x4000, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);
 	slot->common_load_rom(slot->get_rom_base(), size, "rom");
+
+	// mirror 8K ROMs
+	uint8_t *crt = slot->get_rom_base();
+	if (size <= 0x2000) memcpy(crt + 0x2000, crt, 0x2000);
 
 	return image_init_result::PASS;
 }
@@ -216,7 +268,7 @@ image_init_result electron_romboxp_device::load_cart(device_image_interface &ima
 			return image_init_result::FAIL;
 		}
 
-		slot->rom_alloc(filesize, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);
+		slot->rom_alloc(0x4000, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);
 		image.fread(slot->get_rom_base(), filesize);
 		return image_init_result::PASS;
 	}
@@ -237,13 +289,13 @@ image_init_result electron_romboxp_device::load_cart(device_image_interface &ima
 			return image_init_result::FAIL;
 		}
 
-		slot->rom_alloc(upsize + losize, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);
+		slot->rom_alloc(0x8000, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);
 
 		if (upsize)
 			memcpy(slot->get_rom_base(), image.get_software_region("uprom"), upsize);
 
 		if (losize)
-			memcpy(slot->get_rom_base() + upsize, image.get_software_region("lorom"), losize);
+			memcpy(slot->get_rom_base() + 0x4000, image.get_software_region("lorom"), losize);
 
 		return image_init_result::PASS;
 	}

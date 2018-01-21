@@ -245,7 +245,7 @@ void kim1_state::machine_reset()
 //  MACHINE DRIVERS
 //**************************************************************************
 
-static MACHINE_CONFIG_START( kim1 )
+MACHINE_CONFIG_START(kim1_state::kim1)
 	// basic machine hardware
 	MCFG_CPU_ADD("maincpu", M6502, 1000000)        /* 1 MHz */
 	MCFG_CPU_PROGRAM_MAP(kim1_map)

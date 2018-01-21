@@ -287,7 +287,10 @@ void scn2674_device::write_init_regs(uint8_t data)
 			break;
 
 	}
-	recompute_parameters();
+
+	// Don't reconfigure if the display isn't turned on (incomplete configurations may generate invalid screen parameters)
+	if (m_display_enabled)
+		recompute_parameters();
 
 	m_IR_pointer++;
 	if (m_IR_pointer>14)m_IR_pointer=14;

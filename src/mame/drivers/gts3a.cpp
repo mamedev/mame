@@ -27,11 +27,11 @@ ToDo:
 #include "screen.h"
 
 
-class gts3a_state : public driver_device
+class gts3a_state : public genpin_class
 {
 public:
 	gts3a_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag)
+		: genpin_class(mconfig, type, tag)
 		, m_palette(*this, "palette")
 		, m_maincpu(*this, "maincpu")
 		, m_dmdcpu(*this, "dmdcpu")
@@ -52,6 +52,7 @@ public:
 	MC6845_UPDATE_ROW(crtc_update_row);
 	DECLARE_PALETTE_INIT(gts3a);
 	required_device<palette_device> m_palette;
+	void gts3a(machine_config &config);
 private:
 	bool m_dispclk;
 	bool m_lampclk;
@@ -330,7 +331,7 @@ MC6845_UPDATE_ROW( gts3a_state::crtc_update_row )
 	}
 }
 
-static MACHINE_CONFIG_START( gts3a )
+MACHINE_CONFIG_START(gts3a_state::gts3a)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M65C02, XTAL_4MHz / 2)
 	MCFG_CPU_PROGRAM_MAP(gts3a_map)

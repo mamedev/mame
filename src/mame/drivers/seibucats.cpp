@@ -116,6 +116,7 @@ public:
 	DECLARE_WRITE16_MEMBER(aux_rtc_w);
 	DECLARE_DRIVER_INIT(seibucats);
 
+	void seibucats(machine_config &config);
 protected:
 	// driver_device overrides
 	virtual void machine_start() override;
@@ -290,7 +291,7 @@ IRQ_CALLBACK_MEMBER(seibucats_state::spi_irq_callback)
 }
 #endif
 
-static MACHINE_CONFIG_START( seibucats )
+MACHINE_CONFIG_START(seibucats_state::seibucats)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",I386, MAIN_CLOCK)

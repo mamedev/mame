@@ -212,7 +212,7 @@ static ADDRESS_MAP_START( megasys1Z_map, AS_PROGRAM, 16, megasys1_state )
 	AM_RANGE(0x084208, 0x08420d) AM_DEVWRITE("scroll1", megasys1_tilemap_device, scroll_w)
 	AM_RANGE(0x084300, 0x084301) AM_WRITE(screen_flag_w)
 	AM_RANGE(0x084308, 0x084309) AM_WRITE(soundlatch_z_w)
-	AM_RANGE(0x088000, 0x0887ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x088000, 0x0887ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x08e000, 0x08ffff) AM_RAM AM_SHARE("objectram")
 	AM_RANGE(0x090000, 0x093fff) AM_RAM_DEVWRITE("scroll0", megasys1_tilemap_device, write) AM_SHARE("scroll0")
 	AM_RANGE(0x094000, 0x097fff) AM_RAM_DEVWRITE("scroll1", megasys1_tilemap_device, write) AM_SHARE("scroll1")
@@ -309,7 +309,7 @@ static ADDRESS_MAP_START( megasys1B_map, AS_PROGRAM, 16, megasys1_state )
 	AM_RANGE(0x044208, 0x04420d) AM_DEVWRITE("scroll1", megasys1_tilemap_device, scroll_w)
 	AM_RANGE(0x044300, 0x044301) AM_WRITE(screen_flag_w)
 	AM_RANGE(0x044308, 0x044309) AM_WRITE(soundlatch_w)
-	AM_RANGE(0x048000, 0x0487ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x048000, 0x0487ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x04e000, 0x04ffff) AM_RAM AM_SHARE("objectram")
 	AM_RANGE(0x050000, 0x053fff) AM_RAM_DEVWRITE("scroll0", megasys1_tilemap_device, write) AM_SHARE("scroll0")
 	AM_RANGE(0x054000, 0x057fff) AM_RAM_DEVWRITE("scroll1", megasys1_tilemap_device, write) AM_SHARE("scroll1")
@@ -381,7 +381,7 @@ static ADDRESS_MAP_START( megasys1C_map, AS_PROGRAM, 16, megasys1_state )
 	AM_RANGE(0x0e0000, 0x0e3fff) AM_MIRROR(0x4000) AM_RAM_DEVWRITE("scroll0", megasys1_tilemap_device, write) AM_SHARE("scroll0")
 	AM_RANGE(0x0e8000, 0x0ebfff) AM_MIRROR(0x4000) AM_RAM_DEVWRITE("scroll1", megasys1_tilemap_device, write) AM_SHARE("scroll1")
 	AM_RANGE(0x0f0000, 0x0f3fff) AM_MIRROR(0x4000) AM_RAM_DEVWRITE("scroll2", megasys1_tilemap_device, write) AM_SHARE("scroll2")
-	AM_RANGE(0x0f8000, 0x0f87ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x0f8000, 0x0f87ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x1c0000, 0x1cffff) AM_MIRROR(0x30000) AM_RAM_WRITE(ram_w) AM_SHARE("ram") //0x1f****, Cybattler reads attract mode inputs at 0x1d****
 ADDRESS_MAP_END
 
@@ -405,7 +405,7 @@ static ADDRESS_MAP_START( megasys1D_map, AS_PROGRAM, 16, megasys1_state )
 	AM_RANGE(0x0c2308, 0x0c2309) AM_WRITE(screen_flag_w)
 	AM_RANGE(0x0ca000, 0x0cbfff) AM_RAM AM_SHARE("objectram")
 	AM_RANGE(0x0d0000, 0x0d3fff) AM_RAM_DEVWRITE("scroll1", megasys1_tilemap_device, write) AM_SHARE("scroll1")
-	AM_RANGE(0x0d8000, 0x0d87ff) AM_MIRROR(0x3000) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x0d8000, 0x0d87ff) AM_MIRROR(0x3000) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x0e0000, 0x0e0001) AM_READ_PORT("DSW")
 	AM_RANGE(0x0e8000, 0x0ebfff) AM_RAM_DEVWRITE("scroll0", megasys1_tilemap_device, write) AM_SHARE("scroll0")
 	AM_RANGE(0x0f0000, 0x0f0001) AM_READ_PORT("SYSTEM")
@@ -1668,7 +1668,7 @@ GFXDECODE_END
 
 /* Provided by Jim Hernandez: 3.5MHz for FM, 30KHz (!) for ADPCM */
 
-static MACHINE_CONFIG_START( system_A )
+MACHINE_CONFIG_START(megasys1_state::system_A)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, SYS_A_CPU_CLOCK) /* 6MHz verified */
@@ -1722,22 +1722,22 @@ static MACHINE_CONFIG_START( system_A )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.30)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( system_A_hachoo, system_A )
+MACHINE_CONFIG_DERIVED(megasys1_state::system_A_hachoo, system_A)
 	MCFG_MACHINE_RESET_OVERRIDE(megasys1_state,megasys1_hachoo)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( system_A_iganinju, system_A )
+MACHINE_CONFIG_DERIVED(megasys1_state::system_A_iganinju, system_A)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_DEVICE_REMOVE("scantimer")
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", megasys1_state, megasys1A_iganinju_scanline, "screen", 0, 1)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( system_A_soldam, system_A )
+MACHINE_CONFIG_DERIVED(megasys1_state::system_A_soldam, system_A)
 	MCFG_DEVICE_MODIFY("scroll1")
 	MCFG_MEGASYS1_TILEMAP_8X8_SCROLL_FACTOR(4)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( kickoffb, system_A )
+MACHINE_CONFIG_DERIVED(megasys1_state::kickoffb, system_A)
 	MCFG_CPU_MODIFY("audiocpu")
 	MCFG_CPU_PROGRAM_MAP(kickoffb_sound_map)
 
@@ -1750,7 +1750,7 @@ static MACHINE_CONFIG_DERIVED( kickoffb, system_A )
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.80)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( system_B, system_A )
+MACHINE_CONFIG_DERIVED(megasys1_state::system_B, system_A)
 
 	/* basic machine hardware */
 
@@ -1765,12 +1765,12 @@ static MACHINE_CONFIG_DERIVED( system_B, system_A )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( system_B_monkelf, system_B )
+MACHINE_CONFIG_DERIVED(megasys1_state::system_B_monkelf, system_B)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(megasys1B_monkelf_map)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( system_Bbl )
+MACHINE_CONFIG_START(megasys1_state::system_Bbl)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, SYS_B_CPU_CLOCK)
@@ -1809,7 +1809,7 @@ static MACHINE_CONFIG_START( system_Bbl )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.30)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( system_B_hayaosi1, system_B )
+MACHINE_CONFIG_DERIVED(megasys1_state::system_B_hayaosi1, system_B)
 
 	/* basic machine hardware */
 
@@ -1823,7 +1823,7 @@ static MACHINE_CONFIG_DERIVED( system_B_hayaosi1, system_B )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( system_C, system_A )
+MACHINE_CONFIG_DERIVED(megasys1_state::system_C, system_A)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1848,7 +1848,7 @@ MACHINE_CONFIG_END
 ***************************************************************************/
 
 
-static MACHINE_CONFIG_START( system_D )
+MACHINE_CONFIG_START(megasys1_state::system_D)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, SYS_D_CPU_CLOCK)    /* 8MHz */
@@ -1898,7 +1898,7 @@ MACHINE_CONFIG_END
 ***************************************************************************/
 
 
-static MACHINE_CONFIG_START( system_Z )
+MACHINE_CONFIG_START(megasys1_state::system_Z)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, SYS_A_CPU_CLOCK) /* 6MHz (12MHz / 2) */

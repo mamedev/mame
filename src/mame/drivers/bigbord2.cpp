@@ -132,6 +132,7 @@ public:
 	DECLARE_WRITE8_MEMBER(io_write_byte);
 	MC6845_UPDATE_ROW(crtc_update_row);
 
+	void bigbord2(machine_config &config);
 private:
 	u8 crt8002(u8 ac_ra, u8 ac_chr, u8 ac_attr, uint16_t ac_cnt, bool ac_curs);
 	u8 m_term_data;
@@ -540,7 +541,7 @@ MC6845_UPDATE_ROW( bigbord2_state::crtc_update_row )
 
 #define MAIN_CLOCK XTAL_8MHz / 2
 
-static MACHINE_CONFIG_START( bigbord2 )
+MACHINE_CONFIG_START(bigbord2_state::bigbord2)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, MAIN_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(bigbord2_mem)

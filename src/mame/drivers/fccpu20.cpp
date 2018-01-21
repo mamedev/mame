@@ -104,6 +104,13 @@ cpu20_state(const machine_config &mconfig, device_type type, const char *tag)
 	DECLARE_DRIVER_INIT(cpu21ya)    { LOGSETUP("%s\n", FUNCNAME); }
 	DECLARE_DRIVER_INIT(cpu21b)     { LOGSETUP("%s\n", FUNCNAME); }
 	DECLARE_DRIVER_INIT(cpu21yb)    { LOGSETUP("%s\n", FUNCNAME); }
+	void cpu21(machine_config &config);
+	void cpu20(machine_config &config);
+	void cpu21yb(machine_config &config);
+	void cpu21s(machine_config &config);
+	void cpu21b(machine_config &config);
+	void cpu21ya(machine_config &config);
+	void cpu21a(machine_config &config);
 };
 
 /* Input ports */
@@ -140,37 +147,37 @@ static SLOT_INTERFACE_START(cpu21yb_vme_cards)
 SLOT_INTERFACE_END
 
 /* Machine configurations */
-MACHINE_CONFIG_START (cpu20)
+MACHINE_CONFIG_START(cpu20_state::cpu20)
 	MCFG_VME_DEVICE_ADD("vme")
 	MCFG_VME_SLOT_ADD ("vme", 1, cpu20_vme_cards, "fccpu20")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START (cpu21s)
+MACHINE_CONFIG_START(cpu20_state::cpu21s)
 	MCFG_VME_DEVICE_ADD("vme")
 	MCFG_VME_SLOT_ADD ("vme", 1, cpu21s_vme_cards, "fccpu21s")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START (cpu21)
+MACHINE_CONFIG_START(cpu20_state::cpu21)
 	MCFG_VME_DEVICE_ADD("vme")
 	MCFG_VME_SLOT_ADD ("vme", 1, cpu21_vme_cards, "fccpu21")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START (cpu21a)
+MACHINE_CONFIG_START(cpu20_state::cpu21a)
 	MCFG_VME_DEVICE_ADD("vme")
 	MCFG_VME_SLOT_ADD ("vme", 1, cpu21a_vme_cards, "fccpu21a")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START (cpu21ya)
+MACHINE_CONFIG_START(cpu20_state::cpu21ya)
 	MCFG_VME_DEVICE_ADD("vme")
 	MCFG_VME_SLOT_ADD ("vme", 1, cpu21ya_vme_cards, "fccpu21ya")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START (cpu21b)
+MACHINE_CONFIG_START(cpu20_state::cpu21b)
 	MCFG_VME_DEVICE_ADD("vme")
 	MCFG_VME_SLOT_ADD ("vme", 1, cpu21b_vme_cards, "fccpu21b")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START (cpu21yb)
+MACHINE_CONFIG_START(cpu20_state::cpu21yb)
 	MCFG_VME_DEVICE_ADD("vme")
 	MCFG_VME_SLOT_ADD ("vme", 1, cpu21yb_vme_cards, "fccpu21yb")
 MACHINE_CONFIG_END

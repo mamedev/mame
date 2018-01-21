@@ -188,7 +188,7 @@ ROM_END
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( vme_mvme350_card_device::device_add_mconfig )
+MACHINE_CONFIG_START(vme_mvme350_card_device::device_add_mconfig)
 	/* basic machine hardware */
 	MCFG_CPU_ADD (MVME350_CPU_TAG, M68010, XTAL_10MHz)
 	MCFG_CPU_PROGRAM_MAP (mvme350_mem)

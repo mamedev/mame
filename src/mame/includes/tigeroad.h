@@ -60,6 +60,9 @@ public:
 	required_device<tigeroad_spr_device> m_spritegen;
 	required_device<generic_latch_8_device> m_soundlatch;
 
+	void toramich(machine_config &config);
+	void tigeroad(machine_config &config);
+	void f1dream_comad(machine_config &config);
 protected:
 	/* misc */
 	bool m_has_coinlock;
@@ -90,6 +93,8 @@ public:
 	DECLARE_WRITE8_MEMBER(mcu_pb_w);
 	DECLARE_WRITE8_MEMBER(mcu_pc_w);
 
+	void pushman(machine_config &config);
+	void bballs(machine_config &config);
 protected:
 	virtual void machine_start() override;
 

@@ -48,6 +48,7 @@ public:
 	void set_bank(uint8_t data);
 
 	required_device<speaker_sound_device> m_speaker;
+	void photon(machine_config &config);
 };
 
 
@@ -195,7 +196,7 @@ uint32_t photon_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 	return video_update(screen, bitmap, cliprect, memregion("maincpu")->base());
 }
 
-static MACHINE_CONFIG_START( photon )
+MACHINE_CONFIG_START(photon_state::photon)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",I8080, 1780000)

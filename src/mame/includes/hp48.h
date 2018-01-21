@@ -137,6 +137,13 @@ public:
 
 	/* keyboard interrupt system */
 	DECLARE_WRITE_LINE_MEMBER( hp48_rsi );
+	void hp48_common(machine_config &config);
+	void hp48s(machine_config &config);
+	void hp48gp(machine_config &config);
+	void hp48sx(machine_config &config);
+	void hp48g(machine_config &config);
+	void hp48gx(machine_config &config);
+	void hp49g(machine_config &config);
 };
 
 

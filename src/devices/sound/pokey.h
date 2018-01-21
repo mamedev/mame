@@ -94,10 +94,10 @@
 /* k543210 = k5 ... k0 returns bit0: kr1, bit1: kr2 */
 /* all are, in contrast to actual hardware, ACTIVE_HIGH */
 #define MCFG_POKEY_KEYBOARD_CB(_class, _method) \
-	pokey_device::set_keyboard_callback(*device, pokey_device::kb_cb_delegate(&_class::_method, #_class "::" #_method, downcast<_class *>(owner)));
+	pokey_device::set_keyboard_callback(*device, pokey_device::kb_cb_delegate(&_class::_method, #_class "::" #_method, this));
 
 #define MCFG_POKEY_INTERRUPT_CB(_class, _method) \
-	pokey_device::set_interrupt_callback(*device, pokey_device::int_cb_delegate(&_class::_method, #_class "::" #_method, downcast<_class *>(owner)));
+	pokey_device::set_interrupt_callback(*device, pokey_device::int_cb_delegate(&_class::_method, #_class "::" #_method, this));
 
 
 #define MCFG_POKEY_OUTPUT_RC(_R, _C, _V) \

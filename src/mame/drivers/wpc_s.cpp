@@ -55,6 +55,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(scanline_irq);
 	TIMER_DEVICE_CALLBACK_MEMBER(zc_timer);
 
+	void wpc_s(machine_config &config);
 protected:
 	// devices
 	required_device<cpu_device> maincpu;
@@ -1967,7 +1968,7 @@ static INPUT_PORTS_START( tfs )
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("UL Flipper Button")
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( wpc_s )
+MACHINE_CONFIG_START(wpc_s_state::wpc_s)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", MC6809E, XTAL_8MHz/4)
 	MCFG_CPU_PROGRAM_MAP(wpc_s_map)

@@ -75,6 +75,7 @@ public:
 	DECLARE_READ8_MEMBER(dma_r);
 	I8275_DRAW_CHARACTER_MEMBER(display_pixels);
 
+	void unior(machine_config &config);
 private:
 	uint8_t m_4c;
 	uint8_t m_4e;
@@ -373,7 +374,7 @@ void unior_state::machine_reset()
 	m_maincpu->set_state_int(i8080_cpu_device::I8085_PC, 0xF800);
 }
 
-static MACHINE_CONFIG_START( unior )
+MACHINE_CONFIG_START(unior_state::unior)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",I8080, XTAL_20MHz / 9)
 	MCFG_CPU_PROGRAM_MAP(unior_mem)

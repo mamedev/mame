@@ -162,7 +162,7 @@ static GFXDECODE_START( higemaru )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( higemaru )
+MACHINE_CONFIG_START(higemaru_state::higemaru)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_12MHz/4)  /* 3 MHz Sharp LH0080A Z80A-CPU-D */

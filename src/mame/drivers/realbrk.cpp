@@ -158,7 +158,7 @@ WRITE16_MEMBER(realbrk_state::backup_ram_w)
 static ADDRESS_MAP_START( base_mem, AS_PROGRAM, 16, realbrk_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM                                         // ROM
 	AM_RANGE(0x200000, 0x203fff) AM_RAM                   AM_SHARE("spriteram") // Sprites
-	AM_RANGE(0x400000, 0x40ffff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")   // Palette
+	AM_RANGE(0x400000, 0x40ffff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")   // Palette
 	AM_RANGE(0x600000, 0x601fff) AM_RAM_WRITE(vram_0_w) AM_SHARE("vram_0")  // Background   (0)
 	AM_RANGE(0x602000, 0x603fff) AM_RAM_WRITE(vram_1_w) AM_SHARE("vram_1")  // Background   (1)
 	AM_RANGE(0x604000, 0x604fff) AM_RAM_WRITE(vram_2_w) AM_SHARE("vram_2")  // Text         (2)
@@ -754,7 +754,7 @@ INTERRUPT_GEN_MEMBER(realbrk_state::interrupt)
 	m_tmp68301->external_interrupt_1();
 }
 
-static MACHINE_CONFIG_START( realbrk )
+MACHINE_CONFIG_START(realbrk_state::realbrk)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",M68000, XTAL_32MHz / 2)          /* !! TMP68301 !! */
@@ -791,7 +791,7 @@ static MACHINE_CONFIG_START( realbrk )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( pkgnsh, realbrk )
+MACHINE_CONFIG_DERIVED(realbrk_state::pkgnsh, realbrk)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(pkgnsh_mem)
 
@@ -799,12 +799,12 @@ static MACHINE_CONFIG_DERIVED( pkgnsh, realbrk )
 	MCFG_TMP68301_OUT_PARALLEL_CB(NOOP)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( pkgnshdx, pkgnsh )
+MACHINE_CONFIG_DERIVED(realbrk_state::pkgnshdx, pkgnsh)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(pkgnshdx_mem)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( dai2kaku, realbrk )
+MACHINE_CONFIG_DERIVED(realbrk_state::dai2kaku, realbrk)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(dai2kaku_mem)
 

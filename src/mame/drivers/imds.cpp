@@ -40,6 +40,7 @@ public:
 	void kbd_put(u8 data);
 	uint8_t m_term_data;
 	virtual void machine_reset() override;
+	void imds(machine_config &config);
 };
 
 READ8_MEMBER( imds_state::term_status_r )
@@ -88,7 +89,7 @@ void imds_state::machine_reset()
 //  nullptr
 //};
 
-static MACHINE_CONFIG_START( imds )
+MACHINE_CONFIG_START(imds_state::imds)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8080, XTAL_4MHz) // no idea of clock.
 	MCFG_CPU_PROGRAM_MAP(imds_mem)

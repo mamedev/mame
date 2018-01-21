@@ -38,6 +38,12 @@ public:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(vblank_irq);
 
+	void kyugo_base(machine_config &config);
+	void repulse(machine_config &config);
+	void flashgala(machine_config &config);
+	void srdmissn(machine_config &config);
+	void legend(machine_config &config);
+	void gyrodine(machine_config &config);
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;

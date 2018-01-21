@@ -173,6 +173,7 @@ public:
 	DECLARE_WRITE8_MEMBER(lamps3_w);
 
 	DECLARE_CUSTOM_INPUT_MEMBER(hopper_status_r);
+	void jankenmn(machine_config &config);
 };
 
 
@@ -362,7 +363,7 @@ static const z80_daisy_config daisy_chain[] =
 *               Machine Config               *
 *********************************************/
 
-static MACHINE_CONFIG_START( jankenmn )
+MACHINE_CONFIG_START(jankenmn_state::jankenmn)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK)  /* 2.5 MHz */
 	MCFG_Z80_DAISY_CHAIN(daisy_chain)

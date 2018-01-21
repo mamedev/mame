@@ -76,6 +76,7 @@ public:
 		: driver_device(mconfig, type, tag)
 		{ }
 
+		void aim65_40(machine_config &config);
 	// devices
 	//device_t *m_via0;
 	//device_t *m_via1;
@@ -111,7 +112,7 @@ INPUT_PORTS_END
     MACHINE DRIVERS
 ***************************************************************************/
 
-static MACHINE_CONFIG_START( aim65_40 )
+MACHINE_CONFIG_START(aim65_40_state::aim65_40)
 	/* basic machine hardware */
 	MCFG_CPU_ADD(M6502_TAG, M6502, 1000000)
 	MCFG_CPU_PROGRAM_MAP(aim65_40_mem)

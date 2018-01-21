@@ -966,7 +966,7 @@ TIMER_CALLBACK_MEMBER(nds_state::timer_expire)
 	}
 }
 
-static MACHINE_CONFIG_START( nds )
+MACHINE_CONFIG_START(nds_state::nds)
 	MCFG_CPU_ADD("arm7", ARM7, MASTER_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(nds_arm7_map)
 

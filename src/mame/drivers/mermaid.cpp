@@ -423,7 +423,7 @@ INTERRUPT_GEN_MEMBER(mermaid_state::vblank_irq)
 		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
-static MACHINE_CONFIG_START( mermaid )
+MACHINE_CONFIG_START(mermaid_state::mermaid)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 4000000)   // ???
@@ -470,7 +470,7 @@ static MACHINE_CONFIG_START( mermaid )
 
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( rougien, mermaid )
+MACHINE_CONFIG_DERIVED(mermaid_state::rougien, mermaid)
 
 	MCFG_DEVICE_MODIFY("latch1")
 	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(mermaid_state, rougien_sample_playback_w))

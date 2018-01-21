@@ -54,7 +54,7 @@ ROM_END
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( bml3bus_mp1805_device::device_add_mconfig )
+MACHINE_CONFIG_START(bml3bus_mp1805_device::device_add_mconfig)
 	MCFG_DEVICE_ADD( "mc6843", MC6843, 0 )
 	MCFG_MC6843_IRQ_CALLBACK(WRITELINE(bml3bus_mp1805_device, bml3_mc6843_intrq_w))
 	MCFG_LEGACY_FLOPPY_4_DRIVES_ADD(bml3_mp1805_floppy_interface)

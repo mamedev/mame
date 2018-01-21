@@ -43,6 +43,7 @@ public:
 	DECLARE_WRITE32_MEMBER(gamtor_unk_w);
 	DECLARE_DRIVER_INIT(gaminator);
 	required_device<cpu_device> m_maincpu;
+	void gaminator(machine_config &config);
 };
 
 WRITE32_MEMBER(gaminator_state::gamtor_unk_w)
@@ -77,13 +78,18 @@ INPUT_PORTS_END
 
 
 
-static MACHINE_CONFIG_START( gaminator )
+MACHINE_CONFIG_START(gaminator_state::gaminator)
 	MCFG_CPU_ADD("maincpu", MCF5206E, 40000000) /* definitely Coldfire, model / clock uncertain */
 	MCFG_CPU_PROGRAM_MAP(gaminator_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", gaminator_state,  irq6_line_hold) // irq6 seems to be needed to get past the ROM checking
 	MCFG_MCF5206E_PERIPHERAL_ADD("maincpu_onboard")
 
-	MCFG_FRAGMENT_ADD( pcvideo_gamtor_vga )
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_RAW_PARAMS(XTAL_25_1748MHz,900,0,640,526,0,480)
+	MCFG_SCREEN_UPDATE_DEVICE("vga", gamtor_vga_device, screen_update)
+
+	MCFG_PALETTE_ADD("palette", 0x100)
+	MCFG_DEVICE_ADD("vga", GAMTOR_VGA, 0)
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 	/* unknown sound */

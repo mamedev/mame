@@ -22,6 +22,7 @@ public:
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
+	void bntyhunt(machine_config &config);
 protected:
 
 	// devices
@@ -49,7 +50,7 @@ static INPUT_PORTS_START( bntyhunt )
 INPUT_PORTS_END
 
 
-static MACHINE_CONFIG_START( bntyhunt )
+MACHINE_CONFIG_START(bntyhunt_state::bntyhunt)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", PENTIUM, 200000000) /* Probably a Pentium or higher .. ?? Mhz*/
 	MCFG_CPU_PROGRAM_MAP(bntyhunt_map)

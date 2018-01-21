@@ -122,7 +122,7 @@ ADDRESS_MAP_END
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( interpod_device::device_add_mconfig )
+MACHINE_CONFIG_START(interpod_device::device_add_mconfig)
 	MCFG_CPU_ADD(R6502_TAG, M6502, 1000000)
 	MCFG_CPU_PROGRAM_MAP(interpod_mem)
 

@@ -120,6 +120,7 @@ public:
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
+	void flower(machine_config &config);
 protected:
 	// driver_device overrides
 	virtual void machine_start() override;
@@ -486,7 +487,7 @@ INTERRUPT_GEN_MEMBER(flower_state::slave_vblank_irq)
 }
 
 
-static MACHINE_CONFIG_START( flower )
+MACHINE_CONFIG_START(flower_state::flower)
 	MCFG_CPU_ADD("mastercpu",Z80,MASTER_CLOCK/4)
 	MCFG_CPU_PROGRAM_MAP(shared_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", flower_state, master_vblank_irq)

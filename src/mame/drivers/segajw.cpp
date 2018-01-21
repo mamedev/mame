@@ -61,6 +61,7 @@ public:
 	DECLARE_CUSTOM_INPUT_MEMBER(coin_sensors_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(hopper_sensors_r);
 
+	void segajw(machine_config &config);
 protected:
 
 	// devices
@@ -163,8 +164,8 @@ CUSTOM_INPUT_MEMBER( segajw_state::coin_sensors_r )
 static ADDRESS_MAP_START( segajw_map, AS_PROGRAM, 16, segajw_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 
-	AM_RANGE(0x080000, 0x080001) AM_DEVREADWRITE("hd63484", hd63484_device, status_r, address_w)
-	AM_RANGE(0x080002, 0x080003) AM_DEVREADWRITE("hd63484", hd63484_device, data_r, data_w)
+	AM_RANGE(0x080000, 0x080001) AM_DEVREADWRITE("hd63484", hd63484_device, status16_r, address16_w)
+	AM_RANGE(0x080002, 0x080003) AM_DEVREADWRITE("hd63484", hd63484_device, data16_r, data16_w)
 
 	AM_RANGE(0x180000, 0x180001) AM_READ_PORT("DSW0")
 	AM_RANGE(0x180004, 0x180005) AM_DEVREAD8("soundlatch2", generic_latch_8_device, read, 0x00ff) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x00ff)
@@ -349,7 +350,7 @@ static ADDRESS_MAP_START( ramdac_map, 0, 8, segajw_state )
 	AM_RANGE(0x000, 0x3ff) AM_DEVREADWRITE("ramdac",ramdac_device,ramdac_pal_r,ramdac_rgb666_w)
 ADDRESS_MAP_END
 
-static MACHINE_CONFIG_START( segajw )
+MACHINE_CONFIG_START(segajw_state::segajw)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",M68000,8000000) // unknown clock
 	MCFG_CPU_PROGRAM_MAP(segajw_map)

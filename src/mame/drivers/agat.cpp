@@ -153,6 +153,7 @@ public:
 	DECLARE_READ8_MEMBER(controller_strobe_r);
 	DECLARE_WRITE8_MEMBER(controller_strobe_w);
 
+	void agat7(machine_config &config);
 private:
 	int m_speaker_state;
 	int m_cassette_state;
@@ -1069,7 +1070,7 @@ static SLOT_INTERFACE_START(agat7_cards)
 	// Nippel Co-processor (R65C02 clone + dual-ported RAM)
 SLOT_INTERFACE_END
 
-static MACHINE_CONFIG_START( agat7 )
+MACHINE_CONFIG_START(agat7_state::agat7)
 	MCFG_CPU_ADD("maincpu", M6502, XTAL_14_3MHz / 14)
 	MCFG_CPU_PROGRAM_MAP(agat7_map)
 	MCFG_CPU_VBLANK_INT_DRIVER(A7_VIDEO_TAG ":a7screen", agat7_state, agat_vblank)

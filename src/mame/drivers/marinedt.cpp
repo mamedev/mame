@@ -134,6 +134,7 @@ public:
 	DECLARE_WRITE8_MEMBER(output_w);
 	TILE_GET_INFO_MEMBER(get_tile_info);
 
+	void marinedt(machine_config &config);
 protected:
 	// driver_device overrides
 	virtual void machine_start() override;
@@ -621,7 +622,7 @@ PALETTE_INIT_MEMBER(marinedt_state, marinedt)
 	}
 }
 
-static MACHINE_CONFIG_START( marinedt )
+MACHINE_CONFIG_START(marinedt_state::marinedt)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80,MAIN_CLOCK/4)

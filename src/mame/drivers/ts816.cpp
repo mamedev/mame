@@ -44,6 +44,7 @@ public:
 	DECLARE_WRITE8_MEMBER(portf0_w);
 	DECLARE_DRIVER_INIT(ts816);
 
+	void ts816(machine_config &config);
 private:
 	uint8_t m_term_data;
 	uint8_t m_status;
@@ -255,7 +256,7 @@ DRIVER_INIT_MEMBER( ts816_state, ts816 )
 	membank("bank2")->configure_entry(1, &rams[0x1e000]);
 }
 
-static MACHINE_CONFIG_START( ts816 )
+MACHINE_CONFIG_START(ts816_state::ts816)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_16MHz / 4)
 	MCFG_CPU_PROGRAM_MAP(ts816_mem)

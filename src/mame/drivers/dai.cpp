@@ -185,7 +185,7 @@ static GFXDECODE_START( dai )
 GFXDECODE_END
 
 /* machine definition */
-static MACHINE_CONFIG_START( dai )
+MACHINE_CONFIG_START(dai_state::dai)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8080, 2000000)
 	MCFG_CPU_PROGRAM_MAP(dai_mem)

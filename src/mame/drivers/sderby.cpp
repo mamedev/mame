@@ -308,7 +308,7 @@ static ADDRESS_MAP_START( sderby_map, AS_PROGRAM, 16, sderby_state )
 	AM_RANGE(0x308000, 0x30800d) AM_READ(sderby_input_r)
 	AM_RANGE(0x308008, 0x308009) AM_WRITE(sderby_out_w) /* output port */
 	AM_RANGE(0x30800e, 0x30800f) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)
-	AM_RANGE(0x380000, 0x380fff) AM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x380000, 0x380fff) AM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x500000, 0x500001) AM_WRITENOP    /* unknown... write 0x01 in game, and 0x00 on reset */
 	AM_RANGE(0xd00000, 0xd007ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0xffc000, 0xffffff) AM_RAM
@@ -326,7 +326,7 @@ static ADDRESS_MAP_START( sderbya_map, AS_PROGRAM, 16, sderby_state )
 	AM_RANGE(0x308000, 0x30800d) AM_READ(sderbya_input_r)
 	AM_RANGE(0x308008, 0x308009) AM_WRITE(sderby_out_w) /* output port */
 	AM_RANGE(0x30800e, 0x30800f) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)
-	AM_RANGE(0x380000, 0x380fff) AM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x380000, 0x380fff) AM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x300000, 0x300001) AM_WRITENOP    /* unknown... write 0x01 in game, and 0x00 on reset */      //MOD
 	AM_RANGE(0xcf0000, 0xcf07ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0xcfc000, 0xcfffff) AM_RAM                                                                     //MOD
@@ -345,7 +345,7 @@ static ADDRESS_MAP_START( luckboom_map, AS_PROGRAM, 16, sderby_state )
 	AM_RANGE(0x308000, 0x30800d) AM_READ(sderby_input_r)
 	AM_RANGE(0x308008, 0x308009) AM_WRITE(sderby_out_w) /* output port */
 	AM_RANGE(0x30800e, 0x30800f) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)
-	AM_RANGE(0x380000, 0x380fff) AM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x380000, 0x380fff) AM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x500000, 0x500001) AM_WRITENOP    /* unknown... write 0x01 in game, and 0x00 on reset */
 	AM_RANGE(0xe00000, 0xe007ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0xff0000, 0xffffff) AM_RAM
@@ -364,7 +364,7 @@ static ADDRESS_MAP_START( spacewin_map, AS_PROGRAM, 16, sderby_state )
 	AM_RANGE(0x308000, 0x30800d) AM_READ(sderby_input_r)
 	AM_RANGE(0x308008, 0x308009) AM_WRITE(scmatto_out_w)    /* output port */
 	AM_RANGE(0x30800e, 0x30800f) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)
-	AM_RANGE(0x380000, 0x380fff) AM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x380000, 0x380fff) AM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0xd00000, 0xd001ff) AM_RAM
 	AM_RANGE(0x800000, 0x800fff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x801000, 0x80100d) AM_WRITENOP    /* unknown */
@@ -385,7 +385,7 @@ static ADDRESS_MAP_START( shinygld_map, AS_PROGRAM, 16, sderby_state )
 	AM_RANGE(0x308000, 0x30800d) AM_READ(sderby_input_r)
 	AM_RANGE(0x308008, 0x308009) AM_WRITENOP    /* output port */
 	AM_RANGE(0x30800e, 0x30800f) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)
-	AM_RANGE(0x380000, 0x380fff) AM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x380000, 0x380fff) AM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x400000, 0x400fff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x401000, 0x40100d) AM_WRITENOP    /* unknown */
 	AM_RANGE(0x700000, 0x7007ff) AM_RAM AM_SHARE("nvram")   /* 16K Dallas DS1220Y-200 NVRAM */
@@ -406,7 +406,7 @@ static ADDRESS_MAP_START( roulette_map, AS_PROGRAM, 16, sderby_state )
 	AM_RANGE(0x70800a, 0x70800b) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)
 	AM_RANGE(0x70800c, 0x70800d) AM_WRITENOP    /* watchdog?? (0x0003) */
 	AM_RANGE(0x70800e, 0x70800f) AM_READWRITE(rprot_r, rprot_w) /* MCU communication */
-	AM_RANGE(0x780000, 0x780fff) AM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x780000, 0x780fff) AM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 
 	AM_RANGE(0xff0000, 0xff07ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0xffc000, 0xffffff) AM_RAM
@@ -593,7 +593,7 @@ GFXDECODE_END
 *      Machine Drivers      *
 ****************************/
 
-static MACHINE_CONFIG_START( sderby )
+MACHINE_CONFIG_START(sderby_state::sderby)
 
 	MCFG_CPU_ADD("maincpu", M68000, 12000000)
 	MCFG_CPU_PROGRAM_MAP(sderby_map)
@@ -618,7 +618,7 @@ static MACHINE_CONFIG_START( sderby )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( sderbya )
+MACHINE_CONFIG_START(sderby_state::sderbya)
 
 	MCFG_CPU_ADD("maincpu", M68000, 12000000)
 	MCFG_CPU_PROGRAM_MAP(sderbya_map)
@@ -643,7 +643,7 @@ static MACHINE_CONFIG_START( sderbya )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( luckboom )
+MACHINE_CONFIG_START(sderby_state::luckboom)
 
 	MCFG_CPU_ADD("maincpu", M68000, 12000000)
 	MCFG_CPU_PROGRAM_MAP(luckboom_map)
@@ -668,7 +668,7 @@ static MACHINE_CONFIG_START( luckboom )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( spacewin )
+MACHINE_CONFIG_START(sderby_state::spacewin)
 
 	MCFG_CPU_ADD("maincpu", M68000, 12000000)
 	MCFG_CPU_PROGRAM_MAP(spacewin_map)
@@ -693,7 +693,7 @@ static MACHINE_CONFIG_START( spacewin )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( shinygld)
+MACHINE_CONFIG_START(sderby_state::shinygld)
 
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz / 2) // verified
 	MCFG_CPU_PROGRAM_MAP(shinygld_map)
@@ -718,7 +718,7 @@ static MACHINE_CONFIG_START( shinygld)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( pmroulet )
+MACHINE_CONFIG_START(sderby_state::pmroulet)
 
 	MCFG_CPU_ADD("maincpu", M68000, 12000000)
 	MCFG_CPU_PROGRAM_MAP(roulette_map)

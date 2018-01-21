@@ -321,7 +321,7 @@ DECO16IC_BANK_CB_MEMBER(boogwing_state::bank_callback2)
 	return offset;
 }
 
-static MACHINE_CONFIG_START( boogwing )
+MACHINE_CONFIG_START(boogwing_state::boogwing)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 14000000)   /* DE102 */

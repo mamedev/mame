@@ -73,6 +73,8 @@ public:
 	DECLARE_WRITE8_MEMBER(count_reset_w);
 	DECLARE_INPUT_CHANGED_MEMBER(ficha);
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_r);
+	void ltd4(machine_config &config);
+	void ltd3(machine_config &config);
 private:
 	bool m_timer_r;
 	bool m_clear;
@@ -516,7 +518,7 @@ TIMER_DEVICE_CALLBACK_MEMBER( ltd_state::timer_r )
 	}
 }
 
-static MACHINE_CONFIG_START( ltd3 )
+MACHINE_CONFIG_START(ltd_state::ltd3)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6802, XTAL_3_579545MHz)
 	MCFG_CPU_PROGRAM_MAP(ltd3_map)
@@ -532,7 +534,7 @@ static MACHINE_CONFIG_START( ltd3 )
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer_r", ltd_state, timer_r, attotime::from_hz(500))
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( ltd4 )
+MACHINE_CONFIG_START(ltd_state::ltd4)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6803, XTAL_3_579545MHz) // guess, no details available
 	MCFG_CPU_PROGRAM_MAP(ltd4_map)

@@ -339,6 +339,7 @@ public:
 	DECLARE_READ8_MEMBER(rom_ae1f_r);
 
 	virtual void machine_start() override;
+	void tempest(machine_config &config);
 };
 
 
@@ -589,7 +590,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( tempest )
+MACHINE_CONFIG_START(tempest_state::tempest)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, MASTER_CLOCK / 8)

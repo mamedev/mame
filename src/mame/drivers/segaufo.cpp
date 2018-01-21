@@ -127,6 +127,10 @@ public:
 	virtual void machine_start() override;
 	TIMER_DEVICE_CALLBACK_MEMBER(simulate_xyz);
 	TIMER_DEVICE_CALLBACK_MEMBER(update_info);
+	void ufomini(machine_config &config);
+	void ufo21(machine_config &config);
+	void newufo(machine_config &config);
+	void ufo800(machine_config &config);
 };
 
 
@@ -748,7 +752,7 @@ void ufo_state::machine_start()
 	save_item(NAME(m_stepper));
 }
 
-static MACHINE_CONFIG_START( newufo )
+MACHINE_CONFIG_START(ufo_state::newufo)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_16MHz/2)
@@ -796,7 +800,7 @@ static MACHINE_CONFIG_START( newufo )
 	MCFG_SOUND_ROUTE(1, "mono", 0.40)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( ufomini, newufo )
+MACHINE_CONFIG_DERIVED(ufo_state::ufomini, newufo)
 
 	/* basic machine hardware */
 	MCFG_DEVICE_MODIFY("io1")
@@ -806,7 +810,7 @@ static MACHINE_CONFIG_DERIVED( ufomini, newufo )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( ufo21, newufo )
+MACHINE_CONFIG_DERIVED(ufo_state::ufo21, newufo)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -829,7 +833,7 @@ static MACHINE_CONFIG_DERIVED( ufo21, newufo )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( ufo800, newufo )
+MACHINE_CONFIG_DERIVED(ufo_state::ufo800, newufo)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")

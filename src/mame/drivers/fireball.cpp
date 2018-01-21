@@ -76,6 +76,7 @@ public:
 	DECLARE_WRITE8_MEMBER(p3_w);
 	TIMER_DEVICE_CALLBACK_MEMBER(int_0);
 
+	void fireball(machine_config &config);
 protected:
 
 	// devices
@@ -493,7 +494,7 @@ TIMER_DEVICE_CALLBACK_MEMBER( fireball_state::int_0 )
 *************************/
 
 
-static MACHINE_CONFIG_START( fireball )
+MACHINE_CONFIG_START(fireball_state::fireball)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8031, CPU_CLK) //
 	MCFG_CPU_PROGRAM_MAP(fireball_map)

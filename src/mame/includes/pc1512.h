@@ -226,6 +226,10 @@ public:
 
 	// sound state
 	int m_speaker_drive;
+	void pc1512_video(machine_config &config);
+	void pc1512hd(machine_config &config);
+	void pc1512(machine_config &config);
+	void pc1512dd(machine_config &config);
 };
 
 class pc1640_state : public pc1512_state
@@ -246,10 +250,11 @@ public:
 	required_ioport m_sw;
 
 	int m_opt;
+	void pc1640hd(machine_config &config);
+	void pc1640(machine_config &config);
+	void pc1640dd(machine_config &config);
 };
 
 // ---------- defined in video/pc1512.c ----------
-
-MACHINE_CONFIG_EXTERN( pc1512_video );
 
 #endif // MAME_INCLUDES_PC1512_H

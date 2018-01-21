@@ -45,6 +45,7 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_callback);
 	uint8_t get_bit_selected(uint32_t val,int num);
 
+	void busicom(machine_config &config);
 private:
 	required_device<i4004_cpu_device> m_maincpu;
 	required_device<palette_device> m_palette;

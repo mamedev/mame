@@ -38,7 +38,7 @@
 		devcb = &lc7535_device::set_select_callback(*device, DEVCB_##_read);
 
 #define MCFG_LC7535_VOLUME_CB(_class, _method) \
-	lc7535_device::set_volume_callback(*device, lc7535_device::volume_delegate(&_class::_method, #_class "::" #_method, downcast<_class *>(owner)));
+	lc7535_device::set_volume_callback(*device, lc7535_device::volume_delegate(&_class::_method, #_class "::" #_method, this));
 
 #define LC7535_VOLUME_CHANGED(name) void name(int attenuation_right, int attenuation_left, bool loudness)
 

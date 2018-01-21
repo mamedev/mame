@@ -64,7 +64,7 @@ ROM_END
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( electron_plus3_device::device_add_mconfig )
+MACHINE_CONFIG_START(electron_plus3_device::device_add_mconfig)
 	/* fdc */
 	MCFG_WD1770_ADD("fdc", XTAL_16MHz / 2)
 	MCFG_FLOPPY_DRIVE_ADD_FIXED("fdc:0", electron_floppies, "35dd", floppy_formats)
@@ -93,10 +93,12 @@ const tiny_rom_entry *electron_plus3_device::device_rom_region() const
 electron_plus3_device::electron_plus3_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, ELECTRON_PLUS3, tag, owner, clock)
 	, device_electron_expansion_interface(mconfig, *this)
+	, m_exp(*this, "exp")
 	, m_exp_rom(*this, "exp_rom")
 	, m_fdc(*this, "fdc")
 	, m_floppy0(*this, "fdc:0")
 	, m_floppy1(*this, "fdc:1")
+	, m_romsel(0)
 {
 }
 
@@ -106,32 +108,61 @@ electron_plus3_device::electron_plus3_device(const machine_config &mconfig, cons
 
 void electron_plus3_device::device_start()
 {
-	address_space& space = machine().device("maincpu")->memory().space(AS_PROGRAM);
-	m_slot = dynamic_cast<electron_expansion_slot_device *>(owner());
-
-	space.install_readwrite_handler(0xfcc0, 0xfcc0, READ8_DELEGATE(electron_plus3_device, wd1770_status_r), WRITE8_DELEGATE(electron_plus3_device, wd1770_status_w));
-	space.install_readwrite_handler(0xfcc4, 0xfcc7, READ8_DEVICE_DELEGATE(m_fdc, wd1770_device, read), WRITE8_DEVICE_DELEGATE(m_fdc, wd1770_device, write));
 }
 
 //-------------------------------------------------
-//  device_reset - device-specific reset
+//  expbus_r - expansion data read
 //-------------------------------------------------
 
-void electron_plus3_device::device_reset()
+uint8_t electron_plus3_device::expbus_r(address_space &space, offs_t offset, uint8_t data)
 {
-	machine().root_device().membank("bank2")->configure_entry(4, memregion("exp_rom")->base());
+	if (offset >= 0x8000 && offset < 0xc000)
+	{
+		if (m_romsel == 4)
+		{
+			data = memregion("exp_rom")->base()[offset & 0x3fff];
+		}
+	}
+	else if (offset == 0xfcc0)
+	{
+		data = 0xff;
+	}
+	else if (offset >= 0xfcc4 && offset < 0xfcc8)
+	{
+		data = m_fdc->read(space, offset & 0x03);
+	}
+
+	data &= m_exp->expbus_r(space, offset, data);
+
+	return data;
+}
+
+//-------------------------------------------------
+//  expbus_w - expansion data write
+//-------------------------------------------------
+
+void electron_plus3_device::expbus_w(address_space &space, offs_t offset, uint8_t data)
+{
+	m_exp->expbus_w(space, offset, data);
+
+	if (offset == 0xfcc0)
+	{
+		wd1770_status_w(space, offset, data);
+	}
+	else if (offset >= 0xfcc4 && offset < 0xfcc8)
+	{
+		m_fdc->write(space, offset & 0x03, data);
+	}
+	else if (offset == 0xfe05)
+	{
+		m_romsel = data & 0x0f;
+	}
 }
 
 
 //**************************************************************************
 //  IMPLEMENTATION
 //**************************************************************************
-
-READ8_MEMBER(electron_plus3_device::wd1770_status_r)
-{
-	return 0xff;
-}
-
 
 WRITE8_MEMBER(electron_plus3_device::wd1770_status_w)
 {

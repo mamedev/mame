@@ -47,4 +47,5 @@ public:
 	K05324X_CB_MEMBER(sprite_callback);
 	K052109_CB_MEMBER(tile_callback);
 	DECLARE_WRITE8_MEMBER(banking_callback);
+	void surpratk(machine_config &config);
 };

@@ -150,6 +150,11 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	void magic102(machine_config &config);
+	void magic10a(machine_config &config);
+	void magic10(machine_config &config);
+	void hotslot(machine_config &config);
+	void sgsafari(machine_config &config);
 };
 
 
@@ -312,7 +317,7 @@ static ADDRESS_MAP_START( magic10_map, AS_PROGRAM, 16, magic10_state )
 	AM_RANGE(0x101000, 0x101fff) AM_RAM_WRITE(layer0_videoram_w) AM_SHARE("layer0_videoram")
 	AM_RANGE(0x102000, 0x103fff) AM_RAM_WRITE(layer2_videoram_w) AM_SHARE("layer2_videoram")
 	AM_RANGE(0x200000, 0x2007ff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x300000, 0x3001ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x300000, 0x3001ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x400000, 0x400001) AM_READ_PORT("INPUTS")
 	AM_RANGE(0x400002, 0x400003) AM_READ_PORT("DSW")
 	AM_RANGE(0x400008, 0x400009) AM_WRITE(magic10_out_w)
@@ -328,7 +333,7 @@ static ADDRESS_MAP_START( magic10a_map, AS_PROGRAM, 16, magic10_state )
 	AM_RANGE(0x101000, 0x101fff) AM_RAM_WRITE(layer0_videoram_w) AM_SHARE("layer0_videoram")
 	AM_RANGE(0x102000, 0x103fff) AM_RAM_WRITE(layer2_videoram_w) AM_SHARE("layer2_videoram")
 	AM_RANGE(0x200000, 0x2007ff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x300000, 0x3001ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x300000, 0x3001ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x500000, 0x500001) AM_READ_PORT("INPUTS")
 	AM_RANGE(0x500002, 0x500003) AM_READ_PORT("DSW")
 	AM_RANGE(0x500008, 0x500009) AM_WRITE(magic10_out_w)
@@ -344,7 +349,7 @@ static ADDRESS_MAP_START( magic102_map, AS_PROGRAM, 16, magic10_state )
 	AM_RANGE(0x101000, 0x101fff) AM_RAM_WRITE(layer0_videoram_w) AM_SHARE("layer0_videoram")
 	AM_RANGE(0x102000, 0x103fff) AM_RAM_WRITE(layer2_videoram_w) AM_SHARE("layer2_videoram")
 	AM_RANGE(0x200000, 0x2007ff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x400000, 0x4001ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x400000, 0x4001ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x500000, 0x500001) AM_READ(magic102_r)
 	AM_RANGE(0x500004, 0x500005) AM_READNOP // gives credits
 	AM_RANGE(0x500006, 0x500007) AM_READNOP // gives credits
@@ -363,7 +368,7 @@ static ADDRESS_MAP_START( hotslot_map, AS_PROGRAM, 16, magic10_state )
 	AM_RANGE(0x101000, 0x101fff) AM_RAM_WRITE(layer0_videoram_w) AM_SHARE("layer0_videoram")
 	AM_RANGE(0x102000, 0x103fff) AM_RAM_WRITE(layer2_videoram_w) AM_SHARE("layer2_videoram")
 	AM_RANGE(0x200000, 0x2007ff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x400000, 0x4001ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x400000, 0x4001ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x500004, 0x500005) AM_READWRITE(hotslot_copro_r, hotslot_copro_w) // copro comm
 	AM_RANGE(0x500006, 0x500011) AM_RAM
 	AM_RANGE(0x500012, 0x500013) AM_READ_PORT("IN0")
@@ -382,7 +387,7 @@ static ADDRESS_MAP_START( sgsafari_map, AS_PROGRAM, 16, magic10_state )
 	AM_RANGE(0x101000, 0x101fff) AM_RAM_WRITE(layer0_videoram_w) AM_SHARE("layer0_videoram")
 	AM_RANGE(0x102000, 0x103fff) AM_RAM_WRITE(layer2_videoram_w) AM_SHARE("layer2_videoram")
 	AM_RANGE(0x200000, 0x203fff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x300000, 0x3001ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x300000, 0x3001ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x500002, 0x500003) AM_READ_PORT("DSW1")
 	AM_RANGE(0x500008, 0x500009) AM_WRITE(magic10_out_w)
 	AM_RANGE(0x50000a, 0x50000b) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)
@@ -737,7 +742,7 @@ GFXDECODE_END
 *      Machine Drivers      *
 ****************************/
 
-static MACHINE_CONFIG_START( magic10 )
+MACHINE_CONFIG_START(magic10_state::magic10)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, CPU_CLOCK)  // 10 MHz.
 	MCFG_CPU_PROGRAM_MAP(magic10_map)
@@ -765,7 +770,7 @@ static MACHINE_CONFIG_START( magic10 )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( magic10a, magic10 )
+MACHINE_CONFIG_DERIVED(magic10_state::magic10a, magic10)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -773,7 +778,7 @@ static MACHINE_CONFIG_DERIVED( magic10a, magic10 )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( magic102, magic10 )
+MACHINE_CONFIG_DERIVED(magic10_state::magic102, magic10)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -784,7 +789,7 @@ static MACHINE_CONFIG_DERIVED( magic102, magic10 )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( hotslot, magic10 )
+MACHINE_CONFIG_DERIVED(magic10_state::hotslot, magic10)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -795,7 +800,7 @@ static MACHINE_CONFIG_DERIVED( hotslot, magic10 )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( sgsafari, magic10 )
+MACHINE_CONFIG_DERIVED(magic10_state::sgsafari, magic10)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")

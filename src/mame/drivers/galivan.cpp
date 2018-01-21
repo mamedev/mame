@@ -418,7 +418,7 @@ MACHINE_RESET_MEMBER(galivan_state,ninjemak)
 	m_ninjemak_dispdisable = 0;
 }
 
-static MACHINE_CONFIG_START( galivan )
+MACHINE_CONFIG_START(galivan_state::galivan)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_12MHz/2)      /* 6 MHz? */
@@ -468,7 +468,7 @@ static MACHINE_CONFIG_START( galivan )
 	MCFG_SOUND_ROUTE_EX(0, "dac2", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac2", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( ninjemak )
+MACHINE_CONFIG_START(galivan_state::ninjemak)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_12MHz/2)      /* 6 MHz? */
@@ -521,7 +521,7 @@ static MACHINE_CONFIG_START( ninjemak )
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(youmab, ninjemak)
+MACHINE_CONFIG_DERIVED(galivan_state::youmab, ninjemak)
 
 	MCFG_DEVICE_REMOVE("nb1414m4")
 MACHINE_CONFIG_END

@@ -20,7 +20,7 @@ DEFINE_DEVICE_TYPE(SV802, sv802_device, "sv802", "SV-802 Centronics Printer Inte
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( sv802_device::device_add_mconfig )
+MACHINE_CONFIG_START(sv802_device::device_add_mconfig)
 	MCFG_CENTRONICS_ADD("centronics", centronics_devices, "printer")
 	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(sv802_device, busy_w))
 

@@ -311,6 +311,8 @@ public:
 	required_device<i8255_device> m_ppi;
 	required_device<dac_byte_interface> m_dac;
 	required_device_array<cd4099_device, 3> m_latch;
+
+	void luckybal(machine_config &config);
 };
 
 
@@ -516,7 +518,7 @@ INPUT_PORTS_END
 *           Machine Driver            *
 **************************************/
 
-static MACHINE_CONFIG_START( luckybal )
+MACHINE_CONFIG_START(luckybal_state::luckybal)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z180, CPU_CLOCK)

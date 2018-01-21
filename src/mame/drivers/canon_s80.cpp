@@ -28,6 +28,7 @@ public:
 	{ }
 
 	DECLARE_DRIVER_INIT(canons80);
+	void canons80(machine_config &config);
 };
 
 
@@ -36,7 +37,7 @@ static ADDRESS_MAP_START(canons80_map, AS_PROGRAM, 8, canons80_state )
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static MACHINE_CONFIG_START( canons80 )
+MACHINE_CONFIG_START(canons80_state::canons80)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", HD6301, 5000000) /* hd63a01xop 5 MHz guessed: TODO: check on PCB */
 	MCFG_CPU_PROGRAM_MAP(canons80_map)

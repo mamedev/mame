@@ -288,6 +288,9 @@ public:
 	void scsi_dma_read( uint32_t *p_n_psxram, uint32_t n_address, int32_t n_size );
 	void scsi_dma_write( uint32_t *p_n_psxram, uint32_t n_address, int32_t n_size );
 
+	void twinklex(machine_config &config);
+	void twinklei(machine_config &config);
+	void twinkle(machine_config &config);
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
@@ -314,6 +317,8 @@ private:
 	int m_output_bits;
 	int m_output_cs;
 	int m_output_clock;
+
+	static void cdrom_config(device_t *device);
 };
 
 #define LED_A1 0x0001
@@ -1010,13 +1015,14 @@ void twinkle_state::scsi_dma_write( uint32_t *p_n_psxram, uint32_t n_address, in
 }
 
 
-static MACHINE_CONFIG_START( cdrom_config )
-	MCFG_DEVICE_MODIFY( "cdda" )
+void twinkle_state::cdrom_config(device_t *device)
+{
+	device = device->subdevice("cdda");
 	MCFG_SOUND_ROUTE( 0, "^^^^speakerleft", 1.0 )
 	MCFG_SOUND_ROUTE( 1, "^^^^speakerright", 1.0 )
-MACHINE_CONFIG_END
+}
 
-static MACHINE_CONFIG_START( twinkle )
+MACHINE_CONFIG_START(twinkle_state::twinkle)
 	/* basic machine hardware */
 	MCFG_CPU_ADD( "maincpu", CXD8530CQ, XTAL_67_7376MHz )
 	MCFG_CPU_PROGRAM_MAP( main_map )
@@ -1024,8 +1030,8 @@ static MACHINE_CONFIG_START( twinkle )
 	MCFG_RAM_MODIFY("maincpu:ram")
 	MCFG_RAM_DEFAULT_SIZE("4M")
 
-	MCFG_PSX_DMA_CHANNEL_READ( "maincpu", 5, psxdma_device::read_delegate(&twinkle_state::scsi_dma_read, (twinkle_state *) owner ) )
-	MCFG_PSX_DMA_CHANNEL_WRITE( "maincpu", 5, psxdma_device::write_delegate(&twinkle_state::scsi_dma_write, (twinkle_state *) owner ) )
+	MCFG_PSX_DMA_CHANNEL_READ( "maincpu", 5, psxdma_device::read_delegate(&twinkle_state::scsi_dma_read, this ) )
+	MCFG_PSX_DMA_CHANNEL_WRITE( "maincpu", 5, psxdma_device::write_delegate(&twinkle_state::scsi_dma_write, this ) )
 
 	MCFG_CPU_ADD("audiocpu", M68000, 32000000/2)    /* 16.000 MHz */
 	MCFG_CPU_PROGRAM_MAP( sound_map )
@@ -1082,11 +1088,11 @@ static MACHINE_CONFIG_START( twinkle )
 	MCFG_SOUND_ROUTE(1, "speakerright", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( twinklex, twinkle )
+MACHINE_CONFIG_DERIVED(twinkle_state::twinklex, twinkle)
 	MCFG_X76F041_ADD( "security" )
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( twinklei, twinkle )
+MACHINE_CONFIG_DERIVED(twinkle_state::twinklei, twinkle)
 	MCFG_I2CMEM_ADD( "security" )
 	MCFG_I2CMEM_DATA_SIZE( 0x100 )
 MACHINE_CONFIG_END

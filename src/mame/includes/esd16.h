@@ -76,4 +76,10 @@ public:
 	virtual void video_start() override;
 	uint32_t screen_update_hedpanic(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECOSPR_PRIORITY_CB_MEMBER(hedpanic_pri_callback);
+	void jumppop(machine_config &config);
+	void esd16(machine_config &config);
+	void tangtang(machine_config &config);
+	void mchampdx(machine_config &config);
+	void hedpanio(machine_config &config);
+	void hedpanic(machine_config &config);
 };

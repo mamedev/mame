@@ -506,6 +506,7 @@ public:
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(_5clown);
 	uint32_t screen_update_fclown(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void fclown(machine_config &config);
 };
 
 void _5clown_state::machine_start()
@@ -1014,7 +1015,7 @@ GFXDECODE_END
 *    Machine Drivers     *
 *************************/
 
-static MACHINE_CONFIG_START( fclown )
+MACHINE_CONFIG_START(_5clown_state::fclown)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, MASTER_CLOCK/8)  /* guess, seems ok */

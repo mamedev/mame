@@ -77,6 +77,7 @@ public:
 	DECLARE_READ8_MEMBER(rom_r);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(pokemini_cart);
 
+	void pokemini(machine_config &config);
 protected:
 	enum
 	{
@@ -1753,7 +1754,7 @@ uint32_t pokemini_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 }
 
 
-static MACHINE_CONFIG_START( pokemini )
+MACHINE_CONFIG_START(pokemini_state::pokemini)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", MINX, 4000000)
 	MCFG_CPU_PROGRAM_MAP(pokemini_mem_map)

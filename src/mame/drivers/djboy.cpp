@@ -547,7 +547,7 @@ void djboy_state::machine_reset()
 	m_z80_to_beast_full = 0;
 }
 
-static MACHINE_CONFIG_START( djboy )
+MACHINE_CONFIG_START(djboy_state::djboy)
 
 	MCFG_CPU_ADD("maincpu", Z80, 6000000)
 	MCFG_CPU_PROGRAM_MAP(cpu0_am)

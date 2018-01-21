@@ -194,6 +194,7 @@ public:
 	uint32_t screen_update_supercrd(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
+	void supercrd(machine_config &config);
 };
 
 
@@ -412,7 +413,7 @@ GFXDECODE_END
 *     Machine Drivers     *
 **************************/
 
-static MACHINE_CONFIG_START( supercrd )
+MACHINE_CONFIG_START(supercrd_state::supercrd)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK/8)    /* 2MHz, guess */
 	MCFG_CPU_PROGRAM_MAP(supercrd_map)

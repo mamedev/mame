@@ -56,7 +56,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, zerozone_state )
 	AM_RANGE(0x080008, 0x080009) AM_READ_PORT("DSWB")
 	AM_RANGE(0x08000a, 0x08000b) AM_READ_PORT("DSWA")
 	AM_RANGE(0x084000, 0x084001) AM_WRITE(sound_w)
-	AM_RANGE(0x088000, 0x0881ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x088000, 0x0881ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x098000, 0x098001) AM_RAM     /* Watchdog? */
 	AM_RANGE(0x09ce00, 0x09ffff) AM_RAM_WRITE(tilemap_w) AM_SHARE("videoram")
 	AM_RANGE(0x0b4000, 0x0b4001) AM_WRITE(tilebank_w)
@@ -168,7 +168,7 @@ void zerozone_state::machine_reset()
 	m_tilebank = 0;
 }
 
-static MACHINE_CONFIG_START( zerozone )
+MACHINE_CONFIG_START(zerozone_state::zerozone)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 10000000)   /* 10 MHz */

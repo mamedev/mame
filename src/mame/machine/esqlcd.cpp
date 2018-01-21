@@ -161,7 +161,7 @@ static unsigned char const Font5x7[][5] = {
 };
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-MACHINE_CONFIG_MEMBER(esq2x16_sq1_device::device_add_mconfig)
+MACHINE_CONFIG_START(esq2x16_sq1_device::device_add_mconfig)
 	MCFG_DEFAULT_LAYOUT(layout_esq2by16)
 MACHINE_CONFIG_END
 

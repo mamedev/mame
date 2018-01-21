@@ -69,7 +69,7 @@ static ADDRESS_MAP_START( powerins_map, AS_PROGRAM, 16, powerins_state )
 	AM_RANGE(0x100016, 0x100017) AM_WRITENOP          // ? always 1
 	AM_RANGE(0x100018, 0x100019) AM_WRITE8(tilebank_w, 0x00ff)
 	AM_RANGE(0x10001e, 0x10001f) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x00ff)
-	AM_RANGE(0x120000, 0x120fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x120000, 0x120fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x130000, 0x130007) AM_RAM AM_SHARE("vctrl_0")
 	AM_RANGE(0x140000, 0x143fff) AM_RAM_WRITE(vram_0_w) AM_SHARE("vram_0")
 	AM_RANGE(0x170000, 0x170fff) AM_RAM_WRITE(vram_1_w) AM_SHARE("vram_1")
@@ -295,7 +295,7 @@ MACHINE_START_MEMBER(powerins_state, powerinsa)
 	membank("okibank")->configure_entries(0, 5, memregion("oki1")->base() + 0x30000, 0x10000);
 }
 
-static MACHINE_CONFIG_START( powerins )
+MACHINE_CONFIG_START(powerins_state::powerins)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 12000000)   /* 12MHz */
@@ -341,7 +341,7 @@ static MACHINE_CONFIG_START( powerins )
 	MCFG_NMK112_ROM1("oki2")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( powerinsa, powerins )
+MACHINE_CONFIG_DERIVED(powerins_state::powerinsa, powerins)
 
 	/* basic machine hardware */
 
@@ -364,7 +364,7 @@ static MACHINE_CONFIG_DERIVED( powerinsa, powerins )
 	MCFG_DEVICE_REMOVE("nmk112")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( powerinsb, powerins )
+MACHINE_CONFIG_DERIVED(powerins_state::powerinsb, powerins)
 
 	/* basic machine hardware */
 

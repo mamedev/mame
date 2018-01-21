@@ -394,7 +394,7 @@ void kchamp_state::machine_reset()
 	m_sound_nmi_enable = 0;
 }
 
-static MACHINE_CONFIG_START( kchampvs )
+MACHINE_CONFIG_START(kchamp_state::kchampvs)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_12MHz/4)    /* verified on pcb */
@@ -454,7 +454,7 @@ MACHINE_CONFIG_END
 * 1 Player Version  *
 ********************/
 
-static MACHINE_CONFIG_START( kchamp )
+MACHINE_CONFIG_START(kchamp_state::kchamp)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_12MHz/4)  /* 12MHz / 4 = 3.0 MHz */

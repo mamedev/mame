@@ -422,7 +422,7 @@ void pc_kbd_keytronic_pc3270_device::device_reset()
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( pc_kbd_keytronic_pc3270_device::device_add_mconfig )
+MACHINE_CONFIG_START(pc_kbd_keytronic_pc3270_device::device_add_mconfig)
 	MCFG_CPU_ADD("kb_keytr", I8051, 11060250)
 	MCFG_CPU_PROGRAM_MAP(keytronic_pc3270_program)
 	MCFG_CPU_IO_MAP(keytronic_pc3270_io)

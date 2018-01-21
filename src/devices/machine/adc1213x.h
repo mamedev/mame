@@ -88,6 +88,6 @@ DECLARE_DEVICE_TYPE(ADC12132, adc12132_device)
 
 
 #define MCFG_ADC1213X_IPT_CONVERT_CB(_class, _method) \
-	adc12138_device::set_ipt_convert_callback(*device, adc12138_device::ipt_convert_delegate(&_class::_method, #_class "::" #_method, downcast<_class *>(owner)));
+	adc12138_device::set_ipt_convert_callback(*device, adc12138_device::ipt_convert_delegate(&_class::_method, #_class "::" #_method, this));
 
 #endif // MAME_MACHINE_ADC1213X_H

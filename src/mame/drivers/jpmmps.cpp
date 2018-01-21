@@ -150,6 +150,7 @@ public:
 	uint8_t m_psg_latch;
 	virtual void machine_reset() override;
 
+	void jpmmps(machine_config &config);
 protected:
 
 	// devices
@@ -239,7 +240,7 @@ void jpmmps_state::machine_reset()
 	cpu->reset_line(ASSERT_LINE);
 }
 
-static MACHINE_CONFIG_START( jpmmps )
+MACHINE_CONFIG_START(jpmmps_state::jpmmps)
 
 	// CPU TMS9995, standard variant; no line connections
 	MCFG_TMS99xx_ADD("maincpu", TMS9995, MAIN_CLOCK, jpmmps_map, jpmmps_io_map)

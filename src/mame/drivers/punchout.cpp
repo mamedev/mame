@@ -614,7 +614,7 @@ MACHINE_RESET_MEMBER(punchout_state, spnchout)
 }
 
 
-static MACHINE_CONFIG_START( punchout )
+MACHINE_CONFIG_START(punchout_state::punchout)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_8MHz/2)
@@ -671,7 +671,7 @@ static MACHINE_CONFIG_START( punchout )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( spnchout, punchout )
+MACHINE_CONFIG_DERIVED(punchout_state::spnchout, punchout)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -685,7 +685,7 @@ static MACHINE_CONFIG_DERIVED( spnchout, punchout )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( armwrest, punchout )
+MACHINE_CONFIG_DERIVED(punchout_state::armwrest, punchout)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")

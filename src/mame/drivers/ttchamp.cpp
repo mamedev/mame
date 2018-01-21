@@ -141,6 +141,7 @@ public:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	INTERRUPT_GEN_MEMBER(irq);
+	void ttchamp(machine_config &config);
 };
 
 ALLOW_SAVE_TYPE(ttchamp_state::picmode);
@@ -637,7 +638,7 @@ INTERRUPT_GEN_MEMBER(ttchamp_state::irq)/* right? */
 	device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
-static MACHINE_CONFIG_START( ttchamp )
+MACHINE_CONFIG_START(ttchamp_state::ttchamp)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", V30, 8000000)
 	MCFG_CPU_PROGRAM_MAP(ttchamp_map)

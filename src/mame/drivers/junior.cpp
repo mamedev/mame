@@ -55,6 +55,7 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(junior_reset);
 	TIMER_DEVICE_CALLBACK_MEMBER(junior_update_leds);
 	required_device<cpu_device> m_maincpu;
+	void junior(machine_config &config);
 };
 
 
@@ -213,7 +214,7 @@ void junior_state::machine_reset()
 }
 
 
-static MACHINE_CONFIG_START( junior )
+MACHINE_CONFIG_START(junior_state::junior)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",M6502, XTAL_1MHz)
 	MCFG_CPU_PROGRAM_MAP(junior_mem)

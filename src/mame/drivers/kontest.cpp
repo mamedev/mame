@@ -52,6 +52,7 @@ public:
 	// member functions
 	DECLARE_WRITE8_MEMBER(control_w);
 
+	void kontest(machine_config &config);
 protected:
 	// driver_device overrides
 	virtual void machine_start() override;
@@ -247,7 +248,7 @@ void kontest_state::machine_reset()
 	m_control = 0;
 }
 
-static MACHINE_CONFIG_START( kontest )
+MACHINE_CONFIG_START(kontest_state::kontest)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80,MAIN_CLOCK/8)

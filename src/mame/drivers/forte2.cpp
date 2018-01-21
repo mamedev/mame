@@ -61,6 +61,7 @@ public:
 	DECLARE_DRIVER_INIT(pesadelo);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
+	void pesadelo(machine_config &config);
 };
 
 
@@ -117,7 +118,7 @@ void forte2_state::machine_start()
 }
 
 
-static MACHINE_CONFIG_START( pesadelo )
+MACHINE_CONFIG_START(forte2_state::pesadelo)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_3_579545MHz)

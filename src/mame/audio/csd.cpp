@@ -35,7 +35,7 @@ ADDRESS_MAP_END
 //  machine configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER(midway_cheap_squeak_deluxe_device::device_add_mconfig)
+MACHINE_CONFIG_START(midway_cheap_squeak_deluxe_device::device_add_mconfig)
 	MCFG_CPU_ADD("cpu", M68000, XTAL_16MHz/2)
 	MCFG_CPU_PROGRAM_MAP(csdeluxe_map)
 

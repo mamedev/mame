@@ -40,6 +40,7 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<okim6376_device> m_oki;
+	void amerihok(machine_config &config);
 };
 
 WRITE8_MEMBER(amerihok_state::control_w)
@@ -71,7 +72,7 @@ void amerihok_state::machine_reset()
 }
 
 
-static MACHINE_CONFIG_START( amerihok )
+MACHINE_CONFIG_START(amerihok_state::amerihok)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z8681, XTAL_12MHz)

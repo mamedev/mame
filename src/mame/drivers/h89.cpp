@@ -43,6 +43,7 @@ public:
 	uint8_t m_port_f2;
 	virtual void machine_reset() override;
 	TIMER_DEVICE_CALLBACK_MEMBER(h89_irq_timer);
+	void h89(machine_config &config);
 };
 
 
@@ -178,7 +179,7 @@ static DEVICE_INPUT_DEFAULTS_START( terminal )
 DEVICE_INPUT_DEFAULTS_END
 
 
-static MACHINE_CONFIG_START( h89 )
+MACHINE_CONFIG_START(h89_state::h89)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80, XTAL_12_288MHz / 6)
 	MCFG_CPU_PROGRAM_MAP(h89_mem)

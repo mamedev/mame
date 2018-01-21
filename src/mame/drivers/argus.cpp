@@ -530,7 +530,7 @@ static GFXDECODE_START( butasan )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( argus )
+MACHINE_CONFIG_START(argus_state::argus)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 5000000)           /* 4 MHz */
@@ -578,7 +578,7 @@ static MACHINE_CONFIG_START( argus )
 	MCFG_SOUND_ROUTE(3, "mono", 0.50)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( valtric )
+MACHINE_CONFIG_START(argus_state::valtric)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 5000000)           /* 5 MHz */
@@ -626,7 +626,7 @@ static MACHINE_CONFIG_START( valtric )
 	MCFG_SOUND_ROUTE(3, "mono", 0.50)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( butasan )
+MACHINE_CONFIG_START(argus_state::butasan)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 5000000)           /* 5 MHz */

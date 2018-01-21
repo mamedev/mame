@@ -88,7 +88,7 @@ ROM_END
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( bbc_opus8272_device::device_add_mconfig )
+MACHINE_CONFIG_START(bbc_opus8272_device::device_add_mconfig)
 	MCFG_I8272A_ADD("i8272", true)
 	MCFG_UPD765_INTRQ_CALLBACK(WRITELINE(bbc_opus8272_device, fdc_intrq_w))
 	MCFG_FLOPPY_DRIVE_ADD("i8272:0", bbc_floppies_525, "525qd", bbc_opusfdc_device::floppy_formats)
@@ -97,7 +97,7 @@ MACHINE_CONFIG_MEMBER( bbc_opus8272_device::device_add_mconfig )
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_MEMBER( bbc_opus2791_device::device_add_mconfig )
+MACHINE_CONFIG_START(bbc_opus2791_device::device_add_mconfig)
 	MCFG_WD2791_ADD("fdc", XTAL_16MHz / 16)
 	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(bbc_opusfdc_device, fdc_drq_w))
 	MCFG_WD_FDC_HLD_CALLBACK(WRITELINE(bbc_opusfdc_device, motor_w))
@@ -107,7 +107,7 @@ MACHINE_CONFIG_MEMBER( bbc_opus2791_device::device_add_mconfig )
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_MEMBER( bbc_opus2793_device::device_add_mconfig )
+MACHINE_CONFIG_START(bbc_opus2793_device::device_add_mconfig)
 	MCFG_WD2793_ADD("fdc", XTAL_16MHz / 16)
 	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(bbc_opusfdc_device, fdc_drq_w))
 	MCFG_WD_FDC_HLD_CALLBACK(WRITELINE(bbc_opusfdc_device, motor_w))
@@ -117,7 +117,7 @@ MACHINE_CONFIG_MEMBER( bbc_opus2793_device::device_add_mconfig )
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_MEMBER( bbc_opus1770_device::device_add_mconfig )
+MACHINE_CONFIG_START(bbc_opus1770_device::device_add_mconfig)
 	MCFG_WD1770_ADD("fdc", XTAL_16MHz / 2)
 	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(bbc_opusfdc_device, fdc_drq_w))
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", bbc_floppies_525, "525qd", bbc_opusfdc_device::floppy_formats)

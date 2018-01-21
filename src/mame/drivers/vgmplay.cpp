@@ -161,6 +161,7 @@ public:
 	DECLARE_WRITE8_MEMBER(multipcm_bank_lo_b_w);
 	DECLARE_WRITE8_MEMBER(multipcm_bank_hi_b_w);
 
+	void vgmplay(machine_config &config);
 private:
 	std::vector<uint8_t> m_file_data;
 	required_device<bitbanger_device> m_file;
@@ -1347,7 +1348,7 @@ static ADDRESS_MAP_START( h6280_io_map, AS_IO, 8, vgmplay_state )
 	AM_RANGE(0, 3) AM_NOP
 ADDRESS_MAP_END
 
-static MACHINE_CONFIG_START( vgmplay )
+MACHINE_CONFIG_START(vgmplay_state::vgmplay)
 	MCFG_CPU_ADD("vgmplay", VGMPLAY, 44100)
 	MCFG_CPU_PROGRAM_MAP( file_map )
 	MCFG_CPU_IO_MAP( soundchips_map )

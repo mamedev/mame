@@ -59,6 +59,7 @@ public:
 	virtual void video_start() override;
 	uint32_t screen_update_tcl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
+	void tcl(machine_config &config);
 };
 
 
@@ -111,7 +112,7 @@ static GFXDECODE_START( tcl )
 	GFXDECODE_ENTRY( "gfx2", 0, charlayout2,  128, 4 )
 GFXDECODE_END
 
-static MACHINE_CONFIG_START( tcl )
+MACHINE_CONFIG_START(tcl_state::tcl)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80,12000000/4)

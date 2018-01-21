@@ -358,7 +358,7 @@ cdp1869_device::cdp1869_device(const machine_config &mconfig, const char *tag, d
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( cdp1869_device::device_add_mconfig )
+MACHINE_CONFIG_START(cdp1869_device::device_add_mconfig)
 	MCFG_PALETTE_ADD("palette", 8+64)
 	MCFG_PALETTE_INIT_OWNER(cdp1869_device, cdp1869)
 MACHINE_CONFIG_END

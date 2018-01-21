@@ -49,6 +49,7 @@ public:
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	DECLARE_PALETTE_INIT(cesclassic);
+	void cesclassic(machine_config &config);
 protected:
 
 	// devices
@@ -247,7 +248,7 @@ PALETTE_INIT_MEMBER(cesclassic_state, cesclassic)
 		palette.set_pen_color(i, pal2bit(i), 0, 0);
 }
 
-static MACHINE_CONFIG_START( cesclassic )
+MACHINE_CONFIG_START(cesclassic_state::cesclassic)
 
 	MCFG_CPU_ADD("maincpu", M68000, 24000000/2 )
 	MCFG_CPU_PROGRAM_MAP(cesclassic_map)

@@ -298,7 +298,7 @@ static ADDRESS_MAP_START( common_maincpu_map, AS_PROGRAM, 8, bublbobl_state )
 	AM_RANGE(0xc000, 0xdcff) AM_RAM AM_SHARE("videoram")
 	AM_RANGE(0xdd00, 0xdfff) AM_RAM AM_SHARE("objectram")
 	AM_RANGE(0xe000, 0xf7ff) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0xf800, 0xf9ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0xf800, 0xf9ff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( bublbobl_maincpu_map, AS_PROGRAM, 8, bublbobl_state )
@@ -833,7 +833,7 @@ MACHINE_RESET_MEMBER(bublbobl_state,tokio)
 	tokio_videoctrl_w(m_maincpu->device_t::memory().space(AS_PROGRAM), 0, 0x00, 0xFF); // TODO: does /RESET clear this the same as above? probably yes, needs tracing...
 }
 
-static MACHINE_CONFIG_START( tokio )
+MACHINE_CONFIG_START(bublbobl_state::tokio)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, MAIN_XTAL/4) // 6 MHz
@@ -887,7 +887,7 @@ static MACHINE_CONFIG_START( tokio )
 	MCFG_SOUND_ROUTE(3, "mono", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( bublboblp, tokio )
+MACHINE_CONFIG_DERIVED(bublbobl_state::bublboblp, tokio)
 	MCFG_DEVICE_REMOVE("bmcu") // no mcu, socket is empty
 
 	// watchdog circuit is actually present on the prototype pcb, but is either
@@ -901,7 +901,7 @@ static MACHINE_CONFIG_DERIVED( bublboblp, tokio )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", bublbobl_state, irq0_line_hold)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( tokiob, tokio )
+MACHINE_CONFIG_DERIVED(bublbobl_state::tokiob, tokio)
 	MCFG_DEVICE_REMOVE("bmcu") // no mcu, but see below...
 
 	MCFG_CPU_REPLACE("maincpu", Z80, MAIN_XTAL/4) // 6 MHz
@@ -947,7 +947,7 @@ MACHINE_RESET_MEMBER(bublbobl_state,bublbobl)
 	m_port4_out = 0;
 }
 
-static MACHINE_CONFIG_START( bublbobl_nomcu )
+MACHINE_CONFIG_START(bublbobl_state::bublbobl_nomcu)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, MAIN_XTAL/4) // 6 MHz
@@ -1002,7 +1002,7 @@ static MACHINE_CONFIG_START( bublbobl_nomcu )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( bublbobl, bublbobl_nomcu )
+MACHINE_CONFIG_DERIVED(bublbobl_state::bublbobl, bublbobl_nomcu)
 	MCFG_CPU_ADD("mcu", M6801, XTAL_4MHz) // actually 6801U4 - xtal is 4MHz, divided by 4 internally
 	MCFG_CPU_PROGRAM_MAP(mcu_map)
 
@@ -1027,7 +1027,7 @@ MACHINE_RESET_MEMBER(bublbobl_state,boblbobl)
 	m_ic43_b = 0;
 }
 
-static MACHINE_CONFIG_DERIVED( boblbobl, bublbobl_nomcu )
+MACHINE_CONFIG_DERIVED(bublbobl_state::boblbobl, bublbobl_nomcu)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1061,7 +1061,7 @@ MACHINE_RESET_MEMBER(bub68705_state, bub68705)
 	m_latch = 0;
 }
 
-static MACHINE_CONFIG_DERIVED( bub68705, bublbobl_nomcu )
+MACHINE_CONFIG_DERIVED(bub68705_state::bub68705, bublbobl_nomcu)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("mcu", M68705P3, XTAL_4MHz) // xtal is 4MHz, divided by 4 internally

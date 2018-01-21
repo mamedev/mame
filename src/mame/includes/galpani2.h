@@ -71,4 +71,5 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(galpani2_interrupt2);
 	void galpani2_mcu_nmi1();
 	void galpani2_mcu_nmi2();
+	void galpani2(machine_config &config);
 };

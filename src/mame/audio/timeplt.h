@@ -19,6 +19,9 @@ public:
 	DECLARE_WRITE8_MEMBER(filter_w);
 	DECLARE_READ8_MEMBER(portB_r);
 
+	void timeplt_sound(machine_config &config);
+	void locomotn_sound(machine_config &config);
+
 protected:
 	// device-level overrides
 	virtual void device_start() override;
@@ -28,21 +31,14 @@ protected:
 
 private:
 	// internal state
+	required_device<cpu_device> m_soundcpu;
+	required_device_array<filter_rc_device, 3> m_filter_0;
+	required_device_array<filter_rc_device, 3> m_filter_1;
+
 	uint8_t    m_last_irq_state;
-	cpu_device *m_soundcpu;
 
-	device_t *m_filter_0_0;
-	device_t *m_filter_0_1;
-	device_t *m_filter_0_2;
-	device_t *m_filter_1_0;
-	device_t *m_filter_1_1;
-	device_t *m_filter_1_2;
-
-	void filter_w( device_t *device, int data );
+	void filter_w(filter_rc_device &device, int data);
 };
-
-MACHINE_CONFIG_EXTERN( timeplt_sound );
-MACHINE_CONFIG_EXTERN( locomotn_sound );
 
 DECLARE_DEVICE_TYPE(TIMEPLT_AUDIO, timeplt_audio_device)
 

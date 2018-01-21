@@ -229,7 +229,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-MACHINE_CONFIG_START( mw8080bw_root )
+MACHINE_CONFIG_START(mw8080bw_state::mw8080bw_root)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",I8080,MW8080BW_CPU_CLOCK)
@@ -405,7 +405,7 @@ static INPUT_PORTS_START( seawolf )
 INPUT_PORTS_END
 
 
-static MACHINE_CONFIG_DERIVED( seawolf, mw8080bw_root )
+MACHINE_CONFIG_DERIVED(mw8080bw_state::seawolf, mw8080bw_root)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -505,7 +505,7 @@ static INPUT_PORTS_START( gunfight )
 INPUT_PORTS_END
 
 
-static MACHINE_CONFIG_DERIVED( gunfight, mw8080bw_root )
+MACHINE_CONFIG_DERIVED(mw8080bw_state::gunfight, mw8080bw_root)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -733,7 +733,7 @@ static INPUT_PORTS_START( tornbase )
 INPUT_PORTS_END
 
 
-static MACHINE_CONFIG_DERIVED( tornbase, mw8080bw_root )
+MACHINE_CONFIG_DERIVED(mw8080bw_state::tornbase, mw8080bw_root)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -840,7 +840,7 @@ static INPUT_PORTS_START( lagunar )
 INPUT_PORTS_END
 
 
-static MACHINE_CONFIG_DERIVED( zzzap, mw8080bw_root )
+MACHINE_CONFIG_DERIVED(mw8080bw_state::zzzap, mw8080bw_root)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -952,7 +952,7 @@ static INPUT_PORTS_START( maze )
 INPUT_PORTS_END
 
 
-static MACHINE_CONFIG_DERIVED( maze, mw8080bw_root )
+MACHINE_CONFIG_DERIVED(mw8080bw_state::maze, mw8080bw_root)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1044,7 +1044,7 @@ static INPUT_PORTS_START( boothill )
 INPUT_PORTS_END
 
 
-static MACHINE_CONFIG_DERIVED( boothill, mw8080bw_root )
+MACHINE_CONFIG_DERIVED(mw8080bw_state::boothill, mw8080bw_root)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1151,7 +1151,7 @@ static INPUT_PORTS_START( checkmat )
 INPUT_PORTS_END
 
 
-static MACHINE_CONFIG_DERIVED( checkmat, mw8080bw_root )
+MACHINE_CONFIG_DERIVED(mw8080bw_state::checkmat, mw8080bw_root)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1278,7 +1278,7 @@ static INPUT_PORTS_START( desertgu )
 INPUT_PORTS_END
 
 
-static MACHINE_CONFIG_DERIVED( desertgu, mw8080bw_root )
+MACHINE_CONFIG_DERIVED(mw8080bw_state::desertgu, mw8080bw_root)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1480,7 +1480,7 @@ static INPUT_PORTS_START( einning )
 INPUT_PORTS_END
 
 
-static MACHINE_CONFIG_DERIVED( dplay, mw8080bw_root )
+MACHINE_CONFIG_DERIVED(mw8080bw_state::dplay, mw8080bw_root)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1575,7 +1575,7 @@ static INPUT_PORTS_START( gmissile )
 INPUT_PORTS_END
 
 
-static MACHINE_CONFIG_DERIVED( gmissile, mw8080bw_root )
+MACHINE_CONFIG_DERIVED(mw8080bw_state::gmissile, mw8080bw_root)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1669,7 +1669,7 @@ static INPUT_PORTS_START( m4 )
 INPUT_PORTS_END
 
 
-static MACHINE_CONFIG_DERIVED( m4, mw8080bw_root )
+MACHINE_CONFIG_DERIVED(mw8080bw_state::m4, mw8080bw_root)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1838,7 +1838,7 @@ static INPUT_PORTS_START( clowns1 )
 INPUT_PORTS_END
 
 
-static MACHINE_CONFIG_DERIVED( clowns, mw8080bw_root )
+MACHINE_CONFIG_DERIVED(mw8080bw_state::clowns, mw8080bw_root)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1934,7 +1934,7 @@ static INPUT_PORTS_START( spacwalk )
 	PORT_ADJUSTER( 40, "R507 - Music Volume" )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_DERIVED( spacwalk, mw8080bw_root )
+MACHINE_CONFIG_DERIVED(mw8080bw_state::spacwalk, mw8080bw_root)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2017,7 +2017,7 @@ static INPUT_PORTS_START( shuffle )
 INPUT_PORTS_END
 
 
-static MACHINE_CONFIG_DERIVED( shuffle, mw8080bw_root )
+MACHINE_CONFIG_DERIVED(mw8080bw_state::shuffle, mw8080bw_root)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2104,7 +2104,7 @@ static INPUT_PORTS_START( dogpatch )
 INPUT_PORTS_END
 
 
-static MACHINE_CONFIG_DERIVED( dogpatch, mw8080bw_root )
+MACHINE_CONFIG_DERIVED(mw8080bw_state::dogpatch, mw8080bw_root)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2254,7 +2254,7 @@ static INPUT_PORTS_START( spcenctr )
 INPUT_PORTS_END
 
 
-static MACHINE_CONFIG_DERIVED( spcenctr, mw8080bw_root )
+MACHINE_CONFIG_DERIVED(mw8080bw_state::spcenctr, mw8080bw_root)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2350,7 +2350,7 @@ static INPUT_PORTS_START( phantom2 )
 INPUT_PORTS_END
 
 
-static MACHINE_CONFIG_DERIVED( phantom2, mw8080bw_root )
+MACHINE_CONFIG_DERIVED(mw8080bw_state::phantom2, mw8080bw_root)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2491,7 +2491,7 @@ static INPUT_PORTS_START( bowler )
 INPUT_PORTS_END
 
 
-static MACHINE_CONFIG_DERIVED( bowler, mw8080bw_root )
+MACHINE_CONFIG_DERIVED(mw8080bw_state::bowler, mw8080bw_root)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2702,7 +2702,7 @@ static INPUT_PORTS_START( invaders )
 INPUT_PORTS_END
 
 
-MACHINE_CONFIG_DERIVED( invaders, mw8080bw_root )
+MACHINE_CONFIG_DERIVED(mw8080bw_state::invaders, mw8080bw_root)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2787,7 +2787,7 @@ static INPUT_PORTS_START( blueshrk )
 INPUT_PORTS_END
 
 
-static MACHINE_CONFIG_DERIVED( blueshrk, mw8080bw_root )
+MACHINE_CONFIG_DERIVED(mw8080bw_state::blueshrk, mw8080bw_root)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2889,7 +2889,7 @@ static INPUT_PORTS_START( invad2ct )
 INPUT_PORTS_END
 
 
-static MACHINE_CONFIG_DERIVED( invad2ct, mw8080bw_root )
+MACHINE_CONFIG_DERIVED(mw8080bw_state::invad2ct, mw8080bw_root)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")

@@ -16,7 +16,7 @@ Skeleton driver for Visual 102 display terminal.
 #include "machine/z80sio.h"
 //#include "video/crt9007.h"
 //#include "video/crt9021.h"
-//#include "screen.h"
+#include "screen.h"
 
 class v102_state : public driver_device
 {
@@ -27,10 +27,19 @@ public:
 		, m_p_chargen(*this, "chargen")
 	{ }
 
+	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+
+	void v102(machine_config &config);
 private:
 	required_device<cpu_device> m_maincpu;
 	required_region_ptr<u8> m_p_chargen;
 };
+
+
+u32 v102_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+{
+	return 0;
+}
 
 
 static ADDRESS_MAP_START( mem_map, AS_PROGRAM, 8, v102_state )
@@ -60,10 +69,18 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START( v102 )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( v102 )
+MACHINE_CONFIG_START(v102_state::v102)
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_18_575MHz / 5) // divider not verified
 	MCFG_CPU_PROGRAM_MAP(mem_map)
 	MCFG_CPU_IO_MAP(io_map)
+
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_RAW_PARAMS(XTAL_18_575MHz, 970, 0, 800, 319, 0, 300)
+	//MCFG_SCREEN_RAW_PARAMS(XTAL_18_575MHz, 948, 0, 792, 319, 0, 300)
+	MCFG_SCREEN_UPDATE_DRIVER(v102_state, screen_update)
+
+	//MCFG_DEVICE_ADD("vpac", CRT9007, CRTC_CLOCK)
+	//MCFG_CRT9007_CHARACTER_WIDTH(6 or 10)
 
 	MCFG_EEPROM_2804_ADD("eeprom")
 

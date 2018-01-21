@@ -37,19 +37,19 @@
 	mc6845_device::set_char_width(*device, _pixels);
 
 #define MCFG_MC6845_RECONFIGURE_CB(_class, _method) \
-	mc6845_device::set_reconfigure_callback(*device, mc6845_device::reconfigure_delegate(&_class::_method, #_class "::" #_method, downcast<_class *>(owner)));
+	mc6845_device::set_reconfigure_callback(*device, mc6845_device::reconfigure_delegate(&_class::_method, #_class "::" #_method, this));
 
 #define MCFG_MC6845_BEGIN_UPDATE_CB(_class, _method) \
-	mc6845_device::set_begin_update_callback(*device, mc6845_device::begin_update_delegate(&_class::_method, #_class "::" #_method, downcast<_class *>(owner)));
+	mc6845_device::set_begin_update_callback(*device, mc6845_device::begin_update_delegate(&_class::_method, #_class "::" #_method, this));
 
 #define MCFG_MC6845_UPDATE_ROW_CB(_class, _method) \
-	mc6845_device::set_update_row_callback(*device, mc6845_device::update_row_delegate(&_class::_method, #_class "::" #_method, downcast<_class *>(owner)));
+	mc6845_device::set_update_row_callback(*device, mc6845_device::update_row_delegate(&_class::_method, #_class "::" #_method, this));
 
 #define MCFG_MC6845_END_UPDATE_CB(_class, _method) \
-	mc6845_device::set_end_update_callback(*device, mc6845_device::end_update_delegate(&_class::_method, #_class "::" #_method, downcast<_class *>(owner)));
+	mc6845_device::set_end_update_callback(*device, mc6845_device::end_update_delegate(&_class::_method, #_class "::" #_method, this));
 
 #define MCFG_MC6845_ADDR_CHANGED_CB(_class, _method) \
-	mc6845_device::set_on_update_addr_change_callback(*device, mc6845_device::on_update_addr_changed_delegate(&_class::_method, #_class "::" #_method, downcast<_class *>(owner)));
+	mc6845_device::set_on_update_addr_change_callback(*device, mc6845_device::on_update_addr_changed_delegate(&_class::_method, #_class "::" #_method, this));
 
 #define MCFG_MC6845_OUT_DE_CB(_write) \
 	devcb = &mc6845_device::set_out_de_callback(*device, DEVCB_##_write);

@@ -471,7 +471,7 @@ static ADDRESS_MAP_START( helifire_sound_io_map, AS_IO, 8, n8080_state )
 ADDRESS_MAP_END
 
 
-MACHINE_CONFIG_START( spacefev_sound )
+MACHINE_CONFIG_START(n8080_state::spacefev_sound)
 
 	MCFG_SOUND_START_OVERRIDE(n8080_state,spacefev)
 	MCFG_SOUND_RESET_OVERRIDE(n8080_state,spacefev)
@@ -511,7 +511,7 @@ MACHINE_CONFIG_START( spacefev_sound )
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_START( sheriff_sound )
+MACHINE_CONFIG_START(n8080_state::sheriff_sound)
 
 	MCFG_SOUND_START_OVERRIDE(n8080_state,sheriff)
 	MCFG_SOUND_RESET_OVERRIDE(n8080_state,sheriff)
@@ -549,7 +549,7 @@ MACHINE_CONFIG_START( sheriff_sound )
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_START( helifire_sound )
+MACHINE_CONFIG_START(n8080_state::helifire_sound)
 
 	MCFG_SOUND_START_OVERRIDE(n8080_state,helifire)
 	MCFG_SOUND_RESET_OVERRIDE(n8080_state,helifire)

@@ -84,6 +84,7 @@ public:
 	uint8_t   m_frame;
 	uint8_t   m_adc;
 
+	void turrett(machine_config &config);
 protected:
 	// driver_device overrides
 	virtual void machine_reset() override;

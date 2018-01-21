@@ -8984,7 +8984,7 @@
 	-->
 
 	<software name="samsho5">
-		<description>Samurai Shodown V / Samurai Spirits Zero (NGM-2700)</description>
+		<description>Samurai Shodown V / Samurai Spirits Zero (NGM-2700, set 1)</description>
 		<year>2003</year>
 		<publisher>Yuki Enterprise / SNK Playmore</publisher>
 		<info name="serial" value="NGM-2700"/>
@@ -8998,6 +8998,52 @@
 			<dataarea name="maincpu" width="16" endianness="big" size="0x800000">
 				<rom loadflag="load16_word_swap" name="270-p1.p1" offset="0x000000" size="0x400000" crc="4a2a09e6" sha1="2644de02cdab8ccc605488a7c76b8c9cd1d5bcb9" />   <!-- mask rom TC5332205 -->
 				<rom loadflag="load16_word_swap" name="270-p2.sp2" offset="0x400000" size="0x400000" crc="e0c74c85" sha1="df24a4ee76438e40c2f04a714175a7f85cacdfe0" />  <!-- mask rom TC5332205 -->
+			</dataarea>
+			<dataarea name="fixed" size="0x20000">
+				<!-- The Encrypted Boards do _not_ have an s1 rom, data for it comes from the Cx ROMs -->
+				<rom value="0" size="0x20000" offset="0x000000" loadflag="fill" />
+			</dataarea>
+				<!-- Encrypted -->
+			<dataarea name="audiocrypt" size="0x80000">
+				<rom offset="0x00000" size="0x80000" name="270-m1.m1" crc="49c9901a" sha1="2623e9765a0eba58fee2de72851e9dc502344a3d" /> <!-- mask rom 27c040 -->
+			</dataarea>
+			<dataarea name="ymsnd" size="0x1000000">
+				<!-- Encrypted -->
+				<rom name="270-v1.v1" offset="0x000000" size="0x800000" crc="62e434eb" sha1="1985f5e88f8e866f9683b6cea901aa28c04b80bf" />   <!-- mask rom TC5364205 -->
+				<rom name="270-v2.v2" offset="0x800000" size="0x800000" crc="180f3c9a" sha1="6d7dc2605ead6e78704efa127e7e0dfe621e2c54" />   <!-- mask rom TC5364205 -->
+			</dataarea>
+			<dataarea name="sprites" size="0x4000000">
+				<!-- Encrypted -->
+				<rom loadflag="load16_byte" name="270-c1.c1" offset="0x000000" size="0x800000" crc="14ffffac" sha1="2ccebfdd0c7907679ae95bf6eca85b8d322441e2" />    <!-- mask rom TC5364205 -->
+				<rom loadflag="load16_byte" name="270-c2.c2" offset="0x000001" size="0x800000" crc="401f7299" sha1="94e48cdf1682b1250f53c59f3f71d995e928d17b" />    <!-- mask rom TC5364205 -->
+				<rom loadflag="load16_byte" name="270-c3.c3" offset="0x1000000" size="0x800000" crc="838f0260" sha1="d5c8d3c6e7221d04e0b20882a847752e5ba95635" />   <!-- mask rom TC5364205 -->
+				<rom loadflag="load16_byte" name="270-c4.c4" offset="0x1000001" size="0x800000" crc="041560a5" sha1="d165e533699f15b1e079c82f97db3542b3a7dd66" />   <!-- mask rom TC5364205 -->
+				<rom loadflag="load16_byte" name="270-c5.c5" offset="0x2000000" size="0x800000" crc="bd30b52d" sha1="9f8282e684415b4045218cf764ef7d75a70e3240" />   <!-- mask rom TC5364205 -->
+				<rom loadflag="load16_byte" name="270-c6.c6" offset="0x2000001" size="0x800000" crc="86a69c70" sha1="526732cdb408cf680af9da39057bce6a4dfb5e13" />   <!-- mask rom TC5364205 -->
+				<rom loadflag="load16_byte" name="270-c7.c7" offset="0x3000000" size="0x800000" crc="d28fbc3c" sha1="a82a6ba6760fad14d9309f9147cb7d80bd6f70fc" />   <!-- mask rom TC5364205 -->
+				<rom loadflag="load16_byte" name="270-c8.c8" offset="0x3000001" size="0x800000" crc="02c530a6" sha1="7a3fafa6075506c6ef78cc4ec2cb72118ec83cb9" />   <!-- mask rom TC5364205 -->
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- handwritten labels, possible hack of samsho5h? 
+	     p1.bin                  270-p1c.p1              90.607002%
+	     p2.bin                  270-p2c.sp2             99.999763% (all bytes that differ do so by only bits 0x20 or 0x02, which is suspicious)
+	-->
+	<software name="samsho5a" cloneof="samsho5" >
+		<description>Samurai Shodown V / Samurai Spirits Zero (NGM-2700, set 2)</description>
+		<year>2003</year>
+		<publisher>Yuki Enterprise / SNK Playmore</publisher>
+		<info name="serial" value="NGM-2700"/>
+		<info name="release" value="20031010"/>
+		<info name="alt_title" value="サムライスピリッツ 零"/>
+		<sharedfeat name="release" value="MVS" />
+		<sharedfeat name="compatibility" value="MVS" />
+		<part name="cart" interface="neo_cart">
+			<feature name="slot" value="k2k2_samsh5" />
+			<dataarea name="maincpu" width="16" endianness="big" size="0x800000">
+				<rom loadflag="load16_word_swap" name="p1.bin" offset="0x000000" size="0x400000" crc="7795fffe" sha1="2e74a4dbed553a01f1cb2f3db896375de5f1d212" />  <!-- EPROM -->
+				<rom loadflag="load16_word_swap" name="p2.bin" offset="0x400000" size="0x400000" crc="2b844fe9" sha1="899fe6457db4a724bdd9c7e4a912eab50a5221d3" />  <!-- EPROM -->
 			</dataarea>
 			<dataarea name="fixed" size="0x20000">
 				<!-- The Encrypted Boards do _not_ have an s1 rom, data for it comes from the Cx ROMs -->

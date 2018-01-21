@@ -36,7 +36,7 @@ ADDRESS_MAP_END
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( a2bus_softcard_device::device_add_mconfig )
+MACHINE_CONFIG_START(a2bus_softcard_device::device_add_mconfig)
 	MCFG_CPU_ADD(Z80_TAG, Z80, 1021800*2)   // Z80 runs on double the Apple II's clock
 	MCFG_CPU_PROGRAM_MAP(z80_mem)
 MACHINE_CONFIG_END

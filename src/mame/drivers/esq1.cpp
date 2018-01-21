@@ -425,6 +425,8 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(key_stroke);
 
 	void send_through_panel(uint8_t data);
+	void esq1(machine_config &config);
+	void sq80(machine_config &config);
 };
 
 
@@ -579,7 +581,7 @@ INPUT_CHANGED_MEMBER(esq1_state::key_stroke)
 	}
 }
 
-static MACHINE_CONFIG_START( esq1 )
+MACHINE_CONFIG_START(esq1_state::esq1)
 	MCFG_CPU_ADD("maincpu", MC6809, XTAL_8MHz) // XTAL not directly attached to CPU
 	MCFG_CPU_PROGRAM_MAP(esq1_map)
 
@@ -619,7 +621,7 @@ static MACHINE_CONFIG_START( esq1 )
 	MCFG_SOUND_ROUTE_EX(7, "filters", 1.0, 7)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED(sq80, esq1)
+MACHINE_CONFIG_DERIVED(esq1_state::sq80, esq1)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(sq80_map)
 

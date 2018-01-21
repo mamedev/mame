@@ -347,7 +347,7 @@ GFXDECODE_END
     MACHINE DRIVERS
 ***************************************************************************/
 
-static MACHINE_CONFIG_START( aquarius )
+MACHINE_CONFIG_START(aquarius_state::aquarius)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_3_579545MHz) // ???
 	MCFG_CPU_PROGRAM_MAP(aquarius_mem)

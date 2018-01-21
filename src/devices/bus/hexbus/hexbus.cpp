@@ -295,7 +295,7 @@ void hexbus_chained_device::bus_write(int dir, uint8_t data)
 		hexbuscont->write(dir, data);
 }
 
-MACHINE_CONFIG_MEMBER( hexbus_chained_device::device_add_mconfig )
+MACHINE_CONFIG_START(hexbus_chained_device::device_add_mconfig)
 	MCFG_HEXBUS_ADD("hexbus")
 MACHINE_CONFIG_END
 

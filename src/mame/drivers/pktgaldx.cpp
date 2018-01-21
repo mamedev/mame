@@ -185,7 +185,7 @@ static ADDRESS_MAP_START( pktgaldb_map, AS_PROGRAM, 16, pktgaldx_state )
 
 	AM_RANGE(0x300000, 0x30000f) AM_RAM // ??
 
-	AM_RANGE(0x330000, 0x330bff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette") // extra colours?
+	AM_RANGE(0x330000, 0x330bff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette") // extra colours?
 ADDRESS_MAP_END
 
 
@@ -333,7 +333,7 @@ void pktgaldx_state::machine_start()
 {
 }
 
-static MACHINE_CONFIG_START( pktgaldx )
+MACHINE_CONFIG_START(pktgaldx_state::pktgaldx)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 14000000)
@@ -396,7 +396,7 @@ static MACHINE_CONFIG_START( pktgaldx )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( pktgaldb )
+MACHINE_CONFIG_START(pktgaldx_state::pktgaldb)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 16000000)

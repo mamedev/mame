@@ -105,6 +105,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(int_w);
 	MC6845_UPDATE_ROW(update_row);
 
+	void m20(machine_config &config);
 private:
 	offs_t m_memsize;
 	uint8_t m_port21;
@@ -778,7 +779,7 @@ static SLOT_INTERFACE_START(keyboard)
 	SLOT_INTERFACE("m20", M20_KEYBOARD)
 SLOT_INTERFACE_END
 
-static MACHINE_CONFIG_START( m20 )
+MACHINE_CONFIG_START(m20_state::m20)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z8001, MAIN_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(m20_program_mem)

@@ -53,6 +53,11 @@ public:
 			m_sample_bank(*this, "sample_bank")
 	{ }
 
+	void de_bg_audio(machine_config &config);
+	void de_type2(machine_config &config);
+	void de_type1(machine_config &config);
+	void de_type2_alpha3(machine_config &config);
+	void de_type3(machine_config &config);
 protected:
 
 	// devices
@@ -518,7 +523,7 @@ WRITE8_MEMBER(de_2_state::lamps_w)
 }
 
 
-static MACHINE_CONFIG_START( de_bg_audio )
+MACHINE_CONFIG_START(de_2_state::de_bg_audio)
 	/* sound CPU */
 	MCFG_CPU_ADD("audiocpu", MC6809E, XTAL_8MHz / 4) // MC68B09E
 	MCFG_CPU_PROGRAM_MAP(de_2_audio_map)
@@ -535,7 +540,7 @@ static MACHINE_CONFIG_START( de_bg_audio )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "bg", 0.50)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( de_type1 )
+MACHINE_CONFIG_START(de_2_state::de_type1)
 	/* basic machine hardware */
 	MCFG_DECOCPU_TYPE1_ADD("decocpu", XTAL_8MHz / 2, ":maincpu")
 	MCFG_DECOCPU_DISPLAY(READ8(de_2_state,display_r),WRITE8(de_2_state,display_w))
@@ -551,7 +556,7 @@ static MACHINE_CONFIG_START( de_type1 )
 	MCFG_FRAGMENT_ADD(de_bg_audio)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( de_type2 )
+MACHINE_CONFIG_START(de_2_state::de_type2)
 	/* basic machine hardware */
 	MCFG_DECOCPU_TYPE2_ADD("decocpu", XTAL_8MHz / 2, ":maincpu")
 	MCFG_DECOCPU_DISPLAY(READ8(de_2_state,display_r),WRITE8(de_2_state,display_w))
@@ -567,7 +572,7 @@ static MACHINE_CONFIG_START( de_type2 )
 	MCFG_FRAGMENT_ADD(de_bg_audio)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( de_type2_alpha3 )
+MACHINE_CONFIG_START(de_2_state::de_type2_alpha3)
 	/* basic machine hardware */
 	MCFG_DECOCPU_TYPE2_ADD("decocpu", XTAL_8MHz / 2, ":maincpu")
 	MCFG_DECOCPU_DISPLAY(READ8(de_2_state,display_r),WRITE8(de_2_state,type2alpha3_display_w))
@@ -583,7 +588,7 @@ static MACHINE_CONFIG_START( de_type2_alpha3 )
 	MCFG_FRAGMENT_ADD(de_bg_audio)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( de_type3 )
+MACHINE_CONFIG_START(de_2_state::de_type3)
 	/* basic machine hardware */
 	MCFG_DECOCPU_TYPE3_ADD("decocpu", XTAL_8MHz / 2, ":maincpu")
 	MCFG_DECOCPU_DISPLAY(READ8(de_2_state,display_r),WRITE8(de_2_state,alpha3_display_w))

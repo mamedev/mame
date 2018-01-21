@@ -38,6 +38,8 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(bishi_scanline);
 	K056832_CB_MEMBER(tile_callback);
 
+	void bishi(machine_config &config);
+	void dobouchn(machine_config &config);
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;

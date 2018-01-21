@@ -122,6 +122,7 @@ public:
 	DECLARE_WRITE32_MEMBER(clut_w);
 	DECLARE_WRITE32_MEMBER(clut_mask_w);
 
+	void igt_gameking(machine_config &config);
 private:
 	int m_offset, m_r, m_g, m_b, m_state;
 	bool m_bToggle;
@@ -234,7 +235,7 @@ GFXDECODE_END
 
 
 
-static MACHINE_CONFIG_START( igt_gameking )
+MACHINE_CONFIG_START(igt_gameking_state::igt_gameking)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I960, XTAL_24MHz)

@@ -451,6 +451,41 @@ public:
 	void mmpanic_update_leds();
 	void mjchuuka_get_romdata();
 	uint8_t hgokou_player_r( int player );
+	void mjmywrld(machine_config &config);
+	void mjmyster(machine_config &config);
+	void mmpanic(machine_config &config);
+	void nettoqc(machine_config &config);
+	void mjmyornt(machine_config &config);
+	void kotbinsp(machine_config &config);
+	void mjgnight(machine_config &config);
+	void ddenlovrk(machine_config &config);
+	void quizchq(machine_config &config);
+	void mjmyuniv(machine_config &config);
+	void dtoyoken(machine_config &config);
+	void hgokou(machine_config &config);
+	void seljan2(machine_config &config);
+	void janshinp(machine_config &config);
+	void hkagerou(machine_config &config);
+	void ultrchmp(machine_config &config);
+	void rongrong(machine_config &config);
+	void mjflove(machine_config &config);
+	void hanakanz(machine_config &config);
+	void jongtei(machine_config &config);
+	void akamaru(machine_config &config);
+	void mjchuuka(machine_config &config);
+	void hparadis(machine_config &config);
+	void mjreach1(machine_config &config);
+	void ddenlovr(machine_config &config);
+	void funkyfig(machine_config &config);
+	void hginga(machine_config &config);
+	void daimyojn(machine_config &config);
+	void htengoku(machine_config &config);
+	void sryudens(machine_config &config);
+	void hgokbang(machine_config &config);
+	void quiz365(machine_config &config);
+	void kotbinyo(machine_config &config);
+	void mjschuka(machine_config &config);
+	void ddenlovj(machine_config &config);
 };
 
 VIDEO_START_MEMBER(ddenlovr_state,ddenlovr)
@@ -4262,7 +4297,7 @@ static ADDRESS_MAP_START( htengoku_banked_map, AS_PROGRAM, 8, dynax_state )
 	AM_RANGE(0x80000, 0x801ff) AM_WRITE(tenkai_palette_w)
 ADDRESS_MAP_END
 
-static MACHINE_CONFIG_START( htengoku )
+MACHINE_CONFIG_START(ddenlovr_state::htengoku)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80,20000000 / 4)
@@ -9608,7 +9643,7 @@ MACHINE_START_MEMBER(ddenlovr_state,sryudens)
                             Don Den Lover Vol.1
 ***************************************************************************/
 
-static MACHINE_CONFIG_START( ddenlovr )
+MACHINE_CONFIG_START(ddenlovr_state::ddenlovr)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",M68000, XTAL_24MHz / 2)
@@ -9653,7 +9688,7 @@ static MACHINE_CONFIG_START( ddenlovr )
 	MCFG_DEVICE_ADD("rtc", RTC72421, XTAL_32_768kHz) // internal oscillator
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( ddenlovj, ddenlovr )
+MACHINE_CONFIG_DERIVED(ddenlovr_state::ddenlovj, ddenlovr)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -9665,19 +9700,19 @@ static MACHINE_CONFIG_DERIVED( ddenlovj, ddenlovr )
 	MCFG_DEVICE_REPLACE("rtc", RTC62421, XTAL_32_768kHz) // internal oscillator
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( ddenlovrk, ddenlovr )
+MACHINE_CONFIG_DERIVED(ddenlovr_state::ddenlovrk, ddenlovr)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(ddenlovrk_map)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( akamaru, ddenlovr )
+MACHINE_CONFIG_DERIVED(ddenlovr_state::akamaru, ddenlovr)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(akamaru_map)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( quiz365, ddenlovj )
+MACHINE_CONFIG_DERIVED(ddenlovr_state::quiz365, ddenlovj)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -9695,14 +9730,14 @@ static MACHINE_CONFIG_DERIVED( quiz365, ddenlovj )
 	MCFG_DEVICE_REPLACE("rtc", MSM6242, XTAL_32_768kHz)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( nettoqc, ddenlovj )
+MACHINE_CONFIG_DERIVED(ddenlovr_state::nettoqc, ddenlovj)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(nettoqc_map)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( ultrchmp, ddenlovr )
+MACHINE_CONFIG_DERIVED(ddenlovr_state::ultrchmp, ddenlovr)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -9742,7 +9777,7 @@ WRITE_LINE_MEMBER(ddenlovr_state::quizchq_rtc_irq )
 	m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xfc);
 }
 
-static MACHINE_CONFIG_START( quizchq )
+MACHINE_CONFIG_START(ddenlovr_state::quizchq)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_16MHz/2)  /* Verified */
@@ -9781,7 +9816,7 @@ static MACHINE_CONFIG_START( quizchq )
 	MCFG_MSM6242_OUT_INT_HANDLER(WRITELINE(ddenlovr_state, quizchq_rtc_irq))
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( rongrong, quizchq )
+MACHINE_CONFIG_DERIVED(ddenlovr_state::rongrong, quizchq)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -9821,7 +9856,7 @@ WRITE_LINE_MEMBER(ddenlovr_state::mmpanic_rtc_irq )
 	m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xdf); // RST 18, clock
 }
 
-static MACHINE_CONFIG_START( mmpanic )
+MACHINE_CONFIG_START(ddenlovr_state::mmpanic)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 8000000)
@@ -9905,7 +9940,7 @@ WRITE_LINE_MEMBER(ddenlovr_state::hanakanz_rtc_irq)
 	m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xe2);
 }
 
-static MACHINE_CONFIG_START( hanakanz )
+MACHINE_CONFIG_START(ddenlovr_state::hanakanz)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80,8000000) // TMPZ84C015BF-8
@@ -9944,14 +9979,14 @@ static MACHINE_CONFIG_START( hanakanz )
 	MCFG_MSM6242_OUT_INT_HANDLER(WRITELINE(ddenlovr_state, hanakanz_rtc_irq))
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( hkagerou, hanakanz )
+MACHINE_CONFIG_DERIVED(ddenlovr_state::hkagerou, hanakanz)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(hkagerou_portmap)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( kotbinyo )
+MACHINE_CONFIG_START(ddenlovr_state::kotbinyo)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80, XTAL_20MHz / 2) // !! KL5C80A12CFP @ 10MHz? (actually 4 times faster than Z80) !!
@@ -9990,7 +10025,7 @@ static MACHINE_CONFIG_START( kotbinyo )
 //  MCFG_MSM6242_OUT_INT_HANDLER(WRITELINE(ddenlovr_state, hanakanz_rtc_irq))
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( kotbinsp, kotbinyo )
+MACHINE_CONFIG_DERIVED(ddenlovr_state::kotbinsp, kotbinyo)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -9998,7 +10033,7 @@ static MACHINE_CONFIG_DERIVED( kotbinsp, kotbinyo )
 
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( mjreach1, hanakanz )
+MACHINE_CONFIG_DERIVED(ddenlovr_state::mjreach1, hanakanz)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -10037,7 +10072,7 @@ WRITE_LINE_MEMBER(ddenlovr_state::mjchuuka_rtc_irq)
 	m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xfa);
 }
 
-static MACHINE_CONFIG_DERIVED( mjchuuka, hanakanz )
+MACHINE_CONFIG_DERIVED(ddenlovr_state::mjchuuka, hanakanz)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -10052,7 +10087,7 @@ static MACHINE_CONFIG_DERIVED( mjchuuka, hanakanz )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( funkyfig, mmpanic )
+MACHINE_CONFIG_DERIVED(ddenlovr_state::funkyfig, mmpanic)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(funkyfig_map)
 	MCFG_CPU_IO_MAP(funkyfig_portmap)
@@ -10074,7 +10109,7 @@ MACHINE_CONFIG_END
      Mahjong Super Dai Chuuka Ken
 ***************************************************************************/
 
-static MACHINE_CONFIG_START( mjschuka )
+MACHINE_CONFIG_START(ddenlovr_state::mjschuka)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80,XTAL_16MHz/2)
@@ -10163,7 +10198,7 @@ WRITE_LINE_MEMBER(ddenlovr_state::mjmyster_rtc_irq)
 }
 
 
-static MACHINE_CONFIG_DERIVED( mjmyster, quizchq )
+MACHINE_CONFIG_DERIVED(ddenlovr_state::mjmyster, quizchq)
 
 	/* basic machine hardware */
 	MCFG_DEVICE_REMOVE("maincpu")
@@ -10218,7 +10253,7 @@ WRITE_LINE_MEMBER(ddenlovr_state::hginga_rtc_irq)
 }
 
 
-static MACHINE_CONFIG_DERIVED( hginga, quizchq )
+MACHINE_CONFIG_DERIVED(ddenlovr_state::hginga, quizchq)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -10237,7 +10272,7 @@ static MACHINE_CONFIG_DERIVED( hginga, quizchq )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( hgokou, quizchq )
+MACHINE_CONFIG_DERIVED(ddenlovr_state::hgokou, quizchq)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -10256,7 +10291,7 @@ static MACHINE_CONFIG_DERIVED( hgokou, quizchq )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( hgokbang, hgokou )
+MACHINE_CONFIG_DERIVED(ddenlovr_state::hgokbang, hgokou)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -10264,7 +10299,7 @@ static MACHINE_CONFIG_DERIVED( hgokbang, hgokou )
 
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( mjmywrld, mjmyster )
+MACHINE_CONFIG_DERIVED(ddenlovr_state::mjmywrld, mjmyster)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -10272,7 +10307,7 @@ static MACHINE_CONFIG_DERIVED( mjmywrld, mjmyster )
 	MCFG_CPU_IO_MAP(mjmywrld_portmap)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( mjmyuniv, quizchq )
+MACHINE_CONFIG_DERIVED(ddenlovr_state::mjmyuniv, quizchq)
 
 	/* basic machine hardware */
 	MCFG_DEVICE_REMOVE("maincpu")
@@ -10292,7 +10327,7 @@ static MACHINE_CONFIG_DERIVED( mjmyuniv, quizchq )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( mjmyornt, quizchq )
+MACHINE_CONFIG_DERIVED(ddenlovr_state::mjmyornt, quizchq)
 
 	/* basic machine hardware */
 	MCFG_DEVICE_REMOVE("maincpu")
@@ -10329,7 +10364,7 @@ WRITE_LINE_MEMBER(ddenlovr_state::mjflove_rtc_irq)
 }
 
 
-static MACHINE_CONFIG_DERIVED( mjflove, quizchq )
+MACHINE_CONFIG_DERIVED(ddenlovr_state::mjflove, quizchq)
 
 	/* basic machine hardware */
 	MCFG_DEVICE_REMOVE("maincpu")
@@ -10357,7 +10392,7 @@ INTERRUPT_GEN_MEMBER(ddenlovr_state::hparadis_irq)
 	device.execute().set_input_line_and_vector(0, HOLD_LINE, 0xee);
 }
 
-static MACHINE_CONFIG_DERIVED( hparadis, quizchq )
+MACHINE_CONFIG_DERIVED(ddenlovr_state::hparadis, quizchq)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -10370,7 +10405,7 @@ MACHINE_CONFIG_END
 
 
 
-static MACHINE_CONFIG_START( jongtei )
+MACHINE_CONFIG_START(ddenlovr_state::jongtei)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80, XTAL_20MHz / 2) // TMPZ84C015
@@ -10409,7 +10444,7 @@ static MACHINE_CONFIG_START( jongtei )
 	MCFG_MSM6242_OUT_INT_HANDLER(WRITELINE(ddenlovr_state, hanakanz_rtc_irq))
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( mjgnight, jongtei )
+MACHINE_CONFIG_DERIVED(ddenlovr_state::mjgnight, jongtei)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(mjgnight_portmap)
 
@@ -10422,7 +10457,7 @@ MACHINE_CONFIG_END
                             Mahjong Seiryu Densetsu
 ***************************************************************************/
 
-static MACHINE_CONFIG_START( sryudens )
+MACHINE_CONFIG_START(ddenlovr_state::sryudens)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80, XTAL_16MHz / 2) // ?
@@ -10469,7 +10504,7 @@ MACHINE_CONFIG_END
 ***************************************************************************/
 
 // PCB: NM7001004
-static MACHINE_CONFIG_START( janshinp )
+MACHINE_CONFIG_START(ddenlovr_state::janshinp)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80, XTAL_16MHz / 2)
@@ -10512,7 +10547,7 @@ static MACHINE_CONFIG_START( janshinp )
 MACHINE_CONFIG_END
 
 // Same PCB as janshinp
-static MACHINE_CONFIG_DERIVED( dtoyoken, janshinp )
+MACHINE_CONFIG_DERIVED(ddenlovr_state::dtoyoken, janshinp)
 
 	MCFG_VIDEO_START_OVERRIDE(ddenlovr_state,mjflove)  // blitter commands in the roms are shuffled around
 MACHINE_CONFIG_END
@@ -10536,7 +10571,7 @@ MACHINE_START_MEMBER(ddenlovr_state,seljan2)
 	MACHINE_START_CALL_MEMBER(ddenlovr);
 }
 
-static MACHINE_CONFIG_START( seljan2 )
+MACHINE_CONFIG_START(ddenlovr_state::seljan2)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80, XTAL_16MHz / 2)
@@ -10586,7 +10621,7 @@ MACHINE_CONFIG_END
 ***************************************************************************/
 
 
-static MACHINE_CONFIG_START( daimyojn )
+MACHINE_CONFIG_START(ddenlovr_state::daimyojn)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80, XTAL_20MHz / 2)

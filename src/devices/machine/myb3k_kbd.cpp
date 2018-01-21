@@ -136,20 +136,37 @@
 #define LOGMOD(...)   LOGMASKED(LOG_MOD,   __VA_ARGS__)
 #define LOGBYTES(...) LOGMASKED(LOG_BYTES, __VA_ARGS__)
 
+DEFINE_DEVICE_TYPE(MYB3K_KEYBOARD, myb3k_keyboard_device, "myb3k_keyboard", "MyBrain3000 Keyboard")
+DEFINE_DEVICE_TYPE(STEPONE_KEYBOARD, stepone_keyboard_device, "stepone_keyboard", "Step/One Keyboard")
+DEFINE_DEVICE_TYPE(JB3000_KEYBOARD, jb3000_keyboard_device, "jb3000_keyboard", "JB3000 Keyboard")
+
+// When running with the MyBrain3000 rom, then pressing GRAPH+SHIFT+key generates Japanese katakana.
+// (The GRAPH key on the MyBrain3000 and the Step/One keyboard (ALT/GRAPH on the JB3000 keyboard) maps to LALT.
+// For example graph+shift+w generates ヨ on the emulated MyBrain3000 screen.
+// If a Japanese Kana keyboard layout is selected in the host computer, then the natural keyboard in mame
+// does map the same katakana (unicode 0x30e8) to the proper graph+shift+key combination for the MyBrain3000.
+//
+// Pressing just GRAPH+key generates underscore followed by a different katakana. We do not yet understand what the
+// purpose is of this combo, so it is currently ignored in the natural keyboard. The below macro is used a lot.
+
+#define PORT_CHAR_IGNORE PORT_CHAR(UCHAR_MAMEKEY(INVALID))
+
 // The rightmost commented number in the list below, eg // 58 for Left Shift is the numbering used in the manual
 // for reference in the keyboard layout images.
 
-INPUT_PORTS_START( myb3k_keyboard )
+// The mappings below are almost fully complete for the Step/One, but a lot more work is needed for myb3k and jb3000.
+
+INPUT_PORTS_START( myb3k_common_ports )
 
 	PORT_START("MYB3K_T0")
 	PORT_BIT( 0x0001U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_LCONTROL) PORT_NAME("Control") PORT_CHAR(UCHAR_MAMEKEY(LCONTROL)) // 44
 	PORT_BIT( 0x0002U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_LSHIFT)   PORT_NAME("Left Shift") PORT_CHAR(UCHAR_SHIFT_1) // 58
 	PORT_BIT( 0x0004U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_CAPSLOCK) PORT_NAME("Caps lock") PORT_CHAR(UCHAR_MAMEKEY(CAPSLOCK)) // 71
-	PORT_BIT( 0x0008U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_LALT)     PORT_NAME("Graph") PORT_CHAR(UCHAR_MAMEKEY(LALT)) // 72
-	// Bit 0x0010U not used in keyboard.
+	PORT_BIT( 0x0008U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_LALT)     PORT_NAME("Graph") PORT_CHAR(UCHAR_SHIFT_2) // 72
+	PORT_BIT( 0x0010U, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x0020U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_RSHIFT)   PORT_NAME("Right Shift") PORT_CHAR(UCHAR_SHIFT_1) // 70
 	PORT_BIT( 0x0040U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_0_PAD)    PORT_NAME("KP 0") // 94
-//  PORT_BIT( 0x0080U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_STOP)     PORT_NAME("KP .") // 95
+	// PORT_BIT( 0x0080U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_STOP)     PORT_NAME("KP .") // 95
 
 	PORT_START("MYB3K_T1")
 	PORT_BIT( 0x0001U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_F1) PORT_NAME("PF1") PORT_CHAR(UCHAR_MAMEKEY(F1)) // 1
@@ -195,11 +212,11 @@ INPUT_PORTS_START( myb3k_keyboard )
 	PORT_BIT( 0x0001U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_0)         PORT_NAME("0 =") PORT_CHAR('0')  PORT_CHAR('=') // 25
 	PORT_BIT( 0x0002U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_MINUS)     PORT_NAME("+ ?") PORT_CHAR('+') PORT_CHAR('?') // 26
 	PORT_BIT( 0x0004U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_EQUALS)    PORT_NAME("é É") PORT_CHAR(0x00E9)  PORT_CHAR(0x00C9) // 27
-	PORT_BIT( 0x0008U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_BACKSLASH) PORT_NAME("< >") PORT_CHAR('<') PORT_CHAR('>') // 28
-	PORT_BIT( 0x0010U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_BACKSPACE) PORT_NAME("Backspace") PORT_CHAR(8)// 29
-	PORT_BIT( 0x0020U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_TAB)       PORT_NAME("Tab") PORT_CHAR(9)// 30
+	PORT_BIT( 0x0008U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_BACKSLASH2) PORT_NAME("< >") PORT_CHAR('<') PORT_CHAR('>') // 28
+	PORT_BIT( 0x0010U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_BACKSPACE) PORT_NAME("Backspace") PORT_CHAR(8)             // 29
+	PORT_BIT( 0x0020U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_TAB)       PORT_NAME("Tab") PORT_CHAR(9)                   // 30
 	PORT_BIT( 0x0040U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_Q)         PORT_NAME("q Q") PORT_CHAR('q')  PORT_CHAR('Q') // 31
-	PORT_BIT( 0x0080U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_W)         PORT_NAME("w W") PORT_CHAR('w')  PORT_CHAR('W') // 32
+	PORT_BIT( 0x0080U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_W)         PORT_NAME("w W") PORT_CHAR('w') PORT_CHAR('W') // 32
 
 	PORT_START("MYB3K_T6")
 	PORT_BIT( 0x0001U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_E) PORT_NAME("e E") PORT_CHAR('e')  PORT_CHAR('E') // 33
@@ -228,7 +245,7 @@ INPUT_PORTS_START( myb3k_keyboard )
 	PORT_BIT( 0x0008U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_L)         PORT_NAME("l L") PORT_CHAR('l')  PORT_CHAR('L') // 53
 	PORT_BIT( 0x0010U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_COLON)     PORT_NAME("ö Ö") PORT_CHAR(0x00F6)  PORT_CHAR(0x00D6) // 54
 	PORT_BIT( 0x0020U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_QUOTE)     PORT_NAME("ä Ä") PORT_CHAR(0x00E4)  PORT_CHAR(0x00C4) // 55
-//  PORT_BIT( 0x0040U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_)          PORT_NAME("' *") PORT_CHAR('\'')  PORT_CHAR('*') // 56
+	PORT_BIT( 0x0040U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_BACKSLASH) PORT_NAME("' *") PORT_CHAR('\'')  PORT_CHAR('*') // 56
 	PORT_BIT( 0x0080U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_Z)         PORT_NAME("z Z") PORT_CHAR('z')  PORT_CHAR('Z') // 59
 
 	PORT_START("MYB3K_T9")
@@ -254,7 +271,7 @@ INPUT_PORTS_START( myb3k_keyboard )
 	PORT_START("MYB3K_TB")
 	PORT_BIT( 0x0001U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_5_PAD) PORT_NAME("KP 5")              // 87
 	PORT_BIT( 0x0002U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_6_PAD) PORT_NAME("KP 6")              // 88
-//  PORT_BIT( 0x0004U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_COMMA_PAD) PORT_NAME("KP ,")          // 89
+//	PORT_BIT( 0x0004U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_COMMA_PAD) PORT_NAME("KP ,")          // 89
 	PORT_BIT( 0x0008U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_1_PAD) PORT_NAME("KP 1")              // 90
 	PORT_BIT( 0x0010U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_2_PAD) PORT_NAME("KP 2")              // 91
 	PORT_BIT( 0x0020U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_3_PAD) PORT_NAME("KP 3")              // 92
@@ -263,7 +280,39 @@ INPUT_PORTS_START( myb3k_keyboard )
 
 INPUT_PORTS_END
 
-DEFINE_DEVICE_TYPE(MYB3K_KEYBOARD, myb3k_keyboard_device, "myb3k_keyboard", "MyBrain3000 Keyboard")
+INPUT_PORTS_START( myb3k_keyboard )
+	PORT_INCLUDE( myb3k_common_ports )
+
+	PORT_MODIFY("MYB3K_T2")
+	PORT_BIT( 0x0008U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_F12)	PORT_NAME("Kanji") PORT_CHAR(UCHAR_MAMEKEY(F12)) // 12
+
+	PORT_MODIFY("MYB3K_T3")
+	PORT_BIT( 0x0080U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_1)		PORT_NAME("1 !") PORT_CHAR('1') PORT_CHAR('!') PORT_CHAR_IGNORE PORT_CHAR(0x30AA) // 16 オ
+
+	PORT_MODIFY("MYB3K_T4")
+	PORT_BIT( 0x0002U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_3)		PORT_NAME("3 #") PORT_CHAR('3')  PORT_CHAR('#') PORT_CHAR_IGNORE PORT_CHAR(0x30E7) // 18 ョ
+
+	PORT_MODIFY("MYB3K_T5")
+	PORT_BIT( 0x0080U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_W)         PORT_NAME("w W") PORT_CHAR('w') PORT_CHAR('W') PORT_CHAR_IGNORE PORT_CHAR(0x30E8) // 32 ヨ
+
+INPUT_PORTS_END
+
+INPUT_PORTS_START( stepone_keyboard )
+	PORT_INCLUDE( myb3k_common_ports )
+INPUT_PORTS_END
+
+INPUT_PORTS_START( jb3000_keyboard )
+	PORT_INCLUDE(myb3k_common_ports)
+
+	PORT_MODIFY("MYB3K_T5")
+	PORT_BIT( 0x0008U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_BACKSLASH2) PORT_NAME("\\ |") PORT_CHAR('\\') PORT_CHAR('|') // 28
+
+	PORT_MODIFY("MYB3K_T9")
+	PORT_BIT( 0x0040U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_COMMA) PORT_NAME(", <") PORT_CHAR(',')  PORT_CHAR('<') // 66
+	PORT_BIT( 0x0080U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_STOP)  PORT_NAME(". >") PORT_CHAR('.')  PORT_CHAR('>') // 67
+
+INPUT_PORTS_END
+
 
 #define MYB3K_KEY_CTRL 0x02U
 #define MYB3K_KEY_GRAPH 0x04U
@@ -369,8 +418,8 @@ void myb3k_keyboard_device::scan_keys()
 			if (m_y > 7) {
 				m_y = 0;
 				// Done scanning the matrix. Now sleep for a while,
-				// then start scanning again. Scan ~20 times per second.
-				timer_set(attotime::from_msec(50), TIMER_ID_SCAN_KEYS);
+				// then start scanning again. Scan ~50 times per second.
+				timer_set(attotime::from_msec(20), TIMER_ID_SCAN_KEYS);
 				wait_for_timer = true;
 				// (The final switch x=11 y=7 is not electrically connected.
 				// Thus if we get here, then there can be no key changed
@@ -431,4 +480,30 @@ void myb3k_keyboard_device::device_timer(emu_timer &timer, device_timer_id id, i
 		timer_set(attotime::from_msec(10), TIMER_ID_SCAN_KEYS);
 		break;
 	}
+}
+
+stepone_keyboard_device::stepone_keyboard_device(
+	const machine_config &mconfig,
+	char const *tag,
+	device_t *owner,
+	u32 clock) : myb3k_keyboard_device(mconfig, STEPONE_KEYBOARD, tag, owner, clock)
+{
+}
+
+ioport_constructor stepone_keyboard_device::device_input_ports() const
+{
+	return INPUT_PORTS_NAME(stepone_keyboard);
+}
+
+jb3000_keyboard_device::jb3000_keyboard_device(
+	const machine_config &mconfig,
+	char const *tag,
+	device_t *owner,
+	u32 clock) : myb3k_keyboard_device(mconfig, JB3000_KEYBOARD, tag, owner, clock)
+{
+}
+
+ioport_constructor jb3000_keyboard_device::device_input_ports() const
+{
+	return INPUT_PORTS_NAME(jb3000_keyboard);
 }

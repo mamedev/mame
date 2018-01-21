@@ -352,6 +352,7 @@ public:
 	TIMER_CALLBACK_MEMBER(counter_6ms_callback);
 	IRQ_CALLBACK_MEMBER(cat_int_ack);
 
+	void cat(machine_config &config);
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
@@ -1047,7 +1048,7 @@ WRITE_LINE_MEMBER(cat_state::prn_ack_ff) // switch the flipflop state on the ris
 #endif
 }
 
-static MACHINE_CONFIG_START( cat )
+MACHINE_CONFIG_START(cat_state::cat)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",M68000, XTAL_19_968MHz/4)

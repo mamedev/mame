@@ -2047,7 +2047,7 @@ GFXDECODE_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( z80_ym2151 )
+MACHINE_CONFIG_START(segas1x_bootleg_state::z80_ym2151)
 
 	MCFG_CPU_ADD("soundcpu", Z80, 4000000)
 	MCFG_CPU_PROGRAM_MAP(sound_map)
@@ -2067,7 +2067,7 @@ WRITE_LINE_MEMBER(segas1x_bootleg_state::sound_cause_nmi)
 	m_soundcpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
-static MACHINE_CONFIG_START( z80_ym2151_upd7759 )
+MACHINE_CONFIG_START(segas1x_bootleg_state::z80_ym2151_upd7759)
 
 	MCFG_CPU_ADD("soundcpu", Z80, 4000000)
 	MCFG_CPU_PROGRAM_MAP(sound_7759_map)
@@ -2086,7 +2086,7 @@ static MACHINE_CONFIG_START( z80_ym2151_upd7759 )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.48)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( datsu_ym2151_msm5205 )
+MACHINE_CONFIG_START(segas1x_bootleg_state::datsu_ym2151_msm5205)
 	/* TODO:
 	- other games might use this sound configuration
 	- speaker is likely to be mono for the bootlegs, not stereo.
@@ -2109,7 +2109,7 @@ static MACHINE_CONFIG_START( datsu_ym2151_msm5205 )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.80)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( datsu_2x_ym2203_msm5205 )
+MACHINE_CONFIG_START(segas1x_bootleg_state::datsu_2x_ym2203_msm5205)
 	MCFG_CPU_ADD("soundcpu", Z80, 4000000)
 	MCFG_CPU_PROGRAM_MAP(shinobi_datsu_sound_map)
 
@@ -2146,7 +2146,7 @@ MACHINE_CONFIG_END
  *************************************/
 
 /* System 16A/B Bootlegs */
-static MACHINE_CONFIG_START( system16_base )
+MACHINE_CONFIG_START(segas1x_bootleg_state::system16_base)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 10000000)
@@ -2169,7 +2169,7 @@ static MACHINE_CONFIG_START( system16_base )
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( shinobi_datsu, system16_base )
+MACHINE_CONFIG_DERIVED(segas1x_bootleg_state::shinobi_datsu, system16_base)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2186,7 +2186,7 @@ static MACHINE_CONFIG_DERIVED( shinobi_datsu, system16_base )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( passshtb, system16_base )
+MACHINE_CONFIG_DERIVED(segas1x_bootleg_state::passshtb, system16_base)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2204,7 +2204,7 @@ static MACHINE_CONFIG_DERIVED( passshtb, system16_base )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( passsht4b, system16_base )
+MACHINE_CONFIG_DERIVED(segas1x_bootleg_state::passsht4b, system16_base)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2224,7 +2224,7 @@ static MACHINE_CONFIG_DERIVED( passsht4b, system16_base )
 	MCFG_MSM5205_PRESCALER_SELECTOR(S96_4B)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( wb3bb, system16_base )
+MACHINE_CONFIG_DERIVED(segas1x_bootleg_state::wb3bb, system16_base)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2243,7 +2243,7 @@ static MACHINE_CONFIG_DERIVED( wb3bb, system16_base )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( goldnaxeb_base )
+MACHINE_CONFIG_START(segas1x_bootleg_state::goldnaxeb_base)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 10000000)
@@ -2273,12 +2273,12 @@ static MACHINE_CONFIG_START( goldnaxeb_base )
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( goldnaxeb1, goldnaxeb_base )
+MACHINE_CONFIG_DERIVED(segas1x_bootleg_state::goldnaxeb1, goldnaxeb_base)
 
 	MCFG_FRAGMENT_ADD(z80_ym2151_upd7759)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( goldnaxeb2, goldnaxeb_base )
+MACHINE_CONFIG_DERIVED(segas1x_bootleg_state::goldnaxeb2, goldnaxeb_base)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2289,14 +2289,14 @@ static MACHINE_CONFIG_DERIVED( goldnaxeb2, goldnaxeb_base )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( bayrouteb1, goldnaxeb1 )
+MACHINE_CONFIG_DERIVED(segas1x_bootleg_state::bayrouteb1, goldnaxeb1)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(bayrouteb1_map)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( bayrouteb2, goldnaxeb_base )
+MACHINE_CONFIG_DERIVED(segas1x_bootleg_state::bayrouteb2, goldnaxeb_base)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2310,7 +2310,7 @@ static MACHINE_CONFIG_DERIVED( bayrouteb2, goldnaxeb_base )
 
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( tturfbl, system16_base )
+MACHINE_CONFIG_DERIVED(segas1x_bootleg_state::tturfbl, system16_base)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2322,7 +2322,7 @@ static MACHINE_CONFIG_DERIVED( tturfbl, system16_base )
 	MCFG_BOOTLEG_SYS16B_SPRITES_XORIGIN(189-107)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( dduxbl, system16_base )
+MACHINE_CONFIG_DERIVED(segas1x_bootleg_state::dduxbl, system16_base)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2334,7 +2334,7 @@ static MACHINE_CONFIG_DERIVED( dduxbl, system16_base )
 	MCFG_FRAGMENT_ADD(z80_ym2151)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( eswatbl, system16_base )
+MACHINE_CONFIG_DERIVED(segas1x_bootleg_state::eswatbl, system16_base)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2346,7 +2346,7 @@ static MACHINE_CONFIG_DERIVED( eswatbl, system16_base )
 	MCFG_FRAGMENT_ADD(z80_ym2151_upd7759)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( eswatbl2, system16_base )
+MACHINE_CONFIG_DERIVED(segas1x_bootleg_state::eswatbl2, system16_base)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2358,7 +2358,7 @@ static MACHINE_CONFIG_DERIVED( eswatbl2, system16_base )
 	MCFG_FRAGMENT_ADD(datsu_2x_ym2203_msm5205)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( tetrisbl, system16_base )
+MACHINE_CONFIG_DERIVED(segas1x_bootleg_state::tetrisbl, system16_base)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2370,7 +2370,7 @@ static MACHINE_CONFIG_DERIVED( tetrisbl, system16_base )
 	MCFG_FRAGMENT_ADD(z80_ym2151)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( altbeastbl, system16_base )
+MACHINE_CONFIG_DERIVED(segas1x_bootleg_state::altbeastbl, system16_base)
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(tetrisbl_map)
@@ -2383,7 +2383,7 @@ static MACHINE_CONFIG_DERIVED( altbeastbl, system16_base )
 	MCFG_MSM5205_PRESCALER_SELECTOR(S96_4B)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( beautyb, system16_base )
+MACHINE_CONFIG_DERIVED(segas1x_bootleg_state::beautyb, system16_base)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2396,7 +2396,7 @@ MACHINE_CONFIG_END
 
 
 /* System 18 Bootlegs */
-static MACHINE_CONFIG_START( system18 )
+MACHINE_CONFIG_START(segas1x_bootleg_state::system18)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 10000000)
@@ -2446,14 +2446,14 @@ static MACHINE_CONFIG_START( system18 )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( astormbl, system18 )
+MACHINE_CONFIG_DERIVED(segas1x_bootleg_state::astormbl, system18)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(astormbl_map)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( astormb2 )
+MACHINE_CONFIG_START(segas1x_bootleg_state::astormb2)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz/2) /* 12MHz */
@@ -2491,7 +2491,7 @@ static MACHINE_CONFIG_START( astormb2 )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( mwalkbl, astormb2 )
+MACHINE_CONFIG_DERIVED(segas1x_bootleg_state::mwalkbl, astormb2)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2499,7 +2499,7 @@ static MACHINE_CONFIG_DERIVED( mwalkbl, astormb2 )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( shdancbl, system18 )
+MACHINE_CONFIG_DERIVED(segas1x_bootleg_state::shdancbl, system18)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2517,7 +2517,7 @@ static MACHINE_CONFIG_DERIVED( shdancbl, system18 )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.80)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( shdancbla, system18 )
+MACHINE_CONFIG_DERIVED(segas1x_bootleg_state::shdancbla, system18)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2548,7 +2548,7 @@ MACHINE_RESET_MEMBER(segas1x_bootleg_state,ddcrewbl)
 }
 
 
-static MACHINE_CONFIG_START( ddcrewbl )
+MACHINE_CONFIG_START(segas1x_bootleg_state::ddcrewbl)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 10000000)

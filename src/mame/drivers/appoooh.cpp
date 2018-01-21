@@ -416,7 +416,7 @@ INTERRUPT_GEN_MEMBER(appoooh_state::vblank_irq)
 		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
-static MACHINE_CONFIG_START( appoooh_common )
+MACHINE_CONFIG_START(appoooh_state::appoooh_common)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80,18432000/6) /* ??? the main xtal is 18.432 MHz */
@@ -444,7 +444,7 @@ static MACHINE_CONFIG_START( appoooh_common )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( appoooh, appoooh_common )
+MACHINE_CONFIG_DERIVED(appoooh_state::appoooh, appoooh_common)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -463,7 +463,7 @@ static MACHINE_CONFIG_DERIVED( appoooh, appoooh_common )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( robowres, appoooh_common )
+MACHINE_CONFIG_DERIVED(appoooh_state::robowres, appoooh_common)
 
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map)
@@ -484,7 +484,7 @@ static MACHINE_CONFIG_DERIVED( robowres, appoooh_common )
 	MCFG_VIDEO_START_OVERRIDE(appoooh_state,appoooh)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( robowrese, robowres )
+MACHINE_CONFIG_DERIVED(appoooh_state::robowrese, robowres)
 
 	MCFG_CPU_REPLACE("maincpu", SEGA_315_5179,18432000/6) /* ??? the main xtal is 18.432 MHz */
 	MCFG_CPU_PROGRAM_MAP(main_map)

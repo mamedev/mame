@@ -57,7 +57,7 @@ ADDRESS_MAP_END
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( i82371sb_isa_device::device_add_mconfig )
+MACHINE_CONFIG_START(i82371sb_isa_device::device_add_mconfig)
 	MCFG_DEVICE_ADD("pit8254", PIT8254, 0)
 	MCFG_PIT8253_CLK0(4772720/4) /* heartbeat IRQ */
 	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(i82371sb_isa_device, at_pit8254_out0_changed))
@@ -161,7 +161,12 @@ MACHINE_CONFIG_MEMBER( i82371sb_isa_device::device_add_mconfig )
 //  MCFG_ISA16_SLOT_ADD("isabus","board2", pc_isa_onboard, "comat", true)
 //  MCFG_ISA16_SLOT_ADD("isabus","board3", pc_isa_onboard, "lpt", true)
 	// VGA-HACK
-	MCFG_FRAGMENT_ADD( pcvideo_vga );
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_RAW_PARAMS(XTAL_25_1748MHz,900,0,640,526,0,480)
+	MCFG_SCREEN_UPDATE_DEVICE("vga", vga_device, screen_update)
+
+	MCFG_PALETTE_ADD("palette", 0x100)
+	MCFG_DEVICE_ADD("vga", VGA, 0)
 	// end-VGA-HACK
 MACHINE_CONFIG_END
 

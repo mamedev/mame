@@ -54,6 +54,7 @@ public:
 	virtual void machine_start() override;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(interrupt);
+	void horse(machine_config &config);
 };
 
 void horse_state::machine_start()
@@ -191,7 +192,7 @@ INTERRUPT_GEN_MEMBER(horse_state::interrupt)
 	device.execute().set_input_line(I8085_RST75_LINE, CLEAR_LINE);
 }
 
-static MACHINE_CONFIG_START( horse )
+MACHINE_CONFIG_START(horse_state::horse)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8085A, XTAL_12MHz / 2)

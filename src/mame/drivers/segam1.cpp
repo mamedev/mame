@@ -74,6 +74,8 @@ public:
 	required_device<segas24_tile_device> m_tile;
 	required_device<segas24_mixer_device> m_mixer;
 	required_device<ym3438_device> m_ymsnd;
+	void unkm1(machine_config &config);
+	void segam1(machine_config &config);
 };
 
 void segam1_state::machine_start()
@@ -334,7 +336,7 @@ INPUT_PORTS_END
 
 
 
-static MACHINE_CONFIG_START( segam1 )
+MACHINE_CONFIG_START(segam1_state::segam1)
 
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_20MHz/2)
 	MCFG_CPU_PROGRAM_MAP(segam1_map)
@@ -386,7 +388,7 @@ static MACHINE_CONFIG_START( segam1 )
 	//MCFG_YM2612_IRQ_HANDLER(WRITELINE(segam1_state, ym3438_irq_handler))
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( unkm1, segam1 )
+MACHINE_CONFIG_DERIVED(segam1_state::unkm1, segam1)
 	MCFG_CPU_MODIFY("audiocpu")
 	MCFG_CPU_PROGRAM_MAP(unkm1_sound_map)
 

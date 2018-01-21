@@ -729,7 +729,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( grchamp )
+MACHINE_CONFIG_START(grchamp_state::grchamp)
 
 	/* basic machine hardware */
 	/* CPU BOARD */

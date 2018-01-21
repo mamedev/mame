@@ -48,4 +48,6 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
+	void m52(machine_config &config);
+	void alpha1v(machine_config &config);
 };

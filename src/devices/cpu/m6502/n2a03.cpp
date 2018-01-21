@@ -86,7 +86,7 @@ READ8_MEMBER(n2a03_device::apu_read_mem)
 	return mintf->program->read_byte(offset);
 }
 
-MACHINE_CONFIG_MEMBER( n2a03_device::device_add_mconfig )
+MACHINE_CONFIG_START(n2a03_device::device_add_mconfig)
 	MCFG_SOUND_ADD("nesapu", NES_APU, DERIVED_CLOCK(1,1) )
 	MCFG_NES_APU_IRQ_HANDLER(WRITELINE(n2a03_device, apu_irq))
 	MCFG_NES_APU_MEM_READ_CALLBACK(READ8(n2a03_device, apu_read_mem))

@@ -259,6 +259,7 @@ public:
 	// screen updates
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_PALETTE_INIT(bingoman);
+	void bingoman(machine_config &config);
 protected:
 	// driver_device overrides
 	virtual void machine_start() override;
@@ -371,7 +372,7 @@ PALETTE_INIT_MEMBER(bingoman_state, bingoman)
 {
 }
 
-static MACHINE_CONFIG_START( bingoman )
+MACHINE_CONFIG_START(bingoman_state::bingoman)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", H83002, XTAL_20MHz) /* TODO: correct CPU type */

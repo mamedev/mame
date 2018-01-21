@@ -71,6 +71,7 @@ public:
 	DECLARE_WRITE16_MEMBER(write_o);
 	DECLARE_WRITE16_MEMBER(write_r);
 	DECLARE_READ8_MEMBER(read_k);
+	void cmulti8(machine_config &config);
 };
 
 // handlers
@@ -184,7 +185,7 @@ static INPUT_PORTS_START( cmulti8 )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( cmulti8 )
+MACHINE_CONFIG_START(cmulti8_state::cmulti8)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", TMS1070, 250000) // approximation - RC osc. R=56K, C=68pf
@@ -225,6 +226,7 @@ public:
 	DECLARE_WRITE16_MEMBER(write_o);
 	DECLARE_WRITE16_MEMBER(write_r);
 	DECLARE_READ8_MEMBER(read_k);
+	void tisr16(machine_config &config);
 };
 
 // handlers
@@ -400,7 +402,7 @@ static INPUT_PORTS_START( tisr16ii )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_9) PORT_CODE(KEYCODE_9_PAD) PORT_NAME("9")
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( tisr16 )
+MACHINE_CONFIG_START(tisr16_state::tisr16)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", TMS1000, 300000) // approximation - RC osc. R=43K, C=68pf (note: tisr16ii MCU RC osc. is different: R=30K, C=100pf, same freq)
@@ -453,6 +455,8 @@ public:
 	DECLARE_WRITE16_MEMBER(write_o);
 	DECLARE_WRITE16_MEMBER(write_r);
 	DECLARE_READ8_MEMBER(read_k);
+	void ti1270(machine_config &config);
+	void ti1250(machine_config &config);
 };
 
 // handlers
@@ -538,7 +542,7 @@ static INPUT_PORTS_START( ti1270 )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_MINUS) PORT_NAME("+/-")
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( ti1250 )
+MACHINE_CONFIG_START(ti1250_state::ti1250)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", TMS0950, 200000) // approximation - RC osc. R=68K, C=68pf
@@ -552,7 +556,7 @@ static MACHINE_CONFIG_START( ti1250 )
 	/* no sound! */
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( ti1270, ti1250 )
+MACHINE_CONFIG_DERIVED(ti1250_state::ti1270, ti1250)
 
 	/* basic machine hardware */
 	MCFG_CPU_REPLACE("maincpu", TMS0970, 250000) // approximation
@@ -586,6 +590,7 @@ public:
 	DECLARE_WRITE16_MEMBER(write_o);
 	DECLARE_WRITE16_MEMBER(write_r);
 	DECLARE_READ8_MEMBER(read_k);
+	void ti25503(machine_config &config);
 };
 
 // handlers
@@ -664,7 +669,7 @@ static INPUT_PORTS_START( ti25503 )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_X) PORT_NAME("1/x")
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( ti25503 )
+MACHINE_CONFIG_START(ti25503_state::ti25503)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", TMS1000, 250000) // approximation
@@ -703,6 +708,7 @@ public:
 	DECLARE_WRITE16_MEMBER(write_o);
 	DECLARE_WRITE16_MEMBER(write_r);
 	DECLARE_READ8_MEMBER(read_k);
+	void ti1000(machine_config &config);
 };
 
 // handlers
@@ -764,7 +770,7 @@ static INPUT_PORTS_START( ti1000 )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_ENTER) PORT_CODE(KEYCODE_ENTER_PAD) PORT_NAME("=")
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( ti1000 )
+MACHINE_CONFIG_START(ti1000_state::ti1000)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", TMS1990, 250000) // approximation
@@ -800,6 +806,7 @@ public:
 	virtual DECLARE_WRITE16_MEMBER(write_o);
 	virtual DECLARE_WRITE16_MEMBER(write_r);
 	virtual DECLARE_READ8_MEMBER(read_k);
+	void wizatron(machine_config &config);
 };
 
 // handlers
@@ -864,7 +871,7 @@ static INPUT_PORTS_START( wizatron )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_SLASH_PAD) PORT_NAME(UTF8_DIVIDE)
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( wizatron )
+MACHINE_CONFIG_START(wizatron_state::wizatron)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", TMS0970, 250000) // approximation
@@ -902,6 +909,7 @@ public:
 
 	virtual DECLARE_WRITE16_MEMBER(write_o) override;
 	virtual DECLARE_READ8_MEMBER(read_k) override;
+	void lilprof(machine_config &config);
 };
 
 // handlers
@@ -938,7 +946,7 @@ static INPUT_PORTS_START( lilprof )
 	PORT_CONFSETTING(    0x08, "4" )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( lilprof )
+MACHINE_CONFIG_START(lilprof_state::lilprof)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", TMS0970, 250000) // approximation
@@ -977,6 +985,7 @@ public:
 	DECLARE_WRITE16_MEMBER(write_o);
 	DECLARE_WRITE16_MEMBER(write_r);
 	DECLARE_READ8_MEMBER(read_k);
+	void lilprof78(machine_config &config);
 };
 
 // handlers
@@ -1048,7 +1057,7 @@ static INPUT_PORTS_START( lilprof78 )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_PLUS_PAD) PORT_NAME("+")
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( lilprof78 )
+MACHINE_CONFIG_START(lilprof78_state::lilprof78)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", TMS1990, 250000) // approximation
@@ -1085,6 +1094,7 @@ public:
 	virtual DECLARE_WRITE16_MEMBER(write_o);
 	virtual DECLARE_WRITE16_MEMBER(write_r);
 	virtual DECLARE_READ8_MEMBER(read_k);
+	void dataman(machine_config &config);
 };
 
 // handlers
@@ -1160,7 +1170,7 @@ static INPUT_PORTS_START( dataman )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_E) PORT_NAME("Electro Flash")
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( dataman )
+MACHINE_CONFIG_START(dataman_state::dataman)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", TMS1980, 300000) // patent says 300kHz
@@ -1197,6 +1207,7 @@ public:
 	{ }
 
 	virtual DECLARE_WRITE16_MEMBER(write_r) override;
+	void mathmarv(machine_config &config);
 };
 
 // handlers
@@ -1227,7 +1238,7 @@ static INPUT_PORTS_START( mathmarv )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_F) PORT_NAME("Flash")
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( mathmarv )
+MACHINE_CONFIG_START(mathmarv_state::mathmarv)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", TMS1980, 300000) // assume same as dataman
@@ -1280,6 +1291,7 @@ public:
 	DECLARE_WRITE16_MEMBER(write_o);
 	DECLARE_WRITE16_MEMBER(write_r);
 	DECLARE_READ8_MEMBER(read_k);
+	void ti30(machine_config &config);
 };
 
 // handlers
@@ -1487,7 +1499,7 @@ static INPUT_PORTS_START( tibusan )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_PGDN) PORT_NAME("Off") PORT_CHANGED_MEMBER(DEVICE_SELF, hh_tms1k_state, power_button, (void *)false)
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( ti30 )
+MACHINE_CONFIG_START(ti30_state::ti30)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", TMS0980, 400000) // guessed

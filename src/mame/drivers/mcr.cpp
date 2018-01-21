@@ -696,8 +696,8 @@ static ADDRESS_MAP_START( cpu_90009_map, AS_PROGRAM, 8, mcr_state )
 	AM_RANGE(0x0000, 0x6fff) AM_ROM
 	AM_RANGE(0x7000, 0x77ff) AM_MIRROR(0x0800) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0xf000, 0xf1ff) AM_MIRROR(0x0200) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0xf400, 0xf41f) AM_MIRROR(0x03e0) AM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
-	AM_RANGE(0xf800, 0xf81f) AM_MIRROR(0x03e0) AM_DEVWRITE("palette", palette_device, write_ext) AM_SHARE("palette_ext")
+	AM_RANGE(0xf400, 0xf41f) AM_MIRROR(0x03e0) AM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
+	AM_RANGE(0xf800, 0xf81f) AM_MIRROR(0x03e0) AM_DEVWRITE("palette", palette_device, write8_ext) AM_SHARE("palette_ext")
 	AM_RANGE(0xfc00, 0xffff) AM_RAM_WRITE(mcr_90009_videoram_w) AM_SHARE("videoram")
 ADDRESS_MAP_END
 
@@ -1741,7 +1741,7 @@ static const char *const twotiger_sample_names[] =
  *************************************/
 
 /* 90009 CPU board plus 90908/90913/91483 sound board */
-static MACHINE_CONFIG_START( mcr_90009 )
+MACHINE_CONFIG_START(mcr_state::mcr_90009)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, MAIN_OSC_MCR_I/8)
@@ -1782,7 +1782,7 @@ MACHINE_CONFIG_END
 
 
 /* as above, but in a casino cabinet */
-static MACHINE_CONFIG_DERIVED( mcr_90009_dp, mcr_90009 )
+MACHINE_CONFIG_DERIVED(mcr_dpoker_state::mcr_90009_dp, mcr_90009)
 
 	/* basic machine hardware */
 	MCFG_TIMER_DRIVER_ADD("coinin", mcr_dpoker_state, coin_in_callback)
@@ -1791,7 +1791,7 @@ MACHINE_CONFIG_END
 
 
 /* 90010 CPU board plus 90908/90913/91483 sound board */
-static MACHINE_CONFIG_DERIVED( mcr_90010, mcr_90009 )
+MACHINE_CONFIG_DERIVED(mcr_state::mcr_90010, mcr_90009)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1806,7 +1806,7 @@ MACHINE_CONFIG_END
 
 
 /* as above, plus 8-track tape */
-static MACHINE_CONFIG_DERIVED( mcr_90010_tt, mcr_90010 )
+MACHINE_CONFIG_DERIVED(mcr_state::mcr_90010_tt, mcr_90010)
 
 	/* sound hardware */
 	MCFG_SOUND_ADD("samples", SAMPLES, 0)
@@ -1818,7 +1818,7 @@ MACHINE_CONFIG_END
 
 
 /* 91475 CPU board plus 90908/90913/91483 sound board plus cassette interface */
-static MACHINE_CONFIG_DERIVED( mcr_91475, mcr_90010 )
+MACHINE_CONFIG_DERIVED(mcr_state::mcr_91475, mcr_90010)
 
 	/* video hardware */
 	MCFG_PALETTE_MODIFY("palette")
@@ -1835,7 +1835,7 @@ MACHINE_CONFIG_END
 
 
 /* 91490 CPU board plus 90908/90913/91483 sound board */
-static MACHINE_CONFIG_DERIVED( mcr_91490, mcr_90010 )
+MACHINE_CONFIG_DERIVED(mcr_state::mcr_91490, mcr_90010)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1849,7 +1849,7 @@ MACHINE_CONFIG_END
 
 
 /* 91490 CPU board plus 90908/90913/91483 sound board plus Squawk n' Talk sound board */
-static MACHINE_CONFIG_DERIVED( mcr_91490_snt, mcr_91490 )
+MACHINE_CONFIG_DERIVED(mcr_state::mcr_91490_snt, mcr_91490)
 
 	/* basic machine hardware */
 	MCFG_SOUND_ADD("snt", MIDWAY_SQUAWK_N_TALK, 0)
@@ -1859,7 +1859,7 @@ MACHINE_CONFIG_END
 
 
 /* 91490 CPU board plus 90908/90913/91483 sound board plus Squawk n' Talk sound board plus IPU */
-static MACHINE_CONFIG_DERIVED( mcr_91490_ipu, mcr_91490_snt )
+MACHINE_CONFIG_DERIVED(mcr_nflfoot_state::mcr_91490_ipu, mcr_91490_snt)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("ipu", Z80, 7372800/2)
@@ -1886,7 +1886,7 @@ MACHINE_CONFIG_END
 
 
 /* 91490 CPU board plus 90908/90913/91483 sound board plus Turbo Cheap Squeak sound board */
-static MACHINE_CONFIG_DERIVED( mcr_91490_tcs, mcr_91490 )
+MACHINE_CONFIG_DERIVED(mcr_state::mcr_91490_tcs, mcr_91490)
 
 	/* basic machine hardware */
 	MCFG_SOUND_ADD("tcs", MIDWAY_TURBO_CHEAP_SQUEAK, 0)

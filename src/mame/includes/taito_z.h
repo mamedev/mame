@@ -123,6 +123,17 @@ public:
 	void spacegun_draw_sprites_16x8(screen_device &screen, bitmap_ind16 &bitmap,const rectangle &cliprect,int y_offs);
 	void parse_cpu_control();
 
+	void sci(machine_config &config);
+	void spacegun(machine_config &config);
+	void chasehq(machine_config &config);
+	void dblaxle(machine_config &config);
+	void bshark(machine_config &config);
+	void aquajack(machine_config &config);
+	void nightstr(machine_config &config);
+	void contcirc(machine_config &config);
+	void racingb(machine_config &config);
+	void bsharkjjs(machine_config &config);
+	void enforce(machine_config &config);
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };

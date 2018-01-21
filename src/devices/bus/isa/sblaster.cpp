@@ -1140,7 +1140,7 @@ DEFINE_DEVICE_TYPE(ISA16_SOUND_BLASTER_16, isa16_sblaster16_device, "isa_sblaste
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( isa8_sblaster1_0_device::device_add_mconfig )
+MACHINE_CONFIG_START(isa8_sblaster1_0_device::device_add_mconfig)
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 	MCFG_SOUND_ADD("ym3812", YM3812, ym3812_StdClock)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 3.00)
@@ -1165,7 +1165,7 @@ MACHINE_CONFIG_MEMBER( isa8_sblaster1_0_device::device_add_mconfig )
 	MCFG_MIDI_PORT_ADD("mdout", midiout_slot, "midiout")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_MEMBER( isa8_sblaster1_5_device::device_add_mconfig )
+MACHINE_CONFIG_START(isa8_sblaster1_5_device::device_add_mconfig)
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 	MCFG_SOUND_ADD("ym3812", YM3812, ym3812_StdClock)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.00)
@@ -1185,7 +1185,7 @@ MACHINE_CONFIG_MEMBER( isa8_sblaster1_5_device::device_add_mconfig )
 	MCFG_MIDI_PORT_ADD("mdout", midiout_slot, "midiout")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_MEMBER( isa16_sblaster16_device::device_add_mconfig )
+MACHINE_CONFIG_START(isa16_sblaster16_device::device_add_mconfig)
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 	MCFG_SOUND_ADD("ymf262", YMF262, ymf262_StdClock)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.00)

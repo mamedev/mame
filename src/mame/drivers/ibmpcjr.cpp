@@ -106,6 +106,8 @@ public:
 
 	void machine_reset() override;
 	DECLARE_DRIVER_INIT(pcjr);
+	void ibmpcjx(machine_config &config);
+	void ibmpcjr(machine_config &config);
 };
 
 static INPUT_PORTS_START( ibmpcjr )
@@ -557,7 +559,7 @@ static ADDRESS_MAP_START(ibmpcjr_io, AS_IO, 8, pcjr_state)
 	AM_RANGE(0x0200, 0x0207) AM_DEVREADWRITE("pc_joy", pc_joy_device, joy_port_r, joy_port_w)
 	AM_RANGE(0x02f8, 0x02ff) AM_DEVREADWRITE("ins8250", ins8250_device, ins8250_r, ins8250_w)
 	AM_RANGE(0x0378, 0x037b) AM_DEVREADWRITE("lpt_0", pc_lpt_device, read, write)
-	AM_RANGE(0x03d0, 0x03df) AM_DEVREADWRITE("pcvideo_pcjr", pcvideo_pcjr_device, read, write)
+	AM_RANGE(0x03d0, 0x03df) AM_DEVREAD("pcvideo_pcjr", pcvideo_pcjr_device, read) AM_DEVWRITE("pcvideo_pcjr", pcvideo_pcjr_device, write)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(ibmpcjx_map, AS_PROGRAM, 8, pcjr_state )
@@ -575,7 +577,7 @@ static ADDRESS_MAP_START(ibmpcjx_io, AS_IO, 8, pcjr_state)
 	AM_IMPORT_FROM( ibmpcjr_io )
 ADDRESS_MAP_END
 
-static MACHINE_CONFIG_START( ibmpcjr )
+MACHINE_CONFIG_START(pcjr_state::ibmpcjr)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8088, 4900000)
 	MCFG_CPU_PROGRAM_MAP(ibmpcjr_map)
@@ -670,7 +672,7 @@ static GFXDECODE_START( ibmpcjx )
 	GFXDECODE_ENTRY( "kanji", 0x0000, kanji_layout, 3, 1 )
 GFXDECODE_END
 
-static MACHINE_CONFIG_DERIVED( ibmpcjx, ibmpcjr )
+MACHINE_CONFIG_DERIVED(pcjr_state::ibmpcjx, ibmpcjr)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(ibmpcjx_map)
 	MCFG_CPU_IO_MAP(ibmpcjx_io)

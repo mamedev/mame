@@ -520,7 +520,7 @@ to7_io_line_device::to7_io_line_device(const machine_config &mconfig, const char
 {
 }
 
-MACHINE_CONFIG_MEMBER( to7_io_line_device::device_add_mconfig )
+MACHINE_CONFIG_START(to7_io_line_device::device_add_mconfig)
 	/// THIS PIO is part of CC 90-232 expansion
 	MCFG_DEVICE_ADD(THOM_PIA_IO, PIA6821, 0)
 	MCFG_PIA_READPA_HANDLER(READ8(to7_io_line_device, porta_in))

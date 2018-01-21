@@ -210,6 +210,9 @@ public:
 	INTERRUPT_GEN_MEMBER(snd_irq);
 	INTERRUPT_GEN_MEMBER(vblank_irq);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
+	void atomboy(machine_config &config);
+	void m63(machine_config &config);
+	void fghtbskt(machine_config &config);
 };
 
 
@@ -741,7 +744,7 @@ INTERRUPT_GEN_MEMBER(m63_state::vblank_irq)
 		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
-static MACHINE_CONFIG_START( m63 )
+MACHINE_CONFIG_START(m63_state::m63)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80,XTAL_12MHz/4)     /* 3 MHz */
@@ -793,12 +796,12 @@ static MACHINE_CONFIG_START( m63 )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( atomboy, m63 )
+MACHINE_CONFIG_DERIVED(m63_state::atomboy, m63)
 	MCFG_CPU_MODIFY("soundcpu")
 	MCFG_CPU_PERIODIC_INT_DRIVER(m63_state, snd_irq,  60/2)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( fghtbskt )
+MACHINE_CONFIG_START(m63_state::fghtbskt)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_12MHz/4)     /* 3 MHz */

@@ -62,6 +62,7 @@ public:
 		m_maincpu->set_input_line(M68K_IRQ_4, state);
 	}
 
+	void micro20(machine_config &config);
 private:
 	u8 m_tin;
 	u8 m_h4;
@@ -151,7 +152,7 @@ static ADDRESS_MAP_START(micro20_map, AS_PROGRAM, 32, micro20_state )
 	AM_RANGE(0xffff80c0, 0xffff80df) AM_DEVREADWRITE8(PIT_TAG, pit68230_device, read, write, 0xffffffff)
 ADDRESS_MAP_END
 
-static MACHINE_CONFIG_START( micro20 )
+MACHINE_CONFIG_START(micro20_state::micro20)
 	/* basic machine hardware */
 	MCFG_CPU_ADD(MAINCPU_TAG, M68020, XTAL_16_67MHz)
 	MCFG_CPU_PROGRAM_MAP(micro20_map)

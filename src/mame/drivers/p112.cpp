@@ -49,6 +49,7 @@ public:
 	virtual void video_start() override;
 	uint32_t screen_update_p112(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
+	void p112(machine_config &config);
 };
 
 
@@ -81,7 +82,7 @@ uint32_t p112_state::screen_update_p112(screen_device &screen, bitmap_ind16 &bit
 	return 0;
 }
 
-static MACHINE_CONFIG_START( p112 )
+MACHINE_CONFIG_START(p112_state::p112)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z180, XTAL_16MHz)
 	MCFG_CPU_PROGRAM_MAP(p112_mem)

@@ -85,6 +85,9 @@ public:
 	// video updates
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
+	void yboard_deluxe(machine_config &config);
+	void yboard_link(machine_config &config);
+	void yboard(machine_config &config);
 protected:
 	// internal types
 	typedef delegate<void (uint16_t)> output_delegate;

@@ -578,6 +578,7 @@ TIMER_CALLBACK_MEMBER( dcs_audio_device::dcs_reset )
 
 	/* reset the HLE transfer states */
 	m_transfer.dcs_state = m_transfer.state = 0;
+
 }
 
 
@@ -696,7 +697,7 @@ dcs_audio_device::dcs_audio_device(const machine_config &mconfig, device_type ty
 	m_last_input_empty(0),
 	m_progflags(0),
 	m_timer_enable(0),
-	m_timer_ignore(0),
+	m_timer_ignore(false),
 	m_timer_start_cycles(0),
 	m_timer_start_count(0),
 	m_timer_scale(0),
@@ -865,7 +866,7 @@ void dcs2_audio_device::device_start()
 	install_speedup();
 
 	/* allocate a watchdog timer for HLE transfers */
-	m_transfer.hle_enabled = (ENABLE_HLE_TRANSFERS && m_dram_in_mb != 0);
+	m_transfer.hle_enabled = (ENABLE_HLE_TRANSFERS && m_dram_in_mb != 0 && m_rev < REV_DSIO);
 	if (m_transfer.hle_enabled)
 		m_transfer.watchdog = subdevice<timer_device>("dcs_hle_timer");
 
@@ -886,6 +887,8 @@ void dcs_audio_device::install_speedup(void)
 		else {
 			// ADSP 2181 (DSIO and DENVER) use program memory
 			m_cpu->space(AS_PROGRAM).install_readwrite_handler(m_polling_offset, m_polling_offset, read32_delegate(FUNC(dcs_audio_device::dcs_polling32_r), this), write32_delegate(FUNC(dcs_audio_device::dcs_polling32_w), this));
+			// DSIO and DENVER poll in two spots.  This offset covers all three machines (mwskins, sf2049, roadburn).
+			m_cpu->space(AS_PROGRAM).install_readwrite_handler(m_polling_offset + 9, m_polling_offset + 9, read32_delegate(FUNC(dcs_audio_device::dcs_polling32_r), this), write32_delegate(FUNC(dcs_audio_device::dcs_polling32_w), this));
 		}
 	}
 }
@@ -1345,13 +1348,13 @@ WRITE32_MEMBER( dcs_audio_device::dsio_idma_data_w )
 	m_ram_map->set_bank(0);
 	if (ACCESSING_BITS_0_15)
 	{
-		if (LOG_DCS_TRANSFERS && !(downcast<adsp2181_device *>(m_cpu)->idma_addr_r() & 0x0ffc))
+		if (LOG_DCS_TRANSFERS && !(downcast<adsp2181_device *>(m_cpu)->idma_addr_r() & 0x00ff))
 			logerror("%s IDMA_data_w(%04X) = %04X\n", machine().describe_context(), downcast<adsp2181_device *>(m_cpu)->idma_addr_r(), data & 0xffff);
 		downcast<adsp2181_device *>(m_cpu)->idma_data_w(data & 0xffff);
 	}
 	if (ACCESSING_BITS_16_31)
 	{
-		if (LOG_DCS_TRANSFERS && !(downcast<adsp2181_device *>(m_cpu)->idma_addr_r() & 0x0ffc))
+		if (LOG_DCS_TRANSFERS && !(downcast<adsp2181_device *>(m_cpu)->idma_addr_r() & 0x00ff))
 			logerror("%s IDMA_data_w(%04X) = %04X\n", machine().describe_context(), downcast<adsp2181_device *>(m_cpu)->idma_addr_r(), data >> 16);
 		downcast<adsp2181_device *>(m_cpu)->idma_data_w(data >> 16);
 	}
@@ -1532,6 +1535,8 @@ WRITE16_MEMBER( dcs_audio_device::input_latch_ack_w )
 		m_input_empty_cb(m_last_input_empty = 1);
 	SET_INPUT_EMPTY();
 	m_cpu->set_input_line(ADSP2105_IRQ2, CLEAR_LINE);
+	if (LOG_DCS_IO)
+		logerror("%s input_latch_ack_w\n", machine().describe_context());
 }
 
 
@@ -1607,6 +1612,10 @@ void dcs_audio_device::ack_w()
 
 uint16_t dcs_audio_device::data_r()
 {
+	// If the cpu is reading empty data it is probably polling so eat some cyles
+	if IS_OUTPUT_EMPTY()
+		machine().device<cpu_device>("maincpu")->eat_cycles(4444);
+
 	/* data is actually only 8 bit (read from d8-d15, which is d0-d7 from the data access instructions POV) on early dcs, but goes 16 on later (seattle) */
 	if (m_last_output_full && !m_output_full_cb.isnull())
 		m_output_full_cb(m_last_output_full = 0);
@@ -1654,13 +1663,8 @@ int dcs_audio_device::data2_r()
 {
 	if (LOG_DCS_IO)
 		logerror("%08X dcs:data2_r = %04X\n", machine().device<cpu_device>("maincpu")->pc(), m_output_control);
-	if (m_rev >= REV_DSIO) {
-		// Not sure about this but allows sf2049 and roadburn to pass audio initialization tests at boot
-		return m_output_control << 8;
-	}
-	else {
-		return m_output_control;
-	}
+
+	return m_output_control;
 }
 
 
@@ -1686,16 +1690,19 @@ void dcs_audio_device::update_timer_count()
 	elapsed_clocks = elapsed_cycles / m_timer_scale;
 
 	/* if we haven't counted past the initial count yet, just do that */
-	if (elapsed_clocks < m_timer_start_count + 1)
-		m_control_regs[TIMER_COUNT_REG] = m_timer_start_count - elapsed_clocks;
+	if (elapsed_clocks < m_timer_start_count + 1) {
+		m_timer_start_count -= elapsed_clocks;
+		m_control_regs[TIMER_COUNT_REG] = m_timer_start_count;
 
 	/* otherwise, count how many periods */
+	}
 	else
 	{
 		elapsed_clocks -= m_timer_start_count + 1;
 		periods_since_start = elapsed_clocks / (m_timer_period + 1);
 		elapsed_clocks -= periods_since_start * (m_timer_period + 1);
-		m_control_regs[TIMER_COUNT_REG] = m_timer_period - elapsed_clocks;
+		m_timer_start_count = m_timer_period - elapsed_clocks;
+		m_control_regs[TIMER_COUNT_REG] = m_timer_start_count;
 	}
 }
 
@@ -1762,16 +1769,19 @@ void dcs_audio_device::reset_timer()
 
 WRITE_LINE_MEMBER(dcs_audio_device::timer_enable_callback)
 {
-	m_timer_enable = state;
-	m_timer_ignore = 0;
 	if (state)
 	{
-		//osd_printf_debug("Timer enabled @ %d cycles/int, or %f Hz\n", m_timer_scale * (m_timer_period + 1), 1.0 / m_cpu->cycles_to_attotime(m_timer_scale * (m_timer_period + 1)));
+		//logerror("Timer enabled @ %d cycles/int, or %f Hz\n", m_timer_scale * (m_timer_period + 1), 1.0 / m_cpu->cycles_to_attotime(m_timer_scale * (m_timer_period + 1)).as_double());
+		m_timer_enable = state;
+		m_timer_ignore = false;
 		reset_timer();
 	}
 	else
 	{
-		//osd_printf_debug("Timer disabled\n");
+		//logerror("Timer disabled\n");
+		// Update the timer so the start count is correct the next time the timer is enabled
+		update_timer_count();
+		m_timer_enable = state;
 		m_internal_timer->reset();
 	}
 }
@@ -1809,7 +1819,7 @@ READ16_MEMBER( dcs_audio_device::adsp_control_r )
 	{
 		case PROG_FLAG_DATA_REG:
 			// Probably some sort of frame start for DAC with external clock
-			// Denver Atlantis mwskinswants 0x2 to toggle
+			// Denver Atlantis mwskins wants 0x2 to toggle
 			// Denver Durnago sf2049te wants 0x6 to toogle
 			result = (m_control_regs[PROG_FLAG_CONTROL_REG] & m_control_regs[PROG_FLAG_DATA_REG]) | (m_progflags & ~m_control_regs[PROG_FLAG_CONTROL_REG]);
 			m_progflags ^= 0x6;
@@ -2441,7 +2451,7 @@ int dcs_audio_device::preprocess_write(uint16_t data)
 
 /* Basic DCS system with ADSP-2105 and 2k of SRAM (T-unit, V-unit, Killer Instinct) */
 
-MACHINE_CONFIG_MEMBER( dcs_audio_device::add_mconfig_dcs )
+MACHINE_CONFIG_START(dcs_audio_device::add_mconfig_dcs )
 	MCFG_CPU_ADD("dcs", ADSP2105, XTAL_10MHz)
 	MCFG_ADSP21XX_SPORT_TX_CB(WRITE32(dcs_audio_device, sound_tx_callback))      /* callback for serial transmit */
 	MCFG_ADSP21XX_TIMER_FIRED_CB(WRITELINE(dcs_audio_device, timer_enable_callback))   /* callback for timer fired */
@@ -2468,7 +2478,7 @@ dcs_audio_2k_device::dcs_audio_2k_device(const machine_config &mconfig, const ch
 {
 }
 
-MACHINE_CONFIG_MEMBER( dcs_audio_2k_device::device_add_mconfig )
+MACHINE_CONFIG_START(dcs_audio_2k_device::device_add_mconfig)
 
 	dcs_audio_device::add_mconfig_dcs(config);
 MACHINE_CONFIG_END
@@ -2485,7 +2495,7 @@ dcs_audio_2k_uart_device::dcs_audio_2k_uart_device(const machine_config &mconfig
 }
 
 /* Basic DCS system with ADSP-2105 and 2k of SRAM, using a UART for communications (X-unit) */
-MACHINE_CONFIG_MEMBER( dcs_audio_2k_uart_device::device_add_mconfig )
+MACHINE_CONFIG_START(dcs_audio_2k_uart_device::device_add_mconfig)
 
 	dcs_audio_device::add_mconfig_dcs(config);
 
@@ -2505,7 +2515,7 @@ dcs_audio_8k_device::dcs_audio_8k_device(const machine_config &mconfig, const ch
 }
 
 /* Basic DCS system with ADSP-2105 and 8k of SRAM (Wolf-unit) */
-MACHINE_CONFIG_MEMBER( dcs_audio_8k_device::device_add_mconfig )
+MACHINE_CONFIG_START(dcs_audio_8k_device::device_add_mconfig)
 
 	dcs_audio_device::add_mconfig_dcs(config);
 
@@ -2525,7 +2535,7 @@ dcs_audio_wpc_device::dcs_audio_wpc_device(const machine_config &mconfig, const 
 {
 }
 
-MACHINE_CONFIG_MEMBER( dcs_audio_wpc_device::device_add_mconfig )
+MACHINE_CONFIG_START(dcs_audio_wpc_device::device_add_mconfig)
 
 	dcs_audio_device::add_mconfig_dcs(config);
 
@@ -2544,7 +2554,7 @@ dcs2_audio_device::dcs2_audio_device(const machine_config &mconfig, device_type 
 {
 }
 
-MACHINE_CONFIG_MEMBER( dcs2_audio_device::add_mconfig_dcs2 )
+MACHINE_CONFIG_START(dcs2_audio_device::add_mconfig_dcs2 )
 	MCFG_CPU_ADD("dcs2", ADSP2115, XTAL_16MHz)
 	MCFG_ADSP21XX_SPORT_TX_CB(WRITE32(dcs_audio_device, sound_tx_callback))      /* callback for serial transmit */
 	MCFG_ADSP21XX_TIMER_FIRED_CB(WRITELINE(dcs_audio_device, timer_enable_callback))   /* callback for timer fired */
@@ -2576,7 +2586,7 @@ dcs2_audio_2115_device::dcs2_audio_2115_device(const machine_config &mconfig, co
 {
 }
 
-MACHINE_CONFIG_MEMBER( dcs2_audio_2115_device::device_add_mconfig )
+MACHINE_CONFIG_START(dcs2_audio_2115_device::device_add_mconfig)
 
 	dcs2_audio_device::add_mconfig_dcs2(config);
 
@@ -2594,7 +2604,7 @@ dcs2_audio_2104_device::dcs2_audio_2104_device(const machine_config &mconfig, co
 {
 }
 
-MACHINE_CONFIG_MEMBER( dcs2_audio_2104_device::device_add_mconfig )
+MACHINE_CONFIG_START(dcs2_audio_2104_device::device_add_mconfig)
 
 	dcs2_audio_device::add_mconfig_dcs2(config);
 
@@ -2616,7 +2626,7 @@ dcs2_audio_dsio_device::dcs2_audio_dsio_device(const machine_config &mconfig, co
 {
 }
 
-MACHINE_CONFIG_MEMBER( dcs2_audio_dsio_device::device_add_mconfig )
+MACHINE_CONFIG_START(dcs2_audio_dsio_device::device_add_mconfig)
 	MCFG_CPU_ADD("dsio", ADSP2181, XTAL_32MHz)
 	MCFG_ADSP21XX_SPORT_TX_CB(WRITE32(dcs_audio_device, sound_tx_callback))      /* callback for serial transmit */
 	MCFG_ADSP21XX_TIMER_FIRED_CB(WRITELINE(dcs_audio_device, timer_enable_callback))   /* callback for timer fired */
@@ -2657,7 +2667,7 @@ dcs2_audio_denver_device::dcs2_audio_denver_device(const machine_config &mconfig
 {
 }
 
-MACHINE_CONFIG_MEMBER( dcs2_audio_denver_device::device_add_mconfig )
+MACHINE_CONFIG_START(dcs2_audio_denver_device::device_add_mconfig)
 	MCFG_CPU_ADD("denver", ADSP2181, XTAL_33_333MHz)
 	MCFG_ADSP21XX_SPORT_TX_CB(WRITE32(dcs_audio_device, sound_tx_callback))      /* callback for serial transmit */
 	MCFG_ADSP21XX_TIMER_FIRED_CB(WRITELINE(dcs_audio_device, timer_enable_callback))   /* callback for timer fired */

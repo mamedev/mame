@@ -153,6 +153,7 @@ public:
 
 	IRQ_CALLBACK_MEMBER(iack_handler);
 
+	void manohman(machine_config &config);
 private:
 	virtual void machine_start() override;
 
@@ -232,7 +233,7 @@ INPUT_PORTS_END
 *               Machine Config               *
 *********************************************/
 
-static MACHINE_CONFIG_START( manohman )
+MACHINE_CONFIG_START(manohman_state::manohman)
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_8MHz) // MC68000P8
 	MCFG_CPU_PROGRAM_MAP(mem_map)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(manohman_state, iack_handler)

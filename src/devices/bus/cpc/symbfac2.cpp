@@ -51,7 +51,7 @@ static INPUT_PORTS_START(cpc_symbiface2)
 INPUT_PORTS_END
 
 // device machine config
-MACHINE_CONFIG_MEMBER( cpc_symbiface2_device::device_add_mconfig )
+MACHINE_CONFIG_START(cpc_symbiface2_device::device_add_mconfig)
 	MCFG_ATA_INTERFACE_ADD("ide", ata_devices, "hdd", nullptr, false)
 	MCFG_DS12885_ADD("rtc")
 	MCFG_NVRAM_ADD_1FILL("nvram")

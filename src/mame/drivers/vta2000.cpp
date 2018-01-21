@@ -36,6 +36,7 @@ public:
 	uint32_t screen_update_vta2000(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_PALETTE_INIT(vta2000);
 
+	void vta2000(machine_config &config);
 private:
 	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
@@ -154,7 +155,7 @@ PALETTE_INIT_MEMBER(vta2000_state, vta2000)
 	palette.set_pen_color(2, 0x00, 0xff, 0x00); // highlight
 }
 
-static MACHINE_CONFIG_START( vta2000 )
+MACHINE_CONFIG_START(vta2000_state::vta2000)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",I8080, XTAL_4MHz / 4)
 	MCFG_CPU_PROGRAM_MAP(mem_map)

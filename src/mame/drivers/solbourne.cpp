@@ -18,6 +18,7 @@ public:
 //      , m_maincpu(*this, "maincpu")
 	{ }
 
+void solbourne(machine_config &config);
 private:
 //  required_device<cpu_device> m_maincpu;
 };
@@ -28,7 +29,7 @@ private:
 static INPUT_PORTS_START( solbourne )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( solbourne )
+MACHINE_CONFIG_START(solbourne_state::solbourne)
 MACHINE_CONFIG_END
 
 ROM_START( sols5e )

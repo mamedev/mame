@@ -106,6 +106,22 @@ public:
 	void m92_update_scroll_positions();
 	void m92_draw_tiles(screen_device &screen, bitmap_ind16 &bitmap,const rectangle &cliprect);
 
+	void m92(machine_config &config);
+	void inthunt(machine_config &config);
+	void lethalth(machine_config &config);
+	void ppan(machine_config &config);
+	void hook(machine_config &config);
+	void psoldier(machine_config &config);
+	void rtypeleo(machine_config &config);
+	void gunforc2(machine_config &config);
+	void nbbatman2bl(machine_config &config);
+	void bmaster(machine_config &config);
+	void nbbatman(machine_config &config);
+	void uccops(machine_config &config);
+	void dsoccr94j(machine_config &config);
+	void gunforce(machine_config &config);
+	void majtitl2(machine_config &config);
+	void mysticri(machine_config &config);
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };

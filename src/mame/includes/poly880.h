@@ -53,6 +53,7 @@ public:
 	/* display state */
 	uint8_t m_digit;
 	uint8_t m_segment;
+	void poly880(machine_config &config);
 };
 
 #endif

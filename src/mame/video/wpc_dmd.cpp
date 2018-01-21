@@ -35,7 +35,7 @@ wpc_dmd_device::~wpc_dmd_device()
 {
 }
 
-MACHINE_CONFIG_MEMBER( wpc_dmd_device::device_add_mconfig )
+MACHINE_CONFIG_START(wpc_dmd_device::device_add_mconfig)
 	MCFG_SCREEN_ADD("screen", LCD)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))

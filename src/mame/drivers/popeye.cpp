@@ -445,7 +445,7 @@ WRITE8_MEMBER(popeye_state::popeye_portB_w)
 	m_dswbit = (data & 0x0e) >> 1;
 }
 
-static MACHINE_CONFIG_START( tnx1 )
+MACHINE_CONFIG_START(popeye_state::tnx1)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_8MHz/2)   /* 4 MHz */
 	MCFG_CPU_PROGRAM_MAP(tnx1_map)
@@ -474,14 +474,14 @@ static MACHINE_CONFIG_START( tnx1 )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( tpp1, tnx1 )
+MACHINE_CONFIG_DERIVED(popeye_state::tpp1, tnx1)
 	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_INIT_OWNER(popeye_state,tpp1)
 
 	MCFG_VIDEO_START_OVERRIDE(popeye_state,tpp1)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( tpp2, tpp1 )
+MACHINE_CONFIG_DERIVED(popeye_state::tpp2, tpp1)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(tpp2_map)
 
@@ -510,7 +510,7 @@ static MACHINE_CONFIG_DERIVED( tpp2, tpp1 )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( popeyebl, tpp1 )
+MACHINE_CONFIG_DERIVED(popeye_state::popeyebl, tpp1)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(popeyebl_map)
 

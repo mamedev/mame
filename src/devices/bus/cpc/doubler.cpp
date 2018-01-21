@@ -16,7 +16,7 @@
 DEFINE_DEVICE_TYPE(CPC_DOUBLER, cpc_doubler_device, "cpc_doubler", "Draysoft Doubler")
 
 
-MACHINE_CONFIG_MEMBER( cpc_doubler_device::device_add_mconfig )
+MACHINE_CONFIG_START(cpc_doubler_device::device_add_mconfig)
 	MCFG_CASSETTE_ADD( "doubler_tape" )
 	MCFG_CASSETTE_FORMATS(cdt_cassette_formats)
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED)

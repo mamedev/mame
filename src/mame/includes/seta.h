@@ -250,6 +250,51 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(pit_out0);
 	DECLARE_WRITE_LINE_MEMBER(utoukond_ym3438_interrupt);
 	SETA001_SPRITE_GFXBANK_CB_MEMBER(setac_gfxbank_callback);
+	void keroppij(machine_config &config);
+	void madshark(machine_config &config);
+	void jjsquawb(machine_config &config);
+	void oisipuzl(machine_config &config);
+	void zingzipbl(machine_config &config);
+	void eightfrc(machine_config &config);
+	void gundhara(machine_config &config);
+	void triplfun(machine_config &config);
+	void calibr50(machine_config &config);
+	void blandiap(machine_config &config);
+	void wits(machine_config &config);
+	void msgundam(machine_config &config);
+	void extdwnhl(machine_config &config);
+	void pairlove(machine_config &config);
+	void zingzip(machine_config &config);
+	void wiggie(machine_config &config);
+	void umanclub(machine_config &config);
+	void tndrcade(machine_config &config);
+	void daioh(machine_config &config);
+	void atehate(machine_config &config);
+	void usclssic(machine_config &config);
+	void zombraid(machine_config &config);
+	void thunderlbl(machine_config &config);
+	void blockcarb(machine_config &config);
+	void wrofaero(machine_config &config);
+	void downtown(machine_config &config);
+	void blockcar(machine_config &config);
+	void crazyfgt(machine_config &config);
+	void keroppi(machine_config &config);
+	void drgnunit(machine_config &config);
+	void orbs(machine_config &config);
+	void daiohp(machine_config &config);
+	void magspeed(machine_config &config);
+	void krzybowl(machine_config &config);
+	void kiwame(machine_config &config);
+	void qzkklgy2(machine_config &config);
+	void kamenrid(machine_config &config);
+	void superbar(machine_config &config);
+	void jjsquawk(machine_config &config);
+	void twineagl(machine_config &config);
+	void blandia(machine_config &config);
+	void thunderl(machine_config &config);
+	void metafox(machine_config &config);
+	void utoukond(machine_config &config);
+	void rezon(machine_config &config);
 };
 
 class setaroul_state : public seta_state
@@ -295,6 +340,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank);
 	TIMER_DEVICE_CALLBACK_MEMBER(interrupt);
 
+	void setaroul(machine_config &config);
 private:
 	required_device<upd4992_device> m_rtc;  // ! Actually D4911C !
 	required_device<ticket_dispenser_device> m_hopper;
@@ -346,6 +392,8 @@ public:
 	DECLARE_WRITE16_MEMBER(inttoote_out_w);
 	DECLARE_READ16_MEMBER(inttoote_700000_r);
 	DECLARE_DRIVER_INIT(inttoote);
+	void inttoote(machine_config &config);
+	void jockeyc(machine_config &config);
 private:
 	required_device<upd4992_device> m_rtc;  // ! Actually D4911C !
 	required_device<ticket_dispenser_device> m_hopper1, m_hopper2; // the 2nd hopper is optional

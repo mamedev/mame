@@ -121,7 +121,7 @@ static GFXDECODE_START( gomoku )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( gomoku )
+MACHINE_CONFIG_START(gomoku_state::gomoku)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_18_432MHz/12)      /* 1.536 MHz ? */
 	MCFG_CPU_PROGRAM_MAP(gomoku_map)

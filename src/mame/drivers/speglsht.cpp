@@ -144,6 +144,7 @@ public:
 	required_device<cpu_device> m_subcpu;
 
 	DECLARE_WRITE8_MEMBER(st0016_rom_bank_w);
+	void speglsht(machine_config &config);
 };
 
 
@@ -395,7 +396,7 @@ uint32_t speglsht_state::screen_update_speglsht(screen_device &screen, bitmap_rg
 	return 0;
 }
 
-static MACHINE_CONFIG_START( speglsht )
+MACHINE_CONFIG_START(speglsht_state::speglsht)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",ST0016_CPU, 8000000) /* 8 MHz ? */
 	MCFG_CPU_PROGRAM_MAP(st0016_mem)

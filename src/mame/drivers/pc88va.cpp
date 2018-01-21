@@ -187,6 +187,7 @@ DECLARE_WRITE8_MEMBER(dma_memw_cb);
 	void execute_spron_cmd();
 	void execute_sprsw_cmd();
 
+	void pc88va(machine_config &config);
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -1779,7 +1780,7 @@ printf("%08x %02x\n",offset,data);
 }
 
 
-static MACHINE_CONFIG_START( pc88va )
+MACHINE_CONFIG_START(pc88va_state::pc88va)
 
 	MCFG_CPU_ADD("maincpu", V30, 8000000)        /* 8 MHz */
 	MCFG_CPU_PROGRAM_MAP(pc88va_map)

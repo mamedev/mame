@@ -62,6 +62,7 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	void intel82439tx_init();
+	void midqslvr(machine_config &config);
 };
 
 
@@ -407,7 +408,7 @@ void midqslvr_state::machine_reset()
 	membank("video_bank2")->set_base(memregion("video_bios")->base() + 0x4000);
 }
 
-static MACHINE_CONFIG_START( midqslvr )
+MACHINE_CONFIG_START(midqslvr_state::midqslvr)
 	MCFG_CPU_ADD("maincpu", PENTIUM, 333000000) // actually Celeron 333
 	MCFG_CPU_PROGRAM_MAP(midqslvr_map)
 	MCFG_CPU_IO_MAP(midqslvr_io)

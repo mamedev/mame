@@ -78,6 +78,7 @@ public:
 	virtual void video_start() override;
 	uint32_t screen_update_cultures(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(cultures_interrupt);
+	void cultures(machine_config &config);
 };
 
 
@@ -190,7 +191,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( vrambank_map, AS_PROGRAM, 8, cultures_state )
 	AM_RANGE(0x0000, 0x3fff) AM_RAM_WRITE(bg0_videoram_w) AM_SHARE("bg0_videoram")
-	AM_RANGE(0x4000, 0x6fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x4000, 0x6fff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( cultures_map, AS_PROGRAM, 8, cultures_state )
@@ -394,7 +395,7 @@ void cultures_state::machine_reset()
 
 
 
-static MACHINE_CONFIG_START( cultures )
+MACHINE_CONFIG_START(cultures_state::cultures)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, MCLK/2) /* 8.000 MHz */

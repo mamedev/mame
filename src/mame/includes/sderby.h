@@ -45,4 +45,10 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	void spacewin(machine_config &config);
+	void sderbya(machine_config &config);
+	void pmroulet(machine_config &config);
+	void shinygld(machine_config &config);
+	void sderby(machine_config &config);
+	void luckboom(machine_config &config);
 };

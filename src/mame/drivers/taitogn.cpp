@@ -357,7 +357,7 @@ public:
 		m_cat702_2(*this, "cat702_2"),
 		m_znmcu(*this, "znmcu"),
 		m_maincpu(*this, "maincpu"),
-		m_mn10200(*this, "mn10200"),
+		m_mn10200(*this, "taito_zoom:mn10200"),
 		m_flashbank(*this, "flashbank"),
 		m_mb3773(*this, "mb3773"),
 		m_zoom(*this, "taito_zoom"),
@@ -396,6 +396,12 @@ public:
 	DECLARE_READ32_MEMBER(zsg2_ext_r);
 	DECLARE_DRIVER_INIT(coh3002t_nz);
 
+	void coh3002t_t2_mp(machine_config &config);
+	void coh3002t(machine_config &config);
+	void coh3002t_t1_mp(machine_config &config);
+	void coh3002t_cf(machine_config &config);
+	void coh3002t_t2(machine_config &config);
+	void coh3002t_t1(machine_config &config);
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -675,7 +681,7 @@ static ADDRESS_MAP_START( taitogn_mp_map, AS_PROGRAM, 32, taitogn_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( taitogn_mn_map, AS_PROGRAM, 16, taitogn_state )
-	AM_RANGE(0x080000, 0x0fffff) AM_DEVREAD("pgmflash", intelfsh16_device, read)
+	AM_RANGE(0x080000, 0x0fffff) AM_DEVREAD(":pgmflash", intelfsh16_device, read)
 	AM_IMPORT_FROM( taitozoom_mn_map )
 ADDRESS_MAP_END
 
@@ -686,7 +692,7 @@ SLOT_INTERFACE_START(slot_ataflash)
 	SLOT_INTERFACE("ataflash", ATA_FLASH_PCCARD)
 SLOT_INTERFACE_END
 
-static MACHINE_CONFIG_START( coh3002t )
+MACHINE_CONFIG_START(taitogn_state::coh3002t)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD( "maincpu", CXD8661R, XTAL_100MHz )
@@ -746,42 +752,39 @@ static MACHINE_CONFIG_START( coh3002t )
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.45)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.45)
 
-	MCFG_FRAGMENT_ADD( taito_zoom_sound )
-	MCFG_CPU_MODIFY("mn10200")
+	MCFG_TAITO_ZOOM_ADD("taito_zoom")
+	MCFG_CPU_MODIFY("taito_zoom:mn10200")
 	MCFG_CPU_PROGRAM_MAP(taitogn_mn_map)
 
-	MCFG_SOUND_REPLACE("zsg2", ZSG2, XTAL_25MHz)
+	MCFG_DEVICE_MODIFY("taito_zoom:zsg2")
 	MCFG_ZSG2_EXT_READ_HANDLER(READ32(taitogn_state, zsg2_ext_r))
-
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED(coh3002t_t1, coh3002t)
+MACHINE_CONFIG_DERIVED(taitogn_state::coh3002t_t1, coh3002t)
 	MCFG_DEVICE_MODIFY("pccard")
 	MCFG_SLOT_DEFAULT_OPTION("taitopccard1")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED(coh3002t_t2, coh3002t)
+MACHINE_CONFIG_DERIVED(taitogn_state::coh3002t_t2, coh3002t)
 	MCFG_DEVICE_MODIFY("pccard")
 	MCFG_SLOT_DEFAULT_OPTION("taitopccard2")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( coh3002t_t1_mp, coh3002t_t1 )
+MACHINE_CONFIG_DERIVED(taitogn_state::coh3002t_t1_mp, coh3002t_t1)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_PROGRAM_MAP(taitogn_mp_map)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( coh3002t_t2_mp, coh3002t_t2 )
+MACHINE_CONFIG_DERIVED(taitogn_state::coh3002t_t2_mp, coh3002t_t2)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_PROGRAM_MAP(taitogn_mp_map)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED(coh3002t_cf, coh3002t)
+MACHINE_CONFIG_DERIVED(taitogn_state::coh3002t_cf, coh3002t)
 	MCFG_DEVICE_MODIFY("pccard")
 	MCFG_SLOT_DEFAULT_OPTION("taitocf")
 MACHINE_CONFIG_END
@@ -952,9 +955,9 @@ INPUT_PORTS_END
 	ROM_LOAD16_WORD_SWAP_BIOS( 0, "f35-01_m27c800_v1.bin", 0x000000, 0x100000, CRC(cd15cc30) SHA1(78361f46fa7186d5058937c86c66247a86b1257f) ) /* hand made */ \
 	ROM_SYSTEM_BIOS( 1, "v2", "G-NET Bios v2 flasher" ) \
 	ROM_LOAD16_WORD_SWAP_BIOS( 1, "f35-01_m27c800.bin", 0x000000, 0x100000, CRC(6225ec11) SHA1(047852d456b6ff85f8e640887caa03cf3e63ffad) ) \
-	ROM_REGION( 0x80000, "mn10200", 0 ) \
+	ROM_REGION( 0x80000, "taito_zoom:mn10200", 0 ) \
 	ROM_FILL( 0, 0x80000, 0xff ) \
-	ROM_REGION32_LE( 0x600000, "zsg2", 0 ) \
+	ROM_REGION32_LE( 0x600000, "taito_zoom:zsg2", 0 ) \
 	ROM_FILL( 0, 0x600000, 0xff )
 
 ROM_START( coh3002t )

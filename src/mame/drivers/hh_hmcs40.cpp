@@ -364,6 +364,7 @@ public:
 	DECLARE_WRITE8_MEMBER(plate_w);
 	DECLARE_WRITE16_MEMBER(grid_w);
 	DECLARE_READ8_MEMBER(input_r);
+	void bambball(machine_config &config);
 };
 
 // handlers
@@ -429,7 +430,7 @@ static INPUT_PORTS_START( bambball )
 	PORT_CONFSETTING(    0x00, "2" )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( bambball )
+MACHINE_CONFIG_START(bambball_state::bambball)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", HD38750, 400000) // approximation
@@ -477,6 +478,7 @@ public:
 	DECLARE_WRITE8_MEMBER(plate_w);
 	DECLARE_WRITE16_MEMBER(grid_w);
 	DECLARE_READ8_MEMBER(input_r);
+	void bmboxing(machine_config &config);
 };
 
 // handlers
@@ -564,7 +566,7 @@ static INPUT_PORTS_START( bmboxing )
 	PORT_BIT( 0xfff8, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( bmboxing )
+MACHINE_CONFIG_START(bmboxing_state::bmboxing)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", HD38750, 400000) // approximation
@@ -615,6 +617,7 @@ public:
 
 	void update_int1();
 	DECLARE_INPUT_CHANGED_MEMBER(input_changed);
+	void bfriskyt(machine_config &config);
 };
 
 // handlers
@@ -688,7 +691,7 @@ INPUT_CHANGED_MEMBER(bfriskyt_state::input_changed)
 	update_int1();
 }
 
-static MACHINE_CONFIG_START( bfriskyt )
+MACHINE_CONFIG_START(bfriskyt_state::bfriskyt)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", HD38800, 400000) // approximation
@@ -741,6 +744,7 @@ public:
 	DECLARE_WRITE8_MEMBER(plate_w);
 	DECLARE_WRITE16_MEMBER(grid_w);
 	DECLARE_READ16_MEMBER(input_r);
+	void packmon(machine_config &config);
 };
 
 // handlers
@@ -797,7 +801,7 @@ static INPUT_PORTS_START( packmon )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( packmon )
+MACHINE_CONFIG_START(packmon_state::packmon)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", HD38800, 400000) // approximation
@@ -855,6 +859,7 @@ public:
 
 	void update_int0();
 	DECLARE_INPUT_CHANGED_MEMBER(input_changed);
+	void msthawk(machine_config &config);
 };
 
 // handlers
@@ -931,7 +936,7 @@ INPUT_CHANGED_MEMBER(msthawk_state::input_changed)
 	update_int0();
 }
 
-static MACHINE_CONFIG_START( msthawk )
+MACHINE_CONFIG_START(msthawk_state::msthawk)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", HD38800, 400000) // approximation
@@ -981,6 +986,7 @@ public:
 
 	void update_int1();
 	DECLARE_INPUT_CHANGED_MEMBER(input_changed);
+	void bzaxxon(machine_config &config);
 };
 
 // handlers
@@ -1051,7 +1057,7 @@ INPUT_CHANGED_MEMBER(bzaxxon_state::input_changed)
 	update_int1();
 }
 
-static MACHINE_CONFIG_START( bzaxxon )
+MACHINE_CONFIG_START(bzaxxon_state::bzaxxon)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", HD38800, 450000) // approximation
@@ -1100,6 +1106,7 @@ public:
 
 	void update_int0();
 	DECLARE_INPUT_CHANGED_MEMBER(input_changed);
+	void zackman(machine_config &config);
 };
 
 // handlers
@@ -1166,7 +1173,7 @@ INPUT_CHANGED_MEMBER(zackman_state::input_changed)
 	update_int0();
 }
 
-static MACHINE_CONFIG_START( zackman )
+MACHINE_CONFIG_START(zackman_state::zackman)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", HD38820, 400000) // approximation
@@ -1219,6 +1226,7 @@ public:
 
 	void update_int0();
 	DECLARE_INPUT_CHANGED_MEMBER(input_changed);
+	void bpengo(machine_config &config);
 };
 
 // handlers
@@ -1292,7 +1300,7 @@ INPUT_CHANGED_MEMBER(bpengo_state::input_changed)
 	update_int0();
 }
 
-static MACHINE_CONFIG_START( bpengo )
+MACHINE_CONFIG_START(bpengo_state::bpengo)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", HD38820, 400000) // approximation
@@ -1346,6 +1354,7 @@ public:
 
 	void update_int0();
 	DECLARE_INPUT_CHANGED_MEMBER(input_changed);
+	void bbtime(machine_config &config);
 };
 
 // handlers
@@ -1416,7 +1425,7 @@ INPUT_CHANGED_MEMBER(bbtime_state::input_changed)
 	update_int0();
 }
 
-static MACHINE_CONFIG_START( bbtime )
+MACHINE_CONFIG_START(bbtime_state::bbtime)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", HD38820, 400000) // approximation
@@ -1465,6 +1474,7 @@ public:
 
 	DECLARE_WRITE8_MEMBER(plate_w);
 	DECLARE_WRITE16_MEMBER(grid_w);
+	void bdoramon(machine_config &config);
 };
 
 // handlers
@@ -1515,7 +1525,7 @@ static INPUT_PORTS_START( bdoramon )
 	PORT_CONFSETTING(    0x08, DEF_STR( On ) )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( bdoramon )
+MACHINE_CONFIG_START(bdoramon_state::bdoramon)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", HD38800, 400000) // approximation
@@ -1563,6 +1573,7 @@ public:
 
 	DECLARE_WRITE8_MEMBER(plate_w);
 	DECLARE_WRITE16_MEMBER(grid_w);
+	void bultrman(machine_config &config);
 };
 
 // handlers
@@ -1607,7 +1618,7 @@ static INPUT_PORTS_START( bultrman )
 	PORT_BIT( 0xff8f, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( bultrman )
+MACHINE_CONFIG_START(bultrman_state::bultrman)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", HD38800, 350000) // approximation
@@ -1655,6 +1666,7 @@ public:
 	void prepare_display();
 	DECLARE_WRITE8_MEMBER(plate_w);
 	DECLARE_WRITE16_MEMBER(grid_w);
+	void machiman(machine_config &config);
 };
 
 // handlers
@@ -1695,7 +1707,7 @@ static INPUT_PORTS_START( machiman )
 	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_2WAY
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( machiman )
+MACHINE_CONFIG_START(machiman_state::machiman)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", HD38820, 400000) // approximation
@@ -1753,6 +1765,7 @@ public:
 	DECLARE_WRITE8_MEMBER(sound_w);
 	DECLARE_WRITE8_MEMBER(sound2_w);
 	DECLARE_WRITE16_MEMBER(speaker_w);
+	void pairmtch(machine_config &config);
 };
 
 // handlers: maincpu side
@@ -1842,7 +1855,7 @@ static INPUT_PORTS_START( pairmtch )
 	PORT_BIT( 0x86bf, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( pairmtch )
+MACHINE_CONFIG_START(pairmtch_state::pairmtch)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", HD38820, 400000) // approximation
@@ -1900,6 +1913,7 @@ public:
 	DECLARE_WRITE8_MEMBER(plate_w);
 	DECLARE_WRITE16_MEMBER(grid_w);
 	DECLARE_READ16_MEMBER(input_r);
+	void alnattck(machine_config &config);
 };
 
 // handlers
@@ -1963,7 +1977,7 @@ static INPUT_PORTS_START( alnattck )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Fire")
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( alnattck )
+MACHINE_CONFIG_START(alnattck_state::alnattck)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", HD38800, 400000) // approximation
@@ -2016,6 +2030,7 @@ public:
 	void speaker_decay_reset();
 	TIMER_DEVICE_CALLBACK_MEMBER(speaker_decay_sim);
 	double m_speaker_volume;
+	void cdkong(machine_config &config);
 
 protected:
 	virtual void machine_start() override;
@@ -2089,7 +2104,7 @@ void cdkong_state::machine_start()
 	save_item(NAME(m_speaker_volume));
 }
 
-static MACHINE_CONFIG_START( cdkong )
+MACHINE_CONFIG_START(cdkong_state::cdkong)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", HD38820, 400000) // approximation
@@ -2151,6 +2166,7 @@ public:
 	DECLARE_READ8_MEMBER(input_r);
 
 	DECLARE_INPUT_CHANGED_MEMBER(player_switch);
+	void cgalaxn(machine_config &config);
 };
 
 // handlers
@@ -2221,7 +2237,7 @@ INPUT_CHANGED_MEMBER(cgalaxn_state::player_switch)
 	prepare_display();
 }
 
-static MACHINE_CONFIG_START( cgalaxn )
+MACHINE_CONFIG_START(cgalaxn_state::cgalaxn)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", HD38800, 400000) // approximation
@@ -2280,6 +2296,7 @@ public:
 	DECLARE_WRITE8_MEMBER(plate_w);
 	DECLARE_WRITE16_MEMBER(grid_w);
 	DECLARE_READ8_MEMBER(input_r);
+	void cpacman(machine_config &config);
 };
 
 // handlers
@@ -2339,7 +2356,7 @@ static INPUT_PORTS_START( cpacman )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_PLAYER(2)
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( cpacman )
+MACHINE_CONFIG_START(cpacman_state::cpacman)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", HD38820, 400000) // approximation
@@ -2396,6 +2413,7 @@ public:
 	DECLARE_WRITE8_MEMBER(plate_w);
 	DECLARE_WRITE16_MEMBER(grid_w);
 	DECLARE_READ8_MEMBER(input_r);
+	void cmspacmn(machine_config &config);
 };
 
 // handlers
@@ -2455,7 +2473,7 @@ static INPUT_PORTS_START( cmspacmn )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( cmspacmn )
+MACHINE_CONFIG_START(cmspacmn_state::cmspacmn)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", HD38820, 400000) // approximation
@@ -2510,6 +2528,7 @@ public:
 	DECLARE_WRITE8_MEMBER(plate_w);
 	DECLARE_WRITE16_MEMBER(grid_w);
 	DECLARE_READ16_MEMBER(input_r);
+	void sag(machine_config &config);
 };
 
 // handlers
@@ -2601,7 +2620,7 @@ static INPUT_PORTS_START( sag )
 	PORT_CONFSETTING(    0x02, "2" )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( sag )
+MACHINE_CONFIG_START(sag_state::sag)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", HD38800, 450000) // approximation
@@ -2645,6 +2664,7 @@ public:
 	DECLARE_WRITE8_MEMBER(plate_w);
 	DECLARE_WRITE16_MEMBER(grid_w);
 	DECLARE_READ8_MEMBER(input_r);
+	void egalaxn2(machine_config &config);
 };
 
 // handlers
@@ -2715,7 +2735,7 @@ static INPUT_PORTS_START( egalaxn2 )
 	PORT_CONFSETTING(    0x04, "2" )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( egalaxn2 )
+MACHINE_CONFIG_START(egalaxn2_state::egalaxn2)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", HD38820, 400000) // approximation
@@ -2763,6 +2783,8 @@ public:
 	epacman2_state(const machine_config &mconfig, device_type type, const char *tag)
 		: egalaxn2_state(mconfig, type, tag)
 	{ }
+
+	void epacman2(machine_config &config);
 };
 
 // handlers are identical to Galaxian 2, so we can use those
@@ -2799,7 +2821,7 @@ static INPUT_PORTS_START( epacman2 )
 	PORT_CONFSETTING(    0x00, "2" )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_DERIVED( epacman2, egalaxn2 )
+MACHINE_CONFIG_DERIVED(epacman2_state::epacman2, egalaxn2)
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
@@ -2841,6 +2863,7 @@ public:
 
 	void update_int();
 	DECLARE_INPUT_CHANGED_MEMBER(input_changed);
+	void eturtles(machine_config &config);
 
 protected:
 	virtual void machine_start() override;
@@ -2963,7 +2986,7 @@ void eturtles_state::machine_start()
 	save_item(NAME(m_cop_irq));
 }
 
-static MACHINE_CONFIG_START( eturtles )
+MACHINE_CONFIG_START(eturtles_state::eturtles)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", HD38820, 400000) // approximation
@@ -3022,6 +3045,7 @@ public:
 
 	virtual void prepare_display() override;
 	DECLARE_READ8_MEMBER(cop_data_r);
+	void estargte(machine_config &config);
 };
 
 // handlers (most of it is in eturtles_state above)
@@ -3072,7 +3096,7 @@ static INPUT_PORTS_START( estargte )
 	PORT_BIT( 0x03, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( estargte )
+MACHINE_CONFIG_START(estargte_state::estargte)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", HD38820, 400000) // approximation
@@ -3133,6 +3157,7 @@ public:
 	DECLARE_WRITE8_MEMBER(plate_w);
 	DECLARE_WRITE16_MEMBER(grid_w);
 	DECLARE_READ16_MEMBER(input_r);
+	void ghalien(machine_config &config);
 };
 
 // handlers
@@ -3197,7 +3222,7 @@ static INPUT_PORTS_START( ghalien )
 	PORT_CONFSETTING(      0x8000, "Professional" )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( ghalien )
+MACHINE_CONFIG_START(ghalien_state::ghalien)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", HD38800, 400000) // approximation
@@ -3251,6 +3276,7 @@ public:
 
 	void update_int1();
 	DECLARE_INPUT_CHANGED_MEMBER(input_changed);
+	void gckong(machine_config &config);
 };
 
 // handlers
@@ -3323,7 +3349,7 @@ INPUT_CHANGED_MEMBER(gckong_state::input_changed)
 	update_int1();
 }
 
-static MACHINE_CONFIG_START( gckong )
+MACHINE_CONFIG_START(gckong_state::gckong)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", HD38800, 400000) // approximation
@@ -3373,6 +3399,7 @@ public:
 
 	void update_int1();
 	DECLARE_INPUT_CHANGED_MEMBER(input_changed);
+	void gdigdug(machine_config &config);
 };
 
 // handlers
@@ -3441,7 +3468,7 @@ INPUT_CHANGED_MEMBER(gdigdug_state::input_changed)
 	update_int1();
 }
 
-static MACHINE_CONFIG_START( gdigdug )
+MACHINE_CONFIG_START(gdigdug_state::gdigdug)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", HD38820, 400000) // approximation
@@ -3497,6 +3524,7 @@ public:
 	DECLARE_WRITE16_MEMBER(grid_w);
 	DECLARE_WRITE8_MEMBER(speaker_w);
 	DECLARE_READ8_MEMBER(input_r);
+	void mwcbaseb(machine_config &config);
 };
 
 // handlers
@@ -3602,7 +3630,7 @@ INPUT_PORTS_END
 
 static const s16 mwcbaseb_speaker_levels[] = { 0, 0x3fff, -0x4000, 0, -0x4000, 0, -0x8000, -0x4000 };
 
-static MACHINE_CONFIG_START( mwcbaseb )
+MACHINE_CONFIG_START(mwcbaseb_state::mwcbaseb)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", HD38820, 400000) // approximation
@@ -3651,6 +3679,7 @@ public:
 
 	DECLARE_WRITE8_MEMBER(plate_w);
 	DECLARE_WRITE16_MEMBER(grid_w);
+	void pbqbert(machine_config &config);
 };
 
 // handlers
@@ -3689,7 +3718,7 @@ static INPUT_PORTS_START( pbqbert )
 	PORT_BIT( 0xe1ff, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( pbqbert )
+MACHINE_CONFIG_START(pbqbert_state::pbqbert)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", HD38820, 400000) // approximation
@@ -3743,6 +3772,7 @@ public:
 
 	void update_int0();
 	DECLARE_INPUT_CHANGED_MEMBER(input_changed);
+	void kingman(machine_config &config);
 };
 
 // handlers
@@ -3813,7 +3843,7 @@ INPUT_CHANGED_MEMBER(kingman_state::input_changed)
 	update_int0();
 }
 
-static MACHINE_CONFIG_START( kingman )
+MACHINE_CONFIG_START(kingman_state::kingman)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", HD38800, 400000) // approximation
@@ -3863,6 +3893,7 @@ public:
 
 	void update_int1();
 	DECLARE_INPUT_CHANGED_MEMBER(input_changed);
+	void tmtron(machine_config &config);
 };
 
 // handlers
@@ -3933,7 +3964,7 @@ INPUT_CHANGED_MEMBER(tmtron_state::input_changed)
 	update_int1();
 }
 
-static MACHINE_CONFIG_START( tmtron )
+MACHINE_CONFIG_START(tmtron_state::tmtron)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", HD38800, 400000) // approximation
@@ -3983,6 +4014,7 @@ public:
 
 	DECLARE_WRITE8_MEMBER(plate_w);
 	DECLARE_WRITE16_MEMBER(grid_w);
+	void vinvader(machine_config &config);
 };
 
 // handlers
@@ -4026,7 +4058,7 @@ static INPUT_PORTS_START( vinvader )
 	PORT_BIT( 0xfff5, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( vinvader )
+MACHINE_CONFIG_START(vinvader_state::vinvader)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", HD38750, 400000) // approximation

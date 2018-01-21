@@ -46,6 +46,7 @@ public:
 	DECLARE_WRITE8_MEMBER(lamp_w);
 	DECLARE_WRITE8_MEMBER(output_w);
 	DECLARE_WRITE8_MEMBER(oki_bank_w);
+	void ggconnie(machine_config &config);
 };
 
 WRITE8_MEMBER(ggconnie_state::lamp_w)
@@ -178,7 +179,7 @@ static INPUT_PORTS_START(ggconnie)
 	PORT_DIPSETTING(0x00, DEF_STR(On) )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( ggconnie )
+MACHINE_CONFIG_START(ggconnie_state::ggconnie)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", H6280, PCE_MAIN_CLOCK/3)
 	MCFG_CPU_PROGRAM_MAP(sgx_mem)

@@ -87,4 +87,9 @@ public:
 	void jack_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void joinem_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void treahunt_decode(  );
+	void joinem(machine_config &config);
+	void treahunt(machine_config &config);
+	void unclepoo(machine_config &config);
+	void striv(machine_config &config);
+	void jack(machine_config &config);
 };
