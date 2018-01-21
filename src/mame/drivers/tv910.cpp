@@ -425,10 +425,14 @@ INPUT_PORTS_END
 void tv910_state::machine_start()
 {
 	// DCD needs to be driven somehow, or else the terminal will complain
+	// CTS also needs to be driven to prevent hanging caused by buffer overflow
 	auto *acia = subdevice<mos6551_device>(ACIA_TAG);
 	auto *rs232 = subdevice<rs232_port_device>(RS232_TAG);
 	if (rs232->get_card_device() == nullptr)
+	{
 		acia->write_dcd(0);
+		acia->write_cts(0);
+	}
 
 	// DSR is tied to GND
 	acia->write_dsr(0);
