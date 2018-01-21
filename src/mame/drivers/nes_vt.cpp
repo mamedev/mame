@@ -163,14 +163,14 @@ uint32_t nes_vt_state::get_banks(uint8_t bnk)
 {
 	switch (m_410x[0xb] & 0x07)
 	{
-	case 0: return ((m_410x[0x0] & 0xF0) << 4) | (m_410x[0xa] & 0xC0) | (bnk & 0x3F); // makes bank 0xff at 0xe000 map to 0x07e000 by default for vectors at 0x007fffx
-	case 1: return ((m_410x[0x0] & 0xF0) << 4) | (m_410x[0xa] & 0xE0) | (bnk & 0x1F);
-	case 2: return ((m_410x[0x0] & 0xF0) << 4) | (m_410x[0xa] & 0xF0) | (bnk & 0x0F);
-	case 3: return ((m_410x[0x0] & 0xF0) << 4) | (m_410x[0xa] & 0xF8) | (bnk & 0x07);
-	case 4: return ((m_410x[0x0] & 0xF0) << 4) | (m_410x[0xa] & 0xFC) | (bnk & 0x03);
-	case 5: return ((m_410x[0x0] & 0xF0) << 4) | (m_410x[0xa] & 0xFE) | (bnk & 0x01);
-	case 6: return ((m_410x[0x0] & 0xF0) << 4) | m_410x[0xa];
-	case 7: return ((m_410x[0x0] & 0xF0) << 4) | bnk;
+	case 0: return ((m_410x[0x0] & 0xF0) << 4) + ((m_410x[0xa] & 0xC0) | (bnk & 0x3F)); // makes bank 0xff at 0xe000 map to 0x07e000 by default for vectors at 0x007fffx
+	case 1: return ((m_410x[0x0] & 0xF0) << 4) + ((m_410x[0xa] & 0xE0) | (bnk & 0x1F));
+	case 2: return ((m_410x[0x0] & 0xF0) << 4) + ((m_410x[0xa] & 0xF0) | (bnk & 0x0F));
+	case 3: return ((m_410x[0x0] & 0xF0) << 4) + ((m_410x[0xa] & 0xF8) | (bnk & 0x07));
+	case 4: return ((m_410x[0x0] & 0xF0) << 4) + ((m_410x[0xa] & 0xFC) | (bnk & 0x03));
+	case 5: return ((m_410x[0x0] & 0xF0) << 4) + ((m_410x[0xa] & 0xFE) | (bnk & 0x01));
+	case 6: return ((m_410x[0x0] & 0xF0) << 4) + (m_410x[0xa]);
+	case 7: return ((m_410x[0x0] & 0xF0) << 4) + bnk;
 	}
 
 	return 0;
@@ -182,7 +182,7 @@ void nes_vt_state::update_banks()
 	uint8_t bank;
 
 	// 8000-9fff
-	if ((m_410x[0xb] & 0x40) == 0)
+	if ((m_410x[0xb] & 0x40) == (m_410x[0x5] & 0x40))
 	{
 		if ((m_410x[0x5] & 0x40) == 0)
 			bank = m_410x[0x7];
@@ -199,7 +199,7 @@ void nes_vt_state::update_banks()
 	m_prgbank1->set_entry(get_banks(bank) & (m_numbanks-1));
 
 	// c000-dfff
-	if ((m_410x[0xb] & 0x40) != 0)
+	if ((m_410x[0xb] & 0x40) != (m_410x[0x5] & 0x40))
 	{
 		if ((m_410x[0x5] & 0x40) == 0)
 			bank = m_410x[0x9];
@@ -680,103 +680,75 @@ int nes_vt_state::calculate_real_video_address(int addr, int extended, int readt
    so I'm not sure if it's just an incomplete demo, or there is more to this
 */
 
-// the demo program writes to the banking registers like this.. how does this really work? is this mode selectable? some kind of legacy mode?
+// MMC3 compatibility mode
 WRITE8_MEMBER(nes_vt_state::vt03_8000_w)
 {
-	switch (offset + 0x8000)
-	{
-	case 0x8000:
-		m_8000_addr_latch = data;
-		break;
+	logerror("%s: vt03_8000_w (%04x) %02x\n", machine().describe_context(), offset+0x8000, data );
+	uint16_t addr = offset + 0x8000;
+	if((addr < 0xA000) && !(addr & 0x01)) {
+		// Bank select
+		m_8000_addr_latch = data & 0x07;
+		// Bank config
+		m_410x[0x0B] &= 0xBF;
+		m_410x[0x0B] |= (data & 0x40);
+		update_banks();
+	} else if((addr < 0xA000) && (addr & 0x01)) {
+		switch(m_8000_addr_latch) {
+			case 0x00:
+				m_ppu->set_201x_reg(0x6, data);
+				break;
 
-	case 0x8001:
-		switch (m_8000_addr_latch)
-		{
-		case 0x00:
-			m_ppu->set_201x_reg(0x6, data);
-			break;
+			case 0x01:
+				m_ppu->set_201x_reg(0x7, data);
+				break;
 
-		case 0x01:
-			m_ppu->set_201x_reg(0x7, data);
-			break;
+			case 0x02: // hand?
+				m_ppu->set_201x_reg(0x2, data);
+				break;
 
-		case 0x02: // hand?
-			//if ((data != 0x00) && (data != 0x2f) && (data != 0x31) && (data != 0x32) )
-			//  logerror("%s vt03_8001_data_w latch %02x data %02x\n", machine().describe_context(), m_8000_addr_latch, data);
-			m_ppu->set_201x_reg(0x2, data);
-			break;
+			case 0x03: // dog?
+				m_ppu->set_201x_reg(0x3, data);
+				break;
 
-		case 0x03: // dog?
-			//if ((data != 0x00) && (data != 0x2c) && (data != 0x2d) && (data != 0x2e) && (data != 0x2f) && (data != 0x32) && (data != 0x3d) && (data != 0x3e) && (data != 0x3f) && (data != 0x40) && (data != 0x41) && (data != 0x42) && (data != 0x43) && (data != 0x44) && (data != 0x45) && (data != 0x46))
-			//  logerror("%s vt03_8001_data_w latch %02x data %02x\n", machine().describe_context(), m_8000_addr_latch, data);
-			m_ppu->set_201x_reg(0x3, data);
-			break;
+			case 0x04: // ball thrown
+				m_ppu->set_201x_reg(0x4, data);
+				break;
 
-		case 0x04: // ball thrown
-			//if ((data != 0x00) && (data != 0x10) && (data != 0x12))
-			//  logerror("%s vt03_8001_data_w latch %02x data %02x\n", machine().describe_context(), m_8000_addr_latch, data);
-			m_ppu->set_201x_reg(0x4, data);
-			break;
+			case 0x05: // ball thrown
+				m_ppu->set_201x_reg(0x5, data);
+				break;
+			case 0x06:
+				m_410x[0x7] = data;
+				update_banks();
+				break;
 
-		case 0x05: // ball thrown
-			//if ((data != 0x00) && (data != 0x11))
-			//  logerror("%s vt03_8001_data_w latch %02x data %02x\n", machine().describe_context(), m_8000_addr_latch, data);
-			m_ppu->set_201x_reg(0x5, data);
-			break;
-
-		case 0x06:
-			m_410x[0x7] = data;
-			update_banks();
-			break;
-
-		case 0x07:
-			m_410x[0x8] = data;
-			update_banks();
-			break;
-		default:
-			logerror("%s vt03_8001_data_w latch %02x data %02x\n", machine().describe_context(), m_8000_addr_latch, data);
-			break;
+			case 0x07:
+				m_410x[0x8] = data;
+				update_banks();
+				break;	
 		}
-		break;
-
-	case 0xa000:
-		logerror("%s: vt03_a000_w %02x\n", machine().describe_context(), data);
-		break;
-
-	case 0xa001:
-		logerror("%s: vt03_a001_w %02x\n", machine().describe_context(), data);
-		break;
-
-		// registers below appear to provide an alt way of setting the scanline counter/timer
-
-	case 0xc000:
-		// seems to be a mirror of 4101 (timer latch)
-		//logerror("%s: vt03_c000_w %02x\n", machine().describe_context(), data);
+	} else if((addr >= 0xA000) && (addr < 0xC000) && !(addr & 0x01)) {
+		// Mirroring
+		m_410x[0x6] &= 0xFE;
+		m_410x[0x6] |= data & 0x01;
+	} else if((addr >= 0xA000) && (addr < 0xC000) && (addr & 0x01)) {
+		// PRG RAM control, ignore
+	} else if((addr >= 0xC000) && (addr < 0xE000) && !(addr & 0x01)) {
+		// IRQ latch
 		vt03_410x_w(space, 1, data);
-		break;
-
-	case 0xc001:
-		// seems to be a mirror of 4102 (load timer with latched data, start counting)
-		// logerror("%s: vt03_c001_w %02x\n", machine().describe_context(), data);
+	} else if((addr >= 0xC000) && (addr < 0xE000) && (addr & 0x01)) {
+		// IRQ reload
 		vt03_410x_w(space, 2, data);
-		break;
-
-	case 0xe000:
-		// seems to be a mirror of 4103 (disable timer interrupt)
-		// logerror("%s: vt03_e000_w %02x\n", machine().describe_context(), data);
+	} else if((addr >= 0xE000) && !(addr & 0x01)) {
+		// IRQ disable
 		vt03_410x_w(space, 3, data);
-		break;
-
-	case 0xe001:
-		// seems to be a mirror of 4104 (enable timer interrupt)
-		//logerror("%s: vt03_e001_w %02x\n", machine().describe_context(), data);
+	} else if((addr >= 0xE000) && (addr & 0x01)) {
+		// IRQ enable
 		vt03_410x_w(space, 4, data);
-		break;
-
-	default:
-		logerror("%s: vt03_8000_w (%04x) unhandled %02x\n", machine().describe_context(), offset+0x8000, data );
-		break;
+	} else {
+		
 	}
+	
 }
 
 /* APU plumbing, this is because we have a plain M6502 core in the VT03, otherwise this is handled in the core */
@@ -1254,7 +1226,7 @@ ROM_END
 
 ROM_START( bittboy )
 	ROM_REGION( 0x2000000, "mainrom", 0 )
-	ROM_LOAD( "bittboy_flash_read_S29GL256N-TF-V2.bin", 0x00000, 0x2000000, CRC(d9e67279) SHA1(db72b538ea55ea60e92e734b0565bc78b7873573) )
+	ROM_LOAD( "bittboy_flash_read_S29GL256N-TF-V2.bin", 0x00000, 0x2000000, CRC(24c802d7) SHA1(c1300ff799b93b9b53060b94d3985db4389c5d3a) )
 ROM_END
 
 // earlier version of vdogdemo
