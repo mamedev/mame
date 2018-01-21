@@ -461,7 +461,7 @@ WRITE8_MEMBER( deco_bac06_device::pf_control0_8bit_w )
 	if (offset&1)
 		pf_control_0_w(space,offset/2,data,0x00ff); // oscar (mirrors?)
 	else
-		pf_control_0_w(space,offset/2,data<<8,0x00ff);
+		pf_control_0_w(space,offset/2,data,0x00ff);
 }
 
 /* used by dec8.c */
@@ -488,7 +488,7 @@ WRITE8_MEMBER( deco_bac06_device::pf_control1_8bit_w )
 		if (offset&1)
 			pf_control_1_w(space,offset/2,data,0x00ff);
 		else
-			pf_control_1_w(space,offset/2,data<<8,0x00ff);
+			pf_control_1_w(space,offset/2,data,0x00ff);
 	}
 }
 
