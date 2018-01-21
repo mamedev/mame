@@ -905,12 +905,14 @@ chd_error chdcd_parse_cue(const char *tocfname, cdrom_toc &outtoc, chdcd_track_i
 					wavlen = parse_wav_sample(lastfname.c_str(), &wavoffs);
 					if (!wavlen)
 					{
+						fclose(infile);
 						printf("ERROR: couldn't read [%s] or not a valid .WAV\n", lastfname.c_str());
 						return CHDERR_INVALID_DATA;
 					}
 				}
 				else
 				{
+					fclose(infile);
 					printf("ERROR: Unhandled track type %s\n", token);
 					return CHDERR_UNSUPPORTED_FORMAT;
 				}
@@ -952,6 +954,7 @@ chd_error chdcd_parse_cue(const char *tocfname, cdrom_toc &outtoc, chdcd_track_i
 				cdrom_convert_type_string_to_track_info(token, &outtoc.tracks[trknum]);
 				if (outtoc.tracks[trknum].datasize == 0)
 				{
+					fclose(infile);
 					printf("ERROR: Unknown track type [%s].  Contact MAMEDEV.\n", token);
 					return CHDERR_UNSUPPORTED_FORMAT;
 				}
@@ -1297,6 +1300,7 @@ chd_error chdcd_parse_toc(const char *tocfname, cdrom_toc &outtoc, chdcd_track_i
 				cdrom_convert_type_string_to_track_info(token, &outtoc.tracks[trknum]);
 				if (outtoc.tracks[trknum].datasize == 0)
 				{
+					fclose(infile);
 					printf("ERROR: Unknown track type [%s].  Contact MAMEDEV.\n", token);
 					return CHDERR_UNSUPPORTED_FORMAT;
 				}
