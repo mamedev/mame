@@ -393,8 +393,8 @@ static INPUT_PORTS_START( tv910 )
 
 	PORT_DIPNAME( 0x60, 0x00, "Cursor type" )
 	PORT_DIPSETTING(    0x00, "Blinking block" )
-	PORT_DIPSETTING(    0x20, "Blinking underline" )
-	PORT_DIPSETTING(    0x40, "Steady block" )
+	PORT_DIPSETTING(    0x40, "Blinking underline" )
+	PORT_DIPSETTING(    0x20, "Steady block" )
 	PORT_DIPSETTING(    0x60, "Steady underline" )
 
 	PORT_DIPNAME( 0x80, 0x00, "Duplex" )
@@ -472,7 +472,7 @@ MC6845_UPDATE_ROW( tv910_state::crtc_update_row )
 		else if (ra == 0 || att_blk || BIT(att, 0) || (BIT(att, 1) && BIT(m_control, 1)))
 			data = 0;
 
-		if (i == cursor_x && BIT(m_control, 1))
+		if (i == cursor_x && (!BIT(m_control, 4) || ra == 9))
 			data ^= 0xff;
 		if (BIT(att, 2))
 			data ^= 0xff;
