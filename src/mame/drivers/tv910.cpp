@@ -1,9 +1,8 @@
 // license:BSD-3-Clause
-// copyright-holders: R. Belmont
+// copyright-holders:R. Belmont, AJR
 /***************************************************************************
 
-    TeleVideo TV-910 / 910 Plus
-    Preliminary driver by R. Belmont
+    TeleVideo Model 910 / 910 Plus
 
     Hardware:
     6502 CPU
@@ -13,10 +12,14 @@
     IRQ = ACIA gated with flip-flop driven by CRTC VBlank (not wire-OR)
     NMI = AY-5-3600 keyboard char present
 
+    Esc-V (with a capital V) brings up the self-test screen.
+
     TODO:
-        - Attributes might not all be correct (Esc-V brings up test screen)
-        - DIP switches don't all appear to have the expected effects
-        - Keyboard hookup isn't quite right
+        - Reverse attribute handling on the self-test screen doesn't seem
+          to match the picture shown in the Operator's Manual
+        - Make 910 keyboard into a device since the similar Model 925 uses
+          a 950-compatible serial keyboard instead (with a second ACIA)
+        - Add printer port and remaining DIP switches
 
 ****************************************************************************/
 
@@ -31,7 +34,7 @@
 #include "screen.h"
 #include "speaker.h"
 
-#define ACIA_TAG    "acia1"
+#define ACIA_TAG    "acia"
 #define CRTC_TAG    "crtc"
 #define RS232_TAG   "rs232"
 #define KBDC_TAG    "ay3600"
@@ -85,7 +88,7 @@ private:
 	required_shared_ptr<uint8_t> m_vram;
 	required_region_ptr<uint8_t> m_chrrom;
 	required_device<ay3600_device> m_ay3600;
-	required_memory_region m_kbdrom;
+	required_region_ptr<uint8_t> m_kbdrom;
 	required_ioport m_kbspecial;
 	required_device<beep_device> m_beep;
 	required_ioport m_dsw1;
@@ -196,10 +199,8 @@ WRITE_LINE_MEMBER(tv910_state::ay3600_data_ready_w)
 {
 	if (state == ASSERT_LINE)
 	{
-		uint8_t *decode = m_kbdrom->base();
-
 		m_lastchar = m_ay3600->b_r();
-		m_transchar = decode[m_lastchar];
+		m_transchar = m_kbdrom[m_lastchar];
 		m_strobe = 1;
 
 		m_maincpu->set_input_line(M6502_NMI_LINE, ASSERT_LINE);
@@ -359,23 +360,23 @@ static INPUT_PORTS_START( tv910 )
 	PORT_DIPSETTING(    0xf, "19200" )
 
 	PORT_DIPNAME( 0x10, 0x00, "Word Length" ) PORT_DIPLOCATION("S1:5")
-	PORT_DIPSETTING( 0x00, "8 Bits" )
-	PORT_DIPSETTING( 0x10, "7 Bits" )
+	PORT_DIPSETTING( 0x00, "8 data bits" )
+	PORT_DIPSETTING( 0x10, "7 data bits" )
 
 	PORT_DIPNAME( 0x20, 0x00, "Parity" ) PORT_DIPLOCATION("S1:6")
-	PORT_DIPSETTING( 0x00, "No Parity" )
-	PORT_DIPSETTING( 0x20, "Send Parity" )
+	PORT_DIPSETTING( 0x00, "No parity" )
+	PORT_DIPSETTING( 0x20, "Send parity" )
 
 	PORT_DIPNAME( 0x40, 0x00, "Parity Type" ) PORT_DIPLOCATION("S1:7")
-	PORT_DIPSETTING( 0x00, "Odd Parity" )
-	PORT_DIPSETTING( 0x40, "Even Parity" )
+	PORT_DIPSETTING( 0x00, "Odd" )
+	PORT_DIPSETTING( 0x40, "Even" )
 
 	PORT_DIPNAME( 0x80, 0x00, "Stop Bits" ) PORT_DIPLOCATION("S1:8")
 	PORT_DIPSETTING( 0x00, "1" )
 	PORT_DIPSETTING( 0x80, "2" )
 
 	PORT_START("DSW1")
-	PORT_DIPNAME( 0x01, 0x00, "CR Code" ) PORT_DIPLOCATION("S1:10") // TCHAR0
+	PORT_DIPNAME( 0x01, 0x01, "CR Code" ) PORT_DIPLOCATION("S1:10") // TCHAR0
 	PORT_DIPSETTING( 0x00, "CR only" )
 	PORT_DIPSETTING( 0x01, "CRLF" )
 
@@ -394,14 +395,14 @@ static INPUT_PORTS_START( tv910 )
 	PORT_DIPSETTING( 0x10, "50 Hz" )
 
 	PORT_DIPNAME( 0x60, 0x00, "Cursor Type" ) PORT_DIPLOCATION("S2:4,5")
-	PORT_DIPSETTING(    0x00, "Blinking Block" )
-	PORT_DIPSETTING(    0x40, "Blinking Underline" )
-	PORT_DIPSETTING(    0x20, "Steady Block" )
-	PORT_DIPSETTING(    0x60, "Steady Underline" )
+	PORT_DIPSETTING(    0x00, "Blinking block" )
+	PORT_DIPSETTING(    0x40, "Blinking underline" )
+	PORT_DIPSETTING(    0x20, "Steady block" )
+	PORT_DIPSETTING(    0x60, "Steady underline" )
 
 	PORT_DIPNAME( 0x80, 0x00, "Conversation Mode" ) PORT_DIPLOCATION("S2:6") // F/HDX
-	PORT_DIPSETTING( 0x00, "Half Duplex" )
-	PORT_DIPSETTING( 0x80, "Full Duplex" )
+	PORT_DIPSETTING( 0x00, "Half duplex" )
+	PORT_DIPSETTING( 0x80, "Full duplex" )
 
 	PORT_DIPNAME( 0x100, 0x100, "Colors" ) PORT_DIPLOCATION("S2:7") // BOW/WOB
 	PORT_DIPSETTING( 0x00, "Black characters on green screen" )
@@ -423,6 +424,14 @@ INPUT_PORTS_END
 
 void tv910_state::machine_start()
 {
+	// DCD needs to be driven somehow, or else the terminal will complain
+	auto *acia = subdevice<mos6551_device>(ACIA_TAG);
+	auto *rs232 = subdevice<rs232_port_device>(RS232_TAG);
+	if (rs232->get_card_device() == nullptr)
+		acia->write_dcd(0);
+
+	// DSR is tied to GND
+	acia->write_dsr(0);
 }
 
 void tv910_state::machine_reset()
@@ -531,12 +540,10 @@ MACHINE_CONFIG_START(tv910_state::tv910)
 	MCFG_MOS6551_IRQ_HANDLER(DEVWRITELINE("mainirq", input_merger_device, in_w<1>))
 	MCFG_MOS6551_TXD_HANDLER(DEVWRITELINE(RS232_TAG, rs232_port_device, write_txd))
 	MCFG_MOS6551_RTS_HANDLER(DEVWRITELINE(RS232_TAG, rs232_port_device, write_rts))
-	MCFG_MOS6551_DTR_HANDLER(DEVWRITELINE(RS232_TAG, rs232_port_device, write_dtr))
 
 	MCFG_RS232_PORT_ADD(RS232_TAG, default_rs232_devices, nullptr)
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(ACIA_TAG, mos6551_device, write_rxd))
 	MCFG_RS232_DCD_HANDLER(DEVWRITELINE(ACIA_TAG, mos6551_device, write_dcd))
-	MCFG_RS232_DSR_HANDLER(DEVWRITELINE(ACIA_TAG, mos6551_device, write_dsr))
 	MCFG_RS232_CTS_HANDLER(DEVWRITELINE(ACIA_TAG, mos6551_device, write_cts))
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -557,5 +564,5 @@ ROM_START( tv910 )
 ROM_END
 
 /* Driver */
-//    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT  STATE         INIT  COMPANY      FULLNAME  FLAGS
-COMP( 1981, tv910,  0,      0,       tv910,     tv910, tv910_state,  0,    "TeleVideo", "TV910",  MACHINE_NOT_WORKING )
+//    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT  STATE         INIT  COMPANY              FULLNAME               FLAGS
+COMP( 1981, tv910,  0,      0,       tv910,     tv910, tv910_state,  0,    "TeleVideo Systems", "TeleVideo Model 910", 0 )
