@@ -10,20 +10,20 @@ Universal Commandline Options
 
 This section contains configuration options that are applicable to *all* MAME sub-builds (both SDL and Windows native).
 
-Core commands
+Core Commands
 ~~~~~~~~~~~~~
 
 | :ref:`help <mame-commandline-help>`
 | :ref:`validate <mame-commandline-validate>`
 
-Configuration commands
+Configuration Commands
 ~~~~~~~~~~~~~~~~~~~~~~
 
 | :ref:`createconfig <mame-commandline-createconfig>`
 | :ref:`showconfig <mame-commandline-showconfig>`
 | :ref:`showusage <mame-commandline-showusage>`
 
-Frontend commands
+Frontend Commands
 ~~~~~~~~~~~~~~~~~
 
 | :ref:`listxml <mame-commandline-listxml>`
@@ -45,7 +45,7 @@ Frontend commands
 | :ref:`getsoftlist <mame-commandline-getsoftlist>`
 | :ref:`verifysoftlist <mame-commandline-verifysoftlist>`
 
-OSD-related options
+OSD-related Options
 ~~~~~~~~~~~~~~~~~~~
 
 | :ref:`uimodekey <mame-commandline-uimodekey>`
@@ -56,18 +56,37 @@ OSD-related options
 | :ref:`lightgunprovider <mame-commandline-lightgunprovider>`
 | :ref:`joystickprovider <mame-commandline-joystickprovider>`
 
-OSD CLI options
+OSD CLI Options
 ~~~~~~~~~~~~~~~
 
-| :ref:`listxml <mame-commandline->`
+| :ref:`listmidi <mame-commandline-listmidi>`
+| :ref:`listnetwork <mame-commandline-listnetwork>`
 
+OSD Output Options
+~~~~~~~~~~~~~~~~~~
 
+| :ref:`output <mame-commandline-output>`
 
+Configuration Options
+~~~~~~~~~~~~~~~~~~~~~
 
+| :ref:`noreadconfig <mame-commandline-noreadconfig>`
 
+Core Search Path Options
+~~~~~~~~~~~~~~~~~~~~~~~~
 
+| :ref:`rompath <mame-commandline-rompath>`
+| :ref:`hashpath <mame-commandline-hashpath>`
+| :ref:`samplepath <mame-commandline-samplepath>`
+| :ref:`artpath <mame-commandline-artpath>`
+| :ref:`ctrlrpath <mame-commandline-ctrlrpath>`
+| :ref:`inipath <mame-commandline-inipath>`
+| :ref:`fontpath <mame-commandline-fontpath>`
+| :ref:`cheatpath <mame-commandline-cheatpath>`
+| :ref:`crosshairpath <mame-commandline-crosshairpath>`
+| :ref:`pluginspath <mame-commandline-pluginspath>`
+| :ref:`languagepath <mame-commandline-languagepath>`
 
-
-
-
+Core Output Directory Options
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

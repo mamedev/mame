@@ -6,7 +6,7 @@ Universal Commandline Options
 
 This section contains configuration options that are applicable to *all* MAME sub-builds (both SDL and Windows native).
 
-Core commands
+Core Commands
 -------------
 
 .. _mame-commandline-help:
@@ -25,7 +25,7 @@ Core commands
 
 
 
-Configuration commands
+Configuration Commands
 ----------------------
 
 .. _mame-commandline-createconfig:
@@ -57,7 +57,7 @@ Configuration commands
 
 
 
-Frontend commands
+Frontend Commands
 -----------------
 
 Note: By default, all the '**-list**' commands below write info to the screen. If you wish to write the info to a textfile instead, add this to the end of your command:
@@ -185,7 +185,7 @@ Note: By default, all the '**-list**' commands below write info to the screen. I
 
 .. _osd-commandline-options:
 
-OSD related options
+OSD-related Options
 -------------------
 
 .. _mame-commandline-uimodekey:
@@ -254,12 +254,16 @@ OSD related options
 
 
 
-OSD CLI options
+OSD CLI Options
 ---------------
+
+.. _mame-commandline-listmidi:
 
 **\-listmidi**
 
     Create a list of available MIDI I/O devices for use with emulation.
+
+.. _mame-commandline-listnetwork:
 
 **\-listnetwork**
 
@@ -267,8 +271,10 @@ OSD CLI options
 
 
 
-OSD output options
+OSD Output Options
 ------------------
+
+.. _mame-commandline-output:
 
 **\-output**
 
@@ -280,8 +286,10 @@ OSD output options
 
 
 
-Configuration options
+Configuration Options
 ---------------------
+
+.. _mame-commandline-noreadconfig:
 
 **-[no]readconfig** / **-[no]rc**
 
@@ -308,48 +316,70 @@ Configuration options
 
 
 
-Core search path options
+Core Search Path Options
 ------------------------
+
+.. _mame-commandline-rompath:
 
 **-rompath** / **-rp** *<path>*
 
 	Specifies a list of paths within which to find ROM or hard disk images. Multiple paths can be specified by separating them with semicolons. The default is 'roms' (that is, a directory "roms" in the same directory as the MAME executable).
 
+.. _mame-commandline-hashpath:
+
 **-hashpath** *<path>*
 
 	Specifies a list of paths within which to find Software List HASH files. Multiple paths can be specified by separating them with semicolons. The default is 'hash' (that is, a directory "roms" in the same directory as the MAME executable).
+
+.. _mame-commandline-samplepath:
 
 **-samplepath** / **-sp** *<path>*
 
 	Specifies a list of paths within which to find sample files. Multiple paths can be specified by separating them with semicolons. The default is 'samples' (that is, a directory "samples" in the same directory as the MAME executable).
 
+.. _mame-commandline-artpath:
+
 **-artpath** *<path>* / **-artwork_directory** *<path>*
 
 	Specifies a list of paths within which to find artwork files. Multiple paths can be specified by separating them with semicolons. The default is 'artwork' (that is, a directory "artwork" in the same directory as the MAME executable).
+
+.. _mame-commandline-ctrlrpath:
 
 **-ctrlrpath** / **-ctrlr_directory** *<path>*
 
 	Specifies a list of paths within which to find controller-specific configuration files. Multiple paths can be specified by separating them with semicolons. The default is 'ctrlr' (that is, a directory "ctrlr" in the same directory as the MAME executable).
 
+.. _mame-commandline-inipath:
+
 **-inipath** *<path>*
 
 	Specifies a list of paths within which to find .INI files. Multiple paths can be specified by separating them with semicolons. The default is '.;ini' (that is, search in the current directory first, and then in the directory "ini" in the same directory as the MAME executable).
+
+.. _mame-commandline-fontpath:
 
 **-fontpath** *<path>*
 
 	Specifies a list of paths within which to find .BDF font files. Multiple paths can be specified by separating them with semicolons. The default is '.' (that is, search in the same directory as the MAME executable).
 
+.. _mame-commandline-cheatpath:
+
 **-cheatpath** *<path>*
 
     Specifies a list of paths within which to find .XML cheat files. Multiple paths can be specified by separating them with semicolons. The default is 'cheat' (that is, a folder called 'cheat' located in the same directory as the as the MAME executable).
+
+.. _mame-commandline-crosshairpath:
 
 **-crosshairpath** *<path>*
 
 	Specifies a list of paths within which to find crosshair files. Multiple paths can be specified by separating them with semicolons. The default is 'crsshair' (that is, a directory "crsshair" in the same directory as the MAME executable).  If the Crosshair is set to default in the menu, MAME will look for gamename\\cross#.png and then cross#.png in the specified crsshairpath, where # is the player number.  Failing that, MAME will use built-in default crosshairs.
 
+.. _mame-commandline-pluginspath:
+
 **-pluginspath** *<path>*
 
 	Specifies a list of paths within which to find Lua plugins for MAME.
+
+.. _mame-commandline-languagepath:
 
 **-languagepath** *<path>*
 
@@ -390,7 +420,7 @@ Core Output Directory Options
 
 
 
-Core state/playback options
+Core State/Playback Options
 ---------------------------
 
 **-[no]rewind**
@@ -485,7 +515,7 @@ Core state/playback options
 
 
 
-Core performance options
+Core Performance Options
 ------------------------
 
 **-[no]autoframeskip** / **-[no]afs**
@@ -518,7 +548,7 @@ Core performance options
 
 
 
-Core rotation options
+Core Rotation Options
 ---------------------
 
 | **-[no]rotate**
@@ -555,7 +585,7 @@ Core rotation options
 |
 
 
-Core artwork options
+Core Artwork Options
 --------------------
 
 **-[no]artwork_crop** / **-[no]artcrop**
@@ -584,7 +614,7 @@ Core artwork options
 
 
 
-Core screen options
+Core Screen Options
 -------------------
 
 **-brightness** *<value>*
@@ -609,7 +639,7 @@ Core screen options
 
 
 
-Core vector options
+Core Vector Options
 -------------------
 
 **-[no]antialias** / **-[no]aa**
@@ -626,7 +656,7 @@ Core vector options
 
 
 
-Core sound options
+Core Sound Options
 ------------------
 
 **-samplerate** *<value>* / **-sr** *<value>*
@@ -643,7 +673,7 @@ Core sound options
 
 
 
-Core input options
+Core Input Options
 ------------------
 
 **-[no]coin_lockout** / **-[no]coinlock**
@@ -710,7 +740,7 @@ Core input options
  | 777888999.777888999.777888999.444555666.444555666.444555666.111222333.111222333.111222333 |
  +-------------------------------------------------------------------------------------------+
  
-	However, this can be reduced using several shorthands supported by the <map> parameter. If information about a row is missing, then it is assumed that any missing data in columns 5-9 are left/right symmetric with data in columns 0-4; and any missing data in colums 0-4 is assumed to be copies of the previous data. The same logic applies to missing rows, except that up/down symmetry is assumed.
+	However, this can be reduced using several shorthands supported by the <map> parameter. If information about a row is missing, then it is assumed that any missing data in columns 5-9 are left/right symmetric with data in columns 0-4; and any missing data in columns 0-4 is assumed to be copies of the previous data. The same logic applies to missing rows, except that up/down symmetry is assumed.
 
 	By using these shorthands, the 81 character map can be simply specified by this 11 character string: 7778...4445
 
@@ -742,7 +772,7 @@ Core input options
 
 
 
-Core input automatic enable options
+Core Input Automatic Enable Options
 -----------------------------------
 
 **\-paddle_device**       enable (none|keyboard|mouse|lightgun|joystick) if a paddle control is present
@@ -765,7 +795,7 @@ Core input automatic enable options
 
 
 
-Debugging options
+Debugging Options
 -----------------
 
 **-[no]verbose** / **-[no]v**
@@ -793,7 +823,7 @@ Debugging options
 	Enables updating of the main screen bitmap while the game is paused. This means that the VIDEO_UPDATE callback will be called repeatedly during pause, which can be useful for debugging. The default is OFF (*-noupdate_in_pause*).
 
 
-Core communication options
+Core Communication Options
 --------------------------
 
 **-comm_localhost** *<string>*
@@ -814,7 +844,7 @@ Core communication options
 
 
 
-Core misc options
+Core Misc Options
 -----------------
 
 **-[no]drc**
