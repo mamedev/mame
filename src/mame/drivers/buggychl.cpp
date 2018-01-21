@@ -449,13 +449,13 @@ void buggychl_state::machine_reset()
 MACHINE_CONFIG_START(buggychl_state::buggychl)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_48MHz/8) /* 6 MHz according to schematics, though it can be jumpered for 4MHz as well */
+	MCFG_CPU_ADD("maincpu", Z80, XTAL(48'000'000)/8) /* 6 MHz according to schematics, though it can be jumpered for 4MHz as well */
 	MCFG_CPU_PROGRAM_MAP(buggychl_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", buggychl_state,  irq0_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_8MHz/2) /* 4 MHz according to schematics */
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL(8'000'000)/2) /* 4 MHz according to schematics */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(buggychl_state, irq0_line_hold, ((((XTAL_8MHz/2)/2)/256)/64)) // timer irq
+	MCFG_CPU_PERIODIC_INT_DRIVER(buggychl_state, irq0_line_hold, ((((XTAL(8'000'000)/2)/2)/256)/64)) // timer irq
 	// schematics shows a 61.035 (x2?) Hz, similar to flstory.cpp and other Taito MSM5232 based games.
 	// apparently schematics also shows a switch for the timer irq that makes it to run at half speed, no idea where this is located.
 	/* audiocpu nmi is caused by (main->sound semaphore)&&(sound_nmi_enabled), identical to bubble bobble. */
@@ -475,7 +475,7 @@ MACHINE_CONFIG_START(buggychl_state::buggychl)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	// derived from ladyfrog.cpp, causes glitches?
-//  MCFG_SCREEN_RAW_PARAMS( XTAL_8MHz, 510, 0, 256, 262, 2*8, 30*8 ) // pixel clock appears to run at 8 MHz
+//  MCFG_SCREEN_RAW_PARAMS( XTAL(8'000'000), 510, 0, 256, 262, 2*8, 30*8 ) // pixel clock appears to run at 8 MHz
 	MCFG_SCREEN_UPDATE_DRIVER(buggychl_state, screen_update_buggychl)
 	MCFG_SCREEN_PALETTE("palette")
 
@@ -498,17 +498,17 @@ MACHINE_CONFIG_START(buggychl_state::buggychl)
 
 	MCFG_TA7630_ADD("ta7630")
 
-	MCFG_SOUND_ADD("ay1", YM2149, XTAL_8MHz/4)
+	MCFG_SOUND_ADD("ay1", YM2149, XTAL(8'000'000)/4)
 	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(buggychl_state, ta7630_volbal_ay1_w))
 	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(buggychl_state, port_b_0_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MCFG_SOUND_ADD("ay2", YM2149, XTAL_8MHz/4)
+	MCFG_SOUND_ADD("ay2", YM2149, XTAL(8'000'000)/4)
 	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(buggychl_state, ta7630_volbal_ay2_w))
 	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(buggychl_state, port_b_1_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MCFG_SOUND_ADD("msm", MSM5232, XTAL_8MHz/4)
+	MCFG_SOUND_ADD("msm", MSM5232, XTAL(8'000'000)/4)
 	MCFG_MSM5232_SET_CAPACITORS(0.39e-6, 0.39e-6, 0.39e-6, 0.39e-6, 0.39e-6, 0.39e-6, 0.39e-6, 0.39e-6) /* default 0.39 uF capacitors (not verified) */
 	MCFG_SOUND_ROUTE(0, "mono", 1.0)    // pin 28  2'-1
 	MCFG_SOUND_ROUTE(1, "mono", 1.0)    // pin 29  4'-1

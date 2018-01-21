@@ -35,7 +35,7 @@ TODO:
 #include "speaker.h"
 
 
-#define MASTER_CLOCK    XTAL_19_968MHz
+#define MASTER_CLOCK    XTAL(19'968'000)
 
 class nightgal_state : public driver_device
 {

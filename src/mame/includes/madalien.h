@@ -12,7 +12,7 @@
 #include "sound/discrete.h"
 
 
-#define MADALIEN_MAIN_CLOCK     XTAL_10_595MHz
+#define MADALIEN_MAIN_CLOCK     XTAL(10'595'000)
 
 
 class madalien_state : public driver_device

@@ -154,7 +154,7 @@ Notes:
 #include "speaker.h"
 
 
-#define MASTER_CLOCK    XTAL_24MHz
+#define MASTER_CLOCK    XTAL(24'000'000)
 
 
 WRITE8_MEMBER(lsasquad_state::lsasquad_bankswitch_w)

@@ -10,8 +10,8 @@
 
 
 /* oscillators and clocks */
-#define JEDI_MAIN_CPU_OSC       (XTAL_10MHz)
-#define JEDI_AUDIO_CPU_OSC      (XTAL_12_096MHz)
+#define JEDI_MAIN_CPU_OSC       (XTAL(10'000'000))
+#define JEDI_AUDIO_CPU_OSC      (XTAL(12'096'000))
 #define JEDI_MAIN_CPU_CLOCK     (JEDI_MAIN_CPU_OSC / 4)
 #define JEDI_AUDIO_CPU_CLOCK    (JEDI_AUDIO_CPU_OSC / 8)
 #define JEDI_POKEY_CLOCK        (JEDI_AUDIO_CPU_CLOCK)

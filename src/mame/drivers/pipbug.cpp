@@ -156,7 +156,7 @@ QUICKLOAD_LOAD_MEMBER( pipbug_state, pipbug )
 
 MACHINE_CONFIG_START(pipbug_state::pipbug)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", S2650, XTAL_1MHz)
+	MCFG_CPU_ADD("maincpu", S2650, XTAL(1'000'000))
 	MCFG_CPU_PROGRAM_MAP(pipbug_mem)
 	MCFG_CPU_DATA_MAP(pipbug_data)
 	MCFG_S2650_FLAG_OUTPUT(DEVWRITELINE("rs232", rs232_port_device, write_txd))

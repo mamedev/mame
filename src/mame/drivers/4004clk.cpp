@@ -127,7 +127,7 @@ void nixieclock_state::machine_start()
 MACHINE_CONFIG_START(nixieclock_state::_4004clk)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I4004, XTAL_5MHz / 8)
+	MCFG_CPU_ADD("maincpu", I4004, XTAL(5'000'000) / 8)
 	MCFG_I4004_ROM_MAP(4004clk_rom)
 	MCFG_I4004_RAM_MEMORY_MAP(4004clk_mem)
 	MCFG_I4004_ROM_PORTS_MAP(4004clk_rp)

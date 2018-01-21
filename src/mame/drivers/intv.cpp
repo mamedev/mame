@@ -457,13 +457,13 @@ INTERRUPT_GEN_MEMBER(intv_state::intv_interrupt2)
 
 MACHINE_CONFIG_START(intv_state::intv)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", CP1610, XTAL_3_579545MHz/4)        /* Colorburst/4 */
+	MCFG_CPU_ADD("maincpu", CP1610, XTAL(3'579'545)/4)        /* Colorburst/4 */
 	MCFG_CPU_PROGRAM_MAP(intv_mem)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", intv_state,  intv_interrupt)
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("stic", STIC, XTAL_3_579545MHz)
+	MCFG_DEVICE_ADD("stic", STIC, XTAL(3'579'545))
 	MCFG_VIDEO_SET_SCREEN("screen")
 
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -483,7 +483,7 @@ MACHINE_CONFIG_START(intv_state::intv)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("ay8914", AY8914, XTAL_3_579545MHz/2)
+	MCFG_SOUND_ADD("ay8914", AY8914, XTAL(3'579'545)/2)
 	MCFG_AY8910_PORT_A_READ_CB(DEVREAD8("iopt_right_ctrl", intv_control_port_device, ctrl_r))
 	MCFG_AY8910_PORT_B_READ_CB(DEVREAD8("iopt_left_ctrl",  intv_control_port_device, ctrl_r))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.33)
@@ -534,7 +534,7 @@ MACHINE_CONFIG_DERIVED(intv_state::intvkbd, intv)
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_PROGRAM_MAP(intvkbd_mem)
 
-	MCFG_CPU_ADD("keyboard", M6502, XTAL_3_579545MHz/2) /* Colorburst/2 */
+	MCFG_CPU_ADD("keyboard", M6502, XTAL(3'579'545)/2) /* Colorburst/2 */
 	MCFG_CPU_PROGRAM_MAP(intvkbd2_mem)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", intv_state,  intv_interrupt2)
 
@@ -546,7 +546,7 @@ MACHINE_CONFIG_DERIVED(intv_state::intvkbd, intv)
 	MCFG_PALETTE_INIT_OWNER(intv_state, intv)
 
 	/* crt controller */
-	MCFG_DEVICE_ADD("crtc", TMS9927, XTAL_7_15909MHz)
+	MCFG_DEVICE_ADD("crtc", TMS9927, XTAL(7'159'090))
 	MCFG_TMS9927_CHAR_WIDTH(8)
 	MCFG_TMS9927_OVERSCAN(stic_device::OVERSCAN_LEFT_WIDTH*stic_device::X_SCALE*INTVKBD_X_SCALE, stic_device::OVERSCAN_RIGHT_WIDTH*stic_device::X_SCALE*INTVKBD_X_SCALE,
 						  stic_device::OVERSCAN_TOP_HEIGHT*stic_device::Y_SCALE*INTVKBD_Y_SCALE, stic_device::OVERSCAN_BOTTOM_HEIGHT*stic_device::Y_SCALE*INTVKBD_Y_SCALE)

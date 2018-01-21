@@ -271,11 +271,11 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(targeth_state::targeth)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz/2)          /* 12 MHz */
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(24'000'000)/2)          /* 12 MHz */
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", targeth_state, irq2_line_hold)
 
-	MCFG_DEVICE_ADD("gaelco_ds5002fp", GAELCO_DS5002FP, XTAL_24MHz / 2)
+	MCFG_DEVICE_ADD("gaelco_ds5002fp", GAELCO_DS5002FP, XTAL(24'000'000) / 2)
 	MCFG_DEVICE_ADDRESS_MAP(0, mcu_hostmem_map)
 
 	MCFG_DEVICE_ADD("outlatch", LS259, 0)
@@ -298,7 +298,7 @@ MACHINE_CONFIG_START(targeth_state::targeth)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_OKIM6295_ADD("oki", XTAL_1MHz, PIN7_HIGH) // 1MHz resonator - pin 7 not verified
+	MCFG_OKIM6295_ADD("oki", XTAL(1'000'000), PIN7_HIGH) // 1MHz resonator - pin 7 not verified
 	MCFG_DEVICE_ADDRESS_MAP(0, oki_map)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END

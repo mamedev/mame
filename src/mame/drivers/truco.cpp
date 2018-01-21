@@ -212,7 +212,7 @@
 #include "speaker.h"
 
 
-#define MASTER_CLOCK    XTAL_12MHz          /* confirmed */
+#define MASTER_CLOCK    XTAL(12'000'000)          /* confirmed */
 #define CPU_CLOCK       (MASTER_CLOCK/16)   /* guess */
 #define CRTC_CLOCK      (MASTER_CLOCK/8)    /* guess */
 

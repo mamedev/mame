@@ -85,8 +85,8 @@ ________________________|___________________________
 #include "speaker.h"
 
 
-#define MASTER_CLOCK    XTAL_16MHz
-#define VIDEO_CLOCK     XTAL_6MHz
+#define MASTER_CLOCK    XTAL(16'000'000)
+#define VIDEO_CLOCK     XTAL(6'000'000)
 
 
 class flipjack_state : public driver_device

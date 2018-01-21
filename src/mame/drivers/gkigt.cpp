@@ -238,7 +238,7 @@ GFXDECODE_END
 MACHINE_CONFIG_START(igt_gameking_state::igt_gameking)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I960, XTAL_24MHz)
+	MCFG_CPU_ADD("maincpu", I960, XTAL(24'000'000))
 	MCFG_CPU_PROGRAM_MAP(igt_gameking_mem)
 
 
@@ -251,7 +251,7 @@ MACHINE_CONFIG_START(igt_gameking_state::igt_gameking)
 	MCFG_SCREEN_VISIBLE_AREA(8*8, 48*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(igt_gameking_state, screen_update_igt_gameking)
 	MCFG_SCREEN_PALETTE("palette")
-	// Xilinx used as video chip XTAL_26_66666MHz on board
+	// Xilinx used as video chip XTAL(26'666'666) on board
 
 	MCFG_PALETTE_ADD("palette", 0x200)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
@@ -259,7 +259,7 @@ MACHINE_CONFIG_START(igt_gameking_state::igt_gameking)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ymz", YMZ280B, XTAL_16_9344MHz) // enhanced sound on optional Media-Lite sub board
+	MCFG_SOUND_ADD("ymz", YMZ280B, XTAL(16'934'400)) // enhanced sound on optional Media-Lite sub board
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MCFG_NVRAM_ADD_1FILL("nvram")

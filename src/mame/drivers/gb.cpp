@@ -607,7 +607,7 @@ PALETTE_INIT_MEMBER(megaduck_state, megaduck)
 MACHINE_CONFIG_START(gb_state::gameboy)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", LR35902, XTAL_4_194304Mhz)
+	MCFG_CPU_ADD("maincpu", LR35902, XTAL(4'194'304))
 	MCFG_CPU_PROGRAM_MAP(gameboy_map)
 	MCFG_LR35902_TIMER_CB( WRITE8( gb_state, gb_timer_callback ) )
 	MCFG_LR35902_HALT_BUG
@@ -632,7 +632,7 @@ MACHINE_CONFIG_START(gb_state::gameboy)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-	MCFG_SOUND_ADD("apu", DMG_APU, XTAL_4_194304Mhz)
+	MCFG_SOUND_ADD("apu", DMG_APU, XTAL(4'194'304))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.50)
 
@@ -722,7 +722,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(gb_state::gbcolor)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", LR35902, XTAL_4_194304Mhz) // todo XTAL_8_388MHz
+	MCFG_CPU_ADD("maincpu", LR35902, XTAL(4'194'304)) // todo XTAL(8'388'000)
 	MCFG_CPU_PROGRAM_MAP(gbc_map)
 	MCFG_LR35902_TIMER_CB( WRITE8(gb_state, gb_timer_callback ) )
 
@@ -750,7 +750,7 @@ MACHINE_CONFIG_START(gb_state::gbcolor)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-	MCFG_SOUND_ADD("apu", CGB04_APU, XTAL_4_194304Mhz)
+	MCFG_SOUND_ADD("apu", CGB04_APU, XTAL(4'194'304))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.50)
 
@@ -768,7 +768,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(megaduck_state::megaduck)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", LR35902, XTAL_4_194304Mhz) /* 4.194304 MHz */
+	MCFG_CPU_ADD("maincpu", LR35902, XTAL(4'194'304)) /* 4.194304 MHz */
 	MCFG_CPU_PROGRAM_MAP(megaduck_map)
 	MCFG_LR35902_TIMER_CB( WRITE8(gb_state, gb_timer_callback ) )
 	MCFG_LR35902_HALT_BUG
@@ -796,7 +796,7 @@ MACHINE_CONFIG_START(megaduck_state::megaduck)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-	MCFG_SOUND_ADD("apu", DMG_APU, XTAL_4_194304Mhz)
+	MCFG_SOUND_ADD("apu", DMG_APU, XTAL(4'194'304))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.50)
 

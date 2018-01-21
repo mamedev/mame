@@ -388,12 +388,12 @@ MACHINE_RESET_MEMBER(bking_state,bking3)
 MACHINE_CONFIG_START(bking_state::bking)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("main_cpu", Z80, XTAL_12MHz/4) /* 3 MHz */
+	MCFG_CPU_ADD("main_cpu", Z80, XTAL(12'000'000)/4) /* 3 MHz */
 	MCFG_CPU_PROGRAM_MAP(bking_map)
 	MCFG_CPU_IO_MAP(bking_io_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", bking_state,  irq0_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_6MHz/2)  /* 3 MHz */
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL(6'000'000)/2)  /* 3 MHz */
 	MCFG_CPU_PROGRAM_MAP(bking_audio_map)
 	/* interrupts (from Jungle King hardware, might be wrong): */
 	/* - no interrupts synced with vblank */
@@ -426,10 +426,10 @@ MACHINE_CONFIG_START(bking_state::bking)
 	MCFG_INPUT_MERGER_ALL_HIGH("soundnmi")
 	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 
-	MCFG_SOUND_ADD("ay1", AY8910, XTAL_6MHz/4)
+	MCFG_SOUND_ADD("ay1", AY8910, XTAL(6'000'000)/4)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
 
-	MCFG_SOUND_ADD("ay2", AY8910, XTAL_6MHz/4)
+	MCFG_SOUND_ADD("ay2", AY8910, XTAL(6'000'000)/4)
 	MCFG_AY8910_PORT_A_WRITE_CB(DEVWRITE8("dac", dac_byte_interface, write))
 	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(bking_state, port_b_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
@@ -445,7 +445,7 @@ MACHINE_CONFIG_DERIVED(bking_state::bking3, bking)
 	MCFG_CPU_MODIFY("main_cpu")
 	MCFG_CPU_IO_MAP(bking3_io_map)
 
-	MCFG_DEVICE_ADD("bmcu", TAITO68705_MCU, XTAL_3MHz)      /* xtal is 3MHz, divided by 4 internally */
+	MCFG_DEVICE_ADD("bmcu", TAITO68705_MCU, XTAL(3'000'000))      /* xtal is 3MHz, divided by 4 internally */
 
 	MCFG_MACHINE_START_OVERRIDE(bking_state,bking3)
 	MCFG_MACHINE_RESET_OVERRIDE(bking_state,bking3)

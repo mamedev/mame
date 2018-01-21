@@ -152,7 +152,7 @@ static ADDRESS_MAP_START( elektron_map, AS_PROGRAM, 32, elekmono_state )
 ADDRESS_MAP_END
 
 MACHINE_CONFIG_START(elekmono_state::elektron)
-	MCFG_CPU_ADD("maincpu", MCF5206E, XTAL_25_447MHz)
+	MCFG_CPU_ADD("maincpu", MCF5206E, XTAL(25'447'000))
 	MCFG_CPU_PROGRAM_MAP(elektron_map)
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

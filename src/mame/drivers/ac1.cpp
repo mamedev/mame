@@ -128,11 +128,11 @@ INPUT_PORTS_END
 /* Machine driver */
 MACHINE_CONFIG_START(ac1_state::ac1)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_8MHz / 4)
+	MCFG_CPU_ADD("maincpu", Z80, XTAL(8'000'000) / 4)
 	MCFG_CPU_PROGRAM_MAP(ac1_mem)
 	MCFG_CPU_IO_MAP(ac1_io)
 
-	MCFG_DEVICE_ADD("z80pio", Z80PIO, XTAL_8MHz / 4)
+	MCFG_DEVICE_ADD("z80pio", Z80PIO, XTAL(8'000'000) / 4)
 	MCFG_Z80PIO_IN_PA_CB(READ8(ac1_state, ac1_port_a_r))
 	MCFG_Z80PIO_OUT_PA_CB(WRITE8(ac1_state, ac1_port_a_w))
 	MCFG_Z80PIO_IN_PB_CB(READ8(ac1_state, ac1_port_b_r))

@@ -277,10 +277,10 @@
 #define IRQ_DEBUG       (0)
 #define IRQ_LOG(x) do { if (IRQ_DEBUG) printf x; } while (0)
 
-#define MASTER_CLOCK XTAL_4MHz
+#define MASTER_CLOCK XTAL(4'000'000)
 /* TODO: clocks of this */
-#define PIXEL_CLOCK_15KHz XTAL_14_31818MHz
-#define PIXEL_CLOCK_24KHz XTAL_21_4772MHz
+#define PIXEL_CLOCK_15KHz XTAL(14'318'181)
+#define PIXEL_CLOCK_24KHz XTAL(21'477'272)
 
 #define I8214_TAG       "i8214"
 #define UPD1990A_TAG    "upd1990a"
@@ -2505,8 +2505,8 @@ MACHINE_RESET_MEMBER(pc8801_state,pc8801_clock_speed)
 	m_has_clock_speed = 1;
 	m_clock_setting = ioport("CFG")->read() & 0x80;
 
-	m_maincpu->set_unscaled_clock(m_clock_setting ?  XTAL_4MHz : XTAL_8MHz);
-	m_fdccpu->set_unscaled_clock(m_clock_setting ?  XTAL_4MHz : XTAL_8MHz); // correct?
+	m_maincpu->set_unscaled_clock(m_clock_setting ?  XTAL(4'000'000) : XTAL(8'000'000));
+	m_fdccpu->set_unscaled_clock(m_clock_setting ?  XTAL(4'000'000) : XTAL(8'000'000)); // correct?
 	m_baudrate_val = 0;
 }
 
@@ -2604,7 +2604,7 @@ MACHINE_CONFIG_START(pc8801_state::pc8801)
 	#ifdef USE_PROPER_I8214
 	MCFG_I8214_ADD(I8214_TAG, MASTER_CLOCK, pic_intf)
 	#endif
-	MCFG_UPD1990A_ADD(UPD1990A_TAG, XTAL_32_768kHz, NOOP, NOOP)
+	MCFG_UPD1990A_ADD(UPD1990A_TAG, XTAL(32'768), NOOP, NOOP)
 	//MCFG_CENTRONICS_ADD("centronics", centronics_devices, "printer")
 	MCFG_CASSETTE_ADD("cassette")
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED)

@@ -274,8 +274,8 @@
  *
  *************************************/
 
-#define MASTER_CLOCK        XTAL_48_66MHz
-#define SOUND_CLOCK         XTAL_4MHz
+#define MASTER_CLOCK        XTAL(48'660'000)
+#define SOUND_CLOCK         XTAL(4'000'000)
 
 #define PIXEL_CLOCK         (MASTER_CLOCK/8)
 
@@ -1046,7 +1046,7 @@ MACHINE_CONFIG_DERIVED(zaxxon_state::congo, root)
 
 	MCFG_CPU_ADD("audiocpu", Z80, SOUND_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(congo_sound_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(zaxxon_state, irq0_line_hold,  (double)SOUND_CLOCK/16/16/16/4)
+	MCFG_CPU_PERIODIC_INT_DRIVER(zaxxon_state, irq0_line_hold, SOUND_CLOCK/16/16/16/4)
 
 	/* video hardware */
 	MCFG_PALETTE_MODIFY("palette")

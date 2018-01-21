@@ -217,11 +217,11 @@ GFXDECODE_END
 MACHINE_CONFIG_START(vulgus_state::vulgus)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_12MHz/4)  /* 3 MHz */
+	MCFG_CPU_ADD("maincpu", Z80, XTAL(12'000'000)/4)  /* 3 MHz */
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", vulgus_state, vblank_irq)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_12MHz/4) /* 3 MHz */
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL(12'000'000)/4) /* 3 MHz */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(vulgus_state, irq0_line_hold, 8*60)
 
@@ -245,10 +245,10 @@ MACHINE_CONFIG_START(vulgus_state::vulgus)
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("ay1", AY8910, XTAL_12MHz/8) /* 1.5 MHz */
+	MCFG_SOUND_ADD("ay1", AY8910, XTAL(12'000'000)/8) /* 1.5 MHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MCFG_SOUND_ADD("ay2", AY8910, XTAL_12MHz/8) /* 1.5 MHz */
+	MCFG_SOUND_ADD("ay2", AY8910, XTAL(12'000'000)/8) /* 1.5 MHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 

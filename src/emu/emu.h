@@ -25,9 +25,11 @@
 #include <unordered_map>
 #include <unordered_set>
 
-// core emulator headers -- must be first
+// core emulator headers -- must be first (profiler needs attotime, attotime needs xtal)
 #include "emucore.h"
 #include "eminline.h"
+#include "xtal.h"
+#include "attotime.h"
 #include "profiler.h"
 
 // http interface helpers
@@ -40,7 +42,6 @@
 #include "vecstream.h"
 
 // emulator-specific utilities
-#include "attotime.h"
 #include "hash.h"
 #include "fileio.h"
 #include "delegate.h"
@@ -108,7 +109,6 @@ typedef void (*machine_config_constructor)(machine_config &config, device_t *own
 
 // generic helpers
 #include "devcb.h"
-#include "drivers/xtal.h"
 #include "bookkeeping.h"
 #include "video/generic.h"
 

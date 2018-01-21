@@ -27,7 +27,7 @@
 //**************************************************************************
 
 // SYM-1 main (and only) oscillator Y1
-#define SYM1_CLOCK  XTAL_1MHz
+#define SYM1_CLOCK  XTAL(1'000'000)
 
 #define LED_REFRESH_DELAY   attotime::from_usec(70)
 

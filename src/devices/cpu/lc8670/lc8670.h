@@ -85,6 +85,7 @@ public:
 
 	// static configuration helpers
 	static void static_set_cpu_clock(device_t &device, clock_source source, uint32_t clock) { downcast<lc8670_cpu_device &>(device).m_clocks[unsigned(source)] = clock; }
+	static void static_set_cpu_clock(device_t &device, clock_source source, const XTAL &clock) { static_set_cpu_clock(device, source, clock.value()); }
 	static void static_set_lcd_update_cb(device_t &device, lcd_update cb) { downcast<lc8670_cpu_device &>(device).m_lcd_update_func = cb; }
 	template <class Object> static devcb_base & static_set_bankswitch_cb(device_t &device, Object &&cb) { return downcast<lc8670_cpu_device &>(device).m_bankswitch_func.set_callback(std::forward<Object>(cb)); }
 

@@ -39,7 +39,7 @@ The Grid         v1.2   10/18/2000
 
 #define LOG_FW        (0)
 
-#define CPU_CLOCK       XTAL_60MHz
+#define CPU_CLOCK       XTAL(60'000'000)
 
 #define BEAM_DY         3
 #define BEAM_DX         3

@@ -411,11 +411,11 @@ const tiny_rom_entry *sb16_lle_device::device_rom_region() const
 }
 
 MACHINE_CONFIG_START(sb16_lle_device::device_add_mconfig)
-	MCFG_CPU_ADD("sb16_cpu", I80C52, XTAL_24MHz)
+	MCFG_CPU_ADD("sb16_cpu", I80C52, XTAL(24'000'000))
 	MCFG_CPU_IO_MAP(sb16_io)
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-	MCFG_SOUND_ADD("ymf262", YMF262, XTAL_14_31818MHz)
+	MCFG_SOUND_ADD("ymf262", YMF262, XTAL(14'318'181))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.00)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.00)
 	MCFG_SOUND_ROUTE(2, "lspeaker", 1.00)

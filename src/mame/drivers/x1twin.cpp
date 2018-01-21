@@ -38,9 +38,9 @@ public:
 };
 
 
-#define X1_MAIN_CLOCK XTAL_16MHz
-#define VDP_CLOCK  XTAL_42_9545MHz
-#define MCU_CLOCK  XTAL_6MHz
+#define X1_MAIN_CLOCK XTAL(16'000'000)
+#define VDP_CLOCK  XTAL(42'954'545)
+#define MCU_CLOCK  XTAL(6'000'000)
 #define PCE_MAIN_CLOCK      VDP_CLOCK / 2
 
 uint32_t x1twin_state::screen_update_x1pce(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)

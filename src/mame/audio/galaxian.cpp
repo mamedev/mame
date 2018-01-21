@@ -278,7 +278,7 @@ static DISCRETE_SOUND_START(galaxian)
 		/* since only a sample of the LFSR is latched @V2 we let the lfsr
 		 * run at a lower speed
 		 */
-		DISCRETE_LFSR_NOISE(NODE_150, 1, 1, RNG_RATE/100, 1.0, 0, 0.5, &galaxian_lfsr)
+		DISCRETE_LFSR_NOISE(NODE_150, 1, 1, RNG_RATE.dvalue()/100, 1.0, 0, 0.5, &galaxian_lfsr)
 		DISCRETE_SQUAREWFIX(NODE_151,1,60*264/2,1.0,50,0.5,0)  /* 2V signal */
 		DISCRETE_LOGIC_DFLIPFLOP(NODE_152,1,1,NODE_151,NODE_150)
 	DISCRETE_TASK_END()
@@ -315,7 +315,7 @@ static DISCRETE_SOUND_START(galaxian)
 		 * DISCRETE_COUNTER(NODE_132, 1, 0, NODE_130, 0, 15, DISC_COUNT_UP, 0, DISC_CLK_IS_FREQ)
 		 * but there is a native choice:
 		 */
-		DISCRETE_NOTE(NODE_132, 1, SOUND_CLOCK, GAL_INP_PITCH, 255, 15,  DISC_CLK_IS_FREQ)
+		DISCRETE_NOTE(NODE_132, 1, SOUND_CLOCK.dvalue(), GAL_INP_PITCH, 255, 15,  DISC_CLK_IS_FREQ)
 
 		/* from the 74393 (counter 2 above) only QA, QC, QD are used.
 		 * We decode three here and use SUB_NODE(133,x) below to access.

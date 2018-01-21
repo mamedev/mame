@@ -302,7 +302,7 @@ WRITE8_MEMBER( bullet_state::hdcon_w )
 	if (m_hdcon_sw)
 	{
 		// FDC clock
-		m_fdc->set_unscaled_clock(BIT(data, 2) ? XTAL_16MHz/16 : XTAL_16MHz/8);
+		m_fdc->set_unscaled_clock(BIT(data, 2) ? XTAL(16'000'000)/16 : XTAL(16'000'000)/8);
 
 		// density select
 		m_fdc->dden_w(BIT(data, 3));
@@ -495,7 +495,7 @@ WRITE8_MEMBER( bulletf_state::xfdc_w )
 	}
 
 	// FDC clock
-	m_fdc->set_unscaled_clock(BIT(data, 6) ? XTAL_16MHz/16 : XTAL_16MHz/8);
+	m_fdc->set_unscaled_clock(BIT(data, 6) ? XTAL(16'000'000)/16 : XTAL(16'000'000)/8);
 
 	// density select
 	m_fdc->dden_w(BIT(data, 7));
@@ -1054,7 +1054,7 @@ void bullet_state::machine_reset()
 
 	uint8_t sw1 = m_sw1->read();
 	int mini = BIT(sw1, 6);
-	m_fdc->set_unscaled_clock(mini ? XTAL_16MHz/16 : XTAL_16MHz/8);
+	m_fdc->set_unscaled_clock(mini ? XTAL(16'000'000)/16 : XTAL(16'000'000)/8);
 	m_fdc->dden_w(BIT(sw1, 7));
 
 	if (mini)
@@ -1101,21 +1101,21 @@ void bulletf_state::machine_reset()
 
 MACHINE_CONFIG_START(bullet_state::bullet)
 	// basic machine hardware
-	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL_16MHz/4)
+	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL(16'000'000)/4)
 	MCFG_CPU_PROGRAM_MAP(bullet_mem)
 	MCFG_CPU_IO_MAP(bullet_io)
 	MCFG_Z80_DAISY_CHAIN(daisy_chain)
 
 	// devices
-	MCFG_DEVICE_ADD(Z80CTC_TAG, Z80CTC, XTAL_16MHz/4)
+	MCFG_DEVICE_ADD(Z80CTC_TAG, Z80CTC, XTAL(16'000'000)/4)
 	MCFG_Z80CTC_INTR_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
 	MCFG_Z80CTC_ZC0_CB(WRITELINE(bullet_state, dart_rxtxca_w))
 	MCFG_Z80CTC_ZC1_CB(DEVWRITELINE(Z80DART_TAG, z80dart_device, rxtxcb_w))
 	MCFG_Z80CTC_ZC2_CB(DEVWRITELINE(Z80CTC_TAG, z80ctc_device, trg3))
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("ctc", bullet_state, ctc_tick, attotime::from_hz(XTAL_4_9152MHz/4))
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("ctc", bullet_state, ctc_tick, attotime::from_hz(XTAL(4'915'200)/4))
 
-	MCFG_DEVICE_ADD(Z80DART_TAG, Z80DART, XTAL_16MHz/4)
+	MCFG_DEVICE_ADD(Z80DART_TAG, Z80DART, XTAL(16'000'000)/4)
 	MCFG_Z80DART_OUT_TXDA_CB(DEVWRITELINE(RS232_A_TAG, rs232_port_device, write_txd))
 	MCFG_Z80DART_OUT_DTRA_CB(DEVWRITELINE(RS232_A_TAG, rs232_port_device, write_dtr))
 	MCFG_Z80DART_OUT_RTSA_CB(DEVWRITELINE(RS232_A_TAG, rs232_port_device, write_rts))
@@ -1126,7 +1126,7 @@ MACHINE_CONFIG_START(bullet_state::bullet)
 	MCFG_Z80DART_OUT_WRDYB_CB(WRITELINE(bullet_state, dartbrdy_w))
 	MCFG_Z80DART_OUT_INT_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
 
-	MCFG_DEVICE_ADD(Z80DMA_TAG, Z80DMA, XTAL_16MHz/4)
+	MCFG_DEVICE_ADD(Z80DMA_TAG, Z80DMA, XTAL(16'000'000)/4)
 	MCFG_Z80DMA_OUT_BUSREQ_CB(INPUTLINE(Z80_TAG, INPUT_LINE_HALT))
 	MCFG_Z80DMA_OUT_INT_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
 	MCFG_Z80DMA_IN_MREQ_CB(READ8(bullet_state, dma_mreq_r))
@@ -1134,12 +1134,12 @@ MACHINE_CONFIG_START(bullet_state::bullet)
 	MCFG_Z80DMA_IN_IORQ_CB(READ8(bullet_state, io_read_byte))
 	MCFG_Z80DMA_OUT_IORQ_CB(WRITE8(bullet_state, io_write_byte))
 
-	MCFG_DEVICE_ADD(Z80PIO_TAG, Z80PIO, XTAL_16MHz/4)
+	MCFG_DEVICE_ADD(Z80PIO_TAG, Z80PIO, XTAL(16'000'000)/4)
 	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
 	MCFG_Z80PIO_OUT_PA_CB(DEVWRITE8("cent_data_out", output_latch_device, write))
 	MCFG_Z80PIO_IN_PB_CB(READ8(bullet_state, pio_pb_r))
 
-	MCFG_MB8877_ADD(MB8877_TAG, XTAL_16MHz/16)
+	MCFG_MB8877_ADD(MB8877_TAG, XTAL(16'000'000)/16)
 	MCFG_WD_FDC_INTRQ_CALLBACK(DEVWRITELINE(Z80DART_TAG, z80dart_device, dcda_w))
 	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(bullet_state, fdc_drq_w))
 	MCFG_FLOPPY_DRIVE_ADD(MB8877_TAG":0", bullet_525_floppies, "525qd", floppy_image_device::default_floppy_formats)
@@ -1181,21 +1181,21 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(bulletf_state::bulletf)
 	// basic machine hardware
-	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL_16MHz/4)
+	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL(16'000'000)/4)
 	MCFG_CPU_PROGRAM_MAP(bulletf_mem)
 	MCFG_CPU_IO_MAP(bulletf_io)
 	MCFG_Z80_DAISY_CHAIN(daisy_chain)
 
 	// devices
-	MCFG_DEVICE_ADD(Z80CTC_TAG, Z80CTC, XTAL_16MHz/4)
+	MCFG_DEVICE_ADD(Z80CTC_TAG, Z80CTC, XTAL(16'000'000)/4)
 	MCFG_Z80CTC_INTR_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
 	MCFG_Z80CTC_ZC0_CB(WRITELINE(bullet_state, dart_rxtxca_w))
 	MCFG_Z80CTC_ZC1_CB(DEVWRITELINE(Z80DART_TAG, z80dart_device, rxtxcb_w))
 	MCFG_Z80CTC_ZC2_CB(DEVWRITELINE(Z80CTC_TAG, z80ctc_device, trg3))
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("ctc", bullet_state, ctc_tick, attotime::from_hz(XTAL_4_9152MHz/4))
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("ctc", bullet_state, ctc_tick, attotime::from_hz(XTAL(4'915'200)/4))
 
-	MCFG_DEVICE_ADD(Z80DART_TAG, Z80DART, XTAL_16MHz/4)
+	MCFG_DEVICE_ADD(Z80DART_TAG, Z80DART, XTAL(16'000'000)/4)
 	MCFG_Z80DART_OUT_TXDA_CB(DEVWRITELINE(RS232_A_TAG, rs232_port_device, write_txd))
 	MCFG_Z80DART_OUT_DTRA_CB(DEVWRITELINE(RS232_A_TAG, rs232_port_device, write_dtr))
 	MCFG_Z80DART_OUT_RTSA_CB(DEVWRITELINE(RS232_A_TAG, rs232_port_device, write_rts))
@@ -1206,7 +1206,7 @@ MACHINE_CONFIG_START(bulletf_state::bulletf)
 	MCFG_Z80DART_OUT_WRDYB_CB(WRITELINE(bullet_state, dartbrdy_w))
 	MCFG_Z80DART_OUT_INT_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
 
-	MCFG_DEVICE_ADD(Z80DMA_TAG, Z80DMA, XTAL_16MHz/4)
+	MCFG_DEVICE_ADD(Z80DMA_TAG, Z80DMA, XTAL(16'000'000)/4)
 	MCFG_Z80DMA_OUT_BUSREQ_CB(INPUTLINE(Z80_TAG, INPUT_LINE_HALT))
 	MCFG_Z80DMA_OUT_INT_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
 	MCFG_Z80DMA_IN_MREQ_CB(READ8(bullet_state, dma_mreq_r))
@@ -1214,14 +1214,14 @@ MACHINE_CONFIG_START(bulletf_state::bulletf)
 	MCFG_Z80DMA_IN_IORQ_CB(READ8(bullet_state, io_read_byte))
 	MCFG_Z80DMA_OUT_IORQ_CB(WRITE8(bullet_state, io_write_byte))
 
-	MCFG_DEVICE_ADD(Z80PIO_TAG, Z80PIO, XTAL_16MHz/4)
+	MCFG_DEVICE_ADD(Z80PIO_TAG, Z80PIO, XTAL(16'000'000)/4)
 	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
 	MCFG_Z80PIO_IN_PA_CB(DEVREAD8("scsi_ctrl_in", input_buffer_device, read))
 	MCFG_Z80PIO_OUT_PA_CB(WRITE8(bulletf_state, pio_pa_w))
 	MCFG_Z80PIO_OUT_ARDY_CB(DEVWRITE8("cent_data_out", output_latch_device, write))
 	MCFG_Z80PIO_OUT_BRDY_CB(WRITELINE(bulletf_state, cstrb_w))
 
-	MCFG_MB8877_ADD(MB8877_TAG, XTAL_16MHz/16)
+	MCFG_MB8877_ADD(MB8877_TAG, XTAL(16'000'000)/16)
 	MCFG_WD_FDC_INTRQ_CALLBACK(DEVWRITELINE(Z80DART_TAG, z80dart_device, rib_w))
 	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(bullet_state, fdc_drq_w))
 	MCFG_FLOPPY_DRIVE_ADD(MB8877_TAG":0", bullet_525_floppies, "525qd", floppy_image_device::default_floppy_formats)

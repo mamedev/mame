@@ -67,7 +67,7 @@
 #include "speaker.h"
 //#include "sound/ay8910.h"
 
-#define MAIN_CLOCK XTAL_5MHz
+#define MAIN_CLOCK XTAL(5'000'000)
 
 class apc_state : public driver_device
 {
@@ -946,7 +946,7 @@ MACHINE_CONFIG_START(apc_state::apc)
 	MCFG_I8237_OUT_DACK_3_CB(WRITELINE(apc_state, apc_dack3_w))
 
 	MCFG_NVRAM_ADD_1FILL("cmos")
-	MCFG_UPD1990A_ADD("upd1990a", XTAL_32_768kHz, NOOP, NOOP)
+	MCFG_UPD1990A_ADD("upd1990a", XTAL(32'768), NOOP, NOOP)
 
 	MCFG_UPD765A_ADD("upd765", true, true)
 	MCFG_UPD765_INTRQ_CALLBACK(DEVWRITELINE("pic8259_slave", pic8259_device, ir4_w))

@@ -232,7 +232,7 @@ TODO :
 #include "speaker.h"
 
 
-#define MAIN_CLOCK        XTAL_12MHz
+#define MAIN_CLOCK        XTAL(12'000'000)
 #define CPU_CLOCK         MAIN_CLOCK / 4
 #define YM2203_CLOCK      MAIN_CLOCK / 4
 #define ES8712_CLOCK      8000              // 8Khz, it's the only clock for sure (pin13) it come from pin14 of M5205.

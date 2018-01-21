@@ -615,7 +615,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(gaelco_state::maniacsq)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz/2 ) /* verified on pcb */
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(24'000'000)/2 ) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(maniacsq_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", gaelco_state,  irq6_line_hold)
 
@@ -637,7 +637,7 @@ MACHINE_CONFIG_START(gaelco_state::maniacsq)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_OKIM6295_ADD("oki", XTAL_1MHz, PIN7_HIGH) // pin 7 not verified
+	MCFG_OKIM6295_ADD("oki", XTAL(1'000'000), PIN7_HIGH) // pin 7 not verified
 	MCFG_DEVICE_ADDRESS_MAP(0, oki_map)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
@@ -645,7 +645,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(gaelco_state::squash)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_20MHz/2 ) /* verified on pcb */
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(20'000'000)/2 ) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(squash_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", gaelco_state,  irq6_line_hold)
 
@@ -676,7 +676,7 @@ MACHINE_CONFIG_START(gaelco_state::squash)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_OKIM6295_ADD("oki", XTAL_1MHz, PIN7_HIGH) /* verified on pcb */
+	MCFG_OKIM6295_ADD("oki", XTAL(1'000'000), PIN7_HIGH) /* verified on pcb */
 	MCFG_DEVICE_ADDRESS_MAP(0, oki_map)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
@@ -684,7 +684,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(gaelco_state::thoop)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz/2 ) /* verified on pcb */
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(24'000'000)/2 ) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(thoop_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", gaelco_state,  irq6_line_hold)
 
@@ -715,7 +715,7 @@ MACHINE_CONFIG_START(gaelco_state::thoop)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_OKIM6295_ADD("oki", XTAL_1MHz, PIN7_HIGH) // pin 7 not verified
+	MCFG_OKIM6295_ADD("oki", XTAL(1'000'000), PIN7_HIGH) // pin 7 not verified
 	MCFG_DEVICE_ADDRESS_MAP(0, oki_map)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END

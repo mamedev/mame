@@ -331,15 +331,15 @@ INTERRUPT_GEN_MEMBER(tp84_state::sub_vblank_irq)
 MACHINE_CONFIG_START(tp84_state::tp84)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("cpu1", MC6809E, XTAL_18_432MHz/12) /* verified on pcb */
+	MCFG_CPU_ADD("cpu1", MC6809E, XTAL(18'432'000)/12) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(tp84_cpu1_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", tp84_state,  main_vblank_irq)
 
-	MCFG_CPU_ADD("sub", MC6809E, XTAL_18_432MHz/12)   /* verified on pcb */
+	MCFG_CPU_ADD("sub", MC6809E, XTAL(18'432'000)/12)   /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(cpu2_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", tp84_state,  sub_vblank_irq)
 
-	MCFG_CPU_ADD("audiocpu", Z80,XTAL_14_31818MHz/4) /* verified on pcb */
+	MCFG_CPU_ADD("audiocpu", Z80,XTAL(14'318'181)/4) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(audio_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))  /* 100 CPU slices per frame - an high value to ensure proper */
@@ -373,13 +373,13 @@ MACHINE_CONFIG_START(tp84_state::tp84)
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("y2404_1", Y2404, XTAL_14_31818MHz/8) /* verified on pcb */
+	MCFG_SOUND_ADD("y2404_1", Y2404, XTAL(14'318'181)/8) /* verified on pcb */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "filter1", 0.75)
 
-	MCFG_SOUND_ADD("y2404_2", Y2404, XTAL_14_31818MHz/8) /* verified on pcb */
+	MCFG_SOUND_ADD("y2404_2", Y2404, XTAL(14'318'181)/8) /* verified on pcb */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "filter2", 0.75)
 
-	MCFG_SOUND_ADD("y2404_3", Y2404, XTAL_14_31818MHz/8) /* verified on pcb */
+	MCFG_SOUND_ADD("y2404_3", Y2404, XTAL(14'318'181)/8) /* verified on pcb */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "filter3", 0.75)
 
 	MCFG_FILTER_RC_ADD("filter1", 0)

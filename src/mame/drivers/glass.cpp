@@ -231,7 +231,7 @@ void glass_state::machine_reset()
 MACHINE_CONFIG_START(glass_state::glass)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz/2)      /* 12 MHz verified on PCB */
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(24'000'000)/2)      /* 12 MHz verified on PCB */
 	MCFG_CPU_PROGRAM_MAP(glass_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", glass_state,  interrupt)
 
@@ -258,13 +258,13 @@ MACHINE_CONFIG_START(glass_state::glass)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_OKIM6295_ADD("oki", XTAL_1MHz, PIN7_HIGH) /* 1MHz Resonator & pin 7 high verified on PCB */
+	MCFG_OKIM6295_ADD("oki", XTAL(1'000'000), PIN7_HIGH) /* 1MHz Resonator & pin 7 high verified on PCB */
 	MCFG_DEVICE_ADDRESS_MAP(0, oki_map)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_DERIVED(glass_state::glass_ds5002fp, glass)
-	MCFG_DEVICE_ADD("gaelco_ds5002fp", GAELCO_DS5002FP, XTAL_24MHz / 2) /* verified on pcb */
+	MCFG_DEVICE_ADD("gaelco_ds5002fp", GAELCO_DS5002FP, XTAL(24'000'000) / 2) /* verified on pcb */
 	MCFG_DEVICE_ADDRESS_MAP(0, mcu_hostmem_map)
 MACHINE_CONFIG_END
 

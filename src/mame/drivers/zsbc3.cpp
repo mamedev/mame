@@ -79,21 +79,21 @@ INPUT_PORTS_END
 
 MACHINE_CONFIG_START(zsbc3_state::zsbc3)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",Z80, XTAL_16MHz / 4)
+	MCFG_CPU_ADD("maincpu",Z80, XTAL(16'000'000) / 4)
 	MCFG_CPU_PROGRAM_MAP(zsbc3_mem)
 	MCFG_CPU_IO_MAP(zsbc3_io)
 
-	MCFG_DEVICE_ADD("ctc", Z80CTC, XTAL_16MHz / 4)
+	MCFG_DEVICE_ADD("ctc", Z80CTC, XTAL(16'000'000) / 4)
 	MCFG_Z80CTC_ZC0_CB(DEVWRITELINE("sio", z80sio_device, txca_w))
 	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("sio", z80sio_device, rxca_w))
 
-	MCFG_DEVICE_ADD("clk2mhz", CLOCK, XTAL_16MHz / 8)
+	MCFG_DEVICE_ADD("clk2mhz", CLOCK, XTAL(16'000'000) / 8)
 	MCFG_CLOCK_SIGNAL_HANDLER(DEVWRITELINE("ctc", z80ctc_device, trg0))
 	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("ctc", z80ctc_device, trg1))
 	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("ctc", z80ctc_device, trg2))
 	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("ctc", z80ctc_device, trg3))
 
-	MCFG_DEVICE_ADD("sio", Z80SIO, XTAL_16MHz / 4)
+	MCFG_DEVICE_ADD("sio", Z80SIO, XTAL(16'000'000) / 4)
 	//MCFG_Z80SIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))  // no evidence of a daisy chain because IM2 is not set
 	MCFG_Z80SIO_OUT_TXDA_CB(DEVWRITELINE("rs232", rs232_port_device, write_txd))
 	MCFG_Z80SIO_OUT_DTRA_CB(DEVWRITELINE("rs232", rs232_port_device, write_dtr))
@@ -103,7 +103,7 @@ MACHINE_CONFIG_START(zsbc3_state::zsbc3)
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("sio", z80sio_device, rxa_w))
 	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("sio", z80sio_device, ctsa_w))
 
-	MCFG_DEVICE_ADD("pio", Z80PIO, XTAL_16MHz / 4)
+	MCFG_DEVICE_ADD("pio", Z80PIO, XTAL(16'000'000) / 4)
 	//MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
 MACHINE_CONFIG_END
 

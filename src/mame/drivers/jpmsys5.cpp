@@ -617,7 +617,7 @@ MACHINE_RESET_MEMBER(jpmsys5_state,jpmsys5v)
  *************************************/
 
 MACHINE_CONFIG_START(jpmsys5_state::jpmsys5v)
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_8MHz)
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(8'000'000))
 	MCFG_CPU_PROGRAM_MAP(68000_map)
 
 	MCFG_DEVICE_ADD("acia6850_0", ACIA6850, 0)
@@ -643,7 +643,7 @@ MACHINE_CONFIG_START(jpmsys5_state::jpmsys5v)
 	MCFG_MACHINE_RESET_OVERRIDE(jpmsys5_state,jpmsys5v)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL_40MHz / 4, 676, 20*4, 147*4, 256, 0, 254)
+	MCFG_SCREEN_RAW_PARAMS(XTAL(40'000'000) / 4, 676, 20*4, 147*4, 256, 0, 254)
 	MCFG_SCREEN_UPDATE_DRIVER(jpmsys5_state, screen_update_jpmsys5v)
 
 	MCFG_DEVICE_ADD("tms34061", TMS34061, 0)
@@ -833,7 +833,7 @@ MACHINE_RESET_MEMBER(jpmsys5_state,jpmsys5)
 
 // later (incompatible with earlier revision) motherboards used a YM2413
 MACHINE_CONFIG_START(jpmsys5_state::jpmsys5_ym)
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_8MHz)
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(8'000'000))
 
 	MCFG_CPU_PROGRAM_MAP(68000_awp_map)
 
@@ -887,7 +887,7 @@ MACHINE_CONFIG_END
 
 // the first rev PCB used an SAA1099
 MACHINE_CONFIG_START(jpmsys5_state::jpmsys5)
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_8MHz)
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(8'000'000))
 	MCFG_CPU_PROGRAM_MAP(68000_awp_map_saa)
 
 	MCFG_DEVICE_ADD("acia6850_0", ACIA6850, 0)

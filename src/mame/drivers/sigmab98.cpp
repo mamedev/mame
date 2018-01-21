@@ -2947,7 +2947,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(sigmab98_state::sammymdl_irq)
 }
 
 MACHINE_CONFIG_START(sigmab98_state::sammymdl)
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_20MHz / 2)    // !! KL5C80A120FP @ 10MHz? (actually 4 times faster than Z80) !!
+	MCFG_CPU_ADD("maincpu", Z80, XTAL(20'000'000) / 2)    // !! KL5C80A120FP @ 10MHz? (actually 4 times faster than Z80) !!
 	MCFG_CPU_PROGRAM_MAP( animalc_map )
 	MCFG_CPU_IO_MAP( animalc_io )
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", sigmab98_state, sammymdl_irq, "screen", 0, 1)
@@ -2981,7 +2981,7 @@ MACHINE_CONFIG_START(sigmab98_state::sammymdl)
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_OKIM9810_ADD("oki", XTAL_4_096MHz)
+	MCFG_OKIM9810_ADD("oki", XTAL(4'096'000))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.80)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.80)
 MACHINE_CONFIG_END

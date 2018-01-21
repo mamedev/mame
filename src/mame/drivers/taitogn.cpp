@@ -695,7 +695,7 @@ SLOT_INTERFACE_END
 MACHINE_CONFIG_START(taitogn_state::coh3002t)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD( "maincpu", CXD8661R, XTAL_100MHz )
+	MCFG_CPU_ADD( "maincpu", CXD8661R, XTAL(100'000'000) )
 	MCFG_CPU_PROGRAM_MAP(taitogn_map)
 
 	MCFG_RAM_MODIFY("maincpu:ram")
@@ -743,12 +743,12 @@ MACHINE_CONFIG_START(taitogn_state::coh3002t)
 	// we don't have a 78K0 emulation core yet..
 
 	/* video hardware */
-	MCFG_PSXGPU_ADD( "maincpu", "gpu", CXD8654Q, 0x200000, XTAL_53_693175MHz )
+	MCFG_PSXGPU_ADD( "maincpu", "gpu", CXD8654Q, 0x200000, XTAL(53'693'175) )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_SPU_ADD("spu", XTAL_67_7376MHz/2)
+	MCFG_SPU_ADD("spu", XTAL(67'737'600)/2)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.45)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.45)
 

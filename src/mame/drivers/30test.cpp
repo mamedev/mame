@@ -50,7 +50,7 @@ http://blogs.yahoo.co.jp/nadegatayosoyuki/59285865.html
 
 #include "30test.lh"
 
-#define MAIN_CLOCK XTAL_16MHz
+#define MAIN_CLOCK XTAL(16'000'000)
 
 class namco_30test_state : public driver_device
 {

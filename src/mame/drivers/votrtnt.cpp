@@ -135,7 +135,7 @@ MACHINE_RESET_MEMBER( votrtnt_state, votrtnt )
 
 MACHINE_CONFIG_START(votrtnt_state::votrtnt)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6802, XTAL_2_4576MHz)  /* 2.4576MHz XTAL, verified; divided by 4 inside the m6802*/
+	MCFG_CPU_ADD("maincpu", M6802, XTAL(2'457'600))  /* 2.4576MHz XTAL, verified; divided by 4 inside the m6802*/
 	MCFG_CPU_PROGRAM_MAP(6802_mem)
 
 	MCFG_MACHINE_RESET_OVERRIDE(votrtnt_state, votrtnt)

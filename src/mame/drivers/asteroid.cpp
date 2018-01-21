@@ -198,8 +198,8 @@ There is not a rev 03 known or dumped. An Asteroids rev 03 is not mentioned in a
 
 #include "astdelux.lh"
 
-#define MASTER_CLOCK (XTAL_12_096MHz)
-#define CLOCK_3KHZ   (double(MASTER_CLOCK) / 4096)
+#define MASTER_CLOCK (XTAL(12'096'000))
+#define CLOCK_3KHZ   (MASTER_CLOCK / 4096)
 
 /*************************************
  *
@@ -716,7 +716,7 @@ MACHINE_CONFIG_DERIVED(asteroid_state::llander, asteroid_base)
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(llander_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(asteroid_state, llander_interrupt,  (double)MASTER_CLOCK/4096/12)
+	MCFG_CPU_PERIODIC_INT_DRIVER(asteroid_state, llander_interrupt,  MASTER_CLOCK/4096/12)
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_REFRESH_RATE(CLOCK_3KHZ/12/6)

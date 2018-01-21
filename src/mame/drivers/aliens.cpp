@@ -194,11 +194,11 @@ WRITE8_MEMBER( aliens_state::banking_callback )
 MACHINE_CONFIG_START(aliens_state::aliens)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", KONAMI, XTAL_24MHz/2/4)       /* 052001 (verified on pcb) */
+	MCFG_CPU_ADD("maincpu", KONAMI, XTAL(24'000'000)/2/4)       /* 052001 (verified on pcb) */
 	MCFG_CPU_PROGRAM_MAP(aliens_map)
 	MCFG_KONAMICPU_LINE_CB(WRITE8(aliens_state, banking_callback))
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_3_579545MHz)     /* verified on pcb */
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL(3'579'545))     /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(aliens_sound_map)
 
 	MCFG_DEVICE_ADD("bank0000", ADDRESS_MAP_BANK, 0)
@@ -212,9 +212,9 @@ MACHINE_CONFIG_START(aliens_state::aliens)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL_24MHz/3, 528, 112, 400, 256, 16, 240) // measured 59.17
+	MCFG_SCREEN_RAW_PARAMS(XTAL(24'000'000)/3, 528, 112, 400, 256, 16, 240) // measured 59.17
 //  6MHz dotclock is more realistic, however needs drawing updates. replace when ready
-//  MCFG_SCREEN_RAW_PARAMS(XTAL_24MHz/4, 396, hbend, hbstart, 256, 16, 240)
+//  MCFG_SCREEN_RAW_PARAMS(XTAL(24'000'000)/4, 396, hbend, hbstart, 256, 16, 240)
 	MCFG_SCREEN_UPDATE_DRIVER(aliens_state, screen_update_aliens)
 	MCFG_SCREEN_PALETTE("palette")
 
@@ -237,12 +237,12 @@ MACHINE_CONFIG_START(aliens_state::aliens)
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_YM2151_ADD("ymsnd", XTAL_3_579545MHz)  /* verified on pcb */
+	MCFG_YM2151_ADD("ymsnd", XTAL(3'579'545))  /* verified on pcb */
 	MCFG_YM2151_PORT_WRITE_HANDLER(WRITE8(aliens_state,aliens_snd_bankswitch_w))
 	MCFG_SOUND_ROUTE(0, "mono", 0.60)
 	MCFG_SOUND_ROUTE(1, "mono", 0.60)
 
-	MCFG_SOUND_ADD("k007232", K007232, XTAL_3_579545MHz)    /* verified on pcb */
+	MCFG_SOUND_ADD("k007232", K007232, XTAL(3'579'545))    /* verified on pcb */
 	MCFG_K007232_PORT_WRITE_HANDLER(WRITE8(aliens_state, volume_callback))
 	MCFG_SOUND_ROUTE(0, "mono", 0.20)
 	MCFG_SOUND_ROUTE(1, "mono", 0.20)

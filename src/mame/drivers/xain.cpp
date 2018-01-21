@@ -147,7 +147,7 @@ Updates by Bryan McPhail, 12/12/2004:
 #include "speaker.h"
 
 
-#define MASTER_CLOCK        XTAL_12MHz
+#define MASTER_CLOCK        XTAL(12'000'000)
 #define CPU_CLOCK           MASTER_CLOCK / 8
 #define MCU_CLOCK           MASTER_CLOCK / 4
 #define PIXEL_CLOCK         MASTER_CLOCK / 2

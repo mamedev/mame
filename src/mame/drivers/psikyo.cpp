@@ -1002,11 +1002,11 @@ void psikyo_state::machine_reset()
 MACHINE_CONFIG_START(psikyo_state::sngkace)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68EC020, XTAL_32MHz/2) /* verified on pcb */
+	MCFG_CPU_ADD("maincpu", M68EC020, XTAL(32'000'000)/2) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(sngkace_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", psikyo_state,  irq1_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_32MHz/8) /* verified on pcb */
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL(32'000'000)/8) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(sngkace_sound_map)
 	MCFG_CPU_IO_MAP(sngkace_sound_io_map)
 
@@ -1030,7 +1030,7 @@ MACHINE_CONFIG_START(psikyo_state::sngkace)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ymsnd", YM2610, XTAL_32MHz/4) /* verified on pcb */
+	MCFG_SOUND_ADD("ymsnd", YM2610, XTAL(32'000'000)/4) /* verified on pcb */
 	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono",  1.0)
 
@@ -1118,7 +1118,7 @@ MACHINE_CONFIG_START(psikyo_state::s1945bl) /* Bootleg hardware based on the unp
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_OKIM6295_ADD("oki", XTAL_16MHz/16, PIN7_LOW) // ?? clock
+	MCFG_OKIM6295_ADD("oki", XTAL(16'000'000)/16, PIN7_LOW) // ?? clock
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 	MCFG_DEVICE_ADDRESS_MAP(0, s1945bl_oki_map)
 MACHINE_CONFIG_END

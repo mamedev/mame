@@ -18,7 +18,7 @@
 #include "speaker.h"
 
 
-#define SOUND_CLOCK XTAL_4MHz
+#define SOUND_CLOCK XTAL(4'000'000)
 
 
 INPUT_CHANGED_MEMBER(madalien_state::coin_inserted)

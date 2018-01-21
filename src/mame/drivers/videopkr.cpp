@@ -295,9 +295,9 @@
 #include "videopkr.lh"
 
 
-#define CPU_CLOCK       (XTAL_6MHz)         /* main cpu clock */
-#define CPU_CLOCK_ALT   (XTAL_8MHz)         /* alternative main cpu clock for newer games */
-#define SOUND_CLOCK     (XTAL_8MHz)         /* sound cpu clock */
+#define CPU_CLOCK       (XTAL(6'000'000))         /* main cpu clock */
+#define CPU_CLOCK_ALT   (XTAL(8'000'000))         /* alternative main cpu clock for newer games */
+#define SOUND_CLOCK     (XTAL(8'000'000))         /* sound cpu clock */
 #define VIDEO_CLOCK     (XTAL_7.8643MHz)
 
 
@@ -1357,7 +1357,7 @@ MACHINE_CONFIG_DERIVED(videopkr_state::fortune1, videopkr)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_DERIVED(videopkr_state::bpoker, babypkr)
-	MCFG_CPU_REPLACE("maincpu", I8751, XTAL_6MHz)
+	MCFG_CPU_REPLACE("maincpu", I8751, XTAL(6'000'000))
 	MCFG_CPU_PROGRAM_MAP(i8751_map)
 	MCFG_CPU_IO_MAP(i8751_io_port)
 

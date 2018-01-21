@@ -1412,7 +1412,7 @@ Note:
 #include "speaker.h"
 
 
-#define MAIN_CLOCK XTAL_8MHz
+#define MAIN_CLOCK XTAL(8'000'000)
 
 class zaurus_state : public driver_device
 {
@@ -1755,7 +1755,7 @@ MACHINE_CONFIG_START(zaurus_state::zaurus)
 	MCFG_CPU_ADD("maincpu",PXA255,MAIN_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(zaurus_map)
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("rtc_timer", zaurus_state, rtc_irq_callback, attotime::from_hz(XTAL_32_768kHz))
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("rtc_timer", zaurus_state, rtc_irq_callback, attotime::from_hz(XTAL(32'768)))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

@@ -130,7 +130,7 @@
 #include <algorithm>
 
 
-#define MASTER_CLOCK        XTAL_12MHz  /* confirmed */
+#define MASTER_CLOCK        XTAL(12'000'000)  /* confirmed */
 #define HOPPER_PULSE        50 // guessed
 
 

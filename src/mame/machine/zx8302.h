@@ -100,6 +100,7 @@ public:
 	zx8302_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	static void set_rtc_clock(device_t &device, int rtc_clock) { downcast<zx8302_device &>(device).m_rtc_clock = rtc_clock; }
+	static void set_rtc_clock(device_t &device, const XTAL &rtc_clock) { set_rtc_clock(device, rtc_clock.value()); }
 	template <class Object> static devcb_base &set_out_ipl1l_callback(device_t &device, Object &&cb) { return downcast<zx8302_device &>(device).m_out_ipl1l_cb.set_callback(std::forward<Object>(cb)); }
 	template <class Object> static devcb_base &set_out_baudx4_callback(device_t &device, Object &&cb) { return downcast<zx8302_device &>(device).m_out_baudx4_cb.set_callback(std::forward<Object>(cb)); }
 	template <class Object> static devcb_base &set_out_comdata_callback(device_t &device, Object &&cb) { return downcast<zx8302_device &>(device).m_out_comdata_cb.set_callback(std::forward<Object>(cb)); }

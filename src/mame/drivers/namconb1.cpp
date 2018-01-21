@@ -281,7 +281,7 @@ GFX:                Custom 145     ( 80 pin PQFP)
 #include "speaker.h"
 
 
-#define MASTER_CLOCK    XTAL_48_384MHz
+#define MASTER_CLOCK    XTAL(48'384'000)
 
 #define ENABLE_LOGGING (0)
 

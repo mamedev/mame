@@ -143,7 +143,7 @@ INPUT_PORTS_END
 
 MACHINE_CONFIG_START(elekscmp_state::elekscmp)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",INS8060, XTAL_4MHz)
+	MCFG_CPU_ADD("maincpu",INS8060, XTAL(4'000'000))
 	MCFG_CPU_PROGRAM_MAP(mem_map)
 
 	/* video hardware */

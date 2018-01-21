@@ -739,10 +739,10 @@ MACHINE_CONFIG_START(tutor_state::tutor)
 	// basic machine hardware
 	// TMS9995 CPU @ 10.7 MHz
 	// No lines connected yet
-	MCFG_TMS99xx_ADD("maincpu", TMS9995, XTAL_10_738635MHz, tutor_memmap, tutor_io)
+	MCFG_TMS99xx_ADD("maincpu", TMS9995, XTAL(10'738'635), tutor_memmap, tutor_io)
 
 	/* video hardware */
-	MCFG_DEVICE_ADD( "tms9928a", TMS9928A, XTAL_10_738635MHz / 2 )
+	MCFG_DEVICE_ADD( "tms9928a", TMS9928A, XTAL(10'738'635) / 2 )
 	MCFG_TMS9928A_VRAM_SIZE(0x4000)
 	MCFG_TMS9928A_SCREEN_ADD_NTSC( "screen" )
 	MCFG_SCREEN_UPDATE_DEVICE( "tms9928a", tms9928a_device, screen_update )

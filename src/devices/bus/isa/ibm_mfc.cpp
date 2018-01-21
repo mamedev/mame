@@ -373,7 +373,7 @@ ROM_END
 //-------------------------------------------------
 
 MACHINE_CONFIG_START(isa8_ibm_mfc_device::device_add_mconfig)
-	MCFG_CPU_ADD("ibm_mfc", Z80, XTAL_11_8MHz / 2)
+	MCFG_CPU_ADD("ibm_mfc", Z80, XTAL(11'800'000) / 2)
 	MCFG_CPU_PROGRAM_MAP(prg_map)
 	MCFG_CPU_IO_MAP(io_map)
 
@@ -390,19 +390,19 @@ MACHINE_CONFIG_START(isa8_ibm_mfc_device::device_add_mconfig)
 
 	MCFG_DEVICE_ADD("d71051", I8251, 0)
 
-	MCFG_DEVICE_ADD("usart_clock", CLOCK, XTAL_4MHz / 8) // 500KHz
+	MCFG_DEVICE_ADD("usart_clock", CLOCK, XTAL(4'000'000) / 8) // 500KHz
 	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(isa8_ibm_mfc_device, write_usart_clock))
 
 	MCFG_DEVICE_ADD("d8253", PIT8253, 0)
-	MCFG_PIT8253_CLK0(XTAL_4MHz / 8)
+	MCFG_PIT8253_CLK0(XTAL(4'000'000) / 8)
 	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(isa8_ibm_mfc_device, d8253_out0))
 	MCFG_PIT8253_CLK1(0)
 	MCFG_PIT8253_OUT1_HANDLER(WRITELINE(isa8_ibm_mfc_device, d8253_out1))
-	MCFG_PIT8253_CLK2(XTAL_4MHz / 2)
+	MCFG_PIT8253_CLK2(XTAL(4'000'000) / 2)
 	MCFG_PIT8253_OUT2_HANDLER(DEVWRITELINE("d8253", pit8253_device, write_clk1))
 
 	MCFG_SPEAKER_STANDARD_STEREO("ymleft", "ymright")
-	MCFG_YM2151_ADD("ym2151", XTAL_4MHz)
+	MCFG_YM2151_ADD("ym2151", XTAL(4'000'000))
 	MCFG_YM2151_IRQ_HANDLER(WRITELINE(isa8_ibm_mfc_device, ibm_mfc_ym_irq))
 	MCFG_SOUND_ROUTE(0, "ymleft", 1.00)
 	MCFG_SOUND_ROUTE(1, "ymright", 1.00)

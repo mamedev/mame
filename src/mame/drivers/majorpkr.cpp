@@ -463,7 +463,7 @@
 #include "majorpkr.lh"
 
 
-#define MASTER_CLOCK    XTAL_12MHz
+#define MASTER_CLOCK    XTAL(12'000'000)
 #define CPU_CLOCK       (MASTER_CLOCK / 2)   // 6 MHz, measured.
 #define OKI_CLOCK       (MASTER_CLOCK / 8)   // 1.5 MHz, measured.
 #define CRTC_CLOCK      (MASTER_CLOCK / 16)  // 750 kHz, measured.

@@ -1907,11 +1907,11 @@ void taitob_state::machine_reset()
 MACHINE_CONFIG_START(taitob_state::rastsag2)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz/2)   /* 12 MHz */
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(24'000'000)/2)   /* 12 MHz */
 	MCFG_CPU_PROGRAM_MAP(rastsag2_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", taitob_state,  rastansaga2_interrupt)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_16MHz/4)  /* 4 MHz */
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL(16'000'000)/4)  /* 4 MHz */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
@@ -1949,7 +1949,7 @@ MACHINE_CONFIG_START(taitob_state::rastsag2)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ymsnd", YM2610, XTAL_16MHz/2)  /* 8 MHz */
+	MCFG_SOUND_ADD("ymsnd", YM2610, XTAL(16'000'000)/2)  /* 8 MHz */
 	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "mono", 0.25)
 	MCFG_SOUND_ROUTE(1, "mono", 1.0)
@@ -1964,11 +1964,11 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(taitob_state::masterw)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz/2)   /* 12 MHz */
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(24'000'000)/2)   /* 12 MHz */
 	MCFG_CPU_PROGRAM_MAP(masterw_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", taitob_state,  masterw_interrupt)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_24MHz/4)  /* 6 MHz Z80B */
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL(24'000'000)/4)  /* 6 MHz Z80B */
 	MCFG_CPU_PROGRAM_MAP(masterw_sound_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
@@ -2006,7 +2006,7 @@ MACHINE_CONFIG_START(taitob_state::masterw)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ymsnd", YM2203, XTAL_24MHz/8)  /* 3 MHz */
+	MCFG_SOUND_ADD("ymsnd", YM2203, XTAL(24'000'000)/8)  /* 3 MHz */
 	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(taitob_state, bankswitch_w))
 	MCFG_SOUND_ROUTE(0, "mono", 0.25)
@@ -2040,11 +2040,11 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(taitob_state::ashura)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz/2)   /* 12 MHz */
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(24'000'000)/2)   /* 12 MHz */
 	MCFG_CPU_PROGRAM_MAP(rastsag2_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", taitob_state,  rastansaga2_interrupt)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_16MHz/4)  /* 4 MHz */
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL(16'000'000)/4)  /* 4 MHz */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
@@ -2082,7 +2082,7 @@ MACHINE_CONFIG_START(taitob_state::ashura)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ymsnd", YM2610, XTAL_16MHz/2)  /* 8 MHz */
+	MCFG_SOUND_ADD("ymsnd", YM2610, XTAL(16'000'000)/2)  /* 8 MHz */
 	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "mono", 0.25)
 	MCFG_SOUND_ROUTE(1, "mono", 1.0)
@@ -2097,11 +2097,11 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(taitob_state::crimec)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz/2)   /* 12 MHz */
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(24'000'000)/2)   /* 12 MHz */
 	MCFG_CPU_PROGRAM_MAP(crimec_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", taitob_state,  crimec_interrupt)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_16MHz/4)  /* 4 MHz */
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL(16'000'000)/4)  /* 4 MHz */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
@@ -2139,7 +2139,7 @@ MACHINE_CONFIG_START(taitob_state::crimec)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ymsnd", YM2610, XTAL_16MHz/2)  /* 8 MHz */
+	MCFG_SOUND_ADD("ymsnd", YM2610, XTAL(16'000'000)/2)  /* 8 MHz */
 	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 
 	MCFG_SOUND_ROUTE(0, "mono", 0.25)
@@ -2155,11 +2155,11 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(taitob_state::hitice)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz/2)   /* 12 MHz */
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(24'000'000)/2)   /* 12 MHz */
 	MCFG_CPU_PROGRAM_MAP(hitice_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", taitob_state,  hitice_interrupt)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_24MHz/4)  /* 6 MHz Z80B */
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL(24'000'000)/4)  /* 6 MHz Z80B */
 	MCFG_CPU_PROGRAM_MAP(viofight_sound_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
@@ -2198,7 +2198,7 @@ MACHINE_CONFIG_START(taitob_state::hitice)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ymsnd", YM2203, XTAL_24MHz/8)  /* 3 MHz */
+	MCFG_SOUND_ADD("ymsnd", YM2203, XTAL(24'000'000)/8)  /* 3 MHz */
 	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(taitob_state, bankswitch_w))
 	MCFG_SOUND_ROUTE(0, "mono", 0.25)
@@ -2218,11 +2218,11 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(taitob_state::rambo3p)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz/2)   /* verified on pcb */
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(24'000'000)/2)   /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(rambo3_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", taitob_state,  rambo3_interrupt)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_16MHz/4) /* verified on pcb */
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL(16'000'000)/4) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
@@ -2260,7 +2260,7 @@ MACHINE_CONFIG_START(taitob_state::rambo3p)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ymsnd", YM2610, XTAL_16MHz/2)   /* verified on pcb */
+	MCFG_SOUND_ADD("ymsnd", YM2610, XTAL(16'000'000)/2)   /* verified on pcb */
 	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 
 	MCFG_SOUND_ROUTE(0, "mono", 0.25)
@@ -2276,11 +2276,11 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(taitob_state::rambo3)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz/2)   /* 12MHz verified on pcb */
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(24'000'000)/2)   /* 12MHz verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(rambo3_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", taitob_state,  rambo3_interrupt)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_16MHz/4) /* 4MHz verified on pcb */
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL(16'000'000)/4) /* 4MHz verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
@@ -2318,7 +2318,7 @@ MACHINE_CONFIG_START(taitob_state::rambo3)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ymsnd", YM2610, XTAL_16MHz/2)  /* 8 MHz verified on pcb */
+	MCFG_SOUND_ADD("ymsnd", YM2610, XTAL(16'000'000)/2)  /* 8 MHz verified on pcb */
 	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "mono", 0.25)
 	MCFG_SOUND_ROUTE(1, "mono", 1.0)
@@ -2333,11 +2333,11 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(taitob_state::pbobble)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz/2)   /* 12 MHz */
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(24'000'000)/2)   /* 12 MHz */
 	MCFG_CPU_PROGRAM_MAP(pbobble_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", taitob_state,  pbobble_interrupt)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_16MHz/2)  /* 4 MHz */
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL(16'000'000)/2)  /* 4 MHz */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 
 
@@ -2381,7 +2381,7 @@ MACHINE_CONFIG_START(taitob_state::pbobble)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ymsnd", YM2610B, XTAL_16MHz/2)  /* 8 MHz */
+	MCFG_SOUND_ADD("ymsnd", YM2610B, XTAL(16'000'000)/2)  /* 8 MHz */
 	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "mono", 0.25)
 	MCFG_SOUND_ROUTE(1, "mono", 1.0)
@@ -2396,11 +2396,11 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(taitob_state::spacedx)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz/2)   /* 12 MHz */
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(24'000'000)/2)   /* 12 MHz */
 	MCFG_CPU_PROGRAM_MAP(spacedx_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", taitob_state,  pbobble_interrupt)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_16MHz/4)  /* 4 MHz */
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL(16'000'000)/4)  /* 4 MHz */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
@@ -2444,7 +2444,7 @@ MACHINE_CONFIG_START(taitob_state::spacedx)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ymsnd", YM2610, XTAL_16MHz/2)  /* 8 MHz */
+	MCFG_SOUND_ADD("ymsnd", YM2610, XTAL(16'000'000)/2)  /* 8 MHz */
 	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "mono", 0.25)
 	MCFG_SOUND_ROUTE(1, "mono", 1.0)
@@ -2459,11 +2459,11 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(taitob_state::spacedxo)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz/2)   /* 12 MHz */
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(24'000'000)/2)   /* 12 MHz */
 	MCFG_CPU_PROGRAM_MAP(spacedxo_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", taitob_state,  selfeena_interrupt)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_16MHz/4)  /* 4 MHz */
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL(16'000'000)/4)  /* 4 MHz */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
@@ -2501,7 +2501,7 @@ MACHINE_CONFIG_START(taitob_state::spacedxo)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ymsnd", YM2610, XTAL_16MHz/2)  /* 8 MHz */
+	MCFG_SOUND_ADD("ymsnd", YM2610, XTAL(16'000'000)/2)  /* 8 MHz */
 	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "mono", 0.25)
 	MCFG_SOUND_ROUTE(1, "mono", 1.0)
@@ -2579,11 +2579,11 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(taitob_state::viofight)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz/2)   /* 12 MHz */
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(24'000'000)/2)   /* 12 MHz */
 	MCFG_CPU_PROGRAM_MAP(viofight_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", taitob_state,  viofight_interrupt)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_24MHz/4)  /* 6 MHz verified */
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL(24'000'000)/4)  /* 6 MHz verified */
 	MCFG_CPU_PROGRAM_MAP(viofight_sound_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
@@ -2621,7 +2621,7 @@ MACHINE_CONFIG_START(taitob_state::viofight)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ymsnd", YM2203, XTAL_24MHz/8)   /* 3 MHz */
+	MCFG_SOUND_ADD("ymsnd", YM2203, XTAL(24'000'000)/8)   /* 3 MHz */
 	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(taitob_state, bankswitch_w))
 	MCFG_SOUND_ROUTE(0, "mono", 0.25)
@@ -2629,7 +2629,7 @@ MACHINE_CONFIG_START(taitob_state::viofight)
 	MCFG_SOUND_ROUTE(2, "mono", 0.25)
 	MCFG_SOUND_ROUTE(3, "mono", 0.80)
 
-	MCFG_OKIM6295_ADD("oki", XTAL_4_224MHz/4, PIN7_HIGH) // 1.056MHz clock frequency, but pin 7 not verified
+	MCFG_OKIM6295_ADD("oki", XTAL(4'224'000)/4, PIN7_HIGH) // 1.056MHz clock frequency, but pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	MCFG_DEVICE_ADD("ciu", PC060HA, 0)
@@ -2641,11 +2641,11 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(taitob_state::silentd)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz/2)   /* 12 MHz */
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(24'000'000)/2)   /* 12 MHz */
 	MCFG_CPU_PROGRAM_MAP(silentd_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", taitob_state,  silentd_interrupt)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_16MHz/4)  /* 4 MHz */
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL(16'000'000)/4)  /* 4 MHz */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
@@ -2683,7 +2683,7 @@ MACHINE_CONFIG_START(taitob_state::silentd)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ymsnd", YM2610, XTAL_16MHz/2)  /* 8 MHz */
+	MCFG_SOUND_ADD("ymsnd", YM2610, XTAL(16'000'000)/2)  /* 8 MHz */
 	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "mono", 0.25)
 	MCFG_SOUND_ROUTE(1, "mono", 1.0)
@@ -2698,11 +2698,11 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(taitob_state::selfeena)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz/2)   /* 12 MHz */
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(24'000'000)/2)   /* 12 MHz */
 	MCFG_CPU_PROGRAM_MAP(selfeena_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", taitob_state,  selfeena_interrupt)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_16MHz/4)  /* 4 MHz */
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL(16'000'000)/4)  /* 4 MHz */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
@@ -2740,7 +2740,7 @@ MACHINE_CONFIG_START(taitob_state::selfeena)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ymsnd", YM2610, XTAL_16MHz/2)  /* 8 MHz */
+	MCFG_SOUND_ADD("ymsnd", YM2610, XTAL(16'000'000)/2)  /* 8 MHz */
 	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "mono", 0.25)
 	MCFG_SOUND_ROUTE(1, "mono", 1.0)
@@ -2764,11 +2764,11 @@ void taitob_state::ryujin_patch(void)
 MACHINE_CONFIG_START(taitob_state::ryujin)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz/2)   /* 12 MHz */
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(24'000'000)/2)   /* 12 MHz */
 	MCFG_CPU_PROGRAM_MAP(selfeena_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", taitob_state,  selfeena_interrupt)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_16MHz/4)  /* 4 MHz */
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL(16'000'000)/4)  /* 4 MHz */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
@@ -2806,7 +2806,7 @@ MACHINE_CONFIG_START(taitob_state::ryujin)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ymsnd", YM2610, XTAL_16MHz/2)  /* 8 MHz */
+	MCFG_SOUND_ADD("ymsnd", YM2610, XTAL(16'000'000)/2)  /* 8 MHz */
 	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "mono", 0.25)
 	MCFG_SOUND_ROUTE(1, "mono", 1.0)

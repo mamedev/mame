@@ -6018,7 +6018,7 @@ int saturn_state::get_pixel_clock( void )
 {
 	int res,divider;
 
-	res = m_vdp2.dotsel ? MASTER_CLOCK_352 : MASTER_CLOCK_320;
+	res = (m_vdp2.dotsel ? MASTER_CLOCK_352 : MASTER_CLOCK_320).value();
 	/* TODO: divider is ALWAYS 8, this thing is just to over-compensate for MAME framework faults ... */
 	divider = 8;
 

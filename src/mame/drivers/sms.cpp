@@ -253,15 +253,15 @@ DC00      - Selection buttons #2, 9-16 (R)
 #include "sms1.lh"
 
 
-#define MASTER_CLOCK_GG     32215905
-#define MASTER_CLOCK_PALN   10746168
+#define MASTER_CLOCK_GG     32215905.0
+#define MASTER_CLOCK_PALN   10746168.0
 // The clocks for PAL and PAL-M used here differ from their nominal values,
 // because with the latter errors will occur on Flubba's VDPTest, probably
 // due to rounding issues in the core.
 // Nominal XTAL value for SMS PAL-M (Brazil) is 10726834.
-#define MASTER_CLOCK_PALM   10726833
+#define MASTER_CLOCK_PALM   10726833.0
 // Nominal XTAL value for SMS PAL is 53203424.
-#define MASTER_CLOCK_PAL    53203425    /* 12 * subcarrier freq. (4.43361875MHz) */
+#define MASTER_CLOCK_PAL    53203425.0  /* 12 * subcarrier freq. (4.43361875MHz) */
 
 
 static ADDRESS_MAP_START( sms1_mem, AS_PROGRAM, 8, sms_state )
@@ -507,14 +507,14 @@ MACHINE_CONFIG_START(sms_state::sms_base)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_DERIVED(sms_state::sms_ntsc_base, sms_base)
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_10_738635MHz/3)
+	MCFG_CPU_ADD("maincpu", Z80, XTAL(10'738'635)/3)
 	MCFG_CPU_PROGRAM_MAP(sms_mem)
 	MCFG_CPU_IO_MAP(sms_io)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
 	/* actually, PSG is embedded in the VDP chip */
-	MCFG_SOUND_ADD("segapsg", SEGAPSG, XTAL_10_738635MHz/3)
+	MCFG_SOUND_ADD("segapsg", SEGAPSG, XTAL(10'738'635)/3)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_CONFIG_END
 
@@ -543,7 +543,7 @@ MACHINE_CONFIG_END
 		sega315_5124_device::HEIGHT_PAL, \
 		sega315_5124_device::TBORDER_START + sega315_5124_device::PAL_240_TBORDER_HEIGHT, \
 		sega315_5124_device::TBORDER_START + sega315_5124_device::PAL_240_TBORDER_HEIGHT + 240) \
-	MCFG_SCREEN_REFRESH_RATE((double) _pixelclock / (sega315_5124_device::WIDTH * sega315_5124_device::HEIGHT_PAL))
+	MCFG_SCREEN_REFRESH_RATE(_pixelclock / (sega315_5124_device::WIDTH * sega315_5124_device::HEIGHT_PAL))
 
 #define MCFG_SCREEN_SMS_NTSC_RAW_PARAMS(_pixelclock) \
 	MCFG_SCREEN_RAW_PARAMS(_pixelclock, \
@@ -553,7 +553,7 @@ MACHINE_CONFIG_END
 		sega315_5124_device::HEIGHT_NTSC, \
 		sega315_5124_device::TBORDER_START + sega315_5124_device::NTSC_224_TBORDER_HEIGHT, \
 		sega315_5124_device::TBORDER_START + sega315_5124_device::NTSC_224_TBORDER_HEIGHT + 224) \
-	MCFG_SCREEN_REFRESH_RATE((double) _pixelclock / (sega315_5124_device::WIDTH * sega315_5124_device::HEIGHT_NTSC))
+	MCFG_SCREEN_REFRESH_RATE(_pixelclock / (sega315_5124_device::WIDTH * sega315_5124_device::HEIGHT_NTSC))
 
 #define MCFG_SCREEN_GG_RAW_PARAMS(_pixelclock) \
 	MCFG_SCREEN_RAW_PARAMS(_pixelclock, \
@@ -563,13 +563,13 @@ MACHINE_CONFIG_END
 		sega315_5124_device::HEIGHT_NTSC, \
 		sega315_5124_device::TBORDER_START + sega315_5124_device::NTSC_192_TBORDER_HEIGHT + 3*8, \
 		sega315_5124_device::TBORDER_START + sega315_5124_device::NTSC_192_TBORDER_HEIGHT + 21*8 ) \
-	MCFG_SCREEN_REFRESH_RATE((double) _pixelclock / (sega315_5124_device::WIDTH * sega315_5124_device::HEIGHT_NTSC))
+	MCFG_SCREEN_REFRESH_RATE(_pixelclock / (sega315_5124_device::WIDTH * sega315_5124_device::HEIGHT_NTSC))
 
 
 MACHINE_CONFIG_DERIVED(sms_state::sms2_ntsc, sms_ntsc_base)
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_SMS_NTSC_RAW_PARAMS(XTAL_10_738635MHz/2)
+	MCFG_SCREEN_SMS_NTSC_RAW_PARAMS(XTAL(10'738'635)/2)
 	MCFG_SCREEN_UPDATE_DRIVER(sms_state, screen_update_sms)
 
 	MCFG_DEVICE_ADD("sms_vdp", SEGA315_5246, 0)
@@ -587,15 +587,15 @@ MACHINE_CONFIG_DERIVED(sms_state::sms1_ntsc, sms_ntsc_base)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_SMS_NTSC_RAW_PARAMS(XTAL_10_738635MHz/2)
+	MCFG_SCREEN_SMS_NTSC_RAW_PARAMS(XTAL(10'738'635)/2)
 	MCFG_SCREEN_UPDATE_DRIVER(sms_state, screen_update_sms1)
 
 	MCFG_SCREEN_ADD("left_lcd", LCD)    // This is needed for SegaScope Left LCD
-	MCFG_SCREEN_SMS_NTSC_RAW_PARAMS(XTAL_10_738635MHz/2)
+	MCFG_SCREEN_SMS_NTSC_RAW_PARAMS(XTAL(10'738'635)/2)
 	MCFG_SCREEN_UPDATE_DRIVER(sms_state, screen_update_sms1)
 
 	MCFG_SCREEN_ADD("right_lcd", LCD)   // This is needed for SegaScope Right LCD
-	MCFG_SCREEN_SMS_NTSC_RAW_PARAMS(XTAL_10_738635MHz/2)
+	MCFG_SCREEN_SMS_NTSC_RAW_PARAMS(XTAL(10'738'635)/2)
 	MCFG_SCREEN_UPDATE_DRIVER(sms_state, screen_update_sms1)
 
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(sms_state, screen_vblank_sms1))
@@ -621,7 +621,7 @@ MACHINE_CONFIG_DERIVED(smssdisp_state::sms_sdisp, sms1_ntsc)
 	MCFG_DEVICE_MODIFY("sms_vdp")
 	MCFG_SEGA315_5124_INT_CB(WRITELINE(smssdisp_state, sms_store_int_callback))
 
-	MCFG_CPU_ADD("control", Z80, XTAL_10_738635MHz/3)
+	MCFG_CPU_ADD("control", Z80, XTAL(10'738'635)/3)
 	MCFG_CPU_PROGRAM_MAP(sms_store_mem)
 	/* Both CPUs seem to communicate with the VDP etc? */
 	MCFG_CPU_IO_MAP(sms_io)
@@ -889,7 +889,7 @@ MACHINE_CONFIG_DERIVED(sms_state::smsj, sms1_kr)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(smsj_io)
 
-	MCFG_SOUND_ADD("ym2413", YM2413, XTAL_10_738635MHz/3)
+	MCFG_SOUND_ADD("ym2413", YM2413, XTAL(10'738'635)/3)
 	// if this output gain is changed, the gain set when unmute the output need
 	// to be changed too, probably along the gain set for the Mark III FM Unit.
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)

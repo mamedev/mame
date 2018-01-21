@@ -66,7 +66,7 @@ ROM_END
 
 MACHINE_CONFIG_START(electron_plus3_device::device_add_mconfig)
 	/* fdc */
-	MCFG_WD1770_ADD("fdc", XTAL_16MHz / 2)
+	MCFG_WD1770_ADD("fdc", XTAL(16'000'000) / 2)
 	MCFG_FLOPPY_DRIVE_ADD_FIXED("fdc:0", electron_floppies, "35dd", floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", electron_floppies, nullptr, floppy_formats)

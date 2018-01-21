@@ -42,7 +42,7 @@
 #endif
 
 
-#define DUSCC_CLOCK XTAL_14_7456MHz /* XXX Unverified */
+#define DUSCC_CLOCK XTAL(14'745'600) /* XXX Unverified */
 #define RS232P1_TAG      "rs232p1"
 #define RS232P2_TAG      "rs232p2"
 

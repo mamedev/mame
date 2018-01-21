@@ -537,14 +537,14 @@ void sf_state::machine_reset()
 MACHINE_CONFIG_START(sf_state::sfan)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_8MHz)
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(8'000'000))
 	MCFG_CPU_PROGRAM_MAP(sfan_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", sf_state, irq1_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_3_579545MHz)  /* ? xtal is 3.579545MHz */
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL(3'579'545))  /* ? xtal is 3.579545MHz */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 
-	MCFG_CPU_ADD("audio2", Z80, XTAL_3_579545MHz)    /* ? xtal is 3.579545MHz */
+	MCFG_CPU_ADD("audio2", Z80, XTAL(3'579'545))    /* ? xtal is 3.579545MHz */
 	MCFG_CPU_PROGRAM_MAP(sound2_map)
 	MCFG_CPU_IO_MAP(sound2_io_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(sf_state, irq0_line_hold, 8000) // ?
@@ -568,7 +568,7 @@ MACHINE_CONFIG_START(sf_state::sfan)
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_YM2151_ADD("ymsnd", XTAL_3_579545MHz)
+	MCFG_YM2151_ADD("ymsnd", XTAL(3'579'545))
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.60)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.60)

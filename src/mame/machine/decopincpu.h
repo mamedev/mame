@@ -54,7 +54,7 @@
 
 // 6808 CPU's input clock is 4MHz
 // but because it has an internal /4 divider, its E clock runs at 1/4 that frequency
-#define E_CLOCK (XTAL_4MHz/4)
+#define E_CLOCK (XTAL(4'000'000)/4)
 
 // Length of time in cycles between IRQs on the main 6808 CPU
 // This length is determined by the settings of the W14 and W15 jumpers

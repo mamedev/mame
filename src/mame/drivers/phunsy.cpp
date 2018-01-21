@@ -333,7 +333,7 @@ DRIVER_INIT_MEMBER( phunsy_state, phunsy )
 
 MACHINE_CONFIG_START(phunsy_state::phunsy)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",S2650, XTAL_1MHz)
+	MCFG_CPU_ADD("maincpu",S2650, XTAL(1'000'000))
 	MCFG_CPU_PROGRAM_MAP(phunsy_mem)
 	MCFG_CPU_IO_MAP(phunsy_io)
 	MCFG_CPU_DATA_MAP(phunsy_data)
@@ -348,7 +348,7 @@ MACHINE_CONFIG_START(phunsy_state::phunsy)
 	   - 16us not active, 48us active: ( 64 * 6 ) * 60 / 48 => 480 pixels wide
 	   - 313 line display of which 256 are displayed.
 	*/
-	MCFG_SCREEN_RAW_PARAMS(XTAL_8MHz, 480, 0, 64*6, 313, 0, 256)
+	MCFG_SCREEN_RAW_PARAMS(XTAL(8'000'000), 480, 0, 64*6, 313, 0, 256)
 	MCFG_SCREEN_UPDATE_DRIVER(phunsy_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 

@@ -230,7 +230,7 @@ GFXDECODE_END
 MACHINE_CONFIG_START(gunbustr_state::gunbustr)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68EC020, XTAL_16MHz)
+	MCFG_CPU_ADD("maincpu", M68EC020, XTAL(16'000'000))
 	MCFG_CPU_PROGRAM_MAP(gunbustr_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", gunbustr_state,  gunbustr_interrupt) /* VBL */
 

@@ -255,11 +255,11 @@ void kncljoe_state::machine_reset()
 MACHINE_CONFIG_START(kncljoe_state::kncljoe)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_6MHz)  /* verified on pcb */
+	MCFG_CPU_ADD("maincpu", Z80, XTAL(6'000'000))  /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", kncljoe_state,  irq0_line_hold)
 
-	MCFG_CPU_ADD("soundcpu", M6803, XTAL_3_579545MHz) /* verified on pcb */
+	MCFG_CPU_ADD("soundcpu", M6803, XTAL(3'579'545)) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 	MCFG_CPU_IO_MAP(sound_portmap)
 	MCFG_CPU_PERIODIC_INT_DRIVER(kncljoe_state, sound_nmi,  (double)3970) //measured 3.970 kHz
@@ -285,15 +285,15 @@ MACHINE_CONFIG_START(kncljoe_state::kncljoe)
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("aysnd", AY8910, XTAL_3_579545MHz/4) /* verified on pcb */
+	MCFG_SOUND_ADD("aysnd", AY8910, XTAL(3'579'545)/4) /* verified on pcb */
 	MCFG_AY8910_PORT_A_READ_CB(DEVREAD8("soundlatch", generic_latch_8_device, read))
 	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(kncljoe_state, unused_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
-	MCFG_SOUND_ADD("sn1", SN76489, XTAL_3_579545MHz) /* verified on pcb */
+	MCFG_SOUND_ADD("sn1", SN76489, XTAL(3'579'545)) /* verified on pcb */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
-	MCFG_SOUND_ADD("sn2", SN76489, XTAL_3_579545MHz) /* verified on pcb */
+	MCFG_SOUND_ADD("sn2", SN76489, XTAL(3'579'545)) /* verified on pcb */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 MACHINE_CONFIG_END
 

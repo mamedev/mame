@@ -437,11 +437,11 @@ void supduck_state::machine_reset()
 MACHINE_CONFIG_START(supduck_state::supduck)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_8MHz) /* Verified on PCB */
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(8'000'000)) /* Verified on PCB */
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", supduck_state,  irq2_line_hold) // 2 & 4?
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_8MHz/4) /* 2MHz - verified on PCB */
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL(8'000'000)/4) /* 2MHz - verified on PCB */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 
 	/* video hardware */
@@ -468,7 +468,7 @@ MACHINE_CONFIG_START(supduck_state::supduck)
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_OKIM6295_ADD("oki", XTAL_8MHz/8, PIN7_HIGH) // 1MHz - Verified on PCB, pin 7 not verified
+	MCFG_OKIM6295_ADD("oki", XTAL(8'000'000)/8, PIN7_HIGH) // 1MHz - Verified on PCB, pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 	MCFG_DEVICE_ADDRESS_MAP(0, oki_map)
 

@@ -175,7 +175,7 @@ PALETTE_INIT_MEMBER(fb01_state, fb01)
 
 MACHINE_CONFIG_START(fb01_state::fb01)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_12MHz/2)
+	MCFG_CPU_ADD("maincpu", Z80, XTAL(12'000'000)/2)
 	MCFG_CPU_PROGRAM_MAP(fb01_mem)
 	MCFG_CPU_IO_MAP(fb01_io)
 
@@ -198,12 +198,12 @@ MACHINE_CONFIG_START(fb01_state::fb01)
 	MCFG_HD44780_LCD_SIZE(2, 8)   // 2x8 displayed as 1x16
 	MCFG_HD44780_PIXEL_UPDATE_CB(fb01_state,fb01_pixel_update)
 
-	MCFG_DEVICE_ADD("upd71051", I8251, XTAL_4MHz)
+	MCFG_DEVICE_ADD("upd71051", I8251, XTAL(4'000'000))
 	MCFG_I8251_RXRDY_HANDLER(WRITELINE(fb01_state, upd71051_rxrdy_w))
 	MCFG_I8251_TXRDY_HANDLER(WRITELINE(fb01_state, upd71051_txrdy_w))
 	MCFG_I8251_TXD_HANDLER(DEVWRITELINE("mdout", midi_port_device, write_txd))
 
-	MCFG_DEVICE_ADD("usart_clock", CLOCK, XTAL_4MHz / 8) // 500KHz
+	MCFG_DEVICE_ADD("usart_clock", CLOCK, XTAL(4'000'000) / 8) // 500KHz
 	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(fb01_state, write_usart_clock))
 
 	MCFG_MIDI_PORT_ADD("mdin", midiin_slot, "midiin")
@@ -214,7 +214,7 @@ MACHINE_CONFIG_START(fb01_state::fb01)
 	MCFG_MIDI_PORT_ADD("mdthru", midiout_slot, "midiout")
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-	MCFG_YM2151_ADD("ym2164", XTAL_4MHz)
+	MCFG_YM2151_ADD("ym2164", XTAL(4'000'000))
 	MCFG_YM2151_IRQ_HANDLER(WRITELINE(fb01_state, ym2164_irq_w))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.00)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.00)

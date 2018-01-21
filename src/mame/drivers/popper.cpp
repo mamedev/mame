@@ -528,17 +528,17 @@ void popper_state::machine_reset()
 //**************************************************************************
 
 MACHINE_CONFIG_START(popper_state::popper)
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_18_432MHz/3/2)
+	MCFG_CPU_ADD("maincpu", Z80, XTAL(18'432'000)/3/2)
 	MCFG_CPU_PROGRAM_MAP(main_map)
 
-	MCFG_CPU_ADD("subcpu", Z80, XTAL_18_432MHz/3/2)
+	MCFG_CPU_ADD("subcpu", Z80, XTAL(18'432'000)/3/2)
 	MCFG_CPU_PROGRAM_MAP(sub_map)
 
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 
 	// video hardware
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL_18_432MHz/3, 384, 48, 328, 264, 16, 240)
+	MCFG_SCREEN_RAW_PARAMS(XTAL(18'432'000)/3, 384, 48, 328, 264, 16, 240)
 	MCFG_SCREEN_UPDATE_DRIVER(popper_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
@@ -550,10 +550,10 @@ MACHINE_CONFIG_START(popper_state::popper)
 	// audio hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ay1", AY8910, XTAL_18_432MHz/3/2/2)
+	MCFG_SOUND_ADD("ay1", AY8910, XTAL(18'432'000)/3/2/2)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MCFG_SOUND_ADD("ay2", AY8910, XTAL_18_432MHz/3/2/2)
+	MCFG_SOUND_ADD("ay2", AY8910, XTAL(18'432'000)/3/2/2)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 

@@ -136,11 +136,11 @@ nevada TYPE2 :  64       45      51       06       32      02        31     31  
 #include "speaker.h"
 
 
-#define MASTER_CLOCK    XTAL_16MHz
+#define MASTER_CLOCK    XTAL(16'000'000)
 #define MASTER_CPU      ((MASTER_CLOCK)/2)    // 8mhz
 #define SOUND_CLOCK     ((MASTER_CLOCK) /8)   // 2mhz
 
-#define VIDEO_CLOCK     XTAL_33MHz
+#define VIDEO_CLOCK     XTAL(33'000'000)
 #define MC6845_CLOCK    ((VIDEO_CLOCK)/4/16)  // 0.515625 MHZ
 
 
@@ -625,15 +625,15 @@ MACHINE_CONFIG_START(nevada_state::nevada)
 	MCFG_SOUND_ADD("aysnd", AY8912, SOUND_CLOCK)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 
-	MCFG_DEVICE_ADD("duart18_68681", MC68681, XTAL_3_6864MHz)  // UARTA = Modem 1200Baud
+	MCFG_DEVICE_ADD("duart18_68681", MC68681, XTAL(3'686'400))  // UARTA = Modem 1200Baud
 	MCFG_MC68681_IRQ_CALLBACK(WRITELINE(nevada_state, duart18_irq_handler))
 	MCFG_MC68681_INPORT_CALLBACK(IOPORT("DSW1"))
 
-	MCFG_DEVICE_ADD("duart39_68681", MC68681, XTAL_3_6864MHz)  // UARTA = Printer
+	MCFG_DEVICE_ADD("duart39_68681", MC68681, XTAL(3'686'400))  // UARTA = Printer
 	MCFG_MC68681_IRQ_CALLBACK(WRITELINE(nevada_state, duart39_irq_handler))
 	MCFG_MC68681_INPORT_CALLBACK(IOPORT("DSW2"))
 
-	MCFG_DEVICE_ADD("duart40_68681", MC68681, XTAL_3_6864MHz)  // UARTA = Touch , UARTB = Bill Acceptor
+	MCFG_DEVICE_ADD("duart40_68681", MC68681, XTAL(3'686'400))  // UARTA = Touch , UARTB = Bill Acceptor
 	MCFG_MC68681_IRQ_CALLBACK(WRITELINE(nevada_state, duart40_irq_handler))
 	MCFG_MC68681_A_TX_CALLBACK(DEVWRITELINE("microtouch", microtouch_device, rx))
 	MCFG_MC68681_INPORT_CALLBACK(IOPORT("DSW3"))
@@ -641,7 +641,7 @@ MACHINE_CONFIG_START(nevada_state::nevada)
 	MCFG_MICROTOUCH_ADD( "microtouch", 9600, DEVWRITELINE("duart40_68681", mc68681_device, rx_a_w) )
 
 	/* devices */
-	MCFG_DEVICE_ADD("rtc", MSM6242, XTAL_32_768kHz)
+	MCFG_DEVICE_ADD("rtc", MSM6242, XTAL(32'768))
 	MCFG_MSM6242_OUT_INT_HANDLER(WRITELINE(nevada_state, nevada_rtc_irq))
 
 MACHINE_CONFIG_END

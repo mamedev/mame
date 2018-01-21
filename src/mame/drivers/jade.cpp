@@ -60,21 +60,21 @@ INPUT_PORTS_END
 
 MACHINE_CONFIG_START(jade_state::jade)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",Z80, XTAL_4MHz)
+	MCFG_CPU_ADD("maincpu",Z80, XTAL(4'000'000))
 	MCFG_CPU_PROGRAM_MAP(mem_map)
 	MCFG_CPU_IO_MAP(io_map)
 
-	MCFG_DEVICE_ADD("ctc1", Z80CTC, XTAL_4MHz)
+	MCFG_DEVICE_ADD("ctc1", Z80CTC, XTAL(4'000'000))
 
-	MCFG_DEVICE_ADD("ctc2", Z80CTC, XTAL_4MHz)
+	MCFG_DEVICE_ADD("ctc2", Z80CTC, XTAL(4'000'000))
 	MCFG_Z80CTC_ZC0_CB(DEVWRITELINE("sio", z80sio_device, rxca_w))
 	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("sio", z80sio_device, txca_w))
 
-	MCFG_DEVICE_ADD("trg0", CLOCK, XTAL_4MHz / 2)
+	MCFG_DEVICE_ADD("trg0", CLOCK, XTAL(4'000'000) / 2)
 	MCFG_CLOCK_SIGNAL_HANDLER(DEVWRITELINE("ctc2", z80ctc_device, trg0))
 
 	/* Devices */
-	MCFG_DEVICE_ADD("sio", Z80SIO, XTAL_4MHz)
+	MCFG_DEVICE_ADD("sio", Z80SIO, XTAL(4'000'000))
 	//MCFG_Z80SIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))  // no evidence of a daisy chain because IM2 is not set
 	MCFG_Z80SIO_OUT_TXDA_CB(DEVWRITELINE("rs232", rs232_port_device, write_txd))
 	MCFG_Z80SIO_OUT_DTRA_CB(DEVWRITELINE("rs232", rs232_port_device, write_dtr))

@@ -103,7 +103,7 @@ void imsai_state::machine_reset()
 
 MACHINE_CONFIG_START(imsai_state::imsai)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",I8085A, XTAL_6MHz)
+	MCFG_CPU_ADD("maincpu",I8085A, XTAL(6'000'000))
 	MCFG_CPU_PROGRAM_MAP(imsai_mem)
 	MCFG_CPU_IO_MAP(imsai_io)
 
@@ -115,11 +115,11 @@ MACHINE_CONFIG_START(imsai_state::imsai)
 	MCFG_DEVICE_ADD("uart", I8251, 0)
 
 	MCFG_DEVICE_ADD("pit", PIT8253, 0)
-	MCFG_PIT8253_CLK0(XTAL_6MHz / 3) /* Timer 0: baud rate gen for 8251 */
+	MCFG_PIT8253_CLK0(XTAL(6'000'000) / 3) /* Timer 0: baud rate gen for 8251 */
 	MCFG_PIT8253_OUT0_HANDLER(DEVWRITELINE("uart", i8251_device, write_txc))
 	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("uart", i8251_device, write_rxc))
-	MCFG_PIT8253_CLK1(XTAL_6MHz / 3) /* Timer 1: user */
-	MCFG_PIT8253_CLK2(XTAL_6MHz / 3) /* Timer 2: user */
+	MCFG_PIT8253_CLK1(XTAL(6'000'000) / 3) /* Timer 1: user */
+	MCFG_PIT8253_CLK2(XTAL(6'000'000) / 3) /* Timer 2: user */
 MACHINE_CONFIG_END
 
 /* ROM definition */

@@ -121,6 +121,9 @@ public:
 
 	// inline configuration helpers
 	static void static_set_clocks(device_t &device, int clk3, int clk4, int clk5, int clk6);
+	static void static_set_clocks(device_t &device, const XTAL &clk3, const XTAL &clk4, const XTAL &clk5, const XTAL &clk6) {
+		static_set_clocks(device, clk3.value(), clk4.value(), clk5.value(), clk6.value());
+	}
 
 	// API
 	virtual DECLARE_READ8_MEMBER(read);

@@ -76,8 +76,8 @@
 #include "speaker.h"
 
 
-#define MAIN_CLOCK XTAL_10MHz
-#define AUDIO_CLOCK XTAL_3_579545MHz
+#define MAIN_CLOCK XTAL(10'000'000)
+#define AUDIO_CLOCK XTAL(3'579'545)
 
 WRITE16_MEMBER(blockout_state::blockout_irq6_ack_w)
 {
@@ -315,7 +315,7 @@ MACHINE_CONFIG_START(blockout_state::blockout)
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	/* assume same as ddragon3 with adjusted visible display area */
-	MCFG_SCREEN_RAW_PARAMS(XTAL_28MHz / 4, 448, 0, 320, 272, 10, 250)
+	MCFG_SCREEN_RAW_PARAMS(XTAL(28'000'000) / 4, 448, 0, 320, 272, 10, 250)
 	MCFG_SCREEN_UPDATE_DRIVER(blockout_state, screen_update_blockout)
 	MCFG_SCREEN_PALETTE("palette")
 

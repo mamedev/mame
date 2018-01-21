@@ -260,11 +260,11 @@ void asterix_state::machine_reset()
 MACHINE_CONFIG_START(asterix_state::asterix)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz/2) // 12MHz
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(24'000'000)/2) // 12MHz
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", asterix_state,  asterix_interrupt)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_32MHz/4) // 8MHz Z80E ??
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL(32'000'000)/4) // 8MHz Z80E ??
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 
 	MCFG_EEPROM_SERIAL_ER5911_8BIT_ADD("eeprom")
@@ -297,11 +297,11 @@ MACHINE_CONFIG_START(asterix_state::asterix)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_YM2151_ADD("ymsnd", XTAL_32MHz/8) // 4MHz
+	MCFG_YM2151_ADD("ymsnd", XTAL(32'000'000)/8) // 4MHz
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
-	MCFG_K053260_ADD("k053260", XTAL_32MHz/8) // 4MHz
+	MCFG_K053260_ADD("k053260", XTAL(32'000'000)/8) // 4MHz
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.75)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.75)
 MACHINE_CONFIG_END

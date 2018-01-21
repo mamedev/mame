@@ -433,14 +433,14 @@ void tecmosys_state::machine_start()
 }
 
 MACHINE_CONFIG_START(tecmosys_state::deroon)
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz)
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(16'000'000))
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", tecmosys_state,  irq1_line_hold)
 
 	MCFG_WATCHDOG_ADD("watchdog")
 	MCFG_WATCHDOG_VBLANK_INIT("screen", 400) // guess
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_16MHz/2 )
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL(16'000'000)/2 )
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 	MCFG_CPU_IO_MAP(io_map)
 
@@ -471,18 +471,18 @@ MACHINE_CONFIG_START(tecmosys_state::deroon)
 	MCFG_INPUT_MERGER_ALL_HIGH("soundnmi")
 	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 
-	MCFG_SOUND_ADD("ymf", YMF262, XTAL_14_31818MHz)
+	MCFG_SOUND_ADD("ymf", YMF262, XTAL(14'318'181))
 	MCFG_YMF262_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.00)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.00)
 	MCFG_SOUND_ROUTE(2, "lspeaker", 1.00)
 	MCFG_SOUND_ROUTE(3, "rspeaker", 1.00)
 
-	MCFG_OKIM6295_ADD("oki", XTAL_16MHz/8, PIN7_HIGH)
+	MCFG_OKIM6295_ADD("oki", XTAL(16'000'000)/8, PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
 
-	MCFG_SOUND_ADD("ymz", YMZ280B, XTAL_16_9344MHz)
+	MCFG_SOUND_ADD("ymz", YMZ280B, XTAL(16'934'400))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.30)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.30)
 MACHINE_CONFIG_END

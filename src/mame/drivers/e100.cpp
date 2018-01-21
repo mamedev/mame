@@ -541,7 +541,7 @@ static INPUT_PORTS_START( e100 )
 INPUT_PORTS_END
 
 MACHINE_CONFIG_START(e100_state::e100)
-	MCFG_CPU_ADD("maincpu", M6802, XTAL_4MHz)
+	MCFG_CPU_ADD("maincpu", M6802, XTAL(4'000'000))
 	MCFG_CPU_PROGRAM_MAP(e100_map)
 
 	/* Devices */
@@ -592,7 +592,7 @@ MACHINE_CONFIG_START(e100_state::e100)
 
 	/* screen TODO: simplify the screen config, look at zx.cpp */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL_4MHz/2, 265, 0, 265, 265, 0, 265)
+	MCFG_SCREEN_RAW_PARAMS(XTAL(4'000'000)/2, 265, 0, 265, 265, 0, 265)
 	MCFG_SCREEN_UPDATE_DRIVER(e100_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_PALETTE_ADD_MONOCHROME("palette")

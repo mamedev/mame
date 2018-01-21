@@ -681,7 +681,7 @@ GFXDECODE_END
 
 
 MACHINE_CONFIG_START(bingor_state::bingor)
-	MCFG_CPU_ADD("maincpu", I80186, XTAL_16MHz)
+	MCFG_CPU_ADD("maincpu", I80186, XTAL(16'000'000))
 	MCFG_CPU_PROGRAM_MAP(bingor_map)
 	MCFG_CPU_IO_MAP(bingor_io)
 	MCFG_CPU_PERIODIC_INT_DRIVER(bingor_state, nmi_line_pulse, 30)
@@ -765,7 +765,7 @@ static ADDRESS_MAP_START( slave_io, AS_IO, 8, bingor_state)
 ADDRESS_MAP_END
 
 MACHINE_CONFIG_START(bingor_state::vip2000)
-	MCFG_CPU_ADD("maincpu", I80186, XTAL_10MHz)
+	MCFG_CPU_ADD("maincpu", I80186, XTAL(10'000'000))
 	MCFG_CPU_PROGRAM_MAP(vip2000_map)
 	MCFG_CPU_IO_MAP(vip2000_io)
 	MCFG_CPU_PERIODIC_INT_DRIVER(bingor_state, nmi_line_pulse, 30)
@@ -773,11 +773,11 @@ MACHINE_CONFIG_START(bingor_state::vip2000)
 
 	MCFG_ATMEL_49F4096_ADD("flash")
 
-	MCFG_CPU_ADD("slavecpu", I80C31, XTAL_11_0592MHz)
+	MCFG_CPU_ADD("slavecpu", I80C31, XTAL(11'059'200))
 	MCFG_CPU_PROGRAM_MAP(slave_map)
 	MCFG_CPU_IO_MAP(slave_io)
 
-	MCFG_DEVICE_ADD("rtc", MSM6242, XTAL_32_768kHz)
+	MCFG_DEVICE_ADD("rtc", MSM6242, XTAL(32'768))
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)

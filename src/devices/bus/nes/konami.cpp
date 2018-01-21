@@ -645,7 +645,7 @@ MACHINE_CONFIG_START(nes_konami_vrc6_device::device_add_mconfig)
 
 	// TODO: this is not how VRC6 clock signaling works!
 	// The board uses the CLK pin in reality, not hardcoded NTSC values!
-	MCFG_SOUND_ADD("vrc6snd", VRC6, XTAL_21_4772MHz/12)
+	MCFG_SOUND_ADD("vrc6snd", VRC6, XTAL(21'477'272)/12)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "addon", 0.5)
 MACHINE_CONFIG_END
 
@@ -769,6 +769,6 @@ MACHINE_CONFIG_START(nes_konami_vrc7_device::device_add_mconfig)
 
 	// TODO: this is not how VRC7 clock signaling works!
 	// The board uses the CLK pin in reality, not hardcoded NTSC values!
-	MCFG_SOUND_ADD("ym", YM2413, XTAL_21_4772MHz/12)
+	MCFG_SOUND_ADD("ym", YM2413, XTAL(21'477'272)/12)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "addon", 0.5)
 MACHINE_CONFIG_END

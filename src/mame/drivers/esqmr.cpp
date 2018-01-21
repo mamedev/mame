@@ -250,13 +250,13 @@ READ16_MEMBER(esqmr_state::esq5506_read_adc)
 }
 
 MACHINE_CONFIG_START(esqmr_state::mr)
-	MCFG_CPU_ADD("maincpu", M68340, XTAL_16MHz)
+	MCFG_CPU_ADD("maincpu", M68340, XTAL(16'000'000))
 	MCFG_CPU_PROGRAM_MAP(mr_map)
 
 	MCFG_ESQ2X40_SQ1_ADD("sq1vfd")
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-	MCFG_SOUND_ADD("ensoniq", ES5506, XTAL_16MHz)
+	MCFG_SOUND_ADD("ensoniq", ES5506, XTAL(16'000'000))
 	MCFG_ES5506_REGION0("waverom")  /* Bank 0 */
 	MCFG_ES5506_REGION1("waverom2") /* Bank 1 */
 	MCFG_ES5506_REGION2("waverom3") /* Bank 0 */
@@ -266,7 +266,7 @@ MACHINE_CONFIG_START(esqmr_state::mr)
 	MCFG_ES5506_READ_PORT_CB(READ16(esqmr_state, esq5506_read_adc))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.5)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.5)
-	MCFG_SOUND_ADD("ensoniq2", ES5506, XTAL_16MHz)
+	MCFG_SOUND_ADD("ensoniq2", ES5506, XTAL(16'000'000))
 	MCFG_ES5506_REGION0("waverom")  /* Bank 0 */
 	MCFG_ES5506_REGION1("waverom2") /* Bank 1 */
 	MCFG_ES5506_REGION2("waverom3") /* Bank 0 */

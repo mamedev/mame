@@ -397,13 +397,13 @@ void kchamp_state::machine_reset()
 MACHINE_CONFIG_START(kchamp_state::kchampvs)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_12MHz/4)    /* verified on pcb */
+	MCFG_CPU_ADD("maincpu", Z80, XTAL(12'000'000)/4)    /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(kchampvs_map)
 	MCFG_CPU_IO_MAP(kchampvs_io_map)
 	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", kchamp_state,  kc_interrupt)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_12MHz/4)    /* verified on pcb */
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL(12'000'000)/4)    /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(kchampvs_sound_map)
 	MCFG_CPU_IO_MAP(kchampvs_sound_io_map)      /* irq's triggered from main cpu */
 										/* nmi's from msm5205 */
@@ -435,10 +435,10 @@ MACHINE_CONFIG_START(kchamp_state::kchampvs)
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", 0))
 
-	MCFG_SOUND_ADD("ay1", AY8910, XTAL_12MHz/8)    /* verified on pcb */
+	MCFG_SOUND_ADD("ay1", AY8910, XTAL(12'000'000)/8)    /* verified on pcb */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.3)
 
-	MCFG_SOUND_ADD("ay2", AY8910, XTAL_12MHz/8)    /* verified on pcb */
+	MCFG_SOUND_ADD("ay2", AY8910, XTAL(12'000'000)/8)    /* verified on pcb */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.3)
 
 	MCFG_DEVICE_ADD("adpcm_select", LS157, 0) // at 4C
@@ -457,12 +457,12 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(kchamp_state::kchamp)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_12MHz/4)  /* 12MHz / 4 = 3.0 MHz */
+	MCFG_CPU_ADD("maincpu", Z80, XTAL(12'000'000)/4)  /* 12MHz / 4 = 3.0 MHz */
 	MCFG_CPU_PROGRAM_MAP(kchamp_map)
 	MCFG_CPU_IO_MAP(kchamp_io_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", kchamp_state,  kc_interrupt)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_12MHz/4) /* 12MHz / 4 = 3.0 MHz */
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL(12'000'000)/4) /* 12MHz / 4 = 3.0 MHz */
 	MCFG_CPU_PROGRAM_MAP(kchamp_sound_map)
 	MCFG_CPU_IO_MAP(kchamp_sound_io_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(kchamp_state, sound_int,  125) /* Hz */
@@ -495,10 +495,10 @@ MACHINE_CONFIG_START(kchamp_state::kchamp)
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", 0))
 
-	MCFG_SOUND_ADD("ay1", AY8910, XTAL_12MHz/12) /* Guess based on actual pcb recordings of karatedo */
+	MCFG_SOUND_ADD("ay1", AY8910, XTAL(12'000'000)/12) /* Guess based on actual pcb recordings of karatedo */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.3)
 
-	MCFG_SOUND_ADD("ay2", AY8910, XTAL_12MHz/12) /* Guess based on actual pcb recordings of karatedo */
+	MCFG_SOUND_ADD("ay2", AY8910, XTAL(12'000'000)/12) /* Guess based on actual pcb recordings of karatedo */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.3)
 
 	MCFG_SOUND_ADD("dac", DAC08, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.3) // IC11

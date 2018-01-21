@@ -583,7 +583,7 @@ INTERRUPT_GEN_MEMBER(joystand_state::joystand_interrupt)
 MACHINE_CONFIG_START(joystand_state::joystand)
 
 	// basic machine hardware
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz) // !! TMP68301 !!
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(16'000'000)) // !! TMP68301 !!
 	MCFG_CPU_PROGRAM_MAP(joystand_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", joystand_state, joystand_interrupt)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("tmp68301",tmp68301_device,irq_callback)
@@ -609,10 +609,10 @@ MACHINE_CONFIG_START(joystand_state::joystand)
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ym2413", YM2413, XTAL_3_579545MHz)
+	MCFG_SOUND_ADD("ym2413", YM2413, XTAL(3'579'545))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
-	MCFG_OKIM6295_ADD("oki", XTAL_16MHz / 16, PIN7_HIGH) // pin 7 not verified
+	MCFG_OKIM6295_ADD("oki", XTAL(16'000'000) / 16, PIN7_HIGH) // pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	// cart
@@ -631,7 +631,7 @@ MACHINE_CONFIG_START(joystand_state::joystand)
 
 	// devices
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
-	MCFG_DEVICE_ADD("rtc", MSM6242, XTAL_32_768kHz)
+	MCFG_DEVICE_ADD("rtc", MSM6242, XTAL(32'768))
 MACHINE_CONFIG_END
 
 

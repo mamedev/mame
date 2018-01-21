@@ -352,11 +352,11 @@ GFXDECODE_END
 MACHINE_CONFIG_START(carjmbre_state::carjmbre)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_18_432MHz/6)
+	MCFG_CPU_ADD("maincpu", Z80, XTAL(18'432'000)/6)
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", carjmbre_state, vblank_nmi)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_18_432MHz/6/2)
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL(18'432'000)/6/2)
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 	MCFG_CPU_IO_MAP(sound_io_map)
 
@@ -378,10 +378,10 @@ MACHINE_CONFIG_START(carjmbre_state::carjmbre)
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("ay1", AY8910, XTAL_18_432MHz/6/2)
+	MCFG_SOUND_ADD("ay1", AY8910, XTAL(18'432'000)/6/2)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MCFG_SOUND_ADD("ay2", AY8910, XTAL_18_432MHz/6/2)
+	MCFG_SOUND_ADD("ay2", AY8910, XTAL(18'432'000)/6/2)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 

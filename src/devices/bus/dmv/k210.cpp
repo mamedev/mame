@@ -142,7 +142,7 @@ WRITE8_MEMBER( dmv_k210_device::portc_w )
 	if (!(data & 0x80))
 	{
 		m_centronics->write_strobe(ASSERT_LINE);
-		m_clk1_timer->adjust(attotime::from_hz(XTAL_1MHz));
+		m_clk1_timer->adjust(attotime::from_hz(XTAL(1'000'000)));
 	}
 
 	m_centronics->write_init(!BIT(data, 1));

@@ -347,8 +347,8 @@ WRITE_LINE_MEMBER(lwriter_state::scc_int)
     m_via->write_ca1(state);
 }*/
 
-#define CPU_CLK (XTAL_22_3210MHz / 2) // Based on pictures form here: http://picclick.co.uk/Apple-Postscript-LaserWriter-IINT-Printer-640-4105-M6009-Mainboard-282160713108.html#&gid=1&pid=7
-#define RXC_CLK ((CPU_CLK - (87 * 16 * 70)) / 3) // Tuned to get 9600 baud according to manual, needs rework based on real hardware
+#define CPU_CLK (XTAL(22'321'000) / 2) // Based on pictures form here: http://picclick.co.uk/Apple-Postscript-LaserWriter-IINT-Printer-640-4105-M6009-Mainboard-282160713108.html#&gid=1&pid=7
+#define RXC_CLK ((CPU_CLK.value() - (87 * 16 * 70)) / 3) // Tuned to get 9600 baud according to manual, needs rework based on real hardware
 
 MACHINE_CONFIG_START(lwriter_state::lwriter)
 	MCFG_CPU_ADD("maincpu", M68000, CPU_CLK)

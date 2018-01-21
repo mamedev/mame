@@ -169,12 +169,12 @@ READ8_MEMBER(sagitta180_state::memory_read_byte)
 MACHINE_CONFIG_START(sagitta180_state::sagitta180)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I8080, XTAL_10MHz) /* guessed ! */
+	MCFG_CPU_ADD("maincpu", I8080, XTAL(10'000'000)) /* guessed ! */
 	MCFG_CPU_PROGRAM_MAP(maincpu_map)
 	MCFG_CPU_IO_MAP(maincpu_io_map)
 //        MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("intlatch", i8212_device, inta_cb)
 
-	MCFG_DEVICE_ADD("dma", I8257, XTAL_14_7456MHz) /* guessed xtal */
+	MCFG_DEVICE_ADD("dma", I8257, XTAL(14'745'600)) /* guessed xtal */
 	MCFG_I8257_OUT_IOW_2_CB(DEVWRITE8("crtc", i8275_device, dack_w))
 	MCFG_I8257_OUT_HRQ_CB(WRITELINE(sagitta180_state, hrq_w))
 	MCFG_I8257_IN_MEMR_CB(READ8(sagitta180_state, memory_read_byte))

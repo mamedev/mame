@@ -421,15 +421,15 @@ MACHINE_RESET_MEMBER(galivan_state,ninjemak)
 MACHINE_CONFIG_START(galivan_state::galivan)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_12MHz/2)      /* 6 MHz? */
+	MCFG_CPU_ADD("maincpu", Z80, XTAL(12'000'000)/2)      /* 6 MHz? */
 	MCFG_CPU_PROGRAM_MAP(galivan_map)
 	MCFG_CPU_IO_MAP(io_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", galivan_state,  irq0_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_8MHz/2)      /* 4 MHz? */
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL(8'000'000)/2)      /* 4 MHz? */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 	MCFG_CPU_IO_MAP(sound_io_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(galivan_state, irq0_line_hold,  XTAL_8MHz/2/512)   // ?
+	MCFG_CPU_PERIODIC_INT_DRIVER(galivan_state, irq0_line_hold,  XTAL(8'000'000)/2/512)   // ?
 
 	MCFG_MACHINE_START_OVERRIDE(galivan_state,galivan)
 	MCFG_MACHINE_RESET_OVERRIDE(galivan_state,galivan)
@@ -458,7 +458,7 @@ MACHINE_CONFIG_START(galivan_state::galivan)
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("ymsnd", YM3526, XTAL_8MHz/2)
+	MCFG_SOUND_ADD("ymsnd", YM3526, XTAL(8'000'000)/2)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 
 	MCFG_SOUND_ADD("dac1", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25) // unknown DAC
@@ -471,15 +471,15 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(galivan_state::ninjemak)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_12MHz/2)      /* 6 MHz? */
+	MCFG_CPU_ADD("maincpu", Z80, XTAL(12'000'000)/2)      /* 6 MHz? */
 	MCFG_CPU_PROGRAM_MAP(ninjemak_map)
 	MCFG_CPU_IO_MAP(ninjemak_io_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", galivan_state,  irq0_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_8MHz/2)      /* 4 MHz? */
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL(8'000'000)/2)      /* 4 MHz? */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 	MCFG_CPU_IO_MAP(sound_io_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(galivan_state, irq0_line_hold,  XTAL_8MHz/2/512)   // ?
+	MCFG_CPU_PERIODIC_INT_DRIVER(galivan_state, irq0_line_hold,  XTAL(8'000'000)/2/512)   // ?
 
 	MCFG_MACHINE_START_OVERRIDE(galivan_state,ninjemak)
 	MCFG_MACHINE_RESET_OVERRIDE(galivan_state,ninjemak)
@@ -510,7 +510,7 @@ MACHINE_CONFIG_START(galivan_state::ninjemak)
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("ymsnd", YM3526, XTAL_8MHz/2)
+	MCFG_SOUND_ADD("ymsnd", YM3526, XTAL(8'000'000)/2)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 
 	MCFG_SOUND_ADD("dac1", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25) // unknown DAC

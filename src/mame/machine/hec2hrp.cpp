@@ -134,7 +134,7 @@ WRITE8_MEMBER(hec2hrp_state::hector_switch_bank_w)
 							if (m_flag_clk ==1)
 							{
 								m_flag_clk=0;
-								m_maincpu->set_unscaled_clock(XTAL_5MHz);  /* increase CPU*/
+								m_maincpu->set_unscaled_clock(XTAL(5'000'000));  /* increase CPU*/
 							}
 						}
 	if (offset==0x04)   {   /* 0x804 => video page, BR*/
@@ -144,7 +144,7 @@ WRITE8_MEMBER(hec2hrp_state::hector_switch_bank_w)
 							if (m_flag_clk ==0)
 							{
 								m_flag_clk=1;
-								m_maincpu->set_unscaled_clock(XTAL_1_75MHz);  /* slowdown CPU*/
+								m_maincpu->set_unscaled_clock(XTAL(1'750'000));  /* slowdown CPU*/
 							}
 						}
 	if (offset==0x08)   {   /* 0x808 => base page, HR*/
@@ -153,7 +153,7 @@ WRITE8_MEMBER(hec2hrp_state::hector_switch_bank_w)
 							if (m_flag_clk ==1)
 							{
 								m_flag_clk=0;
-								m_maincpu->set_unscaled_clock(XTAL_5MHz);  /* increase CPU*/
+								m_maincpu->set_unscaled_clock(XTAL(5'000'000));  /* increase CPU*/
 							}
 
 						}
@@ -164,7 +164,7 @@ WRITE8_MEMBER(hec2hrp_state::hector_switch_bank_w)
 							if (m_flag_clk ==0)
 							{
 								m_flag_clk=1;
-								m_maincpu->set_unscaled_clock(XTAL_1_75MHz);  /* slowdown CPU*/
+								m_maincpu->set_unscaled_clock(XTAL(1'750'000));  /* slowdown CPU*/
 							}
 						}
 }

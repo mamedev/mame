@@ -440,8 +440,8 @@ public:
 //  CONSTANTS
 //**************************************************************************
 
-const uint32_t MASTER_CLOCK = XTAL_50MHz;
-const uint32_t SOUND_CLOCK = XTAL_16MHz;
+const auto MASTER_CLOCK = XTAL(50'000'000);
+const auto SOUND_CLOCK = XTAL(16'000'000);
 
 
 
@@ -1921,11 +1921,11 @@ MACHINE_CONFIG_START(segaxbd_smgp_fd1094_state::device_add_mconfig)
 	MCFG_CPU_PROGRAM_MAP(smgp_sound2_map)
 	MCFG_CPU_IO_MAP(smgp_sound2_portmap)
 
-	MCFG_CPU_ADD("commcpu", Z80, XTAL_16MHz/2) // Z80E
+	MCFG_CPU_ADD("commcpu", Z80, XTAL(16'000'000)/2) // Z80E
 	MCFG_CPU_PROGRAM_MAP(smgp_comm_map)
 	MCFG_CPU_IO_MAP(smgp_comm_portmap)
 
-	MCFG_CPU_ADD("motorcpu", Z80, XTAL_16MHz/2) // not verified
+	MCFG_CPU_ADD("motorcpu", Z80, XTAL(16'000'000)/2) // not verified
 	MCFG_CPU_PROGRAM_MAP(smgp_airdrive_map)
 	MCFG_CPU_IO_MAP(smgp_airdrive_portmap)
 
@@ -1962,11 +1962,11 @@ MACHINE_CONFIG_START(segaxbd_smgp_state::device_add_mconfig)
 	MCFG_CPU_PROGRAM_MAP(smgp_sound2_map)
 	MCFG_CPU_IO_MAP(smgp_sound2_portmap)
 
-	MCFG_CPU_ADD("commcpu", Z80, XTAL_16MHz/2) // Z80E
+	MCFG_CPU_ADD("commcpu", Z80, XTAL(16'000'000)/2) // Z80E
 	MCFG_CPU_PROGRAM_MAP(smgp_comm_map)
 	MCFG_CPU_IO_MAP(smgp_comm_portmap)
 
-	MCFG_CPU_ADD("motorcpu", Z80, XTAL_16MHz/2) // not verified
+	MCFG_CPU_ADD("motorcpu", Z80, XTAL(16'000'000)/2) // not verified
 	MCFG_CPU_PROGRAM_MAP(smgp_airdrive_map)
 	MCFG_CPU_IO_MAP(smgp_airdrive_portmap)
 

@@ -13,16 +13,16 @@ driver by Chris Moore
 #include "machine/gen_latch.h"
 #include "screen.h"
 
-#define GAMEPLAN_MAIN_MASTER_CLOCK       (XTAL_3_579545MHz)
-#define GAMEPLAN_AUDIO_MASTER_CLOCK      (XTAL_3_579545MHz)
+#define GAMEPLAN_MAIN_MASTER_CLOCK       (XTAL(3'579'545))
+#define GAMEPLAN_AUDIO_MASTER_CLOCK      (XTAL(3'579'545))
 #define GAMEPLAN_MAIN_CPU_CLOCK          (GAMEPLAN_MAIN_MASTER_CLOCK / 4)
 #define GAMEPLAN_AUDIO_CPU_CLOCK         (GAMEPLAN_AUDIO_MASTER_CLOCK / 4)
 #define GAMEPLAN_AY8910_CLOCK            (GAMEPLAN_AUDIO_MASTER_CLOCK / 2)
-#define GAMEPLAN_PIXEL_CLOCK             (XTAL_11_6688MHz / 2)
+#define GAMEPLAN_PIXEL_CLOCK             (XTAL(11'668'800) / 2)
 
 /* Used Leprechaun/Pot of Gold (and Pirate Treasure) - as stated in manual for Pot Of Gold */
 
-#define LEPRECHAUN_MAIN_MASTER_CLOCK     (XTAL_4MHz)
+#define LEPRECHAUN_MAIN_MASTER_CLOCK     (XTAL(4'000'000))
 #define LEPRECHAUN_MAIN_CPU_CLOCK        (LEPRECHAUN_MAIN_MASTER_CLOCK / 4)
 
 

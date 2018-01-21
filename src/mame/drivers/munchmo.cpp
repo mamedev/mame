@@ -316,11 +316,11 @@ void munchmo_state::machine_start()
 MACHINE_CONFIG_START(munchmo_state::mnchmobl)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_15MHz/4) // from pin 13 of XTAL-driven 163
+	MCFG_CPU_ADD("maincpu", Z80, XTAL(15'000'000)/4) // from pin 13 of XTAL-driven 163
 	MCFG_CPU_PROGRAM_MAP(mnchmobl_map)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(munchmo_state, generic_irq_ack) // IORQ clears flip-flop at 1-2C
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_15MHz/8) // from pin 12 of XTAL-driven 163
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL(15'000'000)/8) // from pin 12 of XTAL-driven 163
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(munchmo_state, generic_irq_ack) // IORQ clears flip-flop at 1-7H
 
@@ -354,11 +354,11 @@ MACHINE_CONFIG_START(munchmo_state::mnchmobl)
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(ASSERTLINE("audiocpu", 0))
 
 	/* AY clock speeds confirmed to match known recording */
-	MCFG_SOUND_ADD("ay1", AY8910, XTAL_15MHz/8)
+	MCFG_SOUND_ADD("ay1", AY8910, XTAL(15'000'000)/8)
 	//MCFG_AY8910_OUTPUT_TYPE(AY8910_SINGLE_OUTPUT)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MCFG_SOUND_ADD("ay2", AY8910, XTAL_15MHz/8)
+	MCFG_SOUND_ADD("ay2", AY8910, XTAL(15'000'000)/8)
 	//MCFG_AY8910_OUTPUT_TYPE(AY8910_SINGLE_OUTPUT)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END

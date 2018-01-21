@@ -274,8 +274,8 @@ public:
 };
 
 
-#define SYSTEM_CLK  XTAL_21_4772MHz
-#define UART_CLK    XTAL_1_8432MHz // standard 8250 clock
+#define SYSTEM_CLK  XTAL(21'477'272)
+#define UART_CLK    XTAL(1'843'200) // standard 8250 clock
 
 
 /*************************************

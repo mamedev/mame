@@ -158,8 +158,8 @@
 
 DEFINE_DEVICE_TYPE(VME_FCISIO1, vme_fcisio1_card_device, "fcisio1", "Force Computer SYS68K/ISIO-1/2 Intelligent Serial I/O Board")
 
-#define CPU_CLOCK XTAL_20MHz /* HCJ */
-#define DUSCC_CLOCK XTAL_14_7456MHz /* HCJ */
+#define CPU_CLOCK XTAL(20'000'000) /* HCJ */
+#define DUSCC_CLOCK XTAL(14'745'600) /* HCJ */
 
 static ADDRESS_MAP_START (fcisio1_mem, AS_PROGRAM, 16, vme_fcisio1_card_device)
 	ADDRESS_MAP_UNMAP_HIGH
@@ -361,10 +361,10 @@ MACHINE_CONFIG_START(vme_fcisio1_card_device::device_add_mconfig)
 	MCFG_RS232_RXD_HANDLER (DEVWRITELINE ("duscc3", duscc68562_device, rxb_w))
 	MCFG_RS232_CTS_HANDLER (DEVWRITELINE ("duscc3", duscc68562_device, ctsb_w))
 
-	MCFG_DEVICE_ADD ("pit", PIT68230, XTAL_20MHz / 2)
+	MCFG_DEVICE_ADD ("pit", PIT68230, XTAL(20'000'000) / 2)
 	MCFG_PIT68230_PB_INPUT_CB(READ8(vme_fcisio1_card_device, config_rd))
 
-	MCFG_MC68153_ADD("bim", XTAL_20MHz / 2)
+	MCFG_MC68153_ADD("bim", XTAL(20'000'000) / 2)
 MACHINE_CONFIG_END
 
 const tiny_rom_entry *vme_fcisio1_card_device::device_rom_region() const

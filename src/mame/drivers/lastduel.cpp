@@ -491,7 +491,7 @@ MACHINE_CONFIG_START(lastduel_state::lastduel)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", lastduel_state, irq2_line_hold)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer_irq", lastduel_state, lastduel_timer_cb, attotime::from_hz(120))
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_3_579545MHz)
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL(3'579'545))
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 
 	MCFG_MACHINE_START_OVERRIDE(lastduel_state,lastduel)
@@ -519,11 +519,11 @@ MACHINE_CONFIG_START(lastduel_state::lastduel)
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("ym1", YM2203, XTAL_3_579545MHz)
+	MCFG_SOUND_ADD("ym1", YM2203, XTAL(3'579'545))
 	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 
-	MCFG_SOUND_ADD("ym2", YM2203, XTAL_3_579545MHz)
+	MCFG_SOUND_ADD("ym2", YM2203, XTAL(3'579'545))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 MACHINE_CONFIG_END
 
@@ -531,12 +531,12 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(lastduel_state::madgear)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_10MHz)
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(10'000'000))
 	MCFG_CPU_PROGRAM_MAP(madgear_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", lastduel_state, irq5_line_hold)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer_irq", lastduel_state, madgear_timer_cb, attotime::from_hz(120))
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_3_579545MHz)
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL(3'579'545))
 	MCFG_CPU_PROGRAM_MAP(madgear_sound_map)
 
 	MCFG_MACHINE_START_OVERRIDE(lastduel_state,madgear)
@@ -564,14 +564,14 @@ MACHINE_CONFIG_START(lastduel_state::madgear)
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("ym1", YM2203, XTAL_3_579545MHz)
+	MCFG_SOUND_ADD("ym1", YM2203, XTAL(3'579'545))
 	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 
-	MCFG_SOUND_ADD("ym2", YM2203, XTAL_3_579545MHz)
+	MCFG_SOUND_ADD("ym2", YM2203, XTAL(3'579'545))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 
-	MCFG_OKIM6295_ADD("oki", XTAL_10MHz/10, PIN7_HIGH)
+	MCFG_OKIM6295_ADD("oki", XTAL(10'000'000)/10, PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.98)
 MACHINE_CONFIG_END
 

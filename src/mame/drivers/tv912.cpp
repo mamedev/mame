@@ -269,7 +269,7 @@ void tv912_state::device_timer(emu_timer &timer, device_timer_id id, int param, 
 			if (!BIT(sel, b))
 			{
 				unsigned divisor = 11 * (b < 9 ? 1 << b : 176);
-				m_baudgen_timer->adjust(attotime::from_hz(XTAL_23_814MHz / 3.5 / divisor), !param);
+				m_baudgen_timer->adjust(attotime::from_hz(XTAL(23'814'000) / 3.5 / divisor), !param);
 				break;
 			}
 		}
@@ -882,7 +882,7 @@ static INPUT_PORTS_START( tv912c )
 INPUT_PORTS_END
 
 MACHINE_CONFIG_START(tv912_state::tv912)
-	MCFG_CPU_ADD("maincpu", I8035, XTAL_23_814MHz / 4) // nominally +6MHz, actually 5.9535 MHz
+	MCFG_CPU_ADD("maincpu", I8035, XTAL(23'814'000) / 4) // nominally +6MHz, actually 5.9535 MHz
 	MCFG_CPU_PROGRAM_MAP(prog_map)
 	MCFG_CPU_IO_MAP(io_map)
 	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(tv912_state, p1_w))
@@ -899,10 +899,10 @@ MACHINE_CONFIG_START(tv912_state::tv912)
 	MCFG_ADDRESS_MAP_BANK_STRIDE(0x100)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL_23_814MHz, 105 * CHAR_WIDTH, 0, 80 * CHAR_WIDTH, 270, 0, 240)
+	MCFG_SCREEN_RAW_PARAMS(XTAL(23'814'000), 105 * CHAR_WIDTH, 0, 80 * CHAR_WIDTH, 270, 0, 240)
 	MCFG_SCREEN_UPDATE_DRIVER(tv912_state, screen_update)
 
-	MCFG_DEVICE_ADD("crtc", TMS9927, XTAL_23_814MHz)
+	MCFG_DEVICE_ADD("crtc", TMS9927, XTAL(23'814'000))
 	MCFG_TMS9927_CHAR_WIDTH(CHAR_WIDTH)
 	MCFG_TMS9927_VSYN_CALLBACK(INPUTLINE("maincpu", MCS48_INPUT_IRQ))
 	MCFG_VIDEO_SET_SCREEN("screen")
@@ -914,7 +914,7 @@ MACHINE_CONFIG_START(tv912_state::tv912)
 	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, "loopback")
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("beep", BEEP, XTAL_23_814MHz / 7 / 11 / 256) // nominally 1200 Hz
+	MCFG_SOUND_ADD("beep", BEEP, XTAL(23'814'000) / 7 / 11 / 256) // nominally 1200 Hz
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 

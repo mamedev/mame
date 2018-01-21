@@ -341,7 +341,7 @@ GFXDECODE_END
 MACHINE_CONFIG_START(supershot_state::supershot)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", SCMP, XTAL_11_289MHz/4)
+	MCFG_CPU_ADD("maincpu", SCMP, XTAL(11'289'000)/4)
 	MCFG_CPU_PROGRAM_MAP(supershot_map)
 
 	/* video hardware */

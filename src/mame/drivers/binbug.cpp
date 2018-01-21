@@ -296,7 +296,7 @@ DEVICE_INPUT_DEFAULTS_END
 
 MACHINE_CONFIG_START(binbug_state::binbug)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",S2650, XTAL_1MHz)
+	MCFG_CPU_ADD("maincpu",S2650, XTAL(1'000'000))
 	MCFG_CPU_PROGRAM_MAP(binbug_mem)
 	MCFG_CPU_DATA_MAP(binbug_data)
 	MCFG_S2650_SENSE_INPUT(READLINE(binbug_state, binbug_serial_r))
@@ -529,7 +529,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(dg680_state::uart_tick)
 
 MACHINE_CONFIG_START(dg680_state::dg680)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",Z80, XTAL_8MHz / 4)
+	MCFG_CPU_ADD("maincpu",Z80, XTAL(8'000'000) / 4)
 	MCFG_CPU_PROGRAM_MAP(dg680_mem)
 	MCFG_CPU_IO_MAP(dg680_io)
 	MCFG_Z80_DAISY_CHAIN(dg680_daisy_chain)
@@ -557,11 +557,11 @@ MACHINE_CONFIG_START(dg680_state::dg680)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	/* Devices */
-	MCFG_DEVICE_ADD("z80ctc", Z80CTC, XTAL_8MHz / 4)
+	MCFG_DEVICE_ADD("z80ctc", Z80CTC, XTAL(8'000'000) / 4)
 	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
 	MCFG_Z80CTC_ZC0_CB(DEVWRITELINE("z80ctc", z80ctc_device, trg1))
 
-	MCFG_DEVICE_ADD("z80pio", Z80PIO, XTAL_8MHz / 4)
+	MCFG_DEVICE_ADD("z80pio", Z80PIO, XTAL(8'000'000) / 4)
 	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
 	MCFG_Z80PIO_IN_PA_CB(READ8(dg680_state, porta_r))
 	// OUT_ARDY - this activates to ask for kbd data but not known if actually used

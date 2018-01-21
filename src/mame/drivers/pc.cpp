@@ -641,7 +641,7 @@ MACHINE_CONFIG_END
 // Zenith SuperSport
 MACHINE_CONFIG_START(pc_state::zenith)
 	/* basic machine hardware */
-	MCFG_CPU_PC(zenith, pc8, I8088, XTAL_14_31818MHz/3) /* 4,77 MHz */
+	MCFG_CPU_PC(zenith, pc8, I8088, XTAL(14'318'181)/3) /* 4,77 MHz */
 
 	MCFG_IBM5150_MOTHERBOARD_ADD("mb", "maincpu")
 	MCFG_DEVICE_INPUT_DEFAULTS(pccga)
@@ -683,7 +683,7 @@ DEVICE_INPUT_DEFAULTS_END
 
 MACHINE_CONFIG_START(pc_state::siemens)
 	/* basic machine hardware */
-	MCFG_CPU_PC(pc8, pc8, I8088, XTAL_14_31818MHz/3) /* 4,77 MHz */
+	MCFG_CPU_PC(pc8, pc8, I8088, XTAL(14'318'181)/3) /* 4,77 MHz */
 
 	MCFG_IBM5150_MOTHERBOARD_ADD("mb", "maincpu")
 	MCFG_DEVICE_INPUT_DEFAULTS(siemens)
@@ -761,7 +761,7 @@ MACHINE_CONFIG_END
 
 //Laser XT/3
 MACHINE_CONFIG_START(pc_state::laser_xt3)
-	MCFG_CPU_PC(pc8, pc8, I8088, XTAL_14_31818MHz/3) /* 4,77 MHz */
+	MCFG_CPU_PC(pc8, pc8, I8088, XTAL(14'318'181)/3) /* 4,77 MHz */
 
 	MCFG_IBM5160_MOTHERBOARD_ADD("mb","maincpu")
 	MCFG_DEVICE_INPUT_DEFAULTS(pccga)
@@ -790,7 +790,7 @@ MACHINE_CONFIG_END
 
 //Laser Turbo XT
 MACHINE_CONFIG_START(pc_state::laser_turbo_xt)
-	MCFG_CPU_PC(pc8, pc8, I8088, XTAL_14_31818MHz/3) /* 4,77 MHz */
+	MCFG_CPU_PC(pc8, pc8, I8088, XTAL(14'318'181)/3) /* 4,77 MHz */
 
 	MCFG_IBM5160_MOTHERBOARD_ADD("mb","maincpu")
 	MCFG_DEVICE_INPUT_DEFAULTS(pccga)
@@ -819,7 +819,7 @@ MACHINE_CONFIG_END
 //Olytext 30
 MACHINE_CONFIG_DERIVED(pc_state::olytext30, pccga)
 	MCFG_DEVICE_REMOVE("maincpu")
-	MCFG_CPU_PC(pc8, pc8, V20, XTAL_14_31818MHz/3) /* 4,77 MHz */
+	MCFG_CPU_PC(pc8, pc8, V20, XTAL(14'318'181)/3) /* 4,77 MHz */
 	MCFG_DEVICE_MODIFY("isa2")
 	MCFG_SLOT_OPTION_MACHINE_CONFIG("fdc_xt", cfg_single_720K)
 	MCFG_DEVICE_MODIFY("isa3")

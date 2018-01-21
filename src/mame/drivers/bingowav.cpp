@@ -136,7 +136,7 @@ MACHINE_CONFIG_START(bingowav_state::bingowav)
 	MCFG_CPU_PROGRAM_MAP(bingowav_drive_map)
 	MCFG_DEVICE_DISABLE()
 
-	MCFG_CPU_ADD("ctrlcpu", Z80, XTAL_16MHz / 4)
+	MCFG_CPU_ADD("ctrlcpu", Z80, XTAL(16'000'000) / 4)
 	MCFG_CPU_PROGRAM_MAP(bingowav_control_map)
 MACHINE_CONFIG_END
 

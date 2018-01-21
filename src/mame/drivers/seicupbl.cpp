@@ -24,7 +24,7 @@
 #include "speaker.h"
 
 
-#define MAIN_CLOCK XTAL_8MHz
+#define MAIN_CLOCK XTAL(8'000'000)
 
 class seicupbl_state : public driver_device
 {

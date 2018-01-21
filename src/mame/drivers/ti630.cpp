@@ -184,7 +184,7 @@ GFXDECODE_END
 
 MACHINE_CONFIG_START(ti630_state::ti630)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I80C31, XTAL_10MHz)
+	MCFG_CPU_ADD("maincpu", I80C31, XTAL(10'000'000))
 	MCFG_CPU_PROGRAM_MAP(i80c31_prg)
 	MCFG_CPU_IO_MAP(i80c31_io)
 

@@ -674,11 +674,11 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(kickgoal_state::actionhw)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_12MHz) /* verified on pcb */
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(12'000'000)) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(kickgoal_program_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", kickgoal_state,  irq6_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", PIC16C57, XTAL_12MHz/3)    /* verified on pcb */
+	MCFG_CPU_ADD("audiocpu", PIC16C57, XTAL(12'000'000)/3)    /* verified on pcb */
 	MCFG_DEVICE_DISABLE() /* Disabled since the internal rom isn't dumped */
 	/* Program and Data Maps are internal to the MCU */
 
@@ -705,7 +705,7 @@ MACHINE_CONFIG_START(kickgoal_state::actionhw)
 
 	//MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_OKIM6295_ADD("oki", XTAL_12MHz/12, PIN7_HIGH) /* verified on pcb */
+	MCFG_OKIM6295_ADD("oki", XTAL(12'000'000)/12, PIN7_HIGH) /* verified on pcb */
 	MCFG_DEVICE_ADDRESS_MAP(0, oki_map)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 MACHINE_CONFIG_END

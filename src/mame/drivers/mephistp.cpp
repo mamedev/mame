@@ -157,29 +157,29 @@ void mephisto_pinball_state::machine_reset()
 
 MACHINE_CONFIG_START(mephisto_pinball_state::mephisto)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I8088, XTAL_18MHz/3)
+	MCFG_CPU_ADD("maincpu", I8088, XTAL(18'000'000)/3)
 	MCFG_CPU_PROGRAM_MAP(mephisto_map)
 	//MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("muart", i8256_device, inta_cb)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
-	//MCFG_DEVICE_ADD("muart", I8256, XTAL_18MHz/3)
+	//MCFG_DEVICE_ADD("muart", I8256, XTAL(18'000'000)/3)
 	//MCFG_I8256_IRQ_HANDLER(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
 	//MCFG_I8256_TXD_HANDLER(INPUTLINE("audiocpu", MCS51_RX_LINE))
 
-	MCFG_DEVICE_ADD("ic20", I8155, XTAL_18MHz/6)
+	MCFG_DEVICE_ADD("ic20", I8155, XTAL(18'000'000)/6)
 	//MCFG_I8155_OUT_TIMEROUT_CB(DEVWRITELINE("muart", i8256_device, write_txc))
 
-	MCFG_DEVICE_ADD("ic9", I8155, XTAL_18MHz/6)
+	MCFG_DEVICE_ADD("ic9", I8155, XTAL(18'000'000)/6)
 	//MCFG_I8155_OUT_TIMEROUT_CB(WRITELINE(mephisto_pinball_state, clk_shift_w))
 
-	MCFG_CPU_ADD("soundcpu", I8051, XTAL_12MHz)
+	MCFG_CPU_ADD("soundcpu", I8051, XTAL(12'000'000))
 	MCFG_CPU_PROGRAM_MAP(mephisto_8051_map)
 	MCFG_CPU_IO_MAP(mephisto_8051_io)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("aysnd", AY8910, XTAL_12MHz/8)
+	MCFG_SOUND_ADD("aysnd", AY8910, XTAL(12'000'000)/8)
 	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(mephisto_pinball_state, ay8910_columns_w))
 	MCFG_AY8910_PORT_B_READ_CB(READ8(mephisto_pinball_state, ay8910_inputs_r))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
@@ -195,7 +195,7 @@ static MACHINE_CONFIG_DERIVED(sport2k, mephisto)
 	MCFG_CPU_MODIFY("soundcpu")
 	MCFG_CPU_IO_MAP(sport2k_8051_io)
 
-	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL_14_31818MHz/4)
+	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL(14'318'181)/4)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 MACHINE_CONFIG_END
 #endif

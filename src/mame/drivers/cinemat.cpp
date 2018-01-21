@@ -44,7 +44,7 @@
 #include "tailg.lh"
 #include "wotw.lh"
 
-#define MASTER_CLOCK            XTAL_19_923MHz
+#define MASTER_CLOCK            XTAL(19'923'000)
 
 
 /*************************************

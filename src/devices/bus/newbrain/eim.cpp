@@ -69,12 +69,12 @@ const tiny_rom_entry *newbrain_eim_device::device_rom_region() const
 
 MACHINE_CONFIG_START(newbrain_eim_device::device_add_mconfig)
 	// devices
-	MCFG_DEVICE_ADD(Z80CTC_TAG, Z80CTC, XTAL_16MHz/8)
+	MCFG_DEVICE_ADD(Z80CTC_TAG, Z80CTC, XTAL(16'000'000)/8)
 	MCFG_Z80CTC_ZC0_CB(DEVWRITELINE(MC6850_TAG, acia6850_device, write_rxc))
 	MCFG_Z80CTC_ZC1_CB(DEVWRITELINE(MC6850_TAG, acia6850_device, write_txc))
 	MCFG_Z80CTC_ZC2_CB(WRITELINE(newbrain_eim_device, ctc_z2_w))
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("z80ctc_c2", newbrain_eim_device, ctc_c2_tick, attotime::from_hz(XTAL_16MHz/4/13))
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("z80ctc_c2", newbrain_eim_device, ctc_c2_tick, attotime::from_hz(XTAL(16'000'000)/4/13))
 	MCFG_DEVICE_ADD(ADC0809_TAG, ADC0808, 500000)
 	MCFG_ADC0808_OUT_EOC_CB(WRITELINE(newbrain_eim_device, adc_eoc_w))
 	MCFG_ADC0808_IN_VREF_POS_CB(newbrain_eim_device, adc_vref_pos_r)
@@ -92,7 +92,7 @@ MACHINE_CONFIG_START(newbrain_eim_device::device_add_mconfig)
 	MCFG_ACIA6850_IRQ_HANDLER(WRITELINE(newbrain_eim_device, acia_interrupt))
 	MCFG_RS232_PORT_ADD(RS232_TAG, default_rs232_devices, nullptr)
 
-	MCFG_NEWBRAIN_EXPANSION_SLOT_ADD(NEWBRAIN_EXPANSION_SLOT_TAG, XTAL_16MHz/8, newbrain_expansion_cards, "fdc")
+	MCFG_NEWBRAIN_EXPANSION_SLOT_ADD(NEWBRAIN_EXPANSION_SLOT_TAG, XTAL(16'000'000)/8, newbrain_expansion_cards, "fdc")
 
 	// internal ram
 	MCFG_RAM_ADD(RAM_TAG)

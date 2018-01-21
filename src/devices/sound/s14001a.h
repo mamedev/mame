@@ -30,6 +30,7 @@ public:
 	DECLARE_WRITE8_MEMBER(data_w);      // 6-bit word
 
 	void set_clock(uint32_t clock);       // set new CLK frequency
+	void set_clock(const XTAL &xtal) { set_clock(xtal.value()); }
 	void force_update();                // update stream, eg. before external ROM bankswitch
 
 protected:

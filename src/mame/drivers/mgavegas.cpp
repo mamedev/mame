@@ -43,7 +43,7 @@ Ver. 2.2 should exist
 /****************************
 *    Clock defines          *
 ****************************/
-#define MAIN_XTAL XTAL_8MHz
+#define MAIN_XTAL XTAL(8'000'000)
 #define CPU_CLK MAIN_XTAL/2
 #define AY_CLK  CPU_CLK/2
 #define MSM_CLK   384000

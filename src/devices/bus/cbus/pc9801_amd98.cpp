@@ -32,7 +32,7 @@
 #include "speaker.h"
 
 
-#define MAIN_CLOCK_X1 XTAL_1_9968MHz
+#define MAIN_CLOCK_X1 XTAL(1'996'800)
 
 //**************************************************************************
 //  GLOBAL VARIABLES

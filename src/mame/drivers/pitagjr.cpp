@@ -205,7 +205,7 @@ uint32_t pitagjr_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 
 MACHINE_CONFIG_START(pitagjr_state::pitajr)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", HD63705, XTAL_2MHz)   // probably a m6805-based MCU with internal boot ROM
+	MCFG_CPU_ADD("maincpu", HD63705, XTAL(2'000'000))   // probably a m6805-based MCU with internal boot ROM
 	MCFG_CPU_PROGRAM_MAP(pitajr_mem)
 
 	/* video hardware */

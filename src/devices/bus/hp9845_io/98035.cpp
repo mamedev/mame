@@ -94,7 +94,7 @@
 #define BIT_SET(w , n)  ((w) |= BIT_MASK(n))
 
 // Frequency of digit multiplexing in clock chip
-#define DIGIT_MUX_FREQ  (XTAL_32_768kHz / 64)
+#define DIGIT_MUX_FREQ  (XTAL(32'768) / 64)
 
 // Duration of key presses
 #define KEY_PRESS_SHORT 1   // 1.95 ms
@@ -247,7 +247,7 @@ void hp98035_io_card_device::device_timer(emu_timer &timer, device_timer_id id, 
 		m_prev_clock_keys = m_clock_keys;
 		// Count seconds
 		m_clock_1s_div++;
-		if (m_clock_1s_div >= DIGIT_MUX_FREQ) {
+		if (m_clock_1s_div >= DIGIT_MUX_FREQ.value()) {
 			m_clock_1s_div = 0;
 			advance_seconds();
 			regen_clock_image();
@@ -755,7 +755,7 @@ const tiny_rom_entry *hp98035_io_card_device::device_rom_region() const
 }
 
 MACHINE_CONFIG_START(hp98035_io_card_device::device_add_mconfig)
-	MCFG_CPU_ADD("np" , HP_NANOPROCESSOR , XTAL_1MHz)
+	MCFG_CPU_ADD("np" , HP_NANOPROCESSOR , XTAL(1'000'000))
 	MCFG_CPU_PROGRAM_MAP(np_program_map)
 	MCFG_CPU_IO_MAP(np_io_map)
 	MCFG_HP_NANO_DC_CHANGED(WRITE8(hp98035_io_card_device , dc_w))

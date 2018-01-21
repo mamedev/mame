@@ -102,7 +102,7 @@
 #include "speaker.h"
 
 
-#define MASTER_CLOCK    XTAL_15_468MHz
+#define MASTER_CLOCK    XTAL(15'468'480)
 
 // Video timing
 // PCB measured: H = 15.61khz V = 60.99hz, +/- 0.01hz

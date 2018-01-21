@@ -350,7 +350,7 @@ DRIVER_INIT_MEMBER( gts80_state, gts80 )
 /* with Sound Board */
 MACHINE_CONFIG_START(gts80_state::gts80)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6502, XTAL_3_579545MHz/4)
+	MCFG_CPU_ADD("maincpu", M6502, XTAL(3'579'545)/4)
 	MCFG_CPU_PROGRAM_MAP(gts80_map)
 
 	MCFG_NVRAM_ADD_1FILL("nvram") // must be 1
@@ -359,19 +359,19 @@ MACHINE_CONFIG_START(gts80_state::gts80)
 	MCFG_DEFAULT_LAYOUT(layout_gts80)
 
 	/* Devices */
-	MCFG_DEVICE_ADD("riot1", RIOT6532, XTAL_3_579545MHz/4)
+	MCFG_DEVICE_ADD("riot1", RIOT6532, XTAL(3'579'545)/4)
 	MCFG_RIOT6532_IN_PA_CB(READ8(gts80_state, port1a_r)) // sw_r
 	//MCFG_RIOT6532_OUT_PA_CB(WRITE8(gts80_state, port1a_w))
 	//MCFG_RIOT6532_IN_PB_CB(READ8(gts80_state, port1b_r))
 	MCFG_RIOT6532_OUT_PB_CB(WRITE8(gts80_state, port1b_w)) // sw_w
 	MCFG_RIOT6532_IRQ_CB(INPUTLINE("maincpu", M6502_IRQ_LINE))
-	MCFG_DEVICE_ADD("riot2", RIOT6532, XTAL_3_579545MHz/4)
+	MCFG_DEVICE_ADD("riot2", RIOT6532, XTAL(3'579'545)/4)
 	MCFG_RIOT6532_IN_PA_CB(READ8(gts80_state, port2a_r)) // pa7 - slam tilt
 	MCFG_RIOT6532_OUT_PA_CB(WRITE8(gts80_state, port2a_w)) // digit select
 	//MCFG_RIOT6532_IN_PB_CB(READ8(gts80_state, port2b_r))
 	MCFG_RIOT6532_OUT_PB_CB(WRITE8(gts80_state, port2b_w)) // seg
 	MCFG_RIOT6532_IRQ_CB(INPUTLINE("maincpu", M6502_IRQ_LINE))
-	MCFG_DEVICE_ADD("riot3", RIOT6532, XTAL_3_579545MHz/4)
+	MCFG_DEVICE_ADD("riot3", RIOT6532, XTAL(3'579'545)/4)
 	//MCFG_RIOT6532_IN_PA_CB(READ8(gts80_state, port3a_r))
 	MCFG_RIOT6532_OUT_PA_CB(WRITE8(gts80_state, port3a_w)) // sol, snd
 	//MCFG_RIOT6532_IN_PB_CB(READ8(gts80_state, port3b_r))

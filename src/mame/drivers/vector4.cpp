@@ -64,7 +64,7 @@ void vector4_state::machine_reset()
 
 MACHINE_CONFIG_START(vector4_state::vector4)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",Z80, XTAL_4MHz)
+	MCFG_CPU_ADD("maincpu",Z80, XTAL(4'000'000))
 	MCFG_CPU_PROGRAM_MAP(vector4_mem)
 	MCFG_CPU_IO_MAP(vector4_io)
 

@@ -216,7 +216,7 @@ MACHINE_CONFIG_START(mtxl_state::at486)
 	MCFG_SLOT_OPTION_MACHINE_CONFIG("ide", cdrom)
 	MCFG_ISA16_SLOT_ADD("mb:isabus","isa1", pc_isa16_cards, "svga_dm", true) // original is a gd-5440
 
-	MCFG_DEVICE_ADD("ns16550", NS16550, XTAL_1_8432MHz)
+	MCFG_DEVICE_ADD("ns16550", NS16550, XTAL(1'843'200))
 	MCFG_INS8250_OUT_TX_CB(DEVWRITELINE("microtouch", microtouch_device, rx))
 	MCFG_INS8250_OUT_INT_CB(DEVWRITELINE("mb:pic8259_master", pic8259_device, ir4_w))
 	MCFG_MICROTOUCH_ADD("microtouch", 9600, DEVWRITELINE("ns16550", ins8250_uart_device, rx_w))

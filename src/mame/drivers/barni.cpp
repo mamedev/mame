@@ -58,10 +58,10 @@ INPUT_PORTS_END
 
 MACHINE_CONFIG_START(barni_state::barni)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", MC6809E, XTAL_4MHz / 4)
+	MCFG_CPU_ADD("maincpu", MC6809E, XTAL(4'000'000) / 4)
 	MCFG_CPU_PROGRAM_MAP(maincpu_map)
 
-	MCFG_CPU_ADD("subcpu", MC6809E, XTAL_4MHz / 4)
+	MCFG_CPU_ADD("subcpu", MC6809E, XTAL(4'000'000) / 4)
 	MCFG_CPU_PROGRAM_MAP(subcpu_map)
 
 	MCFG_CPU_ADD("audiocpu", M6802, 4000000) // uses own XTAL, but what is the value?

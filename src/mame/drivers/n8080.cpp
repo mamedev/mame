@@ -16,7 +16,7 @@
 #include "cpu/i8085/i8085.h"
 #include "includes/n8080.h"
 
-#define MASTER_CLOCK    XTAL_20_16MHz
+#define MASTER_CLOCK    XTAL(20'160'000)
 
 
 WRITE8_MEMBER(n8080_state::n8080_shift_bits_w)
@@ -565,7 +565,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_DERIVED(n8080_state::westgun2, sheriff)
 
 	/* basic machine hardware */
-	MCFG_CPU_REPLACE("maincpu", I8080, XTAL_19_968MHz / 10)
+	MCFG_CPU_REPLACE("maincpu", I8080, XTAL(19'968'000) / 10)
 	MCFG_I8085A_STATUS(WRITE8(n8080_state,n8080_status_callback))
 	MCFG_I8085A_INTE(WRITELINE(n8080_state,n8080_inte_callback))
 	MCFG_CPU_PROGRAM_MAP(main_cpu_map)

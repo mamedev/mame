@@ -125,11 +125,11 @@ SLOT_INTERFACE_END
 //-------------------------------------------------
 
 MACHINE_CONFIG_START(adam_fdc_device::device_add_mconfig)
-	MCFG_CPU_ADD(M6801_TAG, M6801, XTAL_4MHz)
+	MCFG_CPU_ADD(M6801_TAG, M6801, XTAL(4'000'000))
 	MCFG_CPU_PROGRAM_MAP(adam_fdc_mem)
 	MCFG_CPU_IO_MAP(adam_fdc_io)
 
-	MCFG_WD2793_ADD(WD2793_TAG, XTAL_4MHz/4)
+	MCFG_WD2793_ADD(WD2793_TAG, XTAL(4'000'000)/4)
 	MCFG_WD_FDC_INTRQ_CALLBACK(INPUTLINE(M6801_TAG, INPUT_LINE_NMI))
 
 	MCFG_FLOPPY_DRIVE_ADD(WD2793_TAG":0", adam_fdc_floppies, "525ssdd", adam_fdc_device::floppy_formats)

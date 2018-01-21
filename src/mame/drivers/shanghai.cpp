@@ -384,7 +384,7 @@ ADDRESS_MAP_END
 MACHINE_CONFIG_START(shanghai_state::shanghai)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", V30, XTAL_16MHz/2) /* NEC D70116C-8 */
+	MCFG_CPU_ADD("maincpu", V30, XTAL(16'000'000)/2) /* NEC D70116C-8 */
 	MCFG_CPU_PROGRAM_MAP(shanghai_map)
 	MCFG_CPU_IO_MAP(shanghai_portmap)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", shanghai_state, half_vblank_irq)
@@ -407,7 +407,7 @@ MACHINE_CONFIG_START(shanghai_state::shanghai)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ymsnd", YM2203, XTAL_16MHz/4)
+	MCFG_SOUND_ADD("ymsnd", YM2203, XTAL(16'000'000)/4)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW1"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW2"))
 	MCFG_SOUND_ROUTE(0, "mono", 0.15)
@@ -420,7 +420,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(shanghai_state::shangha2)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", V30, XTAL_16MHz/2) /* ? */
+	MCFG_CPU_ADD("maincpu", V30, XTAL(16'000'000)/2) /* ? */
 	MCFG_CPU_PROGRAM_MAP(shangha2_map)
 	MCFG_CPU_IO_MAP(shangha2_portmap)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", shanghai_state, half_vblank_irq)
@@ -442,7 +442,7 @@ MACHINE_CONFIG_START(shanghai_state::shangha2)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ymsnd", YM2203, XTAL_16MHz/4)
+	MCFG_SOUND_ADD("ymsnd", YM2203, XTAL(16'000'000)/4)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW1"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW2"))
 	MCFG_SOUND_ROUTE(0, "mono", 0.15)
@@ -455,11 +455,11 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(shanghai_state::kothello)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", V30, XTAL_16MHz)
+	MCFG_CPU_ADD("maincpu", V30, XTAL(16'000'000))
 	MCFG_CPU_PROGRAM_MAP(kothello_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", shanghai_state, half_vblank_irq)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_16MHz/4)
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL(16'000'000)/4)
 	MCFG_CPU_PROGRAM_MAP(kothello_sound_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(12000))
@@ -482,7 +482,7 @@ MACHINE_CONFIG_START(shanghai_state::kothello)
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	/* same as standard seibu ym2203, but also reads "DSW" */
-	MCFG_SOUND_ADD("ymsnd", YM2203, XTAL_16MHz/4)
+	MCFG_SOUND_ADD("ymsnd", YM2203, XTAL(16'000'000)/4)
 	MCFG_YM2203_IRQ_HANDLER(DEVWRITELINE("seibu_sound", seibu_sound_device, fm_irqhandler))
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW1"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW2"))

@@ -80,7 +80,7 @@ void systec_state::machine_reset()
 
 MACHINE_CONFIG_START(systec_state::systec)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_16MHz / 4)
+	MCFG_CPU_ADD("maincpu", Z80, XTAL(16'000'000) / 4)
 	MCFG_CPU_PROGRAM_MAP(systec_mem)
 	MCFG_CPU_IO_MAP(systec_io)
 
@@ -89,7 +89,7 @@ MACHINE_CONFIG_START(systec_state::systec)
 	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("sio", z80sio_device, rxca_w))
 
 	/* Devices */
-	MCFG_DEVICE_ADD("sio", Z80SIO, XTAL_4MHz)
+	MCFG_DEVICE_ADD("sio", Z80SIO, XTAL(4'000'000))
 	//MCFG_Z80SIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))  // no evidence of a daisy chain because IM2 is not set
 	MCFG_Z80SIO_OUT_TXDA_CB(DEVWRITELINE("rs232", rs232_port_device, write_txd))
 	MCFG_Z80SIO_OUT_DTRA_CB(DEVWRITELINE("rs232", rs232_port_device, write_dtr))

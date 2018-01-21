@@ -3658,8 +3658,8 @@ const uint8_t hp9845t_state::m_back_arrow_shape[] = {
 };
 
 MACHINE_CONFIG_START(hp9845_state::hp9845a)
-	//MCFG_CPU_ADD("lpu", HP_5061_3010, XTAL_11_4MHz)
-	//MCFG_CPU_ADD("ppu", HP_5061_3011, XTAL_11_4MHz)
+	//MCFG_CPU_ADD("lpu", HP_5061_3010, XTAL(11'400'000))
+	//MCFG_CPU_ADD("ppu", HP_5061_3011, XTAL(11'400'000))
 
 	// video hardware
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -3673,8 +3673,8 @@ MACHINE_CONFIG_START(hp9845_state::hp9845a)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(hp9845_state::hp9835a)
-	//MCFG_CPU_ADD("lpu", HP_5061_3001, XTAL_11_4MHz)
-	//MCFG_CPU_ADD("ppu", HP_5061_3001, XTAL_11_4MHz)
+	//MCFG_CPU_ADD("lpu", HP_5061_3001, XTAL(11'400'000))
+	//MCFG_CPU_ADD("ppu", HP_5061_3001, XTAL(11'400'000))
 
 	// video hardware
 	MCFG_SCREEN_ADD("screen", RASTER)

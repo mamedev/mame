@@ -309,12 +309,12 @@ MACHINE_CONFIG_START(kungfur_state::kungfur)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-	MCFG_SOUND_ADD("adpcm1", MSM5205, XTAL_384kHz)  // clock verified with recording
+	MCFG_SOUND_ADD("adpcm1", MSM5205, XTAL(384'000))  // clock verified with recording
 	MCFG_MSM5205_VCLK_CB(WRITELINE(kungfur_state, kfr_adpcm1_int))
 	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 
-	MCFG_SOUND_ADD("adpcm2", MSM5205, XTAL_384kHz)  // "
+	MCFG_SOUND_ADD("adpcm2", MSM5205, XTAL(384'000))  // "
 	MCFG_MSM5205_VCLK_CB(WRITELINE(kungfur_state, kfr_adpcm2_int))
 	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
