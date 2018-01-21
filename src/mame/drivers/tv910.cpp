@@ -53,6 +53,7 @@ public:
 		, m_kbspecial(*this, "keyb_special")
 		, m_beep(*this, "bell")
 		, m_dsw1(*this, "DSW1")
+		, m_charset(*this, "CHARSET")
 	{ }
 
 	virtual void machine_start() override;
@@ -88,6 +89,7 @@ private:
 	required_ioport m_kbspecial;
 	required_device<beep_device> m_beep;
 	required_ioport m_dsw1;
+	required_ioport m_charset;
 
 	uint16_t m_lastchar, m_strobe;
 	uint8_t m_transchar;
@@ -133,7 +135,7 @@ WRITE8_MEMBER(tv910_state::control_w)
 
 READ8_MEMBER(tv910_state::charset_r)
 {
-	return 0;   // 0 = US (TODO: make this configurable)
+	return m_charset->read();
 }
 
 WRITE8_MEMBER(tv910_state::nmi_ack_w)
@@ -150,10 +152,21 @@ READ8_MEMBER(tv910_state::kbd_ascii_r)
 READ8_MEMBER(tv910_state::kbd_flags_r)
 {
 	uint8_t rv = 0;
+	ioport_value kbspecial = m_kbspecial->read();
 
-	//rv |= m_strobe ? 0x40 : 0;
-	//rv |= (m_kbspecial->read() & 0x01) ? 0x00 : 0x40; // caps lock
-	rv |= 0x40; // must be set for keyboard reads to work, but disagrees with docs?
+	// D0: Keyboard strobe (AY-5-3600 AKO)
+	if (m_anykeydown)
+		rv |= 0x01;
+
+	// D1: Printer DTR (pin 20)
+
+	// D6: FUNC key (not ALPHA LOCK as indicated in memory map)
+	if (BIT(kbspecial, 4))
+		rv |= 0x40;
+
+	// D7: ALPHA LOCK key (not FUNC as indicated in memory map)
+	if (BIT(kbspecial, 0))
+		rv |= 0x80;
 
 	return rv;
 }
@@ -324,7 +337,7 @@ static INPUT_PORTS_START( tv910 )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Left Shift")   PORT_CODE(KEYCODE_LSHIFT)   PORT_CHAR(UCHAR_SHIFT_1)
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Right Shift")  PORT_CODE(KEYCODE_RSHIFT)   PORT_CHAR(UCHAR_SHIFT_1)
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Control")      PORT_CODE(KEYCODE_LCONTROL) PORT_CHAR(UCHAR_SHIFT_2)
-
+	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_KEYBOARD) PORT_NAME("Func") PORT_CODE(KEYCODE_LALT)
 
 	PORT_START("DSW2")  // "S1" in the Operator's Manual
 	PORT_DIPNAME( 0x0f, 0x00, "Baud rate" )
@@ -397,6 +410,13 @@ static INPUT_PORTS_START( tv910 )
 	PORT_DIPSETTING( 0x00, "DSR connected" )
 	PORT_DIPSETTING( 0x200, "DSR disconnected" )
 #endif
+
+	PORT_START("CHARSET") // actually a pair of jumpers: E4-E5 (bit 1), E6-E7 (bit 0)
+	PORT_DIPNAME( 0x03, 0x00, "Character Set" )
+	PORT_DIPSETTING( 0x00, "English" )
+	PORT_DIPSETTING( 0x01, "German" )
+	PORT_DIPSETTING( 0x02, "French" )
+	PORT_DIPSETTING( 0x03, "Spanish" )
 INPUT_PORTS_END
 
 void tv910_state::machine_start()
@@ -427,7 +447,7 @@ WRITE8_MEMBER(tv910_state::vbl_ack_w)
 MC6845_UPDATE_ROW( tv910_state::crtc_update_row )
 {
 	uint32_t  *p = &bitmap.pix32(y);
-	uint16_t  chr_base = ra & 7;
+	uint16_t  chr_base = (ra & 7) | m_charset->read() << 10;
 	uint8_t   chr = m_vram[0x7ff];
 	uint8_t   att = (chr & 0xf0) == 0x90 ? chr & 0x0f : 0;
 	bool      bow = BIT(m_dsw1->read(), 8);
