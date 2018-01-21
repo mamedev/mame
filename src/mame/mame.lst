@@ -36508,6 +36508,7 @@ stepstag                        // (c) 1999 Jaleco
 tetrisp2                        // (c) 1997 Jaleco
 tetrisp2j                       // (c) 1997 Jaleco
 tetrisp2ja                      // (c) 1997 Jaleco
+vjdash                          // (c) 1999 Jaleco
 
 @source:tg100.cpp
 tg100                           // (c) 1991
