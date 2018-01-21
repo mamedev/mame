@@ -761,8 +761,8 @@ public:
 	DECLARE_READ8_MEMBER(read_g);
 	DECLARE_WRITE_LINE_MEMBER(write_so);
 	DECLARE_READ_LINE_MEMBER(read_si);
-
 	void lchicken(machine_config &config);
+	
 protected:
 	virtual void machine_start() override;
 };

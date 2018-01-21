@@ -103,6 +103,7 @@ public:
 
 	void rev1(machine_config &config);
 	void rev2(machine_config &config);
+
 protected:
 	virtual void machine_start() override;
 };

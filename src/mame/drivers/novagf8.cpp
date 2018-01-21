@@ -45,8 +45,8 @@ public:
 	DECLARE_WRITE8_MEMBER(delta1_io1_w);
 	DECLARE_READ8_MEMBER(delta1_io0_r);
 	DECLARE_READ8_MEMBER(delta1_io1_r);
-
 	void delta1(machine_config &config);
+
 protected:
 	virtual void machine_start() override;
 };

@@ -92,12 +92,14 @@ public:
 	DECLARE_WRITE8_MEMBER(supercon_control_w);
 	DECLARE_READ8_MEMBER(supercon_input1_r);
 	DECLARE_READ8_MEMBER(supercon_input2_r);
+	void supercon(machine_config &config);
 
 	// Constellation Forte
 	void cforte_prepare_display();
 	DECLARE_WRITE64_MEMBER(cforte_lcd_output_w);
 	DECLARE_WRITE8_MEMBER(cforte_mux_w);
 	DECLARE_WRITE8_MEMBER(cforte_control_w);
+	void cforte(machine_config &config);
 
 	// Super Expert
 	DECLARE_WRITE8_MEMBER(sexpert_leds_w);
@@ -110,13 +112,11 @@ public:
 	DECLARE_DRIVER_INIT(sexpert);
 	DECLARE_INPUT_CHANGED_MEMBER(sexpert_cpu_freq);
 	void sexpert_set_cpu_freq();
+	void sexpert(machine_config &config);
 
 	// Super Forte
 	DECLARE_WRITE8_MEMBER(sforte_lcd_control_w);
 	DECLARE_WRITE8_MEMBER(sforte_lcd_data_w);
-	void cforte(machine_config &config);
-	void sexpert(machine_config &config);
-	void supercon(machine_config &config);
 	void sforte(machine_config &config);
 };
 

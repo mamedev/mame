@@ -2030,8 +2030,8 @@ public:
 	void speaker_decay_reset();
 	TIMER_DEVICE_CALLBACK_MEMBER(speaker_decay_sim);
 	double m_speaker_volume;
-
 	void cdkong(machine_config &config);
+
 protected:
 	virtual void machine_start() override;
 };
@@ -2783,6 +2783,7 @@ public:
 	epacman2_state(const machine_config &mconfig, device_type type, const char *tag)
 		: egalaxn2_state(mconfig, type, tag)
 	{ }
+
 	void epacman2(machine_config &config);
 };
 
@@ -2862,8 +2863,8 @@ public:
 
 	void update_int();
 	DECLARE_INPUT_CHANGED_MEMBER(input_changed);
-
 	void eturtles(machine_config &config);
+
 protected:
 	virtual void machine_start() override;
 };

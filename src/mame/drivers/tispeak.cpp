@@ -474,20 +474,22 @@ public:
 	u8 m_overlay;
 	TIMER_DEVICE_CALLBACK_MEMBER(tntell_get_overlay);
 
+	// machine configs
 	void tms5110_route(machine_config &config);
-	void snspellit(machine_config &config);
-	void lantutor(machine_config &config);
-	void snmath(machine_config &config);
-	void snspellsp(machine_config &config);
-	void k28m2(machine_config &config);
-	void snspellc(machine_config &config);
-	void vocaid(machine_config &config);
-	void snspellcuk(machine_config &config);
-	void sns_cd2801(machine_config &config);
-	void tntell(machine_config &config);
-	void snread(machine_config &config);
-	void sns_tmc0281d(machine_config &config);
 	void sns_tmc0281(machine_config &config);
+	void sns_tmc0281d(machine_config &config);
+	void sns_cd2801(machine_config &config);
+	void snspellit(machine_config &config);
+	void snspellsp(machine_config &config);
+	void snspellc(machine_config &config);
+	void snspellcuk(machine_config &config);
+	void snmath(machine_config &config);
+	void snread(machine_config &config);
+	void tntell(machine_config &config);
+	void vocaid(machine_config &config);
+	void lantutor(machine_config &config);
+	void k28m2(machine_config &config);
+
 protected:
 	virtual void machine_start() override;
 };

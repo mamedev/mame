@@ -2067,8 +2067,8 @@ public:
 
 	void set_clock();
 	DECLARE_INPUT_CHANGED_MEMBER(difficulty_switch);
-
 	void tmtennis(machine_config &config);
+
 protected:
 	virtual void machine_reset() override;
 };

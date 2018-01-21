@@ -234,6 +234,7 @@ public:
 	{
 		m_inp_lines = 3;
 	}
+
 	void kdribble(machine_config &config);
 };
 
@@ -306,6 +307,7 @@ public:
 	{
 		m_inp_lines = 3;
 	}
+
 	void ktopgun(machine_config &config);
 };
 
@@ -380,6 +382,7 @@ public:
 	{
 		m_inp_lines = 3;
 	}
+
 	void kcontra(machine_config &config);
 };
 
@@ -451,6 +454,7 @@ public:
 	{
 		m_inp_lines = 3;
 	}
+
 	void ktmnt(machine_config &config);
 };
 
@@ -525,6 +529,7 @@ public:
 	{
 		m_inp_lines = 2;
 	}
+
 	void kgradius(machine_config &config);
 };
 
@@ -592,6 +597,7 @@ public:
 	{
 		m_inp_lines = 2;
 	}
+
 	void kloneran(machine_config &config);
 };
 
@@ -659,6 +665,7 @@ public:
 	{
 		m_inp_lines = 3;
 	}
+
 	void kblades(machine_config &config);
 };
 
@@ -731,6 +738,7 @@ public:
 	{
 		m_inp_lines = 3;
 	}
+
 	void knfl(machine_config &config);
 };
 
@@ -800,6 +808,7 @@ public:
 	{
 		m_inp_lines = 3;
 	}
+
 	void kbilly(machine_config &config);
 };
 
@@ -871,6 +880,7 @@ public:
 	{
 		m_inp_lines = 2;
 	}
+
 	void kbucky(machine_config &config);
 };
 
@@ -936,6 +946,7 @@ public:
 	{
 		m_inp_lines = 3;
 	}
+
 	void kgarfld(machine_config &config);
 };
 
@@ -1014,6 +1025,7 @@ public:
 	{
 		m_inp_lines = 3;
 	}
+
 	void exospace(machine_config &config);
 	void nupogodi(machine_config &config);
 	void gnw_egg(machine_config &config);
@@ -1132,6 +1144,7 @@ public:
 	{
 		m_inp_lines = 2;
 	}
+
 	void gnw_mickdon(machine_config &config);
 };
 
@@ -1211,6 +1224,7 @@ public:
 	{
 		m_inp_lines = 3;
 	}
+
 	void gnw_dkong2(machine_config &config);
 };
 
@@ -1294,6 +1308,7 @@ public:
 	{
 		m_inp_lines = 2;
 	}
+
 	void gnw_mario(machine_config &config);
 };
 
@@ -1381,6 +1396,7 @@ public:
 	{
 		m_inp_lines = 3;
 	}
+
 	void gnw_dkjr(machine_config &config);
 };
 
@@ -1466,6 +1482,7 @@ public:
 	{
 		m_inp_lines = 2;
 	}
+
 	void gnw_mariocm(machine_config &config);
 };
 
@@ -1628,6 +1645,7 @@ public:
 	{
 		m_inp_lines = 7;
 	}
+
 	void gnw_boxing(machine_config &config);
 };
 
@@ -1736,6 +1754,7 @@ public:
 		m_inp_lines = 6;
 		m_inp_fixed = 6;
 	}
+
 	void trobhood(machine_config &config);
 	void tgaunt(machine_config &config);
 };
@@ -1850,6 +1869,7 @@ public:
 		m_inp_lines = 5;
 		m_inp_fixed = 5;
 	}
+
 	void tddragon(machine_config &config);
 };
 
@@ -1940,6 +1960,7 @@ public:
 		m_inp_lines = 6;
 		m_inp_fixed = 6;
 	}
+
 	void tkarnov(machine_config &config);
 };
 
@@ -2034,6 +2055,7 @@ public:
 		m_inp_lines = 6;
 		m_inp_fixed = 6;
 	}
+
 	void tvindictr(machine_config &config);
 };
 
@@ -2230,6 +2252,7 @@ public:
 		m_inp_lines = 5;
 		m_inp_fixed = 5;
 	}
+
 	void tbatman(machine_config &config);
 };
 
@@ -2323,6 +2346,7 @@ public:
 		m_inp_lines = 5;
 		m_inp_fixed = 5;
 	}
+
 	void tsharr2(machine_config &config);
 };
 
@@ -2412,6 +2436,7 @@ public:
 		m_inp_lines = 6;
 		m_inp_fixed = 6;
 	}
+
 	void tgoldnaxe(machine_config &config);
 };
 
@@ -2506,6 +2531,7 @@ public:
 		m_inp_lines = 6;
 		m_inp_fixed = 6;
 	}
+
 	void trobocop2(machine_config &config);
 };
 
@@ -2604,6 +2630,7 @@ public:
 		m_inp_lines = 6;
 		m_inp_fixed = 6;
 	}
+
 	void taltbeast(machine_config &config);
 };
 
@@ -2698,6 +2725,7 @@ public:
 		m_inp_lines = 5;
 		m_inp_fixed = 5;
 	}
+
 	void tswampt(machine_config &config);
 };
 
@@ -2788,6 +2816,7 @@ public:
 		m_inp_lines = 6;
 		m_inp_fixed = 6;
 	}
+
 	void tmchammer(machine_config &config);
 };
 
@@ -2882,6 +2911,7 @@ public:
 		m_inp_lines = 6;
 		m_inp_fixed = 6;
 	}
+
 	void tbtoads(machine_config &config);
 };
 
@@ -3094,6 +3124,7 @@ public:
 		m_inp_lines = 5;
 		m_inp_fixed = 5;
 	}
+
 	void tdummies(machine_config &config);
 };
 
@@ -3184,6 +3215,7 @@ public:
 		m_inp_lines = 6;
 		m_inp_fixed = 6;
 	}
+
 	void tsfight2(machine_config &config);
 };
 
@@ -3477,6 +3509,7 @@ public:
 		m_inp_lines = 6;
 		m_inp_fixed = 6;
 	}
+
 	void tmkombat(machine_config &config);
 };
 
@@ -3572,6 +3605,7 @@ public:
 		m_inp_lines = 6;
 		m_inp_fixed = 6;
 	}
+
 	void tshadow(machine_config &config);
 };
 
@@ -3761,6 +3795,7 @@ public:
 		m_inp_lines = 6;
 		m_inp_fixed = 6;
 	}
+
 	void tbatfor(machine_config &config);
 };
 
@@ -3856,6 +3891,7 @@ public:
 		m_inp_lines = 6;
 		m_inp_fixed = 6;
 	}
+
 	void tjdredd(machine_config &config);
 };
 
@@ -3951,6 +3987,7 @@ public:
 		m_inp_lines = 6;
 		m_inp_fixed = 6;
 	}
+
 	void tapollo13(machine_config &config);
 };
 
@@ -4046,6 +4083,7 @@ public:
 		m_inp_lines = 5;
 		m_inp_fixed = 5;
 	}
+
 	void tsjam(machine_config &config);
 };
 
@@ -4135,6 +4173,7 @@ public:
 	{
 		m_inp_lines = 8;
 	}
+
 	void tigarden(machine_config &config);
 };
 
@@ -4237,6 +4276,7 @@ public:
 	{
 		m_inp_lines = 8;
 	}
+
 	void nummunch(machine_config &config);
 };
 

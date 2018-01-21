@@ -59,6 +59,7 @@ public:
 	void tms5110_route(machine_config &config);
 	void eva11(machine_config &config);
 	void eva24(machine_config &config);
+
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;

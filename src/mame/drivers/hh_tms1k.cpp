@@ -1500,8 +1500,8 @@ public:
 
 	void set_clock();
 	DECLARE_INPUT_CHANGED_MEMBER(skill_switch);
-
 	void h2hbaseb(machine_config &config);
+
 protected:
 	virtual void machine_reset() override;
 };
@@ -1764,8 +1764,8 @@ public:
 	DECLARE_WRITE16_MEMBER(write_r);
 	DECLARE_WRITE16_MEMBER(write_o);
 	DECLARE_READ8_MEMBER(read_k);
-
 	void quizwizc(machine_config &config);
+
 protected:
 	virtual void machine_start() override;
 };
@@ -1941,8 +1941,8 @@ public:
 	DECLARE_WRITE16_MEMBER(write_r);
 	DECLARE_WRITE16_MEMBER(write_o);
 	DECLARE_READ8_MEMBER(read_k);
-
 	void tc4(machine_config &config);
+
 protected:
 	virtual void machine_start() override;
 };
@@ -3101,8 +3101,8 @@ public:
 
 	void set_clock();
 	DECLARE_INPUT_CHANGED_MEMBER(skill_switch);
-
 	void ebball3(machine_config &config);
+
 protected:
 	virtual void machine_reset() override;
 };
@@ -3371,8 +3371,8 @@ public:
 
 	void set_clock();
 	DECLARE_INPUT_CHANGED_MEMBER(skill_switch);
-
 	void einvader(machine_config &config);
+
 protected:
 	virtual void machine_reset() override;
 };
@@ -3733,8 +3733,8 @@ public:
 
 	void set_clock();
 	DECLARE_INPUT_CHANGED_MEMBER(skill_switch);
-
 	void raisedvl(machine_config &config);
+
 protected:
 	virtual void machine_reset() override;
 };
@@ -3992,8 +3992,8 @@ public:
 
 	void set_clock();
 	DECLARE_INPUT_CHANGED_MEMBER(skill_switch);
-
 	void f3in1(machine_config &config);
+
 protected:
 	virtual void machine_reset() override;
 };
@@ -4130,8 +4130,8 @@ public:
 	virtual DECLARE_WRITE16_MEMBER(write_r);
 	virtual DECLARE_WRITE16_MEMBER(write_o);
 	virtual DECLARE_READ8_MEMBER(read_k);
-
 	void gpoker(machine_config &config);
+
 protected:
 	virtual void machine_reset() override;
 };
@@ -4500,8 +4500,8 @@ public:
 	virtual DECLARE_WRITE16_MEMBER(write_r);
 	virtual DECLARE_WRITE16_MEMBER(write_o);
 	virtual DECLARE_READ8_MEMBER(read_k);
-
 	void ginv2000(machine_config &config);
+
 protected:
 	virtual void machine_reset() override;
 };
@@ -6126,8 +6126,8 @@ public:
 
 	void set_clock();
 	DECLARE_INPUT_CHANGED_MEMBER(speed_switch);
-
 	void ssimon(machine_config &config);
+
 protected:
 	virtual void machine_reset() override;
 };
@@ -6275,8 +6275,8 @@ public:
 	int m_gearbox_pos;
 	bool sensor_state() { return m_gearbox_pos < 0 && m_display_decay[0][0] != 0; }
 	TIMER_DEVICE_CALLBACK_MEMBER(gearbox_sim_tick);
-
 	void bigtrak(machine_config &config);
+
 protected:
 	virtual void machine_start() override;
 };
@@ -6467,8 +6467,8 @@ public:
 	DECLARE_WRITE16_MEMBER(write_r);
 	DECLARE_WRITE16_MEMBER(write_o);
 	DECLARE_READ8_MEMBER(read_k);
-
 	void mbdtower(machine_config &config);
+
 protected:
 	virtual void machine_start() override;
 };
@@ -7031,6 +7031,7 @@ public:
 	mmerlin_state(const machine_config &mconfig, device_type type, const char *tag)
 		: merlin_state(mconfig, type, tag)
 	{ }
+
 	void mmerlin(machine_config &config);
 };
 
@@ -7784,6 +7785,7 @@ public:
 	tcfballa_state(const machine_config &mconfig, device_type type, const char *tag)
 		: tcfball_state(mconfig, type, tag)
 	{ }
+
 	void tcfballa(machine_config &config);
 };
 
@@ -8749,8 +8751,8 @@ public:
 
 	void set_clock();
 	DECLARE_INPUT_CHANGED_MEMBER(skill_switch);
-
 	void tbreakup(machine_config &config);
+
 protected:
 	virtual void machine_reset() override;
 	virtual void machine_start() override;
@@ -9182,8 +9184,8 @@ public:
 	DECLARE_WRITE16_MEMBER(write_r);
 	DECLARE_WRITE16_MEMBER(write_o);
 	DECLARE_READ8_MEMBER(read_k);
-
 	void xl25(machine_config &config);
+
 protected:
 	virtual void machine_reset() override;
 };

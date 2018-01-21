@@ -70,6 +70,7 @@ public:
 
 	void rzbatfor(machine_config &config);
 	void rzindy500(machine_config &config);
+
 protected:
 	virtual void machine_start() override;
 };

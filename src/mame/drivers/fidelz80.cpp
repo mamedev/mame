@@ -547,14 +547,18 @@ public:
 	DECLARE_WRITE8_MEMBER(cc10_ppi_porta_w);
 	TIMER_DEVICE_CALLBACK_MEMBER(beeper_off_callback);
 	DECLARE_MACHINE_START(vcc);
+	void cc10(machine_config &config);
+	void vcc(machine_config &config);
 
 	// BCC
 	DECLARE_READ8_MEMBER(bcc_input_r);
 	DECLARE_WRITE8_MEMBER(bcc_control_w);
+	void bcc(machine_config &config);
 
 	// SCC
 	DECLARE_READ8_MEMBER(scc_input_r);
 	DECLARE_WRITE8_MEMBER(scc_control_w);
+	void scc(machine_config &config);
 
 	// VSC
 	void vsc_prepare_display();
@@ -566,6 +570,7 @@ public:
 	DECLARE_READ8_MEMBER(vsc_pio_porta_r);
 	DECLARE_READ8_MEMBER(vsc_pio_portb_r);
 	DECLARE_WRITE8_MEMBER(vsc_pio_portb_w);
+	void vsc(machine_config &config);
 
 	// VBRC
 	void vbrc_prepare_display();
@@ -575,19 +580,14 @@ public:
 	DECLARE_READ_LINE_MEMBER(vbrc_mcu_t1_r);
 	DECLARE_READ8_MEMBER(vbrc_mcu_p2_r);
 	DECLARE_WRITE8_MEMBER(vbrc_ioexp_port_w);
+	void vbrc(machine_config &config);
 
 	// DSC
 	void dsc_prepare_display();
 	DECLARE_WRITE8_MEMBER(dsc_control_w);
 	DECLARE_WRITE8_MEMBER(dsc_select_w);
 	DECLARE_READ8_MEMBER(dsc_input_r);
-	void bcc(machine_config &config);
-	void scc(machine_config &config);
 	void dsc(machine_config &config);
-	void vcc(machine_config &config);
-	void cc10(machine_config &config);
-	void vsc(machine_config &config);
-	void vbrc(machine_config &config);
 };
 
 

@@ -753,8 +753,8 @@ public:
 
 	void set_clock();
 	DECLARE_INPUT_CHANGED_MEMBER(speed_switch);
-
 	void matchme(machine_config &config);
+
 protected:
 	virtual void machine_reset() override;
 };
@@ -910,8 +910,8 @@ public:
 	void speaker_decay_reset();
 	TIMER_DEVICE_CALLBACK_MEMBER(speaker_decay_sim);
 	double m_speaker_volume;
-
 	void leboom(machine_config &config);
+
 protected:
 	virtual void machine_start() override;
 };

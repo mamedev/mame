@@ -89,8 +89,8 @@ public:
 	DECLARE_WRITE8_MEMBER(ch2001_speaker_on_w);
 	DECLARE_WRITE8_MEMBER(ch2001_leds_w);
 	DECLARE_READ8_MEMBER(ch2001_input_r);
-
 	void ch2001(machine_config &config);
+
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
