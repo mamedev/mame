@@ -1252,6 +1252,10 @@ ROM_START( dgun2573 )
 	ROM_LOAD( "dgun2573.bin", 0x00000, 0x2000000, CRC(cde71a53) SHA1(d0d4c1965876291861781ecde46b1142b062f1f3) )
 ROM_END
 
+ROM_START( bittboy )
+	ROM_REGION( 0x2000000, "mainrom", 0 )
+	ROM_LOAD( "bittboy_flash_read_S29GL256N-TF-V2.bin", 0x00000, 0x2000000, CRC(d9e67279) SHA1(db72b538ea55ea60e92e734b0565bc78b7873573) )
+ROM_END
 
 // earlier version of vdogdemo
 CONS( 200?, vdogdeme,  0,  0,  nes_vt,    nes_vt, nes_vt_state,  0, "VRT", "V-Dog (prototype, earlier)", MACHINE_NOT_WORKING )
@@ -1302,8 +1306,8 @@ CONS( 200?, pjoys60,    0,        0,  nes_vt,    nes_vt, nes_vt_state,  0, "<unk
 CONS( 200?, sarc110,    0,        0,  nes_vt,    nes_vt, nes_vt_state,  0, "<unknown>", "Super Arcade 110 (set 1)", MACHINE_NOT_WORKING )
 CONS( 200?, sarc110a,   sarc110,  0,  nes_vt,    nes_vt, nes_vt_state,  0, "<unknown>", "Super Arcade 110 (set 2)", MACHINE_NOT_WORKING )
 // both offer chinese or english menus
-CONS( 200?, mc_110cb,   0,        0,  nes_vt,    nes_vt, nes_vt_state,  0, "CoolBoy", "110 in 1 CoolBaby (CoolBoy RS-1S)", MACHINE_NOT_WORKING )
-CONS( 200?, mc_138cb,   0,        0,  nes_vt,    nes_vt, nes_vt_state,  0, "CoolBoy", "138 in 1 CoolBaby (CoolBoy RS-5, PCB060-10009011V1.3)", MACHINE_NOT_WORKING )
+CONS( 200?, mc_110cb,   0,        0,  nes_vt,    nes_vt, nes_vt_state,  0, "CoolBoy", "110 in 1 CoolBaby (CoolBoy RS-1S)", MACHINE_IMPERFECT_GRAPHICS )
+CONS( 200?, mc_138cb,   0,        0,  nes_vt,    nes_vt, nes_vt_state,  0, "CoolBoy", "138 in 1 CoolBaby (CoolBoy RS-5, PCB060-10009011V1.3)", MACHINE_IMPERFECT_GRAPHICS )
 
 CONS( 200?, gprnrs1,   0,        0,  nes_vt,    nes_vt, nes_vt_state,  0, "<unknown>", "Game Prince RS-1", MACHINE_NOT_WORKING )
 CONS( 200?, gprnrs16,  0,        0,  nes_vt,    nes_vt, nes_vt_state,  0, "<unknown>", "Game Prince RS-16", MACHINE_NOT_WORKING )
@@ -1319,10 +1323,6 @@ CONS( 200?, mc_8x6ss,   0,        0,  nes_vt,    nes_vt, nes_vt_state,  0, "<unk
 CONS( 2004, mc_dcat8,   0,        0,  nes_vt,    nes_vt, nes_vt_state,  0, "<unknown>", "100 in 1 (D-CAT8 8bit Console, set 1) (v5.01.11-frd, BL 20041217)", MACHINE_IMPERFECT_GRAPHICS )
 CONS( 2004, mc_dcat8a,  mc_dcat8, 0,  nes_vt,    nes_vt, nes_vt_state,  0, "<unknown>", "100 in 1 (D-CAT8 8bit Console, set 2)", MACHINE_IMPERFECT_GRAPHICS )
 
-// misc OneBus
-// all have broken gfx, abd games don't load
-CONS( 200?, mc_15kin1,  0, 				0,  nes_vt,    nes_vt, nes_vt_state,  0, "<unknown>", "15000 in 1", MACHINE_NOT_WORKING )
-CONS( 200?, mc_18kin1,  0, 				0,  nes_vt,    nes_vt, nes_vt_state,  0, "<unknown>", "18000 in 1", MACHINE_NOT_WORKING )
-CONS( 200?, gx121in1,  	0, 				0,  nes_vt,    nes_vt, nes_vt_state,  0, "<unknown>", "Games Xplosion 121 in 1", MACHINE_NOT_WORKING )
-
 CONS( 2017, sy889,  		0, 				0,  nes_vt_hh, nes_vt, nes_vt_state,  0, "SY Corp", 	"SY-889 300 in 1 Handheld", MACHINE_NOT_WORKING )
+
+CONS( 2017, bittboy,  	0, 				0,  nes_vt,    nes_vt, nes_vt_state,  0, "BittBoy", 	"BittBoy Mini FC 300 in 1", MACHINE_NOT_WORKING )
