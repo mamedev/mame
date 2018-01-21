@@ -200,6 +200,7 @@ public:
 	DECLARE_WRITE8_MEMBER(mbutrfly_prot_w);
 	READ_LINE_MEMBER(mbutrfly_prot_r);
 	DECLARE_READ8_MEMBER(bdream97_opcode_r);
+	DECLARE_DRIVER_INIT(ypovrixi);
 	DECLARE_DRIVER_INIT(sonikfig);
 	TILE_GET_INFO_MEMBER(get_tile_info);
 	TILE_GET_INFO_MEMBER(get_reel_1_tile_info);
@@ -2051,6 +2052,22 @@ DRIVER_INIT_MEMBER(skylncr_state, sonikfig)
 	}
 }
 
+DRIVER_INIT_MEMBER(skylncr_state, ypovrixi)
+/*
+  Encryption:
+
+  Some offset ranges are xor'ed with 0x44.
+  The begining of the code seems different.
+
+*/
+{
+//	uint8_t *const ROM = memregion("maincpu")->base();
+//	for (unsigned x = 0; x < 0x10000; x++)
+//	{
+//		ROM[x] = ROM[x] ^ 0x44;
+//	}
+}
+
 
 /****************************************************
 *                  Game Drivers                     *
@@ -2064,8 +2081,8 @@ GAME( 1995, madzoo,    0,       skylncr,  skylncr,  skylncr_state,  0,        RO
 GAME( 1995, leader,    0,       skylncr,  leader,   skylncr_state,  0,        ROT0, "bootleg",              "Leader (version Z 2E, Greece)",                  0 )
 GAME( 199?, gallag50,  0,       skylncr,  gallag50, skylncr_state,  0,        ROT0, "bootleg",              "Gallag Video Game / Petalouda (Butterfly, x50)", 0 )
 GAME( 199?, neraidou,  0,       neraidou, neraidou, skylncr_state,  0,        ROT0, "bootleg",              "Neraidoula (Fairy Butterfly)",                   0 )
-GAME( 199?, ypovrixi,  0,       skylncr,  skylncr,  skylncr_state,  0,        ROT0, "bootleg?",             "Ypovrixio (Submarine, set 1)",                   MACHINE_WRONG_COLORS | MACHINE_NOT_WORKING )
-GAME( 199?, ypovrixia, 0,       skylncr,  skylncr,  skylncr_state,  0,        ROT0, "bootleg?",             "Ypovrixio (Submarine, set 2)",                   MACHINE_WRONG_COLORS | MACHINE_NOT_WORKING )
+GAME( 199?, ypovrixi,  0,       skylncr,  skylncr,  skylncr_state,  ypovrixi, ROT0, "bootleg?",             "Ypovrixio (Submarine, set 1)",                   MACHINE_WRONG_COLORS | MACHINE_NOT_WORKING )
+GAME( 199?, ypovrixia, 0,       skylncr,  skylncr,  skylncr_state,  ypovrixi, ROT0, "bootleg?",             "Ypovrixio (Submarine, set 2)",                   MACHINE_WRONG_COLORS | MACHINE_NOT_WORKING )
 GAME( 199?, sstar97,   0,       sstar97,  sstar97,  skylncr_state,  0,        ROT0, "Bordun International", "Super Star 97 / Ming Xing 97 (version V153B)",   0 )
 GAME( 1995, bdream97,  0,       bdream97, skylncr,  skylncr_state,  0,        ROT0, "bootleg (KKK)",        "Hudie Meng 97",                                  MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
 GAME( 2000, sonikfig,  0,       skylncr,  sonikfig, skylncr_state,  sonikfig, ROT0, "Z Games",              "Sonik Fighter (version 02, encrypted)",          MACHINE_WRONG_COLORS | MACHINE_NOT_WORKING )
