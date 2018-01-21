@@ -29,6 +29,7 @@ enum cassette_state
 	CASSETTE_SPEAKER_MUTED      = 8,
 
 	/* masks */
+	CASSETTE_MASK_GLOBAL        = ~0,
 	CASSETTE_MASK_UISTATE       = 3,
 	CASSETTE_MASK_MOTOR         = 4,
 	CASSETTE_MASK_SPEAKER       = 8,
@@ -74,7 +75,7 @@ public:
 
 	// specific implementation
 	cassette_state get_state() { return m_state; }
-	void set_state(cassette_state state) { change_state(state, (cassette_state)(~0)); }
+	void set_state(cassette_state state) { change_state(state, CASSETTE_MASK_GLOBAL); }
 	void change_state(cassette_state state, cassette_state mask);
 
 	double input();
