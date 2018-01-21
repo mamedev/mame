@@ -127,6 +127,9 @@ private:
 	DECLARE_WRITE8_MEMBER(nt_w);
 
 	void scanline_irq(int scanline, int vblank, int blanked);
+	void hblank_irq(int scanline, int vblank, int blanked);
+	void video_irq(bool hblank, int scanline, int vblank, int blanked);
+
 	uint8_t m_410x[0xc];
 	uint8_t m_411c;
 	uint8_t m_412c;
@@ -159,6 +162,7 @@ private:
 	required_region_ptr<uint8_t> m_prgrom;
 	
 	uint16_t decode_nt_addr(uint16_t addr);
+	void do_dma(uint8_t data, bool broken);
 };
 
 uint32_t nes_vt_state::get_banks(uint8_t bnk)
@@ -386,28 +390,42 @@ PALETTE_INIT_MEMBER(nes_vt_state, nesvt)
 
 void nes_vt_state::scanline_irq(int scanline, int vblank, int blanked)
 {
-	int irqstate = 0;
+	video_irq(false, scanline, vblank, blanked);
+}
 
-	//logerror("scanline_irq %d\n", scanline);
+void nes_vt_state::hblank_irq(int scanline, int vblank, int blanked)
+{
+	video_irq(true, scanline, vblank, blanked);
+}
 
-	if (m_timer_running && scanline < 0xe0)
-	{
-		m_timer_val--;
+void nes_vt_state::video_irq(bool hblank, int scanline, int vblank, int blanked)
+{
+	//TSYNEN
+	if(((m_410x[0xb] >> 7) & 0x01) == hblank) {
+		int irqstate = 0;
 
-		if (m_timer_val < 0)
+		//logerror("scanline_irq %d\n", scanline);
+
+		if (m_timer_running && scanline < 0xe0)
 		{
-			if (m_timer_irq_enabled)
+			m_timer_val--;
+
+			if (m_timer_val < 0)
 			{
-				logerror("scanline_irq %d\n", scanline);
-				irqstate = 1;
+				if (m_timer_irq_enabled)
+				{
+					logerror("scanline_irq %d\n", scanline);
+					irqstate = 1;
+				}
 			}
 		}
+
+		if (irqstate)
+			m_maincpu->set_input_line(M6502_IRQ_LINE, ASSERT_LINE);
+		else
+			m_maincpu->set_input_line(M6502_IRQ_LINE, CLEAR_LINE);
 	}
 
-	if (irqstate)
-		m_maincpu->set_input_line(M6502_IRQ_LINE, ASSERT_LINE);
-	else
-		m_maincpu->set_input_line(M6502_IRQ_LINE, CLEAR_LINE);
 }
 
 /* todo, handle custom VT nametable stuff here */
@@ -444,6 +462,8 @@ void nes_vt_state::machine_start()
 	save_pointer(NAME(m_ntram.get()), 0x2000);
 
 	m_ppu->set_scanline_callback(ppu2c0x_device::scanline_delegate(FUNC(nes_vt_state::scanline_irq),this));
+	m_ppu->set_hblank_callback(ppu2c0x_device::scanline_delegate(FUNC(nes_vt_state::hblank_irq),this));
+
 // m_ppu->set_hblank_callback(ppu2c0x_device::hblank_delegate(FUNC(device_nes_cart_interface::hblank_irq),m_cartslot->m_cart));
 //  m_ppu->space(AS_PROGRAM).install_readwrite_handler(0, 0x1fff, read8_delegate(FUNC(device_nes_cart_interface::chr_r),m_cartslot->m_cart), write8_delegate(FUNC(device_nes_cart_interface::chr_w),m_cartslot->m_cart));
 	m_ppu->space(AS_PROGRAM).install_readwrite_handler(0x2000, 0x3eff, read8_delegate(FUNC(nes_vt_state::nt_r),this), write8_delegate(FUNC(nes_vt_state::nt_w),this));
@@ -788,10 +808,15 @@ WRITE8_MEMBER(nes_vt_state::psg1_4017_w)
 
 WRITE8_MEMBER(nes_vt_state::nes_vh_sprite_dma_w)
 {
-	m_ppu->spriteram_dma(space, data);
+	do_dma(data, true);
 }
 
 WRITE8_MEMBER(nes_vt_state::vt_hh_sprite_dma_w)
+{
+	do_dma(data, false);
+}
+
+void nes_vt_state::do_dma(uint8_t data, bool broken)
 {
 	uint8_t dma_mode = m_vdma_ctrl & 0x01;
 	uint8_t dma_len  = (m_vdma_ctrl >> 1) & 0x07;
@@ -806,19 +831,24 @@ WRITE8_MEMBER(nes_vt_state::vt_hh_sprite_dma_w)
 	}
 	uint16_t src_addr = (data << 8) | (src_nib_74 << 4);
 	logerror("vthh dma start ctrl=%02x addr=%04x\n", m_vdma_ctrl, src_addr);
+	if(broken && (dma_mode == 1) && ((m_ppu->get_vram_dest() & 0xFF00) == 0x3F00)
+		&& !(m_ppu->get_201x_reg(0x1) & 0x80)) {
+		length -= 1;
+		src_addr += 1;
+	}
 	for (int i = 0; i < length; i++)
 	{
-		uint8_t spriteData = space.read_byte(src_addr + i);
+		uint8_t spriteData = m_maincpu->space(AS_PROGRAM).read_byte(src_addr + i);
 		if(dma_mode) {
-			space.write_byte(0x2007, spriteData);
+			m_maincpu->space(AS_PROGRAM).write_byte(0x2007, spriteData);
 		} else {
-			space.write_byte(0x2004, spriteData);
+			m_maincpu->space(AS_PROGRAM).write_byte(0x2004, spriteData);
 		}
 		if(((src_addr + i) & 0xFF) == length) break;
 	}
 
 	// should last (length * 4 - 1) CPU cycles.
-	space.device().execute().adjust_icount(-(length * 4 - 1));
+	//((device_t*)m_maincpu)->execute().adjust_icount(-(length * 4 - 1));
 }
 
 
@@ -836,7 +866,9 @@ static ADDRESS_MAP_START( nes_vt_map, AS_PROGRAM, 8, nes_vt_state )
 	AM_RANGE(0x4015, 0x4015) AM_READWRITE(psg1_4015_r, psg1_4015_w) /* PSG status / first control register */
 	AM_RANGE(0x4016, 0x4016) AM_READWRITE(nes_in0_r, nes_in0_w)
 	AM_RANGE(0x4017, 0x4017) AM_READ(nes_in1_r) AM_WRITE(psg1_4017_w)
-
+	
+	AM_RANGE(0x4034, 0x4034) AM_WRITE(vt03_4034_w)
+	
 	AM_RANGE(0x4100, 0x410b) AM_WRITE(vt03_410x_w)
 
 	AM_RANGE(0x8000, 0xffff) AM_WRITE(vt03_8000_w)
@@ -898,7 +930,7 @@ static ADDRESS_MAP_START( nes_vt_dg_map, AS_PROGRAM, 8, nes_vt_state )
 	AM_RANGE(0x8000, 0xffff) AM_DEVICE("prg", address_map_bank_device, amap8)
 
 	AM_RANGE(0x4034, 0x4034) AM_WRITE(vt03_4034_w)
-	AM_RANGE(0x4014, 0x4014) AM_READ(psg1_4014_r) AM_WRITE(vt_hh_sprite_dma_w)
+	AM_RANGE(0x4014, 0x4014) AM_READ(psg1_4014_r) AM_WRITE(nes_vh_sprite_dma_w)
 	AM_RANGE(0x6000, 0x7fff) AM_RAM
 ADDRESS_MAP_END
 
@@ -1023,14 +1055,22 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( nes_vt_dg, nes_vt_xx )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(nes_vt_dg_map)
-	MCFG_PPU_VT03_MODIFY("ppu")
-	MCFG_PPU_VT03_SET_PAL_MODE(PAL_MODE_NEW_VG);
 	
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_REFRESH_RATE(50.0070)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC((106.53/(PAL_APU_CLOCK/1000000)) * (ppu2c0x_device::VBLANK_LAST_SCANLINE_PAL-ppu2c0x_device::VBLANK_FIRST_SCANLINE+1+2)))
 	MCFG_SCREEN_SIZE(32*8, 312)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 30*8-1)
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( nes_vt_vg, nes_vt_dg )
+
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(nes_vt_hh_map)
+
+	MCFG_PPU_VT03_MODIFY("ppu")
+	MCFG_PPU_VT03_SET_PAL_MODE(PAL_MODE_NEW_VG);
+
 MACHINE_CONFIG_END
 
 // New mystery handheld architecture, VTxx derived
@@ -1264,18 +1304,18 @@ CONS( 200?, vdogdemo,  0,  0,  nes_vt,    nes_vt, nes_vt_state,  0, "VRT", "V-Do
 CONS( 200?, mc_dgear,  0,  0,  nes_vt,    nes_vt, nes_vt_state,  0, "dreamGEAR", "dreamGEAR 75-in-1", MACHINE_IMPERFECT_GRAPHICS )
 // all software in this runs in the VT03 enhanced mode, it also includes an actual licensed VT03 port of Frogger.
 // all games work OK except Frogger which has serious graphical issues
-CONS( 200?, vgtablet,   0,        0,  nes_vt_dg,    nes_vt, nes_vt_state,  0, "<unknown> / Konami", "VG Pocket Tablet", MACHINE_NOT_WORKING )
+CONS( 200?, vgtablet,   0, 0,  nes_vt_vg,    nes_vt, nes_vt_state,  0, "<unknown> / Konami", "VG Pocket Tablet", MACHINE_NOT_WORKING )
 
 // this is VT09 based
 // it boots, most games correct, but palette issues in some games still (usually they appear greyscale)
 // and colors overall a bit off
-CONS( 2009, cybar120,  0,  0,  nes_vt_dg, nes_vt, nes_vt_state,  0, "Defender", "Defender M2500P 120-in-1", MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_GRAPHICS )
-CONS( 200?, vgpocket,  0,  0,  nes_vt_dg, nes_vt, nes_vt_state,  0, "<unknown>", "VG Pocket (VG-2000)", MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_GRAPHICS )
-CONS( 200?, vgpmini,   0,  0,  nes_vt_dg, nes_vt, nes_vt_state,  0, "<unknown>", "VG Pocket Mini (VG-1500)", MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2009, cybar120,  0,  0,  nes_vt_vg, nes_vt, nes_vt_state,  0, "Defender", "Defender M2500P 120-in-1", MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 200?, vgpocket,  0,  0,  nes_vt_vg, nes_vt, nes_vt_state,  0, "<unknown>", "VG Pocket (VG-2000)", MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 200?, vgpmini,   0,  0,  nes_vt_vg, nes_vt, nes_vt_state,  0, "<unknown>", "VG Pocket Mini (VG-1500)", MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_GRAPHICS )
 
 // these are NOT VT03, but something newer but based around the same basic designs
 // (no visible tiles in ROM using standard decodes tho, might need moving out of here)
-CONS( 200?, dgun2500,  0,  0,  nes_vt_dg,    nes_vt, nes_vt_state,  0, "dreamGEAR", "dreamGEAR Wireless Motion Control with 130 games (DGUN-2500)", MACHINE_NOT_WORKING )
+CONS( 200?, dgun2500,  0,  0,  nes_vt_dg,    nes_vt, nes_vt_state,  0, "dreamGEAR", "dreamGEAR Wireless Motion Control with 130 games (DGUN-2500)", MACHINE_IMPERFECT_GRAPHICS )
 CONS( 2012, dgun2561,  0,  0,  nes_vt_dg,    nes_vt, nes_vt_state,  0, "dreamGEAR", "dreamGEAR My Arcade Portable Gaming System (DGUN-2561)", MACHINE_NOT_WORKING )
 CONS( 2015, dgun2573,  0,  0,  nes_vt_hh,    nes_vt, nes_vt_state,  0, "dreamGEAR", "dreamGEAR My Arcade Gamer V Portable Gaming System (DGUN-2573)", MACHINE_NOT_WORKING )
 CONS( 200?, lexcyber,  0,  0,  nes_vt_cy, nes_vt, nes_vt_state,  0, "Lexibook", "Lexibook Compact Cyber Arcade", MACHINE_NOT_WORKING )

@@ -1325,6 +1325,11 @@ WRITE8_MEMBER( ppu2c0x_device::write )
 	m_data_latch = data;
 }
 
+uint16_t ppu2c0x_device::get_vram_dest() {
+	return m_videomem_addr;
+}
+
+
 /*************************************
  *
  *  Sprite DMA
