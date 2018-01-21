@@ -120,6 +120,11 @@ public:
 	void nes_vt(machine_config &config);
 	void nes_vt_xx(machine_config &config);
 	void nes_vt_hh(machine_config &config);
+	void nes_vt_cy(machine_config &config);
+	void nes_vt_dg(machine_config &config);
+	void nes_vt_bt(machine_config &config);
+	void nes_vt_vg(machine_config &config);
+
 private:
 
 	/* expansion nametable - todo, see if we can refactor NES code to be reusable without having to add full NES bus etc. */
@@ -1043,17 +1048,17 @@ MACHINE_CONFIG_DERIVED(nes_vt_state::nes_vt_xx, nes_vt)
 	MCFG_CPU_PROGRAM_MAP(nes_vt_xx_map)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( nes_vt_cy, nes_vt_xx )
+MACHINE_CONFIG_DERIVED(nes_vt_state::nes_vt_cy, nes_vt_xx)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(nes_vt_cy_map)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( nes_vt_bt, nes_vt_xx )
+MACHINE_CONFIG_DERIVED(nes_vt_state::nes_vt_bt, nes_vt_xx)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(nes_vt_bt_map)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( nes_vt_dg, nes_vt_xx )
+MACHINE_CONFIG_DERIVED(nes_vt_state::nes_vt_dg, nes_vt_xx)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(nes_vt_dg_map)
 	
@@ -1064,7 +1069,7 @@ static MACHINE_CONFIG_DERIVED( nes_vt_dg, nes_vt_xx )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 30*8-1)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( nes_vt_vg, nes_vt_dg )
+MACHINE_CONFIG_DERIVED(nes_vt_state::nes_vt_vg, nes_vt_dg )
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(nes_vt_hh_map)
