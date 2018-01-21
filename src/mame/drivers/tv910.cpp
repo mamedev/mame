@@ -112,8 +112,8 @@ static ADDRESS_MAP_START(tv910_mem, AS_PROGRAM, 8, tv910_state)
 	AM_RANGE(0x8060, 0x806f) AM_READ(kbd_ascii_r)
 	AM_RANGE(0x8070, 0x807f) AM_READ(kbd_flags_r)
 	AM_RANGE(0x9000, 0x9000) AM_WRITE(control_w)
-	AM_RANGE(0x9001, 0x9001) AM_READ_PORT("DSW1")   // S2 in the operator's manual
-	AM_RANGE(0x9002, 0x9002) AM_READ_PORT("DSW2")   // S1 in the operator's manual
+	AM_RANGE(0x9001, 0x9001) AM_READ_PORT("DSW1")
+	AM_RANGE(0x9002, 0x9002) AM_READ_PORT("DSW2")
 	AM_RANGE(0xf000, 0xffff) AM_ROM AM_REGION("maincpu", 0)
 ADDRESS_MAP_END
 
@@ -339,9 +339,8 @@ static INPUT_PORTS_START( tv910 )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Control")      PORT_CODE(KEYCODE_LCONTROL) PORT_CHAR(UCHAR_SHIFT_2)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_KEYBOARD) PORT_NAME("Func") PORT_CODE(KEYCODE_LALT)
 
-	PORT_START("DSW2")  // "S1" in the Operator's Manual
-	PORT_DIPNAME( 0x0f, 0x00, "Baud rate" )
-	PORT_DIPSETTING(    0x0, "9600" )
+	PORT_START("DSW2")
+	PORT_DIPNAME( 0x0f, 0x00, "Baud Rate" ) PORT_DIPLOCATION("S1:4,3,2,1")
 	PORT_DIPSETTING(    0x1, "50" )
 	PORT_DIPSETTING(    0x2, "75" )
 	PORT_DIPSETTING(    0x3, "110" )
@@ -355,53 +354,56 @@ static INPUT_PORTS_START( tv910 )
 	PORT_DIPSETTING(    0xb, "3600" )
 	PORT_DIPSETTING(    0xc, "4800" )
 	PORT_DIPSETTING(    0xd, "7200" )
-	PORT_DIPSETTING(    0xe, "9600" )
+	PORT_DIPSETTING(    0x0, "9600" )
+	//PORT_DIPSETTING(  0xe, "9600" )
 	PORT_DIPSETTING(    0xf, "19200" )
 
-	PORT_DIPNAME( 0x10, 0x00, "Data bits" )
-	PORT_DIPSETTING( 0x00, "8 bits" )
-	PORT_DIPSETTING( 0x10, "7 bits" )
+	PORT_DIPNAME( 0x10, 0x00, "Word Length" ) PORT_DIPLOCATION("S1:5")
+	PORT_DIPSETTING( 0x00, "8 Bits" )
+	PORT_DIPSETTING( 0x10, "7 Bits" )
 
-	PORT_DIPNAME( 0x20, 0x00, "Parity" )
+	PORT_DIPNAME( 0x20, 0x00, "Parity" ) PORT_DIPLOCATION("S1:6")
 	PORT_DIPSETTING( 0x00, "No Parity" )
 	PORT_DIPSETTING( 0x20, "Send Parity" )
 
-	PORT_DIPNAME( 0x40, 0x00, "Parity Type" )
+	PORT_DIPNAME( 0x40, 0x00, "Parity Type" ) PORT_DIPLOCATION("S1:7")
 	PORT_DIPSETTING( 0x00, "Odd Parity" )
 	PORT_DIPSETTING( 0x40, "Even Parity" )
 
-	PORT_DIPNAME( 0x80, 0x00, "Stop Bits" )
-	PORT_DIPSETTING( 0x00, "1 stop bit" )
-	PORT_DIPSETTING( 0x80, "2 stop bits" )
+	PORT_DIPNAME( 0x80, 0x00, "Stop Bits" ) PORT_DIPLOCATION("S1:8")
+	PORT_DIPSETTING( 0x00, "1" )
+	PORT_DIPSETTING( 0x80, "2" )
 
-	PORT_START("DSW1")  // "S2" in the Operator's Manual
-	PORT_DIPNAME( 0x03, 0x00, "Term Char")
-	PORT_DIPSETTING(    0x0, "0" )
-	PORT_DIPSETTING(    0x1, "1" )
-	PORT_DIPSETTING(    0x2, "2" )
-	PORT_DIPSETTING(    0x3, "3" )
+	PORT_START("DSW1")
+	PORT_DIPNAME( 0x01, 0x00, "CR Code" ) PORT_DIPLOCATION("S1:10") // TCHAR0
+	PORT_DIPSETTING( 0x00, "CR only" )
+	PORT_DIPSETTING( 0x01, "CRLF" )
 
-	PORT_DIPNAME( 0x0c, 0x00, "Emulation" )
+	PORT_DIPNAME( 0x02, 0x02, "Auto Wraparound at 80th Position" ) PORT_DIPLOCATION("S1:9") // TCHAR1
+	PORT_DIPSETTING( 0x00, DEF_STR(No) )
+	PORT_DIPSETTING( 0x02, DEF_STR(Yes) ) // required for self-test to work
+
+	PORT_DIPNAME( 0x0c, 0x00, "Emulation" ) PORT_DIPLOCATION("S2:1,2")
 	PORT_DIPSETTING(    0x0, "Standard 910" )
 	PORT_DIPSETTING(    0x4, "ADM-3A/5" )
 	PORT_DIPSETTING(    0x8, "ADDS 25" )
 	PORT_DIPSETTING(    0xc, "Hazeltine 1410" )
 
-	PORT_DIPNAME( 0x10, 0x00, "Refresh rate" )
+	PORT_DIPNAME( 0x10, 0x00, "Refresh Rate" ) PORT_DIPLOCATION("S2:3")
 	PORT_DIPSETTING( 0x00, "60 Hz" )
 	PORT_DIPSETTING( 0x10, "50 Hz" )
 
-	PORT_DIPNAME( 0x60, 0x00, "Cursor type" )
-	PORT_DIPSETTING(    0x00, "Blinking block" )
-	PORT_DIPSETTING(    0x40, "Blinking underline" )
-	PORT_DIPSETTING(    0x20, "Steady block" )
-	PORT_DIPSETTING(    0x60, "Steady underline" )
+	PORT_DIPNAME( 0x60, 0x00, "Cursor Type" ) PORT_DIPLOCATION("S2:4,5")
+	PORT_DIPSETTING(    0x00, "Blinking Block" )
+	PORT_DIPSETTING(    0x40, "Blinking Underline" )
+	PORT_DIPSETTING(    0x20, "Steady Block" )
+	PORT_DIPSETTING(    0x60, "Steady Underline" )
 
-	PORT_DIPNAME( 0x80, 0x00, "Duplex" )
+	PORT_DIPNAME( 0x80, 0x00, "Conversation Mode" ) PORT_DIPLOCATION("S2:6") // F/HDX
 	PORT_DIPSETTING( 0x00, "Half Duplex" )
 	PORT_DIPSETTING( 0x80, "Full Duplex" )
 
-	PORT_DIPNAME( 0x100, 0x100, "Colors" )
+	PORT_DIPNAME( 0x100, 0x100, "Colors" ) PORT_DIPLOCATION("S2:7") // BOW/WOB
 	PORT_DIPSETTING( 0x00, "Black characters on green screen" )
 	PORT_DIPSETTING( 0x100, "Green characters on black screen" )
 
