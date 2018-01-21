@@ -1554,7 +1554,9 @@ MACHINE_CONFIG_END
 
   First released in 1986 on Crystal Screen (model YM-801), rereleased on
   New Wide Screen in 1988 (model YM-105). It was also a prize in a Nintendo
-  game contest in 1987 (model YM-901-S).
+  game contest in 1987 (model YM-901-S). In YM-801, Mario looks like the
+  ones in ML-102 and MW-56. In YM-901-S and YM-105 he looks more detailed.
+  Until further proof, it's assumed that the ROM is the same for each model.
 
 ***************************************************************************/
 
@@ -4579,7 +4581,7 @@ ROM_START( gnw_mariocm )
 ROM_END
 
 
-ROM_START( gnw_smb ) // dumped from New Wide Screen version
+ROM_START( gnw_smb )
 	ROM_REGION( 0x1000, "maincpu", 0 )
 	ROM_LOAD( "ym-105.program", 0x0000, 0x1000, CRC(0dff3b12) SHA1(3fa83f88e49ea9d7080fe935ec90ce69acbe8850) )
 
@@ -4888,7 +4890,7 @@ CONS( 1983, gnw_mario,   0,          0, gnw_mario,   gnw_mario,   gnw_mario_stat
 
 CONS( 1982, gnw_dkjr,    0,          0, gnw_dkjr,    gnw_dkjr,    gnw_dkjr_state,    0, "Nintendo", "Game & Watch: Donkey Kong Jr. (new wide screen)", MACHINE_SUPPORTS_SAVE )
 CONS( 1983, gnw_mariocm, 0,          0, gnw_mariocm, gnw_mariocm, gnw_mariocm_state, 0, "Nintendo", "Game & Watch: Mario's Cement Factory (new wide screen)", MACHINE_SUPPORTS_SAVE )
-CONS( 1986, gnw_smb,     0,          0, gnw_smb,     gnw_smb,     gnw_smb_state,     0, "Nintendo", "Game & Watch: Super Mario Bros.", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+CONS( 1988, gnw_smb,     0,          0, gnw_smb,     gnw_smb,     gnw_smb_state,     0, "Nintendo", "Game & Watch: Super Mario Bros. (new wide screen)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
 
 CONS( 1984, gnw_boxing,  0,          0, gnw_boxing,  gnw_boxing,  gnw_boxing_state,  0, "Nintendo", "Game & Watch: Boxing", MACHINE_SUPPORTS_SAVE )
 
