@@ -110,6 +110,7 @@ public:
 	DECLARE_WRITE8_MEMBER(vt03_41bx_w);
 	DECLARE_READ8_MEMBER(vt03_41bx_r);
 	DECLARE_WRITE8_MEMBER(vt03_411c_w);
+	DECLARE_WRITE8_MEMBER(vt03_412c_w);
 
 	DECLARE_WRITE8_MEMBER(vt03_48ax_w);
 	DECLARE_READ8_MEMBER(vt03_48ax_r);
@@ -128,6 +129,7 @@ private:
 	void scanline_irq(int scanline, int vblank, int blanked);
 	uint8_t m_410x[0xc];
 	uint8_t m_411c;
+	uint8_t m_412c;
 	uint8_t m_vdma_ctrl;
 	
 	int m_timer_irq_enabled;
@@ -179,6 +181,8 @@ uint32_t nes_vt_state::get_banks(uint8_t bnk)
 // 8000 needs to bank in 60000  ( bank 0x30 )
 void nes_vt_state::update_banks()
 {
+	uint32_t amod = (m_412c & 0x04) ? 0x800 : 0x0;
+
 	uint8_t bank;
 
 	// 8000-9fff
@@ -192,11 +196,11 @@ void nes_vt_state::update_banks()
 	else
 		bank = 0xfe;
 
-	m_prgbank0->set_entry(get_banks(bank) & (m_numbanks-1));
+	m_prgbank0->set_entry((amod | get_banks(bank)) & (m_numbanks-1));
 
 	// a000-bfff
 	bank = m_410x[0x8];
-	m_prgbank1->set_entry(get_banks(bank) & (m_numbanks-1));
+	m_prgbank1->set_entry((amod | get_banks(bank)) & (m_numbanks-1));
 
 	// c000-dfff
 	if ((m_410x[0xb] & 0x40) != 0 || (m_410x[0x5] & 0x40) != 0)
@@ -209,11 +213,11 @@ void nes_vt_state::update_banks()
 	else
 		bank = 0xfe;
 
-	m_prgbank2->set_entry(get_banks(bank) & (m_numbanks-1));
+	m_prgbank2->set_entry((amod | get_banks(bank)) & (m_numbanks-1));
 
 	// e000 - ffff
 	bank = 0xff;
-	m_prgbank3->set_entry(get_banks(bank) & (m_numbanks-1));
+	m_prgbank3->set_entry((amod | get_banks(bank)) & (m_numbanks-1));
 }
 
 uint16_t nes_vt_state::decode_nt_addr(uint16_t addr) {
@@ -321,6 +325,12 @@ WRITE8_MEMBER(nes_vt_state::vt03_411c_w)
 	update_banks();
 }
 
+WRITE8_MEMBER(nes_vt_state::vt03_412c_w)
+{
+	logerror("vt03_412c_w %02x\n", data);
+	m_412c = data;
+	update_banks();
+}
 
 READ8_MEMBER(nes_vt_state::vt03_41bx_r)
 {
@@ -455,6 +465,7 @@ void nes_vt_state::machine_reset()
 	m_410x[0xa] = 0x00;
 	m_410x[0xb] = 0x00;
 	m_411c = 0x00;
+	m_412c = 0x00;
 	m_timer_irq_enabled = 0;
 	m_timer_running = 0;
 	m_timer_val = 0;
@@ -668,8 +679,8 @@ int nes_vt_state::calculate_real_video_address(int addr, int extended, int readt
 
 		}
 	}
-
-	return finaladdr;
+	uint32_t amod = (m_412c & 0x04) ? (1 << 24) : 0x0;
+	return amod | finaladdr;
 }
 
 /*
@@ -845,6 +856,11 @@ static ADDRESS_MAP_START( nes_vt_cy_map, AS_PROGRAM, 8, nes_vt_state )
 	AM_RANGE(0x48a0, 0x48af) AM_READ(vt03_48ax_r) AM_WRITE(vt03_48ax_w)
 ADDRESS_MAP_END
 
+static ADDRESS_MAP_START( nes_vt_bt_map, AS_PROGRAM, 8, nes_vt_state )
+	AM_IMPORT_FROM(nes_vt_xx_map)
+	AM_RANGE(0x412c, 0x412c) AM_WRITE(vt03_412c_w)
+ADDRESS_MAP_END
+
 
 static ADDRESS_MAP_START( nes_vt_hh_map, AS_PROGRAM, 8, nes_vt_state )
 	AM_RANGE(0x0000, 0x1fff) AM_MASK(0x0fff) AM_RAM
@@ -997,6 +1013,11 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( nes_vt_cy, nes_vt_xx )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(nes_vt_cy_map)
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( nes_vt_bt, nes_vt_xx )
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(nes_vt_bt_map)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( nes_vt_dg, nes_vt_xx )
@@ -1300,4 +1321,4 @@ CONS( 2004, mc_dcat8a,  mc_dcat8, 0,  nes_vt,    nes_vt, nes_vt_state,  0, "<unk
 
 CONS( 2017, sy889,  		0, 				0,  nes_vt_hh, nes_vt, nes_vt_state,  0, "SY Corp", 	"SY-889 300 in 1 Handheld", MACHINE_NOT_WORKING )
 
-CONS( 2017, bittboy,  	0, 				0,  nes_vt_dg,    nes_vt, nes_vt_state,  0, "BittBoy", 	"BittBoy Mini FC 300 in 1", MACHINE_NOT_WORKING )
+CONS( 2017, bittboy,  	0, 				0,  nes_vt_bt,    nes_vt, nes_vt_state,  0, "BittBoy", 	"BittBoy Mini FC 300 in 1", MACHINE_NOT_WORKING )
