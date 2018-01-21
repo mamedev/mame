@@ -339,6 +339,16 @@ static INPUT_PORTS_START( switches )
 	PORT_DIPSETTING(0x3fd, "9600")
 	PORT_DIPSETTING(0x3fe, "19200")
 
+	PORT_START("VIDEO")
+	PORT_DIPUNUSED_DIPLOC(0x04, 0x04, "S2:1") // disables TTL video output on earlier revisions
+	PORT_DIPNAME(0x02, 0x00, "Character Set") PORT_DIPLOCATION("S2:2")
+	PORT_DIPSETTING(0x00, "Standard")
+	PORT_DIPSETTING(0x02, "Alternate")
+	PORT_DIPNAME(0x01, 0x00, "Cursor Flash") PORT_DIPLOCATION("S2:10") // originally jumper W25
+	PORT_DIPSETTING(0x01, DEF_STR(Off))
+	PORT_DIPSETTING(0x00, DEF_STR(On))
+	// S2:10 was previously used to short out 270 ohm resistor in video section
+
 	PORT_START("UARTCTRL")
 	PORT_DIPNAME(0x11, 0x11, "Parity Select") PORT_DIPLOCATION("S2:9,5") PORT_CHANGED_MEMBER(DEVICE_SELF, tv912_state, uart_settings_changed, nullptr)
 	PORT_DIPSETTING(0x11, "None")
