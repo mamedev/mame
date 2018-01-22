@@ -204,6 +204,9 @@ Stephh's notes (based on the games M68000 code and some tests) :
 2008-08
 Dip locations verified with US conversion kit manual.
 
+Todo:
+	Blend function aren't fully emulated.
+
 ***************************************************************************/
 
 #include "emu.h"
@@ -219,6 +222,11 @@ Dip locations verified with US conversion kit manual.
 
 
 /**********************************************************************************/
+
+WRITE16_MEMBER(dassault_state::priority_w)
+{
+	COMBINE_DATA(&m_priority);
+}
 
 WRITE16_MEMBER(dassault_state::main_irq_ack_w)
 {
@@ -270,7 +278,7 @@ READ16_MEMBER(dassault_state::dassault_sub_control_r)
 static ADDRESS_MAP_START( dassault_map, AS_PROGRAM, 16, dassault_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 
-	AM_RANGE(0x100000, 0x103fff) AM_RAM_DEVWRITE("deco_common", decocomn_device, nonbuffered_palette_w) AM_SHARE("paletteram")
+	AM_RANGE(0x100000, 0x103fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 
 	AM_RANGE(0x140004, 0x140005) AM_WRITE(main_irq_ack_w)
 	AM_RANGE(0x140006, 0x140007) AM_WRITENOP /* ? */
@@ -511,6 +519,11 @@ DECO16IC_BANK_CB_MEMBER(dassault_state::bank_callback)
 	return ((bank >> 4) & 0xf) << 12;
 }
 
+void dassault_state::machine_reset()
+{
+	m_priority = 0;
+}
+
 MACHINE_CONFIG_START(dassault_state::dassault)
 
 	/* basic machine hardware */
@@ -534,21 +547,15 @@ MACHINE_CONFIG_START(dassault_state::dassault)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(529))
-	MCFG_SCREEN_SIZE(40*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
+	MCFG_SCREEN_RAW_PARAMS(XTAL_28MHz / 4, 442, 0, 320, 274, 8, 248)	// same as robocop2(cninja.cpp)? verify this from real pcb.
 	MCFG_SCREEN_UPDATE_DRIVER(dassault_state, screen_update_dassault)
-
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", dassault)
 	MCFG_PALETTE_ADD("palette", 4096)
+	MCFG_PALETTE_FORMAT(XBGR)
 
 	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram")
 	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram2")
-
-	MCFG_DECOCOMN_ADD("deco_common")
-	MCFG_DECOCOMN_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("tilegen1", DECO16IC, 0)
 	MCFG_DECO16IC_SPLIT(0)
@@ -1061,9 +1068,9 @@ DRIVER_INIT_MEMBER(dassault_state,thndzone)
 
 /**********************************************************************************/
 
-GAME( 1991, thndzone,  0,        dassault, thndzone,  dassault_state, thndzone, ROT0, "Data East Corporation", "Thunder Zone (World, Rev 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, thndzonea, thndzone, dassault, thndzone,  dassault_state, thndzone, ROT0, "Data East Corporation", "Thunder Zone (World)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, thndzone4, thndzone, dassault, thndzone4, dassault_state, thndzone, ROT0, "Data East Corporation", "Thunder Zone (World 4 Players)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, thndzonej, thndzone, dassault, thndzone,  dassault_state, thndzone, ROT0, "Data East Corporation", "Thunder Zone (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, dassault,  thndzone, dassault, dassault,  dassault_state, dassault, ROT0, "Data East Corporation", "Desert Assault (US)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, dassault4, thndzone, dassault, dassault4, dassault_state, dassault, ROT0, "Data East Corporation", "Desert Assault (US 4 Players)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, thndzone,  0,        dassault, thndzone,  dassault_state, thndzone, ROT0, "Data East Corporation", "Thunder Zone (World, Rev 1)",    MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1991, thndzonea, thndzone, dassault, thndzone,  dassault_state, thndzone, ROT0, "Data East Corporation", "Thunder Zone (World)",           MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1991, thndzone4, thndzone, dassault, thndzone4, dassault_state, thndzone, ROT0, "Data East Corporation", "Thunder Zone (World 4 Players)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1991, thndzonej, thndzone, dassault, thndzone,  dassault_state, thndzone, ROT0, "Data East Corporation", "Thunder Zone (Japan)",           MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1991, dassault,  thndzone, dassault, dassault,  dassault_state, dassault, ROT0, "Data East Corporation", "Desert Assault (US)",            MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1991, dassault4, thndzone, dassault, dassault4, dassault_state, dassault, ROT0, "Data East Corporation", "Desert Assault (US 4 Players)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
