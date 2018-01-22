@@ -61,6 +61,7 @@
 #include "speaker.h"
 
 #define CHAR_WIDTH 14
+#define CHARSET_TEST 0
 
 class tv912_state : public driver_device
 {
@@ -78,6 +79,7 @@ public:
 		, m_modem_baud(*this, "MODEMBAUD")
 		, m_printer_baud(*this, "PRINTBAUD")
 		, m_uart_control(*this, "UARTCTRL")
+		, m_video_control(*this, "VIDEOCTRL")
 		, m_modifiers(*this, "MODIFIERS")
 		, m_half_duplex(*this, "HALFDUP")
 		, m_jumpers(*this, "JUMPERS")
@@ -123,6 +125,7 @@ private:
 	required_ioport m_modem_baud;
 	required_ioport m_printer_baud;
 	required_ioport m_uart_control;
+	required_ioport m_video_control;
 	required_ioport m_modifiers;
 	required_ioport m_half_duplex;
 	required_ioport m_jumpers;
@@ -255,6 +258,50 @@ void tv912_state::device_timer(emu_timer &timer, device_timer_id id, int param, 
 
 u32 tv912_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
+	u8 *dispram = static_cast<u8 *>(m_dispram_bank->base());
+	ioport_value videoctrl = m_video_control->read();
+
+	for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
+	{
+		int row = y / 10;
+		int ra = y % 10;
+		int x = 0;
+		u8 *charbase = &m_p_chargen[(ra & 7) | BIT(videoctrl, 1) << 10];
+
+		for (int pos = 0; pos < 80; pos++)
+		{
+			u8 ch = (pos < 64)
+					? dispram[(row << 6) | pos]
+					: dispram[0x600 | ((row & 0x07) << 6) | ((row & 0x18) << 1) | (pos & 0x0f)];
+
+#ifdef CHARSET_TEST
+			if (pos >= 32 && pos < 64)
+				ch = (pos & 0x1f) | (row & 7) << 5;
+#endif
+
+			u8 data = (ra > 0 && ra < 9) ? charbase[(ch & 0x7f) << 3] : 0;
+			u8 dots = data >> 2;
+			bool adv = BIT(data, 0);
+
+			for (int d = 0; d < 7; d++)
+			{
+				if (x >= cliprect.left() && x <= cliprect.right())
+					bitmap.pix(y, x) = BIT(dots, 6) ? rgb_t::white() : rgb_t::black();
+				x++;
+				if (adv)
+					dots <<= 1;
+				if (x >= cliprect.left() && x <= cliprect.right())
+					bitmap.pix(y, x) = BIT(dots, 6) ? rgb_t::white() : rgb_t::black();
+				x++;
+				if (!adv)
+					dots <<= 1;
+
+				if (d == 3)
+					adv = BIT(data, 1);
+			}
+		}
+	}
+
 	return 0;
 }
 
@@ -339,7 +386,7 @@ static INPUT_PORTS_START( switches )
 	PORT_DIPSETTING(0x3fd, "9600")
 	PORT_DIPSETTING(0x3fe, "19200")
 
-	PORT_START("VIDEO")
+	PORT_START("VIDEOCTRL")
 	PORT_DIPUNUSED_DIPLOC(0x04, 0x04, "S2:1") // disables TTL video output on earlier revisions
 	PORT_DIPNAME(0x02, 0x00, "Character Set") PORT_DIPLOCATION("S2:2")
 	PORT_DIPSETTING(0x00, "Standard")
