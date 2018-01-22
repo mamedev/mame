@@ -30,7 +30,8 @@ public:
 	required_region_ptr<uint8_t> m_color_prom_spr;
 
 	std::unique_ptr<uint8_t[]> m_bitmapram;
-	std::unique_ptr<bitmap_ind16> m_tmpbitmap2;
+	std::unique_ptr<bitmap_ind16> m_sprite_bitmap;
+	std::unique_ptr<bitmap_ind16> m_background_bitmap;
 	uint8_t m_invertmask;
 	uint8_t m_bitmap_type;
 	tilemap_t *m_fg_tilemap;
