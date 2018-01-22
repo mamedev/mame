@@ -776,7 +776,7 @@ QUICKLOAD_LOAD_MEMBER(oz750_state,oz750)
 	oz_wzd_extract_tag(data, "<TITLE>", app_name);
 	oz_wzd_extract_tag(data, "<DATA>", file_name);
 	if (!strncmp(file_name, "PFILE:", 6))
-		strcpy(file_name, file_name + 6);
+		memmove(file_name, file_name + 6, strlen(file_name + 6) + 1);
 
 	uint32_t img_start = oz_wzd_extract_tag(data, "<BIN>", nullptr);
 
