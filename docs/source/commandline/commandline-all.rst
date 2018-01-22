@@ -443,51 +443,75 @@ Core Output Directory Options
 Core State/Playback Options
 ---------------------------
 
+.. _mame-commandline-norewind:
+
 **-[no]rewind**
 
 	When enabled and emulation is paused, automatically creates a save state in memory every time a frame is advanced. Rewind save states can then be loaded consecutively by pressing the rewind single step shortcut key (*Left Shift + Tilde by default*). The default rewind value is OFF (-norewind).
 	
 	If debugger is in a 'break' state, a save state is instead created every time step in, step over, or step out occurs. In that mode, rewind save states can be loaded by executing the debugger 'rewind'(or 'rw') command.
 	
+.. _mame-commandline-rewindcapacity:
+
 **-rewind_capacity** *<value>*
 
 	Sets the rewind capacity value, in megabytes. It is the total amount of memory rewind savestates can occupy. When capacity is hit, old savestates get erased as new ones are captured. Setting capacity lower than the current savestate size disables rewind. Values below 0 are automatically clamped to 0.
+
+.. _mame-commandline-state:
 
 **-state** *<slot>*
 
 	Immediately after starting the specified game, will cause the save state in the specified <slot> to be loaded.
 
+.. _mame-commandline-noautosave:
+
 **-[no]autosave**
 
 	When enabled, automatically creates a save state file when exiting MAME and automatically attempts to reload it when later starting MAME with the same game. This only works for games that have explicitly enabled save state support in their driver. The default is OFF (-noautosave).
+
+.. _mame-commandline-playback:
 
 **-playback** / **-pb** *<filename>*
 
 	Specifies a file from which to play back a series of game inputs. Thisfeature does not work reliably for all games, but can be used to watch a previously recorded game session from start to finish. In order to make things consistent, you should only record and playback with all configuration (.cfg), NVRAM (.nv), and memory card files deleted. The default is NULL (no playback).
 
+.. _mame-commandline-exitafterplayback:
+
 **-exit_after_playback**
 
 	Tells MAME to exit after finishing playback of the input file.
+
+.. _mame-commandline-record:
 
 **-record** / **-rec** *<filename>*
 
 	Specifies a file to record all input from a game session. This can be used to record a game session for later playback. This feature does not work reliably for all games, but can be used to watch a previously recorded game session from start to finish. In order to make things consistent, you should only record and playback with all configuration (.cfg), NVRAM (.nv), and memory card files deleted. The default is NULL (no recording).
 
+.. _mame-commandline-recordtimecode:
+
 **-record_timecode**
 
 	Tells MAME to create a timecode file. It contains a line with elapsed times on each press of timecode shortcut key (*default is F12*). This option works only when recording mode is enabled (**-record** option). The file is saved in the *inp* folder. By default, no timecode file is saved.
+
+.. _mame-commandline-mngwrite:
 
 **-mngwrite** *<filename>*
 
 	Writes each video frame to the given <filename> in MNG format, producing an animation of the game session. Note that -mngwrite only writes video frames; it does not save any audio data. Use -wavwrite for that, and reassemble the audio/video using offline tools. The default is NULL (no recording).
 
+.. _mame-commandline-aviwrite:
+
 **-aviwrite** *<filename>*
 
 	Stream video and sound data to the given <filename> in AVI format, producing an animation of the game session complete with sound. The default is NULL (no recording).
 
+.. _mame-commandline-wavwrite:
+
 **-wavwrite** *<filename>*
 
 	Writes the final mixer output to the given <filename> in WAV format, producing an audio recording of the game session. The default is NULL (no recording).
+
+.. _mame-commandline-snapname:
 
 **-snapname** *<name>*
 
@@ -501,9 +525,13 @@ Core State/Playback Options
 	
 	A few examples: if you use 'mame robby -snapname foo/%g%i' snapshots will be saved as 'snaps\\foo\\robby0000.png' , 'snaps\\foo\\robby0001.png' and so on; if you use 'mame nes -cart robby -snapname %g/%d_cart' snapshots will be saved as 'snaps\\nes\\robby.png' ; if you use 'mame c64 -flop1 robby -snapname %g/%d_flop1/%i' snapshots will be saved as 'snaps\\c64\\robby\\0000.png'.
 
+.. _mame-commandline-snapsize:
+
 **-snapsize** *<width>x<height>*
 
 	Hard-codes the size for snapshots and movie recording. By default, MAME will create snapshots at the game's current resolution in raw pixels, and will create movies at the game's starting resolution in raw pixels. If you specify this option, then MAME will create both snapshots and movies at the size specified, and will bilinear filter the result. Note that this size does not automatically rotate if the game is vertically oriented. The default is '*auto*'.
+
+.. _mame-commandline-snapview:
 
 **-snapview** *<viewname>*
 
@@ -511,9 +539,13 @@ Core State/Playback Options
 	
 	For example, **-snapview native** will match the "Native (15:14)" view even though it is not a perfect match. <viewname> can also be 'auto', which selects the first view with all screens present. The default value is '*internal*'.
 
+.. _mame-commandline-nosnapbilinear:
+
 **-[no]snapbilinear**
 
 	Specify if the snapshot or movie should have bilinear filtering	applied.  Shutting this off can make a difference in some performance while recording video to a file.  The default is ON (*-snapbilinear*).
+
+.. _mame-commandline-statename:
 
 **-statename** *<name>*
 
@@ -527,6 +559,8 @@ Core State/Playback Options
 	
 	A few examples: if you use 'mame robby -statename foo/%g' save states will be stored inside 'sta\\foo\\robby\\' ; if you use 'mame nes -cart robby -statename %g/%d_cart' save states will be stored inside 'sta\\nes\\robby\\' ; if you use 'mame c64 -flop1 robby -statename %g/%d_flop1' save states will be stored inside 'sta\\c64\\robby\\'.
 
+.. _mame-commandline-noburnin:
+
 **-[no]burnin**
 
 	Tracks brightness of the screen during play and at the end of emulation generates a PNG that can be used to simulate burn-in effects on other games. The resulting PNG is created such that the least used-areas of the screen are fully white (since burned-in areas are darker, all other areas of the screen must be lightened a touch). 
@@ -538,29 +572,43 @@ Core State/Playback Options
 Core Performance Options
 ------------------------
 
+.. _mame-commandline-noautoframeskip:
+
 **-[no]autoframeskip** / **-[no]afs**
 
 	Automatically determines the frameskip level while you're playing the game, adjusting it constantly in a frantic attempt to keep the game running at full speed. Turning this on overrides the value you have set for -frameskip below. The default is OFF (*-noautoframeskip*).
+
+.. _mame-commandline-frameskip:
 
 **-frameskip** / **-fs** *<level>*
 
 	Specifies the frameskip value. This is the number of frames out of every 12 to drop when running. For example, if you say -frameskip 2, then MAME will display 10 out of every 12 frames. By skipping those frames, you may be able to get full speed in a game that requires more horsepower than your computer has. The default value is **-frameskip 0**, which skips no frames.
 
+.. _mame-commandline-secondstorun:
+
 **-seconds_to_run** / **-str** *<seconds>*
 
 	This option can be used for benchmarking and automated testing. It tells MAME to stop execution after a fixed number of seconds. By combining this with a fixed set of other command line options, you can set up a consistent environment for benchmarking MAME performance. In addition, upon exit, the **-str** option will write a screenshot called *final.png* to the game's snapshot directory.
+
+.. _mame-commandline-nothrottle:
 
 **-[no]throttle**
 
 	Configures the default thottling setting. When throttling is on, MAME attempts to keep the game running at the game's intended speed. When throttling is off, MAME runs the game as fast as it can. Note that the fastest speed is more often than not limited by your graphics card, especially for older games. The default is ON (*-throttle*).
 
+.. _mame-commandline-nosleep:
+
 **-[no]sleep**
 
 	Allows MAME to give time back to the system when running with -throttle. This allows other programs to have some CPU time, assuming that the game isn't taxing 100% of your CPU resources. This option can potentially cause hiccups in performance if other demanding programs are running. The default is ON (*-sleep*).
 
+.. _mame-commandline-speed:
+
 **-speed** *<factor>*
 
 	Changes the way MAME throttles gameplay such that the game runs at some multiplier of the original speed. A <factor> of 1.0 means to run the game at its normal speed. A <factor> of 0.5 means run at half speed, and a <factor> of 2.0 means run at 2x speed. Note that changing this value affects sound playback as well, which will scale in pitch accordingly. The internal resolution of the fraction is two decimalplaces, so a value of 1.002 is the same as 1.0. The default is 1.0.
+
+.. _mame-commandline-norefreshspeed:
 
 **-[no]refreshspeed** / **-[no]rs**
 
@@ -571,12 +619,17 @@ Core Performance Options
 Core Rotation Options
 ---------------------
 
+.. _mame-commandline-norotate:
+
 | **-[no]rotate**
 |
 |	Rotate the game to match its normal state (horizontal/vertical). This ensures that both vertically and horizontally oriented games show up correctly without the need to rotate your monitor. If you want to keep the game displaying 'raw' on the screen the way it would have in the arcade, turn this option OFF. The default is ON (*-rotate*).
 |
 |
 
+.. _mame-commandline-noror:
+
+.. _mame-commandline-norol:
 
 | **-[no]ror**
 | **-[no]rol**
@@ -586,6 +639,10 @@ Core Rotation Options
 |
 |
 
+.. _mame-commandline-noautoror:
+
+.. _mame-commandline-noautorol:
+
 
 | **-[no]autoror**
 | **-[no]autorol**
@@ -594,6 +651,10 @@ Core Rotation Options
 |	These options are designed for use with pivoting screens that only pivot in a single direction. If your screen only pivots clockwise, use -autorol to ensure that the game will fill the screen either horizontally or vertically in one of the directions you can handle. If your screen only pivots counter-clockwise, use **-autoror**.
 |
 |
+
+.. _mame-commandline-noflipx:
+
+.. _mame-commandline-noflipy:
 
 
 | **-[no]flipx**
@@ -608,25 +669,37 @@ Core Rotation Options
 Core Artwork Options
 --------------------
 
+.. _mame-commandline-noartworkcrop:
+
 **-[no]artwork_crop** / **-[no]artcrop**
 
 	Enable cropping of artwork to the game screen area only. This works best with -video gdi or -video d3d, and means that vertically oriented games running full screen can display their artwork to the left and right sides of the screen. This option can also be controlled via the Video Options menu in the user interface. The default is OFF (*-noartwork_crop*).
+
+.. _mame-commandline-nousebackdrops:
 
 **-[no]use_backdrops** / **-[no]backdrop**
 
 	Enables/disables the display of backdrops. The default is ON (*-use_backdrops*).
 
+.. _mame-commandline-nouseoverlays:
+
 **-[no]use_overlays** / **-[no]overlay**
 
 	Enables/disables the display of overlays. The default is ON (*-use_overlays*).
+
+.. _mame-commandline-nousebezels:
 
 **-[no]use_bezels** / **-[no]bezels**
 
 	Enables/disables the display of bezels. The default is ON (*-use_bezels*).
 
+.. _mame-commandline-nousecpanels:
+
 **-[no]use_cpanels** / **-[no]cpanels**
 
 	Enables/disables the display of control panels. The default is ON (*-use_cpanels*).
+
+.. _mame-commandline-nousemarquees:
 
 **-[no]use_marquees** / **-[no]marquees**
 

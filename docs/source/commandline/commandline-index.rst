@@ -101,9 +101,53 @@ Core Output Directory Options
 Core State/Playback Options
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+| :ref:`[no]rewind / rewind<mame-commandline-norewind>`
+| :ref:`rewind_capacity <mame-commandline-rewindcapacity>`
+| :ref:`state <mame-commandline-state>`
+| :ref:`[no]autosave <mame-commandline-noautosave>`
+| :ref:`playback <mame-commandline-playback>`
+| :ref:`exit_after_playback <mame-commandline-exitafterplayback>`
+| :ref:`record <mame-commandline-record>`
+| :ref:`record_timecode <mame-commandline-recordtimecode>`
+| :ref:`mngwrite <mame-commandline-mngwrite>`
+| :ref:`aviwrite <mame-commandline-aviwrite>`
+| :ref:`wavwrite <mame-commandline-wavwrite>`
+| :ref:`snapname <mame-commandline-snapname>`
+| :ref:`snapsize <mame-commandline-snapsize>`
+| :ref:`snapview <mame-commandline-snapview>`
+| :ref:`[no]snapbilinear <mame-commandline-nosnapbilinear>`
+| :ref:`statename <mame-commandline-statename>`
+| :ref:`[no]burnin <mame-commandline-noburnin>`
 
+Core Performance Options
+~~~~~~~~~~~~~~~~~~~~~~~~
 
+| :ref:`[no]autoframeskip <mame-commandline-noautoframeskip>`
+| :ref:`frameskip <mame-commandline-frameskip>`
+| :ref:`seconds_to_run <mame-commandline-secondstorun>`
+| :ref:`[no]throttle <mame-commandline-nothrottle>`
+| :ref:`[no]sleep <mame-commandline-nosleep>`
+| :ref:`speed <mame-commandline-speed>`
+| :ref:`[no]refreshspeed <mame-commandline-norefreshspeed>`
 
+Core Rotation Options
+~~~~~~~~~~~~~~~~~~~~~
 
+| :ref:`[no]rotate <mame-commandline-norotate>`
+| :ref:`[no]ror <mame-commandline-noror>`
+| :ref:`[no]rol <mame-commandline-norol>`
+| :ref:`[no]autoror <mame-commandline-noautoror>`
+| :ref:`[no]autorol <mame-commandline-noautorol>`
+| :ref:`[no]flipx <mame-commandline-noflipx>`
+| :ref:`[no]flipy <mame-commandline-noflipy>`
 
+Core Artwork Options
+~~~~~~~~~~~~~~~~~~~~
+
+| :ref:`[no]artwork_crop <mame-commandline-noartworkcrop>`
+| :ref:`[no]use_backdrops <mame-commandline-nousebackdrops>`
+| :ref:`[no]use_overlays <mame-commandline-nouseoverlays>`
+| :ref:`[no]use_bezels <mame-commandline-nousebezels>`
+| :ref:`[no]use_cpanels <mame-commandline-nousecpanels>`
+| :ref:`[no]use_marquees <mame-commandline-nousemarquees>`
 
