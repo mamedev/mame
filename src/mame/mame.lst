@@ -13738,13 +13738,9 @@ suprpokrb                       // (c) 1986 Grayhound Electronics
 geneve                          // 1987? Myarc Geneve 9640
 
 @source:geniusiq.cpp
-bs9009cx                        // 1999 BrainStation 9009 CXL (Germany)
-gl8008cx                        // 1999 Genius Leader 8008 CX (Germany)
-glmmc                           // 199? Genius Master Mega Color
 iq128                           // 1997 Genius IQ 128 (Germany)
 iq128_fr                        // 1997 Genius PC (France)
 iqtv512                         // IQ TV512 (Germany)
-iqunlim                         // 199? IQ Unlimited (680x0)
 itunlim                         // 199? IT Unlimited
 
 @source:genpc.cpp
@@ -15382,6 +15378,9 @@ iq151                           //
 @source:iqblock.cpp
 grndtour                        // (c) 1993
 iqblock                         // (c) 1993
+
+@source:iqunlim.cpp
+iqunlim                         // 199? IQ Unlimited (680x0)
 
 @source:iris3130.cpp
 sgi_ip2                         // IP2: IRIS 3xx0, 68020, 16MHz
@@ -37980,6 +37979,16 @@ vz300                           // 1984 Dick Smith Electronics VZ-300
 laser350                        // 1984? Laser 350
 laser500                        // 1984? Laser 500
 laser700                        // 1984? Laser 700
+
+@source:vtech_elan_eu3a12.cpp
+vreadere
+
+@source:vtech_unk1.cpp
+bs9009cx                        // 1999 BrainStation 9009 CXL (Germany)
+gl8008cx                        // 1999 Genius Leader 8008 CX (Germany)
+
+@source:vtech_unk2.cpp
+glmmc                           // 199? Genius Master Mega Color
 
 @source:vulgus.cpp
 mach9                           // bootleg (ITISA)

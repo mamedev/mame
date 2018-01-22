@@ -309,6 +309,7 @@ intv.cpp
 ipc.cpp
 ipds.cpp
 iq151.cpp
+iqunlim.cpp
 iris3130.cpp
 irisha.cpp
 isbc.cpp
@@ -765,6 +766,9 @@ vt520.cpp
 vta2000.cpp
 vtech1.cpp
 vtech2.cpp
+vtech_elan_eu3a12.cpp
+vtech_unk1.cpp
+vtech_unk2.cpp
 wangpc.cpp
 wicat.cpp
 wswan.cpp
