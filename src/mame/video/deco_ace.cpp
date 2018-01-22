@@ -203,7 +203,7 @@ uint8_t deco_ace_device::get_alpha(uint8_t val)
 uint16_t deco_ace_device::get_aceram(uint8_t val)
 {
 	val &= 0x3f;
-	m_ace_ram[val]
+	return m_ace_ram[val];
 }
 
 WRITE16_MEMBER( deco_ace_device::palette_dma_w )
