@@ -76,24 +76,16 @@ md_seprom_mm96_device::md_seprom_mm96_device(const machine_config &mconfig, cons
 //  SERIAL I2C DEVICE
 //-------------------------------------------------
 
-// MD_SEPROM_CODEMAST
-
-
-// MD_SEPROM_MM96
-MACHINE_CONFIG_START( md_i2c_24c16a )
-	MCFG_24C16A_ADD("i2cmem")
-MACHINE_CONFIG_END
-
 
 //-------------------------------------------------
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( md_seprom_codemast_device::device_add_mconfig )
+MACHINE_CONFIG_START(md_seprom_codemast_device::device_add_mconfig)
 	MCFG_24C08_ADD("i2cmem")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_MEMBER( md_seprom_mm96_device::device_add_mconfig )
+MACHINE_CONFIG_START(md_seprom_mm96_device::device_add_mconfig)
 	MCFG_24C16A_ADD("i2cmem")
 MACHINE_CONFIG_END
 

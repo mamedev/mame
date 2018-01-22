@@ -57,6 +57,7 @@ public:
 		, m_rs232(*this, RS232_TAG)
 	{ }
 
+	void isbc8030(machine_config &config);
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<i8251_device> m_usart;
@@ -85,7 +86,7 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START( isbc8030 )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( isbc8030 )
+MACHINE_CONFIG_START(isbc8030_state::isbc8030)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8085A, XTAL_22_1184MHz / 4)
 	MCFG_CPU_PROGRAM_MAP(isbc8030_mem)

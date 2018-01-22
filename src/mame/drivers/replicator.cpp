@@ -186,6 +186,7 @@ public:
 	DECLARE_DRIVER_INIT(replicator);
 	virtual void machine_reset() override;
 	DECLARE_PALETTE_INIT(replicator);
+	void replicator(machine_config &config);
 };
 
 void replicator_state::machine_start()
@@ -599,7 +600,7 @@ static GFXDECODE_START( replicator )
 	GFXDECODE_ENTRY( "hd44780:cgrom", 0x0000, hd44780_charlayout, 0, 1 )
 GFXDECODE_END
 
-static MACHINE_CONFIG_START( replicator )
+MACHINE_CONFIG_START(replicator_state::replicator)
 
 	MCFG_CPU_ADD("maincpu", ATMEGA1280, MASTER_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(replicator_prg_map)

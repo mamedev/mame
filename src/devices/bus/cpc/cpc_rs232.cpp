@@ -33,7 +33,7 @@ ROM_START( cpc_rs232_ams )
 ROM_END
 
 // device machine config
-MACHINE_CONFIG_MEMBER( cpc_rs232_device::device_add_mconfig )
+MACHINE_CONFIG_START(cpc_rs232_device::device_add_mconfig)
 	MCFG_DEVICE_ADD("pit", PIT8253, 0)
 	MCFG_PIT8253_CLK0(2000000)
 	MCFG_PIT8253_CLK1(2000000)

@@ -796,7 +796,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(suna16_state::bssoccer_interrupt)
 		m_maincpu->set_input_line(2, HOLD_LINE); // does RAM to sprite buffer copy here
 }
 
-static MACHINE_CONFIG_START( bssoccer )
+MACHINE_CONFIG_START(suna16_state::bssoccer)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_32MHz/4)    /* 8MHz */
@@ -859,7 +859,7 @@ MACHINE_CONFIG_END
                                 Ultra Balloon
 ***************************************************************************/
 
-static MACHINE_CONFIG_START( uballoon )
+MACHINE_CONFIG_START(suna16_state::uballoon)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_32MHz/4)   /* 8MHz */
@@ -914,7 +914,7 @@ MACHINE_CONFIG_END
                             Suna Quiz 6000 Academy
 ***************************************************************************/
 
-static MACHINE_CONFIG_START( sunaq )
+MACHINE_CONFIG_START(suna16_state::sunaq)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz/4)   /* 6MHz */
@@ -975,7 +975,7 @@ WRITE8_MEMBER(suna16_state::bestbest_ay8910_port_a_w)
 	// ?
 }
 
-static MACHINE_CONFIG_START( bestbest )
+MACHINE_CONFIG_START(suna16_state::bestbest)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz/4)   /* 6MHz */

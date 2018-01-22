@@ -2526,7 +2526,7 @@ static SLOT_INTERFACE_START( x1_floppies )
 	SLOT_INTERFACE("dd", FLOPPY_525_DD)
 SLOT_INTERFACE_END
 
-static MACHINE_CONFIG_START( x1 )
+MACHINE_CONFIG_START(x1_state::x1)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("x1_cpu", Z80, MAIN_CLOCK/4)
 	MCFG_CPU_PROGRAM_MAP(x1_mem)
@@ -2609,7 +2609,7 @@ static MACHINE_CONFIG_START( x1 )
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("cmt_wind_timer", x1_state, x1_cmt_wind_timer, attotime::from_hz(16))
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( x1turbo, x1 )
+MACHINE_CONFIG_DERIVED(x1_state::x1turbo, x1)
 	MCFG_CPU_MODIFY("x1_cpu")
 	MCFG_CPU_PROGRAM_MAP(x1turbo_mem)
 	MCFG_CPU_IO_MAP(x1turbo_io)

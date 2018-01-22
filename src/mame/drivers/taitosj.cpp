@@ -1752,7 +1752,7 @@ WRITE8_MEMBER(taitosj_state::taitosj_dacvol_w)
 	m_dacvol->write(space, NODE_01, data ^ 0xff); // 7416 hex inverter
 }
 
-static MACHINE_CONFIG_START( nomcu )
+MACHINE_CONFIG_START(taitosj_state::nomcu)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80,XTAL_8MHz/2)      /* 8 MHz / 2, on CPU board */
@@ -1827,7 +1827,7 @@ MACHINE_CONFIG_END
 
 
 /* same as above, but with additional 68705 MCU */
-static MACHINE_CONFIG_DERIVED( mcu, nomcu )
+MACHINE_CONFIG_DERIVED(taitosj_state::mcu, nomcu)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1844,7 +1844,7 @@ static MACHINE_CONFIG_DERIVED( mcu, nomcu )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( kikstart, mcu )
+MACHINE_CONFIG_DERIVED(taitosj_state::kikstart, mcu)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")

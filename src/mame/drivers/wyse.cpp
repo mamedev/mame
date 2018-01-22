@@ -39,6 +39,7 @@ public:
 //      , m_maincpu(*this, "maincpu")
 	{ }
 
+void wyse(machine_config &config);
 private:
 //  required_device<cpu_device> m_maincpu;
 };
@@ -54,7 +55,7 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START( wyse )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( wyse )
+MACHINE_CONFIG_START(wyse_state::wyse)
 	MCFG_CPU_ADD("maincpu", I8031, 11'000'000) // confirmed for WY-50
 	MCFG_CPU_PROGRAM_MAP(mem_map)
 	MCFG_CPU_IO_MAP(io_map)

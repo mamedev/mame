@@ -35,6 +35,7 @@ public:
 	DECLARE_PALETTE_INIT(tama);
 	DECLARE_INPUT_CHANGED_MEMBER(input_changed);
 	E0C6S46_PIXEL_UPDATE(pixel_update);
+	void tama(machine_config &config);
 
 protected:
 	virtual void machine_start() override;
@@ -131,7 +132,7 @@ INPUT_PORTS_END
 
 ***************************************************************************/
 
-static MACHINE_CONFIG_START( tama )
+MACHINE_CONFIG_START(tamag1_state::tama)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", E0C6S46, XTAL_32_768kHz)

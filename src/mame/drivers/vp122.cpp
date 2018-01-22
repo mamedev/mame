@@ -22,15 +22,16 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_screen(*this, "screen")
-		//, m_p_chargen(*this, "chargen")
+		, m_p_chargen(*this, "chargen")
 	{ }
 
 	SCN2674_DRAW_CHARACTER_MEMBER(draw_character);
 
+	void vp122(machine_config &config);
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;
-	//required_region_ptr<u8> m_p_chargen;
+	required_region_ptr<u8> m_p_chargen;
 };
 
 static ADDRESS_MAP_START( mem_map, AS_PROGRAM, 8, vp122_state )
@@ -63,7 +64,7 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START( vp122 )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( vp122 )
+MACHINE_CONFIG_START(vp122_state::vp122)
 	MCFG_CPU_ADD("maincpu", I8085A, XTAL_8MHz)
 	MCFG_CPU_PROGRAM_MAP(mem_map)
 	MCFG_CPU_IO_MAP(io_map)
@@ -71,16 +72,13 @@ static MACHINE_CONFIG_START( vp122 )
 	MCFG_NVRAM_ADD_0FILL("nvram") // MK48Z02
 
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_SIZE(720, 360)
-	MCFG_SCREEN_VISIBLE_AREA(0, 720-1, 0, 360-1)
+	MCFG_SCREEN_RAW_PARAMS(XTAL_14_916MHz, 960, 0, 800, 259, 0, 240)
 	MCFG_SCREEN_UPDATE_DEVICE("avdc", scn2674_device, screen_update)
 
-	MCFG_DEVICE_ADD("avdc", SCN2674, 4000000)
+	MCFG_DEVICE_ADD("avdc", SCN2674, XTAL_14_916MHz / 10)
 	MCFG_SCN2674_INTR_CALLBACK(INPUTLINE("maincpu", I8085_RST65_LINE))
-	MCFG_SCN2674_TEXT_CHARACTER_WIDTH(8)
-	MCFG_SCN2674_GFX_CHARACTER_WIDTH(8)
+	MCFG_SCN2674_TEXT_CHARACTER_WIDTH(10)
+	MCFG_SCN2674_GFX_CHARACTER_WIDTH(10)
 	MCFG_SCN2674_DRAW_CHARACTER_CALLBACK_OWNER(vp122_state, draw_character)
 	MCFG_DEVICE_ADDRESS_MAP(0, vram_map)
 	MCFG_VIDEO_SET_SCREEN("screen")

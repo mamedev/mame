@@ -50,6 +50,7 @@ public:
 	DECLARE_WRITE8_MEMBER(asp_port_b_w);
 	uint32_t screen_update_mc8030(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
+	void mc8030(machine_config &config);
 private:
 	required_region_ptr<u8> m_p_videoram;
 	required_device<cpu_device> m_maincpu;
@@ -176,7 +177,7 @@ static const z80_daisy_config daisy_chain[] =
 };
 
 
-static MACHINE_CONFIG_START( mc8030 )
+MACHINE_CONFIG_START(mc8030_state::mc8030)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80, XTAL_2_4576MHz)
 	MCFG_CPU_PROGRAM_MAP(mem_map)

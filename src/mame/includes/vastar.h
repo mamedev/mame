@@ -56,4 +56,5 @@ public:
 	void draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect);
 
 	INTERRUPT_GEN_MEMBER(vblank_irq);
+	void vastar(machine_config &config);
 };

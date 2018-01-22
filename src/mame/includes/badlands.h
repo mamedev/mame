@@ -56,4 +56,6 @@ public:
 	DECLARE_WRITE8_MEMBER(bootleg_main_irq_w);
 
 	static const atari_motion_objects_config s_mob_config;
+	void badlandsb(machine_config &config);
+	void badlands(machine_config &config);
 };

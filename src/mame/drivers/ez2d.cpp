@@ -56,6 +56,7 @@ public:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	void ez2d(machine_config &config);
 };
 
 void ez2d_state::video_start()
@@ -82,7 +83,7 @@ void ez2d_state::machine_reset()
 {
 }
 
-static MACHINE_CONFIG_START( ez2d )
+MACHINE_CONFIG_START(ez2d_state::ez2d)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", PENTIUM3, 100000000) // actually a Celeron at 533 MHz

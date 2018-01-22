@@ -394,7 +394,7 @@ static INPUT_PORTS_START( galds )
 INPUT_PORTS_END
 
 
-static MACHINE_CONFIG_START( pastelg )
+MACHINE_CONFIG_START(pastelg_state::pastelg)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 19968000/4)    /* unknown divider, galds definitely relies on this for correct voice pitch */
@@ -455,7 +455,7 @@ Note
 
 */
 
-static MACHINE_CONFIG_START( threeds )
+MACHINE_CONFIG_START(pastelg_state::threeds)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 19968000/4)    /* unknown divider, galds definitely relies on this for correct voice pitch */

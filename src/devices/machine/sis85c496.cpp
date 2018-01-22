@@ -45,7 +45,7 @@ DEVICE_ADDRESS_MAP_START(internal_io_map, 32, sis85c496_host_device)
 	AM_INHERIT_FROM(pci_host_device::io_configuration_access_map)
 ADDRESS_MAP_END
 
-MACHINE_CONFIG_MEMBER(sis85c496_host_device::device_add_mconfig)
+MACHINE_CONFIG_START(sis85c496_host_device::device_add_mconfig)
 	MCFG_DEVICE_ADD("pit8254", PIT8254, 0)
 	MCFG_PIT8253_CLK0(4772720/4) /* heartbeat IRQ */
 	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(sis85c496_host_device, at_pit8254_out0_changed))

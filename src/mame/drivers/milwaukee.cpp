@@ -29,6 +29,7 @@ public:
 		//, m_p_chargen(*this, "chargen")
 	{ }
 
+		void milwaukee(machine_config &config);
 private:
 	required_device<cpu_device> m_maincpu;
 	//required_region_ptr<u8> m_p_chargen;
@@ -49,7 +50,7 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START( milwaukee )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( milwaukee )
+MACHINE_CONFIG_START(milwaukee_state::milwaukee)
 	MCFG_CPU_ADD("maincpu", M6502, XTAL_16MHz / 16)
 	MCFG_CPU_PROGRAM_MAP(mem_map)
 

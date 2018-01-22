@@ -82,6 +82,8 @@ public:
 
 	void pgm_create_dummy_internal_arm_region(void);
 
+	void igs_m036_tt(machine_config &config);
+	void igs_m036(machine_config &config);
 };
 
 
@@ -245,7 +247,7 @@ void igs_m036_state::pgm_create_dummy_internal_arm_region(void)
 
 #define IGS036_CPU ARM7
 
-static MACHINE_CONFIG_START( igs_m036 )
+MACHINE_CONFIG_START(igs_m036_state::igs_m036)
 	MCFG_CPU_ADD("maincpu",IGS036_CPU, 20000000)
 
 	MCFG_CPU_PROGRAM_MAP(igs_m036_map)
@@ -264,7 +266,7 @@ static MACHINE_CONFIG_START( igs_m036 )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( igs_m036_tt )
+MACHINE_CONFIG_START(igs_m036_state::igs_m036_tt)
 	MCFG_CPU_ADD("maincpu",IGS036_CPU, 20000000)
 
 	MCFG_CPU_PROGRAM_MAP(igs_m036_map)

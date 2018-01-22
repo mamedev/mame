@@ -38,6 +38,7 @@ public:
 	DECLARE_WRITE8_MEMBER(lights_a_w);
 	DECLARE_WRITE8_MEMBER(lights_b_w);
 
+	void supstarf(machine_config &config);
 protected:
 	virtual void machine_start() override;
 
@@ -163,7 +164,7 @@ void supstarf_state::machine_start()
 	save_item(NAME(m_port1_data));
 }
 
-static MACHINE_CONFIG_START(supstarf)
+MACHINE_CONFIG_START(supstarf_state::supstarf)
 	MCFG_CPU_ADD("maincpu", I8085A, XTAL_5_0688MHz)
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_IO_MAP(main_io_map)

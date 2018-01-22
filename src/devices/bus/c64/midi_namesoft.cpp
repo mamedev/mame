@@ -44,7 +44,7 @@ WRITE_LINE_MEMBER( c64_namesoft_midi_cartridge_device::write_acia_clock )
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( c64_namesoft_midi_cartridge_device::device_add_mconfig )
+MACHINE_CONFIG_START(c64_namesoft_midi_cartridge_device::device_add_mconfig)
 	MCFG_DEVICE_ADD(MC6850_TAG, ACIA6850, 0)
 	MCFG_ACIA6850_TXD_HANDLER(DEVWRITELINE("mdout", midi_port_device, write_txd))
 	MCFG_ACIA6850_IRQ_HANDLER(WRITELINE(c64_namesoft_midi_cartridge_device, acia_irq_w))

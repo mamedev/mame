@@ -105,7 +105,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, aquarium_state )
 	AM_RANGE(0xc01000, 0xc01fff) AM_RAM_WRITE(aquarium_bak_videoram_w) AM_SHARE("bak_videoram")
 	AM_RANGE(0xc02000, 0xc03fff) AM_RAM_WRITE(aquarium_txt_videoram_w) AM_SHARE("txt_videoram")
 	AM_RANGE(0xc80000, 0xc81fff) AM_DEVREADWRITE8("spritegen", excellent_spr_device, read, write, 0x00ff)
-	AM_RANGE(0xd00000, 0xd00fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0xd00000, 0xd00fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0xd80014, 0xd8001f) AM_WRITEONLY AM_SHARE("scroll")
 	AM_RANGE(0xd80068, 0xd80069) AM_WRITENOP        /* probably not used */
 	AM_RANGE(0xd80080, 0xd80081) AM_READ_PORT("DSW")
@@ -284,7 +284,7 @@ static GFXDECODE_START( aquarium )
 	GFXDECODE_ENTRY( "gfx4", 0, char5bpplayout,   0x400, 32 )
 GFXDECODE_END
 
-static MACHINE_CONFIG_START( aquarium )
+MACHINE_CONFIG_START(aquarium_state::aquarium)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_32MHz/2) // clock not verified on pcb

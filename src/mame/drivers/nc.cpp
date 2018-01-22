@@ -1396,7 +1396,7 @@ INPUT_PORTS_END
 
 /**********************************************************************************************************/
 
-static MACHINE_CONFIG_START( nc100 )
+MACHINE_CONFIG_START(nc_state::nc100)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, /*6000000*/ 4606000)        /* Russell Marks says this is more accurate */
 	MCFG_CPU_PROGRAM_MAP(nc_map)
@@ -1467,7 +1467,7 @@ static SLOT_INTERFACE_START( ibmpc_floppies )
 		SLOT_INTERFACE( "525dd", FLOPPY_525_DD )
 SLOT_INTERFACE_END
 
-static MACHINE_CONFIG_DERIVED( nc200, nc100 )
+MACHINE_CONFIG_DERIVED(nc_state::nc200, nc100)
 
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_IO_MAP(nc200_io)

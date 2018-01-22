@@ -48,6 +48,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(busreq_w);
 	DECLARE_WRITE_LINE_MEMBER(fdc_intrq_w);
 
+	void altos5(machine_config &config);
 private:
 	uint8_t m_port08;
 	uint8_t m_port09;
@@ -344,7 +345,7 @@ DRIVER_INIT_MEMBER( altos5_state, altos5 )
 	membank("bankwf")->configure_entries(0, 50, &RAM[0], 0x1000);
 }
 
-static MACHINE_CONFIG_START( altos5 )
+MACHINE_CONFIG_START(altos5_state::altos5)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_8MHz / 2)
 	MCFG_CPU_PROGRAM_MAP(mem_map)

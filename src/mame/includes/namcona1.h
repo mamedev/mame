@@ -80,6 +80,10 @@ public:
 
 	TIMER_DEVICE_CALLBACK_MEMBER(interrupt);
 
+	void namcona2(machine_config &config);
+	void namcona1w(machine_config &config);
+	void namcona2w(machine_config &config);
+	void namcona1(machine_config &config);
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;

@@ -91,6 +91,7 @@ public:
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
+	void mmagic(machine_config &config);
 protected:
 	virtual void machine_start() override;
 
@@ -299,7 +300,7 @@ void mmagic_state::machine_start()
 //  MACHINE DEFINTIONS
 //**************************************************************************
 
-static MACHINE_CONFIG_START( mmagic )
+MACHINE_CONFIG_START(mmagic_state::mmagic)
 	// basic machine hardware
 	MCFG_CPU_ADD("maincpu", I8085A, XTAL_6_144MHz) // NEC D8085A
 	MCFG_CPU_PROGRAM_MAP(mmagic_mem)

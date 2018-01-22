@@ -72,7 +72,7 @@ static ADDRESS_MAP_START( m90_main_cpu_map, AS_PROGRAM, 16, m90_state )
 	AM_RANGE(0x80000, 0x8ffff) AM_ROMBANK("bank1")  /* Quiz F1 only */
 	AM_RANGE(0xa0000, 0xa3fff) AM_RAM
 	AM_RANGE(0xd0000, 0xdffff) AM_RAM_WRITE(m90_video_w) AM_SHARE("video_data")
-	AM_RANGE(0xe0000, 0xe03ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0xe0000, 0xe03ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0xffff0, 0xfffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -81,7 +81,7 @@ static ADDRESS_MAP_START( dynablsb_main_cpu_map, AS_PROGRAM, 16, m90_state )
 	AM_RANGE(0x6000e, 0x60fff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0xa0000, 0xa3fff) AM_RAM
 	AM_RANGE(0xd0000, 0xdffff) AM_RAM_WRITE(m90_video_w) AM_SHARE("video_data")
-	AM_RANGE(0xe0000, 0xe03ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0xe0000, 0xe03ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0xffff0, 0xfffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -90,7 +90,7 @@ static ADDRESS_MAP_START( bomblord_main_cpu_map, AS_PROGRAM, 16, m90_state )
 	AM_RANGE(0xa0000, 0xa3fff) AM_RAM
 	AM_RANGE(0xc000e, 0xc0fff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0xd0000, 0xdffff) AM_RAM_WRITE(m90_video_w) AM_SHARE("video_data")
-	AM_RANGE(0xe0000, 0xe03ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0xe0000, 0xe03ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0xffff0, 0xfffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -714,7 +714,7 @@ INTERRUPT_GEN_MEMBER(m90_state::bomblord_interrupt)
 
 
 /* Basic hardware -- no decryption table is setup for CPU */
-static MACHINE_CONFIG_START( m90 )
+MACHINE_CONFIG_START(m90_state::m90)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", V35, XTAL_32MHz/2)
 	MCFG_CPU_PROGRAM_MAP(m90_main_cpu_map)
@@ -759,54 +759,54 @@ static MACHINE_CONFIG_START( m90 )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( hasamu, m90 )
+MACHINE_CONFIG_DERIVED(m90_state::hasamu, m90)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_V25_CONFIG(gunforce_decryption_table)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( quizf1, m90 )
+MACHINE_CONFIG_DERIVED(m90_state::quizf1, m90)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_V25_CONFIG(lethalth_decryption_table)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VISIBLE_AREA(6*8, 54*8-1, 17*8-8, 47*8-1+8)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( matchit2, m90 )
+MACHINE_CONFIG_DERIVED(m90_state::matchit2, m90)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_V25_CONFIG(matchit2_decryption_table)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VISIBLE_AREA(6*8, 54*8-1, 17*8-8, 47*8-1+8)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( riskchal, m90 )
+MACHINE_CONFIG_DERIVED(m90_state::riskchal, m90)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_V25_CONFIG(gussun_decryption_table)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VISIBLE_AREA(10*8, 50*8-1, 17*8, 47*8-1)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( bombrman, m90 )
+MACHINE_CONFIG_DERIVED(m90_state::bombrman, m90)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_V25_CONFIG(bomberman_decryption_table)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VISIBLE_AREA(10*8, 50*8-1, 17*8, 47*8-1)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( bbmanwj, m90 )
+MACHINE_CONFIG_DERIVED(m90_state::bbmanwj, m90)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_V25_CONFIG(dynablaster_decryption_table)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VISIBLE_AREA(10*8, 50*8-1, 17*8, 47*8-1)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( bbmanw, bbmanwj )
+MACHINE_CONFIG_DERIVED(m90_state::bbmanw, bbmanwj)
 	MCFG_CPU_MODIFY("soundcpu")
 	MCFG_CPU_IO_MAP(m99_sound_cpu_io_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(m90_state, fake_nmi,  128*60)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( bomblord, m90 )
+MACHINE_CONFIG_DERIVED(m90_state::bomblord, m90)
 	MCFG_CPU_REPLACE("maincpu", V30, 32000000/4)
 	MCFG_CPU_PROGRAM_MAP(bomblord_main_cpu_map)
 	MCFG_CPU_IO_MAP(m90_main_cpu_io_map)
@@ -824,7 +824,7 @@ static MACHINE_CONFIG_DERIVED( bomblord, m90 )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( dynablsb, m90 )
+MACHINE_CONFIG_DERIVED(m90_state::dynablsb, m90)
 	MCFG_CPU_REPLACE("maincpu", V30, 32000000/4)
 	MCFG_CPU_PROGRAM_MAP(dynablsb_main_cpu_map)
 	MCFG_CPU_IO_MAP(dynablsb_main_cpu_io_map)

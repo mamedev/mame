@@ -12,9 +12,6 @@
 
 #include "video/pc_vga.h"
 
-MACHINE_CONFIG_EXTERN( pcvideo_cirrus_gd5428 );
-MACHINE_CONFIG_EXTERN( pcvideo_cirrus_gd5430 );
-
 class cirrus_gd5428_device :  public svga_device
 {
 public:
@@ -90,6 +87,9 @@ protected:
 	uint8_t m_vclk_denom[4];
 
 	inline uint8_t cirrus_vga_latch_write(int offs, uint8_t data);
+
+	void pcvideo_cirrus_gd5428(machine_config &config);
+	void pcvideo_cirrus_gd5430(machine_config &config);
 
 private:
 	void cirrus_define_video_mode();

@@ -226,6 +226,7 @@ public:
 
 	void zr36120_reset();
 
+	void magictg(machine_config &config);
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -897,7 +898,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( magictg )
+MACHINE_CONFIG_START(magictg_state::magictg)
 	MCFG_CPU_ADD("mips", R5000BE, 150000000) /* TODO: CPU type and clock are unknown */
 	//MCFG_MIPS3_ICACHE_SIZE(16384) /* TODO: Unknown */
 	//MCFG_MIPS3_DCACHE_SIZE(16384) /* TODO: Unknown */

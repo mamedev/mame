@@ -3494,7 +3494,7 @@ GFXDECODE_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( pacman )
+MACHINE_CONFIG_START(pacman_state::pacman)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK/6)
@@ -3537,22 +3537,22 @@ static MACHINE_CONFIG_START( pacman )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( maketrax, pacman )
+MACHINE_CONFIG_DERIVED(pacman_state::maketrax, pacman)
 	MCFG_MACHINE_RESET_OVERRIDE(pacman_state,maketrax)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( korosuke, maketrax )
+MACHINE_CONFIG_DERIVED(pacman_state::korosuke, maketrax)
 	MCFG_DEVICE_MODIFY("mainlatch") // 8K on original boards
 	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(NOOP) // outputs 4-7 go to protection chip at 6P
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( pengojpm, pacman )
+MACHINE_CONFIG_DERIVED(pacman_state::pengojpm, pacman)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(pengojpm_map)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( birdiy, pacman )
+MACHINE_CONFIG_DERIVED(pacman_state::birdiy, pacman)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -3574,7 +3574,7 @@ MACHINE_CONFIG_END
 
 
 
-static MACHINE_CONFIG_DERIVED( piranha, pacman )
+MACHINE_CONFIG_DERIVED(pacman_state::piranha, pacman)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -3582,7 +3582,7 @@ static MACHINE_CONFIG_DERIVED( piranha, pacman )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( nmouse, pacman )
+MACHINE_CONFIG_DERIVED(pacman_state::nmouse, pacman)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -3590,7 +3590,7 @@ static MACHINE_CONFIG_DERIVED( nmouse, pacman )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( mspacman, pacman )
+MACHINE_CONFIG_DERIVED(pacman_state::mspacman, pacman)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -3601,14 +3601,14 @@ static MACHINE_CONFIG_DERIVED( mspacman, pacman )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( woodpek, pacman )
+MACHINE_CONFIG_DERIVED(pacman_state::woodpek, pacman)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(woodpek_map)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( numcrash, pacman )
+MACHINE_CONFIG_DERIVED(pacman_state::numcrash, pacman)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -3619,7 +3619,7 @@ static MACHINE_CONFIG_DERIVED( numcrash, pacman )
 	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(NOOP) // ???
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( alibaba, pacman )
+MACHINE_CONFIG_DERIVED(pacman_state::alibaba, pacman)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -3638,7 +3638,7 @@ static MACHINE_CONFIG_DERIVED( alibaba, pacman )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( dremshpr, pacman )
+MACHINE_CONFIG_DERIVED(pacman_state::dremshpr, pacman)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -3656,7 +3656,7 @@ static MACHINE_CONFIG_DERIVED( dremshpr, pacman )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( theglobp, pacman )
+MACHINE_CONFIG_DERIVED(pacman_state::theglobp, pacman)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -3668,7 +3668,7 @@ static MACHINE_CONFIG_DERIVED( theglobp, pacman )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( acitya, pacman )
+MACHINE_CONFIG_DERIVED(pacman_state::acitya, pacman)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -3680,7 +3680,7 @@ static MACHINE_CONFIG_DERIVED( acitya, pacman )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( eeekk, pacman )
+MACHINE_CONFIG_DERIVED(pacman_state::eeekk, pacman)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -3692,7 +3692,7 @@ static MACHINE_CONFIG_DERIVED( eeekk, pacman )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( vanvan, pacman )
+MACHINE_CONFIG_DERIVED(pacman_state::vanvan, pacman)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -3718,7 +3718,7 @@ static MACHINE_CONFIG_DERIVED( vanvan, pacman )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( bigbucks, pacman )
+MACHINE_CONFIG_DERIVED(pacman_state::bigbucks, pacman)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -3734,7 +3734,7 @@ static MACHINE_CONFIG_DERIVED( bigbucks, pacman )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( s2650games, pacman )
+MACHINE_CONFIG_DERIVED(pacman_state::s2650games, pacman)
 
 	/* basic machine hardware */
 	MCFG_DEVICE_REMOVE("maincpu")
@@ -3771,7 +3771,7 @@ static MACHINE_CONFIG_DERIVED( s2650games, pacman )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( drivfrcp, s2650games )
+MACHINE_CONFIG_DERIVED(pacman_state::drivfrcp, s2650games)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -3779,7 +3779,7 @@ static MACHINE_CONFIG_DERIVED( drivfrcp, s2650games )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( 8bpm, s2650games )
+MACHINE_CONFIG_DERIVED(pacman_state::_8bpm, s2650games )
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -3787,7 +3787,7 @@ static MACHINE_CONFIG_DERIVED( 8bpm, s2650games )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( porky, s2650games )
+MACHINE_CONFIG_DERIVED(pacman_state::porky, s2650games)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -3795,7 +3795,7 @@ static MACHINE_CONFIG_DERIVED( porky, s2650games )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( rocktrv2, pacman )
+MACHINE_CONFIG_DERIVED(pacman_state::rocktrv2, pacman)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -3807,7 +3807,7 @@ static MACHINE_CONFIG_DERIVED( rocktrv2, pacman )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( mschamp, pacman )
+MACHINE_CONFIG_DERIVED(pacman_state::mschamp, pacman)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -3819,7 +3819,7 @@ static MACHINE_CONFIG_DERIVED( mschamp, pacman )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( superabc, pacman )
+MACHINE_CONFIG_DERIVED(pacman_state::superabc, pacman)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -3834,13 +3834,13 @@ static MACHINE_CONFIG_DERIVED( superabc, pacman )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( crush4, mschamp )
+MACHINE_CONFIG_DERIVED(pacman_state::crush4, mschamp)
 
 	/* basic machine hardware */
 	MCFG_GFXDECODE_MODIFY("gfxdecode", crush4)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( crushs, pacman )
+MACHINE_CONFIG_DERIVED(pacman_state::crushs, pacman)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -7364,7 +7364,7 @@ GAME( 1984, eeekk,    0,        eeekk,    eeekk,    pacman_state,  0,        ROT
 
 GAME( 1984, drivfrcp, 0,        drivfrcp, drivfrcp, pacman_state,  drivfrcp, ROT90,  "Shinkai Inc. (Magic Electronics Inc. license)", "Driving Force (Pac-Man conversion)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1985, 8bpm,     8ballact, 8bpm,     8bpm,     pacman_state,  8bpm,     ROT90,  "Seatongrove Ltd (Magic Electronics USA license)", "Eight Ball Action (Pac-Man conversion)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, 8bpm,     8ballact, _8bpm,    8bpm,     pacman_state,  8bpm,     ROT90,  "Seatongrove Ltd (Magic Electronics USA license)", "Eight Ball Action (Pac-Man conversion)", MACHINE_SUPPORTS_SAVE )
 
 GAME( 1985, porky,    0,        porky,    porky,    pacman_state,  porky,    ROT90,  "Shinkai Inc. (Magic Electronics Inc. license)", "Porky", MACHINE_SUPPORTS_SAVE )
 

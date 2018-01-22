@@ -53,6 +53,7 @@ public:
 	DECLARE_READ8_MEMBER( pio_b_r );
 	DECLARE_READ8_MEMBER( card_r );
 
+	void tranz330(machine_config &config);
 private:
 	required_device<cpu_device>             m_cpu;
 	required_device<z80ctc_device>          m_ctc;

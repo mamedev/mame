@@ -52,4 +52,7 @@ public:
 	required_device<samples_device> m_samples;
 	required_device<tms9927_device> m_tms;
 	required_device<palette_device> m_palette;
+	void natodef(machine_config &config);
+	void sharkatt(machine_config &config);
+	void thief(machine_config &config);
 };

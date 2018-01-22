@@ -67,6 +67,7 @@ public:
 	DECLARE_WRITE8_MEMBER(i8255_port_c_w);
 	DECLARE_WRITE_LINE_MEMBER(write_centronics_ack);
 
+	void elwro800(machine_config &config);
 protected:
 	required_device<i8251_device> m_i8251;
 	required_device<i8255_device> m_i8255;
@@ -554,7 +555,7 @@ static GFXDECODE_START( elwro800 )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( elwro800 )
+MACHINE_CONFIG_START(elwro800_state::elwro800)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80, 3500000)    /* 3.5 MHz */

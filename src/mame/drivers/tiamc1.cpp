@@ -323,7 +323,7 @@ static GFXDECODE_START( kot )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( tiamc1 )
+MACHINE_CONFIG_START(tiamc1_state::tiamc1)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8080, CPU_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(tiamc1_map)
@@ -352,7 +352,7 @@ static MACHINE_CONFIG_START( tiamc1 )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED(kot, tiamc1)
+MACHINE_CONFIG_DERIVED(tiamc1_state::kot, tiamc1)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(kotrybolov_map)
 	MCFG_CPU_IO_MAP(kotrybolov_io_map)

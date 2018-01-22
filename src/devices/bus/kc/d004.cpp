@@ -146,7 +146,7 @@ void kc_d004_device::device_reset()
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER(kc_d004_device::device_add_mconfig)
+MACHINE_CONFIG_START(kc_d004_device::device_add_mconfig)
 	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL_8MHz/2)
 	MCFG_CPU_PROGRAM_MAP(kc_d004_mem)
 	MCFG_CPU_IO_MAP(kc_d004_io)
@@ -370,7 +370,7 @@ kc_d004_gide_device::kc_d004_gide_device(const machine_config &mconfig, const ch
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER(kc_d004_gide_device::device_add_mconfig)
+MACHINE_CONFIG_START(kc_d004_gide_device::device_add_mconfig)
 	kc_d004_device::device_add_mconfig(config);
 
 	MCFG_CPU_MODIFY(Z80_TAG)

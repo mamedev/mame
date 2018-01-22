@@ -27,6 +27,7 @@ public:
 	DECLARE_WRITE8_MEMBER(sio_out_w);
 	template<unsigned int drive> DECLARE_WRITE_LINE_MEMBER(drive_sel_w);
 
+	void slicer(machine_config &config);
 protected:
 	required_device<fd1797_device> m_fdc;
 	required_device<scsi_port_device> m_sasi;
@@ -83,7 +84,7 @@ static SLOT_INTERFACE_START( slicer_floppies )
 	SLOT_INTERFACE("8dsdd", FLOPPY_8_DSDD)
 SLOT_INTERFACE_END
 
-static MACHINE_CONFIG_START( slicer )
+MACHINE_CONFIG_START(slicer_state::slicer)
 	MCFG_CPU_ADD("maincpu", I80186, XTAL_16MHz / 2)
 	MCFG_CPU_PROGRAM_MAP(slicer_map)
 	MCFG_CPU_IO_MAP(slicer_io)

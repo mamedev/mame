@@ -19,6 +19,7 @@ public:
 		, m_maincpu(*this, "maincpu")
 	{ }
 
+	void hp700_92(machine_config &config);
 private:
 	required_device<cpu_device> m_maincpu;
 };
@@ -39,7 +40,7 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START( hp700_92 )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( hp700_92 )
+MACHINE_CONFIG_START(hp700_state::hp700_92)
 	MCFG_CPU_ADD("maincpu", V20, XTAL_29_4912MHz / 3) // divider not verified
 	MCFG_CPU_PROGRAM_MAP(mem_map)
 	MCFG_CPU_IO_MAP(io_map)

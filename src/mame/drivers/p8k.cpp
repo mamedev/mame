@@ -105,6 +105,8 @@ public:
 	DECLARE_READ8_MEMBER(io_read_byte);
 	DECLARE_WRITE8_MEMBER(io_write_byte);
 
+	void p8k(machine_config &config);
+	void p8k_16(machine_config &config);
 private:
 	required_device<cpu_device> m_maincpu;
 	optional_device<p8k_16_daisy_device> m_daisy;
@@ -399,7 +401,7 @@ GFXDECODE_END
 
 ****************************************************************************/
 
-static MACHINE_CONFIG_START( p8k )
+MACHINE_CONFIG_START(p8k_state::p8k)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_4MHz )
 	MCFG_Z80_DAISY_CHAIN(p8k_daisy_chain)
@@ -467,7 +469,7 @@ static MACHINE_CONFIG_START( p8k )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( p8k_16 )
+MACHINE_CONFIG_START(p8k_state::p8k_16)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z8001, XTAL_4MHz )
 	MCFG_CPU_PROGRAM_MAP(p8k_16_memmap)

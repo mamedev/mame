@@ -117,6 +117,9 @@ public:
 	uint16_t* m_rom16;
 	uint8_t* m_rom8;
 
+	void spider(machine_config &config);
+	void twins(machine_config &config);
+	void twinsa(machine_config &config);
 };
 
 
@@ -379,7 +382,7 @@ static INPUT_PORTS_START(twins)
 INPUT_PORTS_END
 
 
-static MACHINE_CONFIG_START( twins )
+MACHINE_CONFIG_START(twins_state::twins)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", V30, 8000000)
 	MCFG_CPU_PROGRAM_MAP(twins_map)
@@ -427,7 +430,7 @@ static ADDRESS_MAP_START( ramdac_map, 0, 8, twins_state )
 ADDRESS_MAP_END
 
 
-static MACHINE_CONFIG_START( twinsa )
+MACHINE_CONFIG_START(twins_state::twinsa)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", V30, XTAL_16MHz/2) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(twins_map)
@@ -556,7 +559,7 @@ ADDRESS_MAP_END
 
 
 
-static MACHINE_CONFIG_START( spider )
+MACHINE_CONFIG_START(twins_state::spider)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", V30, 8000000)
 	MCFG_CPU_PROGRAM_MAP(twins_map)

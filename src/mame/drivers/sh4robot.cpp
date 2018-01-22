@@ -41,6 +41,7 @@ public:
 	, m_maincpu(*this, "maincpu")
 	{ }
 
+	void sh4robot(machine_config &config);
 private:
 	required_device<cpu_device> m_maincpu;
 };
@@ -61,7 +62,7 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START( sh4robot )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( sh4robot )
+MACHINE_CONFIG_START(sh4robot_state::sh4robot)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", SH4LE, 200000000) // SH7750
 	MCFG_SH4_MD0(1)

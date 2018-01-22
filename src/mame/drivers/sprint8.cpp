@@ -454,7 +454,7 @@ static GFXDECODE_START( sprint8 )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( sprint8 )
+MACHINE_CONFIG_START(sprint8_state::sprint8)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6800, 11055000 / 11) /* ? */

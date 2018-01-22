@@ -435,7 +435,7 @@ INTERRUPT_GEN_MEMBER(skykid_state::mcu_vblank_irq)
 }
 
 
-static MACHINE_CONFIG_START( skykid )
+MACHINE_CONFIG_START(skykid_state::skykid)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", MC6809E, XTAL_49_152MHz/32)

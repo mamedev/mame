@@ -593,7 +593,7 @@ void comx35_state::machine_reset()
 //  MACHINE_CONFIG( pal )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( pal )
+MACHINE_CONFIG_START(comx35_state::pal)
 	// basic system hardware
 	MCFG_CPU_ADD(CDP1802_TAG, CDP1802, cdp1869_device::CPU_CLK_PAL)
 	MCFG_CPU_PROGRAM_MAP(comx35_mem)
@@ -643,7 +643,7 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( ntsc )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( ntsc )
+MACHINE_CONFIG_START(comx35_state::ntsc)
 	// basic system hardware
 	MCFG_CPU_ADD(CDP1802_TAG, CDP1802, cdp1869_device::CPU_CLK_NTSC)
 	MCFG_CPU_PROGRAM_MAP(comx35_mem)

@@ -170,6 +170,8 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	void intel82439tx_init();
+	void calchase(machine_config &config);
+	void hostinv(machine_config &config);
 };
 
 // Intel 82439TX System Controller (MTXC)
@@ -639,7 +641,7 @@ void calchase_state::machine_reset()
 	membank("bios_ext")->set_base(memregion("bios")->base() + 0);
 }
 
-static MACHINE_CONFIG_START( calchase )
+MACHINE_CONFIG_START(calchase_state::calchase)
 	MCFG_CPU_ADD("maincpu", PENTIUM, 133000000) // Cyrix 686MX-PR200 CPU
 	MCFG_CPU_PROGRAM_MAP(calchase_map)
 	MCFG_CPU_IO_MAP(calchase_io)
@@ -671,7 +673,7 @@ static MACHINE_CONFIG_START( calchase )
 	MCFG_SOUND_ROUTE_EX(0, "rdac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "rdac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( hostinv )
+MACHINE_CONFIG_START(calchase_state::hostinv)
 	MCFG_CPU_ADD("maincpu", PENTIUM, 133000000) // Cyrix 686MX-PR200 CPU
 	MCFG_CPU_PROGRAM_MAP(calchase_map)
 	MCFG_CPU_IO_MAP(calchase_io)

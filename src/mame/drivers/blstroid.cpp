@@ -71,7 +71,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, blstroid_state )
 	AM_RANGE(0x800000, 0x800001) AM_MIRROR(0x0381fe) AM_DEVWRITE("watchdog", watchdog_timer_device, reset16_w)
 	AM_RANGE(0x800200, 0x800201) AM_MIRROR(0x0381fe) AM_WRITE(scanline_int_ack_w)
 	AM_RANGE(0x800400, 0x800401) AM_MIRROR(0x0381fe) AM_WRITE(video_int_ack_w)
-	AM_RANGE(0x800600, 0x800601) AM_MIRROR(0x0381fe) AM_DEVWRITE("eeprom", eeprom_parallel_28xx_device, unlock_write)
+	AM_RANGE(0x800600, 0x800601) AM_MIRROR(0x0381fe) AM_DEVWRITE("eeprom", eeprom_parallel_28xx_device, unlock_write16)
 	AM_RANGE(0x800800, 0x8009ff) AM_MIRROR(0x038000) AM_WRITEONLY AM_SHARE("priorityram")
 	AM_RANGE(0x800a00, 0x800a01) AM_MIRROR(0x0381fe) AM_DEVWRITE8("jsa", atari_jsa_i_device, main_command_w, 0x00ff)
 	AM_RANGE(0x800c00, 0x800c01) AM_MIRROR(0x0381fe) AM_DEVWRITE("jsa", atari_jsa_i_device, sound_reset_w)
@@ -81,9 +81,9 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, blstroid_state )
 	AM_RANGE(0x801804, 0x801805) AM_MIRROR(0x0383f8) AM_READ_PORT("DIAL1")
 	AM_RANGE(0x801c00, 0x801c01) AM_MIRROR(0x0383fc) AM_READ_PORT("IN0")
 	AM_RANGE(0x801c02, 0x801c03) AM_MIRROR(0x0383fc) AM_READ_PORT("IN1")
-	AM_RANGE(0x802000, 0x8023ff) AM_MIRROR(0x038c00) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x802000, 0x8023ff) AM_MIRROR(0x038c00) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x803000, 0x8033ff) AM_MIRROR(0x038c00) AM_DEVREADWRITE8("eeprom", eeprom_parallel_28xx_device, read, write, 0x00ff)
-	AM_RANGE(0x804000, 0x804fff) AM_MIRROR(0x038000) AM_RAM_DEVWRITE("playfield", tilemap_device, write) AM_SHARE("playfield")
+	AM_RANGE(0x804000, 0x804fff) AM_MIRROR(0x038000) AM_RAM_DEVWRITE("playfield", tilemap_device, write16) AM_SHARE("playfield")
 	AM_RANGE(0x805000, 0x805fff) AM_MIRROR(0x038000) AM_RAM AM_SHARE("mob")
 	AM_RANGE(0x806000, 0x807fff) AM_MIRROR(0x038000) AM_RAM
 ADDRESS_MAP_END
@@ -174,7 +174,7 @@ GFXDECODE_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( blstroid )
+MACHINE_CONFIG_START(blstroid_state::blstroid)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, ATARI_CLOCK_14MHz/2)

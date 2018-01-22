@@ -107,6 +107,7 @@ public:
 	required_ioport m_io_in3;
 	required_device<palette_device> m_palette;
 	required_shared_ptr<uint32_t> m_generic_paletteram_32;
+	void backfire(machine_config &config);
 };
 
 //uint32_t *backfire_180010, *backfire_188010;
@@ -470,7 +471,7 @@ void backfire_state::machine_start()
 {
 }
 
-static MACHINE_CONFIG_START( backfire )
+MACHINE_CONFIG_START(backfire_state::backfire)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", ARM, 28000000/4) /* Unconfirmed */

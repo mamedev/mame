@@ -102,7 +102,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, m107_state )
 	AM_RANGE(0xd0000, 0xdffff) AM_RAM_WRITE(vram_w) AM_SHARE("vram_data")
 	AM_RANGE(0xe0000, 0xeffff) AM_RAM /* System ram */
 	AM_RANGE(0xf8000, 0xf8fff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0xf9000, 0xf9fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0xf9000, 0xf9fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0xffff0, 0xfffff) AM_ROM AM_REGION("maincpu", 0x7fff0)
 ADDRESS_MAP_END
 
@@ -711,7 +711,7 @@ GFXDECODE_END
 
 /***************************************************************************/
 
-static MACHINE_CONFIG_START( firebarr )
+MACHINE_CONFIG_START(m107_state::firebarr)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", V33, XTAL_28MHz/2)    /* NEC V33, 28MHz clock */
@@ -762,7 +762,7 @@ static MACHINE_CONFIG_START( firebarr )
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( dsoccr94, firebarr )
+MACHINE_CONFIG_DERIVED(m107_state::dsoccr94, firebarr)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -777,7 +777,7 @@ static MACHINE_CONFIG_DERIVED( dsoccr94, firebarr )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( wpksoc, firebarr )
+MACHINE_CONFIG_DERIVED(m107_state::wpksoc, firebarr)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(wpksoc_map)
 	MCFG_CPU_IO_MAP(wpksoc_io_map)
@@ -786,7 +786,7 @@ static MACHINE_CONFIG_DERIVED( wpksoc, firebarr )
 	MCFG_V25_CONFIG(leagueman_decryption_table)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( airass, firebarr )
+MACHINE_CONFIG_DERIVED(m107_state::airass, firebarr)
 	MCFG_GFXDECODE_MODIFY("gfxdecode", m107)
 
 	MCFG_CPU_MODIFY("soundcpu")

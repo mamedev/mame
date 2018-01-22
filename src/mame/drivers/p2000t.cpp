@@ -219,7 +219,7 @@ READ8_MEMBER( p2000t_state::videoram_r )
 }
 
 /* Machine definition */
-static MACHINE_CONFIG_START( p2000t )
+MACHINE_CONFIG_START(p2000t_state::p2000t)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 2500000)
 	MCFG_CPU_PROGRAM_MAP(p2000t_mem)
@@ -246,7 +246,7 @@ MACHINE_CONFIG_END
 
 
 /* Machine definition */
-static MACHINE_CONFIG_START( p2000m )
+MACHINE_CONFIG_START(p2000t_state::p2000m)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 2500000)
 	MCFG_CPU_PROGRAM_MAP(p2000m_mem)

@@ -35,6 +35,8 @@ public:
 
 	static const atari_motion_objects_config s_mob_config;
 
+	void klax(machine_config &config);
+	void klax2bl(machine_config &config);
 private:
 	required_device<tilemap_device> m_playfield_tilemap;
 	required_device<atari_motion_objects_device> m_mob;

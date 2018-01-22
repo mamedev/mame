@@ -435,12 +435,12 @@ ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( scontra_bank5800_map, AS_PROGRAM, 8, thunderx_state )
-	AM_RANGE(0x0000, 0x07ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x0000, 0x07ff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
 	AM_RANGE(0x0800, 0x0fff) AM_RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( thunderx_bank5800_map, AS_PROGRAM, 8, thunderx_state )
-	AM_RANGE(0x0000, 0x07ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x0000, 0x07ff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
 	AM_RANGE(0x0800, 0x0fff) AM_RAM
 	AM_RANGE(0x1000, 0x17ff) AM_READWRITE(pmc_r, pmc_w) AM_SHARE("pmcram")
 ADDRESS_MAP_END
@@ -630,7 +630,7 @@ void thunderx_state::machine_reset()
 	m_priority = 0;
 }
 
-static MACHINE_CONFIG_START( scontra )
+MACHINE_CONFIG_START(thunderx_state::scontra)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", KONAMI, XTAL_24MHz/2/4)     /* 052001 (verified on pcb) */
@@ -693,7 +693,7 @@ WRITE8_MEMBER( thunderx_state::banking_callback )
 	m_rombank->set_entry(data & 0x0f);
 }
 
-static MACHINE_CONFIG_DERIVED( thunderx, scontra )
+MACHINE_CONFIG_DERIVED(thunderx_state::thunderx, scontra)
 
 	/* basic machine hardware */
 	MCFG_DEVICE_MODIFY("maincpu")     /* 052001 (verified on pcb) */
@@ -710,7 +710,7 @@ static MACHINE_CONFIG_DERIVED( thunderx, scontra )
 	MCFG_DEVICE_REMOVE("k007232")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( gbusters, scontra )
+MACHINE_CONFIG_DERIVED(thunderx_state::gbusters, scontra)
 
 	/* basic machine hardware */
 	MCFG_DEVICE_MODIFY("maincpu")     /* 052526 */

@@ -32,8 +32,8 @@ static void construct_address_map_tranz330_mem(address_map &map)
 {
 	map.configure(AS_PROGRAM, 8);
 
-	map.range(0x0000, 0x7fff).rom();
-	map.range(0x8000, 0xffff).ram();
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0xffff).ram();
 }
 
 static void construct_address_map_tranz330_io(address_map &map)
@@ -41,17 +41,10 @@ static void construct_address_map_tranz330_io(address_map &map)
 	map.configure(AS_IO, 8);
 	map.global_mask(0xff);
 
-	map.range(0x00, 0x03).set_handler(read8_delegate(&z80pio_device::read_alt,  "z80pio_device::read_alt",  PIO_TAG, (z80pio_device *)nullptr),
-									  write8_delegate(&z80pio_device::write_alt, "z80pio_device::write_alt", PIO_TAG, (z80pio_device *)nullptr));
-
-	map.range(0x10, 0x13).set_handler(read8_delegate(&z80ctc_device::read,  "z80ctc_device::read",  CTC_TAG, (z80ctc_device *)nullptr),
-									  write8_delegate(&z80ctc_device::write, "z80ctc_device::write", CTC_TAG, (z80ctc_device *)nullptr));
-
-	map.range(0x20, 0x23).set_handler(read8_delegate(&z80dart_device::ba_cd_r, "z80dart_device::ba_cd_r", DART_TAG, (z80dart_device *)nullptr),
-									  write8_delegate(&z80dart_device::ba_cd_w, "z80dart_device::ba_cd_w", DART_TAG, (z80dart_device *)nullptr));
-
-	map.range(0x30, 0x3f).set_handler(read8_delegate(&msm6242_device::read,  "msm6242_device::read",  RTC_TAG, (msm6242_device *)nullptr),
-									  write8_delegate(&msm6242_device::write, "msm6242_device::write", RTC_TAG, (msm6242_device *)nullptr));
+	map(0x00, 0x03).rw(PIO_TAG,  FUNC(z80pio_device::read_alt), FUNC(z80pio_device::write_alt));
+	map(0x10, 0x13).rw(CTC_TAG,  FUNC(z80ctc_device::read),     FUNC(z80ctc_device::write));
+	map(0x20, 0x23).rw(DART_TAG, FUNC(z80dart_device::ba_cd_r), FUNC(z80dart_device::ba_cd_w));
+	map(0x30, 0x3f).rw(RTC_TAG,  FUNC(msm6242_device::read),    FUNC(msm6242_device::write));
 }
 
 static void construct_ioport_tranz330(device_t &owner, ioport_list &portlist, std::string &errorbuf)
@@ -150,7 +143,7 @@ static const z80_daisy_config tranz330_daisy_chain[] =
 
 // * - check clocks
 // ? - check purported RS232 hookup, inconsistent information found at the relevant webpage vs. user-submitted errata
-static MACHINE_CONFIG_START( tranz330 )
+MACHINE_CONFIG_START(tranz330_state::tranz330)
 	MCFG_CPU_ADD(CPU_TAG, Z80, XTAL_7_15909MHz/2) //*
 	MCFG_CPU_PROGRAM_MAP(tranz330_mem)
 	MCFG_CPU_IO_MAP(tranz330_io)

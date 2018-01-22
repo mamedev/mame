@@ -78,6 +78,7 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	void intel82439tx_init();
+	void xtom3d(machine_config &config);
 };
 
 // Intel 82439TX System Controller (MTXC)
@@ -394,7 +395,7 @@ void xtom3d_state::machine_reset()
 	membank("video_bank2")->set_base(memregion("video_bios")->base() + 0x4000);
 }
 
-static MACHINE_CONFIG_START( xtom3d )
+MACHINE_CONFIG_START(xtom3d_state::xtom3d)
 	MCFG_CPU_ADD("maincpu", PENTIUM2, 450000000/16)  // actually Pentium II 450
 	MCFG_CPU_PROGRAM_MAP(xtom3d_map)
 	MCFG_CPU_IO_MAP(xtom3d_io)

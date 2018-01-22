@@ -53,4 +53,11 @@ public:
 	INTERRUPT_GEN_MEMBER(marineb_vblank_irq);
 	INTERRUPT_GEN_MEMBER(wanted_vblank_irq);
 	void set_tilemap_scrolly( int cols );
+	void springer(machine_config &config);
+	void wanted(machine_config &config);
+	void hopprobo(machine_config &config);
+	void marineb(machine_config &config);
+	void bcruzm12(machine_config &config);
+	void hoccer(machine_config &config);
+	void changes(machine_config &config);
 };

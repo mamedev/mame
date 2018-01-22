@@ -136,7 +136,7 @@ WRITE_LINE_MEMBER( wangpc_mvc_device::vsync_w )
 //  MACHINE_CONFIG_START( wangpc_mvc )
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( wangpc_mvc_device::device_add_mconfig )
+MACHINE_CONFIG_START(wangpc_mvc_device::device_add_mconfig)
 	MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
 	MCFG_SCREEN_UPDATE_DEVICE(MC6845_TAG, mc6845_device, screen_update)
 	MCFG_SCREEN_SIZE(80*10, 25*12)

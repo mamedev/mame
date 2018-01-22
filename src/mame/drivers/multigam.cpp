@@ -204,6 +204,10 @@ public:
 	void multigm3_decrypt(uint8_t* mem, int memsize, const uint8_t* decode_nibble);
 	void multigam3_mmc3_scanline_cb(int scanline, int vblank, int blanked);
 	void ppu_irq(int *ppu_regs);
+	void multigam(machine_config &config);
+	void supergm3(machine_config &config);
+	void multigmt(machine_config &config);
+	void multigm3(machine_config &config);
 };
 
 
@@ -1212,7 +1216,7 @@ MACHINE_START_MEMBER(multigam_state,supergm3)
 	m_multigmc_mmc3_6000_ram = std::make_unique<uint8_t[]>(0x2000);
 }
 
-static MACHINE_CONFIG_START( multigam )
+MACHINE_CONFIG_START(multigam_state::multigam)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", N2A03, NTSC_APU_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(multigam_map)
@@ -1238,7 +1242,7 @@ static MACHINE_CONFIG_START( multigam )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( multigm3, multigam )
+MACHINE_CONFIG_DERIVED(multigam_state::multigm3, multigam)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(multigm3_map)
 
@@ -1246,12 +1250,12 @@ static MACHINE_CONFIG_DERIVED( multigm3, multigam )
 	MCFG_MACHINE_RESET_OVERRIDE(multigam_state, multigm3 )
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( multigmt, multigam )
+MACHINE_CONFIG_DERIVED(multigam_state::multigmt, multigam)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(multigmt_map)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( supergm3, multigam )
+MACHINE_CONFIG_DERIVED(multigam_state::supergm3, multigam)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(supergm3_map)
 

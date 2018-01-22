@@ -96,11 +96,15 @@ function portname.startplugin()
 				for fname, field in pairs(port.fields) do
 					local dname = field.default_name
 					if not fields[dname] then
-						fields[dname] = ""
+						fields[dname] = {}
+						fields[dname].name = ""
 					end
 					if fname ~= dname then
-						fields[dname] = fname
+						fields[dname].name = fname
 					end
+					fields[dname].port = pname
+					fields[dname].mask = field.mask
+					fields[dname].default = dname
 				end
 			end
 			local function check_path(path)
@@ -133,10 +137,16 @@ function portname.startplugin()
 				file:close()
 				return false
 			end
+			local sfields = {}
+			for def, field in pairs(fields) do
+				sfields[#sfields + 1] = field
+			end
+			table.sort(sfields, function(a, b) if(a.port == b.port) then return a.mask < b.mask end return a.port < b.port end)
 			file = io.open(ctrlrpath .. "/portname/" .. filename, "w")
-			for def, custom in pairs(fields) do
-				def = def:gsub("[\\\"]", function (s) return "\\" .. s end)
-				custom = custom:gsub("[\\\"]", function (s) return "\\" .. s end)
+			for n, field in ipairs(sfields) do
+				def = field.default:gsub("[\\\"]", function (s) return "\\" .. s end)
+				custom = field.name:gsub("[\\\"]", function (s) return "\\" .. s end)
+				file:write(string.format("# port %s mask %08x\n", field.port, field.mask))
 				file:write("msgid \"" .. def .."\"\nmsgstr \"" .. custom .. "\"\n\n")
 			end
 			file:close()

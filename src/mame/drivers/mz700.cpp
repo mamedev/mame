@@ -368,7 +368,7 @@ GFXDECODE_END
     MACHINE DRIVERS
 ***************************************************************************/
 
-static MACHINE_CONFIG_START( mz700 )
+MACHINE_CONFIG_START(mz_state::mz700)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_17_73447MHz/5)
 	MCFG_CPU_PROGRAM_MAP(mz700_mem)
@@ -432,7 +432,7 @@ static MACHINE_CONFIG_START( mz700 )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( mz800, mz700 )
+MACHINE_CONFIG_DERIVED(mz_state::mz800, mz700)
 	MCFG_DEVICE_REMOVE("banke")
 
 	/* basic machine hardware */

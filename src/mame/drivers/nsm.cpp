@@ -38,6 +38,7 @@ public:
 	DECLARE_READ8_MEMBER(ff_r);
 	DECLARE_WRITE8_MEMBER(cru_w);
 	DECLARE_WRITE8_MEMBER(oe_w);
+	void nsm(machine_config &config);
 protected:
 
 	// devices
@@ -121,7 +122,7 @@ void nsm_state::machine_reset()
 	cpu->reset_line(ASSERT_LINE);
 }
 
-static MACHINE_CONFIG_START( nsm )
+MACHINE_CONFIG_START(nsm_state::nsm)
 	// CPU TMS9995, standard variant; no line connection
 	MCFG_TMS99xx_ADD("maincpu", TMS9995, 11052000, nsm_map, nsm_io_map)
 

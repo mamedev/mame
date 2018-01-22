@@ -44,7 +44,7 @@
 	deco_rmc3_device::static_set_init(*device, deco_rmc3_palette_init_delegate(FUNC(deco_rmc3_device::palette_init_proms), downcast<deco_rmc3_device *>(device)));
 
 //#define MCFG_DECO_RMC3_INIT_OWNER(_class, _method)
-//  deco_rmc3_device::static_set_init(*device, deco_rmc3_palette_init_delegate(&_class::PALETTE_INIT_NAME(_method), #_class "::palette_init_" #_method, downcast<_class *>(owner)));
+//  deco_rmc3_device::static_set_init(*device, deco_rmc3_palette_init_delegate(&_class::PALETTE_INIT_NAME(_method), #_class "::palette_init_" #_method, this));
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -83,16 +83,16 @@ public:
 	}
 
 	// generic read/write handlers
-	DECLARE_READ8_MEMBER(read);
-	DECLARE_WRITE8_MEMBER(write);
-	DECLARE_WRITE8_MEMBER(write_ext);
+	DECLARE_READ8_MEMBER(read8);
+	DECLARE_WRITE8_MEMBER(write8);
+	DECLARE_WRITE8_MEMBER(write8_ext);
 	DECLARE_WRITE8_MEMBER(write_indirect);
 	DECLARE_WRITE8_MEMBER(write_indirect_ext);
-	DECLARE_READ16_MEMBER(read);
-	DECLARE_WRITE16_MEMBER(write);
-	DECLARE_WRITE16_MEMBER(write_ext);
-	DECLARE_READ32_MEMBER(read);
-	DECLARE_WRITE32_MEMBER(write);
+	DECLARE_READ16_MEMBER(read16);
+	DECLARE_WRITE16_MEMBER(write16);
+	DECLARE_WRITE16_MEMBER(write16_ext);
+	DECLARE_READ32_MEMBER(read32);
+	DECLARE_WRITE32_MEMBER(write32);
 
 	void palette_init_proms(deco_rmc3_device &palette);
 

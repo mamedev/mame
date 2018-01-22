@@ -67,4 +67,8 @@ public:
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void cabalt(machine_config &config);
+	void cabalbl2(machine_config &config);
+	void cabal(machine_config &config);
+	void cabalbl(machine_config &config);
 };

@@ -81,6 +81,7 @@ public:
 	DECLARE_WRITE8_MEMBER(video_w);
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
+	void micral(machine_config &config);
 private:
 	u16 s_curpos;
 	u8 s_command;
@@ -366,7 +367,7 @@ MACHINE_RESET_MEMBER( micral_state, micral )
 	m_uart->set_input_pin(AY31015_CS, 0);
 }
 
-static MACHINE_CONFIG_START( micral )
+MACHINE_CONFIG_START(micral_state::micral)
 	// basic machine hardware
 	MCFG_CPU_ADD( "maincpu", Z80, XTAL_4MHz )
 	MCFG_CPU_PROGRAM_MAP(mem_map)

@@ -70,6 +70,7 @@ public:
 	uint8_t ram_bank_r(uint16_t offset, uint8_t bank_num);
 	void ram_bank_w(uint16_t offset, uint8_t data, uint8_t bank_num);
 	TIMER_DEVICE_CALLBACK_MEMBER(dfruit_irq_scanline);
+	void dfruit(machine_config &config);
 };
 
 void dfruit_state::video_start()
@@ -365,7 +366,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(dfruit_state::dfruit_irq_scanline)
 
 #define MASTER_CLOCK XTAL_14MHz
 
-static MACHINE_CONFIG_START( dfruit )
+MACHINE_CONFIG_START(dfruit_state::dfruit)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80,MASTER_CLOCK/2) //!!! TC0091LVC !!!

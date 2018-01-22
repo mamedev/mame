@@ -140,4 +140,7 @@ public:
 	// valtric specific
 	void valtric_draw_mosaic(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void valtric_draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	void valtric(machine_config &config);
+	void argus(machine_config &config);
+	void butasan(machine_config &config);
 };

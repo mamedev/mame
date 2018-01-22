@@ -335,6 +335,10 @@ public:
 	void PatchReset(  );
 	uint16_t GetVidReg( address_space &space, uint16_t reg );
 	void SetVidReg( address_space &space, uint16_t reg, uint16_t val );
+	void crospuzl(machine_config &config);
+	void crystal(machine_config &config);
+	void crzyddz2(machine_config &config);
+	void trivrus(machine_config &config);
 };
 
 void crystal_state::IntReq( int num )
@@ -1471,7 +1475,7 @@ static INPUT_PORTS_START(crzyddz2)
 INPUT_PORTS_END
 
 
-static MACHINE_CONFIG_START( crystal )
+MACHINE_CONFIG_START(crystal_state::crystal)
 
 	MCFG_CPU_ADD("maincpu", SE3208, 43000000)
 	MCFG_CPU_PROGRAM_MAP(crystal_mem)
@@ -1505,17 +1509,17 @@ static MACHINE_CONFIG_START( crystal )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( trivrus, crystal )
+MACHINE_CONFIG_DERIVED(crystal_state::trivrus, crystal)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(trivrus_mem)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( crospuzl, crystal )
+MACHINE_CONFIG_DERIVED(crystal_state::crospuzl, crystal)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(crospuzl_mem)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( crzyddz2, crystal )
+MACHINE_CONFIG_DERIVED(crystal_state::crzyddz2, crystal)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(crzyddz2_mem)
 MACHINE_CONFIG_END

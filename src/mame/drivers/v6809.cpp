@@ -93,6 +93,7 @@ public:
 	MC6845_UPDATE_ROW(crtc_update_row);
 	MC6845_ON_UPDATE_ADDR_CHANGED(crtc_update_addr);
 
+	void v6809(machine_config &config);
 private:
 	uint16_t m_video_address;
 	bool m_speaker_en;
@@ -274,7 +275,7 @@ SLOT_INTERFACE_END
 
 // *** Machine ****
 
-static MACHINE_CONFIG_START( v6809 )
+MACHINE_CONFIG_START(v6809_state::v6809)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", MC6809, XTAL_16MHz / 4) // divided by 4 again internally
 	MCFG_CPU_PROGRAM_MAP(v6809_mem)

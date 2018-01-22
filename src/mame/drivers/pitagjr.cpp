@@ -172,6 +172,7 @@ public:
 	virtual void machine_start() override;
 	DECLARE_PALETTE_INIT(pitagjr);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void pitajr(machine_config &config);
 };
 
 
@@ -202,7 +203,7 @@ uint32_t pitagjr_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 	return 0;
 }
 
-static MACHINE_CONFIG_START( pitajr )
+MACHINE_CONFIG_START(pitagjr_state::pitajr)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", HD63705, XTAL_2MHz)   // probably a m6805-based MCU with internal boot ROM
 	MCFG_CPU_PROGRAM_MAP(pitajr_mem)

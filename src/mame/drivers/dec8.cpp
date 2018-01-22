@@ -466,8 +466,8 @@ WRITE8_MEMBER(dec8_state::flip_screen_w){ flip_screen_set(data); }
 
 static ADDRESS_MAP_START( lastmisn_map, AS_PROGRAM, 8, dec8_state )
 	AM_RANGE(0x0000, 0x0fff) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0x1000, 0x13ff) AM_RAM_DEVWRITE("palette", deco_rmc3_device, write) AM_SHARE("palette")
-	AM_RANGE(0x1400, 0x17ff) AM_RAM_DEVWRITE("palette", deco_rmc3_device, write_ext) AM_SHARE("palette_ext")
+	AM_RANGE(0x1000, 0x13ff) AM_RAM_DEVWRITE("palette", deco_rmc3_device, write8) AM_SHARE("palette")
+	AM_RANGE(0x1400, 0x17ff) AM_RAM_DEVWRITE("palette", deco_rmc3_device, write8_ext) AM_SHARE("palette_ext")
 	AM_RANGE(0x1800, 0x1800) AM_READ_PORT("IN0")
 	AM_RANGE(0x1801, 0x1801) AM_READ_PORT("IN1")
 	AM_RANGE(0x1802, 0x1802) AM_READ_PORT("IN2")
@@ -492,8 +492,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( lastmisn_sub_map, AS_PROGRAM, 8, dec8_state )
 	AM_RANGE(0x0000, 0x0fff) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0x1000, 0x13ff) AM_RAM_DEVWRITE("palette", deco_rmc3_device, write) AM_SHARE("palette")
-	AM_RANGE(0x1400, 0x17ff) AM_RAM_DEVWRITE("palette", deco_rmc3_device, write_ext) AM_SHARE("palette_ext")
+	AM_RANGE(0x1000, 0x13ff) AM_RAM_DEVWRITE("palette", deco_rmc3_device, write8) AM_SHARE("palette")
+	AM_RANGE(0x1400, 0x17ff) AM_RAM_DEVWRITE("palette", deco_rmc3_device, write8_ext) AM_SHARE("palette_ext")
 	AM_RANGE(0x1800, 0x1800) AM_READ_PORT("IN0")
 	AM_RANGE(0x1801, 0x1801) AM_READ_PORT("IN1")
 	AM_RANGE(0x1802, 0x1802) AM_READ_PORT("IN2")
@@ -512,8 +512,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( shackled_map, AS_PROGRAM, 8, dec8_state )
 	AM_RANGE(0x0000, 0x0fff) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0x1000, 0x13ff) AM_RAM_DEVWRITE("palette", deco_rmc3_device, write) AM_SHARE("palette")
-	AM_RANGE(0x1400, 0x17ff) AM_RAM_DEVWRITE("palette", deco_rmc3_device, write_ext) AM_SHARE("palette_ext")
+	AM_RANGE(0x1000, 0x13ff) AM_RAM_DEVWRITE("palette", deco_rmc3_device, write8) AM_SHARE("palette")
+	AM_RANGE(0x1400, 0x17ff) AM_RAM_DEVWRITE("palette", deco_rmc3_device, write8_ext) AM_SHARE("palette_ext")
 	AM_RANGE(0x1800, 0x1800) AM_READ_PORT("IN0")
 	AM_RANGE(0x1801, 0x1801) AM_READ_PORT("IN1")
 	AM_RANGE(0x1802, 0x1802) AM_READ_PORT("IN2")
@@ -536,8 +536,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( shackled_sub_map, AS_PROGRAM, 8, dec8_state )
 	AM_RANGE(0x0000, 0x0fff) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0x1000, 0x13ff) AM_RAM_DEVWRITE("palette", deco_rmc3_device, write) AM_SHARE("palette")
-	AM_RANGE(0x1400, 0x17ff) AM_RAM_DEVWRITE("palette", deco_rmc3_device, write_ext) AM_SHARE("palette_ext")
+	AM_RANGE(0x1000, 0x13ff) AM_RAM_DEVWRITE("palette", deco_rmc3_device, write8) AM_SHARE("palette")
+	AM_RANGE(0x1400, 0x17ff) AM_RAM_DEVWRITE("palette", deco_rmc3_device, write8_ext) AM_SHARE("palette_ext")
 	AM_RANGE(0x1800, 0x1800) AM_READ_PORT("IN0")
 	AM_RANGE(0x1801, 0x1801) AM_READ_PORT("IN1")
 	AM_RANGE(0x1802, 0x1802) AM_READ_PORT("IN2")
@@ -563,8 +563,8 @@ static ADDRESS_MAP_START( gondo_map, AS_PROGRAM, 8, dec8_state )
 	AM_RANGE(0x0000, 0x17ff) AM_RAM
 	AM_RANGE(0x1800, 0x1fff) AM_RAM_WRITE(dec8_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0x2000, 0x27ff) AM_READWRITE(dec8_bg_data_r, dec8_bg_data_w) AM_SHARE("bg_data")
-	AM_RANGE(0x2800, 0x2bff) AM_RAM_DEVWRITE("palette", deco_rmc3_device, write) AM_SHARE("palette")
-	AM_RANGE(0x2c00, 0x2fff) AM_RAM_DEVWRITE("palette", deco_rmc3_device, write_ext) AM_SHARE("palette_ext")
+	AM_RANGE(0x2800, 0x2bff) AM_RAM_DEVWRITE("palette", deco_rmc3_device, write8) AM_SHARE("palette")
+	AM_RANGE(0x2c00, 0x2fff) AM_RAM_DEVWRITE("palette", deco_rmc3_device, write8_ext) AM_SHARE("palette_ext")
 	AM_RANGE(0x3000, 0x37ff) AM_RAM AM_SHARE("spriteram")   /* Sprites */
 	AM_RANGE(0x3800, 0x3800) AM_READ_PORT("DSW0")       /* Dip 1 */
 	AM_RANGE(0x3801, 0x3801) AM_READ_PORT("DSW1")       /* Dip 2 */
@@ -586,8 +586,8 @@ static ADDRESS_MAP_START( garyoret_map, AS_PROGRAM, 8, dec8_state )
 	AM_RANGE(0x0000, 0x17ff) AM_RAM
 	AM_RANGE(0x1800, 0x1fff) AM_RAM_WRITE(dec8_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0x2000, 0x27ff) AM_READWRITE(dec8_bg_data_r, dec8_bg_data_w) AM_SHARE("bg_data")
-	AM_RANGE(0x2800, 0x2bff) AM_RAM_DEVWRITE("palette", deco_rmc3_device, write) AM_SHARE("palette")
-	AM_RANGE(0x2c00, 0x2fff) AM_RAM_DEVWRITE("palette", deco_rmc3_device, write_ext) AM_SHARE("palette_ext")
+	AM_RANGE(0x2800, 0x2bff) AM_RAM_DEVWRITE("palette", deco_rmc3_device, write8) AM_SHARE("palette")
+	AM_RANGE(0x2c00, 0x2fff) AM_RAM_DEVWRITE("palette", deco_rmc3_device, write8_ext) AM_SHARE("palette_ext")
 	AM_RANGE(0x3000, 0x37ff) AM_RAM AM_SHARE("spriteram") /* Sprites */
 	AM_RANGE(0x3800, 0x3800) AM_READ_PORT("DSW0")   /* Dip 1 */
 	AM_RANGE(0x3801, 0x3801) AM_READ_PORT("DSW1")   /* Dip 2 */
@@ -630,8 +630,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( csilver_map, AS_PROGRAM, 8, dec8_state )
 	AM_RANGE(0x0000, 0x0fff) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0x1000, 0x13ff) AM_RAM_DEVWRITE("palette", deco_rmc3_device, write) AM_SHARE("palette")
-	AM_RANGE(0x1400, 0x17ff) AM_RAM_DEVWRITE("palette", deco_rmc3_device, write_ext) AM_SHARE("palette_ext")
+	AM_RANGE(0x1000, 0x13ff) AM_RAM_DEVWRITE("palette", deco_rmc3_device, write8) AM_SHARE("palette")
+	AM_RANGE(0x1400, 0x17ff) AM_RAM_DEVWRITE("palette", deco_rmc3_device, write8_ext) AM_SHARE("palette_ext")
 	AM_RANGE(0x1800, 0x1800) AM_READ_PORT("IN1")
 	AM_RANGE(0x1801, 0x1801) AM_READ_PORT("IN0")
 	AM_RANGE(0x1803, 0x1803) AM_READ_PORT("IN2")
@@ -655,8 +655,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( csilver_sub_map, AS_PROGRAM, 8, dec8_state )
 	AM_RANGE(0x0000, 0x0fff) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0x1000, 0x13ff) AM_RAM_DEVWRITE("palette", deco_rmc3_device, write) AM_SHARE("palette")
-	AM_RANGE(0x1400, 0x17ff) AM_RAM_DEVWRITE("palette", deco_rmc3_device, write_ext) AM_SHARE("palette_ext")
+	AM_RANGE(0x1000, 0x13ff) AM_RAM_DEVWRITE("palette", deco_rmc3_device, write8) AM_SHARE("palette")
+	AM_RANGE(0x1400, 0x17ff) AM_RAM_DEVWRITE("palette", deco_rmc3_device, write8_ext) AM_SHARE("palette_ext")
 	AM_RANGE(0x1803, 0x1803) AM_READ_PORT("IN2")
 	AM_RANGE(0x1804, 0x1804) AM_READ_PORT("DSW1")
 	AM_RANGE(0x1800, 0x1804) AM_WRITE(shackled_int_w)
@@ -676,7 +676,7 @@ static ADDRESS_MAP_START( oscar_map, AS_PROGRAM, 8, dec8_state )
 	AM_RANGE(0x2000, 0x27ff) AM_RAM_WRITE(dec8_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0x2800, 0x2fff) AM_DEVREADWRITE("tilegen1", deco_bac06_device, pf_data_8bit_r, pf_data_8bit_w)
 	AM_RANGE(0x3000, 0x37ff) AM_RAM AM_SHARE("spriteram") /* Sprites */
-	AM_RANGE(0x3800, 0x3bff) AM_RAM_DEVWRITE("palette", deco_rmc3_device, write) AM_SHARE("palette")
+	AM_RANGE(0x3800, 0x3bff) AM_RAM_DEVWRITE("palette", deco_rmc3_device, write8) AM_SHARE("palette")
 	AM_RANGE(0x3c00, 0x3c00) AM_READ_PORT("IN0")
 	AM_RANGE(0x3c01, 0x3c01) AM_READ_PORT("IN1")
 	AM_RANGE(0x3c02, 0x3c02) AM_READ_PORT("IN2")    /* VBL & coins */
@@ -714,8 +714,8 @@ static ADDRESS_MAP_START( srdarwin_map, AS_PROGRAM, 8, dec8_state )
 	AM_RANGE(0x1805, 0x1806) AM_WRITE(srdarwin_control_w) /* Scroll & Bank */
 	AM_RANGE(0x2000, 0x2000) AM_READWRITE(i8751_h_r, dec8_sound_w)  /* Sound */
 	AM_RANGE(0x2001, 0x2001) AM_READWRITE(i8751_l_r, flip_screen_w)     /* Flipscreen */
-	AM_RANGE(0x2800, 0x288f) AM_DEVWRITE("palette", deco_rmc3_device, write) AM_SHARE("palette")
-	AM_RANGE(0x3000, 0x308f) AM_DEVWRITE("palette", deco_rmc3_device, write_ext) AM_SHARE("palette_ext")
+	AM_RANGE(0x2800, 0x288f) AM_DEVWRITE("palette", deco_rmc3_device, write8) AM_SHARE("palette")
+	AM_RANGE(0x3000, 0x308f) AM_DEVWRITE("palette", deco_rmc3_device, write8_ext) AM_SHARE("palette_ext")
 	AM_RANGE(0x3800, 0x3800) AM_READ_PORT("DSW0")   /* Dip 1 */
 	AM_RANGE(0x3801, 0x3801) AM_READ_PORT("IN0")    /* Player 1 */
 	AM_RANGE(0x3802, 0x3802) AM_READ_PORT("IN1")    /* Player 2 (cocktail) + VBL */
@@ -731,7 +731,7 @@ static ADDRESS_MAP_START( cobra_map, AS_PROGRAM, 8, dec8_state )
 	AM_RANGE(0x1800, 0x1fff) AM_RAM
 	AM_RANGE(0x2000, 0x27ff) AM_RAM_WRITE(dec8_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0x2800, 0x2fff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x3000, 0x31ff) AM_RAM_DEVWRITE("palette", deco_rmc3_device, write) AM_SHARE("palette")
+	AM_RANGE(0x3000, 0x31ff) AM_RAM_DEVWRITE("palette", deco_rmc3_device, write8) AM_SHARE("palette")
 	AM_RANGE(0x3200, 0x37ff) AM_WRITEONLY /* Unused */
 	AM_RANGE(0x3800, 0x3800) AM_READ_PORT("IN0")    /* Player 1 */
 	AM_RANGE(0x3801, 0x3801) AM_READ_PORT("IN1")    /* Player 2 */
@@ -1954,7 +1954,7 @@ void dec8_state::machine_reset()
 		MCFG_SCREEN_RAW_PARAMS(XTAL_12MHz/2,384,0,256,272,8,248)
 
 
-static MACHINE_CONFIG_START( lastmisn )
+MACHINE_CONFIG_START(dec8_state::lastmisn)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", MC6809E, 2000000)
@@ -2007,7 +2007,7 @@ static MACHINE_CONFIG_START( lastmisn )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.70)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( shackled )
+MACHINE_CONFIG_START(dec8_state::shackled)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", MC6809E, 2000000)
@@ -2061,7 +2061,7 @@ static MACHINE_CONFIG_START( shackled )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.70)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( gondo )
+MACHINE_CONFIG_START(dec8_state::gondo)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", HD6309,3000000*4) /* HD63C09EP */
@@ -2115,7 +2115,7 @@ static MACHINE_CONFIG_START( gondo )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.70)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( garyoret )
+MACHINE_CONFIG_START(dec8_state::garyoret)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", HD6309,3000000*4) /* HD63C09EP */
@@ -2169,7 +2169,7 @@ static MACHINE_CONFIG_START( garyoret )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.70)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( ghostb )
+MACHINE_CONFIG_START(dec8_state::ghostb)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", HD6309, 3000000*4)
@@ -2225,12 +2225,12 @@ static MACHINE_CONFIG_START( ghostb )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.70)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( meikyuh, ghostb )
+MACHINE_CONFIG_DERIVED(dec8_state::meikyuh, ghostb)
 	MCFG_CPU_REPLACE("audiocpu", M6502, 1500000)
 	MCFG_CPU_PROGRAM_MAP(dec8_s_map)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( csilver )
+MACHINE_CONFIG_START(dec8_state::csilver)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", MC6809E, XTAL_12MHz/8) /* verified on pcb */
@@ -2289,7 +2289,7 @@ static MACHINE_CONFIG_START( csilver )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.88)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( oscar )
+MACHINE_CONFIG_START(dec8_state::oscar)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", HD6309, XTAL_12MHz/2) /* verified on pcb */
@@ -2347,7 +2347,7 @@ static MACHINE_CONFIG_START( oscar )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.70)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( srdarwin )
+MACHINE_CONFIG_START(dec8_state::srdarwin)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", MC6809E, 2000000)  /* MC68A09EP */
@@ -2397,7 +2397,7 @@ static MACHINE_CONFIG_START( srdarwin )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.70)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( cobracom )
+MACHINE_CONFIG_START(dec8_state::cobracom)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", MC6809E, 2000000)

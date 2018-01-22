@@ -84,4 +84,7 @@ public:
 	void moo_objdma();
 	K056832_CB_MEMBER(tile_callback);
 	K053246_CB_MEMBER(sprite_callback);
+	void bucky(machine_config &config);
+	void moo(machine_config &config);
+	void moobl(machine_config &config);
 };

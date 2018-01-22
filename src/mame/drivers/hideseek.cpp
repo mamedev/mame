@@ -46,6 +46,7 @@ public:
 	DECLARE_PALETTE_INIT(hideseek);
 	uint32_t screen_update_hideseek(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
+	void hideseek(machine_config &config);
 protected:
 	required_device<cpu_device> m_maincpu;
 };
@@ -96,7 +97,7 @@ PALETTE_INIT_MEMBER(hideseek_state, hideseek)
 
 
 
-static MACHINE_CONFIG_START( hideseek )
+MACHINE_CONFIG_START(hideseek_state::hideseek)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", SH2, 7372800 * 4 )

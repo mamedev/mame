@@ -88,6 +88,14 @@ public:
 	I8275_DRAW_CHARACTER_MEMBER(display_pixels);
 	required_device<cpu_device> m_maincpu;
 
+	void impuls03(machine_config &config);
+	void mikron2(machine_config &config);
+	void rk7007(machine_config &config);
+	void rk700716(machine_config &config);
+	void radiorom(machine_config &config);
+	void radio86(machine_config &config);
+	void radio16(machine_config &config);
+	void radioram(machine_config &config);
 protected:
 	required_device<cassette_image_device> m_cassette;
 	optional_device<generic_slot_device> m_cart;    // for ROMDisk - only Radio86K & Orion?

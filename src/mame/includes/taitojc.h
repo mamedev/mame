@@ -135,4 +135,6 @@ public:
 	INTERRUPT_GEN_MEMBER(taitojc_vblank);
 	void draw_object(bitmap_ind16 &bitmap, const rectangle &cliprect, uint32_t w1, uint32_t w2, uint8_t bank_type);
 	void draw_object_bank(bitmap_ind16 &bitmap, const rectangle &cliprect, uint8_t bank_type, uint8_t pri);
+	void taitojc(machine_config &config);
+	void dendego(machine_config &config);
 };

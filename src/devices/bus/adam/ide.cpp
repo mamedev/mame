@@ -62,7 +62,7 @@ const tiny_rom_entry *powermate_ide_device::device_rom_region() const
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( powermate_ide_device::device_add_mconfig )
+MACHINE_CONFIG_START(powermate_ide_device::device_add_mconfig)
 	MCFG_ATA_INTERFACE_ADD(ATA_TAG, ata_devices, "hdd", nullptr, false)
 	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, centronics_devices, "printer")
 

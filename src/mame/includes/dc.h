@@ -97,6 +97,8 @@ class dc_state : public driver_device
 	DECLARE_MACHINE_RESET(dc_console);
 
 	DECLARE_INPUT_CHANGED_MEMBER(mastercpu_cheat_r);
+
+	void naomi_aw_base(machine_config &config);
 };
 
 /*--------- Ch2-DMA Control Registers ----------*/

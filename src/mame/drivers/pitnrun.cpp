@@ -274,7 +274,7 @@ static GFXDECODE_START( pitnrun )
 	GFXDECODE_ENTRY( "gfx1", 0, spritelayout,  0, 4 )
 GFXDECODE_END
 
-static MACHINE_CONFIG_START( pitnrun )
+MACHINE_CONFIG_START(pitnrun_state::pitnrun)
 	MCFG_CPU_ADD("maincpu", Z80,XTAL_18_432MHz/6)       /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(pitnrun_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", pitnrun_state,  nmi_source)
@@ -327,7 +327,7 @@ static MACHINE_CONFIG_START( pitnrun )
 	MCFG_DEVICE_ADD("noiselatch", LS259, 0) // 1J
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( pitnrun_mcu, pitnrun )
+MACHINE_CONFIG_DERIVED(pitnrun_state::pitnrun_mcu, pitnrun)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(pitnrun_map_mcu)
 

@@ -390,7 +390,6 @@ protected:
 	virtual uint32_t execute_input_lines() const override { return 1; }
 	virtual uint8_t fetch_op() override;
 	virtual uint8_t fetch() override;
-	uint32_t pc() { return m_pc = (m_sregs[CS] << 4) + m_ip; }
 
 	address_space_config m_program_config;
 	address_space_config m_opcodes_config;
@@ -402,6 +401,9 @@ protected:
 	devcb_write_line m_out_if_func;
 	devcb_write32 m_esc_opcode_handler;
 	devcb_write32 m_esc_data_handler;
+
+protected:
+	uint32_t update_pc() { return m_pc = (m_sregs[CS] << 4) + m_ip; }
 };
 
 class i8088_cpu_device : public i8086_cpu_device

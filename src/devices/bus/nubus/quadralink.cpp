@@ -36,7 +36,7 @@ DEFINE_DEVICE_TYPE(NUBUS_QUADRALINK, nubus_quadralink_device, "nb_qdlink", "Appl
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( nubus_quadralink_device::device_add_mconfig )
+MACHINE_CONFIG_START(nubus_quadralink_device::device_add_mconfig)
 	MCFG_SCC8530_ADD("scc1", XTAL_3_6864MHz, 0, 0, 0, 0)
 	MCFG_Z80SCC_OUT_TXDA_CB(DEVWRITELINE("serport0", rs232_port_device, write_txd))
 	MCFG_Z80SCC_OUT_TXDB_CB(DEVWRITELINE("serport1", rs232_port_device, write_txd))

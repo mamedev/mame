@@ -309,7 +309,7 @@ void zorba_keyboard_device::device_start()
 }
 
 
-MACHINE_CONFIG_MEMBER(zorba_keyboard_device::device_add_mconfig)
+MACHINE_CONFIG_START(zorba_keyboard_device::device_add_mconfig)
 	// MC68705P3S
 	MCFG_CPU_ADD("mcu", M68705P3, XTAL_3_579545MHz)
 	MCFG_M68705_PORTA_R_CB(READ8(zorba_keyboard_device, mcu_pa_r));

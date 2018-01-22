@@ -200,6 +200,8 @@ public:
 
 	uint32_t screen_update_e90(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
+	void aleck64(machine_config &config);
+	void a64_e90(machine_config &config);
 protected:
 	optional_shared_ptr<uint32_t> m_e90_vram;
 	optional_shared_ptr<uint32_t> m_e90_pal;
@@ -898,7 +900,7 @@ static INPUT_PORTS_START( srmvs )
 INPUT_PORTS_END
 
 
-static MACHINE_CONFIG_START( aleck64 )
+MACHINE_CONFIG_START(aleck64_state::aleck64)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", VR4300BE, 93750000)
@@ -980,7 +982,7 @@ uint32_t aleck64_state::screen_update_e90(screen_device &screen, bitmap_rgb32 &b
 	return 0;
 }
 
-static MACHINE_CONFIG_DERIVED( a64_e90, aleck64 )
+MACHINE_CONFIG_DERIVED(aleck64_state::a64_e90, aleck64)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(e90_map)
 

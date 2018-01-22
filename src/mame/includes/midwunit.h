@@ -62,4 +62,7 @@ public:
 	void register_state_saving();
 	void init_wunit_generic();
 	void init_mk3_common();
+	void wunit(machine_config &config);
+	void wunit_picemu(machine_config &config);
+	void wunit_picsim(machine_config &config);
 };

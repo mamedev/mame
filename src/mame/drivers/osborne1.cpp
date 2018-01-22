@@ -279,7 +279,7 @@ static GFXDECODE_START( osborne1 )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( osborne1 )
+MACHINE_CONFIG_START(osborne1_state::osborne1)
 	MCFG_CPU_ADD("maincpu", Z80, MAIN_CLOCK/4)
 	MCFG_CPU_PROGRAM_MAP(osborne1_mem)
 	MCFG_CPU_DECRYPTED_OPCODES_MAP(osborne1_op)
@@ -338,7 +338,7 @@ static MACHINE_CONFIG_START( osborne1 )
 	MCFG_SOFTWARE_LIST_ADD("flop_list","osborne1")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED( osborne1nv, osborne1 )
+MACHINE_CONFIG_DERIVED(osborne1nv_state::osborne1nv, osborne1)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(osborne1nv_io)
 

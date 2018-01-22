@@ -807,7 +807,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( tubep )
+MACHINE_CONFIG_START(tubep_state::tubep)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80,16000000 / 4)    /* 4 MHz */
@@ -870,7 +870,7 @@ static MACHINE_CONFIG_START( tubep )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( tubepb, tubep )
+MACHINE_CONFIG_DERIVED(tubep_state::tubepb, tubep)
 
 	MCFG_CPU_REPLACE("mcu", M6802,6000000) /* ? MHz Xtal */
 	MCFG_CPU_PROGRAM_MAP(nsc_map)
@@ -878,7 +878,7 @@ static MACHINE_CONFIG_DERIVED( tubepb, tubep )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( rjammer )
+MACHINE_CONFIG_START(tubep_state::rjammer)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80,16000000 / 4)    /* 4 MHz */

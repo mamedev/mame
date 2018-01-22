@@ -327,7 +327,7 @@ INTERRUPT_GEN_MEMBER(starfire_state::vblank_int)
 }
 
 
-static MACHINE_CONFIG_START( fireone )
+MACHINE_CONFIG_START(starfire_state::fireone)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, STARFIRE_CPU_CLOCK)
@@ -343,7 +343,7 @@ static MACHINE_CONFIG_START( fireone )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( starfire, fireone )
+MACHINE_CONFIG_DERIVED(starfire_state::starfire, fireone)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

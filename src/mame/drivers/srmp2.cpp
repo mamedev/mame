@@ -435,7 +435,7 @@ static ADDRESS_MAP_START( mjyuugi_map, AS_PROGRAM, 16, srmp2_state )
 	AM_RANGE(0x300000, 0x300001) AM_READ8(mjyuugi_irq4_ack_r,0x00ff) /* irq ack lv 4? */
 	AM_RANGE(0x500000, 0x500001) AM_READ_PORT("DSW3-1")             /* DSW 3-1 */
 	AM_RANGE(0x500010, 0x500011) AM_READ_PORT("DSW3-2")             /* DSW 3-2 */
-	AM_RANGE(0x700000, 0x7003ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x700000, 0x7003ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x800000, 0x800001) AM_READNOP             /* ??? */
 	AM_RANGE(0x900000, 0x900001) AM_READWRITE8(iox_mux_r, iox_command_w,0x00ff) /* key matrix | I/O */
 	AM_RANGE(0x900002, 0x900003) AM_READWRITE8(iox_status_r,iox_data_w,0x00ff)
@@ -1135,7 +1135,7 @@ static GFXDECODE_START( srmp3 )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( srmp2 )
+MACHINE_CONFIG_START(srmp2_state::srmp2)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000,16000000/2)              /* 8.00 MHz */
@@ -1179,7 +1179,7 @@ static MACHINE_CONFIG_START( srmp2 )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( srmp3 )
+MACHINE_CONFIG_START(srmp2_state::srmp3)
 
 	/* basic machine hardware */
 
@@ -1225,7 +1225,7 @@ static MACHINE_CONFIG_START( srmp3 )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.45)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( rmgoldyh, srmp3 )
+MACHINE_CONFIG_DERIVED(srmp2_state::rmgoldyh, srmp3)
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(rmgoldyh_map)
@@ -1234,7 +1234,7 @@ static MACHINE_CONFIG_DERIVED( rmgoldyh, srmp3 )
 	MCFG_MACHINE_START_OVERRIDE(srmp2_state,rmgoldyh)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( mjyuugi )
+MACHINE_CONFIG_START(srmp2_state::mjyuugi)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000,16000000/2)              /* 8.00 MHz */

@@ -161,6 +161,11 @@ public:
 
 	DECLARE_FLOPPY_FORMATS(floppy_formats);
 
+	void ioga(machine_config &config);
+	void interpro_serial1(machine_config &config);
+	void interpro_serial2(machine_config &config);
+	void interpro(machine_config &config);
+	static void interpro_scsi_adapter(device_t *device);
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -190,6 +195,8 @@ public:
 
 	required_device<cammu_c3_device> m_d_cammu;
 	required_device<cammu_c3_device> m_i_cammu;
+	void turquoise(machine_config &config);
+	void ip2000(machine_config &config);
 };
 
 class sapphire_state : public interpro_state
@@ -211,6 +218,11 @@ public:
 
 	required_device<intel_28f010_device> m_flash_lo;
 	required_device<intel_28f010_device> m_flash_hi;
+	void sapphire(machine_config &config);
+	void ip2500(machine_config &config);
+	void ip2400(machine_config &config);
+	void ip2800(machine_config &config);
+	void ip2700(machine_config &config);
 };
 
 #endif // MAME_INCLUDES_INTERPRO_H

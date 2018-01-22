@@ -21,6 +21,7 @@ public:
 
 	static const unsigned short pocketc_colortable[8][2];
 	void pocketc_draw_special(bitmap_ind16 &bitmap,int x, int y, const POCKETC_FIGURE fig, int color);
+	void pocketc(machine_config &config);
 };
 
 #endif /* POCKETC_H_ */

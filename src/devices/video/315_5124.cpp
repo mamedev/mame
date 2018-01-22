@@ -1698,7 +1698,7 @@ void sega315_5124_device::device_reset()
 //  device_add_mconfig - add machine configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( sega315_5124_device::device_add_mconfig )
+MACHINE_CONFIG_START(sega315_5124_device::device_add_mconfig)
 	MCFG_PALETTE_ADD("palette", SEGA315_5124_PALETTE_SIZE)
 	MCFG_PALETTE_INIT_OWNER(sega315_5124_device, sega315_5124)
 MACHINE_CONFIG_END
@@ -1713,7 +1713,7 @@ void sega315_5378_device::device_reset()
 //  device_add_mconfig - add machine configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( sega315_5378_device::device_add_mconfig )
+MACHINE_CONFIG_START(sega315_5378_device::device_add_mconfig)
 	MCFG_PALETTE_ADD("palette", SEGA315_5378_PALETTE_SIZE)
 	MCFG_PALETTE_INIT_OWNER(sega315_5378_device, sega315_5378)
 MACHINE_CONFIG_END

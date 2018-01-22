@@ -77,6 +77,7 @@ public:
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	INTERRUPT_GEN_MEMBER(interrupt);
+	void skydiver(machine_config &config);
 };
 
 /*----------- defined in audio/skydiver.c -----------*/

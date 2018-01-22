@@ -330,7 +330,7 @@ PALETTE_INIT_MEMBER(taxidriv_state, taxidriv)
 	}
 }
 
-static MACHINE_CONFIG_START( taxidriv )
+MACHINE_CONFIG_START(taxidriv_state::taxidriv)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80,4000000)    /* 4 MHz ??? */

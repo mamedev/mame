@@ -139,7 +139,7 @@ DEVICE_ADDRESS_MAP_START(target1_map, 32, vrc5074_device)
 	AM_RANGE(0x00000000, 0xFFFFFFFF) AM_READWRITE(target1_r, target1_w)
 ADDRESS_MAP_END
 
-MACHINE_CONFIG_MEMBER(vrc5074_device::device_add_mconfig)
+MACHINE_CONFIG_START(vrc5074_device::device_add_mconfig)
 	MCFG_DEVICE_ADD("uart", NS16550, SYSTEM_CLOCK / 12)
 	MCFG_INS8250_OUT_INT_CB(WRITELINE(vrc5074_device, uart_irq_callback))
 	MCFG_INS8250_OUT_TX_CB(DEVWRITELINE("ttys00", rs232_port_device, write_txd))
@@ -788,20 +788,20 @@ READ32_MEMBER(vrc5074_device::cpu_reg_r)
 
 	case NREG_INTCTRL + 0:    /* Interrupt control */
 	case NREG_INTCTRL + 1:    /* Interrupt control */
-		if (LOG_NILE | LOG_NILE_IRQS) logerror("%s NILE READ: interrupt control(%03X) = %08X\n", machine().describe_context(), offset * 4, result);
-		update_nile_irqs();
+		if (LOG_NILE) logerror("%s NILE READ: interrupt control(%03X) = %08X\n", machine().describe_context(), offset * 4, result);
+		//update_nile_irqs();
 		logit = 0;
 		break;
 
 	case NREG_INTSTAT0 + 0:   /* Interrupt status 0 */
 	case NREG_INTSTAT0 + 1:   /* Interrupt status 0 */
-		if (LOG_NILE) logerror("%s NILE READ: interrupt status 0(%03X) = %08X\n", machine().describe_context(), offset * 4, result);
+		if (LOG_NILE | LOG_NILE_IRQS) logerror("%s NILE READ: interrupt status 0(%03X) = %08X\n", machine().describe_context(), offset * 4, result);
 		logit = 0;
 		break;
 
 	case NREG_INTSTAT1 + 0:   /* Interrupt status 1 */
 	case NREG_INTSTAT1 + 1:   /* Interrupt status 1 */
-		if (LOG_NILE) logerror("%s NILE READ: interrupt status 1/enable(%03X) = %08X\n", machine().describe_context(), offset * 4, result);
+		if (LOG_NILE | LOG_NILE_IRQS) logerror("%s NILE READ: interrupt status 1/enable(%03X) = %08X\n", machine().describe_context(), offset * 4, result);
 		logit = 0;
 		break;
 
@@ -899,24 +899,25 @@ WRITE32_MEMBER(vrc5074_device::cpu_reg_w)
 
 	case NREG_INTSTAT0 + 0:   /* Interrupt status 0 */
 	case NREG_INTSTAT0 + 1:   /* Interrupt status 0 */
-		if (LOG_NILE | LOG_NILE_IRQS) logerror("%s NILE WRITE: interrupt status 0(%03X) = %08X & %08X\n", machine().describe_context(), offset * 4, data, mem_mask);
+		if (LOG_NILE | LOG_NILE_IRQS) logerror("%s NILE WRITE: interrupt status 0/1(%03X) = %08X & %08X\n", machine().describe_context(), offset * 4, data, mem_mask);
 		logit = 0;
-		update_nile_irqs();
+		//update_nile_irqs();
 		break;
 
 	case NREG_INTSTAT1 + 0:   /* Interrupt status 1 */
 	case NREG_INTSTAT1 + 1:   /* Interrupt status 1 */
-		if (LOG_NILE | LOG_NILE_IRQS) logerror("%s NILE WRITE: interrupt status 1/enable(%03X) = %08X & %08X\n", machine().describe_context(), offset * 4, data, mem_mask);
+		if (LOG_NILE | LOG_NILE_IRQS) logerror("%s NILE WRITE: interrupt status 0/1 enable(%03X) = %08X & %08X\n", machine().describe_context(), offset * 4, data, mem_mask);
 		logit = 0;
-		update_nile_irqs();
+		//update_nile_irqs();
 		break;
 
 	case NREG_INTCLR + 0:     /* Interrupt clear */
 	//case NREG_INTCLR + 1:     /* Interrupt clear */
 		if (LOG_NILE | LOG_NILE_IRQS) logerror("%s NILE WRITE: interrupt clear(%03X) = %08X & %08X\n", machine().describe_context(), offset * 4, data, mem_mask);
 		logit = 0;
-		//m_nile_irq_state &= ~(m_cpu_regs[offset] & ~0xf00);
-		m_nile_irq_state &= ~(data);
+		// Only edge triggered interrupts are cleared
+		// TODO: Check which are edge triggered for midway vegas it is only the lower (non-pci) interrupts
+		m_nile_irq_state &= ~(m_cpu_regs[offset] & ~0xf00);
 		update_nile_irqs();
 		break;
 
@@ -966,7 +967,7 @@ WRITE32_MEMBER(vrc5074_device::cpu_reg_w)
 		/* timer just enabled? */
 		if (!(olddata & 1) && (m_cpu_regs[offset] & 1))
 		{
-			m_timer[which]->adjust(attotime::from_double(m_timer_period[which]), which);
+			m_timer[which]->adjust(attotime::from_hz(SYSTEM_CLOCK) * m_cpu_regs[NREG_T0CNTR + which * 4], which);
 			if (LOG_TIMERS) logerror("Starting timer %d at a rate of %f Hz\n", which, ATTOSECONDS_TO_HZ(attotime::from_double(m_timer_period[which]).as_attoseconds()));
 		}
 

@@ -91,6 +91,9 @@ public:
 	DECLARE_READ8_MEMBER(port02_a_r);
 	DECLARE_READ_LINE_MEMBER(clear_a_r);
 
+	void sklflite(machine_config &config);
+	void play_3(machine_config &config);
+	void megaaton(machine_config &config);
 private:
 	u16 m_clockcnt;
 	u16 m_resetcnt;
@@ -455,7 +458,7 @@ WRITE_LINE_MEMBER( play_3_state::q4013a_w )
 	m_clockcnt = 0;
 }
 
-static MACHINE_CONFIG_START( play_3 )
+MACHINE_CONFIG_START(play_3_state::play_3)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", CDP1802, XTAL_3_579545MHz)
 	MCFG_CPU_PROGRAM_MAP(play_3_map)
@@ -503,7 +506,7 @@ static MACHINE_CONFIG_START( play_3 )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.75)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( megaaton, play_3 )
+MACHINE_CONFIG_DERIVED(play_3_state::megaaton, play_3)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_CLOCK(XTAL_2_95MHz)
 	MCFG_CPU_IO_MAP(megaaton_io)
@@ -512,7 +515,7 @@ static MACHINE_CONFIG_DERIVED( megaaton, play_3 )
 	MCFG_DEVICE_CLOCK(XTAL_2_95MHz / 8) // TPB line from CPU
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( sklflite, play_3 )
+MACHINE_CONFIG_DERIVED(play_3_state::sklflite, play_3)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(sklflite_io)
 

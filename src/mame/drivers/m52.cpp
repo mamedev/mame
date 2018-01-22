@@ -392,7 +392,7 @@ void m52_state::machine_reset()
 	m_bgcontrol = 0;
 }
 
-static MACHINE_CONFIG_START( m52 )
+MACHINE_CONFIG_START(m52_state::m52)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK/6)
@@ -418,7 +418,7 @@ static MACHINE_CONFIG_START( m52 )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( alpha1v, m52 )
+MACHINE_CONFIG_DERIVED(m52_state::alpha1v, m52)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")

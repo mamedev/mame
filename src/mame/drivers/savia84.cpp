@@ -48,6 +48,7 @@ public:
 	DECLARE_WRITE8_MEMBER(savia84_8255_portb_w);
 	DECLARE_WRITE8_MEMBER(savia84_8255_portc_w);
 
+	void savia84(machine_config &config);
 private:
 	uint8_t m_kbd;
 	uint8_t m_segment;
@@ -170,7 +171,7 @@ READ8_MEMBER( savia84_state::savia84_8255_portc_r ) // IN FA - read keyboard
 		return 0xff;
 }
 
-static MACHINE_CONFIG_START( savia84 )
+MACHINE_CONFIG_START(savia84_state::savia84)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80, XTAL_4MHz / 2)
 	MCFG_CPU_PROGRAM_MAP(mem_map)

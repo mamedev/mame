@@ -275,5 +275,5 @@ void lpc210x_device::write_timer(address_space &space, int timer, int offset, ui
 
 
 
-MACHINE_CONFIG_MEMBER( lpc210x_device::device_add_mconfig )
+MACHINE_CONFIG_START(lpc210x_device::device_add_mconfig)
 MACHINE_CONFIG_END

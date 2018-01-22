@@ -67,6 +67,7 @@ public:
 
 	DECLARE_READ8_MEMBER( mc6847_videoram_r );
 
+	void sv8000(machine_config &config);
 private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -368,7 +369,7 @@ READ8_MEMBER( sv8000_state::mc6847_videoram_r )
 	return data;
 }
 
-static MACHINE_CONFIG_START( sv8000 )
+MACHINE_CONFIG_START(sv8000_state::sv8000)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80, XTAL_10_738635MHz/3)  /* Not verified */
 	MCFG_CPU_PROGRAM_MAP(sv8000_mem)

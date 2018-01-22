@@ -1333,7 +1333,7 @@ Pixel clock: 3 MHz = 192 HTotal, assuming it's 6 MHz
 #define ARKANOID_VBEND 16
 #define ARKANOID_VBSTART 240
 
-static MACHINE_CONFIG_START( arkanoid )
+MACHINE_CONFIG_START(arkanoid_state::arkanoid)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_12MHz/2) /* verified on pcb */
@@ -1371,14 +1371,14 @@ static MACHINE_CONFIG_START( arkanoid )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.66)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( p3mcu, arkanoid )
+MACHINE_CONFIG_DERIVED(arkanoid_state::p3mcu, arkanoid)
 
 	/* unprotected MCU */
 	MCFG_DEVICE_REPLACE("mcu", ARKANOID_68705P3, XTAL_12MHz/4)
 	MCFG_ARKANOID_MCU_PORTB_R_CB(IOPORT("MUX"))
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( p3mcuay, arkanoid )
+MACHINE_CONFIG_DERIVED(arkanoid_state::p3mcuay, arkanoid)
 
 	/* unprotected MCU */
 	MCFG_DEVICE_REPLACE("mcu", ARKANOID_68705P3, XTAL_12MHz/4)
@@ -1391,7 +1391,7 @@ static MACHINE_CONFIG_DERIVED( p3mcuay, arkanoid )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.66)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( bootleg, arkanoid )
+MACHINE_CONFIG_DERIVED(arkanoid_state::bootleg, arkanoid)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1400,7 +1400,7 @@ static MACHINE_CONFIG_DERIVED( bootleg, arkanoid )
 	MCFG_DEVICE_REMOVE("mcu")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( aysnd, bootleg )
+MACHINE_CONFIG_DERIVED(arkanoid_state::aysnd, bootleg)
 	MCFG_SOUND_REPLACE("aysnd", AY8910, XTAL_12MHz/4)
 	MCFG_AY8910_OUTPUT_TYPE(AY8910_SINGLE_OUTPUT)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("UNUSED"))
@@ -1409,7 +1409,7 @@ static MACHINE_CONFIG_DERIVED( aysnd, bootleg )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( hexa )
+MACHINE_CONFIG_START(arkanoid_state::hexa)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_12MHz/2)  /* Imported from arkanoid - correct? */
@@ -1439,7 +1439,7 @@ static MACHINE_CONFIG_START( hexa )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( hexaa, hexa )
+MACHINE_CONFIG_DERIVED(arkanoid_state::hexaa, hexa)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(hexaa_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", arkanoid_state,  irq0_line_hold)
@@ -1450,7 +1450,7 @@ static MACHINE_CONFIG_DERIVED( hexaa, hexa )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( brixian )
+MACHINE_CONFIG_START(arkanoid_state::brixian)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_12MHz/2)

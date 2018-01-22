@@ -629,7 +629,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( gameroom )
+MACHINE_CONFIG_START(lethalj_state::gameroom)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", TMS34010, MASTER_CLOCK)
@@ -663,7 +663,7 @@ static MACHINE_CONFIG_START( gameroom )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( lethalj, gameroom )
+MACHINE_CONFIG_DERIVED(lethalj_state::lethalj, gameroom)
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_TMS340X0_PIXEL_CLOCK(VIDEO_CLOCK_LETHALJ) /* pixel clock */

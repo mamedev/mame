@@ -228,7 +228,7 @@ GFXDECODE_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( m57 )
+MACHINE_CONFIG_START(m57_state::m57)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_18_432MHz/6)  /* verified on pcb */

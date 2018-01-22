@@ -83,6 +83,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_dsp;
 	required_device<ls259_device> m_mainlatch;
+	void tomcat(machine_config &config);
 };
 
 
@@ -319,7 +320,7 @@ void tomcat_state::machine_start()
 	m_dsp_BIO = 0;
 }
 
-static MACHINE_CONFIG_START( tomcat )
+MACHINE_CONFIG_START(tomcat_state::tomcat)
 	MCFG_CPU_ADD("maincpu", M68010, XTAL_12MHz / 2)
 	MCFG_CPU_PROGRAM_MAP(tomcat_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(tomcat_state, irq1_line_assert,  5*60)

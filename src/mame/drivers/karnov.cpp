@@ -802,7 +802,7 @@ void karnov_state::machine_reset()
 }
 
 
-static MACHINE_CONFIG_START( karnov )
+MACHINE_CONFIG_START(karnov_state::karnov)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 10000000)   /* 10 MHz */
@@ -847,7 +847,7 @@ static MACHINE_CONFIG_START( karnov )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( karnovjbl, karnov )
+MACHINE_CONFIG_DERIVED(karnov_state::karnovjbl, karnov)
 	/* X-TALs:
 	Top board next to #9 is 20.000 MHz
 	Top board next to the microcontroller is 6.000 MHz
@@ -872,7 +872,7 @@ static ADDRESS_MAP_START( chelnovjbl_mcu_io_map, AS_IO, 8, karnov_state )
 ADDRESS_MAP_END
 
 
-static MACHINE_CONFIG_DERIVED( chelnovjbl, karnov )
+MACHINE_CONFIG_DERIVED(karnov_state::chelnovjbl, karnov)
 	MCFG_CPU_ADD("mcu", I8031, 2000000) // ??mhz
 	MCFG_CPU_PROGRAM_MAP(chelnovjbl_mcu_map)
 	MCFG_CPU_IO_MAP(chelnovjbl_mcu_io_map)
@@ -881,7 +881,7 @@ MACHINE_CONFIG_END
 
 
 
-static MACHINE_CONFIG_START( wndrplnt )
+MACHINE_CONFIG_START(karnov_state::wndrplnt)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 10000000)   /* 10 MHz */

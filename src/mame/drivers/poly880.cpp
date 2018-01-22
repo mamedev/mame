@@ -242,7 +242,7 @@ void poly880_state::machine_start()
 
 /* Machine Driver */
 
-static MACHINE_CONFIG_START( poly880 )
+MACHINE_CONFIG_START(poly880_state::poly880)
 	/* basic machine hardware */
 	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL_7_3728MHz/8)
 	MCFG_CPU_PROGRAM_MAP(poly880_mem)

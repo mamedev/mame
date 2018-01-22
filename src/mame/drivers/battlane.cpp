@@ -270,7 +270,7 @@ void battlane_state::machine_reset()
 	m_cpu_control = 0;
 }
 
-static MACHINE_CONFIG_START( battlane )
+MACHINE_CONFIG_START(battlane_state::battlane)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6809, 1500000)        /* 1.5 MHz ? */

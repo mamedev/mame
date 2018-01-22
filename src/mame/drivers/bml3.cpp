@@ -129,6 +129,10 @@ public:
 	DECLARE_READ8_MEMBER(bml3_ym2203_r);
 	DECLARE_WRITE8_MEMBER(bml3_ym2203_w);
 
+	void bml3mk2(machine_config &config);
+	void bml3mk5(machine_config &config);
+	void bml3(machine_config &config);
+	void bml3_common(machine_config &config);
 private:
 	u8 m_hres_reg;
 	u8 m_crtc_vreg[0x100];
@@ -957,7 +961,7 @@ static SLOT_INTERFACE_START(bml3_cards)
 SLOT_INTERFACE_END
 
 
-static MACHINE_CONFIG_START( bml3_common )
+MACHINE_CONFIG_START(bml3_state::bml3_common)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",M6809, CPU_CLOCK)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", bml3_state,  bml3_timer_firq)
@@ -1028,7 +1032,7 @@ static MACHINE_CONFIG_START( bml3_common )
 
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( bml3, bml3_common )
+MACHINE_CONFIG_DERIVED(bml3_state::bml3, bml3_common)
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_PROGRAM_MAP(bml3_mem)
 
@@ -1044,14 +1048,14 @@ static MACHINE_CONFIG_DERIVED( bml3, bml3_common )
 #endif
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( bml3mk2, bml3_common )
+MACHINE_CONFIG_DERIVED(bml3_state::bml3mk2, bml3_common)
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_PROGRAM_MAP(bml3mk2_mem)
 
 	// TODO: anything to add here?
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( bml3mk5, bml3_common )
+MACHINE_CONFIG_DERIVED(bml3_state::bml3mk5, bml3_common)
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_PROGRAM_MAP(bml3mk5_mem)
 

@@ -203,6 +203,9 @@ public:
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( ngp_cart);
 	DECLARE_DEVICE_IMAGE_UNLOAD_MEMBER( ngp_cart );
 
+	void ngp_common(machine_config &config);
+	void ngp(machine_config &config);
+	void ngpc(machine_config &config);
 protected:
 	bool m_nvram_loaded;
 	required_ioport m_io_controls;
@@ -816,7 +819,7 @@ void ngp_state::nvram_write(emu_file &file)
 }
 
 
-static MACHINE_CONFIG_START( ngp_common )
+MACHINE_CONFIG_START(ngp_state::ngp_common)
 
 	MCFG_CPU_ADD( "maincpu", TMP95C061, XTAL_6_144MHz )
 	MCFG_TLCS900H_AM8_16(1)
@@ -848,7 +851,7 @@ static MACHINE_CONFIG_START( ngp_common )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( ngp, ngp_common )
+MACHINE_CONFIG_DERIVED(ngp_state::ngp, ngp_common)
 
 	MCFG_K1GE_ADD( "k1ge", XTAL_6_144MHz, "screen", WRITELINE( ngp_state, ngp_vblank_pin_w ), WRITELINE( ngp_state, ngp_hblank_pin_w ) )
 
@@ -866,7 +869,7 @@ static MACHINE_CONFIG_DERIVED( ngp, ngp_common )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( ngpc, ngp_common )
+MACHINE_CONFIG_DERIVED(ngp_state::ngpc, ngp_common)
 	MCFG_K2GE_ADD( "k1ge", XTAL_6_144MHz, "screen", WRITELINE( ngp_state, ngp_vblank_pin_w ), WRITELINE( ngp_state, ngp_hblank_pin_w ) )
 
 	MCFG_SCREEN_MODIFY("screen")

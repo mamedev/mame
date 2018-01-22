@@ -22,7 +22,7 @@ null_modem_device::null_modem_device(const machine_config &mconfig, const char *
 {
 }
 
-MACHINE_CONFIG_MEMBER(null_modem_device::device_add_mconfig)
+MACHINE_CONFIG_START(null_modem_device::device_add_mconfig)
 	MCFG_DEVICE_ADD("stream", BITBANGER, 0)
 MACHINE_CONFIG_END
 

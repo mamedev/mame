@@ -621,7 +621,7 @@ static SLOT_INTERFACE_START(z88_cart)
 	SLOT_INTERFACE("1024kflash", Z88_1024K_FLASH)    // 1024KB Flash cart
 SLOT_INTERFACE_END
 
-static MACHINE_CONFIG_START( z88 )
+MACHINE_CONFIG_START(z88_state::z88)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_9_8304MHz/3)  // divided by 3 through the uPD65031
 	MCFG_CPU_PROGRAM_MAP(z88_mem)

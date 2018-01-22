@@ -1073,7 +1073,7 @@ READ8_MEMBER(rmnimbus_state::scsi_r)
 {
 	int result = 0;
 
-	int pc=space.device().safe_pc();
+	int pc=m_maincpu->pc();
 	char drive[5];
 	floppy_image_device *floppy;
 
@@ -1153,7 +1153,7 @@ WRITE8_MEMBER(rmnimbus_state::fdc_ctl_w)
 
 WRITE8_MEMBER(rmnimbus_state::scsi_w)
 {
-	int pc=space.device().safe_pc();
+	int pc=m_maincpu->pc();
 
 	if(LOG_DISK_HDD)
 		logerror("Nimbus HDCW at %05X write of %02X to %04X\n",pc,data,(offset*2)+0x410);
@@ -1272,7 +1272,7 @@ void rmnimbus_state::ipc_dumpregs()
 
 READ8_MEMBER(rmnimbus_state::nimbus_pc8031_r)
 {
-	int pc=space.device().safe_pc();
+	int pc=m_maincpu->pc();
 	uint8_t   result;
 
 	switch(offset*2)
@@ -1296,7 +1296,7 @@ READ8_MEMBER(rmnimbus_state::nimbus_pc8031_r)
 
 WRITE8_MEMBER(rmnimbus_state::nimbus_pc8031_w)
 {
-	int pc=space.device().safe_pc();
+	int pc=m_maincpu->pc();
 
 	switch(offset*2)
 	{
@@ -1322,7 +1322,7 @@ WRITE8_MEMBER(rmnimbus_state::nimbus_pc8031_w)
 
 READ8_MEMBER(rmnimbus_state::nimbus_pc8031_iou_r)
 {
-	int pc=space.device().safe_pc();
+	int pc=m_iocpu->pc();
 	uint8_t   result = 0;
 
 	switch (offset & 0x01)
@@ -1347,7 +1347,7 @@ READ8_MEMBER(rmnimbus_state::nimbus_pc8031_iou_r)
 
 WRITE8_MEMBER(rmnimbus_state::nimbus_pc8031_iou_w)
 {
-	int pc=space.device().safe_pc();
+	int pc=m_iocpu->pc();
 
 	if(LOG_PC8031)
 		logerror("8031 PCIOW %04X write of %02X to %04X\n",pc,data,offset);
@@ -1386,7 +1386,7 @@ WRITE8_MEMBER(rmnimbus_state::nimbus_pc8031_iou_w)
 
 READ8_MEMBER(rmnimbus_state::nimbus_pc8031_port_r)
 {
-	int pc=space.device().safe_pc();
+	int pc=m_iocpu->pc();
 	uint8_t   result = 0;
 
 	if(LOG_PC8031_PORT)
@@ -1404,7 +1404,7 @@ READ8_MEMBER(rmnimbus_state::nimbus_pc8031_port_r)
 
 WRITE8_MEMBER(rmnimbus_state::nimbus_pc8031_port_w)
 {
-	int pc=space.device().safe_pc();
+	int pc=m_iocpu->pc();
 
 	switch (offset)
 	{
@@ -1435,7 +1435,7 @@ WRITE8_MEMBER(rmnimbus_state::nimbus_pc8031_port_w)
 /* IO Unit */
 READ8_MEMBER(rmnimbus_state::nimbus_iou_r)
 {
-	int pc=space.device().safe_pc();
+	int pc=m_maincpu->pc();
 	uint8_t   result=0;
 
 	if(offset==0)
@@ -1451,7 +1451,7 @@ READ8_MEMBER(rmnimbus_state::nimbus_iou_r)
 
 WRITE8_MEMBER(rmnimbus_state::nimbus_iou_w)
 {
-	int pc=space.device().safe_pc();
+	int pc=m_maincpu->pc();
 
 	if(LOG_IOU)
 		logerror("Nimbus IOUW %08X write of %02X to %04X\n",pc,data,(offset*2)+0x92);

@@ -36,6 +36,8 @@ public:
 	{ }
 
 	required_device<cpu_device> m_maincpu;
+	void iskr1030m(machine_config &config);
+	void iskr1031(machine_config &config);
 };
 
 static ADDRESS_MAP_START( iskr1031_map, AS_PROGRAM, 16, iskr103x_state )
@@ -60,7 +62,7 @@ static DEVICE_INPUT_DEFAULTS_START(iskr1031)
 DEVICE_INPUT_DEFAULTS_END
 
 // XXX
-static MACHINE_CONFIG_START( iskr1030m )
+MACHINE_CONFIG_START(iskr103x_state::iskr1030m)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",  I8086, 4772720)
 	MCFG_CPU_PROGRAM_MAP(iskr1031_map)
@@ -85,7 +87,7 @@ static MACHINE_CONFIG_START( iskr1030m )
 	MCFG_RAM_EXTRA_OPTIONS("64K, 128K, 256K, 512K")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( iskr1031, iskr1030m )
+MACHINE_CONFIG_DERIVED(iskr103x_state::iskr1031, iskr1030m)
 	MCFG_DEVICE_MODIFY("mb")
 	MCFG_DEVICE_INPUT_DEFAULTS(iskr1031)
 	MCFG_DEVICE_MODIFY("isa1")

@@ -229,7 +229,7 @@ static GFXDECODE_START( tinvader )
 	GFXDECODE_SCALE( nullptr,   0x1F00, s2636_character, 0, 2, 8, 6 )  /* dynamic */
 GFXDECODE_END
 
-static MACHINE_CONFIG_START( tinvader )
+MACHINE_CONFIG_START(zac2650_state::tinvader)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", S2650, 3800000/4)

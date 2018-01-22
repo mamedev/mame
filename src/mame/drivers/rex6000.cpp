@@ -123,6 +123,7 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(irq_timer2);
 	TIMER_DEVICE_CALLBACK_MEMBER(sec_timer);
 	DECLARE_QUICKLOAD_LOAD_MEMBER(rex6000);
+	void rex6000(machine_config &config);
 };
 
 
@@ -146,6 +147,7 @@ public:
 	virtual void machine_reset() override;
 	uint32_t screen_update_oz(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
+	void oz750(machine_config &config);
 private:
 	int oz_wzd_extract_tag(const std::vector<uint8_t> &data, const char *tag, char *dest_buf);
 
@@ -871,7 +873,7 @@ static GFXDECODE_START( rex6000 )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( rex6000 )
+MACHINE_CONFIG_START(rex6000_state::rex6000)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80, XTAL_4MHz) //Toshiba microprocessor Z80 compatible at 4.3MHz
 	MCFG_CPU_PROGRAM_MAP(rex6000_mem)
@@ -948,7 +950,7 @@ static MACHINE_CONFIG_START( rex6000 )
 	MCFG_SOUND_ROUTE( ALL_OUTPUTS, "mono", 1.00 )
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( oz750 )
+MACHINE_CONFIG_START(oz750_state::oz750)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80, XTAL_9_8304MHz) //Toshiba microprocessor Z80 compatible at 9.8MHz
 	MCFG_CPU_PROGRAM_MAP(rex6000_mem)

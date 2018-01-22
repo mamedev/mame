@@ -83,7 +83,7 @@ DEVICE_ADDRESS_MAP_START( map, 16, imagetek_i4100_device)
 	AM_RANGE(0x40000, 0x5ffff) AM_READWRITE(vram_2_r, vram_2_w) AM_SHARE("vram_2")
 	AM_RANGE(0x60000, 0x6ffff) AM_READ(gfxrom_r)
 	AM_RANGE(0x70000, 0x71fff) AM_READWRITE(scratchram_r, scratchram_w) AM_SHARE("scratchram") // unknown, maybe palette
-	AM_RANGE(0x72000, 0x73fff) AM_DEVREADWRITE("palette", palette_device, read, write) AM_SHARE("palette")
+	AM_RANGE(0x72000, 0x73fff) AM_DEVREADWRITE("palette", palette_device, read16, write16) AM_SHARE("palette")
 	AM_RANGE(0x74000, 0x74fff) AM_READWRITE(spriteram_r, spriteram_w) AM_SHARE("spriteram")
 	AM_RANGE(0x75000, 0x75fff) AM_READWRITE(rmw_vram_0_r, rmw_vram_0_w)
 	AM_RANGE(0x76000, 0x76fff) AM_READWRITE(rmw_vram_1_r, rmw_vram_1_w)
@@ -118,7 +118,7 @@ DEVICE_ADDRESS_MAP_START( v2_map, 16, imagetek_i4220_device)
 	AM_RANGE(0x40000, 0x5ffff) AM_READWRITE(vram_2_r, vram_2_w) AM_SHARE("vram_2")
 	AM_RANGE(0x60000, 0x6ffff) AM_READ(gfxrom_r)
 	AM_RANGE(0x70000, 0x71fff) AM_READWRITE(scratchram_r, scratchram_w) AM_SHARE("scratchram") // unknown, maybe palette
-	AM_RANGE(0x72000, 0x73fff) AM_DEVREADWRITE("palette", palette_device, read, write) AM_SHARE("palette")
+	AM_RANGE(0x72000, 0x73fff) AM_DEVREADWRITE("palette", palette_device, read16, write16) AM_SHARE("palette")
 	AM_RANGE(0x74000, 0x74fff) AM_READWRITE(spriteram_r, spriteram_w) AM_SHARE("spriteram")
 	AM_RANGE(0x75000, 0x75fff) AM_READWRITE(rmw_vram_0_r, rmw_vram_0_w)
 	AM_RANGE(0x76000, 0x76fff) AM_READWRITE(rmw_vram_1_r, rmw_vram_1_w)
@@ -163,7 +163,7 @@ DEVICE_ADDRESS_MAP_START( v3_map, 16, imagetek_i4300_device)
 	AM_RANGE(0x40000, 0x5ffff) AM_READWRITE(vram_2_r, vram_2_w) AM_SHARE("vram_2")
 	AM_RANGE(0x60000, 0x6ffff) AM_READ(gfxrom_r)
 	AM_RANGE(0x70000, 0x71fff) AM_READWRITE(scratchram_r, scratchram_w) AM_SHARE("scratchram") // unknown, maybe palette
-	AM_RANGE(0x72000, 0x73fff) AM_DEVREADWRITE("palette", palette_device, read, write) AM_SHARE("palette")
+	AM_RANGE(0x72000, 0x73fff) AM_DEVREADWRITE("palette", palette_device, read16, write16) AM_SHARE("palette")
 	AM_RANGE(0x74000, 0x74fff) AM_READWRITE(spriteram_r, spriteram_w) AM_SHARE("spriteram")
 	AM_RANGE(0x75000, 0x75fff) AM_READWRITE(rmw_vram_0_r, rmw_vram_0_w)
 	AM_RANGE(0x76000, 0x76fff) AM_READWRITE(rmw_vram_1_r, rmw_vram_1_w)
@@ -246,7 +246,7 @@ imagetek_i4300_device::imagetek_i4300_device(const machine_config &mconfig, cons
 //  configuration addiitons
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER(imagetek_i4100_device::device_add_mconfig)
+MACHINE_CONFIG_START(imagetek_i4100_device::device_add_mconfig)
 	MCFG_PALETTE_ADD("palette", 0x1000)
 	MCFG_PALETTE_FORMAT(GGGGGRRRRRBBBBBx)
 MACHINE_CONFIG_END

@@ -156,6 +156,8 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	void baryon(machine_config &config);
+	void dreamwld(machine_config &config);
 };
 
 
@@ -456,7 +458,7 @@ static ADDRESS_MAP_START( baryon_map, AS_PROGRAM, 32, dreamwld_state )
 	AM_RANGE(0x000000, 0x1fffff) AM_ROM  AM_WRITENOP
 
 	AM_RANGE(0x400000, 0x401fff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x600000, 0x601fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x600000, 0x601fff) AM_RAM_DEVWRITE("palette", palette_device, write32) AM_SHARE("palette")
 	AM_RANGE(0x800000, 0x801fff) AM_RAM_WRITE(dreamwld_bg_videoram_w ) AM_SHARE("bg_videoram")
 	AM_RANGE(0x802000, 0x803fff) AM_RAM_WRITE(dreamwld_bg2_videoram_w ) AM_SHARE("bg2_videoram")
 	AM_RANGE(0x804000, 0x8043ff) AM_READWRITE16(lineram16_r, lineram16_w, 0xffffffff)  // linescroll
@@ -792,7 +794,7 @@ void dreamwld_state::machine_reset()
 }
 
 
-static MACHINE_CONFIG_START( baryon )
+MACHINE_CONFIG_START(dreamwld_state::baryon)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68EC020, XTAL_32MHz/2) /* 16MHz verified */
@@ -823,7 +825,7 @@ static MACHINE_CONFIG_START( baryon )
 
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( dreamwld, baryon )
+MACHINE_CONFIG_DERIVED(dreamwld_state::dreamwld, baryon)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")

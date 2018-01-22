@@ -91,9 +91,9 @@ public:
 	TIMER_CALLBACK_MEMBER(collide_firq_callback);
 	void exidy440_update_firq();
 	void exidy440_bank_select(uint8_t bank);
+	void exidy440(machine_config &config);
+	void exidy440_video(machine_config &config);
+	void exidy440_audio(machine_config &config);
+	void topsecex(machine_config &config);
+	void topsecex_video(machine_config &config);
 };
-
-/*----------- defined in video/exidy440.c -----------*/
-
-MACHINE_CONFIG_EXTERN( exidy440_video );
-MACHINE_CONFIG_EXTERN( topsecex_video );

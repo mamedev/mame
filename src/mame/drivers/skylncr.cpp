@@ -200,6 +200,7 @@ public:
 	DECLARE_WRITE8_MEMBER(mbutrfly_prot_w);
 	READ_LINE_MEMBER(mbutrfly_prot_r);
 	DECLARE_READ8_MEMBER(bdream97_opcode_r);
+	DECLARE_DRIVER_INIT(ypovrixi);
 	DECLARE_DRIVER_INIT(sonikfig);
 	TILE_GET_INFO_MEMBER(get_tile_info);
 	TILE_GET_INFO_MEMBER(get_reel_1_tile_info);
@@ -213,6 +214,11 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	required_device<ticket_dispenser_device> m_hopper;
+	void neraidou(machine_config &config);
+	void sstar97(machine_config &config);
+	void bdream97(machine_config &config);
+	void skylncr(machine_config &config);
+	void mbutrfly(machine_config &config);
 };
 
 
@@ -1616,7 +1622,7 @@ INTERRUPT_GEN_MEMBER(skylncr_state::skylncr_vblank_interrupt)
 *           Machine Driver           *
 *************************************/
 
-static MACHINE_CONFIG_START( skylncr )
+MACHINE_CONFIG_START(skylncr_state::skylncr)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK/4)
@@ -1666,14 +1672,14 @@ static MACHINE_CONFIG_START( skylncr )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( mbutrfly, skylncr )
+MACHINE_CONFIG_DERIVED(skylncr_state::mbutrfly, skylncr)
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(io_map_mbutrfly)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( neraidou, skylncr )
+MACHINE_CONFIG_DERIVED(skylncr_state::neraidou, skylncr)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1681,7 +1687,7 @@ static MACHINE_CONFIG_DERIVED( neraidou, skylncr )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( sstar97, skylncr )
+MACHINE_CONFIG_DERIVED(skylncr_state::sstar97, skylncr)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1689,7 +1695,7 @@ static MACHINE_CONFIG_DERIVED( sstar97, skylncr )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( bdream97, skylncr )
+MACHINE_CONFIG_DERIVED(skylncr_state::bdream97, skylncr)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1876,6 +1882,45 @@ ROM_START( neraidou )
 ROM_END
 
 /*
+  Ypovrixio (Submarine).
+
+*/
+ROM_START( ypovrixi )
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD( "27c512_sub_board.bin",  0x00000, 0x10000, CRC(4865a6de) SHA1(cfa23eef004f9a29d462676d9b9b94a1e84064d6) )
+
+	ROM_REGION( 0x80000, "gfx1", 0 )
+	ROM_LOAD16_BYTE( "u29.bin", 0x00000, 0x20000, CRC(14d2a342) SHA1(5745a4db5af55072e49de80fdc29a33dd78af68e) )
+	ROM_LOAD16_BYTE( "u31.bin", 0x00001, 0x20000, CRC(9079a3d2) SHA1(b4c624cf7bf45d7879118dac7d999d36717e0395) )
+	ROM_LOAD16_BYTE( "u33.bin", 0x40000, 0x20000, CRC(9cf17008) SHA1(9fe1d1522ef0ca271cbe4105f79c55462cec9078) )
+	ROM_LOAD16_BYTE( "u35.bin", 0x40001, 0x20000, CRC(e04d0ae8) SHA1(36ae96302225e7485882ec911b04e24cc2bd9e8d) )
+
+	ROM_REGION( 0x80000, "gfx2", 0 )
+	ROM_LOAD16_BYTE( "u52.bin", 0x00000, 0x20000, CRC(e02ed758) SHA1(a90a3889522f3a8b3f1a4642c191dea8ec6cad21) )
+	ROM_LOAD16_BYTE( "u54.bin", 0x00001, 0x20000, CRC(4724f35b) SHA1(a8117adf903238a1aca16c1e1468d0684a1d5b95) )
+	ROM_LOAD16_BYTE( "u56.bin", 0x40000, 0x20000, CRC(62ca6bc8) SHA1(2aa2a04c18bf25da509e18de7a32d945a084f37a) )
+	ROM_LOAD16_BYTE( "u58.bin", 0x40001, 0x20000, CRC(54e49fa5) SHA1(31e7fb65b78ddf429c794fe94ff63fe5650a9787) )
+ROM_END
+
+ROM_START( ypovrixia )
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD( "27c512_sub_board_set2.bin",  0x00000, 0x10000, CRC(3c4181bf) SHA1(afc4fcd7ec9a48406242fe7e01a32e1a20216330) )
+
+	ROM_REGION( 0x80000, "gfx1", 0 )
+	ROM_LOAD16_BYTE( "u29.bin", 0x00000, 0x20000, CRC(14d2a342) SHA1(5745a4db5af55072e49de80fdc29a33dd78af68e) )
+	ROM_LOAD16_BYTE( "u31.bin", 0x00001, 0x20000, CRC(9079a3d2) SHA1(b4c624cf7bf45d7879118dac7d999d36717e0395) )
+	ROM_LOAD16_BYTE( "u33.bin", 0x40000, 0x20000, CRC(9cf17008) SHA1(9fe1d1522ef0ca271cbe4105f79c55462cec9078) )
+	ROM_LOAD16_BYTE( "u35.bin", 0x40001, 0x20000, CRC(e04d0ae8) SHA1(36ae96302225e7485882ec911b04e24cc2bd9e8d) )
+
+	ROM_REGION( 0x80000, "gfx2", 0 )
+	ROM_LOAD16_BYTE( "u52.bin", 0x00000, 0x20000, CRC(e02ed758) SHA1(a90a3889522f3a8b3f1a4642c191dea8ec6cad21) )
+	ROM_LOAD16_BYTE( "u54.bin", 0x00001, 0x20000, CRC(4724f35b) SHA1(a8117adf903238a1aca16c1e1468d0684a1d5b95) )
+	ROM_LOAD16_BYTE( "u56.bin", 0x40000, 0x20000, CRC(62ca6bc8) SHA1(2aa2a04c18bf25da509e18de7a32d945a084f37a) )
+	ROM_LOAD16_BYTE( "u58.bin", 0x40001, 0x20000, CRC(54e49fa5) SHA1(31e7fb65b78ddf429c794fe94ff63fe5650a9787) )
+ROM_END
+
+
+/*
   Super Star 97
   Bordun International.
 
@@ -2007,19 +2052,37 @@ DRIVER_INIT_MEMBER(skylncr_state, sonikfig)
 	}
 }
 
+DRIVER_INIT_MEMBER(skylncr_state, ypovrixi)
+/*
+  Encryption:
+
+  Some offset ranges are xor'ed with 0x44.
+  The begining of the code seems different.
+
+*/
+{
+//	uint8_t *const ROM = memregion("maincpu")->base();
+//	for (unsigned x = 0; x < 0x10000; x++)
+//	{
+//		ROM[x] = ROM[x] ^ 0x44;
+//	}
+}
+
 
 /****************************************************
 *                  Game Drivers                     *
 ****************************************************/
 
-//    YEAR  NAME      PARENT   MACHINE   INPUT     STATE           INIT      ROT   COMPANY                 FULLNAME                                          FLAGS
-GAME( 1995, skylncr,  0,       skylncr,  skylncr,  skylncr_state,  0,        ROT0, "Bordun International", "Sky Lancer (Bordun, version U450C)",             0 )
-GAME( 1995, butrfly,  0,       skylncr,  skylncr,  skylncr_state,  0,        ROT0, "Bordun International", "Butterfly Video Game (version U350C)",           0 )
-GAME( 1999, mbutrfly, 0,       mbutrfly, mbutrfly, skylncr_state,  0,        ROT0, "Bordun International", "Magical Butterfly (version U350C, protected)",   0 )
-GAME( 1995, madzoo,   0,       skylncr,  skylncr,  skylncr_state,  0,        ROT0, "Bordun International", "Mad Zoo (version U450C)",                        0 )
-GAME( 1995, leader,   0,       skylncr,  leader,   skylncr_state,  0,        ROT0, "bootleg",              "Leader (version Z 2E, Greece)",                  0 )
-GAME( 199?, gallag50, 0,       skylncr,  gallag50, skylncr_state,  0,        ROT0, "bootleg",              "Gallag Video Game / Petalouda (Butterfly, x50)", 0 )
-GAME( 199?, neraidou, 0,       neraidou, neraidou, skylncr_state,  0,        ROT0, "bootleg",              "Neraidoula (Fairy Butterfly)",                   0 )
-GAME( 199?, sstar97,  0,       sstar97,  sstar97,  skylncr_state,  0,        ROT0, "Bordun International", "Super Star 97 / Ming Xing 97 (version V153B)",   0 )
-GAME( 1995, bdream97, 0,       bdream97, skylncr,  skylncr_state,  0,        ROT0, "bootleg (KKK)",        "Hudie Meng 97",                                  MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
-GAME( 2000, sonikfig, 0,       skylncr,  sonikfig, skylncr_state,  sonikfig, ROT0, "Z Games",              "Sonik Fighter (version 02, encrypted)",          MACHINE_WRONG_COLORS | MACHINE_NOT_WORKING )
+//    YEAR  NAME       PARENT   MACHINE   INPUT     STATE           INIT      ROT   COMPANY                 FULLNAME                                          FLAGS
+GAME( 1995, skylncr,   0,       skylncr,  skylncr,  skylncr_state,  0,        ROT0, "Bordun International", "Sky Lancer (Bordun, version U450C)",             0 )
+GAME( 1995, butrfly,   0,       skylncr,  skylncr,  skylncr_state,  0,        ROT0, "Bordun International", "Butterfly Video Game (version U350C)",           0 )
+GAME( 1999, mbutrfly,  0,       mbutrfly, mbutrfly, skylncr_state,  0,        ROT0, "Bordun International", "Magical Butterfly (version U350C, protected)",   0 )
+GAME( 1995, madzoo,    0,       skylncr,  skylncr,  skylncr_state,  0,        ROT0, "Bordun International", "Mad Zoo (version U450C)",                        0 )
+GAME( 1995, leader,    0,       skylncr,  leader,   skylncr_state,  0,        ROT0, "bootleg",              "Leader (version Z 2E, Greece)",                  0 )
+GAME( 199?, gallag50,  0,       skylncr,  gallag50, skylncr_state,  0,        ROT0, "bootleg",              "Gallag Video Game / Petalouda (Butterfly, x50)", 0 )
+GAME( 199?, neraidou,  0,       neraidou, neraidou, skylncr_state,  0,        ROT0, "bootleg",              "Neraidoula (Fairy Butterfly)",                   0 )
+GAME( 199?, ypovrixi,  0,       skylncr,  skylncr,  skylncr_state,  ypovrixi, ROT0, "bootleg?",             "Ypovrixio (Submarine, set 1)",                   MACHINE_WRONG_COLORS | MACHINE_NOT_WORKING )
+GAME( 199?, ypovrixia, 0,       skylncr,  skylncr,  skylncr_state,  ypovrixi, ROT0, "bootleg?",             "Ypovrixio (Submarine, set 2)",                   MACHINE_WRONG_COLORS | MACHINE_NOT_WORKING )
+GAME( 199?, sstar97,   0,       sstar97,  sstar97,  skylncr_state,  0,        ROT0, "Bordun International", "Super Star 97 / Ming Xing 97 (version V153B)",   0 )
+GAME( 1995, bdream97,  0,       bdream97, skylncr,  skylncr_state,  0,        ROT0, "bootleg (KKK)",        "Hudie Meng 97",                                  MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
+GAME( 2000, sonikfig,  0,       skylncr,  sonikfig, skylncr_state,  sonikfig, ROT0, "Z Games",              "Sonik Fighter (version 02, encrypted)",          MACHINE_WRONG_COLORS | MACHINE_NOT_WORKING )

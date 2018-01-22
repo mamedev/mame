@@ -139,6 +139,7 @@ public:
 	uint32_t screen_update_gladiatr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void swap_block(uint8_t *src1,uint8_t *src2,int len);
 
+	void gladiatr(machine_config &config);
 private:
 	required_ioport m_dsw1, m_dsw2;
 	required_ioport m_in0, m_in1, m_in2;
@@ -183,6 +184,7 @@ public:
 
 	uint32_t screen_update_ppking(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
+	void ppking(machine_config &config);
 private:
 	required_shared_ptr<uint8_t>    m_nvram;
 	required_device<generic_latch_8_device> m_soundlatch2;

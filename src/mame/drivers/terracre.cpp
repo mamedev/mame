@@ -573,7 +573,7 @@ static GFXDECODE_START( terracre )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( ym3526 )
+MACHINE_CONFIG_START(terracre_state::ym3526)
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz/2)   // 8mhz
 	MCFG_CPU_PROGRAM_MAP(terracre_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", terracre_state,  irq1_line_hold)
@@ -613,7 +613,7 @@ static MACHINE_CONFIG_START( ym3526 )
 	MCFG_SOUND_ROUTE_EX(0, "dac2", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac2", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( ym2203, ym3526 )
+MACHINE_CONFIG_DERIVED(terracre_state::ym2203, ym3526)
 	MCFG_CPU_MODIFY("audiocpu")
 	MCFG_CPU_IO_MAP(sound_2203_io_map)
 
@@ -626,14 +626,14 @@ static MACHINE_CONFIG_DERIVED( ym2203, ym3526 )
 	MCFG_SOUND_ROUTE(3, "speaker", 0.4)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( amazon_base, ym3526 )
+MACHINE_CONFIG_DERIVED(terracre_state::amazon_base, ym3526)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(amazon_base_map)
 
 	MCFG_MACHINE_START_OVERRIDE(terracre_state,amazon)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( amazon_1412m2, amazon_base )
+MACHINE_CONFIG_DERIVED(terracre_state::amazon_1412m2, amazon_base)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(amazon_1412m2_map)
 

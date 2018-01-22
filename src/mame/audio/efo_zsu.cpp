@@ -187,7 +187,7 @@ TIMER_CALLBACK_MEMBER(cedar_magnet_sound_device::reset_assert_callback)
 }
 
 
-MACHINE_CONFIG_MEMBER( efo_zsu_device::device_add_mconfig )
+MACHINE_CONFIG_START(efo_zsu_device::device_add_mconfig)
 	MCFG_CPU_ADD("soundcpu", Z80, 4000000)
 	MCFG_CPU_PROGRAM_MAP(zsu_map)
 	MCFG_CPU_IO_MAP(zsu_io)
@@ -236,7 +236,7 @@ MACHINE_CONFIG_MEMBER( efo_zsu_device::device_add_mconfig )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_MEMBER( cedar_magnet_sound_device::device_add_mconfig )
+MACHINE_CONFIG_START(cedar_magnet_sound_device::device_add_mconfig)
 	efo_zsu_device::device_add_mconfig(config);
 
 	MCFG_CPU_MODIFY("soundcpu")

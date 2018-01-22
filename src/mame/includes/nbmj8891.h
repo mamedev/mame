@@ -99,6 +99,34 @@ public:
 	void common_save_state();
 	void postload();
 
+	void mjfocusm(machine_config &config);
+	void mjfocus(machine_config &config);
+	void bananadr(machine_config &config);
+	void scandal(machine_config &config);
+	void hanamomo(machine_config &config);
+	void telmahjn(machine_config &config);
+	void pairsten(machine_config &config);
+	void club90s(machine_config &config);
+	void mgion(machine_config &config);
+	void chinmoku(machine_config &config);
+	void msjiken(machine_config &config);
+	void hnageman(machine_config &config);
+	void mjcamerb(machine_config &config);
+	void mjnanpas(machine_config &config);
+	void mmcamera(machine_config &config);
+	void pairsnb(machine_config &config);
+	void taiwanmb(machine_config &config);
+	void hanaoji(machine_config &config);
+	void lovehous(machine_config &config);
+	void hnxmasev(machine_config &config);
+	void mmaiko(machine_config &config);
+	void maiko(machine_config &config);
+	void mladyhtr(machine_config &config);
+	void omotesnd(machine_config &config);
+	void abunai(machine_config &config);
+	void gionbana(machine_config &config);
+	void mgmen89(machine_config &config);
+	void scandalm(machine_config &config);
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };

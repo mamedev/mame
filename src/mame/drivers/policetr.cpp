@@ -397,7 +397,7 @@ void policetr_state::machine_start()
  *
  *************************************/
 
-static MACHINE_CONFIG_START( policetr )
+MACHINE_CONFIG_START(policetr_state::policetr)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", R3041, MASTER_CLOCK/2)
@@ -428,7 +428,7 @@ static MACHINE_CONFIG_START( policetr )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( sshooter, policetr )
+MACHINE_CONFIG_DERIVED(policetr_state::sshooter, policetr)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")

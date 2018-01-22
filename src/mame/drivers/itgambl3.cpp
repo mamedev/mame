@@ -66,6 +66,7 @@ public:
 	uint32_t screen_update_itgambl3(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<palette_device> m_palette;
+	void itgambl3(machine_config &config);
 };
 
 
@@ -258,7 +259,7 @@ PALETTE_INIT_MEMBER(itgambl3_state, itgambl3)
 *     Machine Drivers     *
 **************************/
 
-static MACHINE_CONFIG_START( itgambl3 )
+MACHINE_CONFIG_START(itgambl3_state::itgambl3)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", H83044, MAIN_CLOCK) /* wrong CPU, but we have not a M16C core ATM */

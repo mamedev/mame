@@ -1249,7 +1249,7 @@ WRITE8_MEMBER(leland_state::ataxx_master_output_w)
 WRITE8_MEMBER(leland_state::leland_gated_paletteram_w)
 {
 	if (m_wcol_enable)
-		m_palette->write(space, offset, data);
+		m_palette->write8(space, offset, data);
 }
 
 
@@ -1264,7 +1264,7 @@ READ8_MEMBER(leland_state::leland_gated_paletteram_r)
 WRITE8_MEMBER(leland_state::ataxx_paletteram_and_misc_w)
 {
 	if (m_wcol_enable)
-		m_palette->write(space, offset, data);
+		m_palette->write8(space, offset, data);
 	else if (offset == 0x7f8 || offset == 0x7f9)
 		leland_master_video_addr_w(space, offset - 0x7f8, data);
 	else if (offset == 0x7fc)

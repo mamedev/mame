@@ -152,6 +152,8 @@ public:
 	DECLARE_READ8_MEMBER(riot_console_button_r);
 	DECLARE_WRITE8_MEMBER(riot_button_pullup_w);
 
+	void a7800_ntsc(machine_config &config);
+	void a7800_pal(machine_config &config);
 protected:
 	required_device<cpu_device> m_maincpu;
 	required_device<tia_device> m_tia;
@@ -1352,7 +1354,7 @@ void a7800_state::machine_reset()
 	m_bios_enabled = 0;
 }
 
-static MACHINE_CONFIG_START( a7800_ntsc )
+MACHINE_CONFIG_START(a7800_state::a7800_ntsc)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, A7800_NTSC_Y1/8) /* 1.79 MHz (switches to 1.19 MHz on TIA or RIOT access) */
 	MCFG_CPU_PROGRAM_MAP(a7800_mem)
@@ -1389,7 +1391,7 @@ static MACHINE_CONFIG_START( a7800_ntsc )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( a7800_pal, a7800_ntsc )
+MACHINE_CONFIG_DERIVED(a7800_state::a7800_pal, a7800_ntsc)
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_CLOCK(CLK_PAL)

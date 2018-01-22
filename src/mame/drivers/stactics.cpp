@@ -308,7 +308,7 @@ void stactics_state::machine_start()
  *
  *************************************/
 
-static MACHINE_CONFIG_START( stactics )
+MACHINE_CONFIG_START(stactics_state::stactics)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8080, 1933560)

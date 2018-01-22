@@ -61,7 +61,7 @@
 /* only ROM from FF00-FFFF and DAT memory at FFF0-FFFF (write only) is guaranteed always*/
 
 static ADDRESS_MAP_START(mp09_mem, AS_PROGRAM, 8, swtpc09_state)
-	AM_RANGE(0x0000, 0xffef) AM_READWRITE(main_r, main_w)
+	AM_RANGE(0x0000, 0xfeff) AM_READWRITE(main_r, main_w)
 	AM_RANGE(0xff00, 0xffff) AM_ROM AM_REGION("maincpu", 0xff00)
 	AM_RANGE(0xff00, 0xff0f) AM_MIRROR(0xf0) AM_WRITEONLY AM_SHARE("dat")
 ADDRESS_MAP_END
@@ -159,7 +159,7 @@ SLOT_INTERFACE_END
 
 /* Machine driver */
 /* MPU09, MPID, MPS2 DMF2 */
-static MACHINE_CONFIG_START( swtpc09_base )
+MACHINE_CONFIG_START(swtpc09_state::swtpc09_base)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", MC6809, XTAL_4MHz)
 	MCFG_CPU_PROGRAM_MAP(mp09_mem)
@@ -201,14 +201,14 @@ static MACHINE_CONFIG_START( swtpc09_base )
 	MCFG_FLOPPY_DRIVE_ADD("fdc:3", swtpc09_floppies, "dd", swtpc09_state::floppy_formats)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( swtpc09, swtpc09_base )
+MACHINE_CONFIG_DERIVED(swtpc09_state::swtpc09, swtpc09_base)
 	MCFG_DEVICE_MODIFY("fdc")
 	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(swtpc09_state, fdc_intrq_w))
 	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(swtpc09_state, fdc_drq_w))
 MACHINE_CONFIG_END
 
 /* MPU09, MPID, MPS2 DC4 PIAIDE*/
-static MACHINE_CONFIG_DERIVED( swtpc09i, swtpc09_base )
+MACHINE_CONFIG_DERIVED(swtpc09_state::swtpc09i, swtpc09_base)
 	MCFG_DEVICE_MODIFY("bankdev")
 	MCFG_DEVICE_PROGRAM_MAP(flex_dc4_piaide_mem)
 
@@ -223,14 +223,14 @@ static MACHINE_CONFIG_DERIVED( swtpc09i, swtpc09_base )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( swtpc09u, swtpc09 )
+MACHINE_CONFIG_DERIVED(swtpc09_state::swtpc09u, swtpc09)
 	MCFG_DEVICE_MODIFY("bankdev")
 	MCFG_DEVICE_PROGRAM_MAP(uniflex_dmf2_mem)
 MACHINE_CONFIG_END
 
 
 /* MPU09, MPID, MPS2 DMF3 */
-static MACHINE_CONFIG_DERIVED( swtpc09d3, swtpc09_base )
+MACHINE_CONFIG_DERIVED(swtpc09_state::swtpc09d3, swtpc09_base)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_CLOCK(XTAL_8MHz)
 

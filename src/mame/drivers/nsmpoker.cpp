@@ -91,6 +91,7 @@ public:
 	INTERRUPT_GEN_MEMBER(nsmpoker_interrupt);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
+	void nsmpoker(machine_config &config);
 };
 
 
@@ -409,7 +410,7 @@ void nsmpoker_state::machine_reset()
 *    Machine Drivers     *
 *************************/
 
-static MACHINE_CONFIG_START( nsmpoker )
+MACHINE_CONFIG_START(nsmpoker_state::nsmpoker)
 
 	// CPU TMS9995, standard variant; no line connections
 	MCFG_TMS99xx_ADD("maincpu", TMS9995, MASTER_CLOCK/2, nsmpoker_map, nsmpoker_portmap)

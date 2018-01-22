@@ -66,6 +66,7 @@ public:
 	/* keyboard state */
 	int m_keylatch;         /* key latch */
 	int m_reset;            /* reset activated */
+	void tmc2000e(machine_config &config);
 };
 
 #endif

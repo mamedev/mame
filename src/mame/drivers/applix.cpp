@@ -143,6 +143,7 @@ public:
 	DECLARE_PALETTE_INIT(applix);
 	uint8_t m_palette_latch[4];
 	required_shared_ptr<uint16_t> m_base;
+	void applix(machine_config &config);
 private:
 	uint8_t m_pb;
 	uint8_t m_analog_latch;
@@ -833,7 +834,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(applix_state::cass_timer)
 	}
 }
 
-static MACHINE_CONFIG_START( applix )
+MACHINE_CONFIG_START(applix_state::applix)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_30MHz / 4) // MC68000-P10 @ 7.5 MHz
 	MCFG_CPU_PROGRAM_MAP(applix_mem)

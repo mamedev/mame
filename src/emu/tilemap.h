@@ -734,12 +734,12 @@ public:
 	memory_array &extmem() { return m_extmem; }
 
 	// write handlers
-	DECLARE_WRITE8_MEMBER(write);
-	DECLARE_WRITE16_MEMBER(write);
-	DECLARE_WRITE32_MEMBER(write);
-	DECLARE_WRITE8_MEMBER(write_ext);
-	DECLARE_WRITE16_MEMBER(write_ext);
-	DECLARE_WRITE32_MEMBER(write_ext);
+	DECLARE_WRITE8_MEMBER(write8);
+	DECLARE_WRITE16_MEMBER(write16);
+	DECLARE_WRITE32_MEMBER(write32);
+	DECLARE_WRITE8_MEMBER(write8_ext);
+	DECLARE_WRITE16_MEMBER(write16_ext);
+	DECLARE_WRITE32_MEMBER(write32_ext);
 
 	// optional memory accessors
 	u32 basemem_read(int index) { return m_basemem.read(index); }

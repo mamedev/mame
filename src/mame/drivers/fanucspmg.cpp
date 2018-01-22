@@ -636,6 +636,8 @@ public:
 	uint8_t m_vram[24576];
 	uint8_t m_video_ctrl;
 
+	void fanucspmgm(machine_config &config);
+	void fanucspmg(machine_config &config);
 private:
 	virtual void machine_reset() override;
 	int32_t m_vram_bank;
@@ -955,7 +957,7 @@ FLOPPY_FORMATS_MEMBER( fanucspmg_state::floppy_formats )
 	FLOPPY_IMD_FORMAT
 FLOPPY_FORMATS_END
 
-static MACHINE_CONFIG_START( fanucspmg )
+MACHINE_CONFIG_START(fanucspmg_state::fanucspmg)
 	/* basic machine hardware */
 	MCFG_CPU_ADD(MAINCPU_TAG, I8086, XTAL_15MHz/3)
 	MCFG_CPU_PROGRAM_MAP(maincpu_mem)
@@ -1021,7 +1023,7 @@ static MACHINE_CONFIG_START( fanucspmg )
 	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(fanucspmg_state, vsync_w))
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( fanucspmgm, fanucspmg )
+MACHINE_CONFIG_DERIVED(fanucspmg_state::fanucspmgm, fanucspmg)
 	MCFG_DEVICE_REMOVE( CRTC_TAG )
 
 	MCFG_MC6845_ADD( CRTC_TAG, HD6845, SCREEN_TAG, XTAL_8MHz/2)

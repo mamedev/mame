@@ -267,6 +267,7 @@ public:
 	uint32_t get_stream_bits(int bits);
 
 	int write_dest_byte(uint8_t usedata);
+	void gunpey(machine_config &config);
 	//uint16_t main_m_vram[0x800][0x800];
 };
 
@@ -1439,7 +1440,7 @@ GFXDECODE_END
 
 
 /***************************************************************************************/
-static MACHINE_CONFIG_START( gunpey )
+MACHINE_CONFIG_START(gunpey_state::gunpey)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", V30, 57242400 / 4)

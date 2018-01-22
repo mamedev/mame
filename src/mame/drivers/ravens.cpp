@@ -103,6 +103,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(cass_w);
 	DECLARE_QUICKLOAD_LOAD_MEMBER( ravens );
 
+	void ravens(machine_config &config);
+	void ravens2(machine_config &config);
 private:
 	uint8_t m_term_char;
 	uint8_t m_term_data;
@@ -325,7 +327,7 @@ QUICKLOAD_LOAD_MEMBER( ravens_state, ravens )
 	return result;
 }
 
-static MACHINE_CONFIG_START( ravens )
+MACHINE_CONFIG_START(ravens_state::ravens)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",S2650, XTAL_1MHz) // frequency is unknown
 	MCFG_CPU_PROGRAM_MAP(ravens_mem)
@@ -346,7 +348,7 @@ static MACHINE_CONFIG_START( ravens )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.05)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( ravens2 )
+MACHINE_CONFIG_START(ravens_state::ravens2)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",S2650, XTAL_1MHz) // frequency is unknown
 	MCFG_CPU_PROGRAM_MAP(ravens_mem)

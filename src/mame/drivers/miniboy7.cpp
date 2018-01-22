@@ -189,6 +189,7 @@ public:
 	MC6845_UPDATE_ROW(crtc_update_row);
 	DECLARE_PALETTE_INIT(miniboy7);
 
+	void miniboy7(machine_config &config);
 private:
 	uint8_t m_ay_pb;
 	int m_gpri;
@@ -501,7 +502,7 @@ GFXDECODE_END
 *         Machine Drivers          *
 ***********************************/
 
-static MACHINE_CONFIG_START( miniboy7 )
+MACHINE_CONFIG_START(miniboy7_state::miniboy7)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, MASTER_CLOCK / 16) /* guess */

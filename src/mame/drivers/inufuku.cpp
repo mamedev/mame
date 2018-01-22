@@ -126,7 +126,7 @@ static ADDRESS_MAP_START( inufuku_map, AS_PROGRAM, 16, inufuku_state )
 	AM_RANGE(0x200000, 0x200001) AM_WRITE_PORT("EEPROMOUT")
 	AM_RANGE(0x280000, 0x280001) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x00ff)   // sound command
 
-	AM_RANGE(0x300000, 0x301fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")                        // palette ram
+	AM_RANGE(0x300000, 0x301fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")                        // palette ram
 	AM_RANGE(0x380000, 0x3801ff) AM_WRITEONLY AM_SHARE("bg_rasterram")                                  // bg raster ram
 	AM_RANGE(0x400000, 0x401fff) AM_READWRITE(inufuku_bg_videoram_r, inufuku_bg_videoram_w) AM_SHARE("bg_videoram")     // bg ram
 	AM_RANGE(0x402000, 0x403fff) AM_READWRITE(inufuku_tx_videoram_r, inufuku_tx_videoram_w) AM_SHARE("tx_videoram")     // text ram
@@ -330,7 +330,7 @@ void inufuku_state::machine_reset()
 	m_tx_palettebank = 0;
 }
 
-static MACHINE_CONFIG_START( inufuku )
+MACHINE_CONFIG_START(inufuku_state::inufuku)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 32000000/2) /* 16.00 MHz */
@@ -381,7 +381,7 @@ static MACHINE_CONFIG_START( inufuku )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( _3on3dunk, inufuku )
+MACHINE_CONFIG_DERIVED(inufuku_state::_3on3dunk, inufuku)
 	MCFG_GFXDECODE_MODIFY("gfxdecode", _3on3dunk)
 MACHINE_CONFIG_END
 

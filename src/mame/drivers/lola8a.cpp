@@ -56,6 +56,7 @@ public:
 	DECLARE_READ8_MEMBER(keyboard_r);
 	MC6845_UPDATE_ROW(crtc_update_row);
 
+	void lola8a(machine_config &config);
 private:
 	uint8_t m_portb;
 	virtual void machine_reset() override { m_maincpu->set_pc(0x8000); }
@@ -257,7 +258,7 @@ WRITE_LINE_MEMBER(lola8a_state::crtc_vsync)
 	m_maincpu->set_input_line(I8085_RST75_LINE, state? ASSERT_LINE : CLEAR_LINE);
 }
 
-static MACHINE_CONFIG_START( lola8a )
+MACHINE_CONFIG_START(lola8a_state::lola8a)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8085A, XTAL_4_9152MHz)
 	MCFG_CPU_PROGRAM_MAP(lola8a_mem)

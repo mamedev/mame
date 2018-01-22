@@ -26,6 +26,8 @@
     so no attempt made to play new sound) probably bug in devices\sound\gaelco.cpp ??
 
 Known to exist but not dumped is a Maniac Square v1.0 with checksum 66B1
+  This version of Maniac Square runs on a REF. 960419/1 PCB, the same PCB
+  as the current sets of Snow Board runs on.
 
 ***************************************************************************/
 
@@ -176,7 +178,7 @@ static INPUT_PORTS_START( maniacsq )
 	PORT_BIT( 0xffc0, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( maniacsq )
+MACHINE_CONFIG_START(gaelco2_state::maniacsq)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_26MHz / 2)     /* 13 MHz? */
 	MCFG_CPU_PROGRAM_MAP(maniacsq_map)
@@ -209,7 +211,7 @@ static MACHINE_CONFIG_START( maniacsq )
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( maniacsq_d5002fp, maniacsq )
+MACHINE_CONFIG_DERIVED(gaelco2_state::maniacsq_d5002fp, maniacsq)
 	MCFG_DEVICE_ADD("gaelco_ds5002fp", GAELCO_DS5002FP, XTAL_24MHz / 2) /* ? */
 	MCFG_DEVICE_ADDRESS_MAP(0, mcu_hostmem_map)
 MACHINE_CONFIG_END
@@ -443,7 +445,7 @@ ROM_START( play2000a )
 	ROM_LOAD( "palce16v8h.u29",  0x0000, 0x0117, BAD_DUMP CRC(4a0a6f39) SHA1(57351e471649391c9abf110828fe2f128fe84eee) )
 ROM_END
 
-static MACHINE_CONFIG_START( play2000 )
+MACHINE_CONFIG_START(gaelco2_state::play2000)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_11_0592MHz)     /* or from the 34MHz? (34MHz drives the CG-1V-149 PLD?) */
 	MCFG_CPU_PROGRAM_MAP(play2000_map)
@@ -540,7 +542,7 @@ static INPUT_PORTS_START( bang )
 	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR(Y, 1.0, -6.0 / 240, 0) PORT_SENSITIVITY(35) PORT_KEYDELTA(15) PORT_PLAYER(2)
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( bang )
+MACHINE_CONFIG_START(bang_state::bang)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_30MHz / 2) /* 15 MHz */
 	MCFG_CPU_PROGRAM_MAP(bang_map)
@@ -787,7 +789,7 @@ static INPUT_PORTS_START( alighunt )
 	PORT_BIT( 0xffc0, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( alighunt )
+MACHINE_CONFIG_START(gaelco2_state::alighunt)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz / 2)         /* 12 MHz */
 	MCFG_CPU_PROGRAM_MAP(alighunt_map)
@@ -820,7 +822,7 @@ static MACHINE_CONFIG_START( alighunt )
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( alighunt_d5002fp, alighunt )
+MACHINE_CONFIG_DERIVED(gaelco2_state::alighunt_d5002fp, alighunt)
 	MCFG_DEVICE_ADD("gaelco_ds5002fp", GAELCO_DS5002FP, XTAL_24MHz / 2) /* 12 MHz */
 	MCFG_DEVICE_ADDRESS_MAP(0, mcu_hostmem_map)
 MACHINE_CONFIG_END
@@ -1084,7 +1086,7 @@ static INPUT_PORTS_START( touchgo )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE4 ) PORT_TOGGLE
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( touchgo )
+MACHINE_CONFIG_START(gaelco2_state::touchgo)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_32MHz / 2)         /* 16 MHz */
 	MCFG_CPU_PROGRAM_MAP(touchgo_map)
@@ -1133,7 +1135,7 @@ static MACHINE_CONFIG_START( touchgo )
 	MCFG_SOUND_ROUTE(1, "lspeaker", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( touchgo_d5002fp, touchgo )
+MACHINE_CONFIG_DERIVED(gaelco2_state::touchgo_d5002fp, touchgo)
 	MCFG_DEVICE_ADD("gaelco_ds5002fp", GAELCO_DS5002FP, XTAL_40MHz / 4) /* 10MHz? - Not verified */
 	MCFG_DEVICE_ADDRESS_MAP(0, mcu_hostmem_map)
 MACHINE_CONFIG_END
@@ -1330,7 +1332,7 @@ static INPUT_PORTS_START( snowboar )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SPECIAL )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( snowboar )
+MACHINE_CONFIG_START(gaelco2_state::snowboar)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_30MHz / 2)         /* 15 MHz */
 	MCFG_CPU_PROGRAM_MAP(snowboar_map)
@@ -1573,7 +1575,7 @@ static INPUT_PORTS_START( wrally2 )
 	PORT_BIT( 0xff, 0x8A, IPT_PADDLE_V ) PORT_MINMAX(0x00,0xff) PORT_SENSITIVITY(25) PORT_KEYDELTA(25) PORT_REVERSE PORT_NAME("P2 Wheel")
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( wrally2 )
+MACHINE_CONFIG_START(wrally2_state::wrally2)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_26MHz / 2) /* 13 MHz */
 	MCFG_CPU_PROGRAM_MAP(wrally2_map)
@@ -1742,22 +1744,22 @@ ROM_START( wrally2 )
 	   A little less obvious is why the older dump had the following startup code, which appears to have been partially
 	   patched out
 
-	    0200: mov   sp,#$70
-	    0203: mov   a,pcon
-	    0205: anl   a,#$20
-	    0207: jnz   $0203
-	    0209: nop
-	    020A: nop
-	    020B: nop
-	    020C: mov   dptr,#$FC01
+	    0200: mov   sp,#$70
+	    0203: mov   a,pcon
+	    0205: anl   a,#$20
+	    0207: jnz   $0203
+	    0209: nop
+	    020A: nop
+	    020B: nop
+	    020C: mov   dptr,#$FC01
 
 	   while the newer dump has this
 
-	    0200: mov   sp,#$70
-	    0203: mov   mcon,#$68
-	    0206: mov   i2cfg,#$00
-	    0209: mov   crcr,#$80
-	    020C: mov   dptr,#$FC01
+	    0200: mov   sp,#$70
+	    0203: mov   mcon,#$68
+	    0206: mov   i2cfg,#$00
+	    0209: mov   crcr,#$80
+	    020C: mov   dptr,#$FC01
 
 	   either way the 2nd dump is in much better state, so we're using that.
 	*/

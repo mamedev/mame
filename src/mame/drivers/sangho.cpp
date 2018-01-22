@@ -100,6 +100,8 @@ public:
 	void sexyboom_map_bank(int bank);
 	DECLARE_READ8_MEMBER(sec_slot_r);
 	DECLARE_WRITE8_MEMBER(sec_slot_w);
+	void pzlestar(machine_config &config);
+	void sexyboom(machine_config &config);
 };
 
 /*
@@ -452,7 +454,7 @@ MACHINE_RESET_MEMBER(sangho_state,sexyboom)
 }
 
 
-static MACHINE_CONFIG_START( pzlestar )
+MACHINE_CONFIG_START(sangho_state::pzlestar)
 
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_21_4772MHz/6) // ?
 	MCFG_CPU_PROGRAM_MAP(sangho_map)
@@ -471,7 +473,7 @@ static MACHINE_CONFIG_START( pzlestar )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( sexyboom )
+MACHINE_CONFIG_START(sangho_state::sexyboom)
 
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_21_4772MHz/6)
 	MCFG_CPU_PROGRAM_MAP(sangho_map)

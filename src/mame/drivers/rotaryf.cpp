@@ -57,6 +57,7 @@ public:
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(rotaryf_interrupt);
+	void rotaryf(machine_config &config);
 };
 
 
@@ -256,7 +257,7 @@ static INPUT_PORTS_START( rotaryf )
 INPUT_PORTS_END
 
 
-static MACHINE_CONFIG_START( rotaryf )
+MACHINE_CONFIG_START(rotaryf_state::rotaryf)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",I8085A,4000000) /* ?? MHz */

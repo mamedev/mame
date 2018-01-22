@@ -50,7 +50,7 @@ static ADDRESS_MAP_START( crospang_base_map, AS_PROGRAM, 16, crospang_state )
 
 	AM_RANGE(0x120000, 0x1207ff) AM_RAM_WRITE(crospang_fg_videoram_w) AM_SHARE("fg_videoram")
 	AM_RANGE(0x122000, 0x1227ff) AM_RAM_WRITE(crospang_bg_videoram_w) AM_SHARE("bg_videoram")
-	AM_RANGE(0x200000, 0x2005ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x200000, 0x2005ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x210000, 0x2107ff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x270000, 0x270001) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x00ff)
 	AM_RANGE(0x270004, 0x270007) AM_WRITENOP // ??
@@ -336,7 +336,7 @@ void crospang_state::machine_reset()
 }
 
 
-static MACHINE_CONFIG_START( crospang )
+MACHINE_CONFIG_START(crospang_state::crospang)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 14318180)
@@ -382,7 +382,7 @@ static MACHINE_CONFIG_START( crospang )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( bestri, crospang )
+MACHINE_CONFIG_DERIVED(crospang_state::bestri, crospang)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -390,7 +390,7 @@ static MACHINE_CONFIG_DERIVED( bestri, crospang )
 
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( bestria, crospang )
+MACHINE_CONFIG_DERIVED(crospang_state::bestria, crospang)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")

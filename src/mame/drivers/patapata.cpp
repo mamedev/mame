@@ -48,6 +48,7 @@ public:
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
+	void patapata(machine_config &config);
 protected:
 	virtual void video_start() override;
 
@@ -188,7 +189,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, patapata_state )
 	AM_RANGE(0x10000a, 0x10000b) AM_READ_PORT("DSW2")
 	AM_RANGE(0x100014, 0x100015) AM_WRITE8(flipscreen_w, 0x00ff)
 	AM_RANGE(0x110000, 0x1103ff) AM_RAM AM_SHARE("videoregs")
-	AM_RANGE(0x120000, 0x1205ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x120000, 0x1205ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x130000, 0x13ffff) AM_RAM_WRITE(fg_videoram_w) AM_SHARE("fg_videoram")
 	AM_RANGE(0x140000, 0x14ffff) AM_RAM_WRITE(bg_videoram_w) AM_SHARE("bg_videoram")
 	AM_RANGE(0x150000, 0x150001) AM_DEVREADWRITE8("oki1", okim6295_device, read, write, 0x00ff)
@@ -280,7 +281,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(patapata_state::scanline)
 	if (param==128) m_maincpu->set_input_line(1, HOLD_LINE);
 }
 
-static MACHINE_CONFIG_START( patapata )
+MACHINE_CONFIG_START(patapata_state::patapata)
 
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz) // 16 MHz XTAL, 16 MHz CPU
 	MCFG_CPU_PROGRAM_MAP(main_map)

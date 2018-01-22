@@ -2219,53 +2219,17 @@ WRITE8_MEMBER(vga_device::mem_linear_w)
 	vga.memory[offset % vga.svga_intf.vram_size] = data;
 }
 
-MACHINE_CONFIG_START( pcvideo_vga )
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL_25_1748MHz,900,0,640,526,0,480)
-	MCFG_SCREEN_UPDATE_DEVICE("vga", vga_device, screen_update)
-
-	MCFG_PALETTE_ADD("palette", 0x100)
-	MCFG_DEVICE_ADD("vga", VGA, 0)
-MACHINE_CONFIG_END
-
-MACHINE_CONFIG_START( pcvideo_trident_vga )
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL_25_1748MHz,900,0,640,526,0,480)
-	MCFG_SCREEN_UPDATE_DEVICE("vga", trident_vga_device, screen_update)
-
-	MCFG_PALETTE_ADD("palette", 0x100)
-	MCFG_DEVICE_ADD("vga", TRIDENT_VGA, 0)
-MACHINE_CONFIG_END
-
-MACHINE_CONFIG_START( pcvideo_gamtor_vga )
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL_25_1748MHz,900,0,640,526,0,480)
-	MCFG_SCREEN_UPDATE_DEVICE("vga", gamtor_vga_device, screen_update)
-
-	MCFG_PALETTE_ADD("palette", 0x100)
-	MCFG_DEVICE_ADD("vga", GAMTOR_VGA, 0)
-MACHINE_CONFIG_END
-
-MACHINE_CONFIG_START( pcvideo_s3_vga )
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL_25_1748MHz,900,0,640,526,0,480)
-	MCFG_SCREEN_UPDATE_DEVICE("vga", s3_vga_device, screen_update)
-
-	MCFG_PALETTE_ADD("palette", 0x100)
-	MCFG_DEVICE_ADD("vga", S3_VGA, 0)
-MACHINE_CONFIG_END
-
 
 //-------------------------------------------------
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( ati_vga_device::device_add_mconfig )
+MACHINE_CONFIG_START(ati_vga_device::device_add_mconfig)
 	MCFG_MACH8_ADD_OWNER("8514a")
 	MCFG_EEPROM_SERIAL_93C46_ADD("ati_eeprom")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_MEMBER( s3_vga_device::device_add_mconfig )
+MACHINE_CONFIG_START(s3_vga_device::device_add_mconfig)
 	MCFG_8514A_ADD_OWNER("8514a")
 MACHINE_CONFIG_END
 

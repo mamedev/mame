@@ -127,4 +127,8 @@ public:
 	void drgnbowl_draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void descramble_drgnbowl(int descramble_cpu);
 	void descramble_mastninj_gfx(uint8_t* src);
+	void raiga(machine_config &config);
+	void drgnbowl(machine_config &config);
+	void mastninj(machine_config &config);
+	void shadoww(machine_config &config);
 };

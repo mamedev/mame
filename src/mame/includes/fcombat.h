@@ -75,4 +75,5 @@ public:
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(fcombat);
 	uint32_t screen_update_fcombat(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void fcombat(machine_config &config);
 };

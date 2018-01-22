@@ -186,7 +186,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(btime_state::audio_nmi_gen)
 
 static ADDRESS_MAP_START( btime_map, AS_PROGRAM, 8, btime_state )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_SHARE("rambase")
-	AM_RANGE(0x0c00, 0x0c0f) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x0c00, 0x0c0f) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
 	AM_RANGE(0x1000, 0x13ff) AM_RAM AM_SHARE("videoram")
 	AM_RANGE(0x1400, 0x17ff) AM_RAM AM_SHARE("colorram")
 	AM_RANGE(0x1800, 0x1bff) AM_READWRITE(btime_mirrorvideoram_r, btime_mirrorvideoram_w)
@@ -221,7 +221,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( tisland_map, AS_PROGRAM, 8, btime_state )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_SHARE("rambase")
-	AM_RANGE(0x0c00, 0x0c0f) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x0c00, 0x0c0f) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
 	AM_RANGE(0x1000, 0x13ff) AM_RAM AM_SHARE("videoram")
 	AM_RANGE(0x1400, 0x17ff) AM_RAM AM_SHARE("colorram")
 	AM_RANGE(0x1800, 0x1bff) AM_READWRITE(btime_mirrorvideoram_r, btime_mirrorvideoram_w)
@@ -298,7 +298,7 @@ static ADDRESS_MAP_START( bnj_map, AS_PROGRAM, 8, btime_state )
 	AM_RANGE(0x5200, 0x53ff) AM_RAM
 	AM_RANGE(0x5400, 0x5400) AM_WRITE(bnj_scroll1_w)
 	AM_RANGE(0x5800, 0x5800) AM_WRITE(bnj_scroll2_w)
-	AM_RANGE(0x5c00, 0x5c0f) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x5c00, 0x5c0f) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
 	AM_RANGE(0xa000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -1267,7 +1267,7 @@ MACHINE_RESET_MEMBER(btime_state,mmonkey)
 	m_protection_ret = 0;
 }
 
-static MACHINE_CONFIG_START( btime )
+MACHINE_CONFIG_START(btime_state::btime)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", DECO_CPU7, HCLK2)   /* seletable between H2/H4 via jumper */
@@ -1322,7 +1322,7 @@ static MACHINE_CONFIG_START( btime )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( cookrace, btime )
+MACHINE_CONFIG_DERIVED(btime_state::cookrace, btime)
 
 	/* basic machine hardware */
 	MCFG_CPU_REPLACE("maincpu", DECO_C10707, HCLK2)
@@ -1339,7 +1339,7 @@ static MACHINE_CONFIG_DERIVED( cookrace, btime )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( lnc, btime )
+MACHINE_CONFIG_DERIVED(btime_state::lnc, btime)
 
 	/* basic machine hardware */
 	MCFG_CPU_REPLACE("maincpu", DECO_C10707, HCLK2)
@@ -1359,7 +1359,7 @@ static MACHINE_CONFIG_DERIVED( lnc, btime )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( wtennis, lnc )
+MACHINE_CONFIG_DERIVED(btime_state::wtennis, lnc)
 
 	/* basic machine hardware */
 
@@ -1369,7 +1369,7 @@ static MACHINE_CONFIG_DERIVED( wtennis, lnc )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( mmonkey, wtennis )
+MACHINE_CONFIG_DERIVED(btime_state::mmonkey, wtennis)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1379,7 +1379,7 @@ static MACHINE_CONFIG_DERIVED( mmonkey, wtennis )
 	MCFG_MACHINE_RESET_OVERRIDE(btime_state,mmonkey)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( bnj, btime )
+MACHINE_CONFIG_DERIVED(btime_state::bnj, btime)
 
 	/* basic machine hardware */
 	MCFG_CPU_REPLACE("maincpu", DECO_C10707, HCLK4)
@@ -1397,7 +1397,7 @@ static MACHINE_CONFIG_DERIVED( bnj, btime )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( sdtennis, bnj )
+MACHINE_CONFIG_DERIVED(btime_state::sdtennis, bnj)
 
 	/* basic machine hardware */
 	MCFG_CPU_REPLACE("audiocpu", DECO_C10707, HCLK1/3/2)
@@ -1405,7 +1405,7 @@ static MACHINE_CONFIG_DERIVED( sdtennis, bnj )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( zoar, btime )
+MACHINE_CONFIG_DERIVED(btime_state::zoar, btime)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1433,7 +1433,7 @@ static MACHINE_CONFIG_DERIVED( zoar, btime )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( disco, btime )
+MACHINE_CONFIG_DERIVED(btime_state::disco, btime)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1459,7 +1459,7 @@ static MACHINE_CONFIG_DERIVED( disco, btime )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( tisland, btime )
+MACHINE_CONFIG_DERIVED(btime_state::tisland, btime)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")

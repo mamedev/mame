@@ -66,4 +66,6 @@ public:
 	DECLARE_PALETTE_INIT(cop01);
 	uint32_t screen_update_cop01(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
+	void mightguy(machine_config &config);
+	void cop01(machine_config &config);
 };

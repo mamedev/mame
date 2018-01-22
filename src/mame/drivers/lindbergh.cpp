@@ -375,6 +375,7 @@ public:
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
+	void lindbergh(machine_config &config);
 };
 
 lindbergh_state::lindbergh_state(const machine_config &mconfig, device_type type, const char *tag) : driver_device(mconfig, type, tag)
@@ -389,7 +390,7 @@ void lindbergh_state::machine_reset()
 {
 }
 
-static MACHINE_CONFIG_START(lindbergh)
+MACHINE_CONFIG_START(lindbergh_state::lindbergh)
 	MCFG_CPU_ADD("maincpu", PENTIUM4, 28000000U*5) /* Actually Celeron D at 2,8 GHz */
 
 	MCFG_PCI_ROOT_ADD(                ":pci")

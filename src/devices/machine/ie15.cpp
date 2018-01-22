@@ -564,7 +564,7 @@ static GFXDECODE_START( ie15 )
 	GFXDECODE_ENTRY("chargen", 0x0000, ie15_charlayout, 0, 1)
 GFXDECODE_END
 
-static MACHINE_CONFIG_START( ie15core )
+MACHINE_CONFIG_START(ie15_device::ie15core)
 	/* Basic machine hardware */
 	MCFG_CPU_ADD("maincpu", IE15_CPU, XTAL_30_8MHz/10)
 	MCFG_CPU_PROGRAM_MAP(ie15_mem)
@@ -599,7 +599,7 @@ ROM_START( ie15 )
 	ROM_LOAD("chargen-15ie.bin", 0x0000, 0x0800, CRC(ed16bf6b) SHA1(6af9fb75f5375943d5c0ce9ed408e0fb4621b17e))
 ROM_END
 
-MACHINE_CONFIG_MEMBER( ie15_device::device_add_mconfig )
+MACHINE_CONFIG_START(ie15_device::device_add_mconfig)
 	MCFG_FRAGMENT_ADD(ie15core)
 
 	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green())

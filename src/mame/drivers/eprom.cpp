@@ -150,7 +150,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, eprom_state )
 	AM_RANGE(0x0e0000, 0x0e0fff) AM_DEVREADWRITE8("eeprom", eeprom_parallel_28xx_device, read, write, 0x00ff)
 	AM_RANGE(0x16cc00, 0x16cc01) AM_READWRITE(sync_r, sync_w<true>)
 	AM_RANGE(0x160000, 0x16ffff) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0x1f0000, 0x1fffff) AM_DEVWRITE("eeprom", eeprom_parallel_28xx_device, unlock_write)
+	AM_RANGE(0x1f0000, 0x1fffff) AM_DEVWRITE("eeprom", eeprom_parallel_28xx_device, unlock_write16)
 	AM_RANGE(0x260000, 0x26000f) AM_READ_PORT("260000")
 	AM_RANGE(0x260010, 0x26001f) AM_READ(special_port1_r)
 	AM_RANGE(0x260020, 0x26002f) AM_READ(adc_r)
@@ -161,11 +161,11 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, eprom_state )
 	AM_RANGE(0x360020, 0x360021) AM_DEVWRITE("jsa", atari_jsa_base_device, sound_reset_w)
 	AM_RANGE(0x360030, 0x360031) AM_DEVWRITE8("jsa", atari_jsa_base_device, main_command_w, 0x00ff)
 	AM_RANGE(0x3e0000, 0x3e0fff) AM_RAM AM_SHARE("paletteram")
-	AM_RANGE(0x3f0000, 0x3f1fff) AM_DEVWRITE("playfield", tilemap_device, write) AM_SHARE("playfield")
+	AM_RANGE(0x3f0000, 0x3f1fff) AM_DEVWRITE("playfield", tilemap_device, write16) AM_SHARE("playfield")
 	AM_RANGE(0x3f2000, 0x3f3fff) AM_RAM AM_SHARE("mob")
-	AM_RANGE(0x3f4000, 0x3f4f7f) AM_DEVWRITE("alpha", tilemap_device, write) AM_SHARE("alpha")
+	AM_RANGE(0x3f4000, 0x3f4f7f) AM_DEVWRITE("alpha", tilemap_device, write16) AM_SHARE("alpha")
 	AM_RANGE(0x3f4f80, 0x3f4fff) AM_RAM AM_SHARE("mob:slip")
-	AM_RANGE(0x3f8000, 0x3f9fff) AM_DEVWRITE("playfield", tilemap_device, write_ext) AM_SHARE("playfield_ext")
+	AM_RANGE(0x3f8000, 0x3f9fff) AM_DEVWRITE("playfield", tilemap_device, write16_ext) AM_SHARE("playfield_ext")
 	AM_RANGE(0x3f0000, 0x3f9fff) AM_RAM
 ADDRESS_MAP_END
 
@@ -175,7 +175,7 @@ static ADDRESS_MAP_START( guts_map, AS_PROGRAM, 16, eprom_state )
 	AM_RANGE(0x0e0000, 0x0e0fff) AM_DEVREADWRITE8("eeprom", eeprom_parallel_28xx_device, read, write, 0x00ff)
 	AM_RANGE(0x16cc00, 0x16cc01) AM_READWRITE(sync_r, sync_w<true>)
 	AM_RANGE(0x160000, 0x16ffff) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0x1f0000, 0x1fffff) AM_DEVWRITE("eeprom", eeprom_parallel_28xx_device, unlock_write)
+	AM_RANGE(0x1f0000, 0x1fffff) AM_DEVWRITE("eeprom", eeprom_parallel_28xx_device, unlock_write16)
 	AM_RANGE(0x260000, 0x26000f) AM_READ_PORT("260000")
 	AM_RANGE(0x260010, 0x26001f) AM_READ(special_port1_r)
 	AM_RANGE(0x260020, 0x26002f) AM_READ(adc_r)
@@ -186,10 +186,10 @@ static ADDRESS_MAP_START( guts_map, AS_PROGRAM, 16, eprom_state )
 	AM_RANGE(0x360020, 0x360021) AM_DEVWRITE("jsa", atari_jsa_ii_device, sound_reset_w)
 	AM_RANGE(0x360030, 0x360031) AM_DEVWRITE8("jsa", atari_jsa_ii_device, main_command_w, 0x00ff)
 	AM_RANGE(0x3e0000, 0x3e0fff) AM_RAM AM_SHARE("paletteram")
-	AM_RANGE(0xff0000, 0xff1fff) AM_DEVWRITE("playfield", tilemap_device, write_ext) AM_SHARE("playfield_ext")
-	AM_RANGE(0xff8000, 0xff9fff) AM_DEVWRITE("playfield", tilemap_device, write) AM_SHARE("playfield")
+	AM_RANGE(0xff0000, 0xff1fff) AM_DEVWRITE("playfield", tilemap_device, write16_ext) AM_SHARE("playfield_ext")
+	AM_RANGE(0xff8000, 0xff9fff) AM_DEVWRITE("playfield", tilemap_device, write16) AM_SHARE("playfield")
 	AM_RANGE(0xffa000, 0xffbfff) AM_RAM AM_SHARE("mob")
-	AM_RANGE(0xffc000, 0xffcf7f) AM_DEVWRITE("alpha", tilemap_device, write) AM_SHARE("alpha")
+	AM_RANGE(0xffc000, 0xffcf7f) AM_DEVWRITE("alpha", tilemap_device, write16) AM_SHARE("alpha")
 	AM_RANGE(0xffcf80, 0xffcfff) AM_RAM AM_SHARE("mob:slip")
 	AM_RANGE(0xff0000, 0xff1fff) AM_RAM
 	AM_RANGE(0xff8000, 0xffffff) AM_RAM
@@ -386,7 +386,7 @@ GFXDECODE_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( eprom )
+MACHINE_CONFIG_START(eprom_state::eprom)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, ATARI_CLOCK_14MHz/2)
@@ -435,7 +435,7 @@ static MACHINE_CONFIG_START( eprom )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( klaxp )
+MACHINE_CONFIG_START(eprom_state::klaxp)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, ATARI_CLOCK_14MHz/2)
@@ -480,7 +480,7 @@ static MACHINE_CONFIG_START( klaxp )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( guts )
+MACHINE_CONFIG_START(eprom_state::guts)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, ATARI_CLOCK_14MHz/2)

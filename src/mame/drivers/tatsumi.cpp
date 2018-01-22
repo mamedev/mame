@@ -205,7 +205,7 @@ WRITE16_MEMBER(cyclwarr_state::cyclwarr_sound_w)
 static ADDRESS_MAP_START( apache3_v30_map, AS_PROGRAM, 16, apache3_state )
 	AM_RANGE(0x00000, 0x03fff) AM_RAM
 	AM_RANGE(0x04000, 0x07fff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x08000, 0x08fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x08000, 0x08fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x0c000, 0x0dfff) AM_RAM_WRITE(text_w) AM_SHARE("videoram")
 	AM_RANGE(0x0e800, 0x0e803) AM_WRITENOP // CRT
 	AM_RANGE(0x0f000, 0x0f001) AM_READ_PORT("DSW")
@@ -254,7 +254,7 @@ static ADDRESS_MAP_START( roundup5_v30_map, AS_PROGRAM, 16, roundup5_state )
 	AM_RANGE(0x0d800, 0x0d801) AM_WRITEONLY AM_SHARE("ru5_unknown1") // VRAM2 X scroll (todo)
 	AM_RANGE(0x0dc00, 0x0dc01) AM_WRITEONLY AM_SHARE("ru5_unknown2") // VRAM2 Y scroll (todo)
 	AM_RANGE(0x0e000, 0x0e001) AM_WRITE(roundup5_control_w)
-	AM_RANGE(0x0f000, 0x0ffff) AM_DEVREADWRITE8("palette", palette_device, read, write, 0x00ff) AM_SHARE("palette")
+	AM_RANGE(0x0f000, 0x0ffff) AM_DEVREADWRITE8("palette", palette_device, read8, write8, 0x00ff) AM_SHARE("palette")
 	AM_RANGE(0x10000, 0x1ffff) AM_READWRITE(roundup_v30_z80_r, roundup_v30_z80_w)
 	AM_RANGE(0x20000, 0x2ffff) AM_READWRITE(tatsumi_v30_68000_r, tatsumi_v30_68000_w)
 	AM_RANGE(0x30000, 0x3ffff) AM_READWRITE(roundup5_vram_r, roundup5_vram_w)
@@ -300,7 +300,7 @@ static ADDRESS_MAP_START( cyclwarr_68000a_map, AS_PROGRAM, 16, cyclwarr_state )
 	AM_RANGE(0x0ba000, 0x0ba00f) AM_DEVREAD8("io2", cxd1095_device, read, 0x00ff) AM_WRITE(io2_byte_smear_w)
 	AM_RANGE(0x0c0000, 0x0c3fff) AM_READWRITE(cyclwarr_sprite_r, cyclwarr_sprite_w) AM_SHARE("spriteram")
 	AM_RANGE(0x0ca000, 0x0ca1ff) AM_WRITE(tatsumi_sprite_control_w) AM_SHARE("sprite_ctlram")
-	AM_RANGE(0x0d0000, 0x0d3fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x0d0000, 0x0d3fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x140000, 0x1bffff) AM_ROMBANK("bank2") /* CPU B ROM */
 	AM_RANGE(0x2c0000, 0x33ffff) AM_ROMBANK("bank1") /* CPU A ROM */
 ADDRESS_MAP_END
@@ -319,7 +319,7 @@ static ADDRESS_MAP_START( cyclwarr_68000b_map, AS_PROGRAM, 16, cyclwarr_state )
 	AM_RANGE(0x0ba000, 0x0ba00f) AM_DEVREAD8("io2", cxd1095_device, read, 0x00ff) AM_WRITE(io2_byte_smear_w)
 	AM_RANGE(0x0c0000, 0x0c3fff) AM_READWRITE(cyclwarr_sprite_r, cyclwarr_sprite_w)
 	AM_RANGE(0x0ca000, 0x0ca1ff) AM_WRITE(tatsumi_sprite_control_w)
-	AM_RANGE(0x0d0000, 0x0d3fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x0d0000, 0x0d3fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x140000, 0x1bffff) AM_ROMBANK("bank2") /* CPU B ROM */
 	AM_RANGE(0x2c0000, 0x33ffff) AM_ROMBANK("bank1") /* CPU A ROM */
 ADDRESS_MAP_END
@@ -353,7 +353,7 @@ static ADDRESS_MAP_START( bigfight_68000a_map, AS_PROGRAM, 16, cyclwarr_state )
 	AM_RANGE(0x0ba000, 0x0ba00f) AM_DEVREAD8("io2", cxd1095_device, read, 0x00ff) AM_WRITE(io2_byte_smear_w)
 	AM_RANGE(0x0c0000, 0x0c3fff) AM_READWRITE(cyclwarr_sprite_r, cyclwarr_sprite_w) AM_SHARE("spriteram")
 	AM_RANGE(0x0ca000, 0x0ca1ff) AM_WRITE(tatsumi_sprite_control_w) AM_SHARE("sprite_ctlram")
-	AM_RANGE(0x0d0000, 0x0d3fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x0d0000, 0x0d3fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x100000, 0x17ffff) AM_ROMBANK("bank2") /* CPU A ROM */
 	AM_RANGE(0x200000, 0x27ffff) AM_ROMBANK("bank1") /* CPU B ROM */
 ADDRESS_MAP_END
@@ -370,7 +370,7 @@ static ADDRESS_MAP_START( bigfight_68000b_map, AS_PROGRAM, 16, cyclwarr_state )
 	AM_RANGE(0x0ba000, 0x0ba00f) AM_DEVREAD8("io2", cxd1095_device, read, 0x00ff) AM_WRITE(io2_byte_smear_w)
 	AM_RANGE(0x0c0000, 0x0c3fff) AM_READWRITE(cyclwarr_sprite_r, cyclwarr_sprite_w)
 	AM_RANGE(0x0ca000, 0x0ca1ff) AM_WRITE(tatsumi_sprite_control_w)
-	AM_RANGE(0x0d0000, 0x0d3fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x0d0000, 0x0d3fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x100000, 0x17ffff) AM_ROMBANK("bank2") /* CPU A ROM */
 	AM_RANGE(0x200000, 0x27ffff) AM_ROMBANK("bank1") /* CPU B ROM */
 ADDRESS_MAP_END
@@ -842,7 +842,7 @@ MACHINE_RESET_MEMBER(apache3_state,apache3)
 }
 
 
-static MACHINE_CONFIG_START( apache3 )
+MACHINE_CONFIG_START(apache3_state::apache3)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", V30, CLOCK_1 / 2)
@@ -898,7 +898,7 @@ static MACHINE_CONFIG_START( apache3 )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.75)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( roundup5 )
+MACHINE_CONFIG_START(roundup5_state::roundup5)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", V30, CLOCK_1 / 2)
@@ -946,7 +946,7 @@ static MACHINE_CONFIG_START( roundup5 )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.75)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( cyclwarr )
+MACHINE_CONFIG_START(cyclwarr_state::cyclwarr)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, CLOCK_2 / 4)
@@ -1004,7 +1004,7 @@ static MACHINE_CONFIG_START( cyclwarr )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.75)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( bigfight )
+MACHINE_CONFIG_START(cyclwarr_state::bigfight)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, CLOCK_2 / 4)

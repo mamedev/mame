@@ -120,6 +120,7 @@ public:
 	virtual uint8_t joy_read() override;
 	virtual void machine_reset() override;
 	required_device<discrete_device> m_discrete;
+	void uapce(machine_config &config);
 };
 
 #define UAPCE_SOUND_EN  NODE_10
@@ -298,7 +299,7 @@ static ADDRESS_MAP_START( pce_io , AS_IO, 8, uapce_state )
 ADDRESS_MAP_END
 
 
-static MACHINE_CONFIG_START( uapce )
+MACHINE_CONFIG_START(uapce_state::uapce)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", H6280, PCE_MAIN_CLOCK/3)
 	MCFG_CPU_PROGRAM_MAP(pce_mem)

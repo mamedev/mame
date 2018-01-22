@@ -61,6 +61,8 @@ public:
 
 	DECLARE_READ8_MEMBER(ff_r);
 
+	void horizon(machine_config &config);
+	void horizon2mhz(machine_config &config);
 private:
 	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
@@ -170,7 +172,7 @@ SLOT_INTERFACE_END
 //  MACHINE_CONFIG( horizon )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( horizon )
+MACHINE_CONFIG_START(horizon_state::horizon)
 	// basic machine hardware
 	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL_8MHz / 2)
 	MCFG_CPU_PROGRAM_MAP(horizon_mem)
@@ -216,7 +218,7 @@ static MACHINE_CONFIG_START( horizon )
 	MCFG_SOFTWARE_LIST_ADD("flop_list", "horizon")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( horizon2mhz, horizon )
+MACHINE_CONFIG_DERIVED(horizon_state::horizon2mhz, horizon)
 	MCFG_CPU_MODIFY("z80")
 	MCFG_CPU_CLOCK(XTAL_4MHz / 2)
 

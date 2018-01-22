@@ -54,6 +54,7 @@ public:
 	DECLARE_READ8_MEMBER(io_read_byte);
 	DECLARE_WRITE8_MEMBER(io_write_byte);
 	void kbd_put(u8 data);
+	void ts802(machine_config &config);
 private:
 	uint8_t m_term_data;
 	address_space *m_mem;
@@ -179,7 +180,7 @@ DRIVER_INIT_MEMBER( ts802_state, ts802 )
 	membank("bankw0")->configure_entry(0, &main[0x0000]);
 }
 
-static MACHINE_CONFIG_START( ts802 )
+MACHINE_CONFIG_START(ts802_state::ts802)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_16MHz / 4)
 	MCFG_CPU_PROGRAM_MAP(ts802_mem)

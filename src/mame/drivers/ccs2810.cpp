@@ -103,6 +103,8 @@ public:
 	DECLARE_WRITE8_MEMBER(port34_w);
 	DECLARE_WRITE8_MEMBER(port40_w);
 
+	void ccs2810(machine_config &config);
+	void ccs2422(machine_config &config);
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<ram_device> m_ram;
@@ -894,7 +896,7 @@ SLOT_INTERFACE_END
 
 	//SLOT_INTERFACE( "525dd", FLOPPY_525_DD )
 
-static MACHINE_CONFIG_START( ccs2810 )
+MACHINE_CONFIG_START(ccs_state::ccs2810)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_16MHz / 4)
 	MCFG_CPU_PROGRAM_MAP(ccs2810_mem)
@@ -918,7 +920,7 @@ static MACHINE_CONFIG_START( ccs2810 )
 	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("ins8250", ins8250_device, cts_w))
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( ccs2422 )
+MACHINE_CONFIG_START(ccs_state::ccs2422)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_16MHz / 4)
 	MCFG_CPU_PROGRAM_MAP(ccs2810_mem)

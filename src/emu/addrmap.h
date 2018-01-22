@@ -120,6 +120,71 @@ public:
 	// submap referencing
 	address_map_entry &set_submap(const char *tag, address_map_delegate func, int bits, u64 mask);
 
+	// device tag -> delegate converter
+	template<typename _device> address_map_entry &r(const char *tag, uint8_t (_device::*read)(address_space &, offs_t, uint8_t), const char *read_name, uint64_t mask = 0) {
+		return r(read8_delegate(read, read_name, tag, (_device *)nullptr),
+				 mask);
+	}
+
+	template<typename _device> address_map_entry &r(const char *tag, uint16_t (_device::*read)(address_space &, offs_t, uint16_t), const char *read_name, uint64_t mask = 0) {
+		return r(read16_delegate(read, read_name, tag, (_device *)nullptr),
+				 mask);
+	} 
+
+	template<typename _device> address_map_entry &r(const char *tag, uint32_t (_device::*read)(address_space &, offs_t, uint32_t), const char *read_name, uint64_t mask = 0) {
+		return r(read32_delegate(read, read_name, tag, (_device *)nullptr),
+				 mask);
+	}
+
+	template<typename _device> address_map_entry &r(const char *tag, uint64_t (_device::*read)(address_space &, offs_t, uint64_t), const char *read_name, uint64_t mask = 0) {
+		return r(read64_delegate(read, read_name, tag, (_device *)nullptr),
+				 mask);
+	}
+
+	template<typename _device> address_map_entry &w(const char *tag, void (_device::*write)(address_space &, offs_t, uint8_t, uint8_t), const char *write_name, uint64_t mask = 0) {
+		return w(write8_delegate(write, write_name, tag, (_device *)nullptr), 
+				 mask);
+	}
+
+	template<typename _device> address_map_entry &w(const char *tag, void (_device::*write)(address_space &, offs_t, uint16_t, uint16_t), const char *write_name, uint64_t mask = 0) {
+		return w(write16_delegate(write, write_name, tag, (_device *)nullptr),
+				 mask);
+	} 
+
+	template<typename _device> address_map_entry &w(const char *tag, void (_device::*write)(address_space &, offs_t, uint32_t, uint32_t), const char *write_name, uint64_t mask = 0) {
+		return w(write32_delegate(write, write_name, tag, (_device *)nullptr),
+				 mask);
+	}
+
+	template<typename _device> address_map_entry &w(const char *tag, void (_device::*write)(address_space &, offs_t, uint64_t, uint64_t), const char *write_name, uint64_t mask = 0) {
+		return w(write64_delegate(write, write_name, tag, (_device *)nullptr),
+				 mask);
+	}
+
+	template<typename _device> address_map_entry &rw(const char *tag, uint8_t (_device::*read)(address_space &, offs_t, uint8_t), const char *read_name, void (_device::*write)(address_space &, offs_t, uint8_t, uint8_t), const char *write_name, uint64_t mask = 0) {
+		return rw(read8_delegate(read, read_name, tag, (_device *)nullptr),
+				  write8_delegate(write, write_name, tag, (_device *)nullptr), 
+				  mask);
+	}
+
+	template<typename _device> address_map_entry &rw(const char *tag, uint16_t (_device::*read)(address_space &, offs_t, uint16_t), const char *read_name, void (_device::*write)(address_space &, offs_t, uint16_t, uint16_t), const char *write_name, uint64_t mask = 0) {
+		return rw(read16_delegate(read, read_name, tag, (_device *)nullptr),
+				  write16_delegate(write, write_name, tag, (_device *)nullptr),
+				  mask);
+	} 
+
+	template<typename _device> address_map_entry &rw(const char *tag, uint32_t (_device::*read)(address_space &, offs_t, uint32_t), const char *read_name, void (_device::*write)(address_space &, offs_t, uint32_t, uint32_t), const char *write_name, uint64_t mask = 0) {
+		return rw(read32_delegate(read, read_name, tag, (_device *)nullptr),
+				  write32_delegate(write, write_name, tag, (_device *)nullptr),
+				  mask);
+	}
+
+	template<typename _device> address_map_entry &rw(const char *tag, uint64_t (_device::*read)(address_space &, offs_t, uint64_t), const char *read_name, void (_device::*write)(address_space &, offs_t, uint64_t, uint64_t), const char *write_name, uint64_t mask = 0) {
+		return rw(read64_delegate(read, read_name, tag, (_device *)nullptr),
+				  write64_delegate(write, write_name, tag, (_device *)nullptr),
+				  mask);
+	}
+
 	// public state
 	address_map_entry *     m_next;                 // pointer to the next entry
 	address_map &           m_map;                  // reference to our owning map
@@ -155,25 +220,25 @@ public:
 	// information used during processing
 	void *                  m_memory;               // pointer to memory backing this entry
 
-	// handler setters for 8-bit functions
-	address_map_entry &set_handler(read8_delegate func, u64 mask = 0);
-	address_map_entry &set_handler(write8_delegate func, u64 mask = 0);
-	address_map_entry &set_handler(read8_delegate rfunc, write8_delegate wfunc, u64 mask = 0);
+	// handler setters for 8-bit delegates
+	address_map_entry &r(read8_delegate func, u64 mask = 0);
+	address_map_entry &w(write8_delegate func, u64 mask = 0);
+	address_map_entry &rw(read8_delegate rfunc, write8_delegate wfunc, u64 mask = 0);
 
-	// handler setters for 16-bit functions
-	address_map_entry &set_handler(read16_delegate func, u64 mask = 0);
-	address_map_entry &set_handler(write16_delegate func, u64 mask = 0);
-	address_map_entry &set_handler(read16_delegate rfunc, write16_delegate wfunc, u64 mask = 0);
+	// handler setters for 16-bit delegates
+	address_map_entry &r(read16_delegate func, u64 mask = 0);
+	address_map_entry &w(write16_delegate func, u64 mask = 0);
+	address_map_entry &rw(read16_delegate rfunc, write16_delegate wfunc, u64 mask = 0);
 
-	// handler setters for 32-bit functions
-	address_map_entry &set_handler(read32_delegate func, u64 mask = 0);
-	address_map_entry &set_handler(write32_delegate func, u64 mask = 0);
-	address_map_entry &set_handler(read32_delegate rfunc, write32_delegate wfunc, u64 mask = 0);
+	// handler setters for 32-bit delegates
+	address_map_entry &r(read32_delegate func, u64 mask = 0);
+	address_map_entry &w(write32_delegate func, u64 mask = 0);
+	address_map_entry &rw(read32_delegate rfunc, write32_delegate wfunc, u64 mask = 0);
 
-	// handler setters for 64-bit functions
-	address_map_entry &set_handler(read64_delegate func, u64 mask = 0);
-	address_map_entry &set_handler(write64_delegate func, u64 mask = 0);
-	address_map_entry &set_handler(read64_delegate rfunc, write64_delegate wfunc, u64 mask = 0);
+	// handler setters for 64-bit delegates
+	address_map_entry &r(read64_delegate func, u64 mask = 0);
+	address_map_entry &w(write64_delegate func, u64 mask = 0);
+	address_map_entry &rw(read64_delegate rfunc, write64_delegate wfunc, u64 mask = 0);
 
 private:
 	// helper functions
@@ -202,7 +267,7 @@ public:
 	void unmap_value(u8 value) { m_unmapval = value; }
 
 	// add a new entry of the given type
-	address_map_entry &range(offs_t start, offs_t end);
+	address_map_entry &operator()(offs_t start, offs_t end);
 
 	// public data
 	int                m_spacenum;     // space number of the map
@@ -273,7 +338,7 @@ void _class :: _name(::address_map &map) \
 
 // address ranges
 #define AM_RANGE(_start, _end) \
-	;map.range(_start, _end)
+	;map(_start, _end)
 #define AM_MASK(_mask) \
 	.mask(_mask)
 #define AM_MIRROR(_mirror) \
@@ -283,33 +348,33 @@ void _class :: _name(::address_map &map) \
 
 // driver data reads
 #define AM_READ(_handler) \
-	.set_handler(read_delegate(&drivdata_class::_handler, "driver_data::" #_handler, DEVICE_SELF, (drivdata_class *)nullptr))
+	.r(read_delegate(&drivdata_class::_handler, "driver_data::" #_handler, DEVICE_SELF, (drivdata_class *)nullptr))
 #define AM_READ8(_handler, _unitmask) \
-	.set_handler(read8_delegate(&drivdata_class::_handler, "driver_data::" #_handler, DEVICE_SELF, (drivdata_class *)nullptr), _unitmask)
+	.r(read8_delegate(&drivdata_class::_handler, "driver_data::" #_handler, DEVICE_SELF, (drivdata_class *)nullptr), _unitmask)
 #define AM_READ16(_handler, _unitmask) \
-	.set_handler(read16_delegate(&drivdata_class::_handler, "driver_data::" #_handler, DEVICE_SELF, (drivdata_class *)nullptr), _unitmask)
+	.r(read16_delegate(&drivdata_class::_handler, "driver_data::" #_handler, DEVICE_SELF, (drivdata_class *)nullptr), _unitmask)
 #define AM_READ32(_handler, _unitmask) \
-	.set_handler(read32_delegate(&drivdata_class::_handler, "driver_data::" #_handler, DEVICE_SELF, (drivdata_class *)nullptr), _unitmask)
+	.r(read32_delegate(&drivdata_class::_handler, "driver_data::" #_handler, DEVICE_SELF, (drivdata_class *)nullptr), _unitmask)
 
 // driver data writes
 #define AM_WRITE(_handler) \
-	.set_handler(write_delegate(&drivdata_class::_handler, "driver_data::" #_handler, DEVICE_SELF, (drivdata_class *)nullptr))
+	.w(write_delegate(&drivdata_class::_handler, "driver_data::" #_handler, DEVICE_SELF, (drivdata_class *)nullptr))
 #define AM_WRITE8(_handler, _unitmask) \
-	.set_handler(write8_delegate(&drivdata_class::_handler, "driver_data::" #_handler, DEVICE_SELF, (drivdata_class *)nullptr), _unitmask)
+	.w(write8_delegate(&drivdata_class::_handler, "driver_data::" #_handler, DEVICE_SELF, (drivdata_class *)nullptr), _unitmask)
 #define AM_WRITE16(_handler, _unitmask) \
-	.set_handler(write16_delegate(&drivdata_class::_handler, "driver_data::" #_handler, DEVICE_SELF, (drivdata_class *)nullptr), _unitmask)
+	.w(write16_delegate(&drivdata_class::_handler, "driver_data::" #_handler, DEVICE_SELF, (drivdata_class *)nullptr), _unitmask)
 #define AM_WRITE32(_handler, _unitmask) \
-	.set_handler(write32_delegate(&drivdata_class::_handler, "driver_data::" #_handler, DEVICE_SELF, (drivdata_class *)nullptr), _unitmask)
+	.w(write32_delegate(&drivdata_class::_handler, "driver_data::" #_handler, DEVICE_SELF, (drivdata_class *)nullptr), _unitmask)
 
 // driver data reads/writes
 #define AM_READWRITE(_rhandler, _whandler) \
-	.set_handler(read_delegate(&drivdata_class::_rhandler, "driver_data::" #_rhandler, DEVICE_SELF, (drivdata_class *)nullptr), write_delegate(&drivdata_class::_whandler, "driver_data::" #_whandler, DEVICE_SELF, (drivdata_class *)nullptr))
+	.rw(read_delegate(&drivdata_class::_rhandler, "driver_data::" #_rhandler, DEVICE_SELF, (drivdata_class *)nullptr), write_delegate(&drivdata_class::_whandler, "driver_data::" #_whandler, DEVICE_SELF, (drivdata_class *)nullptr))
 #define AM_READWRITE8(_rhandler, _whandler, _unitmask) \
-	.set_handler(read8_delegate(&drivdata_class::_rhandler, "driver_data::" #_rhandler, DEVICE_SELF, (drivdata_class *)nullptr), write8_delegate(&drivdata_class::_whandler, "driver_data::" #_whandler, DEVICE_SELF, (drivdata_class *)nullptr), _unitmask)
+	.rw(read8_delegate(&drivdata_class::_rhandler, "driver_data::" #_rhandler, DEVICE_SELF, (drivdata_class *)nullptr), write8_delegate(&drivdata_class::_whandler, "driver_data::" #_whandler, DEVICE_SELF, (drivdata_class *)nullptr), _unitmask)
 #define AM_READWRITE16(_rhandler, _whandler, _unitmask) \
-	.set_handler(read16_delegate(&drivdata_class::_rhandler, "driver_data::" #_rhandler, DEVICE_SELF, (drivdata_class *)nullptr), write16_delegate(&drivdata_class::_whandler, "driver_data::" #_whandler, DEVICE_SELF, (drivdata_class *)nullptr), _unitmask)
+	.rw(read16_delegate(&drivdata_class::_rhandler, "driver_data::" #_rhandler, DEVICE_SELF, (drivdata_class *)nullptr), write16_delegate(&drivdata_class::_whandler, "driver_data::" #_whandler, DEVICE_SELF, (drivdata_class *)nullptr), _unitmask)
 #define AM_READWRITE32(_rhandler, _whandler, _unitmask) \
-	.set_handler(read32_delegate(&drivdata_class::_rhandler, "driver_data::" #_rhandler, DEVICE_SELF, (drivdata_class *)nullptr), write32_delegate(&drivdata_class::_whandler, "driver_data::" #_whandler, DEVICE_SELF, (drivdata_class *)nullptr), _unitmask)
+	.rw(read32_delegate(&drivdata_class::_rhandler, "driver_data::" #_rhandler, DEVICE_SELF, (drivdata_class *)nullptr), write32_delegate(&drivdata_class::_whandler, "driver_data::" #_whandler, DEVICE_SELF, (drivdata_class *)nullptr), _unitmask)
 
 // driver set offset. Upcast to base class because there are no data width variants,
 // and the compiler complains if we don't do it explicitly
@@ -318,63 +383,63 @@ void _class :: _name(::address_map &map) \
 
 // device reads
 #define AM_DEVREAD(_tag, _class, _handler) \
-	.set_handler(read_delegate(&_class::_handler, #_class "::" #_handler, _tag, (_class *)nullptr))
+	.r(_tag, &_class::_handler, #_class "::" #_handler)
 #define AM_DEVREAD8(_tag, _class, _handler, _unitmask) \
-	.set_handler(read8_delegate(&_class::_handler, #_class "::" #_handler, _tag, (_class *)nullptr), _unitmask)
+	.r(_tag, &_class::_handler, #_class "::" #_handler, _unitmask)
 #define AM_DEVREAD16(_tag, _class, _handler, _unitmask) \
-	.set_handler(read16_delegate(&_class::_handler, #_class "::" #_handler, _tag, (_class *)nullptr), _unitmask)
+	.r(_tag, &_class::_handler, #_class "::" #_handler, _unitmask)
 #define AM_DEVREAD32(_tag, _class, _handler, _unitmask) \
-	.set_handler(read32_delegate(&_class::_handler, #_class "::" #_handler, _tag, (_class *)nullptr), _unitmask)
+	.r(_tag, &_class::_handler, #_class "::" #_handler, _unitmask)
 
 // device writes
 #define AM_DEVWRITE(_tag, _class, _handler) \
-	.set_handler(write_delegate(&_class::_handler, #_class "::" #_handler, _tag, (_class *)nullptr))
+	.w(_tag, &_class::_handler, #_class "::" #_handler)
 #define AM_DEVWRITE8(_tag, _class, _handler, _unitmask) \
-	.set_handler(write8_delegate(&_class::_handler, #_class "::" #_handler, _tag, (_class *)nullptr), _unitmask)
+	.w(_tag, &_class::_handler, #_class "::" #_handler, _unitmask)
 #define AM_DEVWRITE16(_tag, _class, _handler, _unitmask) \
-	.set_handler(write16_delegate(&_class::_handler, #_class "::" #_handler, _tag, (_class *)nullptr), _unitmask)
+	.w(_tag, &_class::_handler, #_class "::" #_handler, _unitmask)
 #define AM_DEVWRITE32(_tag, _class, _handler, _unitmask) \
-	.set_handler(write32_delegate(&_class::_handler, #_class "::" #_handler, _tag, (_class *)nullptr), _unitmask)
+	.w(_tag, &_class::_handler, #_class "::" #_handler, _unitmask)
 
 // device reads/writes
 #define AM_DEVREADWRITE(_tag, _class, _rhandler, _whandler) \
-	.set_handler(read_delegate(&_class::_rhandler, #_class "::" #_rhandler, _tag, (_class *)nullptr), write_delegate(&_class::_whandler, #_class "::" #_whandler, _tag, (_class *)nullptr))
+	.rw(_tag, &_class::_rhandler, #_class "::" #_rhandler, &_class::_whandler, #_class "::" #_whandler)
 #define AM_DEVREADWRITE8(_tag, _class, _rhandler, _whandler, _unitmask) \
-	.set_handler(read8_delegate(&_class::_rhandler, #_class "::" #_rhandler, _tag, (_class *)nullptr), write8_delegate(&_class::_whandler, #_class "::" #_whandler, _tag, (_class *)nullptr), _unitmask)
+	.rw(_tag, &_class::_rhandler, #_class "::" #_rhandler, &_class::_whandler, #_class "::" #_whandler, _unitmask)
 #define AM_DEVREADWRITE16(_tag, _class, _rhandler, _whandler, _unitmask) \
-	.set_handler(read16_delegate(&_class::_rhandler, #_class "::" #_rhandler, _tag, (_class *)nullptr), write16_delegate(&_class::_whandler, #_class "::" #_whandler, _tag, (_class *)nullptr), _unitmask)
+	.rw(_tag, &_class::_rhandler, #_class "::" #_rhandler, &_class::_whandler, #_class "::" #_whandler, _unitmask)
 #define AM_DEVREADWRITE32(_tag, _class, _rhandler, _whandler, _unitmask) \
-	.set_handler(read32_delegate(&_class::_rhandler, #_class "::" #_rhandler, _tag, (_class *)nullptr), write32_delegate(&_class::_whandler, #_class "::" #_whandler, _tag, (_class *)nullptr), _unitmask)
+	.rw(_tag, &_class::_rhandler, #_class "::" #_rhandler, &_class::_whandler, #_class "::" #_whandler, _unitmask)
 
 // device reads with modified offset
 #define AM_DEVREAD_MOD(_tag, _class, _handler, _modfn) \
-	.set_handler(read_delegate([](_class &device, address_space &space, offs_t offset, native_type mem_mask)->native_type { return device._handler(space, emu::detail::offset_##_modfn(offset), mem_mask); }, #_class "::" #_handler, _tag, (_class *)nullptr))
+	.r(read_delegate([](_class &device, address_space &space, offs_t offset, native_type mem_mask)->native_type { return device._handler(space, emu::detail::offset_##_modfn(offset), mem_mask); }, #_class "::" #_handler, _tag, (_class *)nullptr))
 #define AM_DEVREAD8_MOD(_tag, _class, _handler, _modfn, _unitmask) \
-	.set_handler(read8_delegate([](_class &device, address_space &space, offs_t offset, u8 mem_mask)->u8 { return device._handler(space, emu::detail::offset_##_modfn(offset), mem_mask); }, #_class "::" #_handler, _tag, (_class *)nullptr), _unitmask)
+	.r(read8_delegate([](_class &device, address_space &space, offs_t offset, u8 mem_mask)->u8 { return device._handler(space, emu::detail::offset_##_modfn(offset), mem_mask); }, #_class "::" #_handler, _tag, (_class *)nullptr), _unitmask)
 #define AM_DEVREAD16_MOD(_tag, _class, _handler, _modfn, _unitmask) \
-	.set_handler(read16_delegate([](_class &device, address_space &space, offs_t offset, u16 mem_mask)->u16 { return device._handler(space, emu::detail::offset_##_modfn(offset), mem_mask); }, #_class "::" #_handler, _tag, (_class *)nullptr), _unitmask)
+	.r(read16_delegate([](_class &device, address_space &space, offs_t offset, u16 mem_mask)->u16 { return device._handler(space, emu::detail::offset_##_modfn(offset), mem_mask); }, #_class "::" #_handler, _tag, (_class *)nullptr), _unitmask)
 #define AM_DEVREAD32_MOD(_tag, _class, _handler, _modfn, _unitmask) \
-	.set_handler(read32_delegate([](_class &device, address_space &space, offs_t offset, u32 mem_mask)->u32 { return device._handler(space, emu::detail::offset_##_modfn(offset), mem_mask); }, #_class "::" #_handler, _tag, (_class *)nullptr), _unitmask)
+	.r(read32_delegate([](_class &device, address_space &space, offs_t offset, u32 mem_mask)->u32 { return device._handler(space, emu::detail::offset_##_modfn(offset), mem_mask); }, #_class "::" #_handler, _tag, (_class *)nullptr), _unitmask)
 
 // device writes with modified offset
 #define AM_DEVWRITE_MOD(_tag, _class, _handler, _modfn) \
-	.set_handler(write_delegate([](_class &device, address_space &space, offs_t offset, native_type data, native_type mem_mask) { device._handler(space, emu::detail::offset_##_modfn(offset), data, mem_mask); }, #_class "::" #_handler, _tag, (_class *)nullptr))
+	.w(write_delegate([](_class &device, address_space &space, offs_t offset, native_type data, native_type mem_mask) { device._handler(space, emu::detail::offset_##_modfn(offset), data, mem_mask); }, #_class "::" #_handler, _tag, (_class *)nullptr))
 #define AM_DEVWRITE8_MOD(_tag, _class, _handler, _modfn, _unitmask) \
-	.set_handler(write8_delegate([](_class &device, address_space &space, offs_t offset, u8 data, u8 mem_mask) { device._handler(space, emu::detail::offset_##_modfn(offset), data, mem_mask); }, #_class "::" #_handler, _tag, (_class *)nullptr), _unitmask)
+	.w(write8_delegate([](_class &device, address_space &space, offs_t offset, u8 data, u8 mem_mask) { device._handler(space, emu::detail::offset_##_modfn(offset), data, mem_mask); }, #_class "::" #_handler, _tag, (_class *)nullptr), _unitmask)
 #define AM_DEVWRITE16_MOD(_tag, _class, _handler, _modfn, _unitmask) \
-	.set_handler(write16_delegate([](_class &device, address_space &space, offs_t offset, u16 data, u16 mem_mask) { device._handler(space, emu::detail::offset_##_modfn(offset), data, mem_mask); }, #_class "::" #_handler, _tag, (_class *)nullptr), _unitmask)
+	.w(write16_delegate([](_class &device, address_space &space, offs_t offset, u16 data, u16 mem_mask) { device._handler(space, emu::detail::offset_##_modfn(offset), data, mem_mask); }, #_class "::" #_handler, _tag, (_class *)nullptr), _unitmask)
 #define AM_DEVWRITE32_MOD(_tag, _class, _handler, _modfn, _unitmask) \
-	.set_handler(write32_delegate([](_class &device, address_space &space, offs_t offset, u32 data, u32 mem_mask) { device._handler(space, emu::detail::offset_##_modfn(offset), data, mem_mask); }, #_class "::" #_handler, _tag, (_class *)nullptr), _unitmask)
+	.w(write32_delegate([](_class &device, address_space &space, offs_t offset, u32 data, u32 mem_mask) { device._handler(space, emu::detail::offset_##_modfn(offset), data, mem_mask); }, #_class "::" #_handler, _tag, (_class *)nullptr), _unitmask)
 
 // device reads/writes with modified offset
 #define AM_DEVREADWRITE_MOD(_tag, _class, _rhandler, _whandler, _modfn) \
-	.set_handler(read_delegate([](_class &device, address_space &space, offs_t offset, native_type mem_mask)->native_type { return device._rhandler(space, emu::detail::offset_##_modfn(offset), mem_mask); }, #_class "::" #_rhandler, _tag, (_class *)nullptr), write_delegate([](_class &device, address_space &space, offs_t offset, native_type data, native_type mem_mask) { device._whandler(space, emu::detail::offset_##_modfn(offset), data, mem_mask); }, #_class "::" #_whandler, _tag, (_class *)nullptr))
+	.rw(read_delegate([](_class &device, address_space &space, offs_t offset, native_type mem_mask)->native_type { return device._rhandler(space, emu::detail::offset_##_modfn(offset), mem_mask); }, #_class "::" #_rhandler, _tag, (_class *)nullptr), write_delegate([](_class &device, address_space &space, offs_t offset, native_type data, native_type mem_mask) { device._whandler(space, emu::detail::offset_##_modfn(offset), data, mem_mask); }, #_class "::" #_whandler, _tag, (_class *)nullptr))
 #define AM_DEVREADWRITE8_MOD(_tag, _class, _rhandler, _whandler, _modfn, _unitmask) \
-	.set_handler(read8_delegate([](_class &device, address_space &space, offs_t offset, u8 mem_mask)->u8 { return device._rhandler(space, emu::detail::offset_##_modfn(offset), mem_mask); }, #_class "::" #_rhandler, _tag, (_class *)nullptr), write8_delegate([](_class &device, address_space &space, offs_t offset, u8 data, u8 mem_mask) { device._whandler(space, emu::detail::offset_##_modfn(offset), data, mem_mask); }, #_class "::" #_whandler, _tag, (_class *)nullptr), _unitmask)
+	.rw(read8_delegate([](_class &device, address_space &space, offs_t offset, u8 mem_mask)->u8 { return device._rhandler(space, emu::detail::offset_##_modfn(offset), mem_mask); }, #_class "::" #_rhandler, _tag, (_class *)nullptr), write8_delegate([](_class &device, address_space &space, offs_t offset, u8 data, u8 mem_mask) { device._whandler(space, emu::detail::offset_##_modfn(offset), data, mem_mask); }, #_class "::" #_whandler, _tag, (_class *)nullptr), _unitmask)
 #define AM_DEVREADWRITE16_MOD(_tag, _class, _rhandler, _whandler, _modfn, _unitmask) \
-	.set_handler(read16_delegate([](_class &device, address_space &space, offs_t offset, u16 mem_mask)->u16 { return device._rhandler(space, emu::detail::offset_##_modfn(offset), mem_mask); }, #_class "::" #_rhandler, _tag, (_class *)nullptr), write16_delegate([](_class &device, address_space &space, offs_t offset, u16 data, u16 mem_mask) { device._whandler(space, emu::detail::offset_##_modfn(offset), data, mem_mask); }, #_class "::" #_whandler, _tag, (_class *)nullptr), _unitmask)
+	.rw(read16_delegate([](_class &device, address_space &space, offs_t offset, u16 mem_mask)->u16 { return device._rhandler(space, emu::detail::offset_##_modfn(offset), mem_mask); }, #_class "::" #_rhandler, _tag, (_class *)nullptr), write16_delegate([](_class &device, address_space &space, offs_t offset, u16 data, u16 mem_mask) { device._whandler(space, emu::detail::offset_##_modfn(offset), data, mem_mask); }, #_class "::" #_whandler, _tag, (_class *)nullptr), _unitmask)
 #define AM_DEVREADWRITE32_MOD(_tag, _class, _rhandler, _whandler, _modfn, _unitmask) \
-	.set_handler(read32_delegate([](_class &device, address_space &space, offs_t offset, u32 mem_mask)->u32 { return device._rhandler(space, emu::detail::offset_##_modfn(offset), mem_mask); }, #_class "::" #_rhandler, _tag, (_class *)nullptr), write32_delegate([](_class &device, address_space &space, offs_t offset, u32 data, u32 mem_mask) { device._whandler(space, emu::detail::offset_##_modfn(offset), data, mem_mask); }, #_class "::" #_whandler, _tag, (_class *)nullptr), _unitmask)
+	.rw(read32_delegate([](_class &device, address_space &space, offs_t offset, u32 mem_mask)->u32 { return device._rhandler(space, emu::detail::offset_##_modfn(offset), mem_mask); }, #_class "::" #_rhandler, _tag, (_class *)nullptr), write32_delegate([](_class &device, address_space &space, offs_t offset, u32 data, u32 mem_mask) { device._whandler(space, emu::detail::offset_##_modfn(offset), data, mem_mask); }, #_class "::" #_whandler, _tag, (_class *)nullptr), _unitmask)
 
 // device set offset
 #define AM_DEVSETOFFSET(_tag, _class, _handler) \

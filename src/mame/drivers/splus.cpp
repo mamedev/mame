@@ -120,6 +120,7 @@ public:
 	DECLARE_DRIVER_INIT(splus);
 	required_device<cpu_device> m_maincpu;
 	required_device<i2cmem_device> m_i2cmem;
+	void splus(machine_config &config);
 };
 
 /* Static Variables */
@@ -682,7 +683,7 @@ INPUT_PORTS_END
 *     Machine Driver     *
 *************************/
 
-static MACHINE_CONFIG_START( splus )   // basic machine hardware
+MACHINE_CONFIG_START(splus_state::splus)   // basic machine hardware
 	MCFG_CPU_ADD("maincpu", I80C32, CPU_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(splus_map)
 	MCFG_CPU_IO_MAP(splus_iomap)

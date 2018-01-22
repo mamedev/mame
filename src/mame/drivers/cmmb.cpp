@@ -85,6 +85,7 @@ public:
 	virtual void video_start() override;
 	uint32_t screen_update_cmmb(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(vblank_irq);
+	void cmmb(machine_config &config);
 };
 
 
@@ -195,7 +196,7 @@ static ADDRESS_MAP_START( cmmb_map, AS_PROGRAM, 8, cmmb_state )
 	AM_RANGE(0x2000, 0x2000) AM_READ_PORT("IN3")
 	AM_RANGE(0x2001, 0x2001) AM_READ_PORT("IN4")
 	AM_RANGE(0x2011, 0x2011) AM_READ_PORT("IN5")
-	AM_RANGE(0x2480, 0x249f) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x2480, 0x249f) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
 	//AM_RANGE(0x4000, 0x400f) AM_READWRITE(cmmb_input_r,cmmb_output_w)
 	//AM_RANGE(0x4900, 0x4900) AM_READ(kludge_r)
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1")
@@ -381,7 +382,7 @@ void cmmb_state::machine_reset()
 }
 
 
-static MACHINE_CONFIG_START( cmmb )
+MACHINE_CONFIG_START(cmmb_state::cmmb)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M65SC02, MAIN_CLOCK/5) // Unknown clock, but chip rated for 14MHz

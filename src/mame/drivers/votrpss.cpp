@@ -100,6 +100,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(write_uart_clock);
 	IRQ_CALLBACK_MEMBER(irq_ack);
 
+	void votrpss(machine_config &config);
 private:
 	uint8_t m_term_data;
 	uint8_t m_porta;
@@ -236,7 +237,7 @@ void votrpss_state::kbd_put(u8 data)
  Machine Drivers
 ******************************************************************************/
 
-static MACHINE_CONFIG_START( votrpss )
+MACHINE_CONFIG_START(votrpss_state::votrpss)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_8MHz/2)  /* 4.000 MHz, verified */
 	MCFG_CPU_PROGRAM_MAP(votrpss_mem)

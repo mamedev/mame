@@ -71,6 +71,7 @@ public:
 
 	DECLARE_READ8_MEMBER(ptm_r);
 
+	void zwackery(machine_config &config);
 protected:
 	virtual void machine_start() override;
 
@@ -110,7 +111,7 @@ static ADDRESS_MAP_START( zwackery_map, AS_PROGRAM, 16, zwackery_state )
 	AM_RANGE(0x108000, 0x108007) AM_DEVREADWRITE8("pia1", pia6821_device, read, write, 0x00ff)
 	AM_RANGE(0x10c000, 0x10c007) AM_DEVREADWRITE8("pia2", pia6821_device, read, write, 0x00ff)
 	AM_RANGE(0x800000, 0x800fff) AM_RAM_WRITE(videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x802000, 0x803fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x802000, 0x803fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0xc00000, 0xc00fff) AM_READWRITE8(spriteram_r, spriteram_w, 0x00ff)
 ADDRESS_MAP_END
 
@@ -489,7 +490,7 @@ void zwackery_state::machine_start()
 //  MACHINE DEFINTIONS
 //**************************************************************************
 
-static MACHINE_CONFIG_START( zwackery )
+MACHINE_CONFIG_START(zwackery_state::zwackery)
 	// basic machine hardware
 	MCFG_CPU_ADD("maincpu", M68000, 7652400)    // based on counter usage, should be XTAL_16MHz/2
 	MCFG_CPU_PROGRAM_MAP(zwackery_map)

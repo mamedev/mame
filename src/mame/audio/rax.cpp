@@ -487,7 +487,7 @@ acclaim_rax_device::acclaim_rax_device(const machine_config &mconfig, const char
 // device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( acclaim_rax_device::device_add_mconfig )
+MACHINE_CONFIG_START(acclaim_rax_device::device_add_mconfig)
 	MCFG_CPU_ADD("adsp", ADSP2181, XTAL_16_67MHz)
 	MCFG_ADSP21XX_SPORT_TX_CB(WRITE32(acclaim_rax_device, adsp_sound_tx_callback))      /* callback for serial transmit */
 	MCFG_ADSP21XX_DMOVLAY_CB(WRITE32(acclaim_rax_device, dmovlay_callback)) // callback for adsp 2181 dmovlay instruction

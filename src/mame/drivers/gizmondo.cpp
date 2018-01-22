@@ -66,6 +66,7 @@ public:
 	DECLARE_WRITE32_MEMBER(s3c2440_gpio_port_w);
 
 	bitmap_rgb32 m_bitmap;
+	void gizmondo(machine_config &config);
 };
 
 
@@ -183,7 +184,7 @@ DRIVER_INIT_MEMBER(gizmondo_state,gizmondo)
 	// do nothing
 }
 
-static MACHINE_CONFIG_START( gizmondo )
+MACHINE_CONFIG_START(gizmondo_state::gizmondo)
 	MCFG_CPU_ADD("maincpu", ARM9, 40000000)
 	MCFG_CPU_PROGRAM_MAP(gizmondo_map)
 

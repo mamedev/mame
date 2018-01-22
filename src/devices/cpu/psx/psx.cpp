@@ -3432,7 +3432,7 @@ device_memory_interface::space_config_vector psxcpu_device::memory_space_config(
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( psxcpu_device::device_add_mconfig )
+MACHINE_CONFIG_START(psxcpu_device::device_add_mconfig)
 	MCFG_DEVICE_ADD( "irq", PSX_IRQ, 0 )
 	MCFG_PSX_IRQ_HANDLER( INPUTLINE( DEVICE_SELF, PSXCPU_IRQ0 ) )
 

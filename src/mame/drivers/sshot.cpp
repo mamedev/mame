@@ -188,6 +188,7 @@ public:
 	uint32_t screen_update_supershot(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
+	void supershot(machine_config &config);
 };
 
 
@@ -337,7 +338,7 @@ static GFXDECODE_START( supershot )
 	GFXDECODE_ENTRY( "gfx", 0, supershot_charlayout,   0, 1  )
 GFXDECODE_END
 
-static MACHINE_CONFIG_START( supershot )
+MACHINE_CONFIG_START(supershot_state::supershot)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", SCMP, XTAL_11_289MHz/4)

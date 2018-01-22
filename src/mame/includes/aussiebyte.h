@@ -98,6 +98,7 @@ public:
 	MC6845_UPDATE_ROW(crtc_update_row);
 	MC6845_ON_UPDATE_ADDR_CHANGED(crtc_update_addr);
 
+	void aussiebyte(machine_config &config);
 private:
 	uint8_t crt8002(uint8_t ac_ra, uint8_t ac_chr, uint8_t ac_attr, uint16_t ac_cnt, bool ac_curs);
 	bool m_port15; // rom switched in (0), out (1)

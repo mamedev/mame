@@ -77,6 +77,9 @@ public:
 	DECLARE_WRITE8_MEMBER(display_w);
 	DECLARE_WRITE8_MEMBER(lamps_w);
 
+	void de_3(machine_config &config);
+	void de_3_dmd1(machine_config &config);
+	void de_3_dmd2(machine_config &config);
 protected:
 
 	// driver_device overrides
@@ -391,7 +394,7 @@ DRIVER_INIT_MEMBER(de_3_state,de_3)
 {
 }
 
-static MACHINE_CONFIG_START( de_3 )
+MACHINE_CONFIG_START(de_3_state::de_3)
 	/* basic machine hardware */
 	MCFG_DECOCPU_TYPE3_ADD("decocpu",XTAL_8MHz / 2, ":maincpu")
 	MCFG_DECOCPU_DISPLAY(READ8(de_3_state,display_r),WRITE8(de_3_state,display_w))
@@ -406,11 +409,11 @@ static MACHINE_CONFIG_START( de_3 )
 
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( de_3_dmd2, de_3 )
+MACHINE_CONFIG_DERIVED(de_3_state::de_3_dmd2, de_3)
 	MCFG_DECODMD_TYPE2_ADD("decodmd2",":gfx3")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( de_3_dmd1, de_3 )
+MACHINE_CONFIG_DERIVED(de_3_state::de_3_dmd1, de_3)
 	MCFG_DECODMD_TYPE1_ADD("decodmd1",":gfx3")
 MACHINE_CONFIG_END
 

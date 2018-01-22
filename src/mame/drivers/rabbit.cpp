@@ -169,6 +169,7 @@ public:
 	void drawtilemap( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int whichtilemap );
 	void do_blit();
 
+	void rabbit(machine_config &config);
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
@@ -743,7 +744,7 @@ static ADDRESS_MAP_START( rabbit_map, AS_PROGRAM, 32, rabbit_state )
 	AM_RANGE(0x488000, 0x48bfff) AM_READWRITE(tilemap2_r,tilemap2_w)
 	AM_RANGE(0x48c000, 0x48ffff) AM_READWRITE(tilemap3_r,tilemap3_w)
 	AM_RANGE(0x494000, 0x497fff) AM_RAM AM_SHARE("spriteram") // sprites?
-	AM_RANGE(0x4a0000, 0x4affff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x4a0000, 0x4affff) AM_RAM_DEVWRITE("palette", palette_device, write32) AM_SHARE("palette")
 	AM_RANGE(0xff0000, 0xffffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -898,7 +899,7 @@ INTERRUPT_GEN_MEMBER(rabbit_state::vblank_interrupt)
 	m_maincpu->set_input_line(m_vblirqlevel, HOLD_LINE);
 }
 
-static MACHINE_CONFIG_START( rabbit )
+MACHINE_CONFIG_START(rabbit_state::rabbit)
 	MCFG_CPU_ADD("maincpu", M68EC020, XTAL_24MHz)
 	MCFG_CPU_PROGRAM_MAP(rabbit_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", rabbit_state,  vblank_interrupt)

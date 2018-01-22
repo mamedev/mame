@@ -84,6 +84,8 @@ public:
 	DECLARE_DRIVER_INIT(sidam);
 	DECLARE_DRIVER_INIT(unkitpkr);
 
+	void unkitpkr(machine_config &config);
+	void wallc(machine_config &config);
 protected:
 	virtual void video_start() override;
 
@@ -468,7 +470,7 @@ DRIVER_INIT_MEMBER(wallc_state, wallca)
 }
 
 
-static MACHINE_CONFIG_START( wallc )
+MACHINE_CONFIG_START(wallc_state::wallc)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 12288000 / 4)  /* 3.072 MHz ? */
 	MCFG_CPU_PROGRAM_MAP(wallc_map)
@@ -494,7 +496,7 @@ static MACHINE_CONFIG_START( wallc )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( unkitpkr, wallc )
+MACHINE_CONFIG_DERIVED(wallc_state::unkitpkr, wallc)
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(unkitpkr_map)

@@ -104,6 +104,11 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(fdc_drq);
 	DECLARE_FLOPPY_FORMATS( specimx_floppy_formats );
 
+	void special(machine_config &config);
+	void erik(machine_config &config);
+	void specimx(machine_config &config);
+	void specialp(machine_config &config);
+	void specialm(machine_config &config);
 private:
 	void specimx_set_bank(offs_t i, uint8_t data);
 	void erik_set_bank();

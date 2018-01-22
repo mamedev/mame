@@ -209,6 +209,7 @@ public:
 
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 
+	void nevada(machine_config &config);
 };
 
 /*
@@ -589,7 +590,7 @@ MACHINE_START_MEMBER(nevada_state, nevada)
 *     Machine Driver     *
 *************************/
 
-static MACHINE_CONFIG_START( nevada )
+MACHINE_CONFIG_START(nevada_state::nevada)
 	// basic machine hardware
 	MCFG_CPU_ADD("maincpu", M68000, MASTER_CPU)
 	MCFG_CPU_PROGRAM_MAP(nevada_map)

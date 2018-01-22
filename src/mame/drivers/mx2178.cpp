@@ -45,6 +45,7 @@ public:
 
 	MC6845_UPDATE_ROW(crtc_update_row);
 
+	void mx2178(machine_config &config);
 private:
 	virtual void machine_reset() override;
 	required_device<palette_device> m_palette;
@@ -123,7 +124,7 @@ void mx2178_state::machine_reset()
 {
 }
 
-static MACHINE_CONFIG_START( mx2178 )
+MACHINE_CONFIG_START(mx2178_state::mx2178)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_18_8696MHz / 5) // guess
 	MCFG_CPU_PROGRAM_MAP(mx2178_mem)

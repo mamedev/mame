@@ -39,7 +39,7 @@ ROM_END
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( spectrum_intf1_device::device_add_mconfig )
+MACHINE_CONFIG_START(spectrum_intf1_device::device_add_mconfig)
 	/* rs232 */
 	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, nullptr)
 

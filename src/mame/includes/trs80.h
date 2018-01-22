@@ -128,6 +128,17 @@ public:
 	uint32_t screen_update_radionic(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_meritum(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
+	void sys80(machine_config &config);
+	void trs80(machine_config &config);
+	void lnw80(machine_config &config);
+	void model4p(machine_config &config);
+	void meritum(machine_config &config);
+	void model3(machine_config &config);
+	void radionic(machine_config &config);
+	void model1(machine_config &config);
+	void ht1080z(machine_config &config);
+	void cp500(machine_config &config);
+	void model4(machine_config &config);
 private:
 	uint8_t *m_p_gfxram;
 	uint8_t m_model4;

@@ -153,6 +153,7 @@ public:
 	UPD7220_DISPLAY_PIXELS_MEMBER( hgdc_display_pixels );
 	UPD7220_DRAW_TEXT_LINE_MEMBER( hgdc_draw_text );
 
+	void apc(machine_config &config);
 protected:
 	// driver_device overrides
 	virtual void machine_start() override;
@@ -909,7 +910,7 @@ static SLOT_INTERFACE_START( apc_floppies )
 	SLOT_INTERFACE( "8", FLOPPY_8_DSDD )
 SLOT_INTERFACE_END
 
-static MACHINE_CONFIG_START( apc )
+MACHINE_CONFIG_START(apc_state::apc)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",I8086,MAIN_CLOCK)

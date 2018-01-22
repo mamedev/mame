@@ -91,6 +91,8 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	void flagrall(machine_config &config);
+	void k3(machine_config &config);
 };
 
 
@@ -189,7 +191,7 @@ static ADDRESS_MAP_START( k3_base_map, AS_PROGRAM, 16, k3_state )
 
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM // ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM // Main Ram
-	AM_RANGE(0x200000, 0x200fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x200000, 0x200fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x240000, 0x240fff) AM_RAM AM_SHARE("spritera1")
 	AM_RANGE(0x280000, 0x280fff) AM_RAM AM_SHARE("spritera2")
 	AM_RANGE(0x2c0000, 0x2c07ff) AM_RAM_WRITE(k3_bgram_w) AM_SHARE("bgram")
@@ -367,7 +369,7 @@ void k3_state::machine_start()
 {
 }
 
-static MACHINE_CONFIG_START( flagrall )
+MACHINE_CONFIG_START(k3_state::flagrall)
 
 	MCFG_CPU_ADD("maincpu", M68000, MASTER_CLOCK ) // ?
 	MCFG_CPU_PROGRAM_MAP(flagrall_map)
@@ -393,7 +395,7 @@ static MACHINE_CONFIG_START( flagrall )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( k3, flagrall )
+MACHINE_CONFIG_DERIVED(k3_state::k3, flagrall)
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(k3_map)

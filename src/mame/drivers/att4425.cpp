@@ -60,6 +60,7 @@ public:
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
+	void att4425(machine_config &config);
 private:
 	virtual void machine_start() override;
 	virtual void video_start() override;
@@ -231,7 +232,7 @@ static const z80_daisy_config att4425_daisy_chain[] =
 	{ nullptr }
 };
 
-static MACHINE_CONFIG_START( att4425 )
+MACHINE_CONFIG_START(att4425_state::att4425)
 	/* basic machine hardware */
 	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL_32MHz/8) // XXX
 	MCFG_CPU_PROGRAM_MAP(att4425_mem)

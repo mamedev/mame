@@ -64,7 +64,7 @@ WRITE8_MEMBER(spy_state::spy_bankedram1_w)
 {
 	if (m_rambank & 1)
 	{
-		m_palette->write(space,offset,data);
+		m_palette->write8(space,offset,data);
 	}
 	else if (m_rambank & 2)
 	{
@@ -492,7 +492,7 @@ void spy_state::machine_reset()
 	m_old_3f90 = -1;
 }
 
-static MACHINE_CONFIG_START( spy )
+MACHINE_CONFIG_START(spy_state::spy)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", MC6809E, XTAL_24MHz / 8) // 3 MHz? (divided by 051961)

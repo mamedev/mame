@@ -176,6 +176,7 @@ public:
 	int         m_floppy_motor;
 	int         m_busint[8];
 	int         m_irqs[8];
+	void dmv(machine_config &config);
 };
 
 WRITE8_MEMBER(dmv_state::tc_set_w)
@@ -712,7 +713,7 @@ static SLOT_INTERFACE_START(dmv_slot7a)
 	SLOT_INTERFACE("k235", DMV_K235)            // K235 Internal 8088 module with interrupt controller
 SLOT_INTERFACE_END
 
-static MACHINE_CONFIG_START( dmv )
+MACHINE_CONFIG_START(dmv_state::dmv)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80, XTAL_24MHz / 6)
 	MCFG_CPU_PROGRAM_MAP(dmv_mem)

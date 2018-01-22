@@ -91,12 +91,12 @@ public:
 	void spfghmk2_set_video_control_2( uint8_t data );
 	void tomahawk_set_video_control_2( uint8_t data );
 	void video_update_common( bitmap_rgb32 &bitmap, const rectangle &cliprect, pen_t *pens, int num_pens );
+	void base(machine_config &config);
+	void astrof(machine_config &config);
+	void abattle(machine_config &config);
+	void spfghmk2(machine_config &config);
+	void tomahawk(machine_config &config);
+	void astrof_audio(machine_config &config);
+	void spfghmk2_audio(machine_config &config);
+	void tomahawk_audio(machine_config &config);
 };
-
-/*----------- defined in audio/astrof.c -----------*/
-
-MACHINE_CONFIG_EXTERN( astrof_audio );
-
-MACHINE_CONFIG_EXTERN( spfghmk2_audio );
-
-MACHINE_CONFIG_EXTERN( tomahawk_audio );

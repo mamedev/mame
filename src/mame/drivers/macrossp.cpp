@@ -358,7 +358,7 @@ static ADDRESS_MAP_START( macrossp_map, AS_PROGRAM, 32, macrossp_state )
 	AM_RANGE(0x91c200, 0x91c3ff) AM_RAM AM_SHARE("text_linezoom") /* W/O? */
 	AM_RANGE(0x91d000, 0x91d00b) AM_RAM AM_SHARE("text_videoregs") /* W/O? */
 
-	AM_RANGE(0xa00000, 0xa03fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0xa00000, 0xa03fff) AM_RAM_DEVWRITE("palette", palette_device, write32) AM_SHARE("palette")
 
 	AM_RANGE(0xb00000, 0xb00003) AM_READ_PORT("INPUTS")
 	AM_RANGE(0xb00004, 0xb00007) AM_READ(macrossp_soundstatus_r) AM_WRITENOP // irq related?
@@ -539,7 +539,7 @@ void macrossp_state::machine_reset()
 	m_snd_toggle = 0;
 }
 
-static MACHINE_CONFIG_START( macrossp )
+MACHINE_CONFIG_START(macrossp_state::macrossp)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68EC020, 50000000/2)   /* 25 MHz */
@@ -580,7 +580,7 @@ static MACHINE_CONFIG_START( macrossp )
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.1)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( quizmoon, macrossp )
+MACHINE_CONFIG_DERIVED(macrossp_state::quizmoon, macrossp)
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VISIBLE_AREA(0, 24*16-1, 0*8, 14*16-1)

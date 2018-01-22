@@ -65,6 +65,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( ptm_o3_callback );
 	DECLARE_WRITE8_MEMBER(baud_rate_w);
 
+	void poly(machine_config &config);
 protected:
 	virtual void machine_reset() override;
 
@@ -150,7 +151,7 @@ WRITE8_MEMBER(poly_state::baud_rate_w)
 	m_acia_clock->set_clock_scale((selector <= 5) ? 1.0 / (1 << selector) : 0.0);
 }
 
-static MACHINE_CONFIG_START( poly )
+MACHINE_CONFIG_START(poly_state::poly)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", MC6809, XTAL_12_0576MHz / 3) // nominally 4 MHz
 	MCFG_CPU_PROGRAM_MAP(poly_mem)

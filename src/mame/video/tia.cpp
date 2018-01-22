@@ -377,7 +377,7 @@ tia_pal_video_device::tia_pal_video_device(const machine_config &mconfig, const 
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( tia_pal_video_device::device_add_mconfig )
+MACHINE_CONFIG_START(tia_pal_video_device::device_add_mconfig)
 	MCFG_PALETTE_ADD("palette", TIA_PALETTE_LENGTH)
 	MCFG_PALETTE_INIT_OWNER(tia_pal_video_device, tia_pal)
 MACHINE_CONFIG_END
@@ -398,7 +398,7 @@ tia_ntsc_video_device::tia_ntsc_video_device(const machine_config &mconfig, cons
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( tia_ntsc_video_device::device_add_mconfig )
+MACHINE_CONFIG_START(tia_ntsc_video_device::device_add_mconfig)
 	MCFG_PALETTE_ADD("palette", TIA_PALETTE_LENGTH)
 	MCFG_PALETTE_INIT_OWNER(tia_ntsc_video_device, tia_ntsc)
 MACHINE_CONFIG_END

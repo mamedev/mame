@@ -26,6 +26,7 @@ public:
 
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
+	void qvt103(machine_config &config);
 private:
 	required_device<cpu_device> m_maincpu;
 	required_region_ptr<u8> m_p_chargen;
@@ -60,7 +61,7 @@ static const z80_daisy_config daisy_chain[] =
 	{ nullptr }
 };
 
-static MACHINE_CONFIG_START( qvt103 )
+MACHINE_CONFIG_START(qvt103_state::qvt103)
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_29_376MHz / 9) // divider guessed
 	MCFG_CPU_PROGRAM_MAP(mem_map)
 	MCFG_CPU_IO_MAP(io_map)

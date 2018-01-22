@@ -112,7 +112,7 @@ WRITE16_MEMBER(oneshot_state::soundbank_w)
 static ADDRESS_MAP_START( oneshot_map, AS_PROGRAM, 16, oneshot_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x080000, 0x087fff) AM_RAM
-	AM_RANGE(0x0c0000, 0x0c07ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x0c0000, 0x0c07ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x120000, 0x120fff) AM_RAM AM_SHARE("sprites")
 	AM_RANGE(0x180000, 0x180fff) AM_RAM_WRITE(oneshot_mid_videoram_w) AM_SHARE("mid_videoram") // some people , girl etc.
 	AM_RANGE(0x181000, 0x181fff) AM_RAM_WRITE(oneshot_fg_videoram_w) AM_SHARE("fg_videoram") // credits etc.
@@ -360,7 +360,7 @@ void oneshot_state::machine_reset()
 	m_p2_wobble = 0;
 }
 
-static MACHINE_CONFIG_START( oneshot )
+MACHINE_CONFIG_START(oneshot_state::oneshot)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 12000000)
@@ -396,7 +396,7 @@ static MACHINE_CONFIG_START( oneshot )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( maddonna, oneshot )
+MACHINE_CONFIG_DERIVED(oneshot_state::maddonna, oneshot)
 
 	/* basic machine hardware */
 

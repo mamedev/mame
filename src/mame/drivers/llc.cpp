@@ -195,7 +195,7 @@ static GFXDECODE_START( llc2 )
 GFXDECODE_END
 
 /* Machine driver */
-static MACHINE_CONFIG_START( llc1 )
+MACHINE_CONFIG_START(llc_state::llc1)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_3MHz)
 	MCFG_Z80_DAISY_CHAIN(llc1_daisy_chain)
@@ -239,7 +239,7 @@ static MACHINE_CONFIG_START( llc1 )
 	MCFG_GENERIC_KEYBOARD_CB(PUT(llc_state, kbd_put))
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( llc2 )
+MACHINE_CONFIG_START(llc_state::llc2)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_3MHz)
 	MCFG_Z80_DAISY_CHAIN(llc2_daisy_chain)

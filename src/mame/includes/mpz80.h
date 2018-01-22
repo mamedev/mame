@@ -92,6 +92,7 @@ public:
 	int m_trap_stop;
 	int m_trap_aux;
 	DECLARE_DRIVER_INIT(mpz80);
+	void mpz80(machine_config &config);
 };
 
 #endif // MAME_INCLUDES_MPZ80_H

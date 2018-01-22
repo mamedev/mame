@@ -274,7 +274,7 @@ ROM_START (fcisio1)
 	ROM_LOAD16_BYTE ("ISIO-1_V2.1_U.BIN", 0xf00000, 0x4000, CRC (67986768) SHA1 (215f7ff90d9dbe2bea54510e3722fb33d4e54193))
 ROM_END
 
-MACHINE_CONFIG_MEMBER (vme_fcisio1_card_device::device_add_mconfig)
+MACHINE_CONFIG_START(vme_fcisio1_card_device::device_add_mconfig)
 	/* basic machine hardware */
 	MCFG_CPU_ADD ("maincpu", M68010, CPU_CLOCK / 2)
 	MCFG_CPU_PROGRAM_MAP (fcisio1_mem)

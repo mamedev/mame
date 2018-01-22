@@ -850,7 +850,7 @@ static GFXDECODE_START( montecar )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( firetrk )
+MACHINE_CONFIG_START(firetrk_state::firetrk)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6800, MASTER_CLOCK/12) /* 750Khz during service mode */
@@ -881,7 +881,7 @@ static MACHINE_CONFIG_START( firetrk )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( superbug, firetrk )
+MACHINE_CONFIG_DERIVED(firetrk_state::superbug, firetrk)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -905,7 +905,7 @@ static MACHINE_CONFIG_DERIVED( superbug, firetrk )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( montecar, firetrk )
+MACHINE_CONFIG_DERIVED(firetrk_state::montecar, firetrk)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")

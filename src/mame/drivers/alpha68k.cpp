@@ -680,7 +680,7 @@ static ADDRESS_MAP_START( alpha68k_II_map, AS_PROGRAM, 16, alpha68k_state )
 	AM_RANGE(0x100000, 0x100fff) AM_RAM_WRITE(alpha68k_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0x200000, 0x207fff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x300000, 0x3001ff) AM_READWRITE(alpha_II_trigger_r, alpha_microcontroller_w)
-	AM_RANGE(0x400000, 0x400fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x400000, 0x400fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x800000, 0x83ffff) AM_ROMBANK("bank8")
 ADDRESS_MAP_END
 
@@ -698,7 +698,7 @@ static ADDRESS_MAP_START( alpha68k_V_map, AS_PROGRAM, 16, alpha68k_state )
 	AM_RANGE(0x300000, 0x303fff) AM_READ(alpha_V_trigger_r)
 	AM_RANGE(0x300000, 0x3001ff) AM_WRITE(alpha_microcontroller_w)
 	AM_RANGE(0x303e00, 0x303fff) AM_WRITE(alpha_microcontroller_w) /* Gang Wars mirror */
-	AM_RANGE(0x400000, 0x401fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x400000, 0x401fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x800000, 0x83ffff) AM_ROMBANK("bank8")
 ADDRESS_MAP_END
 
@@ -1911,7 +1911,7 @@ MACHINE_START_MEMBER(alpha68k_state,alpha68k_II)
 #define ALPHA68K_VBEND 16
 #define ALPHA68K_VBSTART 240
 
-static MACHINE_CONFIG_START( sstingry )
+MACHINE_CONFIG_START(alpha68k_state::sstingry)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 6000000) /* 24MHz/4? */
@@ -1972,7 +1972,7 @@ static MACHINE_CONFIG_START( sstingry )
 	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( kyros )
+MACHINE_CONFIG_START(alpha68k_state::kyros)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz/4)   /* Verified on bootleg PCB */
@@ -2024,7 +2024,7 @@ static MACHINE_CONFIG_START( kyros )
 	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( jongbou )
+MACHINE_CONFIG_START(alpha68k_state::jongbou)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 8000000)
@@ -2066,7 +2066,7 @@ static MACHINE_CONFIG_START( jongbou )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.65)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( alpha68k_I )
+MACHINE_CONFIG_START(alpha68k_state::alpha68k_I)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 6000000) /* 24MHz/4? */
@@ -2111,7 +2111,7 @@ INTERRUPT_GEN_MEMBER(alpha68k_state::alpha68k_sound_nmi)
 		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
-static MACHINE_CONFIG_START( alpha68k_II )
+MACHINE_CONFIG_START(alpha68k_state::alpha68k_II)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 8000000) /* Correct */
@@ -2160,13 +2160,13 @@ static MACHINE_CONFIG_START( alpha68k_II )
 	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( btlfieldb, alpha68k_II )
+MACHINE_CONFIG_DERIVED(alpha68k_state::btlfieldb, alpha68k_II)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", alpha68k_state, irq1_line_hold)
 	MCFG_CPU_PERIODIC_INT_DRIVER(alpha68k_state, irq2_line_hold, 60*4) // MCU irq
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( alpha68k_II_gm )
+MACHINE_CONFIG_START(alpha68k_state::alpha68k_II_gm)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 8000000)
@@ -2216,7 +2216,7 @@ static MACHINE_CONFIG_START( alpha68k_II_gm )
 	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( alpha68k_V )
+MACHINE_CONFIG_START(alpha68k_state::alpha68k_V)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 10000000) /* ? */
@@ -2265,7 +2265,7 @@ static MACHINE_CONFIG_START( alpha68k_V )
 	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( alpha68k_V_sb )
+MACHINE_CONFIG_START(alpha68k_state::alpha68k_V_sb)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 10000000) /* ? */
@@ -2314,7 +2314,7 @@ static MACHINE_CONFIG_START( alpha68k_V_sb )
 	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( tnextspc )
+MACHINE_CONFIG_START(alpha68k_state::tnextspc)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 9000000) /* Confirmed 18 MHz/2 */

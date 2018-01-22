@@ -165,6 +165,7 @@ public:
 	DECLARE_WRITE8_MEMBER(irl_w);
 	DECLARE_WRITE8_MEMBER(halt_w);
 
+	void hp85(machine_config &config);
 protected:
 	required_device<capricorn_cpu_device> m_cpu;
 	required_device<screen_device> m_screen;
@@ -1323,7 +1324,7 @@ static ADDRESS_MAP_START(rombank_mem_map , AS_PROGRAM , 8 , hp85_state)
 	AM_RANGE(0x0000 , 0x1fff) AM_ROM
 ADDRESS_MAP_END
 
-static MACHINE_CONFIG_START(hp85)
+MACHINE_CONFIG_START(hp85_state::hp85)
 	MCFG_CPU_ADD("cpu" , HP_CAPRICORN , MASTER_CLOCK / 16)
 	MCFG_CPU_PROGRAM_MAP(cpu_mem_map)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(hp85_state , irq_callback)

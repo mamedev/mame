@@ -17304,6 +17304,7 @@ kenseim                         // 18/04/1994 (c) 1994 Togo/Sigma (Japan) not li
 @source:kickgoal.cpp
 actionhw                        // (c) 1995
 kickgoal                        // (c) 1995
+kickgoala						//
 
 @source:kim1.cpp
 kim1                            // Commodore (MOS) KIM-1 1975
@@ -29657,6 +29658,7 @@ samsho3h                        // 0087 (c) 1995 SNK
 samsho4                         // 0222 (c) 1996 SNK
 samsho4k                        // Censored Korean release of samsho4
 samsho5                         // 0270 (c) 2003 Playmore
+samsho5a						// 0270 (c) 2003 Playmore
 samsho5b                        // bootleg
 samsho5h                        // 0270 (c) 2003 Playmore
 samshoh                         // 0045 (c) 1993 SNK
@@ -29776,6 +29778,8 @@ gprnrs16
 vgpocket
 vgpmini
 sy889
+dgun2573
+bittboy
 
 @source:newbrain.cpp
 newbrain                        //
@@ -31343,6 +31347,7 @@ kov2100                         //
 kov2101                         //
 kov2102                         //
 kov2103                         //
+kov2104                         //
 kov2106                         //
 kov2p                           // (c) 2000 Knights of Valor 2 Nine Dragons
 kov2p202                        //
@@ -34577,6 +34582,7 @@ gegege                          // b9804 (c) 1997 Sigma / Banpresto
 gocowboy                        // (c) 2003 Sammy
 haekaka                         // (c) 2001 Sammy
 itazuram                        // (c) 2000 Sammy
+lufykzku                        // (c) 2001 Banpresto
 pepsiman                        // b9806 (c) 1997 Sigma
 pyenaget                        // (c) 2000 Sammy
 sammymdl                        // (c) 2000-2003 Sammy
@@ -34673,6 +34679,8 @@ skylncr                         // (c) 1995 Bordun International
 sstar97                         // (c) 199? Bordun International
 bdream97                        // Bootleg?
 sonikfig                        // Z Games
+ypovrixi                        // Bootleg?
+ypovrixia                       // Bootleg?
 
 @source:skyraid.cpp
 skyraid                         // 009709           1978/03 [6502]
@@ -37323,6 +37331,7 @@ tutor                           // 1983? Tomy Tutor
 tv910                           //
 
 @source:tv912.cpp
+tv912b                          //
 tv912c                          //
 
 @source:tv950.cpp
@@ -37938,6 +37947,7 @@ vt180                           // 1981 Digital Equipment Corporation
 
 @source:vt220.cpp
 vt220                           // 1983 Digital Equipment Corporation
+vt220a                          // 1983 Digital Equipment Corporation
 
 @source:vt240.cpp
 mc7105                          // Elektronika MC7105

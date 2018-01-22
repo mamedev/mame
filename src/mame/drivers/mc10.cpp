@@ -49,6 +49,9 @@ public:
 	DECLARE_READ8_MEMBER(mc6847_videoram_r);
 	TIMER_DEVICE_CALLBACK_MEMBER(alice32_scanline);
 
+	void alice90(machine_config &config);
+	void alice32(machine_config &config);
+	void mc10(machine_config &config);
 protected:
 	// device-level overrides
 	virtual void driver_start() override;
@@ -497,7 +500,7 @@ INPUT_PORTS_END
     MACHINE DRIVERS
 ***************************************************************************/
 
-MACHINE_CONFIG_START( mc10 )
+MACHINE_CONFIG_START(mc10_state::mc10)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6803, XTAL_3_579545MHz)  /* 0,894886 MHz */
@@ -533,7 +536,7 @@ MACHINE_CONFIG_START( mc10 )
 	MCFG_SOFTWARE_LIST_ADD("cass_list", "mc10")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START( alice32 )
+MACHINE_CONFIG_START(mc10_state::alice32)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6803, XTAL_3_579545MHz)
@@ -576,7 +579,7 @@ MACHINE_CONFIG_START( alice32 )
 	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("mc10_cass", "mc10")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED( alice90, alice32 )
+MACHINE_CONFIG_DERIVED(mc10_state::alice90, alice32)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(alice90_mem)
 

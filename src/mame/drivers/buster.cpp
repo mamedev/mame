@@ -32,6 +32,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	void buster(machine_config &config);
 };
 
 
@@ -315,7 +316,7 @@ static GFXDECODE_START( buster )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( buster )
+MACHINE_CONFIG_START(buster_state::buster)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80,XTAL_3_579545MHz)        /* ? MHz */
 	MCFG_CPU_PROGRAM_MAP(mainmap)

@@ -21,6 +21,7 @@ public:
 	virtual void video_start() override;
 	uint32_t screen_update_hotstuff(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
+	void hotstuff(machine_config &config);
 };
 
 
@@ -87,7 +88,7 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START( hotstuff )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( hotstuff )
+MACHINE_CONFIG_START(hotstuff_state::hotstuff)
 
 	MCFG_CPU_ADD("maincpu", M68000, 16000000)
 	MCFG_CPU_PROGRAM_MAP(hotstuff_map)

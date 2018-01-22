@@ -178,7 +178,7 @@ void exp85_state::machine_start()
 
 /* Machine Driver */
 
-static MACHINE_CONFIG_START( exp85 )
+MACHINE_CONFIG_START(exp85_state::exp85)
 	/* basic machine hardware */
 	MCFG_CPU_ADD(I8085A_TAG, I8085A, XTAL_6_144MHz)
 	MCFG_CPU_PROGRAM_MAP(exp85_mem)

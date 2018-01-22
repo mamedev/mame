@@ -175,6 +175,12 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	void coinmstr(machine_config &config);
+	void pokeroul(machine_config &config);
+	void supnudg2(machine_config &config);
+	void jpcoin(machine_config &config);
+	void quizmstr(machine_config &config);
+	void trailblz(machine_config &config);
 };
 
 
@@ -1234,7 +1240,7 @@ uint32_t coinmstr_state::screen_update_coinmstr(screen_device &screen, bitmap_in
 }
 
 
-static MACHINE_CONFIG_START( coinmstr )
+MACHINE_CONFIG_START(coinmstr_state::coinmstr)
 	MCFG_CPU_ADD("maincpu", Z80, CPU_CLOCK) // 7 MHz.
 	MCFG_CPU_PROGRAM_MAP(coinmstr_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", coinmstr_state,  irq0_line_hold)
@@ -1275,27 +1281,27 @@ static MACHINE_CONFIG_START( coinmstr )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( quizmstr, coinmstr )
+MACHINE_CONFIG_DERIVED(coinmstr_state::quizmstr, coinmstr)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(quizmstr_io_map)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( trailblz, coinmstr )
+MACHINE_CONFIG_DERIVED(coinmstr_state::trailblz, coinmstr)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(trailblz_io_map)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( supnudg2, coinmstr )
+MACHINE_CONFIG_DERIVED(coinmstr_state::supnudg2, coinmstr)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(supnudg2_io_map)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( pokeroul, coinmstr )
+MACHINE_CONFIG_DERIVED(coinmstr_state::pokeroul, coinmstr)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(pokeroul_io_map)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( jpcoin, coinmstr )
+MACHINE_CONFIG_DERIVED(coinmstr_state::jpcoin, coinmstr)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(jpcoin_map)
 	MCFG_CPU_IO_MAP(jpcoin_io_map)

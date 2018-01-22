@@ -198,7 +198,7 @@ void fastlane_state::machine_start()
 	membank("bank1")->configure_entries(0, 4, &ROM[0x10000], 0x4000);
 }
 
-static MACHINE_CONFIG_START( fastlane )
+MACHINE_CONFIG_START(fastlane_state::fastlane)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", HD6309, XTAL_24MHz/2) // 3MHz(XTAL_24MHz/8) internally

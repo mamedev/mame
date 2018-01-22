@@ -97,6 +97,7 @@ public:
 	DECLARE_PALETTE_INIT(mstation);
 	TIMER_DEVICE_CALLBACK_MEMBER(mstation_1hz_timer);
 	TIMER_DEVICE_CALLBACK_MEMBER(mstation_kb_timer);
+	void mstation(machine_config &config);
 };
 
 
@@ -436,7 +437,7 @@ PALETTE_INIT_MEMBER(mstation_state, mstation)
 }
 
 
-static MACHINE_CONFIG_START( mstation )
+MACHINE_CONFIG_START(mstation_state::mstation)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80, XTAL_4MHz)      //unknown clock
 	MCFG_CPU_PROGRAM_MAP(mstation_mem)

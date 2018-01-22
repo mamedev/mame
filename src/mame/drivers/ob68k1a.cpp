@@ -192,7 +192,7 @@ void ob68k1a_state::machine_reset()
 //  MACHINE_CONFIG( ob68k1a )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( ob68k1a )
+MACHINE_CONFIG_START(ob68k1a_state::ob68k1a)
 	// basic machine hardware
 	MCFG_CPU_ADD(MC68000L10_TAG, M68000, XTAL_10MHz)
 	MCFG_CPU_PROGRAM_MAP(ob68k1a_mem)

@@ -34,6 +34,7 @@ public:
 		m_maincpu(*this, "maincpu")
 	{ }
 
+	void vsmilpro(machine_config &config);
 private:
 	required_device<cpu_device> m_maincpu;
 };
@@ -47,7 +48,7 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START( vsmilpro )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( vsmilpro )
+MACHINE_CONFIG_START(vsmilpro_state::vsmilpro)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", ARM9, 150000000)
 	MCFG_CPU_PROGRAM_MAP(vsmilpro_map)

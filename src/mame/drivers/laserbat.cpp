@@ -461,7 +461,7 @@ void laserbat_state_base::device_timer(emu_timer &timer, device_timer_id id, int
 }
 
 
-static MACHINE_CONFIG_START( laserbat_base )
+MACHINE_CONFIG_START(laserbat_state_base::laserbat_base)
 
 	// basic machine hardware
 	MCFG_CPU_ADD("maincpu", S2650, XTAL_14_31818MHz/4)
@@ -494,7 +494,7 @@ static MACHINE_CONFIG_START( laserbat_base )
 
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( laserbat, laserbat_base )
+MACHINE_CONFIG_DERIVED(laserbat_state::laserbat, laserbat_base)
 
 	// video hardware
 	MCFG_PALETTE_ADD("palette", 256)
@@ -526,7 +526,7 @@ static MACHINE_CONFIG_DERIVED( laserbat, laserbat_base )
 
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( catnmous, laserbat_base )
+MACHINE_CONFIG_DERIVED(catnmous_state::catnmous, laserbat_base)
 
 	// video hardware
 	MCFG_PALETTE_ADD("palette", 256)

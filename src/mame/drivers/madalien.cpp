@@ -148,7 +148,7 @@ static INPUT_PORTS_START( madalien )
 INPUT_PORTS_END
 
 
-static MACHINE_CONFIG_START( madalien )
+MACHINE_CONFIG_START(madalien_state::madalien)
 
 	/* main CPU */
 	MCFG_CPU_ADD("maincpu", M6502, MADALIEN_MAIN_CLOCK / 8) /* 1324kHz */

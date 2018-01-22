@@ -51,7 +51,7 @@ const tiny_rom_entry *trs80m2_keyboard_device::device_rom_region() const
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( trs80m2_keyboard_device::device_add_mconfig )
+MACHINE_CONFIG_START(trs80m2_keyboard_device::device_add_mconfig)
 	MCFG_CPU_ADD(I8021_TAG, I8021, 3000000) // 1000uH inductor connected across the XTAL inputs
 	MCFG_MCS48_PORT_T1_IN_CB(READLINE(trs80m2_keyboard_device, kb_t1_r))
 	MCFG_MCS48_PORT_BUS_IN_CB(READ8(trs80m2_keyboard_device, kb_p0_r))

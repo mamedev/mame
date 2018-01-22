@@ -50,6 +50,7 @@ public:
 	DECLARE_WRITE8_MEMBER(diablo68k_leds_w);
 	DECLARE_READ8_MEMBER(diablo68k_input1_r);
 	DECLARE_READ8_MEMBER(diablo68k_input2_r);
+	void diablo68k(machine_config &config);
 };
 
 
@@ -178,7 +179,7 @@ INPUT_PORTS_END
     Machine Drivers
 ******************************************************************************/
 
-static MACHINE_CONFIG_START( diablo68k )
+MACHINE_CONFIG_START(novag68k_state::diablo68k)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz)

@@ -59,6 +59,7 @@
 #include "machine/gen_latch.h"
 #include "machine/watchdog.h"
 #include "screen.h"
+#include "speaker.h"
 
 
 /*************************************
@@ -129,7 +130,7 @@ WRITE8_MEMBER(tutankhm_state::sound_on_w)
 
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, tutankhm_state )
 	AM_RANGE(0x0000, 0x7fff) AM_RAM AM_SHARE("videoram")
-	AM_RANGE(0x8000, 0x800f) AM_MIRROR(0x00f0) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x8000, 0x800f) AM_MIRROR(0x00f0) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
 	AM_RANGE(0x8100, 0x8100) AM_MIRROR(0x000f) AM_RAM AM_SHARE("scroll")
 	AM_RANGE(0x8120, 0x8120) AM_MIRROR(0x000f) AM_DEVREAD("watchdog", watchdog_timer_device, reset_r)
 	AM_RANGE(0x8160, 0x8160) AM_MIRROR(0x000f) AM_READ_PORT("DSW2") /* DSW2 (inverted bits) */
@@ -222,7 +223,17 @@ MACHINE_RESET_MEMBER(tutankhm_state,tutankhm)
 	m_irq_toggle = 0;
 }
 
-static MACHINE_CONFIG_START( tutankhm )
+static ADDRESS_MAP_START( timeplt_sound_map, AS_PROGRAM, 8, timeplt_audio_device )
+	AM_RANGE(0x0000, 0x2fff) AM_ROM
+	AM_RANGE(0x3000, 0x33ff) AM_MIRROR(0x0c00) AM_RAM
+	AM_RANGE(0x4000, 0x4000) AM_MIRROR(0x0fff) AM_DEVREADWRITE("ay1", ay8910_device, data_r, data_w)
+	AM_RANGE(0x5000, 0x5000) AM_MIRROR(0x0fff) AM_DEVWRITE("ay1", ay8910_device, address_w)
+	AM_RANGE(0x6000, 0x6000) AM_MIRROR(0x0fff) AM_DEVREADWRITE("ay2", ay8910_device, data_r, data_w)
+	AM_RANGE(0x7000, 0x7000) AM_MIRROR(0x0fff) AM_DEVWRITE("ay2", ay8910_device, address_w)
+	AM_RANGE(0x8000, 0xffff) AM_DEVWRITE("timeplt_audio", timeplt_audio_device, filter_w)
+ADDRESS_MAP_END
+
+MACHINE_CONFIG_START(tutankhm_state::tutankhm)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", MC6809E, XTAL_18_432MHz/12)   /* 1.5 MHz ??? */
@@ -259,7 +270,40 @@ static MACHINE_CONFIG_START( tutankhm )
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_FRAGMENT_ADD(timeplt_sound)
+	/* basic machine hardware */
+	MCFG_CPU_ADD("tpsound",Z80,XTAL_14_31818MHz/8)
+	MCFG_CPU_PROGRAM_MAP(timeplt_sound_map)
+
+	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_SOUND_ADD("timeplt_audio", TIMEPLT_AUDIO, 0)
+
+	MCFG_SOUND_ADD("ay1", AY8910, XTAL_14_31818MHz/8)
+	MCFG_AY8910_PORT_A_READ_CB(DEVREAD8("soundlatch", generic_latch_8_device, read))
+	MCFG_AY8910_PORT_B_READ_CB(DEVREAD8("timeplt_audio", timeplt_audio_device, portB_r))
+	MCFG_SOUND_ROUTE(0, "filter.0.0", 0.60)
+	MCFG_SOUND_ROUTE(1, "filter.0.1", 0.60)
+	MCFG_SOUND_ROUTE(2, "filter.0.2", 0.60)
+
+	MCFG_SOUND_ADD("ay2", AY8910, XTAL_14_31818MHz/8)
+	MCFG_SOUND_ROUTE(0, "filter.1.0", 0.60)
+	MCFG_SOUND_ROUTE(1, "filter.1.1", 0.60)
+	MCFG_SOUND_ROUTE(2, "filter.1.2", 0.60)
+
+	MCFG_FILTER_RC_ADD("filter.0.0", 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_FILTER_RC_ADD("filter.0.1", 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_FILTER_RC_ADD("filter.0.2", 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+
+	MCFG_FILTER_RC_ADD("filter.1.0", 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_FILTER_RC_ADD("filter.1.1", 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_FILTER_RC_ADD("filter.1.2", 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 

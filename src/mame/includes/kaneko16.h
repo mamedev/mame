@@ -90,6 +90,10 @@ public:
 	void kaneko16_fill_bitmap(_BitmapClass &bitmap, const rectangle &cliprect);
 
 	void kaneko16_unscramble_tiles(const char *region);
+	void bakubrkr(machine_config &config);
+	void wingforc(machine_config &config);
+	void blazeon(machine_config &config);
+	void mgcrystl(machine_config &config);
 };
 
 class kaneko16_gtmr_state : public kaneko16_state
@@ -113,6 +117,11 @@ public:
 	DECLARE_READ16_MEMBER(gtmr2_IN1_r);
 	DECLARE_DRIVER_INIT(gtmr);
 
+	void bonkadv(machine_config &config);
+	void gtmr(machine_config &config);
+	void gtmr2(machine_config &config);
+	void gtmre(machine_config &config);
+	void bloodwar(machine_config &config);
 private:
 	void kaneko16_expand_sample_banks(const char *region);
 
@@ -164,6 +173,7 @@ public:
 	void kaneko16_render_15bpp_bitmap(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	void patch_protection(uint32_t bra_offset,uint16_t bra_value,uint16_t checksum);
+	void berlwall(machine_config &config);
 };
 
 class kaneko16_shogwarr_state : public kaneko16_state
@@ -183,6 +193,8 @@ public:
 
 	TIMER_DEVICE_CALLBACK_MEMBER(shogwarr_interrupt);
 
+	void shogwarr(machine_config &config);
+	void brapboys(machine_config &config);
 private:
 	void kaneko16_common_oki_bank_w(const char *bankname, const char *tag, int bank, size_t fixedsize, size_t bankedsize);
 

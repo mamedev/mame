@@ -59,6 +59,7 @@ public:
 	void kbd_put(u8 data);
 	uint32_t screen_update_modellot(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
+	void modellot(machine_config &config);
 private:
 	uint8_t m_term_data;
 	virtual void machine_reset() override;
@@ -170,7 +171,7 @@ uint32_t modellot_state::screen_update_modellot(screen_device &screen, bitmap_in
 	return 0;
 }
 
-static MACHINE_CONFIG_START( modellot )
+MACHINE_CONFIG_START(modellot_state::modellot)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80, XTAL_4MHz)
 	MCFG_CPU_PROGRAM_MAP(mem_map)

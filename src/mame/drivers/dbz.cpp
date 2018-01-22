@@ -114,7 +114,7 @@ static ADDRESS_MAP_START( dbz_map, AS_PROGRAM, 16, dbz_state )
 	AM_RANGE(0x498000, 0x49ffff) AM_DEVREAD("k056832", k056832_device, rom_word_8000_r)  // code near a60 in dbz2, subroutine at 730 in dbz
 	AM_RANGE(0x4a0000, 0x4a0fff) AM_DEVREADWRITE("k053246", k053247_device, k053247_word_r, k053247_word_w)
 	AM_RANGE(0x4a1000, 0x4a3fff) AM_RAM
-	AM_RANGE(0x4a8000, 0x4abfff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette") // palette
+	AM_RANGE(0x4a8000, 0x4abfff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette") // palette
 	AM_RANGE(0x4c0000, 0x4c0001) AM_DEVREAD("k053246", k053247_device, k053246_word_r)
 	AM_RANGE(0x4c0000, 0x4c0007) AM_DEVWRITE("k053246", k053247_device, k053246_word_w)
 	AM_RANGE(0x4c4000, 0x4c4007) AM_DEVWRITE("k053246", k053247_device, k053246_word_w)
@@ -325,7 +325,7 @@ void dbz_state::machine_reset()
 	m_control = 0;
 }
 
-static MACHINE_CONFIG_START( dbz )
+MACHINE_CONFIG_START(dbz_state::dbz)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 16000000)

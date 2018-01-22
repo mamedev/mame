@@ -67,4 +67,5 @@ public:
 	DECLARE_PALETTE_INIT(taxidriv);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void taxidriv(machine_config &config);
 };

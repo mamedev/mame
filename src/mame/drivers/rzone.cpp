@@ -68,6 +68,9 @@ public:
 	DECLARE_WRITE8_MEMBER(t2_write_r);
 	DECLARE_WRITE8_MEMBER(t2_write_s);
 
+	void rzbatfor(machine_config &config);
+	void rzindy500(machine_config &config);
+
 protected:
 	virtual void machine_start() override;
 };
@@ -238,7 +241,7 @@ INPUT_PORTS_END
 
 ***************************************************************************/
 
-static MACHINE_CONFIG_START( rzindy500 )
+MACHINE_CONFIG_START(rzone_state::rzindy500)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", SM510, XTAL_32_768kHz) // no external XTAL
@@ -264,7 +267,7 @@ static MACHINE_CONFIG_START( rzindy500 )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( rzbatfor )
+MACHINE_CONFIG_START(rzone_state::rzbatfor)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", SM512, XTAL_32_768kHz) // no external XTAL

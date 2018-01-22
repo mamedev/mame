@@ -317,7 +317,7 @@ WRITE_LINE_MEMBER( luxor_55_10828_device::fdc_drq_w )
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( luxor_55_10828_device::device_add_mconfig )
+MACHINE_CONFIG_START(luxor_55_10828_device::device_add_mconfig)
 	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL_4MHz/2)
 	MCFG_CPU_PROGRAM_MAP(luxor_55_10828_mem)
 	MCFG_CPU_IO_MAP(luxor_55_10828_io)

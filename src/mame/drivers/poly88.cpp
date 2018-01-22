@@ -191,7 +191,7 @@ static GFXDECODE_START( poly88 )
 	GFXDECODE_ENTRY( "chargen", 0x0000, poly88_charlayout, 0, 1 )
 GFXDECODE_END
 
-static MACHINE_CONFIG_START( poly88 )
+MACHINE_CONFIG_START(poly88_state::poly88)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8080A, XTAL_16_5888MHz / 9) // uses 8224 clock generator
 	MCFG_CPU_PROGRAM_MAP(poly88_mem)
@@ -231,7 +231,7 @@ static MACHINE_CONFIG_START( poly88 )
 	MCFG_SNAPSHOT_ADD("snapshot", poly88_state, poly88, "img", 2)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( poly8813, poly88 )
+MACHINE_CONFIG_DERIVED(poly88_state::poly8813, poly88)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(poly8813_mem)
 	MCFG_CPU_IO_MAP(poly8813_io)

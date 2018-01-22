@@ -54,6 +54,7 @@ public:
 	DECLARE_WRITE16_MEMBER(cal_vdp_w);
 
 	uint32_t screen_update_calcune(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	void calcune(machine_config &config);
 private:
 	int vdp_state;
 
@@ -245,7 +246,7 @@ MACHINE_START_MEMBER(calcune_state,calcune)
 	m_vdp2->stop_timers();
 }
 
-static MACHINE_CONFIG_START( calcune )
+MACHINE_CONFIG_START(calcune_state::calcune)
 	MCFG_CPU_ADD("maincpu", M68000, MASTER_CLOCK_NTSC / 7) /* 7.67 MHz */
 	MCFG_CPU_PROGRAM_MAP(calcune_map)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(calcune_state,genesis_int_callback)

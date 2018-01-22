@@ -165,6 +165,7 @@ public:
 	NETDEV_ANALOG_CALLBACK_MEMBER(vblank_cb);
 	NETDEV_ANALOG_CALLBACK_MEMBER(tvinterq_cb);
 
+	void hazl1500(machine_config &config);
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<netlist_mame_device> m_video_board;
@@ -686,7 +687,7 @@ static GFXDECODE_START( hazl1500 )
 	GFXDECODE_ENTRY( CHAR_EPROM_TAG, 0x0000, hazl1500_charlayout, 0, 1 )
 GFXDECODE_END
 
-static MACHINE_CONFIG_START( hazl1500 )
+MACHINE_CONFIG_START(hazl1500_state::hazl1500)
 	/* basic machine hardware */
 	MCFG_CPU_ADD(CPU_TAG, I8080, XTAL_18MHz/9) // 18MHz crystal on schematics, using an i8224 clock gen/driver IC
 	MCFG_CPU_PROGRAM_MAP(hazl1500_mem)

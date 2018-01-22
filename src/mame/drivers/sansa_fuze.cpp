@@ -22,6 +22,7 @@ public:
 	{ }
 
 	required_device<cpu_device> m_maincpu;
+	void sansa_fuze(machine_config &config);
 };
 
 
@@ -38,7 +39,7 @@ static INPUT_PORTS_START( sansa_fuze )
 INPUT_PORTS_END
 
 
-static MACHINE_CONFIG_START( sansa_fuze )
+MACHINE_CONFIG_START(sansa_fuze_state::sansa_fuze)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", ARM7, 50000000) // arm based, speed unknown

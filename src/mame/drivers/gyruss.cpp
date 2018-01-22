@@ -471,7 +471,7 @@ INTERRUPT_GEN_MEMBER(gyruss_state::slave_vblank_irq)
 		device.execute().set_input_line(0, ASSERT_LINE);
 }
 
-static MACHINE_CONFIG_START( gyruss )
+MACHINE_CONFIG_START(gyruss_state::gyruss)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK/6)    /* 3.072 MHz */

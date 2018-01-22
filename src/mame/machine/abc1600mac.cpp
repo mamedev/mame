@@ -66,7 +66,7 @@ static ADDRESS_MAP_START( program_map, AS_PROGRAM, 8, abc1600_mac_device )
 ADDRESS_MAP_END
 
 
-MACHINE_CONFIG_MEMBER( abc1600_mac_device::device_add_mconfig )
+MACHINE_CONFIG_START(abc1600_mac_device::device_add_mconfig)
 	MCFG_WATCHDOG_ADD("watchdog")
 	MCFG_WATCHDOG_TIME_INIT(attotime::from_msec(1600)) // XTAL_64MHz/8/10/20000/8/8
 MACHINE_CONFIG_END

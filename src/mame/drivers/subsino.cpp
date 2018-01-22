@@ -329,6 +329,14 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	void mtrainnv(machine_config &config);
+	void stbsub(machine_config &config);
+	void tisub(machine_config &config);
+	void crsbingo(machine_config &config);
+	void srider(machine_config &config);
+	void victor21(machine_config &config);
+	void sharkpy(machine_config &config);
+	void victor5(machine_config &config);
 };
 
 void subsino_state::machine_start()
@@ -2748,7 +2756,7 @@ GFXDECODE_END
 *                             Machine Drivers                              *
 ***************************************************************************/
 
-static MACHINE_CONFIG_START( victor21 )
+MACHINE_CONFIG_START(subsino_state::victor21)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z180, XTAL_12MHz / 8)   /* Unknown clock */
 	MCFG_CPU_PROGRAM_MAP(victor21_map)
@@ -2790,7 +2798,7 @@ static MACHINE_CONFIG_START( victor21 )
 MACHINE_CONFIG_END
 
 /* same but with an additional protection. */
-static MACHINE_CONFIG_DERIVED( victor5, victor21 )
+MACHINE_CONFIG_DERIVED(subsino_state::victor5, victor21)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2798,7 +2806,7 @@ static MACHINE_CONFIG_DERIVED( victor5, victor21 )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( crsbingo )
+MACHINE_CONFIG_START(subsino_state::crsbingo)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z180, XTAL_12MHz / 8)   /* Unknown CPU and clock */
 	MCFG_CPU_PROGRAM_MAP(crsbingo_map)
@@ -2830,7 +2838,7 @@ static MACHINE_CONFIG_START( crsbingo )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( srider )
+MACHINE_CONFIG_START(subsino_state::srider)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z180, XTAL_12MHz / 8)   /* Unknown clock */
 	MCFG_CPU_PROGRAM_MAP(srider_map)
@@ -2875,14 +2883,14 @@ static MACHINE_CONFIG_START( srider )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( sharkpy, srider )
+MACHINE_CONFIG_DERIVED(subsino_state::sharkpy, srider)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(sharkpy_map)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( tisub )
+MACHINE_CONFIG_START(subsino_state::tisub)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z180, XTAL_12MHz / 8)   /* Unknown CPU and clock */
 	MCFG_CPU_PROGRAM_MAP(tisub_map)
@@ -2923,7 +2931,7 @@ static MACHINE_CONFIG_START( tisub )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( stbsub )
+MACHINE_CONFIG_START(subsino_state::stbsub)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z180, XTAL_12MHz / 8)   /* Unknown clock */
 	MCFG_CPU_PROGRAM_MAP(stbsub_map)
@@ -2966,7 +2974,7 @@ static MACHINE_CONFIG_START( stbsub )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( mtrainnv, stbsub )
+MACHINE_CONFIG_DERIVED(subsino_state::mtrainnv, stbsub)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")

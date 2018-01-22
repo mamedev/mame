@@ -262,7 +262,7 @@ DEFINE_DEVICE_TYPE(ISA8_XTIDE, xtide_device, "xtide", "XT-IDE Fixed Drive Adapte
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( xtide_device::device_add_mconfig )
+MACHINE_CONFIG_START(xtide_device::device_add_mconfig)
 	MCFG_ATA_INTERFACE_ADD("ata", ata_devices, "hdd", nullptr, false)
 	MCFG_ATA_INTERFACE_IRQ_HANDLER(WRITELINE(xtide_device, ide_interrupt))
 

@@ -651,7 +651,7 @@ MACHINE_START_MEMBER(hyprduel_state,magerror)
 	m_magerror_irq_timer->adjust(attotime::zero, 0, attotime::from_hz(968));        /* tempo? */
 }
 
-static MACHINE_CONFIG_START( hyprduel )
+MACHINE_CONFIG_START(hyprduel_state::hyprduel)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000,20000000/2)      /* 10MHz */
@@ -692,7 +692,7 @@ static MACHINE_CONFIG_START( hyprduel )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( magerror )
+MACHINE_CONFIG_START(hyprduel_state::magerror)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000,20000000/2)      /* 10MHz */

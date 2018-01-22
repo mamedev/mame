@@ -99,6 +99,7 @@ public:
 	DECLARE_WRITE8_MEMBER(mycom_rtc_w);
 	MC6845_UPDATE_ROW(crtc_update_row);
 
+	void mycom(machine_config &config);
 private:
 	uint8_t m_0a;
 	uint16_t m_i_videoram;
@@ -497,7 +498,7 @@ DRIVER_INIT_MEMBER(mycom_state,mycom)
 	membank("boot")->configure_entries(0, 2, &RAM[0x0000], 0x10000);
 }
 
-static MACHINE_CONFIG_START( mycom )
+MACHINE_CONFIG_START(mycom_state::mycom)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80, XTAL_10MHz / 4)
 	MCFG_CPU_PROGRAM_MAP(mycom_map)

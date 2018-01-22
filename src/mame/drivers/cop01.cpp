@@ -509,7 +509,7 @@ void cop01_state::machine_reset()
 }
 
 
-static MACHINE_CONFIG_START( cop01 )
+MACHINE_CONFIG_START(cop01_state::cop01)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, MAINCPU_CLOCK/2)   /* unknown clock / divider */
@@ -551,7 +551,7 @@ static MACHINE_CONFIG_START( cop01 )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( mightguy )
+MACHINE_CONFIG_START(cop01_state::mightguy)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, MAINCPU_CLOCK/2)   /* unknown divider */

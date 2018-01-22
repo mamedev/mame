@@ -233,7 +233,7 @@ static ADDRESS_MAP_START( vgbmem, AS_PROGRAM, 16, micro3d_state )
 	AM_RANGE(0x00800000, 0x00bfffff) AM_RAM
 	AM_RANGE(0x00c00000, 0x00c0000f) AM_READ_PORT("VGB_SW")
 	AM_RANGE(0x00e00000, 0x00e0000f) AM_WRITE(micro3d_xfer3dk_w)
-	AM_RANGE(0x02000000, 0x0200ffff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette") // clut
+	AM_RANGE(0x02000000, 0x0200ffff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette") // clut
 	AM_RANGE(0x02600000, 0x0260000f) AM_WRITE(micro3d_creg_w)
 	AM_RANGE(0x02c00000, 0x02c0003f) AM_READ8(vgb_uart_r, 0x00ff)
 	AM_RANGE(0x02e00000, 0x02e0003f) AM_WRITE8(vgb_uart_w, 0x00ff)
@@ -295,7 +295,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( micro3d )
+MACHINE_CONFIG_START(micro3d_state::micro3d)
 
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_32MHz / 2)
 	MCFG_CPU_PROGRAM_MAP(hostmem)
@@ -388,7 +388,7 @@ static MACHINE_CONFIG_START( micro3d )
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED( botss11, micro3d )
+MACHINE_CONFIG_DERIVED(micro3d_state::botss11, micro3d)
 	MCFG_DEVICE_MODIFY("adc")
 	MCFG_ADC0844_CH1_CB(NOOP)
 MACHINE_CONFIG_END

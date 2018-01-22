@@ -113,6 +113,9 @@ public:
 
 	DECLARE_DRIVER_INIT(fi6845);
 
+	void fastinvaders(machine_config &config);
+	void fastinvaders_8275(machine_config &config);
+	void fastinvaders_6845(machine_config &config);
 };
 
 
@@ -631,7 +634,7 @@ static GFXDECODE_START( fastinvaders )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout, 0, 1 )
 GFXDECODE_END
 
-static MACHINE_CONFIG_START( fastinvaders )
+MACHINE_CONFIG_START(fastinvaders_state::fastinvaders)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8085A, 6144100/2 ) // 6144100 Xtal /2 internaly
@@ -670,7 +673,7 @@ MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", fastinvaders_state, scanline_timer, 
 	// TODO
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( fastinvaders_8275, fastinvaders )
+MACHINE_CONFIG_DERIVED(fastinvaders_state::fastinvaders_8275, fastinvaders)
 	MCFG_CPU_MODIFY("maincpu" ) // guess
 	MCFG_CPU_IO_MAP(fastinvaders_8275_io)
 
@@ -680,7 +683,7 @@ static MACHINE_CONFIG_DERIVED( fastinvaders_8275, fastinvaders )
 //  MCFG_I8275_DRQ_CALLBACK(DEVWRITELINE("dma8257",i8257_device, dreq2_w))
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( fastinvaders_6845, fastinvaders )
+MACHINE_CONFIG_DERIVED(fastinvaders_state::fastinvaders_6845, fastinvaders)
 	MCFG_CPU_MODIFY("maincpu" ) // guess
 	MCFG_CPU_IO_MAP(fastinvaders_6845_io)
 

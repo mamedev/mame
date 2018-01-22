@@ -43,7 +43,7 @@ static ADDRESS_MAP_START( citycon_map, AS_PROGRAM, 8, citycon_state )
 	AM_RANGE(0x3002, 0x3002) AM_READ_PORT("DSW2") AM_DEVWRITE("soundlatch2", generic_latch_8_device, write)
 	AM_RANGE(0x3004, 0x3005) AM_READNOP AM_WRITEONLY AM_SHARE("scroll")
 	AM_RANGE(0x3007, 0x3007) AM_READ(citycon_irq_ack_r)
-	AM_RANGE(0x3800, 0x3cff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x3800, 0x3cff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
 	AM_RANGE(0x4000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -186,7 +186,7 @@ void citycon_state::machine_reset()
 }
 
 
-static MACHINE_CONFIG_START( citycon )
+MACHINE_CONFIG_START(citycon_state::citycon)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", MC6809, XTAL_8MHz) // HD68B09P

@@ -63,6 +63,9 @@ public:
 	void cd_dma_write( uint32_t *p_n_psxram, uint32_t n_address, int32_t n_size );
 	required_device<psxcpu_device> m_maincpu;
 	required_device<ram_device> m_ram;
+	void pse(machine_config &config);
+	void psu(machine_config &config);
+	void psj(machine_config &config);
 };
 
 
@@ -488,7 +491,7 @@ static ADDRESS_MAP_START( subcpu_map, AS_PROGRAM, 8, psx1_state )
 	AM_RANGE(0x0000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static MACHINE_CONFIG_START( psj )
+MACHINE_CONFIG_START(psx1_state::psj)
 	/* basic machine hardware */
 	MCFG_CPU_ADD( "maincpu", CXD8530CQ, XTAL_67_7376MHz )
 	MCFG_CPU_PROGRAM_MAP( psx_map )
@@ -526,16 +529,16 @@ static MACHINE_CONFIG_START( psj )
 
 	MCFG_PSXCD_ADD(PSXCD_TAG, "cdrom")
 	MCFG_PSXCD_IRQ_HANDLER(DEVWRITELINE("maincpu:irq", psxirq_device, intin2))
-	MCFG_PSX_DMA_CHANNEL_READ( "maincpu", 3, psxdma_device::read_delegate(&psx1_state::cd_dma_read, (psx1_state *) owner ) )
-	MCFG_PSX_DMA_CHANNEL_WRITE( "maincpu", 3, psxdma_device::write_delegate(&psx1_state::cd_dma_write, (psx1_state *) owner ) )
+	MCFG_PSX_DMA_CHANNEL_READ( "maincpu", 3, psxdma_device::read_delegate(&psx1_state::cd_dma_read, this ) )
+	MCFG_PSX_DMA_CHANNEL_WRITE( "maincpu", 3, psxdma_device::write_delegate(&psx1_state::cd_dma_write, this ) )
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( psu, psj )
+MACHINE_CONFIG_DERIVED(psx1_state::psu, psj)
 	MCFG_CPU_ADD( "subcpu", HD63705, 4166667 ) // MC68HC05G6
 	MCFG_CPU_PROGRAM_MAP( subcpu_map )
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( pse )
+MACHINE_CONFIG_START(psx1_state::pse)
 	/* basic machine hardware */
 	MCFG_CPU_ADD( "maincpu", CXD8530AQ, XTAL_67_7376MHz )
 	MCFG_CPU_PROGRAM_MAP( psx_map)
@@ -574,8 +577,8 @@ static MACHINE_CONFIG_START( pse )
 
 	MCFG_PSXCD_ADD(PSXCD_TAG, "cdrom")
 	MCFG_PSXCD_IRQ_HANDLER(DEVWRITELINE("maincpu:irq", psxirq_device, intin2))
-	MCFG_PSX_DMA_CHANNEL_READ( "maincpu", 3, psxdma_device::read_delegate(&psx1_state::cd_dma_read, (psx1_state *) owner ) )
-	MCFG_PSX_DMA_CHANNEL_WRITE( "maincpu", 3, psxdma_device::write_delegate(&psx1_state::cd_dma_write, (psx1_state *) owner ) )
+	MCFG_PSX_DMA_CHANNEL_READ( "maincpu", 3, psxdma_device::read_delegate(&psx1_state::cd_dma_read, this ) )
+	MCFG_PSX_DMA_CHANNEL_WRITE( "maincpu", 3, psxdma_device::write_delegate(&psx1_state::cd_dma_write, this ) )
 MACHINE_CONFIG_END
 
 ROM_START( psj )

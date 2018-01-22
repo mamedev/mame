@@ -55,7 +55,7 @@ ROM_END
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER(bbc_tube_80286_device::device_add_mconfig)
+MACHINE_CONFIG_START(bbc_tube_80286_device::device_add_mconfig)
 	MCFG_CPU_ADD("i80286", I80286, XTAL_12MHz / 2)
 	MCFG_CPU_PROGRAM_MAP(tube_80286_mem)
 	MCFG_CPU_IO_MAP(tube_80286_io)

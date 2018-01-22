@@ -476,7 +476,7 @@ void pc8001_state::machine_start()
 
 /* Machine Drivers */
 
-static MACHINE_CONFIG_START( pc8001 )
+MACHINE_CONFIG_START(pc8001_state::pc8001)
 	/* basic machine hardware */
 	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL_4MHz)
 	MCFG_CPU_PROGRAM_MAP(pc8001_mem)
@@ -526,7 +526,7 @@ static MACHINE_CONFIG_START( pc8001 )
 	MCFG_RAM_EXTRA_OPTIONS("32K,64K")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( pc8001mk2 )
+MACHINE_CONFIG_START(pc8001mk2_state::pc8001mk2)
 	/* basic machine hardware */
 	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL_4MHz)
 	MCFG_CPU_PROGRAM_MAP(pc8001mk2_mem)

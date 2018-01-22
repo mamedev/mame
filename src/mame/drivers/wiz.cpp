@@ -784,7 +784,7 @@ INTERRUPT_GEN_MEMBER(wiz_state::wiz_sound_interrupt)
 		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
-static MACHINE_CONFIG_START( kungfut )
+MACHINE_CONFIG_START(wiz_state::kungfut)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 18432000/6) /* 3.072 MHz ??? */
@@ -823,7 +823,7 @@ static MACHINE_CONFIG_START( kungfut )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( wiz, kungfut )
+MACHINE_CONFIG_DERIVED(wiz_state::wiz, kungfut)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -836,7 +836,7 @@ static MACHINE_CONFIG_DERIVED( wiz, kungfut )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( stinger, kungfut )
+MACHINE_CONFIG_DERIVED(wiz_state::stinger, kungfut)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -861,7 +861,7 @@ static MACHINE_CONFIG_DERIVED( stinger, kungfut )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( scion, stinger )
+MACHINE_CONFIG_DERIVED(wiz_state::scion, stinger)
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_DEVICE_REMOVE_ADDRESS_MAP(AS_OPCODES)

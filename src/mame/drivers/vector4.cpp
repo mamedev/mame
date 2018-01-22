@@ -24,6 +24,7 @@ public:
 	{ }
 
 
+	void vector4(machine_config &config);
 private:
 	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
@@ -61,7 +62,7 @@ void vector4_state::machine_reset()
 }
 
 
-static MACHINE_CONFIG_START( vector4 )
+MACHINE_CONFIG_START(vector4_state::vector4)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80, XTAL_4MHz)
 	MCFG_CPU_PROGRAM_MAP(vector4_mem)

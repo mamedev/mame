@@ -96,6 +96,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<msm5205_device> m_adpcm1;
 	required_device<msm5205_device> m_adpcm2;
+	void kungfur(machine_config &config);
 };
 
 
@@ -284,7 +285,7 @@ void kungfur_state::machine_reset()
 	m_control = 0;
 }
 
-static MACHINE_CONFIG_START( kungfur )
+MACHINE_CONFIG_START(kungfur_state::kungfur)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6809, 8000000/2)   // 4MHz?

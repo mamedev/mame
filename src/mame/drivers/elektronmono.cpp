@@ -129,6 +129,7 @@ public:
 	virtual void machine_reset() override;
 
 	DECLARE_DRIVER_INIT(elektron);
+	void elektron(machine_config &config);
 };
 
 void elekmono_state::machine_start()
@@ -150,7 +151,7 @@ static ADDRESS_MAP_START( elektron_map, AS_PROGRAM, 32, elekmono_state )
 	AM_RANGE(0x10000000, 0x107fffff) AM_ROM AM_REGION("maincpu", 0)
 ADDRESS_MAP_END
 
-static MACHINE_CONFIG_START( elektron )
+MACHINE_CONFIG_START(elekmono_state::elektron)
 	MCFG_CPU_ADD("maincpu", MCF5206E, XTAL_25_447MHz)
 	MCFG_CPU_PROGRAM_MAP(elektron_map)
 

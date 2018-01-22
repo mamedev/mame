@@ -50,6 +50,7 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	required_device<ticket_dispenser_device> m_hopper;
+	void hanaroku(machine_config &config);
 };
 
 
@@ -271,7 +272,7 @@ static GFXDECODE_START( hanaroku )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( hanaroku )
+MACHINE_CONFIG_START(albazc_state::hanaroku)
 
 	MCFG_CPU_ADD("maincpu", Z80,6000000)         /* ? MHz */
 	MCFG_CPU_PROGRAM_MAP(hanaroku_map)

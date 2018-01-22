@@ -58,6 +58,9 @@ public:
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
+	static void cdrom_config(device_t *device);
+	void indigo4k(machine_config &config);
+	void indigo3k(machine_config &config);
 private:
 	struct hpc_t
 	{
@@ -568,12 +571,13 @@ static INPUT_PORTS_START( indigo )
 	PORT_BIT ( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( cdrom_config )
-	MCFG_DEVICE_MODIFY( "cdda" )
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "^^^^mono", 1.0)
-MACHINE_CONFIG_END
+void indigo_state::cdrom_config(device_t *device)
+{
+	device = device->subdevice("cdda");
+	MCFG_SOUND_ROUTE(0, "^^^^mono", 1.0)
+}
 
-static MACHINE_CONFIG_START( indigo3k )
+MACHINE_CONFIG_START(indigo_state::indigo3k)
 	MCFG_CPU_ADD("maincpu", R3041, 33000000)
 	MCFG_R3000_ENDIANNESS(ENDIANNESS_BIG)
 	MCFG_CPU_PROGRAM_MAP(indigo3k_map)
@@ -604,7 +608,7 @@ static MACHINE_CONFIG_START( indigo3k )
 	MCFG_EEPROM_SERIAL_93C56_ADD("eeprom")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( indigo4k, indigo3k )
+MACHINE_CONFIG_DERIVED(indigo_state::indigo4k, indigo3k)
 	MCFG_CPU_REPLACE("maincpu", R4600BE, 150000000) // Should be R4400
 	MCFG_MIPS3_ICACHE_SIZE(32768)
 	MCFG_MIPS3_DCACHE_SIZE(32768)

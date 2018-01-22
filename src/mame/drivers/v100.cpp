@@ -47,6 +47,7 @@ public:
 
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
+	void v100(machine_config &config);
 private:
 	virtual void machine_start() override;
 
@@ -207,7 +208,7 @@ static INPUT_PORTS_START( v100 )
 INPUT_PORTS_END
 
 
-static MACHINE_CONFIG_START( v100 )
+MACHINE_CONFIG_START(v100_state::v100)
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_47_736MHz / 12) // divider not verified
 	MCFG_CPU_PROGRAM_MAP(mem_map)
 	MCFG_CPU_IO_MAP(io_map)

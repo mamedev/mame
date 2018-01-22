@@ -51,6 +51,8 @@ public:
 	DECLARE_WRITE16_MEMBER(magicstk_bgvideoram_w);
 	DECLARE_WRITE16_MEMBER(tile_banking_w);
 	DECLARE_WRITE16_MEMBER(oki_banking);
+	void magicstk(machine_config &config);
+	void powerbal(machine_config &config);
 };
 
 
@@ -89,7 +91,7 @@ WRITE16_MEMBER(powerbal_state::oki_banking)
 
 static ADDRESS_MAP_START( magicstk_main_map, AS_PROGRAM, 16, powerbal_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
-	AM_RANGE(0x088000, 0x0883ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x088000, 0x0883ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x094000, 0x094001) AM_WRITENOP
 	AM_RANGE(0x094002, 0x094003) AM_WRITENOP
 	AM_RANGE(0x094004, 0x094005) AM_WRITE(tile_banking_w)
@@ -108,7 +110,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( powerbal_main_map, AS_PROGRAM, 16, powerbal_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
-	AM_RANGE(0x088000, 0x0883ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x088000, 0x0883ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x094000, 0x094001) AM_WRITENOP
 	AM_RANGE(0x094002, 0x094003) AM_WRITENOP
 	AM_RANGE(0x094004, 0x094005) AM_WRITE(tile_banking_w)
@@ -491,7 +493,7 @@ MACHINE_RESET_MEMBER(powerbal_state,powerbal)
 	configure_oki_banks();
 }
 
-static MACHINE_CONFIG_START( powerbal )
+MACHINE_CONFIG_START(powerbal_state::powerbal)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 12000000)   /* 12 MHz */
@@ -524,7 +526,7 @@ static MACHINE_CONFIG_START( powerbal )
 	MCFG_DEVICE_ADDRESS_MAP(0, oki_map)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( magicstk )
+MACHINE_CONFIG_START(powerbal_state::magicstk)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 12000000)   /* 12 MHz */

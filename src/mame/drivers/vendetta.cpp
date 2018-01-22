@@ -256,7 +256,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( videobank1_map, AS_PROGRAM, 8, vendetta_state )
 	AM_RANGE(0x0000, 0x0fff) AM_READWRITE(K052109_r, K052109_w)
-	AM_RANGE(0x1000, 0x1fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x1000, 0x1fff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, vendetta_state )
@@ -418,7 +418,7 @@ WRITE8_MEMBER( vendetta_state::banking_callback )
 		membank("bank1")->set_entry(data);
 }
 
-static MACHINE_CONFIG_START( vendetta )
+MACHINE_CONFIG_START(vendetta_state::vendetta)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", KONAMI, XTAL_24MHz/8)   /* 052001 (verified on pcb) */
@@ -487,7 +487,7 @@ static MACHINE_CONFIG_START( vendetta )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( esckids, vendetta )
+MACHINE_CONFIG_DERIVED(vendetta_state::esckids, vendetta)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")

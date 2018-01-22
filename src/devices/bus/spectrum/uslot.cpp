@@ -20,7 +20,7 @@ DEFINE_DEVICE_TYPE(SPECTRUM_USLOT, spectrum_uslot_device, "spectrum_uslot", "Spe
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER(spectrum_uslot_device::device_add_mconfig)
+MACHINE_CONFIG_START(spectrum_uslot_device::device_add_mconfig)
 	/* passthru */
 	MCFG_SPECTRUM_EXPANSION_SLOT_ADD("exp1", spectrum_expansion_devices, nullptr)
 	MCFG_SPECTRUM_EXPANSION_SLOT_IRQ_HANDLER(DEVWRITELINE(DEVICE_SELF_OWNER, spectrum_expansion_slot_device, irq_w))

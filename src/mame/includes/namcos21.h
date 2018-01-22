@@ -192,4 +192,8 @@ public:
 	void render_slave_output(uint16_t data);
 	void winrun_flush_poly();
 	void init(int game_type);
+	void configure_c148_standard(machine_config &config);
+	void driveyes(machine_config &config);
+	void winrun(machine_config &config);
+	void namcos21(machine_config &config);
 };

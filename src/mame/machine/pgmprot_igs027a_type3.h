@@ -57,9 +57,9 @@ public:
 	DECLARE_READ32_MEMBER( svg_speedup_r );
 	DECLARE_READ32_MEMBER( svgpcb_speedup_r );
 	DECLARE_MACHINE_RESET(pgm_arm_type3_reset);
+	void pgm_arm_type3(machine_config &config);
 };
 
-MACHINE_CONFIG_EXTERN( pgm_arm_type3 );
 INPUT_PORTS_EXTERN(theglad);
 INPUT_PORTS_EXTERN(happy6);
 INPUT_PORTS_EXTERN(svg);

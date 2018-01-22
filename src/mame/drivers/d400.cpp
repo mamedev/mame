@@ -23,6 +23,7 @@ public:
 
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
+	void d461(machine_config &config);
 private:
 	required_device<cpu_device> m_maincpu;
 };
@@ -47,7 +48,7 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START( d461 )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( d461 )
+MACHINE_CONFIG_START(d400_state::d461)
 	MCFG_CPU_ADD("maincpu", MC6809E, 4'000'000) // HD68B09EP
 	MCFG_CPU_PROGRAM_MAP(mem_map)
 

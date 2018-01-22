@@ -21,7 +21,7 @@ public:
 
 	DECLARE_DRIVER_INIT(olds);
 	DECLARE_MACHINE_RESET(olds);
+	void pgm_028_025_ol(machine_config &config);
 };
 
-MACHINE_CONFIG_EXTERN( pgm_028_025_ol );
 INPUT_PORTS_EXTERN( olds );

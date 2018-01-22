@@ -69,6 +69,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	void astron(machine_config &config);
 };
 
 /* VIDEO GOODS */
@@ -367,7 +368,7 @@ void segald_state::machine_start()
 
 
 /* DRIVER */
-static MACHINE_CONFIG_START( astron )
+MACHINE_CONFIG_START(segald_state::astron)
 
 	/* main cpu */
 	MCFG_CPU_ADD("maincpu", Z80, SCHEMATIC_CLOCK/4)

@@ -209,6 +209,7 @@ DECLARE_WRITE16_MEMBER (bootvect_w);
 virtual void machine_start () override;
 virtual void machine_reset () override;
 
+void hk68v10(machine_config &config);
 protected:
 
 private:
@@ -278,8 +279,8 @@ READ16_MEMBER (hk68v10_state::bootvect_r){
 
 WRITE16_MEMBER (hk68v10_state::bootvect_w){
 	LOG (("%s offset %08x, mask %08x, data %04x\n", FUNCNAME, offset, mem_mask, data));
-	m_sysram[offset % sizeof(m_sysram)] &= ~mem_mask;
-	m_sysram[offset % sizeof(m_sysram)] |= (data & mem_mask);
+	m_sysram[offset % ARRAY_LENGTH(m_sysram)] &= ~mem_mask;
+	m_sysram[offset % ARRAY_LENGTH(m_sysram)] |= (data & mem_mask);
 	m_sysrom = &m_sysram[0]; // redirect all upcoming accesses to masking RAM until reset.
 }
 
@@ -333,7 +334,7 @@ SLOT_INTERFACE_END
 /*
  * Machine configuration
  */
-static MACHINE_CONFIG_START (hk68v10)
+MACHINE_CONFIG_START(hk68v10_state::hk68v10)
 	/* basic machine hardware */
 	MCFG_CPU_ADD ("maincpu", M68010, XTAL_10MHz)
 	MCFG_CPU_PROGRAM_MAP (hk68v10_mem)

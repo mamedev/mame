@@ -245,7 +245,7 @@ DRIVER_INIT_MEMBER( s11b_state, s11b_invert )
 	m_invert = true;
 }
 
-static MACHINE_CONFIG_START( s11b )
+MACHINE_CONFIG_START(s11b_state::s11b)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6808, XTAL_4MHz)
 	MCFG_CPU_PROGRAM_MAP(s11b_main_map)

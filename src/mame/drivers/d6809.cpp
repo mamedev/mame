@@ -101,6 +101,7 @@ public:
 	DECLARE_WRITE8_MEMBER( term_w );
 	void kbd_put(u8 data);
 
+	void d6809(machine_config &config);
 private:
 	uint8_t m_term_data;
 	virtual void machine_reset() override;
@@ -147,7 +148,7 @@ void d6809_state::machine_reset()
 }
 
 
-static MACHINE_CONFIG_START( d6809 )
+MACHINE_CONFIG_START(d6809_state::d6809)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", MC6809E, XTAL_14_7456MHz / 8) // MC68B09EP
 	MCFG_CPU_PROGRAM_MAP(mem_map)

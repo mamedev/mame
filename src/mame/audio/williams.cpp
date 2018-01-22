@@ -174,7 +174,7 @@ ADDRESS_MAP_END
 // device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( williams_cvsd_sound_device::device_add_mconfig )
+MACHINE_CONFIG_START(williams_cvsd_sound_device::device_add_mconfig)
 	MCFG_CPU_ADD("cpu", MC6809E, CVSD_MASTER_CLOCK / 4)
 	MCFG_CPU_PROGRAM_MAP(williams_cvsd_map)
 
@@ -492,7 +492,7 @@ ADDRESS_MAP_END
 //-------------------------------------------------
 
 
-MACHINE_CONFIG_MEMBER( williams_narc_sound_device::device_add_mconfig )
+MACHINE_CONFIG_START(williams_narc_sound_device::device_add_mconfig)
 	MCFG_CPU_ADD("cpu0", MC6809E, NARC_MASTER_CLOCK / 4)
 	MCFG_CPU_PROGRAM_MAP(williams_narc_master_map)
 
@@ -745,7 +745,7 @@ ADDRESS_MAP_END
 // device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( williams_adpcm_sound_device::device_add_mconfig )
+MACHINE_CONFIG_START(williams_adpcm_sound_device::device_add_mconfig)
 	MCFG_CPU_ADD("cpu", MC6809E, ADPCM_MASTER_CLOCK / 4)
 	MCFG_CPU_PROGRAM_MAP(williams_adpcm_map)
 

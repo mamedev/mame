@@ -65,6 +65,8 @@ public:
 
 	void sdwx_gfx_decrypt();
 	void pgm_create_dummy_internal_arm_region();
+	void igs_majhong(machine_config &config);
+	void amazonia(machine_config &config);
 };
 
 
@@ -151,7 +153,7 @@ static ADDRESS_MAP_START( igs_majhong_map, AS_PROGRAM, 32, igs_m027_state )
 
 #if 0
 	AM_RANGE(0x38001000, 0x380017ff) AM_RAM_WRITE(igs_cg_videoram_w) AM_SHARE("igs_cg_videoram")        //0x200 * 1   CG PALETTE?
-	AM_RANGE(0x38001800, 0x38001fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")        //0x200 * 1
+	AM_RANGE(0x38001800, 0x38001fff) AM_RAM_DEVWRITE("palette", palette_device, write32) AM_SHARE("palette")        //0x200 * 1
 
 	AM_RANGE(0x38004000, 0x38005FFF) AM_RAM_WRITE(igs_tx_videoram_w) AM_SHARE("igs_tx_videoram") /* Text Layer */
 	AM_RANGE(0x38006000, 0x38007FFF) AM_RAM_WRITE(igs_bg_videoram_w) AM_SHARE("igs_bg_videoram") /* CG Layer */
@@ -333,7 +335,7 @@ INTERRUPT_GEN_MEMBER(igs_m027_state::igs_majhong_interrupt)
 }
 
 
-static MACHINE_CONFIG_START( igs_majhong )
+MACHINE_CONFIG_START(igs_m027_state::igs_majhong)
 	MCFG_CPU_ADD("maincpu",ARM7, 20000000)
 
 	MCFG_CPU_PROGRAM_MAP(igs_majhong_map)
@@ -367,7 +369,7 @@ MACHINE_CONFIG_END
 
 
 
-static MACHINE_CONFIG_START( amazonia )
+MACHINE_CONFIG_START(igs_m027_state::amazonia)
 	MCFG_CPU_ADD("maincpu",ARM7, 20000000)
 
 	MCFG_CPU_PROGRAM_MAP(igs_majhong_map)

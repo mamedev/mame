@@ -163,6 +163,8 @@ public:
 	bool m_mcu_pending;
 	bool m_mcu_written;
 	bool m_mcu_repeat;
+	void quizpun(machine_config &config);
+	void quizpun2(machine_config &config);
 };
 
 /***************************************************************************
@@ -323,7 +325,7 @@ static ADDRESS_MAP_START( quizpun2_map, AS_PROGRAM, 8, quizpun2_state )
 	AM_RANGE( 0xa000, 0xbfff ) AM_RAM_WRITE(fg_ram_w) AM_SHARE("fg_ram")
 	AM_RANGE( 0xc000, 0xcfff ) AM_RAM_WRITE(bg_ram_w) AM_SHARE("bg_ram")
 
-	AM_RANGE( 0xd000, 0xd3ff ) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE( 0xd000, 0xd3ff ) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
 	AM_RANGE( 0xe000, 0xffff ) AM_RAM
 ADDRESS_MAP_END
 
@@ -558,7 +560,7 @@ GFXDECODE_END
                                 Machine Drivers
 ***************************************************************************/
 
-static MACHINE_CONFIG_START( quizpun2 )
+MACHINE_CONFIG_START(quizpun2_state::quizpun2)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_8MHz / 2) // 4 MHz
 	MCFG_CPU_PROGRAM_MAP(quizpun2_map)
@@ -607,7 +609,7 @@ static MACHINE_CONFIG_START( quizpun2 )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( quizpun, quizpun2 )
+MACHINE_CONFIG_DERIVED(quizpun2_state::quizpun, quizpun2)
 	MCFG_DEVICE_REMOVE("cop")
 
 	MCFG_CPU_ADD("mcu", M68705P5, XTAL_4MHz) // xtal is 4MHz, divided by 4 internally

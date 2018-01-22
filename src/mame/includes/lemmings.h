@@ -65,4 +65,5 @@ public:
 
 	DECLARE_READ16_MEMBER( lem_protection_region_0_146_r );
 	DECLARE_WRITE16_MEMBER( lem_protection_region_0_146_w );
+	void lemmings(machine_config &config);
 };

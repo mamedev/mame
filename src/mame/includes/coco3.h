@@ -49,6 +49,10 @@ public:
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
+	void coco3p(machine_config &config);
+	void coco3h(machine_config &config);
+	void coco3dw1(machine_config &config);
+	void coco3(machine_config &config);
 protected:
 	virtual void update_cart_base(uint8_t *cart_base) override;
 

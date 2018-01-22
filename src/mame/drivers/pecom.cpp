@@ -168,7 +168,7 @@ static INPUT_PORTS_START( pecom )
 INPUT_PORTS_END
 
 /* Machine driver */
-static MACHINE_CONFIG_START( pecom64 )
+MACHINE_CONFIG_START(pecom_state::pecom64)
 	/* basic machine hardware */
 	MCFG_CPU_ADD(CDP1802_TAG, CDP1802, cdp1869_device::DOT_CLK_PAL/3)
 	MCFG_CPU_PROGRAM_MAP(pecom64_mem)

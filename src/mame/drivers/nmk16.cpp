@@ -331,7 +331,7 @@ static ADDRESS_MAP_START( vandyke_map, AS_PROGRAM, 16, nmk16_state )
 	AM_RANGE(0x080016, 0x080017) AM_WRITE(nmk16_x0016_w)
 	AM_RANGE(0x080018, 0x080019) AM_WRITE(nmk_tilebank_w)
 	AM_RANGE(0x08001e, 0x08001f) AM_DEVWRITE8("nmk004", nmk004_device, write, 0x00ff)
-	AM_RANGE(0x088000, 0x0887ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x088000, 0x0887ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x08c000, 0x08c007) AM_WRITE(vandyke_scroll_w)
 	AM_RANGE(0x090000, 0x093fff) AM_RAM_WRITE(nmk_bgvideoram0_w) AM_SHARE("nmk_bgvideoram0")
 	AM_RANGE(0x094000, 0x097fff) AM_RAM /* what is this? */
@@ -350,7 +350,7 @@ static ADDRESS_MAP_START( vandykeb_map, AS_PROGRAM, 16, nmk16_state )
 	AM_RANGE(0x080018, 0x080019) AM_WRITE(nmk_tilebank_w)
 	AM_RANGE(0x080010, 0x08001d) AM_WRITE(vandykeb_scroll_w) /* 10, 12, 1a, 1c */
 //  AM_RANGE(0x08001e, 0x08001f) AM_DEVWRITE8("nmk004", nmk004_device, write, 0x00ff)
-	AM_RANGE(0x088000, 0x0887ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x088000, 0x0887ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x08c000, 0x08c007) AM_WRITENOP    /* just in case... */
 	AM_RANGE(0x090000, 0x093fff) AM_RAM_WRITE(nmk_bgvideoram0_w) AM_SHARE("nmk_bgvideoram0")
 	AM_RANGE(0x094000, 0x097fff) AM_RAM /* what is this? */
@@ -368,7 +368,7 @@ static ADDRESS_MAP_START( manybloc_map, AS_PROGRAM, 16, nmk16_state )
 	AM_RANGE(0x080014, 0x080015) AM_WRITE(nmk_flipscreen_w)
 	AM_RANGE(0x08001c, 0x08001d) AM_WRITENOP            /* See notes at the top of the driver */
 	AM_RANGE(0x08001e, 0x08001f) AM_DEVREAD8("soundlatch2", generic_latch_8_device, read, 0x00ff) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x00ff)
-	AM_RANGE(0x088000, 0x0883ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x088000, 0x0883ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x090000, 0x093fff) AM_RAM_WRITE(nmk_bgvideoram0_w) AM_SHARE("nmk_bgvideoram0")
 	AM_RANGE(0x09c000, 0x09cfff) AM_RAM_WRITE(manybloc_scroll_w) AM_SHARE("scrollram")
 	AM_RANGE(0x09d000, 0x09d7ff) AM_RAM_WRITE(nmk_txvideoram_w) AM_SHARE("nmk_txvideoram")
@@ -387,7 +387,7 @@ static ADDRESS_MAP_START( tharrier_map, AS_PROGRAM, 16, nmk16_state )
 //  AM_RANGE(0x080018, 0x080019) AM_WRITE(nmk_tilebank_w)
 	AM_RANGE(0x08001e, 0x08001f) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x00ff)
 	AM_RANGE(0x080202, 0x080203) AM_READ_PORT("IN2")
-	AM_RANGE(0x088000, 0x0883ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x088000, 0x0883ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 //  AM_RANGE(0x08c000, 0x08c007) AM_WRITE(nmk_scroll_w)
 	AM_RANGE(0x090000, 0x093fff) AM_RAM_WRITE(nmk_bgvideoram0_w) AM_SHARE("nmk_bgvideoram0")
 	AM_RANGE(0x09c000, 0x09c7ff) AM_RAM /* Unused txvideoram area? */
@@ -422,7 +422,7 @@ static ADDRESS_MAP_START( mustang_map, AS_PROGRAM, 16, nmk16_state )
 	AM_RANGE(0x080014, 0x080015) AM_WRITE(nmk_flipscreen_w)
 	AM_RANGE(0x080016, 0x080017) AM_WRITE(nmk16_x0016_w)    // frame number?
 	AM_RANGE(0x08001e, 0x08001f) AM_DEVWRITE8("nmk004", nmk004_device, write, 0x00ff)
-	AM_RANGE(0x088000, 0x0887ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x088000, 0x0887ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x08c000, 0x08c001) AM_WRITE(mustang_scroll_w)
 	AM_RANGE(0x08c002, 0x08c087) AM_WRITENOP    // ??
 	AM_RANGE(0x090000, 0x093fff) AM_RAM_WRITE(nmk_bgvideoram0_w) AM_SHARE("nmk_bgvideoram0")
@@ -439,7 +439,7 @@ static ADDRESS_MAP_START( mustangb_map, AS_PROGRAM, 16, nmk16_state )
 	AM_RANGE(0x080014, 0x080015) AM_WRITE(nmk_flipscreen_w)
 	AM_RANGE(0x080016, 0x080017) AM_WRITENOP    // frame number?
 	AM_RANGE(0x08001e, 0x08001f) AM_DEVWRITE("seibu_sound", seibu_sound_device, main_mustb_w)
-	AM_RANGE(0x088000, 0x0887ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x088000, 0x0887ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x08c000, 0x08c001) AM_WRITE(mustang_scroll_w)
 	AM_RANGE(0x08c002, 0x08c087) AM_WRITENOP    // ??
 	AM_RANGE(0x090000, 0x093fff) AM_RAM_WRITE(nmk_bgvideoram0_w) AM_SHARE("nmk_bgvideoram0")
@@ -457,7 +457,7 @@ static ADDRESS_MAP_START( twinactn_map, AS_PROGRAM, 16, nmk16_state )
 	AM_RANGE(0x080014, 0x080015) AM_WRITE(nmk_flipscreen_w)
 	AM_RANGE(0x080016, 0x080017) AM_WRITENOP    // frame number?
 	AM_RANGE(0x08001e, 0x08001f) AM_WRITE(afega_soundlatch_w)
-	AM_RANGE(0x088000, 0x0887ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x088000, 0x0887ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x08c000, 0x08c001) AM_WRITE(mustang_scroll_w)
 	AM_RANGE(0x08c002, 0x08c087) AM_WRITENOP    // ??
 	AM_RANGE(0x090000, 0x093fff) AM_RAM_WRITE(nmk_bgvideoram0_w) AM_SHARE("nmk_bgvideoram0")
@@ -478,7 +478,7 @@ static ADDRESS_MAP_START( acrobatm_map, AS_PROGRAM, 16, nmk16_state )
 	AM_RANGE(0xc0016, 0xc0017) AM_WRITE(nmk16_x0016_w)
 	AM_RANGE(0xc0018, 0xc0019) AM_WRITE(nmk_tilebank_w)
 	AM_RANGE(0xc001e, 0xc001f) AM_DEVWRITE8("nmk004", nmk004_device, write, 0x00ff)
-	AM_RANGE(0xc4000, 0xc45ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0xc4000, 0xc45ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0xc8000, 0xc8007) AM_RAM_WRITE(nmk_scroll_w)
 	AM_RANGE(0xcc000, 0xcffff) AM_RAM_WRITE(nmk_bgvideoram0_w) AM_SHARE("nmk_bgvideoram0")
 	AM_RANGE(0xd4000, 0xd47ff) AM_RAM_WRITE(nmk_txvideoram_w) AM_SHARE("nmk_txvideoram")
@@ -495,7 +495,7 @@ static ADDRESS_MAP_START( bioship_map, AS_PROGRAM, 16, nmk16_state )
 	AM_RANGE(0x080016, 0x080017) AM_WRITE(nmk16_bioship_x0016_w)
 	AM_RANGE(0x08001e, 0x08001f) AM_DEVWRITE8("nmk004", nmk004_device, write, 0x00ff)
 	AM_RANGE(0x084000, 0x084001) AM_WRITE(bioship_bank_w)
-	AM_RANGE(0x088000, 0x0887ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x088000, 0x0887ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x08c000, 0x08c007) AM_RAM_WRITE(bioshipbg_scroll_w)
 	AM_RANGE(0x08c010, 0x08c017) AM_RAM_WRITE(bioship_scroll_w)
 	AM_RANGE(0x090000, 0x093fff) AM_RAM_WRITE(nmk_bgvideoram0_w) AM_SHARE("nmk_bgvideoram0")
@@ -675,7 +675,7 @@ static ADDRESS_MAP_START( hachamf_map, AS_PROGRAM, 16, nmk16_state )
 	AM_RANGE(0x080018, 0x080019) AM_WRITE(nmk_tilebank_w)
 	AM_RANGE(0x08001e, 0x08001f) AM_DEVWRITE8("nmk004", nmk004_device, write, 0x00ff)
 	/* Video Region */
-	AM_RANGE(0x088000, 0x0887ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x088000, 0x0887ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x08c000, 0x08c007) AM_WRITE(nmk_scroll_w)
 	AM_RANGE(0x090000, 0x093fff) AM_RAM_WRITE(nmk_bgvideoram0_w) AM_SHARE("nmk_bgvideoram0")
 	AM_RANGE(0x09c000, 0x09c7ff) AM_RAM_WRITE(nmk_txvideoram_w) AM_SHARE("nmk_txvideoram")
@@ -908,7 +908,7 @@ static ADDRESS_MAP_START( tdragon_map, AS_PROGRAM, 16, nmk16_state )
 	AM_RANGE(0x0c0018, 0x0c0019) AM_WRITE(nmk_tilebank_w) /* Tile Bank ? */
 	AM_RANGE(0x0c001e, 0x0c001f) AM_DEVWRITE8("nmk004", nmk004_device, write, 0x00ff)
 	AM_RANGE(0x0c4000, 0x0c4007) AM_RAM_WRITE(nmk_scroll_w)
-	AM_RANGE(0x0c8000, 0x0c87ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x0c8000, 0x0c87ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x0cc000, 0x0cffff) AM_RAM_WRITE(nmk_bgvideoram0_w) AM_SHARE("nmk_bgvideoram0")
 	AM_RANGE(0x0d0000, 0x0d07ff) AM_RAM_WRITE(nmk_txvideoram_w) AM_SHARE("nmk_txvideoram")
 ADDRESS_MAP_END
@@ -931,7 +931,7 @@ static ADDRESS_MAP_START( tdragonb_map, AS_PROGRAM, 16, nmk16_state )
 	AM_RANGE(0x0c0018, 0x0c0019) AM_WRITE(nmk_tilebank_w) /* Tile Bank ? */
 	AM_RANGE(0x0c001e, 0x0c001f) AM_DEVWRITE("seibu_sound", seibu_sound_device, main_mustb_w)
 	AM_RANGE(0x0c4000, 0x0c4007) AM_RAM_WRITE(nmk_scroll_w)
-	AM_RANGE(0x0c8000, 0x0c87ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x0c8000, 0x0c87ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x0cc000, 0x0cffff) AM_RAM_WRITE(nmk_bgvideoram0_w) AM_SHARE("nmk_bgvideoram0")
 	AM_RANGE(0x0d0000, 0x0d07ff) AM_RAM_WRITE(nmk_txvideoram_w) AM_SHARE("nmk_txvideoram")
 ADDRESS_MAP_END
@@ -947,7 +947,7 @@ static ADDRESS_MAP_START( ssmissin_map, AS_PROGRAM, 16, nmk16_state )
 	AM_RANGE(0x0c0018, 0x0c0019) AM_WRITE(nmk_tilebank_w) /* Tile Bank ? */
 	AM_RANGE(0x0c001e, 0x0c001f) AM_WRITE(ssmissin_sound_w)
 	AM_RANGE(0x0c4000, 0x0c4007) AM_RAM_WRITE(nmk_scroll_w)
-	AM_RANGE(0x0c8000, 0x0c87ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x0c8000, 0x0c87ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x0cc000, 0x0cffff) AM_RAM_WRITE(nmk_bgvideoram0_w) AM_SHARE("nmk_bgvideoram0")
 	AM_RANGE(0x0d0000, 0x0d07ff) AM_MIRROR(0x1800) AM_RAM_WRITE(nmk_txvideoram_w) AM_SHARE("nmk_txvideoram") //mirror for airattck
 ADDRESS_MAP_END
@@ -982,7 +982,7 @@ static ADDRESS_MAP_START( strahl_map, AS_PROGRAM, 16, nmk16_state )
 	AM_RANGE(0x8001e, 0x8001f) AM_DEVWRITE8("nmk004", nmk004_device, write, 0x00ff)
 	AM_RANGE(0x84000, 0x84007) AM_RAM_WRITE(nmk_scroll_w)
 	AM_RANGE(0x88000, 0x88007) AM_RAM_WRITE(nmk_scroll_2_w)
-	AM_RANGE(0x8c000, 0x8c7ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x8c000, 0x8c7ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x90000, 0x93fff) AM_RAM_WRITE(nmk_bgvideoram0_w) AM_SHARE("nmk_bgvideoram0")
 	AM_RANGE(0x94000, 0x97fff) AM_RAM_WRITE(nmk_fgvideoram_w) AM_SHARE("nmk_fgvideoram")
 	AM_RANGE(0x9c000, 0x9c7ff) AM_RAM_WRITE(nmk_txvideoram_w) AM_SHARE("nmk_txvideoram")
@@ -1000,7 +1000,7 @@ static ADDRESS_MAP_START( macross_map, AS_PROGRAM, 16, nmk16_state )
 	AM_RANGE(0x080016, 0x080017) AM_WRITE(nmk16_x0016_w)
 	AM_RANGE(0x080018, 0x080019) AM_WRITE(nmk_tilebank_w)
 	AM_RANGE(0x08001e, 0x08001f) AM_DEVWRITE8("nmk004", nmk004_device, write, 0x00ff)
-	AM_RANGE(0x088000, 0x0887ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x088000, 0x0887ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x08c000, 0x08c007) AM_RAM_WRITE(nmk_scroll_w)
 	AM_RANGE(0x090000, 0x093fff) AM_RAM_WRITE(nmk_bgvideoram0_w) AM_SHARE("nmk_bgvideoram0")
 	AM_RANGE(0x09c000, 0x09c7ff) AM_RAM_WRITE(nmk_txvideoram_w) AM_SHARE("nmk_txvideoram")
@@ -1018,7 +1018,7 @@ static ADDRESS_MAP_START( gunnail_map, AS_PROGRAM, 16, nmk16_state )
 	AM_RANGE(0x080016, 0x080017) AM_WRITE(nmk16_x0016_w)
 	AM_RANGE(0x080018, 0x080019) AM_WRITE(nmk_tilebank_w)
 	AM_RANGE(0x08001e, 0x08001f) AM_DEVWRITE8("nmk004", nmk004_device, write, 0x00ff)
-	AM_RANGE(0x088000, 0x0887ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x088000, 0x0887ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x08c000, 0x08c1ff) AM_WRITEONLY AM_SHARE("scrollram")
 	AM_RANGE(0x08c200, 0x08c3ff) AM_WRITEONLY AM_SHARE("scrollramy")
 	AM_RANGE(0x08c400, 0x08c7ff) AM_WRITEONLY   // unknown
@@ -1038,7 +1038,7 @@ static ADDRESS_MAP_START( macross2_map, AS_PROGRAM, 16, nmk16_state )
 	AM_RANGE(0x100016, 0x100017) AM_WRITE(macross2_sound_reset_w)   /* Z80 reset */
 	AM_RANGE(0x100018, 0x100019) AM_WRITE(nmk_tilebank_w)
 	AM_RANGE(0x10001e, 0x10001f) AM_WRITE(macross2_sound_command_w) /* to Z80 */
-	AM_RANGE(0x120000, 0x1207ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x120000, 0x1207ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 
 	AM_RANGE(0x130000, 0x1301ff) AM_RAM AM_SHARE("scrollram")
 	AM_RANGE(0x130200, 0x1303ff) AM_RAM AM_SHARE("scrollramy")
@@ -1070,7 +1070,7 @@ static ADDRESS_MAP_START( raphero_map, AS_PROGRAM, 16, nmk16_state )
 	AM_RANGE(0x100016, 0x100017) AM_WRITENOP    /* IRQ enable or z80 sound reset like in Macross 2? */
 	AM_RANGE(0x100018, 0x100019) AM_WRITE(nmk_tilebank_w)
 	AM_RANGE(0x10001e, 0x10001f) AM_WRITE(macross2_sound_command_w) /* to Z80 */
-	AM_RANGE(0x120000, 0x1207ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x120000, 0x1207ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 
 	AM_RANGE(0x130000, 0x1301ff) AM_RAM AM_SHARE("scrollram")
 	AM_RANGE(0x130200, 0x1303ff) AM_RAM AM_SHARE("scrollramy")
@@ -1125,7 +1125,7 @@ static ADDRESS_MAP_START( bjtwin_map, AS_PROGRAM, 16, nmk16_state )
 	AM_RANGE(0x084000, 0x084001) AM_DEVREADWRITE8("oki1", okim6295_device, read, write, 0x00ff)
 	AM_RANGE(0x084010, 0x084011) AM_DEVREADWRITE8("oki2", okim6295_device, read, write, 0x00ff)
 	AM_RANGE(0x084020, 0x08402f) AM_DEVWRITE8("nmk112", nmk112_device, okibank_w, 0x00ff)
-	AM_RANGE(0x088000, 0x0887ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x088000, 0x0887ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x094000, 0x094001) AM_WRITE(nmk_tilebank_w)
 	AM_RANGE(0x094002, 0x094003) AM_WRITENOP    /* IRQ enable? */
 	AM_RANGE(0x09c000, 0x09cfff) AM_MIRROR(0x1000) AM_RAM_WRITE(nmk_bgvideoram0_w) AM_SHARE("nmk_bgvideoram0")
@@ -1135,7 +1135,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( atombjt_map, AS_PROGRAM, 16, nmk16_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x080014, 0x080015) AM_NOP // always 1 in this bootleg. Flip-screen switch not present according to dip sheet.
-	AM_RANGE(0x088000, 0x0887ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x088000, 0x0887ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x094000, 0x094001) AM_WRITE(nmk_tilebank_w)
 	AM_RANGE(0x094002, 0x094003) AM_WRITENOP    /* IRQ enable? */
 	AM_RANGE(0x09c000, 0x09cfff) AM_MIRROR(0x1000) AM_RAM_WRITE(nmk_bgvideoram0_w) AM_SHARE("nmk_bgvideoram0")
@@ -3878,7 +3878,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(nmk16_state::nmk16_scanline)
 
 
 
-static MACHINE_CONFIG_START( tharrier )
+MACHINE_CONFIG_START(nmk16_state::tharrier)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 10000000) /* 10 MHz */
@@ -3921,7 +3921,7 @@ static MACHINE_CONFIG_START( tharrier )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( mustang )
+MACHINE_CONFIG_START(nmk16_state::mustang)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 10000000) /* 10 MHz ? */
@@ -3961,7 +3961,7 @@ static MACHINE_CONFIG_START( mustang )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( mustangb )
+MACHINE_CONFIG_START(nmk16_state::mustangb)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 10000000) /* 10 MHz ? */
@@ -4002,7 +4002,7 @@ MACHINE_CONFIG_END
 #define BIOSHIP_CRYSTAL1 10000000
 #define BIOSHIP_CRYSTAL2 12000000
 
-static MACHINE_CONFIG_START( bioship )
+MACHINE_CONFIG_START(nmk16_state::bioship)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, BIOSHIP_CRYSTAL1 ) /* 10.0 MHz (verified) */
@@ -4042,7 +4042,7 @@ static MACHINE_CONFIG_START( bioship )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( vandyke )
+MACHINE_CONFIG_START(nmk16_state::vandyke)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_10MHz) /* 68000p12 running at 10Mhz, verified on pcb */
@@ -4082,7 +4082,7 @@ static MACHINE_CONFIG_START( vandyke )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( vandykeb )
+MACHINE_CONFIG_START(nmk16_state::vandykeb)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 10000000) /* 10 MHz ? */
@@ -4110,7 +4110,7 @@ static MACHINE_CONFIG_START( vandykeb )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( acrobatm )
+MACHINE_CONFIG_START(nmk16_state::acrobatm)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 10000000) /* 10 MHz (verified on pcb) */
@@ -4151,7 +4151,7 @@ static MACHINE_CONFIG_START( acrobatm )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( tdragonb )    /* bootleg using Raiden sound hardware */
+MACHINE_CONFIG_START(nmk16_state::tdragonb)    /* bootleg using Raiden sound hardware */
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 10000000)
@@ -4189,7 +4189,7 @@ static MACHINE_CONFIG_START( tdragonb )    /* bootleg using Raiden sound hardwar
 	MCFG_SEIBU_SOUND_YM_WRITE_CB(DEVWRITE8("ymsnd", ym3812_device, write))
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( tdragon )
+MACHINE_CONFIG_START(nmk16_state::tdragon)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_8MHz) /* verified on pcb */
@@ -4228,11 +4228,11 @@ static MACHINE_CONFIG_START( tdragon )
 	MCFG_DEVICE_ADDRESS_MAP(0, oki2_map)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 MACHINE_CONFIG_END
-static MACHINE_CONFIG_DERIVED( tdragon_prot, tdragon )
+MACHINE_CONFIG_DERIVED(nmk16_state::tdragon_prot, tdragon)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("coinsim", nmk16_state, tdragon_mcu_sim, attotime::from_hz(10000))
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( ssmissin )
+MACHINE_CONFIG_START(nmk16_state::ssmissin)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 8000000) /* 8 Mhz */
@@ -4264,7 +4264,7 @@ static MACHINE_CONFIG_START( ssmissin )
 
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( strahl )
+MACHINE_CONFIG_START(nmk16_state::strahl)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 12000000) /* 12 MHz ? */
@@ -4303,7 +4303,7 @@ static MACHINE_CONFIG_START( strahl )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( hachamf )
+MACHINE_CONFIG_START(nmk16_state::hachamf)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 10000000) /* 10 MHz ? */
@@ -4342,12 +4342,12 @@ static MACHINE_CONFIG_START( hachamf )
 	MCFG_DEVICE_ADDRESS_MAP(0, oki2_map)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 MACHINE_CONFIG_END
-static MACHINE_CONFIG_DERIVED( hachamf_prot, hachamf )
+MACHINE_CONFIG_DERIVED(nmk16_state::hachamf_prot, hachamf)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("coinsim", nmk16_state, hachamf_mcu_sim, attotime::from_hz(10000))
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( macross )
+MACHINE_CONFIG_START(nmk16_state::macross)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 10000000) /* 10 MHz ? */
@@ -4387,7 +4387,7 @@ static MACHINE_CONFIG_START( macross )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( blkheart )
+MACHINE_CONFIG_START(nmk16_state::blkheart)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_8MHz) /* verified on pcb */
@@ -4427,7 +4427,7 @@ static MACHINE_CONFIG_START( blkheart )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( gunnail )
+MACHINE_CONFIG_START(nmk16_state::gunnail)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_10MHz) /* verified on pcb */
@@ -4466,7 +4466,7 @@ static MACHINE_CONFIG_START( gunnail )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( macross2 )
+MACHINE_CONFIG_START(nmk16_state::macross2)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 10000000) /* 10 MHz ? */
@@ -4512,7 +4512,7 @@ static MACHINE_CONFIG_START( macross2 )
 	MCFG_NMK112_ROM1("oki2")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( tdragon2 )
+MACHINE_CONFIG_START(nmk16_state::tdragon2)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 10000000) /* 10 MHz  */
@@ -4558,13 +4558,13 @@ static MACHINE_CONFIG_START( tdragon2 )
 	MCFG_NMK112_ROM1("oki2")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( tdragon3h, tdragon2 )
+MACHINE_CONFIG_DERIVED(nmk16_state::tdragon3h, tdragon2)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(tdragon3h_map)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( raphero )
+MACHINE_CONFIG_START(nmk16_state::raphero)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 14000000) /* 14 MHz measured */
@@ -4609,7 +4609,7 @@ static MACHINE_CONFIG_START( raphero )
 	MCFG_NMK112_ROM1("oki2")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( bjtwin )
+MACHINE_CONFIG_START(nmk16_state::bjtwin)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 10000000) /* verified on pcb */
@@ -4643,7 +4643,7 @@ MACHINE_CONFIG_END
 
 
 
-static MACHINE_CONFIG_START( atombjt )
+MACHINE_CONFIG_START(nmk16_state::atombjt)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 10000000) /* there is a 28mhz crystal and a 10mhz crystal near the 12 rated CPU */
@@ -4690,7 +4690,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(nmk16_state::manybloc_scanline)
 }
 
 // non-nmk board, different to the others, very timing sensitive
-static MACHINE_CONFIG_START( manybloc )
+MACHINE_CONFIG_START(nmk16_state::manybloc)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 10000000) /* 10? MHz - check */
@@ -5036,7 +5036,7 @@ static ADDRESS_MAP_START( afega, AS_PROGRAM, 16, nmk16_state )
 /**/AM_RANGE(0x084000, 0x084003) AM_RAM_WRITE(afega_scroll0_w)  // Scroll on redhawkb (mirror or changed?..)
 /**/AM_RANGE(0x084004, 0x084007) AM_RAM_WRITE(afega_scroll1_w)  // Scroll on redhawkb (mirror or changed?..)
 	AM_RANGE(0x080020, 0x087fff) AM_WRITEONLY               //
-/**/AM_RANGE(0x088000, 0x0885ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette") // Palette
+/**/AM_RANGE(0x088000, 0x0885ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette") // Palette
 	AM_RANGE(0x088600, 0x08bfff) AM_WRITEONLY               //
 /**/AM_RANGE(0x08c000, 0x08c003) AM_RAM_WRITE(afega_scroll0_w) AM_SHARE("afega_scroll_0")   // Scroll
 /**/AM_RANGE(0x08c004, 0x08c007) AM_RAM_WRITE(afega_scroll1_w) AM_SHARE("afega_scroll_1")   //
@@ -5061,7 +5061,7 @@ static ADDRESS_MAP_START( firehawk_map, AS_PROGRAM, 16, nmk16_state )
 /**/AM_RANGE(0x284000, 0x284003) AM_RAM_WRITE(afega_scroll0_w)  // Scroll on redhawkb (mirror or changed?..)
 /**/AM_RANGE(0x284004, 0x284007) AM_RAM_WRITE(afega_scroll1_w)  // Scroll on redhawkb (mirror or changed?..)
 	AM_RANGE(0x280020, 0x287fff) AM_WRITEONLY               //
-/**/AM_RANGE(0x288000, 0x2885ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette") // Palette
+/**/AM_RANGE(0x288000, 0x2885ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette") // Palette
 	AM_RANGE(0x288600, 0x28bfff) AM_WRITEONLY               //
 /**/AM_RANGE(0x28c000, 0x28c003) AM_RAM_WRITE(afega_scroll0_w) AM_SHARE("afega_scroll_0")   // Scroll
 /**/AM_RANGE(0x28c004, 0x28c007) AM_RAM_WRITE(afega_scroll1_w) AM_SHARE("afega_scroll_1")   //
@@ -5208,7 +5208,7 @@ GFXDECODE_END
 
 ***************************************************************************/
 
-static MACHINE_CONFIG_START( stagger1 )
+MACHINE_CONFIG_START(nmk16_state::stagger1)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000,XTAL_12MHz) /* 68000p10 running at 12mhz, verified on pcb */
@@ -5244,7 +5244,7 @@ static MACHINE_CONFIG_START( stagger1 )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.70)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( redhawki, stagger1 )
+MACHINE_CONFIG_DERIVED(nmk16_state::redhawki, stagger1)
 
 	/* basic machine hardware */
 	/* video hardware */
@@ -5252,7 +5252,7 @@ static MACHINE_CONFIG_DERIVED( redhawki, stagger1 )
 	MCFG_SCREEN_UPDATE_DRIVER(nmk16_state, screen_update_redhawki)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( redhawkb, stagger1 )
+MACHINE_CONFIG_DERIVED(nmk16_state::redhawkb, stagger1)
 
 	/* basic machine hardware */
 	/* video hardware */
@@ -5261,7 +5261,7 @@ static MACHINE_CONFIG_DERIVED( redhawkb, stagger1 )
 	MCFG_SCREEN_UPDATE_DRIVER(nmk16_state, screen_update_redhawkb)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( grdnstrm, stagger1 )
+MACHINE_CONFIG_DERIVED(nmk16_state::grdnstrm, stagger1)
 
 	/* basic machine hardware */
 
@@ -5272,7 +5272,7 @@ static MACHINE_CONFIG_DERIVED( grdnstrm, stagger1 )
 	MCFG_SCREEN_UPDATE_DRIVER(nmk16_state, screen_update_firehawk)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( grdnstrmk, stagger1 ) /* Side by side with PCB, the music seems too fast as well */
+MACHINE_CONFIG_DERIVED(nmk16_state::grdnstrmk, stagger1) /* Side by side with PCB, the music seems too fast as well */
 
 	/* basic machine hardware */
 
@@ -5283,7 +5283,7 @@ static MACHINE_CONFIG_DERIVED( grdnstrmk, stagger1 ) /* Side by side with PCB, t
 	MCFG_VIDEO_START_OVERRIDE(nmk16_state,grdnstrm)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( popspops, grdnstrm )
+MACHINE_CONFIG_DERIVED(nmk16_state::popspops, grdnstrm)
 
 	/* basic machine hardware */
 
@@ -5292,7 +5292,7 @@ static MACHINE_CONFIG_DERIVED( popspops, grdnstrm )
 	MCFG_SCREEN_UPDATE_DRIVER(nmk16_state, screen_update_bubl2000)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( firehawk )
+MACHINE_CONFIG_START(nmk16_state::firehawk)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000,12000000)
@@ -5325,13 +5325,13 @@ static MACHINE_CONFIG_START( firehawk )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( spec2k, firehawk )
+MACHINE_CONFIG_DERIVED(nmk16_state::spec2k, firehawk)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(afega)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( twinactn )
+MACHINE_CONFIG_START(nmk16_state::twinactn)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000,12000000)

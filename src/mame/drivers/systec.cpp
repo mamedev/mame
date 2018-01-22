@@ -48,6 +48,7 @@ public:
 		, m_maincpu(*this, "maincpu")
 	{ }
 
+	void systec(machine_config &config);
 private:
 	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
@@ -77,7 +78,7 @@ void systec_state::machine_reset()
 }
 
 
-static MACHINE_CONFIG_START( systec )
+MACHINE_CONFIG_START(systec_state::systec)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_16MHz / 4)
 	MCFG_CPU_PROGRAM_MAP(systec_mem)

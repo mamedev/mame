@@ -75,8 +75,8 @@ static ADDRESS_MAP_START( gng_map, AS_PROGRAM, 8, gng_state )
 	AM_RANGE(0x3002, 0x3002) AM_READ_PORT("P2")
 	AM_RANGE(0x3003, 0x3003) AM_READ_PORT("DSW1")
 	AM_RANGE(0x3004, 0x3004) AM_READ_PORT("DSW2")
-	AM_RANGE(0x3800, 0x38ff) AM_DEVWRITE("palette", palette_device, write_ext) AM_SHARE("palette_ext")
-	AM_RANGE(0x3900, 0x39ff) AM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x3800, 0x38ff) AM_DEVWRITE("palette", palette_device, write8_ext) AM_SHARE("palette_ext")
+	AM_RANGE(0x3900, 0x39ff) AM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
 	AM_RANGE(0x3a00, 0x3a00) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
 	AM_RANGE(0x3b08, 0x3b09) AM_WRITE(gng_bgscrollx_w)
 	AM_RANGE(0x3b0a, 0x3b0b) AM_WRITE(gng_bgscrolly_w)
@@ -98,8 +98,8 @@ static ADDRESS_MAP_START( diamond_map, AS_PROGRAM, 8, gng_state )
 	AM_RANGE(0x3003, 0x3003) AM_READ_PORT("DSW1")
 	AM_RANGE(0x3004, 0x3004) AM_READ_PORT("DSW2")
 	AM_RANGE(0x3000, 0x33ff) AM_NOP // faulty POST?
-	AM_RANGE(0x3800, 0x38ff) AM_DEVWRITE("palette", palette_device, write_ext) AM_SHARE("palette_ext")
-	AM_RANGE(0x3900, 0x39ff) AM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x3800, 0x38ff) AM_DEVWRITE("palette", palette_device, write8_ext) AM_SHARE("palette_ext")
+	AM_RANGE(0x3900, 0x39ff) AM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
 	AM_RANGE(0x3a00, 0x3a00) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
 	AM_RANGE(0x3b08, 0x3b09) AM_WRITE(gng_bgscrollx_w)
 	AM_RANGE(0x3b0a, 0x3b0b) AM_WRITE(gng_bgscrolly_w)
@@ -385,7 +385,7 @@ void gng_state::machine_reset()
 	}
 }
 
-static MACHINE_CONFIG_START( gng )
+MACHINE_CONFIG_START(gng_state::gng)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", MC6809, XTAL_12MHz/2)        /* verified on pcb */
@@ -438,7 +438,7 @@ static MACHINE_CONFIG_START( gng )
 	MCFG_SOUND_ROUTE(3, "mono", 0.20)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( diamond, gng )
+MACHINE_CONFIG_DERIVED(gng_state::diamond, gng)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(diamond_map)
 

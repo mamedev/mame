@@ -499,7 +499,7 @@ QUICKLOAD_LOAD_MEMBER( cosmicos_state, cosmicos )
 
 /* Machine Driver */
 
-static MACHINE_CONFIG_START( cosmicos )
+MACHINE_CONFIG_START(cosmicos_state::cosmicos)
 	/* basic machine hardware */
 	MCFG_CPU_ADD(CDP1802_TAG, CDP1802, XTAL_1_75MHz)
 	MCFG_CPU_PROGRAM_MAP(cosmicos_mem)

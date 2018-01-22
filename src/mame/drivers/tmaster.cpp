@@ -138,6 +138,8 @@ public:
 
 	DECLARE_READ_LINE_MEMBER(read_rand);
 
+	void tm(machine_config &config);
+	void tmds1204(machine_config &config);
 protected:
 	required_device<cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;
@@ -273,7 +275,7 @@ static ADDRESS_MAP_START( tmaster_map, AS_PROGRAM, 16, tmaster_state )
 
 	AM_RANGE( 0x580000, 0x580001 ) AM_WRITENOP // often
 
-	AM_RANGE( 0x600000, 0x601fff ) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE( 0x600000, 0x601fff ) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 
 	AM_RANGE( 0x800000, 0x800001 ) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff )
 
@@ -359,7 +361,7 @@ int tmaster_compute_addr(uint16_t reg_low, uint16_t reg_mid, uint16_t reg_high)
 	return (reg_low & 0xff) | ((reg_mid & 0x1ff) << 8) | (reg_high << 17);
 }
 
-static MACHINE_CONFIG_START( tm )
+MACHINE_CONFIG_START(tmaster_state::tm)
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz / 2) /* 12MHz */
 	MCFG_CPU_PROGRAM_MAP(tmaster_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", tmaster_state, scanline_interrupt, "screen", 0, 1)
@@ -395,7 +397,7 @@ static MACHINE_CONFIG_START( tm )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( tmds1204, tm )
+MACHINE_CONFIG_DERIVED(tmaster_state::tmds1204, tm)
 	MCFG_DS1204_ADD("ds1204")
 MACHINE_CONFIG_END
 

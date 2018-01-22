@@ -108,7 +108,7 @@ INPUT_CHANGED_MEMBER( gottlieb_sound_r0_device::audio_nmi )
 // device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( gottlieb_sound_r0_device::device_add_mconfig )
+MACHINE_CONFIG_START(gottlieb_sound_r0_device::device_add_mconfig)
 	// audio CPU
 	MCFG_CPU_ADD("audiocpu", M6502, SOUND1_CLOCK/4) // M6503 - clock is a gate, a resistor and a capacitor. Freq unknown.
 	MCFG_CPU_PROGRAM_MAP(gottlieb_sound_r0_map)
@@ -306,7 +306,7 @@ INPUT_PORTS_END
 // device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( gottlieb_sound_r1_device::device_add_mconfig )
+MACHINE_CONFIG_START(gottlieb_sound_r1_device::device_add_mconfig)
 	// audio CPU
 	MCFG_CPU_ADD("audiocpu", M6502, SOUND1_CLOCK/4) // the board can be set to /2 as well
 	MCFG_CPU_PROGRAM_MAP(gottlieb_sound_r1_map)
@@ -364,7 +364,7 @@ gottlieb_sound_r1_with_votrax_device::gottlieb_sound_r1_with_votrax_device(const
 // device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( gottlieb_sound_r1_with_votrax_device::device_add_mconfig )
+MACHINE_CONFIG_START(gottlieb_sound_r1_with_votrax_device::device_add_mconfig)
 	gottlieb_sound_r1_device::device_add_mconfig(config);
 
 	// add the VOTRAX
@@ -664,7 +664,7 @@ INPUT_PORTS_END
 // device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( gottlieb_sound_r2_device::device_add_mconfig )
+MACHINE_CONFIG_START(gottlieb_sound_r2_device::device_add_mconfig)
 	// audio CPUs
 	MCFG_CPU_ADD("audiocpu", M6502, SOUND2_CLOCK/4)
 	MCFG_CPU_PROGRAM_MAP(gottlieb_sound_r2_map)

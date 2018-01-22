@@ -174,7 +174,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, asterix_state )
 	AM_RANGE(0x180000, 0x1807ff) AM_DEVREADWRITE("k053244", k05324x_device, k053245_word_r, k053245_word_w)
 	AM_RANGE(0x180800, 0x180fff) AM_RAM                             // extra RAM, or mirror for the above?
 	AM_RANGE(0x200000, 0x20000f) AM_DEVREADWRITE("k053244", k05324x_device, k053244_word_r, k053244_word_w)
-	AM_RANGE(0x280000, 0x280fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x280000, 0x280fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x300000, 0x30001f) AM_DEVREADWRITE("k053244", k05324x_device, k053244_lsb_r, k053244_lsb_w)
 	AM_RANGE(0x380000, 0x380001) AM_READ_PORT("IN0")
 	AM_RANGE(0x380002, 0x380003) AM_READ_PORT("IN1")
@@ -257,7 +257,7 @@ void asterix_state::machine_reset()
 	}
 }
 
-static MACHINE_CONFIG_START( asterix )
+MACHINE_CONFIG_START(asterix_state::asterix)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz/2) // 12MHz

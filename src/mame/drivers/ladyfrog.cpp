@@ -286,7 +286,7 @@ void ladyfrog_state::machine_reset()
 	m_snd_data = 0;
 }
 
-static MACHINE_CONFIG_START( ladyfrog )
+MACHINE_CONFIG_START(ladyfrog_state::ladyfrog)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80,XTAL_8MHz/2)
@@ -343,7 +343,7 @@ static MACHINE_CONFIG_START( ladyfrog )
 	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( toucheme, ladyfrog )
+MACHINE_CONFIG_DERIVED(ladyfrog_state::toucheme, ladyfrog)
 	MCFG_VIDEO_START_OVERRIDE(ladyfrog_state,toucheme)
 MACHINE_CONFIG_END
 

@@ -66,6 +66,7 @@ public:
 	DECLARE_READ_LINE_MEMBER(audio_T1_r);
 	DECLARE_WRITE8_MEMBER(ay_pa_w);
 
+	void ron(machine_config &config);
 protected:
 	// driver_device overrides
 	virtual void machine_start() override;
@@ -472,7 +473,7 @@ WRITE8_MEMBER(ron_state::ay_pa_w)
 {
 }
 
-static MACHINE_CONFIG_START( ron )
+MACHINE_CONFIG_START(ron_state::ron)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, MAIN_CLOCK)

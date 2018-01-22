@@ -95,7 +95,7 @@ WRITE32_MEMBER(cybstorm_state::latch_w)
 
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 32, cybstorm_state )
 	AM_RANGE(0x000000, 0x1fffff) AM_ROM
-	AM_RANGE(0x200000, 0x20ffff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x200000, 0x20ffff) AM_RAM_DEVWRITE("palette", palette_device, write32) AM_SHARE("palette")
 	AM_RANGE(0x3effc0, 0x3effff) AM_DEVREADWRITE16("vad", atari_vad_device, control_read, control_write, 0xffffffff)
 	AM_RANGE(0x3f0000, 0x3fffff) AM_DEVICE16("vadbank", address_map_bank_device, amap16, 0xffffffff)
 	AM_RANGE(0x9f0000, 0x9f0003) AM_READ_PORT("9F0000")
@@ -104,7 +104,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 32, cybstorm_state )
 	AM_RANGE(0x9f0040, 0x9f0043) AM_DEVWRITE8("jsa", atari_jsa_iii_device, main_command_w, 0x00ff0000)
 	AM_RANGE(0x9f0050, 0x9f0053) AM_WRITE(latch_w)
 	AM_RANGE(0xfb0000, 0xfb0003) AM_DEVWRITE("watchdog", watchdog_timer_device, reset32_w)
-	AM_RANGE(0xfc0000, 0xfc0003) AM_DEVWRITE("eeprom", eeprom_parallel_28xx_device, unlock_write)
+	AM_RANGE(0xfc0000, 0xfc0003) AM_DEVWRITE("eeprom", eeprom_parallel_28xx_device, unlock_write32)
 	AM_RANGE(0xfd0000, 0xfd0fff) AM_DEVREADWRITE8("eeprom", eeprom_parallel_28xx_device, read, write, 0xff00ff00)
 	AM_RANGE(0xfe0000, 0xffffff) AM_RAM
 ADDRESS_MAP_END
@@ -114,7 +114,7 @@ static ADDRESS_MAP_START( vadbank_map, AS_PROGRAM, 16, cybstorm_state )
 	AM_RANGE(0x002000, 0x003fff) AM_RAM_DEVWRITE("vad", atari_vad_device, playfield_latched_lsb_w) AM_SHARE("vad:playfield")
 	AM_RANGE(0x004000, 0x005fff) AM_RAM_DEVWRITE("vad", atari_vad_device, playfield_upper_w) AM_SHARE("vad:playfield_ext")
 	AM_RANGE(0x006000, 0x007fff) AM_RAM AM_SHARE("vad:mob")
-	AM_RANGE(0x008000, 0x008fef) AM_DEVWRITE("vad", atari_vad_device, alpha_w) AM_SHARE("vad:alpha")
+	AM_RANGE(0x008000, 0x008eff) AM_DEVWRITE("vad", atari_vad_device, alpha_w) AM_SHARE("vad:alpha")
 	AM_RANGE(0x008f00, 0x008f7f) AM_RAM AM_SHARE("vad:eof")
 	AM_RANGE(0x008f80, 0x008fff) AM_RAM AM_SHARE("vad:mob:slip")
 	AM_RANGE(0x009000, 0x00ffff) AM_RAM
@@ -232,7 +232,7 @@ GFXDECODE_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( round2 )
+MACHINE_CONFIG_START(cybstorm_state::round2)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68EC020, ATARI_CLOCK_14MHz)
@@ -275,7 +275,7 @@ static MACHINE_CONFIG_START( round2 )
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED( cybstorm, round2 )
+MACHINE_CONFIG_DERIVED(cybstorm_state::cybstorm, round2)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 

@@ -56,7 +56,7 @@ ADDRESS_MAP_END
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( ms7004_device::device_add_mconfig )
+MACHINE_CONFIG_START(ms7004_device::device_add_mconfig)
 	MCFG_CPU_ADD(MS7004_CPU_TAG, I8035, XTAL_4_608MHz)
 	MCFG_CPU_PROGRAM_MAP(ms7004_map)
 	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(ms7004_device, p1_w))

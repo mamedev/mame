@@ -72,7 +72,7 @@ const tiny_rom_entry *ibm_pc_xt_83_keyboard_device::device_rom_region() const
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( ibm_pc_xt_83_keyboard_device::device_add_mconfig )
+MACHINE_CONFIG_START(ibm_pc_xt_83_keyboard_device::device_add_mconfig)
 	MCFG_CPU_ADD(I8048_TAG, I8048, MCS48_LC_CLOCK(IND_U(47), CAP_P(20.7)))
 	MCFG_MCS48_PORT_BUS_IN_CB(READ8(ibm_pc_xt_83_keyboard_device, bus_r))
 	MCFG_MCS48_PORT_BUS_OUT_CB(WRITE8(ibm_pc_xt_83_keyboard_device, bus_w))

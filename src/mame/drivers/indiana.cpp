@@ -38,6 +38,7 @@ public:
 	DECLARE_DRIVER_INIT(indiana);
 	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
+	void indiana(machine_config &config);
 };
 
 
@@ -86,7 +87,7 @@ static DEVICE_INPUT_DEFAULTS_START( keyboard )
 	DEVICE_INPUT_DEFAULTS( "RS232_STOPBITS", 0xff, RS232_STOPBITS_1 )
 DEVICE_INPUT_DEFAULTS_END
 
-static MACHINE_CONFIG_START( indiana )
+MACHINE_CONFIG_START(indiana_state::indiana)
 	/* basic machine hardware */
 	MCFG_CPU_ADD(M68K_TAG, M68030, XTAL_16MHz)
 	MCFG_CPU_PROGRAM_MAP(indiana_mem)

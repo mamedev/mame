@@ -59,6 +59,9 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
+	void slalom03(machine_config &config);
+	void joctronic(machine_config &config);
+	void bldyrolr(machine_config &config);
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_soundcpu;
@@ -312,7 +315,7 @@ void joctronic_state::machine_reset()
 static INPUT_PORTS_START( joctronic )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( joctronic )
+MACHINE_CONFIG_START(joctronic_state::joctronic)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_12MHz/4) // 3 MHz - uses WAIT
 	MCFG_CPU_PROGRAM_MAP(maincpu_map) // 139
@@ -358,7 +361,7 @@ static MACHINE_CONFIG_START( joctronic )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( slalom03 )
+MACHINE_CONFIG_START(joctronic_state::slalom03)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_12MHz/2) // 6 MHz - uses WAIT
 	MCFG_CPU_PROGRAM_MAP(slalom03_maincpu_map) // 138, 368, 32
@@ -411,7 +414,7 @@ static MACHINE_CONFIG_START( slalom03 )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( bldyrolr, slalom03 )
+MACHINE_CONFIG_DERIVED(joctronic_state::bldyrolr, slalom03)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(bldyrolr_maincpu_map)
 MACHINE_CONFIG_END

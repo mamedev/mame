@@ -124,6 +124,8 @@ public:
 
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
 
+	void pt68k2(machine_config &config);
+	void pt68k4(machine_config &config);
 private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -394,7 +396,7 @@ SLOT_INTERFACE_START( pt68k4_isa8_cards )
 	SLOT_INTERFACE("xtide", ISA8_XTIDE) // Monk only
 SLOT_INTERFACE_END
 
-static MACHINE_CONFIG_START( pt68k2 )
+MACHINE_CONFIG_START(pt68k4_state::pt68k2)
 	/* basic machine hardware */
 	MCFG_CPU_ADD(M68K_TAG, M68000, XTAL_16MHz/2)    // 68k2 came in 8, 10, and 12 MHz versions
 	MCFG_CPU_PROGRAM_MAP(pt68k2_mem)
@@ -434,7 +436,7 @@ static MACHINE_CONFIG_START( pt68k2 )
 	MCFG_SOFTWARE_LIST_ADD("flop525_list", "pt68k2")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( pt68k4 )
+MACHINE_CONFIG_START(pt68k4_state::pt68k4)
 	/* basic machine hardware */
 	MCFG_CPU_ADD(M68K_TAG, M68000, XTAL_16MHz)
 	MCFG_CPU_PROGRAM_MAP(pt68k4_mem)

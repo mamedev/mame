@@ -368,7 +368,7 @@ void softbox_state::ieee488_ifc(int state)
 //  MACHINE_CONFIG( softbox )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( softbox )
+MACHINE_CONFIG_START(softbox_state::softbox)
 	// basic machine hardware
 	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL_8MHz/2)
 	MCFG_CPU_PROGRAM_MAP(softbox_mem)

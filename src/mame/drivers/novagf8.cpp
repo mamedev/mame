@@ -45,6 +45,7 @@ public:
 	DECLARE_WRITE8_MEMBER(delta1_io1_w);
 	DECLARE_READ8_MEMBER(delta1_io0_r);
 	DECLARE_READ8_MEMBER(delta1_io1_r);
+	void delta1(machine_config &config);
 
 protected:
 	virtual void machine_start() override;
@@ -185,7 +186,7 @@ F3853_INTERRUPT_REQ_CB(novagf8_state::f3853_interrupt)
 	m_maincpu->set_input_line(F8_INPUT_LINE_INT_REQ, level ? ASSERT_LINE : CLEAR_LINE);
 }
 
-static MACHINE_CONFIG_START( delta1 )
+MACHINE_CONFIG_START(novagf8_state::delta1)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", F8, 2000000) // LC circuit, measured 2MHz

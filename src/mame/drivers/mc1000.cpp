@@ -122,6 +122,7 @@ public:
 
 	DECLARE_DRIVER_INIT(mc1000);
 	TIMER_DEVICE_CALLBACK_MEMBER(ne555_tick);
+	void mc1000(machine_config &config);
 };
 
 /* Memory Banking */
@@ -532,7 +533,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(mc1000_state::ne555_tick)
 	m_maincpu->set_input_line(INPUT_LINE_IRQ0, param);
 }
 
-static MACHINE_CONFIG_START( mc1000 )
+MACHINE_CONFIG_START(mc1000_state::mc1000)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD(Z80_TAG, Z80, 3579545)

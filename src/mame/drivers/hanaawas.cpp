@@ -213,7 +213,7 @@ void hanaawas_state::machine_reset()
 	m_mux = 0;
 }
 
-static MACHINE_CONFIG_START( hanaawas )
+MACHINE_CONFIG_START(hanaawas_state::hanaawas)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80,18432000/6) /* 3.072 MHz ??? */

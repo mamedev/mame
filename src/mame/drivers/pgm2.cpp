@@ -529,11 +529,11 @@ static ADDRESS_MAP_START( pgm2_map, AS_PROGRAM, 32, pgm2_state )
 	AM_RANGE(0x30020000, 0x30021fff) AM_RAM_WRITE(bg_videoram_w) AM_SHARE("bg_videoram")
 	AM_RANGE(0x30040000, 0x30045fff) AM_RAM_WRITE(fg_videoram_w) AM_SHARE("fg_videoram")
 
-	AM_RANGE(0x30060000, 0x30063fff) AM_RAM_DEVWRITE("sp_palette", palette_device, write) AM_SHARE("sp_palette")
+	AM_RANGE(0x30060000, 0x30063fff) AM_RAM_DEVWRITE("sp_palette", palette_device, write32) AM_SHARE("sp_palette")
 
-	AM_RANGE(0x30080000, 0x30081fff) AM_RAM_DEVWRITE("bg_palette", palette_device, write) AM_SHARE("bg_palette")
+	AM_RANGE(0x30080000, 0x30081fff) AM_RAM_DEVWRITE("bg_palette", palette_device, write32) AM_SHARE("bg_palette")
 
-	AM_RANGE(0x300a0000, 0x300a07ff) AM_RAM_DEVWRITE("tx_palette", palette_device, write) AM_SHARE("tx_palette")
+	AM_RANGE(0x300a0000, 0x300a07ff) AM_RAM_DEVWRITE("tx_palette", palette_device, write32) AM_SHARE("tx_palette")
 
 	AM_RANGE(0x300c0000, 0x300c01ff) AM_RAM AM_SHARE("sp_zoom") // sprite zoom table - it uploads the same data 4x, maybe xshrink,xgrow,yshrink,ygrow or just redundant mirrors
 
@@ -554,7 +554,7 @@ static ADDRESS_MAP_START( pgm2_map, AS_PROGRAM, 32, pgm2_state )
 	AM_RANGE(0x30120038, 0x3012003b) AM_WRITE(sprite_encryption_w)
 	// there are other 0x301200xx regs
 
-	AM_RANGE(0x40000000, 0x40000003) AM_DEVREADWRITE8("ymz774", ymz774_device, read, write, 0xffffffff)
+	AM_RANGE(0x40000000, 0x40000003) AM_DEVREAD8("ymz774", ymz774_device, read, 0xffffffff)  AM_DEVWRITE8("ymz774", ymz774_device, write, 0xffffffff)
 
 	// internal IGS036 - most of them is standard ATMEL peripherals followed by custom bits
 	// AM_RANGE(0xfffa0000, 0xfffa00ff) TC (Timer Counter) not used, mentioned in disabled / unused code
@@ -765,7 +765,7 @@ static GFXDECODE_START( pgm2_bg )
 	GFXDECODE_ENTRY( "bgtile", 0, tiles32x32x8_layout, 0, 0x2000/4/0x80 )
 GFXDECODE_END
 
-static MACHINE_CONFIG_START( pgm2 )
+MACHINE_CONFIG_START(pgm2_state::pgm2)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", IGS036, 100000000) // ?? ARM based CPU, has internal ROM.
@@ -813,19 +813,19 @@ static MACHINE_CONFIG_START( pgm2 )
 MACHINE_CONFIG_END
 
 // not strictly needed as the video code supports changing on the fly, but makes recording easier etc.
-static MACHINE_CONFIG_DERIVED( pgm2_lores, pgm2 )
+MACHINE_CONFIG_DERIVED(pgm2_state::pgm2_lores, pgm2)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 240-1)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( pgm2_hires, pgm2 )
+MACHINE_CONFIG_DERIVED(pgm2_state::pgm2_hires, pgm2)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(pgm2_module_rom_map)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 240-1)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( pgm2_ramrom, pgm2 )
+MACHINE_CONFIG_DERIVED(pgm2_state::pgm2_ramrom, pgm2)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(pgm2_ram_rom_map)
 MACHINE_CONFIG_END

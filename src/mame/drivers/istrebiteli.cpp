@@ -168,6 +168,7 @@ public:
 	uint8_t m_spr_collision[2];
 	uint8_t m_spr_xy[8];
 	uint8_t m_tileram[16];
+	void istreb(machine_config &config);
 };
 
 void istrebiteli_state::machine_start()
@@ -413,7 +414,7 @@ static GFXDECODE_START( istrebiteli )
 	GFXDECODE_ENTRY( "sprite", 0x0200, projectile_layout, 0, 2 )
 GFXDECODE_END
 
-static MACHINE_CONFIG_START( istreb )
+MACHINE_CONFIG_START(istrebiteli_state::istreb)
 	/* basic machine hardware */
 	MCFG_CPU_ADD(I8080_TAG, I8080, XTAL_8MHz / 4)       // KR580VM80A
 	MCFG_CPU_PROGRAM_MAP(mem_map)

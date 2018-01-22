@@ -30,6 +30,7 @@ public:
 	DECLARE_WRITE8_MEMBER(tourtabl_led_w);
 	DECLARE_READ16_MEMBER(tourtabl_read_input_port);
 	DECLARE_READ8_MEMBER(tourtabl_get_databus_contents);
+	void tourtabl(machine_config &config);
 };
 
 
@@ -146,7 +147,7 @@ static INPUT_PORTS_START( tourtabl )
 INPUT_PORTS_END
 
 
-static MACHINE_CONFIG_START( tourtabl )
+MACHINE_CONFIG_START(tourtabl_state::tourtabl)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, MASTER_CLOCK / 3)    /* actually M6507 */
 	MCFG_CPU_PROGRAM_MAP(main_map)

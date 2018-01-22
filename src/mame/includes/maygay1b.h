@@ -147,9 +147,8 @@ public:
 	virtual void machine_reset() override;
 	void cpu0_firq(int data);
 	void cpu0_nmi();
+	void maygay_m1_no_oki(machine_config &config);
+	void maygay_m1(machine_config &config);
+	void maygay_m1_nec(machine_config &config);
+	void maygay_m1_empire(machine_config &config);
 };
-
-MACHINE_CONFIG_EXTERN( maygay_m1 );
-MACHINE_CONFIG_EXTERN( maygay_m1_nec );
-MACHINE_CONFIG_EXTERN( maygay_m1_no_oki );
-MACHINE_CONFIG_EXTERN( maygay_m1_empire );

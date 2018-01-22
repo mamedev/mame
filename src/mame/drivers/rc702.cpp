@@ -74,6 +74,7 @@ public:
 	I8275_DRAW_CHARACTER_MEMBER(display_pixels);
 	void kbd_put(u8 data);
 
+	void rc702(machine_config &config);
 private:
 	bool m_q_state;
 	bool m_qbar_state;
@@ -321,7 +322,7 @@ static SLOT_INTERFACE_START( floppies )
 	SLOT_INTERFACE( "525qd", FLOPPY_525_QD )
 SLOT_INTERFACE_END
 
-static MACHINE_CONFIG_START( rc702 )
+MACHINE_CONFIG_START(rc702_state::rc702)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_8MHz / 2)
 	MCFG_CPU_PROGRAM_MAP(rc702_mem)

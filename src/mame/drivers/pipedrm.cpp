@@ -189,6 +189,8 @@ public:
 	DECLARE_WRITE8_MEMBER( pipedrm_bankswitch_w );
 	DECLARE_WRITE8_MEMBER( sound_bankswitch_w );
 	DECLARE_READ8_MEMBER( pending_command_r );
+	void pipedrm(machine_config &config);
+	void hatris(machine_config &config);
 };
 
 
@@ -249,7 +251,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, pipedrm_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x9fff) AM_RAM
 	AM_RANGE(0xa000, 0xbfff) AM_ROMBANK("bank1")
-	AM_RANGE(0xc000, 0xcfff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0xc000, 0xcfff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
 	AM_RANGE(0xd000, 0xffff) AM_READWRITE(fromance_videoram_r, fromance_videoram_w) AM_SHARE("videoram")
 ADDRESS_MAP_END
 
@@ -564,7 +566,7 @@ MACHINE_RESET_MEMBER(pipedrm_state,pipedrm)
 	m_flipscreen = 0;
 }
 
-static MACHINE_CONFIG_START( pipedrm )
+MACHINE_CONFIG_START(pipedrm_state::pipedrm)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80,12000000/2)
@@ -619,7 +621,7 @@ static MACHINE_CONFIG_START( pipedrm )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( hatris )
+MACHINE_CONFIG_START(pipedrm_state::hatris)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80,12000000/2)

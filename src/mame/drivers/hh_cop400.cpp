@@ -263,6 +263,7 @@ public:
 	DECLARE_WRITE8_MEMBER(write_g);
 	DECLARE_WRITE8_MEMBER(write_l);
 	DECLARE_READ8_MEMBER(read_l);
+	void ctstein(machine_config &config);
 };
 
 // handlers
@@ -307,7 +308,7 @@ static INPUT_PORTS_START( ctstein )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Blue Button")
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( ctstein )
+MACHINE_CONFIG_START(ctstein_state::ctstein)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", COP421, 850000) // approximation - RC osc. R=12K, C=100pF
@@ -358,6 +359,9 @@ public:
 	DECLARE_WRITE8_MEMBER(write_l);
 	DECLARE_READ8_MEMBER(read_in);
 	DECLARE_WRITE_LINE_MEMBER(write_so);
+	void h2hsoccer(machine_config &config);
+	void h2hbaskb(machine_config &config);
+	void h2hhockey(machine_config &config);
 };
 
 // handlers
@@ -447,7 +451,7 @@ static INPUT_PORTS_START( h2hsoccer )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SPECIAL )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( h2hbaskb )
+MACHINE_CONFIG_START(h2hbaskb_state::h2hbaskb)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", COP420, 850000) // approximation - RC osc. R=43K, C=101pF
@@ -467,13 +471,13 @@ static MACHINE_CONFIG_START( h2hbaskb )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( h2hhockey, h2hbaskb )
+MACHINE_CONFIG_DERIVED(h2hbaskb_state::h2hhockey, h2hbaskb)
 
 	/* basic machine hardware */
 	MCFG_DEFAULT_LAYOUT(layout_h2hhockey)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( h2hsoccer, h2hbaskb )
+MACHINE_CONFIG_DERIVED(h2hbaskb_state::h2hsoccer, h2hbaskb)
 
 	/* basic machine hardware */
 	MCFG_DEFAULT_LAYOUT(layout_h2hsoccer)
@@ -507,6 +511,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(write_sk);
 	DECLARE_WRITE_LINE_MEMBER(write_so);
 	DECLARE_WRITE8_MEMBER(write_l);
+	void einvaderc(machine_config &config);
 };
 
 // handlers
@@ -570,7 +575,7 @@ static INPUT_PORTS_START( einvaderc )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON1 )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( einvaderc )
+MACHINE_CONFIG_START(einvaderc_state::einvaderc)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", COP444L, 850000) // approximation - RC osc. R=47K, C=100pF
@@ -628,6 +633,7 @@ public:
 	DECLARE_READ8_MEMBER(read_l);
 
 	DECLARE_INPUT_CHANGED_MEMBER(position_changed);
+	void unkeinv(machine_config &config);
 };
 
 // handlers
@@ -698,7 +704,7 @@ static INPUT_PORTS_START( unkeinv )
 	PORT_BIT( 0x0f, 0x00, IPT_POSITIONAL ) PORT_POSITIONS(12) PORT_SENSITIVITY(10) PORT_KEYDELTA(1) PORT_CENTERDELTA(0) PORT_CHANGED_MEMBER(DEVICE_SELF, unkeinv_state, position_changed, nullptr)
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( unkeinv )
+MACHINE_CONFIG_START(unkeinv_state::unkeinv)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", COP421, 850000) // frequency guessed
@@ -755,7 +761,8 @@ public:
 	DECLARE_READ8_MEMBER(read_g);
 	DECLARE_WRITE_LINE_MEMBER(write_so);
 	DECLARE_READ_LINE_MEMBER(read_si);
-
+	void lchicken(machine_config &config);
+	
 protected:
 	virtual void machine_start() override;
 };
@@ -853,7 +860,7 @@ void lchicken_state::machine_start()
 	save_item(NAME(m_motor_pos));
 }
 
-static MACHINE_CONFIG_START( lchicken )
+MACHINE_CONFIG_START(lchicken_state::lchicken)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", COP421, 850000) // approximation - RC osc. R=12K, C=100pF
@@ -899,6 +906,7 @@ public:
 	DECLARE_WRITE8_MEMBER(write_g);
 	DECLARE_READ8_MEMBER(read_l);
 	DECLARE_READ8_MEMBER(read_g);
+	void funjacks(machine_config &config);
 };
 
 // handlers
@@ -962,7 +970,7 @@ static INPUT_PORTS_START( funjacks )
 	PORT_CONFSETTING(    0x08, "2" )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( funjacks )
+MACHINE_CONFIG_START(funjacks_state::funjacks)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", COP410, 1000000) // approximation - RC osc. R=47K, C=56pF
@@ -1010,6 +1018,7 @@ public:
 	DECLARE_WRITE8_MEMBER(write_g);
 
 	DECLARE_INPUT_CHANGED_MEMBER(reset_button);
+	void funrlgl(machine_config &config);
 };
 
 // handlers
@@ -1056,7 +1065,7 @@ INPUT_CHANGED_MEMBER(funrlgl_state::reset_button)
 	m_maincpu->set_input_line(INPUT_LINE_RESET, newval ? ASSERT_LINE : CLEAR_LINE);
 }
 
-static MACHINE_CONFIG_START( funrlgl )
+MACHINE_CONFIG_START(funrlgl_state::funrlgl)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", COP410, 1000000) // approximation - RC osc. R=51K, C=91pF
@@ -1102,6 +1111,7 @@ public:
 	DECLARE_WRITE8_MEMBER(write_d);
 	DECLARE_WRITE8_MEMBER(write_g);
 	DECLARE_READ8_MEMBER(read_in);
+	void mdallas(machine_config &config);
 };
 
 // handlers
@@ -1191,7 +1201,7 @@ static INPUT_PORTS_START( mdallas )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_W) PORT_NAME("North") // N
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( mdallas )
+MACHINE_CONFIG_START(mdallas_state::mdallas)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", COP444L, 1000000) // approximation - RC osc. R=57K, C=101pF
@@ -1236,6 +1246,7 @@ public:
 	DECLARE_WRITE8_MEMBER(write_d);
 	DECLARE_WRITE8_MEMBER(write_l);
 	DECLARE_READ8_MEMBER(read_l);
+	void plus1(machine_config &config);
 };
 
 // handlers
@@ -1274,7 +1285,7 @@ static INPUT_PORTS_START( plus1 )
 	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( plus1 )
+MACHINE_CONFIG_START(plus1_state::plus1)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", COP410, 1000000) // approximation - RC osc. R=51K, C=100pF
@@ -1328,6 +1339,7 @@ public:
 	DECLARE_WRITE8_MEMBER(write_d);
 	DECLARE_WRITE8_MEMBER(write_l);
 	DECLARE_READ8_MEMBER(read_g);
+	void lightfgt(machine_config &config);
 };
 
 // handlers
@@ -1401,7 +1413,7 @@ static INPUT_PORTS_START( lightfgt )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_COCKTAIL
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( lightfgt )
+MACHINE_CONFIG_START(lightfgt_state::lightfgt)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", COP421, 950000) // approximation - RC osc. R=82K, C=56pF
@@ -1445,6 +1457,7 @@ public:
 	DECLARE_READ8_MEMBER(read_l);
 	DECLARE_READ8_MEMBER(read_in);
 	DECLARE_WRITE_LINE_MEMBER(write_so);
+	void bship82(machine_config &config);
 };
 
 // handlers
@@ -1554,7 +1567,7 @@ base pulled high with 4.7K resistor, connects directly to G3, 1K resistor to G2,
 
 */
 
-static MACHINE_CONFIG_START( bship82 )
+MACHINE_CONFIG_START(bship82_state::bship82)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", COP420, 750000) // approximation - RC osc. R=14K, C=100pF
@@ -1603,6 +1616,7 @@ public:
 	DECLARE_WRITE8_MEMBER(write_l);
 	DECLARE_READ8_MEMBER(read_in);
 	DECLARE_WRITE_LINE_MEMBER(write_sk);
+	void qkracer(machine_config &config);
 };
 
 // handlers
@@ -1685,7 +1699,7 @@ static INPUT_PORTS_START( qkracer )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_R) PORT_NAME("Tables")
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( qkracer )
+MACHINE_CONFIG_START(qkracer_state::qkracer)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", COP420, 1000000) // approximation - RC osc. R=47K, C=100pF

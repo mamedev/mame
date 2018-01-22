@@ -2799,7 +2799,7 @@ static GFXDECODE_START( towns )
 	GFXDECODE_ENTRY( "user",   0x180000, fnt_chars_16x16,  0, 16 )
 GFXDECODE_END
 
-static MACHINE_CONFIG_START( towns_base )
+MACHINE_CONFIG_START(towns_state::towns_base)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",I386, 16000000)
 	MCFG_CPU_PROGRAM_MAP(towns_mem)
@@ -2920,12 +2920,12 @@ static MACHINE_CONFIG_START( towns_base )
 	MCFG_RAM_EXTRA_OPTIONS("2M,4M,8M,16M,32M,64M,96M")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( towns )
+MACHINE_CONFIG_START(towns_state::towns)
 	MCFG_FRAGMENT_ADD(towns_base)
 	MCFG_NVRAM_ADD_0FILL("nvram")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( townsux )
+MACHINE_CONFIG_START(towns16_state::townsux)
 	MCFG_FRAGMENT_ADD(towns_base)
 
 	MCFG_CPU_REPLACE("maincpu",I386SX, 16000000)
@@ -2941,7 +2941,7 @@ static MACHINE_CONFIG_START( townsux )
 	MCFG_NVRAM_ADD_0FILL("nvram16")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( townssj, towns )
+MACHINE_CONFIG_DERIVED(towns_state::townssj, towns)
 
 	MCFG_CPU_REPLACE("maincpu",PENTIUM, 66000000)
 	MCFG_CPU_PROGRAM_MAP(towns_mem)
@@ -2954,7 +2954,7 @@ static MACHINE_CONFIG_DERIVED( townssj, towns )
 	MCFG_RAM_EXTRA_OPTIONS("40M,72M")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( townshr, towns )
+MACHINE_CONFIG_DERIVED(towns_state::townshr, towns)
 	MCFG_CPU_REPLACE("maincpu",I486, 20000000)
 	MCFG_CPU_PROGRAM_MAP(towns_mem)
 	MCFG_CPU_IO_MAP(towns_io)
@@ -2966,7 +2966,7 @@ static MACHINE_CONFIG_DERIVED( townshr, towns )
 	MCFG_RAM_EXTRA_OPTIONS("12M,20M,28M")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( townsftv, towns )
+MACHINE_CONFIG_DERIVED(towns_state::townsftv, towns)
 	MCFG_CPU_REPLACE("maincpu",I486, 33000000)
 	MCFG_CPU_PROGRAM_MAP(towns_mem)
 	MCFG_CPU_IO_MAP(towns_io)
@@ -2978,7 +2978,7 @@ static MACHINE_CONFIG_DERIVED( townsftv, towns )
 	MCFG_RAM_EXTRA_OPTIONS("32M,68M")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( marty )
+MACHINE_CONFIG_START(marty_state::marty)
 	MCFG_FRAGMENT_ADD(towns_base)
 
 	MCFG_CPU_REPLACE("maincpu",I386SX, 16000000)

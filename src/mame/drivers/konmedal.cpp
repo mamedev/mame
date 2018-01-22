@@ -21,6 +21,12 @@ Konami Custom chips:
 054156 (tilemaps)
 054157 (tilemaps)
 
+ Shuriken Boy
+
+Konami Custom chips:
+K052109 (tilemaps)
+K051649 (sound)
+
 ***************************************************************************/
 
 #include "emu.h"
@@ -79,6 +85,9 @@ public:
 	DECLARE_READ8_MEMBER(shuri_irq_r);
 	DECLARE_WRITE8_MEMBER(shuri_irq_w);
 
+	void shuriboy(machine_config &config);
+	void ddboy(machine_config &config);
+	void tsukande(machine_config &config);
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -257,6 +266,10 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( shuriboy_main, AS_PROGRAM, 8, konmedal_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM AM_REGION("maincpu", 0)
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
+	AM_RANGE(0x8800, 0x8800) AM_READ_PORT("IN2")
+	AM_RANGE(0x8801, 0x8801) AM_READ_PORT("IN1")
+	AM_RANGE(0x8802, 0x8802) AM_READ_PORT("DSW1")
+	AM_RANGE(0x8803, 0x8803) AM_READ_PORT("DSW2")
 	AM_RANGE(0x8b00, 0x8b00) AM_WRITENOP    // watchdog?
 	AM_RANGE(0x8c00, 0x8c00) AM_WRITE(shuri_bank_w)
 	AM_RANGE(0x9800, 0x987f) AM_DEVREADWRITE("k051649", k051649_device, k051649_waveform_r, k051649_waveform_w)
@@ -328,7 +341,7 @@ static INPUT_PORTS_START( konmedal )
 	PORT_DIPSETTING(    0x10, "24 sec" )
 	PORT_DIPSETTING(    0x20, "18 sec" )
 	PORT_DIPSETTING(    0x30, "12 sec" )
-	PORT_DIPNAME( 0x40, 0x40, "Backup Memory" )      PORT_DIPLOCATION("SW2:7")
+	PORT_DIPNAME( 0x40, 0x00, "Backup Memory" )      PORT_DIPLOCATION("SW2:7")
 	PORT_DIPSETTING(    0x40, "Keep" )
 	PORT_DIPSETTING(    0x00, "Clear" )
 	PORT_DIPNAME( 0x80, 0x00, "Demo Sound" )         PORT_DIPLOCATION("SW2:8")
@@ -368,7 +381,7 @@ void konmedal_state::machine_reset()
 	m_control = m_control2 = m_shuri_irq = 0;
 }
 
-static MACHINE_CONFIG_START( tsukande )
+MACHINE_CONFIG_START(konmedal_state::tsukande)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_14_31818MHz/2) // z84c0008pec 8mhz part, 14.31818Mhz xtal verified on PCB, divisor unknown
 	MCFG_CPU_PROGRAM_MAP(medal_main)
@@ -401,7 +414,7 @@ static MACHINE_CONFIG_START( tsukande )
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( ddboy )
+MACHINE_CONFIG_START(konmedal_state::ddboy)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_14_31818MHz/2) // z84c0008pec 8mhz part, 14.31818Mhz xtal verified on PCB, divisor unknown
 	MCFG_CPU_PROGRAM_MAP(ddboy_main)
@@ -451,13 +464,11 @@ Dips: 2 x 8 dips bank
 
 K052109_CB_MEMBER(konmedal_state::shuriboy_tile_callback)
 {
-	*code |= ((*color & 0x03) << 8) | ((*color & 0x10) << 6) | ((*color & 0x0c) << 9) | (bank << 13);
-//  *color = m_layer_colorbase[layer] + ((*color & 0xe0) >> 5);
+	*code |= ((*color & 0x03) << 8) | (*color & 0x40);
 }
 
 WRITE8_MEMBER(konmedal_state::shuri_bank_w)
 {
-	//printf("ROM bank %x (full %02x)\n", data>>4, data);
 	membank("bank1")->set_entry(data&0x3);
 }
 
@@ -530,7 +541,7 @@ WRITE8_MEMBER(konmedal_state::shuri_vrom_bank_w)
 	m_vrom_base |= (data << 10);
 }
 
-static MACHINE_CONFIG_START( shuriboy )
+MACHINE_CONFIG_START(konmedal_state::shuriboy)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_24MHz / 3) // divisor unknown
 	MCFG_CPU_PROGRAM_MAP(shuriboy_main)

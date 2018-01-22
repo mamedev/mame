@@ -177,7 +177,7 @@ INTERRUPT_GEN_MEMBER(gameplan_state::trvquest_interrupt)
 	m_via_2->write_ca1(0);
 }
 
-static MACHINE_CONFIG_START( trvquest )
+MACHINE_CONFIG_START(gameplan_state::trvquest)
 
 	MCFG_CPU_ADD("maincpu", M6809,XTAL_6MHz/4)
 	MCFG_CPU_PROGRAM_MAP(cpu_map)

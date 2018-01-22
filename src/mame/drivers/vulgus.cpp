@@ -214,7 +214,7 @@ GFXDECODE_END
 
 
 
-static MACHINE_CONFIG_START( vulgus )
+MACHINE_CONFIG_START(vulgus_state::vulgus)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_12MHz/4)  /* 3 MHz */

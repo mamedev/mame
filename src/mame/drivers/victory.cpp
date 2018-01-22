@@ -208,7 +208,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( victory )
+MACHINE_CONFIG_START(victory_state::victory)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, VICTORY_MAIN_CPU_CLOCK)

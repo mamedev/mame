@@ -118,7 +118,7 @@ static ADDRESS_MAP_START( pow_map, AS_PROGRAM, 16, snk68_state )
 //  AM_RANGE(0x0f0008, 0x0f0009) AM_WRITENOP    /* ?? */
 	AM_RANGE(0x100000, 0x100fff) AM_READWRITE(pow_fg_videoram_r, pow_fg_videoram_w) AM_MIRROR(0x1000) AM_SHARE("pow_fg_videoram")   // 8-bit
 	AM_RANGE(0x200000, 0x207fff) AM_DEVREADWRITE("sprites", snk68_spr_device, spriteram_r, spriteram_w) AM_SHARE("spriteram")   // only partially populated
-	AM_RANGE(0x400000, 0x400fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x400000, 0x400fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( searchar_map, AS_PROGRAM, 16, snk68_state )
@@ -140,7 +140,7 @@ static ADDRESS_MAP_START( searchar_map, AS_PROGRAM, 16, snk68_state )
 	AM_RANGE(0x100000, 0x107fff) AM_DEVREADWRITE("sprites", snk68_spr_device, spriteram_r, spriteram_w) AM_SHARE("spriteram")   // only partially populated
 	AM_RANGE(0x200000, 0x200fff) AM_RAM_WRITE(searchar_fg_videoram_w) AM_MIRROR(0x1000) AM_SHARE("pow_fg_videoram") /* Mirror is used by Ikari 3 */
 	AM_RANGE(0x300000, 0x33ffff) AM_ROM AM_REGION("user1", 0) /* Extra code bank */
-	AM_RANGE(0x400000, 0x400fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x400000, 0x400fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 ADDRESS_MAP_END
 
 /******************************************************************************/
@@ -588,7 +588,7 @@ void snk68_state::tile_callback_notpow(int &tile, int& fx, int& fy, int& region)
 	region = 1;
 }
 
-static MACHINE_CONFIG_START( pow )
+MACHINE_CONFIG_START(snk68_state::pow)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_18MHz/2) /* verified on pcb */
@@ -630,12 +630,12 @@ static MACHINE_CONFIG_START( pow )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( streetsm, pow )
+MACHINE_CONFIG_DERIVED(snk68_state::streetsm, pow)
 	MCFG_DEVICE_MODIFY("sprites")
 	MCFG_SNK68_SPR_SET_TILE_INDIRECT( snk68_state, tile_callback_notpow )
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( searchar, streetsm )
+MACHINE_CONFIG_DERIVED(snk68_state::searchar, streetsm)
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(searchar_map)

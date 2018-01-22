@@ -60,6 +60,7 @@ public:
 
 	DECLARE_DRIVER_INIT(upscope);
 
+	void upscope(machine_config &config);
 protected:
 	virtual void machine_reset() override;
 
@@ -256,7 +257,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( upscope )
+MACHINE_CONFIG_START(upscope_state::upscope)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, amiga_state::CLK_7M_NTSC)

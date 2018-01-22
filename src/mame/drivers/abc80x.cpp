@@ -150,9 +150,6 @@ Notes:
 
 #include "emu.h"
 #include "includes/abc80x.h"
-#include "video/abc800.h"
-#include "video/abc802.h"
-#include "video/abc806.h"
 #include "softlist.h"
 #include "speaker.h"
 
@@ -1018,7 +1015,7 @@ void abc806_state::machine_reset()
 //  MACHINE_CONFIG( abc800c )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( abc800c )
+MACHINE_CONFIG_START(abc800c_state::abc800c)
 	// basic machine hardware
 	MCFG_CPU_ADD(Z80_TAG, Z80, ABC800_X01/2/2)
 	MCFG_Z80_DAISY_CHAIN(abc800_daisy_chain)
@@ -1093,7 +1090,7 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( abc800m )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( abc800m )
+MACHINE_CONFIG_START(abc800m_state::abc800m)
 	// basic machine hardware
 	MCFG_CPU_ADD(Z80_TAG, Z80, ABC800_X01/2/2)
 	MCFG_Z80_DAISY_CHAIN(abc800_daisy_chain)
@@ -1168,7 +1165,7 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( abc802 )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( abc802 )
+MACHINE_CONFIG_START(abc802_state::abc802)
 	// basic machine hardware
 	MCFG_CPU_ADD(Z80_TAG, Z80, ABC800_X01/2/2)
 	MCFG_Z80_DAISY_CHAIN(abc800_daisy_chain)
@@ -1244,7 +1241,7 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( abc806 )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( abc806 )
+MACHINE_CONFIG_START(abc806_state::abc806)
 	// basic machine hardware
 	MCFG_CPU_ADD(Z80_TAG, Z80, ABC800_X01/2/2)
 	MCFG_Z80_DAISY_CHAIN(abc800_daisy_chain)

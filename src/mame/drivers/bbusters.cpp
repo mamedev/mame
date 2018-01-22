@@ -337,7 +337,7 @@ static ADDRESS_MAP_START( bbusters_map, AS_PROGRAM, 16, bbusters_state )
 	AM_RANGE(0x0b4000, 0x0b5fff) AM_RAM     /* service mode */
 	AM_RANGE(0x0b8000, 0x0b8003) AM_WRITEONLY AM_SHARE("pf1_scroll_data")
 	AM_RANGE(0x0b8008, 0x0b800b) AM_WRITEONLY AM_SHARE("pf2_scroll_data")
-	AM_RANGE(0x0d0000, 0x0d0fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x0d0000, 0x0d0fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x0e0000, 0x0e0001) AM_READ_PORT("COINS")  /* Coins */
 	AM_RANGE(0x0e0002, 0x0e0003) AM_READ_PORT("IN0")    /* Player 1 & 2 */
 	AM_RANGE(0x0e0004, 0x0e0005) AM_READ_PORT("IN1")    /* Player 3 */
@@ -364,7 +364,7 @@ static ADDRESS_MAP_START( mechatt_map, AS_PROGRAM, 16, bbusters_state )
 	AM_RANGE(0x0b8000, 0x0b8003) AM_WRITEONLY AM_SHARE("pf1_scroll_data")
 	AM_RANGE(0x0c0000, 0x0c3fff) AM_RAM_WRITE(pf2_w) AM_SHARE("pf2_data")
 	AM_RANGE(0x0c8000, 0x0c8003) AM_WRITEONLY AM_SHARE("pf2_scroll_data")
-	AM_RANGE(0x0d0000, 0x0d07ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x0d0000, 0x0d07ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x0e0000, 0x0e0001) AM_READ_PORT("IN0")
 	AM_RANGE(0x0e0002, 0x0e0003) AM_READ_PORT("DSW1")
 	AM_RANGE(0x0e0004, 0x0e0007) AM_READ(mechatt_gun_r)
@@ -647,7 +647,7 @@ GFXDECODE_END
 
 /******************************************************************************/
 
-static MACHINE_CONFIG_START( bbusters )
+MACHINE_CONFIG_START(bbusters_state::bbusters)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 12000000)
@@ -692,7 +692,7 @@ static MACHINE_CONFIG_START( bbusters )
 	MCFG_SOUND_ROUTE(2, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( mechatt )
+MACHINE_CONFIG_START(bbusters_state::mechatt)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 12000000)

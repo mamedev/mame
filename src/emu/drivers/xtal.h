@@ -93,7 +93,7 @@ enum
 	XTAL_5_5296MHz      = 5529600,      /* Kontron PSI98 keyboard */
 	XTAL_5_626MHz       = 5626000,      /* RCA CDP1869 PAL dot clock */
 	XTAL_5_67MHz        = 5670000,      /* RCA CDP1869 NTSC dot clock */
-	XTAL_5_7143MHz      = 5714300,      /* Cidelsa Destroyer */
+	XTAL_5_7143MHz      = 5714300,      /* Cidelsa Destroyer, TeleVideo serial keyboards */
 	XTAL_5_911MHz       = 5911000,      /* Philips Videopac Plus G7400 */
 	XTAL_5_9904MHz      = 5990400,      /* Luxor ABC 800 keyboard (Keytronic custom part #48-300-008 is equivalent) */
 	XTAL_6MHz           = 6000000,      /* American Poker II, Taito SJ System */
@@ -119,6 +119,7 @@ enum
 	XTAL_9_828MHz       = 9828000,      /* Universal PCBs */
 	XTAL_9_832MHz       = 9832000,      /* Robotron A7150 */
 	XTAL_9_8304MHz      = 9830400,      /* Epson PX-8 */
+	XTAL_9_87768MHz     = 9877680,      /* Microterm 420 */
 	XTAL_9_987MHz       = 9987000,      /* Crazy Balloon */
 	XTAL_10MHz          = 10000000,
 	XTAL_10_245MHz      = 10245000,     /* PES Speech box */
@@ -157,8 +158,10 @@ enum
 	XTAL_13_33056MHz    = 13330560,     /* Taito L */
 	XTAL_13_333MHz      = 13333000,     /* Ojanko High School */
 	XTAL_13_4MHz        = 13400000,     /* TNK3, Ikari Warriors h/w */
+	XTAL_13_4784MHz     = 13478400,     /* TeleVideo 970 80-column display clock */
 	XTAL_13_4952MHz     = 13495200,     /* Used on Shadow Force pcb and maybe other Technos pcbs? */
 	XTAL_13_5168MHz     = 13516800,     /* Kontron KDT6 */
+	XTAL_13_608MHz      = 13608000,     /* TeleVideo 910 & 925 */
 	XTAL_14MHz          = 14000000,
 	XTAL_14_112MHz      = 14112000,     /* Timex/Sinclair TS2068 */
 	XTAL_14_192640MHz   = 14192640,     /* Central Data 2650 */
@@ -198,7 +201,7 @@ enum
 	XTAL_17_9712MHz     = 17971200,
 	XTAL_18MHz          = 18000000,     /* S.A.R, Ikari Warriors 3 */
 	XTAL_18_432MHz      = 18432000,     /* Extremely common, used on 100's of PCBs (48000 * 384) */
-	XTAL_18_575MHz      = 18575000,     /* Visual 102 */
+	XTAL_18_575MHz      = 18575000,     /* Visual 102, Visual 220 */
 	XTAL_18_720MHz      = 18720000,     /* Nokia MikroMikko 1 */
 	XTAL_18_8696MHz     = 18869600,     /* Memorex 2178 */
 	XTAL_19_3396MHz     = 19339600,     /* TeleVideo TVI-955 80-column display clock */
@@ -214,6 +217,7 @@ enum
 	XTAL_21MHz          = 21000000,     /* Lock-On pixel clock */
 	XTAL_21_0526MHz     = 21052600,     /* NEC PC-98xx pixel clock */
 	XTAL_21_06MHz       = 21060000,     /* HP 264x display clock (60 Hz configuration) */
+	XTAL_21_2544MHz     = 21254400,     /* TeleVideo 970 132-column display clock */
 	XTAL_21_28137MHz    = 21281370,     /* Radica Tetris */
 	XTAL_21_3MHz        = 21300000,
 	XTAL_21_4772MHz     = 21477272,     /* BMC bowling, some Data East 90's games, Vtech Socrates; (6x NTSC subcarrier) */
@@ -223,7 +227,7 @@ enum
 	XTAL_22_3210MHz     = 22321000,     /* Apple LaserWriter II NT */
 	XTAL_22_656MHz      = 22656000,     /* Super Pinball Action (~1440x NTSC line rate) */
 	XTAL_22_896MHz      = 22896000,     /* DEC VT220 132-column display clock */
-	XTAL_23_814MHz      = 23814000,     /* TeleVideo TVI-912C & 950 */
+	XTAL_23_814MHz      = 23814000,     /* TeleVideo TVI-912, 920 & 950 */
 	XTAL_23_9616MHz     = 23961600,     /* Osborne 4 (Vixen) */
 	XTAL_24MHz          = 24000000,     /* Mario, 80's Data East games, 80's Konami games */
 	XTAL_24_0734MHz     = 24073400,     /* DEC Rainbow 100 */
@@ -239,6 +243,7 @@ enum
 	XTAL_25_7715MHz     = 25771500,     /* HP-2622A */
 	XTAL_25_92MHz       = 25920000,     /* ADDS Viewpoint 60 */
 	XTAL_26MHz          = 26000000,     /* Gaelco PCBs */
+	XTAL_26_366MHz      = 26366000,     /* DEC VT320 */
 	XTAL_26_580MHz      = 26580000,     /* Wyse WY-60 80-column display clock */
 	XTAL_26_601712MHz   = 26601712,     /* Astro Corp.'s Show Hand, PAL Vtech/Yeno Socrates (6x PAL subcarrier) */
 	XTAL_26_666MHz      = 26666000,     /* Imagetek I4100/I4220/I4300 */
@@ -248,6 +253,7 @@ enum
 	XTAL_27MHz          = 27000000,     /* Some Banpresto games macrossp, Irem M92 and 90's Toaplan games */
 	XTAL_27_164MHz      = 27164000,     /* Typically used on 90's Taito PCBs to drive the custom chips */
 	XTAL_27_2109MHz     = 27210900,     /* LA Girl */
+	XTAL_27_562MHz      = 27562000,     /* Visual 220 */
 	XTAL_28MHz          = 28000000,
 	XTAL_28_322MHz      = 28322000,     /* Saitek RISC 2500, Mephisto Montreux */
 	XTAL_28_37516MHz    = 28375160,     /* Amiga PAL systems */
@@ -266,6 +272,7 @@ enum
 	XTAL_31_9488MHz     = 31948800,     /* NEC PC-88xx, PC-98xx */
 	XTAL_32MHz          = 32000000,
 	XTAL_32_22MHz       = 32220000,     /* Typically used on 90's Data East PCBs (close to 9x NTSC subcarrier which is 32.215905Mhz*/
+	XTAL_32_3174MHz     = 32317400,     /* DEC VT330, VT340 */
 	XTAL_32_5304MHz     = 32530400,     /* Seta 2 */
 	XTAL_33MHz          = 33000000,     /* Sega Model 3 video board */
 	XTAL_33_264MHz      = 33264000,     /* Hazeltine 1500 terminal */

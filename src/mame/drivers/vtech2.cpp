@@ -413,7 +413,7 @@ static const floppy_interface vtech2_floppy_interface =
 	nullptr
 };
 
-static MACHINE_CONFIG_START( laser350 )
+MACHINE_CONFIG_START(vtech2_state::laser350)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 3694700)        /* 3.694700 MHz */
 	MCFG_CPU_PROGRAM_MAP(vtech2_mem)
@@ -455,12 +455,12 @@ static MACHINE_CONFIG_START( laser350 )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( laser500, laser350 )
+MACHINE_CONFIG_DERIVED(vtech2_state::laser500, laser350)
 	MCFG_MACHINE_RESET_OVERRIDE(vtech2_state, laser500 )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( laser700, laser350 )
+MACHINE_CONFIG_DERIVED(vtech2_state::laser700, laser350)
 	MCFG_MACHINE_RESET_OVERRIDE(vtech2_state, laser700 )
 
 	/* Second 5.25" floppy drive */

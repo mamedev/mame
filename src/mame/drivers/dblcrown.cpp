@@ -103,6 +103,7 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(dblcrown_irq_scanline);
 	DECLARE_PALETTE_INIT(dblcrown);
 
+	void dblcrown(machine_config &config);
 protected:
 	// driver_device overrides
 	virtual void machine_start() override;
@@ -592,7 +593,7 @@ It needs at least 64 instances because 0xa05b will be eventually nuked by the vb
 }
 
 
-static MACHINE_CONFIG_START( dblcrown )
+MACHINE_CONFIG_START(dblcrown_state::dblcrown)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, CPU_CLOCK)

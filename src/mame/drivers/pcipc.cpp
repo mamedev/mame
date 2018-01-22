@@ -49,6 +49,8 @@ public:
 	virtual void machine_reset() override;
 
 
+	void pcipc(machine_config &config);
+	void pcipctx(machine_config &config);
 };
 
 pcipc_state::pcipc_state(const machine_config &mconfig, device_type type, const char *tag) : driver_device(mconfig, type, tag)
@@ -463,7 +465,7 @@ WRITE8_MEMBER(pcipc_state::boot_state_award_w)
 
 }
 
-static MACHINE_CONFIG_START(pcipc)
+MACHINE_CONFIG_START(pcipc_state::pcipc)
 	MCFG_CPU_ADD("maincpu", PENTIUM, 90000000)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("pci:07.0:pic8259_master", pic8259_device, inta_cb)
 
@@ -475,7 +477,7 @@ static MACHINE_CONFIG_START(pcipc)
 	MCFG_MGA2064W_ADD(    ":pci:12.0")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START(pcipctx)
+MACHINE_CONFIG_START(pcipc_state::pcipctx)
 	MCFG_CPU_ADD("maincpu", PENTIUM, 60000000)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("pci:07.0:pic8259_master", pic8259_device, inta_cb)
 

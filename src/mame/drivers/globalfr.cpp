@@ -37,6 +37,7 @@ public:
 
 	DECLARE_WRITE16_MEMBER(vfd_w);
 
+	void globalfr(machine_config &config);
 };
 
 /******************************************************************************/
@@ -63,7 +64,7 @@ INPUT_PORTS_END
 
 /******************************************************************************/
 
-static MACHINE_CONFIG_START( globalfr )
+MACHINE_CONFIG_START(globalfr_state::globalfr)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M37702S1, 4000000)
 	MCFG_CPU_PROGRAM_MAP(globalfr_map)

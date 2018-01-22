@@ -146,6 +146,7 @@ public:
 	virtual void video_start() override;
 	uint32_t screen_update_bmcbowl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void init_stats(const uint8_t *table, int table_len, int address);
+	void bmcbowl(machine_config &config);
 };
 
 
@@ -450,7 +451,7 @@ static ADDRESS_MAP_START( ramdac_map, 0, 8, bmcbowl_state )
 	AM_RANGE(0x000, 0x3ff) AM_DEVREADWRITE("ramdac",ramdac_device,ramdac_pal_r,ramdac_rgb666_w)
 ADDRESS_MAP_END
 
-static MACHINE_CONFIG_START( bmcbowl )
+MACHINE_CONFIG_START(bmcbowl_state::bmcbowl)
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_21_4772MHz / 2 )
 	MCFG_CPU_PROGRAM_MAP(bmcbowl_mem)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", bmcbowl_state, irq2_line_hold)

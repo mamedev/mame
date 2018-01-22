@@ -87,4 +87,10 @@ public:
 
 	void update_pix_palbank();
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void penkyi(machine_config &config);
+	void tgtball(machine_config &config);
+	void paradise(machine_config &config);
+	void madball(machine_config &config);
+	void torus(machine_config &config);
+	void penky(machine_config &config);
 };

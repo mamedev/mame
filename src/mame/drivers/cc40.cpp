@@ -147,6 +147,7 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(sysram_size_changed);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cc40_cartridge);
 	HD44780_PIXEL_UPDATE(cc40_pixel_update);
+	void cc40(machine_config &config);
 };
 
 
@@ -574,7 +575,7 @@ void cc40_state::machine_start()
 	machine().save().register_postload(save_prepost_delegate(FUNC(cc40_state::postload), this));
 }
 
-static MACHINE_CONFIG_START( cc40 )
+MACHINE_CONFIG_START(cc40_state::cc40)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", TMS70C20, XTAL_5MHz / 2)

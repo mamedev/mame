@@ -109,6 +109,10 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(jngolady_vclk_cb);
 
 	std::unique_ptr<bitmap_ind16> m_tmp_bitmap;
+	void jngolady(machine_config &config);
+	void roylcrdn(machine_config &config);
+	void cntrygrl(machine_config &config);
+	void jangou(machine_config &config);
 };
 
 
@@ -838,7 +842,7 @@ MACHINE_RESET_MEMBER(jangou_state,jngolady)
 }
 
 /* Note: All frequencies and dividers are unverified */
-static MACHINE_CONFIG_START( jangou )
+MACHINE_CONFIG_START(jangou_state::jangou)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("cpu0", Z80, MASTER_CLOCK / 8)
@@ -875,7 +879,7 @@ static MACHINE_CONFIG_START( jangou )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( jngolady, jangou )
+MACHINE_CONFIG_DERIVED(jangou_state::jngolady, jangou)
 
 	/* basic machine hardware */
 
@@ -901,7 +905,7 @@ static MACHINE_CONFIG_DERIVED( jngolady, jangou )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( cntrygrl, jangou )
+MACHINE_CONFIG_DERIVED(jangou_state::cntrygrl, jangou)
 
 	/* basic machine hardware */
 
@@ -919,7 +923,7 @@ static MACHINE_CONFIG_DERIVED( cntrygrl, jangou )
 	MCFG_DEVICE_REMOVE("soundlatch")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( roylcrdn, jangou )
+MACHINE_CONFIG_DERIVED(jangou_state::roylcrdn, jangou)
 
 	/* basic machine hardware */
 

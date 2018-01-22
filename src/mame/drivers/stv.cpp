@@ -1058,7 +1058,7 @@ WRITE8_MEMBER( stv_state::pdr2_output_w )
 }
 
 
-static MACHINE_CONFIG_START( stv )
+MACHINE_CONFIG_START(stv_state::stv)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", SH2, MASTER_CLOCK_352/2) // 28.6364 MHz
@@ -1125,7 +1125,7 @@ static MACHINE_CONFIG_START( stv )
 
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( stv_5881, stv )
+MACHINE_CONFIG_DERIVED(stv_state::stv_5881, stv)
 	MCFG_DEVICE_ADD("315_5881", SEGA315_5881_CRYPT, 0)
 	MCFG_SET_READ_CALLBACK(stv_state, crypt_read_callback)
 MACHINE_CONFIG_END
@@ -1141,7 +1141,7 @@ uint16_t stv_state::crypt_read_callback_ch2(uint32_t addr)
 	return m_maincpu->space().read_word(0x02000000 + 0x0000000 + (addr * 2));
 }
 
-static MACHINE_CONFIG_DERIVED( stv_5838, stv )
+MACHINE_CONFIG_DERIVED(stv_state::stv_5838, stv)
 	MCFG_DEVICE_ADD("315_5838", SEGA315_5838_COMP, 0)
 	MCFG_SET_5838_READ_CALLBACK_CH1(stv_state, crypt_read_callback_ch1)
 	MCFG_SET_5838_READ_CALLBACK_CH2(stv_state, crypt_read_callback_ch2)
@@ -1163,7 +1163,7 @@ WRITE32_MEMBER( stv_state::batmanfr_sound_comms_w )
 }
 
 
-static MACHINE_CONFIG_DERIVED( batmanfr, stv )
+MACHINE_CONFIG_DERIVED(stv_state::batmanfr, stv)
 	MCFG_DEVICE_ADD("rax", ACCLAIM_RAX, 0)
 MACHINE_CONFIG_END
 
@@ -1172,7 +1172,7 @@ MACHINE_CONFIG_END
 	MCFG_GENERIC_CARTSLOT_ADD(_tag, generic_plain_slot, "stv_cart")  \
 	MCFG_GENERIC_LOAD(stv_state, _load)
 
-MACHINE_CONFIG_START( stv_cartslot )
+MACHINE_CONFIG_START(stv_state::stv_cartslot)
 
 	MCFG_STV_CARTSLOT_ADD("stv_slot1", stv_cart1)
 	MCFG_STV_CARTSLOT_ADD("stv_slot2", stv_cart2)
@@ -1182,11 +1182,11 @@ MACHINE_CONFIG_START( stv_cartslot )
 	MCFG_SOFTWARE_LIST_ADD("cart_list","stv")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( stv_slot, stv )
+MACHINE_CONFIG_DERIVED(stv_state::stv_slot, stv)
 	MCFG_FRAGMENT_ADD( stv_cartslot )
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( hopper, stv )
+MACHINE_CONFIG_DERIVED(stv_state::hopper, stv)
 		MCFG_HOPPER_ADD("hopper", attotime::from_msec(100), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH)
 MACHINE_CONFIG_END
 

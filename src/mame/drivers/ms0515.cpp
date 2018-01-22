@@ -100,6 +100,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(irq9_w);
 	DECLARE_WRITE_LINE_MEMBER(irq11_w);
 
+	void ms0515(machine_config &config);
 protected:
 	virtual void machine_reset() override;
 
@@ -513,7 +514,7 @@ WRITE_LINE_MEMBER(ms0515_state::irq11_w)
 	irq_encoder(11, state);
 }
 
-static MACHINE_CONFIG_START( ms0515 )
+MACHINE_CONFIG_START(ms0515_state::ms0515)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", T11, XTAL_15MHz / 2) // actual CPU is T11 clone, KR1807VM1
 	MCFG_T11_INITIAL_MODE(0xf2ff)

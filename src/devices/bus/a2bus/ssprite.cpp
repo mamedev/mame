@@ -33,7 +33,7 @@ DEFINE_DEVICE_TYPE(A2BUS_SSPRITE, a2bus_ssprite_device, "a2ssprite", "Synetix Su
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( a2bus_ssprite_device::device_add_mconfig )
+MACHINE_CONFIG_START(a2bus_ssprite_device::device_add_mconfig)
 	MCFG_DEVICE_ADD( TMS_TAG, TMS9918A, XTAL_10_738635MHz / 2 )
 	MCFG_TMS9928A_VRAM_SIZE(0x4000) // 16k of VRAM
 	MCFG_TMS9928A_OUT_INT_LINE_CB(WRITELINE(a2bus_ssprite_device, tms_irq_w))

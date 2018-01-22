@@ -59,6 +59,7 @@ public:
 	DECLARE_WRITE8_MEMBER(disp_2_w);
 	DECLARE_WRITE8_MEMBER(disp_w);
 
+	void k1003(machine_config &config);
 private:
 	uint8_t m_disp_1;
 	uint8_t m_disp_2;
@@ -136,7 +137,7 @@ void k1003_state::machine_reset()
 {
 }
 
-static MACHINE_CONFIG_START( k1003 )
+MACHINE_CONFIG_START(k1003_state::k1003)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",I8008, 800000)
 	MCFG_CPU_PROGRAM_MAP(k1003_mem)

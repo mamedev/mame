@@ -73,7 +73,7 @@ ADDRESS_MAP_END
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( adam_printer_device::device_add_mconfig )
+MACHINE_CONFIG_START(adam_printer_device::device_add_mconfig)
 	MCFG_CPU_ADD(M6801_TAG, M6801, XTAL_4MHz)
 	MCFG_CPU_PROGRAM_MAP(adam_prn_mem)
 	MCFG_CPU_IO_MAP(adam_prn_io)

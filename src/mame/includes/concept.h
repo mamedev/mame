@@ -66,6 +66,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(via_out_cb2);
 	DECLARE_WRITE_LINE_MEMBER(via_irq_func);
 	void concept_set_interrupt(int level, int state);
+	void concept(machine_config &config);
 };
 
 #endif // MAME_INCLUDES_CONCEPT_H

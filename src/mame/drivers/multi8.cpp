@@ -61,6 +61,7 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(keyboard_callback);
 	MC6845_UPDATE_ROW(crtc_update_row);
 
+	void multi8(machine_config &config);
 private:
 	uint8_t *m_p_vram;
 	uint8_t *m_p_wram;
@@ -559,7 +560,7 @@ void multi8_state::machine_reset()
 	m_mcu_init = 0;
 }
 
-static MACHINE_CONFIG_START( multi8 )
+MACHINE_CONFIG_START(multi8_state::multi8)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_4MHz)
 	MCFG_CPU_PROGRAM_MAP(multi8_mem)

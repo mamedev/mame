@@ -39,6 +39,7 @@ public:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_DRIVER_INIT(c10);
 
+	void c10(machine_config &config);
 private:
 	required_device<cpu_device> m_maincpu;
 	required_shared_ptr<uint8_t> m_p_videoram;
@@ -153,7 +154,7 @@ static GFXDECODE_START( c10 )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( c10 )
+MACHINE_CONFIG_START(c10_state::c10)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_8MHz / 2)
 	MCFG_CPU_PROGRAM_MAP(c10_mem)

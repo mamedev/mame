@@ -69,6 +69,7 @@ public:
 	required_device<beep_device> m_beep;
 	required_device<palette_device> m_palette;
 
+	void esh(machine_config &config);
 protected:
 	//virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
@@ -350,7 +351,7 @@ void esh_state::machine_start()
 
 
 /* DRIVER */
-static MACHINE_CONFIG_START( esh )
+MACHINE_CONFIG_START(esh_state::esh)
 	/* main cpu */
 	MCFG_CPU_ADD("maincpu", Z80, PCB_CLOCK/6)                       /* The denominator is a Daphne guess based on PacMan's hardware */
 	MCFG_CPU_PROGRAM_MAP(z80_0_mem)

@@ -178,10 +178,15 @@ public:
 
 	// screen updates
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-
-	DECLARE_WRITE8_MEMBER(radicasi_500c_w);
-	DECLARE_WRITE8_MEMBER(radicasi_500d_w);
 	
+	// system
+	DECLARE_READ8_MEMBER(radicasi_5003_r);
+	DECLARE_READ8_MEMBER(radicasi_pal_ntsc_r);
+	DECLARE_READ8_MEMBER(radicasi_rombank_lo_r);
+	DECLARE_WRITE8_MEMBER(radicasi_rombank_lo_w);
+	DECLARE_WRITE8_MEMBER(radicasi_rombank_hi_w);
+
+
 	// DMA
 	DECLARE_WRITE8_MEMBER(radicasi_dmasrc_lo_w);
 	DECLARE_WRITE8_MEMBER(radicasi_dmasrc_md_w);
@@ -200,61 +205,24 @@ public:
 	DECLARE_READ8_MEMBER(radicasi_dmatrg_r);
 	DECLARE_WRITE8_MEMBER(radicasi_dmatrg_w);
 
-
-
+	// VIDEO
 	// tile bases
 	DECLARE_WRITE8_MEMBER(radicasi_tile_gfxbase_lo_w);
 	DECLARE_WRITE8_MEMBER(radicasi_tile_gfxbase_hi_w);
 	DECLARE_READ8_MEMBER(radicasi_tile_gfxbase_lo_r);
 	DECLARE_READ8_MEMBER(radicasi_tile_gfxbase_hi_r);
-
 	// sprite tile bases
 	DECLARE_WRITE8_MEMBER(radicasi_sprite_gfxbase_lo_w);
 	DECLARE_WRITE8_MEMBER(radicasi_sprite_gfxbase_hi_w);
 	DECLARE_READ8_MEMBER(radicasi_sprite_gfxbase_lo_r);
 	DECLARE_READ8_MEMBER(radicasi_sprite_gfxbase_hi_r);
-
-	// unknown rom bases
-	DECLARE_WRITE8_MEMBER(radicasi_sound_0_0_w);
-	DECLARE_READ8_MEMBER(radicasi_sound_0_0_r);
-	DECLARE_WRITE8_MEMBER(radicasi_sound_0_1_w);
-	DECLARE_READ8_MEMBER(radicasi_sound_0_1_r);
-	DECLARE_WRITE8_MEMBER(radicasi_sound_0_2_w);
-	DECLARE_READ8_MEMBER(radicasi_sound_0_2_r);
-	DECLARE_WRITE8_MEMBER(radicasi_sound_0_3_w);
-	DECLARE_READ8_MEMBER(radicasi_sound_0_3_r);
-	DECLARE_WRITE8_MEMBER(radicasi_sound_0_4_w);
-	DECLARE_READ8_MEMBER(radicasi_sound_0_4_r);
-	DECLARE_WRITE8_MEMBER(radicasi_sound_0_5_w);
-	DECLARE_READ8_MEMBER(radicasi_sound_0_5_r);
-
-	DECLARE_WRITE8_MEMBER(radicasi_sound_1_0_w);
-	DECLARE_READ8_MEMBER(radicasi_sound_1_0_r);
-	DECLARE_WRITE8_MEMBER(radicasi_sound_1_1_w);
-	DECLARE_READ8_MEMBER(radicasi_sound_1_1_r);
-	DECLARE_WRITE8_MEMBER(radicasi_sound_1_2_w);
-	DECLARE_READ8_MEMBER(radicasi_sound_1_2_r);
-	DECLARE_WRITE8_MEMBER(radicasi_sound_1_3_w);
-	DECLARE_READ8_MEMBER(radicasi_sound_1_3_r);
-	DECLARE_WRITE8_MEMBER(radicasi_sound_1_4_w);
-	DECLARE_READ8_MEMBER(radicasi_sound_1_4_r);
-	DECLARE_WRITE8_MEMBER(radicasi_sound_1_5_w);
-	DECLARE_READ8_MEMBER(radicasi_sound_1_5_r);
-
-	DECLARE_READ8_MEMBER(radicasi_sound_trigger_r);
-	DECLARE_WRITE8_MEMBER(radicasi_sound_trigger_w);
-
-	DECLARE_WRITE8_MEMBER(radicasi_5027_w);
+	
+	DECLARE_WRITE8_MEMBER(radicasi_vidctrl_w);
 
 	DECLARE_READ8_MEMBER(radicasi_sprite_bg_scroll_r);
 	DECLARE_WRITE8_MEMBER(radicasi_sprite_bg_scroll_w);
 
-	DECLARE_READ8_MEMBER(radicasi_5003_r);
-
-	DECLARE_READ8_MEMBER(radicasi_500b_r);
-	DECLARE_READ8_MEMBER(radicasi_500d_r);
-	DECLARE_READ8_MEMBER(radicasi_50a8_r);
-
+	// more sound regs?
 	DECLARE_READ8_MEMBER(radicasi_50a9_r);
 	DECLARE_WRITE8_MEMBER(radicasi_50a9_w);
 
@@ -262,6 +230,11 @@ public:
 
 	DECLARE_READ8_MEMBER(radicasi_nmi_vector_r);
 	DECLARE_READ8_MEMBER(radicasi_irq_vector_r);
+
+	// for callback
+	DECLARE_READ8_MEMBER(read_full_space);
+
+	void radicasi(machine_config &config);
 
 protected:
 	// driver_device overrides
@@ -281,9 +254,9 @@ private:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 
-	uint8_t m_500c_data;
-	uint8_t m_500d_data;
-	uint8_t m_5027_data;
+	uint8_t m_rombank_hi;
+	uint8_t m_rombank_lo;
+	uint8_t m_vidctrl;
 	uint8_t m_50a9_data;
 
 	uint8_t m_dmasrc_lo_data;
@@ -300,12 +273,6 @@ private:
 	uint8_t m_sprite_gfxbase_lo_data;
 	uint8_t m_sprite_gfxbase_hi_data;
 
-	uint32_t m_sound_0_address[6];
-	uint32_t m_sound_1_size[6];
-
-
-	uint8_t m_sound_trigger;
-
 	uint8_t m_bg_scroll[2];
 
 	int m_custom_irq;
@@ -313,17 +280,270 @@ private:
 	uint16_t m_custom_irq_vector;
 	uint16_t m_custom_nmi_vector;
 
-	void handle_trigger(int which);
-
-	void handle_sound_0_w(int which, int offset, uint8_t data);
-	uint8_t handle_sound_0_r(int which, int offset);
-	void handle_sound_1_w(int which, int offset, uint8_t data);
-	uint8_t handle_sound_1_r(int which, int offset);
-
 	bool get_tile_data(int base, int drawpri, int& tile, int &attr, int &unk2);
 	void draw_tilemaps(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int drawpri);
 	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
+
+
+#define MCFG_RADICA6502_SOUND_SPACE_READ_CB(_devcb) \
+	devcb = &radica6502_sound_device::set_space_read_callback(*device, DEVCB_##_devcb);
+
+//**************************************************************************
+//  TYPE DEFINITIONS
+//**************************************************************************
+
+// ======================> radica6502_sound_device
+
+class radica6502_sound_device : public device_t, public device_sound_interface
+{
+public:
+	radica6502_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	template <class Object> static devcb_base &set_space_read_callback(device_t &device, Object &&cb) { return downcast<radica6502_sound_device &>(device).m_space_read_cb.set_callback(std::forward<Object>(cb)); }
+
+	DECLARE_WRITE8_MEMBER(radicasi_sound_addr_w);
+	DECLARE_READ8_MEMBER(radicasi_sound_addr_r);
+	DECLARE_WRITE8_MEMBER(radicasi_sound_size_w);
+	DECLARE_READ8_MEMBER(radicasi_sound_size_r);
+	DECLARE_READ8_MEMBER(radicasi_sound_trigger_r);
+	DECLARE_WRITE8_MEMBER(radicasi_sound_trigger_w);
+	DECLARE_READ8_MEMBER(radicasi_sound_unk_r);
+	DECLARE_WRITE8_MEMBER(radicasi_sound_unk_w);
+
+	DECLARE_READ8_MEMBER(radicasi_50a8_r);
+protected:
+	// device-level overrides
+	virtual void device_start() override;
+	virtual void device_reset() override;
+
+	// sound stream update overrides
+	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
+
+private:
+	sound_stream *m_stream;
+	devcb_read8 m_space_read_cb;
+
+	uint32_t m_sound_byte_address[6];
+	uint32_t m_sound_byte_len[6];
+	uint32_t m_sound_current_nib_pos[6];
+
+	uint8_t m_sound_trigger;
+	uint8_t m_sound_unk;
+
+	uint8_t m_isstopped;
+
+	void handle_sound_trigger(int which);
+
+	void handle_sound_addr_w(int which, int offset, uint8_t data);
+	uint8_t handle_sound_addr_r(int which, int offset);
+	void handle_sound_size_w(int which, int offset, uint8_t data);
+	uint8_t handle_sound_size_r(int which, int offset);
+};
+
+//DECLARE_DEVICE_TYPE(RADICA6502_SOUND, radica6502_sound_device)
+DEFINE_DEVICE_TYPE(RADICA6502_SOUND, radica6502_sound_device, "radica6502sound", "Radica 6502 Sound")
+
+radica6502_sound_device::radica6502_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, RADICA6502_SOUND, tag, owner, clock)
+	, device_sound_interface(mconfig, *this)
+	, m_stream(nullptr)
+	, m_space_read_cb(*this)
+{
+}
+
+void radica6502_sound_device::device_start()
+{
+	m_space_read_cb.resolve_safe(0);
+	m_stream = stream_alloc(0, 1, 8000);
+}
+
+void radica6502_sound_device::device_reset()
+{
+	for (int i = 0; i < 6; i++)
+	{
+		m_sound_byte_address[i] = 0;
+		m_sound_byte_len[i] = 0;
+		m_sound_current_nib_pos[i] = 0;
+	}
+
+	m_isstopped = 0x3f;
+}
+
+//-------------------------------------------------
+//  sound_stream_update - handle a stream update
+//-------------------------------------------------
+
+void radica6502_sound_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+{
+	// reset the output stream
+	memset(outputs[0], 0, samples * sizeof(*outputs[0]));
+
+	int outpos = 0;
+	// loop while we still have samples to generate
+	while (samples-- != 0)
+	{
+		for (int channel = 0; channel < 6; channel++)
+		{
+			if (!((m_isstopped >> channel) & 1))
+			{
+				//logerror("m_isstopped %02x channel %d is active %08x %06x\n", m_isstopped, channel, m_sound_byte_address[channel], m_sound_current_nib_pos[channel]);
+
+				int readoffset = m_sound_byte_address[channel] + (m_sound_current_nib_pos[channel] / 2);
+
+				int nibble = m_space_read_cb(readoffset);
+
+				nibble = nibble >> ((m_sound_current_nib_pos[channel] & 1) ? 0 : 4);
+				nibble &= 0x0f;
+
+				// it's actually some form of ADPCM? but apparently NOT the OKI ADPCM
+				if (nibble & 0x08)
+					nibble -= 0x10;
+
+				outputs[0][outpos] += nibble * 0x100;
+
+				m_sound_current_nib_pos[channel]++;
+
+				if (m_sound_current_nib_pos[channel] >= m_sound_byte_len[channel] * 2)
+				{
+					m_sound_current_nib_pos[channel] = 0;
+					m_isstopped |= (1 << channel);
+
+					// maybe should generate an interrupt with vector
+					// ffb8, ffbc, ffc0, ffc4, ffc8, or ffcc depending on which channel finished??
+				}
+			}
+			else
+			{
+				//logerror("m_isstopped %02x channel %d is NOT active %08x %06x\n", m_isstopped, channel, m_sound_byte_address[channel], m_sound_current_nib_pos[channel]);
+			}
+		}
+		outpos++;
+	}
+}
+
+
+#define MCFG_RADICA6502_GPIO_READ_PORT0_CB(_devcb) \
+	devcb = &radica6502_gpio_device::set_gpio_read_0_callback(*device, DEVCB_##_devcb);
+
+#define MCFG_RADICA6502_GPIO_READ_PORT1_CB(_devcb) \
+	devcb = &radica6502_gpio_device::set_gpio_read_1_callback(*device, DEVCB_##_devcb);
+
+#define MCFG_RADICA6502_GPIO_READ_PORT2_CB(_devcb) \
+	devcb = &radica6502_gpio_device::set_gpio_read_2_callback(*device, DEVCB_##_devcb);
+
+
+class radica6502_gpio_device : public device_t
+{
+public:
+	radica6502_gpio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	template <class Object> static devcb_base &set_gpio_read_0_callback(device_t &device, Object &&cb) { return downcast<radica6502_gpio_device &>(device).m_space_read0_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_gpio_read_1_callback(device_t &device, Object &&cb) { return downcast<radica6502_gpio_device &>(device).m_space_read1_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_gpio_read_2_callback(device_t &device, Object &&cb) { return downcast<radica6502_gpio_device &>(device).m_space_read2_cb.set_callback(std::forward<Object>(cb)); }
+
+	DECLARE_READ8_MEMBER(gpio_r);
+	DECLARE_WRITE8_MEMBER(gpio_w);
+
+	DECLARE_WRITE8_MEMBER(gpio_unk_w);
+
+
+protected:
+	// device-level overrides
+	virtual void device_start() override;
+	virtual void device_reset() override;
+
+private:
+	devcb_read8 m_space_read0_cb;
+	devcb_read8 m_space_read1_cb;
+	devcb_read8 m_space_read2_cb;
+
+	uint8_t read_port_data(int which);
+	uint8_t read_direction(int which);
+	void write_port_data(int which, uint8_t data);
+	void write_direction(int which, uint8_t data);
+
+	uint8_t m_ddr[3];
+	uint8_t m_unk[3];
+};
+
+//DECLARE_DEVICE_TYPE(RADICA6502_SOUND, radica6502_gpio_device)
+DEFINE_DEVICE_TYPE(RADICA6502_GPIO, radica6502_gpio_device, "radica6502gpio", "Radica 6502 GPIO")
+
+radica6502_gpio_device::radica6502_gpio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, RADICA6502_GPIO, tag, owner, clock)
+	, m_space_read0_cb(*this)
+	, m_space_read1_cb(*this)
+	, m_space_read2_cb(*this)
+{
+}
+
+void radica6502_gpio_device::device_start()
+{
+	m_space_read0_cb.resolve_safe(0xff);
+	m_space_read1_cb.resolve_safe(0xff);
+	m_space_read2_cb.resolve_safe(0xff);
+}
+
+void radica6502_gpio_device::device_reset()
+{
+	for (int i = 0; i < 3; i++)
+	{
+		m_ddr[i] = 0;
+		m_unk[i] = 0;
+	}
+}
+
+uint8_t radica6502_gpio_device::read_port_data(int which)
+{
+	//todo, actually use the direction registers
+	switch (which)
+	{
+		case 0: return m_space_read0_cb();
+		case 1: return m_space_read1_cb();
+		case 2: return m_space_read2_cb();
+	}
+
+	return 0xff;
+}
+
+uint8_t radica6502_gpio_device::read_direction(int which)
+{
+	return m_ddr[which];
+}
+
+READ8_MEMBER(radica6502_gpio_device::gpio_r)
+{
+
+	int port = offset/2;
+	if (!(offset&1)) return read_direction(port);
+	else return read_port_data(port);
+}
+
+void radica6502_gpio_device::write_port_data(int which, uint8_t data)
+{
+	//todo, actually use the direction registers
+	logerror("%s: write_port_data (port %d) %02x (direction register %02x)\n", which, data, m_ddr[which]);
+}
+
+void radica6502_gpio_device::write_direction(int which, uint8_t data)
+{
+	logerror("%s: write_direction (port %d) %02x\n", which, data);
+	m_ddr[which] = data;
+}
+
+WRITE8_MEMBER(radica6502_gpio_device::gpio_w)
+{
+
+	int port = offset/2;
+	if (!(offset&1)) return write_direction(port, data);
+	else return write_port_data(port, data);
+}
+
+WRITE8_MEMBER(radica6502_gpio_device::gpio_unk_w)
+{
+	logerror("%s: gpio_unk_w (port %d) %02x (direction register %02x)\n", offset, data, m_ddr[offset]);
+}
 
 void radica_6502_state::video_start()
 {
@@ -506,7 +726,7 @@ void radica_6502_state::draw_tilemaps(screen_device &screen, bitmap_ind16 &bitma
 	int scroll = (m_bg_scroll[1] << 8) | m_bg_scroll[0];
 	address_space& fullbankspace = m_bank->space(AS_PROGRAM);
 
-	if (m_5027_data & 0x40) // 16x16 tiles
+	if (m_vidctrl & 0x40) // 16x16 tiles
 	{
 		int startrow = (scroll >> 4) & 0x1f;
 
@@ -528,7 +748,7 @@ void radica_6502_state::draw_tilemaps(screen_device &screen, bitmap_ind16 &bitma
 
 				int colour = attr & 0xf0;
 		
-				if (m_5027_data & 0x20) // 4bpp mode
+				if (m_vidctrl & 0x20) // 4bpp mode
 				{
 					tile = (tile & 0xf) + ((tile & ~0xf) * 16);
 					tile += ((m_tile_gfxbase_lo_data | m_tile_gfxbase_hi_data << 8) << 5);
@@ -550,7 +770,7 @@ void radica_6502_state::draw_tilemaps(screen_device &screen, bitmap_ind16 &bitma
 					{
 						uint16_t* row = &bitmap.pix16(drawline);
 
-						if (m_5027_data & 0x20) // 4bpp
+						if (m_vidctrl & 0x20) // 4bpp
 						{
 							for (int xx = 0; xx < 16; xx += 2)
 							{
@@ -624,8 +844,6 @@ void radica_6502_state::draw_tilemaps(screen_device &screen, bitmap_ind16 &bitma
 	}
 }
 
-
-
 uint32_t radica_6502_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(0, cliprect);
@@ -673,25 +891,33 @@ uint32_t radica_6502_state::screen_update(screen_device &screen, bitmap_ind16 &b
 	return 0;
 }
 
-WRITE8_MEMBER(radica_6502_state::radicasi_500c_w)
+// System control
+
+WRITE8_MEMBER(radica_6502_state::radicasi_rombank_hi_w)
 {
 	// written with the banking?
-	logerror("%s: radicasi_500c_w (set ROM bank) %02x\n", machine().describe_context().c_str(), data);
-	m_500c_data = data;
+	//logerror("%s: radicasi_rombank_hi_w (set ROM bank) %02x\n", machine().describe_context().c_str(), data);
+	m_rombank_hi = data;
 
-	m_bank->set_bank(m_500d_data | (m_500c_data << 8));
+	m_bank->set_bank(m_rombank_lo | (m_rombank_hi << 8));
 }
 
-READ8_MEMBER(radica_6502_state::radicasi_500d_r)
+WRITE8_MEMBER(radica_6502_state::radicasi_rombank_lo_w)
 {
-	return m_500d_data;
+	//logerror("%s: radicasi_rombank_lo_w (select ROM bank) %02x\n", machine().describe_context().c_str(), data);
+	m_rombank_lo = data;
 }
 
-READ8_MEMBER(radica_6502_state::radicasi_500b_r)
+READ8_MEMBER(radica_6502_state::radicasi_rombank_lo_r)
+{
+	return m_rombank_lo;
+}
+
+READ8_MEMBER(radica_6502_state::radicasi_pal_ntsc_r)
 {
 	// how best to handle this, we probably need to run the PAL machine at 50hz
 	// the text under the radica logo differs between regions
-	logerror("%s: radicasi_500b_r (region + more?)\n", machine().describe_context().c_str());
+	logerror("%s: radicasi_pal_ntsc_r (region + more?)\n", machine().describe_context().c_str());
 	return 0xff; // NTSC
 	//return 0x00; // PAL
 }
@@ -714,35 +940,31 @@ READ8_MEMBER(radica_6502_state::radicasi_5003_r)
 }
 
 
-WRITE8_MEMBER(radica_6502_state::radicasi_500d_w)
-{
-	logerror("%s: radicasi_500d_w (select ROM bank) %02x\n", machine().describe_context().c_str(), data);
-	m_500d_data = data;
-}
+// Video device
 
 // Tile bases
 
 WRITE8_MEMBER(radica_6502_state::radicasi_tile_gfxbase_lo_w)
 {
-	logerror("%s: radicasi_tile_gfxbase_lo_w (select GFX base lower) %02x\n", machine().describe_context().c_str(), data);
+	//logerror("%s: radicasi_tile_gfxbase_lo_w (select GFX base lower) %02x\n", machine().describe_context().c_str(), data);
 	m_tile_gfxbase_lo_data = data;
 }
 
 WRITE8_MEMBER(radica_6502_state::radicasi_tile_gfxbase_hi_w)
 {
-	logerror("%s: radicasi_tile_gfxbase_hi_w (select GFX base upper) %02x\n", machine().describe_context().c_str(), data);
+	//logerror("%s: radicasi_tile_gfxbase_hi_w (select GFX base upper) %02x\n", machine().describe_context().c_str(), data);
 	m_tile_gfxbase_hi_data = data;
 }
 
 READ8_MEMBER(radica_6502_state::radicasi_tile_gfxbase_lo_r)
 {
-	logerror("%s: radicasi_tile_gfxbase_lo_r (GFX base lower)\n", machine().describe_context().c_str());
+	//logerror("%s: radicasi_tile_gfxbase_lo_r (GFX base lower)\n", machine().describe_context().c_str());
 	return m_tile_gfxbase_lo_data;
 }
 
 READ8_MEMBER(radica_6502_state::radicasi_tile_gfxbase_hi_r)
 {
-	logerror("%s: radicasi_tile_gfxbase_hi_r (GFX base upper)\n", machine().describe_context().c_str());
+	//logerror("%s: radicasi_tile_gfxbase_hi_r (GFX base upper)\n", machine().describe_context().c_str());
 	return m_tile_gfxbase_hi_data;
 }
 
@@ -750,29 +972,53 @@ READ8_MEMBER(radica_6502_state::radicasi_tile_gfxbase_hi_r)
 
 WRITE8_MEMBER(radica_6502_state::radicasi_sprite_gfxbase_lo_w)
 {
-	logerror("%s: radicasi_sprite_gfxbase_lo_w (select Sprite GFX base lower) %02x\n", machine().describe_context().c_str(), data);
+	//logerror("%s: radicasi_sprite_gfxbase_lo_w (select Sprite GFX base lower) %02x\n", machine().describe_context().c_str(), data);
 	m_sprite_gfxbase_lo_data = data;
 }
 
 WRITE8_MEMBER(radica_6502_state::radicasi_sprite_gfxbase_hi_w)
 {
-	logerror("%s: radicasi_sprite_gfxbase_hi_w (select Sprite GFX base upper) %02x\n", machine().describe_context().c_str(), data);
+	//logerror("%s: radicasi_sprite_gfxbase_hi_w (select Sprite GFX base upper) %02x\n", machine().describe_context().c_str(), data);
 	m_sprite_gfxbase_hi_data = data;
 }
 
 READ8_MEMBER(radica_6502_state::radicasi_sprite_gfxbase_lo_r)
 {
-	logerror("%s: radicasi_sprite_gfxbase_lo_r (Sprite GFX base lower)\n", machine().describe_context().c_str());
+	//logerror("%s: radicasi_sprite_gfxbase_lo_r (Sprite GFX base lower)\n", machine().describe_context().c_str());
 	return m_sprite_gfxbase_lo_data;
 }
 
 READ8_MEMBER(radica_6502_state::radicasi_sprite_gfxbase_hi_r)
 {
-	logerror("%s: radicasi_sprite_gfxbase_hi_r (Sprite GFX base upper)\n", machine().describe_context().c_str());
+	//logerror("%s: radicasi_sprite_gfxbase_hi_r (Sprite GFX base upper)\n", machine().describe_context().c_str());
 	return m_sprite_gfxbase_hi_data;
 }
 
-// DMA bases
+READ8_MEMBER(radica_6502_state::radicasi_sprite_bg_scroll_r)
+{
+	return m_bg_scroll[offset];
+
+}
+
+WRITE8_MEMBER(radica_6502_state::radicasi_sprite_bg_scroll_w)
+{
+	m_bg_scroll[offset] = data;
+}
+
+
+WRITE8_MEMBER(radica_6502_state::radicasi_vidctrl_w)
+{
+	logerror("%s: radicasi_vidctrl_w %02x (video control?)\n", machine().describe_context().c_str(), data);
+	/*
+		c3  8bpp 16x16         1100 0011
+		e3  4bpp 16x16         1110 0011
+		83  8bpp 8x8           1000 0011
+		02  8bpp 8x8 (phoenix) 0000 0010
+	*/
+	m_vidctrl = data;
+}
+
+// DMA device
 
 WRITE8_MEMBER(radica_6502_state::radicasi_dmasrc_lo_w)
 {
@@ -894,250 +1140,185 @@ WRITE8_MEMBER(radica_6502_state::radicasi_dmatrg_w)
 
 
 
-
-// unknown regs that seem to also be pointers
-// seem to get set to sound data? probably 6 channels of 'DMA DAC' sound with status flags
-
-void radica_6502_state::handle_sound_0_w(int which, int offset, uint8_t data)
+void radica6502_sound_device::handle_sound_addr_w(int which, int offset, uint8_t data)
 {
 	switch (offset)
 	{
 	case 0x00:
-		m_sound_0_address[which] = (m_sound_0_address[which] & 0xffff00) | (data<<0);
-		logerror("%s: sound_0 (%d) write lo address %02x (real address is now %08x)\n", machine().describe_context().c_str(), which, data, m_sound_0_address[which]);
+		m_sound_byte_address[which] = (m_sound_byte_address[which] & 0xffff00) | (data<<0);
+		logerror("%s: sound_0 (%d) write lo address %02x (real address is now %08x)\n", machine().describe_context().c_str(), which, data, m_sound_byte_address[which]);
 		break;
 
 	case 0x01:
-		m_sound_0_address[which] = (m_sound_0_address[which] & 0xff00ff) | (data<<8);
-		logerror("%s: sound_0 (%d) write md address %02x (real address is now %08x)\n", machine().describe_context().c_str(), which, data, m_sound_0_address[which]);
+		m_sound_byte_address[which] = (m_sound_byte_address[which] & 0xff00ff) | (data<<8);
+		logerror("%s: sound_0 (%d) write md address %02x (real address is now %08x)\n", machine().describe_context().c_str(), which, data, m_sound_byte_address[which]);
 		break;
 
 	case 0x02:
-		m_sound_0_address[which] = (m_sound_0_address[which] & 0x00ffff) | (data<<16);
-		logerror("%s: sound_0 (%d) write hi address %02x (real address is now %08x)\n", machine().describe_context().c_str(), which, data, m_sound_0_address[which]);
+		m_sound_byte_address[which] = (m_sound_byte_address[which] & 0x00ffff) | (data<<16);
+		logerror("%s: sound_0 (%d) write hi address %02x (real address is now %08x)\n", machine().describe_context().c_str(), which, data, m_sound_byte_address[which]);
 		break;
 	}
 }
 
-uint8_t radica_6502_state::handle_sound_0_r(int which, int offset)
+uint8_t radica6502_sound_device::handle_sound_addr_r(int which, int offset)
 {
 	switch (offset)
 	{
 	case 0x00:
 		logerror("%s: sound_0 (%d) read lo address\n", machine().describe_context().c_str(), which);
-		return (m_sound_0_address[which]>>0) & 0xff;
+		return (m_sound_byte_address[which]>>0) & 0xff;
 
 	case 0x01:
 		logerror("%s: sound_0 (%d) read mid address\n", machine().describe_context().c_str(), which);
-		return (m_sound_0_address[which]>>8) & 0xff;
+		return (m_sound_byte_address[which]>>8) & 0xff;
 
 	case 0x02:
 		logerror("%s: sound_0 (%d) read hi address\n", machine().describe_context().c_str(), which);
-		return (m_sound_0_address[which]>>16) & 0xff;
+		return (m_sound_byte_address[which]>>16) & 0xff;
 	}
 
 	return 0x00;
 }
 
-WRITE8_MEMBER(radica_6502_state::radicasi_sound_0_0_w)
+WRITE8_MEMBER(radica6502_sound_device::radicasi_sound_addr_w)
 {
-	handle_sound_0_w(0,offset,data);
+	m_stream->update();
+	handle_sound_addr_w(offset / 3, offset % 3, data);
 }
 
-READ8_MEMBER(radica_6502_state::radicasi_sound_0_0_r)
+READ8_MEMBER(radica6502_sound_device::radicasi_sound_addr_r)
 {
-	return handle_sound_0_r(0,offset);
+	m_stream->update();
+	return handle_sound_addr_r(offset / 3, offset % 3);
 }
 
-WRITE8_MEMBER(radica_6502_state::radicasi_sound_0_1_w)
-{
-	handle_sound_0_w(1,offset,data);
-}
-
-READ8_MEMBER(radica_6502_state::radicasi_sound_0_1_r)
-{
-	return handle_sound_0_r(1,offset);
-}
-
-WRITE8_MEMBER(radica_6502_state::radicasi_sound_0_2_w)
-{
-	handle_sound_0_w(2,offset,data);
-}
-
-READ8_MEMBER(radica_6502_state::radicasi_sound_0_2_r)
-{
-	return handle_sound_0_r(2,offset);
-}
-
-WRITE8_MEMBER(radica_6502_state::radicasi_sound_0_3_w)
-{
-	handle_sound_0_w(3,offset,data);
-}
-
-READ8_MEMBER(radica_6502_state::radicasi_sound_0_3_r)
-{
-	return handle_sound_0_r(3,offset);
-}
-
-WRITE8_MEMBER(radica_6502_state::radicasi_sound_0_4_w)
-{
-	handle_sound_0_w(4,offset,data);
-}
-
-READ8_MEMBER(radica_6502_state::radicasi_sound_0_4_r)
-{
-	return handle_sound_0_r(4,offset);
-}
-
-WRITE8_MEMBER(radica_6502_state::radicasi_sound_0_5_w)
-{
-	handle_sound_0_w(5,offset,data);
-}
-
-READ8_MEMBER(radica_6502_state::radicasi_sound_0_5_r)
-{
-	return handle_sound_0_r(5,offset);
-}
-
-void radica_6502_state::handle_sound_1_w(int which, int offset, uint8_t data)
+void radica6502_sound_device::handle_sound_size_w(int which, int offset, uint8_t data)
 {
 	switch (offset)
 	{
 	case 0x00:
-		m_sound_1_size[which] = (m_sound_1_size[which] & 0xffff00) | (data<<0);
-		logerror("%s: sound_1 (%d) write lo size %02x (real size is now %08x)\n", machine().describe_context().c_str(), which, data, m_sound_1_size[which]);
+		m_sound_byte_len[which] = (m_sound_byte_len[which] & 0xffff00) | (data<<0);
+		logerror("%s: sound_1 (%d) write lo size %02x (real size is now %08x)\n", machine().describe_context().c_str(), which, data, m_sound_byte_len[which]);
 		break;
 
 	case 0x01:
-		m_sound_1_size[which] = (m_sound_1_size[which] & 0xff00ff) | (data<<8);
-		logerror("%s: sound_1 (%d) write md size %02x (real size is now %08x)\n", machine().describe_context().c_str(), which, data, m_sound_1_size[which]);
+		m_sound_byte_len[which] = (m_sound_byte_len[which] & 0xff00ff) | (data<<8);
+		logerror("%s: sound_1 (%d) write md size %02x (real size is now %08x)\n", machine().describe_context().c_str(), which, data, m_sound_byte_len[which]);
 		break;
 
 	case 0x02:
-		m_sound_1_size[which] = (m_sound_1_size[which] & 0x00ffff) | (data<<16);
-		logerror("%s: sound_1 (%d) write hi size %02x (real size is now %08x)\n", machine().describe_context().c_str(), which, data, m_sound_1_size[which]);
+		m_sound_byte_len[which] = (m_sound_byte_len[which] & 0x00ffff) | (data<<16);
+		logerror("%s: sound_1 (%d) write hi size %02x (real size is now %08x)\n", machine().describe_context().c_str(), which, data, m_sound_byte_len[which]);
 		break;
 	}
 }
 
-uint8_t radica_6502_state::handle_sound_1_r(int which, int offset)
+uint8_t radica6502_sound_device::handle_sound_size_r(int which, int offset)
 {
 	switch (offset)
 	{
 	case 0x00:
 		logerror("%s: sound_1 (%d) read lo size\n", machine().describe_context().c_str(), which);
-		return (m_sound_1_size[which]>>0) & 0xff;
+		return (m_sound_byte_len[which]>>0) & 0xff;
 
 	case 0x01:
 		logerror("%s: sound_1 (%d) read mid size\n", machine().describe_context().c_str(), which);
-		return (m_sound_1_size[which]>>8) & 0xff;
+		return (m_sound_byte_len[which]>>8) & 0xff;
 
 	case 0x02:
 		logerror("%s: sound_1 (%d) read hi size\n", machine().describe_context().c_str(), which);
-		return (m_sound_1_size[which]>>16) & 0xff;
+		return (m_sound_byte_len[which]>>16) & 0xff;
 	}
 
 	return 0x00;
 }
 
-WRITE8_MEMBER(radica_6502_state::radicasi_sound_1_0_w)
+WRITE8_MEMBER(radica6502_sound_device::radicasi_sound_size_w)
 {
-	handle_sound_1_w(0,offset,data);
+	m_stream->update();
+	handle_sound_size_w(offset / 3, offset % 3, data);
 }
 
-READ8_MEMBER(radica_6502_state::radicasi_sound_1_0_r)
+READ8_MEMBER(radica6502_sound_device::radicasi_sound_size_r)
 {
-	return handle_sound_1_r(0,offset);
+	m_stream->update();
+	return handle_sound_size_r(offset / 3, offset % 3);
 }
 
-WRITE8_MEMBER(radica_6502_state::radicasi_sound_1_1_w)
+READ8_MEMBER(radica6502_sound_device::radicasi_sound_trigger_r)
 {
-	handle_sound_1_w(1,offset,data);
-}
+	m_stream->update();
 
-READ8_MEMBER(radica_6502_state::radicasi_sound_1_1_r)
-{
-	return handle_sound_1_r(1,offset);
-}
-
-WRITE8_MEMBER(radica_6502_state::radicasi_sound_1_2_w)
-{
-	handle_sound_1_w(2,offset,data);
-}
-
-READ8_MEMBER(radica_6502_state::radicasi_sound_1_2_r)
-{
-	return handle_sound_1_r(2,offset);
-}
-
-WRITE8_MEMBER(radica_6502_state::radicasi_sound_1_3_w)
-{
-	handle_sound_1_w(3,offset,data);
-}
-
-READ8_MEMBER(radica_6502_state::radicasi_sound_1_3_r)
-{
-	return handle_sound_1_r(3,offset);
-}
-
-WRITE8_MEMBER(radica_6502_state::radicasi_sound_1_4_w)
-{
-	handle_sound_1_w(4,offset,data);
-}
-
-READ8_MEMBER(radica_6502_state::radicasi_sound_1_4_r)
-{
-	return handle_sound_1_r(4,offset);
-}
-
-WRITE8_MEMBER(radica_6502_state::radicasi_sound_1_5_w)
-{
-	handle_sound_1_w(5,offset,data);
-}
-
-READ8_MEMBER(radica_6502_state::radicasi_sound_1_5_r)
-{
-	return handle_sound_1_r(5,offset);
-}
-
-// do something with the above..
-READ8_MEMBER(radica_6502_state::radicasi_sound_trigger_r)
-{
 	logerror("%s: sound read from trigger?\n", machine().describe_context().c_str());
 	return m_sound_trigger;
 }
 
 
-WRITE8_MEMBER(radica_6502_state::radicasi_sound_trigger_w)
+WRITE8_MEMBER(radica6502_sound_device::radicasi_sound_trigger_w)
 {
+	m_stream->update();
+
 	logerror("%s: sound write to trigger? %02x\n", machine().describe_context().c_str(), data);
-	m_sound_trigger= data;
+	m_sound_trigger = data;
 
 	for (int i = 0; i < 6; i++)
 	{
-		int bit = (data >> i)&1;
+		int bit = (data >> i) & 1;
 
 		if (bit)
-			handle_trigger(i);
+			handle_sound_trigger(i);
 	}
 
 	if (data & 0xc0)
 		logerror("  UNEXPECTED BITS SET");
 }
 
-void radica_6502_state::handle_trigger(int which)
+/* this is read/written with the same individual bits for each channel as the trigger
+   maybe related to interrupts? */
+READ8_MEMBER(radica6502_sound_device::radicasi_sound_unk_r)
 {
-	logerror("Triggering operation on channel (%d) with params %08x %08x\n", which, m_sound_0_address[which], m_sound_1_size[which]);
+	logerror("%s: radicasi_sound_unk_r\n", machine().describe_context().c_str());
+	// don't think this reads back what was written probably a status of something instead?
+	return 0x00; //m_sound_unk;
+}
+
+WRITE8_MEMBER(radica6502_sound_device::radicasi_sound_unk_w)
+{
+	logerror("%s: radicasi_sound_unk_w %02x\n", machine().describe_context().c_str(), data);
+
+	for (int i = 0; i < 6; i++)
+	{
+		int bit = (data >> i) & 1;
+
+		if (bit)
+			logerror("(unknown operation on channel %d)\n", i);
+	}
+
+	m_sound_unk = data;
+
+	if (data & 0xc0)
+		logerror("  UNEXPECTED BITS SET");
+}
+
+void radica6502_sound_device::handle_sound_trigger(int which)
+{
+	logerror("Triggering operation on channel (%d) with params %08x %08x\n", which, m_sound_byte_address[which], m_sound_byte_len[which]);
+
+	m_sound_current_nib_pos[which] = 0;
+	m_isstopped &= ~(1 << which);
 }
 
 
-READ8_MEMBER(radica_6502_state::radicasi_50a8_r)
+READ8_MEMBER(radica6502_sound_device::radicasi_50a8_r)
 {
+	m_stream->update();
+
 	logerror("%s: radicasi_50a8_r\n", machine().describe_context().c_str());
-	return 0x3f;
+	return m_isstopped;
 }
 
-// this is used a bit like the triggers?
+// probably also sound device, maybe for forcing channels to stop?
 READ8_MEMBER(radica_6502_state::radicasi_50a9_r)
 {
 	logerror("%s: radicasi_50a9_r\n", machine().describe_context().c_str());
@@ -1150,28 +1331,11 @@ WRITE8_MEMBER(radica_6502_state::radicasi_50a9_w)
 	m_50a9_data = data;
 }
 
-READ8_MEMBER(radica_6502_state::radicasi_sprite_bg_scroll_r)
+// sound callback
+READ8_MEMBER(radica_6502_state::read_full_space)
 {
-	return m_bg_scroll[offset];
-
-}
-
-WRITE8_MEMBER(radica_6502_state::radicasi_sprite_bg_scroll_w)
-{
-	m_bg_scroll[offset] = data;
-}
-
-
-WRITE8_MEMBER(radica_6502_state::radicasi_5027_w)
-{
-	logerror("%s: radicasi_5027_w %02x (video control?)\n", machine().describe_context().c_str(), data);
-	/*
-		c3  8bpp 16x16         1100 0011
-		e3  4bpp 16x16         1110 0011
-		83  8bpp 8x8           1000 0011
-		02  8bpp 8x8 (phoenix) 0000 0010
-	*/
-	m_5027_data = data;
+	address_space& fullbankspace = m_bank->space(AS_PROGRAM);
+	return fullbankspace.read_byte(offset);
 }
 
 static ADDRESS_MAP_START( radicasi_map, AS_PROGRAM, 8, radica_6502_state )
@@ -1183,9 +1347,9 @@ static ADDRESS_MAP_START( radicasi_map, AS_PROGRAM, 8, radica_6502_state )
 
 	// 500x system regs?
 	AM_RANGE(0x5003, 0x5003) AM_READ(radicasi_5003_r) 
-	AM_RANGE(0x500b, 0x500b) AM_READ(radicasi_500b_r) // PAL / NTSC flag at least
-	AM_RANGE(0x500c, 0x500c) AM_WRITE(radicasi_500c_w)
-	AM_RANGE(0x500d, 0x500d) AM_READWRITE(radicasi_500d_r, radicasi_500d_w)
+	AM_RANGE(0x500b, 0x500b) AM_READ(radicasi_pal_ntsc_r) // PAL / NTSC flag at least
+	AM_RANGE(0x500c, 0x500c) AM_WRITE(radicasi_rombank_hi_w)
+	AM_RANGE(0x500d, 0x500d) AM_READWRITE(radicasi_rombank_lo_r, radicasi_rombank_lo_w)
 
 	// 501x DMA controller
 	AM_RANGE(0x500F, 0x500F) AM_READWRITE(radicasi_dmasrc_lo_r, radicasi_dmasrc_lo_w)
@@ -1202,7 +1366,7 @@ static ADDRESS_MAP_START( radicasi_map, AS_PROGRAM, 8, radica_6502_state )
 
 	// 502x - 503x video regs area?
 	AM_RANGE(0x5020, 0x5026) AM_RAM // unknown, space invaders sets these to fixed values, tetris has them as 00
-	AM_RANGE(0x5027, 0x5027) AM_WRITE(radicasi_5027_w)
+	AM_RANGE(0x5027, 0x5027) AM_WRITE(radicasi_vidctrl_w)
 
 	AM_RANGE(0x5029, 0x5029) AM_READWRITE(radicasi_tile_gfxbase_lo_r, radicasi_tile_gfxbase_lo_w) // tilebase
 	AM_RANGE(0x502a, 0x502a) AM_READWRITE(radicasi_tile_gfxbase_hi_r, radicasi_tile_gfxbase_hi_w) // tilebase
@@ -1214,38 +1378,20 @@ static ADDRESS_MAP_START( radicasi_map, AS_PROGRAM, 8, radica_6502_state )
 
 
 	// 504x GPIO area?
-	AM_RANGE(0x5040, 0x5040) AM_WRITENOP // written at same time as 5048 (port direction?)
-	AM_RANGE(0x5041, 0x5041) AM_WRITENOP AM_READ_PORT("IN0") // written with 0x80 after setting 5040 to 0x7f
-	AM_RANGE(0x5042, 0x5042) AM_WRITENOP // written at same time as 5049 (port direction?)
-	AM_RANGE(0x5043, 0x5043) AM_WRITENOP // written with 0x00 after setting 0x5042 to 0xfe
-	AM_RANGE(0x5044, 0x5044) AM_WRITENOP // written at same time as 504a (port direction?)
-	AM_RANGE(0x5046, 0x5046) AM_WRITENOP //  written with 0x00 after setting 0x5044 to 0xff
-	
-	AM_RANGE(0x5048, 0x5048) AM_WRITENOP  // 5048 see above (some kind of port config?)
-	AM_RANGE(0x5049, 0x5049) AM_WRITENOP  // 5049 see above
-	AM_RANGE(0x504a, 0x504a) AM_WRITENOP  // 504a see above
+	AM_RANGE(0x5040, 0x5046) AM_DEVREADWRITE("gpio", radica6502_gpio_device, gpio_r, gpio_w)
+	AM_RANGE(0x5048, 0x504a) AM_DEVWRITE("gpio", radica6502_gpio_device, gpio_unk_w)
 
 	// 506x unknown
 	AM_RANGE(0x5060, 0x506d) AM_RAM // read/written by tetris
 
-	// 508x - 60ax These might be sound / DMA channels?
-	AM_RANGE(0x5080, 0x5082) AM_READWRITE(radicasi_sound_0_0_r, radicasi_sound_0_0_w) // 5082 set to 0x33, so probably another 'high' address bits reg
-	AM_RANGE(0x5083, 0x5085) AM_READWRITE(radicasi_sound_0_1_r, radicasi_sound_0_1_w) // 5085 set to 0x33, so probably another 'high' address bits reg
-	AM_RANGE(0x5086, 0x5088) AM_READWRITE(radicasi_sound_0_2_r, radicasi_sound_0_2_w) // 5088 set to 0x33, so probably another 'high' address bits reg
-	AM_RANGE(0x5089, 0x508b) AM_READWRITE(radicasi_sound_0_3_r, radicasi_sound_0_3_w) // 508b set to 0x33, so probably another 'high' address bits reg
-	AM_RANGE(0x508c, 0x508e) AM_READWRITE(radicasi_sound_0_4_r, radicasi_sound_0_4_w) // 508e set to 0x33, so probably another 'high' address bits reg
-	AM_RANGE(0x508f, 0x5091) AM_READWRITE(radicasi_sound_0_5_r, radicasi_sound_0_5_w) // 5091 set to 0x33, so probably another 'high' address bits reg
-	// these are set at the same time as the above, so probably additional params  0x5092 is used with 0x5080 etc.
-	AM_RANGE(0x5092, 0x5094) AM_READWRITE(radicasi_sound_1_0_r, radicasi_sound_1_0_w)
-	AM_RANGE(0x5095, 0x5097) AM_READWRITE(radicasi_sound_1_1_r, radicasi_sound_1_1_w)
-	AM_RANGE(0x5098, 0x509a) AM_READWRITE(radicasi_sound_1_2_r, radicasi_sound_1_2_w)
-	AM_RANGE(0x509b, 0x509d) AM_READWRITE(radicasi_sound_1_3_r, radicasi_sound_1_3_w)
-	AM_RANGE(0x509e, 0x50a0) AM_READWRITE(radicasi_sound_1_4_r, radicasi_sound_1_4_w)
-	AM_RANGE(0x50a1, 0x50a3) AM_READWRITE(radicasi_sound_1_5_r, radicasi_sound_1_5_w)
+	// 508x sound
+	AM_RANGE(0x5080, 0x5091) AM_DEVREADWRITE("6ch_sound", radica6502_sound_device, radicasi_sound_addr_r, radicasi_sound_addr_w)
+	AM_RANGE(0x5092, 0x50a3) AM_DEVREADWRITE("6ch_sound", radica6502_sound_device, radicasi_sound_size_r, radicasi_sound_size_w)
+	AM_RANGE(0x50a4, 0x50a4) AM_DEVREADWRITE("6ch_sound", radica6502_sound_device, radicasi_sound_unk_r, radicasi_sound_unk_w)
+	AM_RANGE(0x50a5, 0x50a5) AM_DEVREADWRITE("6ch_sound", radica6502_sound_device, radicasi_sound_trigger_r, radicasi_sound_trigger_w)
 
-	AM_RANGE(0x50a5, 0x50a5) AM_READWRITE(radicasi_sound_trigger_r, radicasi_sound_trigger_w)
+	AM_RANGE(0x50a8, 0x50a8) AM_DEVREAD("6ch_sound", radica6502_sound_device, radicasi_50a8_r) // possible 'stopped' status of above channels, waits for it to be 0x3f in places
 
-	AM_RANGE(0x50a8, 0x50a8) AM_READ(radicasi_50a8_r) // possible 'stopped' status of above channels, waits for it to be 0x3f in places
 	AM_RANGE(0x50a9, 0x50a9) AM_READWRITE(radicasi_50a9_r, radicasi_50a9_w)
 
 	//AM_RANGE(0x5000, 0x50ff) AM_RAM
@@ -1268,7 +1414,7 @@ static ADDRESS_MAP_START( radicasi_bank_map, AS_PROGRAM, 8, radica_6502_state )
 	AM_RANGE(0x000000, 0xffffff) AM_NOP // shut up any logging when video params are invalid
 ADDRESS_MAP_END
 
-static INPUT_PORTS_START( radicasi )
+static INPUT_PORTS_START( rad_sinv )
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )
@@ -1276,8 +1422,25 @@ static INPUT_PORTS_START( radicasi )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON3 )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON4 )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON3 ) // MENU
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( rad_tetr )
+	PORT_START("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 ) // Anticlockwise
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON2 ) // Clockwise
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) // and Select
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	/* Player 2 inputs must be read via serial or similar
+	   the game doesn't read them directly, or even let
+	   you select player 2 mode by default
+	*/
 INPUT_PORTS_END
 
 /* both NMI and IRQ vectors just point to RTI
@@ -1326,6 +1489,21 @@ void radica_6502_state::machine_start()
 
 void radica_6502_state::machine_reset()
 {
+	/* the 6502 core sets the default stack value to 0x01bd
+	   and Tetris does not initialize it to anything else
+
+	   Tetris stores the playfield data at 0x100 - 0x1c7 and
+	   has a clear routine that will erase that range and
+	   trash the stack
+
+	   It seems likely this 6502 sets it to 0x1ff by default
+	   at least.
+
+	   According to
+	   http://mametesters.org/view.php?id=6486
+	   this isn't right for known 6502 types either
+	*/
+	m_maincpu->set_state_int(M6502_S, 0x1ff);
 }
 
 static const gfx_layout helper_4bpp_8_layout =
@@ -1403,7 +1581,7 @@ INTERRUPT_GEN_MEMBER(radica_6502_state::interrupt)
 	*/
 }
 
-static MACHINE_CONFIG_START( radicasi )
+MACHINE_CONFIG_START(radica_6502_state::radicasi)
 
 	/* basic machine hardware */	
 	MCFG_CPU_ADD("maincpu",M6502,XTAL_21_28137MHz/2) // Tetris has a XTAL_21_28137MHz, not confirmed on Space Invaders, actual CPU clock unknown.
@@ -1430,8 +1608,14 @@ static MACHINE_CONFIG_START( radicasi )
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", radicasi_fake)
 
+	MCFG_DEVICE_ADD("gpio", RADICA6502_GPIO, 0)
+	MCFG_RADICA6502_GPIO_READ_PORT0_CB(IOPORT("IN0"))
+
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_DEVICE_ADD("6ch_sound", RADICA6502_SOUND, 8000)
+	MCFG_RADICA6502_SOUND_SPACE_READ_CB(READ8(radica_6502_state, read_full_space))
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 
@@ -1451,5 +1635,5 @@ ROM_START( rad_sinv )
 	ROM_RELOAD(0x300000, 0x100000)
 ROM_END
 
-CONS( 2004, rad_tetr,  0,   0,  radicasi,  radicasi, radica_6502_state, 0, "Radica (licensed from Taito)", "Space Invaders (Radica, Arcade Legends TV Game)", MACHINE_NOT_WORKING )
-CONS( 2004, rad_sinv,  0,   0,  radicasi,  radicasi, radica_6502_state, 0, "Radica",                       "Tetris (Radica, Arcade Legends TV Game)", MACHINE_NOT_WORKING ) // "5 Tetris games in 1"
+CONS( 2004, rad_sinv,  0,   0,  radicasi,  rad_sinv, radica_6502_state, 0, "Radica (licensed from Taito)",                      "Space Invaders [Lunar Rescue, Colony 5, Qix, Phoenix] (Radica, Arcade Legends TV Game)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // "5 Taito games in 1"
+CONS( 2004, rad_tetr,  0,   0,  radicasi,  rad_tetr, radica_6502_state, 0, "Radica (licensed from Elorg / The Tetris Company)", "Tetris (Radica, Arcade Legends TV Game)", MACHINE_NOT_WORKING ) // "5 Tetris games in 1"

@@ -118,6 +118,7 @@ public:
 	INTERRUPT_GEN_MEMBER(vblank_nmi);
 
 	virtual void machine_start() override;
+	void shougi(machine_config &config);
 };
 
 
@@ -360,7 +361,7 @@ INTERRUPT_GEN_MEMBER(shougi_state::vblank_nmi)
 }
 
 
-static MACHINE_CONFIG_START( shougi )
+MACHINE_CONFIG_START(shougi_state::shougi)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_10MHz/4)

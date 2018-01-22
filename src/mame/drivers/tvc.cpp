@@ -108,6 +108,7 @@ public:
 	uint8_t       m_cassette_ff;
 	uint8_t       m_centronics_ff;
 	DECLARE_PALETTE_INIT(tvc);
+	void tvc(machine_config &config);
 };
 
 
@@ -760,7 +761,7 @@ extern SLOT_INTERFACE_START(tvc_exp)
 SLOT_INTERFACE_END
 
 
-static MACHINE_CONFIG_START( tvc )
+MACHINE_CONFIG_START(tvc_state::tvc)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80, 3125000)
 	MCFG_CPU_PROGRAM_MAP(tvc_mem)

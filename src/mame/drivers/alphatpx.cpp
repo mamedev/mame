@@ -115,6 +115,9 @@ public:
 	DECLARE_WRITE8_MEMBER(beep_w);
 	DECLARE_WRITE8_MEMBER(bank_w);
 
+	void alphatp2(machine_config &config);
+	void alphatp3(machine_config &config);
+	void alphatp2u(machine_config &config);
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -593,7 +596,7 @@ void alphatpx_state::machine_reset()
 //  MACHINE DEFINITIONS
 //**************************************************************************
 
-static MACHINE_CONFIG_START( alphatp3 )
+MACHINE_CONFIG_START(alphatpx_state::alphatp3)
 	MCFG_CPU_ADD("maincpu", I8085A, XTAL_6MHz)
 	MCFG_CPU_PROGRAM_MAP(alphatp3_mem)
 	MCFG_CPU_IO_MAP(alphatp3_io)
@@ -644,7 +647,7 @@ static MACHINE_CONFIG_START( alphatp3 )
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", alphatp3_floppies, "525qd", floppy_image_device::default_floppy_formats)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( alphatp2 )
+MACHINE_CONFIG_START(alphatpx_state::alphatp2)
 	MCFG_CPU_ADD("maincpu", I8085A, XTAL_6MHz)
 	MCFG_CPU_PROGRAM_MAP(alphatp3_mem)
 	MCFG_CPU_IO_MAP(alphatp3_io)
@@ -695,7 +698,7 @@ static MACHINE_CONFIG_START( alphatp2 )
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", alphatp2_floppies, "525ssdd", floppy_image_device::default_floppy_formats)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED (alphatp2u, alphatp2)
+MACHINE_CONFIG_DERIVED(alphatpx_state::alphatp2u, alphatp2)
 	MCFG_DEVICE_REMOVE("fdc:0")
 	MCFG_DEVICE_REMOVE("fdc:1")
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", alphatp2su_floppies, "525dd", floppy_image_device::default_floppy_formats)

@@ -84,6 +84,11 @@ public:
 	std::unique_ptr<uint8_t[]> m_pcbram;
 	std::unique_ptr<uint8_t[]> m_charram;
 
+	void destryera(machine_config &config);
+	void altair(machine_config &config);
+	void destryer(machine_config &config);
+	void destryer_video(machine_config &config);
+	void altair_video(machine_config &config);
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
@@ -115,12 +120,8 @@ public:
 	// sound state
 	int m_sound;
 	int m_psg_latch;
+	void draco(machine_config &config);
+	void draco_video(machine_config &config);
 };
-
-/*----------- defined in video/cidelsa.c -----------*/
-
-MACHINE_CONFIG_EXTERN( destryer_video );
-MACHINE_CONFIG_EXTERN( altair_video );
-MACHINE_CONFIG_EXTERN( draco_video );
 
 #endif // MAME_INCLUDES_CIDELSA_H

@@ -1184,7 +1184,7 @@ TIMER_DEVICE_CALLBACK_MEMBER( lc89510_temp_device::segacd_access_timer_callback 
 }
 
 
-MACHINE_CONFIG_MEMBER( lc89510_temp_device::device_add_mconfig )
+MACHINE_CONFIG_START(lc89510_temp_device::device_add_mconfig)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("hock_timer", lc89510_temp_device, segacd_access_timer_callback, attotime::from_hz(75))
 
 	MCFG_SOUND_ADD( "cdda", CDDA, 0 )

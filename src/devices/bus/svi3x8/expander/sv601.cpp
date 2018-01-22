@@ -20,7 +20,7 @@ DEFINE_DEVICE_TYPE(SV601, sv601_device, "sv601", "SV-601 Super Expander")
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( sv601_device::device_add_mconfig )
+MACHINE_CONFIG_START(sv601_device::device_add_mconfig)
 	MCFG_SVI_SLOT_BUS_ADD
 	MCFG_SVI_SLOT_INT_HANDLER(WRITELINE(sv601_device, int_w))
 	MCFG_SVI_SLOT_ROMDIS_HANDLER(WRITELINE(sv601_device, romdis_w))

@@ -24,6 +24,7 @@ public:
 //      , m_maincpu(*this, "maincpu")
 	{ }
 
+void mightyframe(machine_config &config);
 private:
 //  required_device<cpu_device> m_maincpu;
 };
@@ -35,7 +36,7 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START( mightyframe )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( mightyframe )
+MACHINE_CONFIG_START(mightyframe_state::mightyframe)
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz) // no idea of clock
 	MCFG_CPU_PROGRAM_MAP(mem_map)
 MACHINE_CONFIG_END

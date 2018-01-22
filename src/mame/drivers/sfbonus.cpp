@@ -471,6 +471,7 @@ public:
 	virtual void video_start() override;
 	void draw_reel_layer(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int category);
 	uint32_t screen_update_sfbonus(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void sfbonus(machine_config &config);
 };
 
 
@@ -1360,7 +1361,7 @@ static ADDRESS_MAP_START( ramdac_map, 0, 8, sfbonus_state )
 ADDRESS_MAP_END
 
 
-static MACHINE_CONFIG_START( sfbonus )
+MACHINE_CONFIG_START(sfbonus_state::sfbonus)
 	MCFG_CPU_ADD("maincpu", Z80, 6000000) // custom packaged z80 CPU ?? Mhz
 	MCFG_CPU_PROGRAM_MAP(sfbonus_map)
 	MCFG_CPU_IO_MAP(sfbonus_io)

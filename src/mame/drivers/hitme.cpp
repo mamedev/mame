@@ -311,7 +311,7 @@ void hitme_state::machine_reset()
 	m_timeout_time = attotime::zero;
 }
 
-static MACHINE_CONFIG_START( hitme )
+MACHINE_CONFIG_START(hitme_state::hitme)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8080, MASTER_CLOCK/16)
@@ -348,7 +348,7 @@ MACHINE_CONFIG_END
     Barricade or is the resolution set by a dip switch?
 */
 
-static MACHINE_CONFIG_DERIVED( barricad, hitme )
+MACHINE_CONFIG_DERIVED(hitme_state::barricad, hitme)
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")

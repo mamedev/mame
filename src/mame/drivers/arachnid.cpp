@@ -109,6 +109,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(ptm_o1_callback);
 
 	uint8_t read_keyboard(int pa);
+	void arachnid(machine_config &config);
 };
 
 /***************************************************************************
@@ -417,7 +418,7 @@ void arachnid_state::machine_start()
     MACHINE_CONFIG_START( arachnid )
 -------------------------------------------------*/
 
-static MACHINE_CONFIG_START( arachnid )
+MACHINE_CONFIG_START(arachnid_state::arachnid)
 	// basic machine hardware
 	MCFG_CPU_ADD(M6809_TAG, M6809, XTAL_1MHz)
 	MCFG_CPU_PROGRAM_MAP(arachnid_map)

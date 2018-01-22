@@ -138,6 +138,7 @@ public:
 	uint8_t m_cause;
 	int m_partst;               // parity test
 
+	void abc1600(machine_config &config);
 	// peripherals
 	int m_cs7;                  // card select address bit 7
 	int m_bus0;                 // BUS 0 selected

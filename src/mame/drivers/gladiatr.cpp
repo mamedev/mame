@@ -933,7 +933,7 @@ GFXDECODE_END
 
 
 
-static MACHINE_CONFIG_START( ppking )
+MACHINE_CONFIG_START(ppking_state::ppking)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_12MHz/2) /* verified on pcb */
@@ -998,7 +998,7 @@ static MACHINE_CONFIG_START( ppking )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( gladiatr )
+MACHINE_CONFIG_START(gladiatr_state::gladiatr)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_12MHz/2) /* verified on pcb */

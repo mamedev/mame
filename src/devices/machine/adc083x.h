@@ -21,7 +21,7 @@
 #define ADC083X_INPUT_CB(name)  double name(uint8_t input)
 
 #define MCFG_ADC083X_INPUT_CB(_class, _method) \
-	adc083x_device::set_input_callback(*device, adc083x_device::input_delegate(&_class::_method, #_class "::" #_method, downcast<_class *>(owner)));
+	adc083x_device::set_input_callback(*device, adc083x_device::input_delegate(&_class::_method, #_class "::" #_method, this));
 
 /***************************************************************************
     CONSTANTS

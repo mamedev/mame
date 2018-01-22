@@ -123,10 +123,12 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(v_irq3_w);
 	TTL74148_OUTPUT_CB(update_irq);
 
+	void exidy440_audio(machine_config &config);
 	void vertigo_vproc_init();
 	void vertigo_vproc_reset();
 	void am2901x4 (am2901 *bsp, microcode *mc);
 	void vertigo_vgen (vector_generator *vg);
 	void vertigo_vproc(int cycles, int irq4);
 	void update_irq_encoder(int line, int state);
+	void vertigo(machine_config &config);
 };

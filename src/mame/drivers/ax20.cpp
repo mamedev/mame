@@ -44,6 +44,7 @@ public:
 	DECLARE_READ8_MEMBER(unk_r);
 	DECLARE_WRITE8_MEMBER(tc_w);
 	DECLARE_WRITE8_MEMBER(ctl_w);
+	void ax20(machine_config &config);
 };
 
 READ8_MEMBER(ax20_state::unk_r)
@@ -121,7 +122,7 @@ static SLOT_INTERFACE_START( ax20_floppies )
 	SLOT_INTERFACE( "525dd", FLOPPY_525_DD )
 SLOT_INTERFACE_END
 
-static MACHINE_CONFIG_START( ax20 )
+MACHINE_CONFIG_START(ax20_state::ax20)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8088, XTAL_14_31818MHz/3)
 	MCFG_CPU_PROGRAM_MAP(ax20_map)

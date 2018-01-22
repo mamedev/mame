@@ -30,6 +30,7 @@ public:
 		: genpin_class(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu") { }
 
+		void barni(machine_config &config);
 private:
 	required_device<cpu_device> m_maincpu;
 };
@@ -55,7 +56,7 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START( barni )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( barni )
+MACHINE_CONFIG_START(barni_state::barni)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", MC6809E, XTAL_4MHz / 4)
 	MCFG_CPU_PROGRAM_MAP(maincpu_map)

@@ -47,6 +47,7 @@ public:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	uint32_t screen_update_nexus3d(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	void nexus3d(machine_config &config);
 };
 
 
@@ -115,7 +116,7 @@ void nexus3d_state::machine_reset()
 {
 }
 
-static MACHINE_CONFIG_START( nexus3d )
+MACHINE_CONFIG_START(nexus3d_state::nexus3d)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", ARM920T, 200000000)

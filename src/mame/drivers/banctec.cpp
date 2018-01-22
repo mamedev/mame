@@ -38,6 +38,7 @@ public:
 	DECLARE_WRITE8_MEMBER(videoram_w);
 	required_device<palette_device> m_palette;
 
+	void banctec(machine_config &config);
 private:
 	u8 m_video_address;
 	virtual void machine_reset() override;
@@ -127,7 +128,7 @@ static GFXDECODE_START( banctec )
 	GFXDECODE_ENTRY( "chargen", 0x00000, banctec_gfx_layout, 0, 1 )
 GFXDECODE_END
 
-static MACHINE_CONFIG_START( banctec )
+MACHINE_CONFIG_START(banctec_state::banctec)
 	/* basic machine hardware */
 
 	MCFG_CPU_ADD("maincpu", I80C31, XTAL_11_0592MHz)

@@ -94,6 +94,7 @@ public:
 	required_shared_ptr<uint8_t> m_video_ram;
 	required_device<address_map_bank_device> m_video_bankdev;
 	required_device<palette_device> m_palette;
+	void a7150(machine_config &config);
 };
 
 
@@ -423,7 +424,7 @@ static const z80_daisy_config k7070_daisy_chain[] =
  *
  * (framebuffer and terminal should be slot devices.)
  */
-static MACHINE_CONFIG_START( a7150 )
+MACHINE_CONFIG_START(a7150_state::a7150)
 	MCFG_CPU_ADD("maincpu", I8086, XTAL_9_832MHz/2)
 	MCFG_CPU_PROGRAM_MAP(a7150_mem)
 	MCFG_CPU_IO_MAP(a7150_io)

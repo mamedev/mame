@@ -143,6 +143,7 @@ public:
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_stuntair(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_PALETTE_INIT(stuntair);
+	void stuntair(machine_config &config);
 };
 
 
@@ -506,7 +507,7 @@ void stuntair_state::machine_reset()
 {
 }
 
-static MACHINE_CONFIG_START( stuntair )
+MACHINE_CONFIG_START(stuntair_state::stuntair)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80,  XTAL_18_432MHz/6)         /* 3 MHz? */

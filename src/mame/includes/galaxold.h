@@ -267,6 +267,33 @@ public:
 	void bagmanmc_modify_charcode(uint16_t *code, uint8_t x);
 	void bagmanmc_modify_spritecode(uint8_t *spriteram, int *code, int *flipx, int *flipy, int offs);
 	void machine_reset_common(int line);
+	void galaxian(machine_config &config);
+	void galaxold_base(machine_config &config);
+	void ckongg(machine_config &config);
+	void _4in1(machine_config &config);
+	void bongo(machine_config &config);
+	void racknrol(machine_config &config);
+	void hunchbkg(machine_config &config);
+	void videotron(machine_config &config);
+	void hexpoola(machine_config &config);
+	void dkongjrm(machine_config &config);
+	void tazzmang(machine_config &config);
+	void scrambler(machine_config &config);
+	void spcwarp(machine_config &config);
+	void dkongjrmc(machine_config &config);
+	void bagmanmc(machine_config &config);
+	void bullsdrtg(machine_config &config);
+	void drivfrcg(machine_config &config);
+	void rockclim(machine_config &config);
+	void scramblb(machine_config &config);
+	void porter(machine_config &config);
+	void scramb2(machine_config &config);
+	void ozon1(machine_config &config);
+	void mooncrst(machine_config &config);
+	void guttang(machine_config &config);
+	void ckongmc(machine_config &config);
+	void galaxian_audio(machine_config &config);
+	void mooncrst_audio(machine_config &config);
 };
 
 #define galaxold_coin_counter_0_w galaxold_coin_counter_w

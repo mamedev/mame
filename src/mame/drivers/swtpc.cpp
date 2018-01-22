@@ -58,6 +58,8 @@ public:
 
 	virtual void machine_start() override;
 
+	void swtpcm(machine_config &config);
+	void swtpc(machine_config &config);
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<ram_device> m_ram;
@@ -91,7 +93,7 @@ void swtpc_state::machine_start()
 	m_maincpu->space(AS_PROGRAM).install_ram(0, m_ram->size() - 1, m_ram->pointer());
 }
 
-static MACHINE_CONFIG_START( swtpc )
+MACHINE_CONFIG_START(swtpc_state::swtpc)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6800, XTAL_1_8432MHz / 2)
 	MCFG_CPU_PROGRAM_MAP(mem_map)
@@ -173,7 +175,7 @@ static MACHINE_CONFIG_START( swtpc )
 	MCFG_RAM_EXTRA_OPTIONS("4K,8K,12K,16K,20K,24K,28K,32K")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( swtpcm, swtpc )
+MACHINE_CONFIG_DERIVED(swtpc_state::swtpcm, swtpc)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_CLOCK(XTAL_1_7971MHz / 2)
 

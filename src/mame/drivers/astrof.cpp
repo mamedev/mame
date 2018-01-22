@@ -910,7 +910,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( base )
+MACHINE_CONFIG_START(astrof_state::base)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, MAIN_CPU_CLOCK)
@@ -923,7 +923,7 @@ static MACHINE_CONFIG_START( base )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( astrof, base )
+MACHINE_CONFIG_DERIVED(astrof_state::astrof, base)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -940,7 +940,7 @@ static MACHINE_CONFIG_DERIVED( astrof, base )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( abattle, astrof )
+MACHINE_CONFIG_DERIVED(astrof_state::abattle, astrof)
 
 	/* basic machine hardware */
 
@@ -949,7 +949,7 @@ static MACHINE_CONFIG_DERIVED( abattle, astrof )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( spfghmk2, base )
+MACHINE_CONFIG_DERIVED(astrof_state::spfghmk2, base)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -966,7 +966,7 @@ static MACHINE_CONFIG_DERIVED( spfghmk2, base )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( tomahawk, base )
+MACHINE_CONFIG_DERIVED(astrof_state::tomahawk, base)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")

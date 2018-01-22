@@ -171,7 +171,7 @@ DRIVER_INIT_MEMBER( s11a_state, s11a )
 	s11_state::init_s11();
 }
 
-static MACHINE_CONFIG_START( s11a )
+MACHINE_CONFIG_START(s11a_state::s11a)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6808, XTAL_4MHz)
 	MCFG_CPU_PROGRAM_MAP(s11a_main_map)

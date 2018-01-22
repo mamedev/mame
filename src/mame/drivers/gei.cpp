@@ -118,6 +118,16 @@ public:
 
 	INTERRUPT_GEN_MEMBER(vblank_irq);
 
+	void findout(machine_config &config);
+	void suprpokr(machine_config &config);
+	void gselect(machine_config &config);
+	void amuse1(machine_config &config);
+	void gepoker(machine_config &config);
+	void jokpokera(machine_config &config);
+	void quizvid(machine_config &config);
+	void getrivia(machine_config &config);
+	void amuse(machine_config &config);
+	void sprtauth(machine_config &config);
 protected:
 	virtual void video_start() override;
 
@@ -942,7 +952,7 @@ INTERRUPT_GEN_MEMBER(gei_state::vblank_irq)
 }
 
 
-static MACHINE_CONFIG_START( getrivia )
+MACHINE_CONFIG_START(gei_state::getrivia)
 	MCFG_CPU_ADD("maincpu",Z80,4000000) /* 4 MHz */
 	MCFG_CPU_PROGRAM_MAP(getrivia_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", gei_state, vblank_irq)
@@ -979,7 +989,7 @@ static MACHINE_CONFIG_START( getrivia )
 	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( findout, getrivia )
+MACHINE_CONFIG_DERIVED(gei_state::findout, getrivia)
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(findout_map)
@@ -991,7 +1001,7 @@ static MACHINE_CONFIG_DERIVED( findout, getrivia )
 	MCFG_I8255_IN_PORTC_CB(READ8(gei_state, portC_r))
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( quizvid, findout )
+MACHINE_CONFIG_DERIVED(gei_state::quizvid, findout)
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(quizvid_map)
@@ -1000,7 +1010,7 @@ static MACHINE_CONFIG_DERIVED( quizvid, findout )
 	MCFG_PALETTE_ADD_3BIT_GRB("palette")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( gselect, getrivia )
+MACHINE_CONFIG_DERIVED(gei_state::gselect, getrivia)
 
 	/* basic machine hardware */
 
@@ -1024,7 +1034,7 @@ static MACHINE_CONFIG_DERIVED( gselect, getrivia )
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(gei_state, nmi_w))
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( jokpokera, getrivia )
+MACHINE_CONFIG_DERIVED(gei_state::jokpokera, getrivia)
 
 	/* basic machine hardware */
 
@@ -1034,7 +1044,7 @@ static MACHINE_CONFIG_DERIVED( jokpokera, getrivia )
 	MCFG_CPU_PROGRAM_MAP(gselect_map)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( amuse, getrivia )
+MACHINE_CONFIG_DERIVED(gei_state::amuse, getrivia)
 
 	/* basic machine hardware */
 
@@ -1042,7 +1052,7 @@ static MACHINE_CONFIG_DERIVED( amuse, getrivia )
 	MCFG_CPU_PROGRAM_MAP(amuse_map)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( gepoker, getrivia )
+MACHINE_CONFIG_DERIVED(gei_state::gepoker, getrivia)
 
 	/* basic machine hardware */
 
@@ -1050,19 +1060,19 @@ static MACHINE_CONFIG_DERIVED( gepoker, getrivia )
 	MCFG_CPU_PROGRAM_MAP(gepoker_map)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( amuse1, getrivia )
+MACHINE_CONFIG_DERIVED(gei_state::amuse1, getrivia)
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(amuse1_map)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( suprpokr, getrivia )
+MACHINE_CONFIG_DERIVED(gei_state::suprpokr, getrivia)
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(suprpokr_map)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( sprtauth, getrivia )
+MACHINE_CONFIG_DERIVED(gei_state::sprtauth, getrivia)
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(sprtauth_map)

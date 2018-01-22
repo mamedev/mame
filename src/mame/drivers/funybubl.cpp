@@ -216,7 +216,7 @@ void funybubl_state::machine_start()
 }
 
 
-static MACHINE_CONFIG_START( funybubl )
+MACHINE_CONFIG_START(funybubl_state::funybubl)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80,12000000/2)      /* 6 MHz?? */

@@ -541,6 +541,9 @@ public:
 	DECLARE_WRITE16_MEMBER(vip2000_outputs_w);
 	u8 m_toslave;
 	u8 m_fromslave;
+	void bingor(machine_config &config);
+	void bingor2(machine_config &config);
+	void vip2000(machine_config &config);
 };
 
 
@@ -593,7 +596,7 @@ uint32_t bingor_state::screen_update_bingor(screen_device &screen, bitmap_rgb32 
 static ADDRESS_MAP_START( bingor_map, AS_PROGRAM, 16, bingor_state )
 	AM_RANGE(0x00000, 0x0ffff) AM_RAM
 	AM_RANGE(0x90000, 0x9ffff) AM_ROM AM_REGION("gfx", 0)
-	AM_RANGE(0xa0300, 0xa031f) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette") //wrong
+	AM_RANGE(0xa0300, 0xa031f) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette") //wrong
 	AM_RANGE(0xa0000, 0xaffff) AM_RAM AM_SHARE("blit_ram")
 	AM_RANGE(0xf0000, 0xfffff) AM_ROM AM_REGION("boot_prg", 0)
 ADDRESS_MAP_END
@@ -677,7 +680,7 @@ static GFXDECODE_START( bingor )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( bingor )
+MACHINE_CONFIG_START(bingor_state::bingor)
 	MCFG_CPU_ADD("maincpu", I80186, XTAL_16MHz)
 	MCFG_CPU_PROGRAM_MAP(bingor_map)
 	MCFG_CPU_IO_MAP(bingor_io)
@@ -704,7 +707,7 @@ static MACHINE_CONFIG_START( bingor )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( bingor2, bingor )
+MACHINE_CONFIG_DERIVED(bingor_state::bingor2, bingor)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(bingor2_map)
 MACHINE_CONFIG_END
@@ -712,7 +715,7 @@ MACHINE_CONFIG_END
 
 static ADDRESS_MAP_START( vip2000_map, AS_PROGRAM, 16, bingor_state )
 	AM_RANGE(0x00000, 0x0ffff) AM_RAM
-	AM_RANGE(0x40300, 0x4031f) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette") //wrong
+	AM_RANGE(0x40300, 0x4031f) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette") //wrong
 	AM_RANGE(0x40000, 0x4ffff) AM_RAM AM_SHARE("blit_ram")
 	//AM_RANGE(0x50000, 0x5ffff) AM_ROM AM_REGION("gfx", 0)
 	AM_RANGE(0x60000, 0x60003) AM_DEVWRITE8("ymz", ymz284_device, address_data_w, 0x00ff)
@@ -761,7 +764,7 @@ static ADDRESS_MAP_START( slave_io, AS_IO, 8, bingor_state)
 	AM_RANGE(0xc000, 0xcfff) AM_RAM
 ADDRESS_MAP_END
 
-static MACHINE_CONFIG_START( vip2000 )
+MACHINE_CONFIG_START(bingor_state::vip2000)
 	MCFG_CPU_ADD("maincpu", I80186, XTAL_10MHz)
 	MCFG_CPU_PROGRAM_MAP(vip2000_map)
 	MCFG_CPU_IO_MAP(vip2000_io)

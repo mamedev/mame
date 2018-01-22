@@ -256,7 +256,7 @@ INTERRUPT_GEN_MEMBER(mikie_state::vblank_irq)
 		device.execute().set_input_line(M6809_IRQ_LINE, ASSERT_LINE);
 }
 
-static MACHINE_CONFIG_START( mikie )
+MACHINE_CONFIG_START(mikie_state::mikie)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", MC6809E, OSC/12) // 9A (surface scratched)

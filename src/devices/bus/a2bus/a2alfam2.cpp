@@ -39,7 +39,7 @@ DEFINE_DEVICE_TYPE(A2BUS_AESMS,  a2bus_aesms_device,  "a2aesms",  "Applied Engin
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( a2bus_sn76489_device::device_add_mconfig )
+MACHINE_CONFIG_START(a2bus_sn76489_device::device_add_mconfig)
 	MCFG_SPEAKER_STANDARD_STEREO("alf_l", "alf_r")
 
 	MCFG_SOUND_ADD(SN1_TAG, SN76489, 1020484)
@@ -51,7 +51,7 @@ MACHINE_CONFIG_MEMBER( a2bus_sn76489_device::device_add_mconfig )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "alf_r", 0.50)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_MEMBER( a2bus_aesms_device::device_add_mconfig )
+MACHINE_CONFIG_START(a2bus_aesms_device::device_add_mconfig)
 	MCFG_SPEAKER_STANDARD_STEREO("alf_l", "alf_r")
 
 	MCFG_SOUND_ADD(SN1_TAG, SN76489, 1020484)

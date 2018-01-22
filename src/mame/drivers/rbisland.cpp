@@ -349,7 +349,7 @@ WRITE16_MEMBER(rbisland_state::jumping_sound_w)
 static ADDRESS_MAP_START( rbisland_map, AS_PROGRAM, 16, rbisland_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x10c000, 0x10ffff) AM_RAM             /* main RAM */
-	AM_RANGE(0x200000, 0x200fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x200000, 0x200fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x201000, 0x203fff) AM_RAM             /* r/w in initial checks */
 	AM_RANGE(0x390000, 0x390003) AM_READ_PORT("DSWA")
 	AM_RANGE(0x3a0000, 0x3a0001) AM_WRITE(rbisland_spritectrl_w)
@@ -370,7 +370,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( jumping_map, AS_PROGRAM, 16, rbisland_state )
 	AM_RANGE(0x000000, 0x09ffff) AM_ROM
 	AM_RANGE(0x10c000, 0x10ffff) AM_RAM             /* main RAM */
-	AM_RANGE(0x200000, 0x200fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x200000, 0x200fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x201000, 0x203fff) AM_RAM             /* r/w in initial checks */
 	AM_RANGE(0x400000, 0x400001) AM_READ_PORT("DSWA")
 	AM_RANGE(0x400002, 0x400003) AM_READ_PORT("DSWB")
@@ -627,7 +627,7 @@ void rbisland_state::machine_start()
 {
 }
 
-static MACHINE_CONFIG_START( rbisland )
+MACHINE_CONFIG_START(rbisland_state::rbisland)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz/2) /* verified on pcb */
@@ -679,7 +679,7 @@ MACHINE_CONFIG_END
 
 
 /* Jumping: The PCB has 2 Xtals, 18.432MHz and 24MHz */
-static MACHINE_CONFIG_START( jumping )
+MACHINE_CONFIG_START(rbisland_state::jumping)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_18_432MHz/2)  /* verified on pcb */
@@ -723,7 +723,7 @@ static MACHINE_CONFIG_START( jumping )
 MACHINE_CONFIG_END
 
 /* Imnoe PCB uses 16MHz CPU crystal instead of 18.432 for CPU */
-static MACHINE_CONFIG_DERIVED( jumpingi, jumping )
+MACHINE_CONFIG_DERIVED(rbisland_state::jumpingi, jumping)
 	MCFG_CPU_REPLACE("maincpu", M68000, XTAL_16MHz/2)  /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(jumping_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", rbisland_state,  irq4_line_hold)

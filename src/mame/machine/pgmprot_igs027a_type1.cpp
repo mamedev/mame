@@ -211,7 +211,7 @@ MACHINE_START_MEMBER(pgm_arm_type1_state,pgm_arm_type1)
 	save_item(NAME(m_slots));
 }
 
-MACHINE_CONFIG_START( pgm_arm_type1_cave )
+MACHINE_CONFIG_START(pgm_arm_type1_state::pgm_arm_type1_cave)
 	MCFG_FRAGMENT_ADD(pgmbase)
 
 	MCFG_CPU_MODIFY("maincpu")
@@ -223,7 +223,7 @@ MACHINE_CONFIG_START( pgm_arm_type1_cave )
 	MCFG_SCREEN_REFRESH_RATE(59.17) // verified on pcb
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED( pgm_arm_type1_sim, pgm_arm_type1_cave )
+MACHINE_CONFIG_DERIVED(pgm_arm_type1_state::pgm_arm_type1_sim, pgm_arm_type1_cave)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(kov_sim_map)
 
@@ -233,7 +233,7 @@ MACHINE_CONFIG_DERIVED( pgm_arm_type1_sim, pgm_arm_type1_cave )
 	MCFG_DEVICE_DISABLE()
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED( pgm_arm_type1, pgm_arm_type1_cave )
+MACHINE_CONFIG_DERIVED(pgm_arm_type1_state::pgm_arm_type1, pgm_arm_type1_cave)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(kov_map)
 

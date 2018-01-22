@@ -130,8 +130,10 @@ GFXDECODE_START( zorba )
 	GFXDECODE_ENTRY( "chargen", 0x0000, u5_charlayout, 0, 1 )
 GFXDECODE_END
 
+} // anonymous namespace
 
-MACHINE_CONFIG_START( zorba )
+
+MACHINE_CONFIG_START(zorba_state::zorba)
 	// basic machine hardware
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_24MHz / 6)
 	MCFG_CPU_PROGRAM_MAP(zorba_mem)
@@ -261,8 +263,6 @@ MACHINE_CONFIG_START( zorba )
 
 	MCFG_SOFTWARE_LIST_ADD("flop_list", "zorba")
 MACHINE_CONFIG_END
-
-} // anonymous namespace
 
 
 //-------------------------------------------------

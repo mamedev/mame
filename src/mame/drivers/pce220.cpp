@@ -103,6 +103,7 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(kb_irq);
 	DECLARE_INPUT_CHANGED_MEMBER(on_irq);
 	TIMER_DEVICE_CALLBACK_MEMBER(pce220_timer_callback);
+	void pce220(machine_config &config);
 };
 
 class pcg850v_state : public pce220_state
@@ -126,6 +127,8 @@ public:
 	DECLARE_WRITE8_MEMBER( g850v_lcd_control_w );
 	DECLARE_READ8_MEMBER( g850v_lcd_data_r );
 	DECLARE_WRITE8_MEMBER( g850v_lcd_data_w );
+	void pcg850v(machine_config &config);
+	void pcg815(machine_config &config);
 };
 
 uint32_t pce220_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -926,7 +929,7 @@ PALETTE_INIT_MEMBER(pce220_state,pce220)
 }
 
 
-static MACHINE_CONFIG_START( pce220 )
+MACHINE_CONFIG_START(pce220_state::pce220)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80, 3072000 ) // CMOS-SC7852
 	MCFG_CPU_PROGRAM_MAP(pce220_mem)
@@ -962,7 +965,7 @@ static MACHINE_CONFIG_START( pce220 )
 	MCFG_PCE220_SERIAL_ADD(PCE220SERIAL_TAG)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( pcg815 )
+MACHINE_CONFIG_START(pcg850v_state::pcg815)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80, XTAL_4MHz ) // 3.54MHz
 	MCFG_CPU_PROGRAM_MAP(pce220_mem)
@@ -998,7 +1001,7 @@ static MACHINE_CONFIG_START( pcg815 )
 	MCFG_PCE220_SERIAL_ADD(PCE220SERIAL_TAG)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( pcg850v )
+MACHINE_CONFIG_START(pcg850v_state::pcg850v)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80, XTAL_8MHz ) // CMOS-SC7852
 	MCFG_CPU_PROGRAM_MAP(pce220_mem)

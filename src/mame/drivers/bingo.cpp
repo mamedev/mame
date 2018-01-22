@@ -14,6 +14,7 @@ public:
 			m_maincpu(*this, "maincpu")
 	{ }
 
+	void bingo(machine_config &config);
 protected:
 
 	// devices
@@ -43,7 +44,7 @@ DRIVER_INIT_MEMBER(bingo_state,bingo)
 {
 }
 
-static MACHINE_CONFIG_START( bingo )
+MACHINE_CONFIG_START(bingo_state::bingo)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", S2650, 1000000)
 	MCFG_CPU_PROGRAM_MAP(bingo_map)
@@ -57,6 +58,7 @@ public:
 			m_maincpu(*this, "maincpu")
 	{ }
 
+	void seeben(machine_config &config);
 protected:
 
 	// devices
@@ -83,7 +85,7 @@ DRIVER_INIT_MEMBER(seeben_state,seeben)
 {
 }
 
-static MACHINE_CONFIG_START( seeben )
+MACHINE_CONFIG_START(seeben_state::seeben)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8085A, 1000000)
 	MCFG_CPU_PROGRAM_MAP(seeben_map)
@@ -97,6 +99,7 @@ public:
 			m_maincpu(*this, "maincpu")
 	{ }
 
+	void splin(machine_config &config);
 protected:
 
 	// devices
@@ -125,7 +128,7 @@ DRIVER_INIT_MEMBER(splin_state,splin)
 {
 }
 
-static MACHINE_CONFIG_START( splin )
+MACHINE_CONFIG_START(splin_state::splin)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I80186, 16000000)
 	MCFG_CPU_PROGRAM_MAP(splin_map)

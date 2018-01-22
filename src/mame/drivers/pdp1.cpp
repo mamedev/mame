@@ -1917,7 +1917,7 @@ INTERRUPT_GEN_MEMBER(pdp1_state::pdp1_interrupt)
 }
 
 
-static MACHINE_CONFIG_START( pdp1 )
+MACHINE_CONFIG_START(pdp1_state::pdp1)
 
 	/* basic machine hardware */
 	/* PDP1 CPU @ 200 kHz (no master clock, but the instruction and memory rate is 200 kHz) */

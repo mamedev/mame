@@ -233,7 +233,7 @@ GFXDECODE_END
 
 /***************************************************************************/
 
-static MACHINE_CONFIG_START( galastrm )
+MACHINE_CONFIG_START(galastrm_state::galastrm)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68EC020, 16000000) /* 16 MHz */
 	MCFG_CPU_PROGRAM_MAP(galastrm_map)

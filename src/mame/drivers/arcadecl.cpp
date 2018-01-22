@@ -149,7 +149,7 @@ WRITE16_MEMBER(arcadecl_state::latch_w)
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, arcadecl_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x200000, 0x21ffff) AM_RAM AM_SHARE("bitmap")
-	AM_RANGE(0x3c0000, 0x3c07ff) AM_DEVREADWRITE8("palette", palette_device, read, write, 0xff00) AM_SHARE("palette")
+	AM_RANGE(0x3c0000, 0x3c07ff) AM_DEVREADWRITE8("palette", palette_device, read8, write8, 0xff00) AM_SHARE("palette")
 	AM_RANGE(0x3e0000, 0x3e07ff) AM_RAM AM_SHARE("mob")
 	AM_RANGE(0x3e0800, 0x3effbf) AM_RAM
 	AM_RANGE(0x3effc0, 0x3effff) AM_RAM AM_SHARE("mob:slip")
@@ -162,7 +162,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, arcadecl_state )
 	AM_RANGE(0x640024, 0x640025) AM_READ_PORT("TRACKX1")
 	AM_RANGE(0x640026, 0x640027) AM_READ_PORT("TRACKY1")
 	AM_RANGE(0x640040, 0x64004f) AM_WRITE(latch_w)
-	AM_RANGE(0x640060, 0x64006f) AM_DEVWRITE("eeprom", eeprom_parallel_28xx_device, unlock_write)
+	AM_RANGE(0x640060, 0x64006f) AM_DEVWRITE("eeprom", eeprom_parallel_28xx_device, unlock_write16)
 	AM_RANGE(0x641000, 0x641fff) AM_DEVREADWRITE8("eeprom", eeprom_parallel_28xx_device, read, write, 0x00ff)
 	AM_RANGE(0x642000, 0x642001) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0xff00)
 	AM_RANGE(0x646000, 0x646fff) AM_WRITE(scanline_int_ack_w)
@@ -318,7 +318,7 @@ GFXDECODE_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( arcadecl )
+MACHINE_CONFIG_START(arcadecl_state::arcadecl)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, MASTER_CLOCK)
@@ -358,7 +358,7 @@ static MACHINE_CONFIG_START( arcadecl )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( sparkz, arcadecl )
+MACHINE_CONFIG_DERIVED(arcadecl_state::sparkz, arcadecl)
 	MCFG_DEVICE_REMOVE("mob")
 MACHINE_CONFIG_END
 

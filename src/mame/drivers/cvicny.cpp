@@ -51,6 +51,7 @@ public:
 	DECLARE_WRITE8_MEMBER(segment_w );
 	uint8_t m_digit;
 	uint8_t m_digit_last;
+	void cvicny(machine_config &config);
 };
 
 WRITE8_MEMBER( cvicny_state::segment_w ) // output segments on the selected digit
@@ -128,7 +129,7 @@ static INPUT_PORTS_START( cvicny )
 INPUT_PORTS_END
 
 
-static MACHINE_CONFIG_START( cvicny )
+MACHINE_CONFIG_START(cvicny_state::cvicny)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80, XTAL_2MHz)
 	MCFG_CPU_PROGRAM_MAP(cvicny_mem)

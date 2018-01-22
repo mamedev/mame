@@ -173,6 +173,10 @@ public:
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(vii_cart);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(vsmile_cart);
 
+	void vii(machine_config &config);
+	void vsmile(machine_config &config);
+	void wirels60(machine_config &config);
+	void batman(machine_config &config);
 protected:
 	optional_memory_region m_bios_rom;
 	required_ioport m_io_p1;
@@ -1179,7 +1183,7 @@ INTERRUPT_GEN_MEMBER(vii_state::vii_vblank)
 
 }
 
-static MACHINE_CONFIG_START( vii )
+MACHINE_CONFIG_START(vii_state::vii)
 
 	MCFG_CPU_ADD( "maincpu", UNSP, XTAL_27MHz)
 	MCFG_CPU_PROGRAM_MAP( vii_mem )
@@ -1200,7 +1204,7 @@ static MACHINE_CONFIG_START( vii )
 	MCFG_SOFTWARE_LIST_ADD("vii_cart","vii")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( vsmile )
+MACHINE_CONFIG_START(vii_state::vsmile)
 
 	MCFG_CPU_ADD( "maincpu", UNSP, XTAL_27MHz)
 	MCFG_CPU_PROGRAM_MAP( vii_mem )
@@ -1221,7 +1225,7 @@ static MACHINE_CONFIG_START( vsmile )
 	MCFG_SOFTWARE_LIST_ADD("cart_list","vsmile_cart")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( batman )
+MACHINE_CONFIG_START(vii_state::batman)
 
 	MCFG_CPU_ADD( "maincpu", UNSP, XTAL_27MHz)
 	MCFG_CPU_PROGRAM_MAP( vii_mem )
@@ -1239,7 +1243,7 @@ static MACHINE_CONFIG_START( batman )
 	MCFG_PALETTE_ADD("palette", 32768)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( wirels60 )
+MACHINE_CONFIG_START(vii_state::wirels60)
 
 	MCFG_CPU_ADD( "maincpu", UNSP, XTAL_27MHz)
 	MCFG_CPU_PROGRAM_MAP( vii_mem )

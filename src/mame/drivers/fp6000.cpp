@@ -62,6 +62,7 @@ public:
 	required_device<mc6845_device>m_crtc;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	void fp6000(machine_config &config);
 };
 
 void fp6000_state::video_start()
@@ -289,7 +290,7 @@ void fp6000_state::machine_reset()
 {
 }
 
-static MACHINE_CONFIG_START( fp6000 )
+MACHINE_CONFIG_START(fp6000_state::fp6000)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8086, 16000000/2)
 	MCFG_CPU_PROGRAM_MAP(fp6000_map)

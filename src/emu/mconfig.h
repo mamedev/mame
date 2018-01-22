@@ -89,27 +89,6 @@ private:
 //*************************************************************************/
 
 /**
- @def MACHINE_CONFIG_NAME(_name)
- Returns the internal name for the machine config.
- @param _name name of desired config
- @hideinitializer
- */
-#define MACHINE_CONFIG_NAME(_name) construct_machine_config_##_name
-
-/**
- @def MACHINE_CONFIG_START(_name)
- Begins a new machine/device config.
- @param _name name of this config
- @hideinitializer
- */
-#define MACHINE_CONFIG_START(_name) \
-ATTR_COLD void MACHINE_CONFIG_NAME(_name)(machine_config &config, device_t *owner, device_t *device) \
-{ \
-	devcb_base *devcb = nullptr; \
-	(void)devcb; \
-	assert(owner != nullptr);
-
-/**
  @def MACHINE_CONFIG_DERIVED(_name, _base)
  Begins a machine_config that is derived from another machine_config.
  @param _name name of this config
@@ -117,29 +96,27 @@ ATTR_COLD void MACHINE_CONFIG_NAME(_name)(machine_config &config, device_t *owne
  @hideinitializer
 */
 #define MACHINE_CONFIG_DERIVED(_name, _base) \
-ATTR_COLD void MACHINE_CONFIG_NAME(_name)(machine_config &config, device_t *owner, device_t *device) \
-{ \
-	devcb_base *devcb = nullptr; \
-	(void)devcb; \
-	assert(owner != nullptr); \
-	MACHINE_CONFIG_NAME(_base)(config, owner, device);
-
-/**
- @def MACHINE_CONFIG_MEMBER(_name)
- Begins a device machine configuration member (usually overriding device_t::device_add_mconfig).
- @param _name name of this config
- @param _base name of the parent config
- @hideinitializer
-*/
-#define MACHINE_CONFIG_MEMBER(_name) \
 ATTR_COLD void _name(machine_config &config) \
 { \
-	device_t *const owner = this; \
 	device_t *device = nullptr; \
 	devcb_base *devcb = nullptr; \
-	(void)owner; \
 	(void)device; \
 	(void)devcb; \
+	_base(config);
+
+/**
+ @def MACHINE_CONFIG_START(_name)
+ Begins a device machine configuration member
+ @param _name name of this config
+ @hideinitializer
+*/
+#define MACHINE_CONFIG_START(_name) \
+ATTR_COLD void _name(machine_config &config) \
+{ \
+	device_t *device = nullptr; \
+	devcb_base *devcb = nullptr; \
+	(void)device; \
+	(void)devcb;
 
 /**
 @def MACHINE_CONFIG_END
@@ -150,32 +127,19 @@ Ends a machine_config.
 }
 
 //*************************************************************************/
-/** @name Standalone machine config macros */
-//*************************************************************************/
-
-/**
-@def MACHINE_CONFIG_EXTERN(_name)
-References an external machine config.
-@param _name Name of the machine config to reference
-@hideinitializer
-*/
-#define MACHINE_CONFIG_EXTERN(_name) \
-	extern void MACHINE_CONFIG_NAME(_name)(machine_config &config, device_t *owner, device_t *device)
-
-//*************************************************************************/
 /** @name Core machine config options */
 //*************************************************************************/
 
 // importing data from other machine drivers
 #define MCFG_FRAGMENT_ADD(_name) \
-	MACHINE_CONFIG_NAME(_name)(config, owner, device);
+	_name(config);
 
 
 // scheduling parameters
 #define MCFG_QUANTUM_TIME(_time) \
 	config.m_minimum_quantum = _time;
 #define MCFG_QUANTUM_PERFECT_CPU(_cputag) \
-	config.m_perfect_cpu_quantum = owner->subtag(_cputag);
+	config.m_perfect_cpu_quantum = subtag(_cputag);
 
 // core video parameters
 #define MCFG_DEFAULT_LAYOUT(_layout) \
@@ -183,13 +147,13 @@ References an external machine config.
 
 // add/remove devices
 #define MCFG_DEVICE_ADD(_tag, _type, _clock) \
-	device = config.device_add(owner, _tag, _type, _clock);
+	device = config.device_add(this, _tag, _type, _clock);
 #define MCFG_DEVICE_REPLACE(_tag, _type, _clock) \
-	device = config.device_replace(owner, _tag, _type, _clock);
+	device = config.device_replace(this, _tag, _type, _clock);
 #define MCFG_DEVICE_REMOVE(_tag) \
-	device = config.device_remove(owner, _tag);
+	device = config.device_remove(this, _tag);
 #define MCFG_DEVICE_MODIFY(_tag)    \
-	device = config.device_find(owner, _tag);
+	device = config.device_find(this, _tag);
 
 #endif  /* MAME_EMU_MCONFIG_H */
 /** @} */

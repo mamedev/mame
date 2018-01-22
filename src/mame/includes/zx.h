@@ -64,6 +64,13 @@ public:
 	void zx_tape_input();
 	void zx_ula_hsync();
 
+	void zx81(machine_config &config);
+	void zx81_spk(machine_config &config);
+	void ts1000(machine_config &config);
+	void pc8300(machine_config &config);
+	void pow3000(machine_config &config);
+	void ts1500(machine_config &config);
+	void zx80(machine_config &config);
 protected:
 	enum
 	{

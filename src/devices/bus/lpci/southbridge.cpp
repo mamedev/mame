@@ -25,7 +25,7 @@
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( southbridge_device::device_add_mconfig )
+MACHINE_CONFIG_START(southbridge_device::device_add_mconfig)
 	MCFG_DEVICE_ADD("pit8254", PIT8254, 0)
 	MCFG_PIT8253_CLK0(4772720/4) // heartbeat IRQ
 	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(southbridge_device, at_pit8254_out0_changed))
@@ -453,7 +453,7 @@ SLOT_INTERFACE_END
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER(southbridge_extended_device::device_add_mconfig)
+MACHINE_CONFIG_START(southbridge_extended_device::device_add_mconfig)
 	southbridge_device::device_add_mconfig(config);
 
 	MCFG_DEVICE_ADD("keybc", AT_KEYBOARD_CONTROLLER, XTAL_12MHz)

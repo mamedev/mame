@@ -25,6 +25,7 @@ public:
 
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
+	void vp60(machine_config &config);
 private:
 	required_device<cpu_device> m_maincpu;
 	required_region_ptr<u8> m_p_chargen;
@@ -50,7 +51,7 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START( vp60 )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( vp60 )
+MACHINE_CONFIG_START(vp60_state::vp60)
 	MCFG_CPU_ADD("maincpu", I8051, XTAL_10_920MHz)
 	MCFG_CPU_PROGRAM_MAP(mem_map)
 	MCFG_CPU_IO_MAP(io_map)

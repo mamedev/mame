@@ -55,6 +55,7 @@ public:
 
 	DECLARE_DRIVER_INIT(jupiter2);
 
+	void jupiter2(machine_config &config);
 private:
 	virtual void machine_start() override;
 	required_device<cpu_device> m_maincpu;
@@ -80,6 +81,7 @@ public:
 	DECLARE_READ8_MEMBER(key_r);
 	DECLARE_READ8_MEMBER(ff_r);
 
+	void jupiter3(machine_config &config);
 private:
 	virtual void machine_reset() override;
 	uint8_t m_term_data;
@@ -267,7 +269,7 @@ void jupiter3_state::machine_reset()
 //  MACHINE_CONFIG( jupiter )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( jupiter2 )
+MACHINE_CONFIG_START(jupiter2_state::jupiter2)
 	// basic machine hardware
 	MCFG_CPU_ADD(MCM6571AP_TAG, M6800, 2000000)
 	MCFG_CPU_PROGRAM_MAP(jupiter2_mem)
@@ -303,7 +305,7 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( jupiter3 )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( jupiter3 )
+MACHINE_CONFIG_START(jupiter3_state::jupiter3)
 	// basic machine hardware
 	MCFG_CPU_ADD(Z80_TAG, Z80, 4000000)
 	MCFG_CPU_PROGRAM_MAP(jupiter3_mem)

@@ -139,6 +139,27 @@ public:
 	void atpsx_dma_write(uint32_t *p_n_psxram, uint32_t n_address, int32_t n_size );
 	void jdredd_vblank(screen_device &screen, bool vblank_state);
 
+	void zn1_1mb_vram(machine_config &config);
+	void zn1_2mb_vram(machine_config &config);
+	void zn2(machine_config &config);
+	void jdredd(machine_config &config);
+	void coh1002msnd(machine_config &config);
+	void coh1002tb(machine_config &config);
+	void coh1000a(machine_config &config);
+	void coh1000tb(machine_config &config);
+	void coh1002m(machine_config &config);
+	void coh1002ml(machine_config &config);
+	void coh1001l(machine_config &config);
+	void bam2(machine_config &config);
+	void glpracr(machine_config &config);
+	void coh1000ta(machine_config &config);
+	void coh1002v(machine_config &config);
+	void nbajamex(machine_config &config);
+	void coh1000c(machine_config &config);
+	void coh1000w(machine_config &config);
+	void coh1002e(machine_config &config);
+	void coh3002c(machine_config &config);
+	void coh1002c(machine_config &config);
 protected:
 	virtual void machine_start() override;
 
@@ -320,7 +341,7 @@ static ADDRESS_MAP_START( zn_map, AS_PROGRAM, 32, zn_state )
 	AM_RANGE(0x1fb20000, 0x1fb20007) AM_READ16(unknown_r, 0xffffffff)
 ADDRESS_MAP_END
 
-static MACHINE_CONFIG_START( zn1_1mb_vram )
+MACHINE_CONFIG_START(zn_state::zn1_1mb_vram)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD( "maincpu", CXD8530CQ, XTAL_67_7376MHz )
@@ -361,11 +382,11 @@ static MACHINE_CONFIG_START( zn1_1mb_vram )
 	MCFG_DEVICE_ADD("at28c16", AT28C16, 0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( zn1_2mb_vram, zn1_1mb_vram )
+MACHINE_CONFIG_DERIVED(zn_state::zn1_2mb_vram, zn1_1mb_vram)
 	MCFG_PSXGPU_REPLACE( "maincpu", "gpu", CXD8561Q, 0x200000, XTAL_53_693175MHz )
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( zn2 )
+MACHINE_CONFIG_START(zn_state::zn2)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD( "maincpu", CXD8661R, XTAL_100MHz )
@@ -588,7 +609,7 @@ static ADDRESS_MAP_START( qsound_portmap, AS_IO, 8, zn_state )
 	AM_RANGE(0x00, 0x00) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 ADDRESS_MAP_END
 
-static MACHINE_CONFIG_DERIVED( coh1000c, zn1_1mb_vram )
+MACHINE_CONFIG_DERIVED(zn_state::coh1000c, zn1_1mb_vram)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(coh1000c_map)
 
@@ -604,11 +625,11 @@ static MACHINE_CONFIG_DERIVED( coh1000c, zn1_1mb_vram )
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( glpracr, coh1000c )
+MACHINE_CONFIG_DERIVED(zn_state::glpracr, coh1000c)
 	MCFG_MACHINE_RESET_OVERRIDE(zn_state, glpracr)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( coh1002c, zn1_2mb_vram )
+MACHINE_CONFIG_DERIVED(zn_state::coh1002c, zn1_2mb_vram)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(coh1000c_map)
 
@@ -765,7 +786,7 @@ Notes:
                        Unpopulated sockets on Rival Schools - None
 */
 
-static MACHINE_CONFIG_DERIVED(coh3002c, zn2)
+MACHINE_CONFIG_DERIVED(zn_state::coh3002c, zn2)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(coh1000c_map)
 
@@ -1047,7 +1068,7 @@ static ADDRESS_MAP_START( fx1a_sound_map, AS_PROGRAM, 8, zn_state )
 ADDRESS_MAP_END
 
 
-static MACHINE_CONFIG_DERIVED( coh1000ta, zn1_1mb_vram )
+MACHINE_CONFIG_DERIVED(zn_state::coh1000ta, zn1_1mb_vram)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(coh1000ta_map)
 
@@ -1105,7 +1126,7 @@ MACHINE_RESET_MEMBER(zn_state,coh1000tb)
 	m_bankedroms->set_entry( 0 );
 }
 
-static MACHINE_CONFIG_DERIVED(coh1000tb, zn1_1mb_vram)
+MACHINE_CONFIG_DERIVED(zn_state::coh1000tb, zn1_1mb_vram)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1122,10 +1143,10 @@ static MACHINE_CONFIG_DERIVED(coh1000tb, zn1_1mb_vram)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.45)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.45)
 
-	MCFG_FRAGMENT_ADD(taito_zoom_sound)
+	MCFG_TAITO_ZOOM_ADD("taito_zoom")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED(coh1002tb, zn1_2mb_vram)
+MACHINE_CONFIG_DERIVED(zn_state::coh1002tb, zn1_2mb_vram)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1142,7 +1163,7 @@ static MACHINE_CONFIG_DERIVED(coh1002tb, zn1_2mb_vram)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.45)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.45)
 
-	MCFG_FRAGMENT_ADD(taito_zoom_sound)
+	MCFG_TAITO_ZOOM_ADD("taito_zoom")
 MACHINE_CONFIG_END
 
 /*
@@ -1370,7 +1391,7 @@ static ADDRESS_MAP_START(coh1000w_map, AS_PROGRAM, 32, zn_state)
 	AM_IMPORT_FROM(zn_map)
 ADDRESS_MAP_END
 
-static MACHINE_CONFIG_DERIVED( coh1000w, zn1_2mb_vram )
+MACHINE_CONFIG_DERIVED(zn_state::coh1000w, zn1_2mb_vram)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(coh1000w_map)
 
@@ -1379,8 +1400,8 @@ static MACHINE_CONFIG_DERIVED( coh1000w, zn1_2mb_vram )
 
 	MCFG_VT83C461_ADD("ide", ata_devices, "hdd", nullptr, true)
 	MCFG_ATA_INTERFACE_IRQ_HANDLER(DEVWRITELINE("maincpu:irq", psxirq_device, intin10))
-	MCFG_PSX_DMA_CHANNEL_READ( "maincpu", 5, psxdma_device::read_delegate(&zn_state::atpsx_dma_read, (zn_state *) owner ) )
-	MCFG_PSX_DMA_CHANNEL_WRITE( "maincpu", 5, psxdma_device::write_delegate(&zn_state::atpsx_dma_write, (zn_state *) owner ) )
+	MCFG_PSX_DMA_CHANNEL_READ( "maincpu", 5, psxdma_device::read_delegate(&zn_state::atpsx_dma_read, this ) )
+	MCFG_PSX_DMA_CHANNEL_WRITE( "maincpu", 5, psxdma_device::write_delegate(&zn_state::atpsx_dma_write, this ) )
 MACHINE_CONFIG_END
 
 /*
@@ -1567,7 +1588,7 @@ static ADDRESS_MAP_START( psarc_snd_map, AS_PROGRAM, 16, zn_state )
 	AM_RANGE(0x100020, 0xffffff) AM_WRITENOP
 ADDRESS_MAP_END
 
-static MACHINE_CONFIG_DERIVED(coh1002e, zn1_2mb_vram)
+MACHINE_CONFIG_DERIVED(zn_state::coh1002e, zn1_2mb_vram)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(coh1002e_map)
 
@@ -1699,7 +1720,7 @@ MACHINE_RESET_MEMBER(zn_state,bam2)
 	m_bankedroms->set_entry( 1 );
 }
 
-static MACHINE_CONFIG_DERIVED( bam2, zn1_2mb_vram )
+MACHINE_CONFIG_DERIVED(zn_state::bam2, zn1_2mb_vram)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(bam2_map)
 
@@ -2030,12 +2051,12 @@ static ADDRESS_MAP_START(jdredd_map, AS_PROGRAM, 32, zn_state)
 	AM_IMPORT_FROM(coh1000a_map)
 ADDRESS_MAP_END
 
-static MACHINE_CONFIG_DERIVED( coh1000a, zn1_2mb_vram )
+MACHINE_CONFIG_DERIVED(zn_state::coh1000a, zn1_2mb_vram)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(coh1000a_map)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( nbajamex, coh1000a )
+MACHINE_CONFIG_DERIVED(zn_state::nbajamex, coh1000a)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(nbajamex_map)
 	MCFG_NVRAM_ADD_1FILL("71256")
@@ -2043,12 +2064,12 @@ static MACHINE_CONFIG_DERIVED( nbajamex, coh1000a )
 	MCFG_DEVICE_ADD("rax", ACCLAIM_RAX, 0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( jdredd, coh1000a )
+MACHINE_CONFIG_DERIVED(zn_state::jdredd, coh1000a)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(jdredd_map)
 
 	MCFG_DEVICE_MODIFY("gpu")
-	MCFG_PSXGPU_VBLANK_CALLBACK(vblank_state_delegate(&zn_state::jdredd_vblank, (zn_state *) owner))
+	MCFG_PSXGPU_VBLANK_CALLBACK(vblank_state_delegate(&zn_state::jdredd_vblank, this))
 
 	MCFG_ATA_INTERFACE_ADD("ata", ata_devices, "hdd", nullptr, true)
 	MCFG_ATA_INTERFACE_IRQ_HANDLER(DEVWRITELINE("maincpu:irq", psxirq_device, intin10))
@@ -2210,7 +2231,7 @@ static ADDRESS_MAP_START( atlus_snd_map, AS_PROGRAM, 16, zn_state )
 ADDRESS_MAP_END
 
 
-static MACHINE_CONFIG_DERIVED(coh1001l, zn1_2mb_vram)
+MACHINE_CONFIG_DERIVED(zn_state::coh1001l, zn1_2mb_vram)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(coh1001l_map)
 
@@ -2259,7 +2280,7 @@ MACHINE_RESET_MEMBER(zn_state,coh1002v)
 	m_bankedroms->set_entry( 0 );
 }
 
-static MACHINE_CONFIG_DERIVED( coh1002v, zn1_2mb_vram )
+MACHINE_CONFIG_DERIVED(zn_state::coh1002v, zn1_2mb_vram)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(coh1002v_map)
 
@@ -2443,7 +2464,7 @@ MACHINE_RESET_MEMBER(zn_state,coh1002m)
 	m_bankedroms->set_entry( 0 );
 }
 
-static MACHINE_CONFIG_DERIVED( coh1002m, zn1_2mb_vram )
+MACHINE_CONFIG_DERIVED(zn_state::coh1002m, zn1_2mb_vram)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(coh1002m_map)
 
@@ -2492,7 +2513,7 @@ static ADDRESS_MAP_START( coh1002ml_link_port_map, AS_IO, 8, zn_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 ADDRESS_MAP_END
 
-static MACHINE_CONFIG_DERIVED( coh1002msnd, coh1002m )
+MACHINE_CONFIG_DERIVED(zn_state::coh1002msnd, coh1002m)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2513,7 +2534,7 @@ static MACHINE_CONFIG_DERIVED( coh1002msnd, coh1002m )
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.35)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( coh1002ml, coh1002m )
+MACHINE_CONFIG_DERIVED(zn_state::coh1002ml, coh1002m)
 	MCFG_CPU_ADD("link", Z80, 4000000) // ?
 	MCFG_CPU_PROGRAM_MAP(coh1002ml_link_map)
 	MCFG_CPU_IO_MAP(coh1002ml_link_port_map)
@@ -4252,10 +4273,10 @@ ROM_START( ftimpcta )
 	ROM_LOAD( "e25-02.2",            0x0800000, 0x400000, CRC(8e8b4c82) SHA1(55c9d4d3a08fc3226a75ab3a674be433af83e289) )
 	ROM_LOAD( "e25-03.12",           0x0c00000, 0x400000, CRC(43b1c085) SHA1(6e53550e9be0d2f415fc6b4f3b8a71185c5370b2) )
 
-	ROM_REGION( 0x080000, "mn10200", 0 )
+	ROM_REGION( 0x080000, ":taito_zoom:mn10200", 0 )
 	ROM_LOAD( "e25-10.14",    0x0000000, 0x080000, CRC(2b2ad1b1) SHA1(6d064d0b6805d43ce42929ac8f5645b56384f53c) )
 
-	ROM_REGION32_LE( 0x600000, "zsg2", 0 )
+	ROM_REGION32_LE( 0x600000, ":taito_zoom:zsg2", 0 )
 	ROM_LOAD( "e25-04.27",    0x0000000, 0x400000, CRC(09a66d35) SHA1(f0df24bc9bfc9eb0f5150dc035c19fc5b8a39bf9) )
 	ROM_LOAD( "e25-05.28",    0x0400000, 0x200000, CRC(3fb57636) SHA1(aa38bfac11ecf10fd55143cf4525a2a529be8bb6) )
 
@@ -4273,10 +4294,10 @@ ROM_START( ftimpact )
 	ROM_LOAD( "e25-02.2",            0x0800000, 0x400000, CRC(8e8b4c82) SHA1(55c9d4d3a08fc3226a75ab3a674be433af83e289) )
 	ROM_LOAD( "e25-03.12",           0x0c00000, 0x400000, CRC(43b1c085) SHA1(6e53550e9be0d2f415fc6b4f3b8a71185c5370b2) )
 
-	ROM_REGION( 0x080000, "mn10200", 0 )
+	ROM_REGION( 0x080000, ":taito_zoom:mn10200", 0 )
 	ROM_LOAD( "e25-10.14",    0x0000000, 0x080000, CRC(2b2ad1b1) SHA1(6d064d0b6805d43ce42929ac8f5645b56384f53c) )
 
-	ROM_REGION32_LE( 0x600000, "zsg2", 0 )
+	ROM_REGION32_LE( 0x600000, ":taito_zoom:zsg2", 0 )
 	ROM_LOAD( "e25-04.27",    0x0000000, 0x400000, CRC(09a66d35) SHA1(f0df24bc9bfc9eb0f5150dc035c19fc5b8a39bf9) )
 	ROM_LOAD( "e25-05.28",    0x0400000, 0x200000, CRC(3fb57636) SHA1(aa38bfac11ecf10fd55143cf4525a2a529be8bb6) )
 
@@ -4294,10 +4315,10 @@ ROM_START( ftimpactu )
 	ROM_LOAD( "e25-02.2",            0x0800000, 0x400000, CRC(8e8b4c82) SHA1(55c9d4d3a08fc3226a75ab3a674be433af83e289) )
 	ROM_LOAD( "e25-03.12",           0x0c00000, 0x400000, CRC(43b1c085) SHA1(6e53550e9be0d2f415fc6b4f3b8a71185c5370b2) )
 
-	ROM_REGION( 0x080000, "mn10200", 0 )
+	ROM_REGION( 0x080000, ":taito_zoom:mn10200", 0 )
 	ROM_LOAD( "e25-10.14",    0x0000000, 0x080000, CRC(2b2ad1b1) SHA1(6d064d0b6805d43ce42929ac8f5645b56384f53c) )
 
-	ROM_REGION32_LE( 0x600000, "zsg2", 0 )
+	ROM_REGION32_LE( 0x600000, ":taito_zoom:zsg2", 0 )
 	ROM_LOAD( "e25-04.27",    0x0000000, 0x400000, CRC(09a66d35) SHA1(f0df24bc9bfc9eb0f5150dc035c19fc5b8a39bf9) )
 	ROM_LOAD( "e25-05.28",    0x0400000, 0x200000, CRC(3fb57636) SHA1(aa38bfac11ecf10fd55143cf4525a2a529be8bb6) )
 
@@ -4315,10 +4336,10 @@ ROM_START( ftimpactj )
 	ROM_LOAD( "e25-02.2",            0x0800000, 0x400000, CRC(8e8b4c82) SHA1(55c9d4d3a08fc3226a75ab3a674be433af83e289) )
 	ROM_LOAD( "e25-03.12",           0x0c00000, 0x400000, CRC(43b1c085) SHA1(6e53550e9be0d2f415fc6b4f3b8a71185c5370b2) )
 
-	ROM_REGION( 0x080000, "mn10200", 0 )
+	ROM_REGION( 0x080000, ":taito_zoom:mn10200", 0 )
 	ROM_LOAD( "e25-10.14",    0x0000000, 0x080000, CRC(2b2ad1b1) SHA1(6d064d0b6805d43ce42929ac8f5645b56384f53c) )
 
-	ROM_REGION32_LE( 0x600000, "zsg2", 0 )
+	ROM_REGION32_LE( 0x600000, ":taito_zoom:zsg2", 0 )
 	ROM_LOAD( "e25-04.27",    0x0000000, 0x400000, CRC(09a66d35) SHA1(f0df24bc9bfc9eb0f5150dc035c19fc5b8a39bf9) )
 	ROM_LOAD( "e25-05.28",    0x0400000, 0x200000, CRC(3fb57636) SHA1(aa38bfac11ecf10fd55143cf4525a2a529be8bb6) )
 
@@ -4336,10 +4357,10 @@ ROM_START( gdarius )
 	ROM_LOAD( "e39-02.2",            0x0800000, 0x400000, CRC(a47aab5d) SHA1(64b58e47035ad9d8d6dcaf475cbcc3ad85f4d82f) )
 	ROM_LOAD( "e39-03.12",           0x0c00000, 0x400000, CRC(a883b6a5) SHA1(b8d00d944c90f8cd9c2b076688f4c68b2e6d557a) )
 
-	ROM_REGION( 0x080000, "mn10200", 0 )
+	ROM_REGION( 0x080000, ":taito_zoom:mn10200", 0 )
 	ROM_LOAD( "e39-07.14",    0x0000000, 0x080000, CRC(2252c7c1) SHA1(92b9908e0d87cad6587f1acc0eef69eaae8c6a98) )
 
-	ROM_REGION32_LE( 0x400000, "zsg2", 0 )
+	ROM_REGION32_LE( 0x400000, ":taito_zoom:zsg2", 0 )
 	ROM_LOAD( "e39-04.27",    0x0000000, 0x400000, CRC(6ee35e68) SHA1(fdfe63203d8cecf84cb869039fb893d5b63cdd67) )
 
 	ROM_REGION( 0x8, "cat702_2", 0 )
@@ -4356,10 +4377,10 @@ ROM_START( gdariusb )
 	ROM_LOAD( "e39-02.2",            0x0800000, 0x400000, CRC(a47aab5d) SHA1(64b58e47035ad9d8d6dcaf475cbcc3ad85f4d82f) )
 	ROM_LOAD( "e39-03.12",           0x0c00000, 0x400000, CRC(a883b6a5) SHA1(b8d00d944c90f8cd9c2b076688f4c68b2e6d557a) )
 
-	ROM_REGION( 0x080000, "mn10200", 0 )
+	ROM_REGION( 0x080000, ":taito_zoom:mn10200", 0 )
 	ROM_LOAD( "e39-07.14",    0x0000000, 0x080000, CRC(2252c7c1) SHA1(92b9908e0d87cad6587f1acc0eef69eaae8c6a98) )
 
-	ROM_REGION32_LE( 0x400000, "zsg2", 0 )
+	ROM_REGION32_LE( 0x400000, ":taito_zoom:zsg2", 0 )
 	ROM_LOAD( "e39-04.27",    0x0000000, 0x400000, CRC(6ee35e68) SHA1(fdfe63203d8cecf84cb869039fb893d5b63cdd67) )
 
 	ROM_REGION( 0x8, "cat702_2", 0 )
@@ -4376,10 +4397,10 @@ ROM_START( gdarius2 )
 	ROM_LOAD( "e39-02.2",            0x0800000, 0x400000, CRC(a47aab5d) SHA1(64b58e47035ad9d8d6dcaf475cbcc3ad85f4d82f) )
 	ROM_LOAD( "e39-03.12",           0x0c00000, 0x400000, CRC(a883b6a5) SHA1(b8d00d944c90f8cd9c2b076688f4c68b2e6d557a) )
 
-	ROM_REGION( 0x080000, "mn10200", 0 )
+	ROM_REGION( 0x080000, ":taito_zoom:mn10200", 0 )
 	ROM_LOAD( "e39-07.14",    0x0000000, 0x080000, CRC(2252c7c1) SHA1(92b9908e0d87cad6587f1acc0eef69eaae8c6a98) )
 
-	ROM_REGION32_LE( 0x400000, "zsg2", 0 )
+	ROM_REGION32_LE( 0x400000, ":taito_zoom:zsg2", 0 )
 	ROM_LOAD( "e39-04.27",    0x0000000, 0x400000, CRC(6ee35e68) SHA1(fdfe63203d8cecf84cb869039fb893d5b63cdd67) )
 
 	ROM_REGION( 0x8, "cat702_2", 0 )
@@ -4496,10 +4517,10 @@ ROM_START( raystorm )
 	ROM_LOAD( "e24-02.1",          0x0400000, 0x400000, CRC(9f70950d) SHA1(b3e4f925a61ae2e5dd4cc5d7ec3030a0d5c2c04d) )
 	ROM_LOAD( "e24-03.2",          0x0800000, 0x400000, CRC(6c1f0a5d) SHA1(1aac37a7ff23e54021a4cec18c9bb93242337180) )
 
-	ROM_REGION16_LE( 0x080000, "mn10200", 0 )
+	ROM_REGION16_LE( 0x080000, ":taito_zoom:mn10200", 0 )
 	ROM_LOAD( "e24-09.14",    0x0000000, 0x080000, CRC(808589e1) SHA1(46ada4c6d68c2462186a0b962abb435ee740c0ba) )
 
-	ROM_REGION32_LE( 0x400000, "zsg2", 0 )
+	ROM_REGION32_LE( 0x400000, ":taito_zoom:zsg2", 0 )
 	ROM_LOAD( "e24-04.27",    0x0000000, 0x400000, CRC(f403493a) SHA1(3e49fd2a060a3893e26f14cc3cf47c4ba91e17d4) )
 
 	ROM_REGION( 0x8, "cat702_2", 0 )
@@ -4515,10 +4536,10 @@ ROM_START( raystormo )
 	ROM_LOAD( "e24-02.1",            0x0400000, 0x400000, CRC(9f70950d) SHA1(b3e4f925a61ae2e5dd4cc5d7ec3030a0d5c2c04d) )
 	ROM_LOAD( "e24-03.2",            0x0800000, 0x400000, CRC(6c1f0a5d) SHA1(1aac37a7ff23e54021a4cec18c9bb93242337180) )
 
-	ROM_REGION( 0x080000, "mn10200", 0 )
+	ROM_REGION( 0x080000, ":taito_zoom:mn10200", 0 )
 	ROM_LOAD( "e24-09.14",    0x0000000, 0x080000, CRC(808589e1) SHA1(46ada4c6d68c2462186a0b962abb435ee740c0ba) )
 
-	ROM_REGION32_LE( 0x400000, "zsg2", 0 )
+	ROM_REGION32_LE( 0x400000, ":taito_zoom:zsg2", 0 )
 	ROM_LOAD( "e24-04.27",    0x0000000, 0x400000, CRC(f403493a) SHA1(3e49fd2a060a3893e26f14cc3cf47c4ba91e17d4) )
 
 	ROM_REGION( 0x8, "cat702_2", 0 )
@@ -4534,10 +4555,10 @@ ROM_START( raystormu )
 	ROM_LOAD( "e24-02.1",            0x0400000, 0x400000, CRC(9f70950d) SHA1(b3e4f925a61ae2e5dd4cc5d7ec3030a0d5c2c04d) )
 	ROM_LOAD( "e24-03.2",            0x0800000, 0x400000, CRC(6c1f0a5d) SHA1(1aac37a7ff23e54021a4cec18c9bb93242337180) )
 
-	ROM_REGION( 0x080000, "mn10200", 0 )
+	ROM_REGION( 0x080000, ":taito_zoom:mn10200", 0 )
 	ROM_LOAD( "e24-09.14",    0x0000000, 0x080000, CRC(808589e1) SHA1(46ada4c6d68c2462186a0b962abb435ee740c0ba) )
 
-	ROM_REGION32_LE( 0x400000, "zsg2", 0 )
+	ROM_REGION32_LE( 0x400000, ":taito_zoom:zsg2", 0 )
 	ROM_LOAD( "e24-04.27",    0x0000000, 0x400000, CRC(f403493a) SHA1(3e49fd2a060a3893e26f14cc3cf47c4ba91e17d4) )
 
 	ROM_REGION( 0x8, "cat702_2", 0 )
@@ -4553,10 +4574,10 @@ ROM_START( raystormj )
 	ROM_LOAD( "e24-02.1",            0x0400000, 0x400000, CRC(9f70950d) SHA1(b3e4f925a61ae2e5dd4cc5d7ec3030a0d5c2c04d) )
 	ROM_LOAD( "e24-03.2",            0x0800000, 0x400000, CRC(6c1f0a5d) SHA1(1aac37a7ff23e54021a4cec18c9bb93242337180) )
 
-	ROM_REGION( 0x080000, "mn10200", 0 )
+	ROM_REGION( 0x080000, ":taito_zoom:mn10200", 0 )
 	ROM_LOAD( "e24-09.14",    0x0000000, 0x080000, CRC(808589e1) SHA1(46ada4c6d68c2462186a0b962abb435ee740c0ba) )
 
-	ROM_REGION32_LE( 0x400000, "zsg2", 0 )
+	ROM_REGION32_LE( 0x400000, ":taito_zoom:zsg2", 0 )
 	ROM_LOAD( "e24-04.27",    0x0000000, 0x400000, CRC(f403493a) SHA1(3e49fd2a060a3893e26f14cc3cf47c4ba91e17d4) )
 
 	ROM_REGION( 0x8, "cat702_2", 0 )

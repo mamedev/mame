@@ -30,7 +30,7 @@ DEFINE_DEVICE_TYPE(ISA8_MYB3K_COM, isa8_myb3k_com_device, "isa8_myb3k_com", "ADP
 //-------------------------------------------------
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
-MACHINE_CONFIG_MEMBER( isa8_myb3k_com_device::device_add_mconfig )
+MACHINE_CONFIG_START(isa8_myb3k_com_device::device_add_mconfig)
 	MCFG_DEVICE_ADD( "usart", I8251, XTAL_15_9744MHz / 8 )
 	MCFG_I8251_TXD_HANDLER(DEVWRITELINE("com1", rs232_port_device, write_txd))
 	MCFG_I8251_DTR_HANDLER(DEVWRITELINE("com1", rs232_port_device, write_dtr))

@@ -86,6 +86,7 @@ public:
 	DECLARE_WRITE8_MEMBER(eeprom_w);
 	DECLARE_READ8_MEMBER(eeprom_r);
 	DECLARE_DRIVER_INIT(pve500);
+	void pve500(machine_config &config);
 private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -330,7 +331,7 @@ WRITE8_MEMBER(pve500_state::io_sel_w)
 	}
 }
 
-static MACHINE_CONFIG_START( pve500 )
+MACHINE_CONFIG_START(pve500_state::pve500)
 	/* Main CPU */
 	MCFG_CPU_ADD("maincpu", TMPZ84C015, XTAL_12MHz / 2) /* TMPZ84C015BF-6 */
 	MCFG_CPU_PROGRAM_MAP(maincpu_prg)

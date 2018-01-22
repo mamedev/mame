@@ -1006,7 +1006,7 @@ static SLOT_INTERFACE_START(pcw16_com)
 	SLOT_INTERFACE("msystems_mouse", MSYSTEM_SERIAL_MOUSE)
 SLOT_INTERFACE_END
 
-static MACHINE_CONFIG_START( pcw16 )
+MACHINE_CONFIG_START(pcw16_state::pcw16)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 16000000)
 	MCFG_CPU_PROGRAM_MAP(pcw16_map)

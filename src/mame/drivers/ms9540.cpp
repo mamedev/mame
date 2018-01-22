@@ -40,6 +40,7 @@ public:
 
 	void kbd_put(u8 data);
 
+	void ms9540(machine_config &config);
 private:
 	uint8_t m_term_data;
 	virtual void machine_reset() override;
@@ -75,7 +76,7 @@ void ms9540_state::kbd_put(u8 data)
 	m_term_data = data;
 }
 
-static MACHINE_CONFIG_START( ms9540 )
+MACHINE_CONFIG_START(ms9540_state::ms9540)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 8000000) // unknown clock
 	MCFG_CPU_PROGRAM_MAP(mem_map)

@@ -21,13 +21,13 @@
 #define MCFG_CRTC_EGA_SET_SCREEN MCFG_VIDEO_SET_SCREEN
 
 #define MCFG_CRTC_EGA_BEGIN_UPDATE_CB(_class, _method) \
-	crtc_ega_device::set_begin_update_callback(*device, crtc_ega_device::begin_update_delegate(&_class::_method, #_class "::" #_method, downcast<_class *>(owner)));
+	crtc_ega_device::set_begin_update_callback(*device, crtc_ega_device::begin_update_delegate(&_class::_method, #_class "::" #_method, this));
 
 #define MCFG_CRTC_EGA_ROW_UPDATE_CB(_class, _method) \
-	crtc_ega_device::set_row_update_callback(*device, crtc_ega_device::row_update_delegate(&_class::_method, #_class "::" #_method, downcast<_class *>(owner)));
+	crtc_ega_device::set_row_update_callback(*device, crtc_ega_device::row_update_delegate(&_class::_method, #_class "::" #_method, this));
 
 #define MCFG_CRTC_EGA_END_UPDATE_CB(_class, _method) \
-	crtc_ega_device::set_end_update_callback(*device, crtc_ega_device::end_update_delegate(&_class::_method, #_class "::" #_method, downcast<_class *>(owner)));
+	crtc_ega_device::set_end_update_callback(*device, crtc_ega_device::end_update_delegate(&_class::_method, #_class "::" #_method, this));
 
 #define MCFG_CRTC_EGA_HPIXELS_PER_COLUMN(_pix) \
 	crtc_ega_device::set_hpixels_per_column(*device, _pix);

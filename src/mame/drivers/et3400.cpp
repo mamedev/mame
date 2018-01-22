@@ -56,6 +56,7 @@ public:
 	DECLARE_WRITE8_MEMBER(pia_bw);
 	DECLARE_WRITE_LINE_MEMBER(reset_key_w);
 	DECLARE_WRITE_LINE_MEMBER(segment_test_w);
+	void et3400(machine_config &config);
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<pia6821_device> m_pia;
@@ -203,7 +204,7 @@ static DEVICE_INPUT_DEFAULTS_START( terminal )
 	DEVICE_INPUT_DEFAULTS( "RS232_STOPBITS", 0xff, RS232_STOPBITS_2 )
 DEVICE_INPUT_DEFAULTS_END
 
-static MACHINE_CONFIG_START( et3400 )
+MACHINE_CONFIG_START(et3400_state::et3400)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6800, XTAL_4MHz / 4 ) // 1MHz with memory i/o accessory, or 500khz without it
 	MCFG_CPU_PROGRAM_MAP(mem_map)

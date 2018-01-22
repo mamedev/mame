@@ -196,7 +196,7 @@ const tiny_rom_entry *qs1000_device::device_rom_region() const
 //-------------------------------------------------
 //  device_add_mconfig - add machine configuration
 //-------------------------------------------------
-MACHINE_CONFIG_MEMBER( qs1000_device::device_add_mconfig )
+MACHINE_CONFIG_START(qs1000_device::device_add_mconfig)
 	MCFG_CPU_ADD("cpu", I8052, DERIVED_CLOCK(1, 1))
 	MCFG_CPU_PROGRAM_MAP(qs1000_prg_map)
 	MCFG_CPU_IO_MAP(qs1000_io_map)

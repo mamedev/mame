@@ -26,6 +26,7 @@ public:
 	DECLARE_READ8_MEMBER(fff400_r);
 	SCN2674_DRAW_CHARACTER_MEMBER(draw_character);
 
+	void tr175(machine_config &config);
 private:
 	required_device<cpu_device> m_maincpu;
 };
@@ -77,21 +78,18 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START( tr175 )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( tr175 )
+MACHINE_CONFIG_START(tr175_state::tr175)
 	MCFG_CPU_ADD("maincpu", M68000, 12'000'000)
 	MCFG_CPU_PROGRAM_MAP(mem_map)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_SIZE(720, 360)
-	MCFG_SCREEN_VISIBLE_AREA(0, 720-1, 0, 360-1)
+	MCFG_SCREEN_RAW_PARAMS(XTAL_28_322MHz, 900, 0, 720, 449, 0, 416) // guess
 	MCFG_SCREEN_UPDATE_DEVICE("avdc", scn2674_device, screen_update)
 
-	MCFG_DEVICE_ADD("avdc", SCN2674, 4000000)
+	MCFG_DEVICE_ADD("avdc", SCN2674, XTAL_28_322MHz / 18) // guess
 	MCFG_SCN2674_INTR_CALLBACK(INPUTLINE("maincpu", M68K_IRQ_2))
-	MCFG_SCN2674_TEXT_CHARACTER_WIDTH(8)
-	MCFG_SCN2674_GFX_CHARACTER_WIDTH(8)
+	MCFG_SCN2674_TEXT_CHARACTER_WIDTH(18) // guess
+	MCFG_SCN2674_GFX_CHARACTER_WIDTH(18) // guess
 	MCFG_SCN2674_DRAW_CHARACTER_CALLBACK_OWNER(tr175_state, draw_character)
 	MCFG_DEVICE_ADDRESS_MAP(0, vram_map)
 	MCFG_VIDEO_SET_SCREEN("screen")
@@ -110,7 +108,7 @@ MACHINE_CONFIG_END
 Relisys TR-175 II.
 Chips: MC68000P12, HM82C11C, SCN2681, 3x W24257-70L, KDA0476BCN-66 (RAMDAC), 4 undumped proms, Beeper, Button battery
 Crystals: 28.322, 46.448, 11.0592, unknown.
-Colour screen.
+Colour screen (VGA).
 
 ***************************************************************************************************************/
 

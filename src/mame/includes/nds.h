@@ -40,6 +40,7 @@ public:
 	DECLARE_READ32_MEMBER(wram_arm7mirror_r);
 	DECLARE_WRITE32_MEMBER(wram_arm7mirror_w);
 
+	void nds(machine_config &config);
 protected:
 	required_device<arm7_cpu_device> m_arm7;
 	required_device<arm946es_cpu_device> m_arm9;

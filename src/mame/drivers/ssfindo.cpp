@@ -296,6 +296,9 @@ public:
 	void PS7500_reset();
 	void ssfindo_speedups();
 	void ppcar_speedups();
+	void ssfindo(machine_config &config);
+	void ppcar(machine_config &config);
+	void tetfight(machine_config &config);
 };
 
 
@@ -782,7 +785,7 @@ static INPUT_PORTS_START( tetfight )
 INPUT_PORTS_END
 
 
-static MACHINE_CONFIG_START( ssfindo )
+MACHINE_CONFIG_START(ssfindo_state::ssfindo)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", ARM7, 54000000) // guess...
@@ -803,7 +806,7 @@ static MACHINE_CONFIG_START( ssfindo )
 	MCFG_PALETTE_ADD("palette", 256)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( ppcar, ssfindo )
+MACHINE_CONFIG_DERIVED(ssfindo_state::ppcar, ssfindo)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -812,7 +815,7 @@ static MACHINE_CONFIG_DERIVED( ppcar, ssfindo )
 	MCFG_DEVICE_REMOVE("i2cmem")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( tetfight, ppcar )
+MACHINE_CONFIG_DERIVED(ssfindo_state::tetfight, ppcar)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")

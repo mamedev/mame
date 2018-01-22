@@ -48,6 +48,8 @@ public:
 		m_maincpu(*this, "maincpu")
 	{ }
 
+	void goldhexa(machine_config &config);
+	void hexapres(machine_config &config);
 private:
 	required_device<cpu_device> m_maincpu;
 };
@@ -83,7 +85,7 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START( goldhexa )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( goldhexa )
+MACHINE_CONFIG_START(yuvomz80_state::goldhexa)
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_8MHz)
 	MCFG_CPU_PROGRAM_MAP(mem_map)
 	MCFG_CPU_IO_MAP(io_map)
@@ -103,7 +105,7 @@ static MACHINE_CONFIG_START( goldhexa )
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.00)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( hexapres )
+MACHINE_CONFIG_START(yuvomz80_state::hexapres)
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_8MHz)
 	MCFG_DEVICE_DISABLE()
 

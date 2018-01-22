@@ -365,6 +365,16 @@ public:
 	void sc2awp_common_init(int reels, int decrypt);
 	void sc2awpdmd_common_init(int reels, int decrypt);
 	void save_state();
+	void _3meters(machine_config &config);
+	void _5meters(machine_config &config);
+	void _8meters(machine_config &config);
+	void scorpion2_dm01(machine_config &config);
+	void scorpion2_vid(machine_config &config);
+	void scorpion2_dm01_5m(machine_config &config);
+	void scorpion3(machine_config &config);
+	void scorpion2_dm01_3m(machine_config &config);
+	void scorpion2_vidm(machine_config &config);
+	void scorpion2(machine_config &config);
 };
 
 
@@ -2186,17 +2196,17 @@ INPUT_PORTS_END
 // machine config fragments for different meters numbers //////////////////
 ///////////////////////////////////////////////////////////////////////////
 
-MACHINE_CONFIG_START( _3meters )
+MACHINE_CONFIG_START(bfm_sc2_state::_3meters)
 	MCFG_DEVICE_ADD("meters", METERS, 0)
 	MCFG_METERS_NUMBER(3)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START( _5meters )
+MACHINE_CONFIG_START(bfm_sc2_state::_5meters)
 	MCFG_DEVICE_ADD("meters", METERS, 0)
 	MCFG_METERS_NUMBER(5)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START( _8meters )
+MACHINE_CONFIG_START(bfm_sc2_state::_8meters)
 	MCFG_DEVICE_ADD("meters", METERS, 0)
 	MCFG_METERS_NUMBER(8)
 MACHINE_CONFIG_END
@@ -2214,7 +2224,7 @@ MACHINE_START_MEMBER(bfm_sc2_state,bfm_sc2)
 	save_state();
 }
 
-static MACHINE_CONFIG_START( scorpion2_vid )
+MACHINE_CONFIG_START(bfm_sc2_state::scorpion2_vid)
 	MCFG_CPU_ADD("maincpu", M6809, MASTER_CLOCK/4 ) // 6809 CPU at 2 Mhz
 	MCFG_CPU_PROGRAM_MAP(memmap_vid)                    // setup scorpion2 board memorymap
 	MCFG_CPU_PERIODIC_INT_DRIVER(bfm_sc2_state, timer_irq,  1000)               // generate 1000 IRQ's per second
@@ -2245,7 +2255,7 @@ static MACHINE_CONFIG_START( scorpion2_vid )
 MACHINE_CONFIG_END
 
 /* machine driver for scorpion2_vid board with meters (i.e. quintoon uk). Are we really sure the other games don't?*/
-static MACHINE_CONFIG_DERIVED( scorpion2_vidm, scorpion2_vid )
+MACHINE_CONFIG_DERIVED(bfm_sc2_state::scorpion2_vidm, scorpion2_vid)
 	MCFG_FRAGMENT_ADD(_8meters)
 MACHINE_CONFIG_END
 
@@ -3688,7 +3698,7 @@ MACHINE_START_MEMBER(bfm_sc2_state,sc2dmd)
 
 /* machine driver for scorpion2 board */
 
-static MACHINE_CONFIG_START( scorpion2 )
+MACHINE_CONFIG_START(bfm_sc2_state::scorpion2)
 	MCFG_MACHINE_RESET_OVERRIDE(bfm_sc2_state,awp_init)
 	MCFG_CPU_ADD("maincpu", M6809, MASTER_CLOCK/4 )
 	MCFG_CPU_PROGRAM_MAP(memmap_no_vid)
@@ -3739,7 +3749,7 @@ MACHINE_CONFIG_END
 #endif
 
 /* machine driver for scorpion3 board */
-static MACHINE_CONFIG_DERIVED( scorpion3, scorpion2 )
+MACHINE_CONFIG_DERIVED(bfm_sc2_state::scorpion3, scorpion2)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(memmap_no_vid)
 
@@ -3749,7 +3759,7 @@ MACHINE_CONFIG_END
 
 
 /* machine driver for scorpion2 board + matrix board */
-static MACHINE_CONFIG_START( scorpion2_dm01 )
+MACHINE_CONFIG_START(bfm_sc2_state::scorpion2_dm01)
 	MCFG_MACHINE_RESET_OVERRIDE(bfm_sc2_state,dm01_init)
 	MCFG_QUANTUM_TIME(attotime::from_hz(960))                                   // needed for serial communication !!
 	MCFG_CPU_ADD("maincpu", M6809, MASTER_CLOCK/4 )
@@ -3791,12 +3801,12 @@ static MACHINE_CONFIG_START( scorpion2_dm01 )
 	MCFG_FRAGMENT_ADD( _8meters)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( scorpion2_dm01_3m, scorpion2_dm01 )
+MACHINE_CONFIG_DERIVED(bfm_sc2_state::scorpion2_dm01_3m, scorpion2_dm01)
 	MCFG_DEVICE_REMOVE("meters")
 	MCFG_FRAGMENT_ADD( _3meters)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( scorpion2_dm01_5m, scorpion2_dm01 )
+MACHINE_CONFIG_DERIVED(bfm_sc2_state::scorpion2_dm01_5m, scorpion2_dm01)
 	MCFG_DEVICE_REMOVE("meters")
 	MCFG_FRAGMENT_ADD( _5meters)
 MACHINE_CONFIG_END

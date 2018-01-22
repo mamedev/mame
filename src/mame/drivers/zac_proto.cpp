@@ -37,6 +37,7 @@ public:
 	DECLARE_WRITE8_MEMBER(out1_w);
 	DECLARE_WRITE8_MEMBER(digit_w);
 	DECLARE_WRITE8_MEMBER(sound_w);
+	void zac_proto(machine_config &config);
 private:
 	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
@@ -233,7 +234,7 @@ void zac_proto_state::machine_reset()
 	output().set_digit_value(10, 0x3f); // units shows zero all the time
 }
 
-static MACHINE_CONFIG_START( zac_proto )
+MACHINE_CONFIG_START(zac_proto_state::zac_proto)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", INS8060, XTAL_4MHz / 2) // Using SC/MP II chip which has an internal /2 circuit.
 	MCFG_CPU_PROGRAM_MAP(zac_proto_map)

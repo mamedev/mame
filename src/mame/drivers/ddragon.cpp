@@ -491,8 +491,8 @@ READ8_MEMBER(ddragon_state::dd_adpcm_status_r)
 
 static ADDRESS_MAP_START( ddragon_map, AS_PROGRAM, 8, ddragon_state )
 	AM_RANGE(0x0000, 0x0fff) AM_RAM AM_SHARE("rambase")
-	AM_RANGE(0x1000, 0x11ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
-	AM_RANGE(0x1200, 0x13ff) AM_RAM_DEVWRITE("palette", palette_device, write_ext) AM_SHARE("palette_ext")
+	AM_RANGE(0x1000, 0x11ff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
+	AM_RANGE(0x1200, 0x13ff) AM_RAM_DEVWRITE("palette", palette_device, write8_ext) AM_SHARE("palette_ext")
 	AM_RANGE(0x1800, 0x1fff) AM_RAM_WRITE(ddragon_fgvideoram_w) AM_SHARE("fgvideoram")
 	AM_RANGE(0x2000, 0x21ff) AM_READWRITE(ddragon_comram_r, ddragon_comram_w) AM_SHARE("comram") AM_MIRROR(0x0600)
 	AM_RANGE(0x2800, 0x2fff) AM_RAM AM_SHARE("spriteram")
@@ -526,8 +526,8 @@ static ADDRESS_MAP_START( dd2_map, AS_PROGRAM, 8, ddragon_state )
 	AM_RANGE(0x3809, 0x3809) AM_WRITEONLY AM_SHARE("scrollx_lo")
 	AM_RANGE(0x380a, 0x380a) AM_WRITEONLY AM_SHARE("scrolly_lo")
 	AM_RANGE(0x380b, 0x380f) AM_READWRITE(ddragon_interrupt_r, ddragon_interrupt_w)
-	AM_RANGE(0x3c00, 0x3dff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
-	AM_RANGE(0x3e00, 0x3fff) AM_RAM_DEVWRITE("palette", palette_device, write_ext) AM_SHARE("palette_ext")
+	AM_RANGE(0x3c00, 0x3dff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
+	AM_RANGE(0x3e00, 0x3fff) AM_RAM_DEVWRITE("palette", palette_device, write8_ext) AM_SHARE("palette_ext")
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
@@ -936,7 +936,7 @@ GFXDECODE_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( ddragon )
+MACHINE_CONFIG_START(ddragon_state::ddragon)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", HD6309, MAIN_CLOCK)     /* 12 MHz / 4 internally */
@@ -989,7 +989,7 @@ static MACHINE_CONFIG_START( ddragon )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( ddragonb, ddragon )
+MACHINE_CONFIG_DERIVED(ddragon_state::ddragonb, ddragon)
 
 	/* basic machine hardware */
 	MCFG_CPU_REPLACE("sub", M6809, MAIN_CLOCK / 8)  /* 1.5MHz */
@@ -997,7 +997,7 @@ static MACHINE_CONFIG_DERIVED( ddragonb, ddragon )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( ddragonba, ddragon )
+MACHINE_CONFIG_DERIVED(ddragon_state::ddragonba, ddragon)
 
 	/* basic machine hardware */
 	MCFG_CPU_REPLACE("sub", M6803, MAIN_CLOCK / 2)  /* 6MHz / 4 internally */
@@ -1006,7 +1006,7 @@ static MACHINE_CONFIG_DERIVED( ddragonba, ddragon )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( ddragon6809 )
+MACHINE_CONFIG_START(ddragon_state::ddragon6809)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", MC6809E, MAIN_CLOCK / 8)  /* 1.5 MHz */
@@ -1059,7 +1059,7 @@ static MACHINE_CONFIG_START( ddragon6809 )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( ddragon2 )
+MACHINE_CONFIG_START(ddragon_state::ddragon2)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", HD6309, MAIN_CLOCK)     /* 12 MHz / 4 internally */
@@ -1105,7 +1105,7 @@ static MACHINE_CONFIG_START( ddragon2 )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( darktowr, ddragon )
+MACHINE_CONFIG_DERIVED(darktowr_state::darktowr, ddragon)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("mcu", M68705P3, XTAL_4MHz)
@@ -1115,7 +1115,7 @@ static MACHINE_CONFIG_DERIVED( darktowr, ddragon )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( toffy, ddragon )
+MACHINE_CONFIG_DERIVED(toffy_state::toffy, ddragon)
 
 	/* basic machine hardware */
 	MCFG_DEVICE_REMOVE("sub")

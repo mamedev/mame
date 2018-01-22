@@ -18,6 +18,7 @@ public:
 //      , m_maincpu(*this, "maincpu")
 	{ }
 
+void ampscarp(machine_config &config);
 private:
 //  required_device<cpu_device> m_maincpu;
 };
@@ -28,7 +29,7 @@ private:
 static INPUT_PORTS_START( ampscarp )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( ampscarp )
+MACHINE_CONFIG_START(ampscarp_state::ampscarp)
 MACHINE_CONFIG_END
 
 ROM_START( ampscarp )

@@ -118,8 +118,8 @@ ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( main_portmap, AS_IO, 8, iqblock_state )
-	AM_RANGE(0x2000, 0x23ff) AM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
-	AM_RANGE(0x2800, 0x2bff) AM_DEVWRITE("palette", palette_device, write_ext) AM_SHARE("palette_ext")
+	AM_RANGE(0x2000, 0x23ff) AM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
+	AM_RANGE(0x2800, 0x2bff) AM_DEVWRITE("palette", palette_device, write8_ext) AM_SHARE("palette_ext")
 	AM_RANGE(0x5080, 0x5083) AM_DEVREADWRITE("ppi8255", i8255_device, read, write)
 	AM_RANGE(0x5090, 0x5090) AM_READ_PORT("SW0")
 	AM_RANGE(0x50a0, 0x50a0) AM_READ_PORT("SW1")
@@ -339,7 +339,7 @@ GFXDECODE_END
 
 
 
-static MACHINE_CONFIG_START( iqblock )
+MACHINE_CONFIG_START(iqblock_state::iqblock)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80,12000000/2) /* 6 MHz */

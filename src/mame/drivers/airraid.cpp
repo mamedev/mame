@@ -188,6 +188,8 @@ public:
 	DECLARE_DRIVER_INIT(cshooter);
 	DECLARE_MACHINE_RESET(cshooter);
 	TIMER_DEVICE_CALLBACK_MEMBER(cshooter_scanline);
+	void airraid(machine_config &config);
+	void airraid_crypt(machine_config &config);
 };
 
 
@@ -251,8 +253,8 @@ static ADDRESS_MAP_START( airraid_map, AS_PROGRAM, 8, airraid_state )
 	AM_RANGE(0xc700, 0xc700) AM_WRITE(cshooter_c700_w)
 //  AM_RANGE(0xc801, 0xc801) AM_WRITE(cshooter_c801_w)            // see notes
 	AM_RANGE(0xd000, 0xd7ff) AM_RAM_DEVWRITE("airraid_vid", airraid_video_device, txram_w) AM_SHARE("txram")
-	AM_RANGE(0xd800, 0xd8ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
-	AM_RANGE(0xda00, 0xdaff) AM_RAM_DEVWRITE("palette", palette_device, write_ext) AM_SHARE("palette_ext")
+	AM_RANGE(0xd800, 0xd8ff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
+	AM_RANGE(0xda00, 0xdaff) AM_RAM_DEVWRITE("palette", palette_device, write8_ext) AM_SHARE("palette_ext")
 	AM_RANGE(0xdc00, 0xdc0f) AM_RAM_DEVWRITE("airraid_vid", airraid_video_device,  vregs_w) AM_SHARE("vregs")
 //  AM_RANGE(0xdc10, 0xdc10) AM_RAM
 	AM_RANGE(0xdc11, 0xdc11) AM_WRITE(bank_w)
@@ -375,7 +377,7 @@ INPUT_PORTS_END
 
 
 
-static MACHINE_CONFIG_START( airraid )
+MACHINE_CONFIG_START(airraid_state::airraid)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80,XTAL_12MHz/2)        /* verified on pcb */
@@ -411,7 +413,7 @@ static MACHINE_CONFIG_START( airraid )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( airraid_crypt, airraid )
+MACHINE_CONFIG_DERIVED(airraid_state::airraid_crypt, airraid)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map)
 MACHINE_CONFIG_END

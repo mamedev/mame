@@ -94,7 +94,7 @@ static ADDRESS_MAP_START( pbaction_map, AS_PROGRAM, 8, pbaction_state )
 	AM_RANGE(0xd800, 0xdbff) AM_RAM_WRITE(pbaction_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0xdc00, 0xdfff) AM_RAM_WRITE(pbaction_colorram_w) AM_SHARE("colorram")
 	AM_RANGE(0xe000, 0xe07f) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0xe400, 0xe5ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0xe400, 0xe5ff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
 	AM_RANGE(0xe600, 0xe600) AM_READ_PORT("P1") AM_WRITE(nmi_mask_w)
 	AM_RANGE(0xe601, 0xe601) AM_READ_PORT("P2")
 	AM_RANGE(0xe602, 0xe602) AM_READ_PORT("SYSTEM")
@@ -281,7 +281,7 @@ INTERRUPT_GEN_MEMBER(pbaction_state::vblank_irq)
 		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
-static MACHINE_CONFIG_START( pbaction )
+MACHINE_CONFIG_START(pbaction_state::pbaction)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 4000000)   /* 4 MHz? */
@@ -323,7 +323,7 @@ static MACHINE_CONFIG_START( pbaction )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( pbactionx, pbaction )
+MACHINE_CONFIG_DERIVED(pbaction_state::pbactionx, pbaction)
 	MCFG_CPU_REPLACE("maincpu", SEGA_CPU_PBACTIO4, 4000000)   /* 4 MHz? */
 	MCFG_CPU_PROGRAM_MAP(pbaction_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", pbaction_state,  vblank_irq)

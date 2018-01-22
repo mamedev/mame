@@ -180,8 +180,8 @@ static ADDRESS_MAP_START( fromanc2_main_map, AS_PROGRAM, 16, fromanc2_state )
 	AM_RANGE(0x900000, 0x903fff) AM_WRITE(fromanc2_videoram_2_w)        // VRAM 0, 1 (2P)
 	AM_RANGE(0x980000, 0x983fff) AM_WRITE(fromanc2_videoram_3_w)        // VRAM 2, 3 (2P)
 
-	AM_RANGE(0xa00000, 0xa00fff) AM_RAM_DEVWRITE("lpalette", palette_device, write) AM_SHARE("lpalette") // PALETTE (1P)
-	AM_RANGE(0xa80000, 0xa80fff) AM_RAM_DEVWRITE("rpalette", palette_device, write) AM_SHARE("rpalette") // PALETTE (2P)
+	AM_RANGE(0xa00000, 0xa00fff) AM_RAM_DEVWRITE("lpalette", palette_device, write16) AM_SHARE("lpalette") // PALETTE (1P)
+	AM_RANGE(0xa80000, 0xa80fff) AM_RAM_DEVWRITE("rpalette", palette_device, write16) AM_SHARE("rpalette") // PALETTE (2P)
 
 	AM_RANGE(0xd00000, 0xd00023) AM_WRITE(fromanc2_gfxreg_0_w)          // SCROLL REG (1P/2P)
 	AM_RANGE(0xd00100, 0xd00123) AM_WRITE(fromanc2_gfxreg_2_w)          // SCROLL REG (1P/2P)
@@ -212,8 +212,8 @@ static ADDRESS_MAP_START( fromancr_main_map, AS_PROGRAM, 16, fromanc2_state )
 	AM_RANGE(0x900000, 0x903fff) AM_WRITE(fromancr_videoram_2_w)        // VRAM TEXT (1P/2P)
 	AM_RANGE(0x980000, 0x983fff) AM_WRITENOP                            // VRAM Unused ?
 
-	AM_RANGE(0xa00000, 0xa00fff) AM_RAM_DEVWRITE("lpalette", palette_device, write) AM_SHARE("lpalette") // PALETTE (1P)
-	AM_RANGE(0xa80000, 0xa80fff) AM_RAM_DEVWRITE("rpalette", palette_device, write) AM_SHARE("rpalette") // PALETTE (2P)
+	AM_RANGE(0xa00000, 0xa00fff) AM_RAM_DEVWRITE("lpalette", palette_device, write16) AM_SHARE("lpalette") // PALETTE (1P)
+	AM_RANGE(0xa80000, 0xa80fff) AM_RAM_DEVWRITE("rpalette", palette_device, write16) AM_SHARE("rpalette") // PALETTE (2P)
 
 	AM_RANGE(0xd00000, 0xd00023) AM_WRITE(fromancr_gfxreg_1_w)          // SCROLL REG (1P/2P)
 	AM_RANGE(0xd00200, 0xd002ff) AM_WRITENOP                            // ?
@@ -250,8 +250,8 @@ static ADDRESS_MAP_START( fromanc4_main_map, AS_PROGRAM, 16, fromanc2_state )
 	AM_RANGE(0xd90000, 0xd9ffff) AM_WRITE(fromanc4_videoram_1_w)    // VRAM BG (1P/2P)
 	AM_RANGE(0xda0000, 0xdaffff) AM_WRITE(fromanc4_videoram_2_w)    // VRAM TEXT (1P/2P)
 
-	AM_RANGE(0xdb0000, 0xdb0fff) AM_RAM_DEVWRITE("lpalette", palette_device, write) AM_SHARE("lpalette") // PALETTE (1P)
-	AM_RANGE(0xdc0000, 0xdc0fff) AM_RAM_DEVWRITE("rpalette", palette_device, write) AM_SHARE("rpalette") // PALETTE (2P)
+	AM_RANGE(0xdb0000, 0xdb0fff) AM_RAM_DEVWRITE("lpalette", palette_device, write16) AM_SHARE("lpalette") // PALETTE (1P)
+	AM_RANGE(0xdc0000, 0xdc0fff) AM_RAM_DEVWRITE("rpalette", palette_device, write16) AM_SHARE("rpalette") // PALETTE (2P)
 
 	AM_RANGE(0xd10000, 0xd10001) AM_READ(fromanc2_keymatrix_r)      // INPUT KEY MATRIX
 	AM_RANGE(0xd20000, 0xd20001) AM_READ_PORT("SYSTEM")
@@ -506,7 +506,7 @@ void fromanc2_state::machine_reset()
 	m_datalatch_2l = 0;
 }
 
-static MACHINE_CONFIG_START( fromanc2 )
+MACHINE_CONFIG_START(fromanc2_state::fromanc2)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000,32000000/2)      /* 16.00 MHz */
@@ -566,7 +566,7 @@ static MACHINE_CONFIG_START( fromanc2 )
 	MCFG_SOUND_ROUTE(2, "mono", 0.75)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( fromancr )
+MACHINE_CONFIG_START(fromanc2_state::fromancr)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000,32000000/2)      /* 16.00 MHz */
@@ -626,7 +626,7 @@ static MACHINE_CONFIG_START( fromancr )
 	MCFG_SOUND_ROUTE(2, "mono", 0.75)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( fromanc4 )
+MACHINE_CONFIG_START(fromanc2_state::fromanc4)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_32MHz/2)      /* 16.00 MHz */

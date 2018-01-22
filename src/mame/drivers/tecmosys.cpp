@@ -290,7 +290,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, tecmosys_state )
 	AM_RANGE(0x700000, 0x703fff) AM_RAM_WRITE(fg_tilemap_w) AM_SHARE("fgtilemap_ram") // fix ram
 	AM_RANGE(0x800000, 0x80ffff) AM_RAM AM_SHARE("spriteram") // obj ram
 	AM_RANGE(0x880000, 0x88000b) AM_READ(unk880000_r)
-	AM_RANGE(0x900000, 0x907fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette") // AM_WRITEONLY // obj pal
+	AM_RANGE(0x900000, 0x907fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette") // AM_WRITEONLY // obj pal
 
 	//AM_RANGE(0x980000, 0x9807ff) AM_WRITEONLY // bg pal
 	//AM_RANGE(0x980800, 0x980fff) AM_WRITE(paletteram_xGGGGGRRRRRBBBBB_word_w) AM_SHARE("paletteram") // fix pal
@@ -432,7 +432,7 @@ void tecmosys_state::machine_start()
 	save_item(NAME(m_device_value));
 }
 
-static MACHINE_CONFIG_START( deroon )
+MACHINE_CONFIG_START(tecmosys_state::deroon)
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz)
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", tecmosys_state,  irq1_line_hold)

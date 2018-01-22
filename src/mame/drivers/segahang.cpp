@@ -746,7 +746,7 @@ GFXDECODE_END
 //  GENERIC MACHINE DRIVERS
 //**************************************************************************
 
-static MACHINE_CONFIG_START( shared_base )
+MACHINE_CONFIG_START(segahang_state::shared_base)
 
 	// basic machine hardware
 	MCFG_CPU_ADD("maincpu", M68000, MASTER_CLOCK_25MHz/4)
@@ -784,13 +784,13 @@ static MACHINE_CONFIG_START( shared_base )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( hangon_base, shared_base )
+MACHINE_CONFIG_DERIVED(segahang_state::hangon_base, shared_base)
 	// video hardware
 	MCFG_SEGA_HANGON_SPRITES_ADD("sprites")
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( sharrier_base, shared_base )
+MACHINE_CONFIG_DERIVED(segahang_state::sharrier_base, shared_base)
 
 	// basic machine hardware
 	MCFG_CPU_MODIFY("maincpu")
@@ -805,7 +805,7 @@ static MACHINE_CONFIG_DERIVED( sharrier_base, shared_base )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( enduror_base, sharrier_base )
+MACHINE_CONFIG_DERIVED(segahang_state::enduror_base, sharrier_base)
 
 	// basic machine hardware
 	MCFG_CPU_REPLACE("maincpu", FD1089B, MASTER_CLOCK_10MHz)
@@ -813,7 +813,7 @@ static MACHINE_CONFIG_DERIVED( enduror_base, sharrier_base )
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", segahang_state, irq4_line_hold)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( endurord_base, sharrier_base )
+MACHINE_CONFIG_DERIVED(segahang_state::endurord_base, sharrier_base)
 
 	// basic machine hardware
 	MCFG_CPU_REPLACE("maincpu", M68000, MASTER_CLOCK_10MHz)
@@ -821,7 +821,7 @@ static MACHINE_CONFIG_DERIVED( endurord_base, sharrier_base )
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", segahang_state, irq4_line_hold)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( sound_board_2203 )
+MACHINE_CONFIG_START(segahang_state::sound_board_2203)
 
 	// basic machine hardware
 	MCFG_CPU_ADD("soundcpu", Z80, MASTER_CLOCK_8MHz/2)
@@ -849,7 +849,7 @@ static MACHINE_CONFIG_START( sound_board_2203 )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( sound_board_2203x2 )
+MACHINE_CONFIG_START(segahang_state::sound_board_2203x2)
 
 	// basic machine hardware
 	MCFG_CPU_ADD("soundcpu", Z80, MASTER_CLOCK_8MHz/2)
@@ -887,7 +887,7 @@ static MACHINE_CONFIG_START( sound_board_2203x2 )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( sound_board_2151 )
+MACHINE_CONFIG_START(segahang_state::sound_board_2151)
 
 	// basic machine hardware
 	MCFG_CPU_ADD("soundcpu", Z80, MASTER_CLOCK_8MHz/2)
@@ -914,12 +914,12 @@ MACHINE_CONFIG_END
 //  SPECIFIC MACHINE DRIVERS
 //**************************************************************************
 
-static MACHINE_CONFIG_DERIVED( hangon, hangon_base )
+MACHINE_CONFIG_DERIVED(segahang_state::hangon, hangon_base)
 	MCFG_FRAGMENT_ADD(sound_board_2203)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( shangupb, hangon_base )
+MACHINE_CONFIG_DERIVED(segahang_state::shangupb, hangon_base)
 	MCFG_FRAGMENT_ADD(sound_board_2151)
 
 	// not sure about these speeds, but at 6MHz, the road is not updated fast enough
@@ -930,14 +930,14 @@ static MACHINE_CONFIG_DERIVED( shangupb, hangon_base )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( shangonro, shangupb )
+MACHINE_CONFIG_DERIVED(segahang_state::shangonro, shangupb)
 	MCFG_CPU_REPLACE("subcpu", FD1094, 10000000)
 	MCFG_CPU_PROGRAM_MAP(sub_map)
 	MCFG_CPU_DECRYPTED_OPCODES_MAP(fd1094_decrypted_opcodes_map)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( sharrier, sharrier_base )
+MACHINE_CONFIG_DERIVED(segahang_state::sharrier, sharrier_base)
 	MCFG_FRAGMENT_ADD(sound_board_2203)
 
 	MCFG_CPU_MODIFY("maincpu")
@@ -951,25 +951,25 @@ static MACHINE_CONFIG_DERIVED( sharrier, sharrier_base )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( enduror, enduror_base )
+MACHINE_CONFIG_DERIVED(segahang_state::enduror, enduror_base)
 	MCFG_FRAGMENT_ADD(sound_board_2151)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( enduror1, enduror_base )
+MACHINE_CONFIG_DERIVED(segahang_state::enduror1, enduror_base)
 	MCFG_FRAGMENT_ADD(sound_board_2203)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( endurord, endurord_base )
+MACHINE_CONFIG_DERIVED(segahang_state::endurord, endurord_base)
 	MCFG_FRAGMENT_ADD(sound_board_2151)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( enduror1d, endurord_base )
+MACHINE_CONFIG_DERIVED(segahang_state::enduror1d, endurord_base)
 	MCFG_FRAGMENT_ADD(sound_board_2203)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( endurobl, sharrier_base )
+MACHINE_CONFIG_DERIVED(segahang_state::endurobl, sharrier_base)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map)
 
@@ -977,7 +977,7 @@ static MACHINE_CONFIG_DERIVED( endurobl, sharrier_base )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( endurob2, sharrier_base )
+MACHINE_CONFIG_DERIVED(segahang_state::endurob2, sharrier_base)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map)
 

@@ -104,7 +104,7 @@ const tiny_rom_entry *bsmt2000_device::device_rom_region() const
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( bsmt2000_device::device_add_mconfig )
+MACHINE_CONFIG_START(bsmt2000_device::device_add_mconfig)
 	MCFG_CPU_ADD("bsmt2000", TMS32015, DERIVED_CLOCK(1,1))
 	MCFG_CPU_PROGRAM_MAP(tms_program_map)
 	// data map is internal to the CPU

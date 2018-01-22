@@ -125,6 +125,7 @@ public:
 	required_device<dac_byte_interface> m_dac4;
 	required_device<dac_byte_interface> m_dac5;
 	required_device<dac_byte_interface> m_dac6;
+	void laserbas(machine_config &config);
 };
 
 TIMER_DEVICE_CALLBACK_MEMBER(  laserbas_state::laserbas_scanline )
@@ -347,7 +348,7 @@ static ADDRESS_MAP_START( laserbas_io, AS_IO, 8, laserbas_state )
 	AM_RANGE(0x20, 0x23) AM_WRITE(out_w)
 	AM_RANGE(0x40, 0x43) AM_DEVREADWRITE("pit0", pit8253_device, read, write)
 	AM_RANGE(0x44, 0x47) AM_DEVREADWRITE("pit1", pit8253_device, read, write)
-	AM_RANGE(0x80, 0x9f) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x80, 0x9f) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( laserbas )
@@ -405,7 +406,7 @@ INPUT_PORTS_END
 #define CLOCK 16680000
 #define PIT_CLOCK (CLOCK/16) // 12 divider ?
 
-static MACHINE_CONFIG_START( laserbas )
+MACHINE_CONFIG_START(laserbas_state::laserbas)
 
 	MCFG_CPU_ADD("maincpu", Z80, CLOCK / 4)
 	MCFG_CPU_PROGRAM_MAP(laserbas_memory)

@@ -115,7 +115,4 @@ typedef void (*machine_config_constructor)(machine_config &config, device_t *own
 // member templates that don't like incomplete types
 #include "device.ipp"
 
-template <class DriverClass> void game_driver::driver_init_helper_impl<DriverClass>::invoke(driver_init_helper const &helper, running_machine &machine)
-{ (machine.driver_data<DriverClass>()->*static_cast<driver_init_helper_impl<DriverClass> const &>(helper).m_method)(); }
-
 #endif  /* __EMU_H__ */

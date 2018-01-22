@@ -73,7 +73,7 @@ static ADDRESS_MAP_START( lemmings_map, AS_PROGRAM, 16, lemmings_state )
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM
 	AM_RANGE(0x120000, 0x1207ff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x140000, 0x1407ff) AM_RAM AM_SHARE("spriteram2")
-	AM_RANGE(0x160000, 0x160fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x160000, 0x160fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x170000, 0x17000f) AM_RAM_WRITE(lemmings_control_w) AM_SHARE("control_data")
 	AM_RANGE(0x190000, 0x19000f) AM_READ(lemmings_trackball_r)
 	AM_RANGE(0x1a0000, 0x1a3fff) AM_READWRITE(lem_protection_region_0_146_r,lem_protection_region_0_146_w)AM_SHARE("prot16ram") /* Protection device */
@@ -218,7 +218,7 @@ void lemmings_state::machine_start()
 {
 }
 
-static MACHINE_CONFIG_START( lemmings )
+MACHINE_CONFIG_START(lemmings_state::lemmings)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 14000000)

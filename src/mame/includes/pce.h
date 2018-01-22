@@ -76,6 +76,10 @@ public:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_MACHINE_START(pce);
 	DECLARE_MACHINE_RESET(mess_pce);
+	void pce_common(machine_config &config);
+	void pce(machine_config &config);
+	void tg16(machine_config &config);
+	void sgx(machine_config &config);
 };
 
 #endif /* PCE_H_ */

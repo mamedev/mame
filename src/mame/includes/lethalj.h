@@ -67,6 +67,8 @@ public:
 	inline void get_crosshair_xy(int player, int *x, int *y);
 	TMS340X0_SCANLINE_IND16_CB_MEMBER(scanline_update);
 
+	void lethalj(machine_config &config);
+	void gameroom(machine_config &config);
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };

@@ -22,6 +22,7 @@ public:
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
+	void scm_500(machine_config &config);
 //  required_device<cpu_device> m_maincpu;
 };
 
@@ -37,7 +38,7 @@ void scm_500_state::machine_reset()
 {
 }
 
-static MACHINE_CONFIG_START( scm_500 )
+MACHINE_CONFIG_START(scm_500_state::scm_500)
 
 	// unknown CPU
 

@@ -250,6 +250,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(fdchld_w);
 	DECLARE_PALETTE_INIT(itt3030);
 
+	void itt3030(machine_config &config);
 protected:
 	// driver_device overrides
 	virtual void machine_start() override;
@@ -657,7 +658,7 @@ PALETTE_INIT_MEMBER(itt3030_state, itt3030)
 	palette.set_pen_color(2, rgb_t::black());
 }
 
-static MACHINE_CONFIG_START( itt3030 )
+MACHINE_CONFIG_START(itt3030_state::itt3030)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80,XTAL_4MHz)

@@ -86,4 +86,9 @@ public:
 	WRITE16_MEMBER( nb_protection_region_0_146_w );
 	READ16_MEMBER( wf_protection_region_0_104_r );
 	WRITE16_MEMBER( wf_protection_region_0_104_w );
+	void wizdfire(machine_config &config);
+	void nitrobal(machine_config &config);
+	void hangzo(machine_config &config);
+	void schmeisr(machine_config &config);
+	void rohga(machine_config &config);
 };

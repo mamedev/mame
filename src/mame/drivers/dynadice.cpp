@@ -73,6 +73,7 @@ public:
 	uint32_t screen_update_dynadice(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
+	void dynadice(machine_config &config);
 };
 
 
@@ -238,7 +239,7 @@ void dynadice_state::machine_reset()
 	m_ay_data = 0;
 }
 
-static MACHINE_CONFIG_START( dynadice )
+MACHINE_CONFIG_START(dynadice_state::dynadice)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8080,18432000/8)

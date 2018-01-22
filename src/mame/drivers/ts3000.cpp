@@ -21,6 +21,7 @@ public:
 //      , m_maincpu(*this, "maincpu")
 	{ }
 
+void ts3000(machine_config &config);
 private:
 //  required_device<cpu_device> m_maincpu;
 };
@@ -36,7 +37,7 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START( ts3000 )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( ts3000 )
+MACHINE_CONFIG_START(ts3000_state::ts3000)
 	MCFG_CPU_ADD("maincpu", I8088, XTAL_14_31818MHz/3)  // no idea of clock
 	MCFG_CPU_PROGRAM_MAP(mem_map)
 	MCFG_CPU_IO_MAP(io_map)

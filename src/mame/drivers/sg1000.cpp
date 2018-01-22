@@ -517,7 +517,7 @@ void sf7000_state::machine_reset()
     MACHINE_CONFIG_START( sg1000 )
 -------------------------------------------------*/
 
-static MACHINE_CONFIG_START( sg1000 )
+MACHINE_CONFIG_START(sg1000_state::sg1000)
 	/* basic machine hardware */
 	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL_10_738635MHz/3)
 	MCFG_CPU_PROGRAM_MAP(sg1000_map)
@@ -554,7 +554,7 @@ MACHINE_CONFIG_END
     MACHINE_CONFIG_DERIVED( omv, sg1000 )
 -------------------------------------------------*/
 
-static MACHINE_CONFIG_DERIVED( omv, sg1000 )
+MACHINE_CONFIG_DERIVED(sg1000_state::omv, sg1000)
 	MCFG_CPU_MODIFY(Z80_TAG)
 	MCFG_CPU_PROGRAM_MAP(omv_map)
 	MCFG_CPU_IO_MAP(omv_io_map)
@@ -570,7 +570,7 @@ MACHINE_CONFIG_END
     MACHINE_CONFIG_START( sc3000 )
 -------------------------------------------------*/
 
-static MACHINE_CONFIG_START( sc3000 )
+MACHINE_CONFIG_START(sc3000_state::sc3000)
 	/* basic machine hardware */
 	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL_10_738635MHz/3) // LH0080A
 	MCFG_CPU_PROGRAM_MAP(sc3000_map)
@@ -608,7 +608,7 @@ MACHINE_CONFIG_END
     MACHINE_CONFIG_START( sf7000 )
 -------------------------------------------------*/
 
-static MACHINE_CONFIG_START( sf7000 )
+MACHINE_CONFIG_START(sf7000_state::sf7000)
 	/* basic machine hardware */
 	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL_10_738635MHz/3)
 	MCFG_CPU_PROGRAM_MAP(sf7000_map)

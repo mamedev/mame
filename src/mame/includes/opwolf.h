@@ -131,6 +131,9 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(opwolf_msm5205_vck_1);
 	DECLARE_WRITE_LINE_MEMBER(opwolf_msm5205_vck_2);
 
+	void opwolfb(machine_config &config);
+	void opwolfp(machine_config &config);
+	void opwolf(machine_config &config);
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };

@@ -139,6 +139,7 @@ public:
 	void render_jpeg();
 
 	void postload();
+	void sliver(machine_config &config);
 };
 
 void sliver_state::machine_start()
@@ -504,7 +505,7 @@ TIMER_DEVICE_CALLBACK_MEMBER ( sliver_state::obj_irq_cb )
 	m_maincpu->set_input_line(3, HOLD_LINE);
 }
 
-static MACHINE_CONFIG_START( sliver )
+MACHINE_CONFIG_START(sliver_state::sliver)
 	MCFG_CPU_ADD("maincpu", M68000, 12000000)
 	MCFG_CPU_PROGRAM_MAP(sliver_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", sliver_state, irq4_line_hold)

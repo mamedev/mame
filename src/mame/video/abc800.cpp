@@ -174,7 +174,7 @@ PALETTE_INIT_MEMBER( abc800c_state, abc800c )
 //  MACHINE_CONFIG_START( abc800c_video )
 //-------------------------------------------------
 
-MACHINE_CONFIG_START( abc800c_video )
+MACHINE_CONFIG_START(abc800c_state::abc800c_video)
 	MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
 	MCFG_SCREEN_UPDATE_DRIVER(abc800c_state, screen_update)
 	MCFG_SCREEN_REFRESH_RATE(50)
@@ -295,7 +295,7 @@ uint32_t abc800m_state::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 //  MACHINE_CONFIG_START( abc800m_video )
 //-------------------------------------------------
 
-MACHINE_CONFIG_START( abc800m_video )
+MACHINE_CONFIG_START(abc800m_state::abc800m_video)
 	MCFG_MC6845_ADD(MC6845_TAG, MC6845, SCREEN_TAG, ABC800_CCLK)
 	MCFG_MC6845_SHOW_BORDER_AREA(true)
 	MCFG_MC6845_CHAR_WIDTH(ABC800_CHAR_WIDTH)

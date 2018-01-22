@@ -315,7 +315,7 @@ GFXDECODE_END
 
 
 
-static MACHINE_CONFIG_START( espial )
+MACHINE_CONFIG_START(espial_state::espial)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 3072000)   /* 3.072 MHz */
@@ -352,7 +352,7 @@ static MACHINE_CONFIG_START( espial )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( netwars, espial )
+MACHINE_CONFIG_DERIVED(espial_state::netwars, espial)
 
 	/* basic machine hardware */
 

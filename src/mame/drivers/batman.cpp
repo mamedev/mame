@@ -107,9 +107,9 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, batman_state )
 	AM_RANGE(0x260030, 0x260031) AM_MIRROR(0x11ff8e) AM_DEVREAD8("jsa", atari_jsa_iii_device, main_response_r, 0x00ff)
 	AM_RANGE(0x260040, 0x260041) AM_MIRROR(0x11ff8e) AM_DEVWRITE8("jsa", atari_jsa_iii_device, main_command_w, 0x00ff)
 	AM_RANGE(0x260050, 0x260051) AM_MIRROR(0x11ff8e) AM_WRITE(latch_w)
-	AM_RANGE(0x260060, 0x260061) AM_MIRROR(0x11ff8e) AM_DEVWRITE("eeprom", eeprom_parallel_28xx_device, unlock_write)
+	AM_RANGE(0x260060, 0x260061) AM_MIRROR(0x11ff8e) AM_DEVWRITE("eeprom", eeprom_parallel_28xx_device, unlock_write16)
 	AM_RANGE(0x2a0000, 0x2a0001) AM_MIRROR(0x11fffe) AM_DEVWRITE("watchdog", watchdog_timer_device, reset16_w)
-	AM_RANGE(0x2e0000, 0x2e0fff) AM_MIRROR(0x100000) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x2e0000, 0x2e0fff) AM_MIRROR(0x100000) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x2effc0, 0x2effff) AM_MIRROR(0x100000) AM_DEVREADWRITE("vad", atari_vad_device, control_read, control_write)
 	AM_RANGE(0x2f0000, 0x2f1fff) AM_MIRROR(0x100000) AM_DEVWRITE("vad", atari_vad_device, playfield2_latched_msb_w) AM_SHARE("vad:playfield2")
 	AM_RANGE(0x2f2000, 0x2f3fff) AM_MIRROR(0x100000) AM_DEVWRITE("vad", atari_vad_device, playfield_latched_lsb_w) AM_SHARE("vad:playfield")
@@ -197,7 +197,7 @@ GFXDECODE_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( batman )
+MACHINE_CONFIG_START(batman_state::batman)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, ATARI_CLOCK_14MHz)

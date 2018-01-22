@@ -1396,7 +1396,7 @@ void brno_state::machine_reset()
 //  MACHINE_CONFIG( m5 )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( m5 )
+MACHINE_CONFIG_START(m5_state::m5)
 	// basic machine hardware
 	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL_14_31818MHz/4)
 	MCFG_CPU_PROGRAM_MAP(m5_mem)
@@ -1459,7 +1459,7 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG_DERIVED( ntsc, m5 )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_DERIVED( ntsc, m5 )
+MACHINE_CONFIG_DERIVED(m5_state::ntsc, m5)
 	// video hardware
 	MCFG_DEVICE_ADD( "tms9928a", TMS9928A, XTAL_10_738635MHz / 2 )
 	MCFG_TMS9928A_VRAM_SIZE(0x4000)
@@ -1473,7 +1473,7 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG_DERIVED( pal, m5 )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_DERIVED( pal, m5 )
+MACHINE_CONFIG_DERIVED(m5_state::pal, m5)
 	// video hardware
 	MCFG_DEVICE_ADD( "tms9928a", TMS9929A, XTAL_10_738635MHz / 2 )
 	MCFG_TMS9928A_VRAM_SIZE(0x4000)
@@ -1487,7 +1487,7 @@ MACHINE_CONFIG_END
 //-------------------------------------------------
 
 
-static MACHINE_CONFIG_DERIVED( brno, m5 )
+MACHINE_CONFIG_DERIVED(brno_state::brno, m5)
 
 	// basic machine hardware
 	MCFG_CPU_MODIFY(Z80_TAG)

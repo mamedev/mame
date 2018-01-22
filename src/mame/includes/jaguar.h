@@ -249,6 +249,11 @@ public:
 	IRQ_CALLBACK_MEMBER(jaguar_irq_callback);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( jaguar_cart );
 	DECLARE_QUICKLOAD_LOAD_MEMBER( jaguar );
+	void cojagr3k_rom(machine_config &config);
+	void jaguarcd(machine_config &config);
+	void jaguar(machine_config &config);
+	void cojag68k(machine_config &config);
+	void cojagr3k(machine_config &config);
 protected:
 	// timer IDs
 	enum

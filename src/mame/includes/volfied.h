@@ -72,6 +72,7 @@ public:
 	void cchip_init();
 	void cchip_reset();
 
+	void volfied(machine_config &config);
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };

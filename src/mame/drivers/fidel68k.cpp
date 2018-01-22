@@ -207,12 +207,17 @@ public:
 
 	// Excel 68000
 	DECLARE_WRITE8_MEMBER(fex68k_mux_w);
+	void fex68k(machine_config &config);
+	void fex68km2(machine_config &config);
+	void fex68km3(machine_config &config);
 
 	// Designer Master
 	DECLARE_WRITE8_MEMBER(fdes68k_control_w);
 	DECLARE_READ8_MEMBER(fdes68k_input_r);
 	DECLARE_WRITE8_MEMBER(fdes68k_lcd_w);
 	DECLARE_DRIVER_INIT(fdes2265);
+	void fdes2265(machine_config &config);
+	void fdes2325(machine_config &config);
 
 	// EAG(6114/6117)
 	DECLARE_DRIVER_INIT(eag);
@@ -222,6 +227,11 @@ public:
 	DECLARE_WRITE8_MEMBER(eag_7seg_w);
 	DECLARE_WRITE8_MEMBER(eag_mux_w);
 	DECLARE_READ8_MEMBER(eag_input2_r);
+	void eag(machine_config &config);
+	void eagv7(machine_config &config);
+	void eagv9(machine_config &config);
+	void eagv10(machine_config &config);
+	void eagv11(machine_config &config);
 };
 
 
@@ -529,7 +539,7 @@ INPUT_PORTS_END
     Machine Drivers
 ******************************************************************************/
 
-static MACHINE_CONFIG_START( fex68k )
+MACHINE_CONFIG_START(fidel68k_state::fex68k)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_12MHz) // HD68HC000P12
@@ -548,14 +558,14 @@ static MACHINE_CONFIG_START( fex68k )
 	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( fex68km2, fex68k )
+MACHINE_CONFIG_DERIVED(fidel68k_state::fex68km2, fex68k)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(fex68km2_map)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( fex68km3, fex68k )
+MACHINE_CONFIG_DERIVED(fidel68k_state::fex68km3, fex68k)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -563,7 +573,7 @@ static MACHINE_CONFIG_DERIVED( fex68km3, fex68k )
 	MCFG_CPU_PROGRAM_MAP(fex68km3_map)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( fdes2265 )
+MACHINE_CONFIG_START(fidel68k_state::fdes2265)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz) // MC68HC000P12F
@@ -582,7 +592,7 @@ static MACHINE_CONFIG_START( fdes2265 )
 	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( fdes2325, fdes2265 )
+MACHINE_CONFIG_DERIVED(fidel68k_state::fdes2325, fdes2265)
 
 	/* basic machine hardware */
 	MCFG_CPU_REPLACE("maincpu", M68EC020, XTAL_20MHz) // MC68EC020RP25
@@ -591,7 +601,7 @@ static MACHINE_CONFIG_DERIVED( fdes2325, fdes2265 )
 	MCFG_DEFAULT_LAYOUT(layout_fidel_desdis_68kg)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( eag )
+MACHINE_CONFIG_START(fidel68k_state::eag)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz)
@@ -622,7 +632,7 @@ static MACHINE_CONFIG_START( eag )
 	MCFG_SOFTWARE_LIST_ADD("cart_list", "fidel_scc")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( eagv7, eag )
+MACHINE_CONFIG_DERIVED(fidel68k_state::eagv7, eag)
 
 	/* basic machine hardware */
 	MCFG_CPU_REPLACE("maincpu", M68020, XTAL_20MHz)
@@ -631,21 +641,21 @@ static MACHINE_CONFIG_DERIVED( eagv7, eag )
 	MCFG_RAM_REMOVE("ram")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( eagv9, eagv7 )
+MACHINE_CONFIG_DERIVED(fidel68k_state::eagv9, eagv7)
 
 	/* basic machine hardware */
 	MCFG_CPU_REPLACE("maincpu", M68030, XTAL_32MHz)
 	MCFG_CPU_PROGRAM_MAP(eagv7_map)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( eagv10, eagv7 )
+MACHINE_CONFIG_DERIVED(fidel68k_state::eagv10, eagv7)
 
 	/* basic machine hardware */
 	MCFG_CPU_REPLACE("maincpu", M68040, XTAL_25MHz)
 	MCFG_CPU_PROGRAM_MAP(eagv11_map)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( eagv11, eagv7 )
+MACHINE_CONFIG_DERIVED(fidel68k_state::eagv11, eagv7)
 
 	/* basic machine hardware */
 	MCFG_CPU_REPLACE("maincpu", M68EC040, XTAL_36MHz*2*2) // wrong! should be M68EC060 @ 72MHz

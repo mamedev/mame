@@ -209,7 +209,7 @@ void dietgo_state::machine_start()
 {
 }
 
-static MACHINE_CONFIG_START( dietgo )
+MACHINE_CONFIG_START(dietgo_state::dietgo)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_28MHz/2) /* DE102 (verified on pcb) */

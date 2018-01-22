@@ -169,6 +169,7 @@ public:
 	int m_kbackctl;
 
 	void update_kback();
+	void victor9k(machine_config &config);
 };
 
 
@@ -674,7 +675,7 @@ void victor9k_state::machine_reset()
 //  MACHINE_CONFIG( victor9k )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( victor9k )
+MACHINE_CONFIG_START(victor9k_state::victor9k)
 	// basic machine hardware
 	MCFG_CPU_ADD(I8088_TAG, I8088, XTAL_30MHz/6)
 	MCFG_CPU_PROGRAM_MAP(victor9k_mem)

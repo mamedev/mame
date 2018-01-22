@@ -828,7 +828,7 @@ WRITE16_MEMBER(model1_state::md0_w)
 WRITE16_MEMBER(model1_state::p_w)
 {
 	uint16_t old = m_paletteram16[offset];
-	m_palette->write(space, offset, data, mem_mask);
+	m_palette->write16(space, offset, data, mem_mask);
 	if(0 && m_paletteram16[offset] != old)
 		logerror("XVIDEO: p_w %x, %04x @ %04x (%x)\n", offset, data, mem_mask, m_maincpu->pc());
 }
@@ -1614,7 +1614,7 @@ ROM_START( netmerc )
 	ROM_LOAD16_BYTE( "u2", 0x0001, 0x4000, CRC(c589f428) SHA1(98dc0114a5f89636b4e237ed954e19f1cfd186ab) )
 ROM_END
 
-static MACHINE_CONFIG_START( model1 )
+MACHINE_CONFIG_START(model1_state::model1)
 	MCFG_CPU_ADD("maincpu", V60, 16000000)
 	MCFG_CPU_PROGRAM_MAP(model1_mem)
 	MCFG_CPU_IO_MAP(model1_io)
@@ -1654,7 +1654,7 @@ static MACHINE_CONFIG_START( model1 )
 	MCFG_M1COMM_ADD("m1comm")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED(swa, model1)
+MACHINE_CONFIG_DERIVED(model1_state::swa, model1)
 	MCFG_SPEAKER_STANDARD_STEREO("dleft", "dright")
 	MCFG_DSBZ80_ADD(DSBZ80_TAG)
 	MCFG_SOUND_ROUTE(0, "dleft", 1.0)
@@ -1672,12 +1672,12 @@ static ADDRESS_MAP_START( polhemus_map, AS_PROGRAM, 16, model1_state )
 	AM_RANGE(0xf8000, 0xfffff) AM_ROM AM_REGION("polhemus", 0)
 ADDRESS_MAP_END
 
-static MACHINE_CONFIG_DERIVED( netmerc, model1 )
+MACHINE_CONFIG_DERIVED(model1_state::netmerc, model1)
 	MCFG_CPU_ADD("polhemus", I386SX, 16000000)
 	MCFG_CPU_PROGRAM_MAP(polhemus_map)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( model1_vr )
+MACHINE_CONFIG_START(model1_state::model1_vr)
 	MCFG_CPU_ADD("maincpu", V60, 16000000)
 	MCFG_CPU_PROGRAM_MAP(model1_vr_mem)
 	MCFG_CPU_IO_MAP(model1_vr_io)

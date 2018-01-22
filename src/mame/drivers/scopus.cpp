@@ -45,6 +45,7 @@ public:
 	DECLARE_READ8_MEMBER(memory_read_byte);
 	I8275_DRAW_CHARACTER_MEMBER(crtc_display_pixels);
 
+	void sagitta180(machine_config &config);
 private:
 	/* devices */
 	required_device<palette_device> m_palette;
@@ -165,7 +166,7 @@ READ8_MEMBER(sagitta180_state::memory_read_byte)
 	return prog_space.read_byte(offset);
 }
 
-static MACHINE_CONFIG_START( sagitta180 )
+MACHINE_CONFIG_START(sagitta180_state::sagitta180)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8080, XTAL_10MHz) /* guessed ! */

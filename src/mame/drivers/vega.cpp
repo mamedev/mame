@@ -168,6 +168,7 @@ public:
 	DECLARE_PALETTE_INIT(vega);
 	void draw_tilemap(screen_device& screen, bitmap_ind16& bitmap, const rectangle& cliprect);
 	uint32_t screen_update_vega(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void vega(machine_config &config);
 };
 
 WRITE8_MEMBER(vega_state::extern_w)
@@ -789,7 +790,7 @@ void vega_state::machine_start()
 }
 
 
-static MACHINE_CONFIG_START( vega )
+MACHINE_CONFIG_START(vega_state::vega)
 	MCFG_CPU_ADD("maincpu", I8035, 4000000)
 	MCFG_CPU_PROGRAM_MAP(vega_map)
 	MCFG_CPU_IO_MAP(vega_io_map)

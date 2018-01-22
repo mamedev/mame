@@ -122,6 +122,8 @@ public:
 	uint16_t m_irqs;
 	bool m_lb;
 	uint16_t m_scrl;
+	void mc7105(machine_config &config);
+	void vt240(machine_config &config);
 };
 
 void vt240_state::irq_encoder(int irq, int state)
@@ -638,7 +640,7 @@ static INPUT_PORTS_START( vt240 )
 	PORT_CONFSETTING(0x01, "Color")
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( vt240 )
+MACHINE_CONFIG_START(vt240_state::vt240)
 	MCFG_CPU_ADD("maincpu", T11, XTAL_7_3728MHz) // confirm
 	MCFG_CPU_PROGRAM_MAP(vt240_mem)
 	MCFG_T11_INITIAL_MODE(5 << 13)
@@ -700,7 +702,7 @@ static MACHINE_CONFIG_START( vt240 )
 	MCFG_X2212_ADD("x2212")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( mc7105, vt240 )
+MACHINE_CONFIG_DERIVED(vt240_state::mc7105, vt240)
 
 	MCFG_DEVICE_REMOVE("lk201")
 	MCFG_DEVICE_ADD("ms7004", MS7004, 0)

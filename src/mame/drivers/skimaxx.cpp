@@ -90,6 +90,7 @@ public:
 
 	virtual void machine_reset() override;
 	virtual void video_start() override;
+	void skimaxx(machine_config &config);
 };
 
 
@@ -493,7 +494,7 @@ void skimaxx_state::machine_reset()
  *
  *************************************/
 
-static MACHINE_CONFIG_START( skimaxx )
+MACHINE_CONFIG_START(skimaxx_state::skimaxx)
 	MCFG_CPU_ADD("maincpu", M68EC030, XTAL_40MHz)
 	MCFG_CPU_PROGRAM_MAP(68030_1_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", skimaxx_state,  irq3_line_hold)    // 1,3,7 are identical, rest is RTE

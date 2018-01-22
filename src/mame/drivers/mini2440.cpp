@@ -56,6 +56,7 @@ public:
 	DECLARE_WRITE16_MEMBER(s3c2440_i2s_data_w );
 	DECLARE_READ32_MEMBER(s3c2440_adc_data_r );
 
+	void mini2440(machine_config &config);
 };
 
 inline void mini2440_state::verboselog(int n_level, const char *s_fmt, ...)
@@ -219,7 +220,7 @@ DRIVER_INIT_MEMBER(mini2440_state,mini2440)
 	// do nothing
 }
 
-static MACHINE_CONFIG_START( mini2440 )
+MACHINE_CONFIG_START(mini2440_state::mini2440)
 	MCFG_CPU_ADD("maincpu", ARM920T, 400000000)
 	MCFG_CPU_PROGRAM_MAP(mini2440_map)
 

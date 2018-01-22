@@ -268,6 +268,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( apple2gs_doc_irq);
 	DECLARE_READ8_MEMBER(apple2gs_adc_read);
 
+	void apple2gs(machine_config &config);
+	void apple2gsr1(machine_config &config);
 };
 
 #endif /* APPLE2GS_H_ */

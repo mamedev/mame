@@ -67,4 +67,5 @@ public:
 	required_device<palette_device> m_palette;
 	required_device<tigeroad_spr_device> m_spritegen;
 	required_device<generic_latch_8_device> m_soundlatch;
+	void bionicc(machine_config &config);
 };

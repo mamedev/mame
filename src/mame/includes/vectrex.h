@@ -123,6 +123,8 @@ public:
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( vectrex_cart );
 	DECLARE_WRITE_LINE_MEMBER(vectrex_via_irq);
 
+	void vectrex(machine_config &config);
+	void raaspec(machine_config &config);
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 

@@ -113,7 +113,7 @@ DEVICE_ADDRESS_MAP_START(map, 16, h83008_device)
 	AM_RANGE(0xffffe8, 0xffffe9) AM_DEVREADWRITE8("adc",       h8_adc_device,             adcr_r,  adcr_w,  0x00ff)
 ADDRESS_MAP_END
 
-MACHINE_CONFIG_MEMBER(h83008_device::device_add_mconfig)
+MACHINE_CONFIG_START(h83008_device::device_add_mconfig)
 	MCFG_H8H_INTC_ADD("intc")
 	MCFG_H8_ADC_3006_ADD("adc", "intc", 23)
 	MCFG_H8_PORT_ADD("port4", h8_device::PORT_4, 0x00, 0x00)

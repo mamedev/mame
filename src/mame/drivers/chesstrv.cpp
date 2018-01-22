@@ -40,6 +40,8 @@ public:
 	uint8_t m_matrix;
 	//TIMER_DEVICE_CALLBACK_MEMBER(borisdpl_timer_interrupt);
 	required_device<cpu_device> m_maincpu;
+	void chesstrv(machine_config &config);
+	void borisdpl(machine_config &config);
 };
 
 WRITE8_MEMBER( chesstrv_state::ram_addr_w )
@@ -214,7 +216,7 @@ void chesstrv_state::machine_start()
 	save_item(NAME(m_matrix));
 }
 
-static MACHINE_CONFIG_START( chesstrv )
+MACHINE_CONFIG_START(chesstrv_state::chesstrv)
 	/* basic machine hardware */
 	MCFG_CPU_ADD( "maincpu", F8, 3000000 )      // Fairchild 3870
 	MCFG_CPU_PROGRAM_MAP( chesstrv_mem )
@@ -224,7 +226,7 @@ static MACHINE_CONFIG_START( chesstrv )
 	MCFG_DEFAULT_LAYOUT( layout_chesstrv )
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( borisdpl )
+MACHINE_CONFIG_START(chesstrv_state::borisdpl)
 	/* basic machine hardware */
 	MCFG_CPU_ADD( "maincpu", F8, 30000000 )     // Motorola SC80265P
 	MCFG_CPU_PROGRAM_MAP( chesstrv_mem )

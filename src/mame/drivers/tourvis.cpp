@@ -208,6 +208,7 @@ public:
 
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(tourvision_cart);
 
+	void tourvision(machine_config &config);
 private:
 	required_device<cpu_device> m_subcpu;
 	required_device<generic_slot_device> m_cart;
@@ -385,7 +386,7 @@ WRITE_LINE_MEMBER(tourvision_state::tourvision_timer_out)
 }
 
 
-static MACHINE_CONFIG_START( tourvision )
+MACHINE_CONFIG_START(tourvision_state::tourvision)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", H6280, PCE_MAIN_CLOCK/3)
 	MCFG_CPU_PROGRAM_MAP(pce_mem)

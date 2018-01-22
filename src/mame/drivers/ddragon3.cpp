@@ -255,7 +255,7 @@ READ16_MEMBER(wwfwfest_state::wwfwfest_paletteram_r)
 WRITE16_MEMBER(wwfwfest_state::wwfwfest_paletteram_w)
 {
 	offset = (offset & 0x000f) | (offset & 0x7fc0) >> 2;
-	m_palette->write(space, offset, data, mem_mask);
+	m_palette->write16(space, offset, data, mem_mask);
 }
 
 /*- Priority Control -*/
@@ -304,9 +304,9 @@ static ADDRESS_MAP_START( ddragon3_map, AS_PROGRAM, 16, ddragon3_state )
 	AM_RANGE(0x100002, 0x100003) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x00ff)
 	AM_RANGE(0x100004, 0x100005) AM_WRITE(irq6_ack_w)
 	AM_RANGE(0x100006, 0x100007) AM_WRITE(irq5_ack_w)
-	AM_RANGE(0x140000, 0x1405ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette") /* Palette RAM */
+	AM_RANGE(0x140000, 0x1405ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette") /* Palette RAM */
 	AM_RANGE(0x180000, 0x180fff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x1c0000, 0x1c3fff) AM_RAM /* working RAM */
+	AM_RANGE(0x1c0000, 0x1c3fff) AM_RAM /* work RAM */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( dd3b_map, AS_PROGRAM, 16, ddragon3_state )
@@ -315,7 +315,7 @@ static ADDRESS_MAP_START( dd3b_map, AS_PROGRAM, 16, ddragon3_state )
 	AM_RANGE(0x081000, 0x081fff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x082000, 0x0827ff) AM_RAM_WRITE(ddragon3_bg_videoram_w) AM_SHARE("bg_videoram") /* Background (32x32 Tiles - 2 by per tile) */
 	AM_RANGE(0x0c0000, 0x0c000f) AM_WRITE(ddragon3_scroll_w)
-	AM_RANGE(0x100000, 0x1005ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette") /* Palette RAM */
+	AM_RANGE(0x100000, 0x1005ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette") /* Palette RAM */
 	AM_RANGE(0x140000, 0x140001) AM_WRITE(ddragon3_vreg_w)
 	AM_RANGE(0x140002, 0x140003) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x00ff)
 	AM_RANGE(0x140004, 0x140005) AM_WRITE(irq6_ack_w)
@@ -325,7 +325,7 @@ static ADDRESS_MAP_START( dd3b_map, AS_PROGRAM, 16, ddragon3_state )
 	AM_RANGE(0x180002, 0x180003) AM_READ_PORT("IN1")
 	AM_RANGE(0x180004, 0x180005) AM_READ_PORT("IN2")
 	AM_RANGE(0x180006, 0x180007) AM_READ_PORT("IN3")
-	AM_RANGE(0x1c0000, 0x1c3fff) AM_RAM /* working RAM */
+	AM_RANGE(0x1c0000, 0x1c3fff) AM_RAM /* work RAM */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( ctribe_map, AS_PROGRAM, 16, ddragon3_state )
@@ -335,7 +335,7 @@ static ADDRESS_MAP_START( ctribe_map, AS_PROGRAM, 16, ddragon3_state )
 	AM_RANGE(0x082000, 0x0827ff) AM_RAM_WRITE(ddragon3_bg_videoram_w) AM_SHARE("bg_videoram") /* Background (32x32 Tiles - 2 by per tile) */
 	AM_RANGE(0x082800, 0x082fff) AM_RAM
 	AM_RANGE(0x0c0000, 0x0c000f) AM_READWRITE(ddragon3_scroll_r, ddragon3_scroll_w)
-	AM_RANGE(0x100000, 0x1005ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette") /* Palette RAM */
+	AM_RANGE(0x100000, 0x1005ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette") /* Palette RAM */
 	AM_RANGE(0x140000, 0x140001) AM_WRITE(ddragon3_vreg_w)
 	AM_RANGE(0x140002, 0x140003) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x00ff)
 	AM_RANGE(0x140004, 0x140005) AM_WRITE(irq6_ack_w)
@@ -345,7 +345,7 @@ static ADDRESS_MAP_START( ctribe_map, AS_PROGRAM, 16, ddragon3_state )
 	AM_RANGE(0x180002, 0x180003) AM_READ_PORT("IN1")
 	AM_RANGE(0x180004, 0x180005) AM_READ_PORT("IN2")
 	AM_RANGE(0x180006, 0x180007) AM_READ_PORT("IN3")
-	AM_RANGE(0x1c0000, 0x1c3fff) AM_RAM /* working RAM */
+	AM_RANGE(0x1c0000, 0x1c3fff) AM_RAM /* work RAM */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, wwfwfest_state )
@@ -814,7 +814,7 @@ void ddragon3_state::machine_reset()
 	m_bg_tilebase = 0;
 }
 
-static MACHINE_CONFIG_START( ddragon3 )
+MACHINE_CONFIG_START(ddragon3_state::ddragon3)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_20MHz / 2)
@@ -853,7 +853,7 @@ static MACHINE_CONFIG_START( ddragon3 )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.50)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( ddragon3b, ddragon3 )
+MACHINE_CONFIG_DERIVED(ddragon3_state::ddragon3b, ddragon3)
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(dd3b_map)
@@ -862,7 +862,7 @@ static MACHINE_CONFIG_DERIVED( ddragon3b, ddragon3 )
 	MCFG_SCREEN_VBLANK_CALLBACK(NOOP)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( ctribe, ddragon3 )
+MACHINE_CONFIG_DERIVED(ddragon3_state::ctribe, ddragon3)
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(ctribe_map)
@@ -889,7 +889,7 @@ static MACHINE_CONFIG_DERIVED( ctribe, ddragon3 )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( wwfwfest )
+MACHINE_CONFIG_START(wwfwfest_state::wwfwfest)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz / 2)  /* 24 crystal, 12 rated chip */
@@ -927,7 +927,7 @@ static MACHINE_CONFIG_START( wwfwfest )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.90)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( wwfwfstb, wwfwfest )
+MACHINE_CONFIG_DERIVED(wwfwfest_state::wwfwfstb, wwfwfest)
 	MCFG_VIDEO_START_OVERRIDE(wwfwfest_state,wwfwfstb)
 MACHINE_CONFIG_END
 

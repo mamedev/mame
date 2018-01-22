@@ -43,34 +43,34 @@
 	devcb = &adc0808_device::set_out_eoc_callback(*device, DEVCB_##_devcb);
 
 #define MCFG_ADC0808_IN_VREF_POS_CB(_class, _method) \
-	adc0808_device::set_in_vref_pos_callback(*device, adc0808_device::analog_read_delegate(&_class::_method, #_class "::" #_method, downcast<_class *>(owner)));
+	adc0808_device::set_in_vref_pos_callback(*device, adc0808_device::analog_read_delegate(&_class::_method, #_class "::" #_method, this));
 
 #define MCFG_ADC0808_IN_VREF_NEG_CB(_class, _method) \
-	adc0808_device::set_in_vref_neg_callback(*device, adc0808_device::analog_read_delegate(&_class::_method, #_class "::" #_method, downcast<_class *>(owner)));
+	adc0808_device::set_in_vref_neg_callback(*device, adc0808_device::analog_read_delegate(&_class::_method, #_class "::" #_method, this));
 
 #define MCFG_ADC0808_IN_IN_0_CB(_class, _method) \
-	adc0808_device::set_in_in_0_callback(*device, adc0808_device::analog_read_delegate(&_class::_method, #_class "::" #_method, downcast<_class *>(owner)));
+	adc0808_device::set_in_in_0_callback(*device, adc0808_device::analog_read_delegate(&_class::_method, #_class "::" #_method, this));
 
 #define MCFG_ADC0808_IN_IN_1_CB(_class, _method) \
-	adc0808_device::set_in_in_1_callback(*device, adc0808_device::analog_read_delegate(&_class::_method, #_class "::" #_method, downcast<_class *>(owner)));
+	adc0808_device::set_in_in_1_callback(*device, adc0808_device::analog_read_delegate(&_class::_method, #_class "::" #_method, this));
 
 #define MCFG_ADC0808_IN_IN_2_CB(_class, _method) \
-	adc0808_device::set_in_in_2_callback(*device, adc0808_device::analog_read_delegate(&_class::_method, #_class "::" #_method, downcast<_class *>(owner)));
+	adc0808_device::set_in_in_2_callback(*device, adc0808_device::analog_read_delegate(&_class::_method, #_class "::" #_method, this));
 
 #define MCFG_ADC0808_IN_IN_3_CB(_class, _method) \
-	adc0808_device::set_in_in_3_callback(*device, adc0808_device::analog_read_delegate(&_class::_method, #_class "::" #_method, downcast<_class *>(owner)));
+	adc0808_device::set_in_in_3_callback(*device, adc0808_device::analog_read_delegate(&_class::_method, #_class "::" #_method, this));
 
 #define MCFG_ADC0808_IN_IN_4_CB(_class, _method) \
-	adc0808_device::set_in_in_4_callback(*device, adc0808_device::analog_read_delegate(&_class::_method, #_class "::" #_method, downcast<_class *>(owner)));
+	adc0808_device::set_in_in_4_callback(*device, adc0808_device::analog_read_delegate(&_class::_method, #_class "::" #_method, this));
 
 #define MCFG_ADC0808_IN_IN_5_CB(_class, _method) \
-	adc0808_device::set_in_in_5_callback(*device, adc0808_device::analog_read_delegate(&_class::_method, #_class "::" #_method, downcast<_class *>(owner)));
+	adc0808_device::set_in_in_5_callback(*device, adc0808_device::analog_read_delegate(&_class::_method, #_class "::" #_method, this));
 
 #define MCFG_ADC0808_IN_IN_6_CB(_class, _method) \
-	adc0808_device::set_in_in_6_callback(*device, adc0808_device::analog_read_delegate(&_class::_method, #_class "::" #_method, downcast<_class *>(owner)));
+	adc0808_device::set_in_in_6_callback(*device, adc0808_device::analog_read_delegate(&_class::_method, #_class "::" #_method, this));
 
 #define MCFG_ADC0808_IN_IN_7_CB(_class, _method) \
-	adc0808_device::set_in_in_7_callback(*device, adc0808_device::analog_read_delegate(&_class::_method, #_class "::" #_method, downcast<_class *>(owner)));
+	adc0808_device::set_in_in_7_callback(*device, adc0808_device::analog_read_delegate(&_class::_method, #_class "::" #_method, this));
 
 // ======================> adc0808_device
 

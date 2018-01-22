@@ -307,6 +307,7 @@ public:
 	DECLARE_READ8_MEMBER(read_a);
 	DECLARE_WRITE8_MEMBER(write_b);
 	DECLARE_WRITE8_MEMBER(write_c);
+	void touchme(machine_config &config);
 };
 
 // handlers
@@ -377,7 +378,7 @@ INPUT_PORTS_END
 
 static const s16 touchme_speaker_levels[] = { 0, 0x7fff, -0x8000, 0 };
 
-static MACHINE_CONFIG_START( touchme )
+MACHINE_CONFIG_START(touchme_state::touchme)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", PIC1655, 300000) // approximation - RC osc. R=100K, C=47pF
@@ -423,6 +424,7 @@ public:
 	DECLARE_WRITE8_MEMBER(write_c);
 
 	DECLARE_INPUT_CHANGED_MEMBER(reset_button);
+	void pabball(machine_config &config);
 };
 
 // handlers
@@ -485,7 +487,7 @@ INPUT_CHANGED_MEMBER(pabball_state::reset_button)
 	m_maincpu->set_input_line(INPUT_LINE_RESET, newval ? ASSERT_LINE : CLEAR_LINE);
 }
 
-static MACHINE_CONFIG_START( pabball )
+MACHINE_CONFIG_START(pabball_state::pabball)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", PIC1655, 1200000) // approximation - RC osc. R=18K, C=27pF
@@ -528,6 +530,7 @@ public:
 	DECLARE_WRITE8_MEMBER(write_b);
 	DECLARE_READ8_MEMBER(read_c);
 	DECLARE_WRITE8_MEMBER(write_c);
+	void melodym(machine_config &config);
 };
 
 // handlers
@@ -599,7 +602,7 @@ static INPUT_PORTS_START( melodym )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_0) PORT_NAME("Note")
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( melodym )
+MACHINE_CONFIG_START(melodym_state::melodym)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", PIC1655, 1000000) // approximation
@@ -647,6 +650,7 @@ public:
 	void update_speaker();
 	DECLARE_WRITE8_MEMBER(write_b);
 	DECLARE_WRITE8_MEMBER(write_c);
+	void maniac(machine_config &config);
 };
 
 // handlers
@@ -698,7 +702,7 @@ INPUT_PORTS_END
 
 static const s16 maniac_speaker_levels[] = { 0, 0x7fff, -0x8000, 0 };
 
-static MACHINE_CONFIG_START( maniac )
+MACHINE_CONFIG_START(maniac_state::maniac)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", PIC1655, 1000000) // approximation - RC osc. R=~13.4K, C=470pF
@@ -749,6 +753,7 @@ public:
 
 	void set_clock();
 	DECLARE_INPUT_CHANGED_MEMBER(speed_switch);
+	void matchme(machine_config &config);
 
 protected:
 	virtual void machine_reset() override;
@@ -846,7 +851,7 @@ void matchme_state::machine_reset()
 	set_clock();
 }
 
-static MACHINE_CONFIG_START( matchme )
+MACHINE_CONFIG_START(matchme_state::matchme)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", PIC1655, 1200000) // see set_clock
@@ -905,6 +910,7 @@ public:
 	void speaker_decay_reset();
 	TIMER_DEVICE_CALLBACK_MEMBER(speaker_decay_sim);
 	double m_speaker_volume;
+	void leboom(machine_config &config);
 
 protected:
 	virtual void machine_start() override;
@@ -1001,7 +1007,7 @@ void leboom_state::machine_start()
 	save_item(NAME(m_speaker_volume));
 }
 
-static MACHINE_CONFIG_START( leboom )
+MACHINE_CONFIG_START(leboom_state::leboom)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", PIC1655, 1000000) // approximation
@@ -1046,6 +1052,7 @@ public:
 	DECLARE_READ8_MEMBER(read_a);
 	DECLARE_WRITE8_MEMBER(write_b);
 	DECLARE_WRITE8_MEMBER(write_c);
+	void tbaskb(machine_config &config);
 };
 
 // handlers
@@ -1110,7 +1117,7 @@ static INPUT_PORTS_START( tbaskb )
 	PORT_CONFSETTING(    0x00, "2" )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( tbaskb )
+MACHINE_CONFIG_START(tbaskb_state::tbaskb)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", PIC1655, 950000) // approximation - RC osc. R=18K, C=47pF
@@ -1157,6 +1164,7 @@ public:
 	DECLARE_WRITE8_MEMBER(write_b);
 	DECLARE_WRITE8_MEMBER(write_c);
 	DECLARE_WRITE8_MEMBER(write_d);
+	void rockpin(machine_config &config);
 };
 
 // handlers
@@ -1218,7 +1226,7 @@ INPUT_PORTS_END
 
 static const s16 rockpin_speaker_levels[] = { 0, 0x7fff, -0x8000, 0 };
 
-static MACHINE_CONFIG_START( rockpin )
+MACHINE_CONFIG_START(rockpin_state::rockpin)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", PIC1650, 450000) // approximation - RC osc. R=47K, C=47pF
@@ -1271,6 +1279,7 @@ public:
 	DECLARE_READ8_MEMBER(read_a);
 	DECLARE_WRITE8_MEMBER(write_b);
 	DECLARE_WRITE8_MEMBER(write_c);
+	void hccbaskb(machine_config &config);
 };
 
 // handlers
@@ -1335,7 +1344,7 @@ static INPUT_PORTS_START( hccbaskb )
 	PORT_CONFSETTING(    0x00, "2" )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( hccbaskb )
+MACHINE_CONFIG_START(hccbaskb_state::hccbaskb)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", PIC1655, 950000) // approximation - RC osc. R=15K, C=47pF
@@ -1384,6 +1393,7 @@ public:
 	DECLARE_READ8_MEMBER(read_a);
 	DECLARE_WRITE8_MEMBER(write_b);
 	DECLARE_WRITE8_MEMBER(write_c);
+	void ttfball(machine_config &config);
 };
 
 // handlers
@@ -1486,7 +1496,7 @@ static INPUT_PORTS_START( ttfballa )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_16WAY
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( ttfball )
+MACHINE_CONFIG_START(ttfball_state::ttfball)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", PIC1655, 1000000) // approximation - RC osc. R=27K(set 1) or 33K(set 2), C=68pF
@@ -1532,6 +1542,7 @@ public:
 	DECLARE_WRITE8_MEMBER(write_b);
 	DECLARE_WRITE8_MEMBER(write_c);
 	DECLARE_WRITE8_MEMBER(write_d);
+	void uspbball(machine_config &config);
 };
 
 // handlers
@@ -1589,7 +1600,7 @@ static INPUT_PORTS_START( uspbball )
 	PORT_CONFSETTING(    0x00, "2" )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( uspbball )
+MACHINE_CONFIG_START(uspbball_state::uspbball)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", PIC1650, 1000000) // approximation - RC osc. R=22K, C=47pF
@@ -1643,6 +1654,7 @@ public:
 	DECLARE_WRITE8_MEMBER(write_b);
 	DECLARE_WRITE8_MEMBER(write_c);
 	DECLARE_WRITE8_MEMBER(write_d);
+	void us2pfball(machine_config &config);
 };
 
 // handlers
@@ -1723,7 +1735,7 @@ static INPUT_PORTS_START( us2pfball )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START ) PORT_NAME("Status/Score") // S
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( us2pfball )
+MACHINE_CONFIG_START(us2pfball_state::us2pfball)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", PIC1650, 800000) // approximation - RC osc. R=39K, C=75pF

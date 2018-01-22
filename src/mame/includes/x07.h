@@ -282,4 +282,5 @@ public:
 	TIMER_CALLBACK_MEMBER(rstb_clear);
 	TIMER_CALLBACK_MEMBER(beep_stop);
 	TIMER_DEVICE_CALLBACK_MEMBER(blink_timer);
+	void x07(machine_config &config);
 };

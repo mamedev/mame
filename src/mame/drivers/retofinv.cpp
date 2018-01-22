@@ -409,7 +409,7 @@ INTERRUPT_GEN_MEMBER(retofinv_state::sub_vblank_irq)
 }
 
 
-static MACHINE_CONFIG_START( retofinv )
+MACHINE_CONFIG_START(retofinv_state::retofinv)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_18_432MHz/6)    /* XTAL and divider verified, 3.072 MHz */
@@ -465,13 +465,13 @@ static MACHINE_CONFIG_START( retofinv )
 MACHINE_CONFIG_END
 
 /* bootleg which has different palette clut */
-static MACHINE_CONFIG_DERIVED( retofinvb1, retofinv )
+MACHINE_CONFIG_DERIVED(retofinv_state::retofinvb1, retofinv)
 	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_INIT_OWNER(retofinv_state, retofinv_bl)
 MACHINE_CONFIG_END
 
 /* bootleg which has no mcu */
-static MACHINE_CONFIG_DERIVED( retofinvb_nomcu, retofinv )
+MACHINE_CONFIG_DERIVED(retofinv_state::retofinvb_nomcu, retofinv)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(bootleg_map)
 
@@ -482,7 +482,7 @@ static MACHINE_CONFIG_DERIVED( retofinvb_nomcu, retofinv )
 MACHINE_CONFIG_END
 
 /* bootleg which has different pallete clut and also has no mcu */
-static MACHINE_CONFIG_DERIVED( retofinvb1_nomcu, retofinvb1 )
+MACHINE_CONFIG_DERIVED(retofinv_state::retofinvb1_nomcu, retofinvb1)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(bootleg_map)
 

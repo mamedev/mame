@@ -112,6 +112,74 @@ public:
 
 	DECLARE_DRIVER_INIT(neogeo);
 
+	void neogeo_base(machine_config &config);
+	void neogeo_arcade(machine_config &config);
+	void mslug3b6(machine_config &config);
+	void s1945p(machine_config &config);
+	void rotd(machine_config &config);
+	void mslug4(machine_config &config);
+	void kof2003(machine_config &config);
+	void lans2004(machine_config &config);
+	void ms5plus(machine_config &config);
+	void kof2k4se(machine_config &config);
+	void kof2002(machine_config &config);
+	void kof2001(machine_config &config);
+	void svcplus(machine_config &config);
+	void kf2k5uni(machine_config &config);
+	void garou(machine_config &config);
+	void sbp(machine_config &config);
+	void cthd2k3(machine_config &config);
+	void ct2k3sp(machine_config &config);
+	void kof2000n(machine_config &config);
+	void mslug3(machine_config &config);
+	void kog(machine_config &config);
+	void fatfur2(machine_config &config);
+	void garouh(machine_config &config);
+	void ganryu(machine_config &config);
+	void zupapa(machine_config &config);
+	void neobase(machine_config &config);
+	void kof10th(machine_config &config);
+	void mslug5(machine_config &config);
+	void garoubl(machine_config &config);
+	void ct2k3sa(machine_config &config);
+	void nitd(machine_config &config);
+	void samsh5sp(machine_config &config);
+	void kof98(machine_config &config);
+	void kf2k3pl(machine_config &config);
+	void mvs(machine_config &config);
+	void ms4plus(machine_config &config);
+	void samsho5b(machine_config &config);
+	void popbounc(machine_config &config);
+	void svcplusa(machine_config &config);
+	void kof2002b(machine_config &config);
+	void svcboot(machine_config &config);
+	void kof2000(machine_config &config);
+	void samsho5(machine_config &config);
+	void kf2k2mp2(machine_config &config);
+	void pnyaa(machine_config &config);
+	void mslug3h(machine_config &config);
+	void vliner(machine_config &config);
+	void jockeygp(machine_config &config);
+	void matrim(machine_config &config);
+	void matrimbl(machine_config &config);
+	void kof97oro(machine_config &config);
+	void kizuna4p(machine_config &config);
+	void mslugx(machine_config &config);
+	void kf2k2pls(machine_config &config);
+	void kf10thep(machine_config &config);
+	void sengoku3(machine_config &config);
+	void neogeo_mj(machine_config &config);
+	void kf2k3upl(machine_config &config);
+	void preisle2(machine_config &config);
+	void svcsplus(machine_config &config);
+	void kf2k3bl(machine_config &config);
+	void kof99(machine_config &config);
+	void svc(machine_config &config);
+	void kof2003h(machine_config &config);
+	void kof99k(machine_config &config);
+	void irrmaze(machine_config &config);
+	void kf2k2mp(machine_config &config);
+	void bangbead(machine_config &config);
 protected:
 	void common_machine_start();
 
@@ -255,6 +323,7 @@ class aes_state : public neogeo_state
 	DECLARE_INPUT_CHANGED_MEMBER(aes_jp1);
 	DECLARE_MACHINE_START(aes);
 
+	void aes(machine_config &config);
 protected:
 	required_ioport m_io_in2;
 };
@@ -299,12 +368,11 @@ class neopcb_state : public neogeo_state
 	required_device<cmc_prot_device> m_cmc_prot;
 	required_device<pcm2_prot_device> m_pcm2_prot;
 	required_device<pvc_prot_device> m_pvc_prot;
+	void neopcb(machine_config &config);
 };
 
 
 /*----------- defined in drivers/neogeo.c -----------*/
 
-MACHINE_CONFIG_EXTERN( neogeo_base );
-MACHINE_CONFIG_EXTERN( neogeo_arcade );
 INPUT_PORTS_EXTERN(neogeo);
 INPUT_PORTS_EXTERN(aes);

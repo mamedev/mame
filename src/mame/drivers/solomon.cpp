@@ -57,7 +57,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, solomon_state )
 	AM_RANGE(0xd800, 0xdbff) AM_RAM_WRITE(solomon_colorram2_w) AM_SHARE("colorram2")
 	AM_RANGE(0xdc00, 0xdfff) AM_RAM_WRITE(solomon_videoram2_w) AM_SHARE("videoram2")
 	AM_RANGE(0xe000, 0xe07f) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0xe400, 0xe5ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0xe400, 0xe5ff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
 	AM_RANGE(0xe600, 0xe600) AM_READ_PORT("P1")
 	AM_RANGE(0xe601, 0xe601) AM_READ_PORT("P2")
 	AM_RANGE(0xe602, 0xe602) AM_READ_PORT("SYSTEM")
@@ -206,7 +206,7 @@ INTERRUPT_GEN_MEMBER(solomon_state::vblank_irq)
 
 
 
-static MACHINE_CONFIG_START( solomon )
+MACHINE_CONFIG_START(solomon_state::solomon)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 4000000)   /* 4.0 MHz (?????) */

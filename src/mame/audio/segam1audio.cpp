@@ -52,7 +52,7 @@ DEFINE_DEVICE_TYPE(SEGAM1AUDIO, segam1audio_device, "segam1audio", "Sega Model 1
 // device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( segam1audio_device::device_add_mconfig )
+MACHINE_CONFIG_START(segam1audio_device::device_add_mconfig)
 	MCFG_CPU_ADD(M68000_TAG, M68000, 10000000)  // verified on real h/w
 	MCFG_CPU_PROGRAM_MAP(segam1audio_map)
 

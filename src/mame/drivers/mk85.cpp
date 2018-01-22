@@ -37,6 +37,7 @@ public:
 	virtual void video_start() override;
 	uint32_t screen_update_mk85(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
+	void mk85(machine_config &config);
 };
 
 
@@ -64,7 +65,7 @@ uint32_t mk85_state::screen_update_mk85(screen_device &screen, bitmap_ind16 &bit
 	return 0;
 }
 
-static MACHINE_CONFIG_START( mk85 )
+MACHINE_CONFIG_START(mk85_state::mk85)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", K1801VM2, XTAL_4MHz)
 	MCFG_T11_INITIAL_MODE(0)

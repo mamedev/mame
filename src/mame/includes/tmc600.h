@@ -85,10 +85,8 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(blink_tick);
 	CDP1869_CHAR_RAM_READ_MEMBER(tmc600_char_ram_r);
 	CDP1869_PCB_READ_MEMBER(tmc600_pcb_r);
+	void tmc600(machine_config &config);
+	void tmc600_video(machine_config &config);
 };
-
-// ---------- defined in video/tmc600.c ----------
-
-MACHINE_CONFIG_EXTERN( tmc600_video );
 
 #endif

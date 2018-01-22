@@ -325,7 +325,7 @@ static GFXDECODE_START( magmax )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( magmax )
+MACHINE_CONFIG_START(magmax_state::magmax)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz/2)   /* verified on pcb */

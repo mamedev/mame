@@ -48,6 +48,7 @@ public:
 	DECLARE_READ8_MEMBER(sc6_input_r);
 	DECLARE_READ_LINE_MEMBER(sc6_input6_r);
 	DECLARE_READ_LINE_MEMBER(sc6_input7_r);
+	void sc6(machine_config &config);
 };
 
 
@@ -144,7 +145,7 @@ INPUT_PORTS_END
     Machine Drivers
 ******************************************************************************/
 
-static MACHINE_CONFIG_START( sc6 )
+MACHINE_CONFIG_START(fidelmcs48_state::sc6)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8040, XTAL_11MHz)

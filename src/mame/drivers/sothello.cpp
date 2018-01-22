@@ -73,6 +73,7 @@ public:
 	DECLARE_WRITE8_MEMBER(msm_cfg_w);
 	DECLARE_WRITE_LINE_MEMBER(adpcm_int);
 
+	void sothello(machine_config &config);
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -344,7 +345,7 @@ void sothello_state::machine_reset()
 	m_msm_data = 0;
 }
 
-static MACHINE_CONFIG_START( sothello )
+MACHINE_CONFIG_START(sothello_state::sothello)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_21_4772MHz / 6)

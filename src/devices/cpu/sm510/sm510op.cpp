@@ -408,7 +408,7 @@ void sm510_base_device::op_rme()
 
 void sm510_base_device::op_tmel()
 {
-	// TMEL: skip next if rest signal is set, reset it
+	// TMEL: skip next if melody stop flag is set, reset it
 	m_skip = ((m_melody_rd & 2) != 0);
 	m_melody_rd &= ~2;
 }

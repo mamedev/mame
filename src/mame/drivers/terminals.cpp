@@ -20,6 +20,7 @@ public:
 		//, m_p_chargen(*this, "chargen")
 	{ }
 
+		void terminals(machine_config &config);
 private:
 	required_device<cpu_device> m_maincpu;
 	//required_region_ptr<u8> m_p_chargen;
@@ -31,7 +32,7 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START( terminals )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( terminals )
+MACHINE_CONFIG_START(terminals_state::terminals)
 	MCFG_CPU_ADD("maincpu", Z80, 2'000'000)
 	MCFG_CPU_PROGRAM_MAP(mem_map)
 MACHINE_CONFIG_END

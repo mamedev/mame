@@ -42,6 +42,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	void summit(machine_config &config);
 };
 
 
@@ -304,7 +305,7 @@ PALETTE_INIT_MEMBER(summit_state, summit)
 {
 }
 
-static MACHINE_CONFIG_START( summit )
+MACHINE_CONFIG_START(summit_state::summit)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80,4000000)
 	MCFG_CPU_PROGRAM_MAP(mainmap)

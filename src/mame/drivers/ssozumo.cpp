@@ -197,7 +197,7 @@ INTERRUPT_GEN_MEMBER(ssozumo_state::sound_timer_irq)
 		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
-static MACHINE_CONFIG_START( ssozumo )
+MACHINE_CONFIG_START(ssozumo_state::ssozumo)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, 1200000) /* 1.2 MHz ???? */

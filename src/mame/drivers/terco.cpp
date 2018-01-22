@@ -265,6 +265,7 @@ public:
 	//,m_brg(*this, "brg")
 	//,m_ay3600(*this, "ay3600")
 	{ }
+	void t4490(machine_config &config);
 private:
 	required_device<m6800_cpu_device> m_maincpu;
   //    virtual void machine_reset() override { m_maincpu->reset(); LOG("--->%s()\n", FUNCNAME); };
@@ -290,7 +291,7 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START( t4490 )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( t4490 )
+MACHINE_CONFIG_START(t4490_state::t4490)
 	MCFG_CPU_ADD("maincpu", M6800, XTAL_8MHz/4) // divided by a MC6875
 	MCFG_CPU_PROGRAM_MAP(t4490_map)
 

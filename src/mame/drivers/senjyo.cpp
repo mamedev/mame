@@ -129,7 +129,7 @@ static ADDRESS_MAP_START( senjyo_map, AS_PROGRAM, 8, senjyo_state )
 	AM_RANGE(0x9000, 0x93ff) AM_RAM_WRITE(fgvideoram_w) AM_SHARE("fgvideoram")
 	AM_RANGE(0x9400, 0x97ff) AM_RAM_WRITE(fgcolorram_w) AM_SHARE("fgcolorram")
 	AM_RANGE(0x9800, 0x987f) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x9c00, 0x9dff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x9c00, 0x9dff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
 	AM_RANGE(0x9e00, 0x9e1f) AM_RAM AM_SHARE("fgscroll")
 	AM_RANGE(0x9e20, 0x9e21) AM_RAM AM_SHARE("scrolly3")
 /*  AM_RANGE(0x9e22, 0x9e23) height of the layer (Senjyo only, fixed at 0x380) */
@@ -200,7 +200,7 @@ static ADDRESS_MAP_START( starforb_map, AS_PROGRAM, 8, senjyo_state )
 	AM_RANGE(0x9000, 0x93ff) AM_RAM_WRITE(fgvideoram_w) AM_SHARE("fgvideoram")
 	AM_RANGE(0x9400, 0x97ff) AM_RAM_WRITE(fgcolorram_w) AM_SHARE("fgcolorram")
 	AM_RANGE(0x9800, 0x987f) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x9c00, 0x9dff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x9c00, 0x9dff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
 	/* The format / use of the ram here is different on the bootleg */
 	AM_RANGE(0x9e20, 0x9e21) AM_RAM AM_SHARE("scrolly3")
 	AM_RANGE(0x9e25, 0x9e25) AM_RAM AM_SHARE("scrollx3")
@@ -550,7 +550,7 @@ static GFXDECODE_START( senjyo )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( senjyo )
+MACHINE_CONFIG_START(senjyo_state::senjyo)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 4000000)   /* 4 MHz? */
@@ -606,7 +606,7 @@ MACHINE_CONFIG_END
 
 
 
-static MACHINE_CONFIG_DERIVED( senjyox_e, senjyo )
+MACHINE_CONFIG_DERIVED(senjyo_state::senjyox_e, senjyo)
 	MCFG_CPU_REPLACE("maincpu", SEGA_315_5015, 4000000)   /* 4 MHz? */
 	MCFG_CPU_PROGRAM_MAP(senjyo_map)
 	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map)
@@ -614,7 +614,7 @@ static MACHINE_CONFIG_DERIVED( senjyox_e, senjyo )
 	MCFG_SEGACRPT_SET_DECRYPTED_TAG(":decrypted_opcodes")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( senjyox_a, senjyo )
+MACHINE_CONFIG_DERIVED(senjyo_state::senjyox_a, senjyo)
 	MCFG_CPU_REPLACE("maincpu", SEGA_315_5018, 4000000)   /* 4 MHz? */
 	MCFG_CPU_PROGRAM_MAP(senjyo_map)
 	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map)
@@ -623,7 +623,7 @@ static MACHINE_CONFIG_DERIVED( senjyox_a, senjyo )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( starforb, senjyox_e )
+MACHINE_CONFIG_DERIVED(senjyo_state::starforb, senjyox_e)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")

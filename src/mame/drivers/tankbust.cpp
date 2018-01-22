@@ -330,7 +330,7 @@ INTERRUPT_GEN_MEMBER(tankbust_state::vblank_irq)
 		device.execute().set_input_line(0, HOLD_LINE);
 }
 
-static MACHINE_CONFIG_START( tankbust )
+MACHINE_CONFIG_START(tankbust_state::tankbust)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_14_31818MHz/2)    /* Verified on PCB */

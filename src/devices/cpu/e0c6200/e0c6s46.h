@@ -57,7 +57,7 @@ enum
 
 // lcd driver
 #define MCFG_E0C6S46_PIXEL_UPDATE_CB(_class, _method) \
-	e0c6s46_device::static_set_pixel_update_cb(*device, e0c6s46_device::pixel_update_delegate(&_class::_method, #_class "::" #_method, downcast<_class *>(owner)));
+	e0c6s46_device::static_set_pixel_update_cb(*device, e0c6s46_device::pixel_update_delegate(&_class::_method, #_class "::" #_method, this));
 
 #define E0C6S46_PIXEL_UPDATE(name) void name(bitmap_ind16 &bitmap, const rectangle &cliprect, int contrast, int seg, int com, int state)
 

@@ -96,7 +96,7 @@ const float cs4031_device::m_dma_clock_divider[] =
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( cs4031_device::device_add_mconfig )
+MACHINE_CONFIG_START(cs4031_device::device_add_mconfig)
 	MCFG_DEVICE_ADD("dma1", AM9517A, 0)
 	MCFG_I8237_OUT_HREQ_CB(DEVWRITELINE("dma2", am9517a_device, dreq0_w))
 	MCFG_I8237_OUT_EOP_CB(WRITELINE(cs4031_device, dma1_eop_w))

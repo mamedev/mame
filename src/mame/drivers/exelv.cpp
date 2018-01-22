@@ -115,6 +115,8 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(exelv_hblank_interrupt);
 
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( exelvision_cartridge );
+	void exeltel(machine_config &config);
+	void exl100(machine_config &config);
 };
 
 
@@ -473,7 +475,7 @@ MACHINE_START_MEMBER( exelv_state, exeltel)
 }
 
 
-static MACHINE_CONFIG_START( exl100 )
+MACHINE_CONFIG_START(exelv_state::exl100)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", TMS7020_EXL, XTAL_4_9152MHz)
@@ -529,7 +531,7 @@ static MACHINE_CONFIG_START( exl100 )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( exeltel )
+MACHINE_CONFIG_START(exelv_state::exeltel)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", TMS7040, XTAL_4_9152MHz)

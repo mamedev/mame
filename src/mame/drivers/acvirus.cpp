@@ -83,6 +83,7 @@ public:
 	virtual void machine_reset() override;
 
 	DECLARE_DRIVER_INIT(virus);
+	void virus(machine_config &config);
 };
 
 void acvirus_state::machine_start()
@@ -100,7 +101,7 @@ static ADDRESS_MAP_START( virus_map, AS_PROGRAM, 8, acvirus_state )
 	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("rombank")
 ADDRESS_MAP_END
 
-static MACHINE_CONFIG_START( virus )
+MACHINE_CONFIG_START(acvirus_state::virus)
 	MCFG_CPU_ADD("maincpu", I8052, XTAL_12MHz)
 	MCFG_CPU_PROGRAM_MAP(virus_map)
 

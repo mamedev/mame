@@ -160,7 +160,7 @@ static ADDRESS_MAP_START( cchip_map, AS_PROGRAM, 8, taito_cchip_device )
 	AM_RANGE(0x2000, 0x3fff) AM_ROM AM_REGION("cchip_eprom", 0) // might not map here
 ADDRESS_MAP_END
 
-MACHINE_CONFIG_MEMBER( taito_cchip_device::device_add_mconfig )
+MACHINE_CONFIG_START(taito_cchip_device::device_add_mconfig)
 	MCFG_CPU_ADD("upd7811", UPD7811, DERIVED_CLOCK(1,1))
 	MCFG_CPU_PROGRAM_MAP(cchip_map)
 

@@ -29,7 +29,7 @@ DEFINE_DEVICE_TYPE(A2BUS_LASER128, a2bus_laser128_device, "a2laser128", "VTech L
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( a2bus_laser128_device::device_add_mconfig )
+MACHINE_CONFIG_START(a2bus_laser128_device::device_add_mconfig)
 MACHINE_CONFIG_END
 
 //**************************************************************************

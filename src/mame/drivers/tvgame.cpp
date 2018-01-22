@@ -30,6 +30,7 @@ public:
 
 	DECLARE_WRITE8_MEMBER(speaker_w);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void tvgame(machine_config &config);
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<speaker_sound_device> m_speaker;
@@ -93,7 +94,7 @@ uint32_t tvgame_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 	return 0;
 }
 
-static MACHINE_CONFIG_START( tvgame )
+MACHINE_CONFIG_START(tvgame_state::tvgame)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_4MHz)
 	MCFG_CPU_PROGRAM_MAP(mem_map)

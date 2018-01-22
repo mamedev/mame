@@ -35,6 +35,8 @@ public:
 
 	virtual void video_start() override;
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	void tek4109a(machine_config &config);
+	void tek4107a(machine_config &config);
 };
 
 /* Memory Maps */
@@ -86,7 +88,7 @@ void tek4107a_state::machine_start()
 
 /* Machine Driver */
 
-static MACHINE_CONFIG_START( tek4107a )
+MACHINE_CONFIG_START(tek4107a_state::tek4107a)
 	/* basic machine hardware */
 	MCFG_CPU_ADD(I80188_TAG, I80188, 21000000)
 	MCFG_CPU_PROGRAM_MAP(tek4107a_mem)
@@ -104,7 +106,7 @@ static MACHINE_CONFIG_START( tek4107a )
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", tek4107a)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( tek4109a, tek4107a )
+MACHINE_CONFIG_DERIVED(tek4107a_state::tek4109a, tek4107a)
 	/* video hardware */
 	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_ENTRIES(4096)

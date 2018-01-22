@@ -385,7 +385,7 @@ static ADDRESS_MAP_START( ninjakd2_main_cpu, AS_PROGRAM, 8, ninjakd2_state )
 	AM_RANGE(0xc202, 0xc202) AM_WRITE(ninjakd2_bankselect_w)
 	AM_RANGE(0xc203, 0xc203) AM_WRITE(ninjakd2_sprite_overdraw_w)
 	AM_RANGE(0xc208, 0xc20c) AM_WRITE(ninjakd2_bg_ctrl_w)
-	AM_RANGE(0xc800, 0xcdff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0xc800, 0xcdff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
 	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(ninjakd2_fgvideoram_w) AM_SHARE("fg_videoram")
 	AM_RANGE(0xd800, 0xdfff) AM_RAM_WRITE(ninjakd2_bgvideoram_w) AM_SHARE("bg_videoram")
 	AM_RANGE(0xe000, 0xf9ff) AM_RAM
@@ -399,7 +399,7 @@ static ADDRESS_MAP_START( mnight_main_cpu, AS_PROGRAM, 8, ninjakd2_state )
 	AM_RANGE(0xda00, 0xdfff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(ninjakd2_bgvideoram_w) AM_SHARE("bg_videoram")
 	AM_RANGE(0xe800, 0xefff) AM_RAM_WRITE(ninjakd2_fgvideoram_w) AM_SHARE("fg_videoram")
-	AM_RANGE(0xf000, 0xf5ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0xf000, 0xf5ff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
 	AM_RANGE(0xf800, 0xf800) AM_READ_PORT("KEYCOIN")
 	AM_RANGE(0xf801, 0xf801) AM_READ_PORT("PAD1")
 	AM_RANGE(0xf802, 0xf802) AM_READ_PORT("PAD2")
@@ -416,7 +416,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( robokid_main_cpu, AS_PROGRAM, 8, ninjakd2_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
-	AM_RANGE(0xc000, 0xc7ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0xc000, 0xc7ff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
 	AM_RANGE(0xc800, 0xcfff) AM_RAM_WRITE(ninjakd2_fgvideoram_w) AM_SHARE("fg_videoram")
 	AM_RANGE(0xd000, 0xd3ff) AM_READWRITE(robokid_bg2_videoram_r, robokid_bg2_videoram_w)   // banked
 	AM_RANGE(0xd400, 0xd7ff) AM_READWRITE(robokid_bg1_videoram_r, robokid_bg1_videoram_w)   // banked
@@ -457,7 +457,7 @@ static ADDRESS_MAP_START( omegaf_main_cpu, AS_PROGRAM, 8, ninjakd2_state )
 	AM_RANGE(0xc800, 0xcbff) AM_READWRITE(robokid_bg1_videoram_r, robokid_bg1_videoram_w)   // banked
 	AM_RANGE(0xcc00, 0xcfff) AM_READWRITE(robokid_bg2_videoram_r, robokid_bg2_videoram_w)   // banked
 	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(ninjakd2_fgvideoram_w) AM_SHARE("fg_videoram")
-	AM_RANGE(0xd800, 0xdfff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0xd800, 0xdfff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
 	AM_RANGE(0xe000, 0xf9ff) AM_RAM
 	AM_RANGE(0xfa00, 0xffff) AM_RAM AM_SHARE("spriteram")
 ADDRESS_MAP_END
@@ -927,7 +927,7 @@ MACHINE_RESET_MEMBER(ninjakd2_state,omegaf)
 
 /*****************************************************************************/
 
-static MACHINE_CONFIG_START( ninjakd2_core )
+MACHINE_CONFIG_START(ninjakd2_state::ninjakd2_core)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, MAIN_CLOCK_12/2)       /* verified */
@@ -976,20 +976,20 @@ static MACHINE_CONFIG_START( ninjakd2_core )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( ninjakd2, ninjakd2_core )
+MACHINE_CONFIG_DERIVED(ninjakd2_state::ninjakd2, ninjakd2_core)
 	MCFG_CPU_REPLACE("soundcpu", MC8123, MAIN_CLOCK_5)     /* verified */
 	MCFG_CPU_PROGRAM_MAP(ninjakd2_sound_cpu)
 	MCFG_CPU_IO_MAP(ninjakd2_sound_io)
 	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( ninjakd2b, ninjakd2_core )
+MACHINE_CONFIG_DERIVED(ninjakd2_state::ninjakd2b, ninjakd2_core)
 	MCFG_CPU_MODIFY("soundcpu")
 	MCFG_CPU_PROGRAM_MAP(ninjakd2_sound_cpu)
 	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( mnight, ninjakd2_core )
+MACHINE_CONFIG_DERIVED(ninjakd2_state::mnight, ninjakd2_core)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1005,7 +1005,7 @@ static MACHINE_CONFIG_DERIVED( mnight, ninjakd2_core )
 	MCFG_DEVICE_REMOVE("pcm")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( arkarea, ninjakd2_core )
+MACHINE_CONFIG_DERIVED(ninjakd2_state::arkarea, ninjakd2_core)
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(mnight_main_cpu)
@@ -1020,7 +1020,7 @@ static MACHINE_CONFIG_DERIVED( arkarea, ninjakd2_core )
 	MCFG_DEVICE_REMOVE("pcm")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( robokid, mnight )
+MACHINE_CONFIG_DERIVED(ninjakd2_state::robokid, mnight)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1041,7 +1041,7 @@ static MACHINE_CONFIG_DERIVED( robokid, mnight )
 	MCFG_SCREEN_UPDATE_DRIVER(ninjakd2_state, screen_update_robokid)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( omegaf, robokid )
+MACHINE_CONFIG_DERIVED(ninjakd2_state::omegaf, robokid)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")

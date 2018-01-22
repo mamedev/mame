@@ -570,7 +570,7 @@ MACHINE_RESET_MEMBER(unico_state,unico)
                                 Burglar X
 ***************************************************************************/
 
-static MACHINE_CONFIG_START( burglarx )
+MACHINE_CONFIG_START(unico_state::burglarx)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_32MHz/2) /* 16MHz */
@@ -616,7 +616,7 @@ MACHINE_RESET_MEMBER(unico_state,zeropt)
 	MACHINE_RESET_CALL_MEMBER(unico);
 }
 
-static MACHINE_CONFIG_START( zeropnt )
+MACHINE_CONFIG_START(unico_state::zeropnt)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_32MHz/2) /* 16MHz */
@@ -657,7 +657,7 @@ MACHINE_CONFIG_END
                                 Zero Point 2
 ***************************************************************************/
 
-static MACHINE_CONFIG_START( zeropnt2 )
+MACHINE_CONFIG_START(unico_state::zeropnt2)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68EC020, XTAL_32MHz/2) /* 16MHz */

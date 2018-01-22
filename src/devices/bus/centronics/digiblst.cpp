@@ -38,7 +38,7 @@ centronics_digiblaster_device::centronics_digiblaster_device(const machine_confi
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( centronics_digiblaster_device::device_add_mconfig )
+MACHINE_CONFIG_START(centronics_digiblaster_device::device_add_mconfig)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
 	MCFG_SOUND_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5) // unknown DAC

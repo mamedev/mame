@@ -241,7 +241,7 @@ static INPUT_PORTS_START( patinho_feio )
 	PORT_BIT(0x800, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("MEMORIA (Liberada/Protegida)") PORT_CODE(KEYCODE_M) PORT_TOGGLE
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( patinho_feio )
+MACHINE_CONFIG_START(patinho_feio_state::patinho_feio)
 	/* basic machine hardware */
 	/* CPU @ approx. 500 kHz (memory cycle time is 2usec) */
 	MCFG_CPU_ADD("maincpu", PATO_FEIO_CPU, 500000)

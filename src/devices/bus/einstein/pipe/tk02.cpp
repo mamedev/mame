@@ -95,7 +95,7 @@ GFXDECODE_END
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( tk02_device::device_add_mconfig )
+MACHINE_CONFIG_START(tk02_device::device_add_mconfig)
 	MCFG_SCREEN_ADD_MONOCHROME("mono", RASTER, rgb_t::green())
 	MCFG_SCREEN_RAW_PARAMS(XTAL_8MHz * 2, 1024, 0, 640, 312, 0, 250)
 	MCFG_SCREEN_UPDATE_DEVICE("crtc", mc6845_device, screen_update)

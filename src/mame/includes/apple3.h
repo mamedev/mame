@@ -133,6 +133,7 @@ public:
 	uint32_t m_flags;
 	int m_enable_mask;
 
+	void apple3(machine_config &config);
 private:
 	int m_acia_irq;
 	uint8_t m_via_0_a;

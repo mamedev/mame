@@ -138,6 +138,7 @@ public:
 	DECLARE_WRITE8_MEMBER(io20_w);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
+	void funkball(machine_config &config);
 };
 
 void funkball_state::video_start()
@@ -764,7 +765,7 @@ void funkball_state::machine_reset()
 	m_voodoo_pci_regs.base_addr = 0xff000000;
 }
 
-static MACHINE_CONFIG_START( funkball )
+MACHINE_CONFIG_START(funkball_state::funkball)
 	MCFG_CPU_ADD("maincpu", MEDIAGX, 66666666*3.5) // 66,6 MHz x 3.5
 	MCFG_CPU_PROGRAM_MAP(funkball_map)
 	MCFG_CPU_IO_MAP(funkball_io)

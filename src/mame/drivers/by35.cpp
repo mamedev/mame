@@ -138,6 +138,10 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_d_pulse);
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_s);
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_as2888);
+	void by35(machine_config &config);
+	void nuovo(machine_config &config);
+	void as2888(machine_config &config);
+	void as2888_audio(machine_config &config);
 private:
 	uint8_t m_u10a;
 	uint8_t m_u10b;
@@ -1075,7 +1079,7 @@ DISCRETE_SOUND_END
 
 
 
-static MACHINE_CONFIG_START( by35 )
+MACHINE_CONFIG_START(by35_state::by35)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6800, 530000) // No xtal, just 2 chips forming a multivibrator oscillator around 530KHz
 	MCFG_CPU_PROGRAM_MAP(by35_map)
@@ -1119,7 +1123,7 @@ static MACHINE_CONFIG_START( by35 )
 	MCFG_TIMER_DRIVER_ADD("timer_d_pulse", by35_state, timer_d_pulse)                             // 555 Active pulse length
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START( as2888_audio )
+MACHINE_CONFIG_START(by35_state::as2888_audio)
 
 	MCFG_MACHINE_START_OVERRIDE( by35_state, as2888 )
 
@@ -1137,13 +1141,13 @@ MACHINE_CONFIG_START( as2888_audio )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( as2888, by35 )
+MACHINE_CONFIG_DERIVED(by35_state::as2888, by35)
 
 	MCFG_FRAGMENT_ADD( as2888_audio  )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( nuovo, by35 )
+MACHINE_CONFIG_DERIVED(by35_state::nuovo, by35)
 
 	MCFG_CPU_REPLACE("maincpu", M6802, 2000000) // ? MHz ?  Large crystal next to CPU, schematics don't indicate speed.
 	MCFG_CPU_PROGRAM_MAP(nuovo_map)

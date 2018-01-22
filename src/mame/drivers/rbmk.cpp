@@ -91,6 +91,8 @@ public:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(mcu_irq);
 
+	void rbmk(machine_config &config);
+	void rbspm(machine_config &config);
 protected:
 	virtual void video_start() override;
 
@@ -164,7 +166,7 @@ static ADDRESS_MAP_START( rbmk_mem, AS_PROGRAM, 16, rbmk_state )
 	AM_RANGE(0x500000, 0x50ffff) AM_RAM
 	AM_RANGE(0x940000, 0x940fff) AM_RAM AM_SHARE("vidram2")
 	AM_RANGE(0x980300, 0x983fff) AM_RAM // 0x2048  words ???, byte access
-	AM_RANGE(0x900000, 0x900fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x900000, 0x900fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x9c0000, 0x9c0fff) AM_RAM AM_SHARE("vidram")
 	AM_RANGE(0xb00000, 0xb00001) AM_WRITE(eeprom_w)
 	AM_RANGE(0xc00000, 0xc00001) AM_READWRITE(dip_mux_r, dip_mux_w)
@@ -185,7 +187,7 @@ static ADDRESS_MAP_START( rbspm_mem, AS_PROGRAM, 16, rbmk_state )
 	AM_RANGE(0x320000, 0x320001) AM_READ_PORT("IN3")
 	AM_RANGE(0x328000, 0x328001) AM_WRITE(unk_w)
 	AM_RANGE(0x500000, 0x50ffff) AM_RAM
-	AM_RANGE(0x900000, 0x900fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette") // if removed fails gfx test?
+	AM_RANGE(0x900000, 0x900fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette") // if removed fails gfx test?
 	AM_RANGE(0x940000, 0x940fff) AM_RAM AM_SHARE("vidram2") // if removed fails palette test?
 	AM_RANGE(0x980300, 0x983fff) AM_RAM // 0x2048  words ???, byte access, u25 and u26 according to test mode
 	AM_RANGE(0x9c0000, 0x9c0fff) AM_RAM AM_SHARE("vidram")
@@ -556,7 +558,7 @@ INTERRUPT_GEN_MEMBER(rbmk_state::mcu_irq)
 	m_mcu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
-static MACHINE_CONFIG_START( rbmk )
+MACHINE_CONFIG_START(rbmk_state::rbmk)
 	MCFG_CPU_ADD("maincpu", M68000, 22000000 /2)
 	MCFG_CPU_PROGRAM_MAP(rbmk_mem)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", rbmk_state,  irq1_line_hold)
@@ -593,7 +595,7 @@ static MACHINE_CONFIG_START( rbmk )
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.60)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( rbspm, rbmk )
+MACHINE_CONFIG_DERIVED(rbmk_state::rbspm, rbmk)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(rbspm_mem)
 
