@@ -92,6 +92,8 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
+	void sbrkoutct(machine_config &config);
+	void sbrkout(machine_config &config);
 };
 
 
@@ -578,7 +580,7 @@ GFXDECODE_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( sbrkout )
+MACHINE_CONFIG_START(sbrkout_state::sbrkout)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502,MAIN_CLOCK/16)       /* 375 KHz? Should be 750KHz? */
@@ -613,7 +615,7 @@ static MACHINE_CONFIG_START( sbrkout )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED(sbrkoutct, sbrkout)
+MACHINE_CONFIG_DERIVED(sbrkout_state::sbrkoutct, sbrkout)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(sbrkoutct_main_map)
 

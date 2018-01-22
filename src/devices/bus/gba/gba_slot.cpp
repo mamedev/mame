@@ -671,7 +671,14 @@ image_init_result gba_cart_slot_device::call_load()
 				break;
 		}
 		if (size == 0x4000000)
+		{
 			memcpy((uint8_t *)m_cart->get_romhlp_base(), ROM, 0x2000000);
+			for (uint32_t i = 0; i < 16; i++)
+			{
+				memcpy((uint8_t *)m_cart->get_romhlp_base() + i * 0x1000, ROM + 0x200, 0x1000);
+			}
+			memcpy((uint8_t *)m_cart->get_romhlp_base(), ROM, 0x180);
+		}
 
 		if (m_cart->get_nvram_size())
 			battery_load(m_cart->get_nvram_base(), m_cart->get_nvram_size(), 0x00);
@@ -933,13 +940,4 @@ WRITE32_MEMBER(gba_cart_slot_device::write_gpio)
 {
 	if (m_cart)
 		m_cart->write_gpio(space, offset, data, mem_mask);
-}
-
-
-/*-------------------------------------------------
- Internal header logging
- -------------------------------------------------*/
-
-void gba_cart_slot_device::internal_header_logging(uint8_t *ROM, uint32_t len)
-{
 }

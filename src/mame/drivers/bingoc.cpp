@@ -60,6 +60,7 @@ public:
 	required_device<cpu_device> m_soundcpu;
 	required_device<upd7759_device> m_upd7759;
 	required_device<generic_latch_8_device> m_soundlatch;
+	void bingoc(machine_config &config);
 };
 
 
@@ -167,7 +168,7 @@ static INPUT_PORTS_START( bingoc )
 INPUT_PORTS_END
 
 
-static MACHINE_CONFIG_START( bingoc )
+MACHINE_CONFIG_START(bingoc_state::bingoc)
 
 	MCFG_CPU_ADD("maincpu", M68000,8000000)      /* ? MHz */
 	MCFG_CPU_PROGRAM_MAP(main_map)

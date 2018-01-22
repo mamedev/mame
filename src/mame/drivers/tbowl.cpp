@@ -103,7 +103,7 @@ static ADDRESS_MAP_START( 6206C_map, AS_PROGRAM, 8, tbowl_state )
 	AM_RANGE(0xc000, 0xdfff) AM_READONLY
 	AM_RANGE(0xc000, 0xd7ff) AM_WRITEONLY
 	AM_RANGE(0xd800, 0xdfff) AM_WRITEONLY AM_SHARE("spriteram")
-	AM_RANGE(0xe000, 0xefff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette") // 2x palettes, one for each monitor?
+	AM_RANGE(0xe000, 0xefff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette") // 2x palettes, one for each monitor?
 	AM_RANGE(0xf000, 0xf7ff) AM_ROMBANK("subbank")
 	AM_RANGE(0xf800, 0xfbff) AM_RAM AM_SHARE("shared_ram")
 	AM_RANGE(0xfc00, 0xfc00) AM_WRITE(boardc_bankswitch_w)
@@ -427,7 +427,7 @@ void tbowl_state::machine_reset()
 	m_soundlatch->acknowledge_w(machine().dummy_space(), 0, 0);
 }
 
-static MACHINE_CONFIG_START( tbowl )
+MACHINE_CONFIG_START(tbowl_state::tbowl)
 
 	/* CPU on Board '6206B' */
 	MCFG_CPU_ADD("maincpu", Z80, 8000000) /* NEC D70008AC-8 (Z80 Clone) */

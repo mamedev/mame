@@ -37,7 +37,7 @@ PAL16R6A 11H
 READ16_MEMBER( dietgo_state::dietgo_protection_region_0_104_r )
 {
 	int real_address = 0 + (offset *2);
-	int deco146_addr = BITSWAP32(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14,    10,9,8, 7,6,5,4, 3,2,1,0) & 0x7fff;
+	int deco146_addr = bitswap<32>(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14,    10,9,8, 7,6,5,4, 3,2,1,0) & 0x7fff;
 	uint8_t cs = 0;
 	uint16_t data = m_deco104->read_data( deco146_addr, mem_mask, cs );
 	return data;
@@ -46,7 +46,7 @@ READ16_MEMBER( dietgo_state::dietgo_protection_region_0_104_r )
 WRITE16_MEMBER( dietgo_state::dietgo_protection_region_0_104_w )
 {
 	int real_address = 0 + (offset *2);
-	int deco146_addr = BITSWAP32(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14,    10,9,8, 7,6,5,4, 3,2,1,0) & 0x7fff;
+	int deco146_addr = bitswap<32>(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14,    10,9,8, 7,6,5,4, 3,2,1,0) & 0x7fff;
 	uint8_t cs = 0;
 	m_deco104->write_data( space, deco146_addr, data, mem_mask, cs );
 }
@@ -77,7 +77,7 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, dietgo_state )
 	AM_RANGE(0x110000, 0x110001) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
 	AM_RANGE(0x120000, 0x120001) AM_DEVREADWRITE("oki", okim6295_device, read, write)
 	AM_RANGE(0x130000, 0x130001) AM_NOP     /* This board only has 1 oki chip */
-	AM_RANGE(0x140000, 0x140001) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
+	AM_RANGE(0x140000, 0x140000) AM_DEVREAD("ioprot104", deco104_device, soundlatch_r)
 	AM_RANGE(0x1f0000, 0x1f1fff) AM_RAMBANK("bank8")
 	AM_RANGE(0x1fec00, 0x1fec01) AM_DEVWRITE("audiocpu", h6280_device, timer_w)
 	AM_RANGE(0x1ff400, 0x1ff403) AM_DEVWRITE("audiocpu", h6280_device, irq_status_w)
@@ -209,7 +209,7 @@ void dietgo_state::machine_start()
 {
 }
 
-static MACHINE_CONFIG_START( dietgo )
+MACHINE_CONFIG_START(dietgo_state::dietgo)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_28MHz/2) /* DE102 (verified on pcb) */
@@ -259,13 +259,12 @@ static MACHINE_CONFIG_START( dietgo )
 	MCFG_DECO146_IN_PORTA_CB(IOPORT("INPUTS"))
 	MCFG_DECO146_IN_PORTB_CB(IOPORT("SYSTEM"))
 	MCFG_DECO146_IN_PORTC_CB(IOPORT("DSW"))
+	MCFG_DECO146_SOUNDLATCH_IRQ_CB(INPUTLINE("audiocpu", 0))
 	MCFG_DECO146_SET_INTERFACE_SCRAMBLE_INTERLEAVE
 	MCFG_DECO146_SET_USE_MAGIC_ADDRESS_XOR
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_YM2151_ADD("ymsnd", XTAL_32_22MHz/9) /* verified on pcb */
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 1)) /* IRQ 2 */

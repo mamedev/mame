@@ -23,6 +23,7 @@ public:
 	virtual void video_start() override;
 	uint32_t screen_update_dct11em(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
+	void dct11em(machine_config &config);
 };
 
 static ADDRESS_MAP_START( dct11em_mem, AS_PROGRAM, 16, dct11em_state )
@@ -51,7 +52,7 @@ uint32_t dct11em_state::screen_update_dct11em(screen_device &screen, bitmap_ind1
 }
 
 
-static MACHINE_CONFIG_START( dct11em )
+MACHINE_CONFIG_START(dct11em_state::dct11em)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",T11, 7500000) // 7.5MHz XTAL
 	MCFG_T11_INITIAL_MODE(0x1403)  /* according to specs */

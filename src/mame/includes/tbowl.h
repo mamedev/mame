@@ -82,4 +82,5 @@ public:
 	void adpcm_int(msm5205_device *device, int chip);
 	DECLARE_WRITE_LINE_MEMBER(adpcm_int_1);
 	DECLARE_WRITE_LINE_MEMBER(adpcm_int_2);
+	void tbowl(machine_config &config);
 };

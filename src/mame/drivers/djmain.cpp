@@ -318,17 +318,17 @@ WRITE32_MEMBER(djmain_state::light_ctrl_2_w)
 
 WRITE32_MEMBER(djmain_state::unknown590000_w)
 {
-	//logerror("%08X: unknown 590000 write %08X: %08X & %08X\n", space.device().safe_pcbase(), offset, data, mem_mask);
+	//logerror("%08X: unknown 590000 write %08X: %08X & %08X\n", m_maincpu->pcbase(), offset, data, mem_mask);
 }
 
 WRITE32_MEMBER(djmain_state::unknown802000_w)
 {
-	//logerror("%08X: unknown 802000 write %08X: %08X & %08X\n", space.device().safe_pcbase(), offset, data, mem_mask);
+	//logerror("%08X: unknown 802000 write %08X: %08X & %08X\n", m_maincpu->pcbase(), offset, data, mem_mask);
 }
 
 WRITE32_MEMBER(djmain_state::unknownc02000_w)
 {
-	//logerror("%08X: unknown c02000 write %08X: %08X & %08X\n", space.device().safe_pcbase(), offset, data, mem_mask);
+	//logerror("%08X: unknown c02000 write %08X: %08X & %08X\n", m_maincpu->pcbase(), offset, data, mem_mask);
 }
 
 
@@ -380,7 +380,7 @@ WRITE_LINE_MEMBER( djmain_state::ide_interrupt )
 static ADDRESS_MAP_START( maincpu_djmain, AS_PROGRAM, 32, djmain_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM                         // PRG ROM
 	AM_RANGE(0x400000, 0x40ffff) AM_RAM                         // WORK RAM
-	AM_RANGE(0x480000, 0x48443f) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")       // COLOR RAM
+	AM_RANGE(0x480000, 0x48443f) AM_RAM_DEVWRITE("palette", palette_device, write32) AM_SHARE("palette")       // COLOR RAM
 	AM_RANGE(0x500000, 0x57ffff) AM_READWRITE(sndram_r, sndram_w)               // SOUND RAM
 	AM_RANGE(0x580000, 0x58003f) AM_DEVREADWRITE("k056832", k056832_device, long_r, long_w)      // VIDEO REG (tilemap)
 	AM_RANGE(0x590000, 0x590007) AM_WRITE(unknown590000_w)                  // ??
@@ -1376,7 +1376,7 @@ void djmain_state::machine_reset()
  *
  *************************************/
 
-static MACHINE_CONFIG_START( djmainj )
+MACHINE_CONFIG_START(djmain_state::djmainj)
 
 	/* basic machine hardware */
 	// popn3 works 9.6 MHz or slower in some songs */
@@ -1421,12 +1421,12 @@ static MACHINE_CONFIG_START( djmainj )
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED(djmainu, djmainj)
+MACHINE_CONFIG_DERIVED(djmain_state::djmainu, djmainj)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(maincpu_djmainu)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED(djmaina, djmainj)
+MACHINE_CONFIG_DERIVED(djmain_state::djmaina, djmainj)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(maincpu_djmaina)
 MACHINE_CONFIG_END

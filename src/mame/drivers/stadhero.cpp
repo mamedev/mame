@@ -45,7 +45,7 @@ WRITE16_MEMBER(stadhero_state::stadhero_control_w)
 			m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 			break;
 		default:
-			logerror("CPU #0 PC %06x: warning - write %02x to unmapped memory address %06x\n",space.device().safe_pc(),data,0x30c010+offset);
+			logerror("CPU #0 PC %06x: warning - write %02x to unmapped memory address %06x\n",m_maincpu->pc(),data,0x30c010+offset);
 			break;
 	}
 }
@@ -63,7 +63,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, stadhero_state )
 	AM_RANGE(0x30c002, 0x30c003) AM_READ_PORT("COIN")
 	AM_RANGE(0x30c004, 0x30c005) AM_READ_PORT("DSW")
 	AM_RANGE(0x30c000, 0x30c00b) AM_WRITE(stadhero_control_w)
-	AM_RANGE(0x310000, 0x3107ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x310000, 0x3107ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0xff8000, 0xffbfff) AM_RAM /* Main ram */
 	AM_RANGE(0xffc000, 0xffc7ff) AM_MIRROR(0x000800) AM_RAM AM_SHARE("spriteram")
 ADDRESS_MAP_END
@@ -199,7 +199,7 @@ GFXDECODE_END
 
 /******************************************************************************/
 
-static MACHINE_CONFIG_START( stadhero )
+MACHINE_CONFIG_START(stadhero_state::stadhero)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_20MHz/2)

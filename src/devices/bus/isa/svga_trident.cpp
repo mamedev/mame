@@ -30,7 +30,7 @@ DEFINE_DEVICE_TYPE(ISA16_SVGA_TGUI9680, isa16_svga_tgui9680_device, "tgui9680", 
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( isa16_svga_tgui9680_device::device_add_mconfig )
+MACHINE_CONFIG_START(isa16_svga_tgui9680_device::device_add_mconfig)
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(XTAL_25_1748MHz,900,0,640,526,0,480)
 	MCFG_SCREEN_UPDATE_DEVICE("vga", trident_vga_device, screen_update)
@@ -67,7 +67,7 @@ isa16_svga_tgui9680_device::isa16_svga_tgui9680_device(const machine_config &mco
 //-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
-READ8_MEMBER(isa16_svga_tgui9680_device::input_port_0_r ) { return 0xff; } //return space.machine().root_device().ioport("IN0")->read(); }
+READ8_MEMBER(isa16_svga_tgui9680_device::input_port_0_r ) { return 0xff; } //return machine().root_device().ioport("IN0")->read(); }
 
 void isa16_svga_tgui9680_device::device_start()
 {

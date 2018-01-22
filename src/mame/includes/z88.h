@@ -92,6 +92,7 @@ public:
 	uint8_t *               m_ram_base;
 	z88cart_slot_device * m_carts[4];
 	DECLARE_PALETTE_INIT(z88);
+	void z88(machine_config &config);
 };
 
 #endif /* MAME_INCLUDES_Z88_H */

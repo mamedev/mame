@@ -109,7 +109,7 @@ static ADDRESS_MAP_START( common_map, AS_PROGRAM, 16, blmbycar_state )
 	AM_RANGE(0x108000, 0x10bfff) AM_WRITEONLY                                               // ???
 	AM_RANGE(0x10c000, 0x10c003) AM_WRITEONLY AM_SHARE("scroll_1")              // Scroll 1
 	AM_RANGE(0x10c004, 0x10c007) AM_WRITEONLY AM_SHARE("scroll_0")              // Scroll 0
-	AM_RANGE(0x200000, 0x2005ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette") AM_MIRROR(0x4000) // Palette
+	AM_RANGE(0x200000, 0x2005ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette") AM_MIRROR(0x4000) // Palette
 	AM_RANGE(0x200600, 0x203fff) AM_RAM AM_MIRROR(0x4000)
 	AM_RANGE(0x440000, 0x441fff) AM_RAM
 	AM_RANGE(0x444000, 0x445fff) AM_WRITEONLY AM_SHARE("spriteram")// Sprites (size?)
@@ -343,7 +343,7 @@ MACHINE_RESET_MEMBER(blmbycar_state,blmbycar)
 }
 
 
-static MACHINE_CONFIG_START( blmbycar )
+MACHINE_CONFIG_START(blmbycar_state::blmbycar)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz/2)   /* 12MHz */
@@ -389,7 +389,7 @@ MACHINE_RESET_MEMBER(blmbycar_state,watrball)
 	m_retvalue = 0;
 }
 
-static MACHINE_CONFIG_DERIVED( watrball, blmbycar )
+MACHINE_CONFIG_DERIVED(blmbycar_state::watrball, blmbycar)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")

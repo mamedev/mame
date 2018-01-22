@@ -107,6 +107,7 @@ public:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	DECLARE_WRITE_LINE_MEMBER(yunsung8_adpcm_int);
+	void discoboy(machine_config &config);
 };
 
 void discoboy_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )
@@ -443,7 +444,7 @@ WRITE_LINE_MEMBER(discoboy_state::yunsung8_adpcm_int)
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, m_toggle);
 }
 
-static MACHINE_CONFIG_START( discoboy )
+MACHINE_CONFIG_START(discoboy_state::discoboy)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_12MHz/2)  /* 6 MHz? */
@@ -457,8 +458,8 @@ static MACHINE_CONFIG_START( discoboy )
 	MCFG_DEVICE_ADD("rambank1", ADDRESS_MAP_BANK, 0)
 	MCFG_DEVICE_PROGRAM_MAP(rambank1_map)
 	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_BIG)
-	MCFG_ADDRESS_MAP_BANK_DATABUS_WIDTH(8)
-	MCFG_ADDRESS_MAP_BANK_ADDRBUS_WIDTH(13)
+	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
+	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(13)
 	MCFG_ADDRESS_MAP_BANK_STRIDE(0x800)
 
 	/* video hardware */

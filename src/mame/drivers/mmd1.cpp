@@ -175,6 +175,8 @@ public:
 	DECLARE_MACHINE_RESET(mmd1);
 	DECLARE_MACHINE_RESET(mmd2);
 	required_device<cpu_device> m_maincpu;
+	void mmd1(machine_config &config);
+	void mmd2(machine_config &config);
 };
 
 
@@ -475,7 +477,7 @@ We preset all banks here, so that bankswitching will incur no speed penalty.
 	membank("bank8")->configure_entry(2, &p_ram[0xd800]);
 }
 
-static MACHINE_CONFIG_START( mmd1 )
+MACHINE_CONFIG_START(mmd1_state::mmd1)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",I8080, 6750000 / 9)
 	MCFG_CPU_PROGRAM_MAP(mmd1_mem)
@@ -487,7 +489,7 @@ static MACHINE_CONFIG_START( mmd1 )
 	MCFG_DEFAULT_LAYOUT(layout_mmd1)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( mmd2 )
+MACHINE_CONFIG_START(mmd1_state::mmd2)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",I8080, 6750000 / 9)
 	MCFG_CPU_PROGRAM_MAP(mmd2_mem)

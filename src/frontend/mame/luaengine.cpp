@@ -828,7 +828,7 @@ void lua_engine::initialize()
 				[](emu_file &file, const char *path, u32 flags) { new (&file) emu_file(path, flags); },
 				[](emu_file &file, const char *mode) {
 					int flags = 0;
-					for(int i = 0; i < 2; i++) // limit to three chars
+					for(int i = 0; i < 3 && mode[i]; i++) // limit to three chars
 					{
 						switch(mode[i])
 						{
@@ -847,7 +847,7 @@ void lua_engine::initialize()
 				},
 				[](emu_file &file, const char *path, const char* mode) {
 					int flags = 0;
-					for(int i = 0; i < 2; i++) // limit to three chars
+					for(int i = 0; i < 3 && mode[i]; i++) // limit to three chars
 					{
 						switch(mode[i])
 						{
@@ -1454,8 +1454,8 @@ void lua_engine::initialize()
 					for (address_map_entry &entry : space.map()->m_entrylist)
 					{
 						sol::table mapentry = sol().create_table();
-						mapentry["offset"] = space.address_to_byte(entry.m_addrstart) & space.bytemask();
-						mapentry["endoff"] = space.address_to_byte(entry.m_addrend) & space.bytemask();
+						mapentry["offset"] = space.address_to_byte(entry.m_addrstart) & space.addrmask();
+						mapentry["endoff"] = space.address_to_byte(entry.m_addrend) & space.addrmask();
 						mapentry["readtype"] = entry.m_read.m_type;
 						mapentry["writetype"] = entry.m_write.m_type;
 						map.add(mapentry);
@@ -1496,10 +1496,21 @@ void lua_engine::initialize()
 			"field", &ioport_port::field,
 			"fields", sol::property([this](ioport_port &p){
 					sol::table f_table = sol().create_table();
+					// parse twice for custom and default names, default has priority
 					for(ioport_field &field : p.fields())
 					{
 						if (field.type_class() != INPUT_CLASS_INTERNAL)
 							f_table[field.name()] = &field;
+					}
+					for(ioport_field &field : p.fields())
+					{
+						if (field.type_class() != INPUT_CLASS_INTERNAL)
+						{
+							if(field.specific_name())
+								f_table[field.specific_name()] = &field;
+							else
+								f_table[field.manager().type_name(field.type(), field.player())] = &field;
+						}
 					}
 					return f_table;
 				}));
@@ -1511,6 +1522,9 @@ void lua_engine::initialize()
 			"set_value", &ioport_field::set_value,
 			"device", sol::property(&ioport_field::device),
 			"name", sol::property(&ioport_field::name),
+			"default_name", sol::property([](ioport_field &f) {
+					return f.specific_name() ? f.specific_name() : f.manager().type_name(f.type(), f.player());
+				}),
 			"player", sol::property(&ioport_field::player, &ioport_field::set_player),
 			"mask", sol::property(&ioport_field::mask),
 			"defvalue", sol::property(&ioport_field::defvalue),
@@ -1529,8 +1543,15 @@ void lua_engine::initialize()
 			"analog_invert", sol::property(&ioport_field::analog_invert),
 			"impulse", sol::property(&ioport_field::impulse),
 			"type", sol::property(&ioport_field::type),
+			"live", sol::property(&ioport_field::live),
 			"crosshair_scale", sol::property(&ioport_field::crosshair_scale, &ioport_field::set_crosshair_scale),
 			"crosshair_offset", sol::property(&ioport_field::crosshair_offset, &ioport_field::set_crosshair_offset));
+
+/* field.live
+ */
+
+	sol().registry().new_usertype<ioport_field_live>("ioport_field_live", "new", sol::no_constructor,
+			"name", &ioport_field_live::name);
 
 /* machine:parameters()
  * parameter:add(tag, val) - add tag = val parameter
@@ -1587,8 +1608,8 @@ void lua_engine::initialize()
  * input:code_name(code) - get code friendly name
  * input:seq_from_tokens(tokens) - get input_seq for multiple space separated KEYCODE_* string tokens
  * input:seq_pressed(seq) - get pressed state for input_seq
- * input:seq_to_token(seq) - get KEYCODE_* string tokens for seq
- * input:seq_to_name(seq) - get seq friendly name
+ * input:seq_to_tokens(seq) - get KEYCODE_* string tokens for seq
+ * input:seq_name(seq) - get seq friendly name
  */
 
 	sol().registry().new_usertype<input_manager>("input", "new", sol::no_constructor,

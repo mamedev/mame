@@ -12,6 +12,7 @@ public:
 			m_maincpu(*this, "maincpu")
 	{ }
 
+	void by68701(machine_config &config);
 protected:
 
 	// devices
@@ -43,7 +44,7 @@ DRIVER_INIT_MEMBER(by68701_state,by68701)
 {
 }
 
-static MACHINE_CONFIG_START( by68701 )
+MACHINE_CONFIG_START(by68701_state::by68701)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6803, 3579545/4)
 	MCFG_CPU_PROGRAM_MAP(by68701_map)

@@ -33,6 +33,7 @@ public:
 	DECLARE_DRIVER_INIT(alto2);
 	DECLARE_MACHINE_RESET(alto2);
 
+	void alto2(machine_config &config);
 protected:
 	required_device<cpu_device> m_maincpu;
 	required_device<speaker_sound_device> m_speaker;
@@ -272,7 +273,7 @@ ADDRESS_MAP_START( alto2_iomem_map, 2, 16, alto2_state )
 	AM_RANGE(0, 2*ALTO2_RAM_SIZE-1) AM_DEVICE16( "maincpu", alto2_cpu_device, iomem_map, 0xffffU )
 ADDRESS_MAP_END
 
-static MACHINE_CONFIG_START( alto2 )
+MACHINE_CONFIG_START(alto2_state::alto2)
 	// Basic machine hardware
 	// SYSCLK is Display Control part A51 (tagged 29.4MHz) divided by 5(?)
 	// 5.8MHz according to de.wikipedia.org/wiki/Xerox_Alto

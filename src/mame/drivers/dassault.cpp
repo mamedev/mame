@@ -511,7 +511,7 @@ DECO16IC_BANK_CB_MEMBER(dassault_state::bank_callback)
 	return ((bank >> 4) & 0xf) << 12;
 }
 
-static MACHINE_CONFIG_START( dassault )
+MACHINE_CONFIG_START(dassault_state::dassault)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_28MHz/2)   /* 14MHz - Accurate */

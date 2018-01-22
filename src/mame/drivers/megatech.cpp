@@ -142,6 +142,9 @@ public:
 	uint32_t screen_update_menu(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank_main);
 
+	void megatech(machine_config &config);
+	void megatech_multislot(machine_config &config);
+	void megatech_fixedslot(machine_config &config);
 private:
 	uint8_t m_mt_cart_select_reg;
 	uint32_t m_bios_port_ctrl;
@@ -668,7 +671,7 @@ uint32_t mtech_state::screen_update_menu(screen_device &screen, bitmap_rgb32 &bi
 }
 
 
-static MACHINE_CONFIG_START( megatech )
+MACHINE_CONFIG_START(mtech_state::megatech)
 	/* basic machine hardware */
 	MCFG_FRAGMENT_ADD(md_ntsc)
 
@@ -761,7 +764,7 @@ image_init_result mtech_state::load_cart(device_image_interface &image, generic_
 	MCFG_GENERIC_CARTSLOT_ADD(_tag, generic_plain_slot, "megatech_cart") \
 	MCFG_GENERIC_LOAD(mtech_state, _load)
 
-static MACHINE_CONFIG_DERIVED( megatech_multislot, megatech )
+MACHINE_CONFIG_DERIVED(mtech_state::megatech_multislot, megatech)
 
 	// add cart slots
 	MCFG_MEGATECH_CARTSLOT_ADD("mt_slot1", mt_cart1)
@@ -777,7 +780,7 @@ static MACHINE_CONFIG_DERIVED( megatech_multislot, megatech )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( megatech_fixedslot, megatech )
+MACHINE_CONFIG_DERIVED(mtech_state::megatech_fixedslot, megatech)
 
 	// add cart slots
 	MCFG_MEGATECH_CARTSLOT_ADD("mt_slot1", mt_cart1)

@@ -69,6 +69,7 @@ public:
 	uint32_t screen_update_chance32(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
+	void chance32(machine_config &config);
 };
 
 
@@ -199,7 +200,7 @@ WRITE8_MEMBER(chance32_state::muxout_w)
 static ADDRESS_MAP_START( chance32_map, AS_PROGRAM, 8, chance32_state )
 	AM_RANGE(0x0000, 0xcfff) AM_ROM
 	AM_RANGE(0xd800, 0xdfff) AM_RAM
-	AM_RANGE(0xe000, 0xefff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0xe000, 0xefff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM_WRITE(chance32_fgram_w) AM_SHARE("fgram")
 	AM_RANGE(0xf800, 0xffff) AM_RAM_WRITE(chance32_bgram_w) AM_SHARE("bgram")
 ADDRESS_MAP_END
@@ -444,7 +445,7 @@ void chance32_state::machine_reset()
 }
 
 
-static MACHINE_CONFIG_START( chance32 )
+MACHINE_CONFIG_START(chance32_state::chance32)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80,12000000/2)

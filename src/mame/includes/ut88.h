@@ -64,6 +64,8 @@ public:
 	DECLARE_MACHINE_RESET(ut88mini);
 	uint32_t screen_update_ut88(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
+	void ut88(machine_config &config);
+	void ut88mini(machine_config &config);
 private:
 	required_device<cassette_image_device> m_cassette;
 	optional_device<i8255_device> m_ppi;

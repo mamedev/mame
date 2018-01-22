@@ -37,22 +37,24 @@ to discover the special features of this Basic.
 #include "machine/i8255.h"
 #include "machine/terminal.h"
 
-#define TERMINAL_TAG "terminal"
 
 class basic52_state : public driver_device
 {
 public:
 	basic52_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu")
-	{
-	}
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+	{ }
 
 	void kbd_put(u8 data);
 	DECLARE_READ8_MEMBER(unk_r);
+	DECLARE_READ8_MEMBER(from_term);
+
+	void basic52(machine_config &config);
+	void basic31(machine_config &config);
+private:
 	uint8_t m_term_data;
 	required_device<mcs51_cpu_device> m_maincpu;
-	DECLARE_READ8_MEMBER(from_term);
 };
 
 
@@ -98,27 +100,27 @@ void basic52_state::kbd_put(u8 data)
 	m_term_data = data;
 }
 
-static MACHINE_CONFIG_START( basic31 )
+MACHINE_CONFIG_START(basic52_state::basic31)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8031, XTAL_11_0592MHz)
 	MCFG_CPU_PROGRAM_MAP(basic52_mem)
 	MCFG_CPU_IO_MAP(basic52_io)
-	MCFG_MCS51_SERIAL_TX_CB(DEVWRITE8(TERMINAL_TAG, generic_terminal_device, write))
+	MCFG_MCS51_SERIAL_TX_CB(DEVWRITE8("terminal", generic_terminal_device, write))
 	MCFG_MCS51_SERIAL_RX_CB(READ8(basic52_state, from_term))
 
 	/* video hardware */
-	MCFG_DEVICE_ADD(TERMINAL_TAG, GENERIC_TERMINAL, 0)
+	MCFG_DEVICE_ADD("terminal", GENERIC_TERMINAL, 0)
 	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(PUT(basic52_state, kbd_put))
 
 	MCFG_DEVICE_ADD("ppi8255", I8255, 0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( basic52, basic31 )
+MACHINE_CONFIG_DERIVED(basic52_state::basic52, basic31)
 	/* basic machine hardware */
 	MCFG_CPU_REPLACE("maincpu", I8052, XTAL_11_0592MHz)
 	MCFG_CPU_PROGRAM_MAP(basic52_mem)
 	MCFG_CPU_IO_MAP(basic52_io)
-	MCFG_MCS51_SERIAL_TX_CB(DEVWRITE8(TERMINAL_TAG, generic_terminal_device, write))
+	MCFG_MCS51_SERIAL_TX_CB(DEVWRITE8("terminal", generic_terminal_device, write))
 	MCFG_MCS51_SERIAL_RX_CB(READ8(basic52_state, from_term))
 MACHINE_CONFIG_END
 

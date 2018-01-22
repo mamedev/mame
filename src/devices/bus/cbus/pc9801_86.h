@@ -11,7 +11,7 @@
 
 #pragma once
 
-
+#include "bus/cbus/pc9801_cbus.h"
 #include "machine/pic8259.h"
 #include "sound/2608intf.h"
 #include "sound/dac.h"
@@ -50,6 +50,8 @@ protected:
 private:
 	int queue_count();
 	uint8_t queue_pop();
+
+	required_device<pc9801_slot_device> m_bus;
 
 	uint8_t m_joy_sel, m_mask, m_pcm_mode, m_vol[7], m_pcm_ctrl, m_pcm_mute;
 	uint16_t m_head, m_tail, m_count, m_irq_rate;

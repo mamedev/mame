@@ -812,7 +812,7 @@ WRITE16_MEMBER(model1_state::md1_w)
 	//if(0 && offset)
 	//  return;
 	if(true && m_dump)
-		logerror("TGP: md1_w %x, %04x @ %04x (%x)\n", offset, data, mem_mask, space.device().safe_pc());
+		logerror("TGP: md1_w %x, %04x @ %04x (%x)\n", offset, data, mem_mask, m_maincpu->pc());
 }
 
 WRITE16_MEMBER(model1_state::md0_w)
@@ -822,22 +822,22 @@ WRITE16_MEMBER(model1_state::md0_w)
 	//if(0 && offset)
 	//  return;
 	if(true && m_dump)
-		logerror("TGP: md0_w %x, %04x @ %04x (%x)\n", offset, data, mem_mask, space.device().safe_pc());
+		logerror("TGP: md0_w %x, %04x @ %04x (%x)\n", offset, data, mem_mask, m_maincpu->pc());
 }
 
 WRITE16_MEMBER(model1_state::p_w)
 {
 	uint16_t old = m_paletteram16[offset];
-	m_palette->write(space, offset, data, mem_mask);
+	m_palette->write16(space, offset, data, mem_mask);
 	if(0 && m_paletteram16[offset] != old)
-		logerror("XVIDEO: p_w %x, %04x @ %04x (%x)\n", offset, data, mem_mask, space.device().safe_pc());
+		logerror("XVIDEO: p_w %x, %04x @ %04x (%x)\n", offset, data, mem_mask, m_maincpu->pc());
 }
 
 WRITE16_MEMBER(model1_state::mr_w)
 {
 	COMBINE_DATA(m_mr+offset);
 	if(0 && offset == 0x1138/2)
-		logerror("MR.w %x, %04x @ %04x (%x)\n", offset*2+0x500000, data, mem_mask, space.device().safe_pc());
+		logerror("MR.w %x, %04x @ %04x (%x)\n", offset*2+0x500000, data, mem_mask, m_maincpu->pc());
 }
 
 WRITE16_MEMBER(model1_state::mr2_w)
@@ -845,23 +845,23 @@ WRITE16_MEMBER(model1_state::mr2_w)
 	COMBINE_DATA(m_mr2+offset);
 #if 0
 	if(0 && offset == 0x6e8/2) {
-		logerror("MR.w %x, %04x @ %04x (%x)\n", offset*2+0x400000, data, mem_mask, space.device().safe_pc());
+		logerror("MR.w %x, %04x @ %04x (%x)\n", offset*2+0x400000, data, mem_mask, m_maincpu->pc());
 	}
 	if(offset/2 == 0x3680/4)
-		logerror("MW f80[r25], %04x%04x (%x)\n", m_mr2[0x3680/2+1], m_mr2[0x3680/2], space.device().safe_pc());
+		logerror("MW f80[r25], %04x%04x (%x)\n", m_mr2[0x3680/2+1], m_mr2[0x3680/2], m_maincpu->pc());
 	if(offset/2 == 0x06ca/4)
-		logerror("MW fca[r19], %04x%04x (%x)\n", m_mr2[0x06ca/2+1], m_mr2[0x06ca/2], space.device().safe_pc());
+		logerror("MW fca[r19], %04x%04x (%x)\n", m_mr2[0x06ca/2+1], m_mr2[0x06ca/2], m_maincpu->pc());
 	if(offset/2 == 0x1eca/4)
-		logerror("MW fca[r22], %04x%04x (%x)\n", m_mr2[0x1eca/2+1], m_mr2[0x1eca/2], space.device().safe_pc());
+		logerror("MW fca[r22], %04x%04x (%x)\n", m_mr2[0x1eca/2+1], m_mr2[0x1eca/2], m_maincpu->pc());
 #endif
 
 	// wingwar scene position, pc=e1ce -> d735
 	if(offset/2 == 0x1f08/4)
-		logerror("MW  8[r10], %f (%x)\n", *(float *)(m_mr2+0x1f08/2), space.device().safe_pc());
+		logerror("MW  8[r10], %f (%x)\n", *(float *)(m_mr2+0x1f08/2), m_maincpu->pc());
 	if(offset/2 == 0x1f0c/4)
-		logerror("MW  c[r10], %f (%x)\n", *(float *)(m_mr2+0x1f0c/2), space.device().safe_pc());
+		logerror("MW  c[r10], %f (%x)\n", *(float *)(m_mr2+0x1f0c/2), m_maincpu->pc());
 	if(offset/2 == 0x1f10/4)
-		logerror("MW 10[r10], %f (%x)\n", *(float *)(m_mr2+0x1f10/2), space.device().safe_pc());
+		logerror("MW 10[r10], %f (%x)\n", *(float *)(m_mr2+0x1f10/2), m_maincpu->pc());
 }
 
 static ADDRESS_MAP_START( model1_mem, AS_PROGRAM, 16, model1_state )
@@ -1614,7 +1614,7 @@ ROM_START( netmerc )
 	ROM_LOAD16_BYTE( "u2", 0x0001, 0x4000, CRC(c589f428) SHA1(98dc0114a5f89636b4e237ed954e19f1cfd186ab) )
 ROM_END
 
-static MACHINE_CONFIG_START( model1 )
+MACHINE_CONFIG_START(model1_state::model1)
 	MCFG_CPU_ADD("maincpu", V60, 16000000)
 	MCFG_CPU_PROGRAM_MAP(model1_mem)
 	MCFG_CPU_IO_MAP(model1_io)
@@ -1654,7 +1654,7 @@ static MACHINE_CONFIG_START( model1 )
 	MCFG_M1COMM_ADD("m1comm")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED(swa, model1)
+MACHINE_CONFIG_DERIVED(model1_state::swa, model1)
 	MCFG_SPEAKER_STANDARD_STEREO("dleft", "dright")
 	MCFG_DSBZ80_ADD(DSBZ80_TAG)
 	MCFG_SOUND_ROUTE(0, "dleft", 1.0)
@@ -1672,12 +1672,12 @@ static ADDRESS_MAP_START( polhemus_map, AS_PROGRAM, 16, model1_state )
 	AM_RANGE(0xf8000, 0xfffff) AM_ROM AM_REGION("polhemus", 0)
 ADDRESS_MAP_END
 
-static MACHINE_CONFIG_DERIVED( netmerc, model1 )
+MACHINE_CONFIG_DERIVED(model1_state::netmerc, model1)
 	MCFG_CPU_ADD("polhemus", I386SX, 16000000)
 	MCFG_CPU_PROGRAM_MAP(polhemus_map)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( model1_vr )
+MACHINE_CONFIG_START(model1_state::model1_vr)
 	MCFG_CPU_ADD("maincpu", V60, 16000000)
 	MCFG_CPU_PROGRAM_MAP(model1_vr_mem)
 	MCFG_CPU_IO_MAP(model1_vr_io)

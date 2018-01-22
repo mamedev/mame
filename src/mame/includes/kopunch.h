@@ -52,4 +52,5 @@ public:
 
 	virtual void machine_start() override;
 	virtual void video_start() override;
+	void kopunch(machine_config &config);
 };

@@ -257,6 +257,7 @@ public:
 	MC6845_UPDATE_ROW(crtc_update_row);
 	void vram_write(uint8_t data);
 
+	void vk100(machine_config &config);
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
@@ -422,7 +423,7 @@ TIMER_CALLBACK_MEMBER(vk100_state::execute_vg)
 		m_vgPAT_Mask >>= 1; // shift the mask
 		if (m_vgPAT_Mask == 0) m_vgPAT_Mask = 0x80; // reset mask if it hits 0
 	}
-	if (m_vgGO) timer_set(attotime::from_hz(XTAL_45_6192Mhz/3/12/2), TIMER_EXECUTE_VG); // /3/12/2 is correct. the sync counter is clocked by the dot clock, despite the error on figure 5-21
+	if (m_vgGO) timer_set(attotime::from_hz(XTAL_45_6192MHz/3/12/2), TIMER_EXECUTE_VG); // /3/12/2 is correct. the sync counter is clocked by the dot clock, despite the error on figure 5-21
 }
 
 /* ports 0x40 and 0x41: load low and high bytes of vector gen X register */
@@ -1032,7 +1033,7 @@ MC6845_UPDATE_ROW( vk100_state::crtc_update_row )
 }
 
 
-static MACHINE_CONFIG_START( vk100 )
+MACHINE_CONFIG_START(vk100_state::vk100)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8085A, XTAL_5_0688MHz)
 	MCFG_CPU_PROGRAM_MAP(vk100_mem)
@@ -1040,10 +1041,10 @@ static MACHINE_CONFIG_START( vk100 )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL_45_6192Mhz/3, 882, 0, 720, 370, 0, 350 ) // fake screen timings for startup until 6845 sets real ones
+	MCFG_SCREEN_RAW_PARAMS(XTAL_45_6192MHz/3, 882, 0, 720, 370, 0, 350 ) // fake screen timings for startup until 6845 sets real ones
 	MCFG_SCREEN_UPDATE_DEVICE( "crtc", mc6845_device, screen_update )
 
-	MCFG_MC6845_ADD( "crtc", H46505, "screen", XTAL_45_6192Mhz/3/12)
+	MCFG_MC6845_ADD( "crtc", H46505, "screen", XTAL_45_6192MHz/3/12)
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(12)
 	MCFG_MC6845_UPDATE_ROW_CB(vk100_state, crtc_update_row)

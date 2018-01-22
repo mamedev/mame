@@ -289,7 +289,7 @@ FLOPPY_FORMATS_END
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( c8280_device::device_add_mconfig )
+MACHINE_CONFIG_START(c8280_device::device_add_mconfig)
 	MCFG_CPU_ADD(M6502_DOS_TAG, M6502, XTAL_12MHz/8)
 	MCFG_CPU_PROGRAM_MAP(c8280_main_mem)
 

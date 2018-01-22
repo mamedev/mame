@@ -25,6 +25,7 @@
 // - Correct character generator ROMs (a huge "thank you" to Ansgar Kueckes for the dumps!)
 // - 98775 light pen controller
 // - Display softkeys on 45C & 45T
+// - HLE of integral printer
 // What's not yet in:
 // - Better naming of tape drive image (it's now "magt1" and "magt2", should be "t15" and "t14")
 // - Better documentation of this file
@@ -32,7 +33,6 @@
 // - Speed, as usual
 // - Light pen tracing sometimes behaves erratically in 45C and 45T
 // What will probably never be in:
-// - Integral printer (firmware and character generator ROMs are very difficult to dump)
 // - Fast LPU processor (dump of microcode PROMs is not available)
 
 #include "emu.h"
@@ -48,6 +48,7 @@
 
 #include "hp9845b.lh"
 
+#include "machine/hp9845_printer.h"
 
 // Debugging
 #define VERBOSE 0
@@ -187,6 +188,7 @@ constexpr unsigned LP_FOV = 9;  // Field of view
 constexpr unsigned LP_XOFFSET = 5;  // x-offset of LP (due to delay in hit recognition)
 
 // Peripheral Addresses (PA)
+#define PRINTER_PA          0
 #define IO_SLOT_FIRST_PA    1
 #define IO_SLOT_LAST_PA     12
 #define GVIDEO_PA           13
@@ -203,6 +205,8 @@ public:
 	{ }
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	void hp9845a(machine_config &config);
+	void hp9835a(machine_config &config);
 };
 
 static INPUT_PORTS_START( hp9845 )
@@ -523,6 +527,8 @@ void hp9845_base_state::machine_reset()
 
 	m_beeper->set_state(0);
 
+	m_prt_irl = false;
+
 	logerror("STS=%04x FLG=%04x\n" , m_sts_status , m_flg_status);
 }
 
@@ -708,8 +714,8 @@ TIMER_DEVICE_CALLBACK_MEMBER(hp9845_base_state::kb_scan)
 			// Key pressed, store scancode & generate IRL
 			//logerror("idx=%u msl=%d\n" , max_seq_idx , max_seq_len);
 			m_kb_scancode = max_seq_idx;
-			irq_w(0 , 1);
 			BIT_SET(m_kb_status, 0);
+			update_kb_prt_irq();
 
 			// Special case: pressing stop key sets LPU "status" flag
 			if (max_seq_idx == 0x47) {
@@ -732,8 +738,8 @@ READ16_MEMBER(hp9845_base_state::kb_status_r)
 
 WRITE16_MEMBER(hp9845_base_state::kb_irq_clear_w)
 {
-		irq_w(0 , 0);
 		BIT_CLR(m_kb_status, 0);
+		update_kb_prt_irq();
 		m_lpu->status_w(0);
 
 		if (BIT(data , 15)) {
@@ -741,6 +747,12 @@ WRITE16_MEMBER(hp9845_base_state::kb_irq_clear_w)
 			m_beep_timer->adjust(attotime::from_ticks(64, KEY_SCAN_OSCILLATOR / 512));
 			m_beeper->set_state(1);
 		}
+}
+
+void hp9845_base_state::update_kb_prt_irq()
+{
+	bool state = BIT(m_kb_status , 0) || m_prt_irl;
+	irq_w(0 , state);
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER(hp9845_base_state::beeper_off)
@@ -754,6 +766,22 @@ WRITE8_MEMBER(hp9845_base_state::pa_w)
 		m_pa = data;
 		update_flg_sts();
 	}
+}
+
+WRITE_LINE_MEMBER(hp9845_base_state::prt_irl_w)
+{
+	m_prt_irl = state;
+	update_kb_prt_irq();
+}
+
+WRITE_LINE_MEMBER(hp9845_base_state::prt_flg_w)
+{
+	flg_w(PRINTER_PA , state);
+}
+
+WRITE_LINE_MEMBER(hp9845_base_state::prt_sts_w)
+{
+	sts_w(PRINTER_PA , state);
 }
 
 WRITE_LINE_MEMBER(hp9845_base_state::t14_irq_w)
@@ -834,6 +862,7 @@ public:
 
 	DECLARE_WRITE_LINE_MEMBER(vblank_w);
 
+	void hp9845b(machine_config &config);
 protected:
 	void set_graphic_mode(bool graphic);
 	void set_video_mar(uint16_t mar);
@@ -1046,7 +1075,7 @@ void hp9845b_state::video_fill_buff(bool buff_idx)
 				// Limit on accesses per row reached
 				break;
 			}
-			m_video_word = prog_space.read_word(m_video_mar << 1);
+			m_video_word = prog_space.read_word(m_video_mar);
 			if (m_video_load_mar) {
 				// Load new address into MAR after start of a new frame or NWA instruction
 				if (m_video_first_mar) {
@@ -1620,7 +1649,7 @@ void hp9845ct_base_state::video_fill_buff(bool buff_idx)
 			// Limit on accesses per row reached
 			break;
 		}
-		m_video_word = prog_space.read_word(m_video_mar << 1);
+		m_video_word = prog_space.read_word(m_video_mar);
 		if (m_video_load_mar) {
 			// Load new address into MAR after start of a new frame or NWA instruction
 			if (m_video_first_mar) {
@@ -2058,6 +2087,7 @@ public:
 
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline_timer);
 
+	void hp9845c(machine_config &config);
 protected:
 	virtual void set_graphic_mode(bool graphic , bool alpha) override;
 	void video_render_buff(unsigned video_scanline , unsigned line_in_row, bool buff_idx);
@@ -2794,6 +2824,7 @@ public:
 
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline_timer);
 
+	void hp9845t(machine_config &config);
 protected:
 	virtual void set_graphic_mode(bool graphic , bool alpha) override;
 	void video_render_buff(unsigned video_scanline , unsigned line_in_row, bool buff_idx);
@@ -3626,7 +3657,7 @@ const uint8_t hp9845t_state::m_back_arrow_shape[] = {
 	0xf8, 0xf0, 0xe0, 0xc0, 0x80, 0x00, 0x00
 };
 
-static MACHINE_CONFIG_START( hp9845a )
+MACHINE_CONFIG_START(hp9845_state::hp9845a)
 	//MCFG_CPU_ADD("lpu", HP_5061_3010, XTAL_11_4MHz)
 	//MCFG_CPU_ADD("ppu", HP_5061_3011, XTAL_11_4MHz)
 
@@ -3641,7 +3672,7 @@ static MACHINE_CONFIG_START( hp9845a )
 	MCFG_SOFTWARE_LIST_ADD("optrom_list", "hp9845a_rom")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( hp9835a )
+MACHINE_CONFIG_START(hp9845_state::hp9835a)
 	//MCFG_CPU_ADD("lpu", HP_5061_3001, XTAL_11_4MHz)
 	//MCFG_CPU_ADD("ppu", HP_5061_3001, XTAL_11_4MHz)
 
@@ -3695,6 +3726,9 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(ppu_io_map , AS_IO , 16 , hp9845_base_state)
 	ADDRESS_MAP_UNMAP_LOW
+	// PA = 0, IC = 0..1
+	// Internal printer
+	AM_RANGE(HP_MAKE_IOADDR(PRINTER_PA , 0) , HP_MAKE_IOADDR(PRINTER_PA , 1)) AM_DEVREADWRITE("printer" , hp9845_printer_device , printer_r , printer_w)
 	// PA = 0, IC = 2
 	// Keyboard scancode input
 	AM_RANGE(HP_MAKE_IOADDR(0 , 2) , HP_MAKE_IOADDR(0 , 2)) AM_READ(kb_scancode_r)
@@ -3712,7 +3746,7 @@ static ADDRESS_MAP_START(ppu_io_map , AS_IO , 16 , hp9845_base_state)
 	AM_RANGE(HP_MAKE_IOADDR(T15_PA , 0) , HP_MAKE_IOADDR(T15_PA , 3))        AM_DEVREADWRITE("t15" , hp_taco_device , reg_r , reg_w)
 ADDRESS_MAP_END
 
-static MACHINE_CONFIG_START(hp9845_base)
+MACHINE_CONFIG_START(hp9845_base_state::hp9845_base)
 	MCFG_CPU_ADD("lpu", HP_5061_3001, 5700000)
 	MCFG_CPU_PROGRAM_MAP(global_mem_map)
 	MCFG_HPHYBRID_SET_9845_BOOT(true)
@@ -3791,9 +3825,15 @@ static MACHINE_CONFIG_START(hp9845_base)
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("192K")
 	MCFG_RAM_EXTRA_OPTIONS("64K, 320K, 448K")
+
+	// Internal printer
+	MCFG_DEVICE_ADD("printer" , HP9845_PRINTER , 0)
+	MCFG_9845PRT_IRL_HANDLER(WRITELINE(hp9845_base_state , prt_irl_w))
+	MCFG_9845PRT_FLG_HANDLER(WRITELINE(hp9845_base_state , prt_flg_w))
+	MCFG_9845PRT_STS_HANDLER(WRITELINE(hp9845_base_state , prt_sts_w))
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START(hp9845b)
+MACHINE_CONFIG_START(hp9845b_state::hp9845b)
 	MCFG_FRAGMENT_ADD(hp9845_base)
 	// video hardware
 	MCFG_SCREEN_MODIFY("screen")
@@ -3811,7 +3851,7 @@ static MACHINE_CONFIG_START(hp9845b)
 
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START(hp9845c)
+MACHINE_CONFIG_START(hp9845c_state::hp9845c)
 	MCFG_FRAGMENT_ADD(hp9845_base)
 	// video hardware
 	MCFG_SCREEN_MODIFY("screen")
@@ -3825,7 +3865,7 @@ static MACHINE_CONFIG_START(hp9845c)
 
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START(hp9845t)
+MACHINE_CONFIG_START(hp9845t_state::hp9845t)
 	MCFG_FRAGMENT_ADD(hp9845_base)
 	// video hardware
 	MCFG_SCREEN_MODIFY("screen")

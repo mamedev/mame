@@ -119,7 +119,7 @@ READ8_MEMBER(lkage_state::sound_status_r)
 static ADDRESS_MAP_START( lkage_map, AS_PROGRAM, 8, lkage_state )
 	AM_RANGE(0x0000, 0xdfff) AM_ROM
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM /* work ram */
-	AM_RANGE(0xe800, 0xefff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0xe800, 0xefff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
 	AM_RANGE(0xf000, 0xf003) AM_RAM AM_SHARE("vreg") /* video registers */
 	AM_RANGE(0xf060, 0xf060) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
 	AM_RANGE(0xf061, 0xf061) AM_WRITENOP AM_READ(sound_status_r)
@@ -482,7 +482,7 @@ void lkage_state::machine_reset()
 	m_soundnmi->in_w<1>(0);
 }
 
-static MACHINE_CONFIG_START( lkage )
+MACHINE_CONFIG_START(lkage_state::lkage)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, MAIN_CPU_CLOCK)
@@ -535,7 +535,7 @@ static MACHINE_CONFIG_START( lkage )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( lkageb )
+MACHINE_CONFIG_START(lkage_state::lkageb)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80,MAIN_CPU_CLOCK)

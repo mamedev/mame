@@ -296,7 +296,7 @@ READ8_MEMBER(nes_jy_typea_device::read_m)
 
 inline uint8_t nes_jy_typea_device::unscramble(uint8_t bank)
 {
-	return BITSWAP8(bank & 0x7f,7,0,1,2,3,4,5,6);
+	return bitswap<8>(bank & 0x7f,7,0,1,2,3,4,5,6);
 }
 
 void nes_jy_typea_device::update_prg()

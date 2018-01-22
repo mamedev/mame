@@ -8,6 +8,7 @@
 #include "emu.h"
 #include "sharc.h"
 #include "sharcfe.h"
+#include "sharcdsm.h"
 
 #include "debugger.h"
 
@@ -96,10 +97,9 @@ device_memory_interface::space_config_vector adsp21062_device::memory_space_conf
 	};
 }
 
-offs_t adsp21062_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+util::disasm_interface *adsp21062_device::create_disassembler()
 {
-	extern CPU_DISASSEMBLE( sharc );
-	return CPU_DISASSEMBLE_NAME(sharc)(this, stream, pc, oprom, opram, options);
+	return new sharc_disassembler;
 }
 
 void adsp21062_device::enable_recompiler()
@@ -400,7 +400,7 @@ void adsp21062_device::external_iop_write(uint32_t address, uint32_t data)
 	else
 	{
 		osd_printf_debug("SHARC IOP write %08X, %08X\n", address, data);
-		m_data->write_dword(address << 2, data);
+		m_data->write_dword(address, data);
 	}
 }
 
@@ -1031,7 +1031,7 @@ void adsp21062_device::execute_run()
 
 			debugger_instruction_hook(this, m_core->pc);
 
-			m_core->opcode = m_program->read_qword(m_core->pc << 3);
+			m_core->opcode = m_program->read_qword(m_core->pc);
 
 			// handle looping
 			if (m_core->pc == m_core->laddr.addr)

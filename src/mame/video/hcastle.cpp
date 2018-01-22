@@ -56,8 +56,8 @@ TILEMAP_MAPPER_MEMBER(hcastle_state::tilemap_scan)
 
 TILE_GET_INFO_MEMBER(hcastle_state::get_fg_tile_info)
 {
-	uint8_t ctrl_5 = m_k007121_1->ctrlram_r(generic_space(), 5);
-	uint8_t ctrl_6 = m_k007121_1->ctrlram_r(generic_space(), 6);
+	uint8_t ctrl_5 = m_k007121_1->ctrlram_r(5);
+	uint8_t ctrl_6 = m_k007121_1->ctrlram_r(6);
 	int bit0 = (ctrl_5 >> 0) & 0x03;
 	int bit1 = (ctrl_5 >> 2) & 0x03;
 	int bit2 = (ctrl_5 >> 4) & 0x03;
@@ -79,8 +79,8 @@ TILE_GET_INFO_MEMBER(hcastle_state::get_fg_tile_info)
 
 TILE_GET_INFO_MEMBER(hcastle_state::get_bg_tile_info)
 {
-	uint8_t ctrl_5 = m_k007121_2->ctrlram_r(generic_space(), 5);
-	uint8_t ctrl_6 = m_k007121_2->ctrlram_r(generic_space(), 6);
+	uint8_t ctrl_5 = m_k007121_2->ctrlram_r(5);
+	uint8_t ctrl_6 = m_k007121_2->ctrlram_r(6);
 	int bit0 = (ctrl_5 >> 0) & 0x03;
 	int bit1 = (ctrl_5 >> 2) & 0x03;
 	int bit2 = (ctrl_5 >> 4) & 0x03;
@@ -183,8 +183,7 @@ WRITE8_MEMBER(hcastle_state::hcastle_pf2_control_w)
 void hcastle_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, bitmap_ind8 &priority_bitmap, uint8_t *sbank, int bank )
 {
 	k007121_device *k007121 = bank ? m_k007121_2 : m_k007121_1;
-	address_space &space = machine().dummy_space();
-	int base_color = (k007121->ctrlram_r(space, 6) & 0x30) * 2;
+	int base_color = (k007121->ctrlram_r(6) & 0x30) * 2;
 	int bank_base = (bank == 0) ? 0x4000 * (m_gfx_bank & 1) : 0;
 
 	k007121->sprites_draw(bitmap, cliprect, m_gfxdecode->gfx(bank), *m_palette, sbank, base_color, 0, bank_base, priority_bitmap, (uint32_t)-1);
@@ -194,16 +193,14 @@ void hcastle_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect
 
 uint32_t hcastle_state::screen_update_hcastle(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	address_space &space = machine().dummy_space();
-
-	uint8_t ctrl_1_0 = m_k007121_1->ctrlram_r(space, 0);
-	uint8_t ctrl_1_1 = m_k007121_1->ctrlram_r(space, 1);
-	uint8_t ctrl_1_2 = m_k007121_1->ctrlram_r(space, 2);
-	uint8_t ctrl_1_3 = m_k007121_1->ctrlram_r(space, 3);
-	uint8_t ctrl_2_0 = m_k007121_2->ctrlram_r(space, 0);
-	uint8_t ctrl_2_1 = m_k007121_2->ctrlram_r(space, 1);
-	uint8_t ctrl_2_2 = m_k007121_2->ctrlram_r(space, 2);
-	uint8_t ctrl_2_3 = m_k007121_2->ctrlram_r(space, 3);
+	uint8_t ctrl_1_0 = m_k007121_1->ctrlram_r(0);
+	uint8_t ctrl_1_1 = m_k007121_1->ctrlram_r(1);
+	uint8_t ctrl_1_2 = m_k007121_1->ctrlram_r(2);
+	uint8_t ctrl_1_3 = m_k007121_1->ctrlram_r(3);
+	uint8_t ctrl_2_0 = m_k007121_2->ctrlram_r(0);
+	uint8_t ctrl_2_1 = m_k007121_2->ctrlram_r(1);
+	uint8_t ctrl_2_2 = m_k007121_2->ctrlram_r(2);
+	uint8_t ctrl_2_3 = m_k007121_2->ctrlram_r(3);
 
 	m_pf1_bankbase = 0x0000;
 	m_pf2_bankbase = 0x4000 * ((m_gfx_bank & 2) >> 1);

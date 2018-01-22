@@ -327,7 +327,7 @@ static GFXDECODE_START( qwak )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( runaway )
+MACHINE_CONFIG_START(runaway_state::runaway)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, 12096000 / 8) /* ? */
@@ -368,7 +368,7 @@ static MACHINE_CONFIG_START( runaway )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( qwak, runaway )
+MACHINE_CONFIG_DERIVED(runaway_state::qwak, runaway)
 
 	/* basic machine hardware */
 

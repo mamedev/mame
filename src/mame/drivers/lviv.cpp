@@ -420,7 +420,7 @@ INPUT_PORTS_END
 
 
 /* machine definition */
-static MACHINE_CONFIG_START( lviv )
+MACHINE_CONFIG_START(lviv_state::lviv)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8080, 2500000)
 	MCFG_CPU_PROGRAM_MAP(lviv_mem)

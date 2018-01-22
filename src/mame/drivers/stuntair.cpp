@@ -27,7 +27,7 @@ Bg 1,5kb (2114 x3)
 Sprites 1kb (2148 x2)
 color 320byte (27ls00 x10)
 
-Rom definiton:
+Rom definition:
 -top pcb-
 stuntair.a0,a1,a3,a4,a6 main program
 stuntair.e14 sound program
@@ -143,6 +143,7 @@ public:
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_stuntair(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_PALETTE_INIT(stuntair);
+	void stuntair(machine_config &config);
 };
 
 
@@ -506,7 +507,7 @@ void stuntair_state::machine_reset()
 {
 }
 
-static MACHINE_CONFIG_START( stuntair )
+MACHINE_CONFIG_START(stuntair_state::stuntair)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80,  XTAL_18_432MHz/6)         /* 3 MHz? */

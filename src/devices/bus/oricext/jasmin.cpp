@@ -70,7 +70,7 @@ const tiny_rom_entry *jasmin_device::device_rom_region() const
 	return ROM_NAME( jasmin );
 }
 
-MACHINE_CONFIG_MEMBER( jasmin_device::device_add_mconfig )
+MACHINE_CONFIG_START(jasmin_device::device_add_mconfig)
 	MCFG_WD1770_ADD("fdc", XTAL_8MHz)
 	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(oricext_device, irq_w))
 

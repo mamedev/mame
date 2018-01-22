@@ -1697,7 +1697,7 @@ READ8_MEMBER( x1_state::x1_io_r )
 	else if(offset >= 0x4000 && offset <= 0xffff)   { return m_gfx_bitmap_ram[offset-0x4000+(m_scrn_reg.gfx_bank*0xc000)]; }
 	else
 	{
-		//logerror("(PC=%06x) Read i/o address %04x\n",space.device().safe_pc(),offset);
+		//logerror("(PC=%06x) Read i/o address %04x\n",m_maincpu->pc(),offset);
 	}
 	return 0xff;
 }
@@ -1740,7 +1740,7 @@ WRITE8_MEMBER( x1_state::x1_io_w )
 	else if(offset >= 0x4000 && offset <= 0xffff)   { m_gfx_bitmap_ram[offset-0x4000+(m_scrn_reg.gfx_bank*0xc000)] = data; }
 	else
 	{
-		//logerror("(PC=%06x) Write %02x at i/o address %04x\n",space.device().safe_pc(),data,offset);
+		//logerror("(PC=%06x) Write %02x at i/o address %04x\n",m_maincpu->pc(),data,offset);
 	}
 }
 
@@ -1787,7 +1787,7 @@ READ8_MEMBER( x1_state::x1turbo_io_r )
 	else if(offset >= 0x4000 && offset <= 0xffff)   { return m_gfx_bitmap_ram[offset-0x4000+(m_scrn_reg.gfx_bank*0xc000)]; }
 	else
 	{
-		//logerror("(PC=%06x) Read i/o address %04x\n",space.device().safe_pc(),offset);
+		//logerror("(PC=%06x) Read i/o address %04x\n",m_maincpu->pc(),offset);
 	}
 	return 0xff;
 }
@@ -1843,7 +1843,7 @@ WRITE8_MEMBER( x1_state::x1turbo_io_w )
 	else if(offset >= 0x4000 && offset <= 0xffff)   { m_gfx_bitmap_ram[offset-0x4000+(m_scrn_reg.gfx_bank*0xc000)] = data; }
 	else
 	{
-		//logerror("(PC=%06x) Write %02x at i/o address %04x\n",space.device().safe_pc(),data,offset);
+		//logerror("(PC=%06x) Write %02x at i/o address %04x\n",m_maincpu->pc(),data,offset);
 	}
 }
 
@@ -2526,7 +2526,7 @@ static SLOT_INTERFACE_START( x1_floppies )
 	SLOT_INTERFACE("dd", FLOPPY_525_DD)
 SLOT_INTERFACE_END
 
-static MACHINE_CONFIG_START( x1 )
+MACHINE_CONFIG_START(x1_state::x1)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("x1_cpu", Z80, MAIN_CLOCK/4)
 	MCFG_CPU_PROGRAM_MAP(x1_mem)
@@ -2609,7 +2609,7 @@ static MACHINE_CONFIG_START( x1 )
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("cmt_wind_timer", x1_state, x1_cmt_wind_timer, attotime::from_hz(16))
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( x1turbo, x1 )
+MACHINE_CONFIG_DERIVED(x1_state::x1turbo, x1)
 	MCFG_CPU_MODIFY("x1_cpu")
 	MCFG_CPU_PROGRAM_MAP(x1turbo_mem)
 	MCFG_CPU_IO_MAP(x1turbo_io)

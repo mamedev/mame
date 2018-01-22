@@ -296,7 +296,7 @@ DISCRETE_SOUND_START( sprint8 )
 	DISCRETE_TASK_END()
 DISCRETE_SOUND_END
 
-MACHINE_CONFIG_START( sprint8_audio )
+MACHINE_CONFIG_START(sprint8_state::sprint8_audio)
 	/* sound hardware */
 	/* the proper way is to hook up 4 speakers, but they are not really
 	 * F/R/L/R speakers.  Though you can pretend the 1-2 mix is the front. */

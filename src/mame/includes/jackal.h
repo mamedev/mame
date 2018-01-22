@@ -58,4 +58,5 @@ public:
 	void draw_background( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void draw_sprites_region( bitmap_ind16 &bitmap, const rectangle &cliprect, const uint8_t *sram, int length, int bank );
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
+	void jackal(machine_config &config);
 };

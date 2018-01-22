@@ -37,6 +37,7 @@ public:
 	required_ioport_array<6> m_row;
 	TIMER_DEVICE_CALLBACK_MEMBER(zac_2_inttimer);
 	TIMER_DEVICE_CALLBACK_MEMBER(zac_2_outtimer);
+	void zac_2(machine_config &config);
 protected:
 
 	// devices
@@ -185,7 +186,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(zac_2_state::zac_2_inttimer)
 {
 	// a pulse is sent via a capacitor (similar to what one finds at a reset pin)
 	if (m_t_c > 0x80)
-		generic_pulse_irq_line_and_vector(*m_maincpu, INPUT_LINE_IRQ0, 0xbf, 2);
+		m_maincpu->pulse_input_line_and_vector(INPUT_LINE_IRQ0, 0xbf, 2 * m_maincpu->minimum_quantum_time());
 	else
 		m_t_c++;
 }
@@ -204,7 +205,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(zac_2_state::zac_2_outtimer)
 	}
 }
 
-static MACHINE_CONFIG_START( zac_2 )
+MACHINE_CONFIG_START(zac_2_state::zac_2)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", S2650, 6000000/2)
 	MCFG_CPU_PROGRAM_MAP(zac_2_map)

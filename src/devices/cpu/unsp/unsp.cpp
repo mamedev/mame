@@ -10,6 +10,7 @@
 
 #include "emu.h"
 #include "unsp.h"
+#include "unspdasm.h"
 #include "debugger.h"
 
 
@@ -30,10 +31,9 @@ device_memory_interface::space_config_vector unsp_device::memory_space_config() 
 	};
 }
 
-offs_t unsp_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+util::disasm_interface *unsp_device::create_disassembler()
 {
-	extern CPU_DISASSEMBLE( unsp );
-	return CPU_DISASSEMBLE_NAME(unsp)(this, stream, pc, oprom, opram, options);
+	return new unsp_disassembler;
 }
 
 
@@ -116,12 +116,12 @@ void unsp_device::unimplemented_opcode(uint16_t op)
 
 uint16_t unsp_device::READ16(uint32_t address)
 {
-	return m_program->read_word(address<<1);
+	return m_program->read_word(address);
 }
 
 void unsp_device::WRITE16(uint32_t address, uint16_t data)
 {
-	m_program->write_word(address<<1, data);
+	m_program->write_word(address, data);
 }
 
 /*****************************************************************************/

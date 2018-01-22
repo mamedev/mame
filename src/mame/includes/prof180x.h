@@ -45,6 +45,7 @@ public:
 	int m_c2;
 	int m_mm0;
 	int m_mm1;
+	void prof180x(machine_config &config);
 };
 
 #endif // MAME_INCLUDES_PROF180X_H

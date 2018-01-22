@@ -56,7 +56,6 @@ public:
 	uint16_t m_blitter_clip_address;
 	uint8_t m_blitter_window_enable;
 	uint8_t m_cocktail;
-	uint8_t m_port_select;
 	std::unique_ptr<rgb_t[]> m_palette_lookup;
 	uint8_t m_blitterram[8];
 	uint8_t m_blitter_xor;
@@ -73,7 +72,6 @@ public:
 	DECLARE_WRITE8_MEMBER(sinistar_vram_select_w);
 	DECLARE_READ8_MEMBER(williams_video_counter_r);
 	DECLARE_WRITE8_MEMBER(williams_blitter_w);
-	DECLARE_CUSTOM_INPUT_MEMBER(williams_mux_r);
 	DECLARE_DRIVER_INIT(sinistar);
 	DECLARE_DRIVER_INIT(stargate);
 	DECLARE_DRIVER_INIT(playball);
@@ -102,9 +100,7 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(williams_count240_callback);
 	DECLARE_WRITE8_MEMBER(williams_snd_cmd_w);
 	DECLARE_WRITE8_MEMBER(playball_snd_cmd_w);
-	DECLARE_WRITE_LINE_MEMBER(williams_port_select_w);
 	DECLARE_READ8_MEMBER(williams_49way_port_0_r);
-	DECLARE_READ8_MEMBER(williams_input_port_49way_0_5_r);
 	DECLARE_WRITE_LINE_MEMBER(lottofun_coin_lock_w);
 
 	void state_save_register();
@@ -127,6 +123,14 @@ public:
 	required_device<pia6821_device> m_pia_0;
 	required_device<pia6821_device> m_pia_1;
 	required_device<pia6821_device> m_pia_2;
+	void playball(machine_config &config);
+	void defender(machine_config &config);
+	void sinistar(machine_config &config);
+	void lottofun(machine_config &config);
+	void spdball(machine_config &config);
+	void williams(machine_config &config);
+	void williams_muxed(machine_config &config);
+	void jin(machine_config &config);
 };
 
 
@@ -165,6 +169,8 @@ public:
 	uint32_t screen_update_blaster(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	inline void update_blaster_banking();
+	void blastkit(machine_config &config);
+	void blaster(machine_config &config);
 };
 
 
@@ -204,9 +210,6 @@ public:
 	DECLARE_WRITE8_MEMBER(williams2_snd_cmd_w);
 	DECLARE_WRITE_LINE_MEMBER(mysticm_main_irq);
 	DECLARE_WRITE_LINE_MEMBER(tshoot_main_irq);
-	DECLARE_READ8_MEMBER(tshoot_input_port_0_3_r);
-	DECLARE_WRITE_LINE_MEMBER(tshoot_maxvol_w);
-	DECLARE_WRITE8_MEMBER(tshoot_lamp_w);
 
 	DECLARE_DRIVER_INIT(mysticm);
 	DECLARE_DRIVER_INIT(tshoot);
@@ -215,8 +218,27 @@ public:
 	DECLARE_MACHINE_RESET(williams2);
 	DECLARE_VIDEO_START(williams2);
 	uint32_t screen_update_williams2(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	void williams2(machine_config &config);
+	void mysticm(machine_config &config);
+	void inferno(machine_config &config);
 };
 
+
+class tshoot_state : public williams2_state
+{
+public:
+	tshoot_state(const machine_config &mconfig, device_type type, const char *tag)
+		: williams2_state(mconfig, type, tag),
+		m_gun(*this, {"GUNX", "GUNY"}) { }
+
+	DECLARE_CUSTOM_INPUT_MEMBER(gun_r);
+	DECLARE_WRITE_LINE_MEMBER(maxvol_w);
+	DECLARE_WRITE8_MEMBER(lamp_w);
+
+	void tshoot(machine_config &config);
+private:
+	required_ioport_array<2> m_gun;
+};
 
 class joust2_state : public williams2_state
 {
@@ -234,6 +256,7 @@ public:
 	TIMER_CALLBACK_MEMBER(joust2_deferred_snd_cmd_w);
 	DECLARE_WRITE8_MEMBER(joust2_snd_cmd_w);
 	DECLARE_WRITE_LINE_MEMBER(joust2_pia_3_cb1_w);
+	void joust2(machine_config &config);
 };
 
 /*----------- defined in video/williams.cpp -----------*/

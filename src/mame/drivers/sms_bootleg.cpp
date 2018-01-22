@@ -271,7 +271,7 @@ ADDRESS_MAP_END
 
 
 
-static MACHINE_CONFIG_START( sms_supergame )
+MACHINE_CONFIG_START(smsbootleg_state::sms_supergame)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_10_738635MHz/3)
 	MCFG_CPU_PROGRAM_MAP(sms_supergame_map)

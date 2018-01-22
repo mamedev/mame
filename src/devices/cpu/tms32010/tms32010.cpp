@@ -59,6 +59,7 @@
 
 #include "emu.h"
 #include "tms32010.h"
+#include "32010dsm.h"
 #include "debugger.h"
 
 
@@ -134,10 +135,9 @@ device_memory_interface::space_config_vector tms32010_device::memory_space_confi
 	};
 }
 
-offs_t tms32010_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+util::disasm_interface *tms32010_device::create_disassembler()
 {
-	extern CPU_DISASSEMBLE( tms32010 );
-	return CPU_DISASSEMBLE_NAME(tms32010)(this, stream, pc, oprom, opram, options);
+	return new tms32010_disassembler;
 }
 
 
@@ -165,14 +165,14 @@ offs_t tms32010_device::disasm_disassemble(std::ostream &stream, offs_t pc, cons
  *  Input a word from given I/O port
  */
 
-#define TMS32010_In(Port) (m_io->read_word((Port)<<1))
+#define TMS32010_In(Port) (m_io->read_word(Port))
 
 
 /****************************************************************************
  *  Output a word to given I/O port
  */
 
-#define TMS32010_Out(Port,Value) (m_io->write_word((Port)<<1,Value))
+#define TMS32010_Out(Port,Value) (m_io->write_word(Port,Value))
 
 
 
@@ -180,14 +180,14 @@ offs_t tms32010_device::disasm_disassemble(std::ostream &stream, offs_t pc, cons
  *  Read a word from given ROM memory location
  */
 
-#define TMS32010_ROM_RDMEM(A) (m_program->read_word((A)<<1))
+#define TMS32010_ROM_RDMEM(A) (m_program->read_word(A))
 
 
 /****************************************************************************
  *  Write a word to given ROM memory location
  */
 
-#define TMS32010_ROM_WRMEM(A,V) (m_program->write_word((A)<<1,V))
+#define TMS32010_ROM_WRMEM(A,V) (m_program->write_word(A,V))
 
 
 
@@ -195,14 +195,14 @@ offs_t tms32010_device::disasm_disassemble(std::ostream &stream, offs_t pc, cons
  *  Read a word from given RAM memory location
  */
 
-#define TMS32010_RAM_RDMEM(A) (m_data->read_word((A)<<1))
+#define TMS32010_RAM_RDMEM(A) (m_data->read_word(A))
 
 
 /****************************************************************************
  *  Write a word to given RAM memory location
  */
 
-#define TMS32010_RAM_WRMEM(A,V) (m_data->write_word((A)<<1,V))
+#define TMS32010_RAM_WRMEM(A,V) (m_data->write_word(A,V))
 
 
 
@@ -212,7 +212,7 @@ offs_t tms32010_device::disasm_disassemble(std::ostream &stream, offs_t pc, cons
  *  used to greatly speed up emulation
  */
 
-#define TMS32010_RDOP(A) (m_direct->read_word((A)<<1))
+#define TMS32010_RDOP(A) (m_direct->read_word(A))
 
 
 /****************************************************************************
@@ -221,7 +221,7 @@ offs_t tms32010_device::disasm_disassemble(std::ostream &stream, offs_t pc, cons
  *  that use different encoding mechanisms for opcodes and opcode arguments
  */
 
-#define TMS32010_RDOP_ARG(A) (m_direct->read_word((A)<<1))
+#define TMS32010_RDOP_ARG(A) (m_direct->read_word(A))
 
 
 /************************************************************************
@@ -523,7 +523,7 @@ void tms32010_device::eint()
 }
 void tms32010_device::in_p()
 {
-	m_ALU.w.l = P_IN( (m_opcode.b.h & 7) );
+	m_ALU.w.l = P_IN(m_opcode.b.h & 7);
 	putdata(m_ALU.w.l);
 }
 void tms32010_device::lac_sh()
@@ -834,7 +834,7 @@ void tms32010_device::device_start()
 	save_item(NAME(m_addr_mask));
 
 	m_program = &space(AS_PROGRAM);
-	m_direct = &m_program->direct();
+	m_direct = m_program->direct<-1>();
 	m_data = &space(AS_DATA);
 	m_io = &space(AS_IO);
 

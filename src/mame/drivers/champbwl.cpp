@@ -170,6 +170,7 @@ public:
 		m_seta001(*this, "spritegen"),
 		m_palette(*this, "palette"),
 		m_x1(*this, "x1snd"),
+		m_hopper(*this, "hopper"),
 		m_fakex(*this, "FAKEX"),
 		m_fakey(*this, "FAKEY") { }
 
@@ -179,6 +180,7 @@ public:
 	required_device<seta001_device> m_seta001;
 	required_device<palette_device> m_palette;
 	required_device<x1_010_device> m_x1;
+	optional_device<ticket_dispenser_device> m_hopper;
 
 	optional_ioport m_fakex;
 	optional_ioport m_fakey;
@@ -196,6 +198,8 @@ public:
 	uint32_t screen_update_doraemon(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank_champbwl);
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank_doraemon);
+	void champbwl(machine_config &config);
+	void doraemon(machine_config &config);
 };
 
 PALETTE_INIT_MEMBER(champbwl_state,champbwl)
@@ -271,11 +275,11 @@ ADDRESS_MAP_END
 
 WRITE8_MEMBER(champbwl_state::doraemon_outputs_w)
 {
-	machine().bookkeeping().coin_counter_w(0, data & 1); // coin in counter
-	machine().bookkeeping().coin_counter_w(1, data & 2); // gift out counter
+	machine().bookkeeping().coin_counter_w(0, BIT(data, 0)); // coin in counter
+	machine().bookkeeping().coin_counter_w(1, BIT(data, 1)); // gift out counter
 
-	machine().bookkeeping().coin_lockout_w(0, ~data & 8);    // coin lockout
-	machine().device<ticket_dispenser_device>("hopper")->write(space, 0, (data & 0x04) ? 0x00 : 0x80);  // gift out motor
+	machine().bookkeeping().coin_lockout_w(0, BIT(~data, 3));    // coin lockout
+	m_hopper->motor_w(BIT(~data, 2));  // gift out motor
 
 	membank("bank1")->set_entry((data & 0x30) >> 4);
 
@@ -479,7 +483,7 @@ WRITE_LINE_MEMBER(champbwl_state::screen_vblank_champbwl)
 }
 
 
-static MACHINE_CONFIG_START( champbwl )
+MACHINE_CONFIG_START(champbwl_state::champbwl)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 16000000/4) /* 4MHz */
@@ -544,7 +548,7 @@ MACHINE_START_MEMBER(champbwl_state,doraemon)
 	membank("bank1")->configure_entries(0, 4, &ROM[0x10000], 0x4000);
 }
 
-static MACHINE_CONFIG_START( doraemon )
+MACHINE_CONFIG_START(champbwl_state::doraemon)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_14_31818MHz/4)

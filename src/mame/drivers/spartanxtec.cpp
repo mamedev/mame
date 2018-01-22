@@ -68,6 +68,7 @@ public:
 	DECLARE_WRITE8_MEMBER(a801_w);
 	DECLARE_WRITE8_MEMBER(sound_irq_ack);
 	DECLARE_WRITE8_MEMBER(irq_ack);
+	void spartanxtec(machine_config &config);
 };
 
 
@@ -349,7 +350,7 @@ PALETTE_INIT_MEMBER(spartanxtec_state, spartanxtec)
 
 
 
-static MACHINE_CONFIG_START( spartanxtec )
+MACHINE_CONFIG_START(spartanxtec_state::spartanxtec)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80,4000000)         /* ? MHz */

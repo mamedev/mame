@@ -54,7 +54,7 @@ ioport_constructor spectrum_intf2_device::device_input_ports() const
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( spectrum_intf2_device::device_add_mconfig )
+MACHINE_CONFIG_START(spectrum_intf2_device::device_add_mconfig)
 	/* cartridge */
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "spectrum_cart")
 	MCFG_GENERIC_EXTENSIONS("bin,rom")

@@ -283,7 +283,7 @@ INTERRUPT_GEN_MEMBER(wiping_state::sound_timer_irq)
 
 
 
-static MACHINE_CONFIG_START( wiping )
+MACHINE_CONFIG_START(wiping_state::wiping)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80,18432000/6) /* 3.072 MHz */
@@ -319,7 +319,7 @@ static MACHINE_CONFIG_START( wiping )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("wiping", WIPING, 0)
+	MCFG_SOUND_ADD("wiping", WIPING_CUSTOM, 96000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 

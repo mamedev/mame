@@ -108,4 +108,6 @@ public:
 	void   sprite_dma_trigger(void);
 
 	INTERRUPT_GEN_MEMBER(rng_interrupt);
+	void rng(machine_config &config);
+	void rng_dual(machine_config &config);
 };

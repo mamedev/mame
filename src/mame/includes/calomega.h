@@ -54,6 +54,10 @@ public:
 	uint32_t screen_update_calomega(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_PALETTE_INIT(calomega);
 
+	void sys905(machine_config &config);
+	void s903mod(machine_config &config);
+	void sys906(machine_config &config);
+	void sys903(machine_config &config);
 protected:
 	virtual void video_start() override;
 

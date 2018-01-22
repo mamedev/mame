@@ -52,7 +52,7 @@ static const double tx1_engine_gains[16] =
 };
 
 
-DEFINE_DEVICE_TYPE(TX1, tx1_sound_device, "tx1_sound", "TX-1 Audio Custom")
+DEFINE_DEVICE_TYPE(TX1, tx1_sound_device, "tx1_sound", "TX-1 Custom Sound")
 
 tx1_sound_device::tx1_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: tx1_sound_device(mconfig, TX1, tag, owner, clock)
@@ -335,7 +335,7 @@ static const double bb_engine_gains[16] =
 	-1.0/(1.0/(BUGGYBOY_R1S + BUGGYBOY_R2S + BUGGYBOY_R3S + BUGGYBOY_R4S) + 1.0/100e3)/100e3,
 };
 
-DEFINE_DEVICE_TYPE(BUGGYBOY, buggyboy_sound_device, "buggyboy_sound", "Buggy Boy Audio Custom")
+DEFINE_DEVICE_TYPE(BUGGYBOY, buggyboy_sound_device, "buggyboy_sound", "Buggy Boy Custom Sound")
 
 buggyboy_sound_device::buggyboy_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: tx1_sound_device(mconfig, BUGGYBOY, tag, owner, clock)
@@ -435,18 +435,18 @@ WRITE8_MEMBER( buggyboy_sound_device::ym2_a_w )
 
 WRITE8_MEMBER( buggyboy_sound_device::ym2_b_w )
 {
-	device_t *ym1 = space.machine().device("ym1");
-	device_t *ym2 = space.machine().device("ym2");
+	device_t *ym1 = machine().device("ym1");
+	device_t *ym2 = machine().device("ym2");
 	double gain;
 
 	m_stream->update();
 
 	m_ym2_outputb = data ^ 0xff;
 
-	if (!strcmp(space.machine().system().name, "buggyboyjr"))
+	if (!strcmp(machine().system().name, "buggyboyjr"))
 	{
-		space.machine().bookkeeping().coin_counter_w(0, data & 0x01);
-		space.machine().bookkeeping().coin_counter_w(1, data & 0x02);
+		machine().bookkeeping().coin_counter_w(0, data & 0x01);
+		machine().bookkeeping().coin_counter_w(1, data & 0x02);
 	}
 
 	/*

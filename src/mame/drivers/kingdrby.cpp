@@ -130,6 +130,9 @@ public:
 	required_device<cpu_device> m_soundcpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	void kingdrbb(machine_config &config);
+	void cowrace(machine_config &config);
+	void kingdrby(machine_config &config);
 };
 
 
@@ -904,7 +907,7 @@ PALETTE_INIT_MEMBER(kingdrby_state,kingdrbb)
 	for(i = 0; i < 0x200; i++)
 	{
 		/* this set has an extra address line shuffle applied on the prom */
-		prom[i] = raw_prom[BITSWAP16(i, 15,14,13,12,11,10,9,8,7,6,5,0,1,2,3,4)+0x1000];
+		prom[i] = raw_prom[bitswap<16>(i, 15,14,13,12,11,10,9,8,7,6,5,0,1,2,3,4)+0x1000];
 	}
 
 	for(i = 0; i < 0x200; i++)
@@ -926,7 +929,7 @@ PALETTE_INIT_MEMBER(kingdrby_state,kingdrbb)
 	}
 }
 
-static MACHINE_CONFIG_START( kingdrby )
+MACHINE_CONFIG_START(kingdrby_state::kingdrby)
 	MCFG_CPU_ADD("master", Z80, CLK_2)
 	MCFG_CPU_PROGRAM_MAP(master_map)
 	MCFG_CPU_IO_MAP(master_io_map)
@@ -982,7 +985,7 @@ static MACHINE_CONFIG_START( kingdrby )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( kingdrbb, kingdrby )
+MACHINE_CONFIG_DERIVED(kingdrby_state::kingdrbb, kingdrby)
 
 	MCFG_CPU_MODIFY("slave")
 	MCFG_CPU_PROGRAM_MAP(slave_1986_map)
@@ -1005,7 +1008,7 @@ static MACHINE_CONFIG_DERIVED( kingdrbb, kingdrby )
 	/* actually unused */
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( cowrace, kingdrbb )
+MACHINE_CONFIG_DERIVED(kingdrby_state::cowrace, kingdrbb)
 
 	MCFG_CPU_MODIFY("soundcpu")
 	MCFG_CPU_PROGRAM_MAP(cowrace_sound_map)

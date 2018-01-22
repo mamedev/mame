@@ -210,8 +210,8 @@ public:
 	void hp64k_update_floppy_dma(void);
 	void hp64k_update_floppy_irq(void);
 	void hp64k_update_drv_ctrl(void);
-	DECLARE_WRITE8_MEMBER(hp64k_floppy0_rdy);
-	DECLARE_WRITE8_MEMBER(hp64k_floppy1_rdy);
+	DECLARE_WRITE_LINE_MEMBER(hp64k_floppy0_rdy);
+	DECLARE_WRITE_LINE_MEMBER(hp64k_floppy1_rdy);
 	void hp64k_floppy_idx_cb(floppy_image_device *floppy , int state);
 	void hp64k_floppy_wpt_cb(floppy_image_device *floppy , int state);
 
@@ -232,6 +232,7 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(hp64k_beeper_off);
 
 	DECLARE_WRITE_LINE_MEMBER(hp64k_baud_clk_w);
+	void hp64k(machine_config &config);
 private:
 	required_device<hp_5061_3011_cpu_device> m_cpu;
 	required_device<i8275_device> m_crtc;
@@ -439,7 +440,9 @@ WRITE_LINE_MEMBER(hp64k_state::hp64k_crtc_drq_w)
 		if (!prev_crtc && crtc_drq) {
 				address_space& prog_space = m_cpu->space(AS_PROGRAM);
 
-				uint8_t data = prog_space.read_byte(m_crtc_ptr);
+				uint16_t data = prog_space.read_word(m_crtc_ptr >> 1);
+				data = m_crtc_ptr & 1 ? data & 0xff : data >> 8;
+
 				m_crtc_ptr++;
 
 				m_crtc->dack_w(prog_space , 0 , hp64k_crtc_filter(data));
@@ -877,18 +880,18 @@ void hp64k_state::hp64k_update_drv_ctrl(void)
 		}
 }
 
-WRITE8_MEMBER(hp64k_state::hp64k_floppy0_rdy)
+WRITE_LINE_MEMBER(hp64k_state::hp64k_floppy0_rdy)
 {
-		if (data) {
+		if (state) {
 				BIT_CLR(m_floppy_status , 0);
 		} else {
 				BIT_SET(m_floppy_status , 0);
 		}
 }
 
-WRITE8_MEMBER(hp64k_state::hp64k_floppy1_rdy)
+WRITE_LINE_MEMBER(hp64k_state::hp64k_floppy1_rdy)
 {
-		if (data) {
+		if (state) {
 				BIT_CLR(m_floppy_status , 3);
 		} else {
 				BIT_SET(m_floppy_status , 3);
@@ -898,9 +901,9 @@ WRITE8_MEMBER(hp64k_state::hp64k_floppy1_rdy)
 void hp64k_state::hp64k_floppy_idx_cb(floppy_image_device *floppy , int state)
 {
 		if (floppy == m_floppy0->get_device()) {
-				m_ss0->a_w(machine().dummy_space(), 0, !state);
+				m_ss0->a_w(!state);
 		} else if (floppy == m_floppy1->get_device()) {
-				m_ss1->a_w(machine().dummy_space(), 0, !state);
+				m_ss1->a_w(!state);
 		}
 
 		if (floppy == m_current_floppy) {
@@ -1331,7 +1334,7 @@ static SLOT_INTERFACE_START(hp64k_floppies)
 	SLOT_INTERFACE("525dd" , FLOPPY_525_DD)
 SLOT_INTERFACE_END
 
-static MACHINE_CONFIG_START(hp64k)
+MACHINE_CONFIG_START(hp64k_state::hp64k)
 	MCFG_CPU_ADD("cpu" , HP_5061_3011 , 6250000)
 	MCFG_CPU_PROGRAM_MAP(cpu_mem_map)
 	MCFG_CPU_IO_MAP(cpu_io_map)
@@ -1374,7 +1377,7 @@ static MACHINE_CONFIG_START(hp64k)
 	MCFG_TTL74123_CAPACITOR_VALUE(CAP_U(16))
 	MCFG_TTL74123_B_PIN_VALUE(1)
 	MCFG_TTL74123_CLEAR_PIN_VALUE(1)
-	MCFG_TTL74123_OUTPUT_CHANGED_CB(WRITE8(hp64k_state , hp64k_floppy0_rdy));
+	MCFG_TTL74123_OUTPUT_CHANGED_CB(WRITELINE(hp64k_state , hp64k_floppy0_rdy));
 
 	MCFG_DEVICE_ADD("fdc_rdy1" , TTL74123 , 0)
 	MCFG_TTL74123_CONNECTION_TYPE(TTL74123_NOT_GROUNDED_NO_DIODE)
@@ -1382,7 +1385,7 @@ static MACHINE_CONFIG_START(hp64k)
 	MCFG_TTL74123_CAPACITOR_VALUE(CAP_U(16))
 	MCFG_TTL74123_B_PIN_VALUE(1)
 	MCFG_TTL74123_CLEAR_PIN_VALUE(1)
-	MCFG_TTL74123_OUTPUT_CHANGED_CB(WRITE8(hp64k_state , hp64k_floppy1_rdy));
+	MCFG_TTL74123_OUTPUT_CHANGED_CB(WRITELINE(hp64k_state , hp64k_floppy1_rdy));
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("beeper" , BEEP , 2500)

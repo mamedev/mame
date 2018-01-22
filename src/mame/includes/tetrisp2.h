@@ -138,6 +138,11 @@ public:
 	TIMER_CALLBACK_MEMBER(rockn_timer_level1_callback);
 	TIMER_CALLBACK_MEMBER(rockn_timer_sub_level1_callback);
 	void init_rockn_timer();
+	void rockn2(machine_config &config);
+	void tetrisp2(machine_config &config);
+	void nndmseal(machine_config &config);
+	void rocknms(machine_config &config);
+	void rockn(machine_config &config);
 };
 
 class stepstag_state : public tetrisp2_state
@@ -163,4 +168,5 @@ public:
 	uint32_t screen_update_stepstag_right(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_stepstag_mid(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	inline int mypal(int x);
+	void stepstag(machine_config &config);
 };

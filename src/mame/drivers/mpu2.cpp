@@ -49,6 +49,7 @@ public:
 			m_maincpu(*this, "maincpu")
 	{ }
 
+	void mpu2(machine_config &config);
 protected:
 
 	// devices
@@ -70,7 +71,7 @@ INPUT_PORTS_END
 
 
 
-static MACHINE_CONFIG_START( mpu2 )
+MACHINE_CONFIG_START(mpu2_state::mpu2)
 	MCFG_CPU_ADD("maincpu", M6800, 2000000) // ?
 	MCFG_CPU_PROGRAM_MAP(mpu2_basemap)
 MACHINE_CONFIG_END

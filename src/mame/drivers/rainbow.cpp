@@ -622,6 +622,7 @@ public:
 	DECLARE_WRITE16_MEMBER(vram_w);
 	DECLARE_WRITE_LINE_MEMBER(GDC_vblank_irq);
 
+	void rainbow(machine_config &config);
 protected:
 	virtual void machine_start() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
@@ -2661,7 +2662,7 @@ READ8_MEMBER(rainbow_state::diagnostic_r) // 8088 (port 0A READ). Fig.4-29 + tab
 
 WRITE8_MEMBER(rainbow_state::diagnostic_w) // 8088 (port 0A WRITTEN). Fig.4-28 + table 4-15
 {
-	//    printf("%02x to diag port (PC=%x)\n", data, space.device().safe_pc());
+	//    printf("%02x to diag port (PC=%x)\n", data, m_i8088->pc());
 
 	// ZRESET from 8088 to Z80 - - HIGH at powerup!
 	if (!(data & 1))
@@ -2705,7 +2706,7 @@ WRITE8_MEMBER(rainbow_state::diagnostic_w) // 8088 (port 0A WRITTEN). Fig.4-28 +
 			{   printf("\nALARM: GRAPHICS OPTION * SWITCHED OFF * VIA DIP. TEXT OUTPUT STILL ENABLED!\n");
 				m_ONBOARD_GRAPHICS_SELECTED = true;
 			}
-			printf("DATA: %x (PC=%x)\n", data, machine().device("maincpu")->safe_pc());
+			printf("DATA: %x (PC=%x)\n", data, m_i8088->pc());
 	}
 
 	// BIT 3: PARITY (1 enables parity test on memory board. Usually 64K per bank). -> ext_ram_w.
@@ -2863,7 +2864,7 @@ WRITE16_MEMBER(rainbow_state::vram_w)
 
 	if(m_GDC_MODE_REGISTER & GDC_MODE_VECTOR) // VT240 : if(SELECT_VECTOR_PATTERN_REGISTER)
 	{
-		chr = BITSWAP8(m_vpat, m_patidx, m_patidx, m_patidx, m_patidx, m_patidx, m_patidx, m_patidx, m_patidx);
+		chr = bitswap<8>(m_vpat, m_patidx, m_patidx, m_patidx, m_patidx, m_patidx, m_patidx, m_patidx, m_patidx);
 		chr |= (chr << 8);
 		if(m_patcnt-- == 0)
 		{
@@ -3121,7 +3122,7 @@ WRITE8_MEMBER(rainbow_state::GDC_EXTRA_REGISTER_w)
 			// --------------------  WRITE BUFFER USED IN WORD MODE ONLY !
 			// "OUTPUT WRITE BUFFER IS THE INVERSE OF THE INPUT" (quote from 4-3 of the PDF)
 			//  BITSWAP SEEMS NECESSARY (see digits in DOODLE)... !
-			m_GDC_WRITE_BUFFER[m_GDC_write_buffer_index++] = ~BITSWAP8(data, 0, 1, 2, 3, 4, 5, 6, 7);
+			m_GDC_WRITE_BUFFER[m_GDC_write_buffer_index++] = ~bitswap<8>(data, 0, 1, 2, 3, 4, 5, 6, 7);
 			m_GDC_write_buffer_index &= 0xf; // write up to 16 bytes to port 52h.
 			break;
 
@@ -3149,10 +3150,10 @@ WRITE8_MEMBER(rainbow_state::GDC_EXTRA_REGISTER_w)
 		// There is no specific order for the WRITE_MASK (according to txt/code samples in DEC's PDF).
 		// NOTE: LOW <-> HI JUXTAPOSITION!
 		case 4: // 54h   Write Mask LOW
-			m_GDC_WRITE_MASK = ( BITSWAP8(data, 0, 1, 2, 3, 4, 5, 6, 7) << 8 )  | ( m_GDC_WRITE_MASK & 0x00FF );
+			m_GDC_WRITE_MASK = ( bitswap<8>(data, 0, 1, 2, 3, 4, 5, 6, 7) << 8 )  | ( m_GDC_WRITE_MASK & 0x00FF );
 			break;
 		case 5: // 55h   Write Mask HIGH
-			m_GDC_WRITE_MASK = ( m_GDC_WRITE_MASK & 0xFF00 ) | BITSWAP8(data, 0, 1, 2, 3, 4, 5, 6, 7);
+			m_GDC_WRITE_MASK = ( m_GDC_WRITE_MASK & 0xFF00 ) | bitswap<8>(data, 0, 1, 2, 3, 4, 5, 6, 7);
 			break;
 	} // switch
 
@@ -3182,7 +3183,7 @@ static ADDRESS_MAP_START( upd7220_map, 0, 16, rainbow_state)
 	AM_RANGE(0x00000, 0x3ffff) AM_READWRITE(vram_r, vram_w) AM_SHARE("vram")
 ADDRESS_MAP_END
 
-static MACHINE_CONFIG_START(rainbow)
+MACHINE_CONFIG_START(rainbow_state::rainbow)
 MCFG_DEFAULT_LAYOUT(layout_rainbow)
 
 /* basic machine hardware */
@@ -3203,7 +3204,7 @@ MCFG_SCREEN_UPDATE_DRIVER(rainbow_state, screen_update_rainbow)
 MCFG_SCREEN_PALETTE("vt100_video:palette")
 MCFG_GFXDECODE_ADD("gfxdecode", "vt100_video:palette", rainbow)
 
-MCFG_DEVICE_ADD("vt100_video", RAINBOW_VIDEO, 0)
+MCFG_DEVICE_ADD("vt100_video", RAINBOW_VIDEO, XTAL_24_0734MHz)
 
 MCFG_VT_SET_SCREEN("screen")
 MCFG_VT_CHARGEN("chargen")

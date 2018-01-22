@@ -75,6 +75,7 @@ public:
 	required_shared_ptr<uint16_t> m_mapram;
 	required_shared_ptr<uint16_t> m_videoram;
 
+	void unixpc(machine_config &config);
 private:
 	uint16_t *m_ramptr;
 	uint32_t m_ramsize;
@@ -313,7 +314,7 @@ static SLOT_INTERFACE_START( unixpc_floppies )
 	SLOT_INTERFACE( "525dd", FLOPPY_525_DD )
 SLOT_INTERFACE_END
 
-static MACHINE_CONFIG_START( unixpc )
+MACHINE_CONFIG_START(unixpc_state::unixpc)
 	// basic machine hardware
 	MCFG_CPU_ADD("maincpu", M68010, XTAL_10MHz)
 	MCFG_CPU_PROGRAM_MAP(unixpc_mem)
@@ -338,7 +339,7 @@ static MACHINE_CONFIG_START( unixpc )
 	MCFG_DEVICE_ADD("ramrombank", ADDRESS_MAP_BANK, 0)
 	MCFG_DEVICE_PROGRAM_MAP(ramrombank_map)
 	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_BIG)
-	MCFG_ADDRESS_MAP_BANK_DATABUS_WIDTH(16)
+	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(16)
 	MCFG_ADDRESS_MAP_BANK_STRIDE(0x400000)
 
 	// floppy

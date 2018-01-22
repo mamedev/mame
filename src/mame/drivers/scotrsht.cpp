@@ -184,10 +184,10 @@ static GFXDECODE_START( scotrsht )
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout, 16*16*8, 16*8 ) /* sprites */
 GFXDECODE_END
 
-static MACHINE_CONFIG_START( scotrsht )
+MACHINE_CONFIG_START(scotrsht_state::scotrsht)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6809, 18432000/6)        /* 3.072 MHz */
+	MCFG_CPU_ADD("maincpu", MC6809E, 18432000/6)        /* 3.072 MHz */
 	MCFG_CPU_PROGRAM_MAP(scotrsht_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", scotrsht_state, interrupt)
 

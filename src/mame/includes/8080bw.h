@@ -175,6 +175,36 @@ public:
 	inline void set_pixel( bitmap_rgb32 &bitmap, uint8_t y, uint8_t x, int color );
 	inline void set_8_pixels( bitmap_rgb32 &bitmap, uint8_t y, uint8_t x, uint8_t data, int fore_color, int back_color );
 	void clear_extra_columns( bitmap_rgb32 &bitmap, int color );
+	void indianbtbr(machine_config &config);
+	void claybust(machine_config &config);
+	void shuttlei(machine_config &config);
+	void spcewarla(machine_config &config);
+	void escmars(machine_config &config);
+	void lrescue(machine_config &config);
+	void invmulti(machine_config &config);
+	void yosakdon(machine_config &config);
+	void polaris(machine_config &config);
+	void attackfc(machine_config &config);
+	void astropal(machine_config &config);
+	void rollingc(machine_config &config);
+	void vortex(machine_config &config);
+	void invrvnge(machine_config &config);
+	void sflush(machine_config &config);
+	void invadpt2(machine_config &config);
+	void lupin3a(machine_config &config);
+	void indianbt(machine_config &config);
+	void starw1(machine_config &config);
+	void cosmo(machine_config &config);
+	void spcewars(machine_config &config);
+	void cosmicmo(machine_config &config);
+	void darthvdr(machine_config &config);
+	void ballbomb(machine_config &config);
+	void spacecom(machine_config &config);
+	void schasercv(machine_config &config);
+	void lupin3(machine_config &config);
+	void spacerng(machine_config &config);
+	void steelwkr(machine_config &config);
+	void schaser(machine_config &config);
 };
 
 

@@ -24,7 +24,7 @@ READ8_MEMBER(spacefb_state::audio_p2_r)
 
 READ_LINE_MEMBER(spacefb_state::audio_t0_r)
 {
-	return BIT(m_sound_latch, 6);
+	return BIT(m_sound_latch, 5);
 }
 
 
@@ -77,7 +77,7 @@ static const char *const spacefb_sample_names[] =
 };
 
 
-MACHINE_CONFIG_START( spacefb_audio )
+MACHINE_CONFIG_START(spacefb_state::spacefb_audio)
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
 	MCFG_SOUND_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25) // unknown DAC
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)

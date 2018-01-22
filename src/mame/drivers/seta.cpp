@@ -8,16 +8,16 @@
 
 
 CPU    :    68000 + [65C02] (only in the earlier games)
-Custom :    X1-001A  X1-002A (SDIP64)   Sprites
+Custom :    X1-001A, X1-002A (SDIP64)   Sprites
             X1-001
             X1-002
-            X1-003
+            X1-003 or X1-007 (SDIP42)   Video blanking (feeds RGB DACs)
             X1-004           (SDIP52)   Inputs
-            X1-005   X0-005
-            X1-006   X0-006
-            X1-007           (SDIP42)   Video DAC
+            X1-005
+            X1-006           (SDIP64)   Palette
             X1-010           (QFP80)    Sound: 16 Bit PCM
-            X1-011   X1-012  (QFP100)   Tilemaps
+            X1-011           (QFP80)    Graphics mixing
+            X1-012           (QFP100)   Tilemaps
             X1-014                      Sprites?
 
 -------------------------------------------------------------------------------
@@ -1475,7 +1475,7 @@ WRITE16_MEMBER(seta_state::timer_regs_w)
 			uPD71054->max[offset] = (uPD71054->max[offset]&0x00ff)+(data<<8);
 		}
 		if( uPD71054->max[offset] != 0 ) {
-			uPD71054_update_timer( &space.device(), offset );
+			uPD71054_update_timer( m_maincpu.target(), offset );
 		}
 		break;
 		case 0x0003:
@@ -1522,7 +1522,7 @@ WRITE_LINE_MEMBER(seta_state::utoukond_ym3438_interrupt)
 WRITE_LINE_MEMBER(seta_state::pit_out0)
 {
 	if (state)
-		m_maincpu->set_input_line(4, HOLD_LINE);
+		m_maincpu->set_input_line(4, ASSERT_LINE);
 }
 
 
@@ -1685,7 +1685,7 @@ WRITE16_MEMBER(seta_state::ipl2_ack_w)
 
 static ADDRESS_MAP_START( tndrcade_map, AS_PROGRAM, 16, seta_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM                             // ROM
-	AM_RANGE(0x200000, 0x200001) AM_WRITENOP                        // ? 0
+	AM_RANGE(0x200000, 0x200001) AM_WRITE(ipl1_ack_w)
 	AM_RANGE(0x280000, 0x280001) AM_WRITENOP                        // ? 0 / 1 (sub cpu related?)
 	AM_RANGE(0x300000, 0x300001) AM_WRITENOP                        // ? 0 / 1
 	AM_RANGE(0x380000, 0x3803ff) AM_RAM AM_SHARE("paletteram") // Palette
@@ -1925,48 +1925,32 @@ ADDRESS_MAP_END
                     and Zombie Raid (with slight variations)
 ***************************************************************************/
 
+ADC083X_INPUT_CB(seta_state::zombraid_adc_cb)
+{
+	if (input == ADC083X_AGND)
+		return 0.0;
+	else if (input == ADC083X_VREF)
+		return 1.0;
+	else
+		return m_gun_inputs[input - ADC083X_CH0]->read() / 255.0;
+}
+
 READ16_MEMBER(seta_state::zombraid_gun_r)// Serial interface
 {
-	static const char *const portnames[] = { "GUNX1", "GUNY1", "GUNX2", "GUNY2" };
-
-	int data = ioport(portnames[m_gun_input_src])->read();  // Input Ports 5-8
-	return (data >> m_gun_input_bit) & 1;
+	return m_adc->do_read();
 }
 
 // Bit 0 is clock, 1 is data, 2 is reset
 WRITE16_MEMBER(seta_state::zombraid_gun_w)
 {
-	if(data&4) { m_gun_bit_count = 0; return; } // Reset
+	m_adc->cs_write(BIT(data, 2));
+	m_adc->di_write(BIT(data, 1));
+	m_adc->clk_write(BIT(data, 0));
 
-	if((data&1) == m_gun_old_clock) return; // No change
-
-	if(m_gun_old_clock == 0) // Rising edge
-	{
-		switch (m_gun_bit_count)
-		{
-			case 0:
-			case 1: // Starting sequence 2,3,2,3. Other inputs?
-				break;
-			case 2: // First bit of source
-				m_gun_input_src = (m_gun_input_src&2) | (data>>1);
-				break;
-			case 3: // Second bit of source
-				m_gun_input_src = (m_gun_input_src&1) | (data&2);
-				break;
-			default:
-				/* Gun Recoils */
-				/* Note:  In debug menu recoil solenoids strobe when held down.  Is this correct?? */
-				output().set_value("Player1_Gun_Recoil", (data & 0x10)>>4 );
-				output().set_value("Player2_Gun_Recoil", (data & 0x8)>>3 );
-
-				m_gun_input_bit = m_gun_bit_count - 4;
-				m_gun_input_bit = 8 - m_gun_input_bit; // Reverse order
-				break;
-		}
-		m_gun_bit_count++;
-	}
-
-	m_gun_old_clock = data & 1;
+	/* Gun Recoils */
+	/* Note:  In debug menu recoil solenoids strobe when held down.  Is this correct?? */
+	output().set_value("Player1_Gun_Recoil", BIT(data, 4));
+	output().set_value("Player2_Gun_Recoil", BIT(data, 3));
 }
 
 READ16_MEMBER(seta_state::extra_r)
@@ -2011,8 +1995,10 @@ static ADDRESS_MAP_START( wrofaero_map, AS_PROGRAM, 16, seta_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( zombraid_map, AS_PROGRAM, 16, seta_state )
-	AM_IMPORT_FROM( wrofaero_map )
 	AM_RANGE(0x300000, 0x30ffff) AM_RAM AM_SHARE("nvram")           // actually 8K x8 SRAM
+	AM_RANGE(0xf00000, 0xf00001) AM_WRITE(zombraid_gun_w)
+	AM_RANGE(0xf00002, 0xf00003) AM_READ(zombraid_gun_r)
+	AM_IMPORT_FROM( wrofaero_map )
 ADDRESS_MAP_END
 
 READ16_MEMBER(seta_state::zingzipbl_unknown_r)
@@ -2459,7 +2445,7 @@ WRITE8_MEMBER(setaroul_state::pay_w)
 	machine().bookkeeping().coin_counter_w(1,   data  & 0x20);  // note in         (meter 1 in input test, touch '2')
 	//                                          data  & 0x40    // hopper lock-out (lock.o  in input test, touch '8')
 	//                                          data  & 0x80    // hopper motor    (hop.h   in input test, touch '0')
-	m_hopper->write(space, 0,(!(data & 0x40) && (data & 0x80)) ? 0x80 : 0x00);
+	m_hopper->motor_w((!(data & 0x40) && (data & 0x80)) ? 1 : 0);
 
 	show_outputs();
 }
@@ -2561,8 +2547,9 @@ static ADDRESS_MAP_START( kamenrid_map, AS_PROGRAM, 16, seta_state )
 	AM_RANGE(0x500004, 0x500007) AM_READ(seta_dsw_r)                // DSW
 	AM_RANGE(0x500008, 0x500009) AM_READ_PORT("COINS")              // Coins
 	AM_RANGE(0x50000c, 0x50000d) AM_DEVREADWRITE("watchdog", watchdog_timer_device, reset16_r, reset16_w)    // xx Watchdog? (sokonuke)
+	AM_RANGE(0x600004, 0x600005) AM_WRITE(ipl1_ack_w)
 	AM_RANGE(0x600000, 0x600005) AM_RAM_WRITE(seta_vregs_w) AM_SHARE("vregs")   // ? Coin Lockout + Video Registers
-	AM_RANGE(0x600006, 0x600007) AM_WRITENOP                        // ?
+	AM_RANGE(0x600006, 0x600007) AM_WRITE(ipl2_ack_w)
 	AM_RANGE(0x700000, 0x7003ff) AM_RAM                             // Palette RAM (tested)
 	AM_RANGE(0x700400, 0x700fff) AM_RAM AM_SHARE("paletteram")  // Palette
 	AM_RANGE(0x701000, 0x703fff) AM_RAM                             // Palette
@@ -2577,11 +2564,7 @@ static ADDRESS_MAP_START( kamenrid_map, AS_PROGRAM, 16, seta_state )
 	AM_RANGE(0xa80000, 0xa80001) AM_RAM                             // ? $4000
 	AM_RANGE(0xb00000, 0xb03fff) AM_RAM AM_DEVREADWRITE("spritegen", seta001_device, spritecode_r16, spritecode_w16)     // Sprites Code + X + Attr
 	AM_RANGE(0xb04000, 0xb07fff) AM_RAM                             // tested
-#if __uPD71054_TIMER
-	AM_RANGE(0xc00000, 0xc00007) AM_WRITE(timer_regs_w)             // ?
-#else
-	AM_RANGE(0xc00000, 0xc00007) AM_WRITENOP                        // ?
-#endif
+	AM_RANGE(0xc00000, 0xc00007) AM_DEVREADWRITE8("pit", pit8254_device, read, write, 0x00ff)
 	AM_RANGE(0xd00000, 0xd03fff) AM_DEVREADWRITE("x1snd", x1_010_device, word_r, word_w)   // Sound
 ADDRESS_MAP_END
 
@@ -2594,8 +2577,9 @@ static ADDRESS_MAP_START( madshark_map, AS_PROGRAM, 16, seta_state )
 	AM_RANGE(0x500004, 0x500005) AM_READ_PORT("COINS")              // Coins
 	AM_RANGE(0x500008, 0x50000b) AM_READ(seta_dsw_r)                // DSW
 	AM_RANGE(0x50000c, 0x50000d) AM_DEVWRITE("watchdog", watchdog_timer_device, reset16_w)
+	AM_RANGE(0x600004, 0x600005) AM_WRITE(ipl1_ack_w)
 	AM_RANGE(0x600000, 0x600005) AM_RAM_WRITE(seta_vregs_w) AM_SHARE("vregs")   // ? Coin Lockout + Video Registers
-	AM_RANGE(0x600006, 0x600007) AM_WRITENOP                        // ?
+	AM_RANGE(0x600006, 0x600007) AM_WRITE(ipl2_ack_w)
 	AM_RANGE(0x700400, 0x700fff) AM_RAM AM_SHARE("paletteram")  // Palette
 	AM_RANGE(0x800000, 0x803fff) AM_RAM_WRITE(seta_vram_0_w) AM_SHARE("vram_0") // VRAM 0&1
 	AM_RANGE(0x880000, 0x883fff) AM_RAM_WRITE(seta_vram_2_w) AM_SHARE("vram_2") // VRAM 2&3
@@ -2631,8 +2615,8 @@ static ADDRESS_MAP_START( magspeed_map, AS_PROGRAM, 16, seta_state )
 	AM_RANGE(0x500008, 0x50000b) AM_READ(seta_dsw_r)                // DSW
 	AM_RANGE(0x50000c, 0x50000d) AM_DEVWRITE("watchdog", watchdog_timer_device, reset16_w)
 	AM_RANGE(0x500010, 0x500015) AM_RAM_WRITE(msgundam_vregs_w) AM_SHARE("vregs")   // ? Coin Lockout + Video Registers
-	AM_RANGE(0x500018, 0x500019) AM_WRITENOP                        // lev 2 irq ack?
-	AM_RANGE(0x50001c, 0x50001d) AM_WRITENOP                        // lev 4 irq ack?
+	AM_RANGE(0x500018, 0x500019) AM_WRITE(ipl1_ack_w)               // lev 2 irq ack?
+	AM_RANGE(0x50001c, 0x50001d) AM_WRITE(ipl2_ack_w)               // lev 4 irq ack?
 	AM_RANGE(0x600000, 0x600005) AM_WRITE(magspeed_lights_w)        // Lights
 	AM_RANGE(0x600006, 0x600007) AM_WRITENOP                        // ?
 	AM_RANGE(0x700000, 0x7003ff) AM_RAM                             // Palette RAM (tested)
@@ -2649,11 +2633,7 @@ static ADDRESS_MAP_START( magspeed_map, AS_PROGRAM, 16, seta_state )
 	AM_RANGE(0xa80000, 0xa80001) AM_RAM                             // ? $4000
 	AM_RANGE(0xb00000, 0xb03fff) AM_RAM AM_DEVREADWRITE("spritegen", seta001_device, spritecode_r16, spritecode_w16)     // Sprites Code + X + Attr
 	AM_RANGE(0xb04000, 0xb07fff) AM_RAM                             // tested
-#if __uPD71054_TIMER
-	AM_RANGE(0xc00000, 0xc00007) AM_WRITE(timer_regs_w)             // ?
-#else
-	AM_RANGE(0xc00000, 0xc00007) AM_WRITENOP                        // ?
-#endif
+	AM_RANGE(0xc00000, 0xc00007) AM_DEVREADWRITE8("pit", pit8254_device, read, write, 0x00ff)
 	AM_RANGE(0xd00000, 0xd03fff) AM_DEVREADWRITE("x1snd", x1_010_device, word_r, word_w)   // Sound
 ADDRESS_MAP_END
 
@@ -2709,8 +2689,8 @@ static ADDRESS_MAP_START( msgundam_map, AS_PROGRAM, 16, seta_state )
 	AM_RANGE(0x400000, 0x400001) AM_READ_PORT("P1")                 // P1
 	AM_RANGE(0x400002, 0x400003) AM_READ_PORT("P2")                 // P2
 	AM_RANGE(0x400004, 0x400005) AM_READ_PORT("COINS")              // Coins
-	AM_RANGE(0x400000, 0x400001) AM_WRITENOP                        // Lev 2 IRQ Ack
-	AM_RANGE(0x400004, 0x400005) AM_WRITENOP                        // Lev 4 IRQ Ack
+	AM_RANGE(0x400000, 0x400001) AM_WRITE(ipl1_ack_w)               // Lev 2 IRQ Ack
+	AM_RANGE(0x400004, 0x400005) AM_WRITE(ipl2_ack_w)               // Lev 4 IRQ Ack
 	AM_RANGE(0x500000, 0x500005) AM_RAM_WRITE(msgundam_vregs_w) AM_SHARE("vregs")   // Coin Lockout + Video Registers
 	AM_RANGE(0x600000, 0x600003) AM_READ(seta_dsw_r)                // DSW
 	AM_RANGE(0x700400, 0x700fff) AM_RAM AM_SHARE("paletteram")  // Palette
@@ -2723,11 +2703,7 @@ static ADDRESS_MAP_START( msgundam_map, AS_PROGRAM, 16, seta_state )
 	AM_RANGE(0xb00000, 0xb00005) AM_RAM AM_SHARE("vctrl_0")     // VRAM 0&1 Ctrl
 	AM_RANGE(0xb80000, 0xb80005) AM_RAM AM_SHARE("vctrl_2")     // VRAM 2&3 Ctrl
 	AM_RANGE(0xc00000, 0xc03fff) AM_DEVREADWRITE("x1snd", x1_010_device, word_r, word_w)   // Sound
-#if __uPD71054_TIMER
-	AM_RANGE(0xd00000, 0xd00007) AM_WRITE(timer_regs_w) // ?
-#else
-	AM_RANGE(0xd00000, 0xd00007) AM_WRITENOP    // ?
-#endif
+	AM_RANGE(0xd00000, 0xd00007) AM_DEVREADWRITE8("pit", pit8254_device, read, write, 0x00ff)
 ADDRESS_MAP_END
 
 
@@ -2815,7 +2791,7 @@ READ16_MEMBER(seta_state::kiwame_input_r)
 		case 0x08/2:    return 0xffff;
 
 		default:
-			logerror("PC %06X - Read input %02X !\n", space.device().safe_pc(), offset*2);
+			logerror("PC %06X - Read input %02X !\n", m_maincpu->pc(), offset*2);
 			return 0x0000;
 	}
 }
@@ -2841,12 +2817,12 @@ ADDRESS_MAP_END
 
 READ16_MEMBER(seta_state::thunderl_protection_r)
 {
-//  logerror("PC %06X - Protection Read\n", space.device().safe_pc());
+//  logerror("PC %06X - Protection Read\n", m_maincpu->pc());
 	return 0x00dd;
 }
 WRITE16_MEMBER(seta_state::thunderl_protection_w)
 {
-//  logerror("PC %06X - Protection Written: %04X <- %04X\n", space.device().safe_pc(), offset*2, data);
+//  logerror("PC %06X - Protection Written: %04X <- %04X\n", m_maincpu->pc(), offset*2, data);
 }
 
 /* Similar to downtown etc. */
@@ -2855,7 +2831,7 @@ static ADDRESS_MAP_START( thunderl_map, AS_PROGRAM, 16, seta_state )
 	AM_RANGE(0x000000, 0x00ffff) AM_ROM                             // ROM
 	AM_RANGE(0xffc000, 0xffffff) AM_RAM                             // RAM
 	AM_RANGE(0x100000, 0x103fff) AM_DEVREADWRITE("x1snd", x1_010_device, word_r, word_w)   // Sound
-	AM_RANGE(0x200000, 0x200001) AM_WRITENOP                        // ?
+	AM_RANGE(0x200000, 0x200001) AM_READWRITE(ipl1_ack_r, ipl1_ack_w)
 	AM_RANGE(0x300000, 0x300001) AM_WRITENOP                        // ?
 	AM_RANGE(0x400000, 0x40ffff) AM_WRITE(thunderl_protection_w)    // Protection (not in wits)
 	AM_RANGE(0x500000, 0x500001) AM_RAM_WRITE(seta_vregs_w) AM_SHARE("vregs")   // Coin Lockout
@@ -2879,7 +2855,7 @@ static ADDRESS_MAP_START( thunderlbl_map, AS_PROGRAM, 16, seta_state )
 	AM_RANGE(0x000000, 0x00ffff) AM_ROM                             // ROM
 	AM_RANGE(0xffc000, 0xffffff) AM_RAM                             // RAM
 //  AM_RANGE(0x100000, 0x103fff) AM_DEVREADWRITE("x1snd", x1_010_device, word_r, word_w)  // Sound
-	AM_RANGE(0x200000, 0x200001) AM_WRITENOP                        // ?
+	AM_RANGE(0x200000, 0x200001) AM_READWRITE(ipl1_ack_r, ipl1_ack_w)
 	AM_RANGE(0x300000, 0x300001) AM_WRITENOP                        // ?
 //  AM_RANGE(0x400000, 0x40ffff) AM_WRITE(thunderl_protection_w)    // Protection (not in wits)
 	AM_RANGE(0x500000, 0x500001) AM_RAM_WRITE(seta_vregs_w) AM_SHARE("vregs")   // Coin Lockout
@@ -2889,7 +2865,7 @@ static ADDRESS_MAP_START( thunderlbl_map, AS_PROGRAM, 16, seta_state )
 	AM_RANGE(0xb00002, 0xb00003) AM_READ_PORT("P2")                 // P2
 	AM_RANGE(0xb00004, 0xb00005) AM_READ_PORT("COINS")              // Coins
 //  AM_RANGE(0xb0000c, 0xb0000d) AM_READ(thunderl_protection_r  )   // Protection (not in wits)
-	AM_RANGE(0xb00008, 0xb00009) AM_READ_PORT("P3") AM_WRITE(wiggie_soundlatch_w)                // P3 (wits)
+	AM_RANGE(0xb00008, 0xb00009) AM_READ_PORT("P3") AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0xff00) // P3 (wits)
 	AM_RANGE(0xb0000a, 0xb0000b) AM_READ_PORT("P4")                 // P4 (wits)
 /**/AM_RANGE(0xc00000, 0xc00001) AM_RAM                             // ? 0x4000
 /**/AM_RANGE(0xd00000, 0xd005ff) AM_RAM AM_DEVREADWRITE("spritegen", seta001_device, spriteylow_r16, spriteylow_w16)     // Sprites Y
@@ -2902,22 +2878,11 @@ ADDRESS_MAP_END
                     Wiggie Waggie
 ***************************************************************************/
 
-READ8_MEMBER(seta_state::wiggie_soundlatch_r)
-{
-	return m_wiggie_soundlatch;
-}
-
-WRITE16_MEMBER(seta_state::wiggie_soundlatch_w)
-{
-	m_wiggie_soundlatch = data >> 8;
-	m_audiocpu->set_input_line(0, HOLD_LINE);
-}
-
-
 static ADDRESS_MAP_START( wiggie_map, AS_PROGRAM, 16, seta_state )
 	AM_RANGE(0x000000, 0x01ffff) AM_ROM                             // ROM
 	AM_RANGE(0xffc000, 0xffffff) AM_RAM                             // RAM
-	AM_RANGE(0x200000, 0x200001) AM_WRITENOP                        // ?
+	AM_RANGE(0x100000, 0x103fff) AM_NOP                             // X1_010 is not used
+	AM_RANGE(0x200000, 0x200001) AM_READWRITE(ipl1_ack_r, ipl1_ack_w)
 	AM_RANGE(0x300000, 0x300001) AM_WRITENOP                        // ?
 	AM_RANGE(0x400000, 0x40ffff) AM_WRITE(thunderl_protection_w)    // Protection (not in wits)
 	AM_RANGE(0x500000, 0x500001) AM_RAM_WRITE(seta_vregs_w) AM_SHARE("vregs")   // Coin Lockout
@@ -2928,6 +2893,7 @@ static ADDRESS_MAP_START( wiggie_map, AS_PROGRAM, 16, seta_state )
 	AM_RANGE(0xb00004, 0xb00005) AM_READ_PORT("COINS")              // Coins
 	AM_RANGE(0xb0000c, 0xb0000d) AM_READ(thunderl_protection_r)     // Protection (not in wits)
 	AM_RANGE(0xb00008, 0xb00009) AM_READ_PORT("P3")                 // P3 (wits)
+	AM_RANGE(0xb00008, 0xb00009) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0xff00)
 	AM_RANGE(0xb0000a, 0xb0000b) AM_READ_PORT("P4")                 // P4 (wits)
 /**/AM_RANGE(0xc00000, 0xc00001) AM_RAM                             // ? 0x4000
 /**/AM_RANGE(0xd00000, 0xd005ff) AM_RAM AM_DEVREADWRITE("spritegen", seta001_device, spriteylow_r16, spriteylow_w16)     // Sprites Y
@@ -2940,7 +2906,7 @@ static ADDRESS_MAP_START( wiggie_sound_map, AS_PROGRAM, 8, seta_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0x9800, 0x9800) AM_DEVREADWRITE("oki", okim6295_device, read, write)
-	AM_RANGE(0xa000, 0xa000) AM_READ(wiggie_soundlatch_r)
+	AM_RANGE(0xa000, 0xa000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 ADDRESS_MAP_END
 
 
@@ -2972,13 +2938,12 @@ ADDRESS_MAP_END
                             Ultra Toukond Densetsu
 ***************************************************************************/
 
-WRITE16_MEMBER(seta_state::utoukond_soundlatch_w)
+WRITE8_MEMBER(seta_state::utoukond_sound_control_w)
 {
-	if (ACCESSING_BITS_0_7)
-	{
-		m_audiocpu->set_input_line(0, HOLD_LINE);
-		m_soundlatch->write(space, 0, data & 0xff);
-	}
+	if (!BIT(data, 6))
+		m_soundlatch->acknowledge_w(space, 0, 0);
+
+	// other bits used for banking? (low nibble seems to always be 2)
 }
 
 static ADDRESS_MAP_START( utoukond_map, AS_PROGRAM, 16, seta_state )
@@ -2997,7 +2962,7 @@ static ADDRESS_MAP_START( utoukond_map, AS_PROGRAM, 16, seta_state )
 	AM_RANGE(0xa00000, 0xa005ff) AM_RAM AM_DEVREADWRITE("spritegen", seta001_device, spriteylow_r16, spriteylow_w16)     // Sprites Y
 	AM_RANGE(0xa00600, 0xa00607) AM_RAM AM_DEVREADWRITE("spritegen", seta001_device, spritectrl_r16, spritectrl_w16)
 	AM_RANGE(0xb00000, 0xb03fff) AM_RAM AM_DEVREADWRITE("spritegen", seta001_device, spritecode_r16, spritecode_w16)     // Sprites Code + X + Attr
-	AM_RANGE(0xc00000, 0xc00001) AM_WRITE(utoukond_soundlatch_w)    // To Sound CPU (cause an IRQ)
+	AM_RANGE(0xc00000, 0xc00001) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x00ff)
 	AM_RANGE(0xe00000, 0xe00001) AM_WRITENOP                        // ? ack
 ADDRESS_MAP_END
 
@@ -3010,14 +2975,14 @@ READ16_MEMBER(seta_state::pairlove_prot_r)
 	int retdata;
 
 	retdata = m_pairslove_protram[offset];
-	//osd_printf_debug("pairs love protection? read %06x %04x %04x\n",space.device().safe_pc(), offset,retdata);
+	//osd_printf_debug("pairs love protection? read %06x %04x %04x\n",m_maincpu->pc(), offset,retdata);
 	m_pairslove_protram[offset] = m_pairslove_protram_old[offset];
 	return retdata;
 }
 
 WRITE16_MEMBER(seta_state::pairlove_prot_w)
 {
-	//osd_printf_debug("pairs love protection? write %06x %04x %04x\n",space.device().safe_pc(), offset,data);
+	//osd_printf_debug("pairs love protection? write %06x %04x %04x\n",m_maincpu->pc(), offset,data);
 	m_pairslove_protram_old[offset] = m_pairslove_protram[offset];
 	m_pairslove_protram[offset] = data;
 }
@@ -3106,7 +3071,7 @@ READ16_MEMBER(jockeyc_state::mux_r)
 		case 0x40:  return (m_key2[3]->read() << 8) | m_key1[3]->read();
 		case 0x80:  return (m_key2[4]->read() << 8) | m_key1[4]->read();
 	}
-	logerror("%06X: unknown key read, mux = %04x\n", space.device().safe_pc(), m_mux);
+	logerror("%06X: unknown key read, mux = %04x\n", m_maincpu->pc(), m_mux);
 	return 0xffff;
 }
 
@@ -3478,7 +3443,7 @@ WRITE8_MEMBER(seta_state::calibr50_sub_bankswitch_w)
 WRITE8_MEMBER(seta_state::calibr50_soundlatch2_w)
 {
 	m_soundlatch2->write(space,0,data);
-	space.device().execute().spin_until_time(attotime::from_usec(50));  // Allow the other cpu to reply
+	m_subcpu->spin_until_time(attotime::from_usec(50));  // Allow the other cpu to reply
 }
 
 static ADDRESS_MAP_START( calibr50_sub_map, AS_PROGRAM, 8, seta_state )
@@ -3524,7 +3489,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( utoukond_sound_io_map, AS_IO, 8, seta_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("ymsnd", ym3438_device, read, write)
-	AM_RANGE(0x80, 0x80) AM_WRITENOP //?
+	AM_RANGE(0x80, 0x80) AM_WRITE(utoukond_sound_control_w)
 	AM_RANGE(0xc0, 0xc0) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 ADDRESS_MAP_END
 
@@ -7785,12 +7750,12 @@ TIMER_DEVICE_CALLBACK_MEMBER(seta_state::tndrcade_sub_interrupt)
 		m_subcpu->set_input_line(0, HOLD_LINE);
 }
 
-static MACHINE_CONFIG_START( tndrcade )
+MACHINE_CONFIG_START(seta_state::tndrcade)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 16000000/2) /* 8 MHz */
 	MCFG_CPU_PROGRAM_MAP(tndrcade_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", seta_state,  irq2_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", seta_state, irq2_line_assert)
 
 	MCFG_CPU_ADD("sub", M65C02, 16000000/8) /* 2 MHz */
 	MCFG_CPU_PROGRAM_MAP(tndrcade_sub_map)
@@ -7839,7 +7804,7 @@ MACHINE_CONFIG_END
 
 /* twineagl lev 3 = lev 2 + lev 1 ! */
 
-static MACHINE_CONFIG_START( twineagl )
+MACHINE_CONFIG_START(seta_state::twineagl)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 16000000/2) /* 8 MHz */
@@ -7885,7 +7850,7 @@ MACHINE_CONFIG_END
 
 /* downtown lev 3 = lev 2 + lev 1 ! */
 
-static MACHINE_CONFIG_START( downtown )
+MACHINE_CONFIG_START(seta_state::downtown)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz/2) /* verified on pcb */
@@ -7953,7 +7918,7 @@ MACHINE_START_MEMBER(seta_state, usclssic)
 }
 
 
-static MACHINE_CONFIG_START( usclssic )
+MACHINE_CONFIG_START(seta_state::usclssic)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 16000000/2) /* 8 MHz */
@@ -8020,7 +7985,7 @@ MACHINE_CONFIG_END
     Test mode shows a 16ms and 4ms counters. I wonder if every game has
     5 ints per frame */
 
-static MACHINE_CONFIG_START( calibr50 )
+MACHINE_CONFIG_START(seta_state::calibr50)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz/2) /* verified on pcb */
@@ -8077,7 +8042,7 @@ MACHINE_CONFIG_END
 
 /* metafox lev 3 = lev 2 + lev 1 ! */
 
-static MACHINE_CONFIG_START( metafox )
+MACHINE_CONFIG_START(seta_state::metafox)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 16000000/2) /* 8 MHz */
@@ -8121,7 +8086,7 @@ MACHINE_CONFIG_END
                                 Athena no Hatena?
 ***************************************************************************/
 
-static MACHINE_CONFIG_START( atehate )
+MACHINE_CONFIG_START(seta_state::atehate)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 16000000)   /* 16 MHz */
@@ -8164,7 +8129,7 @@ MACHINE_CONFIG_END
     samples are bankswitched
 */
 
-static MACHINE_CONFIG_START( blandia )
+MACHINE_CONFIG_START(seta_state::blandia)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 16000000)   /* 16 MHz */
@@ -8201,7 +8166,7 @@ static MACHINE_CONFIG_START( blandia )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( blandiap )
+MACHINE_CONFIG_START(seta_state::blandiap)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 16000000)   /* 16 MHz */
@@ -8243,7 +8208,7 @@ MACHINE_CONFIG_END
                                 Block Carnival
 ***************************************************************************/
 
-static MACHINE_CONFIG_START( blockcar )
+MACHINE_CONFIG_START(seta_state::blockcar)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 16000000/2) /* 8 MHz */
@@ -8287,10 +8252,10 @@ static ADDRESS_MAP_START( blockcarb_sound_portmap, AS_IO, 8, seta_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 //  AM_RANGE(0x00, 0x01) AM_MIRROR(0x3e) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
-//  AM_RANGE(0xc0, 0xc0) AM_MIRROR(0x3f) AM_READ(wiggie_soundlatch_r)
+//  AM_RANGE(0xc0, 0xc0) AM_MIRROR(0x3f) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 ADDRESS_MAP_END
 
-static MACHINE_CONFIG_DERIVED( blockcarb, blockcar )
+MACHINE_CONFIG_DERIVED(seta_state::blockcarb, blockcar)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -8314,7 +8279,7 @@ MACHINE_CONFIG_END
                                 Daioh
 ***************************************************************************/
 
-static MACHINE_CONFIG_START( daioh )
+MACHINE_CONFIG_START(seta_state::daioh)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz)   /* 16 MHz, MC68000-16, Verified from PCB */
@@ -8351,7 +8316,7 @@ MACHINE_CONFIG_END
                        Daioh (prototype)
 ***************************************************************************/
 
-static MACHINE_CONFIG_START( daiohp )
+MACHINE_CONFIG_START(seta_state::daiohp)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz)   /* 16 MHz, MC68000-16, Verified from PCB */
@@ -8393,7 +8358,7 @@ MACHINE_CONFIG_END
     lev 2 drives the game
 */
 
-static MACHINE_CONFIG_START( drgnunit )
+MACHINE_CONFIG_START(seta_state::drgnunit)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 16000000/2) /* 8 MHz */
@@ -8429,7 +8394,7 @@ MACHINE_CONFIG_END
 /*  Same as qzkklogy, but with a 16MHz CPU and different
     layout for the layer's tiles    */
 
-static MACHINE_CONFIG_START( qzkklgy2 )
+MACHINE_CONFIG_START(seta_state::qzkklgy2)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 16000000)   /* 16 MHz */
@@ -8480,7 +8445,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(setaroul_state::interrupt)
 	// lev 6: RS232
 }
 
-static MACHINE_CONFIG_START( setaroul )
+MACHINE_CONFIG_START(setaroul_state::setaroul)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz/2) /* 8 MHz */
@@ -8533,7 +8498,7 @@ MACHINE_CONFIG_END
                                 Eight Force
 ***************************************************************************/
 
-static MACHINE_CONFIG_START( eightfrc )
+MACHINE_CONFIG_START(seta_state::eightfrc)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 16000000)   /* 16 MHz */
@@ -8576,7 +8541,7 @@ MACHINE_CONFIG_END
     lev 1 == lev 3 (writes to $500000, bit 4 -> 1 then 0)
     lev 2 drives the game
 */
-static MACHINE_CONFIG_START( extdwnhl )
+MACHINE_CONFIG_START(seta_state::extdwnhl)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 16000000)   /* 16 MHz */
@@ -8634,7 +8599,7 @@ MACHINE_START_MEMBER(seta_state,wrofaero){ uPD71054_timer_init(); }
     lev 2: VBlank
     lev 4: Sound (generated by a timer mapped at $d00000-6 ?)
 */
-static MACHINE_CONFIG_START( gundhara )
+MACHINE_CONFIG_START(seta_state::gundhara)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 16000000)   /* 16 MHz */
@@ -8683,13 +8648,16 @@ MACHINE_CONFIG_END
                                 Zombie Raid
 ***************************************************************************/
 
-static MACHINE_CONFIG_DERIVED( zombraid, gundhara )
+MACHINE_CONFIG_DERIVED(seta_state::zombraid, gundhara)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(zombraid_map)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
+
+	MCFG_DEVICE_ADD("adc", ADC0834, 0)
+	MCFG_ADC083X_INPUT_CB(seta_state, zombraid_adc_cb)
 MACHINE_CONFIG_END
 
 /***************************************************************************
@@ -8700,7 +8668,7 @@ MACHINE_CONFIG_END
     lev 1 == lev 3 (writes to $500000, bit 4 -> 1 then 0)
     lev 2 drives the game
 */
-static MACHINE_CONFIG_START( jjsquawk )
+MACHINE_CONFIG_START(seta_state::jjsquawk)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 16000000)   /* 16 MHz */
@@ -8736,7 +8704,7 @@ static MACHINE_CONFIG_START( jjsquawk )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( jjsquawb )
+MACHINE_CONFIG_START(seta_state::jjsquawb)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 16000000)   /* 16 MHz */
@@ -8776,17 +8744,17 @@ MACHINE_CONFIG_END
 ***************************************************************************/
 
 /*  kamenrid: lev 2 by vblank, lev 4 by timer */
-static MACHINE_CONFIG_START( kamenrid )
+MACHINE_CONFIG_START(seta_state::kamenrid)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 16000000)   /* 16 MHz */
 	MCFG_CPU_PROGRAM_MAP(kamenrid_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", seta_state,  wrofaero_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", seta_state, irq2_line_assert)
 	MCFG_WATCHDOG_ADD("watchdog")
 
-#if __uPD71054_TIMER
-	MCFG_MACHINE_START_OVERRIDE(seta_state, wrofaero )
-#endif  // __uPD71054_TIMER
+	MCFG_DEVICE_ADD("pit", PIT8254, 0) // uPD71054C
+	MCFG_PIT8253_CLK0(16000000/2/8)
+	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(seta_state, pit_out0))
 
 	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
 	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
@@ -8819,7 +8787,7 @@ MACHINE_CONFIG_END
 
 /* The CPU clock has been verified/measured, PCB only has one OSC and it's 14.318180 MHz */
 
-static MACHINE_CONFIG_START( orbs )
+MACHINE_CONFIG_START(seta_state::orbs)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 14318180/2) /* 7.143 MHz */
@@ -8859,7 +8827,7 @@ MACHINE_CONFIG_END
                   Kero Kero Keroppi no Issyoni Asobou
 ***************************************************************************/
 
-static MACHINE_CONFIG_START( keroppij )
+MACHINE_CONFIG_START(seta_state::keroppij)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 14318180/2) /* 7.143 MHz */
@@ -8894,7 +8862,7 @@ static MACHINE_CONFIG_START( keroppij )
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( keroppi, keroppij )
+MACHINE_CONFIG_DERIVED(seta_state::keroppi, keroppij)
 	MCFG_GFXDECODE_MODIFY("gfxdecode", tndrcade)
 MACHINE_CONFIG_END
 
@@ -8902,7 +8870,7 @@ MACHINE_CONFIG_END
                                 Krazy Bowl
 ***************************************************************************/
 
-static MACHINE_CONFIG_START( krzybowl )
+MACHINE_CONFIG_START(seta_state::krzybowl)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 16000000)   /* 16 MHz */
@@ -8948,12 +8916,12 @@ MACHINE_CONFIG_END
 ***************************************************************************/
 
 /*  madshark: lev 2 by vblank, lev 4 by timer */
-static MACHINE_CONFIG_START( madshark )
+MACHINE_CONFIG_START(seta_state::madshark)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 16000000)   /* 16 MHz */
 	MCFG_CPU_PROGRAM_MAP(madshark_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", seta_state,  wrofaero_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", seta_state, irq2_line_assert)
 
 	MCFG_DEVICE_ADD("pit", PIT8254, 0) // uPD71054C
 	MCFG_PIT8253_CLK0(16000000/2/8)
@@ -8994,18 +8962,18 @@ MACHINE_CONFIG_END
 ***************************************************************************/
 
 /*  magspeed: lev 2 by vblank, lev 4 by timer */
-static MACHINE_CONFIG_START( magspeed )
+MACHINE_CONFIG_START(seta_state::magspeed)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 16000000)   /* 16 MHz */
 	MCFG_CPU_PROGRAM_MAP(magspeed_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", seta_state,  wrofaero_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", seta_state, irq2_line_assert)
 
 	MCFG_WATCHDOG_ADD("watchdog")
 
-#if __uPD71054_TIMER
-	MCFG_MACHINE_START_OVERRIDE(seta_state, wrofaero )
-#endif  // __uPD71054_TIMER
+	MCFG_DEVICE_ADD("pit", PIT8254, 0) // uPD71054C
+	MCFG_PIT8253_CLK0(16000000/2/8)
+	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(seta_state, pit_out0))
 
 	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
 	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
@@ -9039,20 +9007,16 @@ MACHINE_CONFIG_END
 
 /* msgundam lev 2 == lev 6 ! */
 
-static MACHINE_CONFIG_START( msgundam )
+MACHINE_CONFIG_START(seta_state::msgundam)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 16000000)   /* 16 MHz */
 	MCFG_CPU_PROGRAM_MAP(msgundam_map)
-#if __uPD71054_TIMER
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", seta_state,  wrofaero_interrupt)
-#else
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", seta_state, seta_interrupt_2_and_4, "screen", 0, 1)
-#endif  // __uPD71054_TIMER
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", seta_state, irq2_line_assert)
 
-#if __uPD71054_TIMER
-	MCFG_MACHINE_START_OVERRIDE(seta_state, wrofaero )
-#endif  // __uPD71054_TIMER
+	MCFG_DEVICE_ADD("pit", PIT8254, 0) // uPD71054C
+	MCFG_PIT8253_CLK0(16000000/2/8)
+	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(seta_state, pit_out0))
 
 	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
 	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
@@ -9086,7 +9050,7 @@ MACHINE_CONFIG_END
                             Oishii Puzzle
 ***************************************************************************/
 
-static MACHINE_CONFIG_START( oisipuzl )
+MACHINE_CONFIG_START(seta_state::oisipuzl)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 16000000)   /* 16 MHz */
@@ -9125,7 +9089,7 @@ MACHINE_CONFIG_END
 
 /* same as oisipuzl but with different interrupts and sound */
 
-static MACHINE_CONFIG_START( triplfun )
+MACHINE_CONFIG_START(seta_state::triplfun)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 16000000)   /* 16 MHz */
@@ -9162,7 +9126,7 @@ MACHINE_CONFIG_END
                             Pro Mahjong Kiwame
 ***************************************************************************/
 
-static MACHINE_CONFIG_START( kiwame )
+MACHINE_CONFIG_START(seta_state::kiwame)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 16000000)   /* 16 MHz */
@@ -9170,6 +9134,7 @@ static MACHINE_CONFIG_START( kiwame )
 	/* lev 1-7 are the same. WARNING: the interrupt table is written to. */
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", seta_state,  irq1_line_hold)
 	MCFG_DEVICE_ADD("tmp68301", TMP68301, 0)
+	MCFG_TMP68301_CPU("maincpu")
 	MCFG_TMP68301_OUT_PARALLEL_CB(WRITE16(seta_state, kiwame_row_select_w))
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
@@ -9208,7 +9173,7 @@ MACHINE_CONFIG_END
 
 /* pretty much like wrofaero, but ints are 1&2, not 2&4 */
 
-static MACHINE_CONFIG_START( rezon )
+MACHINE_CONFIG_START(seta_state::rezon)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 16000000)   /* 16 MHz */
@@ -9249,12 +9214,12 @@ MACHINE_CONFIG_END
 
 /*  thunderl lev 2 = lev 3 - other levels lead to an error */
 
-static MACHINE_CONFIG_START( thunderl )
+MACHINE_CONFIG_START(seta_state::thunderl)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 16000000/2) /* 8 MHz */
 	MCFG_CPU_PROGRAM_MAP(thunderl_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", seta_state,  irq2_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", seta_state, irq2_line_assert)
 
 	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
 	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
@@ -9286,7 +9251,6 @@ static ADDRESS_MAP_START( thunderlbl_sound_map, AS_PROGRAM, 8, seta_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xdfff) AM_ROM
-	AM_RANGE(0xe800, 0xe800) AM_READ(wiggie_soundlatch_r)
 	AM_RANGE(0xf800, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -9294,16 +9258,16 @@ static ADDRESS_MAP_START( thunderlbl_sound_portmap, AS_IO, 8, seta_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x01) AM_MIRROR(0x3e) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
-	AM_RANGE(0xc0, 0xc0) AM_MIRROR(0x3f) AM_READ(wiggie_soundlatch_r)
+	AM_RANGE(0xc0, 0xc0) AM_MIRROR(0x3f) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 ADDRESS_MAP_END
 
 
-static MACHINE_CONFIG_DERIVED( thunderlbl, thunderl )
+MACHINE_CONFIG_DERIVED(seta_state::thunderlbl, thunderl)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(thunderlbl_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", seta_state,  irq2_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", seta_state, irq2_line_assert)
 
 	MCFG_CPU_ADD("audiocpu", Z80, 10000000/2)
 	MCFG_CPU_PROGRAM_MAP(thunderlbl_sound_map)
@@ -9314,15 +9278,18 @@ static MACHINE_CONFIG_DERIVED( thunderlbl, thunderl )
 
 	MCFG_YM2151_ADD("ymsnd", 10000000/2)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", 0))
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( wiggie )
+MACHINE_CONFIG_START(seta_state::wiggie)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 16000000/2) /* 8 MHz */
 	MCFG_CPU_PROGRAM_MAP(wiggie_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", seta_state,  irq2_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", seta_state, irq2_line_assert)
 
 	MCFG_CPU_ADD("audiocpu", Z80, 16000000/4)   /* 4 MHz */
 	MCFG_CPU_PROGRAM_MAP(wiggie_sound_map)
@@ -9350,19 +9317,22 @@ static MACHINE_CONFIG_START( wiggie )
 
 	MCFG_OKIM6295_ADD("oki", 1000000, PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", 0))
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( superbar, wiggie )
+MACHINE_CONFIG_DERIVED(seta_state::superbar, wiggie)
 
 	MCFG_GFXDECODE_MODIFY("gfxdecode", superbar)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( wits )
+MACHINE_CONFIG_START(seta_state::wits)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 16000000/2) /* 8 MHz */
 	MCFG_CPU_PROGRAM_MAP(thunderl_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", seta_state,  irq2_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", seta_state, irq2_line_assert)
 
 	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
 	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
@@ -9394,7 +9364,7 @@ MACHINE_CONFIG_END
                     Ultraman Club / SD Gundam Neo Battling
 ***************************************************************************/
 
-static MACHINE_CONFIG_START( umanclub )
+MACHINE_CONFIG_START(seta_state::umanclub)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 16000000)   /* 16 MHz */
@@ -9431,7 +9401,7 @@ MACHINE_CONFIG_END
                             Ultra Toukond Densetsu
 ***************************************************************************/
 
-static MACHINE_CONFIG_START( utoukond )
+MACHINE_CONFIG_START(seta_state::utoukond)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 16000000)   /* 16 MHz */
@@ -9464,6 +9434,8 @@ static MACHINE_CONFIG_START( utoukond )
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", 0))
+	MCFG_GENERIC_LATCH_SEPARATE_ACKNOWLEDGE(true)
 
 	MCFG_SOUND_ADD("x1snd", X1_010, 16000000)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
@@ -9480,7 +9452,7 @@ MACHINE_CONFIG_END
                                 War of Aero
 ***************************************************************************/
 
-static MACHINE_CONFIG_START( wrofaero )
+MACHINE_CONFIG_START(seta_state::wrofaero)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 16000000)   /* 16 MHz */
@@ -9534,7 +9506,7 @@ MACHINE_CONFIG_END
    at int 1 is necessary: it plays the background music.
 */
 
-static MACHINE_CONFIG_START( zingzip )
+MACHINE_CONFIG_START(seta_state::zingzip)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 16000000)   /* 16 MHz */
@@ -9572,7 +9544,7 @@ static MACHINE_CONFIG_START( zingzip )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( zingzipbl, zingzip )
+MACHINE_CONFIG_DERIVED(seta_state::zingzipbl, zingzip)
 	MCFG_GFXDECODE_MODIFY("gfxdecode", zingzipbl)
 
 	MCFG_DEVICE_REMOVE("maincpu")
@@ -9591,7 +9563,7 @@ MACHINE_CONFIG_END
                                 Pairs Love
 ***************************************************************************/
 
-static MACHINE_CONFIG_START( pairlove )
+MACHINE_CONFIG_START(seta_state::pairlove)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 16000000/2) /* 8 MHz */
@@ -9639,7 +9611,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(seta_state::crazyfgt_interrupt)
 		m_maincpu->set_input_line(1, HOLD_LINE);
 }
 
-static MACHINE_CONFIG_START( crazyfgt )
+MACHINE_CONFIG_START(seta_state::crazyfgt)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 16000000)   /* 16 MHz */
@@ -9700,7 +9672,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(jockeyc_state::interrupt)
 		m_maincpu->set_input_line(6, HOLD_LINE);
 }
 
-static MACHINE_CONFIG_START( jockeyc )
+MACHINE_CONFIG_START(jockeyc_state::jockeyc)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz/2) // TMP68000N-8
@@ -9753,7 +9725,7 @@ MACHINE_CONFIG_END
                              International Toote
 ***************************************************************************/
 
-static MACHINE_CONFIG_DERIVED( inttoote, jockeyc )
+MACHINE_CONFIG_DERIVED(jockeyc_state::inttoote, jockeyc)
 	MCFG_DEVICE_REMOVE("maincpu")
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz) // TMP68HC000N-16
 	MCFG_CPU_PROGRAM_MAP(inttoote_map)
@@ -11725,12 +11697,12 @@ READ16_MEMBER(seta_state::twineagl_debug_r)
 READ16_MEMBER(seta_state::twineagl_200100_r)
 {
 	// protection check at boot
-	logerror("%04x: twineagl_200100_r %d\n",space.device().safe_pc(),offset);
+	logerror("%04x: twineagl_200100_r %d\n",m_maincpu->pc(),offset);
 	return m_twineagl_xram[offset];
 }
 WRITE16_MEMBER(seta_state::twineagl_200100_w)
 {
-	logerror("%04x: twineagl_200100_w %d = %02x\n",space.device().safe_pc(),offset,data);
+	logerror("%04x: twineagl_200100_w %d = %02x\n",m_maincpu->pc(),offset,data);
 
 	if (ACCESSING_BITS_0_7)
 	{
@@ -11797,16 +11769,31 @@ DRIVER_INIT_MEMBER(seta_state,arbalest)
 }
 
 
+READ16_MEMBER(seta_state::metafox_protection_r)
+{
+	// very simplified protection simulation
+	// 21c000-21c3ff, 21d000-21d3ff, and 21e000-21e3ff are tested as 8 bit reads/writes
+	// the first address in each range is special and returns data written elsewhere in that range
+	// 21fde0-21fdff appears to be control bytes?
+
+	switch (offset)
+	{
+		case 0x0001/2:
+			return 0x3d;
+
+		case 0x1001/2:
+			return 0x76;
+
+		case 0x2001/2:
+			return 0x10;
+	}
+
+	return offset * 0x1f;
+}
+
 DRIVER_INIT_MEMBER(seta_state,metafox)
 {
-	uint16_t *RAM = (uint16_t *) memregion("maincpu")->base();
-
-	/* This game uses the 21c000-21ffff area for protection? */
-//  m_maincpu->space(AS_PROGRAM).nop_readwrite(0x21c000, 0x21ffff);
-
-	RAM[0x8ab1c/2] = 0x4e71;    // patch protection test: "cp error"
-	RAM[0x8ab1e/2] = 0x4e71;
-	RAM[0x8ab20/2] = 0x4e71;
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x21c000, 0x21ffff,read16_delegate(FUNC(seta_state::metafox_protection_r),this));
 }
 
 
@@ -11844,13 +11831,6 @@ DRIVER_INIT_MEMBER(seta_state,blandia)
 DRIVER_INIT_MEMBER(seta_state,eightfrc)
 {
 	m_maincpu->space(AS_PROGRAM).nop_read(0x500004, 0x500005);   // watchdog??
-}
-
-
-DRIVER_INIT_MEMBER(seta_state,zombraid)
-{
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0xf00002, 0xf00003, read16_delegate(FUNC(seta_state::zombraid_gun_r),this));
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0xf00000, 0xf00001, write16_delegate(FUNC(seta_state::zombraid_gun_w),this));
 }
 
 
@@ -11898,11 +11878,6 @@ DRIVER_INIT_MEMBER(seta_state,wiggie)
 
 
 	}
-
-	/* X1_010 is not used. */
-	m_maincpu->space(AS_PROGRAM).nop_readwrite(0x100000, 0x103fff);
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0xB00008, 0xB00009, write16_delegate(FUNC(seta_state::wiggie_soundlatch_w),this));
-
 }
 
 DRIVER_INIT_MEMBER(seta_state,crazyfgt)
@@ -12044,8 +12019,8 @@ GAME( 1995, gundharac, gundhara, gundhara,  gundhara,  seta_state,     0,       
 
 GAME( 1995, sokonuke,  0,        extdwnhl,  sokonuke,  seta_state,     0,         ROT0,   "Sammy Industries",          "Sokonuke Taisen Game (Japan)", MACHINE_IMPERFECT_SOUND )
 
-GAME( 1995, zombraid,  0,        zombraid,  zombraid,  seta_state,     zombraid,  ROT0,   "American Sammy",            "Zombie Raid (9/28/95, US)", MACHINE_NO_COCKTAIL )
-GAME( 1995, zombraidp, zombraid, zombraid,  zombraid,  seta_state,     zombraid,  ROT0,   "American Sammy",            "Zombie Raid (9/28/95, US, prototype PCB)", MACHINE_NO_COCKTAIL ) // actual code is same as the released version
-GAME( 1995, zombraidpj,zombraid, zombraid,  zombraid,  seta_state,     zombraid,  ROT0,   "Sammy Industries Co.,Ltd.", "Zombie Raid (9/28/95, Japan, prototype PCB)", MACHINE_NO_COCKTAIL ) // just 3 bytes different from above
+GAME( 1995, zombraid,  0,        zombraid,  zombraid,  seta_state,     0,         ROT0,   "American Sammy",            "Zombie Raid (9/28/95, US)", MACHINE_NO_COCKTAIL )
+GAME( 1995, zombraidp, zombraid, zombraid,  zombraid,  seta_state,     0,         ROT0,   "American Sammy",            "Zombie Raid (9/28/95, US, prototype PCB)", MACHINE_NO_COCKTAIL ) // actual code is same as the released version
+GAME( 1995, zombraidpj,zombraid, zombraid,  zombraid,  seta_state,     0,         ROT0,   "Sammy Industries Co.,Ltd.", "Zombie Raid (9/28/95, Japan, prototype PCB)", MACHINE_NO_COCKTAIL ) // just 3 bytes different from above
 
 GAME( 1996, crazyfgt,  0,        crazyfgt,  crazyfgt,  seta_state,     crazyfgt,  ROT0,   "Subsino",                   "Crazy Fight", MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )

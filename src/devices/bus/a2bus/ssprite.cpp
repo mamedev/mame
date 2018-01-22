@@ -33,7 +33,7 @@ DEFINE_DEVICE_TYPE(A2BUS_SSPRITE, a2bus_ssprite_device, "a2ssprite", "Synetix Su
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( a2bus_ssprite_device::device_add_mconfig )
+MACHINE_CONFIG_START(a2bus_ssprite_device::device_add_mconfig)
 	MCFG_DEVICE_ADD( TMS_TAG, TMS9918A, XTAL_10_738635MHz / 2 )
 	MCFG_TMS9928A_VRAM_SIZE(0x4000) // 16k of VRAM
 	MCFG_TMS9928A_OUT_INT_LINE_CB(WRITELINE(a2bus_ssprite_device, tms_irq_w))
@@ -96,44 +96,44 @@ void a2bus_ssprite_device::device_reset()
 */
 
 
-uint8_t a2bus_ssprite_device::read_c0nx(address_space &space, uint8_t offset)
+uint8_t a2bus_ssprite_device::read_c0nx(uint8_t offset)
 {
 	switch (offset)
 	{
 		case 0:
-			return m_tms->vram_read(space, 0);
+			return m_tms->vram_read();
 		case 1:
-			return m_tms->register_read(space, 0);
+			return m_tms->register_read();
 		case 2:
-			return 0x1f | m_tms5220->status_r(space, 0); // copied this line from a2echoii.cpp
+			return 0x1f | m_tms5220->status_r(); // copied this line from a2echoii.cpp
 		case 14:
 		case 15:
-			return m_ay->data_r(space, 0);
+			return m_ay->data_r();
 	}
 
 	return 0xff;
 }
 
-void a2bus_ssprite_device::write_c0nx(address_space &space, uint8_t offset, uint8_t data)
+void a2bus_ssprite_device::write_c0nx(uint8_t offset, uint8_t data)
 {
 	switch (offset)
 	{
 		case 0:
-			m_tms->vram_write(space, 0, data);
+			m_tms->vram_write(data);
 			break;
 		case 1:
-			m_tms->register_write(space, 0, data);
+			m_tms->register_write(data);
 			break;
 		case 2:
-			m_tms5220->data_w(space, offset, data);
+			m_tms5220->data_w(data);
 			break;
 		case 12:
 		case 13:
-			m_ay->data_w(space, 0, data);
+			m_ay->data_w(data);
 			break;
 		case 14:
 		case 15:
-			m_ay->address_w(space, 0, data);
+			m_ay->address_w(data);
 			break;
 	}
 }

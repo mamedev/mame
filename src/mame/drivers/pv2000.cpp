@@ -70,6 +70,7 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(pv2000_cart);
+	void pv2000(machine_config &config);
 };
 
 
@@ -379,7 +380,7 @@ DEVICE_IMAGE_LOAD_MEMBER( pv2000_state, pv2000_cart )
 }
 
 /* Machine Drivers */
-static MACHINE_CONFIG_START( pv2000 )
+MACHINE_CONFIG_START(pv2000_state::pv2000)
 
 	// basic machine hardware
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_7_15909MHz/2) // 3.579545 MHz

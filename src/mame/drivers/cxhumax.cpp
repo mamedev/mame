@@ -1053,7 +1053,7 @@ void cxhumax_state::machine_reset()
 	memset(m_gxa_cmd_regs,0,sizeof(m_gxa_cmd_regs));
 }
 
-static MACHINE_CONFIG_START( cxhumax )
+MACHINE_CONFIG_START(cxhumax_state::cxhumax)
 	MCFG_CPU_ADD("maincpu", ARM920T, 180000000) // CX24175 (RevC up?)
 	MCFG_CPU_PROGRAM_MAP(cxhumax_map)
 

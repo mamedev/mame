@@ -65,11 +65,8 @@ TODO:
 
 #include "cpu/m68000/m68000.h"
 #include "cpu/pic16c5x/pic16c5x.h"
-#include "machine/eepromser.h"
 #include "machine/nvram.h"
-#include "machine/ticket.h"
 #include "screen.h"
-#include "sound/okim6295.h"
 #include "speaker.h"
 
 
@@ -112,20 +109,20 @@ WRITE16_MEMBER(playmark_state::hotmind_coin_eeprom_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-//      if (data & 0x80) logerror("PC$%06x Writing unknown bits %02x to the Coin/EEPROM port\n", space.device().safe_pcbase(), data);
+//      if (data & 0x80) logerror("PC$%06x Writing unknown bits %02x to the Coin/EEPROM port\n", m_maincpu->pcbase(), data);
 
 		if (data) {
 			if ((m_dispenser_latch & 0x80) == 0) m_dispenser_latch = 0;
 			if (data & 0x10) {
 				m_dispenser_latch |= ((data & 0x10) | 0x80);
-				machine().device<ticket_dispenser_device>("token")->write(space, 0, 0x80);
+				m_token->motor_w(1);
 			}
 		}
 		else {
 			m_dispenser_latch &= 0x7f;
-			machine().device<ticket_dispenser_device>("token")->write(space, 0, (m_dispenser_latch & 0x10) ? 0x80 : 0);
+			m_token->motor_w(BIT(m_dispenser_latch, 4));
 		}
-		machine().device<ticket_dispenser_device>("ticket")->write(space, 0, (data & 0x08) ? 0x80 : 0);
+		m_ticket->motor_w(BIT(data, 3));
 
 		machine().bookkeeping().coin_counter_w(0, data & 0x20);      /* Coin In counter - transistor driven */
 		machine().bookkeeping().coin_counter_w(1, data & 0x40);      /* Token/Ticket Out counter - transistor driven */
@@ -140,20 +137,20 @@ WRITE16_MEMBER(playmark_state::luckboomh_dispenser_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-//      if (data & 0x87) logerror("PC$%06x Writing unknown bits %02x to the Coin/EEPROM port\n", space.device().safe_pcbase(), data);
+//      if (data & 0x87) logerror("PC$%06x Writing unknown bits %02x to the Coin/EEPROM port\n", m_maincpu->pcbase(), data);
 
 		if (data) {
 			if ((m_dispenser_latch & 0x80) == 0) m_dispenser_latch = 0;
 			if (data & 0x10) {
 				m_dispenser_latch |= ((data & 0x10) | 0x80);
-				machine().device<ticket_dispenser_device>("token")->write(space, 0, 0x80);
+				m_token->motor_w(1);
 			}
 		}
 		else {
 			m_dispenser_latch &= 0x7f;
-			machine().device<ticket_dispenser_device>("token")->write(space, 0, (m_dispenser_latch & 0x10) ? 0x80 : 0);
+			m_token->motor_w(BIT(m_dispenser_latch, 4));
 		}
-		machine().device<ticket_dispenser_device>("ticket")->write(space, 0, (data & 0x08) ? 0x80 : 0);
+		m_ticket->motor_w(BIT(data, 3));
 
 		machine().bookkeeping().coin_counter_w(0, data & 0x20);      /* Coin In counter - transistor driven */
 		machine().bookkeeping().coin_counter_w(1, data & 0x40);      /* Token/Ticket Out counter - transistor driven */
@@ -170,11 +167,11 @@ WRITE16_MEMBER(playmark_state::playmark_snd_command_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-//      logerror("PC$%06x 68K Writing sound command %02x to OKI\n",space.device().safe_pcbase(), data);
+//      logerror("PC$%06x 68K Writing sound command %02x to OKI\n",m_maincpu->pcbase(), data);
 
 		m_snd_command = (data & 0xff);
 		m_snd_flag = 1;
-		space.device().execute().yield();
+		m_maincpu->yield();
 	}
 }
 
@@ -185,12 +182,12 @@ READ8_MEMBER(playmark_state::playmark_snd_command_r)
 	if ((m_oki_control & 0x38) == 0x30)
 	{
 		data = m_snd_command;
-//      logerror("PC$%03x PortB reading %02x from the 68K\n", space.device().safe_pcbase(), data);
+//      logerror("PC$%03x PortB reading %02x from the 68K\n", m_maincpu->pcbase(), data);
 	}
 	else if ((m_oki_control & 0x38) == 0x28)
 	{
 		data = (m_oki->read(space, 0) & 0x0f);
-//      logerror("PC$%03x PortB reading %02x from the OKI status port\n", space.device().safe_pcbase(), data);
+//      logerror("PC$%03x PortB reading %02x from the OKI status port\n", m_maincpu->pcbase(), data);
 	}
 
 	return data;
@@ -210,7 +207,7 @@ READ8_MEMBER(playmark_state::playmark_snd_flag_r)
 
 WRITE8_MEMBER(playmark_state::playmark_oki_banking_w)
 {
-	logerror("PC$%03x Writing %02x to PortA  (OKI bank select)\n",space.device().safe_pcbase(),data);
+	logerror("%s Writing %02x to PortA  (OKI bank select)\n",machine().describe_context(),data);
 
 	int bank = data & 7;
 
@@ -240,7 +237,7 @@ WRITE8_MEMBER(playmark_state::playmark_snd_control_w)
 
 	if ((data & 0x38) == 0x18)
 	{
-//      logerror("PC$%03x Writing %02x to OKI1, PortC=%02x, Code=%02x\n",space.device().safe_pcbase(),m_oki_command,m_oki_control,m_snd_command);
+//      logerror("PC$%03x Writing %02x to OKI1, PortC=%02x, Code=%02x\n",m_maincpu->pcbase(),m_oki_command,m_oki_control,m_snd_command);
 		m_oki->write(space, 0, m_oki_command);
 	}
 }
@@ -256,7 +253,7 @@ WRITE8_MEMBER(playmark_state::hrdtimes_snd_control_w)
 
 	if ((data & 0x38) == 0x18)
 	{
-//      logerror("PC$%03x Writing %02x to OKI1, PortC=%02x, Code=%02x\n",space.device().safe_pcbase(),m_oki_command,m_oki_control,m_snd_command);
+//      logerror("PC$%03x Writing %02x to OKI1, PortC=%02x, Code=%02x\n",m_maincpu->pcbase(),m_oki_command,m_oki_control,m_snd_command);
 		m_oki->write(space, 0, m_oki_command);
 	}
 }
@@ -282,7 +279,7 @@ static ADDRESS_MAP_START( bigtwin_main_map, AS_PROGRAM, 16, playmark_state )
 	AM_RANGE(0x70001a, 0x70001b) AM_READ_PORT("DSW2")
 	AM_RANGE(0x70001c, 0x70001d) AM_READ_PORT("DSW1")
 	AM_RANGE(0x70001e, 0x70001f) AM_WRITE(playmark_snd_command_w)
-	AM_RANGE(0x780000, 0x7807ff) AM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x780000, 0x7807ff) AM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 //  AM_RANGE(0xe00000, 0xe00001) ?? written on startup
 	AM_RANGE(0xff0000, 0xffffff) AM_RAM
 ADDRESS_MAP_END
@@ -294,7 +291,7 @@ static ADDRESS_MAP_START( bigtwinb_main_map, AS_PROGRAM, 16, playmark_state )
 	AM_RANGE(0x108000, 0x10ffff) AM_RAM_WRITE(hrdtimes_txvideoram_w) AM_SHARE("videoram1")
 	AM_RANGE(0x110000, 0x11000d) AM_WRITE(hrdtimes_scroll_w)
 	AM_RANGE(0x201000, 0x2013ff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x280000, 0x2807ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x280000, 0x2807ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x300010, 0x300011) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x300012, 0x300013) AM_READ_PORT("P1")
 	AM_RANGE(0x300014, 0x300015) AM_READ_PORT("P2")
@@ -323,7 +320,7 @@ static ADDRESS_MAP_START( wbeachvl_main_map, AS_PROGRAM, 16, playmark_state )
 	AM_RANGE(0x71001a, 0x71001b) AM_READ_PORT("P4")
 //  AM_RANGE(0x71001c, 0x71001d) AM_READ(playmark_snd_status???)
 	AM_RANGE(0x71001e, 0x71001f) AM_WRITE(playmark_snd_command_w)
-	AM_RANGE(0x780000, 0x780fff) AM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x780000, 0x780fff) AM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0xff0000, 0xffffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -343,7 +340,7 @@ static ADDRESS_MAP_START( excelsr_main_map, AS_PROGRAM, 16, playmark_state )
 	AM_RANGE(0x70001a, 0x70001b) AM_READ_PORT("DSW2")
 	AM_RANGE(0x70001c, 0x70001d) AM_READ_PORT("DSW1")
 	AM_RANGE(0x70001e, 0x70001f) AM_WRITE(playmark_snd_command_w)
-	AM_RANGE(0x780000, 0x7807ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x780000, 0x7807ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0xff0000, 0xffffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -360,7 +357,7 @@ static ADDRESS_MAP_START( hrdtimes_main_map, AS_PROGRAM, 16, playmark_state )
 	AM_RANGE(0x10c000, 0x10ffff) AM_RAM // Unused
 	AM_RANGE(0x110000, 0x11000d) AM_WRITE(hrdtimes_scroll_w)
 	AM_RANGE(0x200000, 0x200fff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x280000, 0x2807ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x280000, 0x2807ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x280800, 0x280fff) AM_RAM // Unused
 	AM_RANGE(0x300010, 0x300011) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x300012, 0x300013) AM_READ_PORT("P1")
@@ -379,7 +376,7 @@ static ADDRESS_MAP_START( hotmind_main_map, AS_PROGRAM, 16, playmark_state )
 	AM_RANGE(0x108000, 0x10ffff) AM_RAM_WRITE(hrdtimes_txvideoram_w) AM_SHARE("videoram1")
 	AM_RANGE(0x110000, 0x11000d) AM_WRITE(hrdtimes_scroll_w)
 	AM_RANGE(0x200000, 0x200fff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x280000, 0x2807ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x280000, 0x2807ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x300010, 0x300011) AM_READ_PORT("COINS")
 	AM_RANGE(0x300012, 0x300013) AM_READ_PORT("P1")
 	AM_RANGE(0x300014, 0x300015) AM_READ_PORT("DISPENSER") AM_WRITE(hotmind_coin_eeprom_w)
@@ -397,7 +394,7 @@ static ADDRESS_MAP_START( luckboomh_main_map, AS_PROGRAM, 16, playmark_state )
 	AM_RANGE(0x108000, 0x10ffff) AM_RAM_WRITE(hrdtimes_txvideoram_w) AM_SHARE("videoram1")
 	AM_RANGE(0x110000, 0x11000d) AM_WRITE(hrdtimes_scroll_w)
 	AM_RANGE(0x200000, 0x200fff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x280000, 0x2807ff) AM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x280000, 0x2807ff) AM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x300010, 0x300011) AM_READ_PORT("COINS")
 	AM_RANGE(0x300012, 0x300013) AM_READ_PORT("P1")
 	AM_RANGE(0x300014, 0x300015) AM_READ_PORT("DISPENSER") AM_WRITE(luckboomh_dispenser_w)
@@ -413,6 +410,38 @@ static ADDRESS_MAP_START( oki_map, 0, 8, playmark_state )
 	AM_RANGE(0x20000, 0x3ffff) AM_ROMBANK("okibank")
 ADDRESS_MAP_END
 
+
+#define PLAYMARK_COINS \
+	PORT_DIPNAME( 0x01, 0x01, "Coin Slots" ) PORT_DIPLOCATION("DSW1:1") \
+	PORT_DIPSETTING(    0x00, "Separate" ) \
+	PORT_DIPSETTING(    0x01, "Common" ) \
+	PORT_DIPNAME( 0x1e, 0x1e, DEF_STR( Coinage ) ) PORT_CONDITION("DSW1", 0x01, EQUALS, 0x01)  PORT_DIPLOCATION("DSW1:2,3,4,5") \
+	PORT_DIPSETTING(    0x14, DEF_STR( 6C_1C ) ) \
+	PORT_DIPSETTING(    0x16, DEF_STR( 5C_1C ) ) \
+	PORT_DIPSETTING(    0x18, DEF_STR( 4C_1C ) ) \
+	PORT_DIPSETTING(    0x1a, DEF_STR( 3C_1C ) ) \
+	PORT_DIPSETTING(    0x02, DEF_STR( 8C_3C ) ) \
+	PORT_DIPSETTING(    0x1c, DEF_STR( 2C_1C ) ) \
+	PORT_DIPSETTING(    0x04, DEF_STR( 5C_3C ) ) \
+	PORT_DIPSETTING(    0x06, DEF_STR( 3C_2C ) ) \
+	PORT_DIPSETTING(    0x1e, DEF_STR( 1C_1C ) ) \
+	PORT_DIPSETTING(    0x08, DEF_STR( 2C_3C ) ) \
+	PORT_DIPSETTING(    0x12, DEF_STR( 1C_2C ) ) \
+	PORT_DIPSETTING(    0x10, DEF_STR( 1C_3C ) ) \
+	PORT_DIPSETTING(    0x0e, DEF_STR( 1C_4C ) ) \
+	PORT_DIPSETTING(    0x0c, DEF_STR( 1C_5C ) ) \
+	PORT_DIPSETTING(    0x0a, DEF_STR( 1C_6C ) ) \
+	PORT_DIPSETTING(    0x00, DEF_STR( Free_Play ) ) \
+	PORT_DIPNAME( 0x06, 0x06, DEF_STR( Coin_A ) ) PORT_CONDITION("DSW1", 0x01, NOTEQUALS, 0x01)  PORT_DIPLOCATION("DSW1:2,3") \
+	PORT_DIPSETTING(    0x00, DEF_STR( 5C_1C ) ) \
+	PORT_DIPSETTING(    0x02, DEF_STR( 3C_1C ) ) \
+	PORT_DIPSETTING(    0x04, DEF_STR( 2C_1C ) ) \
+	PORT_DIPSETTING(    0x06, DEF_STR( 1C_1C ) ) \
+	PORT_DIPNAME( 0x18, 0x18, DEF_STR( Coin_B ) ) PORT_CONDITION("DSW1", 0x01, NOTEQUALS, 0x01)  PORT_DIPLOCATION("DSW1:4,5") \
+	PORT_DIPSETTING(    0x18, DEF_STR( 1C_2C ) ) \
+	PORT_DIPSETTING(    0x10, DEF_STR( 1C_3C ) ) \
+	PORT_DIPSETTING(    0x08, DEF_STR( 1C_5C ) ) \
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_6C ) )
 
 
 static INPUT_PORTS_START( bigtwin )
@@ -447,167 +476,49 @@ static INPUT_PORTS_START( bigtwin )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START2 )
 
 	PORT_START("DSW1")
-	PORT_DIPNAME( 0x01, 0x01, "Coin Mode" )  PORT_DIPLOCATION("SW1:1")
-	PORT_DIPSETTING(    0x01, "Mode 1" )
-	PORT_DIPSETTING(    0x00, "Mode 2" )
-	PORT_DIPNAME( 0x1e, 0x1e, "Coinage Mode 1" ) PORT_CONDITION("DSW1", 0x01, EQUALS, 0x01)  PORT_DIPLOCATION("SW1:2,3,4,5")
-	PORT_DIPSETTING(    0x14, DEF_STR( 6C_1C ) )
-	PORT_DIPSETTING(    0x16, DEF_STR( 5C_1C ) )
-	PORT_DIPSETTING(    0x18, DEF_STR( 4C_1C ) )
-	PORT_DIPSETTING(    0x1a, DEF_STR( 3C_1C ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( 8C_3C ) )
-	PORT_DIPSETTING(    0x1c, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( 5C_3C ) )
-	PORT_DIPSETTING(    0x06, DEF_STR( 3C_2C ) )
-	PORT_DIPSETTING(    0x1e, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( 2C_3C ) )
-	PORT_DIPSETTING(    0x12, DEF_STR( 1C_2C ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( 1C_3C ) )
-	PORT_DIPSETTING(    0x0e, DEF_STR( 1C_4C ) )
-	PORT_DIPSETTING(    0x0c, DEF_STR( 1C_5C ) )
-	PORT_DIPSETTING(    0x0a, DEF_STR( 1C_6C ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Free_Play ) )
-	PORT_DIPNAME( 0x06, 0x06, "Coin A Mode 2" ) PORT_CONDITION("DSW1", 0x01, NOTEQUALS, 0x01)  PORT_DIPLOCATION("SW1:2,3")
-	PORT_DIPSETTING(    0x00, DEF_STR( 5C_1C ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( 3C_1C ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(    0x06, DEF_STR( 1C_1C ) )
-	PORT_DIPNAME( 0x18, 0x18, "Coin B Mode 2" ) PORT_CONDITION("DSW1", 0x01, NOTEQUALS, 0x01)  PORT_DIPLOCATION("SW1:4,5")
-	PORT_DIPSETTING(    0x18, DEF_STR( 1C_2C ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( 1C_3C ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( 1C_5C ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( 1C_6C ) )
-	PORT_DIPNAME( 0x20, 0x20, "Minimum Credits to Start" )  PORT_DIPLOCATION("SW1:6")
+	PLAYMARK_COINS
+	PORT_DIPNAME( 0x20, 0x20, "Credits to Start" )  PORT_DIPLOCATION("DSW1:6")
 	PORT_DIPSETTING(    0x20, "1" )
 	PORT_DIPSETTING(    0x00, "2" )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:7")
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )  PORT_DIPLOCATION("DSW1:7")
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:8")
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )  PORT_DIPLOCATION("DSW1:8")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("DSW2")
-	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Language ) )  PORT_DIPLOCATION("SW2:1")
+	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Language ) )  PORT_DIPLOCATION("DSW2:1")
 	PORT_DIPSETTING(    0x00, DEF_STR( English ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Italian ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW2:2")
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )  PORT_DIPLOCATION("DSW2:2")
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x00, "Censor Pictures" )  PORT_DIPLOCATION("SW2:3")
+	PORT_DIPNAME( 0x04, 0x00, "Censor Pictures" )  PORT_DIPLOCATION("DSW2:3")
 	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x08, 0x08, "Rising Ground Level" )  PORT_DIPLOCATION("SW2:4")  // Starts from 55th ball drop on 2nd level
+	PORT_DIPNAME( 0x08, 0x08, "Rising Ground Level" )  PORT_DIPLOCATION("DSW2:4")  // Starts from 55th ball drop on 2nd level
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Difficulty ) )  PORT_DIPLOCATION("SW2:5,6")
+	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Difficulty ) )  PORT_DIPLOCATION("DSW2:5,6")
 //  PORT_DIPSETTING(    0x20, DEF_STR( Easy ) ) /* Seems same as Medium */
 	PORT_DIPSETTING(    0x30, DEF_STR( Medium ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( Hard ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Allow_Continue ) )  PORT_DIPLOCATION("SW2:7")
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Allow_Continue ) )  PORT_DIPLOCATION("DSW2:7")
 	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Demo_Sounds ) )  PORT_DIPLOCATION("SW2:8")
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Demo_Sounds ) )  PORT_DIPLOCATION("DSW2:8")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( bigtwinb )
-	PORT_START("SYSTEM")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_INCLUDE( bigtwin )
 
-	PORT_START("P1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START1 )
-
-	PORT_START("P2")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START2 )
-
-	PORT_START("DSW1")
-	PORT_DIPNAME( 0x01, 0x01, "Coin Mode" )  PORT_DIPLOCATION("SW1:1")
-	PORT_DIPSETTING(    0x01, "Mode 1" )
-	PORT_DIPSETTING(    0x00, "Mode 2" )
-	PORT_DIPNAME( 0x1e, 0x1e, "Coinage Mode 1" ) PORT_CONDITION("DSW1", 0x01, EQUALS, 0x01)  PORT_DIPLOCATION("SW1:2,3,4,5")
-	PORT_DIPSETTING(    0x14, DEF_STR( 6C_1C ) )
-	PORT_DIPSETTING(    0x16, DEF_STR( 5C_1C ) )
-	PORT_DIPSETTING(    0x18, DEF_STR( 4C_1C ) )
-	PORT_DIPSETTING(    0x1a, DEF_STR( 3C_1C ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( 8C_3C ) )
-	PORT_DIPSETTING(    0x1c, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( 5C_3C ) )
-	PORT_DIPSETTING(    0x06, DEF_STR( 3C_2C ) )
-	PORT_DIPSETTING(    0x1e, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( 2C_3C ) )
-	PORT_DIPSETTING(    0x12, DEF_STR( 1C_2C ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( 1C_3C ) )
-	PORT_DIPSETTING(    0x0e, DEF_STR( 1C_4C ) )
-	PORT_DIPSETTING(    0x0c, DEF_STR( 1C_5C ) )
-	PORT_DIPSETTING(    0x0a, DEF_STR( 1C_6C ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Free_Play ) )
-	PORT_DIPNAME( 0x06, 0x06, "Coin A Mode 2" ) PORT_CONDITION("DSW1", 0x01, NOTEQUALS, 0x01)  PORT_DIPLOCATION("SW1:2,3")
-	PORT_DIPSETTING(    0x00, DEF_STR( 5C_1C ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( 3C_1C ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(    0x06, DEF_STR( 1C_1C ) )
-	PORT_DIPNAME( 0x18, 0x18, "Coin B Mode 2" ) PORT_CONDITION("DSW1", 0x01, NOTEQUALS, 0x01)  PORT_DIPLOCATION("SW1:4,5")
-	PORT_DIPSETTING(    0x18, DEF_STR( 1C_2C ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( 1C_3C ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( 1C_5C ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( 1C_6C ) )
-	PORT_DIPNAME( 0x20, 0x20, "Minimum Credits to Start" )  PORT_DIPLOCATION("SW1:6")
-	PORT_DIPSETTING(    0x20, "1" )
-	PORT_DIPSETTING(    0x00, "2" )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:7")
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:8")
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-
-	PORT_START("DSW2")
-	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Language ) )  PORT_DIPLOCATION("SW2:1")
-	PORT_DIPSETTING(    0x00, DEF_STR( English ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( Italian ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW2:2")
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW2:3")
+	PORT_MODIFY("DSW2")
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )  PORT_DIPLOCATION("DSW2:3") /* No nudes, No Censor dipswitch */
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, "Rising Ground Level" )  PORT_DIPLOCATION("SW2:4")  // Starts from 67th ball drop on 2nd level
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Difficulty ) )  PORT_DIPLOCATION("SW2:5,6")
-//  PORT_DIPSETTING(    0x20, DEF_STR( Easy ) ) /* Seems same as Medium */
-	PORT_DIPSETTING(    0x30, DEF_STR( Medium ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Hard ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Allow_Continue ) )  PORT_DIPLOCATION("SW2:7")
-	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Demo_Sounds ) )  PORT_DIPLOCATION("SW2:8")
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
@@ -695,64 +606,35 @@ static INPUT_PORTS_START( excelsr )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START2 )
 
 	PORT_START("DSW1")
-	PORT_DIPNAME( 0x01, 0x01, "Coin Mode" )  PORT_DIPLOCATION("SW1:1")
-	PORT_DIPSETTING(    0x01, "Mode 1" )
-	PORT_DIPSETTING(    0x00, "Mode 2" )
-	PORT_DIPNAME( 0x1e, 0x1e, "Coinage Mode 1" ) PORT_CONDITION("DSW1", 0x01, EQUALS, 0x01)  PORT_DIPLOCATION("SW1:2,3,4,5")
-	PORT_DIPSETTING(    0x14, DEF_STR( 6C_1C ) )
-	PORT_DIPSETTING(    0x16, DEF_STR( 5C_1C ) )
-	PORT_DIPSETTING(    0x18, DEF_STR( 4C_1C ) )
-	PORT_DIPSETTING(    0x1a, DEF_STR( 3C_1C ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( 8C_3C ) )
-	PORT_DIPSETTING(    0x1c, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( 5C_3C ) )
-	PORT_DIPSETTING(    0x06, DEF_STR( 3C_2C ) )
-	PORT_DIPSETTING(    0x1e, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( 2C_3C ) )
-	PORT_DIPSETTING(    0x12, DEF_STR( 1C_2C ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( 1C_3C ) )
-	PORT_DIPSETTING(    0x0e, DEF_STR( 1C_4C ) )
-	PORT_DIPSETTING(    0x0c, DEF_STR( 1C_5C ) )
-	PORT_DIPSETTING(    0x0a, DEF_STR( 1C_6C ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Free_Play ) )
-	PORT_DIPNAME( 0x06, 0x06, "Coin A Mode 2" ) PORT_CONDITION("DSW1", 0x01, NOTEQUALS, 0x01)  PORT_DIPLOCATION("SW1:2,3")
-	PORT_DIPSETTING(    0x00, DEF_STR( 5C_1C ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( 3C_1C ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(    0x06, DEF_STR( 1C_1C ) )
-	PORT_DIPNAME( 0x18, 0x18, "Coin B Mode 2" ) PORT_CONDITION("DSW1", 0x01, NOTEQUALS, 0x01)  PORT_DIPLOCATION("SW1:4,5")
-	PORT_DIPSETTING(    0x18, DEF_STR( 1C_2C ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( 1C_3C ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( 1C_5C ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( 1C_6C ) )
-	PORT_DIPNAME( 0x20, 0x20, "Minimum Credits to Start" )  PORT_DIPLOCATION("SW1:6")
+	PLAYMARK_COINS
+	PORT_DIPNAME( 0x20, 0x20, "Credits to Start" )  PORT_DIPLOCATION("DSW1:6")
 	PORT_DIPSETTING(    0x20, "1" )
 	PORT_DIPSETTING(    0x00, "2" )
-	PORT_DIPNAME( 0x40, 0x40, "Percentage to Reveal" )  PORT_DIPLOCATION("SW1:7")
+	PORT_DIPNAME( 0x40, 0x40, "Percentage to Reveal" )  PORT_DIPLOCATION("DSW1:7")
 	PORT_DIPSETTING(    0x40, "80%" )
 	PORT_DIPSETTING(    0x00, "90%" )
-	PORT_SERVICE( 0x80, IP_ACTIVE_LOW )  PORT_DIPLOCATION("SW1:8")
+	PORT_SERVICE( 0x80, IP_ACTIVE_LOW )  PORT_DIPLOCATION("DSW1:8")
 
 	PORT_START("DSW2")
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Lives ) )  PORT_DIPLOCATION("SW2:1,2")
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Lives ) )  PORT_DIPLOCATION("DSW2:1,2")
 	PORT_DIPSETTING(    0x00, "1" )
 	PORT_DIPSETTING(    0x02, "2" )
 	PORT_DIPSETTING(    0x03, "3" )
 	PORT_DIPSETTING(    0x01, "4" )
-	PORT_DIPNAME( 0x0c, 0x00, "Censor Pictures" )  PORT_DIPLOCATION("SW2:3,4")
+	PORT_DIPNAME( 0x0c, 0x00, "Censor Pictures" )  PORT_DIPLOCATION("DSW2:3,4")
 	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
 //  PORT_DIPSETTING(    0x04, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x08, "50%" )
 	PORT_DIPSETTING(    0x0c, "100%" )
-	PORT_DIPNAME( 0x30, 0x20, DEF_STR( Difficulty ) )  PORT_DIPLOCATION("SW2:5,6")
+	PORT_DIPNAME( 0x30, 0x20, DEF_STR( Difficulty ) )  PORT_DIPLOCATION("DSW2:5,6")
 	PORT_DIPSETTING(    0x30, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( Medium ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Hard ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Allow_Continue ) )  PORT_DIPLOCATION("SW2:7")
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Allow_Continue ) )  PORT_DIPLOCATION("DSW2:7")
 	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Demo_Sounds ) )  PORT_DIPLOCATION("SW2:8")
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Demo_Sounds ) )  PORT_DIPLOCATION("DSW2:8")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -789,64 +671,35 @@ static INPUT_PORTS_START( hrdtimes )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START2 )
 
 	PORT_START("DSW1")
-	PORT_DIPNAME( 0x01, 0x01, "Coin Mode" )  PORT_DIPLOCATION("SW1:1")
-	PORT_DIPSETTING(    0x01, "Mode 1" )
-	PORT_DIPSETTING(    0x00, "Mode 2" )
-	PORT_DIPNAME( 0x1e, 0x1e, "Coinage Mode 1" ) PORT_CONDITION("DSW1", 0x01, EQUALS, 0x01)  PORT_DIPLOCATION("SW1:2,3,4,5")
-	PORT_DIPSETTING(    0x14, DEF_STR( 6C_1C ) )
-	PORT_DIPSETTING(    0x16, DEF_STR( 5C_1C ) )
-	PORT_DIPSETTING(    0x18, DEF_STR( 4C_1C ) )
-	PORT_DIPSETTING(    0x1a, DEF_STR( 3C_1C ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( 8C_3C ) )
-	PORT_DIPSETTING(    0x1c, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( 5C_3C ) )
-	PORT_DIPSETTING(    0x06, DEF_STR( 3C_2C ) )
-	PORT_DIPSETTING(    0x1e, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( 2C_3C ) )
-	PORT_DIPSETTING(    0x12, DEF_STR( 1C_2C ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( 1C_3C ) )
-	PORT_DIPSETTING(    0x0e, DEF_STR( 1C_4C ) )
-	PORT_DIPSETTING(    0x0c, DEF_STR( 1C_5C ) )
-	PORT_DIPSETTING(    0x0a, DEF_STR( 1C_6C ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Free_Play ) )
-	PORT_DIPNAME( 0x06, 0x06, "Coin A Mode 2" ) PORT_CONDITION("DSW1", 0x01, NOTEQUALS, 0x01)  PORT_DIPLOCATION("SW1:2,3")
-	PORT_DIPSETTING(    0x00, DEF_STR( 5C_1C ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( 3C_1C ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(    0x06, DEF_STR( 1C_1C ) )
-	PORT_DIPNAME( 0x18, 0x18, "Coin B Mode 2" ) PORT_CONDITION("DSW1", 0x01, NOTEQUALS, 0x01)  PORT_DIPLOCATION("SW1:4,5")
-	PORT_DIPSETTING(    0x18, DEF_STR( 1C_2C ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( 1C_3C ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( 1C_5C ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( 1C_6C ) )
-	PORT_DIPNAME( 0x20, 0x20, "Minimum Credits to Start" )  PORT_DIPLOCATION("SW1:6")
+	PLAYMARK_COINS
+	PORT_DIPNAME( 0x20, 0x20, "Credits to Start" )  PORT_DIPLOCATION("DSW1:6")
 	PORT_DIPSETTING(    0x20, "1" )
 	PORT_DIPSETTING(    0x00, "2" )
-	PORT_DIPNAME( 0x40, 0x40, "1 Life If Continue" )  PORT_DIPLOCATION("SW1:7")
+	PORT_DIPNAME( 0x40, 0x40, "1 Life If Continue" )  PORT_DIPLOCATION("DSW1:7")
 	PORT_DIPSETTING(    0x40, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
-	PORT_SERVICE( 0x80, IP_ACTIVE_LOW )  PORT_DIPLOCATION("SW1:8")
+	PORT_SERVICE( 0x80, IP_ACTIVE_LOW )  PORT_DIPLOCATION("DSW1:8")
 
 	PORT_START("DSW2")
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Lives ) )  PORT_DIPLOCATION("SW2:1,2")
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Lives ) )  PORT_DIPLOCATION("DSW2:1,2")
 	PORT_DIPSETTING(    0x00, "1" )
 	PORT_DIPSETTING(    0x02, "2" )
 	PORT_DIPSETTING(    0x03, "3" )
 	PORT_DIPSETTING(    0x01, "5" )
-	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Bonus_Life ) )  PORT_DIPLOCATION("SW2:3,4")
+	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Bonus_Life ) )  PORT_DIPLOCATION("DSW2:3,4")
 	PORT_DIPSETTING(    0x0c, "Every 300k - 500k" )
 	PORT_DIPSETTING(    0x08, "Every 500k - 500k" )
 	PORT_DIPSETTING(    0x04, "Only 500k" )
 	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
-	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Difficulty ) )  PORT_DIPLOCATION("SW2:5,6")
+	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Difficulty ) )  PORT_DIPLOCATION("DSW2:5,6")
 	PORT_DIPSETTING(    0x20, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x30, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( Hard ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Very_Hard ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Allow_Continue ) )  PORT_DIPLOCATION("SW2:7")
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Allow_Continue ) )  PORT_DIPLOCATION("DSW2:7")
 	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Demo_Sounds ) )  PORT_DIPLOCATION("SW2:8")
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Demo_Sounds ) )  PORT_DIPLOCATION("DSW2:8")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -883,48 +736,19 @@ static INPUT_PORTS_START( hotmind )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("DSW1")
-	PORT_DIPNAME( 0x01, 0x01, "Coin Mode" )  PORT_DIPLOCATION("SW1:1")
-	PORT_DIPSETTING(    0x01, "Mode 1" )
-	PORT_DIPSETTING(    0x00, "Mode 2" )
-	PORT_DIPNAME( 0x1e, 0x1e, "Coinage Mode 1" ) PORT_CONDITION("DSW1", 0x01, EQUALS, 0x01)  PORT_DIPLOCATION("SW1:2,3,4,5")
-	PORT_DIPSETTING(    0x00, DEF_STR( Free_Play ) )
-	PORT_DIPSETTING(    0x0a, DEF_STR( 1C_6C ) )
-	PORT_DIPSETTING(    0x0c, DEF_STR( 1C_5C ) )
-	PORT_DIPSETTING(    0x0e, DEF_STR( 1C_4C ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( 1C_3C ) )
-	PORT_DIPSETTING(    0x12, DEF_STR( 1C_2C ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( 2C_3C ) )
-	PORT_DIPSETTING(    0x1e, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(    0x06, DEF_STR( 3C_2C ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( 5C_3C ) )
-	PORT_DIPSETTING(    0x1c, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( 8C_3C ) )
-	PORT_DIPSETTING(    0x1a, DEF_STR( 3C_1C ) )
-	PORT_DIPSETTING(    0x18, DEF_STR( 4C_1C ) )
-	PORT_DIPSETTING(    0x16, DEF_STR( 5C_1C ) )
-	PORT_DIPSETTING(    0x14, DEF_STR( 6C_1C ) )
-	PORT_DIPNAME( 0x06, 0x06, "Coin A Mode 2" ) PORT_CONDITION("DSW1", 0x01, NOTEQUALS, 0x01)  PORT_DIPLOCATION("SW1:2,3")
-	PORT_DIPSETTING(    0x06, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( 3C_1C ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( 5C_1C ) )
-	PORT_DIPNAME( 0x18, 0x18, "Coin B Mode 2" ) PORT_CONDITION("DSW1", 0x01, NOTEQUALS, 0x01)  PORT_DIPLOCATION("SW1:4,5")
-	PORT_DIPSETTING(    0x00, DEF_STR( 1C_6C ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( 1C_5C ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( 1C_3C ) )
-	PORT_DIPSETTING(    0x18, DEF_STR( 1C_2C ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:6")
+	PLAYMARK_COINS
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )  PORT_DIPLOCATION("DSW1:6")
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, "Time Per Line" )  PORT_DIPLOCATION("SW1:7")
+	PORT_DIPNAME( 0x40, 0x40, "Time Per Line" )  PORT_DIPLOCATION("DSW1:7")
 	PORT_DIPSETTING(    0x40, "10 Seconds" )
 	PORT_DIPSETTING(    0x00, "5 Seconds" )
-	PORT_DIPNAME( 0x80, 0x80, "Clear All Memory" )  PORT_DIPLOCATION("SW1:8")
+	PORT_DIPNAME( 0x80, 0x80, "Clear All Memory" )  PORT_DIPLOCATION("DSW1:8")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("DSW2")
-	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Difficulty ) )  PORT_DIPLOCATION("SW2:1,2,3")
+	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Difficulty ) )  PORT_DIPLOCATION("DSW2:1,2,3")
 	PORT_DIPSETTING(    0x07, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x06, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x05, DEF_STR( Hard ) )
@@ -933,17 +757,17 @@ static INPUT_PORTS_START( hotmind )
 	PORT_DIPSETTING(    0x02, "Very Hard 3" )
 	PORT_DIPSETTING(    0x01, "Very Hard 4" )
 	PORT_DIPSETTING(    0x00, "Very Hard 5" )
-	PORT_SERVICE( 0x08, IP_ACTIVE_LOW )  PORT_DIPLOCATION("SW2:4")
-	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Demo_Sounds ) )  PORT_DIPLOCATION("SW2:5")
+	PORT_SERVICE( 0x08, IP_ACTIVE_LOW )  PORT_DIPLOCATION("DSW2:4")
+	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Demo_Sounds ) )  PORT_DIPLOCATION("DSW2:5")
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x00, "Erogatore Gettoni" )  PORT_DIPLOCATION("SW2:6")
+	PORT_DIPNAME( 0x20, 0x00, "Erogatore Gettoni" )  PORT_DIPLOCATION("DSW2:6")
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x00, "Erogatore Ticket" )  PORT_DIPLOCATION("SW2:7")
+	PORT_DIPNAME( 0x40, 0x00, "Erogatore Ticket" )  PORT_DIPLOCATION("DSW2:7")
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, "Clear Partial Memory" )  PORT_DIPLOCATION("SW2:8")
+	PORT_DIPNAME( 0x80, 0x80, "Clear Partial Memory" )  PORT_DIPLOCATION("DSW2:8")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -1209,7 +1033,7 @@ MACHINE_RESET_MEMBER(playmark_state,playmark)
 	m_dispenser_latch = 0;
 }
 
-static MACHINE_CONFIG_START( bigtwin )
+MACHINE_CONFIG_START(playmark_state::bigtwin)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 12000000)   /* 12 MHz */
@@ -1249,7 +1073,7 @@ static MACHINE_CONFIG_START( bigtwin )
 	MCFG_DEVICE_ADDRESS_MAP(0, oki_map)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( bigtwinb )
+MACHINE_CONFIG_START(playmark_state::bigtwinb)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz/2)
@@ -1289,7 +1113,7 @@ static MACHINE_CONFIG_START( bigtwinb )
 	MCFG_DEVICE_ADDRESS_MAP(0, oki_map)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( wbeachvl )
+MACHINE_CONFIG_START(playmark_state::wbeachvl)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 12000000)   /* 12 MHz */
@@ -1333,7 +1157,7 @@ static MACHINE_CONFIG_START( wbeachvl )
 	MCFG_DEVICE_ADDRESS_MAP(0, oki_map)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( excelsr )
+MACHINE_CONFIG_START(playmark_state::excelsr)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz/2)   /* 12 MHz */
@@ -1373,7 +1197,7 @@ static MACHINE_CONFIG_START( excelsr )
 	MCFG_DEVICE_ADDRESS_MAP(0, oki_map)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( hrdtimes )
+MACHINE_CONFIG_START(playmark_state::hrdtimes)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz/2)   /* verified on pcb */
@@ -1414,7 +1238,7 @@ static MACHINE_CONFIG_START( hrdtimes )
 	MCFG_DEVICE_ADDRESS_MAP(0, oki_map)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( hotmind )
+MACHINE_CONFIG_START(playmark_state::hotmind)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz/2)   /* verified on pcb */
@@ -1460,7 +1284,7 @@ static MACHINE_CONFIG_START( hotmind )
 	MCFG_DEVICE_ADDRESS_MAP(0, oki_map)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( luckboomh )
+MACHINE_CONFIG_START(playmark_state::luckboomh)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz/2)   /* verified on pcb */

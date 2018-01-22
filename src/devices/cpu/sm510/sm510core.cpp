@@ -11,6 +11,7 @@
 
 #include "emu.h"
 #include "sm510.h"
+#include "sm510d.h"
 #include "debugger.h"
 
 
@@ -41,10 +42,9 @@ sm510_device::sm510_device(const machine_config &mconfig, const char *tag, devic
 
 
 // disasm
-offs_t sm510_device::disasm_disassemble(std::ostream &stream, offs_t pc, const u8 *oprom, const u8 *opram, u32 options)
+util::disasm_interface *sm510_device::create_disassembler()
 {
-	extern CPU_DISASSEMBLE(sm510);
-	return CPU_DISASSEMBLE_NAME(sm510)(this, stream, pc, oprom, opram, options);
+	return new sm510_disassembler;
 }
 
 
@@ -57,15 +57,15 @@ void sm510_device::clock_melody()
 {
 	u8 out = 0;
 
-	if (m_r_direct)
+	if (m_r_mask_option == SM510_R_CONTROL_OUTPUT)
 	{
 		// direct output
 		out = m_r & 3;
 	}
 	else
 	{
-		// buzzer from divider, R2 inverse phase
-		out = m_div >> 2 & 1;
+		// from divider, R2 inverse phase
+		out = m_div >> m_r_mask_option & 1;
 		out |= (out << 1 ^ 2);
 		out &= m_r;
 	}

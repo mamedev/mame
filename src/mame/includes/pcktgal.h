@@ -46,4 +46,7 @@ public:
 	uint32_t screen_update_pcktgal(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_pcktgalb(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void bootleg(machine_config &config);
+	void pcktgal(machine_config &config);
+	void pcktgal2(machine_config &config);
 };

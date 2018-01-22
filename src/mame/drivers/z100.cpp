@@ -145,6 +145,7 @@ ZDIPSW      EQU 0FFH    ; Configuration dip switches
 
 #include "emu.h"
 #include "cpu/i86/i86.h"
+//#include "bus/s100/s100.h"
 #include "imagedev/flopdrv.h"
 #include "machine/6821pia.h"
 #include "machine/pic8259.h"
@@ -218,6 +219,7 @@ public:
 	virtual void video_start() override;
 	uint32_t screen_update_z100(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_INPUT_CHANGED_MEMBER(key_stroke);
+	void z100(machine_config &config);
 };
 
 #define mc6845_h_char_total     (m_crtc_vreg[0])
@@ -615,9 +617,9 @@ WRITE8_MEMBER( z100_state::video_pia_A_w )
 	*/
 
 	m_vram_enable = ((data & 0x80) >> 7) ^ 1;
-	m_gbank = BITSWAP8(((data & 0x70) >> 4) ^ 0x7,7,6,5,4,3,1,0,2);
+	m_gbank = bitswap<8>(((data & 0x70) >> 4) ^ 0x7,7,6,5,4,3,1,0,2);
 	m_flash = ((data & 8) >> 3) ^ 1;
-	m_display_mask = BITSWAP8((data & 7) ^ 7,7,6,5,4,3,1,0,2);
+	m_display_mask = bitswap<8>((data & 7) ^ 7,7,6,5,4,3,1,0,2);
 }
 
 WRITE8_MEMBER( z100_state::video_pia_B_w )
@@ -664,7 +666,7 @@ static SLOT_INTERFACE_START( z100_floppies )
 	SLOT_INTERFACE("dd", FLOPPY_525_DD)
 SLOT_INTERFACE_END
 
-static MACHINE_CONFIG_START( z100 )
+MACHINE_CONFIG_START(z100_state::z100)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",I8088, XTAL_14_31818MHz/3)
 	MCFG_CPU_PROGRAM_MAP(z100_mem)

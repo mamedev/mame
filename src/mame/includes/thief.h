@@ -43,7 +43,8 @@ public:
 	DECLARE_DRIVER_INIT(thief);
 	virtual void video_start() override;
 	uint32_t screen_update_thief(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(thief_interrupt);
+	DECLARE_WRITE_LINE_MEMBER(slam_w);
+	IRQ_CALLBACK_MEMBER(iack);
 	uint16_t fetch_image_addr( coprocessor_t &thief_coprocessor );
 	void tape_set_audio( int track, int bOn );
 	void tape_set_motor( int bOn );
@@ -51,4 +52,7 @@ public:
 	required_device<samples_device> m_samples;
 	required_device<tms9927_device> m_tms;
 	required_device<palette_device> m_palette;
+	void natodef(machine_config &config);
+	void sharkatt(machine_config &config);
+	void thief(machine_config &config);
 };

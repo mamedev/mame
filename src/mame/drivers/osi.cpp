@@ -453,8 +453,7 @@ static ADDRESS_MAP_START( osi600_mem, AS_PROGRAM, 8, sb2m600_state )
 	AM_RANGE(0xa000, 0xbfff) AM_ROM
 	AM_RANGE(0xd000, 0xd3ff) AM_RAM AM_SHARE("video_ram")
 	AM_RANGE(0xdf00, 0xdf00) AM_READWRITE(keyboard_r, keyboard_w)
-	AM_RANGE(0xf000, 0xf000) AM_DEVREADWRITE("acia_0", acia6850_device, status_r, control_w)
-	AM_RANGE(0xf001, 0xf001) AM_DEVREADWRITE("acia_0", acia6850_device, data_r, data_w)
+	AM_RANGE(0xf000, 0xf001) AM_DEVREADWRITE("acia_0", acia6850_device, read, write)
 	AM_RANGE(0xf800, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -464,8 +463,7 @@ static ADDRESS_MAP_START( uk101_mem, AS_PROGRAM, 8, uk101_state )
 	AM_RANGE(0xd000, 0xd3ff) AM_RAM AM_SHARE("video_ram")
 	AM_RANGE(0xd400, 0xd7ff) AM_NOP  // bios sets this to spaces at boot
 	AM_RANGE(0xdc00, 0xdfff) AM_READ(keyboard_r) AM_WRITE(keyboard_w)
-	AM_RANGE(0xf000, 0xf000) AM_MIRROR(0x00fe) AM_DEVREADWRITE("acia_0", acia6850_device, status_r, control_w)
-	AM_RANGE(0xf001, 0xf001) AM_MIRROR(0x00fe) AM_DEVREADWRITE("acia_0", acia6850_device, data_r, data_w)
+	AM_RANGE(0xf000, 0xf001) AM_MIRROR(0x00fe) AM_DEVREADWRITE("acia_0", acia6850_device, read, write)
 	AM_RANGE(0xf800, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -479,8 +477,7 @@ static ADDRESS_MAP_START( c1p_mem, AS_PROGRAM, 8, c1p_state )
 	AM_RANGE(0xd400, 0xd7ff) AM_RAM AM_SHARE("color_ram")
 	AM_RANGE(0xd800, 0xd800) AM_WRITE(ctrl_w)
 	AM_RANGE(0xdf00, 0xdf00) AM_READWRITE(keyboard_r, keyboard_w)
-	AM_RANGE(0xf000, 0xf000) AM_DEVREADWRITE("acia_0", acia6850_device, status_r, control_w)
-	AM_RANGE(0xf001, 0xf001) AM_DEVREADWRITE("acia_0", acia6850_device, data_r, data_w)
+	AM_RANGE(0xf000, 0xf001) AM_DEVREADWRITE("acia_0", acia6850_device, read, write)
 	AM_RANGE(0xf7c0, 0xf7c0) AM_WRITE(osi630_sound_w)
 	AM_RANGE(0xf7e0, 0xf7e0) AM_WRITE(osi630_ctrl_w)
 	AM_RANGE(0xf800, 0xffff) AM_ROM
@@ -490,8 +487,7 @@ static ADDRESS_MAP_START( c1pmf_mem, AS_PROGRAM, 8, c1pmf_state )
 	AM_RANGE(0x0000, 0x4fff) AM_RAMBANK("bank1")
 	AM_RANGE(0xa000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xc003) AM_DEVREADWRITE("pia_0", pia6821_device, read, write) // FDC
-	AM_RANGE(0xc010, 0xc010) AM_DEVREADWRITE("acia_1", acia6850_device, status_r, control_w)
-	AM_RANGE(0xc011, 0xc011) AM_DEVREADWRITE("acia_1", acia6850_device, data_r, data_w)
+	AM_RANGE(0xc010, 0xc011) AM_DEVREADWRITE("acia_1", acia6850_device, read, write)
 	AM_RANGE(0xc704, 0xc707) AM_DEVREADWRITE("pia_1", pia6821_device, read, write)
 	AM_RANGE(0xc708, 0xc70b) AM_DEVREADWRITE("pia_2", pia6821_device, read, write)
 	AM_RANGE(0xc70c, 0xc70f) AM_DEVREADWRITE("pia_3", pia6821_device, read, write)
@@ -499,8 +495,7 @@ static ADDRESS_MAP_START( c1pmf_mem, AS_PROGRAM, 8, c1pmf_state )
 	AM_RANGE(0xd400, 0xd7ff) AM_RAM AM_SHARE("color_ram")
 	AM_RANGE(0xd800, 0xd800) AM_WRITE(ctrl_w)
 	AM_RANGE(0xdf00, 0xdf00) AM_READWRITE(keyboard_r, keyboard_w)
-	AM_RANGE(0xf000, 0xf000) AM_DEVREADWRITE("acia_0", acia6850_device, status_r, control_w)
-	AM_RANGE(0xf001, 0xf001) AM_DEVREADWRITE("acia_0", acia6850_device, data_r, data_w)
+	AM_RANGE(0xf000, 0xf001) AM_DEVREADWRITE("acia_0", acia6850_device, read, write)
 	AM_RANGE(0xf7c0, 0xf7c0) AM_WRITE(osi630_sound_w)
 	AM_RANGE(0xf7e0, 0xf7e0) AM_WRITE(osi630_ctrl_w)
 	AM_RANGE(0xf800, 0xffff) AM_ROM
@@ -711,7 +706,7 @@ GFXDECODE_END
 
 /* Machine Drivers */
 
-static MACHINE_CONFIG_START( osi600 )
+MACHINE_CONFIG_START(sb2m600_state::osi600)
 	/* basic machine hardware */
 	MCFG_CPU_ADD(M6502_TAG, M6502, X1/4) // .98304 MHz
 	MCFG_CPU_PROGRAM_MAP(osi600_mem)
@@ -742,7 +737,7 @@ static MACHINE_CONFIG_START( osi600 )
 	MCFG_RAM_EXTRA_OPTIONS("8K")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( uk101 )
+MACHINE_CONFIG_START(uk101_state::uk101)
 	/* basic machine hardware */
 	MCFG_CPU_ADD(M6502_TAG, M6502, UK101_X1/8) // 1 MHz
 	MCFG_CPU_PROGRAM_MAP(uk101_mem)
@@ -767,7 +762,7 @@ static MACHINE_CONFIG_START( uk101 )
 	MCFG_RAM_EXTRA_OPTIONS("8K")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( c1p )
+MACHINE_CONFIG_START(c1p_state::c1p)
 	/* basic machine hardware */
 	MCFG_CPU_ADD(M6502_TAG, M6502, X1/4) // .98304 MHz
 	MCFG_CPU_PROGRAM_MAP(c1p_mem)
@@ -804,7 +799,7 @@ static MACHINE_CONFIG_START( c1p )
 	MCFG_RAM_EXTRA_OPTIONS("20K")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( c1pmf, c1p )
+MACHINE_CONFIG_DERIVED(c1pmf_state::c1pmf, c1p)
 	MCFG_CPU_MODIFY(M6502_TAG)
 	MCFG_CPU_PROGRAM_MAP(c1pmf_mem)
 

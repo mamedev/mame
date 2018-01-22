@@ -285,6 +285,26 @@ public:
 	DECLARE_WRITE8_MEMBER(memory_write_byte);
 	double CD4049(double x);
 
+	void dkong_base(machine_config &config);
+	void braze(machine_config &config);
+	void strtheat(machine_config &config);
+	void spclforc(machine_config &config);
+	void s2650(machine_config &config);
+	void dkongjr(machine_config &config);
+	void radarscp1(machine_config &config);
+	void drktnjr(machine_config &config);
+	void dkong2b(machine_config &config);
+	void drakton(machine_config &config);
+	void radarscp(machine_config &config);
+	void pestplce(machine_config &config);
+	void herbiedk(machine_config &config);
+	void dkong3(machine_config &config);
+	void dkong3b(machine_config &config);
+	void radarscp_audio(machine_config &config);
+	void dkong2b_audio(machine_config &config);
+	void dkongjr_audio(machine_config &config);
+	void dkong3_audio(machine_config &config);
+	void radarscp1_audio(machine_config &config);
 private:
 	// video/dkong.c
 	void radarscp_step(int line_cnt);
@@ -294,11 +314,3 @@ private:
 	void radarscp_draw_background(bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 };
-
-/*----------- defined in audio/dkong.c -----------*/
-
-MACHINE_CONFIG_EXTERN( radarscp_audio );
-MACHINE_CONFIG_EXTERN( dkong2b_audio );
-MACHINE_CONFIG_EXTERN( dkongjr_audio );
-MACHINE_CONFIG_EXTERN( dkong3_audio );
-MACHINE_CONFIG_EXTERN( radarscp1_audio );

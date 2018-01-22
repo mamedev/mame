@@ -62,6 +62,7 @@ public:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	uint32_t screen_update_shtzone(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void shtzone(machine_config &config);
 };
 
 static ADDRESS_MAP_START( shtzone_map, AS_PROGRAM, 8, shtzone_state )
@@ -93,7 +94,7 @@ uint32_t shtzone_state::screen_update_shtzone(screen_device &screen, bitmap_ind1
 }
 
 
-static MACHINE_CONFIG_START( shtzone )
+MACHINE_CONFIG_START(shtzone_state::shtzone)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("timercpu", Z80,10738000/4)

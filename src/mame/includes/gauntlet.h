@@ -65,4 +65,9 @@ public:
 	DECLARE_WRITE16_MEMBER( gauntlet_yscroll_w );
 
 	static const atari_motion_objects_config s_mob_config;
+	void gauntlet_base(machine_config &config);
+	void vindctr2(machine_config &config);
+	void gauntlet(machine_config &config);
+	void gaunt2p(machine_config &config);
+	void gauntlet2(machine_config &config);
 };

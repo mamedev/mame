@@ -110,7 +110,7 @@ READ16_MEMBER( funkyjet_state::funkyjet_protection_region_0_146_r )
 //  uint16_t realdat = deco16_146_funkyjet_prot_r(space,offset&0x3ff,mem_mask);
 
 	int real_address = 0 + (offset *2);
-	int deco146_addr = BITSWAP32(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14,  /* note, same bitswap as fghthist */      10,  9,  8,  7,  6,   5,  4,  3,  2,  1,    0) & 0x7fff;
+	int deco146_addr = bitswap<32>(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14,  /* note, same bitswap as fghthist */      10,  9,  8,  7,  6,   5,  4,  3,  2,  1,    0) & 0x7fff;
 	uint8_t cs = 0;
 	uint16_t data = m_deco146->read_data( deco146_addr, mem_mask, cs );
 
@@ -125,7 +125,7 @@ WRITE16_MEMBER( funkyjet_state::funkyjet_protection_region_0_146_w )
 //  deco16_146_funkyjet_prot_w(space,offset&0x3ff,data,mem_mask);
 
 	int real_address = 0 + (offset *2);
-	int deco146_addr = BITSWAP32(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14, /* note, same bitswap as fghthist */       10,  9,  8,  7,  6,   5,  4,  3,  2,  1,    0) & 0x7fff;
+	int deco146_addr = bitswap<32>(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14, /* note, same bitswap as fghthist */       10,  9,  8,  7,  6,   5,  4,  3,  2,  1,    0) & 0x7fff;
 	uint8_t cs = 0;
 	m_deco146->write_data( space, deco146_addr, data, mem_mask, cs );
 }
@@ -133,7 +133,7 @@ WRITE16_MEMBER( funkyjet_state::funkyjet_protection_region_0_146_w )
 
 static ADDRESS_MAP_START( funkyjet_map, AS_PROGRAM, 16, funkyjet_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
-	AM_RANGE(0x120000, 0x1207ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x120000, 0x1207ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x140000, 0x143fff) AM_RAM
 	AM_RANGE(0x160000, 0x1607ff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x180000, 0x183fff) AM_READWRITE(funkyjet_protection_region_0_146_r,funkyjet_protection_region_0_146_w) AM_SHARE("prot16ram") /* Protection device */ // unlikely to be cs0 region
@@ -155,7 +155,7 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, funkyjet_state )
 	AM_RANGE(0x110000, 0x110001) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
 	AM_RANGE(0x120000, 0x120001) AM_DEVREADWRITE("oki", okim6295_device, read, write)
 	AM_RANGE(0x130000, 0x130001) AM_NOP /* This board only has 1 oki chip */
-	AM_RANGE(0x140000, 0x140001) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
+	AM_RANGE(0x140000, 0x140000) AM_DEVREAD("ioprot", deco146_device, soundlatch_r)
 	AM_RANGE(0x1f0000, 0x1f1fff) AM_RAMBANK("bank8")
 	AM_RANGE(0x1fec00, 0x1fec01) AM_DEVWRITE("audiocpu", h6280_device, timer_w)
 	AM_RANGE(0x1ff400, 0x1ff403) AM_DEVWRITE("audiocpu", h6280_device, irq_status_w)
@@ -310,7 +310,7 @@ void funkyjet_state::machine_start()
 {
 }
 
-static MACHINE_CONFIG_START( funkyjet )
+MACHINE_CONFIG_START(funkyjet_state::funkyjet)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_28MHz/2) /* 28 MHz crystal */
@@ -334,6 +334,7 @@ static MACHINE_CONFIG_START( funkyjet )
 	MCFG_DECO146_IN_PORTA_CB(IOPORT("INPUTS"))
 	MCFG_DECO146_IN_PORTB_CB(IOPORT("SYSTEM"))
 	MCFG_DECO146_IN_PORTC_CB(IOPORT("DSW"))
+	MCFG_DECO146_SOUNDLATCH_IRQ_CB(INPUTLINE("audiocpu", 0))
 	MCFG_DECO146_SET_INTERFACE_SCRAMBLE_INTERLEAVE
 
 
@@ -360,8 +361,6 @@ static MACHINE_CONFIG_START( funkyjet )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_YM2151_ADD("ymsnd", XTAL_32_22MHz/9)
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 1)) // IRQ2

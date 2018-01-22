@@ -131,7 +131,7 @@ DRIVER_INIT_MEMBER(md_boot_state,hshavoc)
 
 	for (x = 0; x < rom_size / 2; x++)
 	{
-		src[x] = BITSWAP16(src[x],
+		src[x] = bitswap<16>(src[x],
 								7, 15,6, 14,
 								5, 2, 1, 10,
 								13,4, 12,3,
@@ -152,7 +152,7 @@ DRIVER_INIT_MEMBER(md_boot_state,hshavoc)
 			if (src[x] & 0x0100)
 				src[x] ^= 0x0004;
 
-			src[x] = BITSWAP16(src[x], 15,14,13,12,
+			src[x] = bitswap<16>(src[x], 15,14,13,12,
 												11,9, 10,8,
 												7, 6, 5, 4,
 												3, 2, 1, 0 );
@@ -162,13 +162,13 @@ DRIVER_INIT_MEMBER(md_boot_state,hshavoc)
 	/* START e? from e80000 to end you need THIS ALONE to match the genesis rom */
 	for (x = rom_size / 2; x < 0x100000 / 2; x++)
 	{
-		src[x] = BITSWAP16(src[x],
+		src[x] = bitswap<16>(src[x],
 								7, 15,6, 14,
 								5, 2, 1, 10,
 								13,4, 12,3,
 								11,0, 8, 9 );
 
-		src[x] = BITSWAP16(src[x],
+		src[x] = bitswap<16>(src[x],
 								15,14,13,12,
 								11,10,9, 2,
 								7, 6, 5, 4,
@@ -192,7 +192,7 @@ DRIVER_INIT_MEMBER(md_boot_state,hshavoc)
 	{
 		src[x] ^= 0x0107; //? seems conditional..
 
-		src[x] = BITSWAP16(src[x],
+		src[x] = bitswap<16>(src[x],
 								15,13,14,12,
 								11,10,9, 0,
 								8, 6, 5, 4,

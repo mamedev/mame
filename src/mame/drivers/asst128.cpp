@@ -52,6 +52,7 @@ public:
 	DECLARE_WRITE8_MEMBER(asst128_fdc_dor_w);
 
 	void machine_start() override;
+	void asst128(machine_config &config);
 };
 
 void asst128_state::machine_start()
@@ -92,14 +93,14 @@ static DEVICE_INPUT_DEFAULTS_START( asst128 )
 	DEVICE_INPUT_DEFAULTS("DSW0", 0x30, 0x20)
 DEVICE_INPUT_DEFAULTS_END
 
-static MACHINE_CONFIG_START( asst128 )
+MACHINE_CONFIG_START(asst128_state::asst128)
 	MCFG_CPU_ADD("maincpu", I8086, 4772720)
 	MCFG_CPU_PROGRAM_MAP(asst128_map)
 	MCFG_CPU_IO_MAP(asst128_io)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("mb:pic8259", pic8259_device, inta_cb)
 
 	MCFG_DEVICE_ADD("mb", ASST128_MOTHERBOARD, 0)
-	asst128_mb_device::static_set_cputag(*device, "maincpu");
+	asst128_mb_device::static_set_cputag(*device, "^maincpu");
 	MCFG_DEVICE_INPUT_DEFAULTS(asst128)
 
 	MCFG_DEVICE_MODIFY("mb:cassette")

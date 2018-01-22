@@ -97,6 +97,7 @@ public:
 	uint32_t screen_update_superwng(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(superwng_nmi_interrupt);
 	INTERRUPT_GEN_MEMBER(superwng_sound_nmi_assert);
+	void superwng(machine_config &config);
 };
 
 WRITE8_MEMBER(superwng_state::superwng_unk_a187_w)
@@ -470,7 +471,7 @@ void superwng_state::machine_reset()
 	m_nmi_enable = 0;
 }
 
-static MACHINE_CONFIG_START( superwng )
+MACHINE_CONFIG_START(superwng_state::superwng)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK/4)

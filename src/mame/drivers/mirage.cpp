@@ -92,6 +92,7 @@ public:
 	virtual void video_start() override;
 	uint32_t screen_update_mirage(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	DECO16IC_BANK_CB_MEMBER(bank_callback);
+	void mirage(machine_config &config);
 };
 
 void miragemj_state::video_start()
@@ -164,7 +165,7 @@ static ADDRESS_MAP_START( mirage_map, AS_PROGRAM, 16, miragemj_state )
 	AM_RANGE(0x110000, 0x110bff) AM_RAM AM_SHARE("pf1_rowscroll")
 	AM_RANGE(0x112000, 0x112bff) AM_RAM AM_SHARE("pf2_rowscroll")
 	AM_RANGE(0x120000, 0x1207ff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x130000, 0x1307ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x130000, 0x1307ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x140000, 0x14000f) AM_DEVREADWRITE8("oki_sfx", okim6295_device, read, write, 0x00ff)
 	AM_RANGE(0x150000, 0x15000f) AM_DEVREADWRITE8("oki_bgm", okim6295_device, read, write, 0x00ff)
 	AM_RANGE(0x160000, 0x160001) AM_WRITENOP
@@ -284,7 +285,7 @@ void miragemj_state::machine_reset()
 	m_mux_data = 0;
 }
 
-static MACHINE_CONFIG_START( mirage )
+MACHINE_CONFIG_START(miragemj_state::mirage)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 28000000/2)

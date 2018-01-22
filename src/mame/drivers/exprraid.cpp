@@ -259,7 +259,7 @@ WRITE8_MEMBER(exprraid_state::exprraid_prot_data_w)
 			break;
 
 		default:
-			logerror("Unknown protection write: %x at PC:%x\n", data, space.device().safe_pc());
+			logerror("Unknown protection write: %x at %s\n", data, machine().describe_context());
 	}
 }
 
@@ -487,14 +487,14 @@ void exprraid_state::machine_reset()
 }
 
 
-static MACHINE_CONFIG_START( exprraid )
+MACHINE_CONFIG_START(exprraid_state::exprraid)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", DECO16, XTAL_12MHz / 8)
 	MCFG_CPU_PROGRAM_MAP(master_map)
 	MCFG_CPU_IO_MAP(master_io_map)
 
-	MCFG_CPU_ADD("slave", M6809, XTAL_12MHz / 8)
+	MCFG_CPU_ADD("slave", MC6809, XTAL_12MHz / 2) // MC68B09P
 	MCFG_CPU_PROGRAM_MAP(slave_map)
 	/* IRQs are caused by the YM3526 */
 
@@ -527,7 +527,7 @@ static MACHINE_CONFIG_START( exprraid )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( exprboot, exprraid )
+MACHINE_CONFIG_DERIVED(exprraid_state::exprboot, exprraid)
 
 	MCFG_CPU_REPLACE("maincpu", M6502, 1500000)        /* 1.5 MHz ??? */
 	MCFG_CPU_PROGRAM_MAP(master_map)

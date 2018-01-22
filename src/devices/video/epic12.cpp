@@ -828,7 +828,7 @@ READ32_MEMBER( epic12_device::blitter_r )
 			return 0xffffffff;
 
 		case 0x50:
-			return space.machine().root_device().ioport(":DSW")->read();
+			return machine().root_device().ioport(":DSW")->read();
 
 		default:
 			logerror("unknownblitter_r %08x %08x\n", offset*4, mem_mask);
@@ -852,7 +852,7 @@ READ32_MEMBER( epic12_device::blitter_r_unsafe )
 			return 0xffffffff;
 
 		case 0x50:
-			return space.machine().root_device().ioport(":DSW")->read();
+			return machine().root_device().ioport(":DSW")->read();
 
 		default:
 			logerror("unknownblitter_r %08x %08x\n", offset*4, mem_mask);

@@ -53,7 +53,7 @@ WRITE8_MEMBER(yunsung8_state::bankswitch_w)
 	membank("mainbank")->set_entry(data & 0x07);
 
 	if (data & ~0x37)
-		logerror("CPU #0 - PC %04X: Bank %02X\n", space.device().safe_pc(), data);
+		logerror("CPU #0 - PC %04X: Bank %02X\n", m_maincpu->pc(), data);
 }
 
 READ8_MEMBER(yunsung8_state::sound_command_r)
@@ -350,7 +350,7 @@ void yunsung8_state::machine_reset()
 }
 
 
-static MACHINE_CONFIG_START( yunsung8 )
+MACHINE_CONFIG_START(yunsung8_state::yunsung8)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_16MHz/2)           /* Z80B @ 8MHz? */

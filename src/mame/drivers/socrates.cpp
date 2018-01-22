@@ -192,6 +192,8 @@ public:
 		uint8_t    count;
 	} m_kb_queue;
 
+	void socrates_pal(machine_config &config);
+	void socrates(machine_config &config);
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
@@ -211,6 +213,7 @@ public:
 	DECLARE_READ8_MEMBER( status_r );
 	DECLARE_INPUT_CHANGED_MEMBER( send_input );
 
+	void iqunlimz(machine_config &config);
 protected:
 	virtual void machine_reset() override;
 	int get_color(int index, int y);
@@ -1443,7 +1446,7 @@ TIMER_CALLBACK_MEMBER(socrates_state::kbmcu_sim_cb)
 	}
 }
 
-static MACHINE_CONFIG_START( socrates )
+MACHINE_CONFIG_START(socrates_state::socrates)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_21_4772MHz/6)  /* Toshiba TMPZ84C00AP @ 3.579545 MHz, verified, xtal is divided by 6 */
 	MCFG_CPU_PROGRAM_MAP(z80_mem)
@@ -1454,19 +1457,19 @@ static MACHINE_CONFIG_START( socrates )
 	MCFG_DEVICE_ADD("rombank1", ADDRESS_MAP_BANK, 0)
 	MCFG_DEVICE_PROGRAM_MAP(socrates_rombank_map)
 	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_ADDRESS_MAP_BANK_DATABUS_WIDTH(8)
+	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
 	MCFG_ADDRESS_MAP_BANK_STRIDE(0x4000)
 
 	MCFG_DEVICE_ADD("rambank1", ADDRESS_MAP_BANK, 0)
 	MCFG_DEVICE_PROGRAM_MAP(socrates_rambank_map)
 	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_ADDRESS_MAP_BANK_DATABUS_WIDTH(8)
+	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
 	MCFG_ADDRESS_MAP_BANK_STRIDE(0x4000)
 
 	MCFG_DEVICE_ADD("rambank2", ADDRESS_MAP_BANK, 0)
 	MCFG_DEVICE_PROGRAM_MAP(socrates_rambank_map)
 	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_ADDRESS_MAP_BANK_DATABUS_WIDTH(8)
+	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
 	MCFG_ADDRESS_MAP_BANK_STRIDE(0x4000)
 
 	/* video hardware */
@@ -1492,7 +1495,7 @@ static MACHINE_CONFIG_START( socrates )
 	MCFG_SOFTWARE_LIST_ADD("cart_list", "socrates")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( socrates_pal, socrates )
+MACHINE_CONFIG_DERIVED(socrates_state::socrates_pal, socrates)
 	MCFG_CPU_REPLACE("maincpu", Z80, XTAL_26_601712MHz/8)
 	MCFG_CPU_PROGRAM_MAP(z80_mem)
 	MCFG_CPU_IO_MAP(z80_io)
@@ -1510,7 +1513,7 @@ static MACHINE_CONFIG_DERIVED( socrates_pal, socrates )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( iqunlimz )
+MACHINE_CONFIG_START(iqunlim_state::iqunlimz)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_4MHz) /* not accurate */
 	MCFG_CPU_PROGRAM_MAP(iqunlimz_mem)
@@ -1520,25 +1523,25 @@ static MACHINE_CONFIG_START( iqunlimz )
 	MCFG_DEVICE_ADD("rombank1", ADDRESS_MAP_BANK, 0)
 	MCFG_DEVICE_PROGRAM_MAP(iqunlimz_rombank_map)
 	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_ADDRESS_MAP_BANK_DATABUS_WIDTH(8)
+	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
 	MCFG_ADDRESS_MAP_BANK_STRIDE(0x4000)
 
 	MCFG_DEVICE_ADD("rombank2", ADDRESS_MAP_BANK, 0)
 	MCFG_DEVICE_PROGRAM_MAP(iqunlimz_rombank_map)
 	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_ADDRESS_MAP_BANK_DATABUS_WIDTH(8)
+	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
 	MCFG_ADDRESS_MAP_BANK_STRIDE(0x4000)
 
 	MCFG_DEVICE_ADD("rambank1", ADDRESS_MAP_BANK, 0)
 	MCFG_DEVICE_PROGRAM_MAP(iqunlimz_rambank_map)
 	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_ADDRESS_MAP_BANK_DATABUS_WIDTH(8)
+	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
 	MCFG_ADDRESS_MAP_BANK_STRIDE(0x4000)
 
 	MCFG_DEVICE_ADD("rambank2", ADDRESS_MAP_BANK, 0)
 	MCFG_DEVICE_PROGRAM_MAP(iqunlimz_rambank_map)
 	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_ADDRESS_MAP_BANK_DATABUS_WIDTH(8)
+	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
 	MCFG_ADDRESS_MAP_BANK_STRIDE(0x4000)
 
 	/* video hardware */
@@ -1675,7 +1678,7 @@ ROM_END
 //    YEAR  NAME      PARENT    COMPAT  MACHINE       INPUT     STATE           INIT      COMPANY                  FULLNAME                             FLAGS
 COMP( 1988, socrates, 0,        0,      socrates,     socrates, socrates_state, socrates, "Video Technology",      "Socrates Educational Video System", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // English NTSC, no title copyright
 COMP( 1988, socratfc, socrates, 0,      socrates,     socrates, socrates_state, socrates, "Video Technology",      "Socrates SAITOUT",                  MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // French Canandian NTSC, 1988 title copyright
-COMP( 1988, profweis, socrates, 0,      socrates_pal, socrates, socrates_state, socrates, "Video Technology/Yeno", "Professor Weiss-Alles",             MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // German PAL, 1988 title copyright
+COMP( 1988, profweis, socrates, 0,      socrates_pal, socrates, socrates_state, socrates, "Video Technology / Yeno", "Professor Weiss-Alles",             MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // German PAL, 1988 title copyright
 // Yeno Professeur Saitout goes here (french SECAM)
 // ? goes here (spanish PAL)
 

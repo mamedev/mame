@@ -28,6 +28,9 @@ paradise: I'm not sure it's working correctly:
 
 - The high scores table can't be entered !?
 
+
+Known to exist but not dumped is Target Ball '96
+
 penky: we need to delay the irqs at startup or it won't boot. Either one of
        ports 0x2003.r or 0x2005.w starts up the irq timer (confirmed via trojan)
 
@@ -106,7 +109,7 @@ WRITE8_MEMBER(paradise_state::rombank_w)
 
 	if (bank >= bank_n)
 	{
-		logerror("PC %04X - invalid rom bank %x\n", space.device().safe_pc(), bank);
+		logerror("PC %04X - invalid rom bank %x\n", m_maincpu->pc(), bank);
 		bank %= bank_n;
 	}
 
@@ -723,7 +726,7 @@ INTERRUPT_GEN_MEMBER(paradise_state::irq)
 		m_maincpu->set_input_line(INPUT_LINE_IRQ0, HOLD_LINE);
 }
 
-static MACHINE_CONFIG_START( paradise )
+MACHINE_CONFIG_START(paradise_state::paradise)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_12MHz/2)          /* Z8400B - 6mhz Verified */
@@ -755,14 +758,14 @@ static MACHINE_CONFIG_START( paradise )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( tgtball, paradise )
+MACHINE_CONFIG_DERIVED(paradise_state::tgtball, paradise)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(tgtball_map)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( torus, paradise )
+MACHINE_CONFIG_DERIVED(paradise_state::torus, paradise)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -776,7 +779,7 @@ static MACHINE_CONFIG_DERIVED( torus, paradise )
 	MCFG_DEVICE_REMOVE("oki2")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( madball, torus )
+MACHINE_CONFIG_DERIVED(paradise_state::madball, torus)
 
 	MCFG_GFXDECODE_MODIFY("gfxdecode", madball)
 
@@ -784,7 +787,7 @@ static MACHINE_CONFIG_DERIVED( madball, torus )
 	MCFG_SCREEN_UPDATE_DRIVER(paradise_state, screen_update_madball)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( penky, paradise )
+MACHINE_CONFIG_DERIVED(paradise_state::penky, paradise)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -793,7 +796,7 @@ static MACHINE_CONFIG_DERIVED( penky, paradise )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( penkyi, penky )
+MACHINE_CONFIG_DERIVED(paradise_state::penkyi, penky)
 
 	// TODO add ticket dispenser
 

@@ -143,6 +143,7 @@ public:
 	DECLARE_PALETTE_INIT(applix);
 	uint8_t m_palette_latch[4];
 	required_shared_ptr<uint16_t> m_base;
+	void applix(machine_config &config);
 private:
 	uint8_t m_pb;
 	uint8_t m_analog_latch;
@@ -833,9 +834,9 @@ TIMER_DEVICE_CALLBACK_MEMBER(applix_state::cass_timer)
 	}
 }
 
-static MACHINE_CONFIG_START( applix )
+MACHINE_CONFIG_START(applix_state::applix)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 7500000)
+	MCFG_CPU_ADD("maincpu", M68000, XTAL_30MHz / 4) // MC68000-P10 @ 7.5 MHz
 	MCFG_CPU_PROGRAM_MAP(applix_mem)
 	MCFG_CPU_ADD("subcpu", Z80, XTAL_16MHz / 2) // Z80H
 	MCFG_CPU_PROGRAM_MAP(subcpu_mem)
@@ -866,13 +867,13 @@ static MACHINE_CONFIG_START( applix )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
 
 	/* Devices */
-	MCFG_MC6845_ADD("crtc", MC6845, "screen", 1875000) // 6545
+	MCFG_MC6845_ADD("crtc", MC6845, "screen", XTAL_30MHz / 16) // MC6545 @ 1.875 MHz
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(8)
 	MCFG_MC6845_UPDATE_ROW_CB(applix_state, crtc_update_row)
 	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(applix_state, vsync_w))
 
-	MCFG_DEVICE_ADD("via6522", VIA6522, 0)
+	MCFG_DEVICE_ADD("via6522", VIA6522, XTAL_30MHz / 4 / 10) // VIA uses 68000 E clock
 	MCFG_VIA6522_READPB_HANDLER(READ8(applix_state, applix_pb_r))
 	// in CB1 kbd clk
 	// in CA2 vsync

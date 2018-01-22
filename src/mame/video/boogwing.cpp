@@ -28,8 +28,7 @@ void boogwing_state::mix_boogwing(screen_device &screen, bitmap_rgb32 &bitmap, c
 	bitmap_ind16 *sprite_bitmap1, *sprite_bitmap2;
 	bitmap_ind8* priority_bitmap;
 
-	address_space &space = machine().dummy_space();
-	uint16_t priority = m_decocomn->priority_r(space, 0, 0xffff);
+	uint16_t priority = m_decocomn->priority_r();
 
 	sprite_bitmap1 = &m_sprgen1->get_sprite_temp_bitmap();
 	sprite_bitmap2 = &m_sprgen2->get_sprite_temp_bitmap();
@@ -182,7 +181,7 @@ uint32_t boogwing_state::screen_update_boogwing(screen_device &screen, bitmap_rg
 {
 	address_space &space = machine().dummy_space();
 	uint16_t flip = m_deco_tilegen1->pf_control_r(space, 0, 0xffff);
-	uint16_t priority = m_decocomn->priority_r(space, 0, 0xffff);
+	uint16_t priority = m_decocomn->priority_r();
 
 	/* Draw sprite planes to bitmaps for later mixing */
 	m_sprgen2->draw_sprites(bitmap, cliprect, m_spriteram2->buffer(), 0x400, true);

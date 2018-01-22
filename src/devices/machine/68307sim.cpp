@@ -32,10 +32,8 @@
 
 READ16_MEMBER( m68307_cpu_device::m68307_internal_sim_r )
 {
-	assert(m68307SIM);
-	m68307_sim &sim = *m68307SIM;
-
-	int pc = space.device().safe_pc();
+	assert(m_m68307SIM);
+	m68307_sim &sim = *m_m68307SIM;
 
 	switch (offset<<1)
 	{
@@ -54,7 +52,7 @@ READ16_MEMBER( m68307_cpu_device::m68307_internal_sim_r )
 		case m68307SIM_OR3: return sim.m_or[3];
 
 		default:
-			logerror("%08x m68307_internal_sim_r %08x, (%04x)\n", pc, offset*2, mem_mask);
+			logerror("%08x m68307_internal_sim_r %08x, (%04x)\n", m_ppc, offset*2, mem_mask);
 			return 0xff;
 	}
 
@@ -64,20 +62,18 @@ READ16_MEMBER( m68307_cpu_device::m68307_internal_sim_r )
 
 WRITE16_MEMBER( m68307_cpu_device::m68307_internal_sim_w )
 {
-	assert(m68307SIM);
-	m68307_sim &sim = *m68307SIM;
-
-	int pc = space.device().safe_pc();
+	assert(m_m68307SIM);
+	m68307_sim &sim = *m_m68307SIM;
 
 	switch (offset<<1)
 	{
 		case m68307SIM_PACNT:
-			logerror("%08x m68307_internal_sim_w %08x, %04x (%04x) (Port A (8-bit) Control Register - PACNT)\n", pc, offset*2,data,mem_mask);
+			logerror("%08x m68307_internal_sim_w %08x, %04x (%04x) (Port A (8-bit) Control Register - PACNT)\n", m_ppc, offset*2,data,mem_mask);
 			sim.write_pacnt(data,mem_mask);
 			break;
 
 		case m68307SIM_PADDR:
-			logerror("%08x m68307_internal_sim_w %08x, %04x (%04x) (Port A (8-bit) Direction Register - PADDR)\n", pc, offset*2,data,mem_mask);
+			logerror("%08x m68307_internal_sim_w %08x, %04x (%04x) (Port A (8-bit) Direction Register - PADDR)\n", m_ppc, offset*2,data,mem_mask);
 			sim.write_paddr(data,mem_mask);
 			break;
 
@@ -86,12 +82,12 @@ WRITE16_MEMBER( m68307_cpu_device::m68307_internal_sim_w )
 			break;
 
 		case m68307SIM_PBCNT:
-			logerror("%08x m68307_internal_sim_w %08x, %04x (%04x) (Port B (16-bit) Control Register - PBCNT)\n", pc, offset*2,data,mem_mask);
+			logerror("%08x m68307_internal_sim_w %08x, %04x (%04x) (Port B (16-bit) Control Register - PBCNT)\n", m_ppc, offset*2,data,mem_mask);
 			sim.write_pbcnt(data,mem_mask);
 			break;
 
 		case m68307SIM_PBDDR:
-			logerror("%08x m68307_internal_sim_w %08x, %04x (%04x) (Port B (16-bit) Direction Register - PBDDR)\n", pc, offset*2,data,mem_mask);
+			logerror("%08x m68307_internal_sim_w %08x, %04x (%04x) (Port B (16-bit) Direction Register - PBDDR)\n", m_ppc, offset*2,data,mem_mask);
 			sim.write_pbddr(data,mem_mask);
 			break;
 
@@ -101,22 +97,22 @@ WRITE16_MEMBER( m68307_cpu_device::m68307_internal_sim_w )
 
 
 		case m68307SIM_LICR1:
-			logerror("%08x m68307_internal_sim_w %08x, %04x (%04x) (Latched Interrupt Control Register 1 - LICR1)\n", pc, offset*2,data,mem_mask);
+			logerror("%08x m68307_internal_sim_w %08x, %04x (%04x) (Latched Interrupt Control Register 1 - LICR1)\n", m_ppc, offset*2,data,mem_mask);
 			sim.write_licr1(this,data,mem_mask);
 			break;
 
 		case m68307SIM_LICR2:
-			logerror("%08x m68307_internal_sim_w %08x, %04x (%04x) (Latched Interrupt Control Register 2 - LICR2)\n", pc, offset*2,data,mem_mask);
+			logerror("%08x m68307_internal_sim_w %08x, %04x (%04x) (Latched Interrupt Control Register 2 - LICR2)\n", m_ppc, offset*2,data,mem_mask);
 			sim.write_licr2(this,data,mem_mask);
 			break;
 
 		case m68307SIM_PICR:
-			logerror("%08x m68307_internal_sim_w %08x, %04x (%04x) (Peripheral Interrupt Control Register - PICR)\n", pc, offset*2,data,mem_mask);
+			logerror("%08x m68307_internal_sim_w %08x, %04x (%04x) (Peripheral Interrupt Control Register - PICR)\n", m_ppc, offset*2,data,mem_mask);
 			sim.write_picr(this,data,mem_mask);
 			break;
 
 		case m68307SIM_PIVR:
-			logerror("%08x m68307_internal_sim_w %08x, %04x (%04x) (Peripheral Interrupt Vector Register - PIVR)\n", pc, offset*2,data,mem_mask);
+			logerror("%08x m68307_internal_sim_w %08x, %04x (%04x) (Peripheral Interrupt Vector Register - PIVR)\n", m_ppc, offset*2,data,mem_mask);
 			sim.write_pivr(this,data,mem_mask);
 			break;
 
@@ -148,7 +144,7 @@ WRITE16_MEMBER( m68307_cpu_device::m68307_internal_sim_w )
 
 
 		default :
-			logerror("%08x m68307_internal_sim_w %08x, %04x (%04x)\n", pc, offset*2,data,mem_mask);
+			logerror("%08x m68307_internal_sim_w %08x, %04x (%04x)\n", m_ppc, offset*2,data,mem_mask);
 			break;
 	}
 }
@@ -167,8 +163,6 @@ void m68307_cpu_device::m68307_sim::write_paddr(uint16_t data, uint16_t mem_mask
 
 uint16_t m68307_cpu_device::m68307_sim::read_padat(m68307_cpu_device* m68k, address_space &space, uint16_t mem_mask)
 {
-	int pc = space.device().safe_pc();
-
 	if (!m68k->m_porta_r.isnull())
 	{
 		// for general purpose bits, if configured as 'output' then anything output gets latched
@@ -185,7 +179,7 @@ uint16_t m68307_cpu_device::m68307_sim::read_padat(m68307_cpu_device* m68k, addr
 	}
 	else
 	{
-		m68k->logerror("%08x m68307_internal_sim_r (%04x) (Port A (8-bit) Data Register - PADAT)\n", pc, mem_mask);
+		m68k->logerror("%08x m68307_internal_sim_r (%04x) (Port A (8-bit) Data Register - PADAT)\n", m68k->pcbase(), mem_mask);
 	}
 	return 0xffff;
 }
@@ -193,7 +187,6 @@ uint16_t m68307_cpu_device::m68307_sim::read_padat(m68307_cpu_device* m68k, addr
 
 void m68307_cpu_device::m68307_sim::write_padat(m68307_cpu_device* m68k, address_space &space, uint16_t data, uint16_t mem_mask)
 {
-	int pc = space.device().safe_pc();
 	COMBINE_DATA(&m_padat);
 
 	if (!m68k->m_porta_w.isnull())
@@ -202,7 +195,7 @@ void m68307_cpu_device::m68307_sim::write_padat(m68307_cpu_device* m68k, address
 	}
 	else
 	{
-		m68k->logerror("%08x m68307_internal_sim_w %04x (%04x) (Port A (8-bit) Data Register - PADAT)\n", pc, data,mem_mask);
+		m68k->logerror("%08x m68307_internal_sim_w %04x (%04x) (Port A (8-bit) Data Register - PADAT)\n", m68k->pcbase(), data,mem_mask);
 	}
 }
 
@@ -218,8 +211,6 @@ void m68307_cpu_device::m68307_sim::write_pbddr(uint16_t data, uint16_t mem_mask
 
 uint16_t m68307_cpu_device::m68307_sim::read_pbdat(m68307_cpu_device* m68k, address_space &space, uint16_t mem_mask)
 {
-	int pc = space.device().safe_pc();
-
 	if (!m68k->m_portb_r.isnull())
 	{
 		// for general purpose bits, if configured as 'output' then anything output gets latched
@@ -236,7 +227,7 @@ uint16_t m68307_cpu_device::m68307_sim::read_pbdat(m68307_cpu_device* m68k, addr
 	}
 	else
 	{
-		m68k->logerror("%08x m68307_internal_sim_r (%04x) (Port B (16-bit) Data Register - PBDAT)\n", pc, mem_mask);
+		m68k->logerror("%08x m68307_internal_sim_r (%04x) (Port B (16-bit) Data Register - PBDAT)\n", m68k->pcbase(), mem_mask);
 	}
 	return 0xffff;
 }
@@ -244,7 +235,6 @@ uint16_t m68307_cpu_device::m68307_sim::read_pbdat(m68307_cpu_device* m68k, addr
 
 void m68307_cpu_device::m68307_sim::write_pbdat(m68307_cpu_device* m68k, address_space &space, uint16_t data, uint16_t mem_mask)
 {
-	int pc = space.device().safe_pc();
 	COMBINE_DATA(&m_pbdat);
 
 	if (!m68k->m_portb_w.isnull())
@@ -253,7 +243,7 @@ void m68307_cpu_device::m68307_sim::write_pbdat(m68307_cpu_device* m68k, address
 	}
 	else
 	{
-		m68k->logerror("%08x m68307_internal_sim_w %04x (%04x) (Port B (16-bit) Data Register - PBDAT)\n", pc, data,mem_mask);
+		m68k->logerror("%08x m68307_internal_sim_w %04x (%04x) (Port B (16-bit) Data Register - PBDAT)\n", m68k->pcbase(), data,mem_mask);
 	}
 }
 

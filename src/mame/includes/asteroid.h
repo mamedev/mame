@@ -57,9 +57,12 @@ public:
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
+	void asteroid_base(machine_config &config);
+	void asterock(machine_config &config);
+	void asteroid(machine_config &config);
+	void llander(machine_config &config);
+	void astdelux(machine_config &config);
+	void asteroid_sound(machine_config &config);
+	void astdelux_sound(machine_config &config);
+	void llander_sound(machine_config &config);
 };
-
-/*----------- defined in audio/asteroid.cpp -----------*/
-
-MACHINE_CONFIG_EXTERN(asteroid_sound);
-MACHINE_CONFIG_EXTERN(astdelux_sound);

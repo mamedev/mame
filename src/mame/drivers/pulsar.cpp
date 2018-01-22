@@ -68,6 +68,7 @@ public:
 	DECLARE_WRITE8_MEMBER(ppi_pc_w);
 	DECLARE_READ8_MEMBER(ppi_pc_r);
 
+	void pulsar(machine_config &config);
 private:
 	floppy_image_device *m_floppy;
 	required_device<cpu_device> m_maincpu;
@@ -205,7 +206,7 @@ DRIVER_INIT_MEMBER( pulsar_state, pulsar )
 	membank("bankw1")->configure_entry(0, &main[0xf800]);
 }
 
-static MACHINE_CONFIG_START( pulsar )
+MACHINE_CONFIG_START(pulsar_state::pulsar)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80, XTAL_4MHz)
 	MCFG_CPU_PROGRAM_MAP(pulsar_mem)

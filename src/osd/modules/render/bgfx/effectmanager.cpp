@@ -13,7 +13,7 @@
 #include <rapidjson/error/en.h>
 
 #include <bx/readerwriter.h>
-#include <bx/crtimpl.h>
+#include <bx/file.h>
 
 #include "emu.h"
 
@@ -55,7 +55,7 @@ bgfx_effect* effect_manager::load_effect(std::string name)
 	osd_subst_env(path, util::string_format("%s" PATH_SEPARATOR "effects" PATH_SEPARATOR, m_options.bgfx_path()));
 	path += full_name;
 
-	bx::CrtFileReader reader;
+	bx::FileReader reader;
 	if (!bx::open(&reader, path.c_str()))
 	{
 		printf("Unable to open effect file %s\n", path.c_str());

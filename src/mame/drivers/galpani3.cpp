@@ -123,6 +123,7 @@ public:
 	uint32_t screen_update_galpani3(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(galpani3_vblank);
 	int gp3_is_alpha_pen(int pen);
+	void galpani3(machine_config &config);
 };
 
 
@@ -468,7 +469,7 @@ static ADDRESS_MAP_START( galpani3_map, AS_PROGRAM, 16, galpani3_state )
 	AM_RANGE(0x000000, 0x17ffff) AM_ROM
 
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM // area [B] - Work RAM
-	AM_RANGE(0x280000, 0x287fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette") // area [A] - palette for sprites
+	AM_RANGE(0x280000, 0x287fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette") // area [A] - palette for sprites
 
 	AM_RANGE(0x300000, 0x303fff) AM_RAM_WRITE(galpani3_suprnova_sprite32_w) AM_SHARE("spriteram")
 	AM_RANGE(0x380000, 0x38003f) AM_RAM_WRITE(galpani3_suprnova_sprite32regs_w) AM_SHARE("sprregs")
@@ -502,7 +503,7 @@ static ADDRESS_MAP_START( galpani3_map, AS_PROGRAM, 16, galpani3_state )
 ADDRESS_MAP_END
 
 
-static MACHINE_CONFIG_START( galpani3 )
+MACHINE_CONFIG_START(galpani3_state::galpani3)
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_28_63636MHz/2) // Confirmed from PCB
 	MCFG_CPU_PROGRAM_MAP(galpani3_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", galpani3_state, galpani3_vblank, "screen", 0, 1)

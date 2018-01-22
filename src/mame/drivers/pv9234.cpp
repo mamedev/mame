@@ -41,6 +41,7 @@ public:
 
 	uint32_t screen_update_pv9234(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
+	void pv9234(machine_config &config);
 protected:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
@@ -143,7 +144,7 @@ uint32_t pv9234_state::screen_update_pv9234(screen_device &screen, bitmap_ind16 
 	return 0;
 }
 
-static MACHINE_CONFIG_START( pv9234 )
+MACHINE_CONFIG_START(pv9234_state::pv9234)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", ARM7, 4915000) //probably a more powerful clone.
 	MCFG_CPU_PROGRAM_MAP(pv9234_map)

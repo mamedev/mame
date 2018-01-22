@@ -919,7 +919,7 @@ READ8_MEMBER( apple2gs_state::apple2gs_c0xx_r )
 		#endif
 
 		case 0x19:  /* C019 - RDVBLBAR */
-			result = (space.machine().first_screen()->vpos() >= (192+BORDER_TOP)) ? 0x80 : 0x00;
+			result = (machine().first_screen()->vpos() >= (192+BORDER_TOP)) ? 0x80 : 0x00;
 			break;
 
 		case 0x22:  /* C022 - TBCOLOR */
@@ -1020,7 +1020,7 @@ READ8_MEMBER( apple2gs_state::apple2gs_c0xx_r )
 			break;
 
 		case 0x2F:  /* C02F - HORIZCNT */
-			result = space.machine().first_screen()->hpos() / 11;
+			result = machine().first_screen()->hpos() / 11;
 			if (result > 0)
 			{
 				result += 0x40;
@@ -1661,7 +1661,7 @@ uint8_t apple2gs_state::apple2gs_xxCxxx_r(address_space &space, offs_t address)
 						m_a2_cnxx_slot = slot;
 						apple2_update_memory();
 					}
-					result = slotdevice->read_cnxx(space, address&0xff);
+					result = slotdevice->read_cnxx(address&0xff);
 				}
 				else
 				{
@@ -1690,7 +1690,7 @@ uint8_t apple2gs_state::apple2gs_xxCxxx_r(address_space &space, offs_t address)
 
 			if (slotdevice)
 			{
-				result = slotdevice->read_c800(space, address&0x7ff);
+				result = slotdevice->read_c800(address&0x7ff);
 			}
 			else
 			{
@@ -1753,7 +1753,7 @@ void apple2gs_state::apple2gs_xxCxxx_w(address_space &space, offs_t address, uin
 						m_a2_cnxx_slot = slot;
 						apple2_update_memory();
 					}
-					slotdevice->write_cnxx(space, address&0xff, data);
+					slotdevice->write_cnxx(address&0xff, data);
 				}
 				// (else slot is your card but there's no card inserted so the write goes nowhere)
 			}
@@ -1776,7 +1776,7 @@ void apple2gs_state::apple2gs_xxCxxx_w(address_space &space, offs_t address, uin
 
 			if (slotdevice)
 			{
-				slotdevice->write_c800(space, address&0x7ff, data);
+				slotdevice->write_c800(address&0x7ff, data);
 			}
 			else
 			{

@@ -42,6 +42,7 @@ public:
 	DECLARE_READ8_MEMBER(keyboard_r);
 	DECLARE_WRITE8_MEMBER(display_7seg_w);
 
+	void zapcomp(machine_config &config);
 private:
 	uint8_t decode7seg(uint8_t data);
 	virtual void machine_start() override;
@@ -63,7 +64,7 @@ uint8_t zapcomp_state::decode7seg(uint8_t data)
 
 	// Bit order for the FAIRCHILD FND-70
 	//                     7-SEGMENT LCD:  .  g  f  e  d  c  b  a
-	return BITSWAP8(patterns[data & 0x0F], 7, 3, 4, 2, 1, 0, 6, 5);
+	return bitswap<8>(patterns[data & 0x0F], 7, 3, 4, 2, 1, 0, 6, 5);
 }
 
 WRITE8_MEMBER( zapcomp_state::display_7seg_w )
@@ -156,7 +157,7 @@ void zapcomp_state::machine_start()
 {
 }
 
-static MACHINE_CONFIG_START( zapcomp )
+MACHINE_CONFIG_START(zapcomp_state::zapcomp)
 	// basic machine hardware
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_2MHz)
 	MCFG_CPU_PROGRAM_MAP(zapcomp_mem)

@@ -1047,14 +1047,14 @@ GFXDECODE_END
 
 /*******************************************************************/
 
-static MACHINE_CONFIG_START( hopmappy )
+MACHINE_CONFIG_START(namcos86_state::hopmappy)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("cpu1", M6809, XTAL_49_152MHz/32)
+	MCFG_CPU_ADD("cpu1", MC6809E, XTAL_49_152MHz/32)
 	MCFG_CPU_PROGRAM_MAP(cpu1_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", namcos86_state,  irq0_line_assert)
 
-	MCFG_CPU_ADD("cpu2", M6809, XTAL_49_152MHz/32)
+	MCFG_CPU_ADD("cpu2", MC6809E, XTAL_49_152MHz/32)
 	MCFG_CPU_PROGRAM_MAP(hopmappy_cpu2_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", namcos86_state,  irq0_line_assert)
 
@@ -1091,7 +1091,7 @@ static MACHINE_CONFIG_START( hopmappy )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( roishtar, hopmappy )
+MACHINE_CONFIG_DERIVED(namcos86_state::roishtar, hopmappy)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("cpu2")
@@ -1102,7 +1102,7 @@ static MACHINE_CONFIG_DERIVED( roishtar, hopmappy )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( genpeitd, hopmappy )
+MACHINE_CONFIG_DERIVED(namcos86_state::genpeitd, hopmappy)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("cpu2")
@@ -1117,7 +1117,7 @@ static MACHINE_CONFIG_DERIVED( genpeitd, hopmappy )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( rthunder, hopmappy )
+MACHINE_CONFIG_DERIVED(namcos86_state::rthunder, hopmappy)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("cpu2")
@@ -1132,7 +1132,7 @@ static MACHINE_CONFIG_DERIVED( rthunder, hopmappy )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( wndrmomo, hopmappy )
+MACHINE_CONFIG_DERIVED(namcos86_state::wndrmomo, hopmappy)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("cpu2")

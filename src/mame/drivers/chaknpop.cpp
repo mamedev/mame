@@ -151,7 +151,7 @@ WRITE8_MEMBER(chaknpop_state::unknown_port_3_w)
 
 WRITE8_MEMBER(chaknpop_state::coinlock_w)
 {
-	logerror("%04x: coin lock %sable\n", space.device().safe_pc(), data ? "dis" : "en");
+	logerror("%04x: coin lock %sable\n", m_maincpu->pc(), data ? "dis" : "en");
 }
 
 
@@ -361,7 +361,7 @@ void chaknpop_state::machine_reset()
 	m_flip_y = 0;
 }
 
-static MACHINE_CONFIG_START( chaknpop )
+MACHINE_CONFIG_START(chaknpop_state::chaknpop)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_18MHz / 6)    // Verified on PCB

@@ -113,6 +113,7 @@ public:
 	DECLARE_READ8_MEMBER(smram_r);
 	DECLARE_WRITE8_MEMBER(smram_w);
 
+	void savquest(machine_config &config);
 protected:
 
 
@@ -802,7 +803,7 @@ SLOT_INTERFACE_START( savquest_isa16_cards )
 	SLOT_INTERFACE("sb16", ISA16_SOUND_BLASTER_16)
 SLOT_INTERFACE_END
 
-static MACHINE_CONFIG_START( savquest )
+MACHINE_CONFIG_START(savquest_state::savquest)
 	MCFG_CPU_ADD("maincpu", PENTIUM2, 450000000) // actually Pentium II 450
 	MCFG_CPU_PROGRAM_MAP(savquest_map)
 	MCFG_CPU_IO_MAP(savquest_io)

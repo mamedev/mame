@@ -125,7 +125,7 @@ WRITE8_MEMBER(thedeep_state::protection_w)
 		break;
 
 		default:
-			logerror( "pc %04x: protection_command %02x\n", space.device().safe_pc(),m_protection_command);
+			logerror( "pc %04x: protection_command %02x\n", m_maincpu->pc(),m_protection_command);
 	}
 }
 
@@ -143,7 +143,7 @@ READ8_MEMBER(thedeep_state::protection_r)
 WRITE8_MEMBER(thedeep_state::e100_w)
 {
 	if (data != 1)
-		logerror("pc %04x: e100 = %02x\n", space.device().safe_pc(),data);
+		logerror("pc %04x: e100 = %02x\n", m_maincpu->pc(),data);
 }
 
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, thedeep_state )
@@ -404,7 +404,7 @@ INTERRUPT_GEN_MEMBER(thedeep_state::mcu_irq)
 	m_mcu->set_input_line(MCS51_INT1_LINE, ASSERT_LINE);
 }
 
-static MACHINE_CONFIG_START( thedeep )
+MACHINE_CONFIG_START(thedeep_state::thedeep)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_12MHz/2)      /* verified on pcb */

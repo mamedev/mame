@@ -247,7 +247,7 @@ void smpc_hle_device::static_set_control_port_tags(device_t &device, const char 
 //  configuration addiitons
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER(smpc_hle_device::device_add_mconfig)
+MACHINE_CONFIG_START(smpc_hle_device::device_add_mconfig)
 	MCFG_NVRAM_ADD_0FILL("smem")
 
 	// TODO: custom RTC subdevice

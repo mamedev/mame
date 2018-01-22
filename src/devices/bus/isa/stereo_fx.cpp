@@ -114,7 +114,7 @@ const tiny_rom_entry *stereo_fx_device::device_rom_region() const
 	return ROM_NAME( stereo_fx );
 }
 
-MACHINE_CONFIG_MEMBER( stereo_fx_device::device_add_mconfig )
+MACHINE_CONFIG_START(stereo_fx_device::device_add_mconfig)
 	MCFG_CPU_ADD("stereo_fx_cpu", I80C31, XTAL_30MHz)
 	MCFG_CPU_IO_MAP(stereo_fx_io)
 	MCFG_CPU_PROGRAM_MAP(stereo_fx_rom)

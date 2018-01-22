@@ -95,7 +95,7 @@
 #include "emu.h"
 #include "sh2.h"
 #include "sh2comn.h"
-
+#include "sh_dasm.h"
 #include "debugger.h"
 
 //#define VERBOSE 1
@@ -200,12 +200,10 @@ device_memory_interface::space_config_vector sh2_device::memory_space_config() c
 		};
 }
 
-offs_t sh2_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+util::disasm_interface *sh2_device::create_disassembler()
 {
-	extern CPU_DISASSEMBLE( sh2 );
-	return CPU_DISASSEMBLE_NAME( sh2 )(this, stream, pc, oprom, opram, options);
+	return new sh_disassembler(false);
 }
-
 
 uint8_t sh2_device::RB(offs_t A)
 {
@@ -443,7 +441,7 @@ void sh2_device::device_start()
 	m_ftcsr_read_cb.bind_relative_to(*owner());
 
 	m_decrypted_program = has_space(AS_OPCODES) ? &space(AS_OPCODES) : &space(AS_PROGRAM);
-	m_direct = &m_decrypted_program->direct();
+	m_direct = m_decrypted_program->direct<0>();
 	m_internal = &space(AS_PROGRAM);
 
 	save_item(NAME(m_cpu_off));

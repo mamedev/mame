@@ -15,7 +15,6 @@
 //
 namespace DSP56K
 {
-#define ADDRESS(X) ((X)<<1)
 #define UNIMPLEMENTED_OPCODE() osd_printf_error("Unimplemented opcode:  PC=%04x | %s;\n", PC, __PRETTY_FUNCTION__);
 
 class Opcode;
@@ -759,7 +758,7 @@ public:
 	void evaluate(dsp56k_core* cpustate) override {}
 	size_t size() const override { return 2; }
 	size_t accumulatorBitsModified() const override { return BM_HIGH | BM_MIDDLE | BM_LOW; }
-	size_t flags() const override { return DASMFLAG_STEP_OVER; }
+	size_t flags() const override { return util::disasm_interface::STEP_OVER; }
 
 private:
 	op_mnem m_mnem;
@@ -790,7 +789,7 @@ public:
 	void evaluate(dsp56k_core* cpustate) override {}
 	size_t size() const override { return 1; }
 	size_t accumulatorBitsModified() const override { return BM_HIGH | BM_MIDDLE | BM_LOW; }
-	size_t flags() const override { return DASMFLAG_STEP_OVER; }
+	size_t flags() const override { return util::disasm_interface::STEP_OVER; }
 
 private:
 	op_mnem m_mnem;
@@ -821,7 +820,7 @@ public:
 	void evaluate(dsp56k_core* cpustate) override {}
 	size_t size() const override { return 2; }
 	size_t accumulatorBitsModified() const override { return BM_HIGH | BM_MIDDLE | BM_LOW; }
-	size_t flags() const override { return DASMFLAG_STEP_OVER; }
+	size_t flags() const override { return util::disasm_interface::STEP_OVER; }
 
 private:
 	int16_t m_immediate;
@@ -847,7 +846,7 @@ public:
 	void evaluate(dsp56k_core* cpustate) override {}
 	size_t size() const override { return 1; }
 	size_t accumulatorBitsModified() const override { return BM_HIGH | BM_MIDDLE | BM_LOW; }
-	size_t flags() const override { return DASMFLAG_STEP_OVER; }
+	size_t flags() const override { return util::disasm_interface::STEP_OVER; }
 };
 
 // CHKAAU : 0000 0000 0000 0100 : A-58 /////////////////////////////////////////
@@ -1597,7 +1596,7 @@ public:
 	void evaluate(dsp56k_core* cpustate) override {}
 	size_t size() const override { return 2; }
 	size_t accumulatorBitsModified() const override { return BM_HIGH | BM_MIDDLE | BM_LOW; }
-	size_t flags() const override { return DASMFLAG_STEP_OVER; }
+	size_t flags() const override { return util::disasm_interface::STEP_OVER; }
 
 private:
 	op_mnem m_mnem;
@@ -1628,7 +1627,7 @@ public:
 	void evaluate(dsp56k_core* cpustate) override {}
 	size_t size() const override { return 1; }
 	size_t accumulatorBitsModified() const override { return BM_HIGH | BM_MIDDLE | BM_LOW; }
-	size_t flags() const override { return DASMFLAG_STEP_OVER; }
+	size_t flags() const override { return util::disasm_interface::STEP_OVER; }
 
 private:
 	op_mnem m_mnem;
@@ -1658,7 +1657,7 @@ public:
 	void evaluate(dsp56k_core* cpustate) override {}
 	size_t size() const override { return 2; }
 	size_t accumulatorBitsModified() const override { return BM_HIGH | BM_MIDDLE | BM_LOW; }
-	size_t flags() const override { return DASMFLAG_STEP_OVER; }
+	size_t flags() const override { return util::disasm_interface::STEP_OVER; }
 
 private:
 	uint16_t m_displacement;
@@ -1688,7 +1687,7 @@ public:
 	void evaluate(dsp56k_core* cpustate) override {}
 	size_t size() const override { return 1; }
 	size_t accumulatorBitsModified() const override { return BM_HIGH | BM_MIDDLE | BM_LOW; }
-	size_t flags() const override { return DASMFLAG_STEP_OVER; }
+	size_t flags() const override { return util::disasm_interface::STEP_OVER; }
 
 private:
 	uint8_t m_bAddr;
@@ -1714,7 +1713,7 @@ public:
 	void evaluate(dsp56k_core* cpustate) override {}
 	size_t size() const override { return 1; }
 	size_t accumulatorBitsModified() const override { return BM_HIGH | BM_MIDDLE | BM_LOW; }
-	size_t flags() const override { return DASMFLAG_STEP_OVER; }
+	size_t flags() const override { return util::disasm_interface::STEP_OVER; }
 };
 
 // LEA : 0000 0001 11TT MMRR : A-116 ///////////////////////////////////////////
@@ -3236,7 +3235,7 @@ public:
 	void evaluate(dsp56k_core* cpustate) override {}
 	size_t size() const override { return 1; }
 	size_t accumulatorBitsModified() const override { return BM_HIGH | BM_MIDDLE | BM_LOW; }
-	size_t flags() const override { return DASMFLAG_STEP_OUT; }
+	size_t flags() const override { return util::disasm_interface::STEP_OUT; }
 };
 
 // RTS : 0000 0000 0000 0110 : A-196 ///////////////////////////////////////////
@@ -3258,7 +3257,7 @@ public:
 	void evaluate(dsp56k_core* cpustate) override {}
 	size_t size() const override { return 1; }
 	size_t accumulatorBitsModified() const override { return BM_HIGH | BM_MIDDLE | BM_LOW; }
-	size_t flags() const override { return DASMFLAG_STEP_OUT; }
+	size_t flags() const override { return util::disasm_interface::STEP_OUT; }
 };
 
 // SBC : .... .... 0101 F01J : A-198 ///////////////////////////////////////////

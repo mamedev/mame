@@ -307,34 +307,28 @@ void adsp21062_device::static_generate_memory_accessor(MEM_ACCESSOR_TYPE type, c
 	switch (type)
 	{
 		case MEM_ACCESSOR_PM_READ48:
-			UML_SHL(block, I1, I1, 3);
 			UML_DREAD(block, I0, I1, SIZE_QWORD, SPACE_PROGRAM);
 			break;
 
 		case MEM_ACCESSOR_PM_WRITE48:
-			UML_SHL(block, I1, I1, 3);
 			UML_DWRITE(block, I1, I0, SIZE_QWORD, SPACE_PROGRAM);
 			UML_MOV(block, mem(&m_core->force_recompile), 1);
 			break;
 
 		case MEM_ACCESSOR_PM_READ32:
-			UML_SHL(block, I1, I1, 3);
 			UML_READ(block, I0, I1, SIZE_DWORD, SPACE_PROGRAM);
 			break;
 
 		case MEM_ACCESSOR_PM_WRITE32:
-			UML_SHL(block, I1, I1, 3);
 			UML_WRITE(block, I1, I0, SIZE_DWORD, SPACE_PROGRAM);
 			UML_MOV(block, mem(&m_core->force_recompile), 1);
 			break;
 
 		case MEM_ACCESSOR_DM_READ32:
-			UML_SHL(block, I1, I1, 2);
 			UML_READ(block, I0, I1, SIZE_DWORD, SPACE_DATA);
 			break;
 
 		case MEM_ACCESSOR_DM_WRITE32:
-			UML_SHL(block, I1, I1, 2);
 			UML_WRITE(block, I1, I0, SIZE_DWORD, SPACE_DATA);
 			break;
 	}

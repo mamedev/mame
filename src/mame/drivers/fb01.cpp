@@ -49,6 +49,7 @@ public:
 	DECLARE_PALETTE_INIT(fb01);
 	HD44780_PIXEL_UPDATE(fb01_pixel_update);
 
+	void fb01(machine_config &config);
 private:
 	required_device<z80_device> m_maincpu;
 	required_device<i8251_device> m_upd71051;
@@ -172,7 +173,7 @@ PALETTE_INIT_MEMBER(fb01_state, fb01)
 }
 
 
-static MACHINE_CONFIG_START( fb01 )
+MACHINE_CONFIG_START(fb01_state::fb01)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_12MHz/2)
 	MCFG_CPU_PROGRAM_MAP(fb01_mem)

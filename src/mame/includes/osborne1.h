@@ -95,6 +95,7 @@ public:
 	required_device<floppy_connector>       m_floppy0;
 	required_device<floppy_connector>       m_floppy1;
 
+	void osborne1(machine_config &config);
 protected:
 	TIMER_CALLBACK_MEMBER(video_callback);
 	TIMER_CALLBACK_MEMBER(acia_rxc_txc_callback);
@@ -164,6 +165,7 @@ public:
 	MC6845_UPDATE_ROW(crtc_update_row);
 	MC6845_ON_UPDATE_ADDR_CHANGED(crtc_update_addr_changed);
 
+	void osborne1nv(machine_config &config);
 protected:
 	required_device<palette_device> m_palette;
 	required_region_ptr<u8>         m_p_nuevo;

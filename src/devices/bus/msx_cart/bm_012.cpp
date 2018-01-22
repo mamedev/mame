@@ -38,7 +38,7 @@ static ADDRESS_MAP_START( bm_012_memory_map, AS_PROGRAM, 8, msx_cart_bm_012_devi
 ADDRESS_MAP_END
 
 
-MACHINE_CONFIG_MEMBER( msx_cart_bm_012_device::device_add_mconfig )
+MACHINE_CONFIG_START(msx_cart_bm_012_device::device_add_mconfig)
 	// 12MHz XTAL @ X1
 	// Toshiba TMPZ84C015AF-6 (@U5) components:
 	// - Z80

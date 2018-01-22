@@ -536,7 +536,7 @@ void itech8_state::update_interrupts(int periodic, int tms34061, int blitter)
 	if (blitter != -1) m_blitter_int = blitter;
 
 	/* handle the 6809 case */
-	if (main_cpu_type == M6809 || main_cpu_type == HD6309)
+	if (main_cpu_type == MC6809 || main_cpu_type == HD6309)
 	{
 		/* just modify lines that have changed */
 		if (periodic != -1) m_maincpu->set_input_line(INPUT_LINE_NMI, periodic ? ASSERT_LINE : CLEAR_LINE);
@@ -625,7 +625,7 @@ void itech8_state::machine_reset()
 	device_type main_cpu_type = m_maincpu->type();
 
 	/* make sure bank 0 is selected */
-	if (main_cpu_type == M6809 || main_cpu_type == HD6309)
+	if (main_cpu_type == MC6809 || main_cpu_type == HD6309)
 	{
 		membank("bank1")->set_entry(0);
 		m_maincpu->reset();
@@ -748,8 +748,8 @@ WRITE8_MEMBER(itech8_state::pia_portb_out)
 	/* bit 5 controls the coin counter */
 	/* bit 6 controls the diagnostic sound LED */
 	m_pia_portb_data = data;
-	m_ticket->write(space, 0, (data & 0x10) << 3);
-	machine().bookkeeping().coin_counter_w(0, (data & 0x20) >> 5);
+	m_ticket->motor_w(BIT(data, 4));
+	machine().bookkeeping().coin_counter_w(0, BIT(data, 5));
 }
 
 
@@ -762,8 +762,8 @@ WRITE8_MEMBER(itech8_state::ym2203_portb_out)
 	/* bit 6 controls the diagnostic sound LED */
 	/* bit 7 controls the ticket dispenser */
 	m_pia_portb_data = data;
-	m_ticket->write(machine().dummy_space(), 0, data & 0x80);
-	machine().bookkeeping().coin_counter_w(0, (data & 0x20) >> 5);
+	m_ticket->motor_w(BIT(data, 7));
+	machine().bookkeeping().coin_counter_w(0, BIT(data, 5));
 }
 
 
@@ -1665,10 +1665,10 @@ WRITE_LINE_MEMBER(itech8_state::generate_tms34061_interrupt)
 
 /************* core pieces ******************/
 
-static MACHINE_CONFIG_START( itech8_core_lo )
+MACHINE_CONFIG_START(itech8_state::itech8_core_lo)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6809, CLOCK_8MHz/4)
+	MCFG_CPU_ADD("maincpu", MC6809, CLOCK_8MHz)
 	MCFG_CPU_PROGRAM_MAP(tmslo_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", itech8_state,  generate_nmi)
 
@@ -1699,7 +1699,7 @@ static MACHINE_CONFIG_START( itech8_core_lo )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( itech8_core_hi, itech8_core_lo )
+MACHINE_CONFIG_DERIVED(itech8_state::itech8_core_hi, itech8_core_lo)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1707,10 +1707,10 @@ static MACHINE_CONFIG_DERIVED( itech8_core_hi, itech8_core_lo )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( itech8_sound_ym2203 )
+MACHINE_CONFIG_START(itech8_state::itech8_sound_ym2203)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("soundcpu", M6809, CLOCK_8MHz/4)
+	MCFG_CPU_ADD("soundcpu", MC6809, CLOCK_8MHz)
 	MCFG_CPU_PROGRAM_MAP(sound2203_map)
 
 	/* sound hardware */
@@ -1727,10 +1727,10 @@ static MACHINE_CONFIG_START( itech8_sound_ym2203 )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( itech8_sound_ym2608b )
+MACHINE_CONFIG_START(itech8_state::itech8_sound_ym2608b)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("soundcpu", M6809, CLOCK_8MHz/4)
+	MCFG_CPU_ADD("soundcpu", MC6809, CLOCK_8MHz)
 	MCFG_CPU_PROGRAM_MAP(sound2608b_map)
 
 	/* sound hardware */
@@ -1741,10 +1741,10 @@ static MACHINE_CONFIG_START( itech8_sound_ym2608b )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( itech8_sound_ym3812 )
+MACHINE_CONFIG_START(itech8_state::itech8_sound_ym3812)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("soundcpu", M6809, CLOCK_8MHz/4)
+	MCFG_CPU_ADD("soundcpu", MC6809, CLOCK_8MHz)
 	MCFG_CPU_PROGRAM_MAP(sound3812_map)
 
 	MCFG_DEVICE_ADD("pia", PIA6821, 0)
@@ -1762,10 +1762,10 @@ static MACHINE_CONFIG_START( itech8_sound_ym3812 )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( itech8_sound_ym3812_external )
+MACHINE_CONFIG_START(itech8_state::itech8_sound_ym3812_external)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("soundcpu", M6809, CLOCK_8MHz/4)
+	MCFG_CPU_ADD("soundcpu", MC6809, CLOCK_8MHz)
 	MCFG_CPU_PROGRAM_MAP(sound3812_external_map)
 
 	/* sound hardware */
@@ -1780,7 +1780,7 @@ MACHINE_CONFIG_END
 
 /************* full drivers ******************/
 
-static MACHINE_CONFIG_DERIVED( wfortune, itech8_core_hi )
+MACHINE_CONFIG_DERIVED(itech8_state::wfortune, itech8_core_hi)
 
 	/* basic machine hardware */
 	MCFG_FRAGMENT_ADD(itech8_sound_ym2203)
@@ -1794,7 +1794,7 @@ static MACHINE_CONFIG_DERIVED( wfortune, itech8_core_hi )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( grmatch, itech8_core_hi )
+MACHINE_CONFIG_DERIVED(itech8_state::grmatch, itech8_core_hi)
 
 	/* basic machine hardware */
 	MCFG_FRAGMENT_ADD(itech8_sound_ym2608b)
@@ -1810,7 +1810,7 @@ static MACHINE_CONFIG_DERIVED( grmatch, itech8_core_hi )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( stratab_hi, itech8_core_hi )
+MACHINE_CONFIG_DERIVED(itech8_state::stratab_hi, itech8_core_hi)
 
 	/* basic machine hardware */
 	MCFG_FRAGMENT_ADD(itech8_sound_ym2203)
@@ -1823,7 +1823,7 @@ static MACHINE_CONFIG_DERIVED( stratab_hi, itech8_core_hi )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( stratab_lo, itech8_core_lo )
+MACHINE_CONFIG_DERIVED(itech8_state::stratab_lo, itech8_core_lo)
 
 	/* basic machine hardware */
 	MCFG_FRAGMENT_ADD(itech8_sound_ym2203)
@@ -1835,7 +1835,7 @@ static MACHINE_CONFIG_DERIVED( stratab_lo, itech8_core_lo )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( slikshot_hi, itech8_core_hi )
+MACHINE_CONFIG_DERIVED(itech8_state::slikshot_hi, itech8_core_hi)
 
 	/* basic machine hardware */
 	MCFG_FRAGMENT_ADD(itech8_sound_ym2203)
@@ -1852,7 +1852,7 @@ static MACHINE_CONFIG_DERIVED( slikshot_hi, itech8_core_hi )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( slikshot_lo, itech8_core_lo )
+MACHINE_CONFIG_DERIVED(itech8_state::slikshot_lo, itech8_core_lo)
 
 	/* basic machine hardware */
 	MCFG_FRAGMENT_ADD(itech8_sound_ym2203)
@@ -1869,7 +1869,7 @@ static MACHINE_CONFIG_DERIVED( slikshot_lo, itech8_core_lo )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( slikshot_lo_noz80, itech8_core_lo )
+MACHINE_CONFIG_DERIVED(itech8_state::slikshot_lo_noz80, itech8_core_lo)
 
 	/* basic machine hardware */
 	MCFG_FRAGMENT_ADD(itech8_sound_ym2203)
@@ -1881,7 +1881,7 @@ static MACHINE_CONFIG_DERIVED( slikshot_lo_noz80, itech8_core_lo )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( sstrike, slikshot_lo )
+MACHINE_CONFIG_DERIVED(itech8_state::sstrike, slikshot_lo)
 
 	/* basic machine hardware */
 	MCFG_MACHINE_START_OVERRIDE(itech8_state,sstrike)
@@ -1889,7 +1889,7 @@ static MACHINE_CONFIG_DERIVED( sstrike, slikshot_lo )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( hstennis_hi, itech8_core_hi )
+MACHINE_CONFIG_DERIVED(itech8_state::hstennis_hi, itech8_core_hi)
 
 	/* basic machine hardware */
 	MCFG_FRAGMENT_ADD(itech8_sound_ym3812)
@@ -1901,7 +1901,7 @@ static MACHINE_CONFIG_DERIVED( hstennis_hi, itech8_core_hi )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( hstennis_lo, itech8_core_lo )
+MACHINE_CONFIG_DERIVED(itech8_state::hstennis_lo, itech8_core_lo)
 
 	/* basic machine hardware */
 	MCFG_FRAGMENT_ADD(itech8_sound_ym3812)
@@ -1913,7 +1913,7 @@ static MACHINE_CONFIG_DERIVED( hstennis_lo, itech8_core_lo )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( rimrockn, itech8_core_hi )
+MACHINE_CONFIG_DERIVED(itech8_state::rimrockn, itech8_core_hi)
 
 	/* basic machine hardware */
 	MCFG_FRAGMENT_ADD(itech8_sound_ym3812_external)
@@ -1929,7 +1929,7 @@ static MACHINE_CONFIG_DERIVED( rimrockn, itech8_core_hi )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( ninclown, itech8_core_hi )
+MACHINE_CONFIG_DERIVED(itech8_state::ninclown, itech8_core_hi)
 
 	/* basic machine hardware */
 	MCFG_FRAGMENT_ADD(itech8_sound_ym3812_external)
@@ -1946,7 +1946,7 @@ static MACHINE_CONFIG_DERIVED( ninclown, itech8_core_hi )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( gtg2, itech8_core_lo )
+MACHINE_CONFIG_DERIVED(itech8_state::gtg2, itech8_core_lo)
 
 	/* basic machine hardware */
 	MCFG_FRAGMENT_ADD(itech8_sound_ym3812_external)
@@ -2395,23 +2395,23 @@ ROM_START( hstennis10 )
 ROM_END
 
 
-ROM_START( arlingtn )
-	/* banks are loaded in the opposite order from the others, */
-	ROM_REGION( 0x1c000, "maincpu", 0 )
-	ROM_LOAD( "ahrd121.bin", 0x10000, 0x4000, CRC(00aae02e) SHA1(3bcfbd256c34ae222dde24ba9544f19da70b698e) )
-	ROM_CONTINUE(            0x04000, 0xc000 )
+ROM_START( arlingtn ) /* PCB  p/n 1030 rev. 1A */
+	ROM_REGION( 0x1c000, "maincpu", 0 ) /* banks are loaded in the opposite order from the others, */
+	ROM_LOAD( "ahr-d_v_1.21.u5", 0x10000, 0x4000, CRC(00aae02e) SHA1(3bcfbd256c34ae222dde24ba9544f19da70b698e) ) /* Service menu reports version as 1.21-D */
+	ROM_CONTINUE(                0x04000, 0xc000 )
 	ROM_COPY( "maincpu", 0x8000, 0x14000, 0x8000 )
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )
-	ROM_LOAD( "ahrsnd11.bin", 0x08000, 0x8000, CRC(dec57dca) SHA1(21a8ead10b0434629f41f6b067c49b6622569a6c) )
+	ROM_LOAD( "ahr_snd_v1.1.u27", 0x08000, 0x8000, CRC(dec57dca) SHA1(21a8ead10b0434629f41f6b067c49b6622569a6c) )
 
 	ROM_REGION( 0xc0000, "grom", 0 )
-	ROM_LOAD( "grom0.bin", 0x00000, 0x20000, CRC(5ef57fe5) SHA1(e877979e034a61968b432037501e25a302a17a9a) )
-	ROM_LOAD( "grom1.bin", 0x20000, 0x20000, CRC(6aca95c0) SHA1(da7a899bf0812a7af178e48b5a626ce56a836579) )
-	ROM_LOAD( "grom2.bin", 0x40000, 0x10000, CRC(6d6fde1b) SHA1(aaabc45d4b566be42e8d28d767e4771a96d9caae) )
+	ROM_LOAD( "grom0.grom0", 0x00000, 0x20000, CRC(5ef57fe5) SHA1(e877979e034a61968b432037501e25a302a17a9a) )
+	ROM_LOAD( "grom1.grom1", 0x20000, 0x20000, CRC(6aca95c0) SHA1(da7a899bf0812a7af178e48b5a626ce56a836579) )
+	ROM_LOAD( "grom2.grom2", 0x40000, 0x10000, CRC(6d6fde1b) SHA1(aaabc45d4b566be42e8d28d767e4771a96d9caae) )
+	/* GROM3, GROM4 & GROM5 are unpopulated */
 
 	ROM_REGION( 0x40000, "oki", 0 )
-	ROM_LOAD( "srom0.bin", 0x00000, 0x40000, CRC(56087f81) SHA1(1d4a1f396ee9d8ed51d0417ea94b0b379312d72f) )
+	ROM_LOAD( "srom0.srom0", 0x00000, 0x40000, CRC(56087f81) SHA1(1d4a1f396ee9d8ed51d0417ea94b0b379312d72f) )
 ROM_END
 
 

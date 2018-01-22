@@ -60,24 +60,6 @@ cirrus_gd5430_device::cirrus_gd5430_device(const machine_config &mconfig, const 
 {
 }
 
-MACHINE_CONFIG_START( pcvideo_cirrus_gd5428 )
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL_25_1748MHz,900,0,640,526,0,480)
-	MCFG_SCREEN_UPDATE_DEVICE("vga", cirrus_gd5428_device, screen_update)
-
-	MCFG_PALETTE_ADD("palette", 0x100)
-	MCFG_DEVICE_ADD("vga", CIRRUS_GD5428, 0)
-MACHINE_CONFIG_END
-
-MACHINE_CONFIG_START( pcvideo_cirrus_gd5430 )
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL_25_1748MHz,900,0,640,526,0,480)
-	MCFG_SCREEN_UPDATE_DEVICE("vga", cirrus_gd5430_device, screen_update)
-
-	MCFG_PALETTE_ADD("palette", 0x100)
-	MCFG_DEVICE_ADD("vga", CIRRUS_GD5430, 0)
-MACHINE_CONFIG_END
-
 void cirrus_gd5428_device::device_start()
 {
 	zero();

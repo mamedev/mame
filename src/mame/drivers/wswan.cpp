@@ -108,7 +108,7 @@ static SLOT_INTERFACE_START(wswan_cart)
 	SLOT_INTERFACE_INTERNAL("ws_eeprom",  WS_ROM_EEPROM)
 SLOT_INTERFACE_END
 
-static MACHINE_CONFIG_START( wswan )
+MACHINE_CONFIG_START(wswan_state::wswan)
 	/* Basic machine hardware */
 	MCFG_CPU_ADD("maincpu", V30MZ, XTAL_3_072MHz)
 	MCFG_CPU_PROGRAM_MAP(wswan_mem)
@@ -154,7 +154,7 @@ static MACHINE_CONFIG_START( wswan )
 	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("pc2_list","pockchalv2")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( wscolor, wswan )
+MACHINE_CONFIG_DERIVED(wswan_state::wscolor, wswan)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(wscolor_mem)
 	MCFG_MACHINE_START_OVERRIDE(wswan_state, wscolor)

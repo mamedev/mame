@@ -77,7 +77,7 @@ void neoboot_prot_device::sx_decrypt(uint8_t* fixed, uint32_t fixed_size, int va
 	else if (value == 2)
 	{
 		for (int i = 0; i < sx_size; i++)
-			rom[i] = BITSWAP8(rom[i], 7, 6, 0, 4, 3, 2, 1, 5);
+			rom[i] = bitswap<8>(rom[i], 7, 6, 0, 4, 3, 2, 1, 5);
 	}
 }
 
@@ -139,7 +139,7 @@ void neoboot_prot_device::kf2k5uni_px_decrypt(uint8_t* cpurom, uint32_t cpurom_s
 	{
 		for (int j = 0; j < 0x80; j += 2)
 		{
-			int ofst = BITSWAP8(j, 0, 3, 4, 5, 6, 1, 2, 7);
+			int ofst = bitswap<8>(j, 0, 3, 4, 5, 6, 1, 2, 7);
 			memcpy(&dst[j], src + i + ofst, 2);
 		}
 		memcpy(src + i, &dst[0], 0x80);
@@ -154,7 +154,7 @@ void neoboot_prot_device::kf2k5uni_sx_decrypt(uint8_t* fixedrom, uint32_t fixedr
 	uint8_t *srom = fixedrom;
 
 	for (int i = 0; i < 0x20000; i++)
-		srom[i] = BITSWAP8(srom[i], 4, 5, 6, 7, 0, 1, 2, 3);
+		srom[i] = bitswap<8>(srom[i], 4, 5, 6, 7, 0, 1, 2, 3);
 }
 
 void neoboot_prot_device::kf2k5uni_mx_decrypt(uint8_t* audiorom, uint32_t audiorom_size)
@@ -162,7 +162,7 @@ void neoboot_prot_device::kf2k5uni_mx_decrypt(uint8_t* audiorom, uint32_t audior
 	uint8_t *mrom = audiorom;
 
 	for (int i = 0; i < 0x30000; i++)
-		mrom[i] = BITSWAP8(mrom[i], 4, 5, 6, 7, 0, 1, 2, 3);
+		mrom[i] = bitswap<8>(mrom[i], 4, 5, 6, 7, 0, 1, 2, 3);
 }
 
 
@@ -187,7 +187,7 @@ void neoboot_prot_device::lans2004_vx_decrypt(uint8_t* ymsndrom, uint32_t ymsndr
 {
 	uint8_t *rom = ymsndrom;
 	for (int i = 0; i < 0xA00000; i++)
-		rom[i] = BITSWAP8(rom[i], 0, 1, 5, 4, 3, 2, 6, 7);
+		rom[i] = bitswap<8>(rom[i], 0, 1, 5, 4, 3, 2, 6, 7);
 }
 
 void neoboot_prot_device::lans2004_decrypt_68k(uint8_t* cpurom, uint32_t cpurom_size)
@@ -239,7 +239,7 @@ void neoboot_prot_device::samsho5b_px_decrypt(uint8_t* cpurom, uint32_t cpurom_s
 
 	for (int i = 0; i < px_size / 2; i++)
 	{
-		int ofst = BITSWAP8((i & 0x000ff), 7, 6, 5, 4, 3, 0, 1, 2);
+		int ofst = bitswap<8>((i & 0x000ff), 7, 6, 5, 4, 3, 0, 1, 2);
 		ofst += (i & 0xfffff00);
 		ofst ^= 0x060005;
 
@@ -259,7 +259,7 @@ void neoboot_prot_device::samsho5b_vx_decrypt(uint8_t* ymsndrom, uint32_t ymsndr
 	uint8_t *rom = ymsndrom;
 
 	for (int i = 0; i < vx_size; i++)
-		rom[i] = BITSWAP8(rom[i], 0, 1, 5, 4, 3, 2, 6, 7);
+		rom[i] = bitswap<8>(rom[i], 0, 1, 5, 4, 3, 2, 6, 7);
 }
 
 
@@ -269,7 +269,7 @@ void neoboot_prot_device::samsho5b_vx_decrypt(uint8_t* ymsndrom, uint32_t ymsndr
 
 READ16_MEMBER( neoboot_prot_device::mslug5p_prot_r )
 {
-	logerror("PC %06x: access protected\n", space.device().safe_pc());
+	logerror("%s access protected\n", machine().describe_context());
 	return 0xa0;
 }
 
@@ -278,12 +278,12 @@ READ16_MEMBER( neoboot_prot_device::mslug5p_prot_r )
 WRITE16_MEMBER( neoboot_prot_device::ms5plus_bankswitch_w )
 {
     int bankaddress;
-    logerror("offset: %06x PC %06x: set banking %04x\n",offset,space.device().safe_pc(),data);
+    logerror("offset: %06x %s set banking %04x\n",offset,machine().describe_context(),data);
     if ((offset == 0) && (data == 0xa0))
     {
         bankaddress = 0xa0;
         m_bankdev->neogeo_set_main_cpu_bank_address(bankaddress);
-        logerror("offset: %06x PC %06x: set banking %04x\n\n",offset,space.device().safe_pc(),bankaddress);
+        logerror("offset: %06x %s set banking %04x\n\n",offset,machine().describe_context(),bankaddress);
     }
     else if(offset == 2)
     {
@@ -291,7 +291,7 @@ WRITE16_MEMBER( neoboot_prot_device::ms5plus_bankswitch_w )
         //data = data & 7;
         bankaddress = data * 0x100000;
         m_bankdev->neogeo_set_main_cpu_bank_address(bankaddress);
-        logerror("offset: %06x PC %06x: set banking %04x\n\n",offset,space.device().safe_pc(),bankaddress);
+        logerror("offset: %06x %s set banking %04x\n\n",offset,machine().describe_context(),bankaddress);
     }
 }
 */
@@ -381,7 +381,7 @@ void neoboot_prot_device::svcboot_px_decrypt(uint8_t* cpurom, uint32_t cpurom_si
 
 	for (int i = 0; i < size / 2; i++)
 	{
-		int ofst = BITSWAP8((i & 0x0000ff), 7, 6, 1, 0, 3, 2, 5, 4);
+		int ofst = bitswap<8>((i & 0x0000ff), 7, 6, 1, 0, 3, 2, 5, 4);
 		ofst += (i & 0xffff00);
 		memcpy(&src[i * 2], &dst[ofst * 2], 0x02);
 	}
@@ -410,7 +410,7 @@ void neoboot_prot_device::svcboot_cx_decrypt(uint8_t* sprrom, uint32_t sprrom_si
 		int bit1 = bitswap4_tbl[idx][1];
 		int bit2 = bitswap4_tbl[idx][2];
 		int bit3 = bitswap4_tbl[idx][3];
-		int ofst = BITSWAP8((i & 0x0000ff), 7, 6, 5, 4, bit3, bit2, bit1, bit0);
+		int ofst = bitswap<8>((i & 0x0000ff), 7, 6, 5, 4, bit3, bit2, bit1, bit0);
 		ofst += (i & 0xfffff00);
 		memcpy(&src[i * 0x80], &dst[ofst * 0x80], 0x80);
 	}
@@ -429,7 +429,7 @@ void neoboot_prot_device::svcplus_px_decrypt(uint8_t* cpurom, uint32_t cpurom_si
 	memcpy(&dst[0], src, size);
 	for (int i = 0; i < size / 2; i++)
 	{
-		int ofst = BITSWAP24((i & 0xfffff), 0x17, 0x16, 0x15, 0x14, 0x13, 0x00, 0x01, 0x02,
+		int ofst = bitswap<24>((i & 0xfffff), 0x17, 0x16, 0x15, 0x14, 0x13, 0x00, 0x01, 0x02,
 								0x0f, 0x0e, 0x0d, 0x0c, 0x0b, 0x0a, 0x09, 0x08,
 								0x07, 0x06, 0x05, 0x04, 0x03, 0x10, 0x11, 0x12);
 		ofst ^= 0x0f0007;
@@ -478,7 +478,7 @@ void neoboot_prot_device::svcsplus_px_decrypt(uint8_t* cpurom, uint32_t cpurom_s
 	memcpy(&dst[0], src, size);
 	for (int i = 0; i < size / 2; i++)
 	{
-		int ofst = BITSWAP16((i & 0x007fff), 0x0f, 0x00, 0x08, 0x09, 0x0b, 0x0a, 0x0c, 0x0d,
+		int ofst = bitswap<16>((i & 0x007fff), 0x0f, 0x00, 0x08, 0x09, 0x0b, 0x0a, 0x0c, 0x0d,
 								0x04, 0x03, 0x01, 0x07, 0x06, 0x02, 0x05, 0x0e);
 
 		ofst += (i & 0x078000);
@@ -524,7 +524,7 @@ void neoboot_prot_device::kof2002b_gfx_decrypt(uint8_t *src, int size)
 		for (int j = 0; j < 0x200; j++)
 		{
 			int n = (j & 0x38) >> 3;
-			int ofst = BITSWAP16(j, 15, 14, 13, 12, 11, 10, 9, t[n][0], t[n][1], t[n][2], 5, 4, 3, t[n][3], t[n][4], t[n][5]);
+			int ofst = bitswap<16>(j, 15, 14, 13, 12, 11, 10, 9, t[n][0], t[n][1], t[n][2], 5, 4, 3, t[n][3], t[n][4], t[n][5]);
 			memcpy(src + i + ofst * 128, &dst[j * 128], 128);
 		}
 	}
@@ -544,7 +544,7 @@ void neoboot_prot_device::kf2k2mp_decrypt(uint8_t* cpurom, uint32_t cpurom_size)
 	{
 		for (int j = 0; j < 0x80 / 2; j++)
 		{
-			int ofst = BITSWAP8( j, 6, 7, 2, 3, 4, 5, 0, 1 );
+			int ofst = bitswap<8>( j, 6, 7, 2, 3, 4, 5, 0, 1 );
 			memcpy(dst + j * 2, src + i + ofst * 2, 2);
 		}
 		memcpy(src + i, dst, 0x80);
@@ -580,7 +580,7 @@ void neoboot_prot_device::kof10th_decrypt(uint8_t* cpurom, uint32_t cpurom_size)
 
 	for (int i = 0; i < 0x900000; i++)
 	{
-		int j = BITSWAP24(i,23,22,21,20,19,18,17,16,15,14,13,12,11,2,9,8,7,1,5,4,3,10,6,0);
+		int j = bitswap<24>(i,23,22,21,20,19,18,17,16,15,14,13,12,11,2,9,8,7,1,5,4,3,10,6,0);
 		src[j] = dst[i];
 	}
 

@@ -55,7 +55,7 @@ const tiny_rom_entry *compis_keyboard_device::device_rom_region() const
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( compis_keyboard_device::device_add_mconfig )
+MACHINE_CONFIG_START(compis_keyboard_device::device_add_mconfig)
 	MCFG_CPU_ADD(I8748_TAG, I8748, 2016000) // XTAL_4_032MHz/2 ???
 	MCFG_MCS48_PORT_BUS_IN_CB(READ8(compis_keyboard_device, bus_r))
 	MCFG_MCS48_PORT_BUS_OUT_CB(WRITE8(compis_keyboard_device, bus_w))

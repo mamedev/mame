@@ -83,7 +83,7 @@ void mb8795_device::recv_cb(uint8_t *buf, int len)
 
 READ8_MEMBER(mb8795_device::txstat_r)
 {
-	//  logerror("%s: txstat_r %02x (%08x)\n", tag(), txstat, space.device().safe_pc());
+	//  logerror("txstat_r %02x %s\n", txstat, machine().describe_context());
 	return txstat;
 }
 
@@ -91,12 +91,12 @@ WRITE8_MEMBER(mb8795_device::txstat_w)
 {
 	txstat = txstat & (0xf0 | ~data);
 	check_irq();
-	logerror("%s: txstat_w %02x (%08x)\n", tag(), txstat, space.device().safe_pc());
+	logerror("txstat_w %02x %s\n", txstat, machine().describe_context());
 }
 
 READ8_MEMBER(mb8795_device::txmask_r)
 {
-	logerror("%s: txmask_r %02x (%08x)\n", tag(), txmask, space.device().safe_pc());
+	logerror("txmask_r %02x %s\n", txmask, machine().describe_context());
 	return txmask;
 }
 
@@ -104,12 +104,12 @@ WRITE8_MEMBER(mb8795_device::txmask_w)
 {
 	txmask = data & 0xaf;
 	check_irq();
-	logerror("%s: txmask_w %02x (%08x)\n", tag(), txmask, space.device().safe_pc());
+	logerror("txmask_w %02x %s\n", txmask, machine().describe_context());
 }
 
 READ8_MEMBER(mb8795_device::rxstat_r)
 {
-	logerror("%s: rxstat_r %02x (%08x)\n", tag(), rxstat, space.device().safe_pc());
+	logerror("rxstat_r %02x %s\n", rxstat, machine().describe_context());
 	return rxstat;
 }
 
@@ -117,12 +117,12 @@ WRITE8_MEMBER(mb8795_device::rxstat_w)
 {
 	rxstat = rxstat & (0x70 | ~data);
 	check_irq();
-	logerror("%s: rxstat_w %02x (%08x)\n", tag(), rxstat, space.device().safe_pc());
+	logerror("rxstat_w %02x %s\n", rxstat, machine().describe_context());
 }
 
 READ8_MEMBER(mb8795_device::rxmask_r)
 {
-	logerror("%s: rxmask_r %02x (%08x)\n", tag(), rxmask, space.device().safe_pc());
+	logerror("rxmask_r %02x %s\n", rxmask, machine().describe_context());
 	return rxmask;
 }
 
@@ -130,31 +130,31 @@ WRITE8_MEMBER(mb8795_device::rxmask_w)
 {
 	rxmask = data & 0x9f;
 	check_irq();
-	logerror("%s: rxmask_w %02x (%08x)\n", tag(), rxmask, space.device().safe_pc());
+	logerror("rxmask_w %02x %s\n", rxmask, machine().describe_context());
 }
 
 READ8_MEMBER(mb8795_device::txmode_r)
 {
-	logerror("%s: txmode_r %02x (%08x)\n", tag(), txmode, space.device().safe_pc());
+	logerror("txmode_r %02x %s\n", txmode, machine().describe_context());
 	return txmode;
 }
 
 WRITE8_MEMBER(mb8795_device::txmode_w)
 {
 	txmode = data;
-	logerror("%s: txmode_w %02x (%08x)\n", tag(), txmode, space.device().safe_pc());
+	logerror("txmode_w %02x %s\n", txmode, machine().describe_context());
 }
 
 READ8_MEMBER(mb8795_device::rxmode_r)
 {
-	logerror("%s: rxmode_r %02x (%08x)\n", tag(), rxmode, space.device().safe_pc());
+	logerror("rxmode_r %02x %s\n", rxmode, machine().describe_context());
 	return rxmode;
 }
 
 WRITE8_MEMBER(mb8795_device::rxmode_w)
 {
 	rxmode = data;
-	logerror("%s: rxmode_w %02x (%08x)\n", tag(), rxmode, space.device().safe_pc());
+	logerror("rxmode_w %02x %s\n", rxmode, machine().describe_context());
 }
 
 WRITE8_MEMBER(mb8795_device::reset_w)
@@ -165,7 +165,7 @@ WRITE8_MEMBER(mb8795_device::reset_w)
 
 READ8_MEMBER(mb8795_device::tdc_lsb_r)
 {
-	logerror("%s: tdc_lsb_r %02x (%08x)\n", tag(), txcount & 0xff, space.device().safe_pc());
+	logerror("tdc_lsb_r %02x %s\n", txcount & 0xff, machine().describe_context());
 	return txcount;
 }
 
@@ -174,7 +174,7 @@ READ8_MEMBER(mb8795_device::mac_r)
 	if(offset < 6)
 		return mac[offset];
 	if(offset == 7) {
-		logerror("%s: tdc_msb_r %02x (%08x)\n", tag(), txcount >> 8, space.device().safe_pc());
+		logerror("tdc_msb_r %02x %s\n", txcount >> 8, machine().describe_context());
 		return (txcount >> 8) & 0x3f;
 	}
 	return 0;
@@ -206,7 +206,7 @@ void mb8795_device::tx_dma_w(uint8_t data, bool eof)
 		drq_tx_cb(drq_tx);
 
 	if(eof) {
-		logerror("%s: send packet, dest=%02x.%02x.%02x.%02x.%02x.%02x len=%04x loopback=%s\n", tag(),
+		logerror("send packet, dest=%02x.%02x.%02x.%02x.%02x.%02x len=%04x loopback=%s\n",
 					txbuf[0], txbuf[1], txbuf[2], txbuf[3], txbuf[4], txbuf[5],
 					txlen,
 					txmode & EN_TMD_LB_DISABLE ? "off" : "on");
@@ -265,7 +265,7 @@ void mb8795_device::receive()
 		keep = true;
 		break;
 	}
-	logerror("%s: received packet for %02x.%02x.%02x.%02x.%02x.%02x len=%04x, mode=%d -> %s\n", tag(),
+	logerror("received packet for %02x.%02x.%02x.%02x.%02x.%02x len=%04x, mode=%d -> %s\n",
 			rxbuf[0], rxbuf[1], rxbuf[2], rxbuf[3], rxbuf[4], rxbuf[5],
 			rxlen, rxmode & 3, keep ? "kept" : "dropped");
 	if(!keep)

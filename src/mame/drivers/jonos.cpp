@@ -37,6 +37,7 @@ public:
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void kbd_put(u8 data);
 
+	void jonos(machine_config &config);
 private:
 	u8 m_framecnt;
 	u8 m_term_data;
@@ -169,7 +170,7 @@ static GFXDECODE_START( jonos )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( jonos )
+MACHINE_CONFIG_START(jonos_state::jonos)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8085A, XTAL_16MHz / 4)
 	MCFG_CPU_PROGRAM_MAP(jonos_mem)

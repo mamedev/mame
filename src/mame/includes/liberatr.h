@@ -52,6 +52,8 @@ public:
 	DECLARE_WRITE8_MEMBER( earom_w );
 	DECLARE_WRITE8_MEMBER( earom_control_w );
 
+	void liberat2(machine_config &config);
+	void liberatr(machine_config &config);
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;

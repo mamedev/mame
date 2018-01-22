@@ -159,6 +159,15 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<okim6376_device> m_okim6376;
 	required_device<palette_device> m_palette;
+	void grancapi(machine_config &config);
+	void tv_ncf(machine_config &config);
+	void ciclone(machine_config &config);
+	void nyjoker(machine_config &config);
+	void magicbom(machine_config &config);
+	void brasil(machine_config &config);
+	void newmcard(machine_config &config);
+	void tv_tcf(machine_config &config);
+	void tv_vcf(machine_config &config);
 };
 
 
@@ -427,7 +436,7 @@ static ADDRESS_MAP_START( tv_tcf_map, AS_PROGRAM, 16, highvdeo_state )
 	AM_RANGE(0x00000, 0x003ff) AM_RAM /*irq vector area*/
 	AM_RANGE(0x00400, 0x03fff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x40000, 0x5d4bf) AM_RAM AM_SHARE("blit_ram") /*blitter ram*/
-	AM_RANGE(0x7fe00, 0x7ffff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x7fe00, 0x7ffff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x80000, 0xbffff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc0000, 0xfffff) AM_ROM AM_REGION("boot_prg",0)
 ADDRESS_MAP_END
@@ -1124,7 +1133,7 @@ static ADDRESS_MAP_START( ramdac_map, 0, 8, highvdeo_state )
 ADDRESS_MAP_END
 
 
-static MACHINE_CONFIG_START( tv_vcf )
+MACHINE_CONFIG_START(highvdeo_state::tv_vcf)
 	MCFG_CPU_ADD("maincpu", V30, XTAL_12MHz/2 ) // ?
 	MCFG_CPU_PROGRAM_MAP(tv_vcf_map)
 	MCFG_CPU_IO_MAP(tv_vcf_io)
@@ -1153,7 +1162,7 @@ static MACHINE_CONFIG_START( tv_vcf )
 
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( tv_ncf, tv_vcf )
+MACHINE_CONFIG_DERIVED(highvdeo_state::tv_ncf, tv_vcf)
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(tv_ncf_map)
@@ -1161,7 +1170,7 @@ static MACHINE_CONFIG_DERIVED( tv_ncf, tv_vcf )
 
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( nyjoker, tv_vcf )
+MACHINE_CONFIG_DERIVED(highvdeo_state::nyjoker, tv_vcf)
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(nyjoker_map)
@@ -1169,7 +1178,7 @@ static MACHINE_CONFIG_DERIVED( nyjoker, tv_vcf )
 
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( tv_tcf, tv_vcf )
+MACHINE_CONFIG_DERIVED(highvdeo_state::tv_tcf, tv_vcf)
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(tv_tcf_map)
@@ -1182,7 +1191,7 @@ static MACHINE_CONFIG_DERIVED( tv_tcf, tv_vcf )
 	MCFG_PALETTE_FORMAT(RRRRRGGGGGGBBBBB)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( newmcard, tv_tcf )
+MACHINE_CONFIG_DERIVED(highvdeo_state::newmcard, tv_tcf)
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(newmcard_map)
@@ -1192,7 +1201,7 @@ static MACHINE_CONFIG_DERIVED( newmcard, tv_tcf )
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 200-1)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( ciclone, tv_tcf )
+MACHINE_CONFIG_DERIVED(highvdeo_state::ciclone, tv_tcf)
 
 	MCFG_DEVICE_REMOVE("maincpu")
 
@@ -1202,7 +1211,7 @@ static MACHINE_CONFIG_DERIVED( ciclone, tv_tcf )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", highvdeo_state,  vblank_irq_80186)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( brasil )
+MACHINE_CONFIG_START(highvdeo_state::brasil)
 	MCFG_CPU_ADD("maincpu", I80186, 20000000 )  // fashion doesn't like 20/2 Mhz
 	MCFG_CPU_PROGRAM_MAP(brasil_map)
 	MCFG_CPU_IO_MAP(brasil_io)
@@ -1228,7 +1237,7 @@ static MACHINE_CONFIG_START( brasil )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( grancapi )
+MACHINE_CONFIG_START(highvdeo_state::grancapi)
 	MCFG_CPU_ADD("maincpu", I80186, 20000000 )
 	MCFG_CPU_PROGRAM_MAP(brasil_map)
 	MCFG_CPU_IO_MAP(grancapi_io)
@@ -1254,7 +1263,7 @@ static MACHINE_CONFIG_START( grancapi )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( magicbom )
+MACHINE_CONFIG_START(highvdeo_state::magicbom)
 	MCFG_CPU_ADD("maincpu", I80186, 20000000 )
 	MCFG_CPU_PROGRAM_MAP(brasil_map)
 	MCFG_CPU_IO_MAP(magicbom_io)

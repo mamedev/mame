@@ -40,6 +40,7 @@ public:
 	DECLARE_READ8_MEMBER(portb_r);
 	DECLARE_WRITE8_MEMBER(unk_w);
 	DECLARE_READ8_MEMBER(unk_r);
+	void spirit76(machine_config &config);
 private:
 	u8 m_t_c;
 	virtual void machine_reset() override;
@@ -116,7 +117,7 @@ void spirit76_state::machine_reset()
 	m_t_c = 0;
 }
 
-static MACHINE_CONFIG_START( spirit76 )
+MACHINE_CONFIG_START(spirit76_state::spirit76)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6800, 500000)
 	MCFG_CPU_PROGRAM_MAP(maincpu_map)

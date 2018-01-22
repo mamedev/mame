@@ -238,7 +238,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(ikki_state::ikki_irq)
 
 
 
-static MACHINE_CONFIG_START( ikki )
+MACHINE_CONFIG_START(ikki_state::ikki)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80,8000000/2) /* 4.000MHz */

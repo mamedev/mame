@@ -164,7 +164,7 @@ void bfm_bd1_device::device_reset()
 
 uint16_t bfm_bd1_device::set_display(uint16_t segin)
 {
-	return BITSWAP16(segin,8,12,11,7,6,4,10,3,14,15,0,13,9,5,1,2);
+	return bitswap<16>(segin,8,12,11,7,6,4,10,3,14,15,0,13,9,5,1,2);
 }
 
 void bfm_bd1_device::device_post_load()

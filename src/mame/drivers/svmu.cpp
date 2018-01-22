@@ -54,6 +54,7 @@ public:
 	DECLARE_READ8_MEMBER(p7_r);
 	DECLARE_QUICKLOAD_LOAD_MEMBER( svmu );
 
+	void svmu(machine_config &config);
 private:
 	uint8_t       m_page;
 };
@@ -300,7 +301,7 @@ QUICKLOAD_LOAD_MEMBER( svmu_state, svmu )
 }
 
 
-static MACHINE_CONFIG_START( svmu )
+MACHINE_CONFIG_START(svmu_state::svmu)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", LC8670, XTAL_32_768kHz)
 	MCFG_CPU_PROGRAM_MAP(svmu_mem)

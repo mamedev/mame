@@ -66,6 +66,7 @@ public:
 	DECLARE_PALETTE_INIT(jongkyo);
 	uint32_t screen_update_jongkyo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
+	void jongkyo(machine_config &config);
 };
 
 
@@ -490,7 +491,7 @@ void jongkyo_state::machine_reset()
 }
 
 
-static MACHINE_CONFIG_START( jongkyo )
+MACHINE_CONFIG_START(jongkyo_state::jongkyo)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", SEGA_315_5084,JONGKYO_CLOCK/4)
@@ -564,7 +565,7 @@ DRIVER_INIT_MEMBER(jongkyo_state,jongkyo)
 	/* first of all, do a simple bitswap */
 	for (int i = 0x6000; i < 0x8c00; ++i)
 	{
-		rom[i] = BITSWAP8(rom[i], 7,6,5,3,4,2,1,0);
+		rom[i] = bitswap<8>(rom[i], 7,6,5,3,4,2,1,0);
 	}
 
 	uint8_t *opcodes = auto_alloc_array(machine(), uint8_t, 0x6c00+0x400*8);

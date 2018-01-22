@@ -241,10 +241,10 @@ uint16_t aw_rom_board::decrypt(uint16_t cipherText, uint32_t address, const uint
 	const int* pbox = permutation_table[key>>18];
 	const sbox_set* ss = &sboxes_table[(key>>16)&3];
 
-	aux = BITSWAP16(cipherText,
+	aux = bitswap<16>(cipherText,
 					pbox[15],pbox[14],pbox[13],pbox[12],pbox[11],pbox[10],pbox[9],pbox[8],
 					pbox[7],pbox[6],pbox[5],pbox[4],pbox[3],pbox[2],pbox[1],pbox[0]);
-	aux = aux ^ BITSWAP16(address, 13,5,2, 14,10,9,4, 15,11,6,1, 12,8,7,3,0);
+	aux = aux ^ bitswap<16>(address, 13,5,2, 14,10,9,4, 15,11,6,1, 12,8,7,3,0);
 
 	b0 = aux&0x1f;
 	b1 = (aux>>5)&0xf;

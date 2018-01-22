@@ -89,6 +89,8 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(audio_nmi);
 	DECLARE_MACHINE_RESET(s3);
 	DECLARE_MACHINE_RESET(s3a);
+	void s3a(machine_config &config);
+	void s3(machine_config &config);
 private:
 	uint8_t m_t_c;
 	uint8_t m_sound_data;
@@ -424,7 +426,7 @@ TIMER_DEVICE_CALLBACK_MEMBER( s3_state::irq )
 		m_t_c++;
 }
 
-static MACHINE_CONFIG_START( s3 )
+MACHINE_CONFIG_START(s3_state::s3)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6800, 3580000)
 	MCFG_CPU_PROGRAM_MAP(s3_main_map)
@@ -476,7 +478,7 @@ static MACHINE_CONFIG_START( s3 )
 	MCFG_NVRAM_ADD_0FILL("nvram")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( s3a, s3 )
+MACHINE_CONFIG_DERIVED(s3_state::s3a, s3)
 	/* Add the soundcard */
 	MCFG_CPU_ADD("audiocpu", M6802, 3580000)
 	MCFG_CPU_PROGRAM_MAP(s3_audio_map)

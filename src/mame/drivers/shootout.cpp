@@ -70,7 +70,7 @@ WRITE8_MEMBER(shootout_state::sound_cpu_command_w)
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 
 	// Allow the other CPU to reply. This fixes the missing music on the title screen (parent set).
-	space.device ().execute ().spin_until_time (attotime :: from_usec (200));
+	m_maincpu->spin_until_time (attotime :: from_usec (200));
 }
 
 WRITE8_MEMBER(shootout_state::flipscreen_w)
@@ -273,7 +273,7 @@ void shootout_state::machine_reset ()
 	m_ccnt_old_val = 0x40;
 }
 
-static MACHINE_CONFIG_START( shootout )
+MACHINE_CONFIG_START(shootout_state::shootout)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", DECO_222, XTAL_12MHz / 6) // 2 MHz?
@@ -306,7 +306,7 @@ static MACHINE_CONFIG_START( shootout )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( shootouj )
+MACHINE_CONFIG_START(shootout_state::shootouj)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, XTAL_12MHz / 6) // 2 MHz? (Assuming the same XTAL as DE-0219 pcb)
@@ -337,7 +337,7 @@ static MACHINE_CONFIG_START( shootouj )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( shootouk, shootouj )
+MACHINE_CONFIG_DERIVED(shootout_state::shootouk, shootouj)
 	/* the Korean 'bootleg' has the usual DECO222 style encryption */
 	MCFG_DEVICE_REMOVE("maincpu")
 	MCFG_CPU_ADD("maincpu", DECO_222, XTAL_12MHz / 6) // 2 MHz? (Assuming the same XTAL as DE-0219 pcb)

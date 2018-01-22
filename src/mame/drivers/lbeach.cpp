@@ -79,6 +79,7 @@ public:
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(lbeach);
 	uint32_t screen_update_lbeach(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void lbeach(machine_config &config);
 };
 
 
@@ -202,7 +203,7 @@ WRITE8_MEMBER(lbeach_state::lbeach_fg_vram_w)
 READ8_MEMBER(lbeach_state::lbeach_in1_r)
 {
 	// d6,7(steering wheel) need to be swapped
-	return BITSWAP8(ioport("IN1")->read(),6,7,5,4,3,2,1,0);
+	return bitswap<8>(ioport("IN1")->read(),6,7,5,4,3,2,1,0);
 }
 
 READ8_MEMBER(lbeach_state::lbeach_in2_r)
@@ -324,7 +325,7 @@ void lbeach_state::machine_reset()
 {
 }
 
-static MACHINE_CONFIG_START( lbeach )
+MACHINE_CONFIG_START(lbeach_state::lbeach)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6800, XTAL_16MHz / 32) // Motorola MC6800P, 500kHz

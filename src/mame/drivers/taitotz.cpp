@@ -57,7 +57,7 @@ Bottom board
 
 IC40    Toshiba TMP95C063F
 IC55    Panasonic MN89306
-EPSON 9X5C pscillator near IC55
+EPSON 9X5C oscillator near IC55
 IC56    HY57V161610D TC-10
 IC22    ID7133 SA70J
 25.000 oscillator near IC22
@@ -84,7 +84,7 @@ HIN239CB (+5v Powered RS-232 Transmitter/Receiver - 120kbps)
 LC321664AM-80 (1Meg (65536 words x 16bits) DRAM)
 74HC4040A (12-Stage Binary Ripple Counter)
 
-E74-07.IC6 & E74-08.IC8 are the OKI samples and are indentical
+E74-07.IC6 & E74-08.IC8 are the OKI samples and are identical
 E74-06.IC2 is the TMP95C063 program code.
 
 
@@ -598,6 +598,7 @@ public:
 	DECLARE_DRIVER_INIT(pwrshovl);
 	DECLARE_DRIVER_INIT(batlgear);
 	DECLARE_DRIVER_INIT(landhigh);
+	DECLARE_DRIVER_INIT(landhigha);
 	DECLARE_DRIVER_INIT(raizpin);
 	DECLARE_DRIVER_INIT(raizpinj);
 	DECLARE_DRIVER_INIT(styphp);
@@ -616,6 +617,8 @@ public:
 	void video_reg_w(uint32_t reg, uint32_t data);
 	void init_taitotz_152();
 	void init_taitotz_111a();
+	void taitotz(machine_config &config);
+	void landhigh(machine_config &config);
 };
 
 class taitotz_renderer : public poly_manager<float, taitotz_polydata, 6, 50000>
@@ -1724,7 +1727,7 @@ WRITE64_MEMBER(taitotz_state::video_chip_w)
 					case 0xb:
 					{
 						m_video_ram_ptr = m_video_reg & 0xfffffff;
-						//logerror("video_chip_ram sel %08X at %08X\n", m_video_reg & 0x0fffffff, space.device().safe_pc());
+						//logerror("video_chip_ram sel %08X at %08X\n", m_video_reg & 0x0fffffff, m_maincpu->pc());
 						break;
 					}
 					case 0x0:
@@ -1813,7 +1816,7 @@ WRITE64_MEMBER(taitotz_state::video_fifo_w)
 			if (m_video_fifo_ptr >= 8)
 			{
 				m_renderer->push_direct_poly_fifo((uint32_t)(data >> 32));
-				//logerror("FIFO packet w: %08X at %08X\n", (uint32_t)(data >> 32), space.device().safe_pc());
+				//logerror("FIFO packet w: %08X at %08X\n", (uint32_t)(data >> 32), m_maincpu->pc());
 			}
 			m_video_fifo_ptr++;
 		}
@@ -1822,7 +1825,7 @@ WRITE64_MEMBER(taitotz_state::video_fifo_w)
 			if (m_video_fifo_ptr >= 8)
 			{
 				m_renderer->push_direct_poly_fifo((uint32_t)(data));
-				//logerror("FIFO packet w: %08X at %08X\n", (uint32_t)(data), space.device().safe_pc());
+				//logerror("FIFO packet w: %08X at %08X\n", (uint32_t)(data), m_maincpu->pc());
 			}
 			m_video_fifo_ptr++;
 		}
@@ -2175,7 +2178,7 @@ WRITE8_MEMBER(taitotz_state::tlcs_rtc_w)
 
 READ16_MEMBER(taitotz_state::tlcs_ide0_r)
 {
-	uint16_t d = m_ata->read_cs0(space, offset, mem_mask);
+	uint16_t d = m_ata->read_cs0(offset, mem_mask);
 	if (offset == 7)
 		d &= ~0x2;      // Type Zero doesn't like the index bit. It's defined as vendor-specific, so it probably shouldn't be up...
 						// The status check explicitly checks for 0x50 (drive ready, seek complete).
@@ -2184,7 +2187,7 @@ READ16_MEMBER(taitotz_state::tlcs_ide0_r)
 
 READ16_MEMBER(taitotz_state::tlcs_ide1_r)
 {
-	uint16_t d = m_ata->read_cs1(space, offset, mem_mask);
+	uint16_t d = m_ata->read_cs1(offset, mem_mask);
 	if (offset == 6)
 		d &= ~0x2;      // Type Zero doesn't like the index bit. It's defined as vendor-specific, so it probably shouldn't be up...
 						// The status check explicitly checks for 0x50 (drive ready, seek complete).
@@ -2556,7 +2559,7 @@ WRITE_LINE_MEMBER(taitotz_state::ide_interrupt)
 	m_iocpu->set_input_line(TLCS900_INT2, state);
 }
 
-static MACHINE_CONFIG_START( taitotz )
+MACHINE_CONFIG_START(taitotz_state::taitotz)
 	/* IBM EMPPC603eBG-100 */
 	MCFG_CPU_ADD("maincpu", PPC603E, 100000000)
 	MCFG_PPC_BUS_FREQUENCY(XTAL_66_6667MHz)    /* Multiplier 1.5, Bus = 66MHz, Core = 100MHz */
@@ -2598,7 +2601,7 @@ static MACHINE_CONFIG_START( taitotz )
 
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( landhigh, taitotz )
+MACHINE_CONFIG_DERIVED(taitotz_state::landhigh, taitotz)
 	MCFG_CPU_MODIFY("iocpu")
 	MCFG_CPU_PROGRAM_MAP(landhigh_tlcs900h_mem)
 MACHINE_CONFIG_END
@@ -2628,6 +2631,9 @@ void taitotz_state::init_taitotz_111a()
 static const char LANDHIGH_HDD_SERIAL[] =           // "824915746386        "
 	{ 0x38, 0x32, 0x34, 0x39, 0x31, 0x35, 0x37, 0x34, 0x36, 0x33, 0x38, 0x36, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20 };
 
+static const char LANDHIGHA_HDD_SERIAL[] =          // "824915546750        "
+	{ 0x38, 0x32, 0x34, 0x39, 0x31, 0x35, 0x35, 0x34, 0x36, 0x37, 0x35, 0x30, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20 };
+
 static const char BATLGR2_HDD_SERIAL[] =            // "            05412842"
 	{ 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x30, 0x35, 0x34, 0x31, 0x32, 0x38, 0x34, 0x32 };
 
@@ -2648,6 +2654,15 @@ DRIVER_INIT_MEMBER(taitotz_state,landhigh)
 	init_taitotz_152();
 
 	m_hdd_serial_number = LANDHIGH_HDD_SERIAL;
+
+	m_scr_base = 0x1c0000;
+}
+
+DRIVER_INIT_MEMBER(taitotz_state,landhigha)
+{
+	init_taitotz_152();
+
+	m_hdd_serial_number = LANDHIGHA_HDD_SERIAL;
 
 	m_scr_base = 0x1c0000;
 }
@@ -2775,6 +2790,26 @@ ROM_START( landhigh )
 
 	DISK_REGION( "ata:0:hdd:image" )
 	DISK_IMAGE( "landhigh", 0, SHA1(7cea4ea5c3899e6ac774a4eb12821f44541d9c9c) )
+ROM_END
+
+ROM_START( landhigha )
+	ROM_REGION64_BE( 0x100000, "user1", 0 )
+	TAITOTZ_BIOS_V152
+
+	ROM_REGION( 0x40000, "io_cpu", 0 )
+	ROM_LOAD16_BYTE( "e82-03.ic14", 0x000000, 0x020000, CRC(0de65b4d) SHA1(932316f7435259b723a29843d58b2e3dca92e7b7) )
+	ROM_LOAD16_BYTE( "e82-04.ic15", 0x000001, 0x020000, CRC(b3cb0f3d) SHA1(80414f50a1593c6b849d9f37e94a32168699a5c1) )
+
+	ROM_REGION( 0x10000, "sound_cpu", 0 ) /* Internal ROM :( */
+	ROM_LOAD( "e68-01.ic7", 0x000000, 0x010000, NO_DUMP )
+
+	ROM_REGION( 0x500, "plds", 0 )
+	ROM_LOAD( "e82-01.ic44", 0x000, 0x117, CRC(49eea30f) SHA1(ef97c792358f05b9214a2f58ee1e97e8208806c4) )
+	ROM_LOAD( "e82-02.ic45", 0x117, 0x2dd, CRC(f581cff5) SHA1(468e0e6a3828f2dcda35c6d523154510f9c99db7) )
+	ROM_LOAD( "e68-06.ic24", 0x3f4, 0x100, NO_DUMP )
+
+	DISK_REGION( "ata:0:hdd:image" )
+	DISK_IMAGE( "landhigha", 0, SHA1(830ff12671a977a4c243491b68444f8ca69d0819) )
 ROM_END
 
 ROM_START( batlgear )
@@ -2916,8 +2951,9 @@ ROM_START( styphp )
 ROM_END
 
 GAME( 1999, taitotz,   0,        taitotz,  taitotz,  taitotz_state, 0,        ROT0, "Taito", "Type Zero BIOS", MACHINE_NO_SOUND|MACHINE_NOT_WORKING|MACHINE_IS_BIOS_ROOT)
-GAME( 1999, landhigh,  taitotz,  landhigh, landhigh, taitotz_state, landhigh, ROT0, "Taito", "Landing High Japan  (Ver 2.01 OK)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 1999, batlgear,  taitotz,  taitotz,  batlgr2,  taitotz_state, batlgear, ROT0, "Taito", "Battle Gear (Ver 2.40 A)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 1998, batlgear,  taitotz,  taitotz,  batlgr2,  taitotz_state, batlgear, ROT0, "Taito", "Battle Gear (Ver 2.40 A)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 1999, landhigh,  taitotz,  landhigh, landhigh, taitotz_state, landhigh, ROT0, "Taito", "Landing High Japan (Ver 2.01 OK)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 1999, landhigha, landhigh, landhigh, landhigh, taitotz_state, landhigha,ROT0, "Taito", "Landing High Japan (Ver 2.02 O)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 GAME( 1999, pwrshovl,  taitotz,  taitotz,  pwrshovl, taitotz_state, pwrshovl, ROT0, "Taito", "Power Shovel ni Norou!! - Power Shovel Simulator (v2.07J)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // 1999/8/5 19:13:35
 GAME( 1999, pwrshovla, pwrshovl, taitotz,  pwrshovl, taitotz_state, pwrshovl, ROT0, "Taito", "Power Shovel ni Norou!! - Power Shovel Simulator (v2.07J, alt)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // seem to be some differences in drive content, but identifies as the same revision, is it just user data changes??
 GAME( 2000, batlgr2,   taitotz,  taitotz,  batlgr2,  taitotz_state, batlgr2,  ROT0, "Taito", "Battle Gear 2 (v2.04J)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

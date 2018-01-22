@@ -118,7 +118,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, midwunit_state )
 	AM_RANGE(0x01600000, 0x0160001f) AM_READWRITE(midwunit_security_r, midwunit_security_w)
 	AM_RANGE(0x01680000, 0x0168001f) AM_READWRITE(midwunit_sound_r, midwunit_sound_w)
 	AM_RANGE(0x01800000, 0x0187ffff) AM_READWRITE(midwunit_io_r, midwunit_io_w)
-	AM_RANGE(0x01880000, 0x018fffff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x01880000, 0x018fffff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x01a00000, 0x01a000ff) AM_MIRROR(0x00080000) AM_READWRITE(midtunit_dma_r, midtunit_dma_w)
 	AM_RANGE(0x01b00000, 0x01b0001f) AM_READWRITE(midwunit_control_r, midwunit_control_w)
 	AM_RANGE(0x02000000, 0x06ffffff) AM_READ(midwunit_gfxrom_r)
@@ -620,7 +620,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( wunit )
+MACHINE_CONFIG_START(midwunit_state::wunit)
 
 	MCFG_CPU_ADD("maincpu", TMS34010, 50000000)
 	MCFG_CPU_PROGRAM_MAP(main_map)
@@ -650,13 +650,13 @@ static MACHINE_CONFIG_START( wunit )
 	MCFG_DEVICE_ADD("dcs", DCS_AUDIO_8K, 0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( wunit_picsim, wunit )
+MACHINE_CONFIG_DERIVED(midwunit_state::wunit_picsim, wunit)
 	MCFG_DEVICE_ADD("serial_security_sim", MIDWAY_SERIAL_PIC, 0)
 	MCFG_MIDWAY_SERIAL_PIC_UPPER(528); // this is actually a generic code all games check for in addition to their own game specific code!
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( wunit_picemu, wunit )
+MACHINE_CONFIG_DERIVED(midwunit_state::wunit_picemu, wunit)
 	MCFG_DEVICE_ADD("serial_security", MIDWAY_SERIAL_PIC_EMU, 0)
 
 	// todo, REMOVE once the emulated PIC above works!

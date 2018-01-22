@@ -184,6 +184,15 @@ public:
 	MC6845_ON_UPDATE_ADDR_CHANGED(crtc_addr);
 	required_device<cpu_device> m_maincpu;
 	required_device<palette_device> m_palette;
+	void hermit(machine_config &config);
+	void bankrob(machine_config &config);
+	void cjffruit(machine_config &config);
+	void steaser(machine_config &config);
+	void deucesw2(machine_config &config);
+	void ilpag(machine_config &config);
+	void maxidbl(machine_config &config);
+	void dualgame(machine_config &config);
+	void bankroba(machine_config &config);
 };
 
 /*************************************************************************************************************
@@ -1674,7 +1683,7 @@ static ADDRESS_MAP_START( ramdac_map, 0, 8, blitz68k_state )
 	AM_RANGE(0x000, 0x3ff) AM_DEVREADWRITE("ramdac",ramdac_device,ramdac_pal_r,ramdac_rgb666_w)
 ADDRESS_MAP_END
 
-static MACHINE_CONFIG_START( ilpag )
+MACHINE_CONFIG_START(blitz68k_state::ilpag)
 	MCFG_CPU_ADD("maincpu", M68000, 11059200 )  // ?
 	MCFG_CPU_PROGRAM_MAP(ilpag_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", blitz68k_state, irq4_line_hold) //3 & 6 used, mcu comms?
@@ -1733,7 +1742,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(blitz68k_state::steaser_mcu_sim)
 }
 
 
-static MACHINE_CONFIG_DERIVED( steaser, ilpag )
+MACHINE_CONFIG_DERIVED(blitz68k_state::steaser, ilpag)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(steaser_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", blitz68k_state, irq5_line_hold) //3, 4 & 6 used, mcu comms?
@@ -1741,7 +1750,7 @@ static MACHINE_CONFIG_DERIVED( steaser, ilpag )
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("coinsim", blitz68k_state, steaser_mcu_sim, attotime::from_hz(10000))
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( cjffruit )
+MACHINE_CONFIG_START(blitz68k_state::cjffruit)
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_22_1184MHz/2)
 	MCFG_CPU_PROGRAM_MAP(cjffruit_map)
 
@@ -1769,7 +1778,7 @@ static MACHINE_CONFIG_START( cjffruit )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( bankrob )
+MACHINE_CONFIG_START(blitz68k_state::bankrob)
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_11_0592MHz)
 	MCFG_CPU_PROGRAM_MAP(bankrob_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", blitz68k_state,  irq3_line_hold)   // protection prevents correct irq frequency by crtc
@@ -1801,7 +1810,7 @@ static MACHINE_CONFIG_START( bankrob )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( bankroba )
+MACHINE_CONFIG_START(blitz68k_state::bankroba)
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_11_0592MHz )
 	MCFG_CPU_PROGRAM_MAP(bankroba_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", blitz68k_state,  irq5_line_hold)   // protection prevents correct irq frequency by crtc
@@ -1831,7 +1840,7 @@ static MACHINE_CONFIG_START( bankroba )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( deucesw2 )
+MACHINE_CONFIG_START(blitz68k_state::deucesw2)
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_22_1184MHz / 2)
 	MCFG_CPU_PROGRAM_MAP(deucesw2_map)
 	// irq 2 reads from MCUs
@@ -1860,7 +1869,7 @@ static MACHINE_CONFIG_START( deucesw2 )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( dualgame )
+MACHINE_CONFIG_START(blitz68k_state::dualgame)
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_11_0592MHz )
 	MCFG_CPU_PROGRAM_MAP(dualgame_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", blitz68k_state,  irq2_line_hold) // lev 2 = MCUs, lev 3 = vblank
@@ -1891,7 +1900,7 @@ static MACHINE_CONFIG_START( dualgame )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( hermit )
+MACHINE_CONFIG_START(blitz68k_state::hermit)
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_22_1184MHz/2 )
 	MCFG_CPU_PROGRAM_MAP(hermit_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", blitz68k_state,  irq1_line_hold)   // protection prevents correct irq frequency by crtc
@@ -1920,7 +1929,7 @@ static MACHINE_CONFIG_START( hermit )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( maxidbl )
+MACHINE_CONFIG_START(blitz68k_state::maxidbl)
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_11_0592MHz)
 	MCFG_CPU_PROGRAM_MAP(maxidbl_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", blitz68k_state,  irq3_line_hold)   // protection prevents correct irq frequency by crtc

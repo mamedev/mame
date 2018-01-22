@@ -9,10 +9,9 @@
 #include "../bgfx_utils.h"
 #include "../packrect.h"
 
-#include <bx/fpumath.h>
+#include <bx/math.h>
 #include <bx/sort.h>
 #include <bx/uint32_t.h>
-#include <bx/crtimpl.h>
 #include <bx/handlealloc.h>
 
 struct DebugVertex
@@ -138,8 +137,8 @@ static void squircle(float* _out, float _angle)
 {
 	float sa = bx::fsin(_angle);
 	float ca = bx::fcos(_angle);
-	_out[0] = bx::fsqrt(bx::fabsolute(sa) ) * bx::fsign(sa);
-	_out[1] = bx::fsqrt(bx::fabsolute(ca) ) * bx::fsign(ca);
+	_out[0] = bx::fsqrt(bx::fabs(sa) ) * bx::fsign(sa);
+	_out[1] = bx::fsqrt(bx::fabs(ca) ) * bx::fsign(ca);
 }
 
 uint32_t genSphere(uint8_t _subdiv0, void* _pos0 = NULL, uint16_t _posStride0 = 0, void* _normals0 = NULL, uint16_t _normalStride0 = 0)
@@ -295,7 +294,6 @@ void getPoint(float* _result, Axis::Enum _axis, float _x, float _y)
 	}
 }
 
-
 #include "vs_debugdraw_lines.bin.h"
 #include "fs_debugdraw_lines.bin.h"
 #include "vs_debugdraw_lines_stipple.bin.h"
@@ -335,7 +333,7 @@ struct SpriteT
 
 	SpriteHandle create(uint16_t _width, uint16_t _height)
 	{
-		SpriteHandle handle = { bx::HandleAlloc::invalid };
+		SpriteHandle handle = { bx::kInvalidHandle };
 
 		if (m_handleAlloc.getNumHandles() < m_handleAlloc.getMaxHandles() )
 		{
@@ -380,13 +378,11 @@ struct DebugDraw
 		m_allocator = _allocator;
 		m_depthTestLess = _depthTestLess;
 
-#if BX_CONFIG_ALLOCATOR_CRT
 		if (NULL == _allocator)
 		{
-			static bx::CrtAllocator allocator;
+			static bx::DefaultAllocator allocator;
 			m_allocator = &allocator;
 		}
-#endif // BX_CONFIG_ALLOCATOR_CRT
 
 		DebugVertex::init();
 		DebugUvVertex::init();
@@ -394,40 +390,35 @@ struct DebugDraw
 
 		bgfx::RendererType::Enum type = bgfx::getRendererType();
 
-		m_program[Program::Lines] =
-			bgfx::createProgram(
-				  bgfx::createEmbeddedShader(s_embeddedShaders, type, "vs_debugdraw_lines")
-				, bgfx::createEmbeddedShader(s_embeddedShaders, type, "fs_debugdraw_lines")
-				, true
-				);
+		m_program[Program::Lines] = bgfx::createProgram(
+			  bgfx::createEmbeddedShader(s_embeddedShaders, type, "vs_debugdraw_lines")
+			, bgfx::createEmbeddedShader(s_embeddedShaders, type, "fs_debugdraw_lines")
+			, true
+			);
 
-		m_program[Program::LinesStipple] =
-			bgfx::createProgram(
-				  bgfx::createEmbeddedShader(s_embeddedShaders, type, "vs_debugdraw_lines_stipple")
-				, bgfx::createEmbeddedShader(s_embeddedShaders, type, "fs_debugdraw_lines_stipple")
-				, true
-				);
+		m_program[Program::LinesStipple] = bgfx::createProgram(
+			  bgfx::createEmbeddedShader(s_embeddedShaders, type, "vs_debugdraw_lines_stipple")
+			, bgfx::createEmbeddedShader(s_embeddedShaders, type, "fs_debugdraw_lines_stipple")
+			, true
+			);
 
-		m_program[Program::Fill] =
-			bgfx::createProgram(
-				  bgfx::createEmbeddedShader(s_embeddedShaders, type, "vs_debugdraw_fill")
-				, bgfx::createEmbeddedShader(s_embeddedShaders, type, "fs_debugdraw_fill")
-				, true
-				);
+		m_program[Program::Fill] = bgfx::createProgram(
+			  bgfx::createEmbeddedShader(s_embeddedShaders, type, "vs_debugdraw_fill")
+			, bgfx::createEmbeddedShader(s_embeddedShaders, type, "fs_debugdraw_fill")
+			, true
+			);
 
-		m_program[Program::FillLit] =
-			bgfx::createProgram(
-				  bgfx::createEmbeddedShader(s_embeddedShaders, type, "vs_debugdraw_fill_lit")
-				, bgfx::createEmbeddedShader(s_embeddedShaders, type, "fs_debugdraw_fill_lit")
-				, true
-				);
+		m_program[Program::FillLit] = bgfx::createProgram(
+			  bgfx::createEmbeddedShader(s_embeddedShaders, type, "vs_debugdraw_fill_lit")
+			, bgfx::createEmbeddedShader(s_embeddedShaders, type, "fs_debugdraw_fill_lit")
+			, true
+			);
 
-		m_program[Program::FillTexture] =
-			bgfx::createProgram(
-				  bgfx::createEmbeddedShader(s_embeddedShaders, type, "vs_debugdraw_fill_texture")
-				, bgfx::createEmbeddedShader(s_embeddedShaders, type, "fs_debugdraw_fill_texture")
-				, true
-				);
+		m_program[Program::FillTexture] = bgfx::createProgram(
+			  bgfx::createEmbeddedShader(s_embeddedShaders, type, "vs_debugdraw_fill_texture")
+			, bgfx::createEmbeddedShader(s_embeddedShaders, type, "fs_debugdraw_fill_texture")
+			, true
+			);
 
 		u_params   = bgfx::createUniform("u_params", bgfx::UniformType::Vec4, 4);
 		s_texColor = bgfx::createUniform("s_texColor", bgfx::UniformType::Int1);
@@ -458,24 +449,26 @@ struct DebugDraw
 				trilist[ii] = uint16_t(ii);
 			}
 
-			uint32_t numLineListIndices = bgfx::topologyConvert(bgfx::TopologyConvert::TriListToLineList
-							, NULL
-							, 0
-							, trilist
-							, numIndices
-							, false
-							);
+			uint32_t numLineListIndices = bgfx::topologyConvert(
+				  bgfx::TopologyConvert::TriListToLineList
+				, NULL
+				, 0
+				, trilist
+				, numIndices
+				, false
+				);
 			indices[id] = (uint16_t*)BX_ALLOC(m_allocator, (numIndices + numLineListIndices)*sizeof(uint16_t) );
 			uint16_t* indicesOut = indices[id];
 			bx::memCopy(indicesOut, trilist, numIndices*sizeof(uint16_t) );
 
-			bgfx::topologyConvert(bgfx::TopologyConvert::TriListToLineList
-							, &indicesOut[numIndices]
-							, numLineListIndices*sizeof(uint16_t)
-							, trilist
-							, numIndices
-							, false
-							);
+			bgfx::topologyConvert(
+				  bgfx::TopologyConvert::TriListToLineList
+				, &indicesOut[numIndices]
+				, numLineListIndices*sizeof(uint16_t)
+				, trilist
+				, numIndices
+				, false
+				);
 
 			m_mesh[id].m_startVertex = startVertex;
 			m_mesh[id].m_numVertices = numVertices;
@@ -495,7 +488,7 @@ struct DebugDraw
 			Mesh::Enum id = Mesh::Enum(Mesh::Cone0+mesh);
 
 			const uint32_t num = getCircleLod(uint8_t(mesh) );
-			const float step = bx::pi * 2.0f / num;
+			const float step = bx::kPi * 2.0f / num;
 
 			const uint32_t numVertices = num+1;
 			const uint32_t numIndices  = num*6;
@@ -556,7 +549,7 @@ struct DebugDraw
 			Mesh::Enum id = Mesh::Enum(Mesh::Cylinder0+mesh);
 
 			const uint32_t num = getCircleLod(uint8_t(mesh) );
-			const float step = bx::pi * 2.0f / num;
+			const float step = bx::kPi * 2.0f / num;
 
 			const uint32_t numVertices = num*2;
 			const uint32_t numIndices  = num*12;
@@ -626,7 +619,7 @@ struct DebugDraw
 			Mesh::Enum id = Mesh::Enum(Mesh::Capsule0+mesh);
 
 			const uint32_t num = getCircleLod(uint8_t(mesh) );
-			const float step = bx::pi * 2.0f / num;
+			const float step = bx::kPi * 2.0f / num;
 
 			const uint32_t numVertices = num*2;
 			const uint32_t numIndices  = num*6;
@@ -733,7 +726,6 @@ struct DebugDraw
 		m_vbh = bgfx::createVertexBuffer(vb, DebugShapeVertex::ms_decl);
 		m_ibh = bgfx::createIndexBuffer(ib);
 
-		m_mtx       = 0;
 		m_viewId    = 0;
 		m_pos       = 0;
 		m_indexPos  = 0;
@@ -743,15 +735,15 @@ struct DebugDraw
 
 	void shutdown()
 	{
-		bgfx::destroyIndexBuffer(m_ibh);
-		bgfx::destroyVertexBuffer(m_vbh);
+		bgfx::destroy(m_ibh);
+		bgfx::destroy(m_vbh);
 		for (uint32_t ii = 0; ii < Program::Count; ++ii)
 		{
-			bgfx::destroyProgram(m_program[ii]);
+			bgfx::destroy(m_program[ii]);
 		}
-		bgfx::destroyUniform(u_params);
-		bgfx::destroyUniform(s_texColor);
-		bgfx::destroyTexture(m_texture);
+		bgfx::destroy(u_params);
+		bgfx::destroy(s_texColor);
+		bgfx::destroy(m_texture);
 	}
 
 	SpriteHandle createSprite(uint16_t _width, uint16_t _height, const void* _data)
@@ -786,7 +778,6 @@ struct DebugDraw
 		BX_CHECK(State::Count == m_state);
 
 		m_viewId  = _viewId;
-		m_mtx     = 0;
 		m_state   = State::None;
 		m_stack   = 0;
 
@@ -804,6 +795,9 @@ struct DebugDraw
 		attrib.m_stipple   = false;
 		attrib.m_wireframe = false;
 		attrib.m_lod       = 0;
+
+		m_mtxStackCurrent = 0;
+		m_mtxStack[m_mtxStackCurrent].reset();
 	}
 
 	void end()
@@ -813,7 +807,7 @@ struct DebugDraw
 		flushQuad();
 		flush();
 
-		m_state  = State::Count;
+		m_state = State::Count;
 	}
 
 	void push()
@@ -836,20 +830,24 @@ struct DebugDraw
 		--m_stack;
 	}
 
-	void setTransform(const void* _mtx)
+	void setTransform(const void* _mtx, uint16_t _num = 1)
 	{
 		BX_CHECK(State::Count != m_state);
 		flush();
 
+		MatrixStack& stack = m_mtxStack[m_mtxStackCurrent];
+
 		if (NULL == _mtx)
 		{
-			m_mtx = 0;
+			stack.reset();
 			return;
 		}
 
 		bgfx::Transform transform;
-		m_mtx = bgfx::allocTransform(&transform, 1);
-		bx::memCopy(transform.data, _mtx, 64);
+		stack.mtx  = bgfx::allocTransform(&transform, _num);
+		stack.num  = _num;
+		stack.data = transform.data;
+		bx::memCopy(transform.data, _mtx, _num*64);
 	}
 
 	void setTranslate(float _x, float _y, float _z)
@@ -862,6 +860,54 @@ struct DebugDraw
 	void setTranslate(const float* _pos)
 	{
 		setTranslate(_pos[0], _pos[1], _pos[2]);
+	}
+
+	void pushTransform(const void* _mtx, uint16_t _num)
+	{
+		BX_CHECK(m_mtxStackCurrent < BX_COUNTOF(m_mtxStack), "Out of matrix stack!");
+		BX_CHECK(State::Count != m_state);
+		flush();
+
+		float* mtx = NULL;
+
+		const MatrixStack& stack = m_mtxStack[m_mtxStackCurrent];
+
+		if (NULL == stack.data)
+		{
+			mtx = (float*)_mtx;
+		}
+		else
+		{
+			mtx = (float*)alloca(_num*64);
+			for (uint16_t ii = 0; ii < _num; ++ii)
+			{
+				const float* mtxTransform = (const float*)_mtx;
+				bx::mtxMul(&mtx[ii*16], &mtxTransform[ii*16], stack.data);
+			}
+		}
+
+		m_mtxStackCurrent++;
+		setTransform(mtx, _num);
+	}
+
+	void popTransform()
+	{
+		BX_CHECK(State::Count != m_state);
+		flush();
+
+		m_mtxStackCurrent--;
+	}
+
+	void pushTranslate(float _x, float _y, float _z)
+	{
+		float mtx[16];
+		bx::mtxTranslate(mtx, _x, _y, _z);
+		pushTransform(mtx, 1);
+	}
+
+	void pushTranslate(const float* _pos)
+	{
+		pushTranslate(_pos[0], _pos[1], _pos[2]);
 	}
 
 	void setState(bool _depthTest, bool _depthWrite, bool _clockwise)
@@ -1057,29 +1103,39 @@ struct DebugDraw
 
 	void draw(const Aabb& _aabb)
 	{
-		moveTo(_aabb.m_min[0], _aabb.m_min[1], _aabb.m_min[2]);
-		lineTo(_aabb.m_max[0], _aabb.m_min[1], _aabb.m_min[2]);
-		lineTo(_aabb.m_max[0], _aabb.m_max[1], _aabb.m_min[2]);
-		lineTo(_aabb.m_min[0], _aabb.m_max[1], _aabb.m_min[2]);
-		close();
+		const Attrib& attrib = m_attrib[m_stack];
+		if (attrib.m_wireframe)
+		{
+			moveTo(_aabb.m_min[0], _aabb.m_min[1], _aabb.m_min[2]);
+			lineTo(_aabb.m_max[0], _aabb.m_min[1], _aabb.m_min[2]);
+			lineTo(_aabb.m_max[0], _aabb.m_max[1], _aabb.m_min[2]);
+			lineTo(_aabb.m_min[0], _aabb.m_max[1], _aabb.m_min[2]);
+			close();
 
-		moveTo(_aabb.m_min[0], _aabb.m_min[1], _aabb.m_max[2]);
-		lineTo(_aabb.m_max[0], _aabb.m_min[1], _aabb.m_max[2]);
-		lineTo(_aabb.m_max[0], _aabb.m_max[1], _aabb.m_max[2]);
-		lineTo(_aabb.m_min[0], _aabb.m_max[1], _aabb.m_max[2]);
-		close();
+			moveTo(_aabb.m_min[0], _aabb.m_min[1], _aabb.m_max[2]);
+			lineTo(_aabb.m_max[0], _aabb.m_min[1], _aabb.m_max[2]);
+			lineTo(_aabb.m_max[0], _aabb.m_max[1], _aabb.m_max[2]);
+			lineTo(_aabb.m_min[0], _aabb.m_max[1], _aabb.m_max[2]);
+			close();
 
-		moveTo(_aabb.m_min[0], _aabb.m_min[1], _aabb.m_min[2]);
-		lineTo(_aabb.m_min[0], _aabb.m_min[1], _aabb.m_max[2]);
+			moveTo(_aabb.m_min[0], _aabb.m_min[1], _aabb.m_min[2]);
+			lineTo(_aabb.m_min[0], _aabb.m_min[1], _aabb.m_max[2]);
 
-		moveTo(_aabb.m_max[0], _aabb.m_min[1], _aabb.m_min[2]);
-		lineTo(_aabb.m_max[0], _aabb.m_min[1], _aabb.m_max[2]);
+			moveTo(_aabb.m_max[0], _aabb.m_min[1], _aabb.m_min[2]);
+			lineTo(_aabb.m_max[0], _aabb.m_min[1], _aabb.m_max[2]);
 
-		moveTo(_aabb.m_min[0], _aabb.m_max[1], _aabb.m_min[2]);
-		lineTo(_aabb.m_min[0], _aabb.m_max[1], _aabb.m_max[2]);
+			moveTo(_aabb.m_min[0], _aabb.m_max[1], _aabb.m_min[2]);
+			lineTo(_aabb.m_min[0], _aabb.m_max[1], _aabb.m_max[2]);
 
-		moveTo(_aabb.m_max[0], _aabb.m_max[1], _aabb.m_min[2]);
-		lineTo(_aabb.m_max[0], _aabb.m_max[1], _aabb.m_max[2]);
+			moveTo(_aabb.m_max[0], _aabb.m_max[1], _aabb.m_min[2]);
+			lineTo(_aabb.m_max[0], _aabb.m_max[1], _aabb.m_max[2]);
+		}
+		else
+		{
+			Obb obb;
+			aabbToObb(obb, _aabb);
+			draw(Mesh::Cube, obb.m_mtx, 1, false);
+		}
 	}
 
 	void draw(const Cylinder& _cylinder, bool _capsule)
@@ -1097,7 +1153,7 @@ struct DebugDraw
 		const Attrib& attrib = m_attrib[m_stack];
 		if (attrib.m_wireframe)
 		{
-			setTransform(_obb.m_mtx);
+			pushTransform(_obb.m_mtx, 1);
 
 			moveTo(-1.0f, -1.0f, -1.0f);
 			lineTo( 1.0f, -1.0f, -1.0f);
@@ -1123,7 +1179,7 @@ struct DebugDraw
 			moveTo(-1.0f, -1.0f, -1.0f);
 			lineTo(-1.0f, -1.0f,  1.0f);
 
-			setTransform(NULL);
+			popTransform();
 		}
 		else
 		{
@@ -1136,16 +1192,16 @@ struct DebugDraw
 		const Attrib& attrib = m_attrib[m_stack];
 		float mtx[16];
 		bx::mtxSRT(mtx
-				, _sphere.m_radius
-				, _sphere.m_radius
-				, _sphere.m_radius
-				, 0.0f
-				, 0.0f
-				, 0.0f
-				, _sphere.m_center[0]
-				, _sphere.m_center[1]
-				, _sphere.m_center[2]
-				);
+			, _sphere.m_radius
+			, _sphere.m_radius
+			, _sphere.m_radius
+			, 0.0f
+			, 0.0f
+			, 0.0f
+			, _sphere.m_center[0]
+			, _sphere.m_center[1]
+			, _sphere.m_center[2]
+			);
 		uint8_t lod = attrib.m_lod > Mesh::SphereMaxLod
 					? uint8_t(Mesh::SphereMaxLod)
 					: attrib.m_lod
@@ -1202,7 +1258,7 @@ struct DebugDraw
 	{
 		const Attrib& attrib = m_attrib[m_stack];
 		const uint32_t num = getCircleLod(attrib.m_lod);
-		const float step = bx::pi * 2.0f / num;
+		const float step = bx::kPi * 2.0f / num;
 
 		_degrees = bx::fwrap(_degrees, 360.0f);
 
@@ -1219,23 +1275,23 @@ struct DebugDraw
 		for (uint32_t ii = 1; ii < n+1; ++ii)
 		{
 			getPoint(pos, _axis
-				 , bx::fsin(step * ii)*_radius
-				 , bx::fcos(step * ii)*_radius
-				 );
+				, bx::fsin(step * ii)*_radius
+				, bx::fcos(step * ii)*_radius
+				);
 			lineTo(pos[0] + _x, pos[1] + _y, pos[2] + _z);
 		}
 
 		moveTo(_x, _y, _z);
 		getPoint(pos, _axis
-			 , bx::fsin(step * 0)*_radius
-			 , bx::fcos(step * 0)*_radius
-			 );
+			, bx::fsin(step * 0)*_radius
+			, bx::fcos(step * 0)*_radius
+			);
 		lineTo(pos[0] + _x, pos[1] + _y, pos[2] + _z);
 
 		getPoint(pos, _axis
-			 , bx::fsin(step * n)*_radius
-			 , bx::fcos(step * n)*_radius
-			 );
+			, bx::fsin(step * n)*_radius
+			, bx::fcos(step * n)*_radius
+			);
 		moveTo(pos[0] + _x, pos[1] + _y, pos[2] + _z);
 		lineTo(_x, _y, _z);
 	}
@@ -1244,7 +1300,7 @@ struct DebugDraw
 	{
 		const Attrib& attrib = m_attrib[m_stack];
 		const uint32_t num = getCircleLod(attrib.m_lod);
-		const float step = bx::pi * 2.0f / num;
+		const float step = bx::kPi * 2.0f / num;
 		_weight = bx::fclamp(_weight, 0.0f, 2.0f);
 
 		float udir[3];
@@ -1291,7 +1347,7 @@ struct DebugDraw
 	{
 		const Attrib& attrib = m_attrib[m_stack];
 		const uint32_t num = getCircleLod(attrib.m_lod);
-		const float step = bx::pi * 2.0f / num;
+		const float step = bx::kPi * 2.0f / num;
 		_weight = bx::fclamp(_weight, 0.0f, 2.0f);
 
 		float xy0[2];
@@ -1546,9 +1602,9 @@ struct DebugDraw
 			mid[0] = _x + _len - _thickness;
 			mid[1] = _y;
 			mid[2] = _z;
-			to[0] = _x + _len;
-			to[1] = _y;
-			to[2] = _z;
+			to[0]  = _x + _len;
+			to[1]  = _y;
+			to[2]  = _z;
 			drawCylinder(from, mid, _thickness, false);
 			drawCone(mid, to, _thickness);
 
@@ -1556,9 +1612,9 @@ struct DebugDraw
 			mid[0] = _x;
 			mid[1] = _y + _len - _thickness;
 			mid[2] = _z;
-			to[0] = _x;
-			to[1] = _y + _len;
-			to[2] = _z;
+			to[0]  = _x;
+			to[1]  = _y + _len;
+			to[2]  = _z;
 			drawCylinder(from, mid, _thickness, false);
 			drawCone(mid, to, _thickness);
 
@@ -1566,9 +1622,9 @@ struct DebugDraw
 			mid[0] = _x;
 			mid[1] = _y;
 			mid[2] = _z + _len - _thickness;
-			to[0] = _x;
-			to[1] = _y;
-			to[2] = _z + _len;
+			to[0]  = _x;
+			to[1]  = _y;
+			to[2]  = _z + _len;
 			drawCylinder(from, mid, _thickness, false);
 			drawCone(mid, to, _thickness);
 		}
@@ -1658,7 +1714,7 @@ struct DebugDraw
 	void drawGrid(Axis::Enum _axis, const float* _center, uint32_t _size, float _step)
 	{
 		push();
-		setTranslate(_center);
+		pushTranslate(_center);
 
 		const uint32_t num = (_size/2)*2-1;
 		const float halfExtent = float(_size/2) * _step;
@@ -1768,8 +1824,10 @@ private:
 		};
 	};
 
-	void draw(Mesh::Enum _mesh, const float* _mtx, uint16_t _num, bool _wireframe) const
+	void draw(Mesh::Enum _mesh, const float* _mtx, uint16_t _num, bool _wireframe)
 	{
+		pushTransform(_mtx, _num);
+
 		const Mesh& mesh = m_mesh[_mesh];
 
 		const Attrib& attrib = m_attrib[m_stack];
@@ -1817,14 +1875,18 @@ private:
 
 		bgfx::setUniform(u_params, params, 4);
 
-		bgfx::setTransform(_mtx, _num);
-		bgfx::setVertexBuffer(m_vbh, mesh.m_startVertex, mesh.m_numVertices);
+		MatrixStack& stack = m_mtxStack[m_mtxStackCurrent];
+		bgfx::setTransform(stack.mtx, stack.num);
+
+		bgfx::setVertexBuffer(0, m_vbh, mesh.m_startVertex, mesh.m_numVertices);
 		bgfx::setState(0
-				| attrib.m_state
-				| (_wireframe ? BGFX_STATE_PT_LINES|BGFX_STATE_LINEAA|BGFX_STATE_BLEND_ALPHA
-				: (alpha < 0xff) ? BGFX_STATE_BLEND_ALPHA : 0)
-				);
+			| attrib.m_state
+			| (_wireframe ? BGFX_STATE_PT_LINES|BGFX_STATE_LINEAA|BGFX_STATE_BLEND_ALPHA
+			: (alpha < 0xff) ? BGFX_STATE_BLEND_ALPHA : 0)
+			);
 		bgfx::submit(m_viewId, m_program[_wireframe ? Program::Fill : Program::FillLit]);
+
+		popTransform();
 	}
 
 	void softFlush()
@@ -1851,16 +1913,16 @@ private:
 
 				const Attrib& attrib = m_attrib[m_stack];
 
-				bgfx::setVertexBuffer(&tvb);
+				bgfx::setVertexBuffer(0, &tvb);
 				bgfx::setIndexBuffer(&tib);
 				bgfx::setState(0
-						| BGFX_STATE_RGB_WRITE
-						| BGFX_STATE_PT_LINES
-						| attrib.m_state
-						| BGFX_STATE_LINEAA
-						| BGFX_STATE_BLEND_ALPHA
-						);
-				bgfx::setTransform(m_mtx);
+					| BGFX_STATE_RGB_WRITE
+					| BGFX_STATE_PT_LINES
+					| attrib.m_state
+					| BGFX_STATE_LINEAA
+					| BGFX_STATE_BLEND_ALPHA
+					);
+				bgfx::setTransform(m_mtxStack[m_mtxStackCurrent].mtx);
 				bgfx::ProgramHandle program = m_program[attrib.m_stipple ? 1 : 0];
 				bgfx::submit(m_viewId, program);
 			}
@@ -1900,12 +1962,12 @@ private:
 
 				const Attrib& attrib = m_attrib[m_stack];
 
-				bgfx::setVertexBuffer(&tvb);
+				bgfx::setVertexBuffer(0, &tvb);
 				bgfx::setIndexBuffer(&tib);
 				bgfx::setState(0
-						| (attrib.m_state & ~BGFX_STATE_CULL_MASK)
-						);
-				bgfx::setTransform(m_mtx);
+					| (attrib.m_state & ~BGFX_STATE_CULL_MASK)
+					);
+				bgfx::setTransform(m_mtxStack[m_mtxStackCurrent].mtx);
 				bgfx::setTexture(0, s_texColor, m_texture);
 				bgfx::submit(m_viewId, m_program[Program::FillTexture]);
 			}
@@ -1939,7 +2001,24 @@ private:
 	DebugUvVertex m_cacheQuad[cacheQuadSize];
 	uint16_t m_posQuad;
 
-	uint32_t m_mtx;
+	uint32_t m_mtxStackCurrent;
+
+	struct MatrixStack
+	{
+		void reset()
+		{
+			mtx  = 0;
+			num  = 1;
+			data = NULL;
+		}
+
+		uint32_t mtx;
+		uint16_t num;
+		float*   data;
+	};
+
+	MatrixStack m_mtxStack[32];
+
 	uint8_t  m_viewId;
 	uint8_t  m_stack;
 	bool     m_depthTestLess;
@@ -2088,9 +2167,14 @@ void ddDraw(const Aabb& _aabb)
 	s_dd.draw(_aabb);
 }
 
-void ddDraw(const Cylinder& _cylinder, bool _capsule)
+void ddDraw(const Cylinder& _cylinder)
 {
-	s_dd.draw(_cylinder, _capsule);
+	s_dd.draw(_cylinder, false);
+}
+
+void ddDraw(const Capsule& _capsule)
+{
+	s_dd.draw( *( (const Cylinder*)&_capsule), true);
 }
 
 void ddDraw(const Disk& _disk)
@@ -2106,6 +2190,11 @@ void ddDraw(const Obb& _obb)
 void ddDraw(const Sphere& _sphere)
 {
 	s_dd.draw(_sphere);
+}
+
+void ddDraw(const Cone& _cone)
+{
+	ddDrawCone(_cone.m_pos, _cone.m_end, _cone.m_radius);
 }
 
 void ddDrawFrustum(const void* _viewProj)
@@ -2148,19 +2237,9 @@ void ddDrawCone(const void* _from, const void* _to, float _radius)
 	s_dd.drawCone(_from, _to, _radius);
 }
 
-void ddDrawCylinder(const void* _from, const void* _to, float _radius, bool _capsule)
+void ddDrawCylinder(const void* _from, const void* _to, float _radius)
 {
-	if (_capsule)
-	{
-		s_dd.push();
-		s_dd.setLod(0);
-		s_dd.drawCylinder(_from, _to, _radius, true);
-		s_dd.pop();
-	}
-	else
-	{
-		s_dd.drawCylinder(_from, _to, _radius, false);
-	}
+	s_dd.drawCylinder(_from, _to, _radius, false);
 }
 
 void ddDrawCapsule(const void* _from, const void* _to, float _radius)

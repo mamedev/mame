@@ -51,6 +51,7 @@ public:
 		, m_maincpu(*this, "maincpu")
 	{ }
 
+	void zsbc3(machine_config &config);
 private:
 	required_device<cpu_device> m_maincpu;
 };
@@ -75,13 +76,8 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START( zsbc3 )
 INPUT_PORTS_END
 
-static DEVICE_INPUT_DEFAULTS_START( terminal )
-	DEVICE_INPUT_DEFAULTS( "RS232_RXBAUD", 0xff, RS232_BAUD_9615 )
-	DEVICE_INPUT_DEFAULTS( "RS232_TXBAUD", 0xff, RS232_BAUD_9615 )
-DEVICE_INPUT_DEFAULTS_END
 
-
-static MACHINE_CONFIG_START( zsbc3 )
+MACHINE_CONFIG_START(zsbc3_state::zsbc3)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80, XTAL_16MHz / 4)
 	MCFG_CPU_PROGRAM_MAP(zsbc3_mem)
@@ -106,7 +102,6 @@ static MACHINE_CONFIG_START( zsbc3 )
 	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, "terminal")
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("sio", z80sio_device, rxa_w))
 	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("sio", z80sio_device, ctsa_w))
-	MCFG_DEVICE_CARD_DEVICE_INPUT_DEFAULTS("terminal", terminal)
 
 	MCFG_DEVICE_ADD("pio", Z80PIO, XTAL_16MHz / 4)
 	//MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))

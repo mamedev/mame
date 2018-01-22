@@ -184,6 +184,7 @@ public:
 	image_verify_result lynx_verify_cart(char *header, int kind);
 	DECLARE_QUICKLOAD_LOAD_MEMBER( lynx );
 
+	void lynx(machine_config &config);
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };

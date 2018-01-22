@@ -8,7 +8,6 @@
 
 
 #include "emu.h"
-#include "includes/amiga.h"
 #include "formats/ami_dsk.h"
 #include "amigafdc.h"
 
@@ -21,6 +20,10 @@ FLOPPY_FORMATS_END
 amiga_fdc_device::amiga_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, AMIGA_FDC, tag, owner, clock),
 	m_write_index(*this),
+	m_read_dma(*this),
+	m_write_dma(*this),
+	m_write_dskblk(*this),
+	m_write_dsksyn(*this),
 	floppy(nullptr), t_gen(nullptr), dsklen(0), pre_dsklen(0), dsksync(0), dskbyt(0), adkcon(0), dmacon(0), dskpt(0), dma_value(0), dma_state(0)
 {
 }
@@ -28,6 +31,10 @@ amiga_fdc_device::amiga_fdc_device(const machine_config &mconfig, const char *ta
 void amiga_fdc_device::device_start()
 {
 	m_write_index.resolve_safe();
+	m_read_dma.resolve_safe(0);
+	m_write_dma.resolve_safe();
+	m_write_dskblk.resolve_safe();
+	m_write_dsksyn.resolve_safe();
 
 	static const char *names[] = { "0", "1", "2", "3" };
 	for(int i=0; i != 4; i++) {
@@ -62,20 +69,18 @@ void amiga_fdc_device::device_reset()
 
 void amiga_fdc_device::dma_done()
 {
-	amiga_state *state = machine().driver_data<amiga_state>();
 	if(dskbyt & 0x2000) {
 		dskbyt &= ~0x2000;
 		cur_live.pll.stop_writing(floppy, cur_live.tm);
 	}
 
 	dma_state = DMA_IDLE;
-	state->custom_chip_w(REG_INTREQ, INTENA_SETCLR | INTENA_DSKBLK);
+	m_write_dskblk(1);
 }
 
 void amiga_fdc_device::dma_write(uint16_t value)
 {
-	amiga_state *state = machine().driver_data<amiga_state>();
-	state->chip_ram_w(dskpt, value);
+	m_write_dma(dskpt, value, 0xffff);
 
 	dskpt += 2;
 	dsklen--;
@@ -88,8 +93,7 @@ void amiga_fdc_device::dma_write(uint16_t value)
 
 uint16_t amiga_fdc_device::dma_read()
 {
-	amiga_state *state = machine().driver_data<amiga_state>();
-	uint16_t res = state->chip_ram_r(dskpt);
+	uint16_t res = m_read_dma(dskpt, 0xffff);
 
 	dskpt += 2;
 	dsklen--;
@@ -175,8 +179,6 @@ void amiga_fdc_device::live_abort()
 
 void amiga_fdc_device::live_run(const attotime &limit)
 {
-	amiga_state *state = machine().driver_data<amiga_state>();
-
 	if(cur_live.state == IDLE || cur_live.next_state != -1)
 		return;
 
@@ -258,7 +260,7 @@ void amiga_fdc_device::live_run(const attotime &limit)
 							cur_live.bit_counter = 0;
 					}
 					dskbyt |= 0x1000;
-					state->custom_chip_w(REG_INTREQ, INTENA_SETCLR | INTENA_DSKSYN);
+					m_write_dsksyn(1);
 				} else
 					dskbyt &= ~0x1000;
 

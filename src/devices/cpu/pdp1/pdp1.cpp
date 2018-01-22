@@ -342,6 +342,7 @@
 #include "emu.h"
 #include "debugger.h"
 #include "pdp1.h"
+#include "pdp1dasm.h"
 
 #define LOG 0
 #define LOG_EXTRA 0
@@ -418,10 +419,9 @@ void pdp1_device::device_config_complete()
 }
 
 
-offs_t pdp1_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+util::disasm_interface *pdp1_device::create_disassembler()
 {
-	extern CPU_DISASSEMBLE( pdp1 );
-	return CPU_DISASSEMBLE_NAME(pdp1)(this, stream, pc, oprom, opram, options);
+	return new pdp1_disassembler;
 }
 
 

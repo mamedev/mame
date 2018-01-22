@@ -95,7 +95,9 @@ class towns_state : public driver_device
 			m_pit(*this, "pit"),
 			m_dma_1(*this, "dma_1"),
 			m_dma_2(*this, "dma_2"),
-			m_palette(*this, "palette"),
+			m_palette(*this, "palette256"),
+			m_palette16_0(*this, "palette16_0"),
+			m_palette16_1(*this, "palette16_1"),
 			m_ram(*this, RAM_TAG),
 			m_fdc(*this, "fdc"),
 			m_flop0(*this, "fdc:0"),
@@ -103,6 +105,7 @@ class towns_state : public driver_device
 			m_icmemcard(*this, "icmemcard"),
 			m_i8251(*this, "i8251"),
 			m_rs232(*this, "rs232c"),
+			m_screen(*this, "screen"),
 			m_nvram(*this, "nvram"),
 			m_nvram16(*this, "nvram16"),
 			m_ctrltype(*this, "ctrltype"),
@@ -131,6 +134,8 @@ class towns_state : public driver_device
 	required_device<upd71071_device> m_dma_1;
 	required_device<upd71071_device> m_dma_2;
 	required_device<palette_device> m_palette;
+	required_device<palette_device> m_palette16_0;
+	required_device<palette_device> m_palette16_1;
 	required_device<ram_device> m_ram;
 	required_device<mb8877_device> m_fdc;
 	required_device<floppy_connector> m_flop0;
@@ -138,6 +143,7 @@ class towns_state : public driver_device
 	required_device<fmt_icmem_device> m_icmemcard;
 	required_device<i8251_device> m_i8251;
 	required_device<rs232_port_device> m_rs232;
+	required_device<screen_device> m_screen;
 	ram_device* m_messram;
 	cdrom_image_device* m_cdrom;
 	cdda_device* m_cdda;
@@ -270,6 +276,7 @@ class towns_state : public driver_device
 	DECLARE_WRITE8_MEMBER(towns_rtc_select_w);
 	DECLARE_READ8_MEMBER(towns_volume_r);
 	DECLARE_WRITE8_MEMBER(towns_volume_w);
+	DECLARE_READ8_MEMBER(unksnd_r);
 	DECLARE_READ8_MEMBER(towns_41ff_r);
 
 	DECLARE_READ8_MEMBER(towns_gfx_high_r);
@@ -331,6 +338,11 @@ class towns_state : public driver_device
 	required_memory_region m_user;
 	optional_memory_region m_serial;
 
+	void towns_base(machine_config &config);
+	void towns(machine_config &config);
+	void townsftv(machine_config &config);
+	void townshr(machine_config &config);
+	void townssj(machine_config &config);
 private:
 	static const device_timer_id TIMER_RTC = 0;
 	static const device_timer_id TIMER_FREERUN = 1;
@@ -368,11 +380,11 @@ public:
 	void towns_crtc_refresh_mode();
 	void towns_update_kanji_offset();
 	void towns_update_palette();
-	void render_sprite_4(uint32_t poffset, uint32_t coffset, uint16_t x, uint16_t y, uint16_t xflip, uint16_t yflip, const rectangle* rect);
-	void render_sprite_16(uint32_t poffset, uint16_t x, uint16_t y, uint16_t xflip, uint16_t yflip, const rectangle* rect);
+	void render_sprite_4(uint32_t poffset, uint32_t coffset, uint16_t x, uint16_t y, bool xflip, bool yflip, bool xhalfsize, bool yhalfsize, bool rotation, const rectangle* rect);
+	void render_sprite_16(uint32_t poffset, uint16_t x, uint16_t y, bool xflip, bool yflip, bool xhalfsize, bool yhalfsize, bool rotation, const rectangle* rect);
 	void draw_sprites(const rectangle* rect);
 	void towns_crtc_draw_scan_layer_hicolour(bitmap_rgb32 &bitmap,const rectangle* rect,int layer,int line,int scanline);
-	void towns_crtc_draw_scan_layer_256(bitmap_rgb32 &bitmap,const rectangle* rect,int layer,int line,int scanline);
+	void towns_crtc_draw_scan_layer_256(bitmap_rgb32 &bitmap,const rectangle* rect,int line,int scanline);
 	void towns_crtc_draw_scan_layer_16(bitmap_rgb32 &bitmap,const rectangle* rect,int layer,int line,int scanline);
 	void towns_crtc_draw_layer(bitmap_rgb32 &bitmap,const rectangle* rect,int layer);
 	void render_text_char(uint8_t x, uint8_t y, uint8_t ascii, uint16_t jis, uint8_t attr);
@@ -397,6 +409,7 @@ class towns16_state : public towns_state
 	towns16_state(const machine_config &mconfig, device_type type, const char *tag)
 		: towns_state(mconfig, type, tag)
 	{ }
+	void townsux(machine_config &config);
 };
 
 class marty_state : public towns_state
@@ -407,6 +420,7 @@ class marty_state : public towns_state
 	{ }
 
 	virtual void driver_start() override;
+	void marty(machine_config &config);
 };
 
 #endif // MAME_INCLUDES_FMTOWNS_H

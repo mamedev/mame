@@ -600,7 +600,7 @@ SLOT_INTERFACE_END
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( c1570_device::device_add_mconfig )
+MACHINE_CONFIG_START(c1570_device::device_add_mconfig)
 	MCFG_CPU_ADD(M6502_TAG, M6502, XTAL_16MHz/16)
 	MCFG_CPU_PROGRAM_MAP(c1571_mem)
 	MCFG_QUANTUM_PERFECT_CPU(M6502_TAG)
@@ -636,7 +636,7 @@ MACHINE_CONFIG_MEMBER( c1570_device::device_add_mconfig )
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_MEMBER( c1571_device::device_add_mconfig )
+MACHINE_CONFIG_START(c1571_device::device_add_mconfig)
 	MCFG_CPU_ADD(M6502_TAG, M6502, XTAL_16MHz/16)
 	MCFG_CPU_PROGRAM_MAP(c1571_mem)
 	MCFG_QUANTUM_PERFECT_CPU(M6502_TAG)
@@ -672,7 +672,7 @@ MACHINE_CONFIG_MEMBER( c1571_device::device_add_mconfig )
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_MEMBER( c1571cr_device::device_add_mconfig )
+MACHINE_CONFIG_START(c1571cr_device::device_add_mconfig)
 	MCFG_CPU_ADD(M6502_TAG, M6502, XTAL_16MHz/16)
 	MCFG_CPU_PROGRAM_MAP(c1571_mem)
 	MCFG_QUANTUM_PERFECT_CPU(M6502_TAG)
@@ -702,7 +702,7 @@ MACHINE_CONFIG_MEMBER( c1571cr_device::device_add_mconfig )
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_MEMBER( mini_chief_device::device_add_mconfig )
+MACHINE_CONFIG_START(mini_chief_device::device_add_mconfig)
 	MCFG_CPU_ADD(M6502_TAG, M6502, XTAL_16MHz/16)
 	MCFG_CPU_PROGRAM_MAP(mini_chief_mem)
 	MCFG_QUANTUM_PERFECT_CPU(M6502_TAG)
@@ -737,7 +737,7 @@ MACHINE_CONFIG_MEMBER( mini_chief_device::device_add_mconfig )
 	MCFG_FLOPPY_DRIVE_ADD_FIXED(C64H156_TAG":0", c1571_floppies, "525qd", c1571_device::floppy_formats)
 
 	MCFG_DEVICE_ADD(ISA_BUS_TAG, ISA8, 0)
-	MCFG_ISA8_CPU(M6502_TAG)
+	MCFG_ISA8_CPU("^" M6502_TAG)
 	MCFG_ISA8_SLOT_ADD(ISA_BUS_TAG, "isa1", mini_chief_isa8_cards, "wd1002a_wx1", false)
 MACHINE_CONFIG_END
 

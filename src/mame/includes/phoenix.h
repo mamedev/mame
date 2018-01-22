@@ -41,6 +41,10 @@ public:
 	DECLARE_READ8_MEMBER(survival_protection_r);
 	DECLARE_READ_LINE_MEMBER(survival_sid_callback);
 
+	void condor(machine_config &config);
+	void phoenix(machine_config &config);
+	void survival(machine_config &config);
+	void pleiads(machine_config &config);
 protected:
 	required_device<cpu_device>             m_maincpu;
 	optional_device<pleiads_sound_device>   m_pleiads_custom;

@@ -86,6 +86,7 @@ public:
 	DECLARE_WRITE8_MEMBER(eeprom_w);
 	DECLARE_READ8_MEMBER(eeprom_r);
 	DECLARE_DRIVER_INIT(pve500);
+	void pve500(machine_config &config);
 private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -325,12 +326,12 @@ WRITE8_MEMBER(pve500_state::io_sel_w)
 	io_SEL = data;
 	for (int i=0; i<4; i++){
 		if (BIT(io_SEL, i)){
-			LD_data[i] = 0x7F & BITSWAP8(io_LD ^ 0xFF, 7, 0, 1, 2, 3, 4, 5, 6);
+			LD_data[i] = 0x7F & bitswap<8>(io_LD ^ 0xFF, 7, 0, 1, 2, 3, 4, 5, 6);
 		}
 	}
 }
 
-static MACHINE_CONFIG_START( pve500 )
+MACHINE_CONFIG_START(pve500_state::pve500)
 	/* Main CPU */
 	MCFG_CPU_ADD("maincpu", TMPZ84C015, XTAL_12MHz / 2) /* TMPZ84C015BF-6 */
 	MCFG_CPU_PROGRAM_MAP(maincpu_prg)

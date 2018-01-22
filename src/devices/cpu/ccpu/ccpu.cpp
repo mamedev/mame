@@ -12,6 +12,7 @@
 
 #include "emu.h"
 #include "ccpu.h"
+#include "ccpudasm.h"
 #include "debugger.h"
 
 
@@ -24,8 +25,8 @@ DEFINE_DEVICE_TYPE(CCPU, ccpu_cpu_device, "ccpu", "Cinematronics CPU")
 
 #define READOP(a)         (m_direct->read_byte(a))
 
-#define RDMEM(a)          (m_data->read_word((a) * 2) & 0xfff)
-#define WRMEM(a,v)        (m_data->write_word((a) * 2, (v)))
+#define RDMEM(a)          (m_data->read_word((a) & 0xfff))
+#define WRMEM(a,v)        (m_data->write_word((a), (v)))
 
 #define READPORT(a)       (m_io->read_byte(a))
 #define WRITEPORT(a,v)    (m_io->write_byte((a), (v)))
@@ -106,7 +107,7 @@ void ccpu_cpu_device::device_start()
 	assert(!m_vector_callback.isnull());
 
 	m_program = &space(AS_PROGRAM);
-	m_direct = &m_program->direct();
+	m_direct = m_program->direct<0>();
 	m_data = &space(AS_DATA);
 	m_io = &space(AS_IO);
 
@@ -695,8 +696,7 @@ void ccpu_cpu_device::execute_run()
 }
 
 
-offs_t ccpu_cpu_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+util::disasm_interface *ccpu_cpu_device::create_disassembler()
 {
-	extern CPU_DISASSEMBLE( ccpu );
-	return CPU_DISASSEMBLE_NAME(ccpu)(this, stream, pc, oprom, opram, options);
+	return new ccpu_disassembler;
 }

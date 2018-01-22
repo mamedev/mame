@@ -290,17 +290,17 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, gauntlet_state )
 	AM_RANGE(0x803100, 0x803101) AM_MIRROR(0x2fce8e) AM_DEVWRITE("watchdog", watchdog_timer_device, reset16_w)
 	AM_RANGE(0x803120, 0x803121) AM_MIRROR(0x2fce8e) AM_DEVWRITE("soundcomm", atari_sound_comm_device, sound_reset_w)
 	AM_RANGE(0x803140, 0x803141) AM_MIRROR(0x2fce8e) AM_WRITE(video_int_ack_w)
-	AM_RANGE(0x803150, 0x803151) AM_MIRROR(0x2fce8e) AM_DEVWRITE("eeprom", eeprom_parallel_28xx_device, unlock_write)
+	AM_RANGE(0x803150, 0x803151) AM_MIRROR(0x2fce8e) AM_DEVWRITE("eeprom", eeprom_parallel_28xx_device, unlock_write16)
 	AM_RANGE(0x803170, 0x803171) AM_MIRROR(0x2fce8e) AM_DEVWRITE8("soundcomm", atari_sound_comm_device, main_command_w, 0x00ff)
 
 	/* VBUS */
-	AM_RANGE(0x900000, 0x901fff) AM_MIRROR(0x2c8000) AM_RAM_DEVWRITE("playfield", tilemap_device, write) AM_SHARE("playfield")
+	AM_RANGE(0x900000, 0x901fff) AM_MIRROR(0x2c8000) AM_RAM_DEVWRITE("playfield", tilemap_device, write16) AM_SHARE("playfield")
 	AM_RANGE(0x902000, 0x903fff) AM_MIRROR(0x2c8000) AM_RAM AM_SHARE("mob")
 	AM_RANGE(0x904000, 0x904fff) AM_MIRROR(0x2c8000) AM_RAM
 	AM_RANGE(0x905f6e, 0x905f6f) AM_MIRROR(0x2c8000) AM_RAM_WRITE(gauntlet_yscroll_w) AM_SHARE("yscroll")
-	AM_RANGE(0x905000, 0x905f7f) AM_MIRROR(0x2c8000) AM_RAM_DEVWRITE("alpha", tilemap_device, write) AM_SHARE("alpha")
+	AM_RANGE(0x905000, 0x905f7f) AM_MIRROR(0x2c8000) AM_RAM_DEVWRITE("alpha", tilemap_device, write16) AM_SHARE("alpha")
 	AM_RANGE(0x905f80, 0x905fff) AM_MIRROR(0x2c8000) AM_RAM AM_SHARE("mob:slip")
-	AM_RANGE(0x910000, 0x9107ff) AM_MIRROR(0x2cf800) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x910000, 0x9107ff) AM_MIRROR(0x2cf800) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x930000, 0x930001) AM_MIRROR(0x2cfffe) AM_WRITE(gauntlet_xscroll_w) AM_SHARE("xscroll")
 ADDRESS_MAP_END
 
@@ -486,7 +486,7 @@ GFXDECODE_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( gauntlet_base )
+MACHINE_CONFIG_START(gauntlet_state::gauntlet_base)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68010, ATARI_CLOCK_14MHz/2)
@@ -551,22 +551,22 @@ static MACHINE_CONFIG_START( gauntlet_base )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( gauntlet, gauntlet_base )
+MACHINE_CONFIG_DERIVED(gauntlet_state::gauntlet, gauntlet_base)
 	MCFG_SLAPSTIC_ADD("slapstic", 104)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( gaunt2p, gauntlet_base )
+MACHINE_CONFIG_DERIVED(gauntlet_state::gaunt2p, gauntlet_base)
 	MCFG_SLAPSTIC_ADD("slapstic", 107)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( gauntlet2, gauntlet_base )
+MACHINE_CONFIG_DERIVED(gauntlet_state::gauntlet2, gauntlet_base)
 	MCFG_SLAPSTIC_ADD("slapstic", 106)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( vindctr2, gauntlet_base )
+MACHINE_CONFIG_DERIVED(gauntlet_state::vindctr2, gauntlet_base)
 	MCFG_SLAPSTIC_ADD("slapstic", 118)
 MACHINE_CONFIG_END
 

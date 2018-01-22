@@ -67,6 +67,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(ctc_z0_w);
 	DECLARE_WRITE_LINE_MEMBER(ctc_z2_w);
 	DECLARE_WRITE_LINE_MEMBER(cassette_w);
+	void amu880(machine_config &config);
 };
 
 #endif

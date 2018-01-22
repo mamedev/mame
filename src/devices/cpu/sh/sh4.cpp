@@ -30,12 +30,8 @@
 #include "sh4comn.h"
 #include "sh3comn.h"
 #include "sh4tmu.h"
-
+#include "sh_dasm.h"
 #include "debugger.h"
-
-
-CPU_DISASSEMBLE( sh4 );
-CPU_DISASSEMBLE( sh4be );
 
 
 DEFINE_DEVICE_TYPE(SH3LE, sh3_device,   "sh3le", "SH-3 (little)")
@@ -144,27 +140,9 @@ sh4be_device::sh4be_device(const machine_config &mconfig, const char *tag, devic
 }
 
 
-offs_t sh34_base_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+util::disasm_interface *sh34_base_device::create_disassembler()
 {
-	extern CPU_DISASSEMBLE( sh4 );
-
-	return CPU_DISASSEMBLE_NAME(sh4)(this, stream, pc, oprom, opram, options);
-}
-
-
-offs_t sh3be_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
-{
-	extern CPU_DISASSEMBLE( sh4be );
-
-	return CPU_DISASSEMBLE_NAME(sh4be)(this, stream, pc, oprom, opram, options);
-}
-
-
-offs_t sh4be_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
-{
-	extern CPU_DISASSEMBLE( sh4be );
-
-	return CPU_DISASSEMBLE_NAME(sh4be)(this, stream, pc, oprom, opram, options);
+	return new sh_disassembler(true);
 }
 
 
@@ -1633,6 +1611,7 @@ void sh34_base_device::device_reset()
 	m_sh2_state->sleep_mode = 0;
 
 	m_sh4_mmu_enabled = 0;
+	m_cache_dirty = true;
 }
 
 /*-------------------------------------------------
@@ -2076,7 +2055,7 @@ void sh34_base_device::device_start()
 	m_internal = &space(AS_PROGRAM);
 	m_program = &space(AS_PROGRAM);
 	m_io = &space(AS_IO);
-	m_direct = &m_program->direct();
+	m_direct = m_program->direct<0>();
 	sh4_default_exception_priorities();
 	m_irln = 15;
 	m_test_irq = 0;
@@ -2597,8 +2576,6 @@ static void cfunc_CHECKIRQ(void *param) { ((sh34_base_device *)param)->func_CHEC
 
 void sh34_base_device::generate_update_cycles(drcuml_block *block, compiler_state *compiler, uml::parameter param, bool allow_exception)
 {
-	/* TODO: this is likely wrong? - I've not seen it called when compiler->checkints is true */
-
 	/* check full interrupts if pending */
 	if (compiler->checkints)
 	{
@@ -2606,7 +2583,7 @@ void sh34_base_device::generate_update_cycles(drcuml_block *block, compiler_stat
 
 		/* param is pc + 2 (the opcode after the current one)
 		   as we're calling from opcode handlers here that will point to the current opcode instead
-		   but I believe the exception functoin requires it to point to the next one so update the
+		   but I believe the exception function requires it to point to the next one so update the
 		   local copy of the PC variable here for that? */
 		UML_MOV(block, mem(&m_sh2_state->pc), param);
 
@@ -3028,7 +3005,7 @@ bool sh34_base_device::generate_group_0_STCDBR(drcuml_block *block, compiler_sta
 }
 
 void sh34_base_device::func_RTE() { RTE(); }
-static void cfunc_RTE(void *param) { ((sh34_base_device *)param)->func_RTE(); };
+static void cfunc_RTE(void *param) { ((sh34_base_device *)param)->func_RTE();  };
 
 bool sh34_base_device::generate_group_0_RTE(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
 {
@@ -3036,6 +3013,9 @@ bool sh34_base_device::generate_group_0_RTE(drcuml_block *block, compiler_state 
 	save_fast_iregs(block);
 	UML_CALLC(block, cfunc_RTE, this);
 	load_fast_iregs(block);
+
+	compiler->checkints = true;
+
 	UML_MOV(block, mem(&m_sh2_state->pc), mem(&m_sh2_state->m_delay));
 	generate_update_cycles(block, compiler, mem(&m_sh2_state->ea), true);  // <subtract cycles>
 	UML_HASHJMP(block, 0, mem(&m_sh2_state->pc), *m_nocode); // and jump to the "resume PC"
@@ -3065,6 +3045,9 @@ bool sh34_base_device::generate_group_4_LDCSR(drcuml_block *block, compiler_stat
 	UML_MOV(block, mem(&m_sh2_state->arg0), desc->opptr.w[0]);
 	UML_CALLC(block, cfunc_LDCSR, this);
 	load_fast_iregs(block);
+
+	compiler->checkints = true;
+
 	return true;
 }
 
@@ -3077,6 +3060,11 @@ bool sh34_base_device::generate_group_4_LDCMSR(drcuml_block *block, compiler_sta
 	UML_MOV(block, mem(&m_sh2_state->arg0), desc->opptr.w[0]);
 	UML_CALLC(block, cfunc_LDCMSR, this);
 	load_fast_iregs(block);
+
+	compiler->checkints = true;
+	if (!in_delay_slot)
+		generate_update_cycles(block, compiler, desc->pc + 2, true);
+
 	return true;
 }
 

@@ -58,6 +58,9 @@ public:
 	DECLARE_WRITE8_MEMBER(stfight_68705_port_b_w);
 	DECLARE_WRITE8_MEMBER(stfight_68705_port_c_w);
 
+	void stfight_base(machine_config &config);
+	void stfight(machine_config &config);
+	void cshooter(machine_config &config);
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;

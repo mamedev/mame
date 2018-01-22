@@ -39,10 +39,10 @@ ef9340_1_device::ef9340_1_device(const machine_config &mconfig, const char *tag,
 void ef9340_1_device::device_start()
 {
 	// Let the screen create our temporary bitmap with the screen's dimensions
-	m_screen->register_screen_bitmap(m_tmp_bitmap);
+	screen().register_screen_bitmap(m_tmp_bitmap);
 
 	m_line_timer = timer_alloc(TIMER_LINE);
-	m_line_timer->adjust( m_screen->time_until_pos(0, 0), 0,  m_screen->scan_period() );
+	m_line_timer->adjust( screen().time_until_pos(0, 0), 0,  screen().scan_period() );
 
 	// register our state
 	save_item(NAME(m_ef9341.TA));
@@ -81,7 +81,7 @@ void ef9340_1_device::device_timer(emu_timer &timer, device_timer_id id, int par
 	switch ( id )
 	{
 		case TIMER_LINE:
-			ef9340_scanline(m_screen->vpos());
+			ef9340_scanline(screen().vpos());
 			break;
 	}
 }
@@ -213,7 +213,7 @@ void ef9340_1_device::ef9341_write( uint8_t command, uint8_t b, uint8_t data )
 
 						if ( b >= 0xa0 )
 						{
-							m_ef934x_ext_char_ram[ ( ( a & 0x80 ) << 3 ) | external_chargen_address( b, slice ) ] = BITSWAP8(m_ef9341.TA,0,1,2,3,4,5,6,7);
+							m_ef934x_ext_char_ram[ ( ( a & 0x80 ) << 3 ) | external_chargen_address( b, slice ) ] = bitswap<8>(m_ef9341.TA,0,1,2,3,4,5,6,7);
 						}
 
 						// Increment slice number

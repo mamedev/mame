@@ -7,8 +7,9 @@
 */
 
 #include "emu.h"
+#include "rsp_dasm.h"
 
-/*static const char *const reg[32] =
+/*const char *const rsp_disassembler::reg[32] =
 {
     "0",    "r1",   "r2",   "r3",   "r4",   "r5",   "r6",   "r7",
     "r8",   "r9",   "r10",  "r11",  "r12",  "r13",  "r14",  "r15",
@@ -17,7 +18,7 @@
 };
 */
 
-static const char *const reg[32] =
+const char *const rsp_disassembler::reg[32] =
 {
 	"$0",   "$at",  "$v0",  "$v1",  "$a0",  "$a1",  "$a2",  "$a3",
 	"$t0",  "$t1",  "$t2",  "$t3",  "$t4",  "$t5",  "$t6",  "$t7",
@@ -25,7 +26,7 @@ static const char *const reg[32] =
 	"$t8",  "$t9",  "$k0",  "$k1",  "$gp",  "$sp",  "$fp",  "$ra"
 };
 
-static const char *const vreg[32] =
+const char *const rsp_disassembler::vreg[32] =
 {
 	" v0", " v1", " v2", " v3", " v4", " v5", " v6", " v7",
 	" v8", " v9", "v10", "v11", "v12", "v13", "v14", "v15",
@@ -33,7 +34,7 @@ static const char *const vreg[32] =
 	"v24", "v25", "v26", "v27", "v28", "v29", "v30", "v31"
 };
 
-static const char *const cop0_regs[32] =
+const char *const rsp_disassembler::cop0_regs[32] =
 {
 	"SP_MEM_ADDR",  "SP_DRAM_ADDR",    "SP_RD_LEN",    "SP_WR_LEN",
 	"SP_STATUS",    "SP_DMA_FULL",     "SP_DMA_BUSY",  "SP_SEMAPHORE",
@@ -45,36 +46,34 @@ static const char *const cop0_regs[32] =
 	"???",          "???",             "???",          "???"
 };
 
-static const char *const element[16] =
+const char *const rsp_disassembler::element[16] =
 {
 	"",           "[???]",      "[00224466]", "[11335577]", "[00004444]", "[11115555]", "[22226666]", "[33337777]",
 	"[00000000]", "[11111111]", "[22222222]", "[33333333]", "[44444444]", "[55555555]", "[66666666]", "[77777777]"
 };
 
-static const char *const element2[16] =
+const char *const rsp_disassembler::element2[16] =
 {
 	"01234567", "????????", "00224466", "11335577", "00004444", "11115555", "22226666", "33337777",
 	"00000000", "11111111", "22222222", "33333333", "44444444", "55555555", "66666666", "77777777"
 };
 
-static inline char *signed_imm16(uint32_t op)
+inline std::string rsp_disassembler::signed_imm16(uint32_t op)
 {
-	static char temp[10];
 	int16_t value = op & 0xffff;
 
 	if (value < 0)
 	{
-		sprintf(temp, "-$%04x", -value);
+		return util::string_format("-$%04x", -value);
 	}
 	else
 	{
-		sprintf(temp, "$%04x", value);
+		return util::string_format("$%04x", value);
 	}
-	return temp;
 }
 
 
-static void disasm_cop0(std::ostream &stream, uint32_t op)
+void rsp_disassembler::disasm_cop0(std::ostream &stream, uint32_t op)
 {
 	int rt = (op >> 16) & 31;
 	int rd = (op >> 11) & 31;
@@ -88,7 +87,7 @@ static void disasm_cop0(std::ostream &stream, uint32_t op)
 	}
 }
 
-static void disasm_cop2(std::ostream &stream, uint32_t op)
+void rsp_disassembler::disasm_cop2(std::ostream &stream, uint32_t op)
 {
 	int rt = (op >> 16) & 31;
 	int rd = (op >> 11) & 31;
@@ -175,7 +174,7 @@ static void disasm_cop2(std::ostream &stream, uint32_t op)
 	}
 }
 
-static void disasm_lwc2(std::ostream &stream, uint32_t op)
+void rsp_disassembler::disasm_lwc2(std::ostream &stream, uint32_t op)
 {
 	int dest = (op >> 16) & 0x1f;
 	int base = (op >> 21) & 0x1f;
@@ -202,7 +201,7 @@ static void disasm_lwc2(std::ostream &stream, uint32_t op)
 	}
 }
 
-static void disasm_swc2(std::ostream &stream, uint32_t op)
+void rsp_disassembler::disasm_swc2(std::ostream &stream, uint32_t op)
 {
 	int dest = (op >> 16) & 0x1f;
 	int base = (op >> 21) & 0x1f;
@@ -229,7 +228,12 @@ static void disasm_swc2(std::ostream &stream, uint32_t op)
 	}
 }
 
-offs_t rsp_dasm_one(std::ostream &stream, offs_t pc, uint32_t op)
+u32 rsp_disassembler::opcode_alignment() const
+{
+	return 1;
+}
+
+offs_t rsp_disassembler::dasm_one(std::ostream &stream, offs_t pc, u32 op)
 {
 	int rs = (op >> 21) & 31;
 	int rt = (op >> 16) & 31;
@@ -260,7 +264,7 @@ offs_t rsp_dasm_one(std::ostream &stream, offs_t pc, uint32_t op)
 				case 0x04:  util::stream_format(stream, "sllv   %s, %s, %s", reg[rd], reg[rt], reg[rs]); break;
 				case 0x06:  util::stream_format(stream, "srlv   %s, %s, %s", reg[rd], reg[rt], reg[rs]); break;
 				case 0x07:  util::stream_format(stream, "srav   %s, %s, %s", reg[rd], reg[rt], reg[rs]); break;
-				case 0x08:  util::stream_format(stream, "jr     %s", reg[rs]); if (rs == 31) flags = DASMFLAG_STEP_OUT; break;
+				case 0x08:  util::stream_format(stream, "jr     %s", reg[rs]); if (rs == 31) flags = STEP_OUT; break;
 				case 0x09:
 				{
 					if (rd == 31)
@@ -271,10 +275,10 @@ offs_t rsp_dasm_one(std::ostream &stream, offs_t pc, uint32_t op)
 					{
 						util::stream_format(stream, "jalr   %s, %s", reg[rs], reg[rd]);
 					}
-					flags = DASMFLAG_STEP_OVER | DASMFLAG_STEP_OVER_EXTRA(1);
+					flags = STEP_OVER | step_over_extra(1);
 					break;
 				}
-				case 0x0d:  util::stream_format(stream, "break"); flags = DASMFLAG_STEP_OVER; break;
+				case 0x0d:  util::stream_format(stream, "break"); flags = STEP_OVER; break;
 				case 0x20:  util::stream_format(stream, "add    %s, %s, %s", reg[rd], reg[rs], reg[rt]); break;
 				case 0x21:  util::stream_format(stream, "addu   %s, %s, %s", reg[rd], reg[rs], reg[rt]); break;
 				case 0x22:  util::stream_format(stream, "sub    %s, %s, %s", reg[rd], reg[rs], reg[rt]); break;
@@ -338,14 +342,11 @@ offs_t rsp_dasm_one(std::ostream &stream, offs_t pc, uint32_t op)
 		default:    util::stream_format(stream, "???"); break;
 	}
 
-	return 4 | flags | DASMFLAG_SUPPORTED;
+	return 4 | flags | SUPPORTED;
 }
 
-/*****************************************************************************/
-
-CPU_DISASSEMBLE( rsp )
+offs_t rsp_disassembler::disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params)
 {
-	uint32_t op = *(uint32_t *)opram;
-	op = big_endianize_int32(op);
-	return rsp_dasm_one(stream, pc, op);
+	u32 op = opcodes.r32(pc);
+	return dasm_one(stream, pc, op);
 }

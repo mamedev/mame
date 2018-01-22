@@ -672,7 +672,7 @@ static const char *const qbert_knocker_names[] =
 	nullptr   /* end of array */
 };
 
-MACHINE_CONFIG_START( qbert_knocker )
+MACHINE_CONFIG_START(gottlieb_state::qbert_knocker)
 	MCFG_SPEAKER_ADD("knocker", 0.0, 0.0, 1.0)
 
 	MCFG_SOUND_ADD("knocker_sam", SAMPLES, 0)
@@ -1764,7 +1764,7 @@ GFXDECODE_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( gottlieb_core )
+MACHINE_CONFIG_START(gottlieb_state::gottlieb_core)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8088, CPU_CLOCK/3)
@@ -1789,24 +1789,24 @@ static MACHINE_CONFIG_START( gottlieb_core )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( gottlieb1, gottlieb_core )
+MACHINE_CONFIG_DERIVED(gottlieb_state::gottlieb1, gottlieb_core)
 	MCFG_SOUND_ADD("r1sound", GOTTLIEB_SOUND_REV1, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( gottlieb2, gottlieb_core )
+MACHINE_CONFIG_DERIVED(gottlieb_state::gottlieb2, gottlieb_core)
 	MCFG_SOUND_ADD("r2sound", GOTTLIEB_SOUND_REV2, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( g2laser, gottlieb_core )
+MACHINE_CONFIG_DERIVED(gottlieb_state::g2laser, gottlieb_core)
 	MCFG_SOUND_ADD("r2sound", GOTTLIEB_SOUND_REV2, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 
 	MCFG_LASERDISC_PR8210_ADD("laserdisc")
-	MCFG_LASERDISC_AUDIO(laserdisc_device::audio_delegate(&gottlieb_state::laserdisc_audio_process, downcast<gottlieb_state*>(owner)))
+	MCFG_LASERDISC_AUDIO(laserdisc_device::audio_delegate(&gottlieb_state::laserdisc_audio_process, this))
 	MCFG_LASERDISC_OVERLAY_DRIVER(GOTTLIEB_VIDEO_HCOUNT, GOTTLIEB_VIDEO_VCOUNT, gottlieb_state, screen_update_gottlieb)
 	MCFG_LASERDISC_OVERLAY_CLIP(0, GOTTLIEB_VIDEO_HBLANK-1, 0, GOTTLIEB_VIDEO_VBLANK-8)
 	MCFG_LASERDISC_OVERLAY_PALETTE("palette")
@@ -1826,13 +1826,13 @@ MACHINE_CONFIG_END
  *************************************/
 
 
-static MACHINE_CONFIG_DERIVED( gottlieb1_votrax, gottlieb_core )
+MACHINE_CONFIG_DERIVED(gottlieb_state::gottlieb1_votrax, gottlieb_core)
 	MCFG_SOUND_ADD("r1sound", GOTTLIEB_SOUND_REV1_VOTRAX, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( reactor, gottlieb1_votrax )
+MACHINE_CONFIG_DERIVED(gottlieb_state::reactor, gottlieb1_votrax)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1842,29 +1842,29 @@ static MACHINE_CONFIG_DERIVED( reactor, gottlieb1_votrax )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( qbert, gottlieb1_votrax )
+MACHINE_CONFIG_DERIVED(gottlieb_state::qbert, gottlieb1_votrax)
 
 	/* sound hardware */
 	MCFG_FRAGMENT_ADD(qbert_knocker)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( tylz, gottlieb1_votrax )
+MACHINE_CONFIG_DERIVED(gottlieb_state::tylz, gottlieb1_votrax)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( screwloo, gottlieb2 )
+MACHINE_CONFIG_DERIVED(gottlieb_state::screwloo, gottlieb2)
 
 	MCFG_VIDEO_START_OVERRIDE(gottlieb_state,screwloo)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( cobram3, gottlieb_core )
+MACHINE_CONFIG_DERIVED(gottlieb_state::cobram3, gottlieb_core)
 	MCFG_SOUND_ADD("r2sound", GOTTLIEB_SOUND_REV2, 0)
 	MCFG_GOTTLIEB_ENABLE_COBRAM3_MODS()
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 
 	MCFG_LASERDISC_PR8210_ADD("laserdisc")
-	MCFG_LASERDISC_AUDIO(laserdisc_device::audio_delegate(&gottlieb_state::laserdisc_audio_process, downcast<gottlieb_state*>(owner)))
+	MCFG_LASERDISC_AUDIO(laserdisc_device::audio_delegate(&gottlieb_state::laserdisc_audio_process, this))
 	MCFG_LASERDISC_OVERLAY_DRIVER(GOTTLIEB_VIDEO_HCOUNT, GOTTLIEB_VIDEO_VCOUNT, gottlieb_state, screen_update_gottlieb)
 	MCFG_LASERDISC_OVERLAY_CLIP(0, GOTTLIEB_VIDEO_HBLANK-1, 0, GOTTLIEB_VIDEO_VBLANK-8)
 	MCFG_LASERDISC_OVERLAY_PALETTE("palette")
@@ -2161,13 +2161,13 @@ ROM_END
 
 ROM_START( krull )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "ram2.bin",     0x1000, 0x1000, CRC(302feadf) SHA1(9d70de35e4f0490dc4e601070993ad146f250dea) )
-	ROM_LOAD( "ram4.bin",     0x2000, 0x1000, CRC(79355a60) SHA1(57ad5c904b9ac4bf7c7d828bf755bbcbba6a4fd7) )
-	ROM_LOAD( "rom4.bin",     0x6000, 0x2000, CRC(2b696394) SHA1(b18270f4ad97743f6ff8c4cbc93e523c77a8e794) )
-	ROM_LOAD( "rom3.bin",     0x8000, 0x2000, CRC(14b0ee42) SHA1(276c4008a013806b3989c529f41cbc358ec49fd6) )
-	ROM_LOAD( "rom2.bin",     0xa000, 0x2000, CRC(b5fad94a) SHA1(1bae895fbdd658cfb56c53cc2139282cc1e778de) )
-	ROM_LOAD( "rom1.bin",     0xc000, 0x2000, CRC(1ad956a3) SHA1(f5b74b196fe1bd9ab48336e0051cbf29c650cfc1) )
-	ROM_LOAD( "rom0.bin",     0xe000, 0x2000, CRC(a466afae) SHA1(d691cbb46e8c3b71f9b1688d7fcef36df82aa854) )
+	ROM_LOAD( "gv-105_ram_2.c7",      0x1000, 0x1000, CRC(302feadf) SHA1(9d70de35e4f0490dc4e601070993ad146f250dea) )
+	ROM_LOAD( "gv-105_ram_4.c9-10",   0x2000, 0x1000, CRC(79355a60) SHA1(57ad5c904b9ac4bf7c7d828bf755bbcbba6a4fd7) )
+	ROM_LOAD( "gv-105_rom_4.c16",     0x6000, 0x2000, CRC(2b696394) SHA1(b18270f4ad97743f6ff8c4cbc93e523c77a8e794) )
+	ROM_LOAD( "gv-105_rom_3.c14-15",  0x8000, 0x2000, CRC(14b0ee42) SHA1(276c4008a013806b3989c529f41cbc358ec49fd6) )
+	ROM_LOAD( "gv-105_rom_2.c13-14",  0xa000, 0x2000, CRC(b5fad94a) SHA1(1bae895fbdd658cfb56c53cc2139282cc1e778de) )
+	ROM_LOAD( "gv-105_rom_1.c12-13",  0xc000, 0x2000, CRC(1ad956a3) SHA1(f5b74b196fe1bd9ab48336e0051cbf29c650cfc1) )
+	ROM_LOAD( "gv-105_rom_0.c11-12",  0xe000, 0x2000, CRC(a466afae) SHA1(d691cbb46e8c3b71f9b1688d7fcef36df82aa854) )
 
 	ROM_REGION( 0x10000, "r1sound:audiocpu", 0 )
 	ROM_LOAD( "snd1.bin",     0x6000, 0x1000, CRC(dd2b30b4) SHA1(f01cb64932493bf69d4fc75a7fa809ff6f6e4263) )
@@ -2177,10 +2177,10 @@ ROM_START( krull )
 	/* no ROMs; RAM is used instead */
 
 	ROM_REGION( 0x8000, "sprites", 0 )
-	ROM_LOAD( "fg3.bin",      0x0000, 0x2000, CRC(82d77a45) SHA1(753476609c4bf4f0f0cd28d61fd8aef6967bda57) )
-	ROM_LOAD( "fg2.bin",      0x2000, 0x2000, CRC(25a24317) SHA1(33d2c23a388b09c4a09b9893648c30fbd5482cc3) )
-	ROM_LOAD( "fg1.bin",      0x4000, 0x2000, CRC(7e3ad7b0) SHA1(0de86e632e5a9e6c1ec82550b15dc25a17ab7066) )
-	ROM_LOAD( "fg0.bin",      0x6000, 0x2000, CRC(7402dc19) SHA1(d6d1b8aca8e9ee3bdc57f4474d22b405963909ec) )
+	ROM_LOAD( "gv-105_fg_3.k7-8",    0x0000, 0x2000, CRC(82d77a45) SHA1(753476609c4bf4f0f0cd28d61fd8aef6967bda57) )
+	ROM_LOAD( "gv-105_fg_2.k6",      0x2000, 0x2000, CRC(25a24317) SHA1(33d2c23a388b09c4a09b9893648c30fbd5482cc3) )
+	ROM_LOAD( "gv-105_fg_1.k5",      0x4000, 0x2000, CRC(7e3ad7b0) SHA1(0de86e632e5a9e6c1ec82550b15dc25a17ab7066) )
+	ROM_LOAD( "gv-105_fg_0.k4",      0x6000, 0x2000, CRC(7402dc19) SHA1(d6d1b8aca8e9ee3bdc57f4474d22b405963909ec) )
 ROM_END
 
 

@@ -80,6 +80,12 @@ public:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void update_pal();
+	void botanic(machine_config &config);
+	void squaitsa(machine_config &config);
+	void sbagman(machine_config &config);
+	void bagman(machine_config &config);
+	void pickin(machine_config &config);
+	void sbagmani(machine_config &config);
 };
 
 /*----------- timings -----------*/

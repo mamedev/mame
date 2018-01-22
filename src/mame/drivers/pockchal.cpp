@@ -48,6 +48,7 @@ public:
 	required_device<generic_slot_device> m_cart;
 	uint32_t  m_rom_size;
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(pockchalv1_cart);
+	void pockchalv1(machine_config &config);
 };
 
 
@@ -91,7 +92,7 @@ void pockchalv1_state::machine_reset()
 }
 
 
-static MACHINE_CONFIG_START( pockchalv1 )
+MACHINE_CONFIG_START(pockchalv1_state::pockchalv1)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", TMP90845,8000000)         /* ? MHz */

@@ -88,10 +88,10 @@ DECLARE_DEVICE_TYPE(SNES_CONTROL_PORT, snes_control_port_device)
 	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false)
 
 #define MCFG_SNESCTRL_ONSCREEN_CB(_class, _method) \
-	snes_control_port_device::set_onscreen_callback(*device, snesctrl_onscreen_delegate(&_class::_method, #_class "::" #_method, downcast<_class *>(owner)));
+	snes_control_port_device::set_onscreen_callback(*device, snesctrl_onscreen_delegate(&_class::_method, #_class "::" #_method, this));
 
 #define MCFG_SNESCTRL_GUNLATCH_CB(_class, _method) \
-	snes_control_port_device::set_gunlatch_callback(*device, snesctrl_gunlatch_delegate(&_class::_method, #_class "::" #_method, downcast<_class *>(owner)));
+	snes_control_port_device::set_gunlatch_callback(*device, snesctrl_gunlatch_delegate(&_class::_method, #_class "::" #_method, this));
 
 
 SLOT_INTERFACE_EXTERN( snes_control_port_devices );

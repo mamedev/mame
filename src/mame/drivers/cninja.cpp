@@ -85,7 +85,7 @@ WRITE16_MEMBER(cninja_state::cninja_pf34_control_w)
 READ16_MEMBER( cninja_state::cninja_protection_region_0_104_r )
 {
 	int real_address = 0 + (offset *2);
-	int deco146_addr = BITSWAP32(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14,    10,9,8, 7,6,5,4, 3,2,1,0) & 0x7fff;
+	int deco146_addr = bitswap<32>(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14,    10,9,8, 7,6,5,4, 3,2,1,0) & 0x7fff;
 	uint8_t cs = 0;
 	uint16_t data = m_deco104->read_data( deco146_addr, mem_mask, cs );
 	return data;
@@ -94,7 +94,7 @@ READ16_MEMBER( cninja_state::cninja_protection_region_0_104_r )
 WRITE16_MEMBER( cninja_state::cninja_protection_region_0_104_w )
 {
 	int real_address = 0 + (offset *2);
-	int deco146_addr = BITSWAP32(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14,    10,9,8, 7,6,5,4, 3,2,1,0) & 0x7fff;
+	int deco146_addr = bitswap<32>(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14,    10,9,8, 7,6,5,4, 3,2,1,0) & 0x7fff;
 	uint8_t cs = 0;
 	m_deco104->write_data( space, deco146_addr, data, mem_mask, cs );
 }
@@ -153,7 +153,7 @@ static ADDRESS_MAP_START( cninjabl_map, AS_PROGRAM, 16, cninja_state )
 
 	AM_RANGE(0x17ff22, 0x17ff23) AM_READ_PORT("DSW")
 	AM_RANGE(0x17ff28, 0x17ff29) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x17ff2a, 0x17ff2b) AM_WRITE(stoneage_sound_w)
+	AM_RANGE(0x17ff2a, 0x17ff2b) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x00ff)
 	AM_RANGE(0x17ff2c, 0x17ff2d) AM_READ_PORT("INPUTS")
 
 	AM_RANGE(0x180000, 0x187fff) AM_RAM // more ram on bootleg?
@@ -167,7 +167,7 @@ ADDRESS_MAP_END
 READ16_MEMBER( cninja_state::sshangha_protection_region_8_146_r )
 {
 	int real_address = 0x1a0000 + (offset *2);
-	int deco146_addr = BITSWAP32(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14,    10,9,8, 7,6,5,4, 3,2,1,0) & 0x7fff;
+	int deco146_addr = bitswap<32>(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14,    10,9,8, 7,6,5,4, 3,2,1,0) & 0x7fff;
 	uint8_t cs = 0;
 	uint16_t data = m_deco146->read_data( deco146_addr, mem_mask, cs );
 	return data;
@@ -176,7 +176,7 @@ READ16_MEMBER( cninja_state::sshangha_protection_region_8_146_r )
 WRITE16_MEMBER( cninja_state::sshangha_protection_region_8_146_w )
 {
 	int real_address = 0x1a0000 + (offset *2);
-	int deco146_addr = BITSWAP32(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14,    10,9,8, 7,6,5,4, 3,2,1,0) & 0x7fff;
+	int deco146_addr = bitswap<32>(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14,    10,9,8, 7,6,5,4, 3,2,1,0) & 0x7fff;
 	uint8_t cs = 0;
 	m_deco146->write_data( space, deco146_addr, data, mem_mask, cs );
 }
@@ -186,7 +186,7 @@ READ16_MEMBER( cninja_state::sshangha_protection_region_6_146_r )
 //  uint16_t realdat = deco16_60_prot_r(space,offset&0x3ff,mem_mask);
 
 	int real_address = 0x198000 + (offset *2);
-	int deco146_addr = BITSWAP32(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14,    10,9,8, 7,6,5,4, 3,2,1,0) & 0x7fff;
+	int deco146_addr = bitswap<32>(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14,    10,9,8, 7,6,5,4, 3,2,1,0) & 0x7fff;
 	uint8_t cs = 0;
 	uint16_t data = m_deco146->read_data( deco146_addr, mem_mask, cs );
 
@@ -203,7 +203,7 @@ WRITE16_MEMBER( cninja_state::sshangha_protection_region_6_146_w )
 
 
 	int real_address = 0x198000 + (offset *2);
-	int deco146_addr = BITSWAP32(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14,    10,9,8, 7,6,5,4, 3,2,1,0) & 0x7fff;
+	int deco146_addr = bitswap<32>(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14,    10,9,8, 7,6,5,4, 3,2,1,0) & 0x7fff;
 	uint8_t cs = 0;
 	m_deco146->write_data( space, deco146_addr, data, mem_mask, cs );
 }
@@ -273,7 +273,7 @@ ADDRESS_MAP_END
 READ16_MEMBER( cninja_state::mutantf_protection_region_0_146_r )
 {
 	int real_address = 0 + (offset *2);
-	int deco146_addr = BITSWAP32(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14,    10,9,8, 7,6,5,4, 3,2,1,0) & 0x7fff;
+	int deco146_addr = bitswap<32>(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14,    10,9,8, 7,6,5,4, 3,2,1,0) & 0x7fff;
 	uint8_t cs = 0;
 	uint16_t data = m_deco146->read_data( deco146_addr, mem_mask, cs );
 	return data;
@@ -282,7 +282,7 @@ READ16_MEMBER( cninja_state::mutantf_protection_region_0_146_r )
 WRITE16_MEMBER( cninja_state::mutantf_protection_region_0_146_w )
 {
 	int real_address = 0 + (offset *2);
-	int deco146_addr = BITSWAP32(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14,    10,9,8, 7,6,5,4, 3,2,1,0) & 0x7fff;
+	int deco146_addr = bitswap<32>(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14,    10,9,8, 7,6,5,4, 3,2,1,0) & 0x7fff;
 	uint8_t cs = 0;
 	m_deco146->write_data( space, deco146_addr, data, mem_mask, cs );
 }
@@ -324,7 +324,19 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, cninja_state )
 	AM_RANGE(0x110000, 0x110001) AM_DEVREADWRITE("ym2", ym2151_device, read, write)
 	AM_RANGE(0x120000, 0x120001) AM_DEVREADWRITE("oki1", okim6295_device, read, write)
 	AM_RANGE(0x130000, 0x130001) AM_DEVREADWRITE("oki2", okim6295_device, read, write)
-	AM_RANGE(0x140000, 0x140001) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
+	AM_RANGE(0x140000, 0x140000) AM_DEVREAD("ioprot104", deco104_device, soundlatch_r)
+	AM_RANGE(0x1f0000, 0x1f1fff) AM_RAMBANK("bank8")
+	AM_RANGE(0x1fec00, 0x1fec01) AM_DEVWRITE("audiocpu", h6280_device, timer_w)
+	AM_RANGE(0x1ff400, 0x1ff403) AM_DEVWRITE("audiocpu", h6280_device, irq_status_w)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( sound_map_146, AS_PROGRAM, 8, cninja_state )
+	AM_RANGE(0x000000, 0x00ffff) AM_ROM
+	AM_RANGE(0x100000, 0x100001) AM_DEVREADWRITE("ym1", ym2203_device, read, write)
+	AM_RANGE(0x110000, 0x110001) AM_DEVREADWRITE("ym2", ym2151_device, read, write)
+	AM_RANGE(0x120000, 0x120001) AM_DEVREADWRITE("oki1", okim6295_device, read, write)
+	AM_RANGE(0x130000, 0x130001) AM_DEVREADWRITE("oki2", okim6295_device, read, write)
+	AM_RANGE(0x140000, 0x140000) AM_DEVREAD("ioprot", deco146_device, soundlatch_r)
 	AM_RANGE(0x1f0000, 0x1f1fff) AM_RAMBANK("bank8")
 	AM_RANGE(0x1fec00, 0x1fec01) AM_DEVWRITE("audiocpu", h6280_device, timer_w)
 	AM_RANGE(0x1ff400, 0x1ff403) AM_DEVWRITE("audiocpu", h6280_device, irq_status_w)
@@ -332,17 +344,25 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_map_mutantf, AS_PROGRAM, 8, cninja_state )
 	AM_RANGE(0x000000, 0x00ffff) AM_ROM
-	AM_RANGE(0x100000, 0x100001) AM_READNOP AM_WRITENOP
+	AM_RANGE(0x100000, 0x100001) AM_NOP
 	AM_RANGE(0x110000, 0x110001) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
 	AM_RANGE(0x120000, 0x120001) AM_DEVREADWRITE("oki1", okim6295_device, read, write)
 	AM_RANGE(0x130000, 0x130001) AM_DEVREADWRITE("oki2", okim6295_device, read, write)
-	AM_RANGE(0x140000, 0x140001) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
+	AM_RANGE(0x140000, 0x140001) AM_DEVREAD("ioprot", deco146_device, soundlatch_r)
 	AM_RANGE(0x1f0000, 0x1f1fff) AM_RAMBANK("bank8")
 	AM_RANGE(0x1fec00, 0x1fec01) AM_DEVWRITE("audiocpu", h6280_device, timer_w)
 	AM_RANGE(0x1ff400, 0x1ff403) AM_DEVWRITE("audiocpu", h6280_device, irq_status_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( stoneage_s_map, AS_PROGRAM, 8, cninja_state )
+	AM_RANGE(0x0000, 0x7fff) AM_ROM
+	AM_RANGE(0x8000, 0x87ff) AM_RAM
+	AM_RANGE(0x8800, 0x8801) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
+	AM_RANGE(0x9800, 0x9800) AM_DEVREADWRITE("oki1", okim6295_device, read, write)
+	AM_RANGE(0xa000, 0xa000) AM_DEVREAD("ioprot104", deco104_device, soundlatch_r)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( cninjabl_sound_map, AS_PROGRAM, 8, cninja_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0x8800, 0x8801) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
@@ -355,7 +375,7 @@ static ADDRESS_MAP_START( cninjabl2_s_map, AS_PROGRAM, 8, cninja_state )
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0x9000, 0x9000) AM_WRITE(cninjabl2_oki_bank_w)
 	AM_RANGE(0x9800, 0x9800) AM_DEVREADWRITE("oki1", okim6295_device, read, write)
-	AM_RANGE(0xa000, 0xa000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
+	AM_RANGE(0xa000, 0xa000) AM_DEVREAD("ioprot104", deco104_device, soundlatch_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( cninjabl2_oki_map, 0, 8, cninja_state )
@@ -790,7 +810,7 @@ DECOSPR_PRIORITY_CB_MEMBER(cninja_state::pri_callback)
 }
 
 
-static MACHINE_CONFIG_START( cninja )
+MACHINE_CONFIG_START(cninja_state::cninja)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz / 2)
@@ -855,12 +875,11 @@ static MACHINE_CONFIG_START( cninja )
 	MCFG_DECO146_IN_PORTA_CB(IOPORT("INPUTS"))
 	MCFG_DECO146_IN_PORTB_CB(IOPORT("SYSTEM"))
 	MCFG_DECO146_IN_PORTC_CB(IOPORT("DSW"))
+	MCFG_DECO146_SOUNDLATCH_IRQ_CB(INPUTLINE("audiocpu", 0))
 	MCFG_DECO146_SET_USE_MAGIC_ADDRESS_XOR
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_SOUND_ADD("ym1", YM2203, XTAL_32_22MHz / 8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
@@ -879,7 +898,7 @@ static MACHINE_CONFIG_START( cninja )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( stoneage )
+MACHINE_CONFIG_START(cninja_state::stoneage)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz / 2)
@@ -946,15 +965,14 @@ static MACHINE_CONFIG_START( stoneage )
 	MCFG_DECO146_IN_PORTA_CB(IOPORT("INPUTS"))
 	MCFG_DECO146_IN_PORTB_CB(IOPORT("SYSTEM"))
 	MCFG_DECO146_IN_PORTC_CB(IOPORT("DSW"))
+	MCFG_DECO146_SOUNDLATCH_IRQ_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 	MCFG_DECO146_SET_USE_MAGIC_ADDRESS_XOR
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-
 	MCFG_YM2151_ADD("ymsnd", XTAL_32_22MHz / 9)
-	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
+	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", INPUT_LINE_IRQ0))
 	MCFG_SOUND_ROUTE(0, "mono", 0.45)
 	MCFG_SOUND_ROUTE(1, "mono", 0.45)
 
@@ -962,12 +980,15 @@ static MACHINE_CONFIG_START( stoneage )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( cninjabl2, stoneage )
+MACHINE_CONFIG_DERIVED(cninja_state::cninjabl2, stoneage)
 	MCFG_CPU_MODIFY("audiocpu")
 	MCFG_CPU_PROGRAM_MAP(cninjabl2_s_map)
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(cninja_state, screen_update_cninjabl2)
+
+	MCFG_DEVICE_MODIFY("ioprot104")
+	MCFG_DECO146_SOUNDLATCH_IRQ_CB(INPUTLINE("audiocpu", INPUT_LINE_IRQ0))
 
 	MCFG_DEVICE_REMOVE("ymsnd")
 
@@ -976,14 +997,14 @@ static MACHINE_CONFIG_DERIVED( cninjabl2, stoneage )
 	MCFG_DEVICE_ADDRESS_MAP(0, cninjabl2_oki_map)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( cninjabl )
+MACHINE_CONFIG_START(cninja_state::cninjabl)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz / 2)
 	MCFG_CPU_PROGRAM_MAP(cninjabl_map)
 
 	MCFG_CPU_ADD("audiocpu", Z80, 3579545)
-	MCFG_CPU_PROGRAM_MAP(stoneage_s_map)
+	MCFG_CPU_PROGRAM_MAP(cninjabl_sound_map)
 
 	MCFG_DECO_IRQ_ADD("irq", "screen")
 	MCFG_DECO_IRQ_RASTER1_IRQ_CB(INPUTLINE("maincpu", 3))
@@ -1036,9 +1057,10 @@ static MACHINE_CONFIG_START( cninjabl )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 
 	MCFG_YM2151_ADD("ymsnd", XTAL_32_22MHz / 9)
-	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
+	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", INPUT_LINE_IRQ0))
 	MCFG_SOUND_ROUTE(0, "mono", 0.45)
 	MCFG_SOUND_ROUTE(1, "mono", 0.45)
 
@@ -1047,14 +1069,14 @@ static MACHINE_CONFIG_START( cninjabl )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( edrandy )
+MACHINE_CONFIG_START(cninja_state::edrandy)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz / 2)
 	MCFG_CPU_PROGRAM_MAP(edrandy_map)
 
 	MCFG_CPU_ADD("audiocpu", H6280, XTAL_32_22MHz / 8)
-	MCFG_CPU_PROGRAM_MAP(sound_map)
+	MCFG_CPU_PROGRAM_MAP(sound_map_146)
 
 	MCFG_DECO_IRQ_ADD("irq", "screen")
 	MCFG_DECO_IRQ_RASTER1_IRQ_CB(INPUTLINE("maincpu", 3))
@@ -1112,11 +1134,10 @@ static MACHINE_CONFIG_START( edrandy )
 	MCFG_DECO146_IN_PORTA_CB(IOPORT("INPUTS"))
 	MCFG_DECO146_IN_PORTB_CB(IOPORT("SYSTEM"))
 	MCFG_DECO146_IN_PORTC_CB(IOPORT("DSW"))
+	MCFG_DECO146_SOUNDLATCH_IRQ_CB(INPUTLINE("audiocpu", 0))
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_SOUND_ADD("ym1", YM2203, XTAL_32_22MHz / 8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
@@ -1135,14 +1156,14 @@ static MACHINE_CONFIG_START( edrandy )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( robocop2 )
+MACHINE_CONFIG_START(cninja_state::robocop2)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_28MHz / 2)
 	MCFG_CPU_PROGRAM_MAP(robocop2_map)
 
 	MCFG_CPU_ADD("audiocpu", H6280, XTAL_32_22MHz / 8)
-	MCFG_CPU_PROGRAM_MAP(sound_map)
+	MCFG_CPU_PROGRAM_MAP(sound_map_146)
 
 	MCFG_DECO_IRQ_ADD("irq", "screen")
 	MCFG_DECO_IRQ_RASTER1_IRQ_CB(INPUTLINE("maincpu", 3))
@@ -1201,6 +1222,7 @@ static MACHINE_CONFIG_START( robocop2 )
 	MCFG_DECO146_IN_PORTA_CB(IOPORT("INPUTS"))
 	MCFG_DECO146_IN_PORTB_CB(IOPORT("SYSTEM"))
 	MCFG_DECO146_IN_PORTC_CB(IOPORT("DSW"))
+	MCFG_DECO146_SOUNDLATCH_IRQ_CB(INPUTLINE("audiocpu", 0))
 	MCFG_DECO146_SET_USE_MAGIC_ADDRESS_XOR
 
 
@@ -1229,7 +1251,7 @@ static MACHINE_CONFIG_START( robocop2 )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( mutantf )
+MACHINE_CONFIG_START(cninja_state::mutantf)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 14000000)
@@ -1299,6 +1321,7 @@ static MACHINE_CONFIG_START( mutantf )
 	MCFG_DECO146_IN_PORTA_CB(IOPORT("INPUTS"))
 	MCFG_DECO146_IN_PORTB_CB(IOPORT("SYSTEM"))
 	MCFG_DECO146_IN_PORTC_CB(IOPORT("DSW"))
+	MCFG_DECO146_SOUNDLATCH_IRQ_CB(INPUTLINE("audiocpu", 0))
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -2249,16 +2272,6 @@ ROM_END
 
 /**********************************************************************************/
 
-DRIVER_INIT_MEMBER(cninja_state,cninja)
-{
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x1bc0a8, 0x1bc0a9, write16_delegate(FUNC(cninja_state::cninja_sound_w),this));
-}
-
-DRIVER_INIT_MEMBER(cninja_state,stoneage)
-{
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x1bc0a8, 0x1bc0a9, write16_delegate(FUNC(cninja_state::stoneage_sound_w),this));
-}
-
 DRIVER_INIT_MEMBER(cninja_state,cninjabl2)
 {
 	m_maincpu->space(AS_PROGRAM).install_ram(0x180000, 0x18ffff);
@@ -2288,11 +2301,11 @@ GAME( 1990, edrandy2, edrandy,  edrandy,  edrandc,  cninja_state, 0,        ROT0
 GAME( 1990, edrandy1, edrandy,  edrandy,  edrandc,  cninja_state, 0,        ROT0, "Data East Corporation", "The Cliffhanger - Edward Randy (World ver 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1990, edrandyj, edrandy,  edrandy,  edrandc,  cninja_state, 0,        ROT0, "Data East Corporation", "The Cliffhanger - Edward Randy (Japan ver 3)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1991, cninja,   0,        cninja,   cninja,   cninja_state, cninja,   ROT0, "Data East Corporation", "Caveman Ninja (World ver 4)",                  MACHINE_SUPPORTS_SAVE )
-GAME( 1991, cninja1,  cninja,   cninja,   cninja,   cninja_state, cninja,   ROT0, "Data East Corporation", "Caveman Ninja (World ver 1)",                  MACHINE_SUPPORTS_SAVE )
-GAME( 1991, cninjau,  cninja,   cninja,   cninjau,  cninja_state, cninja,   ROT0, "Data East Corporation", "Caveman Ninja (US ver 4)",                     MACHINE_SUPPORTS_SAVE )
-GAME( 1991, joemac,   cninja,   cninja,   cninja,   cninja_state, cninja,   ROT0, "Data East Corporation", "Tatakae Genshizin Joe & Mac (Japan ver 1)",    MACHINE_SUPPORTS_SAVE )
-GAME( 1991, stoneage, cninja,   stoneage, cninja,   cninja_state, stoneage, ROT0, "bootleg",               "Stoneage (bootleg of Caveman Ninja)",          MACHINE_SUPPORTS_SAVE )
+GAME( 1991, cninja,   0,        cninja,   cninja,   cninja_state, 0,        ROT0, "Data East Corporation", "Caveman Ninja (World ver 4)",                  MACHINE_SUPPORTS_SAVE )
+GAME( 1991, cninja1,  cninja,   cninja,   cninja,   cninja_state, 0,        ROT0, "Data East Corporation", "Caveman Ninja (World ver 1)",                  MACHINE_SUPPORTS_SAVE )
+GAME( 1991, cninjau,  cninja,   cninja,   cninjau,  cninja_state, 0,        ROT0, "Data East Corporation", "Caveman Ninja (US ver 4)",                     MACHINE_SUPPORTS_SAVE )
+GAME( 1991, joemac,   cninja,   cninja,   cninja,   cninja_state, 0,        ROT0, "Data East Corporation", "Tatakae Genshizin Joe & Mac (Japan ver 1)",    MACHINE_SUPPORTS_SAVE )
+GAME( 1991, stoneage, cninja,   stoneage, cninja,   cninja_state, 0,        ROT0, "bootleg",               "Stoneage (bootleg of Caveman Ninja)",          MACHINE_SUPPORTS_SAVE )
 GAME( 1991, cninjabl, cninja,   cninjabl, cninja,   cninja_state, 0,        ROT0, "bootleg",               "Caveman Ninja (bootleg)",                      MACHINE_SUPPORTS_SAVE )
 GAME( 1991, cninjabl2,cninja,   cninjabl2,cninja,   cninja_state, cninjabl2,ROT0, "bootleg",               "Tatakae Genshizin Joe & Mac (Japan, bootleg)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // tile layers need adjusting
 

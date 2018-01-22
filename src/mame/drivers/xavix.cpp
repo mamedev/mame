@@ -68,6 +68,7 @@ public:
 	// screen updates
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
+	void xavix(machine_config &config);
 protected:
 	// driver_device overrides
 	virtual void machine_start() override;
@@ -173,7 +174,7 @@ void xavix_state::machine_reset()
 }
 
 
-static MACHINE_CONFIG_START( xavix )
+MACHINE_CONFIG_START(xavix_state::xavix)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",G65816,MAIN_CLOCK/4)

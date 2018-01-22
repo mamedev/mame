@@ -121,11 +121,9 @@ static ADDRESS_MAP_START( ob68k1a_mem, AS_PROGRAM, 16, ob68k1a_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000000, 0x01ffff) AM_RAM
 	AM_RANGE(0xfe0000, 0xfeffff) AM_ROM AM_REGION(MC68000L10_TAG, 0)
-	AM_RANGE(0xffff00, 0xffff01) AM_DEVREADWRITE8(MC6850_0_TAG, acia6850_device, status_r, control_w, 0x00ff)
-	AM_RANGE(0xffff02, 0xffff03) AM_DEVREADWRITE8(MC6850_0_TAG, acia6850_device, data_r, data_w, 0x00ff)
+	AM_RANGE(0xffff00, 0xffff03) AM_DEVREADWRITE8(MC6850_0_TAG, acia6850_device, read, write, 0x00ff)
 	AM_RANGE(0xffff10, 0xffff11) AM_WRITE8(com8116_w, 0xff00)
-	AM_RANGE(0xffff20, 0xffff21) AM_DEVREADWRITE8(MC6850_1_TAG, acia6850_device, status_r, control_w, 0x00ff)
-	AM_RANGE(0xffff22, 0xffff23) AM_DEVREADWRITE8(MC6850_1_TAG, acia6850_device, data_r, data_w, 0x00ff)
+	AM_RANGE(0xffff20, 0xffff23) AM_DEVREADWRITE8(MC6850_1_TAG, acia6850_device, read, write, 0x00ff)
 //  AM_RANGE(0xffff40, 0xffff47) AM_DEVREADWRITE8(MC6821_0_TAG, pia6821_device, read, write, 0x00ff)
 //  AM_RANGE(0xffff40, 0xffff47) AM_DEVREADWRITE8(MC6821_1_TAG, pia6821_device, read, write, 0xff00)
 	AM_RANGE(0xffff40, 0xffff47) AM_READWRITE8(pia_r, pia_w, 0xffff)
@@ -194,7 +192,7 @@ void ob68k1a_state::machine_reset()
 //  MACHINE_CONFIG( ob68k1a )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( ob68k1a )
+MACHINE_CONFIG_START(ob68k1a_state::ob68k1a)
 	// basic machine hardware
 	MCFG_CPU_ADD(MC68000L10_TAG, M68000, XTAL_10MHz)
 	MCFG_CPU_PROGRAM_MAP(ob68k1a_mem)

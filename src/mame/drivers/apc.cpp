@@ -153,6 +153,7 @@ public:
 	UPD7220_DISPLAY_PIXELS_MEMBER( hgdc_display_pixels );
 	UPD7220_DRAW_TEXT_LINE_MEMBER( hgdc_draw_text );
 
+	void apc(machine_config &config);
 protected:
 	// driver_device overrides
 	virtual void machine_start() override;
@@ -394,12 +395,12 @@ CH3_EXA ==      0X3E                      ; CH-3 extended address (W)
 
 READ8_MEMBER(apc_state::apc_dma_r)
 {
-	return m_dmac->read(space, BITSWAP8(offset,7,6,5,4,2,1,0,3), 0xff);
+	return m_dmac->read(space, bitswap<8>(offset,7,6,5,4,2,1,0,3), 0xff);
 }
 
 WRITE8_MEMBER(apc_state::apc_dma_w)
 {
-	m_dmac->write(space, BITSWAP8(offset,7,6,5,4,2,1,0,3), data, 0xff);
+	m_dmac->write(space, bitswap<8>(offset,7,6,5,4,2,1,0,3), data, 0xff);
 }
 
 WRITE8_MEMBER(apc_state::apc_irq_ack_w)
@@ -909,7 +910,7 @@ static SLOT_INTERFACE_START( apc_floppies )
 	SLOT_INTERFACE( "8", FLOPPY_8_DSDD )
 SLOT_INTERFACE_END
 
-static MACHINE_CONFIG_START( apc )
+MACHINE_CONFIG_START(apc_state::apc)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",I8086,MAIN_CLOCK)

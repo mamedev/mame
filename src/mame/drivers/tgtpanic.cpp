@@ -37,6 +37,7 @@ public:
 	virtual void machine_start() override;
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	void tgtpanic(machine_config &config);
 };
 
 
@@ -146,7 +147,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( tgtpanic )
+MACHINE_CONFIG_START(tgtpanic_state::tgtpanic)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_4MHz)

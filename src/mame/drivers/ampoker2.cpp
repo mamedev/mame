@@ -1139,7 +1139,7 @@ GFXDECODE_END
 *     Machine Driver     *
 *************************/
 
-static MACHINE_CONFIG_START( ampoker2 )
+MACHINE_CONFIG_START(ampoker2_state::ampoker2)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK/2)        /* 3 MHz */
@@ -1173,7 +1173,7 @@ static MACHINE_CONFIG_START( ampoker2 )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( sigma2k, ampoker2 )
+MACHINE_CONFIG_DERIVED(ampoker2_state::sigma2k, ampoker2)
 
 	/* video hardware */
 	MCFG_GFXDECODE_MODIFY("gfxdecode", sigma2k)
@@ -1392,7 +1392,7 @@ DRIVER_INIT_MEMBER(ampoker2_state, rabbitpk)
 
 	for (i = start; i < size; i++)
 	{
-		rom[i] = BITSWAP8(rom[i], 1, 2, 5, 4, 3, 0, 7, 6) ^ dec_base[(i >> 2) & 0x1f];
+		rom[i] = bitswap<8>(rom[i], 1, 2, 5, 4, 3, 0, 7, 6) ^ dec_base[(i >> 2) & 0x1f];
 	}
 }
 

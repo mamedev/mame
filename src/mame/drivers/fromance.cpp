@@ -893,7 +893,7 @@ MACHINE_RESET_MEMBER(fromance_state,fromance)
 	m_flipscreen = 0;
 }
 
-static MACHINE_CONFIG_START( nekkyoku )
+MACHINE_CONFIG_START(fromance_state::nekkyoku)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80,12000000/2)     /* 6.00 Mhz ? */
@@ -939,7 +939,7 @@ static MACHINE_CONFIG_START( nekkyoku )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( idolmj )
+MACHINE_CONFIG_START(fromance_state::idolmj)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_12MHz / 2)     /* 6.00 Mhz ? */
@@ -985,7 +985,7 @@ static MACHINE_CONFIG_START( idolmj )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( fromance )
+MACHINE_CONFIG_START(fromance_state::fromance)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_12MHz / 2)     /* 6.00 Mhz ? */

@@ -124,6 +124,7 @@ public:
 	required_device<okim6295_device> m_oki1;
 	required_device<okim6295_device> m_oki2;
 	required_device<palette_device> m_palette;
+	void pasha2(machine_config &config);
 };
 
 
@@ -412,7 +413,7 @@ void pasha2_state::machine_reset()
 	m_vbuffer = 0;
 }
 
-static MACHINE_CONFIG_START( pasha2 )
+MACHINE_CONFIG_START(pasha2_state::pasha2)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", E116XT, 20000000*4)     /* 4x internal multiplier */
@@ -473,8 +474,8 @@ ROM_END
 
 READ16_MEMBER(pasha2_state::pasha2_speedup_r)
 {
-	if(space.device().safe_pc() == 0x8302)
-		space.device().execute().spin_until_interrupt();
+	if(m_maincpu->pc() == 0x8302)
+		m_maincpu->spin_until_interrupt();
 
 	return m_wram[(0x95744 / 2) + offset];
 }

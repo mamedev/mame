@@ -203,6 +203,7 @@ public:
 	inline pen_t shift_mode_2();
 	void shifter_tick();
 	inline void shifter_load();
+	inline void draw_pixel(int x, int y, u32 pen);
 	void glue_tick();
 	void set_screen_parameters();
 	void blitter_source();
@@ -334,6 +335,7 @@ public:
 	required_device<palette_device> m_palette;
 	DECLARE_WRITE_LINE_MEMBER( write_monochrome );
 
+	void st(machine_config &config);
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
@@ -347,6 +349,7 @@ public:
 
 	DECLARE_READ16_MEMBER( fpu_r );
 	DECLARE_WRITE16_MEMBER( fpu_w );
+	void megast(machine_config &config);
 };
 
 class ste_state : public st_state
@@ -426,6 +429,10 @@ public:
 	emu_timer *m_microwire_timer;
 	emu_timer *m_dmasound_timer;
 
+	void falcon40(machine_config &config);
+	void tt030(machine_config &config);
+	void falcon(machine_config &config);
+	void ste(machine_config &config);
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
@@ -443,6 +450,7 @@ public:
 	DECLARE_WRITE16_MEMBER( cache_w );
 
 	uint16_t m_cache;
+	void megaste(machine_config &config);
 };
 
 class stbook_state : public ste_state

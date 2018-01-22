@@ -956,7 +956,7 @@ MACHINE_RESET_MEMBER(gameplan_state,gameplan)
 	m_video_data = 0;
 }
 
-static MACHINE_CONFIG_START( gameplan )
+MACHINE_CONFIG_START(gameplan_state::gameplan)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, GAMEPLAN_MAIN_CPU_CLOCK)
@@ -986,18 +986,18 @@ static MACHINE_CONFIG_START( gameplan )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.33)
 
 	/* via */
-	MCFG_DEVICE_ADD("via6522_0", VIA6522, 0)
+	MCFG_DEVICE_ADD("via6522_0", VIA6522, GAMEPLAN_MAIN_CPU_CLOCK)
 	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(gameplan_state, video_data_w))
 	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(gameplan_state, gameplan_video_command_w))
 	MCFG_VIA6522_CA2_HANDLER(WRITELINE(gameplan_state, video_command_trigger_w))
 	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(gameplan_state, via_irq))
 
-	MCFG_DEVICE_ADD("via6522_1", VIA6522, 0)
+	MCFG_DEVICE_ADD("via6522_1", VIA6522, GAMEPLAN_MAIN_CPU_CLOCK)
 	MCFG_VIA6522_READPA_HANDLER(READ8(gameplan_state, io_port_r))
 	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(gameplan_state, io_select_w))
 	MCFG_VIA6522_CB2_HANDLER(WRITELINE(gameplan_state, coin_w))
 
-	MCFG_DEVICE_ADD("via6522_2", VIA6522, 0)
+	MCFG_DEVICE_ADD("via6522_2", VIA6522, GAMEPLAN_MAIN_CPU_CLOCK)
 	MCFG_VIA6522_READPB_HANDLER(DEVREAD8("soundlatch", generic_latch_8_device, read))
 	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(gameplan_state, audio_cmd_w))
 	MCFG_VIA6522_CA2_HANDLER(WRITELINE(gameplan_state, audio_trigger_w))
@@ -1005,7 +1005,7 @@ static MACHINE_CONFIG_START( gameplan )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( leprechn, gameplan )
+MACHINE_CONFIG_DERIVED(gameplan_state::leprechn, gameplan)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_CLOCK(LEPRECHAUN_MAIN_CPU_CLOCK)
 

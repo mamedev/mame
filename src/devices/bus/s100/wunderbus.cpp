@@ -87,7 +87,7 @@ WRITE_LINE_MEMBER( s100_wunderbus_device::rtc_tp_w )
 //-------------------------------------------------
 
 
-MACHINE_CONFIG_MEMBER( s100_wunderbus_device::device_add_mconfig )
+MACHINE_CONFIG_START(s100_wunderbus_device::device_add_mconfig)
 	MCFG_DEVICE_ADD(I8259A_TAG, PIC8259, 0)
 	MCFG_PIC8259_OUT_INT_CB(WRITELINE(s100_wunderbus_device, pic_int_w))
 	MCFG_PIC8259_IN_SP_CB(VCC)
@@ -345,7 +345,7 @@ uint8_t s100_wunderbus_device::s100_sinp_r(address_space &space, offs_t offset)
 
 				*/
 
-				data = BITSWAP8(m_10a->read(),0,1,2,3,4,5,6,7) & 0xfc;
+				data = bitswap<8>(m_10a->read(),0,1,2,3,4,5,6,7) & 0xfc;
 				break;
 
 			case 2: // R.T. Clock IN/RESET CLK. Int.

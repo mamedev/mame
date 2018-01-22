@@ -159,6 +159,7 @@ public:
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	INTERRUPT_GEN_MEMBER(vblank_irq);
+	void mirax(machine_config &config);
 };
 
 
@@ -473,7 +474,7 @@ INTERRUPT_GEN_MEMBER(mirax_state::vblank_irq)
 		device.execute().set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 }
 
-static MACHINE_CONFIG_START( mirax )
+MACHINE_CONFIG_START(mirax_state::mirax)
 	MCFG_CPU_ADD("maincpu", Z80, 12000000/4) // ceramic potted module, encrypted z80
 	MCFG_CPU_PROGRAM_MAP(mirax_main_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", mirax_state, vblank_irq)
@@ -583,13 +584,13 @@ DRIVER_INIT_MEMBER(mirax_state,mirax)
 	int i;
 
 	for(i=0x0000;i<0x4000;i++)
-		ROM[BITSWAP16(i, 15,14,13,12,11,10,9, 5,7,6,8, 4,3,2,1,0)] = (BITSWAP8(DATA[i], 1, 3, 7, 0, 5, 6, 4, 2) ^ 0xff);
+		ROM[bitswap<16>(i, 15,14,13,12,11,10,9, 5,7,6,8, 4,3,2,1,0)] = (bitswap<8>(DATA[i], 1, 3, 7, 0, 5, 6, 4, 2) ^ 0xff);
 
 	for(i=0x4000;i<0x8000;i++)
-		ROM[BITSWAP16(i, 15,14,13,12,11,10,9, 5,7,6,8, 4,3,2,1,0)] = (BITSWAP8(DATA[i], 2, 1, 0, 6, 7, 5, 3, 4) ^ 0xff);
+		ROM[bitswap<16>(i, 15,14,13,12,11,10,9, 5,7,6,8, 4,3,2,1,0)] = (bitswap<8>(DATA[i], 2, 1, 0, 6, 7, 5, 3, 4) ^ 0xff);
 
 	for(i=0x8000;i<0xc000;i++)
-		ROM[BITSWAP16(i, 15,14,13,12,11,10,9, 5,7,6,8, 4,3,2,1,0)] = (BITSWAP8(DATA[i], 1, 3, 7, 0, 5, 6, 4, 2) ^ 0xff);
+		ROM[bitswap<16>(i, 15,14,13,12,11,10,9, 5,7,6,8, 4,3,2,1,0)] = (bitswap<8>(DATA[i], 1, 3, 7, 0, 5, 6, 4, 2) ^ 0xff);
 }
 
 GAME( 1985, mirax,    0,        mirax,    mirax,  mirax_state,   mirax,    ROT90, "Current Technologies", "Mirax (set 1)", MACHINE_SUPPORTS_SAVE )

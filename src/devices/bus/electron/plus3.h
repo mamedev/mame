@@ -25,26 +25,28 @@ public:
 	// construction/destruction
 	electron_plus3_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_READ8_MEMBER(wd1770_status_r);
-	DECLARE_WRITE8_MEMBER(wd1770_status_w);
-
 protected:
 	// device-level overrides
 	virtual void device_start() override;
-	virtual void device_reset() override;
 
 	// optional information overrides
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual const tiny_rom_entry *device_rom_region() const override;
 
+	virtual uint8_t expbus_r(address_space &space, offs_t offset, uint8_t data) override;
+	virtual void expbus_w(address_space &space, offs_t offset, uint8_t data) override;
+
 private:
+	DECLARE_WRITE8_MEMBER(wd1770_status_w);
 	DECLARE_FLOPPY_FORMATS(floppy_formats);
 
+	required_device<electron_expansion_slot_device> m_exp;
 	required_memory_region m_exp_rom;
 	required_device<wd1770_device> m_fdc;
 	required_device<floppy_connector> m_floppy0;
 	optional_device<floppy_connector> m_floppy1;
 
+	uint8_t m_romsel;
 	int m_drive_control;
 };
 

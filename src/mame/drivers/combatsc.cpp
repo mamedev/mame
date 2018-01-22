@@ -692,7 +692,7 @@ void combatsc_state::machine_reset()
 }
 
 /* combat school (original) */
-static MACHINE_CONFIG_START( combatsc )
+MACHINE_CONFIG_START(combatsc_state::combatsc)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", HD6309, 3000000*4)  /* 3 MHz? */
@@ -746,7 +746,7 @@ MACHINE_CONFIG_END
 
 
 /* combat school (bootleg on different hardware) */
-static MACHINE_CONFIG_START( combatscb )
+MACHINE_CONFIG_START(combatsc_state::combatscb)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", HD6309, 3000000*4)  /* 3 MHz? */

@@ -370,7 +370,7 @@ MACHINE_RESET_MEMBER( cdi_state, quizard4 )
 
 READ8_MEMBER( cdi_state::servo_io_r )
 {
-	if (space.machine().side_effect_disabled())
+	if (machine().side_effect_disabled())
 	{
 		return 0;
 	}
@@ -570,7 +570,7 @@ WRITE8_MEMBER( cdi_state::servo_io_w )
 
 READ8_MEMBER( cdi_state::slave_io_r )
 {
-	if (space.machine().side_effect_disabled())
+	if (machine().side_effect_disabled())
 	{
 		return 0;
 	}
@@ -770,7 +770,7 @@ WRITE8_MEMBER( cdi_state::slave_io_w )
 *************************/
 
 // CD-i Mono-I system base
-static MACHINE_CONFIG_START( cdimono1_base )
+MACHINE_CONFIG_START(cdi_state::cdimono1_base)
 	MCFG_CPU_ADD("maincpu", SCC68070, CLOCK_A/2)
 	MCFG_CPU_PROGRAM_MAP(cdimono1_mem)
 
@@ -816,7 +816,7 @@ static MACHINE_CONFIG_START( cdimono1_base )
 MACHINE_CONFIG_END
 
 // CD-i model 220 (Mono-II, NTSC)
-static MACHINE_CONFIG_START( cdimono2 )
+MACHINE_CONFIG_START(cdi_state::cdimono2)
 	MCFG_CPU_ADD("maincpu", SCC68070, CLOCK_A/2)
 	MCFG_CPU_PROGRAM_MAP(cdimono2_mem)
 
@@ -870,7 +870,7 @@ static MACHINE_CONFIG_START( cdimono2 )
 	MCFG_MK48T08_ADD( "mk48t08" )
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( cdi910 )
+MACHINE_CONFIG_START(cdi_state::cdi910)
 	MCFG_CPU_ADD("maincpu", SCC68070, CLOCK_A/2)
 	MCFG_CPU_PROGRAM_MAP(cdi910_mem)
 
@@ -925,7 +925,7 @@ static MACHINE_CONFIG_START( cdi910 )
 MACHINE_CONFIG_END
 
 // CD-i Mono-I, with CD-ROM image device (MESS) and Software List (MESS)
-static MACHINE_CONFIG_DERIVED( cdimono1, cdimono1_base )
+MACHINE_CONFIG_DERIVED(cdi_state::cdimono1, cdimono1_base)
 	MCFG_MACHINE_RESET_OVERRIDE(cdi_state, cdimono1)
 
 	MCFG_CDROM_ADD( "cdrom" )
@@ -934,7 +934,7 @@ static MACHINE_CONFIG_DERIVED( cdimono1, cdimono1_base )
 	MCFG_SOFTWARE_LIST_FILTER("cd_list","!DVC")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( quizard, cdimono1_base )
+MACHINE_CONFIG_DERIVED(cdi_state::quizard, cdimono1_base)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(cdimono1_mem)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", cdi_state, mcu_frame)
@@ -951,7 +951,7 @@ static ADDRESS_MAP_START( mcu_io_map, AS_IO, 8, cdi_state )
 	AM_RANGE(MCS51_PORT_P1, MCS51_PORT_P1) AM_READ(quizard_mcu_p1_r)
 ADDRESS_MAP_END
 
-static MACHINE_CONFIG_DERIVED( quizard1, quizard )
+MACHINE_CONFIG_DERIVED(cdi_state::quizard1, quizard)
 	MCFG_MACHINE_RESET_OVERRIDE(cdi_state, quizard1 )
 
 	MCFG_CPU_ADD("mcu", I8751, 8000000)
@@ -960,15 +960,15 @@ static MACHINE_CONFIG_DERIVED( quizard1, quizard )
 
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( quizard2, quizard )
+MACHINE_CONFIG_DERIVED(cdi_state::quizard2, quizard)
 	MCFG_MACHINE_RESET_OVERRIDE(cdi_state, quizard2 )
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( quizard3, quizard )
+MACHINE_CONFIG_DERIVED(cdi_state::quizard3, quizard)
 	MCFG_MACHINE_RESET_OVERRIDE(cdi_state, quizard3 )
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( quizard4, quizard )
+MACHINE_CONFIG_DERIVED(cdi_state::quizard4, quizard)
 	MCFG_MACHINE_RESET_OVERRIDE(cdi_state, quizard4 )
 
 	MCFG_CPU_ADD("mcu", I8751, 8000000)
@@ -1200,8 +1200,8 @@ ROM_START( quizard3 ) /* CD-ROM printed ??/?? */
 	DISK_REGION( "cdrom" )
 	DISK_IMAGE_READONLY( "quizard34", 0, BAD_DUMP SHA1(37ad49b72b5175afbb87141d57bc8604347fe032) )
 
-	ROM_REGION(0x1000, "mcu", 0)
-	ROM_LOAD( "quizard3_d8751.bin", 0x0000, 0x1000, NO_DUMP )
+	ROM_REGION(0x1000, "mcu", 0) // d8751h
+	ROM_LOAD( "DE132D3.bin", 0x0000, 0x1000, CRC(8858251e) SHA1(2c1005a74bb6f0c2918dff4ab6326528eea48e1f) ) // confirmed good on original hardware
 ROM_END
 
 ROM_START( quizard3_32 )
@@ -1217,8 +1217,8 @@ ROM_START( quizard3_32 )
 	DISK_REGION( "cdrom" )
 	DISK_IMAGE_READONLY( "quizard32", 0, BAD_DUMP SHA1(31e9fa2169aa44d799c37170b238134ab738e1a1) )
 
-	ROM_REGION(0x1000, "mcu", 0)
-	ROM_LOAD( "quizard3_d8751.bin", 0x0000, 0x1000, NO_DUMP )
+	ROM_REGION(0x1000, "mcu", 0) // d8751h
+	ROM_LOAD( "DE132D3.bin", 0x0000, 0x1000, CRC(8858251e) SHA1(2c1005a74bb6f0c2918dff4ab6326528eea48e1f) ) // confirmed good on original hardware
 ROM_END
 
 

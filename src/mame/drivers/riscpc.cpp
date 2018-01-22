@@ -67,6 +67,12 @@ public:
 	TIMER_CALLBACK_MEMBER(IOMD_timer0_callback);
 	TIMER_CALLBACK_MEMBER(IOMD_timer1_callback);
 	TIMER_CALLBACK_MEMBER(flyback_timer_callback);
+	void rpc700(machine_config &config);
+	void rpc600(machine_config &config);
+	void sarpc(machine_config &config);
+	void sarpc_j233(machine_config &config);
+	void a7000(machine_config &config);
+	void a7000p(machine_config &config);
 };
 
 
@@ -589,7 +595,7 @@ TIMER_CALLBACK_MEMBER(riscpc_state::IOMD_timer0_callback)
 	m_IRQ_status_A|=0x20;
 	if(m_IRQ_mask_A&0x20)
 	{
-		generic_pulse_irq_line(*m_maincpu, ARM7_IRQ_LINE,1);
+		m_maincpu->pulse_input_line(ARM7_IRQ_LINE, m_maincpu->minimum_quantum_time());
 	}
 }
 
@@ -598,7 +604,7 @@ TIMER_CALLBACK_MEMBER(riscpc_state::IOMD_timer1_callback)
 	m_IRQ_status_A|=0x40;
 	if(m_IRQ_mask_A&0x40)
 	{
-		generic_pulse_irq_line(*m_maincpu, ARM7_IRQ_LINE,1);
+		m_maincpu->pulse_input_line(ARM7_IRQ_LINE, m_maincpu->minimum_quantum_time());
 	}
 }
 
@@ -607,7 +613,7 @@ TIMER_CALLBACK_MEMBER(riscpc_state::flyback_timer_callback)
 	m_IRQ_status_A|=0x08;
 	if(m_IRQ_mask_A&0x08)
 	{
-		generic_pulse_irq_line(*m_maincpu, ARM7_IRQ_LINE,1);
+		m_maincpu->pulse_input_line(ARM7_IRQ_LINE, m_maincpu->minimum_quantum_time());
 	}
 
 	m_flyback_timer->adjust(machine().first_screen()->time_until_pos(m_vidc20_vert_reg[VDER]));
@@ -799,7 +805,7 @@ void riscpc_state::machine_reset()
 	m_flyback_timer->adjust( attotime::never);
 }
 
-static MACHINE_CONFIG_START( rpc600 )
+MACHINE_CONFIG_START(riscpc_state::rpc600)
 	/* Basic machine hardware */
 	MCFG_CPU_ADD( "maincpu", ARM7, XTAL_30MHz ) // ARM610
 	MCFG_CPU_PROGRAM_MAP(a7000_mem)
@@ -814,7 +820,7 @@ static MACHINE_CONFIG_START( rpc600 )
 	MCFG_PALETTE_ADD("palette", 0x200)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( rpc700 )
+MACHINE_CONFIG_START(riscpc_state::rpc700)
 	/* Basic machine hardware */
 	MCFG_CPU_ADD( "maincpu", ARM7, XTAL_40MHz ) // ARM710
 	MCFG_CPU_PROGRAM_MAP(a7000_mem)
@@ -829,7 +835,7 @@ static MACHINE_CONFIG_START( rpc700 )
 	MCFG_PALETTE_ADD("palette", 0x200)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( a7000 )
+MACHINE_CONFIG_START(riscpc_state::a7000)
 	/* Basic machine hardware */
 	MCFG_CPU_ADD( "maincpu", ARM7, XTAL_32MHz ) // ARM7500
 	MCFG_CPU_PROGRAM_MAP(a7000_mem)
@@ -844,12 +850,12 @@ static MACHINE_CONFIG_START( a7000 )
 	MCFG_PALETTE_ADD("palette", 0x200)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( a7000p, a7000 )
+MACHINE_CONFIG_DERIVED(riscpc_state::a7000p, a7000)
 	MCFG_CPU_MODIFY("maincpu") // ARM7500FE
 	MCFG_CPU_CLOCK(XTAL_48MHz)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( sarpc )
+MACHINE_CONFIG_START(riscpc_state::sarpc)
 	/* Basic machine hardware */
 	MCFG_CPU_ADD( "maincpu", ARM7, 202000000 ) // StrongARM
 	MCFG_CPU_PROGRAM_MAP(a7000_mem)
@@ -864,7 +870,7 @@ static MACHINE_CONFIG_START( sarpc )
 	MCFG_PALETTE_ADD("palette", 0x200)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( sarpc_j233 )
+MACHINE_CONFIG_START(riscpc_state::sarpc_j233)
 	/* Basic machine hardware */
 	MCFG_CPU_ADD( "maincpu", ARM7, 233000000 ) // StrongARM
 	MCFG_CPU_PROGRAM_MAP(a7000_mem)
@@ -883,8 +889,8 @@ ROM_START(rpc600)
 	ROM_REGION( 0x800000, "user1", ROMREGION_ERASEFF )
 	// Version 3.50
 	ROM_SYSTEM_BIOS( 0, "350", "RiscOS 3.50" )
-	ROMX_LOAD( "0277,521-01.bin", 0x000000, 0x100000, CRC(8ba4444e) SHA1(1b31d7a6e924bef0e0056c3a00a3fed95e55b175), ROM_GROUPWORD | ROM_SKIP(2) | ROM_BIOS(1))
-	ROMX_LOAD( "0277,522-01.bin", 0x000002, 0x100000, CRC(2bc95c9f) SHA1(f8c6e2a1deb4fda48aac2e9fa21b9e01955331cf), ROM_GROUPWORD | ROM_SKIP(2) | ROM_BIOS(1))
+	ROMX_LOAD( "0277,521-01.bin", 0x000000, 0x100000, CRC(8ba4444e) SHA1(1b31d7a6e924bef0e0056c3a00a3fed95e55b175), ROM_BIOS(1))
+	ROMX_LOAD( "0277,522-01.bin", 0x100000, 0x100000, CRC(2bc95c9f) SHA1(f8c6e2a1deb4fda48aac2e9fa21b9e01955331cf), ROM_BIOS(1))
 	ROM_REGION( 0x800000, "vram", ROMREGION_ERASE00 )
 ROM_END
 

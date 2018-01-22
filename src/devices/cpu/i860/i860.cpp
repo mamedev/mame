@@ -18,6 +18,7 @@ TODO: Separate out i860XR and i860XP (make different types, etc).
 #include "emu.h"
 #include "debugger.h"
 #include "i860.h"
+#include "i860dis.h"
 
 
 /* Control register numbers.  */
@@ -231,11 +232,9 @@ void i860_cpu_device::device_reset()
 	reset_i860();
 }
 
-
-offs_t i860_cpu_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+util::disasm_interface *i860_cpu_device::create_disassembler()
 {
-	extern CPU_DISASSEMBLE( i860 );
-	return CPU_DISASSEMBLE_NAME(i860)(this, stream, pc, oprom, opram, options);
+	return new i860_disassembler;
 }
 
 

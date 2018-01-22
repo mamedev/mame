@@ -74,4 +74,7 @@ public:
 	virtual void machine_reset() override;
 	TIMER_CALLBACK_MEMBER(delayed_gamma_w);
 	TIMER_DEVICE_CALLBACK_MEMBER(mhavoc_cpu_irq_clock);
+	void alphaone(machine_config &config);
+	void mhavoc(machine_config &config);
+	void mhavocrv(machine_config &config);
 };

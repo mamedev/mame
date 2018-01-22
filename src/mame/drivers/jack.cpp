@@ -189,7 +189,7 @@ static ADDRESS_MAP_START( jack_map, AS_PROGRAM, 8, jack_state )
 	AM_RANGE(0xb504, 0xb504) AM_READ_PORT("IN2")
 	AM_RANGE(0xb505, 0xb505) AM_READ_PORT("IN3")
 	AM_RANGE(0xb506, 0xb507) AM_READWRITE(jack_flipscreen_r, jack_flipscreen_w)
-	AM_RANGE(0xb600, 0xb61f) AM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0xb600, 0xb61f) AM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
 	AM_RANGE(0xb800, 0xbbff) AM_RAM_WRITE(jack_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0xbc00, 0xbfff) AM_RAM_WRITE(jack_colorram_w) AM_SHARE("colorram")
 	AM_RANGE(0xc000, 0xffff) AM_ROM
@@ -903,7 +903,7 @@ MACHINE_RESET_MEMBER(jack_state,joinem)
 
 /***************************************************************/
 
-static MACHINE_CONFIG_START( jack )
+MACHINE_CONFIG_START(jack_state::jack)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_18MHz/6)
@@ -941,13 +941,13 @@ static MACHINE_CONFIG_START( jack )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( treahunt, jack )
+MACHINE_CONFIG_DERIVED(jack_state::treahunt, jack)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( striv, jack )
+MACHINE_CONFIG_DERIVED(jack_state::striv, jack)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -970,7 +970,7 @@ INTERRUPT_GEN_MEMBER(jack_state::joinem_vblank_irq)
 		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
-static MACHINE_CONFIG_DERIVED( joinem, jack )
+MACHINE_CONFIG_DERIVED(jack_state::joinem, jack)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -995,7 +995,7 @@ static MACHINE_CONFIG_DERIVED( joinem, jack )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( unclepoo, joinem )
+MACHINE_CONFIG_DERIVED(jack_state::unclepoo, joinem)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1590,16 +1590,16 @@ DRIVER_INIT_MEMBER(jack_state,striv)
 		if (A & 0x1000)
 		{
 			if (A & 4)
-				ROM[A] = BITSWAP8(data,7,2,5,1,3,6,4,0) ^ 1;
+				ROM[A] = bitswap<8>(data,7,2,5,1,3,6,4,0) ^ 1;
 			else
-				ROM[A] = BITSWAP8(data,0,2,5,1,3,6,4,7) ^ 0x81;
+				ROM[A] = bitswap<8>(data,0,2,5,1,3,6,4,7) ^ 0x81;
 		}
 		else
 		{
 			if (A & 4)
-				ROM[A] = BITSWAP8(data,7,2,5,1,3,6,4,0) ^ 1;
+				ROM[A] = bitswap<8>(data,7,2,5,1,3,6,4,0) ^ 1;
 			else
-				ROM[A] = BITSWAP8(data,0,2,5,1,3,6,4,7);
+				ROM[A] = bitswap<8>(data,0,2,5,1,3,6,4,7);
 		}
 	}
 

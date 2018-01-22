@@ -511,22 +511,22 @@ WRITE8_MEMBER(pc9801_state::ide_ctrl_w)
 
 READ16_MEMBER(pc9801_state::ide_cs0_r)
 {
-	return (m_ide_sel ? m_ide2 : m_ide1)->read_cs0(space, offset, mem_mask);
+	return (m_ide_sel ? m_ide2 : m_ide1)->read_cs0(offset, mem_mask);
 }
 
 WRITE16_MEMBER(pc9801_state::ide_cs0_w)
 {
-	(m_ide_sel ? m_ide2 : m_ide1)->write_cs0(space, offset, data, mem_mask);
+	(m_ide_sel ? m_ide2 : m_ide1)->write_cs0(offset, data, mem_mask);
 }
 
 READ16_MEMBER(pc9801_state::ide_cs1_r)
 {
-	return (m_ide_sel ? m_ide2 : m_ide1)->read_cs1(space, offset, mem_mask);
+	return (m_ide_sel ? m_ide2 : m_ide1)->read_cs1(offset, mem_mask);
 }
 
 WRITE16_MEMBER(pc9801_state::ide_cs1_w)
 {
-	(m_ide_sel ? m_ide2 : m_ide1)->write_cs1(space, offset, data, mem_mask);
+	(m_ide_sel ? m_ide2 : m_ide1)->write_cs1(offset, data, mem_mask);
 }
 
 WRITE_LINE_MEMBER(pc9801_state::ide1_irq_w)
@@ -855,7 +855,7 @@ WRITE8_MEMBER(pc9801_state::grcg_w)
 	else if(offset == 7)
 	{
 //      logerror("%02x GRCG TILE %02x\n",data,m_grcg.tile_index);
-		m_grcg.tile[m_grcg.tile_index] = BITSWAP8(data,0,1,2,3,4,5,6,7);
+		m_grcg.tile[m_grcg.tile_index] = bitswap<8>(data,0,1,2,3,4,5,6,7);
 		m_grcg.tile_index ++;
 		m_grcg.tile_index &= 3;
 		return;
@@ -1061,24 +1061,24 @@ WRITE8_MEMBER(pc9801_state::pic_w)
 READ16_MEMBER(pc9801_state::grcg_gvram_r)
 {
 	uint16_t ret = upd7220_grcg_r(space, (offset + 0x4000) | (m_vram_bank << 16), mem_mask);
-	return BITSWAP16(ret,8,9,10,11,12,13,14,15,0,1,2,3,4,5,6,7);
+	return bitswap<16>(ret,8,9,10,11,12,13,14,15,0,1,2,3,4,5,6,7);
 }
 
 WRITE16_MEMBER(pc9801_state::grcg_gvram_w)
 {
-	data = BITSWAP16(data,8,9,10,11,12,13,14,15,0,1,2,3,4,5,6,7);
+	data = bitswap<16>(data,8,9,10,11,12,13,14,15,0,1,2,3,4,5,6,7);
 	upd7220_grcg_w(space, (offset + 0x4000) | (m_vram_bank << 16), data, mem_mask);
 }
 
 READ16_MEMBER(pc9801_state::grcg_gvram0_r)
 {
 	uint16_t ret = upd7220_grcg_r(space, offset | (m_vram_bank << 16), mem_mask);
-	return BITSWAP16(ret,8,9,10,11,12,13,14,15,0,1,2,3,4,5,6,7);
+	return bitswap<16>(ret,8,9,10,11,12,13,14,15,0,1,2,3,4,5,6,7);
 }
 
 WRITE16_MEMBER(pc9801_state::grcg_gvram0_w)
 {
-	data = BITSWAP16(data,8,9,10,11,12,13,14,15,0,1,2,3,4,5,6,7);
+	data = bitswap<16>(data,8,9,10,11,12,13,14,15,0,1,2,3,4,5,6,7);
 	upd7220_grcg_w(space, offset | (m_vram_bank << 16), data, mem_mask);
 }
 
@@ -2213,12 +2213,12 @@ SLOT_INTERFACE_START(pc9801_atapi_devices)
 	SLOT_INTERFACE("pc9801_cd", PC9801_CD)
 SLOT_INTERFACE_END
 
-static MACHINE_CONFIG_START( pc9801_keyboard )
+MACHINE_CONFIG_START(pc9801_state::pc9801_keyboard)
 	MCFG_DEVICE_ADD("keyb", PC9801_KBD, 53)
 	MCFG_PC9801_KBD_IRQ_CALLBACK(DEVWRITELINE("pic8259_master", pic8259_device, ir1_w))
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( pc9801_mouse )
+MACHINE_CONFIG_START(pc9801_state::pc9801_mouse)
 	MCFG_DEVICE_ADD("ppi8255_mouse", I8255, 0)
 	MCFG_I8255_IN_PORTA_CB(READ8(pc9801_state, ppi_mouse_porta_r))
 	MCFG_I8255_OUT_PORTA_CB(WRITE8(pc9801_state, ppi_mouse_porta_w))
@@ -2230,13 +2230,13 @@ static MACHINE_CONFIG_START( pc9801_mouse )
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("mouse_timer", pc9801_state, mouse_irq_cb, attotime::from_hz(120))
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( pc9801_cbus )
+MACHINE_CONFIG_START(pc9801_state::pc9801_cbus)
 	MCFG_PC9801CBUS_SLOT_ADD("cbus0", pc9801_cbus, "pc9801_26")
 	MCFG_PC9801CBUS_SLOT_ADD("cbus1", pc9801_cbus, nullptr)
 //  TODO: six max slots
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( pc9801_sasi )
+MACHINE_CONFIG_START(pc9801_state::pc9801_sasi)
 	MCFG_DEVICE_ADD(SASIBUS_TAG, SCSI_PORT, 0)
 	MCFG_SCSI_DATA_INPUT_BUFFER("sasi_data_in")
 	MCFG_SCSI_IO_HANDLER(WRITELINE(pc9801_state, write_sasi_io)) // bit2
@@ -2258,7 +2258,7 @@ static MACHINE_CONFIG_START( pc9801_sasi )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( pc9801_ide )
+MACHINE_CONFIG_START(pc9801_state::pc9801_ide)
 	MCFG_ATA_INTERFACE_ADD("ide1", ata_devices, "hdd", nullptr, false)
 	MCFG_ATA_INTERFACE_IRQ_HANDLER(WRITELINE(pc9801_state, ide1_irq_w))
 	MCFG_ATA_INTERFACE_ADD("ide2", pc9801_atapi_devices, "pc9801_cd", nullptr, false)
@@ -2267,7 +2267,7 @@ static MACHINE_CONFIG_START( pc9801_ide )
 	MCFG_SOFTWARE_LIST_ADD("cd_list","pc98_cd")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( pc9801_common )
+MACHINE_CONFIG_START(pc9801_state::pc9801_common)
 	MCFG_DEVICE_ADD("pit8253", PIT8253, 0)
 	MCFG_PIT8253_CLK0(MAIN_CLOCK_X1) /* heartbeat IRQ */
 	MCFG_PIT8253_OUT0_HANDLER(DEVWRITELINE("pic8259_master", pic8259_device, ir0_w))
@@ -2349,7 +2349,7 @@ static MACHINE_CONFIG_START( pc9801_common )
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", pc9801)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( pc9801 )
+MACHINE_CONFIG_START(pc9801_state::pc9801)
 	MCFG_CPU_ADD("maincpu", I8086, 5000000) //unknown clock
 	MCFG_CPU_PROGRAM_MAP(pc9801_map)
 	MCFG_CPU_IO_MAP(pc9801_io)
@@ -2384,7 +2384,7 @@ static MACHINE_CONFIG_START( pc9801 )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( pc9801rs )
+MACHINE_CONFIG_START(pc9801_state::pc9801rs)
 	MCFG_CPU_ADD("maincpu", I386SX, MAIN_CLOCK_X1*8) // unknown clock.
 	MCFG_CPU_PROGRAM_MAP(pc9801rs_map)
 	MCFG_CPU_IO_MAP(pc9801rs_io)
@@ -2396,8 +2396,8 @@ static MACHINE_CONFIG_START( pc9801rs )
 	MCFG_DEVICE_ADD("ipl_bank", ADDRESS_MAP_BANK, 0)
 	MCFG_DEVICE_PROGRAM_MAP(ipl_bank)
 	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_ADDRESS_MAP_BANK_DATABUS_WIDTH(16)
-	MCFG_ADDRESS_MAP_BANK_ADDRBUS_WIDTH(18)
+	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(16)
+	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(18)
 	MCFG_ADDRESS_MAP_BANK_STRIDE(0x18000)
 
 	MCFG_MACHINE_START_OVERRIDE(pc9801_state,pc9801rs)
@@ -2420,7 +2420,7 @@ static MACHINE_CONFIG_START( pc9801rs )
 	MCFG_PALETTE_INIT_OWNER(pc9801_state,pc9801)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( pc9801vm, pc9801rs )
+MACHINE_CONFIG_DERIVED(pc9801_state::pc9801vm, pc9801rs)
 	MCFG_CPU_REPLACE("maincpu",V30,10000000)
 	MCFG_CPU_PROGRAM_MAP(pc9801ux_map)
 	MCFG_CPU_IO_MAP(pc9801ux_io)
@@ -2434,7 +2434,7 @@ static MACHINE_CONFIG_DERIVED( pc9801vm, pc9801rs )
 	MCFG_MACHINE_RESET_OVERRIDE(pc9801_state,pc9801_common)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( pc9801ux, pc9801rs )
+MACHINE_CONFIG_DERIVED(pc9801_state::pc9801ux, pc9801rs)
 	MCFG_CPU_REPLACE("maincpu",I80286,10000000)
 	MCFG_CPU_PROGRAM_MAP(pc9801ux_map)
 	MCFG_CPU_IO_MAP(pc9801ux_io)
@@ -2444,7 +2444,7 @@ static MACHINE_CONFIG_DERIVED( pc9801ux, pc9801rs )
 //  MCFG_DEVICE_MODIFY("i8237", AM9157A, 10000000) // unknown clock
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( pc9801bx2, pc9801rs )
+MACHINE_CONFIG_DERIVED(pc9801_state::pc9801bx2, pc9801rs)
 	MCFG_CPU_REPLACE("maincpu",I486,25000000)
 	MCFG_CPU_PROGRAM_MAP(pc9821_map)
 	MCFG_CPU_IO_MAP(pc9821_io)
@@ -2454,7 +2454,7 @@ static MACHINE_CONFIG_DERIVED( pc9801bx2, pc9801rs )
 	MCFG_MACHINE_START_OVERRIDE(pc9801_state,pc9801bx2)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( pc9821, pc9801rs )
+MACHINE_CONFIG_DERIVED(pc9801_state::pc9821, pc9801rs)
 	MCFG_CPU_REPLACE("maincpu", I486, 16000000) // unknown clock
 	MCFG_CPU_PROGRAM_MAP(pc9821_map)
 	MCFG_CPU_IO_MAP(pc9821_io)
@@ -2477,7 +2477,7 @@ static MACHINE_CONFIG_DERIVED( pc9821, pc9801rs )
 	MCFG_PALETTE_INIT_OWNER(pc9801_state,pc9801)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( pc9821ap2, pc9821)
+MACHINE_CONFIG_DERIVED(pc9801_state::pc9821ap2, pc9821)
 	MCFG_CPU_REPLACE("maincpu", I486, 66666667) // unknown clock
 	MCFG_CPU_PROGRAM_MAP(pc9821_map)
 	MCFG_CPU_IO_MAP(pc9821_io)
@@ -2487,7 +2487,7 @@ static MACHINE_CONFIG_DERIVED( pc9821ap2, pc9821)
 	MCFG_MACHINE_START_OVERRIDE(pc9801_state,pc9821ap2)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( pc9821v20, pc9821 )
+MACHINE_CONFIG_DERIVED(pc9801_state::pc9821v20, pc9821)
 	MCFG_CPU_REPLACE("maincpu",PENTIUM,32000000) /* TODO: clock */
 	MCFG_CPU_PROGRAM_MAP(pc9821_map)
 	MCFG_CPU_IO_MAP(pc9821_io)
@@ -2889,7 +2889,7 @@ DRIVER_INIT_MEMBER(pc9801_state,pc9801_kanji)
 	{
 		for(j=0;j<0x20;j++)
 		{
-			pcg_tile = BITSWAP16(i,15,14,13,12,11,7,6,5,10,9,8,4,3,2,1,0) << 5;
+			pcg_tile = bitswap<16>(i,15,14,13,12,11,7,6,5,10,9,8,4,3,2,1,0) << 5;
 			kanji[j+(i << 5)] = raw_kanji[j+pcg_tile];
 		}
 	}

@@ -50,7 +50,7 @@ ROM_END
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( a2bus_applicard_device::device_add_mconfig )
+MACHINE_CONFIG_START(a2bus_applicard_device::device_add_mconfig)
 	MCFG_CPU_ADD(Z80_TAG, Z80, 6000000) // Z80 runs at 6 MHz
 	MCFG_CPU_PROGRAM_MAP(z80_mem)
 	MCFG_CPU_IO_MAP(z80_io)
@@ -109,7 +109,7 @@ void a2bus_applicard_device::device_reset()
 	m_z80stat = false;
 }
 
-uint8_t a2bus_applicard_device::read_c0nx(address_space &space, uint8_t offset)
+uint8_t a2bus_applicard_device::read_c0nx(uint8_t offset)
 {
 	switch (offset & 0xf)
 	{
@@ -152,7 +152,7 @@ uint8_t a2bus_applicard_device::read_c0nx(address_space &space, uint8_t offset)
 	return 0xff;
 }
 
-void a2bus_applicard_device::write_c0nx(address_space &space, uint8_t offset, uint8_t data)
+void a2bus_applicard_device::write_c0nx(uint8_t offset, uint8_t data)
 {
 	switch (offset & 0xf)
 	{
@@ -169,7 +169,7 @@ void a2bus_applicard_device::write_c0nx(address_space &space, uint8_t offset, ui
 		case 5:
 		case 6:
 		case 7:
-			read_c0nx(space, offset);   // let the read handler take care of these
+			read_c0nx(offset);   // let the read handler take care of these
 			break;
 	}
 }

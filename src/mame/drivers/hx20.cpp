@@ -889,7 +889,7 @@ void hx20_state::machine_start()
 //  MACHINE_CONFIG( hx20 )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( hx20 )
+MACHINE_CONFIG_START(hx20_state::hx20)
 	// basic machine hardware
 	MCFG_CPU_ADD(HD6301V1_MAIN_TAG, HD63701, XTAL_2_4576MHz)
 	MCFG_CPU_PROGRAM_MAP(hx20_mem)
@@ -953,7 +953,7 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( hx20 )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_DERIVED( cm6000, hx20 )
+MACHINE_CONFIG_DERIVED(hx20_state::cm6000, hx20)
 	// basic machine hardware
 	MCFG_CPU_MODIFY(HD6301V1_MAIN_TAG)
 	MCFG_CPU_PROGRAM_MAP(cm6000_mem)

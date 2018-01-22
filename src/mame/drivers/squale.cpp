@@ -134,6 +134,7 @@ public:
 
 	TIMER_DEVICE_CALLBACK_MEMBER(squale_scanline);
 
+	void squale(machine_config &config);
 private:
 	required_device<acia6850_device> m_acia;
 	required_device<ay8910_device> m_ay8910;
@@ -778,9 +779,9 @@ void squale_state::machine_reset()
 {
 }
 
-static MACHINE_CONFIG_START( squale )
+MACHINE_CONFIG_START(squale_state::squale)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",M6809E, CPU_CLOCK) // 12/2015 : Should be set to M6809 but it actually have the wrong clock divisor (1 instead of 4) and working 4 times too fast...
+	MCFG_CPU_ADD("maincpu", MC6809, CPU_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(squale_mem)
 	MCFG_CPU_IO_MAP(squale_io)
 

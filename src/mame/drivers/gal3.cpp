@@ -166,6 +166,7 @@ public:
 	DECLARE_VIDEO_START(gal3);
 	uint32_t screen_update_gal3(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void update_palette(  );
+	void gal3(machine_config &config);
 };
 
 
@@ -593,7 +594,7 @@ static GFXDECODE_START( namcos21 )
 	GFXDECODE_ENTRY( "obj_board1", 0x000000, tile_layout,  0x000, 0x20 )
 GFXDECODE_END
 
-static MACHINE_CONFIG_START( gal3 )
+MACHINE_CONFIG_START(gal3_state::gal3)
 	MCFG_CPU_ADD("maincpu", M68020, 49152000/2)
 	MCFG_CPU_PROGRAM_MAP(cpu_mst_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("lscreen", gal3_state,  irq1_line_hold)
@@ -867,5 +868,5 @@ ROM_START( gal3 )
 ROM_END
 
 /*    YEAR,  NAME     PARENT, MACHINE, INPUT, STATE,      INIT, MONITOR, COMPANY, FULLNAME,                                   FLAGS */
-GAMEL( 199?, gal3,    0,      gal3,    gal3,  gal3_state, 0,    ROT0,    "Namco", "Galaxian 3 - Theater 6 : Project Dragoon", MACHINE_NOT_WORKING | MACHINE_NO_SOUND, layout_dualhsxs )
-//GAMEL( 199?, gal3zlgr,    0,        gal3,    gal3, driver_device,    0, ROT0,  "Namco", "Galaxian 3 - Theater 6 J2 : Attack of The Zolgear", MACHINE_NOT_WORKING | MACHINE_NO_SOUND, layout_dualhsxs )
+GAMEL( 1992, gal3,    0,      gal3,    gal3,  gal3_state, 0,    ROT0,    "Namco", "Galaxian 3 - Theater 6 : Project Dragoon", MACHINE_NOT_WORKING | MACHINE_NO_SOUND, layout_dualhsxs )
+//GAMEL( 1994, gal3zlgr,    0,        gal3,    gal3, driver_device,    0, ROT0,  "Namco", "Galaxian 3 - Theater 6 J2 : Attack of The Zolgear", MACHINE_NOT_WORKING | MACHINE_NO_SOUND, layout_dualhsxs )

@@ -250,6 +250,7 @@ public:
 	DECLARE_WRITE8_MEMBER(omegrace_soundlatch_w);
 	DECLARE_DRIVER_INIT(omegrace);
 	virtual void machine_reset() override;
+	void omegrace(machine_config &config);
 };
 
 
@@ -496,7 +497,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( omegrace )
+MACHINE_CONFIG_START(omegrace_state::omegrace)
 
 	/* basic machine hardware */
 
@@ -620,7 +621,7 @@ DRIVER_INIT_MEMBER(omegrace_state,omegrace)
 	 * in a consistent way to the decoder, we swap the bits
 	 * here. */
 	for (i=0; i<len; i++)
-		prom[i] = BITSWAP8(prom[i],7,6,5,4,1,0,3,2);
+		prom[i] = bitswap<8>(prom[i],7,6,5,4,1,0,3,2);
 }
 
 

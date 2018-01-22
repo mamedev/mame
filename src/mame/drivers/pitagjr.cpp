@@ -7,7 +7,7 @@
     Type:            First steps (4-6 years old) laptop.
     Language:        Spanish.
     Description:     23 didactic games with voice and sounds for 1 or 2 players.
-                     (simple maths operations, spell, hang man, letters, numbers, etc)
+                     (simple maths operations, spell, hangman, letters, numbers, etc)
 
     Docs by Roberto Fresca.
 
@@ -31,7 +31,7 @@
    12  - Redondeando cifras.         Rounding numbers.
    13  - Encuentra el signo.         Find the sign.
    14  - Calculadora.                Calculator.
-   15  - Tres en raya.               Three in a raw.
+   15  - Tres en raya.               Three in a row.
    16  - El juego de los puntos.     The dot's game.
    17  - El juego del squash.        The squash game.
    18  - El juego del arquero.       The archer game.
@@ -172,6 +172,7 @@ public:
 	virtual void machine_start() override;
 	DECLARE_PALETTE_INIT(pitagjr);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void pitajr(machine_config &config);
 };
 
 
@@ -202,7 +203,7 @@ uint32_t pitagjr_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 	return 0;
 }
 
-static MACHINE_CONFIG_START( pitajr )
+MACHINE_CONFIG_START(pitagjr_state::pitajr)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", HD63705, XTAL_2MHz)   // probably a m6805-based MCU with internal boot ROM
 	MCFG_CPU_PROGRAM_MAP(pitajr_mem)
@@ -231,5 +232,5 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME      PARENT  COMPAT  MACHINE  INPUT   STATE          INIT  COMPANY  FULLNAME            FLAGS
+//    YEAR  NAME      PARENT  COMPAT  MACHINE  INPUT   STATE          INIT   COMPANY  FULLNAME           FLAGS
 COMP( 199?, pitagjr,  0,      0,      pitajr,  pitajr, pitagjr_state, 0,    "VTech", "Pitagorin Junior", MACHINE_IS_SKELETON )

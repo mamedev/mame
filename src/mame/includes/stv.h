@@ -140,8 +140,21 @@ public:
 	DECLARE_WRITE8_MEMBER(pdr2_output_w);
 	void stv_select_game(int gameno);
 	uint8_t     m_prev_gamebank_select;
+	void stv_slot(machine_config &config);
+	void stv_cartslot(machine_config &config);
+	void stv(machine_config &config);
+	void hopper(machine_config &config);
+	void batmanfr(machine_config &config);
+	void stv_5838(machine_config &config);
+	void stv_5881(machine_config &config);
 };
 
+class stvpc_state : public stv_state
+{
+public:
+	using stv_state::stv_state;
+	static constexpr feature_type unemulated_features() { return feature::CAMERA | feature::PRINTER; }
+};
 
 //#define MASTER_CLOCK_352 57272720
 //#define MASTER_CLOCK_320 53693174

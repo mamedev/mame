@@ -142,7 +142,7 @@ INTERRUPT_GEN_MEMBER(trucocl_state::trucocl_interrupt)
 
 }
 
-static MACHINE_CONFIG_START( trucocl )
+MACHINE_CONFIG_START(trucocl_state::trucocl)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 18432000/6)
 	MCFG_CPU_PROGRAM_MAP(main_map)

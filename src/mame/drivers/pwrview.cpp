@@ -53,6 +53,7 @@ public:
 	DECLARE_READ8_MEMBER(err_r);
 	MC6845_UPDATE_ROW(update_row);
 
+	void pwrview(machine_config &config);
 protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -347,7 +348,7 @@ static SLOT_INTERFACE_START(pwrview_floppies)
 	SLOT_INTERFACE("525dd", FLOPPY_525_DD)
 SLOT_INTERFACE_END
 
-static MACHINE_CONFIG_START( pwrview )
+MACHINE_CONFIG_START(pwrview_state::pwrview)
 	MCFG_CPU_ADD("maincpu", I80186, XTAL_16MHz)
 	MCFG_CPU_PROGRAM_MAP(pwrview_map)
 	MCFG_CPU_DECRYPTED_OPCODES_MAP(pwrview_fetch_map)
@@ -380,8 +381,8 @@ static MACHINE_CONFIG_START( pwrview )
 	MCFG_DEVICE_ADD("bios_bank", ADDRESS_MAP_BANK, 0)
 	MCFG_DEVICE_PROGRAM_MAP(bios_bank)
 	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_ADDRESS_MAP_BANK_DATABUS_WIDTH(16)
-	MCFG_ADDRESS_MAP_BANK_ADDRBUS_WIDTH(17)
+	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(16)
+	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(17)
 	MCFG_ADDRESS_MAP_BANK_STRIDE(0x8000)
 MACHINE_CONFIG_END
 

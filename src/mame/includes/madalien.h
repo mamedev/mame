@@ -83,10 +83,9 @@ public:
 	required_device<palette_device> m_palette;
 	required_device<generic_latch_8_device> m_soundlatch;
 	required_device<generic_latch_8_device> m_soundlatch2;
+	void madalien(machine_config &config);
+	void madalien_video(machine_config &config);
 };
-/*----------- defined in video/madalien.c -----------*/
-
-MACHINE_CONFIG_EXTERN( madalien_video );
 
 /*----------- defined in audio/madalien.c -----------*/
 

@@ -1445,12 +1445,12 @@ void superfx_device::execute_run()
 	}
 }
 
-offs_t superfx_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+u16 superfx_device::get_alt() const
 {
-	uint8_t  op = *(uint8_t *)(opram + 0);
-	uint8_t  param0 = *(uint8_t *)(opram + 1);
-	uint8_t  param1 = *(uint8_t *)(opram + 2);
-	uint16_t alt = m_sfr & SUPERFX_SFR_ALT;
+	return m_sfr & SUPERFX_SFR_ALT;
+}
 
-	return superfx_dasm_one(stream, pc, op, param0, param1, alt);
+util::disasm_interface *superfx_device::create_disassembler()
+{
+	return new superfx_disassembler(this);
 }

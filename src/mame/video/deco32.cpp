@@ -5,24 +5,24 @@
 
 /******************************************************************************/
 
-WRITE32_MEMBER(deco32_state::pri_w)
+WRITE32_MEMBER( deco32_state::pri_w )
 {
-	m_pri=data;
+	m_pri = data;
 }
 
-WRITE32_MEMBER(dragngun_state::sprite_control_w)
+WRITE32_MEMBER( dragngun_state::sprite_control_w )
 {
-	m_sprite_ctrl=data;
+	m_sprite_ctrl = data;
 }
 
-WRITE32_MEMBER(dragngun_state::spriteram_dma_w)
+WRITE32_MEMBER( dragngun_state::spriteram_dma_w )
 {
 	/* DMA spriteram to private sprite chip area, and clear cpu ram */
 	m_spriteram->copy();
 	memset(m_spriteram->live(),0,0x2000);
 }
 
-WRITE32_MEMBER(deco32_state::ace_ram_w)
+WRITE32_MEMBER( nslasher_state::ace_ram_w )
 {
 	/* Some notes pieced together from Tattoo Assassins info:
 
@@ -61,7 +61,7 @@ WRITE32_MEMBER(deco32_state::ace_ram_w)
 	COMBINE_DATA(&m_ace_ram[offset]);
 }
 
-void deco32_state::updateAceRam()
+void nslasher_state::updateAceRam()
 {
 	int r,g,b,i;
 	uint8_t fadeptr=m_ace_ram[0x20];
@@ -98,37 +98,35 @@ void deco32_state::updateAceRam()
 /* Later games have double buffered paletteram - the real palette ram is
 only updated on a DMA call */
 
-WRITE32_MEMBER(deco32_state::buffered_palette_w)
+WRITE32_MEMBER( deco32_state::buffered_palette_w )
 {
 	COMBINE_DATA(&m_generic_paletteram_32[offset]);
 	m_dirty_palette[offset]=1;
 }
 
-WRITE32_MEMBER(deco32_state::palette_dma_w)
+WRITE32_MEMBER( deco32_state::palette_dma_w )
 {
-	const int m=m_palette->entries();
-	int r,g,b,i;
+	for (int i = 0; i < m_palette->entries(); i++)
+	{
+		if (m_dirty_palette[i])
+		{
+			m_dirty_palette[i] = 0;
 
-	for (i=0; i<m; i++) {
-		if (m_dirty_palette[i]) {
-			m_dirty_palette[i]=0;
+			uint8_t b = (m_generic_paletteram_32[i] >>16) & 0xff;
+			uint8_t g = (m_generic_paletteram_32[i] >> 8) & 0xff;
+			uint8_t r = (m_generic_paletteram_32[i] >> 0) & 0xff;
 
-			if (m_has_ace_ram)
-			{
-				m_ace_ram_dirty=1;
-			}
-			else
-			{
-				b = (m_generic_paletteram_32[i] >>16) & 0xff;
-				g = (m_generic_paletteram_32[i] >> 8) & 0xff;
-				r = (m_generic_paletteram_32[i] >> 0) & 0xff;
-
-				m_palette->set_pen_color(i,rgb_t(r,g,b));
-			}
+			m_palette->set_pen_color(i,rgb_t(r,g,b));
 		}
 	}
 }
 
+WRITE32_MEMBER( nslasher_state::palette_dma_w )
+{
+	for (int i = 0; i < m_palette->entries(); i++)
+		if (m_dirty_palette[i])
+			m_ace_ram_dirty = 1;
+}
 
 /******************************************************************************/
 
@@ -143,24 +141,21 @@ void deco32_state::video_start()
 	save_item(NAME(m_pf4_rowscroll));
 }
 
-VIDEO_START_MEMBER(deco32_state,captaven)
+VIDEO_START_MEMBER( captaven_state, captaven )
 {
-	m_has_ace_ram=0;
-
 	deco32_state::video_start();
 }
 
-VIDEO_START_MEMBER(deco32_state,fghthist)
+VIDEO_START_MEMBER( fghthist_state, fghthist )
 {
 	m_dirty_palette = std::make_unique<uint8_t[]>(4096);
 	m_sprgen->alloc_sprite_bitmap();
-	m_has_ace_ram=0;
 
 	save_pointer(NAME(m_dirty_palette.get()), 4096);
 	deco32_state::video_start();
 }
 
-VIDEO_START_MEMBER(deco32_state,nslasher)
+VIDEO_START_MEMBER( nslasher_state, nslasher )
 {
 	int width, height;
 	m_dirty_palette = std::make_unique<uint8_t[]>(4096);
@@ -170,7 +165,6 @@ VIDEO_START_MEMBER(deco32_state,nslasher)
 	m_sprgen1->alloc_sprite_bitmap();
 	m_sprgen2->alloc_sprite_bitmap();
 	memset(m_dirty_palette.get(),0,4096);
-	m_has_ace_ram=1;
 
 	save_pointer(NAME(m_dirty_palette.get()), 4096);
 	save_item(NAME(m_ace_ram_dirty));
@@ -188,27 +182,23 @@ void dragngun_state::video_start()
 	save_item(NAME(m_pf4_rowscroll));
 }
 
-VIDEO_START_MEMBER(dragngun_state,dragngun)
+VIDEO_START_MEMBER( dragngun_state, dragngun )
 {
 	m_dirty_palette = std::make_unique<uint8_t[]>(4096);
 	m_screen->register_screen_bitmap(m_temp_render_bitmap);
 
 	memset(m_dirty_palette.get(),0,4096);
-
-	m_has_ace_ram=0;
 
 	save_item(NAME(m_sprite_ctrl));
 	save_pointer(NAME(m_dirty_palette.get()), 4096);
 }
 
-VIDEO_START_MEMBER(dragngun_state,lockload)
+VIDEO_START_MEMBER( dragngun_state, lockload )
 {
 	m_dirty_palette = std::make_unique<uint8_t[]>(4096);
 	m_screen->register_screen_bitmap(m_temp_render_bitmap);
 
 	memset(m_dirty_palette.get(),0,4096);
-
-	m_has_ace_ram=0;
 
 	save_item(NAME(m_sprite_ctrl));
 	save_pointer(NAME(m_dirty_palette.get()), 4096);
@@ -218,7 +208,7 @@ VIDEO_START_MEMBER(dragngun_state,lockload)
 
 /******************************************************************************/
 
-uint32_t deco32_state::screen_update_captaven(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t captaven_state::screen_update_captaven(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	address_space &space = machine().dummy_space();
 	uint16_t flip = m_deco_tilegen1->pf_control_r(space, 0, 0xffff);
@@ -287,7 +277,7 @@ uint32_t dragngun_state::screen_update_dragngun(screen_device &screen, bitmap_rg
 }
 
 
-uint32_t deco32_state::screen_update_fghthist(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t fghthist_state::screen_update_fghthist(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	screen.priority().fill(0, cliprect);
 	bitmap.fill(m_palette->pen(0x300), cliprect); // Palette index not confirmed
@@ -327,7 +317,7 @@ uint32_t deco32_state::screen_update_fghthist(screen_device &screen, bitmap_rgb3
     blending support - it can't be done in-place on the final framebuffer
     without a lot of support bitmaps.
 */
-void deco32_state::mixDualAlphaSprites(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, gfx_element *gfx0, gfx_element *gfx1, int mixAlphaTilemap)
+void nslasher_state::mixDualAlphaSprites(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, gfx_element *gfx0, gfx_element *gfx1, int mixAlphaTilemap)
 {
 	const pen_t *pens = m_palette->pens();
 	const pen_t *pal0 = &pens[gfx0->colorbase()];
@@ -458,7 +448,7 @@ void deco32_state::mixDualAlphaSprites(screen_device &screen, bitmap_rgb32 &bitm
 	}
 }
 
-uint32_t deco32_state::screen_update_nslasher(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t nslasher_state::screen_update_nslasher(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	int alphaTilemap=0;
 	m_deco_tilegen1->pf_update(m_pf1_rowscroll, m_pf2_rowscroll);

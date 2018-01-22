@@ -298,6 +298,8 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	optional_device<z80dma_device> m_dma;
+	void x1turbo(machine_config &config);
+	void x1(machine_config &config);
 };
 
 /*----------- defined in machine/x1.c -----------*/

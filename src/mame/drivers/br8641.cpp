@@ -48,6 +48,7 @@ public:
 	DECLARE_WRITE8_MEMBER(port08_w);
 	DECLARE_WRITE8_MEMBER(port09_w);
 
+	void brandt8641(machine_config &config);
 private:
 	uint8_t m_port08;
 	uint8_t m_port09;
@@ -153,7 +154,7 @@ static const z80_daisy_config daisy_chain_intf[] =
 
 
 
-static MACHINE_CONFIG_START( brandt8641 )
+MACHINE_CONFIG_START(brandt8641_state::brandt8641)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_4MHz) // U4 ,4MHz crystal on board
 	MCFG_CPU_PROGRAM_MAP(brandt8641_mem)

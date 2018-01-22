@@ -96,6 +96,7 @@ public:
 
 	emu_timer *m_led_refresh_timer;
 	TIMER_CALLBACK_MEMBER(led_refresh);
+	void beta(machine_config &config);
 };
 
 
@@ -217,7 +218,7 @@ WRITE8_MEMBER( beta_state::riot_pa_w )
 //  logerror("PA %02x\n", data);
 
 	/* display */
-	m_segment = BITSWAP8(data, 7, 3, 4, 1, 0, 2, 5, 6) & 0x7f;
+	m_segment = bitswap<8>(data, 7, 3, 4, 1, 0, 2, 5, 6) & 0x7f;
 	m_led_refresh_timer->adjust(attotime::from_usec(70));
 
 	/* EPROM data */
@@ -335,7 +336,7 @@ void beta_state::machine_start()
 
 /* Machine Driver */
 
-static MACHINE_CONFIG_START( beta )
+MACHINE_CONFIG_START(beta_state::beta)
 	/* basic machine hardware */
 	MCFG_CPU_ADD(M6502_TAG, M6502, XTAL_4MHz/4)
 	MCFG_CPU_PROGRAM_MAP(beta_mem)

@@ -32,6 +32,7 @@ public:
 	DECLARE_DRIVER_INIT(s11b);
 	DECLARE_DRIVER_INIT(s11b_invert);
 
+	void s11b(machine_config &config);
 protected:
 	optional_device<hc55516_device> m_bg_hc55516;
 

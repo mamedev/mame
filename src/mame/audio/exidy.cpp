@@ -8,6 +8,8 @@
 
 #include "emu.h"
 #include "audio/exidy.h"
+#include "includes/exidy.h"
+#include "includes/victory.h"
 
 #include "cpu/z80/z80.h"
 #include "machine/rescap.h"
@@ -406,11 +408,11 @@ void exidy_sound_device::r6532_irq(int state)
 WRITE8_MEMBER( exidy_sound_device::r6532_porta_w )
 {
 	if (m_cvsd != nullptr)
-		space.machine().device("cvsdcpu")->execute().set_input_line(INPUT_LINE_RESET, (data & 0x10) ? CLEAR_LINE : ASSERT_LINE);
+		machine().device("cvsdcpu")->execute().set_input_line(INPUT_LINE_RESET, (data & 0x10) ? CLEAR_LINE : ASSERT_LINE);
 
 	if (m_tms != nullptr)
 	{
-		logerror("(%f)%s:TMS5220 data write = %02X\n", space.machine().time().as_double(), space.machine().describe_context(), m_riot->porta_out_get());
+		logerror("(%f)%s:TMS5220 data write = %02X\n", machine().time().as_double(), machine().describe_context(), m_riot->porta_out_get());
 		m_tms->data_w(space, 0, data);
 	}
 }
@@ -419,7 +421,7 @@ READ8_MEMBER( exidy_sound_device::r6532_porta_r )
 {
 	if (m_tms != nullptr)
 	{
-		logerror("(%f)%s:TMS5220 status read = %02X\n", space.machine().time().as_double(), space.machine().describe_context(), m_tms->status_r(space, 0));
+		logerror("(%f)%s:TMS5220 status read = %02X\n", machine().time().as_double(), machine().describe_context(), m_tms->status_r(space, 0));
 		return m_tms->status_r(space, 0);
 	}
 	else
@@ -737,7 +739,7 @@ static ADDRESS_MAP_START( venture_audio_map, AS_PROGRAM, 8, venture_sound_device
 ADDRESS_MAP_END
 
 
-MACHINE_CONFIG_START( venture_audio )
+MACHINE_CONFIG_START(exidy_state::venture_audio)
 
 	MCFG_CPU_ADD("audiocpu", M6502, 3579545/4)
 	MCFG_CPU_PROGRAM_MAP(venture_audio_map)
@@ -816,7 +818,7 @@ static ADDRESS_MAP_START( cvsd_iomap, AS_IO, 8, venture_sound_device )
 ADDRESS_MAP_END
 
 
-MACHINE_CONFIG_START( mtrap_cvsd_audio )
+MACHINE_CONFIG_START(exidy_state::mtrap_cvsd_audio)
 
 	MCFG_CPU_ADD("cvsdcpu", Z80, CVSD_Z80_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(cvsd_map)
@@ -874,7 +876,7 @@ WRITE8_MEMBER( victory_sound_device::command_w )
 {
 	if (VICTORY_LOG_SOUND) logerror("%04X:!!!! Sound command = %02X\n", m_maincpu->pcbase(), data);
 
-	space.machine().scheduler().synchronize(timer_expired_delegate(FUNC(victory_sound_device::delayed_command_w), this), data);
+	machine().scheduler().synchronize(timer_expired_delegate(FUNC(victory_sound_device::delayed_command_w), this), data);
 }
 
 
@@ -991,7 +993,7 @@ static ADDRESS_MAP_START( victory_audio_map, AS_PROGRAM, 8, venture_sound_device
 ADDRESS_MAP_END
 
 
-MACHINE_CONFIG_START( victory_audio )
+MACHINE_CONFIG_START(victory_state::victory_audio)
 
 	MCFG_CPU_ADD("audiocpu", M6502, VICTORY_AUDIO_CPU_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(victory_audio_map)

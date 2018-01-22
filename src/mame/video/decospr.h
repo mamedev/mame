@@ -77,10 +77,10 @@ DECLARE_DEVICE_TYPE(DECO_SPRITE, decospr_device)
 	decospr_device::set_gfx_region(*device, _region);
 
 #define MCFG_DECO_SPRITE_PRIORITY_CB(_class, _method) \
-	decospr_device::set_pri_callback(*device, decospr_pri_cb_delegate(&_class::_method, #_class "::" #_method, downcast<_class *>(owner)));
+	decospr_device::set_pri_callback(*device, decospr_pri_cb_delegate(&_class::_method, #_class "::" #_method, this));
 
 #define MCFG_DECO_SPRITE_COLOUR_CB(_class, _method) \
-	decospr_device::set_col_callback(*device, decospr_col_cb_delegate(&_class::_method, #_class "::" #_method, downcast<_class *>(owner)));
+	decospr_device::set_col_callback(*device, decospr_col_cb_delegate(&_class::_method, #_class "::" #_method, this));
 
 #define MCFG_DECO_SPRITE_ISBOOTLEG(_boot) \
 	decospr_device::set_is_bootleg(*device, _boot);

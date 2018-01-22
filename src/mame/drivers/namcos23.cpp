@@ -1597,6 +1597,13 @@ public:
 	void render_project(poly_vertex &pv);
 	void render_one_model(const namcos23_render_entry *re);
 	void render_run(bitmap_rgb32 &bitmap);
+	void timecrs2v4a(machine_config &config);
+	void ss23e2(machine_config &config);
+	void gorgon(machine_config &config);
+	void ss23(machine_config &config);
+	void s23(machine_config &config);
+	void gmen(machine_config &config);
+	void timecrs2(machine_config &config);
 };
 
 
@@ -1997,7 +2004,7 @@ READ32_MEMBER(namcos23_state::c435_r)
 		return 1; // Busy flag
 	}
 
-	logerror("c435_r %02x @ %08x (%08x, %08x)\n", offset, mem_mask, space.device().safe_pc(), (unsigned int)space.device().state().state_int(MIPS3_R31));
+	logerror("c435_r %02x @ %08x (%08x, %08x)\n", offset, mem_mask, m_maincpu->pc(), (unsigned int)m_maincpu->state_int(MIPS3_R31));
 	return 0;
 }
 
@@ -2015,7 +2022,7 @@ WRITE32_MEMBER(namcos23_state::c435_w)
 			c435_dma(space, m_c435_address, m_c435_size);
 		break;
 	default:
-		logerror("c435_w %02x, %08x @ %08x (%08x, %08x)\n", offset, data, mem_mask, space.device().safe_pc(), (unsigned int)space.device().state().state_int(MIPS3_R31));
+		logerror("c435_w %02x, %08x @ %08x (%08x, %08x)\n", offset, data, mem_mask, m_maincpu->pc(), (unsigned int)m_maincpu->state_int(MIPS3_R31));
 		break;
 	}
 }
@@ -2492,7 +2499,7 @@ READ16_MEMBER(namcos23_state::c417_r)
 	case 1:
 		return m_c417.adr;
 	case 4:
-		//logerror("c417_r %04x = %04x (%08x, %08x)\n", c417.adr, c417.ram[c417.adr], space.device().safe_pc(), (unsigned int)space.device().state().state_int(MIPS3_R31));
+		//logerror("c417_r %04x = %04x (%08x, %08x)\n", c417.adr, c417.ram[c417.adr], m_maincpu->pc(), (unsigned int)m_maincpu->state_int(MIPS3_R31));
 		return m_c417.ram[m_c417.adr];
 	case 5:
 		if(m_c417.pointrom_adr >= m_ptrom_limit)
@@ -2504,7 +2511,7 @@ READ16_MEMBER(namcos23_state::c417_r)
 		return m_ptrom[m_c417.pointrom_adr];
 	}
 
-	logerror("c417_r %x @ %04x (%08x, %08x)\n", offset, mem_mask, space.device().safe_pc(), (unsigned int)space.device().state().state_int(MIPS3_R31));
+	logerror("c417_r %x @ %04x (%08x, %08x)\n", offset, mem_mask, m_maincpu->pc(), (unsigned int)m_maincpu->state_int(MIPS3_R31));
 	return 0;
 }
 
@@ -2524,7 +2531,7 @@ WRITE16_MEMBER(namcos23_state::c417_w)
 		m_c417.pointrom_adr = 0;
 		break;
 	case 4:
-		//logerror("c417_w %04x = %04x (%08x, %08x)\n", m_c417.adr, data, space.device().safe_pc(), (unsigned int)space.device().state().state_int(MIPS3_R31));
+		//logerror("c417_w %04x = %04x (%08x, %08x)\n", m_c417.adr, data, m_maincpu->pc(), (unsigned int)m_maincpu->state_int(MIPS3_R31));
 		COMBINE_DATA(m_c417.ram + m_c417.adr);
 		break;
 	case 7:
@@ -2532,7 +2539,7 @@ WRITE16_MEMBER(namcos23_state::c417_w)
 		update_main_interrupts(m_main_irqcause & ~MAIN_C435_IRQ);
 		break;
 	default:
-		logerror("c417_w %x, %04x @ %04x (%08x, %08x)\n", offset, data, mem_mask, space.device().safe_pc(), (unsigned int)space.device().state().state_int(MIPS3_R31));
+		logerror("c417_w %x, %04x @ %04x (%08x, %08x)\n", offset, data, mem_mask, m_maincpu->pc(), (unsigned int)m_maincpu->state_int(MIPS3_R31));
 		break;
 	}
 }
@@ -2543,7 +2550,7 @@ WRITE16_MEMBER(namcos23_state::c417_w)
 
 READ16_MEMBER(namcos23_state::c412_ram_r)
 {
-	//  logerror("c412_ram_r %06x (%08x, %08x)\n", offset, space.device().safe_pc(), (unsigned int)space.device().state().state_int(MIPS3_R31));
+	//  logerror("c412_ram_r %06x (%08x, %08x)\n", offset, m_maincpu->pc(), (unsigned int)m_maincpu->state_int(MIPS3_R31));
 	if(offset < 0x100000)
 		return m_c412.sdram_a[offset & 0xfffff];
 	else if(offset < 0x200000)
@@ -2558,7 +2565,7 @@ READ16_MEMBER(namcos23_state::c412_ram_r)
 
 WRITE16_MEMBER(namcos23_state::c412_ram_w)
 {
-	//  logerror("c412_ram_w %06x = %04x (%08x, %08x)\n", offset, data, space.device().safe_pc(), (unsigned int)space.device().state().state_int(MIPS3_R31));
+	//  logerror("c412_ram_w %06x = %04x (%08x, %08x)\n", offset, data, m_maincpu->pc(), (unsigned int)m_maincpu->state_int(MIPS3_R31));
 	if(offset < 0x100000)
 		COMBINE_DATA(m_c412.sdram_a + (offset & 0xfffff));
 	else if(offset < 0x200000)
@@ -2587,7 +2594,7 @@ READ16_MEMBER(namcos23_state::c412_r)
 		return m_c412.status_c;
 	}
 
-	logerror("c412_r %x @ %04x (%08x, %08x)\n", offset, mem_mask, space.device().safe_pc(), (unsigned int)space.device().state().state_int(MIPS3_R31));
+	logerror("c412_r %x @ %04x (%08x, %08x)\n", offset, mem_mask, m_maincpu->pc(), (unsigned int)m_maincpu->state_int(MIPS3_R31));
 	return 0;
 }
 
@@ -2609,7 +2616,7 @@ WRITE16_MEMBER(namcos23_state::c412_w)
 		m_c412.adr += 2;
 		break;
 	default:
-		logerror("c412_w %x, %04x @ %04x (%08x, %08x)\n", offset, data, mem_mask, space.device().safe_pc(), (unsigned int)space.device().state().state_int(MIPS3_R31));
+		logerror("c412_w %x, %04x @ %04x (%08x, %08x)\n", offset, data, mem_mask, m_maincpu->pc(), (unsigned int)m_maincpu->state_int(MIPS3_R31));
 		break;
 	}
 }
@@ -2620,7 +2627,7 @@ WRITE16_MEMBER(namcos23_state::c412_w)
 
 READ16_MEMBER(namcos23_state::c421_ram_r)
 {
-	//  logerror("c421_ram_r %06x (%08x, %08x)\n", offset, space.device().safe_pc(), (unsigned int)space.device().state().state_int(MIPS3_R31));
+	//  logerror("c421_ram_r %06x (%08x, %08x)\n", offset, m_maincpu->pc(), (unsigned int)m_maincpu->state_int(MIPS3_R31));
 	if(offset < 0x40000)
 		return m_c421.dram_a[offset & 0x3ffff];
 	else if(offset < 0x80000)
@@ -2633,7 +2640,7 @@ READ16_MEMBER(namcos23_state::c421_ram_r)
 
 WRITE16_MEMBER(namcos23_state::c421_ram_w)
 {
-	//  logerror("c421_ram_w %06x = %04x (%08x, %08x)\n", offset, data, space.device().safe_pc(), (unsigned int)space.device().state().state_int(MIPS3_R31));
+	//  logerror("c421_ram_w %06x = %04x (%08x, %08x)\n", offset, data, m_maincpu->pc(), (unsigned int)m_maincpu->state_int(MIPS3_R31));
 	if(offset < 0x40000)
 		COMBINE_DATA(m_c421.dram_a + (offset & 0x3ffff));
 	else if(offset < 0x80000)
@@ -2654,7 +2661,7 @@ READ16_MEMBER(namcos23_state::c421_r)
 		return m_c421.adr;
 	}
 
-	logerror("c421_r %x @ %04x (%08x, %08x)\n", offset, mem_mask, space.device().safe_pc(), (unsigned int)space.device().state().state_int(MIPS3_R31));
+	logerror("c421_r %x @ %04x (%08x, %08x)\n", offset, mem_mask, m_maincpu->pc(), (unsigned int)m_maincpu->state_int(MIPS3_R31));
 	return 0;
 }
 
@@ -2672,7 +2679,7 @@ WRITE16_MEMBER(namcos23_state::c421_w)
 		m_c421.adr = (data & mem_mask) | (m_c421.adr & (0xffffffff ^ mem_mask));
 		break;
 	default:
-		logerror("c421_w %x, %04x @ %04x (%08x, %08x)\n", offset, data, mem_mask, space.device().safe_pc(), (unsigned int)space.device().state().state_int(MIPS3_R31));
+		logerror("c421_w %x, %04x @ %04x (%08x, %08x)\n", offset, data, mem_mask, m_maincpu->pc(), (unsigned int)m_maincpu->state_int(MIPS3_R31));
 		break;
 	}
 }
@@ -2743,7 +2750,7 @@ WRITE16_MEMBER(namcos23_state::c361_w)
 		break;
 
 	default:
-		logerror("c361_w %x, %04x @ %04x (%08x, %08x)\n", offset, data, mem_mask, space.device().safe_pc(), (unsigned int)space.device().state().state_int(MIPS3_R31));
+		logerror("c361_w %x, %04x @ %04x (%08x, %08x)\n", offset, data, mem_mask, m_maincpu->pc(), (unsigned int)m_maincpu->state_int(MIPS3_R31));
 		break;
 	}
 }
@@ -2761,7 +2768,7 @@ READ16_MEMBER(namcos23_state::c361_r)
 		return m_screen->vblank() ? 1 : 0;
 	}
 
-	logerror("c361_r %x @ %04x (%08x, %08x)\n", offset, mem_mask, space.device().safe_pc(), (unsigned int)space.device().state().state_int(MIPS3_R31));
+	logerror("c361_r %x @ %04x (%08x, %08x)\n", offset, mem_mask, m_maincpu->pc(), (unsigned int)m_maincpu->state_int(MIPS3_R31));
 	return 0xffff;
 }
 
@@ -2793,11 +2800,11 @@ WRITE16_MEMBER(namcos23_state::ctl_w)
 
 	case 6: // gmen wars spams this heavily with 0 prior to starting the GMEN board test
 		if(data != 0)
-			logerror("ctl_w %x, %04x @ %04x (%08x, %08x)\n", offset, data, mem_mask, space.device().safe_pc(), (unsigned int)space.device().state().state_int(MIPS3_R31));
+			logerror("ctl_w %x, %04x @ %04x (%08x, %08x)\n", offset, data, mem_mask, m_maincpu->pc(), (unsigned int)m_maincpu->state_int(MIPS3_R31));
 		break;
 
 	default:
-		logerror("ctl_w %x, %04x @ %04x (%08x, %08x)\n", offset, data, mem_mask, space.device().safe_pc(), (unsigned int)space.device().state().state_int(MIPS3_R31));
+		logerror("ctl_w %x, %04x @ %04x (%08x, %08x)\n", offset, data, mem_mask, m_maincpu->pc(), (unsigned int)m_maincpu->state_int(MIPS3_R31));
 		break;
 	}
 }
@@ -2815,7 +2822,7 @@ READ16_MEMBER(namcos23_state::ctl_r)
 	}
 	}
 
-	logerror("ctl_r %x @ %04x (%08x, %08x)\n", offset, mem_mask, space.device().safe_pc(), (unsigned int)space.device().state().state_int(MIPS3_R31));
+	logerror("ctl_r %x @ %04x (%08x, %08x)\n", offset, mem_mask, m_maincpu->pc(), (unsigned int)m_maincpu->state_int(MIPS3_R31));
 	return 0xffff;
 }
 
@@ -3536,7 +3543,7 @@ static GFXDECODE_START( namcos23 )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( gorgon )
+MACHINE_CONFIG_START(namcos23_state::gorgon)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", R4650BE, BUSCLOCK*4)
@@ -3602,7 +3609,7 @@ static MACHINE_CONFIG_START( gorgon )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( s23 )
+MACHINE_CONFIG_START(namcos23_state::s23)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", R4650BE, BUSCLOCK*4)
@@ -3667,14 +3674,14 @@ static MACHINE_CONFIG_START( s23 )
 	MCFG_SOUND_ROUTE(3, "lspeaker", 1.00)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( timecrs2, s23 )
+MACHINE_CONFIG_DERIVED(namcos23_state::timecrs2, s23)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("iocpu")
 	MCFG_CPU_PROGRAM_MAP( timecrs2iobrdmap )
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( gmen, s23 )
+MACHINE_CONFIG_DERIVED(namcos23_state::gmen, s23)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -3688,7 +3695,7 @@ static MACHINE_CONFIG_DERIVED( gmen, s23 )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( ss23 )
+MACHINE_CONFIG_START(namcos23_state::ss23)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", R4650BE, BUSCLOCK*5)
@@ -3744,7 +3751,7 @@ static MACHINE_CONFIG_START( ss23 )
 	MCFG_SOUND_ROUTE(3, "lspeaker", 1.00)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( timecrs2v4a, ss23 )
+MACHINE_CONFIG_DERIVED(namcos23_state::timecrs2v4a, ss23)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("iocpu", H83334, JVSCLOCK )
 	MCFG_CPU_PROGRAM_MAP( timecrs2iobrdmap )
@@ -3756,7 +3763,7 @@ static MACHINE_CONFIG_DERIVED( timecrs2v4a, ss23 )
 	MCFG_H8_SCI_TX_CALLBACK(DEVWRITELINE(":iocpu:sci0", h8_sci_device, rx_w))
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( ss23e2, ss23 )
+MACHINE_CONFIG_DERIVED(namcos23_state::ss23e2, ss23)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -5270,8 +5277,8 @@ GAME( 1997, timecrs2v2b, timecrs2, timecrs2,    timecrs2,  namcos23_state, s23, 
 GAME( 1997, timecrs2v1b, timecrs2, timecrs2,    timecrs2,  namcos23_state, s23, ROT0, "Namco", "Time Crisis II (Japan, TSS1 Ver. B)", GAME_FLAGS )
 GAME( 1997, timecrs2v4a, timecrs2, timecrs2v4a, timecrs2,  namcos23_state, s23, ROT0, "Namco", "Time Crisis II (World, TSS4 Ver. A)", GAME_FLAGS )
 GAME( 1997, timecrs2v5a, timecrs2, timecrs2v4a, timecrs2,  namcos23_state, s23, ROT0, "Namco", "Time Crisis II (US, TSS5 Ver. A)", GAME_FLAGS )
-GAME( 1998, panicprk,    0,        s23,         s23,       namcos23_state, s23, ROT0, "Namco", "Panic Park (World, PNP2 Ver. A)",     GAME_FLAGS )
-GAME( 1998, panicprkj,   panicprk, s23,         s23,       namcos23_state, s23, ROT0, "Namco", "Panic Park (Japan, PNP1 Ver. B)",     GAME_FLAGS )
+GAME( 1997, panicprk,    0,        s23,         s23,       namcos23_state, s23, ROT0, "Namco", "Panic Park (World, PNP2 Ver. A)",     GAME_FLAGS )
+GAME( 1997, panicprkj,   panicprk, s23,         s23,       namcos23_state, s23, ROT0, "Namco", "Panic Park (Japan, PNP1 Ver. B)",     GAME_FLAGS )
 GAME( 1998, gunwars,     0,        gmen,        s23,       namcos23_state, s23, ROT0, "Namco", "Gunmen Wars (Japan, GM1 Ver. B)",     GAME_FLAGS )
 GAME( 1998, gunwarsa,    gunwars,  gmen,        s23,       namcos23_state, s23, ROT0, "Namco", "Gunmen Wars (Japan, GM1 Ver. A)",     GAME_FLAGS )
 GAME( 1998, raceon,      0,        gmen,        s23,       namcos23_state, s23, ROT0, "Namco", "Race On! (World, RO2 Ver. A)",        GAME_FLAGS )

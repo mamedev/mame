@@ -709,7 +709,7 @@ void mpz80_state::machine_reset()
 //  MACHINE_CONFIG( mpz80 )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( mpz80 )
+MACHINE_CONFIG_START(mpz80_state::mpz80)
 	// basic machine hardware
 	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL_4MHz)
 	MCFG_CPU_PROGRAM_MAP(mpz80_mem)

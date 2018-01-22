@@ -92,7 +92,7 @@ Notes:
 
 WRITE8_MEMBER(hexion_state::coincntr_w)
 {
-//logerror("%04x: coincntr_w %02x\n",space.device().safe_pc(),data);
+//logerror("%04x: coincntr_w %02x\n",m_maincpu->pc(),data);
 
 	/* bits 0/1 = coin counters */
 	machine().bookkeeping().coin_counter_w(0,data & 0x01);
@@ -254,7 +254,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(hexion_state::scanline)
 }
 
 
-static MACHINE_CONFIG_START( hexion )
+MACHINE_CONFIG_START(hexion_state::hexion)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_24MHz/4) /* Z80B 6 MHz @ 17F, xtal verified, divider not verified */
@@ -289,7 +289,7 @@ static MACHINE_CONFIG_START( hexion )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( hexionb, hexion )
+MACHINE_CONFIG_DERIVED(hexion_state::hexionb, hexion)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(hexionb_map)
 

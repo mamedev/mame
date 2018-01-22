@@ -125,6 +125,16 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	required_device<generic_latch_8_device> m_soundlatch;
+	void tnextspc(machine_config &config);
+	void alpha68k_II(machine_config &config);
+	void btlfieldb(machine_config &config);
+	void alpha68k_I(machine_config &config);
+	void kyros(machine_config &config);
+	void alpha68k_V_sb(machine_config &config);
+	void sstingry(machine_config &config);
+	void jongbou(machine_config &config);
+	void alpha68k_V(machine_config &config);
+	void alpha68k_II_gm(machine_config &config);
 };
 
 /* game_id - used to deal with a few game specific situations */

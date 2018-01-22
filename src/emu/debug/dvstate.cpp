@@ -218,35 +218,23 @@ void debug_view_state::view_update()
 				break;
 
 			case REG_CYCLES:
-				if (source.m_execintf)
-				{
-					curitem.update(source.m_execintf->cycles_remaining(), cycles_changed);
-					valstr = string_format("%-8d", curitem.value());
-				}
+				curitem.update(source.m_execintf ? source.m_execintf->cycles_remaining() : 0, cycles_changed);
+				valstr = string_format("%-8d", curitem.value());
 				break;
 
 			case REG_BEAMX:
-				if (screen)
-				{
-					curitem.update(screen->hpos(), cycles_changed);
-					valstr = string_format("%4d", curitem.value());
-				}
+				curitem.update(screen ? screen->hpos() : 0, cycles_changed);
+				valstr = string_format("%4d", curitem.value());
 				break;
 
 			case REG_BEAMY:
-				if (screen)
-				{
-					curitem.update(screen->vpos(), cycles_changed);
-					valstr = string_format("%4d", curitem.value());
-				}
+				curitem.update(screen ? screen->vpos() : 0, cycles_changed);
+				valstr = string_format("%4d", curitem.value());
 				break;
 
 			case REG_FRAME:
-				if (screen)
-				{
-					curitem.update(screen->frame_number(), cycles_changed);
-					valstr = string_format("%6d", curitem.value());
-				}
+				curitem.update(screen ? screen->frame_number() : 0, cycles_changed);
+				valstr = string_format("%-6d", curitem.value());
 				break;
 
 			default:

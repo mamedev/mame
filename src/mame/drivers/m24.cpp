@@ -55,6 +55,8 @@ public:
 
 	uint8_t m_sysctl, m_pa, m_kbcin, m_kbcout;
 	bool m_kbcibf, m_kbdata, m_i86_halt, m_i86_halt_perm;
+	static void cfg_m20_format(device_t *device);
+	void olivetti(machine_config &config);
 };
 
 void m24_state::machine_reset()
@@ -190,11 +192,6 @@ static ADDRESS_MAP_START(kbc_map, AS_PROGRAM, 8, m24_state)
 	AM_RANGE(0xf800, 0xffff) AM_ROM AM_REGION("kbc", 0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(kbc_io, AS_IO, 8, m24_state)
-	AM_RANGE(TMS7000_PORTA, TMS7000_PORTA) AM_READ(pa_r)
-	AM_RANGE(TMS7000_PORTB, TMS7000_PORTB) AM_WRITE(pb_w)
-ADDRESS_MAP_END
-
 static INPUT_PORTS_START( m24 )
 	PORT_START("DSW0")
 	PORT_DIPNAME( 0x8f, 0x89, "RAM banks")
@@ -243,15 +240,13 @@ FLOPPY_FORMATS_MEMBER( m24_state::floppy_formats )
 	FLOPPY_M20_FORMAT
 FLOPPY_FORMATS_END
 
-static MACHINE_CONFIG_START( cfg_m20_format )
-	MCFG_DEVICE_MODIFY("fdc:0")
-	static_cast<floppy_connector *>(device)->set_formats(m24_state::floppy_formats);
+void m24_state::cfg_m20_format(device_t *device)
+{
+	device->subdevice<floppy_connector>("fdc:0")->set_formats(m24_state::floppy_formats);
+	device->subdevice<floppy_connector>("fdc:1")->set_formats(m24_state::floppy_formats);
+}
 
-	MCFG_DEVICE_MODIFY("fdc:1")
-	static_cast<floppy_connector *>(device)->set_formats(m24_state::floppy_formats);
-MACHINE_CONFIG_END
-
-static MACHINE_CONFIG_START( olivetti )
+MACHINE_CONFIG_START(m24_state::olivetti)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8086, XTAL_8MHz)
 	MCFG_CPU_PROGRAM_MAP(m24_map)
@@ -277,7 +272,8 @@ static MACHINE_CONFIG_START( olivetti )
 
 	MCFG_CPU_ADD("kbc", TMS7000, XTAL_4MHz)
 	MCFG_CPU_PROGRAM_MAP(kbc_map)
-	MCFG_CPU_IO_MAP(kbc_io)
+	MCFG_TMS7000_IN_PORTA_CB(READ8(m24_state, pa_r))
+	MCFG_TMS7000_OUT_PORTB_CB(WRITE8(m24_state, pb_w))
 
 	MCFG_DEVICE_ADD("keyboard", M24_KEYBOARD, 0)
 	MCFG_M24_KEYBOARD_OUT_DATA_HANDLER(WRITELINE(m24_state, kbcin_w))

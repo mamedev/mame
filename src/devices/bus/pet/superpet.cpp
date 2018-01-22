@@ -69,7 +69,7 @@ ADDRESS_MAP_END
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( superpet_device::device_add_mconfig )
+MACHINE_CONFIG_START(superpet_device::device_add_mconfig)
 	MCFG_CPU_ADD(M6809_TAG, M6809, XTAL_16MHz/16)
 	MCFG_CPU_PROGRAM_MAP(superpet_mem)
 

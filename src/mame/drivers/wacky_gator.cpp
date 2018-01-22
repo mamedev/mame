@@ -83,6 +83,7 @@ public:
 
 	TIMER_DEVICE_CALLBACK_MEMBER(nmi_timer)     { m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE); }
 
+	void wackygtr(machine_config &config);
 private:
 	int     m_adpcm_sel;
 	uint16_t  m_adpcm_pos;
@@ -109,7 +110,7 @@ WRITE8_MEMBER(wackygtr_state::status_lamps_w)
 	set_lamps(0, data & 0x3f);
 
 	machine().bookkeeping().coin_counter_w(0, BIT(data, 6));
-	m_ticket->write(space, 0, data & 0x80);
+	m_ticket->motor_w(BIT(data, 7));
 }
 
 WRITE8_MEMBER(wackygtr_state::sample_ctrl_w)
@@ -271,9 +272,9 @@ static ADDRESS_MAP_START( program_map, AS_PROGRAM, 8, wackygtr_state )
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static MACHINE_CONFIG_START( wackygtr )
+MACHINE_CONFIG_START(wackygtr_state::wackygtr)
 
-	MCFG_CPU_ADD("maincpu", M6809E, XTAL_3_579545MHz)   // HD68B09P
+	MCFG_CPU_ADD("maincpu", MC6809, XTAL_3_579545MHz)   // HD68B09P
 	MCFG_CPU_PROGRAM_MAP(program_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(wackygtr_state, irq0_line_assert, 50)  // FIXME
 

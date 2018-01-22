@@ -42,6 +42,7 @@
 #include "formats/ap_dsk35.h"
 #include "formats/ap2_dsk.h"
 
+#include "formats/atom_dsk.h"
 #include "formats/acorn_dsk.h"
 
 #include "formats/oric_dsk.h"
@@ -76,6 +77,7 @@ static floppy_format_type floppy_formats[] = {
 	FLOPPY_RWTS18_FORMAT,
 	FLOPPY_EDD_FORMAT,
 
+	FLOPPY_ATOM_FORMAT,
 	FLOPPY_ACORN_SSD_FORMAT,
 	FLOPPY_ACORN_DSD_FORMAT,
 	FLOPPY_ACORN_DOS_FORMAT,

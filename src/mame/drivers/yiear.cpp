@@ -278,10 +278,10 @@ void yiear_state::machine_reset()
 	m_yiear_nmi_enable = 0;
 }
 
-static MACHINE_CONFIG_START( yiear )
+MACHINE_CONFIG_START(yiear_state::yiear)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6809,XTAL_18_432MHz/12)   /* verified on pcb */
+	MCFG_CPU_ADD("maincpu", MC6809E, XTAL_18_432MHz/12)   /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", yiear_state,  yiear_vblank_interrupt)
 	MCFG_CPU_PERIODIC_INT_DRIVER(yiear_state, yiear_nmi_interrupt, 480) /* music tempo (correct frequency unknown) */

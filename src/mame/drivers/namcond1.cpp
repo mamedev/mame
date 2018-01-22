@@ -322,7 +322,7 @@ INTERRUPT_GEN_MEMBER(namcond1_state::mcu_interrupt)
 {
 	if( m_h8_irq5_enabled )
 	{
-		generic_pulse_irq_line(device.execute(), 5, 1);
+		device.execute().pulse_input_line(5, device.execute().minimum_quantum_time());
 	}
 }
 
@@ -343,7 +343,7 @@ WRITE_LINE_MEMBER( namcond1_state::raster_irq_w )
 	m_maincpu->set_input_line(2, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
-static MACHINE_CONFIG_START( namcond1 )
+MACHINE_CONFIG_START(namcond1_state::namcond1)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_49_152MHz/4)
@@ -389,7 +389,7 @@ static MACHINE_CONFIG_START( namcond1 )
 
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( abcheck, namcond1 )
+MACHINE_CONFIG_DERIVED(namcond1_state::abcheck, namcond1)
 	MCFG_CPU_REPLACE("maincpu", M68000, XTAL_49_152MHz/4)
 	MCFG_CPU_PROGRAM_MAP(abcheck_map)
 //  MCFG_CPU_VBLANK_INT_DRIVER("screen", namcond1_state,  irq1_line_hold)

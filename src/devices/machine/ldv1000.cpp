@@ -270,7 +270,7 @@ const tiny_rom_entry *pioneer_ldv1000_device::device_rom_region() const
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( pioneer_ldv1000_device::device_add_mconfig )
+MACHINE_CONFIG_START(pioneer_ldv1000_device::device_add_mconfig)
 	MCFG_CPU_ADD("ldv1000", Z80, XTAL_5MHz/2)
 	MCFG_Z80_DAISY_CHAIN(daisy_chain)
 	MCFG_CPU_PROGRAM_MAP(ldv1000_map)
@@ -417,7 +417,7 @@ READ8_MEMBER( pioneer_ldv1000_device::z80_controller_r )
 WRITE8_MEMBER( pioneer_ldv1000_device::z80_controller_w )
 {
 	if (LOG_STATUS_CHANGES && data != m_status)
-		logerror("%04X:CONTROLLER.W=%02X\n", space.device().safe_pc(), data);
+		logerror("%s:CONTROLLER.W=%02X\n", machine().describe_context(), data);
 	m_status = data;
 }
 

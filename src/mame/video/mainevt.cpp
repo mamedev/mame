@@ -66,6 +66,9 @@ K051960_CB_MEMBER(mainevt_state::dv_sprite_callback)
 {
 	enum { sprite_colorbase = 128 / 16 };
 
+	// enable shadow if upper bits are 0
+	*shadow = ((*color & 0xe0) >> 5) == 0;
+
 	/* TODO: the priority/shadow handling (bits 5-7) seems to be quite complex (see PROM) */
 	*color = sprite_colorbase + (*color & 0x07);
 }

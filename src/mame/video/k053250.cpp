@@ -420,7 +420,7 @@ void k053250_device::draw( bitmap_rgb32 &bitmap, const rectangle &cliprect, int 
 
 void k053250_device::dma(int limiter)
 {
-	int current_frame = m_screen->frame_number();
+	int current_frame = screen().frame_number();
 
 	if (limiter && current_frame == m_frame)
 		return; // make sure we only do DMA transfer once per frame

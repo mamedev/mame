@@ -46,7 +46,7 @@ protected:
 	virtual void execute_run() override;
 
 	// device_disasm_interface overrides
-	virtual offs_t disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
+	virtual util::disasm_interface *create_disassembler() override;
 
 private:
 	typedef m6809_base_device super;

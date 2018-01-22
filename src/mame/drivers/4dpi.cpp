@@ -49,6 +49,7 @@ public:
 	INTERRUPT_GEN_MEMBER(sgi_ip6_vbl);
 	inline void ATTR_PRINTF(3,4) verboselog( int n_level, const char *s_fmt, ... );
 	required_device<cpu_device> m_maincpu;
+	void sgi_ip6(machine_config &config);
 };
 
 
@@ -227,7 +228,7 @@ ADDRESS_MAP_END
     MACHINE DRIVERS
 ***************************************************************************/
 
-static MACHINE_CONFIG_START( sgi_ip6 )
+MACHINE_CONFIG_START(sgi_ip6_state::sgi_ip6)
 	MCFG_CPU_ADD( "maincpu", R3041, 20000000 ) // FIXME: Should be R2000
 	MCFG_R3000_ENDIANNESS(ENDIANNESS_BIG)
 	MCFG_CPU_PROGRAM_MAP( sgi_ip6_map )

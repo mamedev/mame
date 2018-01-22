@@ -226,7 +226,7 @@ ROM_START (fcscsi1)
 ROM_END
 
 
-MACHINE_CONFIG_MEMBER(vme_fcscsi1_card_device::device_add_mconfig)
+MACHINE_CONFIG_START(vme_fcscsi1_card_device::device_add_mconfig)
 	/* basic machine hardware */
 	MCFG_CPU_ADD ("maincpu", M68010, CPU_CRYSTAL / 2) /* 7474 based frequency divide by 2 */
 	MCFG_CPU_PROGRAM_MAP (fcscsi1_mem)

@@ -416,7 +416,7 @@ INTERRUPT_GEN_MEMBER(truco_state::interrupt)
 *              Machine Driver              *
 *******************************************/
 
-static MACHINE_CONFIG_START( truco )
+MACHINE_CONFIG_START(truco_state::truco)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6809, CPU_CLOCK)

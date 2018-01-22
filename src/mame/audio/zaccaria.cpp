@@ -218,7 +218,7 @@ READ8_MEMBER(zac1b111xx_melody_base::melodypsg1_portb_r)
 	return m_melody_command;
 }
 
-MACHINE_CONFIG_MEMBER(zac1b111xx_melody_base::device_add_mconfig)
+MACHINE_CONFIG_START(zac1b111xx_melody_base::device_add_mconfig)
 	MCFG_CPU_ADD("melodycpu", M6802, XTAL_3_579545MHz) // verified on pcb
 	MCFG_CPU_PROGRAM_MAP(zac1b111xx_melody_base_map)
 
@@ -297,7 +297,7 @@ WRITE8_MEMBER(zac1b11107_audio_device::melodypsg2_porta_w)
 	// TODO: assume LEVELT is controlled here as is the case for 1B11142?
 }
 
-MACHINE_CONFIG_MEMBER(zac1b11107_audio_device::device_add_mconfig)
+MACHINE_CONFIG_START(zac1b11107_audio_device::device_add_mconfig)
 	zac1b111xx_melody_base::device_add_mconfig(config);
 
 	MCFG_CPU_MODIFY("melodycpu")
@@ -400,7 +400,7 @@ WRITE8_MEMBER(zac1b11142_audio_device::pia_1i_portb_w)
 	// TODO: a LED output().set_led_value(0, BIT(data, 4));
 }
 
-MACHINE_CONFIG_MEMBER(zac1b11142_audio_device::device_add_mconfig)
+MACHINE_CONFIG_START(zac1b11142_audio_device::device_add_mconfig)
 	zac1b111xx_melody_base::device_add_mconfig(config);
 
 	MCFG_CPU_MODIFY("melodycpu")

@@ -291,7 +291,7 @@ INTERRUPT_GEN_MEMBER(bankp_state::vblank_irq)
 		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
-static MACHINE_CONFIG_START( bankp )
+MACHINE_CONFIG_START(bankp_state::bankp)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK/6)

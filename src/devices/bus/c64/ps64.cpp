@@ -75,7 +75,7 @@ static struct votrax_sc02_interface votrax_intf =
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( c64_ps64_cartridge_device::device_add_mconfig )
+MACHINE_CONFIG_START(c64_ps64_cartridge_device::device_add_mconfig)
 	//MCFG_SPEAKER_STANDARD_MONO("mono")
 	//MCFG_VOTRAX_SC02_ADD(SSI263_TAG, 2000000, votrax_intf)
 	//MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)

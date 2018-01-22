@@ -34,6 +34,7 @@ public:
 	required_device<astrocade_cart_slot_device> m_cart;
 	required_device<astrocade_exp_device> m_exp;
 	DECLARE_MACHINE_START(astrocde);
+	void astrocde(machine_config &config);
 };
 
 /*********************************************************************************
@@ -190,7 +191,7 @@ static SLOT_INTERFACE_START(astrocade_exp)
 SLOT_INTERFACE_END
 
 
-static MACHINE_CONFIG_START( astrocde )
+MACHINE_CONFIG_START(astrocde_mess_state::astrocde)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, ASTROCADE_CLOCK/4)        /* 1.789 MHz */
 	MCFG_CPU_PROGRAM_MAP(astrocade_mem)

@@ -124,4 +124,11 @@ public:
 	void update_sprites();
 	void lineswap_gfx_roms(const char *region, const int bit);
 	void gfx_unscramble();
+	void omegaf(machine_config &config);
+	void ninjakd2b(machine_config &config);
+	void robokid(machine_config &config);
+	void arkarea(machine_config &config);
+	void mnight(machine_config &config);
+	void ninjakd2(machine_config &config);
+	void ninjakd2_core(machine_config &config);
 };

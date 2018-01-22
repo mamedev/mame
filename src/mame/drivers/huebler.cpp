@@ -309,7 +309,7 @@ static GFXDECODE_START( amu880 )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( amu880 )
+MACHINE_CONFIG_START(amu880_state::amu880)
 	/* basic machine hardware */
 	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL_10MHz/4) // U880D
 	MCFG_CPU_PROGRAM_MAP(amu880_mem)

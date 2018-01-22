@@ -26,9 +26,9 @@ void midxunit_state::register_state_saving()
 	save_item(NAME(m_cmos_write_enable));
 	save_item(NAME(m_iodata));
 	save_item(NAME(m_ioshuffle));
-	save_item(NAME(m_analog_port));
 	save_item(NAME(m_uart));
 	save_item(NAME(m_security_bits));
+	save_item(NAME(m_adc_int));
 }
 
 
@@ -83,8 +83,8 @@ WRITE16_MEMBER(midxunit_state::midxunit_io_w)
 			output().set_value("Player2_Gun_LED", (~data & 0x20) >> 5 );
 			output().set_value("Player3_Gun_LED", (~data & 0x40) >> 6 );
 
-			logerror("%08X:I/O write to %d = %04X\n", space.device().safe_pc(), offset, data);
-//          logerror("%08X:Unknown I/O write to %d = %04X\n", space.device().safe_pc(), offset, data);
+			logerror("%08X:I/O write to %d = %04X\n", m_maincpu->pc(), offset, data);
+//          logerror("%08X:Unknown I/O write to %d = %04X\n", m_maincpu->pc(), offset, data);
 			break;
 	}
 	m_iodata[offset] = newword;
@@ -99,7 +99,13 @@ WRITE16_MEMBER(midxunit_state::midxunit_unknown_w)
 		m_dcs->reset_w(data & 2);
 
 	if (ACCESSING_BITS_0_7 && offset % 0x40000 == 0)
-		logerror("%08X:midxunit_unknown_w @ %d = %02X\n", space.device().safe_pc(), offs, data & 0xff);
+		logerror("%08X:midxunit_unknown_w @ %d = %02X\n", m_maincpu->pc(), offs, data & 0xff);
+}
+
+
+WRITE_LINE_MEMBER(midxunit_state::adc_int_w)
+{
+	m_adc_int = (state != CLEAR_LINE);
 }
 
 
@@ -110,47 +116,10 @@ WRITE16_MEMBER(midxunit_state::midxunit_unknown_w)
  *
  *************************************/
 
-READ16_MEMBER(midxunit_state::midxunit_io_r)
-{
-	static const char *const portnames[] = { "IN0", "IN1", "IN2", "DSW" };
-
-	offset = (offset / 2) % 8;
-
-	switch (offset)
-	{
-		case 0:
-		case 1:
-		case 2:
-		case 3:
-			return ioport(portnames[offset])->read();
-
-		default:
-			logerror("%08X:Unknown I/O read from %d\n", space.device().safe_pc(), offset);
-			break;
-	}
-	return ~0;
-}
-
-
-READ16_MEMBER(midxunit_state::midxunit_analog_r)
-{
-	static const char *const portnames[] = { "AN0", "AN1", "AN2", "AN3", "AN4", "AN5" };
-
-	return ioport(portnames[m_analog_port])->read();
-}
-
-
-WRITE16_MEMBER(midxunit_state::midxunit_analog_select_w)
-{
-	if (offset == 0 && ACCESSING_BITS_0_7)
-		m_analog_port = data - 8;
-}
-
-
 READ16_MEMBER(midxunit_state::midxunit_status_r)
 {
 	/* low bit indicates whether the ADC is done reading the current input */
-	return (m_midway_serial_pic->status_r(space,0) << 1) | 1;
+	return (m_midway_serial_pic->status_r(space,0) << 1) | (m_adc_int ? 1 : 0);
 }
 
 
@@ -233,7 +202,7 @@ READ16_MEMBER(midxunit_state::midxunit_uart_r)
 			break;
 	}
 
-/*  logerror("%08X:UART R @ %X = %02X\n", space.device().safe_pc(), offset, result);*/
+/*  logerror("%08X:UART R @ %X = %02X\n", m_maincpu->pc(), offset, result);*/
 	return result;
 }
 
@@ -269,7 +238,7 @@ WRITE16_MEMBER(midxunit_state::midxunit_uart_w)
 			break;
 	}
 
-/*  logerror("%08X:UART W @ %X = %02X\n", space.device().safe_pc(), offset, data);*/
+/*  logerror("%08X:UART W @ %X = %02X\n", m_maincpu->pc(), offset, data);*/
 }
 
 
@@ -347,7 +316,7 @@ WRITE16_MEMBER(midxunit_state::midxunit_security_clock_w)
 
 READ16_MEMBER(midxunit_state::midxunit_sound_r)
 {
-	logerror("%08X:Sound read\n", space.device().safe_pc());
+	logerror("%08X:Sound read\n", m_maincpu->pc());
 
 	return m_dcs->data_r() & 0xff;
 }
@@ -364,14 +333,14 @@ WRITE16_MEMBER(midxunit_state::midxunit_sound_w)
 	/* check for out-of-bounds accesses */
 	if (offset)
 	{
-		logerror("%08X:Unexpected write to sound (hi) = %04X\n", space.device().safe_pc(), data);
+		logerror("%08X:Unexpected write to sound (hi) = %04X\n", m_maincpu->pc(), data);
 		return;
 	}
 
 	/* call through based on the sound type */
 	if (ACCESSING_BITS_0_7)
 	{
-		logerror("%08X:Sound write = %04X\n", space.device().safe_pc(), data);
+		logerror("%08X:Sound write = %04X\n", m_maincpu->pc(), data);
 		m_dcs->data_w(data & 0xff);
 	}
 }

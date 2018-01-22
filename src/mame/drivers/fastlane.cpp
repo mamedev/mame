@@ -25,10 +25,9 @@ TIMER_DEVICE_CALLBACK_MEMBER(fastlane_state::fastlane_scanline)
 {
 	int scanline = param;
 
-	address_space &space = generic_space();
-	if(scanline == 240 && m_k007121->ctrlram_r(space, 7) & 0x02) // vblank irq
+	if(scanline == 240 && m_k007121->ctrlram_r(7) & 0x02) // vblank irq
 		m_maincpu->set_input_line(HD6309_IRQ_LINE, HOLD_LINE);
-	else if(((scanline % 32) == 0) && m_k007121->ctrlram_r(space, 7) & 0x01) // timer irq
+	else if(((scanline % 32) == 0) && m_k007121->ctrlram_r(7) & 0x01) // timer irq
 		m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
@@ -199,7 +198,7 @@ void fastlane_state::machine_start()
 	membank("bank1")->configure_entries(0, 4, &ROM[0x10000], 0x4000);
 }
 
-static MACHINE_CONFIG_START( fastlane )
+MACHINE_CONFIG_START(fastlane_state::fastlane)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", HD6309, XTAL_24MHz/2) // 3MHz(XTAL_24MHz/8) internally

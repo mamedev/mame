@@ -49,6 +49,7 @@ public:
 		m_oki(*this, "oki"),
 		m_screen(*this, "screen"),
 		m_tlc34076(*this, "tlc34076"),
+		m_ticket(*this, "ticket%u", 1),
 		m_vram(*this, "vram"),
 		m_control(*this, "control") { }
 
@@ -56,6 +57,7 @@ public:
 	optional_device<okim6295_device> m_oki;
 	required_device<screen_device> m_screen;
 	required_device<tlc34076_device> m_tlc34076;
+	optional_device_array<ticket_dispenser_device, 2> m_ticket;
 
 	required_shared_ptr<uint16_t> m_vram;
 	optional_shared_ptr<uint16_t> m_control;
@@ -89,6 +91,10 @@ public:
 	TMS340X0_SCANLINE_RGB32_CB_MEMBER(scanline_update);
 	TMS340X0_SCANLINE_RGB32_CB_MEMBER(rapidfir_scanline_update);
 
+	void rapidfir(machine_config &config);
+	void ghoshunt(machine_config &config);
+	void tickee(machine_config &config);
+	void mouseatk(machine_config &config);
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
@@ -303,14 +309,14 @@ READ16_MEMBER(tickee_state::rapidfir_transparent_r)
 TMS340X0_TO_SHIFTREG_CB_MEMBER(tickee_state::rapidfir_to_shiftreg)
 {
 	if (address < 0x800000)
-		memcpy(shiftreg, &m_vram[TOWORD(address)], TOBYTE(0x2000));
+		memcpy(shiftreg, &m_vram[address >> 4], 0x400);
 }
 
 
 TMS340X0_FROM_SHIFTREG_CB_MEMBER(tickee_state::rapidfir_from_shiftreg)
 {
 	if (address < 0x800000)
-		memcpy(&m_vram[TOWORD(address)], shiftreg, TOBYTE(0x2000));
+		memcpy(&m_vram[address >> 4], shiftreg, 0x400);
 }
 
 
@@ -336,12 +342,12 @@ WRITE16_MEMBER(tickee_state::tickee_control_w)
 
 	if (offset == 3)
 	{
-		machine().device<ticket_dispenser_device>("ticket1")->write(space, 0, (data & 8) << 4);
-		machine().device<ticket_dispenser_device>("ticket2")->write(space, 0, (data & 4) << 5);
+		m_ticket[0]->motor_w(BIT(data, 3));
+		m_ticket[1]->motor_w(BIT(data, 2));
 	}
 
 	if (olddata != m_control[offset])
-		logerror("%08X:tickee_control_w(%d) = %04X (was %04X)\n", space.device().safe_pc(), offset, m_control[offset], olddata);
+		logerror("%08X:tickee_control_w(%d) = %04X (was %04X)\n", m_maincpu->pc(), offset, m_control[offset], olddata);
 }
 
 
@@ -742,7 +748,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( tickee )
+MACHINE_CONFIG_START(tickee_state::tickee)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", TMS34010, XTAL_40MHz)
@@ -782,7 +788,7 @@ static MACHINE_CONFIG_START( tickee )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( ghoshunt, tickee )
+MACHINE_CONFIG_DERIVED(tickee_state::ghoshunt, tickee)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -790,7 +796,7 @@ static MACHINE_CONFIG_DERIVED( ghoshunt, tickee )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( rapidfir )
+MACHINE_CONFIG_START(tickee_state::rapidfir)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", TMS34010, XTAL_50MHz)
@@ -824,7 +830,7 @@ static MACHINE_CONFIG_START( rapidfir )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( mouseatk )
+MACHINE_CONFIG_START(tickee_state::mouseatk)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", TMS34010, XTAL_40MHz)

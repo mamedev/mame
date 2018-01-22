@@ -98,7 +98,7 @@ const tiny_rom_entry *comx_eb_device::device_rom_region() const
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( comx_eb_device::device_add_mconfig )
+MACHINE_CONFIG_START(comx_eb_device::device_add_mconfig)
 	MCFG_COMX_EXPANSION_SLOT_ADD(SLOT1_TAG, comx_expansion_cards, "fd")
 	MCFG_COMX_EXPANSION_SLOT_IRQ_CALLBACK(WRITELINE(comx_eb_device, slot1_irq_w))
 	MCFG_COMX_EXPANSION_SLOT_ADD(SLOT2_TAG, comx_expansion_cards, "clm")

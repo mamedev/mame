@@ -500,7 +500,7 @@ void vidbrain_state::machine_reset()
 //  MACHINE_CONFIG( vidbrain )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( vidbrain )
+MACHINE_CONFIG_START(vidbrain_state::vidbrain)
 	// basic machine hardware
 	MCFG_CPU_ADD(F3850_TAG, F8, XTAL_4MHz/2)
 	MCFG_CPU_PROGRAM_MAP(vidbrain_mem)

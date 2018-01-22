@@ -87,6 +87,8 @@ public:
 	uint32_t screen_update_oric(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(vblank_w);
 
+	void oric(machine_config &config);
+	void prav8d(machine_config &config);
 protected:
 	required_device<cpu_device> m_maincpu;
 	required_device<palette_device> m_palette;
@@ -153,6 +155,7 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
+	void telstrat(machine_config &config);
 protected:
 	enum {
 		P_IRQEN  = 0x01,
@@ -767,7 +770,7 @@ static INPUT_PORTS_START(telstrat)
 INPUT_PORTS_END
 
 
-static MACHINE_CONFIG_START( oric )
+MACHINE_CONFIG_START(oric_state::oric)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, XTAL_12MHz/12)
 	MCFG_CPU_PROGRAM_MAP(oric_mem)
@@ -775,10 +778,7 @@ static MACHINE_CONFIG_START( oric )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_SIZE(40*6, 28*8)
-	MCFG_SCREEN_VISIBLE_AREA(0, 40*6-1, 0, 28*8-1)
+	MCFG_SCREEN_RAW_PARAMS(XTAL_12MHz/2, 64*6, 0, 40*6, 312, 0, 28*8) // 260 lines in 60 Hz mode
 	MCFG_SCREEN_UPDATE_DRIVER(oric_state, screen_update_oric)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(oric_state, vblank_w))
 
@@ -818,7 +818,7 @@ static MACHINE_CONFIG_START( oric )
 	MCFG_ORICEXT_ADD( "ext", oricext_intf, nullptr, "maincpu", WRITELINE(oric_state, ext_irq_w))
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( prav8d, oric )
+MACHINE_CONFIG_DERIVED(oric_state::prav8d, oric)
 MACHINE_CONFIG_END
 
 FLOPPY_FORMATS_MEMBER( telestrat_state::floppy_formats )
@@ -829,7 +829,7 @@ static SLOT_INTERFACE_START( telestrat_floppies )
 	SLOT_INTERFACE( "3dsdd", FLOPPY_3_DSDD )
 SLOT_INTERFACE_END
 
-static MACHINE_CONFIG_DERIVED( telstrat, oric )
+MACHINE_CONFIG_DERIVED(telestrat_state::telstrat, oric)
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_PROGRAM_MAP(telestrat_mem)
 

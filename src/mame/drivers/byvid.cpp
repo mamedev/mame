@@ -106,6 +106,8 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(u11_timer);
 	DECLARE_WRITE8_MEMBER(granny_crtc_w);
 	uint32_t screen_update_granny(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	void babypac(machine_config &config);
+	void granny(machine_config &config);
 private:
 	uint8_t m_mpu_to_vid;
 	uint8_t m_vid_to_mpu;
@@ -120,7 +122,7 @@ private:
 	bool m_u11_timer;
 	virtual void machine_reset() override;
 	required_device<m6800_cpu_device> m_maincpu;
-	required_device<m6809e_device> m_videocpu;
+	required_device<mc6809_device> m_videocpu;
 	required_device<m6803_cpu_device> m_audiocpu;
 	required_device<pia6821_device> m_pia_u7;
 	required_device<pia6821_device> m_pia_u10;
@@ -741,12 +743,12 @@ uint32_t by133_state::screen_update_granny(screen_device &screen, bitmap_rgb32 &
 	return 0;
 }
 
-static MACHINE_CONFIG_START( babypac )
+MACHINE_CONFIG_START(by133_state::babypac)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6800, XTAL_3_579545MHz/4) // no xtal, just 2 chips
 	MCFG_CPU_PROGRAM_MAP(main_map)
 
-	MCFG_CPU_ADD("videocpu", M6809E, XTAL_3_579545MHz)
+	MCFG_CPU_ADD("videocpu", MC6809, XTAL_3_579545MHz)
 	MCFG_CPU_PROGRAM_MAP(video_map)
 
 	MCFG_CPU_ADD("audiocpu", M6803, XTAL_3_579545MHz)
@@ -805,9 +807,9 @@ static MACHINE_CONFIG_START( babypac )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "beee", 0.10)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( granny, babypac )
+MACHINE_CONFIG_DERIVED(by133_state::granny, babypac)
 	MCFG_DEVICE_REMOVE("videocpu")
-	MCFG_CPU_ADD("videocpu", M6809E, XTAL_8MHz) //??
+	MCFG_CPU_ADD("videocpu", MC6809, XTAL_8MHz) // MC68B09P (XTAL value hard to read)
 	MCFG_CPU_PROGRAM_MAP(granny_map)
 
 	MCFG_DEVICE_REMOVE("screen")

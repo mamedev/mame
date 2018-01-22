@@ -79,6 +79,7 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_z_pulse);
 	TIMER_DEVICE_CALLBACK_MEMBER(u11_timer);
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_d_pulse);
+	void by17(machine_config &config);
 private:
 	uint8_t m_u10a;
 	uint8_t m_u10b;
@@ -974,7 +975,7 @@ MACHINE_RESET_MEMBER( by17_state, by17 )
 
 
 
-static MACHINE_CONFIG_START( by17 )
+MACHINE_CONFIG_START(by17_state::by17)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6800, 530000)  // No xtal, just 2 chips forming a multivibrator oscillator around 530KHz
 	MCFG_CPU_PROGRAM_MAP(by17_map)

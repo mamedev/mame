@@ -455,7 +455,7 @@ INTERRUPT_GEN_MEMBER(intv_state::intv_interrupt2)
 	timer_set(m_keyboard->cycles_to_attotime(100), TIMER_INTV_INTERRUPT2_COMPLETE);
 }
 
-static MACHINE_CONFIG_START( intv )
+MACHINE_CONFIG_START(intv_state::intv)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", CP1610, XTAL_3_579545MHz/4)        /* Colorburst/4 */
 	MCFG_CPU_PROGRAM_MAP(intv_mem)
@@ -463,7 +463,8 @@ static MACHINE_CONFIG_START( intv )
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
 	/* video hardware */
-	MCFG_STIC_ADD("stic")
+	MCFG_DEVICE_ADD("stic", STIC, XTAL_3_579545MHz)
+	MCFG_VIDEO_SET_SCREEN("screen")
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(59.92)
@@ -495,12 +496,12 @@ static MACHINE_CONFIG_START( intv )
 	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("ecs_list", "intvecs")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( intv2, intv )
+MACHINE_CONFIG_DERIVED(intv_state::intv2, intv)
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_PROGRAM_MAP(intv2_mem)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( intvoice, intv )
+MACHINE_CONFIG_DERIVED(intv_state::intvoice, intv)
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_PROGRAM_MAP(intvoice_mem)
 
@@ -508,7 +509,7 @@ static MACHINE_CONFIG_DERIVED( intvoice, intv )
 	MCFG_DEVICE_ADD("voice", INTV_ROM_VOICE, 0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( intvecs, intv )
+MACHINE_CONFIG_DERIVED(intv_state::intvecs, intv)
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_PROGRAM_MAP(intvecs_mem)
 
@@ -529,7 +530,7 @@ static MACHINE_CONFIG_DERIVED( intvecs, intv )
 	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("intv_list", "intv")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( intvkbd, intv )
+MACHINE_CONFIG_DERIVED(intv_state::intvkbd, intv)
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_PROGRAM_MAP(intvkbd_mem)
 

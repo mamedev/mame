@@ -37,6 +37,7 @@ public:
 	virtual void video_start() override;
 
 	TMS340X0_SCANLINE_RGB32_CB_MEMBER(scanline_update);
+	void potgold(machine_config &config);
 };
 
 
@@ -71,7 +72,7 @@ static INPUT_PORTS_START( potgold )
 INPUT_PORTS_END
 
 
-static MACHINE_CONFIG_START( potgold )
+MACHINE_CONFIG_START(potgold_state::potgold)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", TMS34010, XTAL_40MHz)

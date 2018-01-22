@@ -173,6 +173,7 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
+	void pv1000(machine_config &config);
 };
 
 
@@ -432,7 +433,7 @@ static GFXDECODE_START( pv1000 )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( pv1000 )
+MACHINE_CONFIG_START(pv1000_state::pv1000)
 
 	MCFG_CPU_ADD( "maincpu", Z80, 17897725/5 )
 	MCFG_CPU_PROGRAM_MAP( pv1000 )

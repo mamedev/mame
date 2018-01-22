@@ -7,24 +7,9 @@
 */
 
 #include "emu.h"
-#include "debugger.h"
-#include "tms7000.h"
+#include "7000dasm.h"
 
-enum operandtype { DONE, NONE, UI8, I8, UI16, I16, PCREL, PCABS, TRAP };
-
-struct oprandinfo {
-	char opstr[4][12];
-	operandtype decode[4];
-};
-
-struct tms7000_opcodeinfo {
-	int opcode;
-	char name[8];
-	int operand;
-	uint32_t s_flag;
-};
-
-static const oprandinfo of[] = {
+const tms7000_disassembler::oprandinfo tms7000_disassembler::of[] = {
 /* 00 */ { {" B,A",     "",         "",         ""},        {NONE, DONE, DONE, DONE} },
 /* 01 */ { {" R%u",     ",A",       "",         ""},        {UI8, NONE, DONE, DONE} },
 /* 02 */ { {" R%u",     ",B",       "",         ""},        {UI8, NONE, DONE, DONE} },
@@ -84,7 +69,7 @@ static const oprandinfo of[] = {
 /* 45 */ { {" *R%u",    "",         "",         ""},        {UI8, DONE, DONE, DONE} }
 };
 
-static const tms7000_opcodeinfo opcodes[] = {
+const tms7000_disassembler::tms7000_opcodeinfo tms7000_disassembler::opcs[] = {
 	{0x69, "ADC", 0, 0 },
 	{0x19, "ADC", 1, 0 },
 	{0x39, "ADC", 2, 0 },
@@ -141,9 +126,9 @@ static const tms7000_opcodeinfo opcodes[] = {
 	{0x97, "BTJZP", 21, 0 },
 	{0xA7, "BTJZP", 22, 0 },
 
-	{0x8E, "CALL", 43, DASMFLAG_STEP_OVER },
-	{0x9E, "CALL", 45, DASMFLAG_STEP_OVER },
-	{0xAE, "CALL", 12, DASMFLAG_STEP_OVER },
+	{0x8E, "CALL", 43, STEP_OVER },
+	{0x9E, "CALL", 45, STEP_OVER },
+	{0xAE, "CALL", 12, STEP_OVER },
 
 	{0xB5, "CLR A", 23, 0 },
 	{0xC5, "CLR B", 23, 0 },
@@ -273,8 +258,8 @@ static const tms7000_opcodeinfo opcodes[] = {
 	{0xD8, "PUSH", 24, 0 },
 	{0x0E, "PUSH ST", 23, 0 },
 
-	{0x0B, "RETI", 23, DASMFLAG_STEP_OUT },
-	{0x0A, "RETS", 23, DASMFLAG_STEP_OUT },
+	{0x0B, "RETI", 23, STEP_OUT },
+	{0x0A, "RETS", 23, STEP_OUT },
 
 	{0xBE, "RL A", 23, 0 },
 	{0xCE, "RL B", 23, 0 },
@@ -316,30 +301,30 @@ static const tms7000_opcodeinfo opcodes[] = {
 	{0x5A, "SUB", 5, 0 },
 	{0x7A, "SUB", 6, 0 },
 
-	{0xFF, "TRAP 0", 44, DASMFLAG_STEP_OVER },
-	{0xFE, "TRAP 1", 44, DASMFLAG_STEP_OVER },
-	{0xFD, "TRAP 2", 44, DASMFLAG_STEP_OVER },
-	{0xFC, "TRAP 3", 44, DASMFLAG_STEP_OVER },
-	{0xFB, "TRAP 4", 44, DASMFLAG_STEP_OVER },
-	{0xFA, "TRAP 5", 44, DASMFLAG_STEP_OVER },
-	{0xF9, "TRAP 6", 44, DASMFLAG_STEP_OVER },
-	{0xF8, "TRAP 7", 44, DASMFLAG_STEP_OVER },
-	{0xF7, "TRAP 8", 44, DASMFLAG_STEP_OVER },
-	{0xF6, "TRAP 9", 44, DASMFLAG_STEP_OVER },
-	{0xF5, "TRAP 10", 44, DASMFLAG_STEP_OVER },
-	{0xF4, "TRAP 11", 44, DASMFLAG_STEP_OVER },
-	{0xF3, "TRAP 12", 44, DASMFLAG_STEP_OVER },
-	{0xF2, "TRAP 13", 44, DASMFLAG_STEP_OVER },
-	{0xF1, "TRAP 14", 44, DASMFLAG_STEP_OVER },
-	{0xF0, "TRAP 15", 44, DASMFLAG_STEP_OVER },
-	{0xEF, "TRAP 16", 44, DASMFLAG_STEP_OVER },
-	{0xEE, "TRAP 17", 44, DASMFLAG_STEP_OVER },
-	{0xED, "TRAP 18", 44, DASMFLAG_STEP_OVER },
-	{0xEC, "TRAP 19", 44, DASMFLAG_STEP_OVER },
-	{0xEB, "TRAP 20", 44, DASMFLAG_STEP_OVER },
-	{0xEA, "TRAP 21", 44, DASMFLAG_STEP_OVER },
-	{0xE9, "TRAP 22", 44, DASMFLAG_STEP_OVER },
-	{0xE8, "TRAP 23", 44, DASMFLAG_STEP_OVER },
+	{0xFF, "TRAP 0", 44, STEP_OVER },
+	{0xFE, "TRAP 1", 44, STEP_OVER },
+	{0xFD, "TRAP 2", 44, STEP_OVER },
+	{0xFC, "TRAP 3", 44, STEP_OVER },
+	{0xFB, "TRAP 4", 44, STEP_OVER },
+	{0xFA, "TRAP 5", 44, STEP_OVER },
+	{0xF9, "TRAP 6", 44, STEP_OVER },
+	{0xF8, "TRAP 7", 44, STEP_OVER },
+	{0xF7, "TRAP 8", 44, STEP_OVER },
+	{0xF6, "TRAP 9", 44, STEP_OVER },
+	{0xF5, "TRAP 10", 44, STEP_OVER },
+	{0xF4, "TRAP 11", 44, STEP_OVER },
+	{0xF3, "TRAP 12", 44, STEP_OVER },
+	{0xF2, "TRAP 13", 44, STEP_OVER },
+	{0xF1, "TRAP 14", 44, STEP_OVER },
+	{0xF0, "TRAP 15", 44, STEP_OVER },
+	{0xEF, "TRAP 16", 44, STEP_OVER },
+	{0xEE, "TRAP 17", 44, STEP_OVER },
+	{0xED, "TRAP 18", 44, STEP_OVER },
+	{0xEC, "TRAP 19", 44, STEP_OVER },
+	{0xEB, "TRAP 20", 44, STEP_OVER },
+	{0xEA, "TRAP 21", 44, STEP_OVER },
+	{0xE9, "TRAP 22", 44, STEP_OVER },
+	{0xE8, "TRAP 23", 44, STEP_OVER },
 
 	{0xB7, "SWAP A", 23, 0 },
 	{0xC7, "SWAP B", 23, 0 },
@@ -367,17 +352,22 @@ static const tms7000_opcodeinfo opcodes[] = {
 	{0x00, "NOP", 23, 0 }
 };
 
-CPU_DISASSEMBLE(tms7000)
+u32 tms7000_disassembler::opcode_alignment() const
+{
+	return 1;
+}
+
+offs_t tms7000_disassembler::disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params)
 {
 	int opcode, i/*, size = 1*/;
-	int pos = 0;
+	offs_t pos = pc;
 	char tmpbuf[32];
 
-	opcode = oprom[pos++];
+	opcode = opcodes.r8(pos++);
 
-	for( i=0; i<sizeof(opcodes) / sizeof(tms7000_opcodeinfo); i++ )
+	for( i=0; i<sizeof(opcs) / sizeof(tms7000_opcodeinfo); i++ )
 	{
-		if( opcode == opcodes[i].opcode )
+		if( opcode == opcs[i].opcode )
 		{
 			/* We found a match */
 
@@ -387,9 +377,9 @@ CPU_DISASSEMBLE(tms7000)
 			uint16_t  c;
 			int16_t   d;
 
-			util::stream_format(stream, "%s", opcodes[i].name);
+			util::stream_format(stream, "%s", opcs[i].name);
 
-			j=opcodes[i].operand;
+			j=opcs[i].operand;
 
 			for( k=0; k<4; k++ )
 			{
@@ -401,34 +391,34 @@ CPU_DISASSEMBLE(tms7000)
 						util::stream_format(stream, "%s", of[j].opstr[k]);
 						break;
 					case UI8:
-						a = (uint8_t)opram[pos++];
+						a = (uint8_t)params.r8(pos++);
 						util::stream_format(stream, of[j].opstr[k], (unsigned int)a);
 						break;
 					case I8:
-						b = (int8_t)opram[pos++];
+						b = (int8_t)params.r8(pos++);
 						util::stream_format(stream, of[j].opstr[k], (int8_t)b);
 						break;
 					case UI16:
-						c = (uint16_t)opram[pos++];
+						c = (uint16_t)params.r8(pos++);
 						c <<= 8;
-						c += opram[pos++];
+						c += params.r8(pos++);
 						util::stream_format(stream, of[j].opstr[k], (unsigned int)c);
 						break;
 					case I16:
-						d = (int16_t)opram[pos++];
+						d = (int16_t)params.r8(pos++);
 						d <<= 8;
-						d += opram[pos++];
+						d += params.r8(pos++);
 						util::stream_format(stream, of[j].opstr[k], (signed int)d);
 						break;
 					case PCREL:
-						b = (int8_t)opram[pos++];
+						b = (int8_t)params.r8(pos++);
 						sprintf(tmpbuf, "$%04X", pc+2+k+b);
 						util::stream_format(stream, of[j].opstr[k], tmpbuf);
 						break;
 					case PCABS:
-						c = (uint16_t)opram[pos++];
+						c = (uint16_t)params.r8(pos++);
 						c <<= 8;
-						c += opram[pos++];
+						c += params.r8(pos++);
 						sprintf(tmpbuf, "$%04X", c);
 						util::stream_format(stream, of[j].opstr[k], tmpbuf);
 						break;
@@ -438,11 +428,11 @@ CPU_DISASSEMBLE(tms7000)
 						break;
 				}
 			}
-			return pos | opcodes[i].s_flag | DASMFLAG_SUPPORTED;
+			return (pos - pc) | opcs[i].s_flag | SUPPORTED;
 		}
 	}
 
 	/* No Match */
 	stream << "Illegal Opcode";
-	return pos | DASMFLAG_SUPPORTED;
+	return (pos - pc) | SUPPORTED;
 }

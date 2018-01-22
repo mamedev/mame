@@ -1,0 +1,127 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<softwarelist name="pcfx" description="NEC PC-FX CD-ROMs">
+
+	<!-- Sourced from Redump -->
+
+	<software name="amateur" supported="no">
+		<description>Amateur Teikyou CD-ROM</description>
+		<year>1994</year>
+		<publisher>NEC</publisher>
+		<part name="cdrom" interface="pcfx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="amateur teikyou cd-rom (japan)" sha1="ce2f6509a2bebcd36a1063ca6233d3d6150b7419"/>
+			</diskarea>
+		</part>
+	</software>
+	<software name="angeliq" supported="no">
+		<description>Fushigi no Kuni no Angelique</description>
+		<year>1996</year>
+		<publisher>Koei</publisher>
+		<part name="cdrom" interface="pcfx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="fushigi no kuni no angelique (japan)" sha1="4d838cd6b5123d86b415bc4ab405714a16bacfad"/>
+			</diskarea>
+		</part>
+	</software>
+	<software name="batlheat" supported="no">
+		<description>Battle Heat</description>
+		<year>1994</year>
+		<publisher>Hudson Soft</publisher>
+		<part name="cdrom" interface="pcfx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="battle heat (japan)" sha1="1a73ab8064ddfaebd5e555f51e4c153da6027fd7"/>
+			</diskarea>
+		</part>
+	</software>
+	<software name="cancandx" supported="no">
+		<description>Can Can Bunny Extra DX</description>
+		<year>1996</year>
+		<publisher>Cocktail Soft</publisher>
+		<part name="cdrom" interface="pcfx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="can can bunny extra dx (japan)" sha1="9153147469b2b9ecadebb9990c707f4c3d3f6587"/>
+			</diskarea>
+		</part>
+	</software>
+	<software name="carrot" supported="no">
+		<description>Pia Carrot e Youkuso!! - We've Been Waiting for You</description>
+		<year>1997</year>
+		<publisher>Cocktail Soft</publisher>
+		<part name="cdrom" interface="pcfx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="pia carrot e youkoso!! weve been waiting for you (japan)" sha1="95a5c2f20d406dcaa0ab5e0ff692e3ee2cd4ad76"/>
+			</diskarea>
+		</part>
+	</software>
+	<software name="dknight4" supported="no">
+		<description>Dragon Knight IV</description>
+		<year>1997</year>
+		<publisher>NEC</publisher>
+		<part name="cdrom" interface="pcfx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="dragon knight 4 (japan)" sha1="c0a81f9b38f6acbccc03c0d5fdad39e1bc834122"/>
+			</diskarea>
+		</part>
+	</software>
+	<software name="doukyuu2" supported="no">
+		<description>Doukyuusei 2</description>
+		<year>1996</year>
+		<publisher>ELF</publisher>
+		<part name="cdrom" interface="pcfx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="doukyuusei 2 (japan)" sha1="b20af9f1d3d2abad58656efcafa4f981f6bdb22b"/>
+			</diskarea>
+		</part>
+	</software>
+	<software name="farland" supported="no">
+		<description>Farland Story FX</description>
+		<year>1996</year>
+		<publisher>NEC</publisher>
+		<part name="cdrom" interface="pcfx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="farland story fx (japan)" sha1="9c9689a0d06a9276bb87a2f1a616bc6e93334b75"/>
+			</diskarea>
+		</part>
+	</software>
+	<software name="firewomn" supported="no">
+		<description>Fire Woman Matoigumi</description>
+		<year>1996</year>
+		<publisher>Tokuma Shoten</publisher>
+		<part name="cdrom" interface="pcfx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="fire woman matoigumi (japan)" sha1="1e31207f18c16ea61b9485d99fe9af3da0a3e2d0"/>
+			</diskarea>
+		</part>
+	</software>
+	<software name="langriss" supported="no">
+		<description>Der Langrisser FX</description>
+		<year>1996</year>
+		<publisher>NCS</publisher>
+		<part name="cdrom" interface="pcfx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="langrisser fx, der (japan)" sha1="15e757fa66c46570f038a27d59b0709d1cf9d4bf"/>
+			</diskarea>
+		</part>
+	</software>
+	<software name="megamip2" supported="no">
+		<description>Megami Paradise II</description>
+		<year>1996</year>
+		<publisher>NEC</publisher>
+		<part name="cdrom" interface="pcfx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="megami paradise ii (japan)" sha1="86ac2e526c9c7821708b0e47e9ebb317b79c790b"/>
+			</diskarea>
+		</part>
+	</software>
+	<software name="sotsugy2" supported="no">
+		<description>Sotsugyou II FX - Neo Generation</description>
+		<year>1994</year>
+		<publisher>Riverhill Soft</publisher>
+		<part name="cdrom" interface="pcfx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="sotsugyou ii fx - neo generation (japan)" sha1="8a9e5f269c854d1daa4114ba68a3e89598f26e81"/>
+			</diskarea>
+		</part>
+	</software>
+</softwarelist>

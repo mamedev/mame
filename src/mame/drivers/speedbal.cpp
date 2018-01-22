@@ -59,7 +59,7 @@ static ADDRESS_MAP_START( main_cpu_map, AS_PROGRAM, 8, speedbal_state )
 	AM_RANGE(0xdc00, 0xdfff) AM_RAM AM_SHARE("share1") // shared with SOUND
 	AM_RANGE(0xe000, 0xe1ff) AM_RAM_WRITE(background_videoram_w) AM_SHARE("bg_videoram")
 	AM_RANGE(0xe800, 0xefff) AM_RAM_WRITE(foreground_videoram_w) AM_SHARE("fg_videoram")
-	AM_RANGE(0xf000, 0xf5ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0xf000, 0xf5ff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
 	AM_RANGE(0xf600, 0xfeff) AM_RAM
 	AM_RANGE(0xff00, 0xffff) AM_RAM AM_SHARE("spriteram")
 ADDRESS_MAP_END
@@ -258,7 +258,7 @@ GFXDECODE_END
 
 
 
-static MACHINE_CONFIG_START( speedbal )
+MACHINE_CONFIG_START(speedbal_state::speedbal)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_4MHz) // 4 MHz
@@ -301,7 +301,7 @@ DRIVER_INIT_MEMBER(speedbal_state,speedbal)
 
 	for (int i=0;i<0x200;i++)
 	{
-		int j = BITSWAP16(i, 15,14,13,12,11,10,9,8,0,1,2,3,4,5,6,7);
+		int j = bitswap<16>(i, 15,14,13,12,11,10,9,8,0,1,2,3,4,5,6,7);
 		memcpy(&temp[i*128], rom+j*128, 128);
 	}
 
@@ -380,7 +380,7 @@ DRIVER_INIT_MEMBER(speedbal_state,musicbal)
 		int bswIdx = xorMask & 3;                           // ... and the bitswap
 
 		// only bits #0, #1, #2 & #7 are affected
-		rom[i] = BITSWAP8(rom[i], swapTable[bswIdx][3], 6,5,4,3, swapTable[bswIdx][2], swapTable[bswIdx][1], swapTable[bswIdx][0]) ^ xorTable[addIdx];
+		rom[i] = bitswap<8>(rom[i], swapTable[bswIdx][3], 6,5,4,3, swapTable[bswIdx][2], swapTable[bswIdx][1], swapTable[bswIdx][0]) ^ xorTable[addIdx];
 	}
 
 	DRIVER_INIT_CALL(speedbal);

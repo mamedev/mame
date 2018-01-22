@@ -23,13 +23,13 @@ TEST_CASE("quickSort", "")
 		{
 			const char* lhs = *(const char**)_lhs;
 			const char* rhs = *(const char**)_rhs;
-			return bx::strncmp(lhs, rhs);
+			return bx::strCmp(lhs, rhs);
 		});
 
-	REQUIRE(0 == bx::strncmp(str[0], "jabuka") );
-	REQUIRE(0 == bx::strncmp(str[1], "jagoda") );
-	REQUIRE(0 == bx::strncmp(str[2], "kruska") );
-	REQUIRE(0 == bx::strncmp(str[3], "malina") );
+	REQUIRE(0 == bx::strCmp(str[0], "jabuka") );
+	REQUIRE(0 == bx::strCmp(str[1], "jagoda") );
+	REQUIRE(0 == bx::strCmp(str[2], "kruska") );
+	REQUIRE(0 == bx::strCmp(str[3], "malina") );
 
 	int8_t byte[128];
 	bx::RngMwc rng;

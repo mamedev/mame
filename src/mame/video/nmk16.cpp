@@ -486,7 +486,7 @@ void nmk16_state::nmk16_draw_sprites_swap(bitmap_ind16 &bitmap, const rectangle 
 
 	for (i = 0; i < 0x100; i++)
 	{
-		int spr = BITSWAP8(i, bittbl[0], bittbl[1], bittbl[2], bittbl[3], bittbl[4], bittbl[5], bittbl[6], bittbl[7]);
+		int spr = bitswap<8>(i, bittbl[0], bittbl[1], bittbl[2], bittbl[3], bittbl[4], bittbl[5], bittbl[6], bittbl[7]);
 		nmk16_draw_sprite(bitmap, cliprect, m_spriteram_old2.get() + (spr * 16/2));
 	}
 }
@@ -497,7 +497,7 @@ void nmk16_state::nmk16_draw_sprites_swap_flipsupported(bitmap_ind16 &bitmap, co
 
 	for ( i = 0; i < 0x100; i++ )
 	{
-		int spr = BITSWAP8(i, bittbl[0], bittbl[1], bittbl[2], bittbl[3], bittbl[4], bittbl[5], bittbl[6], bittbl[7]);
+		int spr = bitswap<8>(i, bittbl[0], bittbl[1], bittbl[2], bittbl[3], bittbl[4], bittbl[5], bittbl[6], bittbl[7]);
 		nmk16_draw_sprite_flipsupported(bitmap, cliprect, m_spriteram_old2.get() + (spr * 16/2));
 	}
 }

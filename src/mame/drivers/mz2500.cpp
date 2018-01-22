@@ -50,7 +50,7 @@
 #include "machine/pit8253.h"
 #include "machine/rp5c15.h"
 #include "machine/wd_fdc.h"
-#include "machine/z80dart.h"
+#include "machine/z80sio.h"
 #include "machine/z80pio.h"
 #include "sound/2203intf.h"
 #include "sound/beep.h"
@@ -237,6 +237,7 @@ public:
 	uint8_t pal_256_param(int index, int param);
 	void mz2500_reset(mz2500_state *state, uint8_t type);
 	required_device<palette_device> m_palette;
+	void mz2500(machine_config &config);
 };
 
 
@@ -1511,7 +1512,7 @@ static ADDRESS_MAP_START(mz2500_io, AS_IO, 8, mz2500_state )
 //  AM_RANGE(0x60, 0x63) AM_WRITE(w3100a_w)
 //  AM_RANGE(0x63, 0x63) AM_READ(w3100a_r)
 //  AM_RANGE(0x98, 0x99) ADPCM, unknown type, custom?
-	AM_RANGE(0xa0, 0xa3) AM_DEVREADWRITE("z80sio",z80sio0_device, ba_cd_r, ba_cd_w)
+	AM_RANGE(0xa0, 0xa3) AM_DEVREADWRITE("z80sio", z80sio_device, ba_cd_r, ba_cd_w)
 //  AM_RANGE(0xa4, 0xa5) AM_READWRITE(sasi_r, sasi_w)
 	AM_RANGE(0xa8, 0xa8) AM_WRITE(mz2500_rom_w)
 	AM_RANGE(0xa9, 0xa9) AM_READ(mz2500_rom_r)
@@ -2076,7 +2077,7 @@ static SLOT_INTERFACE_START( mz2500_floppies )
 SLOT_INTERFACE_END
 
 
-static MACHINE_CONFIG_START( mz2500 )
+MACHINE_CONFIG_START(mz2500_state::mz2500)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 6000000)
 	MCFG_CPU_PROGRAM_MAP(mz2500_map)
@@ -2097,7 +2098,7 @@ static MACHINE_CONFIG_START( mz2500 )
 	MCFG_Z80PIO_OUT_PA_CB(WRITE8(mz2500_state, mz2500_pio1_porta_w))
 	MCFG_Z80PIO_IN_PB_CB(READ8(mz2500_state, mz2500_pio1_porta_r))
 
-	MCFG_DEVICE_ADD("z80sio", Z80SIO0, 6000000)
+	MCFG_DEVICE_ADD("z80sio", Z80SIO, 6000000)
 
 	MCFG_DEVICE_ADD(RP5C15_TAG, RP5C15, XTAL_32_768kHz)
 	MCFG_RP5C15_OUT_ALARM_CB(WRITELINE(mz2500_state, mz2500_rtc_alarm_irq))

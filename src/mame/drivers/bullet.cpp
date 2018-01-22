@@ -1099,7 +1099,7 @@ void bulletf_state::machine_reset()
 //  MACHINE_CONFIG( bullet )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( bullet )
+MACHINE_CONFIG_START(bullet_state::bullet)
 	// basic machine hardware
 	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL_16MHz/4)
 	MCFG_CPU_PROGRAM_MAP(bullet_mem)
@@ -1179,7 +1179,7 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( bulletf )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( bulletf )
+MACHINE_CONFIG_START(bulletf_state::bulletf)
 	// basic machine hardware
 	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL_16MHz/4)
 	MCFG_CPU_PROGRAM_MAP(bulletf_mem)

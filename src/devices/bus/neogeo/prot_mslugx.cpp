@@ -54,7 +54,7 @@ WRITE16_MEMBER( mslugx_prot_device::protection_w )
 		break;
 
 		default:
-			logerror("unknown protection write at pc %06x, offset %08x, data %02x\n", space.device().safe_pc(), offset << 1, data);
+			logerror("unknown protection write at %s, offset %08x, data %02x\n", machine().describe_context(), offset << 1, data);
 		break;
 	}
 }
@@ -79,7 +79,7 @@ READ16_MEMBER( mslugx_prot_device::protection_r )
 		break;
 
 		default:
-			logerror("unknown protection read at pc %06x, offset %08x\n", space.device().safe_pc(), offset << 1);
+			logerror("unknown protection read at %s, offset %08x\n", machine().describe_context(), offset << 1);
 		break;
 	}
 

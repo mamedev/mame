@@ -324,6 +324,7 @@ public:
 	required_device<m68000_device> m_gfxcpu;
 	required_device<i80286_cpu_device> m_convcpu;
 
+	void fanucs15(machine_config &config);
 private:
 	virtual void machine_reset() override;
 };
@@ -359,7 +360,7 @@ void fanucs15_state::machine_reset()
 {
 }
 
-static MACHINE_CONFIG_START( fanucs15 )
+MACHINE_CONFIG_START(fanucs15_state::fanucs15)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68020, XTAL_12MHz)
 	MCFG_CPU_PROGRAM_MAP(maincpu_mem)

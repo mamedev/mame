@@ -94,6 +94,7 @@ public:
 	required_shared_ptr<uint8_t> m_video_ram;
 	required_device<address_map_bank_device> m_video_bankdev;
 	required_device<palette_device> m_palette;
+	void a7150(machine_config &config);
 };
 
 
@@ -423,7 +424,7 @@ static const z80_daisy_config k7070_daisy_chain[] =
  *
  * (framebuffer and terminal should be slot devices.)
  */
-static MACHINE_CONFIG_START( a7150 )
+MACHINE_CONFIG_START(a7150_state::a7150)
 	MCFG_CPU_ADD("maincpu", I8086, XTAL_9_832MHz/2)
 	MCFG_CPU_PROGRAM_MAP(a7150_mem)
 	MCFG_CPU_IO_MAP(a7150_io)
@@ -471,8 +472,8 @@ static MACHINE_CONFIG_START( a7150 )
 	MCFG_DEVICE_ADD("video_bankdev", ADDRESS_MAP_BANK, 0)
 	MCFG_DEVICE_PROGRAM_MAP(k7070_cpu_banked)
 	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_BIG)
-	MCFG_ADDRESS_MAP_BANK_ADDRBUS_WIDTH(18)
-	MCFG_ADDRESS_MAP_BANK_DATABUS_WIDTH(8)
+	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(18)
+	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
 	MCFG_ADDRESS_MAP_BANK_STRIDE(0x10000)
 
 	MCFG_DEVICE_ADD(Z80CTC_TAG, Z80CTC, XTAL_16MHz/3)

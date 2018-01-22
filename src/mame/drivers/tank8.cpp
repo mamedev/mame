@@ -326,7 +326,7 @@ static GFXDECODE_START( tank8 )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( tank8 )
+MACHINE_CONFIG_START(tank8_state::tank8)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6800, 11055000 / 10) /* ? */

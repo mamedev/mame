@@ -238,7 +238,7 @@ void vaportra_state::machine_reset()
 	m_priority[1] = 0;
 }
 
-static MACHINE_CONFIG_START( vaportra )
+MACHINE_CONFIG_START(vaportra_state::vaportra)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000,XTAL_24MHz/2) /* Custom chip 59 */
@@ -864,7 +864,7 @@ DRIVER_INIT_MEMBER(vaportra_state,vaportra)
 	uint8_t *RAM = memregion("maincpu")->base();
 
 	for (int i = 0x00000; i < 0x80000; i++)
-		RAM[i] = BITSWAP8(RAM[i],0,6,5,4,3,2,1,7);
+		RAM[i] = bitswap<8>(RAM[i],0,6,5,4,3,2,1,7);
 }
 
 /******************************************************************************/

@@ -149,7 +149,7 @@ ADDRESS_MAP_END
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( abc99_device::device_add_mconfig )
+MACHINE_CONFIG_START(abc99_device::device_add_mconfig)
 	// keyboard CPU
 	MCFG_CPU_ADD(I8035_Z2_TAG, I8035, XTAL_6MHz/3) // from Z5 T0 output
 	MCFG_CPU_PROGRAM_MAP(abc99_z2_mem)

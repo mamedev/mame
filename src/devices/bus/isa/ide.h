@@ -27,6 +27,8 @@ public:
 	READ8_MEMBER(ide16_alt_r);
 	WRITE8_MEMBER(ide16_alt_w);
 
+	static void cdrom_headphones(device_t *device);
+
 protected:
 	// device-level overrides
 	virtual void device_start() override;

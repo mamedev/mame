@@ -144,7 +144,7 @@ static const z80_daisy_config daisy_chain[] =
  *
  *************************************/
 
-static MACHINE_CONFIG_START( cchasm )
+MACHINE_CONFIG_START(cchasm_state::cchasm)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, CCHASM_68K_CLOCK)    /* 8 MHz (from schematics) */

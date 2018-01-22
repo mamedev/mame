@@ -183,7 +183,7 @@ static ADDRESS_MAP_START( ramdac_map, 0, 8, rltennis_state )
 	AM_RANGE(0x000, 0x3ff) AM_DEVREADWRITE("ramdac",ramdac_device,ramdac_pal_r,ramdac_rgb888_w)
 ADDRESS_MAP_END
 
-static MACHINE_CONFIG_START( rltennis )
+MACHINE_CONFIG_START(rltennis_state::rltennis)
 
 	MCFG_CPU_ADD("maincpu", M68000, RLT_XTAL/2) /* 68000P8  ??? */
 	MCFG_CPU_PROGRAM_MAP(rltennis_main)

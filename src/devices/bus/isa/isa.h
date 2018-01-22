@@ -81,7 +81,7 @@
 #define MCFG_ISA8_SLOT_ADD(_isatag, _tag, _slot_intf, _def_slot, _fixed) \
 	MCFG_DEVICE_ADD(_tag, ISA8_SLOT, 0) \
 	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, _fixed) \
-	isa8_slot_device::static_set_isa8_slot(*device, owner, _isatag);
+	isa8_slot_device::static_set_isa8_slot(*device, this, _isatag);
 #define MCFG_ISA16_CPU(_cputag) \
 	isa8_device::static_set_cputag(*device, _cputag);
 #define MCFG_ISA16_BUS_CUSTOM_SPACES() \
@@ -89,7 +89,7 @@
 #define MCFG_ISA16_SLOT_ADD(_isatag, _tag, _slot_intf, _def_slot, _fixed) \
 	MCFG_DEVICE_ADD(_tag, ISA16_SLOT, 0) \
 	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, _fixed) \
-	isa16_slot_device::static_set_isa16_slot(*device, owner, _isatag);
+	isa16_slot_device::static_set_isa16_slot(*device, this, _isatag);
 
 #define MCFG_ISA_BUS_IOCHCK(_iochck) \
 	devcb = &downcast<isa8_device *>(device)->set_iochck_callback(DEVCB_##_iochck);
@@ -231,6 +231,9 @@ public:
 	void unmap_rom(offs_t start, offs_t end);
 	bool is_option_rom_space_available(offs_t start, int size);
 
+	// FIXME: shouldn't need to expose this
+	address_space &memspace() const { return m_maincpu->space(AS_PROGRAM); }
+
 	DECLARE_WRITE_LINE_MEMBER( irq2_w );
 	DECLARE_WRITE_LINE_MEMBER( irq3_w );
 	DECLARE_WRITE_LINE_MEMBER( irq4_w );
@@ -269,7 +272,7 @@ protected:
 	virtual void device_reset() override;
 
 	// internal state
-	cpu_device   *m_maincpu;
+	required_device<cpu_device> m_maincpu;
 
 	// address spaces
 	address_space *m_iospace, *m_memspace;
@@ -288,7 +291,6 @@ protected:
 
 	device_isa8_card_interface *m_dma_device[8];
 	bool                        m_dma_eop[8];
-	const char                 *m_cputag;
 	bool                        m_nmi_enabled;
 
 private:

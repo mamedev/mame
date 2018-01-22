@@ -426,10 +426,10 @@ INTERRUPT_GEN_MEMBER(pacland_state::mcu_vblank_irq)
 		m_mcu->set_input_line(0, ASSERT_LINE);
 }
 
-static MACHINE_CONFIG_START( pacland )
+MACHINE_CONFIG_START(pacland_state::pacland)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6809, XTAL_49_152MHz/32) /* 1.536 MHz */
+	MCFG_CPU_ADD("maincpu", MC6809E, XTAL_49_152MHz/32) /* 1.536 MHz */
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", pacland_state,  main_vblank_irq)
 

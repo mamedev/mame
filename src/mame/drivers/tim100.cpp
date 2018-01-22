@@ -10,7 +10,6 @@ Mihajlo Pupin Institute
 
 Notes:
 - Serial terminals appear to need 8 bits, 2 stop bits, odd parity @ 9600
-- Unable to set these settings as default, because std::bad_cast fatal error occurs at start
 - Unable to type anything as it seems uarts want BRKDET activated all the time, which we cannot do.
 - Unable to find any technical info at all, so it's all guesswork.
 
@@ -39,6 +38,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(irq_w);
 	I8275_DRAW_CHARACTER_MEMBER( crtc_display_pixels );
 
+	void tim100(machine_config &config);
 private:
 	virtual void machine_start() override;
 	uint8_t *m_charmap;
@@ -155,7 +155,7 @@ WRITE_LINE_MEMBER( tim100_state::irq_w )
 }
 
 
-static MACHINE_CONFIG_START( tim100 )
+MACHINE_CONFIG_START(tim100_state::tim100)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",I8085A, XTAL_4_9152MHz) // divider unknown
 	MCFG_CPU_PROGRAM_MAP(tim100_mem)

@@ -39,7 +39,7 @@ PALETTE_INIT_MEMBER(cvs_state,cvs)
 			uint8_t ctabentry = color_prom[(i << 8) | attr] & 0x07;
 
 			/* bits 0 and 2 are swapped */
-			ctabentry = BITSWAP8(ctabentry,7,6,5,4,3,0,1,2);
+			ctabentry = bitswap<8>(ctabentry,7,6,5,4,3,0,1,2);
 
 			palette.set_pen_indirect((attr << 3) | i, ctabentry);
 		}
@@ -82,7 +82,7 @@ void cvs_state::set_pens(  )
 WRITE8_MEMBER(cvs_state::cvs_video_fx_w)
 {
 	if (data & 0xce)
-		logerror("%4x : CVS: Unimplemented CVS video fx = %2x\n",space.device().safe_pc(), data & 0xce);
+		logerror("%4x : CVS: Unimplemented CVS video fx = %2x\n",m_maincpu->pc(), data & 0xce);
 
 	m_stars_on = data & 0x01;
 

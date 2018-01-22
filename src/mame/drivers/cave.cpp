@@ -68,7 +68,6 @@ Stephh's notes (based on the games M68000 code and some tests) :
     Any info is welcome !
 
 Versions known to exist but not dumped:
-  Pretty Soldier Sailor Moon (95/03/21)
   Dodonpachi Campaign Version
      Reportedly only 3 ever made, one was given out as a prize to a high score contest winner.  The other two
      PCBs were shown running (and could be played) at a Cave fan show known as Cave Festival 2006. There are
@@ -240,7 +239,7 @@ WRITE16_MEMBER(cave_state::sound_cmd_w)
 //  m_sound_flag2 = 1;
 	m_soundlatch->write(space, offset, data, mem_mask);
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
-	space.device().execute().spin_until_time(attotime::from_usec(50));  // Allow the other cpu to reply
+	m_maincpu->spin_until_time(attotime::from_usec(50));  // Allow the other cpu to reply
 }
 
 /* Sound CPU: read the low 8 bits of the 16 bit sound latch */
@@ -269,7 +268,7 @@ READ16_MEMBER(cave_state::soundlatch_ack_r)
 	}
 	else
 	{
-		logerror("CPU #1 - PC %04X: Sound Buffer 2 Underflow Error\n", space.device().safe_pc());
+		logerror("CPU #1 - PC %04X: Sound Buffer 2 Underflow Error\n", m_maincpu->pc());
 		return 0xff;
 	}
 }
@@ -282,7 +281,7 @@ WRITE8_MEMBER(cave_state::soundlatch_ack_w)
 	if (m_soundbuf_len < 32)
 		m_soundbuf_len++;
 	else
-		logerror("CPU #1 - PC %04X: Sound Buffer 2 Overflow Error\n", space.device().safe_pc());
+		logerror("CPU #1 - PC %04X: Sound Buffer 2 Overflow Error\n", m_audiocpu->pc());
 }
 
 
@@ -1155,6 +1154,30 @@ ADDRESS_MAP_END
 
 
 /***************************************************************************
+                                   Pac-Eight
+***************************************************************************/
+
+//TODO: leds need verifying
+
+static ADDRESS_MAP_START( paceight_map, AS_PROGRAM, 16, cave_state )
+	AM_RANGE(0x000000, 0x07ffff) AM_ROM                                                                 // ROM
+	AM_RANGE(0x100000, 0x10ffff) AM_RAM AM_SHARE("nvram")                                               // RAM (battery)
+	AM_RANGE(0x200000, 0x207fff) AM_RAM AM_SHARE("spriteram.0")       // Sprites
+	AM_RANGE(0x208000, 0x20ffff) AM_RAM AM_SHARE("spriteram_2.0")                         // Sprite bank 2
+	AM_RANGE(0x300000, 0x307fff) AM_RAM_WRITE(cave_vram_0_w) AM_SHARE("vram.0")         // Layer 0
+	AM_RANGE(0x400000, 0x40ffff) AM_RAM AM_SHARE("paletteram.0")  // Palette
+	AM_RANGE(0x500000, 0x500001) AM_READ_PORT("IN0")                                                    // Inputs + EEPROM + Hopper
+	AM_RANGE(0x500002, 0x500003) AM_READ_PORT("IN1")                                                    // Inputs
+	AM_RANGE(0x600000, 0x600005) AM_WRITEONLY AM_SHARE("vctrl.0")                       // Layer 0 Control
+	AM_RANGE(0x700000, 0x700007) AM_READ(cave_irq_cause_r)                                              // IRQ Cause
+	AM_RANGE(0x700068, 0x700069) AM_DEVWRITE("watchdog", watchdog_timer_device, reset16_w)              // Watchdog
+	AM_RANGE(0x700000, 0x70007f) AM_WRITEONLY AM_SHARE("videoregs.0")                     // Video Regs
+	AM_RANGE(0x800000, 0x800001) AM_DEVREADWRITE8("oki1", okim6295_device, read, write, 0x00ff) // M6295
+	AM_RANGE(0xc00000, 0xc00001) AM_WRITE(pacslot_leds_w)                                               // Leds + Hopper
+	AM_RANGE(0xe00000, 0xe00001) AM_WRITE(tjumpman_eeprom_lsb_w)                            // EEPROM
+ADDRESS_MAP_END
+
+/***************************************************************************
                                     Uo Poko
 ***************************************************************************/
 
@@ -1203,7 +1226,7 @@ ADDRESS_MAP_END
 WRITE8_MEMBER(cave_state::hotdogst_rombank_w)
 {
 	if (data & ~0x0f)
-		logerror("CPU #1 - PC %04X: Bank %02X\n", space.device().safe_pc(), data);
+		logerror("CPU #1 - PC %04X: Bank %02X\n", m_audiocpu->pc(), data);
 
 	membank("z80bank")->set_entry(data & 0x0f);
 }
@@ -1240,7 +1263,7 @@ ADDRESS_MAP_END
 WRITE8_MEMBER(cave_state::mazinger_rombank_w)
 {
 	if (data & ~0x07)
-		logerror("CPU #1 - PC %04X: Bank %02X\n", space.device().safe_pc(), data);
+		logerror("CPU #1 - PC %04X: Bank %02X\n", m_audiocpu->pc(), data);
 
 	membank("z80bank")->set_entry(data & 0x07);
 }
@@ -1271,7 +1294,7 @@ ADDRESS_MAP_END
 WRITE8_MEMBER(cave_state::metmqstr_rombank_w)
 {
 	if (data & ~0x0f)
-		logerror("CPU #1 - PC %04X: Bank %02X\n", space.device().safe_pc(), data);
+		logerror("CPU #1 - PC %04X: Bank %02X\n", m_audiocpu->pc(), data);
 
 	membank("z80bank")->set_entry(data & 0x0f);
 }
@@ -1319,7 +1342,7 @@ ADDRESS_MAP_END
 WRITE8_MEMBER(cave_state::pwrinst2_rombank_w)
 {
 	if (data & ~0x07)
-		logerror("CPU #1 - PC %04X: Bank %02X\n", space.device().safe_pc(), data);
+		logerror("CPU #1 - PC %04X: Bank %02X\n", m_audiocpu->pc(), data);
 
 	membank("z80bank")->set_entry(data & 0x07);
 }
@@ -1351,7 +1374,7 @@ ADDRESS_MAP_END
 WRITE8_MEMBER(cave_state::sailormn_rombank_w)
 {
 	if (data & ~0x1f)
-		logerror("CPU #1 - PC %04X: Bank %02X\n", space.device().safe_pc(), data);
+		logerror("CPU #1 - PC %04X: Bank %02X\n", m_audiocpu->pc(), data);
 
 	membank("z80bank")->set_entry(data & 0x1f);
 }
@@ -1728,7 +1751,7 @@ static INPUT_PORTS_START( pacslot )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_OTHER   ) PORT_NAME( "Pac-Man" ) PORT_CODE(KEYCODE_Y)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW,  IPT_GAMBLE_PAYOUT )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_BUTTON1 ) PORT_NAME( "Bet" )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, cave_state,tjumpman_hopper_r, nullptr)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, cave_state, tjumpman_hopper_r, nullptr)
 
 	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -1743,6 +1766,16 @@ static INPUT_PORTS_START( pacslot )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( paceight )
+	PORT_INCLUDE( pacslot )
+
+	PORT_MODIFY("IN0")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_OTHER   ) PORT_NAME( "Left" ) PORT_CODE(KEYCODE_Y)
+
+	PORT_MODIFY("IN1")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER   ) PORT_NAME( "Right" ) PORT_CODE(KEYCODE_N)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME( "Max Bet" )
+INPUT_PORTS_END
 
 static INPUT_PORTS_START( ppsatan )
 	PORT_START("SYSTEM")   // $200000
@@ -2063,7 +2096,7 @@ MACHINE_RESET_MEMBER(cave_state,cave)
                                 Dangun Feveron
 ***************************************************************************/
 
-static MACHINE_CONFIG_START( dfeveron )
+MACHINE_CONFIG_START(cave_state::dfeveron)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz)
@@ -2104,7 +2137,7 @@ MACHINE_CONFIG_END
 ***************************************************************************/
 
 
-static MACHINE_CONFIG_START( ddonpach )
+MACHINE_CONFIG_START(cave_state::ddonpach)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz)
@@ -2144,7 +2177,7 @@ MACHINE_CONFIG_END
                                     Donpachi
 ***************************************************************************/
 
-static MACHINE_CONFIG_START( donpachi )
+MACHINE_CONFIG_START(cave_state::donpachi)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz)
@@ -2191,7 +2224,7 @@ MACHINE_CONFIG_END
                                 Esprade
 ***************************************************************************/
 
-static MACHINE_CONFIG_START( esprade )
+MACHINE_CONFIG_START(cave_state::esprade)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz)
@@ -2231,7 +2264,7 @@ MACHINE_CONFIG_END
                                     Gaia Crusaders
 ***************************************************************************/
 
-static MACHINE_CONFIG_START( gaia )
+MACHINE_CONFIG_START(cave_state::gaia)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz)
@@ -2272,7 +2305,7 @@ MACHINE_CONFIG_END
                                     Guwange
 ***************************************************************************/
 
-static MACHINE_CONFIG_START( guwange )
+MACHINE_CONFIG_START(cave_state::guwange)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz)
@@ -2311,7 +2344,7 @@ MACHINE_CONFIG_END
                                 Hotdog Storm
 ***************************************************************************/
 
-static MACHINE_CONFIG_START( hotdogst )
+MACHINE_CONFIG_START(cave_state::hotdogst)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_32MHz/2)
@@ -2364,7 +2397,7 @@ MACHINE_CONFIG_END
                                Koro Koro Quest
 ***************************************************************************/
 
-static MACHINE_CONFIG_START( korokoro )
+MACHINE_CONFIG_START(cave_state::korokoro)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz)
@@ -2399,7 +2432,7 @@ static MACHINE_CONFIG_START( korokoro )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( crusherm, korokoro )
+MACHINE_CONFIG_DERIVED(cave_state::crusherm, korokoro)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(crusherm_map)
 MACHINE_CONFIG_END
@@ -2409,7 +2442,7 @@ MACHINE_CONFIG_END
                                 Mazinger Z
 ***************************************************************************/
 
-static MACHINE_CONFIG_START( mazinger )
+MACHINE_CONFIG_START(cave_state::mazinger)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz)
@@ -2465,7 +2498,7 @@ MACHINE_CONFIG_END
                                 Metamoqester
 ***************************************************************************/
 
-static MACHINE_CONFIG_START( metmqstr )
+MACHINE_CONFIG_START(cave_state::metmqstr)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_32MHz / 2)
@@ -2522,7 +2555,7 @@ MACHINE_CONFIG_END
                                    Pac-Slot
 ***************************************************************************/
 
-static MACHINE_CONFIG_START( pacslot )
+MACHINE_CONFIG_START(cave_state::pacslot)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -2569,7 +2602,10 @@ static MACHINE_CONFIG_START( pacslot )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
-
+MACHINE_CONFIG_DERIVED(cave_state::paceight, pacslot)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(paceight_map)
+MACHINE_CONFIG_END
 /***************************************************************************
                                Poka Poka Satan
 ***************************************************************************/
@@ -2579,7 +2615,7 @@ TIMER_DEVICE_CALLBACK_MEMBER( cave_state::timer_lev2_cb )
 	m_maincpu->set_input_line(M68K_IRQ_2, HOLD_LINE);   // ppsatan: read touch screens
 }
 
-static MACHINE_CONFIG_START( ppsatan )
+MACHINE_CONFIG_START(cave_state::ppsatan)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz)
@@ -2642,7 +2678,7 @@ MACHINE_CONFIG_END
 
 /*  X1 = 12 MHz, X2 = 28 MHz, X3 = 16 MHz. OKI: / 165 mode A ; / 132 mode B */
 
-static MACHINE_CONFIG_START( pwrinst2 )
+MACHINE_CONFIG_START(cave_state::pwrinst2)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz) /* 16 MHz */
@@ -2713,7 +2749,7 @@ MACHINE_RESET_MEMBER(cave_state,sailormn)
 	MACHINE_RESET_CALL_MEMBER(cave);
 }
 
-static MACHINE_CONFIG_START( sailormn )
+MACHINE_CONFIG_START(cave_state::sailormn)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz)
@@ -2774,7 +2810,7 @@ MACHINE_CONFIG_END
                             Tekken Card World
 ***************************************************************************/
 
-static MACHINE_CONFIG_START( tekkencw )
+MACHINE_CONFIG_START(cave_state::tekkencw)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -2818,7 +2854,7 @@ static MACHINE_CONFIG_START( tekkencw )
 	// oki2 chip spot and rom socket are both unpopulated
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( tekkenbs, tekkencw )
+MACHINE_CONFIG_DERIVED(cave_state::tekkenbs, tekkencw)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(tekkenbs_map)
 MACHINE_CONFIG_END
@@ -2828,7 +2864,7 @@ MACHINE_CONFIG_END
                             Tobikose! Jumpman
 ***************************************************************************/
 
-static MACHINE_CONFIG_START( tjumpman )
+MACHINE_CONFIG_START(cave_state::tjumpman)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -2877,7 +2913,7 @@ MACHINE_CONFIG_END
                                 Uo Poko
 ***************************************************************************/
 
-static MACHINE_CONFIG_START( uopoko )
+MACHINE_CONFIG_START(cave_state::uopoko)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz)
@@ -4244,9 +4280,52 @@ ROM_START( pacslot )
 	ROM_REGION( 0x117 * 3, "plds", 0 )
 	ROM_LOAD( "n44u1a.u1",   0x117*0, 0x117, NO_DUMP )  // GAL16V8B-15LP (Protected)
 	ROM_LOAD( "n44u3a.u3",   0x117*1, 0x117, NO_DUMP )  // GAL16V8B-15LP (Protected)
-	ROM_LOAD( "n44u51a.u51", 0x117*2, 0x117, NO_DUMP )  // GAL16V8B-15LP (Protected)
+	ROM_LOAD( "n44u51a.u51", 0x117*2, 0x117, CRC(3c5e9bc5) SHA1(b4e04c4fa91ff33542b73971f67e71d13e24c5ec) )  // GAL16V8B-15LP (Protected, dumped from the paceight PCB)
 ROM_END
 
+
+/***************************************************************************
+
+  Pac-Eight by Namco, 1996 (according to http://pacman.com/ja/museum/index.html)
+  Namco N-44 EM VIDEO platform, PCB C0348
+
+  TMP 68HC000P-16
+
+  013 9341E7002
+  038 9635WY003
+
+  OKI M6295 x 2
+
+  Battery
+  93C46 EEPROM (at U24)
+
+  28MHz XTAL
+
+***************************************************************************/
+
+ROM_START( paceight )
+	ROM_REGION( 0x80000, "maincpu", 0 )        /* 68000 code */
+	ROM_LOAD16_WORD_SWAP( "pae1-mpro.u41", 0x00000, 0x80000, CRC(bb026f97) SHA1(70d48f05275c64b25f37f03206219ef3ee9c0ee2) ) // 27c240
+
+	ROM_REGION( 0x100000 * 2, "sprites0", 0 )        /* Sprites: * 2 */
+	ROM_LOAD16_BYTE( "pae1-obj0.u52", 0x00000, 0x80000, CRC(2cd99155) SHA1(146ed2b3f2763232a60e6b238a16067d3ccfa959) ) // 27c040
+	ROM_LOAD16_BYTE( "pae1-obj1.u53", 0x00001, 0x80000, CRC(9ae2685b) SHA1(5eed5f00d28d803358c8ffaf42c4979af23a0a8c) ) // ""
+
+	ROM_REGION( 0x80000, "layer0", 0 )  /* Layer 0 */
+	ROM_LOAD( "pae1-cha0.u60", 0x00000, 0x40000, CRC(757263e3) SHA1(668060e9e209752474f48362752a3f819ff82d72) ) // 27c020? not readable
+	ROM_LOAD( "pae1-cha1.u61", 0x40000, 0x40000, CRC(0396d241) SHA1(79382805fa4486d8dae792f9afc0f02aee1bbb33) ) // ""
+
+	ROM_REGION( 0x40000, "oki1", 0 )    /* OKIM6295 #1 Samples */
+	ROM_LOAD( "pae1-vo10.u27", 0x00000, 0x40000, CRC(0be7b94f) SHA1(4179e2ab2d2d1df0cc6cfd71e277ea114578f147) ) // 27c? not readable
+
+	ROM_REGION( 0x40000, "oki2", ROMREGION_ERASE00 )    /* OKIM6295 #2 Samples */
+	// empty ROM socket
+
+	ROM_REGION( 0x117 * 3, "plds", 0 )
+	ROM_LOAD( "n44u1c.u1",   0x117*0, 0x117, CRC(903fc2d8) SHA1(becbae356efde873225ef64af462d9702aac03f0) )  // GAL16V8B-15LP
+	ROM_LOAD( "n44u3c.u3",   0x117*1, 0x117, CRC(72201412) SHA1(6ad7d22e612e27343eac5c38f00d548df644d52c) )  // GAL16V8B-15LP
+	ROM_LOAD( "n44u51a.u51", 0x117*2, 0x117, CRC(3c5e9bc5) SHA1(b4e04c4fa91ff33542b73971f67e71d13e24c5ec) )  // GAL16V8B-15LP
+ROM_END
 
 /***************************************************************************
 
@@ -4694,9 +4773,92 @@ ROM_START( sailormnh )
 ROM_END
 
 
-#define ROMS_SAILORMNO \
+#define ROMS_SAILORMNN \
 	ROM_REGION( 0x400000, "maincpu", 0 ) \
 	ROM_LOAD16_WORD_SWAP( "smprg.u45",    0x000000, 0x080000, CRC(234f1152) SHA1(8fc6d4a8995d550862d328011d3357c09334f0fa) ) \
+	ROM_LOAD16_WORD_SWAP( "bpsm.u46",     0x200000, 0x200000, CRC(32084e80) SHA1(0ac503190d95009620b5ad7e7e0e63324f6fa4eb) ) \
+	\
+	ROM_REGION( 0x80000, "audiocpu", 0 ) \
+	ROM_LOAD( "bpsm945a.u9",  0x00000, 0x80000, CRC(438de548) SHA1(81a0ca1cd662e2017aa980da162d39cfd0a19f14) ) \
+	\
+	ROM_REGION( 0x400000 * 2, "sprites0", 0 ) \
+	ROM_LOAD( "bpsm.u76", 0x000000, 0x200000, CRC(a243a5ba) SHA1(3a32d685e53e0b75977f7acb187cf414a50c7f8b) ) \
+	ROM_LOAD( "bpsm.u77", 0x200000, 0x200000, CRC(5179a4ac) SHA1(ceb8d3d889aae885debb2c9cf2263f60be3f1212) ) \
+	\
+	ROM_REGION( 0x200000, "layer0", 0 ) \
+	ROM_LOAD( "bpsm.u53", 0x000000, 0x200000, CRC(b9b15f83) SHA1(8c574c97d38fb9e2889648c8d677b171e80a4229) ) \
+	\
+	ROM_REGION( 0x200000, "layer1", 0 ) \
+	ROM_LOAD( "bpsm.u54", 0x000000, 0x200000, CRC(8f00679d) SHA1(4ea412f8ecdb9fd46f2d1378809919d1a62fcc2b) ) \
+	\
+	ROM_REGION( (5*0x200000)*2, "layer2", 0 ) \
+	\
+	ROM_LOAD( "bpsm.u57", 0x000000, 0x200000, CRC(86be7b63) SHA1(6b7d3d41fb1e4045c765b3cc98304464d91e6e3d) ) \
+	ROM_LOAD( "bpsm.u58", 0x200000, 0x200000, CRC(e0bba83b) SHA1(9e1434814efd9321b2e5210b995d2fe66cca37dd) ) \
+	ROM_LOAD( "bpsm.u62", 0x400000, 0x200000, CRC(a1e3bfac) SHA1(4528887d57e519df8dd60b2392db4c175c57b239) ) \
+	ROM_LOAD( "bpsm.u61", 0x600000, 0x200000, CRC(6a014b52) SHA1(107c687479b59c455fc514cd61d290853c95ad9a) ) \
+	ROM_LOAD( "bpsm.u60", 0x800000, 0x200000, CRC(992468c0) SHA1(3c66cc08313a9a326badc44f53a98cdfe0643da4) ) \
+	\
+	ROM_LOAD( "bpsm.u65", 0xa00000, 0x200000, CRC(f60fb7b5) SHA1(72cb8908cd687a330e14657664cd35037a52c39e) ) \
+	ROM_LOAD( "bpsm.u64", 0xc00000, 0x200000, CRC(6559d31c) SHA1(bf688123a4beff625652cc1844bf0dc192f5c90f) ) \
+	ROM_LOAD( "bpsm.u63", 0xe00000, 0x100000, CRC(d57a56b4) SHA1(e039b336887b66eba4e0630a3cb04cbd8fe14073) ) \
+	ROM_CONTINUE(         0xe00000, 0x100000             ) \
+	\
+	ROM_REGION( 0x200000, "oki1", 0 ) \
+	ROM_LOAD( "bpsm.u48", 0x000000, 0x200000, CRC(498e4ed1) SHA1(28d45a41702d9e5af4e214c1800b2e513ec84d51) ) \
+	\
+	ROM_REGION( 0x200000, "oki2", 0 ) \
+	ROM_LOAD( "bpsm.u47", 0x000000, 0x080000, CRC(0f2901b9) SHA1(ebd3e9e39e8d2bc91688dac19b99548a28b4733c) ) \
+	ROM_RELOAD(           0x080000, 0x080000             ) \
+	ROM_RELOAD(           0x100000, 0x080000             ) \
+	ROM_RELOAD(           0x180000, 0x080000             )
+/* the regions differ only in the EEPROM, hence the macro above - all EEPROMs are Factory Defaulted */
+ROM_START( sailormnn )
+	ROMS_SAILORMNN
+
+	ROM_REGION16_BE( 0x80, "eeprom", 0 )
+	ROM_LOAD16_WORD( "sailormn_europe.nv", 0x0000, 0x0080, CRC(59a7dc50) SHA1(6b116bdfbde42192b01678cb0b9bab0f2e56fd28) )
+ROM_END
+
+ROM_START( sailormnnu )
+	ROMS_SAILORMNN
+
+	ROM_REGION16_BE( 0x80, "eeprom", 0 )
+	ROM_LOAD16_WORD( "sailormn_usa.nv", 0x0000, 0x0080, CRC(3915abe3) SHA1(1b8d3b8c65cf2298939c27607ec52630c017c7ea) )
+ROM_END
+
+ROM_START( sailormnnj )
+	ROMS_SAILORMNN
+
+	ROM_REGION16_BE( 0x80, "eeprom", 0 )
+	ROM_LOAD16_WORD( "sailormn_japan.nv", 0x0000, 0x0080, CRC(ea03c30a) SHA1(2afc71f932674e34fc4491db0e2027e0371569fc) )
+ROM_END
+
+ROM_START( sailormnnk )
+	ROMS_SAILORMNN
+
+	ROM_REGION16_BE( 0x80, "eeprom", 0 )
+	ROM_LOAD16_WORD( "sailormn_korea.nv", 0x0000, 0x0080, CRC(0e7de398) SHA1(b495bf43d8596a0dc9843c74fc04fd21499bd115) )
+ROM_END
+
+ROM_START( sailormnnt )
+	ROMS_SAILORMNN
+
+	ROM_REGION16_BE( 0x80, "eeprom", 0 )
+	ROM_LOAD16_WORD( "sailormn_taiwan.nv", 0x0000, 0x0080, CRC(6c7e8c2a) SHA1(68ef4e6593e4c12e6488a20dcc6dda920b01de67) )
+ROM_END
+
+ROM_START( sailormnnh )
+	ROMS_SAILORMNN
+
+	ROM_REGION16_BE( 0x80, "eeprom", 0 )
+	ROM_LOAD16_WORD( "sailormn_hongkong.nv", 0x0000, 0x0080, CRC(4d24c874) SHA1(93b87ef18cff98e4f6a60234692e7a9a9c8e7552) )
+ROM_END
+
+
+#define ROMS_SAILORMNO \
+	ROM_REGION( 0x400000, "maincpu", 0 ) \
+	ROM_LOAD16_WORD_SWAP( "smprg.u45",    0x000000, 0x080000, CRC(97837ab4) SHA1(bf5a8cf3fbb942c2bb74c3b93312d9018ae6e2fd) ) \
 	ROM_LOAD16_WORD_SWAP( "bpsm.u46",     0x200000, 0x200000, CRC(32084e80) SHA1(0ac503190d95009620b5ad7e7e0e63324f6fa4eb) ) \
 	\
 	ROM_REGION( 0x80000, "audiocpu", 0 ) \
@@ -5120,7 +5282,7 @@ DRIVER_INIT_MEMBER(cave_state,mazinger)
 	{
 		int i;
 		for (i = 0; i < len; i++)
-			buffer[i ^ 0xdf88] = src[BITSWAP24(i,23,22,21,20,19,9,7,3,15,4,17,14,18,2,16,5,11,8,6,13,1,10,12,0)];
+			buffer[i ^ 0xdf88] = src[bitswap<24>(i,23,22,21,20,19,9,7,3,15,4,17,14,18,2,16,5,11,8,6,13,1,10,12,0)];
 		memcpy(src, &buffer[0], len);
 	}
 
@@ -5182,7 +5344,7 @@ DRIVER_INIT_MEMBER(cave_state,pwrinst2j)
 	{
 		for(i = 0; i < len/2; i++)
 		{
-			j = BITSWAP24(i,23,22,21,20,19,18,17,16,15,14,13,12,11,10,9,8,7, 2,4,6,1,5,3, 0);
+			j = bitswap<24>(i,23,22,21,20,19,18,17,16,15,14,13,12,11,10,9,8,7, 2,4,6,1,5,3, 0);
 			if(((j & 6) == 0) || ((j & 6) == 6))
 				j ^= 6;
 			buffer[j ^ 7] = (src[i] >> 4) | (src[i] << 4);
@@ -5235,7 +5397,7 @@ DRIVER_INIT_MEMBER(cave_state,sailormn)
 	{
 		int i;
 		for (i = 0; i < len; i++)
-			buffer[i ^ 0x950c4] = src[BITSWAP24(i,23,22,21,20,15,10,12,6,11,1,13,3,16,17,2,5,14,7,18,8,4,19,9,0)];
+			buffer[i ^ 0x950c4] = src[bitswap<24>(i,23,22,21,20,15,10,12,6,11,1,13,3,16,17,2,5,14,7,18,8,4,19,9,0)];
 		memcpy(src, &buffer[0], len);
 	}
 
@@ -5321,12 +5483,18 @@ GAME( 1995, sailormnj,   sailormn, sailormn, cave,     cave_state, sailormn,  RO
 GAME( 1995, sailormnk,   sailormn, sailormn, cave,     cave_state, sailormn,  ROT0,   "Gazelle (Banpresto license)",            "Pretty Soldier Sailor Moon (Ver. 95/03/22B, Korea)",     MACHINE_SUPPORTS_SAVE )
 GAME( 1995, sailormnt,   sailormn, sailormn, cave,     cave_state, sailormn,  ROT0,   "Gazelle (Banpresto license)",            "Pretty Soldier Sailor Moon (Ver. 95/03/22B, Taiwan)",    MACHINE_SUPPORTS_SAVE )
 GAME( 1995, sailormnh,   sailormn, sailormn, cave,     cave_state, sailormn,  ROT0,   "Gazelle (Banpresto license)",            "Pretty Soldier Sailor Moon (Ver. 95/03/22B, Hong Kong)", MACHINE_SUPPORTS_SAVE )
-GAME( 1995, sailormno,   sailormn, sailormn, cave,     cave_state, sailormn,  ROT0,   "Gazelle (Banpresto license)",            "Pretty Soldier Sailor Moon (Ver. 95/03/22, Europe)",     MACHINE_SUPPORTS_SAVE )
-GAME( 1995, sailormnou,  sailormn, sailormn, cave,     cave_state, sailormn,  ROT0,   "Gazelle (Banpresto license)",            "Pretty Soldier Sailor Moon (Ver. 95/03/22, USA)",        MACHINE_SUPPORTS_SAVE )
-GAME( 1995, sailormnoj,  sailormn, sailormn, cave,     cave_state, sailormn,  ROT0,   "Gazelle (Banpresto license)",            "Pretty Soldier Sailor Moon (Ver. 95/03/22, Japan)",      MACHINE_SUPPORTS_SAVE )
-GAME( 1995, sailormnok,  sailormn, sailormn, cave,     cave_state, sailormn,  ROT0,   "Gazelle (Banpresto license)",            "Pretty Soldier Sailor Moon (Ver. 95/03/22, Korea)",      MACHINE_SUPPORTS_SAVE )
-GAME( 1995, sailormnot,  sailormn, sailormn, cave,     cave_state, sailormn,  ROT0,   "Gazelle (Banpresto license)",            "Pretty Soldier Sailor Moon (Ver. 95/03/22, Taiwan)",     MACHINE_SUPPORTS_SAVE )
-GAME( 1995, sailormnoh,  sailormn, sailormn, cave,     cave_state, sailormn,  ROT0,   "Gazelle (Banpresto license)",            "Pretty Soldier Sailor Moon (Ver. 95/03/22, Hong Kong)",  MACHINE_SUPPORTS_SAVE )
+GAME( 1995, sailormnn,   sailormn, sailormn, cave,     cave_state, sailormn,  ROT0,   "Gazelle (Banpresto license)",            "Pretty Soldier Sailor Moon (Ver. 95/03/22, Europe)",     MACHINE_SUPPORTS_SAVE )
+GAME( 1995, sailormnnu,  sailormn, sailormn, cave,     cave_state, sailormn,  ROT0,   "Gazelle (Banpresto license)",            "Pretty Soldier Sailor Moon (Ver. 95/03/22, USA)",        MACHINE_SUPPORTS_SAVE )
+GAME( 1995, sailormnnj,  sailormn, sailormn, cave,     cave_state, sailormn,  ROT0,   "Gazelle (Banpresto license)",            "Pretty Soldier Sailor Moon (Ver. 95/03/22, Japan)",      MACHINE_SUPPORTS_SAVE )
+GAME( 1995, sailormnnk,  sailormn, sailormn, cave,     cave_state, sailormn,  ROT0,   "Gazelle (Banpresto license)",            "Pretty Soldier Sailor Moon (Ver. 95/03/22, Korea)",      MACHINE_SUPPORTS_SAVE )
+GAME( 1995, sailormnnt,  sailormn, sailormn, cave,     cave_state, sailormn,  ROT0,   "Gazelle (Banpresto license)",            "Pretty Soldier Sailor Moon (Ver. 95/03/22, Taiwan)",     MACHINE_SUPPORTS_SAVE )
+GAME( 1995, sailormnnh,  sailormn, sailormn, cave,     cave_state, sailormn,  ROT0,   "Gazelle (Banpresto license)",            "Pretty Soldier Sailor Moon (Ver. 95/03/22, Hong Kong)",  MACHINE_SUPPORTS_SAVE )
+GAME( 1995, sailormno,   sailormn, sailormn, cave,     cave_state, sailormn,  ROT0,   "Gazelle (Banpresto license)",            "Pretty Soldier Sailor Moon (Ver. 95/03/21, Europe)",     MACHINE_SUPPORTS_SAVE )
+GAME( 1995, sailormnou,  sailormn, sailormn, cave,     cave_state, sailormn,  ROT0,   "Gazelle (Banpresto license)",            "Pretty Soldier Sailor Moon (Ver. 95/03/21, USA)",        MACHINE_SUPPORTS_SAVE )
+GAME( 1995, sailormnoj,  sailormn, sailormn, cave,     cave_state, sailormn,  ROT0,   "Gazelle (Banpresto license)",            "Pretty Soldier Sailor Moon (Ver. 95/03/21, Japan)",      MACHINE_SUPPORTS_SAVE )
+GAME( 1995, sailormnok,  sailormn, sailormn, cave,     cave_state, sailormn,  ROT0,   "Gazelle (Banpresto license)",            "Pretty Soldier Sailor Moon (Ver. 95/03/21, Korea)",      MACHINE_SUPPORTS_SAVE )
+GAME( 1995, sailormnot,  sailormn, sailormn, cave,     cave_state, sailormn,  ROT0,   "Gazelle (Banpresto license)",            "Pretty Soldier Sailor Moon (Ver. 95/03/21, Taiwan)",     MACHINE_SUPPORTS_SAVE )
+GAME( 1995, sailormnoh,  sailormn, sailormn, cave,     cave_state, sailormn,  ROT0,   "Gazelle (Banpresto license)",            "Pretty Soldier Sailor Moon (Ver. 95/03/21, Hong Kong)",  MACHINE_SUPPORTS_SAVE )
 
 // The EEPROM determines the region, program roms are the same between sets
 GAME( 1996, agallet,     0,        sailormn, cave,     cave_state, agallet,   ROT270, "Gazelle (Banpresto license)",            "Air Gallet (Europe)",    MACHINE_SUPPORTS_SAVE )
@@ -5346,7 +5514,8 @@ GAME( 1996, agalletah,   agallet,  sailormn, cave,     cave_state, agallet,   RO
 
 GAME( 1996, hotdogst,    0,        hotdogst, cave,     cave_state, hotdogst,  ROT90,  "Marble",                                 "Hotdog Storm (International)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1996, pacslot,     0,        pacslot,  pacslot,  cave_state, tjumpman,  ROT0,   "Namco",                                  "Pac-Slot", MACHINE_SUPPORTS_SAVE )
+GAME( 1996, pacslot,     0,        pacslot,  pacslot,  cave_state, tjumpman,  ROT0,   "Namco",                                  "Pac-Slot",  MACHINE_SUPPORTS_SAVE )
+GAME( 1996, paceight,    0,        paceight, paceight, cave_state, tjumpman,  ROT0,   "Namco",                                  "Pac-Eight", MACHINE_SUPPORTS_SAVE )
 
 GAME( 1996, ppsatan,     0,        ppsatan,  ppsatan,  cave_state, ppsatan,   ROT0,   "Kato Seisakujo Co., Ltd.",               "Poka Poka Satan (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
 

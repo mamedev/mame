@@ -105,7 +105,7 @@ WRITE8_MEMBER(mainevt_state::mainevt_sh_bankswitch_w)
 {
 	int bank_A, bank_B;
 
-//logerror("CPU #1 PC: %04x bank switch = %02x\n",space.device().safe_pc(),data);
+//logerror("CPU #1 PC: %04x bank switch = %02x\n", m_audiocpu->pc(),data);
 
 	/* bits 0-3 select the 007232 banks */
 	bank_A = (data & 0x3);
@@ -120,7 +120,7 @@ WRITE8_MEMBER(mainevt_state::dv_sh_bankswitch_w)
 {
 	int bank_A, bank_B;
 
-//logerror("CPU #1 PC: %04x bank switch = %02x\n",space.device().safe_pc(),data);
+//logerror("CPU #1 PC: %04x bank switch = %02x\n",m_audiocpu->pc(),data);
 
 	/* bits 0-3 select the 007232 banks */
 	bank_A = (data & 0x3);
@@ -173,7 +173,7 @@ static ADDRESS_MAP_START( mainevt_map, AS_PROGRAM, 8, mainevt_state )
 	AM_RANGE(0x0000, 0x3fff) AM_READWRITE(k052109_051960_r, k052109_051960_w)
 
 	AM_RANGE(0x4000, 0x5dff) AM_RAM
-	AM_RANGE(0x5e00, 0x5fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x5e00, 0x5fff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
 	AM_RANGE(0x6000, 0x7fff) AM_ROMBANK("rombank")
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
@@ -197,7 +197,7 @@ static ADDRESS_MAP_START( devstors_map, AS_PROGRAM, 8, mainevt_state )
 	AM_RANGE(0x0000, 0x3fff) AM_READWRITE(k052109_051960_r, k052109_051960_w)
 
 	AM_RANGE(0x4000, 0x5dff) AM_RAM
-	AM_RANGE(0x5e00, 0x5fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x5e00, 0x5fff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
 	AM_RANGE(0x6000, 0x7fff) AM_ROMBANK("rombank")
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
@@ -239,16 +239,16 @@ static INPUT_PORTS_START( mainevt )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE4 )
 
 	PORT_START("P1")
-	KONAMI8_B21_UNK(1)
+	KONAMI8_B12_UNK(1)
 
 	PORT_START("P2")
-	KONAMI8_B21_UNK(2)
+	KONAMI8_B12_UNK(2)
 
 	PORT_START("P3")
-	KONAMI8_B21_UNK(3)
+	KONAMI8_B12_UNK(3)
 
 	PORT_START("P4")
-	KONAMI8_B21_UNK(4)
+	KONAMI8_B12_UNK(4)
 
 	PORT_START("DSW1")
 	PORT_DIPNAME( 0x0f, 0x0f, DEF_STR( Coinage ) )      PORT_DIPLOCATION("SW1:1,2,3,4")
@@ -406,7 +406,7 @@ INTERRUPT_GEN_MEMBER(mainevt_state::devstors_sound_timer_irq)
 		device.execute().set_input_line(0, HOLD_LINE);
 }
 
-static MACHINE_CONFIG_START( mainevt )
+MACHINE_CONFIG_START(mainevt_state::mainevt)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", HD6309, 3000000*4)  /* ?? */
@@ -454,7 +454,7 @@ static MACHINE_CONFIG_START( mainevt )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( devstors )
+MACHINE_CONFIG_START(mainevt_state::devstors)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", HD6309, 3000000*4)  /* ?? */

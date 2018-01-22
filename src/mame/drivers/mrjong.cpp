@@ -183,7 +183,7 @@ GFXDECODE_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( mrjong )
+MACHINE_CONFIG_START(mrjong_state::mrjong)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80,15468000/6) /* 2.578 MHz?? */

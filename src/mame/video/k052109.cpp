@@ -315,7 +315,7 @@ READ8_MEMBER( k052109_device::read )
 			else if (offset >= 0x3a00 && offset < 0x3c00)
 			{   /* B x scroll */    }
 //          else
-//logerror("%04x: read from unknown 052109 address %04x\n",space.device().safe_pc(),offset);
+//logerror("%s: read from unknown 052109 address %04x\n",m_maincpu->pc(),offset);
 		}
 
 		return m_ram[offset];
@@ -341,7 +341,7 @@ READ8_MEMBER( k052109_device::read )
 	addr = (code << 5) + (offset & 0x1f);
 	addr &= m_char_rom.mask();
 
-//      logerror("%04x: off = %04x sub = %02x (bnk = %x) adr = %06x\n", space.device().safe_pc(), offset, m_romsubbank, bank, addr);
+//      logerror("%s: off = %04x sub = %02x (bnk = %x) adr = %06x\n", m_maincpu->pc(), offset, m_romsubbank, bank, addr);
 
 		return m_char_rom[addr];
 	}
@@ -370,13 +370,13 @@ WRITE8_MEMBER( k052109_device::write )
 			if (m_scrollctrl != data)
 			{
 //popmessage("scrollcontrol = %02x", data);
-//logerror("%04x: rowscrollcontrol = %02x\n", space.device().safe_pc(), data);
+//logerror("%s: rowscrollcontrol = %02x\n", m_maincpu->pc(), data);
 				m_scrollctrl = data;
 			}
 		}
 		else if (offset == 0x1d00)
 		{
-//logerror("%04x: 052109 register 1d00 = %02x\n", space.device().safe_pc(), data);
+//logerror("%s: 052109 register 1d00 = %02x\n", m_maincpu->pc(), data);
 			/* bit 2 = irq enable */
 			/* the custom chip can also generate NMI and FIRQ, for use with a 6809 */
 			m_irq_enabled = data & 0x04;
@@ -411,12 +411,12 @@ WRITE8_MEMBER( k052109_device::write )
 		}
 		else if (offset == 0x1e00 || offset == 0x3e00) // Surprise Attack uses offset 0x3e00
 		{
-//logerror("%04x: 052109 register 1e00 = %02x\n",space.device().safe_pc(),data);
+//logerror("%s: 052109 register 1e00 = %02x\n",m_maincpu->pc(),data);
 			m_romsubbank = data;
 		}
 		else if (offset == 0x1e80)
 		{
-//if ((data & 0xfe)) logerror("%04x: 052109 register 1e80 = %02x\n",space.device().safe_pc(),data);
+//if ((data & 0xfe)) logerror("%s: 052109 register 1e80 = %02x\n",m_maincpu->pc(),data);
 			m_tilemap[0]->set_flip((data & 1) ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 			m_tilemap[1]->set_flip((data & 1) ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 			m_tilemap[2]->set_flip((data & 1) ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
@@ -471,7 +471,7 @@ WRITE8_MEMBER( k052109_device::write )
 			m_charrombank_2[3] = (data >> 4) & 0x0f;
 		}
 //      else
-//          logerror("%04x: write %02x to unknown 052109 address %04x\n",space.device().safe_pc(),data,offset);
+//          logerror("%s: write %02x to unknown 052109 address %04x\n",m_maincpu->pc(),data,offset);
 	}
 }
 

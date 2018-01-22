@@ -53,6 +53,7 @@ i386_device::i386_device(const machine_config &mconfig, device_type type, const 
 	, m_program_config("program", ENDIANNESS_LITTLE, program_data_width, program_addr_width, 0)
 	, m_io_config("io", ENDIANNESS_LITTLE, io_data_width, 16, 0)
 	, m_smiact(*this)
+	, m_ferr_handler(*this)
 {
 	m_program_config.m_logaddr_width = 32;
 	m_program_config.m_page_shift = 12;
@@ -3171,36 +3172,13 @@ uint64_t i386_device::debug_virttophys(symbol_table &table, int params, const ui
 	return result;
 }
 
-uint64_t i386_debug_segbase(symbol_table &table, void *ref, int params, const uint64_t *param)
-{
-	i386_device *i386 = (i386_device *)(ref);
-	return i386->debug_segbase(table, params, param);
-}
-
-uint64_t i386_debug_seglimit(symbol_table &table, void *ref, int params, const uint64_t *param)
-{
-	i386_device *i386 = (i386_device *)(ref);
-	return i386->debug_seglimit(table, params, param);
-}
-
-uint64_t i386_debug_segofftovirt(symbol_table &table, void *ref, int params, const uint64_t *param)
-{
-	i386_device *i386 = (i386_device *)(ref);
-	return i386->debug_segofftovirt(table, params, param);
-}
-
-static uint64_t i386_debug_virttophys(symbol_table &table, void *ref, int params, const uint64_t *param)
-{
-	i386_device *i386 = (i386_device *)(ref);
-	return i386->debug_virttophys(table, params, param);
-}
-
 void i386_device::device_debug_setup()
 {
-	debug()->symtable().add("segbase", (void *)this, 1, 1, i386_debug_segbase);
-	debug()->symtable().add("seglimit", (void *)this, 1, 1, i386_debug_seglimit);
-	debug()->symtable().add("segofftovirt", (void *)this, 2, 2, i386_debug_segofftovirt);
-	debug()->symtable().add("virttophys", (void *)this, 1, 1, i386_debug_virttophys);
+	using namespace std::placeholders;
+	debug()->symtable().add("segbase", 1, 1, std::bind(&i386_device::debug_segbase, this, _1, _2, _3));
+	debug()->symtable().add("seglimit", 1, 1, std::bind(&i386_device::debug_seglimit, this, _1, _2, _3));
+	debug()->symtable().add("segofftovirt", 2, 2, std::bind(&i386_device::debug_segofftovirt, this, _1, _2, _3));
+	debug()->symtable().add("virttophys", 1, 1, std::bind(&i386_device::debug_virttophys, this, _1, _2, _3));
 }
 
 /*************************************************************************/
@@ -3244,7 +3222,7 @@ void i386_device::i386_common_init()
 	}
 
 	m_program = &space(AS_PROGRAM);
-	m_direct = &m_program->direct();
+	m_direct = m_program->direct<0>();
 	m_io = &space(AS_IO);
 	m_smi = false;
 	m_debugger_temp = 0;
@@ -3343,6 +3321,8 @@ void i386_device::i386_common_init()
 	machine().save().register_postload(save_prepost_delegate(FUNC(i386_device::i386_postload), this));
 
 	m_smiact.resolve_safe();
+	m_ferr_handler.resolve_safe();
+	m_ferr_handler(0);
 
 	m_icountptr = &m_cycles;
 }
@@ -3811,59 +3791,60 @@ void i386_device::pentium_smi()
 	m_smi_latched = false;
 
 	// save state
-	WRITE32(m_cr[4], smram_state+SMRAM_IP5_CR4);
-	WRITE32(m_sreg[ES].limit, smram_state+SMRAM_IP5_ESLIM);
-	WRITE32(m_sreg[ES].base, smram_state+SMRAM_IP5_ESBASE);
-	WRITE32(m_sreg[ES].flags, smram_state+SMRAM_IP5_ESACC);
-	WRITE32(m_sreg[CS].limit, smram_state+SMRAM_IP5_CSLIM);
-	WRITE32(m_sreg[CS].base, smram_state+SMRAM_IP5_CSBASE);
-	WRITE32(m_sreg[CS].flags, smram_state+SMRAM_IP5_CSACC);
-	WRITE32(m_sreg[SS].limit, smram_state+SMRAM_IP5_SSLIM);
-	WRITE32(m_sreg[SS].base, smram_state+SMRAM_IP5_SSBASE);
-	WRITE32(m_sreg[SS].flags, smram_state+SMRAM_IP5_SSACC);
-	WRITE32(m_sreg[DS].limit, smram_state+SMRAM_IP5_DSLIM);
-	WRITE32(m_sreg[DS].base, smram_state+SMRAM_IP5_DSBASE);
-	WRITE32(m_sreg[DS].flags, smram_state+SMRAM_IP5_DSACC);
-	WRITE32(m_sreg[FS].limit, smram_state+SMRAM_IP5_FSLIM);
-	WRITE32(m_sreg[FS].base, smram_state+SMRAM_IP5_FSBASE);
-	WRITE32(m_sreg[FS].flags, smram_state+SMRAM_IP5_FSACC);
-	WRITE32(m_sreg[GS].limit, smram_state+SMRAM_IP5_GSLIM);
-	WRITE32(m_sreg[GS].base, smram_state+SMRAM_IP5_GSBASE);
-	WRITE32(m_sreg[GS].flags, smram_state+SMRAM_IP5_GSACC);
-	WRITE32(m_ldtr.flags, smram_state+SMRAM_IP5_LDTACC);
-	WRITE32(m_ldtr.limit, smram_state+SMRAM_IP5_LDTLIM);
-	WRITE32(m_ldtr.base, smram_state+SMRAM_IP5_LDTBASE);
-	WRITE32(m_gdtr.limit, smram_state+SMRAM_IP5_GDTLIM);
-	WRITE32(m_gdtr.base, smram_state+SMRAM_IP5_GDTBASE);
-	WRITE32(m_idtr.limit, smram_state+SMRAM_IP5_IDTLIM);
-	WRITE32(m_idtr.base, smram_state+SMRAM_IP5_IDTBASE);
-	WRITE32(m_task.limit, smram_state+SMRAM_IP5_TRLIM);
-	WRITE32(m_task.base, smram_state+SMRAM_IP5_TRBASE);
-	WRITE32(m_task.flags, smram_state+SMRAM_IP5_TRACC);
+	WRITE32(smram_state + SMRAM_SMBASE, m_smbase);
+	WRITE32(smram_state + SMRAM_IP5_CR4, m_cr[4]);
+	WRITE32(smram_state + SMRAM_IP5_ESLIM, m_sreg[ES].limit);
+	WRITE32(smram_state + SMRAM_IP5_ESBASE, m_sreg[ES].base);
+	WRITE32(smram_state + SMRAM_IP5_ESACC, m_sreg[ES].flags);
+	WRITE32(smram_state + SMRAM_IP5_CSLIM, m_sreg[CS].limit);
+	WRITE32(smram_state + SMRAM_IP5_CSBASE, m_sreg[CS].base);
+	WRITE32(smram_state + SMRAM_IP5_CSACC, m_sreg[CS].flags);
+	WRITE32(smram_state + SMRAM_IP5_SSLIM, m_sreg[SS].limit);
+	WRITE32(smram_state + SMRAM_IP5_SSBASE, m_sreg[SS].base);
+	WRITE32(smram_state + SMRAM_IP5_SSACC, m_sreg[SS].flags);
+	WRITE32(smram_state + SMRAM_IP5_DSLIM, m_sreg[DS].limit);
+	WRITE32(smram_state + SMRAM_IP5_DSBASE, m_sreg[DS].base);
+	WRITE32(smram_state + SMRAM_IP5_DSACC, m_sreg[DS].flags);
+	WRITE32(smram_state + SMRAM_IP5_FSLIM, m_sreg[FS].limit);
+	WRITE32(smram_state + SMRAM_IP5_FSBASE, m_sreg[FS].base);
+	WRITE32(smram_state + SMRAM_IP5_FSACC, m_sreg[FS].flags);
+	WRITE32(smram_state + SMRAM_IP5_GSLIM, m_sreg[GS].limit);
+	WRITE32(smram_state + SMRAM_IP5_GSBASE, m_sreg[GS].base);
+	WRITE32(smram_state + SMRAM_IP5_GSACC, m_sreg[GS].flags);
+	WRITE32(smram_state + SMRAM_IP5_LDTACC, m_ldtr.flags);
+	WRITE32(smram_state + SMRAM_IP5_LDTLIM, m_ldtr.limit);
+	WRITE32(smram_state + SMRAM_IP5_LDTBASE, m_ldtr.base);
+	WRITE32(smram_state + SMRAM_IP5_GDTLIM, m_gdtr.limit);
+	WRITE32(smram_state + SMRAM_IP5_GDTBASE, m_gdtr.base);
+	WRITE32(smram_state + SMRAM_IP5_IDTLIM, m_idtr.limit);
+	WRITE32(smram_state + SMRAM_IP5_IDTBASE, m_idtr.base);
+	WRITE32(smram_state + SMRAM_IP5_TRLIM, m_task.limit);
+	WRITE32(smram_state + SMRAM_IP5_TRBASE, m_task.base);
+	WRITE32(smram_state + SMRAM_IP5_TRACC, m_task.flags);
 
-	WRITE32(m_sreg[ES].selector, smram_state+SMRAM_ES);
-	WRITE32(m_sreg[CS].selector, smram_state+SMRAM_CS);
-	WRITE32(m_sreg[SS].selector, smram_state+SMRAM_SS);
-	WRITE32(m_sreg[DS].selector, smram_state+SMRAM_DS);
-	WRITE32(m_sreg[FS].selector, smram_state+SMRAM_FS);
-	WRITE32(m_sreg[GS].selector, smram_state+SMRAM_GS);
-	WRITE32(m_ldtr.segment, smram_state+SMRAM_LDTR);
-	WRITE32(m_task.segment, smram_state+SMRAM_TR);
+	WRITE32(smram_state + SMRAM_ES, m_sreg[ES].selector);
+	WRITE32(smram_state + SMRAM_CS, m_sreg[CS].selector);
+	WRITE32(smram_state + SMRAM_SS, m_sreg[SS].selector);
+	WRITE32(smram_state + SMRAM_DS, m_sreg[DS].selector);
+	WRITE32(smram_state + SMRAM_FS, m_sreg[FS].selector);
+	WRITE32(smram_state + SMRAM_GS, m_sreg[GS].selector);
+	WRITE32(smram_state + SMRAM_LDTR, m_ldtr.segment);
+	WRITE32(smram_state + SMRAM_TR, m_task.segment);
 
-	WRITE32(m_dr[7], smram_state+SMRAM_DR7);
-	WRITE32(m_dr[6], smram_state+SMRAM_DR6);
-	WRITE32(REG32(EAX), smram_state+SMRAM_EAX);
-	WRITE32(REG32(ECX), smram_state+SMRAM_ECX);
-	WRITE32(REG32(EDX), smram_state+SMRAM_EDX);
-	WRITE32(REG32(EBX), smram_state+SMRAM_EBX);
-	WRITE32(REG32(ESP), smram_state+SMRAM_ESP);
-	WRITE32(REG32(EBP), smram_state+SMRAM_EBP);
-	WRITE32(REG32(ESI), smram_state+SMRAM_ESI);
-	WRITE32(REG32(EDI), smram_state+SMRAM_EDI);
-	WRITE32(m_eip, smram_state+SMRAM_EIP);
-	WRITE32(old_flags, smram_state+SMRAM_EFLAGS);
-	WRITE32(m_cr[3], smram_state+SMRAM_CR3);
-	WRITE32(old_cr0, smram_state+SMRAM_CR0);
+	WRITE32(smram_state + SMRAM_DR7, m_dr[7]);
+	WRITE32(smram_state + SMRAM_DR6, m_dr[6]);
+	WRITE32(smram_state + SMRAM_EAX, REG32(EAX));
+	WRITE32(smram_state + SMRAM_ECX, REG32(ECX));
+	WRITE32(smram_state + SMRAM_EDX, REG32(EDX));
+	WRITE32(smram_state + SMRAM_EBX, REG32(EBX));
+	WRITE32(smram_state + SMRAM_ESP, REG32(ESP));
+	WRITE32(smram_state + SMRAM_EBP, REG32(EBP));
+	WRITE32(smram_state + SMRAM_ESI, REG32(ESI));
+	WRITE32(smram_state + SMRAM_EDI, REG32(EDI));
+	WRITE32(smram_state + SMRAM_EIP, m_eip);
+	WRITE32(smram_state + SMRAM_EFLAGS, old_flags);
+	WRITE32(smram_state + SMRAM_CR3, m_cr[3]);
+	WRITE32(smram_state + SMRAM_CR0, old_cr0);
 
 	m_sreg[DS].selector = m_sreg[ES].selector = m_sreg[FS].selector = m_sreg[GS].selector = m_sreg[SS].selector = 0;
 	m_sreg[DS].base = m_sreg[ES].base = m_sreg[FS].base = m_sreg[GS].base = m_sreg[SS].base = 0x00000000;
@@ -4021,11 +4002,15 @@ bool i386_device::memory_translate(int spacenum, int intention, offs_t &address)
 	return ret;
 }
 
-offs_t i386_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+int i386_device::get_mode() const
 {
-	return i386_dasm_one(stream, pc, oprom, m_sreg[CS].d ? 32 : 16);
+	return m_sreg[CS].d ? 32 : 16;
 }
 
+util::disasm_interface *i386_device::create_disassembler()
+{
+	return new i386_disassembler(this);
+}
 
 /*****************************************************************************/
 /* Intel 486 */

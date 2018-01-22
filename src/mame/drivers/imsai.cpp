@@ -18,6 +18,7 @@
 
 #include "emu.h"
 #include "cpu/i8085/i8085.h"
+//#include "bus/s100/s100.h"
 #include "machine/i8251.h"
 #include "machine/pit8253.h"
 #include "machine/terminal.h"
@@ -38,6 +39,7 @@ public:
 	DECLARE_READ8_MEMBER(status_r);
 	DECLARE_WRITE8_MEMBER(control_w);
 
+	void imsai(machine_config &config);
 private:
 	uint8_t m_term_data;
 	virtual void machine_reset() override;
@@ -99,7 +101,7 @@ void imsai_state::machine_reset()
 	m_term_data = 0;
 }
 
-static MACHINE_CONFIG_START( imsai )
+MACHINE_CONFIG_START(imsai_state::imsai)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",I8085A, XTAL_6MHz)
 	MCFG_CPU_PROGRAM_MAP(imsai_mem)

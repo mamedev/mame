@@ -101,7 +101,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( bank0000_map, AS_PROGRAM, 8, crimfght_state )
 	AM_RANGE(0x0000, 0x03ff) AM_RAM
-	AM_RANGE(0x0400, 0x07ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x0400, 0x07ff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
 ADDRESS_MAP_END
 
 // full memory map derived from schematics
@@ -297,7 +297,7 @@ CUSTOM_INPUT_MEMBER( crimfght_state::system_r )
 	return data >> 4;
 }
 
-static MACHINE_CONFIG_START( crimfght )
+MACHINE_CONFIG_START(crimfght_state::crimfght)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", KONAMI, XTAL_24MHz/8)       /* 052001 (verified on pcb) */
@@ -311,8 +311,8 @@ static MACHINE_CONFIG_START( crimfght )
 	MCFG_DEVICE_ADD("bank0000", ADDRESS_MAP_BANK, 0)
 	MCFG_DEVICE_PROGRAM_MAP(bank0000_map)
 	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_BIG)
-	MCFG_ADDRESS_MAP_BANK_DATABUS_WIDTH(8)
-	MCFG_ADDRESS_MAP_BANK_ADDRBUS_WIDTH(11)
+	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
+	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(11)
 	MCFG_ADDRESS_MAP_BANK_STRIDE(0x400)
 
 	MCFG_WATCHDOG_ADD("watchdog")

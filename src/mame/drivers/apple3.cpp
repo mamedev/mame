@@ -52,7 +52,7 @@ FLOPPY_FORMATS_MEMBER( apple3_state::floppy_formats )
 	FLOPPY_A216S_FORMAT, FLOPPY_RWTS18_FORMAT, FLOPPY_EDD_FORMAT
 FLOPPY_FORMATS_END
 
-static MACHINE_CONFIG_START( apple3 )
+MACHINE_CONFIG_START(apple3_state::apple3)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, 2000000)        /* 2 MHz */
 	MCFG_M6502_SYNC_CALLBACK(WRITELINE(apple3_state, apple3_sync_w))

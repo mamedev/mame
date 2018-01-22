@@ -172,7 +172,7 @@ READ8_MEMBER(stv_state::critcrsh_ioga_r)
 		case 0x01:
 		case 0x03:
 			res = ioport(lgnames[offset >> 1])->read();
-			res = BITSWAP8(res, 2, 3, 0, 1, 6, 7, 5, 4) & 0xf3;
+			res = bitswap<8>(res, 2, 3, 0, 1, 6, 7, 5, 4) & 0xf3;
 			res |= (ioport("PORTC")->read() & 0x10) ? 0x0 : 0x4; // x/y hit latch actually
 			break;
 		default: res = stv_ioga_r(space,offset); break;
@@ -463,16 +463,16 @@ DRIVER_INIT_MEMBER(stv_state,critcrsh)
 
 READ32_MEMBER(stv_state::magzun_hef_hack_r)
 {
-	if(space.device().safe_pc()==0x604bf20) return 0x00000001; //HWEF
+	if(m_maincpu->pc()==0x604bf20) return 0x00000001; //HWEF
 
-	if(space.device().safe_pc()==0x604bfbe) return 0x00000002; //HREF
+	if(m_maincpu->pc()==0x604bfbe) return 0x00000002; //HREF
 
 	return m_workram_h[0x08e830/4];
 }
 
 READ32_MEMBER(stv_state::magzun_rx_hack_r)
 {
-	if(space.device().safe_pc()==0x604c006) return 0x40;
+	if(m_maincpu->pc()==0x604c006) return 0x40;
 
 	return m_workram_h[0x0ff3b4/4];
 }
@@ -1058,7 +1058,7 @@ WRITE8_MEMBER( stv_state::pdr2_output_w )
 }
 
 
-static MACHINE_CONFIG_START( stv )
+MACHINE_CONFIG_START(stv_state::stv)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", SH2, MASTER_CLOCK_352/2) // 28.6364 MHz
@@ -1125,7 +1125,7 @@ static MACHINE_CONFIG_START( stv )
 
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( stv_5881, stv )
+MACHINE_CONFIG_DERIVED(stv_state::stv_5881, stv)
 	MCFG_DEVICE_ADD("315_5881", SEGA315_5881_CRYPT, 0)
 	MCFG_SET_READ_CALLBACK(stv_state, crypt_read_callback)
 MACHINE_CONFIG_END
@@ -1141,7 +1141,7 @@ uint16_t stv_state::crypt_read_callback_ch2(uint32_t addr)
 	return m_maincpu->space().read_word(0x02000000 + 0x0000000 + (addr * 2));
 }
 
-static MACHINE_CONFIG_DERIVED( stv_5838, stv )
+MACHINE_CONFIG_DERIVED(stv_state::stv_5838, stv)
 	MCFG_DEVICE_ADD("315_5838", SEGA315_5838_COMP, 0)
 	MCFG_SET_5838_READ_CALLBACK_CH1(stv_state, crypt_read_callback_ch1)
 	MCFG_SET_5838_READ_CALLBACK_CH2(stv_state, crypt_read_callback_ch2)
@@ -1163,7 +1163,7 @@ WRITE32_MEMBER( stv_state::batmanfr_sound_comms_w )
 }
 
 
-static MACHINE_CONFIG_DERIVED( batmanfr, stv )
+MACHINE_CONFIG_DERIVED(stv_state::batmanfr, stv)
 	MCFG_DEVICE_ADD("rax", ACCLAIM_RAX, 0)
 MACHINE_CONFIG_END
 
@@ -1172,7 +1172,7 @@ MACHINE_CONFIG_END
 	MCFG_GENERIC_CARTSLOT_ADD(_tag, generic_plain_slot, "stv_cart")  \
 	MCFG_GENERIC_LOAD(stv_state, _load)
 
-MACHINE_CONFIG_START( stv_cartslot )
+MACHINE_CONFIG_START(stv_state::stv_cartslot)
 
 	MCFG_STV_CARTSLOT_ADD("stv_slot1", stv_cart1)
 	MCFG_STV_CARTSLOT_ADD("stv_slot2", stv_cart2)
@@ -1182,11 +1182,11 @@ MACHINE_CONFIG_START( stv_cartslot )
 	MCFG_SOFTWARE_LIST_ADD("cart_list","stv")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( stv_slot, stv )
+MACHINE_CONFIG_DERIVED(stv_state::stv_slot, stv)
 	MCFG_FRAGMENT_ADD( stv_cartslot )
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( hopper, stv )
+MACHINE_CONFIG_DERIVED(stv_state::hopper, stv)
 		MCFG_HOPPER_ADD("hopper", attotime::from_msec(100), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH)
 MACHINE_CONFIG_END
 
@@ -1897,11 +1897,11 @@ DRIVER_INIT_MEMBER(stv_state,sanjeon)
 	{
 		src[x] = src[x]^0xff;
 
-		src[x] = BITSWAP8(src[x],7,2,5,1,  3,6,4,0);
-		src[x] = BITSWAP8(src[x],4,6,5,7,  3,2,1,0);
-		src[x] = BITSWAP8(src[x],7,6,5,4,  2,3,1,0);
-		src[x] = BITSWAP8(src[x],7,0,5,4,  3,2,1,6);
-		src[x] = BITSWAP8(src[x],3,6,5,4,  7,2,1,0);
+		src[x] = bitswap<8>(src[x],7,2,5,1,  3,6,4,0);
+		src[x] = bitswap<8>(src[x],4,6,5,7,  3,2,1,0);
+		src[x] = bitswap<8>(src[x],7,6,5,4,  2,3,1,0);
+		src[x] = bitswap<8>(src[x],7,0,5,4,  3,2,1,6);
+		src[x] = bitswap<8>(src[x],3,6,5,4,  7,2,1,0);
 
 	}
 
@@ -3634,47 +3634,47 @@ GAME( 1997, znpwfvt,   znpwfv,  stv,      stv,      stv_state,   znpwfv,     ROT
 
 /* Unemulated printer / camera devices */
 // USA sets
-GAME( 1997, pclub2,    stvbios, stv,      stv,      stv_state,   stv,        ROT0,   "Atlus",                        "Print Club 2 (U 970921 V1.000)", MACHINE_NOT_WORKING )
-GAME( 1999, pclub2v3,  stvbios, stv,      stv,      stv_state,   stv,        ROT0,   "Atlus",                        "Print Club 2 Vol. 3 (U 990310 V1.000)", MACHINE_NOT_WORKING ) // Hello Kitty themed
-GAME( 1999, pclubpok,  stvbios, stv,      stv,      stv_state,   stv,        ROT0,   "Atlus",                        "Print Club Pokemon B (U 991126 V1.000)", MACHINE_NOT_WORKING )
+GAME( 1997, pclub2,    stvbios, stv,      stv,      stvpc_state, stv,        ROT0,   "Atlus",                        "Print Club 2 (U 970921 V1.000)", MACHINE_NOT_WORKING )
+GAME( 1999, pclub2v3,  stvbios, stv,      stv,      stvpc_state, stv,        ROT0,   "Atlus",                        "Print Club 2 Vol. 3 (U 990310 V1.000)", MACHINE_NOT_WORKING ) // Hello Kitty themed
+GAME( 1999, pclubpok,  stvbios, stv,      stv,      stvpc_state, stv,        ROT0,   "Atlus",                        "Print Club Pokemon B (U 991126 V1.000)", MACHINE_NOT_WORKING )
 // Japan sets
-GAME( 1999, pclub2fc,  stvbios, stv,      stv,      stv_state,   stv,        ROT0,   "Atlus",                        "Print Club 2 Felix The Cat (Rev. A) (J 970415 V1.100)", MACHINE_NOT_WORKING )
-GAME( 1998, pclub2pf,  stvbios, stv,      stv,      stv_state,   stv,        ROT0,   "Atlus",                        "Print Club 2 Puffy (Japan)", MACHINE_NOT_WORKING ) // version info is blank
-GAME( 1997, pclub2pe,  stvbios, stv,      stv,      stv_state,   stv,        ROT0,   "Atlus",                        "Print Club 2 Pepsiman (J 970618 V1.100)", MACHINE_NOT_WORKING )
-GAME( 1997, pclub2wb,  stvbios, stv,      stv,      stv_state,   stv,        ROT0,   "Atlus",                        "Print Club 2 Warner Bros (J 970228 V1.000)", MACHINE_NOT_WORKING )
+GAME( 1999, pclub2fc,  stvbios, stv,      stv,      stvpc_state, stv,        ROT0,   "Atlus",                        "Print Club 2 Felix The Cat (Rev. A) (J 970415 V1.100)", MACHINE_NOT_WORKING )
+GAME( 1998, pclub2pf,  stvbios, stv,      stv,      stvpc_state, stv,        ROT0,   "Atlus",                        "Print Club 2 Puffy (Japan)", MACHINE_NOT_WORKING ) // version info is blank
+GAME( 1997, pclub2pe,  stvbios, stv,      stv,      stvpc_state, stv,        ROT0,   "Atlus",                        "Print Club 2 Pepsiman (J 970618 V1.100)", MACHINE_NOT_WORKING )
+GAME( 1997, pclub2wb,  stvbios, stv,      stv,      stvpc_state, stv,        ROT0,   "Atlus",                        "Print Club 2 Warner Bros (J 970228 V1.000)", MACHINE_NOT_WORKING )
 
-GAME( 1997, pclb2elk,  stvbios, stv,      stv,      stv_state,   stv,        ROT0,   "Atlus",                        "Print Club 2 Earth Limited Kobe (Print Club Custom) (J 970808 V1.000)", MACHINE_NOT_WORKING )
-GAME( 1997, pckobe99,  stvbios, stv,      stv,      stv_state,   stv,        ROT0,   "Atlus",                        "Print Club 2 Kobe Luminaire '99 (Print Club Custom 3) (J 991203 V1.000)", MACHINE_NOT_WORKING )
+GAME( 1997, pclb2elk,  stvbios, stv,      stv,      stvpc_state, stv,        ROT0,   "Atlus",                        "Print Club 2 Earth Limited Kobe (Print Club Custom) (J 970808 V1.000)", MACHINE_NOT_WORKING )
+GAME( 1997, pckobe99,  stvbios, stv,      stv,      stvpc_state, stv,        ROT0,   "Atlus",                        "Print Club 2 Kobe Luminaire '99 (Print Club Custom 3) (J 991203 V1.000)", MACHINE_NOT_WORKING )
 
-GAME( 1997, pclub26w,  stvbios, stv,      stv,      stv_state,   stv,        ROT0,   "Atlus",                        "Print Club 2 Vol. 6 Winter (J 961210 V1.000)", MACHINE_NOT_WORKING ) // internal string is 'PURIKURA2 97FUYU' (but in reality it seems to be an end of 96 Winter version)
-GAME( 1997, pclub26wa, pclub26w,stv,      stv,      stv_state,   stv,        ROT0,   "Atlus",                        "Print Club 2 Vol. 6 Winter (J 970121 V1.200)", MACHINE_NOT_WORKING ) // ^
-GAME( 1997, pclub27s,  stvbios, stv,      stv,      stv_state,   stv,        ROT0,   "Atlus",                        "Print Club 2 Vol. 7 Spring (J 970313 V1.100)", MACHINE_NOT_WORKING )
-GAME( 1997, prc28su,   stvbios, stv,      stv,      stv_state,   stv,        ROT0,   "Atlus",                        "Print Club 2 Vol. 8 Summer (J 970616 V1.100)", MACHINE_NOT_WORKING ) // internal string 97SUMMER
-GAME( 1997, prc29au,   stvbios, stv,      stv,      stv_state,   stv,        ROT0,   "Atlus",                        "Print Club 2 Vol. 9 Autumn (J V1.100)", MACHINE_NOT_WORKING ) // internal string 97AUTUMN, no date code! (all 0)
-GAME( 1997, prc297wi,  stvbios, stv,      stv,      stv_state,   stv,        ROT0,   "Atlus",                        "Print Club 2 '97 Winter Ver (J 971017 V1.100, set 1)", MACHINE_NOT_WORKING ) // internal string is '97WINTER'
-GAME( 1997, prc297wia, prc297wi,stv,      stv,      stv_state,   stv,        ROT0,   "Atlus",                        "Print Club 2 '97 Winter Ver (J 971017 V1.100, set 2)", MACHINE_NOT_WORKING ) // different program revision, same date code, clearly didn't get updated properly
-GAME( 1998, prc298sp,  stvbios, stv,      stv,      stv_state,   stv,        ROT0,   "Atlus",                        "Print Club 2 '98 Spring Ver (J 971017 V1.100)", MACHINE_NOT_WORKING ) // again, date doesn't appear to have bene updated, this should be early 98
-GAME( 1998, prc298su,  stvbios, stv,      stv,      stv_state,   stv,        ROT0,   "Atlus",                        "Print Club 2 '98 Summer Ver (J 980603 V1.100)", MACHINE_NOT_WORKING ) //
-GAME( 1998, prc298au,  stvbios, stv,      stv,      stv_state,   stv,        ROT0,   "Atlus",                        "Print Club 2 '98 Autumn Ver (J 980827 V1.000)", MACHINE_NOT_WORKING )
-GAME( 2000, prc2ksu,   stvbios, stv,      stv,      stv_state,   stv,        ROT0,   "Atlus",                        "Print Club 2 2000 Summer (J 000509 V1.000)", MACHINE_NOT_WORKING ) // internal string 2000_SUMMER
-
-
-GAME( 1999, pclubor,   stvbios, stv,      stv,      stv_state,   stv,        ROT0,   "Atlus",                        "Print Club Goukakenran (J 991104 V1.000)", MACHINE_NOT_WORKING )
-GAME( 1999, pclubol,   stvbios, stv,      stv,      stv_state,   stv,        ROT0,   "Atlus",                        "Print Club Olive (J 980717 V1.000)", MACHINE_NOT_WORKING )
-GAME( 1997, pclub2kc,  stvbios, stv,      stv,      stv_state,   stv,        ROT0,   "Atlus",                        "Print Club Kome Kome Club (J 970203 V1.000)", MACHINE_NOT_WORKING )
-GAME( 1997, pclubyo2,  stvbios, stv,      stv,      stv_state,   stv,        ROT0,   "Atlus",                        "Print Club Yoshimoto V2 (J 970422 V1.100)", MACHINE_NOT_WORKING )
+GAME( 1997, pclub26w,  stvbios, stv,      stv,      stvpc_state, stv,        ROT0,   "Atlus",                        "Print Club 2 Vol. 6 Winter (J 961210 V1.000)", MACHINE_NOT_WORKING ) // internal string is 'PURIKURA2 97FUYU' (but in reality it seems to be an end of 96 Winter version)
+GAME( 1997, pclub26wa, pclub26w,stv,      stv,      stvpc_state, stv,        ROT0,   "Atlus",                        "Print Club 2 Vol. 6 Winter (J 970121 V1.200)", MACHINE_NOT_WORKING ) // ^
+GAME( 1997, pclub27s,  stvbios, stv,      stv,      stvpc_state, stv,        ROT0,   "Atlus",                        "Print Club 2 Vol. 7 Spring (J 970313 V1.100)", MACHINE_NOT_WORKING )
+GAME( 1997, prc28su,   stvbios, stv,      stv,      stvpc_state, stv,        ROT0,   "Atlus",                        "Print Club 2 Vol. 8 Summer (J 970616 V1.100)", MACHINE_NOT_WORKING ) // internal string 97SUMMER
+GAME( 1997, prc29au,   stvbios, stv,      stv,      stvpc_state, stv,        ROT0,   "Atlus",                        "Print Club 2 Vol. 9 Autumn (J V1.100)", MACHINE_NOT_WORKING ) // internal string 97AUTUMN, no date code! (all 0)
+GAME( 1997, prc297wi,  stvbios, stv,      stv,      stvpc_state, stv,        ROT0,   "Atlus",                        "Print Club 2 '97 Winter Ver (J 971017 V1.100, set 1)", MACHINE_NOT_WORKING ) // internal string is '97WINTER'
+GAME( 1997, prc297wia, prc297wi,stv,      stv,      stvpc_state, stv,        ROT0,   "Atlus",                        "Print Club 2 '97 Winter Ver (J 971017 V1.100, set 2)", MACHINE_NOT_WORKING ) // different program revision, same date code, clearly didn't get updated properly
+GAME( 1998, prc298sp,  stvbios, stv,      stv,      stvpc_state, stv,        ROT0,   "Atlus",                        "Print Club 2 '98 Spring Ver (J 971017 V1.100)", MACHINE_NOT_WORKING ) // again, date doesn't appear to have bene updated, this should be early 98
+GAME( 1998, prc298su,  stvbios, stv,      stv,      stvpc_state, stv,        ROT0,   "Atlus",                        "Print Club 2 '98 Summer Ver (J 980603 V1.100)", MACHINE_NOT_WORKING ) //
+GAME( 1998, prc298au,  stvbios, stv,      stv,      stvpc_state, stv,        ROT0,   "Atlus",                        "Print Club 2 '98 Autumn Ver (J 980827 V1.000)", MACHINE_NOT_WORKING )
+GAME( 2000, prc2ksu,   stvbios, stv,      stv,      stvpc_state, stv,        ROT0,   "Atlus",                        "Print Club 2 2000 Summer (J 000509 V1.000)", MACHINE_NOT_WORKING ) // internal string 2000_SUMMER
 
 
-GAME( 1997, pclove,    stvbios, stv_5838, stv,      stv_state,   decathlt,   ROT0,   "Atlus",                        "Print Club LoveLove (J 970421 V1.000)", MACHINE_NOT_WORKING ) // uses the same type of protection as decathlete!!
-GAME( 1997, pclove2,   stvbios, stv_5838, stv,      stv_state,   decathlt,   ROT0,   "Atlus",                        "Print Club LoveLove Ver 2 (J 970825 V1.000)", MACHINE_NOT_WORKING ) // ^
-GAME( 1997, pcpooh2,   stvbios, stv_5838, stv,      stv_state,   decathlt,   ROT0,   "Atlus",                        "Print Club Winnie-the-Pooh Vol. 2 (J 971218 V1.000)", MACHINE_NOT_WORKING ) // ^
-GAME( 1998, pcpooh3,   stvbios, stv_5838, stv,      stv_state,   decathlt,   ROT0,   "Atlus",                        "Print Club Winnie-the-Pooh Vol. 3 (J 980406 V1.000)", MACHINE_NOT_WORKING ) // ^
+GAME( 1999, pclubor,   stvbios, stv,      stv,      stvpc_state, stv,        ROT0,   "Atlus",                        "Print Club Goukakenran (J 991104 V1.000)", MACHINE_NOT_WORKING )
+GAME( 1999, pclubol,   stvbios, stv,      stv,      stvpc_state, stv,        ROT0,   "Atlus",                        "Print Club Olive (J 980717 V1.000)", MACHINE_NOT_WORKING )
+GAME( 1997, pclub2kc,  stvbios, stv,      stv,      stvpc_state, stv,        ROT0,   "Atlus",                        "Print Club Kome Kome Club (J 970203 V1.000)", MACHINE_NOT_WORKING )
+GAME( 1997, pclubyo2,  stvbios, stv,      stv,      stvpc_state, stv,        ROT0,   "Atlus",                        "Print Club Yoshimoto V2 (J 970422 V1.100)", MACHINE_NOT_WORKING )
 
-GAME( 1998, stress,    stvbios, stv,      stv,      stv_state,   stv,        ROT0,   "Sega",                         "Stress Busters (J 981020 V1.000)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
-GAME( 1996, nameclub,  stvbios, stv_5838, stv,      stv_state,   decathlt,   ROT0,   "Sega",                         "Name Club (J 960315 V1.000)", MACHINE_NOT_WORKING ) // uses the same type of protection as decathlete!!
-GAME( 1996, nclubv2,   stvbios, stv_5838, stv,      stv_state,   decathlt,   ROT0,   "Sega",                         "Name Club Ver.2 (J 960315 V1.000)", MACHINE_NOT_WORKING ) // ^  (has the same datecode as nameclub, probably incorrect unless both were released today)
-GAME( 1997, nclubv3,   stvbios, stv,      stv,      stv_state,   nameclv3,   ROT0,   "Sega",                         "Name Club Ver.3 (J 970723 V1.000)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING ) // no protection
+GAME( 1997, pclove,    stvbios, stv_5838, stv,      stvpc_state, decathlt,   ROT0,   "Atlus",                        "Print Club LoveLove (J 970421 V1.000)", MACHINE_NOT_WORKING ) // uses the same type of protection as decathlete!!
+GAME( 1997, pclove2,   stvbios, stv_5838, stv,      stvpc_state, decathlt,   ROT0,   "Atlus",                        "Print Club LoveLove Ver 2 (J 970825 V1.000)", MACHINE_NOT_WORKING ) // ^
+GAME( 1997, pcpooh2,   stvbios, stv_5838, stv,      stvpc_state, decathlt,   ROT0,   "Atlus",                        "Print Club Winnie-the-Pooh Vol. 2 (J 971218 V1.000)", MACHINE_NOT_WORKING ) // ^
+GAME( 1998, pcpooh3,   stvbios, stv_5838, stv,      stvpc_state, decathlt,   ROT0,   "Atlus",                        "Print Club Winnie-the-Pooh Vol. 3 (J 980406 V1.000)", MACHINE_NOT_WORKING ) // ^
+
+GAME( 1998, stress,    stvbios, stv,      stv,      stvpc_state, stv,        ROT0,   "Sega",                         "Stress Busters (J 981020 V1.000)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+
+GAME( 1996, nameclub,  stvbios, stv_5838, stv,      stvpc_state, decathlt,   ROT0,   "Sega",                         "Name Club (J 960315 V1.000)", MACHINE_NOT_WORKING ) // uses the same type of protection as decathlete!!
+GAME( 1996, nclubv2,   stvbios, stv_5838, stv,      stvpc_state, decathlt,   ROT0,   "Sega",                         "Name Club Ver.2 (J 960315 V1.000)", MACHINE_NOT_WORKING ) // ^  (has the same datecode as nameclub, probably incorrect unless both were released today)
+GAME( 1997, nclubv3,   stvbios, stv,      stv,      stvpc_state, nameclv3,   ROT0,   "Sega",                         "Name Club Ver.3 (J 970723 V1.000)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING ) // no protection
 
 
 

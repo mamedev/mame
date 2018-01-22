@@ -79,7 +79,7 @@ WRITE8_MEMBER( fuuki16_state::sound_command_w )
 {
 	m_soundlatch->write(space,0,data & 0xff);
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
-//      space.device().execute().spin_until_time(attotime::from_usec(50));   // Allow the other CPU to reply
+//      m_maincpu->spin_until_time(attotime::from_usec(50));   // Allow the other CPU to reply
 	machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(50)); // Fixes glitching in rasters
 }
 
@@ -91,7 +91,7 @@ static ADDRESS_MAP_START( fuuki16_map, AS_PROGRAM, 16, fuuki16_state )
 	AM_RANGE(0x504000, 0x505fff) AM_RAM_WRITE(vram_2_w) AM_SHARE("vram.2")                  //
 	AM_RANGE(0x506000, 0x507fff) AM_RAM_WRITE(vram_3_w) AM_SHARE("vram.3")                  //
 	AM_RANGE(0x600000, 0x601fff) AM_MIRROR(0x008000) AM_DEVREADWRITE("fuukivid", fuukivid_device, fuuki_sprram_r, fuuki_sprram_w) AM_SHARE("spriteram")   // Sprites, mirrored?
-	AM_RANGE(0x700000, 0x703fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")    // Palette
+	AM_RANGE(0x700000, 0x703fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")    // Palette
 	AM_RANGE(0x800000, 0x800001) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x810000, 0x810001) AM_READ_PORT("P1_P2")
 	AM_RANGE(0x880000, 0x880001) AM_READ_PORT("DSW")
@@ -115,7 +115,7 @@ WRITE8_MEMBER(fuuki16_state::sound_rombank_w)
 	if (data <= 2)
 		membank("bank1")->set_entry(data);
 	else
-		logerror("CPU #1 - PC %04X: unknown bank bits: %02X\n", space.device().safe_pc(), data);
+		logerror("CPU #1 - PC %04X: unknown bank bits: %02X\n", m_audiocpu->pc(), data);
 }
 
 WRITE8_MEMBER(fuuki16_state::oki_banking_w)
@@ -438,7 +438,7 @@ void fuuki16_state::machine_reset()
 }
 
 
-static MACHINE_CONFIG_START( fuuki16 )
+MACHINE_CONFIG_START(fuuki16_state::fuuki16)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_32MHz / 2) /* 16 MHz */

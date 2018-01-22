@@ -39,7 +39,7 @@ WRITE16_MEMBER(toaplan1_state::demonwld_dsp_addrsel_w)
 
 	m_main_ram_seg = ((data & 0xe000) << 9);
 	m_dsp_addr_w   = ((data & 0x1fff) << 1);
-	logerror("DSP PC:%04x IO write %04x (%08x) at port 0\n", space.device().safe_pcbase(), data, m_main_ram_seg + m_dsp_addr_w);
+	logerror("DSP PC:%04x IO write %04x (%08x) at port 0\n", m_dsp->pcbase(), data, m_main_ram_seg + m_dsp_addr_w);
 }
 
 READ16_MEMBER(toaplan1_state::demonwld_dsp_r)
@@ -52,9 +52,9 @@ READ16_MEMBER(toaplan1_state::demonwld_dsp_r)
 		case 0xc00000: {address_space &mainspace = m_maincpu->space(AS_PROGRAM);
 						input_data = mainspace.read_word(m_main_ram_seg + m_dsp_addr_w);
 						break;}
-		default:        logerror("DSP PC:%04x Warning !!! IO reading from %08x (port 1)\n", space.device().safe_pcbase(), m_main_ram_seg + m_dsp_addr_w);
+		default:        logerror("DSP PC:%04x Warning !!! IO reading from %08x (port 1)\n", m_dsp->pcbase(), m_main_ram_seg + m_dsp_addr_w);
 	}
-	logerror("DSP PC:%04x IO read %04x at %08x (port 1)\n", space.device().safe_pcbase(), input_data, m_main_ram_seg + m_dsp_addr_w);
+	logerror("DSP PC:%04x IO read %04x at %08x (port 1)\n", m_dsp->pcbase(), input_data, m_main_ram_seg + m_dsp_addr_w);
 	return input_data;
 }
 
@@ -67,9 +67,9 @@ WRITE16_MEMBER(toaplan1_state::demonwld_dsp_w)
 						address_space &mainspace = m_maincpu->space(AS_PROGRAM);
 						mainspace.write_word(m_main_ram_seg + m_dsp_addr_w, data);
 						break;}
-		default:        logerror("DSP PC:%04x Warning !!! IO writing to %08x (port 1)\n", space.device().safe_pcbase(), m_main_ram_seg + m_dsp_addr_w);
+		default:        logerror("DSP PC:%04x Warning !!! IO writing to %08x (port 1)\n", m_dsp->pcbase(), m_main_ram_seg + m_dsp_addr_w);
 	}
-	logerror("DSP PC:%04x IO write %04x at %08x (port 1)\n", space.device().safe_pcbase(), data, m_main_ram_seg + m_dsp_addr_w);
+	logerror("DSP PC:%04x IO write %04x at %08x (port 1)\n", m_dsp->pcbase(), data, m_main_ram_seg + m_dsp_addr_w);
 }
 
 WRITE16_MEMBER(toaplan1_state::demonwld_dsp_bio_w)
@@ -81,7 +81,7 @@ WRITE16_MEMBER(toaplan1_state::demonwld_dsp_bio_w)
 	/*              communication to main processor*/
 
 
-	logerror("DSP PC:%04x IO write %04x at port 3\n", space.device().safe_pcbase(), data);
+	logerror("DSP PC:%04x IO write %04x at port 3\n", m_dsp->pcbase(), data);
 	if (data & 0x8000) {
 		m_dsp_BIO = CLEAR_LINE;
 	}
@@ -127,7 +127,7 @@ void toaplan1_state::demonwld_restore_dsp()
 WRITE16_MEMBER(toaplan1_state::demonwld_dsp_ctrl_w)
 {
 #if 0
-	logerror("68000:%08x  Writing %08x to %08x.\n",space.device().safe_pc() ,data ,0xe0000a + offset);
+	logerror("68000:%08x  Writing %08x to %08x.\n",m_maincpu->pc() ,data ,0xe0000a + offset);
 #endif
 
 	if (ACCESSING_BITS_0_7)
@@ -136,12 +136,12 @@ WRITE16_MEMBER(toaplan1_state::demonwld_dsp_ctrl_w)
 		{
 			case 0x00:  demonwld_dsp(1); break;  /* Enable the INT line to the DSP */
 			case 0x01:  demonwld_dsp(0); break;  /* Inhibit the INT line to the DSP */
-			default:    logerror("68000:%04x  Writing unknown command %08x to %08x\n",space.device().safe_pcbase() ,data ,0xe0000a + offset); break;
+			default:    logerror("68000:%04x  Writing unknown command %08x to %08x\n",m_maincpu->pcbase() ,data ,0xe0000a + offset); break;
 		}
 	}
 	else
 	{
-		logerror("68000:%04x  Writing unknown command %08x to %08x\n",space.device().safe_pcbase() ,data ,0xe0000a + offset);
+		logerror("68000:%04x  Writing unknown command %08x to %08x\n",m_maincpu->pcbase() ,data ,0xe0000a + offset);
 	}
 }
 
@@ -149,7 +149,7 @@ WRITE16_MEMBER(toaplan1_state::demonwld_dsp_ctrl_w)
 READ16_MEMBER(toaplan1_state::samesame_port_6_word_r)
 {
 	/* Bit 0x80 is secondary CPU (HD647180) ready signal */
-	logerror("PC:%04x Warning !!! IO reading from $14000a\n",space.device().safe_pcbase());
+	logerror("PC:%04x Warning !!! IO reading from $14000a\n",m_maincpu->pcbase());
 	return (0x80 | ioport("TJUMP")->read()) & 0xff;
 }
 
@@ -229,7 +229,7 @@ WRITE8_MEMBER(toaplan1_state::toaplan1_coin_w)
 		case 0x02: machine().bookkeeping().coin_lockout_w(1,1); break;   /* Lock coin slot B */
 		case 0x01: machine().bookkeeping().coin_lockout_w(0,1); break;   /* Lock coin slot A */
 		case 0x00: machine().bookkeeping().coin_lockout_global_w(1); break;  /* Lock all coin slots */
-		default:   logerror("PC:%04x  Writing unknown data (%04x) to coin count/lockout port\n",space.device().safe_pcbase(),data); break;
+		default:   logerror("PC:%04x  Writing unknown data (%04x) to coin count/lockout port\n",m_audiocpu->pcbase(),data); break;
 	}
 }
 
@@ -241,7 +241,7 @@ WRITE16_MEMBER(toaplan1_state::samesame_coin_w)
 	}
 	if (ACCESSING_BITS_8_15 && (data&0xff00))
 	{
-		logerror("PC:%04x  Writing unknown MSB data (%04x) to coin count/lockout port\n",space.device().safe_pcbase(),data);
+		logerror("PC:%04x  Writing unknown MSB data (%04x) to coin count/lockout port\n",m_maincpu->pcbase(),data);
 	}
 }
 

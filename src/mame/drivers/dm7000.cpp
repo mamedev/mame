@@ -300,7 +300,7 @@ void dm7000_state::kbd_put(u8 data)
 	m_scc0_lsr = 1;
 }
 
-static MACHINE_CONFIG_START( dm7000 )
+MACHINE_CONFIG_START(dm7000_state::dm7000)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",PPC405GP, 252000000 / 10) // Should be PPC405D4?
 	// Slowed down 10 times in order to get normal response for now

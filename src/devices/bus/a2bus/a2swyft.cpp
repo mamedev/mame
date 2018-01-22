@@ -77,7 +77,7 @@ void a2bus_swyft_device::device_reset()
 	recalc_slot_inh();
 }
 
-uint8_t a2bus_swyft_device::read_c0nx(address_space &space, uint8_t offset)
+uint8_t a2bus_swyft_device::read_c0nx(uint8_t offset)
 {
 	switch (offset)
 	{
@@ -103,7 +103,7 @@ uint8_t a2bus_swyft_device::read_c0nx(address_space &space, uint8_t offset)
 	return 0xff;
 }
 
-void a2bus_swyft_device::write_c0nx(address_space &space, uint8_t offset, uint8_t data)
+void a2bus_swyft_device::write_c0nx(uint8_t offset, uint8_t data)
 {
 	switch (offset)
 	{
@@ -127,7 +127,7 @@ void a2bus_swyft_device::write_c0nx(address_space &space, uint8_t offset, uint8_
 	}
 }
 
-uint8_t a2bus_swyft_device::read_inh_rom(address_space &space, uint16_t offset)
+uint8_t a2bus_swyft_device::read_inh_rom(uint16_t offset)
 {
 	offset -= 0xd000;
 

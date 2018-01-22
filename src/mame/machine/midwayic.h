@@ -198,7 +198,7 @@ private:
 	uint32_t  m_reg[16];
 	uint8_t   m_has_dcs;
 	uint8_t   m_has_cage;
-	device_t *m_dcs_cpu;
+	cpu_device *m_dcs_cpu;
 	uint8_t   m_shuffle_type;
 	uint8_t   m_shuffle_default;
 	uint8_t   m_shuffle_active;

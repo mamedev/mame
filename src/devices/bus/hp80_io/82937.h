@@ -30,15 +30,8 @@ public:
 	virtual void inten() override;
 	virtual void clear_service() override;
 
-	DECLARE_WRITE_LINE_MEMBER(reset_w);
-	DECLARE_READ_LINE_MEMBER(t0_r);
-	DECLARE_READ8_MEMBER(p1_r);
-	DECLARE_WRITE8_MEMBER(p1_w);
-	DECLARE_READ8_MEMBER(dio_r);
-	DECLARE_WRITE8_MEMBER(dio_w);
 	DECLARE_READ8_MEMBER(switch_r);
 	DECLARE_WRITE8_MEMBER(latch_w);
-	DECLARE_WRITE_LINE_MEMBER(ieee488_ctrl_w);
 
 protected:
 	virtual void device_start() override;
@@ -60,6 +53,14 @@ private:
 	bool m_iatn;
 	uint8_t m_latch;    // U3
 	bool m_updating;
+
+	DECLARE_WRITE_LINE_MEMBER(reset_w);
+	DECLARE_READ_LINE_MEMBER(t0_r);
+	DECLARE_READ8_MEMBER(p1_r);
+	DECLARE_WRITE8_MEMBER(p1_w);
+	DECLARE_READ8_MEMBER(dio_r);
+	DECLARE_WRITE8_MEMBER(dio_w);
+	DECLARE_WRITE_LINE_MEMBER(ieee488_ctrl_w);
 
 	void update_data_out();
 	void update_signals();

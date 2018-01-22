@@ -204,9 +204,9 @@ WRITE_LINE_MEMBER(eeprom_parallel_28xx_device::oe_w)
 //  /OE line through external flip-flop
 //-------------------------------------------------
 
-WRITE8_MEMBER(eeprom_parallel_28xx_device::unlock_write) { oe_w(1); }
-WRITE16_MEMBER(eeprom_parallel_28xx_device::unlock_write) { oe_w(1); }
-WRITE32_MEMBER(eeprom_parallel_28xx_device::unlock_write) { oe_w(1); }
+WRITE8_MEMBER(eeprom_parallel_28xx_device::unlock_write8) { oe_w(1); }
+WRITE16_MEMBER(eeprom_parallel_28xx_device::unlock_write16) { oe_w(1); }
+WRITE32_MEMBER(eeprom_parallel_28xx_device::unlock_write32) { oe_w(1); }
 
 
 //**************************************************************************

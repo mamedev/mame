@@ -37,6 +37,7 @@
 #include "emu.h"
 #include "bus/rs232/rs232.h"
 #include "cpu/m6502/m6502.h"
+#include "cpu/mcs48/mcs48.h"
 #include "machine/6522via.h"
 #include "machine/mos6551.h"
 #include "video/mc6845.h"
@@ -50,7 +51,7 @@
 #define RS232A_TAG  "rs232a"
 #define RS232B_TAG  "rs232b"
 
-#define MASTER_CLOCK (23814000)
+#define MASTER_CLOCK XTAL_23_814MHz
 
 class tv950_state : public driver_device
 {
@@ -74,6 +75,7 @@ public:
 	DECLARE_WRITE8_MEMBER(row_addr_w);
 	DECLARE_WRITE_LINE_MEMBER(via_crtc_reset_w);
 
+	void tv950(machine_config &config);
 private:
 	uint8_t m_via_row;
 	uint8_t m_attr_row;
@@ -266,7 +268,7 @@ MC6845_UPDATE_ROW( tv950_state::crtc_update_row )
 	m_row = (m_row + 1) % 250;
 }
 
-static MACHINE_CONFIG_START( tv950 )
+MACHINE_CONFIG_START(tv950_state::tv950)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, MASTER_CLOCK/14)
 	MCFG_CPU_PROGRAM_MAP(tv950_mem)
@@ -301,6 +303,8 @@ static MACHINE_CONFIG_START( tv950 )
 
 	MCFG_DEVICE_ADD(ACIA3_TAG, MOS6551, 0)
 	MCFG_MOS6551_XTAL(MASTER_CLOCK/13)
+
+	MCFG_DEVICE_ADD("kbd", I8748, XTAL_5_7143MHz)
 MACHINE_CONFIG_END
 
 /* ROM definition */
@@ -313,10 +317,18 @@ ROM_START( tv950 )
 	ROM_LOAD16_BYTE( "180000-002a_a33_9294.bin", 0x000001, 0x001000, CRC(eaf4f346) SHA1(b4c531626846f3f055ddc086ac24fdb1b34f3f8e) )
 	ROM_LOAD16_BYTE( "180000-003a_a32_7ebf.bin", 0x000000, 0x001000, CRC(783ca0b6) SHA1(1cec9a9a56ef5795809f7ca7cd2e3f61b27e698d) )
 
-	ROM_REGION(0x1000, "kbd", 0)
+	ROM_REGION(0x400, "kbd", 0)
 	ROM_LOAD( "950kbd_8748_pn52080723-02.bin", 0x000000, 0x000400, CRC(11c8f22c) SHA1(99e73e9c74b10055733e89b92adbc5bf7f4ff338) )
+
+	ROM_REGION(0x10000, "user1", 0)
+	// came with "tv950.zip"
+	ROM_LOAD( "180000-43i.a25", 0x0000, 0x1000, CRC(ac6f0bfc) SHA1(2a3863700405fbb9e510613559d78fceee3544e8) )
+	ROM_LOAD( "180000-44i.a20", 0x0000, 0x1000, CRC(db91a727) SHA1(e94724ed1a563fb846f4203ae6523ee6b4c6577f) )
+	// came with "tv950kbd.zip"
+	ROM_LOAD( "1800000-003a.a32", 0x0000, 0x1000, CRC(eaef0138) SHA1(7198851299fce07c95d18e32cbfbe936c0dbec2a) )
+	ROM_LOAD( "1800000-002a.a33", 0x0000, 0x1000, CRC(856dd85c) SHA1(e2570017e098b0e1ead7749e9c2ac40be2367433) )
 ROM_END
 
 /* Driver */
 //    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT  STATE        INIT  COMPANY      FULLNAME  FLAGS
-COMP( 1981, tv950,  0,      0,      tv950,   tv950, tv950_state, 0,    "TeleVideo", "TV950",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1981, tv950,  0,      0,      tv950,   tv950, tv950_state, 0,    "TeleVideo", "Model 950 Video Display Terminal",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

@@ -29,7 +29,7 @@ INTERRUPT_GEN_MEMBER(surpratk_state::surpratk_interrupt)
 WRITE8_MEMBER(surpratk_state::surpratk_videobank_w)
 {
 	if (data & 0xf8)
-		logerror("%04x: videobank = %02x\n",space.device().safe_pc(),data);
+		logerror("%04x: videobank = %02x\n",m_maincpu->pc(),data);
 
 	/* bit 0 = select 053245 at 0000-07ff */
 	/* bit 1 = select palette at 0000-07ff */
@@ -43,7 +43,7 @@ WRITE8_MEMBER(surpratk_state::surpratk_videobank_w)
 WRITE8_MEMBER(surpratk_state::surpratk_5fc0_w)
 {
 	if ((data & 0xf4) != 0x10)
-		logerror("%04x: 3fc0 = %02x\n",space.device().safe_pc(),data);
+		logerror("%04x: 3fc0 = %02x\n",m_maincpu->pc(),data);
 
 	/* bit 0/1 = coin counters */
 	machine().bookkeeping().coin_counter_w(0, data & 0x01);
@@ -79,7 +79,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( bank0000_map, AS_PROGRAM, 8, surpratk_state )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM
 	AM_RANGE(0x0800, 0x0fff) AM_DEVREADWRITE("k053244", k05324x_device, k053245_r, k053245_w)
-	AM_RANGE(0x1000, 0x1fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x1000, 0x1fff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
 ADDRESS_MAP_END
 
 
@@ -166,7 +166,7 @@ WRITE8_MEMBER( surpratk_state::banking_callback )
 	membank("bank1")->set_entry(data & 0x1f);
 }
 
-static MACHINE_CONFIG_START( surpratk )
+MACHINE_CONFIG_START(surpratk_state::surpratk)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", KONAMI, XTAL_24MHz/2/4) /* 053248, the clock input is 12MHz, and internal CPU divider of 4 */
@@ -177,8 +177,8 @@ static MACHINE_CONFIG_START( surpratk )
 	MCFG_DEVICE_ADD("bank0000", ADDRESS_MAP_BANK, 0)
 	MCFG_DEVICE_PROGRAM_MAP(bank0000_map)
 	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_BIG)
-	MCFG_ADDRESS_MAP_BANK_DATABUS_WIDTH(8)
-	MCFG_ADDRESS_MAP_BANK_ADDRBUS_WIDTH(13)
+	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
+	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(13)
 	MCFG_ADDRESS_MAP_BANK_STRIDE(0x800)
 
 	MCFG_WATCHDOG_ADD("watchdog")
@@ -188,7 +188,7 @@ static MACHINE_CONFIG_START( surpratk )
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(14*8, (64-14)*8-1, 2*8, 30*8-1 )
+	MCFG_SCREEN_VISIBLE_AREA(12*8, (64-12)*8-1, 2*8, 30*8-1 )
 	MCFG_SCREEN_UPDATE_DRIVER(surpratk_state, screen_update_surpratk)
 	MCFG_SCREEN_PALETTE("palette")
 

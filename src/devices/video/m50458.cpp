@@ -370,7 +370,7 @@ uint32_t m50458_device::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 						pix |= ((m_shadow_gfx[offset+0] >> (7-(xi & 0x7))) & 1);
 
 					/* blinking, VERY preliminary */
-					if(tile & 0x800 && m_screen->frame_number() & m_blink)
+					if(tile & 0x800 && screen.frame_number() & m_blink)
 						pix = 0;
 
 					if(yi == 17 && tile & 0x1000) /* underline? */

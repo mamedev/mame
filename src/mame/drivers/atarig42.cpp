@@ -330,7 +330,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, atarig42_state )
 	AM_RANGE(0xe00030, 0xe00031) AM_DEVREAD8("jsa", atari_jsa_iii_device, main_response_r, 0x00ff)
 	AM_RANGE(0xe00040, 0xe00041) AM_DEVWRITE8("jsa", atari_jsa_iii_device, main_command_w, 0x00ff)
 	AM_RANGE(0xe00050, 0xe00051) AM_WRITE(io_latch_w)
-	AM_RANGE(0xe00060, 0xe00061) AM_DEVWRITE("eeprom", eeprom_parallel_28xx_device, unlock_write)
+	AM_RANGE(0xe00060, 0xe00061) AM_DEVWRITE("eeprom", eeprom_parallel_28xx_device, unlock_write16)
 	AM_RANGE(0xe03000, 0xe03001) AM_WRITE(video_int_ack_w)
 	AM_RANGE(0xe03800, 0xe03801) AM_DEVWRITE("watchdog", watchdog_timer_device, reset16_w)
 	AM_RANGE(0xe80000, 0xe80fff) AM_RAM
@@ -338,10 +338,10 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, atarig42_state )
 	AM_RANGE(0xf60000, 0xf60001) AM_DEVREAD("asic65", asic65_device, read)
 	AM_RANGE(0xf80000, 0xf80003) AM_DEVWRITE("asic65", asic65_device, data_w)
 	AM_RANGE(0xfa0000, 0xfa0fff) AM_DEVREADWRITE8("eeprom", eeprom_parallel_28xx_device, read, write, 0x00ff)
-	AM_RANGE(0xfc0000, 0xfc0fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0xfc0000, 0xfc0fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0xff0000, 0xff0fff) AM_RAM AM_SHARE("rle")
-	AM_RANGE(0xff2000, 0xff5fff) AM_DEVWRITE("playfield", tilemap_device, write) AM_SHARE("playfield")
-	AM_RANGE(0xff6000, 0xff6fff) AM_DEVWRITE("alpha", tilemap_device, write) AM_SHARE("alpha")
+	AM_RANGE(0xff2000, 0xff5fff) AM_DEVWRITE("playfield", tilemap_device, write16) AM_SHARE("playfield")
+	AM_RANGE(0xff6000, 0xff6fff) AM_DEVWRITE("alpha", tilemap_device, write16) AM_SHARE("alpha")
 	AM_RANGE(0xff7000, 0xff7001) AM_WRITE(mo_command_w) AM_SHARE("mo_command")
 	AM_RANGE(0xff0000, 0xffffff) AM_RAM
 ADDRESS_MAP_END
@@ -522,7 +522,7 @@ static const atari_rle_objects_config modesc_0x400 =
  *
  *************************************/
 
-static MACHINE_CONFIG_START( atarig42 )
+MACHINE_CONFIG_START(atarig42_state::atarig42)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, ATARI_CLOCK_14MHz)
@@ -563,14 +563,14 @@ static MACHINE_CONFIG_START( atarig42 )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( atarig42_0x200, atarig42 )
+MACHINE_CONFIG_DERIVED(atarig42_state::atarig42_0x200, atarig42)
 	MCFG_ATARIRLE_ADD("rle", modesc_0x200)
 
 	/* ASIC65 */
 	MCFG_ASIC65_ADD("asic65", ASIC65_ROMBASED)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( atarig42_0x400, atarig42 )
+MACHINE_CONFIG_DERIVED(atarig42_state::atarig42_0x400, atarig42)
 	MCFG_ATARIRLE_ADD("rle", modesc_0x400)
 
 	/* ASIC65 */

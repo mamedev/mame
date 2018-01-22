@@ -224,6 +224,8 @@ public:
 	int m_centronics_select;
 	int m_centronics_perror;
 	int m_centronics_busy;
+	void tandy2k_hd(machine_config &config);
+	void tandy2k(machine_config &config);
 };
 
 #endif // MAME_INCLUDES_TANDY2K_H

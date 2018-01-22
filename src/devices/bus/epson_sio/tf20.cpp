@@ -83,7 +83,7 @@ static SLOT_INTERFACE_START( tf20_floppies )
 	SLOT_INTERFACE( "sd320", EPSON_SD_320 )
 SLOT_INTERFACE_END
 
-MACHINE_CONFIG_MEMBER( epson_tf20_device::device_add_mconfig )
+MACHINE_CONFIG_START(epson_tf20_device::device_add_mconfig)
 	MCFG_CPU_ADD("19b", Z80, XTAL_CR1 / 2) /* uPD780C */
 	MCFG_CPU_PROGRAM_MAP(cpu_mem)
 	MCFG_CPU_IO_MAP(cpu_io)
@@ -231,7 +231,7 @@ READ8_MEMBER( epson_tf20_device::rom_disable_r )
 
 READ8_MEMBER( epson_tf20_device::upd765_tc_r )
 {
-	logerror("%s: upd765_tc_r\n", space.machine().describe_context());
+	logerror("%s: upd765_tc_r\n", machine().describe_context());
 
 	// toggle tc on read
 	m_fdc->tc_w(true);
@@ -242,7 +242,7 @@ READ8_MEMBER( epson_tf20_device::upd765_tc_r )
 
 WRITE8_MEMBER( epson_tf20_device::fdc_control_w )
 {
-	logerror("%s: tf20_fdc_control_w(%02x)\n", space.machine().describe_context(), data);
+	logerror("%s: tf20_fdc_control_w(%02x)\n", machine().describe_context(), data);
 
 	// bit 0, motor on signal
 	m_fd0->mon_w(!BIT(data, 0));

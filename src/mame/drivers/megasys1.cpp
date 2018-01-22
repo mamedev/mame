@@ -212,7 +212,7 @@ static ADDRESS_MAP_START( megasys1Z_map, AS_PROGRAM, 16, megasys1_state )
 	AM_RANGE(0x084208, 0x08420d) AM_DEVWRITE("scroll1", megasys1_tilemap_device, scroll_w)
 	AM_RANGE(0x084300, 0x084301) AM_WRITE(screen_flag_w)
 	AM_RANGE(0x084308, 0x084309) AM_WRITE(soundlatch_z_w)
-	AM_RANGE(0x088000, 0x0887ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x088000, 0x0887ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x08e000, 0x08ffff) AM_RAM AM_SHARE("objectram")
 	AM_RANGE(0x090000, 0x093fff) AM_RAM_DEVWRITE("scroll0", megasys1_tilemap_device, write) AM_SHARE("scroll0")
 	AM_RANGE(0x094000, 0x097fff) AM_RAM_DEVWRITE("scroll1", megasys1_tilemap_device, write) AM_SHARE("scroll1")
@@ -309,7 +309,7 @@ static ADDRESS_MAP_START( megasys1B_map, AS_PROGRAM, 16, megasys1_state )
 	AM_RANGE(0x044208, 0x04420d) AM_DEVWRITE("scroll1", megasys1_tilemap_device, scroll_w)
 	AM_RANGE(0x044300, 0x044301) AM_WRITE(screen_flag_w)
 	AM_RANGE(0x044308, 0x044309) AM_WRITE(soundlatch_w)
-	AM_RANGE(0x048000, 0x0487ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x048000, 0x0487ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x04e000, 0x04ffff) AM_RAM AM_SHARE("objectram")
 	AM_RANGE(0x050000, 0x053fff) AM_RAM_DEVWRITE("scroll0", megasys1_tilemap_device, write) AM_SHARE("scroll0")
 	AM_RANGE(0x054000, 0x057fff) AM_RAM_DEVWRITE("scroll1", megasys1_tilemap_device, write) AM_SHARE("scroll1")
@@ -381,7 +381,7 @@ static ADDRESS_MAP_START( megasys1C_map, AS_PROGRAM, 16, megasys1_state )
 	AM_RANGE(0x0e0000, 0x0e3fff) AM_MIRROR(0x4000) AM_RAM_DEVWRITE("scroll0", megasys1_tilemap_device, write) AM_SHARE("scroll0")
 	AM_RANGE(0x0e8000, 0x0ebfff) AM_MIRROR(0x4000) AM_RAM_DEVWRITE("scroll1", megasys1_tilemap_device, write) AM_SHARE("scroll1")
 	AM_RANGE(0x0f0000, 0x0f3fff) AM_MIRROR(0x4000) AM_RAM_DEVWRITE("scroll2", megasys1_tilemap_device, write) AM_SHARE("scroll2")
-	AM_RANGE(0x0f8000, 0x0f87ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x0f8000, 0x0f87ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x1c0000, 0x1cffff) AM_MIRROR(0x30000) AM_RAM_WRITE(ram_w) AM_SHARE("ram") //0x1f****, Cybattler reads attract mode inputs at 0x1d****
 ADDRESS_MAP_END
 
@@ -405,7 +405,7 @@ static ADDRESS_MAP_START( megasys1D_map, AS_PROGRAM, 16, megasys1_state )
 	AM_RANGE(0x0c2308, 0x0c2309) AM_WRITE(screen_flag_w)
 	AM_RANGE(0x0ca000, 0x0cbfff) AM_RAM AM_SHARE("objectram")
 	AM_RANGE(0x0d0000, 0x0d3fff) AM_RAM_DEVWRITE("scroll1", megasys1_tilemap_device, write) AM_SHARE("scroll1")
-	AM_RANGE(0x0d8000, 0x0d87ff) AM_MIRROR(0x3000) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x0d8000, 0x0d87ff) AM_MIRROR(0x3000) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x0e0000, 0x0e0001) AM_READ_PORT("DSW")
 	AM_RANGE(0x0e8000, 0x0ebfff) AM_RAM_DEVWRITE("scroll0", megasys1_tilemap_device, write) AM_SHARE("scroll0")
 	AM_RANGE(0x0f0000, 0x0f0001) AM_READ_PORT("SYSTEM")
@@ -1106,6 +1106,59 @@ static INPUT_PORTS_START( kazan )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( inyourfa )
+	PORT_INCLUDE( megasys1_generic )
+
+	PORT_MODIFY("P1")
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_NAME("P1 Pass / Change Player (defense)")
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1) PORT_NAME("P1 Shoot / Steal")
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1) PORT_NAME("P1 Pass Target change (offense)")
+
+	PORT_MODIFY("P2")
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2) PORT_NAME("P2 Pass / Change Player (defense)")
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2) PORT_NAME("P2 Shoot / Steal")
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2) PORT_NAME("P2 Pass Target change (offense)")
+
+	PORT_START("DSW")
+	PORT_DIPNAME(           0x0003, 0x0003, "Game Time" ) PORT_DIPLOCATION("SW1:1,2")
+	PORT_DIPSETTING(                0x0002, "00:50" )
+	PORT_DIPSETTING(                0x0001, "01:00" )
+	PORT_DIPSETTING(                0x0003, "01:10" )
+	PORT_DIPSETTING(                0x0000, "01:20" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x0004, 0x0004, "SW1:3" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x0008, 0x0008, "SW1:4" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x0010, 0x0010, "SW1:5" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x0020, 0x0020, "SW1:6" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x0040, 0x0040, "SW1:7" )
+	PORT_DIPNAME(           0x0080, 0x0080, DEF_STR( Flip_Screen ) ) PORT_DIPLOCATION("SW1:8")
+	PORT_DIPSETTING(                0x0080, DEF_STR( Off ) )
+	PORT_DIPSETTING(                0x0000, DEF_STR( On ) )
+	PORT_DIPNAME(           0x0700, 0x0700, DEF_STR( Coin_A ) ) PORT_DIPLOCATION("SW2:1,2,3")
+	PORT_DIPSETTING(                0x0400, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(                0x0200, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(                0x0700, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(                0x0300, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(                0x0500, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(                0x0100, DEF_STR( 1C_4C ) )
+	PORT_DIPSETTING(                0x0600, DEF_STR( 1C_5C ) )
+	PORT_DIPSETTING(                0x0000, DEF_STR( Free_Play ) )
+	PORT_DIPNAME(                   0x3800, 0x3800, DEF_STR( Coin_B ) ) PORT_DIPLOCATION("SW2:4,5,6")
+	PORT_DIPSETTING(                0x0000, DEF_STR( 4C_1C ) )
+	PORT_DIPSETTING(                0x2000, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(                0x1000, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(                0x3800, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(                0x1800, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(                0x2800, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(                0x0800, DEF_STR( 1C_4C ) )
+	PORT_DIPSETTING(                0x3000, DEF_STR( 1C_5C ) )
+	PORT_DIPNAME(           0x4000, 0x4000, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW2:7")
+	PORT_DIPSETTING(                0x4000, DEF_STR( On ) )
+	PORT_DIPSETTING(                0x0000, DEF_STR( Off ) )
+	PORT_DIPNAME(           0x8000, 0x8000, "Freeze Screen (Cheat)") PORT_DIPLOCATION("SW2:8")
+	PORT_DIPSETTING(                0x8000, DEF_STR( Off ) )
+	PORT_DIPSETTING(                0x0000, DEF_STR( On ) )
+INPUT_PORTS_END
+
 static INPUT_PORTS_START( jitsupro )
 	PORT_INCLUDE( hachoo )
 
@@ -1615,7 +1668,7 @@ GFXDECODE_END
 
 /* Provided by Jim Hernandez: 3.5MHz for FM, 30KHz (!) for ADPCM */
 
-static MACHINE_CONFIG_START( system_A )
+MACHINE_CONFIG_START(megasys1_state::system_A)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, SYS_A_CPU_CLOCK) /* 6MHz verified */
@@ -1669,22 +1722,22 @@ static MACHINE_CONFIG_START( system_A )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.30)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( system_A_hachoo, system_A )
+MACHINE_CONFIG_DERIVED(megasys1_state::system_A_hachoo, system_A)
 	MCFG_MACHINE_RESET_OVERRIDE(megasys1_state,megasys1_hachoo)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( system_A_iganinju, system_A )
+MACHINE_CONFIG_DERIVED(megasys1_state::system_A_iganinju, system_A)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_DEVICE_REMOVE("scantimer")
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", megasys1_state, megasys1A_iganinju_scanline, "screen", 0, 1)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( system_A_soldam, system_A )
+MACHINE_CONFIG_DERIVED(megasys1_state::system_A_soldam, system_A)
 	MCFG_DEVICE_MODIFY("scroll1")
 	MCFG_MEGASYS1_TILEMAP_8X8_SCROLL_FACTOR(4)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( kickoffb, system_A )
+MACHINE_CONFIG_DERIVED(megasys1_state::kickoffb, system_A)
 	MCFG_CPU_MODIFY("audiocpu")
 	MCFG_CPU_PROGRAM_MAP(kickoffb_sound_map)
 
@@ -1697,7 +1750,7 @@ static MACHINE_CONFIG_DERIVED( kickoffb, system_A )
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.80)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( system_B, system_A )
+MACHINE_CONFIG_DERIVED(megasys1_state::system_B, system_A)
 
 	/* basic machine hardware */
 
@@ -1712,12 +1765,12 @@ static MACHINE_CONFIG_DERIVED( system_B, system_A )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( system_B_monkelf, system_B )
+MACHINE_CONFIG_DERIVED(megasys1_state::system_B_monkelf, system_B)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(megasys1B_monkelf_map)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( system_Bbl )
+MACHINE_CONFIG_START(megasys1_state::system_Bbl)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, SYS_B_CPU_CLOCK)
@@ -1756,7 +1809,7 @@ static MACHINE_CONFIG_START( system_Bbl )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.30)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( system_B_hayaosi1, system_B )
+MACHINE_CONFIG_DERIVED(megasys1_state::system_B_hayaosi1, system_B)
 
 	/* basic machine hardware */
 
@@ -1770,7 +1823,7 @@ static MACHINE_CONFIG_DERIVED( system_B_hayaosi1, system_B )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( system_C, system_A )
+MACHINE_CONFIG_DERIVED(megasys1_state::system_C, system_A)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1795,7 +1848,7 @@ MACHINE_CONFIG_END
 ***************************************************************************/
 
 
-static MACHINE_CONFIG_START( system_D )
+MACHINE_CONFIG_START(megasys1_state::system_D)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, SYS_D_CPU_CLOCK)    /* 8MHz */
@@ -1845,7 +1898,7 @@ MACHINE_CONFIG_END
 ***************************************************************************/
 
 
-static MACHINE_CONFIG_START( system_Z )
+MACHINE_CONFIG_START(megasys1_state::system_Z)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, SYS_A_CPU_CLOCK) /* 6MHz (12MHz / 2) */
@@ -2989,6 +3042,52 @@ ROM_START( iganinju )
 	ROM_LOAD( "iga.131",    0x0000, 0x0200, CRC(1d877538) SHA1(a5be0dc65dcfc36fbba10d1fddbe155e24b6122f) )
 ROM_END
 
+ROM_START( inyourfa )
+	ROM_REGION( 0x60000, "maincpu", 0 )     /* Main CPU Code */
+	ROM_LOAD16_BYTE( "02.27C1001",    0x000000, 0x020000, CRC(ae77e5b7) SHA1(222e1f4c3d82cdedb88ec524ea11500145bc8c87) )
+	ROM_LOAD16_BYTE( "01.27C1001",    0x000001, 0x020000, CRC(e5ea92ef) SHA1(0afcaa1451572aee7486b76c21bdd4617d2b25d2) )
+	ROM_LOAD16_BYTE( "03.27C512", 0x040000, 0x010000, CRC(a1efe9be) SHA1(3f49c337f0cd8634d0049c80631e32ea887d8fef) )
+	ROM_LOAD16_BYTE( "04.27C512", 0x040001, 0x010000, CRC(f786cf3e) SHA1(83de4e679e34bbd2bdad62f2c3b707cf032942b5) )
+
+	ROM_REGION( 0x20000, "audiocpu", 0 )        /* Sound CPU Code */
+	ROM_LOAD16_BYTE( "05.27C512", 0x000000, 0x010000, CRC(1737ed64) SHA1(20be59c43d7975fcc5048f1ee9ed5af893bdef85) )
+	ROM_LOAD16_BYTE( "06.27C512", 0x000001, 0x010000, CRC(9f12bcb9) SHA1(7c5faf6a295b2124e16823f50e57b234b6127a38) )
+
+	ROM_REGION( 0x1000, "mcu", 0 ) /* M50747 MCU Code */
+	ROM_LOAD( "m50747", 0x0000, 0x1000, NO_DUMP )
+
+	ROM_REGION( 0x080000, "scroll0", 0 ) /* Scroll 0 */
+	ROM_LOAD( "11.27C1001", 0x000000, 0x020000, CRC(451a1428) SHA1(c017ef4dd3dffd26a93f5b926d80fd5e7bd7dea1) )
+	ROM_LOAD( "12.27C1001", 0x020000, 0x020000, CRC(9ead7432) SHA1(0690b640ebe9d1461f44040a33236705a303dc7e) )
+	ROM_LOAD( "13.27C1001", 0x040000, 0x020000, CRC(7e39842a) SHA1(00a4c86e8ef6e8e20d8f01eccd7d37f46be5f904) )
+	ROM_LOAD( "14.27C1001", 0x060000, 0x020000, CRC(a91a3569) SHA1(0e530cdc0cf5ff0db589fb644c2181d35701fb2e) )
+
+	ROM_REGION( 0x080000, "scroll1", 0 ) /* Scroll 1 */
+	ROM_LOAD( "15.27C1001", 0x000000, 0x020000, CRC(420081b6) SHA1(02fedf7bc18a1b8f12b4e549a910801c0e315a32) )
+	ROM_LOAD( "16.27C1001", 0x020000, 0x020000, CRC(87b1a582) SHA1(75a8762041cbd72fad821083ce9ea65474e4b2c8) )
+	ROM_LOAD( "17.27C1001", 0x040000, 0x020000, CRC(00857146) SHA1(1a2e6ac6efbec4a825525933b92de933233ad3b2) )
+	ROM_FILL       (              0x60000, 0x20000, 0xff )// 18? not populated?
+
+	ROM_REGION( 0x020000, "scroll2", 0 ) /* Scroll 2 */
+	ROM_LOAD( "19.27C1001", 0x000000, 0x020000, CRC(b82c94ec) SHA1(cf83355fb8941cf4332b764bb7de01d4c2aead21) )
+
+	ROM_REGION( 0x080000, "sprites", 0 ) /* Sprites */
+	ROM_LOAD( "20.27C1001", 0x000000, 0x020000, CRC(4a322d18) SHA1(17a514e50da13bbcbecfbe186bc99c5383eefd38) )
+	ROM_LOAD( "21.27C1001", 0x020000, 0x020000, CRC(7bb4b35d) SHA1(001ef590a5245126182ab7af54bc1c56012ab218) )
+	ROM_LOAD( "22.27C1001", 0x040000, 0x020000, CRC(1dc040d2) SHA1(bda3a441a20f253b67ca646d71d3703a8c59e210) )
+	ROM_LOAD( "23.27C1001", 0x060000, 0x020000, CRC(50478530) SHA1(a17b8fdba4fbcbb2d0b715d5cfb2192edbf5a457) )
+
+	ROM_REGION( 0x040000, "oki1", 0 )       /* Samples */
+	ROM_LOAD( "09.27C1001", 0x000000, 0x020000, CRC(27f4bfb4) SHA1(36c8c8b73f26d812711403135a8210af520efb66) )
+	ROM_LOAD( "10.27C1001", 0x020000, 0x020000, CRC(cf5430ff) SHA1(8d0b1ab9c25312a65fa534a758f7f3ab01b3b593) )
+
+	ROM_REGION( 0x040000, "oki2", 0 )       /* Samples */
+	ROM_LOAD( "07.27C1001",  0x000000, 0x020000, CRC(dc254c7c) SHA1(4daed57c5603bd021f9effb228a4d40b569f72d4) )
+	ROM_LOAD( "08.27C1001",  0x020000, 0x020000, CRC(cadd4731) SHA1(1c4e7ea7064b9c6b2dfdf01fd64f37de6d50bdfa) ) // 11xxxxxxxxxxxxxxx = 0xFF
+
+	ROM_REGION( 0x0200, "proms", 0 )        /* Priority PROM */
+	ROM_LOAD( "prom.14m",    0x0000,   0x0200, BAD_DUMP CRC(1341ba02) SHA1(edff62979d0376ac01b8da0aca46df087d6e4051) ) // wasn't dumped, this one has been handcrafted
+ROM_END
 
 /***************************************************************************
 
@@ -4240,7 +4339,7 @@ void megasys1_state::jitsupro_gfx_unmangle(const char *region)
 
 	/* data lines swap: 76543210 -> 43576210 */
 	for (i = 0;i < size;i++)
-		rom[i] =   BITSWAP8(rom[i],0x4,0x3,0x5,0x7,0x6,0x2,0x1,0x0);
+		rom[i] =   bitswap<8>(rom[i],0x4,0x3,0x5,0x7,0x6,0x2,0x1,0x0);
 
 	std::vector<uint8_t> buffer(size);
 
@@ -4250,7 +4349,7 @@ void megasys1_state::jitsupro_gfx_unmangle(const char *region)
 	for (i = 0;i < size;i++)
 	{
 		int a = (i & ~0xffff) |
-	BITSWAP16(i,0xf,0xe,0x8,0xc,0xb,0x3,0x9,0xd,0x7,0x6,0x5,0x4,0xa,0x2,0x1,0x0);
+	bitswap<16>(i,0xf,0xe,0x8,0xc,0xb,0x3,0x9,0xd,0x7,0x6,0x5,0x4,0xa,0x2,0x1,0x0);
 
 		rom[i] = buffer[a];
 	}
@@ -4264,7 +4363,7 @@ void megasys1_state::stdragona_gfx_unmangle(const char *region)
 
 	/* data lines swap: 76543210 -> 37564210 */
 	for (i = 0;i < size;i++)
-		rom[i] =   BITSWAP8(rom[i],3,7,5,6,4,2,1,0);
+		rom[i] =   bitswap<8>(rom[i],3,7,5,6,4,2,1,0);
 
 	std::vector<uint8_t> buffer(size);
 
@@ -4274,7 +4373,7 @@ void megasys1_state::stdragona_gfx_unmangle(const char *region)
 	for (i = 0;i < size;i++)
 	{
 		int a = (i & ~0xffff) |
-	BITSWAP16(i,0xf,0xe,0x3,0xc,0xb,0xd,0x9,0xa,0x7,0x6,0x5,0x4,0x8,0x2,0x1,0x0);
+	bitswap<16>(i,0xf,0xe,0x3,0xc,0xb,0xd,0x9,0xa,0x7,0x6,0x5,0x4,0x8,0x2,0x1,0x0);
 
 		rom[i] = buffer[a];
 	}
@@ -4734,6 +4833,7 @@ GAME( 1990, rittam,   rodland,  system_A,          rodland,  megasys1_state, rit
 GAME( 1990, rodlandjb,rodland,  system_A,          rodland,  megasys1_state, rodlandjb,ROT0,   "bootleg","Rod-Land (Japan bootleg)", MACHINE_SUPPORTS_SAVE )
 GAME( 1990, phantasm, avspirit, system_A,          phantasm, megasys1_state, phantasm, ROT0,   "Jaleco", "Phantasm (Japan)", MACHINE_SUPPORTS_SAVE )
 GAME( 1991, edfp,     edf,      system_A,          edfp,     megasys1_state, edfp,     ROT0,   "Jaleco", "E.D.F. : Earth Defense Force (Japan, prototype)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, inyourfa, 0,        system_A,          inyourfa, megasys1_state, iganinju, ROT0,   "Jaleco", "In Your Face (North America, prototype)", MACHINE_SUPPORTS_SAVE )
 GAME( 1992, soldam,   0,        system_A_soldam,   soldam,   megasys1_state, soldam,   ROT0,   "Jaleco", "Soldam", MACHINE_SUPPORTS_SAVE )
 GAME( 1992, soldamj,  soldam,   system_A_soldam,   soldam,   megasys1_state, soldamj,  ROT0,   "Jaleco", "Soldam (Japan)", MACHINE_SUPPORTS_SAVE )
 

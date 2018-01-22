@@ -85,6 +85,7 @@ public:
 	DECLARE_READ8_MEMBER(watchdog_clear_r);
 	DECLARE_READ8_MEMBER(inputs_r);
 
+	void popper(machine_config &config);
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -325,13 +326,13 @@ uint32_t popper_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 	// draw the sprites
 	for (int offs = 0; offs < 0x800; offs += 4)
 	{
-		// 0  76653210  Y coordinate
+		// 0  76543210  Y coordinate
 		// 1  76543210  Code
 		// 2  7-------  Flip Y
 		// 2  -6------  Flip X
 		// 2  --54----  Not used
 		// 2  ----3210  Color
-		// 3  76653210  X coordinate
+		// 3  76543210  X coordinate
 
 		int sx = m_sprite_ram[offs + 3];
 		int sy = m_sprite_ram[offs + 0];
@@ -526,7 +527,7 @@ void popper_state::machine_reset()
 //  MACHINE DEFINTIONS
 //**************************************************************************
 
-static MACHINE_CONFIG_START( popper )
+MACHINE_CONFIG_START(popper_state::popper)
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_18_432MHz/3/2)
 	MCFG_CPU_PROGRAM_MAP(main_map)
 

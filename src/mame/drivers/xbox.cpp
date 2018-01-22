@@ -35,6 +35,7 @@ public:
 		xbox_base_state(mconfig, type, tag)
 	{ }
 
+	void xbox(machine_config &config);
 protected:
 	// driver_device overrides
 	virtual void machine_start() override;
@@ -162,7 +163,7 @@ SLOT_INTERFACE_START(xbox_ata_devices)
 	SLOT_INTERFACE("cdrom", ATAPI_CDROM)
 SLOT_INTERFACE_END
 
-static MACHINE_CONFIG_DERIVED(xbox, xbox_base)
+MACHINE_CONFIG_DERIVED(xbox_state::xbox, xbox_base)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(xbox_map)
 	MCFG_CPU_IO_MAP(xbox_map_io)

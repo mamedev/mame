@@ -73,6 +73,8 @@ public:
 	DECLARE_MACHINE_START(scregg);
 	DECLARE_MACHINE_RESET(scregg);
 	TIMER_DEVICE_CALLBACK_MEMBER(scregg_interrupt);
+	void scregg(machine_config &config);
+	void dommy(machine_config &config);
 };
 
 
@@ -258,7 +260,7 @@ MACHINE_RESET_MEMBER(scregg_state,scregg)
 	m_btime_tilemap[3] = 0;
 }
 
-static MACHINE_CONFIG_START( dommy )
+MACHINE_CONFIG_START(scregg_state::dommy)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, XTAL_12MHz/8)
@@ -290,7 +292,7 @@ static MACHINE_CONFIG_START( dommy )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( scregg )
+MACHINE_CONFIG_START(scregg_state::scregg)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, XTAL_12MHz/8)
@@ -419,7 +421,7 @@ DRIVER_INIT_MEMBER(scregg_state,rockduck)
 
 	for (x = 0x2000; x < 0x6000; x++)
 	{
-		src[x] = BITSWAP8(src[x],2,0,3,6,1,4,7,5);
+		src[x] = bitswap<8>(src[x],2,0,3,6,1,4,7,5);
 
 	}
 }

@@ -66,4 +66,8 @@ public:
 	inline int invert( int nb );
 	void draw_sprites( bitmap_ind16 &bitmap,const rectangle &cliprect );
 	void write_dword( address_space &space, offs_t offset, uint32_t data );
+	void sfp(machine_config &config);
+	void sfjp(machine_config &config);
+	void sfus(machine_config &config);
+	void sfan(machine_config &config);
 };

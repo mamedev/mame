@@ -415,6 +415,7 @@ public:
 
 	emu_timer *m_bus_error_timer;
 
+	void hp_ipc(machine_config &config);
 private:
 	required_device<m68000_device> m_maincpu;
 	required_device<address_map_bank_device> m_bankdev;
@@ -709,15 +710,15 @@ SLOT_INTERFACE_END
  *  2   HP-HIL devices (keyboard, mouse)
  *  1   Real-time clock
  */
-static MACHINE_CONFIG_START(hp_ipc)
+MACHINE_CONFIG_START(hp_ipc_state::hp_ipc)
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_15_92MHz / 2)
 	MCFG_CPU_PROGRAM_MAP(hp_ipc_mem_outer)
 
 	MCFG_DEVICE_ADD("bankdev", ADDRESS_MAP_BANK, 0)
 	MCFG_DEVICE_PROGRAM_MAP(hp_ipc_mem_inner)
 	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_BIG)
-	MCFG_ADDRESS_MAP_BANK_ADDRBUS_WIDTH(25)
-	MCFG_ADDRESS_MAP_BANK_DATABUS_WIDTH(16)
+	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(25)
+	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(16)
 	MCFG_ADDRESS_MAP_BANK_STRIDE(0x1000000)
 
 	// horizontal time = 60 us (min)

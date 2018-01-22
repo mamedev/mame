@@ -53,6 +53,7 @@ DEFINE_DEVICE_TYPE(ARM920T,  arm920t_cpu_device,  "arm920t",  "ARM920T")
 DEFINE_DEVICE_TYPE(ARM946ES, arm946es_cpu_device, "arm946es", "ARM946ES")
 DEFINE_DEVICE_TYPE(PXA255,   pxa255_cpu_device,   "pxa255",   "Intel XScale PXA255")
 DEFINE_DEVICE_TYPE(SA1110,   sa1110_cpu_device,   "sa1110",   "Intel StrongARM SA-1110")
+DEFINE_DEVICE_TYPE(IGS036,   igs036_cpu_device,   "igs036",   "IGS036")
 
 arm7_cpu_device::arm7_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: arm7_cpu_device(mconfig, ARM7, tag, owner, clock, 4, ARCHFLAG_T, ENDIANNESS_LITTLE)
@@ -67,6 +68,7 @@ arm7_cpu_device::arm7_cpu_device(const machine_config &mconfig, device_type type
 	, m_endian(endianness)
 	, m_archRev(archRev)
 	, m_archFlags(archFlags)
+	, m_vectorbase(0)
 	, m_pc(0)
 {
 	memset(m_r, 0x00, sizeof(m_r));
@@ -146,13 +148,38 @@ arm920t_cpu_device::arm920t_cpu_device(const machine_config &mconfig, const char
 }
 
 
-arm946es_cpu_device::arm946es_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: arm9_cpu_device(mconfig, ARM946ES, tag, owner, clock, 5, ARCHFLAG_T | ARCHFLAG_E, ENDIANNESS_LITTLE)
+
+
+arm946es_cpu_device::arm946es_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: arm9_cpu_device(mconfig, type, tag, owner, clock, 5, ARCHFLAG_T | ARCHFLAG_E, ENDIANNESS_LITTLE),
+	cp15_control(0x78)
 {
 	m_copro_id = ARM9_COPRO_ID_MFR_ARM
-			   | ARM9_COPRO_ID_ARCH_V5TE
-			   | ARM9_COPRO_ID_PART_ARM946
-			   | ARM9_COPRO_ID_STEP_ARM946_A0;
+		| ARM9_COPRO_ID_ARCH_V5TE
+		| ARM9_COPRO_ID_PART_ARM946
+		| ARM9_COPRO_ID_STEP_ARM946_A0;
+
+	memset(ITCM, 0, 0x8000);
+	memset(DTCM, 0, 0x4000);
+
+	cp15_itcm_base = 0xffffffff;
+	cp15_itcm_size = 0;
+	cp15_itcm_end = 0;
+	cp15_dtcm_base = 0xffffffff;
+	cp15_dtcm_size = 0;
+	cp15_dtcm_end = 0;
+	cp15_itcm_reg = cp15_dtcm_reg = 0;
+}
+
+arm946es_cpu_device::arm946es_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: arm946es_cpu_device(mconfig, ARM946ES, tag, owner, clock)
+{
+}
+
+// unknown configuration, but uses MPU not MMU, so closer to ARM946ES
+igs036_cpu_device::igs036_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: arm946es_cpu_device(mconfig, IGS036, tag, owner, clock)
+{
 }
 
 pxa255_cpu_device::pxa255_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
@@ -531,11 +558,21 @@ bool arm7_cpu_device::memory_translate(int spacenum, int intention, offs_t &addr
  * CPU SPECIFIC IMPLEMENTATIONS
  **************************************************************************/
 
+void arm7_cpu_device::postload()
+{
+	update_reg_ptr();
+}
+
 void arm7_cpu_device::device_start()
 {
 	m_program = &space(AS_PROGRAM);
-	m_direct = &m_program->direct();
+	m_direct = m_program->direct<0>();
 
+	save_item(NAME(m_insn_prefetch_depth));
+	save_item(NAME(m_insn_prefetch_count));
+	save_item(NAME(m_insn_prefetch_index));
+	save_item(NAME(m_insn_prefetch_buffer));
+	save_item(NAME(m_insn_prefetch_address));
 	save_item(NAME(m_r));
 	save_item(NAME(m_pendingIrq));
 	save_item(NAME(m_pendingFiq));
@@ -544,8 +581,16 @@ void arm7_cpu_device::device_start()
 	save_item(NAME(m_pendingUnd));
 	save_item(NAME(m_pendingSwi));
 	save_item(NAME(m_pending_interrupt));
+	save_item(NAME(m_control));
+	save_item(NAME(m_tlbBase));
+	save_item(NAME(m_tlb_base_mask));
+	save_item(NAME(m_faultStatus));
+	save_item(NAME(m_faultAddress));
 	save_item(NAME(m_fcsePID));
 	save_item(NAME(m_pid_offset));
+	save_item(NAME(m_domainAccessControl));
+	save_item(NAME(m_decoded_access_control));
+	machine().save().register_postload(save_prepost_delegate(FUNC(arm7_cpu_device::postload), this));
 
 	m_icountptr = &m_icount;
 
@@ -596,6 +641,24 @@ void arm7_cpu_device::device_start()
 	state_add( ARM7_USPSR, "UR16", m_r[eSPSR_UND]).formatstr("%08X");
 
 	state_add(STATE_GENFLAGS, "GENFLAGS", m_r[eCPSR]).formatstr("%13s").noshow();
+}
+
+
+void arm946es_cpu_device::device_start()
+{
+	arm9_cpu_device::device_start();
+
+	save_item(NAME(cp15_control));
+	save_item(NAME(cp15_itcm_base));
+	save_item(NAME(cp15_dtcm_base));
+	save_item(NAME(cp15_itcm_size));
+	save_item(NAME(cp15_dtcm_size));
+	save_item(NAME(cp15_itcm_end));
+	save_item(NAME(cp15_dtcm_end));
+	save_item(NAME(cp15_itcm_reg));
+	save_item(NAME(cp15_dtcm_reg));
+	save_item(NAME(ITCM));
+	save_item(NAME(DTCM));
 }
 
 
@@ -654,7 +717,7 @@ void arm7_cpu_device::device_reset()
 	/* start up in SVC mode with interrupts disabled. */
 	m_r[eCPSR] = I_MASK | F_MASK | 0x10;
 	SwitchMode(eARM7_MODE_SVC);
-	m_r[eR15] = 0;
+	m_r[eR15] = 0 | m_vectorbase;
 
 	m_impstate.cache_dirty = true;
 }
@@ -908,83 +971,14 @@ void arm7_cpu_device::execute_set_input(int irqline, int state)
 }
 
 
-offs_t arm7_cpu_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+util::disasm_interface *arm7_cpu_device::create_disassembler()
 {
-	extern CPU_DISASSEMBLE( arm7arm );
-	extern CPU_DISASSEMBLE( arm7thumb );
-	extern CPU_DISASSEMBLE( arm7arm_be );
-	extern CPU_DISASSEMBLE( arm7thumb_be );
+	return new arm7_disassembler(this);
+}
 
-	uint8_t fetched_op[4];
-	uint32_t op = 0;
-	int prefetch_index = get_insn_prefetch_index(pc);
-	if (prefetch_index < 0)
-	{
-		memcpy(fetched_op, oprom, 4);
-		if (T_IS_SET(m_r[eCPSR]))
-		{
-			if ( m_endian == ENDIANNESS_BIG )
-			{
-				return CPU_DISASSEMBLE_NAME(arm7thumb_be)(this, stream, pc, fetched_op, opram, options);
-			}
-			else
-			{
-				return CPU_DISASSEMBLE_NAME(arm7thumb)(this, stream, pc, fetched_op, opram, options);
-			}
-		}
-		else
-		{
-			if ( m_endian == ENDIANNESS_BIG )
-			{
-				return CPU_DISASSEMBLE_NAME(arm7arm_be)(this, stream, pc, fetched_op, opram, options);
-			}
-			else
-			{
-				return CPU_DISASSEMBLE_NAME(arm7arm)(this, stream, pc, fetched_op, opram, options);
-			}
-		}
-	}
-	else
-	{
-		op = m_insn_prefetch_buffer[prefetch_index];
-		if (T_IS_SET(m_r[eCPSR]))
-		{
-			if (m_endian == ENDIANNESS_BIG)
-			{
-				op >>= ((pc & 2) ? 0 : 16);
-				fetched_op[1] = op & 0xff;
-				fetched_op[0] = (op >> 8) & 0xff;
-				return CPU_DISASSEMBLE_NAME(arm7thumb_be)(this, stream, pc, fetched_op, opram, options);
-			}
-			else
-			{
-				op >>= ((pc & 2) ? 16 : 0);
-				fetched_op[0] = op & 0xff;
-				fetched_op[1] = (op >> 8) & 0xff;
-				return CPU_DISASSEMBLE_NAME(arm7thumb)(this, stream, pc, fetched_op, opram, options);
-			}
-		}
-		else
-		{
-			if (m_endian == ENDIANNESS_BIG)
-			{
-				fetched_op[3] = op & 0xff;
-				fetched_op[2] = (op >> 8) & 0xff;
-				fetched_op[1] = (op >> 16) & 0xff;
-				fetched_op[0] = (op >> 24) & 0xff;
-				return CPU_DISASSEMBLE_NAME(arm7arm_be)(this, stream, pc, fetched_op, opram, options);
-			}
-			else
-			{
-				fetched_op[0] = op & 0xff;
-				fetched_op[1] = (op >> 8) & 0xff;
-				fetched_op[2] = (op >> 16) & 0xff;
-				fetched_op[3] = (op >> 24) & 0xff;
-				return CPU_DISASSEMBLE_NAME(arm7arm)(this, stream, pc, fetched_op, opram, options);
-			}
-		}
-	}
-	return 0;
+bool arm7_cpu_device::get_t_flag() const
+{
+	return T_IS_SET(m_r[eCPSR]);
 }
 
 
@@ -1222,6 +1216,281 @@ WRITE32_MEMBER( arm7_cpu_device::arm7_rt_w_callback )
 	}
 }
 
+READ32_MEMBER( arm946es_cpu_device::arm7_rt_r_callback )
+{
+	uint32_t opcode = offset;
+	uint8_t cReg = ( opcode & INSN_COPRO_CREG ) >> INSN_COPRO_CREG_SHIFT;
+	uint8_t op2 =  ( opcode & INSN_COPRO_OP2 )  >> INSN_COPRO_OP2_SHIFT;
+	uint8_t op3 =    opcode & INSN_COPRO_OP3;
+	uint8_t cpnum = (opcode & INSN_COPRO_CPNUM) >> INSN_COPRO_CPNUM_SHIFT;
+	uint32_t data = 0;
+
+	//printf("arm7946: read cpnum %d cReg %d op2 %d op3 %d (%x)\n", cpnum, cReg, op2, op3, opcode);
+	if (cpnum == 15)
+	{
+		switch( cReg )
+		{
+			case 0:
+				switch (op2)
+				{
+					case 0: // chip ID
+						data = 0x41059461;
+						break;
+
+					case 1: // cache ID
+						data = 0x0f0d2112;
+						break;
+
+					case 2: // TCM size
+						data = (6 << 6) | (5 << 18);
+						break;
+				}
+				break;
+
+			case 1:
+				return cp15_control;
+				break;
+
+			case 9:
+				if (op3 == 1)
+				{
+					if (op2 == 0)
+					{
+						return cp15_dtcm_reg;
+					}
+					else
+					{
+						return cp15_itcm_reg;
+					}
+				}
+				break;
+		}
+	}
+
+	return data;
+}
+
+WRITE32_MEMBER( arm946es_cpu_device::arm7_rt_w_callback )
+{
+	uint32_t opcode = offset;
+	uint8_t cReg = ( opcode & INSN_COPRO_CREG ) >> INSN_COPRO_CREG_SHIFT;
+	uint8_t op2 =  ( opcode & INSN_COPRO_OP2 )  >> INSN_COPRO_OP2_SHIFT;
+	uint8_t op3 =    opcode & INSN_COPRO_OP3;
+	uint8_t cpnum = (opcode & INSN_COPRO_CPNUM) >> INSN_COPRO_CPNUM_SHIFT;
+
+//  printf("arm7946: copro %d write %x to cReg %d op2 %d op3 %d (mask %08x)\n", cpnum, data, cReg, op2, op3, mem_mask);
+
+	if (cpnum == 15)
+	{
+		switch (cReg)
+		{
+			case 1: // control
+				cp15_control = data;
+				RefreshDTCM();
+				RefreshITCM();
+				break;
+
+			case 2: // Protection Unit cacheability bits
+				break;
+
+			case 3: // write bufferability bits for PU
+				break;
+
+			case 5: // protection unit region controls
+				break;
+
+			case 6: // protection unit region controls 2
+				break;
+
+			case 7: // cache commands
+				break;
+
+			case 9: // cache lockdown & TCM controls
+				if (op3 == 1)
+				{
+					if (op2 == 0)
+					{
+						cp15_dtcm_reg = data;
+						RefreshDTCM();
+					}
+					else if (op2 == 1)
+					{
+						cp15_itcm_reg = data;
+						RefreshITCM();
+					}
+				}
+				break;
+		}
+	}
+}
+
+void arm946es_cpu_device::RefreshDTCM()
+{
+	if (cp15_control & (1<<16))
+	{
+		cp15_dtcm_base = (cp15_dtcm_reg & ~0xfff);
+		cp15_dtcm_size = 512 << ((cp15_dtcm_reg & 0x3f) >> 1);
+		cp15_dtcm_end = cp15_dtcm_base + cp15_dtcm_size;
+		//printf("DTCM enabled: base %08x size %x\n", cp15_dtcm_base, cp15_dtcm_size);
+	}
+	else
+	{
+		cp15_dtcm_base = 0xffffffff;
+		cp15_dtcm_size = cp15_dtcm_end = 0;
+	}
+}
+
+void arm946es_cpu_device::RefreshITCM()
+{
+	if (cp15_control & (1<<18))
+	{
+		cp15_itcm_base = 0; //(cp15_itcm_reg & ~0xfff);
+		cp15_itcm_size = 512 << ((cp15_itcm_reg & 0x3f) >> 1);
+		cp15_itcm_end = cp15_itcm_base + cp15_itcm_size;
+		//printf("ITCM enabled: base %08x size %x\n", cp15_dtcm_base, cp15_dtcm_size);
+	}
+	else
+	{
+		cp15_itcm_base = 0xffffffff;
+		cp15_itcm_size = cp15_itcm_end = 0;
+	}
+}
+
+void arm946es_cpu_device::arm7_cpu_write32(uint32_t addr, uint32_t data)
+{
+	addr &= ~3;
+
+	if ((addr >= cp15_itcm_base) && (addr <= cp15_itcm_end))
+	{
+		uint32_t *wp = (uint32_t *)&ITCM[addr&0x7fff];
+		*wp = data;
+		return;
+	}
+	else if ((addr >= cp15_dtcm_base) && (addr <= cp15_dtcm_end))
+	{
+		uint32_t *wp = (uint32_t *)&DTCM[addr&0x3fff];
+		*wp = data;
+		return;
+	}
+
+	m_program->write_dword(addr, data);
+}
+
+
+void arm946es_cpu_device::arm7_cpu_write16(uint32_t addr, uint16_t data)
+{
+	addr &= ~1;
+	if ((addr >= cp15_itcm_base) && (addr <= cp15_itcm_end))
+	{
+		uint16_t *wp = (uint16_t *)&ITCM[addr&0x7fff];
+		*wp = data;
+		return;
+	}
+	else if ((addr >= cp15_dtcm_base) && (addr <= cp15_dtcm_end))
+	{
+		uint16_t *wp = (uint16_t *)&DTCM[addr&0x3fff];
+		*wp = data;
+		return;
+	}
+
+	m_program->write_word(addr, data);
+}
+
+void arm946es_cpu_device::arm7_cpu_write8(uint32_t addr, uint8_t data)
+{
+	if ((addr >= cp15_itcm_base) && (addr <= cp15_itcm_end))
+	{
+		ITCM[addr&0x7fff] = data;
+		return;
+	}
+	else if ((addr >= cp15_dtcm_base) && (addr <= cp15_dtcm_end))
+	{
+		DTCM[addr&0x3fff] = data;
+		return;
+	}
+
+	m_program->write_byte(addr, data);
+}
+
+uint32_t arm946es_cpu_device::arm7_cpu_read32(uint32_t addr)
+{
+	uint32_t result;
+
+	if ((addr >= cp15_itcm_base) && (addr <= cp15_itcm_end))
+	{
+		if (addr & 3)
+		{
+			uint32_t *wp = (uint32_t *)&ITCM[(addr & ~3)&0x7fff];
+			result = *wp;
+			result = (result >> (8 * (addr & 3))) | (result << (32 - (8 * (addr & 3))));
+		}
+		else
+		{
+			uint32_t *wp = (uint32_t *)&ITCM[addr&0x7fff];
+			result = *wp;
+		}
+	}
+	else if ((addr >= cp15_dtcm_base) && (addr <= cp15_dtcm_end))
+	{
+		if (addr & 3)
+		{
+			uint32_t *wp = (uint32_t *)&DTCM[(addr & ~3)&0x3fff];
+			result = *wp;
+			result = (result >> (8 * (addr & 3))) | (result << (32 - (8 * (addr & 3))));
+		}
+		else
+		{
+			uint32_t *wp = (uint32_t *)&DTCM[addr&0x3fff];
+			result = *wp;
+		}
+	}
+	else
+	{
+		if (addr & 3)
+		{
+			result = m_program->read_dword(addr & ~3);
+			result = (result >> (8 * (addr & 3))) | (result << (32 - (8 * (addr & 3))));
+		}
+		else
+		{
+			result = m_program->read_dword(addr);
+		}
+	}
+	return result;
+}
+
+uint32_t arm946es_cpu_device::arm7_cpu_read16(uint32_t addr)
+{
+	addr &= ~1;
+
+	if ((addr >= cp15_itcm_base) && (addr <= cp15_itcm_end))
+	{
+		uint16_t *wp = (uint16_t *)&ITCM[addr & 0x7fff];
+		return *wp;
+	}
+	else if ((addr >= cp15_dtcm_base) && (addr <= cp15_dtcm_end))
+	{
+		uint16_t *wp = (uint16_t *)&DTCM[addr &0x3fff];
+		return *wp;
+	}
+
+	return m_program->read_word(addr);
+}
+
+uint8_t arm946es_cpu_device::arm7_cpu_read8(uint32_t addr)
+{
+	if ((addr >= cp15_itcm_base) && (addr <= cp15_itcm_end))
+	{
+		return ITCM[addr & 0x7fff];
+	}
+	else if ((addr >= cp15_dtcm_base) && (addr <= cp15_dtcm_end))
+	{
+		return DTCM[addr & 0x3fff];
+	}
+
+	// Handle through normal 8 bit handler (for 32 bit cpu)
+	return m_program->read_byte(addr);
+}
 
 void arm7_cpu_device::arm7_dt_r_callback(uint32_t insn, uint32_t *prn)
 {
@@ -1323,9 +1592,9 @@ uint32_t arm7_cpu_device::arm7_cpu_read32(uint32_t addr)
 	return result;
 }
 
-uint16_t arm7_cpu_device::arm7_cpu_read16(uint32_t addr)
+uint32_t arm7_cpu_device::arm7_cpu_read16(uint32_t addr)
 {
-	uint16_t result;
+	uint32_t result;
 
 	if( COPRO_CTRL & COPRO_CTRL_MMU_EN )
 	{
@@ -1339,7 +1608,7 @@ uint16_t arm7_cpu_device::arm7_cpu_read16(uint32_t addr)
 
 	if (addr & 1)
 	{
-		result = ((result >> 8) & 0xff) | ((result & 0xff) << 8);
+		result = ((result >> 8) & 0xff) | ((result & 0xff) << 24);
 	}
 
 	return result;

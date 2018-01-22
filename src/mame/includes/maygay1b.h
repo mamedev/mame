@@ -104,7 +104,13 @@ public:
 	DECLARE_WRITE8_MEMBER(reel12_w);
 	DECLARE_WRITE8_MEMBER(reel34_w);
 	DECLARE_WRITE8_MEMBER(reel56_w);
-	DECLARE_WRITE8_MEMBER(m1_latch_w);
+	DECLARE_WRITE_LINE_MEMBER(ramen_w);
+	DECLARE_WRITE_LINE_MEMBER(alarmen_w);
+	DECLARE_WRITE_LINE_MEMBER(nmien_w);
+	DECLARE_WRITE_LINE_MEMBER(rts_w);
+	DECLARE_WRITE_LINE_MEMBER(psurelay_w);
+	DECLARE_WRITE_LINE_MEMBER(wdog_w);
+	DECLARE_WRITE_LINE_MEMBER(srsel_w);
 	DECLARE_WRITE8_MEMBER(latch_ch2_w);
 	DECLARE_READ8_MEMBER(latch_st_hi);
 	DECLARE_READ8_MEMBER(latch_st_lo);
@@ -141,9 +147,8 @@ public:
 	virtual void machine_reset() override;
 	void cpu0_firq(int data);
 	void cpu0_nmi();
+	void maygay_m1_no_oki(machine_config &config);
+	void maygay_m1(machine_config &config);
+	void maygay_m1_nec(machine_config &config);
+	void maygay_m1_empire(machine_config &config);
 };
-
-MACHINE_CONFIG_EXTERN( maygay_m1 );
-MACHINE_CONFIG_EXTERN( maygay_m1_nec );
-MACHINE_CONFIG_EXTERN( maygay_m1_no_oki );
-MACHINE_CONFIG_EXTERN( maygay_m1_empire );

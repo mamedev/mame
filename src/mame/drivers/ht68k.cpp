@@ -65,6 +65,7 @@ public:
 	DECLARE_WRITE8_MEMBER(duart_output);
 	required_shared_ptr<uint16_t> m_p_ram;
 	virtual void machine_reset() override;
+	void ht68k(machine_config &config);
 };
 
 
@@ -123,13 +124,13 @@ static SLOT_INTERFACE_START( ht68k_floppies )
 SLOT_INTERFACE_END
 
 
-static MACHINE_CONFIG_START( ht68k )
+MACHINE_CONFIG_START(ht68k_state::ht68k)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",M68000, XTAL_8MHz)
 	MCFG_CPU_PROGRAM_MAP(ht68k_mem)
 
 	/* video hardware */
-	MCFG_MC68681_ADD( "duart68681", XTAL_8MHz / 2 )
+	MCFG_DEVICE_ADD( "duart68681", MC68681, XTAL_8MHz / 2 )
 	MCFG_MC68681_SET_EXTERNAL_CLOCKS(500000, 500000, 1000000, 1000000)
 	MCFG_MC68681_IRQ_CALLBACK(WRITELINE(ht68k_state, duart_irq_handler))
 	MCFG_MC68681_A_TX_CALLBACK(DEVWRITELINE("rs232", rs232_port_device, write_txd))

@@ -22,7 +22,7 @@ DEFINE_DEVICE_TYPE(TTL166, ttl166_device, "ttl166", "SN54/74166")
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( ttl166_device::device_add_mconfig )
+MACHINE_CONFIG_START(ttl166_device::device_add_mconfig)
 	MCFG_TIMER_DRIVER_ADD("timer", ttl166_device, qh_output)
 MACHINE_CONFIG_END
 

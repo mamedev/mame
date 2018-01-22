@@ -105,6 +105,7 @@ public:
 	DECLARE_WRITE8_MEMBER(cv_w);
 	DECLARE_WRITE8_MEMBER(gate_w);
 
+	void prophet600(machine_config &config);
 private:
 	uint16_t m_dac;
 	uint8_t m_scanrow;
@@ -241,10 +242,8 @@ static ADDRESS_MAP_START( cpu_map, AS_PROGRAM, 8, prophet600_state )
 	AM_RANGE(0x2000, 0x27ff) AM_RAM
 	AM_RANGE(0x3000, 0x37ff) AM_RAM
 	AM_RANGE(0x4000, 0x4001) AM_WRITE(dac_w)
-	AM_RANGE(0x6000, 0x6000) AM_DEVWRITE(UART_TAG, acia6850_device, control_w)
-	AM_RANGE(0x6001, 0x6001) AM_DEVWRITE(UART_TAG, acia6850_device, data_w)
-	AM_RANGE(0xe000, 0xe000) AM_DEVREAD(UART_TAG, acia6850_device, status_r)
-	AM_RANGE(0xe001, 0xe001) AM_DEVREAD(UART_TAG, acia6850_device, data_r)
+	AM_RANGE(0x6000, 0x6001) AM_DEVWRITE(UART_TAG, acia6850_device, write)
+	AM_RANGE(0xe000, 0xe001) AM_DEVREAD(UART_TAG, acia6850_device, read)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( io_map, AS_IO, 8, prophet600_state )
@@ -262,7 +261,7 @@ DRIVER_INIT_MEMBER(prophet600_state, prophet600)
 }
 
 // master crystal is 8 MHz, all clocks derived from there
-static MACHINE_CONFIG_START( prophet600 )
+MACHINE_CONFIG_START(prophet600_state::prophet600)
 	MCFG_CPU_ADD(MAINCPU_TAG, Z80, XTAL_8MHz/2)
 	MCFG_CPU_PROGRAM_MAP(cpu_map)
 	MCFG_CPU_IO_MAP(io_map)

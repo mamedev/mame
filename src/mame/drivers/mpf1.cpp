@@ -276,7 +276,7 @@ READ8_MEMBER( mpf1_state::ppi_pa_r )
 WRITE8_MEMBER( mpf1_state::ppi_pb_w )
 {
 	/* swap bits around for the mame 7-segment emulation */
-	uint8_t led_data = BITSWAP8(data, 6, 1, 2, 0, 7, 5, 4, 3);
+	uint8_t led_data = bitswap<8>(data, 6, 1, 2, 0, 7, 5, 4, 3);
 
 	/* timer to update segments */
 	m_led_refresh_timer->adjust(attotime::from_usec(70), led_data);
@@ -352,7 +352,7 @@ void mpf1_state::machine_reset()
 
 /* Machine Drivers */
 
-static MACHINE_CONFIG_START( mpf1 )
+MACHINE_CONFIG_START(mpf1_state::mpf1)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL_3_579545MHz/2)
@@ -387,7 +387,7 @@ static MACHINE_CONFIG_START( mpf1 )
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("halt_timer", mpf1_state, check_halt_callback, attotime::from_hz(1))
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( mpf1b )
+MACHINE_CONFIG_START(mpf1_state::mpf1b)
 	/* basic machine hardware */
 	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL_3_579545MHz/2)
 	MCFG_CPU_PROGRAM_MAP(mpf1b_map)
@@ -424,7 +424,7 @@ static MACHINE_CONFIG_START( mpf1b )
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("halt_timer", mpf1_state, check_halt_callback, attotime::from_hz(1))
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( mpf1p )
+MACHINE_CONFIG_START(mpf1_state::mpf1p)
 	/* basic machine hardware */
 	MCFG_CPU_ADD(Z80_TAG, Z80, 2500000)
 	MCFG_CPU_PROGRAM_MAP(mpf1p_map)

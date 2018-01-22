@@ -126,6 +126,7 @@ public:
 	required_device<dac_word_interface> m_dac;
 	required_device<screen_device> m_screen;
 	ESRIP_DRAW(esripsys_draw);
+	void esripsys(machine_config &config);
 };
 
 #endif // _ESRIPSYS_H_

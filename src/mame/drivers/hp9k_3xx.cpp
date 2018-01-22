@@ -134,6 +134,14 @@ public:
 #endif
 	}
 
+	void hp9k370(machine_config &config);
+	void hp9k330(machine_config &config);
+	void hp9k382(machine_config &config);
+	void hp9k310(machine_config &config);
+	void hp9k340(machine_config &config);
+	void hp9k380(machine_config &config);
+	void hp9k320(machine_config &config);
+	void hp9k332(machine_config &config);
 private:
 	bool m_in_buserr;
 	bool m_hil_read;
@@ -360,7 +368,7 @@ static SLOT_INTERFACE_START(dio16_cards)
 	SLOT_INTERFACE("98603", HPDIO_98603) /* 98603 ROM BASIC */
 SLOT_INTERFACE_END
 
-static MACHINE_CONFIG_START( hp9k310 )
+MACHINE_CONFIG_START(hp9k3xx_state::hp9k310)
 	/* basic machine hardware */
 	MCFG_CPU_ADD(MAINCPU_TAG, M68010, 10000000)
 	MCFG_CPU_PROGRAM_MAP(hp9k310_map)
@@ -389,7 +397,7 @@ static MACHINE_CONFIG_START( hp9k310 )
 	MCFG_DIO16_SLOT_ADD("diobus", "sl3", dio16_cards, nullptr, false)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( hp9k320 )
+MACHINE_CONFIG_START(hp9k3xx_state::hp9k320)
 	/* basic machine hardware */
 	MCFG_CPU_ADD(MAINCPU_TAG, M68020FPU, 16670000)
 	MCFG_CPU_PROGRAM_MAP(hp9k320_map)
@@ -418,13 +426,13 @@ static MACHINE_CONFIG_START( hp9k320 )
 	MCFG_DIO32_SLOT_ADD("diobus", "sl3", dio16_cards, nullptr, false)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( hp9k330, hp9k320 )
+MACHINE_CONFIG_DERIVED(hp9k3xx_state::hp9k330, hp9k320)
 	/* basic machine hardware */
 	MCFG_CPU_REPLACE(MAINCPU_TAG, M68020PMMU, 16670000)
 	MCFG_CPU_PROGRAM_MAP(hp9k330_map)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( hp9k332 )
+MACHINE_CONFIG_START(hp9k3xx_state::hp9k332)
 	/* basic machine hardware */
 	MCFG_CPU_ADD(MAINCPU_TAG, M68020PMMU, 16670000)
 	MCFG_CPU_PROGRAM_MAP(hp9k332_map)
@@ -453,25 +461,25 @@ static MACHINE_CONFIG_START( hp9k332 )
 	MCFG_SCREEN_REFRESH_RATE(70)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( hp9k340, hp9k320 )
+MACHINE_CONFIG_DERIVED(hp9k3xx_state::hp9k340, hp9k320)
 	/* basic machine hardware */
 	MCFG_CPU_REPLACE(MAINCPU_TAG, M68030, 16670000)
 	MCFG_CPU_PROGRAM_MAP(hp9k330_map)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( hp9k370, hp9k320 )
+MACHINE_CONFIG_DERIVED(hp9k3xx_state::hp9k370, hp9k320)
 	/* basic machine hardware */
 	MCFG_CPU_REPLACE(MAINCPU_TAG, M68030, 33000000)
 	MCFG_CPU_PROGRAM_MAP(hp9k370_map)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( hp9k380, hp9k320 )
+MACHINE_CONFIG_DERIVED(hp9k3xx_state::hp9k380, hp9k320)
 	/* basic machine hardware */
 	MCFG_CPU_REPLACE(MAINCPU_TAG, M68040, 25000000)
 	MCFG_CPU_PROGRAM_MAP(hp9k380_map)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( hp9k382, hp9k320 )
+MACHINE_CONFIG_DERIVED(hp9k3xx_state::hp9k382, hp9k320)
 	/* basic machine hardware */
 	MCFG_CPU_REPLACE(MAINCPU_TAG, M68040, 25000000)
 	MCFG_CPU_PROGRAM_MAP(hp9k382_map)

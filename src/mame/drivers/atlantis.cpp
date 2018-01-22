@@ -21,6 +21,7 @@
         * Actiontec PM560LKI PCI Data/Fax Modem (PCI\VEN_11C1&DEV_0480&SUBSYS_04801668)
         * TL16c552 dual UART
         * ADSP-2181 based DCS2 audio (unclear which variant)
+        * Micron MT48LC1M16A1 1Mx16 SDRAM, 2X (4MB) for audio
         * ICS AV9110 Serially Programmable Frequency Generator.  Programmed through ADSP FL0,FL1,FL2 pins.
         * Cirrus Logic CS4338 16 bit stereo audio serial DAC, PCB has space for 3 chips (6-channels), only 1 is populated
         * Maxim MAX192 8 channel 10 bit serial ADC
@@ -181,6 +182,7 @@ public:
 
 	DECLARE_READ8_MEMBER(parallel_r);
 	DECLARE_WRITE8_MEMBER(parallel_w);
+	void mwskins(machine_config &config);
 };
 
 // Parallel Port
@@ -334,7 +336,9 @@ WRITE32_MEMBER(atlantis_state::board_ctrl_w)
 READ8_MEMBER(atlantis_state::cmos_r)
 {
 	uint8_t result = m_rtc->read(space, offset);
-
+	// Initial RTC check expects reads to the RTC to take some time
+	if (offset == 0x7ff9)
+		machine().device<cpu_device>("maincpu")->eat_cycles(30);
 	if (LOG_RTC || ((offset >= 0x7ff0) && (offset != 0x7ff9)))
 		logerror("%s:RTC read from offset %04X = %08X\n", machine().describe_context(), offset, result);
 	return result;
@@ -791,7 +795,7 @@ DEVICE_INPUT_DEFAULTS_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( mwskins )
+MACHINE_CONFIG_START(atlantis_state::mwskins)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", VR4310LE, 166666666)    // clock is TRUSTED
@@ -814,7 +818,7 @@ static MACHINE_CONFIG_START( mwskins )
 	MCFG_M48T37_RESET_HANDLER(WRITELINE(atlantis_state, watchdog_reset))
 	MCFG_M48T37_IRQ_HANDLER(WRITELINE(atlantis_state, watchdog_irq))
 
-	MCFG_IDE_PCI_ADD(PCI_ID_IDE, 0x10950646, 0x05, 0x0)
+	MCFG_IDE_PCI_ADD(PCI_ID_IDE, 0x10950646, 0x07, 0x0)
 	MCFG_IDE_PCI_IRQ_HANDLER(DEVWRITELINE(":", atlantis_state, ide_irq))
 	// The pci-ide by default expects the system controller to be pci:00.0 so need to fix here
 	MCFG_DEVICE_MODIFY(PCI_ID_IDE":ide")
@@ -833,10 +837,9 @@ static MACHINE_CONFIG_START( mwskins )
 	MCFG_SCREEN_UPDATE_DEVICE("zeus2", zeus2_device, screen_update)
 
 	/* sound hardware */
-	//MCFG_DEVICE_ADD("dcs", DCS2_AUDIO_DSIO, 0)
 	MCFG_DEVICE_ADD("dcs", DCS2_AUDIO_DENVER, 0)
-	MCFG_DCS2_AUDIO_DRAM_IN_MB(8)
-	MCFG_DCS2_AUDIO_POLLING_OFFSET(0x200d)
+	MCFG_DCS2_AUDIO_DRAM_IN_MB(4)
+	MCFG_DCS2_AUDIO_POLLING_OFFSET(0xe33)
 
 	MCFG_DEVICE_ADD("ioasic", MIDWAY_IOASIC, 0)
 	MCFG_MIDWAY_IOASIC_SHUFFLE(MIDWAY_IOASIC_STANDARD)

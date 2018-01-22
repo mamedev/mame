@@ -80,6 +80,11 @@ public:
 	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void scroll_w(address_space &space, int offset, int data, int layer);
 
+	void genpeitd(machine_config &config);
+	void wndrmomo(machine_config &config);
+	void roishtar(machine_config &config);
+	void rthunder(machine_config &config);
+	void hopmappy(machine_config &config);
 private:
 	inline void get_tile_info(tile_data &tileinfo,int tile_index,int layer,uint8_t *vram);
 	void set_scroll(int layer);

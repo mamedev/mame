@@ -83,6 +83,7 @@ public:
 	uint32_t screen_update_buggychl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_CUSTOM_INPUT_MEMBER( pedal_in_r );
 
+	void buggychl(machine_config &config);
 private:
 	void draw_sky( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void draw_bg( bitmap_ind16 &bitmap, const rectangle &cliprect );

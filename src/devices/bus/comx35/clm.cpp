@@ -136,7 +136,7 @@ GFXDECODE_END
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( comx_clm_device::device_add_mconfig )
+MACHINE_CONFIG_START(comx_clm_device::device_add_mconfig)
 	MCFG_SCREEN_ADD_MONOCHROME(MC6845_SCREEN_TAG, RASTER, rgb_t::white())
 	MCFG_SCREEN_UPDATE_DEVICE(MC6845_TAG, mc6845_device, screen_update)
 	MCFG_SCREEN_SIZE(80*8, 24*8)

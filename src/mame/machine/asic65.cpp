@@ -536,7 +536,7 @@ ADDRESS_MAP_END
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( asic65_device::device_add_mconfig )
+MACHINE_CONFIG_START(asic65_device::device_add_mconfig)
 
 	/* ASIC65 */
 	MCFG_CPU_ADD("asic65cpu", TMS32010, 20000000)

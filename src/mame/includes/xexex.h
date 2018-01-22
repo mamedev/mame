@@ -99,4 +99,5 @@ public:
 	K056832_CB_MEMBER(tile_callback);
 	K053246_CB_MEMBER(sprite_callback);
 	K054539_CB_MEMBER(ym_set_mixing);
+	void xexex(machine_config &config);
 };

@@ -565,11 +565,11 @@ WRITE8_MEMBER(williams_state::williams_blitter_w)
 		estimated_clocks_at_4MHz = 4 + 2 * (accesses + 3);
 	}
 
-	space.device().execute().adjust_icount(-((estimated_clocks_at_4MHz + 3) / 4));
+	m_maincpu->adjust_icount(-((estimated_clocks_at_4MHz + 3) / 4));
 
 	/* Log blits */
 	logerror("%04X:Blit @ %3d : %02X%02X -> %02X%02X, %3dx%3d, mask=%02X, flags=%02X, icount=%d, win=%d\n",
-			space.device().safe_pc(), m_screen->vpos(),
+			m_maincpu->pc(), m_screen->vpos(),
 			m_blitterram[2], m_blitterram[3],
 			m_blitterram[4], m_blitterram[5],
 			m_blitterram[6], m_blitterram[7],

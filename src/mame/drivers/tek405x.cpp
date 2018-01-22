@@ -180,8 +180,7 @@ static ADDRESS_MAP_START( tek4051_mem, AS_PROGRAM, 8, tek4051_state )
 	AM_RANGE(0x87b0, 0x87b3) AM_DEVREADWRITE(MC6820_GPIB_TAG, pia6821_device, read, write)
 	AM_RANGE(0x87c0, 0x87c0) AM_MIRROR(0x03) AM_WRITE(lbs_w)
 //  AM_RANGE(0x87c0, 0x87c3) AM_DEVREADWRITE(MC6820_COM_TAG, pia6821_device, read, write)
-//  AM_RANGE(0x87c4, 0x87c4) AM_MIRROR(0x02) AM_DEVREADWRITE(MC6850_TAG, acia6850_device, status_r, control_w)
-//  AM_RANGE(0x87c5, 0x87c5) AM_MIRROR(0x02) AM_DEVREADWRITE(MC6850_TAG, acia6850_device, data_r, data_w)
+//  AM_RANGE(0x87c4, 0x87c5) AM_MIRROR(0x02) AM_DEVREADWRITE(MC6850_TAG, acia6850_device, read, write)
 //  AM_RANGE(0x87c8, 0x87cb) XPC2
 //  AM_RANGE(0x87cc, 0x87cf) XPC3
 //  AM_RANGE(0x87d0, 0x87d3) XPC4
@@ -997,7 +996,7 @@ void tek4052_state::machine_start()
 //  MACHINE_CONFIG( tek4051 )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( tek4051 )
+MACHINE_CONFIG_START(tek4051_state::tek4051)
 	// basic machine hardware
 	MCFG_CPU_ADD(MC6800_TAG, M6800, XTAL_12_5MHz/15)
 	MCFG_CPU_PROGRAM_MAP(tek4051_mem)
@@ -1104,7 +1103,7 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( tek4052 )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( tek4052 )
+MACHINE_CONFIG_START(tek4052_state::tek4052)
 	// basic machine hardware
 	MCFG_CPU_ADD(AM2901A_TAG, M6800, 1000000) // should be 4x AM2901A + AM2911
 	MCFG_CPU_PROGRAM_MAP(tek4052_mem)
@@ -1143,7 +1142,7 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( tek4054 )
 //-------------------------------------------------
 /*
-static MACHINE_CONFIG_START( tek4054 )
+MACHINE_CONFIG_START(tek4054_state::tek4054)
     MCFG_SCREEN_SIZE(4096, 3125)
     MCFG_SCREEN_VISIBLE_AREA(0, 4096-1, 0, 3125-1)
 MACHINE_CONFIG_END

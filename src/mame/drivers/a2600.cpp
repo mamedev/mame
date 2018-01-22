@@ -80,6 +80,9 @@ public:
 	DECLARE_READ8_MEMBER(cart_over_all_r);
 	DECLARE_WRITE8_MEMBER(cart_over_all_w);
 
+	void a2600p(machine_config &config);
+	void a2600(machine_config &config);
+	void a2600_cartslot(machine_config &config);
 protected:
 	required_device<vcs_control_port_device> m_joy1;
 	required_device<vcs_control_port_device> m_joy2;
@@ -562,7 +565,7 @@ static SLOT_INTERFACE_START(a2600_cart)
 	SLOT_INTERFACE_INTERNAL("a26_harmony",   A26_ROM_HARMONY)
 SLOT_INTERFACE_END
 
-static MACHINE_CONFIG_START(a2600_cartslot)
+MACHINE_CONFIG_START(a2600_state::a2600_cartslot)
 	MCFG_VCS_CARTRIDGE_ADD("cartslot", a2600_cart, nullptr)
 
 	/* software lists */
@@ -570,7 +573,7 @@ static MACHINE_CONFIG_START(a2600_cartslot)
 	MCFG_SOFTWARE_LIST_ADD("cass_list","a2600_cass")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( a2600 )
+MACHINE_CONFIG_START(a2600_state::a2600)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6507, MASTER_CLOCK_NTSC / 3)
 	MCFG_M6502_DISABLE_DIRECT()
@@ -619,7 +622,7 @@ static MACHINE_CONFIG_START( a2600 )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( a2600p )
+MACHINE_CONFIG_START(a2600_state::a2600p)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6507, MASTER_CLOCK_PAL / 3)
 	MCFG_CPU_PROGRAM_MAP(a2600_mem)

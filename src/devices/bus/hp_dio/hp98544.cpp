@@ -33,7 +33,7 @@ DEFINE_DEVICE_TYPE(HPDIO_98544, dio16_98544_device, "dio98544", "HP98544 high-re
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( dio16_98544_device::device_add_mconfig )
+MACHINE_CONFIG_START(dio16_98544_device::device_add_mconfig)
 	MCFG_SCREEN_ADD(HP98544_SCREEN_NAME, RASTER)
 	MCFG_SCREEN_UPDATE_DEVICE(DEVICE_SELF, dio16_98544_device, screen_update)
 	MCFG_SCREEN_SIZE(1024,768)

@@ -45,7 +45,7 @@ static ADDRESS_MAP_START( iocpu_map, AS_PROGRAM, 8, a2232_device)
 	AM_RANGE(0xc000, 0xffff) AM_RAM AM_SHARE("shared")
 ADDRESS_MAP_END
 
-MACHINE_CONFIG_MEMBER( a2232_device::device_add_mconfig )
+MACHINE_CONFIG_START(a2232_device::device_add_mconfig)
 	// main cpu
 	MCFG_CPU_ADD("iocpu", M65CE02, XTAL_28_37516MHz / 8) // should run at Amiga clock 7M / 2
 	MCFG_CPU_PROGRAM_MAP(iocpu_map)

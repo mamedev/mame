@@ -68,6 +68,7 @@ int configuration_manager::load_settings()
 	{
 		/* open the config file */
 		emu_file file(machine().options().ctrlr_path(), OPEN_FLAG_READ);
+		osd_printf_verbose("Attempting to parse: %s.cfg\n",controller);
 		osd_file::error filerr = file.open(controller, ".cfg");
 
 		if (filerr != osd_file::error::NONE)
@@ -81,11 +82,13 @@ int configuration_manager::load_settings()
 	/* next load the defaults file */
 	emu_file file(machine().options().cfg_directory(), OPEN_FLAG_READ);
 	osd_file::error filerr = file.open("default.cfg");
+	osd_printf_verbose("Attempting to parse: default.cfg\n");
 	if (filerr == osd_file::error::NONE)
 		load_xml(file, config_type::DEFAULT);
 
 	/* finally, load the game-specific file */
 	filerr = file.open(machine().basename(), ".cfg");
+	osd_printf_verbose("Attempting to parse: %s.cfg\n",machine().basename());
 	if (filerr == osd_file::error::NONE)
 		loaded = load_xml(file, config_type::GAME);
 
@@ -94,7 +97,7 @@ int configuration_manager::load_settings()
 		type.load(config_type::FINAL, nullptr);
 
 	/* if we didn't find a saved config, return 0 so the main core knows that it */
-	/* is the first time the game is run and it should diplay the disclaimer. */
+	/* is the first time the game is run and it should display the disclaimer. */
 	return loaded;
 }
 

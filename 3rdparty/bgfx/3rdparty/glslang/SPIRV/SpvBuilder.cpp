@@ -59,6 +59,9 @@ namespace spv {
 Builder::Builder(unsigned int magicNumber, SpvBuildLogger* buildLogger) :
     source(SourceLanguageUnknown),
     sourceVersion(0),
+    sourceFileStringId(NoResult),
+    currentLine(0),
+    emitOpLines(false),
     addressModel(AddressingModelLogical),
     memoryModel(MemoryModelGLSL450),
     builderNumber(magicNumber),
@@ -82,6 +85,26 @@ Id Builder::import(const char* name)
 
     imports.push_back(std::unique_ptr<Instruction>(import));
     return import->getResultId();
+}
+
+// Emit an OpLine if we've been asked to emit OpLines and the line number
+// has changed since the last time, and is a valid line number.
+void Builder::setLine(int lineNum)
+{
+    if (lineNum != 0 && lineNum != currentLine) {
+        currentLine = lineNum;
+        if (emitOpLines)
+            addLine(sourceFileStringId, currentLine, 0);
+    }
+}
+
+void Builder::addLine(Id fileName, int lineNum, int column)
+{
+    Instruction* line = new Instruction(OpLine);
+    line->addIdOperand(fileName);
+    line->addImmediateOperand(lineNum);
+    line->addImmediateOperand(column);
+    buildPoint->addInstruction(std::unique_ptr<Instruction>(line));
 }
 
 // For creating new groupedTypes (will return old type if the requested one was already made).
@@ -379,6 +402,8 @@ Id Builder::makeFunctionType(Id returnType, const std::vector<Id>& paramTypes)
 
 Id Builder::makeImageType(Id sampledType, Dim dim, bool depth, bool arrayed, bool ms, unsigned sampled, ImageFormat format)
 {
+    assert(sampled == 1 || sampled == 2);
+
     // try to find it
     Instruction* type;
     for (int t = 0; t < (int)groupedTypes[OpTypeImage].size(); ++t) {
@@ -410,27 +435,27 @@ Id Builder::makeImageType(Id sampledType, Dim dim, bool depth, bool arrayed, boo
     // deal with capabilities
     switch (dim) {
     case DimBuffer:
-        if (sampled)
+        if (sampled == 1)
             addCapability(CapabilitySampledBuffer);
         else
             addCapability(CapabilityImageBuffer);
         break;
     case Dim1D:
-        if (sampled)
+        if (sampled == 1)
             addCapability(CapabilitySampled1D);
         else
             addCapability(CapabilityImage1D);
         break;
     case DimCube:
         if (arrayed) {
-            if (sampled)
+            if (sampled == 1)
                 addCapability(CapabilitySampledCubeArray);
             else
                 addCapability(CapabilityImageCubeArray);
         }
         break;
     case DimRect:
-        if (sampled)
+        if (sampled == 1)
             addCapability(CapabilitySampledRect);
         else
             addCapability(CapabilityImageRect);
@@ -443,10 +468,14 @@ Id Builder::makeImageType(Id sampledType, Dim dim, bool depth, bool arrayed, boo
     }
 
     if (ms) {
-        if (arrayed)
-            addCapability(CapabilityImageMSArray);
-        if (! sampled)
-            addCapability(CapabilityStorageImageMultisample);
+        if (sampled == 2) {
+            // Images used with subpass data are not storage
+            // images, so don't require the capability for them.
+            if (dim != Dim::DimSubpassData)
+                addCapability(CapabilityStorageImageMultisample);
+            if (arrayed)
+                addCapability(CapabilityImageMSArray);
+        }
     }
 
     return type->getResultId();
@@ -928,17 +957,6 @@ void Builder::addMemberName(Id id, int memberNumber, const char* string)
     names.push_back(std::unique_ptr<Instruction>(name));
 }
 
-void Builder::addLine(Id target, Id fileName, int lineNum, int column)
-{
-    Instruction* line = new Instruction(OpLine);
-    line->addIdOperand(target);
-    line->addIdOperand(fileName);
-    line->addImmediateOperand(lineNum);
-    line->addImmediateOperand(column);
-
-    lines.push_back(std::unique_ptr<Instruction>(line));
-}
-
 void Builder::addDecoration(Id id, Decoration decoration, int num)
 {
     if (decoration == spv::DecorationMax)
@@ -971,16 +989,16 @@ Function* Builder::makeEntryPoint(const char* entryPoint)
 
     Block* entry;
     std::vector<Id> params;
-    std::vector<Decoration> precisions;
+    std::vector<std::vector<Decoration>> decorations;
 
-    entryPointFunction = makeFunctionEntry(NoPrecision, makeVoidType(), entryPoint, params, precisions, &entry);
+    entryPointFunction = makeFunctionEntry(NoPrecision, makeVoidType(), entryPoint, params, decorations, &entry);
 
     return entryPointFunction;
 }
 
 // Comments in header
 Function* Builder::makeFunctionEntry(Decoration precision, Id returnType, const char* name,
-                                     const std::vector<Id>& paramTypes, const std::vector<Decoration>& precisions, Block **entry)
+                                     const std::vector<Id>& paramTypes, const std::vector<std::vector<Decoration>>& decorations, Block **entry)
 {
     // Make the function and initial instructions in it
     Id typeId = makeFunctionType(returnType, paramTypes);
@@ -989,8 +1007,10 @@ Function* Builder::makeFunctionEntry(Decoration precision, Id returnType, const 
 
     // Set up the precisions
     setPrecision(function->getId(), precision);
-    for (unsigned p = 0; p < (unsigned)precisions.size(); ++p)
-        setPrecision(firstParamId + p, precisions[p]);
+    for (unsigned p = 0; p < (unsigned)decorations.size(); ++p) {
+        for (int d = 0; d < (int)decorations[p].size(); ++d)
+            addDecoration(firstParamId + p, decorations[p][d]);
+    }
 
     // CFG
     if (entry) {
@@ -1997,9 +2017,10 @@ Id Builder::createMatrixConstructor(Decoration precision, const std::vector<Id>&
 }
 
 // Comments in header
-Builder::If::If(Id cond, Builder& gb) :
+Builder::If::If(Id cond, unsigned int ctrl, Builder& gb) :
     builder(gb),
     condition(cond),
+    control(ctrl),
     elseBlock(0)
 {
     function = &builder.getBuildPoint()->getParent();
@@ -2040,7 +2061,7 @@ void Builder::If::makeEndIf()
 
     // Go back to the headerBlock and make the flow control split
     builder.setBuildPoint(headerBlock);
-    builder.createSelectionMerge(mergeBlock, SelectionControlMaskNone);
+    builder.createSelectionMerge(mergeBlock, control);
     if (elseBlock)
         builder.createConditionalBranch(condition, thenBlock, elseBlock);
     else
@@ -2052,7 +2073,7 @@ void Builder::If::makeEndIf()
 }
 
 // Comments in header
-void Builder::makeSwitch(Id selector, int numSegments, const std::vector<int>& caseValues,
+void Builder::makeSwitch(Id selector, unsigned int control, int numSegments, const std::vector<int>& caseValues,
                          const std::vector<int>& valueIndexToSegment, int defaultSegment,
                          std::vector<Block*>& segmentBlocks)
 {
@@ -2065,7 +2086,7 @@ void Builder::makeSwitch(Id selector, int numSegments, const std::vector<int>& c
     Block* mergeBlock = new Block(getUniqueId(), function);
 
     // make and insert the switch's selection-merge instruction
-    createSelectionMerge(mergeBlock, SelectionControlMaskNone);
+    createSelectionMerge(mergeBlock, control);
 
     // make the switch instruction
     Instruction* switchInst = new Instruction(NoResult, NoType, OpSwitch);
@@ -2411,12 +2432,9 @@ void Builder::dump(std::vector<unsigned int>& out) const
     dumpInstructions(out, executionModes);
 
     // Debug instructions
-    if (source != SourceLanguageUnknown) {
-        Instruction sourceInst(0, 0, OpSource);
-        sourceInst.addImmediateOperand(source);
-        sourceInst.addImmediateOperand(sourceVersion);
-        sourceInst.dump(out);
-    }
+    dumpInstructions(out, strings);
+    dumpModuleProcesses(out);
+    dumpSourceInstructions(out);
     for (int e = 0; e < (int)sourceExtensions.size(); ++e) {
         Instruction sourceExtInst(0, 0, OpSourceExtension);
         sourceExtInst.addStringOperand(sourceExtensions[e]);
@@ -2574,10 +2592,63 @@ void Builder::createConditionalBranch(Id condition, Block* thenBlock, Block* els
     elseBlock->addPredecessor(buildPoint);
 }
 
+// OpSource
+// [OpSourceContinued]
+// ...
+void Builder::dumpSourceInstructions(std::vector<unsigned int>& out) const
+{
+    const int maxWordCount = 0xFFFF;
+    const int opSourceWordCount = 4;
+    const int nonNullBytesPerInstruction = 4 * (maxWordCount - opSourceWordCount) - 1;
+
+    if (source != SourceLanguageUnknown) {
+        // OpSource Language Version File Source
+        Instruction sourceInst(NoResult, NoType, OpSource);
+        sourceInst.addImmediateOperand(source);
+        sourceInst.addImmediateOperand(sourceVersion);
+        // File operand
+        if (sourceFileStringId != NoResult) {
+            sourceInst.addIdOperand(sourceFileStringId);
+            // Source operand
+            if (sourceText.size() > 0) {
+                int nextByte = 0;
+                std::string subString;
+                while ((int)sourceText.size() - nextByte > 0) {
+                    subString = sourceText.substr(nextByte, nonNullBytesPerInstruction);
+                    if (nextByte == 0) {
+                        // OpSource
+                        sourceInst.addStringOperand(subString.c_str());
+                        sourceInst.dump(out);
+                    } else {
+                        // OpSourcContinued
+                        Instruction sourceContinuedInst(OpSourceContinued);
+                        sourceContinuedInst.addStringOperand(subString.c_str());
+                        sourceContinuedInst.dump(out);
+                    }
+                    nextByte += nonNullBytesPerInstruction;
+                }
+            } else
+                sourceInst.dump(out);
+        } else
+            sourceInst.dump(out);
+    }
+}
+
 void Builder::dumpInstructions(std::vector<unsigned int>& out, const std::vector<std::unique_ptr<Instruction> >& instructions) const
 {
     for (int i = 0; i < (int)instructions.size(); ++i) {
         instructions[i]->dump(out);
+    }
+}
+
+void Builder::dumpModuleProcesses(std::vector<unsigned int>& out) const
+{
+    for (int i = 0; i < (int)moduleProcesses.size(); ++i) {
+        // TODO: switch this out for the 1.1 headers
+        const spv::Op OpModuleProcessed = (spv::Op)330;
+        Instruction moduleProcessed(OpModuleProcessed);
+        moduleProcessed.addStringOperand(moduleProcesses[i]);
+        moduleProcessed.dump(out);
     }
 }
 

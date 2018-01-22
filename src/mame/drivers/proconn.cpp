@@ -30,7 +30,7 @@
 #include "machine/meters.h"
 #include "machine/roc10937.h"
 #include "machine/z80ctc.h"
-#include "machine/z80dart.h"
+#include "machine/z80sio.h"
 #include "machine/z80pio.h"
 #include "sound/ay8910.h"
 #include "video/awpvid.h"
@@ -136,7 +136,7 @@ public:
 	/* PIO 1 */
 
 	DECLARE_WRITE_LINE_MEMBER(pio_1_m_out_int_w)    { /* logerror("pio_1_m_out_int_w %02x\n", state); */ }
-	DECLARE_READ8_MEMBER(pio_1_m_in_pa_r)           { logerror("pio_1_m_in_pa_r (INPUT MATRIX)\n"); return space.machine().rand(); }
+	DECLARE_READ8_MEMBER(pio_1_m_in_pa_r)           { logerror("pio_1_m_in_pa_r (INPUT MATRIX)\n"); return machine().rand(); }
 	DECLARE_WRITE8_MEMBER(pio_1_m_out_pa_w)         { logerror("pio_1_m_out_pa_w %02x\n", data); }
 	DECLARE_WRITE_LINE_MEMBER(pio_1_m_out_ardy_w)   { logerror("pio_1_m_out_ardy_w %02x\n", state); }
 	DECLARE_READ8_MEMBER(pio_1_m_in_pb_r)           { logerror("pio_1_m_in_pb_r\n"); return 0x00; }
@@ -179,6 +179,7 @@ public:
 	DECLARE_WRITE8_MEMBER(pio_5_m_out_pb_w)         { logerror("pio_5_m_out_pb_w %02x (LAMPS1)\n", data); }
 	DECLARE_WRITE_LINE_MEMBER(pio_5_m_out_brdy_w)   { logerror("pio_5_m_out_brdy_w %02x\n", state); }
 
+	void proconn(machine_config &config);
 protected:
 
 	// devices
@@ -190,7 +191,7 @@ protected:
 	required_device<z80pio_device> m_z80pio_4;
 	required_device<z80pio_device> m_z80pio_5;
 	required_device<z80ctc_device> m_z80ctc;
-	required_device<z80dart_device> m_z80sio;
+	required_device<z80sio_device> m_z80sio;
 	required_device<ay8910_device> m_ay;
 	required_device<meters_device> m_meters;
 
@@ -318,7 +319,7 @@ void proconn_state::machine_reset()
 	m_vfd->reset(); // reset display1
 }
 
-static MACHINE_CONFIG_START( proconn )
+MACHINE_CONFIG_START(proconn_state::proconn)
 	MCFG_CPU_ADD("maincpu", Z80, 4000000) /* ?? Mhz */
 	MCFG_Z80_DAISY_CHAIN(z80_daisy_chain)
 	MCFG_CPU_PROGRAM_MAP(proconn_map)
@@ -373,7 +374,7 @@ static MACHINE_CONFIG_START( proconn )
 	MCFG_DEVICE_ADD("z80ctc", Z80CTC, 4000000)
 	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
 
-	MCFG_DEVICE_ADD("z80sio", Z80SIO0, 4000000) /* ?? Mhz */
+	MCFG_DEVICE_ADD("z80sio", Z80SIO, 4000000) /* ?? Mhz */
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 

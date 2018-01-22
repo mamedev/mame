@@ -95,8 +95,8 @@ static ADDRESS_MAP_START( pokechmp_map, AS_PROGRAM, 8, pokechmp_state )
 	AM_RANGE(0x1c00, 0x1c00) AM_READ_PORT("DSW") AM_WRITE(pokechmp_bank_w)
 
 	/* Extra on Poke Champ (not on Pocket Gal) */
-	AM_RANGE(0x2000, 0x23ff) AM_RAM_DEVWRITE("palette", palette_device, write_ext) AM_SHARE("palette_ext")
-	AM_RANGE(0x2400, 0x27ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x2000, 0x23ff) AM_RAM_DEVWRITE("palette", palette_device, write8_ext) AM_SHARE("palette_ext")
+	AM_RANGE(0x2400, 0x27ff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
 
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("fixed")
@@ -216,7 +216,7 @@ OKI M6295 (an AD65 on this board, note pin 7 is low): 1.5mhz
 
 */
 
-static MACHINE_CONFIG_START( pokechmp )
+MACHINE_CONFIG_START(pokechmp_state::pokechmp)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, XTAL_4MHz/4)

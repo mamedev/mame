@@ -97,10 +97,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<screen_device> m_screen;
+	void jedi(machine_config &config);
+	void jedi_audio(machine_config &config);
+	void jedi_video(machine_config &config);
 };
-
-/*----------- defined in audio/jedi.c -----------*/
-MACHINE_CONFIG_EXTERN( jedi_audio );
-
-/*----------- defined in video/jedi.c -----------*/
-MACHINE_CONFIG_EXTERN( jedi_video );

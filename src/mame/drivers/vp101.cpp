@@ -140,6 +140,8 @@ public:
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t vp50_screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
+	void vp50(machine_config &config);
+	void vp101(machine_config &config);
 protected:
 
 	// devices
@@ -361,7 +363,7 @@ static INPUT_PORTS_START( vp50 )
 	PORT_BIT( 0xfffffff0, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( vp101 )
+MACHINE_CONFIG_START(vp10x_state::vp101)
 	MCFG_CPU_ADD("maincpu", VR5500LE, 400000000)
 	MCFG_MIPS3_DCACHE_SIZE(32768)
 	MCFG_MIPS3_SYSTEM_CLOCK(100000000)
@@ -380,7 +382,7 @@ static MACHINE_CONFIG_START( vp101 )
 	MCFG_NVRAM_ADD_0FILL("nvram")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( vp50 )
+MACHINE_CONFIG_START(vp10x_state::vp50)
 	MCFG_CPU_ADD("maincpu", TX4925LE, 200000000)
 	MCFG_MIPS3_DCACHE_SIZE(32768)
 	MCFG_MIPS3_SYSTEM_CLOCK(100000000)

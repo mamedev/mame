@@ -257,7 +257,7 @@ void pc_kbd_microsoft_natural_device::device_reset()
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( pc_kbd_microsoft_natural_device::device_add_mconfig )
+MACHINE_CONFIG_START(pc_kbd_microsoft_natural_device::device_add_mconfig)
 	MCFG_CPU_ADD("ms_natrl_cpu", I8051, XTAL_6MHz)
 	MCFG_CPU_IO_MAP(microsoft_natural_io)
 MACHINE_CONFIG_END

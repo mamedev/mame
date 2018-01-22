@@ -25,6 +25,12 @@
 #define MCFG_RS232_CTS_HANDLER(_devcb) \
 	devcb = &rs232_port_device::set_cts_handler(*device, DEVCB_##_devcb);
 
+#define MCFG_RS232_RXC_HANDLER(_devcb) \
+	devcb = &rs232_port_device::set_rxc_handler(*device, DEVCB_##_devcb);
+
+#define MCFG_RS232_TXC_HANDLER(_devcb) \
+	devcb = &rs232_port_device::set_txc_handler(*device, DEVCB_##_devcb);
+
 #define RS232_BAUD_110 (0x00)
 #define RS232_BAUD_150 (0x01)
 #define RS232_BAUD_300 (0x02)
@@ -40,10 +46,6 @@
 #define RS232_BAUD_57600 (0x0c)
 #define RS232_BAUD_115200 (0x0d)
 
-// Some systems may not include a dedicated XTAL capable of producing standard baud rates for the UART.
-// These slightly deviant rates, which might lie within tolerance limits of actual hardware, have been found in use.
-#define RS232_BAUD_9615 (0x0e)
-
 #define MCFG_RS232_BAUD(_tag, _default_baud, _description, _class, _write_line) \
 	PORT_START(_tag) \
 	PORT_CONFNAME(0xff, _default_baud, _description) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, _class, _write_line) \
@@ -55,7 +57,6 @@
 	PORT_CONFSETTING( RS232_BAUD_2400, "2400") \
 	PORT_CONFSETTING( RS232_BAUD_4800, "4800") \
 	PORT_CONFSETTING( RS232_BAUD_9600, "9600") \
-	PORT_CONFSETTING( RS232_BAUD_9615, "9615") \
 	PORT_CONFSETTING( RS232_BAUD_14400, "14400") \
 	PORT_CONFSETTING( RS232_BAUD_19200, "19200") \
 	PORT_CONFSETTING( RS232_BAUD_28800, "28800") \
@@ -130,6 +131,8 @@ public:
 	template <class Object> static devcb_base &set_dsr_handler(device_t &device, Object &&cb) { return downcast<rs232_port_device &>(device).m_dsr_handler.set_callback(std::forward<Object>(cb)); }
 	template <class Object> static devcb_base &set_ri_handler(device_t &device, Object &&cb) { return downcast<rs232_port_device &>(device).m_ri_handler.set_callback(std::forward<Object>(cb)); }
 	template <class Object> static devcb_base &set_cts_handler(device_t &device, Object &&cb) { return downcast<rs232_port_device &>(device).m_cts_handler.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_rxc_handler(device_t &device, Object &&cb) { return downcast<rs232_port_device &>(device).m_rxc_handler.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_txc_handler(device_t &device, Object &&cb) { return downcast<rs232_port_device &>(device).m_txc_handler.set_callback(std::forward<Object>(cb)); }
 
 	DECLARE_WRITE_LINE_MEMBER( write_txd );
 	DECLARE_WRITE_LINE_MEMBER( write_dtr );
@@ -141,6 +144,8 @@ public:
 	DECLARE_READ_LINE_MEMBER( dsr_r ) { return m_dsr; }
 	DECLARE_READ_LINE_MEMBER( ri_r )  { return m_ri; }
 	DECLARE_READ_LINE_MEMBER( cts_r ) { return m_cts; }
+	DECLARE_READ_LINE_MEMBER( rxc_r ) { return m_dce_rxc; }
+	DECLARE_READ_LINE_MEMBER( txc_r ) { return m_dce_txc; }
 
 protected:
 	rs232_port_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
@@ -153,12 +158,16 @@ protected:
 	int m_dsr;
 	int m_ri;
 	int m_cts;
+	int m_dce_rxc;
+	int m_dce_txc;
 
 	devcb_write_line m_rxd_handler;
 	devcb_write_line m_dcd_handler;
 	devcb_write_line m_dsr_handler;
 	devcb_write_line m_ri_handler;
 	devcb_write_line m_cts_handler;
+	devcb_write_line m_rxc_handler;
+	devcb_write_line m_txc_handler;
 
 private:
 	device_rs232_port_interface *m_dev;
@@ -181,6 +190,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( output_dsr ) { m_port->m_dsr = state; m_port->m_dsr_handler(state); }
 	DECLARE_WRITE_LINE_MEMBER( output_ri )  { m_port->m_ri = state; m_port->m_ri_handler(state); }
 	DECLARE_WRITE_LINE_MEMBER( output_cts ) { m_port->m_cts = state; m_port->m_cts_handler(state); }
+	DECLARE_WRITE_LINE_MEMBER( output_rxc ) { m_port->m_dce_rxc = state; m_port->m_rxc_handler(state); }
+	DECLARE_WRITE_LINE_MEMBER( output_txc ) { m_port->m_dce_txc = state; m_port->m_txc_handler(state); }
 
 protected:
 	device_rs232_port_interface(const machine_config &mconfig, device_t &device);
@@ -204,8 +215,7 @@ protected:
 			28800,
 			38400,
 			57600,
-			115200,
-			9615
+			115200
 		};
 
 		return values[baud];

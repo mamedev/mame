@@ -304,7 +304,7 @@ static GFXDECODE_START( wolfpack )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( wolfpack )
+MACHINE_CONFIG_START(wolfpack_state::wolfpack)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, 12096000 / 16)

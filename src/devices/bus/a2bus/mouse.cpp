@@ -127,7 +127,7 @@ ioport_constructor a2bus_mouse_device::device_input_ports() const
     machine configurations
 -------------------------------------------------*/
 
-MACHINE_CONFIG_MEMBER(a2bus_mouse_device::device_add_mconfig)
+MACHINE_CONFIG_START(a2bus_mouse_device::device_add_mconfig)
 	MCFG_CPU_ADD(MOUSE_MCU_TAG, M68705P3, 2043600)
 	MCFG_M68705_PORTA_R_CB(READ8(a2bus_mouse_device, mcu_port_a_r))
 	MCFG_M68705_PORTB_R_CB(READ8(a2bus_mouse_device, mcu_port_b_r))
@@ -203,25 +203,25 @@ void a2bus_mouse_device::device_reset()
     read_c0nx - called for reads from this card's c0nx space
 -------------------------------------------------*/
 
-uint8_t a2bus_mouse_device::read_c0nx(address_space &space, uint8_t offset)
+uint8_t a2bus_mouse_device::read_c0nx(uint8_t offset)
 {
-	return m_pia->read(space, offset & 3);
+	return m_pia->reg_r(offset & 3);
 }
 
 /*-------------------------------------------------
     write_c0nx - called for writes to this card's c0nx space
 -------------------------------------------------*/
 
-void a2bus_mouse_device::write_c0nx(address_space &space, uint8_t offset, uint8_t data)
+void a2bus_mouse_device::write_c0nx(uint8_t offset, uint8_t data)
 {
-	m_pia->write(space, offset & 3, data);
+	m_pia->reg_w(offset & 3, data);
 }
 
 /*-------------------------------------------------
     read_cnxx - called for reads from this card's cnxx space
 -------------------------------------------------*/
 
-uint8_t a2bus_mouse_device::read_cnxx(address_space &space, uint8_t offset)
+uint8_t a2bus_mouse_device::read_cnxx(uint8_t offset)
 {
 	return m_rom[offset+m_rom_bank];
 }

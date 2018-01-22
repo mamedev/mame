@@ -129,7 +129,7 @@ static ADDRESS_MAP_START( agress_map, AS_PROGRAM, 16, blockout_state )
 	AM_RANGE(0x180000, 0x1bffff) AM_RAM_WRITE(blockout_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0x1d4000, 0x1dffff) AM_RAM /* work RAM */
 	AM_RANGE(0x1f4000, 0x1fffff) AM_RAM /* work RAM */
-	AM_RANGE(0x200000, 0x203fff) AM_RAM AM_SHARE("frontvideoram") AM_MIRROR(0x004000) // agress checks at F3A that this is mirrored, blockout glitches if you do it to it
+	AM_RANGE(0x200000, 0x207fff) AM_RAM AM_SHARE("frontvideoram") 
 	AM_RANGE(0x208000, 0x21ffff) AM_RAM /* ??? */
 	AM_RANGE(0x280002, 0x280003) AM_WRITE(blockout_frontcolor_w)
 	AM_RANGE(0x280200, 0x2805ff) AM_RAM_WRITE(blockout_paletteram_w) AM_SHARE("paletteram")
@@ -156,9 +156,9 @@ static INPUT_PORTS_START( blockout )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON4 )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON3 )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("P1 Drop Button") // on top of stick
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("P1 B Button")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("P1 C Button")
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START1 )
 
 	PORT_START("P2")
@@ -166,9 +166,9 @@ static INPUT_PORTS_START( blockout )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(2)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(2) PORT_NAME("P2 Drop Button") // on top of stick
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2) PORT_NAME("P2 B Button")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2) PORT_NAME("P2 C Button")
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START2 )
 
 	PORT_START("SYSTEM")
@@ -207,30 +207,43 @@ static INPUT_PORTS_START( blockout )
 	PORT_DIPUNUSED_DIPLOC( 0x08, 0x08, "SW2:4" )        /* Listed as "Unused" */
 	PORT_DIPUNUSED_DIPLOC( 0x10, 0x10, "SW2:5" )        /* Listed as "Unused" */
 	PORT_DIPUNUSED_DIPLOC( 0x20, 0x20, "SW2:6" )        /* Listed as "Unused" */
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON1 )        PORT_DIPLOCATION("SW2:7") /* Listed as "Unused" */
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2) PORT_DIPLOCATION("SW2:8") /* Listed as "Unused" */
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("P1 A Button") PORT_DIPLOCATION("SW2:7") /* Listed as "Unused" */
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("P2 A Button") PORT_PLAYER(2) PORT_DIPLOCATION("SW2:8") /* Listed as "Unused" */
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( blockoutj )
 	PORT_INCLUDE( blockout )
 
 	PORT_MODIFY("P1")
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("P1 A Button (Drop)")
 
 	PORT_MODIFY("P2")
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("P2 A Button (Drop)") PORT_PLAYER(2)
 
 	PORT_MODIFY("DSW2")
 	/* The following switch is 2/3 rotate buttons on the other sets, option doesn't exist in the Japan version */
 	PORT_DIPUNKNOWN_DIPLOC( 0x04, 0x04, "SW2:3" )
 	/* these can still be used on the difficutly select even if they can't be used for rotating pieces in this version */
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON4 )        PORT_DIPLOCATION("SW2:7")
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(2) PORT_DIPLOCATION("SW2:8")
+	PORT_DIPUNUSED_DIPLOC( 0x40, 0x40, "SW2:7" )        /* Listed as "Unused" */
+	PORT_DIPUNUSED_DIPLOC( 0x80, 0x80, "SW2:8" )        /* Listed as "Unused" */
+//	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON4 )        PORT_DIPLOCATION("SW2:7")
+//	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(2) PORT_DIPLOCATION("SW2:8")
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( agress )
 	PORT_INCLUDE( blockout )
 
+	// Button 1 & 2 looks identical gameplay wise (i.e. stop slots after each ten levels)
+	PORT_MODIFY("P1")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1) PORT_NAME("P1 Button 3 (Bomb)")
+	
+	PORT_MODIFY("P2")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2) PORT_NAME("P2 Button 3 (Bomb)")
+	
 	/* factory shipment setting is all dips OFF */
 	PORT_MODIFY("DSW1")
 	PORT_DIPNAME( 0x04, 0x04, "Opening Cut" )           PORT_DIPLOCATION("SW1:3")
@@ -243,6 +256,8 @@ static INPUT_PORTS_START( agress )
 	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Players ) )      PORT_DIPLOCATION("SW2:3")
 	PORT_DIPSETTING(    0x04, "1" )
 	PORT_DIPSETTING(    0x00, "2" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x40, 0x40, "SW2:7" )     
+	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x80, "SW2:8" )     
 INPUT_PORTS_END
 
 
@@ -279,14 +294,14 @@ TIMER_DEVICE_CALLBACK_MEMBER(blockout_state::blockout_scanline)
 {
 	int scanline = param;
 
-	if(scanline == 248) // vblank-out irq
+	if(scanline == 250) // vblank-out irq
 		m_maincpu->set_input_line(6, ASSERT_LINE);
 
 	if(scanline == 0) // vblank-in irq or directly tied to coin inputs (TODO: check)
 		m_maincpu->set_input_line(5, ASSERT_LINE);
 }
 
-static MACHINE_CONFIG_START( blockout )
+MACHINE_CONFIG_START(blockout_state::blockout)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, MAIN_CLOCK)       /* MRH - 8.76 makes gfx/adpcm samples sync better -- but 10 is correct speed*/
@@ -299,10 +314,8 @@ static MACHINE_CONFIG_START( blockout )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(58)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(320, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 319, 8, 247)
+	/* assume same as ddragon3 with adjusted visible display area */
+	MCFG_SCREEN_RAW_PARAMS(XTAL_28MHz / 4, 448, 0, 320, 272, 10, 250)
 	MCFG_SCREEN_UPDATE_DRIVER(blockout_state, screen_update_blockout)
 	MCFG_SCREEN_PALETTE("palette")
 
@@ -325,7 +338,7 @@ static MACHINE_CONFIG_START( blockout )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( agress, blockout )
+MACHINE_CONFIG_DERIVED(blockout_state::agress, blockout)
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_PROGRAM_MAP(agress_map)
 MACHINE_CONFIG_END
@@ -419,8 +432,28 @@ ROM_END
  *
  *************************************/
 
+DRIVER_INIT_MEMBER(blockout_state,agress)
+{
+	/*
+	 * agress checks at F3A that this is mirrored, blockout glitches if you mirror to it
+	 * But actually mirroring this VRAM makes display to be offset 
+	 * (clearly visible with text being on top bank instead of bottom during gameplay)
+	 * There are many possible solutions to this:
+	 * A) reads are actually ORed between upper and lower banks
+	 * B) VRAM is initialized with same pattern checked, or extreme open bus occurs for the second uninitalized bank. 
+	 * C) Agress isn't truly identical to Block Out HW wise, it really mirrors VRAM data and offsets display
+	 * D) it's not supposed to enter into trace mode at all, cause of the bogus mirror check (trace exception 
+	 *    occurs at very beginning of the program execution)
+	 * For now let's use D and just patch the TRACE exception that causes the bogus mirror check
+	 */
+	 
+ 	uint16_t *rom = (uint16_t *)memregion("maincpu")->base();
+
+	rom[0x82/2] = 0x2700;
+}
+ 
 GAME( 1989, blockout, 0,        blockout, blockout,  blockout_state, 0, ROT0, "Technos Japan / California Dreams", "Block Out (set 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1989, blockout2,blockout, blockout, blockout,  blockout_state, 0, ROT0, "Technos Japan / California Dreams", "Block Out (set 2)", MACHINE_SUPPORTS_SAVE )
 GAME( 1989, blockoutj,blockout, blockout, blockoutj, blockout_state, 0, ROT0, "Technos Japan / California Dreams", "Block Out (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, agress,   0,        agress,   agress,    blockout_state, 0, ROT0, "Palco",   "Agress - Missile Daisenryaku (Japan)",           MACHINE_SUPPORTS_SAVE )
-GAME( 2003, agressb,  agress,   agress,   agress,    blockout_state, 0, ROT0, "bootleg", "Agress - Missile Daisenryaku (English bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, agress,   0,        agress,   agress,    blockout_state, agress, ROT0, "Palco",   "Agress - Missile Daisenryaku (Japan)",           MACHINE_SUPPORTS_SAVE )
+GAME( 2003, agressb,  agress,   agress,   agress,    blockout_state, agress, ROT0, "bootleg", "Agress - Missile Daisenryaku (English bootleg)", MACHINE_SUPPORTS_SAVE )

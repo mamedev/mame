@@ -129,6 +129,11 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(fdc_drq_w);
 	DECLARE_WRITE_LINE_MEMBER(fdc_intrq_w);
 
+	void pg685_backplane(machine_config &config);
+	void pg685_module(machine_config &config);
+	void pg685(machine_config &config);
+	void pg675(machine_config &config);
+	void pg685oua12(machine_config &config);
 private:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
@@ -380,7 +385,7 @@ MC6845_UPDATE_ROW( pg685_state::crtc_update_row_oua12 )
 //  MACHINE DRIVERS
 //**************************************************************************
 
-static MACHINE_CONFIG_START(pg685_backplane)
+MACHINE_CONFIG_START(pg685_state::pg685_backplane)
 	MCFG_DEVICE_ADD("bppit", PIT8253, 0)
 
 	MCFG_DEVICE_ADD("bppic", PIC8259, 0)
@@ -389,7 +394,7 @@ static MACHINE_CONFIG_START(pg685_backplane)
 	MCFG_DEVICE_ADD("bpuart", MC2661, XTAL_4_9152MHz) // internal clock
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START(pg685_module)
+MACHINE_CONFIG_START(pg685_state::pg685_module)
 	MCFG_DEVICE_ADD("fdc", FD1797, XTAL_4MHz / 2) // divider guessed
 	MCFG_WD_FDC_INTRQ_CALLBACK(DEVWRITELINE("mainpic", pic8259_device, ir4_w))
 
@@ -402,7 +407,7 @@ static MACHINE_CONFIG_START(pg685_module)
 
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( pg675 )
+MACHINE_CONFIG_START(pg685_state::pg675)
 	// main cpu
 	MCFG_CPU_ADD("maincpu", I8088, XTAL_15MHz / 3)
 	MCFG_CPU_PROGRAM_MAP(pg675_mem)
@@ -451,7 +456,7 @@ static MACHINE_CONFIG_START( pg675 )
 
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( pg685 )
+MACHINE_CONFIG_START(pg685_state::pg685)
 	// main cpu
 	MCFG_CPU_ADD("maincpu", V20, XTAL_15MHz / 3)
 	MCFG_CPU_PROGRAM_MAP(pg685_mem)
@@ -502,7 +507,7 @@ static MACHINE_CONFIG_START( pg685 )
 	MCFG_WD2010_OUT_INTRQ_CB(DEVWRITELINE("mainpic", pic8259_device, ir3_w))
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( pg685oua12 )
+MACHINE_CONFIG_START(pg685_state::pg685oua12)
 	// main cpu
 	MCFG_CPU_ADD("maincpu", I80286, XTAL_20MHz / 2)
 	MCFG_CPU_PROGRAM_MAP(pg685oua12_mem)

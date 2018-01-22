@@ -55,7 +55,7 @@ PCB Layout
 static ADDRESS_MAP_START( gumbo_map, AS_PROGRAM, 16, gumbo_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x080000, 0x083fff) AM_RAM // main ram
-	AM_RANGE(0x1b0000, 0x1b03ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x1b0000, 0x1b03ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x1c0100, 0x1c0101) AM_READ_PORT("P1_P2")
 	AM_RANGE(0x1c0200, 0x1c0201) AM_READ_PORT("DSW")
 	AM_RANGE(0x1c0300, 0x1c0301) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)
@@ -69,7 +69,7 @@ static ADDRESS_MAP_START( mspuzzle_map, AS_PROGRAM, 16, gumbo_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x100000, 0x103fff) AM_RAM // main ram
 	AM_RANGE(0x190000, 0x197fff) AM_RAM_WRITE(gumbo_fg_videoram_w) AM_SHARE("fg_videoram") // fg tilemap
-	AM_RANGE(0x1a0000, 0x1a03ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x1a0000, 0x1a03ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x1b0100, 0x1b0101) AM_READ_PORT("P1_P2")
 	AM_RANGE(0x1b0200, 0x1b0201) AM_READ_PORT("DSW")
 	AM_RANGE(0x1b0300, 0x1b0301) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)
@@ -79,7 +79,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( dblpoint_map, AS_PROGRAM, 16, gumbo_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x080000, 0x083fff) AM_RAM // main ram
-	AM_RANGE(0x1b0000, 0x1b03ff) AM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x1b0000, 0x1b03ff) AM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x1c0100, 0x1c0101) AM_READ_PORT("P1_P2")
 	AM_RANGE(0x1c0200, 0x1c0201) AM_READ_PORT("DSW")
 	AM_RANGE(0x1c0300, 0x1c0301) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)
@@ -233,7 +233,7 @@ static GFXDECODE_START( gumbo )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( gumbo )
+MACHINE_CONFIG_START(gumbo_state::gumbo)
 
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_14_31818MHz/2)
 	MCFG_CPU_PROGRAM_MAP(gumbo_map)
@@ -259,13 +259,13 @@ static MACHINE_CONFIG_START( gumbo )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.47)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( mspuzzle, gumbo )
+MACHINE_CONFIG_DERIVED(gumbo_state::mspuzzle, gumbo)
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(mspuzzle_map)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( dblpoint, gumbo )
+MACHINE_CONFIG_DERIVED(gumbo_state::dblpoint, gumbo)
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(dblpoint_map)

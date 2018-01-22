@@ -143,6 +143,7 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(int_0);
 
 
+	void mgavegas(machine_config &config);
 protected:
 
 	// devices
@@ -357,7 +358,6 @@ WRITE8_MEMBER(mgavegas_state::csoki_w)
 
 WRITE8_MEMBER(mgavegas_state::cso1_w)
 {
-	int hopper_data = 0x00;
 	if (LOG_CSO1)
 		logerror("write to CSO1 data = %02X\n",data);
 
@@ -372,8 +372,7 @@ WRITE8_MEMBER(mgavegas_state::cso1_w)
 
 	update_custom();
 
-	hopper_data=(m_hop&0x01)<<7;
-	m_ticket->write(machine().dummy_space(), 0, hopper_data);
+	m_ticket->motor_w(m_hop);
 }
 
 WRITE8_MEMBER(mgavegas_state::cso2_w)
@@ -588,7 +587,7 @@ DRIVER_INIT_MEMBER(mgavegas_state,mgavegas133)
 *************************/
 
 
-static MACHINE_CONFIG_START( mgavegas )
+MACHINE_CONFIG_START(mgavegas_state::mgavegas)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, CPU_CLK)
 	MCFG_CPU_PROGRAM_MAP(mgavegas_map)

@@ -115,6 +115,8 @@ public:
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(ti74_cartridge);
 	HD44780_PIXEL_UPDATE(ti74_pixel_update);
 	HD44780_PIXEL_UPDATE(ti95_pixel_update);
+	void ti74(machine_config &config);
+	void ti95(machine_config &config);
 };
 
 
@@ -269,12 +271,6 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, ti74_state )
 	AM_RANGE(0x2000, 0x3fff) AM_RAM AM_SHARE("sysram.ic3")
 	//AM_RANGE(0x4000, 0xbfff) // mapped by the cartslot
 	AM_RANGE(0xc000, 0xdfff) AM_ROMBANK("sysbank")
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( main_io_map, AS_IO, 8, ti74_state )
-	AM_RANGE(TMS7000_PORTA, TMS7000_PORTA) AM_READ(keyboard_r)
-	AM_RANGE(TMS7000_PORTB, TMS7000_PORTB) AM_WRITE(bankswitch_w)
-	AM_RANGE(TMS7000_PORTE, TMS7000_PORTE) AM_WRITE(keyboard_w) AM_READNOP
 ADDRESS_MAP_END
 
 
@@ -509,12 +505,14 @@ void ti74_state::machine_start()
 	save_item(NAME(m_power));
 }
 
-static MACHINE_CONFIG_START( ti74 )
+MACHINE_CONFIG_START(ti74_state::ti74)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", TMS70C46, XTAL_4MHz)
 	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_IO_MAP(main_io_map)
+	MCFG_TMS7000_IN_PORTA_CB(READ8(ti74_state, keyboard_r))
+	MCFG_TMS7000_OUT_PORTB_CB(WRITE8(ti74_state, bankswitch_w))
+	MCFG_TMS7000_OUT_PORTE_CB(WRITE8(ti74_state, keyboard_w))
 
 	MCFG_NVRAM_ADD_0FILL("sysram.ic3")
 
@@ -543,12 +541,14 @@ static MACHINE_CONFIG_START( ti74 )
 	MCFG_SOFTWARE_LIST_ADD("cart_list", "ti74_cart")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( ti95 )
+MACHINE_CONFIG_START(ti74_state::ti95)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", TMS70C46, XTAL_4MHz)
 	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_IO_MAP(main_io_map)
+	MCFG_TMS7000_IN_PORTA_CB(READ8(ti74_state, keyboard_r))
+	MCFG_TMS7000_OUT_PORTB_CB(WRITE8(ti74_state, bankswitch_w))
+	MCFG_TMS7000_OUT_PORTE_CB(WRITE8(ti74_state, keyboard_w))
 
 	MCFG_NVRAM_ADD_0FILL("sysram.ic3")
 
@@ -574,7 +574,7 @@ static MACHINE_CONFIG_START( ti95 )
 	MCFG_GENERIC_EXTENSIONS("bin,rom,256")
 	MCFG_GENERIC_LOAD(ti74_state, ti74_cartridge)
 
-	//MCFG_SOFTWARE_LIST_ADD("cart_list", "ti95_cart")
+	MCFG_SOFTWARE_LIST_ADD("cart_list", "ti95_cart")
 MACHINE_CONFIG_END
 
 

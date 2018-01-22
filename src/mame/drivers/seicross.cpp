@@ -87,7 +87,7 @@ READ8_MEMBER(seicross_state::portB_r)
 
 WRITE8_MEMBER(seicross_state::portB_w)
 {
-	//logerror("PC %04x: 8910 port B = %02x\n", space.device().safe_pc(), data);
+	//logerror("PC %04x: 8910 port B = %02x\n", m_maincpu->pc(), data);
 	/* bit 0 is IRQ enable */
 	m_irq_mask = data & 1;
 
@@ -390,7 +390,7 @@ INTERRUPT_GEN_MEMBER(seicross_state::vblank_irq)
 }
 
 
-static MACHINE_CONFIG_START( no_nvram )
+MACHINE_CONFIG_START(seicross_state::no_nvram)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_18_432MHz / 6)   /* D780C, 3.072 MHz? */
@@ -433,7 +433,7 @@ static MACHINE_CONFIG_START( no_nvram )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( nvram, no_nvram )
+MACHINE_CONFIG_DERIVED(seicross_state::nvram, no_nvram)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("mcu")
@@ -442,7 +442,7 @@ static MACHINE_CONFIG_DERIVED( nvram, no_nvram )
 	MCFG_NVRAM_ADD_CUSTOM_DRIVER("nvram", seicross_state, nvram_init)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( friskytb, nvram )
+MACHINE_CONFIG_DERIVED(seicross_state::friskytb, nvram)
 	MCFG_CPU_MODIFY("mcu")
 	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map)
 MACHINE_CONFIG_END
@@ -628,7 +628,7 @@ DRIVER_INIT_MEMBER(seicross_state,friskytb)
 	// this code is in ROM 6.3h, maps to MCU at dxxx
 	for (int i = 0; i < 0x7800; i++)
 	{
-		m_decrypted_opcodes[i] = BITSWAP8(ROM[i], 6, 7, 5, 4, 3, 2, 0, 1);
+		m_decrypted_opcodes[i] = bitswap<8>(ROM[i], 6, 7, 5, 4, 3, 2, 0, 1);
 	}
 }
 

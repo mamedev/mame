@@ -86,6 +86,7 @@ public:
 
 	DECLARE_READ8_MEMBER(i7000_kbd_r);
 	DECLARE_WRITE8_MEMBER(i7000_scanlines_w);
+	void i7000(machine_config &config);
 };
 
 WRITE8_MEMBER( i7000_state::i7000_scanlines_w )
@@ -332,7 +333,7 @@ MC6845_ON_UPDATE_ADDR_CHANGED(i7000_state::crtc_addr)
 }
 
 
-static MACHINE_CONFIG_START( i7000 )
+MACHINE_CONFIG_START(i7000_state::i7000)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", NSC800, XTAL_4MHz)

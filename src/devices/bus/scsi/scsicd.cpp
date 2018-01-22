@@ -30,7 +30,7 @@ void scsicd_device::device_start()
 	scsihle_device::device_start();
 }
 
-MACHINE_CONFIG_MEMBER(scsicd_device::device_add_mconfig)
+MACHINE_CONFIG_START(scsicd_device::device_add_mconfig)
 	MCFG_CDROM_ADD("image")
 	MCFG_CDROM_INTERFACE("cdrom")
 	MCFG_SOUND_ADD("cdda", CDDA, 0)

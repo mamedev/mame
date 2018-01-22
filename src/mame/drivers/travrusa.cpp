@@ -303,7 +303,7 @@ void travrusa_state::machine_reset()
 	m_scrollx[1] = 0;
 }
 
-static MACHINE_CONFIG_START( travrusa )
+MACHINE_CONFIG_START(travrusa_state::travrusa)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 4000000)   /* 4 MHz (?) */
@@ -334,7 +334,7 @@ static MACHINE_CONFIG_START( travrusa )
 
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( shtrider, travrusa )
+MACHINE_CONFIG_DERIVED(travrusa_state::shtrider, travrusa)
 
 	/* video hardware */
 	MCFG_GFXDECODE_MODIFY("gfxdecode", shtrider)
@@ -342,7 +342,7 @@ static MACHINE_CONFIG_DERIVED( shtrider, travrusa )
 	MCFG_PALETTE_INIT_OWNER(travrusa_state,shtrider)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( shtriderb, travrusa )
+MACHINE_CONFIG_DERIVED(travrusa_state::shtriderb, travrusa)
 
 	/* video hardware */
 	MCFG_GFXDECODE_MODIFY("gfxdecode", shtrider)
@@ -587,8 +587,8 @@ DRIVER_INIT_MEMBER(travrusa_state,motorace)
 	/* The first CPU ROM has the address and data lines scrambled */
 	for (A = 0; A < 0x2000; A++)
 	{
-		j = BITSWAP16(A,15,14,13,9,7,5,3,1,12,10,8,6,4,2,0,11);
-		rom[j] = BITSWAP8(buffer[A],2,7,4,1,6,3,0,5);
+		j = bitswap<16>(A,15,14,13,9,7,5,3,1,12,10,8,6,4,2,0,11);
+		rom[j] = bitswap<8>(buffer[A],2,7,4,1,6,3,0,5);
 	}
 }
 
@@ -599,12 +599,12 @@ DRIVER_INIT_MEMBER(travrusa_state,shtridra)
 
 	/* D3/D4  and  D5/D6 swapped */
 	for (A = 0; A < 0x2000; A++)
-		rom[A] = BITSWAP8(rom[A],7,5,6,3,4,2,1,0);
+		rom[A] = bitswap<8>(rom[A],7,5,6,3,4,2,1,0);
 }
 
 READ8_MEMBER(travrusa_state::shtridrb_port11_r)
 {
-	printf("shtridrb_port11_r %04x\n", space.device().safe_pc());
+	printf("shtridrb_port11_r %04x\n", m_maincpu->pc());
 	// reads, masks with 0xa8, checks for 0x88, resets game if not happy with value?
 	return 0x88;
 }

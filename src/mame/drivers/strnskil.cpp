@@ -50,7 +50,7 @@ READ8_MEMBER(strnskil_state::pettanp_protection_r)
 {
 	int res;
 
-	switch (space.device().safe_pc())
+	switch (m_maincpu->pc())
 	{
 		case 0x6066:    res = 0xa5; break;
 		case 0x60dc:    res = 0x20; break;  /* bits 0-3 unknown */
@@ -61,7 +61,7 @@ READ8_MEMBER(strnskil_state::pettanp_protection_r)
 		default:        res = 0xff; break;
 	}
 
-	logerror("%04x: protection_r -> %02x\n",space.device().safe_pc(),res);
+	logerror("%04x: protection_r -> %02x\n",m_maincpu->pc(),res);
 	return res;
 }
 
@@ -69,7 +69,7 @@ READ8_MEMBER(strnskil_state::banbam_protection_r)
 {
 	int res;
 
-	switch (space.device().safe_pc())
+	switch (m_maincpu->pc())
 	{
 		case 0x6094:    res = 0xa5; break;
 		case 0x6118:    res = 0x20; break;  /* bits 0-3 unknown */
@@ -80,13 +80,13 @@ READ8_MEMBER(strnskil_state::banbam_protection_r)
 		default:        res = 0xff; break;
 	}
 
-	logerror("%04x: protection_r -> %02x\n",space.device().safe_pc(),res);
+	logerror("%04x: protection_r -> %02x\n",m_maincpu->pc(),res);
 	return res;
 }
 
 WRITE8_MEMBER(strnskil_state::protection_w)
 {
-	logerror("%04x: protection_w %02x\n",space.device().safe_pc(),data);
+	logerror("%04x: protection_w %02x\n",m_maincpu->pc(),data);
 }
 
 /****************************************************************************/
@@ -336,7 +336,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(strnskil_state::strnskil_irq)
 }
 
 
-static MACHINE_CONFIG_START( strnskil )
+MACHINE_CONFIG_START(strnskil_state::strnskil)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80,8000000/2) /* 4.000MHz */
@@ -375,7 +375,7 @@ static MACHINE_CONFIG_START( strnskil )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( banbam, strnskil )
+MACHINE_CONFIG_DERIVED(strnskil_state::banbam, strnskil)
 	MCFG_CPU_ADD("mcu", MB8841, 8000000/2)
 //  MCFG_MB88XX_READ_K_CB(READ8(strnskil_state, mcu_portk_r))
 //  MCFG_MB88XX_READ_R0_CB(READ8(strnskil_state, mcu_portr0_r))

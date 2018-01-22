@@ -1262,93 +1262,95 @@ msgstr "Cronometraje\tImperfecto\n"
 
 #: src/frontend/mame/ui/selgame.cpp:945
 msgid "Mechanical Machine\tYes\n"
-msgstr ""
+msgstr "Máquina mecánica\tSi\n"
 
 #: src/frontend/mame/ui/selgame.cpp:945
 msgid "Mechanical Machine\tNo\n"
-msgstr ""
+msgstr "Máquina mecánica\tNo\n"
 
 #: src/frontend/mame/ui/selgame.cpp:946
 msgid "Requires Artwork\tYes\n"
-msgstr ""
+msgstr "Requiere arte\tSi\n"
 
 #: src/frontend/mame/ui/selgame.cpp:946
 msgid "Requires Artwork\tNo\n"
-msgstr ""
+msgstr "Requiere arte\tNo\n"
 
 #: src/frontend/mame/ui/selgame.cpp:947
 msgid "Requires Clickable Artwork\tYes\n"
-msgstr ""
+msgstr "Requiere arte clicable\tSi\n"
 
 #: src/frontend/mame/ui/selgame.cpp:947
 msgid "Requires Clickable Artwork\tNo\n"
-msgstr ""
+msgstr "Requiere arte clicable\tNo\n"
 
 #: src/frontend/mame/ui/selgame.cpp:948
 msgid "Support Cocktail\tYes\n"
-msgstr ""
+msgstr "Soporta modo cocktail\tSi\n"
 
 #: src/frontend/mame/ui/selgame.cpp:948
 msgid "Support Cocktail\tNo\n"
-msgstr ""
+msgstr "Soporta modo cocktail\tNo\n"
 
 #: src/frontend/mame/ui/selgame.cpp:949
 msgid "Driver is BIOS\tYes\n"
-msgstr ""
+msgstr "El controlador es una BIOS\tSi\n"
 
 #: src/frontend/mame/ui/selgame.cpp:949
 msgid "Driver is BIOS\tNo\n"
-msgstr ""
+msgstr "El controlador es una BIOS\tNo\n"
 
 #: src/frontend/mame/ui/selgame.cpp:950
 msgid "Support Save\tYes\n"
-msgstr ""
+msgstr "Soporta guardado\tSi\n"
 
 #: src/frontend/mame/ui/selgame.cpp:950
 msgid "Support Save\tNo\n"
-msgstr ""
+msgstr "Soporta guardado\tNo\n"
 
 #: src/frontend/mame/ui/selgame.cpp:951
 msgid "Screen Orientation\tVertical\n"
-msgstr ""
+msgstr "Orientación de la pantalla\tVertical\n"
 
 #: src/frontend/mame/ui/selgame.cpp:951
 msgid "Screen Orientation\tHorizontal\n"
-msgstr ""
+msgstr "Orientación de la pantalla\tHorizontal\n"
 
 #: src/frontend/mame/ui/selgame.cpp:961
 msgid "Requires CHD\tYes\n"
-msgstr ""
+msgstr "Requiere CHD\tSi\n"
 
 #: src/frontend/mame/ui/selgame.cpp:961
 msgid "Requires CHD\tNo\n"
-msgstr ""
+msgstr "Requiere CHD\tNo\n"
 
 #: src/frontend/mame/ui/selgame.cpp:974
 msgid "ROM Audit Result\tOK\n"
-msgstr ""
+msgstr "Resultado de la auditoría de ROMs\tCORRECTA\n"
 
 #: src/frontend/mame/ui/selgame.cpp:976
 msgid "ROM Audit Result\tBAD\n"
-msgstr ""
+msgstr "Resultado de la auditoría de ROMs\tINCORRECTA\n"
 
 #: src/frontend/mame/ui/selgame.cpp:979
 msgid "Samples Audit Result\tNone Needed\n"
-msgstr ""
+msgstr "Resultado de la auditoría de muestras\tNo necesaria\n"
 
 #: src/frontend/mame/ui/selgame.cpp:981
 msgid "Samples Audit Result\tOK\n"
-msgstr ""
+msgstr "Resultado de la auditoría de muestras\tCORRECTA\n"
 
 #: src/frontend/mame/ui/selgame.cpp:983
 msgid "Samples Audit Result\tBAD\n"
-msgstr ""
+msgstr "Resultado de la auditoría de muestras\tINCORRECTA\n"
 
 #: src/frontend/mame/ui/selgame.cpp:987
 msgid ""
 "ROM Audit Disabled\t\n"
 "Samples Audit Disabled\t\n"
 msgstr ""
+"Auditoría de ROMs deshabilitada\t\n"
+"Auditoría de muestras deshabilitada\t\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1171
 #, c-format
@@ -2482,27 +2484,27 @@ msgstr "Ajustes"
 
 #: plugins/timer/init.lua:94
 msgid "Current time"
-msgstr ""
+msgstr "Tiempo actual"
 
 #: plugins/timer/init.lua:96
 msgid "Total time"
-msgstr ""
+msgstr "Tiempo total"
 
 #: plugins/timer/init.lua:98
 msgid "Play Count"
-msgstr ""
+msgstr "Contador de ejecuciones"
 
 #: plugins/timer/init.lua:106
 msgid "Timer"
-msgstr ""
+msgstr "Tiempo"
 
 #: plugins/cheat/init.lua:458
 msgid "Select cheat to set hotkey"
-msgstr ""
+msgstr "Selecciona truco para configurar la tecla-rápida"
 
 #: plugins/cheat/init.lua:464
 msgid "Press button for hotkey or wait to clear"
-msgstr ""
+msgstr "Pulsa la tecla-rápida o espera para borrar"
 
 #: plugins/cheat/init.lua:476
 msgid "None"
@@ -2510,40 +2512,40 @@ msgstr "Ninguno"
 
 #: plugins/cheat/init.lua:481
 msgid "Done"
-msgstr ""
+msgstr "Hecho"
 
 #: plugins/cheat/init.lua:495 plugins/cheat/init.lua:509
 msgid "Set"
-msgstr ""
+msgstr "Configurar"
 
 #: plugins/cheat/init.lua:528
 msgid "Set hotkeys"
-msgstr ""
+msgstr "Configurar teclas rápidas"
 
 #: plugins/cheat/init.lua:668
 #, lua-format
 msgid "Activated: %s = %s"
-msgstr ""
+msgstr "Activado: %s = %s"
 
 #: plugins/cheat/init.lua:671 plugins/cheat/init.lua:729
 #, lua-format
 msgid "Activated: %s"
-msgstr ""
+msgstr "Activado: %s"
 
 #: plugins/cheat/init.lua:733
 #, lua-format
 msgid "Enabled: %s"
-msgstr ""
+msgstr "Habilitado: %s"
 
 #: plugins/cheat/init.lua:738
 #, lua-format
 msgid "Disabled: %s"
-msgstr ""
+msgstr "Deshabilitado: %s"
 
 #: plugins/cheat/init.lua:776
 #, lua-format
 msgid "%s added"
-msgstr ""
+msgstr "%s añadido"
 
 #: plugins/data/data_command.lua:19
 msgid "Command"
@@ -2568,6 +2570,10 @@ msgid ""
 "--- DRIVER INFO ---\n"
 "Driver: "
 msgstr ""
+"\n"
+"\n"
+"--- INFORMACIÓN DEL CONTROLADOR ---\n"
+"Controlador: "
 
 #: plugins/data/data_mameinfo.lua:20
 msgid "MAMEinfo"
@@ -2591,204 +2597,206 @@ msgstr "Puntuación MARP"
 
 #: plugins/cheatfind/init.lua:344
 msgid "Save Cheat"
-msgstr ""
+msgstr "Guardar Truco"
 
 #: plugins/cheatfind/init.lua:347
 msgid "Default"
-msgstr ""
+msgstr "Por defecto"
 
 #: plugins/cheatfind/init.lua:347
 msgid "Custom"
-msgstr ""
+msgstr "Personalizado"
 
 #: plugins/cheatfind/init.lua:348
 msgid "Cheat Name"
-msgstr ""
+msgstr "Nombre del Truco"
 
 #: plugins/cheatfind/init.lua:354
 #, lua-format
 msgid "Default name is %s"
-msgstr ""
+msgstr "El nombre por defecto es %s"
 
 #: plugins/cheatfind/init.lua:362
 msgid "Player"
-msgstr ""
+msgstr "Jugador"
 
 #: plugins/cheatfind/init.lua:367
 msgid "Type"
-msgstr ""
+msgstr "Tipo"
 
 #: plugins/cheatfind/init.lua:373
 msgid "Save"
-msgstr ""
+msgstr "Guardar"
 
 #: plugins/cheatfind/init.lua:399
 #, lua-format
 msgid "Cheat written to %s and added to cheat.simple"
-msgstr ""
+msgstr "Truco escrito en %s y añadido a cheat.simple"
 
 #: plugins/cheatfind/init.lua:407
 msgid "Cheat added to cheat.simple"
-msgstr ""
+msgstr "Truco añadido a cheat.simple"
 
 #: plugins/cheatfind/init.lua:412
 msgid ""
 "Unable to write file\n"
 "Ensure that cheatpath folder exists"
 msgstr ""
+"No se ha podido escribir el fichero\n"
+"Asegúrese de que existe la ruta de la carpeta cheatpath"
 
 #: plugins/cheatfind/init.lua:421
 msgid "Cancel"
-msgstr ""
+msgstr "Cancelar"
 
 #: plugins/cheatfind/init.lua:426
 msgid "CPU or RAM"
-msgstr ""
+msgstr "Procesador o Memoria RAM"
 
 #: plugins/cheatfind/init.lua:430
 msgid "Changes to this only take effect when \"Start new search\" is selected"
-msgstr ""
+msgstr "Los cambios solo tendrán efecto cuando se seleccione \"Comenzar nueva búsqueda\""
 
 #: plugins/cheatfind/init.lua:449
 msgid "Data cleared and current state saved"
-msgstr ""
+msgstr "Datos borrados y estado actual guardado"
 
 #: plugins/cheatfind/init.lua:457
 msgid "Start new search"
-msgstr ""
+msgstr "Comenzar nueva búsqueda"
 
 #: plugins/cheatfind/init.lua:467
 msgid "Current state saved"
-msgstr ""
+msgstr "Estado actual guardado"
 
 #: plugins/cheatfind/init.lua:474
 msgid "Save current -- #"
-msgstr ""
+msgstr "Guardar actual -- #"
 
 #: plugins/cheatfind/init.lua:506
 msgid " total matches found"
-msgstr ""
+msgstr " elementos encontrados"
 
 #: plugins/cheatfind/init.lua:513
 msgid "Compare"
-msgstr ""
+msgstr "Comparar"
 
 #: plugins/cheatfind/init.lua:516
 msgid "Left operand"
-msgstr ""
+msgstr "Operando izquierdo"
 
 #: plugins/cheatfind/init.lua:519
 msgid "Current"
-msgstr ""
+msgstr "Actual"
 
 #: plugins/cheatfind/init.lua:524
 msgid "Operator"
-msgstr ""
+msgstr "Operador"
 
 #: plugins/cheatfind/init.lua:531
 msgid "Left less than right, value is difference"
-msgstr ""
+msgstr "Izquierdo menor que derecho, el valor es la diferencia"
 
 #: plugins/cheatfind/init.lua:533
 msgid "Left greater than right, value is difference"
-msgstr ""
+msgstr "Izquierdo mayor que derecho, el valor es la diferencia"
 
 #: plugins/cheatfind/init.lua:535
 msgid "Left equal to right"
-msgstr ""
+msgstr "Izquierdo igual que derecho"
 
 #: plugins/cheatfind/init.lua:537
 msgid "Left not equal to right, value is difference"
-msgstr ""
+msgstr "Izquierdo distinto que derecho, el valor es la diferencia"
 
 #: plugins/cheatfind/init.lua:539
 msgid "Left equal to right with bitmask"
-msgstr ""
+msgstr "Izquierdo igual que derecho con máscara de bits"
 
 #: plugins/cheatfind/init.lua:541
 msgid "Left not equal to right with bitmask"
-msgstr ""
+msgstr "Izquierdo distinto que derecho con máscara de bits"
 
 #: plugins/cheatfind/init.lua:543
 msgid "Left less than value"
-msgstr ""
+msgstr "Izquierdo menor que el valor"
 
 #: plugins/cheatfind/init.lua:545
 msgid "Left greater than value"
-msgstr ""
+msgstr "Izquierdo mayor que el valor"
 
 #: plugins/cheatfind/init.lua:547
 msgid "Left equal to value"
-msgstr ""
+msgstr "Izquierdo igual que el valor"
 
 #: plugins/cheatfind/init.lua:549
 msgid "Left not equal to value"
-msgstr ""
+msgstr "Izquierdo distinto que el valor"
 
 #: plugins/cheatfind/init.lua:560
 msgid "Right operand"
-msgstr ""
+msgstr "Operador derecho"
 
 #: plugins/cheatfind/init.lua:568
 msgid "Value"
-msgstr ""
+msgstr "Valor"
 
 #: plugins/cheatfind/init.lua:572
 msgid "Any"
-msgstr ""
+msgstr "Cualquiera"
 
 #: plugins/cheatfind/init.lua:578
 msgid "Data Format"
-msgstr ""
+msgstr "Formato de los datos"
 
 #: plugins/cheatfind/init.lua:602
 msgid "Undo last search -- #"
-msgstr ""
+msgstr "Deshacer última búsqueda -- #"
 
 #: plugins/cheatfind/init.lua:606
 msgid "Match block"
-msgstr ""
+msgstr "Coincidir bloque"
 
 #: plugins/cheatfind/init.lua:609
 msgid "All"
-msgstr ""
+msgstr "Todo"
 
 #: plugins/cheatfind/init.lua:660
 #, lua-format
 msgid "Test cheat at addr %08X"
-msgstr ""
+msgstr "Probar truco en la dirección %08X"
 
 #: plugins/cheatfind/init.lua:692
 msgid "Cheat engine not available"
-msgstr ""
+msgstr "Motor de trucos no disponible"
 
 #: plugins/cheatfind/init.lua:718
 msgid "Default name is "
-msgstr ""
+msgstr "El nombre por defecto es "
 
 #: plugins/cheatfind/init.lua:741
 msgid "Test"
-msgstr ""
+msgstr "Probar"
 
 #: plugins/cheatfind/init.lua:741
 msgid "Write"
-msgstr ""
+msgstr "Escribir"
 
 #: plugins/cheatfind/init.lua:741
 msgid "Watch"
-msgstr ""
+msgstr "Inspeccionar"
 
 #: plugins/cheatfind/init.lua:758
 msgid "Page"
-msgstr ""
+msgstr "Página"
 
 #: plugins/cheatfind/init.lua:776
 msgid "Clear Watches"
-msgstr ""
+msgstr "Limpiar inspecciones"
 
 #: plugins/cheatfind/init.lua:786
 msgid "Cheat Finder"
-msgstr ""
+msgstr "Buscador de Trucos"
 
 #~ msgid "Mechanical Machine\t%1$s\n"
 #~ msgstr "Máquina mecánica\t%1$s\n"

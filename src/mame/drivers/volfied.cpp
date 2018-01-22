@@ -72,7 +72,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, volfied_state )
 	AM_RANGE(0x100000, 0x103fff) AM_RAM     /* main    */
 	AM_RANGE(0x200000, 0x203fff) AM_DEVREADWRITE("pc090oj", pc090oj_device, word_r, word_w)
 	AM_RANGE(0x400000, 0x47ffff) AM_READWRITE(video_ram_r, video_ram_w)
-	AM_RANGE(0x500000, 0x503fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x500000, 0x503fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x600000, 0x600001) AM_WRITE(video_mask_w)
 	AM_RANGE(0x700000, 0x700001) AM_WRITE(sprite_ctrl_w)
 	AM_RANGE(0xd00000, 0xd00001) AM_READWRITE(video_ctrl_r, video_ctrl_w)
@@ -219,7 +219,7 @@ void volfied_state::machine_reset()
 	cchip_reset();
 }
 
-static MACHINE_CONFIG_START( volfied )
+MACHINE_CONFIG_START(volfied_state::volfied)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, CPU_CLOCK)   /* 8MHz */

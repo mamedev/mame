@@ -9,7 +9,6 @@ Undumped games, based on http://www.acorn-gaming.org.uk/index.php3?p=Database/
 
 3D Construction Kit by Domark
 Abuse by R-Comp Interactive (RiscPC & StrongARM)
-Alps by Alpine Software (RiscOS2 & 3)
 Ankh by Artex Software (RiscOS3+)
 Arcade 3 by Clares Micro Supplies (??)
 Arcade Soccer by 4th Dimension (RiscOS2)
@@ -363,6 +362,17 @@ Zelanites: The Onslaught by Micro Power (RiscOS2)
 			<feature name="part_id" value="Disc 8"/>
 			<dataarea name="flop" size="819200">
 				<rom name="Alone In The Dark (1995)(Krisalis)(Disk 8 of 8).adf" size="819200" crc="5ae4d49c" sha1="cbf5f42a59a9b76db2e82c72edc4d584cfce01a9" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="alps">
+		<description>ALPS - Adventure Language Programming System</description>
+		<year>1994</year>
+		<publisher>Alpine Software</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="819200">
+				<rom name="ALPS (1994)(Alpine Software).adf" size="819200" crc="70410b68" sha1="6758b80917b92b5fb907d37b19d7fc089ceac048" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -3890,8 +3900,20 @@ Zelanites: The Onslaught by Micro Power (RiscOS2)
 		</part>
 	</software>
 
+	<software name="euclid206" cloneof="euclid">
+		<description>Euclid v2.06</description>
+		<year>1988</year>
+		<publisher>Ace Computing</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Euclid"/>
+			<dataarea name="flop" size="819200">
+				<rom name="Euclid (1988)(Ace Computing).adf" size="819200" crc="522d6279" sha1="55fa6b28b457258c02977c9c77a55467eaf18e0a" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="euclid">
-		<description>Euclid</description>
+		<description>Euclid v2.19</description>
 		<year>1989</year>
 		<publisher>Ace Computing</publisher>
 		<part name="flop1" interface="floppy_3_5">
@@ -5025,6 +5047,17 @@ Zelanites: The Onslaught by Micro Power (RiscOS2)
 
 	<!-- Hardware -->
 
+	<software name="apecutils">
+		<description>APEC Utils Disc v1.3</description>
+		<year>1992</year>
+		<publisher>Atomwide Ltd</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="819200">
+				<rom name="APEC Utils Disk V1.3 (Atomwide Ltd).adf" size="819200" crc="0439f587" sha1="fc0046592e0628ca9b30fe81b2a51c071e7abe31" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="scsiutils">
 		<description>SCSI Support Disc</description>
 		<year>1992</year>
@@ -5032,6 +5065,17 @@ Zelanites: The Onslaught by Micro Power (RiscOS2)
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="819200">
 				<rom name="A3000 SCSI support disc(Morley).adf" size="819200" crc="17175efb" sha1="9e105b3bbbc8c3cc3a62087d8f70079b96f3ed52" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="whdutils">
+		<description>Archimedes Hard Disc Utilities Disc</description>
+		<year>1998</year>
+		<publisher>Watford Electronics</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="655360">
+				<rom name="Archimedes Hard Disc Utilities Disc (Watford Electronics).adf" size="655360" crc="adc811ff" sha1="b54c7473003b0280453f2057507917896f1362a2" offset="0"/>
 			</dataarea>
 		</part>
 	</software>

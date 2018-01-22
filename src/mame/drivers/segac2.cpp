@@ -213,6 +213,8 @@ public:
 	int prot_func_pclubjv2(int in);
 	int prot_func_pclubjv4(int in);
 	int prot_func_pclubjv5(int in);
+	void segac2(machine_config &config);
+	void segac(machine_config &config);
 };
 
 
@@ -449,10 +451,10 @@ WRITE8_MEMBER(segac2_state::io_portd_w)
 	 D1 : To CN1 pin J. (Coin meter 2)
 	 D0 : To CN1 pin 8. (Coin meter 1)
 	*/
-	//space.machine().bookkeeping().coin_lockout_w(1, data & 0x08);
-	//space.machine().bookkeeping().coin_lockout_w(0, data & 0x04);
-	space.machine().bookkeeping().coin_counter_w(1, data & 0x02);
-	space.machine().bookkeeping().coin_counter_w(0, data & 0x01);
+	//machine().bookkeeping().coin_lockout_w(1, data & 0x08);
+	//machine().bookkeeping().coin_lockout_w(0, data & 0x04);
+	machine().bookkeeping().coin_counter_w(1, data & 0x02);
+	machine().bookkeeping().coin_counter_w(0, data & 0x01);
 }
 
 WRITE8_MEMBER(segac2_state::io_porth_w)
@@ -497,7 +499,7 @@ WRITE8_MEMBER(segac2_state::control_w)
 	data &= 0x0f;
 
 	/* bit 0 controls display enable */
-	//segac2_enable_display(space.machine(), ~data & 1);
+	//segac2_enable_display(machine(), ~data & 1);
 	m_segac2_enable_display = ~data & 1;
 
 	/* bit 1 resets the protection */
@@ -526,7 +528,7 @@ WRITE8_MEMBER(segac2_state::control_w)
 /* protection chip reads */
 READ8_MEMBER(segac2_state::prot_r)
 {
-	if (LOG_PROTECTION) logerror("%06X:protection r=%02X\n", space.device().safe_pcbase(), m_prot_read_buf);
+	if (LOG_PROTECTION) logerror("%06X:protection r=%02X\n", m_maincpu->pcbase(), m_prot_read_buf);
 	return m_prot_read_buf | 0xf0;
 }
 
@@ -546,7 +548,7 @@ WRITE8_MEMBER(segac2_state::prot_w)
 
 	/* determine the value to return, should a read occur */
 	m_prot_read_buf = m_prot_func(table_index);
-	if (LOG_PROTECTION) logerror("%06X:protection w=%02X, new result=%02X\n", space.device().safe_pcbase(), data & 0x0f, m_prot_read_buf);
+	if (LOG_PROTECTION) logerror("%06X:protection w=%02X, new result=%02X\n", m_maincpu->pcbase(), data & 0x0f, m_prot_read_buf);
 
 	/* if the palette changed, force an update */
 	if (new_sp_palbase != m_sp_palbase || new_bg_palbase != m_bg_palbase)
@@ -587,8 +589,8 @@ WRITE8_MEMBER(segac2_state::counter_timer_w)
 			break;
 
 		case 0x10:  /* coin counter */
-//          space.machine().bookkeeping().coin_counter_w(0,1);
-//          space.machine().bookkeeping().coin_counter_w(0,0);
+//          machine().bookkeeping().coin_counter_w(0,1);
+//          machine().bookkeeping().coin_counter_w(0,0);
 			break;
 
 		case 0x12:  /* set coinage info -- followed by two 4-bit values */
@@ -1533,7 +1535,7 @@ WRITE_LINE_MEMBER(segac2_state::vdp_lv4irqline_callback_c2)
 }
 
 
-static MACHINE_CONFIG_START( segac )
+MACHINE_CONFIG_START(segac2_state::segac)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XL2_CLOCK/6)
@@ -1589,7 +1591,7 @@ static MACHINE_CONFIG_START( segac )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( segac2, segac )
+MACHINE_CONFIG_DERIVED(segac2_state::segac2, segac)
 
 	/* basic machine hardware */
 	MCFG_DEVICE_MODIFY("io")
@@ -2559,7 +2561,7 @@ GAME( 1994, tantrbl3,  tantr,    segac,  ichir, segac2_state,    tantr,    ROT0,
 GAME( 1992, wwmarine,   0,       segac2, wwmarine, segac2_state, bloxeedc, ROT0,   "Sega", "Waku Waku Marine", 0 )
 
 // not really sure how this should hook up, things like the 'sold out' flags could be mechanical sensors, or from another MCU / CPU board in the actual popcorn part of the machine?
-GAME( 199?, anpanman,   0,       segac2, anpanman, segac2_state, bloxeedc, ROT0,   "Sega", "Soreike! Anpanman Popcorn Factory (Rev B)", MACHINE_MECHANICAL ) // 'Mechanical' part isn't emulated
+GAME( 1992, anpanman,   0,       segac2, anpanman, segac2_state, bloxeedc, ROT0,   "Sega", "Soreike! Anpanman Popcorn Factory (Rev B)", MACHINE_MECHANICAL ) // 'Mechanical' part isn't emulated
 GAME( 1993, sonicpop,   0,       segac2, sonicpop, segac2_state, bloxeedc, ROT0,   "Sega", "SegaSonic Popcorn Shop (Rev B)", MACHINE_MECHANICAL ) // region DSW for USA / Export / Japan, still speaks Japanese tho.  'Mechanical' part isn't emulated
 
 GAME( 1993, sonicfgt,  0,        segac2, systemc_generic, segac2_state, bloxeedc, ROT0,   "Sega", "Sega Sonic Cosmo Fighter", 0 )

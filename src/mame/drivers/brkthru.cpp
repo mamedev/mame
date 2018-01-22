@@ -370,7 +370,7 @@ INTERRUPT_GEN_MEMBER(brkthru_state::vblank_irq)
 		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
-static MACHINE_CONFIG_START( brkthru )
+MACHINE_CONFIG_START(brkthru_state::brkthru)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6809, MASTER_CLOCK/8)        /* 1.5 MHz ? */
@@ -411,7 +411,7 @@ static MACHINE_CONFIG_START( brkthru )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( darwin )
+MACHINE_CONFIG_START(brkthru_state::darwin)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6809, MASTER_CLOCK/8)        /* 1.5 MHz ? */

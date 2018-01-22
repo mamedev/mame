@@ -873,7 +873,7 @@ GFXDECODE_END
 
 ***************************************************************************/
 
-static MACHINE_CONFIG_START( perfrman )
+MACHINE_CONFIG_START(slapfght_state::perfrman)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_16MHz/4) // 4MHz? XTAL is known, divider is guessed
@@ -924,7 +924,7 @@ static MACHINE_CONFIG_START( perfrman )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( tigerh )
+MACHINE_CONFIG_START(slapfght_state::tigerh)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_36MHz/6) // 6MHz
@@ -975,7 +975,7 @@ static MACHINE_CONFIG_START( tigerh )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( tigerhb1, tigerh )
+MACHINE_CONFIG_DERIVED(slapfght_state::tigerhb1, tigerh)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -985,7 +985,7 @@ static MACHINE_CONFIG_DERIVED( tigerhb1, tigerh )
 	MCFG_DEVICE_REMOVE("bmcu")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( tigerhb2, tigerhb1 )
+MACHINE_CONFIG_DERIVED(slapfght_state::tigerhb2, tigerhb1)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -993,7 +993,7 @@ static MACHINE_CONFIG_DERIVED( tigerhb2, tigerhb1 )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( slapfigh )
+MACHINE_CONFIG_START(slapfght_state::slapfigh)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80, XTAL_36MHz/6) // 6MHz
@@ -1046,7 +1046,7 @@ static MACHINE_CONFIG_START( slapfigh )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( slapfighb1, slapfigh )
+MACHINE_CONFIG_DERIVED(slapfght_state::slapfighb1, slapfigh)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1056,21 +1056,21 @@ static MACHINE_CONFIG_DERIVED( slapfighb1, slapfigh )
 	MCFG_DEVICE_REMOVE("bmcu")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( slapfighb2, slapfighb1 )
+MACHINE_CONFIG_DERIVED(slapfght_state::slapfighb2, slapfighb1)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(slapfighb2_map)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( getstarb1, slapfighb1 )
+MACHINE_CONFIG_DERIVED(slapfght_state::getstarb1, slapfighb1)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(getstarb1_io_map)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( getstarb2, slapfighb1 )
+MACHINE_CONFIG_DERIVED(slapfght_state::getstarb2, slapfighb1)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")

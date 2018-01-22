@@ -133,6 +133,7 @@ public:
 	IRQ_CALLBACK_MEMBER(neocd_int_callback);
 
 	std::unique_ptr<uint8_t[]> m_meminternal_data;
+	void neocd(machine_config &config);
 protected:
 
 	int32_t SekIdle(int32_t nCycles);
@@ -282,7 +283,7 @@ WRITE16_MEMBER(ngcd_state::neocd_control_w)
 		case 0x0126:
 //          bprintf(PRINT_NORMAL, _T("  - NGCD Z80 BUSREQ -> 1 (PC: 0x%06X)\n"), SekGetPC(-1));
 			m_has_z80_bus = false;
-			space.machine().scheduler().synchronize();
+			machine().scheduler().synchronize();
 			m_audiocpu->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
 			break;
 		case 0x0128:
@@ -301,7 +302,7 @@ WRITE16_MEMBER(ngcd_state::neocd_control_w)
 		case 0x0146:
 //          bprintf(PRINT_NORMAL, _T("  - NGCD Z80 BUSREQ -> 0 (PC: 0x%06X)\n"), SekGetPC(-1));
 			m_has_z80_bus = true;
-			space.machine().scheduler().synchronize();
+			machine().scheduler().synchronize();
 			m_audiocpu->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
 			break;
 		case 0x0148:
@@ -1037,7 +1038,7 @@ uint32_t ngcd_state::screen_update_neocd(screen_device &screen, bitmap_rgb32 &bi
 }
 
 
-static MACHINE_CONFIG_DERIVED( neocd, neogeo_base )
+MACHINE_CONFIG_DERIVED(ngcd_state::neocd, neogeo_base)
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(neocd_main_map)
@@ -1083,10 +1084,12 @@ MACHINE_CONFIG_END
 
 ROM_START( neocd )
 	ROM_REGION16_BE( 0x80000, "mainbios", 0 )
-	ROM_SYSTEM_BIOS( 0, "top",   "Top loading NeoGeo CD" )
+	ROM_SYSTEM_BIOS( 0, "top",   "Top loading Neo-Geo CD" )
 	ROMX_LOAD( "top-sp1.bin",    0x00000, 0x80000, CRC(c36a47c0) SHA1(235f4d1d74364415910f73c10ae5482d90b4274f), ROM_GROUPWORD | ROM_REVERSE | ROM_BIOS(1))
-	ROM_SYSTEM_BIOS( 1, "front",   "Front loading NeoGeo CD" )
+	ROM_SYSTEM_BIOS( 1, "front",   "Front loading Neo-Geo CD" )
 	ROMX_LOAD( "front-sp1.bin",    0x00000, 0x80000, CRC(cac62307) SHA1(53bc1f283cdf00fa2efbb79f2e36d4c8038d743a), ROM_GROUPWORD | ROM_REVERSE | ROM_BIOS(2))
+	ROM_SYSTEM_BIOS( 2, "unibios32", "Universe Bios (Hack, Ver. 3.2)" )
+	ROMX_LOAD( "uni-bioscd.rom",    0x00000, 0x80000, CRC(0ffb3127) SHA1(5158b728e62b391fb69493743dcf7abbc62abc82), ROM_GROUPWORD | ROM_REVERSE | ROM_BIOS(3))
 
 	ROM_REGION( 0x100000, "ymsnd", ROMREGION_ERASEFF )
 	/* 1MB of Sound RAM */
@@ -1109,7 +1112,10 @@ ROM_END
 
 ROM_START( neocdz )
 	ROM_REGION16_BE( 0x80000, "mainbios", 0 )
-	ROM_LOAD16_WORD_SWAP( "neocd.bin",    0x00000, 0x80000, CRC(df9de490) SHA1(7bb26d1e5d1e930515219cb18bcde5b7b23e2eda) )
+	ROM_SYSTEM_BIOS( 0, "official",   "Official BIOS" )
+	ROMX_LOAD( "neocd.bin",    0x00000, 0x80000, CRC(df9de490) SHA1(7bb26d1e5d1e930515219cb18bcde5b7b23e2eda), ROM_GROUPWORD | ROM_REVERSE | ROM_BIOS(1))
+	ROM_SYSTEM_BIOS( 1, "unibios32", "Universe Bios (Hack, Ver. 3.2)" )
+	ROMX_LOAD( "uni-bioscd.rom",    0x00000, 0x80000, CRC(0ffb3127) SHA1(5158b728e62b391fb69493743dcf7abbc62abc82), ROM_GROUPWORD | ROM_REVERSE | ROM_BIOS(2))
 
 	ROM_REGION( 0x100000, "ymsnd", ROMREGION_ERASEFF )
 	/* 1MB of Sound RAM */

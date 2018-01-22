@@ -94,9 +94,9 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_deco_tilegen1(*this, "tilegen1"),
-		m_deco104(*this, "ioprot104"),
+		m_deco104(*this, "ioprot"),
 		m_sprgen(*this, "spritegen"),
-		m_soundlatch(*this, "soundlatch")
+		m_soundlatch_pending(false)
 	{ }
 
 	/* memory pointers */
@@ -111,20 +111,21 @@ public:
 	required_device<deco16ic_device> m_deco_tilegen1;
 	required_device<deco104_device> m_deco104;
 	required_device<decospr_device> m_sprgen;
-	required_device<generic_latch_8_device> m_soundlatch;
 
 	DECLARE_READ8_MEMBER(irq_latch_r);
+	DECLARE_WRITE_LINE_MEMBER(soundlatch_irq_w);
 	DECLARE_DRIVER_INIT(dblewing);
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
 	uint32_t screen_update_dblewing(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	DECO16IC_BANK_CB_MEMBER(bank_callback);
 	DECOSPR_PRIORITY_CB_MEMBER(pri_callback);
-	void dblewing_sound_cb( address_space &space, uint16_t data, uint16_t mem_mask );
 
 	READ16_MEMBER( wf_protection_region_0_104_r );
 	WRITE16_MEMBER( wf_protection_region_0_104_w );
+
+	void dblewing(machine_config &config);
+private:
+	bool m_soundlatch_pending;
 };
 
 
@@ -148,7 +149,7 @@ uint32_t dblewing_state::screen_update_dblewing(screen_device &screen, bitmap_in
 READ16_MEMBER( dblewing_state::wf_protection_region_0_104_r )
 {
 	int real_address = 0 + (offset *2);
-	int deco146_addr = BITSWAP32(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14,    10,9,8, 7,6,5,4, 3,2,1,0) & 0x7fff;
+	int deco146_addr = bitswap<32>(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14,    10,9,8, 7,6,5,4, 3,2,1,0) & 0x7fff;
 	uint8_t cs = 0;
 	uint16_t data = m_deco104->read_data( deco146_addr, mem_mask, cs );
 	return data;
@@ -157,11 +158,15 @@ READ16_MEMBER( dblewing_state::wf_protection_region_0_104_r )
 WRITE16_MEMBER( dblewing_state::wf_protection_region_0_104_w )
 {
 	int real_address = 0 + (offset *2);
-	int deco146_addr = BITSWAP32(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14,    10,9,8, 7,6,5,4, 3,2,1,0) & 0x7fff;
+	int deco146_addr = bitswap<32>(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14,    10,9,8, 7,6,5,4, 3,2,1,0) & 0x7fff;
 	uint8_t cs = 0;
 	m_deco104->write_data( space, deco146_addr, data, mem_mask, cs );
 }
 
+WRITE_LINE_MEMBER( dblewing_state::soundlatch_irq_w )
+{
+	m_soundlatch_pending = bool(state);
+}
 
 static ADDRESS_MAP_START( dblewing_map, AS_PROGRAM, 16, dblewing_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
@@ -179,7 +184,7 @@ static ADDRESS_MAP_START( dblewing_map, AS_PROGRAM, 16, dblewing_state )
 	AM_RANGE(0x288000, 0x288001) AM_RAM
 	AM_RANGE(0x28c000, 0x28c00f) AM_RAM_DEVWRITE("tilegen1", deco16ic_device, pf_control_w)
 	AM_RANGE(0x300000, 0x3007ff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x320000, 0x3207ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x320000, 0x3207ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0xff0000, 0xff3fff) AM_MIRROR(0xc000) AM_RAM
 ADDRESS_MAP_END
 
@@ -189,7 +194,8 @@ ADDRESS_MAP_END
 
 READ8_MEMBER(dblewing_state::irq_latch_r)
 {
-	return m_soundlatch->pending_r() ? 0 : 1;
+	// bit 0: irq type (0 = latch, 1 = ym)
+	return m_soundlatch_pending ? 0 : 1;
 }
 
 static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, dblewing_state )
@@ -197,7 +203,7 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, dblewing_state )
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0xa000, 0xa001) AM_DEVREADWRITE("ymsnd", ym2151_device, status_r, write)
 	AM_RANGE(0xb000, 0xb000) AM_DEVREADWRITE("oki", okim6295_device, read, write)
-	AM_RANGE(0xc000, 0xc000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
+	AM_RANGE(0xc000, 0xc000) AM_DEVREAD("ioprot", deco104_device, soundlatch_r)
 	AM_RANGE(0xd000, 0xd000) AM_READ(irq_latch_r) //timing? sound latch?
 	AM_RANGE(0xf000, 0xf000) AM_DEVREADWRITE("oki", okim6295_device, read, write)
 ADDRESS_MAP_END
@@ -334,21 +340,7 @@ DECOSPR_PRIORITY_CB_MEMBER(dblewing_state::pri_callback)
 	return 0; // sprites always on top?
 }
 
-
-void dblewing_state::machine_start()
-{
-}
-
-void dblewing_state::machine_reset()
-{
-}
-
-void dblewing_state::dblewing_sound_cb( address_space &space, uint16_t data, uint16_t mem_mask )
-{
-	m_soundlatch->write(space, 0, data & 0xff);
-}
-
-static MACHINE_CONFIG_START( dblewing )
+MACHINE_CONFIG_START(dblewing_state::dblewing)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_28MHz/2)   /* DE102 */
@@ -399,22 +391,20 @@ static MACHINE_CONFIG_START( dblewing )
 	MCFG_DECO_SPRITE_PRIORITY_CB(dblewing_state, pri_callback)
 	MCFG_DECO_SPRITE_GFXDECODE("gfxdecode")
 
-	MCFG_DECO104_ADD("ioprot104")
+	MCFG_DECO104_ADD("ioprot")
 	MCFG_DECO146_IN_PORTA_CB(IOPORT("INPUTS"))
 	MCFG_DECO146_IN_PORTB_CB(IOPORT("SYSTEM"))
 	MCFG_DECO146_IN_PORTC_CB(IOPORT("DSW"))
 	MCFG_DECO146_SET_INTERFACE_SCRAMBLE_INTERLEAVE
 	MCFG_DECO146_SET_USE_MAGIC_ADDRESS_XOR
-	MCFG_DECO146_SET_SOUNDLATCH_CALLBACK(dblewing_state, dblewing_sound_cb)
+	MCFG_DECO146_SOUNDLATCH_IRQ_CB(WRITELINE(dblewing_state, soundlatch_irq_w))
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("soundirq", input_merger_device, in_w<0>))
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(DEVWRITELINE("soundirq", input_merger_device, in_w<1>))
-
 	MCFG_YM2151_ADD("ymsnd", XTAL_32_22MHz/9)
-	MCFG_YM2151_IRQ_HANDLER(DEVWRITELINE("soundirq", input_merger_device, in_w<0>))
+	MCFG_YM2151_IRQ_HANDLER(DEVWRITELINE("soundirq", input_merger_device, in_w<1>))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	MCFG_OKIM6295_ADD("oki", XTAL_28MHz/28, PIN7_HIGH)
@@ -450,6 +440,8 @@ DRIVER_INIT_MEMBER(dblewing_state,dblewing)
 {
 	deco56_decrypt_gfx(machine(), "gfx1");
 	deco102_decrypt_cpu((uint16_t *)memregion("maincpu")->base(), m_decrypted_opcodes, 0x80000, 0x399d, 0x25, 0x3d);
+
+	save_item(NAME(m_soundlatch_pending));
 }
 
 

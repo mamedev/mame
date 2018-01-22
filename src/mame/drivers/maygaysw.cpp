@@ -109,6 +109,7 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu") { }
 	required_device<cpu_device> m_maincpu;
+	void maygayew(machine_config &config);
 };
 
 
@@ -125,7 +126,7 @@ static INPUT_PORTS_START( maygayew )
 INPUT_PORTS_END
 
 
-static MACHINE_CONFIG_START( maygayew )
+MACHINE_CONFIG_START(maygayew_state::maygayew)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000,8000000) // MC68306FC16 - standard 68000 core + peripherals

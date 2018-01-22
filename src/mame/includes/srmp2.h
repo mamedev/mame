@@ -74,4 +74,8 @@ public:
 	SETA001_SPRITE_GFXBANK_CB_MEMBER(srmp3_gfxbank_callback);
 
 	uint8_t iox_key_matrix_calc(uint8_t p_side);
+	void mjyuugi(machine_config &config);
+	void srmp2(machine_config &config);
+	void rmgoldyh(machine_config &config);
+	void srmp3(machine_config &config);
 };

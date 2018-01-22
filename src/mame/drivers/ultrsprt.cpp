@@ -52,6 +52,7 @@ public:
 
 	uint32_t screen_update_ultrsprt(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
+	void ultrsprt(machine_config &config);
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -154,7 +155,7 @@ static ADDRESS_MAP_START( ultrsprt_map, AS_PROGRAM, 32, ultrsprt_state )
 	AM_RANGE(0x700000c0, 0x700000cf) AM_WRITENOP // Written following DMA interrupt - unused int ack?
 	AM_RANGE(0x700000e0, 0x700000e3) AM_WRITE(int_ack_w)
 	AM_RANGE(0x7f000000, 0x7f01ffff) AM_RAM AM_SHARE("workram")
-	AM_RANGE(0x7f700000, 0x7f703fff) AM_RAM_DEVWRITE("palette",  palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x7f700000, 0x7f703fff) AM_RAM_DEVWRITE("palette",  palette_device, write32) AM_SHARE("palette")
 	AM_RANGE(0x7f800000, 0x7f9fffff) AM_MIRROR(0x00600000) AM_ROM AM_REGION("program", 0)
 ADDRESS_MAP_END
 
@@ -229,7 +230,7 @@ void ultrsprt_state::machine_reset()
 
 /*****************************************************************************/
 
-static MACHINE_CONFIG_START( ultrsprt )
+MACHINE_CONFIG_START(ultrsprt_state::ultrsprt)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", PPC403GA, 25000000)
 	MCFG_CPU_PROGRAM_MAP(ultrsprt_map)

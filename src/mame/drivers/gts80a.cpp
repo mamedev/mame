@@ -39,6 +39,9 @@ public:
 	DECLARE_WRITE8_MEMBER(port2b_w);
 	DECLARE_WRITE8_MEMBER(port3a_w);
 	DECLARE_WRITE8_MEMBER(port3b_w);
+	void gts80a(machine_config &config);
+	void gts80a_s(machine_config &config);
+	void gts80a_ss(machine_config &config);
 private:
 	uint8_t m_port2;
 	uint8_t m_segment;
@@ -286,7 +289,7 @@ WRITE8_MEMBER( gts80a_state::port2a_w )
 	m_port2 = data;
 	static const uint8_t patterns[16] = { 0x3f,0x06,0x5b,0x4f,0x66,0x6d,0x7c,0x07,0x7f,0x67,0x58,0x4c,0x62,0x69,0x78,0 }; // 7448
 	uint16_t seg1 = (uint16_t)patterns[m_segment & 15];
-	uint16_t seg2 = BITSWAP16(seg1, 8, 8, 8, 8, 8, 8, 7, 7, 6, 6, 5, 4, 3, 2, 1, 0);
+	uint16_t seg2 = bitswap<16>(seg1, 8, 8, 8, 8, 8, 8, 7, 7, 6, 6, 5, 4, 3, 2, 1, 0);
 	switch (data & 0x70)
 	{
 		case 0x10: // player 1&2
@@ -335,7 +338,7 @@ DRIVER_INIT_MEMBER( gts80a_state, gts80a )
 }
 
 /* with Sound Board */
-static MACHINE_CONFIG_START( gts80a )
+MACHINE_CONFIG_START(gts80a_state::gts80a)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, XTAL_3_579545MHz/4)
 	MCFG_CPU_PROGRAM_MAP(gts80a_map)
@@ -370,12 +373,12 @@ static MACHINE_CONFIG_START( gts80a )
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( gts80a_s, gts80a )
+MACHINE_CONFIG_DERIVED(gts80a_state::gts80a_s, gts80a)
 	MCFG_SOUND_ADD("r0sound", GOTTLIEB_SOUND_REV0, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( gts80a_ss, gts80a )
+MACHINE_CONFIG_DERIVED(gts80a_state::gts80a_ss, gts80a)
 	MCFG_SOUND_ADD("r1sound", GOTTLIEB_SOUND_REV1, 0)
 	//MCFG_SOUND_ADD("r1sound", GOTTLIEB_SOUND_REV1_WITH_VOTRAX, 0)  // votrax crashes
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
@@ -396,6 +399,7 @@ public:
 
 	uint32_t screen_update_caveman(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
+	void caveman(machine_config &config);
 private:
 	required_device<cpu_device> m_videocpu;
 	required_shared_ptr<uint8_t> m_vram;
@@ -441,7 +445,7 @@ static ADDRESS_MAP_START( video_io_map, AS_IO, 8, caveman_state )
 
 ADDRESS_MAP_END
 
-static MACHINE_CONFIG_DERIVED( caveman, gts80a_ss )
+MACHINE_CONFIG_DERIVED(caveman_state::caveman, gts80a_ss)
 	MCFG_CPU_ADD("video_cpu", I8088, 5000000)
 	MCFG_CPU_PROGRAM_MAP(video_map)
 	MCFG_CPU_IO_MAP(video_io_map)

@@ -101,6 +101,7 @@ public:
 	uint32_t screen_update_vvillage(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
+	void vvillage(machine_config &config);
 };
 
 
@@ -321,7 +322,7 @@ PALETTE_INIT_MEMBER(caswin_state, caswin)
 }
 
 
-static MACHINE_CONFIG_START( vvillage )
+MACHINE_CONFIG_START(caswin_state::vvillage)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80,4000000)         /* ? MHz */
 	MCFG_CPU_PROGRAM_MAP(vvillage_mem)

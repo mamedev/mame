@@ -274,6 +274,7 @@ public:
 
 	DECLARE_DRIVER_INIT(ecoinf3);
 	DECLARE_DRIVER_INIT(ecoinf3_swap);
+	void ecoinf3_pyramid(machine_config &config);
 };
 
 
@@ -351,7 +352,7 @@ static const uint16_t ecoin_charset[]=
 
 static uint32_t set_display(uint32_t segin)
 {
-	return BITSWAP32(segin, 31,30,29,28,27,26,25,24,23,22,21,20,19,18,17,16,11,9,15,13,12,8,10,14,7,6,5,4,3,2,1,0);
+	return bitswap<32>(segin, 31,30,29,28,27,26,25,24,23,22,21,20,19,18,17,16,11,9,15,13,12,8,10,14,7,6,5,4,3,2,1,0);
 }
 
 void ecoinf3_state::update_display()
@@ -660,7 +661,7 @@ static INPUT_PORTS_START( ecoinf3 )
 INPUT_PORTS_END
 
 
-static MACHINE_CONFIG_START( ecoinf3_pyramid )
+MACHINE_CONFIG_START(ecoinf3_state::ecoinf3_pyramid)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z180,8000000) // certainly not a plain z80 at least, invalid opcodes for that
 

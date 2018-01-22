@@ -20,9 +20,9 @@
 
 // TODO: when there are more SPARC CPUs, move setter to a base class
 #define MCFG_SPARC_ADD_ASI_DESC(desc) \
-	mb86901_device::add_asi_desc(*device, desc);
+	mb86901_device::add_asi_desc(*device, [](sparc_disassembler *dasm) { dasm->add_asi_desc(desc); });
 
-class mb86901_device : public cpu_device, protected sparc_debug_state
+class mb86901_device : public cpu_device, protected sparc_disassembler::config
 {
 public:
 	mb86901_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
@@ -43,9 +43,7 @@ public:
 	virtual space_config_vector memory_space_config() const override;
 
 	// device_disasm_interface overrides
-	virtual uint32_t disasm_min_opcode_bytes() const override;
-	virtual uint32_t disasm_max_opcode_bytes() const override;
-	virtual offs_t disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
+	virtual util::disasm_interface *create_disassembler() override;
 
 	// device_state_interface overrides
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
@@ -53,7 +51,7 @@ public:
 	uint8_t get_asi() { return m_asi; }
 	uint32_t pc() { return m_pc; }
 
-	template<typename T> static void add_asi_desc(device_t &device, const T &desc) { return downcast<mb86901_device &>(device).add_asi_desc(desc); }
+	static void add_asi_desc(device_t &device, std::function<void (sparc_disassembler *)> f) { downcast<mb86901_device &>(device).m_asi_desc_adder = f; }
 
 #if LOG_FCODES
 	void enable_log_fcodes(bool enable) { m_log_fcodes = enable; }
@@ -62,8 +60,6 @@ public:
 #endif
 
 protected:
-	template<typename T> void add_asi_desc(const T &desc) { m_dasm.add_asi_desc(desc); }
-
 	void update_gpr_pointers();
 
 	void execute_add(uint32_t op);
@@ -213,7 +209,6 @@ protected:
 
 	// debugger helpers
 	uint32_t m_dbgregs[24];
-	sparc_disassembler m_dasm;
 
 	// address spaces
 	address_space *m_program;
@@ -230,6 +225,8 @@ protected:
 
 	// processor configuration
 	static const int NWINDOWS;
+
+	std::function<void (sparc_disassembler *)> m_asi_desc_adder;
 };
 
 // device type definition

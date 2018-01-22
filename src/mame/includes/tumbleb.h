@@ -133,4 +133,18 @@ public:
 	void tumblepb_gfx_rearrange(int rgn);
 	void suprtrio_decrypt_code();
 	void suprtrio_decrypt_gfx();
+	void tumblepb(machine_config &config);
+	void bcstory(machine_config &config);
+	void pangpang(machine_config &config);
+	void semibase(machine_config &config);
+	void tumbleb2(machine_config &config);
+	void cookbib(machine_config &config);
+	void metlsavr(machine_config &config);
+	void fncywld(machine_config &config);
+	void suprtrio(machine_config &config);
+	void htchctch(machine_config &config);
+	void sdfight(machine_config &config);
+	void chokchok(machine_config &config);
+	void cookbib_mcu(machine_config &config);
+	void jumpkids(machine_config &config);
 };

@@ -56,6 +56,10 @@ public:
 	DECLARE_WRITE16_MEMBER(eva11_write_o);
 	DECLARE_WRITE16_MEMBER(eva11_write_r);
 
+	void tms5110_route(machine_config &config);
+	void eva11(machine_config &config);
+	void eva24(machine_config &config);
+
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -123,7 +127,8 @@ WRITE16_MEMBER(eva_state::eva11_write_o)
 READ8_MEMBER(eva_state::eva11_read_k)
 {
 	// K84: TMS5100 CTL81(O30)
-	u8 ctl = BITSWAP8(m_tms5100->ctl_r(space, 0),7,6,5,4,3,0,1,2) & 0xc;
+	u8 ctl = m_tms5100->ctl_r(space, 0);
+	ctl = bitswap<2>(ctl, 3,0) << 2;
 
 	// TODO: sensors
 
@@ -152,9 +157,10 @@ INPUT_PORTS_END
 
 ***************************************************************************/
 
-static MACHINE_CONFIG_START( tms5110_route )
+MACHINE_CONFIG_START(eva_state::tms5110_route)
 
 	/* sound hardware */
+	MCFG_DEVICE_MODIFY("tms5100")
 	MCFG_TMS5110_M0_CB(DEVWRITELINE("tms6100", tms6100_device, m0_w))
 	MCFG_TMS5110_M1_CB(DEVWRITELINE("tms6100", tms6100_device, m1_w))
 	MCFG_TMS5110_ADDR_CB(DEVWRITE8("tms6100", tms6100_device, add_w))
@@ -163,7 +169,7 @@ static MACHINE_CONFIG_START( tms5110_route )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( eva24 )
+MACHINE_CONFIG_START(eva_state::eva24)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", COP420, XTAL_640kHz/2) // guessed
@@ -180,7 +186,7 @@ static MACHINE_CONFIG_START( eva24 )
 	MCFG_FRAGMENT_ADD(tms5110_route)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( eva11 )
+MACHINE_CONFIG_START(eva_state::eva11)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", TMS1000, XTAL_640kHz/2) // from TMS5110A CPU CK

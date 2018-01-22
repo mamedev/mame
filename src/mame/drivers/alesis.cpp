@@ -355,7 +355,7 @@ HD44780_PIXEL_UPDATE(alesis_state::sr16_pixel_update)
 		bitmap.pix16(line*9 + y, pos*6 + x) = state;
 }
 
-static MACHINE_CONFIG_START( hr16 )
+MACHINE_CONFIG_START(alesis_state::hr16)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",I8031, XTAL_12MHz)
 	MCFG_CPU_PROGRAM_MAP(hr16_mem)
@@ -387,7 +387,7 @@ static MACHINE_CONFIG_START( hr16 )
 	MCFG_NVRAM_ADD_0FILL("nvram")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( sr16, hr16 )
+MACHINE_CONFIG_DERIVED(alesis_state::sr16, hr16)
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(sr16_mem)
@@ -404,7 +404,7 @@ static MACHINE_CONFIG_DERIVED( sr16, hr16 )
 	MCFG_HD44780_PIXEL_UPDATE_CB(alesis_state, sr16_pixel_update)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( mmt8, hr16 )
+MACHINE_CONFIG_DERIVED(alesis_state::mmt8, hr16)
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(mmt8_io)
@@ -472,7 +472,7 @@ DRIVER_INIT_MEMBER(alesis_state,hr16)
 	uint8_t *orig = memregion("user1")->base();
 	for (i = 0; i < 0x8000; i++)
 	{
-		ROM[BITSWAP16(i,15,14,13,12,11,10,9,8,0,1,2,3,4,5,6,7)] = orig[i];
+		ROM[bitswap<16>(i,15,14,13,12,11,10,9,8,0,1,2,3,4,5,6,7)] = orig[i];
 	}
 }
 

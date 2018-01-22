@@ -94,6 +94,8 @@ datamux_device::datamux_device(const machine_config &mconfig, const char *tag, d
 	m_sysready(CLEAR_LINE),
 	m_latch(0),
 	m_waitcount(0),
+	m_romgq_state(CLEAR_LINE),
+	m_memen_state(CLEAR_LINE),
 	m_use32k(false),
 	m_base32k(0),
 	m_console_groms_present(false),
@@ -147,6 +149,7 @@ void datamux_device::read_all(address_space& space, uint16_t addr, uint8_t *valu
 	// I/O port gets all accesses
 	m_ioport->readz(space, addr, value);
 	m_ioport->memen_in(CLEAR_LINE);
+	m_memen_state = CLEAR_LINE;
 }
 
 void datamux_device::write_all(address_space& space, uint16_t addr, uint8_t value)
@@ -183,6 +186,7 @@ void datamux_device::write_all(address_space& space, uint16_t addr, uint8_t valu
 	// I/O port gets all accesses
 	m_ioport->write(space, addr, value);
 	m_ioport->memen_in(CLEAR_LINE);
+	m_memen_state = CLEAR_LINE;
 }
 
 void datamux_device::setaddress_all(address_space& space, uint16_t addr)
@@ -215,10 +219,12 @@ void datamux_device::setaddress_all(address_space& space, uint16_t addr)
 	// Sound chip and video chip do not require the address to be set before access
 
 	// GROMport (ROMs)
-	m_gromport->romgq_line(iscartrom? ASSERT_LINE : CLEAR_LINE);
+	m_romgq_state = iscartrom? ASSERT_LINE : CLEAR_LINE;
+	m_gromport->romgq_line(m_romgq_state);
 
 	// I/O port gets all accesses
-	m_ioport->memen_in(ASSERT_LINE);
+	m_memen_state = ASSERT_LINE;
+	m_ioport->memen_in(m_memen_state);
 	m_ioport->setaddress_dbin(space, addr, m_dbin);
 }
 
@@ -261,12 +267,12 @@ uint16_t datamux_device::debugger_read(address_space& space, uint16_t addr)
 					m_gromport->romgq_line(ASSERT_LINE);
 					m_gromport->readz(space, addrb+1, &lval);
 					m_gromport->readz(space, addrb, &hval);
-					m_gromport->romgq_line(CLEAR_LINE);
+					m_gromport->romgq_line(m_romgq_state);  // reset to previous state
 				}
 				m_ioport->memen_in(ASSERT_LINE);
 				m_ioport->readz(space, addrb+1, &lval);
 				m_ioport->readz(space, addrb, &hval);
-				m_ioport->memen_in(CLEAR_LINE);
+				m_ioport->memen_in(m_memen_state);   // reset to previous state
 				value = ((hval << 8)&0xff00) | (lval & 0xff);
 			}
 		}
@@ -306,13 +312,13 @@ void datamux_device::debugger_write(address_space& space, uint16_t addr, uint16_
 				m_gromport->romgq_line(ASSERT_LINE);
 				m_gromport->write(space, addr+1, data & 0xff);
 				m_gromport->write(space, addr, (data>>8) & 0xff);
-				m_gromport->romgq_line(CLEAR_LINE);
+				m_gromport->romgq_line(m_romgq_state);  // reset to previous state
 			}
 
 			m_ioport->memen_in(ASSERT_LINE);
 			m_ioport->write(space, addr+1, data & 0xff);
 			m_ioport->write(space, addr,  (data>>8) & 0xff);
-			m_ioport->memen_in(CLEAR_LINE);
+			m_ioport->memen_in(m_memen_state);   // reset to previous state
 		}
 	}
 }

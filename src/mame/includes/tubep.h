@@ -110,6 +110,9 @@ public:
 	required_device<screen_device> m_screen;
 
 
+	void tubepb(machine_config &config);
+	void tubep(machine_config &config);
+	void rjammer(machine_config &config);
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };

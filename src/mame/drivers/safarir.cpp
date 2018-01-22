@@ -91,6 +91,8 @@ public:
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(safarir);
 	uint32_t screen_update_safarir(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void safarir(machine_config &config);
+	void safarir_audio(machine_config &config);
 };
 
 
@@ -300,7 +302,7 @@ static const char *const safarir_sample_names[] =
 };
 
 
-static MACHINE_CONFIG_START( safarir_audio )
+MACHINE_CONFIG_START(safarir_state::safarir_audio)
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("samples", SAMPLES, 0)
 	MCFG_SAMPLES_CHANNELS(6)
@@ -399,7 +401,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( safarir )
+MACHINE_CONFIG_START(safarir_state::safarir)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8080A, XTAL_18MHz/12)  /* 1.5 MHz ? */

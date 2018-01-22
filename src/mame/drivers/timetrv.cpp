@@ -27,6 +27,7 @@ CPU is an Intel 80188
 
 #include "emu.h"
 #include "cpu/i86/i186.h"
+#include "machine/i8255.h"
 #include "screen.h"
 
 
@@ -50,6 +51,7 @@ public:
 	INTERRUPT_GEN_MEMBER(vblank_irq);
 	INTERRUPT_GEN_MEMBER(ld_irq);
 	required_device<cpu_device> m_maincpu;
+	void timetrv(machine_config &config);
 };
 
 
@@ -94,10 +96,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( timetrv_io, AS_IO, 8, timetrv_state )
 	AM_RANGE(0x0122, 0x0123) AM_WRITENOP //eeprom write bits
-	AM_RANGE(0x1000, 0x1000) AM_READ(test1_r) //inputs
-	AM_RANGE(0x1001, 0x1001) AM_READ(test2_r) //eeprom read bit + inputs
-
-	AM_RANGE(0x1080, 0x1082) AM_READ(in_r) //dsw
+	AM_RANGE(0x1000, 0x1003) AM_DEVREADWRITE("ppi1", i8255_device, read, write)
+	AM_RANGE(0x1080, 0x1083) AM_DEVREADWRITE("ppi2", i8255_device, read, write)
 	AM_RANGE(0x1100, 0x1105) AM_WRITENOP //laserdisc write area
 	AM_RANGE(0x1100, 0x1105) AM_READ(ld_r) //5 -> laserdisc read status
 	AM_RANGE(0x1180, 0x1187) AM_RAM AM_SHARE("led_vralo")//led string,part 1
@@ -150,7 +150,7 @@ INTERRUPT_GEN_MEMBER(timetrv_state::ld_irq)
 	device.execute().set_input_line_and_vector(0,HOLD_LINE,0x48/4); //ld irq
 }
 
-static MACHINE_CONFIG_START( timetrv )
+MACHINE_CONFIG_START(timetrv_state::timetrv)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",I80188,20000000) //???
@@ -158,6 +158,15 @@ static MACHINE_CONFIG_START( timetrv )
 	MCFG_CPU_IO_MAP(timetrv_io)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", timetrv_state, vblank_irq)
 	MCFG_CPU_PERIODIC_INT_DRIVER(timetrv_state, ld_irq, 60) //remove from here
+
+	MCFG_DEVICE_ADD("ppi1", I8255, 0)
+	MCFG_I8255_IN_PORTA_CB(READ8(timetrv_state, test1_r)) //inputs
+	MCFG_I8255_IN_PORTB_CB(READ8(timetrv_state, test2_r)) //eeprom read bit + inputs
+
+	MCFG_DEVICE_ADD("ppi2", I8255, 0)
+	MCFG_I8255_IN_PORTA_CB(READ8(timetrv_state, in_r)) //dsw
+	MCFG_I8255_IN_PORTB_CB(READ8(timetrv_state, in_r)) //dsw
+	MCFG_I8255_IN_PORTC_CB(READ8(timetrv_state, in_r)) //dsw
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

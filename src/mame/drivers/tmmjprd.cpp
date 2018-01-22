@@ -92,6 +92,8 @@ public:
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int screen);
 	void draw_tile(bitmap_ind16 &bitmap, const rectangle &cliprect, int x,int y,int sizex,int sizey, uint32_t tiledata, uint8_t* rom);
 	void draw_tilemap(bitmap_ind16 &bitmap, const rectangle &cliprect, uint32_t*tileram, uint32_t*tileregs, uint8_t*rom );
+	void tmmjprd(machine_config &config);
+	void tmpdoki(machine_config &config);
 };
 
 
@@ -715,7 +717,7 @@ static ADDRESS_MAP_START( tmmjprd_map, AS_PROGRAM, 32, tmmjprd_state )
 	AM_RANGE(0x28c000, 0x28ffff) AM_READWRITE(tilemap3_r,tilemap3_w)
 	/* ?? is palette ram shared with sprites in this case or just a different map */
 	AM_RANGE(0x290000, 0x29bfff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x29c000, 0x29ffff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x29c000, 0x29ffff) AM_RAM_DEVWRITE("palette", palette_device, write32) AM_SHARE("palette")
 
 	AM_RANGE(0x400000, 0x400003) AM_READ(mux_r) AM_WRITE(eeprom_write)
 	AM_RANGE(0xf00000, 0xffffff) AM_RAM
@@ -764,7 +766,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(tmmjprd_state::scanline)
 
 }
 
-static MACHINE_CONFIG_START( tmmjprd )
+MACHINE_CONFIG_START(tmmjprd_state::tmmjprd)
 	MCFG_CPU_ADD("maincpu",M68EC020,24000000) /* 24 MHz */
 	MCFG_CPU_PROGRAM_MAP(tmmjprd_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", tmmjprd_state, scanline, "lscreen", 0, 1)
@@ -813,7 +815,7 @@ static MACHINE_CONFIG_START( tmmjprd )
 	MCFG_SOUND_ROUTE(1, "lspeaker", 1.00)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( tmpdoki, tmmjprd )
+MACHINE_CONFIG_DERIVED(tmmjprd_state::tmpdoki, tmmjprd)
 	MCFG_DEFAULT_LAYOUT(layout_horizont)
 MACHINE_CONFIG_END
 

@@ -1,5 +1,4 @@
 310AofA.vert
-Warning, version 310 is not yet complete; most version-specific features are present, but some are missing.
 ERROR: 0:17: '' : array size required 
 ERROR: 0:23: '' : array size required 
 ERROR: 0:28: '[]' : only outermost dimension of an array of arrays can be implicitly sized 
@@ -321,7 +320,7 @@ ERROR: node is still EOpNull!
 0:?   Linker Objects
 0:?     'name' (layout( column_major shared) buffer 3-element array of block{layout( column_major shared) buffer implicitly-sized array of highp float u, layout( column_major shared) buffer implicitly-sized array of highp 4-component vector of float v})
 0:?     'uname' (layout( column_major shared) uniform 3-element array of block{layout( column_major shared) uniform highp float u, layout( column_major shared) uniform implicitly-sized array of highp 4-component vector of float v})
-0:?     'name2' (layout( column_major shared) buffer 3-element array of block{layout( column_major shared) buffer highp float u, layout( column_major shared) buffer implicitly-sized array of implicitly-sized array of highp 4-component vector of float v})
+0:?     'name2' (layout( column_major shared) buffer 3-element array of block{layout( column_major shared) buffer highp float u, layout( column_major shared) buffer implicitly-sized array of 1-element array of highp 4-component vector of float v})
 0:?     'name3' (layout( column_major shared) buffer 3-element array of block{layout( column_major shared) buffer highp float u, layout( column_major shared) buffer implicitly-sized array of 7-element array of highp 4-component vector of float v})
 0:?     'many' ( global 1-element array of 2-element array of 3-element array of 4-element array of 5-element array of 6-element array of highp float)
 0:?     'gu' ( global implicitly-sized array of 7-element array of highp float)
@@ -362,7 +361,7 @@ ERROR: node is still EOpNull!
 0:?   Linker Objects
 0:?     'name' (layout( column_major shared) buffer 3-element array of block{layout( column_major shared) buffer implicitly-sized array of highp float u, layout( column_major shared) buffer implicitly-sized array of highp 4-component vector of float v})
 0:?     'uname' (layout( column_major shared) uniform 3-element array of block{layout( column_major shared) uniform highp float u, layout( column_major shared) uniform 1-element array of highp 4-component vector of float v})
-0:?     'name2' (layout( column_major shared) buffer 3-element array of block{layout( column_major shared) buffer highp float u, layout( column_major shared) buffer implicitly-sized array of implicitly-sized array of highp 4-component vector of float v})
+0:?     'name2' (layout( column_major shared) buffer 3-element array of block{layout( column_major shared) buffer highp float u, layout( column_major shared) buffer implicitly-sized array of 1-element array of highp 4-component vector of float v})
 0:?     'name3' (layout( column_major shared) buffer 3-element array of block{layout( column_major shared) buffer highp float u, layout( column_major shared) buffer implicitly-sized array of 7-element array of highp 4-component vector of float v})
 0:?     'many' ( global 1-element array of 2-element array of 3-element array of 4-element array of 5-element array of 6-element array of highp float)
 0:?     'gu' ( global 1-element array of 7-element array of highp float)

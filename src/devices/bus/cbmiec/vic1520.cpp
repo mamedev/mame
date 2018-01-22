@@ -93,7 +93,7 @@ ADDRESS_MAP_END
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( vic1520_device::device_add_mconfig )
+MACHINE_CONFIG_START(vic1520_device::device_add_mconfig)
 	MCFG_CPU_ADD(M6500_1_TAG, M6502, XTAL_2MHz) // M6500/1
 	MCFG_CPU_PROGRAM_MAP(vic1520_mem)
 MACHINE_CONFIG_END

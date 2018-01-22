@@ -77,6 +77,9 @@ public:
 	DECLARE_WRITE8_MEMBER(display_w);
 	DECLARE_WRITE8_MEMBER(lamps_w);
 
+	void de_3(machine_config &config);
+	void de_3_dmd1(machine_config &config);
+	void de_3_dmd2(machine_config &config);
 protected:
 
 	// driver_device overrides
@@ -211,9 +214,9 @@ WRITE8_MEMBER( de_3_state::dig1_w )
 //  if ((m_segment2 & 0x70000) == 0x30000)
 //  {
 //      if(m_is_alpha3)  // Alphanumeric type 2 uses 7 segment LEDs on the bottom row, type 3 uses 14 segment LEDs
-//          output().set_digit_value(m_strobe+16, BITSWAP16(m_segment2, 7, 15, 12, 10, 8, 14, 13, 9, 11, 6, 5, 4, 3, 2, 1, 0));
+//          output().set_digit_value(m_strobe+16, bitswap<16>(m_segment2, 7, 15, 12, 10, 8, 14, 13, 9, 11, 6, 5, 4, 3, 2, 1, 0));
 //      else
-//          output().set_digit_value(m_strobe+16, BITSWAP16(m_segment2, 11, 15, 12, 10, 8, 14, 13, 9, 7, 6, 5, 4, 3, 2, 1, 0));
+//          output().set_digit_value(m_strobe+16, bitswap<16>(m_segment2, 11, 15, 12, 10, 8, 14, 13, 9, 7, 6, 5, 4, 3, 2, 1, 0));
 //      m_segment2 |= 0x40000;
 //  }
 }
@@ -246,7 +249,7 @@ WRITE8_MEMBER( de_3_state::pia2c_pa_w )
 //  m_segment1 |= 0x10000;
 //  if ((m_segment1 & 0x70000) == 0x30000)
 //  {
-//      output().set_digit_value(m_strobe, BITSWAP16(m_segment1, 7, 15, 12, 10, 8, 14, 13, 9, 11, 6, 5, 4, 3, 2, 1, 0));
+//      output().set_digit_value(m_strobe, bitswap<16>(m_segment1, 7, 15, 12, 10, 8, 14, 13, 9, 11, 6, 5, 4, 3, 2, 1, 0));
 //      m_segment1 |= 0x40000;
 //  }
 }
@@ -278,7 +281,7 @@ WRITE8_MEMBER( de_3_state::pia2c_pb_w )
 //  m_segment1 |= 0x20000;
 //  if ((m_segment1 & 0x70000) == 0x30000)
 //  {
-//      output().set_digit_value(m_strobe, BITSWAP16(m_segment1, 7, 15, 12, 10, 8, 14, 13, 9, 11, 6, 5, 4, 3, 2, 1, 0));
+//      output().set_digit_value(m_strobe, bitswap<16>(m_segment1, 7, 15, 12, 10, 8, 14, 13, 9, 11, 6, 5, 4, 3, 2, 1, 0));
 //      m_segment1 |= 0x40000;
 //  }
 }
@@ -312,7 +315,7 @@ WRITE8_MEMBER( de_3_state::pia34_pa_w )
 //  m_segment2 |= 0x10000;
 //  if ((m_segment2 & 0x70000) == 0x30000)
 //  {
-//      output().set_digit_value(m_strobe+16, BITSWAP16(m_segment2, 7, 15, 12, 10, 8, 14, 13, 9, 11, 6, 5, 4, 3, 2, 1, 0));
+//      output().set_digit_value(m_strobe+16, bitswap<16>(m_segment2, 7, 15, 12, 10, 8, 14, 13, 9, 11, 6, 5, 4, 3, 2, 1, 0));
 //      m_segment2 |= 0x40000;
 //  }
 }
@@ -391,7 +394,7 @@ DRIVER_INIT_MEMBER(de_3_state,de_3)
 {
 }
 
-static MACHINE_CONFIG_START( de_3 )
+MACHINE_CONFIG_START(de_3_state::de_3)
 	/* basic machine hardware */
 	MCFG_DECOCPU_TYPE3_ADD("decocpu",XTAL_8MHz / 2, ":maincpu")
 	MCFG_DECOCPU_DISPLAY(READ8(de_3_state,display_r),WRITE8(de_3_state,display_w))
@@ -406,11 +409,11 @@ static MACHINE_CONFIG_START( de_3 )
 
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( de_3_dmd2, de_3 )
+MACHINE_CONFIG_DERIVED(de_3_state::de_3_dmd2, de_3)
 	MCFG_DECODMD_TYPE2_ADD("decodmd2",":gfx3")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( de_3_dmd1, de_3 )
+MACHINE_CONFIG_DERIVED(de_3_state::de_3_dmd1, de_3)
 	MCFG_DECODMD_TYPE1_ADD("decodmd1",":gfx3")
 MACHINE_CONFIG_END
 

@@ -1020,7 +1020,7 @@ void v1050_state::machine_reset()
 
 // Machine Driver
 
-static MACHINE_CONFIG_START( v1050 )
+MACHINE_CONFIG_START(v1050_state::v1050)
 	// basic machine hardware
 	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL_16MHz/4)
 	MCFG_CPU_PROGRAM_MAP(v1050_mem)

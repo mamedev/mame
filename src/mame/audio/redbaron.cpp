@@ -27,7 +27,7 @@
 
 
 // device type definition
-DEFINE_DEVICE_TYPE(REDBARON, redbaron_sound_device, "redbaron_custom", "Red Baron Audio Custom")
+DEFINE_DEVICE_TYPE(REDBARON, redbaron_sound_device, "redbaron_custom", "Red Baron Custom Sound")
 
 
 //**************************************************************************

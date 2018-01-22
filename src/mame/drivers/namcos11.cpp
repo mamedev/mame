@@ -333,6 +333,20 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(mcu_irq2_cb);
 	TIMER_DEVICE_CALLBACK_MEMBER(mcu_adc_cb);
 
+	void coh110(machine_config &config);
+	void coh100(machine_config &config);
+	void myangel3(machine_config &config);
+	void xevi3dg(machine_config &config);
+	void dunkmnia(machine_config &config);
+	void pocketrc(machine_config &config);
+	void ptblank2ua(machine_config &config);
+	void tekken2o(machine_config &config);
+	void danceyes(machine_config &config);
+	void starswep(machine_config &config);
+	void primglex(machine_config &config);
+	void souledge(machine_config &config);
+	void tekken(machine_config &config);
+	void tekken2(machine_config &config);
 protected:
 	virtual void driver_start() override;
 
@@ -516,9 +530,9 @@ ADDRESS_MAP_END
 
 READ16_MEMBER(namcos11_state::c76_speedup_r)
 {
-	if ((space.device().safe_pc() == 0xc153) && (!(m_su_83 & 0xff00)))
+	if ((m_mcu->pc() == 0xc153) && (!(m_su_83 & 0xff00)))
 	{
-		space.device().execute().spin_until_interrupt();
+		m_mcu->spin_until_interrupt();
 	}
 
 	return m_su_83;
@@ -578,7 +592,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(namcos11_state::mcu_adc_cb)
 	m_mcu->set_input_line(M37710_LINE_ADC, HOLD_LINE);
 }
 
-static MACHINE_CONFIG_START( coh110 )
+MACHINE_CONFIG_START(namcos11_state::coh110)
 	MCFG_CPU_ADD( "maincpu", CXD8530CQ, XTAL_67_7376MHz )
 	MCFG_CPU_PROGRAM_MAP( namcos11_map )
 
@@ -607,7 +621,7 @@ static MACHINE_CONFIG_START( coh110 )
 	MCFG_AT28C16_ADD( "at28c16", nullptr )
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( coh100, coh110 )
+MACHINE_CONFIG_DERIVED(namcos11_state::coh100, coh110)
 	MCFG_CPU_REPLACE( "maincpu", CXD8530AQ, XTAL_67_7376MHz )
 	MCFG_CPU_PROGRAM_MAP( namcos11_map )
 
@@ -617,7 +631,7 @@ static MACHINE_CONFIG_DERIVED( coh100, coh110 )
 	MCFG_PSXGPU_REPLACE( "maincpu", "gpu", CXD8538Q, 0x200000, XTAL_53_693175MHz )
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( tekken, coh100 )
+MACHINE_CONFIG_DERIVED(namcos11_state::tekken, coh100)
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_PROGRAM_MAP( rom8_map )
 
@@ -625,74 +639,74 @@ static MACHINE_CONFIG_DERIVED( tekken, coh100 )
 	MCFG_DEVICE_ADD( "keycus", KEYCUS_C406, 0 )
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( tekken2o, coh100 )
+MACHINE_CONFIG_DERIVED(namcos11_state::tekken2o, coh100)
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_PROGRAM_MAP( rom8_map )
 
 	MCFG_DEVICE_ADD( "keycus", KEYCUS_C406, 0 )
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( tekken2, coh110 )
+MACHINE_CONFIG_DERIVED(namcos11_state::tekken2, coh110)
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_PROGRAM_MAP( rom8_map )
 
 	MCFG_DEVICE_ADD( "keycus", KEYCUS_C406, 0 )
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( souledge, coh110 )
+MACHINE_CONFIG_DERIVED(namcos11_state::souledge, coh110)
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_PROGRAM_MAP( rom8_map )
 
 	MCFG_DEVICE_ADD( "keycus", KEYCUS_C409, 0 )
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( dunkmnia, coh110 )
+MACHINE_CONFIG_DERIVED(namcos11_state::dunkmnia, coh110)
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_PROGRAM_MAP( rom8_map )
 
 	MCFG_DEVICE_ADD( "keycus", KEYCUS_C410, 0 )
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( primglex, coh110 )
+MACHINE_CONFIG_DERIVED(namcos11_state::primglex, coh110)
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_PROGRAM_MAP( rom8_map )
 
 	MCFG_DEVICE_ADD( "keycus", KEYCUS_C411, 0 )
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( xevi3dg, coh110 )
+MACHINE_CONFIG_DERIVED(namcos11_state::xevi3dg, coh110)
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_PROGRAM_MAP( rom8_map )
 
 	MCFG_DEVICE_ADD( "keycus", KEYCUS_C430, 0 )
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( danceyes, coh110 )
+MACHINE_CONFIG_DERIVED(namcos11_state::danceyes, coh110)
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_PROGRAM_MAP( rom8_map )
 
 	MCFG_DEVICE_ADD( "keycus", KEYCUS_C431, 0 )
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( pocketrc, coh110 )
+MACHINE_CONFIG_DERIVED(namcos11_state::pocketrc, coh110)
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_PROGRAM_MAP( rom8_map )
 
 	MCFG_DEVICE_ADD( "keycus", KEYCUS_C432, 0 )
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( starswep, coh110 )
+MACHINE_CONFIG_DERIVED(namcos11_state::starswep, coh110)
 	MCFG_DEVICE_ADD( "keycus", KEYCUS_C442, 0 )
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( myangel3, coh110 )
+MACHINE_CONFIG_DERIVED(namcos11_state::myangel3, coh110)
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_PROGRAM_MAP( rom8_64_map )
 
 	MCFG_DEVICE_ADD( "keycus", KEYCUS_C443, 0 )
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( ptblank2ua, coh110 )
+MACHINE_CONFIG_DERIVED(namcos11_state::ptblank2ua, coh110)
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_PROGRAM_MAP( ptblank2ua_map )
 
@@ -1676,7 +1690,7 @@ GAME( 1995, xevi3dgj,   xevi3dg,  xevi3dg,    namcos11,   namcos11_state, 0, ROT
 GAME( 1996, primglex,   0,        primglex,   tekken,     namcos11_state, 0, ROT0, "Namco",         "Prime Goal EX (Japan, PG1/VER.A)",             MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1996, danceyes,   0,        danceyes,   namcos11,   namcos11_state, 0, ROT0, "Namco",         "Dancing Eyes (US, DC3/VER.C)",                 MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1996, danceyesj,  danceyes, danceyes,   namcos11,   namcos11_state, 0, ROT0, "Namco",         "Dancing Eyes (Japan, DC1/VER.A)",              MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1996, pocketrc,   0,        pocketrc,   pocketrc,   namcos11_state, 0, ROT0, "Namco",         "Pocket Racer (Japan, PKR1/VER.B)",             MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1996, pocketrc,   0,        pocketrc,   pocketrc,   namcos11_state, 0, ROT0, "Namco",         "Pocket Racer (Japan, PKR1/VER.B)",             MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN )
 GAME( 1997, starswep,   0,        starswep,   namcos11,   namcos11_state, 0, ROT0, "Axela / Namco", "Star Sweep (World, STP2/VER.A)",               MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1997, starswepj,  starswep, starswep,   namcos11,   namcos11_state, 0, ROT0, "Axela / Namco", "Star Sweep (Japan, STP1/VER.A)",               MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1998, myangel3,   0,        myangel3,   myangel3,   namcos11_state, 0, ROT0, "MOSS / Namco",  "Kosodate Quiz My Angel 3 (Japan, KQT1/VER.A)", MACHINE_IMPERFECT_GRAPHICS )

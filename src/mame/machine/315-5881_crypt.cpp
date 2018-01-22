@@ -617,7 +617,7 @@ uint16_t sega_315_5881_crypt_device::block_decrypt(uint32_t game_key, uint16_t s
 
 	// First Feistel Network
 
-	aux = BITSWAP16(counter, 5, 12, 14, 13, 9, 3, 6, 4, 8, 1, 15, 11, 0, 7, 10, 2);
+	aux = bitswap<16>(counter, 5, 12, 14, 13, 9, 3, 6, 4, 8, 1, 15, 11, 0, 7, 10, 2);
 
 	// 1st round
 	B = aux >> 8;
@@ -647,7 +647,7 @@ uint16_t sega_315_5881_crypt_device::block_decrypt(uint32_t game_key, uint16_t s
 
 	// Second Feistel Network
 
-	aux = BITSWAP16(data, 14, 3, 8, 12, 13, 7, 15, 4, 6, 2, 9, 5, 11, 0, 1, 10);
+	aux = bitswap<16>(data, 14, 3, 8, 12, 13, 7, 15, 4, 6, 2, 9, 5, 11, 0, 1, 10);
 
 	// 1st round
 	B = aux >> 8;
@@ -664,7 +664,7 @@ uint16_t sega_315_5881_crypt_device::block_decrypt(uint32_t game_key, uint16_t s
 
 	aux = (B << 8) | A;
 
-	aux = BITSWAP16(aux, 15, 7, 6, 14, 13, 12, 5, 4, 3, 2, 11, 10, 9, 1, 0, 8);
+	aux = bitswap<16>(aux, 15, 7, 6, 14, 13, 12, 5, 4, 3, 2, 11, 10, 9, 1, 0, 8);
 
 	return aux;
 }

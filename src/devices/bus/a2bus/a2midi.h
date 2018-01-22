@@ -36,8 +36,8 @@ protected:
 	virtual void device_reset() override;
 	virtual void device_add_mconfig(machine_config &config) override;
 
-	virtual uint8_t read_c0nx(address_space &space, uint8_t offset) override;
-	virtual void write_c0nx(address_space &space, uint8_t offset, uint8_t data) override;
+	virtual uint8_t read_c0nx(uint8_t offset) override;
+	virtual void write_c0nx(uint8_t offset, uint8_t data) override;
 
 	required_device<ptm6840_device> m_ptm;
 	required_device<acia6850_device> m_acia;

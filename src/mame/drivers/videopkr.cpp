@@ -379,6 +379,12 @@ public:
 	required_device<cpu_device> m_soundcpu;
 	required_device<dac_byte_interface> m_dac;
 	required_device<gfxdecode_device> m_gfxdecode;
+	void babypkr(machine_config &config);
+	void videodad(machine_config &config);
+	void videopkr(machine_config &config);
+	void fortune1(machine_config &config);
+	void blckjack(machine_config &config);
+	void bpoker(machine_config &config);
 };
 
 
@@ -1240,7 +1246,7 @@ void videopkr_state::machine_start()
 *    Machine Drivers    *
 ************************/
 
-static MACHINE_CONFIG_START( videopkr )
+MACHINE_CONFIG_START(videopkr_state::videopkr)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8039, CPU_CLOCK)
@@ -1289,7 +1295,7 @@ static MACHINE_CONFIG_START( videopkr )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( blckjack, videopkr )
+MACHINE_CONFIG_DERIVED(videopkr_state::blckjack, videopkr)
 
 	/* basic machine hardware */
 
@@ -1300,7 +1306,7 @@ static MACHINE_CONFIG_DERIVED( blckjack, videopkr )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( videodad, videopkr )
+MACHINE_CONFIG_DERIVED(videopkr_state::videodad, videopkr)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1316,7 +1322,7 @@ static MACHINE_CONFIG_DERIVED( videodad, videopkr )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( babypkr, videopkr )
+MACHINE_CONFIG_DERIVED(videopkr_state::babypkr, videopkr)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1340,7 +1346,7 @@ static MACHINE_CONFIG_DERIVED( babypkr, videopkr )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.3)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( fortune1, videopkr )
+MACHINE_CONFIG_DERIVED(videopkr_state::fortune1, videopkr)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1350,7 +1356,7 @@ static MACHINE_CONFIG_DERIVED( fortune1, videopkr )
 	MCFG_PALETTE_INIT_OWNER(videopkr_state,fortune1)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( bpoker, babypkr )
+MACHINE_CONFIG_DERIVED(videopkr_state::bpoker, babypkr)
 	MCFG_CPU_REPLACE("maincpu", I8751, XTAL_6MHz)
 	MCFG_CPU_PROGRAM_MAP(i8751_map)
 	MCFG_CPU_IO_MAP(i8751_io_port)

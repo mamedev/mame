@@ -64,6 +64,7 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(activity_test);
 	DECLARE_INPUT_CHANGED_MEMBER(self_test);
 	TIMER_DEVICE_CALLBACK_MEMBER(pia0_timer);
+	void by6803(machine_config &config);
 private:
 	uint8_t m_pia0_a;
 	uint8_t m_pia0_b;
@@ -370,7 +371,7 @@ TIMER_DEVICE_CALLBACK_MEMBER( by6803_state::pia0_timer )
 	m_pia0->cb1_w(m_pia0_timer);
 }
 
-static MACHINE_CONFIG_START( by6803 )
+MACHINE_CONFIG_START(by6803_state::by6803)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6803, XTAL_3_579545MHz)
 	MCFG_CPU_PROGRAM_MAP(by6803_map)

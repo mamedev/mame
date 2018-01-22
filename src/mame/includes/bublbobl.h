@@ -131,6 +131,12 @@ public:
 	uint32_t screen_update_bublbobl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void configure_banks();
 
+	void tokio(machine_config &config);
+	void boblbobl(machine_config &config);
+	void bublbobl(machine_config &config);
+	void bublbobl_nomcu(machine_config &config);
+	void bublboblp(machine_config &config);
+	void tokiob(machine_config &config);
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
@@ -158,6 +164,7 @@ public:
 	DECLARE_MACHINE_START(bub68705);
 	DECLARE_MACHINE_RESET(bub68705);
 
+	void bub68705(machine_config &config);
 protected:
 	required_device<m68705p_device> m_mcu;
 	required_ioport_array<4>        m_mux_ports;

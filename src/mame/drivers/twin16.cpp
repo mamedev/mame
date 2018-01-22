@@ -181,7 +181,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, twin16_state )
 	AM_RANGE(0x040000, 0x043fff) AM_RAM AM_SHARE("comram")
 //  AM_RANGE(0x044000, 0x04ffff) AM_NOP             // miaj
 	AM_RANGE(0x060000, 0x063fff) AM_RAM
-	AM_RANGE(0x080000, 0x080fff) AM_DEVREADWRITE8("palette", palette_device, read, write, 0x00ff) AM_SHARE("palette")
+	AM_RANGE(0x080000, 0x080fff) AM_DEVREADWRITE8("palette", palette_device, read8, write8, 0x00ff) AM_SHARE("palette")
 	AM_RANGE(0x081000, 0x081fff) AM_WRITENOP
 	AM_RANGE(0x0a0000, 0x0a0001) AM_READ_PORT("SYSTEM") AM_WRITE(CPUA_register_w)
 	AM_RANGE(0x0a0002, 0x0a0003) AM_READ_PORT("P1")
@@ -220,7 +220,7 @@ static ADDRESS_MAP_START( fround_map, AS_PROGRAM, 16, fround_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x040000, 0x043fff) AM_RAM AM_SHARE("comram")
 	AM_RANGE(0x060000, 0x063fff) AM_RAM
-	AM_RANGE(0x080000, 0x080fff) AM_DEVREADWRITE8("palette", palette_device, read, write, 0x00ff) AM_SHARE("palette")
+	AM_RANGE(0x080000, 0x080fff) AM_DEVREADWRITE8("palette", palette_device, read8, write8, 0x00ff) AM_SHARE("palette")
 	AM_RANGE(0x0a0000, 0x0a0001) AM_READ_PORT("SYSTEM") AM_WRITE(fround_CPU_register_w)
 	AM_RANGE(0x0a0002, 0x0a0003) AM_READ_PORT("P1")
 	AM_RANGE(0x0a0004, 0x0a0005) AM_READ_PORT("P2")
@@ -661,7 +661,7 @@ void twin16_state::machine_start()
 	save_item(NAME(m_CPUB_register));
 }
 
-static MACHINE_CONFIG_START( twin16 )
+MACHINE_CONFIG_START(twin16_state::twin16)
 	// basic machine hardware
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_18_432MHz/2)
 	MCFG_CPU_PROGRAM_MAP(main_map)
@@ -715,11 +715,11 @@ static MACHINE_CONFIG_START( twin16 )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.20)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( devilw, twin16 )
+MACHINE_CONFIG_DERIVED(twin16_state::devilw, twin16)
 	MCFG_QUANTUM_TIME(attotime::from_hz(60000)) // watchdog reset otherwise
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( fround )
+MACHINE_CONFIG_START(fround_state::fround)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_18_432MHz/2)
 	MCFG_CPU_PROGRAM_MAP(fround_map)
@@ -769,12 +769,12 @@ static MACHINE_CONFIG_START( fround )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.20)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( miaj, twin16 )
+MACHINE_CONFIG_DERIVED(twin16_state::miaj, twin16)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_RAW_PARAMS(XTAL_18_432MHz/2, 576, 1*8, 39*8, 264, 2*8, 30*8)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( cuebrickj, twin16 )
+MACHINE_CONFIG_DERIVED(cuebrickj_state::cuebrickj, twin16)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_RAW_PARAMS(XTAL_18_432MHz/2, 576, 1*8, 39*8, 264, 2*8, 30*8)
 	MCFG_NVRAM_ADD_0FILL("nvram")

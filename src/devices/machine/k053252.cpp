@@ -143,9 +143,9 @@ READ8_MEMBER( k053252_device::read )
 		/* VCT read-back */
 		// TODO: correct?
 		case 0x0e:
-			return ((m_screen->vpos()-m_vc) >> 8) & 1;
+			return ((screen().vpos()-m_vc) >> 8) & 1;
 		case 0x0f:
-			return (m_screen->vpos()-m_vc) & 0xff;
+			return (screen().vpos()-m_vc) & 0xff;
 		default:
 			//popmessage("Warning: k053252 read %02x, contact MAMEdev",offset);
 			break;
@@ -171,7 +171,7 @@ void k053252_device::res_change()
 		visarea.max_x = m_offsx + m_hc - m_hfp - m_hbp - 8*(m_hsw) - 1;
 		visarea.max_y = m_offsy + m_vc - m_vfp - m_vbp - (m_vsw) - 1;
 
-		m_screen->configure(m_hc, m_vc, visarea, refresh);
+		screen().configure(m_hc, m_vc, visarea, refresh);
 
 		if (m_slave_screen.found())
 			m_slave_screen->configure(m_hc, m_vc, visarea, refresh);

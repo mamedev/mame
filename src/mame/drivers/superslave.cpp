@@ -22,6 +22,7 @@ Oxx,yy          = Out port
 
 #include "emu.h"
 #include "bus/rs232/rs232.h"
+//#include "bus/s100/s100.h"
 #include "cpu/z80/z80.h"
 #include "cpu/z80/z80daisy.h"
 #include "machine/com8116.h"
@@ -65,6 +66,7 @@ public:
 	DECLARE_READ8_MEMBER( status_r );
 	DECLARE_WRITE8_MEMBER( cmd_w );
 
+	void superslave(machine_config &config);
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<com8116_device> m_dbrg;
@@ -370,7 +372,7 @@ void superslave_state::machine_reset()
 //  MACHINE_CONFIG( superslave )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( superslave )
+MACHINE_CONFIG_START(superslave_state::superslave)
 	// basic machine hardware
 	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL_8MHz/2)
 	MCFG_CPU_PROGRAM_MAP(superslave_mem)

@@ -97,7 +97,7 @@ DEFINE_DEVICE_TYPE(M1COMM, m1comm_device, "m1comm", "Model 1 Communication Board
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( m1comm_device::device_add_mconfig )
+MACHINE_CONFIG_START(m1comm_device::device_add_mconfig)
 	MCFG_CPU_ADD(Z80_TAG, Z80, 8000000) /* 32 MHz / 4 */
 	MCFG_CPU_PROGRAM_MAP(m1comm_mem)
 	MCFG_CPU_IO_MAP(m1comm_io)

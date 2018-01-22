@@ -17,7 +17,7 @@ Implements WD2010 / WD1010 controller basics for a single hard disk.
 
 UNIMPLEMENTED FEATURES :
         - more than 1 drive (untested)
-    - multi sector transfers (M = 1)
+	- multi sector transfers (M = 1)
         - seek and index timers / ID not found.
         - implied seeks / implied writes / retries
         - edge or level triggered seek complete (SC)
@@ -41,7 +41,7 @@ UNIMPLEMENTED FEATURES :
 #define VERBOSE 1
 #include "logmacro.h"
 
-
+#include <math.h>
 //**************************************************************************
 //  MACROS / CONSTANTS
 //**************************************************************************
@@ -59,6 +59,14 @@ UNIMPLEMENTED FEATURES :
 // --------------------------------------------------------
 #define MAX_MFM_SECTORS 17      // STANDARD MFM SECTORS/TRACK
 // --------------------------------------------------------
+
+// Typical access times for MFM drives (as listed in ST412_OEM Manual_Apr82)
+#define SETTLING_MS 15.0
+#define LATENCY_MS 8.33
+
+// Step rates in ms for 5 Mhz WCLK (35 uS when zero)
+#define STEP_RATE_MS \
+	(float) ( (data & 0x0f) ? ((data & 0x0f) * 0.5) : 0.035 )
 
 
 // task file
@@ -93,10 +101,10 @@ enum
 #define DRIVE \
 	((m_task_file[TASK_FILE_SDH_REGISTER] >> 3) & 0x03)
 
-static constexpr int SECTOR_SIZES[4] = { 256, 512, 1024, 128 };
-
 #define SECTOR_SIZE \
 	SECTOR_SIZES[(m_task_file[TASK_FILE_SDH_REGISTER] >> 5) & 0x03]
+
+static constexpr int SECTOR_SIZES[4] = { 256, 512, 1024, 128 };
 
 // status register
 #define STATUS_BSY      0x80
@@ -129,8 +137,6 @@ static constexpr int SECTOR_SIZES[4] = { 256, 512, 1024, 128 };
 #define COMMAND_COMPUTE_CORRECTION  0x08
 #define COMMAND_SET_PARAMETER_MASK  0xfe
 #define COMMAND_SET_PARAMETER       0x00
-
-
 
 //**************************************************************************
 //  DEVICE DEFINITIONS
@@ -390,17 +396,13 @@ void wd2010_device::restore(uint8_t data)
 
 	m_out_rwc_cb(0); // reset RWC, set direction = OUT
 
-	// datasheet: DIRIN HIGH = in ;  LOW = out
+	// Datasheet: DIRIN HIGH = in ;  LOW = out
 	m_out_dirin_cb(0); // 0 = heads move away from the spindle, towards track O.
 
-	// TODO: store step rate
-
-	m_present_cylinder = 0; // (sse WD2010-05 datasheet)
-	m_task_file[TASK_FILE_CYLINDER_HIGH] = 0;
-	m_task_file[TASK_FILE_CYLINDER_LOW] = 0;
+	// Omitted: store step rate for later (implied seeks). 
 
 	int step_pulses = 0;
-	while (step_pulses < STEP_LIMIT)
+	while (step_pulses <= STEP_LIMIT)
 	{
 		while (!m_in_sc_cb())
 		{
@@ -415,25 +417,20 @@ void wd2010_device::restore(uint8_t data)
 			}
 		}
 
-		//if (m_in_tk000_cb())
-		if (step_pulses == STEP_LIMIT - 2) // Simulate TRACK 00 signal (normally from DRIVE)
+		if ( m_in_tk000_cb() || (step_pulses == STEP_LIMIT) ) // Simulate TRACK 00 signal (normally from DRIVE)
 		{
-			m_out_bcr_cb(0); // pulse BCR
-			m_out_bcr_cb(1);
-			newstatus &= ~(STATUS_BSY | STATUS_CIP); // prepare new status; (INTRQ later) reset BSY, CIP
-			complete_cmd(newstatus);
-			return;
-		}
-
-		if (step_pulses == STEP_LIMIT - 1) // NOTE: STEP_LIMIT - differs - between WD2010 and WD1010
-		{
-			m_error = ERROR_TK; // ERROR: track 0 not reached within limit
-			newstatus = newstatus | STATUS_ERR;
+			m_present_cylinder = 0; 
+			m_task_file[TASK_FILE_CYLINDER_HIGH] = 0;
+			m_task_file[TASK_FILE_CYLINDER_LOW] = 0;
 
 			m_out_bcr_cb(0); // pulse BCR
 			m_out_bcr_cb(1);
 			newstatus &= ~(STATUS_BSY | STATUS_CIP); // prepare new status; (INTRQ later) reset BSY, CIP
-			complete_cmd(newstatus);
+
+			// NOTE: calculation needs 'data' (extracted from command register)
+			float step_ms = SETTLING_MS + LATENCY_MS + ( (float)sqrt(1.0 * step_pulses) * STEP_RATE_MS );  
+
+			cmd_timer->adjust(attotime::from_usec(1000 * step_ms), newstatus); 
 			return;
 		}
 
@@ -449,9 +446,11 @@ void wd2010_device::restore(uint8_t data)
 //  seek -
 //-------------------------------------------------
 
-// FIXME : step rate, drive change (untested)
+// FIXME : drive change (untested)
 
-// NOT IMPLEMENTED: IMPLIED SEEK ("wait until rising edge of SC signal")
+// Not implemented: IMPLIED SEEK ("wait until rising edge of SC signal")
+// Also, step rate for implied seeks _should be_ taken from previous restore.
+
 void wd2010_device::seek(uint8_t data)
 {
 	uint8_t newstatus = STATUS_RDY | STATUS_SC;
@@ -460,12 +459,11 @@ void wd2010_device::seek(uint8_t data)
 	m_error = 0;
 	m_status = STATUS_BSY | STATUS_CIP;
 
-	// TODO : store STEP RATE.
 	auto_scan_id(data); // has drive number changed?
 
 	int direction; // 0 = towards 0
 	int step_pulses;
-
+	
 	// Calculate number of steps by comparing the cylinder registers
 	//           HI/LO with the internally stored position.
 	uint32_t cylinder_registers = CYLINDER;
@@ -479,7 +477,10 @@ void wd2010_device::seek(uint8_t data)
 		step_pulses = cylinder_registers - m_present_cylinder;
 		direction = 1;
 	}
-	logerror("SEEK - direction = %u, step_pulses = %u\n", direction, step_pulses);
+
+	// NOTE: calculation needs 'step_pulses' and 'data' (taken from command register)
+	float step_ms = SETTLING_MS + LATENCY_MS + ( (float)sqrt(1.0 * step_pulses) * STEP_RATE_MS );  
+
 	m_out_dirin_cb(direction);
 
 	if (!m_in_drdy_cb() || m_in_wf_cb()) // DRDY de-asserted or WF asserted?
@@ -530,9 +531,8 @@ void wd2010_device::seek(uint8_t data)
 	m_task_file[TASK_FILE_CYLINDER_HIGH] = (m_present_cylinder >> 8) & 0xff;
 	m_task_file[TASK_FILE_CYLINDER_LOW] = (m_present_cylinder - ((m_task_file[TASK_FILE_CYLINDER_HIGH] << 8) )) & 0xff;
 
-	logerror("SEEK (END) - m_present_cylinder = %u SDH CYL L/H %02x / %02x\n", m_present_cylinder,m_task_file[TASK_FILE_CYLINDER_LOW],m_task_file[TASK_FILE_CYLINDER_HIGH]);
-
-	cmd_timer->adjust(attotime::from_msec(35), newstatus);  // 35 msecs makes "SEEK_TIMING" test happy.
+	//LOGERROR("SEEK (END) - m_present_cylinder = %u SDH CYL L/H %02x / %02x\n", m_present_cylinder,m_task_file[TASK_FILE_CYLINDER_LOW],m_task_file[TASK_FILE_CYLINDER_HIGH]);
+	cmd_timer->adjust(attotime::from_usec(1000 * step_ms), newstatus); 
 }
 
 //-------------------------------------------------

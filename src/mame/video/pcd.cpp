@@ -99,7 +99,7 @@ ioport_constructor pcd_video_device::device_input_ports() const
 	return INPUT_PORTS_NAME(pcd_mouse);
 }
 
-MACHINE_CONFIG_MEMBER( pcd_video_device::device_add_mconfig )
+MACHINE_CONFIG_START(pcd_video_device::device_add_mconfig)
 	MCFG_CPU_ADD("graphics", I8741, XTAL_16MHz/2)
 	MCFG_MCS48_PORT_P1_IN_CB(READ8(pcd_video_device, p1_r))
 	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(pcd_video_device, p2_w))
@@ -115,7 +115,7 @@ MACHINE_CONFIG_MEMBER( pcd_video_device::device_add_mconfig )
 	MCFG_PALETTE_ADD("palette", 3)
 	MCFG_PALETTE_INIT_OWNER(pcdx_video_device, pcdx)
 
-	MCFG_SCN2674_VIDEO_ADD("crtc", 0, NOOP);
+	MCFG_DEVICE_ADD("crtc", SCN2674, 0)
 	MCFG_SCN2674_TEXT_CHARACTER_WIDTH(8)
 	MCFG_SCN2674_GFX_CHARACTER_WIDTH(16)
 	MCFG_SCN2674_DRAW_CHARACTER_CALLBACK_OWNER(pcd_video_device, display_pixels)
@@ -140,7 +140,7 @@ static ADDRESS_MAP_START( pcx_vram, 0, 8, pcx_video_device )
 	AM_RANGE(0x0000, 0x07ff) AM_READWRITE(vram_r, vram_w)
 ADDRESS_MAP_END
 
-MACHINE_CONFIG_MEMBER( pcx_video_device::device_add_mconfig )
+MACHINE_CONFIG_START(pcx_video_device::device_add_mconfig)
 	MCFG_CPU_ADD("graphics", I8031, XTAL_24MHz/2)
 	MCFG_CPU_PROGRAM_MAP(pcx_vid_map)
 	MCFG_CPU_IO_MAP(pcx_vid_io)
@@ -157,7 +157,8 @@ MACHINE_CONFIG_MEMBER( pcx_video_device::device_add_mconfig )
 
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
-	MCFG_SCN2674_VIDEO_ADD("crtc", 0, INPUTLINE("graphics", MCS51_INT0_LINE));
+	MCFG_DEVICE_ADD("crtc", SCN2674, 0)
+	MCFG_SCN2674_INTR_CALLBACK(INPUTLINE("graphics", MCS51_INT0_LINE))
 	MCFG_SCN2674_TEXT_CHARACTER_WIDTH(8)
 	MCFG_SCN2674_GFX_CHARACTER_WIDTH(16)
 	MCFG_SCN2674_DRAW_CHARACTER_CALLBACK_OWNER(pcx_video_device, display_pixels)

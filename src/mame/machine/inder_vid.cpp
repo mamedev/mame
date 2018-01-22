@@ -57,18 +57,18 @@ TMS340X0_TO_SHIFTREG_CB_MEMBER(inder_vid_device::to_shiftreg)
 {
 	if (m_shiftfull == 0)
 	{
-		//printf("read to shift regs address %08x (%08x)\n", address, TOWORD(address) * 2);
+		//printf("read to shift regs address %08x\n", address);
 
-		memcpy(shiftreg, &m_vram[TOWORD(address) & ~TOWORD(0x1fff)], TOBYTE(0x2000)); // & ~TOWORD(0x1fff) is needed for round 6
+		memcpy(shiftreg, &m_vram[(address & ~0x1fff) >> 4], 0x400); // & ~0x1fff is needed for round 6
 		m_shiftfull = 1;
 	}
 }
 
 TMS340X0_FROM_SHIFTREG_CB_MEMBER(inder_vid_device::from_shiftreg)
 {
-//  printf("write from shift regs address %08x (%08x)\n", address, TOWORD(address) * 2);
+//  printf("write from shift regs address %08x\n", address);
 
-	memcpy(&m_vram[TOWORD(address) & ~TOWORD(0x1fff)], shiftreg, TOBYTE(0x2000));
+	memcpy(&m_vram[(address & ~0x1fff) >> 4], shiftreg, 0x400);
 
 	m_shiftfull = 0;
 }
@@ -85,7 +85,7 @@ static ADDRESS_MAP_START( ramdac_map, 0, 8, inder_vid_device )
 	AM_RANGE(0x000, 0x3ff) AM_DEVREADWRITE("ramdac",ramdac_device,ramdac_pal_r,ramdac_rgb888_w)
 ADDRESS_MAP_END
 
-MACHINE_CONFIG_MEMBER( inder_vid_device::device_add_mconfig )
+MACHINE_CONFIG_START(inder_vid_device::device_add_mconfig)
 	MCFG_CPU_ADD("tms", TMS34010, XTAL_40MHz)
 	MCFG_CPU_PROGRAM_MAP(megaphx_tms_map)
 	MCFG_TMS340X0_HALT_ON_RESET(true) /* halt on reset */

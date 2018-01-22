@@ -33,6 +33,7 @@ public:
 	virtual void video_start() override;
 	uint32_t screen_update_hapyfish(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
+	void hapyfish(machine_config &config);
 };
 
 static ADDRESS_MAP_START( hapyfish_map, AS_PROGRAM, 32, hapyfish_state )
@@ -53,7 +54,7 @@ void hapyfish_state::video_start()
 
 
 
-static MACHINE_CONFIG_START( hapyfish )
+MACHINE_CONFIG_START(hapyfish_state::hapyfish)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", ARM9, 20000000) // ?? ARM baesd CPU

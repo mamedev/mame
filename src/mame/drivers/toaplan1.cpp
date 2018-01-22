@@ -843,7 +843,7 @@ static ADDRESS_MAP_START( rallybik_sound_io_map, AS_IO, 8, toaplan1_rallybik_sta
 	AM_RANGE(0x00, 0x00) AM_READ_PORT("P1")
 	AM_RANGE(0x10, 0x10) AM_READ_PORT("P2")
 	AM_RANGE(0x20, 0x20) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x30, 0x30) AM_DEVWRITE("coinlatch", ls259_device, write_nibble)  /* Coin counter/lockout */
+	AM_RANGE(0x30, 0x30) AM_DEVWRITE("coinlatch", ls259_device, write_nibble_d0)  /* Coin counter/lockout */
 	AM_RANGE(0x40, 0x40) AM_READ_PORT("DSWA")
 	AM_RANGE(0x50, 0x50) AM_READ_PORT("DSWB")
 	AM_RANGE(0x60, 0x61) AM_DEVREADWRITE("ymsnd", ym3812_device, read, write)
@@ -1887,7 +1887,7 @@ GFXDECODE_END
 #define VBSTART             (240)
 
 
-static MACHINE_CONFIG_START( rallybik )
+MACHINE_CONFIG_START(toaplan1_rallybik_state::rallybik)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_10MHz)
@@ -1933,7 +1933,7 @@ static MACHINE_CONFIG_START( rallybik )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( truxton )
+MACHINE_CONFIG_START(toaplan1_state::truxton)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_10MHz)
@@ -1971,7 +1971,7 @@ static MACHINE_CONFIG_START( truxton )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( hellfire )
+MACHINE_CONFIG_START(toaplan1_state::hellfire)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_10MHz)
@@ -2009,7 +2009,7 @@ static MACHINE_CONFIG_START( hellfire )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( zerowing )
+MACHINE_CONFIG_START(toaplan1_state::zerowing)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_10MHz)
@@ -2047,7 +2047,7 @@ static MACHINE_CONFIG_START( zerowing )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( demonwld )
+MACHINE_CONFIG_START(toaplan1_state::demonwld)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_10MHz)
@@ -2090,7 +2090,7 @@ static MACHINE_CONFIG_START( demonwld )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( samesame )
+MACHINE_CONFIG_START(toaplan1_state::samesame)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_10MHz)
@@ -2128,7 +2128,7 @@ static MACHINE_CONFIG_START( samesame )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( outzone )
+MACHINE_CONFIG_START(toaplan1_state::outzone)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_10MHz)
@@ -2166,7 +2166,7 @@ static MACHINE_CONFIG_START( outzone )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( outzonecv )
+MACHINE_CONFIG_START(toaplan1_state::outzonecv)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_10MHz)
@@ -2184,7 +2184,7 @@ static MACHINE_CONFIG_START( outzonecv )
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
-	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND+16, VBSTART+16)
+	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
 	MCFG_SCREEN_UPDATE_DRIVER(toaplan1_state, screen_update_toaplan1)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(toaplan1_state, screen_vblank_toaplan1))
 	MCFG_SCREEN_PALETTE("palette")
@@ -2204,7 +2204,7 @@ static MACHINE_CONFIG_START( outzonecv )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( vimana )
+MACHINE_CONFIG_START(toaplan1_state::vimana)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_10MHz) /* verified on pcb */

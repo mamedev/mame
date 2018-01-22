@@ -61,7 +61,7 @@ INPUT_PORTS_END
 
 /* Machine Driver */
 
-static MACHINE_CONFIG_START( advision )
+MACHINE_CONFIG_START(advision_state::advision)
 	/* basic machine hardware */
 	MCFG_CPU_ADD(I8048_TAG, I8048, XTAL_11MHz)
 	MCFG_CPU_PROGRAM_MAP(program_map)

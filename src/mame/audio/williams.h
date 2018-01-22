@@ -57,7 +57,7 @@ protected:
 
 private:
 	// devices
-	required_device<m6809e_device> m_cpu;
+	required_device<mc6809e_device> m_cpu;
 	required_device<pia6821_device> m_pia;
 	required_device<hc55516_device> m_hc55516;
 
@@ -112,8 +112,8 @@ private:
 	};
 
 	// devices
-	required_device<m6809e_device> m_cpu0;
-	required_device<m6809e_device> m_cpu1;
+	required_device<mc6809e_device> m_cpu0;
+	required_device<mc6809e_device> m_cpu1;
 	required_device<hc55516_device> m_hc55516;
 
 	// internal state
@@ -161,7 +161,7 @@ protected:
 
 private:
 	// devices
-	required_device<m6809e_device> m_cpu;
+	required_device<mc6809e_device> m_cpu;
 
 	// internal state
 	uint8_t m_latch;

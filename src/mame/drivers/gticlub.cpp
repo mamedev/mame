@@ -329,6 +329,10 @@ public:
 	uint32_t screen_update_gticlub(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_hangplt(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
+	void thunderh(machine_config &config);
+	void hangplt(machine_config &config);
+	void slrasslt(machine_config &config);
+	void gticlub(machine_config &config);
 private:
 	void gticlub_led_setreg(int offset, uint8_t data);
 
@@ -934,7 +938,7 @@ uint32_t gticlub_state::screen_update_hangplt(screen_device &screen, bitmap_rgb3
 
 	return 0;
 }
-static MACHINE_CONFIG_START( gticlub )
+MACHINE_CONFIG_START(gticlub_state::gticlub)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", PPC403GA, XTAL_64MHz/2)   /* PowerPC 403GA 32MHz */
@@ -1007,7 +1011,7 @@ static MACHINE_CONFIG_START( gticlub )
 	MCFG_KONPPC_CGBOARD_TYPE(GTICLUB)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( thunderh, gticlub )
+MACHINE_CONFIG_DERIVED(gticlub_state::thunderh, gticlub)
 
 	MCFG_DEVICE_REMOVE("adc1038")
 	MCFG_DEVICE_ADD("adc1038", ADC1038, 0)
@@ -1019,7 +1023,7 @@ static MACHINE_CONFIG_DERIVED( thunderh, gticlub )
 	MCFG_K056230_HACK(1)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( slrasslt, gticlub )
+MACHINE_CONFIG_DERIVED(gticlub_state::slrasslt, gticlub)
 
 	MCFG_DEVICE_REMOVE("adc1038")
 	MCFG_DEVICE_ADD("adc1038", ADC1038, 0)
@@ -1041,7 +1045,7 @@ MACHINE_RESET_MEMBER(gticlub_state,hangplt)
 	m_dsp2->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 }
 
-static MACHINE_CONFIG_START( hangplt )
+MACHINE_CONFIG_START(gticlub_state::hangplt)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", PPC403GA, XTAL_64MHz/2)   /* PowerPC 403GA 32MHz */
@@ -1500,8 +1504,8 @@ GAME( 1996, gticlub,    0,        gticlub,  gticlub,  gticlub_state, gticlub,  R
 GAME( 1996, gticlubu,   gticlub,  gticlub,  gticlub,  gticlub_state, gticlub,  ROT0, "Konami", "GTI Club (ver UAA)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 GAME( 1996, gticluba,   gticlub,  gticlub,  gticlub,  gticlub_state, gticlub,  ROT0, "Konami", "GTI Club (ver AAA)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 GAME( 1996, gticlubj,   gticlub,  gticlub,  gticlub,  gticlub_state, gticlub,  ROT0, "Konami", "GTI Club (ver JAA)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-GAME( 1996, thunderh,   0,        thunderh, thunderh, gticlub_state, gticlub,  ROT0, "Konami", "Operation Thunder Hurricane (ver EAA)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
-GAME( 1996, thunderhu,  thunderh, thunderh, thunderh, gticlub_state, gticlub,  ROT0, "Konami", "Operation Thunder Hurricane (ver UAA)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+GAME( 1997, thunderh,   0,        thunderh, thunderh, gticlub_state, gticlub,  ROT0, "Konami", "Operation Thunder Hurricane (ver EAA)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+GAME( 1997, thunderhu,  thunderh, thunderh, thunderh, gticlub_state, gticlub,  ROT0, "Konami", "Operation Thunder Hurricane (ver UAA)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 GAME( 1997, slrasslt,   0,        slrasslt, slrasslt, gticlub_state, gticlub,  ROT0, "Konami", "Solar Assault (ver UAA)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // Based on Revised code
 GAME( 1997, slrassltj,  slrasslt, slrasslt, slrasslt, gticlub_state, gticlub,  ROT0, "Konami", "Solar Assault Revised (ver JAA)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 GAME( 1997, slrassltj1, slrasslt, slrasslt, slrasslt, gticlub_state, gticlub,  ROT0, "Konami", "Solar Assault (ver JAA)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )

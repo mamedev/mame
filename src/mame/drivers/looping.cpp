@@ -167,6 +167,7 @@ public:
 	required_device<palette_device> m_palette;
 	required_device<generic_latch_8_device> m_soundlatch;
 	required_device<watchdog_timer_device> m_watchdog;
+	void looping(machine_config &config);
 };
 
 
@@ -349,7 +350,9 @@ void looping_state::machine_start()
 void looping_state::machine_reset()
 {
 	// Disable auto wait state generation by raising the READY line on reset
-	static_cast<tms9995_device*>(machine().device("maincpu"))->ready_line(ASSERT_LINE);
+	tms9995_device* cpu = static_cast<tms9995_device*>(machine().device("maincpu"));
+	cpu->ready_line(ASSERT_LINE);
+	cpu->reset_line(ASSERT_LINE);
 }
 
 /*************************************
@@ -472,8 +475,8 @@ WRITE_LINE_MEMBER(looping_state::ballon_enable_w)
 WRITE8_MEMBER(looping_state::out_0_w){ osd_printf_debug("out0 = %02X\n", data); }
 WRITE8_MEMBER(looping_state::out_2_w){ osd_printf_debug("out2 = %02X\n", data); }
 
-READ8_MEMBER(looping_state::adc_r){ osd_printf_debug("%04X:ADC read\n", space.device().safe_pc()); return 0xff; }
-WRITE8_MEMBER(looping_state::adc_w){ osd_printf_debug("%04X:ADC write = %02X\n", space.device().safe_pc(), data); }
+READ8_MEMBER(looping_state::adc_r){ osd_printf_debug("%04X:ADC read\n", m_maincpu->pc()); return 0xff; }
+WRITE8_MEMBER(looping_state::adc_w){ osd_printf_debug("%04X:ADC write = %02X\n", m_maincpu->pc(), data); }
 
 WRITE_LINE_MEMBER(looping_state::plr2_w)
 {
@@ -608,7 +611,7 @@ GFXDECODE_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( looping )
+MACHINE_CONFIG_START(looping_state::looping)
 
 	// CPU TMS9995, standard variant; no line connections
 	MCFG_TMS99xx_ADD("maincpu", TMS9995, MAIN_CPU_CLOCK, looping_map, looping_io_map)
@@ -913,7 +916,7 @@ DRIVER_INIT_MEMBER(looping_state,looping)
 
 	/* bitswap the TMS9995 ROMs */
 	for (i = 0; i < length; i++)
-		rom[i] = BITSWAP8(rom[i], 0,1,2,3,4,5,6,7);
+		rom[i] = bitswap<8>(rom[i], 0,1,2,3,4,5,6,7);
 
 	/* install protection handlers */
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x7000, 0x7007, read8_delegate(FUNC(looping_state::protection_r), this));

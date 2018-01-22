@@ -160,7 +160,7 @@ WRITE8_MEMBER( poly880_state::pio1_pa_w )
 
 	*/
 
-	m_segment = BITSWAP8(data, 3, 4, 6, 0, 1, 2, 7, 5);
+	m_segment = bitswap<8>(data, 3, 4, 6, 0, 1, 2, 7, 5);
 
 	update_display();
 }
@@ -242,7 +242,7 @@ void poly880_state::machine_start()
 
 /* Machine Driver */
 
-static MACHINE_CONFIG_START( poly880 )
+MACHINE_CONFIG_START(poly880_state::poly880)
 	/* basic machine hardware */
 	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL_7_3728MHz/8)
 	MCFG_CPU_PROGRAM_MAP(poly880_mem)

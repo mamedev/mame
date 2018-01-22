@@ -1394,6 +1394,21 @@ void ay8910_device::device_reset()
  *
  *************************************/
 
+u8 ay8910_device::data_r()
+{
+	return ay8910_read_ym();
+}
+
+void ay8910_device::address_w(u8 data)
+{
+	ay8910_write_ym(0, data);
+}
+
+void ay8910_device::data_w(u8 data)
+{
+	ay8910_write_ym(1, data);
+}
+
 READ8_MEMBER( ay8910_device::data_r )
 {
 	return ay8910_read_ym();
@@ -1448,6 +1463,11 @@ WRITE8_MEMBER( ay8910_device::write_bc1_bc2 )
 }
 
 WRITE8_MEMBER( ay8910_device::reset_w )
+{
+	reset_w();
+}
+
+void ay8910_device::reset_w()
 {
 	ay8910_reset_ym();
 }

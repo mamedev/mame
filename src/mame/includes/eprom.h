@@ -36,7 +36,7 @@ public:
 	DECLARE_READ16_MEMBER(adc_r);
 	DECLARE_WRITE16_MEMBER(eprom_latch_w);
 	DECLARE_READ16_MEMBER(sync_r);
-	DECLARE_WRITE16_MEMBER(sync_w);
+	template<bool maincpu> DECLARE_WRITE16_MEMBER(sync_w);
 	DECLARE_DRIVER_INIT(klaxp);
 	DECLARE_DRIVER_INIT(guts);
 	DECLARE_DRIVER_INIT(eprom);
@@ -54,4 +54,7 @@ public:
 	required_device<palette_device> m_palette;
 	static const atari_motion_objects_config s_mob_config;
 	static const atari_motion_objects_config s_guts_mob_config;
+	void guts(machine_config &config);
+	void eprom(machine_config &config);
+	void klaxp(machine_config &config);
 };

@@ -209,6 +209,7 @@ public:
 
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 
+	void nevada(machine_config &config);
 };
 
 /*
@@ -589,7 +590,7 @@ MACHINE_START_MEMBER(nevada_state, nevada)
 *     Machine Driver     *
 *************************/
 
-static MACHINE_CONFIG_START( nevada )
+MACHINE_CONFIG_START(nevada_state::nevada)
 	// basic machine hardware
 	MCFG_CPU_ADD("maincpu", M68000, MASTER_CPU)
 	MCFG_CPU_PROGRAM_MAP(nevada_map)
@@ -624,15 +625,15 @@ static MACHINE_CONFIG_START( nevada )
 	MCFG_SOUND_ADD("aysnd", AY8912, SOUND_CLOCK)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 
-	MCFG_MC68681_ADD( "duart18_68681", XTAL_3_6864MHz )  // UARTA = Modem 1200Baud
+	MCFG_DEVICE_ADD("duart18_68681", MC68681, XTAL_3_6864MHz)  // UARTA = Modem 1200Baud
 	MCFG_MC68681_IRQ_CALLBACK(WRITELINE(nevada_state, duart18_irq_handler))
 	MCFG_MC68681_INPORT_CALLBACK(IOPORT("DSW1"))
 
-	MCFG_MC68681_ADD( "duart39_68681", XTAL_3_6864MHz )  // UARTA = Printer
+	MCFG_DEVICE_ADD("duart39_68681", MC68681, XTAL_3_6864MHz)  // UARTA = Printer
 	MCFG_MC68681_IRQ_CALLBACK(WRITELINE(nevada_state, duart39_irq_handler))
 	MCFG_MC68681_INPORT_CALLBACK(IOPORT("DSW2"))
 
-	MCFG_MC68681_ADD( "duart40_68681", XTAL_3_6864MHz )  // UARTA = Touch , UARTB = Bill Acceptor
+	MCFG_DEVICE_ADD("duart40_68681", MC68681, XTAL_3_6864MHz)  // UARTA = Touch , UARTB = Bill Acceptor
 	MCFG_MC68681_IRQ_CALLBACK(WRITELINE(nevada_state, duart40_irq_handler))
 	MCFG_MC68681_A_TX_CALLBACK(DEVWRITELINE("microtouch", microtouch_device, rx))
 	MCFG_MC68681_INPORT_CALLBACK(IOPORT("DSW3"))

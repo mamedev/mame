@@ -114,7 +114,7 @@ WRITE16_MEMBER(pirates_state::out_w)
 		/* bit 7 used (function unknown) */
 	}
 
-//  logerror("%06x: out_w %04x\n",space.device().safe_pc(),data);
+//  logerror("%06x: out_w %04x\n",m_maincpu->pc(),data);
 }
 
 CUSTOM_INPUT_MEMBER(pirates_state::prot_r)
@@ -163,7 +163,7 @@ static ADDRESS_MAP_START( pirates_map, AS_PROGRAM, 16, pirates_state )
 //  AM_RANGE(0x500800, 0x50080f) AM_WRITENOP
 	AM_RANGE(0x600000, 0x600001) AM_WRITE(out_w)
 	AM_RANGE(0x700000, 0x700001) AM_WRITEONLY AM_SHARE("scroll")    // scroll reg
-	AM_RANGE(0x800000, 0x803fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x800000, 0x803fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x900000, 0x90017f) AM_RAM  // more of tilemaps ?
 	AM_RANGE(0x900180, 0x90137f) AM_RAM_WRITE(tx_tileram_w) AM_SHARE("tx_tileram")
 	AM_RANGE(0x901380, 0x902a7f) AM_RAM_WRITE(fg_tileram_w) AM_SHARE("fg_tileram")
@@ -251,7 +251,7 @@ GFXDECODE_END
 
 /* Machine Driver + Related bits */
 
-static MACHINE_CONFIG_START( pirates )
+MACHINE_CONFIG_START(pirates_state::pirates)
 	MCFG_CPU_ADD("maincpu", M68000, 16000000) /* 16mhz */
 	MCFG_CPU_PROGRAM_MAP(pirates_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", pirates_state,  irq1_line_hold)
@@ -365,11 +365,11 @@ void pirates_state::decrypt_68k()
 		int adrl, adrr;
 		uint8_t vl, vr;
 
-		adrl = BITSWAP24(i,23,22,21,20,19,18,4,8,3,14,2,15,17,0,9,13,10,5,16,7,12,6,1,11);
-		vl = BITSWAP8(buf[adrl],    4,2,7,1,6,5,0,3);
+		adrl = bitswap<24>(i,23,22,21,20,19,18,4,8,3,14,2,15,17,0,9,13,10,5,16,7,12,6,1,11);
+		vl = bitswap<8>(buf[adrl],    4,2,7,1,6,5,0,3);
 
-		adrr = BITSWAP24(i,23,22,21,20,19,18,4,10,1,11,12,5,9,17,14,0,13,6,15,8,3,16,7,2);
-		vr = BITSWAP8(buf[adrr]>>8, 1,4,7,0,3,5,6,2);
+		adrr = bitswap<24>(i,23,22,21,20,19,18,4,10,1,11,12,5,9,17,14,0,13,6,15,8,3,16,7,2);
+		vr = bitswap<8>(buf[adrr]>>8, 1,4,7,0,3,5,6,2);
 
 		rom[i] = (vr<<8) | vl;
 	}
@@ -390,11 +390,11 @@ void pirates_state::decrypt_p()
 
 	for (i=0; i<rom_size/4; i++)
 	{
-		int adr = BITSWAP24(i,23,22,21,20,19,18,10,2,5,9,7,13,16,14,11,4,1,6,12,17,3,0,15,8);
-		rom[adr+0*(rom_size/4)] = BITSWAP8(buf[i+0*(rom_size/4)], 2,3,4,0,7,5,1,6);
-		rom[adr+1*(rom_size/4)] = BITSWAP8(buf[i+1*(rom_size/4)], 4,2,7,1,6,5,0,3);
-		rom[adr+2*(rom_size/4)] = BITSWAP8(buf[i+2*(rom_size/4)], 1,4,7,0,3,5,6,2);
-		rom[adr+3*(rom_size/4)] = BITSWAP8(buf[i+3*(rom_size/4)], 2,3,4,0,7,5,1,6);
+		int adr = bitswap<24>(i,23,22,21,20,19,18,10,2,5,9,7,13,16,14,11,4,1,6,12,17,3,0,15,8);
+		rom[adr+0*(rom_size/4)] = bitswap<8>(buf[i+0*(rom_size/4)], 2,3,4,0,7,5,1,6);
+		rom[adr+1*(rom_size/4)] = bitswap<8>(buf[i+1*(rom_size/4)], 4,2,7,1,6,5,0,3);
+		rom[adr+2*(rom_size/4)] = bitswap<8>(buf[i+2*(rom_size/4)], 1,4,7,0,3,5,6,2);
+		rom[adr+3*(rom_size/4)] = bitswap<8>(buf[i+3*(rom_size/4)], 2,3,4,0,7,5,1,6);
 	}
 }
 
@@ -413,11 +413,11 @@ void pirates_state::decrypt_s()
 
 	for (i=0; i<rom_size/4; i++)
 	{
-		int adr = BITSWAP24(i,23,22,21,20,19,18,17,5,12,14,8,3,0,7,9,16,4,2,6,11,13,1,10,15);
-		rom[adr+0*(rom_size/4)] = BITSWAP8(buf[i+0*(rom_size/4)], 4,2,7,1,6,5,0,3);
-		rom[adr+1*(rom_size/4)] = BITSWAP8(buf[i+1*(rom_size/4)], 1,4,7,0,3,5,6,2);
-		rom[adr+2*(rom_size/4)] = BITSWAP8(buf[i+2*(rom_size/4)], 2,3,4,0,7,5,1,6);
-		rom[adr+3*(rom_size/4)] = BITSWAP8(buf[i+3*(rom_size/4)], 4,2,7,1,6,5,0,3);
+		int adr = bitswap<24>(i,23,22,21,20,19,18,17,5,12,14,8,3,0,7,9,16,4,2,6,11,13,1,10,15);
+		rom[adr+0*(rom_size/4)] = bitswap<8>(buf[i+0*(rom_size/4)], 4,2,7,1,6,5,0,3);
+		rom[adr+1*(rom_size/4)] = bitswap<8>(buf[i+1*(rom_size/4)], 1,4,7,0,3,5,6,2);
+		rom[adr+2*(rom_size/4)] = bitswap<8>(buf[i+2*(rom_size/4)], 2,3,4,0,7,5,1,6);
+		rom[adr+3*(rom_size/4)] = bitswap<8>(buf[i+3*(rom_size/4)], 4,2,7,1,6,5,0,3);
 	}
 }
 
@@ -437,8 +437,8 @@ void pirates_state::decrypt_oki()
 
 	for (i=0; i<rom_size; i++)
 	{
-		int adr = BITSWAP24(i,23,22,21,20,19,10,16,13,8,4,7,11,14,17,12,6,2,0,5,18,15,3,1,9);
-		rom[adr] = BITSWAP8(buf[i], 2,3,4,0,7,5,1,6);
+		int adr = bitswap<24>(i,23,22,21,20,19,10,16,13,8,4,7,11,14,17,12,6,2,0,5,18,15,3,1,9);
+		rom[adr] = bitswap<8>(buf[i], 2,3,4,0,7,5,1,6);
 	}
 }
 

@@ -61,6 +61,8 @@ public:
 
 	DECLARE_READ8_MEMBER(ff_r);
 
+	void horizon(machine_config &config);
+	void horizon2mhz(machine_config &config);
 private:
 	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
@@ -146,6 +148,7 @@ DEVICE_INPUT_DEFAULTS_END
 //#include "bus/s100/mm65k16s.h"
 #include "bus/s100/nsmdsa.h"
 #include "bus/s100/nsmdsad.h"
+#include "bus/s100/seals8k.h"
 //#include "bus/s100/wunderbus.h"
 
 static SLOT_INTERFACE_START( horizon_s100_cards )
@@ -155,6 +158,8 @@ static SLOT_INTERFACE_START( horizon_s100_cards )
 	//SLOT_INTERFACE("ram32a", S100_RAM32A)
 	//SLOT_INTERFACE("ram16a", S100_RAM16A)
 	//SLOT_INTERFACE("fpb", S100_FPB)
+	SLOT_INTERFACE("8ksc", S100_8K_SC)
+	SLOT_INTERFACE("8kscbb", S100_8K_SC_BB)
 SLOT_INTERFACE_END
 
 
@@ -167,7 +172,7 @@ SLOT_INTERFACE_END
 //  MACHINE_CONFIG( horizon )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( horizon )
+MACHINE_CONFIG_START(horizon_state::horizon)
 	// basic machine hardware
 	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL_8MHz / 2)
 	MCFG_CPU_PROGRAM_MAP(horizon_mem)
@@ -213,7 +218,7 @@ static MACHINE_CONFIG_START( horizon )
 	MCFG_SOFTWARE_LIST_ADD("flop_list", "horizon")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( horizon2mhz, horizon )
+MACHINE_CONFIG_DERIVED(horizon_state::horizon2mhz, horizon)
 	MCFG_CPU_MODIFY("z80")
 	MCFG_CPU_CLOCK(XTAL_4MHz / 2)
 

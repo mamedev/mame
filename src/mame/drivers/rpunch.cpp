@@ -208,7 +208,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, rpunch_state )
 	AM_RANGE(0x040000, 0x04ffff) AM_RAM AM_SHARE("bitmapram")
 	AM_RANGE(0x060000, 0x060fff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x080000, 0x083fff) AM_RAM_WRITE(rpunch_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x0a0000, 0x0a07ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x0a0000, 0x0a07ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x0c0000, 0x0c0007) AM_WRITE(rpunch_scrollreg_w)
 	AM_RANGE(0x0c0008, 0x0c0009) AM_SELECT(0x20) AM_WRITE8(rpunch_gga_w, 0x00ff)
 	AM_RANGE(0x0c000c, 0x0c000d) AM_WRITE(rpunch_videoreg_w)
@@ -455,7 +455,7 @@ GFXDECODE_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( rpunch )
+MACHINE_CONFIG_START(rpunch_state::rpunch)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, MASTER_CLOCK/2)
@@ -499,13 +499,13 @@ static MACHINE_CONFIG_START( rpunch )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( svolley, rpunch )
+MACHINE_CONFIG_DERIVED(rpunch_state::svolley, rpunch)
 	MCFG_VIDEO_START_OVERRIDE(rpunch_state,svolley)
 MACHINE_CONFIG_END
 
 
 // c+p of above for now, bootleg hw, things need verifying
-static MACHINE_CONFIG_START( svolleybl )
+MACHINE_CONFIG_START(rpunch_state::svolleybl)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, MASTER_CLOCK/2)

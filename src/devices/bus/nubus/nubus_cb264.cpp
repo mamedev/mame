@@ -40,7 +40,7 @@ DEFINE_DEVICE_TYPE(NUBUS_CB264, nubus_cb264_device, "nb_c264", "RasterOps ColorB
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( nubus_cb264_device::device_add_mconfig )
+MACHINE_CONFIG_START(nubus_cb264_device::device_add_mconfig)
 	MCFG_SCREEN_ADD( CB264_SCREEN_NAME, RASTER)
 	MCFG_SCREEN_UPDATE_DEVICE(DEVICE_SELF, nubus_cb264_device, screen_update)
 	MCFG_SCREEN_RAW_PARAMS(25175000, 800, 0, 640, 525, 0, 480)
@@ -239,7 +239,7 @@ WRITE32_MEMBER( nubus_cb264_device::cb264_w )
 			break;
 
 		default:
-//          printf("cb264_w: %x to reg %x (mask %x PC %x)\n", data, offset*4, mem_mask, space.device().safe_pc());
+//          printf("cb264_w: %x to reg %x (mask %x %s)\n", data, offset*4, mem_mask, machine().describe_context());
 			break;
 	}
 }
@@ -257,7 +257,7 @@ READ32_MEMBER( nubus_cb264_device::cb264_r )
 			return m_cb264_toggle;  // bit 0 is vblank?
 
 		default:
-			logerror("cb264_r: reg %x (mask %x PC %x)\n", offset*4, mem_mask, space.device().safe_pc());
+			logerror("cb264_r: reg %x (mask %x %s)\n", offset*4, mem_mask, machine().describe_context());
 			break;
 	}
 

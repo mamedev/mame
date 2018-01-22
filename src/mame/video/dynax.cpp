@@ -38,9 +38,9 @@ PALETTE_INIT_MEMBER(dynax_state,sprtmtch)
 	{
 		int x = (color_prom[i] << 8) + color_prom[0x200 + i];
 		/* The bits are in reverse order! */
-		int r = BITSWAP8((x >>  0) & 0x1f, 7, 6, 5, 0, 1, 2, 3, 4);
-		int g = BITSWAP8((x >>  5) & 0x1f, 7, 6, 5, 0, 1, 2, 3, 4);
-		int b = BITSWAP8((x >> 10) & 0x1f, 7, 6, 5, 0, 1, 2, 3, 4);
+		int r = bitswap<8>((x >>  0) & 0x1f, 7, 6, 5, 0, 1, 2, 3, 4);
+		int g = bitswap<8>((x >>  5) & 0x1f, 7, 6, 5, 0, 1, 2, 3, 4);
+		int b = bitswap<8>((x >> 10) & 0x1f, 7, 6, 5, 0, 1, 2, 3, 4);
 		palette.set_pen_color(i, pal5bit(r), pal5bit(g), pal5bit(b));
 	}
 }
@@ -56,9 +56,9 @@ PALETTE_INIT_MEMBER(dynax_state,janyuki)
 	{
 		int x = (color_prom[i] << 8) + color_prom[0x200 + i];
 		/* The bits are in reverse order! */
-		int r = BITSWAP8((x >>  0) & 0x0f, 7, 6, 5, 4, 0, 1, 2, 3);
-		int g = BITSWAP8((x >>  5) & 0x0f, 7, 6, 5, 4, 0, 1, 2, 3);
-		int b = BITSWAP8((x >> 10) & 0x0f, 7, 6, 5, 4, 0, 1, 2, 3);
+		int r = bitswap<8>((x >>  0) & 0x0f, 7, 6, 5, 4, 0, 1, 2, 3);
+		int g = bitswap<8>((x >>  5) & 0x0f, 7, 6, 5, 4, 0, 1, 2, 3);
+		int b = bitswap<8>((x >> 10) & 0x0f, 7, 6, 5, 4, 0, 1, 2, 3);
 		palette.set_pen_color(i, pal4bit(r), pal4bit(g), pal4bit(b));
 	}
 }
@@ -107,7 +107,7 @@ WRITE8_MEMBER(dynax_state::dynax_blit_dest_w)
 {
 	m_blit_dest = data;
 	if (m_layer_layout == LAYOUT_HNORIDUR)
-		m_blit_dest = BITSWAP8(m_blit_dest ^ 0x0f, 7, 6, 5, 4, 0, 1, 2, 3);
+		m_blit_dest = bitswap<8>(m_blit_dest ^ 0x0f, 7, 6, 5, 4, 0, 1, 2, 3);
 
 	LOG(("D=%02X ", data));
 }
@@ -120,7 +120,7 @@ WRITE8_MEMBER(dynax_state::dynax_blit2_dest_w)
 
 WRITE8_MEMBER(dynax_state::tenkai_blit_dest_w)
 {
-	dynax_blit_dest_w(space, 0, BITSWAP8(data, 7, 6, 5, 4, 0, 1, 2, 3));
+	dynax_blit_dest_w(space, 0, bitswap<8>(data, 7, 6, 5, 4, 0, 1, 2, 3));
 }
 
 /*
@@ -129,7 +129,7 @@ mjembase:   b d e -> - 2 4 8
 */
 WRITE8_MEMBER(dynax_state::mjembase_blit_dest_w)
 {
-	dynax_blit_dest_w(space, 0, BITSWAP8(data, 7, 6, 5, 4, 2, 3, 1, 0));
+	dynax_blit_dest_w(space, 0, bitswap<8>(data, 7, 6, 5, 4, 2, 3, 1, 0));
 }
 
 
@@ -187,7 +187,7 @@ WRITE8_MEMBER(dynax_state::tenkai_blit_palette23_w)
 
 WRITE8_MEMBER(dynax_state::mjembase_blit_palette23_w)
 {
-	dynax_blit_palette23_w(space, offset, BITSWAP8(data, 3, 2, 1, 0, 7, 6, 5, 4), mem_mask);
+	dynax_blit_palette23_w(space, offset, bitswap<8>(data, 3, 2, 1, 0, 7, 6, 5, 4), mem_mask);
 }
 
 
@@ -1248,7 +1248,7 @@ WRITE8_MEMBER(dynax_state::hanamai_priority_w)
 
 WRITE8_MEMBER(dynax_state::tenkai_priority_w)
 {
-	m_hanamai_priority = BITSWAP8(data, 3, 2, 1, 0, 4, 7, 5, 6);
+	m_hanamai_priority = bitswap<8>(data, 3, 2, 1, 0, 4, 7, 5, 6);
 }
 
 /*
@@ -1258,7 +1258,7 @@ mjelctrn:   priority: 00 20 10 40 30 50; enable: 1,2,8
 */
 WRITE8_MEMBER(dynax_state::mjembase_priority_w)
 {
-	m_hanamai_priority = BITSWAP8(data, 6, 5, 4, 3, 2, 7, 1, 0);
+	m_hanamai_priority = bitswap<8>(data, 6, 5, 4, 3, 2, 7, 1, 0);
 }
 
 
@@ -1377,7 +1377,7 @@ uint32_t dynax_state::screen_update_hanamai(screen_device &screen, bitmap_ind16 
 
 uint32_t dynax_state::screen_update_hnoridur(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	int layers_ctrl = ~BITSWAP8(m_hanamai_priority, 7, 6, 5, 4, 0, 1, 2, 3);
+	int layers_ctrl = ~bitswap<8>(m_hanamai_priority, 7, 6, 5, 4, 0, 1, 2, 3);
 	int lay[4];
 	int pri;
 

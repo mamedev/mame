@@ -53,7 +53,7 @@ ROM_START(hp98603)
 	ROMX_LOAD("u14.bin", 0xa0001, 65536, CRC(96527d4e) SHA1(6706ab97eab4465ea4fa2d6b07e8107468e83818), ROM_SKIP(1) | ROM_BIOS(2))
 ROM_END
 
-MACHINE_CONFIG_MEMBER( dio16_98603_device::device_add_mconfig )
+MACHINE_CONFIG_START(dio16_98603_device::device_add_mconfig)
 MACHINE_CONFIG_END
 
 const tiny_rom_entry *dio16_98603_device::device_rom_region() const

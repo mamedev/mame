@@ -45,6 +45,7 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<multipcm_device> m_ymw258;
+	void tg100(machine_config &config);
 };
 
 /* all memory accesses are decoded by the gate array... */
@@ -64,7 +65,7 @@ static ADDRESS_MAP_START( ymw258_map, 0, 8, tg100_state )
 	AM_RANGE(0x000000, 0x1fffff) AM_ROM
 ADDRESS_MAP_END
 
-static MACHINE_CONFIG_START( tg100 )
+MACHINE_CONFIG_START(tg100_state::tg100)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",  H83002, XTAL_20MHz) /* TODO: correct CPU type (H8/520) */
 	MCFG_CPU_PROGRAM_MAP( tg100_map )

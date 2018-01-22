@@ -387,6 +387,11 @@ newoption {
 }
 
 newoption {
+	trigger = "SANITIZE",
+	description = "Specifies the santizer(s) to use."
+}
+
+newoption {
 	trigger = "PROJECT",
 	description = "Select projects to be built. Will look into project folder for files.",
 }
@@ -847,7 +852,7 @@ end
 
 configuration { "mingw-clang" }
 	buildoptions {
-		"-O1", -- without this executable crash often
+		"-Xclang -flto-visibility-public-std", -- workround for __imp___ link errors
 	}
 configuration {  }
 
@@ -950,13 +955,38 @@ end
 	buildoptions_cpp {
 		"-Woverloaded-virtual",
 	}
-
---ifdef SANITIZE
---CCOMFLAGS += -fsanitize=$(SANITIZE)
+	
+if _OPTIONS["SANITIZE"] then
+	buildoptions {
+		"-fsanitize=".. _OPTIONS["SANITIZE"]
+	}
+	linkoptions {
+		"-fsanitize=".. _OPTIONS["SANITIZE"]
+	}
+	if string.find(_OPTIONS["SANITIZE"], "address") then
+		buildoptions {
+			"-fsanitize-address-use-after-scope"
+		}
+		linkoptions {
+			"-fsanitize-address-use-after-scope"
+		}
+	end
+	if string.find(_OPTIONS["SANITIZE"], "undefined") then
+		-- 'function' produces errors without delegates by design
+		-- 'alignment' produces a lot of errors which we are not interested in
+		buildoptions {
+			"-fno-sanitize=function",
+			"-fno-sanitize=alignment"
+		}
+		linkoptions {
+			"-fno-sanitize=function",
+			"-fno-sanitize=alignment"
+		}
+	end
+end
 
 --ifneq (,$(findstring thread,$(SANITIZE)))
 --CCOMFLAGS += -fPIE
---endif
 --endif
 
 
@@ -1133,8 +1163,7 @@ configuration { "osx* or xcode4" }
 		}
 
 configuration { "mingw*" }
-		local version = str_to_version(_OPTIONS["gcc_version"])
-		if not (_OPTIONS["gcc"]~=nil and string.find(_OPTIONS["gcc"], "clang")) or version < 40000
+		if _OPTIONS["osd"]~="sdl"
 		then
 			linkoptions {
 				"-static",

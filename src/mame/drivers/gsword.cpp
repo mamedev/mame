@@ -280,7 +280,7 @@ READ8_MEMBER(gsword_state::i8741_2_r )
 	case 0x04: /* Player 2 Controller */
 		return ioport("IN3")->read();
 //  default:
-//      logerror("8741-2 unknown read %d PC=%04x\n",offset,space.device().safe_pc());
+//      logerror("8741-2 unknown read %d %s\n",offset,machine().describe_context());
 	}
 	/* unknown */
 	return 0;
@@ -298,7 +298,7 @@ READ8_MEMBER(gsword_state::i8741_3_r )
 		return ioport("IN3")->read();
 	}
 	/* unknown */
-//  logerror("8741-3 unknown read %d PC=%04x\n",offset,space.device().safe_pc());
+//  logerror("8741-3 unknown read %d %s\n",offset,machine().describe_context());
 	return 0;
 }
 
@@ -774,7 +774,7 @@ static GFXDECODE_START( gsword )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( gsword )
+MACHINE_CONFIG_START(gsword_state::gsword)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_18MHz/6) /* verified on pcb */
@@ -832,7 +832,7 @@ static MACHINE_CONFIG_START( gsword )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( josvolly )
+MACHINE_CONFIG_START(josvolly_state::josvolly)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 18000000/4) /* ? */

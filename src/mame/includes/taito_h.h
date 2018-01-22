@@ -45,4 +45,8 @@ public:
 	void recordbr_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, int priority );
 	void dleague_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, int priority );
 	void taitoh_log_vram();
+	void recordbr(machine_config &config);
+	void syvalion(machine_config &config);
+	void dleague(machine_config &config);
+	void tetristh(machine_config &config);
 };

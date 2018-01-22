@@ -8,6 +8,7 @@
 ***************************************************************************/
 
 #include "machine/74157.h"
+#include "machine/adc083x.h"
 #include "machine/gen_latch.h"
 #include "machine/ticket.h"
 #include "machine/timer.h"
@@ -48,8 +49,10 @@ public:
 		m_soundlatch2(*this, "soundlatch2"),
 		m_upd4701(*this, "upd4701"),
 		m_buttonmux(*this, "buttonmux"),
+		m_adc(*this, "adc"),
 		m_dsw(*this, "DSW"),
 		m_rot(*this, {"ROT1", "ROT2"}),
+		m_gun_inputs(*this, {"GUNX1", "GUNY1", "GUNX2", "GUNY2"}),
 		m_p1(*this, "P1"),
 		m_p2(*this, "P2"),
 		m_coins(*this, "COINS"),
@@ -78,9 +81,11 @@ public:
 	optional_device<generic_latch_8_device> m_soundlatch2;
 	optional_device<upd4701_device> m_upd4701;
 	optional_device<hc157_device> m_buttonmux;
+	optional_device<adc083x_device> m_adc;
 
 	optional_ioport m_dsw;
 	optional_ioport_array<2> m_rot;
+	optional_ioport_array<4> m_gun_inputs;
 	optional_ioport m_p1;
 	optional_ioport m_p2;
 	optional_ioport m_coins;
@@ -120,16 +125,9 @@ public:
 
 	int m_sub_ctrl_data;
 
-	int m_gun_input_bit;
-	int m_gun_input_src;
-	int m_gun_bit_count;
-	int m_gun_old_clock;
-
 	uint8_t m_usclssic_port_select;
 	int m_keroppi_prize_hop;
 	int m_keroppi_protection_count;
-
-	int m_wiggie_soundlatch;
 
 	uint8_t m_twineagl_xram[8];
 	int m_twineagl_tilebank[4];
@@ -142,6 +140,7 @@ public:
 
 	uint16_t m_kiwame_row_select;
 
+	DECLARE_READ16_MEMBER(metafox_protection_r);
 	DECLARE_WRITE16_MEMBER(seta_vregs_w);
 	DECLARE_WRITE16_MEMBER(seta_vram_0_w);
 	DECLARE_WRITE16_MEMBER(seta_vram_2_w);
@@ -155,6 +154,7 @@ public:
 	DECLARE_CUSTOM_INPUT_MEMBER(usclssic_trackball_x_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(usclssic_trackball_y_r);
 	DECLARE_WRITE8_MEMBER(usclssic_lockout_w);
+	ADC083X_INPUT_CB(zombraid_adc_cb);
 	DECLARE_READ16_MEMBER(zombraid_gun_r);
 	DECLARE_WRITE16_MEMBER(zombraid_gun_w);
 	DECLARE_READ16_MEMBER(zingzipbl_unknown_r);
@@ -167,9 +167,7 @@ public:
 	DECLARE_READ16_MEMBER(kiwame_input_r);
 	DECLARE_READ16_MEMBER(thunderl_protection_r);
 	DECLARE_WRITE16_MEMBER(thunderl_protection_w);
-	DECLARE_READ8_MEMBER(wiggie_soundlatch_r);
-	DECLARE_WRITE16_MEMBER(wiggie_soundlatch_w);
-	DECLARE_WRITE16_MEMBER(utoukond_soundlatch_w);
+	DECLARE_WRITE8_MEMBER(utoukond_sound_control_w);
 	DECLARE_READ16_MEMBER(pairlove_prot_r);
 	DECLARE_WRITE16_MEMBER(pairlove_prot_w);
 	DECLARE_WRITE8_MEMBER(sub_bankswitch_w);
@@ -191,7 +189,6 @@ public:
 	DECLARE_DRIVER_INIT(downtown);
 	DECLARE_DRIVER_INIT(rezon);
 	DECLARE_DRIVER_INIT(twineagl);
-	DECLARE_DRIVER_INIT(zombraid);
 	DECLARE_DRIVER_INIT(crazyfgt);
 	DECLARE_DRIVER_INIT(metafox);
 	DECLARE_DRIVER_INIT(arbalest);
@@ -253,6 +250,51 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(pit_out0);
 	DECLARE_WRITE_LINE_MEMBER(utoukond_ym3438_interrupt);
 	SETA001_SPRITE_GFXBANK_CB_MEMBER(setac_gfxbank_callback);
+	void keroppij(machine_config &config);
+	void madshark(machine_config &config);
+	void jjsquawb(machine_config &config);
+	void oisipuzl(machine_config &config);
+	void zingzipbl(machine_config &config);
+	void eightfrc(machine_config &config);
+	void gundhara(machine_config &config);
+	void triplfun(machine_config &config);
+	void calibr50(machine_config &config);
+	void blandiap(machine_config &config);
+	void wits(machine_config &config);
+	void msgundam(machine_config &config);
+	void extdwnhl(machine_config &config);
+	void pairlove(machine_config &config);
+	void zingzip(machine_config &config);
+	void wiggie(machine_config &config);
+	void umanclub(machine_config &config);
+	void tndrcade(machine_config &config);
+	void daioh(machine_config &config);
+	void atehate(machine_config &config);
+	void usclssic(machine_config &config);
+	void zombraid(machine_config &config);
+	void thunderlbl(machine_config &config);
+	void blockcarb(machine_config &config);
+	void wrofaero(machine_config &config);
+	void downtown(machine_config &config);
+	void blockcar(machine_config &config);
+	void crazyfgt(machine_config &config);
+	void keroppi(machine_config &config);
+	void drgnunit(machine_config &config);
+	void orbs(machine_config &config);
+	void daiohp(machine_config &config);
+	void magspeed(machine_config &config);
+	void krzybowl(machine_config &config);
+	void kiwame(machine_config &config);
+	void qzkklgy2(machine_config &config);
+	void kamenrid(machine_config &config);
+	void superbar(machine_config &config);
+	void jjsquawk(machine_config &config);
+	void twineagl(machine_config &config);
+	void blandia(machine_config &config);
+	void thunderl(machine_config &config);
+	void metafox(machine_config &config);
+	void utoukond(machine_config &config);
+	void rezon(machine_config &config);
 };
 
 class setaroul_state : public seta_state
@@ -298,6 +340,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank);
 	TIMER_DEVICE_CALLBACK_MEMBER(interrupt);
 
+	void setaroul(machine_config &config);
 private:
 	required_device<upd4992_device> m_rtc;  // ! Actually D4911C !
 	required_device<ticket_dispenser_device> m_hopper;
@@ -349,6 +392,8 @@ public:
 	DECLARE_WRITE16_MEMBER(inttoote_out_w);
 	DECLARE_READ16_MEMBER(inttoote_700000_r);
 	DECLARE_DRIVER_INIT(inttoote);
+	void inttoote(machine_config &config);
+	void jockeyc(machine_config &config);
 private:
 	required_device<upd4992_device> m_rtc;  // ! Actually D4911C !
 	required_device<ticket_dispenser_device> m_hopper1, m_hopper2; // the 2nd hopper is optional

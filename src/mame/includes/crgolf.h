@@ -79,7 +79,8 @@ public:
 	TIMER_CALLBACK_MEMBER(sound_to_main_callback);
 	void get_pens( pen_t *pens );
 	DECLARE_WRITE_LINE_MEMBER(vck_callback);
+	void crgolfhi(machine_config &config);
+	void crgolf(machine_config &config);
+	void crgolf_video(machine_config &config);
+	void mastrglf(machine_config &config);
 };
-
-/*----------- defined in video/crgolf.c -----------*/
-MACHINE_CONFIG_EXTERN( crgolf_video );

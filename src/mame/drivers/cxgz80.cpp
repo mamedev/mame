@@ -89,6 +89,7 @@ public:
 	DECLARE_WRITE8_MEMBER(ch2001_speaker_on_w);
 	DECLARE_WRITE8_MEMBER(ch2001_leds_w);
 	DECLARE_READ8_MEMBER(ch2001_input_r);
+	void ch2001(machine_config &config);
 
 protected:
 	virtual void machine_start() override;
@@ -392,7 +393,7 @@ INPUT_PORTS_END
     Machine Drivers
 ******************************************************************************/
 
-static MACHINE_CONFIG_START( ch2001 )
+MACHINE_CONFIG_START(cxgz80_state::ch2001)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_8MHz/2)

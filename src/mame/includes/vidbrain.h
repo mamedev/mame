@@ -97,10 +97,8 @@ public:
 
 	// timers
 	emu_timer *m_timer_ne555;
+	void vidbrain(machine_config &config);
+	void vidbrain_video(machine_config &config);
 };
-
-//----------- defined in video/vidbrain.c -----------
-
-MACHINE_CONFIG_EXTERN( vidbrain_video );
 
 #endif

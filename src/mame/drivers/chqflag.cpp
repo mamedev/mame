@@ -5,9 +5,14 @@
     Chequered Flag / Checkered Flag (GX717) (c) Konami 1988
 
     Notes:
-    - 007232 volume & panning control is almost certainly wrong.
-    - Needs HW tests or side-by-side tests to determine if the protection
-      is 100% ok now;
+    - 007232 volume & panning control is almost certainly wrong;
+    - 051733 opponent cars have wrong RNG colors compared to references;
+    - 051733 opponent car-to-car collisions direction are wrong, according
+      to reference orange car should shift to the left instead (current emulation
+      makes them to wall crash most of the time instead);
+    - needs proper shadow/highlight factor values for sprites and tilemap;
+    - compared to references, emulation is a bit slower (around 2/3 seconds
+      behind on a full lap of stage 2);
 
     2008-07
     Dip locations and recommended settings verified with manual
@@ -71,22 +76,33 @@ WRITE8_MEMBER(chqflag_state::chqflag_vreg_w)
 	/* Bits 3 and 7 are set in night stages, where the background should get darker and */
 	/* the headlight (which have the shadow bit set) become highlights */
 	/* Maybe one of the bits inverts the SHAD line while the other darkens the background. */
-	if (data & 0x08)
-		m_palette->set_shadow_factor(1 / PALETTE_DEFAULT_SHADOW_FACTOR);
-	else
-		m_palette->set_shadow_factor(PALETTE_DEFAULT_SHADOW_FACTOR);
+	/*
+	 * Update according to a reference:
+	 * 0x00 is certainly shadow (car pit-in shadow when zoomed in/clouds before rain)
+	 * 0x80 is used when rain shows up (which should be white/highlighted)
+	 * 0x88 is for when night shows up (max amount of highlight)
+	 * 0x08 is used at dawn after 0x88 state
+	 * The shadow part looks ugly when rain starts/ends pouring (-> black colored with a setting of 0x00),
+	 * the reference shows dimmed background when this event occurs (which is handled via reg 1 bit 0 of k051960 device),
+	 * might be actually disabling the shadow here (-> setting 1.0f instead).
+	 *
+	 * TODO: true values aren't known, also shadow_factors table probably scales towards zero instead (game doesn't use those)
+	 */
+	const double shadow_factors[4] = {0.8, 1.33, 1.66, 2.0 };
+	const double highlight_factors[4] = {1.0, 1.33, 1.66, 2.0 };
+	uint8_t shadow_value = ((data & 0x80) >> 6) | ((data & 0x08) >> 3);
 
+	m_palette->set_shadow_factor(m_last_vreg != 0 ? highlight_factors[shadow_value] : shadow_factors[shadow_value] );
+
+	#if 0
 	if ((data & 0x80) != m_last_vreg)
 	{
-		double brt = (data & 0x80) ? PALETTE_DEFAULT_SHADOW_FACTOR : 1.0;
-		int i;
-
 		m_last_vreg = data & 0x80;
 
 		/* only affect the background */
-		for (i = 512; i < 1024; i++)
-			m_palette->set_pen_contrast(i, brt);
+		update_background_shadows(data);
 	}
+	#endif
 
 //if ((data & 0xf8) && (data & 0xf8) != 0x88)
 //  popmessage("chqflag_vreg_w %02x",data);
@@ -150,7 +166,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( bank1000_map, AS_PROGRAM, 8, chqflag_state )
 	AM_RANGE(0x0000, 0x0fff) AM_RAM
 	AM_RANGE(0x1000, 0x17ff) AM_READ(k051316_1_ramrom_r) AM_DEVWRITE("k051316_1", k051316_device, write)
-	AM_RANGE(0x1800, 0x1fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x1800, 0x1fff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
 ADDRESS_MAP_END
 
 
@@ -286,9 +302,30 @@ void chqflag_state::machine_reset()
 	m_analog_ctrl = 0;
 	m_accel = 0;
 	m_wheel = 0;
+	update_background_shadows(0);
 }
 
-static MACHINE_CONFIG_START( chqflag )
+inline void chqflag_state::update_background_shadows(uint8_t data)
+{
+	double brt = (data & 1) ? 0.8 : 1.0;
+
+	for (int i = 512; i < 1024; i++)
+		m_palette->set_pen_contrast(i, brt);
+}
+
+
+WRITE_LINE_MEMBER(chqflag_state::background_brt_w)
+{
+//  popmessage("%d",state);
+
+	if (state != m_last_vreg)
+	{
+		m_last_vreg = state;
+		update_background_shadows(state);
+	}
+}
+
+MACHINE_CONFIG_START(chqflag_state::chqflag)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", KONAMI, XTAL_24MHz/2/4)    /* 052001 (verified on pcb) */
@@ -300,8 +337,8 @@ static MACHINE_CONFIG_START( chqflag )
 	MCFG_DEVICE_ADD("bank1000", ADDRESS_MAP_BANK, 0)
 	MCFG_DEVICE_PROGRAM_MAP(bank1000_map)
 	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_BIG)
-	MCFG_ADDRESS_MAP_BANK_DATABUS_WIDTH(8)
-	MCFG_ADDRESS_MAP_BANK_ADDRBUS_WIDTH(13)
+	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
+	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(13)
 	MCFG_ADDRESS_MAP_BANK_STRIDE(0x1000)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
@@ -326,6 +363,7 @@ static MACHINE_CONFIG_START( chqflag )
 	MCFG_K051960_CB(chqflag_state, sprite_callback)
 	MCFG_K051960_IRQ_HANDLER(INPUTLINE("maincpu", KONAMI_IRQ_LINE))
 	MCFG_K051960_NMI_HANDLER(INPUTLINE("maincpu", INPUT_LINE_NMI))
+	MCFG_K051960_VREG_CONTRAST_HANDLER(WRITELINE(chqflag_state,background_brt_w))
 
 	MCFG_DEVICE_ADD("k051316_1", K051316, 0)
 	MCFG_GFX_PALETTE("palette")
@@ -423,5 +461,5 @@ ROM_END
 
 
 //     YEAR, NAME,     PARENT,  MACHINE, INPUT,    STATE,         INIT, MONITOR, COMPANY,  FULLNAME,                 FLAGS,                                           LAYOUT
-GAMEL( 1988, chqflag,  0,       chqflag, chqflag,  chqflag_state, 0,    ROT90,   "Konami", "Chequered Flag",         MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_chqflag )
-GAMEL( 1988, chqflagj, chqflag, chqflag, chqflagj, chqflag_state, 0,    ROT90,   "Konami", "Chequered Flag (Japan)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_chqflag )
+GAMEL( 1988, chqflag,  0,       chqflag, chqflag,  chqflag_state, 0,    ROT90,   "Konami", "Chequered Flag",         MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_chqflag )
+GAMEL( 1988, chqflagj, chqflag, chqflag, chqflagj, chqflag_state, 0,    ROT90,   "Konami", "Chequered Flag (Japan)", MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_chqflag )

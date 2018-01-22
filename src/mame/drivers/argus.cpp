@@ -530,7 +530,7 @@ static GFXDECODE_START( butasan )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( argus )
+MACHINE_CONFIG_START(argus_state::argus)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 5000000)           /* 4 MHz */
@@ -578,7 +578,7 @@ static MACHINE_CONFIG_START( argus )
 	MCFG_SOUND_ROUTE(3, "mono", 0.50)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( valtric )
+MACHINE_CONFIG_START(argus_state::valtric)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 5000000)           /* 5 MHz */
@@ -626,7 +626,7 @@ static MACHINE_CONFIG_START( valtric )
 	MCFG_SOUND_ROUTE(3, "mono", 0.50)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( butasan )
+MACHINE_CONFIG_START(argus_state::butasan)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 5000000)           /* 5 MHz */
@@ -737,6 +737,9 @@ ROM_START( valtric )
 
 	ROM_REGION( 0x08000, "gfx3", 0 )    /* Text */
 	ROM_LOAD( "vt_07.bin",    0x00000, 0x08000, CRC(d5f9bfb9) SHA1(6b3f11f9b8f76c0144a109f1506d8cbb01876237) )
+
+	ROM_REGION (0x100, "proms", 0)
+	ROM_LOAD( "82s129", 0x000, 0x100, NO_DUMP ) // located on the top board
 ROM_END
 
 ROM_START( butasan ) /* English "subtitle" of Butasan for Japanese region.  Original Jaleco PCB */

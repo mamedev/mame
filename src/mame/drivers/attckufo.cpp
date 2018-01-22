@@ -32,6 +32,7 @@ public:
 	DECLARE_READ8_MEMBER( vic_videoram_r );
 	DECLARE_READ8_MEMBER( vic_colorram_r );
 
+	void attckufo(machine_config &config);
 private:
 	required_device<cpu_device> m_maincpu;
 };
@@ -110,7 +111,7 @@ READ8_MEMBER(attckufo_state::vic_colorram_r)
 //  MACHINE DEFINTIONS
 //**************************************************************************
 
-static MACHINE_CONFIG_START( attckufo )
+MACHINE_CONFIG_START(attckufo_state::attckufo)
 	MCFG_CPU_ADD("maincpu", M6502, XTAL_14_31818MHz / 14)
 	MCFG_CPU_PROGRAM_MAP(cpu_map)
 

@@ -10,7 +10,7 @@ typedef device_delegate<void (int layer, int *code, int *color, int *flags)> k05
 #define K056832_CB_MEMBER(_name)   void _name(int layer, int *code, int *color, int *flags)
 
 #define MCFG_K056832_CB(_class, _method) \
-	k056832_device::set_k056832_callback(*device, k056832_cb_delegate(&_class::_method, #_class "::" #_method, downcast<_class *>(owner)));
+	k056832_device::set_k056832_callback(*device, k056832_cb_delegate(&_class::_method, #_class "::" #_method, this));
 
 #define MCFG_K056832_CONFIG(_gfx_reg, _bpp, _big, _djmain_hack, _k055555) \
 	k056832_device::set_config(*device, "^" _gfx_reg, _bpp, _big, _djmain_hack, _k055555);

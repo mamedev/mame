@@ -23,9 +23,10 @@ TODO:
 ***************************************************************************************************/
 
 #include "emu.h"
-#include "bus/rs232/rs232.h"
 #include "cpu/z80/z80.h"
+//#include "cpu/8x300/8x300.h" // device = N8X300
 #include "machine/6850acia.h"
+#include "bus/rs232/rs232.h"
 #include "machine/clock.h"
 #include "video/mc6845.h"
 #include "screen.h"
@@ -44,10 +45,11 @@ public:
 
 	MC6845_UPDATE_ROW(crtc_update_row);
 
+	void mx2178(machine_config &config);
 private:
 	virtual void machine_reset() override;
 	required_device<palette_device> m_palette;
-	required_shared_ptr<uint8_t> m_p_videoram;
+	required_shared_ptr<u8> m_p_videoram;
 	required_device<z80_device> m_maincpu;
 	required_region_ptr<u8> m_p_chargen;
 };
@@ -64,10 +66,8 @@ static ADDRESS_MAP_START(mx2178_io, AS_IO, 8, mx2178_state)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_DEVREADWRITE("crtc", mc6845_device, status_r, address_w)
 	AM_RANGE(0x01, 0x01) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
-	AM_RANGE(0x80, 0x80) AM_DEVREADWRITE("acia1", acia6850_device, status_r, control_w)
-	AM_RANGE(0x81, 0x81) AM_DEVREADWRITE("acia1", acia6850_device, data_r, data_w)
-	AM_RANGE(0xa0, 0xa0) AM_DEVREADWRITE("acia2", acia6850_device, status_r, control_w)
-	AM_RANGE(0xa1, 0xa1) AM_DEVREADWRITE("acia2", acia6850_device, data_r, data_w)
+	AM_RANGE(0x80, 0x81) AM_DEVREADWRITE("acia1", acia6850_device, read, write)
+	AM_RANGE(0xa0, 0xa1) AM_DEVREADWRITE("acia2", acia6850_device, read, write)
 ADDRESS_MAP_END
 
 
@@ -124,7 +124,7 @@ void mx2178_state::machine_reset()
 {
 }
 
-static MACHINE_CONFIG_START( mx2178 )
+MACHINE_CONFIG_START(mx2178_state::mx2178)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_18_8696MHz / 5) // guess
 	MCFG_CPU_PROGRAM_MAP(mx2178_mem)

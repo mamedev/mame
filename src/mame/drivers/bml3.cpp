@@ -129,6 +129,10 @@ public:
 	DECLARE_READ8_MEMBER(bml3_ym2203_r);
 	DECLARE_WRITE8_MEMBER(bml3_ym2203_w);
 
+	void bml3mk2(machine_config &config);
+	void bml3mk5(machine_config &config);
+	void bml3(machine_config &config);
+	void bml3_common(machine_config &config);
 private:
 	u8 m_hres_reg;
 	u8 m_crtc_vreg[0x100];
@@ -401,8 +405,7 @@ static ADDRESS_MAP_START(bml3_mem, AS_PROGRAM, 8, bml3_state)
 	AM_RANGE(0x4400, 0x9fff) AM_RAM
 	AM_RANGE(0xff40, 0xff46) AM_NOP // lots of unknown reads and writes
 	AM_RANGE(0xffc0, 0xffc3) AM_DEVREADWRITE("pia", pia6821_device, read, write)
-	AM_RANGE(0xffc4, 0xffc4) AM_DEVREADWRITE("acia", acia6850_device, status_r, control_w)
-	AM_RANGE(0xffc5, 0xffc5) AM_DEVREADWRITE("acia", acia6850_device, data_r, data_w)
+	AM_RANGE(0xffc4, 0xffc5) AM_DEVREADWRITE("acia", acia6850_device, read, write)
 	AM_RANGE(0xffc6, 0xffc7) AM_READWRITE(bml3_6845_r,bml3_6845_w)
 	// KBNMI - Keyboard "Break" key non-maskable interrupt
 	AM_RANGE(0xffc8, 0xffc8) AM_READ(bml3_keyb_nmi_r) // keyboard nmi
@@ -958,7 +961,7 @@ static SLOT_INTERFACE_START(bml3_cards)
 SLOT_INTERFACE_END
 
 
-static MACHINE_CONFIG_START( bml3_common )
+MACHINE_CONFIG_START(bml3_state::bml3_common)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",M6809, CPU_CLOCK)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", bml3_state,  bml3_timer_firq)
@@ -1029,7 +1032,7 @@ static MACHINE_CONFIG_START( bml3_common )
 
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( bml3, bml3_common )
+MACHINE_CONFIG_DERIVED(bml3_state::bml3, bml3_common)
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_PROGRAM_MAP(bml3_mem)
 
@@ -1045,14 +1048,14 @@ static MACHINE_CONFIG_DERIVED( bml3, bml3_common )
 #endif
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( bml3mk2, bml3_common )
+MACHINE_CONFIG_DERIVED(bml3_state::bml3mk2, bml3_common)
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_PROGRAM_MAP(bml3mk2_mem)
 
 	// TODO: anything to add here?
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( bml3mk5, bml3_common )
+MACHINE_CONFIG_DERIVED(bml3_state::bml3mk5, bml3_common)
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_PROGRAM_MAP(bml3mk5_mem)
 

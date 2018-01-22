@@ -97,6 +97,7 @@ public:
 	void draw_framebuffer(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void draw_cga(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void init_mediagx();
+	void mediagx(machine_config &config);
 };
 
 // Display controller registers
@@ -591,7 +592,7 @@ static ADDRESS_MAP_START( ramdac_map, 0, 8, pinball2k_state )
 	AM_RANGE(0x000, 0x3ff) AM_DEVREADWRITE("ramdac",ramdac_device,ramdac_pal_r,ramdac_rgb666_w)
 ADDRESS_MAP_END
 
-static MACHINE_CONFIG_START( mediagx )
+MACHINE_CONFIG_START(pinball2k_state::mediagx)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", MEDIAGX, 166000000)

@@ -172,7 +172,7 @@ static GFXDECODE_START( galaxy )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( galaxy )
+MACHINE_CONFIG_START(galaxy_state::galaxy)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL / 2)
 	MCFG_CPU_PROGRAM_MAP(galaxy_mem)
@@ -214,7 +214,7 @@ static MACHINE_CONFIG_START( galaxy )
 	MCFG_RAM_EXTRA_OPTIONS("2K,22K,38K,54K")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( galaxyp )
+MACHINE_CONFIG_START(galaxy_state::galaxyp)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL / 2)
 	MCFG_CPU_PROGRAM_MAP(galaxyp_mem)

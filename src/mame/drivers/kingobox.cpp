@@ -453,7 +453,7 @@ void kingofb_state::machine_reset()
 	kingofb_f800_w(machine().dummy_space(), 0, 0); // LS174 reset
 }
 
-static MACHINE_CONFIG_START( kingofb )
+MACHINE_CONFIG_START(kingofb_state::kingofb)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 4000000)        /* 4.0 MHz */
@@ -512,7 +512,7 @@ MACHINE_CONFIG_END
 
 
 /* Ring King */
-static MACHINE_CONFIG_START( ringking )
+MACHINE_CONFIG_START(kingofb_state::ringking)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 4000000)        /* 4.0 MHz */
@@ -524,7 +524,7 @@ static MACHINE_CONFIG_START( ringking )
 	MCFG_CPU_ADD("sprite", Z80, 4000000)        /* 4.0 MHz */
 	MCFG_CPU_PROGRAM_MAP(ringking_sprite_map)
 
-	MCFG_INPUT_MERGER_ANY_HIGH("nmigate")
+	MCFG_INPUT_MERGER_ALL_HIGH("nmigate")
 	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("maincpu", INPUT_LINE_NMI))
 	MCFG_DEVCB_CHAIN_OUTPUT(INPUTLINE("video", INPUT_LINE_NMI))
 	MCFG_DEVCB_CHAIN_OUTPUT(INPUTLINE("sprite", INPUT_LINE_NMI))

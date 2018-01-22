@@ -57,4 +57,7 @@ public:
 	virtual void video_start() override;
 	uint32_t screen_update_crospang(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void tumblepb_gfx1_rearrange();
+	void crospang(machine_config &config);
+	void bestri(machine_config &config);
+	void bestria(machine_config &config);
 };

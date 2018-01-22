@@ -47,6 +47,8 @@ public:
 //  DECLARE_READ8_MEMBER( dc_flash_r );
 //  DECLARE_WRITE8_MEMBER( dc_flash_w );
 
+	static void gdrom_config(device_t *device);
+	void dc(machine_config &config);
 private:
 	uint64_t PDTRA, PCTRA;
 	emu_timer *atapi_timer;

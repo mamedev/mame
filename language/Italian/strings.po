@@ -1,4 +1,4 @@
-# Copyright (C) 2016 THE PACKAGE'S COPYRIGHT HOLDER
+# Copyright (C) 2017 THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
 # Automatically generated, 2016.
 #
@@ -8,7 +8,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2017-10-03 10:32+1100\n"
 "PO-Revision-Date: 2017-08-30 09:37+0200\n"
-"Last-Translator: Piergiorgio Bellezza\n"
+"Last-Translator: theheroGAC\n"
 "Language-Team: MAME Language Team\n"
 "Language: it\n"
 "MIME-Version: 1.0\n"
@@ -1266,27 +1266,27 @@ msgstr ""
 
 #: src/frontend/mame/ui/selgame.cpp:946
 msgid "Requires Artwork\tYes\n"
-msgstr ""
+msgstr "Richiede Artwork\tSi\n"
 
 #: src/frontend/mame/ui/selgame.cpp:946
 msgid "Requires Artwork\tNo\n"
-msgstr ""
+msgstr "Richiede Artwork\tNo\n"
 
 #: src/frontend/mame/ui/selgame.cpp:947
 msgid "Requires Clickable Artwork\tYes\n"
-msgstr ""
+msgstr "Richiede Artwork Cliccabile\tSi\n"
 
 #: src/frontend/mame/ui/selgame.cpp:947
 msgid "Requires Clickable Artwork\tNo\n"
-msgstr ""
+msgstr "Richiede Artwork Cliccabile\tNo\n"
 
 #: src/frontend/mame/ui/selgame.cpp:948
 msgid "Support Cocktail\tYes\n"
-msgstr ""
+msgstr "Supporto Cocktail\tSi\n"
 
 #: src/frontend/mame/ui/selgame.cpp:948
 msgid "Support Cocktail\tNo\n"
-msgstr ""
+msgstr "Supporto Cocktail\tNo\n"
 
 #: src/frontend/mame/ui/selgame.cpp:949
 msgid "Driver is BIOS\tYes\n"
@@ -1298,11 +1298,11 @@ msgstr ""
 
 #: src/frontend/mame/ui/selgame.cpp:950
 msgid "Support Save\tYes\n"
-msgstr ""
+msgstr "Supporto Salvataggio\tSi\n"
 
 #: src/frontend/mame/ui/selgame.cpp:950
 msgid "Support Save\tNo\n"
-msgstr ""
+msgstr "Supporto Salvataggio\tNo\n"
 
 #: src/frontend/mame/ui/selgame.cpp:951
 msgid "Screen Orientation\tVertical\n"
@@ -1314,11 +1314,11 @@ msgstr ""
 
 #: src/frontend/mame/ui/selgame.cpp:961
 msgid "Requires CHD\tYes\n"
-msgstr ""
+msgstr "Richiede CHD\tSi\n"
 
 #: src/frontend/mame/ui/selgame.cpp:961
 msgid "Requires CHD\tNo\n"
-msgstr ""
+msgstr "Richiede CHD\tNo\n"
 
 #: src/frontend/mame/ui/selgame.cpp:974
 msgid "ROM Audit Result\tOK\n"
@@ -2043,7 +2043,7 @@ msgstr "Utilizza i pannelli di controllo"
 
 #: src/frontend/mame/ui/submenu.cpp:62
 msgid "Use Marquees"
-msgstr "Utilizza le Marce"
+msgstr "Utilizza i Marquees"
 
 #: src/frontend/mame/ui/submenu.cpp:64
 msgid "State/Playback Options"
@@ -2475,11 +2475,11 @@ msgstr "Impostazioni"
 
 #: plugins/timer/init.lua:94
 msgid "Current time"
-msgstr ""
+msgstr "Tempo corrente"
 
 #: plugins/timer/init.lua:96
 msgid "Total time"
-msgstr ""
+msgstr "Tempo totale"
 
 #: plugins/timer/init.lua:98
 msgid "Play Count"
@@ -2491,11 +2491,11 @@ msgstr ""
 
 #: plugins/cheat/init.lua:458
 msgid "Select cheat to set hotkey"
-msgstr ""
+msgstr "Seleziona cheat per impostare gli hotkey"
 
 #: plugins/cheat/init.lua:464
 msgid "Press button for hotkey or wait to clear"
-msgstr ""
+msgstr "Premere il pulsante per gli hotkey o attendere per cancellare"
 
 #: plugins/cheat/init.lua:476
 msgid "None"
@@ -2503,7 +2503,7 @@ msgstr "Nessuno"
 
 #: plugins/cheat/init.lua:481
 msgid "Done"
-msgstr ""
+msgstr "Fatto"
 
 #: plugins/cheat/init.lua:495 plugins/cheat/init.lua:509
 msgid "Set"
@@ -2511,32 +2511,32 @@ msgstr ""
 
 #: plugins/cheat/init.lua:528
 msgid "Set hotkeys"
-msgstr ""
+msgstr "Imposta i tasti di scelta rapida"
 
 #: plugins/cheat/init.lua:668
 #, lua-format
 msgid "Activated: %s = %s"
-msgstr ""
+msgstr "Attivato: %s = %s"
 
 #: plugins/cheat/init.lua:671 plugins/cheat/init.lua:729
 #, lua-format
 msgid "Activated: %s"
-msgstr ""
+msgstr "Attivato: %s"
 
 #: plugins/cheat/init.lua:733
 #, lua-format
 msgid "Enabled: %s"
-msgstr ""
+msgstr "Abilitato: %s"
 
 #: plugins/cheat/init.lua:738
 #, lua-format
 msgid "Disabled: %s"
-msgstr ""
+msgstr "Disabilitato: %s"
 
 #: plugins/cheat/init.lua:776
 #, lua-format
 msgid "%s added"
-msgstr ""
+msgstr "%s aggiunto"
 
 #: plugins/data/data_command.lua:19
 msgid "Command"
@@ -2584,15 +2584,15 @@ msgstr "Punteggio MARP"
 
 #: plugins/cheatfind/init.lua:344
 msgid "Save Cheat"
-msgstr ""
+msgstr "Salva Cheat"
 
 #: plugins/cheatfind/init.lua:347
 msgid "Default"
-msgstr ""
+msgstr "Predefinito"
 
 #: plugins/cheatfind/init.lua:347
 msgid "Custom"
-msgstr ""
+msgstr "Personalizzato"
 
 #: plugins/cheatfind/init.lua:348
 msgid "Cheat Name"
@@ -2601,7 +2601,7 @@ msgstr ""
 #: plugins/cheatfind/init.lua:354
 #, lua-format
 msgid "Default name is %s"
-msgstr ""
+msgstr "Il nome predefinito è %s"
 
 #: plugins/cheatfind/init.lua:362
 msgid "Player"
@@ -2609,20 +2609,20 @@ msgstr ""
 
 #: plugins/cheatfind/init.lua:367
 msgid "Type"
-msgstr ""
+msgstr "Tipo"
 
 #: plugins/cheatfind/init.lua:373
 msgid "Save"
-msgstr ""
+msgstr "Salva"
 
 #: plugins/cheatfind/init.lua:399
 #, lua-format
 msgid "Cheat written to %s and added to cheat.simple"
-msgstr ""
+msgstr "Cheat scritto su %s e aggiunto a cheat.simple"
 
 #: plugins/cheatfind/init.lua:407
 msgid "Cheat added to cheat.simple"
-msgstr ""
+msgstr "Cheat aggiunto a cheat.simple"
 
 #: plugins/cheatfind/init.lua:412
 msgid ""
@@ -2632,31 +2632,31 @@ msgstr ""
 
 #: plugins/cheatfind/init.lua:421
 msgid "Cancel"
-msgstr ""
+msgstr "Cancella"
 
 #: plugins/cheatfind/init.lua:426
 msgid "CPU or RAM"
-msgstr ""
+msgstr "CPU o RAM"
 
 #: plugins/cheatfind/init.lua:430
 msgid "Changes to this only take effect when \"Start new search\" is selected"
-msgstr ""
+msgstr "Le modifiche avranno effetto solo quando \"Inizia nuova ricerca\" è selezionato"
 
 #: plugins/cheatfind/init.lua:449
 msgid "Data cleared and current state saved"
-msgstr ""
+msgstr "Dati cancellati e stato attuale salvato"
 
 #: plugins/cheatfind/init.lua:457
 msgid "Start new search"
-msgstr ""
+msgstr "Inizia nuova ricerca"
 
 #: plugins/cheatfind/init.lua:467
 msgid "Current state saved"
-msgstr ""
+msgstr "Stato attuale salvato"
 
 #: plugins/cheatfind/init.lua:474
 msgid "Save current -- #"
-msgstr ""
+msgstr "Salva corrente -- #"
 
 #: plugins/cheatfind/init.lua:506
 msgid " total matches found"
@@ -2688,7 +2688,7 @@ msgstr ""
 
 #: plugins/cheatfind/init.lua:535
 msgid "Left equal to right"
-msgstr ""
+msgstr "Sinistra uguale a destra"
 
 #: plugins/cheatfind/init.lua:537
 msgid "Left not equal to right, value is difference"
@@ -2704,7 +2704,7 @@ msgstr ""
 
 #: plugins/cheatfind/init.lua:543
 msgid "Left less than value"
-msgstr ""
+msgstr "Sinistra, inferiore al valore"
 
 #: plugins/cheatfind/init.lua:545
 msgid "Left greater than value"
@@ -2732,7 +2732,7 @@ msgstr ""
 
 #: plugins/cheatfind/init.lua:578
 msgid "Data Format"
-msgstr ""
+msgstr "Formato dati"
 
 #: plugins/cheatfind/init.lua:602
 msgid "Undo last search -- #"
@@ -2744,7 +2744,7 @@ msgstr ""
 
 #: plugins/cheatfind/init.lua:609
 msgid "All"
-msgstr ""
+msgstr "TUTTO"
 
 #: plugins/cheatfind/init.lua:660
 #, lua-format
@@ -2753,11 +2753,11 @@ msgstr ""
 
 #: plugins/cheatfind/init.lua:692
 msgid "Cheat engine not available"
-msgstr ""
+msgstr "Cheat engine non disponibile"
 
 #: plugins/cheatfind/init.lua:718
 msgid "Default name is "
-msgstr ""
+msgstr "Il nome predefinito è "
 
 #: plugins/cheatfind/init.lua:741
 msgid "Test"
@@ -2765,7 +2765,7 @@ msgstr ""
 
 #: plugins/cheatfind/init.lua:741
 msgid "Write"
-msgstr ""
+msgstr "Scrivere"
 
 #: plugins/cheatfind/init.lua:741
 msgid "Watch"
@@ -2773,7 +2773,7 @@ msgstr ""
 
 #: plugins/cheatfind/init.lua:758
 msgid "Page"
-msgstr ""
+msgstr "Pagina"
 
 #: plugins/cheatfind/init.lua:776
 msgid "Clear Watches"

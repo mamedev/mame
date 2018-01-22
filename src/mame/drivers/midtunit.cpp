@@ -54,7 +54,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, midtunit_state )
 	AM_RANGE(0x01600010, 0x0160001f) AM_READ_PORT("IN1")
 	AM_RANGE(0x01600020, 0x0160002f) AM_READ_PORT("IN2")
 	AM_RANGE(0x01600030, 0x0160003f) AM_READ_PORT("DSW")
-	AM_RANGE(0x01800000, 0x0187ffff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x01800000, 0x0187ffff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x01a80000, 0x01a800ff) AM_READWRITE(midtunit_dma_r, midtunit_dma_w)
 	AM_RANGE(0x01b00000, 0x01b0001f) AM_WRITE(midtunit_control_w)
 /*  AM_RANGE(0x01c00060, 0x01c0007f) AM_WRITE(midtunit_cmos_enable_w) */
@@ -590,7 +590,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( tunit_core )
+MACHINE_CONFIG_START(midtunit_state::tunit_core)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", TMS34010, CPU_CLOCK)
@@ -621,7 +621,7 @@ static MACHINE_CONFIG_START( tunit_core )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( tunit_adpcm, tunit_core )
+MACHINE_CONFIG_DERIVED(midtunit_state::tunit_adpcm, tunit_core)
 
 	/* basic machine hardware */
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
@@ -630,7 +630,7 @@ static MACHINE_CONFIG_DERIVED( tunit_adpcm, tunit_core )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( tunit_dcs, tunit_core )
+MACHINE_CONFIG_DERIVED(midtunit_state::tunit_dcs, tunit_core)
 
 	/* basic machine hardware */
 	MCFG_DEVICE_ADD("dcs", DCS_AUDIO_2K, 0)

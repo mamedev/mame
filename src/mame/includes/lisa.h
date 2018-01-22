@@ -238,6 +238,9 @@ public:
 	void scan_keyboard();
 	void unplug_keyboard();
 	void plug_keyboard();
+	void lisa(machine_config &config);
+	void lisa210(machine_config &config);
+	void macxl(machine_config &config);
 };
 
 #endif // MAME_INCLUDES_LISA_H

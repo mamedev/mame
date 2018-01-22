@@ -82,6 +82,8 @@ public:
 
 	TIMER_DEVICE_CALLBACK_MEMBER(ctc_tick);
 
+	void mk83(machine_config &config);
+	void xerox820(machine_config &config);
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -128,6 +130,7 @@ public:
 
 	DECLARE_WRITE8_MEMBER( kbpio_pa_w );
 
+	void bigboard(machine_config &config);
 protected:
 	virtual void machine_reset() override;
 
@@ -157,6 +160,8 @@ public:
 	DECLARE_WRITE8_MEMBER( rdpio_pb_w );
 	DECLARE_WRITE_LINE_MEMBER( rdpio_pardy_w );
 
+	void xerox168(machine_config &config);
+	void xerox820ii(machine_config &config);
 protected:
 	virtual void machine_reset() override;
 

@@ -127,11 +127,11 @@ READ16_MEMBER(offtwall_state::bankswitch_r)
 READ16_MEMBER(offtwall_state::bankrom_r)
 {
 	/* this is the banked ROM read */
-	logerror("%06X: %04X\n", space.device().safe_pcbase(), offset);
+	logerror("%06X: %04X\n", m_maincpu->pcbase(), offset);
 
 	/* if the values are $3e000 or $3e002 are being read by code just below the
 	    ROM bank area, we need to return the correct value to give the proper checksum */
-	if ((offset == 0x3000 || offset == 0x3001) && space.device().safe_pcbase() > 0x37000)
+	if ((offset == 0x3000 || offset == 0x3001) && m_maincpu->pcbase() > 0x37000)
 	{
 		uint32_t checksum = (space.read_word(0x3fd210) << 16) | space.read_word(0x3fd212);
 		uint32_t us = 0xaaaa5555 - checksum;
@@ -166,7 +166,7 @@ READ16_MEMBER(offtwall_state::bankrom_r)
 
 READ16_MEMBER(offtwall_state::spritecache_count_r)
 {
-	int prevpc = space.device().safe_pcbase();
+	int prevpc = m_maincpu->pcbase();
 
 	/* if this read is coming from $99f8 or $9992, it's in the sprite copy loop */
 	if (prevpc == 0x99f8 || prevpc == 0x9992)
@@ -220,7 +220,7 @@ READ16_MEMBER(offtwall_state::spritecache_count_r)
 
 READ16_MEMBER(offtwall_state::unknown_verify_r)
 {
-	int prevpc = space.device().safe_pcbase();
+	int prevpc = m_maincpu->pcbase();
 	if (prevpc < 0x5c5e || prevpc > 0xc432)
 		return m_unknown_verify_base[offset];
 	else
@@ -249,9 +249,9 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, offtwall_state )
 	AM_RANGE(0x260030, 0x260031) AM_DEVREAD8("jsa", atari_jsa_iii_device, main_response_r, 0x00ff)
 	AM_RANGE(0x260040, 0x260041) AM_DEVWRITE8("jsa", atari_jsa_iii_device, main_command_w, 0x00ff)
 	AM_RANGE(0x260050, 0x260051) AM_WRITE(io_latch_w)
-	AM_RANGE(0x260060, 0x260061) AM_DEVWRITE("eeprom", eeprom_parallel_28xx_device, unlock_write)
+	AM_RANGE(0x260060, 0x260061) AM_DEVWRITE("eeprom", eeprom_parallel_28xx_device, unlock_write16)
 	AM_RANGE(0x2a0000, 0x2a0001) AM_DEVWRITE("watchdog", watchdog_timer_device, reset16_w)
-	AM_RANGE(0x3e0000, 0x3e0fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x3e0000, 0x3e0fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x3effc0, 0x3effff) AM_DEVREADWRITE("vad", atari_vad_device, control_read, control_write)
 	AM_RANGE(0x3f4000, 0x3f5eff) AM_RAM_DEVWRITE("vad", atari_vad_device, playfield_latched_msb_w) AM_SHARE("vad:playfield")
 	AM_RANGE(0x3f5f00, 0x3f5f7f) AM_RAM AM_SHARE("vad:eof")
@@ -361,7 +361,7 @@ GFXDECODE_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( offtwall )
+MACHINE_CONFIG_START(offtwall_state::offtwall)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, ATARI_CLOCK_14MHz/2)

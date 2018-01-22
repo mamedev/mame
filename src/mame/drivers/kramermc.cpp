@@ -109,7 +109,7 @@ static INPUT_PORTS_START( kramermc )
 INPUT_PORTS_END
 
 /* Machine driver */
-static MACHINE_CONFIG_START( kramermc )
+MACHINE_CONFIG_START(kramermc_state::kramermc)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 1500000)
 	MCFG_CPU_PROGRAM_MAP(kramermc_mem)

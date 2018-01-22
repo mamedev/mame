@@ -8,6 +8,7 @@
 #include "machine/ram.h"
 #include "bus/isa/isa_cards.h"
 #include "bus/pc_kbd/keyboards.h"
+#include "softlist_dev.h"
 
 class ps2_state : public driver_device
 {
@@ -22,9 +23,19 @@ public:
 	required_device<at_mb_device> m_mb;
 	required_device<ram_device> m_ram;
 
+	void ps2m30286(machine_config &config);
+	void ps2386(machine_config &config);
+	void at_softlists(machine_config &config);
 protected:
 	void machine_start() override;
 };
+
+MACHINE_CONFIG_START(ps2_state::at_softlists)
+	/* software lists */
+	MCFG_SOFTWARE_LIST_ADD("pc_disk_list","ibm5150")
+	MCFG_SOFTWARE_LIST_ADD("at_disk_list","ibm5170")
+	MCFG_SOFTWARE_LIST_ADD("at_cdrom_list","ibm5170_cdrom")
+MACHINE_CONFIG_END
 
 static ADDRESS_MAP_START( ps2_16_map, AS_PROGRAM, 16, ps2_state )
 	ADDRESS_MAP_UNMAP_HIGH
@@ -66,7 +77,7 @@ void ps2_state::machine_start()
 	}
 }
 
-static MACHINE_CONFIG_START( ps2m30286 )
+MACHINE_CONFIG_START(ps2_state::ps2m30286)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I80286, 10000000)
 	MCFG_CPU_PROGRAM_MAP(ps2_16_map)
@@ -90,7 +101,7 @@ static MACHINE_CONFIG_START( ps2m30286 )
 	MCFG_RAM_EXTRA_OPTIONS("2M,4M,8M,15M")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( ps2386 )
+MACHINE_CONFIG_START(ps2_state::ps2386)
 	MCFG_CPU_ADD("maincpu", I386, 12000000)
 	MCFG_CPU_PROGRAM_MAP(ps2_32_map)
 	MCFG_CPU_IO_MAP(ps2_32_io)

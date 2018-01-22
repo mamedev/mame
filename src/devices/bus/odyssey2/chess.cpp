@@ -43,7 +43,7 @@ ADDRESS_MAP_END
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( o2_chess_device::device_add_mconfig )
+MACHINE_CONFIG_START(o2_chess_device::device_add_mconfig)
 	MCFG_CPU_ADD("subcpu", NSC800, XTAL_4MHz)
 	MCFG_CPU_PROGRAM_MAP(chess_mem)
 	MCFG_CPU_IO_MAP(chess_io)

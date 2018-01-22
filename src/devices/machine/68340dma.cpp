@@ -8,22 +8,20 @@
 
 READ32_MEMBER( m68340_cpu_device::m68340_internal_dma_r )
 {
-	assert(m68340DMA);
-	//m68340_dma &dma = *m68340DMA;
+	assert(m_m68340DMA);
+	//m68340_dma &dma = *m_m68340DMA;
 
-	int pc = space.device().safe_pc();
-	logerror("%08x m68340_internal_dma_r %08x, (%08x)\n", pc, offset*4,mem_mask);
+	logerror("%08x m68340_internal_dma_r %08x, (%08x)\n", m_ppc, offset*4,mem_mask);
 
 	return 0x00000000;
 }
 
 WRITE32_MEMBER( m68340_cpu_device::m68340_internal_dma_w )
 {
-	assert(m68340DMA);
-	//m68340_dma &dma = *m68340DMA;
+	assert(m_m68340DMA);
+	//m68340_dma &dma = *m_m68340DMA;
 
-	int pc = space.device().safe_pc();
-	logerror("%08x m68340_internal_dma_w %08x, %08x (%08x)\n", pc, offset*4,data,mem_mask);
+	logerror("%08x m68340_internal_dma_w %08x, %08x (%08x)\n", m_ppc, offset*4,data,mem_mask);
 }
 
 void m68340_dma::reset()

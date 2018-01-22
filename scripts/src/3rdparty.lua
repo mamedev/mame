@@ -782,23 +782,83 @@ project "bx"
 
 	includedirs {
 		MAME_DIR .. "3rdparty/bx/include",
+		MAME_DIR .. "3rdparty/bx/3rdparty",
 	}
 
 	files {
+		MAME_DIR .. "3rdparty/bx/src/allocator.cpp",
 		MAME_DIR .. "3rdparty/bx/src/bx.cpp",
 		MAME_DIR .. "3rdparty/bx/src/commandline.cpp",
 		MAME_DIR .. "3rdparty/bx/src/crtnone.cpp",
-		MAME_DIR .. "3rdparty/bx/src/crtimpl.cpp",
 		MAME_DIR .. "3rdparty/bx/src/debug.cpp",
 		MAME_DIR .. "3rdparty/bx/src/dtoa.cpp",
-		MAME_DIR .. "3rdparty/bx/src/fpumath.cpp",
+		MAME_DIR .. "3rdparty/bx/src/easing.cpp",
+		MAME_DIR .. "3rdparty/bx/src/file.cpp",
+		MAME_DIR .. "3rdparty/bx/src/filepath.cpp",
+		MAME_DIR .. "3rdparty/bx/src/hash.cpp",
+		MAME_DIR .. "3rdparty/bx/src/math.cpp",
 		MAME_DIR .. "3rdparty/bx/src/mutex.cpp",
 		MAME_DIR .. "3rdparty/bx/src/os.cpp",
+		MAME_DIR .. "3rdparty/bx/src/process.cpp",
 		MAME_DIR .. "3rdparty/bx/src/semaphore.cpp",
+		MAME_DIR .. "3rdparty/bx/src/settings.cpp",
 		MAME_DIR .. "3rdparty/bx/src/sort.cpp",
 		MAME_DIR .. "3rdparty/bx/src/string.cpp",
-		MAME_DIR .. "3rdparty/bx/src/timer.cpp",
 		MAME_DIR .. "3rdparty/bx/src/thread.cpp",
+		MAME_DIR .. "3rdparty/bx/src/timer.cpp",
+		MAME_DIR .. "3rdparty/bx/src/url.cpp",
+	}
+
+--------------------------------------------------
+-- BIMG library objects
+--------------------------------------------------
+
+project "bimg"
+	uuid "5603611b-8bf8-4ffd-85bc-76858cd7df39"
+	kind "StaticLib"
+
+	includedirs {
+		MAME_DIR .. "3rdparty/bx/include",
+	}
+
+	configuration { "vs*" }
+		includedirs {
+			MAME_DIR .. "3rdparty/bx/include/compat/msvc",
+		}
+	configuration { "mingw*" }
+		includedirs {
+			MAME_DIR .. "3rdparty/bx/include/compat/mingw",
+		}
+
+	configuration { "osx* or xcode4" }
+		includedirs {
+			MAME_DIR .. "3rdparty/bx/include/compat/osx",
+		}
+
+	configuration { "freebsd" }
+		includedirs {
+			MAME_DIR .. "3rdparty/bx/include/compat/freebsd",
+		}
+
+	configuration { "netbsd" }
+		includedirs {
+			MAME_DIR .. "3rdparty/bx/include/compat/freebsd",
+		}
+
+	configuration { }
+
+	defines {
+		"__STDC_LIMIT_MACROS",
+		"__STDC_FORMAT_MACROS",
+		"__STDC_CONSTANT_MACROS",
+	}
+
+	includedirs {
+		MAME_DIR .. "3rdparty/bimg/include",
+	}
+
+	files {
+		MAME_DIR .. "3rdparty/bimg/src/image.cpp",
 	}
 
 --------------------------------------------------
@@ -829,6 +889,7 @@ end
 		MAME_DIR .. "3rdparty/bgfx/include",
 		MAME_DIR .. "3rdparty/bgfx/3rdparty",
 		MAME_DIR .. "3rdparty/bx/include",
+		MAME_DIR .. "3rdparty/bimg/include",
 		MAME_DIR .. "3rdparty/bgfx/3rdparty/dxsdk/include",
 	}
 
@@ -923,30 +984,28 @@ end
 	}
 	files {
 		MAME_DIR .. "3rdparty/bgfx/src/bgfx.cpp",
+		MAME_DIR .. "3rdparty/bgfx/src/debug_renderdoc.cpp",
 		MAME_DIR .. "3rdparty/bgfx/src/glcontext_egl.cpp",
 		MAME_DIR .. "3rdparty/bgfx/src/glcontext_glx.cpp",
-		MAME_DIR .. "3rdparty/bgfx/src/glcontext_ppapi.cpp",
 		MAME_DIR .. "3rdparty/bgfx/src/glcontext_wgl.cpp",
-		MAME_DIR .. "3rdparty/bgfx/src/image.cpp",
 		MAME_DIR .. "3rdparty/bgfx/src/hmd.cpp",
 		MAME_DIR .. "3rdparty/bgfx/src/hmd_ovr.cpp",
 		MAME_DIR .. "3rdparty/bgfx/src/hmd_openvr.cpp",
-		MAME_DIR .. "3rdparty/bgfx/src/renderer_d3d12.cpp",
+		MAME_DIR .. "3rdparty/bgfx/src/nvapi.cpp",
 		MAME_DIR .. "3rdparty/bgfx/src/renderer_d3d11.cpp",
+		MAME_DIR .. "3rdparty/bgfx/src/renderer_d3d12.cpp",
 		MAME_DIR .. "3rdparty/bgfx/src/renderer_d3d9.cpp",
 		MAME_DIR .. "3rdparty/bgfx/src/renderer_gl.cpp",
 		MAME_DIR .. "3rdparty/bgfx/src/renderer_gnm.cpp",
 		MAME_DIR .. "3rdparty/bgfx/src/renderer_noop.cpp",
 		MAME_DIR .. "3rdparty/bgfx/src/renderer_vk.cpp",
-		MAME_DIR .. "3rdparty/bgfx/src/debug_renderdoc.cpp",
 		MAME_DIR .. "3rdparty/bgfx/src/shader.cpp",
-		MAME_DIR .. "3rdparty/bgfx/src/shader_dxbc.cpp",
 		MAME_DIR .. "3rdparty/bgfx/src/shader_dx9bc.cpp",
+		MAME_DIR .. "3rdparty/bgfx/src/shader_dxbc.cpp",
 		MAME_DIR .. "3rdparty/bgfx/src/shader_spirv.cpp",
 		MAME_DIR .. "3rdparty/bgfx/src/topology.cpp",
 		MAME_DIR .. "3rdparty/bgfx/src/vertexdecl.cpp",
 		MAME_DIR .. "3rdparty/bgfx/examples/common/imgui/imgui.cpp",
-		MAME_DIR .. "3rdparty/bgfx/examples/common/imgui/ocornut_imgui.cpp",
 		MAME_DIR .. "3rdparty/bgfx/examples/common/nanovg/nanovg.cpp",
 		MAME_DIR .. "3rdparty/bgfx/examples/common/nanovg/nanovg_bgfx.cpp",
 		MAME_DIR .. "3rdparty/bgfx/3rdparty/ocornut-imgui/imgui.cpp",

@@ -153,6 +153,10 @@ public:
 	bitmap_ind16 tile_buffer, sprite_buffer;
 	optional_device<raiden2cop_device> m_raiden2cop;
 
+	void raidendx(machine_config &config);
+	void xsedae(machine_config &config);
+	void zeroteam(machine_config &config);
+	void raiden2(machine_config &config);
 protected:
 	virtual void machine_start() override;
 };

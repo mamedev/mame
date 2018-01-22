@@ -11,8 +11,11 @@
 #define VERBOSE 1
 
 #include "emu.h"
+#include "debug/debugbuf.h"
 #include "includes/apollo.h"
-#include "cpu/m68000/m68kcpu.h"
+#include "cpu/m68000/m68000.h"
+
+#if 0
 
 //------------------------------------------------------
 //         TRAP 0
@@ -1034,11 +1037,10 @@ static const char* get_svc_call(m68000_base_device *m68k, int trap_no,
 	return sb;
 }
 
+// WTF?
 static const std::string &disassemble(m68000_base_device *m68k, offs_t pc, std::string& sb)
 {
-	uint8_t oprom[10];
-	uint8_t opram[10];
-	uint32_t options = 0;
+	debug_disasm_buffer buffer(*m68k);
 
 	// remember bus error state
 	uint32_t tmp_buserror_occurred = m68k->mmu_tmp_buserror_occurred;
@@ -1047,25 +1049,9 @@ static const std::string &disassemble(m68000_base_device *m68k, offs_t pc, std::
 	m68k->mmu_tmp_buserror_occurred = 0;
 	m68k->mmu_tmp_rw = 1;
 
-	int i;
-	for (i = 0; i < sizeof(oprom); i++)
-	{
-		oprom[i] = opram[i] = m68k->read8(pc + i);
-		if (m68k->mmu_tmp_buserror_occurred)
-		{
-			sb = string_format("- (apollo_disassemble failed at %08x)", pc + i);
-
-			// restore previous bus error state
-			m68k->mmu_tmp_buserror_occurred = tmp_buserror_occurred;
-			m68k->mmu_tmp_buserror_address = tmp_buserror_address;
-
-			return sb;
-		}
-	}
-
-	std::ostringstream stream;
-	m68k->disassemble(stream, pc, oprom, opram, options);
-	sb = stream.str();
+	offs_t next_pc, size;
+	u32 info;
+	buffer.disassemble(pc, sb, next_pc, size, info);
 
 	// restore previous bus error state
 	m68k->mmu_tmp_buserror_occurred = tmp_buserror_occurred;
@@ -1135,7 +1121,7 @@ int apollo_debug_instruction_hook(m68000_base_device *device, offs_t curpc)
 		else if ((ir & 0xff00) == 0xf200 && (apollo_config( APOLLO_CONF_FPU_TRACE)))
 		{
 			std::string sb;
-			DLOG(("%s sp=%08x FPU: %x %s", apollo_cpu_context(device->machine().firstcpu),
+			DLOG(("%s sp=%08x FPU: %x %s", apollo_cpu_context(m68k),
 					REG_A(m68k)[7], ir, disassemble(m68k, REG_PC(m68k), sb)));
 		}
 		else if (!m68k->pmmu_enabled)
@@ -1147,7 +1133,7 @@ int apollo_debug_instruction_hook(m68000_base_device *device, offs_t curpc)
 			const uint16_t *data = get_data(m68k, REG_A(m68k)[7]);
 			if ( REG_USP(m68k) == 0 && (data[0] & 0x2000) == 0) {
 				DLOG(("%s sp=%08x RTE: sr=%04x pc=%04x%04x v=%04x usp=%08x",
-					apollo_cpu_context(device->machine().firstcpu),
+					apollo_cpu_context(m68k),
 					REG_A(m68k)[7], data[0], data[1], data[2], data[3], REG_USP(m68k)));
 			}
 		}
@@ -1161,7 +1147,7 @@ int apollo_debug_instruction_hook(m68000_base_device *device, offs_t curpc)
 
 			char sb[1000];
 			DLOG(("%s sp=%08x Domain/OS SVC: trap %x 0x%02x: %s",
-					apollo_cpu_context(device->machine().firstcpu), trap.sp,
+					apollo_cpu_context(m68k), trap.sp,
 					trap.trap_no, trap.trap_code,
 					get_svc_call(m68k, trap.trap_no, trap.trap_code, sb)));
 
@@ -1171,7 +1157,7 @@ int apollo_debug_instruction_hook(m68000_base_device *device, offs_t curpc)
 			// rte
 			char sb[1000];
 			DLOG(("%s sp=%08x Domain/OS SVC:              %s D0=0x%x",
-					apollo_cpu_context(device->machine().firstcpu), trap.sp,
+					apollo_cpu_context(m68k), trap.sp,
 					get_svc_call(m68k, trap.trap_no, trap.trap_code, sb), REG_D(m68k)[0]));
 
 			trap.pc = 0;
@@ -1184,3 +1170,4 @@ int apollo_debug_instruction_hook(m68000_base_device *device, offs_t curpc)
 	}
 	return 0;
 }
+#endif

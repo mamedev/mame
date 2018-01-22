@@ -70,7 +70,7 @@ namco_c148_device::namco_c148_device(const machine_config &mconfig, const char *
 	m_out_ext1_cb(*this),
 	m_out_ext2_cb(*this),
 	m_hostcpu_tag(nullptr),
-	m_linked_c148_tag(nullptr)
+	m_linked_c148_tag(finder_base::DUMMY_TAG)
 {
 }
 
@@ -133,6 +133,25 @@ void namco_c148_device::device_reset()
 	m_irqlevel.sci = 0;
 	m_irqlevel.ex = 0;
 	m_irqlevel.cpu = 0;
+}
+
+//-------------------------------------------------
+//  device_validity_check - device-specific checks
+//-------------------------------------------------
+
+void namco_c148_device::device_validity_check(validity_checker &valid) const
+{
+	device_t *const hostcpu = mconfig().root_device().subdevice(m_hostcpu_tag);
+	if (!hostcpu)
+		osd_printf_error("Host CPU device %s not found\n", m_hostcpu_tag ? m_hostcpu_tag : "<nullptr>");
+	else if (!dynamic_cast<cpu_device *>(hostcpu))
+		osd_printf_error("Host CPU device %s is not an instance of cpu_device\n", m_hostcpu_tag ? m_hostcpu_tag : "<nullptr>");
+
+	device_t *const linked_c148 = mconfig().root_device().subdevice(m_linked_c148_tag);
+	if ((finder_base::DUMMY_TAG != m_linked_c148_tag) && !linked_c148)
+		osd_printf_error("Linked C148 device %s not found\n", m_linked_c148_tag ? m_linked_c148_tag : "<nullptr>");
+	else if (linked_c148 && !dynamic_cast<namco_c148_device *>(linked_c148))
+		osd_printf_error("Linked C148 device %s is not an instance of c148_device\n", m_linked_c148_tag ? m_linked_c148_tag : "<nullptr>");
 }
 
 //**************************************************************************

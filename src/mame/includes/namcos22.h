@@ -502,4 +502,16 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(dsp_master_serial_irq);
 	TIMER_DEVICE_CALLBACK_MEMBER(dsp_slave_serial_irq);
 	TIMER_DEVICE_CALLBACK_MEMBER(mcu_irq);
+	void namcos22s(machine_config &config);
+	void propcycl(machine_config &config);
+	void dirtdash(machine_config &config);
+	void airco22b(machine_config &config);
+	void cybrcycc(machine_config &config);
+	void tokyowar(machine_config &config);
+	void cybrcomm(machine_config &config);
+	void alpine(machine_config &config);
+	void alpinesa(machine_config &config);
+	void adillor(machine_config &config);
+	void timecris(machine_config &config);
+	void namcos22(machine_config &config);
 };

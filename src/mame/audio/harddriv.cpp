@@ -266,13 +266,13 @@ WRITE16_MEMBER(harddriv_sound_board_device::hdsnd68k_320ram_w)
 
 READ16_MEMBER(harddriv_sound_board_device::hdsnd68k_320ports_r)
 {
-	return m_sounddsp->space(AS_IO).read_word((offset & 7) << 1);
+	return m_sounddsp->space(AS_IO).read_word(offset & 7);
 }
 
 
 WRITE16_MEMBER(harddriv_sound_board_device::hdsnd68k_320ports_w)
 {
-	m_sounddsp->space(AS_IO).write_word((offset & 7) << 1, data);
+	m_sounddsp->space(AS_IO).write_word(offset & 7, data);
 }
 
 
@@ -429,7 +429,7 @@ ADDRESS_MAP_END
 // device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( harddriv_sound_board_device::device_add_mconfig )
+MACHINE_CONFIG_START(harddriv_sound_board_device::device_add_mconfig)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("soundcpu", M68000, XTAL_16MHz/2)

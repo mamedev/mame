@@ -261,6 +261,8 @@ public:
 	ADC083X_INPUT_CB(adc0838_callback);
 	K056832_CB_MEMBER(tile_callback);
 
+	void zr107(machine_config &config);
+	void jetwave(machine_config &config);
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -756,7 +758,7 @@ void zr107_state::machine_reset()
 	m_dsp->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 }
 
-static MACHINE_CONFIG_START( zr107 )
+MACHINE_CONFIG_START(zr107_state::zr107)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", PPC403GA, XTAL_64MHz/2)   /* PowerPC 403GA 32MHz */
@@ -827,7 +829,7 @@ static MACHINE_CONFIG_START( zr107 )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( jetwave )
+MACHINE_CONFIG_START(zr107_state::jetwave)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", PPC403GA, XTAL_64MHz/2)   /* PowerPC 403GA 32MHz */

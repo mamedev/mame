@@ -29,6 +29,10 @@ namespace bx
 	{
 	}
 
+	inline ProcessOpenI::~ProcessOpenI()
+	{
+	}
+
 	inline CloserI::~CloserI()
 	{
 	}
@@ -196,10 +200,10 @@ namespace bx
 
 	inline MemoryWriter::MemoryWriter(MemoryBlockI* _memBlock)
 		: m_memBlock(_memBlock)
-		  , m_data(NULL)
-		  , m_pos(0)
-		  , m_top(0)
-		  , m_size(0)
+		, m_data(NULL)
+		, m_pos(0)
+		, m_top(0)
+		, m_size(0)
 	{
 	}
 
@@ -293,6 +297,16 @@ namespace bx
 		return _writer->write(_data, _size, _err);
 	}
 
+	inline int32_t write(WriterI* _writer, const char* _str, Error* _err)
+	{
+		return write(_writer, _str, strLen(_str), _err);
+	}
+
+	inline int32_t write(WriterI* _writer, const StringView& _str, Error* _err)
+	{
+		return write(_writer, _str.getPtr(), _str.getLength(), _err);
+	}
+
 	inline int32_t writeRep(WriterI* _writer, uint8_t _byte, int32_t _size, Error* _err)
 	{
 		BX_ERROR_SCOPE(_err);
@@ -377,9 +391,17 @@ namespace bx
 	inline int64_t getSize(SeekerI* _seeker)
 	{
 		int64_t offset = _seeker->seek();
-		int64_t size = _seeker->seek(0, Whence::End);
+		int64_t size   = _seeker->seek(0, Whence::End);
 		_seeker->seek(offset, Whence::Begin);
 		return size;
+	}
+
+	inline int64_t getRemain(SeekerI* _seeker)
+	{
+		int64_t offset = _seeker->seek();
+		int64_t size   = _seeker->seek(0, Whence::End);
+		_seeker->seek(offset, Whence::Begin);
+		return size-offset;
 	}
 
 	inline int32_t peek(ReaderSeekerI* _reader, void* _data, int32_t _size, Error* _err)
@@ -432,16 +454,22 @@ namespace bx
 		return 0;
 	}
 
-	inline bool open(ReaderOpenI* _reader, const char* _filePath, Error* _err)
+	inline bool open(ReaderOpenI* _reader, const FilePath& _filePath, Error* _err)
 	{
 		BX_ERROR_USE_TEMP_WHEN_NULL(_err);
 		return _reader->open(_filePath, _err);
 	}
 
-	inline bool open(WriterOpenI* _writer, const char* _filePath, bool _append, Error* _err)
+	inline bool open(WriterOpenI* _writer, const FilePath& _filePath, bool _append, Error* _err)
 	{
 		BX_ERROR_USE_TEMP_WHEN_NULL(_err);
 		return _writer->open(_filePath, _append, _err);
+	}
+
+	inline bool open(ProcessOpenI* _process, const FilePath& _filePath, const StringView& _args, Error* _err)
+	{
+		BX_ERROR_USE_TEMP_WHEN_NULL(_err);
+		return _process->open(_filePath, _args, _err);
 	}
 
 	inline void close(CloserI* _reader)

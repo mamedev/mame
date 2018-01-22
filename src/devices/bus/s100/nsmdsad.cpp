@@ -57,7 +57,7 @@ SLOT_INTERFACE_END
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( s100_mds_ad_device::device_add_mconfig )
+MACHINE_CONFIG_START(s100_mds_ad_device::device_add_mconfig)
 	MCFG_FLOPPY_DRIVE_ADD("floppy0", mds_ad_floppies, "525dd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("floppy1", mds_ad_floppies, "525dd", floppy_image_device::default_floppy_formats)
 MACHINE_CONFIG_END

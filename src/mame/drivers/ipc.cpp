@@ -54,6 +54,7 @@ public:
 		, m_maincpu(*this, "maincpu")
 	{ }
 
+	void ipc(machine_config &config);
 private:
 	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
@@ -87,7 +88,7 @@ void ipc_state::machine_reset()
 }
 
 
-static MACHINE_CONFIG_START( ipc )
+MACHINE_CONFIG_START(ipc_state::ipc)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",I8085A, XTAL_19_6608MHz / 4)
 	MCFG_CPU_PROGRAM_MAP(ipc_mem)

@@ -468,21 +468,26 @@ public:
 
 	struct cool_render_object
 	{
-		uint8_t* indirect_tiles;
-		uint32_t* indirect_zoom;
+		cool_render_object(coolridr_state &s) : state(s), colbase(s.m_colbase)
+		{
+			std::copy(std::begin(s.m_spriteblit), std::end(s.m_spriteblit), std::begin(spriteblit));
+		}
+
+		std::unique_ptr<uint8_t []> indirect_tiles;
+		std::unique_ptr<uint32_t []> indirect_zoom;
 		uint32_t spriteblit[12];
-		bitmap_ind16* drawbitmap;
-		//bitmap_ind16* zbitmap;
-		uint16_t zpri;
-		uint8_t blittype;
-		coolridr_state* state;
+		bitmap_ind16* drawbitmap = nullptr;
+		//bitmap_ind16* zbitmap = nullptr;
+		uint16_t zpri = 0;
+		uint8_t blittype = 0;
+		coolridr_state& state;
 		uint32_t clipvals[3];
-		int screen;
+		int screen = 0;
 		int colbase;
 	};
 
-	struct cool_render_object **m_cool_render_object_list1;
-	struct cool_render_object **m_cool_render_object_list2;
+	std::unique_ptr<std::unique_ptr<cool_render_object> []> m_cool_render_object_list1;
+	std::unique_ptr<std::unique_ptr<cool_render_object> []> m_cool_render_object_list2;
 
 	int m_listcount1;
 	int m_listcount2;
@@ -532,6 +537,8 @@ public:
 	};
 
 	objcachemanager decode[2];
+	void aquastge(machine_config &config);
+	void coolridr(machine_config &config);
 };
 
 #define PRINT_BLIT_STUFF \
@@ -1020,11 +1027,11 @@ uint32_t coolridr_state::screen_update_coolridr2(screen_device &screen, bitmap_i
 			} \
 			if (!indirect_tile_enable && size < DECODECACHE_NUMSPRITETILES) \
 			{ \
-				object->state->decode[screen].objcache[use_object].tiles[v*used_hCellCount + h].tempshape_multi_decoded = true; \
+				object->state.decode[screen].objcache[use_object].tiles[v*used_hCellCount + h].tempshape_multi_decoded = true; \
 				if (blankcount==0) \
-					object->state->decode[screen].objcache[use_object].tiles[v*used_hCellCount + h].is_blank = true; \
+					object->state.decode[screen].objcache[use_object].tiles[v*used_hCellCount + h].is_blank = true; \
 				else \
-					object->state->decode[screen].objcache[use_object].tiles[v*used_hCellCount + h].is_blank = false; \
+					object->state.decode[screen].objcache[use_object].tiles[v*used_hCellCount + h].is_blank = false; \
 				/* if (object->screen==0) printf("marking offset %04x as decoded (sprite number %08x ptr %08x)\n", v*used_hCellCount + h, spriteNumber, ((uint64_t)(void*)tempshape)&0xffffffff);*/ \
 			} \
 		} \
@@ -1055,7 +1062,7 @@ uint32_t coolridr_state::screen_update_coolridr2(screen_device &screen, bitmap_i
 	} \
 	if (!indirect_tile_enable && size < DECODECACHE_NUMSPRITETILES) \
 	{ \
-		if (object->state->decode[screen].objcache[use_object].tiles[v*used_hCellCount + h].is_blank == true) \
+		if (object->state.decode[screen].objcache[use_object].tiles[v*used_hCellCount + h].is_blank == true) \
 				continue; \
 	} \
 	else \
@@ -1292,7 +1299,7 @@ TODO: fix anything that isn't text.
 
 void *coolridr_state::draw_object_threaded(void *param, int threadid)
 {
-	cool_render_object *object = reinterpret_cast<cool_render_object *>(param);
+	const std::unique_ptr<cool_render_object> object(reinterpret_cast<cool_render_object *>(param));
 	bitmap_ind16* drawbitmap = object->drawbitmap;
 
 	/************* object->spriteblit[3] *************/
@@ -1317,8 +1324,8 @@ void *coolridr_state::draw_object_threaded(void *param, int threadid)
 
 
 
-	uint16_t* rearranged_16bit_gfx = object->state->m_rearranged_16bit_gfx.get();
-	uint16_t* expanded_10bit_gfx = object->state->m_expanded_10bit_gfx.get();
+	uint16_t* rearranged_16bit_gfx = object->state.m_rearranged_16bit_gfx.get();
+	uint16_t* expanded_10bit_gfx = object->state.m_expanded_10bit_gfx.get();
 
 	int16_t clipminX = CLIPMINX_FULL;
 	int16_t clipmaxX = CLIPMAXX_FULL;
@@ -1338,7 +1345,7 @@ void *coolridr_state::draw_object_threaded(void *param, int threadid)
 
 	if (b1mode)
 	{
-	//  b1colorNumber = object->state->machine().rand()&0xfff;
+	//  b1colorNumber = object->state.machine().rand()&0xfff;
 	}
 
 	/************* object->spriteblit[3] *************/
@@ -1350,7 +1357,7 @@ void *coolridr_state::draw_object_threaded(void *param, int threadid)
 
 	if (b2colorNumber != b1colorNumber)
 	{
-	//  b1colorNumber = space.machine().rand()&0xfff;
+	//  b1colorNumber = machine().rand()&0xfff;
 	}
 
 //  if(b1colorNumber > 0x60 || b2colorNumber)
@@ -1410,9 +1417,9 @@ void *coolridr_state::draw_object_threaded(void *param, int threadid)
 	// note the road always has 0x8000 bit set in the palette.  I *think* this is because they do a gradual blend of some kind between the road types
 	//  see the number of transitional road bits which have various values above set
 
-	if (blit4blendlevel==object->state->debug_randompal)
+	if (blit4blendlevel==object->state.debug_randompal)
 	{
-		b1colorNumber = object->state->machine().rand()&0xfff;
+		b1colorNumber = object->state.machine().rand()&0xfff;
 	}
 
 
@@ -1439,18 +1446,7 @@ void *coolridr_state::draw_object_threaded(void *param, int threadid)
 	// if we have no vertical zoom value there's no point in going any further
 	// because there are no known vertical indirect modes
 	if (!vZoom)
-	{
-		// abort, but make sure we clean up
-		if (object->indirect_tiles)
-			free(object->indirect_tiles);
-
-		if (object->indirect_zoom)
-			free(object->indirect_zoom);
-
-		free (object);
-
 		return nullptr;
-	}
 
 	/************* object->spriteblit[9] *************/
 
@@ -1781,7 +1777,7 @@ void *coolridr_state::draw_object_threaded(void *param, int threadid)
 		if (clipminY>clipmaxY) clipminY = clipmaxY;
 
 
-		//b1colorNumber = object->state->machine().rand()&0xfff;
+		//b1colorNumber = object->state.machine().rand()&0xfff;
 	}
 
 	/* DRAW */
@@ -1820,16 +1816,16 @@ void *coolridr_state::draw_object_threaded(void *param, int threadid)
 
 		for (int k=0;k<DECODECACHE_NUMOBJECTCACHES;k++)
 		{
-			if(((object->state->decode[screen].objcache[k].lastromoffset == b3romoffset)) &&
-				((object->state->decode[screen].objcache[k].lastused_flipx == used_flipx)) &&
-				((object->state->decode[screen].objcache[k].lastused_flipy == used_flipy)) &&
-				((object->state->decode[screen].objcache[k].lastblit_rotate == blit_rotate)) &&
-				((object->state->decode[screen].objcache[k].lastb1mode == b1mode)) &&
-				((object->state->decode[screen].objcache[k].lastb1colorNumber == b1colorNumber)) &&
-				((object->state->decode[screen].objcache[k].lastb2colorNumber == b2colorNumber)) &&
-				((object->state->decode[screen].objcache[k].lastused_hCellCount == used_hCellCount)) &&
-				((object->state->decode[screen].objcache[k].lastused_vCellCount == used_vCellCount)) &&
-				((object->state->decode[screen].objcache[k].lastb2altpenmask == b2altpenmask)))
+			if(((object->state.decode[screen].objcache[k].lastromoffset == b3romoffset)) &&
+				((object->state.decode[screen].objcache[k].lastused_flipx == used_flipx)) &&
+				((object->state.decode[screen].objcache[k].lastused_flipy == used_flipy)) &&
+				((object->state.decode[screen].objcache[k].lastblit_rotate == blit_rotate)) &&
+				((object->state.decode[screen].objcache[k].lastb1mode == b1mode)) &&
+				((object->state.decode[screen].objcache[k].lastb1colorNumber == b1colorNumber)) &&
+				((object->state.decode[screen].objcache[k].lastb2colorNumber == b2colorNumber)) &&
+				((object->state.decode[screen].objcache[k].lastused_hCellCount == used_hCellCount)) &&
+				((object->state.decode[screen].objcache[k].lastused_vCellCount == used_vCellCount)) &&
+				((object->state.decode[screen].objcache[k].lastb2altpenmask == b2altpenmask)))
 			{
 				found = k;
 				break;
@@ -1838,32 +1834,32 @@ void *coolridr_state::draw_object_threaded(void *param, int threadid)
 
 		if (found != -1)
 		{
-			object->state->decode[screen].objcache[found].repeatcount++;
+			object->state.decode[screen].objcache[found].repeatcount++;
 			use_object = found;
 		}
 		else
 		{
-			use_object = object->state->decode[screen].current_object;
+			use_object = object->state.decode[screen].current_object;
 
 			// dirty the cache
 			for (int i=0;i<DECODECACHE_NUMSPRITETILES;i++)
-				object->state->decode[screen].objcache[use_object].tiles[i].tempshape_multi_decoded = false;
+				object->state.decode[screen].objcache[use_object].tiles[i].tempshape_multi_decoded = false;
 
-			object->state->decode[screen].objcache[use_object].lastromoffset = b3romoffset;
-			object->state->decode[screen].objcache[use_object].lastused_flipx = used_flipx;
-			object->state->decode[screen].objcache[use_object].lastused_flipy = used_flipy;
-			object->state->decode[screen].objcache[use_object].lastblit_rotate = blit_rotate;
-			object->state->decode[screen].objcache[use_object].lastb1mode = b1mode;
-			object->state->decode[screen].objcache[use_object].lastb1colorNumber = b1colorNumber;
-			object->state->decode[screen].objcache[use_object].lastb2colorNumber = b2colorNumber;
-			object->state->decode[screen].objcache[use_object].lastused_hCellCount = used_hCellCount;
-			object->state->decode[screen].objcache[use_object].lastused_vCellCount = used_vCellCount;
-			object->state->decode[screen].objcache[use_object].lastb2altpenmask = b2altpenmask;
-			object->state->decode[screen].objcache[use_object].repeatcount = 0;
+			object->state.decode[screen].objcache[use_object].lastromoffset = b3romoffset;
+			object->state.decode[screen].objcache[use_object].lastused_flipx = used_flipx;
+			object->state.decode[screen].objcache[use_object].lastused_flipy = used_flipy;
+			object->state.decode[screen].objcache[use_object].lastblit_rotate = blit_rotate;
+			object->state.decode[screen].objcache[use_object].lastb1mode = b1mode;
+			object->state.decode[screen].objcache[use_object].lastb1colorNumber = b1colorNumber;
+			object->state.decode[screen].objcache[use_object].lastb2colorNumber = b2colorNumber;
+			object->state.decode[screen].objcache[use_object].lastused_hCellCount = used_hCellCount;
+			object->state.decode[screen].objcache[use_object].lastused_vCellCount = used_vCellCount;
+			object->state.decode[screen].objcache[use_object].lastb2altpenmask = b2altpenmask;
+			object->state.decode[screen].objcache[use_object].repeatcount = 0;
 
-			object->state->decode[screen].current_object++;
-			if (object->state->decode[screen].current_object >= DECODECACHE_NUMOBJECTCACHES)
-				object->state->decode[screen].current_object = 0;
+			object->state.decode[screen].current_object++;
+			if (object->state.decode[screen].current_object >= DECODECACHE_NUMOBJECTCACHES)
+				object->state.decode[screen].current_object = 0;
 		}
 	}
 
@@ -1957,8 +1953,8 @@ void *coolridr_state::draw_object_threaded(void *param, int threadid)
 
 			if (!indirect_tile_enable && size < DECODECACHE_NUMSPRITETILES)
 			{
-				tempshape = object->state->decode[screen].objcache[use_object].tiles[v*used_hCellCount + h].tempshape_multi;
-				current_decoded = object->state->decode[screen].objcache[use_object].tiles[v*used_hCellCount + h].tempshape_multi_decoded;
+				tempshape = object->state.decode[screen].objcache[use_object].tiles[v*used_hCellCount + h].tempshape_multi;
+				current_decoded = object->state.decode[screen].objcache[use_object].tiles[v*used_hCellCount + h].tempshape_multi_decoded;
 				/*
 				if (object->screen==0)
 				{
@@ -1970,7 +1966,7 @@ void *coolridr_state::draw_object_threaded(void *param, int threadid)
 			else
 			{
 				//if (object->screen==0) printf("using base tempshape\n");
-				tempshape = object->state->decode[screen].tempshape;
+				tempshape = object->state.decode[screen].tempshape;
 			}
 
 
@@ -2127,14 +2123,6 @@ void *coolridr_state::draw_object_threaded(void *param, int threadid)
 
 	end:
 
-	if (object->indirect_tiles)
-		free(object->indirect_tiles);
-
-	if (object->indirect_zoom)
-		free(object->indirect_zoom);
-
-	free (object);
-
 	return nullptr;
 
 }
@@ -2239,13 +2227,7 @@ void coolridr_state::blit_current_sprite(address_space &space)
 		return;
 	}
 
-	cool_render_object* testobject = (cool_render_object *)malloc(sizeof(cool_render_object));
-
-	testobject->state = this;
-	testobject->colbase = m_colbase;
-
-	for (int i=0;i<12;i++)
-		testobject->spriteblit[i] = m_spriteblit[i];
+	std::unique_ptr<cool_render_object> testobject(new cool_render_object(*this));
 
 	// cache some values that are looked up from RAM to be safe.. alternatively we could stall the rendering if they get written to, but they're a direct memory pointer..
 	int test_indirect_tile_enable = (m_spriteblit[5] & 0x00010000)>>16;
@@ -2256,7 +2238,7 @@ void coolridr_state::blit_current_sprite(address_space &space)
 		uint16_t test_hCellCount = (m_spriteblit[6] & 0x00003ff);
 		uint16_t test_vCellCount = (m_spriteblit[6] & 0x03ff0000) >> 16;
 		int bytes = test_vCellCount*test_hCellCount;
-		testobject->indirect_tiles = (uint8_t*)malloc(bytes);
+		testobject->indirect_tiles = std::make_unique<uint8_t []>(bytes);
 		for (int i=0;i<bytes;i++)
 		{
 			testobject->indirect_tiles[i] = space.read_byte(test_textlookup + i);
@@ -2273,7 +2255,7 @@ void coolridr_state::blit_current_sprite(address_space &space)
 		uint32_t test_blit10 =  m_spriteblit[10];
 		uint16_t test_vCellCount = (m_spriteblit[6] & 0x03ff0000) >> 16;
 		int bytes = test_vCellCount * 4 * 16;
-		testobject->indirect_zoom = (uint32_t*)malloc(bytes);
+		testobject->indirect_zoom = std::make_unique<uint32_t []>(bytes/4);
 		for (int i=0;i<bytes/4;i++)
 		{
 			testobject->indirect_zoom[i] = space.read_dword(test_blit10 + i*4);
@@ -2320,11 +2302,11 @@ void coolridr_state::blit_current_sprite(address_space &space)
 #if 0
 	if (m_usethreads)
 	{
-		osd_work_item_queue(queue, draw_object_threaded, testobject, WORK_ITEM_FLAG_AUTO_RELEASE);
+		osd_work_item_queue(queue, draw_object_threaded, testobject.release(), WORK_ITEM_FLAG_AUTO_RELEASE);
 	}
 	else
 	{
-		draw_object_threaded((void*)testobject,0);
+		draw_object_threaded(testobject.release(), 0);
 	}
 #else
 
@@ -2332,7 +2314,7 @@ void coolridr_state::blit_current_sprite(address_space &space)
 	{
 		if (m_listcount1<1000000)
 		{
-			m_cool_render_object_list1[m_listcount1] =  testobject;
+			m_cool_render_object_list1[m_listcount1] =  std::move(testobject);
 			m_listcount1++;
 		}
 		else
@@ -2344,7 +2326,7 @@ void coolridr_state::blit_current_sprite(address_space &space)
 	{
 		if (m_listcount2<1000000)
 		{
-			m_cool_render_object_list2[m_listcount2] =  testobject;
+			m_cool_render_object_list2[m_listcount2] =  std::move(testobject);
 			m_listcount2++;
 		}
 		else
@@ -2587,16 +2569,12 @@ WRITE32_MEMBER(coolridr_state::sysh1_fb_data_w)
 				m_clipblitterMode[0] = 0xff;
 
 				/* bubble sort, might be something better to use instead */
-				for (int pass = 0 ; pass < ( m_listcount1 - 1 ); pass++)
+				for (int pass = 0 ; pass < (m_listcount1 - 1); pass++)
 				{
 					for (int elem2 = 0 ; elem2 < m_listcount1 - pass - 1; elem2++)
 					{
 						if (m_cool_render_object_list1[elem2]->zpri > m_cool_render_object_list1[elem2+1]->zpri)
-						{
-							cool_render_object* temp = m_cool_render_object_list1[elem2];
-							m_cool_render_object_list1[elem2]   = m_cool_render_object_list1[elem2+1];
-							m_cool_render_object_list1[elem2+1] = temp;
-						}
+							std::swap(m_cool_render_object_list1[elem2], m_cool_render_object_list1[elem2+1]);
 					}
 				}
 
@@ -2604,11 +2582,11 @@ WRITE32_MEMBER(coolridr_state::sysh1_fb_data_w)
 				{
 					if (m_usethreads)
 					{
-						osd_work_item_queue(m_work_queue[0], draw_object_threaded, m_cool_render_object_list1[i], WORK_ITEM_FLAG_AUTO_RELEASE);
+						osd_work_item_queue(m_work_queue[0], draw_object_threaded, m_cool_render_object_list1[i].release(), WORK_ITEM_FLAG_AUTO_RELEASE);
 					}
 					else
 					{
-						draw_object_threaded((void*)m_cool_render_object_list1[i],0);
+						draw_object_threaded((void*)m_cool_render_object_list1[i].release(), 0);
 					}
 				}
 
@@ -2638,17 +2616,13 @@ WRITE32_MEMBER(coolridr_state::sysh1_fb_data_w)
 				m_clipvals[1][2] = 0;
 				m_clipblitterMode[1] = 0xff;
 
-					/* bubble sort, might be something better to use instead */
-				for (int pass = 0 ; pass < ( m_listcount2 - 1 ); pass++)
+				/* bubble sort, might be something better to use instead */
+				for (int pass = 0 ; pass < (m_listcount2 - 1); pass++)
 				{
 					for (int elem2 = 0 ; elem2 < m_listcount2 - pass - 1; elem2++)
 					{
 						if (m_cool_render_object_list2[elem2]->zpri > m_cool_render_object_list2[elem2+1]->zpri)
-						{
-							cool_render_object* temp = m_cool_render_object_list2[elem2];
-							m_cool_render_object_list2[elem2]   = m_cool_render_object_list2[elem2+1];
-							m_cool_render_object_list2[elem2+1] = temp;
-						}
+							std::swap(m_cool_render_object_list2[elem2], m_cool_render_object_list2[elem2+1]);
 					}
 				}
 
@@ -2656,11 +2630,11 @@ WRITE32_MEMBER(coolridr_state::sysh1_fb_data_w)
 				{
 					if (m_usethreads)
 					{
-						osd_work_item_queue(m_work_queue[1], draw_object_threaded, m_cool_render_object_list2[i], WORK_ITEM_FLAG_AUTO_RELEASE);
+						osd_work_item_queue(m_work_queue[1], draw_object_threaded, m_cool_render_object_list2[i].release(), WORK_ITEM_FLAG_AUTO_RELEASE);
 					}
 					else
 					{
-						draw_object_threaded((void*)m_cool_render_object_list2[i],0);
+						draw_object_threaded((void*)m_cool_render_object_list2[i].release(), 0);
 					}
 				}
 
@@ -3666,10 +3640,10 @@ void coolridr_state::machine_start()
 	m_h1_pcg = make_unique_clear<uint8_t[]>(VRAM_SIZE);
 	m_h1_pal = make_unique_clear<uint16_t[]>(VRAM_SIZE);
 
-	m_cool_render_object_list1 = auto_alloc_array_clear(machine(), struct cool_render_object*, 1000000);
+	m_cool_render_object_list1 = std::make_unique<std::unique_ptr<cool_render_object> []>(1000000);
 	m_listcount1 = 0;
 
-	m_cool_render_object_list2 = auto_alloc_array_clear(machine(), struct cool_render_object*, 1000000);
+	m_cool_render_object_list2 = std::make_unique<std::unique_ptr<cool_render_object> []>(1000000);
 	m_listcount2 = 0;
 
 	m_work_queue[0] = osd_work_queue_alloc(WORK_QUEUE_FLAG_HIGH_FREQ);
@@ -3715,7 +3689,7 @@ WRITE_LINE_MEMBER(coolridr_state::scsp2_to_sh1_irq)
 
 #define MAIN_CLOCK XTAL_28_63636MHz
 
-static MACHINE_CONFIG_START( coolridr )
+MACHINE_CONFIG_START(coolridr_state::coolridr)
 	MCFG_CPU_ADD("maincpu", SH2, MAIN_CLOCK)  // 28 mhz
 	MCFG_CPU_PROGRAM_MAP(system_h1_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", coolridr_state, system_h1_main, "screen", 0, 1)
@@ -3762,7 +3736,7 @@ static MACHINE_CONFIG_START( coolridr )
 	MCFG_SOUND_ROUTE(0, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( aquastge, coolridr )
+MACHINE_CONFIG_DERIVED(coolridr_state::aquastge, coolridr)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(aquastge_h1_map)
 
@@ -3884,7 +3858,7 @@ TODO: both irq routines writes 1 to 0x60d8894, sets up the Watchdog timer then e
 */
 READ32_MEMBER(coolridr_state::coolridr_hack2_r)
 {
-	offs_t pc = downcast<cpu_device *>(&space.device())->pc();
+	offs_t pc = m_maincpu->pc();
 
 	if(pc == 0x6002cba || pc == 0x6002d42)
 		return 0;
@@ -3899,7 +3873,7 @@ READ32_MEMBER(coolridr_state::coolridr_hack2_r)
 
 READ32_MEMBER(coolridr_state::aquastge_hack_r)
 {
-	offs_t pc = downcast<cpu_device *>(&space.device())->pc();
+	offs_t pc = m_maincpu->pc();
 
 	if ((pc == 0x6009e76) || (pc == 0x6009e78))
 		return 0;

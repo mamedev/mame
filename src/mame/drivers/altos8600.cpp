@@ -66,6 +66,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(sintr1_w);
 	DECLARE_WRITE8_MEMBER(ics_attn_w);
 	IRQ_CALLBACK_MEMBER(inta);
+	void altos8600(machine_config &config);
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -677,7 +678,7 @@ static SLOT_INTERFACE_START(altos8600_floppies)
 	SLOT_INTERFACE( "8dd", FLOPPY_8_DSDD )
 SLOT_INTERFACE_END
 
-static MACHINE_CONFIG_START(altos8600)
+MACHINE_CONFIG_START(altos8600_state::altos8600)
 	MCFG_CPU_ADD("maincpu", I8086, XTAL_5MHz)
 	MCFG_CPU_PROGRAM_MAP(cpu_mem)
 	MCFG_CPU_IO_MAP(cpu_io)
@@ -691,7 +692,7 @@ static MACHINE_CONFIG_START(altos8600)
 	MCFG_CPU_ADD("dmac", I8089, XTAL_5MHz)
 	MCFG_CPU_PROGRAM_MAP(dmac_mem)
 	MCFG_CPU_IO_MAP(dmac_io)
-	MCFG_I8089_DATABUS_WIDTH(16)
+	MCFG_I8089_DATA_WIDTH(16)
 	MCFG_I8089_SINTR1(WRITELINE(altos8600_state, sintr1_w))
 	MCFG_I8089_SINTR2(DEVWRITELINE("pic8259_2", pic8259_device, ir4_w))
 

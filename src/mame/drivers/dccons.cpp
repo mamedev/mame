@@ -279,18 +279,18 @@
 
 READ64_MEMBER(dc_cons_state::dcus_idle_skip_r )
 {
-	//if (space.device().safe_pc()==0xc0ba52a)
-	//  space.device().execute().spin_until_time(attotime::from_usec(2500));
-	//  device_spinuntil_int(&space.device());
+	//if (m_maincpu->pc()==0xc0ba52a)
+	//  m_maincpu->spin_until_time(attotime::from_usec(2500));
+	//  device_spinuntil_int(m_maincpu);
 
 	return dc_ram[0x2303b0/8];
 }
 
 READ64_MEMBER(dc_cons_state::dcjp_idle_skip_r )
 {
-	//if (space.device().safe_pc()==0xc0bac62)
-	//  space.device().execute().spin_until_time(attotime::from_usec(2500));
-	//  device_spinuntil_int(&space.device());
+	//if (m_maincpu->pc()==0xc0bac62)
+	//  m_maincpu->spin_until_time(attotime::from_usec(2500));
+	//  device_spinuntil_int(m_maincpu);
 
 	return dc_ram[0x2302f8/8];
 }
@@ -568,13 +568,14 @@ static INPUT_PORTS_START( dc )
 	PORT_CONFSETTING(    0x03, "S-Video" )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( gdrom_config )
-	MCFG_DEVICE_MODIFY("cdda")
+void dc_cons_state::gdrom_config(device_t *device)
+{
+	device = device->subdevice("cdda");
 	MCFG_SOUND_ROUTE(0, "^^^^lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "^^^^rspeaker", 1.0)
-MACHINE_CONFIG_END
+}
 
-static MACHINE_CONFIG_START( dc )
+MACHINE_CONFIG_START(dc_cons_state::dc)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", SH4LE, CPU_CLOCK)
 	MCFG_SH4_MD0(1)
@@ -752,5 +753,5 @@ ROM_END
 CONS( 1999, dc,     dcjp,   0,      dc,     dc,   dc_cons_state,   dcus,   "Sega", "Dreamcast (USA, NTSC)", MACHINE_NOT_WORKING )
 CONS( 1998, dcjp,   0,      0,      dc,     dc,   dc_cons_state,   dcjp,   "Sega", "Dreamcast (Japan, NTSC)", MACHINE_NOT_WORKING )
 CONS( 1999, dceu,   dcjp,   0,      dc,     dc,   dc_cons_state,   dcus,   "Sega", "Dreamcast (Europe, PAL)", MACHINE_NOT_WORKING )
-CONS( 200?, dctream,dcjp,   0,      dc,     dc,   dc_cons_state,   dcus,"unknown", "Treamcast", MACHINE_NOT_WORKING )
+CONS( 200?, dctream,dcjp,   0,      dc,     dc,   dc_cons_state,   dcus,   "<unknown>", "Treamcast", MACHINE_NOT_WORKING )
 CONS( 1998, dcdev,  0,      0,      dc,     dc,   dc_cons_state,   dc,     "Sega", "HKT-0120 Sega Dreamcast Development Box", MACHINE_NOT_WORKING )

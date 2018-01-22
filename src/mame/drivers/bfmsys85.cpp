@@ -134,6 +134,7 @@ public:
 	required_device<stepper_device> m_reel3;
 	required_device<acia6850_device> m_acia6850_0;
 	required_device<meters_device> m_meters;
+	void bfmsys85(machine_config &config);
 };
 
 #define MASTER_CLOCK    (XTAL_4MHz)
@@ -373,11 +374,8 @@ static ADDRESS_MAP_START( memmap, AS_PROGRAM, 8, bfmsys85_state )
 	AM_RANGE(0x3001, 0x3001) AM_READNOP //sound latch
 	AM_RANGE(0x3200, 0x3200) AM_DEVWRITE("aysnd", ay8910_device, address_w)
 
-	AM_RANGE(0x3402, 0x3402) AM_DEVWRITE("acia6850_0", acia6850_device, control_w)
-	AM_RANGE(0x3403, 0x3403) AM_DEVWRITE("acia6850_0", acia6850_device, data_w)
-
-	AM_RANGE(0x3406, 0x3406) AM_DEVREAD("acia6850_0", acia6850_device, status_r)
-	AM_RANGE(0x3407, 0x3407) AM_DEVREAD("acia6850_0", acia6850_device, data_r)
+	AM_RANGE(0x3402, 0x3403) AM_DEVWRITE("acia6850_0", acia6850_device, write)
+	AM_RANGE(0x3406, 0x3407) AM_DEVREAD("acia6850_0", acia6850_device, read)
 
 	AM_RANGE(0x3600, 0x3600) AM_WRITE(mux_enable_w)     // mux enable
 
@@ -388,7 +386,7 @@ ADDRESS_MAP_END
 
 // machine driver for system85 board //////////////////////////////////////
 
-static MACHINE_CONFIG_START( bfmsys85 )
+MACHINE_CONFIG_START(bfmsys85_state::bfmsys85)
 	MCFG_CPU_ADD("maincpu", M6809, MASTER_CLOCK/4)          // 6809 CPU at 1 Mhz
 	MCFG_CPU_PROGRAM_MAP(memmap)                        // setup read and write memorymap
 	MCFG_CPU_PERIODIC_INT_DRIVER(bfmsys85_state, timer_irq,  1000)              // generate 1000 IRQ's per second

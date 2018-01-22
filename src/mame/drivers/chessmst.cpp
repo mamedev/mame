@@ -65,6 +65,9 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(view_monitor_button);
 	DECLARE_WRITE_LINE_MEMBER( timer_555_w );
 
+	void chessmst(machine_config &config);
+	void chessmsta(machine_config &config);
+	void chessmstdm(machine_config &config);
 private:
 	void update_display();
 };
@@ -253,7 +256,7 @@ void chessmst_state::update_display()
 	for(int i=0; i<4; i++)
 	{
 		if (BIT(m_digit_matrix, i))
-			output().set_indexed_value("digit", i, BITSWAP16(m_digit, 3,5,12,10,14,1,2,13,8,6,11,15,7,9,4,0) | (m_digit_dot << 16));
+			output().set_indexed_value("digit", i, bitswap<16>(m_digit, 3,5,12,10,14,1,2,13,8,6,11,15,7,9,4,0) | (m_digit_dot << 16));
 	}
 }
 
@@ -353,7 +356,7 @@ static const z80_daisy_config chessmstdm_daisy_chain[] =
 	{ nullptr }
 };
 
-static MACHINE_CONFIG_START( chessmst )
+MACHINE_CONFIG_START(chessmst_state::chessmst)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_9_8304MHz/4) // U880 Z80 clone
@@ -378,7 +381,7 @@ static MACHINE_CONFIG_START( chessmst )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( chessmsta )
+MACHINE_CONFIG_START(chessmst_state::chessmsta)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_8MHz/4) // U880 Z80 clone
@@ -403,7 +406,7 @@ static MACHINE_CONFIG_START( chessmsta )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( chessmstdm )
+MACHINE_CONFIG_START(chessmst_state::chessmstdm)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_8MHz/2) // U880 Z80 clone

@@ -440,11 +440,11 @@ READ32_MEMBER(midzeus_state::zeus_r)
 		if (logit)
 		{
 			if (offset & 1)
-				logerror("%06X:zeus32_r(%02X) = %08X -- unexpected in 32-bit mode\n", space.device().safe_pc(), offset, result);
+				logerror("%06X:zeus32_r(%02X) = %08X -- unexpected in 32-bit mode\n", m_maincpu->pc(), offset, result);
 			else if (offset != 0xe0)
-				logerror("%06X:zeus32_r(%02X) = %08X\n", space.device().safe_pc(), offset, result);
+				logerror("%06X:zeus32_r(%02X) = %08X\n", m_maincpu->pc(), offset, result);
 			else
-				logerror("%06X:zeus32_r(%02X) = %08X\n", space.device().safe_pc(), offset, result);
+				logerror("%06X:zeus32_r(%02X) = %08X\n", m_maincpu->pc(), offset, result);
 		}
 	}
 
@@ -456,7 +456,7 @@ READ32_MEMBER(midzeus_state::zeus_r)
 		else
 			result &= 0xffff;
 		if (logit)
-			logerror("%06X:zeus16_r(%02X) = %04X\n", space.device().safe_pc(), offset, result);
+			logerror("%06X:zeus16_r(%02X) = %04X\n", m_maincpu->pc(), offset, result);
 	}
 	return result;
 }
@@ -474,7 +474,7 @@ WRITE32_MEMBER(midzeus_state::zeus_w)
 	bool logit = zeus_enable_logging || ((offset < 0xb0 || offset > 0xb7) && (offset < 0xe0 || offset > 0xe1));
 
 	if (logit)
-		logerror("%06X:zeus_w", space.device().safe_pc());
+		logerror("%06X:zeus_w", m_maincpu->pc());
 
 	/* 32-bit mode */
 	if (m_zeusbase[0x80] & 0x00020000)

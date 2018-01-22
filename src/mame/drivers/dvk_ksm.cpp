@@ -123,6 +123,7 @@ public:
 	DECLARE_WRITE8_MEMBER(ksm_ppi_porta_w);
 	DECLARE_WRITE8_MEMBER(ksm_ppi_portc_w);
 
+	void ksm(machine_config &config);
 private:
 	uint32_t draw_scanline(uint16_t *p, uint16_t offset, uint8_t scanline);
 	rectangle m_tmpclip;
@@ -410,7 +411,7 @@ static GFXDECODE_START( ksm )
 	GFXDECODE_ENTRY("chargen", 0x0000, ksm_charlayout, 0, 1)
 GFXDECODE_END
 
-static MACHINE_CONFIG_START( ksm )
+MACHINE_CONFIG_START(ksm_state::ksm)
 	MCFG_CPU_ADD("maincpu", I8080, XTAL_15_4MHz/10)
 	MCFG_CPU_PROGRAM_MAP(ksm_mem)
 	MCFG_CPU_IO_MAP(ksm_io)

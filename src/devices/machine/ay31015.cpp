@@ -8,8 +8,9 @@
     and AY-6-1013 UARTs (Universal Asynchronous Receiver/Transmitters).
 
     Compatible UARTs were produced by Harris (HD6402), TI (TMS6011),
-    Western Digital (TR1602/TR1402/TR1863/TR1865), AMI (S1883), Standard
-    Microsystems (COM2502/COM2017), Tesla (MHB1012) and other companies.
+    Western Digital (TR1602/TR1402/TR1863/TR1865), AMI (S1883), Signetics
+    (2536), National (MM5303), Standard Microsystems (COM2502/COM2017),
+    Tesla (MHB1012) and other companies.
 
     This is cycle-accurate according to the specifications.
 
@@ -627,6 +628,16 @@ void ay31015_device::set_input_pin( ay31015_input_pin_t pin, int data )
 
 	switch (pin)
 	{
+	case AY31015_RCP:
+		if (!m_pins[pin] && data)
+			rx_process();
+		m_pins[pin] = data;
+		break;
+	case AY31015_TCP:
+		if (m_pins[pin] && !data)
+			tx_process();
+		m_pins[pin] = data;
+		break;
 	case AY31015_SWE:
 		m_pins[pin] = data;
 		update_status_pins();

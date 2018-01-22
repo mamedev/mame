@@ -42,7 +42,7 @@ WRITE8_MEMBER(bking_state::bking_sndnmi_enable_w)
 
 WRITE8_MEMBER(bking_state::bking_soundlatch_w)
 {
-	m_soundlatch->write(space, offset, BITSWAP8(data, 0, 1, 2, 3, 4, 5, 6, 7));
+	m_soundlatch->write(space, offset, bitswap<8>(data, 0, 1, 2, 3, 4, 5, 6, 7));
 }
 
 WRITE8_MEMBER(bking_state::bking3_addr_l_w)
@@ -385,7 +385,7 @@ MACHINE_RESET_MEMBER(bking_state,bking3)
 	m_addr_l = 0;
 }
 
-static MACHINE_CONFIG_START( bking )
+MACHINE_CONFIG_START(bking_state::bking)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("main_cpu", Z80, XTAL_12MHz/4) /* 3 MHz */
@@ -439,7 +439,7 @@ static MACHINE_CONFIG_START( bking )
 	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( bking3, bking )
+MACHINE_CONFIG_DERIVED(bking_state::bking3, bking)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("main_cpu")

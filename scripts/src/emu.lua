@@ -187,6 +187,8 @@ files {
 	MAME_DIR .. "src/emu/rendersw.hxx",
 	MAME_DIR .. "src/emu/ui/uimain.h",
 	MAME_DIR .. "src/emu/ui/cmddata.h",   -- TODO: remove
+	MAME_DIR .. "src/emu/debug/debugbuf.cpp",
+	MAME_DIR .. "src/emu/debug/debugbuf.h",
 	MAME_DIR .. "src/emu/debug/debugcmd.cpp",
 	MAME_DIR .. "src/emu/debug/debugcmd.h",
 	MAME_DIR .. "src/emu/debug/debugcon.cpp",

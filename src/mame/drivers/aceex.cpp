@@ -59,6 +59,7 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
+	void aceex2814(machine_config &config);
 };
 
 static ADDRESS_MAP_START( aceex2814_map, AS_PROGRAM, 8, aceex2814_state )
@@ -78,7 +79,7 @@ void aceex2814_state::machine_reset()
 
 #define Y1_CLOCK 40320000
 #define Y2_CLOCK 45342720
-static MACHINE_CONFIG_START( aceex2814 )
+MACHINE_CONFIG_START(aceex2814_state::aceex2814)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I80C31, Y2_CLOCK)

@@ -426,6 +426,8 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	DECLARE_WRITE_LINE_MEMBER(kurukuru_msm5205_vck);
+	void ppj(machine_config &config);
+	void kurukuru(machine_config &config);
 };
 
 #define MAIN_CLOCK      XTAL_21_4772MHz
@@ -491,13 +493,13 @@ WRITE8_MEMBER(kurukuru_state::kurukuru_out_latch_w)
     07 | Not connected      | unused
 
 */
-	machine().bookkeeping().coin_counter_w(0, data & 0x01);      /* Coin Counter 1 */
-	machine().bookkeeping().coin_counter_w(1, data & 0x20);      /* Coin Counter 2 */
-	machine().bookkeeping().coin_lockout_global_w(data & 0x40);  /* Coin Lock */
-	m_hopper->write(space, 0, (data & 0x40) ? 0x80 : 0);         /* Hopper Motor */
+	machine().bookkeeping().coin_counter_w(0, BIT(data, 0));
+	machine().bookkeeping().coin_counter_w(1, BIT(data, 5));
+	//machine().bookkeeping().coin_lockout_global_w(BIT(data, 6));
+	m_hopper->motor_w(BIT(data, 6));
 
 	if (data & 0x9e)
-		logerror("kurukuru_out_latch_w %02X @ %04X\n", data, space.device().safe_pc());
+		logerror("kurukuru_out_latch_w %02X @ %04X\n", data, m_maincpu->pc());
 }
 
 WRITE8_MEMBER(kurukuru_state::kurukuru_bankswitch_w)
@@ -604,7 +606,7 @@ WRITE8_MEMBER(kurukuru_state::kurukuru_adpcm_reset_w)
        bit 2 = S2
        bit 3 = S1
 */
-	m_adpcm->playmode_w(BITSWAP8((data>>1), 7,6,5,4,3,0,1,2));
+	m_adpcm->playmode_w(bitswap<8>((data>>1), 7,6,5,4,3,0,1,2));
 	m_adpcm->reset_w(data & 1);
 }
 
@@ -848,7 +850,7 @@ void kurukuru_state::machine_reset()
 *                 Machine Driver                 *
 *************************************************/
 
-static MACHINE_CONFIG_START( kurukuru )
+MACHINE_CONFIG_START(kurukuru_state::kurukuru)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80, CPU_CLOCK)
@@ -886,7 +888,7 @@ static MACHINE_CONFIG_START( kurukuru )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( ppj )
+MACHINE_CONFIG_START(kurukuru_state::ppj)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80, CPU_CLOCK)

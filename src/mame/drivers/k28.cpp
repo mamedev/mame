@@ -92,6 +92,7 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(power_on);
 	void power_off();
 
+	void k28(machine_config &config);
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -337,7 +338,7 @@ WRITE_LINE_MEMBER(k28_state::mcu_prog_w)
 
 			// output 0-15: digit segment data
 			u16 seg_data = (u16)(m_vfd_shiftreg >> 19);
-			seg_data = BITSWAP16(seg_data,0,1,13,9,10,12,14,8,3,4,5,2,15,11,6,7);
+			seg_data = bitswap<16>(seg_data,0,1,13,9,10,12,14,8,3,4,5,2,15,11,6,7);
 
 			// output 16-24: digit select
 			u16 digit_sel = (u16)(m_vfd_shiftreg >> 10) & 0x1ff;
@@ -450,7 +451,7 @@ INPUT_PORTS_END
 
 ***************************************************************************/
 
-static MACHINE_CONFIG_START( k28 )
+MACHINE_CONFIG_START(k28_state::k28)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8021, XTAL_3_579545MHz)

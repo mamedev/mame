@@ -44,4 +44,6 @@ public:
 	void set_pal_color( uint8_t offset, uint8_t data );
 	required_device<cpu_device> m_maincpu;
 	required_device<palette_device> m_palette;
+	void epos(machine_config &config);
+	void dealer(machine_config &config);
 };

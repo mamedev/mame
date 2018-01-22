@@ -514,7 +514,7 @@ WRITE8_MEMBER( newbrain_state::cop_d_w )
 
 		// COP to VFD serial format, bits 15..0
 		// A B J I x H G2 C x F G1 E K L M D
-		uint16_t value = BITSWAP16(m_402_q, 11, 7, 1, 13, 10, 3, 2, 12, 9, 5, 6, 4, 0, 8, 14, 15) & 0x3fff;
+		uint16_t value = bitswap<16>(m_402_q, 11, 7, 1, 13, 10, 3, 2, 12, 9, 5, 6, 4, 0, 8, 14, 15) & 0x3fff;
 		output().set_digit_value(m_405_q & 0x0f, value);
 
 		if (LOG_VFD) logerror("%s %s vfd segment %u 402.Q %04x data %04x\n", machine().time().as_string(), machine().describe_context(), m_405_q & 0x0f, m_402_q, value);
@@ -805,7 +805,7 @@ void newbrain_state::device_timer(emu_timer &timer, device_timer_id id, int para
 //  MACHINE_CONFIG( newbrain )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( newbrain )
+MACHINE_CONFIG_START(newbrain_state::newbrain)
 	// basic system hardware
 	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL_16MHz/4)
 	MCFG_CPU_PROGRAM_MAP(newbrain_mreq)
@@ -846,7 +846,7 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( newbrain_ad )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_DERIVED( newbrain_ad, newbrain )
+MACHINE_CONFIG_DERIVED(newbrain_state::newbrain_ad, newbrain)
 	MCFG_DEFAULT_LAYOUT(layout_newbrain)
 MACHINE_CONFIG_END
 
@@ -855,7 +855,7 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( newbrain_a )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_DERIVED( newbrain_a, newbrain )
+MACHINE_CONFIG_DERIVED(newbrain_state::newbrain_a, newbrain)
 	MCFG_DEFAULT_LAYOUT(layout_newbraina)
 MACHINE_CONFIG_END
 
@@ -864,7 +864,7 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( newbrain_md )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_DERIVED( newbrain_md, newbrain )
+MACHINE_CONFIG_DERIVED(newbrain_state::newbrain_md, newbrain)
 	MCFG_DEFAULT_LAYOUT(layout_newbrain)
 MACHINE_CONFIG_END
 

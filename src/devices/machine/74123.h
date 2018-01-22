@@ -105,10 +105,10 @@ public:
 	static void set_clear_pin_value(device_t &device, int value) { downcast<ttl74123_device &>(device).m_clear = value; }
 	template <class Object> static devcb_base &set_output_changed_callback(device_t &device, Object &&cb) { return downcast<ttl74123_device &>(device).m_output_changed_cb.set_callback(std::forward<Object>(cb)); }
 
-	DECLARE_WRITE8_MEMBER(a_w);
-	DECLARE_WRITE8_MEMBER(b_w);
-	DECLARE_WRITE8_MEMBER(clear_w);
-	DECLARE_WRITE8_MEMBER(reset_w);
+	DECLARE_WRITE_LINE_MEMBER(a_w);
+	DECLARE_WRITE_LINE_MEMBER(b_w);
+	DECLARE_WRITE_LINE_MEMBER(clear_w);
+	DECLARE_WRITE_LINE_MEMBER(reset_w);
 
 protected:
 	// device-level overrides
@@ -133,7 +133,7 @@ private:
 	int m_a;                /* initial/constant value of the A pin */
 	int m_b;                /* initial/constant value of the B pin */
 	int m_clear;            /* initial/constant value of the Clear pin */
-	devcb_write8  m_output_changed_cb;
+	devcb_write_line  m_output_changed_cb;
 };
 
 

@@ -34,6 +34,8 @@ public:
 	DECLARE_WRITE8_MEMBER(ac1_port_a_w);
 	DECLARE_WRITE8_MEMBER(ac1_port_b_w);
 
+	void ac1_32(machine_config &config);
+	void ac1(machine_config &config);
 private:
 	required_device<cassette_image_device> m_cassette;
 	required_device<cpu_device> m_maincpu;

@@ -120,7 +120,7 @@ WRITE16_MEMBER(hyprduel_state::subcpu_control_w)
 				m_subcpu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
 				m_subcpu_resetline = 0;
 			}
-			space.device().execute().spin_until_interrupt();
+			m_maincpu->spin_until_interrupt();
 			break;
 
 		case 0x0c:
@@ -150,7 +150,7 @@ WRITE16_MEMBER(hyprduel_state::hyprduel_cpusync_trigger1_w)
 	{
 		if (!m_cpu_trigger && !m_subcpu_resetline)
 		{
-			space.device().execute().spin_until_trigger(1001);
+			m_maincpu->spin_until_trigger(1001);
 			m_cpu_trigger = 1001;
 		}
 	}
@@ -176,7 +176,7 @@ WRITE16_MEMBER(hyprduel_state::hyprduel_cpusync_trigger2_w)
 	{
 		if (!m_cpu_trigger && !m_subcpu_resetline)
 		{
-			space.device().execute().spin_until_trigger(1002);
+			m_maincpu->spin_until_trigger(1002);
 			m_cpu_trigger = 1002;
 		}
 	}
@@ -276,7 +276,7 @@ void hyprduel_state::blt_write( address_space &space, const int tmap, const offs
 		case 2: vram_1_w(space, offs, data, mask); break;
 		case 3: vram_2_w(space, offs, data, mask); break;
 	}
-//  logerror("%s : Blitter %X] %04X <- %04X & %04X\n", space.machine().describe_context(), tmap, offs, data, mask);
+//  logerror("%s : Blitter %X] %04X <- %04X & %04X\n", machine().describe_context(), tmap, offs, data, mask);
 }
 
 
@@ -296,7 +296,7 @@ WRITE16_MEMBER(hyprduel_state::blitter_w)
 		int shift = (dst_offs & 0x80) ? 0 : 8;
 		uint16_t mask = (dst_offs & 0x80) ? 0x00ff : 0xff00;
 
-//      logerror("CPU #0 PC %06X : Blitter regs %08X, %08X, %08X\n", space.device().safe_pc(), tmap, src_offs, dst_offs);
+//      logerror("CPU #0 PC %06X : Blitter regs %08X, %08X, %08X\n", m_maincpu->pc(), tmap, src_offs, dst_offs);
 
 		dst_offs >>= 7 + 1;
 		switch (tmap)
@@ -306,7 +306,7 @@ WRITE16_MEMBER(hyprduel_state::blitter_w)
 			case 3:
 				break;
 			default:
-				logerror("CPU #0 PC %06X : Blitter unknown destination: %08X\n", space.device().safe_pc(), tmap);
+				logerror("CPU #0 PC %06X : Blitter unknown destination: %08X\n", m_maincpu->pc(), tmap);
 				return;
 		}
 
@@ -316,7 +316,7 @@ WRITE16_MEMBER(hyprduel_state::blitter_w)
 
 			src_offs %= src_len;
 			b1 = blt_read(src, src_offs);
-//          logerror("CPU #0 PC %06X : Blitter opcode %02X at %06X\n", space.device().safe_pc(), b1, src_offs);
+//          logerror("CPU #0 PC %06X : Blitter opcode %02X at %06X\n", m_maincpu->pc(), b1, src_offs);
 			src_offs++;
 
 			count = ((~b1) & 0x3f) + 1;
@@ -400,7 +400,7 @@ WRITE16_MEMBER(hyprduel_state::blitter_w)
 
 
 				default:
-					logerror("CPU #0 PC %06X : Blitter unknown opcode %02X at %06X\n", space.device().safe_pc(), b1, src_offs - 1);
+					logerror("CPU #0 PC %06X : Blitter unknown opcode %02X at %06X\n", m_maincpu->pc(), b1, src_offs - 1);
 					return;
 			}
 
@@ -424,6 +424,7 @@ static ADDRESS_MAP_START( hyprduel_map, AS_PROGRAM, 16, hyprduel_state )
 	AM_RANGE(0x475000, 0x477fff) AM_RAM         /* only used memory test */
 	AM_RANGE(0x478000, 0x4787ff) AM_RAM AM_SHARE("tiletable")   /* Tiles Set */
 	AM_RANGE(0x478840, 0x47884d) AM_WRITE(blitter_w) AM_SHARE("blitter_regs")  /* Tiles Blitter */
+	AM_RANGE(0x478850, 0x478853) AM_RAM AM_SHARE("spriteregs")
 	AM_RANGE(0x478860, 0x47886b) AM_WRITE(window_w) AM_SHARE("window")         /* Tilemap Window */
 	AM_RANGE(0x478870, 0x47887b) AM_RAM_WRITE(scrollreg_w) AM_SHARE("scroll")      /* Scroll Regs */
 	AM_RANGE(0x47887c, 0x47887d) AM_WRITE(scrollreg_init_w)
@@ -471,6 +472,7 @@ static ADDRESS_MAP_START( magerror_map, AS_PROGRAM, 16, hyprduel_state )
 	AM_RANGE(0x875000, 0x877fff) AM_RAM         /* only used memory test */
 	AM_RANGE(0x878000, 0x8787ff) AM_RAM AM_SHARE("tiletable")   /* Tiles Set */
 	AM_RANGE(0x878840, 0x87884d) AM_WRITE(blitter_w) AM_SHARE("blitter_regs")  /* Tiles Blitter */
+	AM_RANGE(0x878850, 0x878853) AM_RAM AM_SHARE("spriteregs")
 	AM_RANGE(0x878860, 0x87886b) AM_WRITE(window_w) AM_SHARE("window")         /* Tilemap Window */
 	AM_RANGE(0x878870, 0x87887b) AM_RAM_WRITE(scrollreg_w) AM_SHARE("scroll")      /* Scroll Regs */
 	AM_RANGE(0x87887c, 0x87887d) AM_WRITE(scrollreg_init_w)
@@ -649,7 +651,7 @@ MACHINE_START_MEMBER(hyprduel_state,magerror)
 	m_magerror_irq_timer->adjust(attotime::zero, 0, attotime::from_hz(968));        /* tempo? */
 }
 
-static MACHINE_CONFIG_START( hyprduel )
+MACHINE_CONFIG_START(hyprduel_state::hyprduel)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000,20000000/2)      /* 10MHz */
@@ -690,7 +692,7 @@ static MACHINE_CONFIG_START( hyprduel )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( magerror )
+MACHINE_CONFIG_START(hyprduel_state::magerror)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000,20000000/2)      /* 10MHz */

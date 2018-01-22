@@ -129,7 +129,7 @@ WRITE8_MEMBER(hotsmash_state::pbillian_0410_w)
 	 --5-----  flip screen
 	*/
 
-	if (data&0xc1) logerror("%04x: pbillian_0410_w with invalid bits: %02x\n",space.device().safe_pc(),data);
+	if (data&0xc1) logerror("%04x: pbillian_0410_w with invalid bits: %02x\n",m_maincpu->pc(),data);
 	machine().bookkeeping().coin_counter_w(0,BIT(data,1));
 	machine().bookkeeping().coin_counter_w(1,BIT(data,2));
 
@@ -148,7 +148,7 @@ WRITE8_MEMBER(superqix_state_base::superqix_0410_w)
 	 ----3---  nmi enable/disable
 	 --54----  rom bank
 	*/
-	if (data&0xc0) logerror("%04x: superqix_0410_w with invalid high bits: %02x\n",space.device().safe_pc(),data);
+	if (data&0xc0) logerror("%04x: superqix_0410_w with invalid high bits: %02x\n",m_maincpu->pc(),data);
 	/* bits 0-1 select the tile bank */
 	if (m_gfxbank != (data & 0x03))
 	{

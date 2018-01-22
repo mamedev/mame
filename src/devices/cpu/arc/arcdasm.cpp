@@ -7,7 +7,7 @@
 \*********************************/
 
 #include "emu.h"
-#include <stdarg.h>
+#include "arcdasm.h"
 
 /*****************************************************************************/
 
@@ -15,7 +15,7 @@
 
 /*****************************************************************************/
 
-static const char *basic[0x20] =
+const char *const arc_disassembler::basic[0x20] =
 {
 	/* 00 */ "LD r+r",
 	/* 01 */ "LD r+o",
@@ -51,7 +51,7 @@ static const char *basic[0x20] =
 	/* 1f */ "MIN"
 };
 
-static const char *conditions[0x20] =
+const char *arc_disassembler::conditions[0x20] =
 {
 	/* 00 */ "AL", // (aka RA         - Always)
 	/* 01 */ "EQ", // (aka Z          - Zero
@@ -87,7 +87,7 @@ static const char *conditions[0x20] =
 	/* 1f */ "0x1f Reserved"
 };
 
-static const char *delaytype[0x4] =
+const char *arc_disassembler::delaytype[0x4] =
 {
 	"ND", // NO DELAY - execute next instruction only when NOT jumping
 	"D",  // always execute next instruction
@@ -95,7 +95,7 @@ static const char *delaytype[0x4] =
 	"Res!", // reserved / invalid
 };
 
-static const char *regnames[0x40] =
+const char *arc_disassembler::regnames[0x40] =
 {
 	/* 0x00 */ "r00",
 	/* 0x01 */ "r01",
@@ -180,10 +180,14 @@ static const char *regnames[0x40] =
 #define ARC_REGOP_SHIMM     ((op & 0x000001ff) >> 0  ) // aka D
 
 
-CPU_DISASSEMBLE(arc)
+u32 arc_disassembler::opcode_alignment() const
 {
-	uint32_t op = oprom[0] | (oprom[1] << 8) | (oprom[2] << 16) | (oprom[3] << 24);
-	op = big_endianize_int32(op);
+	return 4;
+}
+
+offs_t arc_disassembler::disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params)
+{
+	uint32_t op = opcodes.r32(pc);
 
 	uint8_t opcode = ARC_OPERATION;
 
@@ -205,5 +209,5 @@ CPU_DISASSEMBLE(arc)
 		break;
 	}
 
-	return 4 | DASMFLAG_SUPPORTED;
+	return 4 | SUPPORTED;
 }

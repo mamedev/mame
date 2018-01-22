@@ -37,6 +37,7 @@ public:
 	I8275_DRAW_CHARACTER_MEMBER( crtc_display_pixels );
 	uint8_t m_term_data;
 	virtual void machine_reset() override;
+	void ipds(machine_config &config);
 };
 
 READ8_MEMBER( ipds_state::ipds_b0_r )
@@ -126,7 +127,7 @@ void ipds_state::kbd_put(u8 data)
 	m_term_data = data;
 }
 
-static MACHINE_CONFIG_START( ipds )
+MACHINE_CONFIG_START(ipds_state::ipds)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",I8085A, XTAL_19_6608MHz / 4)
 	MCFG_CPU_PROGRAM_MAP(ipds_mem)
@@ -158,8 +159,12 @@ ROM_START( ipds )
 	ROM_REGION( 0x10000, "slavecpu", ROMREGION_ERASEFF )
 	ROM_LOAD( "164196.bin", 0x0000, 0x1000, CRC(d3e18bc6) SHA1(01bc233be154bdfea9e8015839c5885cdaa08f11) )
 
-	ROM_REGION(0x0800, "chargen",0)
+	ROM_REGION(0x0800, "chargen", 0)
 	ROM_LOAD( "163642.bin", 0x0000, 0x0800, CRC(3d81b2d1) SHA1(262a42920f15f1156ad0717c876cc0b2ed947ec5) )
+
+	ROM_REGION(0x1000, "user1", 0)
+	ROM_LOAD( "162806-001.u24", 0x0000, 0x0800, CRC(e6ba41ca) SHA1(a2d3438b728670b75c359ff49146ef57c08bf0f1) )
+	ROM_LOAD( "163775-001.u8",  0x0800, 0x0800, CRC(0442163e) SHA1(737732adcfe22823db37112e28758464f5d9af7b) )
 ROM_END
 
 /* Driver */

@@ -1,39 +1,45 @@
 // license:BSD-3-Clause
-// copyright-holders: R. Belmont
+// copyright-holders:R. Belmont, AJR
 /***************************************************************************
 
-    TeleVideo TV-910 / 910 Plus
-    Preliminary driver by R. Belmont
+    TeleVideo Model 910 / 910 Plus
 
     Hardware:
     6502 CPU
     6545 CRTC
     6551 ACIA
 
-    IRQ = ACIA wire-OR CRTC VBlank
+    IRQ = ACIA gated with flip-flop driven by CRTC VBlank (not wire-OR)
     NMI = AY-5-3600 keyboard char present
 
+    Esc-V (with a capital V) brings up the self-test screen.
+
     TODO:
-        - Character attributes: how is that even possible?  (Esc-V brings up test screen)
-        - DIP switches don't all appear to have the expected effects
-        - Keyboard hookup isn't quite right
+        - Reverse attribute handling on the self-test screen doesn't seem
+          to match the picture shown in the Operator's Manual
+        - Make 910 keyboard into a device since the similar Model 925 uses
+          a 950-compatible serial keyboard instead (with a second ACIA)
+        - Add printer port and remaining DIP switches
 
 ****************************************************************************/
 
 #include "emu.h"
 #include "bus/rs232/rs232.h"
 #include "cpu/m6502/m6502.h"
+#include "machine/input_merger.h"
 #include "machine/kb3600.h"
 #include "machine/mos6551.h"
+#include "sound/beep.h"
 #include "video/mc6845.h"
 #include "screen.h"
+#include "speaker.h"
 
-#define ACIA_TAG    "acia1"
+#define ACIA_TAG    "acia"
 #define CRTC_TAG    "crtc"
 #define RS232_TAG   "rs232"
 #define KBDC_TAG    "ay3600"
 
-#define MASTER_CLOCK (13608000)
+#define MASTER_CLOCK XTAL_13_608MHz
 
 class tv910_state : public driver_device
 {
@@ -41,11 +47,16 @@ public:
 	tv910_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
+		, m_mainirq(*this, "mainirq")
 		, m_crtc(*this, CRTC_TAG)
 		, m_vram(*this, "vram")
+		, m_chrrom(*this, "graphics")
 		, m_ay3600(*this, KBDC_TAG)
 		, m_kbdrom(*this, "keyboard")
 		, m_kbspecial(*this, "keyb_special")
+		, m_beep(*this, "bell")
+		, m_dsw1(*this, "DSW1")
+		, m_charset(*this, "CHARSET")
 	{ }
 
 	virtual void machine_start() override;
@@ -63,22 +74,25 @@ public:
 	DECLARE_WRITE8_MEMBER(control_w);
 
 	DECLARE_WRITE_LINE_MEMBER(vbl_w);
-	DECLARE_WRITE_LINE_MEMBER(acia_irq_w);
 
 	DECLARE_READ_LINE_MEMBER(ay3600_shift_r);
 	DECLARE_READ_LINE_MEMBER(ay3600_control_r);
 	DECLARE_WRITE_LINE_MEMBER(ay3600_data_ready_w);
 	DECLARE_WRITE_LINE_MEMBER(ay3600_ako_w);
 
+	void tv910(machine_config &config);
+private:
 	required_device<m6502_device> m_maincpu;
+	required_device<input_merger_device> m_mainirq;
 	required_device<r6545_1_device> m_crtc;
 	required_shared_ptr<uint8_t> m_vram;
+	required_region_ptr<uint8_t> m_chrrom;
 	required_device<ay3600_device> m_ay3600;
-	required_memory_region m_kbdrom;
+	required_region_ptr<uint8_t> m_kbdrom;
 	required_ioport m_kbspecial;
-
-private:
-	uint8_t *m_vramptr, *m_chrrom;
+	required_device<beep_device> m_beep;
+	required_ioport m_dsw1;
+	required_ioport m_charset;
 
 	uint16_t m_lastchar, m_strobe;
 	uint8_t m_transchar;
@@ -86,8 +100,6 @@ private:
 	int m_repeatdelay;
 
 	uint8_t m_control;
-
-	bool m_vbl_irq, m_aica_irq;
 };
 
 static ADDRESS_MAP_START(tv910_mem, AS_PROGRAM, 8, tv910_state)
@@ -103,8 +115,8 @@ static ADDRESS_MAP_START(tv910_mem, AS_PROGRAM, 8, tv910_state)
 	AM_RANGE(0x8060, 0x806f) AM_READ(kbd_ascii_r)
 	AM_RANGE(0x8070, 0x807f) AM_READ(kbd_flags_r)
 	AM_RANGE(0x9000, 0x9000) AM_WRITE(control_w)
-	AM_RANGE(0x9001, 0x9001) AM_READ_PORT("DSW1")   // S2 in the operator's manual
-	AM_RANGE(0x9002, 0x9002) AM_READ_PORT("DSW2")   // S1 in the operator's manual
+	AM_RANGE(0x9001, 0x9001) AM_READ_PORT("DSW1")
+	AM_RANGE(0x9002, 0x9002) AM_READ_PORT("DSW2")
 	AM_RANGE(0xf000, 0xffff) AM_ROM AM_REGION("maincpu", 0)
 ADDRESS_MAP_END
 
@@ -120,11 +132,13 @@ WRITE8_MEMBER(tv910_state::control_w)
 		(data & 0x2) ? 'C' : 'c',
 		(data & 1) ? 'B' : ' ');
 	#endif
+
+	m_beep->set_state(BIT(data, 0));
 }
 
 READ8_MEMBER(tv910_state::charset_r)
 {
-	return 0;   // 0 = US (TODO: make this configurable)
+	return m_charset->read();
 }
 
 WRITE8_MEMBER(tv910_state::nmi_ack_w)
@@ -141,10 +155,21 @@ READ8_MEMBER(tv910_state::kbd_ascii_r)
 READ8_MEMBER(tv910_state::kbd_flags_r)
 {
 	uint8_t rv = 0;
+	ioport_value kbspecial = m_kbspecial->read();
 
-	//rv |= m_strobe ? 0x40 : 0;
-	//rv |= (m_kbspecial->read() & 0x01) ? 0x00 : 0x40; // caps lock
-	rv |= 0x40; // must be set for keyboard reads to work, but disagrees with docs?
+	// D0: Keyboard strobe (AY-5-3600 AKO)
+	if (m_anykeydown)
+		rv |= 0x01;
+
+	// D1: Printer DTR (pin 20)
+
+	// D6: FUNC key (not ALPHA LOCK as indicated in memory map)
+	if (BIT(kbspecial, 4))
+		rv |= 0x40;
+
+	// D7: ALPHA LOCK key (not FUNC as indicated in memory map)
+	if (BIT(kbspecial, 0))
+		rv |= 0x80;
 
 	return rv;
 }
@@ -174,10 +199,8 @@ WRITE_LINE_MEMBER(tv910_state::ay3600_data_ready_w)
 {
 	if (state == ASSERT_LINE)
 	{
-		uint8_t *decode = m_kbdrom->base();
-
 		m_lastchar = m_ay3600->b_r();
-		m_transchar = decode[m_lastchar];
+		m_transchar = m_kbdrom[m_lastchar];
 		m_strobe = 1;
 
 		m_maincpu->set_input_line(M6502_NMI_LINE, ASSERT_LINE);
@@ -315,11 +338,10 @@ static INPUT_PORTS_START( tv910 )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Left Shift")   PORT_CODE(KEYCODE_LSHIFT)   PORT_CHAR(UCHAR_SHIFT_1)
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Right Shift")  PORT_CODE(KEYCODE_RSHIFT)   PORT_CHAR(UCHAR_SHIFT_1)
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Control")      PORT_CODE(KEYCODE_LCONTROL) PORT_CHAR(UCHAR_SHIFT_2)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_KEYBOARD) PORT_NAME("Func") PORT_CODE(KEYCODE_LALT)
 
-
-	PORT_START("DSW2")  // "S1" in the Operator's Manual
-	PORT_DIPNAME( 0x0f, 0x00, "Baud rate" )
-	PORT_DIPSETTING(    0x0, "9600" )
+	PORT_START("DSW2")
+	PORT_DIPNAME( 0x0f, 0x00, "Baud Rate" ) PORT_DIPLOCATION("S1:4,3,2,1")
 	PORT_DIPSETTING(    0x1, "50" )
 	PORT_DIPSETTING(    0x2, "75" )
 	PORT_DIPSETTING(    0x3, "110" )
@@ -333,70 +355,92 @@ static INPUT_PORTS_START( tv910 )
 	PORT_DIPSETTING(    0xb, "3600" )
 	PORT_DIPSETTING(    0xc, "4800" )
 	PORT_DIPSETTING(    0xd, "7200" )
-	PORT_DIPSETTING(    0xe, "9600" )
+	PORT_DIPSETTING(    0x0, "9600" )
+	//PORT_DIPSETTING(  0xe, "9600" )
 	PORT_DIPSETTING(    0xf, "19200" )
 
-	PORT_DIPNAME( 0x10, 0x00, "Data bits" )
-	PORT_DIPSETTING( 0x00, "8 bits" )
-	PORT_DIPSETTING( 0x10, "7 bits" )
+	PORT_DIPNAME( 0x10, 0x00, "Word Length" ) PORT_DIPLOCATION("S1:5")
+	PORT_DIPSETTING( 0x00, "8 data bits" )
+	PORT_DIPSETTING( 0x10, "7 data bits" )
 
-	PORT_DIPNAME( 0x20, 0x00, "Parity" )
-	PORT_DIPSETTING( 0x00, "No Parity" )
-	PORT_DIPSETTING( 0x20, "Send Parity" )
+	PORT_DIPNAME( 0x20, 0x00, "Parity" ) PORT_DIPLOCATION("S1:6")
+	PORT_DIPSETTING( 0x00, "No parity" )
+	PORT_DIPSETTING( 0x20, "Send parity" )
 
-	PORT_DIPNAME( 0x40, 0x00, "Parity Type" )
-	PORT_DIPSETTING( 0x00, "Odd Parity" )
-	PORT_DIPSETTING( 0x40, "Even Parity" )
+	PORT_DIPNAME( 0x40, 0x00, "Parity Type" ) PORT_DIPLOCATION("S1:7")
+	PORT_DIPSETTING( 0x00, "Odd" )
+	PORT_DIPSETTING( 0x40, "Even" )
 
-	PORT_DIPNAME( 0x80, 0x00, "Stop Bits" )
-	PORT_DIPSETTING( 0x00, "1 stop bit" )
-	PORT_DIPSETTING( 0x80, "2 stop bits" )
+	PORT_DIPNAME( 0x80, 0x00, "Stop Bits" ) PORT_DIPLOCATION("S1:8")
+	PORT_DIPSETTING( 0x00, "1" )
+	PORT_DIPSETTING( 0x80, "2" )
 
-	PORT_START("DSW1")  // "S2" in the Operator's Manual
-	PORT_DIPNAME( 0x03, 0x00, "Term Char")
-	PORT_DIPSETTING(    0x0, "0" )
-	PORT_DIPSETTING(    0x1, "1" )
-	PORT_DIPSETTING(    0x2, "2" )
-	PORT_DIPSETTING(    0x3, "3" )
+	PORT_START("DSW1")
+	PORT_DIPNAME( 0x01, 0x01, "CR Code" ) PORT_DIPLOCATION("S1:10") // TCHAR0
+	PORT_DIPSETTING( 0x00, "CR only" )
+	PORT_DIPSETTING( 0x01, "CRLF" )
 
-	PORT_DIPNAME( 0x0c, 0x00, "Emulation" )
+	PORT_DIPNAME( 0x02, 0x02, "Auto Wraparound at 80th Position" ) PORT_DIPLOCATION("S1:9") // TCHAR1
+	PORT_DIPSETTING( 0x00, DEF_STR(No) )
+	PORT_DIPSETTING( 0x02, DEF_STR(Yes) ) // required for self-test to work
+
+	PORT_DIPNAME( 0x0c, 0x00, "Emulation" ) PORT_DIPLOCATION("S2:1,2")
 	PORT_DIPSETTING(    0x0, "Standard 910" )
 	PORT_DIPSETTING(    0x4, "ADM-3A/5" )
 	PORT_DIPSETTING(    0x8, "ADDS 25" )
 	PORT_DIPSETTING(    0xc, "Hazeltine 1410" )
 
-	PORT_DIPNAME( 0x10, 0x00, "Refresh rate" )
+	PORT_DIPNAME( 0x10, 0x00, "Refresh Rate" ) PORT_DIPLOCATION("S2:3")
 	PORT_DIPSETTING( 0x00, "60 Hz" )
 	PORT_DIPSETTING( 0x10, "50 Hz" )
 
-	PORT_DIPNAME( 0x60, 0x00, "Cursor type" )
+	PORT_DIPNAME( 0x60, 0x00, "Cursor Type" ) PORT_DIPLOCATION("S2:4,5")
 	PORT_DIPSETTING(    0x00, "Blinking block" )
-	PORT_DIPSETTING(    0x20, "Blinking underline" )
-	PORT_DIPSETTING(    0x40, "Steady block" )
+	PORT_DIPSETTING(    0x40, "Blinking underline" )
+	PORT_DIPSETTING(    0x20, "Steady block" )
 	PORT_DIPSETTING(    0x60, "Steady underline" )
 
-	PORT_DIPNAME( 0x80, 0x00, "Duplex" )
-	PORT_DIPSETTING( 0x00, "Half Duplex" )
-	PORT_DIPSETTING( 0x80, "Full Duplex" )
-#if 0
-	PORT_DIPNAME( 0x100, 0x000, "Colors" )
-	PORT_DIPSETTING( 0x00, "Black characters on white screen" )
-	PORT_DIPSETTING( 0x100, "White characters on black screen" )
+	PORT_DIPNAME( 0x80, 0x00, "Conversation Mode" ) PORT_DIPLOCATION("S2:6") // F/HDX
+	PORT_DIPSETTING( 0x00, "Half duplex" )
+	PORT_DIPSETTING( 0x80, "Full duplex" )
 
+	PORT_DIPNAME( 0x100, 0x100, "Colors" ) PORT_DIPLOCATION("S2:7") // BOW/WOB
+	PORT_DIPSETTING( 0x00, "Black characters on green screen" )
+	PORT_DIPSETTING( 0x100, "Green characters on black screen" )
+
+#if 0
 	PORT_DIPNAME( 0x200, 0x200, "Data Set Ready" )
 	PORT_DIPSETTING( 0x00, "DSR connected" )
 	PORT_DIPSETTING( 0x200, "DSR disconnected" )
 #endif
+
+	PORT_START("CHARSET") // actually a pair of jumpers: E4-E5 (bit 1), E6-E7 (bit 0)
+	PORT_DIPNAME( 0x03, 0x00, "Character Set" )
+	PORT_DIPSETTING( 0x00, "English" )
+	PORT_DIPSETTING( 0x01, "German" )
+	PORT_DIPSETTING( 0x02, "French" )
+	PORT_DIPSETTING( 0x03, "Spanish" )
 INPUT_PORTS_END
 
 void tv910_state::machine_start()
 {
-	m_vramptr = m_vram.target();
-	m_chrrom = memregion("graphics")->base();
+	// DCD needs to be driven somehow, or else the terminal will complain
+	// CTS also needs to be driven to prevent hanging caused by buffer overflow
+	auto *acia = subdevice<mos6551_device>(ACIA_TAG);
+	auto *rs232 = subdevice<rs232_port_device>(RS232_TAG);
+	if (rs232->get_card_device() == nullptr)
+	{
+		acia->write_dcd(0);
+		acia->write_cts(0);
+	}
+
+	// DSR is tied to GND
+	acia->write_dsr(0);
 }
 
 void tv910_state::machine_reset()
 {
+	control_w(machine().dummy_space(), 0, 0);
 }
 
 MC6845_ON_UPDATE_ADDR_CHANGED( tv910_state::crtc_update_addr )
@@ -407,96 +451,70 @@ WRITE_LINE_MEMBER(tv910_state::vbl_w)
 {
 	// this is ACKed by vbl_ack_w, state going 0 here doesn't ack the IRQ
 	if (state)
-	{
-		m_vbl_irq = true;
-		m_maincpu->set_input_line(M6502_IRQ_LINE, ASSERT_LINE);
-	}
-}
-
-WRITE_LINE_MEMBER(tv910_state::acia_irq_w)
-{
-	m_aica_irq = (state == ASSERT_LINE) ? true : false;
-
-	if (m_aica_irq || m_vbl_irq)
-	{
-		m_maincpu->set_input_line(M6502_IRQ_LINE, ASSERT_LINE);
-	}
-	else
-	{
-		m_maincpu->set_input_line(M6502_IRQ_LINE, CLEAR_LINE);
-	}
+		m_mainirq->in_w<0>(1);
 }
 
 WRITE8_MEMBER(tv910_state::vbl_ack_w)
 {
-	m_vbl_irq = false;
-
-	if (m_aica_irq || m_vbl_irq)
-	{
-		m_maincpu->set_input_line(M6502_IRQ_LINE, ASSERT_LINE);
-	}
-	else
-	{
-		m_maincpu->set_input_line(M6502_IRQ_LINE, CLEAR_LINE);
-	}
+	m_mainirq->in_w<0>(0);
 }
 
 MC6845_UPDATE_ROW( tv910_state::crtc_update_row )
 {
-	static const uint32_t palette[2] = { 0, 0x00ff00 };
 	uint32_t  *p = &bitmap.pix32(y);
-	uint16_t  chr_base = ra;
-	int i;
+	uint16_t  chr_base = (ra & 7) | m_charset->read() << 10;
+	uint8_t   chr = m_vram[0x7ff];
+	uint8_t   att = (chr & 0xf0) == 0x90 ? chr & 0x0f : 0;
+	bool      bow = BIT(m_dsw1->read(), 8);
 
-	for ( i = 0; i < x_count; i++ )
+	for (int i = 0; i < x_count; i++)
 	{
 		uint16_t offset = ( ma + i ) & 0x7ff;
-		uint8_t chr = m_vramptr[ offset ];
-		uint8_t data = m_chrrom[ chr_base + chr * 8 ];
-		uint8_t fg = 1;
-		uint8_t bg = 0;
+		uint8_t chr = m_vram[ offset ];
+		bool att_blk = (chr & 0xf0) == 0x90;
+		bool half_int = BIT(chr, 7) && !att_blk;
+		if (att_blk)
+			att = chr & 0x0f;
 
-		if ( i == cursor_x )
-		{
-			if (m_control & 2)
-			{
-				data = 0xFF;
-			}
-		}
+		uint8_t data = m_chrrom[chr_base | (chr & 0x7f) << 3];
+		rgb_t fg = rgb_t::green();
+		rgb_t bg = rgb_t::black();
+		if (half_int)
+			fg = rgb_t(fg.r() / 2, fg.g() / 2, fg.b() / 2);
 
-		if ((y % 10) >= 8)
-		{
-			*p++ = palette[0];
-			*p++ = palette[0];
-			*p++ = palette[0];
-			*p++ = palette[0];
-			*p++ = palette[0];
-			*p++ = palette[0];
-			*p++ = palette[0];
-			*p++ = palette[0];
-			*p++ = palette[0];
-		}
-		else
-		{
-			*p = palette[( data & 0x80 ) ? fg : bg]; p++;
-			*p = palette[( data & 0x40 ) ? fg : bg]; p++;
-			*p = palette[( data & 0x20 ) ? fg : bg]; p++;
-			*p = palette[( data & 0x10 ) ? fg : bg]; p++;
-			*p = palette[( data & 0x08 ) ? fg : bg]; p++;
-			*p = palette[( data & 0x04 ) ? fg : bg]; p++;
-			*p = palette[( data & 0x02 ) ? fg : bg]; p++;
-			*p = palette[( data & 0x01 ) ? fg : bg]; p++;
-		}
+		if (ra == 9)
+			data = BIT(att, 3) ? 0xff : 0;
+		else if (ra == 0 || att_blk || BIT(att, 0) || (BIT(att, 1) && BIT(m_control, 1)))
+			data = 0;
+
+		if (i == cursor_x && (!BIT(m_control, 4) || ra == 9))
+			data ^= 0xff;
+		if (BIT(att, 2))
+			data ^= 0xff;
+		if (bow)
+			data ^= 0xff;
+
+		*p = BIT(data, 7) ? bg : fg; p++;
+		*p = BIT(data, 6) ? bg : fg; p++;
+		*p = BIT(data, 5) ? bg : fg; p++;
+		*p = BIT(data, 4) ? bg : fg; p++;
+		*p = BIT(data, 3) ? bg : fg; p++;
+		*p = BIT(data, 2) ? bg : fg; p++;
+		*p = BIT(data, 1) ? bg : fg; p++;
+		*p = BIT(data, 0) ? bg : fg; p++;
 	}
 }
 
-static MACHINE_CONFIG_START( tv910 )
+MACHINE_CONFIG_START(tv910_state::tv910)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, MASTER_CLOCK/8)
 	MCFG_CPU_PROGRAM_MAP(tv910_mem)
 
+	MCFG_INPUT_MERGER_ANY_HIGH("mainirq")
+	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("maincpu", M6502_IRQ_LINE))
+
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK, 882, 0, 720, 370, 0, 350 ) // not real values
+	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK, 840, 0, 640, 270, 0, 240)
 	MCFG_SCREEN_UPDATE_DEVICE( CRTC_TAG, r6545_1_device, screen_update )
 
 	MCFG_MC6845_ADD(CRTC_TAG, R6545_1, "screen", MASTER_CLOCK/8)
@@ -523,17 +541,18 @@ static MACHINE_CONFIG_START( tv910 )
 
 	MCFG_DEVICE_ADD(ACIA_TAG, MOS6551, 0)
 	MCFG_MOS6551_XTAL(XTAL_1_8432MHz)
-	MCFG_MOS6551_IRQ_HANDLER(WRITELINE(tv910_state, acia_irq_w))
+	MCFG_MOS6551_IRQ_HANDLER(DEVWRITELINE("mainirq", input_merger_device, in_w<1>))
 	MCFG_MOS6551_TXD_HANDLER(DEVWRITELINE(RS232_TAG, rs232_port_device, write_txd))
 	MCFG_MOS6551_RTS_HANDLER(DEVWRITELINE(RS232_TAG, rs232_port_device, write_rts))
-	MCFG_MOS6551_DTR_HANDLER(DEVWRITELINE(RS232_TAG, rs232_port_device, write_dtr))
 
 	MCFG_RS232_PORT_ADD(RS232_TAG, default_rs232_devices, nullptr)
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(ACIA_TAG, mos6551_device, write_rxd))
 	MCFG_RS232_DCD_HANDLER(DEVWRITELINE(ACIA_TAG, mos6551_device, write_dcd))
-	MCFG_RS232_DSR_HANDLER(DEVWRITELINE(ACIA_TAG, mos6551_device, write_dsr))
 	MCFG_RS232_CTS_HANDLER(DEVWRITELINE(ACIA_TAG, mos6551_device, write_cts))
 
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("bell", BEEP, MASTER_CLOCK / 8400) // 1620 Hz (Row 10 signal)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
 /* ROM definition */
@@ -549,5 +568,5 @@ ROM_START( tv910 )
 ROM_END
 
 /* Driver */
-//    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT  STATE         INIT  COMPANY      FULLNAME  FLAGS
-COMP( 1981, tv910,  0,      0,       tv910,     tv910, tv910_state,  0,    "TeleVideo", "TV910",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+//    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT  STATE         INIT  COMPANY              FULLNAME               FLAGS
+COMP( 1981, tv910,  0,      0,       tv910,     tv910, tv910_state,  0,    "TeleVideo Systems", "TeleVideo Model 910", 0 )

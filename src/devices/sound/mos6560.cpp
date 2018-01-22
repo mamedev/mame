@@ -737,7 +737,7 @@ device_memory_interface::space_config_vector mos6560_device::memory_space_config
 
 void mos6560_device::device_start()
 {
-	m_screen->register_screen_bitmap(m_bitmap);
+	screen().register_screen_bitmap(m_bitmap);
 
 	// resolve callbacks
 	m_read_potx.resolve_safe(0xff);
@@ -769,7 +769,7 @@ void mos6560_device::device_start()
 
 	// allocate timers
 	m_line_timer = timer_alloc(TIMER_LINE);
-	m_line_timer->adjust(m_screen->scan_period(), 0, m_screen->scan_period());
+	m_line_timer->adjust(screen().scan_period(), 0, screen().scan_period());
 
 	// initialize sound
 	sound_start();

@@ -62,4 +62,9 @@ public:
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int priority_to_draw);
 
 	INTERRUPT_GEN_MEMBER(vblank_irq);
+	void suprmous(machine_config &config);
+	void desertdn(machine_config &config);
+	void intrepid(machine_config &config);
+	void thepit(machine_config &config);
+	void fitter(machine_config &config);
 };

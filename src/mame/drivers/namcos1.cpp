@@ -349,9 +349,14 @@ C - uses sub board with support for player 3 and 4 controls
 
 /**********************************************************************/
 
-WRITE8_MEMBER(namcos1_state::irq_ack_w)
+WRITE8_MEMBER(namcos1_state::audiocpu_irq_ack_w)
 {
-	space.device().execute().set_input_line(0, CLEAR_LINE);
+	m_audiocpu->set_input_line(0, CLEAR_LINE);
+}
+
+WRITE8_MEMBER(namcos1_state::mcu_irq_ack_w)
+{
+	m_mcu->set_input_line(0, CLEAR_LINE);
 }
 
 
@@ -413,7 +418,7 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, namcos1_state )
 	AM_RANGE(0x8000, 0x9fff) AM_RAM /* Sound RAM 3 */
 	AM_RANGE(0xc000, 0xc001) AM_WRITE(sound_bankswitch_w) /* ROM bank selector */
 	AM_RANGE(0xd001, 0xd001) AM_DEVWRITE("c117", namco_c117_device, sound_watchdog_w)
-	AM_RANGE(0xe000, 0xe000) AM_WRITE(irq_ack_w)
+	AM_RANGE(0xe000, 0xe000) AM_WRITE(audiocpu_irq_ack_w)
 	AM_RANGE(0xc000, 0xffff) AM_ROM AM_REGION("audiocpu", 0)
 ADDRESS_MAP_END
 
@@ -430,7 +435,7 @@ static ADDRESS_MAP_START( mcu_map, AS_PROGRAM, 8, namcos1_state )
 	AM_RANGE(0xd000, 0xd000) AM_DEVWRITE("dac0", dac_byte_interface, write)
 	AM_RANGE(0xd400, 0xd400) AM_DEVWRITE("dac1", dac_byte_interface, write)
 	AM_RANGE(0xd800, 0xd800) AM_WRITE(mcu_bankswitch_w) /* ROM bank selector */
-	AM_RANGE(0xf000, 0xf000) AM_WRITE(irq_ack_w)
+	AM_RANGE(0xf000, 0xf000) AM_WRITE(mcu_irq_ack_w)
 	AM_RANGE(0xf000, 0xffff) AM_ROM AM_REGION("mcu", 0) /* internal ROM */
 ADDRESS_MAP_END
 
@@ -1012,22 +1017,22 @@ GFXDECODE_END
     LPF info : Fco = 3.3KHz , g = -12dB/oct
 */
 
-static MACHINE_CONFIG_START( ns1 )
+MACHINE_CONFIG_START(namcos1_state::ns1)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6809,XTAL_49_152MHz/32)
+	MCFG_CPU_ADD("maincpu", MC6809E, XTAL_49_152MHz/32)
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", namcos1_state,  irq0_line_assert)
 
-	MCFG_CPU_ADD("subcpu", M6809,XTAL_49_152MHz/32)
+	MCFG_CPU_ADD("subcpu", MC6809E, XTAL_49_152MHz/32)
 	MCFG_CPU_PROGRAM_MAP(sub_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", namcos1_state,  irq0_line_assert)
 
-	MCFG_CPU_ADD("audiocpu", M6809,XTAL_49_152MHz/32)
+	MCFG_CPU_ADD("audiocpu", MC6809E, XTAL_49_152MHz/32)
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", namcos1_state,  irq0_line_assert)
 
-	MCFG_CPU_ADD("mcu",HD63701,XTAL_49_152MHz/8)
+	MCFG_CPU_ADD("mcu", HD63701, XTAL_49_152MHz/8)
 	MCFG_CPU_PROGRAM_MAP(mcu_map)
 	MCFG_CPU_IO_MAP(mcu_port_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", namcos1_state,  irq0_line_assert)

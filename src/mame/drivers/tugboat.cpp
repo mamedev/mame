@@ -78,6 +78,7 @@ public:
 	void draw_tilemap(bitmap_ind16 &bitmap,const rectangle &cliprect,
 		int addr,int gfx0,int gfx1,int transparency);
 
+		void tugboat(machine_config &config);
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
@@ -358,7 +359,7 @@ static GFXDECODE_START( tugboat )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( tugboat )
+MACHINE_CONFIG_START(tugboat_state::tugboat)
 	MCFG_CPU_ADD("maincpu", M6502, 2000000) /* 2 MHz ???? */
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", tugboat_state,  nmi_line_pulse)

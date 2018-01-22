@@ -63,7 +63,6 @@ instead of magnet sensors.
 #include "cpu/m6502/r65c02.h"
 #include "machine/mos6551.h"
 #include "machine/nvram.h"
-#include "machine/timer.h"
 #include "video/hlcd0538.h"
 #include "screen.h"
 #include "speaker.h"
@@ -93,12 +92,14 @@ public:
 	DECLARE_WRITE8_MEMBER(supercon_control_w);
 	DECLARE_READ8_MEMBER(supercon_input1_r);
 	DECLARE_READ8_MEMBER(supercon_input2_r);
+	void supercon(machine_config &config);
 
 	// Constellation Forte
 	void cforte_prepare_display();
 	DECLARE_WRITE64_MEMBER(cforte_lcd_output_w);
 	DECLARE_WRITE8_MEMBER(cforte_mux_w);
 	DECLARE_WRITE8_MEMBER(cforte_control_w);
+	void cforte(machine_config &config);
 
 	// Super Expert
 	DECLARE_WRITE8_MEMBER(sexpert_leds_w);
@@ -111,10 +112,12 @@ public:
 	DECLARE_DRIVER_INIT(sexpert);
 	DECLARE_INPUT_CHANGED_MEMBER(sexpert_cpu_freq);
 	void sexpert_set_cpu_freq();
+	void sexpert(machine_config &config);
 
 	// Super Forte
 	DECLARE_WRITE8_MEMBER(sforte_lcd_control_w);
 	DECLARE_WRITE8_MEMBER(sforte_lcd_data_w);
+	void sforte(machine_config &config);
 };
 
 
@@ -349,7 +352,7 @@ WRITE64_MEMBER(novag6502_state::cforte_lcd_output_w)
 		for (int i = 0; i < 4; i++)
 			m_display_state[dig+3] |= ((rowdata[i] >> (2*dig) & 3) << (2*i));
 
-		m_display_state[dig+3] = BITSWAP8(m_display_state[dig+3],7,2,0,4,6,5,3,1);
+		m_display_state[dig+3] = bitswap<8>(m_display_state[dig+3],7,2,0,4,6,5,3,1);
 	}
 
 	cforte_prepare_display();
@@ -851,7 +854,7 @@ INPUT_PORTS_END
     Machine Drivers
 ******************************************************************************/
 
-static MACHINE_CONFIG_START( supercon )
+MACHINE_CONFIG_START(novag6502_state::supercon)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, XTAL_8MHz/2)
@@ -869,7 +872,7 @@ static MACHINE_CONFIG_START( supercon )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( cforte )
+MACHINE_CONFIG_START(novag6502_state::cforte)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", R65C02, XTAL_10MHz/2)
@@ -893,7 +896,7 @@ static MACHINE_CONFIG_START( cforte )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( sexpert )
+MACHINE_CONFIG_START(novag6502_state::sexpert)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M65C02, XTAL_10MHz/2) // or XTAL_12MHz/2
@@ -940,7 +943,7 @@ static MACHINE_CONFIG_START( sexpert )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( sforte, sexpert )
+MACHINE_CONFIG_DERIVED(novag6502_state::sforte, sexpert)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")

@@ -8,6 +8,7 @@
 **************************************************************************/
 
 #include "machine/nvram.h"
+#include "machine/ticket.h"
 #include "screen.h"
 
 #define VIDEO_CLOCK     XTAL_8MHz           /* video (pixel) clock */
@@ -28,6 +29,7 @@ public:
 		m_dsp2(*this, "dsp2"),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
+		m_ticket(*this, "ticket"),
 		m_main_ram(*this, "main_ram", 0),
 		m_nvram(*this, "nvram", 0),
 		m_video(*this, "video", 0),
@@ -44,6 +46,7 @@ public:
 	optional_device<cpu_device> m_dsp2;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
+	required_device<ticket_dispenser_device> m_ticket;
 
 	optional_shared_ptr<uint16_t> m_main_ram;
 	optional_shared_ptr<uint16_t> m_nvram;
@@ -199,4 +202,9 @@ public:
 	void handle_video_command();
 	inline int determine_irq_state(int vint, int xint, int qint);
 	void itech32_update_interrupts(int vint, int xint, int qint);
+	void tourny(machine_config &config);
+	void sftm(machine_config &config);
+	void drivedge(machine_config &config);
+	void bloodstm(machine_config &config);
+	void timekill(machine_config &config);
 };

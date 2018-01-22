@@ -16,6 +16,7 @@ TODO:
 #include "emu.h"
 #include "debugger.h"
 #include "mc68hc11.h"
+#include "hc11dasm.h"
 
 enum
 {
@@ -44,8 +45,8 @@ DEFINE_DEVICE_TYPE(MC68HC11, mc68hc11_cpu_device, "mc68hc11", "MC68HC11")
 
 mc68hc11_cpu_device::mc68hc11_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: cpu_device(mconfig, MC68HC11, tag, owner, clock)
-	, m_program_config("program", ENDIANNESS_LITTLE, 8, 16, 0 )
-	, m_io_config("io", ENDIANNESS_LITTLE, 8, 8, 0)
+	, m_program_config("program", ENDIANNESS_BIG, 8, 16, 0 )
+	, m_io_config("io", ENDIANNESS_BIG, 8, 8, 0)
 	/* defaults it to the HC11M0 version for now (I might strip this down on a later date) */
 	, m_has_extended_io(1)
 	, m_internal_ram_size(1280)
@@ -61,10 +62,9 @@ device_memory_interface::space_config_vector mc68hc11_cpu_device::memory_space_c
 	};
 }
 
-offs_t mc68hc11_cpu_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+util::disasm_interface *mc68hc11_cpu_device::create_disassembler()
 {
-	extern CPU_DISASSEMBLE( hc11 );
-	return CPU_DISASSEMBLE_NAME(hc11)(this, stream, pc, oprom, opram, options);
+	return new hc11_disassembler;
 }
 
 
@@ -397,7 +397,7 @@ void mc68hc11_cpu_device::device_start()
 	m_internal_ram.resize(m_internal_ram_size);
 
 	m_program = &space(AS_PROGRAM);
-	m_direct = &m_program->direct();
+	m_direct = m_program->direct<0>();
 	m_io = &space(AS_IO);
 
 	save_item(NAME(m_pc));

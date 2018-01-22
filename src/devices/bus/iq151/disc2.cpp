@@ -71,7 +71,7 @@ void iq151_disc2_device::device_reset()
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( iq151_disc2_device::device_add_mconfig )
+MACHINE_CONFIG_START(iq151_disc2_device::device_add_mconfig)
 	MCFG_UPD765A_ADD("fdc", false, true)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", iq151_disc2_floppies, "8sssd", iq151_disc2_device::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:2", iq151_disc2_floppies, "8sssd", iq151_disc2_device::floppy_formats)

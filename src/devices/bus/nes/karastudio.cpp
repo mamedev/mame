@@ -295,6 +295,6 @@ static SLOT_INTERFACE_START(karaoke_studio_cart)
 SLOT_INTERFACE_END
 
 
-MACHINE_CONFIG_MEMBER( nes_karaokestudio_device::device_add_mconfig )
+MACHINE_CONFIG_START(nes_karaokestudio_device::device_add_mconfig)
 	MCFG_KSTUDIO_MINICART_ADD("exp_slot", karaoke_studio_cart)
 MACHINE_CONFIG_END

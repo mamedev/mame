@@ -61,6 +61,7 @@ public:
 	DECLARE_WRITE8_MEMBER(port_a_w);
 	DECLARE_WRITE_LINE_MEMBER(cass_w);
 	DECLARE_READ_LINE_MEMBER(cass_r);
+	void mk14(machine_config &config);
 private:
 	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
@@ -105,7 +106,7 @@ WRITE8_MEMBER( mk14_state::display_w )
 	}
 }
 
-static ADDRESS_MAP_START(mk14_mem, AS_PROGRAM, 8, mk14_state)
+static ADDRESS_MAP_START(mem_map, AS_PROGRAM, 8, mk14_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0x0fff)
 	AM_RANGE(0x000, 0x1ff) AM_MIRROR(0x600) AM_ROM // ROM
@@ -188,12 +189,12 @@ void mk14_state::machine_reset()
 {
 }
 
-static MACHINE_CONFIG_START( mk14 )
+MACHINE_CONFIG_START(mk14_state::mk14)
 	/* basic machine hardware */
 	// IC1 1SP-8A/600 (8060) SC/MP Microprocessor
 	MCFG_CPU_ADD("maincpu", INS8060, XTAL_4_433619MHz)
 	MCFG_SCMP_CONFIG(WRITELINE(mk14_state, cass_w), NOOP, READLINE(mk14_state, cass_r), NOOP, READLINE(mk14_state, cass_r), NOOP)
-	MCFG_CPU_PROGRAM_MAP(mk14_mem)
+	MCFG_CPU_PROGRAM_MAP(mem_map)
 
 	/* video hardware */
 	MCFG_DEFAULT_LAYOUT(layout_mk14)

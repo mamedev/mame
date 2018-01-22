@@ -30,6 +30,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	optional_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	void igs_fear(machine_config &config);
 };
 
 
@@ -75,7 +76,7 @@ WRITE_LINE_MEMBER(igs_fear_state::sound_irq)
 }
 
 
-static MACHINE_CONFIG_START( igs_fear )
+MACHINE_CONFIG_START(igs_fear_state::igs_fear)
 	MCFG_CPU_ADD("maincpu",ARM7, 50000000/2)
 	MCFG_CPU_PROGRAM_MAP(igs_igs_fear_map)
 

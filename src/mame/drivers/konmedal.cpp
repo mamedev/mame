@@ -21,16 +21,24 @@ Konami Custom chips:
 054156 (tilemaps)
 054157 (tilemaps)
 
+ Shuriken Boy
+
+Konami Custom chips:
+K052109 (tilemaps)
+K051649 (sound)
+
 ***************************************************************************/
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "machine/eepromser.h"
 #include "machine/gen_latch.h"
+#include "machine/timer.h"
 #include "sound/ymz280b.h"
 #include "sound/okim6295.h"
 #include "sound/k051649.h"
 #include "video/k054156_k054157_k056832.h"
+#include "video/k052109.h"
 #include "video/konami_helper.h"
 #include "screen.h"
 #include "speaker.h"
@@ -42,39 +50,59 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_k056832(*this, "k056832"),
+		m_k052109(*this, "k052109"),
 		m_palette(*this, "palette"),
 		m_ymz(*this, "ymz"),
 		m_oki(*this, "oki")
 	{ }
 
-	required_device<cpu_device> m_maincpu;
-	required_device<k056832_device> m_k056832;
-	required_device<palette_device> m_palette;
-	optional_device<ymz280b_device> m_ymz;
-	optional_device<okim6295_device> m_oki;
-
 	DECLARE_PALETTE_INIT(konmedal);
+	DECLARE_MACHINE_START(shuriboy);
 
-	READ8_MEMBER(vram_r);
-	WRITE8_MEMBER(vram_w);
-	READ8_MEMBER(magic_r);
-	WRITE8_MEMBER(bankswitch_w);
-	WRITE8_MEMBER(control2_w);
+	DECLARE_READ8_MEMBER(vram_r);
+	DECLARE_WRITE8_MEMBER(vram_w);
+	DECLARE_READ8_MEMBER(magic_r);
+	DECLARE_WRITE8_MEMBER(bankswitch_w);
+	DECLARE_WRITE8_MEMBER(control2_w);
 	READ8_MEMBER(inputs_r)
 	{
 		return 0xff;
 	}
 
-private:
-	u8 m_control, m_control2;
+	uint32_t screen_update_konmedal(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_shuriboy(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	INTERRUPT_GEN_MEMBER(konmedal_interrupt);
+	K056832_CB_MEMBER(tile_callback);
 
-public:
+	K052109_CB_MEMBER(shuriboy_tile_callback);
+	TIMER_DEVICE_CALLBACK_MEMBER(scanline);
+	DECLARE_WRITE8_MEMBER(shuri_bank_w);
+	DECLARE_READ8_MEMBER(shuri_video_r);
+	DECLARE_WRITE8_MEMBER(shuri_video_w);
+	DECLARE_WRITE8_MEMBER(shuri_control_w);
+	DECLARE_WRITE8_MEMBER(shuri_vrom_addr_w);
+	DECLARE_WRITE8_MEMBER(shuri_vrom_bank_w);
+	DECLARE_READ8_MEMBER(shuri_irq_r);
+	DECLARE_WRITE8_MEMBER(shuri_irq_w);
+
+	void shuriboy(machine_config &config);
+	void ddboy(machine_config &config);
+	void tsukande(machine_config &config);
+protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	uint32_t screen_update_konmedal(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(konmedal_interrupt);
-	K056832_CB_MEMBER(tile_callback);
+
+private:
+	required_device<cpu_device> m_maincpu;
+	optional_device<k056832_device> m_k056832;
+	optional_device<k052109_device> m_k052109;
+	required_device<palette_device> m_palette;
+	optional_device<ymz280b_device> m_ymz;
+	optional_device<okim6295_device> m_oki;
+
+	u8 m_control, m_control2, m_shuri_irq;
+	u32 m_vrom_base;
 };
 
 WRITE8_MEMBER(konmedal_state::control2_w)
@@ -154,6 +182,18 @@ uint32_t konmedal_state::screen_update_konmedal(screen_device &screen, bitmap_in
 	return 0;
 }
 
+uint32_t konmedal_state::screen_update_shuriboy(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	bitmap.fill(0, cliprect);
+	screen.priority().fill(0, cliprect);
+
+	m_k052109->tilemap_draw(screen, bitmap, cliprect, 0, 0, 1);
+	m_k052109->tilemap_draw(screen, bitmap, cliprect, 1, 0, 2);
+	m_k052109->tilemap_draw(screen, bitmap, cliprect, 2, 0, 4);
+
+	return 0;
+}
+
 PALETTE_INIT_MEMBER(konmedal_state, konmedal)
 {
 	int i;
@@ -223,6 +263,29 @@ static ADDRESS_MAP_START( ddboy_main, AS_PROGRAM, 8, konmedal_state )
 	AM_RANGE(0xe000, 0xffff) AM_READWRITE(vram_r, vram_w)
 ADDRESS_MAP_END
 
+static ADDRESS_MAP_START( shuriboy_main, AS_PROGRAM, 8, konmedal_state )
+	AM_RANGE(0x0000, 0x7fff) AM_ROM AM_REGION("maincpu", 0)
+	AM_RANGE(0x8000, 0x87ff) AM_RAM
+	AM_RANGE(0x8800, 0x8800) AM_READ_PORT("IN2")
+	AM_RANGE(0x8801, 0x8801) AM_READ_PORT("IN1")
+	AM_RANGE(0x8802, 0x8802) AM_READ_PORT("DSW1")
+	AM_RANGE(0x8803, 0x8803) AM_READ_PORT("DSW2")
+	AM_RANGE(0x8b00, 0x8b00) AM_WRITENOP    // watchdog?
+	AM_RANGE(0x8c00, 0x8c00) AM_WRITE(shuri_bank_w)
+	AM_RANGE(0x9800, 0x987f) AM_DEVREADWRITE("k051649", k051649_device, k051649_waveform_r, k051649_waveform_w)
+	AM_RANGE(0x9880, 0x9889) AM_DEVWRITE("k051649", k051649_device, k051649_frequency_w)
+	AM_RANGE(0x988a, 0x988e) AM_DEVWRITE("k051649", k051649_device, k051649_volume_w)
+	AM_RANGE(0x988f, 0x988f) AM_DEVWRITE("k051649", k051649_device, k051649_keyonoff_w)
+	AM_RANGE(0x98e0, 0x98ff) AM_DEVREADWRITE("k051649", k051649_device, k051649_test_r, k051649_test_w)
+	AM_RANGE(0xa000, 0xbfff) AM_ROMBANK("bank1")
+	AM_RANGE(0xc000, 0xdbff) AM_DEVREADWRITE("k052109", k052109_device, read, write)
+	AM_RANGE(0xdd00, 0xdd00) AM_READWRITE(shuri_irq_r, shuri_irq_w)
+	AM_RANGE(0xdd80, 0xdd80) AM_WRITE(shuri_control_w)
+	AM_RANGE(0xde00, 0xde00) AM_WRITE(shuri_vrom_addr_w)
+	AM_RANGE(0xdf00, 0xdf00) AM_WRITE(shuri_vrom_bank_w)
+	AM_RANGE(0xe000, 0xffff) AM_READWRITE(shuri_video_r, shuri_video_w)
+ADDRESS_MAP_END
+
 static INPUT_PORTS_START( konmedal )
 	PORT_START("DSW1")
 	PORT_DIPNAME( 0x07, 0x00, "Coin Slot 1" )   PORT_DIPLOCATION("SW1:1,2,3")
@@ -278,7 +341,7 @@ static INPUT_PORTS_START( konmedal )
 	PORT_DIPSETTING(    0x10, "24 sec" )
 	PORT_DIPSETTING(    0x20, "18 sec" )
 	PORT_DIPSETTING(    0x30, "12 sec" )
-	PORT_DIPNAME( 0x40, 0x40, "Backup Memory" )      PORT_DIPLOCATION("SW2:7")
+	PORT_DIPNAME( 0x40, 0x00, "Backup Memory" )      PORT_DIPLOCATION("SW2:7")
 	PORT_DIPSETTING(    0x40, "Keep" )
 	PORT_DIPSETTING(    0x00, "Clear" )
 	PORT_DIPNAME( 0x80, 0x00, "Demo Sound" )         PORT_DIPLOCATION("SW2:8")
@@ -306,11 +369,19 @@ void konmedal_state::machine_start()
 	membank("bank1")->set_entry(4);
 }
 
-void konmedal_state::machine_reset()
+MACHINE_START_MEMBER(konmedal_state, shuriboy)
 {
+	membank("bank1")->configure_entries(0, 0x8, memregion("maincpu")->base()+0x8000, 0x2000);
+	membank("bank1")->set_entry(0);
 }
 
-static MACHINE_CONFIG_START( tsukande )
+void konmedal_state::machine_reset()
+{
+	m_vrom_base = 0;
+	m_control = m_control2 = m_shuri_irq = 0;
+}
+
+MACHINE_CONFIG_START(konmedal_state::tsukande)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_14_31818MHz/2) // z84c0008pec 8mhz part, 14.31818Mhz xtal verified on PCB, divisor unknown
 	MCFG_CPU_PROGRAM_MAP(medal_main)
@@ -343,7 +414,7 @@ static MACHINE_CONFIG_START( tsukande )
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( ddboy )
+MACHINE_CONFIG_START(konmedal_state::ddboy)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_14_31818MHz/2) // z84c0008pec 8mhz part, 14.31818Mhz xtal verified on PCB, divisor unknown
 	MCFG_CPU_PROGRAM_MAP(ddboy_main)
@@ -376,6 +447,133 @@ static MACHINE_CONFIG_START( ddboy )
 
 	MCFG_K051649_ADD("k051649", XTAL_14_31818MHz/8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.45)
+MACHINE_CONFIG_END
+
+/*
+Shuriken Boy
+While being a Z80 medal game, it runs on fairly different hardware. It might merit a new driver when emulation will be fleshed out.
+
+PCB: Konami PWB 452039A
+Main CPU: Z80B
+OSC: 24.000 MHz
+Custom video chips: 051962 + 052109
+Sound chips: NEC UPD7759C + 051649
+Other custom chip: 051550
+Dips: 2 x 8 dips bank
+*/
+
+K052109_CB_MEMBER(konmedal_state::shuriboy_tile_callback)
+{
+	*code |= ((*color & 0x03) << 8) | (*color & 0x40);
+}
+
+WRITE8_MEMBER(konmedal_state::shuri_bank_w)
+{
+	membank("bank1")->set_entry(data&0x3);
+}
+
+READ8_MEMBER(konmedal_state::shuri_video_r)
+{
+	if (!(m_control & 0x10))
+	{
+		return m_k052109->read(space, offset+0x2000);
+	}
+
+	uint8_t *ROM = memregion("k052109")->base();
+	return ROM[offset + m_vrom_base];
+}
+
+WRITE8_MEMBER(konmedal_state::shuri_video_w)
+{
+	m_k052109->write(space, offset+0x2000, data);
+}
+
+READ8_MEMBER(konmedal_state::shuri_irq_r)
+{
+	return m_shuri_irq;
+}
+
+WRITE8_MEMBER(konmedal_state::shuri_irq_w)
+{
+	if ((m_shuri_irq & 0x4) && !(data & 0x4))
+	{
+		m_maincpu->set_input_line(0, CLEAR_LINE);
+	}
+	else if ((m_shuri_irq & 0x1) && !(data & 0x1))
+	{
+		m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
+	}
+
+	m_shuri_irq = data;
+}
+
+TIMER_DEVICE_CALLBACK_MEMBER(konmedal_state::scanline)
+{
+	int scanline = param;
+
+	if ((scanline == 240) && (m_shuri_irq & 0x4))
+	{
+		m_maincpu->set_input_line(0, ASSERT_LINE);
+
+	}
+
+	if ((scanline == 255) && (m_shuri_irq & 0x1))
+	{
+		m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
+	}
+}
+
+WRITE8_MEMBER(konmedal_state::shuri_control_w)
+{
+	m_control = data;
+}
+
+WRITE8_MEMBER(konmedal_state::shuri_vrom_addr_w)
+{
+	m_vrom_base &= ~0xf000;
+	m_vrom_base |= (data << 12);
+}
+
+WRITE8_MEMBER(konmedal_state::shuri_vrom_bank_w)
+{
+	m_vrom_base &= ~0xf0000;
+	data &= 0xc0;
+	m_vrom_base |= (data << 10);
+}
+
+MACHINE_CONFIG_START(konmedal_state::shuriboy)
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu", Z80, XTAL_24MHz / 3) // divisor unknown
+	MCFG_CPU_PROGRAM_MAP(shuriboy_main)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", konmedal_state, scanline, "screen", 0, 1)
+
+	/* video hardware */
+	MCFG_SCREEN_ADD("screen", RASTER) // everything not verified, just a placeholder
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(30))
+	MCFG_SCREEN_SIZE(64*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(80, 400-1, 16, 240-1)
+	MCFG_SCREEN_UPDATE_DRIVER(konmedal_state, screen_update_shuriboy)
+	MCFG_SCREEN_PALETTE("palette")
+
+	MCFG_PALETTE_ADD("palette", 8192) // not verified
+	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
+	MCFG_PALETTE_ENABLE_SHADOWS()
+	MCFG_PALETTE_ENABLE_HILIGHTS()
+
+	MCFG_DEVICE_ADD("k052109", K052109, 0)
+	MCFG_GFX_PALETTE("palette")
+	MCFG_K052109_CB(konmedal_state, shuriboy_tile_callback)
+
+	MCFG_MACHINE_START_OVERRIDE(konmedal_state, shuriboy)
+
+	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_K051649_ADD("k051649", XTAL_24MHz / 12) // divisor unknown
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.45)
+
+	// upd7759c
 MACHINE_CONFIG_END
 
 ROM_START( tsukande )
@@ -419,5 +617,21 @@ ROM_START( ddboy )
 	ROM_LOAD( "342_a10.82s129.14g", 0x000300, 0x000100, CRC(1fa443f9) SHA1(84b0a36a4e49bf75bda1871bf52090ee5a75cd03) )
 ROM_END
 
-GAME( 1995, tsukande, 0, tsukande, konmedal,  konmedal_state, 0, ROT0, "Konami", "Tsukande Toru Chicchi", MACHINE_NOT_WORKING)
-GAME( 1995, ddboy,    0, ddboy,    konmedal,  konmedal_state, 0, ROT0, "Konami", "Dam Dam Boy", MACHINE_NOT_WORKING)
+ROM_START( shuriboy )
+	ROM_REGION( 0x10000, "maincpu", 0 ) /* main program */
+	ROM_LOAD( "gs-341-b01.13g", 0x000000, 0x010000, CRC(3c0f36b6) SHA1(1d3838f45969228a8b2054cd5baf8892db68b644) )
+
+	ROM_REGION( 0x40000, "k052109", 0 )   /* tilemaps */
+	ROM_LOAD32_BYTE( "341-A03.2H", 0x000000, 0x010000, CRC(8e9e9835) SHA1(f8dc4579f238d91c0aef59167be7e5de87dc4ba7) )
+	ROM_LOAD32_BYTE( "341-A04.4H", 0x000001, 0x010000, CRC(ac82d67b) SHA1(65869adfbb67cf10c92e50239fd747fc5ad4714d) )
+	ROM_LOAD32_BYTE( "341-A05.5H", 0x000002, 0x010000, CRC(31403832) SHA1(d13c54d3768a0c2d60a3751db8980199f60db243) )
+	ROM_LOAD32_BYTE( "341-A06.7H", 0x000003, 0x010000, CRC(361e26eb) SHA1(7b5ad6a6067afb3350d85a3f2026e4d685429e20) )
+
+	ROM_REGION( 0x200000, "upd", 0 )
+	ROM_LOAD( "341-A02.13C", 0x000000, 0x020000, CRC(e1f5c8f1) SHA1(323a078720e09a7326e82cb623b6c90e2674e800) )
+ROM_END
+
+GAME( 1995, tsukande,    0, tsukande, konmedal,  konmedal_state, 0, ROT0, "Konami", "Tsukande Toru Chicchi", MACHINE_NOT_WORKING)
+GAME( 1995, ddboy,       0, ddboy,    konmedal,  konmedal_state, 0, ROT0, "Konami", "Dam Dam Boy", MACHINE_NOT_WORKING)
+GAME( 1993, shuriboy,    0, shuriboy, konmedal,  konmedal_state, 0, ROT0, "Konami", "Shuriken Boy", MACHINE_NOT_WORKING)
+

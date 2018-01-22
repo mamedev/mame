@@ -91,6 +91,7 @@ public:
 
 	INTERRUPT_GEN_MEMBER(vblank);
 	DECLARE_INPUT_CHANGED_MEMBER(color);
+	void tv990(machine_config &config);
 private:
 	uint16_t tvi1111_regs[(0x100/2)+2];
 	emu_timer *m_rowtimer;
@@ -367,7 +368,7 @@ void tv990_state::device_post_load()
 	m_screen->set_visible_area(0, m_width * 16 - 1, 0, m_height * m_rowh - 1);
 }
 
-static MACHINE_CONFIG_START( tv990 )
+MACHINE_CONFIG_START(tv990_state::tv990)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 14967500)   // verified (59.86992/4)
 	MCFG_CPU_PROGRAM_MAP(tv990_mem)

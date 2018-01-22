@@ -423,6 +423,9 @@ public:
 
 	TIMER_CALLBACK_MEMBER(clock_irq);
 	TIMER_CALLBACK_MEMBER(adjust_cpu_speed);
+	void missileb(machine_config &config);
+	void missile(machine_config &config);
+	void missilea(machine_config &config);
 };
 
 
@@ -762,7 +765,7 @@ WRITE8_MEMBER(missile_state::missile_w)
 
 	/* anything else */
 	else
-		logerror("%04X:Unknown write to %04X = %02X\n", space.device().safe_pc(), offset, data);
+		logerror("%04X:Unknown write to %04X = %02X\n", m_maincpu->pc(), offset, data);
 }
 
 
@@ -816,7 +819,7 @@ READ8_MEMBER(missile_state::missile_r)
 
 	/* anything else */
 	else
-		logerror("%04X:Unknown read from %04X\n", space.device().safe_pc(), offset);
+		logerror("%04X:Unknown read from %04X\n", m_maincpu->pc(), offset);
 
 
 	/* update the MADSEL state */
@@ -875,7 +878,7 @@ WRITE8_MEMBER(missile_state::bootleg_w)
 
 	/* anything else */
 	else
-		logerror("%04X:Unknown write to %04X = %02X\n", space.device().safe_pc(), offset, data);
+		logerror("%04X:Unknown write to %04X = %02X\n", m_maincpu->pc(), offset, data);
 }
 
 
@@ -923,7 +926,7 @@ READ8_MEMBER(missile_state::bootleg_r)
 
 	/* anything else */
 	else
-		logerror("%04X:Unknown read from %04X\n", space.device().safe_pc(), offset);
+		logerror("%04X:Unknown read from %04X\n", m_maincpu->pc(), offset);
 
 
 	/* update the MADSEL state */
@@ -1134,7 +1137,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( missile )
+MACHINE_CONFIG_START(missile_state::missile)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, MASTER_CLOCK/8)
@@ -1161,12 +1164,12 @@ static MACHINE_CONFIG_START( missile )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( missilea, missile )
+MACHINE_CONFIG_DERIVED(missile_state::missilea, missile)
 
 	MCFG_DEVICE_REMOVE("pokey")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( missileb, missilea )
+MACHINE_CONFIG_DERIVED(missile_state::missileb, missilea)
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(bootleg_main_map)
@@ -1466,8 +1469,8 @@ DRIVER_INIT_MEMBER(missile_state,missilem)
 	// decrypt rom and put in maincpu region (result looks correct, but is untested)
 	for (int i = 0; i < 0x10000; i++)
 	{
-		int a = BITSWAP16(i, 15,2,3,0,8,9,7,5,1,4,6,14,13,12,10,11);
-		int d = BITSWAP8(src[a], 3,2,4,5,6,1,7,0);
+		int a = bitswap<16>(i, 15,2,3,0,8,9,7,5,1,4,6,14,13,12,10,11);
+		int d = bitswap<8>(src[a], 3,2,4,5,6,1,7,0);
 
 		a = i;
 		a ^= (~a >> 1 & 0x400);

@@ -92,7 +92,7 @@ WRITE16_MEMBER(cabal_state::sound_irq_trigger_word_w)
 		m_seibu_sound->main_w(space, 4, data & 0x00ff);
 
 	/* spin for a while to let the Z80 read the command, otherwise coins "stick" */
-	space.device().execute().spin_until_time(attotime::from_usec(50));
+	m_maincpu->spin_until_time(attotime::from_usec(50));
 }
 
 WRITE16_MEMBER(cabal_state::cabalbl_sound_irq_trigger_word_w)
@@ -115,7 +115,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, cabal_state )
 	AM_RANGE(0xa0010, 0xa0011) AM_READ_PORT("INPUTS")
 	AM_RANGE(0xc0040, 0xc0041) AM_WRITENOP /* ??? */
 	AM_RANGE(0xc0080, 0xc0081) AM_WRITE(flipscreen_w)
-	AM_RANGE(0xe0000, 0xe07ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0xe0000, 0xe07ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0xe8008, 0xe8009) AM_WRITE(sound_irq_trigger_word_w) // fix coin insertion
 	AM_RANGE(0xe8000, 0xe800d) AM_DEVREADWRITE8("seibu_sound", seibu_sound_device, main_r, main_w, 0x00ff)
 ADDRESS_MAP_END
@@ -145,7 +145,7 @@ static ADDRESS_MAP_START( cabalbl_main_map, AS_PROGRAM, 16, cabal_state )
 	AM_RANGE(0xa0010, 0xa0011) AM_READ_PORT("INPUTS")
 	AM_RANGE(0xc0040, 0xc0041) AM_WRITENOP /* ??? */
 	AM_RANGE(0xc0080, 0xc0081) AM_WRITE(flipscreen_w)
-	AM_RANGE(0xe0000, 0xe07ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0xe0000, 0xe07ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0xe8000, 0xe8003) AM_WRITE(cabalbl_sndcmd_w)
 	AM_RANGE(0xe8004, 0xe8005) AM_DEVREAD8("soundlatch", generic_latch_8_device, read, 0x00ff)
 	AM_RANGE(0xe8008, 0xe8009) AM_WRITE(cabalbl_sound_irq_trigger_word_w)
@@ -156,12 +156,12 @@ ADDRESS_MAP_END
 
 READ8_MEMBER(cabal_state::cabalbl_snd2_r)
 {
-	return BITSWAP8(m_sound_command2, 7,2,4,5,3,6,1,0);
+	return bitswap<8>(m_sound_command2, 7,2,4,5,3,6,1,0);
 }
 
 READ8_MEMBER(cabal_state::cabalbl_snd1_r)
 {
-	return BITSWAP8(m_sound_command1, 7,2,4,5,3,6,1,0);
+	return bitswap<8>(m_sound_command1, 7,2,4,5,3,6,1,0);
 }
 
 WRITE8_MEMBER(cabal_state::cabalbl_coin_w)
@@ -489,7 +489,7 @@ static GFXDECODE_START( cabal )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( cabal )
+MACHINE_CONFIG_START(cabal_state::cabal)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_20MHz/2) /* verified on pcb */
@@ -535,7 +535,7 @@ static MACHINE_CONFIG_START( cabal )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( cabalt, cabal )
+MACHINE_CONFIG_DERIVED(cabal_state::cabalt, cabal)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(trackball_main_map)
 
@@ -548,7 +548,7 @@ static MACHINE_CONFIG_DERIVED( cabalt, cabal )
 	MCFG_UPD4701_PORTY("IN3")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( cabalbl2, cabal )
+MACHINE_CONFIG_DERIVED(cabal_state::cabalbl2, cabal)
 	MCFG_DEVICE_REMOVE("sei80bu")
 
 	MCFG_DEVICE_MODIFY("audiocpu")
@@ -558,7 +558,7 @@ MACHINE_CONFIG_END
 
 
 /* the bootleg has different sound hardware (2 extra Z80s for ADPCM playback) */
-static MACHINE_CONFIG_START( cabalbl )
+MACHINE_CONFIG_START(cabal_state::cabalbl)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_20MHz/2) /* verified on pcb */

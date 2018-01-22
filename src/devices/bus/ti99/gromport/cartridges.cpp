@@ -231,7 +231,7 @@ image_init_result ti99_cartridge_device::call_load()
 	}
 	else
 	{
-		auto reader = new rpk_reader(pcbdefs);
+		auto reader = std::make_unique<rpk_reader>(pcbdefs);
 		try
 		{
 			m_rpk = reader->open(machine().options(), filename(), machine().system().name);
@@ -239,7 +239,7 @@ image_init_result ti99_cartridge_device::call_load()
 		}
 		catch (rpk_exception& err)
 		{
-			logerror("Failed to load cartridge '%s': %s\n", basename(), err.to_string());
+			logerror("Failed to load cartridge '%s': %s\n", basename(), err.to_string().c_str());
 			m_rpk = nullptr;
 			m_err = IMAGE_ERROR_INVALIDIMAGE;
 			return image_init_result::FAIL;
@@ -396,7 +396,7 @@ void ti99_cartridge_device::device_config_complete()
 /*
     5 GROMs that may be contained in a cartridge
 */
-MACHINE_CONFIG_MEMBER( ti99_cartridge_device::device_add_mconfig )
+MACHINE_CONFIG_START(ti99_cartridge_device::device_add_mconfig)
 	MCFG_GROM_ADD( GROM3_TAG, 3, CARTGROM_TAG, 0x0000, WRITELINE(ti99_cartridge_device, ready_line))
 	MCFG_GROM_ADD( GROM4_TAG, 4, CARTGROM_TAG, 0x2000, WRITELINE(ti99_cartridge_device, ready_line))
 	MCFG_GROM_ADD( GROM5_TAG, 5, CARTGROM_TAG, 0x4000, WRITELINE(ti99_cartridge_device, ready_line))
@@ -1505,13 +1505,13 @@ void ti99_cartridge_device::rpk::close()
     not a network socket)
 ***************************************************************/
 
-ti99_cartridge_device::rpk_socket::rpk_socket(const char* id, int length, uint8_t* contents, const char *pathname)
-	: m_id(id), m_length(length), m_contents(contents), m_pathname(pathname)
+ti99_cartridge_device::rpk_socket::rpk_socket(const char* id, int length, uint8_t* contents, std::string &&pathname)
+	: m_id(id), m_length(length), m_contents(contents), m_pathname(std::move(pathname))
 {
 }
 
 ti99_cartridge_device::rpk_socket::rpk_socket(const char* id, int length, uint8_t* contents)
-	: rpk_socket(id, length, contents, nullptr)
+	: rpk_socket(id, length, contents, "")
 {
 }
 
@@ -1618,7 +1618,7 @@ std::unique_ptr<ti99_cartridge_device::rpk_socket> ti99_cartridge_device::rpk_re
 	const char* length_string;
 	const char* ram_type;
 	const char* ram_filename;
-	const char* ram_pname;
+	std::string ram_pname;
 	unsigned int length;
 	uint8_t* contents;
 
@@ -1653,8 +1653,6 @@ std::unique_ptr<ti99_cartridge_device::rpk_socket> ti99_cartridge_device::rpk_re
 
 	if (TRACE_RPK) printf("gromport/RPK: Allocating RAM buffer (%d bytes) for socket '%s'\n", length, socketname);
 
-	ram_pname = nullptr;
-
 	// That's it for pure RAM. Now check whether the RAM is "persistent", i.e. NVRAM.
 	// In that case we must load it from the NVRAM directory.
 	// The file name is given in the RPK file; the subdirectory is the system name.
@@ -1670,10 +1668,9 @@ std::unique_ptr<ti99_cartridge_device::rpk_socket> ti99_cartridge_device::rpk_re
 				global_free_array(contents);
 				throw rpk_exception(RPK_INVALID_RAM_SPEC, "<ram type='persistent'> must have a 'file' attribute");
 			}
-			std::string ram_pathname = std::string(system_name).append(PATH_SEPARATOR).append(ram_filename);
-			ram_pname = core_strdup(ram_pathname.c_str());
+			ram_pname = std::string(system_name).append(PATH_SEPARATOR).append(ram_filename);
 			// load, and fill rest with 00
-			if (TRACE_RPK) printf("gromport/RPK: Loading NVRAM contents from '%s'\n", ram_pname);
+			if (TRACE_RPK) printf("gromport/RPK: Loading NVRAM contents from '%s'\n", ram_pname.c_str());
 
 			// Load the NVRAM contents
 			int bytes_read = 0;
@@ -1691,7 +1688,7 @@ std::unique_ptr<ti99_cartridge_device::rpk_socket> ti99_cartridge_device::rpk_re
 	}
 
 	// Create a socket instance
-	return std::make_unique<rpk_socket>(socketname, length, contents, ram_pname);
+	return std::make_unique<rpk_socket>(socketname, length, contents, std::move(ram_pname));
 }
 
 /*-------------------------------------------------
