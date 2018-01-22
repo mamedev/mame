@@ -1299,6 +1299,10 @@ ROM_START( bittboy )
 	ROM_LOAD( "bittboy_flash_read_S29GL256N-TF-V2.bin", 0x00000, 0x2000000, CRC(24c802d7) SHA1(c1300ff799b93b9b53060b94d3985db4389c5d3a) )
 ROM_END
 
+ROM_START( mc_89in1 )
+	ROM_REGION( 0x400000, "mainrom", 0 )
+	ROM_LOAD( "89in1.bin", 0x00000, 0x400000, CRC(b97f8ce5) SHA1(1a8e67f2b58a671ceec2b0ed18ec5954a71ae63a) )
+ROM_END
 // earlier version of vdogdemo
 CONS( 200?, vdogdeme,  0,  0,  nes_vt,    nes_vt, nes_vt_state,  0, "VRT", "V-Dog (prototype, earlier)", MACHINE_NOT_WORKING )
 
@@ -1374,3 +1378,5 @@ CONS( 2004, mc_dcat8a,  mc_dcat8, 0,  nes_vt,    nes_vt, nes_vt_state,  0, "<unk
 CONS( 2017, sy889,  		0, 				0,  nes_vt_hh, nes_vt, nes_vt_state,  0, "SY Corp", 	"SY-889 300 in 1 Handheld", MACHINE_NOT_WORKING )
 // Runs well, only issues in SMB3 which crashes
 CONS( 2017, bittboy,  	0, 				0,  nes_vt_bt,    nes_vt, nes_vt_state,  0, "BittBoy", 	"BittBoy Mini FC 300 in 1", MACHINE_NOT_WORKING )
+// Runs well, all games seem to work
+CONS( 201?, mc_89in1,  	0, 				0,  nes_vt,    nes_vt, nes_vt_state,  0, "<unknown>", 	"89 in 1 Mini Game Console (060-92023011V1.0)", MACHINE_NOT_WORKING )
