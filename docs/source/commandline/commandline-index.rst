@@ -90,3 +90,20 @@ Core Search Path Options
 Core Output Directory Options
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+| :ref:`cfg_directory <mame-commandline-cfgdirectory>`
+| :ref:`nvram_directory <mame-commandline-nvramdirectory>`
+| :ref:`input_directory <mame-commandline-inputdirectory>`
+| :ref:`state_directory <mame-commandline-statedirectory>`
+| :ref:`snapshot_directory <mame-commandline-snapshotdirectory>`
+| :ref:`diff_directory <mame-commandline-diffdirectory>`
+| :ref:`comment_directory <mame-commandline-commentdirectory>`
+
+Core State/Playback Options
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+
+
+
+
+

@@ -64,8 +64,14 @@ Note: By default, all the '**-list**' commands below write info to the screen. I
 
   **> filename**
 
-...where 'filename' is the textfile's path and name (e.g., c:\\mame\\list.txt).
+...where 'filename' is the textfile's path and name (e.g., list.txt).
 
+Example:
+
+|  **mame -listcrc puckman > list.txt**
+|
+| This creates (or overwrites if it's already there) list.txt and fills the file with the results of **-listcrc puckman**. In other words, the list of each ROM used in Puckman and the CRC for that ROM are written into that file.
+|
 
 .. _mame-commandline-listxml:
 
@@ -390,29 +396,43 @@ Core Search Path Options
 Core Output Directory Options
 -----------------------------
 
+.. _mame-commandline-cfgdirectory:
+
 **-cfg_directory** *<path>*
 
 	Specifies a single directory where configuration files are stored. Configuration files store user configurable settings that are read at startup and written when MAME exits. The default is 'cfg' (that is, a directory "cfg" in the same directory as the MAME executable). If this directory does not exist, it will be automatically created.
+
+.. _mame-commandline-nvramdirectory:
 
 **-nvram_directory** *<path>*
 
 	Specifies a single directory where NVRAM files are stored. NVRAM files store the contents of EEPROM and non-volatile RAM (NVRAM) for games which used this type of hardware. This data is read at startup and written when MAME exits. The default is 'nvram' (that is, a directory "nvram" in the same directory as the MAME executable). If this directory does not exist, it will be automatically created.
 
+.. _mame-commandline-inputdirectory:
+
 **-input_directory** *<path>*
 
 	Specifies a single directory where input recording files are stored. Input recordings are created via the -record option and played back via the -playback option. The default is 'inp' (that is, a directory	"inp" in the same directory as the MAME executable). If this directory does not exist, it will be automatically created.
+
+.. _mame-commandline-statedirectory:
 
 **-state_directory** *<path>*
 
 	Specifies a single directory where save state files are stored. Save state files are read and written either upon user request, or when using the -autosave option. The default is 'sta' (that is, a directory "sta" in the same directory as the MAME executable). If this directory does not exist, it will be  automatically created.
 
+.. _mame-commandline-snapshotdirectory:
+
 **-snapshot_directory** *<path>*
 
 	Specifies a single directory where screen snapshots are stored, when requested by the user. The default is 'snap' (that is, a directory "snap" in the same directory as the MAME executable). If this directory does not exist, it will be automatically created.
 
+.. _mame-commandline-diffdirectory:
+
 **-diff_directory** *<path>*
 
 	Specifies a single directory where hard drive differencing files are stored. Hard drive differencing files store any data that is written back to a hard disk image, in order to preserve the original image. The differencing files are created at startup when a game with a hard disk image. The default is 'diff' (that is, a directory "diff" in the same directory as the MAME executable). If this directory does not exist, it will be automatically created.
+
+.. _mame-commandline-commentdirectory:
 
 **-comment_directory** *<path>*
 
