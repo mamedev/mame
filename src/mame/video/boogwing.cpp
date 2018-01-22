@@ -7,8 +7,10 @@
 
 void boogwing_state::video_start()
 {
+	m_priority = 0;
 	m_sprgen1->alloc_sprite_bitmap();
 	m_sprgen2->alloc_sprite_bitmap();
+	save_item(NAME(m_priority));
 }
 
 
@@ -28,7 +30,7 @@ void boogwing_state::mix_boogwing(screen_device &screen, bitmap_rgb32 &bitmap, c
 	bitmap_ind16 *sprite_bitmap1, *sprite_bitmap2;
 	bitmap_ind8* priority_bitmap;
 
-	uint16_t priority = m_decocomn->priority_r();
+	uint16_t priority = m_priority;
 
 	sprite_bitmap1 = &m_sprgen1->get_sprite_temp_bitmap();
 	sprite_bitmap2 = &m_sprgen2->get_sprite_temp_bitmap();
@@ -58,7 +60,7 @@ void boogwing_state::mix_boogwing(screen_device &screen, bitmap_rgb32 &bitmap, c
 
 			int pri1, pri2;
 			int spri1, spri2, alpha2;
-			alpha2 = 0xff;
+			alpha2 = m_deco_ace->get_alpha((pix2 >> 4) & 0xf);
 
 			// pix1 sprite vs pix2 sprite
 			if (pix1 & 0x400)       // todo - check only in pri mode 2??
@@ -100,7 +102,7 @@ void boogwing_state::mix_boogwing(screen_device &screen, bitmap_rgb32 &bitmap, c
 
 			// Transparency
 			if (pix2 & 0x100)
-				alpha2 = 0x80;
+				alpha2 = 0x80; // todo
 
 			// pix2 sprite vs playfield
 			switch (priority)
@@ -109,7 +111,7 @@ void boogwing_state::mix_boogwing(screen_device &screen, bitmap_rgb32 &bitmap, c
 					{
 						// Additional sprite alpha in this mode
 						if (pix2 & 0x400)
-							alpha2 = 0x80;
+							alpha2 = 0x80; // todo
 
 						// Sprite vs playfield
 						if ((pix2 & 0x600) == 0x600)
@@ -181,7 +183,7 @@ uint32_t boogwing_state::screen_update_boogwing(screen_device &screen, bitmap_rg
 {
 	address_space &space = machine().dummy_space();
 	uint16_t flip = m_deco_tilegen1->pf_control_r(space, 0, 0xffff);
-	uint16_t priority = m_decocomn->priority_r();
+	uint16_t priority = m_priority;
 
 	/* Draw sprite planes to bitmaps for later mixing */
 	m_sprgen2->draw_sprites(bitmap, cliprect, m_spriteram2->buffer(), 0x400, true);
@@ -190,6 +192,8 @@ uint32_t boogwing_state::screen_update_boogwing(screen_device &screen, bitmap_rg
 	flip_screen_set(BIT(flip, 7));
 	m_deco_tilegen1->pf_update(m_pf1_rowscroll, m_pf2_rowscroll);
 	m_deco_tilegen2->pf_update(m_pf3_rowscroll, m_pf4_rowscroll);
+
+	m_deco_ace->palette_update();
 
 	/* Draw playfields */
 	bitmap.fill(m_palette->pen(0x400), cliprect); /* pen not confirmed */
