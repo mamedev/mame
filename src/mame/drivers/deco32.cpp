@@ -571,8 +571,7 @@ static ADDRESS_MAP_START( tattass_map, AS_PROGRAM, 32, nslasher_state )
 	AM_RANGE(0x16400c, 0x16400f) AM_WRITENOP
 	AM_RANGE(0x168000, 0x169fff) AM_DEVREADWRITE("deco_ace", deco_ace_device, buffered_palette_r, buffered_palette_w)
 	AM_RANGE(0x16c000, 0x16c003) AM_WRITENOP
-	AM_RANGE(0x16c008, 0x16c00b) AM_DEVWRITE16("deco_ace", deco_ace_device, palette_dma_w, 0xffff0000)
-	AM_RANGE(0x16c008, 0x16c00b) AM_DEVWRITE16("deco_ace", deco_ace_device, palette_dma_w, 0x0000ffff)
+	AM_RANGE(0x16c008, 0x16c00b) AM_DEVWRITE16("deco_ace", deco_ace_device, palette_dma_w, 0xffffffff)
 	AM_RANGE(0x170000, 0x171fff) AM_READWRITE(spriteram_r, spriteram_w)
 	AM_RANGE(0x174000, 0x174003) AM_WRITENOP /* Sprite DMA mode (2) */
 	AM_RANGE(0x174010, 0x174013) AM_WRITE(buffer_spriteram_w)
@@ -609,8 +608,7 @@ static ADDRESS_MAP_START( nslasher_map, AS_PROGRAM, 32, nslasher_state )
 	AM_RANGE(0x16400c, 0x16400f) AM_WRITENOP
 	AM_RANGE(0x168000, 0x169fff) AM_DEVREADWRITE("deco_ace", deco_ace_device, buffered_palette_r, buffered_palette_w)
 	AM_RANGE(0x16c000, 0x16c003) AM_WRITENOP
-	AM_RANGE(0x16c008, 0x16c00b) AM_DEVWRITE16("deco_ace", deco_ace_device, palette_dma_w, 0xffff0000)
-	AM_RANGE(0x16c008, 0x16c00b) AM_DEVWRITE16("deco_ace", deco_ace_device, palette_dma_w, 0x0000ffff)
+	AM_RANGE(0x16c008, 0x16c00b) AM_DEVWRITE16("deco_ace", deco_ace_device, palette_dma_w, 0xffffffff)
 	AM_RANGE(0x170000, 0x171fff) AM_READWRITE(spriteram_r, spriteram_w)
 	AM_RANGE(0x174000, 0x174003) AM_WRITENOP /* Sprite DMA mode (2) */
 	AM_RANGE(0x174010, 0x174013) AM_WRITE(buffer_spriteram_w)
