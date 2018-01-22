@@ -61,7 +61,7 @@
         * There may be some kind of fullscreen palette effect (controlled by bit 3 in priority
           word - used at end of each level, and on final boss).
         * A shadow effect (used in level 1) is not implemented.
-		* ACE Chip aren't fully emulated.
+        * ACE Chip aren't fully emulated.
 
     Sprite Priority Notes:
         * On the Imperial Science Museum level at the beginning, you fly behind a wall, but your
