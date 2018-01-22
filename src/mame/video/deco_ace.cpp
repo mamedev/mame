@@ -158,7 +158,7 @@ void deco_ace_device::palette_update()
 			g = (m_generic_paletteram_32[i] >> 8) & 0xff;
 			r = (m_generic_paletteram_32[i] >> 0) & 0xff;
 
-			if ((i>=m_palette_effect_min) && (i<m_palette_effect_max)) /* Screenshots seem to suggest ACE fades do not affect playfield 1 palette (0-255) */
+			if ((i>=m_palette_effect_min) && (i<=m_palette_effect_max)) /* Screenshots seem to suggest ACE fades do not affect playfield 1 palette (0-255) */
 			{
 				/* Yeah, this should really be fixed point, I know */
 				// if (mode == 0x1100)
