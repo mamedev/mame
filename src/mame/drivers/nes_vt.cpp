@@ -1309,6 +1309,16 @@ ROM_START( mc_cb280 )
 	ROM_LOAD( "w25q32.u5", 0x00000, 0x400000, CRC(c9541bdf) SHA1(f0ce46f18658ca5dbed881e5a80460e59820bbd0) )
 ROM_END
 
+ROM_START( mc_pg150 )
+	ROM_REGION( 0x2000000, "mainrom", 0 )
+	ROM_LOAD( "pocketgames150-in1.bin", 0x00000, 0x2000000, CRC(32f1176b) SHA1(2cfd9b61ebdfc328f020ae9bd5e5e2219321e828) )
+ROM_END
+
+ROM_START( mc_hh210 )
+	ROM_REGION( 0x1000000, "mainrom", 0 )
+	ROM_LOAD( "msp55lv128t.u4", 0x00000, 0x1000000, CRC(9ba520d4) SHA1(627f811b24314197e289a2ade668ff4115421bed) )
+ROM_END
+
 // earlier version of vdogdemo
 CONS( 200?, vdogdeme,  0,  0,  nes_vt,    nes_vt, nes_vt_state,  0, "VRT", "V-Dog (prototype, earlier)", MACHINE_NOT_WORKING )
 
@@ -1383,9 +1393,14 @@ CONS( 2004, mc_dcat8a,  mc_dcat8, 0,  nes_vt,    nes_vt, nes_vt_state,  0, "<unk
 // Runs well, minor GFX issues in intro
 CONS( 2017, sy889,  		0, 				0,  nes_vt_hh, nes_vt, nes_vt_state,  0, "SY Corp", 	"SY-889 300 in 1 Handheld", MACHINE_NOT_WORKING )
 // Same hardware as SY-889
-CONS( 2017, mc_cb280,  	0, 				0,  nes_vt_hh, nes_vt, nes_vt_state,  0, "CoolBoy", 	"Coolboy RS-18 (280 in 1)", MACHINE_NOT_WORKING )
+CONS( 201?, mc_cb280,  	0, 				0,  nes_vt_hh, nes_vt, nes_vt_state,  0, "CoolBoy", 	"Coolboy RS-18 (280 in 1)", MACHINE_NOT_WORKING )
 
 // Runs well, only issues in SMB3 which crashes
 CONS( 2017, bittboy,  	0, 				0,  nes_vt_bt,    nes_vt, nes_vt_state,  0, "BittBoy", 	"BittBoy Mini FC 300 in 1", MACHINE_NOT_WORKING )
 // Runs well, all games seem to work
 CONS( 201?, mc_89in1,  	0, 				0,  nes_vt,    nes_vt, nes_vt_state,  0, "<unknown>", 	"89 in 1 Mini Game Console (060-92023011V1.0)", MACHINE_NOT_WORKING )
+// Broken GFX, investigate
+CONS( 201?, mc_pg150,  	0, 				0,  nes_vt_bt,    nes_vt, nes_vt_state,  0, "<unknown>", 	"Pocket Games 150 in 1", MACHINE_NOT_WORKING )
+// No title screen, but press start and menu and games run fine. Makes odd
+// memory accesses which probably explain broken title screen
+CONS( 201?, mc_hh210,  	0, 				0,  nes_vt_xx,    nes_vt, nes_vt_state,  0, "<unknown>", 	"Handheld 210 in 1", MACHINE_NOT_WORKING )
