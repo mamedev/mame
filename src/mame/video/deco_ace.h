@@ -25,11 +25,15 @@ public:
 	// static configuration
 	static void static_set_palette_tag(device_t &device, const char *tag);
 	
+	DECLARE_READ32_MEMBER( buffered_palette_r );
+	DECLARE_READ16_MEMBER( buffered_palette16_r );
+	DECLARE_READ16_MEMBER( ace_r );
 	DECLARE_WRITE32_MEMBER( buffered_palette_w );
 	DECLARE_WRITE16_MEMBER( buffered_palette16_w );
 	DECLARE_WRITE16_MEMBER( ace_w );
 	void palette_update();
 	void set_palette_effect_max(uint32_t val);
+	uint16_t get_aceram(uint8_t val);
 	uint8_t get_alpha(uint8_t val);
 	DECLARE_WRITE16_MEMBER( palette_dma_w );
 
