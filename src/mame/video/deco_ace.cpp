@@ -97,18 +97,36 @@ void deco_ace_device::device_reset()
 *****************************************************************************/
 
 // nslasher
+READ32_MEMBER( deco_ace_device::buffered_palette_r )
+{
+	return m_generic_paletteram_32[offset];
+}
+
 WRITE32_MEMBER( deco_ace_device::buffered_palette_w )
 {
 	COMBINE_DATA(&m_generic_paletteram_32[offset]);
 }
 
 // boogwing has 16 bit cpu data bus
+READ16_MEMBER( deco_ace_device::buffered_palette16_r )
+{
+	if ((offset & 1) == 0)
+		return (m_generic_paletteram_32[offset >> 1] >> 16) & 0xffff;
+	else
+		return m_generic_paletteram_32[offset >> 1] & 0xffff;
+}
+
 WRITE16_MEMBER( deco_ace_device::buffered_palette16_w )
 {
 	if ((offset & 1) == 0)
 		m_generic_paletteram_32[offset >> 1] = (m_generic_paletteram_32[offset >> 1] & ~(mem_mask<<16)) | ((data & mem_mask)<<16);
 	else
 		m_generic_paletteram_32[offset >> 1] = (m_generic_paletteram_32[offset >> 1] & ~mem_mask) | (data & mem_mask);
+}
+
+READ16_MEMBER( deco_ace_device::ace_r )
+{
+	return m_ace_ram[offset];
 }
 
 WRITE16_MEMBER( deco_ace_device::ace_w )
@@ -120,34 +138,37 @@ WRITE16_MEMBER( deco_ace_device::ace_w )
 
 void deco_ace_device::palette_update()
 {
-	int r,g,b,i;
-	uint8_t fadeptr=m_ace_ram[0x20] & 0xff;
-	uint8_t fadeptg=m_ace_ram[0x21] & 0xff;
-	uint8_t fadeptb=m_ace_ram[0x22] & 0xff;
-	uint8_t fadepsr=m_ace_ram[0x23] & 0xff;
-	uint8_t fadepsg=m_ace_ram[0x24] & 0xff;
-	uint8_t fadepsb=m_ace_ram[0x25] & 0xff;
-//  uint16_t mode=m_ace_ram[0x26] & 0xffff;
-
-	m_dirty_palette=0;
-
-	for (i=0; i<2048; i++)
+	if (m_dirty_palette != 0)
 	{
-		/* Lerp palette entry to 'fadept' according to 'fadeps' */
-		b = (m_generic_paletteram_32[i] >>16) & 0xff;
-		g = (m_generic_paletteram_32[i] >> 8) & 0xff;
-		r = (m_generic_paletteram_32[i] >> 0) & 0xff;
+		int r,g,b,i;
+		uint8_t fadeptr=m_ace_ram[0x20] & 0xff;
+		uint8_t fadeptg=m_ace_ram[0x21] & 0xff;
+		uint8_t fadeptb=m_ace_ram[0x22] & 0xff;
+		uint8_t fadepsr=m_ace_ram[0x23] & 0xff;
+		uint8_t fadepsg=m_ace_ram[0x24] & 0xff;
+		uint8_t fadepsb=m_ace_ram[0x25] & 0xff;
+	//  uint16_t mode=m_ace_ram[0x26] & 0xffff;
 
-		if ((i>=m_palette_effect_min) && (i<m_palette_effect_max)) /* Screenshots seem to suggest ACE fades do not affect playfield 1 palette (0-255) */
+		m_dirty_palette=0;
+
+		for (i=0; i<2048; i++)
 		{
-			/* Yeah, this should really be fixed point, I know */
-			// if (mode == 0x1100)
-			b = (uint8_t)((float)b + (((float)fadeptb - (float)b) * (float)fadepsb/255.0f));
-			g = (uint8_t)((float)g + (((float)fadeptg - (float)g) * (float)fadepsg/255.0f));
-			r = (uint8_t)((float)r + (((float)fadeptr - (float)r) * (float)fadepsr/255.0f));
-		}
+			/* Lerp palette entry to 'fadept' according to 'fadeps' */
+			b = (m_generic_paletteram_32[i] >>16) & 0xff;
+			g = (m_generic_paletteram_32[i] >> 8) & 0xff;
+			r = (m_generic_paletteram_32[i] >> 0) & 0xff;
 
-		m_palette->set_pen_color(i,rgb_t(r,g,b));
+			if ((i>=m_palette_effect_min) && (i<m_palette_effect_max)) /* Screenshots seem to suggest ACE fades do not affect playfield 1 palette (0-255) */
+			{
+				/* Yeah, this should really be fixed point, I know */
+				// if (mode == 0x1100)
+				b = (uint8_t)((float)b + (((float)fadeptb - (float)b) * (float)fadepsb/255.0f));
+				g = (uint8_t)((float)g + (((float)fadeptg - (float)g) * (float)fadepsg/255.0f));
+				r = (uint8_t)((float)r + (((float)fadeptr - (float)r) * (float)fadepsr/255.0f));
+			}
+
+			m_palette->set_pen_color(i,rgb_t(r,g,b));
+		}
 	}
 }
 
@@ -163,7 +184,7 @@ void deco_ace_device::set_palette_effect_max(uint32_t val)
 uint8_t deco_ace_device::get_alpha(uint8_t val)
 {
 	val &= 0x1f;
-	uint8_t alpha = m_ace_ram[val];
+	uint8_t alpha = m_ace_ram[val] & 0xff;
 	if (alpha > 0x20)
 	{
 		return 0x80; // todo
@@ -177,6 +198,12 @@ uint8_t deco_ace_device::get_alpha(uint8_t val)
 		}
 		return alpha;
 	}
+}
+
+uint16_t deco_ace_device::get_aceram(uint8_t val)
+{
+	val &= 0x3f;
+	m_ace_ram[val]
 }
 
 WRITE16_MEMBER( deco_ace_device::palette_dma_w )
