@@ -138,6 +138,7 @@ private:
 	emu_timer *m_baudgen_timer;
 
 	bool m_force_blank;
+	bool m_4hz_flasher;
 	bool m_lpt_select;
 	u8 m_keyboard_scan;
 	std::unique_ptr<u8[]> m_dispram;
@@ -172,6 +173,7 @@ WRITE8_MEMBER(tv912_state::p2_w)
 	m_bankdev->set_bank(data & 0x0f);
 
 	// P24: +4Hz Flasher
+	m_4hz_flasher = BIT(data, 4);
 }
 
 READ8_MEMBER(tv912_state::crtc_r)
@@ -276,7 +278,7 @@ void tv912_state::device_timer(emu_timer &timer, device_timer_id id, int param, 
 
 u32 tv912_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	if (m_crtc->screen_reset())
+	if (m_crtc->screen_reset() || m_force_blank)
 	{
 		bitmap.fill(rgb_t::black(), cliprect);
 		return 0;
@@ -284,6 +286,9 @@ u32 tv912_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, cons
 
 	u8 *dispram = static_cast<u8 *>(m_dispram_bank->base());
 	ioport_value videoctrl = m_video_control->read();
+
+	rectangle curs;
+	m_crtc->cursor_bounds(curs);
 
 	for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
 	{
@@ -302,18 +307,24 @@ u32 tv912_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, cons
 				ch = (pos & 0x1f) | (row & 7) << 5;
 
 			u8 data = (ra > 0 && ra < 9) ? charbase[(ch & 0x7f) << 3] : 0;
-			u8 dots = data >> 2;
+			u8 dots = (data & 0xfc) >> 1;
 			bool adv = BIT(data, 1);
 
-			for (int d = 0; d < 7; d++)
+			if (x == curs.left() && y >= curs.top() && y <= curs.bottom())
+			{
+				if (BIT(videoctrl, 0) || !m_4hz_flasher)
+					dots ^= 0xff;
+			}
+
+			for (int d = 0; d < CHAR_WIDTH / 2; d++)
 			{
 				if (x >= cliprect.left() && x <= cliprect.right())
-					bitmap.pix(y, x) = BIT(dots, 6) ? rgb_t::white() : rgb_t::black();
+					bitmap.pix(y, x) = BIT(dots, 7) ? rgb_t::white() : rgb_t::black();
 				x++;
 				if (adv)
 					dots <<= 1;
 				if (x >= cliprect.left() && x <= cliprect.right())
-					bitmap.pix(y, x) = BIT(dots, 6) ? rgb_t::white() : rgb_t::black();
+					bitmap.pix(y, x) = BIT(dots, 7) ? rgb_t::white() : rgb_t::black();
 				x++;
 				if (!adv)
 					dots <<= 1;
@@ -337,6 +348,7 @@ void tv912_state::machine_start()
 
 	save_item(NAME(m_force_blank));
 	save_item(NAME(m_lpt_select));
+	save_item(NAME(m_4hz_flasher));
 	save_item(NAME(m_keyboard_scan));
 	save_pointer(NAME(m_dispram.get()), 0x1000);
 }
