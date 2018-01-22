@@ -306,7 +306,7 @@ void nslasher_state::mixDualAlphaSprites(screen_device &screen, bitmap_rgb32 &bi
 					*/
 
 					/* Alpha values are tied to ACE ram... */
-					//int alpha=m_deco_ace->get_alpha((priColAlphaPal1&0xf0)>>4);
+					//int alpha=m_deco_ace->get_alpha(((priColAlphaPal1&0xf0)>>4)/2);
 					//if (alpha<0)
 					//  alpha=0;
 
@@ -354,7 +354,7 @@ void nslasher_state::mixDualAlphaSprites(screen_device &screen, bitmap_rgb32 &bi
 						&& ((priColAlphaPal1&0xff)==0 || (pri1&0x3)==2 || (pri1&0x3)==3 || alpha1))
 					{
 						/* Alpha values are tied to ACE ram */
-						int alpha=m_deco_ace->get_alpha(0x17 + ((p&0xf0)>>4));
+						int alpha=m_deco_ace->get_alpha(0x17 + (((p&0xf0)>>4)/2));
 						if (alpha<0)
 							alpha=0;
 
