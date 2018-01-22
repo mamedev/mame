@@ -111,12 +111,18 @@ WRITE16_MEMBER( boogwing_state::boogwing_protection_region_0_104_w )
 	m_deco104->write_data( space, deco146_addr, data, mem_mask, cs );
 }
 
+WRITE16_MEMBER( boogwing_state::priority_w )
+{
+	COMBINE_DATA(&m_priority);
+	m_deco_ace->set_palette_effect_max((m_priority & 0x8) ? 0x6ff : 0xfff);
+}
+
 
 static ADDRESS_MAP_START( boogwing_map, AS_PROGRAM, 16, boogwing_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM
 
-	AM_RANGE(0x220000, 0x220001) AM_DEVWRITE("deco_common", decocomn_device, priority_w)
+	AM_RANGE(0x220000, 0x220001) AM_WRITE(priority_w)
 	AM_RANGE(0x220002, 0x22000f) AM_NOP
 
 	AM_RANGE(0x240000, 0x240001) AM_DEVWRITE("spriteram", buffered_spriteram16_device, write)
@@ -143,10 +149,10 @@ static ADDRESS_MAP_START( boogwing_map, AS_PROGRAM, 16, boogwing_state )
 
 	AM_RANGE(0x280000, 0x28000f) AM_NOP // ?
 	AM_RANGE(0x282000, 0x282001) AM_NOP // Palette setup?
-	AM_RANGE(0x282008, 0x282009) AM_DEVWRITE("deco_common", decocomn_device, palette_dma_w)
-	AM_RANGE(0x284000, 0x285fff) AM_DEVWRITE("deco_common", decocomn_device, buffered_palette_w) AM_SHARE("paletteram")
+	AM_RANGE(0x282008, 0x282009) AM_DEVWRITE("deco_ace", deco_ace_device, palette_dma_w)
+	AM_RANGE(0x284000, 0x285fff) AM_DEVREADWRITE("deco_ace", deco_ace_device, buffered_palette16_r, buffered_palette16_w)
 
-	AM_RANGE(0x3c0000, 0x3c004f) AM_RAM // ?
+	AM_RANGE(0x3c0000, 0x3c004f) AM_DEVREADWRITE("deco_ace", deco_ace_device, ace_r, ace_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( decrypted_opcodes_map, AS_OPCODES, 16, boogwing_state )
@@ -300,6 +306,11 @@ GFXDECODE_END
 
 /**********************************************************************************/
 
+void boogwing_state::machine_reset()
+{
+	m_priority = 0;
+}
+
 WRITE8_MEMBER(boogwing_state::sound_bankswitch_w)
 {
 	m_oki2->set_rom_bank((data & 2) >> 1);
@@ -343,12 +354,11 @@ MACHINE_CONFIG_START(boogwing_state::boogwing)
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", boogwing)
 
-
 	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram")
 	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram2")
 
-	MCFG_DECOCOMN_ADD("deco_common")
-	MCFG_DECOCOMN_PALETTE("palette")
+	MCFG_DECO_ACE_ADD("deco_ace")
+	MCFG_DECO_ACE_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("tilegen1", DECO16IC, 0)
 	MCFG_DECO16IC_SPLIT(0)
