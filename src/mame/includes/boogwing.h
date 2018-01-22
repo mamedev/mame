@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Bryan McPhail, David Haywood
+// copyright-holders:Bryan McPhail, David Haywood, cam900
 /*************************************************************************
 
     Boogie Wings

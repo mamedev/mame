@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Bryan McPhail,cam900
+// copyright-holders:Bryan McPhail, cam900
 /*************************************************************************
 
     deco_ace.h
@@ -48,7 +48,8 @@ private:
 	uint32_t m_palette_effect_min;
 	uint32_t m_palette_effect_max;
 	required_device<palette_device> m_palette;
-	std::unique_ptr<uint32_t[]> m_generic_paletteram_32;
+	std::unique_ptr<uint32_t[]> m_paletteram;
+	std::unique_ptr<uint32_t[]> m_paletteram_buffered;
 	std::unique_ptr<uint16_t[]> m_ace_ram;
 };
 

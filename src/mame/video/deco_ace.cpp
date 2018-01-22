@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Bryan McPhail,cam900
+// copyright-holders:Bryan McPhail, cam900
 /* Data East 99 "ACE" Chip Emulation */
 /*Some notes pieced together from Tattoo Assassins info(from deco32.cpp):
 
@@ -33,6 +33,9 @@
     becomes zero).
 
     'fadetype' - 1100 for multiplicative fade, 1000 for additive
+
+	Todo:
+		additive fade of 'fadetype' aren't implemented.
 */
 
 
@@ -49,7 +52,8 @@ deco_ace_device::deco_ace_device(const machine_config &mconfig, const char *tag,
 	m_palette_effect_min(0x100),
 	m_palette_effect_max(0xfff),
 	m_palette(*this, finder_base::DUMMY_TAG),
-	m_generic_paletteram_32(nullptr),
+	m_paletteram(nullptr),
+	m_paletteram_buffered(nullptr),
 	m_ace_ram(nullptr)
 {
 }
@@ -70,11 +74,13 @@ void deco_ace_device::static_set_palette_tag(device_t &device, const char *tag)
 
 void deco_ace_device::device_start()
 {
-	m_generic_paletteram_32 = make_unique_clear<uint32_t[]>(4096);
+	m_paletteram = make_unique_clear<uint32_t[]>(4096);
+	m_paletteram_buffered = make_unique_clear<uint32_t[]>(4096);
 	m_ace_ram = make_unique_clear<uint16_t[]>(0x28);
 
 	save_item(NAME(m_dirty_palette));
-	save_pointer(NAME(m_generic_paletteram_32.get()), 4096);
+	save_pointer(NAME(m_paletteram.get()), 4096);
+	save_pointer(NAME(m_paletteram_buffered.get()), 4096);
 	save_pointer(NAME(m_ace_ram.get()), 0x28);
 }
 
@@ -86,9 +92,7 @@ void deco_ace_device::device_reset()
 {
 	m_palette_effect_min = 0x100;
 	m_palette_effect_max = 0xfff;
-	for (int i = 0; i < 0x28; i++)
-		m_ace_ram[i] = 0;
-
+	memset(m_ace_ram.get(),0,0x28);
 	m_dirty_palette = 1;
 }
 
@@ -99,29 +103,29 @@ void deco_ace_device::device_reset()
 // nslasher
 READ32_MEMBER( deco_ace_device::buffered_palette_r )
 {
-	return m_generic_paletteram_32[offset];
+	return m_paletteram[offset];
 }
 
 WRITE32_MEMBER( deco_ace_device::buffered_palette_w )
 {
-	COMBINE_DATA(&m_generic_paletteram_32[offset]);
+	COMBINE_DATA(&m_paletteram[offset]);
 }
 
 // boogwing has 16 bit cpu data bus
 READ16_MEMBER( deco_ace_device::buffered_palette16_r )
 {
 	if ((offset & 1) == 0)
-		return (m_generic_paletteram_32[offset >> 1] >> 16) & 0xffff;
+		return (m_paletteram[offset >> 1] >> 16) & 0xffff;
 	else
-		return m_generic_paletteram_32[offset >> 1] & 0xffff;
+		return m_paletteram[offset >> 1] & 0xffff;
 }
 
 WRITE16_MEMBER( deco_ace_device::buffered_palette16_w )
 {
 	if ((offset & 1) == 0)
-		m_generic_paletteram_32[offset >> 1] = (m_generic_paletteram_32[offset >> 1] & ~(mem_mask<<16)) | ((data & mem_mask)<<16);
+		m_paletteram[offset >> 1] = (m_paletteram[offset >> 1] & ~(mem_mask<<16)) | ((data & mem_mask)<<16);
 	else
-		m_generic_paletteram_32[offset >> 1] = (m_generic_paletteram_32[offset >> 1] & ~mem_mask) | (data & mem_mask);
+		m_paletteram[offset >> 1] = (m_paletteram[offset >> 1] & ~mem_mask) | (data & mem_mask);
 }
 
 READ16_MEMBER( deco_ace_device::ace_r )
@@ -154,11 +158,11 @@ void deco_ace_device::palette_update()
 		for (i=0; i<2048; i++)
 		{
 			/* Lerp palette entry to 'fadept' according to 'fadeps' */
-			b = (m_generic_paletteram_32[i] >>16) & 0xff;
-			g = (m_generic_paletteram_32[i] >> 8) & 0xff;
-			r = (m_generic_paletteram_32[i] >> 0) & 0xff;
+			b = (m_paletteram_buffered[i] >>16) & 0xff;
+			g = (m_paletteram_buffered[i] >> 8) & 0xff;
+			r = (m_paletteram_buffered[i] >> 0) & 0xff;
 
-			if ((i>=m_palette_effect_min) && (i<m_palette_effect_max)) /* Screenshots seem to suggest ACE fades do not affect playfield 1 palette (0-255) */
+			if ((i>=m_palette_effect_min) && (i<=m_palette_effect_max)) /* Screenshots seem to suggest ACE fades do not affect playfield 1 palette (0-255) */
 			{
 				/* Yeah, this should really be fixed point, I know */
 				// if (mode == 0x1100)
@@ -184,30 +188,30 @@ void deco_ace_device::set_palette_effect_max(uint32_t val)
 uint8_t deco_ace_device::get_alpha(uint8_t val)
 {
 	val &= 0x1f;
-	uint8_t alpha = m_ace_ram[val] & 0xff;
+	int alpha = m_ace_ram[val] & 0xff;
 	if (alpha > 0x20)
 	{
 		return 0x80; // todo
 	}
 	else
 	{
-		alpha = 256 - (alpha << 3);
-		if (alpha == 256)
-		{
-			alpha = 255;
-		}
-		return alpha;
+		alpha = 255 - (alpha << 3);
+		if (alpha < 0)
+			alpha = 0;
+
+		return (uint8_t)alpha;
 	}
 }
 
 uint16_t deco_ace_device::get_aceram(uint8_t val)
 {
 	val &= 0x3f;
-	m_ace_ram[val]
+	return m_ace_ram[val];
 }
 
 WRITE16_MEMBER( deco_ace_device::palette_dma_w )
 {
+	memcpy(m_paletteram_buffered.get(), m_paletteram.get(), 4096);
 	m_dirty_palette = 1;
 }
 
