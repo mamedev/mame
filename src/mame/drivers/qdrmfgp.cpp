@@ -186,21 +186,21 @@ WRITE16_MEMBER(qdrmfgp_state::gp2_vram_mirror_w)
 
 /*************/
 
-READ16_MEMBER(qdrmfgp_state::sndram_r)
+READ16_MEMBER(qdrmfgp_state::pcmram_r)
 {
 	if (ACCESSING_BITS_0_7)
-		return m_sndram[offset];
+		return m_pcmram[offset];
 
 	return 0;
 }
 
-WRITE16_MEMBER(qdrmfgp_state::sndram_w)
+WRITE16_MEMBER(qdrmfgp_state::pcmram_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		m_sndram[offset] = data & 0xff;
+		m_pcmram[offset] = data & 0xff;
 		if (offset >= 0x40000)
-			m_sndram[offset+0xc00000-0x900000] = data & 0xff;
+			m_pcmram[offset+0xc00000-0x900000] = data & 0xff;
 	}
 }
 
@@ -320,7 +320,7 @@ static ADDRESS_MAP_START( qdrmfgp_map, AS_PROGRAM, 16, qdrmfgp_state )
 	AM_RANGE(0x900000, 0x901fff) AM_READ(v_rom_r)                                               /* gfxrom through */
 	AM_RANGE(0xa00000, 0xa0000f) AM_DEVREADWRITE("ata", ata_interface_device, read_cs0, write_cs0) /* IDE control regs */
 	AM_RANGE(0xa40000, 0xa4000f) AM_DEVREADWRITE("ata", ata_interface_device, read_cs1, write_cs1) /* IDE status control reg */
-	AM_RANGE(0xc00000, 0xcbffff) AM_READWRITE(sndram_r, sndram_w)                               /* sound ram */
+	AM_RANGE(0xc00000, 0xcbffff) AM_READWRITE(pcmram_r, pcmram_w)                               /* sound ram */
 ADDRESS_MAP_END
 
 
@@ -347,9 +347,14 @@ static ADDRESS_MAP_START( qdrmfgp2_map, AS_PROGRAM, 16, qdrmfgp_state )
 	AM_RANGE(0xa00000, 0xa0000f) AM_DEVREADWRITE("ata", ata_interface_device, read_cs0, write_cs0) /* IDE control regs */
 #endif
 	AM_RANGE(0xa40000, 0xa4000f) AM_DEVREADWRITE("ata", ata_interface_device, read_cs1, write_cs1) /* IDE status control reg */
-	AM_RANGE(0xc00000, 0xcbffff) AM_READWRITE(sndram_r,sndram_w)                                /* sound ram */
+	AM_RANGE(0xc00000, 0xcbffff) AM_READWRITE(pcmram_r,pcmram_w)                                /* sound ram */
 ADDRESS_MAP_END
 
+
+static ADDRESS_MAP_START( k054539_map, AS_0, 8, qdrmfgp_state )
+	AM_RANGE(0x000000, 0x0fffff) AM_ROM AM_REGION("k054539", 0)
+	AM_RANGE(0x100000, 0x4fffff) AM_RAM AM_SHARE("pcmram")
+ADDRESS_MAP_END
 
 /*************************************
  *
@@ -562,8 +567,6 @@ MACHINE_START_MEMBER(qdrmfgp_state,qdrmfgp2)
 
 void qdrmfgp_state::machine_reset()
 {
-	m_sndram = memregion("k054539")->base() + 0x100000;
-
 	/* reset the IDE controller */
 	m_gp2_irq_control = 0;
 }
@@ -613,6 +616,7 @@ MACHINE_CONFIG_START(qdrmfgp_state::qdrmfgp)
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MCFG_DEVICE_ADD("k054539", K054539, XTAL_18_432MHz)
+	MCFG_DEVICE_ADDRESS_MAP(AS_0, k054539_map)
 	MCFG_K054539_TIMER_HANDLER(WRITELINE(qdrmfgp_state, k054539_irq1_gen))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
@@ -657,6 +661,7 @@ MACHINE_CONFIG_START(qdrmfgp_state::qdrmfgp2)
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MCFG_DEVICE_ADD("k054539", K054539, XTAL_18_432MHz)
+	MCFG_DEVICE_ADDRESS_MAP(AS_0, k054539_map)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
@@ -677,7 +682,7 @@ ROM_START( qdrmfgp )
 	ROM_LOAD( "gq_460_a01.15e", 0x000000, 0x80000, CRC(6536b700) SHA1(47ffe0cfbf80810179560150b23d825fe1a5c5ca) )
 	ROM_LOAD( "gq_460_a02.17e", 0x080000, 0x80000, CRC(ac01d675) SHA1(bf66433ace95f4ef14699d03add7cbc2e5d90eea) )
 
-	ROM_REGION( 0x460000, "k054539", 0)      /* SE SAMPLES + space for additional RAM */
+	ROM_REGION( 0x100000, "k054539", 0)      /* SE SAMPLES + space for additional RAM */
 	ROM_LOAD( "gq_460_a07.14h", 0x000000, 0x80000, CRC(67d8ea6b) SHA1(11af1b5a33de2a6e24823964d210bef193ecefe4) )
 	ROM_LOAD( "gq_460_a06.12h", 0x080000, 0x80000, CRC(97ed5a77) SHA1(68600fd8d914451284cf181fb4bd5872860fb9ad) )
 
@@ -694,7 +699,7 @@ ROM_START( qdrmfgp2 )
 	ROM_LOAD( "ge_557_a01.13e", 0x000000, 0x80000, CRC(c301d406) SHA1(5fad8cc611edd83380972abf37ec80561b9317a6) )
 	ROM_LOAD( "ge_557_a02.15e", 0x080000, 0x80000, CRC(3bfe1e56) SHA1(9e4df512a804a96fcb545d4e0eb58b5421d65ea4) )
 
-	ROM_REGION( 0x460000, "k054539", 0)      /* SE SAMPLES + space for additional RAM */
+	ROM_REGION( 0x100000, "k054539", 0)      /* SE SAMPLES + space for additional RAM */
 	ROM_LOAD( "ge_557_a07.19h", 0x000000, 0x80000, CRC(7491e0c8) SHA1(6459ab5e7af052ef7a1c4ce01cd844c0f4319f2e) )
 	ROM_LOAD( "ge_557_a08.19k", 0x080000, 0x80000, CRC(3da2b20c) SHA1(fdc2cdc27f3299f541944a78ce36ed33a7926056) )
 

@@ -22,7 +22,8 @@ public:
 		m_ata(*this, "ata"),
 		m_inputs_port(*this, "INPUTS"),
 		m_dsw_port(*this, "DSW"),
-		m_palette(*this, "palette")
+		m_palette(*this, "palette"),
+		m_pcmram(*this, "pcmram")
 	{
 	}
 
@@ -36,8 +37,8 @@ public:
 	required_ioport m_inputs_port;
 	required_ioport m_dsw_port;
 	required_device<palette_device> m_palette;
+	required_shared_ptr<uint8_t> m_pcmram;
 
-	uint8_t *m_sndram;
 	uint16_t m_control;
 	int32_t m_gp2_irq_control;
 	int32_t m_pal;
@@ -50,8 +51,8 @@ public:
 	DECLARE_READ16_MEMBER(gp2_vram_mirror_r);
 	DECLARE_WRITE16_MEMBER(gp2_vram_w);
 	DECLARE_WRITE16_MEMBER(gp2_vram_mirror_w);
-	DECLARE_READ16_MEMBER(sndram_r);
-	DECLARE_WRITE16_MEMBER(sndram_w);
+	DECLARE_READ16_MEMBER(pcmram_r);
+	DECLARE_WRITE16_MEMBER(pcmram_w);
 	DECLARE_READ16_MEMBER(gp2_ide_std_r);
 	DECLARE_READ16_MEMBER(inputs_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(battery_sensor_r);

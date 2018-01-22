@@ -11,6 +11,7 @@ public:
 	djmain_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_obj_ram(*this, "obj_ram"),
+		m_pcmram(*this, "pcmram"),
 		m_maincpu(*this, "maincpu"),
 		m_k056832(*this, "k056832"),
 		m_k055555(*this, "k055555"),
@@ -21,8 +22,7 @@ public:
 	{
 	}
 
-	int m_sndram_bank;
-	uint8_t *m_sndram;
+	int m_pcmram_bank;
 	int m_turntable_select;
 	uint8_t m_turntable_last_pos[2];
 	uint16_t m_turntable_pos[2];
@@ -32,9 +32,10 @@ public:
 	const uint8_t *m_ata_user_password;
 	const uint8_t *m_ata_master_password;
 	required_shared_ptr<uint32_t> m_obj_ram;
-	DECLARE_WRITE32_MEMBER(sndram_bank_w);
-	DECLARE_READ32_MEMBER(sndram_r);
-	DECLARE_WRITE32_MEMBER(sndram_w);
+	required_shared_ptr<uint32_t> m_pcmram;
+	DECLARE_WRITE32_MEMBER(pcmram_bank_w);
+	DECLARE_READ32_MEMBER(pcmram_r);
+	DECLARE_WRITE32_MEMBER(pcmram_w);
 	DECLARE_READ32_MEMBER(obj_ctrl_r);
 	DECLARE_WRITE32_MEMBER(obj_ctrl_w);
 	DECLARE_READ32_MEMBER(obj_rom_r);
@@ -67,7 +68,7 @@ public:
 	uint32_t screen_update_djmain(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(vb_interrupt);
 	DECLARE_WRITE_LINE_MEMBER(ide_interrupt);
-	void sndram_set_bank();
+	void pcmram_set_bank();
 	void draw_sprites( bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<k056832_device> m_k056832;
