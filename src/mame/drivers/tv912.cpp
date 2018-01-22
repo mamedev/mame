@@ -71,6 +71,7 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_crtc(*this, "crtc")
 		, m_uart(*this, "uart")
+		, m_rs232(*this, "rs232")
 		, m_bankdev(*this, "bankdev")
 		, m_beep(*this, "beep")
 		, m_dispram_bank(*this, "dispram")
@@ -84,6 +85,7 @@ public:
 		, m_half_duplex(*this, "HALFDUP")
 		, m_jumpers(*this, "JUMPERS")
 		, m_option(*this, "OPTION")
+		, m_dtr(*this, "DTR")
 		, m_baudgen_timer(nullptr)
 	{ }
 
@@ -117,6 +119,7 @@ private:
 	required_device<cpu_device> m_maincpu;
 	required_device<tms9927_device> m_crtc;
 	required_device<ay51013_device> m_uart;
+	required_device<rs232_port_device> m_rs232;
 	required_device<address_map_bank_device> m_bankdev;
 	required_device<beep_device> m_beep;
 	required_memory_bank m_dispram_bank;
@@ -130,6 +133,7 @@ private:
 	required_ioport m_half_duplex;
 	required_ioport m_jumpers;
 	required_ioport m_option;
+	required_ioport m_dtr;
 
 	emu_timer *m_baudgen_timer;
 
@@ -146,13 +150,20 @@ WRITE8_MEMBER(tv912_state::p1_w)
 
 READ8_MEMBER(tv912_state::p2_r)
 {
+	ioport_value dup = m_half_duplex->read();
+
 	// P27: -HALF DUPLEX
-	u8 result = m_half_duplex->read() << 7;
+	u8 result = BIT(dup, 0) << 7;
 
 	// P26: -PTR RDY
-	// P25: -DCR
 
-	return result | 0x7f;
+	// P25: -DCR
+	if (!BIT(dup, 1))
+		result |= m_rs232->dsr_r() << 5;
+	if (!BIT(dup, 2))
+		result |= m_rs232->dcd_r() << 5;
+
+	return result | 0x5f;
 }
 
 WRITE8_MEMBER(tv912_state::p2_w)
@@ -224,7 +235,14 @@ WRITE8_MEMBER(tv912_state::output_40c)
 	m_lpt_select = BIT(data, 4);
 
 	// Bit 3: -BREAK
+
 	// Bit 2: -RQS
+	ioport_value dtr = m_dtr->read();
+	m_rs232->write_rts(BIT(data, 2));
+	if (!BIT(dtr, 0))
+		m_rs232->write_dtr(BIT(data, 2));
+	if (!BIT(dtr, 1))
+		m_rs232->write_dtr(0);
 
 	// Bit 1: +BEEP
 	m_beep->set_state(BIT(data, 1));
@@ -280,10 +298,8 @@ u32 tv912_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, cons
 					? dispram[(row << 6) | pos]
 					: dispram[0x600 | ((row & 0x07) << 6) | ((row & 0x18) << 1) | (pos & 0x0f)];
 
-#ifdef CHARSET_TEST
-			if (pos >= 32 && pos < 64)
+			if (CHARSET_TEST && pos >= 32 && pos < 64)
 				ch = (pos & 0x1f) | (row & 7) << 5;
-#endif
 
 			u8 data = (ra > 0 && ra < 9) ? charbase[(ch & 0x7f) << 3] : 0;
 			u8 dots = data >> 2;
@@ -430,9 +446,12 @@ static INPUT_PORTS_START( switches )
 	PORT_DIPNAME(0x01, 0x01, "Conversation Mode") PORT_DIPLOCATION("S2:3")
 	PORT_DIPSETTING(0x00, "Half Duplex")
 	PORT_DIPSETTING(0x01, "Full Duplex")
+	PORT_DIPNAME(0x06, 0x04, "DCR (RS232)") PORT_DIPLOCATION("S5:1,2")
+	PORT_DIPSETTING(0x04, "DSR") // at P3-6
+	PORT_DIPSETTING(0x02, "DCD") // at P3-8
 
 	PORT_START("JUMPERS")
-	PORT_DIPNAME(0x08, 0x08, "Automatic CRLF") PORT_DIPLOCATION("S4:1") // or jumper W31
+	PORT_DIPNAME(0x08, 0x00, "Automatic CRLF") PORT_DIPLOCATION("S4:1") // or jumper W31
 	PORT_DIPSETTING(0x08, DEF_STR(Off))
 	PORT_DIPSETTING(0x00, DEF_STR(On))
 	PORT_DIPNAME(0x04, 0x04, "End of Send Character") PORT_DIPLOCATION("S4:2") // or jumper W32
@@ -449,6 +468,11 @@ static INPUT_PORTS_START( switches )
 	PORT_DIPUNKNOWN_DIPLOC(0x20, 0x20, "S4:5")
 	PORT_DIPUNKNOWN_DIPLOC(0x40, 0x40, "S4:6")
 	PORT_DIPUNKNOWN_DIPLOC(0x80, 0x80, "S4:7")
+
+	PORT_START("DTR")
+	PORT_DIPNAME(0x03, 0x02, "DTR (RS232)") PORT_DIPLOCATION("S5:3,4")
+	PORT_DIPSETTING(0x02, "Tied to RTS")
+	PORT_DIPSETTING(0x01, "Pulled to +12V")
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( tv912b )
@@ -873,7 +897,7 @@ MACHINE_CONFIG_START(tv912_state::tv912)
 	MCFG_AY51013_READ_SI_CB(DEVREADLINE("rs232", rs232_port_device, rxd_r))
 	MCFG_AY51013_WRITE_SO_CB(DEVWRITELINE("rs232", rs232_port_device, write_txd))
 
-	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, nullptr)
+	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, "loopback")
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("beep", BEEP, XTAL_23_814MHz / 7 / 11 / 256) // nominally 1200 Hz
